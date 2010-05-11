@@ -65,6 +65,55 @@ EFI_PEI_SERVICES  gPs = {
 };
 
 /**
+  Shadow PeiCore module from flash to installed memory.
+  
+  @param PrivateData    PeiCore's private data structure
+
+  @return PeiCore function address after shadowing.
+**/
+PEICORE_FUNCTION_POINTER
+ShadowPeiCore (
+  IN PEI_CORE_INSTANCE  *PrivateData
+  )
+{
+  EFI_PEI_FILE_HANDLE  PeiCoreFileHandle;
+  EFI_PHYSICAL_ADDRESS EntryPoint;
+  EFI_STATUS           Status;
+  UINT32               AuthenticationState;
+
+  PeiCoreFileHandle = NULL;
+
+  //
+  // Find the PEI Core in the BFV
+  //
+  Status = PrivateData->Fv[0].FvPpi->FindFileByType (
+                                       PrivateData->Fv[0].FvPpi,
+                                       EFI_FV_FILETYPE_PEI_CORE,
+                                       PrivateData->Fv[0].FvHandle,
+                                       &PeiCoreFileHandle
+                                       );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Shadow PEI Core into memory so it will run faster
+  //
+  Status = PeiLoadImage (
+              GetPeiServicesTablePointer (),
+              *((EFI_PEI_FILE_HANDLE*)&PeiCoreFileHandle),
+              PEIM_STATE_REGISITER_FOR_SHADOW,
+              &EntryPoint,
+              &AuthenticationState
+              );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Compute the PeiCore's function address after shaowed PeiCore.
+  // _ModuleEntryPoint is PeiCore main function entry
+  //
+  return (PEICORE_FUNCTION_POINTER)((UINTN) EntryPoint + (UINTN) PeiCore - (UINTN) _ModuleEntryPoint);
+}
+
+/**
   This routine is invoked by main entry of PeiMain module during transition
   from SEC to PEI. After switching stack in the PEI core, it will restart
   with the old core data.
@@ -91,17 +140,17 @@ PeiCore (
   IN VOID                              *Data
   )
 {
-  PEI_CORE_INSTANCE                                     PrivateData;
-  EFI_STATUS                                            Status;
-  PEI_CORE_TEMP_POINTERS                                TempPtr;
-  UINT64                                                Tick;
-  PEI_CORE_INSTANCE                                     *OldCoreData;
-  EFI_PEI_CPU_IO_PPI                                    *CpuIo;
-  EFI_PEI_PCI_CFG2_PPI                                  *PciCfg;
-  PEICORE_FUNCTION_POINTER                              ShadowedPeiCore;
+  PEI_CORE_INSTANCE           PrivateData;
+  EFI_STATUS                  Status;
+  PEI_CORE_TEMP_POINTERS      TempPtr;
+  UINT64                      Tick;
+  PEI_CORE_INSTANCE           *OldCoreData;
+  EFI_PEI_CPU_IO_PPI          *CpuIo;
+  EFI_PEI_PCI_CFG2_PPI        *PciCfg;
+  EFI_HOB_HANDOFF_INFO_TABLE  *HandoffInformationTable;
 
   Tick = 0;
-  OldCoreData = (PEI_CORE_INSTANCE *) Data;
+  OldCoreData = (PEI_CORE_INSTANCE *)Data;
 
   //
   // Record the system tick for first entering PeiCore.
@@ -114,22 +163,82 @@ PeiCore (
   }
 
   if (OldCoreData != NULL) {
-    ShadowedPeiCore = (PEICORE_FUNCTION_POINTER) (UINTN) OldCoreData->ShadowedPeiCore;
-    
-    //
-    // PeiCore has been shadowed to memory for first entering, so
-    // just jump to PeiCore in memory here.
-    //
-    if (ShadowedPeiCore != NULL) {
-      OldCoreData->ShadowedPeiCore = NULL;
-      ShadowedPeiCore (
-        SecCoreData,
-        PpiList,
-        OldCoreData
-        );
+    if (OldCoreData->ShadowedPeiCore == NULL) {
+      //
+      //
+      // Fixup the PeiCore's private data
+      //
+      OldCoreData->Ps          = &OldCoreData->ServiceTableShadow;
+      OldCoreData->CpuIo       = &OldCoreData->ServiceTableShadow.CpuIo;
+      if (OldCoreData->HeapOffsetPositive) {
+        OldCoreData->HobList.Raw = (VOID *)(OldCoreData->HobList.Raw + OldCoreData->HeapOffset);
+      } else {
+        OldCoreData->HobList.Raw = (VOID *)(OldCoreData->HobList.Raw - OldCoreData->HeapOffset);
+      }
+
+      //
+      // Fixup for PeiService's address
+      //
+      SetPeiServicesTablePointer ((CONST EFI_PEI_SERVICES **)&OldCoreData->Ps);
+
+      //
+      // Update HandOffHob for new installed permenent memory
+      //
+      HandoffInformationTable = OldCoreData->HobList.HandoffInformationTable;
+      if (OldCoreData->HeapOffsetPositive) {
+        HandoffInformationTable->EfiEndOfHobList   = HandoffInformationTable->EfiEndOfHobList + OldCoreData->HeapOffset;
+      } else {
+        HandoffInformationTable->EfiEndOfHobList   = HandoffInformationTable->EfiEndOfHobList - OldCoreData->HeapOffset;
+      }
+      HandoffInformationTable->EfiMemoryTop        = OldCoreData->PhysicalMemoryBegin + OldCoreData->PhysicalMemoryLength;
+      HandoffInformationTable->EfiMemoryBottom     = OldCoreData->PhysicalMemoryBegin;
+      HandoffInformationTable->EfiFreeMemoryTop    = OldCoreData->FreePhysicalMemoryTop;
+      HandoffInformationTable->EfiFreeMemoryBottom = HandoffInformationTable->EfiEndOfHobList + sizeof (EFI_HOB_GENERIC_HEADER);
+
+      //
+      // We need convert the PPI desciptor's pointer
+      //
+      ConvertPpiPointers (OldCoreData, (UINTN)SecCoreData->TemporaryRamBase, (UINTN)SecCoreData->TemporaryRamBase + SecCoreData->TemporaryRamSize, OldCoreData->HeapOffset, OldCoreData->HeapOffsetPositive);
+
+      //
+      // After the whole temporary memory is migrated, then we can allocate page in
+      // permenent memory.
+      //
+      OldCoreData->PeiMemoryInstalled = TRUE;
+
+      //
+      // Indicate that PeiCore reenter
+      //
+      OldCoreData->PeimDispatcherReenter = TRUE;
+      
+      if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0 && (OldCoreData->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
+        //
+        // if Loading Module at Fixed Address is enabled, allocate the PEI code memory range usage bit map array.
+        // Every bit in the array indicate the status of the corresponding memory page available or not
+        //
+        OldCoreData->PeiCodeMemoryRangeUsageBitMap = AllocateZeroPool (((PcdGet32(PcdLoadFixAddressPeiCodePageNumber)>>6) + 1)*sizeof(UINT64));
+      }
+
+      //
+      // Process the Notify list and dispatch any notifies for
+      // newly installed PPIs.
+      //
+      ProcessNotifyList (OldCoreData);
+
+      //
+      // Shadow PEI Core. When permanent memory is avaiable, shadow
+      // PEI Core and PEIMs to get high performance.
+      //
+      OldCoreData->ShadowedPeiCore = ShadowPeiCore (OldCoreData);
+      
+      //
+      // PeiCore has been shadowed to memory for first entering, so
+      // just jump to PeiCore in memory here.
+      //
+      OldCoreData->ShadowedPeiCore (SecCoreData, PpiList, OldCoreData);
     }
 
-    CopyMem (&PrivateData, OldCoreData, sizeof (PEI_CORE_INSTANCE));
+    CopyMem (&PrivateData, OldCoreData, sizeof (PrivateData));
     
     CpuIo = (VOID*)PrivateData.ServiceTableShadow.CpuIo;
     PciCfg = (VOID*)PrivateData.ServiceTableShadow.PciCfg;

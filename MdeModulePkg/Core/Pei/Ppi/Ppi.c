@@ -47,6 +47,8 @@ InitializePpiServices (
                              will be fixup for PpiData and PpiDescriptor.
   @param Fixup               The address difference between
                              the new Hob list and old Hob list.
+  @param FixupPositive       TRUE if new Hob list is above the old Hob list.  
+                             Otherwise FALSE.
 
 **/
 VOID
@@ -54,7 +56,8 @@ ConvertPpiPointers (
   IN PEI_CORE_INSTANCE       *PrivateData,
   IN UINTN                   OldCheckingBottom,
   IN UINTN                   OldCheckingTop,
-  IN INTN                    Fixup
+  IN UINTN                   Fixup,
+  IN BOOLEAN                 FixupPositive
   )
 {
   UINT8                 Index;
@@ -71,7 +74,11 @@ ConvertPpiPointers (
         // Convert the pointer to the PEIM descriptor from the old HOB heap
         // to the relocated HOB heap.
         //
-        PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw + Fixup);
+        if (FixupPositive) {
+          PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw + Fixup);
+        } else {
+          PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw - Fixup);
+        }
 
         //
         // Only when the PEIM descriptor is in the old HOB should it be necessary
@@ -84,7 +91,11 @@ ConvertPpiPointers (
           // Convert the pointer to the GUID in the PPI or NOTIFY descriptor
           // from the old HOB heap to the relocated HOB heap.
           //
-          PpiPointer->Ppi->Guid = (VOID *) ((UINTN)PpiPointer->Ppi->Guid + Fixup);
+          if (FixupPositive) {
+            PpiPointer->Ppi->Guid = (VOID *) ((UINTN)PpiPointer->Ppi->Guid + Fixup);
+          } else {
+            PpiPointer->Ppi->Guid = (VOID *) ((UINTN)PpiPointer->Ppi->Guid - Fixup);
+          }
         }
 
         //
@@ -98,7 +109,11 @@ ConvertPpiPointers (
             // Convert the pointer to the PPI interface structure in the PPI descriptor
             // from the old HOB heap to the relocated HOB heap.
             //
-            PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi+ Fixup);
+            if (FixupPositive) {
+              PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi + Fixup);
+            } else {
+              PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi - Fixup);
+            }
         }
       }
     }

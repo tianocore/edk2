@@ -128,13 +128,39 @@ typedef struct {
   UINTN                               SectionIndex;
 } CACHE_SECTION_DATA;
 
+///
+/// Forward declaration for PEI_CORE_INSTANCE
+///
+typedef struct _PEI_CORE_INSTANCE  PEI_CORE_INSTANCE;
+
+
+/**
+  Function Pointer type for PeiCore function.
+  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
+                         and location of temporary RAM, the stack location and the BFV location.
+  @param PpiList         Points to a list of one or more PPI descriptors to be installed initially by the PEI core.
+                         An empty PPI list consists of a single descriptor with the end-tag
+                         EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST. As part of its initialization
+                         phase, the PEI Foundation will add these SEC-hosted PPIs to its PPI database such
+                         that both the PEI Foundation and any modules can leverage the associated service
+                         calls and/or code in these early PPIs
+  @param OldCoreData     Pointer to old core data that is used to initialize the
+                         core's data areas.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *PEICORE_FUNCTION_POINTER)(
+  IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
+  IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList,
+  IN PEI_CORE_INSTANCE              *OldCoreData
+  );
 
 #define PEI_CORE_HANDLE_SIGNATURE  SIGNATURE_32('P','e','i','C')
 
 ///
 /// Pei Core private data structure instance
 ///
-typedef struct{
+struct _PEI_CORE_INSTANCE {
   UINTN                              Signature;
   
   ///
@@ -166,8 +192,6 @@ typedef struct{
   EFI_PEI_HOB_POINTERS               HobList;
   BOOLEAN                            SwitchStackSignal;
   BOOLEAN                            PeiMemoryInstalled;
-  EFI_PHYSICAL_ADDRESS               StackBase;
-  UINT64                             StackSize;
   VOID                               *CpuIo;
   EFI_PEI_SECURITY2_PPI              *PrivateSecurityPpi;
   EFI_PEI_SERVICES                   ServiceTableShadow;
@@ -175,7 +199,9 @@ typedef struct{
   EFI_PHYSICAL_ADDRESS               PhysicalMemoryBegin;
   UINT64                             PhysicalMemoryLength;
   EFI_PHYSICAL_ADDRESS               FreePhysicalMemoryTop;
-  VOID*                              ShadowedPeiCore;
+  UINTN                              HeapOffset;
+  BOOLEAN                            HeapOffsetPositive;
+  PEICORE_FUNCTION_POINTER           ShadowedPeiCore;
   CACHE_SECTION_DATA                 CacheSection;
   //
   // For Loading modules at fixed address feature to cache the top address below which the 
@@ -193,34 +219,13 @@ typedef struct{
   // This field points to the shadowed image read function
   //
   PE_COFF_LOADER_READ_FILE          ShadowedImageRead;
-} PEI_CORE_INSTANCE;
+};
 
 ///
 /// Pei Core Instance Data Macros
 ///
 #define PEI_CORE_INSTANCE_FROM_PS_THIS(a) \
   CR(a, PEI_CORE_INSTANCE, Ps, PEI_CORE_HANDLE_SIGNATURE)
-
-/**
-  Function Pointer type for PeiCore function.
-  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
-                         and location of temporary RAM, the stack location and the BFV location.
-  @param PpiList         Points to a list of one or more PPI descriptors to be installed initially by the PEI core.
-                         An empty PPI list consists of a single descriptor with the end-tag
-                         EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST. As part of its initialization
-                         phase, the PEI Foundation will add these SEC-hosted PPIs to its PPI database such
-                         that both the PEI Foundation and any modules can leverage the associated service
-                         calls and/or code in these early PPIs
-  @param OldCoreData     Pointer to old core data that is used to initialize the
-                         core's data areas.
-**/
-typedef
-EFI_STATUS
-(EFIAPI *PEICORE_FUNCTION_POINTER)(
-  IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
-  IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList,
-  IN PEI_CORE_INSTANCE              *OldCoreData
-  );
 
 ///
 /// Union of temporarily used function pointers (to save stack space)
@@ -380,6 +385,8 @@ InitializePpiServices (
                              will be fixup for PpiData and PpiDescriptor.
   @param Fixup               The address difference between
                              the new Hob list and old Hob list.
+  @param FixupPositive       TRUE if new Hob list is above the old Hob list.  
+                             Otherwise FALSE.
 
 **/
 VOID
@@ -387,7 +394,8 @@ ConvertPpiPointers (
   IN PEI_CORE_INSTANCE       *PrivateData,
   IN UINTN                   OldCheckingBottom,
   IN UINTN                   OldCheckingTop,
-  IN INTN                    Fixup
+  IN UINTN                   Fixup,
+  IN BOOLEAN                 FixupPositive
   );
 
 /**
