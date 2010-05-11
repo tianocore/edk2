@@ -99,6 +99,7 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedIoEnable
   gEmbeddedTokenSpaceGuid.PcdEmbeddedScriptCmd
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPciDebugCmd
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedProbeRemovable
 
 [FixedPcd.common]
   gEmbeddedTokenSpaceGuid.PcdEmbeddedAutomaticBootCommand

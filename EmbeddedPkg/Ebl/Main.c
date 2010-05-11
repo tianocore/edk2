@@ -456,6 +456,45 @@ EblPrintStartupBanner (
 
 
 /**
+  Send null requests to all removable media block IO devices so the a media add/remove/change
+  can be detected in real before we execute a command. 
+
+  This is mainly due to the fact that the FAT driver does not do this today so you can get stale 
+  dir commands after an SD Card has been removed.
+**/
+VOID
+EblProbeRemovableMedia (
+  VOID
+  )
+{
+  UINTN         Index;
+  UINTN         Max;
+  EFI_OPEN_FILE *File;
+
+  //
+  // Probe for media insertion/removal in removable media devices
+  //
+  Max = EfiGetDeviceCounts (EfiOpenBlockIo);
+  if (Max != 0) {
+    for (Index = 0; Index < Max; Index++) {
+      File = EfiDeviceOpenByType (EfiOpenBlockIo, Index);
+      if (File != NULL) {
+        if (File->FsBlockIoMedia->RemovableMedia) {
+          // Probe to see if media is present (or not) or media changed
+          //  this causes the ReinstallProtocolInterface() to fire in the
+          //  block io driver to update the system about media change events
+          File->FsBlockIo->ReadBlocks (File->FsBlockIo, File->FsBlockIo->Media->MediaId, (EFI_LBA)0, 0, NULL);
+        }
+        EfiClose (File);
+      }
+    }
+  }
+}
+
+
+
+
+/**
   Print the prompt for the EBL.
 **/
 VOID
@@ -611,6 +650,11 @@ EdkBootLoaderEntry (
     EblPrompt ();
     GetCmd (CmdLine, MAX_CMD_LINE);
     SetCmdHistory (CmdLine);
+
+    if (FeaturePcdGet (PcdEmbeddedProbeRemovable)) {
+      // Probe removable media devices to see if media has been inserted or removed.
+      EblProbeRemovableMedia ();
+    }
   }
 }
 

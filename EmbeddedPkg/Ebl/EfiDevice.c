@@ -210,34 +210,13 @@ EblDeviceCmd (
   UINTN         Index;
   UINTN         CurrentRow;
   UINTN         Max;
-  EFI_OPEN_FILE *File;
 
   CurrentRow = 0;
 
   // Need to call here to make sure Device Counts are valid
   EblUpdateDeviceLists ();
 
-  //
-  // Probe for media insertion/removal in removable media devices
-  //
-  Max = EfiGetDeviceCounts (EfiOpenBlockIo);
-  if (Max != 0) {
-    for (Index = 0; Index < Max; Index++) {
-      File = EfiDeviceOpenByType (EfiOpenBlockIo, Index);
-      if (File != NULL) {
-        if (File->FsBlockIoMedia->RemovableMedia) {
-          // Probe to see if media is present (or not) or media changed
-          //  this causes the ReinstallProtocolInterface() to fire in the
-          //  block io driver to update the system about media change events
-          File->FsBlockIo->ReadBlocks (File->FsBlockIo, File->FsBlockIo->Media->MediaId, (EFI_LBA)0, 0, NULL);
-        }
-        EfiClose (File);
-      }
-    }
-  }
-
   // Now we can print out the info...
-
   Max = EfiGetDeviceCounts (EfiOpenFirmwareVolume);
   if (Max != 0) {
     AsciiPrint ("Firmware Volume Devices:\n");

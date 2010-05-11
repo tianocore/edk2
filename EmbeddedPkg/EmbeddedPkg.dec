@@ -65,6 +65,8 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedIoEnable|FALSE|BOOLEAN|0x00000005
   gEmbeddedTokenSpaceGuid.PcdEmbeddedScriptCmd|FALSE|BOOLEAN|0x00000006
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPciDebugCmd|FALSE|BOOLEAN|0x00000041
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedProbeRemovable|TRUE|BOOLEAN|0x00000050
+  
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE|BOOLEAN|0x0000001b
   gEmbeddedTokenSpaceGuid.PcdCacheEnable|FALSE|BOOLEAN|0x00000042
   gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x0000004d
@@ -74,7 +76,7 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedAutomaticBootCommand|L""|VOID*|0x00000007
   gEmbeddedTokenSpaceGuid.PcdEmbeddedDefaultTextColor|0x07|UINT32|0x00000008
   gEmbeddedTokenSpaceGuid.PcdEmbeddedMemVariableStoreSize|0x10000|UINT32|0x00000009
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"Ebl"|VOID*|0x00000034
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"Ebl %a"|VOID*|0x00000034
 
   gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|131072|UINT32|0x00000040
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0|UINT32|0x0000000b
