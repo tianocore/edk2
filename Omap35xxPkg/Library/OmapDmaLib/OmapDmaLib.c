@@ -125,11 +125,17 @@ EnableDmaChannel (
 
   /* - Set the destination frame index CDFI[31:0]*/
   MmioWrite32 (DMA4_CDFI (Channel), DMA4->DestinationFrameIndex);
-  
+ 
+  MmioWrite32 (DMA4_CDFI (Channel), DMA4->DestinationFrameIndex);
+
+  // Enable all the status bits since we are polling
+  MmioWrite32 (DMA4_CICR (Channel), DMA4_CICR_ENABLE_ALL);
+  MmioWrite32 (DMA4_CSR (Channel),  DMA4_CSR_RESET);
+
   /* 2) Start the DMA transfer by Setting the enable bit CCR[7]=1 */
   /*--------------------------------------------------------------*/
   //write enable bit
-  MmioOr32 (DMA4_CCR(0), DMA4_CCR_ENABLE); //Launch transfer
+  MmioOr32 (DMA4_CCR(Channel), DMA4_CCR_ENABLE); //Launch transfer
 
   return EFI_SUCCESS;
 }
@@ -138,6 +144,8 @@ EnableDmaChannel (
   Turn of DMA channel configured by EnableDma().
             
   @param  Channel               DMA Channel to configure
+  @param  SuccesMask            Bits in DMA4_CSR register indicate EFI_SUCCESS
+  @param  ErrorMask             Bits in DMA4_CSR register indicate EFI_DEVICE_ERROR
                                   
   @retval EFI_SUCCESS           DMA hardware disabled
   @retval EFI_INVALID_PARAMETER Channel is not valid
@@ -147,16 +155,38 @@ EnableDmaChannel (
 EFI_STATUS
 EFIAPI
 DisableDmaChannel (
-  IN  UINTN       Channel
+  IN  UINTN       Channel,
+  IN  UINT32      SuccessMask,
+  IN  UINT32      ErrorMask
   )
 {
+  EFI_STATUS  Status = EFI_SUCCESS;
+  UINT32      Reg;
+
+
   if (Channel > DMA4_MAX_CHANNEL) {
     return EFI_INVALID_PARAMETER;
   }
 
+  do {
+    Reg = MmioRead32 (DMA4_CSR(Channel));
+    if ((Reg & ErrorMask) != 0) {
+      Status = EFI_DEVICE_ERROR;
+      DEBUG ((EFI_D_ERROR, "DMA Error (%d) %x\n", Channel, Reg));
+      break;
+    }
+  } while ((Reg & SuccessMask) != SuccessMask);
+
+
+  // Disable all status bits and clear them
+  MmioWrite32 (DMA4_CICR (Channel), 0);
+  MmioWrite32 (DMA4_CSR (Channel),  DMA4_CSR_RESET);
+
   MmioAnd32 (DMA4_CCR(0), ~(DMA4_CCR_ENABLE | DMA4_CCR_RD_ACTIVE | DMA4_CCR_WR_ACTIVE)); 
-  return EFI_SUCCESS;
+  return Status;
 }
+
+
 
 /**                                                                 
   Provides the DMA controller-specific addresses needed to access system memory.

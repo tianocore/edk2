@@ -22,6 +22,7 @@
 
 #define DMA4_CCR(_i)  (0x48056080 + (0x60*(_i)))
 #define DMA4_CICR(_i) (0x48056088 + (0x60*(_i)))
+#define DMA4_CSR(_i)  (0x4805608c + (0x60*(_i)))
 #define DMA4_CSDP(_i) (0x48056090 + (0x60*(_i)))
 #define DMA4_CEN(_i)  (0x48056094 + (0x60*(_i)))
 #define DMA4_CFN(_i)  (0x48056098 + (0x60*(_i)))
@@ -105,6 +106,25 @@
 #define DMA4_CCR_TRANSPARENT_COPY_ENABLE  BIT17
   
 #define DMA4_CCR_SEL_SRC_DEST_SYNC_SOURCE BIT24
+
+#define DMA4_CSR_DROP                     BIT1
+#define DMA4_CSR_HALF                     BIT2
+#define DMA4_CSR_FRAME                    BIT3
+#define DMA4_CSR_LAST                     BIT4
+#define DMA4_CSR_BLOCK                    BIT5
+#define DMA4_CSR_SYNC                     BIT6
+#define DMA4_CSR_PKT                      BIT7
+#define DMA4_CSR_TRANS_ERR                BIT8
+#define DMA4_CSR_SECURE_ERR               BIT9
+#define DMA4_CSR_SUPERVISOR_ERR           BIT10
+#define DMA4_CSR_MISALIGNED_ADRS_ERR      BIT11
+#define DMA4_CSR_DRAIN_END                BIT12
+#define DMA4_CSR_RESET                    0x1FE
+#define DMA4_CSR_ERR                      (DMA4_CSR_TRANS_ERR | DMA4_CSR_SECURE_ERR | DMA4_CSR_SUPERVISOR_ERR | DMA4_CSR_MISALIGNED_ADRS_ERR)
+
+// same mapping as CSR except for SYNC. Enable all since we are polling
+#define DMA4_CICR_ENABLE_ALL              0x1FBE
+
 
 #endif 
 

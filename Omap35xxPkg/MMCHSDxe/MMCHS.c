@@ -740,7 +740,7 @@ DmaBlocks (
   )
 {
   EFI_STATUS            Status;
-  UINTN                 RetryCount = 0;
+  UINTN                 DmaSize = 0;
   UINTN                 Cmd = 0;
   UINTN                 CmdInterruptEnable;
   UINTN                 CmdArgument;
@@ -749,66 +749,73 @@ DmaBlocks (
   OMAP_DMA4             Dma4;
   DMA_MAP_OPERATION     DmaOperation;
 
+CpuDeadLoop ();
+  // Map passed in buffer for DMA xfer
+  DmaSize = BlockCount * This->Media->BlockSize;
+  Status = DmaMap (DmaOperation, Buffer, &DmaSize, &BufferAddress, &BufferMap);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  ZeroMem (&DmaOperation, sizeof (DMA_MAP_OPERATION));
+  
+  Dma4.DataType = 2;                      // DMA4_CSDPi[1:0]   32-bit elements from MMCHS_DATA
+  Dma4.SourceEndiansim = 0;               // DMA4_CSDPi[21]    
+  Dma4.DestinationEndianism = 0;          // DMA4_CSDPi[19]
+  Dma4.SourcePacked = 0;                  // DMA4_CSDPi[6]
+  Dma4.DestinationPacked = 0;             // DMA4_CSDPi[13]
+  Dma4.NumberOfElementPerFrame = This->Media->BlockSize/4; // DMA4_CENi  (TRM 4K is optimum value)  
+  Dma4.NumberOfFramePerTransferBlock = BlockCount;         // DMA4_CFNi    
+  Dma4.ReadPriority = 0;                  // DMA4_CCRi[6]      Low priority read  
+  Dma4.WritePriority = 0;                 // DMA4_CCRi[23]     Prefetech disabled
 
   //Populate the command information based on the operation type.
   if (OperationType == READ) {
     Cmd = CMD18; //Multiple block read
     CmdInterruptEnable = CMD18_INT_EN;
     DmaOperation = MapOperationBusMasterCommonBuffer;
+
+    Dma4.ReadPortAccessType =0 ;            // DMA4_CSDPi[8:7]   Can not burst MMCHS_DATA reg
+    Dma4.WritePortAccessType = 3;           // DMA4_CSDPi[15:14] Memory burst 16x32
+    Dma4.WriteMode = 1;                     // DMA4_CSDPi[17:16] Write posted
+    
+    Dma4.SourceStartAddress = MMCHS_DATA;                   // DMA4_CSSAi
+    Dma4.DestinationStartAddress = (UINT32)BufferAddress;   // DMA4_CDSAi
+    Dma4.SourceElementIndex = 1;                            // DMA4_CSEi
+    Dma4.SourceFrameIndex = 0x200;                          // DMA4_CSFi
+    Dma4.DestinationElementIndex = 1;                       // DMA4_CDEi
+    Dma4.DestinationFrameIndex = 0;                         // DMA4_CDFi
+
+    Dma4.ReadPortAccessMode = 0;            // DMA4_CCRi[13:12]  Always read MMCHS_DATA
+    Dma4.WritePortAccessMode = 1;           // DMA4_CCRi[15:14]  Post increment memory address
+    Dma4.ReadRequestNumber = 0x1e;          // DMA4_CCRi[4:0]    Syncro with MMCA_DMA_RX (61)  
+    Dma4.WriteRequestNumber = 1;            // DMA4_CCRi[20:19]  Syncro upper 0x3e == 62 (one based)
+
   } else if (OperationType == WRITE) { 
     Cmd = CMD25; //Multiple block write
     CmdInterruptEnable = CMD25_INT_EN;
     DmaOperation = MapOperationBusMasterRead;
+
+    Dma4.ReadPortAccessType = 3;            // DMA4_CSDPi[8:7]   Memory burst 16x32
+    Dma4.WritePortAccessType = 0;           // DMA4_CSDPi[15:14] Can not burst MMCHS_DATA reg
+    Dma4.WriteMode = 1;                     // DMA4_CSDPi[17:16] Write posted ???
+    
+    Dma4.SourceStartAddress = (UINT32)BufferAddress;        // DMA4_CSSAi
+    Dma4.DestinationStartAddress = MMCHS_DATA;              // DMA4_CDSAi
+    Dma4.SourceElementIndex = 1;                            // DMA4_CSEi
+    Dma4.SourceFrameIndex = 0x200;                          // DMA4_CSFi
+    Dma4.DestinationElementIndex = 1;                       // DMA4_CDEi
+    Dma4.DestinationFrameIndex = 0;                         // DMA4_CDFi
+
+    Dma4.ReadPortAccessMode = 1;            // DMA4_CCRi[13:12]  Post increment memory address
+    Dma4.WritePortAccessMode = 0;           // DMA4_CCRi[15:14]  Always write MMCHS_DATA
+    Dma4.ReadRequestNumber = 0x1d;          // DMA4_CCRi[4:0]    Syncro with MMCA_DMA_TX (60)  
+    Dma4.WriteRequestNumber = 1;            // DMA4_CCRi[20:19]  Syncro upper 0x3d == 61 (one based)
+
   } else {
     return EFI_INVALID_PARAMETER;
   }
 
-  // Map passed in buffer for DMA xfer
-  RetryCount = BlockCount * This->Media->BlockSize;
-  Status = DmaMap (DmaOperation, Buffer, &RetryCount, &BufferAddress, &BufferMap);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  #if 0
-  MmioWrite32 (DMA4_CSDP(0), DMA4_CSDP_DATA_TYPE32 | DMA4_CSDP_SRC_BURST_EN64 | DMA4_CSDP_WRITE_MODE_POSTED);
-  MmioWrite32 (DMA4_CEN(0), 0x4096); // Channel Element number
-  MmioWrite32 (DMA4_CFN(0), 0x1);    // Channel Frame number
-  if () {
-    MmioWrite32 (DMA4_CCR(0), X | DMA4_CCR_FS_PACKET | DMA4_CCR_RD_ACTIVE | DMA4_CCR_WR_ACTIVE | DMA4_CCR_DST_AMODE_POST_INC | DMA4_CCR_SEL_SRC_DEST_SYNC_SOURCE);
-    MmioWrite32 (DMA4_CSSA(0), MMCHS_DATA);            // Src is SD Card
-    MmioWrite32 (DMA4_CDSA(0), (UINT32)BufferAddress); // Dst memory
-  } else {
-    MmioWrite32 (DMA4_CCR(0), X | DMA4_CCR_FS_PACKET | DMA4_CCR_RD_ACTIVE | DMA4_CCR_WR_ACTIVE | DMA4_CCR_SRC_AMODE_POST_INC);
-    MmioWrite32 (DMA4_CSSA(0), (UINT32)BufferAddress); // Src memory
-    MmioWrite32 (DMA4_CDSA(0), MMCHS_DATA);            // Dst SD Card
-  }
-  MmioWrite32 (DMA4_CSE(0), 1);
-  MmioWrite32 (DMA4_CSF(0), This->Media->BlockSize);
-  MmioWrite32 (DMA4_CDE(0), 1);
-#endif
-  Dma4.DataType = 0;                      // DMA4_CSDPi[1:0]
-  Dma4.ReadPortAccessType =0;             // DMA4_CSDPi[8:7]
-  Dma4.WritePortAccessType =0;            // DMA4_CSDPi[15:14]
-  Dma4.SourceEndiansim = 0;               // DMA4_CSDPi[21]
-  Dma4.DestinationEndianism = 0;          // DMA4_CSDPi[19]
-  Dma4.WriteMode = 0;                     // DMA4_CSDPi[17:16]
-  Dma4.SourcePacked = 0;                  // DMA4_CSDPi[6]
-  Dma4.DestinationPacked = 0;             // DMA4_CSDPi[13]
-  Dma4.NumberOfElementPerFrame = 0;       // DMA4_CENi
-  Dma4.NumberOfFramePerTransferBlock = 0; // DMA4_CFNi
-  Dma4.SourceStartAddress = 0;            // DMA4_CSSAi
-  Dma4.DestinationStartAddress = 0;       // DMA4_CDSAi
-  Dma4.SourceElementIndex = 0;            // DMA4_CSEi
-  Dma4.SourceFrameIndex = 0;              // DMA4_CSFi
-  Dma4.DestinationElementIndex = 0;       // DMA4_CDEi
-  Dma4.DestinationFrameIndex = 0;         // DMA4_CDFi
-  Dma4.ReadPortAccessMode = 0;            // DMA4_CCRi[13:12]
-  Dma4.WritePortAccessMode = 0;           // DMA4_CCRi[15:14]
-  Dma4.ReadPriority = 0;                  // DMA4_CCRi[6]
-  Dma4.WritePriority = 0;                 // DMA4_CCRi[23]
-  Dma4.ReadRequestNumber = 0;             // DMA4_CCRi[4:0]
-  Dma4.WriteRequestNumber = 0;            // DMA4_CCRi[20:19]
 
   EnableDmaChannel (2, &Dma4);
   
@@ -827,7 +834,7 @@ DmaBlocks (
     return Status;
   }
 
-  DisableDmaChannel (2);
+  DisableDmaChannel (2, DMA4_CSR_BLOCK, DMA4_CSR_ERR);
   Status = DmaUnmap (BufferMap);
 
   return Status;
@@ -1029,6 +1036,7 @@ DetectCard (
   return Status;
 }
 
+#define MAX_MMCHS_TRANSFER_SIZE  0x4000
 
 EFI_STATUS
 SdReadWrite (
@@ -1042,7 +1050,7 @@ SdReadWrite (
   EFI_STATUS Status = EFI_SUCCESS;
   UINTN      RetryCount = 0;
   UINTN      BlockCount;
-  UINTN      BytesToBeTranferedThisPass;
+  UINTN      BytesToBeTranferedThisPass = 0;
   UINTN      BytesRemainingToBeTransfered;
   EFI_TPL    OldTpl;
   BOOLEAN    Update;
@@ -1323,7 +1331,7 @@ MMCHSInitialize (
   Status = gBS->CreateEvent (EVT_TIMER | EVT_NOTIFY_SIGNAL, TPL_CALLBACK, TimerCallback, NULL, &gTimerEvent);
   ASSERT_EFI_ERROR (Status);
  
-  Status = gBS->SetTimer (gTimerEvent, TimerPeriodic, 1000000ULL); // make me a PCD
+  Status = gBS->SetTimer (gTimerEvent, TimerPeriodic, FixedPcdGet32 (PcdMmchsTimerFreq100NanoSeconds)); 
   ASSERT_EFI_ERROR (Status);
 
   //Publish BlockIO.

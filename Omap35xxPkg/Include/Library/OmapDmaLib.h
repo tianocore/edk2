@@ -88,6 +88,8 @@ EnableDmaChannel (
   Turn of DMA channel configured by EnableDma().
             
   @param  Channel               DMA Channel to configure
+  @param  SuccesMask            Bits in DMA4_CSR register indicate EFI_SUCCESS
+  @param  ErrorMask             Bits in DMA4_CSR register indicate EFI_DEVICE_ERROR
                                   
   @retval EFI_SUCCESS           DMA hardware disabled
   @retval EFI_INVALID_PARAMETER Channel is not valid
@@ -97,7 +99,9 @@ EnableDmaChannel (
 EFI_STATUS
 EFIAPI
 DisableDmaChannel (
-  IN  UINTN       Channel
+  IN  UINTN       Channel,
+  IN  UINT32      SuccessMask,
+  IN  UINT32      ErrorMask
   );
 
 

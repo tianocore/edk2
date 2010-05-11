@@ -54,4 +54,5 @@
   gOmap35xxTokenSpaceGuid.PcdOmap35xxFreeTimer|4|UINT32|0x00000206
   gOmap35xxTokenSpaceGuid.PcdOmap35xxDebugAgentTimer|5|UINT32|0x00000207
   gOmap35xxTokenSpaceGuid.PcdDebugAgentTimerFreqNanoSeconds|77|UINT32|0x00000208
+  gOmap35xxTokenSpaceGuid.PcdMmchsTimerFreq100NanoSeconds|1000000|UINT32|0x00000209
   
