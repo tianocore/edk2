@@ -1,7 +1,7 @@
 /** @file
   ACPI Table Protocol Implementation
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,7 +16,10 @@
 // Includes
 //
 #include "AcpiTable.h"
-
+//
+// The maximum number of tables that pre-allocated. 
+//
+UINTN         mEfiAcpiMaxNumTables = EFI_ACPI_MAX_NUM_TABLES; 
 
 /**
   This function adds an ACPI table to the table list.  It will detect FACS and
@@ -70,7 +73,6 @@ RemoveTableFromList (
   @param  ChecksumOffset  Offset to place the checksum result in
 
   @return EFI_SUCCESS             The function completed successfully.
-
 **/
 EFI_STATUS
 AcpiPlatformChecksum (
@@ -408,7 +410,118 @@ UninstallAcpiTable (
   }
 }
 
+/**
+  If the number of APCI tables exceeds the preallocated max table number, enlarge the table buffer.
 
+  @param  AcpiTableInstance       ACPI table protocol instance data structure.
+
+  @return EFI_SUCCESS             reallocate the table beffer successfully.
+  @return EFI_OUT_OF_RESOURCES    Unable to allocate required resources.
+
+**/
+EFI_STATUS
+ReallocateAcpiTableBuffer (
+  IN EFI_ACPI_TABLE_INSTANCE                   *AcpiTableInstance
+  )
+{
+  UINTN                    NewMaxTableNumber;
+  UINTN                    TotalSize;
+  UINT8                    *Pointer;
+  EFI_PHYSICAL_ADDRESS     PageAddress;
+  EFI_ACPI_TABLE_INSTANCE  TempPrivateData;
+  EFI_STATUS               Status;
+  UINT64                   CurrentData;
+   
+  CopyMem (&TempPrivateData, AcpiTableInstance, sizeof (EFI_ACPI_TABLE_INSTANCE)); 
+  //
+  // Enlarge the max table number from mEfiAcpiMaxNumTables to mEfiAcpiMaxNumTables + EFI_ACPI_MAX_NUM_TABLES
+  //
+  NewMaxTableNumber = mEfiAcpiMaxNumTables + EFI_ACPI_MAX_NUM_TABLES;
+  //
+  // Create RSDP, RSDT, XSDT structures and allocate all buffers
+  //
+  TotalSize = sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER) +
+      sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER) +
+      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 1.0 RSDT
+      NewMaxTableNumber * sizeof (UINT32) +
+      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 RSDT
+      NewMaxTableNumber * sizeof (UINT32) +
+      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 XSDT
+      NewMaxTableNumber * sizeof (UINT64);
+
+  //
+  // Allocate memory in the lower 32 bit of address range for
+  // compatibility with ACPI 1.0 OS.
+  //
+  // This is done because ACPI 1.0 pointers are 32 bit values.
+  // ACPI 2.0 OS and all 64 bit OS must use the 64 bit ACPI table addresses.
+  // There is no architectural reason these should be below 4GB, it is purely
+  // for convenience of implementation that we force memory below 4GB.
+  //
+  PageAddress = 0xFFFFFFFF;
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiACPIReclaimMemory,
+                  EFI_SIZE_TO_PAGES (TotalSize),
+                  &PageAddress
+                  );
+
+  if (EFI_ERROR (Status)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Pointer = (UINT8 *) (UINTN) PageAddress;
+  ZeroMem (Pointer, TotalSize);
+  
+  AcpiTableInstance->Rsdp1 = (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER *) Pointer;
+  Pointer += sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER);
+  AcpiTableInstance->Rsdp3 = (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER *) Pointer;
+  Pointer += sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER);
+
+  AcpiTableInstance->Rsdt1 = (EFI_ACPI_DESCRIPTION_HEADER *) Pointer;
+  Pointer += (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + NewMaxTableNumber * sizeof (UINT32));
+  AcpiTableInstance->Rsdt3 = (EFI_ACPI_DESCRIPTION_HEADER *) Pointer;
+  Pointer += (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + NewMaxTableNumber * sizeof (UINT32));
+
+  AcpiTableInstance->Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *) Pointer;
+
+  //
+  // Initialize RSDP
+  //
+  CopyMem (AcpiTableInstance->Rsdp1, TempPrivateData.Rsdp1, sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER)); 
+  AcpiTableInstance->Rsdp1->RsdtAddress = (UINT32) (UINTN) AcpiTableInstance->Rsdt1;
+  
+  CopyMem (AcpiTableInstance->Rsdp3, TempPrivateData.Rsdp3, sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER)); 
+  AcpiTableInstance->Rsdp3->RsdtAddress = (UINT32) (UINTN) AcpiTableInstance->Rsdt3;
+  CurrentData = (UINT64) (UINTN) AcpiTableInstance->Xsdt;
+  CopyMem (&AcpiTableInstance->Rsdp3->XsdtAddress, &CurrentData, sizeof (UINT64));
+
+  //
+  // copy the original Rsdt1, Rsdt3 and Xsdt structure to new buffer 
+  //
+  CopyMem (AcpiTableInstance->Rsdt1, TempPrivateData.Rsdt1, (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + mEfiAcpiMaxNumTables * sizeof (UINT32))); 
+  CopyMem (AcpiTableInstance->Rsdt3, TempPrivateData.Rsdt3, (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + mEfiAcpiMaxNumTables * sizeof (UINT32))); 
+  CopyMem (AcpiTableInstance->Xsdt, TempPrivateData.Xsdt, (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + mEfiAcpiMaxNumTables * sizeof (UINT64)));
+  
+  //
+  // Calculate orignal ACPI table buffer size
+  //
+  TotalSize = sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER) +
+      sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER) +
+      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 1.0 RSDT
+      mEfiAcpiMaxNumTables * sizeof (UINT32) +
+      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 RSDT
+      mEfiAcpiMaxNumTables * sizeof (UINT32) +
+      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 XSDT
+      mEfiAcpiMaxNumTables * sizeof (UINT64);
+  gBS->FreePages ((EFI_PHYSICAL_ADDRESS)TempPrivateData.Rsdp1, EFI_SIZE_TO_PAGES (TotalSize));
+  
+  //
+  // Update the Max ACPI table number
+  // 
+  mEfiAcpiMaxNumTables = NewMaxTableNumber;
+  return EFI_SUCCESS;
+}
 /**
   This function adds an ACPI table to the table list.  It will detect FACS and
   allocate the correct type of memory and properly align the table.
@@ -865,18 +978,25 @@ AddTableToList (
   // Add to ACPI 1.0b table tree
   //
   if ((Version & EFI_ACPI_TABLE_VERSION_1_0B) != 0) {
-    CurrentRsdtEntry = (UINT32 *)
-      (
-        (UINT8 *) AcpiTableInstance->Rsdt1 +
-        sizeof (EFI_ACPI_DESCRIPTION_HEADER) +
-        AcpiTableInstance->NumberOfTableEntries1 *
-        sizeof (UINT32)
-      );
-
-    //
-    // Add entry to the RSDT unless its the FACS or DSDT
-    //
     if (AddToRsdt) {
+      //
+      // If the table number exceed the gEfiAcpiMaxNumTables, enlarge the table buffer
+      //
+      if (AcpiTableInstance->NumberOfTableEntries1 >= mEfiAcpiMaxNumTables) {
+        Status = ReallocateAcpiTableBuffer (AcpiTableInstance);
+        ASSERT_EFI_ERROR (Status);
+      }
+      CurrentRsdtEntry = (UINT32 *)
+        (
+          (UINT8 *) AcpiTableInstance->Rsdt1 +
+          sizeof (EFI_ACPI_DESCRIPTION_HEADER) +
+          AcpiTableInstance->NumberOfTableEntries1 *
+          sizeof (UINT32)
+        );
+
+      //
+      // Add entry to the RSDT unless its the FACS or DSDT
+      //
       *CurrentRsdtEntry = (UINT32) (UINTN) CurrentTableList->Table;
 
       //
@@ -886,69 +1006,72 @@ AddTableToList (
 
       AcpiTableInstance->NumberOfTableEntries1++;
     }
-
-    ASSERT (AcpiTableInstance->NumberOfTableEntries1 <= EFI_ACPI_MAX_NUM_TABLES);
   }
   //
   // Add to ACPI 2.0/3.0  table tree
   //
   if ((Version & EFI_ACPI_TABLE_VERSION_2_0) != 0 ||
       (Version & EFI_ACPI_TABLE_VERSION_3_0) != 0) {
-    if (AddToRsdt) {
-      //
-      // At this time, it is assumed that RSDT and XSDT maintain parallel lists of tables.
-      // If it becomes necessary to maintain separate table lists, changes will be required.
-      //
-      CurrentRsdtEntry = (UINT32 *)
-        (
-          (UINT8 *) AcpiTableInstance->Rsdt3 +
-          sizeof (EFI_ACPI_DESCRIPTION_HEADER) +
-          AcpiTableInstance->NumberOfTableEntries3 *
-          sizeof (UINT32)
-        );
+     if (AddToRsdt) {
+       //
+       // If the table number exceed the gEfiAcpiMaxNumTables, enlarge the table buffer
+       //
+       if (AcpiTableInstance->NumberOfTableEntries3 >= mEfiAcpiMaxNumTables) {
+         Status = ReallocateAcpiTableBuffer (AcpiTableInstance);
+         ASSERT_EFI_ERROR (Status);
+       }
+       //
+       // At this time, it is assumed that RSDT and XSDT maintain parallel lists of tables.
+       // If it becomes necessary to maintain separate table lists, changes will be required.
+       //
+       CurrentRsdtEntry = (UINT32 *)
+         (
+           (UINT8 *) AcpiTableInstance->Rsdt3 +
+           sizeof (EFI_ACPI_DESCRIPTION_HEADER) +
+           AcpiTableInstance->NumberOfTableEntries3 *
+           sizeof (UINT32)
+         );
 
-      //
-      // This pointer must not be directly dereferenced as the XSDT entries may not
-      // be 64 bit aligned resulting in a possible fault.  Use CopyMem to update.
-      //
-      CurrentXsdtEntry = (VOID *)
-        (
-          (UINT8 *) AcpiTableInstance->Xsdt +
-          sizeof (EFI_ACPI_DESCRIPTION_HEADER) +
-          AcpiTableInstance->NumberOfTableEntries3 *
-          sizeof (UINT64)
-        );
+       //
+       // This pointer must not be directly dereferenced as the XSDT entries may not
+       // be 64 bit aligned resulting in a possible fault.  Use CopyMem to update.
+       //
+       CurrentXsdtEntry = (VOID *)
+         (
+           (UINT8 *) AcpiTableInstance->Xsdt +
+           sizeof (EFI_ACPI_DESCRIPTION_HEADER) +
+           AcpiTableInstance->NumberOfTableEntries3 *
+           sizeof (UINT64)
+         );
 
-      //
-      // Add entry to the RSDT
-      //
-      *CurrentRsdtEntry = (UINT32) (UINTN) CurrentTableList->Table;
+       //
+       // Add entry to the RSDT
+       //
+       *CurrentRsdtEntry = (UINT32) (UINTN) CurrentTableList->Table;
 
-      //
-      // Update RSDT length
-      //
-      AcpiTableInstance->Rsdt3->Length = AcpiTableInstance->Rsdt3->Length + sizeof (UINT32);
+       //
+       // Update RSDT length
+       //
+       AcpiTableInstance->Rsdt3->Length = AcpiTableInstance->Rsdt3->Length + sizeof (UINT32);
 
-      //
-      // Add entry to XSDT, XSDT expects 64 bit pointers, but
-      // the table pointers in XSDT are not aligned on 8 byte boundary.
-      //
-      Buffer64 = (UINT64) (UINTN) CurrentTableList->Table;
-      CopyMem (
-        CurrentXsdtEntry,
-        &Buffer64,
-        sizeof (UINT64)
-        );
+       //
+       // Add entry to XSDT, XSDT expects 64 bit pointers, but
+       // the table pointers in XSDT are not aligned on 8 byte boundary.
+       //
+       Buffer64 = (UINT64) (UINTN) CurrentTableList->Table;
+       CopyMem (
+         CurrentXsdtEntry,
+         &Buffer64,
+         sizeof (UINT64)
+         );
 
-      //
-      // Update length
-      //
-      AcpiTableInstance->Xsdt->Length = AcpiTableInstance->Xsdt->Length + sizeof (UINT64);
+       //
+       // Update length
+       //
+       AcpiTableInstance->Xsdt->Length = AcpiTableInstance->Xsdt->Length + sizeof (UINT64);
 
-      AcpiTableInstance->NumberOfTableEntries3++;
+       AcpiTableInstance->NumberOfTableEntries3++;
     }
-
-    ASSERT (AcpiTableInstance->NumberOfTableEntries3 <= EFI_ACPI_MAX_NUM_TABLES);
   }
 
   ChecksumCommonTables (AcpiTableInstance);
@@ -1593,11 +1716,11 @@ AcpiTableAcpiTableConstructor (
   TotalSize = sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER) +
       sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER) +
       sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 1.0 RSDT
-      EFI_ACPI_MAX_NUM_TABLES * sizeof (UINT32) +
+      mEfiAcpiMaxNumTables * sizeof (UINT32) +
       sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 RSDT
-      EFI_ACPI_MAX_NUM_TABLES * sizeof (UINT32) +
+      mEfiAcpiMaxNumTables * sizeof (UINT32) +
       sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 XSDT
-      EFI_ACPI_MAX_NUM_TABLES * sizeof (UINT64);
+      mEfiAcpiMaxNumTables * sizeof (UINT64);
 
   //
   // Allocate memory in the lower 32 bit of address range for
