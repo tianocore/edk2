@@ -514,7 +514,7 @@ ReallocateAcpiTableBuffer (
       mEfiAcpiMaxNumTables * sizeof (UINT32) +
       sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 XSDT
       mEfiAcpiMaxNumTables * sizeof (UINT64);
-  gBS->FreePages ((EFI_PHYSICAL_ADDRESS)TempPrivateData.Rsdp1, EFI_SIZE_TO_PAGES (TotalSize));
+  gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)TempPrivateData.Rsdp1, EFI_SIZE_TO_PAGES (TotalSize));
   
   //
   // Update the Max ACPI table number
