@@ -1,4 +1,4 @@
-##  @file  MdePkg.dec
+## @file  MdePkg.dec
 #
 # This Package provides all definitions(including functions, MACROs, structures and library classes)
 # and libraries instances, which are defined in MDE Specification.
