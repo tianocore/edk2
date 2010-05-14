@@ -749,6 +749,7 @@ EfiPxeBcDiscover (
   PXEBC_PRIVATE_DATA              *Private;
   EFI_PXE_BASE_CODE_MODE          *Mode;
   EFI_PXE_BASE_CODE_DISCOVER_INFO DefaultInfo;
+  EFI_PXE_BASE_CODE_DISCOVER_INFO *CreatedInfo;
   EFI_PXE_BASE_CODE_SRVLIST       *SrvList;
   EFI_PXE_BASE_CODE_SRVLIST       DefaultSrvList;
   PXEBC_CACHED_DHCP4_PACKET       *Packet;
@@ -765,6 +766,7 @@ EfiPxeBcDiscover (
   Mode              = Private->PxeBc.Mode;
   BootSvrEntry      = NULL;
   SrvList           = NULL;
+  CreatedInfo       = NULL;
   Status            = EFI_DEVICE_ERROR;
   Private->Function = EFI_PXE_BASE_CODE_FUNCTION_DISCOVER;
 
@@ -831,6 +833,8 @@ EfiPxeBcDiscover (
     }
 
     DefaultInfo.IpCnt = 0;
+    Info    = &DefaultInfo;
+    SrvList = Info->SrvList;
 
     if (DefaultInfo.MustUseList) {
       BootSvrEntry  = VendorOpt->BootSvr;
@@ -851,9 +855,25 @@ EfiPxeBcDiscover (
       }
 
       DefaultInfo.IpCnt = BootSvrEntry->IpCnt;
+
+      if (DefaultInfo.IpCnt >= 1) {
+        CreatedInfo = AllocatePool (sizeof (DefaultInfo) + (DefaultInfo.IpCnt - 1) * sizeof (*SrvList));
+        if (CreatedInfo == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }     
+      
+        CopyMem (CreatedInfo, &DefaultInfo, sizeof (DefaultInfo));
+        Info    = CreatedInfo;
+        SrvList = Info->SrvList;
+      }
+
+      for (Index = 0; Index < DefaultInfo.IpCnt; Index++) {
+        CopyMem (&SrvList[Index].IpAddr, &BootSvrEntry->IpAddr[Index], sizeof (EFI_IPv4_ADDRESS));
+        SrvList[Index].AcceptAnyResponse   = FALSE;
+        SrvList[Index].Type                = BootSvrEntry->Type;
+      }
     }
 
-    Info = &DefaultInfo;
   } else {
 
     SrvList = Info->SrvList;
@@ -904,6 +924,9 @@ EfiPxeBcDiscover (
                 TRUE,
                 &Private->PxeReply.Packet.Ack
                 );
+      if (!EFI_ERROR (Status)) {
+        break;
+      }                
     }
 
   } else if (Info->UseMCast) {
@@ -953,6 +976,10 @@ EfiPxeBcDiscover (
       );
   }
 
+  if (CreatedInfo != NULL) {
+    FreePool (CreatedInfo);
+  }
+  
   return Status;
 }
 
@@ -1524,7 +1551,7 @@ EfiPxeBcUdpRead (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((BufferSize == NULL) || ((BufferPtr == NULL) && (*BufferSize != 0))) {
+  if ((BufferSize == NULL) || (BufferPtr == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 

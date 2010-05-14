@@ -1832,6 +1832,8 @@ PxeBcSelectBootMenu (
     gST->ConOut->SetCursorPosition (gST->ConOut, 0, TopRow + MenuNum);
   } while (!Finish);
 
+   ASSERT (Select < PXEBC_MAX_MENU_NUM);
+
   //
   // Swap the byte order
   //
