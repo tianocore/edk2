@@ -543,7 +543,7 @@ EFI_STATUS
   @param  SrcAddr    The source HW MAC address. If HeaderSize is zero, then this parameter
                      is ignored. If HeaderSize is non-zero and SrcAddr is NULL, then
                      This->Mode->CurrentAddress is used for the source HW MAC address.
-  @param  DsetAddr   The destination HW MAC address. If HeaderSize is zero, then this
+  @param  DestAddr   The destination HW MAC address. If HeaderSize is zero, then this
                      parameter is ignored.
   @param  Protocol   The type of header to build. If HeaderSize is zero, then this
                      parameter is ignored. See RFC 1700, section "Ether Types", for
@@ -584,7 +584,7 @@ EFI_STATUS
   @param  SrcAddr    The source HW MAC address. If this parameter is NULL, the
                      HW MAC source address will not be extracted from the media
                      header.
-  @param  DsetAddr   The destination HW MAC address. If this parameter is NULL,
+  @param  DestAddr   The destination HW MAC address. If this parameter is NULL,
                      the HW MAC destination address will not be extracted from the
                      media header.
   @param  Protocol   The media header type. If this parameter is NULL, then the
