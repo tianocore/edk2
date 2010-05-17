@@ -19,7 +19,8 @@
 #include <Library/SerialPortLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
-#include <ArmEbUart.h>
+
+#include <ArmEb/ArmEb.h>
 
 /*
 

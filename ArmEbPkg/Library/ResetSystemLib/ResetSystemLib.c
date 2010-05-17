@@ -20,12 +20,10 @@
 #include <PiDxe.h>
 
 #include <Library/PcdLib.h>
-#include <Library/ArmLib.h>
-#include <Library/CacheMaintenanceLib.h>
 #include <Library/DebugLib.h>
 #include <Library/EfiResetSystemLib.h>
 
-#include <ArmEbUart.h>
+#include <ArmEb/ArmEb.h>
 
 /**
   Resets the entire platform.

@@ -16,7 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = ArmEbResetSystemLib
-  FILE_GUID                      = DA6BF954-F0FF-4A1A-88D7-16560B9A9D20
+  FILE_GUID                      = CEFFA65C-B568-453e-9E11-B81AE683D035
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = EfiResetSystemLib
@@ -26,15 +26,9 @@
   ResetSystemLib.c
 
 [Packages]
-  ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   ArmEbPkg/ArmEbPkg.dec
 
-[Pcd.common]
-  gArmTokenSpaceGuid.PcdCpuResetAddress
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress
-  
 [LibraryClasses]
   DebugLib
-  BeagleBoardSystemLib
