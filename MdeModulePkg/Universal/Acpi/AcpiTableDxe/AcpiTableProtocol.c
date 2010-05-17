@@ -719,61 +719,59 @@ AddTableToList (
       //
       // Update pointers in FADT.  If tables don't exist this will put NULL pointers there.
       //
-      if (AcpiTableInstance->Fadt3 != NULL) {
-        AcpiTableInstance->Fadt3->FirmwareCtrl  = (UINT32) (UINTN) AcpiTableInstance->Facs3;
-        Buffer64 = (UINT64) (UINTN) AcpiTableInstance->Facs3;
-        CopyMem (
-          &AcpiTableInstance->Fadt3->XFirmwareCtrl,
-          &Buffer64,
-          sizeof (UINT64)
-          );
-        AcpiTableInstance->Fadt3->Dsdt  = (UINT32) (UINTN) AcpiTableInstance->Dsdt3;
-        Buffer64                          = (UINT64) (UINTN) AcpiTableInstance->Dsdt3;
-        CopyMem (
-          &AcpiTableInstance->Fadt3->XDsdt,
-          &Buffer64,
-          sizeof (UINT64)
-          );
+      AcpiTableInstance->Fadt3->FirmwareCtrl  = (UINT32) (UINTN) AcpiTableInstance->Facs3;
+      Buffer64 = (UINT64) (UINTN) AcpiTableInstance->Facs3;
+      CopyMem (
+        &AcpiTableInstance->Fadt3->XFirmwareCtrl,
+        &Buffer64,
+        sizeof (UINT64)
+        );
+      AcpiTableInstance->Fadt3->Dsdt  = (UINT32) (UINTN) AcpiTableInstance->Dsdt3;
+      Buffer64                          = (UINT64) (UINTN) AcpiTableInstance->Dsdt3;
+      CopyMem (
+        &AcpiTableInstance->Fadt3->XDsdt,
+        &Buffer64,
+        sizeof (UINT64)
+        );
 
-        //
-        // RSDP OEM information is updated to match the FADT OEM information
-        //
-        CopyMem (
-          &AcpiTableInstance->Rsdp3->OemId,
-          &AcpiTableInstance->Fadt3->Header.OemId,
-          6
-          );
-        
-        //
-        // RSDT OEM information is updated to match FADT OEM information.
-        //
-        CopyMem (
-          &AcpiTableInstance->Rsdt3->OemId,
-          &AcpiTableInstance->Fadt3->Header.OemId,
-          6
-          );
-        CopyMem (
-          &AcpiTableInstance->Rsdt3->OemTableId,
-          &AcpiTableInstance->Fadt3->Header.OemTableId,
-          sizeof (UINT64)
-          );
-        AcpiTableInstance->Rsdt3->OemRevision = AcpiTableInstance->Fadt3->Header.OemRevision;
-        
-        //
-        // XSDT OEM information is updated to match FADT OEM information.
-        //
-        CopyMem (
-          &AcpiTableInstance->Xsdt->OemId,
-          &AcpiTableInstance->Fadt3->Header.OemId,
-          6
-          );
-        CopyMem (
-          &AcpiTableInstance->Xsdt->OemTableId,
-          &AcpiTableInstance->Fadt3->Header.OemTableId,
-          sizeof (UINT64)
-          );
-        AcpiTableInstance->Xsdt->OemRevision = AcpiTableInstance->Fadt3->Header.OemRevision;
-      }
+      //
+      // RSDP OEM information is updated to match the FADT OEM information
+      //
+      CopyMem (
+        &AcpiTableInstance->Rsdp3->OemId,
+        &AcpiTableInstance->Fadt3->Header.OemId,
+        6
+        );
+      
+      //
+      // RSDT OEM information is updated to match FADT OEM information.
+      //
+      CopyMem (
+        &AcpiTableInstance->Rsdt3->OemId,
+        &AcpiTableInstance->Fadt3->Header.OemId,
+        6
+        );
+      CopyMem (
+        &AcpiTableInstance->Rsdt3->OemTableId,
+        &AcpiTableInstance->Fadt3->Header.OemTableId,
+        sizeof (UINT64)
+        );
+      AcpiTableInstance->Rsdt3->OemRevision = AcpiTableInstance->Fadt3->Header.OemRevision;
+      
+      //
+      // XSDT OEM information is updated to match FADT OEM information.
+      //
+      CopyMem (
+        &AcpiTableInstance->Xsdt->OemId,
+        &AcpiTableInstance->Fadt3->Header.OemId,
+        6
+        );
+      CopyMem (
+        &AcpiTableInstance->Xsdt->OemTableId,
+        &AcpiTableInstance->Fadt3->Header.OemTableId,
+        sizeof (UINT64)
+        );
+      AcpiTableInstance->Xsdt->OemRevision = AcpiTableInstance->Fadt3->Header.OemRevision;
     }    
     //
     // Checksum the table

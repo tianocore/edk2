@@ -1,7 +1,7 @@
 /** @file
   Implementation of translation upon VT-UTF8.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -145,10 +145,11 @@ GetOneValidUtf8Char (
       // three-byte utf8 char go on
       //
       if ((Temp & 0xc0) == 0x80) {
-
-        Utf8Char->Utf8_3[2 - Index] = Temp;
-        Index++;
-        if (Index > 2) {
+        if (Index == 1) {
+          Utf8Char->Utf8_3[1] = Temp;
+          Index++;
+        } else {
+          Utf8Char->Utf8_3[0] = Temp;
           FetchFlag = FALSE;
         }
       } else {
