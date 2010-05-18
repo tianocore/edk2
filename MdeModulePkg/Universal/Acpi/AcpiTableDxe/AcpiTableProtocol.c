@@ -357,6 +357,19 @@ InstallAcpiTable (
   }
   FreePool (AcpiTableBufferConst);
   
+  //
+  // Add a new table successfully, notify registed callback
+  //
+  if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
+    if (!EFI_ERROR (Status)) {
+      SdtNotifyAcpiList (
+        AcpiTableInstance,
+        EFI_ACPI_TABLE_VERSION_1_0B | EFI_ACPI_TABLE_VERSION_2_0 | EFI_ACPI_TABLE_VERSION_3_0,
+        *TableKey
+        );
+    }
+  }
+
   return Status;
 }
 
@@ -1707,6 +1720,11 @@ AcpiTableAcpiTableConstructor (
 
   AcpiTableInstance->AcpiTableProtocol.InstallAcpiTable   = InstallAcpiTable;
   AcpiTableInstance->AcpiTableProtocol.UninstallAcpiTable = UninstallAcpiTable;
+
+  if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
+    SdtAcpiTableAcpiSdtConstructor (AcpiTableInstance);
+  }
+
   //
   // Create RSDP, RSDT, XSDT structures
   // Allocate all buffers

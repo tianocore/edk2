@@ -1,7 +1,7 @@
 /** @file
   ACPI Table Protocol Driver
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +21,7 @@
 // Handle to install ACPI Table Protocol
 //
 EFI_HANDLE    mHandle = NULL;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_ACPI_TABLE_INSTANCE   *mPrivateData;
 
 /**
   Entry point of the ACPI table driver.
@@ -64,12 +65,24 @@ InitializeAcpiTableDxe (
   //
   // Install ACPI Table protocol
   //
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &mHandle,
-                  &gEfiAcpiTableProtocolGuid,
-                  &PrivateData->AcpiTableProtocol,
-                  NULL
-                  );
+  if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
+    mPrivateData = PrivateData;
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &mHandle,
+                    &gEfiAcpiTableProtocolGuid,
+                    &PrivateData->AcpiTableProtocol,
+                    &gEfiAcpiSdtProtocolGuid,
+                    &mPrivateData->AcpiSdtProtocol,
+                    NULL
+                    );
+  } else {
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &mHandle,
+                    &gEfiAcpiTableProtocolGuid,
+                    &PrivateData->AcpiTableProtocol,
+                    NULL
+                    );
+  }
   ASSERT_EFI_ERROR (Status);
 
   return Status;

@@ -31,6 +31,13 @@
   AcpiTableProtocol.c
   AcpiTable.h
   AcpiTable.c
+  AcpiSdt.h
+  AcpiSdt.c
+  Aml.c
+  AmlString.c
+  AmlOption.c
+  AmlChild.c
+  AmlNamespace.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -50,8 +57,13 @@
   gEfiAcpi10TableGuid                           # ALWAYS_CONSUMED
   gEfiAcpiTableGuid
 
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol
+
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_PRODUCED
+  gEfiAcpiSdtProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
+  gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
 
 [Depex]
   TRUE

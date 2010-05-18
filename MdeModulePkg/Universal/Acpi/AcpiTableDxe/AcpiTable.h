@@ -1,7 +1,7 @@
 /** @file
   ACPI Table Protocol Driver
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,8 @@
 
 #include <Protocol/AcpiTable.h>
 #include <Guid/Acpi.h>
+#include <Protocol/AcpiSystemDescriptionTable.h>
+#include <Protocol/DxeSmmReadyToLock.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -34,6 +36,8 @@
 // Statements that include other files
 //
 #include <IndustryStandard/Acpi.h>
+
+#include "AcpiSdt.h"
 
 //
 // From Protocol/AcpiSupport.h
@@ -93,7 +97,7 @@ typedef struct {
 } EFI_ACPI_TABLE_LIST;
 
 //
-// Containment record for linked list.
+// Containment record for ACPI Table linked list.
 //
 #define EFI_ACPI_TABLE_LIST_FROM_LINK(_link)  CR (_link, EFI_ACPI_TABLE_LIST, Link, EFI_ACPI_TABLE_LIST_SIGNATURE)
 
@@ -135,13 +139,15 @@ typedef struct {
   EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs3;                 // Pointer to FACS table header
   EFI_ACPI_DESCRIPTION_HEADER                   *Dsdt1;                 // Pointer to DSDT table header
   EFI_ACPI_DESCRIPTION_HEADER                   *Dsdt3;                 // Pointer to DSDT table header
-  LIST_ENTRY                                TableList;
+  LIST_ENTRY                                    TableList;
   UINTN                                         NumberOfTableEntries1;  // Number of ACPI 1.0 tables
   UINTN                                         NumberOfTableEntries3;  // Number of ACPI 3.0 tables
   UINTN                                         CurrentHandle;
   BOOLEAN                                       TablesInstalled1;       // ACPI 1.0 tables published
   BOOLEAN                                       TablesInstalled3;       // ACPI 3.0 tables published
   EFI_ACPI_TABLE_PROTOCOL                       AcpiTableProtocol;
+  EFI_ACPI_SDT_PROTOCOL                         AcpiSdtProtocol;
+  LIST_ENTRY                                    NotifyList;
 } EFI_ACPI_TABLE_INSTANCE;
 
 //
@@ -193,5 +199,74 @@ InitializeAcpiTableDxe (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   );
+
+/**
+
+  This function finds the table specified by the handle and returns a pointer to it.
+  If the handle is not found, EFI_NOT_FOUND is returned and the contents of Table are
+  undefined.
+
+  @param[in]  Handle      Table to find.
+  @param[in]  TableList   Table list to search
+  @param[out] Table       Pointer to table found. 
+
+  @retval EFI_SUCCESS              The function completed successfully.
+  @retval EFI_NOT_FOUND            No table found matching the handle specified.
+
+**/
+EFI_STATUS
+FindTableByHandle (
+  IN UINTN                                Handle,
+  IN LIST_ENTRY                           *TableList,
+  OUT EFI_ACPI_TABLE_LIST                 **Table
+  );
+
+/**
+
+  This function calculates and updates an UINT8 checksum.
+
+  @param[in]  Buffer          Pointer to buffer to checksum
+  @param[in]  Size            Number of bytes to checksum
+  @param[in]  ChecksumOffset  Offset to place the checksum result in
+
+  @retval EFI_SUCCESS             The function completed successfully.
+
+**/
+EFI_STATUS
+AcpiPlatformChecksum (
+  IN VOID       *Buffer,
+  IN UINTN      Size,
+  IN UINTN      ChecksumOffset
+  );
+
+/**
+  This function invokes ACPI notification.
+
+  @param[in]  AcpiTableInstance          Instance to AcpiTable
+  @param[in]  Version                    Version(s) to set.
+  @param[in]  Handle                     Handle of the table.
+**/
+VOID
+SdtNotifyAcpiList (
+  IN EFI_ACPI_TABLE_INSTANCE   *AcpiTableInstance,
+  IN EFI_ACPI_TABLE_VERSION    Version,
+  IN UINTN                     Handle
+  );
+
+/**
+  This function initializes AcpiSdt protocol in ACPI table instance.
+
+  @param[in]  AcpiTableInstance       Instance to construct
+**/
+VOID
+SdtAcpiTableAcpiSdtConstructor (
+  IN EFI_ACPI_TABLE_INSTANCE   *AcpiTableInstance
+  );
+
+//
+// export PrivateData symbol, because we need that in AcpiSdtProtol implementation
+//
+extern EFI_HANDLE                mHandle;
+extern EFI_ACPI_TABLE_INSTANCE   *mPrivateData;
 
 #endif
