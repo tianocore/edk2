@@ -159,7 +159,7 @@ CEntryPoint (
 
   DEBUG ((EFI_D_ERROR, "UART Enabled\n"));
 
-  // Start up a free running time so that the timer lib will work
+  // Start up a free running timer so that the timer lib will work
   TimerInit ();
 
   // SEC phase needs to run library constructors by hand.

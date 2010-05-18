@@ -156,9 +156,16 @@ READ_LOCK_STATUS   = TRUE
 
   #NOTE: Open source EHCI stack doesn't work on Beagleboard.
   #NOTE: UsbBus and UsbMassStorage don't work using iPhond SDK tool chain.
-  INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
-  INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-  INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+##  INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+##  INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+##  INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+
+  INF AppleCommonPkg/Bus/Pci/EhciDxe/Ehci.inf 
+  INF AppleCommonPkg/Bus/Usb/UsbBotDxe/UsbBot.inf
+  INF AppleCommonPkg/Bus/Usb/UsbCbiDxe/Cbi0/UsbCbi0.inf
+  INF AppleCommonPkg/Bus/Usb/UsbCbiDxe/Cbi1/UsbCbi1.inf
+  INF AppleCommonPkg/Bus/Usb/UsbBusDxe/UsbBus.inf
+  INF AppleCommonPkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorage.inf
 
   #
   # UEFI application (Shell Embedded Boot Loader) 
@@ -171,10 +178,6 @@ READ_LOCK_STATUS   = TRUE
   #
   INF BeagleBoardPkg/Bds/Bds.inf
 
-  #
-  # Gdb Stub
-  #
-  #INF ArmPkg/Drivers/DebugSupportDxe/DebugSupportDxe.inf
 
 
 [FV.FVMAIN_COMPACT]

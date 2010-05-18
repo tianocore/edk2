@@ -1,7 +1,7 @@
 #/** @file
 # Beagle board package.
 #
-# Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -36,7 +36,8 @@
   UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
 !else
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-  UncachedMemoryAllocationLib|ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
+  UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
+#  UncachedMemoryAllocationLib|ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
 !endif
 
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
@@ -112,6 +113,8 @@
   GdbSerialLib|Omap35xxPkg/Library/GdbSerialLib/GdbSerialLib.inf
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+
+UsbLib|AppleCommonPkg/Library/AppleUsbLib/AppleUsbDxeLib.inf
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
@@ -384,6 +387,12 @@
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
+  AppleCommonPkg/Bus/Pci/EhciDxe/Ehci.inf
+  AppleCommonPkg/Bus/Usb/UsbBotDxe/UsbBot.inf
+  AppleCommonPkg/Bus/Usb/UsbCbiDxe/Cbi0/UsbCbi0.inf
+  AppleCommonPkg/Bus/Usb/UsbCbiDxe/Cbi1/UsbCbi1.inf
+  AppleCommonPkg/Bus/Usb/UsbBusDxe/UsbBus.inf
+  AppleCommonPkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorage.inf
 
   #
   # Nand Flash
@@ -393,7 +402,10 @@
   #
   # MMC/SD
   #
-  Omap35xxPkg/MMCHSDxe/MMCHS.inf
+  Omap35xxPkg/MMCHSDxe/MMCHS.inf {
+    <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x800fffff
+  }
   
   #
   # I2C
