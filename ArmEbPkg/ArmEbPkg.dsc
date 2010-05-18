@@ -351,6 +351,7 @@
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
   ArmEbPkg/InterruptDxe/InterruptDxe.inf
+  ArmEbPkg/TimerDxe/TimerDxe.inf
 
   #
   # Semi-hosting filesystem

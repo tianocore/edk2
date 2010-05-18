@@ -108,6 +108,9 @@ READ_LOCK_STATUS   = TRUE
   INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
   
+  INF ArmEbPkg/InterruptDxe/InterruptDxe.inf
+  INF ArmEbPkg/TimerDxe/TimerDxe.inf
+
   #
   # Semi-hosting filesystem
   #

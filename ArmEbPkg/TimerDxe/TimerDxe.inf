@@ -28,7 +28,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
-  ArmPkg/ArmPkg.dec
+  ArmEbPkg/ArmEbPkg.dec
 
 [LibraryClasses]
   BaseLib

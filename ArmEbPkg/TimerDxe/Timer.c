@@ -23,7 +23,6 @@
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
-#include <Library/OmapLib.h>
 
 #include <Protocol/Timer.h>
 #include <Protocol/HardwareInterrupt.h>
@@ -43,6 +42,8 @@ EFI_HARDWARE_INTERRUPT_PROTOCOL *gInterrupt = NULL;
 
 // Cached interrupt vector
 UINTN  gVector;
+
+UINT32 mLastTickCount;
 
 
 /**
@@ -184,7 +185,7 @@ TimerDriverSetTimerPeriod (
     Status = gInterrupt->DisableInterruptSource (gInterrupt, gVector);    
   } else {  
     // Convert TimerPeriod into 1MHz clock counts (us units = 100ns units / 10)
-    TimerTicks = DivU64x32 (TimerPeriod, 10, NULL);
+    TimerTicks = DivU64x32 (TimerPeriod, 10);
    
     // if it's larger than 32-bits, pin to highest value
     if (TimerTicks > 0xffffffff) {
@@ -351,10 +352,6 @@ TimerInitialize (
 
   // Disable the timer
   Status = TimerDriverSetTimerPeriod (&gTimer, 0);
-  ASSERT_EFI_ERROR (Status);
-
-  // Install interrupt handler for SP804 timer 0/1 interrupts
-  Status = mGic->RegisterInterruptHandler(mGic, EB_TIMER01_INTERRUPT_NUM, TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
 
   // Install interrupt handler
