@@ -77,5 +77,4 @@
   ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
 
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
-  ArmPkg/Drivers/DebugSupportDxe/DebugSupportDxe.inf
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
