@@ -47,7 +47,6 @@
 [Protocols]
   gEfiTimerArchProtocolGuid  
   gHardwareInterruptProtocolGuid
-  gTimerDebugSupportProtocolGuid
 
 [Pcd.common]
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod

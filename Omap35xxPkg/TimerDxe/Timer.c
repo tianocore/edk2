@@ -27,14 +27,12 @@
 
 #include <Protocol/Timer.h>
 #include <Protocol/HardwareInterrupt.h>
-#include <Protocol/TimerDebugSupport.h>
 
 #include <Omap3530/Omap3530.h>
 
 
 // The notification function to call on every timer interrupt.
 volatile EFI_TIMER_NOTIFY      mTimerNotifyFunction   = (EFI_TIMER_NOTIFY)NULL;
-volatile EFI_PERIODIC_CALLBACK mTimerPeriodicCallback = (EFI_PERIODIC_CALLBACK)NULL;
 
 
 // The current period of the timer interrupt
@@ -84,11 +82,6 @@ TimerInterruptHandler (
   // to make sure TPL level is set to TPL_HIGH while we are handling the timer tick. 
   //
   OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-
-
-  if (mTimerPeriodicCallback) {
-    mTimerPeriodicCallback(SystemContext);
-  }
 
   if (mTimerNotifyFunction) {
     mTimerNotifyFunction(mTimerPeriod);
@@ -276,27 +269,6 @@ TimerDriverGenerateSoftInterrupt (
 }
 
 
-EFI_STATUS
-EFIAPI
-TimerDriverRegisterPeriodicCallback (
-  IN  TIMER_DEBUG_SUPPORT_PROTOCOL  *This,
-  IN  EFI_PERIODIC_CALLBACK         PeriodicCallback
-  )
-{
-  if ((PeriodicCallback == NULL) && (mTimerPeriodicCallback == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if ((PeriodicCallback != NULL) && (mTimerPeriodicCallback != NULL)) {
-    return EFI_ALREADY_STARTED;
-  }
-
-  mTimerPeriodicCallback = PeriodicCallback;
-
-  return EFI_SUCCESS;
-}
-
-
 /**
   Interface stucture for the Timer Architectural Protocol.
 
@@ -338,10 +310,6 @@ EFI_TIMER_ARCH_PROTOCOL   gTimer = {
   TimerDriverGenerateSoftInterrupt
 };
 
-TIMER_DEBUG_SUPPORT_PROTOCOL  gTimerDebugSupport = {
-  TimerDriverRegisterPeriodicCallback
-};
-
 
 /**
   Initialize the state information for the Timer Architectural Protocol and
@@ -368,11 +336,11 @@ TimerInitialize (
   UINT32      TimerBaseAddress;
 
   // Find the interrupt controller protocol.  ASSERT if not found.
-  Status = gBS->LocateProtocol(&gHardwareInterruptProtocolGuid, NULL, (VOID **)&gInterrupt);
+  Status = gBS->LocateProtocol (&gHardwareInterruptProtocolGuid, NULL, (VOID **)&gInterrupt);
   ASSERT_EFI_ERROR (Status);
 
   // Set up the timer registers
-  TimerBaseAddress = TimerBase(FixedPcdGet32(PcdOmap35xxArchTimer));
+  TimerBaseAddress = TimerBase (FixedPcdGet32(PcdOmap35xxArchTimer));
   TISR = TimerBaseAddress + GPTIMER_TISR;
   TCLR = TimerBaseAddress + GPTIMER_TCLR;
   TLDR = TimerBaseAddress + GPTIMER_TLDR;
@@ -380,23 +348,24 @@ TimerInitialize (
   TIER = TimerBaseAddress + GPTIMER_TIER;
 
   // Disable the timer
-  Status = TimerDriverSetTimerPeriod(&gTimer, 0);
+  Status = TimerDriverSetTimerPeriod (&gTimer, 0);
   ASSERT_EFI_ERROR (Status);
 
   // Install interrupt handler
-  gVector = InterruptVectorForTimer(FixedPcdGet32(PcdOmap35xxArchTimer));
-  Status = gInterrupt->RegisterInterruptSource(gInterrupt, gVector, TimerInterruptHandler);
+  gVector = InterruptVectorForTimer (FixedPcdGet32(PcdOmap35xxArchTimer));
+  Status = gInterrupt->RegisterInterruptSource (gInterrupt, gVector, TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
 
   // Set up default timer
-  Status = TimerDriverSetTimerPeriod(&gTimer, FixedPcdGet32(PcdTimerPeriod));
+  Status = TimerDriverSetTimerPeriod (&gTimer, FixedPcdGet32(PcdTimerPeriod));
   ASSERT_EFI_ERROR (Status);
 
   // Install the Timer Architectural Protocol onto a new handle
-  Status = gBS->InstallMultipleProtocolInterfaces(&Handle,
-                                                  &gEfiTimerArchProtocolGuid,      &gTimer,
-                                                  &gTimerDebugSupportProtocolGuid, &gTimerDebugSupport,
-                                                  NULL);
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &Handle,
+                  &gEfiTimerArchProtocolGuid,      &gTimer,
+                  NULL
+                  );
   ASSERT_EFI_ERROR(Status);
 
   return Status;
