@@ -4,8 +4,8 @@
 # This module contains the functionality to generate build report after
 # build all target completes successfully.
 #
-# Copyright (c) 2010, Intel Corporation
-# All rights reserved. This program and the accompanying materials
+# Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
@@ -22,12 +22,14 @@ import platform
 import textwrap
 import traceback
 import sys
+import time
 from datetime import datetime
+from StringIO import StringIO
 from Common import EdkLogger
+from Common.Misc import SaveFileOnChange
 from Common.Misc import GuidStructureByteArrayToGuidString
 from Common.Misc import GuidStructureStringToGuidString
 from Common.InfClassObject import gComponentType2ModuleType
-from Common.BuildToolError import FILE_OPEN_FAILURE
 from Common.BuildToolError import FILE_WRITE_FAILURE
 from Common.BuildToolError import CODE_ERROR
 
@@ -578,7 +580,8 @@ class PcdReport(object):
         for Platform in Wa.BuildDatabase.WorkspaceDb.PlatformList:
             for (TokenCName, TokenSpaceGuidCName) in Platform.Pcds:
                 DscDefaultValue = Platform.Pcds[(TokenCName, TokenSpaceGuidCName)].DefaultValue
-                self.DscPcdDefault[(TokenCName, TokenSpaceGuidCName)] = DscDefaultValue
+                if DscDefaultValue:
+                    self.DscPcdDefault[(TokenCName, TokenSpaceGuidCName)] = DscDefaultValue
 
     ##
     # Generate report for PCD information
@@ -765,6 +768,13 @@ class PredictionReport(object):
         for Pa in Wa.AutoGenObjectList:
             for Module in Pa.LibraryAutoGenList + Pa.ModuleAutoGenList:
                 #
+                # BASE typed modules are EFI agnostic, so we need not scan
+                # their source code to find PPI/Protocol produce or consume
+                # information.
+                #
+                if Module.ModuleType == "BASE":
+                    continue
+                #
                 # Add module referenced source files
                 #
                 self._SourceList.append(str(Module))
@@ -889,12 +899,17 @@ class PredictionReport(object):
 
         try:
             from Eot.Eot import Eot
+
             #
-            # Invoke EOT tool
+            # Invoke EOT tool and echo its runtime performance
             #
+            EotStartTime = time.time()
             Eot(CommandLineOption=False, SourceFileList=SourceList, GuidList=GuidList,
                 FvFileList=' '.join(FvFileList), Dispatch=DispatchList, IsInit=True)
-
+            EotEndTime = time.time()
+            EotDuration = time.strftime("%H:%M:%S", time.gmtime(int(round(EotEndTime - EotStartTime))))
+            EdkLogger.quiet("EOT run time: %s\n" % EotDuration)
+            
             #
             # Parse the output of EOT tool
             #
@@ -1415,13 +1430,11 @@ class BuildReport(object):
     def GenerateReport(self, BuildDuration):
         if self.ReportFile:
             try:
-                File = open(self.ReportFile, "w+")
-            except IOError:
-                EdkLogger.error(None, FILE_OPEN_FAILURE, ExtraData=self.ReportFile)
-            try:
+                File = StringIO('')
                 for (Wa, MaList) in self.ReportList:
                     PlatformReport(Wa, MaList, self.ReportType).GenerateReport(File, BuildDuration, self.ReportType)
-                EdkLogger.quiet("Report successfully saved to %s" % os.path.abspath(self.ReportFile))
+                SaveFileOnChange(self.ReportFile, File.getvalue(), False)
+                EdkLogger.quiet("Build report can be found at %s" % os.path.abspath(self.ReportFile))
             except IOError:
                 EdkLogger.error(None, FILE_WRITE_FAILURE, ExtraData=self.ReportFile)
             except:

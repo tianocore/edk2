@@ -1,9 +1,9 @@
 ## @file
 # generate flash image
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 #
-#  All rights reserved. This program and the accompanying materials
+#  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
@@ -35,6 +35,7 @@ import Common.GlobalData as GlobalData
 from Common import EdkLogger
 from Common.String import *
 from Common.Misc import DirCache,PathClass
+from Common.Misc import SaveFileOnChange
 
 ## Version and Copyright
 versionNumber = "1.0"
@@ -486,14 +487,15 @@ class GenFds :
 
     def GenerateGuidXRefFile(BuildDb, ArchList):
         GuidXRefFileName = os.path.join(GenFdsGlobalVariable.FvDir, "Guid.xref")
-        GuidXRefFile = open(GuidXRefFileName, "w+")
+        GuidXRefFile = StringIO.StringIO('')
         for Arch in ArchList:
             PlatformDataBase = BuildDb.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch]
             for ModuleFile in PlatformDataBase.Modules:
                 Module = BuildDb.BuildObject[ModuleFile, Arch]
                 GuidXRefFile.write("%s %s\n" % (Module.Guid, Module.BaseName))
+        SaveFileOnChange(GuidXRefFileName, GuidXRefFile.getvalue(), False)
         GuidXRefFile.close()
-        GenFdsGlobalVariable.InfLogger("\nGUID cross reference file saved to %s" % GuidXRefFileName)
+        GenFdsGlobalVariable.InfLogger("\nGUID cross reference file can be found at %s" % GuidXRefFileName)
         
     ##Define GenFd as static function
     GenFd = staticmethod(GenFd)

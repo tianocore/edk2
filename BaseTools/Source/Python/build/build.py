@@ -1,9 +1,9 @@
 ## @file
 # build a platform or a module
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 #
-#  All rights reserved. This program and the accompanying materials
+#  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
@@ -1289,12 +1289,10 @@ class Build():
         #
         # Save address map into MAP file.
         #
-        MapFile = open(MapFilePath, "wb")
-        MapFile.write(MapBuffer.getvalue())
-        MapFile.close()
+        SaveFileOnChange(MapFilePath, MapBuffer.getvalue(), False)
         MapBuffer.close()
         if self.LoadFixAddress != 0:
-            sys.stdout.write ("\nLoad Module At Fix Address Map file saved to %s\n" %(MapFilePath))
+            sys.stdout.write ("\nLoad Module At Fix Address Map file can be found at %s\n" %(MapFilePath))
         sys.stdout.flush()
 
     ## Build active platform for different build targets and different tool chains

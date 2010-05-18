@@ -2,8 +2,8 @@
 
   Functions to get info and load PE/COFF image.
 
-Copyright (c) 2004 - 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
+Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
 http://opensource.org/licenses/bsd-license.php                                            
@@ -66,6 +66,14 @@ PeCoffLoaderRelocateX64Image (
 RETURN_STATUS
 PeCoffLoaderRelocateIpfImage (
   IN UINT16      *Reloc,
+  IN OUT CHAR8   *Fixup,
+  IN OUT CHAR8   **FixupData,
+  IN UINT64      Adjust
+  );
+
+RETURN_STATUS
+PeCoffLoaderRelocateArmImage (
+  IN UINT16      **Reloc,
   IN OUT CHAR8   *Fixup,
   IN OUT CHAR8   **FixupData,
   IN UINT64      Adjust
@@ -777,8 +785,10 @@ Returns:
       default:
         switch (MachineType) {
         case EFI_IMAGE_MACHINE_IA32:
-        case EFI_IMAGE_MACHINE_ARMT:
           Status = PeCoffLoaderRelocateIa32Image (Reloc, Fixup, &FixupData, Adjust);
+          break;
+        case EFI_IMAGE_MACHINE_ARMT:
+          Status = PeCoffLoaderRelocateArmImage (&Reloc, Fixup, &FixupData, Adjust);
           break;
         case EFI_IMAGE_MACHINE_X64:
           Status = PeCoffLoaderRelocateX64Image (Reloc, Fixup, &FixupData, Adjust);

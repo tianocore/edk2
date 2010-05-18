@@ -1,8 +1,8 @@
 ## @file
 # Trim files preprocessed by compiler
 #
-# Copyright (c) 2007 - 2010, Intel Corporation
-# All rights reserved. This program and the accompanying materials
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
@@ -33,7 +33,7 @@ __copyright__ = "Copyright (c) 2007-2010, Intel Corporation. All rights reserved
 ## Regular expression for matching Line Control directive like "#line xxx"
 gLineControlDirective = re.compile('^\s*#(?:line)?\s+([0-9]+)\s+"*([^"]*)"')
 ## Regular expression for matching "typedef struct"
-gTypedefPattern = re.compile("^\s*typedef\s+struct\s*[{]*$", re.MULTILINE)
+gTypedefPattern = re.compile("^\s*typedef\s+struct(\s+\w+)?\s*[{]*$", re.MULTILINE)
 ## Regular expression for matching "#pragma pack"
 gPragmaPattern = re.compile("^\s*#pragma\s+pack", re.MULTILINE)
 ## Regular expression for matching HEX number
@@ -294,6 +294,7 @@ def DoInclude(Source, Indent=''):
         CurrentIndent = Indent + Result[0][0]
         IncludedFile = Result[0][1]
         NewFileContent.extend(DoInclude(IncludedFile, CurrentIndent))
+        NewFileContent.append("\n")
 
     gIncludedAslFile.pop()
     F.close()

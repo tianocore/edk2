@@ -1,9 +1,9 @@
 ## @file
 # preprocess source file
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 #
-#  All rights reserved. This program and the accompanying materials
+#  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
@@ -353,9 +353,12 @@ def GetFunctionList():
 def CreateCCodeDB(FileNameList):
     FileObjList = []
     ParseErrorFileList = []
-
+    ParsedFiles = {}
     for FullName in FileNameList:
         if os.path.splitext(FullName)[1] in ('.h', '.c'):
+            if FullName.lower() in ParsedFiles:
+                continue
+            ParsedFiles[FullName.lower()] = 1
             EdkLogger.info("Parsing " + FullName)
             model = FullName.endswith('c') and DataClass.MODEL_FILE_C or DataClass.MODEL_FILE_H
             collector = CodeFragmentCollector.CodeFragmentCollector(FullName)

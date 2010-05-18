@@ -1,6 +1,6 @@
 /*++
-Copyright (c) 2004 - 2010, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -1900,6 +1900,9 @@ vfrStatementStringType :
 vfrStatementString :
   <<
      CIfrString SObj;
+     UINT32 VarArraySize;
+     UINT8 StringMinSize;
+     UINT8 StringMaxSize;
   >>
   L:String                                             << SObj.SetLineNo(L->getLine()); >>
   vfrQuestionHeader[SObj] ","
@@ -1907,8 +1910,27 @@ vfrStatementString :
   {
     Key "=" KN:Number ","                              << AssignQuestionKey (SObj, KN); >>
   }
-  MinSize "=" MIN:Number ","                           << SObj.SetMinSize (_STOU8(MIN->getText())); >>
-  MaxSize "=" MAX:Number ","                           << SObj.SetMaxSize (_STOU8(MAX->getText())); >>
+  MinSize "=" MIN:Number ","                           << 
+                                                          VarArraySize = _GET_CURRQEST_ARRAY_SIZE();
+                                                          StringMinSize = _STOU8(MIN->getText());
+                                                          if (_STOU64(MIN->getText()) > StringMinSize) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, MIN->getLine(), "String MinSize takes only one byte, which can't be larger than 0xFF.");
+                                                          } else if (VarArraySize != 0 && StringMinSize > VarArraySize) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, MIN->getLine(), "String MinSize can't be larger than the max number of elements in string array.");
+                                                          }
+                                                          SObj.SetMinSize (StringMinSize);
+                                                       >>
+  MaxSize "=" MAX:Number ","                           << 
+                                                          StringMaxSize = _STOU8(MAX->getText());
+                                                          if (_STOU64(MAX->getText()) > StringMaxSize) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, MAX->getLine(), "String MaxSize takes only one byte, which can't be larger than 0xFF.");
+                                                          } else if (VarArraySize != 0 && StringMaxSize > VarArraySize) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, MAX->getLine(), "String MaxSize can't be larger than the max number of elements in string array.");
+                                                          } else if (StringMaxSize < StringMinSize) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, MAX->getLine(), "String MaxSize can't be less than String MinSize.");
+                                                          }
+                                                          SObj.SetMaxSize (StringMaxSize);
+                                                       >>
   vfrStatementQuestionOptionList
   E:EndString                                          << CRT_END_OP (E); >>
   ";"
@@ -1932,6 +1954,9 @@ stringFlagsField [UINT8 & HFlags, UINT8 & LFlags] :
 vfrStatementPassword :
   <<
      CIfrPassword PObj;
+     UINT32 VarArraySize;
+     UINT16 PasswordMinSize;
+     UINT16 PasswordMaxSize;
   >>
   L:Password                                           << PObj.SetLineNo(L->getLine()); >>
   vfrQuestionHeader[PObj] ","
@@ -1939,8 +1964,27 @@ vfrStatementPassword :
   {
     Key "=" KN:Number ","                              << AssignQuestionKey (PObj, KN); >>
   }
-  MinSize "=" MIN:Number ","                           << PObj.SetMinSize (_STOU16(MIN->getText())); >>
-  MaxSize "=" MAX:Number ","                           << PObj.SetMaxSize (_STOU16(MAX->getText())); >>
+  MinSize "=" MIN:Number ","                           << 
+                                                          VarArraySize = _GET_CURRQEST_ARRAY_SIZE();
+                                                          PasswordMinSize = _STOU16(MIN->getText());
+                                                          if (_STOU64(MIN->getText()) > PasswordMinSize) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, MIN->getLine(), "Password MinSize takes only two byte, which can't be larger than 0xFFFF.");
+                                                          } else if (VarArraySize != 0 && PasswordMinSize > VarArraySize) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, MIN->getLine(), "Password MinSize can't be larger than the max number of elements in password array.");
+                                                          }
+                                                          PObj.SetMinSize (PasswordMinSize);
+                                                       >>
+  MaxSize "=" MAX:Number ","                           << 
+                                                          PasswordMaxSize = _STOU16(MAX->getText());
+                                                          if (_STOU64(MAX->getText()) > PasswordMaxSize) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, MAX->getLine(), "Password MaxSize takes only two byte, which can't be larger than 0xFFFF.");
+                                                          } else if (VarArraySize != 0 && PasswordMaxSize > VarArraySize) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, MAX->getLine(), "Password MaxSize can't be larger than the max number of elements in password array.");
+                                                          } else if (PasswordMaxSize < PasswordMinSize) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, MAX->getLine(), "Password MaxSize can't be less than Password MinSize.");
+                                                          }
+                                                          PObj.SetMaxSize (PasswordMaxSize);
+                                                       >>
   { Encoding "=" Number "," }
   vfrStatementQuestionOptionList
   E:EndPassword                                        << CRT_END_OP (E); >>
@@ -1961,12 +2005,23 @@ passwordFlagsField [UINT8 & HFlags] :
 vfrStatementOrderedList :
   <<
      CIfrOrderedList OLObj;
+     UINT32 VarArraySize;
   >>
   L:OrderedList                                        << OLObj.SetLineNo(L->getLine()); >>
   vfrQuestionHeader[OLObj] ","
-                                                       << OLObj.SetMaxContainers ((UINT8) _GET_CURRQEST_ARRAY_SIZE()); >>
+                                                       << 
+                                                          VarArraySize = _GET_CURRQEST_ARRAY_SIZE();
+                                                          OLObj.SetMaxContainers ((UINT8) (VarArraySize > 0xFF ? 0xFF : VarArraySize));
+                                                       >>
   {
-    MaxContainers "=" M:Number ","                     << OLObj.SetMaxContainers (_STOU8(M->getText())); >>
+    MaxContainers "=" M:Number ","                     << 
+                                                          if (_STOU64(M->getText()) > _STOU8(M->getText())) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, M->getLine(), "OrderedList MaxContainers takes only one byte, which can't be larger than 0xFF.");
+                                                          } else if (VarArraySize != 0 && _STOU8(M->getText()) > VarArraySize) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, M->getLine(), "OrderedList MaxContainers can't be larger than the max number of elements in array.");
+                                                          }
+                                                          OLObj.SetMaxContainers (_STOU8(M->getText()));
+                                                       >>
   }
   { F:FLAGS "=" vfrOrderedListFlags[OLObj, F->getLine()] }
   vfrStatementQuestionOptionList
@@ -2002,7 +2057,7 @@ vfrStatementTime :
     (
       vfrQuestionHeader[TObj, QUESTION_TIME] ","
     { F:FLAGS "=" vfrTimeFlags[TObj, F->getLine()] "," }
-      vfrStatementDefault
+      vfrStatementQuestionOptionList
     )
     |
     (

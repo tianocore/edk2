@@ -1,8 +1,8 @@
 ## @file
 # Common routines used by all tools
 #
-# Copyright (c) 2007, Intel Corporation
-# All rights reserved. This program and the accompanying materials
+# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
@@ -1322,7 +1322,12 @@ class PathClass(object):
 
         RealFile, RealRoot = RealPath2(self.File, self.Root, self.AlterRoot)
         if not RealRoot and not RealFile:
-            return FILE_NOT_FOUND, self.File
+            RealFile = self.File
+            if self.AlterRoot:
+                RealFile = os.path.join(self.AlterRoot, self.File)
+            elif self.Root:
+                RealFile = os.path.join(self.Root, self.File)
+            return FILE_NOT_FOUND, os.path.join(self.AlterRoot, RealFile)
 
         ErrorCode = 0
         ErrorInfo = ''

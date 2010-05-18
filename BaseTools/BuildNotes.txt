@@ -6,7 +6,7 @@ Root Package 1.00
 Intel is a trademark or registered trademark of Intel Corporation or its
 subsidiaries in the United States and other countries.
 * Other names and brands may be claimed as the property of others.
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007, Intel Corporation. All rights reserved.
 
 -------------------------------------------------------------------------------
 Quick Start

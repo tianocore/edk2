@@ -1,8 +1,8 @@
 ## @file
 # This file is used to define checkpoints used by ECC tool
 #
-# Copyright (c) 2008 - 2010, Intel Corporation
-# All rights reserved. This program and the accompanying materials
+# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
@@ -341,9 +341,19 @@ class Check(object):
 
             for Dirpath, Dirnames, Filenames in self.WalkTree():
                 for F in Filenames:
-                    if os.path.splitext(F)[1] in ('.h', '.c'):
+                    Ext = os.path.splitext(F)[1]
+                    if Ext in ('.h', '.c'):
                         FullName = os.path.join(Dirpath, F)
                         MsgList = c.CheckFileHeaderDoxygenComments(FullName)
+                    elif Ext in ('.inf', '.dec', '.dsc', '.fdf'):
+                        FullName = os.path.join(Dirpath, F)
+                        if not open(FullName).read().startswith('## @file'):
+                            SqlStatement = """ select ID from File where FullPath like '%s'""" % FullName
+                            ResultSet = EccGlobalData.gDb.TblFile.Exec(SqlStatement)
+                            for Result in ResultSet:
+                                Msg = 'INF/DEC/DSC/FDF file header comment should begin with ""## @file""'
+                                EccGlobalData.gDb.TblReport.Insert(ERROR_DOXYGEN_CHECK_FILE_HEADER, Msg, "File", Result[0])
+                                        
 
     # Check whether the function headers are followed Doxygen special documentation blocks in section 2.3.5
     def DoxygenCheckFunctionHeader(self):
@@ -399,6 +409,7 @@ class Check(object):
         self.MetaDataFileCheckGuidDuplicate()
         self.MetaDataFileCheckModuleFileNoUse()
         self.MetaDataFileCheckPcdType()
+        self.MetaDataFileCheckModuleFileGuidDuplication()
 
     # Check whether each file defined in meta-data exists
     def MetaDataFileCheckPathName(self):
@@ -691,6 +702,38 @@ class Check(object):
 
             #ERROR_META_DATA_FILE_CHECK_PCD_TYPE
         pass
+
+    # Internal worker function to get the INF workspace relative path from FileID
+    def GetInfFilePathFromID(self, FileID):
+        Table = EccGlobalData.gDb.TblFile
+        SqlCommand = """select A.FullPath from %s as A where A.ID = %s""" % (Table.Table, FileID)
+        RecordSet = Table.Exec(SqlCommand)
+        Path = ""
+        for Record in RecordSet:
+            Path = Record[0].replace(EccGlobalData.gWorkspace, '')
+            if Path.startswith('\\') or Path.startswith('/'):
+                Path = Path[1:]
+        return Path
+    
+    # Check whether two module INFs under one workspace has the same FILE_GUID value
+    def MetaDataFileCheckModuleFileGuidDuplication(self):
+        if EccGlobalData.gConfig.MetaDataFileCheckModuleFileGuidDuplication == '1' or EccGlobalData.gConfig.MetaDataFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+            EdkLogger.quiet("Checking for pcd type in c code function usage ...")
+            Table = EccGlobalData.gDb.TblInf
+            SqlCommand = """
+                         select A.ID, A.Value2, A.BelongsToFile, B.BelongsToFile from %s as A, %s as B
+                         where A.Value1 = 'FILE_GUID' and B.Value1 = 'FILE_GUID' and
+                         A.Value2 = B.Value2 and A.ID <> B.ID group by A.ID
+                         """ % (Table.Table, Table.Table)
+            RecordSet = Table.Exec(SqlCommand)
+            for Record in RecordSet:
+                InfPath1 = self.GetInfFilePathFromID(Record[2])
+                InfPath2 = self.GetInfFilePathFromID(Record[3])
+                if InfPath1 and InfPath2:
+                    if not EccGlobalData.gException.IsException(ERROR_META_DATA_FILE_CHECK_MODULE_FILE_GUID_DUPLICATION, InfPath1):
+                        Msg = "The FILE_GUID of INF file [%s] is duplicated with that of %s" % (InfPath1, InfPath2)
+                        EccGlobalData.gDb.TblReport.Insert(ERROR_META_DATA_FILE_CHECK_MODULE_FILE_GUID_DUPLICATION, OtherMsg = Msg, BelongsToTable = Table.Table, BelongsToItem = Record[0])
+        
 
     # Check whether these is duplicate Guid/Ppi/Protocol name
     def CheckGuidProtocolPpi(self, ErrorID, Model, Table):

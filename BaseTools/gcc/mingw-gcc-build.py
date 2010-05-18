@@ -6,8 +6,8 @@
 #   http://mingw-w64.svn.sourceforge.net/viewvc/mingw-w64/trunk/mingw-w64-doc/
 #     howto-build/mingw-w64-howto-build.txt?revision=216&view=markup
 #
-# Copyright (c) 2008 - 2010, Intel Corporation
-# All rights reserved. This program and the accompanying materials
+# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.    The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
@@ -227,8 +227,8 @@ class SourceFiles:
                    'mingw-w64/files/mingw-w64/mingw-w64-snapshot/' + \
                    'mingw-w64-v1.0-snapshot-$version.tar.bz2/download',
             'extract-dir': os.path.join('mingw-w64-v1.0-$version', 'mingw-w64-headers'),
-            'version': '20100223',
-            'md5': '700b9f54e740b1b962c8a3a0f52b7c04',
+            'version': '20100427',
+            'md5': '1fe68f486bba8995f6a5cf0ed06c80f3',
             },
         }
 

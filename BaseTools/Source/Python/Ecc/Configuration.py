@@ -1,8 +1,8 @@
 ## @file
 # This file is used to define class Configuration
 #
-# Copyright (c) 2008, Intel Corporation
-# All rights reserved. This program and the accompanying materials
+# Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
@@ -222,7 +222,9 @@ class Configuration(object):
         self.MetaDataFileCheckModuleFileNoUse = 1
         # Check whether the PCD is correctly used in C function via its type
         self.MetaDataFileCheckPcdType = 1
-        
+        # Check whether there are FILE_GUID duplication among different INF files
+        self.MetaDataFileCheckModuleFileGuidDuplication = 1
+
         #
         # The check points in this section are reserved
         #

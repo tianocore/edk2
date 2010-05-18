@@ -1,8 +1,8 @@
 /** @file
 Ported ELF include files from FreeBSD
 
-Copyright (c) 2009 - 2010, Apple, Inc. All  rights reserved. 
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -597,7 +597,11 @@ typedef struct {
 #define	R_ARM_GOTPC		25	/* Add PC-relative GOT table address. */
 #define	R_ARM_GOT32		26	/* Add PC-relative GOT offset. */
 #define	R_ARM_PLT32		27	/* Add PC-relative PLT offset. */
-#define R_ARM_CALL          28
+#define R_ARM_CALL            28
+#define R_ARM_JMP24           29
+#define R_ARM_THM_MOVW_ABS_NC 47 
+#define R_ARM_THM_MOVT_ABS    48
+
 #define R_ARM_THM_JUMP19    51
 #define	R_ARM_GNU_VTENTRY	100
 #define	R_ARM_GNU_VTINHERIT	101

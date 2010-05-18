@@ -3,7 +3,7 @@
 @REM   however it may be executed directly from the BaseTools project folder
 @REM   if the file is not executed within a WORKSPACE\BaseTools folder.
 @REM
-@REM Copyright (c) 2006 - 2009, Intel Corporation.  All rights reserved.
+@REM Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
 @REM
 @REM This program and the accompanying materials are licensed and made available
 @REM under the terms and conditions of the BSD Licensewhich accompanies this 

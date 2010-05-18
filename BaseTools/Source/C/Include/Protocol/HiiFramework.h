@@ -3,7 +3,7 @@
   be used by resources which want to publish IFR/Font/String data and have it
   collected by the Configuration engine.
 
-  Copyright (c) 2007, Intel Corporation  All rights reserved.
+  Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this

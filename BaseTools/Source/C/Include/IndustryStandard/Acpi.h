@@ -2,7 +2,7 @@
   This file contains some basic ACPI definitions that are consumed by drivers
   that do not care about ACPI versions.
 
-  Copyright (c) 2006, Intel Corporation  All rights reserved.
+  Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this

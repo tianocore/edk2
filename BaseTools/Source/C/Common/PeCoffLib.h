@@ -1,8 +1,8 @@
 /** @file
 	Function prototypes and defines on Memory Only PE COFF loader
 
-	Copyright (c) 2006, Intel Corporation                                                         
-	All rights reserved. This program and the accompanying materials                          
+	Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials                          
 	are licensed and made available under the terms and conditions of the BSD License         
 	which accompanies this distribution.  The full text of the license may be found at        
 	http://opensource.org/licenses/bsd-license.php                                            
@@ -143,5 +143,39 @@ PeCoffLoaderGetEntryPoint (
   OUT VOID  **BaseOfImage
   )
 ;
+
+//
+// These functions are used by the ARM PE/COFF relocation code and by
+// the ELF to PE/COFF converter so that is why they are public
+//
+
+/**
+  Pass in a pointer to an ARM MOVT or MOVW immediate instruciton and 
+  return the immediate data encoded in the instruction
+
+  @param  Instruction   Pointer to ARM MOVT or MOVW immediate instruction
+
+  @return Immediate address encoded in the instruction
+
+**/
+UINT16
+ThumbMovtImmediateAddress (
+  IN UINT16 *Instruction
+  );
+
+/**
+  Update an ARM MOVT or MOVW immediate instruction immediate data.
+
+  @param  Instruction   Pointer to ARM MOVT or MOVW immediate instruction
+  @param  Address       New addres to patch into the instruction
+
+**/
+VOID
+ThumbMovtImmediatePatch (
+  IN OUT UINT16 *Instruction,
+  IN     UINT16 Address
+  );
+
+
 
 #endif

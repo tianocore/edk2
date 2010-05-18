@@ -1,5 +1,5 @@
-# Copyright (c) 2007 - 2010, Intel Corporation
-# All rights reserved. This program and the accompanying materials
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
@@ -15,6 +15,7 @@
 # Import Modules
 #
 import os, codecs, re
+import distutils.util
 import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import *
 from Common.String import GetLineNo
@@ -125,6 +126,8 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
         else:
             EdkLogger.error("Unicode File Parser", FORMAT_INVALID, "Invalid ISO 639-2 language code : %s" % LangName, File)
 
+    if (LangName[0] == 'X' or LangName[0] == 'x') and LangName[1] == '-':
+        return LangName
     if length == 2:
         if LangName.isalpha():
             return LangName
@@ -193,20 +196,20 @@ class UniFileClassObject(object):
     # Get Language definition
     #
     def GetLangDef(self, File, Line):
-        Lang = Line.split(u"//")[0].split()
+        Lang = distutils.util.split_quoted((Line.split(u"//")[0]))
         if len(Lang) != 3:
             try:
-                FileIn = codecs.open(File, mode='rb', encoding='utf-16').read()
+                FileIn = codecs.open(File.Path, mode='rb', encoding='utf-16').read()
             except UnicodeError, X:
                 EdkLogger.error("build", FILE_READ_FAILURE, "File read failure: %s" % str(X), ExtraData=File);
             except:
                 EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=File);
             LineNo = GetLineNo(FileIn, Line, False)
             EdkLogger.error("Unicode File Parser", PARSER_ERROR, "Wrong language definition",
-                            ExtraData="""%s\n\t*Correct format is like '#langdef eng "English"'""" % Line, File = File, Line = LineNo)
+                            ExtraData="""%s\n\t*Correct format is like '#langdef en-US "English"'""" % Line, File = File, Line = LineNo)
         else:
             LangName = GetLanguageCode(Lang[1], self.IsCompatibleMode, self.File)
-            LangPrintName = Lang[2][1:-1]
+            LangPrintName = Lang[2]
 
         IsLangInDef = False
         for Item in self.LanguageDef:

@@ -1,7 +1,7 @@
 /**@file
   Header file for EFI Variable Services.
 
-  Copyright (c) 2007 - 2008, Intel Corporation.  All rights reserved. <BR>
+  Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this

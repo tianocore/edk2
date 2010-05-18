@@ -1,7 +1,7 @@
 /** @file
   ACPI 3.0 definitions from the ACPI Specification Revision 3.0 September 2, 2004
 
-  Copyright (c) 2006 - 2007 Intel Corporation. All rights reserved. 
+  Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this

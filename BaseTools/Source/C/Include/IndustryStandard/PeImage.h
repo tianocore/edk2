@@ -4,7 +4,7 @@
 
   @bug Fix text - doc as defined in MSFT EFI specification.
 
-  Copyright (c) 2006 - 2008, Intel Corporation  All rights reserved.
+  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -110,6 +110,7 @@ typedef struct {
 #define EFI_IMAGE_FILE_EXECUTABLE_IMAGE     0x0002  // File is executable  (i.e. no unresolved externel references).
 #define EFI_IMAGE_FILE_LINE_NUMS_STRIPPED   0x0004  // Line nunbers stripped from file.
 #define EFI_IMAGE_FILE_LOCAL_SYMS_STRIPPED  0x0008  // Local symbols stripped from file.
+#define EFI_IMAGE_FILE_LARGE_ADDRESS_AWARE  0x0020  // Supports addresses > 2-GB
 #define EFI_IMAGE_FILE_BYTES_REVERSED_LO    0x0080  // Bytes of machine word are reversed.
 #define EFI_IMAGE_FILE_32BIT_MACHINE        0x0100  // 32 bit word machine.
 #define EFI_IMAGE_FILE_DEBUG_STRIPPED       0x0200  // Debugging info stripped from file in .DBG file
@@ -512,6 +513,9 @@ typedef struct {
 #define EFI_IMAGE_REL_BASED_MIPS_JMPADDR  5
 #define EFI_IMAGE_REL_BASED_IA64_IMM64    9
 #define EFI_IMAGE_REL_BASED_DIR64         10
+
+#define EFI_IMAGE_REL_BASED_ARM_THUMB_MOVW  11
+#define EFI_IMAGE_REL_BASED_ARM_THUMB_MOVT  12
 
 ///
 /// Line number format.

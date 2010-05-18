@@ -1,7 +1,7 @@
 /** @file
 
-Copyright (c) 1999 - 2010, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -123,7 +123,8 @@ PrintFileInfo (
 static
 EFI_STATUS
 PrintFvInfo (
-  IN VOID                         *Fv
+  IN VOID                         *Fv,
+  IN BOOLEAN                      IsChildFv
   );
 
 static
@@ -291,7 +292,7 @@ Returns:
 
   LoadGuidedSectionToolsTxt (argv[0]);
 
-  PrintFvInfo (FvImage);
+  PrintFvInfo (FvImage, FALSE);
 
   //
   // Clean up
@@ -305,7 +306,8 @@ Returns:
 static
 EFI_STATUS
 PrintFvInfo (
-  IN VOID                         *Fv
+  IN VOID                         *Fv,
+  IN BOOLEAN                      IsChildFv
   )
 /*++
 
@@ -316,6 +318,7 @@ Routine Description:
 Arguments:
 
   Fv            - Firmware Volume to print information about
+  IsChildFv     - Flag specifies whether the input FV is a child FV.
 
 Returns:
 
@@ -375,7 +378,11 @@ Returns:
     }
   }
 
-  printf ("There are a total of %d files in this FV\n", (int) NumberOfFiles);
+  if (IsChildFv) {
+    printf ("There are a total of %d files in the child FV\n", (int) NumberOfFiles);
+  } else {
+    printf ("There are a total of %d files in this FV\n", (int) NumberOfFiles);
+  }
 
   return EFI_SUCCESS;
 }
@@ -1275,7 +1282,7 @@ Returns:
       break;
 
     case EFI_SECTION_FIRMWARE_VOLUME_IMAGE:
-      Status = PrintFvInfo (((EFI_FIRMWARE_VOLUME_IMAGE_SECTION*)Ptr) + 1);
+      Status = PrintFvInfo (((EFI_FIRMWARE_VOLUME_IMAGE_SECTION*)Ptr) + 1, TRUE);
       if (EFI_ERROR (Status)) {
         Error (NULL, 0, 0003, "printing of FV section contents failed", NULL);
         return EFI_SECTION_ERROR;

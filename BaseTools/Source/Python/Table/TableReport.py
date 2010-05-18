@@ -1,8 +1,8 @@
 ## @file
 # This file is used to create/update/query/erase table for ECC reports
 #
-# Copyright (c) 2008 - 2010, Intel Corporation
-# All rights reserved. This program and the accompanying materials
+# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
@@ -105,7 +105,7 @@ class TableReport(Table):
                 IsCorrected = Record[5]
                 SqlCommand = ''
                 if BelongsToTable == 'File':
-                    SqlCommand = """select 0, FullPath from %s where ID = %s
+                    SqlCommand = """select 1, FullPath from %s where ID = %s
                              """ % (BelongsToTable, BelongsToItem)
                 else:
                     SqlCommand = """select A.StartLine, B.FullPath from %s as A, File as B
