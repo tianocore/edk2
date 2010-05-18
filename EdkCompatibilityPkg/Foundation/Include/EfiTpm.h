@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -25,11 +25,6 @@ Abstract:
 #define _EFI_TPM_H_
 
 #include "Tiano.h"
-
-//
-// The start of TPM return codes
-//
-#define TPM_BASE                    (EFI_MAX_BIT + (EFI_MAX_BIT >> 1))
 #include "IndustryStandard/Tpm12.h"
 
 //
@@ -117,7 +112,7 @@ typedef struct tdEFI_IMAGE_LOAD_EVENT {
 // the measurement of given configuration tables.
 //
 typedef struct tdEFI_HANDOFF_TABLE_POINTERS {
-  UINTN 	                          NumberOfTables;
+  UINTN                             NumberOfTables;
   EFI_CONFIGURATION_TABLE           TableEntry[1];
 } EFI_HANDOFF_TABLE_POINTERS;
 

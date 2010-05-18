@@ -2,7 +2,7 @@
   TPM Specification data structures (TCG TPM Specification Version 1.2 Revision 103)
   See http://trustedcomputinggroup.org for latest specification updates
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -19,7 +19,7 @@
 ///
 /// The start of TPM return codes
 ///
-#define TPM_BASE                    (MAX_BIT + (MAX_BIT >> 1))
+#define TPM_BASE                    0
 
 //
 // All structures MUST be packed on a byte boundary.
