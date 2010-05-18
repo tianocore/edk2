@@ -37,5 +37,6 @@
 [PcdsFeatureFlag.common]
 
 [PcdsFixedAtBuild.common]
-  gArmEbTokenSpaceGuid.PcdConsoleUart|0x12345678|UINT32|0x00000202
+  gArmEbTokenSpaceGuid.PcdConsoleUartBase|0x10009000|UINT32|0x00000001
+  gArmEbTokenSpaceGuid.PcdGdbUartBase|0x1000a000|UINT32|0x00000002
   

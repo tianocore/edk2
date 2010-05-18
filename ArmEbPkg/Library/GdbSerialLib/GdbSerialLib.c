@@ -17,7 +17,7 @@
 #include <Library/GdbSerialLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
-#include <Library/DebugLib.h>
+
 #include <ArmEb/ArmEb.h>
 
 RETURN_STATUS
@@ -26,7 +26,7 @@ GdbSerialLibConstructor (
   VOID
   )
 {
-  return RETURN_SUCCESS;
+  return GdbSerialInit (115200, 0, 8, 1);
 }
 
 RETURN_STATUS
@@ -38,6 +38,30 @@ GdbSerialInit (
   IN UINT8      StopBits 
   )
 {
+  if ((Parity != 0) || (DataBits != 8) || (StopBits != 1)) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  if (BaudRate != 115200) {
+    // Could add support for different Baud rates....
+    return RETURN_UNSUPPORTED;
+  }
+      
+  UINT32  Base = PcdGet32 (PcdGdbUartBase);
+  
+  // initialize baud rate generator to 115200 based on EB clock REFCLK24MHZ
+  MmioWrite32 (Base + UARTIBRD, UART_115200_IDIV);
+  MmioWrite32 (Base + UARTFBRD, UART_115200_FDIV);
+
+  // no parity, 1 stop, no fifo, 8 data bits
+  MmioWrite32 (Base + UARTLCR_H, 0x60);
+
+  // clear any pending errors
+  MmioWrite32 (Base + UARTECR, 0);
+
+  // enable tx, rx, and uart overall
+  MmioWrite32 (Base + UARTCR, 0x301);
+
   return RETURN_SUCCESS;
 }
 
@@ -47,7 +71,13 @@ GdbIsCharAvailable (
   VOID
   )  
 {
-  return FALSE;
+  UINT32 FR = PcdGet32 (PcdGdbUartBase) + UARTFR;
+
+  if ((MmioRead32 (FR) & UART_RX_EMPTY_FLAG_MASK) == 0) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
 }
 
 CHAR8
@@ -56,7 +86,11 @@ GdbGetChar (
   VOID
   )
 {
-  return (CHAR8)0;
+  UINT32  FR = PcdGet32 (PcdGdbUartBase) + UARTFR;
+  UINT32  DR = PcdGet32 (PcdGdbUartBase) + UARTDR;
+    
+  while ((MmioRead32 (FR) & UART_RX_EMPTY_FLAG_MASK) == 0);
+  return MmioRead8 (DR);
 }
 
 VOID
@@ -65,6 +99,11 @@ GdbPutChar (
   IN  CHAR8   Char
   )
 {
+  UINT32 FR = PcdGet32 (PcdGdbUartBase) + UARTFR;
+  UINT32 DR = PcdGet32 (PcdGdbUartBase) + UARTDR;
+
+  while ((MmioRead32 (FR) & UART_TX_EMPTY_FLAG_MASK) != 0);
+  MmioWrite8 (DR, Char);
   return;
 }
 

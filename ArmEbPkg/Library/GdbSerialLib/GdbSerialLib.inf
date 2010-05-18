@@ -35,3 +35,5 @@
   DebugLib
   IoLib   
 
+[FixedPcd]
+  gArmEbTokenSpaceGuid.PcdGdbUartBase

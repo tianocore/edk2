@@ -1,7 +1,9 @@
 #/** @file
-# EDK Serial port lib
+# Component description file for Base PCI Cf8 Library.
 #
-# Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
+# PCI CF8 Library that uses I/O ports 0xCF8 and 0xCFC to perform PCI Configuration cycles.
+#  Layers on top of an I/O Library instance.
+# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,27 +17,22 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ArmEbSerialPortLib
-  FILE_GUID                      = C653196A-3BE1-4ec7-850B-DB7E0A16150F
+  BASE_NAME                      = ArmEbDebugAgentTimerLib
+  FILE_GUID                      = 80949BBB-68EE-4a4c-B434-D5DB5A232F0C
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = SerialPortLib
+  LIBRARY_CLASS                  = DebugAgentTimerLib|SEC BASE DXE_CORE
 
-
-#
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
-#
 
 [Sources.common]
-  SerialPortLib.c
+  DebugAgentTimerLib.c
 
-[LibraryClasses]
-  IoLib
 
 [Packages]
   MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
   ArmEbPkg/ArmEbPkg.dec
-  
-[FixedPcd]
-  gArmEbTokenSpaceGuid.PcdConsoleUartBase
+
+[LibraryClasses]
+  IoLib
 

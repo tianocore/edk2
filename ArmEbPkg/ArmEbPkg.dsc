@@ -71,7 +71,7 @@
   
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
   
-  RealTimeClockLib|EmbeddedPkg/Library/TemplateRealTimeClockLib/TemplateRealTimeClockLib.inf
+  RealTimeClockLib|ArmEbPkg/Library/RealTimeClockLib/RealTimeClockLib.inf
 
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   
@@ -113,11 +113,13 @@
   
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+  DebugAgentTimerLib|ArmEbPkg/Library/DebugAgentTimerLib/DebugAgentTimerLib.inf
 
   SerialPortLib|ArmEbPkg/Library/SerialPortLib/SerialPortLib.inf
   TimerLib|ArmEbPkg/Library/TimerLib/TimerLib.inf  
   SerialPortLib|ArmEbPkg/Library/SerialPortLib/SerialPortLib.inf
   GdbSerialLib|ArmEbPkg/Library/GdbSerialLib/GdbSerialLib.inf
+
 
 
 [LibraryClasses.common.SEC]
@@ -133,6 +135,9 @@
   
   # 1/123 faster than Stm or Vstm version
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+
+  # Uncomment to turn on GDB stub in SEC. 
+  #DebugAgentLib|EmbeddedPkg/Library/GdbDebugAgent/GdbDebugAgent.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -312,6 +317,13 @@
   # ARM Pcds
   #
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
+
+  #
+  # ARM EB PCDS
+  #
+  gArmEbTokenSpaceGuid.PcdConsoleUartBase|0x10009000
+  gArmEbTokenSpaceGuid.PcdGdbUartBase|0x1000a000
+
 
 ################################################################################
 #

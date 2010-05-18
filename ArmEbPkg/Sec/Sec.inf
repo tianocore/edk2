@@ -35,6 +35,8 @@
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  ArmEbPkg/ArmEbPkg.dec
+  
 
 [LibraryClasses]
   BaseLib
@@ -44,6 +46,8 @@
   ExtractGuidedSectionLib
   LzmaDecompressLib
   PeCoffGetEntryPointLib
+  DebugAgentLib
+
 
 [FeaturePcd]  
   gEmbeddedTokenSpaceGuid.PcdCacheEnable

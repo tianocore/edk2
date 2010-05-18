@@ -55,6 +55,7 @@ LibResetSystem (
   case EfiResetCold:
   case EfiResetShutdown:
   default:
+    CpuDeadLoop ();
     break;
   }
 

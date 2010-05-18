@@ -15,7 +15,6 @@
 **/
 
 #include <Base.h>
-#include <Library/DebugLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
@@ -35,7 +34,7 @@ SerialPortInitialize (
   VOID
   )
 {
-  UINT32  Base = PcdGet32 (PcdConsoleUart);
+  UINT32  Base = PcdGet32 (PcdConsoleUartBase);
   
   // initialize baud rate generator to 115200 based on EB clock REFCLK24MHZ
   MmioWrite32 (Base + UARTIBRD, UART_115200_IDIV);
@@ -70,8 +69,8 @@ SerialPortWrite (
   IN UINTN     NumberOfBytes
 )
 {
-  UINT32 FR = PcdGet32(PcdConsoleUart) + UARTFR;
-  UINT32 DR = PcdGet32(PcdConsoleUart) + UARTDR;
+  UINT32 FR = PcdGet32 (PcdConsoleUartBase) + UARTFR;
+  UINT32 DR = PcdGet32 (PcdConsoleUartBase) + UARTDR;
   UINTN  Count;
     
   for (Count = 0; Count < NumberOfBytes; Count++, Buffer++) {
@@ -100,8 +99,8 @@ SerialPortRead (
   IN  UINTN     NumberOfBytes
 )
 {
-  UINT32  FR = PcdGet32(PcdConsoleUart) + UARTFR;
-  UINT32  DR = PcdGet32(PcdConsoleUart) + UARTDR;
+  UINT32  FR = PcdGet32 (PcdConsoleUartBase) + UARTFR;
+  UINT32  DR = PcdGet32 (PcdConsoleUartBase) + UARTDR;
   UINTN   Count;
     
   for (Count = 0; Count < NumberOfBytes; Count++, Buffer++) {
@@ -127,7 +126,7 @@ SerialPortPoll (
   VOID
   )
 {
-  UINT32 FR = PcdGet32(PcdConsoleUart) + UARTFR;
+  UINT32 FR = PcdGet32 (PcdConsoleUartBase) + UARTFR;
 
   if ((MmioRead32 (FR) & UART_RX_EMPTY_FLAG_MASK) == 0) {
     return TRUE;

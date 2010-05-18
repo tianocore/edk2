@@ -1,7 +1,8 @@
 #/** @file
-# EDK Serial port lib
+# Memory Status Code Library for UEFI drivers
 #
-# Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
+# Lib to provide memory journal status code reporting Routines
+# Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,27 +16,22 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ArmEbSerialPortLib
-  FILE_GUID                      = C653196A-3BE1-4ec7-850B-DB7E0A16150F
+  BASE_NAME                      = ArmEbRealTimeClockLib
+  FILE_GUID                      = 470DFB96-E205-4515-A75E-2E60F853E79D
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = SerialPortLib
+  LIBRARY_CLASS                  = RealTimeClockLib
 
-
-#
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
-#
 
 [Sources.common]
-  SerialPortLib.c
+  RealTimeClockLib.c
 
-[LibraryClasses]
-  IoLib
 
 [Packages]
   MdePkg/MdePkg.dec
-  ArmEbPkg/ArmEbPkg.dec
-  
-[FixedPcd]
-  gArmEbTokenSpaceGuid.PcdConsoleUartBase
+  EmbeddedPkg/EmbeddedPkg.dec
 
+[LibraryClasses]
+  IoLib
+  DebugLib
+  
