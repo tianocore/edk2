@@ -32,3 +32,4 @@
 
 [LibraryClasses]
   DebugLib
+  BaseLib

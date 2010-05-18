@@ -19,6 +19,7 @@
 
 #include <PiDxe.h>
 
+#include <Library/BaseLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 #include <Library/EfiResetSystemLib.h>
