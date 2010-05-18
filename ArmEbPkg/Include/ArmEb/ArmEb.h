@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __ARM_EB_H__
 #define __ARM_EB_H__
 
-#include <ArmEb\ArmEbUart.h>
-#include <ArmEb\ArmEbTimer.h>
+#include <ArmEb/ArmEbUart.h>
+#include <ArmEb/ArmEbTimer.h>
 
 #endif 

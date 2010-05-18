@@ -76,6 +76,7 @@ TimerInterruptHandler (
   OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
   // clear the periodic interrupt
+
   MmioWrite32 (EB_SP804_TIMER0_BASE + SP804_TIMER_INT_CLR_REG, 0);
 
   // signal end of interrupt early to help avoid losing subsequent ticks from long duration handlers
@@ -174,31 +175,49 @@ TimerDriverSetTimerPeriod (
 {
   EFI_STATUS  Status;
   UINT64      TimerTicks;
+
   
   // always disable the timer
   MmioAnd32 (EB_SP804_TIMER0_BASE + SP804_TIMER_CONTROL_REG, ~SP804_TIMER_CTRL_ENABLE);
 
   if (TimerPeriod == 0) {
     // leave timer disabled from above, and...
+
     // disable timer 0/1 interrupt for a TimerPeriod of 0
+
     
     Status = gInterrupt->DisableInterruptSource (gInterrupt, gVector);    
   } else {  
     // Convert TimerPeriod into 1MHz clock counts (us units = 100ns units / 10)
+
     TimerTicks = DivU64x32 (TimerPeriod, 10);
+
    
+
     // if it's larger than 32-bits, pin to highest value
+
     if (TimerTicks > 0xffffffff) {
+
       TimerTicks = 0xffffffff;
+
     }
 
+
+
     // Program the SP804 timer with the new count value
+
     MmioWrite32 (EB_SP804_TIMER0_BASE + SP804_TIMER_LOAD_REG, TimerTicks);
+
     
+
     // enable the timer
+
     MmioOr32 (EB_SP804_TIMER0_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
 
+
+
     // enable timer 0/1 interrupts
+
     Status = gInterrupt->EnableInterruptSource (gInterrupt, gVector);    
   }
 
@@ -330,17 +349,19 @@ TimerInitialize (
 {
   EFI_HANDLE  Handle = NULL;
   EFI_STATUS  Status;
-  UINT32      TimerBaseAddress;
+
 
   // configure free running timer (TIMER1) for 1MHz operation
   
+
   // AND disable clock, OR configure 1MHz clock
   MmioAndThenOr32 (EB_SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER1_EN, SP810_SYS_CTRL_TIMER1_TIMCLK);  
 
+
   // Renable timer
   MmioOr32 (EB_SP810_CTRL_BASE + SP810_SYS_CTRL_REG, SP810_SYS_CTRL_TIMER1_EN);  
-    
 
+    
   // configure timer 1 for free running operation, 32 bits, no prescaler, interrupt disabled
   MmioWrite32 (EB_SP804_TIMER1_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
 
@@ -349,6 +370,7 @@ TimerInitialize (
 
   // record free running tick value (should be close to 0xffffffff)
   mLastTickCount = MmioRead32 (EB_SP804_TIMER1_BASE + SP804_TIMER_CURRENT_REG);
+
 
   // Disable the timer
   Status = TimerDriverSetTimerPeriod (&gTimer, 0);
@@ -363,12 +385,13 @@ TimerInitialize (
   // configure periodic timer (TIMER0) for 1MHz operation
   MmioAndThenOr32 (EB_SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER0_EN, SP810_SYS_CTRL_TIMER0_TIMCLK);
 
+
   // Renable timer
   MmioOr32 (EB_SP810_CTRL_BASE + SP810_SYS_CTRL_REG, SP810_SYS_CTRL_TIMER0_EN);  
 
+
   // configure timer 0 for periodic operation, 32 bits, no prescaler, and interrupt enabled
   MmioWrite32 (EB_SP804_TIMER0_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_PERIODIC | SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1 | SP804_TIMER_CTRL_INT_ENABLE);
-
 
   // Set up default timer
   Status = TimerDriverSetTimerPeriod (&gTimer, FixedPcdGet32(PcdTimerPeriod)); // TIMER_DEFAULT_PERIOD
