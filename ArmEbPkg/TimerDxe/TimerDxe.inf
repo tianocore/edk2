@@ -1,0 +1,55 @@
+#/** @file
+#  
+#    Component discription file for Timer module
+#  
+#  Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmEbTimerDxe
+  FILE_GUID                      = B93B3662-C599-42ad-99E5-CD592431AE97
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = TimerInitialize
+
+[Sources.common]
+  Timer.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  UefiDriverEntryPoint
+  IoLib
+
+[Guids]
+
+[Protocols]
+  gEfiTimerArchProtocolGuid  
+  gHardwareInterruptProtocolGuid
+
+[Pcd.common]
+  gEmbeddedTokenSpaceGuid.PcdTimerPeriod
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds
+
+
+[Depex]
+  gHardwareInterruptProtocolGuid
