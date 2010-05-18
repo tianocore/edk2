@@ -10,6 +10,8 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
+  This does not follow public spec.
+
 **/
 
 #ifndef __ACPI_SYSTEM_DESCRIPTION_TABLE_H___
@@ -238,7 +240,7 @@ EFI_STATUS
 (EFIAPI *EFI_ACPI_FIND_PATH)(
   IN    EFI_ACPI_HANDLE HandleIn,
   IN    VOID            *AcpiPath,
-  OUT   EFI_ACPI_HANDLE HandleOut
+  OUT   EFI_ACPI_HANDLE *HandleOut
 );
 
 typedef struct _EFI_ACPI_SDT_PROTOCOL {
