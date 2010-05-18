@@ -41,10 +41,7 @@
   Ia32/InterlockedIncrement.asm | INTEL 
   Synchronization.c | INTEL
 
-  Ia32/InterlockedCompareExchange64.S | GCC 
-  Ia32/InterlockedCompareExchange32.S | GCC 
-  Ia32/InterlockedDecrement.S | GCC 
-  Ia32/InterlockedIncrement.S | GCC 
+  Ia32/GccInline.c | GCC
   SynchronizationGcc.c  | GCC
 
 [Sources.X64]
@@ -62,11 +59,7 @@
   X64/InterlockedIncrement.asm | INTEL 
   Synchronization.c | INTEL 
 
-
-  X64/InterlockedIncrement.S | GCC 
-  X64/InterlockedDecrement.S | GCC 
-  X64/InterlockedCompareExchange64.S | GCC 
-  X64/InterlockedCompareExchange32.S | GCC 
+  X64/GccInline.c | GCC
   SynchronizationGcc.c  | GCC 
 
 [Sources.IPF]
