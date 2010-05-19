@@ -51,7 +51,7 @@ ASM_PFX(_ModuleEntryPoint):
   // CPU DXE driver likes known values so it can let GDB stub hook vectors
   ldr     r1, ShouldNeverGetHere
   movs    r2, #0
-FillVectors
+FillVectors:
   str     r1, [r0, r2]
   adds    r2, r2, #4
   cmp     r2, #32
