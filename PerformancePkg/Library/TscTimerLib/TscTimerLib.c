@@ -15,7 +15,7 @@
   duration of each clock tick is uniform and supports the use of the TSC as a wall clock timer even if
   the processor core changes frequency.  This is the architectural behavior moving forward.
 
-  A Processor’s support for invariant TSC is indicated by CPUID.0x80000007.EDX[8].
+  A Processor's support for invariant TSC is indicated by CPUID.0x80000007.EDX[8].
 
   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
