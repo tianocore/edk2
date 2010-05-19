@@ -21,7 +21,7 @@
 // Handle to install ACPI Table Protocol
 //
 EFI_HANDLE    mHandle = NULL;
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_ACPI_TABLE_INSTANCE   *mPrivateData;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_ACPI_TABLE_INSTANCE   *mPrivateData = NULL;
 
 /**
   Entry point of the ACPI table driver.
