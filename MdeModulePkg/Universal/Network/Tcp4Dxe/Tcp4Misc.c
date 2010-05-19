@@ -1,7 +1,7 @@
 /** @file
   Misc support routines for tcp.
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -171,7 +171,7 @@ TcpInitTcbPeer (
   @param  Local                 Pointer to the local (IP, Port).
   @param  Remote                Pointer to the remote (IP, Port).
 
-  @return  Pointer to the TCP_CB with the least number of wildcard, 
+  @return  Pointer to the TCP_CB with the least number of wildcard,
            if NULL no match is found.
 
 **/
@@ -500,6 +500,9 @@ TcpSetState (
   IN     UINT8   State
   )
 {
+  ASSERT (Tcb->State < (sizeof (mTcpStateName) / sizeof (CHAR16 *)));
+  ASSERT (State < (sizeof (mTcpStateName) / sizeof (CHAR16 *)));
+
   DEBUG (
     (EFI_D_INFO,
     "Tcb (%p) state %s --> %s\n",
