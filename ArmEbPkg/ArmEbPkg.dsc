@@ -300,14 +300,14 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode|10
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData|0
 
-  gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|0x80001000
-  gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0x87FE0000 # stack at top of memory
+  gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|0x00001000
+  gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0x07FE0000 # stack at top of memory
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|0x20000    # 128K stack
-  gEmbeddedTokenSpaceGuid.PcdMemoryBase|0x80000000
-  gEmbeddedTokenSpaceGuid.PcdMemorySize|0x10000000
+  gEmbeddedTokenSpaceGuid.PcdMemoryBase|0x00000000
+  gEmbeddedTokenSpaceGuid.PcdMemorySize|0x10000000     # 256 MB
 
-  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x80000000
-  gArmTokenSpaceGuid.PcdCpuResetAddress|0x80008000
+  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x00000000
+  gArmTokenSpaceGuid.PcdCpuResetAddress|0x40000000       # set to start of NOR
   
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds|77
