@@ -398,12 +398,12 @@
   #  This PCD is a sample to explain FixedAtBuild UINT32 PCD usage.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
 
-  ## Indicate the max size of the populated capsule image that the platform can support.
+  ## Indicate the max size of the capsule image with reset flag that the platform can support.
   #  The default max size is 100MB (0x6400000) for more than one large capsule images.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule|0x6400000|UINT32|0x0001001e
 
-  ## Indicate the max size of the non-populated capsule image that the platform can support.
-  #  The default max size is 10MB (0xa00000) for the casule image without populated flag setting.
+  ## Indicate the max size of the capsule image without reset flag that the platform can support.
+  #  The default max size is 10MB (0xa00000) for the casule image without reset flag setting.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|0xa00000|UINT32|0x0001001f
 
   ## Null-terminated Unicode string of the firmware vendor name that is default name filled into the EFI System Table

@@ -238,6 +238,7 @@ QueryCapsuleCapabilities (
 {
   UINTN                     ArrayNumber;
   EFI_CAPSULE_HEADER        *CapsuleHeader;
+  BOOLEAN                   NeedReset;
 
   //
   // Capsule Count can't be less than one.
@@ -254,6 +255,7 @@ QueryCapsuleCapabilities (
   }
 
   CapsuleHeader = NULL;
+  NeedReset     = FALSE;
 
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
@@ -281,31 +283,31 @@ QueryCapsuleCapabilities (
   }
 
   //
-  // Assume that capsules have the same flags on reseting or not.
+  // Find out whether there is any capsule defined to persist across system reset. 
   //
-  CapsuleHeader = CapsuleHeaderArray[0];
-  if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
+  for (ArrayNumber = 0; ArrayNumber < CapsuleCount ; ArrayNumber++) {
+    CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
+    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
+      NeedReset = TRUE;
+      break;
+    }
+  }
+  
+  if (NeedReset) {
     //
     //Check if the platform supports update capsule across a system reset
     //
     if (!FeaturePcdGet(PcdSupportUpdateCapsuleReset)) {
       return EFI_UNSUPPORTED;
     }
-    *ResetType = EfiResetWarm;   
+    *ResetType = EfiResetWarm;
+    *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizePopulateCapsule);
   } else {
     //
     // For non-reset capsule image.
     //
     *ResetType = EfiResetCold;
-  }
-  
-  //
-  // The support max capsule image size
-  //
-  if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) != 0) {
-    *MaxiumCapsuleSize = PcdGet32(PcdMaxSizePopulateCapsule);
-  } else {
-    *MaxiumCapsuleSize = PcdGet32(PcdMaxSizeNonPopulateCapsule);
+    *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizeNonPopulateCapsule);
   }
 
   return EFI_SUCCESS;
