@@ -49,6 +49,10 @@
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   FileHandleLib|ShellPkg/Library/BaseFileHandleLib/BaseFileHandleLib.inf
 
+  PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
+  PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
+
+[LibraryClasses.IA32, LibraryClasses.X64]
   # This library instance mapping needs adjusting based on platform.
   # The TimerLib instance must match the TimerLib the platform was built with.
   # If the platform was built with more than one TimerLib type, then this utility
@@ -57,12 +61,12 @@
   #
   # TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
   TimerLib|PerformancePkg/Library/TscTimerLib/TscTimerLib.inf
-  PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
-  PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
 
 [LibraryClasses.IPF]
   PalLib|MdePkg/Library/UefiPalLib/UefiPalLib.inf
 
-[Components]
+[Components.IA32, Components.X64]
   PerformancePkg/Library/TscTimerLib/TscTimerLib.inf
+
+[Components]
   PerformancePkg/Dp_App/Dp.inf
