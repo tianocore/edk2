@@ -1,7 +1,7 @@
 /** @file
   GCC inline implementation of BaseSynchronizationLib processor specific functions.
   
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR> 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -49,7 +49,6 @@ InternalSyncIncrement (
     );
     
   return Result;    
-
 }
 
 
@@ -115,12 +114,7 @@ InternalSyncCompareExchange32 (
   IN      UINT32                    ExchangeValue
   )
 {
-// GCC 4.1 and forward supports atomic builtins  
-#if ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)))
 
-  return __sync_val_compare_and_swap (Value, CompareValue, ExchangeValue);
-
-#else
 
   __asm__ __volatile__ (
     "lock                 \n\t"
@@ -134,9 +128,7 @@ InternalSyncCompareExchange32 (
       "cc"
     );
     
-    return CompareValue;
-
-#endif
+  return CompareValue;
 }
 
 
@@ -165,12 +157,6 @@ InternalSyncCompareExchange64 (
   IN      UINT64                    ExchangeValue
   )
 {
-// GCC 4.1 and forward supports atomic builtins  
-#if ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)))
-
-  return __sync_val_compare_and_swap (Value, CompareValue, ExchangeValue);
-
-#else
 
   __asm__ __volatile__ (
     "lock                 \n\t"
@@ -185,8 +171,6 @@ InternalSyncCompareExchange64 (
     );
   
   return CompareValue;
-
-#endif
 }
 
 
