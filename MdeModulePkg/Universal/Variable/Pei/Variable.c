@@ -492,7 +492,7 @@ FindVariable (
   //
   // If gone through the VariableStore, that means we never find in Firmware any more.
   //
-  if (IndexTable->Length < VARIABLE_INDEX_TABLE_VOLUME) {
+  if ((IndexTable->Length < VARIABLE_INDEX_TABLE_VOLUME) && (!StopRecord)) {
     IndexTable->GoneThrough = 1;
   }
 
