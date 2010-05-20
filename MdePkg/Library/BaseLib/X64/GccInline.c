@@ -33,8 +33,8 @@ MemoryFence (
   )
 {
   // This is a little bit of overkill and it is more about the compiler that it is
-  // actually processor syncronization. This is like the _ReadWriteBarrier 
-  // Microsft specific intrinsic
+  // actually processor synchronization. This is like the _ReadWriteBarrier 
+  // Microsoft specific intrinsic
   __asm__ __volatile__ ("":::"memory");
 }
 
