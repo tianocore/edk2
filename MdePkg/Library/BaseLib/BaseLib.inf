@@ -391,7 +391,8 @@
   X86ReadIdtr.c
   X86ReadGdtr.c
   X86Msr.c
-  X86MemoryFence.c
+  X86MemoryFence.c | MSFT
+  X86MemoryFence.c | INTEL
   X86GetInterruptState.c
   X86FxSave.c
   X86FxRestore.c
