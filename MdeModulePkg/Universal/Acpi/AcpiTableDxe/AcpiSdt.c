@@ -562,6 +562,8 @@ Open (
   EFI_STATUS          Status;
   UINTN               MaxSize;
 
+  MaxSize = 0;
+
   //
   // Check for invalid input parameters
   //
