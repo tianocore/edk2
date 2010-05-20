@@ -3,7 +3,7 @@
   IDE Bus driver to support platform dependent timing information. This driver
   is responsible for early initialization of IDE controller.
 
-  Copyright (c) 2008 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -28,9 +28,9 @@ EFI_DRIVER_BINDING_PROTOCOL gIdeControllerDriverBinding = {
   NULL
 };
 
-//
-//  EFI_IDE_CONTROLLER_PROVATE_DATA Template
-//
+///
+///  EFI_IDE_CONTROLLER_PROVATE_DATA Template
+///
 EFI_IDE_CONTROLLER_INIT_PROTOCOL  gEfiIdeControllerInit = {
   IdeInitGetChannelInfo,
   IdeInitNotifyPhase,
@@ -42,9 +42,9 @@ EFI_IDE_CONTROLLER_INIT_PROTOCOL  gEfiIdeControllerInit = {
   ICH_IDE_MAX_CHANNEL
 };
 
-//
-//  EFI_ATA_COLLECTIVE_MODE Template
-//
+///
+///  EFI_ATA_COLLECTIVE_MODE Template
+///
 EFI_ATA_COLLECTIVE_MODE  gEfiAtaCollectiveModeTemplate = {
   {           
     TRUE,                   // PioMode.Valid
@@ -64,31 +64,24 @@ EFI_ATA_COLLECTIVE_MODE  gEfiAtaCollectiveModeTemplate = {
   }
 };
 
+/**
+  Chipset Ide Driver EntryPoint function. It follows the standard EFI driver model. 
+  It's called by StartImage() of DXE Core.
+
+  @param ImageHandle    While the driver image loaded be the ImageLoader(), 
+                        an image handle is assigned to this driver binary, 
+                        all activities of the driver is tied to this ImageHandle
+  @param SystemTable    A pointer to the system table, for all BS(Boo Services) and
+                        RT(Runtime Services)
+  
+  @return EFI_STATUS    Status of  EfiLibInstallDriverBindingComponentName2().
+**/
 EFI_STATUS
 EFIAPI
 InitializeIdeControllerDriver (
   IN EFI_HANDLE       ImageHandle,
   IN EFI_SYSTEM_TABLE *SystemTable
   )
-/*++
-  Routine Description:
-  
-    Chipset Ide Driver EntryPoint function. It follows the standard EFI driver 
-    model. It's called by StartImage() of DXE Core
-    
-  Argments:
-  
-    ImageHnadle  -- While the driver image loaded be the ImageLoader(), 
-                    an image handle is assigned to this driver binary, 
-                    all activities of the driver is tied to this ImageHandle
-    *SystemTable -- A pointer to the system table, for all BS(Boo Services) and
-                    RT(Runtime Services)
-
-  Retruns:
-  
-    Always call EfiLibInstallDriverBindingProtocol( ) and retrun the result
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -108,6 +101,17 @@ InitializeIdeControllerDriver (
   return Status;
 }
 
+/**
+  Register Driver Binding protocol for this driver.
+
+  @param This                   A pointer points to the Binding Protocol instance
+  @param Controller             The handle of controller to be tested. 
+  @param RemainingDevicePath    A pointer to the device path. Ignored by device
+                                driver but used by bus driver
+  
+  @retval EFI_SUCCESS           Driver loaded. 
+  @retval !EFI_SUCESS           Driver not loaded. 
+**/
 EFI_STATUS
 EFIAPI
 IdeControllerSupported (
@@ -115,24 +119,6 @@ IdeControllerSupported (
   IN EFI_HANDLE                  Controller,
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
   )
-/*++
-
-  Routine Description:
-  
-  Register Driver Binding protocol for this driver.
-  
-  Arguments:
-  
-    This                 -- a pointer points to the Binding Protocol instance
-    Controller           -- The handle of controller to be tested. 
-    *RemainingDevicePath -- A pointer to the device path. Ignored by device
-                            driver but used by bus driver
-
-  Returns:
-
-    EFI_SUCCESS          -- Driver loaded.
-    other                -- Driver not loaded.
---*/
 {
   EFI_STATUS                Status;
   EFI_PCI_IO_PROTOCOL       *PciIo;
@@ -198,6 +184,19 @@ Done:
   return Status;
 }
 
+/**
+  This routine is called right after the .Supported() called and return 
+  EFI_SUCCESS. Notes: The supported protocols are checked but the Protocols
+  are closed.  
+
+  @param This                   A pointer points to the Binding Protocol instance
+  @param Controller             The handle of controller to be tested. Parameter
+                                passed by the caller
+  @param RemainingDevicePath    A pointer to the device path. Should be ignored by
+                                device driver
+  
+  @return EFI_STATUS            Status of InstallMultipleProtocolInterfaces()
+**/
 EFI_STATUS
 EFIAPI
 IdeControllerStart (
@@ -205,22 +204,6 @@ IdeControllerStart (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
-
-  Routine Description:
-  
-    This routine is called right after the .Supported() called and return 
-    EFI_SUCCESS. Notes: The supported protocols are checked but the Protocols
-    are closed.
-
-  Arguments:
-      
-    This                 -- a pointer points to the Binding Protocol instance
-    Controller           -- The handle of controller to be tested. Parameter
-                            passed by the caller
-    *RemainingDevicePath -- A pointer to the device path. Should be ignored by
-                            device driver
---*/
 {
   EFI_STATUS           Status;
   EFI_PCI_IO_PROTOCOL  *PciIo;
@@ -258,6 +241,17 @@ IdeControllerStart (
                 );
 }
 
+/**
+  Stop this driver on Controller Handle. 
+
+  @param This               Protocol instance pointer.
+  @param Controller         Handle of device to stop driver on 
+  @param NumberOfChildren   Not used
+  @param ChildHandleBuffer  Not used
+  
+  @retval EFI_SUCESS        This driver is removed DeviceHandle 
+  @retval !EFI_SUCCESS      This driver was not removed from this device 
+**/
 EFI_STATUS
 EFIAPI
 IdeControllerStop (
@@ -266,22 +260,6 @@ IdeControllerStop (
   IN  UINTN                           NumberOfChildren,
   IN  EFI_HANDLE                      *ChildHandleBuffer
   )
-/*++
-  
-  Routine Description:
-    Stop this driver on Controller Handle. 
-
-  Arguments:
-    This              - Protocol instance pointer.
-    Controller        - Handle of device to stop driver on 
-    NumberOfChildren  - Not used
-    ChildHandleBuffer - Not used
-
-  Returns:
-    EFI_SUCCESS       - This driver is removed DeviceHandle
-    other             - This driver was not removed from this device
-  
---*/
 {
   EFI_STATUS                        Status;
   EFI_IDE_CONTROLLER_INIT_PROTOCOL  *IdeControllerInit;
@@ -334,6 +312,20 @@ IdeControllerStop (
 //
 // Interface functions of IDE_CONTROLLER_INIT protocol
 //
+/**
+  This function can be used to obtain information about a specified channel. 
+  It's usually used by IDE Bus driver during enumeration process.  
+
+  @param This           the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param Channel        Channel number (0 based, either 0 or 1)
+  @param Enabled        TRUE if the channel is enabled. If the channel is disabled, 
+                        then it will no be enumerated.
+  @param MaxDevices     The Max number of IDE devices that the bus driver can expect
+                        on this channel. For ATA/ATAPI, this number is either 1 or 2.
+  
+  @retval EFI_SUCCESS           Success to get channel information
+  @retval EFI_INVALID_PARAMETER Invalid channel id.
+**/
 EFI_STATUS
 EFIAPI
 IdeInitGetChannelInfo (
@@ -342,25 +334,6 @@ IdeInitGetChannelInfo (
   OUT  BOOLEAN                          *Enabled,
   OUT  UINT8                            *MaxDevices
   )
-/*++
-Routine Description:
-
-  This function can be used to obtain information about a specified channel. 
-  It's usually used by IDE Bus driver during enumeration process.
-
-Arguments:
-
-  This       -- the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
-  Channel    -- Channel number (0 based, either 0 or 1)
-  Enabled    -- TRUE if the channel is enabled. If the channel is disabled, 
-                then it will no be enumerated.
-  MaxDevices -- The Max number of IDE devices that the bus driver can expect
-                on this channel. For ATA/ATAPI, this number is either 1 or 2.
-
-Returns:
-  EFI_STATUS 
-
---*/
 {
   //
   // Channel number (0 based, either 0 or 1)
@@ -375,7 +348,16 @@ Returns:
   return EFI_INVALID_PARAMETER;
 }
 
+/**
+  This function is called by IdeBus driver before executing certain actions. 
+  This allows IDE Controller Init to prepare for each action.  
 
+  @param This       the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param Phase      phase indicator defined by IDE_CONTROLLER_INIT protocol
+  @param Channel    Channel number (0 based, either 0 or 1)
+  
+  @return EFI_SUCCESS Success operation.
+**/
 EFI_STATUS
 EFIAPI
 IdeInitNotifyPhase (
@@ -383,26 +365,21 @@ IdeInitNotifyPhase (
   IN  EFI_IDE_CONTROLLER_ENUM_PHASE      Phase,
   IN  UINT8                              Channel
   )
-/*++
-
-Routine Description:
-
-  This function is called by IdeBus driver before executing certain actions. 
-  This allows IDE Controller Init to prepare for each action.
-
-Arguments:
-
-  This     -- the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
-  Phase    -- phase indicator defined by IDE_CONTROLLER_INIT protocol
-  Channel  -- Channel number (0 based, either 0 or 1)
-
-Returns:
-    
---*/
 {
   return EFI_SUCCESS;
 }
 
+/**
+  This function is called by IdeBus driver to submit EFI_IDENTIFY_DATA data structure
+  obtained from IDE deivce. This structure is used to set IDE timing  
+
+  @param This           The EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param Channel        IDE channel number (0 based, either 0 or 1)
+  @param Device         IDE device number
+  @param IdentifyData   A pointer to EFI_IDENTIFY_DATA data structure
+  
+  @return EFI_SUCCESS   Success operation. 
+**/
 EFI_STATUS
 EFIAPI
 IdeInitSubmitData (
@@ -411,27 +388,21 @@ IdeInitSubmitData (
   IN  UINT8                               Device,
   IN  EFI_IDENTIFY_DATA                   *IdentifyData
   )
-/*++
-
-Routine Description:
-
-  This function is called by IdeBus driver to submit EFI_IDENTIFY_DATA data structure
-  obtained from IDE deivce. This structure is used to set IDE timing
-
-Arguments:
-
-  This         -- the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
-  Channel      -- IDE channel number (0 based, either 0 or 1)
-  Device       -- IDE device number
-  IdentifyData -- A pointer to EFI_IDENTIFY_DATA data structure
-
-Returns:
-    
---*/
 {
   return EFI_SUCCESS;
 }
 
+/**
+  This function is called by IdeBus driver to disqualify unsupported operation
+  mode on specfic IDE device  
+
+  @param This       the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param Channel    IDE channel number (0 based, either 0 or 1)
+  @param Device     IDE device number
+  @param BadModes   Operation mode indicator
+  
+  @return EFI_SUCCESS Success operation. 
+**/
 EFI_STATUS
 EFIAPI
 IdeInitDisqualifyMode (
@@ -440,27 +411,22 @@ IdeInitDisqualifyMode (
   IN  UINT8                               Device,
   IN  EFI_ATA_COLLECTIVE_MODE             *BadModes
   )
-/*++
-
-Routine Description:
-
-  This function is called by IdeBus driver to disqualify unsupported operation
-  mode on specfic IDE device
-
-Arguments:
-
-  This     -- the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
-  Channel  -- IDE channel number (0 based, either 0 or 1)
-  Device   -- IDE device number
-  BadModes -- Operation mode indicator
-
-Returns:
-    
---*/
 {
   return EFI_SUCCESS;
 }
 
+/**
+  This function is called by IdeBus driver to calculate the best operation mode
+  supported by specific IDE device  
+
+  @param This               the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param Channel            IDE channel number (0 based, either 0 or 1)
+  @param Device             IDE device number
+  @param SupportedModes     Modes collection supported by IDE device
+  
+  @retval EFI_OUT_OF_RESOURCES  Fail to allocate pool. 
+  @retval EFI_INVALID_PARAMETER Invalid channel id and device id.
+**/
 EFI_STATUS
 EFIAPI
 IdeInitCalculateMode (
@@ -469,23 +435,6 @@ IdeInitCalculateMode (
   IN  UINT8                                  Device,
   OUT EFI_ATA_COLLECTIVE_MODE                **SupportedModes
   )
-/*++
-
-Routine Description:
-
-  This function is called by IdeBus driver to calculate the best operation mode
-  supported by specific IDE device
-
-Arguments:
-
-  This           -- the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
-  Channel        -- IDE channel number (0 based, either 0 or 1)
-  Device         -- IDE device number
-  SupportedModes -- Modes collection supported by IDE device
-
-Returns:
-    
---*/
 {
   if (Channel >= ICH_IDE_MAX_CHANNEL || Device >= ICH_IDE_MAX_DEVICES) {
     return EFI_INVALID_PARAMETER;
@@ -499,7 +448,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function is called by IdeBus driver to set appropriate timing on IDE
+  controller according supported operation mode.  
 
+  @param This       the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param Channel    IDE channel number (0 based, either 0 or 1)
+  @param Device     IDE device number
+  @param Modes      IDE device modes
+  
+  @retval EFI_SUCCESS Sucess operation.
+**/
 EFI_STATUS
 EFIAPI
 IdeInitSetTiming (
@@ -508,22 +467,6 @@ IdeInitSetTiming (
   IN  UINT8                               Device,
   IN  EFI_ATA_COLLECTIVE_MODE             *Modes
   )
-/*++
-
-Routine Description:
-
-  This function is called by IdeBus driver to set appropriate timing on IDE
-  controller according supported operation mode
-
-Arguments:
-
-  This           -- the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
-  Channel        -- IDE channel number (0 based, either 0 or 1)
-  Device         -- IDE device number
-
-Returns:
-    
---*/
 {
   return EFI_SUCCESS;
 }
