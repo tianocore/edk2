@@ -39,7 +39,7 @@ ASM_PFX(_ModuleEntryPoint):
   orr     r0, r0, #0x00f00000   // Enable VPF access (V* instructions)
   mcr     p15, 0, r0, c1, c0, 2
   mov     r0, #0x40000000       // Set EN bit in FPEXC
-  msr     FPEXC,r0
+  mcr     p10,#0x7,r0,c8,c0,#0  // msr     FPEXC,r0 in ARM assembly
   
    
   // Set CPU vectors to start of DRAM
