@@ -1388,6 +1388,8 @@ BOpt_GetOptionNumber (
                           &gEfiGlobalVariableGuid,
                           &OrderListSize
                           );
+  ASSERT (OrderList != NULL);
+
   for (OptionNumber = 0; ; OptionNumber++) {
     for (Index = 0; Index < OrderListSize / sizeof (UINT16); Index++) {
       if (OptionNumber == OrderList[Index]) {
