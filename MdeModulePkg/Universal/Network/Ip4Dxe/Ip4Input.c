@@ -292,7 +292,7 @@ Ip4Reassemble (
   // check whether THIS.Start < PREV.End for overlap. If two fragments
   // overlaps, trim the overlapped part off THIS fragment.
   //
-  if ((Prev = Cur->ForwardLink) != Head) {
+  if ((Cur != Head) && ((Prev = Cur->BackLink) != Head)) {
     Fragment  = NET_LIST_USER_STRUCT (Prev, NET_BUF, List);
     Node      = IP4_GET_CLIP_INFO (Fragment);
 
