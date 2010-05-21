@@ -37,9 +37,6 @@
 ################################################################################
 [PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x06
-  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF
-  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
 
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
@@ -47,8 +44,6 @@
 [PcdsFeatureFlag]
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
 
 ###################################################################################################
 #
