@@ -26,10 +26,8 @@
 [LibraryClasses]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
