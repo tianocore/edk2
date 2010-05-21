@@ -63,21 +63,16 @@
 #
 ################################################################################
 [PcdsFeatureFlag]
-  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
   gOptionRomPkgTokenSpaceGuid.PcdSupportScsiPassThru|TRUE
   gOptionRomPkgTokenSpaceGuid.PcdSupportExtScsiPassThru|TRUE
 
 [PcdsFixedAtBuild]
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|0x0
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|0x0
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|0x0
-  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|0x0
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x27
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000042
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0x0
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|0x0
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|0x0
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|0x0
   gOptionRomPkgTokenSpaceGuid.PcdDriverSupportedEfiVersion|0x0002000a # EFI_2_10_SYSTEM_TABLE_REVISION
 
 ###################################################################################################
