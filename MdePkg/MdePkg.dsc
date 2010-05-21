@@ -25,28 +25,12 @@
   SKUID_IDENTIFIER               = DEFAULT
 
 [PcdsFeatureFlag]
-  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport|TRUE
 
 [PcdsFixedAtBuild]
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
-  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x06
-  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF
-  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|0
-  gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask|0
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000
-  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
-  gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue|3000
 
 [PcdsFixedAtBuild.IPF]
   gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000
