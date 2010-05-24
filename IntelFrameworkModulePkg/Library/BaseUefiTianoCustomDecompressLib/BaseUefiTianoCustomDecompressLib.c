@@ -108,6 +108,7 @@ GetBits (
 
   Creates Huffman Code mapping table for Extra Set, Char&Len Set 
   and Position Set according to code length array.
+  If TableBits > 16, then ASSERT ().
 
   @param  Sd        The global scratch data
   @param  NumOfChar Number of symbols in the symbol set
@@ -142,6 +143,12 @@ MakeTable (
   UINT16  Mask;
   UINT16  WordOfStart;
   UINT16  WordOfCount;
+
+  //
+  // The maximum mapping table width supported by this internal
+  // working function is 16.
+  //
+  ASSERT (TableBits <= 16);
 
   for (Index = 0; Index <= 16; Index++) {
     Count[Index] = 0;
