@@ -177,6 +177,7 @@ PerformQuickSort (
   ASSERT and return 0.
 **/
 INTN
+EFIAPI
 DevicePathCompare (
   IN  CONST VOID             *Buffer1,
   IN  CONST VOID             *Buffer2
