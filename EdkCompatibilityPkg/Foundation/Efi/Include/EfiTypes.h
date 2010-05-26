@@ -82,7 +82,9 @@ typedef UINT64 EFI_LBA;
 // use the correct C calling convention. All protocol member functions and
 // EFI intrinsics are required to modify thier member functions with EFIAPI.
 //
-#define EFIAPI  _EFIAPI
+#ifndef EFIAPI
+  #define EFIAPI  _EFIAPI
+#endif  
 
 //
 // EFI Constants. They may exist in other build structures, so #ifndef them.

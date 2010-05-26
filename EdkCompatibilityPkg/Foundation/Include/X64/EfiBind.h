@@ -128,45 +128,27 @@ Abstract:
 
 #endif
 
-
-#if !defined(__GNUC__) && (__STDC_VERSION__ < 199901L)
+#if defined(_MSC_EXTENSIONS)
   //
-  // No ANSI C 2000 stdint.h integer width declarations, so define equivalents
+  // use Microsoft C complier dependent integer width types 
   //
- 
-  #if _MSC_EXTENSIONS 
-    
-    //
-    // use Microsoft* C complier dependent interger width types 
-    //
-    typedef unsigned __int64    uint64_t;
-    typedef __int64             int64_t;
-    typedef unsigned __int32    uint32_t;
-    typedef __int32             int32_t;
-    typedef unsigned short      uint16_t;
-    typedef short               int16_t;
-    typedef unsigned char       uint8_t;
-    typedef char                int8_t;
-  #else
-
-    //
-    // Assume standard IA-32 alignment. 
-    // BugBug: Need to check portability of long long
-    //
-    typedef unsigned long long  uint64_t;
-    typedef long long           int64_t;
-    typedef unsigned int        uint32_t;
-    typedef int                 int32_t;
-    typedef unsigned short      uint16_t;
-    typedef short               int16_t;
-    typedef unsigned char       uint8_t;
-    typedef char                int8_t;
-  #endif
+  typedef unsigned __int64    uint64_t;
+  typedef __int64             int64_t;
+  typedef unsigned __int32    uint32_t;
+  typedef __int32             int32_t;
+  typedef unsigned short      uint16_t;
+  typedef short               int16_t;
+  typedef unsigned char       uint8_t;
+  typedef char                int8_t;
 #else
-  //
-  // Use ANSI C 2000 stdint.h integer width declarations
-  //
-  #include "stdint.h"
+  typedef unsigned long long  uint64_t;
+  typedef long long           int64_t;
+  typedef unsigned int        uint32_t;
+  typedef int                 int32_t;
+  typedef unsigned short      uint16_t;
+  typedef short               int16_t;
+  typedef unsigned char       uint8_t;
+  typedef char                int8_t;
 #endif
 
 //
