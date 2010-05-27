@@ -114,8 +114,6 @@
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
 
-UsbLib|AppleCommonPkg/Library/AppleUsbLib/AppleUsbDxeLib.inf
-
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -386,13 +384,6 @@ UsbLib|AppleCommonPkg/Library/AppleUsbLib/AppleUsbDxeLib.inf
 
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-
-  AppleCommonPkg/Bus/Pci/EhciDxe/Ehci.inf
-  AppleCommonPkg/Bus/Usb/UsbBotDxe/UsbBot.inf
-  AppleCommonPkg/Bus/Usb/UsbCbiDxe/Cbi0/UsbCbi0.inf
-  AppleCommonPkg/Bus/Usb/UsbCbiDxe/Cbi1/UsbCbi1.inf
-  AppleCommonPkg/Bus/Usb/UsbBusDxe/UsbBus.inf
-  AppleCommonPkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorage.inf
 
   #
   # Nand Flash
