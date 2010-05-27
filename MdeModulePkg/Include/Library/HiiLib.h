@@ -878,6 +878,105 @@ HiiCreateOrderedListOpCode (
   );
 
 /**
+  Create EFI_IFR_TEXT_OP opcode.
+
+  If OpCodeHandle is NULL, then ASSERT().
+
+  @param[in]  OpCodeHandle  Handle to the buffer of opcodes.
+  @param[in]  Prompt        String ID for Prompt.
+  @param[in]  Help          String ID for Help.
+  @param[in]  TextTwo       String ID for TextTwo.
+
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
+
+**/
+UINT8 *
+EFIAPI
+HiiCreateTextOpCode (
+  IN VOID           *OpCodeHandle,
+  IN EFI_STRING_ID  Prompt,
+  IN EFI_STRING_ID  Help,
+  IN EFI_STRING_ID  TextTwo
+  );
+
+/**
+  Create EFI_IFR_DATE_OP opcode.
+
+  If OpCodeHandle is NULL, then ASSERT().
+  If any reserved bits are set in QuestionFlags, then ASSERT().
+  If any reserved bits are set in DateFlags, then ASSERT().
+
+  @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
+  @param[in]  QuestionId            Question ID
+  @param[in]  VarStoreId            Storage ID, optional. If DateFlags is not
+                                    QF_DATE_STORAGE_NORMAL, this parameter is ignored.
+  @param[in]  VarOffset             Offset in Storage, optional. If DateFlags is not
+                                    QF_DATE_STORAGE_NORMAL, this parameter is ignored.
+  @param[in]  Prompt                String ID for Prompt
+  @param[in]  Help                  String ID for Help
+  @param[in]  QuestionFlags         Flags in Question Header
+  @param[in]  DateFlags             Flags for date opcode
+  @param[in]  DefaultsOpCodeHandle  Handle for a buffer of DEFAULT opcodes.  This
+                                    is an optional parameter that may be NULL.
+
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
+
+**/
+UINT8 *
+EFIAPI
+HiiCreateDateOpCode (
+  IN VOID             *OpCodeHandle,
+  IN EFI_QUESTION_ID  QuestionId,
+  IN EFI_VARSTORE_ID  VarStoreId,   OPTIONAL
+  IN UINT16           VarOffset,    OPTIONAL
+  IN EFI_STRING_ID    Prompt,
+  IN EFI_STRING_ID    Help,
+  IN UINT8            QuestionFlags,
+  IN UINT8            DateFlags,
+  IN VOID             *DefaultsOpCodeHandle  OPTIONAL
+  );
+
+/**
+  Create EFI_IFR_TIME_OP opcode.
+
+  If OpCodeHandle is NULL, then ASSERT().
+  If any reserved bits are set in QuestionFlags, then ASSERT().
+  If any reserved bits are set in TimeFlags, then ASSERT().
+
+  @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
+  @param[in]  QuestionId            Question ID
+  @param[in]  VarStoreId            Storage ID, optional. If TimeFlags is not
+                                    QF_TIME_STORAGE_NORMAL, this parameter is ignored.
+  @param[in]  VarOffset             Offset in Storage, optional. If TimeFlags is not
+                                    QF_TIME_STORAGE_NORMAL, this parameter is ignored.
+  @param[in]  Prompt                String ID for Prompt
+  @param[in]  Help                  String ID for Help
+  @param[in]  QuestionFlags         Flags in Question Header
+  @param[in]  TimeFlags             Flags for time opcode
+  @param[in]  DefaultsOpCodeHandle  Handle for a buffer of DEFAULT opcodes.  This
+                                    is an optional parameter that may be NULL.
+
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
+
+**/
+UINT8 *
+EFIAPI
+HiiCreateTimeOpCode (
+  IN VOID             *OpCodeHandle,
+  IN EFI_QUESTION_ID  QuestionId,
+  IN EFI_VARSTORE_ID  VarStoreId,   OPTIONAL
+  IN UINT16           VarOffset,    OPTIONAL
+  IN EFI_STRING_ID    Prompt,
+  IN EFI_STRING_ID    Help,
+  IN UINT8            QuestionFlags,
+  IN UINT8            TimeFlags,
+  IN VOID             *DefaultsOpCodeHandle  OPTIONAL
+  );
+
+/**
   This function updates a form that has previously been registered with the HII 
   Database.  This function will perform at most one update operation.
     
