@@ -765,6 +765,63 @@ ScsiDiskWrite10 (
   );
 
 /**
+  Submit Read(16) command.
+
+  @param  ScsiDiskDevice     The pointer of ScsiDiskDevice
+  @param  NeedRetry          The pointer of flag indicates if needs retry if error happens
+  @param  SenseDataArray     NOT used yet in this function
+  @param  NumberOfSenseKeys  The number of sense key
+  @param  Timeout            The time to complete the command
+  @param  DataBuffer         The buffer to fill with the read out data
+  @param  DataLength         The length of buffer
+  @param  StartLba           The start logic block address
+  @param  SectorSize         The size of sector
+
+  @return  EFI_STATUS is returned by calling ScsiRead10Command().
+**/
+EFI_STATUS
+ScsiDiskRead16 (
+  IN     SCSI_DISK_DEV         *ScsiDiskDevice,
+     OUT BOOLEAN               *NeedRetry,
+     OUT EFI_SCSI_SENSE_DATA   **SenseDataArray,   OPTIONAL
+     OUT UINTN                 *NumberOfSenseKeys,
+  IN     UINT64                Timeout,
+     OUT UINT8                 *DataBuffer,
+  IN OUT UINT32                *DataLength,
+  IN     UINT64                StartLba,
+  IN     UINT32                SectorSize
+  );
+  
+/**
+  Submit Write(16) Command.
+
+  @param  ScsiDiskDevice     The pointer of ScsiDiskDevice
+  @param  NeedRetry          The pointer of flag indicates if needs retry if error happens
+  @param  SenseDataArray     NOT used yet in this function
+  @param  NumberOfSenseKeys  The number of sense key
+  @param  Timeout            The time to complete the command
+  @param  DataBuffer         The buffer to fill with the read out data
+  @param  DataLength         The length of buffer
+  @param  StartLba           The start logic block address
+  @param  SectorSize         The size of sector
+
+  @return  EFI_STATUS is returned by calling ScsiWrite10Command().
+
+**/
+EFI_STATUS
+ScsiDiskWrite16 (
+  IN     SCSI_DISK_DEV         *ScsiDiskDevice,
+     OUT BOOLEAN               *NeedRetry,
+     OUT EFI_SCSI_SENSE_DATA   **SenseDataArray,   OPTIONAL
+     OUT UINTN                 *NumberOfSenseKeys,
+  IN     UINT64                Timeout,
+  IN     UINT8                 *DataBuffer,
+  IN OUT UINT32                *DataLength,
+  IN     UINT64                StartLba,
+  IN     UINT32                SectorSize
+  );  
+
+/**
   Get information from media read capacity command.
 
   @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
