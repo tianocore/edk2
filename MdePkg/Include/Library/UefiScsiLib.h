@@ -5,7 +5,7 @@
   for hard drive, CD and DVD devices that are the most common SCSI boot targets used by UEFI platforms.
   This library class depends on SCSI I/O Protocol defined in UEFI Specification and SCSI-2 industry standard.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -531,5 +531,108 @@ ScsiWrite10Command (
   IN     UINT32                SectorSize
   );
 
+/**
+  Execute Read(16) SCSI command on a specific SCSI target.
+
+  Executes the SCSI Read(16) command on the SCSI target specified by ScsiIo.
+  If Timeout is zero, then this function waits indefinitely for the command to complete.
+  If Timeout is greater than zero, then the command is executed and will timeout
+  after Timeout 100 ns units.  The StartLba and SectorSize parameters are used to
+  construct the CDB for this SCSI command.
+  If ScsiIo is NULL, then ASSERT().
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
+
+
+  @param[in]      ScsiIo               A pointer to SCSI IO protocol.
+  @param[in]      Timeout              The length of timeout period.
+  @param[in, out] SenseData            A pointer to output sense data.
+  @param[in, out] SenseDataLength      The length of output sense data.
+  @param[out]     HostAdapterStatus    The status of Host Adapter.
+  @param[out]     TargetStatus         The status of the target.
+  @param[in, out] DataBuffer           Read 16 command data.
+  @param[in, out] DataLength           The length of data buffer.
+  @param[in]      StartLba             The start address of LBA.
+  @param[in]      SectorSize           The sector size.
+
+  @retval  EFI_SUCCESS          Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire DataBuffer could
+                                not be transferred. The actual number of bytes transferred is returned in DataLength.
+  @retval  EFI_NOT_READY        The SCSI Request Packet could not be sent because there are too many 
+                                SCSI Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR     A device error occurred while attempting to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED      The command described by the SCSI Request Packet is not supported by 
+                                the SCSI initiator(i.e., SCSI  Host Controller)
+  @retval  EFI_TIMEOUT          A timeout occurred while waiting for the SCSI Request Packet to execute.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiRead16Command (
+  IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN     UINT64                Timeout,
+  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT UINT8                 *SenseDataLength,
+     OUT UINT8                 *HostAdapterStatus,
+     OUT UINT8                 *TargetStatus,
+  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT UINT32                *DataLength,
+  IN     UINT64                StartLba,
+  IN     UINT32                SectorSize
+  );
+
+
+/**
+  Execute Write(16) SCSI command on a specific SCSI target.
+
+  Executes the SCSI Write(16) command on the SCSI target specified by ScsiIo.
+  If Timeout is zero, then this function waits indefinitely for the command to complete.
+  If Timeout is greater than zero, then the command is executed and will timeout after
+  Timeout 100 ns units.  The StartLba and SectorSize parameters are used to construct
+  the CDB for this SCSI command.
+  If ScsiIo is NULL, then ASSERT().
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
+
+  @param[in]      ScsiIo               SCSI IO Protocol to use
+  @param[in]      Timeout              The length of timeout period.
+  @param[in, out] SenseData            A pointer to output sense data.
+  @param[in, out] SenseDataLength      The length of output sense data.
+  @param[out]     HostAdapterStatus    The status of Host Adapter.
+  @param[out]     TargetStatus         The status of the target.
+  @param[in, out] DataBuffer           A pointer to a data buffer.
+  @param[in, out] DataLength           The length of data buffer.
+  @param[in]      StartLba             The start address of LBA.
+  @param[in]      SectorSize           The sector size.
+
+  @retval  EFI_SUCCESS          Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire DataBuffer could
+                                not be transferred. The actual number of bytes transferred is returned in DataLength.
+  @retval  EFI_NOT_READY        The SCSI Request Packet could not be sent because there are too many 
+                                SCSI Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR     A device error occurred while attempting to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED      The command described by the SCSI Request Packet is not supported by 
+                                the SCSI initiator(i.e., SCSI  Host Controller)
+  @retval  EFI_TIMEOUT          A timeout occurred while waiting for the SCSI Request Packet to execute.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiWrite16Command (
+  IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN     UINT64                Timeout,
+  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT UINT8                 *SenseDataLength,
+     OUT UINT8                 *HostAdapterStatus,
+     OUT UINT8                 *TargetStatus,
+  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT UINT32                *DataLength,
+  IN     UINT64                StartLba,
+  IN     UINT32                SectorSize
+  );
 
 #endif
