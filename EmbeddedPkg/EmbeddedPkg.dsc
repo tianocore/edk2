@@ -239,14 +239,15 @@
   EmbeddedPkg/Library/EblAddExternalCommandLib/EblAddExternalCommandLib.inf 
   EmbeddedPkg/Library/EblCmdLibNull/EblCmdLibNull.inf
   EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
-  EmbeddedPkg/Library/GdbSerialDebugPortLib/GdbSerialDebugPortLib.inf  # ApplePkg
-  EmbeddedPkg/Library/GdbSerialLib/GdbSerialLib.inf                    # ApplePkg
+  EmbeddedPkg/Library/GdbSerialDebugPortLib/GdbSerialDebugPortLib.inf  
+  EmbeddedPkg/Library/GdbSerialLib/GdbSerialLib.inf                    
   EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
   EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   EmbeddedPkg/Library/TemplateSerialPortLib/TemplateSerialPortLib.inf
   EmbeddedPkg/Library/TemplateResetSystemLib/TemplateResetSystemLib.inf
   EmbeddedPkg/Library/TemplateRealTimeClockLib/TemplateRealTimeClockLib.inf
   EmbeddedPkg/Library/LzmaHobCustomDecompressLib/LzmaHobCustomDecompressLib.inf
+  EmbeddedPkg/Library/NullDmaLib/NullDmaLib.inf
 
   EmbeddedPkg/Ebl/Ebl.inf
 ####  EmbeddedPkg/EblExternCmd/EblExternCmd.inf
