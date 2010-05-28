@@ -748,6 +748,8 @@ DmaBlocks (
   EFI_PHYSICAL_ADDRESS	BufferAddress;
   OMAP_DMA4             Dma4;
   DMA_MAP_OPERATION     DmaOperation;
+  EFI_STATUS            MmcStatus;
+  UINTN                 RetryCount = 0;
 
 CpuDeadLoop ();
   // Map passed in buffer for DMA xfer
@@ -834,8 +836,41 @@ CpuDeadLoop ();
     return Status;
   }
 
+    //Check for the Transfer completion.
+  while (RetryCount < MAX_RETRY_COUNT) {
+    //Read Status
+    do {
+      MmcStatus = MmioRead32 (MMCHS_STAT);
+    } while (MmcStatus == 0);
+
+    //Check if Transfer complete (TC) bit is set?
+    if (MmcStatus & TC) {
+      break;
+    } else {
+      DEBUG ((EFI_D_ERROR, "MmcStatus for TC: %x\n", MmcStatus));
+      //Check if DEB, DCRC or DTO interrupt occured.
+      if ((MmcStatus & DEB) | (MmcStatus & DCRC) | (MmcStatus & DTO)) {
+        //There was an error during the data transfer.
+
+        //Set SRD bit to 1 and wait until it return to 0x0.
+        MmioOr32 (MMCHS_SYSCTL, SRD);
+        while((MmioRead32 (MMCHS_SYSCTL) & SRD) != 0x0);
+
+        DisableDmaChannel (2, DMA4_CSR_BLOCK, DMA4_CSR_ERR);
+        DmaUnmap (BufferMap);
+        return EFI_DEVICE_ERROR;
+      }
+    }
+    RetryCount++;
+  } 
+
   DisableDmaChannel (2, DMA4_CSR_BLOCK, DMA4_CSR_ERR);
   Status = DmaUnmap (BufferMap);
+
+  if (RetryCount == MAX_RETRY_COUNT) {
+    DEBUG ((EFI_D_ERROR, "TransferBlockData timed out.\n"));
+    return EFI_TIMEOUT;
+  }
 
   return Status;
 }
@@ -1121,7 +1156,8 @@ SdReadWrite (
       goto DoneRestoreTPL;
     }
 
-    //BytesToBeTranferedThisPass = (BytesToBeTranferedThisPass >= MAX_MMCHS_TRANSFER_SIZE) ? MAX_MMCHS_TRANSFER_SIZE : BytesRemainingToBeTransfered;
+    // Turn OFF DMA path until it is debugged
+    // BytesToBeTranferedThisPass = (BytesToBeTranferedThisPass >= MAX_MMCHS_TRANSFER_SIZE) ? MAX_MMCHS_TRANSFER_SIZE : BytesRemainingToBeTransfered;
     BytesToBeTranferedThisPass   = This->Media->BlockSize;
 
     BlockCount = BytesToBeTranferedThisPass/This->Media->BlockSize;
