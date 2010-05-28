@@ -50,6 +50,8 @@ DmaMap (
   OUT    VOID                           **Mapping
   )
 {
+  *DeviceAddress = (PHYSICAL_ADDRESS)(UINTN)HostAddress;
+  *Mapping = NULL;
   return EFI_SUCCESS;
 }
 
