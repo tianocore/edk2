@@ -35,6 +35,8 @@
   MemoryAllocationLib
   UncachedMemoryAllocationLib
   IoLib
+  BaseMemoryLib
+  ArmLib
   
   
 [Protocols]

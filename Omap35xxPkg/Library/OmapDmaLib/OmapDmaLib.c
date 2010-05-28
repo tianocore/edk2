@@ -21,6 +21,8 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UncachedMemoryAllocationLib.h>
 #include <Library/IoLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/ArmLib.h>
 #include <Omap3530/Omap3530.h>
 
 #include <Protocol/Cpu.h>
@@ -30,11 +32,13 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS      DeviceAddress;
   UINTN                     NumberOfBytes;
   DMA_MAP_OPERATION         Operation;
+  BOOLEAN                   DoubleBuffer;
 } MAP_INFO_INSTANCE;
 
 
 
 EFI_CPU_ARCH_PROTOCOL      *gCpu;
+UINTN                      gCacheAlignment = 0;
 
 /**                                                                 
   Configure OMAP DMA Channel
@@ -218,7 +222,9 @@ DmaMap (
   OUT    VOID                           **Mapping
   )
 {
+  EFI_STATUS            Status;
   MAP_INFO_INSTANCE     *Map;
+  VOID                  *Buffer;
 
   if ( HostAddress == NULL || NumberOfBytes == NULL || 
        DeviceAddress == NULL || Mapping == NULL ) {
@@ -240,13 +246,36 @@ DmaMap (
   
   *Mapping = Map;
 
+  if (((UINTN)HostAddress & (gCacheAlignment - 1)) != 0) {
+    Map->DoubleBuffer  = TRUE;
+    Status = DmaAllocateBuffer (EfiBootServicesData, EFI_SIZE_TO_PAGES (*NumberOfBytes), &Buffer);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    
+    *DeviceAddress = (PHYSICAL_ADDRESS)(UINTN)Buffer;
+    
+  } else {
+    Map->DoubleBuffer  = FALSE;
+  }
+
+  *NumberOfBytes &= *NumberOfBytes & ~(gCacheAlignment - 1); // Only do it on full cache lines
+  
   Map->HostAddress   = (UINTN)HostAddress;
   Map->DeviceAddress = *DeviceAddress;
   Map->NumberOfBytes = *NumberOfBytes;
   Map->Operation     = Operation;
 
-  // EfiCpuFlushTypeWriteBack, EfiCpuFlushTypeInvalidate
-  gCpu->FlushDataCache (gCpu, (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress, *NumberOfBytes, EfiCpuFlushTypeWriteBackInvalidate);
+  if (Map->DoubleBuffer) {
+    if (Map->Operation == MapOperationBusMasterWrite) {
+      CopyMem ((VOID *)(UINTN)Map->DeviceAddress, (VOID *)(UINTN)Map->HostAddress, Map->NumberOfBytes);
+    }
+  } else {
+    // EfiCpuFlushTypeWriteBack, EfiCpuFlushTypeInvalidate
+    if (Map->Operation == MapOperationBusMasterWrite || Map->Operation == MapOperationBusMasterRead) {
+      gCpu->FlushDataCache (gCpu, (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress,  Map->NumberOfBytes, EfiCpuFlushTypeWriteBackInvalidate);
+    }
+  }
   
   return EFI_SUCCESS;
 }
@@ -276,12 +305,22 @@ DmaUnmap (
   }
   
   Map = (MAP_INFO_INSTANCE *)Mapping;
-  if (Map->Operation == MapOperationBusMasterWrite) {
-    //
-    // Make sure we read buffer from uncached memory and not the cache
-    //
-    gCpu->FlushDataCache (gCpu, Map->HostAddress, Map->NumberOfBytes, EfiCpuFlushTypeInvalidate);
-  } 
+  
+  if (Map->DoubleBuffer) {
+    if (Map->Operation == MapOperationBusMasterRead) {
+      CopyMem ((VOID *)(UINTN)Map->HostAddress, (VOID *)(UINTN)Map->DeviceAddress, Map->NumberOfBytes);
+    }
+    
+    DmaFreeBuffer (EFI_SIZE_TO_PAGES (Map->NumberOfBytes), (VOID *)(UINTN)Map->DeviceAddress);
+  
+  } else {
+    if (Map->Operation == MapOperationBusMasterWrite) {
+      //
+      // Make sure we read buffer from uncached memory and not the cache
+      //
+      gCpu->FlushDataCache (gCpu, Map->HostAddress, Map->NumberOfBytes, EfiCpuFlushTypeInvalidate);
+    }
+  }
   
   FreePool (Map);
 
@@ -304,7 +343,8 @@ DmaUnmap (
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
   @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.  
                                    
-**/EFI_STATUS
+**/
+EFI_STATUS
 EFIAPI
 DmaAllocateBuffer (
   IN  EFI_MEMORY_TYPE              MemoryType,
@@ -373,6 +413,8 @@ OmapDmaLibConstructor (
   Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpu);
   ASSERT_EFI_ERROR(Status);
 
-  return EFI_SUCCESS;
+  gCacheAlignment = ArmDataCacheLineLength ();
+  
+  return Status;
 }
 
