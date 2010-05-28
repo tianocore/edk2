@@ -612,26 +612,6 @@ typedef struct {
   CHAR16                    TargetName[1];
 } ISCSI_DEVICE_PATH_WITH_NAME;
 
-
-//
-// Notes: EFI 64 shadow all option rom
-//
-#if defined (MDE_CPU_IPF)
-#define EFI64_SHADOW_ALL_LEGACY_ROM() ShadowAllOptionRom ();
-#else
-#define EFI64_SHADOW_ALL_LEGACY_ROM()
-#endif
-
-/**
-  Shadow all Legacy OptionRom. 
-
-**/
-VOID
-EFIAPI
-ShadowAllOptionRom (
-  VOID
-  );
-
 //
 // BBS support macros and functions
 //

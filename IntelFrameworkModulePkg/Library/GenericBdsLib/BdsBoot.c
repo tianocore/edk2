@@ -200,11 +200,6 @@ BdsLibBootViaBootOption (
   *ExitData     = NULL;
 
   //
-  // Notes: put EFI64 ROM Shadow Solution
-  //
-  EFI64_SHADOW_ALL_LEGACY_ROM ();
-
-  //
   // Notes: this code can be remove after the s3 script table
   // hook on the event EVT_SIGNAL_READY_TO_BOOT or
   // EVT_SIGNAL_LEGACY_BOOT

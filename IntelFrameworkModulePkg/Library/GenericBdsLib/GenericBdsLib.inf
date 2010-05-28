@@ -44,9 +44,6 @@
   String.c
   GenericBdsStrings.uni
   
-[Sources.IPF]
-  Ipf/ShadowRom.c
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
