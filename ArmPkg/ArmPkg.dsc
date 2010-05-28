@@ -28,6 +28,19 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
+[BuildOptions]
+  XCODE:*_*_ARM_ARCHCC_FLAGS     == -arch armv7 -march=armv7
+  XCODE:*_*_ARM_ARCHASM_FLAGS    == -arch armv7
+  XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv7
+  XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
+  
+  GCC:*_*_ARM_ARCHCC_FLAGS     == -march=armv7-a -mthumb
+  GCC:*_*_ARM_ARCHASM_FLAGS    == -march=armv7-a
+  GCC:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
+
+  RVCT:*_*_ARM_ARCHCC_FLAGS  == --cpu Cortex-A8 --thumb
+  RVCT:*_*_ARM_ARCHASM_FLAGS == --cpu Cortex-A8 
+  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG 
 
 [LibraryClasses.common]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -60,10 +73,10 @@
 
 [Components.common]
   ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
-  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLib.inf
-  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLibPrePi.inf
-  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLib.inf
-  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLibPrePi.inf
+##  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLib.inf
+##  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLibPrePi.inf
+##  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLib.inf
+##  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLibPrePi.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
   ArmPkg/Library/ArmLib/Null/NullArmLib.inf
@@ -75,6 +88,7 @@
   ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
   ArmPkg/Library/RvdPeCoffExtraActionLib/RvdPeCoffExtraActionLib.inf
   ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
+  ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
 
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
