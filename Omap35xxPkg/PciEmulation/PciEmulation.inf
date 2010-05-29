@@ -42,6 +42,7 @@
   UefiRuntimeServicesTableLib
   IoLib
   OmapDmaLib
+  DmaLib
 
 [Protocols]
   gEfiPciRootBridgeIoProtocolGuid

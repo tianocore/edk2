@@ -119,7 +119,7 @@
   TimerLib|ArmEbPkg/Library/TimerLib/TimerLib.inf  
   SerialPortLib|ArmEbPkg/Library/SerialPortLib/SerialPortLib.inf
   GdbSerialLib|ArmEbPkg/Library/GdbSerialLib/GdbSerialLib.inf
-
+  DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
 
 
 [LibraryClasses.common.SEC]

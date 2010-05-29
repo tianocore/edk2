@@ -36,6 +36,7 @@
   MemoryAllocationLib
   IoLib
   OmapDmaLib
+  DmaLib
 
 [Guids]
   

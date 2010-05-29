@@ -60,6 +60,7 @@
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
+  DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
 
 #
 # Assume everything is fixed at build
@@ -172,7 +173,7 @@
 [Components.common]
   Omap35xxPkg/Library/Omap35xxTimerLib/Omap35xxTimerLib.inf  
   Omap35xxPkg/Library/OmapLib/OmapLib.inf
-  Omap35xxPkg/Library/OmapLib/OmapDmaLib.inf
+  Omap35xxPkg/Library/OmapDmaLib/OmapDmaLib.inf
   
   Omap35xxPkg/Flash/Flash.inf
   Omap35xxPkg/MMCHSDxe/MMCHS.inf

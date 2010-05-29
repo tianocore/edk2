@@ -29,6 +29,7 @@
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/OmapDmaLib.h>
+#include <Library/DmaLib.h>
 
 #include <Protocol/EmbeddedExternalDevice.h>
 #include <Protocol/DevicePath.h>
