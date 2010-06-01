@@ -10,7 +10,8 @@ This is EDK style package and the following steps can help to build the package:
 2. Update EDK_SHELL_DIR macro in the [Defines] section in EdkShellPkg.dsc to point to
    the directory containing the EDK Shell source directory, e.g. $(WORKSPACE)\Shell.
 
-3. The EDK II style DSC file is used to validate build EDK Shell source & EDK compatibility package and can generate     the binaries in EdkShellBinPkg.
+3. The EDK II style DSC file is used to validate build EDK Shell source & EDK compatibility package and can
+   generate the binaries in EdkShellBinPkg.
    To use this file, execute the following command under workspace to build EDK Shell source:
    build -a IA32 -a X64 -a IPF -p EdkShellPkg\EdkShellPkg.dsc
    
@@ -20,3 +21,5 @@ This is EDK style package and the following steps can help to build the package:
    would not fix. Just fix the case of the file to match its usage and you should be 
    able to compile.
    
+5. If you need to use the binaries that are built from this package, be sure to update platform FDF file
+    to replace the binaries from EdkShellBinPkg.
