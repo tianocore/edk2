@@ -1092,7 +1092,7 @@ InternalX86ReadIdtr (
   )
 {
   __asm__ __volatile__ (
-    "sldt  %0"
+    "sidt  %0"
     : "=m" (*Idtr)
     );
 }
