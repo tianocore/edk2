@@ -1516,8 +1516,10 @@ DhcpOnTimerTick (
       Status = DhcpChooseOffer (DhcpSb);
 
       if (EFI_ERROR(Status)) {
-        FreePool (DhcpSb->LastOffer);
-        DhcpSb->LastOffer = NULL;
+        if (DhcpSb->LastOffer != NULL) {
+          FreePool (DhcpSb->LastOffer);
+          DhcpSb->LastOffer = NULL;
+        }
       } else {
         goto ON_EXIT;
       }
