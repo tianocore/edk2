@@ -670,6 +670,13 @@ Ip4FormCallback (
   EFI_STATUS                Status;
   EFI_INPUT_KEY             Key;
 
+  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
+    //
+    // Do nothing for UEFI OPEN/CLOSE Action
+    //
+    return EFI_SUCCESS;
+  }
+
   Ip4ConfigInstance = IP4_CONFIG_INSTANCE_FROM_CONFIG_ACCESS (This);
 
   IfrFormNvData = AllocateZeroPool (sizeof (IP4_CONFIG_IFR_NVDATA));

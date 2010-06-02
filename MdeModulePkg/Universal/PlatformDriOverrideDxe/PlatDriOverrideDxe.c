@@ -1334,7 +1334,14 @@ PlatOverMngrCallback (
   EFI_STRING_ID                             NewStringToken;
   EFI_INPUT_KEY                             Key;
   PLAT_OVER_MNGR_DATA                       *FakeNvData;
-  
+
+  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
+    //
+    // Do nothing for UEFI OPEN/CLOSE Action
+    //
+    return EFI_SUCCESS;
+  }
+
   Private = EFI_CALLBACK_INFO_FROM_THIS (This);
   FakeNvData = &Private->FakeNvData;
   if (!HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {

@@ -842,6 +842,8 @@ FormUpdateNotify (
   return EFI_SUCCESS;
 }
 
+BOOLEAN mFormCloseCallBack = FALSE;
+
 /**
   The worker function that send the displays to the screen. On output,
   the selection made by user is returned.
@@ -870,10 +872,16 @@ SetupBrowser (
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
   FORM_BROWSER_FORMSET            *FormSet;
   EFI_INPUT_KEY                   Key;
+  BOOLEAN                         FormOpenCallBack;
+  BOOLEAN                         SubmitFormIsRequired;
+  EFI_GUID                        CurrentFormSetGuid;
+  EFI_HII_HANDLE                  CurrentHiiHandle;
+  UINT16                          CurrentFormId;
 
   gMenuRefreshHead = NULL;
   gResetRequired = FALSE;
   FormSet = Selection->FormSet;
+  ConfigAccess = Selection->FormSet->ConfigAccess;
 
   //
   // Register notify for Form package update
@@ -891,53 +899,6 @@ SetupBrowser (
   }
 
   //
-  // Before display the formset, invoke ConfigAccess.Callback() with EFI_BROWSER_ACTION_FORM_OPEN
-  //
-  ConfigAccess = Selection->FormSet->ConfigAccess;
-  if ((ConfigAccess != NULL) && (Selection->Action != UI_ACTION_REFRESH_FORMSET)) {
-    ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-    mHiiPackageListUpdated = FALSE;
-    Status = ConfigAccess->Callback (
-                             ConfigAccess,
-                             EFI_BROWSER_ACTION_FORM_OPEN,
-                             0,
-                             EFI_IFR_TYPE_UNDEFINED,
-                             NULL,
-                             &ActionRequest
-                             );
-
-    if (!EFI_ERROR (Status)) {
-      switch (ActionRequest) {
-      case EFI_BROWSER_ACTION_REQUEST_RESET:
-        gResetRequired = TRUE;
-        break;
-
-      case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
-        //
-        // Till now there is no uncommitted data, so ignore this request
-        //
-        break;
-
-      case EFI_BROWSER_ACTION_REQUEST_EXIT:
-        Selection->Action = UI_ACTION_EXIT;
-        break;
-
-      default:
-        break;
-      }
-    }
-
-    if (mHiiPackageListUpdated) {
-      //
-      // IFR is updated during callback, force to reparse the IFR binary
-      //
-      mHiiPackageListUpdated = FALSE;
-      Selection->Action = UI_ACTION_REFRESH_FORMSET;
-      goto Done;
-    }
-  }
-
-  //
   // Initialize current settings of Questions in this FormSet
   //
   Status = InitializeCurrentSetting (Selection->FormSet);
@@ -950,7 +911,13 @@ SetupBrowser (
     //
     // Initialize Selection->Form
     //
+    FormOpenCallBack = FALSE;
     if (Selection->FormId == 0) {
+      //
+      // First Form will open.
+      //
+      FormOpenCallBack = TRUE;
+
       //
       // Zero FormId indicates display the first Form in a FormSet
       //
@@ -959,6 +926,12 @@ SetupBrowser (
       Selection->Form = FORM_BROWSER_FORM_FROM_LINK (Link);
       Selection->FormId = Selection->Form->FormId;
     } else {
+      if (Selection->Form == NULL) {
+        //
+        // First Form will open.
+        //
+        FormOpenCallBack = TRUE;
+      }
       Selection->Form = IdToForm (Selection->FormSet, Selection->FormId);
     }
 
@@ -989,11 +962,99 @@ SetupBrowser (
         return EFI_NOT_FOUND;
       }
     }
-    
+
+    //
+    // Keep current form information
+    //
+    CurrentHiiHandle   = Selection->Handle;
+    CopyGuid (&CurrentFormSetGuid, &Selection->FormSetGuid);
+    CurrentFormId      = Selection->FormId;
+
     //
     // Reset FormPackage update flag
     //
     mHiiPackageListUpdated = FALSE;
+
+    //
+    // Before display new form, invoke ConfigAccess.Callback() with EFI_BROWSER_ACTION_FORM_OPEN
+    // for each question with callback flag.
+    // New form may be the first form, or the different form after another form close.
+    //
+    if ((FormOpenCallBack || mFormCloseCallBack) && (ConfigAccess != NULL)) {
+      mFormCloseCallBack = FALSE;
+      //
+      // Go through each statement in this form
+      //
+      SubmitFormIsRequired = FALSE;
+      Link = GetFirstNode (&Selection->Form->StatementListHead);
+      while (!IsNull (&Selection->Form->StatementListHead, Link)) {
+        Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
+        Link = GetNextNode (&Selection->Form->StatementListHead, Link);
+        
+        if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != EFI_IFR_FLAG_CALLBACK) {
+          continue;
+        }
+
+        //
+        // Check whether Statement is disabled.
+        //
+        if (Statement->DisableExpression != NULL) {
+          Status = EvaluateExpression (Selection->FormSet, Selection->Form, Statement->DisableExpression);
+          if (!EFI_ERROR (Status) && 
+              (Statement->DisableExpression->Result.Type == EFI_IFR_TYPE_BOOLEAN) && 
+              (Statement->DisableExpression->Result.Value.b)) {
+            continue;
+          }
+        }
+
+        ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+        Status = ConfigAccess->Callback (
+                                 ConfigAccess,
+                                 EFI_BROWSER_ACTION_FORM_OPEN,
+                                 Statement->QuestionId,
+                                 EFI_IFR_TYPE_UNDEFINED,
+                                 NULL,
+                                 &ActionRequest
+                                 );
+
+        if (!EFI_ERROR (Status)) {
+          switch (ActionRequest) {
+          case EFI_BROWSER_ACTION_REQUEST_RESET:
+            gResetRequired = TRUE;
+            break;
+
+          case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
+            SubmitFormIsRequired = TRUE;
+            break;
+
+          case EFI_BROWSER_ACTION_REQUEST_EXIT:
+            Selection->Action = UI_ACTION_EXIT;
+            gNvUpdateRequired = FALSE;
+            break;
+
+          default:
+            break;
+          }
+        }
+      }
+      if (SubmitFormIsRequired) {
+        SubmitForm (Selection->FormSet, Selection->Form);
+      }
+      //
+      // EXIT requests to close form.
+      //
+      if (Selection->Action == UI_ACTION_EXIT) {
+        goto Done;
+      }
+      //
+      // IFR is updated during callback of open form, force to reparse the IFR binary
+      //
+      if (mHiiPackageListUpdated) {
+        Selection->Action = UI_ACTION_REFRESH_FORMSET;
+        mHiiPackageListUpdated = FALSE;
+        goto Done;
+      }
+    }
 
     //
     // Load Questions' Value for display
@@ -1003,6 +1064,12 @@ SetupBrowser (
       return Status;
     }
 
+    //
+    // EXIT requests to close form.
+    //
+    if (Selection->Action == UI_ACTION_EXIT) {
+      goto Done;
+    }
     //
     // IFR is updated during callback of read value, force to reparse the IFR binary
     //
@@ -1119,41 +1186,66 @@ SetupBrowser (
         Selection->Action = UI_ACTION_REFRESH_FORMSET;
       }
     }
-  } while (Selection->Action == UI_ACTION_REFRESH_FORM);
 
-  //
-  // Before exit the formset, invoke ConfigAccess.Callback() with EFI_BROWSER_ACTION_FORM_CLOSE
-  //
-  if ((ConfigAccess != NULL) && (Selection->Action == UI_ACTION_EXIT)) {
-    ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-    Status = ConfigAccess->Callback (
-                             ConfigAccess,
-                             EFI_BROWSER_ACTION_FORM_CLOSE,
-                             0,
-                             EFI_IFR_TYPE_UNDEFINED,
-                             NULL,
-                             &ActionRequest
-                             );
+    //
+    // Before exit the form, invoke ConfigAccess.Callback() with EFI_BROWSER_ACTION_FORM_CLOSE
+    // for each question with callback flag.
+    //
+    mFormCloseCallBack = FALSE;
+    if ((ConfigAccess != NULL) && 
+        ((Selection->Action == UI_ACTION_EXIT) || 
+         (Selection->Handle != CurrentHiiHandle) ||
+         (!CompareGuid (&CurrentFormSetGuid, &Selection->FormSetGuid)) ||
+         (Selection->FormId != CurrentFormId))) {
+      //
+      // Go through each statement in this form
+      //
+      mFormCloseCallBack   = TRUE;
+      SubmitFormIsRequired = FALSE;
+      Link = GetFirstNode (&Selection->Form->StatementListHead);
+      while (!IsNull (&Selection->Form->StatementListHead, Link)) {
+        Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
+        Link = GetNextNode (&Selection->Form->StatementListHead, Link);
+        
+        if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != EFI_IFR_FLAG_CALLBACK) {
+          continue;
+        }
 
-    if (!EFI_ERROR (Status)) {
-      switch (ActionRequest) {
-      case EFI_BROWSER_ACTION_REQUEST_RESET:
-        gResetRequired = TRUE;
-        break;
+        ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+        Status = ConfigAccess->Callback (
+                                 ConfigAccess,
+                                 EFI_BROWSER_ACTION_FORM_CLOSE,
+                                 Statement->QuestionId,
+                                 EFI_IFR_TYPE_UNDEFINED,
+                                 NULL,
+                                 &ActionRequest
+                                 );
 
-      case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
+        if (!EFI_ERROR (Status)) {
+          switch (ActionRequest) {
+          case EFI_BROWSER_ACTION_REQUEST_RESET:
+            gResetRequired = TRUE;
+            break;
+
+          case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
+            SubmitFormIsRequired = TRUE;
+            break;
+
+          case EFI_BROWSER_ACTION_REQUEST_EXIT:
+            Selection->Action = UI_ACTION_EXIT;
+            gNvUpdateRequired = FALSE;
+            break;
+
+          default:
+            break;
+          }
+        }
+      }
+      if (SubmitFormIsRequired) {
         SubmitForm (Selection->FormSet, Selection->Form);
-        break;
-
-      case EFI_BROWSER_ACTION_REQUEST_EXIT:
-        gNvUpdateRequired = FALSE;
-        break;
-
-      default:
-        break;
       }
     }
-  }
+  } while (Selection->Action == UI_ACTION_REFRESH_FORM);
 
   //
   // Record the old formset

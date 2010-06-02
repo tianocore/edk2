@@ -562,6 +562,13 @@ IScsiFormCallback (
   EFI_STATUS                Status;
   EFI_INPUT_KEY             Key;
 
+  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
+    //
+    // Do nothing for UEFI OPEN/CLOSE Action
+    //
+    return EFI_SUCCESS;
+  }
+
   Private   = ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (This);
 
   //

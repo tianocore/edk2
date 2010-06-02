@@ -1679,10 +1679,9 @@ ValidateQuestion (
 
 
 /**
-  Perform NoSubmit check for a Form.
+  Perform NoSubmit check for each Form in FormSet.
 
   @param  FormSet                FormSet data structure.
-  @param  Form                   Form data structure.
 
   @retval EFI_SUCCESS            Form validation pass.
   @retval other                  Form validation failed.
@@ -1690,24 +1689,32 @@ ValidateQuestion (
 **/
 EFI_STATUS
 NoSubmitCheck (
-  IN  FORM_BROWSER_FORMSET            *FormSet,
-  IN  FORM_BROWSER_FORM               *Form
+  IN  FORM_BROWSER_FORMSET            *FormSet
   )
 {
   EFI_STATUS              Status;
   LIST_ENTRY              *Link;
   FORM_BROWSER_STATEMENT  *Question;
+  FORM_BROWSER_FORM       *Form;
+  LIST_ENTRY              *LinkForm;
 
-  Link = GetFirstNode (&Form->StatementListHead);
-  while (!IsNull (&Form->StatementListHead, Link)) {
-    Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
+  LinkForm = GetFirstNode (&FormSet->FormListHead);
+  while (!IsNull (&FormSet->FormListHead, LinkForm)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (LinkForm);
 
-    Status = ValidateQuestion (FormSet, Form, Question, EFI_HII_EXPRESSION_NO_SUBMIT_IF);
-    if (EFI_ERROR (Status)) {
-      return Status;
+    Link = GetFirstNode (&Form->StatementListHead);
+    while (!IsNull (&Form->StatementListHead, Link)) {
+      Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
+
+      Status = ValidateQuestion (FormSet, Form, Question, EFI_HII_EXPRESSION_NO_SUBMIT_IF);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      Link = GetNextNode (&Form->StatementListHead, Link);
     }
 
-    Link = GetNextNode (&Form->StatementListHead, Link);
+    LinkForm = GetNextNode (&FormSet->FormListHead, LinkForm);
   }
 
   return EFI_SUCCESS;
@@ -1738,7 +1745,7 @@ SubmitForm (
   //
   // Validate the Form by NoSubmit check
   //
-  Status = NoSubmitCheck (FormSet, Form);
+  Status = NoSubmitCheck (FormSet);
   if (EFI_ERROR (Status)) {
     return Status;
   }
