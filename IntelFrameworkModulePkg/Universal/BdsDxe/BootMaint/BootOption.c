@@ -1380,6 +1380,7 @@ BOpt_GetOptionNumber (
   OrderListSize = 0;
   OrderList     = NULL;
   OptionNumber  = 0;
+  Index         = 0;
 
   UnicodeSPrint (StrTemp, sizeof (StrTemp), L"%sOrder", Type);
 
@@ -1388,12 +1389,13 @@ BOpt_GetOptionNumber (
                           &gEfiGlobalVariableGuid,
                           &OrderListSize
                           );
-  ASSERT (OrderList != NULL);
 
   for (OptionNumber = 0; ; OptionNumber++) {
-    for (Index = 0; Index < OrderListSize / sizeof (UINT16); Index++) {
-      if (OptionNumber == OrderList[Index]) {
-        break;
+    if (OrderList != NULL) {
+      for (Index = 0; Index < OrderListSize / sizeof (UINT16); Index++) {
+        if (OptionNumber == OrderList[Index]) {
+          break;
+        }
       }
     }
 
