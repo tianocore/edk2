@@ -1618,9 +1618,9 @@ ScsiDiskReadSectors (
   // limit the data bytes that can be transferred by one Read(10) or Read(16) Command
   //
   if (ScsiVersion < SCSI_COMMAND_VERSION_3) {
-    MaxBlock         = 65535;
+    MaxBlock         = 0xFFFF;
   } else {
-    MaxBlock         = 4294967295;
+    MaxBlock         = 0xFFFFFFFF;
   }
 
   PtrBuffer = Buffer;
@@ -1742,9 +1742,9 @@ ScsiDiskWriteSectors (
   // limit the data bytes that can be transferred by one Read(10) or Read(16) Command
   //
   if (ScsiVersion < SCSI_COMMAND_VERSION_3) {
-    MaxBlock         = 65535;
+    MaxBlock         = 0xFFFF;
   } else {
-    MaxBlock         = 4294967295;
+    MaxBlock         = 0xFFFFFFFF;
   }
 
   PtrBuffer = Buffer;
