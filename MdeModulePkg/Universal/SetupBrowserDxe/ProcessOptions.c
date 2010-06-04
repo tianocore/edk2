@@ -778,8 +778,9 @@ ProcessOptions (
         //
         *StringPtr = 0;
         Status = PasswordCallback (Selection, MenuOption, StringPtr);
-        if (Status == EFI_NOT_AVAILABLE_YET) {
+        if (Status == EFI_NOT_AVAILABLE_YET || Status == EFI_UNSUPPORTED) {
           //
+          // Callback is not supported, or
           // Callback request to terminate password input
           //
           FreePool (StringPtr);

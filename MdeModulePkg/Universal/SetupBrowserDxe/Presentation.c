@@ -16,7 +16,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 BOOLEAN            mHiiPackageListUpdated;
 UI_MENU_SELECTION  *gCurrentSelection;
-
+EFI_HII_HANDLE     mCurrentHiiHandle = NULL;
+EFI_GUID           mCurrentFormSetGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
+UINT16             mCurrentFormId = 0;
 
 /**
   Clear retangle with specified text attribute.
@@ -842,8 +844,6 @@ FormUpdateNotify (
   return EFI_SUCCESS;
 }
 
-BOOLEAN mFormCloseCallBack = FALSE;
-
 /**
   The worker function that send the displays to the screen. On output,
   the selection made by user is returned.
@@ -872,11 +872,7 @@ SetupBrowser (
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
   FORM_BROWSER_FORMSET            *FormSet;
   EFI_INPUT_KEY                   Key;
-  BOOLEAN                         FormOpenCallBack;
   BOOLEAN                         SubmitFormIsRequired;
-  EFI_GUID                        CurrentFormSetGuid;
-  EFI_HII_HANDLE                  CurrentHiiHandle;
-  UINT16                          CurrentFormId;
 
   gMenuRefreshHead = NULL;
   gResetRequired = FALSE;
@@ -903,7 +899,6 @@ SetupBrowser (
   //
   Status = InitializeCurrentSetting (Selection->FormSet);
   if (EFI_ERROR (Status)) {
-    Selection->Action = UI_ACTION_EXIT;
     goto Done;
   }
 
@@ -911,13 +906,7 @@ SetupBrowser (
     //
     // Initialize Selection->Form
     //
-    FormOpenCallBack = FALSE;
     if (Selection->FormId == 0) {
-      //
-      // First Form will open.
-      //
-      FormOpenCallBack = TRUE;
-
       //
       // Zero FormId indicates display the first Form in a FormSet
       //
@@ -926,12 +915,6 @@ SetupBrowser (
       Selection->Form = FORM_BROWSER_FORM_FROM_LINK (Link);
       Selection->FormId = Selection->Form->FormId;
     } else {
-      if (Selection->Form == NULL) {
-        //
-        // First Form will open.
-        //
-        FormOpenCallBack = TRUE;
-      }
       Selection->Form = IdToForm (Selection->FormSet, Selection->FormId);
     }
 
@@ -939,7 +922,8 @@ SetupBrowser (
       //
       // No Form to display
       //
-      return EFI_NOT_FOUND;
+      Status = EFI_NOT_FOUND;
+      goto Done;
     }
 
     //
@@ -947,8 +931,9 @@ SetupBrowser (
     //
     if (Selection->Form->SuppressExpression != NULL) {
       Status = EvaluateExpression (Selection->FormSet, Selection->Form, Selection->Form->SuppressExpression);
-      if (EFI_ERROR (Status)) {
-        return Status;
+      if (EFI_ERROR (Status) || (Selection->Form->SuppressExpression->Result.Type != EFI_IFR_TYPE_BOOLEAN)) {
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
       }
 
       if (Selection->Form->SuppressExpression->Result.Value.b) {
@@ -959,16 +944,10 @@ SetupBrowser (
           CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gFormSuppress, gPressEnter, gEmptyString);
         } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
 
-        return EFI_NOT_FOUND;
+        Status = EFI_NOT_FOUND;
+        goto Done;
       }
     }
-
-    //
-    // Keep current form information
-    //
-    CurrentHiiHandle   = Selection->Handle;
-    CopyGuid (&CurrentFormSetGuid, &Selection->FormSetGuid);
-    CurrentFormId      = Selection->FormId;
 
     //
     // Reset FormPackage update flag
@@ -980,8 +959,18 @@ SetupBrowser (
     // for each question with callback flag.
     // New form may be the first form, or the different form after another form close.
     //
-    if ((FormOpenCallBack || mFormCloseCallBack) && (ConfigAccess != NULL)) {
-      mFormCloseCallBack = FALSE;
+    if ((ConfigAccess != NULL) &&
+        ((Selection->Handle != mCurrentHiiHandle) ||
+        (!CompareGuid (&Selection->FormSetGuid, &mCurrentFormSetGuid)) ||
+        (Selection->FormId != mCurrentFormId))) {
+
+      //
+      // Keep current form information
+      //
+      mCurrentHiiHandle   = Selection->Handle;
+      CopyGuid (&mCurrentFormSetGuid, &Selection->FormSetGuid);
+      mCurrentFormId      = Selection->FormId;
+
       //
       // Go through each statement in this form
       //
@@ -1061,7 +1050,7 @@ SetupBrowser (
     //
     Status = LoadFormSetConfig (Selection, Selection->FormSet);
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto Done;
     }
 
     //
@@ -1089,7 +1078,7 @@ SetupBrowser (
     //
     Status = DisplayForm (Selection);
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto Done;
     }
 
     //
@@ -1106,12 +1095,11 @@ SetupBrowser (
       //
       mHiiPackageListUpdated = FALSE;
 
-      if (((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK) && (Statement->Operand != EFI_IFR_PASSWORD_OP)) {
-        ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+      if ((ConfigAccess != NULL) && 
+          ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK) && 
+          (Statement->Operand != EFI_IFR_PASSWORD_OP)) {
 
-        if (ConfigAccess == NULL) {
-          return EFI_UNSUPPORTED;
-        }
+        ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
 
         HiiValue = &Statement->HiiValue;
         TypeValue = &HiiValue->Value;
@@ -1191,16 +1179,14 @@ SetupBrowser (
     // Before exit the form, invoke ConfigAccess.Callback() with EFI_BROWSER_ACTION_FORM_CLOSE
     // for each question with callback flag.
     //
-    mFormCloseCallBack = FALSE;
     if ((ConfigAccess != NULL) && 
         ((Selection->Action == UI_ACTION_EXIT) || 
-         (Selection->Handle != CurrentHiiHandle) ||
-         (!CompareGuid (&CurrentFormSetGuid, &Selection->FormSetGuid)) ||
-         (Selection->FormId != CurrentFormId))) {
+         (Selection->Handle != mCurrentHiiHandle) ||
+         (!CompareGuid (&Selection->FormSetGuid, &mCurrentFormSetGuid)) ||
+         (Selection->FormId != mCurrentFormId))) {
       //
       // Go through each statement in this form
       //
-      mFormCloseCallBack   = TRUE;
       SubmitFormIsRequired = FALSE;
       Link = GetFirstNode (&Selection->Form->StatementListHead);
       while (!IsNull (&Selection->Form->StatementListHead, Link)) {
@@ -1257,11 +1243,20 @@ SetupBrowser (
 
 Done:
   //
+  // Reset current form information to the initial setting when error happens or form exit.
+  //
+  if (EFI_ERROR (Status) || Selection->Action == UI_ACTION_EXIT) {
+    mCurrentHiiHandle = NULL;
+    CopyGuid (&mCurrentFormSetGuid, &gZeroGuid);
+    mCurrentFormId = 0;
+  }
+
+  //
   // Unregister notify for Form package update
   //
-  Status = mHiiDatabase->UnregisterPackageNotify (
-                           mHiiDatabase,
-                           NotifyHandle
-                           );
+  mHiiDatabase->UnregisterPackageNotify (
+                   mHiiDatabase,
+                   NotifyHandle
+                   );
   return Status;
 }

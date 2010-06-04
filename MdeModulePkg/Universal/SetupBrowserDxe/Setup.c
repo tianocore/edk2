@@ -2080,15 +2080,13 @@ LoadFormConfig (
     //
     // Check whether EfiVarstore with CallBack can be got.
     //
-    if ((Question->QuestionId != 0) && (Question->Storage != NULL) &&
+    if ((FormSet->ConfigAccess != NULL) &&
+        (Selection->Action != UI_ACTION_REFRESH_FORMSET) &&
+        (Question->QuestionId != 0) && 
+        (Question->Storage != NULL) &&
         (Question->Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) && 
         ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK)) {
-      //
-      // ConfigAccess can't be NULL.
-      //
-      if (FormSet->ConfigAccess == NULL) {
-        return EFI_UNSUPPORTED;
-      }
+
       //
       // Check QuestionValue does exist.
       //
