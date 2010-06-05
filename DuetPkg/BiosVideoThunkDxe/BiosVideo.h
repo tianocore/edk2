@@ -219,8 +219,9 @@ BiosVideoDriverBindingStop (
 
 **/
 EFI_STATUS
+EFIAPI
 BiosVideoCheckForVbe (
-  BIOS_VIDEO_DEV  *BiosVideoPrivate
+  IN OUT BIOS_VIDEO_DEV  *BiosVideoPrivate
   )
 ;
 
@@ -233,6 +234,7 @@ BiosVideoCheckForVbe (
 **/
 
 EFI_STATUS
+EFIAPI
 BiosVideoCheckForVga (
   BIOS_VIDEO_DEV  *BiosVideoPrivate
   )
