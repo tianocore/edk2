@@ -25,6 +25,7 @@ Revision History
 #define _EFI_PCI_POWER_MANAGEMENT_H
 
 EFI_STATUS
+EFIAPI
 ResetPowerManagementFeature (
   IN PCI_IO_DEVICE *PciIoDevice
   )
