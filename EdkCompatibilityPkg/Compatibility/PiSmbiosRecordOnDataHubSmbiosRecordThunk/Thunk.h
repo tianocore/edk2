@@ -265,6 +265,20 @@ SmbiosEnlargeStructureBuffer (
   );
 
 /**
+  Update the structure buffer of a structure node in SMBIOS database.
+  The function lead the structure pointer for SMBIOS record changed.
+  
+  @param StructureNode The structure node whose structure buffer is to be enlarged.
+  @param NewRecord     The new SMBIOS record.
+  
+**/
+VOID
+SmbiosUpdateStructureBuffer (
+  IN OUT  SMBIOS_STRUCTURE_NODE *StructureNode,
+  IN EFI_SMBIOS_TABLE_HEADER    *NewRecord
+  );
+
+/**
   Fill a standard Smbios string field. 
   
   This function will convert the unicode string to single byte chars, and only

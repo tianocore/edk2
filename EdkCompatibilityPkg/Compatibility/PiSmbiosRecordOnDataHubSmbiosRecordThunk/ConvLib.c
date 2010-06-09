@@ -2,7 +2,7 @@
   Common filling functions used in translating Datahub's record
   to PI SMBIOS's record.
   
-Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -156,6 +156,49 @@ SmbiosEnlargeStructureBuffer (
     &CountOfString
     );
   return EFI_SUCCESS;
+}
+
+/**
+  Update the structure buffer of a structure node in SMBIOS database.
+  The function lead the structure pointer for SMBIOS record changed.
+  
+  @param StructureNode The structure node whose structure buffer is to be enlarged.
+  @param NewRecord     The new SMBIOS record.
+  
+**/
+VOID
+SmbiosUpdateStructureBuffer (
+  IN OUT  SMBIOS_STRUCTURE_NODE *StructureNode,
+  IN EFI_SMBIOS_TABLE_HEADER    *NewRecord
+  )
+{
+  EFI_SMBIOS_PROTOCOL       *Smbios;
+  EFI_STATUS                Status;
+  UINT8                     CountOfString;
+  
+  Smbios    = GetSmbiosProtocol();
+  ASSERT (Smbios != NULL);
+  
+  Status = Smbios->Remove (Smbios, StructureNode->SmbiosHandle);
+  ASSERT_EFI_ERROR (Status);
+  
+  //
+  // try to use original handle to enlarge the buffer.
+  //
+  Status = Smbios->Add (Smbios, NULL, &StructureNode->SmbiosHandle, NewRecord);
+  ASSERT_EFI_ERROR (Status);
+  
+  StructureNode->Structure = GetSmbiosBufferFromHandle (
+                               StructureNode->SmbiosHandle, 
+                               StructureNode->SmbiosType, 
+                               NULL
+                               );
+  GetSmbiosStructureSize (
+    StructureNode->Structure,
+    &StructureNode->StructureSize,
+    &CountOfString
+    );
+  return ;
 }
 
 /**
