@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -466,6 +466,10 @@ Returns:
   EFI_STATUS  Status;
   VOID        *HobStart2;
 
+  //
+  // Initialize 'Buffer' to NULL before usage
+  //
+  Buffer = NULL;
   HobStart2 = HobStart;
   Status = GetNextGuidHob (
             &HobStart2,
@@ -473,9 +477,14 @@ Returns:
             &Buffer,
             &BufferSize
             );
-
+  if (EFI_ERROR (Status) || (Buffer == NULL)) {
+    //
+    // Failed to get HOB for gPalEntryHob
+    //
+    return EFI_NOT_FOUND;
+  }
   *PalEntry = *((EFI_PHYSICAL_ADDRESS *) Buffer);
-  return Status;
+  return EFI_SUCCESS;
 }
 
 
@@ -508,6 +517,10 @@ Returns:
   EFI_STATUS  Status;
   VOID        *HobStart2;
 
+  //
+  // Initialize 'Buffer' to NULL before usage
+  //
+  Buffer = NULL;
   HobStart2 = HobStart;
   Status = GetNextGuidHob (
             &HobStart2,
@@ -515,7 +528,13 @@ Returns:
             &Buffer,
             &BufferSize
             );
+  if (EFI_ERROR (Status) || (Buffer == NULL)) {
+    //
+    // Failed to get HOB for gEfiIoBaseHobGuid
+    //
+    return EFI_NOT_FOUND;
+  }
 
   *IoPortSpaceAddress = *((EFI_PHYSICAL_ADDRESS *) Buffer);
-  return Status;
+  return EFI_SUCCESS;
 }

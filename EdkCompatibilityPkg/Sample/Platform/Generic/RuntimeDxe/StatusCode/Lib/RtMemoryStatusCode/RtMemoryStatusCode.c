@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -124,6 +124,7 @@ Returns:
   // Locate the HOB that contains the PPI structure for the memory journal
   // We don't check for more than one.
   //
+  StatusCodeMemoryPpi = NULL;
   EfiLibGetSystemConfigurationTable (
     &gEfiHobListGuid,
     &HobList
@@ -134,7 +135,7 @@ Returns:
             (VOID **) &StatusCodeMemoryPpi,
             NULL
             );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (StatusCodeMemoryPpi == NULL)) {
     return ;
   }
   //

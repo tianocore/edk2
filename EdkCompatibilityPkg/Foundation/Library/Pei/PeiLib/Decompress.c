@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -312,14 +312,32 @@ Returns:
   UINT16  NextCode;
   UINT16  Mask;
 
-  for (Index = 1; Index <= 16; Index++) {
+  //
+  // TableBits should not be greater than 16.
+  //
+  if (TableBits >= (sizeof (Count)/sizeof (UINT16))) {
+    return (UINT16) BAD_TABLE;
+  }
+ 
+  //
+  // Initialize Count array starting from Index 0, as there is a possibility of Count array being uninitialized.
+  //
+  for (Index = 0; Index <= 16; Index++) {
     Count[Index] = 0;
   }
 
   for (Index = 0; Index < NumOfChar; Index++) {
-    Count[BitLen[Index]]++;
+    //
+    // Count array index should not be greater than or equal to its size.
+    //
+    if (BitLen[Index] < (sizeof (Count)/sizeof (UINT16))) {
+      Count[BitLen[Index]]++;
+    } else {
+      return (UINT16) BAD_TABLE;
+    }
   }
 
+  Start[0] = 0;
   Start[1] = 0;
 
   for (Index = 1; Index <= 16; Index++) {
@@ -358,7 +376,7 @@ Returns:
   for (Char = 0; Char < NumOfChar; Char++) {
 
     Len = BitLen[Char];
-    if (Len == 0) {
+    if (Len == 0 || Len >= 17) {
       continue;
     }
 
@@ -377,14 +395,20 @@ Returns:
       Index   = (UINT16) (Len - TableBits);
 
       while (Index != 0) {
-        if (*Pointer == 0) {
+        //
+        // Avail should be lesser than size of mRight and mLeft to prevent buffer overflow.
+        //
+        if ((*Pointer == 0) && (Avail < sizeof (Sd->mRight)/sizeof (UINT16)) && (Avail < sizeof (Sd->mLeft)/sizeof (UINT16))) {
           Sd->mRight[Avail]                     = Sd->mLeft[Avail] = 0;
           *Pointer = Avail++;
         }
 
-        if (Index3 & Mask) {
+        //
+        // *Pointer should be lesser than size of mRight and mLeft to prevent buffer overflow.
+        //
+        if ((Index3 & Mask) && (*Pointer < (sizeof (Sd->mRight)/sizeof (UINT16)))) {
           Pointer = &Sd->mRight[*Pointer];
-        } else {
+        } else if (*Pointer < (sizeof (Sd->mLeft)/sizeof (UINT16))) {
           Pointer = &Sd->mLeft[*Pointer];
         }
 
@@ -493,6 +517,13 @@ Returns:
 
   Number = (UINT16) GetBits (Sd, nbit);
 
+  if ((Number > sizeof (Sd->mPTLen)) || (nn > sizeof (Sd->mPTLen))) {
+    //
+    // Fail if Number or nn is greater than size of mPTLen
+    //
+    return (UINT16) BAD_TABLE;
+  }
+
   if (Number == 0) {
     CharC = (UINT16) GetBits (Sd, nbit);
 
@@ -528,6 +559,12 @@ Returns:
     if (Index == Special) {
       CharC = (UINT16) GetBits (Sd, 2);
       while ((INT16) (--CharC) >= 0) {
+        if (Index >= sizeof (Sd->mPTLen)) {
+          //
+          // Fail if Index is greater than or equal to mPTLen
+          //
+          return (UINT16) BAD_TABLE;
+        }
         Sd->mPTLen[Index++] = 0;
       }
     }

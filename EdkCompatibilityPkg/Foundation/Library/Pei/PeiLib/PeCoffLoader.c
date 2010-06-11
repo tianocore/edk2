@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -785,12 +785,18 @@ Returns:
     // the optional header to verify a desired directory entry is there.
     //
 
-    if (NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC) {
+    if (NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC && RelocDir->Size > 0) {
       RelocBase = PeCoffLoaderImageAddress (ImageContext, RelocDir->VirtualAddress);
       RelocBaseEnd = PeCoffLoaderImageAddress (
                       ImageContext,
                       RelocDir->VirtualAddress + RelocDir->Size - 1
                       );
+      if ((RelocBase == NULL) || (RelocBaseEnd == NULL)) {
+        //
+        // If the base start or end address resolved to 0, then fail.
+        //
+        return EFI_LOAD_ERROR;
+      }
     } else {
       //
       // Set base and end to bypass processing below.
@@ -806,13 +812,21 @@ Returns:
     // Find the relocation block
     //
     RelocDir = &Hdr.Te->DataDirectory[0];
-    RelocBase = (EFI_IMAGE_BASE_RELOCATION *)(UINTN)(
-                                    ImageContext->ImageAddress + 
-                                    RelocDir->VirtualAddress +
-                                    sizeof(EFI_TE_IMAGE_HEADER) - 
-                                    Hdr.Te->StrippedSize
-                                    );
-    RelocBaseEnd = (EFI_IMAGE_BASE_RELOCATION *) ((UINTN) RelocBase + (UINTN) RelocDir->Size - 1);
+    if (RelocDir->Size > 0) {
+      RelocBase = (EFI_IMAGE_BASE_RELOCATION *)(UINTN)(
+                                      ImageContext->ImageAddress +
+                                      RelocDir->VirtualAddress +
+                                      sizeof(EFI_TE_IMAGE_HEADER) -
+                                      Hdr.Te->StrippedSize
+                                      );
+      RelocBaseEnd = (EFI_IMAGE_BASE_RELOCATION *) ((UINTN) RelocBase + (UINTN) RelocDir->Size - 1);
+    } else {
+      //
+      // Set base and end to bypass processing below.
+      //
+      RelocBase = NULL;
+      RelocBaseEnd = NULL;
+    }
   }
   
   //
@@ -825,6 +839,13 @@ Returns:
     RelocEnd  = (UINT16 *) ((CHAR8 *) RelocBase + RelocBase->SizeOfBlock);
     if (!(ImageContext->IsTeImage)) {
       FixupBase = PeCoffLoaderImageAddress (ImageContext, RelocBase->VirtualAddress);
+
+      if (FixupBase == NULL) {
+        //
+        // If the FixupBase address resolved to 0, then fail.
+        //
+        return EFI_LOAD_ERROR;
+      }
     } else {
       FixupBase = (CHAR8 *)(UINTN)(ImageContext->ImageAddress +
                     RelocBase->VirtualAddress +

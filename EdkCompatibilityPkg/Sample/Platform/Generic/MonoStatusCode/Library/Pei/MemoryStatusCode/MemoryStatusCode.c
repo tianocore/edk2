@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -289,8 +289,7 @@ Returns:
                               &mPpiListStatusCode
                               );
     if (EFI_ERROR (Status)) {
-      EFI_BREAKPOINT ();
-      return ;
+      EFI_DEADLOOP ();
     }
     //
     // Publish a GUIDed HOB that contains a pointer to the status code PPI
@@ -306,8 +305,7 @@ Returns:
               sizeof (VOID *)
               );
     if (EFI_ERROR (Status)) {
-      EFI_BREAKPOINT ();
-      return ;
+      EFI_DEADLOOP ();
     }
   }
 }

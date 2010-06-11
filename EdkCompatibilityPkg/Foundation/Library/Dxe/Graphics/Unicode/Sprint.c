@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -123,8 +123,8 @@ Returns:
 --*/
 {
   UINTN   Index;
-  CHAR16  UnicodeFormat[EFI_DRIVER_LIB_MAX_PRINT_BUFFER];
-  CHAR16  UnicodeResult[EFI_DRIVER_LIB_MAX_PRINT_BUFFER];
+  CHAR16  UnicodeFormat[EFI_DRIVER_LIB_MAX_PRINT_BUFFER+1];
+  CHAR16  UnicodeResult[EFI_DRIVER_LIB_MAX_PRINT_BUFFER+1];
 
   for (Index = 0; Index < EFI_DRIVER_LIB_MAX_PRINT_BUFFER && FormatString[Index] != '\0'; Index++) {
     UnicodeFormat[Index] = (CHAR16) FormatString[Index];
@@ -132,7 +132,7 @@ Returns:
 
   UnicodeFormat[Index]  = '\0';
 
-  Index                 = VSPrint (UnicodeResult, EFI_DRIVER_LIB_MAX_PRINT_BUFFER, UnicodeFormat, Marker);
+  Index                 = VSPrint (UnicodeResult, sizeof (UnicodeResult), UnicodeFormat, Marker);
 
   for (Index = 0; (Index < (BufferSize - 1)) && UnicodeResult[Index] != '\0'; Index++) {
     Buffer[Index] = (CHAR8) UnicodeResult[Index];

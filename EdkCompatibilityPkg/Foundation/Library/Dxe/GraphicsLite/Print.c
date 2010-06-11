@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -125,8 +125,7 @@ Arguments:
 
 Returns: 
 
-  EFI_SUCCESS             -  success
-  EFI_OUT_OF_RESOURCES    -  out of resources
+  Length of string printed to the console
 
 --*/
 {
@@ -158,7 +157,7 @@ Returns:
   //
   Buffer = EfiLibAllocateZeroPool (0x10000);
   if (Buffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    return 0;
   }
 
   if (GraphicsOutput != NULL) {
@@ -337,10 +336,15 @@ Error:
   EfiLibSafeFreePool (Blt);
   EfiLibSafeFreePool (FontInfo);
 #else
-  gBS->FreePool (LineBuffer);
+  EfiLibSafeFreePool (LineBuffer);
 #endif  
   gBS->FreePool (Buffer);
-  return Status;
+  
+  if (EFI_ERROR (Status)) {
+    return 0;
+  }
+
+  return BufferLen;
 }
 
 
@@ -406,19 +410,20 @@ Returns:
                     (VOID **) &UgaDraw
                     );
 
-    if (EFI_ERROR (Status)) {
-      return Status;
+    if (EFI_ERROR (Status) || (UgaDraw != NULL)) {
+      return 0;
     }
   }
 
+  Sto = NULL;
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiSimpleTextOutProtocolGuid,
                   (VOID **) &Sto
                   );
 
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (EFI_ERROR (Status) || (Sto != NULL)) {
+    return 0;
   }
 
   return _IPrint (GraphicsOutput, UgaDraw, Sto, X, Y, ForeGround, BackGround, Fmt, Args);

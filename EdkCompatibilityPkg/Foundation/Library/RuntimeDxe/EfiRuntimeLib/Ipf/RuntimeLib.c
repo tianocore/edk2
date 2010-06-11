@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2005, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -947,6 +947,7 @@ Returns:
   EFI_GUID Guid = EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID;
 
   ReturnReg = EfiCallEsalService (&Guid, IoRead, (UINT64) Width, Address, Count, (UINT64) Buffer, 0, 0, 0);
+  ASSERT (ReturnReg.Status == EFI_SAL_SUCCESS);
 
   return ReturnReg.Status;
 
@@ -1015,6 +1016,7 @@ Returns:
   EFI_GUID Guid = EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID;
 
   ReturnReg = EfiCallEsalService (&Guid, MemRead, (UINT64) Width, Address, Count, (UINT64) Buffer, 0, 0, 0);
+  ASSERT (ReturnReg.Status == EFI_SAL_SUCCESS);
 
   return ReturnReg.Status;
 
