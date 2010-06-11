@@ -1,7 +1,7 @@
       TITLE   CpuAsm.asm:
 ;------------------------------------------------------------------------------
 ;*
-;*   Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+;*   Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 ;*   This program and the accompanying materials
 ;*   are licensed and made available under the terms and conditions of the BSD License
 ;*   which accompanies this distribution.  The full text of the license may be found at
@@ -256,16 +256,8 @@ ErrorCodeAndVectorOnStack:
 ;; UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
     mov     eax, dr7
     push    eax
-;; clear Dr7 while executing debugger itself
-    xor     eax, eax
-    mov     dr7, eax
-
     mov     eax, dr6
     push    eax
-;; insure all status bits in dr6 are clear...
-    xor     eax, eax
-    mov     dr6, eax
-
     mov     eax, dr3
     push    eax
     mov     eax, dr2
@@ -317,18 +309,9 @@ nullExternalExceptionHandler:
     add     esp, 512
 
 ;; UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
-    pop     eax
-    mov     dr0, eax
-    pop     eax
-    mov     dr1, eax
-    pop     eax
-    mov     dr2, eax
-    pop     eax
-    mov     dr3, eax
-;; skip restore of dr6.  We cleared dr6 during the context save.
-    add     esp, 4
-    pop     eax
-    mov     dr7, eax
+;; Skip restoration of DRx registers to support in-circuit emualators
+;; or debuggers set breakpoint in interrupt/exception context
+    add     esp, 4 * 6
 
 ;; UINT32  Cr0, Cr1, Cr2, Cr3, Cr4;
     pop     eax

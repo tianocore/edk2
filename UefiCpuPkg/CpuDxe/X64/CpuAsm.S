@@ -2,7 +2,7 @@
 
 #------------------------------------------------------------------------------
 #*
-#*   Copyright (c) 2008 - 2009, Intel Corporation. All rights reserved.<BR>
+#*   Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
 #*   This program and the accompanying materials
 #*   are licensed and made available under the terms and conditions of the BSD License
 #*   which accompanies this distribution.  The full text of the license may be found at
@@ -218,16 +218,8 @@ CommonInterruptEntry_al_0000:
 #; UINT64  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
     movq    %dr7, %rax
     pushq   %rax
-#; clear Dr7 while executing debugger itself
-    xorq    %rax, %rax
-    movq    %rax, %dr7
-
     movq    %dr6, %rax
     pushq   %rax
-#; insure all status bits in dr6 are clear...
-    xorq    %rax, %rax
-    movq    %rax, %dr6
-
     movq    %dr3, %rax
     pushq   %rax
     movq    %dr2, %rax
@@ -277,18 +269,9 @@ nonNullValue:
     addq    $512, %rsp
 
 #; UINT64  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
-    popq    %rax
-    movq    %rax, %dr0
-    popq    %rax
-    movq    %rax, %dr1
-    popq    %rax
-    movq    %rax, %dr2
-    popq    %rax
-    movq    %rax, %dr3
-#; skip restore of dr6.  We cleared dr6 during the context save.
-    addq    $8, %rsp
-    popq    %rax
-    movq    %rax, %dr7
+#; Skip restoration of DRx registers to support in-circuit emualators
+#; or debuggers set breakpoint in interrupt/exception context
+    addq    $48, %rsp
 
 #; UINT64  Cr0, Cr1, Cr2, Cr3, Cr4, Cr8;
     popq    %rax
