@@ -1,7 +1,7 @@
 /** @file
 Include file for PI MP Services Protocol Thunk.
 
-Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -46,8 +46,11 @@ Module Name:
 //
 // Local APIC register definition for IPI.
 //
+#define APIC_REGISTER_SPURIOUS_VECTOR_OFFSET  0xF0
 #define APIC_REGISTER_ICR_LOW_OFFSET          0x300
 #define APIC_REGISTER_ICR_HIGH_OFFSET         0x310
+#define APIC_REGISTER_LINT0_VECTOR_OFFSET     0x350
+#define APIC_REGISTER_LINT1_VECTOR_OFFSET     0x360
 
 typedef struct {
   UINTN             Lock;
@@ -55,6 +58,7 @@ typedef struct {
   UINTN             StackSize;
   VOID              *ApFunction;
   IA32_DESCRIPTOR   GdtrProfile;
+  IA32_DESCRIPTOR   IdtrProfile;
   UINT32            BufferStart;
   UINT32            Cr3;
 } MP_CPU_EXCHANGE_INFO;
@@ -159,7 +163,7 @@ GetNumberOfProcessors (
   @retval EFI_SUCCESS           Processor information successfully returned.
   @retval EFI_DEVICE_ERROR      Caller processor is AP.
   @retval EFI_INVALID_PARAMETER ProcessorInfoBuffer is NULL
-  @retval EFI_NOT_FOUND         Processor with the handle specified by ProcessorNumber does not exist. 
+  @retval EFI_NOT_FOUND         Processor with the handle specified by ProcessorNumber does not exist.
 
 **/
 EFI_STATUS
@@ -188,7 +192,7 @@ GetProcessorInfo (
   @param  FailedCpuList         The list of processor numbers that fail to finish the function before
                                 TimeoutInMicrosecsond expires.
 
-  @retval EFI_SUCCESS           In blocking mode, all APs have finished before the timeout expired. 
+  @retval EFI_SUCCESS           In blocking mode, all APs have finished before the timeout expired.
   @retval EFI_SUCCESS           In non-blocking mode, function has been dispatched to all enabled APs.
   @retval EFI_DEVICE_ERROR      Caller processor is AP.
   @retval EFI_NOT_STARTED       No enabled AP exists in the system.
@@ -289,7 +293,7 @@ SwitchBSP (
   @retval EFI_DEVICE_ERROR       Caller processor is AP.
   @retval EFI_NOT_FOUND          Processor with the handle specified by ProcessorNumber does not exist.
   @retval EFI_INVALID_PARAMETERS ProcessorNumber specifies the BSP.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -445,7 +449,7 @@ ApProcWrapper (
 
 /**
   Function to wake up a specified AP and assign procedure to it.
-  
+
   @param  ProcessorNumber  Handle number of the specified processor.
   @param  Procedure        Procedure to assign.
   @param  ProcArguments    Argument for Procedure.
@@ -460,7 +464,7 @@ WakeUpAp (
 
 /**
   Terminate AP's task and set it to idle state.
-  
+
   This function terminates AP's task due to timeout by sending INIT-SIPI,
   and sends it to idle state.
 
@@ -491,7 +495,7 @@ ChangeCpuState (
 
 /**
   Gets the processor number of BSP.
-  
+
   @return  The processor number of BSP.
 
 **/

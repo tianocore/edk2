@@ -1,7 +1,7 @@
 ;------------------------------------------------------------------------------
 ; IA32 assembly file for AP startup vector.
 ;
-; Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -60,6 +60,11 @@ RendezvousFunnelProcStart::
         dw GdtrProfile                ; mov        si, GdtrProfile
         db 66h                        ; db         66h
         db 2Eh,0Fh, 01h, 14h          ; lgdt       fword ptr cs:[si]
+
+        db 0BEh
+        dw IdtrProfile                ; mov        si, IdtrProfile
+        db 66h                        ; db         66h
+        db 2Eh,0Fh, 01h, 1Ch          ; lidt       fword ptr cs:[si]
         
         db 33h, 0C0h                  ; xor        ax,  ax
         db 8Eh, 0D8h                  ; mov        ds,  ax

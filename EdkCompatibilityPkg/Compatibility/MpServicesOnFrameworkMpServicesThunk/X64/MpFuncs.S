@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # X64 assembly file for AP startup vector.
 #
-# Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -65,6 +65,11 @@ RendezvousFunnelProcStart:
         .word GdtrLocation
         .byte 0x66                    # db         66h
         .byte 0x2E,0xF,0x1,0x14       # lgdt       fword ptr cs:[si]
+
+        .byte 0xBE
+        .word IdtrLocation
+        .byte 0x66                    # db         66h
+        .byte 0x2E,0xF,0x1,0x1C       # lidt       fword ptr cs:[si]
 
         .byte 0x33,0xC0               # xor        ax,  ax
         .byte 0x8E,0xD8               # mov        ds,  ax
