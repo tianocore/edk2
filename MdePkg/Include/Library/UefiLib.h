@@ -986,6 +986,7 @@ EfiGetNameGuidFromFwVolDevicePathNode (
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
+  If gST->ConOut is NULL, then ASSERT().
 
   @param Format   A null-terminated Unicode format string.
   @param ...      The variable argument list whose contents are accessed based 
@@ -1012,6 +1013,7 @@ Print (
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
+  If gST->StdErr is NULL, then ASSERT().
 
   @param Format   A null-terminated Unicode format string.
   @param ...      The variable argument list whose contents are accessed based 
@@ -1037,6 +1039,7 @@ ErrorPrint (
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
   If Format is NULL, then ASSERT().
+  If gST->ConOut is NULL, then ASSERT().
 
   @param Format   A null-terminated ASCII format string.
   @param ...      The variable argument list whose contents are accessed based 
@@ -1062,6 +1065,7 @@ AsciiPrint (
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
   If Format is NULL, then ASSERT().
+  If gST->StdErr is NULL, then ASSERT().
 
   @param Format   A null-terminated ASCII format string.
   @param ...      The variable argument list whose contents are accessed based 
@@ -1098,6 +1102,7 @@ AsciiErrorPrint (
   string is printed, and 0 is returned.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
+  If gST->ConsoleOutputHandle is NULL, then ASSERT().
 
   @param  PointX       X coordinate to print the string.
   @param  PointY       Y coordinate to print the string.
@@ -1147,6 +1152,7 @@ PrintXY (
   If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no 
   string is printed, and 0 is returned.
   If Format is NULL, then ASSERT().
+  If gST->ConsoleOutputHandle is NULL, then ASSERT().
 
   @param  PointX       X coordinate to print the string.
   @param  PointY       Y coordinate to print the string.

@@ -59,12 +59,14 @@ InternalPrint (
   IN  VA_LIST                          Marker
   )
 {
-  UINTN   Return;
-  CHAR16  *Buffer;
-  UINTN   BufferSize;
+  EFI_STATUS  Status;
+  UINTN       Return;
+  CHAR16      *Buffer;
+  UINTN       BufferSize;
 
   ASSERT (Format != NULL);
   ASSERT (((UINTN) Format & BIT0) == 0);
+  ASSERT (Console != NULL);
 
   BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
 
@@ -77,7 +79,10 @@ InternalPrint (
     //
     // To be extra safe make sure Console has been initialized
     //
-    Console->OutputString (Console, Buffer);
+    Status = Console->OutputString (Console, Buffer);
+    if (EFI_ERROR (Status)) {
+      Return = 0;
+    }
   }
 
   FreePool (Buffer);
@@ -96,6 +101,7 @@ InternalPrint (
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
+  If gST->ConOut is NULL, then ASSERT().
 
   @param Format   Null-terminated Unicode format string.
   @param ...      Variable argument list whose contents are accessed based 
@@ -134,6 +140,7 @@ Print (
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
+  If gST->StdErr is NULL, then ASSERT().
 
   @param Format   Null-terminated Unicode format string.
   @param ...      Variable argument list whose contents are accessed based 
@@ -188,11 +195,13 @@ AsciiInternalPrint (
   IN  VA_LIST                          Marker
   )
 {
-  UINTN   Return;
-  CHAR16  *Buffer;
-  UINTN   BufferSize;
+  EFI_STATUS  Status;
+  UINTN       Return;
+  CHAR16      *Buffer;
+  UINTN       BufferSize;
 
   ASSERT (Format != NULL);
+  ASSERT (Console != NULL);
 
   BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
 
@@ -205,7 +214,10 @@ AsciiInternalPrint (
     //
     // To be extra safe make sure Console has been initialized
     //
-    Console->OutputString (Console, Buffer);
+    Status = Console->OutputString (Console, Buffer);
+    if (EFI_ERROR (Status)) {
+      Return = 0;
+    }
   }
 
   FreePool (Buffer);
@@ -223,6 +235,7 @@ AsciiInternalPrint (
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
   If Format is NULL, then ASSERT().
+  If gST->ConOut is NULL, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
   @param ...      Variable argument list whose contents are accessed based 
@@ -261,6 +274,7 @@ AsciiPrint (
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
   If Format is NULL, then ASSERT().
+  If gST->StdErr is NULL, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
   @param ...      Variable argument list whose contents are accessed based 
@@ -357,6 +371,8 @@ InternalPrintGraphic (
   RowInfoArray          = NULL;
 
   ConsoleHandle = gST->ConsoleOutHandle;
+  
+  ASSERT( ConsoleHandle != NULL);
 
   Status = gBS->HandleProtocol (
                   ConsoleHandle,
@@ -558,6 +574,7 @@ Error:
   string is printed, and 0 is returned.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
+  If gST->ConsoleOutputHandle is NULL, then ASSERT().
 
   @param  PointX       X coordinate to print the string.
   @param  PointY       Y coordinate to print the string.
@@ -634,6 +651,7 @@ PrintXY (
   If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no 
   string is printed, and 0 is returned.
   If Format is NULL, then ASSERT().
+  If gST->ConsoleOutputHandle is NULL, then ASSERT().
 
   @param  PointX       X coordinate to print the string.
   @param  PointY       Y coordinate to print the string.
