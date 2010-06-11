@@ -4,11 +4,11 @@
   All assertions for bit field operations are handled bit field functions in the
   Base Library.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -186,7 +186,7 @@ IoBitFieldWrite8 (
   between the read result and the value specified by OrData, and writes the
   result to the 8-bit I/O port specified by Port. The value written to the I/O
   port is returned. This function must guarantee that all I/O read and write
-  operations are serialized. Extra left bits in OrData are stripped.
+  operations are serialized. Extra bits left in OrData are stripped.
 
   If 8-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
@@ -226,7 +226,7 @@ IoBitFieldOr8 (
   the read result and the value specified by AndData, and writes the result to
   the 8-bit I/O port specified by Port. The value written to the I/O port is
   returned. This function must guarantee that all I/O read and write operations
-  are serialized. Extra left bits in AndData are stripped.
+  are serialized. Extra bits left in AndData are stripped.
 
   If 8-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
@@ -267,7 +267,7 @@ IoBitFieldAnd8 (
   by a bitwise OR between the read result and the value specified by
   AndData, and writes the result to the 8-bit I/O port specified by Port. The
   value written to the I/O port is returned. This function must guarantee that
-  all I/O read and write operations are serialized. Extra left bits in both
+  all I/O read and write operations are serialized. Extra bits left in both
   AndData and OrData are stripped.
 
   If 8-bit I/O port operations are not supported, then ASSERT().
@@ -430,7 +430,7 @@ IoBitFieldRead16 (
   Writes Value to the bit field of the I/O register. The bit field is specified
   by the StartBit and the EndBit. All other bits in the destination I/O
   register are preserved. The value written to the I/O port is returned. Extra
-  left bits in Value are stripped.
+  bits left in Value are stripped.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 16-bit boundary, then ASSERT().
@@ -471,7 +471,7 @@ IoBitFieldWrite16 (
   between the read result and the value specified by OrData, and writes the
   result to the 16-bit I/O port specified by Port. The value written to the I/O
   port is returned. This function must guarantee that all I/O read and write
-  operations are serialized. Extra left bits in OrData are stripped.
+  operations are serialized. Extra bits left in OrData are stripped.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 16-bit boundary, then ASSERT().
@@ -512,7 +512,7 @@ IoBitFieldOr16 (
   the read result and the value specified by AndData, and writes the result to
   the 16-bit I/O port specified by Port. The value written to the I/O port is
   returned. This function must guarantee that all I/O read and write operations
-  are serialized. Extra left bits in AndData are stripped.
+  are serialized. Extra bits left in AndData are stripped.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 16-bit boundary, then ASSERT().
@@ -554,7 +554,7 @@ IoBitFieldAnd16 (
   by a bitwise OR between the read result and the value specified by
   AndData, and writes the result to the 16-bit I/O port specified by Port. The
   value written to the I/O port is returned. This function must guarantee that
-  all I/O read and write operations are serialized. Extra left bits in both
+  all I/O read and write operations are serialized. Extra bits left in both
   AndData and OrData are stripped.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
@@ -718,7 +718,7 @@ IoBitFieldRead32 (
   Writes Value to the bit field of the I/O register. The bit field is specified
   by the StartBit and the EndBit. All other bits in the destination I/O
   register are preserved. The value written to the I/O port is returned. Extra
-  left bits in Value are stripped.
+  bits left in Value are stripped.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 32-bit boundary, then ASSERT().
@@ -759,7 +759,7 @@ IoBitFieldWrite32 (
   between the read result and the value specified by OrData, and writes the
   result to the 32-bit I/O port specified by Port. The value written to the I/O
   port is returned. This function must guarantee that all I/O read and write
-  operations are serialized. Extra left bits in OrData are stripped.
+  operations are serialized. Extra bits left in OrData are stripped.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 32-bit boundary, then ASSERT().
@@ -800,7 +800,7 @@ IoBitFieldOr32 (
   the read result and the value specified by AndData, and writes the result to
   the 32-bit I/O port specified by Port. The value written to the I/O port is
   returned. This function must guarantee that all I/O read and write operations
-  are serialized. Extra left bits in AndData are stripped.
+  are serialized. Extra bits left in AndData are stripped.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 32-bit boundary, then ASSERT().
@@ -842,7 +842,7 @@ IoBitFieldAnd32 (
   by a bitwise OR between the read result and the value specified by
   AndData, and writes the result to the 32-bit I/O port specified by Port. The
   value written to the I/O port is returned. This function must guarantee that
-  all I/O read and write operations are serialized. Extra left bits in both
+  all I/O read and write operations are serialized. Extra bits left in both
   AndData and OrData are stripped.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
@@ -1006,7 +1006,7 @@ IoBitFieldRead64 (
   Writes Value to the bit field of the I/O register. The bit field is specified
   by the StartBit and the EndBit. All other bits in the destination I/O
   register are preserved. The value written to the I/O port is returned. Extra
-  left bits in Value are stripped.
+  bits left in Value are stripped.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 64-bit boundary, then ASSERT().
@@ -1047,7 +1047,7 @@ IoBitFieldWrite64 (
   between the read result and the value specified by OrData, and writes the
   result to the 64-bit I/O port specified by Port. The value written to the I/O
   port is returned. This function must guarantee that all I/O read and write
-  operations are serialized. Extra left bits in OrData are stripped.
+  operations are serialized. Extra bits left in OrData are stripped.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 64-bit boundary, then ASSERT().
@@ -1088,7 +1088,7 @@ IoBitFieldOr64 (
   the read result and the value specified by AndData, and writes the result to
   the 64-bit I/O port specified by Port. The value written to the I/O port is
   returned. This function must guarantee that all I/O read and write operations
-  are serialized. Extra left bits in AndData are stripped.
+  are serialized. Extra bits left in AndData are stripped.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 64-bit boundary, then ASSERT().
@@ -1130,7 +1130,7 @@ IoBitFieldAnd64 (
   by a bitwise OR between the read result and the value specified by
   AndData, and writes the result to the 64-bit I/O port specified by Port. The
   value written to the I/O port is returned. This function must guarantee that
-  all I/O read and write operations are serialized. Extra left bits in both
+  all I/O read and write operations are serialized. Extra bits left in both
   AndData and OrData are stripped.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
@@ -1265,7 +1265,7 @@ MmioAndThenOr8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to read.
+  @param  Address   The MMIO register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1297,7 +1297,7 @@ MmioBitFieldRead8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1330,7 +1330,7 @@ MmioBitFieldWrite8 (
   OR between the read result and the value specified by OrData, and
   writes the result to the 8-bit MMIO register specified by Address. The value
   written to the MMIO register is returned. This function must guarantee that
-  all MMIO read and write operations are serialized. Extra left bits in OrData
+  all MMIO read and write operations are serialized. Extra bits left in OrData
   are stripped.
 
   If 8-bit MMIO register operations are not supported, then ASSERT().
@@ -1338,7 +1338,7 @@ MmioBitFieldWrite8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1371,7 +1371,7 @@ MmioBitFieldOr8 (
   between the read result and the value specified by AndData, and writes the
   result to the 8-bit MMIO register specified by Address. The value written to
   the MMIO register is returned. This function must guarantee that all MMIO
-  read and write operations are serialized. Extra left bits in AndData are
+  read and write operations are serialized. Extra bits left in AndData are
   stripped.
 
   If 8-bit MMIO register operations are not supported, then ASSERT().
@@ -1379,7 +1379,7 @@ MmioBitFieldOr8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1414,14 +1414,14 @@ MmioBitFieldAnd8 (
   specified by AndData, and writes the result to the 8-bit MMIO register
   specified by Address. The value written to the MMIO register is returned.
   This function must guarantee that all MMIO read and write operations are
-  serialized. Extra left bits in both AndData and OrData are stripped.
+  serialized. Extra bits left in both AndData and OrData are stripped.
 
   If 8-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1550,7 +1550,7 @@ MmioAndThenOr16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to read.
+  @param  Address   The MMIO register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1583,7 +1583,7 @@ MmioBitFieldRead16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1616,7 +1616,7 @@ MmioBitFieldWrite16 (
   OR between the read result and the value specified by OrData, and
   writes the result to the 16-bit MMIO register specified by Address. The value
   written to the MMIO register is returned. This function must guarantee that
-  all MMIO read and write operations are serialized. Extra left bits in OrData
+  all MMIO read and write operations are serialized. Extra bits left in OrData
   are stripped.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
@@ -1625,7 +1625,7 @@ MmioBitFieldWrite16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1658,7 +1658,7 @@ MmioBitFieldOr16 (
   between the read result and the value specified by AndData, and writes the
   result to the 16-bit MMIO register specified by Address. The value written to
   the MMIO register is returned. This function must guarantee that all MMIO
-  read and write operations are serialized. Extra left bits in AndData are
+  read and write operations are serialized. Extra bits left in AndData are
   stripped.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
@@ -1667,7 +1667,7 @@ MmioBitFieldOr16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1702,7 +1702,7 @@ MmioBitFieldAnd16 (
   specified by AndData, and writes the result to the 16-bit MMIO register
   specified by Address. The value written to the MMIO register is returned.
   This function must guarantee that all MMIO read and write operations are
-  serialized. Extra left bits in both AndData and OrData are stripped.
+  serialized. Extra bits left in both AndData and OrData are stripped.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
   If Address is not aligned on a 16-bit boundary, then ASSERT().
@@ -1710,7 +1710,7 @@ MmioBitFieldAnd16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1839,7 +1839,7 @@ MmioAndThenOr32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to read.
+  @param  Address   The MMIO register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1872,7 +1872,7 @@ MmioBitFieldRead32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1905,7 +1905,7 @@ MmioBitFieldWrite32 (
   OR between the read result and the value specified by OrData, and
   writes the result to the 32-bit MMIO register specified by Address. The value
   written to the MMIO register is returned. This function must guarantee that
-  all MMIO read and write operations are serialized. Extra left bits in OrData
+  all MMIO read and write operations are serialized. Extra bits left in OrData
   are stripped.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
@@ -1914,7 +1914,7 @@ MmioBitFieldWrite32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1947,7 +1947,7 @@ MmioBitFieldOr32 (
   between the read result and the value specified by AndData, and writes the
   result to the 32-bit MMIO register specified by Address. The value written to
   the MMIO register is returned. This function must guarantee that all MMIO
-  read and write operations are serialized. Extra left bits in AndData are
+  read and write operations are serialized. Extra bits left in AndData are
   stripped.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
@@ -1956,7 +1956,7 @@ MmioBitFieldOr32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1991,7 +1991,7 @@ MmioBitFieldAnd32 (
   specified by AndData, and writes the result to the 32-bit MMIO register
   specified by Address. The value written to the MMIO register is returned.
   This function must guarantee that all MMIO read and write operations are
-  serialized. Extra left bits in both AndData and OrData are stripped.
+  serialized. Extra bits left in both AndData and OrData are stripped.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
@@ -1999,7 +1999,7 @@ MmioBitFieldAnd32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -2128,7 +2128,7 @@ MmioAndThenOr64 (
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to read.
+  @param  Address   The MMIO register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -2161,7 +2161,7 @@ MmioBitFieldRead64 (
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -2194,7 +2194,7 @@ MmioBitFieldWrite64 (
   OR between the read result and the value specified by OrData, and
   writes the result to the 64-bit MMIO register specified by Address. The value
   written to the MMIO register is returned. This function must guarantee that
-  all MMIO read and write operations are serialized. Extra left bits in OrData
+  all MMIO read and write operations are serialized. Extra bits left in OrData
   are stripped.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
@@ -2203,7 +2203,7 @@ MmioBitFieldWrite64 (
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -2236,7 +2236,7 @@ MmioBitFieldOr64 (
   between the read result and the value specified by AndData, and writes the
   result to the 64-bit MMIO register specified by Address. The value written to
   the MMIO register is returned. This function must guarantee that all MMIO
-  read and write operations are serialized. Extra left bits in AndData are
+  read and write operations are serialized. Extra bits left in AndData are
   stripped.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
@@ -2245,7 +2245,7 @@ MmioBitFieldOr64 (
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -2280,7 +2280,7 @@ MmioBitFieldAnd64 (
   specified by AndData, and writes the result to the 64-bit MMIO register
   specified by Address. The value written to the MMIO register is returned.
   This function must guarantee that all MMIO read and write operations are
-  serialized. Extra left bits in both AndData and OrData are stripped.
+  serialized. Extra bits left in both AndData and OrData are stripped.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
   If Address is not aligned on a 64-bit boundary, then ASSERT().
@@ -2288,7 +2288,7 @@ MmioBitFieldAnd64 (
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.

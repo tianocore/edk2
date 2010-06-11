@@ -1,11 +1,11 @@
 /** @file
   I/O Library MMIO Buffer Functions.
 
-  Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -15,9 +15,9 @@
 #include "BaseIoLibIntrinsicInternal.h"
 
 /**
-  Copy data from MMIO region to system memory by using 8-bit access.
+  Copy data from the MMIO region to system memory by using 8-bit access.
 
-  Copy data from MMIO region specified by starting address StartAddress 
+  Copy data from the MMIO region specified by starting address StartAddress 
   to system memory specified by Buffer by using 8-bit access. The total 
   number of byte to be copied is specified by Length. Buffer is returned.
   
@@ -27,7 +27,7 @@
 
   @param  StartAddress    Starting address for the MMIO region to be copied from.
   @param  Length          The size, in bytes, of Buffer.
-  @param  Buffer          Pointer to a system memory buffer receiving the data read.
+  @param  Buffer          The pointer to a system memory buffer receiving the data read.
 
   @return Buffer
 
@@ -55,9 +55,9 @@ MmioReadBuffer8 (
 }
 
 /**
-  Copy data from MMIO region to system memory by using 16-bit access.
+  Copy data from the MMIO region to system memory by using 16-bit access.
 
-  Copy data from MMIO region specified by starting address StartAddress 
+  Copy data from the MMIO region specified by starting address StartAddress 
   to system memory specified by Buffer by using 16-bit access. The total 
   number of byte to be copied is specified by Length. Buffer is returned.
   
@@ -71,7 +71,7 @@ MmioReadBuffer8 (
 
   @param  StartAddress    Starting address for the MMIO region to be copied from.
   @param  Length          The size, in bytes, of Buffer.
-  @param  Buffer          Pointer to a system memory buffer receiving the data read.
+  @param  Buffer          The pointer to a system memory buffer receiving the data read.
 
   @return Buffer
 
@@ -106,9 +106,9 @@ MmioReadBuffer16 (
 }
 
 /**
-  Copy data from MMIO region to system memory by using 32-bit access.
+  Copy data from the MMIO region to system memory by using 32-bit access.
 
-  Copy data from MMIO region specified by starting address StartAddress 
+  Copy data from the MMIO region specified by starting address StartAddress 
   to system memory specified by Buffer by using 32-bit access. The total 
   number of byte to be copied is specified by Length. Buffer is returned.
   
@@ -122,7 +122,7 @@ MmioReadBuffer16 (
 
   @param  StartAddress    Starting address for the MMIO region to be copied from.
   @param  Length          The size, in bytes, of Buffer.
-  @param  Buffer          Pointer to a system memory buffer receiving the data read.
+  @param  Buffer          The pointer to a system memory buffer receiving the data read.
 
   @return Buffer
 
@@ -157,9 +157,9 @@ MmioReadBuffer32 (
 }
 
 /**
-  Copy data from MMIO region to system memory by using 64-bit access.
+  Copy data from the MMIO region to system memory by using 64-bit access.
 
-  Copy data from MMIO region specified by starting address StartAddress 
+  Copy data from the MMIO region specified by starting address StartAddress 
   to system memory specified by Buffer by using 64-bit access. The total 
   number of byte to be copied is specified by Length. Buffer is returned.
   
@@ -173,7 +173,7 @@ MmioReadBuffer32 (
 
   @param  StartAddress    Starting address for the MMIO region to be copied from.
   @param  Length          The size, in bytes, of Buffer.
-  @param  Buffer          Pointer to a system memory buffer receiving the data read.
+  @param  Buffer          The pointer to a system memory buffer receiving the data read.
 
   @return Buffer
 
@@ -209,9 +209,9 @@ MmioReadBuffer64 (
 
 
 /**
-  Copy data from system memory to MMIO region by using 8-bit access.
+  Copy data from system memory to the MMIO region by using 8-bit access.
 
-  Copy data from system memory specified by Buffer to MMIO region specified 
+  Copy data from system memory specified by Buffer to the MMIO region specified 
   by starting address StartAddress by using 8-bit access. The total number 
   of byte to be copied is specified by Length. Buffer is returned.
   
@@ -221,7 +221,7 @@ MmioReadBuffer64 (
 
   @param  StartAddress    Starting address for the MMIO region to be copied to.
   @param  Length          The size, in bytes, of Buffer.
-  @param  Buffer          Pointer to a system memory buffer containing the data to write.
+  @param  Buffer          The pointer to a system memory buffer containing the data to write.
 
   @return Buffer
 
@@ -250,9 +250,9 @@ MmioWriteBuffer8 (
 }
 
 /**
-  Copy data from system memory to MMIO region by using 16-bit access.
+  Copy data from system memory to the MMIO region by using 16-bit access.
 
-  Copy data from system memory specified by Buffer to MMIO region specified 
+  Copy data from system memory specified by Buffer to the MMIO region specified 
   by starting address StartAddress by using 16-bit access. The total number 
   of byte to be copied is specified by Length. Buffer is returned.
   
@@ -267,7 +267,7 @@ MmioWriteBuffer8 (
 
   @param  StartAddress    Starting address for the MMIO region to be copied to.
   @param  Length          The size, in bytes, of Buffer.
-  @param  Buffer          Pointer to a system memory buffer containing the data to write.
+  @param  Buffer          The pointer to a system memory buffer containing the data to write.
 
   @return Buffer
 
@@ -304,9 +304,9 @@ MmioWriteBuffer16 (
 
 
 /**
-  Copy data from system memory to MMIO region by using 32-bit access.
+  Copy data from system memory to the MMIO region by using 32-bit access.
 
-  Copy data from system memory specified by Buffer to MMIO region specified 
+  Copy data from system memory specified by Buffer to the MMIO region specified 
   by starting address StartAddress by using 32-bit access. The total number 
   of byte to be copied is specified by Length. Buffer is returned.
   
@@ -321,7 +321,7 @@ MmioWriteBuffer16 (
 
   @param  StartAddress    Starting address for the MMIO region to be copied to.
   @param  Length          The size, in bytes, of Buffer.
-  @param  Buffer          Pointer to a system memory buffer containing the data to write.
+  @param  Buffer          The pointer to a system memory buffer containing the data to write.
 
   @return Buffer
 
@@ -357,9 +357,9 @@ MmioWriteBuffer32 (
 }
 
 /**
-  Copy data from system memory to MMIO region by using 64-bit access.
+  Copy data from system memory to the MMIO region by using 64-bit access.
 
-  Copy data from system memory specified by Buffer to MMIO region specified 
+  Copy data from system memory specified by Buffer to the MMIO region specified 
   by starting address StartAddress by using 64-bit access. The total number 
   of byte to be copied is specified by Length. Buffer is returned.
   
@@ -374,7 +374,7 @@ MmioWriteBuffer32 (
 
   @param  StartAddress    Starting address for the MMIO region to be copied to.
   @param  Length          The size, in bytes, of Buffer.
-  @param  Buffer          Pointer to a system memory buffer containing the data to write.
+  @param  Buffer          The pointer to a system memory buffer containing the data to write.
 
   @return Buffer
 

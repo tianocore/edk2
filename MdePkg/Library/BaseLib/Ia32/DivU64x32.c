@@ -1,11 +1,11 @@
 /** @file
   Calculate the quotient of a 64-bit integer by a 32-bit integer
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -23,7 +23,7 @@
   unsigned value Divisor and generates a 64-bit unsigned quotient. This
   function returns the 64-bit unsigned quotient.
 
-   @param  Dividend  A 64-bit unsigned value.
+  @param  Dividend  A 64-bit unsigned value.
   @param  Divisor   A 32-bit unsigned value.
 
   @return Dividend / Divisor

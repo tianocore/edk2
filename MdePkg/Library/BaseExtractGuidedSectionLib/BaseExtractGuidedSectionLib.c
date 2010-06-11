@@ -5,7 +5,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -103,7 +103,7 @@ GetExtractGuidedSectionHandlerInfo (
   @param[out]  ExtractHandlerGuidTable  A pointer to the array of GUIDs that have been registered through
                                         ExtractGuidedSectionRegisterHandlers().
 
-  @return the number of the supported extract guided Handler.
+  @return The number of the supported extract guided Handler.
 
 **/
 UINTN
@@ -242,7 +242,7 @@ ExtractGuidedSectionRegisterHandlers (
   @param[out] SectionAttribute   A pointer to the attributes of the GUIDed section.  See the Attributes field of
                                  EFI_GUID_DEFINED_SECTION in the PI Specification.
 
-  @retval  RETURN_SUCCESS      Get the required information successfully.
+  @retval  RETURN_SUCCESS      Successfully retrieved the required information.
   @retval  RETURN_UNSUPPORTED  The GUID from the section specified by InputSection does not match any of
                                the GUIDs registered with ExtractGuidedSectionRegisterHandlers().
   @retval  Others              The return status from the handler associated with the GUID retrieved from
@@ -314,7 +314,7 @@ ExtractGuidedSectionGetInfo (
   of type EXTRACT_GUIDED_SECTION_DECODE_HANDLER that was registered with ExtractGuidedSectionRegisterHandlers()
   is used to decode InputSection into the buffer specified by OutputBuffer and the authentication status of this
   decode operation is returned in AuthenticationStatus.  If the decoded buffer is identical to the data in InputSection,
-  then OutputBuffer is set to point at the data in InputSection.  Otherwise, the decoded data will be placed in caller
+  then OutputBuffer is set to point at the data in InputSection.  Otherwise, the decoded data will be placed in a caller
   allocated buffer specified by OutputBuffer.    This function is responsible for computing the  EFI_AUTH_STATUS_PLATFORM_OVERRIDE
   bit of in AuthenticationStatus.  The return status from the handler of type EXTRACT_GUIDED_SECTION_DECODE_HANDLER is returned. 
    

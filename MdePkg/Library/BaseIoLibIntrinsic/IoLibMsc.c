@@ -8,11 +8,11 @@
   We don't advocate putting compiler specifics in libraries or drivers but there
   is no other way to make this work.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -91,7 +91,7 @@ IoRead8 (
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
-  @return The value written the I/O port.
+  @return The value written to the I/O port.
 
 **/
 UINT8
@@ -150,7 +150,7 @@ IoRead16 (
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
-  @return The value written the I/O port.
+  @return The value written to the I/O port.
 
 **/
 UINT16
@@ -210,7 +210,7 @@ IoRead32 (
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
-  @return The value written the I/O port.
+  @return The value written to the I/O port.
 
 **/
 UINT32
