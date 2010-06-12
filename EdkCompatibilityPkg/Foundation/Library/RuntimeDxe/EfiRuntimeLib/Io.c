@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -42,6 +42,7 @@ Returns:
 {
   UINT8 Buffer;
 
+  Buffer = 0;
   EfiIoRead (EfiCpuIoWidthUint8, Address, 1, &Buffer);
   return Buffer;
 }
@@ -65,6 +66,7 @@ Returns:
 {
   UINT16  Buffer;
 
+  Buffer = 0;
   EfiIoRead (EfiCpuIoWidthUint16, Address, 1, &Buffer);
   return Buffer;
 }
@@ -88,6 +90,7 @@ Returns:
 {
   UINT32  Buffer;
 
+  Buffer = 0;
   EfiIoRead (EfiCpuIoWidthUint32, Address, 1, &Buffer);
   return Buffer;
 }
@@ -177,6 +180,7 @@ Returns:
 {
   UINT8   Buffer;
 
+  Buffer = 0;
   EfiMemRead (EfiCpuIoWidthUint8, Address, 1, &Buffer);
   return Buffer;
 }
@@ -200,6 +204,7 @@ Returns:
 {
   UINT16  Buffer;
 
+  Buffer = 0;
   EfiMemRead (EfiCpuIoWidthUint16, Address, 1, &Buffer);
   return Buffer;
 }
@@ -223,6 +228,7 @@ Returns:
 {
   UINT32  Buffer;
 
+  Buffer = 0;
   EfiMemRead (EfiCpuIoWidthUint32, Address, 1, &Buffer);
   return Buffer;
 }
@@ -246,6 +252,7 @@ Returns:
 {
   UINT64  Buffer;
 
+  Buffer = 0;
   EfiMemRead (EfiCpuIoWidthUint64, Address, 1, &Buffer);
   return Buffer;
 }

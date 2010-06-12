@@ -155,6 +155,7 @@ Returns:
   //
   // For now, allocate an arbitrarily long buffer
   //
+  BufferLen = 0;
   Buffer = EfiLibAllocateZeroPool (0x10000);
   if (Buffer == NULL) {
     return 0;
@@ -394,14 +395,15 @@ Returns:
 
   Handle = gST->ConsoleOutHandle;
 
+  GraphicsOutput = NULL;
+  UgaDraw = NULL;
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiGraphicsOutputProtocolGuid,
                   (VOID **) &GraphicsOutput
                   );
 
-  UgaDraw = NULL;
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (GraphicsOutput == NULL)) {
     GraphicsOutput = NULL;
 
     Status = gBS->HandleProtocol (
@@ -410,7 +412,7 @@ Returns:
                     (VOID **) &UgaDraw
                     );
 
-    if (EFI_ERROR (Status) || (UgaDraw != NULL)) {
+    if (EFI_ERROR (Status) || (UgaDraw == NULL)) {
       return 0;
     }
   }
@@ -422,7 +424,7 @@ Returns:
                   (VOID **) &Sto
                   );
 
-  if (EFI_ERROR (Status) || (Sto != NULL)) {
+  if (EFI_ERROR (Status) || (Sto == NULL)) {
     return 0;
   }
 

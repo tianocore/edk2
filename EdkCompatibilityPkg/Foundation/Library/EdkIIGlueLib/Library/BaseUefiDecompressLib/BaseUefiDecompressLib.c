@@ -155,7 +155,7 @@ GlueMakeTable (
   //
   // TableBits should not be greater than 16.
   //
-  if (TableBits >= (sizeof (Count)/sizeof (UINT16))) {
+  if (TableBits > 16) {
     return (UINT16) BAD_TABLE;
   }
  
@@ -170,7 +170,7 @@ GlueMakeTable (
     //
     // Count array index should not be greater than or equal to its size.
     //
-    if (BitLen[Index] < (sizeof (Count)/sizeof (UINT16))) {
+    if (BitLen[Index] <= 16) {
       Count[BitLen[Index]]++;
     } else {
       return (UINT16) BAD_TABLE;
