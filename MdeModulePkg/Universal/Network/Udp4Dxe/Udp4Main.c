@@ -79,7 +79,7 @@ Udp4GetModeData (
     CopyMem (Udp4ConfigData, &Instance->ConfigData, sizeof (*Udp4ConfigData));
   }
 
-  Ip = Instance->IpInfo->Ip;
+  Ip = Instance->IpInfo->Ip.Ip4;
 
   //
   // Get the underlying Ip4ModeData, MnpConfigData and SnpModeData.
@@ -357,7 +357,7 @@ Udp4Groups (
     return EFI_NOT_STARTED;
   }
 
-  Ip = Instance->IpInfo->Ip;
+  Ip = Instance->IpInfo->Ip.Ip4;
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
@@ -457,7 +457,7 @@ Udp4Routes (
     return EFI_NOT_STARTED;
   }
 
-  Ip = Instance->IpInfo->Ip;
+  Ip = Instance->IpInfo->Ip.Ip4;
 
   //
   // Invoke the Ip instance the Udp4 instance consumes to do the actual operation.
@@ -900,7 +900,7 @@ Udp4Poll (
   }
 
   Instance = UDP4_INSTANCE_DATA_FROM_THIS (This);
-  Ip       = Instance->IpInfo->Ip;
+  Ip       = Instance->IpInfo->Ip.Ip4;
 
   //
   // Invode the Ip instance consumed by the udp instance to do the poll operation.

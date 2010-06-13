@@ -153,6 +153,11 @@ typedef union {
   UINT8                     PrefixLength;
 } IP_IO_IP_MASK;
 
+typedef union {
+  EFI_IP4_PROTOCOL  *Ip4;
+  EFI_IP6_PROTOCOL  *Ip6;
+} IP_IO_IP_PROTOCOL;
+
 ///
 /// The IP session for an IP receive packet.
 ///
@@ -195,17 +200,18 @@ VOID
   @param[in] Status        Result of the IP packet being sent.
   @param[in] Context       The data provided by user for the received packet when
                            the callback is registered in IP_IO_OPEN_DATA::SndContext.
-  @param[in] Sender        A pointer to EFI_IP4_PROTOCOL or EFI_IP6_PROTOCOL.
+  @param[in] Sender        A Union type to specify a pointer of EFI_IP4_PROTOCOL 
+                           or EFI_IP6_PROTOCOL.
   @param[in] NotifyData    The Context data specified when calling IpIoSend()
   
 **/
 typedef
 VOID
 (EFIAPI *PKT_SENT_NOTIFY) (
-  IN EFI_STATUS  Status,
-  IN VOID        *Context,
-  IN VOID        *Sender,
-  IN VOID        *NotifyData
+  IN EFI_STATUS        Status,
+  IN VOID              *Context,
+  IN IP_IO_IP_PROTOCOL Sender,
+  IN VOID              *NotifyData
   );
 
 ///
@@ -229,7 +235,7 @@ typedef struct _IP_IO {
   //
   // The IP instance consumed by this IP_IO
   //
-  VOID                          *Ip;
+  IP_IO_IP_PROTOCOL             Ip;
   BOOLEAN                       IsConfigured;
 
   ///
@@ -280,7 +286,7 @@ typedef struct _IP_IO_SEND_ENTRY {
   IP_IO                     *IpIo;
   VOID                      *Context;
   VOID                      *NotifyData;
-  VOID                      *Ip;
+  IP_IO_IP_PROTOCOL         Ip;
   NET_BUF                   *Pkt;
   IP_IO_IP_COMPLETION_TOKEN SndToken;
 } IP_IO_SEND_ENTRY;
@@ -294,7 +300,7 @@ typedef struct _IP_IO_IP_INFO {
   IP_IO_IP_MASK             PreMask;
   LIST_ENTRY                Entry;
   EFI_HANDLE                ChildHandle;
-  VOID                      *Ip;
+  IP_IO_IP_PROTOCOL         Ip;
   IP_IO_IP_COMPLETION_TOKEN DummyRcvToken;
   INTN                      RefCnt;
   UINT8                     IpVersion;

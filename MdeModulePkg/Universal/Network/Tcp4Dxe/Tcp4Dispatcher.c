@@ -39,14 +39,14 @@ Tcp4Route (
   IN TCP4_ROUTE_INFO  *RouteInfo
   )
 {
-  EFI_IP4_PROTOCOL  *Ip;
+  EFI_IP4_PROTOCOL  *Ip4;
 
-  Ip = Tcb->IpInfo->Ip;
+  Ip4 = Tcb->IpInfo->Ip.Ip4;
 
-  ASSERT (Ip != NULL);
+  ASSERT (Ip4 != NULL);
 
-  return Ip->Routes (
-              Ip,
+  return Ip4->Routes (
+              Ip4,
               RouteInfo->DeleteRoute,
               RouteInfo->SubnetAddress,
               RouteInfo->SubnetMask,
@@ -131,7 +131,7 @@ Tcp4GetMode (
     }
   }
 
-  Ip = Tcb->IpInfo->Ip;
+  Ip = Tcb->IpInfo->Ip.Ip4;
   ASSERT (Ip != NULL);
 
   return Ip->GetModeData (Ip, Mode->Ip4ModeData, Mode->MnpConfigData, Mode->SnpModeData);
@@ -607,7 +607,7 @@ Tcp4Dispatcher (
 
   switch (Request) {
   case SOCK_POLL:
-    Ip = (EFI_IP4_PROTOCOL *) (ProtoData->TcpService->IpIo->Ip);
+    Ip = ProtoData->TcpService->IpIo->Ip.Ip4;
     Ip->Poll (Ip);
     break;
 

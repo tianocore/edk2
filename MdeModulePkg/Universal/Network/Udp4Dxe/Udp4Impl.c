@@ -59,17 +59,17 @@ Udp4FindInstanceByPort (
 
   @param[in]  Status                 The completion status of the output udp datagram.
   @param[in]  Context                Pointer to the context data.
-  @param[in]  Sender                 Pointer to the Ip sender of the udp datagram.
+  @param[in]  Sender                 Specify a pointer of EFI_IP4_PROTOCOL for sending.
   @param[in]  NotifyData             Pointer to the notify data.
 
 **/
 VOID
 EFIAPI
 Udp4DgramSent (
-  IN EFI_STATUS  Status,
-  IN VOID        *Context,
-  IN VOID        *Sender,
-  IN VOID        *NotifyData
+  IN EFI_STATUS        Status,
+  IN VOID              *Context,
+  IN IP_IO_IP_PROTOCOL Sender,
+  IN VOID              *NotifyData
   );
 
 /**
@@ -989,17 +989,17 @@ Udp4RemoveToken (
 
   @param[in]  Status                 The completion status of the output udp datagram.
   @param[in]  Context                Pointer to the context data.
-  @param[in]  Sender                 Pointer to the Ip sender of the udp datagram.
+  @param[in]  Sender                 Specify a pointer of EFI_IP4_PROTOCOL for sending.
   @param[in]  NotifyData             Pointer to the notify data.
 
 **/
 VOID
 EFIAPI
 Udp4DgramSent (
-  IN EFI_STATUS  Status,
-  IN VOID        *Context,
-  IN VOID        *Sender,
-  IN VOID        *NotifyData
+  IN EFI_STATUS        Status,
+  IN VOID              *Context,
+  IN IP_IO_IP_PROTOCOL Sender,
+  IN VOID              *NotifyData
   )
 {
   UDP4_INSTANCE_DATA         *Instance;

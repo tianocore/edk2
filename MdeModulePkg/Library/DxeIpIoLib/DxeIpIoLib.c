@@ -616,7 +616,7 @@ IP_IO_SEND_ENTRY *
 IpIoCreateSndEntry (
   IN OUT IP_IO             *IpIo,
   IN OUT NET_BUF           *Pkt,
-  IN     VOID              *Sender,
+  IN     IP_IO_IP_PROTOCOL Sender,
   IN     VOID              *Context    OPTIONAL,
   IN     VOID              *NotifyData OPTIONAL,
   IN     EFI_IP_ADDRESS    *Dest       OPTIONAL,
@@ -941,15 +941,15 @@ IpIoDummyHandlerDpc (
   // Continue the receive.
   //
   if (IpInfo->IpVersion == IP_VERSION_4) {
-    ((EFI_IP4_PROTOCOL *) (IpInfo->Ip))->Receive (
-                                           (EFI_IP4_PROTOCOL *) (IpInfo->Ip),
-                                           &IpInfo->DummyRcvToken.Ip4Token
-                                           );
+    IpInfo->Ip.Ip4->Receive (
+                      IpInfo->Ip.Ip4,
+                      &IpInfo->DummyRcvToken.Ip4Token
+                      );
   } else {
-    ((EFI_IP6_PROTOCOL *) (IpInfo->Ip))->Receive (
-                                           (EFI_IP6_PROTOCOL *) (IpInfo->Ip),
-                                           &IpInfo->DummyRcvToken.Ip6Token
-                                           );
+    IpInfo->Ip.Ip6->Receive (
+                      IpInfo->Ip.Ip6,
+                      &IpInfo->DummyRcvToken.Ip6Token
+                      );
   }
 }
 
@@ -991,12 +991,10 @@ IpIoListenHandlerDpc (
   IP_IO                 *IpIo;
   EFI_STATUS            Status;
   IP_IO_IP_RX_DATA      *RxData;
-  VOID                  *Ip;
   EFI_NET_SESSION_DATA  Session;
   NET_BUF               *Pkt;
 
   IpIo = (IP_IO *) Context;
-  Ip   = IpIo->Ip;
 
   if (IpIo->IpVersion == IP_VERSION_4) {
     Status = IpIo->RcvToken.Ip4Token.Status;
@@ -1125,9 +1123,9 @@ CleanUp:
 Resume:
 
   if (IpIo->IpVersion == IP_VERSION_4){
-    ((EFI_IP4_PROTOCOL *) Ip)->Receive (Ip, &(IpIo->RcvToken.Ip4Token));
+    IpIo->Ip.Ip4->Receive (IpIo->Ip.Ip4, &(IpIo->RcvToken.Ip4Token));
   } else {
-    ((EFI_IP6_PROTOCOL *) Ip)->Receive (Ip, &(IpIo->RcvToken.Ip6Token));
+    IpIo->Ip.Ip6->Receive (IpIo->Ip.Ip6, &(IpIo->RcvToken.Ip6Token));
   }
 }
 
@@ -1266,7 +1264,6 @@ IpIoOpen (
   )
 {
   EFI_STATUS        Status;
-  VOID              *Ip;
   UINT8             IpVersion;
 
   if (IpIo->IsConfigured) {
@@ -1277,22 +1274,20 @@ IpIoOpen (
 
   ASSERT ((IpVersion == IP_VERSION_4) || (IpVersion == IP_VERSION_6));
 
-  Ip = IpIo->Ip;
-
   //
   // configure ip
   //
   if (IpVersion == IP_VERSION_4){
-    Status = ((EFI_IP4_PROTOCOL *) Ip)->Configure (
-                                          (EFI_IP4_PROTOCOL *) Ip,
-                                          &OpenData->IpConfigData.Ip4CfgData
-                                          );
+    Status = IpIo->Ip.Ip4->Configure (
+                             IpIo->Ip.Ip4,
+                             &OpenData->IpConfigData.Ip4CfgData
+                             );
   } else {
 
-    Status = ((EFI_IP6_PROTOCOL *) Ip)->Configure (
-                                          (EFI_IP6_PROTOCOL *) Ip, 
-                                          &OpenData->IpConfigData.Ip6CfgData
-                                          );
+    Status = IpIo->Ip.Ip6->Configure (
+                             IpIo->Ip.Ip6, 
+                             &OpenData->IpConfigData.Ip6CfgData
+                             );
   }
 
   if (EFI_ERROR (Status)) {
@@ -1305,13 +1300,13 @@ IpIoOpen (
   // @bug its code
   //
   if (IpVersion == IP_VERSION_4){
-    Status = ((EFI_IP4_PROTOCOL *) Ip)->Routes (
-                                          (EFI_IP4_PROTOCOL *) Ip,
-                                          TRUE,
-                                          &mZeroIp4Addr,
-                                          &mZeroIp4Addr,
-                                          &mZeroIp4Addr
-                                          );
+    Status = IpIo->Ip.Ip4->Routes (
+                             IpIo->Ip.Ip4,
+                             TRUE,
+                             &mZeroIp4Addr,
+                             &mZeroIp4Addr,
+                             &mZeroIp4Addr
+                             );
 
     if (EFI_ERROR (Status) && (EFI_NOT_FOUND != Status)) {
       return Status;
@@ -1330,24 +1325,24 @@ IpIoOpen (
     //
     // start to listen incoming packet
     //
-    Status = ((EFI_IP4_PROTOCOL *) Ip)->Receive (
-                                          (EFI_IP4_PROTOCOL *) Ip,
-                                          &(IpIo->RcvToken.Ip4Token)
-                                          );
+    Status = IpIo->Ip.Ip4->Receive (
+                             IpIo->Ip.Ip4,
+                             &(IpIo->RcvToken.Ip4Token)
+                             );
     if (EFI_ERROR (Status)) {
-      ((EFI_IP4_PROTOCOL *) Ip)->Configure ((EFI_IP4_PROTOCOL *) Ip, NULL);
+      IpIo->Ip.Ip4->Configure (IpIo->Ip.Ip4, NULL);
       goto ErrorExit;
     }
 
   } else {
 
     IpIo->Protocol = OpenData->IpConfigData.Ip6CfgData.DefaultProtocol;
-    Status = ((EFI_IP6_PROTOCOL *) Ip)->Receive (
-                                          (EFI_IP6_PROTOCOL *) Ip,
-                                          &(IpIo->RcvToken.Ip6Token)
-                                          );
+    Status = IpIo->Ip.Ip6->Receive (
+                             IpIo->Ip.Ip6,
+                             &(IpIo->RcvToken.Ip6Token)
+                             );
     if (EFI_ERROR (Status)) {
-      ((EFI_IP6_PROTOCOL *) Ip)->Configure ((EFI_IP6_PROTOCOL *) Ip, NULL);
+      IpIo->Ip.Ip6->Configure (IpIo->Ip.Ip6, NULL);
       goto ErrorExit;
     }
   }
@@ -1380,7 +1375,6 @@ IpIoStop (
   )
 {
   EFI_STATUS        Status;
-  VOID              *Ip;
   IP_IO_IP_INFO     *IpInfo;
   UINT8             IpVersion;
 
@@ -1397,15 +1391,13 @@ IpIoStop (
   //
   RemoveEntryList (&IpIo->Entry);
 
-  Ip = IpIo->Ip;
-
   //
   // Configure NULL Ip
   //
   if (IpVersion == IP_VERSION_4) {
-    Status = ((EFI_IP4_PROTOCOL *) Ip)->Configure ((EFI_IP4_PROTOCOL *) Ip, NULL);
+    Status = IpIo->Ip.Ip4->Configure (IpIo->Ip.Ip4, NULL);
   } else {
-    Status = ((EFI_IP6_PROTOCOL *) Ip)->Configure ((EFI_IP6_PROTOCOL *) Ip, NULL);
+    Status = IpIo->Ip.Ip6->Configure (IpIo->Ip.Ip6, NULL);
   }
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1517,7 +1509,7 @@ IpIoSend (
   )
 {
   EFI_STATUS        Status;
-  VOID              *Ip;
+  IP_IO_IP_PROTOCOL Ip;
   IP_IO_SEND_ENTRY  *SndEntry;
 
   ASSERT ((IpIo->IpVersion != IP_VERSION_4) || (Dest != NULL));
@@ -1540,15 +1532,15 @@ IpIoSend (
   // Send this Packet
   //
   if (IpIo->IpVersion == IP_VERSION_4){
-    Status = ((EFI_IP4_PROTOCOL *) Ip)->Transmit (
-                                          (EFI_IP4_PROTOCOL *) Ip,
-                                          &SndEntry->SndToken.Ip4Token
-                                          );
+    Status = Ip.Ip4->Transmit (
+                       Ip.Ip4,
+                       &SndEntry->SndToken.Ip4Token
+                       );
   } else {
-    Status = ((EFI_IP6_PROTOCOL *) Ip)->Transmit (
-                                          (EFI_IP6_PROTOCOL *) Ip,
-                                          &SndEntry->SndToken.Ip6Token
-                                          );
+    Status = Ip.Ip6->Transmit (
+                       Ip.Ip6,
+                       &SndEntry->SndToken.Ip6Token
+                       );
   }
 
   if (EFI_ERROR (Status)) {
@@ -1575,7 +1567,7 @@ IpIoCancelTxToken (
 {
   LIST_ENTRY        *Node;
   IP_IO_SEND_ENTRY  *SndEntry;
-  VOID              *Ip;
+  IP_IO_IP_PROTOCOL Ip;
 
   ASSERT ((IpIo != NULL) && (Packet != NULL));
 
@@ -1588,15 +1580,15 @@ IpIoCancelTxToken (
       Ip = SndEntry->Ip;
 
       if (IpIo->IpVersion == IP_VERSION_4) {
-        ((EFI_IP4_PROTOCOL *) Ip)->Cancel (
-                                     (EFI_IP4_PROTOCOL *) Ip,
-                                     &SndEntry->SndToken.Ip4Token
-                                     );
+        Ip.Ip4->Cancel (
+                  Ip.Ip4,
+                  &SndEntry->SndToken.Ip4Token
+                  );
       } else {
-        ((EFI_IP6_PROTOCOL *) Ip)->Cancel (
-                                     (EFI_IP6_PROTOCOL *) Ip,
-                                     &SndEntry->SndToken.Ip6Token
-                                     );
+        Ip.Ip6->Cancel (
+                  Ip.Ip6,
+                  &SndEntry->SndToken.Ip6Token
+                  );
       }
 
       break;
@@ -1730,7 +1722,7 @@ IpIoConfigIp (
   )
 {
   EFI_STATUS         Status;
-  VOID               *Ip;
+  IP_IO_IP_PROTOCOL  Ip;
   UINT8              IpVersion;
   EFI_IP4_MODE_DATA  Ip4ModeData;
   EFI_IP6_MODE_DATA  Ip6ModeData;
@@ -1753,9 +1745,9 @@ IpIoConfigIp (
   Ip = IpInfo->Ip;
 
   if (IpInfo->IpVersion == IP_VERSION_4) {
-    Status = ((EFI_IP4_PROTOCOL *) Ip)->Configure ((EFI_IP4_PROTOCOL *) Ip, IpConfigData);
+    Status = Ip.Ip4->Configure (Ip.Ip4, IpConfigData);
   } else {
-    Status = ((EFI_IP6_PROTOCOL *) Ip)->Configure ((EFI_IP6_PROTOCOL *) Ip, IpConfigData);
+    Status = Ip.Ip6->Configure (Ip.Ip6, IpConfigData);
   }
 
   if (EFI_ERROR (Status)) {
@@ -1766,12 +1758,12 @@ IpIoConfigIp (
     if (IpInfo->IpVersion == IP_VERSION_4){
 
       if (((EFI_IP4_CONFIG_DATA *) IpConfigData)->UseDefaultAddress) {
-        ((EFI_IP4_PROTOCOL *) Ip)->GetModeData (
-                                     (EFI_IP4_PROTOCOL *) Ip, 
-                                     &Ip4ModeData, 
-                                     NULL, 
-                                     NULL
-                                     );
+        Ip.Ip4->GetModeData (
+                  Ip.Ip4, 
+                  &Ip4ModeData, 
+                  NULL, 
+                  NULL
+                  );
 
         ((EFI_IP4_CONFIG_DATA*) IpConfigData)->StationAddress = Ip4ModeData.ConfigData.StationAddress;
         ((EFI_IP4_CONFIG_DATA*) IpConfigData)->SubnetMask     = Ip4ModeData.ConfigData.SubnetMask;
@@ -1788,21 +1780,20 @@ IpIoConfigIp (
         sizeof (IP4_ADDR)
         );
 
-      Status = ((EFI_IP4_PROTOCOL *) Ip)->Receive (
-                                            (EFI_IP4_PROTOCOL *) Ip,
-                                            &IpInfo->DummyRcvToken.Ip4Token
-                                            );
+      Status = Ip.Ip4->Receive (
+                         Ip.Ip4,
+                         &IpInfo->DummyRcvToken.Ip4Token
+                         );
     if (EFI_ERROR (Status)) {
-        ((EFI_IP4_PROTOCOL*)Ip)->Configure (Ip, NULL);
+      Ip.Ip4->Configure (Ip.Ip4, NULL);
     }
   } else {
-
-      ((EFI_IP6_PROTOCOL *) Ip)->GetModeData (
-                                   (EFI_IP6_PROTOCOL *) Ip,
-                                   &Ip6ModeData,
-                                   NULL,
-                                   NULL
-                                   );
+    Ip.Ip6->GetModeData (
+              Ip.Ip6,
+              &Ip6ModeData,
+              NULL,
+              NULL
+              );
 
       if (Ip6ModeData.IsConfigured) {
         CopyMem (
@@ -1846,12 +1837,12 @@ IpIoConfigIp (
         sizeof (EFI_IPv6_ADDRESS)
         );
 
-      Status = ((EFI_IP6_PROTOCOL *) Ip)->Receive (
-                                            (EFI_IP6_PROTOCOL *) Ip,
-                                            &IpInfo->DummyRcvToken.Ip6Token
-                                            );
+      Status = Ip.Ip6->Receive (
+                         Ip.Ip6,
+                         &IpInfo->DummyRcvToken.Ip6Token
+                         );
       if (EFI_ERROR (Status)) {
-        ((EFI_IP6_PROTOCOL *) Ip)->Configure ((EFI_IP6_PROTOCOL *) Ip, NULL);
+        Ip.Ip6->Configure (Ip.Ip6, NULL);
       }
     }  
   } else {
@@ -1906,10 +1897,10 @@ IpIoRemoveIp (
   RemoveEntryList (&IpInfo->Entry);
 
   if (IpVersion == IP_VERSION_4){
-    ((EFI_IP4_PROTOCOL *) (IpInfo->Ip))->Configure (
-                                           (EFI_IP4_PROTOCOL *) (IpInfo->Ip),
-                                           NULL
-                                           );
+    IpInfo->Ip.Ip4->Configure (
+                      IpInfo->Ip.Ip4,
+                      NULL
+                      );
     IpIoCloseProtocolDestroyIpChild (
       IpIo->Controller,
       IpIo->Image,
@@ -1921,10 +1912,10 @@ IpIoRemoveIp (
 
   } else {
 
-    ((EFI_IP6_PROTOCOL *) (IpInfo->Ip))->Configure (
-                                           (EFI_IP6_PROTOCOL *) (IpInfo->Ip),
-                                           NULL
-                                           );
+    IpInfo->Ip.Ip6->Configure (
+                      IpInfo->Ip.Ip6,
+                      NULL
+                      );
 
     IpIoCloseProtocolDestroyIpChild (
       IpIo->Controller,
@@ -2151,7 +2142,7 @@ IpIoRefreshNeighbor (
     return EFI_NOT_STARTED;
   }
 
-  Ip = (EFI_IP6_PROTOCOL *) (IpIo->Ip);
+  Ip = IpIo->Ip.Ip6;
 
   return Ip->Neighbors (Ip, FALSE, &Neighbor->v6, NULL, Timeout, TRUE);
 }

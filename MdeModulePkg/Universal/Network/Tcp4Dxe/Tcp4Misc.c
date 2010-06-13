@@ -478,7 +478,7 @@ TcpGetRcvMss (
   ASSERT (Sock != NULL);
 
   TcpProto = (TCP4_PROTO_DATA *) Sock->ProtoReserved;
-  Ip       = (EFI_IP4_PROTOCOL *) (TcpProto->TcpService->IpIo->Ip);
+  Ip       = TcpProto->TcpService->IpIo->Ip.Ip4;
   ASSERT (Ip != NULL);
 
   Ip->GetModeData (Ip, &Ip4Mode, NULL, NULL);
