@@ -28,6 +28,10 @@ Revision History
 // The protocols, PPI and GUID defintions for this module
 //
 #include <Ppi/NtAutoscan.h>
+#include <Ppi/ReadOnlyVariable2.h>
+
+#include <Guid/MemoryTypeInformation.h>
+
 //
 // The Library classes this module consumes
 //
@@ -35,6 +39,15 @@ Revision History
 #include <Library/PeimEntryPoint.h>
 #include <Library/HobLib.h>
 #include <Library/PeiServicesLib.h>
+
+EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {
+  { EfiReservedMemoryType,  0x0004 },
+  { EfiRuntimeServicesCode, 0x0040 },
+  { EfiRuntimeServicesData, 0x0040 },
+  { EfiBootServicesCode,    0x0300 },
+  { EfiBootServicesData,    0x1000 },
+  { EfiMaxMemoryType,       0      }
+};
 
 EFI_STATUS
 EFIAPI
@@ -63,6 +76,9 @@ Returns:
   EFI_PHYSICAL_ADDRESS        MemoryBase;
   UINTN                       Index;
   EFI_RESOURCE_ATTRIBUTE_TYPE Attributes;
+  EFI_PEI_READ_ONLY_VARIABLE2_PPI       *Variable;
+  UINTN                                 DataSize;
+  EFI_MEMORY_TYPE_INFORMATION           MemoryData [EfiMaxMemoryType + 1];
 
 
   DEBUG ((EFI_D_ERROR, "NT 32 Autoscan PEIM Loaded\n"));
@@ -116,6 +132,46 @@ Returns:
   // Build the CPU hob with 36-bit addressing and 16-bits of IO space.
   //
   BuildCpuHob (36, 16);
-  
+
+  //
+  // Build GUIDed Hob that contains the Memory Type Information array
+  //
+  Status = PeiServicesLocatePpi (
+             &gEfiPeiReadOnlyVariable2PpiGuid,
+             0,
+             NULL,
+             (VOID **)&Variable
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  DataSize = sizeof (MemoryData);
+  Status = Variable->GetVariable (
+                       Variable,
+                       EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
+                       &gEfiMemoryTypeInformationGuid,
+                       NULL,
+                       &DataSize,
+                       &MemoryData
+                       );
+  if (EFI_ERROR (Status)) {
+    //
+    // Create Memory Type Information HOB
+    //
+    BuildGuidDataHob (
+      &gEfiMemoryTypeInformationGuid,
+      mDefaultMemoryTypeInformation,
+      sizeof(mDefaultMemoryTypeInformation)
+      );
+  } else {
+    //
+    // Create Memory Type Information HOB
+    //
+    BuildGuidDataHob (
+      &gEfiMemoryTypeInformationGuid,
+      MemoryData,
+      DataSize
+      );
+  }
+
   return Status;
 }

@@ -46,6 +46,10 @@
 
 [Ppis]
   gPeiNtAutoScanPpiGuid                         # PPI ALWAYS_CONSUMED
+  gEfiPeiReadOnlyVariable2PpiGuid               # PPI ALWAYS_CONSUMED
 
-[depex]
-  gPeiNtAutoScanPpiGuid AND gEfiPeiMasterBootModePpiGuid
+[Guids]
+  gEfiMemoryTypeInformationGuid
+  
+[Depex]
+  gPeiNtAutoScanPpiGuid AND gEfiPeiMasterBootModePpiGuid AND gEfiPeiReadOnlyVariable2PpiGuid
