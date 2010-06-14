@@ -59,12 +59,14 @@ InternalPrint (
   IN  VA_LIST                          Marker
   )
 {
+  EFI_STATUS  Status;
   UINTN   Return;
   CHAR16  *Buffer;
   UINTN   BufferSize;
 
   ASSERT (Format != NULL);
   ASSERT (((UINTN) Format & BIT0) == 0);
+  ASSERT (Console != NULL);
 
   BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
 
@@ -77,7 +79,10 @@ InternalPrint (
     //
     // To be extra safe make sure Console has been initialized
     //
-    Console->OutputString (Console, Buffer);
+    Status = Console->OutputString (Console, Buffer);
+    if (EFI_ERROR (Status)) {
+      Return = 0;
+    }
   }
 
   FreePool (Buffer);
@@ -96,6 +101,7 @@ InternalPrint (
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
+  If gST->ConOut is NULL, then ASSERT().
 
   @param Format   Null-terminated Unicode format string.
   @param ...      Variable argument list whose contents are accessed based 
@@ -134,6 +140,7 @@ Print (
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
+  If gST->StdErr is NULL, then ASSERT().
 
   @param Format   Null-terminated Unicode format string.
   @param ...      Variable argument list whose contents are accessed based 
@@ -188,11 +195,13 @@ AsciiInternalPrint (
   IN  VA_LIST                          Marker
   )
 {
+  EFI_STATUS  Status;
   UINTN   Return;
   CHAR16  *Buffer;
   UINTN   BufferSize;
 
   ASSERT (Format != NULL);
+  ASSERT (Console != NULL);
 
   BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
 
@@ -205,7 +214,10 @@ AsciiInternalPrint (
     //
     // To be extra safe make sure Console has been initialized
     //
-    Console->OutputString (Console, Buffer);
+    Status = Console->OutputString (Console, Buffer);
+    if (EFI_ERROR (Status)) {
+      Return = 0;
+    }
   }
 
   FreePool (Buffer);
@@ -223,6 +235,7 @@ AsciiInternalPrint (
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
   If Format is NULL, then ASSERT().
+  If gST->ConOut is NULL, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
   @param ...      Variable argument list whose contents are accessed based 
@@ -261,6 +274,7 @@ AsciiPrint (
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
   If Format is NULL, then ASSERT().
+  If gST->StdErr is NULL, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
   @param ...      Variable argument list whose contents are accessed based 
@@ -347,6 +361,9 @@ InternalPrintGraphic (
   EFI_UGA_DRAW_PROTOCOL               *UgaDraw;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL     *Sto;
   EFI_HANDLE                          ConsoleHandle;
+  UINTN                               Width;
+  UINTN                               Height;
+  UINTN                               Delta;
 
   HorizontalResolution  = 0;
   VerticalResolution    = 0;
@@ -354,6 +371,8 @@ InternalPrintGraphic (
   RowInfoArray          = NULL;
 
   ConsoleHandle = gST->ConsoleOutHandle;
+
+  ASSERT( ConsoleHandle != NULL);
 
   Status = gBS->HandleProtocol (
                   ConsoleHandle,
@@ -464,7 +483,9 @@ InternalPrintGraphic (
     //
     Status = HiiFont->StringToImage (
                          HiiFont,
-                         EFI_HII_IGNORE_IF_NO_GLYPH,
+                         EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_OUT_FLAG_CLIP |
+                         EFI_HII_OUT_FLAG_CLIP_CLEAN_X | EFI_HII_OUT_FLAG_CLIP_CLEAN_Y |
+                         EFI_HII_IGNORE_LINE_BREAK,
                          Buffer,
                          &FontInfo,
                          &Blt,
@@ -478,11 +499,20 @@ InternalPrintGraphic (
     if (!EFI_ERROR (Status)) {
       ASSERT (RowInfoArray != NULL);
       //
-      // Line breaks are handled by caller of DrawUnicodeWeightAtCursorN, so the updated parameter RowInfoArraySize by StringToImage will
+      // Explicit Line break characters are ignored, so the updated parameter RowInfoArraySize by StringToImage will
       // always be 1 or 0 (if there is no valid Unicode Char can be printed). ASSERT here to make sure.
       //
       ASSERT (RowInfoArraySize <= 1);
 
+      if (RowInfoArraySize != 0) {
+        Width  = RowInfoArray[0].LineWidth;
+        Height = RowInfoArray[0].LineHeight;
+        Delta  = Blt->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
+      } else {
+        Width  = 0;
+        Height = 0;
+        Delta  = 0;
+      }
       Status = UgaDraw->Blt (
                           UgaDraw,
                           (EFI_UGA_PIXEL *) Blt->Image.Bitmap,
@@ -491,9 +521,9 @@ InternalPrintGraphic (
                           PointY,
                           PointX,
                           PointY,
-                          RowInfoArray[0].LineWidth,
-                          RowInfoArray[0].LineHeight,
-                          Blt->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+                          Width,
+                          Height,
+                          Delta
                           );
     } else {
       goto Error;
@@ -505,7 +535,11 @@ InternalPrintGraphic (
   //
   // Calculate the number of actual printed characters
   //
+  if (RowInfoArraySize != 0) {
   PrintNum = RowInfoArray[0].EndIndex - RowInfoArray[0].StartIndex + 1;
+  } else {
+    PrintNum = 0;
+  }
 
   FreePool (RowInfoArray);
   FreePool (Blt);
@@ -540,6 +574,7 @@ Error:
   string is printed, and 0 is returned.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
+  If gST->ConsoleOutputHandle is NULL, then ASSERT().
 
   @param  PointX       X coordinate to print the string.
   @param  PointY       Y coordinate to print the string.
@@ -616,6 +651,7 @@ PrintXY (
   If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no 
   string is printed, and 0 is returned.
   If Format is NULL, then ASSERT().
+  If gST->ConsoleOutputHandle is NULL, then ASSERT().
 
   @param  PointX       X coordinate to print the string.
   @param  PointY       Y coordinate to print the string.

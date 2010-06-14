@@ -5,7 +5,7 @@
   EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers, 
   and print messages on the console output and standard error devices.
 
-  Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -92,14 +92,16 @@ EfiGetSystemConfigurationTable (
   instances specified by ProtocolGuid.
 
   This function causes the notification function to be executed for every protocol of type
-  ProtocolGuid instance that exists in the system when this function is invoked.
-  In addition, every time a protocol of type ProtocolGuid instance is installed or reinstalled,
-  the notification function is also executed.  This function returns the notification event
-  that was created. 
+  ProtocolGuid instance that exists in the system when this function is invoked. If there are
+  no instances of ProtocolGuid in the handle database at the time this function is invoked,
+  then the notification function is still executed one time. In addition, every time a protocol
+  of type ProtocolGuid instance is installed or reinstalled, the notification function is also
+  executed. This function returns the notification event that was created. 
   If ProtocolGuid is NULL, then ASSERT().
   If NotifyTpl is not a legal TPL value, then ASSERT().
   If NotifyFunction is NULL, then ASSERT().
   If Registration is NULL, then ASSERT().
+
 
   @param  ProtocolGuid    Supplies GUID of the protocol upon whose installation the event is fired.
   @param  NotifyTpl       Supplies the task priority level of the event notifications.
@@ -143,7 +145,7 @@ EfiCreateProtocolNotifyEvent(
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Register for protocol notifactions on this event
+  // Register for protocol notifications on this event
   //
 
   Status = gBS->RegisterProtocolNotify (
@@ -454,9 +456,9 @@ EfiReleaseLock (
                                function.
 
   @retval EFI_SUCCESS          ControllerHandle is managed by the driver
-                               specifed by DriverBindingHandle.
+                               specified by DriverBindingHandle.
   @retval EFI_UNSUPPORTED      ControllerHandle is not managed by the driver
-                               specifed by DriverBindingHandle.
+                               specified by DriverBindingHandle.
 
 **/
 EFI_STATUS
@@ -579,7 +581,7 @@ EfiTestChildHandle (
 
   @retval EFI_SUCCESS             The Unicode string that matches the language 
                                   specified by Language was found
-                                  in the table of Unicoide strings UnicodeStringTable, 
+                                  in the table of Unicode strings UnicodeStringTable, 
                                   and it was returned in UnicodeString.
   @retval EFI_INVALID_PARAMETER   Language is NULL.
   @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.
@@ -659,7 +661,7 @@ LookupUnicodeString (
                                RFC 4646 language code for the Unicode string to look up and
                                return. If Iso639Language is TRUE, then this ASCII string is
                                not assumed to be Null-terminated, and only the first three
-                               chacters are used. If Iso639Language is FALSE, then this ASCII
+                               characters are used. If Iso639Language is FALSE, then this ASCII
                                string must be Null-terminated. 
   @param  SupportedLanguages   A pointer to a Null-terminated ASCII string that contains a
                                set of ISO 639-2 or RFC 4646 language codes that the Unicode
@@ -689,7 +691,6 @@ LookupUnicodeString (
 
 **/
 EFI_STATUS
-
 EFIAPI
 LookupUnicodeString2 (
   IN CONST CHAR8                     *Language,
@@ -1188,3 +1189,229 @@ FreeUnicodeStringTable (
 
   return EFI_SUCCESS;
 }
+
+/**
+  Returns a pointer to an allocated buffer that contains the contents of a 
+  variable retrieved through the UEFI Runtime Service GetVariable().  The 
+  returned buffer is allocated using AllocatePool().  The caller is responsible
+  for freeing this buffer with FreePool().
+
+  If Name is NULL, then ASSERT().
+  If Guid is NULL, then ASSERT().
+
+  @param[in]  Name  Pointer to a Null-terminated Unicode string.
+  @param[in]  Guid  Pointer to an EFI_GUID structure
+
+  @retval NULL   The variable could not be retrieved.
+  @retval NULL   There are not enough resources available for the variable contents.
+  @retval Other  A pointer to allocated buffer containing the variable contents.
+
+**/
+VOID *
+EFIAPI
+GetVariable (
+  IN CONST CHAR16    *Name,
+  IN CONST EFI_GUID  *Guid
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       Size;
+  VOID        *Value;
+
+  ASSERT (Name != NULL);
+  ASSERT (Guid != NULL);
+
+  //
+  // Try to get the variable size.
+  //
+  Value = NULL;
+  Size = 0;
+  Status = gRT->GetVariable ((CHAR16 *) Name, (EFI_GUID *) Guid, NULL, &Size, Value);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    return NULL;
+  }
+
+  //
+  // Allocate buffer to get the variable.
+  //
+  Value = AllocatePool (Size);
+  if (Value == NULL) {
+    return NULL;
+  }
+
+  //
+  // Get the variable data.
+  //
+  Status = gRT->GetVariable ((CHAR16 *) Name, (EFI_GUID *) Guid, NULL, &Size, Value);
+  if (EFI_ERROR (Status)) {
+    FreePool(Value);
+    return NULL;
+  }
+
+  return Value;
+}
+
+
+/**
+  Returns a pointer to an allocated buffer that contains the contents of a 
+  variable retrieved through the UEFI Runtime Service GetVariable().  This 
+  function always uses the EFI_GLOBAL_VARIABLE GUID to retrieve variables.
+  The returned buffer is allocated using AllocatePool().  The caller is 
+  responsible for freeing this buffer with FreePool().
+
+  If Name is NULL, then ASSERT().
+
+  @param[in]  Name  Pointer to a Null-terminated Unicode string.
+
+  @retval NULL   The variable could not be retrieved.
+  @retval NULL   There are not enough resources available for the variable contents.
+  @retval Other  A pointer to allocated buffer containing the variable contents.
+
+**/
+VOID *
+EFIAPI
+GetEfiGlobalVariable (
+  IN CONST CHAR16  *Name
+  )
+{
+  return GetVariable (Name, &gEfiGlobalVariableGuid);
+}
+
+
+/**
+  Returns a pointer to an allocated buffer that contains the best matching language 
+  from a set of supported languages.  
+  
+  This function supports both ISO 639-2 and RFC 4646 language codes, but language 
+  code types may not be mixed in a single call to this function.  The language 
+  code returned is allocated using AllocatePool().  The caller is responsible for 
+  freeing the allocated buffer using FreePool().  This function supports a variable
+  argument list that allows the caller to pass in a prioritized list of language 
+  codes to test against all the language codes in SupportedLanguages. 
+
+  If SupportedLanguages is NULL, then ASSERT().
+
+  @param[in]  SupportedLanguages  A pointer to a Null-terminated ASCII string that
+                                  contains a set of language codes in the format 
+                                  specified by Iso639Language.
+  @param[in]  Iso639Language      If TRUE, then all language codes are assumed to be
+                                  in ISO 639-2 format.  If FALSE, then all language
+                                  codes are assumed to be in RFC 4646 language format
+  @param[in]  ...                 A variable argument list that contains pointers to 
+                                  Null-terminated ASCII strings that contain one or more
+                                  language codes in the format specified by Iso639Language.
+                                  The first language code from each of these language
+                                  code lists is used to determine if it is an exact or
+                                  close match to any of the language codes in 
+                                  SupportedLanguages.  Close matches only apply to RFC 4646
+                                  language codes, and the matching algorithm from RFC 4647
+                                  is used to determine if a close match is present.  If 
+                                  an exact or close match is found, then the matching
+                                  language code from SupportedLanguages is returned.  If
+                                  no matches are found, then the next variable argument
+                                  parameter is evaluated.  The variable argument list 
+                                  is terminated by a NULL.
+
+  @retval NULL   The best matching language could not be found in SupportedLanguages.
+  @retval NULL   There are not enough resources available to return the best matching 
+                 language.
+  @retval Other  A pointer to a Null-terminated ASCII string that is the best matching 
+                 language in SupportedLanguages.
+
+**/
+CHAR8 *
+EFIAPI
+GetBestLanguage (
+  IN CONST CHAR8  *SupportedLanguages, 
+  IN BOOLEAN      Iso639Language,
+  ...
+  )
+{
+  VA_LIST      Args;
+  CHAR8        *Language;
+  UINTN        CompareLength;
+  UINTN        LanguageLength;
+  CONST CHAR8  *Supported;
+  CHAR8        *BestLanguage;
+
+  ASSERT (SupportedLanguages != NULL);
+
+  VA_START (Args, Iso639Language);
+  while ((Language = VA_ARG (Args, CHAR8 *)) != NULL) {
+    //
+    // Default to ISO 639-2 mode
+    //
+    CompareLength  = 3;
+    LanguageLength = MIN (3, AsciiStrLen (Language));
+
+    //
+    // If in RFC 4646 mode, then determine the length of the first RFC 4646 language code in Language
+    //
+    if (!Iso639Language) {
+      for (LanguageLength = 0; Language[LanguageLength] != 0 && Language[LanguageLength] != ';'; LanguageLength++);
+    }
+
+    //
+    // Trim back the length of Language used until it is empty
+    //
+    while (LanguageLength > 0) {
+      //
+      // Loop through all language codes in SupportedLanguages
+      //
+      for (Supported = SupportedLanguages; *Supported != '\0'; Supported += CompareLength) {
+        //
+        // In RFC 4646 mode, then Loop through all language codes in SupportedLanguages
+        //
+        if (!Iso639Language) {
+          //
+          // Skip ';' characters in Supported
+          //
+          for (; *Supported != '\0' && *Supported == ';'; Supported++);
+          //
+          // Determine the length of the next language code in Supported
+          //
+          for (CompareLength = 0; Supported[CompareLength] != 0 && Supported[CompareLength] != ';'; CompareLength++);
+          //
+          // If Language is longer than the Supported, then skip to the next language
+          //
+          if (LanguageLength > CompareLength) {
+            continue;
+          }
+        }
+        //
+        // See if the first LanguageLength characters in Supported match Language
+        //
+        if (AsciiStrnCmp (Supported, Language, LanguageLength) == 0) {
+          VA_END (Args);
+          //
+          // Allocate, copy, and return the best matching language code from SupportedLanguages
+          //
+          BestLanguage = AllocateZeroPool (CompareLength + 1);
+          if (BestLanguage == NULL) {
+            return NULL;
+          }
+          return CopyMem (BestLanguage, Supported, CompareLength);
+        }
+      }
+
+      if (Iso639Language) {
+        //
+        // If ISO 639 mode, then each language can only be tested once
+        //
+        LanguageLength = 0;
+      } else {
+        //
+        // If RFC 4646 mode, then trim Language from the right to the next '-' character 
+        //
+        for (LanguageLength--; LanguageLength > 0 && Language[LanguageLength] != '-'; LanguageLength--);
+      }
+    }
+  }
+  VA_END (Args);
+
+  //
+  // No matches were found 
+  //
+  return NULL;
+}
+
