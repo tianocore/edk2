@@ -1124,8 +1124,25 @@ BdsSetMemoryTypeInformationVariable (
   UINT32                       Current;
   UINT32                       Next;
   EFI_HOB_GUID_TYPE            *GuidHob;
+  BOOLEAN                      MemoryTypeInformationVariableExists;
 
-  UpdateRequired = FALSE;
+  UpdateRequired = TRUE;
+  MemoryTypeInformationVariableExists = FALSE;
+
+  if (GetBootModeHob () != BOOT_WITH_DEFAULT_SETTINGS) {
+    VariableSize = 0;
+    Status = gRT->GetVariable (
+                    EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
+                    &gEfiMemoryTypeInformationGuid,
+                    NULL, 
+                    &VariableSize, 
+                    NULL
+                    );
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      MemoryTypeInformationVariableExists = TRUE;
+      UpdateRequired = FALSE;
+    }
+  }
 
   //
   // Retrieve the current memory usage statistics.  If they are not found, then
@@ -1157,6 +1174,10 @@ BdsSetMemoryTypeInformationVariable (
   //
   // Use a heuristic to adjust the Memory Type Information for the next boot
   //
+  DEBUG ((EFI_D_INFO, "Memory  Previous  Current    Next   \n"));
+  DEBUG ((EFI_D_INFO, " Type    Pages     Pages     Pages  \n"));
+  DEBUG ((EFI_D_INFO, "======  ========  ========  ========\n"));
+
   for (Index = 0; PreviousMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
 
     Current = 0;
@@ -1176,7 +1197,9 @@ BdsSetMemoryTypeInformationVariable (
     //
     // Write next varible to 125% * current and Inconsistent Memory Reserved across bootings may lead to S4 fail
     //
-    if (Current > Previous) {
+    if (!MemoryTypeInformationVariableExists && Current < Previous) {
+      Next = Current + (Current >> 2);
+    } else if (Current > Previous) {
       Next = Current + (Current >> 2);
     } else {
       Next = Previous;
@@ -1190,12 +1213,13 @@ BdsSetMemoryTypeInformationVariable (
       UpdateRequired = TRUE;
     }
 
+    DEBUG ((EFI_D_INFO, "  %02x    %08x  %08x  %08x\n", PreviousMemoryTypeInformation[Index].Type, Previous, Current, Next));
   }
 
   //
   // If any changes were made to the Memory Type Information settings, then set the new variable value
   //
-  if (UpdateRequired) {
+  if (UpdateRequired || !MemoryTypeInformationVariableExists) {
     Status = gRT->SetVariable (
           EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
           &gEfiMemoryTypeInformationGuid,
@@ -1204,8 +1228,6 @@ BdsSetMemoryTypeInformationVariable (
           PreviousMemoryTypeInformation
           );
   }
-
-  return;
 }
 
 /**
@@ -1231,7 +1253,6 @@ BdsLibSaveMemoryTypeInformation (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR,"Bds Set Memory Type Informationa Variable Fails\n"));
   }
-
 }
 
 
