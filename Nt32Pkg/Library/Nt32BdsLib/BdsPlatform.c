@@ -84,6 +84,7 @@ Returns:
 
 --*/
 {
+  BdsLibSaveMemoryTypeInformation ();
   SetupVariableInit ();
 }
 
