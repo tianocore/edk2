@@ -590,6 +590,7 @@ Returns:
 // Driver entry point
 //
 EFI_STATUS
+EFIAPI
 InitializePerformanceInfrastructure (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable,
@@ -649,6 +650,7 @@ Returns:
 
 
 EFI_STATUS
+EFIAPI
 StartMeasure (
   EFI_HANDLE          Handle,
   IN UINT16           *Token,
@@ -688,6 +690,7 @@ Returns:
 
 
 EFI_STATUS
+EFIAPI
 EndMeasure (
   EFI_HANDLE          Handle,
   IN UINT16           *Token,
@@ -726,6 +729,7 @@ Returns:
 
 
 EFI_STATUS
+EFIAPI
 UpdateMeasure (
   EFI_HANDLE         Handle,
   IN UINT16          *Token,

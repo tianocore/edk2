@@ -213,6 +213,7 @@ ReportDispatcher (
 
 **/
 EFI_STATUS
+EFIAPI
 SmmStatusCodeHandler (
   IN EFI_STATUS_CODE_TYPE     CodeType,
   IN EFI_STATUS_CODE_VALUE    Value,

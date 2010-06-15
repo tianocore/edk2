@@ -25,6 +25,7 @@ Abstract:
 #include EFI_PROTOCOL_DEFINITION (Performance)
 
 EFI_STATUS
+EFIAPI
 InitializePerformanceInfrastructure (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable,
@@ -50,6 +51,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 EndMeasure (
   IN EFI_HANDLE       Handle,
   IN UINT16           *Token,
@@ -77,6 +79,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 StartMeasure (
   IN EFI_HANDLE       Handle,
   IN UINT16           *Token,
@@ -104,6 +107,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 UpdateMeasure (
   IN EFI_HANDLE      Handle,
   IN UINT16          *Token,

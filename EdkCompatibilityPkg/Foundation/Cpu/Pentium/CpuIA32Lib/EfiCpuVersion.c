@@ -21,6 +21,7 @@ Abstract:
 #include "CpuIA32.h"
 
 VOID
+EFIAPI
 EfiCpuVersion (
   IN  OUT UINT16  *FamilyId,    OPTIONAL
   IN  OUT UINT8   *Model,       OPTIONAL
