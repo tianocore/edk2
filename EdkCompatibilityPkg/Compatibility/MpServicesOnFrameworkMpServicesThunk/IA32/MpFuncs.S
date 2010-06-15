@@ -16,11 +16,12 @@
 .equ                   NotVacantFlag,    0xff
 
 .equ                   LockLocation,     RendezvousFunnelProcEnd - RendezvousFunnelProcStart
-.equ                   StackStart,       LockLocation + 0x04
-.equ                   StackSize,        LockLocation + 0x08
-.equ                   RendezvousProc,   LockLocation + 0x0C
-.equ                   GdtrProfile,      LockLocation + 0x10
-.equ                   BufferStart,      LockLocation + 0x18
+.equ                   StackStart,       RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x04
+.equ                   StackSize,        RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x08
+.equ                   RendezvousProc,   RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x0C
+.equ                   GdtrProfile,      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x10
+.equ                   IdtrProfile,      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x16
+.equ                   BufferStart,      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x1C
 
 #-------------------------------------------------------------------------------------
 #RendezvousFunnelProc  procedure follows. All APs execute their procedure. This
