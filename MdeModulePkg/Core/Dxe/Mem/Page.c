@@ -862,6 +862,7 @@ CoreConvertPages (
   the requested address.
 
   @param  MaxAddress             The address that the range must be below
+  @param  MinAddress             The address that the range must be above
   @param  NumberOfPages          Number of pages needed
   @param  NewType                The type of memory the range is going to be
                                  turned into
