@@ -357,7 +357,7 @@ typedef struct {
   UINT8   NumberBbsEntries;             ///< The number of valid BBS table entries upon entry and exit. The IBV code may
                                         ///< increase this number, if BBS-compliant devices also hook INTs in order to force the
                                         ///< OpROM BIOS Setup to be executed.
-  VOID    *BbsTablePointer;             ///< A pointer to the BBS table.
+  UINT32  BbsTablePointer;              ///< A pointer to the BBS table.
   UINT16  RuntimeSegment;               ///< The segment where the OpROM can be relocated to. If this value is 0x0000, this
                                         ///< means that the relocation of this run time code is not supported.
                                         ///< Inconsistent with specification here: 
