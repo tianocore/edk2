@@ -2630,6 +2630,7 @@ ConSplitterAddGraphicsOutputMode (
 
   Index        = 0;
   CurrentIndex = 0;
+  Status       = EFI_SUCCESS;
 
   if (Private->CurrentNumberOfUgaDraw != 0) {
     //
@@ -2834,21 +2835,48 @@ Done:
   // regardless whether the console is in EfiConsoleControlScreenGraphics or EfiConsoleControlScreenText mode
   //
   Private->HardwareNeedsStarting = TRUE;
-  //
-  // Current mode number may need update now, so set it to an invalid mode number
-  //
-  CurrentGraphicsOutputMode->Mode = 0xffff;
-  //
-  // Graphics console can ensure all GOP devices have the same mode which can be taken as current mode.
-  //
-  Status = Private->GraphicsOutput.SetMode (&Private->GraphicsOutput, (UINT32) CurrentIndex);
-  if (EFI_ERROR(Status)) {
+  
+  Mode = &Private->GraphicsOutputModeBuffer[CurrentIndex];
+  if ((GraphicsOutput != NULL) &&
+      (Mode->HorizontalResolution == CurrentGraphicsOutputMode->Info->HorizontalResolution) &&
+      (Mode->VerticalResolution == CurrentGraphicsOutputMode->Info->VerticalResolution)) {
+    CurrentGraphicsOutputMode->Mode = (UINT32) CurrentIndex;
+    if ((Mode->HorizontalResolution != GraphicsOutput->Mode->Info->HorizontalResolution) ||
+        (Mode->VerticalResolution != GraphicsOutput->Mode->Info->VerticalResolution)) {
+      //
+      // If all existing video device has been set to common mode, only set new GOP device to
+      // the common mode
+      //
+      for (NumberIndex = 0; NumberIndex < GraphicsOutput->Mode->MaxMode; NumberIndex ++) {
+        Status = GraphicsOutput->QueryMode (GraphicsOutput, (UINT32) NumberIndex, &SizeOfInfo, &Info);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+        if ((Info->HorizontalResolution == Mode->HorizontalResolution) && (Info->VerticalResolution == Mode->VerticalResolution)) {
+          FreePool (Info);
+          break;
+        }
+        FreePool (Info);
+      }
+      Status = GraphicsOutput->SetMode (GraphicsOutput, (UINT32) NumberIndex);
+    }
+  } else {
     //
-    // If user defined mode is not valid for display device, set to the default mode 800x600.
+    // Current mode number may need update now, so set it to an invalid mode number
     //
-    (Private->GraphicsOutputModeBuffer[0]).HorizontalResolution = 800;
-    (Private->GraphicsOutputModeBuffer[0]).VerticalResolution   = 600;
-    Status = Private->GraphicsOutput.SetMode (&Private->GraphicsOutput, 0);
+    CurrentGraphicsOutputMode->Mode = 0xffff;
+    //
+    // Graphics console can ensure all GOP devices have the same mode which can be taken as current mode.
+    //
+    Status = Private->GraphicsOutput.SetMode (&Private->GraphicsOutput, (UINT32) CurrentIndex);
+    if (EFI_ERROR(Status)) {
+      //
+      // If user defined mode is not valid for display device, set to the default mode 800x600.
+      //
+      (Private->GraphicsOutputModeBuffer[0]).HorizontalResolution = 800;
+      (Private->GraphicsOutputModeBuffer[0]).VerticalResolution   = 600;
+      Status = Private->GraphicsOutput.SetMode (&Private->GraphicsOutput, 0);
+    }
   }
 
   return Status;
@@ -3066,11 +3094,6 @@ ConSplitterTextOutAddDevice (
       }
     }
   }
-
-  //
-  // If ConOut, then set the mode to Mode #0 which us 80 x 25
-  //
-  Private->TextOut.SetMode (&Private->TextOut, 0);
 
   //
   // After adding new console device, all existing console devices should be
@@ -4387,14 +4410,6 @@ ConSplitterTextOutSetMode (
                                                     Private->TextOutList[Index].TextOut,
                                                     TextOutModeMap[Index]
                                                     );
-    //
-    // If this console device is based on a GOP or UGA device, then sync up the bitmap from
-    // the GOP/UGA splitter and reclear the text portion of the display in the new mode.
-    //
-    if ((Private->TextOutList[Index].GraphicsOutput != NULL) || (Private->TextOutList[Index].UgaDraw != NULL)) {
-      Private->TextOutList[Index].TextOut->ClearScreen (Private->TextOutList[Index].TextOut);
-    }
-
     if (EFI_ERROR (Status)) {
       ReturnStatus = Status;
     }

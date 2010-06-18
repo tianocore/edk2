@@ -1,7 +1,7 @@
 /** @file
   This is the main routine for initializing the Graphics Console support routines.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -640,10 +640,18 @@ CheckModeSupported (
     if (!EFI_ERROR (Status)) {
       if ((Info->HorizontalResolution == HorizontalResolution) &&
           (Info->VerticalResolution == VerticalResolution)) {
-        Status = GraphicsOutput->SetMode (GraphicsOutput, ModeNumber);
-        if (!EFI_ERROR (Status)) {
-          FreePool (Info);
+        if ((GraphicsOutput->Mode->Info->HorizontalResolution == HorizontalResolution) &&
+            (GraphicsOutput->Mode->Info->VerticalResolution == VerticalResolution)) {
+          //
+          // If video device has been set to this mode, we do not need to SetMode again
+          //
           break;
+        } else {
+          Status = GraphicsOutput->SetMode (GraphicsOutput, ModeNumber);
+          if (!EFI_ERROR (Status)) {
+            FreePool (Info);
+            break;
+          }
         }
       }
       FreePool (Info);
