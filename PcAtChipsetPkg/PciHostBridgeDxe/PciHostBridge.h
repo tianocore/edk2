@@ -1,7 +1,7 @@
 /** @file
   The Header file of the Pci Host Bridge Driver 
 
-  Copyright (c) 2008 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are
   licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,7 +22,6 @@
 
 #include <Protocol/PciHostBridgeResourceAllocation.h>
 #include <Protocol/PciRootBridgeIo.h>
-#include <Protocol/CpuIo2.h>
 #include <Protocol/Metronome.h>
 #include <Protocol/DevicePath.h>
 
@@ -35,12 +34,24 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/IoLib.h>
+#include <Library/PciLib.h>
 
 //
 // Hard code the host bridge number in the platform.
 // In this chipset, there is only one host bridge.
 //
 #define HOST_BRIDGE_NUMBER  1
+
+#define MAX_PCI_DEVICE_NUMBER      31
+#define MAX_PCI_FUNCTION_NUMBER    7
+#define MAX_PCI_REG_ADDRESS        0xFF
+
+typedef enum {
+  IoOperation,
+  MemOperation,
+  PciOperation
+} OPERATION_TYPE;
 
 #define PCI_HOST_BRIDGE_SIGNATURE  SIGNATURE_32('e', 'h', 's', 't')
 typedef struct {
@@ -219,7 +230,6 @@ typedef struct {
   UINT64                 MemLimit;    
   UINT64                 IoLimit;     
 
-  EFI_LOCK               PciLock;
   UINTN                  PciAddress;
   UINTN                  PciData;
   

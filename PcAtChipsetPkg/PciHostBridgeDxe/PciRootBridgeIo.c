@@ -573,41 +573,45 @@ RootBridgeIoConfiguration (
   );
 
 //
-// Sub Function Prototypes
-//
-/**
-   Internal help function for read and write PCI configuration space.
-
-   @param[in]   This          A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-   @param[in]   Write         Switch value for Read or Write.
-   @param[in]   Width         Signifies the width of the memory operations.
-   @param[in]   UserAddress   The address within the PCI configuration space for the PCI controller.
-   @param[in]   Count         The number of PCI configuration operations to perform. Bytes
-                              moved is Width size * Count, starting at Address.
-   @param[out]  UserBuffer    For read operations, the destination buffer to store the results. For
-                              write operations, the source buffer to write data from.
-   
-   @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
-   @retval EFI_INVALID_PARAMETER  Width is invalid for this PCI root bridge.
-   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
-   @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
-
-**/
-EFI_STATUS
-RootBridgeIoPciRW (
-  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
-  IN     BOOLEAN                                Write,
-  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
-  IN     UINT64                                 UserAddress,
-  IN     UINTN                                  Count,
-  IN OUT VOID                                   *UserBuffer
-  );
-
-//
 // Memory Controller Pci Root Bridge Io Module Variables
 //
 EFI_METRONOME_ARCH_PROTOCOL *mMetronome;
-EFI_CPU_IO2_PROTOCOL *mCpuIo;
+
+//
+// Lookup table for increment values based on transfer widths
+//
+UINT8 mInStride[] = {
+  1, // EfiPciWidthUint8
+  2, // EfiPciWidthUint16
+  4, // EfiPciWidthUint32
+  8, // EfiPciWidthUint64
+  0, // EfiPciWidthFifoUint8
+  0, // EfiPciWidthFifoUint16
+  0, // EfiPciWidthFifoUint32
+  0, // EfiPciWidthFifoUint64
+  1, // EfiPciWidthFillUint8
+  2, // EfiPciWidthFillUint16
+  4, // EfiPciWidthFillUint32
+  8  // EfiPciWidthFillUint64
+};
+
+//
+// Lookup table for increment values based on transfer widths
+//
+UINT8 mOutStride[] = {
+  1, // EfiPciWidthUint8
+  2, // EfiPciWidthUint16
+  4, // EfiPciWidthUint32
+  8, // EfiPciWidthUint64
+  1, // EfiPciWidthFifoUint8
+  2, // EfiPciWidthFifoUint16
+  4, // EfiPciWidthFifoUint32
+  8, // EfiPciWidthFifoUint64
+  0, // EfiPciWidthFillUint8
+  0, // EfiPciWidthFillUint16
+  0, // EfiPciWidthFillUint32
+  0  // EfiPciWidthFillUint64
+};
 
 /**
 
@@ -665,8 +669,6 @@ RootBridgeConstructor (
     PrivateData->ResAllocNode[Index].Status    = ResNone;
   }
   
-
-  EfiInitializeLock (&PrivateData->PciLock, TPL_HIGH_LEVEL);
   PrivateData->PciAddress = 0xCF8;
   PrivateData->PciData    = 0xCFC;
 
@@ -706,11 +708,387 @@ RootBridgeConstructor (
 
   Protocol->SegmentNumber  = 0;
 
-  Status = gBS->LocateProtocol (&gEfiCpuIo2ProtocolGuid, NULL, (VOID **)&mCpuIo);
-  ASSERT_EFI_ERROR (Status);
-
   Status = gBS->LocateProtocol (&gEfiMetronomeArchProtocolGuid, NULL, (VOID **)&mMetronome);
   ASSERT_EFI_ERROR (Status);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Check parameters for IO,MMIO,PCI read/write services of PCI Root Bridge IO.
+
+  The I/O operations are carried out exactly as requested. The caller is responsible 
+  for satisfying any alignment and I/O width restrictions that a PI System on a 
+  platform might require. For example on some platforms, width requests of 
+  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will 
+  be handled by the driver.
+  
+  @param[in] This           A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param[in] OperationType  I/O operation type: IO/MMIO/PCI.
+  @param[in] Width          Signifies the width of the I/O or Memory operation.
+  @param[in] Address        The base address of the I/O operation. 
+  @param[in] Count          The number of I/O operations to perform. The number of  
+                            bytes moved is Width size * Count, starting at Address.
+  @param[in] Buffer         For read operations, the destination buffer to store the results.
+                            For write operations, the source buffer from which to write data.
+
+  @retval EFI_SUCCESS            The parameters for this request pass the checks.
+  @retval EFI_INVALID_PARAMETER  Width is invalid for this PI system.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+  @retval EFI_UNSUPPORTED        The Buffer is not aligned for the given Width.
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+                                 and Count is not valid for this PI system.
+
+**/
+EFI_STATUS
+RootBridgeIoCheckParameter (
+  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
+  IN OPERATION_TYPE                         OperationType,
+  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
+  IN UINT64                                 Address,
+  IN UINTN                                  Count,
+  IN VOID                                   *Buffer
+  )
+{
+  PCI_ROOT_BRIDGE_INSTANCE                     *PrivateData;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS  *PciRbAddr;
+  UINT64                                       MaxCount;
+  UINT64                                       Base;
+  UINT64                                       Limit;
+
+  //
+  // Check to see if Buffer is NULL
+  //
+  if (Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check to see if Width is in the valid range
+  //
+  if (Width < EfiPciWidthUint8 || Width >= EfiPciWidthMaximum) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // For FIFO type, the target address won't increase during the access,
+  // so treat Count as 1
+  //
+  if (Width >= EfiPciWidthFifoUint8 && Width <= EfiPciWidthFifoUint64) {
+    Count = 1;
+  }
+
+  //
+  // Check to see if Width is in the valid range for I/O Port operations
+  //
+  Width = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) (Width & 0x03);
+  if ((OperationType != MemOperation) && (Width == EfiPciWidthUint64)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check to see if Address is aligned
+  //
+  if ((Address & (UINT64)(mInStride[Width] - 1)) != 0) {
+    return EFI_UNSUPPORTED;
+  }
+
+  PrivateData = DRIVER_INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS (This);
+
+  //
+  // Check to see if any address associated with this transfer exceeds the maximum 
+  // allowed address.  The maximum address implied by the parameters passed in is
+  // Address + Size * Count.  If the following condition is met, then the transfer
+  // is not supported.
+  //
+  //    Address + Size * Count > Limit + 1
+  //
+  // Since Limit can be the maximum integer value supported by the CPU and Count 
+  // can also be the maximum integer value supported by the CPU, this range
+  // check must be adjusted to avoid all oveflow conditions.
+  //   
+  // The following form of the range check is equivalent but assumes that 
+  // Limit is of the form (2^n - 1).
+  //
+  if (OperationType == IoOperation) {
+    Base = PrivateData->IoBase;
+    Limit = PrivateData->IoLimit;
+  } else if (OperationType == MemOperation) {
+    Base = PrivateData->MemBase;
+    Limit = PrivateData->MemLimit;
+  } else {
+    PciRbAddr = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS*) &Address;
+    if (PciRbAddr->Bus < PrivateData->BusBase || PciRbAddr->Bus > PrivateData->BusLimit) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (PciRbAddr->Device > MAX_PCI_DEVICE_NUMBER || PciRbAddr->Function > MAX_PCI_FUNCTION_NUMBER) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (PciRbAddr->ExtendedRegister != 0) {
+      Address = PciRbAddr->ExtendedRegister;
+    } else {
+      Address = PciRbAddr->Register;
+    }
+    Base = 0;
+    Limit = MAX_PCI_REG_ADDRESS;
+  }
+
+  if (Address < Base) {
+      return EFI_INVALID_PARAMETER;
+  }
+
+  if (Count == 0) {
+    if (Address > Limit) {
+      return EFI_UNSUPPORTED;
+    }
+  } else {  
+    MaxCount = RShiftU64 (Limit, Width);
+    if (MaxCount < (Count - 1)) {
+      return EFI_UNSUPPORTED;
+    }
+    if (Address > LShiftU64 (MaxCount - Count + 1, Width)) {
+      return EFI_UNSUPPORTED;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+   Internal help function for read and write memory space.
+
+   @param[in]   This          A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+   @param[in]   Write         Switch value for Read or Write.
+   @param[in]   Width         Signifies the width of the memory operations.
+   @param[in]   UserAddress   The address within the PCI configuration space for the PCI controller.
+   @param[in]   Count         The number of PCI configuration operations to perform. Bytes
+                              moved is Width size * Count, starting at Address.
+   @param[out]  UserBuffer    For read operations, the destination buffer to store the results. For
+                              write operations, the source buffer to write data from.
+   
+   @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
+   @retval EFI_INVALID_PARAMETER  Width is invalid for this PCI root bridge.
+   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+   @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
+
+**/
+EFI_STATUS
+RootBridgeIoMemRW (
+  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
+  IN     BOOLEAN                                Write,
+  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
+  IN     UINT64                                 Address,
+  IN     UINTN                                  Count,
+  IN OUT VOID                                   *Buffer
+  )
+{
+  EFI_STATUS                             Status;
+  UINT8                                  InStride;
+  UINT8                                  OutStride;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  OperationWidth;
+  UINT8                                  *Uint8Buffer;
+
+  Status = RootBridgeIoCheckParameter (This, MemOperation, Width, Address, Count, Buffer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  InStride = mInStride[Width];
+  OutStride = mOutStride[Width];
+  OperationWidth = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) (Width & 0x03);
+  for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
+    if (Write) {
+      switch (OperationWidth) {
+        case EfiPciWidthUint8:
+          MmioWrite8 ((UINTN)Address, *Uint8Buffer);
+          break;
+        case EfiPciWidthUint16:
+          MmioWrite16 ((UINTN)Address, *((UINT16 *)Uint8Buffer));
+          break;
+        case EfiPciWidthUint32:
+          MmioWrite32 ((UINTN)Address, *((UINT32 *)Uint8Buffer));
+          break;
+        case EfiPciWidthUint64:
+          MmioWrite64 ((UINTN)Address, *((UINT64 *)Uint8Buffer));
+          break;
+      }
+    } else {
+      switch (OperationWidth) {
+        case EfiPciWidthUint8:
+          *Uint8Buffer = MmioRead8 ((UINTN)Address);
+          break;
+        case EfiPciWidthUint16:
+          *((UINT16 *)Uint8Buffer) = MmioRead16 ((UINTN)Address);
+          break;
+        case EfiPciWidthUint32:
+          *((UINT32 *)Uint8Buffer) = MmioRead32 ((UINTN)Address);
+          break;
+        case EfiPciWidthUint64:
+          *((UINT64 *)Uint8Buffer) = MmioRead64 ((UINTN)Address);
+          break;
+      }
+    }
+  }
+  return EFI_SUCCESS;  
+}
+
+/**
+   Internal help function for read and write IO space.
+
+   @param[in]   This          A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+   @param[in]   Write         Switch value for Read or Write.
+   @param[in]   Width         Signifies the width of the memory operations.
+   @param[in]   UserAddress   The address within the PCI configuration space for the PCI controller.
+   @param[in]   Count         The number of PCI configuration operations to perform. Bytes
+                              moved is Width size * Count, starting at Address.
+   @param[out]  UserBuffer    For read operations, the destination buffer to store the results. For
+                              write operations, the source buffer to write data from.
+   
+   @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
+   @retval EFI_INVALID_PARAMETER  Width is invalid for this PCI root bridge.
+   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+   @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
+
+**/
+EFI_STATUS
+RootBridgeIoIoRW (
+  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
+  IN     BOOLEAN                                Write,
+  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
+  IN     UINT64                                 Address,
+  IN     UINTN                                  Count,
+  IN OUT VOID                                   *Buffer
+  )
+{
+  EFI_STATUS                             Status;
+  UINT8                                  InStride;
+  UINT8                                  OutStride;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  OperationWidth;
+  UINT8                                  *Uint8Buffer;
+
+  Status = RootBridgeIoCheckParameter (This, IoOperation, Width, Address, Count, Buffer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  InStride = mInStride[Width];
+  OutStride = mOutStride[Width];
+  OperationWidth = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) (Width & 0x03);
+  for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
+    if (Write) {
+      switch (OperationWidth) {
+        case EfiPciWidthUint8:
+          IoWrite8 ((UINTN)Address, *Uint8Buffer);
+          break;
+        case EfiPciWidthUint16:
+          IoWrite16 ((UINTN)Address, *((UINT16 *)Uint8Buffer));
+          break;
+        case EfiPciWidthUint32:
+          IoWrite32 ((UINTN)Address, *((UINT32 *)Uint8Buffer));
+          break;
+      }
+    } else {
+      switch (OperationWidth) {
+        case EfiPciWidthUint8:
+          *Uint8Buffer = IoRead8 ((UINTN)Address);
+          break;
+        case EfiPciWidthUint16:
+          *((UINT16 *)Uint8Buffer) = IoRead16 ((UINTN)Address);
+          break;
+        case EfiPciWidthUint32:
+          *((UINT32 *)Uint8Buffer) = IoRead32 ((UINTN)Address);
+          break;
+      }
+    }
+  }
+  return EFI_SUCCESS;
+}
+
+/**
+   Internal help function for read and write PCI configuration space.
+
+   @param[in]   This          A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+   @param[in]   Write         Switch value for Read or Write.
+   @param[in]   Width         Signifies the width of the memory operations.
+   @param[in]   UserAddress   The address within the PCI configuration space for the PCI controller.
+   @param[in]   Count         The number of PCI configuration operations to perform. Bytes
+                              moved is Width size * Count, starting at Address.
+   @param[out]  UserBuffer    For read operations, the destination buffer to store the results. For
+                              write operations, the source buffer to write data from.
+   
+   @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
+   @retval EFI_INVALID_PARAMETER  Width is invalid for this PCI root bridge.
+   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+   @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
+
+**/
+EFI_STATUS
+RootBridgeIoPciRW (
+  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
+  IN BOOLEAN                                Write,
+  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
+  IN UINT64                                 Address,
+  IN UINTN                                  Count,
+  IN OUT VOID                               *Buffer
+  )
+{
+  EFI_STATUS                                   Status;
+  UINT8                                        InStride;
+  UINT8                                        OutStride;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH        OperationWidth;
+  UINT8                                        *Uint8Buffer;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS  *PciRbAddr;
+  UINTN                                        PcieRegAddr;
+
+  Status = RootBridgeIoCheckParameter (This, PciOperation, Width, Address, Count, Buffer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  PciRbAddr = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS*) &Address;
+
+  PcieRegAddr = (UINTN) PCI_LIB_ADDRESS (
+                          PciRbAddr->Bus,
+                          PciRbAddr->Device,
+                          PciRbAddr->Function,
+                          (PciRbAddr->ExtendedRegister != 0) ? \
+                            PciRbAddr->ExtendedRegister :
+                            PciRbAddr->Register
+                          );
+
+  InStride = mInStride[Width];
+  OutStride = mOutStride[Width];
+  OperationWidth = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) (Width & 0x03);
+  for (Uint8Buffer = Buffer; Count > 0; PcieRegAddr += InStride, Uint8Buffer += OutStride, Count--) {
+    if (Write) {
+      switch (OperationWidth) {
+        case EfiPciWidthUint8:
+          PciWrite8 (PcieRegAddr, *Uint8Buffer);
+          break;
+        case EfiPciWidthUint16:
+          PciWrite16 (PcieRegAddr, *((UINT16 *)Uint8Buffer));
+          break;
+        case EfiPciWidthUint32:
+          PciWrite32 (PcieRegAddr, *((UINT32 *)Uint8Buffer));
+          break;
+      }
+    } else {
+      switch (OperationWidth) {
+        case EfiPciWidthUint8:
+          *Uint8Buffer = PciRead8 (PcieRegAddr);
+          break;
+        case EfiPciWidthUint16:
+          *((UINT16 *)Uint8Buffer) = PciRead16 (PcieRegAddr);
+          break;
+        case EfiPciWidthUint32:
+          *((UINT32 *)Uint8Buffer) = PciRead32 (PcieRegAddr);
+          break;
+      }
+    }
+  }
 
   return EFI_SUCCESS;
 }
@@ -952,42 +1330,7 @@ RootBridgeIoMemRead (
   IN OUT VOID                                   *Buffer
   )
 {
-  PCI_ROOT_BRIDGE_INSTANCE                 *PrivateData;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH    OldWidth;
-  UINTN                                    OldCount;
-  
-  if (Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (Width < 0 || Width >= EfiPciWidthMaximum) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  PrivateData = DRIVER_INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS(This);
-
-  //
-  // Check memory access limit
-  //
-  if (Address < PrivateData->MemBase) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  OldWidth = Width;
-  OldCount = Count;
-
-  if (Width >= EfiPciWidthFifoUint8 && Width <= EfiPciWidthFifoUint64) {
-    Count = 1;
-  }
-
-  Width = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH)(Width & 0x03);
-
-  if (Address + (((UINTN)1 << Width) * Count) - 1 > PrivateData->MemLimit) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  return mCpuIo->Mem.Read (mCpuIo, (EFI_CPU_IO_PROTOCOL_WIDTH) OldWidth, 
-                       Address, OldCount, Buffer);
+  return RootBridgeIoMemRW (This, FALSE, Width, Address, Count, Buffer);
 }
 
 /**
@@ -1022,41 +1365,7 @@ RootBridgeIoMemWrite (
   IN OUT VOID                                   *Buffer
   )
 {
-  PCI_ROOT_BRIDGE_INSTANCE                    *PrivateData;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH       OldWidth;
-  UINTN                                       OldCount;
-
-  if (Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (Width < 0 || Width >= EfiPciWidthMaximum) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  PrivateData = DRIVER_INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS(This);
-
-  //
-  // Check memory access limit
-  //
-  if (Address < PrivateData->MemBase) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  OldWidth = Width;
-  OldCount = Count;
-  if (Width >= EfiPciWidthFifoUint8 && Width <= EfiPciWidthFifoUint64) {
-    Count = 1;
-  }
-
-  Width = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH)(Width & 0x03);
-
-  if (Address + (((UINTN)1 << Width) * Count) - 1 > PrivateData->MemLimit) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  return mCpuIo->Mem.Write (mCpuIo, (EFI_CPU_IO_PROTOCOL_WIDTH) OldWidth, 
-                       Address, OldCount, Buffer);
+  return RootBridgeIoMemRW (This, TRUE, Width, Address, Count, Buffer);  
 }
 
 /**
@@ -1087,52 +1396,7 @@ RootBridgeIoIoRead (
   IN OUT VOID                                   *Buffer
   )
 {
-  
-  
-  UINTN                                    AlignMask;
-  PCI_ROOT_BRIDGE_INSTANCE                 *PrivateData;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH    OldWidth;
-  UINTN                                    OldCount;
-
-  if (Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-  
-  if (Width < 0 || Width >= EfiPciWidthMaximum) {
-    return EFI_INVALID_PARAMETER;
-  }
-  
-  PrivateData = DRIVER_INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS(This);
-
-  //AlignMask = (1 << Width) - 1;
-  AlignMask = (1 << (Width & 0x03)) - 1;
-
-  //
-  // check Io access limit
-  //
-  if (Address < PrivateData->IoBase) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  OldWidth = Width;
-  OldCount = Count;
-  if (Width >= EfiPciWidthFifoUint8 && Width <= EfiPciWidthFifoUint64) {
-    Count = 1;
-  }
-
-  Width = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH)(Width & 0x03);
-  
-  if (Address + (((UINTN)1 << Width) * Count) - 1 >= PrivateData->IoLimit) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (Address & AlignMask) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  return mCpuIo->Io.Read (mCpuIo, (EFI_CPU_IO_PROTOCOL_WIDTH) OldWidth, 
-                      Address, OldCount, Buffer);
-
+  return RootBridgeIoIoRW (This, FALSE, Width, Address, Count, Buffer);  
 }
 
 /**
@@ -1163,50 +1427,7 @@ RootBridgeIoIoWrite (
   IN OUT   VOID                                    *Buffer
   )
 {
-  UINTN                                         AlignMask;
-  PCI_ROOT_BRIDGE_INSTANCE                      *PrivateData;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH         OldWidth;
-  UINTN                                         OldCount;
-
-  if (Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (Width < 0 || Width >= EfiPciWidthMaximum) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  PrivateData = DRIVER_INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS(This);
-
-  //AlignMask = (1 << Width) - 1;
-  AlignMask = (1 << (Width & 0x03)) - 1;
-
-  //
-  // Check Io access limit
-  //
-  if (Address < PrivateData->IoBase) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  OldWidth = Width;
-  OldCount = Count;
-  if (Width >= EfiPciWidthFifoUint8 && Width <= EfiPciWidthFifoUint64) {
-    Count = 1;
-  }
-
-  Width = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH)(Width & 0x03);
-  
-  if (Address + (((UINTN)1 << Width) * Count) - 1 >= PrivateData->IoLimit) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (Address & AlignMask) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  return mCpuIo->Io.Write (mCpuIo, (EFI_CPU_IO_PROTOCOL_WIDTH) OldWidth, 
-                      Address, OldCount, Buffer);
-
+  return RootBridgeIoIoRW (This, TRUE, Width, Address, Count, Buffer);  
 }
 
 /**
@@ -1331,17 +1552,6 @@ RootBridgeIoPciRead (
   IN OUT   VOID                                   *Buffer
   )
 {
-  
-  if (Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (Width < 0 || Width >= EfiPciWidthMaximum) {
-    return EFI_INVALID_PARAMETER;
-  }
-  //
-  // Read Pci configuration space
-  //
   return RootBridgeIoPciRW (This, FALSE, Width, Address, Count, Buffer);
 }
 
@@ -1378,17 +1588,6 @@ RootBridgeIoPciWrite (
   IN OUT   VOID                                   *Buffer
   )
 {
-  
-  if (Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (Width < 0 || Width >= EfiPciWidthMaximum) {
-    return EFI_INVALID_PARAMETER;
-  }
-  //
-  // Write Pci configuration space
-  //
   return RootBridgeIoPciRW (This, TRUE, Width, Address, Count, Buffer);
 }
 
@@ -1879,111 +2078,3 @@ RootBridgeIoConfiguration (
   return EFI_SUCCESS;
 }
 
-//
-// Internal function
-//
-/**
-   Internal help function for read and write PCI configuration space.
-
-   @param[in]   This          A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-   @param[in]   Write         Switch value for Read or Write.
-   @param[in]   Width         Signifies the width of the memory operations.
-   @param[in]   UserAddress   The address within the PCI configuration space for the PCI controller.
-   @param[in]   Count         The number of PCI configuration operations to perform. Bytes
-                              moved is Width size * Count, starting at Address.
-   @param[out]  UserBuffer    For read operations, the destination buffer to store the results. For
-                              write operations, the source buffer to write data from.
-   
-   @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
-   @retval EFI_INVALID_PARAMETER  Width is invalid for this PCI root bridge.
-   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
-   @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
-
-**/
-EFI_STATUS
-RootBridgeIoPciRW (
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
-  IN BOOLEAN                                Write,
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
-  IN UINT64                                 UserAddress,
-  IN UINTN                                  Count,
-  IN OUT VOID                               *UserBuffer
-  )
-{
-  PCI_CONFIG_ACCESS_CF8             Pci;
-  PCI_CONFIG_ACCESS_CF8             PciAligned;
-  UINT32                            InStride;
-  UINT32                            OutStride;
-  UINTN                             PciData;
-  UINTN                             PciDataStride;
-  PCI_ROOT_BRIDGE_INSTANCE     *PrivateData;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS  PciAddress;
-
-  if (Width < 0 || Width >= EfiPciWidthMaximum) {
-    return EFI_INVALID_PARAMETER;
-  }
-  
-  if ((Width & 0x03) >= EfiPciWidthUint64) {
-    return EFI_INVALID_PARAMETER;
-  }
-  
-  PrivateData = DRIVER_INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS(This);
-
-  InStride    = 1 << (Width & 0x03);
-  OutStride   = InStride;
-  if (Width >= EfiCpuIoWidthFifoUint8 && Width <= EfiCpuIoWidthFifoUint64) {
-    InStride = 0;
-  }
-
-  if (Width >= EfiCpuIoWidthFillUint8 && Width <= EfiCpuIoWidthFillUint64) {
-    OutStride = 0;
-  }
-
-  CopyMem (&PciAddress, &UserAddress, sizeof(UINT64));
-
-  if (PciAddress.ExtendedRegister > 0xFF) {
-    return EFI_UNSUPPORTED;
-  }
-
-  if (PciAddress.ExtendedRegister != 0) {
-    Pci.Bits.Reg = PciAddress.ExtendedRegister & 0xFF;
-  } else {
-    Pci.Bits.Reg = PciAddress.Register;
-  }
-
-  Pci.Bits.Func     = PciAddress.Function;
-  Pci.Bits.Dev      = PciAddress.Device;
-  Pci.Bits.Bus      = PciAddress.Bus;
-  Pci.Bits.Reserved = 0;
-  Pci.Bits.Enable   = 1;
-
-  //
-  // PCI Config access are all 32-bit alligned, but by accessing the
-  //  CONFIG_DATA_REGISTER (0xcfc) with different widths more cycle types
-  //  are possible on PCI.
-  //
-  // To read a byte of PCI config space you load 0xcf8 and 
-  //  read 0xcfc, 0xcfd, 0xcfe, 0xcff
-  //
-  PciDataStride = Pci.Bits.Reg & 0x03;
-
-  while (Count) {
-    CopyMem (&PciAligned, &Pci, sizeof (PciAligned));
-    PciAligned.Bits.Reg &= 0xfc;
-    PciData = (UINTN)PrivateData->PciData + PciDataStride;
-    EfiAcquireLock(&PrivateData->PciLock);
-    This->Io.Write (This, EfiPciWidthUint32, PrivateData->PciAddress, 1, &PciAligned);
-    if (Write) {
-      This->Io.Write (This, Width, PciData, 1, UserBuffer);
-    } else {
-      This->Io.Read (This, Width, PciData, 1, UserBuffer);
-    }
-    EfiReleaseLock(&PrivateData->PciLock);
-    UserBuffer = ((UINT8 *)UserBuffer) + OutStride;
-    PciDataStride = (PciDataStride + InStride) % 4;
-    Pci.Bits.Reg += InStride;
-    Count -= 1;
-  }
-  
-  return EFI_SUCCESS;
-}

@@ -35,7 +35,9 @@
   BaseLib
   DebugLib
   DevicePathLib
-  
+  IoLib
+  PciLib
+
 [Sources]
   PciHostBridge.c
   PciRootBridgeIo.c
@@ -44,9 +46,9 @@
 [Protocols]
   gEfiPciHostBridgeResourceAllocationProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
-  gEfiCpuIo2ProtocolGuid 
   gEfiMetronomeArchProtocolGuid
   gEfiDevicePathProtocolGuid
 
 [depex]
-  gEfiCpuIo2ProtocolGuid AND gEfiMetronomeArchProtocolGuid
+  gEfiMetronomeArchProtocolGuid
+

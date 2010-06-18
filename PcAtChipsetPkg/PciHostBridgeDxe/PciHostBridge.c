@@ -51,7 +51,7 @@ EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mEfiPciRootBridgeDevicePath[1][1] = {
 };
 
 PCI_ROOT_BRIDGE_RESOURCE_APPETURE  mResAppeture[1][1] = {
-  {0, 0, 0, 0xffffffff, 0, 1 << 16}
+  {0, 0xff, 0x80000000, 0xffffffff, 0, 0xffff}
 };
 
 EFI_HANDLE mDriverImageHandle;
