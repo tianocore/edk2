@@ -914,6 +914,13 @@ RootBridgeIoMemRW (
         case EfiPciWidthUint64:
           MmioWrite64 ((UINTN)Address, *((UINT64 *)Uint8Buffer));
           break;
+        default:
+          //
+          // The RootBridgeIoCheckParameter call above will ensure that this
+          // path is not taken.
+          //
+          ASSERT (FALSE);
+          break;
       }
     } else {
       switch (OperationWidth) {
@@ -928,6 +935,13 @@ RootBridgeIoMemRW (
           break;
         case EfiPciWidthUint64:
           *((UINT64 *)Uint8Buffer) = MmioRead64 ((UINTN)Address);
+          break;
+        default:
+          //
+          // The RootBridgeIoCheckParameter call above will ensure that this
+          // path is not taken.
+          //
+          ASSERT (FALSE);
           break;
       }
     }
@@ -989,6 +1003,13 @@ RootBridgeIoIoRW (
         case EfiPciWidthUint32:
           IoWrite32 ((UINTN)Address, *((UINT32 *)Uint8Buffer));
           break;
+        default:
+          //
+          // The RootBridgeIoCheckParameter call above will ensure that this
+          // path is not taken.
+          //
+          ASSERT (FALSE);
+          break;
       }
     } else {
       switch (OperationWidth) {
@@ -1000,6 +1021,13 @@ RootBridgeIoIoRW (
           break;
         case EfiPciWidthUint32:
           *((UINT32 *)Uint8Buffer) = IoRead32 ((UINTN)Address);
+          break;
+        default:
+          //
+          // The RootBridgeIoCheckParameter call above will ensure that this
+          // path is not taken.
+          //
+          ASSERT (FALSE);
           break;
       }
     }
@@ -1074,6 +1102,13 @@ RootBridgeIoPciRW (
         case EfiPciWidthUint32:
           PciWrite32 (PcieRegAddr, *((UINT32 *)Uint8Buffer));
           break;
+        default:
+          //
+          // The RootBridgeIoCheckParameter call above will ensure that this
+          // path is not taken.
+          //
+          ASSERT (FALSE);
+          break;
       }
     } else {
       switch (OperationWidth) {
@@ -1085,6 +1120,13 @@ RootBridgeIoPciRW (
           break;
         case EfiPciWidthUint32:
           *((UINT32 *)Uint8Buffer) = PciRead32 (PcieRegAddr);
+          break;
+        default:
+          //
+          // The RootBridgeIoCheckParameter call above will ensure that this
+          // path is not taken.
+          //
+          ASSERT (FALSE);
           break;
       }
     }
