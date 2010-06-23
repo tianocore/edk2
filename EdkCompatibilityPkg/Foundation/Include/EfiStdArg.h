@@ -108,6 +108,9 @@ typedef __builtin_va_list VA_LIST;
 #define VA_END(Marker)               __builtin_va_end (Marker)
 
 #else
+
+#ifndef VA_START
+
 ///
 /// Variable used to traverse the list of arguments. This type can vary by 
 /// implementation and could be an array or structure. 
@@ -161,6 +164,8 @@ typedef CHAR8 *VA_LIST;
   
 **/
 #define VA_END(Marker)      (Marker = (VA_LIST) 0)
+
+#endif
 
 #endif
 
