@@ -2,11 +2,11 @@
   Leaf math worker functions that require 64-bit arithmetic support from the
   compiler.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -25,7 +25,7 @@
   @param  Operand The 64-bit operand to shift left.
   @param  Count   The number of bits to shift left.
 
-  @return Operand << Count
+  @return Operand << Count.
 
 **/
 UINT64
@@ -48,7 +48,7 @@ InternalMathLShiftU64 (
   @param  Operand The 64-bit operand to shift right.
   @param  Count   The number of bits to shift right.
 
-  @return Operand >> Count
+  @return Operand >> Count.
 
 **/
 UINT64
@@ -71,7 +71,7 @@ InternalMathRShiftU64 (
   @param  Operand The 64-bit operand to shift right.
   @param  Count   The number of bits to shift right.
 
-  @return Operand arithmetically shifted right by Count
+  @return Operand arithmetically shifted right by Count.
 
 **/
 UINT64
@@ -113,7 +113,7 @@ InternalMathARShiftU64 (
   @param  Operand The 64-bit operand to rotate left.
   @param  Count   The number of bits to rotate left.
 
-  @return Operand <<< Count
+  @return Operand <<< Count.
 
 **/
 UINT64
@@ -137,7 +137,7 @@ InternalMathLRotU64 (
   @param  Operand The 64-bit operand to rotate right.
   @param  Count   The number of bits to rotate right.
 
-  @return Operand >>> Count
+  @return Operand >>> Count.
 
 **/
 UINT64
@@ -178,10 +178,10 @@ InternalMathSwapBytes64 (
 }
 
 /**
-  Multiples a 64-bit unsigned integer by a 32-bit unsigned integer
+  Multiplies a 64-bit unsigned integer by a 32-bit unsigned integer
   and generates a 64-bit unsigned result.
 
-  This function multiples the 64-bit unsigned value Multiplicand by the 32-bit
+  This function multiplies the 64-bit unsigned value Multiplicand by the 32-bit
   unsigned value Multiplier and generates a 64-bit unsigned result. This 64-
   bit unsigned result is returned.
 
@@ -203,17 +203,17 @@ InternalMathMultU64x32 (
 
 
 /**
-  Multiples a 64-bit unsigned integer by a 64-bit unsigned integer
+  Multiplies a 64-bit unsigned integer by a 64-bit unsigned integer
   and generates a 64-bit unsigned result.
 
-  This function multiples the 64-bit unsigned value Multiplicand by the 64-bit
+  This function multiplies the 64-bit unsigned value Multiplicand by the 64-bit
   unsigned value Multiplier and generates a 64-bit unsigned result. This 64-
   bit unsigned result is returned.
 
   @param  Multiplicand  A 64-bit unsigned value.
   @param  Multiplier    A 64-bit unsigned value.
 
-  @return Multiplicand * Multiplier
+  @return Multiplicand * Multiplier.
 
 **/
 UINT64
@@ -237,7 +237,7 @@ InternalMathMultU64x64 (
   @param  Dividend  A 64-bit unsigned value.
   @param  Divisor   A 32-bit unsigned value.
 
-  @return Dividend / Divisor
+  @return Dividend / Divisor.
 
 **/
 UINT64
@@ -261,7 +261,7 @@ InternalMathDivU64x32 (
   @param  Dividend  A 64-bit unsigned value.
   @param  Divisor   A 32-bit unsigned value.
 
-  @return Dividend % Divisor
+  @return Dividend % Divisor.
 
 **/
 UINT32
@@ -288,7 +288,7 @@ InternalMathModU64x32 (
   @param  Remainder A pointer to a 32-bit unsigned value. This parameter is
                     optional and may be NULL.
 
-  @return Dividend / Divisor
+  @return Dividend / Divisor.
 
 **/
 UINT64
@@ -350,7 +350,7 @@ InternalMathDivRemU64x64 (
   @param  Remainder A pointer to a 64-bit signed value. This parameter is
                     optional and may be NULL.
 
-  @return Dividend / Divisor
+  @return Dividend / Divisor.
 
 **/
 INT64

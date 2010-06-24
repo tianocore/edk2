@@ -5,7 +5,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -53,7 +53,7 @@ extern CONST UINT16                 mTransition;
   on the real mode stack and the starting address of the save area is returned.
 
   @param  RegisterSet Values of registers before invocation of 16-bit code.
-  @param  Transition  Pointer to the transition code under 1MB.
+  @param  Transition  The pointer to the transition code under 1MB.
 
   @return The pointer to a IA32_REGISTER_SET structure containing the updated
           register values.

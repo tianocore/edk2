@@ -1,11 +1,11 @@
 /** @file
   Bit field functions of BaseLib.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -52,7 +52,7 @@ InternalBaseLibBitFieldReadUint (
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-  @param  OrData    The value to OR with the read value from the value
+  @param  OrData    The value to OR with the read value from the value.
 
   @return The new value.
 
@@ -84,7 +84,7 @@ InternalBaseLibBitFieldOrUint (
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-  @param  AndData    The value to And with the read value from the value
+  @param  AndData    The value to And with the read value from the value.
 
   @return The new value.
 
@@ -191,7 +191,7 @@ BitFieldWrite8 (
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..7.
-  @param  OrData    The value to OR with the read value from the value
+  @param  OrData    The value to OR with the read value from the value.
 
   @return The new 8-bit value.
 
@@ -378,7 +378,7 @@ BitFieldWrite16 (
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..15.
-  @param  OrData    The value to OR with the read value from the value
+  @param  OrData    The value to OR with the read value from the value.
 
   @return The new 16-bit value.
 
@@ -415,7 +415,7 @@ BitFieldOr16 (
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..15.
-  @param  AndData   The value to AND with the read value from the value
+  @param  AndData   The value to AND with the read value from the value.
 
   @return The new 16-bit value.
 
@@ -565,7 +565,7 @@ BitFieldWrite32 (
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..31.
-  @param  OrData    The value to OR with the read value from the value
+  @param  OrData    The value to OR with the read value from the value.
 
   @return The new 32-bit value.
 
@@ -602,7 +602,7 @@ BitFieldOr32 (
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..31.
-  @param  AndData   The value to AND with the read value from the value
+  @param  AndData   The value to AND with the read value from the value.
 
   @return The new 32-bit value.
 
@@ -796,7 +796,7 @@ BitFieldOr64 (
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..63.
-  @param  AndData   The value to AND with the read value from the value
+  @param  AndData   The value to AND with the read value from the value.
 
   @return The new 64-bit value.
 

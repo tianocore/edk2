@@ -1,11 +1,11 @@
 /** @file
   Unaligned access functions of BaseLib.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -24,7 +24,7 @@
 
   If the Buffer is NULL, then ASSERT().
 
-  @param  Buffer  Pointer to a 16-bit value that may be unaligned.
+  @param  Buffer  A pointer to a 16-bit value that may be unaligned.
 
   @return The 16-bit value read from Buffer.
 
@@ -49,7 +49,7 @@ ReadUnaligned16 (
 
   If the Buffer is NULL, then ASSERT().
 
-  @param  Buffer  Pointer to a 16-bit value that may be unaligned.
+  @param  Buffer  A pointer to a 16-bit value that may be unaligned.
   @param  Value   16-bit value to write to Buffer.
 
   @return The 16-bit value to write to Buffer.
@@ -75,7 +75,7 @@ WriteUnaligned16 (
 
   If the Buffer is NULL, then ASSERT().
 
-  @param  Buffer  Pointer to a 24-bit value that may be unaligned.
+  @param  Buffer  A pointer to a 24-bit value that may be unaligned.
 
   @return The 24-bit value read from Buffer.
 
@@ -100,7 +100,7 @@ ReadUnaligned24 (
 
   If the Buffer is NULL, then ASSERT().
 
-  @param  Buffer  Pointer to a 24-bit value that may be unaligned.
+  @param  Buffer  A pointer to a 24-bit value that may be unaligned.
   @param  Value   24-bit value to write to Buffer.
 
   @return The 24-bit value to write to Buffer.
@@ -127,7 +127,7 @@ WriteUnaligned24 (
 
   If the Buffer is NULL, then ASSERT().
 
-  @param  Buffer  Pointer to a 32-bit value that may be unaligned.
+  @param  Buffer  A pointer to a 32-bit value that may be unaligned.
 
   @return The 32-bit value read from Buffer.
 
@@ -152,8 +152,8 @@ ReadUnaligned32 (
 
   If the Buffer is NULL, then ASSERT().
 
-  @param  Buffer  Pointer to a 32-bit value that may be unaligned.
-  @param  Value   32-bit value to write to Buffer.
+  @param  Buffer  A pointer to a 32-bit value that may be unaligned.
+  @param  Value   The 32-bit value to write to Buffer.
 
   @return The 32-bit value to write to Buffer.
 
@@ -178,7 +178,7 @@ WriteUnaligned32 (
 
   If the Buffer is NULL, then ASSERT().
 
-  @param  Buffer  Pointer to a 64-bit value that may be unaligned.
+  @param  Buffer  A pointer to a 64-bit value that may be unaligned.
 
   @return The 64-bit value read from Buffer.
 
@@ -203,8 +203,8 @@ ReadUnaligned64 (
 
   If the Buffer is NULL, then ASSERT().
 
-  @param  Buffer  Pointer to a 64-bit value that may be unaligned.
-  @param  Value   64-bit value to write to Buffer.
+  @param  Buffer  A pointer to a 64-bit value that may be unaligned.
+  @param  Value   The 64-bit value to write to Buffer.
 
   @return The 64-bit value to write to Buffer.
 

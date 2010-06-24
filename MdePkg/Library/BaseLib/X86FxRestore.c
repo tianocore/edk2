@@ -1,11 +1,11 @@
 /** @file
   IA-32/x64 AsmFxRestore()
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -28,7 +28,7 @@
   If Buffer is not aligned on a 16-byte boundary, then ASSERT().
   If Buffer was not saved with AsmFxSave(), then ASSERT().
 
-  @param  Buffer  Pointer to a buffer to save the floating point/SSE/SSE2 context.
+  @param  Buffer  A pointer to a buffer to save the floating point/SSE/SSE2 context.
 
 **/
 VOID
