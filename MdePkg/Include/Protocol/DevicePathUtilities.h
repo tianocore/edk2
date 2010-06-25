@@ -2,7 +2,7 @@
   EFI_DEVICE_PATH_UTILITIES_PROTOCOL as defined in UEFI 2.0.  
   Use to create and manipulate device paths and device nodes.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -152,7 +152,7 @@ EFI_DEVICE_PATH_PROTOCOL*
 **/
 typedef
 EFI_DEVICE_PATH_PROTOCOL*
-(EFIAPI *EFI_DEVICE_PATH_CREATE_NODE)(
+(EFIAPI *EFI_DEVICE_PATH_UTILS_CREATE_NODE)(
   IN UINT8                          NodeType,
   IN UINT8                          NodeSubType,
   IN UINT16                         NodeLength
@@ -184,7 +184,7 @@ typedef struct {
   EFI_DEVICE_PATH_UTILS_APPEND_INSTANCE      AppendDevicePathInstance;
   EFI_DEVICE_PATH_UTILS_GET_NEXT_INSTANCE    GetNextDevicePathInstance;
   EFI_DEVICE_PATH_UTILS_IS_MULTI_INSTANCE    IsDevicePathMultiInstance;
-  EFI_DEVICE_PATH_CREATE_NODE                CreateDeviceNode;
+  EFI_DEVICE_PATH_UTILS_CREATE_NODE          CreateDeviceNode;
 } EFI_DEVICE_PATH_UTILITIES_PROTOCOL;
 
 extern EFI_GUID gEfiDevicePathUtilitiesProtocolGuid; 
