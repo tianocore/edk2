@@ -114,9 +114,18 @@ PciCf8Read8 (
   IN      UINTN                     Address
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT8    Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoRead8 (PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3));
+  Result = IoRead8 (PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3));
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -143,12 +152,21 @@ PciCf8Write8 (
   IN      UINT8                     Value
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT8    Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoWrite8 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
-           Value
-           );
+  Result = IoWrite8 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
+             Value
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -179,12 +197,21 @@ PciCf8Or8 (
   IN      UINT8                     OrData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT8    Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoOr8 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
-           OrData
-           );
+  Result = IoOr8 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
+             OrData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -215,12 +242,21 @@ PciCf8And8 (
   IN      UINT8                     AndData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT8    Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoAnd8 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
-           AndData
-           );
+  Result = IoAnd8 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
+             AndData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -254,13 +290,22 @@ PciCf8AndThenOr8 (
   IN      UINT8                     OrData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT8    Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoAndThenOr8 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
-           AndData,
-           OrData
-           );
+  Result = IoAndThenOr8 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
+             AndData,
+             OrData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -293,13 +338,22 @@ PciCf8BitFieldRead8 (
   IN      UINTN                     EndBit
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT8    Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldRead8 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
-           StartBit,
-           EndBit
-           );
+  Result = IoBitFieldRead8 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
+             StartBit,
+             EndBit
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -335,14 +389,23 @@ PciCf8BitFieldWrite8 (
   IN      UINT8                     Value
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT8    Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldWrite8 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
-           StartBit,
-           EndBit,
-           Value
-           );
+  Result = IoBitFieldWrite8 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
+             StartBit,
+             EndBit,
+             Value
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -381,14 +444,23 @@ PciCf8BitFieldOr8 (
   IN      UINT8                     OrData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT8    Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldOr8 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
-           StartBit,
-           EndBit,
-           OrData
-           );
+  Result = IoBitFieldOr8 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
+             StartBit,
+             EndBit,
+             OrData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -427,14 +499,23 @@ PciCf8BitFieldAnd8 (
   IN      UINT8                     AndData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT8    Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldAnd8 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
-           StartBit,
-           EndBit,
-           AndData
-           );
+  Result = IoBitFieldAnd8 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
+             StartBit,
+             EndBit,
+             AndData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -477,15 +558,24 @@ PciCf8BitFieldAndThenOr8(
   IN      UINT8                     OrData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT8    Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldAndThenOr8 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
-           StartBit,
-           EndBit,
-           AndData,
-           OrData
-           );
+  Result = IoBitFieldAndThenOr8 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
+             StartBit,
+             EndBit,
+             AndData,
+             OrData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -511,9 +601,18 @@ PciCf8Read16 (
   IN      UINTN                     Address
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT16   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoRead16 (PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2));
+  Result = IoRead16 (PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2));
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -541,12 +640,21 @@ PciCf8Write16 (
   IN      UINT16                    Value
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT16   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoWrite16 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
-           Value
-           );
+  Result = IoWrite16 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
+             Value
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -578,12 +686,21 @@ PciCf8Or16 (
   IN      UINT16                    OrData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT16   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoOr16 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
-           OrData
-           );
+  Result = IoOr16 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
+             OrData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -615,12 +732,21 @@ PciCf8And16 (
   IN      UINT16                    AndData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT16   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoAnd16 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
-           AndData
-           );
+  Result = IoAnd16 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
+             AndData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -655,13 +781,22 @@ PciCf8AndThenOr16 (
   IN      UINT16                    OrData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT16   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoAndThenOr16 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
-           AndData,
-           OrData
-           );
+  Result = IoAndThenOr16 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
+             AndData,
+             OrData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -695,13 +830,22 @@ PciCf8BitFieldRead16 (
   IN      UINTN                     EndBit
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT16   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldRead16 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
-           StartBit,
-           EndBit
-           );
+  Result = IoBitFieldRead16 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
+             StartBit,
+             EndBit
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -738,14 +882,23 @@ PciCf8BitFieldWrite16 (
   IN      UINT16                    Value
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT16   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldWrite16 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
-           StartBit,
-           EndBit,
-           Value
-           );
+  Result = IoBitFieldWrite16 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
+             StartBit,
+             EndBit,
+             Value
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -785,14 +938,23 @@ PciCf8BitFieldOr16 (
   IN      UINT16                    OrData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT16   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldOr16 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
-           StartBit,
-           EndBit,
-           OrData
-           );
+  Result = IoBitFieldOr16 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
+             StartBit,
+             EndBit,
+             OrData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -832,14 +994,23 @@ PciCf8BitFieldAnd16 (
   IN      UINT16                    AndData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT16   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldAnd16 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
-           StartBit,
-           EndBit,
-           AndData
-           );
+  Result = IoBitFieldAnd16 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
+             StartBit,
+             EndBit,
+             AndData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -883,15 +1054,24 @@ PciCf8BitFieldAndThenOr16(
   IN      UINT16                    OrData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT16   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldAndThenOr16 (
-           PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
-           StartBit,
-           EndBit,
-           AndData,
-           OrData
-           );
+  Result = IoBitFieldAndThenOr16 (
+             PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
+             StartBit,
+             EndBit,
+             AndData,
+             OrData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -917,9 +1097,18 @@ PciCf8Read32 (
   IN      UINTN                     Address
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT32   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoRead32 (PCI_CONFIGURATION_DATA_PORT);
+  Result = IoRead32 (PCI_CONFIGURATION_DATA_PORT);
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -947,12 +1136,21 @@ PciCf8Write32 (
   IN      UINT32                    Value
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT32   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoWrite32 (
-           PCI_CONFIGURATION_DATA_PORT,
-           Value
-           );
+  Result = IoWrite32 (
+             PCI_CONFIGURATION_DATA_PORT,
+             Value
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -984,12 +1182,21 @@ PciCf8Or32 (
   IN      UINT32                    OrData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT32   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoOr32 (
-           PCI_CONFIGURATION_DATA_PORT,
-           OrData
-           );
+  Result = IoOr32 (
+             PCI_CONFIGURATION_DATA_PORT,
+             OrData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -1021,12 +1228,21 @@ PciCf8And32 (
   IN      UINT32                    AndData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT32   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoAnd32 (
-           PCI_CONFIGURATION_DATA_PORT,
-           AndData
-           );
+  Result = IoAnd32 (
+             PCI_CONFIGURATION_DATA_PORT,
+             AndData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -1061,13 +1277,22 @@ PciCf8AndThenOr32 (
   IN      UINT32                    OrData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT32   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoAndThenOr32 (
-           PCI_CONFIGURATION_DATA_PORT,
-           AndData,
-           OrData
-           );
+  Result = IoAndThenOr32 (
+             PCI_CONFIGURATION_DATA_PORT,
+             AndData,
+             OrData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -1101,13 +1326,22 @@ PciCf8BitFieldRead32 (
   IN      UINTN                     EndBit
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT32   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldRead32 (
-           PCI_CONFIGURATION_DATA_PORT,
-           StartBit,
-           EndBit
-           );
+  Result = IoBitFieldRead32 (
+             PCI_CONFIGURATION_DATA_PORT,
+             StartBit,
+             EndBit
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -1144,14 +1378,23 @@ PciCf8BitFieldWrite32 (
   IN      UINT32                    Value
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT32   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldWrite32 (
-           PCI_CONFIGURATION_DATA_PORT,
-           StartBit,
-           EndBit,
-           Value
-           );
+  Result = IoBitFieldWrite32 (
+             PCI_CONFIGURATION_DATA_PORT,
+             StartBit,
+             EndBit,
+             Value
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -1191,14 +1434,23 @@ PciCf8BitFieldOr32 (
   IN      UINT32                    OrData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT32   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldOr32 (
-           PCI_CONFIGURATION_DATA_PORT,
-           StartBit,
-           EndBit,
-           OrData
-           );
+  Result = IoBitFieldOr32 (
+             PCI_CONFIGURATION_DATA_PORT,
+             StartBit,
+             EndBit,
+             OrData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -1238,14 +1490,23 @@ PciCf8BitFieldAnd32 (
   IN      UINT32                    AndData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT32   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldAnd32 (
-           PCI_CONFIGURATION_DATA_PORT,
-           StartBit,
-           EndBit,
-           AndData
-           );
+  Result = IoBitFieldAnd32 (
+             PCI_CONFIGURATION_DATA_PORT,
+             StartBit,
+             EndBit,
+             AndData
+             );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
@@ -1289,15 +1550,24 @@ PciCf8BitFieldAndThenOr32(
   IN      UINT32                    OrData
   )
 {
+  BOOLEAN  InterruptState;
+  UINT32   AddressPort;
+  UINT32   Result;
+  
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
+  InterruptState = SaveAndDisableInterrupts ();
+  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
-  return IoBitFieldAndThenOr32 (
-           PCI_CONFIGURATION_DATA_PORT,
-           StartBit,
-           EndBit,
-           AndData,
-           OrData
-           );
+  Result = IoBitFieldAndThenOr32 (
+               PCI_CONFIGURATION_DATA_PORT,
+               StartBit,
+               EndBit,
+               AndData,
+               OrData
+               );
+  IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
+  SetInterruptState (InterruptState);
+  return Result;
 }
 
 /**
