@@ -33,7 +33,7 @@
   PE32|Ia32/Shell_Full.efi|*
 
 [Binaries.X64]
-  PE32|X64/Shell_full.efi|*
+  PE32|X64/Shell_Full.efi|*
 
 [Binaries.IPF]
   PE32|Ipf/Shell_Full.efi|*
