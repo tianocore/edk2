@@ -334,3 +334,8 @@
   MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
   OvmfPkg/AcpiTables/AcpiTables.inf
 
+  #
+  # Remove the following statements after build tool issue with Binary INFs is resolved
+  #
+  FatBinPkg/EnhancedFatDxe/Fat.inf
+  EdkShellBinPkg/FullShell/FullShell.inf

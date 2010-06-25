@@ -14,14 +14,17 @@
 ##
 
 ################################################################################
-[FD.SEC]
-BaseAddress   = 0xFFFEE000
-Size          = 0x00012000
+[FD.OVMF]
+BaseAddress   = 0xFFF00000
+Size          = 0x00100000
 ErasePolarity = 1
 BlockSize     = 0x1000
-NumBlocks     = 0x12
+NumBlocks     = 0x100
 
-0x0|0x12000
+0x00000000|0x000EE000
+FV = FVMAIN_COMPACT
+
+0x000EE000|0x12000
 FV = SECFV
 
 ################################################################################
@@ -110,9 +113,7 @@ INF  OvmfPkg/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
 FILE FV_IMAGE = A4EF5A93-3F1B-4232-A1C4-F0910E6D1D9C {
-  SECTION COMPRESS PI_NONE {
-    SECTION FV_IMAGE = DXEFV
-  }
+  SECTION FV_IMAGE = DXEFV
 }
 
 ################################################################################
@@ -195,21 +196,19 @@ INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
 INF  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
 INF  RuleOverride=ACPITABLE OvmfPkg/AcpiTables/AcpiTables.inf
+INF  OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
 
-INF  RuleOverride=BINARY FatBinPkg/EnhancedFatDxe/Fat.inf
+INF  FatBinPkg/EnhancedFatDxe/Fat.inf
 
-INF  RuleOverride=BINARY EdkShellBinPkg/FullShell/FullShell.inf
+INF  EdkShellBinPkg/FullShell/FullShell.inf
 
 FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
-    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE { # LzmaCompress
-      SECTION RAW = MdeModulePkg/Logo/Logo.bmp
-    }
-  }
+  SECTION RAW = MdeModulePkg/Logo/Logo.bmp
+}
 
 ################################################################################
 
-[FV.OVMF]
-BlockSize          = 0x10000
+[FV.FVMAIN_COMPACT]
 FvAlignment        = 16
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
@@ -227,36 +226,13 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-#
-# This file contains the compressed MAINFV, which is compressed
-# in a single compression operation in order to achieve better
-# overall compression.
-#
-FILE FV_IMAGE = 20bc8ac9-94d1-4208-ab28-5d673fd73486 {
-   SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE { # LzmaCompress
-      SECTION FV_IMAGE = MAINFV
+FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
+   SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+     SECTION FV_IMAGE = MAINFV
    }
  }
 
-#
-# This file contains the uncompressed SECFV, which contains the initial
-# boot code.  The code in this FV decompresses the MAINFV.
-#
-# It uses the Volume Top File (VTF) GUID so it will be placed at the
-# end of the FV.
-#
-FILE FREEFORM = 1BA0062E-C779-4582-8566-336AE8F78F09 {
-  SECTION Align=16 FV_IMAGE = SECFV
-}
-
 ################################################################################
-
-[Rule.Common.PEI_CORE]
-  FILE PEI_CORE = $(NAMED_GUID) {
-    PE32     PE32   Align=32    $(INF_OUTPUT)/$(MODULE_NAME).efi
-    UI       STRING ="$(MODULE_NAME)" Optional
-    VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-  }
 
 [Rule.Common.SEC]
   FILE SEC = $(NAMED_GUID) {
@@ -265,12 +241,11 @@ FILE FREEFORM = 1BA0062E-C779-4582-8566-336AE8F78F09 {
     VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
-[Rule.Common.PEIM.NORELOC]
-  FILE PEIM = $(NAMED_GUID) RELOCS_STRIPPED  {
-     PEI_DEPEX PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).depex
-     TE        TE                        $(INF_OUTPUT)/$(MODULE_NAME).efi
-     UI        STRING="$(MODULE_NAME)" Optional
-     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+[Rule.Common.PEI_CORE]
+  FILE PEI_CORE = $(NAMED_GUID) {
+    PE32     PE32   Align=32    $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING ="$(MODULE_NAME)" Optional
+    VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
 [Rule.Common.PEIM]
@@ -281,27 +256,9 @@ FILE FREEFORM = 1BA0062E-C779-4582-8566-336AE8F78F09 {
      VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
-[Rule.Common.PEIM.TIANOCOMPRESSED]
-  FILE PEIM = $(NAMED_GUID) {
-    PEI_DEPEX PEI_DEPEX Optional         $(INF_OUTPUT)/$(MODULE_NAME).depex
-    GUIDED A31280AD-481E-41B6-95E8-127F4C984779 PROCESSING_REQUIRED = TRUE {
-      PE32      PE32                     $(INF_OUTPUT)/$(MODULE_NAME).efi
-      UI        STRING="$(MODULE_NAME)" Optional
-      VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-    }
-  }
-
 [Rule.Common.DXE_CORE]
   FILE DXE_CORE = $(NAMED_GUID) {
     PE32     PE32           $(INF_OUTPUT)/$(MODULE_NAME).efi
-    UI       STRING="$(MODULE_NAME)" Optional
-    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-  }
-
-[Rule.Common.UEFI_DRIVER]
-  FILE DRIVER = $(NAMED_GUID) {
-    DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
-    PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
     UI       STRING="$(MODULE_NAME)" Optional
     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
@@ -321,25 +278,17 @@ FILE FREEFORM = 1BA0062E-C779-4582-8566-336AE8F78F09 {
     UI       STRING="$(MODULE_NAME)" Optional
     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
-
-[Rule.Common.UEFI_APPLICATION]
-  FILE APPLICATION = $(NAMED_GUID) {
+[Rule.Common.UEFI_DRIVER]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
     PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
     UI       STRING="$(MODULE_NAME)" Optional
     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
-[Rule.Common.UEFI_DRIVER.BINARY]
-  FILE DRIVER = $(NAMED_GUID) {
-    DXE_DEPEX    DXE_DEPEX Optional      |.depex
-    PE32     PE32                        |.efi
-    UI       STRING="$(MODULE_NAME)" Optional
-    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-  }
-
-[Rule.Common.UEFI_APPLICATION.BINARY]
+[Rule.Common.UEFI_APPLICATION]
   FILE APPLICATION = $(NAMED_GUID) {
-    PE32     PE32                    |.efi
+    PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
     UI       STRING="$(MODULE_NAME)" Optional
     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
@@ -359,4 +308,3 @@ FILE FREEFORM = 1BA0062E-C779-4582-8566-336AE8F78F09 {
 INF  OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf {
     PCI_DEVICE_ID  = 0x00B8
   }
-

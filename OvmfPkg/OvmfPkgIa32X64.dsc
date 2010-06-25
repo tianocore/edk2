@@ -83,7 +83,7 @@
   UefiCpuLib|UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
-
+  
 [LibraryClasses.common.SEC]
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
@@ -336,3 +336,8 @@
   MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
   OvmfPkg/AcpiTables/AcpiTables.inf
 
+  #
+  # Remove the following statements after build tool issue with Binary INFs is resolved
+  #
+  FatBinPkg/EnhancedFatDxe/Fat.inf
+  EdkShellBinPkg/FullShell/FullShell.inf
