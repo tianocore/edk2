@@ -1,11 +1,11 @@
 /** @file
   Null Serial Port library instance with empty functions.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -47,8 +47,8 @@ SerialPortInitialize (
   If Buffer is NULL, then ASSERT(). 
   If NumberOfBytes is zero, then return 0.
 
-  @param  Buffer           Pointer to the data buffer to be written.
-  @param  NumberOfBytes    Number of bytes to written to the serial device.
+  @param  Buffer           The pointer to the data buffer to be written.
+  @param  NumberOfBytes    The number of bytes to written to the serial device.
 
   @retval 0                NumberOfBytes is 0.
   @retval >0               The number of bytes written to the serial device.  
@@ -75,11 +75,11 @@ SerialPortWrite (
   If Buffer is NULL, then ASSERT(). 
   If NumberOfBytes is zero, then return 0.
 
-  @param  Buffer           Pointer to the data buffer to store the data read from the serial device.
-  @param  NumberOfBytes    Number of bytes which will be read.
+  @param  Buffer           The pointer to the data buffer to store the data read from the serial device.
+  @param  NumberOfBytes    The number of bytes which will be read.
 
-  @retval 0                Read data failed, No data is to be read.
-  @retval >0               Aactual number of bytes read from serial device.
+  @retval 0                Read data failed; No data is to be read.
+  @retval >0               The actual number of bytes read from serial device.
 
 **/
 UINTN

@@ -512,7 +512,7 @@ EfiSetVariable (
   32-bit value is nonvolatile and is increased by 1 whenever the system resets or whenever the low
   32-bit count (returned by GetNextMonoticCount()) overflows.
 
-  @param  HighCount Pointer to returned value.
+  @param  HighCount The pointer to returned value.
 
   @retval  EFI_SUCCESS           The next high monotonic count was returned.
   @retval  EFI_DEVICE_ERROR      The device is not functioning properly.
@@ -703,7 +703,7 @@ EfiSetVirtualAddressMap (
                                 CapsuleHeaderArray must be the same capsules as the
                                 ScatterGatherList. The CapsuleHeaderArray must
                                 have the capsules in the same order as the ScatterGatherList.
-  @param  CapsuleCount          Number of pointers to EFI_CAPSULE_HEADER in
+  @param  CapsuleCount          The number of pointers to EFI_CAPSULE_HEADER in
                                 CaspuleHeaderArray.
   @param  ScatterGatherList     Physical pointer to a set of
                                 EFI_CAPSULE_BLOCK_DESCRIPTOR that describes the
@@ -758,7 +758,7 @@ EfiUpdateCapsule (
   @param  CapsuleHeaderArray    Virtual pointer to an array of virtual pointers to the capsules
                                 being passed into update capsule. The capsules are assumed to
                                 stored in contiguous virtual memory.
-  @param  CapsuleCount          Number of pointers to EFI_CAPSULE_HEADER in
+  @param  CapsuleCount          The number of pointers to EFI_CAPSULE_HEADER in
                                 CaspuleHeaderArray.
   @param  MaximumCapsuleSize     On output the maximum size that UpdateCapsule() can
                                 support as an argument to UpdateCapsule() via

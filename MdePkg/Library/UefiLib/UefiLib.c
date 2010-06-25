@@ -9,7 +9,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -55,8 +55,8 @@ CompareIso639LanguageCode (
   If TableGuid is NULL, then ASSERT().
   If Table is NULL, then ASSERT().
 
-  @param  TableGuid       Pointer to table's GUID type..
-  @param  Table           Pointer to the table associated with TableGuid in the EFI System Table.
+  @param  TableGuid       The pointer to table's GUID type..
+  @param  Table           The pointer to the table associated with TableGuid in the EFI System Table.
 
   @retval EFI_SUCCESS     A configuration table matching TableGuid was found.
   @retval EFI_NOT_FOUND   A configuration table matching TableGuid could not be found.
@@ -1199,8 +1199,8 @@ FreeUnicodeStringTable (
   If Name is NULL, then ASSERT().
   If Guid is NULL, then ASSERT().
 
-  @param[in]  Name  Pointer to a Null-terminated Unicode string.
-  @param[in]  Guid  Pointer to an EFI_GUID structure
+  @param[in]  Name  The pointer to a Null-terminated Unicode string.
+  @param[in]  Guid  The pointer to an EFI_GUID structure
 
   @retval NULL   The variable could not be retrieved.
   @retval NULL   There are not enough resources available for the variable contents.
@@ -1261,7 +1261,7 @@ GetVariable (
 
   If Name is NULL, then ASSERT().
 
-  @param[in]  Name  Pointer to a Null-terminated Unicode string.
+  @param[in]  Name  The pointer to a Null-terminated Unicode string.
 
   @retval NULL   The variable could not be retrieved.
   @retval NULL   There are not enough resources available for the variable contents.

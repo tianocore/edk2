@@ -26,7 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+  @param  SmBusAddress  The address that encodes the SMBUS Slave Address,
                         SMBUS Command, SMBUS Data Length, and PEC.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
@@ -65,7 +65,7 @@ SmBusQuickRead (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+  @param  SmBusAddress  The address that encodes the SMBUS Slave Address,
                         SMBUS Command, SMBUS Data Length, and PEC.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
@@ -104,7 +104,7 @@ SmBusQuickWrite (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+  @param  SmBusAddress  The address that encodes the SMBUS Slave Address,
                         SMBUS Command, SMBUS Data Length, and PEC.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
@@ -149,7 +149,7 @@ SmBusReceiveByte (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+  @param  SmBusAddress  The address that encodes the SMBUS Slave Address,
                         SMBUS Command, SMBUS Data Length, and PEC.
   @param  Value         The 8-bit value to send.
   @param  Status        Return status for the executed command.
@@ -196,7 +196,7 @@ SmBusSendByte (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+  @param  SmBusAddress    The address that encodes the SMBUS Slave Address,
                           SMBUS Command, SMBUS Data Length, and PEC.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
@@ -240,7 +240,7 @@ SmBusReadDataByte (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+  @param  SmBusAddress  The address that encodes the SMBUS Slave Address,
                         SMBUS Command, SMBUS Data Length, and PEC.
   @param  Value         The 8-bit value to write.
   @param  Status        Return status for the executed command.
@@ -286,7 +286,7 @@ SmBusWriteDataByte (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
   
-  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+  @param  SmBusAddress  The address that encodes the SMBUS Slave Address,
                         SMBUS Command, SMBUS Data Length, and PEC.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
@@ -330,7 +330,7 @@ SmBusReadDataWord (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+  @param  SmBusAddress  The address that encodes the SMBUS Slave Address,
                         SMBUS Command, SMBUS Data Length, and PEC.
   @param  Value         The 16-bit value to write.
   @param  Status        Return status for the executed command.
@@ -377,7 +377,7 @@ SmBusWriteDataWord (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+  @param  SmBusAddress  The address that encodes the SMBUS Slave Address,
                         SMBUS Command, SMBUS Data Length, and PEC.
   @param  Value         The 16-bit value to write.
   @param  Status        Return status for the executed command.
@@ -424,9 +424,9 @@ SmBusProcessCall (
   If Buffer is NULL, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+  @param  SmBusAddress  The address that encodes the SMBUS Slave Address,
                         SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Buffer        Pointer to the buffer to store the bytes read from the SMBUS.
+  @param  Buffer        The pointer to the buffer to store the bytes read from the SMBUS.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
                         RETURN_SUCCESS The SMBUS command was executed.
@@ -468,9 +468,9 @@ SmBusReadBlock (
   If Buffer is NULL, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+  @param  SmBusAddress  The address that encodes the SMBUS Slave Address,
                         MBUS Command, SMBUS Data Length, and PEC.
-  @param  Buffer        Pointer to the buffer to store the bytes read from the SMBUS.
+  @param  Buffer        The pointer to the buffer to store the bytes read from the SMBUS.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
                         RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
@@ -517,10 +517,10 @@ SmBusWriteBlock (
   If ReadBuffer is NULL, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+  @param  SmBusAddress  The address that encodes the SMBUS Slave Address,
                         SMBUS Command, SMBUS Data Length, and PEC.
-  @param  WriteBuffer   Pointer to the buffer of bytes to write to the SMBUS.
-  @param  ReadBuffer    Pointer to the buffer of bytes to read from the SMBUS.
+  @param  WriteBuffer   The pointer to the buffer of bytes to write to the SMBUS.
+  @param  ReadBuffer    The pointer to the buffer of bytes to read from the SMBUS.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
                         RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.

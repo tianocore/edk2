@@ -1,12 +1,12 @@
 /** @file
   Base Print Library instance implementation.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -52,7 +52,7 @@ VA_LIST gNullVaList;
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    A Null-terminated Unicode format string.
   @param  Marker          VA_LIST marker for the variable argument list.
   
   @return The number of Unicode characters in the produced output buffer not including the
@@ -100,7 +100,7 @@ UnicodeVSPrint (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    A Null-terminated Unicode format string.
   @param  Marker          BASE_LIST marker for the variable argument list.
   
   @return The number of Unicode characters in the produced output buffer not including the
@@ -147,7 +147,7 @@ UnicodeBSPrint (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    A Null-terminated Unicode format string.
   @param  ...             Variable argument list whose contents are accessed based on the 
                           format string specified by FormatString.
   
@@ -196,7 +196,7 @@ UnicodeSPrint (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated ASCII format string.
+  @param  FormatString    A Null-terminated ASCII format string.
   @param  Marker          VA_LIST marker for the variable argument list.
   
   @return The number of Unicode characters in the produced output buffer not including the
@@ -242,7 +242,7 @@ UnicodeVSPrintAsciiFormat (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated ASCII format string.
+  @param  FormatString    A Null-terminated ASCII format string.
   @param  Marker          BASE_LIST marker for the variable argument list.
   
   @return The number of Unicode characters in the produced output buffer not including the
@@ -288,7 +288,7 @@ UnicodeBSPrintAsciiFormat (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated ASCII format string.
+  @param  FormatString    A Null-terminated ASCII format string.
   @param  ...             Variable argument list whose contents are accessed based on the 
                           format string specified by FormatString.
   
@@ -342,7 +342,7 @@ UnicodeSPrintAsciiFormat (
   If both COMMA_TYPE and RADIX_HEX are set in Flags, then ASSERT().
   If Width >= MAXIMUM_VALUE_CHARACTERS, then ASSERT()
 
-  @param  Buffer  Pointer to the output buffer for the produced Null-terminated
+  @param  Buffer  The pointer to the output buffer for the produced Null-terminated
                   Unicode string.
   @param  Flags   The bitmask of flags that specify left justification, zero pad, and commas.
   @param  Value   The 64-bit signed value to convert to a string.
@@ -390,7 +390,7 @@ UnicodeValueToString (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated ASCII format string.
+  @param  FormatString    A Null-terminated ASCII format string.
   @param  Marker          VA_LIST marker for the variable argument list.
   
   @return The number of ASCII characters in the produced output buffer not including the
@@ -434,7 +434,7 @@ AsciiVSPrint (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated ASCII format string.
+  @param  FormatString    A Null-terminated ASCII format string.
   @param  Marker          BASE_LIST marker for the variable argument list.
   
   @return The number of ASCII characters in the produced output buffer not including the
@@ -478,7 +478,7 @@ AsciiBSPrint (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated ASCII format string.
+  @param  FormatString    A Null-terminated ASCII format string.
   @param  ...             Variable argument list whose contents are accessed based on the 
                           format string specified by FormatString.
    
@@ -527,7 +527,7 @@ AsciiSPrint (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    A Null-terminated Unicode format string.
   @param  Marker          VA_LIST marker for the variable argument list.
   
   @return The number of ASCII characters in the produced output buffer not including the
@@ -573,7 +573,7 @@ AsciiVSPrintUnicodeFormat (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    A Null-terminated Unicode format string.
   @param  Marker          BASE_LIST marker for the variable argument list.
   
   @return The number of ASCII characters in the produced output buffer not including the
@@ -619,7 +619,7 @@ AsciiBSPrintUnicodeFormat (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    A Null-terminated Unicode format string.
   @param  ...             Variable argument list whose contents are accessed based on the 
                           format string specified by FormatString.
   
@@ -673,7 +673,7 @@ AsciiSPrintUnicodeFormat (
   If both COMMA_TYPE and RADIX_HEX are set in Flags, then ASSERT().
   If Width >= MAXIMUM_VALUE_CHARACTERS, then ASSERT()
 
-  @param  Buffer  Pointer to the output buffer for the produced Null-terminated
+  @param  Buffer  The pointer to the output buffer for the produced Null-terminated
                   ASCII string.
   @param  Flags   The bitmask of flags that specify left justification, zero pad, and commas.
   @param  Value   The 64-bit signed value to convert to a string.

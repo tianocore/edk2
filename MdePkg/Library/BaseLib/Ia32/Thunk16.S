@@ -134,8 +134,8 @@ _16DsDesc:
 GdtEnd:
 
 #
-#   @param  RegSet  Pointer to a IA32_DWORD_REGS structure
-#   @param  Transition  Pointer to the transition code
+#   @param  RegSet  The pointer to a IA32_DWORD_REGS structure
+#   @param  Transition  The pointer to the transition code
 #   @return The address of the 16-bit stack after returning from user code
 #
 ASM_PFX(InternalAsmThunk16):

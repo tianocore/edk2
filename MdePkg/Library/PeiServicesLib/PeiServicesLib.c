@@ -5,7 +5,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -60,8 +60,8 @@ PeiServicesInstallPpi (
 /**
   This service enables PEIMs to replace an entry in the PPI database with an alternate entry.
 
-  @param  OldPpi                Pointer to the old PEI PPI Descriptors.
-  @param  NewPpi                Pointer to the new PEI PPI Descriptors.
+  @param  OldPpi                The pointer to the old PEI PPI Descriptors.
+  @param  NewPpi                The pointer to the new PEI PPI Descriptors.
 
   @retval EFI_SUCCESS           The interface was successfully installed.
   @retval EFI_INVALID_PARAMETER The OldPpi or NewPpi is NULL.
@@ -255,7 +255,7 @@ PeiServicesFfsFindNextVolume (
   This service enables PEIMs to discover additional firmware files.
 
   @param  SearchType            A filter to find files only of this type.
-  @param  VolumeHandle          Pointer to the firmware volume header of the volume to search.
+  @param  VolumeHandle          The pointer to the firmware volume header of the volume to search.
                                 This parameter must point to a valid FFS volume.
   @param  FileHandle            Handle of the current file from which to begin searching.
 
@@ -334,7 +334,7 @@ PeiServicesInstallPeiMemory (
   PEIM.
 
   @param  MemoryType            Type of memory to allocate.
-  @param  Pages                 Number of pages to allocate.
+  @param  Pages                 The number of pages to allocate.
   @param  Memory                Pointer of memory allocated.
 
   @retval EFI_SUCCESS           The memory range was successfully allocated.
@@ -466,7 +466,7 @@ PeiServicesFfsGetFileInfo (
   @param VolumeHandle   The firmware volume to search FileHandle
                         Upon exit, points to the found file's
                         handle or NULL if it could not be found.
-  @param FileHandle     Pointer to found file handle 
+  @param FileHandle     The pointer to found file handle 
 
   @retval EFI_SUCCESS             File was found.
 

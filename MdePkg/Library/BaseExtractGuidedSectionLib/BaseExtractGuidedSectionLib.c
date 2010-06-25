@@ -34,7 +34,7 @@ typedef struct {
   the registered guid and Handler list. When it is initialized, it will be directly returned. 
   Or, HandlerInfo table will be initialized in this function.
 
-  @param[in, out]  InfoPointer   Pointer to the handler info structure.
+  @param[in, out]  InfoPointer   The pointer to the handler info structure.
 
   @retval  RETURN_SUCCESS            HandlerInfo table can be used to store guid and function tables.
   @retval  RETURN_OUT_OF_RESOURCES   HandlerInfo table address is not writable.
@@ -147,10 +147,10 @@ ExtractGuidedSectionGetGuidList (
 
   @param[in]  SectionGuid    A pointer to the GUID associated with the the handlers
                              of the GUIDed section type being registered.
-  @param[in]  GetInfoHandler Pointer to a function that examines a GUIDed section and returns the
+  @param[in]  GetInfoHandler The pointer to a function that examines a GUIDed section and returns the
                              size of the decoded buffer and the size of an optional scratch buffer
                              required to actually decode the data in a GUIDed section.
-  @param[in]  DecodeHandler  Pointer to a function that decodes a GUIDed section into a caller
+  @param[in]  DecodeHandler  The pointer to a function that decodes a GUIDed section into a caller
                              allocated output buffer. 
 
   @retval  RETURN_SUCCESS           The handlers were registered.

@@ -6,7 +6,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -82,7 +82,7 @@ PostCode (
   immediately.
 
   @param  Value        The 32-bit value to write to the POST card.
-  @param  Description  Pointer to an ASCII string that is a description of the 
+  @param  Description  The pointer to an ASCII string that is a description of the 
                        POST code value.  This is an optional parameter that may 
                        be NULL.
 

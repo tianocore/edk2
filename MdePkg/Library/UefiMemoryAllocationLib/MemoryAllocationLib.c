@@ -6,7 +6,7 @@
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  http://opensource.org/licenses/bsd-license.php.                                            
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
@@ -134,7 +134,7 @@ AllocateReservedPages (
   then ASSERT().
   If Pages is zero, then ASSERT().
  
-  @param  Buffer                Pointer to the buffer of pages to free.
+  @param  Buffer                The pointer to the buffer of pages to free.
   @param  Pages                 The number of 4 KB pages to free.
 
 **/
@@ -331,7 +331,7 @@ AllocateAlignedReservedPages (
   Library, then ASSERT().
   If Pages is zero, then ASSERT().
   
-  @param  Buffer                Pointer to the buffer of pages to free.
+  @param  Buffer                The pointer to the buffer of pages to free.
   @param  Pages                 The number of 4 KB pages to free.
 
 **/
@@ -800,7 +800,7 @@ ReallocateReservedPool (
   If Buffer was not allocated with a pool allocation function in the Memory Allocation Library,
   then ASSERT().
 
-  @param  Buffer                Pointer to the buffer to free.
+  @param  Buffer                The pointer to the buffer to free.
 
 **/
 VOID

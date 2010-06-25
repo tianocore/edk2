@@ -1,11 +1,11 @@
 /** @file
   Declaration of internal functions in BaseSynchronizationLib.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -73,8 +73,8 @@ InternalSyncDecrement (
 
   @param  Value         A pointer to the 32-bit value for the compare exchange
                         operation.
-  @param  CompareValue  32-bit value used in compare operation.
-  @param  ExchangeValue 32-bit value used in exchange operation.
+  @param  CompareValue  A 32-bit value used in compare operation.
+  @param  ExchangeValue A 32-bit value used in exchange operation.
 
   @return The original *Value before exchange.
 
@@ -98,8 +98,8 @@ InternalSyncCompareExchange32 (
 
   @param  Value         A pointer to the 64-bit value for the compare exchange
                         operation.
-  @param  CompareValue  64-bit value used in compare operation.
-  @param  ExchangeValue 64-bit value used in exchange operation.
+  @param  CompareValue  A 64-bit value used in compare operation.
+  @param  ExchangeValue A 64-bit value used in exchange operation.
 
   @return The original *Value before exchange.
 

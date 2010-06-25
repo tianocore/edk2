@@ -25,7 +25,7 @@
 
   If Idtr is NULL, then ASSERT().
 
-  @param  Idtr  Pointer to a IDTR descriptor.
+  @param  Idtr  The pointer to a IDTR descriptor.
 
 **/
 VOID

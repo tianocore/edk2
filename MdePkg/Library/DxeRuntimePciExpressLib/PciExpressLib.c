@@ -9,7 +9,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -186,7 +186,7 @@ DxeRuntimePciExpressLibDestructor (
   This internal functions retrieves PCI Express Base Address via a PCD entry
   PcdPciExpressBaseAddress.
   
-  @param  Address  Address that encodes the PCI Bus, Device, Function and Register.
+  @param  Address  The address that encodes the PCI Bus, Device, Function and Register.
   @return          The base address of PCI Express.
 
 **/
@@ -262,7 +262,7 @@ GetPciExpressAddress (
   
   If Address > 0x0FFFFFFF, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
   
   @retval RETURN_SUCCESS           The PCI device was registered for runtime access.
@@ -359,7 +359,7 @@ PciExpressRegisterForRuntimeAccess (
 
   If Address > 0x0FFFFFFF, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
 
   @return The read value from the PCI configuration register.
@@ -383,7 +383,7 @@ PciExpressRead8 (
 
   If Address > 0x0FFFFFFF, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
   @param  Value   The value to write.
 
@@ -413,7 +413,7 @@ PciExpressWrite8 (
 
   If Address > 0x0FFFFFFF, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
   @param  OrData  The value to OR with the PCI configuration register.
 
@@ -443,7 +443,7 @@ PciExpressOr8 (
 
   If Address > 0x0FFFFFFF, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
   @param  AndData The value to AND with the PCI configuration register.
 
@@ -474,7 +474,7 @@ PciExpressAnd8 (
 
   If Address > 0x0FFFFFFF, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
   @param  AndData The value to AND with the PCI configuration register.
   @param  OrData  The value to OR with the result of the AND operation.
@@ -509,7 +509,7 @@ PciExpressAndThenOr8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to read.
+  @param  Address   The PCI configuration register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -546,12 +546,12 @@ PciExpressBitFieldRead8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to write.
+  @param  Address   The PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..7.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The value written back to the PCI configuration register.
 
@@ -589,7 +589,7 @@ PciExpressBitFieldWrite8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to write.
+  @param  Address   The PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -632,7 +632,7 @@ PciExpressBitFieldOr8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to write.
+  @param  Address   The PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -677,7 +677,7 @@ PciExpressBitFieldAnd8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to write.
+  @param  Address   The PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -717,7 +717,7 @@ PciExpressBitFieldAndThenOr8 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If Address is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
 
   @return The read value from the PCI configuration register.
@@ -742,7 +742,7 @@ PciExpressRead16 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If Address is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
   @param  Value   The value to write.
 
@@ -773,7 +773,7 @@ PciExpressWrite16 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If Address is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
   @param  OrData  The value to OR with the PCI configuration register.
 
@@ -804,7 +804,7 @@ PciExpressOr16 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If Address is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
   @param  AndData The value to AND with the PCI configuration register.
 
@@ -836,7 +836,7 @@ PciExpressAnd16 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If Address is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
   @param  AndData The value to AND with the PCI configuration register.
   @param  OrData  The value to OR with the result of the AND operation.
@@ -872,7 +872,7 @@ PciExpressAndThenOr16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to read.
+  @param  Address   The PCI configuration register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -910,12 +910,12 @@ PciExpressBitFieldRead16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to write.
+  @param  Address   The PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..15.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The value written back to the PCI configuration register.
 
@@ -954,7 +954,7 @@ PciExpressBitFieldWrite16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to write.
+  @param  Address   The PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -998,7 +998,7 @@ PciExpressBitFieldOr16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to write.
+  @param  Address   The PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1044,7 +1044,7 @@ PciExpressBitFieldAnd16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to write.
+  @param  Address   The PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1084,7 +1084,7 @@ PciExpressBitFieldAndThenOr16 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
 
   @return The read value from the PCI configuration register.
@@ -1109,7 +1109,7 @@ PciExpressRead32 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
   @param  Value   The value to write.
 
@@ -1140,7 +1140,7 @@ PciExpressWrite32 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
   @param  OrData  The value to OR with the PCI configuration register.
 
@@ -1171,7 +1171,7 @@ PciExpressOr32 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
   @param  AndData The value to AND with the PCI configuration register.
 
@@ -1203,7 +1203,7 @@ PciExpressAnd32 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Bus, Device, Function and
+  @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
   @param  AndData The value to AND with the PCI configuration register.
   @param  OrData  The value to OR with the result of the AND operation.
@@ -1239,7 +1239,7 @@ PciExpressAndThenOr32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to read.
+  @param  Address   The PCI configuration register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1277,12 +1277,12 @@ PciExpressBitFieldRead32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to write.
+  @param  Address   The PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..31.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The value written back to the PCI configuration register.
 
@@ -1321,7 +1321,7 @@ PciExpressBitFieldWrite32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to write.
+  @param  Address   The PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1365,7 +1365,7 @@ PciExpressBitFieldOr32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to write.
+  @param  Address   The PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1411,7 +1411,7 @@ PciExpressBitFieldAnd32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to write.
+  @param  Address   The PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1456,10 +1456,10 @@ PciExpressBitFieldAndThenOr32 (
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  Starting address that encodes the PCI Bus, Device,
+  @param  StartAddress  The starting address that encodes the PCI Bus, Device,
                         Function and Register.
-  @param  Size          Size in bytes of the transfer.
-  @param  Buffer        Pointer to a buffer receiving the data read.
+  @param  Size          The size in bytes of the transfer.
+  @param  Buffer        The pointer to a buffer receiving the data read.
 
   @return Size read data from StartAddress.
 
@@ -1559,10 +1559,10 @@ PciExpressReadBuffer (
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  Starting address that encodes the PCI Bus, Device,
+  @param  StartAddress  The starting address that encodes the PCI Bus, Device,
                         Function and Register.
-  @param  Size          Size in bytes of the transfer.
-  @param  Buffer        Pointer to a buffer containing the data to write.
+  @param  Size          The size in bytes of the transfer.
+  @param  Buffer        The pointer to a buffer containing the data to write.
 
   @return Size written to StartAddress.
 

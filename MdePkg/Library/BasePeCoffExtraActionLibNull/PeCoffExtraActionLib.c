@@ -5,7 +5,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -21,7 +21,7 @@
 
   If ImageContext is NULL, then ASSERT().
 
-  @param  ImageContext  Pointer to the image context structure that describes the
+  @param  ImageContext  The pointer to the image context structure that describes the
                         PE/COFF image that has already been loaded and relocated.
 
 **/
@@ -40,7 +40,7 @@ PeCoffLoaderRelocateImageExtraAction (
   
   If ImageContext is NULL, then ASSERT().
   
-  @param  ImageContext  Pointer to the image context structure that describes the
+  @param  ImageContext  The pointer to the image context structure that describes the
                         PE/COFF image that is being unloaded.
 
 **/

@@ -5,7 +5,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -34,7 +34,7 @@ typedef struct {
   Build guid hob for the global memory to store the registered guid and Handler list.
   If GuidHob exists, HandlerInfo will be directly got from Guid hob data.
 
-  @param[in, out]  InfoPointer   Pointer to pei handler info structure.
+  @param[in, out]  InfoPointer   The pointer to pei handler info structure.
 
   @retval  RETURN_SUCCESS            Build Guid hob for the global memory space to store guid and function tables.
   @retval  RETURN_OUT_OF_RESOURCES   No enough memory to allocated.
@@ -174,10 +174,10 @@ ExtractGuidedSectionGetGuidList (
 
   @param[in]  SectionGuid    A pointer to the GUID associated with the the handlers
                              of the GUIDed section type being registered.
-  @param[in]  GetInfoHandler Pointer to a function that examines a GUIDed section and returns the
+  @param[in]  GetInfoHandler The pointer to a function that examines a GUIDed section and returns the
                              size of the decoded buffer and the size of an optional scratch buffer
                              required to actually decode the data in a GUIDed section.
-  @param[in]  DecodeHandler  Pointer to a function that decodes a GUIDed section into a caller
+  @param[in]  DecodeHandler  The pointer to a function that decodes a GUIDed section into a caller
                              allocated output buffer. 
 
   @retval  RETURN_SUCCESS           The handlers were registered.

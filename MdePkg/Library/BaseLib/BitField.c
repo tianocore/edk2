@@ -154,7 +154,7 @@ BitFieldRead8 (
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..7.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The new 8-bit value.
 
@@ -341,7 +341,7 @@ BitFieldRead16 (
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..15.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The new 16-bit value.
 
@@ -528,7 +528,7 @@ BitFieldRead32 (
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..31.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The new 32-bit value.
 
@@ -715,7 +715,7 @@ BitFieldRead64 (
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..63.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The new 64-bit value.
 

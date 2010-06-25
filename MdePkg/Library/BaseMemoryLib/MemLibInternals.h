@@ -33,7 +33,7 @@
 
   @param  DestinationBuffer Target of copy
   @param  SourceBuffer      Place to copy from
-  @param  Length            Number of bytes to copy
+  @param  Length            The number of bytes to copy
 
   @return Destination
 

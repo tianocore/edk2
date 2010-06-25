@@ -25,7 +25,7 @@
 
   If Gdtr is NULL, then ASSERT().
 
-  @param  Gdtr  Pointer to a GDTR descriptor.
+  @param  Gdtr  The pointer to a GDTR descriptor.
 
 **/
 VOID

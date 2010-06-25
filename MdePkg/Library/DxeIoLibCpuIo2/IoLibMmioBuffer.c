@@ -25,9 +25,9 @@
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
 
-  @param  StartAddress    Starting address for the MMIO region to be copied from.
-  @param  Length          Size in bytes of the copy.
-  @param  Buffer          Pointer to a system memory buffer receiving the data read.
+  @param  StartAddress    The starting address for the MMIO region to be copied from.
+  @param  Length          The size in bytes of the copy.
+  @param  Buffer          The pointer to a system memory buffer receiving the data read.
 
   @return Buffer
 
@@ -70,9 +70,9 @@ MmioReadBuffer8 (
   
   If Buffer is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  StartAddress    Starting address for the MMIO region to be copied from.
-  @param  Length          Size in bytes of the copy.
-  @param  Buffer          Pointer to a system memory buffer receiving the data read.
+  @param  StartAddress    The starting address for the MMIO region to be copied from.
+  @param  Length          The size in bytes of the copy.
+  @param  Buffer          The pointer to a system memory buffer receiving the data read.
 
   @return Buffer
 
@@ -121,9 +121,9 @@ MmioReadBuffer16 (
   If Length is not aligned on a 32-bit boundary, then ASSERT().
   If Buffer is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  StartAddress    Starting address for the MMIO region to be copied from.
-  @param  Length          Size in bytes of the copy.
-  @param  Buffer          Pointer to a system memory buffer receiving the data read.
+  @param  StartAddress    The starting address for the MMIO region to be copied from.
+  @param  Length          The size in bytes of the copy.
+  @param  Buffer          The pointer to a system memory buffer receiving the data read.
 
   @return Buffer
 
@@ -173,9 +173,9 @@ MmioReadBuffer32 (
  
   If Buffer is not aligned on a 64-bit boundary, then ASSERT().
 
-  @param  StartAddress    Starting address for the MMIO region to be copied from.
-  @param  Length          Size in bytes of the copy.
-  @param  Buffer          Pointer to a system memory buffer receiving the data read.
+  @param  StartAddress    The starting address for the MMIO region to be copied from.
+  @param  Length          The size in bytes of the copy.
+  @param  Buffer          The pointer to a system memory buffer receiving the data read.
 
   @return Buffer
 
@@ -221,9 +221,9 @@ MmioReadBuffer64 (
   If Length is greater than (MAX_ADDRESS -Buffer + 1), then ASSERT().
 
 
-  @param  StartAddress    Starting address for the MMIO region to be copied to.
-  @param  Length     Size in bytes of the copy.
-  @param  Buffer          Pointer to a system memory buffer containing the data to write.
+  @param  StartAddress    The starting address for the MMIO region to be copied to.
+  @param  Length     The size in bytes of the copy.
+  @param  Buffer          The pointer to a system memory buffer containing the data to write.
 
   @return Buffer
 
@@ -267,9 +267,9 @@ MmioWriteBuffer8 (
 
   If Buffer is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  StartAddress    Starting address for the MMIO region to be copied to.
-  @param  Length     Size in bytes of the copy.
-  @param  Buffer          Pointer to a system memory buffer containing the data to write.
+  @param  StartAddress    The starting address for the MMIO region to be copied to.
+  @param  Length     The size in bytes of the copy.
+  @param  Buffer          The pointer to a system memory buffer containing the data to write.
 
   @return Buffer
 
@@ -321,9 +321,9 @@ MmioWriteBuffer16 (
 
   If Buffer is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  StartAddress    Starting address for the MMIO region to be copied to.
-  @param  Length     Size in bytes of the copy.
-  @param  Buffer          Pointer to a system memory buffer containing the data to write.
+  @param  StartAddress    The starting address for the MMIO region to be copied to.
+  @param  Length     The size in bytes of the copy.
+  @param  Buffer          The pointer to a system memory buffer containing the data to write.
 
   @return Buffer
 
@@ -374,9 +374,9 @@ MmioWriteBuffer32 (
 
   If Buffer is not aligned on a 64-bit boundary, then ASSERT().
 
-  @param  StartAddress    Starting address for the MMIO region to be copied to.
-  @param  Length     Size in bytes of the copy.
-  @param  Buffer          Pointer to a system memory buffer containing the data to write.
+  @param  StartAddress    The starting address for the MMIO region to be copied to.
+  @param  Length     The size in bytes of the copy.
+  @param  Buffer          The pointer to a system memory buffer containing the data to write.
 
   @return Buffer
 

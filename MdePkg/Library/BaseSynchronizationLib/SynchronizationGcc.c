@@ -1,12 +1,12 @@
 /** @file
   Implementation of synchronization functions.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -61,7 +61,7 @@ GetSpinLockProperties (
   @param  SpinLock  A pointer to the spin lock to initialize to the released
                     state.
 
-  @return SpinLock in release state.
+  @return SpinLock is in release state.
 
 **/
 SPIN_LOCK *
@@ -96,7 +96,7 @@ InitializeSpinLock (
 
   @param  SpinLock  A pointer to the spin lock to place in the acquired state.
 
-  @return SpinLock acquired lock.
+  @return SpinLock acquired the lock.
 
 **/
 SPIN_LOCK *
@@ -219,7 +219,7 @@ AcquireSpinLockOrFail (
 
   @param  SpinLock  A pointer to the spin lock to release.
 
-  @return SpinLock released lock.
+  @return SpinLock released the lock.
 
 **/
 SPIN_LOCK *
@@ -305,8 +305,8 @@ InterlockedDecrement (
 
   @param  Value         A pointer to the 32-bit value for the compare exchange
                         operation.
-  @param  CompareValue  32-bit value used in compare operation.
-  @param  ExchangeValue 32-bit value used in exchange operation.
+  @param  CompareValue  A 32-bit value used in compare operation.
+  @param  ExchangeValue A 32-bit value used in exchange operation.
 
   @return The original *Value before exchange.
 
@@ -335,8 +335,8 @@ InterlockedCompareExchange32 (
 
   @param  Value         A pointer to the 64-bit value for the compare exchange
                         operation.
-  @param  CompareValue  64-bit value used in compare operation.
-  @param  ExchangeValue 64-bit value used in exchange operation.
+  @param  CompareValue  A 64-bit value used in a compare operation.
+  @param  ExchangeValue A 64-bit value used in an exchange operation.
 
   @return The original *Value before exchange.
 
@@ -366,8 +366,8 @@ InterlockedCompareExchange64 (
 
   @param  Value         A pointer to the pointer value for the compare exchange
                         operation.
-  @param  CompareValue  Pointer value used in compare operation.
-  @param  ExchangeValue Pointer value used in exchange operation.
+  @param  CompareValue  A pointer value used in a compare operation.
+  @param  ExchangeValue A pointer value used in an exchange operation.
 
   @return The original *Value before exchange.
 **/

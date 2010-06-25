@@ -5,7 +5,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -40,8 +40,8 @@
 #endif
 
 typedef struct {
-  UINT8   *mSrcBase;  // Starting address of compressed data
-  UINT8   *mDstBase;  // Starting address of decompressed data
+  UINT8   *mSrcBase;  // The starting address of compressed data
+  UINT8   *mDstBase;  // The starting address of decompressed data
   UINT32  mOutBuf;
   UINT32  mInBuf;
 
@@ -110,7 +110,7 @@ GetBits (
   If TableBits > 16, then ASSERT ().
 
   @param  Sd        The global scratch data
-  @param  NumOfChar Number of symbols in the symbol set
+  @param  NumOfChar The number of symbols in the symbol set
   @param  BitLen    Code length array
   @param  TableBits The width of the mapping table
   @param  Table     The table to be created.
@@ -150,8 +150,8 @@ DecodeP (
   generate the Huffman code mapping for them.
 
   @param  Sd      The global scratch data.
-  @param  nn      Number of symbols.
-  @param  nbit    Number of bits needed to represent nn.
+  @param  nn      The number of symbols.
+  @param  nbit    The number of bits needed to represent nn.
   @param  Special The special symbol that needs to be taken care of.
 
   @retval  0 OK.

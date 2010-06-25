@@ -57,9 +57,9 @@ DebugPrint (
   If FileName is NULL, then a <FileName> string of "(NULL) Filename" is printed.
   If Description is NULL, then a <Description> string of "(NULL) Description" is printed.
 
-  @param  FileName     Pointer to the name of the source file that generated the assert condition.
+  @param  FileName     The pointer to the name of the source file that generated the assert condition.
   @param  LineNumber   The line number in the source file that generated the assert condition
-  @param  Description  Pointer to the description of the assert condition.
+  @param  Description  The pointer to the description of the assert condition.
 
 **/
 VOID
@@ -82,10 +82,10 @@ DebugAssert (
   If Buffer is NULL, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
-  @param   Buffer  Pointer to the target buffer to be filled with PcdDebugClearMemoryValue.
-  @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
+  @param   Buffer  The pointer to the target buffer to be filled with PcdDebugClearMemoryValue.
+  @param   Length  The number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
 
-  @return  Buffer  Pointer to the target buffer filled with PcdDebugClearMemoryValue.
+  @return  Buffer  The pointer to the target buffer filled with PcdDebugClearMemoryValue.
 
 **/
 VOID *

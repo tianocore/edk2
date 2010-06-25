@@ -1,11 +1,11 @@
 /** @file
   Base Performance Library which provides no service.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -28,11 +28,11 @@
   If TimeStamp is zero, then this function reads the current time stamp
   and adds that time stamp value to the record as the start time.
 
-  @param  Handle                  Pointer to environment specific context used
+  @param  Handle                  The pointer to environment specific context used
                                   to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
+  @param  Token                   The pointer to a Null-terminated ASCII string
                                   that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
+  @param  Module                  The pointer to a Null-terminated ASCII string
                                   that identifies the module being measured.
   @param  TimeStamp               64-bit time stamp.
 
@@ -64,15 +64,15 @@ StartPerformanceMeasurement (
   the current time stamp and adds that time stamp value to the record as the end time.
   If this function is called multiple times for the same record, then the end time is overwritten.
 
-  @param  Handle                  Pointer to environment specific context used
+  @param  Handle                  The pointer to environment specific context used
                                   to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
+  @param  Token                   The pointer to a Null-terminated ASCII string
                                   that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
+  @param  Module                  The pointer to a Null-terminated ASCII string
                                   that identifies the module being measured.
   @param  TimeStamp               64-bit time stamp.
 
-  @retval RETURN_SUCCESS          The end of  the measurement was recorded.
+  @retval RETURN_SUCCESS          The end of the measurement was recorded.
   @retval RETURN_NOT_FOUND        The specified measurement record could not be found.
   @retval RETURN_DEVICE_ERROR     A device error reading the time stamp.
 
@@ -112,15 +112,15 @@ EndPerformanceMeasurement (
   @param  LogEntryKey             On entry, the key of the performance measurement log entry to retrieve.
                                   0, then the first performance measurement log entry is retrieved.
                                   On exit, the key of the next performance lof entry entry.
-  @param  Handle                  Pointer to environment specific context used to identify the component
+  @param  Handle                  The pointer to environment specific context used to identify the component
                                   being measured.  
-  @param  Token                   Pointer to a Null-terminated ASCII string that identifies the component
+  @param  Token                   The pointer to a Null-terminated ASCII string that identifies the component
                                   being measured. 
-  @param  Module                  Pointer to a Null-terminated ASCII string that identifies the module
+  @param  Module                  The pointer to a Null-terminated ASCII string that identifies the module
                                   being measured.
-  @param  StartTimeStamp          Pointer to the 64-bit time stamp that was recorded when the measurement
+  @param  StartTimeStamp          The pointer to the 64-bit time stamp that was recorded when the measurement
                                   was started.
-  @param  EndTimeStamp            Pointer to the 64-bit time stamp that was recorded when the measurement
+  @param  EndTimeStamp            The pointer to the 64-bit time stamp that was recorded when the measurement
                                   was ended.
 
   @return The key for the next performance log entry (in general case).

@@ -40,7 +40,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param  SmbusOperation  Signifies which particular SMBus hardware protocol instance that it will use to
                           execute the SMBus transactions.
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+  @param  SmBusAddress    The address that encodes the SMBUS Slave Address,
                           SMBUS Command, SMBUS Data Length, and PEC.
   @param  Length          Signifies the number of bytes that this operation will do. The maximum number of
                           bytes can be revision specific and operation specific.

@@ -28,7 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   checked correctly since it is now mapped into CreateEventEx() in UEFI 2.0.
  
   @param  Event                 Event whose notification function is being invoked.
-  @param  Context               Pointer to the notification function's context,
+  @param  Context               The pointer to the notification function's context,
                                 which is implementation-dependent.
 
 **/
@@ -276,7 +276,7 @@ EfiSignalEventLegacyBoot (
   the differences from the caller.
   If FvDevicePathNode is NULL, then ASSERT().
 
-  @param  FvDevicePathNode  Pointer to FV device path to check.
+  @param  FvDevicePathNode  The pointer to FV device path to check.
 
   @retval NULL              FvDevicePathNode is not valid.
   @retval Other             FvDevicePathNode is valid and pointer to NameGuid was returned.
@@ -311,7 +311,7 @@ EfiGetNameGuidFromFwVolDevicePathNode (
   If FvDevicePathNode is NULL, then ASSERT().
   If NameGuid is NULL, then ASSERT().
   
-  @param  FvDevicePathNode  Pointer to a FV device path node to initialize
+  @param  FvDevicePathNode  The pointer to a FV device path node to initialize
   @param  NameGuid          FV file name to use in FvDevicePathNode
 
 **/

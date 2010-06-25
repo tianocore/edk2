@@ -12,11 +12,11 @@
     PeiMemoryLib
     UefiMemoryLib
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -35,9 +35,9 @@
   If Length is greater than (MAX_ADDRESS - DestinationBuffer + 1), then ASSERT().
   If Length is greater than (MAX_ADDRESS - SourceBuffer + 1), then ASSERT().
 
-  @param  DestinationBuffer   Pointer to the destination buffer of the memory copy.
-  @param  SourceBuffer        Pointer to the source buffer of the memory copy.
-  @param  Length              Number of bytes to copy from SourceBuffer to DestinationBuffer.
+  @param  DestinationBuffer   The pointer to the destination buffer of the memory copy.
+  @param  SourceBuffer        The pointer to the source buffer of the memory copy.
+  @param  Length              The number of bytes to copy from SourceBuffer to DestinationBuffer.
 
   @return DestinationBuffer.
 

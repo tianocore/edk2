@@ -5,7 +5,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -27,9 +27,9 @@
 
   This function wraps the (*PeiServices)->CopyMem ().
   
-  @param  DestinationBuffer   Pointer to the destination buffer of the memory copy.
-  @param  SourceBuffer        Pointer to the source buffer of the memory copy.
-  @param  Length              Number of bytes to copy from SourceBuffer to DestinationBuffer.
+  @param  DestinationBuffer   The pointer to the destination buffer of the memory copy.
+  @param  SourceBuffer        The pointer to the source buffer of the memory copy.
+  @param  Length              The number of bytes to copy from SourceBuffer to DestinationBuffer.
 
   @return DestinationBuffer.
 
@@ -48,7 +48,7 @@ InternalMemCopyMem (
   This function wraps the (*PeiServices)->SetMem ().
   
   @param  Buffer    Memory to set.
-  @param  Size      Number of bytes to set.
+  @param  Size      The number of bytes to set.
   @param  Value     Value of the set operation.
 
   @return Buffer.
@@ -65,9 +65,9 @@ InternalMemSetMem (
 /**
   Fills a target buffer with a 16-bit value, and returns the target buffer.
 
-  @param  Buffer  Pointer to the target buffer to fill.
-  @param  Length  Count of 16-bit value to fill.
-  @param  Value   Value with which to fill Length bytes of Buffer.
+  @param  Buffer  The pointer to the target buffer to fill.
+  @param  Length  The count of 16-bit value to fill.
+  @param  Value   The value with which to fill Length bytes of Buffer.
 
   @return Buffer
 
@@ -83,9 +83,9 @@ InternalMemSetMem16 (
 /**
   Fills a target buffer with a 32-bit value, and returns the target buffer.
 
-  @param  Buffer  Pointer to the target buffer to fill.
-  @param  Length  Count of 32-bit value to fill.
-  @param  Value   Value with which to fill Length bytes of Buffer.
+  @param  Buffer  The pointer to the target buffer to fill.
+  @param  Length  The count of 32-bit value to fill.
+  @param  Value   The value with which to fill Length bytes of Buffer.
 
   @return Buffer
 
@@ -101,9 +101,9 @@ InternalMemSetMem32 (
 /**
   Fills a target buffer with a 64-bit value, and returns the target buffer.
 
-  @param  Buffer  Pointer to the target buffer to fill.
-  @param  Length  Count of 64-bit value to fill.
-  @param  Value   Value with which to fill Length bytes of Buffer.
+  @param  Buffer  The pointer to the target buffer to fill.
+  @param  Length  The count of 64-bit value to fill.
+  @param  Value   The value with which to fill Length bytes of Buffer.
 
   @return Buffer
 
@@ -120,7 +120,7 @@ InternalMemSetMem64 (
   Set Buffer to 0 for Size bytes.
 
   @param  Buffer Memory to set.
-  @param  Length Number of bytes to set
+  @param  Length The number of bytes to set
 
   @return Buffer
 
@@ -157,11 +157,11 @@ InternalMemCompareMem (
   Scans a target buffer for an 8-bit value, and returns a pointer to the
   matching 8-bit value in the target buffer.
 
-  @param  Buffer  Pointer to the target buffer to scan.
-  @param  Length  Count of 8-bit value to scan. Must be non-zero.
-  @param  Value   Value to search for in the target buffer.
+  @param  Buffer  The pointer to the target buffer to scan.
+  @param  Length  The count of 8-bit value to scan. Must be non-zero.
+  @param  Value   The value to search for in the target buffer.
 
-  @return Pointer to the first occurrence or NULL if not found.
+  @return The pointer to the first occurrence or NULL if not found.
 
 **/
 CONST VOID *
@@ -176,11 +176,11 @@ InternalMemScanMem8 (
   Scans a target buffer for a 16-bit value, and returns a pointer to the
   matching 16-bit value in the target buffer.
 
-  @param  Buffer  Pointer to the target buffer to scan.
-  @param  Length  Count of 16-bit value to scan. Must be non-zero.
-  @param  Value   Value to search for in the target buffer.
+  @param  Buffer  The pointer to the target buffer to scan.
+  @param  Length  The count of 16-bit value to scan. Must be non-zero.
+  @param  Value   The value to search for in the target buffer.
 
-  @return Pointer to the first occurrence or NULL if not found.
+  @return The pointer to the first occurrence or NULL if not found.
 
 **/
 CONST VOID *
@@ -195,11 +195,11 @@ InternalMemScanMem16 (
   Scans a target buffer for a 32-bit value, and returns a pointer to the
   matching 32-bit value in the target buffer.
 
-  @param  Buffer  Pointer to the target buffer to scan.
-  @param  Length  Count of 32-bit value to scan. Must be non-zero.
-  @param  Value   Value to search for in the target buffer.
+  @param  Buffer  The pointer to the target buffer to scan.
+  @param  Length  The count of 32-bit value to scan. Must be non-zero.
+  @param  Value   The value to search for in the target buffer.
 
-  @return Pointer to the first occurrence or NULL if not found.
+  @return The pointer to the first occurrence or NULL if not found.
 
 **/
 CONST VOID *
@@ -214,11 +214,11 @@ InternalMemScanMem32 (
   Scans a target buffer for a 64-bit value, and returns a pointer to the
   matching 64-bit value in the target buffer.
 
-  @param  Buffer  Pointer to the target buffer to scan.
-  @param  Length  Count of 64-bit value to scan. Must be non-zero.
-  @param  Value   Value to search for in the target buffer.
+  @param  Buffer  The pointer to the target buffer to scan.
+  @param  Length  The count of 64-bit value to scan. Must be non-zero.
+  @param  Value   The value to search for in the target buffer.
 
-  @return Pointer to the first occurrence or NULL if not found.
+  @return The pointer to the first occurrence or NULL if not found.
 
 **/
 CONST VOID *

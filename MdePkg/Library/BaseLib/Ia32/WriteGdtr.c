@@ -22,7 +22,7 @@
   Writes and the current GDTR descriptor specified by Gdtr. This function is
   only available on IA-32 and x64.
 
-  @param  Gdtr  Pointer to a GDTR descriptor.
+  @param  Gdtr  The pointer to a GDTR descriptor.
 
 **/
 VOID

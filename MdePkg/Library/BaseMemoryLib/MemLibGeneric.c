@@ -95,7 +95,7 @@ InternalMemSetMem64 (
   Set Buffer to 0 for Size bytes.
 
   @param  Buffer Memory to set.
-  @param  Length Number of bytes to set.
+  @param  Length The number of bytes to set.
 
   @return Buffer
 

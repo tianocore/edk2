@@ -6,7 +6,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -107,7 +107,7 @@ InternalPrint (
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
-  @return Number of Unicode characters printed to ConOut.
+  @return The number of Unicode characters printed to ConOut.
 
 **/
 UINTN
@@ -146,7 +146,7 @@ Print (
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
-  @return Number of Unicode characters printed to StdErr.
+  @return The number of Unicode characters printed to StdErr.
 
 **/
 UINTN
@@ -241,7 +241,7 @@ AsciiInternalPrint (
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
-  @return Number of ASCII characters printed to ConOut.
+  @return The number of ASCII characters printed to ConOut.
 
 **/
 UINTN
@@ -280,7 +280,7 @@ AsciiPrint (
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
-  @return Number of ASCII characters printed to ConErr.
+  @return The number of ASCII characters printed to ConErr.
 
 **/
 UINTN
@@ -333,7 +333,7 @@ AsciiErrorPrint (
   @param  Buffer       Null-terminated Unicode formatted string.
   @param  PrintNum     The number of Unicode formatted string to be printed.
 
-  @return  Number of Unicode Characters printed. Zero means no any character
+  @return  The number of Unicode Characters printed. Zero means no any character
            displayed successfully.
 
 **/

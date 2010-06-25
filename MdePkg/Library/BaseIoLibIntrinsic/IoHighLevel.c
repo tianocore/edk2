@@ -158,7 +158,7 @@ IoBitFieldRead8 (
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..7.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The value written back to the I/O port.
 
@@ -443,7 +443,7 @@ IoBitFieldRead16 (
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..15.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The value written back to the I/O port.
 
@@ -731,7 +731,7 @@ IoBitFieldRead32 (
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..31.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The value written back to the I/O port.
 
@@ -1019,7 +1019,7 @@ IoBitFieldRead64 (
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..63.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The value written back to the I/O port.
 
@@ -1302,7 +1302,7 @@ MmioBitFieldRead8 (
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..7.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The value written back to the MMIO register.
 
@@ -1588,7 +1588,7 @@ MmioBitFieldRead16 (
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..15.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The value written back to the MMIO register.
 
@@ -1877,7 +1877,7 @@ MmioBitFieldRead32 (
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..31.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The value written back to the MMIO register.
 
@@ -2166,7 +2166,7 @@ MmioBitFieldRead64 (
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..63.
-  @param  Value     New value of the bit field.
+  @param  Value     The new value of the bit field.
 
   @return The value written back to the MMIO register.
 

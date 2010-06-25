@@ -19,7 +19,7 @@
 ;/**
 ;  This allows the caller to switch the stack and goes to the new entry point
 ;
-; @param      EntryPoint   Pointer to the location to enter
+; @param      EntryPoint   The pointer to the location to enter
 ; @param      Context      Parameter to pass in
 ; @param      Context2     Parameter2 to pass in
 ; @param      NewStack     New Location of the stack

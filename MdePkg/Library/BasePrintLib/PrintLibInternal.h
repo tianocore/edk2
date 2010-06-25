@@ -5,7 +5,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -59,16 +59,16 @@ typedef struct {
   VA_LIST is used this routine allows the nesting of Vararg routines. Thus 
   this is the main print working routine.
 
-  @param  Buffer          Character buffer to print the results of the parsing
+  @param  Buffer          The character buffer to print the results of the parsing
                           of Format into.
-  @param  BufferSize      Maximum number of characters to put into buffer.
+  @param  BufferSize      The maximum number of characters to put into buffer.
   @param  Flags           Initial flags value.
                           Can only have FORMAT_UNICODE and OUTPUT_UNICODE set.
-  @param  Format          Null-terminated format string.
+  @param  Format          A Null-terminated format string.
   @param  VaListMarker    VA_LIST style variable argument list consumed by processing Format.
   @param  BaseListMarker  BASE_LIST style variable argument list consumed by processing Format.
 
-  @return Number of characters printed not including the Null-terminator.
+  @return The number of characters printed not including the Null-terminator.
 
 **/
 UINTN
@@ -89,16 +89,16 @@ BasePrintLibSPrintMarker (
   VA_LIST is used this routine allows the nesting of Vararg routines. Thus 
   this is the main print working routine
 
-  @param  StartOfBuffer Character buffer to print the results of the parsing
+  @param  StartOfBuffer The character buffer to print the results of the parsing
                         of Format into.
-  @param  BufferSize    Maximum number of characters to put into buffer.
+  @param  BufferSize    The maximum number of characters to put into buffer.
                         Zero means no limit.
   @param  Flags         Initial flags value.
                         Can only have FORMAT_UNICODE and OUTPUT_UNICODE set
   @param  FormatString  Null-terminated format string.
   @param  ...           The variable argument list.
 
-  @return Number of characters printed.
+  @return The number of characters printed.
 
 **/
 UINTN
@@ -119,10 +119,10 @@ BasePrintLibSPrint (
   @param  Buffer      Buffer to place the Unicode or ASCII string.
   @param  EndBuffer   The end of the input Buffer. No characters will be
                       placed after that. 
-  @param  Length      Count of character to be placed into Buffer.
+  @param  Length      The count of character to be placed into Buffer.
                       (Negative value indicates no buffer fill.)
-  @param  Character   Character to be placed into Buffer.
-  @param  Increment   Character increment in Buffer.
+  @param  Character   The character to be placed into Buffer.
+  @param  Increment   The character increment in Buffer.
 
   @return Buffer      Buffer filled with the input Character.
 
@@ -142,7 +142,7 @@ BasePrintLibFillBuffer (
   Print worker function that converts a decimal or hexadecimal number to an ASCII string in Buffer.
 
   @param  Buffer    Location to place the ASCII string of Value.
-  @param  Value     Value to convert to a Decimal or Hexadecimal string in Buffer.
+  @param  Value     The value to convert to a Decimal or Hexadecimal string in Buffer.
   @param  Radix     Radix of the value
 
   @return A pointer to the end of buffer filled with ASCII string.
@@ -181,7 +181,7 @@ BasePrintLibValueToString (
   If unsupported bits are set in Flags, then ASSERT().
   If Width >= MAXIMUM_VALUE_CHARACTERS, then ASSERT()
 
-  @param  Buffer    Pointer to the output buffer for the produced Null-terminated
+  @param  Buffer    The pointer to the output buffer for the produced Null-terminated
                     string.
   @param  Flags     The bitmask of flags that specify left justification, zero pad,
                     and commas.

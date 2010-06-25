@@ -1036,7 +1036,7 @@ AsmReadTr (
   Reads and returns the current GDTR descriptor and returns it in Gdtr. This
   function is only available on IA-32 and X64.
 
-  @param  Gdtr  Pointer to a GDTR descriptor.
+  @param  Gdtr  The pointer to a GDTR descriptor.
 
 **/
 VOID
@@ -1058,7 +1058,7 @@ InternalX86ReadGdtr (
   Writes and the current GDTR descriptor specified by Gdtr. This function is
   only available on IA-32 and X64.
 
-  @param  Gdtr  Pointer to a GDTR descriptor.
+  @param  Gdtr  The pointer to a GDTR descriptor.
 
 **/
 VOID
@@ -1082,7 +1082,7 @@ InternalX86WriteGdtr (
   Reads and returns the current IDTR descriptor and returns it in Idtr. This
   function is only available on IA-32 and X64.
 
-  @param  Idtr  Pointer to a IDTR descriptor.
+  @param  Idtr  The pointer to a IDTR descriptor.
 
 **/
 VOID
@@ -1104,7 +1104,7 @@ InternalX86ReadIdtr (
   Writes the current IDTR descriptor and returns it in Idtr. This function is
   only available on IA-32 and X64.
 
-  @param  Idtr  Pointer to a IDTR descriptor.
+  @param  Idtr  The pointer to a IDTR descriptor.
 
 **/
 VOID
@@ -1177,7 +1177,7 @@ AsmWriteLdtr (
   Buffer. Buffer must be aligned on a 16-byte boundary. This function is only
   available on IA-32 and X64.
 
-  @param  Buffer  Pointer to a buffer to save the floating point/SSE/SSE2 context.
+  @param  Buffer  The pointer to a buffer to save the floating point/SSE/SSE2 context.
 
 **/
 VOID
@@ -1201,7 +1201,7 @@ InternalX86FxSave (
   by Buffer. Buffer must be aligned on a 16-byte boundary. This function is
   only available on IA-32 and X64.
 
-  @param  Buffer  Pointer to a buffer to save the floating point/SSE/SSE2 context.
+  @param  Buffer  The pointer to a buffer to save the floating point/SSE/SSE2 context.
 
 **/
 VOID

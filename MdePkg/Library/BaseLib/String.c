@@ -103,7 +103,7 @@ StrCpy (
 
   @param  Destination A pointer to a Null-terminated Unicode string.
   @param  Source      A pointer to a Null-terminated Unicode string.
-  @param  Length      Maximum number of Unicode characters to copy.
+  @param  Length      The maximum number of Unicode characters to copy.
 
   @return Destination.
 
@@ -290,7 +290,7 @@ StrCmp (
 
   @param  FirstString   A pointer to a Null-terminated Unicode string.
   @param  SecondString  A pointer to a Null-terminated Unicode string.
-  @param  Length        Maximum number of Unicode characters to compare.
+  @param  Length        The maximum number of Unicode characters to compare.
 
   @retval 0      FirstString is identical to SecondString.
   @return others FirstString is not identical to SecondString.
@@ -411,7 +411,7 @@ StrCat (
 
   @param  Destination A pointer to a Null-terminated Unicode string.
   @param  Source      A pointer to a Null-terminated Unicode string.
-  @param  Length      Maximum number of Unicode characters to concatenate from
+  @param  Length      The maximum number of Unicode characters to concatenate from
                       Source.
 
   @return Destination.
@@ -1157,7 +1157,7 @@ AsciiStrCpy (
 
   @param  Destination A pointer to a Null-terminated ASCII string.
   @param  Source      A pointer to a Null-terminated ASCII string.
-  @param  Length      Maximum number of ASCII characters to copy.
+  @param  Length      The maximum number of ASCII characters to copy.
 
   @return Destination
 
@@ -1444,7 +1444,7 @@ AsciiStriCmp (
 
   @param  FirstString   A pointer to a Null-terminated ASCII string.
   @param  SecondString  A pointer to a Null-terminated ASCII string.
-  @param  Length        Maximum number of ASCII characters for compare.
+  @param  Length        The maximum number of ASCII characters for compare.
   
   @retval ==0       FirstString is identical to SecondString.
   @retval !=0       FirstString is not identical to SecondString.
@@ -1556,7 +1556,7 @@ AsciiStrCat (
 
   @param  Destination A pointer to a Null-terminated ASCII string.
   @param  Source      A pointer to a Null-terminated ASCII string.
-  @param  Length      Maximum number of ASCII characters to concatenate from
+  @param  Length      The maximum number of ASCII characters to concatenate from
                       Source.
 
   @return Destination

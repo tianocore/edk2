@@ -23,7 +23,7 @@
   Buffer. Buffer must be aligned on a 16-byte boundary. This function is only
   available on IA-32 and x64.
 
-  @param  Buffer  Pointer to a buffer to save the floating point/SSE/SSE2 context.
+  @param  Buffer  The pointer to a buffer to save the floating point/SSE/SSE2 context.
 
 **/
 VOID

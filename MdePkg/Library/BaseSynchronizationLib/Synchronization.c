@@ -1,11 +1,11 @@
 /** @file
   Implementation of synchronization functions.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -55,7 +55,7 @@ GetSpinLockProperties (
   @param  SpinLock  A pointer to the spin lock to initialize to the released
                     state.
 
-  @return SpinLock in release state.
+  @return SpinLock is in release state.
 
 **/
 SPIN_LOCK *
@@ -86,7 +86,7 @@ InitializeSpinLock (
 
   @param  SpinLock  A pointer to the spin lock to place in the acquired state.
 
-  @return SpinLock acquired lock.
+  @return SpinLock acquired the lock.
 
 **/
 SPIN_LOCK *

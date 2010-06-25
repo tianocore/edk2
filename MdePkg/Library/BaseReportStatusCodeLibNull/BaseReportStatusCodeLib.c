@@ -1,11 +1,11 @@
 /** @file
   Null Base Report Status Code Library instance with empty functions.
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -72,10 +72,10 @@ CodeTypeToPostCode (
 
   @param  CodeType     The type of status code being converted.
   @param  Value        The status code value being converted.
-  @param  Data         Pointer to status code data buffer.
-  @param  Filename     Pointer to the source file name that generated the ASSERT().
-  @param  Description  Pointer to the description of the ASSERT().
-  @param  LineNumber   Pointer to source line number that generated the ASSERT().
+  @param  Data         The pointer to the status code data buffer.
+  @param  Filename     The pointer to the source file name that generated the ASSERT().
+  @param  Description  The pointer to the description of the ASSERT().
+  @param  LineNumber   The pointer to the source line number that generated the ASSERT().
 
   @retval  TRUE   The status code specified by CodeType, Value, and Data was
                   converted ASSERT() arguments specified by Filename, Description,
@@ -116,10 +116,10 @@ ReportStatusCodeExtractAssertInfo (
   If Marker is NULL, then ASSERT().
   If Format is NULL, then ASSERT().
 
-  @param  Data        Pointer to status code data buffer.
-  @param  ErrorLevel  Pointer to error level mask for a debug message.
-  @param  Marker      Pointer to the variable argument list associated with Format.
-  @param  Format      Pointer to a Null-terminated ASCII format string of a
+  @param  Data        The pointer to the status code data buffer.
+  @param  ErrorLevel  The pointer to the error level mask for a debug message.
+  @param  Marker      The pointer to the variable argument list associated with Format.
+  @param  Format      The pointer to a Null-terminated ASCII format string of a
                       debug message.
 
   @retval  TRUE   The status code specified by Data was converted DEBUG() arguments
@@ -158,13 +158,13 @@ ReportStatusCodeExtractDebugInfo (
   is called while processing another any other Report Status Code Library function,
   then ReportStatusCode() must return immediately.
 
-  @param  Type   Status code type.
-  @param  Value  Status code value.
+  @param  Type   The status code type.
+  @param  Value  The status code value.
 
   @retval  EFI_SUCCESS       The status code was reported.
   @retval  EFI_DEVICE_ERROR  There status code could not be reported due to a
                              device error.
-  @retval  EFI_UNSUPPORTED   Report status code is not supported
+  @retval  EFI_UNSUPPORTED   The report status code is not supported.
 
 **/
 EFI_STATUS
@@ -197,13 +197,13 @@ ReportStatusCode (
 
   @param  Type        Status code type.
   @param  Value       Status code value.
-  @param  DevicePath  Pointer to the Device Path Protocol to be reported.
+  @param  DevicePath  The pointer to the Device Path Protocol to be reported.
 
   @retval  EFI_SUCCESS           The status code was reported with the extended
                                  data specified by DevicePath.
   @retval  EFI_OUT_OF_RESOURCES  There were not enough resources to allocate the
                                  extended data section.
-  @retval  EFI_UNSUPPORTED       Report status code is not supported
+  @retval  EFI_UNSUPPORTED       The report status code is not supported
 
 **/
 EFI_STATUS
@@ -242,7 +242,7 @@ ReportStatusCodeWithDevicePath (
 
   @param  Type              Status code type.
   @param  Value             Status code value.
-  @param  ExtendedData      Pointer to the extended data buffer to be reported.
+  @param  ExtendedData      The pointer to the extended data buffer to be reported.
   @param  ExtendedDataSize  The size, in bytes, of the extended data buffer to
                             be reported.
 
@@ -250,7 +250,7 @@ ReportStatusCodeWithDevicePath (
                                  data specified by ExtendedData and ExtendedDataSize.
   @retval  EFI_OUT_OF_RESOURCES  There were not enough resources to allocate the
                                  extended data section.
-  @retval  EFI_UNSUPPORTED       Report status code is not supported
+  @retval  EFI_UNSUPPORTED       The report status code is not supported.
 
 **/
 EFI_STATUS
@@ -289,24 +289,24 @@ ReportStatusCodeWithExtendedData (
   If ExtendedData is NULL and ExtendedDataSize is not zero, then ASSERT().
   If ExtendedData is not NULL and ExtendedDataSize is zero, then ASSERT().
 
-  @param  Type              Status code type.
-  @param  Value             Status code value.
+  @param  Type              The status code type.
+  @param  Value             The status code value.
   @param  Instance          Status code instance number.
-  @param  CallerId          Pointer to a GUID that identifies the caller of this
+  @param  CallerId          The pointer to a GUID that identifies the caller of this
                             function.  If this parameter is NULL, then a caller
                             ID of gEfiCallerIdGuid is used.
-  @param  ExtendedDataGuid  Pointer to the GUID for the extended data buffer.
+  @param  ExtendedDataGuid  The pointer to the GUID for the extended data buffer.
                             If this parameter is NULL, then a the status code
                             standard header is filled in with
                             gEfiStatusCodeSpecificDataGuid.
-  @param  ExtendedData      Pointer to the extended data buffer.  This is an
+  @param  ExtendedData      The pointer to the extended data buffer.  This is an
                             optional parameter that may be NULL.
   @param  ExtendedDataSize  The size, in bytes, of the extended data buffer.
 
   @retval  EFI_SUCCESS           The status code was reported.
   @retval  EFI_OUT_OF_RESOURCES  There were not enough resources to allocate
                                  the extended data section if it was specified.
-  @retval  EFI_UNSUPPORTED       Report status code is not supported
+  @retval  EFI_UNSUPPORTED       The report status code is not supported.
 
 **/
 EFI_STATUS

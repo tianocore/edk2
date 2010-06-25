@@ -6,7 +6,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -20,9 +20,9 @@
   Performs an ARM-based specific relocation fixup and is a no-op on other
   instruction sets.
 
-  @param  Reloc       Pointer to the relocation record.
-  @param  Fixup       Pointer to the address to fix up.
-  @param  FixupData   Pointer to a buffer to log the fixups.
+  @param  Reloc       The pointer to the relocation record.
+  @param  Fixup       The pointer to the address to fix up.
+  @param  FixupData   The pointer to a buffer to log the fixups.
   @param  Adjust      The offset to adjust the fixup.
 
   @return Status code.
@@ -69,9 +69,9 @@ PeCoffLoaderImageFormatSupported (
   instruction sets. This is used to re-relocated the image into the EFI virtual
   space for runtime calls.
 
-  @param  Reloc       Pointer to the relocation record.
-  @param  Fixup       Pointer to the address to fix up.
-  @param  FixupData   Pointer to a buffer to log the fixups.
+  @param  Reloc       The pointer to the relocation record.
+  @param  Fixup       The pointer to the address to fix up.
+  @param  FixupData   The pointer to a buffer to log the fixups.
   @param  Adjust      The offset to adjust the fixup.
 
   @return Status code.

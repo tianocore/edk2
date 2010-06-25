@@ -37,9 +37,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   If Length is greater than (MAX_ADDRESS - DestinationBuffer + 1), then ASSERT().
   If Length is greater than (MAX_ADDRESS - SourceBuffer + 1), then ASSERT().
 
-  @param  DestinationBuffer Pointer to the destination buffer to compare.
-  @param  SourceBuffer      Pointer to the source buffer to compare.
-  @param  Length            Number of bytes to compare.
+  @param  DestinationBuffer The pointer to the destination buffer to compare.
+  @param  SourceBuffer      The pointer to the source buffer to compare.
+  @param  Length            The number of bytes to compare.
 
   @return 0                 All Length bytes of the two buffers are identical.
   @retval Non-zero          The first mismatched byte in SourceBuffer subtracted from the first

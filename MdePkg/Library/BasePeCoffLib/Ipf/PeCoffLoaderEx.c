@@ -5,7 +5,7 @@
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -66,9 +66,9 @@
 /**
   Performs an Itanium-based specific relocation fixup.
 
-  @param  Reloc       Pointer to the relocation record.
-  @param  Fixup       Pointer to the address to fix up.
-  @param  FixupData   Pointer to a buffer to log the fixups.
+  @param  Reloc       The pointer to the relocation record.
+  @param  Fixup       The pointer to the address to fix up.
+  @param  FixupData   The pointer to a buffer to log the fixups.
   @param  Adjust      The offset to adjust the fixup.
 
   @retval RETURN_SUCCESS Succeed to fix the relocation entry.
@@ -247,7 +247,7 @@ PeCoffLoaderImageFormatSupported (
 
   @param  Reloc             Ponter to baes of the input stream
   @param  Fixup             Offset to the start of the buffer
-  @param  FixupData         Number of bytes to copy into the buffer
+  @param  FixupData         The number of bytes to copy into the buffer
   @param  Adjust            Location to place results of read
 
   @retval RETURN_SUCCESS    Data is read from FileOffset from the Handle into
