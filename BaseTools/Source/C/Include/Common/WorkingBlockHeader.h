@@ -4,7 +4,7 @@
   working block, the header structure of the variable block, FTW
   working block, or event log block.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -34,7 +34,7 @@ typedef struct {
 #define WORKING_BLOCK_INVALID 0x2
   UINT8     Reserved : 6;
   UINT8     Reserved3[3];
-  UINT32    WriteQueueSize;
+  UINT64    WriteQueueSize;
   //
   // UINT8                WriteQueue[WriteQueueSize];
   //

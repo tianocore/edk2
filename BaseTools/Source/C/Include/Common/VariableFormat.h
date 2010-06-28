@@ -1,7 +1,7 @@
 /**@file
   Header file for EFI Variable Services.
 
-  Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -18,8 +18,6 @@
 #ifndef __VARIABLE_FORMAT_H__
 #define __VARIABLE_FORMAT_H__
 
-#define VARIABLE_STORE_SIGNATURE  EFI_SIGNATURE_32 ('$', 'V', 'S', 'S')
-
 #define VARIABLE_DATA                     0x55AA
 
 //
@@ -31,12 +29,12 @@
 #pragma pack(1)
 
 typedef struct {
-  UINT32  Signature;
-  UINT32  Size;
-  UINT8   Format;
-  UINT8   State;
-  UINT16  Reserved;
-  UINT32  Reserved1;
+  EFI_GUID  Signature;
+  UINT32    Size;
+  UINT8     Format;
+  UINT8     State;
+  UINT16    Reserved;
+  UINT32    Reserved1;
 } VARIABLE_STORE_HEADER;
 
 typedef struct {

@@ -227,16 +227,16 @@ class SourceFiles:
                    'mingw-w64/files/mingw-w64/mingw-w64-snapshot/' + \
                    'mingw-w64-v1.0-snapshot-$version.tar.bz2/download',
             'extract-dir': os.path.join('mingw-w64-v1.0-$version', 'mingw-w64-headers'),
-            'version': '20100427',
-            'md5': '1fe68f486bba8995f6a5cf0ed06c80f3',
+            'version': '20100604',
+            'md5': '636a84d1ea1a8cd61616738760021d6a',
             },
         }
 
     source_files_ia32 = {
         'gcc': source_files_x64['gcc'],
         'mingw_hdr': {
-            'url': 'http://sourceforge.net/projects/' + \
-                   'mingw/files/MinGW%20Runtime/' + \
+            'url': 'http://sourceforge.net/projects/mingw/files/MinGW/' + \
+                   'BaseSystem/RuntimeLibrary/MinGW-RT/' + \
                    'mingwrt-$version/' + \
                    'mingwrt-$version-mingw32-src.tar.gz/download',
             'extract-dir': 'mingwrt-$version-mingw32',

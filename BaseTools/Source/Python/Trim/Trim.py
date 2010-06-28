@@ -77,11 +77,6 @@ gImportCodePatterns = [
     ],
 
     [
-        re.compile('#include\s+["<]LoadFile\.h[">]', re.MULTILINE),
-        '#include <FvLoadFile.h>'
-    ],
-
-    [
         re.compile('#include\s+EFI_GUID_DEFINITION\s*\(FirmwareFileSystem\)', re.MULTILINE),
         '#include EFI_GUID_DEFINITION (FirmwareFileSystem)\n#include EFI_GUID_DEFINITION (FirmwareFileSystem2)'
     ],

@@ -2388,9 +2388,11 @@ class FdfParser:
             FfsFileObj.CheckSum = True
 
         if self.__GetAlignment():
-            FfsFileObj.Alignment = self.__Token
-
-
+            if self.__Token not in ("Auto", "8", "16", "32", "64", "128", "512", "1K", "4K", "32K" ,"64K"):
+                raise Warning("Incorrect alignment '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
+            #For FFS, Auto is default option same to ""
+            if not self.__Token == "Auto":
+                FfsFileObj.Alignment = self.__Token
 
     ## __GetAlignment() method
     #

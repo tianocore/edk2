@@ -1227,7 +1227,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
     NumberOfExTokens = 0
     NumberOfSizeItems = 0
     GuidList = []
-
+    
     for Pcd in Platform.DynamicPcdList:
         CName = Pcd.TokenCName
         TokenSpaceGuidCName = Pcd.TokenSpaceGuidCName
@@ -1262,7 +1262,9 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
         VariableHeadValueList = []
         Pcd.InitString = 'UNINIT'
 
-        if Pcd.DatumType == 'VOID*':
+        if Pcd.Type in ["DynamicVpd", "DynamicExVpd"]:
+            Pcd.TokenTypeList = ['PCD_TYPE_VPD']
+        elif Pcd.DatumType == 'VOID*':
             Pcd.TokenTypeList = ['PCD_TYPE_STRING']
         elif Pcd.DatumType == 'BOOLEAN':
             Pcd.TokenTypeList = ['PCD_DATUM_TYPE_UINT8']
@@ -1329,7 +1331,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                 Pcd.TokenTypeList += ['PCD_TYPE_VPD']
                 Pcd.InitString = 'INIT'
                 VpdHeadOffsetList.append(Sku.VpdOffset)
-            
+                continue
           
             if Pcd.DatumType == 'VOID*':
                 Pcd.TokenTypeList += ['PCD_TYPE_STRING']

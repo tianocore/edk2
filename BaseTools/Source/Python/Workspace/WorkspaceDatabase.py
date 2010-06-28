@@ -2287,6 +2287,13 @@ determine whether database file is out of date!\n")
             Result = self.Cur.execute("select min(ID) from %s" % (TableName)).fetchall()
             if Result[0][0] != -1:
                 return False
+            #
+            # Check whether the meta data file has external dependency by comparing the time stamp
+            #
+            Sql = "select Value1, Value2 from %s where Model=%d" % (TableName, MODEL_EXTERNAL_DEPENDENCY)
+            for Dependency in self.Cur.execute(Sql).fetchall():
+                if str(os.stat(Dependency[0])[8]) != Dependency[1]:
+                    return False
         except:
             return False
         return True

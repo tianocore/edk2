@@ -2,7 +2,7 @@
 
   Functions to get info and load PE/COFF image.
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -629,15 +629,10 @@ Returns:
   }
 
   //
-  // If the destination address is not 0, use that rather than the
-  // image address as the relocation target.
+  // Use DestinationAddress field of ImageContext as the relocation address even if it is 0.
   //
-  if (ImageContext->DestinationAddress) {
-    BaseAddress = ImageContext->DestinationAddress;
-  } else {
-    BaseAddress = ImageContext->ImageAddress;
-  }
-
+  BaseAddress = ImageContext->DestinationAddress;
+  
   if (!(ImageContext->IsTeImage)) {
     PeHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((UINTN)ImageContext->ImageAddress + 
                                             ImageContext->PeCoffHeaderOffset);

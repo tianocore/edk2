@@ -68,7 +68,7 @@ SUBDIRS := $(LIBRARIES) $(APPLICATIONS)
 
 .PHONY: outputdirs
 makerootdir:
-	-mkdir $(MAKEROOT)
+	-mkdir -p $(MAKEROOT)
 
 .PHONY: subdirs $(SUBDIRS)
 subdirs: $(SUBDIRS)

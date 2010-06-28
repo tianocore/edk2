@@ -1,7 +1,7 @@
 ## @file
-# This file is used to define class for data sturcture used in ECC
+# This file is used to define class for data structure used in ECC
 #
-# Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.    The full text of the license may be found at
@@ -91,6 +91,8 @@ MODEL_META_DATA_NMAKE = 5012
 MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSEIF = 50013
 MODEL_META_DATA_CONDITIONAL_STATEMENT_ENDIF = 5014
 MODEL_META_DATA_COMPONENT_SOURCE_OVERRIDE_PATH = 5015
+
+MODEL_EXTERNAL_DEPENDENCY = 10000
 
 MODEL_LIST = [('MODEL_UNKNOWN', MODEL_UNKNOWN),
               ('MODEL_FILE_C', MODEL_FILE_C),

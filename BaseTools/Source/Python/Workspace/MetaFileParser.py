@@ -774,6 +774,8 @@ class DscParser(MetaFileParser):
             except:
                 EdkLogger.error("Parser", PARSER_ERROR, File=self.MetaFile, Line=self._LineIndex+1,
                                 ExtraData="Failed to parse content in file %s" % IncludedFile)
+            # insert an imaginary token in the DSC table to indicate its external dependency on another file
+            self._Store(MODEL_EXTERNAL_DEPENDENCY, IncludedFile, str(os.stat(IncludedFile)[8]), "")
             # update current status with sub-parser's status
             self._SectionName = Parser._SectionName
             self._SectionType = Parser._SectionType
