@@ -24,7 +24,7 @@ EFI_EVENT                 mLogDataHubEvent;
 //
 // Cache data hub protocol.
 //
-EFI_DATA_HUB_PROTOCOL     *mDataHubProtocol = NULL;
+EFI_DATA_HUB_PROTOCOL     *mDataHubProtocol;
 
 
 /**
@@ -189,7 +189,6 @@ DataHubStatusCodeReportWorker (
   BASE_LIST                         Marker;
   CHAR8                             *Format;
   UINTN                             CharCount;
-  EFI_STATUS                        Status;
 
   //
   // Use atom operation to avoid the reentant of report.
@@ -206,13 +205,6 @@ DataHubStatusCodeReportWorker (
     return EFI_DEVICE_ERROR;
   }
 
-  if (mDataHubProtocol == NULL) {
-    Status = DataHubStatusCodeInitializeWorker ();
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
-  
   Record = AcquireRecordBuffer ();
   if (Record == NULL) {
     //
@@ -366,10 +358,7 @@ DataHubStatusCodeInitializeWorker (
                   NULL, 
                   (VOID **) &mDataHubProtocol
                   );
-  if (EFI_ERROR (Status)) {
-    mDataHubProtocol = NULL;
-    return Status;
-  }
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Create a Notify Event to log data in Data Hub

@@ -104,10 +104,11 @@ MemoryStatusCodeReportWorker (
   PacketIndex = 0;
 
   //
-  // Journal GUID'ed HOBs to find empty record entry. 
+  // Journal GUID'ed HOBs to find empty record entry. if found, then save status code in it.
+  // otherwise, create a new GUID'ed HOB.
   //
   Hob.Raw = GetFirstGuidHob (&gMemoryStatusCodeRecordGuid);
-  while ((Hob.Raw = GetNextGuidHob (&gMemoryStatusCodeRecordGuid, Hob.Raw)) != NULL) {
+  while (Hob.Raw != NULL) {
     PacketHeader = (MEMORY_STATUSCODE_PACKET_HEADER *) GET_GUID_HOB_DATA (Hob.Guid);
 
     //
@@ -123,14 +124,17 @@ MemoryStatusCodeReportWorker (
     //
     PacketIndex++;
 
-    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextGuidHob (&gMemoryStatusCodeRecordGuid, Hob.Raw);
   }
 
   if (Record == NULL) {
     //
-    // No available entry found
+    // No available entry found, so create new packet.
     //
-    return EFI_OUT_OF_RESOURCES;
+    PacketHeader = CreateMemoryStatusCodePacket (PacketIndex);
+
+    Record = (MEMORY_STATUSCODE_RECORD *) (PacketHeader + 1);
+    Record = &Record[PacketHeader->RecordIndex++];
   }
 
   Record->CodeType = CodeType;
