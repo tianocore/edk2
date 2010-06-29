@@ -226,8 +226,7 @@ InitializationDispatcherWorker (
     ASSERT_EFI_ERROR (Status);
   }
   if (FeaturePcdGet (PcdStatusCodeUseDataHub)) {
-    Status = DataHubStatusCodeInitializeWorker ();
-    ASSERT_EFI_ERROR (Status);
+    DataHubStatusCodeInitializeWorker ();
   }
   if (FeaturePcdGet (PcdStatusCodeUseOEM)) {
     //
