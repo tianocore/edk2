@@ -198,9 +198,8 @@ INF  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
 INF  RuleOverride=ACPITABLE OvmfPkg/AcpiTables/AcpiTables.inf
 INF  OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
 
-INF  FatBinPkg/EnhancedFatDxe/Fat.inf
-
-INF  EdkShellBinPkg/FullShell/FullShell.inf
+INF  RuleOverride = BINARY FatBinPkg/EnhancedFatDxe/Fat.inf
+INF  RuleOverride = BINARY EdkShellBinPkg/FullShell/FullShell.inf
 
 FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
   SECTION RAW = MdeModulePkg/Logo/Logo.bmp
@@ -286,6 +285,14 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
+[Rule.Common.UEFI_DRIVER.BINARY]
+  FILE APPLICATION = $(NAMED_GUID) {
+    DXE_DEPEX DXE_DEPEX Optional      |.depex
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+  
 [Rule.Common.UEFI_APPLICATION]
   FILE APPLICATION = $(NAMED_GUID) {
     PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
@@ -293,6 +300,13 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
+[Rule.Common.UEFI_APPLICATION.BINARY]
+  FILE APPLICATION = $(NAMED_GUID) {
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+  
 [Rule.Common.USER_DEFINED.ACPITABLE]
   FILE FREEFORM = $(NAMED_GUID) {
     RAW ACPI               |.acpi
