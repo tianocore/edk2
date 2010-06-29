@@ -290,7 +290,7 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
   }
 
 [Rule.Common.UEFI_DRIVER.BINARY]
-  FILE APPLICATION = $(NAMED_GUID) {
+  FILE DRIVER = $(NAMED_GUID) {
     DXE_DEPEX DXE_DEPEX Optional      |.depex
     PE32      PE32                    |.efi
     UI        STRING="$(MODULE_NAME)" Optional
