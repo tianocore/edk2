@@ -1,7 +1,7 @@
 /** @file
   Routines to process Wrq (upload).
   
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -145,7 +145,8 @@ Mtftp4WrqHandleAck (
 {
   UINT16                    AckNum;
   INTN                      Expected;
-
+  UINT64                    TotalBlock;
+ 
   *Completed  = FALSE;
   AckNum      = NTOHS (Packet->Ack.Block[0]);
   Expected    = Mtftp4GetNextBlockNum (&Instance->Blocks);
@@ -165,7 +166,7 @@ Mtftp4WrqHandleAck (
   // tell the Mtftp4WrqInput to finish the transfer. This is the last
   // block number if the block range are empty..
   //
-  Mtftp4RemoveBlockNum (&Instance->Blocks, AckNum);
+  Mtftp4RemoveBlockNum (&Instance->Blocks, AckNum, &TotalBlock);
 
   Expected = Mtftp4GetNextBlockNum (&Instance->Blocks);
 

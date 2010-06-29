@@ -1,7 +1,7 @@
 /** @file
   Support routines for MTFTP.
   
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -24,6 +24,8 @@ typedef struct {
   LIST_ENTRY                Link;
   INTN                      Start;
   INTN                      End;
+  INTN                      Round;
+  INTN                      Bound;
 } MTFTP4_BLOCK_RANGE;
 
 
@@ -90,6 +92,7 @@ Mtftp4SetLastBlockNum (
 
   @param  Head                  The block range list to remove from
   @param  Num                   The block number to remove
+  @param  TotalBlock            The continuous block number in all 
 
   @retval EFI_NOT_FOUND         The block number isn't in the block range list
   @retval EFI_SUCCESS           The block number has been removed from the list
@@ -99,7 +102,8 @@ Mtftp4SetLastBlockNum (
 EFI_STATUS
 Mtftp4RemoveBlockNum (
   IN LIST_ENTRY             *Head,
-  IN UINT16                 Num
+  IN UINT16                 Num,
+  OUT UINT64                *TotalBlock
   );
 
 /**

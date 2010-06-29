@@ -1,7 +1,7 @@
 /** @file
   Routines to process Rrq (download).
   
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -145,15 +145,19 @@ Mtftp4RrqSaveBlock (
   UINT16                    Block;
   UINT64                    Start;
   UINT32                    DataLen;
+  UINT64                    TotalBlock;
+  BOOLEAN                   Completed;
 
-  Token   = Instance->Token;
-  Block   = NTOHS (Packet->Data.Block);
-  DataLen = Len - MTFTP4_DATA_HEAD_LEN;
+  Completed = FALSE;
+  Token     = Instance->Token;
+  Block     = NTOHS (Packet->Data.Block);
+  DataLen   = Len - MTFTP4_DATA_HEAD_LEN;
 
   //
   // This is the last block, save the block no
   //
   if (DataLen < Instance->BlkSize) {
+	Completed = TRUE;
     Instance->LastBlock = Block;
     Mtftp4SetLastBlockNum (&Instance->Blocks, Block);
   }
@@ -161,8 +165,11 @@ Mtftp4RrqSaveBlock (
   //
   // Remove this block number from the file hole. If Mtftp4RemoveBlockNum
   // returns EFI_NOT_FOUND, the block has been saved, don't save it again.
+  // Note that : For bigger files, allowing the block counter to roll over
+  // to accept transfers of unlimited size. So TotalBlock is memorised as 
+  // continuous block counter.
   //
-  Status = Mtftp4RemoveBlockNum (&Instance->Blocks, Block);
+  Status = Mtftp4RemoveBlockNum (&Instance->Blocks, Block, &TotalBlock);
 
   if (Status == EFI_NOT_FOUND) {
     return EFI_SUCCESS;
@@ -185,7 +192,7 @@ Mtftp4RrqSaveBlock (
   }
 
   if (Token->Buffer != NULL) {
-    Start = MultU64x32 (Block - 1, Instance->BlkSize);
+     Start = MultU64x32 (TotalBlock - 1, Instance->BlkSize);
 
     if (Start + DataLen <= Token->BufferSize) {
       CopyMem ((UINT8 *) Token->Buffer + Start, Packet->Data.Data, DataLen);
@@ -193,7 +200,7 @@ Mtftp4RrqSaveBlock (
       //
       // Update the file size when received the last block
       //
-      if (Instance->LastBlock == Block) {
+      if ((Instance->LastBlock == Block) && Completed) {
         Token->BufferSize = Start + DataLen;
       }
 
