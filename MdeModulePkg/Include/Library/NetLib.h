@@ -51,6 +51,7 @@ typedef UINT16          TCP_PORTNO;
 
 #define  IP6_HOP_BY_HOP        0
 #define  IP6_DESTINATION       60
+#define  IP6_ROUTING           43
 #define  IP6_FRAGMENT          44
 #define  IP6_AH                51
 #define  IP6_ESP               50
