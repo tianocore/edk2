@@ -37,7 +37,7 @@
 
   @param  ErrorLevel  The error level of the debug message.
   @param  Format      Format string for the debug message to print.
-  @param  ...         Variable argument list whose contents are accessed 
+  @param  ...         A variable argument list whose contents are accessed 
                       based on the format string specified by Format.
 
 **/
@@ -97,8 +97,10 @@ DebugPrint (
   If FileName is NULL, then a <FileName> string of "(NULL) Filename" is printed.
   If Description is NULL, then a <Description> string of "(NULL) Description" is printed.
 
-  @param  FileName     The pointer to the name of the source file that generated the assert condition.
-  @param  LineNumber   The line number in the source file that generated the assert condition
+  @param  FileName     The pointer to the name of the source file that generated 
+                       the assert condition.
+  @param  LineNumber   The line number in the source file that generated the 
+                       assert condition
   @param  Description  The pointer to the description of the assert condition.
 
 **/

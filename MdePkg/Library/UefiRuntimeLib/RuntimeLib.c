@@ -10,7 +10,7 @@ Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php.
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -36,8 +36,8 @@ EFI_RUNTIME_SERVICES   *mInternalRT;
 /**
   Set AtRuntime flag as TRUE after ExitBootServices.
 
-  @param[in]  Event   The Event that is being processed
-  @param[in]  Context Event Context
+  @param[in]  Event   The Event that is being processed.
+  @param[in]  Context The Event Context.
 
 **/
 VOID
@@ -55,8 +55,8 @@ RuntimeLibExitBootServicesEvent (
   Call the passed in Child Notify event and convert any pointers in
   lib to virtual mode.
 
-  @param[in]    Event   The Event that is being processed
-  @param[in]    Context Event Context
+  @param[in]    Event   The Event that is being processed.
+  @param[in]    Context The Event Context.
 **/
 VOID
 EFIAPI
@@ -133,8 +133,8 @@ RuntimeDriverLibConstruct (
   @param[in]  ImageHandle   The firmware allocated handle for the EFI image.
   @param[in]  SystemTable   A pointer to the EFI System Table.
 
-  @retval     EFI_SUCCESS       Shutdown the Runtime Driver Lib successfully
-  @retval     EFI_UNSUPPORTED   Runtime Driver lib was not initialized at all
+  @retval     EFI_SUCCESS       The Runtime Driver Lib shutdown successfully.
+  @retval     EFI_UNSUPPORTED   Runtime Driver lib was not initialized.
 **/
 EFI_STATUS
 EFIAPI
@@ -320,7 +320,7 @@ EfiSetTime (
   @param  Time     The current alarm setting. Type EFI_TIME is defined in the GetTime()
                    function description.
 
-  @retval  EFI_SUCCESS           The alarm settings were returned.
+  @retval  EFI_SUCCESS            The alarm settings were returned.
   @retval  EFI_INVALID_PARAMETER  Enabled is NULL.
   @retval  EFI_INVALID_PARAMETER  Pending is NULL.
   @retval  EFI_INVALID_PARAMETER  Time is NULL.
@@ -466,13 +466,13 @@ EfiGetNextVariableName (
   Variables are stored by the firmware and may maintain their values across power cycles. Each vendor
   may create and manage its own variables without the risk of name conflicts by using a unique VendorGuid.
 
-  @param  VariableName the name of the vendor's variable, it's a
-                       Null-Terminated Unicode String
+  @param  VariableName The name of the vendor's variable; it's a Null-Terminated 
+                       Unicode String
   @param  VendorGuid   Unify identifier for vendor.
-  @param  Attributes   Point to memory location to return the attributes of variable. If the point
+  @param  Attributes   Points to a memory location to return the attributes of variable. If the point
                        is NULL, the parameter would be ignored.
   @param  DataSize     The size in bytes of Data-Buffer.
-  @param  Data         Point to the content of the variable.
+  @param  Data         Points to the content of the variable.
 
   @retval  EFI_SUCCESS            The firmware has successfully stored the variable and its data as
                                   defined by the Attributes.
@@ -766,7 +766,7 @@ EfiUpdateCapsule (
                                 Undefined on input.
   @param  ResetType             Returns the type of reset required for the capsule update.
 
-  @retval EFI_SUCCESS           Valid answer returned.
+  @retval EFI_SUCCESS           A valid answer was returned.
   @retval EFI_INVALID_PARAMETER MaximumCapsuleSize is NULL.
   @retval EFI_UNSUPPORTED       The capsule type is not supported on this platform, and
                                 MaximumCapsuleSize and ResetType are undefined.
@@ -817,7 +817,7 @@ EfiQueryCapsuleCapabilities (
   @param  MaximumVariableSize   Returns the maximum size of the individual EFI
                                 variables associated with the attributes specified.
 
-  @retval EFI_SUCCESS           Valid answer returned.
+  @retval EFI_SUCCESS           A valid answer was returned.
   @retval EFI_INVALID_PARAMETER An invalid combination of attribute bits was supplied.
   @retval EFI_UNSUPPORTED       EFI_UNSUPPORTED The attribute is not supported on this platform, and the
                                 MaximumVariableStorageSize,

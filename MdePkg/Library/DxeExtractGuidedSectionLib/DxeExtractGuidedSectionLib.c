@@ -1,7 +1,7 @@
 /** @file
   Provide generic extract guided section functions for Dxe phase.
 
-  Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -31,8 +31,8 @@ EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER *mExtractGetInfoHandlerTable = NULL;
 /**
   Reallocates more global memory to store the registered guid and Handler list.
 
-  @retval  RETURN_SUCCESS            Reallocate more global memory space to store guid and function tables.
-  @retval  RETURN_OUT_OF_RESOURCES   No enough memory to allocated.
+  @retval  RETURN_SUCCESS            Reallocated more global memory space to store guid and function tables.
+  @retval  RETURN_OUT_OF_RESOURCES   Not enough memory to allocate.
 **/
 RETURN_STATUS
 EFIAPI
@@ -103,8 +103,8 @@ Done:
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
 
-  @retval  RETURN_SUCCESS            Allocate the global memory space to store guid and function tables.
-  @retval  RETURN_OUT_OF_RESOURCES   No enough memory to allocated.
+  @retval  RETURN_SUCCESS            Allocated the global memory space to store guid and function tables.
+  @retval  RETURN_OUT_OF_RESOURCES   Not enough memory to allocate.
 **/
 RETURN_STATUS
 EFIAPI
@@ -127,7 +127,7 @@ DxeExtractGuidedSectionLibConstructor (
   @param[out]  ExtractHandlerGuidTable  A pointer to the array of GUIDs that have been registered through
                                         ExtractGuidedSectionRegisterHandlers().
 
-  @return the number of the supported extract guided Handler.
+  @return The number of the supported extract guided Handler.
 
 **/
 UINTN
@@ -242,7 +242,7 @@ ExtractGuidedSectionRegisterHandlers (
   @param[out] SectionAttribute   A pointer to the attributes of the GUIDed section.  See the Attributes field of
                                  EFI_GUID_DEFINED_SECTION in the PI Specification.
 
-  @retval  RETURN_SUCCESS      Get the required information successfully.
+  @retval  RETURN_SUCCESS      Successfully obtained the required information.
   @retval  RETURN_UNSUPPORTED  The GUID from the section specified by InputSection does not match any of
                                the GUIDs registered with ExtractGuidedSectionRegisterHandlers().
   @retval  Others              The return status from the handler associated with the GUID retrieved from

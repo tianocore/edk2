@@ -4,7 +4,7 @@
   This library is used for PEIM which does executed from flash device directly but
   executed in memory.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -71,10 +71,10 @@ GetPeiServicesTablePointer (
   The constructor function caches the pointer to PEI services.
   It will always return EFI_SUCCESS.
 
-  @param  FileHandle   Handle of FFS header the loaded driver.
-  @param  PeiServices The pointer to the PEI services.
+  @param  FileHandle   The handle of FFS header the loaded driver.
+  @param  PeiServices  The pointer to the PEI services.
 
-  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+  @retval EFI_SUCCESS  The constructor always returns EFI_SUCCESS.
 
 **/
 EFI_STATUS

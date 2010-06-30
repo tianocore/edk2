@@ -49,7 +49,8 @@
 
   This internal function retrieves PCI CFG2 PPI from PPI database.
 
-  @param  Address       The address that encodes the PCI Segment, Bus, Device, Function and Register.
+  @param  Address       The address that encodes the PCI Segment, Bus, Device, 
+                        Function and Register.
 
   @return The pointer to PCI CFG2 PPI.
 
@@ -94,7 +95,7 @@ InternalGetPciCfg2Ppi (
 
   @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Width   Width of data to read
+  @param  Width   The width of data to read
 
   @return The value read from the PCI configuration register.
 
@@ -132,7 +133,7 @@ PeiPciSegmentLibPciCfg2ReadWorker (
 
   @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Width   Width of data to write
+  @param  Width   The width of data to write
   @param  Data    The value to write.
 
   @return The value written to the PCI configuration register.
@@ -197,7 +198,8 @@ PciSegmentRegisterForRuntimeAccess (
   
   If any reserved bits in Address are set, then ASSERT().
   
-  @param  Address   The address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   The address that encodes the PCI Segment, Bus, Device, Function, 
+                    and Register.
 
   @return The 8-bit PCI configuration register specified by Address.
 
@@ -646,7 +648,7 @@ PciSegmentAnd16 (
   If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address   The address that encodes the PCI Segment, Bus, Device, Function, and Register.
-  @param  AndData    The value to AND with the PCI configuration register.
+  @param  AndData   The value to AND with the PCI configuration register.
   @param  OrData    The value to OR with the PCI configuration register.
 
   @return The value written to the PCI configuration register.
@@ -867,7 +869,8 @@ PciSegmentBitFieldAndThenOr16 (
   If any reserved bits in Address are set, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address   The address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   The address that encodes the PCI Segment, Bus, Device, Function, 
+                    and Register.
 
   @return The 32-bit PCI configuration register specified by Address.
 
@@ -892,7 +895,8 @@ PciSegmentRead32 (
   If any reserved bits in Address are set, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address     The address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address     The address that encodes the PCI Segment, Bus, Device, 
+                      Function, and Register.
   @param  Value       The value to write.
 
   @return The parameter of Value.
@@ -950,7 +954,8 @@ PciSegmentOr32 (
   If any reserved bits in Address are set, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address   The address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   The address that encodes the PCI Segment, Bus, Device, Function, 
+                    and Register.
   @param  AndData   The value to AND with the PCI configuration register.
 
   @return The value written to the PCI configuration register.
@@ -980,7 +985,8 @@ PciSegmentAnd32 (
   If any reserved bits in Address are set, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address   The address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   The address that encodes the PCI Segment, Bus, Device, Function,
+                    and Register.
   @param  AndData   The value to AND with the PCI configuration register.
   @param  OrData    The value to OR with the PCI configuration register.
 
@@ -1213,8 +1219,8 @@ PciSegmentBitFieldAndThenOr32 (
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  The starting address that encodes the PCI Segment, Bus, Device,
-                        Function and Register.
+  @param  StartAddress  The starting address that encodes the PCI Segment, Bus, 
+                        Device, Function and Register.
   @param  Size          The size in bytes of the transfer.
   @param  Buffer        The pointer to a buffer receiving the data read.
 
@@ -1312,8 +1318,8 @@ PciSegmentReadBuffer (
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  The starting address that encodes the PCI Segment, Bus, Device,
-                        Function and Register.
+  @param  StartAddress  The starting address that encodes the PCI Segment, Bus, 
+                        Device, Function and Register.
   @param  Size          The size in bytes of the transfer.
   @param  Buffer        The pointer to a buffer containing the data to write.
 

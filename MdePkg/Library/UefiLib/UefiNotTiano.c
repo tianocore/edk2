@@ -138,7 +138,7 @@ EfiCreateEventLegacyBootEx (
   change with the version of the specification supported.
   If ReadyToBootEvent is NULL, then ASSERT().
 
-  @param  ReadyToBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
+  @param  ReadyToBootEvent  Returns the EFI event returned from gBS->CreateEvent(Ex).
 
   @retval EFI_SUCCESS       Event was created.
   @retval Other             Event was not created.

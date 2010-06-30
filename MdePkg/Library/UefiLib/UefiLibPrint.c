@@ -45,12 +45,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_GRAPHICS_OUTPUT_BLT_PIXEL mEfiColors[16] = {
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param Format   Null-terminated Unicode format string.
+  @param Format   A Null-terminated Unicode format string.
   @param Console  The output console.
-  @param Marker   VA_LIST marker for the variable argument list.
+  @param Marker   A VA_LIST marker for the variable argument list.
 
   @return The number of Unicode characters in the produced
-          output buffer not including the Null-terminator.
+          output buffer, not including the Null-terminator.
 **/
 UINTN
 InternalPrint (
@@ -103,8 +103,8 @@ InternalPrint (
   If Format is not aligned on a 16-bit boundary, then ASSERT().
   If gST->ConOut is NULL, then ASSERT().
 
-  @param Format   Null-terminated Unicode format string.
-  @param ...      Variable argument list whose contents are accessed based 
+  @param Format   A Null-terminated Unicode format string.
+  @param ...      A Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
   @return The number of Unicode characters printed to ConOut.
@@ -142,7 +142,7 @@ Print (
   If Format is not aligned on a 16-bit boundary, then ASSERT().
   If gST->StdErr is NULL, then ASSERT().
 
-  @param Format   Null-terminated Unicode format string.
+  @param Format   A Null-terminated Unicode format string.
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
@@ -180,7 +180,7 @@ ErrorPrint (
 
   If Format is NULL, then ASSERT().
 
-  @param Format   Null-terminated ASCII format string.
+  @param Format   A Null-terminated ASCII format string.
   @param Console  The output console.
   @param Marker   VA_LIST marker for the variable argument list.
 
@@ -237,7 +237,7 @@ AsciiInternalPrint (
   If Format is NULL, then ASSERT().
   If gST->ConOut is NULL, then ASSERT().
 
-  @param Format   Null-terminated ASCII format string.
+  @param Format   A Null-terminated ASCII format string.
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
@@ -276,7 +276,7 @@ AsciiPrint (
   If Format is NULL, then ASSERT().
   If gST->StdErr is NULL, then ASSERT().
 
-  @param Format   Null-terminated ASCII format string.
+  @param Format   A Null-terminated ASCII format string.
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
@@ -320,8 +320,8 @@ AsciiErrorPrint (
   If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no
   string is printed, and 0 is returned.
 
-  @param  PointX       X coordinate to print the string.
-  @param  PointY       Y coordinate to print the string.
+  @param  PointX       An X coordinate to print the string.
+  @param  PointY       A Y coordinate to print the string.
   @param  Foreground   The foreground color of the string being printed.  This is
                        an optional parameter that may be NULL.  If it is NULL,
                        then the foreground color of the current ConOut device
@@ -330,7 +330,7 @@ AsciiErrorPrint (
                        an optional parameter that may be NULL.  If it is NULL,
                        then the background color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
-  @param  Buffer       Null-terminated Unicode formatted string.
+  @param  Buffer       A Null-terminated Unicode formatted string.
   @param  PrintNum     The number of Unicode formatted string to be printed.
 
   @return  The number of Unicode Characters printed. Zero means no any character
@@ -576,8 +576,8 @@ Error:
   If Format is not aligned on a 16-bit boundary, then ASSERT().
   If gST->ConsoleOutputHandle is NULL, then ASSERT().
 
-  @param  PointX       X coordinate to print the string.
-  @param  PointY       Y coordinate to print the string.
+  @param  PointX       An X coordinate to print the string.
+  @param  PointY       A Y coordinate to print the string.
   @param  ForeGround   The foreground color of the string being printed.  This is
                        an optional parameter that may be NULL.  If it is NULL,
                        then the foreground color of the current ConOut device
@@ -586,9 +586,9 @@ Error:
                        an optional parameter that may be NULL.  If it is NULL, 
                        then the background color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
-  @param  Format       Null-terminated Unicode format string.  See Print Library 
+  @param  Format       A Null-terminated Unicode format string.  See Print Library 
                        for the supported format string syntax.
-  @param  ...          Variable argument list whose contents are accessed based on 
+  @param  ...          A Variable argument list whose contents are accessed based on 
                        the format string specified by Format.         
 
   @return  The number of Unicode characters printed.
@@ -653,8 +653,8 @@ PrintXY (
   If Format is NULL, then ASSERT().
   If gST->ConsoleOutputHandle is NULL, then ASSERT().
 
-  @param  PointX       X coordinate to print the string.
-  @param  PointY       Y coordinate to print the string.
+  @param  PointX       An X coordinate to print the string.
+  @param  PointY       A Y coordinate to print the string.
   @param  ForeGround   The foreground color of the string being printed.  This is
                        an optional parameter that may be NULL.  If it is NULL,
                        then the foreground color of the current ConOut device
@@ -663,7 +663,7 @@ PrintXY (
                        an optional parameter that may be NULL.  If it is NULL, 
                        then the background color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
-  @param  Format       Null-terminated ASCII format string.  See Print Library 
+  @param  Format       A Null-terminated ASCII format string.  See Print Library 
                        for the supported format string syntax.
   @param  ...          Variable argument list whose contents are accessed based on 
                        the format string specified by Format.         

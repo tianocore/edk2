@@ -1,7 +1,7 @@
 /** @file
   Implementation for PEI Services Library.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -117,13 +117,14 @@ PeiServicesLocatePpi (
   This service enables PEIMs to register a given service to be invoked when another service is
   installed or reinstalled.
 
-  @param  NotifyList            A pointer to the list of notification interfaces that the caller
-                                shall install.
+  @param  NotifyList            A pointer to the list of notification interfaces 
+                                that the caller shall install.
 
   @retval EFI_SUCCESS           The interface was successfully installed.
   @retval EFI_INVALID_PARAMETER The NotifyList pointer is NULL.
-  @retval EFI_INVALID_PARAMETER Any of the PEI notify descriptors in the list do not have the
-                                EFI_PEI_PPI_DESCRIPTOR_NOTIFY_TYPES bit set in the Flags field.
+  @retval EFI_INVALID_PARAMETER Any of the PEI notify descriptors in the list do
+                                 not have the EFI_PEI_PPI_DESCRIPTOR_NOTIFY_TYPES
+                                 bit set in the Flags field.
   @retval EFI_OUT_OF_RESOURCES  There is no additional space in the PPI database.
 
 **/
@@ -183,8 +184,9 @@ PeiServicesSetBootMode (
 /**
   This service enables a PEIM to ascertain the address of the list of HOBs in memory.
 
-  @param  HobList               A pointer to the list of HOBs that the PEI Foundation will initialize.
-
+  @param  HobList               A pointer to the list of HOBs that the PEI Foundation 
+                                will initialize.
+  
   @retval EFI_SUCCESS           The list was successfully returned.
   @retval EFI_NOT_AVAILABLE_YET The HOB list is not yet published.
 
@@ -206,7 +208,8 @@ PeiServicesGetHobList (
 
   @param  Type                  The type of HOB to be installed.
   @param  Length                The length of the HOB to be added.
-  @param  Hob                   The address of a pointer that will contain the HOB header.
+  @param  Hob                   The address of a pointer that will contain the 
+                                HOB header.
 
   @retval EFI_SUCCESS           The HOB was successfully created.
   @retval EFI_OUT_OF_RESOURCES  There is no additional space for HOB creation.
@@ -229,9 +232,10 @@ PeiServicesCreateHob (
 /**
   This service enables PEIMs to discover additional firmware volumes.
 
-  @param  Instance              This instance of the firmware volume to find.  The value 0 is the
-                                Boot Firmware Volume (BFV).
-  @param  VolumeHandle          Handle of the firmware volume header of the volume to return.
+  @param  Instance              This instance of the firmware volume to find.  The 
+                                value 0 is the Boot Firmware Volume (BFV).
+  @param  VolumeHandle          Handle of the firmware volume header of the volume
+                                to return.
 
   @retval EFI_SUCCESS           The volume was found.
   @retval EFI_NOT_FOUND         The volume was not found.
@@ -255,8 +259,9 @@ PeiServicesFfsFindNextVolume (
   This service enables PEIMs to discover additional firmware files.
 
   @param  SearchType            A filter to find files only of this type.
-  @param  VolumeHandle          The pointer to the firmware volume header of the volume to search.
-                                This parameter must point to a valid FFS volume.
+  @param  VolumeHandle          The pointer to the firmware volume header of the 
+                                volume to search. This parameter must point to a 
+                                valid FFS volume. 
   @param  FileHandle            Handle of the current file from which to begin searching.
 
   @retval EFI_SUCCESS           The file was found.
@@ -282,8 +287,8 @@ PeiServicesFfsFindNextFile (
   This service enables PEIMs to discover sections of a given type within a valid FFS file.
 
   @param  SectionType           The value of the section type to find.
-  @param  FileHandle            A pointer to the file header that contains the set of sections to
-                                be searched.
+  @param  FileHandle            A pointer to the file header that contains the set 
+                                of sections to be searched.
   @param  SectionData           A pointer to the discovered section, if successful.
 
   @retval EFI_SUCCESS           The section was found.
@@ -330,8 +335,8 @@ PeiServicesInstallPeiMemory (
 }
 
 /**
-  This service enables PEIMs to allocate memory after the permanent memory has been installed by a
-  PEIM.
+  This service enables PEIMs to allocate memory after the permanent memory has been
+   installed by a PEIM.
 
   @param  MemoryType            Type of memory to allocate.
   @param  Pages                 The number of pages to allocate.
@@ -361,8 +366,8 @@ PeiServicesAllocatePages (
   This service allocates memory from the Hand-Off Block (HOB) heap.
 
   @param  Size                  The number of bytes to allocate from the pool.
-  @param  Buffer                If the call succeeds, a pointer to a pointer to the allocate
-                                buffer; undefined otherwise.
+  @param  Buffer                If the call succeeds, a pointer to a pointer to 
+                                the allocate buffer; otherwise, undefined.
 
   @retval EFI_SUCCESS           The allocation was successful
   @retval EFI_OUT_OF_RESOURCES  There is not enough heap to allocate the requested size.
@@ -401,21 +406,21 @@ PeiServicesResetSystem (
 }
 
 /**
-  This service is a wrapper for the PEI Service RegisterForShadow(), except the pointer to the PEI Services 
-  Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface 
-  Specification for details. 
+  This service is a wrapper for the PEI Service RegisterForShadow(), except the 
+  pointer to the PEI Services Table has been removed.  See the Platform 
+  Initialization Pre-EFI Initialization Core Interface Specification for details. 
 
-  @param FileHandle   PEIM's file handle. Must be the currently
-                      executing PEIM.
+  @param FileHandle             PEIM's file handle. Must be the currently
+                                executing PEIM.
   
-  @retval EFI_SUCCESS   The PEIM was successfully registered for
-                        shadowing.
+  @retval EFI_SUCCESS           The PEIM was successfully registered for
+                                shadowing.
 
   @retval EFI_ALREADY_STARTED   The PEIM was previously
                                 registered for shadowing.
 
-  @retval EFI_NOT_FOUND   The FileHandle does not refer to a
-                          valid file handle.
+  @retval EFI_NOT_FOUND         The FileHandle does not refer to a
+                                valid file handle.
 **/
 EFI_STATUS
 EFIAPI
@@ -431,17 +436,17 @@ PeiServicesRegisterForShadow (
   Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface 
   Specification for details. 
 
-  @param FileHandle   Handle of the file.
+  @param FileHandle              The handle of the file.
 
-  @param FileInfo     Upon exit, points to the file's
-                      information.
+  @param FileInfo                 Upon exit, points to the file's
+                                  information.
 
   @retval EFI_SUCCESS             File information returned.
   
   @retval EFI_INVALID_PARAMETER   If FileHandle does not
                                   represent a valid file.
   
-  @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
+  @retval EFI_INVALID_PARAMETER   FileInfo is NULL.
   
 **/
 EFI_STATUS
@@ -460,13 +465,13 @@ PeiServicesFfsGetFileInfo (
   Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface 
   Specification for details. 
 
-  @param FileName       A pointer to the name of the file to
-                        find within the firmware volume.
+  @param FileName                 A pointer to the name of the file to
+                                  find within the firmware volume.
 
-  @param VolumeHandle   The firmware volume to search FileHandle
-                        Upon exit, points to the found file's
-                        handle or NULL if it could not be found.
-  @param FileHandle     The pointer to found file handle 
+  @param VolumeHandle             The firmware volume to search FileHandle
+                                  Upon exit, points to the found file's
+                                  handle or NULL if it could not be found.
+  @param FileHandle               The pointer to found file handle 
 
   @retval EFI_SUCCESS             File was found.
 
@@ -493,10 +498,10 @@ PeiServicesFfsFindFileByName (
   Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface 
   Specification for details. 
 
-  @param VolumeHandle   Handle of the volume.
+  @param VolumeHandle             Handle of the volume.
 
-  @param VolumeInfo     Upon exit, points to the volume's
-                        information.
+  @param VolumeInfo               Upon exit, points to the volume's
+                                  information.
 
   @retval EFI_SUCCESS             File information returned.
   
@@ -525,20 +530,26 @@ PeiServicesFfsGetVolumeInfo (
   If the EFI_PEI_FIRMWARE_VOLUME_INFO_PPI can not be installed, then ASSERT().
 
   
-  @param  FvFormat             Unique identifier of the format of the memory-mapped firmware volume.
-                               This parameter is optional and may be NULL.  
-                               If NULL is specified, the EFI_FIRMWARE_FILE_SYSTEM2_GUID format is assumed.
-  @param  FvInfo               Points to a buffer which allows the EFI_PEI_FIRMWARE_VOLUME_PPI to process the volume. 
-                               The format of this buffer is specific to the FvFormat. For memory-mapped firmware volumes, 
-                               this typically points to the first byte of the firmware volume.
-  @param  FvInfoSize           The size, in bytes, of FvInfo. For memory-mapped firmware volumes, 
-                               this is typically the size of the firmware volume.
-  @param  ParentFvName         If the new firmware volume originated from a file in a different firmware volume, 
-                               then this parameter specifies the GUID name of the originating firmware volume.
-                               Otherwise, this parameter must be NULL.
-  @param  ParentFileName       If the new firmware volume originated from a file in a different firmware volume, 
-                               then this parameter specifies the GUID file name of the originating firmware file.
-                               Otherwise, this parameter must be NULL.
+  @param  FvFormat             Unique identifier of the format of the memory-mapped 
+                               firmware volume.  This parameter is optional and 
+                               may be NULL.  If NULL is specified, the 
+                               EFI_FIRMWARE_FILE_SYSTEM2_GUID format is assumed.
+  @param  FvInfo               Points to a buffer which allows the 
+                               EFI_PEI_FIRMWARE_VOLUME_PPI to process the volume. 
+                               The format of this buffer is specific to the FvFormat. 
+                               For memory-mapped firmware volumes, this typically 
+                               points to the first byte of the firmware volume.
+  @param  FvInfoSize           The size, in bytes, of FvInfo. For memory-mapped 
+                               firmware volumes, this is typically the size of 
+                               the firmware volume.
+  @param  ParentFvName         If the new firmware volume originated from a file 
+                               in a different firmware volume, then this parameter 
+                               specifies the GUID name of the originating firmware
+                               volume. Otherwise, this parameter must be NULL.
+  @param  ParentFileName       If the new firmware volume originated from a file 
+                               in a different firmware volume, then this parameter 
+                               specifies the GUID file name of the originating 
+                               firmware file. Otherwise, this parameter must be NULL.
 **/
 VOID
 EFIAPI

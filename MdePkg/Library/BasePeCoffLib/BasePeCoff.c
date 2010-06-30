@@ -270,7 +270,7 @@ PeCoffLoaderGetImageInfo (
   // Obviously having base relocations with RELOCS_STRIPPED==1 is invalid.
   //
   // Look at the file header to determine if relocations have been stripped, and
-  // save this info in the image context for later use.
+  // save this information in the image context for later use.
   //
   if ((!(ImageContext->IsTeImage)) && ((Hdr.Pe32->FileHeader.Characteristics & EFI_IMAGE_FILE_RELOCS_STRIPPED) != 0)) {
     ImageContext->RelocationsStripped = TRUE;
@@ -831,7 +831,7 @@ PeCoffLoaderLoadImage (
   ImageContext->ImageError = IMAGE_ERROR_SUCCESS;
 
   //
-  // Copy the provided context info into our local version, get what we
+  // Copy the provided context information into our local version, get what we
   // can from the original image, and then use that to make sure everything
   // is legit.
   //
@@ -1079,7 +1079,7 @@ PeCoffLoaderLoadImage (
   ImageContext->FixupData = NULL;
 
   //
-  // Load the Codeview info if present
+  // Load the Codeview information if present
   //
   if (ImageContext->DebugDirectoryEntryRva != 0) {
     if (!(ImageContext->IsTeImage)) {

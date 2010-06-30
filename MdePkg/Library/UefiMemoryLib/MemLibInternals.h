@@ -119,7 +119,7 @@ InternalMemSetMem64 (
 /**
   Set Buffer to 0 for Size bytes.
 
-  @param  Buffer Memory to set.
+  @param  Buffer The memory to set.
   @param  Length The number of bytes to set
 
   @return Buffer
@@ -135,9 +135,9 @@ InternalMemZeroMem (
 /**
   Compares two memory buffers of a given length.
 
-  @param  DestinationBuffer First memory buffer
-  @param  SourceBuffer      Second memory buffer
-  @param  Length            Length of DestinationBuffer and SourceBuffer memory
+  @param  DestinationBuffer The first memory buffer
+  @param  SourceBuffer      The second memory buffer
+  @param  Length            The length of DestinationBuffer and SourceBuffer memory
                             regions to compare. Must be non-zero.
 
   @return 0                 All Length bytes of the two buffers are identical.

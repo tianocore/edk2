@@ -213,7 +213,7 @@ ScsiTestUnitReadyCommand (
                                          If FALSE, then the standard inquiry data is
                                          returned in InquiryDataBuffer. 
 
-  @retval EFI_SUCCESS          The command was executed successfully. See HostAdapterStatus,
+  @retval EFI_SUCCESS          The command executed successfully. See HostAdapterStatus,
                                TargetStatus, SenseDataLength, and SenseData in that order
                                for additional status information.
   @retval EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire
@@ -357,7 +357,7 @@ ScsiInquiryCommand (
   @param[in]      PageControl        Specifies the PC field of the CDB for this SCSI Command. 
   @param[in]      PageCode           Specifies the Page Control field of the CDB for this SCSI Command. 
 
-  @retval EFI_SUCCESS               The command was executed successfully.
+  @retval EFI_SUCCESS               The command executed successfully.
                                     See HostAdapterStatus, TargetStatus, SenseDataLength,
                                     and SenseData in that order for additional status information.
   @retval EFI_BAD_BUFFER_SIZE       The SCSI Request Packet was executed, but the
@@ -471,7 +471,7 @@ ScsiModeSense10Command (
   @param[out]      HostAdapterStatus    The status of Host Adapter.
   @param[out]      TargetStatus         The status of the target.
 
-  @retval EFI_SUCCESS                   Command is executed successfully.
+  @retval EFI_SUCCESS                   The command executed successfully.
   @retval EFI_NOT_READY                 The SCSI Request Packet could not be sent because there are
                                         too many SCSI Command Packets already queued.
   @retval EFI_DEVICE_ERROR              A device error occurred while attempting to send SCSI Request Packet.
@@ -556,9 +556,9 @@ ScsiRequestSenseCommand (
   @param[out]     TargetStatus         The status of the target.
   @param[in, out] DataBuffer           A pointer to a data buffer.
   @param[in, out] DataLength           The length of data buffer.
-  @param[in]      Pmi                  Partial medium indicator.
+  @param[in]      Pmi                  A partial medium indicator.
 
-  @retval  EFI_SUCCESS           Command is executed successfully.
+  @retval  EFI_SUCCESS           The command executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE   The SCSI Request Packet was executed, but the entire
                                  DataBuffer could not be transferred. The actual
                                  number of bytes transferred is returned in DataLength.
@@ -660,7 +660,7 @@ ScsiReadCapacityCommand (
   @param[in, out] DataLength           The length of data buffer.
   @param[in]      Pmi                  Partial medium indicator.
 
-  @retval  EFI_SUCCESS           Command is executed successfully.
+  @retval  EFI_SUCCESS           The command executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE   The SCSI Request Packet was executed, but the entire
                                  DataBuffer could not be transferred. The actual
                                  number of bytes transferred is returned in DataLength.
@@ -766,7 +766,7 @@ ScsiReadCapacity16Command (
   @param[in]      StartLba             The start address of LBA.
   @param[in]      SectorSize           The sector size.
 
-  @retval  EFI_SUCCESS          Command is executed successfully.
+  @retval  EFI_SUCCESS          The command is executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire DataBuffer could
                                 not be transferred. The actual number of bytes transferred is returned in DataLength.
   @retval  EFI_NOT_READY        The SCSI Request Packet could not be sent because there are too many 
@@ -864,7 +864,7 @@ ScsiRead10Command (
   @param[in]      StartLba             The start address of LBA.
   @param[in]      SectorSize           The sector size.
 
-  @retval  EFI_SUCCESS          Command is executed successfully.
+  @retval  EFI_SUCCESS          The command executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire DataBuffer could
                                 not be transferred. The actual number of bytes transferred is returned in DataLength.
   @retval  EFI_NOT_READY        The SCSI Request Packet could not be sent because there are too many 
@@ -962,7 +962,7 @@ ScsiWrite10Command (
   @param[in]      StartLba             The start address of LBA.
   @param[in]      SectorSize           The sector size.
 
-  @retval  EFI_SUCCESS          Command is executed successfully.
+  @retval  EFI_SUCCESS          The command executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire DataBuffer could
                                 not be transferred. The actual number of bytes transferred is returned in DataLength.
   @retval  EFI_NOT_READY        The SCSI Request Packet could not be sent because there are too many 
@@ -1060,7 +1060,7 @@ ScsiRead16Command (
   @param[in]      StartLba             The start address of LBA.
   @param[in]      SectorSize           The sector size.
 
-  @retval  EFI_SUCCESS          Command is executed successfully.
+  @retval  EFI_SUCCESS          The command is executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire DataBuffer could
                                 not be transferred. The actual number of bytes transferred is returned in DataLength.
   @retval  EFI_NOT_READY        The SCSI Request Packet could not be sent because there are too many 

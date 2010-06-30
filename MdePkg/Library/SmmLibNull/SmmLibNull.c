@@ -51,11 +51,12 @@ TriggerRuntimeSoftwareSmi (
 /**
   Test if a boot time software SMI happened.  
 
-  This function tests if a software SMM interrupt happened. If a software SMM interrupt happened and
-  it was triggered at boot time, it returns TRUE. Otherwise, it returns FALSE.
+  This function tests if a software SMM interrupt happened. If a software SMM 
+  interrupt happened and it was triggered at boot time, it returns TRUE. Otherwise, 
+  it returns FALSE.
 
   @retval TRUE   A software SMI triggered at boot time happened.
-  @retval FLASE  No software SMI happened or the software SMI was triggered at run time.
+  @retval FALSE  No software SMI happened or the software SMI was triggered at run time.
 
 **/
 BOOLEAN
@@ -71,11 +72,12 @@ IsBootServiceSoftwareSmi (
 /**
   Test if a run time software SMI happened.  
 
-  This function tests if a software SMM interrupt happened. If a software SMM interrupt happened and
-  it was triggered at run time, it returns TRUE. Otherwise, it returns FALSE.
+  This function tests if a software SMM interrupt happened. If a software SMM 
+  interrupt happened and it was triggered at run time, it returns TRUE. Otherwise, 
+  it returns FALSE.
 
   @retval TRUE   A software SMI triggered at run time happened.
-  @retval FLASE  No software SMI happened or the software SMI was triggered at boot time.
+  @retval FALSE  No software SMI happened or the software SMI was triggered at boot time.
 
 **/
 BOOLEAN

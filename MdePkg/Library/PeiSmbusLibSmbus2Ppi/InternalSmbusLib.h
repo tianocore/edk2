@@ -1,7 +1,7 @@
 /** @file
 Internal header file for Smbus library.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -52,14 +52,16 @@ InternalGetSmbusPpi (
   as defined in the SmBus Specification. The data can either be of
   the Length byte, word, or a block of data.
 
-  @param  SmbusOperation  Signifies which particular SMBus hardware protocol instance that it will use to
-                          execute the SMBus transactions.
+  @param  SmbusOperation  Signifies which particular SMBus hardware protocol 
+                          instance that it will use to execute the SMBus transactions.
   @param  SmBusAddress    The address that encodes the SMBUS Slave Address,
                           SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Length          Signifies the number of bytes that this operation will do. The maximum number of
-                          bytes can be revision specific and operation specific.
-  @param  Buffer          Contains the value of data to execute to the SMBus slave device. Not all operations
-                          require this argument. The length of this buffer is identified by Length.
+  @param  Length          Signifies the number of bytes that this operation will 
+                          do. The maximum number of bytes can be revision specific 
+                          and operation specific.
+  @param  Buffer          Contains the value of data to execute to the SMBus slave 
+                          device. Not all operations require this argument. The 
+                          length of this buffer is identified by Length.
   @param  Status          Return status for the executed command.
                           This is an optional parameter and may be NULL.
 

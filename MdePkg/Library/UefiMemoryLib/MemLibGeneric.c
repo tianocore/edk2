@@ -6,7 +6,7 @@
     PeiMemoryLib
     UefiMemoryLib
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -113,9 +113,9 @@ InternalMemZeroMem (
 /**
   Compares two memory buffers of a given length.
 
-  @param  DestinationBuffer First memory buffer
-  @param  SourceBuffer      Second memory buffer
-  @param  Length            Length of DestinationBuffer and SourceBuffer memory
+  @param  DestinationBuffer The first memory buffer
+  @param  SourceBuffer      The second memory buffer
+  @param  Length            The length of DestinationBuffer and SourceBuffer memory
                             regions to compare. Must be non-zero.
 
   @return 0                 All Length bytes of the two buffers are identical.

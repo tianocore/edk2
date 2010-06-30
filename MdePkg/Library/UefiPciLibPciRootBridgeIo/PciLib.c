@@ -1,7 +1,7 @@
 /** @file
   PCI Library using PCI Root Bridge I/O Protocol.
 
-  Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are
   licensed and made available under the terms and conditions of
   the BSD License which accompanies this distribution.  The full
@@ -85,7 +85,7 @@ PciLibConstructor (
 
   @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Width   Width of data to read
+  @param  Width   The width of data to read
 
   @return The value read from the PCI configuration register.
 
@@ -119,7 +119,7 @@ DxePciLibPciRootBridgeIoReadWorker (
 
   @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Width   Width of data to write
+  @param  Width   The width of data to write
   @param  Data    The value to write.
 
   @return The value written to the PCI configuration register.

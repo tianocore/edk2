@@ -1,11 +1,11 @@
 /** @file
   Entry point to a the PEI Core.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php.
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -39,17 +39,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   the PEI Services Table and the file handle for the PEI Core itself have been established.
   If ProcessModuleEntryPointList() returns, then ASSERT() and halt the system.
 
-  @param SecCoreData  Points to a data structure containing information about the PEI
-                      core's operating environment, such as the size and location of
-                      temporary RAM, the stack location and the BFV location. 
-
-  @param PpiList      Points to a list of one or more PPI descriptors to be installed
-                      initially by the PEI core. An empty PPI list consists of a single
-                      descriptor with the end-tag EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST.
-                      As part of its initialization phase, the PEI Foundation will add
-                      these SEC-hosted PPIs to its PPI database such that both the PEI
-                      Foundation and any modules can leverage the associated service calls
-                      and/or code in these early PPIs.
+  @param SecCoreData  Points to a data structure containing information about the 
+                      PEI core's operating environment, such as the size and 
+                      location of temporary RAM, the stack location and the BFV 
+                      location.
+                      
+  @param PpiList      Points to a list of one or more PPI descriptors to be 
+                      installed initially by the PEI core. An empty PPI list 
+                      consists of a single descriptor with the end-tag 
+                      EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST.
+                      As part of its initialization phase, the PEI Foundation will
+                      add these SEC-hosted PPIs to its PPI database, such that both 
+                      the PEI Foundation and any modules can leverage the associated 
+                      service calls and/or code in these early PPIs.
 
 **/
 VOID
@@ -79,12 +81,13 @@ _ModuleEntryPoint(
                       the stack location and the BFV location. 
 
   @param PpiList      Points to a list of one or more PPI descriptors to be installed
-                      initially by the PEI core.  An empty PPI list consists of a single
-                      descriptor with the end-tag EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST.
-                      As part of its initialization phase, the PEI Foundation will add these
-                      SEC-hosted PPIs to its PPI database such that both the PEI Foundation
-                      and any modules can leverage the associated service calls and/or code
-                      in these early PPIs.
+                      initially by the PEI core.  An empty PPI list consists of 
+                      a single descriptor with the end-tag 
+                      EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST.
+                      As part of its initialization phase, the PEI Foundation will 
+                      add these SEC-hosted PPIs to its PPI database, such that both 
+                      the PEI Foundationand any modules can leverage the associated 
+                      service calls and/or code in these early PPIs.
 
 **/
 VOID

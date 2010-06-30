@@ -34,7 +34,7 @@ typedef struct {
   Build guid hob for the global memory to store the registered guid and Handler list.
   If GuidHob exists, HandlerInfo will be directly got from Guid hob data.
 
-  @param[in, out]  InfoPointer   The pointer to pei handler info structure.
+  @param[in, out]  InfoPointer   The pointer to pei handler information structure.
 
   @retval  RETURN_SUCCESS            Build Guid hob for the global memory space to store guid and function tables.
   @retval  RETURN_OUT_OF_RESOURCES   No enough memory to allocated.
@@ -48,7 +48,7 @@ PeiGetExtractGuidedSectionHandlerInfo (
   EFI_PEI_HOB_POINTERS                    Hob;
   
   //
-  // First try to get handler info from guid hob specified by CallerId.
+  // First try to get handler information from guid hob specified by CallerId.
   //
   Hob.Raw = GetNextHob (EFI_HOB_TYPE_GUID_EXTENSION, GetHobList ());
   while (Hob.Raw != NULL) {
@@ -313,7 +313,7 @@ ExtractGuidedSectionGetInfo (
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
     if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
       //
-      // Call the match handler to get info for the input section data.
+      // Call the match handler to get information for the input section data.
       //
       return HandlerInfo->ExtractGetInfoHandlerTable [Index] (
                 InputSection,

@@ -34,7 +34,7 @@ typedef struct {
   the registered guid and Handler list. When it is initialized, it will be directly returned. 
   Or, HandlerInfo table will be initialized in this function.
 
-  @param[in, out]  InfoPointer   The pointer to the handler info structure.
+  @param[in, out]  InfoPointer   The pointer to the handler information structure.
 
   @retval  RETURN_SUCCESS            HandlerInfo table can be used to store guid and function tables.
   @retval  RETURN_OUT_OF_RESOURCES   HandlerInfo table address is not writable.
@@ -52,23 +52,23 @@ GetExtractGuidedSectionHandlerInfo (
   HandlerInfo = (EXTRACT_GUIDED_SECTION_HANDLER_INFO*)(VOID*)(UINTN) PcdGet64 (PcdGuidedExtractHandlerTableAddress);
 
   //
-  // First check whether the handler info structure is initialized.
+  // First check whether the handler information structure is initialized.
   //
   if (HandlerInfo->Signature == EXTRACT_HANDLER_INFO_SIGNATURE) {
     //
-    // The handler info has been initialized and is returned.
+    // The handler information has been initialized and is returned.
     //
     *InfoPointer = HandlerInfo;
     return RETURN_SUCCESS;
   }
 
   //
-  // Try to initialize the handler info structure
+  // Try to initialize the handler information structure
   //
   HandlerInfo->Signature = EXTRACT_HANDLER_INFO_SIGNATURE;
   if (HandlerInfo->Signature != EXTRACT_HANDLER_INFO_SIGNATURE) {
     //
-    // The handler info structure was not writeable because the memory is not ready.
+    // The handler information structure was not writeable because the memory is not ready.
     //
     *InfoPointer = NULL;
     return RETURN_OUT_OF_RESOURCES;
@@ -284,7 +284,7 @@ ExtractGuidedSectionGetInfo (
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
     if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
       //
-      // Call the match handler to get info for the input section data.
+      // Call the match handler to get information for the input section data.
       //
       return HandlerInfo->ExtractGetInfoHandlerTable [Index] (
                 InputSection,

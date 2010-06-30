@@ -40,14 +40,14 @@ SAL_PROC         mSalProcEntry;
   or undefined result may occur during the execution of the procedure.
   This function is only available on IPF.
 
-  @param  Index       The SAL procedure Index number
-  @param  Arg2        The 2nd parameter for SAL procedure calls
-  @param  Arg3        The 3rd parameter for SAL procedure calls
-  @param  Arg4        The 4th parameter for SAL procedure calls
-  @param  Arg5        The 5th parameter for SAL procedure calls
-  @param  Arg6        The 6th parameter for SAL procedure calls
-  @param  Arg7        The 7th parameter for SAL procedure calls
-  @param  Arg8        The 8th parameter for SAL procedure calls
+  @param  Index       The SAL procedure Index number.
+  @param  Arg2        The 2nd parameter for SAL procedure calls.
+  @param  Arg3        The 3rd parameter for SAL procedure calls.
+  @param  Arg4        The 4th parameter for SAL procedure calls.
+  @param  Arg5        The 5th parameter for SAL procedure calls.
+  @param  Arg6        The 6th parameter for SAL procedure calls.
+  @param  Arg7        The 7th parameter for SAL procedure calls.
+  @param  Arg8        The 8th parameter for SAL procedure calls.
 
   @return SAL returned registers.
 

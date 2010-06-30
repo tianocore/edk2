@@ -78,8 +78,8 @@ GetPiPcdPpiPointer (
   Sets the current SKU in the PCD database to the value specified by SkuId.  SkuId is returned.
   If SkuId >= PCD_MAX_SKU_ID, then ASSERT(). 
 
-  @param  SkuId   The SKU value that will be used when the PCD service retrieves and sets values
-                  associated with a PCD token.
+  @param  SkuId   The SKU value that will be used when the PCD service retrieves 
+                  and sets values associated with a PCD token.
 
   @return  Return the SKU ID that just be set.
 
@@ -446,7 +446,7 @@ LibPcdGetExSize (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 8-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT8
@@ -476,7 +476,7 @@ LibPcdSet8 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 16-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT16
@@ -506,7 +506,7 @@ LibPcdSet16 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 32-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT32
@@ -536,7 +536,7 @@ LibPcdSet32 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 64-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT64
@@ -615,7 +615,7 @@ LibPcdSetPtr (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The boolean value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 BOOLEAN
@@ -649,7 +649,7 @@ LibPcdSetBool (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 8-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT8
@@ -686,7 +686,7 @@ LibPcdSetEx8 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 16-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT16
@@ -721,7 +721,7 @@ LibPcdSetEx16 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 32-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT32
@@ -757,7 +757,7 @@ LibPcdSetEx32 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 64-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT64
@@ -842,7 +842,7 @@ LibPcdSetExPtr (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The Boolean value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 BOOLEAN
@@ -873,9 +873,9 @@ LibPcdSetExBool (
   If Guid is NULL, then the default token space is used.
   If NotificationFunction is NULL, then ASSERT().
 
-  @param[in]  Guid                  The pointer to a 128-bit unique value that designates which 
-                                    namespace to set a value from.  If NULL, then the default 
-                                    token space is used.
+  @param[in]  Guid                  The pointer to a 128-bit unique value that 
+                                    designates which namespace to set a value from.  
+                                    If NULL, then the default token space is used.
   @param[in]  TokenNumber           The PCD token number to monitor.
   @param[in]  NotificationFunction  The function to call when the token 
                                     specified by Guid and TokenNumber is set.

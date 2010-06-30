@@ -5,7 +5,7 @@ Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php.
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -116,10 +116,10 @@ GetFirstHob (
   
   This function searches the first instance of a HOB from the starting HOB pointer. 
   Such HOB should satisfy two conditions: 
-  its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid. 
-  If there does not exist such HOB from the starting HOB pointer, it will return NULL. 
+  its HOB type is EFI_HOB_TYPE_GUID_EXTENSION, and its GUID Name equals to the input Guid. 
+  If such a HOB from the starting HOB pointer does not exist, it will return NULL. 
   Caller is required to apply GET_GUID_HOB_DATA () and GET_GUID_HOB_DATA_SIZE ()
-  to extract the data section and its size info respectively.
+  to extract the data section and its size information, respectively.
   In contrast with macro GET_NEXT_HOB(), this function does not skip the starting HOB pointer
   unconditionally: it returns HobStart back if HobStart itself meets the requirement;
   caller is required to use GET_NEXT_HOB() if it wishes to skip current HobStart.
@@ -158,9 +158,9 @@ GetNextGuidHob (
   This function searches the first instance of a HOB among the whole HOB list. 
   Such HOB should satisfy two conditions:
   its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid.
-  If there does not exist such HOB from the starting HOB pointer, it will return NULL.
+  If such a HOB from the starting HOB pointer does not exist, it will return NULL.
   Caller is required to apply GET_GUID_HOB_DATA () and GET_GUID_HOB_DATA_SIZE ()
-  to extract the data section and its size info respectively.
+  to extract the data section and its size information, respectively.
   
   If the pointer to the HOB list is NULL, then ASSERT().
   If Guid is NULL, then ASSERT().
@@ -213,7 +213,7 @@ GetBootModeHob (
 
   This function builds a HOB for a loaded PE32 module.
   It can only be invoked during PEI phase;
-  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  for DXE phase, it will ASSERT() because PEI HOB is read-only for DXE phase.
   
   If ModuleName is NULL, then ASSERT().
   If there is no additional space for HOB creation, then ASSERT().
@@ -244,7 +244,7 @@ BuildModuleHob (
 
   This function builds a HOB that describes a chunk of system memory.
   It can only be invoked during PEI phase;
-  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  for DXE phase, it will ASSERT() because PEI HOB is read-only for DXE phase.
   
   If there is no additional space for HOB creation, then ASSERT().
 
@@ -276,8 +276,8 @@ BuildResourceDescriptorHob (
   This function builds a customized HOB tagged with a GUID for identification 
   and returns the start address of GUID HOB data so that caller can fill the customized data. 
   The HOB Header and Name field is already stripped.
-  It can only be invoked during PEI phase;
-  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  It can only be invoked during PEI phase.
+  For DXE phase, it will ASSERT() because PEI HOB is read-only for DXE phase.
   
   If Guid is NULL, then ASSERT().
   If there is no additional space for HOB creation, then ASSERT().
@@ -309,10 +309,10 @@ BuildGuidHob (
 
   This function builds a customized HOB tagged with a GUID for identification and copies the input
   data to the HOB data field and returns the start address of the GUID HOB data.  It can only be 
-  invoked during PEI phase; for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.  
+  invoked during PEI phase; for DXE phase, it will ASSERT() because PEI HOB is read-only for DXE phase.  
   The HOB Header and Name field is already stripped.
-  It can only be invoked during PEI phase;
-  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  It can only be invoked during PEI phase.
+  For DXE phase, it will ASSERT() because PEI HOB is read-only for DXE phase.
   
   If Guid is NULL, then ASSERT().
   If Data is NULL and DataLength > 0, then ASSERT().
@@ -346,7 +346,7 @@ BuildGuidDataHob (
 
   This function builds a Firmware Volume HOB.
   It can only be invoked during PEI phase;
-  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  for DXE phase, it will ASSERT() because PEI HOB is read-only for DXE phase.
   
   If there is no additional space for HOB creation, then ASSERT().
 
@@ -372,7 +372,7 @@ BuildFvHob (
 
   This function builds a EFI_HOB_TYPE_FV2 HOB.
   It can only be invoked during PEI phase;
-  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  for DXE phase, it will ASSERT() because PEI HOB is read-only for DXE phase.
   
   If there is no additional space for HOB creation, then ASSERT().
 
@@ -399,7 +399,7 @@ BuildFv2Hob (
 
   This function builds a Capsule Volume HOB.
   It can only be invoked during PEI phase;
-  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  for DXE phase, it will ASSERT() because PEI HOB is read-only for DXE phase.
   
   If the platform does not support Capsule Volume HOBs, then ASSERT().
   If there is no additional space for HOB creation, then ASSERT().
@@ -426,7 +426,7 @@ BuildCvHob (
 
   This function builds a HOB for the CPU.
   It can only be invoked during PEI phase;
-  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  for DXE phase, it will ASSERT() because PEI HOB is read-only for DXE phase.
   
   If there is no additional space for HOB creation, then ASSERT().
 
@@ -452,7 +452,7 @@ BuildCpuHob (
 
   This function builds a HOB for the stack.
   It can only be invoked during PEI phase;
-  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  for DXE phase, it will ASSERT() because PEI HOB is read-only for DXE phase.
   
   If there is no additional space for HOB creation, then ASSERT().
 
@@ -478,7 +478,7 @@ BuildStackHob (
 
   This function builds a HOB for BSP store.
   It can only be invoked during PEI phase;
-  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  for DXE phase, it will ASSERT() because PEI HOB is read-only for DXE phase.
   
   If there is no additional space for HOB creation, then ASSERT().
 
@@ -506,7 +506,7 @@ BuildBspStoreHob (
 
   This function builds a HOB for the memory allocation.
   It can only be invoked during PEI phase;
-  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  for DXE phase, it will ASSERT() because PEI HOB is read-only for DXE phase.
   
   If there is no additional space for HOB creation, then ASSERT().
 

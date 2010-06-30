@@ -222,8 +222,9 @@ MmioReadBuffer64 (
 
 
   @param  StartAddress    The starting address for the MMIO region to be copied to.
-  @param  Length     The size in bytes of the copy.
-  @param  Buffer          The pointer to a system memory buffer containing the data to write.
+  @param  Length          The size in bytes of the copy.
+  @param  Buffer          The pointer to a system memory buffer containing the 
+                          data to write.
 
   @return Buffer
 
@@ -268,8 +269,9 @@ MmioWriteBuffer8 (
   If Buffer is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  StartAddress    The starting address for the MMIO region to be copied to.
-  @param  Length     The size in bytes of the copy.
-  @param  Buffer          The pointer to a system memory buffer containing the data to write.
+  @param  Length          The size in bytes of the copy.
+  @param  Buffer          The pointer to a system memory buffer containing the 
+                          data to write.
 
   @return Buffer
 
@@ -322,8 +324,9 @@ MmioWriteBuffer16 (
   If Buffer is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  StartAddress    The starting address for the MMIO region to be copied to.
-  @param  Length     The size in bytes of the copy.
-  @param  Buffer          The pointer to a system memory buffer containing the data to write.
+  @param  Length          The size in bytes of the copy.
+  @param  Buffer          The pointer to a system memory buffer containing the 
+                          data to write.
 
   @return Buffer
 
@@ -375,8 +378,9 @@ MmioWriteBuffer32 (
   If Buffer is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  StartAddress    The starting address for the MMIO region to be copied to.
-  @param  Length     The size in bytes of the copy.
-  @param  Buffer          The pointer to a system memory buffer containing the data to write.
+  @param  Length          The size in bytes of the copy.
+  @param  Buffer          The pointer to a system memory buffer containing the 
+                          data to write.
 
   @return Buffer
 

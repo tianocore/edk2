@@ -1237,7 +1237,7 @@ MmioAndThenOr8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to read.
+  @param  Address   The MMIO register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1269,7 +1269,7 @@ MmioBitFieldRead8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1310,7 +1310,7 @@ MmioBitFieldWrite8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1351,7 +1351,7 @@ MmioBitFieldOr8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1393,7 +1393,7 @@ MmioBitFieldAnd8 (
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1519,7 +1519,7 @@ MmioAndThenOr16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to read.
+  @param  Address   The MMIO register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1551,7 +1551,7 @@ MmioBitFieldRead16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1592,7 +1592,7 @@ MmioBitFieldWrite16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1633,7 +1633,7 @@ MmioBitFieldOr16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1675,7 +1675,7 @@ MmioBitFieldAnd16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1801,7 +1801,7 @@ MmioAndThenOr32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to read.
+  @param  Address   The MMIO register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1833,7 +1833,7 @@ MmioBitFieldRead32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1874,7 +1874,7 @@ MmioBitFieldWrite32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1915,7 +1915,7 @@ MmioBitFieldOr32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -1957,7 +1957,7 @@ MmioBitFieldAnd32 (
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -2083,7 +2083,7 @@ MmioAndThenOr64 (
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to read.
+  @param  Address   The MMIO register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -2115,7 +2115,7 @@ MmioBitFieldRead64 (
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -2156,7 +2156,7 @@ MmioBitFieldWrite64 (
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -2197,7 +2197,7 @@ MmioBitFieldOr64 (
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
@@ -2239,7 +2239,7 @@ MmioBitFieldAnd64 (
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   MMIO register to write.
+  @param  Address   The MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
                     Range 0..63.
   @param  EndBit    The ordinal of the most significant bit in the bit field.

@@ -63,7 +63,7 @@ typedef struct {
 
   ///
   /// The length of the field 'Position Set Code Length Array Size' in Block Header.
-  /// For UEFI 2.0 de/compression algorithm, mPBit = 4
+  /// For UEFI 2.0 de/compression algorithm, mPBit = 4.
   ///
   UINT8   mPBit;
 } SCRATCH_DATA;
@@ -73,7 +73,7 @@ typedef struct {
 
   Shift mBitBuf NumOfBits left. Read in NumOfBits of bits from source.
 
-  @param  Sd        The global scratch data
+  @param  Sd        The global scratch data.
   @param  NumOfBits The number of bits to shift and read.
 
 **/
@@ -109,10 +109,10 @@ GetBits (
   and Position Set according to code length array.
   If TableBits > 16, then ASSERT ().
 
-  @param  Sd        The global scratch data
-  @param  NumOfChar The number of symbols in the symbol set
-  @param  BitLen    Code length array
-  @param  TableBits The width of the mapping table
+  @param  Sd        The global scratch data.
+  @param  NumOfChar The number of symbols in the symbol set.
+  @param  BitLen    Code length array.
+  @param  TableBits The width of the mapping table.
   @param  Table     The table to be created.
 
   @retval  0 OK.
@@ -133,7 +133,7 @@ MakeTable (
 
   Get a position value according to Position Huffman Table.
 
-  @param  Sd the global scratch data
+  @param  Sd The global scratch data.
 
   @return The position value decoded.
 
@@ -172,7 +172,7 @@ ReadPTLen (
   Read in and decode the Char&Len Set Code Length Array, then
   generate the Huffman Code mapping table for the Char&Len Set.
 
-  @param  Sd the global scratch data
+  @param  Sd The global scratch data.
 
 **/
 VOID
@@ -200,7 +200,7 @@ DecodeC (
 /**
   Decode the source data and put the resulting data into the destination buffer.
 
-  @param  Sd The global scratch data
+  @param  Sd The global scratch data.
 
 **/
 VOID

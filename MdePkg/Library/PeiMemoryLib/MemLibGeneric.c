@@ -6,7 +6,7 @@
     PeiMemoryLib
     UefiMemoryLib
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,7 +26,7 @@
   @param  Length  The count of 16-bit value to fill.
   @param  Value   The value with which to fill Length bytes of Buffer.
 
-  @return Buffer
+  @return Buffer.
 
 **/
 VOID *
@@ -50,7 +50,7 @@ InternalMemSetMem16 (
   @param  Length  The count of 32-bit value to fill.
   @param  Value   The value with which to fill Length bytes of Buffer.
 
-  @return Buffer
+  @return Buffer.
 
 **/
 VOID *
@@ -74,7 +74,7 @@ InternalMemSetMem32 (
   @param  Length  The count of 64-bit value to fill.
   @param  Value   The value with which to fill Length bytes of Buffer.
 
-  @return Buffer
+  @return Buffer.
 
 **/
 VOID *
@@ -94,10 +94,10 @@ InternalMemSetMem64 (
 /**
   Set Buffer to 0 for Size bytes.
 
-  @param  Buffer Memory to set.
+  @param  Buffer The memory to set.
   @param  Length The number of bytes to set
 
-  @return Buffer
+  @return Buffer.
 
 **/
 VOID *
@@ -113,9 +113,9 @@ InternalMemZeroMem (
 /**
   Compares two memory buffers of a given length.
 
-  @param  DestinationBuffer First memory buffer
-  @param  SourceBuffer      Second memory buffer
-  @param  Length            Length of DestinationBuffer and SourceBuffer memory
+  @param  DestinationBuffer The first memory buffer
+  @param  SourceBuffer      The second memory buffer
+  @param  Length            The length of DestinationBuffer and SourceBuffer memory
                             regions to compare. Must be non-zero.
 
   @return 0                 All Length bytes of the two buffers are identical.
@@ -147,7 +147,7 @@ InternalMemCompareMem (
   @param  Length  The count of 8-bit value to scan. Must be non-zero.
   @param  Value   The value to search for in the target buffer.
 
-  @return The pointer to the first occurrence or NULL if not found.
+  @return The pointer to the first occurrence, or NULL if not found.
 
 **/
 CONST VOID *
@@ -177,7 +177,7 @@ InternalMemScanMem8 (
   @param  Length  The count of 16-bit value to scan. Must be non-zero.
   @param  Value   The value to search for in the target buffer.
 
-  @return The pointer to the first occurrence or NULL if not found.
+  @return The pointer to the first occurrence, or NULL if not found.
 
 **/
 CONST VOID *
@@ -207,7 +207,7 @@ InternalMemScanMem16 (
   @param  Length  The count of 32-bit value to scan. Must be non-zero.
   @param  Value   The value to search for in the target buffer.
 
-  @return The pointer to the first occurrence or NULL if not found.
+  @return The pointer to the first occurrence, or NULL if not found.
 
 **/
 CONST VOID *
@@ -237,7 +237,7 @@ InternalMemScanMem32 (
   @param  Length  The count of 64-bit value to scan. Must be non-zero.
   @param  Value   The value to search for in the target buffer.
 
-  @return The pointer to the first occurrence or NULL if not found.
+  @return The pointer to the first occurrence, or NULL if not found.
 
 **/
 CONST VOID *

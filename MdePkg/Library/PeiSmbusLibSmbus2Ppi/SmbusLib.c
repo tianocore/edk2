@@ -30,13 +30,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                         SMBUS Command, SMBUS Data Length, and PEC.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
-                        RETURN_SUCCESS  The SMBUS command was executed.
-                        RETURN_TIMEOUT  A timeout occurred while executing the SMBUS command.
-                        RETURN_DEVICE_ERROR The request was not completed because a failure
-                        reflected in the Host Status Register bit.  Device errors are a result
-                        of a transaction collision, illegal command field, unclaimed cycle
+                        RETURN_SUCCESS:  The SMBUS command was executed.
+                        RETURN_TIMEOUT:  A timeout occurred while executing the 
+                        SMBUS command.
+                        RETURN_DEVICE_ERROR: The request was not completed because 
+                        a failure reflected in the Host Status Register bit.  
+                        Device errors are a result of a transaction collision, 
+                        illegal command field, unclaimed cycle
                         (host initiated), or bus errors (collisions).
-                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
+                        RETURN_UNSUPPORTED:  The SMBus operation is not supported.
 
 **/
 VOID
@@ -69,13 +71,15 @@ SmBusQuickRead (
                         SMBUS Command, SMBUS Data Length, and PEC.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
-                        RETURN_SUCCESS The SMBUS command was executed.
-                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
-                        RETURN_DEVICE_ERROR  The request was not completed because a failure
-                        reflected in the Host Status Register bit.  Device errors are a result
-                        of a transaction collision, illegal command field, unclaimed cycle
-                        (host initiated), or bus errors (collisions).
-                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
+                        RETURN_SUCCESS: The SMBUS command was executed.
+                        RETURN_TIMEOUT: A timeout occurred while executing the 
+                        SMBUS command.
+                        RETURN_DEVICE_ERROR:  The request was not completed because 
+                        a failure reflected in the Host Status Register bit.  Device 
+                        errors are a result of a transaction collision, illegal 
+                        command field, unclaimed cycle (host initiated), or bus 
+                        errors (collisions).
+                        RETURN_UNSUPPORTED::  The SMBus operation is not supported.
 
 **/
 VOID
@@ -108,14 +112,16 @@ SmBusQuickWrite (
                         SMBUS Command, SMBUS Data Length, and PEC.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
-                        RETURN_SUCCESS The SMBUS command was executed.
-                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
-                        RETURN_DEVICE_ERROR  The request was not completed because a failure
-                        reflected in the Host Status Register bit.  Device errors are a result
-                        of a transaction collision, illegal command field, unclaimed cycle
-                        (host initiated), or bus errors (collisions).
-                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
-                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
+                        RETURN_SUCCESS: The SMBUS command was executed.
+                        RETURN_TIMEOUT: A timeout occurred while executing the 
+                        SMBUS command.
+                        RETURN_DEVICE_ERROR:  The request was not completed because 
+                        a failure reflected in the Host Status Register bit.  
+                        Device errors are a result of a transaction collision, 
+                        illegal command field, unclaimed cycle (host initiated),
+                        or bus errors (collisions).
+                        RETURN_CRC_ERROR:  The checksum is not correct. (PEC is incorrect.)
+                        RETURN_UNSUPPORTED:  The SMBus operation is not supported.
 
   @return The byte received from the SMBUS.
 
@@ -154,14 +160,16 @@ SmBusReceiveByte (
   @param  Value         The 8-bit value to send.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
-                        RETURN_SUCCESS The SMBUS command was executed.
-                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
-                        RETURN_DEVICE_ERROR  The request was not completed because a failure
-                        reflected in the Host Status Register bit.  Device errors are a result
-                        of a transaction collision, illegal command field, unclaimed cycle
-                        (host initiated), or bus errors (collisions).
-                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
-                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
+                        RETURN_SUCCESS: The SMBUS command was executed.
+                        RETURN_TIMEOUT: A timeout occurred while executing the 
+                        SMBUS command.
+                        RETURN_DEVICE_ERROR:  The request was not completed because 
+                        a failure reflected in the Host Status Register bit.  Device 
+                        errors are a result of a transaction collision, illegal 
+                        command field, unclaimed cycle (host initiated), or bus 
+                        errors (collisions).
+                        RETURN_CRC_ERROR:  The checksum is not correct. (PEC is incorrect.)
+                        RETURN_UNSUPPORTED:  The SMBus operation is not supported.
 
   @return The parameter of Value.
 
@@ -200,14 +208,16 @@ SmBusSendByte (
                           SMBUS Command, SMBUS Data Length, and PEC.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
-                        RETURN_SUCCESS The SMBUS command was executed.
-                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
-                        RETURN_DEVICE_ERROR  The request was not completed because a failure
-                        reflected in the Host Status Register bit.  Device errors are a result
-                        of a transaction collision, illegal command field, unclaimed cycle
-                        (host initiated), or bus errors (collisions).
-                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
-                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
+                        RETURN_SUCCESS: The SMBUS command was executed.
+                        RETURN_TIMEOUT: A timeout occurred while executing the 
+                        SMBUS command.
+                        RETURN_DEVICE_ERROR:  The request was not completed because 
+                        a failure reflected in the Host Status Register bit.  
+                        Device errors are a result of a transaction collision, 
+                        illegal command field, unclaimed cycle (host initiated),
+                       or bus errors (collisions).
+                        RETURN_CRC_ERROR:  The checksum is not correct. (PEC is incorrect.)
+                        RETURN_UNSUPPORTED:  The SMBus operation is not supported.
 
   @return The byte read from the SMBUS.
 
@@ -245,14 +255,16 @@ SmBusReadDataByte (
   @param  Value         The 8-bit value to write.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
-                        RETURN_SUCCESS The SMBUS command was executed.
-                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
-                        RETURN_DEVICE_ERROR  The request was not completed because a failure
-                        reflected in the Host Status Register bit.  Device errors are a result
-                        of a transaction collision, illegal command field, unclaimed cycle
-                        (host initiated), or bus errors (collisions).
-                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
-                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
+                        RETURN_SUCCESS: The SMBUS command was executed.
+                        RETURN_TIMEOUT: A timeout occurred while executing the 
+                        SMBUS command.
+                        RETURN_DEVICE_ERROR:  The request was not completed because 
+                        a failure reflected in the Host Status Register bit.  
+                        Device errors are a result of a transaction collision, 
+                        illegal command field, unclaimed cycle (host initiated),
+                        or bus errors (collisions).
+                        RETURN_CRC_ERROR:  The checksum is not correct. (PEC is incorrect.)
+                        RETURN_UNSUPPORTED:  The SMBus operation is not supported.
 
   @return The parameter of Value.
 
@@ -290,14 +302,16 @@ SmBusWriteDataByte (
                         SMBUS Command, SMBUS Data Length, and PEC.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
-                        RETURN_SUCCESS The SMBUS command was executed.
-                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
-                        RETURN_DEVICE_ERROR  The request was not completed because a failure
-                        reflected in the Host Status Register bit.  Device errors are a result
-                        of a transaction collision, illegal command field, unclaimed cycle
-                        (host initiated), or bus errors (collisions).
-                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
-                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
+                        RETURN_SUCCESS: The SMBUS command was executed.
+                        RETURN_TIMEOUT: A timeout occurred while executing the 
+                        SMBUS command.
+                        RETURN_DEVICE_ERROR:  The request was not completed because 
+                        a failure reflected in the Host Status Register bit.  
+                        Device errors are a result of a transaction collision, 
+                        illegal command field, unclaimed cycle (host initiated),
+                        or bus errors (collisions).
+                        RETURN_CRC_ERROR:  The checksum is not correct. (PEC is incorrect.)
+                        RETURN_UNSUPPORTED:  The SMBus operation is not supported.
 
   @return The byte read from the SMBUS.
 
@@ -335,14 +349,16 @@ SmBusReadDataWord (
   @param  Value         The 16-bit value to write.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
-                        RETURN_SUCCESS The SMBUS command was executed.
-                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
-                        RETURN_DEVICE_ERROR  The request was not completed because a failure
-                        reflected in the Host Status Register bit.  Device errors are a result
-                        of a transaction collision, illegal command field, unclaimed cycle
-                        (host initiated), or bus errors (collisions).
-                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
-                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
+                        RETURN_SUCCESS: The SMBUS command was executed.
+                        RETURN_TIMEOUT: A timeout occurred while executing the 
+                        SMBUS command.
+                        RETURN_DEVICE_ERROR:  The request was not completed because 
+                        a failure reflected in the Host Status Register bit.  
+                        Device errors are a result of a transaction collision, 
+                        illegal command field, unclaimed cycle (host initiated),
+                        or bus errors (collisions).
+                        RETURN_CRC_ERROR:  The checksum is not correct. (PEC is incorrect.)
+                        RETURN_UNSUPPORTED:  The SMBus operation is not supported.
 
   @return The parameter of Value.
 
@@ -382,14 +398,16 @@ SmBusWriteDataWord (
   @param  Value         The 16-bit value to write.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
-                        RETURN_SUCCESS The SMBUS command was executed.
-                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
-                        RETURN_DEVICE_ERROR  The request was not completed because a failure
-                        reflected in the Host Status Register bit.  Device errors are a result
-                        of a transaction collision, illegal command field, unclaimed cycle
-                        (host initiated), or bus errors (collisions).
-                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
-                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
+                        RETURN_SUCCESS: The SMBUS command was executed.
+                        RETURN_TIMEOUT: A timeout occurred while executing the 
+                        SMBUS command.
+                        RETURN_DEVICE_ERROR:  The request was not completed because 
+                        a failure reflected in the Host Status Register bit.  
+                        Device errors are a result of a transaction collision, 
+                        illegal command field, unclaimed cycle (host initiated),
+                        or bus errors (collisions).
+                        RETURN_CRC_ERROR:  The checksum is not correct. (PEC is incorrect.)
+                        RETURN_UNSUPPORTED:  The SMBus operation is not supported.
 
   @return The 16-bit value returned by the process call command.
 
@@ -429,14 +447,16 @@ SmBusProcessCall (
   @param  Buffer        The pointer to the buffer to store the bytes read from the SMBUS.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
-                        RETURN_SUCCESS The SMBUS command was executed.
-                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
-                        RETURN_DEVICE_ERROR  The request was not completed because a failure
-                        reflected in the Host Status Register bit.  Device errors are a result
-                        of a transaction collision, illegal command field, unclaimed cycle
-                        (host initiated), or bus errors (collisions).
-                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
-                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
+                        RETURN_SUCCESS: The SMBUS command was executed.
+                        RETURN_TIMEOUT: A timeout occurred while executing the 
+                        SMBUS command.
+                        RETURN_DEVICE_ERROR:  The request was not completed because 
+                        a failure reflected in the Host Status Register bit.  
+                        Device errors are a result of a transaction collision, 
+                        illegal command field, unclaimed cycle (host initiated), 
+                        or bus errors (collisions).
+                        RETURN_CRC_ERROR:  The checksum is not correct. (PEC is incorrect.)
+                        RETURN_UNSUPPORTED:  The SMBus operation is not supported.
 
   @return The number of bytes read.
 
@@ -473,13 +493,15 @@ SmBusReadBlock (
   @param  Buffer        The pointer to the buffer to store the bytes read from the SMBUS.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
-                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
-                        RETURN_DEVICE_ERROR  The request was not completed because a failure
-                        reflected in the Host Status Register bit.  Device errors are a result
-                        of a transaction collision, illegal command field, unclaimed cycle
-                        (host initiated), or bus errors (collisions).
-                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
-                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
+                        RETURN_TIMEOUT: A timeout occurred while executing the 
+                        SMBUS command.
+                        RETURN_DEVICE_ERROR:  The request was not completed because 
+                        a failure reflected in the Host Status Register bit.  
+                        Device errors are a result of a transaction collision, 
+                        illegal command field, unclaimed cycle (host initiated), 
+                        or bus errors (collisions).
+                        RETURN_CRC_ERROR:  The checksum is not correct (PEC is incorrect)
+                        RETURN_UNSUPPORTED:  The SMBus operation is not supported.
 
   @return The number of bytes written.
 
@@ -523,13 +545,15 @@ SmBusWriteBlock (
   @param  ReadBuffer    The pointer to the buffer of bytes to read from the SMBUS.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
-                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
-                        RETURN_DEVICE_ERROR  The request was not completed because a failure
-                        reflected in the Host Status Register bit.  Device errors are a result
-                        of a transaction collision, illegal command field, unclaimed cycle
-                        (host initiated), or bus errors (collisions).
-                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
-                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
+                        RETURN_TIMEOUT: A timeout occurred while executing the 
+                        SMBUS command.
+                        RETURN_DEVICE_ERROR:  The request was not completed because 
+                        a failure reflected in the Host Status Register bit.  
+                        Device errors are a result of a transaction collision, 
+                        illegal command field, unclaimed cycle (host initiated), 
+                        or bus errors (collisions).
+                        RETURN_CRC_ERROR  The checksum is not correct. (PEC is incorrect.)
+                        RETURN_UNSUPPORTED:  The SMBus operation is not supported.
 
   @return The number of bytes written.
 

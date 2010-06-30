@@ -152,7 +152,7 @@ GetFirstHob (
   its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid. 
   If there does not exist such HOB from the starting HOB pointer, it will return NULL. 
   Caller is required to apply GET_GUID_HOB_DATA () and GET_GUID_HOB_DATA_SIZE ()
-  to extract the data section and its size info respectively.
+  to extract the data section and its size information, respectively.
   In contrast with macro GET_NEXT_HOB(), this function does not skip the starting HOB pointer
   unconditionally: it returns HobStart back if HobStart itself meets the requirement;
   caller is required to use GET_NEXT_HOB() if it wishes to skip current HobStart.
@@ -193,7 +193,7 @@ GetNextGuidHob (
   its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid.
   If there does not exist such HOB from the starting HOB pointer, it will return NULL.
   Caller is required to apply GET_GUID_HOB_DATA () and GET_GUID_HOB_DATA_SIZE ()
-  to extract the data section and its size info respectively.
+  to extract the data section and its size information, respectively.
   
   If the pointer to the HOB list is NULL, then ASSERT().
   If Guid is NULL, then ASSERT().

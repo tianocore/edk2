@@ -5,7 +5,7 @@
   EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers, 
   and print messages on the console output and standard error devices.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -55,7 +55,7 @@ CompareIso639LanguageCode (
   If TableGuid is NULL, then ASSERT().
   If Table is NULL, then ASSERT().
 
-  @param  TableGuid       The pointer to table's GUID type..
+  @param  TableGuid       The pointer to table's GUID type.
   @param  Table           The pointer to the table associated with TableGuid in the EFI System Table.
 
   @retval EFI_SUCCESS     A configuration table matching TableGuid was found.
@@ -175,7 +175,7 @@ EfiCreateProtocolNotifyEvent(
   If NotifyTpl is not a legal TPL value, then ASSERT().
   If NotifyFunction is NULL, then ASSERT().
 
-  @param  Name                  Supplies GUID name of the event.
+  @param  Name                  Supplies the GUID name of the event.
   @param  NotifyTpl             Supplies the task priority level of the event notifications.
   @param  NotifyFunction        Supplies the function to notify when the event is signaled.
   @param  NotifyContext         The context parameter to pass to NotifyFunction. 
@@ -246,7 +246,7 @@ EfiNamedEventListen (
   created with EfiNamedEventListen().
   If Name is NULL, then ASSERT().
 
-  @param  Name                  Supplies GUID name of the event.
+  @param  Name                  Supplies the GUID name of the event.
 
   @retval EFI_SUCCESS           A named event was signaled.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resource to signal the named event.
@@ -320,7 +320,7 @@ EfiGetCurrentTpl (
   If Priority is not a valid TPL value, then ASSERT().
 
   @param  Lock       A pointer to the lock data structure to initialize.
-  @param  Priority   EFI TPL associated with the lock.
+  @param  Priority   EFI TPL is associated with the lock.
 
   @return The lock.
 

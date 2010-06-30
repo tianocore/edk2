@@ -444,7 +444,7 @@ LibPcdGetExSize (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 8-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT8
@@ -475,7 +475,7 @@ LibPcdSet8 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 16-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT16
@@ -506,7 +506,7 @@ LibPcdSet16 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 32-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT32
@@ -537,7 +537,7 @@ LibPcdSet32 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 64-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT64
@@ -618,7 +618,7 @@ LibPcdSetPtr (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The boolean value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 BOOLEAN
@@ -653,7 +653,7 @@ LibPcdSetBool (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 8-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT8
@@ -690,7 +690,7 @@ LibPcdSetEx8 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 16-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT16
@@ -727,7 +727,7 @@ LibPcdSetEx16 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 32-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT32
@@ -763,7 +763,7 @@ LibPcdSetEx32 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 64-bit value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 UINT64
@@ -852,7 +852,7 @@ LibPcdSetExPtr (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The Boolean value to set.
 
-  @return Return the value been set.
+  @return Return the value that was set.
 
 **/
 BOOLEAN
@@ -992,7 +992,7 @@ LibPcdGetNextToken (
   If TokenSpaceGuid is NULL, then a pointer to the first PCD token spaces returned.
   If TokenSpaceGuid is the last PCD token space GUID in the list, then NULL is returned.
   
-  @param  TokenSpaceGuid  The pointer to the a PCD token space GUID
+  @param  TokenSpaceGuid  The pointer to the a PCD token space GUID.
 
   @return The next valid token namespace.
 

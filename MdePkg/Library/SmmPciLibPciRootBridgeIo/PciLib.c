@@ -83,7 +83,7 @@ PciLibConstructor (
 
   @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Width   Width of data to read
+  @param  Width   The width of data to read
 
   @return The value read from the PCI configuration register.
 
@@ -117,7 +117,7 @@ SmmPciLibPciRootBridgeIoReadWorker (
 
   @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Width   Width of data to write
+  @param  Width   The width of data to write
   @param  Data    The value to write.
 
   @return The value written to the PCI configuration register.

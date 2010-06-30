@@ -5,7 +5,7 @@
   All assertions for I/O operations are handled in MMIO functions in the IoLib
   Library.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -45,22 +45,22 @@ typedef struct {
 EFI_EVENT                               mDxeRuntimePciExpressLibVirtualNotifyEvent = NULL;
 
 ///
-/// Module global that contains the base physical address of the PCI Express MMIO range
+/// Module global that contains the base physical address of the PCI Express MMIO range.
 ///
 UINTN                                   mDxeRuntimePciExpressLibPciExpressBaseAddress = 0;
 
 ///
-/// The number of PCI devices that have been registered for runtime access
+/// The number of PCI devices that have been registered for runtime access.
 ///
 UINTN                                   mDxeRuntimePciExpressLibNumberOfRuntimeRanges = 0;
 
 ///
-/// The table of PCI devices that have been registered for runtime access
+/// The table of PCI devices that have been registered for runtime access.
 ///
 PCI_EXPRESS_RUNTIME_REGISTRATION_TABLE  *mDxeRuntimePciExpressLibRegistrationTable = NULL;
 
 ///
-/// The table index of the most recent virtual address lookup
+/// The table index of the most recent virtual address lookup.
 ///
 UINTN                                   mDxeRuntimePciExpressLibLastRuntimeRange = 0;
 
@@ -69,8 +69,8 @@ UINTN                                   mDxeRuntimePciExpressLibLastRuntimeRange
   Convert the physical PCI Express MMIO addresses for all registered PCI devices
   to virtual addresses.
 
-  @param[in]    Event   The Event that is being processed
-  @param[in]    Context Event Context
+  @param[in]    Event   The event that is being processed.
+  @param[in]    Context The Event Context.
 **/
 VOID
 EFIAPI

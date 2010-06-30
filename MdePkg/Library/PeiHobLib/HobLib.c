@@ -1,11 +1,11 @@
 /** @file
   Provide Hob Library functions for Pei phase.
 
-Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php.
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -127,7 +127,7 @@ GetFirstHob (
   its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid. 
   If there does not exist such HOB from the starting HOB pointer, it will return NULL. 
   Caller is required to apply GET_GUID_HOB_DATA () and GET_GUID_HOB_DATA_SIZE ()
-  to extract the data section and its size info respectively.
+  to extract the data section and its size information, respectively.
   In contrast with macro GET_NEXT_HOB(), this function does not skip the starting HOB pointer
   unconditionally: it returns HobStart back if HobStart itself meets the requirement;
   caller is required to use GET_NEXT_HOB() if it wishes to skip current HobStart.
@@ -168,7 +168,7 @@ GetNextGuidHob (
   its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid.
   If there does not exist such HOB from the starting HOB pointer, it will return NULL.
   Caller is required to apply GET_GUID_HOB_DATA () and GET_GUID_HOB_DATA_SIZE ()
-  to extract the data section and its size info respectively.
+  to extract the data section and its size information, respectively.
   
   If the pointer to the HOB list is NULL, then ASSERT().
   If Guid is NULL, then ASSERT().
@@ -198,7 +198,7 @@ GetFirstGuidHob (
 
   If the pointer to the HOB list is NULL, then ASSERT().
   
-  @param  VOID
+  @param  VOID.
 
   @return The Boot Mode.
 
@@ -579,7 +579,7 @@ BuildStackHob (
 
   @param  BaseAddress   The 64 bit physical address of the BSP.
   @param  Length        The length of the BSP store in bytes.
-  @param  MemoryType    Type of memory allocated by this HOB.
+  @param  MemoryType    The type of memory allocated by this HOB.
 
 **/
 VOID
@@ -619,7 +619,7 @@ BuildBspStoreHob (
 
   @param  BaseAddress   The 64 bit physical address of the memory.
   @param  Length        The length of the memory allocation in bytes.
-  @param  MemoryType    Type of memory allocated by this HOB.
+  @param  MemoryType    The type of memory allocated by this HOB.
 
 **/
 VOID
