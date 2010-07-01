@@ -158,6 +158,7 @@ Mtftp4SetLastBlockNum (
 
   @param  Head                  The block range list to remove from
   @param  Num                   The block number to remove
+  @param  Completed             Whether Num is the last block number
   @param  TotalBlock            The continuous block number in all 
 
   @retval EFI_NOT_FOUND         The block number isn't in the block range list
@@ -169,6 +170,7 @@ EFI_STATUS
 Mtftp4RemoveBlockNum (
   IN LIST_ENTRY             *Head,
   IN UINT16                 Num,
+  IN BOOLEAN                Completed,
   OUT UINT64                *TotalBlock
   )
 {
@@ -229,7 +231,7 @@ Mtftp4RemoveBlockNum (
 		  Range->Round ++;
       }
 
-      if (Range->Start > Range->End) {
+      if ((Range->Start > Range->End) || Completed) {
         RemoveEntryList (&Range->Link);
         FreePool (Range);
       }

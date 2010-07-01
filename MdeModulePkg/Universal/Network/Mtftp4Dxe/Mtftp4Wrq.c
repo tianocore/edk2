@@ -166,7 +166,7 @@ Mtftp4WrqHandleAck (
   // tell the Mtftp4WrqInput to finish the transfer. This is the last
   // block number if the block range are empty..
   //
-  Mtftp4RemoveBlockNum (&Instance->Blocks, AckNum, &TotalBlock);
+  Mtftp4RemoveBlockNum (&Instance->Blocks, AckNum, *Completed,&TotalBlock);
 
   Expected = Mtftp4GetNextBlockNum (&Instance->Blocks);
 

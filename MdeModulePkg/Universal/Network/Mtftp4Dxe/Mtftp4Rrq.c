@@ -169,7 +169,7 @@ Mtftp4RrqSaveBlock (
   // to accept transfers of unlimited size. So TotalBlock is memorised as 
   // continuous block counter.
   //
-  Status = Mtftp4RemoveBlockNum (&Instance->Blocks, Block, &TotalBlock);
+  Status = Mtftp4RemoveBlockNum (&Instance->Blocks, Block, Completed, &TotalBlock);
 
   if (Status == EFI_NOT_FOUND) {
     return EFI_SUCCESS;
