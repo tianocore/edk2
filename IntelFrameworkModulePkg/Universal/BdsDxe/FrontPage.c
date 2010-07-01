@@ -443,7 +443,7 @@ InitializeFrontPage (
 
     if (FirstFlag) {
       StringBuffer = HiiGetString (HiiHandle, PRINTABLE_LANGUAGE_NAME_STRING_ID, Lang);
-      ASSERT_EFI_ERROR (StringBuffer != NULL);
+      ASSERT (StringBuffer != NULL);
 
       //
       // Save the string Id for each language
