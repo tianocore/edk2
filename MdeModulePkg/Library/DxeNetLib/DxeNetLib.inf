@@ -49,7 +49,7 @@
   HiiLib
   PrintLib
 
-[Guids]  
+[Guids]
   gEfiNicIp4ConfigVariableGuid
 
 [Protocols]
@@ -59,3 +59,4 @@
   gEfiComponentNameProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
   gEfiComponentName2ProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiHiiConfigRoutingProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
