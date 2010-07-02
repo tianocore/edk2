@@ -7,7 +7,7 @@ define /r FindFv()
 }
 .
 
-include /s 'ZZZZZZ/ArmRealViewEbPkg/Debugger_scripts/EfiFuncs.inc'
+include /s 'ZZZZZZ/EfiFuncs.inc'
 error=continue
 unload ,all
 error=abort
