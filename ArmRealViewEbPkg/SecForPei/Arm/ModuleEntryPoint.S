@@ -31,8 +31,7 @@
 .globl ASM_PFX(StartupAddr)
 
 
-ASM_PFX(CEntryPointData):
-  .word ASM_PFX(StartupAddr)
+ASM_PFX(StartupAddr):   .word ASM_PFX(CEntryPoint)
 
 ASM_PFX(_ModuleEntryPoint):
  
@@ -67,8 +66,7 @@ ASM_PFX(_ModuleEntryPoint):
  
   // move sec startup address into a data register
   // ensure we're jumping to FV version of the code (not boot remapped alias)
-  ldr   r5, ASM_PFX(CEntryPointData) // Extra level of indirection fixes Xcode relocation issue
-  ldr   r4, [r5]
+  ldr   r4, ASM_PFX(StartupAddr) // Extra level of indirection fixes Xcode relocation issue
 
   // jump to SEC C code
   blx   r4
