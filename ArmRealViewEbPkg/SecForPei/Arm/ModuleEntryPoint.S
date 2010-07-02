@@ -30,6 +30,10 @@
 .globl ASM_PFX(_ModuleEntryPoint)
 .globl ASM_PFX(StartupAddr)
 
+
+ASM_PFX(CEntryPointData):
+  .word ASM_PFX(StartupAddr)
+
 ASM_PFX(_ModuleEntryPoint):
  
   // Turn off remapping NOR to 0. We can now use DRAM in low memory
@@ -63,13 +67,11 @@ ASM_PFX(_ModuleEntryPoint):
  
   // move sec startup address into a data register
   // ensure we're jumping to FV version of the code (not boot remapped alias)
-#ifndef __APPLE__
-// This does not generate a valid relocation for Xcode. Fix me...
-  ldr   r4, ASM_PFX(StartupAddr)
+  ldr   r5, ASM_PFX(CEntryPointData) // Extra level of indirection fixes Xcode relocation issue
+  ldr   r4, [r5]
 
   // jump to SEC C code
   blx   r4
-#endif
   
 
 ASM_PFX(ShouldNeverGetHere):
