@@ -73,6 +73,10 @@ PcatIsaAcpiDriverBindingSupported (
   EFI_STATUS           Status;
   EFI_PCI_IO_PROTOCOL  *PciIo;
   PCI_TYPE00           Pci;
+  UINTN                SegmentNumber;
+  UINTN                BusNumber;
+  UINTN                DeviceNumber;
+  UINTN                FunctionNumber;
 
   //
   // Get PciIo protocol instance
@@ -110,10 +114,25 @@ PcatIsaAcpiDriverBindingSupported (
         //
         // See if this is an Intel PCI to ISA bridge in Positive Decode Mode
         //
-        if (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA_PDECODE &&
-            Pci.Hdr.VendorId == 0x8086 && 
-            (Pci.Hdr.DeviceId & 0xF000) == 0x7000) {
-          Status = EFI_SUCCESS;
+        if (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA_PDECODE && 
+            Pci.Hdr.VendorId     == 0x8086                          ) {
+          //
+          // See if this is on Function #0 to avoid false positives on 
+          // PCI_CLASS_BRIDGE_OTHER that has the same value as 
+          // PCI_CLASS_BRIDGE_ISA_PDECODE
+          //
+          Status = PciIo->GetLocation (
+                            PciIo, 
+                            &SegmentNumber, 
+                            &BusNumber, 
+                            &DeviceNumber, 
+                            &FunctionNumber
+                            );
+          if (!EFI_ERROR (Status) && FunctionNumber == 0) {
+            Status = EFI_SUCCESS;
+          } else {
+            Status = EFI_UNSUPPORTED;
+          }
         }
       } 
     }
