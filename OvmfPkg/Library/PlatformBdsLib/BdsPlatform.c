@@ -110,6 +110,7 @@ Returns:
 --*/
 {
   DEBUG ((EFI_D_INFO, "PlatformBdsInit\n"));
+  BdsLibSaveMemoryTypeInformation ();
   InstallDevicePathCallback ();
   LoadVideoRom ();
 }
