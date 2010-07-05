@@ -1,7 +1,7 @@
 /** @file
   Data Hub status code worker.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -24,7 +24,7 @@ EFI_EVENT                 mLogDataHubEvent;
 //
 // Cache data hub protocol.
 //
-EFI_DATA_HUB_PROTOCOL     *mDataHubProtocol;
+EFI_DATA_HUB_PROTOCOL     *mDataHubProtocol = NULL;
 
 
 /**
@@ -189,6 +189,7 @@ DataHubStatusCodeReportWorker (
   BASE_LIST                         Marker;
   CHAR8                             *Format;
   UINTN                             CharCount;
+  EFI_STATUS                        Status;
 
   //
   // Use atom operation to avoid the reentant of report.
@@ -205,6 +206,13 @@ DataHubStatusCodeReportWorker (
     return EFI_DEVICE_ERROR;
   }
 
+  if (mDataHubProtocol == NULL) {
+    Status = DataHubStatusCodeInitializeWorker ();
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+  
   Record = AcquireRecordBuffer ();
   if (Record == NULL) {
     //
@@ -358,7 +366,10 @@ DataHubStatusCodeInitializeWorker (
                   NULL, 
                   (VOID **) &mDataHubProtocol
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    mDataHubProtocol = NULL;
+    return Status;
+  }
 
   //
   // Create a Notify Event to log data in Data Hub
