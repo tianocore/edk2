@@ -79,9 +79,8 @@ InitializationDispatcherWorker (
   EFI_STATUS                        Status;
   MEMORY_STATUSCODE_PACKET_HEADER   *PacketHeader;
   MEMORY_STATUSCODE_RECORD          *Record;
-  UINTN                             ExpectedPacketIndex;
   UINTN                             Index;
-  VOID                              *HobStart;
+  UINTN                             MaxRecordNumber;
 
   //
   // If enable UseSerial, then initialize serial port.
@@ -107,54 +106,40 @@ InitializationDispatcherWorker (
     // Journal GUID'ed HOBs to find all record entry, if found, 
     // then output record to support replay device.
     //
-    ExpectedPacketIndex = 0;
     Hob.Raw   = GetFirstGuidHob (&gMemoryStatusCodeRecordGuid);
-    HobStart  = Hob.Raw;
-    while (Hob.Raw != NULL) {
+    if (Hob.Raw != NULL) {
       PacketHeader = (MEMORY_STATUSCODE_PACKET_HEADER *) GET_GUID_HOB_DATA (Hob.Guid);
-      if (PacketHeader->PacketIndex == ExpectedPacketIndex) {
-        Record = (MEMORY_STATUSCODE_RECORD *) (PacketHeader + 1);
-        for (Index = 0; Index < PacketHeader->RecordIndex; Index++) {
-          //
-          // Dispatch records to devices based on feature flag.
-          //
-          if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
-            SerialStatusCodeReportWorker (
-              Record[Index].CodeType,
-              Record[Index].Value,
-              Record[Index].Instance,
-              NULL,
-              NULL
-              );
-          }
-          if (FeaturePcdGet (PcdStatusCodeUseMemory)) {
-            RtMemoryStatusCodeReportWorker (
-              Record[Index].CodeType,
-              Record[Index].Value,
-              Record[Index].Instance,
-              NULL,
-              NULL
-              );
-          }
-        }
-        ExpectedPacketIndex++;
-  
+      Record = (MEMORY_STATUSCODE_RECORD *) (PacketHeader + 1);
+      MaxRecordNumber = (UINTN) PacketHeader->RecordIndex;
+      if (PacketHeader->PacketIndex > 0) {
         //
-        // See whether there is gap of packet or not
+        // Record has been wrapped around. So, record number has arrived at max number.
         //
-        if (HobStart != NULL) {
-          HobStart  = NULL;
-          Hob.Raw   = HobStart;
-          continue;
-        }
-      } else if (HobStart != NULL) {
-        //
-        // Cache the found packet for improve the performance
-        //
-        HobStart = Hob.Raw;
+        MaxRecordNumber = (UINTN) PacketHeader->MaxRecordsNumber;
       }
-  
-      Hob.Raw = GetNextGuidHob (&gMemoryStatusCodeRecordGuid, Hob.Raw);
+      for (Index = 0; Index < MaxRecordNumber; Index++) {
+        //
+        // Dispatch records to devices based on feature flag.
+        //
+        if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
+          SerialStatusCodeReportWorker (
+            Record[Index].CodeType,
+            Record[Index].Value,
+            Record[Index].Instance,
+            NULL,
+            NULL
+            );
+        }
+        if (FeaturePcdGet (PcdStatusCodeUseMemory)) {
+          RtMemoryStatusCodeReportWorker (
+            Record[Index].CodeType,
+            Record[Index].Value,
+            Record[Index].Instance,
+            NULL,
+            NULL
+            );
+        }
+      }
     }
   }
 }

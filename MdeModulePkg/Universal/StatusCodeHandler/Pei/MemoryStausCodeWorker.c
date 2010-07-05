@@ -15,19 +15,19 @@
 #include "StatusCodeHandlerPei.h"
 
 /**
-  Worker function to create one memory status code GUID'ed HOB,
-  using PacketIndex to identify the packet.
+  Create the first memory status code GUID'ed HOB as initialization for memory status code worker.
 
-  @param   PacketIndex    Index of records packet.
-
-  @return  Pointer to the memory status code packet.
+  @retval EFI_SUCCESS  The GUID'ed HOB is created successfully.
 
 **/
-MEMORY_STATUSCODE_PACKET_HEADER *
-CreateMemoryStatusCodePacket (
-  UINT16 PacketIndex
+EFI_STATUS
+MemoryStatusCodeInitializeWorker (
+  VOID
   )
 {
+  //
+  // Create memory status code GUID'ed HOB.
+  //
   MEMORY_STATUSCODE_PACKET_HEADER *PacketHeader;
 
   //
@@ -40,27 +40,8 @@ CreateMemoryStatusCodePacket (
   ASSERT (PacketHeader != NULL);
 
   PacketHeader->MaxRecordsNumber = (PcdGet16 (PcdStatusCodeMemorySize) * 1024) / sizeof (MEMORY_STATUSCODE_RECORD);
-  PacketHeader->PacketIndex      = PacketIndex;
+  PacketHeader->PacketIndex      = 0;
   PacketHeader->RecordIndex      = 0;
-
-  return PacketHeader;
-}
-
-/**
-  Create the first memory status code GUID'ed HOB as initialization for memory status code worker.
-
-  @retval EFI_SUCCESS  The GUID'ed HOB is created successfully.
-
-**/
-EFI_STATUS
-MemoryStatusCodeInitializeWorker (
-  VOID
-  )
-{
-  //
-  // Create first memory status code GUID'ed HOB.
-  //
-  CreateMemoryStatusCodePacket (0);
 
   return EFI_SUCCESS;
 }
@@ -107,48 +88,40 @@ MemoryStatusCodeReportWorker (
   EFI_PEI_HOB_POINTERS              Hob;
   MEMORY_STATUSCODE_PACKET_HEADER   *PacketHeader;
   MEMORY_STATUSCODE_RECORD          *Record;
-  UINT16                            PacketIndex;
-
-  Record      = NULL;
-  PacketIndex = 0;
 
   //
-  // Journal GUID'ed HOBs to find empty record entry. if found, then save status code in it.
-  // otherwise, create a new GUID'ed HOB.
+  // Find GUID'ed HOBs to locate current record buffer. 
   //
   Hob.Raw = GetFirstGuidHob (&gMemoryStatusCodeRecordGuid);
-  while (Hob.Raw != NULL) {
-    PacketHeader = (MEMORY_STATUSCODE_PACKET_HEADER *) GET_GUID_HOB_DATA (Hob.Guid);
+  ASSERT (Hob.Raw != NULL);
 
-    //
-    // Check whether pccket is full or not.
-    //
-    if (PacketHeader->RecordIndex < PacketHeader->MaxRecordsNumber) {
-      Record = (MEMORY_STATUSCODE_RECORD *) (PacketHeader + 1);
-      Record = &Record[PacketHeader->RecordIndex++];
-      break;
-    }
-    //
-    // Cache number of found packet in PacketIndex.
-    //
-    PacketIndex++;
+  PacketHeader = (MEMORY_STATUSCODE_PACKET_HEADER *) GET_GUID_HOB_DATA (Hob.Guid);
+  Record = (MEMORY_STATUSCODE_RECORD *) (PacketHeader + 1);
+  Record = &Record[PacketHeader->RecordIndex++];
 
-    Hob.Raw = GetNextGuidHob (&gMemoryStatusCodeRecordGuid, Hob.Raw);
-  }
-
-  if (Record == NULL) {
-    //
-    // No available entry found, so create new packet.
-    //
-    PacketHeader = CreateMemoryStatusCodePacket (PacketIndex);
-
-    Record = (MEMORY_STATUSCODE_RECORD *) (PacketHeader + 1);
-    Record = &Record[PacketHeader->RecordIndex++];
-  }
-
+  //
+  // Save status code.
+  //
   Record->CodeType = CodeType;
   Record->Instance = Instance;
   Record->Value    = Value;
 
+  //
+  // If record index equals to max record number, then wrap around record index to zero.
+  //
+  // The reader of status code should compare the number of records with max records number,
+  // If it is equal to or larger than the max number, then the wrap-around had happened,
+  // so the first record is pointed by record index.
+  // If it is less then max number, index of the first record is zero.
+  //
+  if (PacketHeader->RecordIndex == PacketHeader->MaxRecordsNumber) {
+    //
+    // Wrap around record index.
+    //
+    PacketHeader->RecordIndex = 0;
+    PacketHeader->PacketIndex ++;
+  }
+
   return EFI_SUCCESS;
 }
+
