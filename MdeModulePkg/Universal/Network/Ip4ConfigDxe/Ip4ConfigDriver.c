@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Ip4Config.h"
 #include "Ip4ConfigNv.h"
+#include "NicIp4Variable.h"
 
 EFI_DRIVER_BINDING_PROTOCOL gIp4ConfigDriverBinding = {
   Ip4ConfigDriverBindingSupported,
@@ -24,42 +25,6 @@ EFI_DRIVER_BINDING_PROTOCOL gIp4ConfigDriverBinding = {
   NULL,
   NULL
 };
-
-/**
-  Stop all the auto configuration when the IP4 configure driver is
-  being unloaded.
-
-  @param  ImageHandle          The driver that is being unloaded
-
-  @retval EFI_SUCCESS          The driver has been ready for unload.
-
-**/
-EFI_STATUS
-EFIAPI
-EfiIp4ConfigUnload (
-  IN EFI_HANDLE             ImageHandle
-  )
-{
-  UINT32      Index;
-
-  //
-  //  Stop all the IP4_CONFIG instances
-  //
-  for (Index = 0; Index < MAX_IP4_CONFIG_IN_VARIABLE; Index++) {
-    if (mIp4ConfigNicList[Index] == NULL) {
-      continue;
-    }
-
-    gIp4ConfigDriverBinding.Stop (
-                              &gIp4ConfigDriverBinding,
-                              mIp4ConfigNicList[Index]->MnpHandle,
-                              0,
-                              NULL
-                              );
-  }
-
-  return NetLibDefaultUnload (ImageHandle);
-}
 
 /**
   The entry point for IP4 config driver which install the driver
@@ -152,11 +117,8 @@ Ip4ConfigDriverBindingStart (
   EFI_HANDLE                    MnpHandle;
   IP4_CONFIG_INSTANCE           *Instance;
   EFI_SIMPLE_NETWORK_MODE       SnpMode;
-  IP4_CONFIG_VARIABLE           *Variable;
   NIC_IP4_CONFIG_INFO           *NicConfig;
-  IP4_CONFIG_VARIABLE           *NewVariable;
   EFI_STATUS                    Status;
-  UINT32                        Index;
   EFI_DEVICE_PATH_PROTOCOL      *ParentDevicePath;
 
   Status = gBS->HandleProtocol (
@@ -218,7 +180,7 @@ Ip4ConfigDriverBindingStart (
   //
   // Allocate an instance then initialize it
   //
-  Instance = AllocatePool (sizeof (IP4_CONFIG_INSTANCE));
+  Instance = AllocateZeroPool (sizeof (IP4_CONFIG_INSTANCE));
 
   if (Instance == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -258,30 +220,15 @@ Ip4ConfigDriverBindingStart (
   //
   // Add it to the global list, and compose the name
   //
-  for (Index = 0; Index < MAX_IP4_CONFIG_IN_VARIABLE; Index++) {
-    if (mIp4ConfigNicList[Index] == NULL) {
-      mIp4ConfigNicList[Index]  = Instance;
-      Instance->NicIndex        = Index;
-
-      if (Instance->NicAddr.Type == NET_IFTYPE_ETHERNET) {
-        UnicodeSPrint (Instance->NicName, (UINTN) IP4_NIC_NAME_LENGTH, L"eth%d", Index);
-      } else {
-        UnicodeSPrint (Instance->NicName, (UINTN) IP4_NIC_NAME_LENGTH, L"unk%d", Index);
-      }
-
-      break;
-    }
-  }
-
-  if (Index == MAX_IP4_CONFIG_IN_VARIABLE) {
-    Status = EFI_OUT_OF_RESOURCES;
+  Status = NetLibGetMacString (Instance->Controller, Instance->Image, &Instance->MacString);
+  if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
 
   Status = Ip4ConfigDeviceInit (Instance);
 
   //
-  // Install the IP4_CONFIG and NIC_IP4CONFIG protocols
+  // Install the IP4_CONFIG protocols
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ControllerHandle,
@@ -291,7 +238,6 @@ Ip4ConfigDriverBindingStart (
                   );
 
   if (EFI_ERROR (Status)) {
-    mIp4ConfigNicList[Index] = NULL;
     goto ON_ERROR;
   }
 
@@ -299,50 +245,27 @@ Ip4ConfigDriverBindingStart (
   // Get the previous configure parameters. If an error happend here,
   // just ignore it because the driver should be able to operate.
   //
-  Variable = Ip4ConfigReadVariable ();
-
-  if (Variable == NULL) {
-    return EFI_SUCCESS;
-  }
-
-  NicConfig = Ip4ConfigFindNicVariable (Variable, &Instance->NicAddr);
-
-  if (NicConfig == NULL) {
-    goto ON_EXIT;
-  }
-
-  //
-  // Don't modify the permant static configuration
-  //
-  if (NicConfig->Perment && (NicConfig->Source == IP4_CONFIG_SOURCE_STATIC)) {
-    goto ON_EXIT;
-  }
-
-  //
-  // Delete the non-permant configuration and remove the previous
-  // acquired DHCP parameters. Only doing DHCP itself is permant
-  //
-  NewVariable = NULL;
-
-  if (!NicConfig->Perment) {
-    NewVariable = Ip4ConfigModifyVariable (Variable, &Instance->NicAddr, NULL);
-
-  } else if (NicConfig->Source == IP4_CONFIG_SOURCE_DHCP) {
-    ZeroMem (&NicConfig->Ip4Info, sizeof (EFI_IP4_IPCONFIG_DATA));
-    NewVariable = Ip4ConfigModifyVariable (Variable, &Instance->NicAddr, NicConfig);
-
-  }
-
-  Ip4ConfigWriteVariable (NewVariable);
-
-  if (NewVariable != NULL) {
-    FreePool (NewVariable);
-  }
-
-ON_EXIT:
-  FreePool (Variable);
-
+  NicConfig = Ip4ConfigReadVariable (Instance);
   if (NicConfig != NULL) {
+    if (NicConfig->Perment) {
+      if (NicConfig->Source == IP4_CONFIG_SOURCE_STATIC) {
+        //
+        // Don't modify the permanent static configuration.
+        //
+      } else if (NicConfig->Source == IP4_CONFIG_SOURCE_DHCP) {
+        //
+        // Remove the previous acquired DHCP parameters.
+        //
+        ZeroMem (&NicConfig->Ip4Info, sizeof (EFI_IP4_IPCONFIG_DATA));
+        Ip4ConfigWriteVariable (Instance, NicConfig);
+      }
+    } else {
+      //
+      // Delete the non-permanent configuration.
+      //
+      Ip4ConfigWriteVariable (Instance, NULL);
+    }
+
     FreePool (NicConfig);
   }
 
@@ -505,10 +428,12 @@ Ip4ConfigDriverBindingStop (
     Instance->MnpHandle = NULL;
   }
 
+  if (Instance->MacString != NULL) {
+    FreePool (Instance->MacString);
+  }
+
   Ip4ConfigCleanConfig (Instance);
-  mIp4ConfigNicList[Instance->NicIndex] = NULL;
   FreePool (Instance);
 
   return EFI_SUCCESS;
 }
-

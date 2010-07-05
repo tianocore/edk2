@@ -26,6 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/ServiceBinding.h>
 
 #include <Guid/MdeModuleHii.h>
+#include <Guid/NicIp4ConfigNvData.h>
 
 #include <Library/DevicePathLib.h>
 #include <Library/DebugLib.h>
@@ -41,8 +42,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DpcLib.h>
 #include <Library/UefiHiiServicesLib.h>
 
-#include "NicIp4Variable.h"
-
 typedef struct _IP4_CONFIG_INSTANCE IP4_CONFIG_INSTANCE;
 
 //
@@ -52,7 +51,6 @@ extern EFI_DRIVER_BINDING_PROTOCOL     gIp4ConfigDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL     gIp4ConfigComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL    gIp4ConfigComponentName2;
 
-extern IP4_CONFIG_INSTANCE             *mIp4ConfigNicList[MAX_IP4_CONFIG_IN_VARIABLE];
 extern EFI_IP4_CONFIG_PROTOCOL         mIp4ConfigProtocolTemplate;
 
 #define IP4_PROTO_ICMP                 0x01
@@ -122,8 +120,7 @@ struct _IP4_CONFIG_INSTANCE {
   // Identity of this interface and some configuration info.
   //
   NIC_ADDR                        NicAddr;
-  UINT16                          NicName[IP4_NIC_NAME_LENGTH];
-  UINT32                          NicIndex;
+  CHAR16                          *MacString;
   NIC_IP4_CONFIG_INFO             *NicConfig;
 
   //
@@ -173,28 +170,18 @@ EfiNicIp4ConfigSetInfo (
   );
 
 /**
-  Get the configure parameter for this NIC.
+  Get the NIC's configure information from the IP4 configure variable.
+  It will remove the invalid variable.
 
-  @param  Instance               The IP4 CONFIG Instance.
-  @param  ConfigLen              The length of the NicConfig buffer.
-  @param  NicConfig              The buffer to receive the NIC's configure
-                                 parameter.
+  @param  Instance               The IP4 CONFIG instance.
 
-  @retval EFI_SUCCESS            The configure parameter for this NIC was
-                                 obtained successfully .
-  @retval EFI_INVALID_PARAMETER  This or ConfigLen is NULL.
-  @retval EFI_NOT_FOUND          There is no configure parameter for the NIC in
-                                 NVRam.
-  @retval EFI_BUFFER_TOO_SMALL   The ConfigLen is too small or the NicConfig is
-                                 NULL.
+  @return NULL if no configure for the NIC in the variable, or it is invalid.
+          Otherwise the pointer to the NIC's IP configure parameter will be returned.
 
 **/
-EFI_STATUS
-EFIAPI
+NIC_IP4_CONFIG_INFO *
 EfiNicIp4ConfigGetInfo (
-  IN  IP4_CONFIG_INSTANCE         *Instance,
-  IN OUT  UINTN                   *ConfigLen,
-  OUT NIC_IP4_CONFIG_INFO         *NicConfig
+  IN  IP4_CONFIG_INSTANCE   *Instance
   );
 
 /**

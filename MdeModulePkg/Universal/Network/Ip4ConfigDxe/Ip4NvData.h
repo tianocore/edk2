@@ -40,7 +40,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// of variable length.
 ///
 typedef struct {
-  UINT16          NicAddr[3];                        ///< NIC MAC address
   UINT8           Configure;                         ///< NIC configure status
   UINT8           DhcpEnable;                        ///< Static or DHCP
   CHAR16          StationAddress[IP4_STR_MAX_SIZE];  ///< IP addresses

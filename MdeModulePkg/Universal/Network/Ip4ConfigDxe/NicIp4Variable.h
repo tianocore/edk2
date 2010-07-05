@@ -1,7 +1,7 @@
 /** @file
   Routines used to operate the Ip4 configure variable.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -14,29 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #ifndef _NIC_IP4_VARIABLE_H_
 #define _NIC_IP4_VARIABLE_H_
-
-#include <Uefi.h>
-
-#include <Guid/NicIp4ConfigNvData.h>
-
-#include <Library/NetLib.h>
-#include <Library/DebugLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-
-///
-/// IP4_CONFIG_VARIABLE is the EFI variable to
-/// save the configuration. IP4_CONFIG_VARIABLE is
-/// of variable length.
-///
-typedef struct {
-  UINT32                    Len;        ///< Total length of the variable
-  UINT16                    CheckSum;   ///< CheckSum, the same as IP4 head checksum
-  UINT32                    Count;      ///< Number of NIC_IP4_CONFIG_INFO follows
-  NIC_IP4_CONFIG_INFO       ConfigInfo;
-} IP4_CONFIG_VARIABLE;
 
 //
 // Return the size of NIC_IP4_CONFIG_INFO and EFI_IP4_IPCONFIG_DATA.
@@ -73,78 +50,48 @@ Ip4ConfigIsValid (
 /**
   Read the ip4 configure variable from the EFI variable.
 
-  None
+  @param  Instance     The IP4 CONFIG instance.
 
-  @return The IP4 configure read if it is there and is valid, otherwise NULL
+  @return The IP4 configure read if it is there and is valid, otherwise NULL.
 
 **/
-IP4_CONFIG_VARIABLE *
+NIC_IP4_CONFIG_INFO *
 Ip4ConfigReadVariable (
-  VOID
+  IN  IP4_CONFIG_INSTANCE   *Instance
   );
 
 /**
   Write the IP4 configure variable to the NVRAM. If Config
   is NULL, remove the variable.
 
-  @param  Config       The IP4 configure data to write
+  @param  Instance     The IP4 CONFIG instance.
+  @param  NicConfig    The IP4 configure data to write.
 
-  @retval EFI_SUCCESS  The variable is written to the NVRam
+  @retval EFI_SUCCESS  The variable is written to the NVRam.
   @retval Others       Failed to write the variable.
 
 **/
 EFI_STATUS
 Ip4ConfigWriteVariable (
-  IN IP4_CONFIG_VARIABLE    *Config        OPTIONAL
+  IN IP4_CONFIG_INSTANCE    *Instance,
+  IN NIC_IP4_CONFIG_INFO    *NicConfig OPTIONAL
   );
 
 /**
-  Locate the IP4 configure parameters from the variable.If a
-  configuration is found, copy it to a newly allocated block
-  of memory to avoid the alignment problem. Caller should
-  release the memory after use.
-
-  @param  Variable     The IP4 configure variable to search in
-  @param  NicAddr      The interface address to check
-
-  @return The point to the NIC's IP4 configure info if it is found
-          in the IP4 variable, otherwise NULL.
+  Reclaim Ip4Config Variables for NIC which has been removed from the platform.
 
 **/
-NIC_IP4_CONFIG_INFO *
-Ip4ConfigFindNicVariable (
-  IN IP4_CONFIG_VARIABLE    *Variable,
-  IN NIC_ADDR               *NicAddr
+VOID
+Ip4ConfigReclaimVariable (
+  VOID
   );
 
 /**
-  Modify the configuration parameter for the NIC in the variable.
-  If Config is NULL, old configuration will be remove from the new
-  variable. Otherwise, append it or replace the old one.
+  Fix the RouteTable pointer in an EFI_IP4_IPCONFIG_DATA structure.
 
-  @param  Variable     The IP4 variable to change
-  @param  NicAddr      The interface to search
-  @param  Config       The new configuration parameter (NULL to remove the old)
-
-  @return The new IP4_CONFIG_VARIABLE variable if the new variable has at
-          least one NIC configure and no EFI_OUT_OF_RESOURCES failure.
-          Return NULL either because failed to locate memory for new variable
-          or the only NIC configure is removed from the Variable.
-
-**/
-IP4_CONFIG_VARIABLE *
-Ip4ConfigModifyVariable (
-  IN IP4_CONFIG_VARIABLE    *Variable     OPTIONAL,
-  IN NIC_ADDR               *NicAddr,
-  IN NIC_IP4_CONFIG_INFO    *Config       OPTIONAL
-  );
-
-/**
-  Fix the RouteTable pointer in an EFI_IP4_IPCONFIG_DATA structure. 
-  
   The pointer is set to be immediately follow the ConfigData if there're entries
   in the RouteTable. Otherwise it is set to NULL.
-  
+
   @param  ConfigData     The IP4 IP configure data.
 
 **/

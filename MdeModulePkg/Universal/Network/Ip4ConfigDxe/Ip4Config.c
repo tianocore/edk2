@@ -1,7 +1,7 @@
 /** @file
   This code implements the IP4Config and NicIp4Config protocols.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -13,43 +13,32 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "Ip4Config.h"
-
-IP4_CONFIG_INSTANCE *mIp4ConfigNicList[MAX_IP4_CONFIG_IN_VARIABLE];
+#include "NicIp4Variable.h"
 
 
 /**
   Get the NIC's configure information from the IP4 configure variable.
   It will remove the invalid variable.
 
-  @param  NicAddr                The NIC to check
+  @param  Instance               The IP4 CONFIG instance.
 
   @return NULL if no configure for the NIC in the variable, or it is invalid.
           Otherwise the pointer to the NIC's IP configure parameter will be returned.
 
 **/
 NIC_IP4_CONFIG_INFO *
-Ip4ConfigGetNicInfo (
-  IN  NIC_ADDR              *NicAddr
+EfiNicIp4ConfigGetInfo (
+  IN  IP4_CONFIG_INSTANCE   *Instance
   )
 {
-  IP4_CONFIG_VARIABLE       *Variable;
-  IP4_CONFIG_VARIABLE       *NewVariable;
-  NIC_IP4_CONFIG_INFO       *Config;
+  NIC_IP4_CONFIG_INFO *NicConfig;
 
   //
-  // Read the configuration parameter for this NicAddr from
+  // Read the configuration parameter for this NIC from
   // the EFI variable
   //
-  Variable = Ip4ConfigReadVariable ();
-
-  if (Variable == NULL) {
-    return NULL;
-  }
-
-  Config = Ip4ConfigFindNicVariable (Variable, NicAddr);
-
-  if (Config == NULL) {
-    FreePool (Variable);
+  NicConfig = Ip4ConfigReadVariable (Instance);
+  if (NicConfig == NULL) {
     return NULL;
   }
 
@@ -57,84 +46,15 @@ Ip4ConfigGetNicInfo (
   // Validate the configuration, if the configuration is invalid,
   // remove it from the variable.
   //
-  if (!Ip4ConfigIsValid (Config)) {
-    NewVariable = Ip4ConfigModifyVariable (Variable, &Config->NicAddr, NULL);
-    Ip4ConfigWriteVariable (NewVariable);
+  if (!Ip4ConfigIsValid (NicConfig)) {
+    Ip4ConfigWriteVariable (Instance, NULL);
 
-    if (NewVariable != NULL) {
-      FreePool (NewVariable);
-    };
-
-    FreePool (Config);
-    Config = NULL;
+    FreePool (NicConfig);
+    NicConfig = NULL;
   }
 
-  FreePool (Variable);
-  return Config;
+  return NicConfig;
 }
-
-
-/**
-  Get the configure parameter for this NIC.
-
-  @param  Instance               The IP4 CONFIG Instance.
-  @param  ConfigLen              The length of the NicConfig buffer.
-  @param  NicConfig              The buffer to receive the NIC's configure
-                                 parameter.
-
-  @retval EFI_SUCCESS            The configure parameter for this NIC was
-                                 obtained successfully .
-  @retval EFI_INVALID_PARAMETER  This or ConfigLen is NULL.
-  @retval EFI_NOT_FOUND          There is no configure parameter for the NIC in
-                                 NVRam.
-  @retval EFI_BUFFER_TOO_SMALL   The ConfigLen is too small or the NicConfig is
-                                 NULL.
-
-**/
-EFI_STATUS
-EFIAPI
-EfiNicIp4ConfigGetInfo (
-  IN  IP4_CONFIG_INSTANCE         *Instance,
-  IN OUT  UINTN                   *ConfigLen,
-  OUT NIC_IP4_CONFIG_INFO         *NicConfig
-  )
-{
-  NIC_IP4_CONFIG_INFO *Config;
-  EFI_STATUS          Status;
-  UINTN               Len;
-
-  if ((Instance == NULL) || (ConfigLen == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Read the Nic's configuration parameter from variable
-  //
-  Config    = Ip4ConfigGetNicInfo (&Instance->NicAddr);
-
-  if (Config == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
-  //
-  // Copy the data to user's buffer
-  //
-  Len = SIZEOF_NIC_IP4_CONFIG_INFO (Config);
-
-  if ((*ConfigLen < Len) || (NicConfig == NULL)) {
-    Status = EFI_BUFFER_TOO_SMALL;
-  } else {
-    Status = EFI_SUCCESS;
-    CopyMem (NicConfig, Config, Len);
-    Ip4ConfigFixRouteTablePointer (&NicConfig->Ip4Info);
-  }
-
-  *ConfigLen = Len;
-
-  FreePool (Config);
-  return Status;
-}
-
 
 /**
   Set the IP configure parameters for this NIC.
@@ -167,9 +87,7 @@ EfiNicIp4ConfigSetInfo (
   IN BOOLEAN                      Reconfig
   )
 {
-  IP4_CONFIG_VARIABLE *Variable;
-  IP4_CONFIG_VARIABLE *NewVariable;
-  EFI_STATUS          Status;
+  EFI_STATUS  Status;
 
   //
   // Validate the parameters
@@ -190,26 +108,7 @@ EfiNicIp4ConfigSetInfo (
   //
   // Update the parameter in the configure variable
   //
-  Variable = Ip4ConfigReadVariable ();
-
-  if ((Variable == NULL) && (NicConfig == NULL)) {
-    return EFI_NOT_FOUND;
-  }
-
-  NewVariable = Ip4ConfigModifyVariable (Variable, &Instance->NicAddr, NicConfig);
-  Status      = Ip4ConfigWriteVariable (NewVariable);
-
-  if (NewVariable != NULL) {
-    FreePool (NewVariable);
-  }
-
-  //
-  // Variable is NULL when saving the first configure parameter
-  //
-  if (Variable != NULL) {
-    FreePool (Variable);
-  }
-
+  Status = Ip4ConfigWriteVariable (Instance, NicConfig);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -420,7 +319,7 @@ EfiIp4ConfigStart (
   Instance->DoneEvent     = DoneEvent;
   Instance->ReconfigEvent = ReconfigEvent;
 
-  Instance->NicConfig     = Ip4ConfigGetNicInfo (&Instance->NicAddr);
+  Instance->NicConfig     = EfiNicIp4ConfigGetInfo (Instance);
 
   if (Instance->NicConfig == NULL) {
     Source = IP4_CONFIG_SOURCE_DHCP;

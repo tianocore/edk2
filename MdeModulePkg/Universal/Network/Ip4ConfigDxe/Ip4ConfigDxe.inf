@@ -21,7 +21,7 @@
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = Ip4ConfigDriverEntryPoint
-  UNLOAD_IMAGE                   = EfiIp4ConfigUnload
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
 #
 # The following information is for reference only and not required by the build tools.
 #
@@ -67,4 +67,4 @@
 
 [Guids]
   gEfiNicIp4ConfigVariableGuid                  ## CONSUMES ## Guid
-  
+
