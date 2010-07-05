@@ -1,7 +1,7 @@
 /** @file
   ARP driver functions.
   
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -53,6 +53,14 @@ ArpCreateService (
   ASSERT (ArpService != NULL);
 
   ArpService->Signature = ARP_SERVICE_DATA_SIGNATURE;
+
+  //
+  // Init the lists.
+  //
+  InitializeListHead (&ArpService->ChildrenList);
+  InitializeListHead (&ArpService->PendingRequestTable);
+  InitializeListHead (&ArpService->DeniedCacheTable);
+  InitializeListHead (&ArpService->ResolvedCacheTable);
 
   //
   // Init the servicebinding protocol members.
@@ -168,17 +176,6 @@ ArpCreateService (
                   TimerPeriodic,
                   ARP_PERIODIC_TIMER_INTERVAL
                   );
-  if (EFI_ERROR (Status)) {
-    goto ERROR_EXIT;
-  }
-
-  //
-  // Init the lists.
-  //
-  InitializeListHead (&ArpService->ChildrenList);
-  InitializeListHead (&ArpService->PendingRequestTable);
-  InitializeListHead (&ArpService->DeniedCacheTable);
-  InitializeListHead (&ArpService->ResolvedCacheTable);
 
 ERROR_EXIT:
 
