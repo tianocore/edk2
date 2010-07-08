@@ -376,6 +376,7 @@ MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
+  ArmRealViewEbPkg/FvbDxe/FvbDxe.inf
   ArmRealViewEbPkg/InterruptDxe/InterruptDxe.inf
   ArmRealViewEbPkg/TimerDxe/TimerDxe.inf
 
