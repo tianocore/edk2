@@ -193,10 +193,11 @@ PxeBcParseCachedDhcpPacket (
     // RFC 2132, Section 9.5 does not strictly state Bootfile name (option 67) is null 
     // terminated string. So force to append null terminated character at the end of string.
     //
-    ASSERT (Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL);
-    Ptr8 =  (UINT8*)&Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Data[0];
-    Ptr8 += Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Length;
-    *Ptr8 =  '\0';
+    if (Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL) {
+      Ptr8 =  (UINT8*)&Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Data[0];
+      Ptr8 += Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Length;
+      *Ptr8 =  '\0';
+    }
 
   } else if ((Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] == NULL) &&
             (Offer->Dhcp4.Header.BootFileName[0] != 0)) {
