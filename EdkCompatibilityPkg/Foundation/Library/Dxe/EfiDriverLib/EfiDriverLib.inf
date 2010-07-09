@@ -55,6 +55,10 @@ COMPONENT_TYPE  = LIBRARY
 [sources.ebc]
   Ebc/PerformancePrimitives.c
 
+[sources.ARM]
+  Ebc/PerformancePrimitives.c
+
+
 [includes.common]
   $(EDK_SOURCE)/Foundation
   $(EDK_SOURCE)/Foundation/Framework
@@ -84,5 +88,6 @@ COMPONENT_TYPE  = LIBRARY
 
 [libraries.ipf]
   CpuIA64Lib
+  
 
 [nmake.common]

@@ -68,6 +68,13 @@ COMPONENT_TYPE  = LIBRARY
 #  X64/EfiZeroMem.asm
   Math.c
 
+[sources.ARM]
+  EfiCopyMem.c
+  EfiSetMem.c
+  EfiZeroMem.c
+  Math.c
+
+
 [includes.common]
   $(EDK_SOURCE)/Foundation
   $(EDK_SOURCE)/Foundation/Framework

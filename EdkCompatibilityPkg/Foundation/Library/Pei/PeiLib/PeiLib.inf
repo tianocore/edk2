@@ -72,7 +72,9 @@ COMPONENT_TYPE    = LIBRARY
   Ipf/HwAccess.s
   Ipf/PeiServicePointer.c
   
-  
+[sources.ARM]
+  Arm/PerformancePrimitives.c
+    
 [libraries.common]
   EdkGuidLib
   EfiCommonLib

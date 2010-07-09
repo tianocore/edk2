@@ -27,6 +27,7 @@ Abstract:
 #ifndef _LINKED_LIST_H_
 #define _LINKED_LIST_H_
 
+#ifndef _SHELL_LINKED_LIST_H_
 
 typedef struct _EFI_LIST_ENTRY {
   struct _EFI_LIST_ENTRY  *ForwardLink;
@@ -307,4 +308,5 @@ Returns:
 --*/
 ;
 
+#endif
 #endif

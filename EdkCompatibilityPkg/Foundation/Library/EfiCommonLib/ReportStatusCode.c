@@ -332,8 +332,12 @@ Returns:
   // The first 12 * UINTN bytes of the string are really an 
   // arguement stack to support varargs on the Format string.
   //
+#ifdef EFIARM
+  // It is not legal C code to case VA_LIST to a pointer. VA_LIST can 
+  // be a structure. 
+#else
   *Marker = (VA_LIST) (DebugInfo + 1);
   *Format = (CHAR8 *)(((UINT64 *)*Marker) + 12);
-
+#endif
   return TRUE;
 }
