@@ -1188,11 +1188,6 @@ GraphicsConsoleConOutSetMode (
   UgaDraw   = Private->UgaDraw;
   ModeData  = &(Private->ModeData[ModeNumber]);
 
-  if (ModeData->Columns <= 0 && ModeData->Rows <= 0) {
-    Status = EFI_UNSUPPORTED;
-    goto Done;
-  }
-
   //
   // Make sure the requested mode number is supported
   //
@@ -1951,7 +1946,7 @@ InitializeGraphicsConsole (
 
   //
   // Register notify function on HII Database Protocol to add font package.
-  // 
+  //
   EfiCreateProtocolNotifyEvent (
     &gEfiHiiDatabaseProtocolGuid,
     TPL_CALLBACK,
