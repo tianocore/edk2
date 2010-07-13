@@ -315,6 +315,7 @@ MtrrGetMemoryAttributeInVariableMtrr (
 VOID
 EFIAPI
 MtrrDebugPrintAllMtrrs (
+  VOID
   );
 
 /**

@@ -12,60 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <PiSmm.h>
-
-#include <Protocol/SmmCpuIo2.h>
-
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/IoLib.h>
-#include <Library/SmmServicesTableLib.h>
-#include <Library/BaseMemoryLib.h>
-
-#define MAX_IO_PORT_ADDRESS   0xFFFF
-
-//
-// Function Prototypes
-//
-EFI_STATUS
-EFIAPI
-CpuMemoryServiceRead (
-  IN  CONST EFI_SMM_CPU_IO2_PROTOCOL  *This,
-  IN  EFI_SMM_IO_WIDTH                Width,
-  IN  UINT64                          Address,
-  IN  UINTN                           Count,
-  OUT VOID                            *Buffer
-  );
-
-EFI_STATUS
-EFIAPI
-CpuMemoryServiceWrite (
-  IN CONST EFI_SMM_CPU_IO2_PROTOCOL  *This,
-  IN EFI_SMM_IO_WIDTH                Width,
-  IN UINT64                          Address,
-  IN UINTN                           Count,
-  IN VOID                            *Buffer
-  );
-
-EFI_STATUS
-EFIAPI
-CpuIoServiceRead (
-  IN  CONST EFI_SMM_CPU_IO2_PROTOCOL  *This,
-  IN  EFI_SMM_IO_WIDTH                Width,
-  IN  UINT64                          Address,
-  IN  UINTN                           Count,
-  OUT VOID                            *Buffer
-  );
-
-EFI_STATUS
-EFIAPI
-CpuIoServiceWrite (
-  IN CONST EFI_SMM_CPU_IO2_PROTOCOL  *This,
-  IN EFI_SMM_IO_WIDTH                Width,
-  IN UINT64                          Address,
-  IN UINTN                           Count,
-  IN VOID                            *Buffer
-  );
+#include "CpuIo2Smm.h"
 
 //
 // Handle for the SMM CPU I/O Protocol
@@ -104,7 +51,7 @@ UINT8 mStride[] = {
   @param[in]  Address        The base address of the I/O operations.  The caller is 
                              responsible for aligning the Address if required. 
   @param[in]  Count          The number of I/O operations to perform.
-  @param[out] Buffer         For read operations, the destination buffer to store 
+  @param[in]  Buffer         For read operations, the destination buffer to store 
                              the results.  For write operations, the source buffer 
                              from which to write data.
 
@@ -443,7 +390,7 @@ SmmCpuIo2Initialize (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
- {
+{
   EFI_STATUS  Status;
 
   //

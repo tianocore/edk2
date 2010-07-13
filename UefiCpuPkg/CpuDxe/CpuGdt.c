@@ -2,7 +2,7 @@
   C based implemention of IA32 interrupt handling only
   requiring a minimal assembly interrupt entry point.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,14 +26,13 @@
 // Global Descriptor Entry structures
 //
 
-typedef
-struct _GDT_ENTRY {
-  UINT16 limit15_0;
-  UINT16 base15_0;
-  UINT8  base23_16;
-  UINT8  type;
-  UINT8  limit19_16_and_flags;
-  UINT8  base31_24;
+typedef struct _GDT_ENTRY {
+  UINT16 Limit15_0;
+  UINT16 Base15_0;
+  UINT8  Base23_16;
+  UINT8  Type;
+  UINT8  Limit19_16_and_flags;
+  UINT8  Base31_24;
 } GDT_ENTRY;
 
 typedef
@@ -162,11 +161,12 @@ STATIC GDT_ENTRIES GdtTemplate = {
 };
 
 /**
-  Initialize Global Descriptor Table
+  Initialize Global Descriptor Table.
 
 **/
 VOID
 InitGlobalDescriptorTable (
+  VOID
   )
 {
   GDT_ENTRIES *gdt;

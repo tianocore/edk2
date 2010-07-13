@@ -28,6 +28,7 @@
 
 [Sources]
   CpuIo2Smm.c
+  CpuIo2Smm.h
   
 [Packages]
   MdePkg/MdePkg.dec

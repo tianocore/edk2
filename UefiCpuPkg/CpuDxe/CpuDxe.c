@@ -136,7 +136,7 @@ CommonExceptionHandler (
     "!!!! IA32 Exception Type - %08x !!!!\n",
     InterruptType
     ));
-  if (mErrorCodeFlag & (1 << InterruptType)) {
+  if ((mErrorCodeFlag & (1 << InterruptType)) != 0) {
     DEBUG ((
       EFI_D_ERROR,
       "ExceptionData - %08x\n",
@@ -217,7 +217,7 @@ CommonExceptionHandler (
     "!!!! X64 Exception Type - %016lx !!!!\n",
     (UINT64)InterruptType
     ));
-  if (mErrorCodeFlag & (1 << InterruptType)) {
+  if ((mErrorCodeFlag & (1 << InterruptType)) != 0) {
     DEBUG ((
       EFI_D_ERROR,
       "ExceptionData - %016lx\n",
@@ -676,11 +676,11 @@ InitializeMtrrMask (
 }
 
 /**
-  Gets GCD Mem Space type from MTRR Type
+  Gets GCD Mem Space type from MTRR Type.
 
-  This function gets GCD Mem Space type from MTRR Type
+  This function gets GCD Mem Space type from MTRR Type.
 
-  @param  MtrrAttribute  MTRR memory type
+  @param  MtrrAttributes  MTRR memory type
 
   @return GCD Mem Space type
 
@@ -1009,7 +1009,6 @@ RefreshGcdMemoryAttributes (
   Initialize Interrupt Descriptor Table for interrupt handling.
 
 **/
-STATIC
 VOID
 InitInterruptDescriptorTable (
   VOID

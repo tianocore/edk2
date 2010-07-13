@@ -29,7 +29,8 @@
 
 [Sources]
   CpuIoPei.c
-
+  CpuIoPei.h
+  
 [Packages]
   MdePkg/MdePkg.dec
 
