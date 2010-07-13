@@ -1,7 +1,7 @@
 /** @file
   Internal library implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -738,50 +738,43 @@ PciScanBus (
                 );
 
       if (EFI_ERROR (Status)) {
-        if (Func == 0) {
-          //
-          // Skip sub functions, this is not a multi function device
-          //
-          Func = PCI_MAX_FUNC;
-        }
-
         continue;
       }
 
       DEBUG((EFI_D_INFO, "Found DEV(%02d,%02d,%02d)\n", StartBusNumber, Device, Func ));
 
+      //
+      // Get the PCI device information
+      //
+      Status = PciSearchDevice (
+                Bridge,
+                &Pci,
+                StartBusNumber,
+                Device,
+                Func,
+                &PciDevice
+                );
+
+      ASSERT (!EFI_ERROR (Status));
+
+      PciAddress = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0);
+
+      if (!IS_PCI_BRIDGE (&Pci)) {
+        //
+        // PCI bridges will be called later
+        // Here just need for PCI device or PCI to cardbus controller
+        // EfiPciBeforeChildBusEnumeration for PCI Device Node
+        //
+        PreprocessController (
+            PciDevice,
+            PciDevice->BusNumber,
+            PciDevice->DeviceNumber,
+            PciDevice->FunctionNumber,
+            EfiPciBeforeChildBusEnumeration
+            );
+      }
+
       if (FeaturePcdGet (PcdPciBusHotplugDeviceSupport)) {
-        //
-        // Get the PCI device information
-        //
-        Status = PciSearchDevice (
-                  Bridge,
-                  &Pci,
-                  StartBusNumber,
-                  Device,
-                  Func,
-                  &PciDevice
-                  );
-
-        ASSERT (!EFI_ERROR (Status));
-
-        PciAddress = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0);
-
-        if (!IS_PCI_BRIDGE (&Pci)) {
-          //
-          // PCI bridges will be called later
-          // Here just need for PCI device or PCI to cardbus controller
-          // EfiPciBeforeChildBusEnumeration for PCI Device Node
-          //
-          PreprocessController (
-              PciDevice,
-              PciDevice->BusNumber,
-              PciDevice->DeviceNumber,
-              PciDevice->FunctionNumber,
-              EfiPciBeforeChildBusEnumeration
-              );
-        }
-
         //
         // For Pci Hotplug controller devcie only
         //
@@ -976,18 +969,9 @@ PciScanBus (
       } else  {
         //
         // It is device. Check PCI IOV for Bus reservation
-        //
-        if (PciDevice == NULL) {
-          //
-          // No PciDevice found, conitue Scan
-          //
-          continue;
-        }
-        //
         // Go through each function, just reserve the MAX ReservedBusNum for one device
         //
-        if ((PciDevice->AriCapabilityOffset != 0) && ((FeaturePcdGet(PcdSrIovSupport)& EFI_PCI_IOV_POLICY_SRIOV) != 0)) {
-
+        if (PcdGetBool (PcdSrIovSupport) && PciDevice->SrIovCapabilityOffset != 0) {
           if (TempReservedBusNum < PciDevice->ReservedBusNum) {
 
             (*SubBusNumber) = (UINT8)((*SubBusNumber) + PciDevice->ReservedBusNum - TempReservedBusNum);

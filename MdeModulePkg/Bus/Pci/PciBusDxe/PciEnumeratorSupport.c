@@ -328,11 +328,9 @@ GatherDeviceInfo (
   UINTN                           Offset;
   UINTN                           BarIndex;
   PCI_IO_DEVICE                   *PciIoDevice;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
 
-  PciRootBridgeIo = Bridge->PciRootBridgeIo;
   PciIoDevice = CreatePciIoDevice (
-                  PciRootBridgeIo,
+                  Bridge,
                   Pci,
                   Bus,
                   Device,
@@ -370,7 +368,7 @@ GatherDeviceInfo (
   //
   // Parse the SR-IOV VF bars
   //
-  if ((PciIoDevice->SrIovCapabilityOffset != 0) && ((FeaturePcdGet(PcdSrIovSupport)& EFI_PCI_IOV_POLICY_SRIOV) != 0)) {
+  if (PcdGetBool (PcdSrIovSupport) && PciIoDevice->SrIovCapabilityOffset != 0) {
     for (Offset = PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_BAR0, BarIndex = 0;
          Offset <= PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_BAR5;
          BarIndex++) {
@@ -403,16 +401,14 @@ GatherPpbInfo (
   IN UINT8                            Func
   )
 {
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
   PCI_IO_DEVICE                   *PciIoDevice;
   EFI_STATUS                      Status;
   UINT8                           Value;
   EFI_PCI_IO_PROTOCOL             *PciIo;
   UINT8                           Temp;
 
-  PciRootBridgeIo = Bridge->PciRootBridgeIo;
   PciIoDevice = CreatePciIoDevice (
-                  PciRootBridgeIo,
+                  Bridge,
                   Pci,
                   Bus,
                   Device,
@@ -558,12 +554,10 @@ GatherP2CInfo (
   IN UINT8                            Func
   )
 {
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
   PCI_IO_DEVICE                   *PciIoDevice;
 
-  PciRootBridgeIo = Bridge->PciRootBridgeIo;
   PciIoDevice = CreatePciIoDevice (
-                  PciRootBridgeIo,
+                  Bridge,
                   Pci,
                   Bus,
                   Device,
@@ -1415,11 +1409,11 @@ PciIovParseVfBar (
     //
     // Scan all the BARs anyway
     //
-    PciIoDevice->VfPciBar[BarIndex].Offset = (UINT8) Offset;
+    PciIoDevice->VfPciBar[BarIndex].Offset = (UINT16) Offset;
     return Offset + 4;
   }
 
-  PciIoDevice->VfPciBar[BarIndex].Offset = (UINT8) Offset;
+  PciIoDevice->VfPciBar[BarIndex].Offset = (UINT16) Offset;
   if ((Value & 0x01) != 0) {
     //
     // Device I/Os. Impossible
@@ -1905,14 +1899,14 @@ InitializeP2C (
 **/
 PCI_IO_DEVICE *
 CreatePciIoDevice (
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
+  IN PCI_IO_DEVICE                    *Bridge,
   IN PCI_TYPE00                       *Pci,
   IN UINT8                            Bus,
   IN UINT8                            Device,
   IN UINT8                            Func
   )
 {
-  PCI_IO_DEVICE *PciIoDevice;
+  PCI_IO_DEVICE        *PciIoDevice;
   EFI_PCI_IO_PROTOCOL  *PciIo;
   EFI_STATUS           Status;
 
@@ -1923,7 +1917,7 @@ CreatePciIoDevice (
 
   PciIoDevice->Signature        = PCI_IO_DEVICE_SIGNATURE;
   PciIoDevice->Handle           = NULL;
-  PciIoDevice->PciRootBridgeIo  = PciRootBridgeIo;
+  PciIoDevice->PciRootBridgeIo  = Bridge->PciRootBridgeIo;
   PciIoDevice->DevicePath       = NULL;
   PciIoDevice->BusNumber        = Bus;
   PciIoDevice->DeviceNumber     = Device;
@@ -1968,146 +1962,261 @@ CreatePciIoDevice (
     PciIoDevice->IsPciExp = TRUE;
   }
 
-  //
-  // Initialize for PCI IOV
-  //
+  if (PcdGetBool (PcdAriSupport)) {
+    //
+    // Check if the device is an ARI device.
+    //
+    Status = LocatePciExpressCapabilityRegBlock (
+               PciIoDevice,
+               EFI_PCIE_CAPABILITY_ID_ARI,
+               &PciIoDevice->AriCapabilityOffset,
+               NULL
+               );
+    if (!EFI_ERROR (Status)) {
+      //
+      // We need to enable ARI feature before calculate BusReservation,
+      // because FirstVFOffset and VFStride may change after that.
+      //
+      EFI_PCI_IO_PROTOCOL  *ParentPciIo;
+      UINT32               Data32;
 
-  //
-  // Check ARI for function 0 only
-  //
-  Status = LocatePciExpressCapabilityRegBlock (
-             PciIoDevice,
-             EFI_PCIE_CAPABILITY_ID_ARI,
-             &PciIoDevice->AriCapabilityOffset,
-             NULL
-             );
-  if (!EFI_ERROR (Status)) {
-    DEBUG ((
-      EFI_D_INFO,
-      "PCI-IOV B%x.D%x.F%x - ARI Cap offset - 0x%x\n",
-      (UINTN)Bus,
-      (UINTN)Device,
-      (UINTN)Func,
-      (UINTN)PciIoDevice->AriCapabilityOffset
-      ));
+      //
+      // Check if its parent supports ARI forwarding.
+      //
+      ParentPciIo = &Bridge->PciIo;
+      ParentPciIo->Pci.Read (
+                          ParentPciIo, 
+                          EfiPciIoWidthUint32,
+                          Bridge->PciExpressCapabilityOffset + EFI_PCIE_CAPABILITY_DEVICE_CAPABILITIES_2_OFFSET,
+                          1,
+                          &Data32
+                          );
+      if ((Data32 & EFI_PCIE_CAPABILITY_DEVICE_CAPABILITIES_2_ARI_FORWARDING) != 0) {
+        //
+        // ARI forward support in bridge, so enable it.
+        //
+        ParentPciIo->Pci.Read (
+                            ParentPciIo,
+                            EfiPciIoWidthUint32,
+                            Bridge->PciExpressCapabilityOffset + EFI_PCIE_CAPABILITY_DEVICE_CONTROL_2_OFFSET,
+                            1,
+                            &Data32
+                            );
+        if ((Data32 & EFI_PCIE_CAPABILITY_DEVICE_CONTROL_2_ARI_FORWARDING) == 0) {
+          Data32 |= EFI_PCIE_CAPABILITY_DEVICE_CONTROL_2_ARI_FORWARDING;
+          ParentPciIo->Pci.Write (
+                              ParentPciIo,
+                              EfiPciIoWidthUint32,
+                              Bridge->PciExpressCapabilityOffset + EFI_PCIE_CAPABILITY_DEVICE_CONTROL_2_OFFSET,
+                              1,
+                              &Data32
+                              );
+          DEBUG ((
+            EFI_D_INFO,
+            "PCI B%x.D%x.F%x - ARI forwarding enabled\n",
+            (UINTN)Bridge->BusNumber,
+            (UINTN)Bridge->DeviceNumber,
+            (UINTN)Bridge->FunctionNumber
+            ));
+        }
+      }
+
+      DEBUG ((
+        EFI_D_INFO,
+        "PCI ARI B%x.D%x.F%x - ARI Cap offset - 0x%x\n",
+        (UINTN)Bus,
+        (UINTN)Device,
+        (UINTN)Func,
+        (UINTN)PciIoDevice->AriCapabilityOffset
+        ));
+    }
   }
 
-  Status = LocatePciExpressCapabilityRegBlock (
-             PciIoDevice,
-             EFI_PCIE_CAPABILITY_ID_SRIOV,
-             &PciIoDevice->SrIovCapabilityOffset,
-             NULL
-             );
-  if (!EFI_ERROR (Status)) {
-    DEBUG ((
-      EFI_D_INFO,
-      "PCI-IOV B%x.D%x.F%x - SRIOV Cap offset - 0x%x\n",
-      (UINTN)Bus,
-      (UINTN)Device,
-      (UINTN)Func,
-      (UINTN)PciIoDevice->SrIovCapabilityOffset
-      ));
-  }
-
-  Status = LocatePciExpressCapabilityRegBlock (
-             PciIoDevice,
-             EFI_PCIE_CAPABILITY_ID_MRIOV,
-             &PciIoDevice->MrIovCapabilityOffset,
-             NULL
-             );
-  if (!EFI_ERROR (Status)) {
-    DEBUG ((
-      EFI_D_INFO,
-      "PCI-IOV B%x.D%x.F%x - MRIOV Cap offset - 0x%x\n",
-      (UINTN)Bus,
-      (UINTN)Device,
-      (UINTN)Func,
-      (UINTN)PciIoDevice->MrIovCapabilityOffset
-      ));
-  }
-
   //
-  // Calculate SystemPageSize
+  // Initialization for SR-IOV
   //
-  if ((PciIoDevice->SrIovCapabilityOffset != 0) && ((FeaturePcdGet(PcdSrIovSupport)& EFI_PCI_IOV_POLICY_SRIOV) != 0)) {
 
-    PciIo->Pci.Read (
-                 PciIo,
-                 EfiPciIoWidthUint32,
-                 PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_SUPPORTED_PAGE_SIZE,
-                 1,
-                 &PciIoDevice->SystemPageSize
-                 );
-    DEBUG ((EFI_D_INFO, "PCI-IOV B%x.D%x.F%x - SupportedPageSize - 0x%x\n", (UINTN)Bus, (UINTN)Device, (UINTN)Func, PciIoDevice->SystemPageSize));
+  if (PcdGetBool (PcdSrIovSupport)) {
+    Status = LocatePciExpressCapabilityRegBlock (
+               PciIoDevice,
+               EFI_PCIE_CAPABILITY_ID_SRIOV,
+               &PciIoDevice->SrIovCapabilityOffset,
+               NULL
+               );
+    if (!EFI_ERROR (Status)) {
+      UINT16    VFStride;
+      UINT16    FirstVFOffset;
+      UINT16    Data16;
+      UINT32    PFRid;
+      UINT32    LastVF;
 
-    PciIoDevice->SystemPageSize = (PcdGet32 (PcdSrIovSystemPageSize) & PciIoDevice->SystemPageSize);
-    ASSERT (PciIoDevice->SystemPageSize != 0);
+      //
+      // If the SR-IOV device is an ARI device, then Set ARI Capable Hierarchy for the device.
+      //
+      if (PcdGetBool (PcdAriSupport) && PciIoDevice->AriCapabilityOffset != 0) {
+        PciIo->Pci.Read (
+                     PciIo,
+                     EfiPciIoWidthUint16,
+                     PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_CONTROL,
+                     1,
+                     &Data16
+                     );
+        Data16 |= EFI_PCIE_CAPABILITY_ID_SRIOV_CONTROL_ARI_HIERARCHY;
+        PciIo->Pci.Write (
+                     PciIo,
+                     EfiPciIoWidthUint16,
+                     PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_CONTROL,
+                     1,
+                     &Data16
+                     );
+      }
 
-    PciIo->Pci.Write (
-                 PciIo,
-                 EfiPciIoWidthUint32,
-                 PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_SYSTEM_PAGE_SIZE,
-                 1,
-                 &PciIoDevice->SystemPageSize
-                 );
-    DEBUG ((EFI_D_INFO, "PCI-IOV B%x.D%x.F%x - SystemPageSize - 0x%x\n", (UINTN)Bus, (UINTN)Device, (UINTN)Func, PciIoDevice->SystemPageSize));
-    //
-    // Adjust SystemPageSize for Alignment usage later
-    //
-    PciIoDevice->SystemPageSize <<= 12;
+      //
+      // Calculate SystemPageSize
+      //
+
+      PciIo->Pci.Read (
+                   PciIo,
+                   EfiPciIoWidthUint32,
+                   PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_SUPPORTED_PAGE_SIZE,
+                   1,
+                   &PciIoDevice->SystemPageSize
+                   );
+      DEBUG ((
+        EFI_D_INFO,
+        "PCI SR-IOV B%x.D%x.F%x - SupportedPageSize - 0x%x\n",
+        (UINTN)Bus,
+        (UINTN)Device,
+        (UINTN)Func,
+        PciIoDevice->SystemPageSize
+        ));
+
+      PciIoDevice->SystemPageSize = (PcdGet32 (PcdSrIovSystemPageSize) & PciIoDevice->SystemPageSize);
+      ASSERT (PciIoDevice->SystemPageSize != 0);
+
+      PciIo->Pci.Write (
+                   PciIo,
+                   EfiPciIoWidthUint32,
+                   PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_SYSTEM_PAGE_SIZE,
+                   1,
+                   &PciIoDevice->SystemPageSize
+                   );
+      DEBUG ((
+        EFI_D_INFO,
+        "PCI SR-IOV B%x.D%x.F%x - SystemPageSize - 0x%x\n",
+        (UINTN)Bus,
+        (UINTN)Device,
+        (UINTN)Func,
+        PciIoDevice->SystemPageSize
+        ));
+      //
+      // Adjust SystemPageSize for Alignment usage later
+      //
+      PciIoDevice->SystemPageSize <<= 12;
+
+      //
+      // Calculate BusReservation for PCI IOV
+      //
+
+      //
+      // Read First FirstVFOffset, InitialVFs, and VFStride
+      //
+      PciIo->Pci.Read (
+                   PciIo,
+                   EfiPciIoWidthUint16,
+                   PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_FIRSTVF,
+                   1,
+                   &FirstVFOffset
+                   );
+      DEBUG ((
+        EFI_D_INFO,
+        "PCI SR-IOV B%x.D%x.F%x - FirstVFOffset - 0x%x\n",
+        (UINTN)Bus,
+        (UINTN)Device,
+        (UINTN)Func,
+        (UINTN)FirstVFOffset
+        ));
+
+      PciIo->Pci.Read (
+                   PciIo,
+                   EfiPciIoWidthUint16,
+                   PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_INITIALVFS,
+                   1,
+                   &PciIoDevice->InitialVFs
+                   );
+      DEBUG ((
+        EFI_D_INFO,
+        "PCI SR-IOV B%x.D%x.F%x - InitialVFs - 0x%x\n",
+        (UINTN)Bus,
+        (UINTN)Device,
+        (UINTN)Func,
+        (UINTN)PciIoDevice->InitialVFs
+        ));
+
+      PciIo->Pci.Read (
+                   PciIo,
+                   EfiPciIoWidthUint16,
+                   PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_VFSTRIDE,
+                   1,
+                   &VFStride
+                   );
+      DEBUG ((
+        EFI_D_INFO,
+        "PCI SR-IOV B%x.D%x.F%x - VFStride - 0x%x\n",
+        (UINTN)Bus,
+        (UINTN)Device,
+        (UINTN)Func,
+        (UINTN)VFStride
+        ));
+
+      //
+      // Calculate LastVF
+      //
+      PFRid = EFI_PCI_RID(Bus, Device, Func);
+      LastVF = PFRid + FirstVFOffset + (PciIoDevice->InitialVFs - 1) * VFStride;
+
+      //
+      // Calculate ReservedBusNum for this PF
+      //
+      PciIoDevice->ReservedBusNum = (UINT16)(EFI_PCI_BUS_OF_RID (LastVF) - Bus + 1);
+      DEBUG ((
+        EFI_D_INFO,
+        "PCI SR-IOV B%x.D%x.F%x - reserved bus number - 0x%x\n",
+        (UINTN)Bus,
+        (UINTN)Device,
+        (UINTN)Func,
+        (UINTN)PciIoDevice->ReservedBusNum
+        ));
+
+      DEBUG ((
+        EFI_D_INFO,
+        "PCI SR-IOV B%x.D%x.F%x - SRIOV Cap offset - 0x%x\n",
+        (UINTN)Bus,
+        (UINTN)Device,
+        (UINTN)Func,
+        (UINTN)PciIoDevice->SrIovCapabilityOffset
+        ));
+    }
   }
 
-  // Calculate BusReservation for PCI IOV
-  //
-  if ((PciIoDevice->SrIovCapabilityOffset != 0) && ((FeaturePcdGet(PcdSrIovSupport)& EFI_PCI_IOV_POLICY_SRIOV) != 0)) {
-    UINT16    VFStride;
-    UINT16    FirstVFOffset;
-    UINT32    PFRid;
-    UINT32    LastVF;
-
-    //
-    // Read First FirstVFOffset, InitialVFs, and VFStride
-    //
-    PciIo->Pci.Read (
-                 PciIo,
-                 EfiPciIoWidthUint16,
-                 PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_FIRSTVF,
-                 1,
-                 &FirstVFOffset
-                 );
-    DEBUG ((EFI_D_INFO, "PCI-IOV B%x.D%x.F%x - FirstVFOffset - 0x%x\n", (UINTN)Bus, (UINTN)Device, (UINTN)Func, (UINTN)FirstVFOffset));
-
-    PciIo->Pci.Read (
-                 PciIo,
-                 EfiPciIoWidthUint16,
-                 PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_INITIALVFS,
-                 1,
-                 &PciIoDevice->InitialVFs
-                 );
-    DEBUG ((EFI_D_INFO, "PCI-IOV B%x.D%x.F%x - InitialVFs - 0x%x\n", (UINTN)Bus, (UINTN)Device, (UINTN)Func, (UINTN)PciIoDevice->InitialVFs));
-
-    PciIo->Pci.Read (
-                 PciIo,
-                 EfiPciIoWidthUint16,
-                 PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_VFSTRIDE,
-                 1,
-                 &VFStride
-                 );
-    DEBUG ((EFI_D_INFO, "PCI-IOV B%x.D%x.F%x - VFStride - 0x%x\n", (UINTN)Bus, (UINTN)Device, (UINTN)Func, (UINTN)VFStride));
-
-    //
-    // Calculate LastVF
-    //
-    PFRid = EFI_PCI_RID(Bus, Device, Func);
-    LastVF = PFRid + FirstVFOffset + (PciIoDevice->InitialVFs - 1) * VFStride;
-
-    //
-    // Calculate ReservedBusNum for this PF
-    //
-    PciIoDevice->ReservedBusNum = (UINT16)(EFI_PCI_BUS_OF_RID (LastVF) - Bus + 1);
-    DEBUG ((EFI_D_INFO, "PCI-IOV B%x.D%x.F%x - reserved bus number - 0x%x\n", (UINTN)Bus, (UINTN)Device, (UINTN)Func, (UINTN)PciIoDevice->ReservedBusNum));
+  if (PcdGetBool (PcdMrIovSupport)) {
+    Status = LocatePciExpressCapabilityRegBlock (
+               PciIoDevice,
+               EFI_PCIE_CAPABILITY_ID_MRIOV,
+               &PciIoDevice->MrIovCapabilityOffset,
+               NULL
+               );
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((
+        EFI_D_INFO,
+        "PCI MR-IOV B%x.D%x.F%x - MRIOV Cap offset - 0x%x\n",
+        (UINTN)Bus,
+        (UINTN)Device,
+        (UINTN)Func,
+        (UINTN)PciIoDevice->MrIovCapabilityOffset
+        ));
+    }
   }
-
 
   //
   // Initialize the reserved resource list

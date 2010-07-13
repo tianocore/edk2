@@ -1,7 +1,7 @@
 /** @file
   PCI emumeration support functions declaration for PCI Bus module.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -364,7 +364,7 @@ InitializeP2C (
   Create and initiliaze general PCI I/O device instance for
   PCI device/bridge device/hotplug bridge device.
 
-  @param PciRootBridgeIo   Pointer to instance of EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param Bridge            Parent bridge instance.
   @param Pci               Input Pci information block.
   @param Bus               Device Bus NO.
   @param Device            Device device NO.
@@ -375,7 +375,7 @@ InitializeP2C (
 **/
 PCI_IO_DEVICE *
 CreatePciIoDevice (
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
+  IN PCI_IO_DEVICE                    *Bridge,
   IN PCI_TYPE00                       *Pci,
   IN UINT8                            Bus,
   IN UINT8                            Device,
