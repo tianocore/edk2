@@ -37,7 +37,7 @@ GetSubnetMaskPrefixLength (
   //
   // The SubnetMask is in network byte order.
   //
-  ReverseMask = (SubnetMask->Addr[0] << 24) | (SubnetMask->Addr[1] << 16) | (SubnetMask->Addr[2] << 8) | (SubnetMask->Addr[3]);
+  ReverseMask = SwapBytes32 (*(UINT32 *)&SubnetMask[0]);
 
   //
   // Reverse it.

@@ -15,6 +15,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ip4Config.h"
 #include "NicIp4Variable.h"
 
+//
+// Ip4 Config Protocol
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_IP4_CONFIG_PROTOCOL     mIp4ConfigProtocolTemplate = {
+  EfiIp4ConfigStart,
+  EfiIp4ConfigStop,
+  EfiIp4ConfigGetData
+};
 
 /**
   Get the NIC's configure information from the IP4 configure variable.
@@ -650,10 +658,4 @@ Ip4ConfigCleanConfig (
 
   Ip4ConfigCleanDhcp4 (Instance);
 }
-
-EFI_IP4_CONFIG_PROTOCOL     mIp4ConfigProtocolTemplate = {
-  EfiIp4ConfigStart,
-  EfiIp4ConfigStop,
-  EfiIp4ConfigGetData
-};
 

@@ -26,6 +26,60 @@ EFI_DRIVER_BINDING_PROTOCOL gIp4ConfigDriverBinding = {
   NULL
 };
 
+//
+// The intance of template of IP4 Config private data
+//
+IP4_CONFIG_INSTANCE        mIp4ConfigTemplate = {
+  IP4_CONFIG_INSTANCE_SIGNATURE,
+  NULL,
+  NULL,
+  (EFI_DEVICE_PATH_PROTOCOL *) NULL,
+  {
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    NULL,
+    NULL,
+    NULL
+  },
+  NULL,
+  (EFI_DEVICE_PATH_PROTOCOL *) NULL,
+  NULL,
+  {
+    FALSE,
+    FALSE,
+    {
+      0
+    },
+    {
+      0
+    },
+    {
+      0
+    }
+  },
+  0,
+  (EFI_MANAGED_NETWORK_PROTOCOL *) NULL,
+  NULL,
+  NULL,
+  NULL,
+  EFI_NOT_READY,
+  {
+    0,
+    0,
+    {
+      0
+    }
+  },
+  (CHAR16 *) NULL,
+  (NIC_IP4_CONFIG_INFO *) NULL,
+  (EFI_DHCP4_PROTOCOL *) NULL,
+  NULL,
+  NULL
+};
+
 /**
   The entry point for IP4 config driver which install the driver
   binding and component name protocol on its image.
@@ -180,14 +234,13 @@ Ip4ConfigDriverBindingStart (
   //
   // Allocate an instance then initialize it
   //
-  Instance = AllocateZeroPool (sizeof (IP4_CONFIG_INSTANCE));
+  Instance = AllocateCopyPool (sizeof (IP4_CONFIG_INSTANCE), &mIp4ConfigTemplate);
 
   if (Instance == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_ERROR;
   }
 
-  Instance->Signature         = IP4_CONFIG_INSTANCE_SIGNATURE;
   Instance->Controller        = ControllerHandle;
   Instance->Image             = This->DriverBindingHandle;
   Instance->ParentDevicePath  = ParentDevicePath;
@@ -197,15 +250,6 @@ Ip4ConfigDriverBindingStart (
   Instance->State             = IP4_CONFIG_STATE_IDLE;
   Instance->Mnp               = Mnp;
   Instance->MnpHandle         = MnpHandle;
-
-  Instance->DoneEvent         = NULL;
-  Instance->ReconfigEvent     = NULL;
-  Instance->Result            = EFI_NOT_READY;
-  Instance->NicConfig         = NULL;
-
-  Instance->Dhcp4             = NULL;
-  Instance->Dhcp4Handle       = NULL;
-  Instance->Dhcp4Event        = NULL;
 
   Status = Mnp->GetModeData (Mnp, NULL, &SnpMode);
 
