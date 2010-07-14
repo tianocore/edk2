@@ -121,7 +121,7 @@ GasketUint64Uintn (void *api, UINT64 a, UINTN b)
 }
 
 UINT64
-GasketUintnUiny64Uintn (void *api, UINTN a, UINT64 b, UINTN c)
+GasketUintnUint64Uintn (void *api, UINTN a, UINT64 b, UINTN c)
 {
   GASKET_UINTN_UINT64_UINTN func;
   

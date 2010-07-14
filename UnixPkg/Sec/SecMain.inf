@@ -39,6 +39,11 @@
 [Sources.Ia32]  
   Ia32/Gasket.S
   Ia32/Stack.S
+  Ia32/SwitchStack.c
+
+[Sources.X64]  
+  X64/Gasket.S
+  X64/SwitchStack.S
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -84,3 +89,7 @@
    XCODE:*_*_IA32_DLINK_PATH == gcc
    XCODE:*_*_IA32_DLINK_FLAGS == -arch i386 -o $(BIN_DIR)/SecMain -L/usr/X11R6/lib -lXext -lX11 -lIOKit -framework Carbon		
    XCODE:*_*_IA32_ASM_FLAGS == -arch i386 -g
+
+   XCODE:*_*_X64_DLINK_PATH == gcc
+   XCODE:*_*_X64_DLINK_FLAGS == -o $(BIN_DIR)/SecMain -L/usr/X11R6/lib -lXext -lX11 -lIOKit -framework Carbon		
+   XCODE:*_*_X64_ASM_FLAGS == -g

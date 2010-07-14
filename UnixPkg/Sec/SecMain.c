@@ -499,28 +499,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-/**
-  Transfers control to a function starting with a new stack.
-
-  Transfers control to the function specified by EntryPoint using the new stack
-  specified by NewStack and passing in the parameters specified by Context1 and
-  Context2. Context1 and Context2 are optional and may be NULL. The function
-  EntryPoint must never return.
-
-  If EntryPoint is NULL, then ASSERT().
-  If NewStack is NULL, then ASSERT().
-
-  @param  EntryPoint  A pointer to function to call with the new stack.
-  @param  Context1    A pointer to the context to pass into the EntryPoint
-                      function.
-  @param  Context2    A pointer to the context to pass into the EntryPoint
-                      function.
-  @param  NewStack    A pointer to the new stack to use for the EntryPoint
-                      function.
-  @param  NewBsp      A pointer to the new BSP for the EntryPoint on IPF. It's
-                      Reserved on other architectures.
-
-**/
 VOID
 EFIAPI
 PeiSwitchStacks (
@@ -529,33 +507,7 @@ PeiSwitchStacks (
   IN      VOID                      *Context2,  OPTIONAL
   IN      VOID                      *Context3,  OPTIONAL
   IN      VOID                      *NewStack
-  )
-{
-  BASE_LIBRARY_JUMP_BUFFER  JumpBuffer;
-  
-  ASSERT (EntryPoint != NULL);
-  ASSERT (NewStack != NULL);
-
-  //
-  // Stack should be aligned with CPU_STACK_ALIGNMENT
-  //
-  ASSERT (((UINTN)NewStack & (CPU_STACK_ALIGNMENT - 1)) == 0);
-
-  JumpBuffer.Eip = (UINTN)EntryPoint;
-  JumpBuffer.Esp = (UINTN)NewStack - sizeof (VOID*);
-  JumpBuffer.Esp -= sizeof (Context1) + sizeof (Context2) + sizeof(Context3);
-  ((VOID**)JumpBuffer.Esp)[1] = Context1;
-  ((VOID**)JumpBuffer.Esp)[2] = Context2;
-  ((VOID**)JumpBuffer.Esp)[3] = Context3;
-
-  LongJump (&JumpBuffer, (UINTN)-1);
-  
-
-  //
-  // InternalSwitchStack () will never return
-  //
-  ASSERT (FALSE);  
-}
+  );
 
 VOID
 SecLoadFromCore (
@@ -1110,7 +1062,7 @@ PrintLoadAddress (
 {
   fprintf (stderr,
      "0x%08lx Loading %s with entry point 0x%08lx\n",
-     (unsigned long)ImageContext->ImageAddress + ImageContext->SizeOfHeaders,
+     (unsigned long)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders),
      ImageContext->PdbPointer,   
      (unsigned long)ImageContext->EntryPoint
      );
@@ -1171,7 +1123,7 @@ SecPeCoffRelocateImageExtraAction (
     //
     GdbTempFile = fopen (gGdbWorkingFileName, "w");
     if (GdbTempFile != NULL) {
-      fprintf (GdbTempFile, "add-symbol-file %s 0x%x\n", ImageContext->PdbPointer, (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders));
+      fprintf (GdbTempFile, "add-symbol-file %s 0x%x\n", ImageContext->PdbPointer, (unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders));
       fclose (GdbTempFile);
       
       //

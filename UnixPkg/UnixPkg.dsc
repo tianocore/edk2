@@ -27,7 +27,7 @@
   PLATFORM_VERSION               = 0.3
   DSC_ SPECIFICATION             = 0x00010005
   OUTPUT_DIRECTORY               = Build/Unix
-  SUPPORTED_ARCHITECTURES        = IA32
+  SUPPORTED_ARCHITECTURES        = IA32|X64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = UnixPkg/UnixPkg.fdf
@@ -224,7 +224,7 @@
 #       generated for it, but the binary will not be put into any firmware volume.
 #
 ###################################################################################################
-[Components.IA32]
+[Components.common]
   ##
   #  SEC Phase modules
   ##

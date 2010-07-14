@@ -1,1026 +1,458 @@
-#------------------------------------------------------------------------------
-#
-# Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#
-# Abstract:
-#
-# EFI uses a simplified version of the MSFT calling convention, and every one else,
-# Mac OS X, BSD, Linux, uses a different one. We can skip dealing with floating point
-# other than making sure non volatile registers are preserved. 
-#
-#   Register for arguments
-#   MSFT    Every One Else  
-#   ----    --------------
-#   rcx     rdi 
-#   rdx     rsi
-#   r8      rdx
-#   r9      rcx
-#           r8 
-#           r9
-#
-#   Callee saved registers
-#   MSFT    Every One Else  
-#   ----    --------------
-#   rbx     rbx
-#   rbp     rbp
-#   r12-r15 r12-r15
-#   rsi
-#   rdi
-#   xmm6-xmm15
-#
-# cat t.c
-##include <stdio.h>
-##include <sys/stat.h>
-#
-#int chmod (int fd, mode_t len){
-#  long m = (long)fd;
-#}
-#
-#int Gasketchmod (int fd, mode_t len){
-#  return chmod (fd, len);
-#}
-#
-# gcc -arch x86_64  -S t.c
-# cat t.s
-# this gives you the starting point.... 
-#
-#
-#------------------------------------------------------------------------------
-
-#include <ProcessorBind.h>
-
-  .text
-  
-#
-#
-# EFI_UNIX_THUNK_PROTOCOL that gets exported
-#
-#
-  
-#------------------------------------------------------------------------------
-# VOID GasketmsSleep (unsigned long Milliseconds);
-#------------------------------------------------------------------------------    
-.globl _GasketmsSleep
-_GasketmsSleep:
-	pushl	%rbp
-	movq  %rsp, %rbp     # does leave use rbp or rsp???
-  subq  $148, %rsp
-  
-  # save registers the OS X will think are volatile
-  movaps  %xmm6,    -8(%rbp)
-  movaps  %xmm7,   -24(%rbp)
-  movaps  %xmm8,   -40(%rbp)
-  movaps  %xmm9,   -56(%rbp)
-  movaps  %xmm10,  -72(%rbp)
-  movaps  %xmm11,  -88(%rbp)
-  movaps  %xmm12, -104(%rbp)
-  movaps  %xmm13, -120(%rbp)
-  movaps  %xmm14, -136(%rbp)
-  movaps  %xmm15, -152(%rbp)
-  movq    %rsi,   -160(%rbp)
-  movq    %rdi,   -168(%rbp)
-  
-  movq  %rcx, %rdi
-	call	_msSleep
-
-  movaps   -8(%rbp), %xmm6,  
-  movaps  -24(%rbp), %xmm7  
-  movaps  -40(%rbp), %xmm8  
-  movaps  -56(%rbp), %xmm9 
-  movaps  -72(%rbp), %xmm10 
-  movaps  -88(%rbp), %xmm11 
-  movaps -104(%rbp), %xmm12 
-  movaps -120(%rbp), %xmm13 
-  movaps -136(%rbp), %xmm14 
-  movaps -152(%rbp), %xmm15 
-  movq   -160(%rbp), %rsi   
-  movq   -168(%rbp), %rdi   
-	
-  leave
-	ret
-
-
-#------------------------------------------------------------------------------
-# void Gasketexit (int status);
-#------------------------------------------------------------------------------
-.globl  _Gasketexit
-_Gasketexit:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_exit
+	.text
+.globl _GasketVoid
+_GasketVoid:
+LFB2:
+	pushq	%rbp
+LCFI0:
+	movq	%rsp, %rbp
+LCFI1:
+	subq	$32, %rsp
+LCFI2:
+	movq	%rdi, -24(%rbp)
+	movq	-24(%rbp), %rax
+	movq	%rax, -8(%rbp)
+	movq	-8(%rbp), %rdx
+	movl	$0, %eax
+	call	*%rdx
 	leave
 	ret
-
-
-#------------------------------------------------------------------------------
-# void GasketSetTimer (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs));
-#------------------------------------------------------------------------------
-.globl  _GasketSetTimer
-_GasketSetTimer:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$56, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, -16(%ebp)
-	movl	12(%ebp), %eax
-	movl	%eax, -12(%ebp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	-16(%ebp), %eax
-	movl	-12(%ebp), %edx
-	movl	%eax, (%esp)
-	movl	%edx, 4(%esp)
-	call	_SetTimer
+LFE2:
+.globl _GasketUintn
+_GasketUintn:
+LFB3:
+	pushq	%rbp
+LCFI3:
+	movq	%rsp, %rbp
+LCFI4:
+	subq	$32, %rsp
+LCFI5:
+	movq	%rdi, -24(%rbp)
+	movl	%esi, -28(%rbp)
+	movq	-24(%rbp), %rax
+	movq	%rax, -8(%rbp)
+	movl	-28(%rbp), %edi
+	movq	-8(%rbp), %rax
+	call	*%rax
 	leave
 	ret
-
-
-
-#------------------------------------------------------------------------------
-# void GasketGetLocalTime (EFI_TIME *Time);
-#------------------------------------------------------------------------------
-.globl  _GasketGetLocalTime
-_GasketGetLocalTime:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_GetLocalTime
+LFE3:
+.globl _GasketUintnUintn
+_GasketUintnUintn:
+LFB4:
+	pushq	%rbp
+LCFI6:
+	movq	%rsp, %rbp
+LCFI7:
+	subq	$32, %rsp
+LCFI8:
+	movq	%rdi, -24(%rbp)
+	movl	%esi, -28(%rbp)
+	movl	%edx, -32(%rbp)
+	movq	-24(%rbp), %rax
+	movq	%rax, -8(%rbp)
+	movl	-32(%rbp), %esi
+	movl	-28(%rbp), %edi
+	movq	-8(%rbp), %rax
+	call	*%rax
 	leave
 	ret
-
-
-
-#------------------------------------------------------------------------------
-# struct tm *Gasketgmtime (const time_t *clock);
-#------------------------------------------------------------------------------
-.globl  _Gasketgmtime
-_Gasketgmtime:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_gmtime
+LFE4:
+.globl _GasketUintnUintnUintn
+_GasketUintnUintnUintn:
+LFB5:
+	pushq	%rbp
+LCFI9:
+	movq	%rsp, %rbp
+LCFI10:
+	subq	$48, %rsp
+LCFI11:
+	movq	%rdi, -24(%rbp)
+	movl	%esi, -28(%rbp)
+	movl	%edx, -32(%rbp)
+	movl	%ecx, -36(%rbp)
+	movq	-24(%rbp), %rax
+	movq	%rax, -8(%rbp)
+	movl	-36(%rbp), %edx
+	movl	-32(%rbp), %esi
+	movl	-28(%rbp), %edi
+	movq	-8(%rbp), %rax
+	call	*%rax
 	leave
 	ret
-
-
-
-
-#------------------------------------------------------------------------------
-# long GasketGetTimeZone(void);
-#------------------------------------------------------------------------------
-.globl _GasketGetTimeZone
-_GasketGetTimeZone:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$24, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	call	_GetTimeZone
+LFE5:
+.globl _GasketUintnUintnUintnUintn
+_GasketUintnUintnUintnUintn:
+LFB6:
+	pushq	%rbp
+LCFI12:
+	movq	%rsp, %rbp
+LCFI13:
+	subq	$48, %rsp
+LCFI14:
+	movq	%rdi, -24(%rbp)
+	movl	%esi, -28(%rbp)
+	movl	%edx, -32(%rbp)
+	movl	%ecx, -36(%rbp)
+	movl	%r8d, -40(%rbp)
+	movq	-24(%rbp), %rax
+	movq	%rax, -8(%rbp)
+	movl	-40(%rbp), %ecx
+	movl	-36(%rbp), %edx
+	movl	-32(%rbp), %esi
+	movl	-28(%rbp), %edi
+	movq	-8(%rbp), %rax
+	call	*%rax
 	leave
 	ret
-
-
-#------------------------------------------------------------------------------
-# int GasketGetDayLight (void);
-#------------------------------------------------------------------------------
-.globl  _GasketGetDayLight
-_GasketGetDayLight:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$24, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	call	_GetDayLight
+LFE6:
+.globl _GasketUintn10Args
+_GasketUintn10Args:
+LFB7:
+	pushq	%rbp
+LCFI15:
+	movq	%rsp, %rbp
+LCFI16:
+	subq	$80, %rsp
+LCFI17:
+	movq	%rdi, -24(%rbp)
+	movl	%esi, -28(%rbp)
+	movl	%edx, -32(%rbp)
+	movl	%ecx, -36(%rbp)
+	movl	%r8d, -40(%rbp)
+	movl	%r9d, -44(%rbp)
+	movq	-24(%rbp), %rax
+	movq	%rax, -8(%rbp)
+	movl	-44(%rbp), %edx
+	movl	-40(%rbp), %ecx
+	movl	-36(%rbp), %esi
+	movl	-32(%rbp), %edi
+	movl	-28(%rbp), %r10d
+	movl	48(%rbp), %eax
+	movl	%eax, 24(%rsp)
+	movl	40(%rbp), %eax
+	movl	%eax, 16(%rsp)
+	movl	32(%rbp), %eax
+	movl	%eax, 8(%rsp)
+	movl	24(%rbp), %eax
+	movl	%eax, (%rsp)
+	movq	-8(%rbp), %rax
+	movl	16(%rbp), %r9d
+	movl	%edx, %r8d
+	movl	%esi, %edx
+	movl	%edi, %esi
+	movl	%r10d, %edi
+	call	*%rax
 	leave
 	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketpoll (struct pollfd *pfd, int nfds, int timeout);
-#------------------------------------------------------------------------------
-.globl  _Gasketpoll
-_Gasketpoll:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$56, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_poll
+LFE7:
+.globl _GasketUint64Uintn
+_GasketUint64Uintn:
+LFB8:
+	pushq	%rbp
+LCFI18:
+	movq	%rsp, %rbp
+LCFI19:
+	subq	$48, %rsp
+LCFI20:
+	movq	%rdi, -24(%rbp)
+	movq	%rsi, -32(%rbp)
+	movl	%edx, -36(%rbp)
+	movq	-24(%rbp), %rax
+	movq	%rax, -8(%rbp)
+	movl	-36(%rbp), %esi
+	movq	-32(%rbp), %rdi
+	movq	-8(%rbp), %rax
+	call	*%rax
 	leave
 	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketread (int fd, void *buf, int count);
-#------------------------------------------------------------------------------
-.globl  _Gasketread
-_Gasketread:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$56, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_read
+LFE8:
+.globl _GasketUintnUint64Uintn
+_GasketUintnUint64Uintn:
+LFB9:
+	pushq	%rbp
+LCFI21:
+	movq	%rsp, %rbp
+LCFI22:
+	subq	$48, %rsp
+LCFI23:
+	movq	%rdi, -24(%rbp)
+	movl	%esi, -28(%rbp)
+	movq	%rdx, -40(%rbp)
+	movl	%ecx, -44(%rbp)
+	movq	-24(%rbp), %rax
+	movq	%rax, -8(%rbp)
+	movl	-44(%rbp), %edx
+	movq	-40(%rbp), %rsi
+	movl	-28(%rbp), %edi
+	movq	-8(%rbp), %rax
+	call	*%rax
 	leave
 	ret
-
-
-#------------------------------------------------------------------------------
-# int Gasketwrite (int fd, const void *buf, int count);
-#------------------------------------------------------------------------------
-.globl  _Gasketwrite
-_Gasketwrite:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$56, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_write
+LFE9:
+.globl _GasketUintnUint16
+_GasketUintnUint16:
+LFB10:
+	pushq	%rbp
+LCFI24:
+	movq	%rsp, %rbp
+LCFI25:
+	subq	$32, %rsp
+LCFI26:
+	movq	%rdi, -24(%rbp)
+	movl	%esi, -28(%rbp)
+	movw	%dx, -32(%rbp)
+	movq	-24(%rbp), %rax
+	movq	%rax, -8(%rbp)
+	movzwl	-32(%rbp), %esi
+	movl	-28(%rbp), %edi
+	movq	-8(%rbp), %rax
+	call	*%rax
 	leave
 	ret
-
-
-
-#------------------------------------------------------------------------------
-# char *Gasketgetenv (const char *name);
-#------------------------------------------------------------------------------
-.globl  _Gasketgetenv
-_Gasketgetenv:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_getenv
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketopen (const char *name, int flags, int mode);
-#------------------------------------------------------------------------------
-.globl  _Gasketopen
-_Gasketopen:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$56, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_open
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# off_t Gasketlseek (int fd, off_t off, int whence);
-#------------------------------------------------------------------------------
-.globl  _Gasketlseek
-_Gasketlseek:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$56, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movl	%eax, -16(%ebp)
-	movl	16(%ebp), %eax
-	movl	%eax, -12(%ebp)
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	-16(%ebp), %eax
-	movl	-12(%ebp), %edx
-	movl	%eax, 4(%esp)
-	movl	%edx, 8(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_lseek
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketftruncate (int fd, long int len);
-#------------------------------------------------------------------------------
-.globl  _Gasketftruncate
-_Gasketftruncate:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_truncate
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketclose (int fd);
-#------------------------------------------------------------------------------
-.globl  _Gasketclose
-_Gasketclose:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_close
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketmkdir (const char *pathname, mode_t mode);
-#------------------------------------------------------------------------------
-.globl  _Gasketmkdir
-_Gasketmkdir:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_mkdir
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketrmdir (const char *pathname);
-#------------------------------------------------------------------------------
-.globl  _Gasketrmdir
-_Gasketrmdir:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_rmdir
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketunlink (const char *pathname);
-#------------------------------------------------------------------------------
-.globl  _Gasketunlink
-_Gasketunlink:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_unlink
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int GasketGetErrno (void);
-#------------------------------------------------------------------------------
-.globl  _GasketGetErrno
-_GasketGetErrno:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$24, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	call	_GetErrno
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# DIR *Gasketopendir (const char *pathname);
-#------------------------------------------------------------------------------
-.globl  _Gasketopendir
-_Gasketopendir:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_opendir
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# void *Gasketrewinddir (DIR *dir);
-#------------------------------------------------------------------------------
-.globl  _Gasketrewinddir
-_Gasketrewinddir:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_rewinddir
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# struct dirent *Gasketreaddir (DIR *dir);
-#------------------------------------------------------------------------------
-.globl  _Gasketreaddir
-_Gasketreaddir:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_readdir
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketclosedir (DIR *dir);
-#------------------------------------------------------------------------------
-.globl  _Gasketclosedir
-_Gasketclosedir:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_closedir
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketstat (const char *path, struct stat *buf);
-#------------------------------------------------------------------------------
-.globl  _Gasketstat
-_Gasketstat:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_stat
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketstatfs (const char *path, struct statfs *buf);
-#------------------------------------------------------------------------------
-.globl  _Gasketstatfs
-_Gasketstatfs:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_statfs
-	leave
-	ret
-
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketrename (const char *oldpath, const char *newpath);
-#------------------------------------------------------------------------------
-.globl  _Gasketrename
-_Gasketrename:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_rename
-	leave
-	ret
-
-
-
-
-#------------------------------------------------------------------------------
-# time_t Gasketmktime (struct tm *tm);
-#------------------------------------------------------------------------------
-.globl  _Gasketmktime
-_Gasketmktime:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_mktime
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketfsync (int fd);
-#------------------------------------------------------------------------------
-.globl  _Gasketfsync
-_Gasketfsync:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_fsync
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketchmod (const char *path, mode_t mode);
-#------------------------------------------------------------------------------
-.globl  _Gasketchmod
-_Gasketchmod:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$56, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movw	%ax, -12(%ebp)
-	movzwl	-12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_chmod
-	leave
-	ret
-
-#------------------------------------------------------------------------------
-# int Gasketutime (const char *filename, const struct utimbuf *buf);
-#------------------------------------------------------------------------------
-.globl  _Gasketutime
-_Gasketutime:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_rename
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gaskettcflush (int fildes, int queue_selector);
-#------------------------------------------------------------------------------
-.globl  _Gaskettcflush
-_Gaskettcflush:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_rename
-	leave
-	ret
-
-
-#------------------------------------------------------------------------------
-# EFI_STATUS UgaCreate (struct _EFI_UNIX_UGA_IO_PROTOCOL **UgaIo, CONST CHAR16 *Title);
-#------------------------------------------------------------------------------
-.globl _GasketUgaCreate
-_GasketUgaCreate:
-  pushl   %ebp
-  movl    %esp, %ebp
-  subl    $40, %esp         #sub extra 0x10 from the stack for the AND
-  and     $-16, %esp        # stack needs to end in 0xFFFFFFF0 before call
-  movl    12(%ebp), %eax
-  movl    %eax, 4(%esp)
-  movl    8(%ebp), %eax
-  movl    %eax, (%esp)
-  call    _UgaCreate
-  leave
-  ret
-
-
-#------------------------------------------------------------------------------
-# void Gasketperror (__const char *__s);
-#------------------------------------------------------------------------------
-.globl  _Gasketperror
-_Gasketperror:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_perror
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketioctl (int fd, unsigned long int __request, ...);
-#
-# ... is really int or pointer to structure, so we can treat like an int
-#
-#------------------------------------------------------------------------------
-.globl  _Gasketioctl
-_Gasketioctl:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_ioctl
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketfcntl (int __fd, int __cmd, ...);
-#
-# ... is really int or pointer to structure, so we can treat like an int
-#
-#------------------------------------------------------------------------------
-.globl  _Gasketfcntl
-_Gasketfcntl:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_fcntl
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketcfsetispeed (struct termios *__termios_p, speed_t __speed);
-#------------------------------------------------------------------------------
-.globl  _Gasketcfsetispeed
-_Gasketcfsetispeed:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp         # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp        # stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_cfsetispeed
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gasketcfsetospeed (struct termios *__termios_p, speed_t __speed);
-#------------------------------------------------------------------------------
-.globl  _Gasketcfsetospeed
-_Gasketcfsetospeed:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp         # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp        # stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_cfsetospeed
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gaskettcgetattr (int __fd, struct termios *__termios_p); 
-#------------------------------------------------------------------------------
-.globl  _Gaskettcgetattr
-_Gaskettcgetattr:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp         # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp        # stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_tcgetattr
-	leave
-	ret
-
-
-
-#------------------------------------------------------------------------------
-# int Gaskettcsetattr (int __fd, int __optional_actions, __const struct termios *__termios_p);
-#------------------------------------------------------------------------------
-.globl  _Gaskettcsetattr
-_Gaskettcsetattr:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_tcsetattr
-	leave
-	ret
-
-#------------------------------------------------------------------------------
-# int Gasketsigaction (int sig, const struct sigaction *act, struct sigaction *oact);
-#------------------------------------------------------------------------------
-.globl  _Gasketsigaction
-_Gasketsigaction:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_sigaction
-	leave
-	ret
-
-
-#------------------------------------------------------------------------------
-# int Gasketsetcontext (const ucontext_t *ucp);
-#------------------------------------------------------------------------------
-.globl  _Gasketsetcontext
-_Gasketsetcontext:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_setcontext
-	leave
-	ret
-
-#------------------------------------------------------------------------------
-# int Gasketgetcontext (ucontext_t *ucp);
-#------------------------------------------------------------------------------
-.globl  _Gasketgetcontext
-_Gasketgetcontext:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_getcontext
-	leave
-	ret
-
-#------------------------------------------------------------------------------
-# int Gasketsigemptyset (sigset_t *set);
-#------------------------------------------------------------------------------
-.globl  _Gasketsigemptyset
-_Gasketsigemptyset:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp           # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp          # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_sigemptyset
-	leave
-	ret
-
-
-#------------------------------------------------------------------------------
-# int Gasketsigaltstack (const stack_t *ss, stack_t *oss);
-#------------------------------------------------------------------------------
-.globl  _Gasketsigaltstack
-_Gasketsigaltstack:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp         # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp        # stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_sigaltstack
-	leave
-	ret
-
-#
-#
-# UGA Functions that get exported
-#
-#
-
-#------------------------------------------------------------------------------
-# EFI_STATUS GasketUgaClose (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo);
-#------------------------------------------------------------------------------    
-.globl _GasketUgaClose
-_GasketUgaClose:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp        # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp       # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-  movl	%eax, (%esp)
-	call	_UgaClose
-	leave
-	ret
-
-#------------------------------------------------------------------------------
-# EFI_STATUS GasketUgaSize (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, UINT32 Width, UINT32 Height);
-#------------------------------------------------------------------------------
-.globl _GasketUgaSize
-_GasketUgaSize:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp
-	and   $-16, %esp       # stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_UgaSize
-	leave
-	ret
-
-
-#------------------------------------------------------------------------------
-# EFI_STATUS GasketUgaCheckKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo);
-#------------------------------------------------------------------------------    
-.globl _GasketUgaCheckKey
-_GasketUgaCheckKey:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp        # sub extra 0x10 from the stack for the AND
-	and   $-16, %esp       # stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-  movl	%eax, (%esp)
-	call	_UgaCheckKey
-	leave
-	ret
-
-#------------------------------------------------------------------------------
-# EFI_STATUS GasketUgaGetKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_INPUT_KEY *key);
-#------------------------------------------------------------------------------
-.globl _GasketUgaGetKey
-_GasketUgaGetKey:
-  pushl   %ebp
-  movl    %esp, %ebp
-  subl    $40, %esp         #sub extra 0x10 from the stack for the AND
-  and     $-16, %esp        # stack needs to end in 0xFFFFFFF0 before call
-  movl    12(%ebp), %eax
-  movl    %eax, 4(%esp)
-  movl    8(%ebp), %eax
-  movl    %eax, (%esp)
-  call    _UgaGetKey
-  leave
-  ret
-
-
-#------------------------------------------------------------------------------
-# EFI_STATUS
-# GasketUgaBlt(
-#    EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
-#    IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
-#    IN  EFI_UGA_BLT_OPERATION                   BltOperation,
-#    IN  UINTN                                   SourceX,
-#    IN  UINTN                                   SourceY,
-#    IN  UINTN                                   DestinationX,
-#    IN  UINTN                                   DestinationY,
-#    IN  UINTN                                   Width,
-#    IN  UINTN                                   Height,
-#    IN  UINTN                                   Delta OPTIONAL
-#    );
-#------------------------------------------------------------------------------
-.globl _GasketUgaBlt
-_GasketUgaBlt:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$88, %esp         #sub extra 0x10 from the stack for the AND
-  and   $-16, %esp        # stack needs to end in 0xFFFFFFF0 before call
-	movl	$0, -12(%ebp)
-	movl	44(%ebp), %eax
-	movl	%eax, 36(%esp)
-	movl	40(%ebp), %eax
-	movl	%eax, 32(%esp)
-	movl	36(%ebp), %eax
-	movl	%eax, 28(%esp)
-	movl	32(%ebp), %eax
-	movl	%eax, 24(%esp)
-	movl	28(%ebp), %eax
-	movl	%eax, 20(%esp)
-	movl	24(%ebp), %eax
-	movl	%eax, 16(%esp)
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
-	call	_UgaBlt
-	leave
-	ret
-
-
-
+LFE10:
+	.section __TEXT,__eh_frame,coalesced,no_toc+strip_static_syms+live_support
+EH_frame1:
+	.set L$set$0,LECIE1-LSCIE1
+	.long L$set$0
+LSCIE1:
+	.long	0x0
+	.byte	0x1
+	.ascii "zR\0"
+	.byte	0x1
+	.byte	0x78
+	.byte	0x10
+	.byte	0x1
+	.byte	0x10
+	.byte	0xc
+	.byte	0x7
+	.byte	0x8
+	.byte	0x90
+	.byte	0x1
+	.align 3
+LECIE1:
+.globl _GasketVoid.eh
+_GasketVoid.eh:
+LSFDE1:
+	.set L$set$1,LEFDE1-LASFDE1
+	.long L$set$1
+LASFDE1:
+	.long	LASFDE1-EH_frame1
+	.quad	LFB2-.
+	.set L$set$2,LFE2-LFB2
+	.quad L$set$2
+	.byte	0x0
+	.byte	0x4
+	.set L$set$3,LCFI0-LFB2
+	.long L$set$3
+	.byte	0xe
+	.byte	0x10
+	.byte	0x86
+	.byte	0x2
+	.byte	0x4
+	.set L$set$4,LCFI1-LCFI0
+	.long L$set$4
+	.byte	0xd
+	.byte	0x6
+	.align 3
+LEFDE1:
+.globl _GasketUintn.eh
+_GasketUintn.eh:
+LSFDE3:
+	.set L$set$5,LEFDE3-LASFDE3
+	.long L$set$5
+LASFDE3:
+	.long	LASFDE3-EH_frame1
+	.quad	LFB3-.
+	.set L$set$6,LFE3-LFB3
+	.quad L$set$6
+	.byte	0x0
+	.byte	0x4
+	.set L$set$7,LCFI3-LFB3
+	.long L$set$7
+	.byte	0xe
+	.byte	0x10
+	.byte	0x86
+	.byte	0x2
+	.byte	0x4
+	.set L$set$8,LCFI4-LCFI3
+	.long L$set$8
+	.byte	0xd
+	.byte	0x6
+	.align 3
+LEFDE3:
+.globl _GasketUintnUintn.eh
+_GasketUintnUintn.eh:
+LSFDE5:
+	.set L$set$9,LEFDE5-LASFDE5
+	.long L$set$9
+LASFDE5:
+	.long	LASFDE5-EH_frame1
+	.quad	LFB4-.
+	.set L$set$10,LFE4-LFB4
+	.quad L$set$10
+	.byte	0x0
+	.byte	0x4
+	.set L$set$11,LCFI6-LFB4
+	.long L$set$11
+	.byte	0xe
+	.byte	0x10
+	.byte	0x86
+	.byte	0x2
+	.byte	0x4
+	.set L$set$12,LCFI7-LCFI6
+	.long L$set$12
+	.byte	0xd
+	.byte	0x6
+	.align 3
+LEFDE5:
+.globl _GasketUintnUintnUintn.eh
+_GasketUintnUintnUintn.eh:
+LSFDE7:
+	.set L$set$13,LEFDE7-LASFDE7
+	.long L$set$13
+LASFDE7:
+	.long	LASFDE7-EH_frame1
+	.quad	LFB5-.
+	.set L$set$14,LFE5-LFB5
+	.quad L$set$14
+	.byte	0x0
+	.byte	0x4
+	.set L$set$15,LCFI9-LFB5
+	.long L$set$15
+	.byte	0xe
+	.byte	0x10
+	.byte	0x86
+	.byte	0x2
+	.byte	0x4
+	.set L$set$16,LCFI10-LCFI9
+	.long L$set$16
+	.byte	0xd
+	.byte	0x6
+	.align 3
+LEFDE7:
+.globl _GasketUintnUintnUintnUintn.eh
+_GasketUintnUintnUintnUintn.eh:
+LSFDE9:
+	.set L$set$17,LEFDE9-LASFDE9
+	.long L$set$17
+LASFDE9:
+	.long	LASFDE9-EH_frame1
+	.quad	LFB6-.
+	.set L$set$18,LFE6-LFB6
+	.quad L$set$18
+	.byte	0x0
+	.byte	0x4
+	.set L$set$19,LCFI12-LFB6
+	.long L$set$19
+	.byte	0xe
+	.byte	0x10
+	.byte	0x86
+	.byte	0x2
+	.byte	0x4
+	.set L$set$20,LCFI13-LCFI12
+	.long L$set$20
+	.byte	0xd
+	.byte	0x6
+	.align 3
+LEFDE9:
+.globl _GasketUintn10Args.eh
+_GasketUintn10Args.eh:
+LSFDE11:
+	.set L$set$21,LEFDE11-LASFDE11
+	.long L$set$21
+LASFDE11:
+	.long	LASFDE11-EH_frame1
+	.quad	LFB7-.
+	.set L$set$22,LFE7-LFB7
+	.quad L$set$22
+	.byte	0x0
+	.byte	0x4
+	.set L$set$23,LCFI15-LFB7
+	.long L$set$23
+	.byte	0xe
+	.byte	0x10
+	.byte	0x86
+	.byte	0x2
+	.byte	0x4
+	.set L$set$24,LCFI16-LCFI15
+	.long L$set$24
+	.byte	0xd
+	.byte	0x6
+	.align 3
+LEFDE11:
+.globl _GasketUint64Uintn.eh
+_GasketUint64Uintn.eh:
+LSFDE13:
+	.set L$set$25,LEFDE13-LASFDE13
+	.long L$set$25
+LASFDE13:
+	.long	LASFDE13-EH_frame1
+	.quad	LFB8-.
+	.set L$set$26,LFE8-LFB8
+	.quad L$set$26
+	.byte	0x0
+	.byte	0x4
+	.set L$set$27,LCFI18-LFB8
+	.long L$set$27
+	.byte	0xe
+	.byte	0x10
+	.byte	0x86
+	.byte	0x2
+	.byte	0x4
+	.set L$set$28,LCFI19-LCFI18
+	.long L$set$28
+	.byte	0xd
+	.byte	0x6
+	.align 3
+LEFDE13:
+.globl _GasketUintnUint64Uintn.eh
+_GasketUintnUint64Uintn.eh:
+LSFDE15:
+	.set L$set$29,LEFDE15-LASFDE15
+	.long L$set$29
+LASFDE15:
+	.long	LASFDE15-EH_frame1
+	.quad	LFB9-.
+	.set L$set$30,LFE9-LFB9
+	.quad L$set$30
+	.byte	0x0
+	.byte	0x4
+	.set L$set$31,LCFI21-LFB9
+	.long L$set$31
+	.byte	0xe
+	.byte	0x10
+	.byte	0x86
+	.byte	0x2
+	.byte	0x4
+	.set L$set$32,LCFI22-LCFI21
+	.long L$set$32
+	.byte	0xd
+	.byte	0x6
+	.align 3
+LEFDE15:
+.globl _GasketUintnUint16.eh
+_GasketUintnUint16.eh:
+LSFDE17:
+	.set L$set$33,LEFDE17-LASFDE17
+	.long L$set$33
+LASFDE17:
+	.long	LASFDE17-EH_frame1
+	.quad	LFB10-.
+	.set L$set$34,LFE10-LFB10
+	.quad L$set$34
+	.byte	0x0
+	.byte	0x4
+	.set L$set$35,LCFI24-LFB10
+	.long L$set$35
+	.byte	0xe
+	.byte	0x10
+	.byte	0x86
+	.byte	0x2
+	.byte	0x4
+	.set L$set$36,LCFI25-LCFI24
+	.long L$set$36
+	.byte	0xd
+	.byte	0x6
+	.align 3
+LEFDE17:
+	.subsections_via_symbols
