@@ -973,7 +973,7 @@ Returns:
     return EFI_MEDIA_CHANGED;
   }
 
-  if ((UINT32) Buffer % Private->Media.IoAlign != 0) {
+  if ((UINTN) Buffer % Private->Media.IoAlign != 0) {
     return EFI_INVALID_PARAMETER;
   }
   
@@ -1256,7 +1256,7 @@ SetFilePointer64 (
   IN  UNIX_BLOCK_IO_PRIVATE    *Private,
   IN  INT64                      DistanceToMove,
   OUT UINT64                     *NewFilePointer,
-  IN  INTN                      MoveMethod
+  IN  INT32                      MoveMethod
   )
 /*++
 
