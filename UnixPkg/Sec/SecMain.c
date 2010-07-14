@@ -190,7 +190,7 @@ Returns:
   MemorySizeStr      = (CHAR16 *) PcdGetPtr (PcdUnixMemorySizeForSecMain);
   FirmwareVolumesStr = (CHAR16 *) PcdGetPtr (PcdUnixFirmwareVolume);
 
-  printf ("\nEDK SEC Main UNIX Emulation Environment from www.TianoCore.org\n");
+  printf ("\nEDK SEC Main UNIX Emulation Environment from edk2.sourceforge.net\n");
 
 #ifdef __APPLE__
   //
