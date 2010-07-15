@@ -95,7 +95,12 @@ DmaMap (
   
   *Mapping = Map;
 
-  if (((UINTN)HostAddress & (gCacheAlignment - 1)) != 0) {
+  if ((((UINTN)HostAddress & (gCacheAlignment - 1)) != 0) ||
+      ((*NumberOfBytes % gCacheAlignment) != 0)) {
+    //
+    // If the buffer does not fill entire cache lines we must double buffer into 
+    // uncached memory. Device (PCI) address becomes uncached page.
+    //
     Map->DoubleBuffer  = TRUE;
     Status = DmaAllocateBuffer (EfiBootServicesData, EFI_SIZE_TO_PAGES (*NumberOfBytes), &Buffer);
     if (EFI_ERROR (Status)) {
@@ -108,8 +113,6 @@ DmaMap (
     Map->DoubleBuffer  = FALSE;
   }
 
-  *NumberOfBytes &= *NumberOfBytes & ~(gCacheAlignment - 1); // Only do it on full cache lines
-  
   Map->HostAddress   = (UINTN)HostAddress;
   Map->DeviceAddress = *DeviceAddress;
   Map->NumberOfBytes = *NumberOfBytes;
