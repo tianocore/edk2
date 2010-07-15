@@ -236,7 +236,7 @@ Returns:
   InitialStackMemorySize  = STACK_SIZE;
   InitialStackMemory = (UINTN)MapMemory(0, 
           (UINT32) InitialStackMemorySize,
-          PROT_READ | PROT_WRITE,
+          PROT_READ | PROT_WRITE | PROT_EXEC,
           MAP_ANONYMOUS | MAP_PRIVATE);
   if (InitialStackMemory == 0) {
     printf ("ERROR : Can not open SecStack Exiting\n");
@@ -716,18 +716,26 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  
+  
   //
   // Allocate space in UNIX (not emulator) memory. Extra space is for alignment
   //
-  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) malloc ((UINTN) (ImageContext.ImageSize + (ImageContext.SectionAlignment * 2)));
+  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) MapMemory (
+    0, 
+    (UINT32) (ImageContext.ImageSize + (ImageContext.SectionAlignment * 2)),
+    PROT_READ | PROT_WRITE | PROT_EXEC,
+    MAP_ANONYMOUS | MAP_PRIVATE
+    );
   if (ImageContext.ImageAddress == 0) {
     return EFI_OUT_OF_RESOURCES;
   }
+    
   //
   // Align buffer on section boundry
   //
   ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
-  ImageContext.ImageAddress &= ~(ImageContext.SectionAlignment - 1);
+  ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)(ImageContext.SectionAlignment - 1));
 
 
   Status = PeCoffLoaderLoadImage (&ImageContext);
@@ -1123,7 +1131,7 @@ SecPeCoffRelocateImageExtraAction (
     //
     GdbTempFile = fopen (gGdbWorkingFileName, "w");
     if (GdbTempFile != NULL) {
-      fprintf (GdbTempFile, "add-symbol-file %s 0x%x\n", ImageContext->PdbPointer, (unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders));
+      fprintf (GdbTempFile, "add-symbol-file %s 0x%08lx\n", ImageContext->PdbPointer, (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders));
       fclose (GdbTempFile);
       
       //
