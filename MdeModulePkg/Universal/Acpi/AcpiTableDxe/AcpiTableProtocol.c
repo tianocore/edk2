@@ -330,7 +330,13 @@ InstallAcpiTable (
 
   Length   = ((EFI_ACPI_COMMON_HEADER *) AcpiTableBuffer)->Length;
   Checksum = CalculateCheckSum8 ((UINT8 *)AcpiTableBuffer, Length);
-  ASSERT (Checksum == 0);
+  if (Checksum != 0) {
+    AcpiPlatformChecksum (
+      (VOID *)AcpiTableBuffer,
+      (UINTN)Length,
+      OFFSET_OF (EFI_ACPI_DESCRIPTION_HEADER, Checksum)
+      );
+  }
 
   //
   // Get the instance of the ACPI table protocol
