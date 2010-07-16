@@ -15,17 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PciHostBridge.h"
 
 //
-// Support 64 K IO space
-//
-#define RES_IO_BASE   0x1000
-#define RES_IO_LIMIT  0xFFFF
-//
-// Support 4G address space
-//
-#define RES_MEM_BASE_1 0xF8000000
-#define RES_MEM_LIMIT_1 (0xFEC00000 - 1)
-
-//
 // Hard code: Root Bridge Number within the host bridge
 //            Root Bridge's attribute
 //            Root Bridge's device path
@@ -100,8 +89,6 @@ InitializePciHostBridge (
   UINTN                       Loop2;
   PCI_HOST_BRIDGE_INSTANCE    *HostBridge;
   PCI_ROOT_BRIDGE_INSTANCE    *PrivateData;
-  IN EFI_PHYSICAL_ADDRESS     BaseAddress;
-  IN UINT64                   Length;
  
   mDriverImageHandle = ImageHandle;
   
@@ -162,29 +149,6 @@ InitializePciHostBridge (
     }
   } 
 
-  Status = gDS->AddIoSpace (
-                  EfiGcdIoTypeIo, 
-                  RES_IO_BASE, 
-                  RES_IO_LIMIT - RES_IO_BASE + 1
-                  );
-  
-  // PCI memory space from 3.75Gbytes->(4GBytes - BIOSFWH local APIC etc)
-  Status = gDS->AddMemorySpace (
-                  EfiGcdMemoryTypeMemoryMappedIo, 
-                  RES_MEM_BASE_1, 
-                  (RES_MEM_LIMIT_1 - RES_MEM_BASE_1 + 1),
-                  0
-                  );
-  
-  BaseAddress = 0x80000000;
-  Length      = RES_MEM_BASE_1 - BaseAddress;
-  Status = gDS->AddMemorySpace (
-                  EfiGcdMemoryTypeMemoryMappedIo, 
-                  BaseAddress, 
-                  Length,
-                  0
-                  );
-  
   return EFI_SUCCESS;
 }
 
