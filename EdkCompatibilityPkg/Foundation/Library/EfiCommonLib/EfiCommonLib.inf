@@ -94,4 +94,7 @@ COMPONENT_TYPE  = LIBRARY
 [libraries.common]
   EdkFrameworkGuidLib
 
+[libraries.ARM]
+  CompilerIntrinsicsLib
+
 [nmake.common]

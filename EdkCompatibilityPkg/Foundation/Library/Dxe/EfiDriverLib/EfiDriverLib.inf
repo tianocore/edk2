@@ -89,5 +89,7 @@ COMPONENT_TYPE  = LIBRARY
 [libraries.ipf]
   CpuIA64Lib
   
+[libraries.ARM]
+  CompilerIntrinsicsLib
 
 [nmake.common]
