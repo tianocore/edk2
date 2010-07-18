@@ -510,10 +510,10 @@ Decompress (
   EFI_STATUS                      Status;
   UINT8                           *DstBuffer;
   UINT8                           *ScratchBuffer;
-  UINTN                           DstBufferSize;
+  UINT32                          DstBufferSize;
   UINT32                          ScratchBufferSize;
   EFI_COMMON_SECTION_HEADER       *Section;
-  UINTN                           SectionLength;
+  UINT32                          SectionLength;
 
   if (CompressionSection->CommonHeader.Type != EFI_SECTION_COMPRESSION) {
     ASSERT (FALSE);
@@ -535,8 +535,8 @@ Decompress (
       //
       Status = UefiDecompressGetInfo (
                  (UINT8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
-                 (UINT32) SectionLength - sizeof (EFI_COMPRESSION_SECTION),
-                 (UINT32 *) &DstBufferSize,
+                 SectionLength - sizeof (EFI_COMPRESSION_SECTION),
+                 &DstBufferSize,
                  &ScratchBufferSize
                  );
       if (EFI_ERROR (Status)) {
