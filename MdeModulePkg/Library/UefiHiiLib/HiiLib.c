@@ -2816,7 +2816,7 @@ HiiCreateActionOpCode (
 {
   EFI_IFR_ACTION  OpCode;
 
-  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_OPTIONS_ONLY))) == 0);
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
 
   ZeroMem (&OpCode, sizeof (OpCode));
   OpCode.Question.QuestionId    = QuestionId;
@@ -2906,7 +2906,7 @@ HiiCreateGotoOpCode (
 {
   EFI_IFR_REF  OpCode;
 
-  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_OPTIONS_ONLY))) == 0);
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
 
   ZeroMem (&OpCode, sizeof (OpCode));
   OpCode.Question.Header.Prompt = Prompt;
@@ -2957,7 +2957,7 @@ HiiCreateCheckBoxOpCode (
   EFI_IFR_CHECKBOX  OpCode;
   UINTN             Position;
 
-  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_OPTIONS_ONLY))) == 0);
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
 
   ZeroMem (&OpCode, sizeof (OpCode));
   OpCode.Question.QuestionId             = QuestionId;
@@ -3024,7 +3024,7 @@ HiiCreateNumericOpCode (
   EFI_IFR_NUMERIC  OpCode;
   UINTN            Position;
 
-  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_OPTIONS_ONLY))) == 0);
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
 
   ZeroMem (&OpCode, sizeof (OpCode));
   OpCode.Question.QuestionId             = QuestionId;
@@ -3115,7 +3115,7 @@ HiiCreateStringOpCode (
   EFI_IFR_STRING  OpCode;
   UINTN           Position;
 
-  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_OPTIONS_ONLY))) == 0);
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
 
   ZeroMem (&OpCode, sizeof (OpCode));
   OpCode.Question.Header.Prompt          = Prompt;
@@ -3266,6 +3266,167 @@ HiiCreateOrderedListOpCode (
   if (DefaultsOpCodeHandle != NULL) {
     InternalHiiAppendOpCodes (OpCodeHandle, DefaultsOpCodeHandle);
   }
+  HiiCreateEndOpCode (OpCodeHandle);
+  return InternalHiiOpCodeHandleBuffer (OpCodeHandle) + Position;
+}
+
+/**
+  Create EFI_IFR_TEXT_OP opcode.
+
+  If OpCodeHandle is NULL, then ASSERT().
+
+  @param[in]  OpCodeHandle  Handle to the buffer of opcodes.
+  @param[in]  Prompt        String ID for Prompt.
+  @param[in]  Help          String ID for Help.
+  @param[in]  TextTwo       String ID for TextTwo.
+
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
+
+**/
+UINT8 *
+EFIAPI
+HiiCreateTextOpCode (
+  IN VOID           *OpCodeHandle,
+  IN EFI_STRING_ID  Prompt,
+  IN EFI_STRING_ID  Help,
+  IN EFI_STRING_ID  TextTwo
+  )
+{
+  EFI_IFR_TEXT  OpCode;
+
+  ZeroMem (&OpCode, sizeof (OpCode));
+  OpCode.Statement.Prompt = Prompt;
+  OpCode.Statement.Help   = Help;
+  OpCode.TextTwo          = TextTwo;
+
+  return InternalHiiCreateOpCode (OpCodeHandle, &OpCode, EFI_IFR_TEXT_OP, sizeof (OpCode));
+}
+
+/**
+  Create EFI_IFR_DATE_OP opcode.
+
+  If OpCodeHandle is NULL, then ASSERT().
+  If any reserved bits are set in QuestionFlags, then ASSERT().
+  If any reserved bits are set in DateFlags, then ASSERT().
+
+  @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
+  @param[in]  QuestionId            Question ID
+  @param[in]  VarStoreId            Storage ID, optional. If DateFlags is not
+                                    QF_DATE_STORAGE_NORMAL, this parameter is ignored.
+  @param[in]  VarOffset             Offset in Storage, optional. If DateFlags is not
+                                    QF_DATE_STORAGE_NORMAL, this parameter is ignored.
+  @param[in]  Prompt                String ID for Prompt
+  @param[in]  Help                  String ID for Help
+  @param[in]  QuestionFlags         Flags in Question Header
+  @param[in]  DateFlags             Flags for date opcode
+  @param[in]  DefaultsOpCodeHandle  Handle for a buffer of DEFAULT opcodes.  This
+                                    is an optional parameter that may be NULL.
+
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
+
+**/
+UINT8 *
+EFIAPI
+HiiCreateDateOpCode (
+  IN VOID             *OpCodeHandle,
+  IN EFI_QUESTION_ID  QuestionId,
+  IN EFI_VARSTORE_ID  VarStoreId,   OPTIONAL
+  IN UINT16           VarOffset,    OPTIONAL
+  IN EFI_STRING_ID    Prompt,
+  IN EFI_STRING_ID    Help,
+  IN UINT8            QuestionFlags,
+  IN UINT8            DateFlags,
+  IN VOID             *DefaultsOpCodeHandle  OPTIONAL
+  )
+{
+  EFI_IFR_DATE    OpCode;
+  UINTN           Position;
+
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
+  ASSERT ((DateFlags & (~(EFI_QF_DATE_YEAR_SUPPRESS | EFI_QF_DATE_MONTH_SUPPRESS | EFI_QF_DATE_DAY_SUPPRESS | EFI_QF_DATE_STORAGE))) == 0);
+
+  ZeroMem (&OpCode, sizeof (OpCode));
+  OpCode.Question.Header.Prompt          = Prompt;
+  OpCode.Question.Header.Help            = Help;
+  OpCode.Question.QuestionId             = QuestionId;
+  OpCode.Question.VarStoreId             = VarStoreId;
+  OpCode.Question.VarStoreInfo.VarOffset = VarOffset;
+  OpCode.Question.Flags                  = QuestionFlags;
+  OpCode.Flags                           = DateFlags;
+
+  if (DefaultsOpCodeHandle == NULL) {
+    return InternalHiiCreateOpCode (OpCodeHandle, &OpCode, EFI_IFR_DATE_OP, sizeof (OpCode));
+  }
+
+  Position = InternalHiiOpCodeHandlePosition (OpCodeHandle);
+  InternalHiiCreateOpCodeExtended (OpCodeHandle, &OpCode, EFI_IFR_DATE_OP, sizeof (OpCode), 0, 1);
+  InternalHiiAppendOpCodes (OpCodeHandle, DefaultsOpCodeHandle);
+  HiiCreateEndOpCode (OpCodeHandle);
+  return InternalHiiOpCodeHandleBuffer (OpCodeHandle) + Position;
+}
+
+/**
+  Create EFI_IFR_TIME_OP opcode.
+
+  If OpCodeHandle is NULL, then ASSERT().
+  If any reserved bits are set in QuestionFlags, then ASSERT().
+  If any reserved bits are set in TimeFlags, then ASSERT().
+
+  @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
+  @param[in]  QuestionId            Question ID
+  @param[in]  VarStoreId            Storage ID, optional. If TimeFlags is not
+                                    QF_TIME_STORAGE_NORMAL, this parameter is ignored.
+  @param[in]  VarOffset             Offset in Storage, optional. If TimeFlags is not
+                                    QF_TIME_STORAGE_NORMAL, this parameter is ignored.
+  @param[in]  Prompt                String ID for Prompt
+  @param[in]  Help                  String ID for Help
+  @param[in]  QuestionFlags         Flags in Question Header
+  @param[in]  TimeFlags             Flags for time opcode
+  @param[in]  DefaultsOpCodeHandle  Handle for a buffer of DEFAULT opcodes.  This
+                                    is an optional parameter that may be NULL.
+
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
+
+**/
+UINT8 *
+EFIAPI
+HiiCreateTimeOpCode (
+  IN VOID             *OpCodeHandle,
+  IN EFI_QUESTION_ID  QuestionId,
+  IN EFI_VARSTORE_ID  VarStoreId,   OPTIONAL
+  IN UINT16           VarOffset,    OPTIONAL
+  IN EFI_STRING_ID    Prompt,
+  IN EFI_STRING_ID    Help,
+  IN UINT8            QuestionFlags,
+  IN UINT8            TimeFlags,
+  IN VOID             *DefaultsOpCodeHandle  OPTIONAL
+  )
+{
+  EFI_IFR_TIME    OpCode;
+  UINTN           Position;
+
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
+  ASSERT ((TimeFlags & (~(QF_TIME_HOUR_SUPPRESS | QF_TIME_MINUTE_SUPPRESS | QF_TIME_SECOND_SUPPRESS | QF_TIME_STORAGE))) == 0);
+
+  ZeroMem (&OpCode, sizeof (OpCode));
+  OpCode.Question.Header.Prompt          = Prompt;
+  OpCode.Question.Header.Help            = Help;
+  OpCode.Question.QuestionId             = QuestionId;
+  OpCode.Question.VarStoreId             = VarStoreId;
+  OpCode.Question.VarStoreInfo.VarOffset = VarOffset;
+  OpCode.Question.Flags                  = QuestionFlags;
+  OpCode.Flags                           = TimeFlags;
+
+  if (DefaultsOpCodeHandle == NULL) {
+    return InternalHiiCreateOpCode (OpCodeHandle, &OpCode, EFI_IFR_TIME_OP, sizeof (OpCode));
+  }
+
+  Position = InternalHiiOpCodeHandlePosition (OpCodeHandle);
+  InternalHiiCreateOpCodeExtended (OpCodeHandle, &OpCode, EFI_IFR_TIME_OP, sizeof (OpCode), 0, 1);
+  InternalHiiAppendOpCodes (OpCodeHandle, DefaultsOpCodeHandle);
   HiiCreateEndOpCode (OpCodeHandle);
   return InternalHiiOpCodeHandleBuffer (OpCodeHandle) + Position;
 }

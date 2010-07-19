@@ -842,61 +842,67 @@ DriverCallback (
   UINTN                           MyVarSize;
 
   if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
-    //
-    // On FORM_OPEN event, update the form on-the-fly
-    //
-    PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
+    if (QuestionId == 0x1234) {
+      //
+      // Sample CallBack for UEFI FORM_OPEN action:
+      //   Add Save action into Form 3 when Form 1 is opened.
+      //   This will be done only in FORM_OPEN CallBack of question with ID 0x1234 from Form 1.
+      //
+      PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
 
-    //
-    // Initialize the container for dynamic opcodes
-    //
-    StartOpCodeHandle = HiiAllocateOpCodeHandle ();
-    ASSERT (StartOpCodeHandle != NULL);
+      //
+      // Initialize the container for dynamic opcodes
+      //
+      StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+      ASSERT (StartOpCodeHandle != NULL);
 
-    //
-    // Create Hii Extend Label OpCode as the start opcode
-    //
-    StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
-    StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-    StartLabel->Number       = LABEL_UPDATE2;
+      //
+      // Create Hii Extend Label OpCode as the start opcode
+      //
+      StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+      StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+      StartLabel->Number       = LABEL_UPDATE2;
 
-    HiiCreateActionOpCode (
-      StartOpCodeHandle,                // Container for dynamic created opcodes
-      0x1238,                           // Question ID
-      STRING_TOKEN(STR_SAVE_TEXT),      // Prompt text
-      STRING_TOKEN(STR_SAVE_TEXT),      // Help text
-      EFI_IFR_FLAG_CALLBACK,            // Question flag
-      0                                 // Action String ID
-    );
-
-    HiiUpdateForm (
-      PrivateData->HiiHandle[0],  // HII handle
-      &mFormSetGuid,              // Formset GUID
-      0x3,                        // Form ID
-      StartOpCodeHandle,          // Label for where to insert opcodes
-      NULL                        // Insert data
+      HiiCreateActionOpCode (
+        StartOpCodeHandle,                // Container for dynamic created opcodes
+        0x1238,                           // Question ID
+        STRING_TOKEN(STR_SAVE_TEXT),      // Prompt text
+        STRING_TOKEN(STR_SAVE_TEXT),      // Help text
+        EFI_IFR_FLAG_CALLBACK,            // Question flag
+        0                                 // Action String ID
       );
 
-    HiiFreeOpCodeHandle (StartOpCodeHandle);
+      HiiUpdateForm (
+        PrivateData->HiiHandle[0],  // HII handle
+        &mFormSetGuid,              // Formset GUID
+        0x3,                        // Form ID
+        StartOpCodeHandle,          // Label for where to insert opcodes
+        NULL                        // Insert data
+        );
+
+      HiiFreeOpCodeHandle (StartOpCodeHandle);
+    }
     return EFI_SUCCESS;
   }
 
   if (Action == EFI_BROWSER_ACTION_FORM_CLOSE) {
-    //
-    // On FORM_CLOSE event, show up a pop-up
-    //
-    do {
-      CreatePopUp (
-        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-        &Key,
-        L"",
-        L"You are going to leave the Form!",
-        L"Press ESC or ENTER to continue ...",
-        L"",
-        NULL
-        );
-    } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
-
+    if (QuestionId == 0x5678) {
+      //
+      // Sample CallBack for UEFI FORM_CLOSE action:
+      //   Show up a pop-up to specify Form 3 will be closed when exit Form 3.
+      //
+      do {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"",
+          L"You are going to leave third Form!",
+          L"Press ESC or ENTER to continue ...",
+          L"",
+          NULL
+          );
+      } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
+    }
     return EFI_SUCCESS;
   }
 
@@ -1026,6 +1032,37 @@ DriverCallback (
       5,                                         // Maximum container
       OptionsOpCodeHandle,                       // Option Opcode list
       NULL                                       // Default Opcode is NULl
+      );
+
+    HiiCreateTextOpCode (
+      StartOpCodeHandle,
+      STRING_TOKEN(STR_TEXT_SAMPLE_HELP),
+      STRING_TOKEN(STR_TEXT_SAMPLE_HELP),
+      STRING_TOKEN(STR_TEXT_SAMPLE_STRING)
+    );
+
+    HiiCreateDateOpCode (
+      StartOpCodeHandle,
+      0x8004,
+      0x0,
+      0x0,
+      STRING_TOKEN(STR_DATE_SAMPLE_HELP),
+      STRING_TOKEN(STR_DATE_SAMPLE_HELP),
+      0,
+      QF_DATE_STORAGE_TIME,
+      NULL
+      );
+
+    HiiCreateTimeOpCode (
+      StartOpCodeHandle,
+      0x8005,
+      0x0,
+      0x0,
+      STRING_TOKEN(STR_TIME_SAMPLE_HELP),
+      STRING_TOKEN(STR_TIME_SAMPLE_HELP),
+      0,
+      QF_TIME_STORAGE_TIME,
+      NULL
       );
 
     HiiCreateGotoOpCode (
