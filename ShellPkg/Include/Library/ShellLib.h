@@ -1134,6 +1134,7 @@ typedef enum {
   @retval EFI_SUCCESS             The operation was sucessful.
   @retval EFI_UNSUPPORTED         The operation is not supported as requested.
   @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
   @return other                   The operation failed.
 **/
 EFI_STATUS
