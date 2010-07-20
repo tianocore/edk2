@@ -238,7 +238,7 @@ EFI_STATUS
 (EFIAPI *EFI_ACPI_FIND_PATH)(
   IN    EFI_ACPI_HANDLE HandleIn,
   IN    VOID            *AcpiPath,
-  OUT   EFI_ACPI_HANDLE HandleOut
+  OUT   EFI_ACPI_HANDLE *HandleOut
 );
 
 typedef struct _EFI_ACPI_SDT_PROTOCOL {
