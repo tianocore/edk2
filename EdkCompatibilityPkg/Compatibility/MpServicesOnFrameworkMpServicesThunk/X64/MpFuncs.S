@@ -1,8 +1,8 @@
 #------------------------------------------------------------------------------
 # X64 assembly file for AP startup vector.
 #
-# Copyright (c) 2009, Intel Corporation
-# All rights reserved. This program and the accompanying materials
+# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
@@ -21,8 +21,9 @@
 .equ                   StackSizeLocation,         RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x10
 .equ                   CProcedureLocation,        RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x18
 .equ                   GdtrLocation,              RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x20
-.equ                   BufferStartLocation,       RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x2C
-.equ                   Cr3OffsetLocation,         RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x30
+.equ                   IdtrLocation,              RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x2A
+.equ                   BufferStartLocation,       RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x34
+.equ                   Cr3OffsetLocation,         RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x38
 
 #-------------------------------------------------------------------------------------
 
@@ -65,6 +66,11 @@ RendezvousFunnelProcStart:
         .word GdtrLocation
         .byte 0x66                    # db         66h
         .byte 0x2E,0xF,0x1,0x14       # lgdt       fword ptr cs:[si]
+
+        .byte 0xBE
+        .word IdtrLocation
+        .byte 0x66                    # db         66h
+        .byte 0x2E,0xF,0x1,0x1C       # lidt       fword ptr cs:[si]
 
         .byte 0x33,0xC0               # xor        ax,  ax
         .byte 0x8E,0xD8               # mov        ds,  ax

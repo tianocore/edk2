@@ -1,8 +1,8 @@
 #------------------------------------------------------------------------------
 # IA32 assembly file for AP startup vector.
 #
-# Copyright (c) 2009, Intel Corporation
-# All rights reserved. This program and the accompanying materials
+# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
@@ -16,11 +16,12 @@
 .equ                   NotVacantFlag,    0xff
 
 .equ                   LockLocation,     RendezvousFunnelProcEnd - RendezvousFunnelProcStart
-.equ                   StackStart,       LockLocation + 0x04
-.equ                   StackSize,        LockLocation + 0x08
-.equ                   RendezvousProc,   LockLocation + 0x0C
-.equ                   GdtrProfile,      LockLocation + 0x10
-.equ                   BufferStart,      LockLocation + 0x18
+.equ                   StackStart,       RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x04
+.equ                   StackSize,        RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x08
+.equ                   RendezvousProc,   RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x0C
+.equ                   GdtrProfile,      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x10
+.equ                   IdtrProfile,      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x16
+.equ                   BufferStart,      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x1C
 
 #-------------------------------------------------------------------------------------
 #RendezvousFunnelProc  procedure follows. All APs execute their procedure. This
@@ -57,6 +58,11 @@ RendezvousFunnelProcStart:
         .word GdtrProfile
         .byte 0x66                    # db         66h
         .byte 0x2E,0xF,0x1,0x14       # lgdt       fword ptr cs:[si]
+
+        .byte 0xBE
+        .word IdtrProfile
+        .byte 0x66                    # db         66h
+        .byte 0x2E,0xF,0x1,0x1C       # lidt       fword ptr cs:[si]
 
         .byte 0x33,0xC0               # xor        ax,  ax
         .byte 0x8E,0xD8               # mov        ds,  ax
