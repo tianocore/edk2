@@ -275,6 +275,9 @@
   ## This PCD specifies whether Peiphase StatusCode is replayed in DxePhase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn|FALSE|BOOLEAN|0x0001002d
 
+  ## This PCD specified whether ACPI SDT protocol is installed.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|FALSE|BOOLEAN|0x0001004d
+
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
   ##
   # This feature flag specifies whether DxeIpl switches to long mode to enter DXE phase.
