@@ -4,7 +4,7 @@
   of the raw block devices media. Currently "El Torito CD-ROM", Legacy
   MBR, and GPT partition schemes are supported.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -657,6 +657,15 @@ PartitionInstallChildHandle (
                                ) - 1;
 
   Private->Media.BlockSize      = (UINT32) BlockSize;
+
+  //
+  // Per UEFI Spec, LowestAlignedLba and LogicalBlocksPerPhysicalBlock must be 0
+  //  for logical partitions.
+  //
+  if (Private->BlockIo.Revision >= EFI_BLOCK_IO_PROTOCOL_REVISION2) {
+    Private->BlockIo.Media->LowestAlignedLba              = 0;
+    Private->BlockIo.Media->LogicalBlocksPerPhysicalBlock = 0;
+  }
 
   Private->BlockIo.Reset        = PartitionReset;
   Private->BlockIo.ReadBlocks   = PartitionReadBlocks;
