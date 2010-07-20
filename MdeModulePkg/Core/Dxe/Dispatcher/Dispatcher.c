@@ -545,6 +545,15 @@ CoreDispatcher (
     }
 
     //
+    // Now DXE Dispatcher finished one round of dispatch, signal an event group
+    // so that SMM Dispatcher get chance to dispatch SMM Drivers which depend
+    // on UEFI protocols
+    //
+    if (!EFI_ERROR (ReturnStatus)) {
+      CoreSignalEvent (DxeDispatchEvent);
+    }
+
+    //
     // Search DriverList for items to place on Scheduled Queue
     //
     ReadyToRun = FALSE;
@@ -564,15 +573,6 @@ CoreDispatcher (
           ReadyToRun = TRUE;
         }
       }
-    }
-
-    //
-    // Now DXE Dispatcher finished one round of dispatch, signal an event group
-    // so that SMM Dispatcher get chance to dispatch SMM Drivers which depend
-    // on UEFI protocols
-    //
-    if (!EFI_ERROR (ReturnStatus)) {
-      CoreSignalEvent (DxeDispatchEvent);
     }
   } while (ReadyToRun);
 
