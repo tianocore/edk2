@@ -127,8 +127,8 @@ typedef struct stat_fix {
 	__int64_t	st_qspare[2];	/* RESERVED: DO NOT USE! */
 } STAT_FIX;
 
-#pragma pack()
 #endif
+#pragma pack()
 
 #else 
 
