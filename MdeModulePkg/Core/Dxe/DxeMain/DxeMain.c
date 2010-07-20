@@ -244,7 +244,7 @@ DxeMain (
   //
   // Initialize Debug Agent to support source level debug in DXE phase
   //
-  InitializeDebugAgent (DEBUG_AGENT_INIT_DXE_CORE, HobStart);
+  InitializeDebugAgent (DEBUG_AGENT_INIT_DXE_CORE, HobStart, NULL);
 
   //
   // Initialize Memory Services
