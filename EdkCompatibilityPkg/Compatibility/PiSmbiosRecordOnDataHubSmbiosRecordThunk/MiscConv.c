@@ -2391,29 +2391,27 @@ SmbiosFldMiscTypeOEM (
   ASSERT_EFI_ERROR (Status);
   
   if (StructureSize < RecordDataSize) {
-    Status = SmbiosEnlargeStructureBuffer (
-               StructureNode,
-               ((EFI_SMBIOS_TABLE_HEADER *)RecordData)->Length,
-               StructureSize,
-               RecordDataSize
-               );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    //
+    // Create new SMBIOS table entry
+    //
+    SmbiosUpdateStructureBuffer (
+      StructureNode,
+      RecordData
+      );
+  } else {
+    //
+    // Copy the entire data (including the Smbios structure header),
+    // but preserve the handle that is already allocated.
+    //
+    Handle = StructureNode->Structure->Handle;
+    CopyMem (
+      StructureNode->Structure,
+      RecordData,
+      RecordDataSize
+      );
+    StructureNode->Structure->Handle = Handle;
+    StructureNode->StructureSize = RecordDataSize;
   }
-  
-  //
-  // Copy the entire data (including the Smbios structure header),
-  // but preserve the handle that is already allocated.
-  //
-  Handle = StructureNode->Structure->Handle;
-  CopyMem (
-    StructureNode->Structure,
-    RecordData,
-    RecordDataSize
-    );
-  StructureNode->Structure->Handle = Handle;
-  StructureNode->StructureSize = RecordDataSize;
   
   if (NewRecordData != NULL) {
     FreePool (NewRecordData);
