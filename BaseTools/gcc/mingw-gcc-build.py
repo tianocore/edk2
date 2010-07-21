@@ -222,27 +222,10 @@ class SourceFiles:
             'version': '4.3.0',
             'md5': '197ed8468b38db1d3481c3111691d85b',
             },
-        'mingw_hdr': {
-            'url': 'http://sourceforge.net/projects/' + \
-                   'mingw-w64/files/mingw-w64/mingw-w64-snapshot/' + \
-                   'mingw-w64-v1.0-snapshot-$version.tar.bz2/download',
-            'extract-dir': os.path.join('mingw-w64-v1.0-$version', 'mingw-w64-headers'),
-            'version': '20100604',
-            'md5': '636a84d1ea1a8cd61616738760021d6a',
-            },
         }
 
     source_files_ia32 = {
         'gcc': source_files_x64['gcc'],
-        'mingw_hdr': {
-            'url': 'http://sourceforge.net/projects/mingw/files/MinGW/' + \
-                   'BaseSystem/RuntimeLibrary/MinGW-RT/' + \
-                   'mingwrt-$version/' + \
-                   'mingwrt-$version-mingw32-src.tar.gz/download',
-            'extract-dir': 'mingwrt-$version-mingw32',
-            'version': '3.15.2',
-            'md5': '7bf0525f158213f3ac990ea68a5ec34d',
-            },
         }
 
     source_files_ipf = source_files_x64.copy()
@@ -439,7 +422,6 @@ class Builder:
         if not self.config.options.skip_binutils:
             self.BuildModule('binutils')
         if not self.config.options.skip_gcc:
-            self.CopyIncludeDirectory()
             self.BuildModule('gcc')
             self.MakeSymLinks()
 
@@ -459,24 +441,6 @@ class Builder:
             "w"
             ).close()
 
-    def CopyIncludeDirectory(self):
-        linkdst = os.path.join(self.config.prefix, 'mingw')
-        src = os.path.join(
-            self.config.src_dir,
-            self.config.arch,
-            self.source_files.GetExtractDirOf('mingw_hdr'),
-            'include'
-            )
-        dst_parent = os.path.join(self.config.prefix, self.config.target_combo)
-        dst = os.path.join(dst_parent, 'include')
-        if not os.path.exists(dst):
-            if not os.path.exists(dst_parent):
-                os.makedirs(dst_parent)
-            print 'Copying headers to', self.config.Relative(dst)
-            shutil.copytree(src, dst, True)
-        if not os.path.lexists(linkdst):
-            print 'Making symlink at', self.config.Relative(linkdst)
-            os.symlink(self.config.target_combo, linkdst)
 
     def BuildModule(self, module):
         base_dir = os.getcwd()

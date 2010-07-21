@@ -28,7 +28,7 @@ SetWorkspace() {
     echo Run this script from the base of your tree.  For example:
     echo "  cd /Path/To/Edk/Root"
     echo "  . BaseTools/BuildEnv"
-    return -1
+    return 1
   fi
 
   #
@@ -99,13 +99,6 @@ SetEdkToolsPath() {
   fi
 
   #
-  # Figure out a uniq directory name from the uname command
-  #
-  UNAME_DIRNAME=`uname -sm`
-  UNAME_DIRNAME=${UNAME_DIRNAME// /-}
-  UNAME_DIRNAME=${UNAME_DIRNAME//\//-}
-
-  #
   # Try $WORKSPACE/Conf/EdkTools
   #
   if [ -e $WORKSPACE/Conf/EdkTools ]
@@ -124,9 +117,9 @@ SetEdkToolsPath() {
   fi
 
   #
-  # Try $WORKSPACE/BaseTools/Bin/$UNAME_DIRNAME
+  # Try $WORKSPACE/BaseTools
   #
-  if [ -e $WORKSPACE/BaseTools/Bin/$UNAME_DIRNAME ]
+  if [ -e $WORKSPACE/BaseTools ]
   then
     export EDK_TOOLS_PATH=$WORKSPACE/BaseTools
     return 0
@@ -174,7 +167,7 @@ AddEdkToolsToPath() {
   #
   if [ -z "$EDK_TOOLS_PATH" ]
   then
-    return -1
+    return 1
   fi
 
   EDK_TOOLS_PATH_BIN=`GetEdkToolsPathBinDirectory`
@@ -183,7 +176,7 @@ AddEdkToolsToPath() {
   then
     echo "Unable to find expected bin path under \$EDK_TOOLS_PATH!"
     echo "> $EDK_TOOLS_PATH_BIN"
-    return -1
+    return 1
   fi
 
   if [ "${PATH/$EDK_TOOLS_PATH_BIN/}" == "$PATH" ]
@@ -227,7 +220,7 @@ ScriptMain() {
   if [ -z $WORKSPACE ]
   then
     echo "Failure setting WORKSPACE"
-    return -1
+    return 1
   fi
 
   RestorePreviousConfiguration
@@ -235,14 +228,14 @@ ScriptMain() {
   SetEdkToolsPath
   if [ -z $EDK_TOOLS_PATH ]
   then
-    return -1
+    return 1
   fi
 
   AddEdkToolsToPath
   if [ $? -ne 0 ]
   then
     echo "Failure adding EDK Tools into PATH!"
-    return -1
+    return 1
   fi
 
   StoreCurrentConfiguration

@@ -1823,7 +1823,7 @@ Returns:
   }
   
   // Add opcode for an uncondional branch with no link. AKA B SecEntryPoint
-  ResetVector[0] |= 0xEA000000;
+  ResetVector[0] |= 0xEB000000;
   
   
   // Address of PEI Core, if we have one

@@ -423,7 +423,14 @@ def Main():
 
         Dpx = DependencyExpression(DxsString, Option.ModuleType, Option.Optimize)
         if Option.OutputFile != None:
-            Dpx.Generate(Option.OutputFile)
+            FileChangeFlag = Dpx.Generate(Option.OutputFile)
+            if not FileChangeFlag and DxsFile: 
+                #
+                # Touch the output file if its time stamp is older than the original
+                # DXS file to avoid re-invoke this tool for the dependency check in build rule.
+                #
+                if os.stat(DxsFile)[8] > os.stat(Option.OutputFile)[8]:
+                    os.utime(Option.OutputFile, None)
         else:
             Dpx.Generate()
     except BaseException, X:

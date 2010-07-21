@@ -193,16 +193,17 @@ class GuidSection(GuidSectionClassObject) :
 
             Attribute = []
             HeaderLength = None
-            if TempFileSize > InputFileSize and TempFileSize % 4 == 0:
-                FileHandleIn.seek(0)
-                BufferIn  = FileHandleIn.read()
-                FileHandleOut.seek(0)
-                BufferOut = FileHandleOut.read()
-                if BufferIn == BufferOut[TempFileSize - InputFileSize:]:
-                    HeaderLength = str(TempFileSize - InputFileSize)
-            #auto sec guided attribute with process required
-            if HeaderLength == None:
-                Attribute.append('PROCESSING_REQUIRED')
+            if self.ProcessRequired == "NONE":
+                if TempFileSize > InputFileSize and TempFileSize % 4 == 0:
+                    FileHandleIn.seek(0)
+                    BufferIn  = FileHandleIn.read()
+                    FileHandleOut.seek(0)
+                    BufferOut = FileHandleOut.read()
+                    if BufferIn == BufferOut[TempFileSize - InputFileSize:]:
+                        HeaderLength = str(TempFileSize - InputFileSize)
+                #auto sec guided attribute with process required
+                if HeaderLength == None:
+                    Attribute.append('PROCESSING_REQUIRED')
 
             FileHandleIn.close()
             FileHandleOut.close()
