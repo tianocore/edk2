@@ -16,7 +16,7 @@
 # on Leopard and _stat$INDOE64 on Snow Leopard. That is why we pass stat()
 # into one of these gaskets from C code.
 #
-# Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -235,7 +235,23 @@ _GasketUintnUint16:
   call  *%eax
   leave
   ret
-
+.globl _ReverseGasketUint64
+_ReverseGasketUint64:
+	pushl	%ebp
+	movl	%esp, %ebp
+	subl	$56, %esp
+	movl	12(%ebp), %eax
+	movl	%eax, -32(%ebp)
+	movl	16(%ebp), %eax
+	movl	%eax, -28(%ebp)
+	movl	8(%ebp), %eax
+	movl	%eax, -12(%ebp)
+	movl	-32(%ebp), %eax
+	movl	%eax, (%esp)
+	movl	-12(%ebp), %eax
+	call	*%eax
+	leave
+	ret
   .subsections_via_symbols
   
   #endif

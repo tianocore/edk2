@@ -827,7 +827,7 @@ Returns:
     // If the memory buffer could not be allocated at the FD build address
     // the Fixup is the difference.
     //
-    *FixUp = *FdBase - PcdGet32 (PcdUnixFdBaseAddress);
+    *FixUp = *FdBase - PcdGet64 (PcdUnixFdBaseAddress);
   }
 
   return EFI_SUCCESS;

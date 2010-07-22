@@ -373,9 +373,10 @@ UgaCheckKey(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
 {
   UGA_IO_PRIVATE *drv = (UGA_IO_PRIVATE *)UgaIo;
   HandleEvents(drv);
-  if (drv->key_count != 0)
+  
+  if (drv->key_count != 0) {
     return EFI_SUCCESS;
-  else {
+  } else {
     /* EFI is certainly polling.  Be CPU-friendly.  */
     msSleep (20);
     return EFI_NOT_READY;
@@ -631,8 +632,8 @@ EFI_STATUS EFIAPI GasketUgaBlt (
     XStoreName (drv->display, drv->win, title);
   }
 
-  XSelectInput (drv->display, drv->win,
-                 ExposureMask | KeyPressMask);
+  XSelectInput (drv->display, drv->win, ExposureMask | KeyPressMask);
+  
   drv->gc = DefaultGC (drv->display, drv->screen);
 
   *Uga = (EFI_UNIX_UGA_IO_PROTOCOL *)drv;

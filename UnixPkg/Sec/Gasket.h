@@ -33,9 +33,9 @@ void GasketGetLocalTime (EFI_TIME *Time);
 struct tm *Gasketgmtime (const time_t *clock);
 long GasketGetTimeZone (void);
 int GasketGetDayLight (void);
-int Gasketpoll (struct pollfd *pfd, int nfds, int timeout);
-int Gasketread (int fd, void *buf, int count);
-int Gasketwrite (int fd, const void *buf, int count);
+int Gasketpoll (struct pollfd *pfd, unsigned int nfds, int timeout);
+long Gasketread (int fd, void *buf, int count);
+long Gasketwrite (int fd, const void *buf, int count);
 char *Gasketgetenv (const char *name);
 int Gasketopen (const char *name, int flags, int mode);
 off_t Gasketlseek (int fd, off_t off, int whence);
@@ -46,7 +46,7 @@ int Gasketrmdir (const char *pathname);
 int Gasketunlink (const char *pathname);
 int GasketGetErrno (void);
 DIR *Gasketopendir (const char *pathname);
-void *Gasketrewinddir (DIR *dir);
+void Gasketrewinddir (DIR *dir);
 struct dirent *Gasketreaddir (DIR *dir);
 int Gasketclosedir (DIR *dir);
 int Gasketstat (const char *path, STAT_FIX *buf);
@@ -88,21 +88,22 @@ GasketUnixPeCoffRelocateImageExtraAction (
   );
 
 VOID
-GasketPeCoffLoaderUnloadImageExtraAction (
+GasketUnixPeCoffUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   );
   
 
-int GasketVoid (void *api);
-int GasketUintn (void *api, UINTN a);
-int GasketUintnUintn (void *api, UINTN a, UINTN b);
-int GasketUintnUintnUintn (void *api, UINTN a, UINTN b, UINTN c);
-int GasketUintnUintnUintnUintn (void *api, UINTN a, UINTN b, UINTN c, UINTN d);
-int GasketUintn10Args (void *api, UINTN a, UINTN b, UINTN c, UINTN d, UINTN e, UINTN f, UINTN g, UINTN h, UINTN i, UINTN j);
-int GasketUint64Uintn (void *api, UINT64 a, UINTN b);
+UINTN GasketVoid (void *api);
+UINTN GasketUintn (void *api, UINTN a);
+UINTN GasketUintnUintn (void *api, UINTN a, UINTN b);
+UINTN GasketUintnUintnUintn (void *api, UINTN a, UINTN b, UINTN c);
+UINTN GasketUintnUintnUintnUintn (void *api, UINTN a, UINTN b, UINTN c, UINTN d);
+UINTN GasketUintn10Args (void *api, UINTN a, UINTN b, UINTN c, UINTN d, UINTN e, UINTN f, UINTN g, UINTN h, UINTN i, UINTN j);
+UINTN GasketUint64Uintn (void *api, UINT64 a, UINTN b);
 UINT64 GasketUintnUint64Uintn (void *api, UINTN a, UINT64 b, UINTN c);
-int GasketUintnUint16 (void *api, UINTN a, UINT16 b);
+UINTN GasketUintnUint16 (void *api, UINTN a, UINT16 b);
 
+UINTN ReverseGasketUint64 (void *api, UINT64 a);
 
 //
 // Gasket functions for EFI_UNIX_UGA_IO_PROTOCOL

@@ -83,9 +83,9 @@ Returns:
     return Status;
   }
   
-  PcdSet32 (PcdFlashNvStorageVariableBase, PcdGet32 (PcdUnixFlashNvStorageVariableBase) + (UINT32)FdFixUp);
-  PcdSet32 (PcdFlashNvStorageFtwWorkingBase, PcdGet32 (PcdUnixFlashNvStorageFtwWorkingBase) + (UINT32)FdFixUp);
-  PcdSet32 (PcdFlashNvStorageFtwSpareBase, PcdGet32 (PcdUnixFlashNvStorageFtwSpareBase) + (UINT32)FdFixUp);
+  PcdSet64 (PcdFlashNvStorageVariableBase64, PcdGet64 (PcdUnixFlashNvStorageVariableBase) + FdFixUp);
+  PcdSet64 (PcdFlashNvStorageFtwWorkingBase64, PcdGet64 (PcdUnixFlashNvStorageFtwWorkingBase) + FdFixUp);
+  PcdSet64 (PcdFlashNvStorageFtwSpareBase64, PcdGet64 (PcdUnixFlashNvStorageFtwSpareBase) + FdFixUp);
 
   return EFI_SUCCESS;
 }

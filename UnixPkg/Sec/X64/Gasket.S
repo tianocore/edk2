@@ -27,10 +27,10 @@ LCFI4:
 	subq	$32, %rsp
 LCFI5:
 	movq	%rdi, -24(%rbp)
-	movl	%esi, -28(%rbp)
+	movq	%rsi, -32(%rbp)
 	movq	-24(%rbp), %rax
 	movq	%rax, -8(%rbp)
-	movl	-28(%rbp), %edi
+	movq	-32(%rbp), %rdi
 	movq	-8(%rbp), %rax
 	call	*%rax
 	leave
@@ -43,15 +43,15 @@ LFB4:
 LCFI6:
 	movq	%rsp, %rbp
 LCFI7:
-	subq	$32, %rsp
+	subq	$48, %rsp
 LCFI8:
 	movq	%rdi, -24(%rbp)
-	movl	%esi, -28(%rbp)
-	movl	%edx, -32(%rbp)
+	movq	%rsi, -32(%rbp)
+	movq	%rdx, -40(%rbp)
 	movq	-24(%rbp), %rax
 	movq	%rax, -8(%rbp)
-	movl	-32(%rbp), %esi
-	movl	-28(%rbp), %edi
+	movq	-40(%rbp), %rsi
+	movq	-32(%rbp), %rdi
 	movq	-8(%rbp), %rax
 	call	*%rax
 	leave
@@ -67,14 +67,14 @@ LCFI10:
 	subq	$48, %rsp
 LCFI11:
 	movq	%rdi, -24(%rbp)
-	movl	%esi, -28(%rbp)
-	movl	%edx, -32(%rbp)
-	movl	%ecx, -36(%rbp)
+	movq	%rsi, -32(%rbp)
+	movq	%rdx, -40(%rbp)
+	movq	%rcx, -48(%rbp)
 	movq	-24(%rbp), %rax
 	movq	%rax, -8(%rbp)
-	movl	-36(%rbp), %edx
-	movl	-32(%rbp), %esi
-	movl	-28(%rbp), %edi
+	movq	-48(%rbp), %rdx
+	movq	-40(%rbp), %rsi
+	movq	-32(%rbp), %rdi
 	movq	-8(%rbp), %rax
 	call	*%rax
 	leave
@@ -87,19 +87,19 @@ LFB6:
 LCFI12:
 	movq	%rsp, %rbp
 LCFI13:
-	subq	$48, %rsp
+	subq	$64, %rsp
 LCFI14:
 	movq	%rdi, -24(%rbp)
-	movl	%esi, -28(%rbp)
-	movl	%edx, -32(%rbp)
-	movl	%ecx, -36(%rbp)
-	movl	%r8d, -40(%rbp)
+	movq	%rsi, -32(%rbp)
+	movq	%rdx, -40(%rbp)
+	movq	%rcx, -48(%rbp)
+	movq	%r8, -56(%rbp)
 	movq	-24(%rbp), %rax
 	movq	%rax, -8(%rbp)
-	movl	-40(%rbp), %ecx
-	movl	-36(%rbp), %edx
-	movl	-32(%rbp), %esi
-	movl	-28(%rbp), %edi
+	movq	-56(%rbp), %rcx
+	movq	-48(%rbp), %rdx
+	movq	-40(%rbp), %rsi
+	movq	-32(%rbp), %rdi
 	movq	-8(%rbp), %rax
 	call	*%rax
 	leave
@@ -112,35 +112,35 @@ LFB7:
 LCFI15:
 	movq	%rsp, %rbp
 LCFI16:
-	subq	$80, %rsp
+	subq	$96, %rsp
 LCFI17:
 	movq	%rdi, -24(%rbp)
-	movl	%esi, -28(%rbp)
-	movl	%edx, -32(%rbp)
-	movl	%ecx, -36(%rbp)
-	movl	%r8d, -40(%rbp)
-	movl	%r9d, -44(%rbp)
+	movq	%rsi, -32(%rbp)
+	movq	%rdx, -40(%rbp)
+	movq	%rcx, -48(%rbp)
+	movq	%r8, -56(%rbp)
+	movq	%r9, -64(%rbp)
 	movq	-24(%rbp), %rax
 	movq	%rax, -8(%rbp)
-	movl	-44(%rbp), %edx
-	movl	-40(%rbp), %ecx
-	movl	-36(%rbp), %esi
-	movl	-32(%rbp), %edi
-	movl	-28(%rbp), %r10d
-	movl	48(%rbp), %eax
-	movl	%eax, 24(%rsp)
-	movl	40(%rbp), %eax
-	movl	%eax, 16(%rsp)
-	movl	32(%rbp), %eax
-	movl	%eax, 8(%rsp)
-	movl	24(%rbp), %eax
-	movl	%eax, (%rsp)
+	movq	-64(%rbp), %rdx
+	movq	-56(%rbp), %rcx
+	movq	-48(%rbp), %rsi
+	movq	-40(%rbp), %rdi
+	movq	-32(%rbp), %r10
+	movq	48(%rbp), %rax
+	movq	%rax, 24(%rsp)
+	movq	40(%rbp), %rax
+	movq	%rax, 16(%rsp)
+	movq	32(%rbp), %rax
+	movq	%rax, 8(%rsp)
+	movq	24(%rbp), %rax
+	movq	%rax, (%rsp)
 	movq	-8(%rbp), %rax
-	movl	16(%rbp), %r9d
-	movl	%edx, %r8d
-	movl	%esi, %edx
-	movl	%edi, %esi
-	movl	%r10d, %edi
+	movq	16(%rbp), %r9
+	movq	%rdx, %r8
+	movq	%rsi, %rdx
+	movq	%rdi, %rsi
+	movq	%r10, %rdi
 	call	*%rax
 	leave
 	ret
@@ -156,10 +156,10 @@ LCFI19:
 LCFI20:
 	movq	%rdi, -24(%rbp)
 	movq	%rsi, -32(%rbp)
-	movl	%edx, -36(%rbp)
+	movq	%rdx, -40(%rbp)
 	movq	-24(%rbp), %rax
 	movq	%rax, -8(%rbp)
-	movl	-36(%rbp), %esi
+	movq	-40(%rbp), %rsi
 	movq	-32(%rbp), %rdi
 	movq	-8(%rbp), %rax
 	call	*%rax
@@ -176,14 +176,14 @@ LCFI22:
 	subq	$48, %rsp
 LCFI23:
 	movq	%rdi, -24(%rbp)
-	movl	%esi, -28(%rbp)
+	movq	%rsi, -32(%rbp)
 	movq	%rdx, -40(%rbp)
-	movl	%ecx, -44(%rbp)
+	movq	%rcx, -48(%rbp)
 	movq	-24(%rbp), %rax
 	movq	%rax, -8(%rbp)
-	movl	-44(%rbp), %edx
+	movq	-48(%rbp), %rdx
 	movq	-40(%rbp), %rsi
-	movl	-28(%rbp), %edi
+	movq	-32(%rbp), %rdi
 	movq	-8(%rbp), %rax
 	call	*%rax
 	leave
@@ -196,20 +196,39 @@ LFB10:
 LCFI24:
 	movq	%rsp, %rbp
 LCFI25:
-	subq	$32, %rsp
+	subq	$48, %rsp
 LCFI26:
 	movq	%rdi, -24(%rbp)
-	movl	%esi, -28(%rbp)
-	movw	%dx, -32(%rbp)
+	movq	%rsi, -32(%rbp)
+	movw	%dx, -36(%rbp)
 	movq	-24(%rbp), %rax
 	movq	%rax, -8(%rbp)
-	movzwl	-32(%rbp), %esi
-	movl	-28(%rbp), %edi
+	movzwl	-36(%rbp), %esi
+	movq	-32(%rbp), %rdi
 	movq	-8(%rbp), %rax
 	call	*%rax
 	leave
 	ret
 LFE10:
+.globl _ReverseGasketUint64
+_ReverseGasketUint64:
+LFB11:
+	pushq	%rbp
+LCFI27:
+	movq	%rsp, %rbp
+LCFI28:
+	subq	$32, %rsp
+LCFI29:
+	movq	%rdi, -24(%rbp)
+	movq	%rsi, -32(%rbp)
+	movq	-24(%rbp), %rax
+	movq	%rax, -8(%rbp)
+	movq	-32(%rbp), %rdi
+	movq	-8(%rbp), %rax
+	call	*%rax
+	leave
+	ret
+LFE11:
 	.section __TEXT,__eh_frame,coalesced,no_toc+strip_static_syms+live_support
 EH_frame1:
 	.set L$set$0,LECIE1-LSCIE1
@@ -455,4 +474,29 @@ LASFDE17:
 	.byte	0x6
 	.align 3
 LEFDE17:
+.globl _ReverseGasketUint64.eh
+_ReverseGasketUint64.eh:
+LSFDE19:
+	.set L$set$37,LEFDE19-LASFDE19
+	.long L$set$37
+LASFDE19:
+	.long	LASFDE19-EH_frame1
+	.quad	LFB11-.
+	.set L$set$38,LFE11-LFB11
+	.quad L$set$38
+	.byte	0x0
+	.byte	0x4
+	.set L$set$39,LCFI27-LFB11
+	.long L$set$39
+	.byte	0xe
+	.byte	0x10
+	.byte	0x86
+	.byte	0x2
+	.byte	0x4
+	.set L$set$40,LCFI28-LCFI27
+	.long L$set$40
+	.byte	0xd
+	.byte	0x6
+	.align 3
+LEFDE19:
 	.subsections_via_symbols

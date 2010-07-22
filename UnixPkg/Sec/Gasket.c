@@ -74,20 +74,20 @@ GasketGetDayLight (void)
 
 
 int 
-Gasketpoll (struct pollfd *pfd, int nfds, int timeout)
+Gasketpoll (struct pollfd *pfd, unsigned int nfds, int timeout)
 {
   return GasketUintnUintnUintn (poll, (UINTN)pfd, nfds, timeout);
 }
 
 
-int 
+long
 Gasketread (int fd, void *buf, int count)
 {
   return  GasketUintnUintnUintn (read, fd, (UINTN)buf, count);
 }
 
 
-int 
+long
 Gasketwrite (int fd, const void *buf, int count)
 {
   return  GasketUintnUintnUintn (write, fd, (UINTN)buf, count);
@@ -168,10 +168,11 @@ Gasketopendir (const char *pathname)
 }
 
 
-void *
+void 
 Gasketrewinddir (DIR *dir)
 {
-  return (void *)(UINTN)GasketUintn (rewinddir, (UINTN)dir);
+  GasketUintn (rewinddir, (UINTN)dir);
+  return;
 }
 
 
@@ -372,7 +373,7 @@ GasketUnixPeCoffRelocateImageExtraAction (
 
 
 VOID
-GasketPeCoffLoaderUnloadImageExtraAction (
+GasketUnixPeCoffUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {

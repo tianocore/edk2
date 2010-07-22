@@ -26,11 +26,11 @@
   PLATFORM_GUID                  = 7b3c1fb4-8986-11db-b5b2-0040d02b1835
   PLATFORM_VERSION               = 0.3
   DSC_ SPECIFICATION             = 0x00010005
-  OUTPUT_DIRECTORY               = Build/Unix
-  SUPPORTED_ARCHITECTURES        = IA32
+  OUTPUT_DIRECTORY               = Build/UnixX64
+  SUPPORTED_ARCHITECTURES        = X64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = UnixPkg/UnixPkg.fdf
+  FLASH_DEFINITION               = UnixPkg/UnixPkgX64.fdf
 
 ################################################################################
 #
@@ -188,7 +188,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
-
   gEfiUnixPkgTokenSpaceGuid.PcdUnixConsole|L"Bus Driver Console Window"
   gEfiUnixPkgTokenSpaceGuid.PcdUnixUga|L"UGA Window"
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFileSystem|L".!../../../../EdkShellBinPkg/Bin/Ia32/Apps"
@@ -321,5 +320,5 @@
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
 
-  #FatPkg/EnhancedFatDxe/Fat.inf
+  FatPkg/EnhancedFatDxe/Fat.inf
 

@@ -53,7 +53,7 @@ case `uname` in
     
 esac
 
-BUILD_ROOT_ARCH=$WORKSPACE/Build/Unix/DEBUG_"$TARGET_TOOLS"/X64
+BUILD_ROOT_ARCH=$WORKSPACE/Build/UnixX64/DEBUG_"$TARGET_TOOLS"/X64
 
 if  [[ ! -f `which build` || ! -f `which GenFv` ]];
 then
@@ -80,7 +80,7 @@ do
         # This .gdbinit script sets a breakpoint that loads symbols for the PE/COFFEE
         # images that get loaded in SecMain
         #
-        cp $WORKSPACE/UnixPkg/.gdbinit $WORKSPACE/Build/Unix/DEBUG_"$TARGET_TOOLS"/X64
+        cp $WORKSPACE/UnixPkg/.gdbinit $WORKSPACE/Build/UnixX64/DEBUG_"$TARGET_TOOLS"/X64
         ;;
     esac 
 
@@ -100,7 +100,7 @@ done
 echo $PATH
 echo `which build`
 # Uncomment this if you want to build the shell. 
-#build -p $WORKSPACE/EdkShellPkg/EdkShellPkg.dsc -a X64 -t $TARGET_TOOLS $1 $2 $3 $4 $5 $6 $7 $8
-build -p $WORKSPACE/UnixPkg/UnixPkg.dsc         -a X64 -t $TARGET_TOOLS $1 $2 $3 $4 $5 $6 $7 $8
+build -p $WORKSPACE/GccShellPkg/GccShellPkg.dsc -a X64 -t $TARGET_TOOLS -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc      -a X64 -t $TARGET_TOOLS -n 3 $1 $2 $3 $4 $5 $6 $7 $8
 exit $?
 

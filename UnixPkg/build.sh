@@ -100,7 +100,7 @@ done
 echo $PATH
 echo `which build`
 # Uncomment this if you want to build the shell. 
-#build -p $WORKSPACE/EdkShellPkg/EdkShellPkg.dsc -a IA32 -t $TARGET_TOOLS $1 $2 $3 $4 $5 $6 $7 $8
-build -p $WORKSPACE/UnixPkg/UnixPkg.dsc         -a IA32 -t $TARGET_TOOLS $1 $2 $3 $4 $5 $6 $7 $8
+#build -p $WORKSPACE/GccShellPkg/GccShellPkg.dsc -a IA32 -t $TARGET_TOOLS -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+build -p $WORKSPACE/UnixPkg/UnixPkg.dsc         -a IA32 -t $TARGET_TOOLS -n 3 $1 $2 $3 $4 $5 $6 $7 $8
 exit $?
 

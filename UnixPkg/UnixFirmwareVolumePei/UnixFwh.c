@@ -117,7 +117,7 @@ Returns:
           PcdGet32 (PcdFlashNvStorageFtwSpareSize) +
           PcdGet32 (PcdUnixFlashNvStorageEventLogSize);
 
-        BuildFvHob (FdFixUp + PcdGet32 (PcdUnixFlashNvStorageVariableBase), FdSize);
+        BuildFvHob (FdFixUp + PcdGet64 (PcdUnixFlashNvStorageVariableBase), FdSize);
       } else {
         //
         // For other FD's just map them in.

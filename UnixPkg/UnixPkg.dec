@@ -59,14 +59,14 @@
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
   gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySizeForSecMain|L"64!64"|VOID*|0x0000100c
   
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageVariableBase|0x0|UINT32|0x00001014
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageFtwSpareBase|0x0|UINT32|0x00001015
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageFtwWorkingBase|0x0|UINT32|0x00001016
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixFdBaseAddress|0x0|UINT32|0x00001017
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageVariableBase|0x0|UINT64|0x00001014
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageFtwSpareBase|0x0|UINT64|0x00001015
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageFtwWorkingBase|0x0|UINT64|0x00001016
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFdBaseAddress|0x0|UINT64|0x00001017
 
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageEventLogBase|0x0|UINT32|0x0000100e
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageEventLogBase|0x0|UINT64|0x0000100e
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageEventLogSize|0x0|UINT32|0x0000100f
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoveryBase|0x0|UINT32|0x00001010
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoveryBase|0x0|UINT64|0x00001010
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoverySize|0x0|UINT32|0x00001011
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareFdSize|0x0|UINT32|0x00001012
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareBlockSize|0|UINT32|0x00001013

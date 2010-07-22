@@ -55,8 +55,14 @@ settimer_handler (int sig)
     - ((UINT64)settimer_timeval.tv_sec * 1000) 
     - (settimer_timeval.tv_usec / 1000);
   settimer_timeval = timeval;
-  if (settimer_callback)
-    (*settimer_callback)(delta);
+  
+  if (settimer_callback) {
+#ifdef __APPLE__
+    ReverseGasketUint64 (settimer_callback, delta);
+#else
+   (*settimer_callback)(delta);
+#endif
+  }
 }
 
 VOID
@@ -94,13 +100,18 @@ SetTimer (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs))
 void
 msSleep (unsigned long Milliseconds)
 {
-  struct timespec ts;
+  struct timespec rq, rm;
 
-  ts.tv_sec = Milliseconds / 1000;
-  ts.tv_nsec = (Milliseconds % 1000) * 1000000;
+  rq.tv_sec = Milliseconds / 1000;
+  rq.tv_nsec = (Milliseconds % 1000) * 1000000;
 
-  while (nanosleep (&ts, &ts) != 0 && errno == EINTR)
-    ;
+  while (nanosleep (&rq, &rm) != -1) {
+    if (errno != EINTR) {
+      break;
+    }
+    rq = rm;
+  } 
+    
 }
 
 void
@@ -174,20 +185,20 @@ EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   Gasketgmtime,
   GasketGetTimeZone,
   GasketGetDayLight,
-  (UnixPoll)Gasketpoll,
-  (UnixRead)Gasketread,
-  (UnixWrite)Gasketwrite,
+  Gasketpoll,
+  Gasketread,
+  Gasketwrite,
   Gasketgetenv,
-  (UnixOpen)Gasketopen,
-  (UnixSeek)Gasketlseek,
-  (UnixFtruncate)Gasketftruncate,
+  Gasketopen,
+  Gasketlseek,
+  Gasketftruncate,
   Gasketclose,
   Gasketmkdir,
   Gasketrmdir,
   Gasketunlink,
   GasketGetErrno,
   Gasketopendir,
-  (UnixRewindDir)Gasketrewinddir,
+  Gasketrewinddir,
   Gasketreaddir,
   Gasketclosedir,
   Gasketstat,
@@ -206,14 +217,9 @@ EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   Gasketcfsetospeed,
   Gaskettcgetattr,
   Gaskettcsetattr,
-  
-  dlopen,  // Update me with a gasket
-  dlerror, // Update me with a gasket
-  dlsym,   // Update me with a gasket
-
-  SecPeCoffGetEntryPoint,                // Update me with a gasket
-  SecPeCoffRelocateImageExtraAction,     // Update me with a gasket
-  SecPeCoffLoaderUnloadImageExtraAction  // Update me with a gasket
+  GasketUnixPeCoffGetEntryPoint,                
+  GasketUnixPeCoffRelocateImageExtraAction,     
+  GasketUnixPeCoffUnloadImageExtraAction  
 
 #else
   msSleep, /* Sleep */
@@ -255,9 +261,6 @@ EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   cfsetospeed,
   tcgetattr,
   tcsetattr,
-  dlopen,
-  dlerror,
-  dlsym,
   SecPeCoffGetEntryPoint,
   SecPeCoffRelocateImageExtraAction,
   SecPeCoffLoaderUnloadImageExtraAction

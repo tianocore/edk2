@@ -74,7 +74,9 @@ Abstract:
 // st_size is 64-bit but starts on a 32-bit offset in the structure. The compiler
 // flags used to produce compatible EFI images, break struct stat
 //
+#ifdef MDE_CPU_IA32
 #pragma pack(4)
+#endif
 
 #if __DARWIN_64_BIT_INO_T
 
@@ -128,7 +130,10 @@ typedef struct stat_fix {
 } STAT_FIX;
 
 #endif
-#pragma pack()
+
+#ifdef MDE_CPU_IA32
+#pragma pack(4)
+#endif
 
 #else 
 
@@ -155,40 +160,75 @@ VOID
 
 typedef
 VOID
-(*UnixSetTimer) (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs));
+(*UnixSetTimer) (
+  UINT64 PeriodMs, 
+  VOID (*CallBack)(UINT64 DeltaMs)
+  );
+
 typedef
 VOID
-(*UnixGetLocalTime) (EFI_TIME *Time);
+(*UnixGetLocalTime) (
+  EFI_TIME *Time
+  );
+
 typedef
 struct tm *
-(*UnixGmTime)(const time_t *timep);
+(*UnixGmTime)(
+  const time_t *timep
+  );
+
 typedef
 long
-(*UnixGetTimeZone)(void);
+(*UnixGetTimeZone)(
+  void
+  );
+
 typedef
 int
-(*UnixGetDayLight)(void);
+(*UnixGetDayLight)(
+  void
+  );
+
 typedef
 int
-(*UnixPoll)(struct pollfd *pfd, int nfds, int timeout);
+(*UnixPoll)(
+  struct pollfd *pfd, 
+  unsigned int  nfds, 
+  int           timeout
+  );
+
 typedef
-int
-(*UnixRead) (int fd, void *buf, int count);
+long
+(*UnixRead) (
+  int  fd, 
+  void *buf, 
+  int  count
+  );
+
 typedef
-int
-(*UnixWrite) (int fd, const void *buf, int count);
+long
+(*UnixWrite) (
+  int         fd, 
+  const void  *buf, 
+  int         count
+  );
+
 typedef
 char *
 (*UnixGetenv) (const char *var);
+
 typedef
 int
 (*UnixOpen) (const char *name, int flags, int mode);
+
 typedef
 off_t
 (*UnixSeek) (int fd, off_t off, int whence);
+
 typedef
 int
 (*UnixFtruncate) (int fd, long int len);
+
 typedef
 int
 (*UnixClose) (int fd);
@@ -196,45 +236,59 @@ int
 typedef
 int
 (*UnixMkdir)(const char *pathname, mode_t mode);
+
 typedef
 int
 (*UnixRmDir)(const char *pathname);
+
 typedef
 int
 (*UnixUnLink)(const char *pathname);
+
 typedef
 int
 (*UnixGetErrno)(VOID);
+
 typedef
 DIR *
 (*UnixOpenDir)(const char *pathname);
+
 typedef
 void
 (*UnixRewindDir)(DIR *dir);
+
 typedef
 struct dirent *
 (*UnixReadDir)(DIR *dir);
+
 typedef
 int
 (*UnixCloseDir)(DIR *dir);
+
 typedef
 int
 (*UnixStat)(const char *path, STAT_FIX *buf);
+
 typedef
 int
 (*UnixStatFs)(const char *path, struct statfs *buf);
+
 typedef
 int
 (*UnixRename)(const char *oldpath, const char *newpath);
+
 typedef
 time_t
 (*UnixMkTime)(struct tm *tm);
+
 typedef
 int
 (*UnixFSync)(int fd);
+
 typedef
 int
 (*UnixChmod)(const char *path, mode_t mode);
+
 typedef
 int
 (*UnixUTime)(const char *filename, const struct utimbuf *buf);
@@ -282,21 +336,9 @@ int
 (*UnixTcsetattr) (int __fd, int __optional_actions,
 		      __const struct termios *__termios_p);
 
-typedef 
-VOID *
-(*UnixDlopen) (const char *FileName, int Flag);
-
-typedef
-char *
-(*UnixDlerror) (VOID);
-
-typedef 
-VOID *
-(*UnixDlsym) (VOID* Handle, const char* Symbol);
-
 
 //
-// Work functions to enable source level debug in the emulator
+// Worker functions to enable source level debug in the emulator
 //
 
 typedef 
@@ -364,9 +406,6 @@ typedef struct _EFI_UNIX_THUNK_PROTOCOL {
   UnixCfsetospeed                     Cfsetospeed;
   UnixTcgetattr                       Tcgetattr;
   UnixTcsetattr                       Tcsetattr;
-  UnixDlopen                          Dlopen;
-  UnixDlerror                         Dlerror;
-  UnixDlsym                           Dlsym;
   UnixPeCoffGetEntryPoint                 PeCoffGetEntryPoint;
   UnixPeCoffRelocateImageExtraAction      PeCoffRelocateImageExtraAction;
   UnixPeCoffLoaderUnloadImageExtraAction  PeCoffUnloadImageExtraAction;
