@@ -19,8 +19,8 @@
 ;
 ;------------------------------------------------------------------------------
 
-mOriginalHandler PROTO
-PageFaultHandler PROTO
+EXTERN mOriginalHandler:QWORD
+EXTERN PageFaultHandler:PROC
 
   .code
 

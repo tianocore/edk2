@@ -40,7 +40,7 @@ ASM_PFX(PageFaultHandlerHook):
     popq     %rcx
     popq     %rax                         # restore all volatile registers
     jnz      L1
-    jmp      ASM_PFX(mOriginalHandler)
+    jmpq     *ASM_PFX(mOriginalHandler)
 L1:
     addq     $0x08, %rsp                  # skip error code for PF
     iretq
