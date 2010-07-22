@@ -181,38 +181,6 @@ InitializeDeviceManager (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  //
-  // Publish our HII data
-  //
-  gDeviceManagerPrivate.HiiHandle = HiiAddPackages (
-                                      &mDeviceManagerGuid,
-                                      gDeviceManagerPrivate.DriverHandle,
-                                      DeviceManagerVfrBin,
-                                      BdsDxeStrings,
-                                      NULL
-                                      );
-  if (gDeviceManagerPrivate.HiiHandle == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  } else {
-    Status = EFI_SUCCESS;
-  }
-  
-  //
-  // Publish Driver Health HII data
-  //
-  gDeviceManagerPrivate.DriverHealthHiiHandle = HiiAddPackages (
-                                                  &mDeviceManagerGuid,
-                                                  gDeviceManagerPrivate.DriverHealthHandle,
-                                                  DriverHealthVfrBin,
-                                                  BdsDxeStrings,
-                                                  NULL
-                                                  );
-  if (gDeviceManagerPrivate.DriverHealthHiiHandle == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-  } else {
-    Status = EFI_SUCCESS;
-  }
-
   return Status;
 }
 
@@ -389,6 +357,26 @@ CallDeviceManager (
     BdsLibConnectAllDriversToAllControllers ();
     gConnectAllHappened = TRUE;
   }
+
+  HiiHandle = gDeviceManagerPrivate.HiiHandle;
+  if (HiiHandle == NULL) {
+    //
+    // Publish our HII data.
+    //
+    HiiHandle = HiiAddPackages (
+                  &mDeviceManagerGuid,
+                  gDeviceManagerPrivate.DriverHandle,
+                  DeviceManagerVfrBin,
+                  BdsDxeStrings,
+                  NULL
+                  );
+    if (HiiHandle == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    gDeviceManagerPrivate.HiiHandle = HiiHandle;
+  }
+
   //
   // Create Subtitle OpCodes
   //
@@ -422,8 +410,6 @@ CallDeviceManager (
   //
   HiiHandles = HiiGetHiiHandles (NULL);
   ASSERT (HiiHandles != NULL);
-
-  HiiHandle = gDeviceManagerPrivate.HiiHandle;
 
   //
   // Search for formset of each class type
@@ -565,22 +551,10 @@ CallDeviceManager (
   }
 
   //
-  // Cleanup dynamic created strings in HII database by reinstall the packagelist
+  // Remove our packagelist from HII database.
   //
   HiiRemovePackages (HiiHandle);
-
-  gDeviceManagerPrivate.HiiHandle = HiiAddPackages (
-                                      &mDeviceManagerGuid,
-                                      gDeviceManagerPrivate.DriverHandle,
-                                      DeviceManagerVfrBin,
-                                      BdsDxeStrings,
-                                      NULL
-                                      );
-  if (gDeviceManagerPrivate.HiiHandle == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-  } else {
-    Status = EFI_SUCCESS;
-  }
+  gDeviceManagerPrivate.HiiHandle = NULL;
 
   HiiFreeOpCodeHandle (StartOpCodeHandle);
   HiiFreeOpCodeHandle (EndOpCodeHandle);
@@ -676,12 +650,30 @@ CallDriverHealth (
   EFI_DEVICE_PATH_PROTOCOL    *DriverDevicePath;
   UINTN                       Length;
 
-  HiiHandle           = gDeviceManagerPrivate.DriverHealthHiiHandle;
   Index               = 0;
   Length              = 0;
   DriverHealthInfo    = NULL;  
   DriverDevicePath    = NULL;
   InitializeListHead (&DriverHealthList);
+
+  HiiHandle = gDeviceManagerPrivate.DriverHealthHiiHandle;
+  if (HiiHandle == NULL) {
+    //
+    // Publish Driver Health HII data.
+    //
+    HiiHandle = HiiAddPackages (
+                  &mDeviceManagerGuid,
+                  gDeviceManagerPrivate.DriverHealthHandle,
+                  DriverHealthVfrBin,
+                  BdsDxeStrings,
+                  NULL
+                  );
+    if (HiiHandle == NULL) {
+      return;
+    }
+
+    gDeviceManagerPrivate.DriverHealthHiiHandle = HiiHandle;
+  }
 
   //
   // Allocate space for creation of UpdateData Buffer
@@ -964,23 +956,11 @@ CallDriverHealth (
   }
    
   //
-  // Cleanup dynamic created strings in HII database by reinstall the packagelist
+  // Remove driver health packagelist from HII database.
   //
-  
   HiiRemovePackages (HiiHandle);
+  gDeviceManagerPrivate.DriverHealthHiiHandle = NULL;
 
-  gDeviceManagerPrivate.DriverHealthHiiHandle = HiiAddPackages (
-                                                  &mDriverHealthGuid,
-                                                  gDeviceManagerPrivate.DriverHealthHandle,
-                                                  DriverHealthVfrBin,
-                                                  BdsDxeStrings,
-                                                  NULL
-                                                  );
-  if (gDeviceManagerPrivate.DriverHealthHiiHandle == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-  } else {
-    Status = EFI_SUCCESS;
-  }
   //
   // Free driver health info list
   //
