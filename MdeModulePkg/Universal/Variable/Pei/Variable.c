@@ -428,7 +428,11 @@ FindVariable (
     if ((IndexTable->StartPtr != NULL) || (IndexTable->EndPtr != NULL)) {
       Variable = IndexTable->StartPtr;
     } else {
-      VariableBase = (UINT8 *) (UINTN) PcdGet32 (PcdFlashNvStorageVariableBase);
+      VariableBase = (UINT8 *) (UINTN) PcdGet64 (PcdFlashNvStorageVariableBase64);
+      if (VariableBase == NULL) {
+        VariableBase = (UINT8 *) (UINTN) PcdGet32 (PcdFlashNvStorageVariableBase);
+      }
+      
       VariableStoreHeader = (VARIABLE_STORE_HEADER *) (VariableBase + \
                             ((EFI_FIRMWARE_VOLUME_HEADER *) (VariableBase)) -> HeaderLength);
 

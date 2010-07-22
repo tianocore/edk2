@@ -2303,7 +2303,11 @@ VariableCommonInitialize (
   // Get non volatile varaible store
   //
 
-  TempVariableStoreHeader = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
+  TempVariableStoreHeader = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageVariableBase64);
+  if (TempVariableStoreHeader == 0) {
+    TempVariableStoreHeader = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
+  }
+  
   VariableStoreBase = TempVariableStoreHeader + \
                               (((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(TempVariableStoreHeader)) -> HeaderLength);
   VariableStoreLength = (UINT64) PcdGet32 (PcdFlashNvStorageVariableSize) - \
@@ -2534,7 +2538,11 @@ FvbNotificationEvent (
     }
 
     FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvbBaseAddress);
-    NvStorageVariableBase = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
+    NvStorageVariableBase = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageVariableBase64);
+    if (NvStorageVariableBase == 0) {
+      NvStorageVariableBase = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
+    }
+    
     if ((NvStorageVariableBase >= FvbBaseAddress) && (NvStorageVariableBase < (FvbBaseAddress + FwVolHeader->FvLength))) {
       Status      = EFI_SUCCESS;
       break;

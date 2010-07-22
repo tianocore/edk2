@@ -376,6 +376,15 @@
   ## Base address of the FTW working block range in flash device.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x0|UINT32|0x30000010
 
+  ## 64-bit Base address of the NV variable range in flash device
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0x0|UINT64|0x80000001
+
+  ## 64-bit Base address of the FTW spare block range in flash device.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0x0|UINT64|0x80000013
+
+  ## 64-bit Base address of the FTW working block range in flash device.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0x0|UINT64|0x80000010
+
   ## This PCD defines the print string.
   #  This PCD is a sample to explain String typed PCD usage.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString|L"UEFI Hello World!\n"|VOID*|0x40000004

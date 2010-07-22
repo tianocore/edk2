@@ -52,7 +52,8 @@
   gEfiPeiReadOnlyVariable2PpiGuid                ## SOMETIMES_PRODUCES (Not for boot mode RECOVERY)
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64  ## CONSUMES
 
 [Depex]
   TRUE
