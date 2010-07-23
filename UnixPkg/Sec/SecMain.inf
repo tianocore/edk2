@@ -34,9 +34,9 @@
   UnixThunk.c
   FwVol.c
   SecMain.c
-  Gasket.c
   
 [Sources.Ia32]  
+  Gasket.c
   Ia32/Gasket.S
   Ia32/Stack.S
   Ia32/SwitchStack.c
@@ -44,6 +44,10 @@
 [Sources.X64]  
   X64/Gasket.S
   X64/SwitchStack.S
+  X64/NameManglingFix.c
+  
+# Only used to help construct Gasket.S
+#  X64/GasketEfiTemplate.c
 
 [Packages]
   MdePkg/MdePkg.dec

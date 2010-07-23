@@ -71,10 +71,6 @@ int Gasketcfsetospeed (struct termios *__termios_p, speed_t __speed);
 int Gaskettcgetattr (int __fd, struct termios *__termios_p); 
 int Gaskettcsetattr (int __fd, int __optional_actions, __const struct termios *__termios_p);
 int Gasketsigaction (int sig, const struct sigaction *act, struct sigaction *oact);
-int Gasketsetcontext (const ucontext_t *ucp);
-int Gasketgetcontext (ucontext_t *ucp);
-int Gasketsigemptyset (sigset_t *set);
-int Gasketsigaltstack (const stack_t *ss, stack_t *oss);
 
 RETURN_STATUS
 GasketUnixPeCoffGetEntryPoint (

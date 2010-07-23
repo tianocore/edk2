@@ -61,8 +61,6 @@ Abstract:
 #endif 
 
 #include <utime.h>
-#include <dlfcn.h>
-#include <ucontext.h>
 
 #include <Base.h>
 #include <Library/PeCoffLib.h>
