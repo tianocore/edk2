@@ -132,7 +132,7 @@ CEntryPoint (
   // Start talking
   UartInit ();
 
-  InitializeDebugAgent (DEBUG_AGENT_INIT_PREMEM_SEC, NULL);
+  InitializeDebugAgent (DEBUG_AGENT_INIT_PREMEM_SEC, NULL, NULL);
   SaveAndSetDebugTimerInterrupt (TRUE);
 
   DEBUG ((EFI_D_ERROR, "UART Enabled\n"));
