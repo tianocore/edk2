@@ -26,6 +26,7 @@
 #include <Library/PrintLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/DebugAgentTimerLib.h>
+#include <Library/DebugAgentLib.h>
 
 #include <IndustryStandard/PeImage.h>
 #include <Protocol/DebugSupport.h>
