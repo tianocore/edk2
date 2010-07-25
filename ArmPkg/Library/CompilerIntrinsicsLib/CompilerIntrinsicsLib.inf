@@ -89,6 +89,8 @@
 
   Arm/sourcery.S   | GCC
   Arm/uldivmod.c   | GCC
+  Arm/uldiv.S      | GCC
+  Arm/ldivmod.S    | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
