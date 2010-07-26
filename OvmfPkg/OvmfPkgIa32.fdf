@@ -26,7 +26,7 @@ FV = FVMAIN_COMPACT
 
 0x000EE000|0x12000
 FV = SECFV
-  
+
 ################################################################################
 
 [FD.MEMFD]
@@ -68,7 +68,7 @@ READ_LOCK_STATUS   = TRUE
 #
 INF  OvmfPkg/Sec/SecMain.inf
 
-INF  RuleOverride=RESET_VECTOR USE = IA32 UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector.inf
+INF  RuleOverride=RESET_VECTOR UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector.inf
 
 ################################################################################
 [FV.MAINFV]
@@ -198,8 +198,8 @@ INF  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
 INF  RuleOverride=ACPITABLE OvmfPkg/AcpiTables/AcpiTables.inf
 INF  OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
 
-INF  RuleOverride = BINARY USE = X64 FatBinPkg/EnhancedFatDxe/Fat.inf
-INF  RuleOverride = BINARY USE = X64 EdkShellBinPkg/FullShell/FullShell.inf
+INF  RuleOverride = BINARY FatBinPkg/EnhancedFatDxe/Fat.inf
+INF  RuleOverride = BINARY EdkShellBinPkg/FullShell/FullShell.inf
 
 FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
   SECTION RAW = MdeModulePkg/Logo/Logo.bmp
@@ -210,9 +210,8 @@ FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
 #
 !if $(NETWORK_ENABLE)
   FILE DRIVER = 5D695E11-9B3F-4b83-B25F-4A8D5D69BE07 {
-    SECTION PE32 = Intel3.5/EFIX64/E3507X2.EFI
+    SECTION PE32 = Intel3.5/EFI32/E3507E2.EFI
   }
-
   INF  MdeModulePkg/Universal/Network/SnpDxe/SnpDxe.inf
   INF  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
   INF  MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
@@ -227,7 +226,7 @@ FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
   INF  MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   INF  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
 !endif
-  
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
@@ -249,11 +248,11 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
-       SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
-          SECTION FV_IMAGE = MAINFV
-       }
-     }
-  
+   SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+     SECTION FV_IMAGE = MAINFV
+   }
+ }
+
 ################################################################################
 
 [Rule.Common.SEC]

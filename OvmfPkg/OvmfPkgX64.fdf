@@ -205,6 +205,28 @@ FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
   SECTION RAW = MdeModulePkg/Logo/Logo.bmp
 }
 
+#
+# Network modules
+#
+!if $(NETWORK_ENABLE)
+  FILE DRIVER = A5C9C8B3-5ABB-4be2-8CA6-2FF06F405D04 {
+    SECTION PE32 = Intel3.5/EFIX64/E3507X2.EFI
+  }
+  INF  MdeModulePkg/Universal/Network/SnpDxe/SnpDxe.inf
+  INF  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
+  INF  MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
+  INF  MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
+  INF  MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
+  INF  MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
+  INF  MdeModulePkg/Universal/Network/Ip4ConfigDxe/Ip4ConfigDxe.inf
+  INF  MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
+  INF  MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
+  INF  MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
+  INF  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
+  INF  MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
+  INF  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
+!endif
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
@@ -277,6 +299,7 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     UI       STRING="$(MODULE_NAME)" Optional
     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
+
 [Rule.Common.UEFI_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
     DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
