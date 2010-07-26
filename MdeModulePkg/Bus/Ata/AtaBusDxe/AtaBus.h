@@ -18,7 +18,7 @@
 #ifndef _ATA_BUS_H_
 #define _ATA_BUS_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/AtaPassThru.h>
 #include <Protocol/BlockIo.h>
