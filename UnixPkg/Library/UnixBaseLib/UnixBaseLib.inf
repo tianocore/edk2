@@ -22,7 +22,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseLib
-  FILE_GUID                      = 27d67720-ea68-48ae-93da-a3a074c90e30
+  FILE_GUID                      = 25A41BF7-7718-4e9a-9A7E-50DC324929FD
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = BaseLib 
