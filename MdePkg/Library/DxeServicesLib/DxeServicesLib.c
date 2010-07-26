@@ -122,6 +122,7 @@ InternalGetSectionFromFv (
   EFI_STATUS                    Status;
   EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
   UINT32                        AuthenticationStatus;
+  VOID*                         TempBuffer;
 
   ASSERT (NameGuid != NULL);
   ASSERT (Buffer != NULL);
@@ -168,6 +169,17 @@ InternalGetSectionFromFv (
                     Size,
                     &AuthenticationStatus
                     );
+  }
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // The found buffer by FV protocol is allocated by gBS AllocatePool() service. 
+    // Copy the found buffer to the allocated buffer by AllocatePool().
+    // So, the returned buffer can be freed by FreePool().
+    //
+    TempBuffer = AllocateCopyPool (*Size, *Buffer);
+    gBS->FreePool (*Buffer);
+    *Buffer = TempBuffer;
   }
 
   return Status;
@@ -312,7 +324,11 @@ GetSectionFromAnyFvByFileType  (
 
 Done:
   if (HandleBuffer != NULL) {  
-    FreePool(HandleBuffer);
+    //
+    // HandleBuffer is allocated by gBS AllocatePool() service. 
+    // So, gBS FreePool() service is used to free HandleBuffer.
+    //
+    gBS->FreePool (HandleBuffer);
   }
 
   return Status;
@@ -435,8 +451,12 @@ GetSectionFromAnyFv  (
 
 Done:
   
-  if (HandleBuffer != NULL) {  
-    FreePool(HandleBuffer);
+  if (HandleBuffer != NULL) {
+    //
+    // HandleBuffer is allocated by gBS AllocatePool() service. 
+    // So, gBS FreePool() service is used to free HandleBuffer.
+    //
+    gBS->FreePool (HandleBuffer);
   }
   return Status;
   
@@ -615,6 +635,7 @@ GetFileBufferByFilePath (
   EFI_FIRMWARE_VOLUME2_PROTOCOL     *FwVol;
   EFI_SECTION_TYPE                  SectionType;
   UINT8                             *ImageBuffer;
+  UINT8                             *TempBuffer;
   UINTN                             ImageBufferSize;
   EFI_FV_FILETYPE                   Type;
   EFI_FV_FILE_ATTRIBUTES            Attrib;
@@ -642,6 +663,7 @@ GetFileBufferByFilePath (
   FileInfo            = NULL;
   FileHandle          = NULL;
   ImageBuffer         = NULL;
+  TempBuffer          = NULL;
   ImageBufferSize     = 0;
   *AuthenticationStatus = 0;
   
@@ -701,6 +723,16 @@ GetFileBufferByFilePath (
                             &Attrib,
                             AuthenticationStatus
                             );
+        }
+        if (!EFI_ERROR (Status)) {
+          //
+          // The found buffer by FV protocol is allocated by gBS AllocatePool() service. 
+          // Copy the found buffer to the allocated buffer by AllocatePool().
+          // Then, this returned buffer can be freed by FreePool().
+          //
+          TempBuffer = AllocateCopyPool (ImageBufferSize, ImageBuffer);
+          gBS->FreePool (ImageBuffer);
+          ImageBuffer = TempBuffer;
         }
       }
     }

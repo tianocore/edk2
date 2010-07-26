@@ -96,7 +96,11 @@ PciSegmentLibConstructor (
     ASSERT (Descriptors->Desc != ACPI_END_TAG_DESCRIPTOR);
   }
 
-  FreePool(HandleBuffer);
+  //
+  // HandleBuffer is allocated by gBS AllocatePool() service. 
+  // So, gBS FreePool() service is used to free HandleBuffer.
+  //
+  gBS->FreePool (HandleBuffer);
 
   return EFI_SUCCESS;
 }
