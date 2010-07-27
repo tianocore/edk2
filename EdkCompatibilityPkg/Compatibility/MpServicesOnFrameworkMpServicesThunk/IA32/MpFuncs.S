@@ -12,16 +12,16 @@
 #
 #------------------------------------------------------------------------------
 
-.equ                   VacantFlag,       0x0
-.equ                   NotVacantFlag,    0xff
+#define VacantFlag       0x0
+#define NotVacantFlag    0xff
 
-.equ                   LockLocation,     RendezvousFunnelProcEnd - RendezvousFunnelProcStart
-.equ                   StackStart,       RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x04
-.equ                   StackSize,        RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x08
-.equ                   RendezvousProc,   RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x0C
-.equ                   GdtrProfile,      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x10
-.equ                   IdtrProfile,      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x16
-.equ                   BufferStart,      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x1C
+#define LockLocation     RendezvousFunnelProcEnd - RendezvousFunnelProcStart
+#define StackStart       RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x04
+#define StackSize        RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x08
+#define RendezvousProc   RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x0C
+#define GdtrProfile      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x10
+#define IdtrProfile      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x16
+#define BufferStart      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x1C
 
 #-------------------------------------------------------------------------------------
 #RendezvousFunnelProc  procedure follows. All APs execute their procedure. This
