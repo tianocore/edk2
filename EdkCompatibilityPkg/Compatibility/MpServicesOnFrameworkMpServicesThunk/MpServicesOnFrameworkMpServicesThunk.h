@@ -31,6 +31,7 @@ Module Name:
 #include <Library/DxeServicesTableLib.h>
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
+#include <Library/DebugAgentLib.h>
 
 #define AP_STACK_SIZE                         0x8000
 #define MAX_CPU_NUMBER                        256
@@ -49,8 +50,18 @@ Module Name:
 #define APIC_REGISTER_SPURIOUS_VECTOR_OFFSET  0xF0
 #define APIC_REGISTER_ICR_LOW_OFFSET          0x300
 #define APIC_REGISTER_ICR_HIGH_OFFSET         0x310
+#define APIC_REGISTER_LVT_TIMER               0x320
+#define APIC_REGISTER_TIMER_INIT_COUNT        0x380
 #define APIC_REGISTER_LINT0_VECTOR_OFFSET     0x350
 #define APIC_REGISTER_LINT1_VECTOR_OFFSET     0x360
+#define APIC_REGISTER_TIMER_COUNT             0x390
+#define APIC_REGISTER_TIMER_DIVIDE            0x3E0
+
+//
+// Definition for MSR address
+//
+#define MSR_IA32_TIME_STAMP_COUNTER           0x10
+#define MSR_IA32_APIC_BASE                    0x1B
 
 typedef struct {
   UINTN             Lock;

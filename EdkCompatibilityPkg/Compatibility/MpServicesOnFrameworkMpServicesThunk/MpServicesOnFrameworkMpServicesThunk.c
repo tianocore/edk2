@@ -532,6 +532,12 @@ SwitchBSP (
   CPU_DATA_BLOCK        *CpuData;
   UINTN                 CallerNumber;
   UINTN                 BspNumber;
+  UINTN                 ApicBase;
+  UINT32                CurrentTimerValue;
+  UINT32                CurrentTimerRegister;
+  UINT32                CurrentTimerDivide;
+  UINT64                CurrentTscValue;
+  BOOLEAN               OldInterruptState;
 
   //
   // Check whether caller processor is BSP
@@ -572,6 +578,28 @@ SwitchBSP (
     return EFI_NOT_READY;
   }
 
+  //
+  // Save and disable interrupt.
+  //
+  OldInterruptState = SaveAndDisableInterrupts ();
+	
+  //
+  // Record the current local APIC timer setting of BSP
+  //
+  ApicBase = (UINTN)AsmMsrBitFieldRead64 (MSR_IA32_APIC_BASE, 12, 35) << 12;
+  CurrentTimerValue     = MmioRead32 (ApicBase + APIC_REGISTER_TIMER_COUNT);
+  CurrentTimerRegister  = MmioRead32 (ApicBase + APIC_REGISTER_LVT_TIMER);
+  CurrentTimerDivide    = MmioRead32 (ApicBase + APIC_REGISTER_TIMER_DIVIDE);
+  //
+  // Set mask bit (BIT 16) of LVT Timer Register to disable its interrupt
+  //
+  MmioBitFieldWrite32 (ApicBase + APIC_REGISTER_LVT_TIMER, 16, 16, 1);
+
+  //
+  // Record the current TSC value
+  //
+  CurrentTscValue = AsmReadTsc ();
+  
   Status = mFrameworkMpService->SwitchBSP (
                                   mFrameworkMpService,
                                   ProcessorNumber,
@@ -579,6 +607,23 @@ SwitchBSP (
                                   );
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Restore TSC value
+  //
+  AsmWriteMsr64 (MSR_IA32_TIME_STAMP_COUNTER, CurrentTscValue);
+
+  //
+  // Restore local APIC timer setting to new BSP
+  //
+  MmioWrite32 (ApicBase + APIC_REGISTER_TIMER_DIVIDE, CurrentTimerDivide);
+  MmioWrite32 (ApicBase + APIC_REGISTER_TIMER_INIT_COUNT, CurrentTimerValue);
+  MmioWrite32 (ApicBase + APIC_REGISTER_LVT_TIMER, CurrentTimerRegister);
+
+  //
+  // Restore interrupt state.
+  //
+  SetInterruptState (OldInterruptState);
+  
   ChangeCpuState (BspNumber, EnableOldBSP);
 
   return EFI_SUCCESS;
@@ -1091,7 +1136,7 @@ ProgramVirtualWireMode (
   UINTN                 ApicBase;
   UINT32                Value;
 
-  ApicBase = (UINTN)AsmMsrBitFieldRead64 (27, 12, 35) << 12;
+  ApicBase = (UINTN)AsmMsrBitFieldRead64 (MSR_IA32_APIC_BASE, 12, 35) << 12;
 
   //
   // Program the Spurious Vector entry
@@ -1157,7 +1202,15 @@ ApProcWrapper (
   UINTN                 ProcessorNumber;
   CPU_DATA_BLOCK        *CpuData;
 
+  //
+  // Program virtual wire mode for AP, since it will be lost after AP wake up
+  //
   ProgramVirtualWireMode (FALSE);
+
+  //
+  // Initialize Debug Agent to support source level debug on AP code.
+  //
+  InitializeDebugAgent (DEBUG_AGENT_INIT_DXE_AP, NULL, NULL);
 
   WhoAmI (&mMpService, &ProcessorNumber);
   CpuData = &mMPSystemData.CpuData[ProcessorNumber];
@@ -1235,7 +1288,7 @@ SendInitSipiSipi (
   DeliveryMode = DELIVERY_MODE_INIT;
   ICRLow      |= VectorNumber | (DeliveryMode << 8);
 
-  ApicBase = 0xfee00000;
+  ApicBase = (UINTN)AsmMsrBitFieldRead64 (MSR_IA32_APIC_BASE, 12, 35) << 12;;
 
   //
   // Write Interrupt Command Registers to send INIT IPI.

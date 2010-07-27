@@ -58,6 +58,7 @@
   DebugLib
   BaseLib
   SynchronizationLib
+  DebugAgentLib
 
 [Protocols]
   gEfiMpServiceProtocolGuid                   ## PRODUCES
