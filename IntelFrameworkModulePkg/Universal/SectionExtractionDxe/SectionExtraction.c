@@ -528,8 +528,9 @@ CreateProtocolNotifyEvent (
 }
 
 /**
-  RPN callback function.  Removes a stale section stream and re-initializes it
-  with an updated AuthenticationStatus.
+  RPN callback function.  
+  1. Initialize the section stream when the GUIDED_SECTION_EXTRACTION_PROTOCOL is installed.
+  2. Removes a stale section stream and re-initializes it with an updated AuthenticationStatus.
 
   @param Event               The event that fired
   @param RpnContext          A pointer to the context that allows us to identify
@@ -552,11 +553,14 @@ NotifyGuidedExtraction (
   RPN_EVENT_CONTEXT                       *Context;
   
   Context = RpnContext;
-  
-  Status = CloseSectionStream (&mSectionExtraction, Context->ChildNode->EncapsulatedStreamHandle);
+  Status = EFI_SUCCESS;
+  if (Context->ChildNode->EncapsulatedStreamHandle != NULL_STREAM_HANDLE) {
+    Status = CloseSectionStream (&mSectionExtraction, Context->ChildNode->EncapsulatedStreamHandle);
+  }
   if (!EFI_ERROR (Status)) {
     //
-    // The stream closed successfully, so re-open the stream with correct AuthenticationStatus
+    // The stream is not initialized, open it. 
+    // Or the stream closed successfully, so re-open the stream with correct AuthenticationStatus.
     //
   
     GuidedHeader = (EFI_GUID_DEFINED_SECTION *) 
@@ -839,45 +843,46 @@ CreateChildNode (
         //
         if ((GuidedHeader->Attributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) == EFI_GUIDED_SECTION_PROCESSING_REQUIRED) {
           //
-          // If the section REQUIRES an extraction protocol, then we're toast
+          // If the section REQUIRES an extraction protocol, register for RPN 
+          // when the required GUIDed extraction protocol becomes available. 
           //
-          FreePool (*ChildNode);
-          return EFI_PROTOCOL_ERROR;
-        }
-        
-        //
-        // Figure out the proper authentication status
-        //
-        AuthenticationStatus = Stream->AuthenticationStatus;
-        if ((GuidedHeader->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) == EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
+          AuthenticationStatus = 0;
+          CreateGuidedExtractionRpnEvent (Stream, Node);
+        } else {
           //
-          //  The local status of the new stream is contained in 
-          //  AuthenticaionStatus.  This value needs to be ORed into the
-          //  Aggregate bits also...
+          // Figure out the proper authentication status
           //
+          AuthenticationStatus = Stream->AuthenticationStatus;
+          if ((GuidedHeader->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) == EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
+            //
+            //  The local status of the new stream is contained in 
+            //  AuthenticaionStatus.  This value needs to be ORed into the
+            //  Aggregate bits also...
+            //
+            
+            //
+            // Clear out and initialize the local status
+            //
+            AuthenticationStatus &= ~EFI_LOCAL_AUTH_STATUS_ALL;
+            AuthenticationStatus |= EFI_LOCAL_AUTH_STATUS_IMAGE_SIGNED | EFI_LOCAL_AUTH_STATUS_NOT_TESTED;
+            //
+            // OR local status into aggregate status
+            //
+            AuthenticationStatus |= AuthenticationStatus >> 16;
+          }
           
-          //
-          // Clear out and initialize the local status
-          //
-          AuthenticationStatus &= ~EFI_LOCAL_AUTH_STATUS_ALL;
-          AuthenticationStatus |= EFI_LOCAL_AUTH_STATUS_IMAGE_SIGNED | EFI_LOCAL_AUTH_STATUS_NOT_TESTED;
-          //
-          // OR local status into aggregate status
-          //
-          AuthenticationStatus |= AuthenticationStatus >> 16;
-        }
-        
-        SectionLength = SECTION_SIZE (GuidedHeader);
-        Status = OpenSectionStreamEx (
-                   SectionLength - GuidedHeader->DataOffset,
-                   (UINT8 *) GuidedHeader + GuidedHeader->DataOffset,
-                   TRUE,
-                   AuthenticationStatus,
-                   &Node->EncapsulatedStreamHandle
-                   );
-        if (EFI_ERROR (Status)) {
-          FreePool (Node);
-          return Status;
+          SectionLength = SECTION_SIZE (GuidedHeader);
+          Status = OpenSectionStreamEx (
+                     SectionLength - GuidedHeader->DataOffset,
+                     (UINT8 *) GuidedHeader + GuidedHeader->DataOffset,
+                     TRUE,
+                     AuthenticationStatus,
+                     &Node->EncapsulatedStreamHandle
+                     );
+          if (EFI_ERROR (Status)) {
+            FreePool (Node);
+            return Status;
+          }
         }
       }
       
@@ -1026,6 +1031,13 @@ FindChildNode (
       } else {
         ErrorStatus = Status;
       }
+    } else if ((CurrentChildNode->Type == EFI_SECTION_GUID_DEFINED) && (SearchType != EFI_SECTION_GUID_DEFINED)) {
+      //
+      // When Node Type is GUIDED section, but Node has no encapsulated data, Node data should not be parsed
+      // because a required GUIDED section extraction protocol does not exist.
+      // If SearchType is not GUIDED section, EFI_PROTOCOL_ERROR should return.
+      //
+      ErrorStatus = EFI_PROTOCOL_ERROR;
     }
     
     if (!IsNodeAtEnd (&SourceStream->Children, &CurrentChildNode->Link)) {
