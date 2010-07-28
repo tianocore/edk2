@@ -185,11 +185,7 @@ SyslogLocateSnp (
     Snp = NULL;
   }
 
-  //
-  // Handles is allocated by gBS AllocatePool() service. 
-  // So, gBS FreePool() service is used to free Handles.
-  //
-  gBS->FreePool (Handles);
+  FreePool (Handles);
   return Snp;
 }
 
@@ -1642,11 +1638,7 @@ NetGetChildHandle (
               // Found item matched gEfiNicIp4ConfigVariableGuid
               //
               *ChildHandle = Handles[Index];
-              //
-              // Handles is allocated by gBS AllocatePool() service. 
-              // So, gBS FreePool() service is used to free Handles.
-              //
-              gBS->FreePool (Handles);
+              FreePool (Handles);
               return EFI_SUCCESS;
             }
           }
@@ -1655,11 +1647,7 @@ NetGetChildHandle (
     }
   }
 
-  //
-  // Handles is allocated by gBS AllocatePool() service. 
-  // So, gBS FreePool() service is used to free Handles.
-  //
-  gBS->FreePool (Handles);
+  FreePool (Handles);
   return Status;
 }
 
