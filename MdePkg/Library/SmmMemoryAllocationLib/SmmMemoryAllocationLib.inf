@@ -22,6 +22,8 @@
   VERSION_STRING                 = 1.0
   PI_SPECIFICATION_VERSION       = 0x0001000A
   LIBRARY_CLASS                  = MemoryAllocationLib|DXE_SMM_DRIVER 
+  CONSTRUCTOR                    = SmmMemoryAllocationLibConstructor
+  DESTRUCTOR                     = SmmMemoryAllocationLibDestructor
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64
@@ -37,3 +39,10 @@
   DebugLib
   BaseMemoryLib
   SmmServicesTableLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiSmmAccess2ProtocolGuid    ## CONSUMES  
+
+[Depex]
+  gEfiSmmAccess2ProtocolGuid

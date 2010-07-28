@@ -24,10 +24,115 @@
 
 #include <PiSmm.h>
 
+#include <Protocol/SmmAccess2.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+
+EFI_SMRAM_DESCRIPTOR  *mSmramRanges;
+UINTN                 mSmramRangeCount;
+
+/**
+  The constructor function caches SMRAM ranges that are present in the system.
+    
+  It will ASSERT() if SMM Access2 Protocol doesn't exist.
+  It will ASSERT() if SMRAM ranges can't be got.
+  It will ASSERT() if Resource can't be allocated for cache SMRAM range. 
+  It will always return EFI_SUCCESS.
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmMemoryAllocationLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS                Status;
+  EFI_SMM_ACCESS2_PROTOCOL  *SmmAccess;
+  UINTN                     Size;
+
+  //
+  // Locate SMM Access2 Protocol
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiSmmAccess2ProtocolGuid, 
+                  NULL, 
+                  (VOID **)&SmmAccess
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Get SMRAM range information
+  //
+  Size = 0;
+  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, NULL);
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+
+  mSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocatePool (Size);
+  ASSERT (mSmramRanges != NULL);
+
+  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, mSmramRanges);
+  ASSERT_EFI_ERROR (Status);
+
+  mSmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  If SMM driver exits with an error, it must call this routine 
+  to free the allocated resource before the exiting.
+
+  @param[in]  ImageHandle   The firmware allocated handle for the EFI image.
+  @param[in]  SystemTable   A pointer to the EFI System Table.
+
+  @retval     EFI_SUCCESS   The deconstructor always returns EFI_SUCCESS.
+**/
+EFI_STATUS
+EFIAPI
+SmmMemoryAllocationLibDestructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  FreePool (mSmramRanges);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Check whether the start address of buffer is within any of the SMRAM ranges.
+
+  @param[in]  Buffer   The pointer to the buffer to be checked.
+
+  @retval     TURE     The buffer is in SMRAM ranges.
+  @retval     FALSE    The buffer is out of SMRAM ranges.
+**/
+BOOLEAN
+EFIAPI
+BufferInSmram (
+  IN VOID *Buffer
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < mSmramRangeCount; Index ++) {
+    if (((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer >= mSmramRanges[Index].CpuStart) && 
+        ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer < (mSmramRanges[Index].CpuStart + mSmramRanges[Index].PhysicalSize))) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
 
 /**
   Allocates one or more 4KB pages of a certain memory type.
@@ -156,7 +261,19 @@ FreePages (
   EFI_STATUS  Status;
 
   ASSERT (Pages != 0);
-  Status = gSmst->SmmFreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
+  if (BufferInSmram (Buffer)) {
+    //
+    // When Buffer is in SMRAM range, it should be allocated by gSmst->SmmAllocatePages() service.
+    // So, gSmst->SmmFreePages() service is used to free it.
+    //
+    Status = gSmst->SmmFreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
+  } else {
+    //
+    // When Buffer is out of SMRAM range, it should be allocated by gBS->AllocatePages() service.
+    // So, gBS->FreePages() service is used to free it.
+    //
+    Status = gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
+  }
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -357,7 +474,19 @@ FreeAlignedPages (
   EFI_STATUS  Status;
 
   ASSERT (Pages != 0);
-  Status = gSmst->SmmFreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
+  if (BufferInSmram (Buffer)) {
+    //
+    // When Buffer is in SMRAM range, it should be allocated by gSmst->SmmAllocatePages() service.
+    // So, gSmst->SmmFreePages() service is used to free it.
+    //
+    Status = gSmst->SmmFreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
+  } else {
+    //
+    // When Buffer is out of SMRAM range, it should be allocated by gBS->AllocatePages() service.
+    // So, gBS->FreePages() service is used to free it.
+    //
+    Status = gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
+  }
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -831,6 +960,18 @@ FreePool (
 {
   EFI_STATUS    Status;
 
-  Status = gSmst->SmmFreePool (Buffer);
+  if (BufferInSmram (Buffer)) {
+    //
+    // When Buffer is in SMRAM range, it should be allocated by gSmst->SmmAllocatePool() service.
+    // So, gSmst->SmmFreePool() service is used to free it.
+    //
+    Status = gSmst->SmmFreePool (Buffer);
+  } else {
+    //
+    // When Buffer is out of SMRAM range, it should be allocated by gBS->AllocatePool() service.
+    // So, gBS->FreePool() service is used to free it.
+    //
+    Status = gBS->FreePool (Buffer);
+  }
   ASSERT_EFI_ERROR (Status);
 }
