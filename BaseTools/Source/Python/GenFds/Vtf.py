@@ -67,6 +67,14 @@ class Vtf (VtfClassObject):
         FvList = self.GetFvList()
         self.BsfInfName = os.path.join(GenFdsGlobalVariable.FvDir, self.UiName + '.inf')
         BsfInf = open (self.BsfInfName, 'w+')
+        if self.ResetBin != None:
+            BsfInf.writelines ("[OPTIONS]" + T_CHAR_LF)
+            BsfInf.writelines ("IA32_RST_BIN"     + \
+                               " = "              + \
+                               GenFdsGlobalVariable.MacroExtend(GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.ResetBin)) + \
+                               T_CHAR_LF )
+            BsfInf.writelines (T_CHAR_LF )
+        
         BsfInf.writelines ("[COMPONENTS]" + T_CHAR_LF)
 
         for ComponentObj in self.ComponentStatementList :

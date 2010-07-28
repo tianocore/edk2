@@ -3532,6 +3532,11 @@ class FdfParser:
                 raise Warning("expected Reset file", self.FileName, self.CurrentLineNumber)
 
             VtfObj.ResetBin = self.__Token
+            if VtfObj.ResetBin.replace('$(WORKSPACE)', '').find('$') == -1:
+                #check for file path
+                ErrorCode, ErrorInfo = PathClass(NormPath(VtfObj.ResetBin), GenFdsGlobalVariable.WorkSpaceDir).Validate()
+                if ErrorCode != 0:
+                    EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
 
         while self.__GetComponentStatement(VtfObj):
             pass
@@ -3634,6 +3639,11 @@ class FdfParser:
             raise Warning("expected Component file", self.FileName, self.CurrentLineNumber)
 
         CompStatementObj.CompBin = self.__Token
+        if CompStatementObj.CompBin != '-' and CompStatementObj.CompBin.replace('$(WORKSPACE)', '').find('$') == -1:
+            #check for file path
+            ErrorCode, ErrorInfo = PathClass(NormPath(CompStatementObj.CompBin), GenFdsGlobalVariable.WorkSpaceDir).Validate()
+            if ErrorCode != 0:
+                EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
 
         if not self.__IsKeyword("COMP_SYM"):
             raise Warning("expected COMP_SYM", self.FileName, self.CurrentLineNumber)
@@ -3645,6 +3655,11 @@ class FdfParser:
             raise Warning("expected Component symbol file", self.FileName, self.CurrentLineNumber)
 
         CompStatementObj.CompSym = self.__Token
+        if CompStatementObj.CompSym != '-' and CompStatementObj.CompSym.replace('$(WORKSPACE)', '').find('$') == -1:
+            #check for file path
+            ErrorCode, ErrorInfo = PathClass(NormPath(CompStatementObj.CompSym), GenFdsGlobalVariable.WorkSpaceDir).Validate()
+            if ErrorCode != 0:
+                EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
 
         if not self.__IsKeyword("COMP_SIZE"):
             raise Warning("expected COMP_SIZE", self.FileName, self.CurrentLineNumber)
@@ -3722,6 +3737,11 @@ class FdfParser:
         if not self.__GetNextToken():
             raise Warning("expected INF file path", self.FileName, self.CurrentLineNumber)
         ffsInf.InfFileName = self.__Token
+        if ffsInf.InfFileName.replace('$(WORKSPACE)', '').find('$') == -1:
+            #check for file path
+            ErrorCode, ErrorInfo = PathClass(NormPath(ffsInf.InfFileName), GenFdsGlobalVariable.WorkSpaceDir).Validate()
+            if ErrorCode != 0:
+                EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
 
         if not ffsInf.InfFileName in self.Profile.InfList:
             self.Profile.InfList.append(ffsInf.InfFileName)
@@ -3814,6 +3834,11 @@ class FdfParser:
         if not self.__GetNextToken():
             raise Warning("expected File path", self.FileName, self.CurrentLineNumber)
         FfsFileObj.FileName = self.__Token
+        if FfsFileObj.FileName.replace('$(WORKSPACE)', '').find('$') == -1:
+            #check for file path
+            ErrorCode, ErrorInfo = PathClass(NormPath(FfsFileObj.FileName), GenFdsGlobalVariable.WorkSpaceDir).Validate()
+            if ErrorCode != 0:
+                EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
 
         if FfsFileObj.FileType == 'EFI':
             self.__GetOptRomOverrides(FfsFileObj)

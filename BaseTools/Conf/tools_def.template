@@ -3125,7 +3125,7 @@ RELEASE_ICC11x86xASL_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG 
 *_MYTOOLS_IA32_ASLCC_PATH           = DEF(VS2008_BIN)\cl.exe
 *_MYTOOLS_IA32_ASLPP_PATH           = DEF(VS2008_BIN)\cl.exe
 *_MYTOOLS_IA32_ASLDLINK_PATH        = DEF(VS2008_BIN)\link.exe
-*_MYTOOLS_IA32_RC_PATH              = DEF(VS2008_BIN)\rc.exe
+*_MYTOOLS_IA32_RC_PATH              = DEF(WINSDK_BIN)\rc.exe
 
   DEBUG_MYTOOLS_IA32_CC_FLAGS            = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
 RELEASE_MYTOOLS_IA32_CC_FLAGS            = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
@@ -3150,7 +3150,7 @@ RELEASE_MYTOOLS_IA32_DLINK_FLAGS         = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 *_MYTOOLS_X64_ASLCC_PATH            = DEF(VS2008_BINX64)\cl.exe
 *_MYTOOLS_X64_ASLPP_PATH            = DEF(VS2008_BINX64)\cl.exe
 *_MYTOOLS_X64_ASLDLINK_PATH         = DEF(VS2008_BINX64)\link.exe
-*_MYTOOLS_X64_RC_PATH               = DEF(VS2008_BIN)\rc.exe
+*_MYTOOLS_X64_RC_PATH               = DEF(WINSDK_BIN)\rc.exe
 
   DEBUG_MYTOOLS_X64_CC_FLAGS             = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
 RELEASE_MYTOOLS_X64_CC_FLAGS             = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
