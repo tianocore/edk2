@@ -40,3 +40,7 @@
 [LibraryClasses]
   DebugLib
   BaseMemoryLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiSmmAccess2ProtocolGuid    ## CONSUMES  
