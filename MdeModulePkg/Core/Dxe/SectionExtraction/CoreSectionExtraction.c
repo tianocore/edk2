@@ -478,6 +478,113 @@ ChildIsType (
   return CompareGuid (&GuidedSection->SectionDefinitionGuid, SectionDefinitionGuid);
 }
 
+/**
+  RPN callback function. Initializes the section stream
+  when GUIDED_SECTION_EXTRACTION_PROTOCOL is installed.
+
+  @param Event               The event that fired
+  @param RpnContext          A pointer to the context that allows us to identify
+                             the relevent encapsulation.
+**/
+VOID
+EFIAPI
+NotifyGuidedExtraction (
+  IN   EFI_EVENT   Event,
+  IN   VOID        *RpnContext
+  )
+{
+  EFI_STATUS                              Status;
+  EFI_GUID_DEFINED_SECTION                *GuidedHeader;
+  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  *GuidedExtraction;
+  VOID                                    *NewStreamBuffer;
+  UINTN                                   NewStreamBufferSize;
+  UINT32                                  AuthenticationStatus;
+  RPN_EVENT_CONTEXT                       *Context;
+  
+  Context = RpnContext;
+  
+  GuidedHeader = (EFI_GUID_DEFINED_SECTION *) (Context->ParentStream->StreamBuffer + Context->ChildNode->OffsetInStream);
+  ASSERT (GuidedHeader->CommonHeader.Type == EFI_SECTION_GUID_DEFINED);
+  
+  Status = gBS->LocateProtocol (Context->ChildNode->EncapsulationGuid, NULL, (VOID **)&GuidedExtraction);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+  
+  Status = GuidedExtraction->ExtractSection (
+                               GuidedExtraction,
+                               GuidedHeader,
+                               &NewStreamBuffer,
+                               &NewStreamBufferSize,
+                               &AuthenticationStatus
+                               );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Make sure we initialize the new stream with the correct
+  // authentication status for both aggregate and local status fields.
+  //
+  if ((GuidedHeader->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) != 0) {
+    //
+    // OR in the parent stream's aggregate status.
+    //
+    AuthenticationStatus |= Context->ParentStream->AuthenticationStatus & EFI_AUTH_STATUS_ALL;
+  } else {
+    //
+    // since there's no authentication data contributed by the section,
+    // just inherit the full value from our immediate parent.
+    //
+    AuthenticationStatus = Context->ParentStream->AuthenticationStatus;
+  }
+
+  Status = OpenSectionStreamEx (
+             NewStreamBufferSize,
+             NewStreamBuffer,
+             FALSE,
+             AuthenticationStatus,
+             &Context->ChildNode->EncapsulatedStreamHandle
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  //  Close the event when done.
+  //
+  gBS->CloseEvent (Event);
+  FreePool (Context);
+}  
+
+/**
+  Constructor for RPN event when a missing GUIDED_SECTION_EXTRACTION_PROTOCOL appears...
+
+  @param ParentStream        Indicates the parent of the ecnapsulation section (child)
+  @param ChildNode           Indicates the child node that is the encapsulation section.
+
+**/
+VOID
+CreateGuidedExtractionRpnEvent (
+  IN CORE_SECTION_STREAM_NODE      *ParentStream,
+  IN CORE_SECTION_CHILD_NODE       *ChildNode
+  )
+{
+  RPN_EVENT_CONTEXT *Context;
+  
+  //
+  // Allocate new event structure and context
+  //
+  Context = AllocatePool (sizeof (RPN_EVENT_CONTEXT));
+  ASSERT (Context != NULL);
+  
+  Context->ChildNode = ChildNode;
+  Context->ParentStream = ParentStream;
+ 
+  Context->Event = EfiCreateProtocolNotifyEvent (
+                    Context->ChildNode->EncapsulationGuid,
+                    TPL_NOTIFY,
+                    NotifyGuidedExtraction,
+                    Context,
+                    &Context->Registration
+                    );
+}
 
 /**
   Worker function.  Constructor for new child nodes.
@@ -687,28 +794,28 @@ CreateChildNode (
         //
         if ((GuidedHeader->Attributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) != 0) {
           //
-          // If the section REQUIRES an extraction protocol, then we're toast
+          // If the section REQUIRES an extraction protocol, register for RPN 
+          // when the required GUIDed extraction protocol becomes available. 
           //
-          CoreFreePool (*ChildNode);
-          return EFI_PROTOCOL_ERROR;
-        }
+          CreateGuidedExtractionRpnEvent (Stream, Node);
+        } else {
+          //
+          // Figure out the proper authentication status
+          //
+          AuthenticationStatus = Stream->AuthenticationStatus;
 
-        //
-        // Figure out the proper authentication status
-        //
-        AuthenticationStatus = Stream->AuthenticationStatus;
-
-        SectionLength = SECTION_SIZE (GuidedHeader);
-        Status = OpenSectionStreamEx (
-                   SectionLength - GuidedHeader->DataOffset,
-                   (UINT8 *) GuidedHeader + GuidedHeader->DataOffset,
-                   TRUE,
-                   AuthenticationStatus,
-                   &Node->EncapsulatedStreamHandle
-                   );
-        if (EFI_ERROR (Status)) {
-          CoreFreePool (Node);
-          return Status;
+          SectionLength = SECTION_SIZE (GuidedHeader);
+          Status = OpenSectionStreamEx (
+                     SectionLength - GuidedHeader->DataOffset,
+                     (UINT8 *) GuidedHeader + GuidedHeader->DataOffset,
+                     TRUE,
+                     AuthenticationStatus,
+                     &Node->EncapsulatedStreamHandle
+                     );
+          if (EFI_ERROR (Status)) {
+            CoreFreePool (Node);
+            return Status;
+          }
         }
       }
 
@@ -849,6 +956,13 @@ FindChildNode (
       } else {
         ErrorStatus = Status;
       }
+    } else if ((CurrentChildNode->Type == EFI_SECTION_GUID_DEFINED) && (SearchType != EFI_SECTION_GUID_DEFINED)) {
+      //
+      // When Node Type is GUIDED section, but Node has no encapsulated data, Node data should not be parsed
+      // because a required GUIDED section extraction protocol does not exist.
+      // If SearchType is not GUIDED section, EFI_PROTOCOL_ERROR should return.
+      //
+      ErrorStatus = EFI_PROTOCOL_ERROR;
     }
 
     if (!IsNodeAtEnd (&SourceStream->Children, &CurrentChildNode->Link)) {
