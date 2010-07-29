@@ -886,7 +886,7 @@ AddUnicodeString (
       //
       NewUnicodeStringTable[NumberOfEntries].Language = AllocateCopyPool (3, Language);
       if (NewUnicodeStringTable[NumberOfEntries].Language == NULL) {
-        gBS->FreePool (NewUnicodeStringTable);
+        FreePool (NewUnicodeStringTable);
         return EFI_OUT_OF_RESOURCES;
       }
 
@@ -904,8 +904,8 @@ AddUnicodeString (
                                                               UnicodeString
                                                               );
       if (NewUnicodeStringTable[NumberOfEntries].UnicodeString == NULL) {
-        gBS->FreePool (NewUnicodeStringTable[NumberOfEntries].Language);
-        gBS->FreePool (NewUnicodeStringTable);
+        FreePool (NewUnicodeStringTable[NumberOfEntries].Language);
+        FreePool (NewUnicodeStringTable);
         return EFI_OUT_OF_RESOURCES;
       }
 
@@ -919,7 +919,7 @@ AddUnicodeString (
       // Free the old Unicode String Table
       //
       if (*UnicodeStringTable != NULL) {
-        gBS->FreePool (*UnicodeStringTable);
+        FreePool (*UnicodeStringTable);
       }
 
       //
@@ -1097,7 +1097,7 @@ AddUnicodeString2 (
   //
   NewUnicodeStringTable[NumberOfEntries].Language = AllocateCopyPool (AsciiStrSize(Language), Language);
   if (NewUnicodeStringTable[NumberOfEntries].Language == NULL) {
-    gBS->FreePool (NewUnicodeStringTable);
+    FreePool (NewUnicodeStringTable);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1111,8 +1111,8 @@ AddUnicodeString2 (
   //
   NewUnicodeStringTable[NumberOfEntries].UnicodeString = AllocateCopyPool (StrSize (UnicodeString), UnicodeString);
   if (NewUnicodeStringTable[NumberOfEntries].UnicodeString == NULL) {
-    gBS->FreePool (NewUnicodeStringTable[NumberOfEntries].Language);
-    gBS->FreePool (NewUnicodeStringTable);
+    FreePool (NewUnicodeStringTable[NumberOfEntries].Language);
+    FreePool (NewUnicodeStringTable);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1126,7 +1126,7 @@ AddUnicodeString2 (
   // Free the old Unicode String Table
   //
   if (*UnicodeStringTable != NULL) {
-    gBS->FreePool (*UnicodeStringTable);
+    FreePool (*UnicodeStringTable);
   }
 
   //
@@ -1172,20 +1172,20 @@ FreeUnicodeStringTable (
     //
     // Free the Language string from the Unicode String Table
     //
-    gBS->FreePool (UnicodeStringTable[Index].Language);
+    FreePool (UnicodeStringTable[Index].Language);
 
     //
     // Free the Unicode String from the Unicode String Table
     //
     if (UnicodeStringTable[Index].UnicodeString != NULL) {
-      gBS->FreePool (UnicodeStringTable[Index].UnicodeString);
+      FreePool (UnicodeStringTable[Index].UnicodeString);
     }
   }
 
   //
   // Free the Unicode String Table itself
   //
-  gBS->FreePool (UnicodeStringTable);
+  FreePool (UnicodeStringTable);
 
   return EFI_SUCCESS;
 }
