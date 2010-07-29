@@ -44,11 +44,6 @@ RuntimeDriverExitBootServices (
   IN VOID             *Context
   )
 {
-  //
-  // Clear out BootService globals
-  //
-  gBS             = NULL;
-
   mEfiAtRuntime = TRUE;
 }
 
