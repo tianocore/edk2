@@ -30,30 +30,30 @@
 //
 
 ASM_PFX(__aeabi_ldivmod):
-    PUSH     {r4,lr}
-    ASRS     r4,r1,#1
-    EOR      r4,r4,r3,LSR #1
-    BPL      L_Test1
-    RSBS     r0,r0,#0
-    RSC      r1,r1,#0
+    push     {r4,lr}
+    asrs     r4,r1,#1
+    eor      r4,r4,r3,LSR #1
+    bpl      L_Test1
+    rsbs     r0,r0,#0
+    rsc      r1,r1,#0
 L_Test1:
-    TST      r3,r3
-    BPL      L_Test2
-    RSBS     r2,r2,#0
-    RSC      r3,r3,#0
+    tst      r3,r3
+    bpl      L_Test2
+    rsbs     r2,r2,#0
+    rsc      r3,r3,#0
 L_Test2:
-    BL       ASM_PFX(__aeabi_uldivmod)  
-    TST      r4,#0x40000000
-    BEQ      L_Test3
-    RSBS     r0,r0,#0
-    RSC      r1,r1,#0
+    bl       ASM_PFX(__aeabi_uldivmod)  
+    tst      r4,#0x40000000
+    beq      L_Test3
+    rsbs     r0,r0,#0
+    rsc      r1,r1,#0
 L_Test3:
-    TST      r4,#0x80000000
-    BEQ      L_Exit
-    RSBS     r2,r2,#0
-    RSC      r3,r3,#0
+    tst      r4,#0x80000000
+    beq      L_Exit
+    rsbs     r2,r2,#0
+    rsc      r3,r3,#0
 L_Exit:
-    POP      {r4,pc}
+    pop      {r4,pc}
  
 
 

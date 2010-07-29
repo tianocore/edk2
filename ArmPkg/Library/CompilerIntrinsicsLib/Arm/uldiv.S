@@ -262,6 +262,6 @@ ASM_PFX(_ll_div0):
   b       ASM_PFX(__aeabi_ldiv0)
   
 ASM_PFX(__aeabi_ldiv0):
-  BX        r14
+  bx      r14
 
 
