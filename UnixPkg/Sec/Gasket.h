@@ -63,8 +63,8 @@ void Gasketperror (__const char *__s);
 //
 // ... is always an int or pointer to device specific data structure
 //
-int Gasketioctl (int fd, unsigned long int __request, ...);
-int Gasketfcntl (int __fd, int __cmd, ...);
+int Gasketioctl (int fd, unsigned long int __request, void *Arg);
+int Gasketfcntl (int __fd, int __cmd, void *Arg);
 
 int Gasketcfsetispeed (struct termios *__termios_p, speed_t __speed);
 int Gasketcfsetospeed (struct termios *__termios_p, speed_t __speed);

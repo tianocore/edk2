@@ -1,3 +1,36 @@
+#------------------------------------------------------------------------------
+#
+# This template was generated from GasketEfiTemplate.c Unix x86_64 ABI
+#
+# Efi Prefix means it has been ported to gasket EFIABI to Unix x86_64 ABI
+#
+# The EFI_UNIX_THUNK_PROTOCOL member functions call these these generic assembly 
+# routines.  
+#
+# Some OS X POSIX calls get name mangled in C code and we need to fill in a C global
+# to get the correct binding (does not work from assembly). So we have 4 functions
+# that do an indirect call, while the others call POSIX APIs directly
+#
+# movq	_gUnixRmDir@GOTPCREL(%rip), %rax 
+#
+#
+# UNIX Arg passing: RCX, RDX,  R8,  R9
+# EFI  Arg passing: RDI, RDI, RDX, RCX, R8, R9
+#
+# RSI, RDI calle-save on EFI, scatch on UNIX callign
+#
+#
+# Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#------------------------------------------------------------------------------
+#ifdef __APPLE__
 	.section __DWARF,__debug_frame,regular,debug
 Lsection__debug_frame:
 	.section __DWARF,__debug_info,regular,debug
@@ -28,6 +61,8 @@ Ldebug_abbrev0:
 Ldebug_info0:
 	.section __DWARF,__debug_line,regular,debug
 Ldebug_line0:
+#endif
+
 	.text
 Ltext0:
 .globl _Gasketrmdir
@@ -50,6 +85,7 @@ LCFI2:
 	.loc 1 37 0
 	leave
 	ret
+	
 LFE16:
 .globl _Gasketopendir
 _Gasketopendir:
@@ -1069,6 +1105,7 @@ LCFI137:
 	leave
 	ret
 LFE62:
+
 .globl _ReverseGasketUint64
 _ReverseGasketUint64:
 LFB63:
@@ -1093,6 +1130,24 @@ LCFI140:
 	.loc 1 418 0
 	leave
 	ret
+	
+.globl _EfiReverseGasketUint64
+_EfiReverseGasketUint64:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	subq	$64, %rsp
+	movq	%rdi, -24(%rbp)
+	movq	%rsi, -32(%rbp)
+	movq	-24(%rbp), %rax
+	movq	%rax, -8(%rbp)
+	movq	-32(%rbp), %rcx
+	movq	-8(%rbp), %rax
+	call	*%rax
+	leave
+	ret
+	
+#if __APPLE__
+
 LFE63:
 	.section __DWARF,__debug_frame,regular,debug
 Lframe0:
@@ -8777,3 +8832,6 @@ LASF10:
 LASF29:
 	.ascii "Gasketfsync\0"
 	.subsections_via_symbols
+
+#endif
+

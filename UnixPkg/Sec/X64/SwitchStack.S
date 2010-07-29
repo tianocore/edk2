@@ -22,35 +22,35 @@
 # Routine Description:
 #
 #   Routine for switching stacks with 3 parameters EFI ABI
+#   Convert UNIX to EFI ABI
 #
 # Arguments:
 #
-#   (rcx) EntryPoint    - Entry point with new stack.
-#   (rdx) Context1      - Parameter1 for entry point.
-#   (r8)  Context2      - Parameter2 for entry point.
-#   (r9)  Context3      - Parameter3 for entry point.
-#   (rsp)0x20  NewStack - The pointer to new stack.
+#   (rdi) EntryPoint    - Entry point with new stack.
+#   (rsi) Context1      - Parameter1 for entry point. (rcx)
+#   (rdx) Context2      - Parameter2 for entry point. (rdx) 
+#   (rcx) Context3      - Parameter3 for entry point. (r8)
+#   (r8)  NewStack      - The pointer to new stack.
 #
 # Returns:
 #
 #   None
 #
 #------------------------------------------------------------------------------
-ASM_GLOBAL ASM_PFX(MsftPeiSwitchStacks)
-ASM_PFX(MsftPeiSwitchStacks):
-    mov     %rcx, %rax
-    mov     %rdx, %rcx
-    mov     %r8, %rdx
-    mov     %r9, %r8
+ASM_GLOBAL ASM_PFX(GasketPeiSwitchStacks)
+ASM_PFX(GasketPeiSwitchStacks):
+//  movq    %rdx, %rdx   
+    movq    %r8,  %rsp
     
-    # get new stack from the stack
-    mov     0x20(%rsp), %rsp  # is this off by 8?
+    movq    %rdi, %rax
+    movq    %rsi, %rcx
+    movq    %rcx, %r8    
     
     #
     # Reserve space for register parameters (rcx, rdx, r8 & r9) on the stack,
     # in case the callee wishes to spill them.
     #
-    lea     -0x20(%rsp), %rsp
+	  subq    40, %rsp  // 32-byte shadow space plus alignment pad
     call    *%rax
 
 

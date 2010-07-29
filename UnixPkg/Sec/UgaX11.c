@@ -400,16 +400,11 @@ UgaGetKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_INPUT_KEY *key)
 }
 
 EFI_STATUS
-UgaBlt(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
-       IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
-       IN  EFI_UGA_BLT_OPERATION                   BltOperation,
-       IN  UINTN                                   SourceX,
-       IN  UINTN                                   SourceY,
-       IN  UINTN                                   DestinationX,
-       IN  UINTN                                   DestinationY,
-       IN  UINTN                                   Width,
-       IN  UINTN                                   Height,
-       IN  UINTN                                   Delta OPTIONAL
+UgaBlt(
+  IN EFI_UNIX_UGA_IO_PROTOCOL                 *UgaIo,
+  IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
+  IN  EFI_UGA_BLT_OPERATION                   BltOperation,
+  IN  UGA_BLT_ARGS                            *Args
   )
 {
   UGA_IO_PRIVATE *Private = (UGA_IO_PRIVATE *)UgaIo;
@@ -432,11 +427,11 @@ UgaBlt(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
     //
     // Source is Video.
     //
-    if (SourceY + Height > Private->height) {
+    if (Args->SourceY + Args->Height > Private->height) {
       return EFI_INVALID_PARAMETER;
     }
 
-    if (SourceX + Width > Private->width) {
+    if (Args->SourceX + Args->Width > Private->width) {
       return EFI_INVALID_PARAMETER;
     }
   }
@@ -447,55 +442,55 @@ UgaBlt(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
     //
     // Destination is Video
     //
-    if (DestinationY + Height > Private->height) {
+    if (Args->DestinationY + Args->Height > Private->height) {
       return EFI_INVALID_PARAMETER;
     }
 
-    if (DestinationX + Width > Private->width) {
+    if (Args->DestinationX + Args->Width > Private->width) {
       return EFI_INVALID_PARAMETER;
     }
   }
 
   switch (BltOperation) {
   case EfiUgaVideoToBltBuffer:
-    Blt = (EFI_UGA_PIXEL *)((UINT8 *)BltBuffer + (DestinationY * Delta) + DestinationX * sizeof (EFI_UGA_PIXEL));
-    Delta -= Width * sizeof (EFI_UGA_PIXEL);
-    for (SrcY = SourceY; SrcY < (Height + SourceY); SrcY++) {
-      for (SrcX = SourceX; SrcX < (Width + SourceX); SrcX++) {
+    Blt = (EFI_UGA_PIXEL *)((UINT8 *)BltBuffer + (Args->DestinationY * Args->Delta) + Args->DestinationX * sizeof (EFI_UGA_PIXEL));
+    Args->Delta -= Args->Width * sizeof (EFI_UGA_PIXEL);
+    for (SrcY = Args->SourceY; SrcY < (Args->Height + Args->SourceY); SrcY++) {
+      for (SrcX = Args->SourceX; SrcX < (Args->Width + Args->SourceX); SrcX++) {
         *Blt++ = UgaColorToPixel(Private,
                                   XGetPixel(Private->image, SrcX, SrcY));
       }
-      Blt = (EFI_UGA_PIXEL *) ((UINT8 *) Blt + Delta);
+      Blt = (EFI_UGA_PIXEL *) ((UINT8 *) Blt + Args->Delta);
     }
     break;
   case EfiUgaBltBufferToVideo:
-    Blt = (EFI_UGA_PIXEL *)((UINT8 *)BltBuffer + (SourceY * Delta) + SourceX * sizeof (EFI_UGA_PIXEL));
-    Delta -= Width * sizeof (EFI_UGA_PIXEL);
-    for (DstY = DestinationY; DstY < (Height + DestinationY); DstY++) {
-      for (DstX = DestinationX; DstX < (Width + DestinationX); DstX++) {
+    Blt = (EFI_UGA_PIXEL *)((UINT8 *)BltBuffer + (Args->SourceY * Args->Delta) + Args->SourceX * sizeof (EFI_UGA_PIXEL));
+    Args->Delta -= Args->Width * sizeof (EFI_UGA_PIXEL);
+    for (DstY = Args->DestinationY; DstY < (Args->Height + Args->DestinationY); DstY++) {
+      for (DstX = Args->DestinationX; DstX < (Args->Width + Args->DestinationX); DstX++) {
         XPutPixel(Private->image, DstX, DstY, UgaPixelToColor(Private, *Blt));
         Blt++;
       }
-      Blt = (EFI_UGA_PIXEL *) ((UINT8 *) Blt + Delta);
+      Blt = (EFI_UGA_PIXEL *) ((UINT8 *) Blt + Args->Delta);
     }
     break;
   case EfiUgaVideoToVideo:
-    Dst = Private->image_data + (DestinationX << Private->pixel_shift)
-      + DestinationY * Private->line_bytes;
-    Src = Private->image_data + (SourceX << Private->pixel_shift)
-      + SourceY * Private->line_bytes;
-    Nbr = Width << Private->pixel_shift;
-    if (DestinationY < SourceY) {
-      for (Index = 0; Index < Height; Index++) {
+    Dst = Private->image_data + (Args->DestinationX << Private->pixel_shift)
+      + Args->DestinationY * Private->line_bytes;
+    Src = Private->image_data + (Args->SourceX << Private->pixel_shift)
+      + Args->SourceY * Private->line_bytes;
+    Nbr = Args->Width << Private->pixel_shift;
+    if (Args->DestinationY < Args->SourceY) {
+      for (Index = 0; Index < Args->Height; Index++) {
         memcpy (Dst, Src, Nbr);
         Dst += Private->line_bytes;
         Src += Private->line_bytes;
       }
     }
     else {
-      Dst += (Height - 1) * Private->line_bytes;
-      Src += (Height - 1) * Private->line_bytes;
-      for (Index = 0; Index < Height; Index++) {
+      Dst += (Args->Height - 1) * Private->line_bytes;
+      Src += (Args->Height - 1) * Private->line_bytes;
+      for (Index = 0; Index < Args->Height; Index++) {
       //
       // Source and Destination Y may be equal, therefore Dst and Src may
       // overlap.
@@ -508,8 +503,8 @@ UgaBlt(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
     break;
   case EfiUgaVideoFill:
     Color = UgaPixelToColor(Private, *BltBuffer);
-    for (DstY = DestinationY; DstY < (Height + DestinationY); DstY++) {
-      for (DstX = DestinationX; DstX < (Width + DestinationX); DstX++) {
+    for (DstY = Args->DestinationY; DstY < (Args->Height + Args->DestinationY); DstY++) {
+      for (DstX = Args->DestinationX; DstX < (Args->Width + Args->DestinationX); DstX++) {
         XPutPixel(Private->image, DstX, DstY, Color);
       }
     }
@@ -524,7 +519,7 @@ UgaBlt(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
   switch (BltOperation) {
   case EfiUgaVideoToVideo:
     XCopyArea(Private->display, Private->win, Private->win, Private->gc,
-               SourceX, SourceY, Width, Height, DestinationX, DestinationY);
+               Args->SourceX, Args->SourceY, Args->Width, Args->Height, Args->DestinationX, Args->DestinationY);
     while (1) {
       XEvent ev;
 
@@ -538,11 +533,11 @@ UgaBlt(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
     Color = UgaPixelToColor(Private, *BltBuffer);
     XSetForeground(Private->display, Private->gc, Color);
     XFillRectangle(Private->display, Private->win, Private->gc,
-                    DestinationX, DestinationY, Width, Height);
+                    Args->DestinationX, Args->DestinationY, Args->Width, Args->Height);
     XFlush(Private->display);
     break;
   case EfiUgaBltBufferToVideo:
-    Redraw(Private, DestinationX, DestinationY, Width, Height);
+    Redraw(Private, Args->DestinationX, Args->DestinationY, Args->Width, Args->Height);
     break;
   default:
     break;
@@ -571,16 +566,10 @@ EFI_STATUS EFIAPI GasketUgaSize (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, UINT32 Width, 
 EFI_STATUS EFIAPI GasketUgaCheckKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo);
 EFI_STATUS EFIAPI GasketUgaGetKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_INPUT_KEY *key);
 EFI_STATUS EFIAPI GasketUgaBlt (
-   EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
+   EFI_UNIX_UGA_IO_PROTOCOL                    *UgaIo,
    IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
    IN  EFI_UGA_BLT_OPERATION                   BltOperation,
-   IN  UINTN                                   SourceX,
-   IN  UINTN                                   SourceY,
-   IN  UINTN                                   DestinationX,
-   IN  UINTN                                   DestinationY,
-   IN  UINTN                                   Width,
-   IN  UINTN                                   Height,
-   IN  UINTN                                   Delta OPTIONAL
+   IN  UGA_BLT_ARGS                            *Args
    );
 
   drv->UgaIo.UgaClose    = GasketUgaClose; 

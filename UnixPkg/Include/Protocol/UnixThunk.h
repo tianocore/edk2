@@ -308,14 +308,14 @@ void
 typedef 
 int 
 #if __CYGWIN__
-(*UnixIoCtl) (int fd, int __request, ...);
+(*UnixIoCtl) (int fd, int __request, UINTN Arg);
 #else
-(*UnixIoCtl) (int fd, unsigned long int __request, ...);
+(*UnixIoCtl) (int fd, unsigned long int __request, void *Arg);
 #endif
 
 typedef 
 int 
-(*UnixFcntl) (int __fd, int __cmd, ...);
+(*UnixFcntl) (int __fd, int __cmd, void *Arg);
 
 typedef
 int 

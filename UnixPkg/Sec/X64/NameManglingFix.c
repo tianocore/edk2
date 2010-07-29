@@ -20,8 +20,25 @@
 // So these globals get you the correct name mangled functions that can
 // be accessed from assembly
 //
-UnixRmDir   gUnixRmDir    = rmdir;
-UnixOpenDir gUnixOpenDir  = opendir;
-UnixStat    gUnixStat     = (UnixStat)stat;
-UnixStatFs  gUnixStatFs   = statfs;
+UnixRmDir     gUnixRmDir     = rmdir;
+UnixOpenDir   gUnixOpenDir   = opendir;
+UnixStat      gUnixStat      = (UnixStat)stat;
+UnixStatFs    gUnixStatFs    = statfs;
+UnixReadDir   gUnixReaddir   = readdir;
+UnixRewindDir gUnixRewinddir = rewinddir;
 
+int
+UnixIoCtl1 (
+  int               fd, 
+  unsigned long int __request, 
+  UINTN             Arg
+  ) 
+{
+  return ioctl (fd, __request, Arg);
+}
+
+int
+UnixFcntl1 (int __fd, int __cmd, UINTN Arg)
+{
+  return fcntl (__fd, __cmd, Arg);
+}

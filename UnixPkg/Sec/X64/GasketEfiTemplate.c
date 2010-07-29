@@ -390,19 +390,13 @@ GasketUgaGetKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_INPUT_KEY *key)
 EFI_STATUS 
 EFIAPI 
 GasketUgaBlt (
-   EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
+   EFI_UNIX_UGA_IO_PROTOCOL                    *UgaIo,
    IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
    IN  EFI_UGA_BLT_OPERATION                   BltOperation,
-   IN  UINTN                                   SourceX,
-   IN  UINTN                                   SourceY,
-   IN  UINTN                                   DestinationX,
-   IN  UINTN                                   DestinationY,
-   IN  UINTN                                   Width,
-   IN  UINTN                                   Height,
-   IN  UINTN                                   Delta OPTIONAL
+	 IN  UGA_BLT_ARGS                            *Args
    )
 {
-  return UgaBlt (UgaIo, BltBuffer, BltOperation, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
+  return UgaBlt (UgaIo, BltBuffer, BltOperation, Args);
 }
 
 typedef void (*SET_TIMER_CALLBACK)(UINT64 delta);

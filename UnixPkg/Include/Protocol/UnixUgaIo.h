@@ -51,19 +51,24 @@ EFI_STATUS
   EFI_INPUT_KEY            *key
   );
 
+
+typedef struct {
+	  UINTN                                   SourceX;
+	  UINTN                                   SourceY;
+	  UINTN                                   DestinationX;
+	  UINTN                                   DestinationY;
+	  UINTN                                   Width;
+	  UINTN                                   Height;
+	  UINTN                                   Delta;
+} UGA_BLT_ARGS;
+
 typedef
 EFI_STATUS
 (*UGABlt)(
     IN  EFI_UNIX_UGA_IO_PROTOCOL                *Uga,
 	  IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
 	  IN  EFI_UGA_BLT_OPERATION                   BltOperation,
-	  IN  UINTN                                   SourceX,
-	  IN  UINTN                                   SourceY,
-	  IN  UINTN                                   DestinationX,
-	  IN  UINTN                                   DestinationY,
-	  IN  UINTN                                   Width,
-	  IN  UINTN                                   Height,
-	  IN  UINTN                                   Delta OPTIONAL
+	  IN  UGA_BLT_ARGS                            *Args
 	  );
 
 struct _EFI_UNIX_UGA_IO_PROTOCOL {

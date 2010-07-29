@@ -266,22 +266,16 @@ Gasketperror (__const char *__s)
 // ... is always an int or pointer to device specific data structure
 //
 int 
-Gasketioctl (int fd, unsigned long int __request, ...)
+Gasketioctl (int fd, unsigned long int __request, void *Arg)
 {
-  VA_LIST Marker;
-  
-  VA_START (Marker, __request);
-  return GasketUintnUintnUintn (ioctl, fd, __request, VA_ARG (Marker, UINTN));
+  return GasketUintnUintnUintn (ioctl, fd, __request, (UINTN)Arg);
 }
 
 
 int 
-Gasketfcntl (int __fd, int __cmd, ...)
+Gasketfcntl (int __fd, int __cmd, void  *Arg)
 {
-  VA_LIST Marker;
-  
-  VA_START (Marker, __cmd);
-  return GasketUintnUintnUintn (fcntl, __fd, __cmd, VA_ARG (Marker, UINTN));
+  return GasketUintnUintnUintn (fcntl, __fd, __cmd, (UINTN)Arg);
 }
 
 
