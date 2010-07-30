@@ -154,18 +154,26 @@ Ip4ConfigConvertDeviceConfigDataToIfrNvData (
   NicConfig = EfiNicIp4ConfigGetInfo (Ip4ConfigInstance);
   if (NicConfig != NULL) {
     IfrFormNvData->Configure = 1;
+    Ip4ConfigInstance->Ip4ConfigCallbackInfo.Configured = TRUE;
     if (NicConfig->Source == IP4_CONFIG_SOURCE_DHCP) {
       IfrFormNvData->DhcpEnable = 1;
+      Ip4ConfigInstance->Ip4ConfigCallbackInfo.DhcpEnabled = TRUE;
     } else {
       IfrFormNvData->DhcpEnable = 0;
       Ip4ConfigIpToStr (&NicConfig->Ip4Info.StationAddress, IfrFormNvData->StationAddress);
       Ip4ConfigIpToStr (&NicConfig->Ip4Info.SubnetMask, IfrFormNvData->SubnetMask);
       Ip4ConfigIpToStr (&NicConfig->Ip4Info.RouteTable[1].GatewayAddress, IfrFormNvData->GatewayAddress);
+
+      Ip4ConfigInstance->Ip4ConfigCallbackInfo.DhcpEnabled = FALSE;
+      CopyMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.LocalIp, &NicConfig->Ip4Info.StationAddress, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.SubnetMask, &NicConfig->Ip4Info.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.Gateway, &NicConfig->Ip4Info.RouteTable[1].GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
     }
 
     FreePool (NicConfig);
   } else {
     IfrFormNvData->Configure = 0;
+    Ip4ConfigInstance->Ip4ConfigCallbackInfo.Configured = FALSE;
   }
 }
 
