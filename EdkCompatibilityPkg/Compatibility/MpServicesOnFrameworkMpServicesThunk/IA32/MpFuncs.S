@@ -22,7 +22,7 @@
 #define GdtrProfile      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x10
 #define IdtrProfile      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x16
 #define BufferStart      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x1C
-#define ProcessorNumber, RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x20
+#define ProcessorNumber  RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x20
 
 #-------------------------------------------------------------------------------------
 #RendezvousFunnelProc  procedure follows. All APs execute their procedure. This
