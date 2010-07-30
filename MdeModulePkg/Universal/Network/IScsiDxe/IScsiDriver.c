@@ -1,7 +1,7 @@
 /** @file
   The entry point of IScsi driver.
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -137,16 +137,61 @@ IScsiDriverBindingStart (
 {
   EFI_STATUS        Status;
   ISCSI_DRIVER_DATA *Private;
+  VOID              *Interface;
+
+  Private = IScsiCreateDriverData (This->DriverBindingHandle, ControllerHandle);
+  if (Private == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Create a underlayer child instance, but not need to configure it. Just open ChildHandle
+  // via BY_DRIVER. That is, establishing the relationship between ControllerHandle and ChildHandle.
+  // Therefore, when DisconnectController(), especially VLAN virtual controller handle,
+  // IScsiDriverBindingStop() will be called.
+  //
+  Status = NetLibCreateServiceChild (
+             ControllerHandle,
+             This->DriverBindingHandle,
+             &gEfiTcp4ServiceBindingProtocolGuid,
+             &Private->ChildHandle
+             );
+
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  Status = gBS->OpenProtocol (
+                  Private->ChildHandle,
+                  &gEfiTcp4ProtocolGuid,
+                  &Interface,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  //
+  // Always install private protocol no matter what happens later. We need to 
+  // keep the relationship between ControllerHandle and ChildHandle.
+  //
+  Status = gBS->InstallProtocolInterface (
+                  &ControllerHandle,
+                  &gIScsiPrivateGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &Private->IScsiIdentifier
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
   //
   // Try to add a port configuration page for this controller.
   //
   IScsiConfigUpdateForm (This->DriverBindingHandle, ControllerHandle, TRUE);
 
-  Private = IScsiCreateDriverData (This->DriverBindingHandle, ControllerHandle);
-  if (Private == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
   //
   // Get the iSCSI configuration data of this controller.
   //
@@ -190,19 +235,7 @@ IScsiDriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  //
-  // Install the iSCSI private stuff as a flag to indicate this controller
-  // is already controlled by iSCSI driver.
-  //
-  Status = gBS->InstallProtocolInterface (
-                  &ControllerHandle,
-                  &gIScsiPrivateGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &Private->IScsiIdentifier
-                  );
-  if (EFI_ERROR (Status)) {
-    goto ON_ERROR;
-  }
+
   //
   // Update/Publish the iSCSI Boot Firmware Table.
   //
@@ -213,7 +246,6 @@ IScsiDriverBindingStart (
 ON_ERROR:
 
   IScsiSessionAbort (&Private->Session);
-  IScsiCleanDriverData (Private);
 
   return Status;
 }
@@ -311,6 +343,27 @@ IScsiDriverBindingStop (
   }
 
   Private = ISCSI_DRIVER_DATA_FROM_IDENTIFIER (IScsiIdentifier);
+
+  if (Private->ChildHandle != NULL) {
+    Status = gBS->CloseProtocol (
+                    Private->ChildHandle,
+                    &gEfiTcp4ProtocolGuid,
+                    This->DriverBindingHandle,
+                    IScsiController
+                    );
+
+    ASSERT (!EFI_ERROR (Status));
+
+    Status = NetLibDestroyServiceChild (
+               IScsiController,
+               This->DriverBindingHandle,
+               &gEfiTcp4ServiceBindingProtocolGuid,
+               Private->ChildHandle
+               );
+    ASSERT (!EFI_ERROR (Status));
+  }
+
+  IScsiConfigUpdateForm (This->DriverBindingHandle, IScsiController, FALSE);
 
   //
   // Uninstall the private protocol.
