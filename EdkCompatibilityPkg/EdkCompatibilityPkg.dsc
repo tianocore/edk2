@@ -192,6 +192,7 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
 
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/SmmRuntimeDxeReportStatusCodeLib/SmmRuntimeDxeReportStatusCodeLib.inf  
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/DxeSmbusLib/DxeSmbusLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/EdkDxeRuntimeDriverLib/EdkDxeRuntimeDriverLib.inf
