@@ -1272,6 +1272,8 @@ SendInitSipiSipi (
   UINT32                VectorNumber;
   UINT32                DeliveryMode;
 
+  ASSERT (ApicID < MAX_CPU_NUMBER);
+
   mExchangeInfo->ApFunction = ApFunction;
   mExchangeInfo->ProcessorNumber[ApicID] = (UINT32) ProcessorNumber;
 
