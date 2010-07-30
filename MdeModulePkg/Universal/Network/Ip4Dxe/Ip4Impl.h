@@ -197,6 +197,7 @@ struct _IP4_SERVICE {
   // NIC this IP4_SERVICE works on.
   //
   CHAR16                          *MacString;
+  UINT32                          MaxPacketSize;  
 };
 
 #define IP4_INSTANCE_FROM_PROTOCOL(Ip4) \
