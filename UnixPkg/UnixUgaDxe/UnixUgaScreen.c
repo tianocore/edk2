@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -230,6 +230,7 @@ UnixUgaBlt (
   UGA_PRIVATE_DATA  *Private;
   EFI_TPL           OriginalTPL;
   EFI_STATUS        Status;
+  UGA_BLT_ARGS      UgaBltArgs;
 
   Private = UGA_DRAW_PRIVATE_DATA_FROM_THIS (This);
 
@@ -255,14 +256,22 @@ UnixUgaBlt (
   // doing this operation.
   //
   OriginalTPL = gBS->RaiseTPL (TPL_NOTIFY);
-
+  
+  //
+  // Package UGA Draw protocol parameters to UGA_BLT_ARGS structure to adapt to Unix UGA IO protocol.
+  //
+  UgaBltArgs.DestinationX = DestinationX;
+  UgaBltArgs.DestinationY = DestinationY;
+  UgaBltArgs.Height       = Height;
+  UgaBltArgs.Width        = Width;
+  UgaBltArgs.SourceX      = SourceX;
+  UgaBltArgs.SourceY      = SourceY;
+  UgaBltArgs.Delta        = Delta;
   Status = Private->UgaIo->UgaBlt (Private->UgaIo,
              BltBuffer,
              BltOperation,
-             SourceX, SourceY,
-             DestinationX, DestinationY,
-             Width, Height,
-             Delta);
+             &UgaBltArgs
+             );
 
   gBS->RestoreTPL (OriginalTPL);
 
