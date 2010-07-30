@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which relate with create or process the boot option.
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -55,7 +55,7 @@ BdsLibDoLegacyBoot (
   BdsRefreshBbsTableForBoot (Option);
 
   //
-  // Write boot to OS performance data to a file
+  // Write boot to OS performance data for legacy boot.
   //
   PERF_CODE (
     WriteBootToOsPerformanceData ();
@@ -253,8 +253,69 @@ BdsLibBootViaBootOption (
     Status = SecurityProtocol->FileAuthenticationState (SecurityProtocol, 0, DevicePath);
   }
 
-  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Booting %S\n", Option->Description));
+  DEBUG_CODE_BEGIN();
+    UINTN                     DevicePathTypeValue;
+    CHAR16                    *HiiString;
+    CHAR16                    *BootStringNumber;
+    UINTN                     BufferSize;
+  
+    DevicePathTypeValue = BdsGetBootTypeFromDevicePath (Option->DevicePath);
+  
+    //
+    // store number string of boot option temporary.
+    //
+    HiiString = NULL;
+    switch (DevicePathTypeValue) {
+    case BDS_EFI_ACPI_FLOPPY_BOOT:
+      HiiString = L"EFI Floppy";
+      break;
+    case BDS_EFI_MEDIA_CDROM_BOOT:
+    case BDS_EFI_MESSAGE_SATA_BOOT:
+    case BDS_EFI_MESSAGE_ATAPI_BOOT:
+      HiiString = L"EFI DVD/CDROM";
+      break;
+    case BDS_EFI_MESSAGE_USB_DEVICE_BOOT:
+      HiiString = L"EFI USB Device";
+      break;
+    case BDS_EFI_MESSAGE_SCSI_BOOT:
+      HiiString = L"EFI SCSI Device";
+      break;
+    case BDS_EFI_MESSAGE_MISC_BOOT:
+      HiiString = L"EFI Misc Device";
+      break;
+    case BDS_EFI_MESSAGE_MAC_BOOT:
+      HiiString = L"EFI Network";
+      break;
+    case BBS_DEVICE_PATH:
+      //
+      // Do nothing for legacy boot option.
+      //
+      break;
+    default:
+      DEBUG((EFI_D_INFO, "Can not find HiiString for given device path type 0x%x\n", DevicePathTypeValue));
+    }
 
+    //
+    // If found Hii description string then cat Hii string with original description.
+    //
+    if (HiiString != NULL) {
+      BootStringNumber = Option->Description;
+      BufferSize = StrSize(BootStringNumber);
+      BufferSize += StrSize(HiiString);
+      Option->Description = AllocateZeroPool(BufferSize);
+      StrCpy (Option->Description, HiiString);
+      if (StrnCmp (BootStringNumber, L"0", 1) != 0) {
+        StrCat (Option->Description, L" ");
+        StrCat (Option->Description, BootStringNumber);
+      } 
+      
+      FreePool (BootStringNumber);
+    }
+  
+    DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Booting %S\n", Option->Description));
+    
+  DEBUG_CODE_END();
+  
   Status = gBS->LoadImage (
                   TRUE,
                   mBdsImageHandle,
@@ -322,6 +383,13 @@ BdsLibBootViaBootOption (
   // the 5 Minute period
   //
   gBS->SetWatchdogTimer (5 * 60, 0x0000, 0x00, NULL);
+
+  //
+  // Write boot to OS performance data for UEFI boot
+  //
+  PERF_CODE (
+    WriteBootToOsPerformanceData ();
+  );
 
   Status = gBS->StartImage (ImageHandle, ExitDataSize, ExitData);
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Image Return Status = %r\n", Status));
