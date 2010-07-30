@@ -72,6 +72,7 @@ typedef struct {
   IA32_DESCRIPTOR   IdtrProfile;
   UINT32            BufferStart;
   UINT32            Cr3;
+  UINT32            ProcessorNumber[MAX_CPU_NUMBER];
 } MP_CPU_EXCHANGE_INFO;
 
 typedef struct {

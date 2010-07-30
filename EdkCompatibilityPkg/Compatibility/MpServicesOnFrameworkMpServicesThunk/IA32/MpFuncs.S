@@ -22,6 +22,7 @@
 #define GdtrProfile      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x10
 #define IdtrProfile      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x16
 #define BufferStart      RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x1C
+#define ProcessorNumber, RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x20
 
 #-------------------------------------------------------------------------------------
 #RendezvousFunnelProc  procedure follows. All APs execute their procedure. This
@@ -94,30 +95,33 @@ ProtectedModeStart:                   # protected mode entry point
         .byte       0x66
         movw        %ax,%ss           # Flat mode setup.
 
-
+        #
+        # ProgramStack
+        #
+        movl        $0x1b, %ecx
+        rdmsr
+        andl        $0xfffff000, %eax
+        addl        $0x20, %eax
+        movl        (%eax), %ebx
+        shrl        $24, %ebx
+        
+        xorl        %ecx, %ecx
         movl        %esi,%edi
-        addl        $LockLocation, %edi
-        movb        $NotVacantFlag, %al
-TestLock:
-        xchgb       (%edi), %al
-        cmpb        $NotVacantFlag, %al
-        jz          TestLock
+        addl        $ProcessorNumber, %edi
+        movl        (%edi, %ebx, 4), %ecx
 
-ProgramStack:
         movl        %esi,%edi
         addl        $StackSize, %edi
         movl        (%edi), %eax
+        incl        %ecx
+        mull        %ecx
+
         movl        %esi,%edi
         addl        $StackStart, %edi
-        addl        (%edi), %eax
-        movl        %eax,%esp
-        movl        %eax, (%edi)
+        movl        (%edi), %ebx
+        addl        %ebx, %eax
 
-Releaselock:
-        movb        $VacantFlag, %al
-        movl        %esi,%edi
-        addl        $LockLocation, %edi
-        xchgb       (%edi), %al
+        movl        %eax, %esp
 
         #
         # Call C Function

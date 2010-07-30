@@ -22,5 +22,5 @@ RendezvousProc      equ        LockLocation + 0Ch
 GdtrProfile         equ        LockLocation + 10h
 IdtrProfile         equ        LockLocation + 16h
 BufferStart         equ        LockLocation + 1Ch
-
+ProcessorNumber     equ        LockLocation + 20h
 ;-------------------------------------------------------------------------------

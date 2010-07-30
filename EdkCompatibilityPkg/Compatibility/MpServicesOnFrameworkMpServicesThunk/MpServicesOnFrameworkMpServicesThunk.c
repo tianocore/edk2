@@ -22,7 +22,6 @@ EFI_HANDLE                          mHandle = NULL;
 MP_SYSTEM_DATA                      mMPSystemData;
 EFI_PHYSICAL_ADDRESS                mStartupVector;
 MP_CPU_EXCHANGE_INFO                *mExchangeInfo;
-VOID                                *mStackStartAddress;
 BOOLEAN                             mStopCheckAPsStatus = FALSE;
 UINTN                               mNumberOfProcessors;
 EFI_GENERIC_MEMORY_TEST_PROTOCOL    *mGenMemoryTest;
@@ -1254,14 +1253,14 @@ ApProcWrapper (
 
   This function sends INIT-SIPI-SIPI to AP, and assign procedure specified by ApFunction.
 
-  @param  Broadcast   If TRUE, broadcase IPI to all APs; otherwise, send to specified AP.
-  @param  ApicID      The Local APIC ID of the specified AP. If Broadcast is TRUE, it is ignored.
-  @param  ApFunction  The procedure for AP to work on.
+  @param  ProcessorNumber The processor number of the specified AP.
+  @param  ApicID          The Local APIC ID of the specified AP.
+  @param  ApFunction      The procedure for AP to work on.
 
 **/
 VOID
 SendInitSipiSipi (
-  IN BOOLEAN            Broadcast,
+  IN UINTN              ProcessorNumber,
   IN UINT32             ApicID,
   IN VOID               *ApFunction
   )
@@ -1274,15 +1273,10 @@ SendInitSipiSipi (
   UINT32                DeliveryMode;
 
   mExchangeInfo->ApFunction = ApFunction;
-  mExchangeInfo->StackStart = mStackStartAddress;
+  mExchangeInfo->ProcessorNumber[ApicID] = (UINT32) ProcessorNumber;
 
-  if (Broadcast) {
-    ICRHigh = 0;
-    ICRLow  = BROADCAST_MODE_ALL_EXCLUDING_SELF_BIT | TRIGGER_MODE_LEVEL_BIT | ASSERT_BIT;
-  } else {
-    ICRHigh = ApicID << 24;
-    ICRLow  = SPECIFY_CPU_MODE_BIT | TRIGGER_MODE_LEVEL_BIT | ASSERT_BIT;
-  }
+  ICRHigh = ApicID << 24;
+  ICRLow  = SPECIFY_CPU_MODE_BIT | TRIGGER_MODE_LEVEL_BIT | ASSERT_BIT;
 
   VectorNumber = 0;
   DeliveryMode = DELIVERY_MODE_INIT;
@@ -1300,11 +1294,7 @@ SendInitSipiSipi (
 
   VectorNumber = (UINT32) RShiftU64 (mStartupVector, 12);
   DeliveryMode = DELIVERY_MODE_SIPI;
-  if (Broadcast) {
-    ICRLow = BROADCAST_MODE_ALL_EXCLUDING_SELF_BIT | TRIGGER_MODE_LEVEL_BIT | ASSERT_BIT;
-  } else {
-    ICRLow = SPECIFY_CPU_MODE_BIT | TRIGGER_MODE_LEVEL_BIT | ASSERT_BIT;
-  }
+  ICRLow = SPECIFY_CPU_MODE_BIT | TRIGGER_MODE_LEVEL_BIT | ASSERT_BIT;
 
   ICRLow |= VectorNumber | (DeliveryMode << 8);
 
@@ -1358,7 +1348,7 @@ WakeUpAp (
   ASSERT_EFI_ERROR (Status);
 
   SendInitSipiSipi (
-    FALSE,
+    ProcessorNumber,
     (UINT32) ProcessorInfoBuffer.ProcessorId,
     (VOID *) (UINTN) ApProcWrapper
     );
@@ -1390,7 +1380,7 @@ ResetProcessorToIdleState (
   ASSERT_EFI_ERROR (Status);
 
   SendInitSipiSipi (
-    FALSE,
+    ProcessorNumber,
     (UINT32) ProcessorInfoBuffer.ProcessorId,
     NULL
     );
@@ -1601,7 +1591,7 @@ PrepareAPStartupVector (
 
   ZeroMem ((VOID *) mExchangeInfo, sizeof (MP_CPU_EXCHANGE_INFO));
 
-  mStackStartAddress = AllocatePages (EFI_SIZE_TO_PAGES (MAX_CPU_NUMBER * AP_STACK_SIZE));
+  mExchangeInfo->StackStart  = AllocatePages (EFI_SIZE_TO_PAGES (mNumberOfProcessors * AP_STACK_SIZE));
   mExchangeInfo->StackSize  = AP_STACK_SIZE;
 
   AsmReadGdtr (&GdtrForBSP);
@@ -1711,8 +1701,6 @@ InitializeMpServicesProtocol (
 {
   EFI_STATUS Status;
 
-  PrepareMemoryForConfiguration ();
-
   //
   // Locates Framework version MP Services Protocol
   //
@@ -1733,6 +1721,8 @@ InitializeMpServicesProtocol (
                                   );
   ASSERT_EFI_ERROR (Status);
   ASSERT (mNumberOfProcessors < MAX_CPU_NUMBER);
+
+  PrepareMemoryForConfiguration ();
 
   //
   // Create timer event to check AP state for non-blocking execution.

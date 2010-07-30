@@ -24,6 +24,7 @@
 .equ                   IdtrLocation,              RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x2A
 .equ                   BufferStartLocation,       RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x34
 .equ                   Cr3OffsetLocation,         RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x38
+.equ                   ProcessorNumberLocation,   RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x38
 
 #-------------------------------------------------------------------------------------
 
@@ -128,31 +129,33 @@ LongModeStart:
         .byte       0x66
         movw        %ax,%ss
 
-        movl        %esi, %edi
-        addl        $LockLocation, %edi
-        movb        $NotVacantFlag, %al
-TestLock:
-        xchgb       (%edi), %al
-        cmpb        $NotVacantFlag, %al
-        jz          TestLock
+        #
+        # ProgramStack
+        #
+        movl        $0x1b, %ecx
+        rdmsr
+        andl        $0xfffff000, %eax
+        addl        $0x20, %eax
+        movl        (%eax), %ebx
+        shrl        $24, %ebx
+        
+        xorq        %rcx, %rcx
+        movl        %esi,%edi
+        addl        $ProcessorNumberLocation, %edi
+        movl        (%edi, %ebx, 4), %ecx
 
-ProgramStack:
-
-        movl        %esi, %edi
-        addl        $StackSizeLocation, %edi 
+        movl        %esi,%edi
+        addl        $StackSizeLocation, %edi
         movq        (%edi), %rax
-        movl        %esi, %edi
+        incq        %rcx
+        mulq        %rcx
+
+        movl        %esi,%edi
         addl        $StackStartAddressLocation, %edi
-        addq        (%edi), %rax
+        movq        (%edi), %rbx
+        addq        %rbx, %rax
+
         movq        %rax, %rsp
-        movq        %rax, (%edi) 
-
-Releaselock:
-
-        movb        $VacantFlag, %al
-        movl        %esi, %edi
-        addl        $LockLocation, %edi
-        xchgb       (%edi), %al
 
         #
         # Call C Function
