@@ -101,6 +101,7 @@
 
 [FeaturePcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe
 
 # [Event]
 #   ##

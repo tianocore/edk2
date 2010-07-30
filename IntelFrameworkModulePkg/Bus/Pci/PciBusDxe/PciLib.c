@@ -236,10 +236,14 @@ PciHostBridgeResourceAllocator (
       // enumerator. Several resource tree was created
       //
 
+      //
+      // If non-stardard PCI Bridge I/O window alignment is supported,
+      // set I/O aligment to minimum possible alignment for root bridge.
+      //
       IoBridge = CreateResourceNode (
                    RootBridgeDev,
                    0,
-                   0xFFF,
+                   FeaturePcdGet (PcdPciBridgeIoAlignmentProbe) ? 0x1FF: 0xFFF,
                    0,
                    PciBarTypeIo16,
                    PciResUsageTypical
