@@ -2236,19 +2236,27 @@ GetIfrBinaryData (
           // Check whether return default FormSet
           //
           if (ReturnDefault) {
-            //
-            // Check ClassGuid of formset OpCode
-            //
-            IsSetupClassGuid  = FALSE;
-            NumberOfClassGuid = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
-            ClassGuid         = (EFI_GUID *) (OpCodeData + sizeof (EFI_IFR_FORM_SET));
-            for (Index = 0; Index < NumberOfClassGuid; Index++) {
-              if (CompareGuid (ClassGuid + Index, &gEfiHiiPlatformSetupFormsetGuid)) {
-                IsSetupClassGuid = TRUE;
+            if (((EFI_IFR_OP_HEADER *) OpCodeData)->Length > OFFSET_OF (EFI_IFR_FORM_SET, Flags)) {
+              //
+              // Check ClassGuid of formset OpCode
+              //
+              IsSetupClassGuid  = FALSE;
+              NumberOfClassGuid = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
+              ClassGuid         = (EFI_GUID *) (OpCodeData + sizeof (EFI_IFR_FORM_SET));
+              for (Index = 0; Index < NumberOfClassGuid; Index++) {
+                if (CompareGuid (ClassGuid + Index, &gEfiHiiPlatformSetupFormsetGuid)) {
+                  IsSetupClassGuid = TRUE;
+                  break;
+                }
+              }
+              if (IsSetupClassGuid) {
                 break;
               }
-            }
-            if (IsSetupClassGuid) {
+            } else {
+              //
+              // No class guid in FormSet opcode, directly return the first form.
+              //
+              IsSetupClassGuid = TRUE;
               break;
             }
           }
