@@ -1,7 +1,7 @@
 /** @file
   FrontPage routines to handle the callbacks and browser calls
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -26,10 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 extern UINT8  FrontPageVfrBin[];
 
-extern EFI_HII_DATABASE_PROTOCOL       *gHiiDatabase;
-extern EFI_HII_STRING_PROTOCOL         *gHiiString;
 extern EFI_FORM_BROWSER2_PROTOCOL      *gFormBrowser2;
-extern EFI_HII_CONFIG_ROUTING_PROTOCOL *gHiiConfigRouting;
 
 extern UINTN    gCallbackKey;
 extern BOOLEAN  gConnectAllHappened;
