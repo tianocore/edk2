@@ -49,7 +49,7 @@ Ip4ConfigGetNicInfo (
   Config = Ip4ConfigFindNicVariable (Variable, NicAddr);
 
   if (Config == NULL) {
-    gBS->FreePool (Variable);
+    FreePool (Variable);
     return NULL;
   }
 
@@ -62,14 +62,14 @@ Ip4ConfigGetNicInfo (
     Ip4ConfigWriteVariable (NewVariable);
 
     if (NewVariable != NULL) {
-      gBS->FreePool (NewVariable);
+      FreePool (NewVariable);
     };
 
-    gBS->FreePool (Config);
+    FreePool (Config);
     Config = NULL;
   }
 
-  gBS->FreePool (Variable);
+  FreePool (Variable);
   return Config;
 }
 
@@ -131,7 +131,7 @@ EfiNicIp4ConfigGetInfo (
 
   *ConfigLen = Len;
 
-  gBS->FreePool (Config);
+  FreePool (Config);
   return Status;
 }
 
@@ -200,14 +200,14 @@ EfiNicIp4ConfigSetInfo (
   Status      = Ip4ConfigWriteVariable (NewVariable);
 
   if (NewVariable != NULL) {
-    gBS->FreePool (NewVariable);
+    FreePool (NewVariable);
   }
 
   //
   // Variable is NULL when saving the first configure parameter
   //
   if (Variable != NULL) {
-    gBS->FreePool (Variable);
+    FreePool (Variable);
   }
 
   if (EFI_ERROR (Status)) {
@@ -277,7 +277,7 @@ Ip4ConfigOnDhcp4Complete (
     if (Instance->NicConfig != NULL) {
       ASSERT (Instance->NicConfig->Source == IP4_CONFIG_SOURCE_DHCP);
       Perment = Instance->NicConfig->Perment;
-      gBS->FreePool (Instance->NicConfig);
+      FreePool (Instance->NicConfig);
     }
 
     Instance->NicConfig = AllocatePool (sizeof (NIC_IP4_CONFIG_INFO) + 2* sizeof (EFI_IP4_ROUTE_TABLE));
@@ -741,7 +741,7 @@ Ip4ConfigCleanConfig (
   )
 {
   if (Instance->NicConfig != NULL) {
-    gBS->FreePool (Instance->NicConfig);
+    FreePool (Instance->NicConfig);
     Instance->NicConfig = NULL;
   }
 
