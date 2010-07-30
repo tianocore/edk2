@@ -85,7 +85,7 @@
    GCC:*_*_*_DLINK2_FLAGS == -lc
    GCC:*_*_IA32_CC_FLAGS == -m32 -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -idirafter/usr/include -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
    GCC:*_*_IA32_PP_FLAGS == -m32 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
-   GCC:*_*_IA32_ASM_FLAGS == -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
+   GCC:*_*_IA32_ASM_FLAGS == -m32 -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 
 #
 # Need to do this link via gcc and not ld as the pathing to libraries changes from OS version to OS version
