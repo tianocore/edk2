@@ -631,7 +631,7 @@ Abstract:
   #error EdkIIGluePciLibPciExpress and EdkIIGluePciLibCf8: can only be mutual exclusively used.
 #endif
 
-#if defined (__EDKII_GLUE_DXE_HOB_LIB__) && (__EDKII_GLUE_PEI_HOB_LIB__)
+#if defined(__EDKII_GLUE_DXE_HOB_LIB__) && defined(__EDKII_GLUE_PEI_HOB_LIB__)
   #error EdkIIGlueDxeHobLib and EdkIIGluePeiHobLib: can only be mutual exclusively used.
 #endif
 
