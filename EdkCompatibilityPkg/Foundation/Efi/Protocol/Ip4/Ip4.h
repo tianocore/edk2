@@ -79,6 +79,7 @@ typedef struct _EFI_IP4_ICMP_TYPE {
 
 typedef struct {
   BOOLEAN                 IsStarted;
+  UINT32                  MaxPacketSize;  
 
   EFI_IP4_CONFIG_DATA     ConfigData;
   BOOLEAN                 IsConfigured;
