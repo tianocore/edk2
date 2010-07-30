@@ -140,6 +140,10 @@ typedef struct {
   /// Set to TRUE after this EFI IPv4 Protocol instance has been successfully configured.
   ///
   BOOLEAN                 IsStarted;
+  /// The maximum packet size, in bytes, of the packet which the upper layer driver could feed.
+  ///
+  UINT32                  MaxPacketSize;
+  ///  
   ///
   /// Current configuration settings.
   ///
