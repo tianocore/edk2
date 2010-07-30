@@ -308,6 +308,9 @@ HiiThunkGetString (
   Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
   Rfc4646AsciiLanguage = NULL;
+  SupportedLanguages   = NULL;
+  PlatformLanguage     = NULL;
+  Status               = EFI_SUCCESS;
 
   if (LanguageString != NULL) {
     Iso639AsciiLanguage = AllocateZeroPool (StrLen (LanguageString) + 1);
@@ -328,7 +331,6 @@ HiiThunkGetString (
     // Iso639ToRfc4646Map.
     //
     ASSERT (Rfc4646AsciiLanguage != NULL);
-    
   }
 
   UefiHiiHandle = FwHiiHandleToUefiHiiHandle (Private, Handle);
@@ -342,16 +344,13 @@ HiiThunkGetString (
   //
   SupportedLanguages = HiiGetSupportedLanguages (UefiHiiHandle);
   if (SupportedLanguages == NULL) {
-    goto Error2;
+    goto Done;
   }
 
   //
   // Get the current platform language setting
   //
   PlatformLanguage = GetEfiGlobalVariable (L"PlatformLang");
-  if (PlatformLanguage == NULL) {
-    goto Error1;
-  }
 
   //
   // Get the best matching language from SupportedLanguages
@@ -359,36 +358,38 @@ HiiThunkGetString (
   BestLanguage = GetBestLanguage (
                    SupportedLanguages, 
                    FALSE,                // RFC 4646 mode
-                   (Rfc4646AsciiLanguage != NULL) ? Rfc4646AsciiLanguage : "",
-                   PlatformLanguage,     // Next highest priority
+                   (Rfc4646AsciiLanguage != NULL) ? Rfc4646AsciiLanguage : "", // Highest priority 
+                   (PlatformLanguage != NULL) ? PlatformLanguage : "",         // Next highest priority
                    SupportedLanguages,   // Lowest priority 
                    NULL
                    );
-  if (BestLanguage == NULL) {
-    FreePool (PlatformLanguage);
-Error1:
-    FreePool (SupportedLanguages);
-Error2:
+  if (BestLanguage != NULL) {
+    Status = mHiiStringProtocol->GetString (
+                                 mHiiStringProtocol,
+                                 BestLanguage,
+                                 UefiHiiHandle,
+                                 Token,
+                                 StringBuffer,
+                                 BufferLengthTemp,
+                                 NULL
+                                 );
+    FreePool (BestLanguage);
+  } else {
     Status = EFI_INVALID_PARAMETER;
-    goto Done;
   }
-
-  Status = mHiiStringProtocol->GetString (
-                               mHiiStringProtocol,
-                               BestLanguage,
-                               UefiHiiHandle,
-                               Token,
-                               StringBuffer,
-                               BufferLengthTemp,
-                               NULL
-                               );
-  FreePool (BestLanguage);
 
 Done:
 	if (Rfc4646AsciiLanguage != NULL) {
     FreePool (Rfc4646AsciiLanguage);
   }
-  
+
+  if (SupportedLanguages != NULL) {
+    FreePool (SupportedLanguages);
+  }
+
+  if (PlatformLanguage != NULL) {
+    FreePool (PlatformLanguage);
+  }
   return Status;
 }
 
