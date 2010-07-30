@@ -66,7 +66,7 @@
   gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_CONSUMES (Needed if Data Hub is supported for status code.)
   gMemoryStatusCodeRecordGuid                   ## CONSUMES ## HOB
   gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
-
+  gEfiStatusCodeDataTypeStringGuid              ## CONSUMES
 
 [Protocols]
   gEfiStatusCodeRuntimeProtocolGuid             ## PRODUCES

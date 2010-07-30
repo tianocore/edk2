@@ -55,7 +55,7 @@
 
 [Guids]
   gMemoryStatusCodeRecordGuid                   ## SOMETIMES_CONSUMES ## HOB
-
+  gEfiStatusCodeDataTypeStringGuid              ## CONSUMES
 
 [Ppis]
   gEfiPeiStatusCodePpiGuid                      ## PRODUCES
