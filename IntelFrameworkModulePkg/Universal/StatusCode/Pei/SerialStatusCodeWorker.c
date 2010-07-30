@@ -126,7 +126,8 @@ SerialStatusCodeReportWorker (
                   Value,
                   Instance
                   );
-  } else if (CompareGuid (&Data->Type, &gEfiStatusCodeDataTypeStringGuid) &&
+  } else if (Data != NULL &&
+             CompareGuid (&Data->Type, &gEfiStatusCodeDataTypeStringGuid) &&
              ((EFI_STATUS_CODE_STRING_DATA *) Data)->StringType == EfiStringAscii) {
     //
     // EFI_STATUS_CODE_STRING_DATA
