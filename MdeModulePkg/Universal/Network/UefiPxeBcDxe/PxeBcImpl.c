@@ -243,6 +243,71 @@ IcmpErrorListenHandler (
   QueueDpc (TPL_CALLBACK, IcmpErrorListenHandlerDpc, Context);
 }
 
+/**
+  Get current media status
+
+  @param[in]  Snp               Pointer to the simple network protocol.
+
+  @retval TRUE                  Media is connected to the network interface.
+  @retval FALSE                 Media isn't connect to the network interface.
+
+**/
+BOOLEAN
+GetCurrentMediaStatus (
+  IN EFI_SIMPLE_NETWORK       *Snp
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_MAC_ADDRESS             *MCastFilter;
+  UINT32                      MCastFilterCnt;
+  UINT32                      EnableFilterBits;
+  UINT32                      DisableFilterBits;
+
+  if (Snp == NULL) {
+    return FALSE;
+  }
+  
+  //
+  // Pre-UEFI2.3, Media Status is only refreshed when interface intialize
+  // To get the up to date media status, re-initialize the NIC is required
+  // Considering PXE boot scenario, the assumption is no other network 
+  // application is running when PXE boot
+  //
+  if (Snp->Mode->State == EfiSimpleNetworkInitialized) {
+    //
+    // Save current receive filtter setting
+    //
+    EnableFilterBits = Snp->Mode->ReceiveFilterSetting;
+    DisableFilterBits = (Snp->Mode->ReceiveFilterMask) ^ EnableFilterBits;
+
+    MCastFilterCnt = Snp->Mode->MCastFilterCount;
+    MCastFilter = AllocatePool (sizeof (EFI_MAC_ADDRESS) * MCastFilterCnt);
+    if (MCastFilter == NULL) {
+      DEBUG ((EFI_D_ERROR, "GetCurrentMediaStatus: Failed to allocate memory resource for MCastFilter.\n"));
+      return FALSE;
+    }
+    CopyMem (MCastFilter, Snp->Mode->MCastFilter, sizeof (EFI_MAC_ADDRESS) * MCastFilterCnt);
+
+    //
+    // Re Initialize the NIC
+    //
+    Snp->Shutdown (Snp);
+    Snp->Stop (Snp);
+    Snp->Start (Snp);
+    Status = Snp->Initialize (Snp, 0, 0);
+    if (!EFI_ERROR(Status)) {
+      //
+      // Recover previous recieve filter setting
+      //
+      Snp->ReceiveFilters (Snp, EnableFilterBits, DisableFilterBits, FALSE, MCastFilterCnt, MCastFilter);
+      FreePool (MCastFilter);
+      return Snp->Mode->MediaPresent;
+    }
+  }
+
+  return FALSE;
+}
+
 /**                                                                 
   Enables the use of the PXE Base Code Protocol functions.
 
@@ -334,6 +399,13 @@ EfiPxeBcStart (
     // IPv6 is not supported now.
     //
     return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Check Up to date Media Status
+  //
+  if (FALSE == GetCurrentMediaStatus (Private->Snp)) {
+  	return EFI_NO_MEDIA;
   }
 
   //
@@ -2480,9 +2552,11 @@ DiscoverBootFile (
   }
 
   //
-  // use option 54, if zero, use siaddr in header
+  // Use siaddr(next server) in DHCPOFFER packet header, if zero, use option 54(server identifier)
+  // in DHCPOFFER packet.
+  // (It does not comply with PXE Spec, Ver2.1)
   //
-  if (Packet->Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_SERVER_ID] != NULL) {
+  if (EFI_IP4_EQUAL (&Packet->Packet.Offer.Dhcp4.Header.ServerAddr, &mZeroIp4Addr)) {
     CopyMem (
       &Private->ServerIp,
       Packet->Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_SERVER_ID]->Data,
@@ -2695,12 +2769,16 @@ EfiPxeLoadFile (
   // Check download status
   //
   if (Status == EFI_SUCCESS) {
+
     return EFI_SUCCESS;
 
   } else if (Status == EFI_BUFFER_TOO_SMALL) {
     if (Buffer != NULL) {
       AsciiPrint ("PXE-E05: Download buffer is smaller than requested file.\n");
     } else {
+      //
+      // The functionality of PXE Base Code protocol will not be stopped.
+      //
       return Status;
     }
 

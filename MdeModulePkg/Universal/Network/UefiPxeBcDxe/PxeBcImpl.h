@@ -63,6 +63,7 @@ struct _PXEBC_PRIVATE_DATA {
   EFI_HANDLE                                Udp4WriteChild;
 
   EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL *Nii;
+  EFI_SIMPLE_NETWORK_PROTOCOL               *Snp;
 
   EFI_PXE_BASE_CODE_PROTOCOL                PxeBc;
   EFI_LOAD_FILE_PROTOCOL                    LoadFile;
