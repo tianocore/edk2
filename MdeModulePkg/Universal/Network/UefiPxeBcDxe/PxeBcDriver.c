@@ -188,6 +188,21 @@ PxeBcDriverBindingStart (
     Private->Nii = NULL;
   }
 
+  //
+  // Get the SNP protocol interface
+  // 
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiSimpleNetworkProtocolGuid,
+                  (VOID **) &Private->Snp,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    Private->Snp = NULL;
+  }
+
   Status = NetLibCreateServiceChild (
             ControllerHandle,
             This->DriverBindingHandle,
@@ -532,6 +547,14 @@ PxeBcDriverBindingStop (
                   );
 
   if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Stop functionality of PXE Base Code protocol
+  //
+  Status = PxeBc->Stop (PxeBc);
+  if (Status != EFI_SUCCESS && Status != EFI_NOT_STARTED) {
     return Status;
   }
 
