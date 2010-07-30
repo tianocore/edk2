@@ -46,10 +46,12 @@
   ReportStatusCodeLib
   PrintLib
   DebugLib
-
+  BaseMemoryLib
+  
 [Guids]
   gMemoryStatusCodeRecordGuid                   ## SOMETIMES_CONSUMES ## HOB
-
+  gEfiStatusCodeDataTypeStringGuid              ## CONSUMES
+  
 [Ppis]
   gEfiPeiRscHandlerPpiGuid                      ## CONSUMES
 

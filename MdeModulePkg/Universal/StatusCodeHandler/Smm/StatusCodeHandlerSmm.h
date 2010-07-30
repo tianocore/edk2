@@ -30,6 +30,7 @@
 #include <Library/SmmServicesTableLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/BaseMemoryLib.h>
 
 //
 // Runtime memory status code worker definition

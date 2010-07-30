@@ -49,11 +49,13 @@
   ReportStatusCodeLib
   DebugLib
   SynchronizationLib
-
+  BaseMemoryLib
+  
 [Guids]
   gMemoryStatusCodeRecordGuid                   ## CONSUMES ## HOB
   gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
   gEfiEventExitBootServicesGuid                 ## CONSUMES ## Event
+  gEfiStatusCodeDataTypeStringGuid              ## CONSUMES
 
 [Protocols]
   gEfiRscHandlerProtocolGuid                    ## CONSUMES

@@ -1,7 +1,7 @@
 /** @file
   Serial I/O status code reporting worker.
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -124,6 +124,17 @@ SerialStatusCodeReportWorker (
                   "PROGRESS CODE: V%x I%x\n\r", 
                   Value, 
                   Instance
+                  );
+  } else if (CompareGuid (&Data->Type, &gEfiStatusCodeDataTypeStringGuid) &&
+             ((EFI_STATUS_CODE_STRING_DATA *) Data)->StringType == EfiStringAscii) {
+    //
+    // EFI_STATUS_CODE_STRING_DATA
+    //
+    CharCount = AsciiSPrint (
+                  Buffer,
+                  sizeof (Buffer),
+                  "%a\n\r",
+                  ((EFI_STATUS_CODE_STRING_DATA *) Data)->String.Ascii
                   );
   } else {
     //

@@ -129,6 +129,17 @@ SerialStatusCodeReportWorker (
                   Value,
                   Instance
                   );
+  } else if (CompareGuid (&Data->Type, &gEfiStatusCodeDataTypeStringGuid) &&
+             ((EFI_STATUS_CODE_STRING_DATA *) Data)->StringType == EfiStringAscii) {
+    //
+    // EFI_STATUS_CODE_STRING_DATA
+    //
+    CharCount = AsciiSPrint (
+                  Buffer,
+                  sizeof (Buffer),
+                  "%a\n\r",
+                  ((EFI_STATUS_CODE_STRING_DATA *) Data)->String.Ascii
+                  );
   } else {
     //
     // Code type is not defined.

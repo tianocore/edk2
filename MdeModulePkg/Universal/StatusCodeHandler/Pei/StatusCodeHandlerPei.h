@@ -30,6 +30,7 @@
 #include <Library/PcdLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PeimEntryPoint.h>
+#include <Library/BaseMemoryLib.h>
 
 /**
   Convert status code value and extended data to readable ASCII string, send string to serial I/O device.
