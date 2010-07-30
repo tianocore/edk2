@@ -74,6 +74,9 @@ WatchdogTimerDriverExpires (
   if (mWatchdogTimerNotifyFunction != NULL) {
     mWatchdogTimerNotifyFunction (mWatchdogTimerPeriod);
   }
+  
+  DEBUG ((EFI_D_ERROR, "Watchdog Timer reseting system\n"));
+
   //
   // Reset the platform
   //
