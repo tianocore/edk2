@@ -258,7 +258,8 @@ UnixUgaBlt (
   OriginalTPL = gBS->RaiseTPL (TPL_NOTIFY);
   
   //
-  // Package UGA Draw protocol parameters to UGA_BLT_ARGS structure to adapt to Unix UGA IO protocol.
+  // Pack UGA Draw protocol parameters to UGA_BLT_ARGS structure to adapt to
+  // UgaBlt() API of Unix UGA IO protocol.
   //
   UgaBltArgs.DestinationX = DestinationX;
   UgaBltArgs.DestinationY = DestinationY;
