@@ -85,31 +85,33 @@ ProtectedModeStart::                  ; protected mode entry point
         mov         gs,  ax
         mov         ss,  ax           ; Flat mode setup.
 
-
+        ;
+        ; ProgramStack
+        ;
+        mov         ecx, 1bh                          ; Read IA32_APIC_BASE MSR
+        rdmsr
+        and         eax, 0fffff000h
+        add         eax, 20h
+        mov         ebx, dword ptr [eax]
+        shr         ebx, 24
+        
+        xor         ecx, ecx
         mov         edi, esi
-        add         edi, LockLocation
-        mov         al,  NotVacantFlag
-TestLock::
-        xchg        byte ptr [edi], al
-        cmp         al,  NotVacantFlag
-        jz          TestLock
-
-ProgramStack::
+        add         edi, ProcessorNumber
+        mov         ecx, dword ptr [edi + 4 * ebx]    ; ECX = CpuNumber
 
         mov         edi, esi
         add         edi, StackSize
         mov         eax, dword ptr [edi]
+        inc         ecx
+        mul         ecx                               ; EAX = StackSize * (CpuNumber + 1)
+
         mov         edi, esi
         add         edi, StackStart
-        add         eax, dword ptr [edi]
-        mov         esp, eax
-        mov         dword ptr [edi], eax
+        mov         ebx, dword ptr [edi]
+        add         eax, ebx                          ; EAX = StackStart + StackSize * (CpuNumber + 1)
 
-Releaselock::
-        mov         al,  VacantFlag
-        mov         edi, esi
-        add         edi, LockLocation
-        xchg        byte ptr [edi], al
+        mov         esp, eax
 
         ;
         ; Call C Function

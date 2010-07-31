@@ -23,5 +23,6 @@ GdtrLocation                  equ        LockLocation + 20h
 IdtrLocation                  equ        LockLocation + 2Ah
 BufferStartLocation           equ        LockLocation + 34h
 Cr3OffsetLocation             equ        LockLocation + 38h
+ProcessorNumberLocation       equ        LockLocation + 3Ch
 
 ;-------------------------------------------------------------------------------

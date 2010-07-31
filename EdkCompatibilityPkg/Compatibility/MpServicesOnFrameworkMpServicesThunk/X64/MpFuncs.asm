@@ -112,31 +112,33 @@ LongModeStart::
         mov         es,  ax
         mov         ss,  ax
 
+        ;
+        ; ProgramStack
+        ;
+        mov         ecx, 1bh                          ; Read IA32_APIC_BASE MSR
+        rdmsr
+        and         eax, 0fffff000h
+        add         eax, 20h
+        mov         ebx, dword ptr [eax]
+        shr         ebx, 24
+        
+        xor         rcx, rcx
         mov         edi, esi
-        add         edi, LockLocation
-        mov         al,  NotVacantFlag
-TestLock::
-        xchg        byte ptr [edi], al
-        cmp         al, NotVacantFlag
-        jz          TestLock
-
-ProgramStack::
+        add         edi, ProcessorNumberLocation
+        mov         ecx, dword ptr [edi + 4 * ebx]    ; RCX = CpuNumber
 
         mov         edi, esi
         add         edi, StackSizeLocation
         mov         rax, qword ptr [edi]
+        inc         rcx
+        mul         rcx                               ; RAX = StackSize * (CpuNumber + 1)
+
         mov         edi, esi
         add         edi, StackStartAddressLocation
-        add         rax, qword ptr [edi]
+        mov         rbx, qword ptr [edi]
+        add         rax, rbx                          ; RAX = StackStart + StackSize * (CpuNumber + 1)
+
         mov         rsp, rax
-        mov         qword ptr [edi], rax
-
-Releaselock::
-
-        mov         al,  VacantFlag
-        mov         edi, esi
-        add         edi, LockLocation
-        xchg        byte ptr [edi], al
 
         ;
         ; Call C Function
