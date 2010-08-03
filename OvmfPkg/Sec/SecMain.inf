@@ -28,31 +28,37 @@
 #
 
 [Sources]
-  FindPeiCore.c
   SecMain.c
 
 [Sources.IA32]
-  Ia32/SecEntry.asm
-  Ia32/SecEntry.S
-  Ia32/SwitchStack.c
+  Ia32/SecEntry.asm | MSFT
+  Ia32/SecEntry.asm | INTEL
+  Ia32/SecEntry.S   | GCC
 
 [Sources.X64]
-  X64/SecEntry.asm
-  X64/SecEntry.S
-  X64/SwitchStack.c
+  X64/SecEntry.asm  | MSFT
+  X64/SecEntry.asm  | INTEL
+  X64/SecEntry.S    | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   BaseLib
+  DebugLib
   BaseMemoryLib
-  ExtractGuidedSectionLib
+  PeiServicesLib
   PcdLib
-  PeCoffGetEntryPointLib
   UefiCpuLib
+  DebugAgentLib
+  IoLib
+  PeCoffLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
+  ExtractGuidedSectionLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
@@ -60,4 +66,3 @@
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
-

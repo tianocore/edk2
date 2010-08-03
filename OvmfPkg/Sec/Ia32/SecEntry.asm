@@ -16,7 +16,7 @@
 ;*
 ;------------------------------------------------------------------------------
 
-#include "SecMain.h"
+#include <Base.h>
 
     .686
     .model  flat,C
@@ -41,7 +41,7 @@ _ModuleEntryPoint PROC PUBLIC
     ; Load temporary stack top at very low memory.  The C code
     ; can reload to a better address.
     ;
-    mov     eax, INITIAL_TOP_OF_STACK
+    mov     eax, BASE_512KB
     mov     esp, eax
     nop
 

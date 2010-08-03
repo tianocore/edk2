@@ -17,7 +17,7 @@
 #------------------------------------------------------------------------------
 
 
-#include "SecMain.h"
+#include <Base.h>
 
 #EXTERN ASM_PFX(SecCoreStartupWithStack)
 
@@ -39,7 +39,7 @@ ASM_PFX(_ModuleEntryPoint):
     # Load temporary stack top at very low memory.  The C code
     # can reload to a better address.
     #
-    movq    $INITIAL_TOP_OF_STACK, %rsp 
+    movq    $BASE_512KB, %rsp 
     nop
 
     #
