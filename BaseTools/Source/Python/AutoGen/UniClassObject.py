@@ -177,18 +177,24 @@ class StringDefClassObject(object):
                repr(self.StringValue) + ' ' + \
                repr(self.UseOtherLangDef)
 
+    def UpdateValue(self, Value = None):
+        if Value != None:
+            self.StringValue = Value + u'\x00'        # Add a NULL at string tail
+            self.StringValueByteList = UniToHexList(self.StringValue)
+            self.Length = len(self.StringValueByteList)
+
 ## UniFileClassObject
 #
 # A structure for .uni file definition
 #
 class UniFileClassObject(object):
-    def __init__(self, FileList = [], IsCompatibleMode = False):
+    def __init__(self, FileList = [], IsCompatibleMode = False, IncludePathList = []):
         self.FileList = FileList
         self.Token = 2
         self.LanguageDef = []                   #[ [u'LanguageIdentifier', u'PrintableName'], ... ]
         self.OrderedStringList = {}             #{ u'LanguageIdentifier' : [StringDefClassObject]  }
         self.IsCompatibleMode = IsCompatibleMode
-
+        self.IncludePathList = IncludePathList
         if len(self.FileList) > 0:
             self.LoadUniFiles(FileList)
 
@@ -225,6 +231,21 @@ class UniFileClassObject(object):
         #
         self.AddStringToList(u'$LANGUAGE_NAME', LangName, LangName, 0, True, Index=0)
         self.AddStringToList(u'$PRINTABLE_LANGUAGE_NAME', LangName, LangPrintName, 1, True, Index=1)
+
+        if not IsLangInDef:
+            #
+            # The found STRING tokens will be added into new language string list
+            # so that the unique STRING identifier is reserved for all languages in the package list. 
+            #
+            FirstLangName = self.LanguageDef[0][0]
+            if LangName != FirstLangName:
+                for Index in range (2, len (self.OrderedStringList[FirstLangName])):
+                    Item = self.OrderedStringList[FirstLangName][Index]
+                    if Item.UseOtherLangDef != '':
+                        OtherLang = Item.UseOtherLangDef
+                    else:
+                        OtherLang = FirstLangName
+                    self.OrderedStringList[LangName].append (StringDefClassObject(Item.StringName, '', Item.Referenced, Item.Token, OtherLang))
 
         return True
 
@@ -266,7 +287,6 @@ class UniFileClassObject(object):
         if not os.path.exists(File.Path) or not os.path.isfile(File.Path):
             EdkLogger.error("Unicode File Parser", FILE_NOT_FOUND, ExtraData=File.Path)
 
-        Dir = File.Dir
         try:
             FileIn = codecs.open(File.Path, mode='rb', encoding='utf-16').readlines()
         except UnicodeError, X:
@@ -309,7 +329,13 @@ class UniFileClassObject(object):
 
             IncList = gIncludePattern.findall(Line)
             if len(IncList) == 1:
-                Lines.extend(self.PreProcess(PathClass(str(IncList[0]), Dir)))
+                for Dir in [File.Dir] + self.IncludePathList:
+                    IncFile = PathClass(str(IncList[0]), Dir)
+                    if os.path.isfile(IncFile.Path):
+                        Lines.extend(self.PreProcess(IncFile))
+                        break
+                else:
+                    EdkLogger.error("Unicode File Parser", FILE_NOT_FOUND, Message="Cannot find include file", ExtraData=str(IncList[0]))
                 continue
 
             Lines.append(Line)
@@ -421,15 +447,30 @@ class UniFileClassObject(object):
         if Language not in self.OrderedStringList:
             self.OrderedStringList[Language] = []
 
-        IsAdded = False
+        IsAdded = True
         for Item in self.OrderedStringList[Language]:
             if Name == Item.StringName:
-                IsAdded = True
+                IsAdded = False
+                if Value != None:
+                    Item.UpdateValue(Value)
+                    Item.UseOtherLangDef = ''
                 break
-        if not IsAdded:
+
+        if IsAdded:
             Token = len(self.OrderedStringList[Language])
             if Index == -1:
                 self.OrderedStringList[Language].append(StringDefClassObject(Name, Value, Referenced, Token, UseOtherLangDef))
+                for LangName in self.LanguageDef:
+                    #
+                    # New STRING token will be added into all language string lists.
+                    # so that the unique STRING identifier is reserved for all languages in the package list. 
+                    #
+                    if LangName[0] != Language:
+                        if UseOtherLangDef != '':
+                            OtherLangDef = UseOtherLangDef
+                        else:
+                            OtherLangDef = Language
+                        self.OrderedStringList[LangName[0]].append(StringDefClassObject(Name, '', Referenced, Token, OtherLangDef))
             else:
                 self.OrderedStringList[Language].insert(Index, StringDefClassObject(Name, Value, Referenced, Token, UseOtherLangDef))
 
@@ -437,11 +478,15 @@ class UniFileClassObject(object):
     # Set the string as referenced
     #
     def SetStringReferenced(self, Name):
-        for Lang in self.OrderedStringList:
-            for Item in self.OrderedStringList[Lang]:
-                if Name == Item.StringName:
-                    Item.Referenced = True
-                    break
+        #
+        # String stoken are added in the same order in all language string lists.
+        # So, only update the status of string stoken in first language string list.
+        #
+        Lang = self.LanguageDef[0][0]
+        for Item in self.OrderedStringList[Lang]:
+            if Name == Item.StringName:
+                Item.Referenced = True
+                break
     #
     # Search the string in language definition by Name
     #
@@ -467,61 +512,36 @@ class UniFileClassObject(object):
     #
     def ReToken(self):
         #
-        # Search each string to find if it is defined for each language
-        # Use secondary language value to replace if missing in any one language
+        # Retoken all language strings according to the status of string stoken in the first language string.
         #
-        for IndexI in range(0, len(self.LanguageDef)):
-            LangKey = self.LanguageDef[IndexI][0]
-            for Item in self.OrderedStringList[LangKey]:
-                Name = Item.StringName
-                Value = Item.StringValue[0:-1]
-                Referenced = Item.Referenced
-                Index = self.OrderedStringList[LangKey].index(Item)
-                for IndexJ in range(0, len(self.LanguageDef)):
-                    LangFind = self.LanguageDef[IndexJ][0]
-                    if self.FindStringValue(Name, LangFind) == None:
-                        EdkLogger.debug(EdkLogger.DEBUG_5, Name)
-                        Token = len(self.OrderedStringList[LangFind])
-                        self.AddStringToList(Name, LangFind, Value, Token, Referenced, LangKey, Index)
-        #
-        # Retoken
-        #
-        # First re-token the first language
-        LangName = self.LanguageDef[0][0]
-        ReferencedStringList = []
-        NotReferencedStringList = []
-        Token = 0
+        FirstLangName = self.LanguageDef[0][0]
 
         #
-        # Order UNI token by their String Name
+        # Use small token for all referred string stoken.
         #
-        StringNameList = []
-        for Item in self.OrderedStringList[LangName]:
-            StringNameList.append (Item.StringName)
-        StringNameList.sort()
-
-        for Name in StringNameList:
-            Item = self.FindStringValue (Name, LangName)
-            if Item.Referenced == True:
-                Item.Token = Token
-                ReferencedStringList.append(Item)
-                Token = Token + 1
-            else:
-                NotReferencedStringList.append(Item)
-        self.OrderedStringList[LangName] = ReferencedStringList
-        for Index in range(len(NotReferencedStringList)):
-            NotReferencedStringList[Index].Token = Token + Index
-            self.OrderedStringList[LangName].append(NotReferencedStringList[Index])
+        RefToken = 0
+        for Index in range (0, len (self.OrderedStringList[FirstLangName])):
+            FirstLangItem = self.OrderedStringList[FirstLangName][Index]
+            if FirstLangItem.Referenced == True:
+                for LangNameItem in self.LanguageDef:
+                    LangName = LangNameItem[0]
+                    OtherLangItem = self.OrderedStringList[LangName][Index]
+                    OtherLangItem.Referenced = True
+                    OtherLangItem.Token = RefToken
+                RefToken = RefToken + 1
 
         #
-        # Adjust the orders of other languages
+        # Use big token for all unreferred string stoken.
         #
-        for IndexOfLanguage in range(1, len(self.LanguageDef)):
-            for OrderedString in self.OrderedStringList[LangName]:
-                for UnOrderedString in self.OrderedStringList[self.LanguageDef[IndexOfLanguage][0]]:
-                    if OrderedString.StringName == UnOrderedString.StringName:
-                        UnOrderedString.Token = OrderedString.Token
-                        break
+        UnRefToken = 0
+        for Index in range (0, len (self.OrderedStringList[FirstLangName])):
+            FirstLangItem = self.OrderedStringList[FirstLangName][Index]
+            if FirstLangItem.Referenced == False:
+                for LangNameItem in self.LanguageDef:
+                    LangName = LangNameItem[0]
+                    OtherLangItem = self.OrderedStringList[LangName][Index]
+                    OtherLangItem.Token = RefToken + UnRefToken
+                UnRefToken = UnRefToken + 1
 
     #
     # Show the instance itself

@@ -1,4 +1,4 @@
-# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -168,6 +168,8 @@ def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
     Str = WriteLine(Str, Line)
     Line = COMMENT_DEFINE_STR + ' ' + PRINTABLE_LANGUAGE_NAME_STRING_NAME + ' ' * (ValueStartPtr - len(DEFINE_STR + PRINTABLE_LANGUAGE_NAME_STRING_NAME)) + DecToHexStr(1, 4) + COMMENT_NOT_REFERENCED
     Str = WriteLine(Str, Line)
+
+    #Group the referred STRING token together. 
     for Index in range(2, len(UniObjectClass.OrderedStringList[UniObjectClass.LanguageDef[0][0]])):
         StringItem = UniObjectClass.OrderedStringList[UniObjectClass.LanguageDef[0][0]][Index]
         Name = StringItem.StringName
@@ -180,12 +182,22 @@ def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
                     Line = DEFINE_STR + ' ' + Name + ' ' + DecToHexStr(Token, 4)
                 else:
                     Line = DEFINE_STR + ' ' + Name + ' ' * (ValueStartPtr - len(DEFINE_STR + Name)) + DecToHexStr(Token, 4)
-            else:
+                Str = WriteLine(Str, Line)
+
+    #Group the unused STRING token together.
+    for Index in range(2, len(UniObjectClass.OrderedStringList[UniObjectClass.LanguageDef[0][0]])):
+        StringItem = UniObjectClass.OrderedStringList[UniObjectClass.LanguageDef[0][0]][Index]
+        Name = StringItem.StringName
+        Token = StringItem.Token
+        Referenced = StringItem.Referenced
+        if Name != None:
+            Line = ''
+            if Referenced == False:
                 if (ValueStartPtr - len(DEFINE_STR + Name)) <= 0:
                     Line = COMMENT_DEFINE_STR + ' ' + Name + ' ' + DecToHexStr(Token, 4) + COMMENT_NOT_REFERENCED
                 else:
                     Line = COMMENT_DEFINE_STR + ' ' + Name + ' ' * (ValueStartPtr - len(DEFINE_STR + Name)) + DecToHexStr(Token, 4) + COMMENT_NOT_REFERENCED
-            Str = WriteLine(Str, Line)
+                Str = WriteLine(Str, Line)
 
     Str = WriteLine(Str, '')
     if IsCompatibleMode or UniGenCFlag:
@@ -506,7 +518,7 @@ def SearchString(UniObjectClass, FileList, IsCompatibleMode):
 # This function is used for UEFI2.1 spec
 #
 #
-def GetStringFiles(UniFilList, SourceFileList, IncludeList, SkipList, BaseName, IsCompatibleMode = False, ShellMode = False, UniGenCFlag = True, UniGenBinBuffer = None):
+def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, SkipList, BaseName, IsCompatibleMode = False, ShellMode = False, UniGenCFlag = True, UniGenBinBuffer = None):
     Status = True
     ErrorMessage = ''
 
@@ -515,15 +527,15 @@ def GetStringFiles(UniFilList, SourceFileList, IncludeList, SkipList, BaseName, 
             #
             # support ISO 639-2 codes in .UNI files of EDK Shell
             #
-            Uni = UniFileClassObject(UniFilList, True)
+            Uni = UniFileClassObject(sorted (UniFilList), True, IncludePathList)
         else:
-            Uni = UniFileClassObject(UniFilList, IsCompatibleMode)
+            Uni = UniFileClassObject(sorted (UniFilList), IsCompatibleMode, IncludePathList)
     else:
         EdkLogger.error("UnicodeStringGather", AUTOGEN_ERROR, 'No unicode files given')
 
     FileList = GetFileList(SourceFileList, IncludeList, SkipList)
 
-    Uni = SearchString(Uni, FileList, IsCompatibleMode)
+    Uni = SearchString(Uni, sorted (FileList), IsCompatibleMode)
 
     HFile = CreateHFile(BaseName, Uni, IsCompatibleMode, UniGenCFlag)
     CFile = None

@@ -413,7 +413,7 @@
 
     <Command.MSFT, Command.INTEL>
         cd $(OUTPUT_DIR)(+)${s_dir}
-        "$(ASM16)" /nologo /c /omf /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj ${src}
+        "$(ASM16)" /nologo /c /omf $(INC) /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj ${src}
         "$(ASMLINK)" $(ASMLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj,${dst},,,,
 
     <Command.GCC>

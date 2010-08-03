@@ -632,6 +632,7 @@ WriteSections32 (
           switch (ELF32_R_TYPE(Rel->r_info)) {
           case R_ARM_RBASE:
             // No relocation - no action required
+            // break skipped
 
           case R_ARM_PC24:
           case R_ARM_XPC25:
@@ -639,6 +640,35 @@ WriteSections32 (
           case R_ARM_THM_JUMP19:
           case R_ARM_CALL:
           case R_ARM_JMP24:
+          case R_ARM_THM_JUMP24:  
+          case R_ARM_PREL31:  
+          case R_ARM_MOVW_PREL_NC:  
+          case R_ARM_MOVT_PREL:
+          case R_ARM_THM_MOVW_PREL_NC:
+          case R_ARM_THM_MOVT_PREL:
+          case R_ARM_THM_JMP6:
+          case R_ARM_THM_ALU_PREL_11_0:
+          case R_ARM_THM_PC12:
+          case R_ARM_REL32_NOI:
+          case R_ARM_ALU_PC_G0_NC:
+          case R_ARM_ALU_PC_G0:
+          case R_ARM_ALU_PC_G1_NC:
+          case R_ARM_ALU_PC_G1:
+          case R_ARM_ALU_PC_G2:
+          case R_ARM_LDR_PC_G1:
+          case R_ARM_LDR_PC_G2:
+          case R_ARM_LDRS_PC_G0:
+          case R_ARM_LDRS_PC_G1:
+          case R_ARM_LDRS_PC_G2:
+          case R_ARM_LDC_PC_G0:
+          case R_ARM_LDC_PC_G1:
+          case R_ARM_LDC_PC_G2:
+          case R_ARM_GOT_PREL:
+          case R_ARM_THM_JUMP11:
+          case R_ARM_THM_JUMP8:
+          case R_ARM_TLS_GD32:
+          case R_ARM_TLS_LDM32:
+          case R_ARM_TLS_IE32:
             // Thease are all PC-relative relocations and don't require modification
             // GCC does not seem to have the concept of a application that just needs to get relocated.
             break;
@@ -736,14 +766,45 @@ WriteRelocations32 (
             }
           } else if (mEhdr->e_machine == EM_ARM) {
             switch (ELF32_R_TYPE(Rel->r_info)) {
-            case R_ARM_RBASE: 
+            case R_ARM_RBASE:
               // No relocation - no action required
+              // break skipped
+
             case R_ARM_PC24:
             case R_ARM_XPC25:
             case R_ARM_THM_PC22:
             case R_ARM_THM_JUMP19:
             case R_ARM_CALL:
             case R_ARM_JMP24:
+            case R_ARM_THM_JUMP24:  
+            case R_ARM_PREL31:  
+            case R_ARM_MOVW_PREL_NC:  
+            case R_ARM_MOVT_PREL:
+            case R_ARM_THM_MOVW_PREL_NC:
+            case R_ARM_THM_MOVT_PREL:
+            case R_ARM_THM_JMP6:
+            case R_ARM_THM_ALU_PREL_11_0:
+            case R_ARM_THM_PC12:
+            case R_ARM_REL32_NOI:
+            case R_ARM_ALU_PC_G0_NC:
+            case R_ARM_ALU_PC_G0:
+            case R_ARM_ALU_PC_G1_NC:
+            case R_ARM_ALU_PC_G1:
+            case R_ARM_ALU_PC_G2:
+            case R_ARM_LDR_PC_G1:
+            case R_ARM_LDR_PC_G2:
+            case R_ARM_LDRS_PC_G0:
+            case R_ARM_LDRS_PC_G1:
+            case R_ARM_LDRS_PC_G2:
+            case R_ARM_LDC_PC_G0:
+            case R_ARM_LDC_PC_G1:
+            case R_ARM_LDC_PC_G2:
+            case R_ARM_GOT_PREL:
+            case R_ARM_THM_JUMP11:
+            case R_ARM_THM_JUMP8:
+            case R_ARM_TLS_GD32:
+            case R_ARM_TLS_LDM32:
+            case R_ARM_TLS_IE32:
               // Thease are all PC-relative relocations and don't require modification
               break;
 
