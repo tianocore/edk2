@@ -82,6 +82,8 @@
   DebugLib
   DxeCoreEntryPoint
   PeCoffLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
   ExtractGuidedSectionLib
   MemoryAllocationLib
   UefiBootServicesTableLib

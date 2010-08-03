@@ -74,6 +74,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeCoffLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/PeCoffExtraActionLib.h>
 #include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
