@@ -25,16 +25,15 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
+  UefiDriverEntryPoint
   DebugLib
   UefiBootServicesTableLib
-  UefiDriverEntryPoint
-  IoLib
+  ResetSystemLib
 
 [Sources]
-  Reset.c
-  Reset.h
   ResetEntry.c
 
 [Protocols]
@@ -42,5 +41,3 @@
 
 [Depex]
   TRUE
-
-

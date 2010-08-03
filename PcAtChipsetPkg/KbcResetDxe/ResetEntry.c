@@ -11,13 +11,56 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 **/
 
-#include "Reset.h"
+#include <PiDxe.h>
+
+#include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/ResetSystemLib.h>
+
+#include <Protocol/Reset.h>
 
 //
 // The handle onto which the Reset Architectural Protocol is installed
 //
 EFI_HANDLE  mResetHandle = NULL;
 
+/**
+  Reset the system.
+
+  @param ResetType       warm or cold
+  @param ResetStatus     possible cause of reset
+  @param DataSize        Size of ResetData in bytes
+  @param ResetData       Optional Unicode string
+
+**/
+VOID
+EFIAPI
+KbcResetSystem (
+  IN EFI_RESET_TYPE   ResetType,
+  IN EFI_STATUS       ResetStatus,
+  IN UINTN            DataSize,
+  IN VOID             *ResetData OPTIONAL
+  )
+{
+  switch (ResetType) {
+  case EfiResetWarm:
+    ResetWarm ();
+    break;
+  case EfiResetCold:
+    ResetCold ();
+    break;
+  case EfiResetShutdown:
+    ResetShutdown ();
+    break;
+  default:
+    return;
+  }
+
+  //
+  // Given we should have reset getting here would be bad
+  //
+  ASSERT (FALSE);
+}
 
 /**
   Initialize the state information for the Reset Architectural Protocol
@@ -54,8 +97,7 @@ InitializeReset (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mResetHandle,
-                  &gEfiResetArchProtocolGuid,
-                  NULL,
+                  &gEfiResetArchProtocolGuid, NULL,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
