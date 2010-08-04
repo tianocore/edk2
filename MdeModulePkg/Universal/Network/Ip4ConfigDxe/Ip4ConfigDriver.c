@@ -332,7 +332,7 @@ ON_ERROR:
   NetLibDestroyServiceChild (
     ControllerHandle,
     This->DriverBindingHandle,
-    &gEfiManagedNetworkProtocolGuid,
+    &gEfiManagedNetworkServiceBindingProtocolGuid,
     MnpHandle
     );
 
