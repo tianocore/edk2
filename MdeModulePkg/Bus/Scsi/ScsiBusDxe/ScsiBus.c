@@ -1210,7 +1210,7 @@ DiscoverScsiDevice (
     //
     // ANSI-approved version
     //
-    ScsiIoDevice->ScsiVersion = (UINT8) (InquiryData.Version & 0x03);
+    ScsiIoDevice->ScsiVersion = (UINT8) (InquiryData.Version & 0x07);
   }
 
   return TRUE;

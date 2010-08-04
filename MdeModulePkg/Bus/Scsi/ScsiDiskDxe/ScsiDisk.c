@@ -1195,7 +1195,7 @@ ScsiDiskReadCapacity (
 
   *NumberOfSenseKeys  = 0;
   *NeedRetry          = FALSE;
-  ScsiVersion         = (UINT8)(ScsiDiskDevice->InquiryData.Version & 0x03);
+  ScsiVersion         = (UINT8)(ScsiDiskDevice->InquiryData.Version & 0x07);
 
   if (ScsiVersion < SCSI_COMMAND_VERSION_3) {
     //
@@ -1505,7 +1505,7 @@ GetMediaInfo (
   UINT8       ScsiVersion;
   UINT8       *Ptr;
 
-  ScsiVersion    = (UINT8)(ScsiDiskDevice->InquiryData.Version & 0x03);
+  ScsiVersion    = (UINT8)(ScsiDiskDevice->InquiryData.Version & 0x07);
   ScsiDiskDevice->BlkIo.Media->LowestAlignedLba               = 0;
   ScsiDiskDevice->BlkIo.Media->LogicalBlocksPerPhysicalBlock  = 1;
   
@@ -1612,7 +1612,7 @@ ScsiDiskReadSectors (
 
   BlocksRemaining   = NumberOfBlocks;
   BlockSize         = ScsiDiskDevice->BlkIo.Media->BlockSize;
-  ScsiVersion       = (UINT8)(ScsiDiskDevice->InquiryData.Version & 0x03);
+  ScsiVersion       = (UINT8)(ScsiDiskDevice->InquiryData.Version & 0x07);
   
   //
   // limit the data bytes that can be transferred by one Read(10) or Read(16) Command
@@ -1736,7 +1736,7 @@ ScsiDiskWriteSectors (
 
   BlocksRemaining   = NumberOfBlocks;
   BlockSize         = ScsiDiskDevice->BlkIo.Media->BlockSize;
-  ScsiVersion       = (UINT8)(ScsiDiskDevice->InquiryData.Version & 0x03);
+  ScsiVersion       = (UINT8)(ScsiDiskDevice->InquiryData.Version & 0x07);
 
   //
   // limit the data bytes that can be transferred by one Read(10) or Read(16) Command
