@@ -944,7 +944,14 @@ MnpReceivePacket (
   }
 
   VlanId = 0;
-  IsVlanPacket = MnpRemoveVlanTag (MnpDeviceData, Nbuf, &VlanId);
+  if (MnpDeviceData->NumberOfVlan != 0) {
+    //
+    // VLAN is configured, remove the VLAN tag if any
+    //
+    IsVlanPacket = MnpRemoveVlanTag (MnpDeviceData, Nbuf, &VlanId);
+  } else {
+    IsVlanPacket = FALSE;
+  }
 
   MnpServiceData = MnpFindServiceData (MnpDeviceData, VlanId);
   if (MnpServiceData == NULL) {
