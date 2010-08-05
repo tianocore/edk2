@@ -283,6 +283,10 @@ PeCoffLoaderRelocateImageExtraAction (
 
   ASSERT (ImageContext != NULL);
 
+  if (mWinNt == NULL) {
+    return;
+  }
+
 	//
   // If we load our own PE COFF images the Windows debugger can not source
   //  level debug our code. If a valid PDB pointer exists usw it to load
@@ -396,6 +400,9 @@ PeCoffLoaderUnloadImageExtraAction (
 	VOID *ModHandle;
 
   ASSERT (ImageContext != NULL);
+  if (mWinNt == NULL) {
+    return;
+  }
 
   ModHandle = RemoveModeHandle (ImageContext);
   if (ModHandle != NULL) {
