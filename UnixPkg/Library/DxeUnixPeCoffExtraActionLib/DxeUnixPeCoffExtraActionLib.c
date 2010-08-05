@@ -84,8 +84,10 @@ PeCoffLoaderRelocateImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-  mUnix->PeCoffRelocateImageExtraAction (ImageContext);
+  if (mUnix != NULL) {
+    mUnix->PeCoffRelocateImageExtraAction (ImageContext);
   }
+}
 
 
 
@@ -105,5 +107,7 @@ PeCoffLoaderUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-  mUnix->PeCoffUnloadImageExtraAction (ImageContext);
+  if (mUnix != NULL) {
+    mUnix->PeCoffUnloadImageExtraAction (ImageContext);
+  }
 }
