@@ -237,9 +237,10 @@ DxeMain (
   IN  VOID *HobStart
   )
 {
-  EFI_STATUS                         Status;
-  EFI_PHYSICAL_ADDRESS               MemoryBaseAddress;
-  UINT64                             MemoryLength;
+  EFI_STATUS                    Status;
+  EFI_PHYSICAL_ADDRESS          MemoryBaseAddress;
+  UINT64                        MemoryLength;
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
 
   //
   // Initialize Debug Agent to support source level debug in DXE phase
@@ -275,6 +276,13 @@ DxeMain (
   ProcessLibraryConstructorList (gDxeCoreImageHandle, gDxeCoreST);
   PERF_END   (NULL,"PEI", NULL, 0) ;
   PERF_START (NULL,"DXE", NULL, 0) ;
+
+  //
+  // Report DXE Core image information to the PE/COFF Extra Action Library
+  //
+  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)gDxeCoreLoadedImage->ImageBase;
+  ImageContext.PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageContext.ImageAddress);
+  PeCoffLoaderRelocateImageExtraAction (&ImageContext);
 
   //
   // Initialize the Global Coherency Domain Services

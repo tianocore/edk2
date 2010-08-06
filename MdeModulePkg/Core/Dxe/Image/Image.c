@@ -97,7 +97,6 @@ CoreInitializeImageServices (
   UINT64                            DxeCoreImageLength;
   VOID                              *DxeCoreEntryPoint;
   EFI_PEI_HOB_POINTERS              DxeCoreHob;
-  PE_COFF_LOADER_IMAGE_CONTEXT      ImageContext;
  
   //
   // Searching for image hob
@@ -119,13 +118,6 @@ CoreInitializeImageServices (
   DxeCoreEntryPoint       = (VOID *) (UINTN) DxeCoreHob.MemoryAllocationModule->EntryPoint;
   gDxeCoreFileName        = &DxeCoreHob.MemoryAllocationModule->ModuleName;
   
-  //
-  // Report DXE Core image information to the PE/COFF Extra Action Library
-  //
-  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)DxeCoreImageBaseAddress;
-  ImageContext.PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageContext.ImageAddress);
-  PeCoffLoaderRelocateImageExtraAction (&ImageContext);
-
   //
   // Initialize the fields for an internal driver
   //
@@ -163,11 +155,11 @@ CoreInitializeImageServices (
     // Export DXE Core PE Loader functionality for backward compatibility.
     //
     Status = CoreInstallProtocolInterface (
-      &mLoadPe32PrivateData.Handle,
-      &gEfiLoadPeImageProtocolGuid,
-      EFI_NATIVE_INTERFACE,
-      &mLoadPe32PrivateData.Pe32Image
-      );
+               &mLoadPe32PrivateData.Handle,
+               &gEfiLoadPeImageProtocolGuid,
+               EFI_NATIVE_INTERFACE,
+               &mLoadPe32PrivateData.Pe32Image
+               );
   }
 
   return Status;
