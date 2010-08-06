@@ -2808,13 +2808,17 @@ NetLibAsciiStrToIp6 (
   UINTN                          NodeVal;
   BOOLEAN                        Short;
   BOOLEAN                        Update;
+  BOOLEAN                        LeadZero;
+  UINT8                          LeadZeroCnt;
+  UINT8                          Cnt;
 
   if ((String == NULL) || (Ip6Address == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Ip6Str     = (CHAR8 *) String;
-  AllowedCnt = 6;
+  Ip6Str      = (CHAR8 *) String;
+  AllowedCnt  = 6;
+  LeadZeroCnt = 0;
 
   //
   // An IPv6 address leading with : looks strange.
@@ -2833,6 +2837,7 @@ NetLibAsciiStrToIp6 (
   TailNodeCnt = 0;
   Short       = FALSE;
   Update      = FALSE;
+  LeadZero    = FALSE;
 
   for (Index = 0; Index < 15; Index = (UINT8) (Index + 2)) {
     TempStr = Ip6Str;
@@ -2847,10 +2852,15 @@ NetLibAsciiStrToIp6 (
 
     if (*Ip6Str == ':') {
       if (*(Ip6Str + 1) == ':') {
-        if ((*(Ip6Str + 2) == '0') || (NodeCnt > 6)) {
+        if ((NodeCnt > 6) || 
+            ((*(Ip6Str + 2) != '\0') && (AsciiStrHexToUintn (Ip6Str + 2) == 0))) {
           //
           // ::0 looks strange. report error to user.
           //
+          return EFI_INVALID_PARAMETER;
+        }
+        if ((NodeCnt == 6) && (*(Ip6Str + 2) != '\0') && 
+            (AsciiStrHexToUintn (Ip6Str + 2) != 0)) {
           return EFI_INVALID_PARAMETER;
         }
 
@@ -2884,6 +2894,9 @@ NetLibAsciiStrToIp6 (
 
         Ip6Str = Ip6Str + 2;
       } else {
+        if (*(Ip6Str + 1) == '\0') {
+          return EFI_INVALID_PARAMETER;
+        }
         Ip6Str++;
         NodeCnt++;
         if ((Short && (NodeCnt > 6)) || (!Short && (NodeCnt > 7))) {
@@ -2903,6 +2916,46 @@ NetLibAsciiStrToIp6 (
     if ((NodeVal > 0xFFFF) || (Index > 14)) {
       return EFI_INVALID_PARAMETER;
     }
+    if (NodeVal != 0) {
+      if ((*TempStr  == '0') && 
+          ((*(TempStr + 2) == ':') || (*(TempStr + 3) == ':') || 
+          (*(TempStr + 2) == '\0') || (*(TempStr + 3) == '\0'))) {
+        return EFI_INVALID_PARAMETER;
+      }
+      if ((*TempStr  == '0') && (*(TempStr + 4) != '\0') && 
+          (*(TempStr + 4) != ':')) { 
+        return EFI_INVALID_PARAMETER;
+      }
+    } else {
+      if (((*TempStr  == '0') && (*(TempStr + 1) == '0') && 
+          ((*(TempStr + 2) == ':') || (*(TempStr + 2) == '\0'))) ||
+          ((*TempStr  == '0') && (*(TempStr + 1) == '0') && (*(TempStr + 2) == '0') && 
+          ((*(TempStr + 3) == ':') || (*(TempStr + 3) == '\0')))) {
+        return EFI_INVALID_PARAMETER;
+      }
+    }
+
+    Cnt = 0;
+    while ((TempStr[Cnt] != ':') && (TempStr[Cnt] != '\0')) {
+      Cnt++; 
+    }
+    if (LeadZeroCnt == 0) {
+      if ((Cnt == 4) && (*TempStr  == '0')) {
+        LeadZero = TRUE;
+        LeadZeroCnt++;
+      }
+      if ((Cnt != 0) && (Cnt < 4)) {
+        LeadZero = FALSE;
+        LeadZeroCnt++;
+      }
+    } else {
+      if ((Cnt == 4) && (*TempStr  == '0') && (LeadZero == FALSE)) {
+        return EFI_INVALID_PARAMETER;
+      }
+      if ((Cnt != 0) && (Cnt < 4) && (LeadZero == TRUE)) {
+        return EFI_INVALID_PARAMETER;
+      }
+    } 
 
     Ip6Address->Addr[Index] = (UINT8) (NodeVal >> 8);
     Ip6Address->Addr[Index + 1] = (UINT8) (NodeVal & 0xFF);
