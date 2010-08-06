@@ -23,8 +23,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PeCoffExtraActionLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER
 
-  CONSTRUCTOR                    = DxeNt32PeCoffLibExtraActionConstructor
-
 #
 # The following information is for reference only and not required by the build tools.
 #

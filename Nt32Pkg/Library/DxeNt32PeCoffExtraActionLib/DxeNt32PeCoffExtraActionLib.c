@@ -68,12 +68,11 @@ UINTN                   mPdbNameModHandleArraySize = 0;
 **/
 EFI_STATUS
 EFIAPI
-DxeNt32PeCoffLibExtraActionConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+Nt32PeCoffGetWinNtThunkStucture (
+  VOID
   )
 {
-	EFI_HOB_GUID_TYPE   *GuidHob;
+  EFI_HOB_GUID_TYPE   *GuidHob;
 
   //
   // Retrieve WinNtThunkProtocol from GUID'ed HOB
@@ -284,10 +283,10 @@ PeCoffLoaderRelocateImageExtraAction (
   ASSERT (ImageContext != NULL);
 
   if (mWinNt == NULL) {
-    return;
+    Nt32PeCoffGetWinNtThunkStucture ();
   }
 
-	//
+  //
   // If we load our own PE COFF images the Windows debugger can not source
   //  level debug our code. If a valid PDB pointer exists usw it to load
   //  the *.dll file as a library using Windows* APIs. This allows 
@@ -397,12 +396,9 @@ PeCoffLoaderUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-	VOID *ModHandle;
+  VOID *ModHandle;
 
   ASSERT (ImageContext != NULL);
-  if (mWinNt == NULL) {
-    return;
-  }
 
   ModHandle = RemoveModeHandle (ImageContext);
   if (ModHandle != NULL) {
