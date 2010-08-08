@@ -58,7 +58,7 @@ settimer_handler (int sig)
   
   if (settimer_callback) {
 #ifdef __APPLE__
-    ReverseGasketUint64 (settimer_callback, delta);
+   ReverseGasketUint64 (settimer_callback, delta);
 #else
    (*settimer_callback)(delta);
 #endif

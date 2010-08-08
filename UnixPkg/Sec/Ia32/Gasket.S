@@ -235,23 +235,27 @@ _GasketUintnUint16:
   call  *%eax
   leave
   ret
+  
+  
 .globl _ReverseGasketUint64
 _ReverseGasketUint64:
 	pushl	%ebp
 	movl	%esp, %ebp
-	subl	$56, %esp
+	subl	$40, %esp
 	movl	12(%ebp), %eax
-	movl	%eax, -32(%ebp)
+	movl	%eax, -16(%ebp)
 	movl	16(%ebp), %eax
-	movl	%eax, -28(%ebp)
-	movl	8(%ebp), %eax
 	movl	%eax, -12(%ebp)
-	movl	-32(%ebp), %eax
+	movl	-16(%ebp), %eax
+	movl	-12(%ebp), %edx
 	movl	%eax, (%esp)
-	movl	-12(%ebp), %eax
+	movl	%edx, 4(%esp)
+	movl	8(%ebp), %eax
 	call	*%eax
 	leave
 	ret
+  
+  
   .subsections_via_symbols
   
   #endif

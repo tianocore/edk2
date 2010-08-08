@@ -403,10 +403,8 @@ typedef void (*SET_TIMER_CALLBACK)(UINT64 delta);
 
 
 UINTN 
-ReverseGasketUint64 (void *api, UINT64 a)
+ReverseGasketUint64 (SET_TIMER_CALLBACK settimer_callback, UINT64 a)
 {
-  SET_TIMER_CALLBACK settimer_callback = (SET_TIMER_CALLBACK)api;
-  
   (*settimer_callback)(a);
   return 0;
 }

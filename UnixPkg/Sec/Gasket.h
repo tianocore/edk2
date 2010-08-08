@@ -99,7 +99,9 @@ UINTN GasketUint64Uintn (void *api, UINT64 a, UINTN b);
 UINT64 GasketUintnUint64Uintn (void *api, UINTN a, UINT64 b, UINTN c);
 UINTN GasketUintnUint16 (void *api, UINTN a, UINT16 b);
 
-UINTN ReverseGasketUint64 (void *api, UINT64 a);
+typedef void (*CALL_BACK) (UINT64 Delta);
+
+UINTN ReverseGasketUint64 (CALL_BACK CallBack, UINT64 a);
 
 //
 // Gasket functions for EFI_UNIX_UGA_IO_PROTOCOL

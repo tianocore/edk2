@@ -35,6 +35,7 @@ typedef UINT32    UINTN;
 
 typedef int (*GASKET_VOID) ();
 typedef int (*GASKET_UINTN) (UINTN);
+typedef int (*GASKET_UINT64) (UINT64);
 typedef int (*GASKET_UINTN_UINTN) (UINTN, UINTN);
 typedef int (*GASKET_UINTN_UINTN_UINTN) (UINTN, UINTN, UINTN);
 typedef int (*GASKET_UINTN_UINTN_UINTN_UINTN) (UINTN, UINTN, UINTN, UINTN);
@@ -143,7 +144,7 @@ ReverseGasketUint64 (void *api, UINT64 a)
 {
   GASKET_UINTN func;
   
-  func = (GASKET_UINTN)api;
+  func = (GASKET_UINT64)api;
   func (a);
   return;
 }
