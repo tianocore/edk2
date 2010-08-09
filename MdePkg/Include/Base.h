@@ -494,7 +494,7 @@ typedef CHAR8 *VA_LIST;
   @return  A pointer to the beginning of a variable argument list.
 
 **/
-#define VA_START(Marker, Parameter) (Marker = (VA_LIST) & (Parameter) + _INT_SIZE_OF (Parameter))
+#define VA_START(Marker, Parameter) (Marker = (VA_LIST) ((UINTN) & (Parameter) + _INT_SIZE_OF (Parameter)))
 
 /**
   Returns an argument of a specified type from a variable argument list and updates 
