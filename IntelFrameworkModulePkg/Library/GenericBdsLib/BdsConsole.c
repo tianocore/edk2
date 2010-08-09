@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which contain all the code to connect console device
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -361,21 +361,16 @@ BdsLibConnectConsoleVariable (
 
     SetDevicePathEndNode (Next);
     //
-    // Check USB1.1 console
+    // Connect the USB console
+    // USB console device path is a short-form device path that 
+    //  starts with the first element being a USB WWID
+    //  or a USB Class device path
     //
     if ((DevicePathType (Instance) == MESSAGING_DEVICE_PATH) &&
        ((DevicePathSubType (Instance) == MSG_USB_CLASS_DP)
        || (DevicePathSubType (Instance) == MSG_USB_WWID_DP)
        )) {
-      //
-      // Check the Usb console in Usb2.0 bus firstly, then Usb1.1 bus
-      //
-      Status = BdsLibConnectUsbDevByShortFormDP (PCI_IF_EHCI, Instance);
-      if (!EFI_ERROR (Status)) {
-        DeviceExist = TRUE;
-      }
-
-      Status = BdsLibConnectUsbDevByShortFormDP (PCI_IF_UHCI, Instance);
+      Status = BdsLibConnectUsbDevByShortFormDP (0xFF, Instance);
       if (!EFI_ERROR (Status)) {
         DeviceExist = TRUE;
       }
