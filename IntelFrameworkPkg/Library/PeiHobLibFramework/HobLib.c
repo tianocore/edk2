@@ -5,7 +5,7 @@
  This library instance uses EFI_HOB_TYPE_CV defined in Intel framework HOB specification v0.9
  to implement HobLib BuildCvHob() API. 
 
-Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -281,7 +281,7 @@ BuildModuleHob (
   ASSERT (((MemoryAllocationModule & (EFI_PAGE_SIZE - 1)) == 0) &&
           ((ModuleLength & (EFI_PAGE_SIZE - 1)) == 0));
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE));
 
   CopyGuid (&(Hob->MemoryAllocationHeader.Name), &gEfiHobMemoryAllocModuleGuid);
   Hob->MemoryAllocationHeader.MemoryBaseAddress = MemoryAllocationModule;
@@ -323,7 +323,7 @@ BuildResourceDescriptorHob (
 {
   EFI_HOB_RESOURCE_DESCRIPTOR  *Hob;
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, (UINT16) sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
 
   Hob->ResourceType      = ResourceType;
   Hob->ResourceAttribute = ResourceAttribute;
@@ -432,7 +432,7 @@ BuildFvHob (
 {
   EFI_HOB_FIRMWARE_VOLUME  *Hob;
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_FV, sizeof (EFI_HOB_FIRMWARE_VOLUME));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_FV, (UINT16) sizeof (EFI_HOB_FIRMWARE_VOLUME));
 
   Hob->BaseAddress = BaseAddress;
   Hob->Length      = Length;
@@ -464,7 +464,7 @@ BuildFv2Hob (
 {
   EFI_HOB_FIRMWARE_VOLUME2  *Hob;
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_FV2, sizeof (EFI_HOB_FIRMWARE_VOLUME2));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_FV2, (UINT16) sizeof (EFI_HOB_FIRMWARE_VOLUME2));
 
   Hob->BaseAddress = BaseAddress;
   Hob->Length      = Length;
@@ -495,7 +495,7 @@ BuildCvHob (
 {
   EFI_HOB_CAPSULE_VOLUME     *Hob;
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_CV, sizeof (EFI_HOB_CAPSULE_VOLUME));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_CV, (UINT16) sizeof (EFI_HOB_CAPSULE_VOLUME));
 
   Hob->BaseAddress = BaseAddress;
   Hob->Length      = Length;
@@ -523,7 +523,7 @@ BuildCpuHob (
 {
   EFI_HOB_CPU  *Hob;
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_CPU, sizeof (EFI_HOB_CPU));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_CPU, (UINT16) sizeof (EFI_HOB_CPU));
 
   Hob->SizeOfMemorySpace = SizeOfMemorySpace;
   Hob->SizeOfIoSpace     = SizeOfIoSpace;
@@ -559,7 +559,7 @@ BuildStackHob (
   ASSERT (((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
           ((Length & (EFI_PAGE_SIZE - 1)) == 0));
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_STACK));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION_STACK));
 
   CopyGuid (&(Hob->AllocDescriptor.Name), &gEfiHobMemoryAllocStackGuid);
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
@@ -599,7 +599,7 @@ BuildBspStoreHob (
   ASSERT (((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
           ((Length & (EFI_PAGE_SIZE - 1)) == 0));
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_BSP_STORE));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION_BSP_STORE));
 
   CopyGuid (&(Hob->AllocDescriptor.Name), &gEfiHobMemoryAllocBspStoreGuid);
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
@@ -639,7 +639,7 @@ BuildMemoryAllocationHob (
   ASSERT (((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
           ((Length & (EFI_PAGE_SIZE - 1)) == 0));
   
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION));
   
   ZeroMem (&(Hob->AllocDescriptor.Name), sizeof (EFI_GUID));
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
