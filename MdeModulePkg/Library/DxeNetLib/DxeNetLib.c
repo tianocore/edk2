@@ -2949,10 +2949,10 @@ NetLibAsciiStrToIp6 (
         LeadZeroCnt++;
       }
     } else {
-      if ((Cnt == 4) && (*TempStr  == '0') && (LeadZero == FALSE)) {
+      if ((Cnt == 4) && (*TempStr  == '0') && !LeadZero) {
         return EFI_INVALID_PARAMETER;
       }
-      if ((Cnt != 0) && (Cnt < 4) && (LeadZero == TRUE)) {
+      if ((Cnt != 0) && (Cnt < 4) && LeadZero) {
         return EFI_INVALID_PARAMETER;
       }
     } 
