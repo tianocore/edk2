@@ -2,7 +2,7 @@
   This code produces the Data Hub protocol. It preloads the data hub
   with status information copied in from PEI HOBs.
   
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -99,7 +99,7 @@ DataHubLogData (
   // Build Standard Log Header
   //
   Record->Version     = EFI_DATA_RECORD_HEADER_VERSION;
-  Record->HeaderSize  = sizeof (EFI_DATA_RECORD_HEADER);
+  Record->HeaderSize  = (UINT16) sizeof (EFI_DATA_RECORD_HEADER);
   Record->RecordSize  = RecordSize;
   CopyMem (&Record->DataRecordGuid, DataRecordGuid, sizeof (EFI_GUID));
   CopyMem (&Record->ProducerName, ProducerName, sizeof (EFI_GUID));

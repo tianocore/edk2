@@ -1,7 +1,7 @@
 /** @file
    This file contains all helper functions on the ATAPI command 
   
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -554,7 +554,7 @@ AtapiInquiry (
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
   Packet.Inquiry.opcode             = ATA_CMD_INQUIRY;
   Packet.Inquiry.page_code          = 0;
-  Packet.Inquiry.allocation_length  = sizeof (ATAPI_INQUIRY_DATA);
+  Packet.Inquiry.allocation_length  = (UINT8) sizeof (ATAPI_INQUIRY_DATA);
 
   InquiryData                       = AllocatePool (sizeof (ATAPI_INQUIRY_DATA));
   if (InquiryData == NULL) {
@@ -790,7 +790,7 @@ AtapiRequestSense (
   //
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
   Packet.RequestSence.opcode            = ATA_CMD_REQUEST_SENSE;
-  Packet.RequestSence.allocation_length = sizeof (ATAPI_REQUEST_SENSE_DATA);
+  Packet.RequestSence.allocation_length = (UINT8) sizeof (ATAPI_REQUEST_SENSE_DATA);
 
   //
   // initialize pointer

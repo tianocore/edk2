@@ -1,7 +1,7 @@
 /** @file
   API implementation for instance of Report Status Code Library.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -400,7 +400,7 @@ ReportStatusCodeEx (
   //
   // Fill in the extended data header
   //
-  mStatusCodeData->HeaderSize = sizeof (EFI_STATUS_CODE_DATA);
+  mStatusCodeData->HeaderSize = (UINT16) sizeof (EFI_STATUS_CODE_DATA);
   mStatusCodeData->Size = (UINT16)ExtendedDataSize;
   if (ExtendedDataGuid == NULL) {
     ExtendedDataGuid = &gEfiStatusCodeSpecificDataGuid;
