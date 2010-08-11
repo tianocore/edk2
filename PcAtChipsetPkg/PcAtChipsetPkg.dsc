@@ -41,7 +41,7 @@
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
-  ReseySystemLib|PcAtChipsetPkg/ResetSystemLib/ResetSystemLib.inf
+  ResetSystemLib|PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
 
 [Components]
   PcAtChipsetPkg/8254TimerDxe/8254Timer.inf
@@ -49,6 +49,6 @@
   PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
   PcAtChipsetPkg/KbcResetDxe/Reset.inf
   PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
-  PcAtChipsetPkg/ResetSystemLib/ResetSystemLib.inf
+  PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
   PcAtChipsetPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
