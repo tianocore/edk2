@@ -1,8 +1,8 @@
 /** @file
   Support for SCSI-2 standard
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
   http://opensource.org/licenses/bsd-license.php                                            
@@ -48,6 +48,7 @@
 #define EFI_SCSI_OP_MEDIA_REMOVAL   0x1e
 #define EFI_SCSI_OP_READ6           0x08
 #define EFI_SCSI_OP_READ10          0x28
+#define EFI_SCSI_OP_READ16          0x88
 #define EFI_SCSI_OP_READ_CAPACITY   0x25
 #define EFI_SCSI_OP_READ_CAPACITY16 0x9e
 #define EFI_SCSI_OP_READ_DEFECT     0x37
@@ -67,6 +68,7 @@
 #define EFI_SCSI_OP_VERIFY          0x2f
 #define EFI_SCSI_OP_WRITE6          0x0a
 #define EFI_SCSI_OP_WRITE10         0x2a
+#define EFI_SCSI_OP_WRITE16         0x8a
 #define EFI_SCSI_OP_WRITE_VERIFY    0x2e
 #define EFI_SCSI_OP_WRITE_LONG      0x3f
 #define EFI_SCSI_OP_WRITE_SAME      0x41
