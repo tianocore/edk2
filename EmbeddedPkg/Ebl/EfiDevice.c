@@ -403,7 +403,9 @@ EblLoadFvCmd (
     }
       
     Status = gDS->ProcessFirmwareVolume (FvStart, FvSize, &FvHandle);
-    FreePool (FvStart);
+    if (EFI_ERROR (Status)) {
+      FreePool (FvStart);
+    } 
   }
   return Status;
 }
