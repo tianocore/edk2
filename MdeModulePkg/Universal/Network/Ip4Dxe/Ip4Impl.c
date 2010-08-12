@@ -1241,7 +1241,8 @@ EfiIp4Configure (
       }
 
       if (Current->UseDefaultAddress && IP4_NO_MAPPING (IpInstance)) {
-        return EFI_NO_MAPPING;
+        Status = EFI_NO_MAPPING;
+        goto ON_EXIT;
       }
     }
   }
