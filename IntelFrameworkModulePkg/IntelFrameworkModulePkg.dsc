@@ -142,7 +142,8 @@
   IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
   IntelFrameworkModulePkg/Universal/LegacyRegionDxe/LegacyRegionDxe.inf
-
+  IntelFrameworkModulePkg/Universal/StatusCode/DatahubStatusCodeHandlerDxe/DatahubStatusCodeHandlerDxe.inf
+  
 [Components.IA32]
   IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
   IntelFrameworkModulePkg/Universal/CpuIoDxe/CpuIoDxe.inf {
