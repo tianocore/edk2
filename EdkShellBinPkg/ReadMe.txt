@@ -1,4 +1,4 @@
-The binaries of EdkShellBinPkg are generated with EFI shell project (svn r41) and build with Edk Compatibility & BaseTools Package (r10348). The binaries are built with no debug information by building with "RELEASE" target.
+The binaries of EdkShellBinPkg are generated with EFI shell project (svn r42) and build with Edk Compatibility & BaseTools Package (r10348). The binaries are built with no debug information by building with "RELEASE" target.
 
 The following steps can help to re-generate these binaries for customization:
 1. Check out EdkCompatibilityPkg (r10348) to $(WORKSPACE)\EdkCompatibilityPkg (svn http://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkCompatibilityPkg).
