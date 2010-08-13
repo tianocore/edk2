@@ -1185,6 +1185,7 @@ Returns:
   FAT_ODIR    *ODir;
   EFI_STATUS  Status;
 
+  ASSERT (OFile != NULL);
   ODir = OFile->ODir;
   ASSERT (ODir != NULL);
   DirEnt = AllocateZeroPool (sizeof (FAT_DIRENT));
@@ -1376,8 +1377,8 @@ Returns:
   FAT_VOLUME  *Volume;
 
   OFile   = DirEnt->OFile;
-  Volume  = OFile->Volume;
   ASSERT (OFile != NULL);
+  Volume  = OFile->Volume;
 
   if (OFile->ODir != NULL) {
     FatDiscardODir (OFile);
