@@ -14,17 +14,18 @@
 
 #include "BaseLibInternals.h"
 
-#define QUOTIENT_MAX_UINTN_DIVIDED_BY_10      ((UINTN) -1 / 10U)
-#define REMAINDER_MAX_UINTN_DIVIDED_BY_10    ((UINTN) -1 % 10U)
+#define QUOTIENT_MAX_UINTN_DIVIDED_BY_10      ((~((UINTN) 0)) / 10U)
+#define REMAINDER_MAX_UINTN_DIVIDED_BY_10    ((~((UINTN) 0)) % 10U)
 
-#define QUOTIENT_MAX_UINTN_DIVIDED_BY_16       ((UINTN) -1 / 16U)
-#define REMAINDER_MAX_UINTN_DIVIDED_BY_16     ((UINTN) -1 % 16U)
 
-#define QUOTIENT_MAX_UINT64_DIVIDED_BY_10      ((UINT64) -1 / 10U)
-#define REMAINDER_MAX_UINT64_DIVIDED_BY_10    ((UINT64) -1 % 10U)
+#define QUOTIENT_MAX_UINTN_DIVIDED_BY_16       ((~((UINTN) 0)) / 16U)
+#define REMAINDER_MAX_UINTN_DIVIDED_BY_16     ((~((UINTN) 0)) % 16U)
 
-#define QUOTIENT_MAX_UINT64_DIVIDED_BY_16      ((UINT64) -1 / 16U)
-#define REMAINDER_MAX_UINT64_DIVIDED_BY_16    ((UINT64) -1 % 16U)
+#define QUOTIENT_MAX_UINT64_DIVIDED_BY_10      ((~((UINT64) 0)) / 10U)
+#define REMAINDER_MAX_UINT64_DIVIDED_BY_10    ((~((UINT64) 0)) % 10U)
+
+#define QUOTIENT_MAX_UINT64_DIVIDED_BY_16      ((~((UINT64) 0)) / 16U)
+#define REMAINDER_MAX_UINT64_DIVIDED_BY_16    ((~((UINT64) 0)) % 16U)
 
 /**
   Copies one Null-terminated Unicode string to another Null-terminated Unicode
