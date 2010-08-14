@@ -3,7 +3,7 @@
   The library provides USB HID Class standard and specific requests defined
   in USB HID Firmware Specification 7 section : Requests.
   
-  Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -67,7 +67,7 @@ UsbGetHidDescriptor (
   Request.Request     = USB_REQ_GET_DESCRIPTOR;
   Request.Value       = (UINT16) (USB_DESC_TYPE_HID << 8);
   Request.Index       = Interface;
-  Request.Length      = sizeof (EFI_USB_HID_DESCRIPTOR);
+  Request.Length      = (UINT16) sizeof (EFI_USB_HID_DESCRIPTOR);
 
   Result = UsbIo->UsbControlTransfer (
                     UsbIo,
