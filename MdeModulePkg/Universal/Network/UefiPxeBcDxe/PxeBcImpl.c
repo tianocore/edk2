@@ -347,11 +347,7 @@ EfiPxeBcStart (
     return Status;
   }
 
-  //
-  // Configure block size for TFTP as a default value to handle all link layers.
-  // 
-  Private->BlockSize   = (UINTN) (MIN (Private->Ip4MaxPacketSize, PXEBC_DEFAULT_PACKET_SIZE) - 
-                           PXEBC_DEFAULT_UDP_OVERHEAD_SIZE - PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE);
+  Private->BlockSize   = 0x8000;
   Private->AddressIsOk = FALSE;
 
   ZeroMem (Mode, sizeof (EFI_PXE_BASE_CODE_MODE));
