@@ -299,7 +299,7 @@ Returns:
 
 --*/
 {
-  CHAR16  Buffer[FAT_MAIN_NAME_LEN + 1];
+  CHAR16  Buffer[FAT_MAIN_NAME_LEN + 1 + FAT_EXTEND_NAME_LEN + 1];
   UINT8   OutCaseFlag;
 
   ASSERT (StrSize (Str) <= sizeof (Buffer));
