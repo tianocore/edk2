@@ -14,18 +14,6 @@
 
 #include "BaseLibInternals.h"
 
-#define QUOTIENT_MAX_UINTN_DIVIDED_BY_10      ((~((UINTN) 0)) / 10U)
-#define REMAINDER_MAX_UINTN_DIVIDED_BY_10    ((~((UINTN) 0)) % 10U)
-
-
-#define QUOTIENT_MAX_UINTN_DIVIDED_BY_16       ((~((UINTN) 0)) / 16U)
-#define REMAINDER_MAX_UINTN_DIVIDED_BY_16     ((~((UINTN) 0)) % 16U)
-
-#define QUOTIENT_MAX_UINT64_DIVIDED_BY_10      ((~((UINT64) 0)) / 10U)
-#define REMAINDER_MAX_UINT64_DIVIDED_BY_10    ((~((UINT64) 0)) % 10U)
-
-#define QUOTIENT_MAX_UINT64_DIVIDED_BY_16      ((~((UINT64) 0)) / 16U)
-#define REMAINDER_MAX_UINT64_DIVIDED_BY_16    ((~((UINT64) 0)) % 16U)
 
 /**
   Copies one Null-terminated Unicode string to another Null-terminated Unicode
@@ -682,10 +670,7 @@ StrDecimalToUintn (
     // If the number represented by String overflows according 
     // to the range defined by UINTN, then ASSERT().
     //
-    ASSERT ((Result < QUOTIENT_MAX_UINTN_DIVIDED_BY_10) ||
-      ((Result == QUOTIENT_MAX_UINTN_DIVIDED_BY_10) &&
-      (*String - L'0') <= REMAINDER_MAX_UINTN_DIVIDED_BY_10)
-      );
+    ASSERT (Result <= ((((UINTN) ~0) - (*String - L'0')) / 10));
 
     Result = Result * 10 + (*String - L'0');
     String++;
@@ -764,10 +749,7 @@ StrDecimalToUint64 (
     // If the number represented by String overflows according 
     // to the range defined by UINTN, then ASSERT().
     //
-    ASSERT ((Result < QUOTIENT_MAX_UINT64_DIVIDED_BY_10) || 
-      ((Result == QUOTIENT_MAX_UINT64_DIVIDED_BY_10) && 
-      (*String - L'0') <= REMAINDER_MAX_UINT64_DIVIDED_BY_10)
-      );
+    ASSERT (Result <= DivU64x32 (((UINT64) ~0) - (*String - L'0') , 10));
 
     Result = MultU64x32 (Result, 10) + (*String - L'0');
     String++;
@@ -856,10 +838,7 @@ StrHexToUintn (
     // If the Hex Number represented by String overflows according 
     // to the range defined by UINTN, then ASSERT().
     //
-    ASSERT ((Result < QUOTIENT_MAX_UINTN_DIVIDED_BY_16) ||
-      ((Result == QUOTIENT_MAX_UINTN_DIVIDED_BY_16) && 
-      (InternalHexCharToUintn (*String) <= REMAINDER_MAX_UINTN_DIVIDED_BY_16))
-      );
+    ASSERT (Result <= ((((UINTN) ~0) - InternalHexCharToUintn (*String)) >> 4));
 
     Result = (Result << 4) + InternalHexCharToUintn (*String);
     String++;
@@ -950,10 +929,7 @@ StrHexToUint64 (
     // If the Hex Number represented by String overflows according 
     // to the range defined by UINTN, then ASSERT().
     //
-    ASSERT ((Result < QUOTIENT_MAX_UINT64_DIVIDED_BY_16)|| 
-      ((Result == QUOTIENT_MAX_UINT64_DIVIDED_BY_16) && 
-      (InternalHexCharToUintn (*String) <= REMAINDER_MAX_UINT64_DIVIDED_BY_16))
-      );
+    ASSERT (Result <= RShiftU64 (((UINT64) ~0) - InternalHexCharToUintn (*String) , 4));
 
     Result = LShiftU64 (Result, 4);
     Result = Result + InternalHexCharToUintn (*String);
@@ -1717,10 +1693,7 @@ AsciiStrDecimalToUintn (
     // If the number represented by String overflows according 
     // to the range defined by UINTN, then ASSERT().
     //
-    ASSERT ((Result < QUOTIENT_MAX_UINTN_DIVIDED_BY_10) ||
-      ((Result == QUOTIENT_MAX_UINTN_DIVIDED_BY_10) && 
-      (*String - '0') <= REMAINDER_MAX_UINTN_DIVIDED_BY_10)
-      );
+    ASSERT (Result <= ((((UINTN) ~0) - (*String - L'0')) / 10));
 
     Result = Result * 10 + (*String - '0');
     String++;
@@ -1794,10 +1767,7 @@ AsciiStrDecimalToUint64 (
     // If the number represented by String overflows according 
     // to the range defined by UINTN, then ASSERT().
     //
-    ASSERT ((Result < QUOTIENT_MAX_UINT64_DIVIDED_BY_10) || 
-      ((Result == QUOTIENT_MAX_UINT64_DIVIDED_BY_10) && 
-      (*String - '0') <= REMAINDER_MAX_UINT64_DIVIDED_BY_10)
-      );
+    ASSERT (Result <= DivU64x32 (((UINT64) ~0) - (*String - L'0') , 10));
 
     Result = MultU64x32 (Result, 10) + (*String - '0');
     String++;
@@ -1885,10 +1855,7 @@ AsciiStrHexToUintn (
     // If the Hex Number represented by String overflows according 
     // to the range defined by UINTN, then ASSERT().
     //
-     ASSERT ((Result < QUOTIENT_MAX_UINTN_DIVIDED_BY_16) ||
-       ((Result == QUOTIENT_MAX_UINTN_DIVIDED_BY_16) && 
-       (InternalAsciiHexCharToUintn (*String) <= REMAINDER_MAX_UINTN_DIVIDED_BY_16))
-       );
+    ASSERT (Result <= ((((UINTN) ~0) - InternalHexCharToUintn (*String)) >> 4));
 
     Result = (Result << 4) + InternalAsciiHexCharToUintn (*String);
     String++;
@@ -1980,10 +1947,7 @@ AsciiStrHexToUint64 (
     // If the Hex Number represented by String overflows according 
     // to the range defined by UINTN, then ASSERT().
     //
-    ASSERT ((Result < QUOTIENT_MAX_UINT64_DIVIDED_BY_16) ||
-      ((Result == QUOTIENT_MAX_UINT64_DIVIDED_BY_16) && 
-      (InternalAsciiHexCharToUintn (*String) <= REMAINDER_MAX_UINT64_DIVIDED_BY_16))
-      );
+    ASSERT (Result <= RShiftU64 (((UINT64) ~0) - InternalHexCharToUintn (*String) , 4));
 
     Result = LShiftU64 (Result, 4);
     Result = Result + InternalAsciiHexCharToUintn (*String);
