@@ -1336,6 +1336,7 @@ ConSplitterStdErrDriverBindingStart (
     }
   }
 
+  CpuBreakpoint ();
   //
   // Start ConSplitter on ControllerHandle, and create the virtual
   // agrogated console device on first call Start for a StandardError handle.
@@ -3043,8 +3044,6 @@ ConSplitterTextOutAddDevice (
   }
 
   if (FeaturePcdGet (PcdConOutUgaSupport)) {
-
-    Status = EFI_DEVICE_ERROR;
     //
     // If UGA is produced by Consplitter
     //
