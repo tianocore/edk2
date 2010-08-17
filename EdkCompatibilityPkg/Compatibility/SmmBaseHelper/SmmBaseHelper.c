@@ -672,8 +672,9 @@ LoadImage (
   if (!EFI_ERROR (Status)) {
     ///
     /// Update MP state in Framework SMST before transferring control to Framework SMM driver entry point
-    /// in case it may invoke AP
     ///
+    mFrameworkSmst->SmmStartupThisAp      = gSmst->SmmStartupThisAp;
+    mFrameworkSmst->NumberOfCpus          = mNumberOfProcessors;
     mFrameworkSmst->CurrentlyExecutingCpu = gSmst->CurrentlyExecutingCpu;
 
     Status = gBS->StartImage (*ImageHandle, NULL, NULL);
