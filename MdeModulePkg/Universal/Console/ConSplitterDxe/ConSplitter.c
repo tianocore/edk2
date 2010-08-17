@@ -1336,7 +1336,6 @@ ConSplitterStdErrDriverBindingStart (
     }
   }
 
-  CpuBreakpoint ();
   //
   // Start ConSplitter on ControllerHandle, and create the virtual
   // agrogated console device on first call Start for a StandardError handle.
