@@ -256,7 +256,36 @@ _ReverseGasketUint64:
 	ret
   
   
-  .subsections_via_symbols
+// Sec PPI Callbacks
+
+.globl _GasketSecUnixPeiLoadFile
+_GasketSecUnixPeiLoadFile:
+	jmp	  _SecUnixPeiLoadFile
+
+
+.globl _GasketSecUnixPeiAutoScan
+_GasketSecUnixPeiAutoScan:
+	jmp	  _SecUnixPeiAutoScan
+
+
+.globl _GasketSecUnixUnixThunkAddress
+_GasketSecUnixUnixThunkAddress:
+	jmp	  _SecUnixUnixThunkAddress
+
+
+.globl _GasketSecPeiReportStatusCode
+_GasketSecPeiReportStatusCode:
+	jmp	  _SecPeiReportStatusCode
+
+
+.globl _GasketSecUnixFdAddress
+_GasketSecUnixFdAddress:
+	jmp	  _SecUnixFdAddress
+
+
+.globl _GasketSecTemporaryRamSupport
+_GasketSecTemporaryRamSupport:
+	jmp	  _SecTemporaryRamSupport
   
   #endif
   

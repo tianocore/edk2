@@ -48,18 +48,21 @@ char *gGdbWorkingFileName = NULL;
 //
 // Globals
 //
-
-UNIX_PEI_LOAD_FILE_PPI                    mSecUnixLoadFilePpi          = { SecUnixPeiLoadFile };
-
-PEI_UNIX_AUTOSCAN_PPI                     mSecUnixAutoScanPpi          = { SecUnixPeiAutoScan };
-
-PEI_UNIX_THUNK_PPI                        mSecUnixThunkPpi          = { SecUnixUnixThunkAddress };
-
+#ifdef __APPLE__
+UNIX_PEI_LOAD_FILE_PPI                    mSecUnixLoadFilePpi        = { GasketSecUnixPeiLoadFile };
+PEI_UNIX_AUTOSCAN_PPI                     mSecUnixAutoScanPpi        = { GasketSecUnixPeiAutoScan };
+PEI_UNIX_THUNK_PPI                        mSecUnixThunkPpi           = { GasketSecUnixUnixThunkAddress };
+EFI_PEI_PROGRESS_CODE_PPI                 mSecStatusCodePpi          = { GasketSecPeiReportStatusCode };
+UNIX_FWH_PPI                              mSecFwhInformationPpi      = { GasketSecUnixFdAddress };
+TEMPORARY_RAM_SUPPORT_PPI                 mSecTemporaryRamSupportPpi = { GasketSecTemporaryRamSupport };
+#else
+UNIX_PEI_LOAD_FILE_PPI                    mSecUnixLoadFilePpi        = { SecUnixPeiLoadFile };
+PEI_UNIX_AUTOSCAN_PPI                     mSecUnixAutoScanPpi        = { SecUnixPeiAutoScan };
+PEI_UNIX_THUNK_PPI                        mSecUnixThunkPpi           = { SecUnixUnixThunkAddress };
 EFI_PEI_PROGRESS_CODE_PPI                 mSecStatusCodePpi          = { SecPeiReportStatusCode };
-
 UNIX_FWH_PPI                              mSecFwhInformationPpi      = { SecUnixFdAddress };
-
-TEMPORARY_RAM_SUPPORT_PPI                 mSecTemporaryRamSupportPpi = {SecTemporaryRamSupport};
+TEMPORARY_RAM_SUPPORT_PPI                 mSecTemporaryRamSupportPpi = { SecTemporaryRamSupport };
+#endif
 
 EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
   {
@@ -1068,13 +1071,20 @@ PrintLoadAddress (
   IN PE_COFF_LOADER_IMAGE_CONTEXT          *ImageContext
   )
 {
-  fprintf (stderr,
-     "0x%08lx Loading %s with entry point 0x%08lx\n",
-     (unsigned long)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders),
-     ImageContext->PdbPointer,   
-     (unsigned long)ImageContext->EntryPoint
-     );
-     
+  if (ImageContext->PdbPointer == NULL) {
+    fprintf (stderr,
+      "0x%08lx Loading NO DEBUG with entry point 0x%08lx\n",
+      (unsigned long)(ImageContext->ImageAddress),   
+      (unsigned long)ImageContext->EntryPoint
+      );
+  } else {
+    fprintf (stderr,
+      "0x%08lx Loading %s with entry point 0x%08lx\n",
+      (unsigned long)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders),
+      ImageContext->PdbPointer,   
+      (unsigned long)ImageContext->EntryPoint
+      );
+  }
   // Keep output synced up
   fflush (stderr);
 }

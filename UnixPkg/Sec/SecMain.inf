@@ -42,12 +42,12 @@
   Ia32/SwitchStack.c
 
 [Sources.X64]  
-  X64/Gasket.S
+#  X64/Gasket.S       # pure UINX x86_64 ABI also need to fix issues in BaseLib
+  X64/MangleGasket.S  # convert between UNIX x86_64 ABI and EFI X64 ABI
+ 
   X64/SwitchStack.S
   X64/NameManglingFix.c
-  
-# Only used to help construct Gasket.S
-#  X64/GasketEfiTemplate.c
+
 
 [Packages]
   MdePkg/MdePkg.dec

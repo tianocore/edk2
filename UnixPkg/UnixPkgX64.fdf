@@ -31,7 +31,7 @@
 # buffer for the FD (0x41000000). If this address does not match the FV will get
 # relocated in place (works, but not a great idea).
 #
-BaseAddress   = 0x41000000|gEfiUnixPkgTokenSpaceGuid.PcdUnixFdBaseAddress   #The base address of the FLASH Device.
+BaseAddress   = 0x102000000|gEfiUnixPkgTokenSpaceGuid.PcdUnixFdBaseAddress   #The base address of the FLASH Device.
 Size          = 0x004a0000|gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareFdSize  #The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x10000
@@ -244,16 +244,17 @@ INF  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 #INF  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
 #INF  UnixPkg/SnpUnixDxe/SnpUnixDxe.inf
  
+!if $(COMPILE_BINS)
 INF FatPkg/EnhancedFatDxe/Fat.inf
 
-FILE APPLICATION = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile) {
-  SECTION PE32 =Build/GccShellPkg/DEBUG_XCODE32/X64/ShellFull.efi
+ FILE APPLICATION = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile) {
+  SECTION PE32 =Build/GccShellPkg/DEBUG_UNIXPKG/X64/ShellFull.efi
  }
-
-# Note: Warning current X64 port does not use EFI ABI so thease bins will crash
-#INF  RuleOverride = BINARY USE = X64 FatBinPkg/EnhancedFatDxe/Fat.inf
-#INF  RuleOverride = BINARY USE = X64 EdkShellBinPkg/FullShell/FullShell.inf
-
+!else
+# Used checked in Visual Studio binaries
+INF  RuleOverride = BINARY USE = X64 FatBinPkg/EnhancedFatDxe/Fat.inf
+INF  RuleOverride = BINARY USE = X64 EdkShellBinPkg/FullShell/FullShell.inf
+!endif
 
 FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
         SECTION RAW = MdeModulePkg/Logo/Logo.bmp

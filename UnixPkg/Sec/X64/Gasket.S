@@ -1146,6 +1146,39 @@ _EfiReverseGasketUint64:
 	leave
 	ret
 	
+// Sec PPI Callbacks
+
+.globl _GasketSecUnixPeiLoadFile
+_GasketSecUnixPeiLoadFile:
+	jmp	  _SecUnixPeiLoadFile
+
+
+.globl _GasketSecUnixPeiAutoScan
+_GasketSecUnixPeiAutoScan:
+	jmp	  _SecUnixPeiAutoScan
+
+
+.globl _GasketSecUnixUnixThunkAddress
+_GasketSecUnixUnixThunkAddress:
+	jmp	  _SecUnixUnixThunkAddress
+
+
+.globl _GasketSecPeiReportStatusCode
+_GasketSecPeiReportStatusCode:
+	jmp	  _SecPeiReportStatusCode
+
+
+.globl _GasketSecUnixFdAddress
+_GasketSecUnixFdAddress:
+	jmp	  _SecUnixFdAddress
+
+
+.globl _GasketSecTemporaryRamSupport
+_GasketSecTemporaryRamSupport:
+	jmp	  _SecTemporaryRamSupport
+
+	
+	
 #if __APPLE__
 
 LFE63:

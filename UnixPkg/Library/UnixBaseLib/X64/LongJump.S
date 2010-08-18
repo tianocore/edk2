@@ -23,12 +23,12 @@
 # VOID
 # EFIAPI
 # InternalLongJump (
-#   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer, // %rcx
-#   IN      UINTN                     Value        // %rdx
+#   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
+#   IN      UINTN                     Value
 #   );
 #------------------------------------------------------------------------------
-ASM_GLOBAL ASM_PFX(EfiInternalLongJump)
-ASM_PFX(EfiInternalLongJump):
+ASM_GLOBAL ASM_PFX(InternalLongJump)
+ASM_PFX(InternalLongJump):
     mov     (%rcx), %rbx
     mov     0x8(%rcx), %rsp
     mov     0x10(%rcx), %rbp
@@ -52,37 +52,3 @@ ASM_PFX(EfiInternalLongJump):
     movdqu  0xE8(%rcx), %xmm15  
     mov     %rdx, %rax          # set return value
     jmp     *0x48(%rcx)
-
-#------------------------------------------------------------------------------
-# VOID
-# EFIAPI
-# UnixInternalLongJump (
-#   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer, // %rdi
-#   IN      UINTN                     Value        // %rsi
-#   );
-#------------------------------------------------------------------------------
-ASM_GLOBAL ASM_PFX(InternalLongJump)
-ASM_PFX(InternalLongJump):
-    mov     (%rdi), %rbx
-    mov     0x8(%rdi), %rsp
-    mov     0x10(%rdi), %rbp
-    mov     0x18(%rdi), %rdi
-    mov     0x20(%rdi), %rsi
-    mov     0x28(%rdi), %r12
-    mov     0x30(%rdi), %r13
-    mov     0x38(%rdi), %r14
-    mov     0x40(%rdi), %r15
-    # load non-volatile fp registers
-    ldmxcsr 0x50(%rdi)
-    movdqu  0x58(%rdi), %xmm6
-    movdqu  0x68(%rdi), %xmm7
-    movdqu  0x78(%rdi), %xmm8
-    movdqu  0x88(%rdi), %xmm9
-    movdqu  0x98(%rdi), %xmm10
-    movdqu  0xA8(%rdi), %xmm11
-    movdqu  0xB8(%rdi), %xmm12
-    movdqu  0xC8(%rdi), %xmm13
-    movdqu  0xD8(%rdi), %xmm14
-    movdqu  0xE8(%rdi), %xmm15  
-    mov     %rsi, %rax          # set return value
-    jmp     *0x48(%rdi)

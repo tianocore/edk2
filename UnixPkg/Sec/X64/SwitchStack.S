@@ -37,8 +37,8 @@
 #   None
 #
 #------------------------------------------------------------------------------
-ASM_GLOBAL ASM_PFX(GasketPeiSwitchStacks)
-ASM_PFX(GasketPeiSwitchStacks):
+ASM_GLOBAL ASM_PFX(PeiSwitchStacks)
+ASM_PFX(PeiSwitchStacks):
 //  movq    %rdx, %rdx   
     movq    %r8,  %rsp
     
@@ -50,7 +50,7 @@ ASM_PFX(GasketPeiSwitchStacks):
     # Reserve space for register parameters (rcx, rdx, r8 & r9) on the stack,
     # in case the callee wishes to spill them.
     #
-	  subq    40, %rsp  // 32-byte shadow space plus alignment pad
+	  subq    $40, %rsp  // 32-byte shadow space plus alignment pad
     call    *%rax
 
 
@@ -72,8 +72,8 @@ ASM_PFX(GasketPeiSwitchStacks):
 #   None
 #
 #------------------------------------------------------------------------------
-ASM_GLOBAL ASM_PFX(PeiSwitchStacks)
-ASM_PFX(PeiSwitchStacks):
+ASM_GLOBAL ASM_PFX(UnixPeiSwitchStacks)
+ASM_PFX(UnixPeiSwitchStacks):
     mov     %rdi, %rax
     mov     %rsi, %rdi
     mov     %rdx, %rsi

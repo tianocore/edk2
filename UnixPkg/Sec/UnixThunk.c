@@ -130,7 +130,7 @@ GetLocalTime (EFI_TIME *Time)
   Time->Minute = tm->tm_min;
   Time->Second = tm->tm_sec;
   Time->Nanosecond = 0;
-  Time->TimeZone = timezone;
+  Time->TimeZone = GetTimeZone ();
   Time->Daylight = (daylight ? EFI_TIME_ADJUST_DAYLIGHT : 0)
     | (tm->tm_isdst > 0 ? EFI_TIME_IN_DAYLIGHT : 0);
 }

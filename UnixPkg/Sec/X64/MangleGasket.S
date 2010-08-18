@@ -166,7 +166,7 @@ _Gasketexit:
   movq    %rcx, %rdi    // Swizzle args 
 	call	_exit           // Less to do as we will never return to EFI ABI world
 LDEAD_LOOP:
-  jmp  LDEAD_LOOP:      // _exit should never return
+  jmp  LDEAD_LOOP       // _exit should never return
 
 
 
@@ -508,7 +508,6 @@ _Gaskettcflush:
 	popq    %rdi          // restore state
 	popq    %rsi
   ret
-	call	
 
 
 .globl _GasketUgaCreate
@@ -566,7 +565,7 @@ _Gasketfcntl:
   movq    %rdx, %rsi     
   movq    %r8,  %rdx
 
-	call	  _UnixFctl1
+	call	  _UnixFcntl1
 	
 	popq    %rdi          // restore state
 	popq    %rsi
@@ -754,7 +753,7 @@ _GasketUgaBlt:
 	
 	popq    %rdi          // restore state
 	popq    %rsi
-
+  ret
 
 
 //
@@ -775,10 +774,115 @@ _ReverseGasketUint64:
   movq    %rcx, %r8
   movq    %r9,  %rcx
 
-	subq  40, %rsp              // 32-byte shadow space plus alignment pad
+	subq  $40, %rsp              // 32-byte shadow space plus alignment pad
 	call	*%rax
-  addq  40, %rsp
+  addq  $40, %rsp
 
 	ret
 	
+
+// Sec PPI Callbacks
+
+.globl _GasketSecUnixPeiLoadFile
+_GasketSecUnixPeiLoadFile:
+	pushq	  %rsi          // %rsi & %rdi are volatie in Unix and callee-save in EFI ABI
+	pushq	  %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+  movq    %rdx, %rsi     
+  movq    %r8,  %rdx
+  movq    %r9,  %rcx
+
+	call	  _SecUnixPeiLoadFile
+	
+	popq    %rdi          // restore state
+	popq    %rsi
+  ret
+
+
+
+.globl _GasketSecUnixPeiAutoScan
+_GasketSecUnixPeiAutoScan:
+	pushq	  %rsi          // %rsi & %rdi are volatie in Unix and callee-save in EFI ABI
+	pushq	  %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+  movq    %rdx, %rsi     
+  movq    %r8,  %rdx
+
+	call	  _SecUnixPeiAutoScan
+	
+	popq    %rdi          // restore state
+	popq    %rsi
+  ret
+
+.globl _GasketSecUnixUnixThunkAddress
+_GasketSecUnixUnixThunkAddress:
+	pushq	  %rsi          // %rsi & %rdi are volatie in Unix and callee-save in EFI ABI
+	pushq	  %rdi
+
+	call	  _SecUnixUnixThunkAddress
+	
+	popq    %rdi          // restore state
+	popq    %rsi
+  ret
+
+
+.globl _GasketSecPeiReportStatusCode
+_GasketSecPeiReportStatusCode:
+	pushq	  %rsi          // %rsi & %rdi are volatie in Unix and callee-save in EFI ABI
+	pushq	  %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+  movq    %rdx, %rsi     
+  movq    %r8,  %rdx
+  movq    %r9,  %rcx
+  movq    $0,   %r8     // BugBug: This should come from the stack
+  movq    $0,   %r9     //         But we can cheat since they are optional for bringup....
+
+	call	  _SecPeiReportStatusCode
+	
+	popq    %rdi          // restore state
+	popq    %rsi
+  ret
+
+
+.globl _GasketSecUnixFdAddress
+_GasketSecUnixFdAddress:
+	pushq	  %rsi          // %rsi & %rdi are volatie in Unix and callee-save in EFI ABI
+	pushq	  %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+  movq    %rdx, %rsi     
+  movq    %r8,  %rdx
+  movq    %r9,  %rcx
+
+	call	  _SecUnixFdAddress
+	
+	popq    %rdi          // restore state
+	popq    %rsi
+  ret
+
+
+
+
+.globl _GasketSecTemporaryRamSupport
+_GasketSecTemporaryRamSupport:
+	pushq	  %rsi          // %rsi & %rdi are volatie in Unix and callee-save in EFI ABI
+	pushq	  %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+  movq    %rdx, %rsi     
+  movq    %r8,  %rdx
+  movq    %r9,  %rcx
+
+	call	  _SecTemporaryRamSupport
+	
+	popq    %rdi          // restore state
+	popq    %rsi
+  ret
+
+
+
+
 

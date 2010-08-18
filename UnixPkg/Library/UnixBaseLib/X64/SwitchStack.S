@@ -35,45 +35,17 @@
 #   None
 #
 #------------------------------------------------------------------------------
-ASM_GLOBAL ASM_PFX(EfiInternalSwitchStack)
-ASM_PFX(EfiInternalSwitchStack):
-    mov     %rcx, %rax
-    mov     %rdx, %rcx
-    mov     %r8, %rdx
-    #
-    # Reserve space for register parameters (rcx, rdx, r8 & r9) on the stack,
-    # in case the callee wishes to spill them.
-    #
-    lea     -0x20(%r9), %rsp
-    call    *%rax
-
-
-
-#------------------------------------------------------------------------------
-# Routine Description:
-#
-#   Routine for switching stacks with 2 parameters (Unix ABI)
-#
-# Arguments:
-#
-#   (rdi) EntryPoint    - Entry point with new stack.
-#   (rsi) Context1      - Parameter1 for entry point.
-#   (rdx) Context2      - Parameter2 for entry point.
-#   (rcx) NewStack      - The pointer to new stack.
-#
-# Returns:
-#
-#   None
-#
-#------------------------------------------------------------------------------
 ASM_GLOBAL ASM_PFX(InternalSwitchStack)
 ASM_PFX(InternalSwitchStack):
-    mov     %rdi, %rax
-    mov     %rsi, %rdi
-    mov     %rdx, %rsi
+    movq    %rcx, %rax
+    movq    %rdx, %rcx
+    movq    %r8,  %rdx
+    movq    %r9,  %rsp
+
     #
     # Reserve space for register parameters (rcx, rdx, r8 & r9) on the stack,
     # in case the callee wishes to spill them.
     #
-    lea     -0x20(%rcx), %rsp
+	  subq    $40, %rsp  // 32-byte shadow space plus alignment pad
+
     call    *%rax

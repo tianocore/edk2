@@ -155,6 +155,7 @@
   PrintLib|MdeModulePkg/Library/DxePrintLibPrint2Protocol/DxePrintLibPrint2Protocol.inf
 
 [LibraryClasses.X64]
+  # turn off CR3 write so that DXE IPL will not crash emulator
   BaseLib|UnixPkg/Library/UnixBaseLib/UnixBaseLib.inf
 
 ################################################################################
@@ -222,11 +223,12 @@
 #
 ###################################################################################################
 [Components.common]
+!if $(SEC_ONLY)
   ##
   #  SEC Phase modules
   ##
   UnixPkg/Sec/SecMain.inf
-
+!else
   ##
   #  PEI Phase modules
   ##
@@ -322,4 +324,4 @@
   }
 
   FatPkg/EnhancedFatDxe/Fat.inf
-  
+!endif  

@@ -256,7 +256,7 @@ UnixUgaBlt (
   // doing this operation.
   //
   OriginalTPL = gBS->RaiseTPL (TPL_NOTIFY);
-  
+
   //
   // Pack UGA Draw protocol parameters to UGA_BLT_ARGS structure to adapt to
   // UgaBlt() API of Unix UGA IO protocol.

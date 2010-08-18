@@ -14,7 +14,6 @@ set -e
 shopt -s nocasematch
 
 
-
 #
 # Setup workspace if it is not set
 #
@@ -37,6 +36,7 @@ fi
 # Pick a default tool type for a given OS
 #
 TARGET_TOOLS=MYTOOLS
+UNIXPKG_TOOLS=UNIXPKG
 case `uname` in
   CYGWIN*) echo Cygwin not fully supported yet. ;;
   Darwin*) 
@@ -53,7 +53,7 @@ case `uname` in
     
 esac
 
-BUILD_ROOT_ARCH=$WORKSPACE/Build/UnixX64/DEBUG_"$TARGET_TOOLS"/X64
+BUILD_ROOT_ARCH=$WORKSPACE/Build/UnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
 
 if  [[ ! -f `which build` || ! -f `which GenFv` ]];
 then
@@ -80,7 +80,7 @@ do
         # This .gdbinit script sets a breakpoint that loads symbols for the PE/COFFEE
         # images that get loaded in SecMain
         #
-        cp $WORKSPACE/UnixPkg/.gdbinit $WORKSPACE/Build/UnixX64/DEBUG_"$TARGET_TOOLS"/X64
+        cp $WORKSPACE/UnixPkg/.gdbinit $WORKSPACE/Build/UnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
         ;;
     esac 
 
@@ -92,7 +92,7 @@ do
     make -C $WORKSPACE/BaseTools clean  
   fi
   if [[ $arg == shell ]]; then
-    build -p $WORKSPACE/GccShellPkg/GccShellPkg.dsc -a X64 -t $TARGET_TOOLS -n 3  $2 $3 $4 $5 $6 $7 $8
+    build -p $WORKSPACE/GccShellPkg/GccShellPkg.dsc -a X64 -t $UNIXPKG_TOOLS -n 3  $2 $3 $4 $5 $6 $7 $8
     exit $?
   fi
   
@@ -105,6 +105,8 @@ done
 #
 echo $PATH
 echo `which build`
-build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc      -a X64 -t $TARGET_TOOLS -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc      -a X64 -t $TARGET_TOOLS -D SEC_ONLY -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
+build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc      -a X64 -t $UNIXPKG_TOOLS -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+cp $WORKSPACE/Build/UnixX64/DEBUG_"$TARGET_TOOLS"/X64/SecMain $WORKSPACE/Build/UnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
 exit $?
 
