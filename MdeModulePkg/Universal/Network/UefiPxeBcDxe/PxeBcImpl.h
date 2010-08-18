@@ -40,6 +40,7 @@ typedef struct _PXEBC_PRIVATE_DATA  PXEBC_PRIVATE_DATA;
 #include <Library/BaseLib.h>
 #include <Library/NetLib.h>
 #include <Library/DpcLib.h>
+#include <Library/PcdLib.h>
 
 #include "PxeBcDriver.h"
 #include "PxeBcDhcp.h"

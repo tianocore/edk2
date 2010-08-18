@@ -64,6 +64,7 @@
   DebugLib
   NetLib
   DpcLib
+  PcdLib
 
 [Guids]
   gEfiSmbiosTableGuid                              # ALWAYS_CONSUMED
@@ -83,3 +84,6 @@
   gEfiNetworkInterfaceIdentifierProtocolGuid_31    ## SOMETIMES_CONSUMES
   gEfiIp4ServiceBindingProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiIp4ProtocolGuid                              # PROTOCOL ALWAYS_CONSUMED
+
+[Pcd]  
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTftpBlockSize     ## CONSUMES  

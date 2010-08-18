@@ -347,7 +347,19 @@ EfiPxeBcStart (
     return Status;
   }
 
-  Private->BlockSize   = 0x8000;
+
+  //
+  // Configure block size for TFTP as a default value to handle all link layers.
+  // 
+  Private->BlockSize   = (UINTN) (MIN (Private->Ip4MaxPacketSize, PXEBC_DEFAULT_PACKET_SIZE) - 
+                           PXEBC_DEFAULT_UDP_OVERHEAD_SIZE - PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE);
+  //
+  // If PcdTftpBlockSize is set to non-zero, override the default value.
+  //
+  if (PcdGet64 (PcdTftpBlockSize) != 0) {
+    Private->BlockSize   = (UINTN) PcdGet64 (PcdTftpBlockSize);
+  }
+  
   Private->AddressIsOk = FALSE;
 
   ZeroMem (Mode, sizeof (EFI_PXE_BASE_CODE_MODE));
