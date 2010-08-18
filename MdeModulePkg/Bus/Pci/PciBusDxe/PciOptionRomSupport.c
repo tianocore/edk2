@@ -1,7 +1,7 @@
 /** @file
   PCI Rom supporting funtions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -546,6 +546,7 @@ RomDecode (
 {
   UINT32              Value32;
   UINT32              Offset;
+  UINT32              OffsetMax;
   EFI_PCI_IO_PROTOCOL *PciIo;
 
   PciIo = &PciDevice->PciIo;
@@ -553,7 +554,12 @@ RomDecode (
     //
     // Clear all bars
     //
-    for (Offset = 0x10; Offset <= 0x24; Offset += sizeof (UINT32)) {
+    OffsetMax = 0x24;
+    if (IS_PCI_BRIDGE(&PciDevice->Pci)) {
+      OffsetMax = 0x14;
+    }
+
+    for (Offset = 0x10; Offset <= OffsetMax; Offset += sizeof (UINT32)) {
       PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, Offset, 1, &gAllZero);
     }
 
