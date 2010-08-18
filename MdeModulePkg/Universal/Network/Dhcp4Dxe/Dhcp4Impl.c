@@ -1,7 +1,7 @@
 /** @file
   This file implement the EFI_DHCP4_PROTOCOL interface.
   
-Copyright (c) 2006 - 2009, Intel Corporation.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -917,16 +917,17 @@ EfiDhcp4RenewRebind (
 
   if (DhcpSb->DhcpState == Dhcp4Stopped) {
     Status = EFI_NOT_STARTED;
-    goto ON_ERROR;
+    goto ON_EXIT;
   }
 
   if (DhcpSb->DhcpState != Dhcp4Bound) {
     Status = EFI_ACCESS_DENIED;
-    goto ON_ERROR;
+    goto ON_EXIT;
   }
 
   if (DHCP_IS_BOOTP (DhcpSb->Para)) {
-    return EFI_SUCCESS;
+    Status = EFI_SUCCESS;
+    goto ON_EXIT;
   }
 
   //
@@ -948,7 +949,7 @@ EfiDhcp4RenewRebind (
 
   if (EFI_ERROR (Status)) {
     DhcpSetState (DhcpSb, Dhcp4Bound, FALSE);
-    goto ON_ERROR;
+    goto ON_EXIT;
   }
 
   DhcpSb->ExtraRefresh        = TRUE;
@@ -967,7 +968,7 @@ EfiDhcp4RenewRebind (
 
   return EFI_SUCCESS;
 
-ON_ERROR:
+ON_EXIT:
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
