@@ -1,0 +1,67 @@
+## @file
+# Component description file for IsaIoDxe module.
+#
+# Produces an instance of the ISA I/O Protocol for every SIO controller.
+#
+# Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IsaIoDxe
+  FILE_GUID                      = 61AD3083-DCAD-4850-A50C-73B23B3B14F9
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeIsaIo
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  DRIVER_BINDING                = gIsaIoDriver
+#  COMPONENT_NAME                = gIsaIoComponentName;
+#  COMPONENT_NAME2               = gIsaIoComponentName2;
+#
+
+[Sources]
+  ComponentName.h
+  ComponentName.c
+  IsaIo.h
+  IsaIo.c
+  IsaDriver.h
+  IsaDriver.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  ReportStatusCodeLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  DevicePathLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+
+[Protocols]
+  gEfiIsaIoProtocolGuid                         # PROTOCOL BY_START
+  gEfiSioProtocolGuid                           # PROTOCOL TO_START
+  gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiGenericMemTestProtocolGuid                # PROTOCOL TO_START
+
+[Pcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportedFeatures
+
+
