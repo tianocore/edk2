@@ -43,8 +43,15 @@ typedef struct {
 //
 // Define for Desriptor
 //
-#define ACPI_ADDRESS_SPACE_DESCRIPTOR 0x8A
-#define ACPI_END_TAG_DESCRIPTOR       0x79
+#define ACPI_DMA_DESCRIPTOR                       0x2A
+#define ACPI_IO_PORT_DESCRIPTOR                   0x47
+#define ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR    0x4B
+#define ACPI_IRQ_NOFLAG_DESCRIPTOR                0x22
+#define ACPI_IRQ_DESCRIPTOR                       0x23
+#define ACPI_32_BIT_MEMORY_RANGE_DESCRIPTOR       0x85
+#define ACPI_32_BIT_FIXED_MEMORY_RANGE_DESCRIPTOR 0x86
+#define ACPI_ADDRESS_SPACE_DESCRIPTOR             0x8A
+#define ACPI_END_TAG_DESCRIPTOR                   0x79
 
 //
 // Resource Type
@@ -80,6 +87,94 @@ typedef PACKED struct {
   UINT64  AddrLen;
 } EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR;
 
+typedef union {
+  UINT8     Byte;
+  struct {
+    UINT8 Length : 3;
+    UINT8 Name : 4;
+    UINT8 Type : 1;
+  } Bits;
+} ACPI_SMALL_RESOURCE_HEADER;
+
+typedef struct {
+  union {
+    UINT8 Byte;
+    struct{
+      UINT8 Name : 7;
+      UINT8 Type : 1;
+    }Bits;
+  } Header;
+  UINT16 Length;
+} ACPI_LARGE_RESOURCE_HEADER;
+
+///
+/// IRQ Descriptor.
+///
+typedef PACKED struct {
+  ACPI_SMALL_RESOURCE_HEADER   Header;
+  UINT16                       Mask;
+} EFI_ACPI_IRQ_NOFLAG_DESCRIPTOR;
+
+///
+/// IRQ Descriptor.
+///
+typedef PACKED struct {
+  ACPI_SMALL_RESOURCE_HEADER   Header;
+  UINT16                       Mask;
+  UINT8                        Information;
+} EFI_ACPI_IRQ_DESCRIPTOR;
+
+///
+/// DMA Descriptor.
+///
+typedef PACKED struct {
+  ACPI_SMALL_RESOURCE_HEADER   Header;
+  UINT8                        ChannelMask;
+  UINT8                        Information;
+} EFI_ACPI_DMA_DESCRIPTOR;
+
+///
+/// I/O Port Descriptor
+///
+typedef PACKED struct {
+  ACPI_SMALL_RESOURCE_HEADER   Header;
+  UINT8                        Information;
+  UINT16                       BaseAddressMin;
+  UINT16                       BaseAddressMax;
+  UINT8                        Alignment;
+  UINT8                        Length;
+} EFI_ACPI_IO_PORT_DESCRIPTOR;
+
+///
+/// Fixed Location I/O Port Descriptor.
+///
+typedef PACKED struct {
+  ACPI_SMALL_RESOURCE_HEADER   Header;
+  UINT16                       BaseAddress;
+  UINT8                        Length;
+} EFI_ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR;
+
+///
+/// 32-Bit Memory Range Descriptor
+///
+typedef PACKED struct {
+  ACPI_LARGE_RESOURCE_HEADER    Header;
+  UINT8                         Information;
+  UINT32                        BaseAddressMin;
+  UINT32                        BaseAddressMax;
+  UINT32                        Alignment;
+  UINT32                        Length;
+} EFI_ACPI_32_BIT_MEMORY_RANGE_DESCRIPTOR;
+
+///
+/// Fixed 32-Bit Fixed Memory Range Descriptor
+///
+typedef PACKED struct {
+  ACPI_LARGE_RESOURCE_HEADER    Header;
+  UINT8                         Information;
+  UINT32                        BaseAddress;
+  UINT32                        Length;
+} EFI_ACPI_32_BIT_FIXED_MEMORY_RANGE_DESCRIPTOR;
 #pragma pack()
 
 ///
@@ -125,6 +220,55 @@ typedef struct {
 //
 #define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_TYPE_TRANSLATION          (1 << 5)
 #define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_TYPE_STATIC               (0 << 5)
+
+//
+// IRQ Information
+// Ref ACPI specification 6.4.2.1
+//
+#define EFI_ACPI_IRQ_SHARABLE_MASK                      0x10
+#define   EFI_ACPI_IRQ_SHARABLE                         0x10
+
+#define EFI_ACPI_IRQ_POLARITY_MASK                      0x08
+#define   EFI_ACPI_IRQ_HIGH_TRUE                        0x00
+#define   EFI_ACPI_IRQ_LOW_FALSE                        0x08
+
+#define EFI_ACPI_IRQ_MODE                               0x01
+#define   EFI_ACPI_IRQ_LEVEL_TRIGGERED                  0x00
+#define   EFI_ACPI_IRQ_EDGE_TRIGGERED                   0x01
+
+//
+// DMA Information
+// Ref ACPI specification 6.4.2.2
+//
+#define EFI_ACPI_DMA_SPEED_TYPE_MASK                    0x60
+#define   EFI_ACPI_DMA_SPEED_TYPE_COMPATIBILITY         0x00
+#define   EFI_ACPI_DMA_SPEED_TYPE_A                     0x20
+#define   EFI_ACPI_DMA_SPEED_TYPE_B                     0x40
+#define   EFI_ACPI_DMA_SPEED_TYPE_F                     0x60
+                                               
+#define EFI_ACPI_DMA_BUS_MASTER_MASK                    0x04
+#define   EFI_ACPI_DMA_BUS_MASTER                       0x04
+
+#define EFI_ACPI_DMA_TRANSFER_TYPE_MASK                 0x03
+#define   EFI_ACPI_DMA_TRANSFER_TYPE_8_BIT              0x00
+#define   EFI_ACPI_DMA_TRANSFER_TYPE_8_BIT_AND_16_BIT   0x01
+#define   EFI_ACPI_DMA_TRANSFER_TYPE_16_BIT             0x10
+
+//
+// IO Information
+// Ref ACPI specification 6.4.2.5
+//
+#define EFI_ACPI_IO_DECODE_MASK                         0x01
+#define   EFI_ACPI_IO_DECODE_16_BIT                     0x01
+#define   EFI_ACPI_IO_DECODE_10_BIT                     0x00
+
+//
+// Memory Information
+// Ref ACPI specification 6.4.3.4
+//
+#define EFI_ACPI_MEMORY_WRITE_STATUS_MASK               0x01
+#define   EFI_ACPI_MEMORY_WRITABLE                      0x01
+#define   EFI_ACPI_MEMORY_NON_WRITABLE                  0x00
 
 //
 // Ensure proper structure formats

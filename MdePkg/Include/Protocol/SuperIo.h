@@ -5,7 +5,7 @@
   Super I/O is powered up, enabled, and assigned with the default set of resources. In the Stop()
   routine of the Super I/O driver, the device is disabled and Super I/O protocol is uninstalled.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -18,29 +18,10 @@
 
 #ifndef __EFI_SUPER_IO_PROTOCOL_H__
 #define __EFI_SUPER_IO_PROTOCOL_H__
+#include <IndustryStandard/Acpi.h>
 
 #define EFI_SIO_PROTOCOL_GUID \
   { 0x215fdd18, 0xbd50, 0x4feb, { 0x89, 0xb, 0x58, 0xca, 0xb, 0x47, 0x39, 0xe9 } }
-  
-typedef union {
-  UINT8     Byte;
-  struct {
-    UINT8 Length : 3;
-    UINT8 Name : 4;
-    UINT8 Type : 1;
-  } Bits;
-} ACPI_SMALL_RESOURCE_HEADER;
-
-typedef struct {
-  union {
-    UINT8 Byte;
-    struct{
-      UINT8 Name : 7;
-      UINT8 Type : 1;
-    }Bits;
-  } Header;
-  UINT16 Length;
-} ACPI_LARGE_RESOURCE_HEADER;
 
 typedef union {
   ACPI_SMALL_RESOURCE_HEADER *SmallHeader;
