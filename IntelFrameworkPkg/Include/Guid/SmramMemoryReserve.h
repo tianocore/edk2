@@ -42,7 +42,11 @@ typedef struct {
   /// Designates the number of possible regions in the system
   /// that can be usable for SMRAM. 
   ///
-  UINTN                 NumberOfSmmReservedRegions;
+  /// Inconsistent with specification here:  
+  /// In Framework SMM CIS 0.91 specification, it defines the field type as UINTN.
+  /// However, HOBs are supposed to be CPU neutral, so UINT32 should be used instead.
+  ///
+  UINT32                NumberOfSmmReservedRegions;
   ///
   /// Used throughout this protocol to describe the candidate
   /// regions for SMRAM that are supported by this platform. 

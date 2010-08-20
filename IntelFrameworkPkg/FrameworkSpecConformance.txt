@@ -1119,12 +1119,17 @@
 ##
   1. Include/Guid/SmramMemoryReserve.h
     typedef struct {
+      UINT32                NumberOfSmmReservedRegions;
       ...
     } EFI_SMRAM_HOB_DESCRIPTOR_BLOCK;
 
-    The name of the definition is *NOT* consistent with Framework SmmCis specification 0.91, in which it's 
+    1) The name of the definition is *NOT* consistent with Framework SmmCis specification 0.91, in which it's 
     defined as "EFI_HOB_SMRAM_DESCRIPTOR_BLOCK" rather than "EFI_SMRAM_HOB_DESCRIPTOR_BLOCK". 
     Keeping this inconsistency for backward compatibility.
+
+    2) The definition of NumberOfSmmReservedRegions is *NOT* consistent with Framework SmmCis specification 0.91,
+    in which the type of this field is defined as UINTN. However, HOBs are supposed to be CPU neutral, so UINTN
+    is incorrect and UINT32 should be used.
 
   2. Include/Guid/SmramMemoryReserve.h
     typedef enum {
