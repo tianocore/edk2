@@ -215,7 +215,7 @@ IsaIoDriverStart (
             ((DevicePathSubType (AcpiNode) == ACPI_DP) || (DevicePathSubType (AcpiNode) == ACPI_EXTENDED_DP))
            );
 
-    Status = gBS->HandleProtocol (PciHandle, &gEfiPciIoProtocolGuid, &PciIo);
+    Status = gBS->HandleProtocol (PciHandle, &gEfiPciIoProtocolGuid, (VOID **) &PciIo);
     ASSERT_EFI_ERROR (Status);
 
     //
