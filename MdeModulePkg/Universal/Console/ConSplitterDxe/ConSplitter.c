@@ -3015,8 +3015,6 @@ ConSplitterTextOutAddDevice (
   }
 
   if (FeaturePcdGet (PcdConOutUgaSupport)) {
-
-    Status = EFI_DEVICE_ERROR;
     //
     // If UGA is produced by Consplitter
     //
