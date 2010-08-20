@@ -297,6 +297,7 @@ Ip4CreateService (
     //
     IpSb->MaxPacketSize -= NET_VLAN_TAG_LEN;
   }
+  IpSb->OldMaxPacketSize = IpSb->MaxPacketSize;
   IpSb->MacString = NULL;
 
   *Service = IpSb;

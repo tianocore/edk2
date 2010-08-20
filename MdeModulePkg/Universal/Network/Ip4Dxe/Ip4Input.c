@@ -510,20 +510,11 @@ Ip4IpSecProcessPacket (
   
   if (mIpSec == NULL) {
     gBS->LocateProtocol (&gEfiIpSecProtocolGuid, NULL, (VOID **) &mIpSec);
-    if (mIpSec != NULL) {
-      //
-      // Save the original MTU
-      //
-      IpSb->OldMaxPacketSize = IpSb->MaxPacketSize; 
+    if (mIpSec == NULL) {
+      goto ON_EXIT;
     }
   }
 
-  //
-  // Check whether the IPsec protocol is available.
-  //
-  if (mIpSec == NULL) {
-    goto ON_EXIT;
-  }
   //
   // Check whether the IPsec enable variable is set.
   //
