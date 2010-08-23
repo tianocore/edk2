@@ -1180,7 +1180,6 @@ ScsiDiskReadCapacity (
   UINT8                         Index;
   UINT8                         MaxRetry;
   UINT8                         SenseDataLength;
-  UINT8                         ScsiVersion;
   UINT32                        DataLength10;
   UINT32                        DataLength16;
   EFI_SCSI_DISK_CAPACITY_DATA   CapacityData10;
@@ -1195,40 +1194,47 @@ ScsiDiskReadCapacity (
 
   *NumberOfSenseKeys  = 0;
   *NeedRetry          = FALSE;
-  ScsiVersion         = (UINT8)(ScsiDiskDevice->InquiryData.Version & 0x07);
 
-  if (ScsiVersion < SCSI_COMMAND_VERSION_3) {
+  //
+  // submit Read Capacity(10) Command. If it returns capacity of FFFFFFFFh, 
+  // 16 byte command should be used to access large hard disk >2TB
+  //
+  CommandStatus = ScsiReadCapacityCommand (
+                    ScsiDiskDevice->ScsiIo,
+                    EFI_TIMER_PERIOD_SECONDS(1),
+                    NULL,
+                    &SenseDataLength,
+                    &HostAdapterStatus,
+                    &TargetStatus,
+                    (VOID *) &CapacityData10,
+                    &DataLength10,
+                    FALSE
+                    );
+
+  ScsiDiskDevice->Cdb16Byte = FALSE;
+  if ((!EFI_ERROR (CommandStatus)) && (CapacityData10.LastLba3 == 0xff) && (CapacityData10.LastLba2 == 0xff) &&
+      (CapacityData10.LastLba1 == 0xff) && (CapacityData10.LastLba0 == 0xff)) {
     //
-    // submit Read Capacity(10) Command. in this call,not request sense data
+    // use Read Capacity (16), Read (16) and Write (16) next when hard disk size > 2TB
     //
-    CommandStatus = ScsiReadCapacityCommand (
+    ScsiDiskDevice->Cdb16Byte = TRUE;
+    //
+    // submit Read Capacity(16) Command to get parameter LogicalBlocksPerPhysicalBlock
+    // and LowestAlignedLba
+    //
+    CommandStatus = ScsiReadCapacity16Command (
                       ScsiDiskDevice->ScsiIo,
-                      EFI_TIMER_PERIOD_SECONDS(1),
+                      EFI_TIMER_PERIOD_SECONDS (1),
                       NULL,
                       &SenseDataLength,
                       &HostAdapterStatus,
                       &TargetStatus,
-                      (VOID *) &CapacityData10,
-                      &DataLength10,
+                      (VOID *) &CapacityData16,
+                      &DataLength16,
                       FALSE
                       );
-    } else {
-      //
-      // submit Read Capacity(16) Command to get parameter LogicalBlocksPerPhysicalBlock
-      // and LowestAlignedLba
-      //
-      CommandStatus = ScsiReadCapacity16Command (
-                        ScsiDiskDevice->ScsiIo,
-                        EFI_TIMER_PERIOD_SECONDS (1),
-                        NULL,
-                        &SenseDataLength,
-                        &HostAdapterStatus,
-                        &TargetStatus,
-                        (VOID *) &CapacityData16,
-                        &DataLength16,
-                        FALSE
-                        );
-    }
+  }
+
     //
     // no need to check HostAdapterStatus and TargetStatus
     //
@@ -1502,15 +1508,13 @@ GetMediaInfo (
   IN     EFI_SCSI_DISK_CAPACITY_DATA16  *Capacity16
   )
 {
-  UINT8       ScsiVersion;
   UINT8       *Ptr;
 
-  ScsiVersion    = (UINT8)(ScsiDiskDevice->InquiryData.Version & 0x07);
   ScsiDiskDevice->BlkIo.Media->LowestAlignedLba               = 0;
   ScsiDiskDevice->BlkIo.Media->LogicalBlocksPerPhysicalBlock  = 1;
   
 
-  if (ScsiVersion < SCSI_COMMAND_VERSION_3) {
+  if (!ScsiDiskDevice->Cdb16Byte) {
     ScsiDiskDevice->BlkIo.Media->LastBlock =  (Capacity10->LastLba3 << 24) |
                                               (Capacity10->LastLba2 << 16) |
                                               (Capacity10->LastLba1 << 8)  |
@@ -1603,7 +1607,6 @@ ScsiDiskReadSectors (
   BOOLEAN             NeedRetry;
   EFI_SCSI_SENSE_DATA *SenseData;
   UINTN               NumberOfSenseKeys;
-  UINT8               ScsiVersion;
 
   SenseData         = NULL;
   NumberOfSenseKeys = 0;
@@ -1612,12 +1615,11 @@ ScsiDiskReadSectors (
 
   BlocksRemaining   = NumberOfBlocks;
   BlockSize         = ScsiDiskDevice->BlkIo.Media->BlockSize;
-  ScsiVersion       = (UINT8)(ScsiDiskDevice->InquiryData.Version & 0x07);
   
   //
   // limit the data bytes that can be transferred by one Read(10) or Read(16) Command
   //
-  if (ScsiVersion < SCSI_COMMAND_VERSION_3) {
+  if (!ScsiDiskDevice->Cdb16Byte) {
     MaxBlock         = 0xFFFF;
   } else {
     MaxBlock         = 0xFFFFFFFF;
@@ -1628,7 +1630,7 @@ ScsiDiskReadSectors (
   while (BlocksRemaining > 0) {
 
     if (BlocksRemaining <= MaxBlock) {
-      if (ScsiVersion < SCSI_COMMAND_VERSION_3) {
+      if (!ScsiDiskDevice->Cdb16Byte) {
         SectorCount = (UINT16) BlocksRemaining;
       } else {
         SectorCount = (UINT32) BlocksRemaining;
@@ -1642,19 +1644,7 @@ ScsiDiskReadSectors (
 
     MaxRetry  = 2;
     for (Index = 0; Index < MaxRetry; Index++) {
-      if (ScsiVersion >= SCSI_COMMAND_VERSION_3) {
-        Status = ScsiDiskRead16 (
-                  ScsiDiskDevice,
-                  &NeedRetry,
-                  &SenseData,
-                  &NumberOfSenseKeys,
-                  Timeout,
-                  PtrBuffer,
-                  &ByteCount,
-                  Lba,
-                  SectorCount
-                  );
-      } else {
+      if (!ScsiDiskDevice->Cdb16Byte) {
         Status = ScsiDiskRead10 (
                   ScsiDiskDevice,
                   &NeedRetry,
@@ -1664,6 +1654,18 @@ ScsiDiskReadSectors (
                   PtrBuffer,
                   &ByteCount,
                   (UINT32) Lba,
+                  SectorCount
+                  );
+      } else {
+        Status = ScsiDiskRead16 (
+                  ScsiDiskDevice,
+                  &NeedRetry,
+                  &SenseData,
+                  &NumberOfSenseKeys,
+                  Timeout,
+                  PtrBuffer,
+                  &ByteCount,
+                  Lba,
                   SectorCount
                   );
       }
@@ -1727,7 +1729,6 @@ ScsiDiskWriteSectors (
   BOOLEAN             NeedRetry;
   EFI_SCSI_SENSE_DATA *SenseData;
   UINTN               NumberOfSenseKeys;
-  UINT8               ScsiVersion;
 
   SenseData         = NULL;
   NumberOfSenseKeys = 0;
@@ -1736,12 +1737,11 @@ ScsiDiskWriteSectors (
 
   BlocksRemaining   = NumberOfBlocks;
   BlockSize         = ScsiDiskDevice->BlkIo.Media->BlockSize;
-  ScsiVersion       = (UINT8)(ScsiDiskDevice->InquiryData.Version & 0x07);
 
   //
   // limit the data bytes that can be transferred by one Read(10) or Read(16) Command
   //
-  if (ScsiVersion < SCSI_COMMAND_VERSION_3) {
+  if (!ScsiDiskDevice->Cdb16Byte) {
     MaxBlock         = 0xFFFF;
   } else {
     MaxBlock         = 0xFFFFFFFF;
@@ -1752,7 +1752,7 @@ ScsiDiskWriteSectors (
   while (BlocksRemaining > 0) {
 
     if (BlocksRemaining <= MaxBlock) {
-      if (ScsiVersion < SCSI_COMMAND_VERSION_3) {
+      if (!ScsiDiskDevice->Cdb16Byte) {
         SectorCount = (UINT16) BlocksRemaining;
       } else {
         SectorCount = (UINT32) BlocksRemaining;
@@ -1765,19 +1765,7 @@ ScsiDiskWriteSectors (
     Timeout   = EFI_TIMER_PERIOD_SECONDS (2);
     MaxRetry  = 2;
     for (Index = 0; Index < MaxRetry; Index++) {
-      if (ScsiVersion >= SCSI_COMMAND_VERSION_3) {
-        Status = ScsiDiskWrite16 (
-                  ScsiDiskDevice,
-                  &NeedRetry,
-                  &SenseData,
-                  &NumberOfSenseKeys,
-                  Timeout,
-                  PtrBuffer,
-                  &ByteCount,
-                  Lba,
-                  SectorCount
-                  );        
-      } else {
+      if (!ScsiDiskDevice->Cdb16Byte) {
         Status = ScsiDiskWrite10 (
                   ScsiDiskDevice,
                   &NeedRetry,
@@ -1789,6 +1777,18 @@ ScsiDiskWriteSectors (
                   (UINT32) Lba,
                   SectorCount
                   );
+      } else {
+        Status = ScsiDiskWrite16 (
+                  ScsiDiskDevice,
+                  &NeedRetry,
+                  &SenseData,
+                  &NumberOfSenseKeys,
+                  Timeout,
+                  PtrBuffer,
+                  &ByteCount,
+                  Lba,
+                  SectorCount
+                  );         
         }
       if (!EFI_ERROR (Status)) {
         break;
