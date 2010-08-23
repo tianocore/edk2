@@ -32,6 +32,7 @@ Module Name:
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
 #include <Library/DebugAgentLib.h>
+#include <Library/LocalApicLib.h>
 
 #define AP_STACK_SIZE                         0x8000
 #define MAX_CPU_NUMBER                        256

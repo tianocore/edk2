@@ -1119,70 +1119,6 @@ GetNextWaitingProcessorNumber (
   return EFI_NOT_FOUND;
 }
 
-/**
-  Programs Local APIC registers for virtual wire mode.
-
-  This function programs Local APIC registers for virtual wire mode.
-
-  @param  Bsp  Indicates whether the programmed processor is going to be BSP
-
-**/
-VOID
-ProgramVirtualWireMode (
-  BOOLEAN                       Bsp
-  )
-{
-  UINTN                 ApicBase;
-  UINT32                Value;
-
-  ApicBase = (UINTN)AsmMsrBitFieldRead64 (MSR_IA32_APIC_BASE, 12, 35) << 12;
-
-  //
-  // Program the Spurious Vector entry
-  // Set bit 8 (APIC Software Enable/Disable) to enable local APIC,
-  // and set Spurious Vector as 0x0F.
-  //
-  MmioBitFieldWrite32 (ApicBase + APIC_REGISTER_SPURIOUS_VECTOR_OFFSET, 0, 9, 0x10F);
-
-  //
-  // Program the LINT0 vector entry as ExtInt
-  // Set bits 8..10 to 7 as ExtInt Delivery Mode,
-  // and clear bits for Delivery Status, Interrupt Input Pin Polarity, Remote IRR,
-  // Trigger Mode, and Mask
-  //
-  if (!Bsp) {
-    DisableInterrupts ();
-  }
-  Value = MmioRead32 (ApicBase + APIC_REGISTER_LINT0_VECTOR_OFFSET);
-  Value = BitFieldWrite32 (Value, 8, 10, 7);
-  Value = BitFieldWrite32 (Value, 12, 16, 0);
-  if (!Bsp) {
-    //
-    // For APs, LINT0 is masked
-    //
-    Value = BitFieldWrite32 (Value, 16, 16, 1);
-  }
-  MmioWrite32 (ApicBase + APIC_REGISTER_LINT0_VECTOR_OFFSET, Value);
-
-  //
-  // Program the LINT1 vector entry as NMI
-  // Set bits 8..10 to 4 as NMI Delivery Mode,
-  // and clear bits for Delivery Status, Interrupt Input Pin Polarity, Remote IRR,
-  // Trigger Mode.
-  // For BSP clear Mask bit, and for AP set mask bit.
-  //
-  Value = MmioRead32 (ApicBase + APIC_REGISTER_LINT1_VECTOR_OFFSET);
-  Value = BitFieldWrite32 (Value, 8, 10, 4);
-  Value = BitFieldWrite32 (Value, 12, 16, 0);
-  if (!Bsp) {
-    //
-    // For APs, LINT1 is masked
-    //
-    Value = BitFieldWrite32 (Value, 16, 16, 1);
-  }
-  MmioWrite32 (ApicBase + APIC_REGISTER_LINT1_VECTOR_OFFSET, Value);
-}
-
 
 /**
   Wrapper function for all procedures assigned to AP.
@@ -1200,11 +1136,6 @@ ApProcWrapper (
   VOID                  *Parameter;
   UINTN                 ProcessorNumber;
   CPU_DATA_BLOCK        *CpuData;
-
-  //
-  // Program virtual wire mode for AP, since it will be lost after AP wake up
-  //
-  ProgramVirtualWireMode (FALSE);
 
   //
   // Initialize Debug Agent to support source level debug on AP code.
@@ -1249,71 +1180,6 @@ ApProcWrapper (
 }
 
 /**
-  Sends INIT-SIPI-SIPI to AP.
-
-  This function sends INIT-SIPI-SIPI to AP, and assign procedure specified by ApFunction.
-
-  @param  ProcessorNumber The processor number of the specified AP.
-  @param  ApicID          The Local APIC ID of the specified AP.
-  @param  ApFunction      The procedure for AP to work on.
-
-**/
-VOID
-SendInitSipiSipi (
-  IN UINTN              ProcessorNumber,
-  IN UINT32             ApicID,
-  IN VOID               *ApFunction
-  )
-{
-  UINTN                 ApicBase;
-  UINT32                ICRLow;
-  UINT32                ICRHigh;
-
-  UINT32                VectorNumber;
-  UINT32                DeliveryMode;
-
-  ASSERT (ApicID < MAX_CPU_NUMBER);
-
-  mExchangeInfo->ApFunction = ApFunction;
-  mExchangeInfo->ProcessorNumber[ApicID] = (UINT32) ProcessorNumber;
-
-  ICRHigh = ApicID << 24;
-  ICRLow  = SPECIFY_CPU_MODE_BIT | TRIGGER_MODE_LEVEL_BIT | ASSERT_BIT;
-
-  VectorNumber = 0;
-  DeliveryMode = DELIVERY_MODE_INIT;
-  ICRLow      |= VectorNumber | (DeliveryMode << 8);
-
-  ApicBase = (UINTN)AsmMsrBitFieldRead64 (MSR_IA32_APIC_BASE, 12, 35) << 12;;
-
-  //
-  // Write Interrupt Command Registers to send INIT IPI.
-  //
-  MmioWrite32 (ApicBase + APIC_REGISTER_ICR_HIGH_OFFSET, ICRHigh);
-  MmioWrite32 (ApicBase + APIC_REGISTER_ICR_LOW_OFFSET, ICRLow);
-
-  MicroSecondDelay (10);
-
-  VectorNumber = (UINT32) RShiftU64 (mStartupVector, 12);
-  DeliveryMode = DELIVERY_MODE_SIPI;
-  ICRLow = SPECIFY_CPU_MODE_BIT | TRIGGER_MODE_LEVEL_BIT | ASSERT_BIT;
-
-  ICRLow |= VectorNumber | (DeliveryMode << 8);
-
-  //
-  // Write Interrupt Command Register to send first SIPI IPI.
-  //
-  MmioWrite32 (ApicBase + APIC_REGISTER_ICR_LOW_OFFSET, ICRLow);
-
-  MicroSecondDelay (200);
-
-  //
-  // Write Interrupt Command Register to send second SIPI IPI.
-  //
-  MmioWrite32 (ApicBase + APIC_REGISTER_ICR_LOW_OFFSET, ICRLow);
-}
-
-/**
   Function to wake up a specified AP and assign procedure to it.
 
   @param  ProcessorNumber  Handle number of the specified processor.
@@ -1349,10 +1215,11 @@ WakeUpAp (
              );
   ASSERT_EFI_ERROR (Status);
 
+  mExchangeInfo->ApFunction = (VOID *) (UINTN) ApProcWrapper;
+  mExchangeInfo->ProcessorNumber[ProcessorInfoBuffer.ProcessorId] = (UINT32) ProcessorNumber;
   SendInitSipiSipi (
-    ProcessorNumber,
     (UINT32) ProcessorInfoBuffer.ProcessorId,
-    (VOID *) (UINTN) ApProcWrapper
+    (UINT32) (UINTN) mStartupVector
     );
 }
 
@@ -1381,10 +1248,11 @@ ResetProcessorToIdleState (
              );
   ASSERT_EFI_ERROR (Status);
 
+  mExchangeInfo->ApFunction = NULL;
+  mExchangeInfo->ProcessorNumber[ProcessorInfoBuffer.ProcessorId] = (UINT32) ProcessorNumber;
   SendInitSipiSipi (
-    ProcessorNumber,
     (UINT32) ProcessorInfoBuffer.ProcessorId,
-    NULL
+    (UINT32) (UINTN) mStartupVector
     );
 
   CpuData = &mMPSystemData.CpuData[ProcessorNumber];

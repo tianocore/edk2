@@ -45,6 +45,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   TimerLib
@@ -59,6 +60,7 @@
   BaseLib
   SynchronizationLib
   DebugAgentLib
+  LocalApicLib
 
 [Protocols]
   gEfiMpServiceProtocolGuid                   ## PRODUCES
