@@ -74,3 +74,6 @@
   UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
   UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
   UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
+  UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
+  UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
+

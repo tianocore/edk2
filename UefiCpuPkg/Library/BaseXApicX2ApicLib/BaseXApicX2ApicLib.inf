@@ -1,0 +1,47 @@
+## @file
+#  Component description file for CPU Local APIC Library.
+#
+#  This library instance supports x2APIC capable processors
+#  which have xAPIC and x2APIC modes.
+#
+#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseXApicX2ApicLib
+  FILE_GUID                      = 967B6E05-F10D-4c10-8BF7-365291CA143F
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LocalApicLib 
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  BaseXApicX2ApicLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  TimerLib
+  IoLib
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
+
