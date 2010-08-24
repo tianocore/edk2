@@ -70,6 +70,11 @@ typedef struct {
   UINT32                    Channel;
   UINT32                    Device;
   ATAPI_IDENTIFY_DATA       IdentifyData;
+  
+  //
+  // The flag indicates if 16-byte command can be used
+  //
+  BOOLEAN                   Cdb16Byte;
 } SCSI_DISK_DEV;
 
 #define SCSI_DISK_DEV_FROM_THIS(a)  CR (a, SCSI_DISK_DEV, BlkIo, SCSI_DISK_DEV_SIGNATURE)
