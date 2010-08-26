@@ -163,7 +163,7 @@ InternalMemScanMem8 (
   Pointer = (CONST UINT8*)Buffer;
   do {
     if (*(Pointer++) == Value) {
-      return Pointer;
+      return --Pointer;
     }
   } while (--Length != 0);
   return NULL;
@@ -193,7 +193,7 @@ InternalMemScanMem16 (
   Pointer = (CONST UINT16*)Buffer;
   do {
     if (*(Pointer++) == Value) {
-      return Pointer;
+      return --Pointer;
     }
   } while (--Length != 0);
   return NULL;
@@ -223,7 +223,7 @@ InternalMemScanMem32 (
   Pointer = (CONST UINT32*)Buffer;
   do {
     if (*(Pointer++) == Value) {
-      return Pointer;
+      return --Pointer;
     }
   } while (--Length != 0);
   return NULL;
@@ -253,7 +253,7 @@ InternalMemScanMem64 (
   Pointer = (CONST UINT64*)Buffer;
   do {
     if (*(Pointer++) == Value) {
-      return Pointer;
+      return --Pointer;
     }
   } while (--Length != 0);
   return NULL;
