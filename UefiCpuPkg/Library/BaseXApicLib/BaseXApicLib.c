@@ -203,6 +203,67 @@ GetApicId (
 }
 
 /**
+  Get the value of the local APIC version register.
+
+  @return  the value of the local APIC version register.
+**/
+UINT32
+EFIAPI
+GetApicVersion (
+  VOID
+  )
+{
+  return ReadLocalApicReg (XAPIC_VERSION_OFFSET);
+}
+
+/**
+  Send a Fixed IPI to a specified target processor.
+
+  This function returns after the IPI has been accepted by the target processor. 
+
+  @param  ApicId   The local APIC ID of the target processor.
+  @param  Vector   The vector number of the interrupt being sent.
+**/
+VOID
+EFIAPI
+SendFixedIpi (
+  IN UINT32          ApicId,
+  IN UINT8           Vector
+  )
+{
+  LOCAL_APIC_ICR_LOW IcrLow;
+
+  IcrLow.Uint32 = 0;
+  IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_FIXED;
+  IcrLow.Bits.Level = 1;
+  IcrLow.Bits.Vector = Vector;
+  SendIpi (IcrLow.Uint32, ApicId);
+}
+
+/**
+  Send a Fixed IPI to all processors excluding self.
+
+  This function returns after the IPI has been accepted by the target processors. 
+
+  @param  Vector   The vector number of the interrupt being sent.
+**/
+VOID
+EFIAPI
+SendFixedIpiAllExcludingSelf (
+  IN UINT8           Vector
+  )
+{
+  LOCAL_APIC_ICR_LOW IcrLow;
+
+  IcrLow.Uint32 = 0;
+  IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_FIXED;
+  IcrLow.Bits.Level = 1;
+  IcrLow.Bits.DestinationShorthand = LOCAL_APIC_DESTINATION_SHORTHAND_ALL_EXCLUDING_SELF;
+  IcrLow.Bits.Vector = Vector;
+  SendIpi (IcrLow.Uint32, 0);
+}
+
+/**
   Send a SMI IPI to a specified target processor.
 
   This function returns after the IPI has been accepted by the target processor. 
@@ -381,43 +442,22 @@ ProgramVirtualWireMode (
   //
   // Program the LINT0 vector entry as ExtInt. Not masked, edge, active high.
   //
-  Lint.Uint32 = ReadLocalApicReg (XAPIC_LINT0_VECTOR_OFFSET);
+  Lint.Uint32 = ReadLocalApicReg (XAPIC_LVT_LINT0_OFFSET);
   Lint.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_EXTINT;
   Lint.Bits.InputPinPolarity = 0;
   Lint.Bits.TriggerMode = 0;
   Lint.Bits.Mask = 0;
-  WriteLocalApicReg (XAPIC_LINT0_VECTOR_OFFSET, Lint.Uint32);
+  WriteLocalApicReg (XAPIC_LVT_LINT0_OFFSET, Lint.Uint32);
 
   //
   // Program the LINT0 vector entry as NMI. Not masked, edge, active high.
   //
-  Lint.Uint32 = ReadLocalApicReg (XAPIC_LINT1_VECTOR_OFFSET);
+  Lint.Uint32 = ReadLocalApicReg (XAPIC_LVT_LINT1_OFFSET);
   Lint.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_NMI;
   Lint.Bits.InputPinPolarity = 0;
   Lint.Bits.TriggerMode = 0;
   Lint.Bits.Mask = 0;
-  WriteLocalApicReg (XAPIC_LINT1_VECTOR_OFFSET, Lint.Uint32);
-}
-
-/**
-  Get the divide value from the DCR (Divide Configuration Register) by which
-  the processor's bus clock is divided to form the time base for the APIC timer.
-
-  @return The divide value is one of 1,2,4,8,16,32,64,128.
-**/
-UINTN
-EFIAPI
-GetApicTimerDivisor (
-  VOID
-  )
-{
-  UINT32         DivideValue;
-  LOCAL_APIC_DCR Dcr;
-
-  Dcr.Uint32 = ReadLocalApicReg (XAPIC_TIMER_DIVIDE_CONFIGURATION_OFFSET);
-  DivideValue = Dcr.Bits.DivideValue1 | (Dcr.Bits.DivideValue2 << 2);
-  DivideValue = (DivideValue + 1) & 0x7;
-  return ((UINTN)1) << DivideValue;
+  WriteLocalApicReg (XAPIC_LVT_LINT1_OFFSET, Lint.Uint32);
 }
 
 /**
@@ -508,6 +548,47 @@ InitializeApicTimer (
   LvtTimer.Bits.Mask = 0;
   LvtTimer.Bits.Vector = Vector;
   WriteLocalApicReg (XAPIC_LVT_TIMER_OFFSET, LvtTimer.Uint32);
+}
+
+/**
+  Get the state of the local APIC timer.
+
+  @param DivideValue   Return the divide value for the DCR. It is one of 1,2,4,8,16,32,64,128.
+  @param PeriodicMode  Return the timer mode. If TRUE, timer mode is peridoic. Othewise, timer mode is one-shot.
+  @param Vector        Return the timer interrupt vector number.
+**/
+VOID
+EFIAPI
+GetApicTimerState (
+  OUT UINTN    *DivideValue  OPTIONAL,
+  OUT BOOLEAN  *PeriodicMode  OPTIONAL,
+  OUT UINT8    *Vector  OPTIONAL
+  )
+{
+  UINT32 Divisor;
+  LOCAL_APIC_DCR Dcr;
+  LOCAL_APIC_LVT_TIMER LvtTimer;
+
+  if (DivideValue != NULL) {
+    Dcr.Uint32 = ReadLocalApicReg (XAPIC_TIMER_DIVIDE_CONFIGURATION_OFFSET);
+    Divisor = Dcr.Bits.DivideValue1 | (Dcr.Bits.DivideValue2 << 2);
+    Divisor = (Divisor + 1) & 0x7;
+    *DivideValue = ((UINTN)1) << Divisor;
+  }
+
+  if (PeriodicMode != NULL || Vector != NULL) {
+    LvtTimer.Uint32 = ReadLocalApicReg (XAPIC_LVT_TIMER_OFFSET);
+    if (PeriodicMode != NULL) {
+      if (LvtTimer.Bits.TimerMode == 1) {
+        *PeriodicMode = TRUE;
+      } else {
+        *PeriodicMode = FALSE;
+      }
+    }
+    if (Vector != NULL) {
+      *Vector = (UINT8) LvtTimer.Bits.Vector;
+    }
+  }
 }
 
 /**

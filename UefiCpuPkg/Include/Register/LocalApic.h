@@ -30,15 +30,16 @@
 //
 // Definition for Local APIC registers and related values
 //
-#define XAPIC_ID_OFFSET                         0x0
+#define XAPIC_ID_OFFSET                         0x20
+#define XAPIC_VERSION_OFFSET                    0x30
 #define XAPIC_EOI_OFFSET                        0x0b0
 #define XAPIC_ICR_DFR_OFFSET                    0x0e0
 #define XAPIC_SPURIOUS_VECTOR_OFFSET            0x0f0
 #define XAPIC_ICR_LOW_OFFSET                    0x300
 #define XAPIC_ICR_HIGH_OFFSET                   0x310
 #define XAPIC_LVT_TIMER_OFFSET                  0x320
-#define XAPIC_LINT0_VECTOR_OFFSET               0x350
-#define XAPIC_LINT1_VECTOR_OFFSET               0x360
+#define XAPIC_LVT_LINT0_OFFSET                  0x350
+#define XAPIC_LVT_LINT1_OFFSET                  0x360
 #define XAPIC_TIMER_INIT_COUNT_OFFSET           0x380
 #define XAPIC_TIMER_CURRENT_COUNT_OFFSET        0x390
 #define XAPIC_TIMER_DIVIDE_CONFIGURATION_OFFSET 0x3E0
@@ -70,6 +71,20 @@ typedef union {
   } Bits;
   UINT64    Uint64;
 } MSR_IA32_APIC_BASE;
+
+//
+// Local APIC Version Register.
+//
+typedef union {
+  struct {
+    UINT32  Version:8;                  ///< The version numbers of the local APIC.
+    UINT32  Reserved0:8;                ///< Reserved.
+    UINT32  MaxLvtEntry:8;              ///< Number of LVT entries minus 1.
+    UINT32  EoiBroadcastSuppression:1;  ///< 1 if EOI-broadcast suppression supported.
+    UINT32  Reserved1:7;                ///< Reserved.
+  } Bits;
+  UINT32    Uint32;
+} LOCAL_APIC_VERSION;
 
 //
 // Low half of Interrupt Command Register (ICR).

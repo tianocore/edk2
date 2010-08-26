@@ -76,6 +76,45 @@ GetApicId (
   );
 
 /**
+  Get the value of the local APIC version register.
+
+  @return  the value of the local APIC version register.
+**/
+UINT32
+EFIAPI
+GetApicVersion (
+  VOID
+  );
+
+/**
+  Send a Fixed IPI to a specified target processor.
+
+  This function returns after the IPI has been accepted by the target processor. 
+
+  @param  ApicId   The local APIC ID of the target processor.
+  @param  Vector   The vector number of the interrupt being sent.
+**/
+VOID
+EFIAPI
+SendFixedIpi (
+  IN UINT32          ApicId,
+  IN UINT8           Vector
+  );
+
+/**
+  Send a Fixed IPI to all processors excluding self.
+
+  This function returns after the IPI has been accepted by the target processors. 
+
+  @param  Vector   The vector number of the interrupt being sent.
+**/
+VOID
+EFIAPI
+SendFixedIpiAllExcludingSelf (
+  IN UINT8           Vector
+  );
+
+/**
   Send a SMI IPI to a specified target processor.
 
   This function returns after the IPI has been accepted by the target processor. 
@@ -174,18 +213,6 @@ ProgramVirtualWireMode (
   );
 
 /**
-  Get the divide value from the DCR (Divide Configuration Register) by which
-  the processor's bus clock is divided to form the time base for the APIC timer.
-
-  @return The divide value is one of 1,2,4,8,16,32,64,128.
-**/
-UINTN
-EFIAPI
-GetApicTimerDivisor (
-  VOID
-  );
-
-/**
   Read the initial count value from the init-count register.
 
   @return The initial count value read from the init-count register.
@@ -225,6 +252,21 @@ InitializeApicTimer (
   IN UINT32  InitCount,
   IN BOOLEAN PeriodicMode,
   IN UINT8   Vector
+  );
+
+/**
+  Get the state of the local APIC timer.
+
+  @param DivideValue   Return the divide value for the DCR. It is one of 1,2,4,8,16,32,64,128.
+  @param PeriodicMode  Return the timer mode. If TRUE, timer mode is peridoic. Othewise, timer mode is one-shot.
+  @param Vector        Return the timer interrupt vector number.
+**/
+VOID
+EFIAPI
+GetApicTimerState (
+  OUT UINTN    *DivideValue  OPTIONAL,
+  OUT BOOLEAN  *PeriodicMode  OPTIONAL,
+  OUT UINT8    *Vector  OPTIONAL
   );
 
 /**
