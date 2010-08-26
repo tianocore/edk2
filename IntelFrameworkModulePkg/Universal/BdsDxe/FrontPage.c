@@ -663,50 +663,26 @@ GetOptionalStringByIndex (
   OUT     CHAR16                  **String
   )
 {
-  UINT8          StrNum;
-  UINTN          CurrentStrLen;
-  CHAR8*         CharInStr;
-  EFI_STATUS     Status;
+  UINTN          StrSize;
 
-  StrNum        = 0;
-  Status        = EFI_NOT_FOUND;
-  CharInStr     = OptionalStrStart;
-
-  if (Index != 1) {
-    CurrentStrLen = 0;
-    //
-    // look for the two consecutive zeros, check the string limit by the way.
-    //
-    while (*CharInStr != 0 || *(CharInStr+1) != 0) { 
-      if (*CharInStr == 0) {
-        StrNum += 1;
-        CharInStr++;
-      }
-  
-      if (StrNum == Index) {
-        Status = EFI_SUCCESS;
-        break;
-      }
-  
-      CurrentStrLen = AsciiStrLen(CharInStr);
-  
-      //
-      // forward the pointer
-      //
-      OptionalStrStart = CharInStr;
-      CharInStr += CurrentStrLen;
-    }
-  
-    if (EFI_ERROR (Status)) {
-      *String = GetStringById (STRING_TOKEN (STR_MISSING_STRING));
-      return Status;
-    }
-  } else {
-    CurrentStrLen = AsciiStrLen(CharInStr);
+  if (Index == 0) {
+    *String = AllocateZeroPool (sizeof (CHAR16));
+    return EFI_SUCCESS;
   }
 
-  *String = AllocatePool((CurrentStrLen + 1)*sizeof(CHAR16));
-  AsciiStrToUnicodeStr(OptionalStrStart, *String);
+  StrSize = 0;
+  do {
+    Index--;
+    OptionalStrStart += StrSize;
+    StrSize           = AsciiStrSize (OptionalStrStart);
+  } while (OptionalStrStart[StrSize] != 0 && Index != 0);
+
+  if (Index != 0) {
+    *String = GetStringById (STRING_TOKEN (STR_MISSING_STRING));
+  } else {
+    *String = AllocatePool (StrSize * sizeof (CHAR16));
+    AsciiStrToUnicodeStr (OptionalStrStart, *String);
+  }
 
   return EFI_SUCCESS;
 }
