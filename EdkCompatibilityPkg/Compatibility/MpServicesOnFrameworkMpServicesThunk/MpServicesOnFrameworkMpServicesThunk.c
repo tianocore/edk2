@@ -1138,6 +1138,12 @@ ApProcWrapper (
   CPU_DATA_BLOCK        *CpuData;
 
   //
+  // Program virtual wire mode for AP, since it will be lost after AP wake up
+  //
+  ProgramVirtualWireMode ();
+  DisableLvtInterrupts ();
+
+  //
   // Initialize Debug Agent to support source level debug on AP code.
   //
   InitializeDebugAgent (DEBUG_AGENT_INIT_DXE_AP, NULL, NULL);
