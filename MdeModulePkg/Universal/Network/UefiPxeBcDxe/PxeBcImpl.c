@@ -561,15 +561,16 @@ EfiPxeBcDhcp (
   IN BOOLEAN                          SortOffers
   )
 {
-  PXEBC_PRIVATE_DATA      *Private;
-  EFI_PXE_BASE_CODE_MODE  *Mode;
-  EFI_DHCP4_PROTOCOL      *Dhcp4;
-  EFI_DHCP4_CONFIG_DATA   Dhcp4CfgData;
-  EFI_DHCP4_MODE_DATA     Dhcp4Mode;
-  EFI_DHCP4_PACKET_OPTION *OptList[PXEBC_DHCP4_MAX_OPTION_NUM];
-  UINT32                  OptCount;
-  EFI_STATUS              Status;
-  EFI_ARP_CONFIG_DATA     ArpConfigData;
+  PXEBC_PRIVATE_DATA           *Private;
+  EFI_PXE_BASE_CODE_MODE       *Mode;
+  EFI_DHCP4_PROTOCOL           *Dhcp4;
+  EFI_DHCP4_CONFIG_DATA        Dhcp4CfgData;
+  EFI_DHCP4_MODE_DATA          Dhcp4Mode;
+  EFI_DHCP4_PACKET_OPTION      *OptList[PXEBC_DHCP4_MAX_OPTION_NUM];
+  UINT32                       OptCount;
+  EFI_STATUS                   Status;
+  EFI_ARP_CONFIG_DATA          ArpConfigData;
+  EFI_PXE_BASE_CODE_IP_FILTER  IpFilter;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -587,6 +588,11 @@ EfiPxeBcDhcp (
   }
 
   Mode->IcmpErrorReceived = FALSE;
+
+  //
+  // Stop Udp4Read instance
+  //
+  Private->Udp4Read->Configure (Private->Udp4Read, NULL);
 
   //
   // Initialize the DHCP options and build the option list
@@ -694,9 +700,41 @@ ON_EXIT:
         Mode->RouteTable[1].SubnetMask.Addr[0] = 0;
         Mode->RouteTable[1].GwAddr.Addr[0]     = Private->GatewayIp.Addr[0];
       }
+
+      //
+      // Flush new station IP address into Udp4CfgData and Ip4ConfigData
+      //
+      CopyMem (&Private->Udp4CfgData.StationAddress, &Private->StationIp, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Private->Udp4CfgData.SubnetMask, &Private->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Private->Ip4ConfigData.StationAddress, &Private->StationIp, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Private->Ip4ConfigData.SubnetMask, &Private->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+  
+      //
+      // Reconfigure the Ip4 instance to capture background ICMP packets with new station Ip address.
+      //
+      Private->Ip4->Cancel (Private->Ip4, &Private->IcmpErrorRcvToken);
+      Private->Ip4->Configure (Private->Ip4, NULL);
+  
+      Status = Private->Ip4->Configure (Private->Ip4, &Private->Ip4ConfigData);
+      if (EFI_ERROR (Status)) {
+        goto ON_EXIT;
+      }
+  
+      Status = Private->Ip4->Receive (Private->Ip4, &Private->IcmpErrorRcvToken);
+      if (EFI_ERROR (Status)) {
+        goto ON_EXIT;
+      } 
     }
   }
 
+  //
+  // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP 
+  // receive filter list emptied and the filter set to EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP.
+  //
+  ZeroMem(&IpFilter, sizeof (EFI_PXE_BASE_CODE_IP_FILTER));
+  IpFilter.Filters = EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP;
+  This->SetIpFilter (This, &IpFilter);
+  
   return Status;
 }
 
@@ -765,6 +803,7 @@ EfiPxeBcDiscover (
   UINT16                          Index;
   EFI_STATUS                      Status;
   PXEBC_BOOT_SVR_ENTRY            *BootSvrEntry;
+  EFI_PXE_BASE_CODE_IP_FILTER     IpFilter;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -786,6 +825,11 @@ EfiPxeBcDiscover (
     return EFI_NOT_STARTED;
   }
 
+  //
+  // Stop Udp4Read instance
+  //
+  Private->Udp4Read->Configure (Private->Udp4Read, NULL);
+
   Mode->IcmpErrorReceived = FALSE;
 
   //
@@ -798,7 +842,8 @@ EfiPxeBcDiscover (
 
     if (!Mode->PxeDiscoverValid || !Mode->PxeReplyReceived || (!Mode->PxeBisReplyReceived && UseBis)) {
 
-      return EFI_INVALID_PARAMETER;
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;  
     }
 
     DefaultInfo.IpCnt                 = 1;
@@ -821,7 +866,8 @@ EfiPxeBcDiscover (
       //
       // Address is not acquired or no discovery options.
       //
-      return EFI_INVALID_PARAMETER;
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;  
     }
 
     DefaultInfo.UseMCast    = (BOOLEAN)!IS_DISABLE_MCAST_DISCOVER (VendorOpt->DiscoverCtrl);
@@ -859,7 +905,7 @@ EfiPxeBcDiscover (
       }
 
       if (EFI_ERROR (Status)) {
-        return Status;
+        goto ON_EXIT;
       }
 
       DefaultInfo.IpCnt = BootSvrEntry->IpCnt;
@@ -867,7 +913,9 @@ EfiPxeBcDiscover (
       if (DefaultInfo.IpCnt >= 1) {
         CreatedInfo = AllocatePool (sizeof (DefaultInfo) + (DefaultInfo.IpCnt - 1) * sizeof (*SrvList));
         if (CreatedInfo == NULL) {
-          return EFI_OUT_OF_RESOURCES;
+          Status = EFI_OUT_OF_RESOURCES;
+          goto ON_EXIT;
+          
         }     
       
         CopyMem (CreatedInfo, &DefaultInfo, sizeof (DefaultInfo));
@@ -895,14 +943,16 @@ EfiPxeBcDiscover (
       }
 
       if (Index != Info->IpCnt) {
-        return EFI_INVALID_PARAMETER;
+        Status = EFI_INVALID_PARAMETER;
+        goto ON_EXIT;        
       }
     }
   }
 
   if ((!Info->UseUCast && !Info->UseBCast && !Info->UseMCast) || (Info->MustUseList && Info->IpCnt == 0)) {
 
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto ON_EXIT;
   }
   //
   // Execute discover by UniCast/BroadCast/MultiCast
@@ -987,6 +1037,16 @@ EfiPxeBcDiscover (
   if (CreatedInfo != NULL) {
     FreePool (CreatedInfo);
   }
+
+ON_EXIT:
+
+  //
+  // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP 
+  // receive filter list emptied and the filter set to EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP.
+  //
+  ZeroMem(&IpFilter, sizeof (EFI_PXE_BASE_CODE_IP_FILTER));
+  IpFilter.Filters = EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP;
+  This->SetIpFilter (This, &IpFilter);
   
   return Status;
 }
@@ -1078,11 +1138,12 @@ EfiPxeBcMtftp (
   IN BOOLEAN                          DontUseBuffer
   )
 {
-  PXEBC_PRIVATE_DATA      *Private;
-  EFI_MTFTP4_CONFIG_DATA  Mtftp4Config;
-  EFI_STATUS              Status;
-  EFI_PXE_BASE_CODE_MODE  *Mode;
-  EFI_MAC_ADDRESS         TempMacAddr;
+  PXEBC_PRIVATE_DATA           *Private;
+  EFI_MTFTP4_CONFIG_DATA       Mtftp4Config;
+  EFI_STATUS                   Status;
+  EFI_PXE_BASE_CODE_MODE       *Mode;
+  EFI_MAC_ADDRESS              TempMacAddr;
+  EFI_PXE_BASE_CODE_IP_FILTER  IpFilter;
 
   if ((This == NULL)                                                          ||
       (Filename == NULL)                                                      ||
@@ -1107,6 +1168,11 @@ EfiPxeBcMtftp (
       return EFI_DEVICE_ERROR;
     }
   }
+
+  //
+  // Stop Udp4Read instance
+  //
+  Private->Udp4Read->Configure (Private->Udp4Read, NULL);
 
   Mode->TftpErrorReceived = FALSE;
   Mode->IcmpErrorReceived = FALSE;
@@ -1207,6 +1273,14 @@ EfiPxeBcMtftp (
   if (Status == EFI_ICMP_ERROR) {
     Mode->IcmpErrorReceived = TRUE;
   }
+
+  //
+  // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP 
+  // receive filter list emptied and the filter set to EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP.
+  //
+  ZeroMem(&IpFilter, sizeof (EFI_PXE_BASE_CODE_IP_FILTER));
+  IpFilter.Filters = EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP;
+  This->SetIpFilter (This, &IpFilter);
 
   return Status;
 }
