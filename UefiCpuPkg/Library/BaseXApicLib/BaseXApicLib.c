@@ -461,6 +461,28 @@ ProgramVirtualWireMode (
 }
 
 /**
+  Disable LINT0 & LINT1 interrupts.
+
+  This function sets the mask flag in the LVT LINT0 & LINT1 registers.
+**/
+VOID
+EFIAPI
+DisableLvtInterrupts (
+  VOID
+  )
+{
+  LOCAL_APIC_LVT_LINT LvtLint;
+
+  LvtLint.Uint32 = ReadLocalApicReg (XAPIC_LVT_LINT0_OFFSET);
+  LvtLint.Bits.Mask = 1;
+  WriteLocalApicReg (XAPIC_LVT_LINT0_OFFSET, LvtLint.Uint32);
+
+  LvtLint.Uint32 = ReadLocalApicReg (XAPIC_LVT_LINT1_OFFSET);
+  LvtLint.Bits.Mask = 1;
+  WriteLocalApicReg (XAPIC_LVT_LINT1_OFFSET, LvtLint.Uint32);
+}
+
+/**
   Read the initial count value from the init-count register.
 
   @return The initial count value read from the init-count register.

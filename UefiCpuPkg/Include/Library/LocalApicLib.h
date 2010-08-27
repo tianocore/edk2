@@ -213,6 +213,17 @@ ProgramVirtualWireMode (
   );
 
 /**
+  Disable LINT0 & LINT1 interrupts.
+
+  This function sets the mask flag in the LVT LINT0 & LINT1 registers.
+**/
+VOID
+EFIAPI
+DisableLvtInterrupts (
+  VOID
+  );
+
+/**
   Read the initial count value from the init-count register.
 
   @return The initial count value read from the init-count register.
