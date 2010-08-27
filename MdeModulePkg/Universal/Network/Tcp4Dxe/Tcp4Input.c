@@ -1,7 +1,7 @@
 /** @file
   TCP input process routines.
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -33,7 +33,7 @@ TcpSeqAcceptable (
   )
 {
   return (TCP_SEQ_LEQ (Tcb->RcvWl2, Seg->End) &&
-          TCP_SEQ_LEQ (Seg->Seq, Tcb->RcvWl2 + Tcb->RcvWnd));
+          TCP_SEQ_LT (Seg->Seq, Tcb->RcvWl2 + Tcb->RcvWnd));
 }
 
 
@@ -926,6 +926,14 @@ TcpInput (
   //
 
   //
+  // Clear probe timer since the RecvWindow is opened.
+  //
+  if (Tcb->ProbeTimerOn && (Seg->Wnd != 0)) {
+    TcpClearTimer (Tcb, TCP_TIMER_PROBE);
+    Tcb->ProbeTimerOn = FALSE;
+  }
+
+  //
   // First step: Check whether SEG.SEQ is acceptable
   //
   if (TcpSeqAcceptable (Tcb, Seg) == 0) {
@@ -1280,11 +1288,6 @@ StepSix:
 
   Tcb->Idle = 0;
   TcpSetKeepaliveTimer (Tcb);
-
-  if (TCP_TIMER_ON (Tcb->EnabledTimer, TCP_TIMER_PROBE)) {
-
-    TcpClearTimer (Tcb, TCP_TIMER_PROBE);
-  }
 
   if (TCP_FLG_ON (Seg->Flag, TCP_FLG_URG) &&
       !TCP_FIN_RCVD (Tcb->State)) {

@@ -1,7 +1,7 @@
 /** @file
   TCP timer related functions.
     
-Copyright (c) 2005 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -212,6 +212,7 @@ TcpProbeTimeout (
   if ((TcpDataToSend (Tcb, 1) != 0) && (TcpToSendData (Tcb, 1) > 0)) {
 
     ASSERT (TCP_TIMER_ON (Tcb->EnabledTimer, TCP_TIMER_REXMIT) != 0);
+    Tcb->ProbeTimerOn = FALSE;
     return ;
   }
 
@@ -387,8 +388,9 @@ TcpSetProbeTimer (
   IN OUT TCP_CB *Tcb
   )
 {
-  if (!TCP_TIMER_ON (Tcb->EnabledTimer, TCP_TIMER_PROBE)) {
-    Tcb->ProbeTime = Tcb->Rto;
+  if (!Tcb->ProbeTimerOn) {
+    Tcb->ProbeTime    = Tcb->Rto;
+    Tcb->ProbeTimerOn = TRUE;
 
   } else {
     Tcb->ProbeTime <<= 1;

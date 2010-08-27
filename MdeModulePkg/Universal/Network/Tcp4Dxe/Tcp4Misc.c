@@ -77,7 +77,9 @@ TcpInitTcbLocal (
   //
   // First window size is never scaled
   //
-  Tcb->RcvWndScale = 0;
+  Tcb->RcvWndScale  = 0;
+
+  Tcb->ProbeTimerOn = FALSE;
 }
 
 
