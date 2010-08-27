@@ -1,0 +1,70 @@
+## @file
+# Component name for module Mtftp4
+#
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Mtftp4Dxe
+  FILE_GUID                      = DC3641B8-2FA8-4ed3-BC1F-F9962A03454B
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Mtftp4DriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gMtftp4DriverBinding                        
+#  COMPONENT_NAME                =  gMtftp4ComponentName
+#  COMPONENT_NAME2               =  gMtftp4ComponentName2
+#
+
+[Sources]
+  Mtftp4Option.c
+  Mtftp4Rrq.c
+  Mtftp4Impl.h
+  ComponentName.c
+  Mtftp4Support.c
+  Mtftp4Impl.c
+  Mtftp4Option.h
+  Mtftp4Support.h
+  Mtftp4Driver.h
+  Mtftp4Driver.c
+  Mtftp4Wrq.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  DebugLib
+  NetLib
+  UdpIoLib
+  MemoryAllocationLib
+  BaseMemoryLib
+
+
+[Protocols]
+  gEfiMtftp4ServiceBindingProtocolGuid          # PROTOCOL ALWAYS_CONSUMED
+  gEfiMtftp4ProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
+  gEfiUdp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiUdp4ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
+

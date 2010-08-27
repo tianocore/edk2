@@ -1,0 +1,61 @@
+## @file
+# Component description file for ARP module
+#
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+#   This program and the accompanying materials
+#   are licensed and made available under the terms and conditions of the BSD License
+#   which accompanies this distribution.  The full text of the license may be found at
+#   http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArpDxe
+  FILE_GUID                      = 529D3F93-E8E9-4e73-B1E1-BDF6A9D50113
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ArpDriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gArpDriverBinding                       
+#  COMPONENT_NAME                =  gArpComponentName
+#  COMPONENT_NAME2               =  gArpComponentName2
+#
+
+[Sources]
+  ArpMain.c
+  ArpDriver.h
+  ComponentName.c
+  ArpImpl.h
+  ArpImpl.c
+  ArpDriver.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  DebugLib
+  NetLib
+  DpcLib
+
+[Protocols]
+  gEfiManagedNetworkServiceBindingProtocolGuid  # PROTOCOL ALWAYS_CONSUMED
+  gEfiArpServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiManagedNetworkProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+  gEfiArpProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED

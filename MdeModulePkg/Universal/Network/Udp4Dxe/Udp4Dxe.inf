@@ -1,0 +1,66 @@
+## @file
+# Component name for module Udp4
+#
+# FIX ME!
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Udp4Dxe
+  FILE_GUID                      = 6d6963ab-906d-4a65-a7ca-bd40e5d6af2b
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Udp4DriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gUdp4DriverBinding                        
+#  COMPONENT_NAME                =  gUdp4ComponentName
+#  COMPONENT_NAME2               =  gUdp4ComponentName2
+#
+
+[Sources]
+  Udp4Impl.h
+  Udp4Main.c
+  ComponentName.c
+  Udp4Impl.c
+  Udp4Driver.h
+  Udp4Driver.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  UefiLib
+  BaseLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  DebugLib
+  IpIoLib
+  NetLib
+  DpcLib
+
+[Protocols]
+  gEfiIp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
+  gEfiUdp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiIp4ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiUdp4ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
+  
