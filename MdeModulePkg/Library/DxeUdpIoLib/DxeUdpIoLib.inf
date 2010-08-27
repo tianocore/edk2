@@ -1,0 +1,55 @@
+## @file
+#  Instance of UdpIoLib.
+#
+#  This module provides UDP services by consuming EFI UDP4 Service Binding Protocol and
+#  EFI UDP4 Protocol.
+#  
+# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeUpdIoLib
+  FILE_GUID                      = 7E615AA1-41EE-49d4-B7E9-1D7A60AA5C8D
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UdpIoLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  DxeUdpIoLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  UdpIoLib
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  DpcLib
+
+[Protocols]
+  gEfiUdp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiUdp4ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
+  gEfiUdp6ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiUdp6ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
+  
