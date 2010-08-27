@@ -647,13 +647,14 @@ UpdateStackHob (
   while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
     if (CompareGuid (&gEfiHobMemoryAllocStackGuid, &(Hob.MemoryAllocationStack->AllocDescriptor.Name))) {
       //
-      // Build a new memory allocation HOB with old stack info with EfiConventionalMemory type
-      // to be reclaimed by DXE core.
+      // Build a new memory allocation HOB with old stack info with EfiBootServicesData type. Need to 
+      // avoid this region be reclaimed by DXE core as the IDT built in SEC might be on stack, and some 
+      // PEIMs may also keep key information on stack
       //
       BuildMemoryAllocationHob (
         Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress,
         Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength,
-        EfiConventionalMemory
+        EfiBootServicesData
         );
       //
       // Update the BSP Stack Hob to reflect the new stack info.
