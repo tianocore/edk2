@@ -354,6 +354,7 @@ DiscoverAtaDevice (
   //
   Acb = ZeroMem (&AtaDevice->Acb, sizeof (*Acb));
   Acb->AtaCommand = ATA_CMD_IDENTIFY_DRIVE;
+  Acb->AtaDeviceHead = (UINT8) (BIT7 | BIT6 | BIT5 | (AtaDevice->PortMultiplierPort << 4)); 
 
   //
   // Prepare for ATA pass through packet.
