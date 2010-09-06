@@ -28,7 +28,7 @@ from Common.String import *
 class Configuration(object):
     def __init__(self, Filename):
         self.Filename = Filename
-        
+
         self.Version = 0.1
 
         ## Identify to if check all items
@@ -49,14 +49,14 @@ class Configuration(object):
         # SpaceCheckAll
         #
         self.AutoCorrect = 0
-        
+
         # List customized Modifer here, split with ','
         # Defaultly use the definition in class DataType
         self.ModifierList = MODIFIER_LIST
-        
+
         ## General Checking
         self.GeneralCheckAll = 0
-        
+
         # Check whether NO Tab is used, replaced with spaces
         self.GeneralCheckNoTab = 1
         # The width of Tab
@@ -77,31 +77,33 @@ class Configuration(object):
         self.GeneralCheckCarriageReturn = 1
         # Check whether the file exists
         self.GeneralCheckFileExistence = 1
-        
+        # Check whether file has non ACSII char
+        self.GeneralCheckNonAcsii = 1
+
         ## Space Checking
         self.SpaceCheckAll = 1
-        
+
         ## Predicate Expression Checking
         self.PredicateExpressionCheckAll = 0
-        
+
         # Check whether Boolean values, variable type BOOLEAN not use explicit comparisons to TRUE or FALSE
         self.PredicateExpressionCheckBooleanValue = 1
-        # Check whether Non-Boolean comparisons use a compare operator (==, !=, >, < >=, <=). 
+        # Check whether Non-Boolean comparisons use a compare operator (==, !=, >, < >=, <=).
         self.PredicateExpressionCheckNonBooleanOperator = 1
         # Check whether a comparison of any pointer to zero must be done via the NULL type
         self.PredicateExpressionCheckComparisonNullType = 1
-        
+
         ## Headers Checking
         self.HeaderCheckAll = 0
-        
+
         # Check whether File header exists
         self.HeaderCheckFile = 1
         # Check whether Function header exists
         self.HeaderCheckFunction = 1
-        
+
         ## C Function Layout Checking
         self.CFunctionLayoutCheckAll = 0
-        
+
         # Check whether return type exists and in the first line
         self.CFunctionLayoutCheckReturnType = 1
         # Check whether any optional functional modifiers exist and next to the return type
@@ -119,10 +121,10 @@ class Configuration(object):
         self.CFunctionLayoutCheckNoInitOfVariable = 1
         # Check whether no use of STATIC for functions
         self.CFunctionLayoutCheckNoStatic = 1
-        
+
         ## Include Files Checking
         self.IncludeFileCheckAll = 0
-        
+
         #Check whether having include files with same name
         self.IncludeFileCheckSameName = 1
         # Check whether all include file contents is guarded by a #ifndef statement.
@@ -132,10 +134,10 @@ class Configuration(object):
         # Check whether include files contain only public or only private data
         # Check whether include files NOT contain code or define data variables
         self.IncludeFileCheckData = 1
-        
+
         ## Declarations and Data Types Checking
         self.DeclarationDataTypeCheckAll = 0
-        
+
         # Check whether no use of int, unsigned, char, void, static, long in any .c, .h or .asl files.
         self.DeclarationDataTypeCheckNoUseCType = 1
         # Check whether the modifiers IN, OUT, OPTIONAL, and UNALIGNED are used only to qualify arguments to a function and should not appear in a data type declaration
@@ -150,10 +152,10 @@ class Configuration(object):
         self.DeclarationDataTypeCheckSameStructure = 1
         # Check whether Union Type has a 'typedef' and the name is capital
         self.DeclarationDataTypeCheckUnionType = 1
-        
+
         ## Naming Conventions Checking
         self.NamingConventionCheckAll = 0
-        
+
         # Check whether only capital letters are used for #define declarations
         self.NamingConventionCheckDefineStatement = 1
         # Check whether only capital letters are used for typedef declarations
@@ -172,33 +174,33 @@ class Configuration(object):
         self.NamingConventionCheckFunctionName = 1
         # Check whether NO use short variable name with single character
         self.NamingConventionCheckSingleCharacterVariable = 1
-        
+
         ## Doxygen Checking
         self.DoxygenCheckAll = 0
-        
+
         # Check whether the file headers are followed Doxygen special documentation blocks in section 2.3.5
         self.DoxygenCheckFileHeader = 1
         # Check whether the function headers are followed Doxygen special documentation blocks in section 2.3.5
         self.DoxygenCheckFunctionHeader = 1
-        # Check whether the first line of text in a comment block is a brief description of the element being documented. 
+        # Check whether the first line of text in a comment block is a brief description of the element being documented.
         # The brief description must end with a period.
         self.DoxygenCheckCommentDescription = 1
         # Check whether comment lines with '///< ... text ...' format, if it is used, it should be after the code section.
         self.DoxygenCheckCommentFormat = 1
         # Check whether only Doxygen commands allowed to mark the code are @bug and @todo.
         self.DoxygenCheckCommand = 1
-        
+
         ## Meta-Data File Processing Checking
         self.MetaDataFileCheckAll = 0
-        
+
         # Check whether each file defined in meta-data exists
         self.MetaDataFileCheckPathName = 1
         # Generate a list for all files defined in meta-data files
         self.MetaDataFileCheckGenerateFileList = 1
         # The path of log file
         self.MetaDataFileCheckPathOfGenerateFileList = 'File.log'
-        # Check whether all Library Instances defined for a given module (or dependent library instance) match the module's type.  
-        # Each Library Instance must specify the Supported Module Types in its INF file, 
+        # Check whether all Library Instances defined for a given module (or dependent library instance) match the module's type.
+        # Each Library Instance must specify the Supported Module Types in its INF file,
         # and any module specifying the library instance must be one of the supported types.
         self.MetaDataFileCheckLibraryInstance = 1
         # Check whether a Library Instance has been defined for all dependent library classes
@@ -235,14 +237,17 @@ class Configuration(object):
         # The directory listed here will not be parsed, split with ','
         self.SkipDirList = []
 
+        # A list for binary file ext name
+        self.BinaryExtList = []
+
         self.ParseConfig()
-        
+
     def ParseConfig(self):
         Filepath = os.path.normpath(self.Filename)
         if not os.path.isfile(Filepath):
             ErrorMsg = "Can't find configuration file '%s'" % Filepath
             EdkLogger.error("Ecc", EdkLogger.ECC_ERROR, ErrorMsg, File = Filepath)
-        
+
         LineNo = 0
         for Line in open(Filepath, 'r'):
             LineNo = LineNo + 1
@@ -258,8 +263,10 @@ class Configuration(object):
                     continue
                 if List[0] == 'SkipDirList':
                     List[1] = GetSplitValueList(List[1], TAB_COMMA_SPLIT)
+                if List[0] == 'BinaryExtList':
+                    List[1] = GetSplitValueList(List[1], TAB_COMMA_SPLIT)
                 self.__dict__[List[0]] = List[1]
-    
+
     def ShowMe(self):
         print self.Filename
         for Key in self.__dict__.keys():

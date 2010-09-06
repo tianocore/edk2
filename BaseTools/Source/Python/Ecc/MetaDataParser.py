@@ -26,7 +26,7 @@ def GetIncludeListOfFile(WorkSpace, Filepath, Db):
     Filepath = os.path.normpath(Filepath)
     SqlCommand = """
                 select Value1, FullPath from Inf, File where Inf.Model = %s and Inf.BelongsToFile in(
-                    select distinct B.BelongsToFile from File as A left join Inf as B 
+                    select distinct B.BelongsToFile from File as A left join Inf as B
                         where A.ID = B.BelongsToFile and B.Model = %s and (A.Path || '%s' || B.Value1) = '%s')
                         and Inf.BelongsToFile = File.ID""" \
                 % (MODEL_META_DATA_PACKAGE, MODEL_EFI_SOURCE_FILE, '\\', Filepath)
@@ -36,7 +36,7 @@ def GetIncludeListOfFile(WorkSpace, Filepath, Db):
         InfFullPath = os.path.normpath(os.path.join(WorkSpace, Record[1]))
         (DecPath, DecName) = os.path.split(DecFullPath)
         (InfPath, InfName) = os.path.split(InfFullPath)
-        SqlCommand = """select Value1 from Dec where BelongsToFile = 
+        SqlCommand = """select Value1 from Dec where BelongsToFile =
                            (select ID from File where FullPath = '%s') and Model = %s""" \
                     % (DecFullPath, MODEL_EFI_INCLUDE)
         NewRecordSet = Db.TblDec.Exec(SqlCommand)
@@ -46,8 +46,21 @@ def GetIncludeListOfFile(WorkSpace, Filepath, Db):
             IncludePath = os.path.normpath(os.path.join(DecPath, NewRecord[0]))
             if IncludePath not in IncludeList:
                 IncludeList.append(IncludePath)
-    
+
     return IncludeList
+
+## Get the file list
+#
+# Search table file and find all specific type files
+#
+def GetFileList(FileModel, Db):
+    FileList = []
+    SqlCommand = """select FullPath from File where Model = %s""" % str(FileModel)
+    RecordSet = Db.TblFile.Exec(SqlCommand)
+    for Record in RecordSet:
+        FileList.append(Record[0])
+
+    return FileList
 
 ## Get the table list
 #
@@ -60,6 +73,6 @@ def GetTableList(FileModelList, Table, Db):
     for Record in RecordSet:
         TableName = Table + str(Record[0])
         TableList.append(TableName)
-    
+
     return TableList
 

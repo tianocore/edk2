@@ -719,7 +719,7 @@ class TemplateString(object):
         while Template:
             MatchObj = gPlaceholderPattern.search(Template, SearchFrom)
             if not MatchObj:
-                if MatchEnd < len(Template):
+                if MatchEnd <= len(Template):
                     TemplateSection = TemplateString.Section(Template[SectionStart:], PlaceHolderList)
                     TemplateSectionList.append(TemplateSection)
                 break

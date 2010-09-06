@@ -296,6 +296,50 @@ def CleanString(Line, CommentCharacter = DataType.TAB_COMMENT_SPLIT, AllowCppSty
 
     return Line
 
+## CleanString2
+#
+# Split comments in a string
+# Remove spaces
+#
+# @param Line:              The string to be cleaned
+# @param CommentCharacter:  Comment char, used to ignore comment content, default is DataType.TAB_COMMENT_SPLIT
+#
+# @retval Path Formatted path
+#
+def CleanString2(Line, CommentCharacter = DataType.TAB_COMMENT_SPLIT, AllowCppStyleComment=False):
+    #
+    # remove whitespace
+    #
+    Line = Line.strip();
+    #
+    # Replace R8's comment character
+    #
+    if AllowCppStyleComment:
+        Line = Line.replace(DataType.TAB_COMMENT_R8_SPLIT, CommentCharacter)
+    #
+    # separate comments and statements
+    #
+    LineParts = Line.split(CommentCharacter, 1);
+    #
+    # remove whitespace again
+    #
+    Line = LineParts[0].strip();
+    if len(LineParts) > 1:
+        Comment = LineParts[1].strip()
+        # Remove prefixed and trailing comment characters
+        Start = 0
+        End = len(Comment)
+        while Start < End and Comment.startswith(CommentCharacter, Start, End):
+            Start += 1
+        while End >= 0 and Comment.endswith(CommentCharacter, Start, End):
+            End -= 1
+        Comment = Comment[Start:End]
+        Comment = Comment.strip()
+    else:
+        Comment = ''
+
+    return Line, Comment
+
 ## GetMultipleValuesOfKeyFromLines
 #
 # Parse multiple strings to clean comment and spaces

@@ -34,6 +34,7 @@ import Common.GlobalData as GlobalData
 from GenFds.FdfParser import *
 from CommonDataClass.CommonClass import SkuInfoClass
 from Workspace.BuildClassObject import *
+import Common.VpdInfoFile as VpdInfoFile
 
 ## Regular expression for splitting Dependency Expression stirng into tokens
 gDepexTokenPattern = re.compile("(\(|\)|\w+| \S+\.inf)")
@@ -244,7 +245,7 @@ class WorkspaceAutoGen(AutoGen):
             self._BuildCommand = self.AutoGenObjectList[0].BuildCommand
         return self._BuildCommand
 
-    ## Create makefile for the platform and mdoules in it
+    ## Create makefile for the platform and modules in it
     #
     #   @param      CreateDepsMakeFile      Flag indicating if the makefile for
     #                                       modules will be created as well
@@ -476,19 +477,141 @@ class PlatformAutoGen(AutoGen):
         UnicodePcdArray = []
         HiiPcdArray     = []
         OtherPcdArray   = []
-        for Pcd in self._DynamicPcdList:
-            # just pick the a value to determine whether is unicode string type
-            Sku      = Pcd.SkuInfoList[Pcd.SkuInfoList.keys()[0]]
-            PcdValue = Sku.DefaultValue
-            if Pcd.DatumType == 'VOID*' and PcdValue.startswith("L"):
-                # if found PCD which datum value is unicode string the insert to left size of UnicodeIndex
-                UnicodePcdArray.append(Pcd)
-            elif len(Sku.VariableName) > 0:
-                # if found HII type PCD then insert to right of UnicodeIndex
-                HiiPcdArray.append(Pcd)
-            else:
-                OtherPcdArray.append(Pcd)
-        del self._DynamicPcdList[:]
+        VpdFile               = VpdInfoFile.VpdInfoFile()
+        NeedProcessVpdMapFile = False                    
+        
+        if (self.Workspace.ArchList[-1] == self.Arch): 
+            for Pcd in self._DynamicPcdList:
+
+                # just pick the a value to determine whether is unicode string type
+                Sku      = Pcd.SkuInfoList[Pcd.SkuInfoList.keys()[0]]
+                Sku.VpdOffset = Sku.VpdOffset.strip()
+                
+                PcdValue = Sku.DefaultValue
+                if Pcd.DatumType == 'VOID*' and PcdValue.startswith("L"):
+                    # if found PCD which datum value is unicode string the insert to left size of UnicodeIndex
+                    UnicodePcdArray.append(Pcd)
+                elif len(Sku.VariableName) > 0:
+                    # if found HII type PCD then insert to right of UnicodeIndex
+                    HiiPcdArray.append(Pcd)
+                else:
+                    OtherPcdArray.append(Pcd)
+                    
+                if Pcd.Type in [TAB_PCDS_DYNAMIC_VPD, TAB_PCDS_DYNAMIC_EX_VPD]:
+                    if not (self.Platform.VpdToolGuid == None or self.Platform.VpdToolGuid == ''):
+                        #
+                        # Fix the optional data of VPD PCD.
+                        #
+                        if (Pcd.DatumType.strip() != "VOID*"):
+                            if Sku.DefaultValue == '':
+                                Pcd.SkuInfoList[Pcd.SkuInfoList.keys()[0]].DefaultValue = Pcd.MaxDatumSize
+                                Pcd.MaxDatumSize = None
+                            else:
+                                EdkLogger.error("build", AUTOGEN_ERROR, "PCD setting error",
+                                                File=self.MetaFile,
+                                                ExtraData="\n\tPCD: %s.%s format incorrect in DSC: %s\n\t\t\n"
+                                                          % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, self.Platform.MetaFile.Path))                                                                            
+                        
+                        VpdFile.Add(Pcd, Sku.VpdOffset)
+                        # if the offset of a VPD is *, then it need to be fixed up by third party tool.
+                        if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
+                            NeedProcessVpdMapFile = True
+                                   
+            #
+            # Fix the PCDs define in VPD PCD section that never referenced by module.
+            # An example is PCD for signature usage.
+            #              
+            for DscPcd in self.Platform.Pcds:
+                DscPcdEntry = self.Platform.Pcds[DscPcd]
+                if DscPcdEntry.Type in [TAB_PCDS_DYNAMIC_VPD, TAB_PCDS_DYNAMIC_EX_VPD]:
+                    if not (self.Platform.VpdToolGuid == None or self.Platform.VpdToolGuid == ''):
+                        FoundFlag = False
+                        for VpdPcd in VpdFile._VpdArray.keys():
+                            # This PCD has been referenced by module
+                            if (VpdPcd.TokenSpaceGuidCName == DscPcdEntry.TokenSpaceGuidCName) and \
+                               (VpdPcd.TokenCName == DscPcdEntry.TokenCName):
+                                    FoundFlag = True
+                        
+                        # Not found, it should be signature
+                        if not FoundFlag :
+                            # just pick the a value to determine whether is unicode string type
+                            Sku           = DscPcdEntry.SkuInfoList[DscPcdEntry.SkuInfoList.keys()[0]]
+                            Sku.VpdOffset = Sku.VpdOffset.strip() 
+                            
+                            # Need to iterate DEC pcd information to get the value & datumtype
+                            for eachDec in self.PackageList:
+                                for DecPcd in eachDec.Pcds:
+                                    DecPcdEntry = eachDec.Pcds[DecPcd]
+                                    if (DecPcdEntry.TokenSpaceGuidCName == DscPcdEntry.TokenSpaceGuidCName) and \
+                                       (DecPcdEntry.TokenCName == DscPcdEntry.TokenCName):
+                                        DscPcdEntry.DatumType    = DecPcdEntry.DatumType
+                                        DscPcdEntry.DefaultValue = DecPcdEntry.DefaultValue
+                                        Sku.DefaultValue         = DecPcdEntry.DefaultValue                                                                    
+                                                       
+                            VpdFile.Add(DscPcdEntry, Sku.VpdOffset)
+                            # if the offset of a VPD is *, then it need to be fixed up by third party tool.
+                            if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
+                                NeedProcessVpdMapFile = True                        
+                    
+                    
+            if (self.Platform.FlashDefinition == None or self.Platform.FlashDefinition == '') and \
+               VpdFile.GetCount() != 0:
+                EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE, 
+                                "Fail to get FLASH_DEFINITION definition in DSC file %s which is required when DSC contains VPD PCD." % str(self.Platform.MetaFile))
+            
+            if VpdFile.GetCount() != 0:
+                WorkspaceDb = self.BuildDatabase.WorkspaceDb
+                DscTimeStamp = WorkspaceDb.GetTimeStamp(WorkspaceDb.GetFileId(str(self.Platform.MetaFile)))
+                FvPath = os.path.join(self.BuildDir, "FV")
+                if not os.path.exists(FvPath):
+                    try:
+                        os.makedirs(FvPath)
+                    except:
+                        EdkLogger.error("build", FILE_WRITE_FAILURE, "Fail to create FV folder under %s" % self.BuildDir)
+                        
+                VpdFileName = self.Platform.VpdFileName           
+                if VpdFileName == None or VpdFileName == "" :
+                    VpdFilePath = os.path.join(FvPath, "%s.txt" % self.Platform.VpdToolGuid)
+                else :
+                    VpdFilePath = os.path.join(FvPath, "%s.txt" % VpdFileName)  
+                
+                if not os.path.exists(VpdFilePath) or os.path.getmtime(VpdFilePath) < DscTimeStamp:
+                    VpdFile.Write(VpdFilePath)
+        
+                    # retrieve BPDG tool's path from tool_def.txt according to VPD_TOOL_GUID defined in DSC file.
+                    BPDGToolName = None
+                    for ToolDef in self.ToolDefinition.values():
+                        if ToolDef.has_key("GUID") and ToolDef["GUID"] == self.Platform.VpdToolGuid:
+                            if not ToolDef.has_key("PATH"):
+                                EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE, "PATH attribute was not provided for BPDG guid tool %s in tools_def.txt" % self.Platform.VpdToolGuid)
+                            BPDGToolName = ToolDef["PATH"]
+                            break
+                    # Call third party GUID BPDG tool.
+                    if BPDGToolName != None:
+                        VpdInfoFile.CallExtenalBPDGTool(BPDGToolName, VpdFilePath, VpdFileName)
+                    else:
+                        EdkLogger.error("Build", FILE_NOT_FOUND, "Fail to find third-party BPDG tool to process VPD PCDs. BPDG Guid tool need to be defined in tools_def.txt and VPD_TOOL_GUID need to be provided in DSC file.")
+                        
+                # Process VPD map file generated by third party BPDG tool
+                if NeedProcessVpdMapFile:
+                    if VpdFileName == None or VpdFileName == "" :
+                        VpdMapFilePath = os.path.join(self.BuildDir, "FV", "%s.map" % self.Platform.VpdToolGuid)
+                    else :
+                        VpdMapFilePath = os.path.join(self.BuildDir, "FV", "%s.map" % VpdFileName)
+                    if os.path.exists(VpdMapFilePath):
+                        VpdFile.Read(VpdMapFilePath)
+                
+                        # Fixup "*" offset
+                        for Pcd in self._DynamicPcdList:
+                            # just pick the a value to determine whether is unicode string type
+                            Sku = Pcd.SkuInfoList[Pcd.SkuInfoList.keys()[0]]                        
+                            if Sku.VpdOffset == "*":
+                                    Sku.VpdOffset = VpdFile.GetOffset(Pcd)[0]
+                    else:
+                        EdkLogger.error("build", FILE_READ_FAILURE, "Can not find VPD map file %s to fix up VPD offset." % VpdMapFilePath)
+            
+            # Delete the DynamicPcdList At the last time enter into this function 
+            del self._DynamicPcdList[:]	                
         self._DynamicPcdList.extend(UnicodePcdArray)
         self._DynamicPcdList.extend(HiiPcdArray)
         self._DynamicPcdList.extend(OtherPcdArray)
@@ -709,10 +832,14 @@ class PlatformAutoGen(AutoGen):
 
     ## Get list of non-dynamic PCDs
     def _GetNonDynamicPcdList(self):
+        if self._NonDynamicPcdList == None:
+            self.CollectPlatformDynamicPcds()
         return self._NonDynamicPcdList
 
     ## Get list of dynamic PCDs
     def _GetDynamicPcdList(self):
+        if self._DynamicPcdList == None:
+            self.CollectPlatformDynamicPcds()
         return self._DynamicPcdList
 
     ## Generate Token Number for all PCD
@@ -952,6 +1079,10 @@ class PlatformAutoGen(AutoGen):
         if FromPcd != None:
             if ToPcd.Pending and FromPcd.Type not in [None, '']:
                 ToPcd.Type = FromPcd.Type
+            elif (ToPcd.Type not in [None, '']) and (FromPcd.Type not in [None, ''])\
+                and (ToPcd.Type != FromPcd.Type) and (ToPcd.Type in FromPcd.Type):
+                if ToPcd.Type.strip() == "DynamicEx":
+                    ToPcd.Type = FromPcd.Type             
             elif ToPcd.Type not in [None, ''] and FromPcd.Type not in [None, ''] \
                 and ToPcd.Type != FromPcd.Type:
                 EdkLogger.error("build", OPTION_CONFLICT, "Mismatched PCD type",

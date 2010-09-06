@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define each component of the build database
 #
-# Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -31,6 +31,7 @@ from Common.BuildToolError import *
 # @param MaxDatumSize:       Input value for MaxDatumSize of Pcd, default is None
 # @param SkuInfoList:        Input value for SkuInfoList of Pcd, default is {}
 # @param IsOverrided:        Input value for IsOverrided of Pcd, default is False
+# @param GuidValue:          Input value for TokenSpaceGuidValue of Pcd, default is None
 #
 # @var TokenCName:           To store value for TokenCName
 # @var TokenSpaceGuidCName:  To store value for TokenSpaceGuidCName
@@ -43,7 +44,7 @@ from Common.BuildToolError import *
 # @var Phase:                To store value for Phase, default is "DXE"
 #
 class PcdClassObject(object):
-    def __init__(self, Name = None, Guid = None, Type = None, DatumType = None, Value = None, Token = None, MaxDatumSize = None, SkuInfoList = {}, GuidValue = None):
+    def __init__(self, Name = None, Guid = None, Type = None, DatumType = None, Value = None, Token = None, MaxDatumSize = None, SkuInfoList = {}, IsOverrided = False, GuidValue = None):
         self.TokenCName = Name
         self.TokenSpaceGuidCName = Guid
         self.TokenSpaceGuidValue = GuidValue
@@ -55,7 +56,8 @@ class PcdClassObject(object):
         self.SkuInfoList = SkuInfoList
         self.Phase = "DXE"
         self.Pending = False
-
+        self.IsOverrided = IsOverrided
+        
     ## Convert the class to a string
     #
     #  Convert each member of the class to string
@@ -73,7 +75,7 @@ class PcdClassObject(object):
               'MaxDatumSize=' + str(self.MaxDatumSize) + ', '
         for Item in self.SkuInfoList.values():
             Rtn = Rtn + 'SkuId=' + Item.SkuId + ', ' + 'SkuIdName=' + Item.SkuIdName
-        Rtn = Rtn + str(self.IsOverrided)
+        Rtn = Rtn + ', IsOverrided=' + str(self.IsOverrided)
 
         return Rtn
 

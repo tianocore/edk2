@@ -751,7 +751,7 @@ class FdfParser:
                     raise Warning("Value %s is not a number", self.FileName, Line)
 
         for Profile in AllMacroList:
-            if Profile.FileName == FileLineTuple[0] and Profile.MacroName == Name and Profile.DefinedAtLine <= FileLineTuple[1]:
+            if Profile.MacroName == Name and Profile.DefinedAtLine <= FileLineTuple[1]:
                 if Op == None:
                     if Value == 'Bool' and Profile.MacroValue == None or Profile.MacroValue.upper() == 'FALSE':
                         return False

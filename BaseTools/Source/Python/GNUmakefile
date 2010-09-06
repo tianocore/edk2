@@ -1,5 +1,5 @@
 ## @file
-# Windows makefile for Python tools build.
+# Linux makefile for Python tools build.
 #
 # Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials

@@ -86,8 +86,8 @@ DEFINE ICC11_ASM32x86     = C:\Program Files (x86)\Intel\Compiler\DEF(ICC11_VERS
 
 DEFINE ICC11_BINX64       = C:\Program Files\Intel\Compiler\DEF(ICC11_VERSION)\DEF(ICC11_BUILD)\bin\ia32_intel64
 DEFINE ICC11_ASMX64       = C:\Program Files\Intel\Compiler\DEF(ICC11_VERSION)\DEF(ICC11_BUILD)\bin\ia32_intel64
-DEFINE ICC11_BINX64x86    = C:\Program Files (x86)\Intel\Compiler\DEF(ICC11_VERSION)\DEF(ICC11_BUILD)\bin\ia32_intel64
-DEFINE ICC11_ASMX64x86    = C:\Program Files (x86)\Intel\Compiler\DEF(ICC11_VERSION)\DEF(ICC11_BUILD)\bin\ia32_intel64
+DEFINE ICC11_BINX64x86    = C:\Program Files (x86)\Intel\Compiler\DEF(ICC11_VERSION)\DEF(ICC11_BUILD)\bin\intel64
+DEFINE ICC11_ASMX64x86    = C:\Program Files (x86)\Intel\Compiler\DEF(ICC11_VERSION)\DEF(ICC11_BUILD)\bin\intel64
 
 DEFINE ICC11_BIN64        = C:\Program Files\Intel\Compiler\DEF(ICC11_VERSION)\DEF(ICC11_BUILD)\bin\ia32_ia64
 DEFINE ICC11_BIN64x86     = C:\Program Files (x86)\Intel\Compiler\DEF(ICC11_VERSION)\DEF(ICC11_BUILD)\bin\ia32_ia64
@@ -3308,8 +3308,8 @@ RELEASE_XCODE32_ARM_ASM_FLAGS  = $(ARCHASM_FLAGS)
 *_XCODE32_ARM_PP_FLAGS         = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
 *_XCODE32_ARM_VFRPP_FLAGS      = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
 
-  DEBUG_XCODE32_ARM_CC_FLAGS   = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mthumb-interwork -g -Oz -mabi=aapcs -mapcs -fno-short-enums  -save-temps -combine  -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h -mdynamic-no-pic -fno-stack-protector
-RELEASE_XCODE32_ARM_CC_FLAGS   = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mthumb-interwork -Oz    -mabi=aapcs -mapcs -fno-short-enums  -save-temps -combine -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h -mdynamic-no-pic -fno-stack-protector
+  DEBUG_XCODE32_ARM_CC_FLAGS   = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mthumb-interwork -g -Oz -mabi=aapcs -mapcs -fno-short-enums  -save-temps -combine -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h -fno-stack-protector
+RELEASE_XCODE32_ARM_CC_FLAGS   = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mthumb-interwork -Oz    -mabi=aapcs -mapcs -fno-short-enums  -save-temps -combine -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h  -fno-stack-protector
 
 
 ####################################################################################
@@ -3482,6 +3482,12 @@ RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mfpu=fpa -mlitt
 *_*_*_OPTROM_FLAGS                  = -e
 
 ##################
+# GenFw tool definitions
+##################
+*_*_*_GENFW_PATH                   = GenFw
+*_*_*_GENFW_FLAGS                  = 
+
+##################
 # Asl Compiler definitions
 ##################
 *_*_*_ASLCC_FLAGS                  = /GL- /Y- /TC /Dmain=ReferenceAcpiTable
@@ -3501,3 +3507,8 @@ RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mfpu=fpa -mlitt
 *_*_*_TIANO_PATH         = TianoCompress
 *_*_*_TIANO_GUID         = A31280AD-481E-41B6-95E8-127F4C984779
 
+##################
+# BPDG tool definitions
+##################
+*_*_*_VPDTOOL_PATH         = BPDG
+*_*_*_VPDTOOL_GUID         = 8C3D856A-9BE6-468E-850A-24F7A8D38E08

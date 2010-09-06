@@ -172,6 +172,7 @@ def main():
 
         """call Workspace build create database"""
         os.environ["WORKSPACE"] = Workspace
+        FdfParser.InputMacroDict["WORKSPACE"] = Workspace
         BuildWorkSpace = WorkspaceDatabase(':memory:', FdfParser.InputMacroDict)
         BuildWorkSpace.InitDatabase()
         

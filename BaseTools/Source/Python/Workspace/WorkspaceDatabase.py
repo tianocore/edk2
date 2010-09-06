@@ -18,6 +18,7 @@ import sqlite3
 import os
 import os.path
 import pickle
+import uuid
 
 import Common.EdkLogger as EdkLogger
 import Common.GlobalData as GlobalData
@@ -99,6 +100,10 @@ class DscBuildData(PlatformBuildClassObject):
         RecordList = self._RawData[MODEL_META_DATA_DEFINE, self._Arch]
         for Record in RecordList:
             GlobalData.gEdkGlobal[Record[0]] = Record[1]
+        
+        RecordList = self._RawData[MODEL_META_DATA_GLOBAL_DEFINE, self._Arch]
+        for Record in RecordList:
+            GlobalData.gGlobalDefines[Record[0]] = Record[1]
 
     ## XXX[key] = value
     def __setitem__(self, key, value):
@@ -135,6 +140,8 @@ class DscBuildData(PlatformBuildClassObject):
         self._Pcds              = None
         self._BuildOptions      = None
         self._LoadFixAddress    = None
+        self._VpdToolGuid       = None
+        self._VpdFileName       = None
 
     ## Get architecture
     def _GetArch(self):
@@ -188,6 +195,18 @@ class DscBuildData(PlatformBuildClassObject):
                     self._SkuName = Record[1]
             elif Name == TAB_FIX_LOAD_TOP_MEMORY_ADDRESS:
                 self._LoadFixAddress = Record[1]
+            elif Name == TAB_DSC_DEFINES_VPD_TOOL_GUID:
+                #
+                # try to convert GUID to a real UUID value to see whether the GUID is format 
+                # for VPD_TOOL_GUID is correct.
+                #
+                try:
+                    uuid.UUID(Record[1])
+                except:
+                    EdkLogger.error("build", FORMAT_INVALID, "Invalid GUID format for VPD_TOOL_GUID", File=self.MetaFile)
+                self._VpdToolGuid = Record[1]               
+            elif Name == TAB_DSC_DEFINES_VPD_FILENAME:
+                self._VpdFileName = Record[1]       
         # set _Header to non-None in order to avoid database re-querying
         self._Header = 'DUMMY'
 
@@ -267,6 +286,8 @@ class DscBuildData(PlatformBuildClassObject):
     def _SetSkuName(self, Value):
         if Value in self.SkuIds:
             self._SkuName = Value
+            # Needs to re-retrieve the PCD information
+            self._Pcds = None
 
     def _GetFdfFile(self):
         if self._FlashDefinition == None:
@@ -321,6 +342,24 @@ class DscBuildData(PlatformBuildClassObject):
                 self._LoadFixAddress = ''
         return self._LoadFixAddress
 
+    ## Retrieve the GUID string for VPD tool
+    def _GetVpdToolGuid(self):
+        if self._VpdToolGuid == None:
+            if self._Header == None:
+                self._GetHeaderInfo()
+            if self._VpdToolGuid == None:
+                self._VpdToolGuid = ''
+        return self._VpdToolGuid
+  
+    ## Retrieve the VPD file Name, this is optional in DSC file
+    def _GetVpdFileName(self):
+        if self._VpdFileName == None:
+            if self._Header == None:
+                self._GetHeaderInfo()
+            if self._VpdFileName == None:
+                self._VpdFileName = ''
+        return self._VpdFileName  
+    
     ## Retrieve [SkuIds] section information
     def _GetSkuIds(self):
         if self._SkuIds == None:
@@ -418,6 +457,7 @@ class DscBuildData(PlatformBuildClassObject):
                             '',
                             MaxDatumSize,
                             {},
+                            False,
                             None
                             )
                     Module.Pcds[PcdCName, TokenSpaceGuid] = Pcd
@@ -576,6 +616,7 @@ class DscBuildData(PlatformBuildClassObject):
                                                 '',
                                                 MaxDatumSize,
                                                 {},
+                                                False,
                                                 None
                                                 )
         return Pcds
@@ -619,6 +660,7 @@ class DscBuildData(PlatformBuildClassObject):
                                                 '',
                                                 MaxDatumSize,
                                                 {self.SkuName : SkuInfo},
+                                                False,
                                                 None
                                                 )
         return Pcds
@@ -661,6 +703,7 @@ class DscBuildData(PlatformBuildClassObject):
                                                 '',
                                                 '',
                                                 {self.SkuName : SkuInfo},
+                                                False,
                                                 None
                                                 )
         return Pcds
@@ -686,15 +729,21 @@ class DscBuildData(PlatformBuildClassObject):
             PcdDict[Arch, SkuName, PcdCName, TokenSpaceGuid] = Setting
         # Remove redundant PCD candidates, per the ARCH and SKU
         for PcdCName, TokenSpaceGuid in PcdSet:
-            ValueList = ['', '']
+            ValueList = ['', '', '']
             Setting = PcdDict[self._Arch, self.SkuName, PcdCName, TokenSpaceGuid]
             if Setting == None:
                 continue
             TokenList = Setting.split(TAB_VALUE_SPLIT)
             ValueList[0:len(TokenList)] = TokenList
-            VpdOffset, MaxDatumSize = ValueList
+            #
+            # For the VOID* type, it can have optional data of MaxDatumSize and InitialValue
+            # For the Integer & Boolean type, the optional data can only be InitialValue.
+            # At this point, we put all the data into the PcdClssObject for we don't know the PCD's datumtype
+            # until the DEC parser has been called.
+            # 
+            VpdOffset, MaxDatumSize, InitialValue = ValueList
 
-            SkuInfo = SkuInfoClass(self.SkuName, self.SkuIds[self.SkuName], '', '', '', '', VpdOffset)
+            SkuInfo = SkuInfoClass(self.SkuName, self.SkuIds[self.SkuName], '', '', '', '', VpdOffset, InitialValue)
             Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
                                                 PcdCName,
                                                 TokenSpaceGuid,
@@ -704,6 +753,7 @@ class DscBuildData(PlatformBuildClassObject):
                                                 '',
                                                 MaxDatumSize,
                                                 {self.SkuName : SkuInfo},
+                                                False,
                                                 None
                                                 )
         return Pcds
@@ -733,7 +783,7 @@ class DscBuildData(PlatformBuildClassObject):
     #
     def AddPcd(self, Name, Guid, Value):
         if (Name, Guid) not in self.Pcds:
-            self.Pcds[Name, Guid] = PcdClassObject(Name, Guid, '', '', '', '', '', {}, None)
+            self.Pcds[Name, Guid] = PcdClassObject(Name, Guid, '', '', '', '', '', {}, False, None)
         self.Pcds[Name, Guid].DefaultValue = Value
 
     Arch                = property(_GetArch, _SetArch)
@@ -752,7 +802,8 @@ class DscBuildData(PlatformBuildClassObject):
     BsBaseAddress       = property(_GetBsBaseAddress)
     RtBaseAddress       = property(_GetRtBaseAddress)
     LoadFixAddress      = property(_GetLoadFixAddress)
-
+    VpdToolGuid         = property(_GetVpdToolGuid)
+    VpdFileName         = property(_GetVpdFileName)    
     SkuIds              = property(_GetSkuIds)
     Modules             = property(_GetModules)
     LibraryInstances    = property(_GetLibraryInstances)
@@ -760,7 +811,7 @@ class DscBuildData(PlatformBuildClassObject):
     Pcds                = property(_GetPcds)
     BuildOptions        = property(_GetBuildOptions)
 
-## Platform build information from DSC file
+## Platform build information from DEC file
 #
 #  This class is used to retrieve information stored in database and convert them
 # into PackageBuildClassObject form for easier use for AutoGen.
@@ -789,6 +840,7 @@ class DecBuildData(PackageBuildClassObject):
         TAB_DEC_DEFINES_PACKAGE_NAME                : "_PackageName",
         TAB_DEC_DEFINES_PACKAGE_GUID                : "_Guid",
         TAB_DEC_DEFINES_PACKAGE_VERSION             : "_Version",
+        TAB_DEC_DEFINES_PKG_UNI_FILE                : "_PkgUniFile",
     }
 
 
@@ -830,6 +882,7 @@ class DecBuildData(PackageBuildClassObject):
         self._PackageName       = None
         self._Guid              = None
         self._Version           = None
+        self._PkgUniFile        = None
         self._Protocols         = None
         self._Ppis              = None
         self._Guids             = None
@@ -1063,6 +1116,7 @@ class DecBuildData(PackageBuildClassObject):
                                                                             TokenNumber,
                                                                             '',
                                                                             {},
+                                                                            False,
                                                                             None
                                                                             )
         return Pcds
@@ -1914,6 +1968,7 @@ class InfBuildData(ModuleBuildClassObject):
                     '',
                     '',
                     {},
+                    False,
                     self.Guids[TokenSpaceGuid]
                     )
 
@@ -1927,7 +1982,7 @@ class InfBuildData(ModuleBuildClassObject):
                 #   "FixedAtBuild", "PatchableInModule", "FeatureFlag", "Dynamic", "DynamicEx"
                 #
                 PcdType = self._PCD_TYPE_STRING_[Type]
-                if Type in [MODEL_PCD_DYNAMIC, MODEL_PCD_DYNAMIC_EX]:
+                if Type == MODEL_PCD_DYNAMIC:
                     Pcd.Pending = True
                     for T in ["FixedAtBuild", "PatchableInModule", "FeatureFlag", "Dynamic", "DynamicEx"]:
                         if (PcdCName, TokenSpaceGuid, T) in Package.Pcds:
@@ -1994,7 +2049,7 @@ class InfBuildData(ModuleBuildClassObject):
 
 ## Database
 #
-#   This class defined the build databse for all modules, packages and platform.
+#   This class defined the build database for all modules, packages and platform.
 # It will call corresponding parser for the given file if it cannot find it in
 # the database.
 #

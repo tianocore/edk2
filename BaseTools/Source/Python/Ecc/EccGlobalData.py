@@ -21,4 +21,6 @@ gTarget = ''
 gConfig = None
 gDb = None
 gIdentifierTableList = []
+gCFileList = []
+gHFileList = []
 gException = None

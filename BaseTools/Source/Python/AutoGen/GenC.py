@@ -1028,7 +1028,9 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                     ArraySize = ArraySize / 2;
 
                 if ArraySize < (len(Value) + 1):
-                    ArraySize = len(Value) + 1
+                    EdkLogger.error("build", AUTOGEN_ERROR,
+                                    "The maximum size of VOID* type PCD '%s.%s' is less than its actual size occupied." % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
+                                    ExtraData="[%s]" % str(Info))
                 Value = NewValue + '0 }'
             Array = '[%d]' % ArraySize
         #
@@ -1262,10 +1264,11 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
         VariableHeadValueList = []
         Pcd.InitString = 'UNINIT'
 
-        if Pcd.Type in ["DynamicVpd", "DynamicExVpd"]:
-            Pcd.TokenTypeList = ['PCD_TYPE_VPD']
-        elif Pcd.DatumType == 'VOID*':
-            Pcd.TokenTypeList = ['PCD_TYPE_STRING']
+        if Pcd.DatumType == 'VOID*':
+            if Pcd.Type not in ["DynamicVpd", "DynamicExVpd"]:
+                Pcd.TokenTypeList = ['PCD_TYPE_STRING']
+            else:
+                Pcd.TokenTypeList = []
         elif Pcd.DatumType == 'BOOLEAN':
             Pcd.TokenTypeList = ['PCD_DATUM_TYPE_UINT8']
         else:
@@ -1364,8 +1367,11 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                     Dict['SIZE_TABLE_MAXIMUM_LENGTH'].append(Pcd.MaxDatumSize)
                     if Pcd.MaxDatumSize != '':
                         MaxDatumSize = int(Pcd.MaxDatumSize, 0)
-                        if MaxDatumSize > Size:
-                            Size = MaxDatumSize
+                        if MaxDatumSize < Size:
+                            EdkLogger.error("build", AUTOGEN_ERROR,
+                                            "The maximum size of VOID* type PCD '%s.%s' is less than its actual size occupied." % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
+                                            ExtraData="[%s]" % str(Platform))
+                        Size = MaxDatumSize
                     Dict['STRING_TABLE_LENGTH'].append(Size)
                     StringTableIndex += 1
                     StringTableSize += (Size)

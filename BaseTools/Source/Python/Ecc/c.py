@@ -514,7 +514,9 @@ def CollectSourceCodeDataIntoDB(RootDir):
                     dirnames.append(Dirname)
 
         for f in filenames:
+            collector = None
             FullName = os.path.normpath(os.path.join(dirpath, f))
+            model = DataClass.MODEL_FILE_OTHERS
             if os.path.splitext(f)[1] in ('.h', '.c'):
                 EdkLogger.info("Parsing " + FullName)
                 model = f.endswith('c') and DataClass.MODEL_FILE_C or DataClass.MODEL_FILE_H
@@ -526,12 +528,13 @@ def CollectSourceCodeDataIntoDB(RootDir):
                     collector.CleanFileProfileBuffer()
                     collector.ParseFileWithClearedPPDirective()
 #                collector.PrintFragments()
-                BaseName = os.path.basename(f)
-                DirName = os.path.dirname(FullName)
-                Ext = os.path.splitext(f)[1].lstrip('.')
-                ModifiedTime = os.path.getmtime(FullName)
-                FileObj = DataClass.FileClass(-1, BaseName, Ext, DirName, FullName, model, ModifiedTime, GetFunctionList(), GetIdentifierList(), [])
-                FileObjList.append(FileObj)
+            BaseName = os.path.basename(f)
+            DirName = os.path.dirname(FullName)
+            Ext = os.path.splitext(f)[1].lstrip('.')
+            ModifiedTime = os.path.getmtime(FullName)
+            FileObj = DataClass.FileClass(-1, BaseName, Ext, DirName, FullName, model, ModifiedTime, GetFunctionList(), GetIdentifierList(), [])
+            FileObjList.append(FileObj)
+            if collector:
                 collector.CleanFileProfileBuffer()
 
     if len(ParseErrorFileList) > 0:
@@ -539,7 +542,8 @@ def CollectSourceCodeDataIntoDB(RootDir):
 
     Db = GetDB()
     for file in FileObjList:
-        Db.InsertOneFile(file)
+        if file.ExtName.upper() not in ['INF', 'DEC', 'DSC', 'FDF']:
+            Db.InsertOneFile(file)
 
     Db.UpdateIdentifierBelongsToFunction()
 
@@ -552,7 +556,6 @@ def GetTableID(FullFileName, ErrorMsgList = None):
                        from File
                        where FullPath like '%s'
                    """ % FullFileName
-
     ResultSet = Db.TblFile.Exec(SqlStatement)
 
     FileID = -1
@@ -567,6 +570,8 @@ def GetTableID(FullFileName, ErrorMsgList = None):
     return FileID
 
 def GetIncludeFileList(FullFileName):
+    if os.path.splitext(FullFileName)[1].upper() not in ('.H'):
+        return []
     IFList = IncludeFileListDict.get(FullFileName)
     if IFList != None:
         return IFList
@@ -2301,21 +2306,32 @@ def CheckFileHeaderDoxygenComments(FullFileName):
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Value, ID
                        from %s
-                       where Model = %d and StartLine = 1 and StartColumn = 0
+                       where Model = %d and (StartLine = 1 or StartLine = 7 or StartLine = 8) and StartColumn = 0
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_COMMENT)
     ResultSet = Db.TblFile.Exec(SqlStatement)
     if len(ResultSet) == 0:
         PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'No Comment appear at the very beginning of file.', 'File', FileID)
         return ErrorMsgList
 
+    IsFoundError1 = True
+    IsFoundError2 = True
+    IsFoundError3 = True
     for Result in ResultSet:
-        CommentStr = Result[0]
-        if not CommentStr.startswith('/** @file'):
-            PrintErrorMsg(ERROR_DOXYGEN_CHECK_FILE_HEADER, 'File header comment should begin with ""/** @file""', FileTable, Result[1])
-        if not CommentStr.endswith('**/'):
-            PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'File header comment should end with **/', FileTable, Result[1])
-        if CommentStr.find('.') == -1:
-            PrintErrorMsg(ERROR_DOXYGEN_CHECK_COMMENT_DESCRIPTION, 'Comment description should end with period \'.\'', FileTable, Result[1])
+        CommentStr = Result[0].strip()
+        ID = Result[1]
+        if CommentStr.startswith('/** @file'):
+            IsFoundError1 = False
+        if CommentStr.endswith('**/'):
+            IsFoundError2 = False
+        if CommentStr.find('.') != -1:
+            IsFoundError3 = False
+
+    if IsFoundError1:
+        PrintErrorMsg(ERROR_DOXYGEN_CHECK_FILE_HEADER, 'File header comment should begin with ""/** @file""', FileTable, ID)
+    if IsFoundError2:
+        PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'File header comment should end with ""**/""', FileTable, ID)
+    if IsFoundError3:
+        PrintErrorMsg(ERROR_DOXYGEN_CHECK_COMMENT_DESCRIPTION, 'Comment description should end with period "".""', FileTable, ID)
 
 def CheckFuncHeaderDoxygenComments(FullFileName):
     ErrorMsgList = []

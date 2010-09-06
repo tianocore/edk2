@@ -44,13 +44,10 @@ LFLAGS =
 #  to x86_64. So make sure tools match uname -m
 #
 uname_s = $(shell uname -s)
-uname_m = $(shell uname -m)
 ifeq ($(uname_s),Darwin)
-ifeq ($(uname_m),i386)
   CFLAGS   += -arch i386
   CPPFLAGS += -arch i386
   LFLAGS   += -arch i386
-endif
 endif
   
 .PHONY: all

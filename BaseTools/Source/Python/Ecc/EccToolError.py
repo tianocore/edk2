@@ -19,6 +19,7 @@ ERROR_GENERAL_CHECK_NO_ASM = 1004
 ERROR_GENERAL_CHECK_NO_PROGMA = 1005
 ERROR_GENERAL_CHECK_CARRIAGE_RETURN = 1006
 ERROR_GENERAL_CHECK_FILE_EXISTENCE = 1007
+ERROR_GENERAL_CHECK_NON_ACSII = 1008
 
 ERROR_SPACE_CHECK_ALL = 2000
 
@@ -105,6 +106,7 @@ gEccErrorMessage = {
     ERROR_GENERAL_CHECK_NO_PROGMA : """There should be no use of "#progma" in source file except "#pragma pack(#)\"""",
     ERROR_GENERAL_CHECK_CARRIAGE_RETURN : "There should be a carriage return at the end of the file",
     ERROR_GENERAL_CHECK_FILE_EXISTENCE : "File not found",
+    ERROR_GENERAL_CHECK_NON_ACSII : "File has invalid Non-ACSII char",
 
     ERROR_SPACE_CHECK_ALL : "",
 

@@ -23,6 +23,7 @@ import textwrap
 import traceback
 import sys
 import time
+import struct
 from datetime import datetime
 from StringIO import StringIO
 from Common import EdkLogger
@@ -101,6 +102,9 @@ gDriverTypeMap = {
   'SMM_DRIVER'        : '0xA (SMM)', # Extension of module type to support PI 1.1 SMM drivers
   }
 
+## The look up table of the supported opcode in the dependency expression binaries
+gOpCodeList = ["BEFORE", "AFTER", "PUSH", "AND", "OR", "NOT", "TRUE", "FALSE", "END", "SOR"]
+
 ##
 # Writes a string to the file object.
 #
@@ -162,6 +166,60 @@ def FindIncludeFiles(Source, IncludePathList, IncludeFiles):
                 IncludeFiles[FullFileName.lower().replace("\\", "/")] = FullFileName
                 break
 
+##
+# Parse binary dependency expression section
+#
+# This utility class parses the dependency expression section and translate the readable
+# GUID name and value.
+#
+class DepexParser(object):
+    ##
+    # Constructor function for class DepexParser
+    #
+    # This constructor function collect GUID values so that the readable
+    # GUID name can be translated.
+    #
+    # @param self            The object pointer
+    # @param Wa              Workspace context information
+    #
+    def __init__(self, Wa):
+        self._GuidDb = {}
+        for Package in Wa.BuildDatabase.WorkspaceDb.PackageList:
+            for Protocol in Package.Protocols:
+                GuidValue = GuidStructureStringToGuidString(Package.Protocols[Protocol])
+                self._GuidDb[GuidValue.upper()] = Protocol
+            for Ppi in Package.Ppis:
+                GuidValue = GuidStructureStringToGuidString(Package.Ppis[Ppi])
+                self._GuidDb[GuidValue.upper()] = Ppi
+            for Guid in Package.Guids:
+                GuidValue = GuidStructureStringToGuidString(Package.Guids[Guid])
+                self._GuidDb[GuidValue.upper()] = Guid
+    
+    ##
+    # Parse the binary dependency expression files.
+    # 
+    # This function parses the binary dependency expression file and translate it
+    # to the instruction list.
+    #
+    # @param self            The object pointer
+    # @param DepexFileName   The file name of binary dependency expression file.
+    #
+    def ParseDepexFile(self, DepexFileName):
+        DepexFile = open(DepexFileName, "rb")
+        DepexStatement = []
+        OpCode = DepexFile.read(1)
+        while OpCode:
+            Statement = gOpCodeList[struct.unpack("B", OpCode)[0]]
+            if Statement in ["BEFORE", "AFTER", "PUSH"]:
+                GuidValue = "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X" % \
+                            struct.unpack("LHHBBBBBBBB", DepexFile.read(16))
+                GuidString = self._GuidDb.get(GuidValue, GuidValue)
+                Statement = "%s %s" % (Statement, GuidString)
+            DepexStatement.append(Statement)
+            OpCode = DepexFile.read(1)     
+        
+        return DepexStatement
+    
 ##
 # Reports library information
 #
@@ -254,6 +312,7 @@ class DepexReport(object):
     #
     def __init__(self, M):
         self.Depex = ""
+        self._DepexFileName = os.path.join(M.BuildDir, "OUTPUT", M.Module.BaseName + ".depex") 
         ModuleType = M.ModuleType
         if not ModuleType:
             ModuleType = gComponentType2ModuleType.get(M.ComponentType, "")
@@ -289,14 +348,25 @@ class DepexReport(object):
     #
     # This function generates report for the module dependency expression.
     #
-    # @param self            The object pointer
-    # @param File            The file object for report
+    # @param self              The object pointer
+    # @param File              The file object for report
+    # @param GlobalDepexParser The platform global Dependency expression parser object
     #
-    def GenerateReport(self, File):
+    def GenerateReport(self, File, GlobalDepexParser):
         if not self.Depex:
             return
-                
+
         FileWrite(File, gSubSectionStart)
+        if os.path.isfile(self._DepexFileName):
+            try:
+                DepexStatements = GlobalDepexParser.ParseDepexFile(self._DepexFileName)
+                FileWrite(File, "Final Dependency Expression (DEPEX) Instructions")
+                for DepexStatement in DepexStatements:
+                    FileWrite(File, "  %s" % DepexStatement)
+                FileWrite(File, gSubSectionSep)
+            except:
+                EdkLogger.warn(None, "Dependency expression file is corrupted", self._DepexFileName)
+        
         FileWrite(File, "Dependency Expression (DEPEX) from %s" % self.Source)
 
         if self.Source == "INF":
@@ -453,12 +523,14 @@ class ModuleReport(object):
     # This function generates report for separate module expression
     # in a platform build.
     #
-    # @param self            The object pointer
-    # @param File            The file object for report
-    # @param GlobalPcdReport The platform global PCD class object
-    # @param ReportType      The kind of report items in the final report file
+    # @param self                   The object pointer
+    # @param File                   The file object for report
+    # @param GlobalPcdReport        The platform global PCD report object
+    # @param GlobalPredictionReport The platform global Prediction report object
+    # @param GlobalDepexParser      The platform global Dependency expression parser object
+    # @param ReportType             The kind of report items in the final report file
     #
-    def GenerateReport(self, File, GlobalPcdReport, GlobalPredictionReport, ReportType):
+    def GenerateReport(self, File, GlobalPcdReport, GlobalPredictionReport, GlobalDepexParser, ReportType):
         FileWrite(File, gSectionStart)
 
         FwReportFileName = os.path.join(self._BuildDir, "DEBUG", self.ModuleName + ".txt")
@@ -505,7 +577,7 @@ class ModuleReport(object):
             self.LibraryReport.GenerateReport(File)
 
         if "DEPEX" in ReportType:
-            self.DepexReport.GenerateReport(File)
+            self.DepexReport.GenerateReport(File, GlobalDepexParser)
 
         if "BUILD_FLAGS" in ReportType:
             self.BuildFlagsReport.GenerateReport(File)
@@ -1325,6 +1397,10 @@ class PlatformReport(object):
         if "FIXED_ADDRESS" in ReportType or "EXECUTION_ORDER" in ReportType:
             self.PredictionReport = PredictionReport(Wa)
 
+        self.DepexParser = None
+        if "DEPEX" in ReportType:
+            self.DepexParser = DepexParser(Wa)
+            
         self.ModuleReportList = []
         if MaList != None:
             self._IsModuleBuild = True
@@ -1371,7 +1447,7 @@ class PlatformReport(object):
                     FdReportListItem.GenerateReport(File)
 
         for ModuleReportItem in self.ModuleReportList:
-            ModuleReportItem.GenerateReport(File, self.PcdReport, self.PredictionReport, ReportType)
+            ModuleReportItem.GenerateReport(File, self.PcdReport, self.PredictionReport, self.DepexParser, ReportType)
 
         if not self._IsModuleBuild:
             if "EXECUTION_ORDER" in ReportType:

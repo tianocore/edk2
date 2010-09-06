@@ -29,6 +29,7 @@ MODEL_FILE_DSC = 1013
 MODEL_FILE_FDF = 1014
 MODEL_FILE_INC = 1015
 MODEL_FILE_CIF = 1016
+MODEL_FILE_OTHERS = 1099
 
 MODEL_IDENTIFIER_FILE_HEADER = 2001
 MODEL_IDENTIFIER_FUNCTION_HEADER = 2002
@@ -91,6 +92,8 @@ MODEL_META_DATA_NMAKE = 5012
 MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSEIF = 50013
 MODEL_META_DATA_CONDITIONAL_STATEMENT_ENDIF = 5014
 MODEL_META_DATA_COMPONENT_SOURCE_OVERRIDE_PATH = 5015
+MODEL_META_DATA_COMMENT = 5016
+MODEL_META_DATA_GLOBAL_DEFINE = 5017
 
 MODEL_EXTERNAL_DEPENDENCY = 10000
 
@@ -103,6 +106,8 @@ MODEL_LIST = [('MODEL_UNKNOWN', MODEL_UNKNOWN),
               ('MODEL_FILE_DSC', MODEL_FILE_DSC),
               ('MODEL_FILE_FDF', MODEL_FILE_FDF),
               ('MODEL_FILE_INC', MODEL_FILE_INC),
+              ('MODEL_FILE_CIF', MODEL_FILE_CIF),
+              ('MODEL_FILE_OTHERS', MODEL_FILE_OTHERS),
               ('MODEL_IDENTIFIER_FILE_HEADER', MODEL_IDENTIFIER_FILE_HEADER),
               ('MODEL_IDENTIFIER_FUNCTION_HEADER', MODEL_IDENTIFIER_FUNCTION_HEADER),
               ('MODEL_IDENTIFIER_COMMENT', MODEL_IDENTIFIER_COMMENT),
@@ -159,16 +164,17 @@ MODEL_LIST = [('MODEL_UNKNOWN', MODEL_UNKNOWN),
               ("MODEL_META_DATA_COMPONENT", MODEL_META_DATA_COMPONENT),
               ('MODEL_META_DATA_USER_EXTENSION', MODEL_META_DATA_USER_EXTENSION),
               ('MODEL_META_DATA_PACKAGE', MODEL_META_DATA_PACKAGE),
-              ('MODEL_META_DATA_NMAKE', MODEL_META_DATA_NMAKE)
+              ('MODEL_META_DATA_NMAKE', MODEL_META_DATA_NMAKE),
+              ('MODEL_META_DATA_COMMENT', MODEL_META_DATA_COMMENT)
              ]
 
 ## FunctionClass
 #
 # This class defines a structure of a function
-# 
+#
 # @param ID:               ID of a Function
 # @param Header:           Header of a Function
-# @param Modifier:         Modifier of a Function 
+# @param Modifier:         Modifier of a Function
 # @param Name:             Name of a Function
 # @param ReturnStatement:  ReturnStatement of a Funciont
 # @param StartLine:        StartLine of a Function
@@ -183,7 +189,7 @@ MODEL_LIST = [('MODEL_UNKNOWN', MODEL_UNKNOWN),
 #
 # @var ID:                 ID of a Function
 # @var Header:             Header of a Function
-# @var Modifier:           Modifier of a Function 
+# @var Modifier:           Modifier of a Function
 # @var Name:               Name of a Function
 # @var ReturnStatement:    ReturnStatement of a Funciont
 # @var StartLine:          StartLine of a Function
@@ -204,7 +210,7 @@ class FunctionClass(object):
                  FunNameStartLine = -1, FunNameStartColumn = -1):
         self.ID = ID
         self.Header = Header
-        self.Modifier = Modifier                    
+        self.Modifier = Modifier
         self.Name = Name
         self.ReturnStatement = ReturnStatement
         self.StartLine = StartLine
@@ -216,14 +222,14 @@ class FunctionClass(object):
         self.BelongsToFile = BelongsToFile
         self.FunNameStartLine = FunNameStartLine
         self.FunNameStartColumn = FunNameStartColumn
-        
+
         self.IdentifierList = IdentifierList
         self.PcdList = PcdList
 
 ## IdentifierClass
 #
 # This class defines a structure of a variable
-# 
+#
 # @param ID:                 ID of a Identifier
 # @param Modifier:           Modifier of a Identifier
 # @param Type:               Type of a Identifier
@@ -269,7 +275,7 @@ class IdentifierClass(object):
 ## PcdClass
 #
 # This class defines a structure of a Pcd
-# 
+#
 # @param ID:                   ID of a Pcd
 # @param CName:                CName of a Pcd
 # @param TokenSpaceGuidCName:  TokenSpaceGuidCName of a Pcd
@@ -314,7 +320,7 @@ class PcdDataClass(object):
 ## FileClass
 #
 # This class defines a structure of a file
-# 
+#
 # @param ID:              ID of a File
 # @param Name:            Name of a File
 # @param ExtName:         ExtName of a File
@@ -340,14 +346,14 @@ class PcdDataClass(object):
 class FileClass(object):
     def __init__(self, ID = -1, Name = '', ExtName = '', Path = '', FullPath = '', Model = MODEL_UNKNOWN, TimeStamp = '', \
                  FunctionList = [], IdentifierList = [], PcdList = []):
-        self.ID = ID                                   
+        self.ID = ID
         self.Name = Name
-        self.ExtName = ExtName                    
+        self.ExtName = ExtName
         self.Path = Path
         self.FullPath = FullPath
         self.Model = Model
         self.TimeStamp = TimeStamp
-        
+
         self.FunctionList = FunctionList
         self.IdentifierList = IdentifierList
         self.PcdList = PcdList

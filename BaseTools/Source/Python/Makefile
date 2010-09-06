@@ -22,7 +22,7 @@ MODULES=encodings.cp437,encodings.gbk,encodings.utf_16,encodings.utf_8,encodings
 BIN_DIR=$(EDK_TOOLS_PATH)\Bin\Win32
 
 
-APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BIN_DIR)\MigrationMsa2Inf.exe $(BIN_DIR)\Fpd2Dsc.exe $(BIN_DIR)\TargetTool.exe $(BIN_DIR)\spd2dec.exe $(BIN_DIR)\GenDepex.exe $(BIN_DIR)\GenPatchPcdTable.exe $(BIN_DIR)\PatchPcdValue.exe
+APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BIN_DIR)\MigrationMsa2Inf.exe $(BIN_DIR)\Fpd2Dsc.exe $(BIN_DIR)\TargetTool.exe $(BIN_DIR)\spd2dec.exe $(BIN_DIR)\GenDepex.exe $(BIN_DIR)\GenPatchPcdTable.exe $(BIN_DIR)\PatchPcdValue.exe $(BIN_DIR)\BPDG.exe
 
 COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Database.py \
@@ -46,6 +46,7 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\String.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\TargetTxtClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\ToolDefClassObject.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Common\VpdInfoFile.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\XmlParser.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\XmlRoutines.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\__init__.py \
@@ -62,7 +63,7 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Autogen\GenMake.py \
               $(BASE_TOOLS_PATH)\Source\Python\Autogen\StrGather.py \
               $(BASE_TOOLS_PATH)\Source\Python\Autogen\UniClassObject.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Autogen\__init__.py 
+              $(BASE_TOOLS_PATH)\Source\Python\Autogen\__init__.py
 
               
 all: SetPythonPath $(APPLICATIONS)
@@ -100,6 +101,9 @@ $(BIN_DIR)\GenPatchPcdTable.exe: $(BASE_TOOLS_PATH)\Source\Python\GenPatchPcdTab
 $(BIN_DIR)\PatchPcdValue.exe: $(BASE_TOOLS_PATH)\Source\Python\PatchPcdValue\PatchPcdValue.py $(COMMON_PYTHON)
   @pushd . & @cd PatchPcdValue & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) PatchPcdValue.py & @popd
 
+$(BIN_DIR)\BPDG.exe: $(BASE_TOOLS_PATH)\Source\Python\BPDG\BPDG.py $(COMMON_PYTHON)
+  @pushd . & @cd BPDG & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) BPDG.py & @popd
+  
 clean:
 cleanall:  
   @del /f /q $(BIN_DIR)\*.pyd $(BIN_DIR)\*.dll
