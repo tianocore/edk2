@@ -87,19 +87,19 @@ typedef PACKED struct {
   UINT64  AddrLen;
 } EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR;
 
-typedef union {
+typedef PACKED union {
   UINT8     Byte;
-  struct {
+  PACKED struct {
     UINT8 Length : 3;
     UINT8 Name : 4;
     UINT8 Type : 1;
   } Bits;
 } ACPI_SMALL_RESOURCE_HEADER;
 
-typedef struct {
-  union {
+typedef PACKED struct {
+  PACKED union {
     UINT8 Byte;
-    struct{
+    PACKED struct {
       UINT8 Name : 7;
       UINT8 Type : 1;
     }Bits;
