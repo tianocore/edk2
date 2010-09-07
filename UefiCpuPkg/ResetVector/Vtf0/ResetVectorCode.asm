@@ -2,7 +2,7 @@
 ; @file
 ; This file includes all other code files to assemble the reset vector code
 ;
-; Copyright (c) 2008 - 2009, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -40,10 +40,10 @@
 %include "Ia32/SearchForSecEntry.asm"
 
 %ifdef ARCH_X64
-%include "Ia32/32FlatTo64Flat.asm"
+%include "Ia32/Flat32ToFlat64.asm"
 %endif
 
-%include "Ia16/16RealTo32Flat.asm"
+%include "Ia16/Real16ToFlat32.asm"
 %include "Ia16/Init16.asm"
 
 %include "Main.asm"

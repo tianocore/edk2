@@ -1,7 +1,7 @@
 ## @file
 #  Makefile to create FFS Raw sections for VTF images.
 #
-#  Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,8 +16,8 @@ TARGETS = Bin/ResetVector.ia32.raw Bin/ResetVector.x64.raw
 ASM = nasm
 
 COMMON_DEPS = \
-  Ia16/16RealTo32Flat.asm \
-  Ia32/32FlatTo64Flat.asm \
+  Ia16/Real16ToFlat32.asm \
+  Ia32/Flat32ToFlat64.asm \
   JumpToSec.asm \
   Ia16/ResetVectorVtf0.asm \
   Ia32/SearchForBfvBase.asm \
