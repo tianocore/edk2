@@ -32,7 +32,7 @@
 
 [Sources]
   DriverSample.c
-  inventorystrings.uni
+  InventoryStrings.uni
   NVDataStruc.h
   VfrStrings.uni
   DriverSample.h
