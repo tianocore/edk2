@@ -39,7 +39,7 @@
   Simple arm disassembler via a library
 
   Argv[0] - symboltable
-  Argv[1] - Optional qoted format string 
+  Argv[1] - Optional quoted format string 
   Argv[2] - Optional flag
 
   @param  Argc   Number of command arguments in Argv
@@ -66,8 +66,18 @@ EblSymbolTable (
   BOOLEAN                           Elf;
   
   // Need to add lots of error checking on the passed in string
-  // Default string is for RealView debugger
-  Format = (Argc > 1) ? Argv[1] : "load /a /ni /np %a &0x%x";
+  // Default string is for RealView debugger or gdb depending on toolchain used.
+  if (Argc > 1) {
+    Format = Argv[1];
+  } else {
+#if __GNUC__
+    // Assume gdb
+    Format = "add-symbol-file %a 0x%x";
+#else
+    // Default to RVCT 
+    Format = "load /a /ni /np %a &0x%x";
+#endif
+  }
   Elf = (Argc > 2) ? FALSE : TRUE;
   
   Status = EfiGetSystemConfigurationTable (&gEfiDebugImageInfoTableGuid, (VOID **)&DebugImageTableHeader);
