@@ -502,8 +502,10 @@ ShellSetEnvironmentVariable (
   The CommandLine is executed from the current working directory on the current
   device.
 
-  EnvironmentVariables and Status are only supported for UEFI Shell 2.0 (or later).
-  Output is only supported for pre-UEFI Shell 2.0
+  The EnvironmentVariables and Status parameters are ignored in a pre-UEFI Shell 2.0
+  environment.  The values pointed to by the parameters will be unchanged by the
+  ShellExecute() function.  The Output parameter has no effect in a
+  UEFI Shell 2.0 environment.
 
   @param[in] ImageHandle          Parent image that is starting the operation.
   @param[in] CommandLine          Pointer to NULL terminated command line.
