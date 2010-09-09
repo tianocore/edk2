@@ -431,7 +431,7 @@ Udp4CheckTimeout (
       //
       // TimeoutTick unit is microsecond, MNP_TIMEOUT_CHECK_INTERVAL unit is 100ns.
       //
-      if (Wrap->TimeoutTick <= (UDP4_TIMEOUT_INTERVAL / 10)) {
+      if (Wrap->TimeoutTick < (UDP4_TIMEOUT_INTERVAL / 10)) {
         //
         // Remove this RxData if it timeouts.
         //
