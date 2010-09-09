@@ -1407,20 +1407,20 @@ EfiPxeBcUdpWrite (
     if (SrcPort != NULL) {
       Private->CurrentUdpSrcPort = *SrcPort;
     }
-
-    Status = PxeBcConfigureUdpWriteInstance (
-               Udp4,
-               &Private->StationIp.v4,
-               &Private->SubnetMask.v4,
-               &Private->GatewayIp.v4,
-               &Private->CurrentUdpSrcPort
-               );
-    if (EFI_ERROR (Status)) {
-      Private->CurrentUdpSrcPort = 0;
-      return EFI_INVALID_PARAMETER;
-    }
   }
 
+  Status = PxeBcConfigureUdpWriteInstance (
+             Udp4,
+             &Private->StationIp.v4,
+             &Private->SubnetMask.v4,
+             &Private->GatewayIp.v4,
+             &Private->CurrentUdpSrcPort
+             );
+  if (EFI_ERROR (Status)) {
+    Private->CurrentUdpSrcPort = 0;
+    return EFI_INVALID_PARAMETER;
+  }
+  
   ZeroMem (&Token, sizeof (EFI_UDP4_COMPLETION_TOKEN));
   ZeroMem (&Udp4Session, sizeof (EFI_UDP4_SESSION_DATA));
 
@@ -1492,6 +1492,10 @@ ON_EXIT:
 
   FreePool (Udp4TxData);
 
+  //
+  // Reset the instance.
+  //
+  Udp4->Configure (Udp4, NULL);
   return Status;
 }
 

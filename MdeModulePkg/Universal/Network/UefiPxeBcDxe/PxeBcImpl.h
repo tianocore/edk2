@@ -53,7 +53,7 @@ typedef struct _PXEBC_PRIVATE_DATA  PXEBC_PRIVATE_DATA;
 #define PXEBC_DEFAULT_UDP_OVERHEAD_SIZE    8
 #define PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE   4
 #define PXEBC_DEFAULT_PACKET_SIZE          1480
-#define PXEBC_DEFAULT_LIFETIME             2000000  // 2 seconds, unit is microsecond
+#define PXEBC_DEFAULT_LIFETIME             50000  // 50ms, unit is microsecond
 
 struct _PXEBC_PRIVATE_DATA {
   UINT32                                    Signature;
