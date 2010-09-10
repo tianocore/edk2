@@ -489,6 +489,7 @@ Returns:
   EFI_HII_HANDLE  *HiiHandleBuffer;
   EFI_GUID        Guid;
 
+  HiiHandleBuffer = NULL;
   Status = GetHiiHandles (&HandleBufferLen, &HiiHandleBuffer);
   if (EFI_ERROR(Status)) {
     return Status;

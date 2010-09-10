@@ -193,7 +193,7 @@ F2UCreateTextOpCode (
     ZeroMem (&UTextOpCode, sizeof(UTextOpCode));
     
     UTextOpCode.Header.OpCode = EFI_IFR_TEXT_OP;
-    UTextOpCode.Header.Length = sizeof (EFI_IFR_TEXT);
+    UTextOpCode.Header.Length = (UINT8) sizeof (EFI_IFR_TEXT);
 
     UTextOpCode.Statement.Help   = FwOpcode->Help;
 
@@ -229,7 +229,7 @@ F2UCreateReferenceOpCode (
 
   ZeroMem (&UOpcode, sizeof(UOpcode));
 
-  UOpcode.Header.Length = sizeof(UOpcode);
+  UOpcode.Header.Length = (UINT8) sizeof (UOpcode);
   UOpcode.Header.OpCode = EFI_IFR_REF_OP;
 
   UOpcode.Question.Header.Prompt = FwOpcode->Prompt;
@@ -269,7 +269,7 @@ F2UCreateOneOfOptionOpCode (
 
   ZeroMem (&UOpcode, sizeof(UOpcode));
 
-  UOpcode.Header.Length = sizeof(UOpcode);
+  UOpcode.Header.Length = (UINT8) sizeof (UOpcode);
   UOpcode.Header.OpCode = EFI_IFR_ONE_OF_OPTION_OP;
 
   UOpcode.Option        = FwOpcode->Option;
@@ -374,7 +374,7 @@ F2UCreateOneOfOpCode (
   ZeroMem (&UOpcode, sizeof(UOpcode));
   *OpcodeCount = 0;
 
-  UOpcode.Header.Length = sizeof(UOpcode);
+  UOpcode.Header.Length = (UINT8) sizeof (UOpcode);
   UOpcode.Header.OpCode = EFI_IFR_ONE_OF_OP;
   UOpcode.Header.Scope  = 1;
 
@@ -491,7 +491,7 @@ F2UCreateOrderedListOpCode (
   ZeroMem (&UOpcode, sizeof(UOpcode));
   *OpcodeCount = 0;
 
-  UOpcode.Header.Length = sizeof(UOpcode);
+  UOpcode.Header.Length = (UINT8) sizeof (UOpcode);
   UOpcode.Header.OpCode = EFI_IFR_ORDERED_LIST_OP;
   UOpcode.Header.Scope  = 1;
 
@@ -587,7 +587,7 @@ F2UCreateCheckBoxOpCode (
 
   ZeroMem (&UOpcode, sizeof(UOpcode));
 
-  UOpcode.Header.Length = sizeof(UOpcode);
+  UOpcode.Header.Length = (UINT8) sizeof (UOpcode);
   UOpcode.Header.OpCode = EFI_IFR_CHECKBOX_OP;
 
   UOpcode.Question.Header.Prompt = FwOpcode->Prompt;
@@ -667,7 +667,7 @@ F2UCreateNumericOpCode (
     UOpcode.Question.QuestionId    = FwOpcode->Key;
   }
 
-  UOpcode.Header.Length = sizeof(UOpcode);
+  UOpcode.Header.Length = (UINT8) sizeof (UOpcode);
   UOpcode.Header.OpCode = EFI_IFR_NUMERIC_OP;
   //
   // We need to create a nested default value for the UEFI Numeric Opcode.
@@ -786,7 +786,7 @@ F2UCreateStringOpCode (
     UOpcode.Question.QuestionId    = FwOpcode->Key;
   }
 
-  UOpcode.Header.Length = sizeof(UOpcode);
+  UOpcode.Header.Length = (UINT8) sizeof (UOpcode);
   UOpcode.Header.OpCode = EFI_IFR_STRING_OP;
 
   UOpcode.Question.Header.Prompt = FwOpcode->Prompt;

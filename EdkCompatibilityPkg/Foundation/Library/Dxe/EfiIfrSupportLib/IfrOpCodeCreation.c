@@ -51,7 +51,7 @@ Returns:
   EFI_IFR_SUBTITLE  Subtitle;
 
   Subtitle.Header.OpCode  = EFI_IFR_SUBTITLE_OP;
-  Subtitle.Header.Length  = sizeof (EFI_IFR_SUBTITLE);
+  Subtitle.Header.Length  = (UINT8) sizeof (EFI_IFR_SUBTITLE);
   Subtitle.SubTitle       = StringToken;
 
   EfiCopyMem (FormBuffer, &Subtitle, sizeof (EFI_IFR_SUBTITLE));
@@ -100,7 +100,7 @@ Returns:
   EFI_IFR_TEXT  Text;
 
   Text.Header.OpCode  = EFI_IFR_TEXT_OP;
-  Text.Header.Length  = sizeof (EFI_IFR_TEXT);
+  Text.Header.Length  = (UINT8) sizeof (EFI_IFR_TEXT);
   Text.Text           = StringToken;
 
   Text.TextTwo        = StringTokenTwo;
@@ -155,7 +155,7 @@ Returns:
   EFI_IFR_REF Hyperlink;
 
   Hyperlink.Header.OpCode = EFI_IFR_REF_OP;
-  Hyperlink.Header.Length = sizeof (EFI_IFR_REF);
+  Hyperlink.Header.Length = (UINT8) sizeof (EFI_IFR_REF);
   Hyperlink.FormId        = FormId;
   Hyperlink.Prompt        = StringToken;
   Hyperlink.Help          = StringTokenTwo;
@@ -228,7 +228,7 @@ Returns:
   }
 
   OneOf.Header.OpCode = EFI_IFR_ONE_OF_OP;
-  OneOf.Header.Length = sizeof (EFI_IFR_ONE_OF);
+  OneOf.Header.Length = (UINT8) sizeof (EFI_IFR_ONE_OF);
   OneOf.QuestionId    = QuestionId;
   OneOf.Width         = DataWidth;
   OneOf.Prompt        = PromptToken;
@@ -316,7 +316,7 @@ Returns:
   UINT8                 *LocalBuffer;
 
   OrderedList.Header.OpCode = EFI_IFR_ORDERED_LIST_OP;
-  OrderedList.Header.Length = sizeof (EFI_IFR_ORDERED_LIST);
+  OrderedList.Header.Length = (UINT8) sizeof (EFI_IFR_ORDERED_LIST);
   OrderedList.QuestionId    = QuestionId;
   OrderedList.MaxEntries    = MaxEntries;
   OrderedList.Prompt        = PromptToken;
@@ -406,7 +406,7 @@ Returns:
   }
 
   CheckBox.Header.OpCode  = EFI_IFR_CHECKBOX_OP;
-  CheckBox.Header.Length  = sizeof (EFI_IFR_CHECK_BOX);
+  CheckBox.Header.Length  = (UINT8) sizeof (EFI_IFR_CHECK_BOX);
   CheckBox.QuestionId     = QuestionId;
   CheckBox.Width          = DataWidth;
   CheckBox.Prompt         = PromptToken;
@@ -486,7 +486,7 @@ Returns:
   }
 
   Numeric.Header.OpCode = EFI_IFR_NUMERIC_OP;
-  Numeric.Header.Length = sizeof (EFI_IFR_NUMERIC);
+  Numeric.Header.Length = (UINT8) sizeof (EFI_IFR_NUMERIC);
   Numeric.QuestionId    = QuestionId;
   Numeric.Width         = DataWidth;
   Numeric.Prompt        = PromptToken;
@@ -555,7 +555,7 @@ Returns:
   EFI_IFR_STRING  String;
 
   String.Header.OpCode  = EFI_IFR_STRING_OP;
-  String.Header.Length  = sizeof (EFI_IFR_STRING);
+  String.Header.Length  = (UINT8) sizeof (EFI_IFR_STRING);
   String.QuestionId     = QuestionId;
   String.Width          = DataWidth;
   String.Prompt         = PromptToken;
@@ -604,7 +604,7 @@ Returns:
   EFI_IFR_BANNER  Banner;
 
   Banner.Header.OpCode  = EFI_IFR_BANNER_OP;
-  Banner.Header.Length  = sizeof (EFI_IFR_BANNER);
+  Banner.Header.Length  = (UINT8) sizeof (EFI_IFR_BANNER);
   EfiCopyMem (&Banner.Title, &Title, sizeof (UINT16));
   EfiCopyMem (&Banner.LineNumber, &LineNumber, sizeof (UINT16));
   Banner.Alignment = Alignment;

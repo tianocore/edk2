@@ -254,7 +254,7 @@ GlueBuildModuleHob (
 {
   EFI_HOB_MEMORY_ALLOCATION_MODULE  *Hob;
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE));
 
   CopyGuid (&(Hob->MemoryAllocationHeader.Name), &gEfiHobMemoryAllocModuleGuid);
   Hob->MemoryAllocationHeader.MemoryBaseAddress = MemoryAllocationModule;
@@ -295,7 +295,7 @@ BuildResourceDescriptorHob (
 {
   EFI_HOB_RESOURCE_DESCRIPTOR  *Hob;
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, (UINT16) sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
 
   Hob->ResourceType      = ResourceType;
   Hob->ResourceAttribute = ResourceAttribute;
@@ -402,7 +402,7 @@ BuildFvHob (
   // Check FV Signature
   //
   ASSERT (((EFI_FIRMWARE_VOLUME_HEADER*)((UINTN)BaseAddress))->Signature == EFI_FVH_SIGNATURE);
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_FV, sizeof (EFI_HOB_FIRMWARE_VOLUME));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_FV, (UINT16) sizeof (EFI_HOB_FIRMWARE_VOLUME));
 
   Hob->BaseAddress = BaseAddress;
   Hob->Length      = Length;
@@ -429,7 +429,7 @@ BuildCvHob (
 {
   EFI_HOB_CAPSULE_VOLUME  *Hob;
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_CV, sizeof (EFI_HOB_CAPSULE_VOLUME));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_CV, (UINT16) sizeof (EFI_HOB_CAPSULE_VOLUME));
 
   Hob->BaseAddress  = BaseAddress;
   Hob->Length       = Length;
@@ -456,7 +456,7 @@ BuildCpuHob (
 {
   EFI_HOB_CPU  *Hob;
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_CPU, sizeof (EFI_HOB_CPU));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_CPU, (UINT16) sizeof (EFI_HOB_CPU));
 
   Hob->SizeOfMemorySpace = SizeOfMemorySpace;
   Hob->SizeOfIoSpace     = SizeOfIoSpace;
@@ -488,7 +488,7 @@ BuildStackHob (
 {
   EFI_HOB_MEMORY_ALLOCATION_STACK  *Hob;
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_STACK));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION_STACK));
 
   CopyGuid (&(Hob->AllocDescriptor.Name), &gEfiHobMemoryAllocStackGuid);
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
@@ -524,7 +524,7 @@ BuildBspStoreHob (
 {
   EFI_HOB_MEMORY_ALLOCATION_BSP_STORE  *Hob;
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_BSP_STORE));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION_BSP_STORE));
 
   CopyGuid (&(Hob->AllocDescriptor.Name), &gEfiHobMemoryAllocBspStoreGuid);
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
@@ -560,7 +560,7 @@ GlueBuildMemoryAllocationHob (
 {
   EFI_HOB_MEMORY_ALLOCATION  *Hob;
 
-  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION));
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION));
 
   ZeroMem (&(Hob->AllocDescriptor.Name), sizeof (EFI_GUID));
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;

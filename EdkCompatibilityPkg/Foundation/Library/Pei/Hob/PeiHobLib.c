@@ -52,7 +52,7 @@ Returns:
   Hob.Raw = HobStart;
   
   Hob.Header->HobType   = EFI_HOB_TYPE_END_OF_HOB_LIST;
-  Hob.Header->HobLength = sizeof(EFI_HOB_GENERIC_HEADER);
+  Hob.Header->HobLength = (UINT16) sizeof (EFI_HOB_GENERIC_HEADER);
 
   Hob.Header++;
   return Hob;
@@ -102,7 +102,7 @@ Returns:
   HandOffHob.Raw     = HobStart;
   Hob.Raw            = HobStart;
   Hob.Header->HobType   = EFI_HOB_TYPE_HANDOFF;
-  Hob.Header->HobLength = sizeof(EFI_HOB_HANDOFF_INFO_TABLE);
+  Hob.Header->HobLength = (UINT16) sizeof (EFI_HOB_HANDOFF_INFO_TABLE);
 
   Hob.HandoffInformationTable->Version        = Version;
   Hob.HandoffInformationTable->BootMode       = BootMode;
@@ -161,7 +161,7 @@ Returns:
   Hob.Raw = (VOID*)(UINTN)(HandOffHob.HandoffInformationTable->EfiEndOfHobList);
 
   Hob.Header->HobType   = EFI_HOB_TYPE_MEMORY_ALLOCATION;
-  Hob.Header->HobLength = sizeof(EFI_HOB_MEMORY_ALLOCATION_MODULE);
+  Hob.Header->HobLength = (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE);
   
   CopyMem(&(Hob.MemoryAllocationModule->ModuleName), ModuleName, sizeof(EFI_GUID));
   CopyMem(&(Hob.MemoryAllocationModule->MemoryAllocationHeader.Name), &gEfiHobMemeryAllocModuleGuid, sizeof(EFI_GUID));
@@ -218,7 +218,7 @@ Returns:
   Hob.Raw = (VOID *)(UINTN)(HandOffHob.HandoffInformationTable->EfiEndOfHobList);
   
   Hob.Header->HobType   = EFI_HOB_TYPE_RESOURCE_DESCRIPTOR;
-  Hob.Header->HobLength = sizeof(EFI_HOB_RESOURCE_DESCRIPTOR);
+  Hob.Header->HobLength = (UINT16) sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
 
   Hob.ResourceDescriptor->ResourceType          = ResourceType;
   Hob.ResourceDescriptor->ResourceAttribute     = ResourceAttribute;
@@ -319,7 +319,7 @@ Returns:
   Hob.Raw = (VOID*)(UINTN)(HandOffHob.HandoffInformationTable->EfiEndOfHobList);  
 
   Hob.Header->HobType   = EFI_HOB_TYPE_FV;
-  Hob.Header->HobLength = sizeof(EFI_HOB_FIRMWARE_VOLUME);
+  Hob.Header->HobLength = (UINT16) sizeof (EFI_HOB_FIRMWARE_VOLUME);
 
   Hob.FirmwareVolume->BaseAddress = BaseAddress;
   Hob.FirmwareVolume->Length      = Length;
@@ -368,7 +368,7 @@ Returns:
   Hob.Raw = (VOID*)(UINTN)HandOffHob.HandoffInformationTable->EfiEndOfHobList;
 
   Hob.Header->HobType   = EFI_HOB_TYPE_CPU;
-  Hob.Header->HobLength = sizeof(EFI_HOB_CPU);
+  Hob.Header->HobLength = (UINT16) sizeof (EFI_HOB_CPU);
 
   Hob.Cpu->SizeOfMemorySpace = SizeOfMemorySpace;
   Hob.Cpu->SizeOfIoSpace     = SizeOfIoSpace;
@@ -416,7 +416,7 @@ Returns:
   Hob.Raw = (VOID*)(UINTN)HandOffHob.HandoffInformationTable->EfiEndOfHobList;
 
   Hob.Header->HobType   = EFI_HOB_TYPE_MEMORY_ALLOCATION;
-  Hob.Header->HobLength = sizeof(EFI_HOB_MEMORY_ALLOCATION_STACK);
+  Hob.Header->HobLength = (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION_STACK);
 
   CopyMem(&(Hob.MemoryAllocationStack->AllocDescriptor.Name), &gEfiHobMemeryAllocStackGuid, sizeof(EFI_GUID));
   (Hob.MemoryAllocationStack->AllocDescriptor).MemoryBaseAddress = BaseAddress;
@@ -468,7 +468,7 @@ Returns:
   HandOffHob.Raw = HobStart;
   Hob.Raw = (VOID *)(UINTN)HandOffHob.HandoffInformationTable->EfiEndOfHobList;
   Hob.Header->HobType   = EFI_HOB_TYPE_MEMORY_ALLOCATION;
-  Hob.Header->HobLength = sizeof(EFI_HOB_MEMORY_ALLOCATION_BSP_STORE);
+  Hob.Header->HobLength = (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION_BSP_STORE);
 
   (Hob.MemoryAllocationBspStore->AllocDescriptor).MemoryBaseAddress = BaseAddress;
   (Hob.MemoryAllocationBspStore->AllocDescriptor).MemoryLength = Length;
@@ -525,12 +525,12 @@ Returns:
   Hob.Raw = (VOID*)(UINTN)HandOffHob.HandoffInformationTable->EfiEndOfHobList;
 
   Hob.Header->HobType   = EFI_HOB_TYPE_MEMORY_ALLOCATION;
-  Hob.Header->HobLength = sizeof(EFI_HOB_MEMORY_ALLOCATION);
+  Hob.Header->HobLength = (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION);
 
   if (Name != NULL) {
-    CopyMem(&(Hob.MemoryAllocation->AllocDescriptor.Name), &Name, sizeof(EFI_GUID));
+    CopyMem (&(Hob.MemoryAllocation->AllocDescriptor.Name), &Name, sizeof (EFI_GUID));
   } else {
-    ZeroMem(&Hob.MemoryAllocation->AllocDescriptor.Name, sizeof(EFI_GUID));
+    ZeroMem (&Hob.MemoryAllocation->AllocDescriptor.Name, sizeof (EFI_GUID));
   }
 
   (Hob.MemoryAllocation->AllocDescriptor).MemoryBaseAddress = BaseAddress;

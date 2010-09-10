@@ -49,8 +49,8 @@ InternalMathDivRemS64x64 (
   INT64                             Quot;
 
   Quot = InternalMathDivRemU64x64 (
-           Dividend >= 0 ? Dividend : -Dividend,
-           Divisor >= 0 ? Divisor : -Divisor,
+           (UINT64) (Dividend >= 0 ? Dividend : -Dividend),
+           (UINT64) (Divisor >= 0 ? Divisor : -Divisor),
            (UINT64 *) Remainder
            );
   if (Remainder != NULL && Dividend < 0) {

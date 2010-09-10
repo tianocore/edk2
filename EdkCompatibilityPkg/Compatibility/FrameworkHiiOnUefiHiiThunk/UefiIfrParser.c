@@ -805,7 +805,7 @@ ParseOpCodes (
         CurrentStatement->Minimum = ((EFI_IFR_NUMERIC *) OpCodeData)->data.u8.MinValue;
         CurrentStatement->Maximum = ((EFI_IFR_NUMERIC *) OpCodeData)->data.u8.MaxValue;
         CurrentStatement->Step    = ((EFI_IFR_NUMERIC *) OpCodeData)->data.u8.Step;
-        CurrentStatement->StorageWidth = sizeof (UINT8);
+        CurrentStatement->StorageWidth = (UINT16) sizeof (UINT8);
         Value->Type = EFI_IFR_TYPE_NUM_SIZE_8;
         break;
 
