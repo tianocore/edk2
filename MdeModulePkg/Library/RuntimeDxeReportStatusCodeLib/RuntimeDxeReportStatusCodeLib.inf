@@ -19,7 +19,7 @@
   FILE_GUID                      = 07D25BBB-F832-41bb-BBA0-612E9F033067
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ReportStatusCodeLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = ReportStatusCodeLib|DXE_RUNTIME_DRIVER DXE_SAL_DRIVER
   CONSTRUCTOR                    = ReportStatusCodeLibConstructor
   DESTRUCTOR                     = ReportStatusCodeLibDestructor
 #
