@@ -424,7 +424,7 @@ BasePrintLibVSPrint (
             ArgumentString = StatusString [Index + WARNING_STATUS_NUMBER];
           }
         } else {
-          Index = Status;
+          Index = (UINTN) Status;
           if (Index <= WARNING_STATUS_NUMBER) {
             ArgumentString = StatusString [Index];
           }

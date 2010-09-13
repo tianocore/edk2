@@ -717,7 +717,7 @@ F2UCreateNumericOpCode (
   // We need to create a default value.
   //
   ZeroMem (&UOpcodeDefault, sizeof (UOpcodeDefault));
-  UOpcodeDefault.Header.Length = sizeof (UOpcodeDefault);
+  UOpcodeDefault.Header.Length = (UINT8) sizeof (UOpcodeDefault);
   UOpcodeDefault.Header.OpCode = EFI_IFR_DEFAULT_OP;
 
   UOpcodeDefault.DefaultId = 0;

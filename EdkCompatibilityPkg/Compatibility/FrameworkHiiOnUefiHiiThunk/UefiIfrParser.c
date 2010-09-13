@@ -813,7 +813,7 @@ ParseOpCodes (
         CopyMem (&CurrentStatement->Minimum, &((EFI_IFR_NUMERIC *) OpCodeData)->data.u16.MinValue, sizeof (UINT16));
         CopyMem (&CurrentStatement->Maximum, &((EFI_IFR_NUMERIC *) OpCodeData)->data.u16.MaxValue, sizeof (UINT16));
         CopyMem (&CurrentStatement->Step,    &((EFI_IFR_NUMERIC *) OpCodeData)->data.u16.Step,     sizeof (UINT16));
-        CurrentStatement->StorageWidth = sizeof (UINT16);
+        CurrentStatement->StorageWidth = (UINT16) sizeof (UINT16);
         Value->Type = EFI_IFR_TYPE_NUM_SIZE_16;
         break;
 
@@ -821,7 +821,7 @@ ParseOpCodes (
         CopyMem (&CurrentStatement->Minimum, &((EFI_IFR_NUMERIC *) OpCodeData)->data.u32.MinValue, sizeof (UINT32));
         CopyMem (&CurrentStatement->Maximum, &((EFI_IFR_NUMERIC *) OpCodeData)->data.u32.MaxValue, sizeof (UINT32));
         CopyMem (&CurrentStatement->Step,    &((EFI_IFR_NUMERIC *) OpCodeData)->data.u32.Step,     sizeof (UINT32));
-        CurrentStatement->StorageWidth = sizeof (UINT32);
+        CurrentStatement->StorageWidth = (UINT16) sizeof (UINT32);
         Value->Type = EFI_IFR_TYPE_NUM_SIZE_32;
         break;
 
@@ -829,7 +829,7 @@ ParseOpCodes (
         CopyMem (&CurrentStatement->Minimum, &((EFI_IFR_NUMERIC *) OpCodeData)->data.u64.MinValue, sizeof (UINT64));
         CopyMem (&CurrentStatement->Maximum, &((EFI_IFR_NUMERIC *) OpCodeData)->data.u64.MaxValue, sizeof (UINT64));
         CopyMem (&CurrentStatement->Step,    &((EFI_IFR_NUMERIC *) OpCodeData)->data.u64.Step,     sizeof (UINT64));
-        CurrentStatement->StorageWidth = sizeof (UINT64);
+        CurrentStatement->StorageWidth = (UINT16) sizeof (UINT64);
         Value->Type = EFI_IFR_TYPE_NUM_SIZE_64;
         break;
 
@@ -866,7 +866,7 @@ ParseOpCodes (
       ASSERT (CurrentStatement != NULL);
 
       CurrentStatement->Flags = ((EFI_IFR_CHECKBOX *) OpCodeData)->Flags;
-      CurrentStatement->StorageWidth = sizeof (BOOLEAN);
+      CurrentStatement->StorageWidth = (UINT16) sizeof (BOOLEAN);
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_BOOLEAN;
 
       break;

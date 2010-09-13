@@ -243,7 +243,7 @@ Returns:
 
   for (Index = 0; Index < OptionCount; Index++) {
     OneOfOption.Header.OpCode = EFI_IFR_ONE_OF_OPTION_OP;
-    OneOfOption.Header.Length = sizeof (EFI_IFR_ONE_OF_OPTION);
+    OneOfOption.Header.Length = (UINT8) sizeof (EFI_IFR_ONE_OF_OPTION);
 
     OneOfOption.Option        = OptionsList[Index].StringToken;
     OneOfOption.Value         = OptionsList[Index].Value;
@@ -255,7 +255,7 @@ Returns:
     LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_ONE_OF_OPTION));
   }
 
-  EndOneOf.Header.Length  = sizeof (EFI_IFR_END_ONE_OF);
+  EndOneOf.Header.Length  = (UINT8) sizeof (EFI_IFR_END_ONE_OF);
   EndOneOf.Header.OpCode  = EFI_IFR_END_ONE_OF_OP;
 
   EfiCopyMem (LocalBuffer, &EndOneOf, sizeof (EFI_IFR_END_ONE_OF));
@@ -331,7 +331,7 @@ Returns:
 
   for (Index = 0; Index < OptionCount; Index++) {
     OrderedListOption.Header.OpCode = EFI_IFR_ONE_OF_OPTION_OP;
-    OrderedListOption.Header.Length = sizeof (EFI_IFR_ONE_OF_OPTION);
+    OrderedListOption.Header.Length = (UINT8) sizeof (EFI_IFR_ONE_OF_OPTION);
 
     OrderedListOption.Option        = OptionsList[Index].StringToken;
     OrderedListOption.Value         = OptionsList[Index].Value;
@@ -343,7 +343,7 @@ Returns:
     LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_ONE_OF_OPTION));
   }
 
-  EndOrderedList.Header.Length  = sizeof (EFI_IFR_END_ONE_OF);
+  EndOrderedList.Header.Length  = (UINT8) sizeof (EFI_IFR_END_ONE_OF);
   EndOrderedList.Header.OpCode  = EFI_IFR_END_ONE_OF_OP;
 
   EfiCopyMem (LocalBuffer, &EndOrderedList, sizeof (EFI_IFR_END_ONE_OF));
