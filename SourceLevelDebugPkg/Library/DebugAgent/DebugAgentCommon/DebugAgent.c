@@ -384,6 +384,11 @@ GetBreakCause (
       //
       if ((CpuContext->Dr6 & BIT14) != 0) {
         Cause = DEBUG_DATA_BREAK_CAUSE_STEPPING;
+        //
+        // If it's single step, no need to check DR0, to ensure single step work in PeCoffExtraActionLib
+        // (right after triggering a breakpoint to report image load/unload).
+        //
+        return Cause;
 
       } else {
         Cause = DEBUG_DATA_BREAK_CAUSE_HW_BREAKPOINT;
