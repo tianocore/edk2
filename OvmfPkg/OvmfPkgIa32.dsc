@@ -57,7 +57,6 @@
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
-  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
@@ -82,13 +81,29 @@
   FileHandleLib|ShellPkg/Library/BaseFileHandleLib/BaseFileHandleLib.inf
   UefiCpuLib|UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
+!ifdef $(SOURCE_DEBUG_ENABLE)
+  PeCoffExtraActionLib|SourceLevelDebugPkg/Library/PeCoffExtraActionLibDebug/PeCoffExtraActionLibDebug.inf
+  DebugCommunicationLib|SourceLevelDebugPkg/Library/DebugCommunicationLibSerialPort/DebugCommunicationLibSerialPort.inf
+!else
+  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
-
+!endif
+  
+  ResetSystemLib|PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  LocalApicLib|UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
+  
 [LibraryClasses.common.SEC]
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   ExtractGuidedSectionLib|OvmfPkg/Library/SecExtractGuidedSectionLib/SecExtractGuidedSectionLib.inf
-
+!ifdef $(SOURCE_DEBUG_ENABLE)
+  DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
+!endif
+  HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
+  PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+  PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
+  MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+  
 [LibraryClasses.common.PEI_CORE]
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptPei/BaseMemoryLibOptPei.inf
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
@@ -116,6 +131,9 @@
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PeiResourcePublicationLib|MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
+!ifdef $(SOURCE_DEBUG_ENABLE)
+  DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
+!endif
 
 [LibraryClasses.common.DXE_CORE]
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
@@ -126,6 +144,9 @@
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
+!ifdef $(SOURCE_DEBUG_ENABLE)
+  DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
+!endif
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
@@ -205,7 +226,13 @@
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
+!ifdef $(SOURCE_DEBUG_ENABLE)
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+!else
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
+!endif
+
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
 
 ################################################################################
 #
