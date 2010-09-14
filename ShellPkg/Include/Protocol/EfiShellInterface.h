@@ -4,9 +4,7 @@
   Shell Interface - additional information (over image_info) provided
   to an application started by the shell.
 
-  ConIo - provides a file style interface to the console.  Note that the
-  ConOut & ConIn interfaces in the system table will work as well, and both
-  all will be redirected to a file if needed on a command line
+  ConIo provides a file-style interface to the console.
 
   The shell interface's and data (including ConIo) are only valid during
   the applications Entry Point.  Once the application returns from it's
@@ -23,8 +21,10 @@
 
 **/
 
-#if !defined(_SHELLINTERFACE_H_)
+#ifndef _SHELLINTERFACE_H_
 #define _SHELLINTERFACE_H_
+
+#include <Protocol/SimpleFileSystem.h>
 
 #define SHELL_INTERFACE_PROTOCOL_GUID \
   { \
@@ -32,7 +32,7 @@
   }
 
 ///
-/// bit definitions for EFI_SHELL_ARG_INFO
+/// Bit definitions for EFI_SHELL_ARG_INFO
 ///
 typedef enum {
   ARG_NO_ATTRIB         = 0x0,
@@ -43,48 +43,48 @@ typedef enum {
 } EFI_SHELL_ARG_INFO_TYPES;
 
 ///
-/// attributes for an argument.
+/// Attributes for an argument.
 ///
 typedef struct _EFI_SHELL_ARG_INFO {
   UINT32  Attributes;
 } EFI_SHELL_ARG_INFO;
 
 ///
-/// This protocol provides access to additional information about a shell app.
+/// This protocol provides access to additional information about a shell application.
 ///
 typedef struct {
   ///
-  /// Handle back to original image handle & image info
+  /// Handle back to original image handle & image information.
   ///
   EFI_HANDLE                ImageHandle;
   EFI_LOADED_IMAGE_PROTOCOL *Info;
 
   ///
-  /// Parsed arg list converted more C like format
+  /// Parsed arg list converted more C-like format.
   ///
   CHAR16                    **Argv;
   UINTN                     Argc;
 
   ///
-  /// Storage for file redirection args after parsing
+  /// Storage for file redirection args after parsing.
   ///
   CHAR16                    **RedirArgv;
   UINTN                     RedirArgc;
 
   ///
-  /// A file style handle for console io
+  /// A file style handle for console io.
   ///
-  EFI_FILE_HANDLE           StdIn;
-  EFI_FILE_HANDLE           StdOut;
-  EFI_FILE_HANDLE           StdErr;
+  EFI_FILE_PROTOCOL         *StdIn;
+  EFI_FILE_PROTOCOL         *StdOut;
+  EFI_FILE_PROTOCOL         *StdErr;
 
   ///
-  /// list of attributes for each argument
+  /// List of attributes for each argument.
   ///
   EFI_SHELL_ARG_INFO        *ArgInfo;
 
   ///
-  /// whether we are echoing
+  /// Whether we are echoing.
   ///
   BOOLEAN                   EchoOn;
 } EFI_SHELL_INTERFACE;

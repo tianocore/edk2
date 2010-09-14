@@ -12,28 +12,29 @@
 
 **/
 
-#if !defined (_FILE_HANDLE_LIBRARY_HEADER_)
+#ifndef _FILE_HANDLE_LIBRARY_HEADER_
 #define _FILE_HANDLE_LIBRARY_HEADER_
 
-/// Tag for use in identifying UNICODE files.
-/// If the file is UNICODE the first 16 bits of the file will equal this value.
+#include <Protocol/SimpleFileSystem.h>
+
+/// The tag for use in identifying UNICODE files.
+/// If the file is UNICODE, the first 16 bits of the file will equal this value.
 enum {
   UnicodeFileTag = 0xFEFF
 };
 
 /**
-  This function will retrieve the information about the file for the handle
-  specified and store it in allocated pool memory.
+  This function retrieves information about the file for the handle
+  specified and stores it in the allocated pool memory.
 
   This function allocates a buffer to store the file's information. It is the
   caller's responsibility to free the buffer.
 
-  @param  FileHandle  The file handle of the file for which information is
-                      being requested.
+  @param[in] FileHandle         The file handle of the file for which information is
+                                being requested.
 
-  @retval NULL        information could not be retrieved.
-
-  @retval !NULL       the information about the file
+  @retval NULL                  Information could not be retrieved.
+  @retval !NULL                 The information about the file.
 **/
 EFI_FILE_INFO*
 EFIAPI
@@ -42,23 +43,23 @@ FileHandleGetInfo (
   );
 
 /**
-  This function will set the information about the file for the opened handle
+  This function sets the information about the file for the opened handle
   specified.
 
-  @param  FileHandle            The file handle of the file for which information
+  @param[in]  FileHandle        The file handle of the file for which information
                                 is being set.
 
-  @param  FileInfo              The information to set.
+  @param[in]  FileInfo          The information to set.
 
   @retval EFI_SUCCESS		        The information was set.
-  @retval EFI_INVALID_PARAMETER A Parameter was out of range or invalid.
+  @retval EFI_INVALID_PARAMETER A parameter was out of range or invalid.
   @retval EFI_UNSUPPORTED       The FileHandle does not support FileInfo.
   @retval EFI_NO_MEDIA		      The device has no medium.
   @retval EFI_DEVICE_ERROR	    The device reported an error.
   @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
   @retval EFI_WRITE_PROTECTED	  The file or medium is write protected.
-  @retval EFI_ACCESS_DENIED	    The file was opened read only.
-  @retval EFI_VOLUME_FULL	      The volume is full.
+  @retval EFI_ACCESS_DENIED     The file was opened read only.
+  @retval EFI_VOLUME_FULL       The volume is full.
 **/
 EFI_STATUS
 EFIAPI
@@ -83,16 +84,16 @@ FileHandleSetInfo (
   are no more directory entries, the read returns a zero-length buffer.
   EFI_FILE_INFO is the structure returned as the directory entry.
 
-  @param FileHandle             The opened file handle.
-  @param BufferSize             On input the size of buffer in bytes.  On return
+  @param[in] FileHandle         The opened file handle.
+  @param[in,out] BufferSize     On input, the size of buffer in bytes.  On return,
                                 the number of bytes written.
-  @param Buffer                 The buffer to put read data into.
+  @param[out] Buffer            The buffer to put read data into.
 
-  @retval EFI_SUCCESS	          Data was read.
+  @retval EFI_SUCCESS	        Data was read.
   @retval EFI_NO_MEDIA	        The device has no media.
-  @retval EFI_DEVICE_ERROR	    The device reported an error.
+  @retval EFI_DEVICE_ERROR	The device reported an error.
   @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_BUFFER_TO_SMALL	  Buffer is too small. ReadSize contains required
+  @retval EFI_BUFFER_TO_SMALL	Buffer is too small. ReadSize contains required
                                 size.
 
 **/
@@ -114,19 +115,19 @@ FileHandleRead(
   The file is automatically grown to hold the data if required. Direct writes to
   opened directories are not supported.
 
-  @param FileHandle             The opened file for writing
-  @param BufferSize             On input the number of bytes in Buffer.  On output
+  @param[in] FileHandle         The opened file for writing.
+  @param[in,out] BufferSize     On input, the number of bytes in Buffer.  On output,
                                 the number of bytes written.
-  @param Buffer                 The buffer containing data to write is stored.
+  @param[in] Buffer             The buffer containing data to write is stored.
 
-  @retval EFI_SUCCESS	          Data was written.
-  @retval EFI_UNSUPPORTED	      Writes to an open directory are not supported.
+  @retval EFI_SUCCESS	        Data was written.
+  @retval EFI_UNSUPPORTED       Writes to an open directory are not supported.
   @retval EFI_NO_MEDIA	        The device has no media.
-  @retval EFI_DEVICE_ERROR	    The device reported an error.
+  @retval EFI_DEVICE_ERROR	The device reported an error.
   @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED	  The device is write-protected.
-  @retval EFI_ACCESS_DENIED	    The file was open for read only.
-  @retval EFI_VOLUME_FULL	      The volume is full.
+  @retval EFI_WRITE_PROTECTED	The device is write-protected.
+  @retval EFI_ACCESS_DENIED	The file was opened for read only.
+  @retval EFI_VOLUME_FULL	The volume is full.
 **/
 EFI_STATUS
 EFIAPI
@@ -143,9 +144,9 @@ FileHandleWrite(
   flushed to the device, and the file is closed. In all cases the handle is
   closed.
 
-  @param FileHandle               The file handle to close.
+  @param[in] FileHandle           The file handle to close.
 
-  @retval EFI_SUCCESS             The file handle was closed sucessfully.
+  @retval EFI_SUCCESS             The file handle was closed successfully.
 **/
 EFI_STATUS
 EFIAPI
@@ -160,11 +161,11 @@ FileHandleClose (
   If the file cannot be deleted, the warning code EFI_WARN_DELETE_FAILURE is
   returned, but the handle is still closed.
 
-  @param FileHandle             The file handle to delete.
+  @param[in] FileHandle             The file handle to delete.
 
-  @retval EFI_SUCCESS               The file was closed sucessfully.
-  @retval EFI_WARN_DELETE_FAILURE   the handle was closed, but the file was not
-                                    deleted
+  @retval EFI_SUCCESS               The file was closed successfully.
+  @retval EFI_WARN_DELETE_FAILURE   The handle was closed, but the file was not
+                                    deleted.
   @retval INVALID_PARAMETER    	    One of the parameters has an invalid value.
 **/
 EFI_STATUS
@@ -177,18 +178,18 @@ FileHandleDelete (
   Set the current position in a file.
 
   This function sets the current file position for the handle to the position
-  supplied. With the exception of seeking to position 0xFFFFFFFFFFFFFFFF, only
-  absolute positioning is supported, and seeking past the end of the file is
-  allowed (a subsequent write would grow the file). Seeking to position
+  supplied. With the exception of moving to position 0xFFFFFFFFFFFFFFFF, only
+  absolute positioning is supported, and moving past the end of the file is
+  allowed (a subsequent write would grow the file). Moving to position
   0xFFFFFFFFFFFFFFFF causes the current position to be set to the end of the file.
   If FileHandle is a directory, the only position that may be set is zero. This
-  has the effect of starting the read process of the directory entries over.
+  has the effect of starting the read process of the directory entries over again.
 
-  @param FileHandle             The file handle on which the position is being set
-  @param Position               Byte position from begining of file
+  @param[in] FileHandle         The file handle on which the position is being set.
+  @param[in] Position           The byte position from the begining of the file.
 
-  @retval EFI_SUCCESS           Operation completed sucessfully.
-  @retval EFI_UNSUPPORTED       the seek request for non-zero is not valid on
+  @retval EFI_SUCCESS           The operation completed sucessfully.
+  @retval EFI_UNSUPPORTED       The request for non-zero is not valid on
                                 directories.
   @retval INVALID_PARAMETER     One of the parameters has an invalid value.
 **/
@@ -204,15 +205,15 @@ FileHandleSetPosition (
 
   This function retrieves the current file position for the file handle. For
   directories, the current file position has no meaning outside of the file
-  system driver and as such the operation is not supported. An error is returned
+  system driver. As such, the operation is not supported. An error is returned
   if FileHandle is a directory.
 
-  @param FileHandle             The open file handle on which to get the position.
-  @param Position               Byte position from begining of file.
+  @param[in] FileHandle         The open file handle on which to get the position.
+  @param[out] Position          The byte position from begining of file.
 
-  @retval EFI_SUCCESS           the operation completed sucessfully.
+  @retval EFI_SUCCESS           The operation completed successfully.
   @retval INVALID_PARAMETER     One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED       the request is not valid on directories.
+  @retval EFI_UNSUPPORTED       The request is not valid on directories.
 **/
 EFI_STATUS
 EFIAPI
@@ -225,7 +226,7 @@ FileHandleGetPosition (
 
   This function flushes all modified data associated with a file to a device.
 
-  @param FileHandle             The file handle on which to flush data.
+  @param[in] FileHandle         The file handle on which to flush data.
 
   @retval EFI_SUCCESS           The data was flushed.
   @retval EFI_NO_MEDIA          The device has no media.
@@ -243,16 +244,16 @@ FileHandleFlush (
 /**
   Function to determine if a given handle is a directory handle.
 
-  If DirHandle is NULL then ASSERT().
+  If DirHandle is NULL, then ASSERT().
 
-  Open the file information on the DirHandle and verify that the Attribute
+  Open the file information on the DirHandle, and verify that the Attribute
   includes EFI_FILE_DIRECTORY bit set.
 
-  @param DirHandle              Handle to open file.
+  @param[in] DirHandle          The handle to open the file.
 
-  @retval EFI_SUCCESS           DirHandle is a directory
-  @retval EFI_INVALID_PARAMETER DirHandle did not have EFI_FILE_INFO available
-  @retval EFI_NOT_FOUND         DirHandle is not a directory
+  @retval EFI_SUCCESS           DirHandle is a directory.
+  @retval EFI_INVALID_PARAMETER DirHandle did not have EFI_FILE_INFO available.
+  @retval EFI_NOT_FOUND         DirHandle is not a directory.
 **/
 EFI_STATUS
 EFIAPI
@@ -263,20 +264,20 @@ FileHandleIsDirectory (
 /**
   Retrieves the first file from a directory.
 
-  This function opens a directory and gets the first file's info in the
-  directory. Caller can use FileHandleFindNextFile() to get other files.  When
-  complete the caller is responsible for calling FreePool() on *Buffer.
+  This function opens a directory and gets the first file's information in the
+  directory. The caller the uses FileHandleFindNextFile() to get other files.  When
+  complete, the caller is responsible for calling FreePool() on *Buffer.
 
-  @param DirHandle              The file handle of the directory to search
-  @param Buffer                 Pointer to pointer to buffer for file's information
+  @param[in] DirHandle          The file handle of the directory to search.
+  @param[out] Buffer            The pointer to pointer to buffer for file's information.
 
   @retval EFI_SUCCESS           Found the first file.
   @retval EFI_NOT_FOUND         Cannot find the directory.
   @retval EFI_NO_MEDIA          The device has no media.
   @retval EFI_DEVICE_ERROR      The device reported an error.
   @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
-  @return Others                status of FileHandleGetInfo, FileHandleSetPosition,
-                                or FileHandleRead
+  @return Others                The status of FileHandleGetInfo, FileHandleSetPosition,
+                                or FileHandleRead.
 **/
 EFI_STATUS
 EFIAPI
@@ -294,11 +295,11 @@ FileHandleFindFirstFile (
   call of this function has no file to get. *NoFile will be set to TRUE and the
   Buffer memory will be automatically freed.
 
-  @param DirHandle              the file handle of the directory
-  @param Buffer			            pointer to buffer for file's information
-  @param NoFile			            pointer to boolean when last file is found
+  @param[in] DirHandle          The file handle of the directory.
+  @param[out] Buffer            The pointer to buffer for file's information.
+  @param[out] NoFile            The pointer to boolean when last file is found.
 
-  @retval EFI_SUCCESS           Found the next file, or reached last file
+  @retval EFI_SUCCESS           Found the next file, or reached last file.
   @retval EFI_NO_MEDIA          The device has no media.
   @retval EFI_DEVICE_ERROR      The device reported an error.
   @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
@@ -314,23 +315,44 @@ FileHandleFindNextFile(
 /**
   Retrieve the size of a file.
 
-  If FileHandle is NULL then ASSERT()
-  If Size is NULL then ASSERT()
+  If FileHandle is NULL then ASSERT().
+  If Size is NULL then ASSERT().
 
   This function extracts the file size info from the FileHandle's EFI_FILE_INFO
   data.
 
-  @param FileHandle             The file handle from which size is retrieved.
-  @param Size                   pointer to size.
+  @param[in] FileHandle         The file handle from which size is retrieved.
+  @param[out] Size              The pointer to size.
 
-  @retval EFI_SUCCESS           operation was completed sucessfully
-  @retval EFI_DEVICE_ERROR      cannot access the file
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_DEVICE_ERROR      Cannot access the file.
 **/
 EFI_STATUS
 EFIAPI
 FileHandleGetSize (
   IN EFI_FILE_HANDLE            FileHandle,
   OUT UINT64                    *Size
+  );
+
+/**
+  Set the size of a file.
+
+  If FileHandle is NULL then ASSERT().
+
+  This function changes the file size info from the FileHandle's EFI_FILE_INFO
+  data.
+
+  @param[in] FileHandle         The file handle whose size is to be changed.
+  @param[in] Size               The new size.
+
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_DEVICE_ERROR      Cannot access the file.
+**/
+EFI_STATUS
+EFIAPI
+FileHandleSetSize (
+  IN EFI_FILE_HANDLE            FileHandle,
+  IN UINT64                     Size
   );
 
 /**
@@ -341,10 +363,10 @@ FileHandleGetSize (
   @param[out] FullFileName      Pointer to pointer to generated full file name.  It
                                 is the responsibility of the caller to free this memory
                                 with a call to FreePool().
-  @retval EFI_SUCCESS           the operation was sucessful and the FullFileName is valid.
+  @retval EFI_SUCCESS           The operation was successful and FullFileName is valid.
   @retval EFI_INVALID_PARAMETER Handle was NULL.
   @retval EFI_INVALID_PARAMETER FullFileName was NULL.
-  @retval EFI_OUT_OF_MEMORY     a memory allocation failed.
+  @retval EFI_OUT_OF_MEMORY     A memory allocation failed.
 **/
 EFI_STATUS
 EFIAPI
@@ -359,21 +381,24 @@ FileHandleGetFileName (
   If the position upon start is 0, then the Ascii Boolean will be set.  This should be
   maintained and not changed for all operations with the same file.
 
-  @param[in]      Handle        FileHandle to read from
-  @param[in,out]  Buffer        pointer to buffer to read into
-  @param[in,out]  Size          pointer to number of bytes in buffer
-  @param[in]      Truncate      if TRUE then allows for truncation of the line to fit.
-                                if FALSE will reset the position to the begining of the
-                                line if the buffer is not large enough.
-  @param[in,out]  Ascii         Boolean value for indicating whether the file is
-                                Ascii (TRUE) or UCS2 (FALSE);
+  @param[in]      Handle        FileHandle to read from.
+  @param[in,out]  Buffer        The pointer to buffer to read into.
+  @param[in,out]  Size          The pointer to number of bytes in Buffer.
+  @param[in]      Truncate      If the buffer is large enough, this has no effect.
+                                If the buffer is is too small and Truncate is TRUE,
+                                the line will be truncated.
+                                If the buffer is is too small and Truncate is FALSE,
+                                then no read will occur.
 
-  @retval EFI_SUCCESS           the operation was sucessful.  the line is stored in
+  @param[in,out]  Ascii         Boolean value for indicating whether the file is
+                                Ascii (TRUE) or UCS2 (FALSE).
+
+  @retval EFI_SUCCESS           The operation was successful.  The line is stored in
                                 Buffer.
   @retval EFI_INVALID_PARAMETER Handle was NULL.
   @retval EFI_INVALID_PARAMETER Size was NULL.
-  @retval EFI_BUFFER_TOO_SMALL  Size was not enough space to store the line.
-                                Size was updated to minimum space required.
+  @retval EFI_BUFFER_TOO_SMALL  Size was not large enough to store the line.
+                                Size was updated to the minimum space required.
   @sa FileHandleRead
 **/
 EFI_STATUS
@@ -394,7 +419,8 @@ FileHandleReadLine(
   maintained and not changed for all operations with the same file.
 
   @param[in]      Handle        FileHandle to read from.
-  @param[in,out]  Ascii         Boolean value for indicating whether the file is Ascii (TRUE) or UCS2 (FALSE);
+  @param[in,out]  Ascii         Boolean value for indicating whether the file is
+                                Ascii (TRUE) or UCS2 (FALSE).
 
   @return                       The line of text from the file.
 
@@ -412,12 +438,12 @@ FileHandleReturnLine(
 
   If Handle is NULL, ASSERT.
 
-  @param[in]     Handle         FileHandle to write to
+  @param[in]     Handle         FileHandle to write to.
   @param[in]     Buffer         Buffer to write, if NULL the function will
                                 take no action and return EFI_SUCCESS.
 
-  @retval  EFI_SUCCESS          the data was written.
-  @retval  other                failure.
+  @retval  EFI_SUCCESS          The data was written.
+  @retval  other                Failure.
 
   @sa FileHandleWrite
 **/
@@ -429,14 +455,14 @@ FileHandleWriteLine(
   );
 
 /**
-  function to take a formatted argument and print it to a file.
+  Function to take a formatted argument and print it to a file.
 
-  @param[in] Handle   the file handle for the file to write to
-  @param[in] Format   the format argument (see printlib for format specifier)
-  @param[in] ...      the variable arguments for the format
+  @param[in] Handle   The file handle for the file to write to.
+  @param[in] Format   The format argument (see printlib for the format specifier).
+  @param[in] ...      The variable arguments for the format.
 
-  @retval EFI_SUCCESS the operation was sucessful
-  @return other       a return value from FileHandleWriteLine
+  @retval EFI_SUCCESS The operation was successful.
+  @retval other       A return value from FileHandleWriteLine.
 
   @sa FileHandleWriteLine
 **/
@@ -453,12 +479,12 @@ FileHandlePrintLine(
 
   This will NOT work on directories.
 
-  If Handle is NULL, then ASSERT.
+  If Handle is NULL, then ASSERT().
 
-  @param[in] Handle     the file handle
+  @param[in] Handle     The file handle.
 
-  @retval TRUE          the position is at the end of the file
-  @retval FALSE         the position is not at the end of the file
+  @retval TRUE          The position is at the end of the file.
+  @retval FALSE         The position is not at the end of the file.
 **/
 BOOLEAN
 EFIAPI

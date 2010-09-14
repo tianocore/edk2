@@ -1,5 +1,5 @@
 /** @file
-  GUID for EFI shell Environment2 Extension
+  GUID for EFI shell Environment2 Extension.
 
   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef _SHELLPKG_SHELL_ENV2_EXT_GUID_H
-#define _SHELLPKG_SHELL_ENV2_EXT_GUID_H
+#ifndef _SHELLPKG_SHELL_ENV2_EXT_GUID_H_
+#define _SHELLPKG_SHELL_ENV2_EXT_GUID_H_
 
 #define SHELLPKG_SHELL_ENV2_EXT_GUID \
 { \

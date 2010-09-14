@@ -12,7 +12,7 @@
 
 **/
 
-#if !defined(__SHELL_LIB__)
+#ifndef __SHELL_LIB__
 #define __SHELL_LIB__
 
 #include <Uefi.h>
@@ -23,6 +23,12 @@
 #include <Protocol/EfiShellEnvironment2.h>
 #include <Protocol/EfiShell.h>
 #include <Protocol/EfiShellParameters.h>
+
+// (20 * (6+5+2))+1) unicode characters from EFI FAT spec (doubled for bytes)
+#define MAX_FILE_NAME_LEN 512
+
+extern EFI_SHELL_PARAMETERS_PROTOCOL *mEfiShellParametersProtocol;
+extern EFI_SHELL_PROTOCOL            *mEfiShellProtocol;
 
 /**
   This function will retrieve the information about the file for the handle
@@ -41,31 +47,32 @@
 EFI_FILE_INFO*
 EFIAPI
 ShellGetFileInfo (
-  IN EFI_FILE_HANDLE            FileHandle
+  IN SHELL_FILE_HANDLE          FileHandle
   );
 
 /**
-  This function will set the information about the file for the opened handle
+  This function sets the information about the file for the opened handle
   specified.
 
   @param[in]  FileHandle        The file handle of the file for which information
                                 is being set.
 
-  @param[in] FileInfo           The infotmation to set.
+  @param[in]  FileInfo          The information to set.
 
-  @retval EFI_SUCCESS	          The information was set.
-  @retval EFI_UNSUPPORTED       The InformationType is not known.
+  @retval EFI_SUCCESS		        The information was set.
+  @retval EFI_INVALID_PARAMETER A parameter was out of range or invalid.
+  @retval EFI_UNSUPPORTED       The FileHandle does not support FileInfo.
   @retval EFI_NO_MEDIA		      The device has no medium.
   @retval EFI_DEVICE_ERROR	    The device reported an error.
   @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED   The file or medium is write protected.
-  @retval EFI_ACCESS_DENIED	    The file was opened read only.
-  @retval EFI_VOLUME_FULL	      The volume is full.
+  @retval EFI_WRITE_PROTECTED	  The file or medium is write protected.
+  @retval EFI_ACCESS_DENIED     The file was opened read only.
+  @retval EFI_VOLUME_FULL       The volume is full.
 **/
 EFI_STATUS
 EFIAPI
 ShellSetFileInfo (
-  IN EFI_FILE_HANDLE  	        FileHandle,
+  IN SHELL_FILE_HANDLE	        FileHandle,
   IN EFI_FILE_INFO              *FileInfo
   );
 
@@ -75,36 +82,36 @@ ShellSetFileInfo (
   This function opens a file with the open mode according to the file path. The
   Attributes is valid only for EFI_FILE_MODE_CREATE.
 
-  @param[in]  FilePath 		      On input the device path to the file.  On output
+  @param[in,out]  FilePath      On input, the device path to the file.  On output,
                                 the remaining device path.
-  @param[out]  DeviceHandle  	  Pointer to the system device handle.
-  @param[out]  FileHandle		    Pointer to the file handle.
-  @param[in]  OpenMode	    	  The mode to open the file with.
-  @param[in]  Attributes	  	  The file's file attributes.
+  @param[out]  DeviceHandle     Pointer to the system device handle.
+  @param[out]  FileHandle       Pointer to the file handle.
+  @param[in]  OpenMode          The mode to open the file with.
+  @param[in]  Attributes        The file's file attributes.
 
-  @retval EFI_SUCCESS		        The information was set.
+  @retval EFI_SUCCESS	        The information was set.
   @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED	      Could not open the file path.
+  @retval EFI_UNSUPPORTED       Could not open the file path.
   @retval EFI_NOT_FOUND	        The specified file could not be found on the
                                 device or the file system could not be found on
                                 the device.
-  @retval EFI_NO_MEDIA		      The device has no medium.
-  @retval EFI_MEDIA_CHANGED	    The device has a different medium in it or the
+  @retval EFI_NO_MEDIA          The device has no medium.
+  @retval EFI_MEDIA_CHANGED     The device has a different medium in it or the
                                 medium is no longer supported.
-  @retval EFI_DEVICE_ERROR	    The device reported an error.
+  @retval EFI_DEVICE_ERROR      The device reported an error.
   @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED	  The file or medium is write protected.
-  @retval EFI_ACCESS_DENIED	    The file was opened read only.
+  @retval EFI_WRITE_PROTECTED   The file or medium is write protected.
+  @retval EFI_ACCESS_DENIED     The file was opened read only.
   @retval EFI_OUT_OF_RESOURCES	Not enough resources were available to open the
                                 file.
-  @retval EFI_VOLUME_FULL	      The volume is full.
+  @retval EFI_VOLUME_FULL       The volume is full.
 **/
 EFI_STATUS
 EFIAPI
 ShellOpenFileByDevicePath(
   IN OUT EFI_DEVICE_PATH_PROTOCOL  	  **FilePath,
   OUT EFI_HANDLE                    	*DeviceHandle,
-  OUT EFI_FILE_HANDLE               	*FileHandle,
+  OUT SHELL_FILE_HANDLE             	*FileHandle,
   IN UINT64                          	OpenMode,
   IN UINT64                          	Attributes
   );
@@ -113,36 +120,36 @@ ShellOpenFileByDevicePath(
   This function will open a file or directory referenced by filename.
 
   If return is EFI_SUCCESS, the Filehandle is the opened file's handle;
-  otherwise, the Filehandle is NULL. The Attributes is valid only for
+  otherwise, the Filehandle is NULL. Attributes is valid only for
   EFI_FILE_MODE_CREATE.
 
-  @param[in] FileName 		      Pointer to file name.
-  @param[out] FileHandle		    Pointer to the file handle.
-  @param[in] OpenMode		        The mode to open the file with.
-  @param[in] Attributes		      The file's file attributes.
+  @param[in] FilePath           The pointer to file name.
+  @param[out] FileHandle        The pointer to the file handle.
+  @param[in] OpenMode           The mode to open the file with.
+  @param[in] Attributes         The file's file attributes.
 
-  @retval EFI_SUCCESS		        The information was set.
+  @retval EFI_SUCCESS	        The information was set.
   @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED	      Could not open the file path.
+  @retval EFI_UNSUPPORTED       Could not open the file path.
   @retval EFI_NOT_FOUND	        The specified file could not be found on the
                                 device or the file system could not be found
                                 on the device.
-  @retval EFI_NO_MEDIA		      The device has no medium.
-  @retval EFI_MEDIA_CHANGED	    The device has a different medium in it or the
+  @retval EFI_NO_MEDIA          The device has no medium.
+  @retval EFI_MEDIA_CHANGED     The device has a different medium in it or the
                                 medium is no longer supported.
-  @retval EFI_DEVICE_ERROR	    The device reported an error.
+  @retval EFI_DEVICE_ERROR      The device reported an error.
   @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED	  The file or medium is write protected.
-  @retval EFI_ACCESS_DENIED	    The file was opened read only.
+  @retval EFI_WRITE_PROTECTED   The file or medium is write protected.
+  @retval EFI_ACCESS_DENIED     The file was opened read only.
   @retval EFI_OUT_OF_RESOURCES	Not enough resources were available to open the
                                 file.
-  @retval EFI_VOLUME_FULL	      The volume is full.
+  @retval EFI_VOLUME_FULL       The volume is full.
 **/
 EFI_STATUS
 EFIAPI
 ShellOpenFileByName(
   IN CONST CHAR16		            *FilePath,
-  OUT EFI_FILE_HANDLE           *FileHandle,
+  OUT SHELL_FILE_HANDLE         *FileHandle,
   IN UINT64                     OpenMode,
   IN UINT64                    	Attributes
   );
@@ -154,31 +161,31 @@ ShellOpenFileByName(
   otherwise, the Filehandle is NULL. If the directory already existed, this
   function opens the existing directory.
 
-  @param[in]  DirectoryName     Pointer to Directory name.
-  @param[out] FileHandle        Pointer to the file handle.
+  @param[in]  DirectoryName     The pointer to Directory name.
+  @param[out] FileHandle        The pointer to the file handle.
 
-  @retval EFI_SUCCESS		        The information was set.
+  @retval EFI_SUCCESS	        The information was set.
   @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED	      Could not open the file path.
+  @retval EFI_UNSUPPORTED       Could not open the file path.
   @retval EFI_NOT_FOUND	        The specified file could not be found on the
-                                device or the file system could not be found
+                                device, or the file system could not be found
                                 on the device.
-  @retval EFI_NO_MEDIA		      The device has no medium.
-  @retval EFI_MEDIA_CHANGED	    The device has a different medium in it or the
+  @retval EFI_NO_MEDIA          The device has no medium.
+  @retval EFI_MEDIA_CHANGED     The device has a different medium in it or the
                                 medium is no longer supported.
-  @retval EFI_DEVICE_ERROR	    The device reported an error.
+  @retval EFI_DEVICE_ERROR      The device reported an error.
   @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED	  The file or medium is write protected.
-  @retval EFI_ACCESS_DENIED	    The file was opened read only.
+  @retval EFI_WRITE_PROTECTED   The file or medium is write protected.
+  @retval EFI_ACCESS_DENIED     The file was opened read only.
   @retval EFI_OUT_OF_RESOURCES	Not enough resources were available to open the
                                 file.
-  @retval EFI_VOLUME_FULL	      The volume is full.
+  @retval EFI_VOLUME_FULL       The volume is full.
 **/
 EFI_STATUS
 EFIAPI
 ShellCreateDirectory(
   IN CONST CHAR16             *DirectoryName,
-  OUT EFI_FILE_HANDLE         *FileHandle
+  OUT SHELL_FILE_HANDLE       *FileHandle
   );
 
 /**
@@ -198,22 +205,22 @@ ShellCreateDirectory(
   EFI_FILE_INFO is the structure returned as the directory entry.
 
   @param[in] FileHandle         The opened file handle.
-  @param[in] ReadSize           On input the size of buffer in bytes.  On return
+  @param[in,out] ReadSize       On input the size of buffer in bytes.  On return
                                 the number of bytes written.
   @param[out] Buffer            The buffer to put read data into.
 
-  @retval EFI_SUCCESS	          Data was read.
+  @retval EFI_SUCCESS           Data was read.
   @retval EFI_NO_MEDIA	        The device has no media.
-  @retval EFI_DEVICE_ERROR	    The device reported an error.
+  @retval EFI_DEVICE_ERROR      The device reported an error.
   @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_BUFFER_TO_SMALL	  Buffer is too small. ReadSize contains required
+  @retval EFI_BUFFER_TO_SMALL   Buffer is too small. ReadSize contains required
                                 size.
 
 **/
 EFI_STATUS
 EFIAPI
 ShellReadFile(
-  IN EFI_FILE_HANDLE            FileHandle,
+  IN SHELL_FILE_HANDLE          FileHandle,
   IN OUT UINTN                  *ReadSize,
   OUT VOID                      *Buffer
   );
@@ -230,24 +237,24 @@ ShellReadFile(
 
   @param[in] FileHandle         The opened file for writing.
 
-  @param[in] BufferSize         On input the number of bytes in Buffer.  On output
+  @param[in,out] BufferSize     On input the number of bytes in Buffer.  On output
                                 the number of bytes written.
 
   @param[in] Buffer             The buffer containing data to write is stored.
 
-  @retval EFI_SUCCESS	          Data was written.
-  @retval EFI_UNSUPPORTED	      Writes to an open directory are not supported.
+  @retval EFI_SUCCESS           Data was written.
+  @retval EFI_UNSUPPORTED       Writes to an open directory are not supported.
   @retval EFI_NO_MEDIA	        The device has no media.
-  @retval EFI_DEVICE_ERROR	    The device reported an error.
-  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED	  The device is write-protected.
-  @retval EFI_ACCESS_DENIED	    The file was open for read only.
-  @retval EFI_VOLUME_FULL	      The volume is full.
+  @retval EFI_DEVICE_ERROR      The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED   The device is write-protected.
+  @retval EFI_ACCESS_DENIED     The file was open for read only.
+  @retval EFI_VOLUME_FULL       The volume is full.
 **/
 EFI_STATUS
 EFIAPI
 ShellWriteFile(
-  IN EFI_FILE_HANDLE            FileHandle,
+  IN SHELL_FILE_HANDLE          FileHandle,
   IN OUT UINTN                  *BufferSize,
   IN VOID                       *Buffer
   );
@@ -262,12 +269,12 @@ ShellWriteFile(
   @param[in] FileHandle           The file handle to close.
 
   @retval EFI_SUCCESS             The file handle was closed sucessfully.
-  @retval INVALID_PARAMETER      	One of the parameters has an invalid value.
+  @retval INVALID_PARAMETER       One of the parameters has an invalid value.
 **/
 EFI_STATUS
 EFIAPI
 ShellCloseFile (
-  IN EFI_FILE_HANDLE            *FileHandle
+  IN SHELL_FILE_HANDLE          *FileHandle
   );
 
 /**
@@ -287,7 +294,7 @@ ShellCloseFile (
 EFI_STATUS
 EFIAPI
 ShellDeleteFile (
-  IN EFI_FILE_HANDLE		*FileHandle
+  IN SHELL_FILE_HANDLE          *FileHandle
   );
 
 /**
@@ -295,15 +302,15 @@ ShellDeleteFile (
 
   This function sets the current file position for the handle to the position
   supplied. With the exception of seeking to position 0xFFFFFFFFFFFFFFFF, only
-  absolute positioning is supported, and seeking past the end of the file is
-  allowed (a subsequent write would grow the file). Seeking to position
+  absolute positioning is supported, and moving past the end of the file is
+  allowed (a subsequent write would grow the file). Moving to position
   0xFFFFFFFFFFFFFFFF causes the current position to be set to the end of the file.
   If FileHandle is a directory, the only position that may be set is zero. This
   has the effect of starting the read process of the directory entries over.
 
   @param[in] FileHandle         The file handle on which the position is being set.
 
-  @param[in] Position           Byte position from begining of file.
+  @param[in] Position           The byte position from the begining of the file.
 
   @retval EFI_SUCCESS           Operation completed sucessfully.
   @retval EFI_UNSUPPORTED       The seek request for non-zero is not valid on
@@ -313,7 +320,7 @@ ShellDeleteFile (
 EFI_STATUS
 EFIAPI
 ShellSetFilePosition (
-  IN EFI_FILE_HANDLE   	FileHandle,
+  IN SHELL_FILE_HANDLE 	FileHandle,
   IN UINT64           	Position
   );
 
@@ -326,7 +333,7 @@ ShellSetFilePosition (
   if FileHandle is a directory.
 
   @param[in] FileHandle         The open file handle on which to get the position.
-  @param[out] Position          Byte position from begining of file.
+  @param[out] Position          The byte position from the begining of the file.
 
   @retval EFI_SUCCESS           The operation completed sucessfully.
   @retval INVALID_PARAMETER     One of the parameters has an invalid value.
@@ -335,7 +342,7 @@ ShellSetFilePosition (
 EFI_STATUS
 EFIAPI
 ShellGetFilePosition (
-  IN EFI_FILE_HANDLE            FileHandle,
+  IN SHELL_FILE_HANDLE          FileHandle,
   OUT UINT64                    *Position
   );
 
@@ -356,7 +363,7 @@ ShellGetFilePosition (
 EFI_STATUS
 EFIAPI
 ShellFlushFile (
-  IN EFI_FILE_HANDLE            FileHandle
+  IN SHELL_FILE_HANDLE          FileHandle
   );
 
 /**
@@ -368,20 +375,20 @@ ShellFlushFile (
 
   Caller must use FreePool on *Buffer opon completion of all file searching.
 
-  @param[in] DirHandle          The file handle of the directory to search
-  @param[out] Buffer            Pointer to pointer to buffer for file's information
+  @param[in] DirHandle          The file handle of the directory to search.
+  @param[out] Buffer            The pointer to the buffer for the file's information.
 
   @retval EFI_SUCCESS           Found the first file.
   @retval EFI_NOT_FOUND         Cannot find the directory.
   @retval EFI_NO_MEDIA          The device has no media.
   @retval EFI_DEVICE_ERROR      The device reported an error.
   @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
-  @return ShellReadFile
+  @sa ShellReadFile
 **/
 EFI_STATUS
 EFIAPI
 ShellFindFirstFile (
-  IN EFI_FILE_HANDLE            DirHandle,
+  IN SHELL_FILE_HANDLE          DirHandle,
   OUT EFI_FILE_INFO             **Buffer
   );
 
@@ -392,24 +399,25 @@ ShellFindFirstFile (
   first file, and then use this function get other files. This function can be
   called for several times to get each file's information in the directory. If
   the call of ShellFindNextFile() got the last file in the directory, the next
-  call of this function has no file to get. *NoFile will be set to TRUE and the
+  call of this function has no file to get. *NoFile will be set to TRUE, and the
   data in Buffer is meaningless.
 
   @param[in] DirHandle          The file handle of the directory.
-  @param[out] Buffer			      Pointer to buffer for file's information.
-  @param[out] NoFile			      Pointer to boolean when last file is found.
+  @param[in,out] Buffer         The pointer to buffer for file's information.
+  @param[in,out] NoFile         The pointer to boolean when last file is found.
 
   @retval EFI_SUCCESS           Found the next file.
   @retval EFI_NO_MEDIA          The device has no media.
   @retval EFI_DEVICE_ERROR      The device reported an error.
   @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+  @sa ShellReadFile
 **/
 EFI_STATUS
 EFIAPI
 ShellFindNextFile(
-  IN EFI_FILE_HANDLE             DirHandle,
-  OUT EFI_FILE_INFO              *Buffer,
-  OUT BOOLEAN                    *NoFile
+  IN SHELL_FILE_HANDLE           DirHandle,
+  IN OUT EFI_FILE_INFO           *Buffer,
+  IN OUT BOOLEAN                 *NoFile
   );
 
 /**
@@ -419,7 +427,7 @@ ShellFindNextFile(
   data.
 
   @param[in] FileHandle         The file handle from which size is retrieved.
-  @param[out] Size              Pointer to size.
+  @param[out] Size              The pointer to size.
 
   @retval EFI_SUCCESS           The operation was completed sucessfully.
   @retval EFI_DEVICE_ERROR      Cannot access the file.
@@ -427,7 +435,7 @@ ShellFindNextFile(
 EFI_STATUS
 EFIAPI
 ShellGetFileSize (
-  IN EFI_FILE_HANDLE            FileHandle,
+  IN SHELL_FILE_HANDLE          FileHandle,
   OUT UINT64                    *Size
   );
 
@@ -436,8 +444,8 @@ ShellGetFileSize (
 
   This function is useful to check whether the application is being asked to halt by the shell.
 
-  @retval TRUE                  the execution break is enabled
-  @retval FALSE                 the execution break is not enabled
+  @retval TRUE                  The execution break is enabled.
+  @retval FALSE                 The execution break is not enabled.
 **/
 BOOLEAN
 EFIAPI
@@ -454,7 +462,7 @@ ShellGetExecutionBreakFlag(
   @param[in] EnvKey             The key name of the environment variable.
 
   @retval NULL                  The named environment variable does not exist.
-  @return != NULL               pointer to the value of the environment variable.
+  @return != NULL               The pointer to the value of the environment variable.
 **/
 CONST CHAR16*
 EFIAPI
@@ -479,8 +487,8 @@ ShellGetEnvironmentVariable (
   @param[in] EnvVal             The Value of the environment variable
   @param[in] Volatile           Indicates whether the variable is non-volatile (FALSE) or volatile (TRUE).
 
-  @retval EFI_SUCCESS           the operation was completed sucessfully
-  @retval EFI_UNSUPPORTED       This operation is not allowed in pre UEFI 2.0 Shell environments
+  @retval EFI_SUCCESS           The operation completed sucessfully
+  @retval EFI_UNSUPPORTED       This operation is not allowed in pre-UEFI 2.0 Shell environments.
 **/
 EFI_STATUS
 EFIAPI
@@ -507,11 +515,11 @@ ShellSetEnvironmentVariable (
   ShellExecute() function.  The Output parameter has no effect in a
   UEFI Shell 2.0 environment.
 
-  @param[in] ImageHandle          Parent image that is starting the operation.
-  @param[in] CommandLine          Pointer to NULL terminated command line.
+  @param[in] ParentHandle         The parent image starting the operation.
+  @param[in] CommandLine          The pointer to a NULL terminated command line.
   @param[in] Output               True to display debug output.  False to hide it.
   @param[in] EnvironmentVariables Optional pointer to array of environment variables
-                                  in the form "x=y".  If NULL current set is used.
+                                  in the form "x=y".  If NULL, the current set is used.
   @param[out] Status              The status of the run command line.
 
   @retval EFI_SUCCESS             The operation completed sucessfully.  Status
@@ -545,7 +553,7 @@ ShellExecute (
 CONST CHAR16*
 EFIAPI
 ShellGetCurrentDir (
-  IN CHAR16                     *DeviceName OPTIONAL
+  IN CHAR16                     * CONST DeviceName OPTIONAL
   );
 
 /**
@@ -575,9 +583,9 @@ ShellSetPageBreakMode (
   If you are NOT appending to an existing list *ListHead must be NULL.  If
   *ListHead is NULL then it must be callee freed.
 
-  @param[in] Arg                Pointer to path string.
+  @param[in] Arg                The pointer to path string.
   @param[in] OpenMode           Mode to open files with.
-  @param[in] ListHead           Head of linked list of results.
+  @param[in,out] ListHead       Head of linked list of results.
 
   @retval EFI_SUCCESS           The operation was sucessful and the list head
                                 contains the list of opened files.
@@ -596,7 +604,7 @@ ShellOpenFileMetaArg (
 /**
   Free the linked list returned from ShellOpenFileMetaArg.
 
-  @param[in] ListHead           The pointer to free.
+  @param[in,out] ListHead       The pointer to free.
 
   @retval EFI_SUCCESS           The operation was sucessful.
   @retval EFI_INVALID_PARAMETER A parameter was invalid.
@@ -631,12 +639,12 @@ ShellFindFilePath (
   in the order provided and return the first one that is successful.
 
   If FileName is NULL, then ASSERT.
-  If FileExtension is NULL, then behavior is identical to ShellFindFilePath.
+  If FileExtension is NULL, then the behavior is identical to ShellFindFilePath.
 
   If the return value is not NULL then the memory must be caller freed.
 
-  @param[in] FileName           Filename string.
-  @param[in] FileExtension      Semi-colon delimeted list of possible extensions.
+  @param[in] FileName           The filename string.
+  @param[in] FileExtension      Semicolon delimited list of possible extensions.
 
   @retval NULL                  The file was not found.
   @retval !NULL                 The path to the file.
@@ -656,16 +664,19 @@ typedef enum {
   TypeDoubleValue,  ///< A flag that has 2 space seperated value data following it (IE "-a 1 2").
   TypeMaxValue,     ///< A flag followed by all the command line data before the next flag.
   TypeMax,
-} ParamType;
+} SHELL_PARAM_TYPE;
 
 typedef struct {
-  CHAR16      *Name;
-  ParamType   Type;
+  CHAR16             *Name;
+  SHELL_PARAM_TYPE   Type;
 } SHELL_PARAM_ITEM;
 
 
 /// Helper structure for no parameters (besides -? and -b)
 extern SHELL_PARAM_ITEM EmptyParamList[];
+
+/// Helper structure for -sfo only (besides -? and -b)
+extern SHELL_PARAM_ITEM SfoParamList[];
 
 /**
   Checks the command line arguments passed against the list of valid ones.
@@ -673,8 +684,8 @@ extern SHELL_PARAM_ITEM EmptyParamList[];
 
   If no initialization is required, then return RETURN_SUCCESS.
 
-  @param[in] CheckList          Pointer to list of parameters to check.
-  @param[out] CheckPackage      Package of checked values.
+  @param[in] CheckList          The pointer to list of parameters to check.
+  @param[out] CheckPackage      The package of checked values.
   @param[out] ProblemParam      Optional pointer to pointer to unicode string for
                                 the paramater that caused failure.
   @param[in] AutoPageBreak      Will automatically set PageBreakEnabled.
@@ -683,9 +694,7 @@ extern SHELL_PARAM_ITEM EmptyParamList[];
   @retval EFI_SUCCESS           The operation completed sucessfully.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval EFI_INVALID_PARAMETER A parameter was invalid.
-  @retval EFI_VOLUME_CORRUPTED  The command line was corrupt.  An argument was
-                                duplicated.  The duplicated command line argument
-                                was returned in ProblemParam if provided.
+  @retval EFI_VOLUME_CORRUPTED  The command line was corrupt.
   @retval EFI_DEVICE_ERROR      The commands contained 2 opposing arguments.  One
                                 of the command line arguments was returned in
                                 ProblemParam if provided.
@@ -735,12 +744,12 @@ ShellCommandLineFreeVarList (
 
   @retval TRUE                  The flag is on the command line.
   @retval FALSE                 The flag is not on the command line.
-  **/
+**/
 BOOLEAN
 EFIAPI
 ShellCommandLineGetFlag (
-  IN CONST LIST_ENTRY              *CheckPackage,
-  IN CHAR16                        *KeyString
+  IN CONST LIST_ENTRY         * CONST CheckPackage,
+  IN CONST CHAR16             * CONST KeyString
   );
 
 /**
@@ -754,8 +763,8 @@ ShellCommandLineGetFlag (
   @param[in] KeyString          The Key of the command line argument to check for.
 
   @retval NULL                  The flag is not on the command line.
-  @retval !=NULL                Pointer to unicode string of the value.
-  **/
+  @retval !=NULL                The pointer to unicode string of the value.
+**/
 CONST CHAR16*
 EFIAPI
 ShellCommandLineGetValue (
@@ -774,13 +783,13 @@ ShellCommandLineGetValue (
   @param[in] Position           The position of the value.
 
   @retval NULL                  The flag is not on the command line.
-  @retval !=NULL                Pointer to unicode string of the value.
-  **/
+  @retval !=NULL                The pointer to unicode string of the value.
+**/
 CONST CHAR16*
 EFIAPI
 ShellCommandLineGetRawValue (
-  IN CONST LIST_ENTRY              *CheckPackage,
-  IN UINT32                        Position
+  IN CONST LIST_ENTRY              * CONST CheckPackage,
+  IN UINTN                         Position
   );
 
 /**
@@ -788,20 +797,22 @@ ShellCommandLineGetRawValue (
 
   This will not include flags.
 
-  @retval (UINTN)-1     No parsing has ocurred.
-  @return               The number of value parameters found.
+  @param[in] CheckPackage       The package of parsed command line arguments.
+
+  @retval (UINTN)-1             No parsing has occurred.
+  @retval other                 The number of value parameters found.
 **/
 UINTN
 EFIAPI
 ShellCommandLineGetCount(
-  VOID
+  IN CONST LIST_ENTRY              *CheckPackage
   );
 
 /**
-  Determins if a parameter is duplicated.
+  Determines if a parameter is duplicated.
 
-  If Param is not NULL then it will point to a callee allocated string buffer
-  with the parameter value if a duplicate is found.
+  If Param is not NULL, then it will point to a callee-allocated string buffer
+  with the parameter value, if a duplicate is found.
 
   If CheckPackage is NULL, then ASSERT.
 
@@ -820,7 +831,7 @@ ShellCommandLineCheckDuplicate (
 
 /**
   This function causes the shell library to initialize itself.  If the shell library
-  is already initialized it will de-initialize all the current protocol poitners and
+  is already initialized it will de-initialize all the current protocol pointers and
   re-populate them again.
 
   When the library is used with PcdShellLibAutoInitialize set to true this function
@@ -828,7 +839,7 @@ ShellCommandLineCheckDuplicate (
 
   This function is intended for internal access for shell commands only.
 
-  @retval EFI_SUCCESS   the initialization was complete sucessfully
+  @retval EFI_SUCCESS   The initialization was complete sucessfully.
 
 **/
 EFI_STATUS
@@ -858,14 +869,15 @@ ShellInitialize (
 
   Note: The background color is controlled by the shell command cls.
 
-  @param[in] Row        The row to print at.
   @param[in] Col        The column to print at.
+  @param[in] Row        The row to print at.
   @param[in] Format     The format string.
+  @param[in] ...        The variable argument list.
 
-  @return The number of characters printed to the screen.
+  @return EFI_SUCCESS           The printing was successful.
+  @return EFI_DEVICE_ERROR      The console device reported an error.
 **/
-
-UINTN
+EFI_STATUS
 EFIAPI
 ShellPrintEx(
   IN INT32                Col OPTIONAL,
@@ -895,16 +907,18 @@ ShellPrintEx(
 
   Note: The background color is controlled by the shell command cls.
 
-  @param[in] Row                The row to print at.
   @param[in] Col                The column to print at.
+  @param[in] Row                The row to print at.
   @param[in] Language           The language of the string to retrieve.  If this parameter
                                 is NULL, then the current platform language is used.
   @param[in] HiiFormatStringId  The format string Id for getting from Hii.
   @param[in] HiiFormatHandle    The format string Handle for getting from Hii.
+  @param[in] ...                The variable argument list.
 
-  @return the number of characters printed to the screen.
+  @return EFI_SUCCESS           The printing was successful.
+  @return EFI_DEVICE_ERROR      The console device reported an error.
 **/
-UINTN
+EFI_STATUS
 EFIAPI
 ShellPrintHiiEx(
   IN INT32                Col OPTIONAL,
@@ -999,7 +1013,7 @@ ShellStrToUintn(
   given in CurrentSize the string will be grown such that the copy can be performed
   and CurrentSize will be updated to the new size.
 
-  If Source is NULL, there is nothing to append, just return the current buffer in
+  If Source is NULL, there is nothing to append, so return the current buffer in
   Destination.
 
   If Destination is NULL, then ASSERT().
@@ -1007,14 +1021,14 @@ ShellStrToUintn(
   CurrentSize, then ASSERT().
 
   @param[in,out] Destination    The String to append onto.
-  @param[in,out] CurrentSize    On call the number of bytes in Destination.  On
-                                return possibly the new size (still in bytes).  If NULL
+  @param[in,out] CurrentSize    On call, the number of bytes in Destination.  On
+                                return, possibly the new size (still in bytes).  If NULL,
                                 then allocate whatever is needed.
   @param[in]     Source         The String to append from.
-  @param[in]     Count          Maximum number of characters to append.  If 0 then
+  @param[in]     Count          The maximum number of characters to append.  If 0, then
                                 all are appended.
 
-  @return                       The Destination after apending the Source.
+  @return                       The Destination after appending the Source.
 **/
 CHAR16*
 EFIAPI
@@ -1033,13 +1047,14 @@ StrnCatGrow (
 
   If the string would grow bigger than NewSize it will halt and return error.
 
-  @param[in] SourceString             String with source buffer.
-  @param[in,out] NewString            String with resultant buffer.
-  @param[in] NewSize                  Size in bytes of NewString.
-  @param[in] FindTarget               String to look for.
-  @param[in] ReplaceWith              String to replace FindTarget with.
+  @param[in] SourceString             The string with source buffer.
+  @param[in,out] NewString            The string with resultant buffer.
+  @param[in] NewSize                  The size in bytes of NewString.
+  @param[in] FindTarget               The string to look for.
+  @param[in] ReplaceWith              The string to replace FindTarget with.
   @param[in] SkipPreCarrot            If TRUE will skip a FindTarget that has a '^'
                                       immediately before it.
+  @param[in] ParameterReplacing       If TRUE will add "" around items with spaces.
 
   @retval EFI_INVALID_PARAMETER       SourceString was NULL.
   @retval EFI_INVALID_PARAMETER       NewString was NULL.
@@ -1049,36 +1064,32 @@ StrnCatGrow (
   @retval EFI_INVALID_PARAMETER       SourceString had length < 1.
   @retval EFI_BUFFER_TOO_SMALL        NewSize was less than the minimum size to hold
                                       the new string (truncation occurred).
-  @retval EFI_SUCCESS                 The string was sucessfully copied with replacement.
+  @retval EFI_SUCCESS                 The string was successfully copied with replacement.
 **/
-
 EFI_STATUS
 EFIAPI
-ShellCopySearchAndReplace2(
+ShellCopySearchAndReplace(
   IN CHAR16 CONST                     *SourceString,
-  IN CHAR16                           *NewString,
+  IN OUT CHAR16                       *NewString,
   IN UINTN                            NewSize,
   IN CONST CHAR16                     *FindTarget,
   IN CONST CHAR16                     *ReplaceWith,
-  IN CONST BOOLEAN                    SkipPreCarrot
+  IN CONST BOOLEAN                    SkipPreCarrot,
+  IN CONST BOOLEAN                    ParameterReplacing
   );
-
-///
-/// make upgrades easier from old version
-///
-#define ShellLibCopySearchAndReplace(a,b,c,d,e) ShellCopySearchAndReplace2(a,b,c,d,e,FALSE)
 
 /**
   Check if a Unicode character is a hexadecimal character.
 
   This internal function checks if a Unicode character is a
-  decimal character.  The valid hexadecimal character is
+  numeric character.  The valid hexadecimal characters are
   L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
 
-  @param[in]  Char  The character to check.
 
-  @retval TRUE      The Char is a hexadecmial character.
-  @retval FALSE     The Char is not a hexadecmial character.
+  @param  Char  The character to check against.
+
+  @retval TRUE  The Char is a hexadecmial character.
+  @retval FALSE The Char is not a hexadecmial character.
 
 **/
 BOOLEAN
@@ -1087,31 +1098,51 @@ ShellIsHexaDecimalDigitCharacter (
   IN      CHAR16                    Char
   );
 
+/**
+  Check if a Unicode character is a decimal character.
+
+  This internal function checks if a Unicode character is a
+  decimal character.  The valid characters are
+  L'0' to L'9'.
+
+
+  @param  Char  The character to check against.
+
+  @retval TRUE  The Char is a hexadecmial character.
+  @retval FALSE The Char is not a hexadecmial character.
+
+**/
+BOOLEAN
+EFIAPI
+ShellIsDecimalDigitCharacter (
+  IN      CHAR16                    Char
+  );
+
 ///
-/// What type of answer is requested
+/// What type of answer is requested.
 ///
 typedef enum {
-  SHELL_PROMPT_REQUEST_TYPE_YES_NO,
-  SHELL_PROMPT_REQUEST_TYPE_YES_NO_CANCEL,
-  SHELL_PROMPT_REQUEST_TYPE_FREEFORM,
-  SHELL_PROMPT_REQUEST_TYPE_QUIT_CONTINUE,
-  SHELL_PROMPT_REQUEST_TYPE_YES_NO_ALL_CANCEL,
-  SHELL_PROMPT_REQUEST_TYPE_ENTER_TO_COMTINUE,
-  SHELL_PROMPT_REQUEST_TYPE_ANYKEY_TO_COMTINUE,
-  SHELL_PROMPT_REQUEST_TYPE_MAX
+  ShellPromptResponseTypeYesNo,
+  ShellPromptResponseTypeYesNoCancel,
+  ShellPromptResponseTypeFreeform,
+  ShellPromptResponseTypeQuitContinue,
+  ShellPromptResponseTypeYesNoAllCancel,
+  ShellPromptResponseTypeEnterContinue,
+  ShellPromptResponseTypeAnyKeyContinue,
+  ShellPromptResponseTypeMax
 } SHELL_PROMPT_REQUEST_TYPE;
 
 ///
-/// what answer was given
+/// What answer was given.
 ///
 typedef enum {
-  SHELL_PROMPT_RESPONSE_YES,
-  SHELL_PROMPT_RESPONSE_NO,
-  SHELL_PROMPT_RESPONSE_CANCEL,
-  SHELL_PROMPT_RESPONSE_QUIT,
-  SHELL_PROMPT_RESPONSE_CONTINUE,
-  SHELL_PROMPT_RESPONSE_ALL,
-  SHELL_PROMPT_RESPONSE_MAX
+  ShellPromptResponseYes,
+  ShellPromptResponseNo,
+  ShellPromptResponseCancel,
+  ShellPromptResponseQuit,
+  ShellPromptResponseContinue,
+  ShellPromptResponseAll,
+  ShellPromptResponseMax
 } SHELL_PROMPT_RESPONSE;
 
 /**
@@ -1120,23 +1151,22 @@ typedef enum {
   This function will display the requested question on the shell prompt and then
   wait for an apropriate answer to be input from the console.
 
-  if the SHELL_PROMPT_REQUEST_TYPE is SHELL_PROMPT_REQUEST_TYPE_YESNO, SHELL_PROMPT_REQUEST_TYPE_QUIT_CONTINUE
+  If the SHELL_PROMPT_REQUEST_TYPE is SHELL_PROMPT_REQUEST_TYPE_YESNO, ShellPromptResponseTypeQuitContinue
   or SHELL_PROMPT_REQUEST_TYPE_YESNOCANCEL then *Response is of type SHELL_PROMPT_RESPONSE.
 
-  if the SHELL_PROMPT_REQUEST_TYPE is SHELL_PROMPT_REQUEST_TYPE_FREEFORM then *Response is of type
+  If the SHELL_PROMPT_REQUEST_TYPE is ShellPromptResponseTypeFreeform then *Response is of type
   CHAR16*.
 
   In either case *Response must be callee freed if Response was not NULL;
 
   @param Type                     What type of question is asked.  This is used to filter the input
                                   to prevent invalid answers to question.
-  @param Prompt                   Pointer to string prompt to use to request input.
-  @param Response                 Pointer to Response which will be populated upon return.
+  @param Prompt                   The pointer to a string prompt used to request input.
+  @param Response                 The pointer to Response, which will be populated upon return.
 
-  @retval EFI_SUCCESS             The operation was sucessful.
+  @retval EFI_SUCCESS             The operation was successful.
   @retval EFI_UNSUPPORTED         The operation is not supported as requested.
   @retval EFI_INVALID_PARAMETER   A parameter was invalid.
-  @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
   @return other                   The operation failed.
 **/
 EFI_STATUS
@@ -1155,11 +1185,12 @@ ShellPromptForResponse (
 
   @param Type     What type of question is asked.  This is used to filter the input
                   to prevent invalid answers to question.
-  @param Prompt   Pointer to string prompt to use to request input.
-  @param Response Pointer to Response which will be populated upon return.
+  @param[in] HiiFormatStringId  The format string Id for getting from Hii.
+  @param[in] HiiFormatHandle    The format string Handle for getting from Hii.
+  @param Response               The pointer to Response, which will be populated upon return.
 
-  @retval EFI_SUCCESS the operation was sucessful.
-  @return other       the operation failed.
+  @retval EFI_SUCCESS The operation was sucessful.
+  @return other       The operation failed.
 
   @sa ShellPromptForResponse
 **/
@@ -1172,5 +1203,39 @@ ShellPromptForResponseHii (
   IN OUT VOID             **Response
   );
 
+/**
+  Function to determin if an entire string is a valid number.
+
+  If Hex it must be preceeded with a 0x or has ForceHex, set TRUE.
+
+  @param[in] String       The string to evaluate.
+  @param[in] ForceHex     TRUE - always assume hex.
+  @param[in] StopAtSpace  TRUE to halt upon finding a space, FALSE to keep going.
+
+  @retval TRUE        It is all numeric (dec/hex) characters.
+  @retval FALSE       There is a non-numeric character.
+**/
+BOOLEAN
+EFIAPI
+ShellIsHexOrDecimalNumber (
+  IN CONST CHAR16   *String,
+  IN CONST BOOLEAN  ForceHex,
+  IN CONST BOOLEAN  StopAtSpace
+  );
+
+/**
+  Function to determine if a given filename exists.
+
+  @param[in] Name         Path to test.
+
+  @retval EFI_SUCCESS     The Path represents a file.
+  @retval EFI_NOT_FOUND   The Path does not represent a file.
+  @retval other           The path failed to open.
+**/
+EFI_STATUS
+EFIAPI
+ShellFileExists(
+  IN CONST CHAR16 *Name
+  );
 
 #endif // __SHELL_LIB__

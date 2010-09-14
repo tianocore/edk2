@@ -1,5 +1,5 @@
 /** @file
-  Provides application point extension for "C" style main funciton
+  Provides application point extension for "C" style main funciton.
 
   Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
@@ -19,8 +19,8 @@
   The ShellCEntryLib library instance wrappers the actual UEFI application
   entry point and calls this ShellAppMain function.
 
-  @param  ImageHandle  The image handle of the UEFI Application.
-  @param  SystemTable  A pointer to the EFI System Table.
+  @param[in]  Argc  The number of parameters.
+  @param[in]  Argv  The array of pointers to parameters.
 
   @retval  0               The application exited normally.
   @retval  Other           An error occurred.

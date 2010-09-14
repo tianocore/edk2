@@ -1,7 +1,7 @@
-## @file
+##  @file
 #  Provides interface to shell functionality for shell commands and applications.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2010, Intel Corporation.All rights reserved. <BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,13 +19,13 @@
   FILE_GUID                      = 0e205c8a-8586-4dec-9f5c-4f9e394aefe8
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ShellCEntryLib|UEFI_APPLICATION
+  LIBRARY_CLASS                  = ShellCEntryLib|UEFI_APPLICATION UEFI_DRIVER
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources]
+[Sources.common]
   UefiShellCEntryLib.c
 
 [Packages]
@@ -43,5 +43,5 @@
 
 [Guids]
 
-[Pcd]
+[Pcd.common]
 

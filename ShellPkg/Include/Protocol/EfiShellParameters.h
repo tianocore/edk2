@@ -12,6 +12,8 @@
 
 **/
 
+#include <ShellBase.h>
+
 #ifndef __EFI_SHELL_PARAMETERS_PROTOCOL__
 #define __EFI_SHELL_PARAMETERS_PROTOCOL__
 
@@ -36,21 +38,21 @@ typedef struct _EFI_SHELL_PARAMETERS_PROTOCOL {
 
   ///
   /// The file handle for the standard input for this executable. This may be different
-  /// from the ConInHandle in the EFI_SYSTEM_TABLE.
+  /// from the ConInHandle in EFI_SYSTEM_TABLE.
   ///
-  EFI_FILE_HANDLE StdIn;
+  SHELL_FILE_HANDLE StdIn;
 
   ///
   /// The file handle for the standard output for this executable. This may be different
-  /// from the ConOutHandle in the EFI_SYSTEM_TABLE.
+  /// from the ConOutHandle in EFI_SYSTEM_TABLE.
   ///
-  EFI_FILE_HANDLE StdOut;
+  SHELL_FILE_HANDLE StdOut;
 
   ///
   /// The file handle for the standard error output for this executable. This may be
-  /// different from the StdErrHandle in the EFI_SYSTEM_TABLE.
+  /// different from the StdErrHandle in EFI_SYSTEM_TABLE.
   ///
-  EFI_FILE_HANDLE StdErr;
+  SHELL_FILE_HANDLE StdErr;
 } EFI_SHELL_PARAMETERS_PROTOCOL;
 
 extern EFI_GUID gEfiShellParametersProtocolGuid;

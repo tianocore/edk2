@@ -52,7 +52,7 @@ UefiMain (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_FILE_HANDLE     FileHandle;
+  SHELL_FILE_HANDLE   FileHandle;
   EFI_STATUS          Status;
   CHAR16              FileName[100];
   UINTN               BufferSize;

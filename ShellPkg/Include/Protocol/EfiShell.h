@@ -1,7 +1,7 @@
 /** @file
   EFI Shell protocol as defined in the UEFI Shell 2.0 specification including errata.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,7 @@
 #ifndef __EFI_SHELL_PROTOCOL__
 #define __EFI_SHELL_PROTOCOL__
 
-#include <Protocol/SimpleFileSystem.h>
+#include <ShellBase.h>
 #include <Guid/FileInfo.h>
 
 #define EFI_SHELL_PROTOCOL_GUID \
@@ -26,12 +26,12 @@
 // replaced EFI_LIST_ENTRY with LIST_ENTRY for simplicity.
 // they are identical outside of the name.
 typedef struct {
-  LIST_ENTRY      Link;       ///< Linked list members.
-  EFI_STATUS      Status;     ///< Status of opening the file.  Valid only if Handle != NULL.
-  CONST CHAR16    *FullName;  ///< Fully qualified filename.
-  CONST CHAR16    *FileName;  ///< name of this file.
-  EFI_FILE_HANDLE Handle;     ///< Handle for interacting with the opened file or NULL if closed.
-  EFI_FILE_INFO   *Info;      ///< Pointer to the FileInfo struct for this file or NULL.
+  LIST_ENTRY        Link;       ///< Linked list members.
+  EFI_STATUS        Status;     ///< Status of opening the file.  Valid only if Handle != NULL.
+  CONST CHAR16      *FullName;  ///< Fully qualified filename.
+  CONST CHAR16      *FileName;  ///< name of this file.
+  SHELL_FILE_HANDLE Handle;     ///< Handle for interacting with the opened file or NULL if closed.
+  EFI_FILE_INFO     *Info;      ///< Pointer to the FileInfo struct for this file or NULL.
 } EFI_SHELL_FILE_INFO;
 
 /**
@@ -61,7 +61,7 @@ BOOLEAN
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_CLOSE_FILE)(
-  IN EFI_FILE_HANDLE FileHandle
+  IN SHELL_FILE_HANDLE FileHandle
   );
 
 /**
@@ -79,9 +79,9 @@ EFI_STATUS
   already exists and is non-volatile then EFI_INVALID_PARAMETER is returned.
 
   @param[in] FileName           Pointer to NULL-terminated file path.
-  @param[in] FileAttribs        The new file's attrbiutes.  the different attributes are
+  @param[in] FileAttribs        The new file's attrbiutes.  The different attributes are
                                 described in EFI_FILE_PROTOCOL.Open().
-  @param[out] FileHandle        On return, points to the created file handle or directory's handle
+  @param[out] FileHandle        On return, points to the created file handle or directory's handle.
 
   @retval EFI_SUCCESS           The file was opened.  FileHandle points to the new file's handle.
   @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
@@ -103,9 +103,9 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_CREATE_FILE)(
-  IN CONST CHAR16 *FileName,
-  IN UINT64 FileAttribs,
-  OUT EFI_FILE_HANDLE *FileHandle
+  IN CONST CHAR16               *FileName,
+  IN UINT64                     FileAttribs,
+  OUT SHELL_FILE_HANDLE         *FileHandle
   );
 
 /**
@@ -123,7 +123,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_DELETE_FILE)(
-  IN EFI_FILE_HANDLE FileHandle
+  IN SHELL_FILE_HANDLE FileHandle
   );
 
 /**
@@ -194,10 +194,10 @@ VOID
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_EXECUTE) (
-  IN EFI_HANDLE *ParentImageHandle,
-  IN CHAR16 *CommandLine OPTIONAL,
-  IN CHAR16 **Environment OPTIONAL,
-  OUT EFI_STATUS *StatusCode OPTIONAL
+  IN EFI_HANDLE                 *ParentImageHandle,
+  IN CHAR16                     *CommandLine OPTIONAL,
+  IN CHAR16                     **Environment OPTIONAL,
+  OUT EFI_STATUS                *StatusCode OPTIONAL
   );
 
 /**
@@ -224,8 +224,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_FIND_FILES)(
-  IN CONST CHAR16 *FilePattern,
-  OUT EFI_SHELL_FILE_INFO **FileList
+  IN CONST CHAR16               *FilePattern,
+  OUT EFI_SHELL_FILE_INFO       **FileList
   );
 
 /**
@@ -243,8 +243,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_FIND_FILES_IN_DIR)(
-IN EFI_FILE_HANDLE FileDirHandle,
-OUT EFI_SHELL_FILE_INFO **FileList
+IN SHELL_FILE_HANDLE            FileDirHandle,
+OUT EFI_SHELL_FILE_INFO         **FileList
 );
 
 /**
@@ -265,7 +265,7 @@ OUT EFI_SHELL_FILE_INFO **FileList
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_FLUSH_FILE)(
-  IN EFI_FILE_HANDLE FileHandle
+  IN SHELL_FILE_HANDLE FileHandle
   );
 
 /**
@@ -342,10 +342,10 @@ typedef UINT32 EFI_SHELL_DEVICE_NAME_FLAGS;
 typedef
 EFI_STATUS
 (*EFI_SHELL_GET_DEVICE_NAME) (
-  IN EFI_HANDLE DeviceHandle,
-  IN EFI_SHELL_DEVICE_NAME_FLAGS Flags,
-  IN CHAR8 *Language,
-  OUT CHAR16 **BestDeviceName
+  IN EFI_HANDLE                   DeviceHandle,
+  IN EFI_SHELL_DEVICE_NAME_FLAGS  Flags,
+  IN CHAR8                        *Language,
+  OUT CHAR16                      **BestDeviceName
   );
 
 /**
@@ -427,7 +427,7 @@ CONST CHAR16 *
 typedef
 EFI_FILE_INFO *
 (EFIAPI *EFI_SHELL_GET_FILE_INFO)(
-  IN EFI_FILE_HANDLE FileHandle
+  IN SHELL_FILE_HANDLE FileHandle
   );
 
 /**
@@ -464,7 +464,7 @@ CHAR16 *
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_GET_FILE_POSITION)(
-  IN EFI_FILE_HANDLE FileHandle,
+  IN SHELL_FILE_HANDLE FileHandle,
   OUT UINT64 *Position
   );
 
@@ -482,7 +482,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_GET_FILE_SIZE)(
-  IN EFI_FILE_HANDLE FileHandle,
+  IN SHELL_FILE_HANDLE FileHandle,
   OUT UINT64 *Size
   );
 
@@ -629,7 +629,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_OPEN_FILE_BY_NAME) (
   IN CONST CHAR16 *FileName,
-  OUT EFI_FILE_HANDLE *FileHandle,
+  OUT SHELL_FILE_HANDLE *FileHandle,
   IN UINT64 OpenMode
   );
 
@@ -676,7 +676,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_OPEN_ROOT)(
   IN EFI_DEVICE_PATH_PROTOCOL *DevicePath,
-  OUT EFI_FILE_HANDLE *FileHandle
+  OUT SHELL_FILE_HANDLE *FileHandle
   );
 
 /**
@@ -698,7 +698,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_OPEN_ROOT_BY_HANDLE)(
   IN EFI_HANDLE DeviceHandle,
-  OUT EFI_FILE_HANDLE *FileHandle
+  OUT SHELL_FILE_HANDLE *FileHandle
   );
 
 /**
@@ -723,7 +723,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_READ_FILE) (
-  IN EFI_FILE_HANDLE FileHandle,
+  IN SHELL_FILE_HANDLE FileHandle,
   IN OUT UINTN *ReadSize,
   IN OUT VOID *Buffer
   );
@@ -873,7 +873,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_SET_FILE_INFO)(
-  IN EFI_FILE_HANDLE FileHandle,
+  IN SHELL_FILE_HANDLE FileHandle,
   IN CONST EFI_FILE_INFO *FileInfo
   );
 
@@ -895,7 +895,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_SET_FILE_POSITION)(
-  IN EFI_FILE_HANDLE FileHandle,
+  IN SHELL_FILE_HANDLE FileHandle,
   IN UINT64 Position
   );
 
@@ -945,7 +945,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_WRITE_FILE)(
-  IN EFI_FILE_HANDLE            FileHandle,
+  IN SHELL_FILE_HANDLE          FileHandle,
   IN OUT UINTN                  *BufferSize,
   IN VOID                       *Buffer
   );

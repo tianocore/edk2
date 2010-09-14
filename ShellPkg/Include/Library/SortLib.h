@@ -1,7 +1,7 @@
 /** @file
   Library used for sorting and comparison routines.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2010, Intel Corporation.All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,18 +12,18 @@
 
 **/
 
-#if !defined(__SORT_LIB_H__)
+#ifndef __SORT_LIB_H__
 #define __SORT_LIB_H__
 
 /**
-  Prototype for comparison function for any 2 element types.
+  Prototype for comparison function for any two element types.
 
-  @param[in] Buffer1                  Pointer to first buffer.
-  @param[in] Buffer2                  Pointer to second buffer.
+  @param[in] Buffer1                  The pointer to first buffer.
+  @param[in] Buffer2                  The pointer to second buffer.
 
   @retval 0                           Buffer1 equal to Buffer2.
-  @return < 0                         Buffer1 is less than Buffer2.
-  @return > 0                         Buffer1 is greater than Buffer2.
+  @return <0                          Buffer1 is less than Buffer2.
+  @return >0                          Buffer1 is greater than Buffer2.
 **/
 typedef
 INTN
@@ -40,15 +40,15 @@ INTN
   If BufferToSort is NULL, then ASSERT.
   If CompareFunction is NULL, then ASSERT.
 
-  If Count is < 2 then perform no action.
-  If Size is < 1 then perform no action.
+  If Count is < 2 , then perform no action.
+  If Size is < 1 , then perform no action.
 
-  @param[in,out] BufferToSort   On call a Buffer of (possibly sorted) elements
-                                on return a buffer of sorted elements.
-  @param[in] Count              The number of elements in the buffer to sort
-  @param[in] ElementSize        Size of an element in bytes.
+  @param[in,out] BufferToSort   On call, a Buffer of (possibly sorted) elements;
+                                on return, a buffer of sorted elements.
+  @param[in] Count              The number of elements in the buffer to sort.
+  @param[in] ElementSize        The size of an element in bytes.
   @param[in] CompareFunction    The function to call to perform the comparison
-                                of any 2 elements.
+                                of any two elements.
 **/
 VOID
 EFIAPI
@@ -63,8 +63,8 @@ PerformQuickSort (
 /**
   Function to compare 2 device paths for use as CompareFunction.
 
-  @param[in] Buffer1            Pointer to Device Path to compare.
-  @param[in] Buffer2            Pointer to second DevicePath to compare.
+  @param[in] Buffer1            The pointer to Device Path to compare.
+  @param[in] Buffer2            The pointer to second DevicePath to compare.
 
   @retval 0                     Buffer1 equal to Buffer2.
   @return < 0                   Buffer1 is less than Buffer2.
@@ -80,8 +80,8 @@ DevicePathCompare (
 /**
   Function to compare 2 strings without regard to case of the characters.
 
-  @param[in] Buffer1            Pointer to String to compare (CHAR16**).
-  @param[in] Buffer2            Pointer to second String to compare (CHAR16**).
+  @param[in] Buffer1            The pointer to String to compare (CHAR16**).
+  @param[in] Buffer2            The pointer to second String to compare (CHAR16**).
 
   @retval 0                     Buffer1 equal to Buffer2.
   @return < 0                   Buffer1 is less than Buffer2.
@@ -90,6 +90,23 @@ DevicePathCompare (
 INTN
 EFIAPI
 StringNoCaseCompare (
+  IN  CONST VOID                *Buffer1,
+  IN  CONST VOID                *Buffer2
+  );
+
+/**
+  Function to compare 2 strings.
+
+  @param[in] Buffer1            The pointer to String to compare (CHAR16**).
+  @param[in] Buffer2            The pointer to second String to compare (CHAR16**).
+
+  @retval 0                     Buffer1 equal to Buffer2.
+  @return < 0                   Buffer1 is less than Buffer2.
+  @return > 0                   Buffer1 is greater than Buffer2.
+**/
+INTN
+EFIAPI
+StringCompare (
   IN  CONST VOID                *Buffer1,
   IN  CONST VOID                *Buffer2
   );

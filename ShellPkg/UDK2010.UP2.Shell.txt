@@ -1,0 +1,89 @@
+============================================================================
+UEFI Shell 2.0 implementation release notes.
+September 13, 2010
+============================================================================
+============================================================================
+                                   DISCLAIMER
+============================================================================
+This release note as well as the software described in it is furnished under 
+license and may only be used or copied in accordance with the terms of the 
+license. The information in this manual is furnished for informational use 
+only, is subject to change without notice, and should not be construed as a 
+commitment by Intel Corporation.
+
+Intel Corporation assumes no responsibility or liability for any errors or 
+inaccuracies that may appear in this document or any software that may be 
+provided in association with this document.
+
+Except as permitted by such license, no part of this document may be 
+reproduced, stored in a retrieval system, or transmitted in any form or by 
+any means without the express written consent of Intel Corporation.
+
+============================================================================
+                              ADDITIONAL DISCLAIMER
+============================================================================
+This code is based upon the EDK II code base as found on the UEFI Open 
+Source Community Website at http://www.tianocore.org.
+
+============================================================================
+                                  CONTENTS
+============================================================================
+* Overview
+* How to build shell
+* Known limitations
+* Incorporation
+
+============================================================================
+                                  OVERVIEW
+============================================================================
+The UEFI 2.0 shell provides a standard pre-boot command line processor.  
+It is similar to the EDK EFI Shell or a *nix command line parser.
+
+============================================================================
+                               HOW TO BUILD SHELL
+============================================================================
+1. Tools preparation
+  1). *Visual Studio 2005* or Intel(r) Compiler 9.1
+      
+
+2. Source preparation
+  1). Extract .zip (or later) to root of EDK II workspace
+
+3. Build steps
+  1) run edksetup script
+  2) run build -p ShellPlg\ShellPkg.dsc
+
+============================================================================
+                            KNOWN LIMITATIONS
+============================================================================
+1. Redirecting StdErr is not completely functional.
+
+2. This uses errata approved by the USHT/USWG, but not yet published by UEFI.
+
+3. Online help may be incomplete and examples may be slightly out of date.
+
+4. CTRL-C is not functional.
+
+============================================================================
+         HOW TO INCORPORATE THIS SHELL INTO NT32
+============================================================================
+The instructions below are included as a sample and template on how a 
+developer may integrate this code into An existing platform:
+
+1. Add this shell build to the NT32 build:
+Add the shell.inf to the [components] section as it is in the ShellPkg.dsc.
+
+1) Update system PCDs to support this new module
+Update the PCD as follows using the Shell's PCD:
+
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1C, 0x4F, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
+
+2) Remove the old shell from the NT32 Firmware list 
+Remove the FILE APPLICATION section for the old shell.
+
+3) Add this shell to the NT32 firmware list
+Add the Shell.INF to the end of the list of DXE modules.
+
+4) Build NT32 (per instructions provided with EDK II/UDK2010)
+
+============================================================================

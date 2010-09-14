@@ -1,7 +1,7 @@
-## @file
+##  @file
 # Provides interface to shell functionality for shell commands and applications.
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved. <BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -27,7 +27,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources]
+[Sources.common]
   UefiShellLib.c
   UefiShellLib.h
 
@@ -63,6 +63,6 @@
   gEfiFileInfoGuid                              # ALWAYS_CONSUMED
   gEfiShellEnvironment2ExtGuid                  # ALWAYS_CONSUMED
 
-[Pcd]
+[Pcd.common]
   gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize     # ALWAYS_CONSUMED
   gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize       # ALWAYS_CONSUMED

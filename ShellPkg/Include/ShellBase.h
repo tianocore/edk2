@@ -1,7 +1,7 @@
 /** @file
   Root include file for Shell Package modules that utilize the SHELL_RETURN type
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2010, Intel Corporation.All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,8 +12,19 @@
 
 **/
 
-#if !defined(__SHELL_BASE__)
+#ifndef __SHELL_BASE__
 #define __SHELL_BASE__
+
+typedef VOID *SHELL_FILE_HANDLE;
+
+#ifndef SHELL_FREE_NON_NULL
+#define SHELL_FREE_NON_NULL(Pointer)  \
+  do {                                \
+    if (Pointer != NULL) {            \
+      FreePool(Pointer);              \
+    }                                 \
+  } while(FALSE)
+#endif //SHELL_FREE_NON_NULL
 
 typedef enum {
 ///
@@ -60,7 +71,7 @@ SHELL_NOT_READY             = 6,
 SHELL_DEVICE_ERROR          = 7,
 
 ///
-/// The device can not be written to.
+/// The device cannot be written to.
 ///
 SHELL_WRITE_PROTECTED       = 8,
 

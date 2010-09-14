@@ -59,7 +59,7 @@ ShellCEntryLib (
                              ImageHandle,
                              NULL,
                              EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                             );
+                            );
   if (!EFI_ERROR(Status)) {
     //
     // use shell 2.0 interface
@@ -67,7 +67,7 @@ ShellCEntryLib (
     ReturnFromMain = ShellAppMain (
                        EfiShellParametersProtocol->Argc,
                        EfiShellParametersProtocol->Argv
-                       );
+                      );
   } else {
     //
     // try to get shell 1.0 interface instead.
@@ -78,7 +78,7 @@ ShellCEntryLib (
                                ImageHandle,
                                NULL,
                                EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                               );
+                              );
     if (!EFI_ERROR(Status)) {
       //
       // use shell 1.0 interface
@@ -86,7 +86,7 @@ ShellCEntryLib (
       ReturnFromMain = ShellAppMain (
                          EfiShellInterface->Argc,
                          EfiShellInterface->Argv
-                         );
+                        );
     } else {
       ASSERT(FALSE);
     }
