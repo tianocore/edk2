@@ -1429,7 +1429,7 @@ ScsiDiskRequestSenseKeys (
   UINT8               TargetStatus;
 
   FallStatus      = EFI_SUCCESS;
-  SenseDataLength = sizeof (EFI_SCSI_SENSE_DATA);
+  SenseDataLength = (UINT8) sizeof (EFI_SCSI_SENSE_DATA);
 
   ZeroMem (
     ScsiDiskDevice->SenseData,
@@ -2694,7 +2694,7 @@ AtapiIdentifyDevice (
   Cdb[0] = ATA_CMD_IDENTIFY_DEVICE;
   CommandPacket.Timeout = EFI_TIMER_PERIOD_SECONDS (1);
   CommandPacket.Cdb = Cdb;
-  CommandPacket.CdbLength = sizeof (Cdb);
+  CommandPacket.CdbLength = (UINT8) sizeof (Cdb);
   CommandPacket.InDataBuffer = &ScsiDiskDevice->IdentifyData;
   CommandPacket.InTransferLength = sizeof (ScsiDiskDevice->IdentifyData);
 

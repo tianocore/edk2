@@ -51,7 +51,7 @@ PxeStart (
   // a S/W UNDI.
   //
   if (Snp->IsSwUndi) {
-    Snp->Cdb.CPBsize  = sizeof (PXE_CPB_START_31);
+    Snp->Cdb.CPBsize  = (UINT16) sizeof (PXE_CPB_START_31);
     Snp->Cdb.CPBaddr  = (UINT64)(UINTN) Cpb31;
 
     Cpb31->Delay     = (UINT64)(UINTN) &SnpUndi32CallbackDelay;

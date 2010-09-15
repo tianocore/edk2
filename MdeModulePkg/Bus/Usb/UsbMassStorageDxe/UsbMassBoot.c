@@ -50,7 +50,7 @@ UsbBootRequestSense (
 
   SenseCmd.OpCode   = USB_BOOT_REQUEST_SENSE_OPCODE;
   SenseCmd.Lun      = (UINT8) (USB_BOOT_LUN (UsbMass->Lun));
-  SenseCmd.AllocLen = sizeof (USB_BOOT_REQUEST_SENSE_DATA);
+  SenseCmd.AllocLen = (UINT8) sizeof (USB_BOOT_REQUEST_SENSE_DATA);
 
   Status = Transport->ExecCommand (
                         UsbMass->Context,
@@ -289,7 +289,7 @@ UsbBootIsUnitReady (
   return UsbBootExecCmdWithRetry (
            UsbMass,
            &TestCmd,
-           sizeof (USB_BOOT_TEST_UNIT_READY_CMD),
+           (UINT8) sizeof (USB_BOOT_TEST_UNIT_READY_CMD),
            EfiUsbNoData,
            NULL,
            0,
@@ -325,12 +325,12 @@ UsbBootInquiry (
 
   InquiryCmd.OpCode   = USB_BOOT_INQUIRY_OPCODE;
   InquiryCmd.Lun      = (UINT8) (USB_BOOT_LUN (UsbMass->Lun));
-  InquiryCmd.AllocLen = sizeof (InquiryData);
+  InquiryCmd.AllocLen = (UINT8) sizeof (InquiryData);
 
   Status = UsbBootExecCmdWithRetry (
              UsbMass,
              &InquiryCmd,
-             sizeof (USB_BOOT_INQUIRY_CMD),
+             (UINT8) sizeof (USB_BOOT_INQUIRY_CMD),
              EfiUsbDataIn,
              &InquiryData,
              sizeof (USB_BOOT_INQUIRY_DATA),
@@ -392,7 +392,7 @@ UsbBootReadCapacity (
   Status = UsbBootExecCmdWithRetry (
              UsbMass,
              &CapacityCmd,
-             sizeof (USB_BOOT_READ_CAPACITY_CMD),
+             (UINT8) sizeof (USB_BOOT_READ_CAPACITY_CMD),
              EfiUsbDataIn,
              &CapacityData,
              sizeof (USB_BOOT_READ_CAPACITY_DATA),
@@ -460,7 +460,7 @@ UsbScsiModeSense (
   Status = UsbBootExecCmdWithRetry (
              UsbMass,
              &ModeSenseCmd,
-             sizeof (USB_SCSI_MODE_SENSE6_CMD),
+             (UINT8) sizeof (USB_SCSI_MODE_SENSE6_CMD),
              EfiUsbDataIn,
              &ModeParaHeader,
              sizeof (USB_SCSI_MODE_SENSE6_PARA_HEADER),
@@ -704,7 +704,7 @@ UsbBootReadBlocks (
     Status = UsbBootExecCmdWithRetry (
                UsbMass,
                &ReadCmd,
-               sizeof (USB_BOOT_READ10_CMD),
+               (UINT8) sizeof (USB_BOOT_READ10_CMD),
                EfiUsbDataIn,
                Buffer,
                ByteSize,
@@ -780,7 +780,7 @@ UsbBootWriteBlocks (
     Status = UsbBootExecCmdWithRetry (
                UsbMass,
                &WriteCmd,
-               sizeof (USB_BOOT_WRITE10_CMD),
+               (UINT8) sizeof (USB_BOOT_WRITE10_CMD),
                EfiUsbDataOut,
                Buffer,
                ByteSize,

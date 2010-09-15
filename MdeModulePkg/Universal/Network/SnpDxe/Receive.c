@@ -68,10 +68,10 @@ PxeReceive (
   Snp->Cdb.OpCode     = PXE_OPCODE_RECEIVE;
   Snp->Cdb.OpFlags    = PXE_OPFLAGS_NOT_USED;
 
-  Snp->Cdb.CPBsize    = sizeof (PXE_CPB_RECEIVE);
+  Snp->Cdb.CPBsize    = (UINT16) sizeof (PXE_CPB_RECEIVE);
   Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Cpb;
 
-  Snp->Cdb.DBsize     = sizeof (PXE_DB_RECEIVE);
+  Snp->Cdb.DBsize     = (UINT16) sizeof (PXE_DB_RECEIVE);
   Snp->Cdb.DBaddr     = (UINT64)(UINTN) Db;
 
   Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;

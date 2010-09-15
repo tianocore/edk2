@@ -1637,7 +1637,7 @@ PciIoGetBarAttributes (
 
     if (NumConfig == 1) {
       Ptr->Desc         = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-      Ptr->Len          = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+      Ptr->Len          = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
 
       Ptr->AddrRangeMin = PciIoDevice->PciBar[BarIndex].BaseAddress;
       Ptr->AddrLen      = PciIoDevice->PciBar[BarIndex].Length;

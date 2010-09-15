@@ -677,6 +677,8 @@ Tcp4ServiceBindingCreateChild (
     *ChildHandle = Sock->SockHandle;
   }
 
+  mTcp4DefaultSockData.ProtoData = NULL;
+
   gBS->RestoreTPL (OldTpl);
   return Status;
 }

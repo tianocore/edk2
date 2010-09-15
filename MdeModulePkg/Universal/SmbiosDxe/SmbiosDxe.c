@@ -379,7 +379,7 @@ SmbiosAdd (
   // Build internal record Header
   //
   InternalRecord->Version     = EFI_SMBIOS_RECORD_HEADER_VERSION;
-  InternalRecord->HeaderSize  = sizeof (EFI_SMBIOS_RECORD_HEADER);
+  InternalRecord->HeaderSize  = (UINT16) sizeof (EFI_SMBIOS_RECORD_HEADER);
   InternalRecord->RecordSize  = RecordSize;
   InternalRecord->ProducerHandle = ProducerHandle;
   InternalRecord->NumberOfStrings = NumberOfStrings;
@@ -541,7 +541,7 @@ SmbiosUpdateString (
       // Build internal record Header
       //
       InternalRecord->Version     = EFI_SMBIOS_RECORD_HEADER_VERSION;
-      InternalRecord->HeaderSize  = sizeof (EFI_SMBIOS_RECORD_HEADER);
+      InternalRecord->HeaderSize  = (UINT16) sizeof (EFI_SMBIOS_RECORD_HEADER);
       InternalRecord->RecordSize  = SmbiosEntry->RecordHeader->RecordSize + InputStrLen - TargetStrLen;
       InternalRecord->ProducerHandle = SmbiosEntry->RecordHeader->ProducerHandle;
       InternalRecord->NumberOfStrings = SmbiosEntry->RecordHeader->NumberOfStrings;
@@ -864,7 +864,7 @@ SmbiosCreateTable (
   //
   GetMaxSmbiosHandle(SmbiosProtocol, &SmbiosHandle);
   EndStructure.Header.Type = EFI_SMBIOS_TYPE_END_OF_TABLE;
-  EndStructure.Header.Length = sizeof(EFI_SMBIOS_TABLE_HEADER);
+  EndStructure.Header.Length = (UINT8) sizeof (EFI_SMBIOS_TABLE_HEADER);
   EndStructure.Header.Handle = SmbiosHandle;
   EndStructure.Tailing[0] = 0;
   EndStructure.Tailing[1] = 0;

@@ -48,7 +48,7 @@ PxeNvDataRead (
   Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
   Snp->Cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
 
-  Snp->Cdb.DBsize     = sizeof (PXE_DB_NVDATA);
+  Snp->Cdb.DBsize     = (UINT16) sizeof (PXE_DB_NVDATA);
   Snp->Cdb.DBaddr     = (UINT64)(UINTN) Db;
 
   Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;

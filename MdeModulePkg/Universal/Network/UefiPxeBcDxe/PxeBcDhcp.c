@@ -852,7 +852,7 @@ PxeBcDhcpCallBack (
         ZeroMem (DhcpHeader->ClientHwAddr, sizeof (EFI_GUID));
       }
 
-      DhcpHeader->HwAddrLen = sizeof (EFI_GUID);
+      DhcpHeader->HwAddrLen = (UINT8) sizeof (EFI_GUID);
     }
 
     if (Dhcp4Event == Dhcp4SendDiscover) {
@@ -948,7 +948,7 @@ PxeBcBuildDhcpOptions (
     // Append max message size.
     //
     OptList[Index]->OpCode  = PXEBC_DHCP4_TAG_MAXMSG;
-    OptList[Index]->Length  = sizeof (PXEBC_DHCP4_OPTION_MAX_MESG_SIZE);
+    OptList[Index]->Length  = (UINT8) sizeof (PXEBC_DHCP4_OPTION_MAX_MESG_SIZE);
     OptEnt.MaxMesgSize      = (PXEBC_DHCP4_OPTION_MAX_MESG_SIZE *) OptList[Index]->Data;
     Value                   = NTOHS (PXEBC_DHCP4_MAX_PACKET_SIZE);
     CopyMem (&OptEnt.MaxMesgSize->Size, &Value, sizeof (UINT16));
@@ -1003,7 +1003,7 @@ PxeBcBuildDhcpOptions (
   // Append UUID/Guid-based client identifier option
   //
   OptList[Index]->OpCode  = PXEBC_PXE_DHCP4_TAG_UUID;
-  OptList[Index]->Length  = sizeof (PXEBC_DHCP4_OPTION_UUID);
+  OptList[Index]->Length  = (UINT8) sizeof (PXEBC_DHCP4_OPTION_UUID);
   OptEnt.Uuid             = (PXEBC_DHCP4_OPTION_UUID *) OptList[Index]->Data;
   OptEnt.Uuid->Type       = 0;
   Index++;
@@ -1022,7 +1022,7 @@ PxeBcBuildDhcpOptions (
   // Append client network device interface option
   //
   OptList[Index]->OpCode  = PXEBC_PXE_DHCP4_TAG_UNDI;
-  OptList[Index]->Length  = sizeof (PXEBC_DHCP4_OPTION_UNDI);
+  OptList[Index]->Length  = (UINT8) sizeof (PXEBC_DHCP4_OPTION_UNDI);
   OptEnt.Undi             = (PXEBC_DHCP4_OPTION_UNDI *) OptList[Index]->Data;
   if (Private->Nii != NULL) {
     OptEnt.Undi->Type       = Private->Nii->Type;
@@ -1041,7 +1041,7 @@ PxeBcBuildDhcpOptions (
   // Append client system architecture option
   //
   OptList[Index]->OpCode  = PXEBC_PXE_DHCP4_TAG_ARCH;
-  OptList[Index]->Length  = sizeof (PXEBC_DHCP4_OPTION_ARCH);
+  OptList[Index]->Length  = (UINT8) sizeof (PXEBC_DHCP4_OPTION_ARCH);
   OptEnt.Arch             = (PXEBC_DHCP4_OPTION_ARCH *) OptList[Index]->Data;
   Value                   = HTONS (EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE);
   CopyMem (&OptEnt.Arch->Type, &Value, sizeof (UINT16));
@@ -1052,7 +1052,7 @@ PxeBcBuildDhcpOptions (
   // Append client system architecture option
   //
   OptList[Index]->OpCode  = PXEBC_DHCP4_TAG_CLASS_ID;
-  OptList[Index]->Length  = sizeof (PXEBC_DHCP4_OPTION_CLID);
+  OptList[Index]->Length  = (UINT8) sizeof (PXEBC_DHCP4_OPTION_CLID);
   OptEnt.Clid             = (PXEBC_DHCP4_OPTION_CLID *) OptList[Index]->Data;
   CopyMem (OptEnt.Clid, DEFAULT_CLASS_ID_DATA, sizeof (PXEBC_DHCP4_OPTION_CLID));
   CvtNum (EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE, OptEnt.Clid->ArchitectureType, sizeof (OptEnt.Clid->ArchitectureType));
@@ -1149,7 +1149,7 @@ PxeBcDiscvBootService (
     //
     // Add vendor option of PXE_BOOT_ITEM
     //
-    VendorOptLen      = (sizeof (EFI_DHCP4_PACKET_OPTION) - 1) * 2 + sizeof (PXEBC_OPTION_BOOT_ITEM) + 1;
+    VendorOptLen = (UINT8) ((sizeof (EFI_DHCP4_PACKET_OPTION) - 1) * 2 + sizeof (PXEBC_OPTION_BOOT_ITEM) + 1);
     OptList[OptCount] = AllocatePool (VendorOptLen);
     if (OptList[OptCount] == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -1159,7 +1159,7 @@ PxeBcDiscvBootService (
     OptList[OptCount]->Length     = (UINT8) (VendorOptLen - 2);
     PxeOpt                        = (EFI_DHCP4_PACKET_OPTION *) OptList[OptCount]->Data;
     PxeOpt->OpCode                = PXEBC_VENDOR_TAG_BOOT_ITEM;
-    PxeOpt->Length                = sizeof (PXEBC_OPTION_BOOT_ITEM);
+    PxeOpt->Length                = (UINT8) sizeof (PXEBC_OPTION_BOOT_ITEM);
     PxeBootItem                   = (PXEBC_OPTION_BOOT_ITEM *) PxeOpt->Data;
     PxeBootItem->Type             = HTONS (Type);
     PxeBootItem->Layer            = HTONS (*Layer);
@@ -1187,7 +1187,7 @@ PxeBcDiscvBootService (
       ZeroMem (DhcpHeader->ClientHwAddr, sizeof (EFI_GUID));
     }
 
-    DhcpHeader->HwAddrLen = sizeof (EFI_GUID);
+    DhcpHeader->HwAddrLen = (UINT8) sizeof (EFI_GUID);
   }
 
   Xid                                 = NET_RANDOM (NetRandomInitSeed ());

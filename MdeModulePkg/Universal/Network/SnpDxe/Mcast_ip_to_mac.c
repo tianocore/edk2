@@ -45,8 +45,8 @@ PxeIp2Mac (
   Db                  = Snp->Db;
   Snp->Cdb.OpCode     = PXE_OPCODE_MCAST_IP_TO_MAC;
   Snp->Cdb.OpFlags    = (UINT16) (IPv6 ? PXE_OPFLAGS_MCAST_IPV6_TO_MAC : PXE_OPFLAGS_MCAST_IPV4_TO_MAC);
-  Snp->Cdb.CPBsize    = sizeof (PXE_CPB_MCAST_IP_TO_MAC);
-  Snp->Cdb.DBsize     = sizeof (PXE_DB_MCAST_IP_TO_MAC);
+  Snp->Cdb.CPBsize    = (UINT16) sizeof (PXE_CPB_MCAST_IP_TO_MAC);
+  Snp->Cdb.DBsize     = (UINT16) sizeof (PXE_DB_MCAST_IP_TO_MAC);
 
   Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Cpb;
   Snp->Cdb.DBaddr     = (UINT64)(UINTN) Db;

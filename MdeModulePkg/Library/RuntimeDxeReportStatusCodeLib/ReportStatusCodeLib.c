@@ -590,7 +590,7 @@ ReportStatusCodeEx (
     if (sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize > EFI_STATUS_CODE_DATA_MAX_SIZE) {
       return EFI_OUT_OF_RESOURCES;
     }
-    StatusCodeData = (EFI_STATUS_CODE_DATA *)StatusCodeBuffer;
+    StatusCodeData = (EFI_STATUS_CODE_DATA *) StatusCodeBuffer;
   } else  {
     if (gBS == NULL || gBS->AllocatePool == NULL || gBS->FreePool == NULL) {
       return EFI_UNSUPPORTED;
@@ -609,8 +609,8 @@ ReportStatusCodeEx (
   //
   // Fill in the extended data header
   //
-  StatusCodeData->HeaderSize = sizeof (EFI_STATUS_CODE_DATA);
-  StatusCodeData->Size = (UINT16)ExtendedDataSize;
+  StatusCodeData->HeaderSize = (UINT16) sizeof (EFI_STATUS_CODE_DATA);
+  StatusCodeData->Size = (UINT16) ExtendedDataSize;
   if (ExtendedDataGuid == NULL) {
     ExtendedDataGuid = &gEfiStatusCodeSpecificDataGuid;
   }

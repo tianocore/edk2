@@ -1063,11 +1063,11 @@ ParseOpCodes (
           break;
 
         case EFI_IFR_TYPE_DATE:
-          ExpressionOpCode->ValueWidth = sizeof (EFI_IFR_DATE);
+          ExpressionOpCode->ValueWidth = (UINT8) sizeof (EFI_IFR_DATE);
           break;
 
         case EFI_IFR_TYPE_TIME:
-          ExpressionOpCode->ValueWidth = sizeof (EFI_IFR_TIME);
+          ExpressionOpCode->ValueWidth = (UINT8) sizeof (EFI_IFR_TIME);
           break;
 
         case EFI_IFR_TYPE_OTHER:

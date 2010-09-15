@@ -43,11 +43,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define IS_NULL(a)                 ((a) == L'\0')
 
 
-#define SET_DEVICE_PATH_INSTANCE_END_NODE(a) {           \
-    (a)->Type       = END_DEVICE_PATH_TYPE;              \
-    (a)->SubType    = END_INSTANCE_DEVICE_PATH_SUBTYPE;  \
-    (a)->Length[0]  = sizeof (EFI_DEVICE_PATH_PROTOCOL); \
-    (a)->Length[1]  = 0;                                 \
+#define SET_DEVICE_PATH_INSTANCE_END_NODE(a) {                   \
+    (a)->Type       = END_DEVICE_PATH_TYPE;                      \
+    (a)->SubType    = END_INSTANCE_DEVICE_PATH_SUBTYPE;          \
+    (a)->Length[0]  = (UINT8) sizeof (EFI_DEVICE_PATH_PROTOCOL); \
+    (a)->Length[1]  = 0;                                         \
   }
 
 //

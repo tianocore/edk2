@@ -1718,7 +1718,7 @@ ExecuteMOVxx (
     //
     // Not indirect source: MOVxx {@}Rx, Ry [Index]
     //
-    Data64 = VmPtr->Gpr[OPERAND2_REGNUM (Operands)] + Index64Op2;
+    Data64 = (UINT64) (VmPtr->Gpr[OPERAND2_REGNUM (Operands)] + Index64Op2);
     //
     // Did Operand2 have an index? If so, treat as two signed values since
     // indexes are signed values.
@@ -2005,7 +2005,7 @@ ExecuteJMP (
     // 64-bit immediate data is full address. Read the immediate data,
     // check for alignment, and jump absolute.
     //
-    Data64 = VmReadImmed64 (VmPtr, 2);
+    Data64 = (UINT64) VmReadImmed64 (VmPtr, 2);
     if (!IS_ALIGNED ((UINTN) Data64, sizeof (UINT16))) {
       EbcDebugSignalException (
         EXCEPT_EBC_ALIGNMENT_CHECK,
@@ -2049,7 +2049,7 @@ ExecuteJMP (
   if (OPERAND1_REGNUM (Operand) == 0) {
     Data64 = 0;
   } else {
-    Data64 = OPERAND1_REGDATA (VmPtr, Operand);
+    Data64 = (UINT64) OPERAND1_REGDATA (VmPtr, Operand);
   }
   //
   // Decode the forms
@@ -2264,7 +2264,7 @@ ExecuteMOVI (
     } else if ((Operands & MOVI_M_MOVEWIDTH) == MOVI_MOVEWIDTH32) {
       VmWriteMem32 (VmPtr, (UINTN) Op1, (UINT32) ImmData64);
     } else {
-      VmWriteMem64 (VmPtr, (UINTN) Op1, ImmData64);
+      VmWriteMem64 (VmPtr, (UINTN) Op1, (UINT64) ImmData64);
     }
   }
   //
@@ -2551,9 +2551,9 @@ ExecuteMOVsnw (
   //
   // Get the data from the source.
   //
-  Op2 = (INT64) ((INTN) (VmPtr->Gpr[OPERAND2_REGNUM (Operands)] + Op2Index));
+  Op2 = (UINT64) (VmPtr->Gpr[OPERAND2_REGNUM (Operands)] + Op2Index);
   if (OPERAND2_INDIRECT (Operands)) {
-    Op2 = (INT64) (INTN) VmReadMemN (VmPtr, (UINTN) Op2);
+    Op2 = (UINT64) VmReadMemN (VmPtr, (UINTN) Op2);
   }
   //
   // Now write back the result.
@@ -2644,9 +2644,9 @@ ExecuteMOVsnd (
   //
   // Get the data from the source.
   //
-  Op2 = (INT64) ((INTN) (VmPtr->Gpr[OPERAND2_REGNUM (Operands)] + Op2Index));
+  Op2 = (UINT64) (VmPtr->Gpr[OPERAND2_REGNUM (Operands)] + Op2Index);
   if (OPERAND2_INDIRECT (Operands)) {
-    Op2 = (INT64) (INTN) VmReadMemN (VmPtr, (UINTN) Op2);
+    Op2 = (UINT64) VmReadMemN (VmPtr, (UINTN) Op2);
   }
   //
   // Now write back the result.
@@ -3698,7 +3698,7 @@ ExecuteDIVU (
     // Get the destination register
     //
     if ((*VmPtr->Ip & DATAMANIP_M_64) != 0) {
-      return (UINT64) (DivU64x64Remainder ((INT64)Op1, (INT64)Op2, &Remainder));
+      return (UINT64) (DivU64x64Remainder (Op1, Op2, &Remainder));
     } else {
       return (UINT64) ((UINT32) Op1 / (UINT32) Op2);
     }
@@ -4195,7 +4195,7 @@ ExecuteDataManip (
   // Get operand1 (destination and sometimes also an actual operand)
   // of form {@}R1
   //
-  Op1 = VmPtr->Gpr[OPERAND1_REGNUM (Operands)];
+  Op1 = (UINT64) VmPtr->Gpr[OPERAND1_REGNUM (Operands)];
   if (OPERAND1_INDIRECT (Operands)) {
     if ((Opcode & DATAMANIP_M_64) != 0) {
       Op1 = VmReadMem64 (VmPtr, (UINTN) Op1);
@@ -4238,7 +4238,7 @@ ExecuteDataManip (
   // Write back the result.
   //
   if (OPERAND1_INDIRECT (Operands)) {
-    Op1 = VmPtr->Gpr[OPERAND1_REGNUM (Operands)];
+    Op1 = (UINT64) VmPtr->Gpr[OPERAND1_REGNUM (Operands)];
     if ((Opcode & DATAMANIP_M_64) != 0) {
       VmWriteMem64 (VmPtr, (UINTN) Op1, Op2);
     } else {
@@ -4573,7 +4573,7 @@ VmReadIndex64 (
   //
   ConstUnits = ARShiftU64 (((Index &~0xF000000000000000ULL) & Mask), (UINTN)NBits);
 
-  Offset  = MultU64x64 (NaturalUnits, sizeof (UINTN)) + ConstUnits;
+  Offset  = MultU64x64 ((UINT64) NaturalUnits, sizeof (UINTN)) + ConstUnits;
 
   //
   // Now set the sign
@@ -4781,7 +4781,6 @@ VmWriteMem64 (
   )
 {
   EFI_STATUS  Status;
-  UINT32      Data32;
 
   //
   // Convert the address if it's in the stack gap
@@ -4803,8 +4802,7 @@ VmWriteMem64 (
     }
 
     MemoryFence ();
-    Data32 = (UINT32) (((UINT32 *) &Data)[1]);
-    if ((Status = VmWriteMem32 (VmPtr, Addr + sizeof (UINT32), Data32)) != EFI_SUCCESS) {
+    if ((Status = VmWriteMem32 (VmPtr, Addr + sizeof (UINT32), (UINT32) RShiftU64(Data, 32))) != EFI_SUCCESS) {
       return Status;
     }
 
@@ -5259,9 +5257,9 @@ VmReadMem64 (
   //
   // Return unaligned data. Assume little endian.
   //
-  Data    = (UINT64) VmReadMem32 (VmPtr, Addr);
-  Data32  = VmReadMem32 (VmPtr, Addr + sizeof (UINT32));
-  *(UINT32 *) ((UINT32 *) &Data + 1) = Data32;
+  Data32 = VmReadMem32 (VmPtr, Addr);
+  Data  = (UINT64) VmReadMem32 (VmPtr, Addr + sizeof (UINT32));
+  Data  = LShiftU64 (Data, 32) | Data32;
   return Data;
 }
 

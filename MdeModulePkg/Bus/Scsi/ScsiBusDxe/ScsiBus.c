@@ -1165,7 +1165,7 @@ DiscoverScsiDevice (
   // Using Inquiry command to scan for the device
   //
   InquiryDataLength = sizeof (EFI_SCSI_INQUIRY_DATA);
-  SenseDataLength   = sizeof (EFI_SCSI_SENSE_DATA);
+  SenseDataLength   = (UINT8) sizeof (EFI_SCSI_SENSE_DATA);
 
   Status = ScsiInquiryCommand (
             &ScsiIoDevice->ScsiIo,

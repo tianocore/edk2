@@ -472,9 +472,9 @@ ReportStatusCodeEx (
   if (ExtendedDataSize > (MAX_EXTENDED_DATA_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
     return EFI_OUT_OF_RESOURCES;
   }
-  StatusCodeData = (EFI_STATUS_CODE_DATA  *)Buffer;
-  StatusCodeData->HeaderSize = sizeof (EFI_STATUS_CODE_DATA);
-  StatusCodeData->Size = (UINT16)ExtendedDataSize;
+  StatusCodeData = (EFI_STATUS_CODE_DATA  *) Buffer;
+  StatusCodeData->HeaderSize = (UINT16) sizeof (EFI_STATUS_CODE_DATA);
+  StatusCodeData->Size = (UINT16) ExtendedDataSize;
   if (ExtendedDataGuid == NULL) {
     ExtendedDataGuid = &gEfiStatusCodeSpecificDataGuid;
   }

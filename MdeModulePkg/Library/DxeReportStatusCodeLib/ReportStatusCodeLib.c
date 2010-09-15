@@ -504,8 +504,8 @@ ReportStatusCodeEx (
   //
   // Fill in the extended data header
   //
-  StatusCodeData->HeaderSize = sizeof (EFI_STATUS_CODE_DATA);
-  StatusCodeData->Size = (UINT16)ExtendedDataSize;
+  StatusCodeData->HeaderSize = (UINT16) sizeof (EFI_STATUS_CODE_DATA);
+  StatusCodeData->Size = (UINT16) ExtendedDataSize;
   if (ExtendedDataGuid == NULL) {
     ExtendedDataGuid = &gEfiStatusCodeSpecificDataGuid;
   }

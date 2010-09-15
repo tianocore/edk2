@@ -346,7 +346,7 @@ PCheckDevice (
         Dsc = (EFI_PCI_RESOUCE_DESCRIPTOR *) (ListPtr + 1);
 
         AcpiPtr->Desc = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-        AcpiPtr->Len = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR);
+        AcpiPtr->Len = (UINT16) sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR);
         AcpiPtr->ResType = (UINT8) Dsc->ResType;
         AcpiPtr->GenFlag = (UINT8) Dsc->GenFlag;
         AcpiPtr->SpecificFlag = (UINT8) Dsc->SpecificFlag;

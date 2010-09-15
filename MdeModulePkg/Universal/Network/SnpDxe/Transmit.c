@@ -162,7 +162,7 @@ PxeTransmit (
 
   Snp->Cdb.OpFlags    = PXE_OPFLAGS_TRANSMIT_WHOLE;
 
-  Snp->Cdb.CPBsize    = sizeof (PXE_CPB_TRANSMIT);
+  Snp->Cdb.CPBsize    = (UINT16) sizeof (PXE_CPB_TRANSMIT);
   Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Cpb;
 
   Snp->Cdb.OpCode     = PXE_OPCODE_TRANSMIT;

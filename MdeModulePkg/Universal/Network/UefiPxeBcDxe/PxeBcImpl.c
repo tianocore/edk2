@@ -677,7 +677,7 @@ ON_EXIT:
       ZeroMem (&ArpConfigData, sizeof (EFI_ARP_CONFIG_DATA));
 
       ArpConfigData.SwAddressType   = 0x0800;
-      ArpConfigData.SwAddressLength = sizeof (EFI_IPv4_ADDRESS);
+      ArpConfigData.SwAddressLength = (UINT8) sizeof (EFI_IPv4_ADDRESS);
       ArpConfigData.StationAddress  = &Private->StationIp.v4;
 
       Private->Arp->Configure (Private->Arp, NULL);
@@ -2263,7 +2263,7 @@ EfiPxeBcSetStationIP (
     ZeroMem (&ArpConfigData, sizeof (EFI_ARP_CONFIG_DATA));
 
     ArpConfigData.SwAddressType   = 0x0800;
-    ArpConfigData.SwAddressLength = sizeof (EFI_IPv4_ADDRESS);
+    ArpConfigData.SwAddressLength = (UINT8) sizeof (EFI_IPv4_ADDRESS);
     ArpConfigData.StationAddress  = &Private->StationIp.v4;
 
     Private->Arp->Configure (Private->Arp, NULL);
