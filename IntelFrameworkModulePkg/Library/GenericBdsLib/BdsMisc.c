@@ -1117,18 +1117,23 @@ BdsSetMemoryTypeInformationVariable (
   EFI_MEMORY_TYPE_INFORMATION  *PreviousMemoryTypeInformation;
   EFI_MEMORY_TYPE_INFORMATION  *CurrentMemoryTypeInformation;
   UINTN                        VariableSize;
-  BOOLEAN                      UpdateRequired;
   UINTN                        Index;
   UINTN                        Index1;
   UINT32                       Previous;
   UINT32                       Current;
   UINT32                       Next;
   EFI_HOB_GUID_TYPE            *GuidHob;
+  BOOLEAN                      MemoryTypeInformationModified;
   BOOLEAN                      MemoryTypeInformationVariableExists;
 
-  UpdateRequired = TRUE;
+  MemoryTypeInformationModified       = FALSE;
   MemoryTypeInformationVariableExists = FALSE;
 
+  //
+  // Only get the the Memory Type Information variable in the boot mode 
+  // other than BOOT_WITH_DEFAULT_SETTINGS because the Memory Type
+  // Information is not valid in this boot mode.
+  //
   if (GetBootModeHob () != BOOT_WITH_DEFAULT_SETTINGS) {
     VariableSize = 0;
     Status = gRT->GetVariable (
@@ -1140,7 +1145,6 @@ BdsSetMemoryTypeInformationVariable (
                     );
     if (Status == EFI_BUFFER_TOO_SMALL) {
       MemoryTypeInformationVariableExists = TRUE;
-      UpdateRequired = FALSE;
     }
   }
 
@@ -1210,23 +1214,34 @@ BdsSetMemoryTypeInformationVariable (
 
     if (Next != Previous) {
       PreviousMemoryTypeInformation[Index].NumberOfPages = Next;
-      UpdateRequired = TRUE;
+      MemoryTypeInformationModified = TRUE;
     }
 
     DEBUG ((EFI_D_INFO, "  %02x    %08x  %08x  %08x\n", PreviousMemoryTypeInformation[Index].Type, Previous, Current, Next));
   }
 
   //
-  // If any changes were made to the Memory Type Information settings, then set the new variable value
+  // If any changes were made to the Memory Type Information settings, then set the new variable value;
+  // Or create the variable in first boot.
   //
-  if (UpdateRequired || !MemoryTypeInformationVariableExists) {
+  if (MemoryTypeInformationModified || !MemoryTypeInformationVariableExists) {
     Status = gRT->SetVariable (
-          EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
-          &gEfiMemoryTypeInformationGuid,
-          EFI_VARIABLE_NON_VOLATILE  | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-          VariableSize,
-          PreviousMemoryTypeInformation
-          );
+                    EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
+                    &gEfiMemoryTypeInformationGuid,
+                    EFI_VARIABLE_NON_VOLATILE  | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                    VariableSize,
+                    PreviousMemoryTypeInformation
+                    );
+
+    //
+    // If the Memory Type Information settings have been modified, then reset the platform
+    // so the new Memory Type Information setting will be used to guarantee that an S4
+    // entry/resume cycle will not fail.
+    //
+    if (MemoryTypeInformationModified) {
+      DEBUG ((EFI_D_ERROR, "Memory Type Information settings change. Warm Reset!!!\n"));
+      gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+    }
   }
 }
 
