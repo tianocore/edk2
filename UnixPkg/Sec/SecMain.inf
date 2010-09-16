@@ -96,7 +96,7 @@
 # Need to do this link via gcc and not ld as the pathing to libraries changes from OS version to OS version
 #
    XCODE:*_*_IA32_DLINK_PATH == gcc
-   XCODE:*_*_IA32_DLINK_FLAGS == -arch i386 -o $(BIN_DIR)/SecMain -L/usr/X11R6/lib -lXext -lX11 -lIOKit -framework Carbon		
+   XCODE:*_*_IA32_DLINK_FLAGS == -arch i386 -o $(BIN_DIR)/SecMain -L/usr/X11R6/lib -lXext -lX11 -framework IOKit -framework Carbon		
    XCODE:*_*_IA32_ASM_FLAGS == -arch i386 -g
 
    XCODE:*_*_X64_DLINK_PATH == gcc

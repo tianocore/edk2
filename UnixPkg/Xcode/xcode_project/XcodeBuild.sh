@@ -10,5 +10,4 @@ set -e
 # Source the workspace and set up the environment varaibles we need
 #
 cd ../..
-echo `pwd`
-./build.sh
+./build.sh $1 $2 $3 $4 $5 $6 $8

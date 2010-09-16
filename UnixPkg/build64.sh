@@ -90,7 +90,18 @@ do
 
   if [[ $arg == cleanall ]]; then
     make -C $WORKSPACE/BaseTools clean  
+    build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc -a X64 -t $TARGET_TOOLS -D SEC_ONLY -n 3 clean
+    build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc -a X64 -t $UNIXPKG_TOOLS -n 3 clean
+    exit $?
   fi
+
+  if [[ $arg == clean ]]; then
+    build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc -a X64 -t $TARGET_TOOLS -D SEC_ONLY -n 3 clean
+    build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc -a X64 -t $UNIXPKG_TOOLS -n 3 clean
+    exit $?
+  fi
+  
+  
   if [[ $arg == shell ]]; then
     build -p $WORKSPACE/GccShellPkg/GccShellPkg.dsc -a X64 -t $UNIXPKG_TOOLS -n 3  $2 $3 $4 $5 $6 $7 $8
     exit $?
