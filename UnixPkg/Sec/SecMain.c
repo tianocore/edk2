@@ -543,6 +543,7 @@ Returns:
   EFI_PHYSICAL_ADDRESS        PeiImageAddress;
   EFI_SEC_PEI_HAND_OFF        *SecCoreData;
   UINTN                       PeiStackSize;
+  EFI_PEI_PPI_DESCRIPTOR      *DispatchTable;
 
   //
   // Compute Top Of Memory for Stack and PEI Core Allocations
@@ -597,12 +598,18 @@ Returns:
   }
   
   //
+  // Allow an override for extra PPIs to be passed up to PEI
+  // This is an easy way to enable OS specific customizations
+  //
+  DispatchTable = OverrideDispatchTable (&gPrivateDispatchTable[0]);
+  
+  //
   // Transfer control to the PEI Core
   //
   PeiSwitchStacks (
     (SWITCH_STACK_ENTRY_POINT) (UINTN) PeiCoreEntryPoint,
     SecCoreData,
-    (VOID *) (UINTN) ((EFI_PEI_PPI_DESCRIPTOR *) &gPrivateDispatchTable),
+    (VOID *)DispatchTable,
     NULL,
     TopOfStack
     );

@@ -30,6 +30,8 @@ Abstract:
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/SecDispatchTableLib.h>
+
 
 #define STACK_SIZE                0x20000      
 

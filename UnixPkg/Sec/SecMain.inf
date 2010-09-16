@@ -62,6 +62,7 @@
   BaseLib
   PeCoffLib
   ReportStatusCodeLib
+  SecDispatchTableLib
 
 
 [Ppis]

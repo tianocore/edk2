@@ -104,6 +104,7 @@
   DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+  SecDispatchTableLib|UnixPkg/Library/SecDispatchTableLib/SecDispatchTableLib.inf
 
 [LibraryClasses.common.USER_DEFINED]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
