@@ -86,7 +86,7 @@ GenerateHiiDatabaseRecord (
   // Backup the number of Hii handles
   //
   Private->HiiHandleCount++;
-  HiiHandle->Key = Private->HiiHandleCount;
+  HiiHandle->Key = (UINTN) Private->HiiHandleCount;
   //
   // Insert the handle to hii handle list of the whole database.
   //

@@ -118,7 +118,7 @@ CoreRestoreTpl (
   // Dispatch any pending events
   //
   while (((-2 << NewTpl) & gEventPending) != 0) {
-    gEfiCurrentTpl = HighBitSet64 (gEventPending);
+    gEfiCurrentTpl = (UINTN) HighBitSet64 (gEventPending);
     if (gEfiCurrentTpl < TPL_HIGH_LEVEL) {
       CoreSetInterruptState (TRUE);
     }

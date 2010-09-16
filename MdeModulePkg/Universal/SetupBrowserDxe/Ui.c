@@ -1775,8 +1775,8 @@ UiDisplayMenu (
         UpArrow         = FALSE;
         Row             = TopRow;
 
-        Temp            = SkipValue;
-        Temp2           = SkipValue;
+        Temp            = (UINTN) SkipValue;
+        Temp2           = (UINTN) SkipValue;
 
         ClearLines (
           LocalScreen.LeftColumn,
@@ -2532,6 +2532,7 @@ UiDisplayMenu (
           }
           BufferSize = StrLen (StringPtr) / 2;
           DevicePath = AllocatePool (BufferSize);
+          ASSERT (DevicePath != NULL);
 
           //
           // Convert from Device Path String to DevicePath Buffer in the reverse order.
@@ -2940,6 +2941,7 @@ UiDisplayMenu (
     case CfUiPageDown:
       ControlFlag     = CfCheckSelection;
 
+      ASSERT (NewPos != NULL);
       if (NewPos->ForwardLink == &gMenuOption) {
         NewLine = FALSE;
         Repaint = FALSE;
@@ -3007,7 +3009,7 @@ UiDisplayMenu (
         //
         // An option might be multi-line, so we need to reflect that data in the overall skip value
         //
-        UpdateOptionSkipLines (Selection, NextMenuOption, &OptionString, SkipValue);
+        UpdateOptionSkipLines (Selection, NextMenuOption, &OptionString, (UINTN) SkipValue);
 
         Temp = MenuOption->Row + MenuOption->Skip + DistanceValue - 1;
         if ((MenuOption->Row + MenuOption->Skip == BottomRow + 1) &&

@@ -467,7 +467,7 @@ DhcpCopyConfigure (
 {
   EFI_DHCP4_PACKET_OPTION   **DstOptions;
   EFI_DHCP4_PACKET_OPTION   **SrcOptions;
-  INTN                      Len;
+  UINTN                     Len;
   UINT32                    Index;
 
   CopyMem (Dst, Src, sizeof (*Dst));

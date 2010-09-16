@@ -1127,7 +1127,7 @@ ConstructAcpiResourceRequestor (
     //
     if ((Aperture & 0x02) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-      Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+      Ptr->Len      = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
       //
       // Mem
       //
@@ -1151,7 +1151,7 @@ ConstructAcpiResourceRequestor (
     //
     if ((Aperture & 0x04) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-      Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+      Ptr->Len      = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
       //
       // Mem
       //
@@ -1174,7 +1174,7 @@ ConstructAcpiResourceRequestor (
     //
     if ((Aperture & 0x08) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-      Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+      Ptr->Len      = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
       //
       // Mem
       //
@@ -1197,7 +1197,7 @@ ConstructAcpiResourceRequestor (
     //
     if ((Aperture & 0x10) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-      Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+      Ptr->Len      = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
       //
       // Mem
       //

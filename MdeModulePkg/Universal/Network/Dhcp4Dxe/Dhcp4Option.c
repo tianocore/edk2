@@ -611,7 +611,7 @@ DhcpParseOption (
   // Allocate a buffer to hold the DHCP options, and after that, a
   // continuous buffer to put all the options' data.
   //
-  Options = AllocateZeroPool (OptNum * sizeof (DHCP_OPTION) + TotalLen);
+  Options = AllocateZeroPool ((UINTN) (OptNum * sizeof (DHCP_OPTION)) + TotalLen);
 
   if (Options == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -754,7 +754,7 @@ DhcpAppendOption (
 
     *(Buf++) = Tag;
     *(Buf++) = (UINT8) Len;
-    CopyMem (Buf, Data + Index * 255, Len);
+    CopyMem (Buf, Data + Index * 255, (UINTN) Len);
 
     Buf     += Len;
   }

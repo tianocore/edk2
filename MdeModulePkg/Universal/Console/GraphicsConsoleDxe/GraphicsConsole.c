@@ -816,8 +816,8 @@ GraphicsConsoleConOutOutputString (
 
   MaxColumn = Private->ModeData[Mode].Columns;
   MaxRow    = Private->ModeData[Mode].Rows;
-  DeltaX    = Private->ModeData[Mode].DeltaX;
-  DeltaY    = Private->ModeData[Mode].DeltaY;
+  DeltaX    = (UINTN) Private->ModeData[Mode].DeltaX;
+  DeltaY    = (UINTN) Private->ModeData[Mode].DeltaY;
   Width     = MaxColumn * EFI_GLYPH_WIDTH;
   Height    = (MaxRow - 1) * EFI_GLYPH_HEIGHT;
   Delta     = Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);

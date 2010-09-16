@@ -490,7 +490,8 @@ CoreLocateDevicePath (
     // Check if DevicePath is first part of SourcePath
     //
     Size = GetDevicePathSize (TmpDevicePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
-    if ((Size <= SourceSize) && CompareMem (SourcePath, TmpDevicePath, Size) == 0) {
+    ASSERT (Size >= 0);
+    if ((Size <= SourceSize) && CompareMem (SourcePath, TmpDevicePath, (UINTN) Size) == 0) {
       //
       // If the size is equal to the best match, then we
       // have a duplicate device path for 2 different device

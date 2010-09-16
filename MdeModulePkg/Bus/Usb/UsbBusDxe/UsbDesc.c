@@ -197,12 +197,12 @@ UsbCreateDesc (
     return NULL;
   }
 
-  Desc = AllocateZeroPool (CtrlLen);
+  Desc = AllocateZeroPool ((UINTN) CtrlLen);
   if (Desc == NULL) {
     return NULL;
   }
 
-  CopyMem (Desc, Head, DescLen);
+  CopyMem (Desc, Head, (UINTN) DescLen);
 
   *Consumed = Offset + Head->Len;
 
