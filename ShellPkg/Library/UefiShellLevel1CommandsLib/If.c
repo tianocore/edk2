@@ -62,7 +62,7 @@ IsNextFragment (
     //
     *Statement+=StrLen(Fragment);
     while (*Statement[0] == L' ') {
-      Statement++;
+      (*Statement)++;
     }
     FreePool(Tester);
     return (TRUE);
