@@ -63,7 +63,7 @@ KbcResetSystem (
 }
 
 /**
-  Initialize the state information for the Reset Architectural Protocol
+  Initialize the state information for the Reset Architectural Protocol.
 
   @param ImageHandle     Handle of the loaded driver 
   @param SystemTable     Pointer to the System Table

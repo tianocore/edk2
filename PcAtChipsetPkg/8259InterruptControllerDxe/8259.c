@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Global for the Legacy 8259 Protocol that is produced by this driver
 //
-EFI_LEGACY_8259_PROTOCOL  m8259 = {
+EFI_LEGACY_8259_PROTOCOL  mInterrupt8259 = {
   Interrupt8259SetVectorBase,
   Interrupt8259GetMask,
   Interrupt8259SetMask,
@@ -592,13 +592,13 @@ Install8259 (
   // Clear all pending interrupt
   //
   for (Irq = Efi8259Irq0; Irq <= Efi8259Irq15; Irq++) {
-    Interrupt8259EndOfInterrupt (&m8259, Irq);
+    Interrupt8259EndOfInterrupt (&mInterrupt8259, Irq);
   }
 
   //
   // Set the 8259 Master base to 0x68 and the 8259 Slave base to 0x70
   //
-  Status = Interrupt8259SetVectorBase (&m8259, PROTECTED_MODE_BASE_VECTOR_MASTER, PROTECTED_MODE_BASE_VECTOR_SLAVE);
+  Status = Interrupt8259SetVectorBase (&mInterrupt8259, PROTECTED_MODE_BASE_VECTOR_MASTER, PROTECTED_MODE_BASE_VECTOR_SLAVE);
 
   //
   // Set all 8259 interrupts to edge triggered and disabled
@@ -612,7 +612,7 @@ Install8259 (
                   &m8259Handle,
                   &gEfiLegacy8259ProtocolGuid,
                   EFI_NATIVE_INTERFACE,
-                  &m8259
+                  &mInterrupt8259
                   );
   return Status;
 }

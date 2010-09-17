@@ -84,9 +84,9 @@ typedef struct {
 // Register A
 //
 typedef struct {
-  UINT8 RS : 4;   // Rate Selection Bits
-  UINT8 DV : 3;   // Divisor
-  UINT8 UIP : 1;  // Update in progress
+  UINT8 Rs : 4;   // Rate Selection Bits
+  UINT8 Dv : 3;   // Divisor
+  UINT8 Uip : 1;  // Update in progress
 } RTC_REGISTER_A_BITS;
 
 typedef union {
@@ -98,14 +98,14 @@ typedef union {
 // Register B
 //
 typedef struct {
-  UINT8 DSE : 1;  // 0 - Daylight saving disabled  1 - Daylight savings enabled
-  UINT8 MIL : 1;  // 0 - 12 hour mode              1 - 24 hour mode
-  UINT8 DM : 1;   // 0 - BCD Format                1 - Binary Format
-  UINT8 SQWE : 1; // 0 - Disable SQWE output       1 - Enable SQWE output
-  UINT8 UIE : 1;  // 0 - Update INT disabled       1 - Update INT enabled
-  UINT8 AIE : 1;  // 0 - Alarm INT disabled        1 - Alarm INT Enabled
-  UINT8 PIE : 1;  // 0 - Periodic INT disabled     1 - Periodic INT Enabled
-  UINT8 SET : 1;  // 0 - Normal operation.         1 - Updates inhibited
+  UINT8 Dse : 1;  // 0 - Daylight saving disabled  1 - Daylight savings enabled
+  UINT8 Mil : 1;  // 0 - 12 hour mode              1 - 24 hour mode
+  UINT8 Dm : 1;   // 0 - BCD Format                1 - Binary Format
+  UINT8 Sqwe : 1; // 0 - Disable SQWE output       1 - Enable SQWE output
+  UINT8 Uie : 1;  // 0 - Update INT disabled       1 - Update INT enabled
+  UINT8 Aie : 1;  // 0 - Alarm INT disabled        1 - Alarm INT Enabled
+  UINT8 Pie : 1;  // 0 - Periodic INT disabled     1 - Periodic INT Enabled
+  UINT8 Set : 1;  // 0 - Normal operation.         1 - Updates inhibited
 } RTC_REGISTER_B_BITS;
 
 typedef union {
@@ -118,10 +118,10 @@ typedef union {
 //
 typedef struct {
   UINT8 Reserved : 4; // Read as zero.  Can not be written.
-  UINT8 UF : 1;       // Update End Interrupt Flag
-  UINT8 AF : 1;       // Alarm Interrupt Flag
-  UINT8 PF : 1;       // Periodic Interrupt Flag
-  UINT8 IRQF : 1;     // Iterrupt Request Flag = PF & PIE | AF & AIE | UF & UIE
+  UINT8 Uf : 1;       // Update End Interrupt Flag
+  UINT8 Af : 1;       // Alarm Interrupt Flag
+  UINT8 Pf : 1;       // Periodic Interrupt Flag
+  UINT8 Irqf : 1;     // Iterrupt Request Flag = PF & PIE | AF & AIE | UF & UIE
 } RTC_REGISTER_C_BITS;
 
 typedef union {
@@ -134,7 +134,7 @@ typedef union {
 //
 typedef struct {
   UINT8 Reserved : 7; // Read as zero.  Can not be written.
-  UINT8 VRT : 1;      // Valid RAM and Time
+  UINT8 Vrt : 1;      // Valid RAM and Time
 } RTC_REGISTER_D_BITS;
 
 typedef union {

@@ -382,7 +382,7 @@ PcRtcSetTime (
   // Read Register B, and inhibit updates of the RTC
   //
   RegisterB.Data      = RtcRead (RTC_ADDRESS_REGISTER_B);
-  RegisterB.Bits.SET  = 1;
+  RegisterB.Bits.Set  = 1;
   RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
   ConvertEfiTimeToRtcTime (&RtcTime, RegisterB, &Century);
@@ -398,7 +398,7 @@ PcRtcSetTime (
   //
   // Allow updates of the RTC registers
   //
-  RegisterB.Bits.SET = 0;
+  RegisterB.Bits.Set = 0;
   RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
   //
@@ -488,7 +488,7 @@ PcRtcGetWakeupTime (
   //
   // Get the Time/Date/Daylight Savings values.
   //
-  *Enabled = RegisterB.Bits.AIE;
+  *Enabled = RegisterB.Bits.Aie;
   if (*Enabled) {
     Time->Second  = RtcRead (RTC_ADDRESS_SECONDS_ALARM);
     Time->Minute  = RtcRead (RTC_ADDRESS_MINUTES_ALARM);
@@ -531,7 +531,7 @@ PcRtcGetWakeupTime (
     return EFI_DEVICE_ERROR;
   }
 
-  *Pending = RegisterC.Bits.AF;
+  *Pending = RegisterC.Bits.Af;
 
   return EFI_SUCCESS;
 }
@@ -614,7 +614,7 @@ PcRtcSetWakeupTime (
   //
   RegisterB.Data      = RtcRead (RTC_ADDRESS_REGISTER_B);
 
-  RegisterB.Bits.SET  = 1;
+  RegisterB.Bits.Set  = 1;
   RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
   if (Enable) {
@@ -627,15 +627,15 @@ PcRtcSetWakeupTime (
     RtcWrite (RTC_ADDRESS_MINUTES_ALARM, RtcTime.Minute);
     RtcWrite (RTC_ADDRESS_HOURS_ALARM, RtcTime.Hour);
 
-    RegisterB.Bits.AIE = 1;
+    RegisterB.Bits.Aie = 1;
 
   } else {
-    RegisterB.Bits.AIE = 0;
+    RegisterB.Bits.Aie = 0;
   }
   //
   // Allow updates of the RTC registers
   //
-  RegisterB.Bits.SET = 0;
+  RegisterB.Bits.Set = 0;
   RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
   //
@@ -707,7 +707,7 @@ ConvertRtcTimeToEfiTime (
 
   Time->Hour = (UINT8) (Time->Hour & 0x7f);
 
-  if (RegisterB.Bits.DM == 0) {
+  if (RegisterB.Bits.Dm == 0) {
     Time->Year    = CheckAndConvertBcd8ToDecimal8 ((UINT8) Time->Year);
     Time->Month   = CheckAndConvertBcd8ToDecimal8 (Time->Month);
     Time->Day     = CheckAndConvertBcd8ToDecimal8 (Time->Day);
@@ -728,7 +728,7 @@ ConvertRtcTimeToEfiTime (
   //
   // If time is in 12 hour format, convert it to 24 hour format
   //
-  if (RegisterB.Bits.MIL == 0) {
+  if (RegisterB.Bits.Mil == 0) {
     if (IsPM && Time->Hour < 12) {
       Time->Hour = (UINT8) (Time->Hour + 12);
     }
@@ -764,7 +764,7 @@ RtcWaitToUpdate (
   //
   RegisterD.Data = RtcRead (RTC_ADDRESS_REGISTER_D);
 
-  if (RegisterD.Bits.VRT == 0) {
+  if (RegisterD.Bits.Vrt == 0) {
     return EFI_DEVICE_ERROR;
   }
   //
@@ -772,14 +772,14 @@ RtcWaitToUpdate (
   //
   Timeout         = (Timeout / 10) + 1;
   RegisterA.Data  = RtcRead (RTC_ADDRESS_REGISTER_A);
-  while (RegisterA.Bits.UIP == 1 && Timeout > 0) {
+  while (RegisterA.Bits.Uip == 1 && Timeout > 0) {
     MicroSecondDelay (10);
     RegisterA.Data = RtcRead (RTC_ADDRESS_REGISTER_A);
     Timeout--;
   }
 
   RegisterD.Data = RtcRead (RTC_ADDRESS_REGISTER_D);
-  if (Timeout == 0 || RegisterD.Bits.VRT == 0) {
+  if (Timeout == 0 || RegisterD.Bits.Vrt == 0) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -914,7 +914,7 @@ ConvertEfiTimeToRtcTime (
   //
   // Adjust hour field if RTC is in 12 hour mode
   //
-  if (RegisterB.Bits.MIL == 0) {
+  if (RegisterB.Bits.Mil == 0) {
     if (Time->Hour < 12) {
       IsPM = FALSE;
     }
@@ -932,7 +932,7 @@ ConvertEfiTimeToRtcTime (
 
   Time->Year  = (UINT16) (Time->Year % 100);
 
-  if (RegisterB.Bits.DM == 0) {
+  if (RegisterB.Bits.Dm == 0) {
     Time->Year    = DecimalToBcd8 ((UINT8) Time->Year);
     Time->Month   = DecimalToBcd8 (Time->Month);
     Time->Day     = DecimalToBcd8 (Time->Day);
@@ -943,7 +943,7 @@ ConvertEfiTimeToRtcTime (
   //
   // If we are in 12 hour mode and PM is set, then set bit 7 of the Hour field.
   //
-  if (RegisterB.Bits.MIL == 0 && IsPM) {
+  if (RegisterB.Bits.Mil == 0 && IsPM) {
     Time->Hour = (UINT8) (Time->Hour | 0x80);
   }
 }

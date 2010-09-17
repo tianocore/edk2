@@ -145,7 +145,7 @@ RootBridgeIoMemRead (
   IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN     UINT64                                 Address,
   IN     UINTN                                  Count,
-  IN OUT VOID                                   *Buffer
+  OUT    VOID                                   *Buffer
   );
 
 /**
@@ -162,7 +162,7 @@ RootBridgeIoMemRead (
                           responsible for aligning the Address if required.
    @param[in]   Count     The number of memory operations to perform. Bytes moved is
                           Width size * Count, starting at Address.
-   @param[out]  Buffer    For read operations, the destination buffer to store the results. For
+   @param[in]   Buffer    For read operations, the destination buffer to store the results. For
                           write operations, the source buffer to write data from.
    
    @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
@@ -177,7 +177,7 @@ RootBridgeIoMemWrite (
   IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN     UINT64                                 Address,
   IN     UINTN                                  Count,
-  IN OUT VOID                                   *Buffer
+  IN     VOID                                   *Buffer
   );
 
 /**
@@ -185,11 +185,11 @@ RootBridgeIoMemWrite (
 
    @param[in]   This        A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
    @param[in]   Width       Signifies the width of the memory operations.
-   @param[in]   Address     The base address of the I/O operation. The caller is responsible for
+   @param[in]   UserAddress The base address of the I/O operation. The caller is responsible for
                             aligning the Address if required.
    @param[in]   Count       The number of I/O operations to perform. Bytes moved is Width
                             size * Count, starting at Address.
-   @param[out]  Buffer      For read operations, the destination buffer to store the results. For
+   @param[out]  UserBuffer  For read operations, the destination buffer to store the results. For
                             write operations, the source buffer to write data from.
    
    @retval EFI_SUCCESS              The data was read from or written to the PCI root bridge.
@@ -205,7 +205,7 @@ RootBridgeIoIoRead (
   IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN     UINT64                                 UserAddress,
   IN     UINTN                                  Count,
-  IN OUT VOID                                   *UserBuffer
+  OUT    VOID                                   *UserBuffer
   );
 
 /**
@@ -213,11 +213,11 @@ RootBridgeIoIoRead (
 
    @param[in]   This        A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
    @param[in]   Width       Signifies the width of the memory operations.
-   @param[in]   Address     The base address of the I/O operation. The caller is responsible for
+   @param[in]   UserAddress The base address of the I/O operation. The caller is responsible for
                             aligning the Address if required.
    @param[in]   Count       The number of I/O operations to perform. Bytes moved is Width
                             size * Count, starting at Address.
-   @param[out]  Buffer      For read operations, the destination buffer to store the results. For
+   @param[in]   UserBuffer  For read operations, the destination buffer to store the results. For
                             write operations, the source buffer to write data from.
    
    @retval EFI_SUCCESS              The data was read from or written to the PCI root bridge.
@@ -233,7 +233,7 @@ RootBridgeIoIoWrite (
   IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN     UINT64                                 UserAddress,
   IN     UINTN                                  Count,
-  IN OUT VOID                                   *UserBuffer
+  IN     VOID                                   *UserBuffer
   );
 
 /**
@@ -300,7 +300,7 @@ RootBridgeIoPciRead (
   IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN     UINT64                                 Address,
   IN     UINTN                                  Count,
-  IN OUT VOID                                   *Buffer
+  OUT    VOID                                   *Buffer
   );
 
 /**
@@ -317,7 +317,7 @@ RootBridgeIoPciRead (
    @param[in]   Address   The address within the PCI configuration space for the PCI controller.
    @param[in]   Count     The number of PCI configuration operations to perform. Bytes
                           moved is Width size * Count, starting at Address.
-   @param[out]  Buffer    For read operations, the destination buffer to store the results. For
+   @param[in]   Buffer    For read operations, the destination buffer to store the results. For
                           write operations, the source buffer to write data from.
    
    @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
@@ -333,7 +333,7 @@ RootBridgeIoPciWrite (
   IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN     UINT64                                 Address,
   IN     UINTN                                  Count,
-  IN OUT VOID                                   *Buffer
+  IN     VOID                                   *Buffer
   );
 
 /**
@@ -346,7 +346,7 @@ RootBridgeIoPciWrite (
    @param[in]       This            A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
    @param[in]       Operation       Indicates if the bus master is going to read or write to system memory.
    @param[in]       HostAddress     The system memory address to map to the PCI controller.
-   @param[in][out]  NumberOfBytes   On input the number of bytes to map. On output the number of bytes that were mapped.
+   @param[in, out]  NumberOfBytes   On input the number of bytes to map. On output the number of bytes that were mapped.
    @param[out]      DeviceAddress   The resulting map address for the bus master PCI controller to use
                                     to access the system memory's HostAddress.
    @param[out]      Mapping         The value to pass to Unmap() when the bus master DMA operation is complete.
@@ -523,9 +523,9 @@ RootBridgeIoGetAttributes (
                                     MEMORY_WRITE_COMBINE, MEMORY_CACHED, and
                                     MEMORY_DISABLE are not set, then ResourceBase and
                                     ResourceLength are ignored, and may be NULL.
-   @param[in][out]  ResourceBase    A pointer to the base address of the resource range to be modified
+   @param[in, out]  ResourceBase    A pointer to the base address of the resource range to be modified
                                     by the attributes specified by Attributes.
-   @param[in][out]  ResourceLength  A pointer to the length of the resource range to be modified by the
+   @param[in, out]  ResourceLength  A pointer to the length of the resource range to be modified by the
                                     attributes specified by Attributes.
    
    @retval  EFI_SUCCESS     The current configuration of this PCI root bridge was returned in Resources.
@@ -866,7 +866,7 @@ RootBridgeIoCheckParameter (
    @param[in]   UserAddress   The address within the PCI configuration space for the PCI controller.
    @param[in]   Count         The number of PCI configuration operations to perform. Bytes
                               moved is Width size * Count, starting at Address.
-   @param[out]  UserBuffer    For read operations, the destination buffer to store the results. For
+   @param[in, out] UserBuffer For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
    
    @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
@@ -958,7 +958,7 @@ RootBridgeIoMemRW (
    @param[in]   UserAddress   The address within the PCI configuration space for the PCI controller.
    @param[in]   Count         The number of PCI configuration operations to perform. Bytes
                               moved is Width size * Count, starting at Address.
-   @param[out]  UserBuffer    For read operations, the destination buffer to store the results. For
+   @param[in, out] UserBuffer For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
    
    @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
@@ -1044,7 +1044,7 @@ RootBridgeIoIoRW (
    @param[in]   UserAddress   The address within the PCI configuration space for the PCI controller.
    @param[in]   Count         The number of PCI configuration operations to perform. Bytes
                               moved is Width size * Count, starting at Address.
-   @param[out]  UserBuffer    For read operations, the destination buffer to store the results. For
+   @param[in, out] UserBuffer For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
    
    @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
@@ -1219,7 +1219,7 @@ RootBridgeIoPollMem (
     }
     NumberOfTicks += 1;
   
-    while (NumberOfTicks) {
+    while (NumberOfTicks != 0) {
 
       mMetronome->WaitForTick (mMetronome, 1);
     
@@ -1320,7 +1320,7 @@ RootBridgeIoPollIo (
     }
     NumberOfTicks += 1;
   
-    while (NumberOfTicks) {
+    while (NumberOfTicks != 0) {
 
       mMetronome->WaitForTick (mMetronome, 1);
     
@@ -1369,7 +1369,7 @@ RootBridgeIoMemRead (
   IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN     UINT64                                 Address,
   IN     UINTN                                  Count,
-  IN OUT VOID                                   *Buffer
+  OUT    VOID                                   *Buffer
   )
 {
   return RootBridgeIoMemRW (This, FALSE, Width, Address, Count, Buffer);
@@ -1389,7 +1389,7 @@ RootBridgeIoMemRead (
                           responsible for aligning the Address if required.
    @param[in]   Count     The number of memory operations to perform. Bytes moved is
                           Width size * Count, starting at Address.
-   @param[out]  Buffer    For read operations, the destination buffer to store the results. For
+   @param[in]   Buffer    For read operations, the destination buffer to store the results. For
                           write operations, the source buffer to write data from.
    
    @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
@@ -1404,7 +1404,7 @@ RootBridgeIoMemWrite (
   IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN     UINT64                                 Address,
   IN     UINTN                                  Count,
-  IN OUT VOID                                   *Buffer
+  IN     VOID                                   *Buffer
   )
 {
   return RootBridgeIoMemRW (This, TRUE, Width, Address, Count, Buffer);  
@@ -1435,7 +1435,7 @@ RootBridgeIoIoRead (
   IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN     UINT64                                 Address,
   IN     UINTN                                  Count,
-  IN OUT VOID                                   *Buffer
+  OUT    VOID                                   *Buffer
   )
 {
   return RootBridgeIoIoRW (This, FALSE, Width, Address, Count, Buffer);  
@@ -1450,7 +1450,7 @@ RootBridgeIoIoRead (
                             aligning the Address if required.
    @param[in]   Count       The number of I/O operations to perform. Bytes moved is Width
                             size * Count, starting at Address.
-   @param[out]  Buffer      For read operations, the destination buffer to store the results. For
+   @param[in]   Buffer       For read operations, the destination buffer to store the results. For
                             write operations, the source buffer to write data from.
    
    @retval EFI_SUCCESS              The data was read from or written to the PCI root bridge.
@@ -1466,7 +1466,7 @@ RootBridgeIoIoWrite (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH   Width,
   IN       UINT64                                  Address,
   IN       UINTN                                   Count,
-  IN OUT   VOID                                    *Buffer
+  IN       VOID                                    *Buffer
   )
 {
   return RootBridgeIoIoRW (This, TRUE, Width, Address, Count, Buffer);  
@@ -1499,7 +1499,7 @@ RootBridgeIoIoWrite (
 EFI_STATUS
 EFIAPI
 RootBridgeIoCopyMem (
-  IN struct _EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL      *This,
+  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL              *This,
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH        Width,
   IN UINT64                                       DestAddress,
   IN UINT64                                       SrcAddress,
@@ -1591,7 +1591,7 @@ RootBridgeIoPciRead (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN       UINT64                                 Address,
   IN       UINTN                                  Count,
-  IN OUT   VOID                                   *Buffer
+  OUT      VOID                                   *Buffer
   )
 {
   return RootBridgeIoPciRW (This, FALSE, Width, Address, Count, Buffer);
@@ -1611,7 +1611,7 @@ RootBridgeIoPciRead (
    @param[in]   Address   The address within the PCI configuration space for the PCI controller.
    @param[in]   Count     The number of PCI configuration operations to perform. Bytes
                           moved is Width size * Count, starting at Address.
-   @param[out]  Buffer    For read operations, the destination buffer to store the results. For
+   @param[in]   Buffer    For read operations, the destination buffer to store the results. For
                           write operations, the source buffer to write data from.
    
    @retval EFI_SUCCESS            The data was read from or written to the PCI root bridge.
@@ -1627,7 +1627,7 @@ RootBridgeIoPciWrite (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN       UINT64                                 Address,
   IN       UINTN                                  Count,
-  IN OUT   VOID                                   *Buffer
+  IN       VOID                                   *Buffer
   )
 {
   return RootBridgeIoPciRW (This, TRUE, Width, Address, Count, Buffer);
@@ -1643,7 +1643,7 @@ RootBridgeIoPciWrite (
    @param[in]       This            A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
    @param[in]       Operation       Indicates if the bus master is going to read or write to system memory.
    @param[in]       HostAddress     The system memory address to map to the PCI controller.
-   @param[in][out]  NumberOfBytes   On input the number of bytes to map. On output the number of bytes that were mapped.
+   @param[in, out]  NumberOfBytes   On input the number of bytes to map. On output the number of bytes that were mapped.
    @param[out]      DeviceAddress   The resulting map address for the bus master PCI controller to use
                                     to access the system memory's HostAddress.
    @param[out]      Mapping         The value to pass to Unmap() when the bus master DMA operation is complete.
@@ -1872,7 +1872,7 @@ RootBridgeIoAllocateBuffer (
   //
   // Validate Attributes
   //
-  if (Attributes & EFI_PCI_ATTRIBUTE_INVALID_FOR_ALLOCATE_BUFFER) {
+  if ((Attributes & EFI_PCI_ATTRIBUTE_INVALID_FOR_ALLOCATE_BUFFER) != 0) {
     return EFI_UNSUPPORTED;
   }
 
@@ -2000,11 +2000,11 @@ RootBridgeIoGetAttributes (
   //
   // Set the return value for Supported and Attributes
   //
-  if (Supported) {
+  if (Supported != NULL) {
     *Supported  = PrivateData->Supports; 
   }
 
-  if (Attributes) {
+  if (Attributes != NULL) {
     *Attributes = PrivateData->Attributes;
   }
   
@@ -2031,9 +2031,9 @@ RootBridgeIoGetAttributes (
                                     MEMORY_WRITE_COMBINE, MEMORY_CACHED, and
                                     MEMORY_DISABLE are not set, then ResourceBase and
                                     ResourceLength are ignored, and may be NULL.
-   @param[in][out]  ResourceBase    A pointer to the base address of the resource range to be modified
+   @param[in, out]  ResourceBase    A pointer to the base address of the resource range to be modified
                                     by the attributes specified by Attributes.
-   @param[in][out]  ResourceLength  A pointer to the length of the resource range to be modified by the
+   @param[in, out]  ResourceLength  A pointer to the length of the resource range to be modified by the
                                     attributes specified by Attributes.
    
    @retval  EFI_SUCCESS     The current configuration of this PCI root bridge was returned in Resources.
@@ -2054,7 +2054,7 @@ RootBridgeIoSetAttributes (
   
   PrivateData = DRIVER_INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS(This);
   
-  if (Attributes) {
+  if (Attributes != 0) {
     if ((Attributes & (~(PrivateData->Supports))) != 0) {
       return EFI_UNSUPPORTED;
     }

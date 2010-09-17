@@ -137,7 +137,7 @@ SerialPortWrite (
 
   Result = NumberOfBytes;
 
-  while (NumberOfBytes--) {
+  while ((NumberOfBytes--) != 0) {
     //
     // Wait for the serail port to be ready.
     //
@@ -178,7 +178,7 @@ SerialPortRead (
 
   Result = NumberOfBytes;
 
-  while (NumberOfBytes--) {
+  while ((NumberOfBytes--) != 0) {
     //
     // Wait for the serail port to be ready.
     //

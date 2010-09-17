@@ -242,7 +242,7 @@ PcatIsaAcpiDriverBindingStart (
 
 Done:
   if (EFI_ERROR (Status)) {
-    if (PciIo) {
+    if (PciIo != NULL) {
       PciIo->Attributes (
                PciIo, 
                EfiPciIoAttributeOperationDisable, 

@@ -69,7 +69,7 @@ SetPitCount (
 }
 
 /**
-  8254 Timer #0 Interrupt Handler
+  8254 Timer #0 Interrupt Handler.
 
   @param InterruptType    The type of interrupt that occured
   @param SystemContext    A pointer to the system context when the interrupt occured
@@ -87,9 +87,9 @@ TimerInterruptHandler (
 
   mLegacy8259->EndOfInterrupt (mLegacy8259, Efi8259Irq0);
 
-  if (mTimerNotifyFunction) {
+  if (mTimerNotifyFunction != NULL) {
     //
-    // BUGBUG : This does not handle missed timer interrupts
+    // @bug : This does not handle missed timer interrupts
     //
     mTimerNotifyFunction (mTimerPeriod);
   }
@@ -311,9 +311,9 @@ TimerDriverGenerateSoftInterrupt (
     //
     OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
-    if (mTimerNotifyFunction) {
+    if (mTimerNotifyFunction != NULL) {
       //
-      // BUGBUG : This does not handle missed timer interrupts
+      // @bug : This does not handle missed timer interrupts
       //
       mTimerNotifyFunction (mTimerPeriod);
     }

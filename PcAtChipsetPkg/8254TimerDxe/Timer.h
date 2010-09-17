@@ -78,7 +78,7 @@ TimerDriverInitialize (
 
 
   @param This            The EFI_TIMER_ARCH_PROTOCOL instance.
-  @param TimerPeriod     The rate to program the timer interrupt in 100 nS units.  If
+  @param NotifyFunction  The rate to program the timer interrupt in 100 nS units.  If
                          the timer hardware is not programmable, then EFI_UNSUPPORTED is
                          returned.  If the timer is programmable, then the timer period
                          will be rounded up to the nearest timer period that is supported

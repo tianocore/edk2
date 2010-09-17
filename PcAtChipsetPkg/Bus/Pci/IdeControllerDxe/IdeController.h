@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef _IDE_CONTROLLER_H
-#define _IDE_CONTROLLER_H
+#ifndef _IDE_CONTROLLER_H_
+#define _IDE_CONTROLLER_H_
 
 #include <Uefi.h>
 #include <Protocol/ComponentName.h>
@@ -155,7 +155,7 @@ EFIAPI
 IdeInitNotifyPhase (
   IN  EFI_IDE_CONTROLLER_INIT_PROTOCOL  *This,
   IN  EFI_IDE_CONTROLLER_ENUM_PHASE     Phase,
-  OUT UINT8                             Channel
+  IN  UINT8                             Channel
   )
 ;
 
@@ -219,7 +219,7 @@ IdeInitCalculateMode (
   IN  EFI_IDE_CONTROLLER_INIT_PROTOCOL  *This,
   IN  UINT8                             Channel,
   IN  UINT8                             Device,
-  IN  EFI_ATA_COLLECTIVE_MODE           **SupportedModes
+  OUT EFI_ATA_COLLECTIVE_MODE           **SupportedModes
   )
 ;
 
@@ -285,7 +285,7 @@ IdeControllerComponentNameGetDriverName (
   @param ControllerHandle       The handle of a controller that the driver specified by
                                 This is managing.  This handle specifies the controller
                                 whose name is to be returned.
-  @param OPTIONAL               The handle of the child controller to retrieve the name
+  @param OPTIONAL   ChildHandle The handle of the child controller to retrieve the name
                                 of.  This is an optional parameter that may be NULL.  It
                                 will be NULL for device drivers.  It will also be NULL
                                 for a bus drivers that wish to retrieve the name of the

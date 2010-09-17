@@ -107,7 +107,7 @@ IdeControllerComponentNameGetDriverName (
   @param ControllerHandle       The handle of a controller that the driver specified by
                                 This is managing.  This handle specifies the controller
                                 whose name is to be returned.
-  @param OPTIONAL               The handle of the child controller to retrieve the name
+  @param ChildHandle OPTIONAL   The handle of the child controller to retrieve the name
                                 of.  This is an optional parameter that may be NULL.  It
                                 will be NULL for device drivers.  It will also be NULL
                                 for a bus drivers that wish to retrieve the name of the

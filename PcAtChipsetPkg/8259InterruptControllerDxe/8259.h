@@ -47,7 +47,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 // Protocol Function Prototypes
 
+/**
+  Sets the base address for the 8259 master and slave PICs.
 
+  @param[in]  This        Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]  MasterBase  Interrupt vectors for IRQ0-IRQ7.
+  @param[in]  SlaveBase   Interrupt vectors for IRQ8-IRQ15.
+
+  @retval  EFI_SUCCESS       The 8259 PIC was programmed successfully.
+  @retval  EFI_DEVICE_ERROR  There was an error while writing to the 8259 PIC.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259SetVectorBase (
@@ -56,6 +66,19 @@ Interrupt8259SetVectorBase (
   IN UINT8                     SlaveBase
   );
 
+/**
+  Gets the current 16-bit real mode and 32-bit protected-mode IRQ masks.
+
+  @param[in]   This                Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[out]  LegacyMask          16-bit mode interrupt mask for IRQ0-IRQ15.
+  @param[out]  LegacyEdgeLevel     16-bit mode edge/level mask for IRQ-IRQ15.
+  @param[out]  ProtectedMask       32-bit mode interrupt mask for IRQ0-IRQ15.
+  @param[out]  ProtectedEdgeLevel  32-bit mode edge/level mask for IRQ0-IRQ15.
+
+  @retval  EFI_SUCCESS       The 8259 PIC was programmed successfully.
+  @retval  EFI_DEVICE_ERROR  There was an error while reading the 8259 PIC.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259GetMask (
@@ -66,6 +89,19 @@ Interrupt8259GetMask (
   OUT UINT16                    *ProtectedEdgeLevel OPTIONAL
   );
 
+/**
+  Sets the current 16-bit real mode and 32-bit protected-mode IRQ masks.
+
+  @param[in]  This                Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]  LegacyMask          16-bit mode interrupt mask for IRQ0-IRQ15.
+  @param[in]  LegacyEdgeLevel     16-bit mode edge/level mask for IRQ-IRQ15.
+  @param[in]  ProtectedMask       32-bit mode interrupt mask for IRQ0-IRQ15.
+  @param[in]  ProtectedEdgeLevel  32-bit mode edge/level mask for IRQ0-IRQ15.
+
+  @retval  EFI_SUCCESS       The 8259 PIC was programmed successfully.
+  @retval  EFI_DEVICE_ERROR  There was an error while writing the 8259 PIC.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259SetMask (
@@ -76,6 +112,18 @@ Interrupt8259SetMask (
   IN UINT16                    *ProtectedEdgeLevel OPTIONAL
   );
 
+/**
+  Sets the mode of the PICs.
+
+  @param[in]  This       Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]  Mode       16-bit real or 32-bit protected mode.
+  @param[in]  Mask       The value with which to set the interrupt mask.
+  @param[in]  EdgeLevel  The value with which to set the edge/level mask.
+
+  @retval  EFI_SUCCESS            The mode was set successfully.
+  @retval  EFI_INVALID_PARAMETER  The mode was not set.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259SetMode (
@@ -85,6 +133,17 @@ Interrupt8259SetMode (
   IN UINT16                    *EdgeLevel OPTIONAL
   );
 
+/**
+  Translates the IRQ into a vector.
+
+  @param[in]   This    Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]   Irq     IRQ0-IRQ15.
+  @param[out]  Vector  The vector that is assigned to the IRQ.
+
+  @retval  EFI_SUCCESS            The Vector that matches Irq was returned.
+  @retval  EFI_INVALID_PARAMETER  Irq is not valid.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259GetVector (
@@ -93,6 +152,17 @@ Interrupt8259GetVector (
   OUT UINT8                     *Vector
   );
 
+/**
+  Enables the specified IRQ.
+
+  @param[in]  This            Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]  Irq             IRQ0-IRQ15.
+  @param[in]  LevelTriggered  0 = Edge triggered; 1 = Level triggered.
+
+  @retval  EFI_SUCCESS            The Irq was enabled on the 8259 PIC.
+  @retval  EFI_INVALID_PARAMETER  The Irq is not valid.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259EnableIrq (
@@ -101,6 +171,16 @@ Interrupt8259EnableIrq (
   IN BOOLEAN                   LevelTriggered
   );
 
+/**
+  Disables the specified IRQ.
+
+  @param[in]  This  Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]  Irq   IRQ0-IRQ15.
+
+  @retval  EFI_SUCCESS            The Irq was disabled on the 8259 PIC.
+  @retval  EFI_INVALID_PARAMETER  The Irq is not valid.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259DisableIrq (
@@ -108,6 +188,16 @@ Interrupt8259DisableIrq (
   IN EFI_8259_IRQ              Irq
   );
 
+/**
+  Reads the PCI configuration space to get the interrupt number that is assigned to the card.
+
+  @param[in]   This       Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]   PciHandle  PCI function for which to return the vector.
+  @param[out]  Vector     IRQ number that corresponds to the interrupt line.
+
+  @retval  EFI_SUCCESS  The interrupt line value was read successfully.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259GetInterruptLine (
@@ -116,6 +206,16 @@ Interrupt8259GetInterruptLine (
   OUT UINT8                     *Vector
   );
 
+/**
+  Issues the End of Interrupt (EOI) commands to PICs.
+
+  @param[in]  This  Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]  Irq   The interrupt for which to issue the EOI command.
+
+  @retval  EFI_SUCCESS            The EOI command was issued.
+  @retval  EFI_INVALID_PARAMETER  The Irq is not valid.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259EndOfInterrupt (
