@@ -18,7 +18,9 @@
 #include <Library/ShellCEntryLib.h>
 #include <Library/SortLib.h>
 
-INTN Test(CONST VOID*b1, CONST VOID*b2)
+INTN
+EFIAPI
+Test(CONST VOID*b1, CONST VOID*b2)
 {
   if (*(INTN*)b1 == *(INTN*)b2) {
     return (0);

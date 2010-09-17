@@ -341,7 +341,7 @@ typedef UINT32 EFI_SHELL_DEVICE_NAME_FLAGS;
 **/
 typedef
 EFI_STATUS
-(*EFI_SHELL_GET_DEVICE_NAME) (
+(EFIAPI *EFI_SHELL_GET_DEVICE_NAME) (
   IN EFI_HANDLE                   DeviceHandle,
   IN EFI_SHELL_DEVICE_NAME_FLAGS  Flags,
   IN CHAR8                        *Language,

@@ -43,8 +43,8 @@ typedef struct {
 typedef struct {
   UINT8 Type;
   UINT8 SubType;
-  VOID (*SerialFun) (EFI_DEVICE_PATH_PROTOCOL *, DEVICE_CONSIST_MAPPING_INFO *);
-  INTN (*CompareFun) (EFI_DEVICE_PATH_PROTOCOL *, EFI_DEVICE_PATH_PROTOCOL *);
+  VOID (EFIAPI *SerialFun) (EFI_DEVICE_PATH_PROTOCOL *, DEVICE_CONSIST_MAPPING_INFO *);
+  INTN (EFIAPI *CompareFun) (EFI_DEVICE_PATH_PROTOCOL *, EFI_DEVICE_PATH_PROTOCOL *);
 } DEV_PATH_CONSIST_MAPPING_TABLE;
 
 
@@ -259,6 +259,7 @@ AppendCSDGuid (
 }
 
 INTN
+EFIAPI
 _DevPathCompareAcpi (
   IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath1,
   IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath2
@@ -284,6 +285,7 @@ _DevPathCompareAcpi (
 }
 
 INTN
+EFIAPI
 _DevPathComparePci (
   IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath1,
   IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath2
@@ -1063,7 +1065,7 @@ GetDeviceConsistMappingInfo (
   IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath
   )
 {
-  VOID (*SerialFun) (EFI_DEVICE_PATH_PROTOCOL *, DEVICE_CONSIST_MAPPING_INFO *);
+  VOID (EFIAPI *SerialFun) (EFI_DEVICE_PATH_PROTOCOL *, DEVICE_CONSIST_MAPPING_INFO *);
 
   UINTN Index;
 
@@ -1204,10 +1206,10 @@ ShellCommandConsistMappingUnInitialize (
 }
 
 /**
-  Create a consistent mapped name for the device specified by DevicePath 
+  Create a consistent mapped name for the device specified by DevicePath
   based on the Table.
 
-  This must be called after ShellCommandConsistMappingInitialize() and 
+  This must be called after ShellCommandConsistMappingInitialize() and
   before ShellCommandConsistMappingUnInitialize() is called.
 
   @param[in] DeviecPath   The pointer to the dev path for the device.
