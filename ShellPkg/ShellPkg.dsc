@@ -71,8 +71,6 @@
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
       gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|16000
-    <BuildOptions>
-      *_*_*_CC_FLAGS = /Od
   }
 
 
