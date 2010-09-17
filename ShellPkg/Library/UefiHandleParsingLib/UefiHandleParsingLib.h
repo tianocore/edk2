@@ -52,7 +52,6 @@
 #include <Protocol/EdidOverride.h>
 #include <Protocol/LoadFile.h>
 #include <Protocol/LoadFile2.h>
-#include <Protocol/SimpleFilesystem.h>
 #include <Protocol/TapeIo.h>
 #include <Protocol/DiskIo.h>
 #include <Protocol/BlockIo.h>

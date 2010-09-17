@@ -20,10 +20,10 @@
 #include <Protocol/EfiShell.h>
 #include <Protocol/EfiShellParameters.h>
 
-#include <Library/Debuglib.h>
-#include <Library/Baselib.h>
-#include <Library/BaseMemorylib.h>
-#include <Library/MemoryAllocationlib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/HiiLib.h>
 #include <Library/ShellLib.h>

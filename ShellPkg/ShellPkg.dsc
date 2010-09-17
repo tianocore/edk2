@@ -56,7 +56,7 @@
 
   ShellPkg/Application/Shell/Shell.inf {
     <LibraryClasses>
-      DebugLib|MdePkg\Library\UefiDebugLibConOut\UefiDebugLibConOut.inf
+      DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
       ShellCommandLib|ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf
       NULL|ShellPkg/Library/UefiShellLevel2CommandsLib/UefiShellLevel2CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellLevel1CommandsLib/UefiShellLevel1CommandsLib.inf

@@ -37,7 +37,7 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-#include <library/ShellCommandLib.h>
+#include <Library/ShellCommandLib.h>
 #include <Library/PrintLib.h>
 #include <Library/ShellLib.h>
 #include <Library/HiiLib.h>
