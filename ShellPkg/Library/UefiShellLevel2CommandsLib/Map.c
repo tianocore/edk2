@@ -790,9 +790,9 @@ IsNumberLetterOnly(
   )
 {
   while(String != NULL && *String != CHAR_NULL) {
-    if (! ( *String >= L'a' && *String <= L'z'
-         || *String >= L'A' && *String <= L'Z'
-         || *String >= L'0' && *String <= L'9')
+    if (! ((*String >= L'a' && *String <= L'z') ||
+           (*String >= L'A' && *String <= L'Z') ||
+           (*String >= L'0' && *String <= L'9'))
         ){
       return (FALSE);
     }

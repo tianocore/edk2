@@ -488,7 +488,9 @@ EfiShellGetDevicePathFromFilePath(
     NewPath = AllocateZeroPool(Size);
     ASSERT(NewPath != NULL);
     StrCpy(NewPath, Cwd);
-    if (NewPath[StrLen(NewPath)-1] == Path[0] == (CHAR16)L'\\') {
+    if ((NewPath[0] == (CHAR16)L'\\') &&
+        (NewPath[StrLen(NewPath)-1] == (CHAR16)L'\\')
+       ) {
       ((CHAR16*)NewPath)[StrLen(NewPath)-1] = CHAR_NULL;
     }
     StrCat(NewPath, Path);
@@ -2958,7 +2960,7 @@ EFI_SHELL_PROTOCOL         mShellProtocol = {
 
   This must be removed via calling CleanUpShellProtocol().
 
-  @param[in,out] NewShell   The pointer to the pointer to the structure 
+  @param[in,out] NewShell   The pointer to the pointer to the structure
   to install.
 
   @retval EFI_SUCCESS     The operation was successful.
@@ -3071,7 +3073,7 @@ CreatePopulateInstallShellProtocol (
 }
 
 /**
-  Opposite of CreatePopulateInstallShellProtocol.  
+  Opposite of CreatePopulateInstallShellProtocol.
 
   Free all memory and restore the system to the state it was in before calling
   CreatePopulateInstallShellProtocol.

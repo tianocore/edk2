@@ -111,6 +111,8 @@ CopySingleFile(
           *Resp = Response;
         case ShellPromptResponseYes:
           break;
+        default:
+          return SHELL_ABORTED;
       }
     }
   }

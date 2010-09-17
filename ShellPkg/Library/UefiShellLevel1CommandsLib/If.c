@@ -62,7 +62,7 @@ IsNextFragment (
     //
     *Statement+=StrLen(Fragment);
     while (*Statement[0] == L' ') {
-      *Statement++;
+      Statement++;
     }
     FreePool(Tester);
     return (TRUE);
@@ -302,6 +302,9 @@ TestOperation (
     }
     return (FALSE);
     break;
+  default:
+    ASSERT(FALSE);
+    return (FALSE);
   }
   ASSERT(FALSE);
   return (FALSE);
