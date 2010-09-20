@@ -306,8 +306,6 @@ TestOperation (
     ASSERT(FALSE);
     return (FALSE);
   }
-  ASSERT(FALSE);
-  return (FALSE);
 }
 
 EFI_STATUS
