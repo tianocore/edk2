@@ -882,7 +882,7 @@ AppendMac2DevPath (
 
   MacAddrNode.Header.Type       = MESSAGING_DEVICE_PATH;
   MacAddrNode.Header.SubType    = MSG_MAC_ADDR_DP;
-  MacAddrNode.Header.Length[0]  = sizeof (MacAddrNode);
+  MacAddrNode.Header.Length[0]  = (UINT8) sizeof (MacAddrNode);
   MacAddrNode.Header.Length[1]  = 0;
 
   //
