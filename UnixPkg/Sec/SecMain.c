@@ -544,6 +544,7 @@ Returns:
   EFI_SEC_PEI_HAND_OFF        *SecCoreData;
   UINTN                       PeiStackSize;
   EFI_PEI_PPI_DESCRIPTOR      *DispatchTable;
+  UINTN                       DispatchTableSize;
 
   //
   // Compute Top Of Memory for Stack and PEI Core Allocations
@@ -597,11 +598,19 @@ Returns:
     return ;
   }
   
+  DispatchTableSize = sizeof (gPrivateDispatchTable);
+  DispatchTableSize += OverrideDispatchTableExtraSize ();
+  
+  DispatchTable = malloc (DispatchTableSize);
+  if (DispatchTable == NULL) {
+    return;
+  }
+  
   //
   // Allow an override for extra PPIs to be passed up to PEI
   // This is an easy way to enable OS specific customizations
   //
-  DispatchTable = OverrideDispatchTable (&gPrivateDispatchTable[0]);
+  OverrideDispatchTable (&gPrivateDispatchTable[0], sizeof (gPrivateDispatchTable), DispatchTable, DispatchTableSize);
   
   //
   // Transfer control to the PEI Core

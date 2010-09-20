@@ -14,23 +14,48 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 --*/
 
 #include <PiPei.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/SecDispatchTableLib.h>
+
+
+/**
+  Return the number of bytes that OverrideDispatchTable() will append to
+  the dispatch table.
+
+  @return  Size of table in bytes OverrideDispatchTable() will return
+
+**/
+UINTN
+EFIAPI
+OverrideDispatchTableExtraSize (
+  )
+{
+  return 0;
+}
+
 
 /**
   Allow an override of the Sec PPI Dispatch Table. This table contains PPIs passed
-  up from SEC to PEI. This function is responcible for allocating space for the 
-  overridden table.
+  up from SEC to PEI. 
 
+  @param  OriginalTable         SECs default PPI dispatch table
+  @param  OriginalTableSize     Size of SECs default PPI dispatch table
+  @param  NewTable              New dispatch table
+  @param  NewTableSize          Size of of the NewTable in bytes
 
-  @param  OriginalTable  SECs default PPI dispatch table
-
-  @return OriginalTable or override of the table
+  @return EFI_SUCCESS table was copied
 
 **/
-EFI_PEI_PPI_DESCRIPTOR *
+EFI_STATUS
 EFIAPI
 OverrideDispatchTable (
-  IN CONST EFI_PEI_PPI_DESCRIPTOR          *OriginalTable
+  IN CONST EFI_PEI_PPI_DESCRIPTOR          *OriginalTable,
+  IN       UINTN                           OriginalTableSize,
+  IN OUT   EFI_PEI_PPI_DESCRIPTOR          *NewTable,
+  IN       UINTN                           NewTableSize
   )
 {
-  return (EFI_PEI_PPI_DESCRIPTOR *)OriginalTable;
+  CopyMem (NewTable, OriginalTable, OriginalTableSize);
+
+  return EFI_SUCCESS;
 }

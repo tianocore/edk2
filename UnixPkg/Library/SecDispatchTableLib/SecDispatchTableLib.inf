@@ -38,5 +38,6 @@
 
 [LibraryClasses]
   BaseLib
+  BaseMemoryLib
 
 

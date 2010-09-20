@@ -223,7 +223,7 @@
 #       generated for it, but the binary will not be put into any firmware volume.
 #
 ###################################################################################################
-[Components.common]
+[Components]
   ##
   #  SEC Phase modules
   ##
