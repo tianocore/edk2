@@ -67,6 +67,7 @@ typedef struct {
 
 **/
 EFI_STATUS
+EFIAPI
 DataHubStatusCodeReportWorker (
   IN EFI_STATUS_CODE_TYPE     CodeType,
   IN EFI_STATUS_CODE_VALUE    Value,
