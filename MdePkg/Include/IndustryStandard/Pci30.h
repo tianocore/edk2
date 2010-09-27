@@ -1,7 +1,7 @@
 /** @file
   Support for PCI 3.0 standard.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -24,6 +24,17 @@
 #define PCI_CLASS_MASS_STORAGE_SATADPA   0x06
 #define   PCI_IF_MASS_STORAGE_SATA         0x00
 #define   PCI_IF_MASS_STORAGE_AHCI         0x01
+
+/**  
+  Macro that checks whether device is a SATA controller.
+
+  @param  _p      Specified device.
+
+  @retval TRUE    Device is a SATA controller.
+  @retval FALSE   Device is not a SATA controller.
+
+**/
+#define IS_PCI_SATADPA(_p) IS_CLASS2 (_p, PCI_CLASS_MASS_STORAGE, PCI_CLASS_MASS_STORAGE_SATADPA)
 
 ///
 /// PCI Capability List IDs and records
