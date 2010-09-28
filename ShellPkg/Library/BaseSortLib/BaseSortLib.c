@@ -109,20 +109,23 @@ QuickSortWorker (
   // Now recurse on 2 paritial lists.  neither of these will have the 'pivot' element
   // IE list is sorted left half, pivot element, sorted right half...
   //
-  QuickSortWorker(
-    BufferToSort,
-    NextSwapLocation,
-    ElementSize,
-    CompareFunction,
-    Buffer);
+  if (NextSwapLocation >= 2) {
+    QuickSortWorker(
+      BufferToSort,
+      NextSwapLocation,
+      ElementSize,
+      CompareFunction,
+      Buffer);
+  }
 
-  QuickSortWorker(
-    (UINT8 *)BufferToSort + (NextSwapLocation+1) * ElementSize,
-    Count - NextSwapLocation - 1,
-    ElementSize,
-    CompareFunction,
-    Buffer);
-
+  if ((Count - NextSwapLocation - 1) >= 2) {
+    QuickSortWorker(
+      (UINT8 *)BufferToSort + (NextSwapLocation+1) * ElementSize,
+      Count - NextSwapLocation - 1,
+      ElementSize,
+      CompareFunction,
+      Buffer);
+  }
   return;
 }
 /**
