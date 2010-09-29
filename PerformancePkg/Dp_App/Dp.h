@@ -76,9 +76,9 @@ typedef struct {
 } PERF_SUMMARY_DATA;
 
 typedef struct {
-  VOID                  *Handle;
-  CHAR8                 *Token;           ///< Measured token string name.
-  CHAR8                 *Module;          ///< Module string name.
+  CONST VOID            *Handle;
+  CONST CHAR8           *Token;           ///< Measured token string name.
+  CONST CHAR8           *Module;          ///< Module string name.
   UINT64                StartTimeStamp;   ///< Start time point.
   UINT64                EndTimeStamp;     ///< End time point.
 } MEASUREMENT_RECORD;

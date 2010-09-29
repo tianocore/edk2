@@ -568,7 +568,7 @@ ProcessPeims(
     Duration = GetDuration (&Measurement);
     ElapsedTime = DurationInMicroSeconds ( Duration );  // Calculate elapsed time in microseconds
     if (ElapsedTime >= mInterestThreshold) {
-      GetNameFromHandle (Measurement.Handle);           // Name placed in mGaugeString
+      GetNameFromHandle ((EFI_HANDLE) Measurement.Handle); // Name placed in mGaugeString
       PrintToken (STRING_TOKEN (STR_DP_PEIM_STAT2),
             TIndex,   // 1 based, Which measurement record is being printed
             Measurement.Handle,

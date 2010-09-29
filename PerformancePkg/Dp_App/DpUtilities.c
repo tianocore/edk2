@@ -23,7 +23,7 @@
 #include <Library/PcdLib.h>
 
 #include <Protocol/LoadedImage.h>
-#include <Protocol/Driverbinding.h>
+#include <Protocol/DriverBinding.h>
 
 #include <Guid/Performance.h>
 
@@ -191,7 +191,7 @@ GetNameFromHandle (
   Status = gBS->HandleProtocol (
                 Handle,
                 &gEfiLoadedImageProtocolGuid,
-                &Image
+                (VOID**) &Image
                 );
 
   if (EFI_ERROR (Status)) {
@@ -213,7 +213,7 @@ GetNameFromHandle (
     Status = gBS->HandleProtocol (
                   DriverBinding->ImageHandle,
                   &gEfiLoadedImageProtocolGuid,
-                  &Image
+                  (VOID**) &Image
                   );
   }
 
