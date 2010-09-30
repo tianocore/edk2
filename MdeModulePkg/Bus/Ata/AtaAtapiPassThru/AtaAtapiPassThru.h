@@ -98,7 +98,7 @@ typedef struct {
   //
   LIST_ENTRY                        DeviceList;
   UINT64                            OriginalPciAttributes;
-
+
   //
   // For AtaPassThru protocol, using the following bytes to record the previous call in 
   // GetNextPort()/GetNextDevice().
@@ -500,6 +500,7 @@ EnumerateAttachedDevice (
 
 **/
 EFI_STATUS
+EFIAPI
 AtaPassThruPassThru (
   IN     EFI_ATA_PASS_THRU_PROTOCOL       *This,
   IN     UINT16                           Port,
@@ -540,6 +541,7 @@ AtaPassThruPassThru (
 
 **/
 EFI_STATUS
+EFIAPI
 AtaPassThruGetNextPort (
   IN EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN OUT UINT16                 *Port
@@ -588,6 +590,7 @@ AtaPassThruGetNextPort (
 
 **/
 EFI_STATUS
+EFIAPI
 AtaPassThruGetNextDevice (
   IN EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN UINT16                     Port,
@@ -627,6 +630,7 @@ AtaPassThruGetNextDevice (
 
 **/
 EFI_STATUS
+EFIAPI
 AtaPassThruBuildDevicePath (
   IN     EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN     UINT16                     Port,
@@ -671,6 +675,7 @@ AtaPassThruBuildDevicePath (
                                   port number does not exist.
 **/
 EFI_STATUS
+EFIAPI
 AtaPassThruGetDevice (
   IN  EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN  EFI_DEVICE_PATH_PROTOCOL   *DevicePath,
@@ -703,6 +708,7 @@ AtaPassThruGetDevice (
 
 **/
 EFI_STATUS
+EFIAPI
 AtaPassThruResetPort (
   IN EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN UINT16                     Port
@@ -740,6 +746,7 @@ AtaPassThruResetPort (
 
 **/
 EFI_STATUS
+EFIAPI
 AtaPassThruResetDevice (
   IN EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN UINT16                     Port,

@@ -960,7 +960,7 @@ GetIdeRegisterIoAddr (
   IdeRegisters[EfiIdeSecondary].Head              = (UINT16) (CommandBlockBaseAddr + 0x06);
   IdeRegisters[EfiIdeSecondary].CmdOrStatus       = (UINT16) (CommandBlockBaseAddr + 0x07);
   IdeRegisters[EfiIdeSecondary].AltOrDev          = ControlBlockBaseAddr;
-  IdeRegisters[EfiIdeSecondary].BusMasterBaseAddr = BusMasterBaseAddr + 0x8;
+  IdeRegisters[EfiIdeSecondary].BusMasterBaseAddr = (UINT16) (BusMasterBaseAddr + 0x8);
 
   return EFI_SUCCESS;
 }
@@ -1411,7 +1411,7 @@ AtaUdmaInOut (
                        AllocateAnyPages,
                        EfiBootServicesData,
                        PageCount,
-                       &PrdBaseAddr,
+                       (VOID **)&PrdBaseAddr,
                        0
                        );
   if (EFI_ERROR (Status)) {
@@ -1503,9 +1503,9 @@ AtaUdmaInOut (
   DeviceControl = 0;
   IdeWritePortB (PciIo, IdeRegisters->AltOrDev, DeviceControl);
 
-  IoPortForBmic = IdeRegisters->BusMasterBaseAddr + BMIC_OFFSET;
-  IoPortForBmis = IdeRegisters->BusMasterBaseAddr + BMIS_OFFSET;
-  IoPortForBmid = IdeRegisters->BusMasterBaseAddr + BMID_OFFSET;
+  IoPortForBmic = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMIC_OFFSET);
+  IoPortForBmis = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMIS_OFFSET);
+  IoPortForBmid = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMID_OFFSET);
 
   //
   // Read BMIS register and clear ERROR and INTR bit
@@ -1715,8 +1715,7 @@ AtaPacketReadWrite (
     //
     Status = DRQReady2 (PciIo, IdeRegisters, Timeout);
     if (EFI_ERROR (Status)) {
-      CheckStatusRegister (PciIo, IdeRegisters);
-      return EFI_DEVICE_ERROR;
+      return CheckStatusRegister (PciIo, IdeRegisters);
     }
 
     //
@@ -1890,7 +1889,7 @@ AtaPacketCommandExecute (
   //
   AtaCommandBlock.AtaCylinderLow  = (UINT8) (ATAPI_MAX_BYTE_COUNT & 0x00ff);
   AtaCommandBlock.AtaCylinderHigh = (UINT8) (ATAPI_MAX_BYTE_COUNT >> 8);
-  AtaCommandBlock.AtaDeviceHead   = Device << 0x4;
+  AtaCommandBlock.AtaDeviceHead   = (UINT8) (Device << 0x4);
   AtaCommandBlock.AtaCommand      = ATA_CMD_PACKET;
 
   IdeWritePortB (PciIo, IdeRegisters->Head, (UINT8)(0xe0 | (Device << 0x4)));
@@ -2247,7 +2246,7 @@ DetectAndConfigIdeDevice (
   UINT8                             LBAMidReg;
   UINT8                             LBAHighReg;
   EFI_ATA_DEVICE_TYPE               DeviceType;
-  EFI_IDE_DEVICE                    IdeDevice;
+  UINT8                             IdeDevice;
   EFI_IDE_REGISTERS                 *IdeRegisters;
   EFI_IDENTIFY_DATA                 Buffer;
 
@@ -2409,7 +2408,7 @@ DetectAndConfigIdeDevice (
       // Init driver parameters
       //
       DriveParameters.Sector         = (UINT8) ((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->sectors_per_track;
-      DriveParameters.Heads          = (UINT8) ((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->heads - 1;
+      DriveParameters.Heads          = (UINT8) (((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->heads - 1);
       DriveParameters.MultipleSector = (UINT8) ((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->multi_sector_cmd_max_sct_cnt;
     
       Status = SetDriveParameters (Instance, IdeChannel, IdeDevice, &DriveParameters, NULL);

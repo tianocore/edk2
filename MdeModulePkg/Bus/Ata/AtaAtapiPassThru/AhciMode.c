@@ -135,11 +135,11 @@ AhciOrReg (
 /**
   Wait for memory set to the test value.
     
-  @param  PciIo      The PCI IO protocol instance.
-  @param  Offset         The memory address to test.
-  @param  MaskValue      The mask value of memory.
-  @param  TestValue      The test value of memory.
-  @param  Timeout        The time out value for wait memory set.
+  @param  PciIo             The PCI IO protocol instance.
+  @param  Offset            The memory address to test.
+  @param  MaskValue         The mask value of memory.
+  @param  TestValue         The test value of memory.
+  @param  Timeout           The time out value for wait memory set.
 
   @retval EFI_DEVICE_ERROR  The memory is not set.
   @retval EFI_TIMEOUT       The memory setting is time out.
@@ -188,8 +188,8 @@ AhciWaitMemSet (
   Check if the device is still on port. It also checks if the AHCI controller 
   supports the address and data count will be transfered.
 
-  @param  PciIo      The PCI IO protocol instance.
-  @param  Port           The number of port.
+  @param  PciIo            The PCI IO protocol instance.
+  @param  Port             The number of port.
 
   @retval EFI_SUCCESS      The device is attached to port and the transfer data is 
                            supported by AHCI controller.
@@ -347,15 +347,15 @@ AhciDisableFisReceive (
 /**
   Build the command list, command table and prepare the fis receiver.
     
-  @param    PciIo         The PCI IO protocol instance.
+  @param    PciIo                 The PCI IO protocol instance.
   @param    AhciRegisters         The pointer to the EFI_AHCI_REGISTERS.
-  @param    Port          The number of port.
-  @param    PortMultiplier    The timeout value of stop.
-  @param    CommandFis      The control fis will be used for the transfer.
-  @param    CommandList     The command list will be used for the transfer.
-  @param    AtapiCommand      The atapi command will be used for the transfer.
-  @param    AtapiCommandLength  The length of the atapi command.
-  @param    CommandSlotNumber   The command slot will be used for the transfer.
+  @param    Port                  The number of port.
+  @param    PortMultiplier        The timeout value of stop.
+  @param    CommandFis            The control fis will be used for the transfer.
+  @param    CommandList           The command list will be used for the transfer.
+  @param    AtapiCommand          The atapi command will be used for the transfer.
+  @param    AtapiCommandLength    The length of the atapi command.
+  @param    CommandSlotNumber     The command slot will be used for the transfer.
   @param    DataPhysicalAddr      The pointer to the data buffer pci bus master address.
   @param    DataLength            The data count to be transferred.
 
@@ -466,7 +466,7 @@ AhciBuildCommand (
 /**
   Buid a command FIS.
     
-  @param  CmdFis          A pointer to the EFI_AHCI_COMMAND_FIS data structure.
+  @param  CmdFis            A pointer to the EFI_AHCI_COMMAND_FIS data structure.
   @param  AtaCommandBlock   A pointer to the AhciBuildCommandFis data structure.
 
 **/
@@ -501,17 +501,17 @@ AhciBuildCommandFis (
   CmdFis->AhciCFisSecCount    = AtaCommandBlock->AtaSectorCount;
   CmdFis->AhciCFisSecCountExp = AtaCommandBlock->AtaSectorCountExp;
 
-  CmdFis->AhciCFisDevHead     = AtaCommandBlock->AtaDeviceHead | 0xE0;
+  CmdFis->AhciCFisDevHead     = (UINT8) (AtaCommandBlock->AtaDeviceHead | 0xE0);
 }
 
 /**
   Start a PIO data transfer on specific port.
     
-  @param  PciIo             The PCI IO protocol instance.
+  @param  PciIo               The PCI IO protocol instance.
   @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
-  @param  Port              The number of port.
-  @param  PortMultiplier    The timeout value of stop.
-  @param  AtapiCommand      The atapi command will be used for the transfer.
+  @param  Port                The number of port.
+  @param  PortMultiplier      The timeout value of stop.
+  @param  AtapiCommand        The atapi command will be used for the transfer.
   @param  AtapiCommandLength  The length of the atapi command.
   @param  Read                The transfer direction.
   @param  AtaCommandBlock     The EFI_ATA_COMMAND_BLOCK data.
@@ -527,6 +527,7 @@ AhciBuildCommandFis (
 
 **/
 EFI_STATUS
+EFIAPI
 AhciPioTransfer (
   IN     EFI_PCI_IO_PROTOCOL        *PciIo,
   IN     EFI_AHCI_REGISTERS         *AhciRegisters,
@@ -691,23 +692,23 @@ Exit:
 /**
   Start a DMA data transfer on specific port
 
-  @param  PciIo         The PCI IO protocol instance.
-  @param  AhciRegisters         The pointer to the EFI_AHCI_REGISTERS.
-  @param  Port          The number of port.
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
   @param  PortMultiplier      The timeout value of stop.
   @param  AtapiCommand        The atapi command will be used for the transfer.
-  @param  AtapiCommandLength    The length of the atapi command.
-  @param  Read                  The transfer direction.
-  @param  AtaCommandBlock       The EFI_ATA_COMMAND_BLOCK data.
-  @param  AtaStatusBlock        The EFI_ATA_STATUS_BLOCK data.
-  @param  MemoryAddr            The pointer to the data buffer.
-  @param  DataCount             The data count to be transferred.
-  @param  Timeout               The timeout value of non data transfer.
+  @param  AtapiCommandLength  The length of the atapi command.
+  @param  Read                The transfer direction.
+  @param  AtaCommandBlock     The EFI_ATA_COMMAND_BLOCK data.
+  @param  AtaStatusBlock      The EFI_ATA_STATUS_BLOCK data.
+  @param  MemoryAddr          The pointer to the data buffer.
+  @param  DataCount           The data count to be transferred.
+  @param  Timeout             The timeout value of non data transfer.
 
-  @retval EFI_DEVICE_ERROR  The DMA data transfer abort with error occurs.
-  @retval EFI_TIMEOUT     The operation is time out.
-  @retval EFI_UNSUPPORTED   The device is not ready for transfer.
-  @retval EFI_SUCCESS     The DMA data transfer executes successfully.
+  @retval EFI_DEVICE_ERROR    The DMA data transfer abort with error occurs.
+  @retval EFI_TIMEOUT         The operation is time out.
+  @retval EFI_UNSUPPORTED     The device is not ready for transfer.
+  @retval EFI_SUCCESS         The DMA data transfer executes successfully.
    
 **/
 EFI_STATUS
@@ -860,15 +861,15 @@ Exit:
 /**
   Start a non data transfer on specific port.
     
-  @param  PciIo             The PCI IO protocol instance.
-  @param  AhciRegisters         The pointer to the EFI_AHCI_REGISTERS.
-  @param  Port              The number of port.
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
   @param  PortMultiplier      The timeout value of stop.
-  @param  AtapiCommand      The atapi command will be used for the transfer.
-  @param  AtapiCommandLength    The length of the atapi command.
-  @param    AtaCommandBlock       The EFI_ATA_COMMAND_BLOCK data.
-  @param    AtaStatusBlock        The EFI_ATA_STATUS_BLOCK data.
-  @param  Timeout               The timeout value of non data transfer.
+  @param  AtapiCommand        The atapi command will be used for the transfer.
+  @param  AtapiCommandLength  The length of the atapi command.
+  @param  AtaCommandBlock     The EFI_ATA_COMMAND_BLOCK data.
+  @param  AtaStatusBlock      The EFI_ATA_STATUS_BLOCK data.
+  @param  Timeout             The timeout value of non data transfer.
 
   @retval EFI_DEVICE_ERROR    The non data transfer abort with error occurs.
   @retval EFI_TIMEOUT         The operation is time out.
@@ -1251,11 +1252,11 @@ AhciReset (
 /**
   Send Buffer cmd to specific device.
     
-  @param  PciIo             The PCI IO protocol instance.
-  @param  AhciRegisters         The pointer to the EFI_AHCI_REGISTERS.
-  @param  Port              The number of port.
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
   @param  PortMultiplier      The timeout value of stop.
-  @param    Buffer                The data buffer to store IDENTIFY PACKET data.
+  @param  Buffer              The data buffer to store IDENTIFY PACKET data.
 
   @retval EFI_DEVICE_ERROR    The cmd abort with error occurs.
   @retval EFI_TIMEOUT         The operation is time out.
@@ -1308,11 +1309,11 @@ AhciIdentify (
 /**
   Send Buffer cmd to specific device.
     
-  @param  PciIo             The PCI IO protocol instance.
-  @param  AhciRegisters         The pointer to the EFI_AHCI_REGISTERS.
-  @param  Port              The number of port.
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
   @param  PortMultiplier      The timeout value of stop.
-  @param    Buffer                The data buffer to store IDENTIFY PACKET data.
+  @param  Buffer              The data buffer to store IDENTIFY PACKET data.
 
   @retval EFI_DEVICE_ERROR    The cmd abort with error occurs.
   @retval EFI_TIMEOUT         The operation is time out.
@@ -1365,12 +1366,12 @@ AhciIdentifyPacket (
 /**
   Send SET FEATURE cmd on specific device.
     
-  @param  PciIo             The PCI IO protocol instance.
-  @param  AhciRegisters         The pointer to the EFI_AHCI_REGISTERS.
-  @param  Port              The number of port.
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
   @param  PortMultiplier      The timeout value of stop.
-  @param    Feature               The data to send Feature register.
-  @param  FeatureSpecificData   The specific data for SET FEATURE cmd.
+  @param  Feature             The data to send Feature register.
+  @param  FeatureSpecificData The specific data for SET FEATURE cmd.
 
   @retval EFI_DEVICE_ERROR    The cmd abort with error occurs.
   @retval EFI_TIMEOUT         The operation is time out.
@@ -1561,7 +1562,7 @@ AhciCreateTransferDescriptor (
   // Get the number of command slots per port supported by this HBA.
   //
   MaxCommandSlotNumber = (UINT8) (((Capability & 0x1F00) >> 8) + 1);
-  Support64Bit         = ((Capability & BIT31) != 0) ? TRUE : FALSE;
+  Support64Bit         = (BOOLEAN) (((Capability & BIT31) != 0) ? TRUE : FALSE);
 
   MaxReceiveFisSize    = MaxPortNumber * sizeof (EFI_AHCI_RECEIVED_FIS);
   Status = PciIo->AllocateBuffer (
@@ -1588,7 +1589,7 @@ AhciCreateTransferDescriptor (
                     EfiPciIoOperationBusMasterCommonBuffer,
                     Buffer,
                     &Bytes,
-                    &(EFI_PHYSICAL_ADDRESS)AhciRegisters->AhciRFisPciAddr,
+                    (EFI_PHYSICAL_ADDRESS *) &AhciRegisters->AhciRFisPciAddr,
                     &AhciRegisters->MapRFis
                     );
 
@@ -1600,7 +1601,7 @@ AhciCreateTransferDescriptor (
     goto Error6;
   }
 
-  if ((!Support64Bit) && ((EFI_PHYSICAL_ADDRESS)AhciRegisters->AhciRFisPciAddr > 0x100000000UL)) {
+  if ((!Support64Bit) && ((EFI_PHYSICAL_ADDRESS)(UINTN)AhciRegisters->AhciRFisPciAddr > 0x100000000ULL)) {
     //
     // The AHCI HBA doesn't support 64bit addressing, so should not get a >4G pci bus master address.
     //
@@ -1642,7 +1643,7 @@ AhciCreateTransferDescriptor (
                     EfiPciIoOperationBusMasterCommonBuffer,
                     Buffer,
                     &Bytes,
-                    &(EFI_PHYSICAL_ADDRESS)AhciRegisters->AhciCmdListPciAddr,
+                    (EFI_PHYSICAL_ADDRESS *)&AhciRegisters->AhciCmdListPciAddr,
                     &AhciRegisters->MapCmdList
                     );
 
@@ -1654,7 +1655,7 @@ AhciCreateTransferDescriptor (
     goto Error4;
   }
 
-  if ((!Support64Bit) && ((EFI_PHYSICAL_ADDRESS)AhciRegisters->AhciCmdListPciAddr > 0x100000000UL)) {
+  if ((!Support64Bit) && ((EFI_PHYSICAL_ADDRESS)(UINTN)AhciRegisters->AhciCmdListPciAddr > 0x100000000ULL)) {
     //
     // The AHCI HBA doesn't support 64bit addressing, so should not get a >4G pci bus master address.
     //
@@ -1697,7 +1698,7 @@ AhciCreateTransferDescriptor (
                     EfiPciIoOperationBusMasterCommonBuffer,
                     Buffer,
                     &Bytes,
-                    &(EFI_PHYSICAL_ADDRESS)AhciRegisters->AhciCommandTablePciAddr,
+                    (EFI_PHYSICAL_ADDRESS *)&AhciRegisters->AhciCommandTablePciAddr,
                     &AhciRegisters->MapCommandTable
                     );
 
@@ -1709,7 +1710,7 @@ AhciCreateTransferDescriptor (
     goto Error2;
   }
 
-  if ((!Support64Bit) && ((EFI_PHYSICAL_ADDRESS)AhciRegisters->AhciCommandTablePciAddr > 0x100000000UL)) {
+  if ((!Support64Bit) && ((EFI_PHYSICAL_ADDRESS)(UINTN)AhciRegisters->AhciCommandTablePciAddr > 0x100000000ULL)) {
     //
     // The AHCI HBA doesn't support 64bit addressing, so should not get a >4G pci bus master address.
     //
@@ -1819,7 +1820,7 @@ AhciModeInitialization (
   // Get the number of command slots per port supported by this HBA.
   //
   MaxCommandSlotNumber = (UINT8) (((Capability & 0x1F00) >> 8) + 1);
-  Support64Bit         = ((Capability & BIT31) != 0) ? TRUE : FALSE;
+  Support64Bit         = (BOOLEAN) (((Capability & BIT31) != 0) ? TRUE : FALSE);
 
   //
   // Get the bit map of those ports exposed by this HBA.
@@ -1942,7 +1943,7 @@ AhciModeInitialization (
         } else {
           continue;
         }
-    
+
         DEBUG ((EFI_D_INFO, "port [%d] port mulitplier [%d] has a [%a]\n", 
             Port, 0, DeviceType == EfiIdeCdrom ? "cdrom" : "harddisk"));
 
@@ -1991,7 +1992,7 @@ AhciModeInitialization (
         }
 
         Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, 0, 0x03, (UINT32)(*(UINT8 *)&TransferMode));
-    
+
         if (EFI_ERROR (Status)) {
           DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
           continue;
@@ -2005,6 +2006,4 @@ AhciModeInitialization (
   }
   return EFI_SUCCESS;
 }
-
-
 

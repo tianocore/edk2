@@ -351,15 +351,15 @@ AhciStopCommand (
 /**
   Start a non data transfer on specific port.
     
-  @param  PciIo             The PCI IO protocol instance.
-  @param  AhciRegisters         The pointer to the EFI_AHCI_REGISTERS.
-  @param  Port              The number of port.
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
   @param  PortMultiplier      The timeout value of stop.
-  @param  AtapiCommand      The atapi command will be used for the transfer.
-  @param  AtapiCommandLength    The length of the atapi command.
-  @param    AtaCommandBlock       The EFI_ATA_COMMAND_BLOCK data.
-  @param    AtaStatusBlock        The EFI_ATA_STATUS_BLOCK data.
-  @param  Timeout               The timeout value of non data transfer.
+  @param  AtapiCommand        The atapi command will be used for the transfer.
+  @param  AtapiCommandLength  The length of the atapi command.
+  @param  AtaCommandBlock     The EFI_ATA_COMMAND_BLOCK data.
+  @param  AtaStatusBlock      The EFI_ATA_STATUS_BLOCK data.
+  @param  Timeout             The timeout value of non data transfer.
 
   @retval EFI_DEVICE_ERROR    The non data transfer abort with error occurs.
   @retval EFI_TIMEOUT         The operation is time out.
@@ -384,23 +384,23 @@ AhciNonDataTransfer (
 /**
   Start a DMA data transfer on specific port
 
-  @param  PciIo         The PCI IO protocol instance.
-  @param  AhciRegisters         The pointer to the EFI_AHCI_REGISTERS.
-  @param  Port          The number of port.
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
   @param  PortMultiplier      The timeout value of stop.
   @param  AtapiCommand        The atapi command will be used for the transfer.
-  @param  AtapiCommandLength    The length of the atapi command.
-  @param  Read                  The transfer direction.
-  @param  AtaCommandBlock       The EFI_ATA_COMMAND_BLOCK data.
-  @param  AtaStatusBlock        The EFI_ATA_STATUS_BLOCK data.
-  @param  MemoryAddr            The pointer to the data buffer.
-  @param  DataCount             The data count to be transferred.
-  @param  Timeout               The timeout value of non data transfer.
+  @param  AtapiCommandLength  The length of the atapi command.
+  @param  Read                The transfer direction.
+  @param  AtaCommandBlock     The EFI_ATA_COMMAND_BLOCK data.
+  @param  AtaStatusBlock      The EFI_ATA_STATUS_BLOCK data.
+  @param  MemoryAddr          The pointer to the data buffer.
+  @param  DataCount           The data count to be transferred.
+  @param  Timeout             The timeout value of non data transfer.
 
-  @retval EFI_DEVICE_ERROR  The DMA data transfer abort with error occurs.
-  @retval EFI_TIMEOUT     The operation is time out.
-  @retval EFI_UNSUPPORTED   The device is not ready for transfer.
-  @retval EFI_SUCCESS     The DMA data transfer executes successfully.
+  @retval EFI_DEVICE_ERROR    The DMA data transfer abort with error occurs.
+  @retval EFI_TIMEOUT         The operation is time out.
+  @retval EFI_UNSUPPORTED     The device is not ready for transfer.
+  @retval EFI_SUCCESS         The DMA data transfer executes successfully.
    
 **/
 EFI_STATUS
@@ -423,11 +423,11 @@ AhciDmaTransfer (
 /**
   Start a PIO data transfer on specific port.
     
-  @param  PciIo             The PCI IO protocol instance.
+  @param  PciIo               The PCI IO protocol instance.
   @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
-  @param  Port              The number of port.
-  @param  PortMultiplier    The timeout value of stop.
-  @param  AtapiCommand      The atapi command will be used for the transfer.
+  @param  Port                The number of port.
+  @param  PortMultiplier      The timeout value of stop.
+  @param  AtapiCommand        The atapi command will be used for the transfer.
   @param  AtapiCommandLength  The length of the atapi command.
   @param  Read                The transfer direction.
   @param  AtaCommandBlock     The EFI_ATA_COMMAND_BLOCK data.

@@ -303,23 +303,8 @@ AtaAtapiPassThruSupported (
                         PciData.Hdr.ClassCode
                         );
   if (EFI_ERROR (Status)) {
-    gBS->CloseProtocol (
-           Controller,
-           &gEfiPciIoProtocolGuid,
-           This->DriverBindingHandle,
-           Controller
-           );
     return EFI_UNSUPPORTED;
   }
-  //
-  // Close PciIo protocol as we have gotten the PciData.
-  //
-  gBS->CloseProtocol (
-         Controller,
-         &gEfiPciIoProtocolGuid,
-         This->DriverBindingHandle,
-         Controller
-         );
 
   if (IS_PCI_IDE (&PciData) || IS_PCI_SATADPA (&PciData)) {
     return EFI_SUCCESS;
@@ -625,7 +610,7 @@ AtaAtapiPassThruStop (
              );
     PciIo->FreeBuffer (
              PciIo,
-             EFI_SIZE_TO_PAGES (AhciRegisters->MaxCommandTableSize),
+             (UINTN) EFI_SIZE_TO_PAGES (AhciRegisters->MaxCommandTableSize),
              AhciRegisters->AhciCommandTable
              );
     PciIo->Unmap (
@@ -634,7 +619,7 @@ AtaAtapiPassThruStop (
              );
     PciIo->FreeBuffer (
              PciIo,
-             EFI_SIZE_TO_PAGES (AhciRegisters->MaxCommandListSize),
+             (UINTN) EFI_SIZE_TO_PAGES (AhciRegisters->MaxCommandListSize),
              AhciRegisters->AhciCmdList
              );
     PciIo->Unmap (
@@ -643,7 +628,7 @@ AtaAtapiPassThruStop (
              );
     PciIo->FreeBuffer (
              PciIo,
-             EFI_SIZE_TO_PAGES (AhciRegisters->MaxReceiveFisSize),
+             (UINTN) EFI_SIZE_TO_PAGES (AhciRegisters->MaxReceiveFisSize),
              AhciRegisters->AhciRFis
              );
   }
