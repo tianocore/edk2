@@ -152,6 +152,10 @@ GetDestinationLocation(
       NewSize = StrSize(Cwd);
       NewSize += StrSize(DestDir);
       DestPath = AllocateZeroPool(NewSize);
+      if (DestPath == NULL) {
+        ShellCloseFileMetaArg(&DestList);
+        return (SHELL_OUT_OF_RESOURCES);
+      }
       StrCpy(DestPath, Cwd);
       if (DestPath[StrLen(DestPath)-1] != L'\\' && DestDir[0] != L'\\') {
         StrCat(DestPath, L"\\");
@@ -162,6 +166,10 @@ GetDestinationLocation(
     } else {
       ASSERT(DestPath == NULL);
       DestPath = StrnCatGrow(&DestPath, NULL, DestDir, 0);
+      if (DestPath == NULL) {
+        ShellCloseFileMetaArg(&DestList);
+        return (SHELL_OUT_OF_RESOURCES);
+      }
     }
   } else {
     Node = (EFI_SHELL_FILE_INFO*)GetFirstNode(&DestList->Link);
@@ -175,6 +183,10 @@ GetDestinationLocation(
     }
     if (ShellIsDirectory(Node->FullName)==EFI_SUCCESS) {
       DestPath = AllocateZeroPool(StrSize(Node->FullName)+sizeof(CHAR16));
+      if (DestPath == NULL) {
+        ShellCloseFileMetaArg(&DestList);
+        return (SHELL_OUT_OF_RESOURCES);
+      }
       StrCpy(DestPath, Node->FullName);
       StrCat(DestPath, L"\\");
     } else {
@@ -287,62 +299,66 @@ ValidateAndMoveFiles(
     NewSize = StrSize(DestPath);
     NewSize += StrSize(Node->FileName) + sizeof(EFI_FILE_INFO) + sizeof(CHAR16);
     NewFileInfo = AllocateZeroPool(NewSize);
-    ASSERT(NewFileInfo != NULL);
-    CopyMem(NewFileInfo, Node->Info, sizeof(EFI_FILE_INFO));
-    if (DestPath[0] != L'\\') {
-      StrCpy(NewFileInfo->FileName, L"\\");
-      StrCat(NewFileInfo->FileName, DestPath);
+    if (NewFileInfo == NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellLevel2HiiHandle);
+      ShellStatus = SHELL_OUT_OF_RESOURCES;
     } else {
-      StrCpy(NewFileInfo->FileName, DestPath);
-    }
-    if (NewFileInfo->FileName[StrLen(NewFileInfo->FileName)-1] == L'\\') {
-      if (Node->FileName[0] == L'\\') {
-        //
-        // Don't allow for double slashes. Eliminate one of them.
-        //
-        NewFileInfo->FileName[StrLen(NewFileInfo->FileName)-1] = CHAR_NULL;
+      CopyMem(NewFileInfo, Node->Info, sizeof(EFI_FILE_INFO));
+      if (DestPath[0] != L'\\') {
+        StrCpy(NewFileInfo->FileName, L"\\");
+        StrCat(NewFileInfo->FileName, DestPath);
+      } else {
+        StrCpy(NewFileInfo->FileName, DestPath);
       }
-      StrCat(NewFileInfo->FileName, Node->FileName);
-    }
-    NewFileInfo->Size = sizeof(EFI_FILE_INFO) + StrSize(NewFileInfo->FileName);
+      if (NewFileInfo->FileName[StrLen(NewFileInfo->FileName)-1] == L'\\') {
+        if (Node->FileName[0] == L'\\') {
+          //
+          // Don't allow for double slashes. Eliminate one of them.
+          //
+          NewFileInfo->FileName[StrLen(NewFileInfo->FileName)-1] = CHAR_NULL;
+        }
+        StrCat(NewFileInfo->FileName, Node->FileName);
+      }
+      NewFileInfo->Size = sizeof(EFI_FILE_INFO) + StrSize(NewFileInfo->FileName);
 
-    ShellPrintEx(-1, -1, HiiOutput, Node->FullName, NewFileInfo->FileName);
+      ShellPrintEx(-1, -1, HiiOutput, Node->FullName, NewFileInfo->FileName);
 
-    //
-    // Perform the move operation
-    //
-    Status = ShellSetFileInfo(Node->Handle, NewFileInfo);
-
-    //
-    // Free the info object we used...
-    //
-    ASSERT  (NewFileInfo != NULL);
-    FreePool(NewFileInfo);
-
-    //
-    // Check our result
-    //
-    if (EFI_ERROR(Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, Status);
       //
-      // move failed
+      // Perform the move operation
       //
-      switch(Status){
-        default:
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        case EFI_SECURITY_VIOLATION:
-          ShellStatus = SHELL_SECURITY_VIOLATION;
-        case EFI_WRITE_PROTECTED:
-          ShellStatus = SHELL_WRITE_PROTECTED;
-        case EFI_OUT_OF_RESOURCES:
-          ShellStatus = SHELL_OUT_OF_RESOURCES;
-        case EFI_DEVICE_ERROR:
-          ShellStatus = SHELL_DEVICE_ERROR;
-        case EFI_ACCESS_DENIED:
-          ShellStatus = SHELL_ACCESS_DENIED;
-      } // switch
-    } else {
-      ShellPrintEx(-1, -1, L"%s", HiiResultOk);
+      Status = ShellSetFileInfo(Node->Handle, NewFileInfo);
+
+      //
+      // Free the info object we used...
+      //
+      ASSERT  (NewFileInfo != NULL);
+      FreePool(NewFileInfo);
+
+      //
+      // Check our result
+      //
+      if (EFI_ERROR(Status)) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, Status);
+        //
+        // move failed
+        //
+        switch(Status){
+          default:
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          case EFI_SECURITY_VIOLATION:
+            ShellStatus = SHELL_SECURITY_VIOLATION;
+          case EFI_WRITE_PROTECTED:
+            ShellStatus = SHELL_WRITE_PROTECTED;
+          case EFI_OUT_OF_RESOURCES:
+            ShellStatus = SHELL_OUT_OF_RESOURCES;
+          case EFI_DEVICE_ERROR:
+            ShellStatus = SHELL_DEVICE_ERROR;
+          case EFI_ACCESS_DENIED:
+            ShellStatus = SHELL_ACCESS_DENIED;
+        } // switch
+      } else {
+        ShellPrintEx(-1, -1, L"%s", HiiResultOk);
+      }
     }
   } // for loop
 

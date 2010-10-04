@@ -186,17 +186,27 @@ ShellCommandRunCd (
         // change directory on other drive letter
         //
         Drive = AllocateZeroPool(StrSize(Param1));
-        Drive = StrCpy(Drive, Param1);
-        Path = StrStr(Drive, L":");
-        *(++Path) = CHAR_NULL;
-        Status = gEfiShellProtocol->SetCurDir(Drive, ++Path);
+        if (Drive == NULL) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellLevel2HiiHandle);
+          ShellStatus = SHELL_OUT_OF_RESOURCES;
+        } else {
+          Drive = StrCpy(Drive, Param1);
+          Path = StrStr(Drive, L":");
+          *(++Path) = CHAR_NULL;
+          if (Path == Drive + StrLen(Drive)) {
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
+            ShellStatus = SHELL_NOT_FOUND;
+          } else {
+            Status = gEfiShellProtocol->SetCurDir(Drive, ++Path);
+          }
 
-        if (Status == EFI_NOT_FOUND) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
-          Status = SHELL_NOT_FOUND;
-        } else if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, Param1);
-          Status = SHELL_NOT_FOUND;
+          if (Status == EFI_NOT_FOUND) {
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
+            Status = SHELL_NOT_FOUND;
+          } else if (EFI_ERROR(Status)) {
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, Param1);
+            Status = SHELL_NOT_FOUND;
+          }
         }
       }
     }

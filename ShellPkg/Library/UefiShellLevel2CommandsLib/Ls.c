@@ -349,30 +349,35 @@ PrintLsOutput(
 
   if (Rec){
     DirectoryName = AllocatePool(LongestPath + 2*sizeof(CHAR16));
-    for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode(&ListHead->Link)
-        ; !IsNull(&ListHead->Link, &Node->Link)
-        ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode(&ListHead->Link, &Node->Link)
-       ){
-      //
-      // recurse on any directory except the traversing ones...
-      //
-      if (((Node->Info->Attribute & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY)
-        && StrCmp(Node->FileName, L".") != 0
-        && StrCmp(Node->FileName, L"..") != 0
-       ){
-        StrCpy(DirectoryName, Node->FullName);
-        StrCat(DirectoryName, L"\\*");
-        PrintLsOutput(
-          Rec,
-          Attribs,
-          Sfo,
-          DirectoryName,
-          FALSE,
-          Count,
-          TimeZone);
+    if (DirectoryName == NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellLevel2HiiHandle);
+      ShellStatus = SHELL_OUT_OF_RESOURCES;
+    } else {
+      for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode(&ListHead->Link)
+          ; !IsNull(&ListHead->Link, &Node->Link)
+          ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode(&ListHead->Link, &Node->Link)
+         ){
+        //
+        // recurse on any directory except the traversing ones...
+        //
+        if (((Node->Info->Attribute & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY)
+          && StrCmp(Node->FileName, L".") != 0
+          && StrCmp(Node->FileName, L"..") != 0
+         ){
+          StrCpy(DirectoryName, Node->FullName);
+          StrCat(DirectoryName, L"\\*");
+          PrintLsOutput(
+            Rec,
+            Attribs,
+            Sfo,
+            DirectoryName,
+            FALSE,
+            Count,
+            TimeZone);
+        }
       }
+      FreePool(DirectoryName);
     }
-    FreePool(DirectoryName);
   }
 
   FreePool(CorrectedPath);

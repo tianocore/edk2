@@ -287,6 +287,13 @@ ValidateAndCopyFiles(
   HiiResultOk = HiiGetString (gShellLevel2HiiHandle, STRING_TOKEN (STR_GEN_RES_OK), NULL);
   DestPath    = AllocatePool(PathLen);
 
+  if (HiiOutput == NULL || HiiOutput == NULL || HiiResultOk == NULL) {
+    SHELL_FREE_NON_NULL(DestPath);
+    SHELL_FREE_NON_NULL(HiiOutput);
+    SHELL_FREE_NON_NULL(HiiResultOk);
+    return (SHELL_OUT_OF_RESOURCES);
+  }
+
   //
   // Go through the list of files to copy...
   //

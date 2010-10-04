@@ -103,8 +103,11 @@ typedef struct {
   @param[in] Alias              The alias to test for.
   @param[in] CommandString      The updated command string.
   @param[in,out] List           The list to search.
+
+  @retval EFI_SUCCESS           The operation was completed successfully.
+  @retval EFI_OUT_OF_RESOURCES  There was not enough free memory.
 **/
-VOID
+EFI_STATUS
 EFIAPI
 InternalUpdateAliasOnList(
   IN CONST CHAR16       *Alias,
@@ -139,12 +142,16 @@ InternalUpdateAliasOnList(
   }
   if (!Found) {
     Node = AllocateZeroPool(sizeof(ALIAS_LIST));
+    if (Node == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
     ASSERT(Node->Alias == NULL);
     Node->Alias         = StrnCatGrow(&Node->Alias, NULL, Alias, 0);
     ASSERT(Node->CommandString == NULL);
     Node->CommandString = StrnCatGrow(&Node->CommandString, NULL, CommandString, 0);
     InsertTailList(List, &Node->Link);
   }
+  return (EFI_SUCCESS);
 }
 
 /**

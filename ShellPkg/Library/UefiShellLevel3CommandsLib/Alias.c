@@ -41,6 +41,9 @@ PrintAllShellAlias(
     return (SHELL_SUCCESS);
   }
   Alias = AllocateZeroPool(StrSize(ConstAllAliasList));
+  if (Alias == NULL) {
+    return (SHELL_OUT_OF_RESOURCES);
+  }
   Walker = (CHAR16*)ConstAllAliasList;
 
   do {

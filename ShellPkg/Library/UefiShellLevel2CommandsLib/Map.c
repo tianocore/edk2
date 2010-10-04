@@ -99,7 +99,7 @@ UpdateMapping (
   //
   // Find each handle with Simple File System
   //
-  HandleList = GetHandleListByPotocol(&gEfiSimpleFileSystemProtocolGuid);
+  HandleList = GetHandleListByProtocol(&gEfiSimpleFileSystemProtocolGuid);
   if (HandleList != NULL) {
     //
     // Do a count of the handles
@@ -503,6 +503,9 @@ PerformMappingDisplay(
     HandleBuffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HandleBuffer = AllocatePool(BufferSize);
+    if (HandleBuffer == NULL) {
+      return (SHELL_OUT_OF_RESOURCES);
+    }
     Status = gBS->LocateHandle(
       ByProtocol,
       &gEfiDevicePathProtocolGuid,
@@ -542,6 +545,9 @@ PerformMappingDisplay(
   if (Status == EFI_BUFFER_TOO_SMALL) {
     FreePool(HandleBuffer);
     HandleBuffer = AllocatePool(BufferSize);
+    if (HandleBuffer == NULL) {
+      return (SHELL_OUT_OF_RESOURCES);
+    }
     Status = gBS->LocateHandle(
       ByProtocol,
       &gEfiBlockIoProtocolGuid,
@@ -549,37 +555,37 @@ PerformMappingDisplay(
       &BufferSize,
       HandleBuffer);
   }
-  ASSERT_EFI_ERROR(Status);
-
-  //
-  // Get the map name(s) for each one.
-  //
-  for ( LoopVar = 0
-      ; LoopVar < BufferSize / sizeof(EFI_HANDLE)
-      ; LoopVar ++
-     ){
+  if (!EFI_ERROR(Status)) {
     //
-    // Skip any that were already done...
+    // Get the map name(s) for each one.
     //
-    if (gBS->OpenProtocol(
-      HandleBuffer[LoopVar],
-      &gEfiDevicePathProtocolGuid,
-      NULL,
-      gImageHandle,
-      NULL,
-      EFI_OPEN_PROTOCOL_TEST_PROTOCOL) == EFI_SUCCESS) {
-        continue;
+    for ( LoopVar = 0
+        ; LoopVar < BufferSize / sizeof(EFI_HANDLE)
+        ; LoopVar ++
+       ){
+      //
+      // Skip any that were already done...
+      //
+      if (gBS->OpenProtocol(
+        HandleBuffer[LoopVar],
+        &gEfiDevicePathProtocolGuid,
+        NULL,
+        gImageHandle,
+        NULL,
+        EFI_OPEN_PROTOCOL_TEST_PROTOCOL) == EFI_SUCCESS) {
+          continue;
+      }
+      PerformSingleMappingDisplay(
+        Verbose,
+        Consist,
+        Normal,
+        Test,
+        SFO,
+        Specific,
+        HandleBuffer[LoopVar]);
     }
-    PerformSingleMappingDisplay(
-      Verbose,
-      Consist,
-      Normal,
-      Test,
-      SFO,
-      Specific,
-      HandleBuffer[LoopVar]);
+    FreePool(HandleBuffer);
   }
-  FreePool(HandleBuffer);
   return (SHELL_SUCCESS);
 }
 
