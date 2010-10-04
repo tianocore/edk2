@@ -1116,7 +1116,7 @@ ParseHandleDatabaseForChildControllers(
     return Status;
   }
 
-  HandleBufferForReturn = GetHandleListByPotocol(&gEfiDriverBindingProtocolGuid);
+  HandleBufferForReturn = GetHandleListByProtocol(&gEfiDriverBindingProtocolGuid);
   if (HandleBufferForReturn == NULL) {
     FreePool (DriverBindingHandleBuffer);
     return Status;
@@ -1311,7 +1311,7 @@ ParseHandleDatabaseForChildDevices(
 **/
 EFI_HANDLE*
 EFIAPI
-GetHandleListByPotocol (
+GetHandleListByProtocol (
   IN CONST EFI_GUID *ProtocolGuid OPTIONAL
   )
 {
@@ -1329,6 +1329,9 @@ GetHandleListByPotocol (
     Status = gBS->LocateHandle(AllHandles, NULL, NULL, &Size, HandleList);
     if (Status == EFI_BUFFER_TOO_SMALL) {
       HandleList = AllocatePool(Size + sizeof(EFI_HANDLE));
+      if (HandleList == NULL) {
+        return (NULL);
+      }
       Status = gBS->LocateHandle(AllHandles, NULL, NULL, &Size, HandleList);
       HandleList[Size/sizeof(EFI_HANDLE)] = NULL;
     }
@@ -1336,6 +1339,9 @@ GetHandleListByPotocol (
     Status = gBS->LocateHandle(ByProtocol, (EFI_GUID*)ProtocolGuid, NULL, &Size, HandleList);
     if (Status == EFI_BUFFER_TOO_SMALL) {
       HandleList = AllocatePool(Size + sizeof(EFI_HANDLE));
+      if (HandleList == NULL) {
+        return (NULL);
+      }
       Status = gBS->LocateHandle(ByProtocol, (EFI_GUID*)ProtocolGuid, NULL, &Size, HandleList);
       HandleList[Size/sizeof(EFI_HANDLE)] = NULL;
     }
@@ -1359,13 +1365,14 @@ GetHandleListByPotocol (
 **/
 EFI_HANDLE*
 EFIAPI
-GetHandleListByPotocolList (
+GetHandleListByProtocolList (
   IN CONST EFI_GUID **ProtocolGuids
   )
 {
   EFI_HANDLE          *HandleList;
   UINTN               Size;
   UINTN               TotalSize;
+  UINTN               TempSize;
   EFI_STATUS          Status;
   CONST EFI_GUID      **GuidWalker;
   EFI_HANDLE          *HandleWalker1;
@@ -1381,7 +1388,15 @@ GetHandleListByPotocolList (
       TotalSize += Size;
     }
   }
-  HandleList = AllocatePool(TotalSize);
+
+  //
+  // No handles were found... 
+  //
+  if (TotalSize == sizeof(EFI_HANDLE)) {
+    return (NULL);
+  }
+
+  HandleList = AllocateZeroPool(TotalSize);
   ASSERT(HandleList != NULL);
   if (HandleList == NULL) {
     return (NULL);
@@ -1389,9 +1404,15 @@ GetHandleListByPotocolList (
 
   Size = 0;
   for (GuidWalker = ProtocolGuids ; GuidWalker != NULL && *GuidWalker != NULL ; GuidWalker++){
-    Size = TotalSize - Size;
-    Status = gBS->LocateHandle(ByProtocol, (EFI_GUID*)(*GuidWalker), NULL, &Size, HandleList+((TotalSize - Size)/sizeof(EFI_HANDLE)));
-    ASSERT_EFI_ERROR(Status);
+    TempSize = TotalSize - Size;
+    Status = gBS->LocateHandle(ByProtocol, (EFI_GUID*)(*GuidWalker), NULL, &TempSize, HandleList+((TotalSize - Size)/sizeof(EFI_HANDLE)));
+
+    //
+    // Allow for missing protocols... Only update the 'used' size upon success.
+    //
+    if (!EFI_ERROR(Status)) {
+      Size = TempSize;
+    }
   }
   HandleList[(TotalSize/sizeof(EFI_HANDLE))-1] = NULL;
 

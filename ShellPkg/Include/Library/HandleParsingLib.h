@@ -321,7 +321,7 @@ ConvertHandleIndexToHandle(
 **/
 EFI_HANDLE*
 EFIAPI
-GetHandleListByPotocol (
+GetHandleListByProtocol (
   IN CONST EFI_GUID *ProtocolGuid OPTIONAL
   );
 
@@ -335,7 +335,7 @@ GetHandleListByPotocol (
 **/
 EFI_HANDLE*
 EFIAPI
-GetHandleListByPotocolList (
+GetHandleListByProtocolList (
   IN CONST EFI_GUID **ProtocolGuids
   );
 
