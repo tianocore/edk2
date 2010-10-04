@@ -420,6 +420,17 @@ ShellCommandSetNewScript (
   );
 
 /**
+  Function to cleanup all memory from a SCRIPT_FILE structure.
+
+  @param[in] Script     The pointer to the structure to cleanup.
+**/
+VOID
+EFIAPI
+DeleteScriptFileStruct (
+  IN SCRIPT_FILE *Script
+  );
+
+/**
   Function to get the current Profile string.
 
   This is used to retrieve what profiles were installed.

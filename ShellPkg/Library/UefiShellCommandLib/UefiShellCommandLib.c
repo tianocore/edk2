@@ -767,13 +767,16 @@ DeleteScriptFileStruct (
   )
 {
   UINT8       LoopVar;
-  ASSERT(Script             != NULL);
-  ASSERT(Script->ScriptName != NULL);
+
+  if (Script == NULL) {
+    return;
+  }
+
   for (LoopVar = 0 ; LoopVar < Script->Argc ; LoopVar++) {
-    FreePool(Script->Argv[LoopVar]);
+    SHELL_FREE_NON_NULL(Script->Argv[LoopVar]);
   }
   if (Script->Argv != NULL) {
-    FreePool(Script->Argv);
+    SHELL_FREE_NON_NULL(Script->Argv);
   }
   Script->CurrentCommand = NULL;
   while (!IsListEmpty (&Script->CommandList)) {
@@ -781,16 +784,16 @@ DeleteScriptFileStruct (
     if (Script->CurrentCommand != NULL) {
       RemoveEntryList(&Script->CurrentCommand->Link);
       if (Script->CurrentCommand->Cl != NULL) {
-        FreePool(Script->CurrentCommand->Cl);
+        SHELL_FREE_NON_NULL(Script->CurrentCommand->Cl);
       }
       if (Script->CurrentCommand->Data != NULL) {
-        FreePool(Script->CurrentCommand->Data);
+        SHELL_FREE_NON_NULL(Script->CurrentCommand->Data);
       }
-      FreePool(Script->CurrentCommand);
+      SHELL_FREE_NON_NULL(Script->CurrentCommand);
     }
   }
-  FreePool(Script->ScriptName);
-  FreePool(Script);
+  SHELL_FREE_NON_NULL(Script->ScriptName);
+  SHELL_FREE_NON_NULL(Script);
 }
 
 /**
@@ -833,7 +836,6 @@ ShellCommandSetNewScript (
   SCRIPT_FILE_LIST *Node;
   if (Script == NULL) {
     if (IsListEmpty (&mScriptList.Link)) {
-      ASSERT(FALSE);
       return (NULL);
     }
     Node = (SCRIPT_FILE_LIST *)GetFirstNode(&mScriptList.Link);
@@ -842,6 +844,9 @@ ShellCommandSetNewScript (
     FreePool(Node);
   } else {
     Node = AllocateZeroPool(sizeof(SCRIPT_FILE_LIST));
+    if (Node == NULL) {
+      return (NULL);
+    }
     Node->Data = Script;
     InsertHeadList(&mScriptList.Link, &Node->Link);
   }
@@ -1025,7 +1030,7 @@ ShellCommandCreateInitialMappingsAndPaths(
   //
   // Find each handle with Simple File System
   //
-  HandleList = GetHandleListByPotocol(&gEfiSimpleFileSystemProtocolGuid);
+  HandleList = GetHandleListByProtocol(&gEfiSimpleFileSystemProtocolGuid);
   if (HandleList != NULL) {
     //
     // Do a count of the handles
@@ -1085,7 +1090,7 @@ ShellCommandCreateInitialMappingsAndPaths(
   //
   // Find each handle with Block Io
   //
-  HandleList = GetHandleListByPotocol(&gEfiBlockIoProtocolGuid);
+  HandleList = GetHandleListByProtocol(&gEfiBlockIoProtocolGuid);
   if (HandleList != NULL) {
     for (Count = 0 ; HandleList[Count] != NULL ; Count++);
 

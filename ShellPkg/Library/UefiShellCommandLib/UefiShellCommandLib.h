@@ -58,17 +58,6 @@ typedef struct {
   SCRIPT_FILE *Data;
 } SCRIPT_FILE_LIST;
 
-/**
-  Function to cleanup all memory from a SCRIPT_FILE structure.
-
-  @param[in] Script     The pointer to the structure to cleanup.
-**/
-VOID
-EFIAPI
-DeleteScriptFileStruct (
-  IN SCRIPT_FILE *Script
-  );
-
 typedef struct {
   EFI_FILE_PROTOCOL *FileHandle;
   CHAR16            *Path;
