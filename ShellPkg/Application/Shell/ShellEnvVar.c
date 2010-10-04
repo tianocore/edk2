@@ -144,27 +144,30 @@ GetEnvironmentVariableList(
   UINTN             ValSize;
   ENV_VAR_LIST      *VarList;
 
-  ASSERT(ListHead != NULL);
+  if (ListHead == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   Status = gRT->QueryVariableInfo(EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS, &MaxStorSize, &RemStorSize, &MaxVarSize);
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR(Status)) {
+    return (Status);
+  }
 
   NameSize = (UINTN)MaxVarSize;
   VariableName = AllocatePool(NameSize);
+  if (VariableName == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
   StrCpy(VariableName, L"");
 
-  while (TRUE) {
+  while (!EFI_ERROR(Status)) {
     NameSize = (UINTN)MaxVarSize;
     Status = gRT->GetNextVariableName(&NameSize, VariableName, &Guid);
     if (Status == EFI_NOT_FOUND){
       Status = EFI_SUCCESS;
       break;
     }
-    ASSERT_EFI_ERROR(Status);
-    if (EFI_ERROR(Status)) {
-      break;
-    }
-    if (CompareGuid(&Guid, &gShellVariableGuid)){
+    if (!EFI_ERROR(Status) && CompareGuid(&Guid, &gShellVariableGuid)){
       VarList = AllocateZeroPool(sizeof(ENV_VAR_LIST));
       ValSize = 0;
       Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(VariableName, &VarList->Atts, &ValSize, VarList->Val);
@@ -173,12 +176,12 @@ GetEnvironmentVariableList(
         ASSERT(VarList->Val != NULL);
         Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(VariableName, &VarList->Atts, &ValSize, VarList->Val);
       }
-      ASSERT_EFI_ERROR(Status);
-      VarList->Key = AllocatePool(StrSize(VariableName));
-      ASSERT(VarList->Key != NULL);
-      StrCpy(VarList->Key, VariableName);
-
-      InsertTailList(ListHead, &VarList->Link);
+      if (!EFI_ERROR(Status)) {
+        VarList->Key = AllocatePool(StrSize(VariableName));
+        ASSERT(VarList->Key != NULL);
+        StrCpy(VarList->Key, VariableName);
+        InsertTailList(ListHead, &VarList->Link);
+      }
     } // compare guid
   } // while
   FreePool(VariableName);

@@ -39,8 +39,10 @@ ConsoleLoggerInstall(
   EFI_STATUS Status;
   ASSERT(ConsoleInfo != NULL);
 
-  *ConsoleInfo = AllocatePool(sizeof(CONSOLE_LOGGER_PRIVATE_DATA));
-  ASSERT(ConsoleInfo != NULL);
+  (*ConsoleInfo) = AllocatePool(sizeof(CONSOLE_LOGGER_PRIVATE_DATA));
+  if ((*ConsoleInfo) == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
 
   (*ConsoleInfo)->Signature        = CONSOLE_LOGGER_PRIVATE_DATA_SIGNATURE;
   (*ConsoleInfo)->OldConOut        = NULL;

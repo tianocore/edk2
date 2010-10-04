@@ -280,7 +280,9 @@ CreatePopulateInstallShellParametersProtocol (
   // Allocate the new structure
   //
   *NewShellParameters = AllocateZeroPool(sizeof(EFI_SHELL_PARAMETERS_PROTOCOL));
-  ASSERT(NewShellParameters != NULL);
+  if ((*NewShellParameters) == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
 
   //
   // get loaded image protocol
@@ -307,19 +309,22 @@ CreatePopulateInstallShellParametersProtocol (
     // no parameters via environment... ok
     //
   } else {
-    ASSERT_EFI_ERROR(Status);
+    if (EFI_ERROR(Status)) {
+      return (Status);
+    }
   }
   if (Size == 0 && LoadedImage->LoadOptionsSize != 0) {
+    ASSERT(FullCommandLine == NULL);
     //
     // Now we need to include a NULL terminator in the size.
     //
     Size = LoadedImage->LoadOptionsSize + sizeof(FullCommandLine[0]);
     FullCommandLine = AllocateZeroPool(Size);
   }
-  if (LoadedImage->LoadOptionsSize != 0){
-    StrCpy(FullCommandLine, LoadedImage->LoadOptions);
-  }
   if (FullCommandLine != NULL) {
+    if (LoadedImage->LoadOptionsSize != 0){
+      StrCpy(FullCommandLine, LoadedImage->LoadOptions);
+    }
     //
     // Populate Argc and Argv
     //
@@ -685,6 +690,8 @@ UpdateStdInStdOutStdErr(
       ||(StdInFileName  != NULL && StdInVarName  != NULL)
       ||(StdErrVarName  != NULL && !IsVolatileEnv(StdErrVarName))
       ||(StdOutVarName  != NULL && !IsVolatileEnv(StdOutVarName))
+      ||(StrStr(NewCommandLine, L"connect -r") != NULL 
+         && (StdOutVarName != NULL || StdOutFileName != NULL || StdErrFileName != NULL || StdErrVarName != NULL))
       ){
       Status = EFI_INVALID_PARAMETER;
     } else {
@@ -733,30 +740,33 @@ UpdateStdInStdOutStdErr(
           ShellInfoObject.NewEfiShellProtocol->DeleteFileByName(StdOutFileName);
         }
         Status = ShellOpenFileByName(StdOutFileName, &TempHandle, EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ|EFI_FILE_MODE_CREATE,0);
-        ASSERT(TempHandle != NULL);
-        if (!OutAppend && OutUnicode && !EFI_ERROR(Status)) {
-          //
-          // Write out the UnicodeFileTag
-          //
-          Size = sizeof(CHAR16);
-          TagBuffer[0] = UnicodeFileTag;
-          TagBuffer[1] = CHAR_NULL;
-          ShellInfoObject.NewEfiShellProtocol->WriteFile(TempHandle, &Size, TagBuffer);
-        } else if (OutAppend) {
-          //
-          // Move to end of file
-          //
-          Status = ShellInfoObject.NewEfiShellProtocol->GetFileSize(TempHandle, &FileSize);
-          if (!EFI_ERROR(Status)) {
-            Status = ShellInfoObject.NewEfiShellProtocol->SetFilePosition(TempHandle, FileSize);
+        if (TempHandle == NULL) {
+          Status = EFI_INVALID_PARAMETER;
+        } else {
+          if (!OutAppend && OutUnicode && !EFI_ERROR(Status)) {
+            //
+            // Write out the UnicodeFileTag
+            //
+            Size = sizeof(CHAR16);
+            TagBuffer[0] = UnicodeFileTag;
+            TagBuffer[1] = CHAR_NULL;
+            ShellInfoObject.NewEfiShellProtocol->WriteFile(TempHandle, &Size, TagBuffer);
+          } else if (OutAppend) {
+            //
+            // Move to end of file
+            //
+            Status = ShellInfoObject.NewEfiShellProtocol->GetFileSize(TempHandle, &FileSize);
+            if (!EFI_ERROR(Status)) {
+              Status = ShellInfoObject.NewEfiShellProtocol->SetFilePosition(TempHandle, FileSize);
+            }
           }
-        }
-        if (!OutUnicode && !EFI_ERROR(Status)) {
-          TempHandle = CreateFileInterfaceFile(TempHandle, FALSE);
-          ASSERT(TempHandle != NULL);
-        }
-        if (!EFI_ERROR(Status)) {
-          ShellParameters->StdOut = TempHandle;
+          if (!OutUnicode && !EFI_ERROR(Status)) {
+            TempHandle = CreateFileInterfaceFile(TempHandle, FALSE);
+            ASSERT(TempHandle != NULL);
+          }
+          if (!EFI_ERROR(Status)) {
+            ShellParameters->StdOut = TempHandle;
+          }
         }
       }
 

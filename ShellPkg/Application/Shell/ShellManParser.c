@@ -32,17 +32,23 @@ GetManFileName(
   )
 {
   CHAR16 *Buffer;
-  ASSERT(ManFileName != NULL);
+  if (ManFileName == NULL) {
+    return (NULL);
+  }
   //
   // Fix the file name
   //
   if (StrnCmp(ManFileName+StrLen(ManFileName)-4, L".man", 4)==0) {
     Buffer = AllocateZeroPool(StrSize(ManFileName));
-    StrCpy(Buffer, ManFileName);
+    if (Buffer != NULL) {
+      StrCpy(Buffer, ManFileName);
+    }
   } else {
     Buffer = AllocateZeroPool(StrSize(ManFileName) + 4*sizeof(CHAR16));
-    StrCpy(Buffer, ManFileName);
-    StrCat(Buffer, L".man");
+    if (Buffer != NULL) {
+      StrCpy(Buffer, ManFileName);
+      StrCat(Buffer, L".man");
+    }
   }
   return (Buffer);
 }

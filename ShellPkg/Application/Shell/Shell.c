@@ -56,6 +56,7 @@ SHELL_INFO ShellInfoObject = {
 
 STATIC CONST CHAR16 mScriptExtension[]      = L".NSH";
 STATIC CONST CHAR16 mExecutableExtensions[] = L".NSH;.EFI";
+STATIC CONST CHAR16 mStartupScript[]        = L"startup.nsh";
 
 /**
   The entry point for the application.
@@ -94,7 +95,9 @@ UefiMain (
   // Clear the screen
   //
   Status = gST->ConOut->ClearScreen(gST->ConOut);
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR(Status)) {
+    return (Status);
+  }
 
   //
   // Populate the global structure from PCDs
@@ -136,178 +139,179 @@ UefiMain (
   // install our console logger.  This will keep a log of the output for back-browsing
   //
   Status = ConsoleLoggerInstall(ShellInfoObject.LogScreenCount, &ShellInfoObject.ConsoleInfo);
-  ASSERT_EFI_ERROR(Status);
-
-  //
-  // Enable the cursor to be visible
-  //
-  gST->ConOut->EnableCursor (gST->ConOut, TRUE);
-
-  //
-  // If supporting EFI 1.1 we need to install HII protocol
-  // only do this if PcdShellRequireHiiPlatform == FALSE
-  //
-  // remove EFI_UNSUPPORTED check above when complete.
-  ///@todo add support for Framework HII
-
-  //
-  // install our (solitary) HII package
-  //
-  ShellInfoObject.HiiHandle = HiiAddPackages (&gEfiCallerIdGuid, gImageHandle, ShellStrings, NULL);
-  if (ShellInfoObject.HiiHandle == NULL) {
-    if (PcdGetBool(PcdShellSupportFrameworkHii)) {
-      ///@todo Add our package into Framework HII
-    }
-    if (ShellInfoObject.HiiHandle == NULL) {
-      return (EFI_NOT_STARTED);
-    }
-  }
-
-  //
-  // create and install the EfiShellParametersProtocol
-  //
-  Status = CreatePopulateInstallShellParametersProtocol(&ShellInfoObject.NewShellParametersProtocol, &ShellInfoObject.RootShellInstance);
-  ASSERT_EFI_ERROR(Status);
-  ASSERT(ShellInfoObject.NewShellParametersProtocol != NULL);
-
-  //
-  // create and install the EfiShellProtocol
-  //
-  Status = CreatePopulateInstallShellProtocol(&ShellInfoObject.NewEfiShellProtocol);
-  ASSERT_EFI_ERROR(Status);
-  ASSERT(ShellInfoObject.NewEfiShellProtocol != NULL);
-
-  //
-  // Now initialize the shell library (it requires Shell Parameters protocol)
-  //
-  Status = ShellInitialize();
-  ASSERT_EFI_ERROR(Status);
-
-  Status = CommandInit();
-  ASSERT_EFI_ERROR(Status);
-
-  //
-  // Check the command line
-  //
-  Status = ProcessCommandLine();
-
-  //
-  // If shell support level is >= 1 create the mappings and paths
-  //
-  if (PcdGet8(PcdShellSupportLevel) >= 1) {
-    Status = ShellCommandCreateInitialMappingsAndPaths();
-  }
-
-  //
-  // save the device path for the loaded image and the device path for the filepath (under loaded image)
-  // These are where to look for the startup.nsh file
-  //
-  Status = GetDevicePathsForImageAndFile(&ShellInfoObject.ImageDevPath, &ShellInfoObject.FileDevPath);
-  ASSERT_EFI_ERROR(Status);
-
-  //
-  // Display the version
-  //
-  if (!ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoVersion) {
-    ShellPrintHiiEx (
-      0,
-      gST->ConOut->Mode->CursorRow,
-      NULL,
-      STRING_TOKEN (STR_VER_OUTPUT_MAIN),
-      ShellInfoObject.HiiHandle,
-      SupportLevel[PcdGet8(PcdShellSupportLevel)],
-      gEfiShellProtocol->MajorVersion,
-      gEfiShellProtocol->MinorVersion,
-      (gST->Hdr.Revision&0xffff0000)>>16,
-      (gST->Hdr.Revision&0x0000ffff),
-      gST->FirmwareVendor,
-      gST->FirmwareRevision
-     );
-  }
-
-  //
-  // Display the mapping
-  //
-  if (PcdGet8(PcdShellSupportLevel) >= 2 && !ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoMap) {
-    Status = RunCommand(L"map");
-    ASSERT_EFI_ERROR(Status);
-  }
-
-  //
-  // init all the built in alias'
-  //
-  Status = SetBuiltInAlias();
-  ASSERT_EFI_ERROR(Status);
-
-  //
-  // Initialize environment variables
-  //
-  if (ShellCommandGetProfileList() != NULL) {
-    Status = InternalEfiShellSetEnv(L"profiles", ShellCommandGetProfileList(), TRUE);
-    ASSERT_EFI_ERROR(Status);
-  }
-
-  Size        = 100;
-  TempString  = AllocateZeroPool(Size);
-
-  UnicodeSPrint(TempString, Size, L"%d", PcdGet8(PcdShellSupportLevel));
-  Status = InternalEfiShellSetEnv(L"uefishellsupport", TempString, TRUE);
-  ASSERT_EFI_ERROR(Status);
-
-  UnicodeSPrint(TempString, Size, L"%d.%d", ShellInfoObject.NewEfiShellProtocol->MajorVersion, ShellInfoObject.NewEfiShellProtocol->MinorVersion);
-  Status = InternalEfiShellSetEnv(L"uefishellversion", TempString, TRUE);
-  ASSERT_EFI_ERROR(Status);
-
-  UnicodeSPrint(TempString, Size, L"%d.%d", (gST->Hdr.Revision & 0xFFFF0000) >> 16, gST->Hdr.Revision & 0x0000FFFF);
-  Status = InternalEfiShellSetEnv(L"uefiversion", TempString, TRUE);
-  ASSERT_EFI_ERROR(Status);
-
-  FreePool(TempString);
-
   if (!EFI_ERROR(Status)) {
-    if (!ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoInterrupt) {
-      //
-      // Set up the event for CTRL-C monitoring...
-      //
+    //
+    // Enable the cursor to be visible
+    //
+    gST->ConOut->EnableCursor (gST->ConOut, TRUE);
 
-      ///@todo add support for using SimpleInputEx here
-      //  if SimpleInputEx is not available display a warning.
+    //
+    // If supporting EFI 1.1 we need to install HII protocol
+    // only do this if PcdShellRequireHiiPlatform == FALSE
+    //
+    // remove EFI_UNSUPPORTED check above when complete.
+    ///@todo add support for Framework HII
+
+    //
+    // install our (solitary) HII package
+    //
+    ShellInfoObject.HiiHandle = HiiAddPackages (&gEfiCallerIdGuid, gImageHandle, ShellStrings, NULL);
+    if (ShellInfoObject.HiiHandle == NULL) {
+      if (PcdGetBool(PcdShellSupportFrameworkHii)) {
+        ///@todo Add our package into Framework HII
+      }
+      if (ShellInfoObject.HiiHandle == NULL) {
+        return (EFI_NOT_STARTED);
+      }
     }
 
-    if (!EFI_ERROR(Status) && PcdGet8(PcdShellSupportLevel) >= 1) {
-      //
-      // process the startup script or launch the called app.
-      //
-      Status = DoStartupScript(ShellInfoObject.ImageDevPath, ShellInfoObject.FileDevPath);
+    //
+    // create and install the EfiShellParametersProtocol
+    //
+    Status = CreatePopulateInstallShellParametersProtocol(&ShellInfoObject.NewShellParametersProtocol, &ShellInfoObject.RootShellInstance);
+    ASSERT_EFI_ERROR(Status);
+    ASSERT(ShellInfoObject.NewShellParametersProtocol != NULL);
+
+    //
+    // create and install the EfiShellProtocol
+    //
+    Status = CreatePopulateInstallShellProtocol(&ShellInfoObject.NewEfiShellProtocol);
+    ASSERT_EFI_ERROR(Status);
+    ASSERT(ShellInfoObject.NewEfiShellProtocol != NULL);
+
+    //
+    // Now initialize the shell library (it requires Shell Parameters protocol)
+    //
+    Status = ShellInitialize();
+    ASSERT_EFI_ERROR(Status);
+
+    Status = CommandInit();
+    ASSERT_EFI_ERROR(Status);
+
+    //
+    // Check the command line
+    //
+    Status = ProcessCommandLine();
+
+    //
+    // If shell support level is >= 1 create the mappings and paths
+    //
+    if (PcdGet8(PcdShellSupportLevel) >= 1) {
+      Status = ShellCommandCreateInitialMappingsAndPaths();
     }
 
-    if ((PcdGet8(PcdShellSupportLevel) >= 3 || PcdGetBool(PcdShellForceConsole)) && !EFI_ERROR(Status) && !ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoConsoleIn) {
-      //
-      // begin the UI waiting loop
-      //
-      do {
-        //
-        // clean out all the memory allocated for CONST <something> * return values
-        // between each shell prompt presentation
-        //
-        if (!IsListEmpty(&ShellInfoObject.BufferToFreeList.Link)){
-          FreeBufferList(&ShellInfoObject.BufferToFreeList);
-        }
+    //
+    // save the device path for the loaded image and the device path for the filepath (under loaded image)
+    // These are where to look for the startup.nsh file
+    //
+    Status = GetDevicePathsForImageAndFile(&ShellInfoObject.ImageDevPath, &ShellInfoObject.FileDevPath);
+    ASSERT_EFI_ERROR(Status);
 
-        //
-        // Reset page break back to default.
-        //
-        ShellInfoObject.PageBreakEnabled        = PcdGetBool(PcdShellPageBreakDefault);
-        ShellInfoObject.ConsoleInfo->Enabled    = TRUE;
-        ShellInfoObject.ConsoleInfo->RowCounter = 0;
+    //
+    // Display the version
+    //
+    if (!ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoVersion) {
+      ShellPrintHiiEx (
+        0,
+        gST->ConOut->Mode->CursorRow,
+        NULL,
+        STRING_TOKEN (STR_VER_OUTPUT_MAIN),
+        ShellInfoObject.HiiHandle,
+        SupportLevel[PcdGet8(PcdShellSupportLevel)],
+        gEfiShellProtocol->MajorVersion,
+        gEfiShellProtocol->MinorVersion,
+        (gST->Hdr.Revision&0xffff0000)>>16,
+        (gST->Hdr.Revision&0x0000ffff),
+        gST->FirmwareVendor,
+        gST->FirmwareRevision
+       );
+    }
 
+    //
+    // Display the mapping
+    //
+    if (PcdGet8(PcdShellSupportLevel) >= 2 && !ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoMap) {
+      Status = RunCommand(L"map");
+      ASSERT_EFI_ERROR(Status);
+    }
+
+    //
+    // init all the built in alias'
+    //
+    Status = SetBuiltInAlias();
+    ASSERT_EFI_ERROR(Status);
+
+    //
+    // Initialize environment variables
+    //
+    if (ShellCommandGetProfileList() != NULL) {
+      Status = InternalEfiShellSetEnv(L"profiles", ShellCommandGetProfileList(), TRUE);
+      ASSERT_EFI_ERROR(Status);
+    }
+
+    Size        = 100;
+    TempString  = AllocateZeroPool(Size);
+
+    UnicodeSPrint(TempString, Size, L"%d", PcdGet8(PcdShellSupportLevel));
+    Status = InternalEfiShellSetEnv(L"uefishellsupport", TempString, TRUE);
+    ASSERT_EFI_ERROR(Status);
+
+    UnicodeSPrint(TempString, Size, L"%d.%d", ShellInfoObject.NewEfiShellProtocol->MajorVersion, ShellInfoObject.NewEfiShellProtocol->MinorVersion);
+    Status = InternalEfiShellSetEnv(L"uefishellversion", TempString, TRUE);
+    ASSERT_EFI_ERROR(Status);
+
+    UnicodeSPrint(TempString, Size, L"%d.%d", (gST->Hdr.Revision & 0xFFFF0000) >> 16, gST->Hdr.Revision & 0x0000FFFF);
+    Status = InternalEfiShellSetEnv(L"uefiversion", TempString, TRUE);
+    ASSERT_EFI_ERROR(Status);
+
+    FreePool(TempString);
+
+    if (!EFI_ERROR(Status)) {
+      if (!ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoInterrupt) {
         //
-        // Display Prompt
+        // Set up the event for CTRL-C monitoring...
         //
-        Status = DoShellPrompt();
-      } while (!ShellCommandGetExit());
+
+        ///@todo add support for using SimpleInputEx here
+        //  if SimpleInputEx is not available display a warning.
+      }
+
+      if (!EFI_ERROR(Status) && PcdGet8(PcdShellSupportLevel) >= 1) {
+        //
+        // process the startup script or launch the called app.
+        //
+        Status = DoStartupScript(ShellInfoObject.ImageDevPath, ShellInfoObject.FileDevPath);
+      }
+
+      if ((PcdGet8(PcdShellSupportLevel) >= 3 || PcdGetBool(PcdShellForceConsole)) && !EFI_ERROR(Status) && !ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoConsoleIn) {
+        //
+        // begin the UI waiting loop
+        //
+        do {
+          //
+          // clean out all the memory allocated for CONST <something> * return values
+          // between each shell prompt presentation
+          //
+          if (!IsListEmpty(&ShellInfoObject.BufferToFreeList.Link)){
+            FreeBufferList(&ShellInfoObject.BufferToFreeList);
+          }
+
+          //
+          // Reset page break back to default.
+          //
+          ShellInfoObject.PageBreakEnabled        = PcdGetBool(PcdShellPageBreakDefault);
+          ShellInfoObject.ConsoleInfo->Enabled    = TRUE;
+          ShellInfoObject.ConsoleInfo->RowCounter = 0;
+
+          //
+          // Display Prompt
+          //
+          Status = DoShellPrompt();
+        } while (!ShellCommandGetExit());
+      }
     }
   }
+
   //
   // uninstall protocols / free memory / etc...
   //
@@ -342,7 +346,7 @@ UefiMain (
   }
 
   if (!IsListEmpty(&ShellInfoObject.SplitList.Link)){
-    ASSERT(FALSE);
+    ASSERT(FALSE); ///@todo finish this de-allocation.
   }
 
   if (ShellInfoObject.ShellInitSettings.FileName != NULL) {
@@ -579,6 +583,9 @@ ProcessCommandLine(
   TempConst = ShellCommandLineGetRawValue(Package, Count++);
   if (TempConst != NULL && StrLen(TempConst)) {
     ShellInfoObject.ShellInitSettings.FileName = AllocatePool(StrSize(TempConst));
+    if (ShellInfoObject.ShellInitSettings.FileName == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
     StrCpy(ShellInfoObject.ShellInitSettings.FileName, TempConst);
     ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoStartup = 1;
     for (LoopVar = 0 ; LoopVar < gEfiShellParametersProtocol->Argc ; LoopVar++) {
@@ -593,10 +600,18 @@ ProcessCommandLine(
                       &Size,
                       L" ",
                       0);
+          if (ShellInfoObject.ShellInitSettings.FileOptions == NULL) {
+            SHELL_FREE_NON_NULL(ShellInfoObject.ShellInitSettings.FileName);
+            return (EFI_OUT_OF_RESOURCES);
+          }
           StrnCatGrow(&ShellInfoObject.ShellInitSettings.FileOptions,
                       &Size,
                       gEfiShellParametersProtocol->Argv[LoopVar],
                       0);
+          if (ShellInfoObject.ShellInitSettings.FileOptions == NULL) {
+            SHELL_FREE_NON_NULL(ShellInfoObject.ShellInitSettings.FileName);
+            return (EFI_OUT_OF_RESOURCES);
+          }
         }
       }
     }
@@ -676,9 +691,12 @@ DoStartupScript(
       NewSize += StrSize(ShellInfoObject.ShellInitSettings.FileOptions) + sizeof(CHAR16);
     }
     FileStringPath = AllocateZeroPool(NewSize);
+    if (FileStringPath == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
     StrCpy(FileStringPath, ShellInfoObject.ShellInitSettings.FileName);
     if (ShellInfoObject.ShellInitSettings.FileOptions != NULL) {
-      StrCat (FileStringPath, L" ");
+      StrCat(FileStringPath, L" ");
       StrCat(FileStringPath, ShellInfoObject.ShellInitSettings.FileOptions);
     }
     Status = RunCommand(FileStringPath);
@@ -717,7 +735,7 @@ DoStartupScript(
     return (EFI_SUCCESS);
   }
 
-  NamePath = FileDevicePath (NULL, L"startup.nsh");
+  NamePath = FileDevicePath (NULL, mStartupScript);
   //
   // Try the first location
   //
@@ -736,14 +754,20 @@ DoStartupScript(
   // If we got a file, run it
   //
   if (!EFI_ERROR(Status)) {
-    Status = RunScriptFileHandle (FileHandle, L"startup.nsh");
+    Status = RunScriptFileHandle (FileHandle, mStartupScript);
     ShellInfoObject.NewEfiShellProtocol->CloseFile(FileHandle);
   } else {
-    //
-    // we return success since we dont need to have a startup script
-    //
-    Status = EFI_SUCCESS;
-    ASSERT(FileHandle == NULL);
+    FileStringPath = ShellFindFilePath(mStartupScript);
+    if (FileStringPath == NULL) {
+      //
+      // we return success since we dont need to have a startup script
+      //
+      Status = EFI_SUCCESS;
+      ASSERT(FileHandle == NULL);
+    } else {
+      Status = RunScriptFile(FileStringPath);
+      FreePool(FileStringPath);
+    }
   }
 
   FreePool(NamePath);
@@ -993,6 +1017,12 @@ ShellConvertVariables (
   NewCommandLine1 = AllocateZeroPool(NewSize);
   NewCommandLine2 = AllocateZeroPool(NewSize);
   ItemTemp        = AllocateZeroPool(ItemSize+(2*sizeof(CHAR16)));
+  if (NewCommandLine1 == NULL || NewCommandLine2 == NULL || ItemTemp == NULL) {
+    SHELL_FREE_NON_NULL(NewCommandLine1);
+    SHELL_FREE_NON_NULL(NewCommandLine2);
+    SHELL_FREE_NON_NULL(ItemTemp);
+    return (NULL);
+  }
   StrCpy(NewCommandLine1, OriginalCommandLine);
   for (MasterEnvList = EfiShellGetEnv(NULL)
     ;  MasterEnvList != NULL && *MasterEnvList != CHAR_NULL //&& *(MasterEnvList+1) != CHAR_NULL
@@ -1223,6 +1253,10 @@ RunCommand(
   if (PostAliasCmdLine != NULL) {
     FreePool(PostAliasCmdLine);
     PostAliasCmdLine = NULL;
+  }
+
+  if (PostVariableCmdLine == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
   }
 
   while (PostVariableCmdLine[StrLen(PostVariableCmdLine)-1] == L' ') {
@@ -1481,13 +1515,19 @@ RunScriptFileHandle (
   PreScriptEchoState = ShellCommandGetEchoState();
 
   NewScriptFile = (SCRIPT_FILE*)AllocateZeroPool(sizeof(SCRIPT_FILE));
-  ASSERT(NewScriptFile != NULL);
+  if (NewScriptFile == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
 
   //
   // Set up the name
   //
   ASSERT(NewScriptFile->ScriptName == NULL);
   NewScriptFile->ScriptName = StrnCatGrow(&NewScriptFile->ScriptName, NULL, Name, 0);
+  if (NewScriptFile->ScriptName == NULL) {
+    DeleteScriptFileStruct(NewScriptFile);
+    return (EFI_OUT_OF_RESOURCES);
+  }
 
   //
   // Save the parameters (used to replace %0 to %9 later on)
@@ -1495,10 +1535,17 @@ RunScriptFileHandle (
   NewScriptFile->Argc = ShellInfoObject.NewShellParametersProtocol->Argc;
   if (NewScriptFile->Argc != 0) {
     NewScriptFile->Argv = (CHAR16**)AllocateZeroPool(NewScriptFile->Argc * sizeof(CHAR16*));
-    ASSERT(NewScriptFile->Argv != NULL);
+    if (NewScriptFile->Argv == NULL) {
+      DeleteScriptFileStruct(NewScriptFile);
+      return (EFI_OUT_OF_RESOURCES);
+    }
     for (LoopVar = 0 ; LoopVar < 10 && LoopVar < NewScriptFile->Argc; LoopVar++) {
       ASSERT(NewScriptFile->Argv[LoopVar] == NULL);
       NewScriptFile->Argv[LoopVar] = StrnCatGrow(&NewScriptFile->Argv[LoopVar], NULL, ShellInfoObject.NewShellParametersProtocol->Argv[LoopVar], 0);
+      if (NewScriptFile->Argv[LoopVar] == NULL) {
+        DeleteScriptFileStruct(NewScriptFile);
+        return (EFI_OUT_OF_RESOURCES);
+      }
     }
   } else {
     NewScriptFile->Argv = NULL;
@@ -1518,7 +1565,10 @@ RunScriptFileHandle (
       continue;
     }
     NewScriptFile->CurrentCommand = AllocateZeroPool(sizeof(SCRIPT_COMMAND_LIST));
-    ASSERT(NewScriptFile->CurrentCommand != NULL);
+    if (NewScriptFile->CurrentCommand == NULL) {
+      DeleteScriptFileStruct(NewScriptFile);
+      return (EFI_OUT_OF_RESOURCES);
+    }
 
     NewScriptFile->CurrentCommand->Cl   = CommandLine;
     NewScriptFile->CurrentCommand->Data = NULL;
@@ -1536,12 +1586,22 @@ RunScriptFileHandle (
   // Now enumerate through the commands and run each one.
   //
   CommandLine = AllocatePool(PcdGet16(PcdShellPrintBufferSize));
+  if (CommandLine == NULL) {
+    DeleteScriptFileStruct(NewScriptFile);
+    return (EFI_OUT_OF_RESOURCES);
+  }
   CommandLine2 = AllocatePool(PcdGet16(PcdShellPrintBufferSize));
+  if (CommandLine2 == NULL) {
+    FreePool(CommandLine);
+    DeleteScriptFileStruct(NewScriptFile);
+    return (EFI_OUT_OF_RESOURCES);
+  }
 
   for ( NewScriptFile->CurrentCommand = (SCRIPT_COMMAND_LIST *)GetFirstNode(&NewScriptFile->CommandList)
       ; !IsNull(&NewScriptFile->CommandList, &NewScriptFile->CurrentCommand->Link)
       ; // conditional increment in the body of the loop
   ){
+    ASSERT(CommandLine2 != NULL);
     StrCpy(CommandLine2, NewScriptFile->CurrentCommand->Cl);
 
     //
@@ -1619,7 +1679,7 @@ RunScriptFileHandle (
 
       for (CommandLine3 = CommandLine2 ; CommandLine3[0] == L' ' ; CommandLine3++);
 
-      if (CommandLine3[0] == L':' ) {
+      if (CommandLine3 != NULL && CommandLine3[0] == L':' ) {
         //
         // This line is a goto target / label
         //

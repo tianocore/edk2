@@ -1406,7 +1406,7 @@ FileInterfaceMemClose(
   )
 {
   SHELL_FREE_NON_NULL(((EFI_FILE_PROTOCOL_MEM*)This)->Buffer);
-  SHELL_FREE_NON_NULL((EFI_FILE_PROTOCOL_MEM*)This);
+  SHELL_FREE_NON_NULL(This);
   return (EFI_SUCCESS);
 }
 
@@ -1553,6 +1553,9 @@ CreateFileInterfaceFile(
   EFI_FILE_PROTOCOL_FILE *NewOne;
 
   NewOne = AllocatePool(sizeof(EFI_FILE_PROTOCOL_FILE));
+  if (NewOne == NULL) {
+    return (NULL);
+  }
   CopyMem(NewOne, Template, sizeof(EFI_FILE_PROTOCOL_FILE));
   NewOne->Orig    = (EFI_FILE_PROTOCOL *)Template;
   NewOne->Unicode = Unicode;

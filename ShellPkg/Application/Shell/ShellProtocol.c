@@ -666,6 +666,9 @@ EfiShellGetDeviceName(
       }
       if (Language == NULL) {
         Lang = AllocatePool(AsciiStrSize(CompName2->SupportedLanguages));
+        if (Lang == NULL) {
+          return (EFI_OUT_OF_RESOURCES);
+        }
         AsciiStrCpy(Lang, CompName2->SupportedLanguages);
         TempChar = AsciiStrStr(Lang, ";");
         if (TempChar != NULL){
@@ -673,6 +676,9 @@ EfiShellGetDeviceName(
         }
       } else {
         Lang = AllocatePool(AsciiStrSize(Language));
+        if (Lang == NULL) {
+          return (EFI_OUT_OF_RESOURCES);
+        }
         AsciiStrCpy(Lang, Language);
       }
       Status = CompName2->GetControllerName(CompName2, DeviceHandle, NULL, Lang, &DeviceNameToReturn);
@@ -686,7 +692,7 @@ EfiShellGetDeviceName(
       FreePool(HandleList);
     }
     if (DeviceNameToReturn != NULL){
-      ASSERT(BestDeviceName == NULL);
+      ASSERT(BestDeviceName != NULL);
       StrnCatGrow(BestDeviceName, NULL, DeviceNameToReturn, 0);
       return (EFI_SUCCESS);
     }
@@ -2270,6 +2276,12 @@ EfiShellGetEnv(
     Size += 2*sizeof(CHAR16);
 
     Buffer = AllocateZeroPool(Size);
+    if (Buffer == NULL) {
+      if (!IsListEmpty (&List)) {
+        FreeEnvironmentVariableList(&List);
+      }
+      return (NULL);
+    }
     CurrentWriteLocation = (CHAR16*)Buffer;
 
     for ( Node = (ENV_VAR_LIST*)GetFirstNode(&List)
@@ -2284,7 +2296,9 @@ EfiShellGetEnv(
     //
     // Free the list...
     //
-    FreeEnvironmentVariableList(&List);
+    if (!IsListEmpty (&List)) {
+      FreeEnvironmentVariableList(&List);
+    }
   } else {
     //
     // We are doing a specific environment variable
@@ -2506,7 +2520,7 @@ EfiShellSetCurDir(
   TempString    = NULL;
   DirectoryName = NULL;
 
-  if (FileSystem == NULL && Dir == NULL) {
+  if ((FileSystem == NULL && Dir == NULL) || Dir == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
 
@@ -2732,6 +2746,10 @@ InternalEfiShellGetListAlias(
   VariableName  = AllocateZeroPool((UINTN)MaxVarSize);
   RetSize       = 0;
   RetVal        = NULL;
+
+  if (VariableName == NULL) {
+    return (NULL);
+  }
 
   VariableName[0] = CHAR_NULL;
 
