@@ -664,6 +664,9 @@ PerformMappingDelete(
     HandleBuffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HandleBuffer = AllocatePool(BufferSize);
+    if (HandleBuffer == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
     Status = gBS->LocateHandle(
       ByProtocol,
       &gEfiDevicePathProtocolGuid,
@@ -671,8 +674,10 @@ PerformMappingDelete(
       &BufferSize,
       HandleBuffer);
   }
-  ASSERT_EFI_ERROR(Status);
-  ASSERT(HandleBuffer != NULL);
+  if (EFI_ERROR(Status)) {
+    SHELL_FREE_NON_NULL(HandleBuffer);
+    return (Status);
+  }
 
   //
   // Get the map name(s) for each one.
@@ -698,6 +703,9 @@ PerformMappingDelete(
   if (Status == EFI_BUFFER_TOO_SMALL) {
     FreePool(HandleBuffer);
     HandleBuffer = AllocatePool(BufferSize);
+    if (HandleBuffer == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
     Status = gBS->LocateHandle(
       ByProtocol,
       &gEfiBlockIoProtocolGuid,
@@ -705,7 +713,10 @@ PerformMappingDelete(
       &BufferSize,
       HandleBuffer);
   }
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR(Status)) {
+    SHELL_FREE_NON_NULL(HandleBuffer);
+    return (Status);
+  }
 
   //
   // Get the map name(s) for each one.

@@ -1639,31 +1639,36 @@ ShellFindFilePath (
     Size = StrSize(Path)+sizeof(CHAR16);
     Size += StrSize(FileName);
     TestPath = AllocateZeroPool(Size);
+    if (TestPath == NULL) {
+      return (NULL);
+    }
     Walker = (CHAR16*)Path;
     do {
       CopyMem(TestPath, Walker, StrSize(Walker));
-      TempChar = StrStr(TestPath, L";");
-      if (TempChar != NULL) {
-        *TempChar = CHAR_NULL;
-      }
-      if (TestPath[StrLen(TestPath)-1] != L'\\') {
-        StrCat(TestPath, L"\\");
-      }
-      StrCat(TestPath, FileName);
-      if (StrStr(Walker, L";") != NULL) {
-        Walker = StrStr(Walker, L";") + 1;
-      } else {
-        Walker = NULL;
-      }
-      Status = ShellOpenFileByName(TestPath, &Handle, EFI_FILE_MODE_READ, 0);
-      if (!EFI_ERROR(Status)){
-        if (FileHandleIsDirectory(Handle) != EFI_SUCCESS) {
-          ASSERT(RetVal == NULL);
-          RetVal = StrnCatGrow(&RetVal, NULL, TestPath, 0);
-          ShellCloseFile(&Handle);
-          break;
+      if (TestPath != NULL) {
+        TempChar = StrStr(TestPath, L";");
+        if (TempChar != NULL) {
+          *TempChar = CHAR_NULL;
+        }
+        if (TestPath[StrLen(TestPath)-1] != L'\\') {
+          StrCat(TestPath, L"\\");
+        }
+        StrCat(TestPath, FileName);
+        if (StrStr(Walker, L";") != NULL) {
+          Walker = StrStr(Walker, L";") + 1;
         } else {
-          ShellCloseFile(&Handle);
+          Walker = NULL;
+        }
+        Status = ShellOpenFileByName(TestPath, &Handle, EFI_FILE_MODE_READ, 0);
+        if (!EFI_ERROR(Status)){
+          if (FileHandleIsDirectory(Handle) != EFI_SUCCESS) {
+            ASSERT(RetVal == NULL);
+            RetVal = StrnCatGrow(&RetVal, NULL, TestPath, 0);
+            ShellCloseFile(&Handle);
+            break;
+          } else {
+            ShellCloseFile(&Handle);
+          }
         }
       }
     } while (Walker != NULL && Walker[0] != CHAR_NULL);
@@ -2460,6 +2465,9 @@ ShellCopySearchAndReplace(
     Replace = AllocateZeroPool(StrSize(ReplaceWith) + 2*sizeof(CHAR16));
     UnicodeSPrint(Replace, StrSize(ReplaceWith) + 2*sizeof(CHAR16), L"\"%s\"", ReplaceWith);
   }
+  if (Replace == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
   NewString = SetMem16(NewString, NewSize, CHAR_NULL);
   while (*SourceString != CHAR_NULL) {
     //
@@ -2702,6 +2710,9 @@ ShellPrintEx(
 {
   VA_LIST           Marker;
   EFI_STATUS        RetVal;
+  if (Format == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
   VA_START (Marker, Format);
   RetVal = InternalShellPrintWorker(Col, Row, Format, Marker);
   VA_END(Marker);
@@ -2784,7 +2795,8 @@ ShellIsDirectory(
 {
   EFI_STATUS        Status;
   SHELL_FILE_HANDLE Handle;
-        CHAR16      *TempLocation;
+  CHAR16            *TempLocation;
+  CHAR16            *TempLocation2;
 
   ASSERT(DirName != NULL);
 
@@ -2797,9 +2809,10 @@ ShellIsDirectory(
     // try good logic first.
     //
     if (mEfiShellProtocol != NULL) {
-      TempLocation = StrnCatGrow(&TempLocation, NULL, DirName, 0);
-      if (StrStr(TempLocation, L":") != NULL && StrLen(StrStr(TempLocation, L":")) == 2) {
-        *(StrStr(TempLocation, L":")+1) = CHAR_NULL;
+      TempLocation  = StrnCatGrow(&TempLocation, NULL, DirName, 0);
+      TempLocation2 = StrStr(TempLocation, L":");
+      if (TempLocation2 != NULL && StrLen(StrStr(TempLocation, L":")) == 2) {
+        *(TempLocation2+1) = CHAR_NULL;
       }
       if (mEfiShellProtocol->GetDevicePathFromMap(TempLocation) != NULL) {
         FreePool(TempLocation);
@@ -3074,6 +3087,9 @@ ShellPromptForResponse (
   Size    = 0;
   if (Type != ShellPromptResponseTypeFreeform) {
     Resp = (SHELL_PROMPT_RESPONSE*)AllocatePool(sizeof(SHELL_PROMPT_RESPONSE));
+    if (Resp == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
   }
 
   switch(Type) {

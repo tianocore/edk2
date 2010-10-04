@@ -44,7 +44,7 @@ IsValidMove(
   CHAR16  *Test;
   CHAR16  *Test1;
   CHAR16  *TestWalker;
-  UINTN   Result;
+  INTN    Result;
   UINTN   TempLen;
   if (Cwd != NULL && StrCmp(FullName, Cwd) == 0) {
     //
@@ -236,6 +236,7 @@ ValidateAndMoveFiles(
   EFI_FILE_INFO             *NewFileInfo;
   CHAR16                    *TempLocation;
   UINTN                     NewSize;
+  UINTN                     Length;
 
   ASSERT(FileList != NULL);
   ASSERT(DestDir  != NULL);
@@ -310,12 +311,16 @@ ValidateAndMoveFiles(
       } else {
         StrCpy(NewFileInfo->FileName, DestPath);
       }
-      if (NewFileInfo->FileName[StrLen(NewFileInfo->FileName)-1] == L'\\') {
+      Length = StrLen(NewFileInfo->FileName);
+      if (Length > 0) {
+        Length--;
+      }
+      if (NewFileInfo->FileName[Length] == L'\\') {
         if (Node->FileName[0] == L'\\') {
           //
           // Don't allow for double slashes. Eliminate one of them.
           //
-          NewFileInfo->FileName[StrLen(NewFileInfo->FileName)-1] = CHAR_NULL;
+          NewFileInfo->FileName[Length] = CHAR_NULL;
         }
         StrCat(NewFileInfo->FileName, Node->FileName);
       }
