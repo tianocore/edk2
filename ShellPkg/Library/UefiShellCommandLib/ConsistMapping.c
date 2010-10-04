@@ -1279,6 +1279,9 @@ ShellCommandConsistMappingGenMappingName (
 
   NewSize           = (Str.Len + 1) * sizeof (CHAR16);
   Str.Str           = ReallocatePool (Str.Len, NewSize, Str.Str);
+  if (Str.Str == NULL) {
+    return (NULL);
+  }
   Str.Str[Str.Len]  = CHAR_NULL;
   return Str.Str;
 }
