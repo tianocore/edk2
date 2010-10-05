@@ -74,7 +74,6 @@
   }
 
 
-  ShellPkg/Application/ShellLibTestApp/SA3.inf
   ShellPkg/Application/ShellCTestApp/ShellCTestApp.inf {
     <LibraryClasses>
       ShellCEntryLib|ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
