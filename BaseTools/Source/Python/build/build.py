@@ -305,7 +305,7 @@ class BuildUnit:
 
     ## str() method
     #
-    #   It just returns the string representaion of self.BuildObject
+    #   It just returns the string representation of self.BuildObject
     #
     #   @param  self        The object pointer
     #
@@ -943,7 +943,7 @@ class Build():
 
     ## Build a module or platform
     #
-    # Create autogen code and makfile for a module or platform, and the launch
+    # Create autogen code and makefile for a module or platform, and the launch
     # "make" command to build it
     #
     #   @param  Target                      The target of build command

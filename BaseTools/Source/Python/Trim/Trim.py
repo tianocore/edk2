@@ -40,6 +40,10 @@ gPragmaPattern = re.compile("^\s*#pragma\s+pack", re.MULTILINE)
 gHexNumberPattern = re.compile("0[xX]([0-9a-fA-F]+)")
 ## Regular expression for matching "Include ()" in asl file
 gAslIncludePattern = re.compile("^(\s*)[iI]nclude\s*\(\"?([^\"\(\)]+)\"\)", re.MULTILINE)
+## Regular expression for matching C style #include "XXX.asl" in asl file
+gAslCIncludePattern = re.compile(r'^(\s*)#include\s*[<"]\s*([-\\/\w.]+)\s*[>"]', re.MULTILINE)
+## Regular expression for matching constant with 'ULL' and 'UL', 'LL', 'L' postfix
+gLongNumberPattern = re.compile("(0[xX][0-9a-fA-F]+|[0-9]+)U?LL", re.MULTILINE)
 ## Patterns used to convert EDK conventions to EDK2 ECP conventions
 gImportCodePatterns = [
     [
@@ -118,7 +122,7 @@ gIncludedAslFile = []
 # @param  Target    File to store the trimmed content
 # @param  Convert   If True, convert standard HEX format to MASM format
 #
-def TrimPreprocessedFile(Source, Target, Convert):
+def TrimPreprocessedFile(Source, Target, ConvertHex, TrimLong):
     CreateDirectory(os.path.dirname(Target))
     try:
         f = open (Source, 'r')
@@ -164,8 +168,10 @@ def TrimPreprocessedFile(Source, Target, Convert):
                               % (LineIndexOfOriginalFile + 1))
 
         # convert HEX number format if indicated
-        if Convert:
+        if ConvertHex:
             Line = gHexNumberPattern.sub(r"0\1h", Line)
+        if TrimLong:
+            Line = gLongNumberPattern.sub(r"\1", Line)
 
         if LineNumber != None:
             EdkLogger.verbose("Got line directive: line=%d" % LineNumber)
@@ -264,31 +270,43 @@ def TrimPreprocessedVfr(Source, Target):
 
 ## Read the content  ASL file, including ASL included, recursively
 #
-# @param  Source    File to be read
-# @param  Indent    Spaces before the Include() statement
+# @param  Source            File to be read
+# @param  Indent            Spaces before the Include() statement
+# @param  IncludePathList   The list of external include file
 #
-def DoInclude(Source, Indent=''):
+def DoInclude(Source, Indent='', IncludePathList=[]):
     NewFileContent = []
-    # avoid A "include" B and B "include" A
-    if Source in gIncludedAslFile:
-        EdkLogger.warn("Trim", "Circular include",
-                       ExtraData= "%s -> %s" % (" -> ".join(gIncludedAslFile), Source))
-        return []
-    gIncludedAslFile.append(Source)
 
     try:
-        F = open(Source,'r')
+        for IncludePath in IncludePathList:
+            IncludeFile = os.path.join(IncludePath, Source)
+            if os.path.isfile(IncludeFile):
+                F = open(IncludeFile, "r")
+                break
+        else:
+            EdkLogger.error("Trim", "Failed to find include file %s" % Source)
     except:
         EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Source)
 
+    
+    # avoid A "include" B and B "include" A
+    IncludeFile = os.path.abspath(os.path.normpath(IncludeFile))
+    if IncludeFile in gIncludedAslFile:
+        EdkLogger.warn("Trim", "Circular include",
+                       ExtraData= "%s -> %s" % (" -> ".join(gIncludedAslFile), IncludeFile))
+        return []
+    gIncludedAslFile.append(IncludeFile)
+    
     for Line in F:
         Result = gAslIncludePattern.findall(Line)
         if len(Result) == 0:
-            NewFileContent.append("%s%s" % (Indent, Line))
-            continue
+            Result = gAslCIncludePattern.findall(Line)
+            if len(Result) == 0 or os.path.splitext(Result[0][1])[1].lower() not in [".asl", ".asi"]:
+                NewFileContent.append("%s%s" % (Indent, Line))
+                continue
         CurrentIndent = Indent + Result[0][0]
         IncludedFile = Result[0][1]
-        NewFileContent.extend(DoInclude(IncludedFile, CurrentIndent))
+        NewFileContent.extend(DoInclude(IncludedFile, CurrentIndent, IncludePathList))
         NewFileContent.append("\n")
 
     gIncludedAslFile.pop()
@@ -301,19 +319,44 @@ def DoInclude(Source, Indent=''):
 #
 # Replace ASL include statement with the content the included file
 #
-# @param  Source    File to be trimmed
-# @param  Target    File to store the trimmed content
+# @param  Source          File to be trimmed
+# @param  Target          File to store the trimmed content
+# @param  IncludePathFile The file to log the external include path 
 #
-def TrimAslFile(Source, Target):
+def TrimAslFile(Source, Target, IncludePathFile):
     CreateDirectory(os.path.dirname(Target))
     
-    Cwd = os.getcwd()
     SourceDir = os.path.dirname(Source)
     if SourceDir == '':
         SourceDir = '.'
-    os.chdir(SourceDir)
-    Lines = DoInclude(Source)
-    os.chdir(Cwd)
+    
+    #
+    # Add source directory as the first search directory
+    #
+    IncludePathList = [SourceDir]
+    
+    #
+    # If additional include path file is specified, append them all
+    # to the search directory list.
+    #
+    if IncludePathFile:
+        try:
+            LineNum = 0
+            for Line in open(IncludePathFile,'r'):
+                LineNum += 1
+                if Line.startswith("/I") or Line.startswith ("-I"):
+                    IncludePathList.append(Line[2:].strip())
+                else:
+                    EdkLogger.warn("Trim", "Invalid include line in include list file.", IncludePathFile, LineNum)
+        except:
+            EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=IncludePathFile)
+
+    Lines = DoInclude(Source, '', IncludePathList)
+
+    #
+    # Undef MIN and MAX to avoid collision in ASL source code
+    #
+    Lines.insert(0, "#undef MIN\n#undef MAX\n")
 
     # save all lines trimmed
     try:
@@ -437,6 +480,10 @@ def Options():
         make_option("-c", "--convert-hex", dest="ConvertHex", action="store_true",
                           help="Convert standard hex format (0xabcd) to MASM format (abcdh)"),
 
+        make_option("-l", "--trim-long", dest="TrimLong", action="store_true",
+                          help="Remove postfix of long number"),
+        make_option("-i", "--include-path-file", dest="IncludePathFile",
+                          help="The input file is include path list to search for ASL include file"),
         make_option("-o", "--output", dest="OutputFile",
                           help="File to store the trimmed content"),
         make_option("-v", "--verbose", dest="LogLevel", action="store_const", const=EdkLogger.VERBOSE,
@@ -449,7 +496,7 @@ def Options():
     ]
 
     # use clearer usage to override default usage message
-    UsageString = "%prog [-s|-r|-a] [-c] [-v|-d <debug_level>|-q] [-o <output_file>] <input_file>"
+    UsageString = "%prog [-s|-r|-a] [-c] [-v|-d <debug_level>|-q] [-i <include_path_file>] [-o <output_file>] <input_file>"
 
     Parser = OptionParser(description=__copyright__, version=__version__, option_list=OptionList, usage=UsageString)
     Parser.set_defaults(FileType="Vfr")
@@ -495,13 +542,13 @@ def Main():
         elif CommandOptions.FileType == "Asl":
             if CommandOptions.OutputFile == None:
                 CommandOptions.OutputFile = os.path.splitext(InputFile)[0] + '.iii'
-            TrimAslFile(InputFile, CommandOptions.OutputFile)
+            TrimAslFile(InputFile, CommandOptions.OutputFile, CommandOptions.IncludePathFile)
         elif CommandOptions.FileType == "R8SourceCode":
             TrimR8Sources(InputFile, CommandOptions.OutputFile)
         else :
             if CommandOptions.OutputFile == None:
                 CommandOptions.OutputFile = os.path.splitext(InputFile)[0] + '.iii'
-            TrimPreprocessedFile(InputFile, CommandOptions.OutputFile, CommandOptions.ConvertHex)
+            TrimPreprocessedFile(InputFile, CommandOptions.OutputFile, CommandOptions.ConvertHex, CommandOptions.TrimLong)
     except FatalError, X:
         import platform
         import traceback

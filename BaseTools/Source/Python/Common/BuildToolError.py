@@ -1,7 +1,7 @@
 ## @file
 # Standardized Error Hanlding infrastructures.
 #
-# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -125,7 +125,7 @@ gErrorMessage = {
     RESOURCE_FULL           :   "Full",
     RESOURCE_OVERFLOW       :   "Overflow",
     RESOURCE_UNDERRUN       :   "Underrun",
-    RESOURCE_UNKNOWN_ERROR  :   "Unkown error",
+    RESOURCE_UNKNOWN_ERROR  :   "Unknown error",
 
     ATTRIBUTE_NOT_AVAILABLE :   "Not available",
     ATTRIBUTE_GET_FAILURE   :   "Failed to retrieve",

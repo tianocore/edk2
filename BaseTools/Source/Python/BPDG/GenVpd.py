@@ -28,6 +28,10 @@ _FORMAT_CHAR = {1: 'B',
                 8: 'Q'
                 }
 
+## The VPD PCD data structure for store and process each VPD PCD entry.
+#
+#  This class contain method to format and pack pcd's value.          
+#
 class PcdEntry:
     def __init__(self, PcdCName, PcdOffset, PcdSize, PcdValue, Lineno=None, FileName=None, PcdUnpackValue=None, 
                  PcdBinOffset=None, PcdBinSize=None):
@@ -54,12 +58,29 @@ class PcdEntry:
                             "Invalid PCD format(Name: %s File: %s Line: %s), no PcdSize specified!" %(self.PcdCName, self.FileName, self.Lineno))  
                    
         self._GenOffsetValue ()
+    
+    ## Analyze the string value to judge the PCD's datum type euqal to Boolean or not.
+    # 
+    #  @param   ValueString      PCD's value
+    #  @param   Size             PCD's size
+    #  
+    #  @retval  True   PCD's datum type is Boolean
+    #  @retval  False  PCD's datum type is not Boolean.              
+    #    
+    def _IsBoolean(self, ValueString, Size):
+        if (Size == "1"):
+            if ValueString.upper() in ["TRUE", "FALSE"]:
+                return True
+            elif ValueString in ["0", "1", "0x0", "0x1", "0x00", "0x01"]:
+                return True 
         
-    def _IsBoolean(self, ValueString):
-        if ValueString.upper() in ["TRUE", "FALSE"]:
-            return True
         return False
     
+    ## Convert the PCD's value from string to integer.
+    #              
+    #  This function will try to convert the Offset value form string to integer
+    #  for both hexadecimal and decimal.
+    #    
     def _GenOffsetValue(self):
         if self.PcdOffset != "*" :
             try:
@@ -70,9 +91,14 @@ class PcdEntry:
                 except:
                     EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
                                     "Invalid offset value %s for PCD %s (File: %s Line: %s)" % (self.PcdOffset, self.PcdCName, self.FileName, self.Lineno))                                  
-        
+    
+    ## Pack Boolean type VPD PCD's value form string to binary type.
+    # 
+    #  @param ValueString     The boolean type string for pack.
+    # 
+    # 
     def _PackBooleanValue(self, ValueString):
-        if ValueString.upper() == "TRUE":
+        if ValueString.upper() == "TRUE" or ValueString in ["1", "0x1", "0x01"]:
             try:    
                 self.PcdValue =  pack(_FORMAT_CHAR[1], 1)
             except:
@@ -83,18 +109,65 @@ class PcdEntry:
                 self.PcdValue =  pack(_FORMAT_CHAR[1], 0)
             except:
                 EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
-                                "Invalid size or value for PCD %s to pack(File: %s Line: %s)." % (self.PcdCName, self.FileName, self.Lineno))      
-                               
+                                "Invalid size or value for PCD %s to pack(File: %s Line: %s)." % (self.PcdCName, self.FileName, self.Lineno)) 
+                     
+    ## Pack Integer type VPD PCD's value form string to binary type.
+    # 
+    #  @param ValueString     The Integer type string for pack.
+    # 
+    #                                
     def _PackIntValue(self, IntValue, Size):
         if Size not in _FORMAT_CHAR.keys():
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
                             "Invalid size %d for PCD %s in integer datum size(File: %s Line: %s)." % (Size, self.PcdCName, self.FileName, self.Lineno))        
+        
+        if Size == 1:            
+            if IntValue < 0:
+                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
+                                "PCD can't be set to negative value %d for PCD %s in UINT8 datum type(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
+            elif IntValue >= 0x100:
+                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
+                                "Too large PCD value %d for datum type UINT8 for PCD %s(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))                             
+        elif Size == 2:
+            if IntValue < 0:
+                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
+                                "PCD can't be set to negative value %d for PCD %s in UINT16 datum type(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
+            elif IntValue >= 0x10000:
+                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
+                                "Too large PCD value %d for datum type UINT16 for PCD %s(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno)) 
+        elif Size == 4:
+            if IntValue < 0:
+                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
+                                "PCD can't be set to negative value %d for PCD %s in UINT32 datum type(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
+            elif IntValue >= 0x100000000:
+                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
+                                "Too large PCD value %d for datum type UINT32 for PCD %s(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
+        elif Size == 8:
+            if IntValue < 0:
+                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
+                                "PCD can't be set to negative value %d for PCD %s in UINT32 datum type(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
+            elif IntValue >= 0x10000000000000000:
+                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
+                                "Too large PCD value %d for datum type UINT32 for PCD %s(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
+        else:
+            EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
+                            "Invalid size %d for PCD %s in integer datum size(File: %s Line: %s)." % (Size, self.PcdCName, self.FileName, self.Lineno))              
+        
         try:
             self.PcdValue =  pack(_FORMAT_CHAR[Size], IntValue)
         except:
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
                             "Invalid size or value for PCD %s to pack(File: %s Line: %s)." % (self.PcdCName, self.FileName, self.Lineno))                
-        
+
+    ## Pack VOID* type VPD PCD's value form string to binary type.
+    #
+    #  The VOID* type of string divided into 3 sub-type:
+    #    1:    L"String", Unicode type string.
+    #    2:    "String",  Ascii type string.
+    #    3:    {bytearray}, only support byte-array.
+    #
+    #  @param ValueString     The Integer type string for pack.
+    #       
     def _PackPtrValue(self, ValueString, Size):
         if ValueString.startswith('L"'):
             self._PackUnicode(ValueString, Size)
@@ -105,7 +178,11 @@ class PcdEntry:
         else:
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
                             "Invalid VOID* type PCD %s value %s (File: %s Line: %s)" % (self.PcdCName, ValueString, self.FileName, self.Lineno)) 
-                   
+            
+    ## Pack an Ascii PCD value.
+    #  
+    #  An Ascii string for a PCD should be in format as  "".
+    #                   
     def _PackString(self, ValueString, Size):
         if (Size < 0):
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
@@ -123,8 +200,12 @@ class PcdEntry:
             self.PcdValue=  pack('%ds' % Size, ValueString)
         except:
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 
-                            "Invalid size or value for PCD %s to pack(File: %s Line: %s)." % (self.PcdCName, self.FileName, self.Lineno))                  
-        
+                            "Invalid size or value for PCD %s to pack(File: %s Line: %s)." % (self.PcdCName, self.FileName, self.Lineno))   
+                           
+    ## Pack a byte-array PCD value.
+    #  
+    #  A byte-array for a PCD should be in format as  {0x01, 0x02, ...}.
+    #         
     def _PackByteArray(self, ValueString, Size):
         if (Size < 0):        
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "Invalid parameter Size %s of PCD %s!(File: %s Line: %s)" % (self.PcdBinSize, self.PcdCName, self.FileName, self.Lineno))
@@ -206,9 +287,18 @@ class PcdEntry:
             ReturnArray.append(0)
             
         self.PcdValue =  ReturnArray.tolist()    
-        
-class GenVPD :
-    
+
+
+
+## The class implementing the BPDG VPD PCD offset fix process
+#
+#   The VPD PCD offset fix process includes:
+#       1. Parse the input guided.txt file and store it in the data structure;
+#       2. Format the input file data to remove unused lines;
+#       3. Fixed offset if needed;
+#       4. Generate output file, including guided.map and guided.bin file;
+#        
+class GenVPD :    
     ## Constructor of DscBuildData
     #
     #  Initialize object of GenVPD
@@ -310,7 +400,7 @@ class GenVPD :
                     except:
                         EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "Invalid PCD size value %s at file: %s line: %s" % (PCD.PcdSize, self.InputFileName, PCD.Lineno))
                     
-                if PCD._IsBoolean(PCD.PcdValue):
+                if PCD._IsBoolean(PCD.PcdValue, PCD.PcdSize):
                     PCD._PackBooleanValue(PCD.PcdValue)
                     self.FileLinesList[count] = PCD
                     count += 1

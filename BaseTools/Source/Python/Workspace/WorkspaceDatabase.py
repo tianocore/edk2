@@ -141,7 +141,6 @@ class DscBuildData(PlatformBuildClassObject):
         self._BuildOptions      = None
         self._LoadFixAddress    = None
         self._VpdToolGuid       = None
-        self._VpdFileName       = None
 
     ## Get architecture
     def _GetArch(self):
@@ -204,9 +203,7 @@ class DscBuildData(PlatformBuildClassObject):
                     uuid.UUID(Record[1])
                 except:
                     EdkLogger.error("build", FORMAT_INVALID, "Invalid GUID format for VPD_TOOL_GUID", File=self.MetaFile)
-                self._VpdToolGuid = Record[1]               
-            elif Name == TAB_DSC_DEFINES_VPD_FILENAME:
-                self._VpdFileName = Record[1]       
+                self._VpdToolGuid = Record[1]                   
         # set _Header to non-None in order to avoid database re-querying
         self._Header = 'DUMMY'
 
@@ -350,16 +347,7 @@ class DscBuildData(PlatformBuildClassObject):
             if self._VpdToolGuid == None:
                 self._VpdToolGuid = ''
         return self._VpdToolGuid
-  
-    ## Retrieve the VPD file Name, this is optional in DSC file
-    def _GetVpdFileName(self):
-        if self._VpdFileName == None:
-            if self._Header == None:
-                self._GetHeaderInfo()
-            if self._VpdFileName == None:
-                self._VpdFileName = ''
-        return self._VpdFileName  
-    
+      
     ## Retrieve [SkuIds] section information
     def _GetSkuIds(self):
         if self._SkuIds == None:
@@ -802,8 +790,7 @@ class DscBuildData(PlatformBuildClassObject):
     BsBaseAddress       = property(_GetBsBaseAddress)
     RtBaseAddress       = property(_GetRtBaseAddress)
     LoadFixAddress      = property(_GetLoadFixAddress)
-    VpdToolGuid         = property(_GetVpdToolGuid)
-    VpdFileName         = property(_GetVpdFileName)    
+    VpdToolGuid         = property(_GetVpdToolGuid)   
     SkuIds              = property(_GetSkuIds)
     Modules             = property(_GetModules)
     LibraryInstances    = property(_GetLibraryInstances)
@@ -1330,18 +1317,16 @@ class InfBuildData(ModuleBuildClassObject):
             if Name in self:
                 self[Name] = Record[1]
             # some special items in [Defines] section need special treatment
-            elif Name in ('EFI_SPECIFICATION_VERSION', 'UEFI_SPECIFICATION_VERSION'):
+            elif Name in ('EFI_SPECIFICATION_VERSION', 'UEFI_SPECIFICATION_VERSION', 'EDK_RELEASE_VERSION', 'PI_SPECIFICATION_VERSION'):
+                if Name in ('EFI_SPECIFICATION_VERSION', 'UEFI_SPECIFICATION_VERSION'):
+                    Name = 'UEFI_SPECIFICATION_VERSION'
                 if self._Specification == None:
                     self._Specification = sdict()
-                self._Specification['UEFI_SPECIFICATION_VERSION'] = Record[1]
-            elif Name == 'EDK_RELEASE_VERSION':
-                if self._Specification == None:
-                    self._Specification = sdict()
-                self._Specification[Name] = Record[1]
-            elif Name == 'PI_SPECIFICATION_VERSION':
-                if self._Specification == None:
-                    self._Specification = sdict()
-                self._Specification[Name] = Record[1]
+                self._Specification[Name] = GetHexVerValue(Record[1])
+                if self._Specification[Name] == None:
+                    EdkLogger.error("build", FORMAT_NOT_SUPPORTED,
+                                    "'%s' format is not supported for %s" % (Record[1], Name),
+                                    File=self.MetaFile, Line=Record[-1])
             elif Name == 'LIBRARY_CLASS':
                 if self._LibraryClass == None:
                     self._LibraryClass = []

@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define common items of class object
 #
-# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.    The full text of the license may be found at
@@ -53,7 +53,7 @@ class CommonClass(object):
         self.HelpText = HelpText
         self.HelpTextList = []
 
-## CommonClass
+## CommonHeaderClass
 #
 # This class defined common items used in Module/Platform/Package files
 # 
@@ -301,7 +301,7 @@ class SkuInfoClass(object):
     #  @retval Rtn Formatted String
     #
     def __str__(self):
-        Rtn = Rtn = 'SkuId = ' + str(self.SkuId) + "," + \
+        Rtn = 'SkuId = ' + str(self.SkuId) + "," + \
                     'SkuIdName = ' + str(self.SkuIdName) + "," + \
                     'VariableName = ' + str(self.VariableName) + "," + \
                     'VariableGuid = ' + str(self.VariableGuid) + "," + \

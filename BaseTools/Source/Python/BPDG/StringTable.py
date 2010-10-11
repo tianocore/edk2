@@ -55,7 +55,7 @@ Intel(r) Binary Product Data Generation Tool (Intel(r) BPDG)
 Copyright (c) 2010 Intel Corporation All Rights Reserved.
 
 Required Flags:
-  -o VPD_FILENAME, --vpd-filename=VPD_FILENAME
+  -o BIN_FILENAME, --vpd-filename=BIN_FILENAME
             Specify the file name for the VPD binary file
   -m FILENAME, --map-filename=FILENAME
             Generate file name for consumption during the build that contains 
@@ -67,11 +67,10 @@ Required Flags:
 MSG_OPTION_HELP             = ("Show this help message and exit.")
 MSG_OPTION_DEBUG_LEVEL      = ("Print DEBUG statements, where DEBUG_LEVEL is 0-9.")
 MSG_OPTION_VERBOSE          = ("Print informational statements.")
-MSG_OPTION_SILENT           = ("Only the exit code will be returned, all informational and error messages will not be displayed.")
 MSG_OPTION_QUIET            = ("Returns the exit code and will display only error messages.")
 MSG_OPTION_VPD_FILENAME     = ("Specify the file name for the VPD binary file.")
 MSG_OPTION_MAP_FILENAME     = ("Generate file name for consumption during the build that contains the mapping of Pcd name, offset, datum size and value derived from the input file and any automatic calculations.")
-MSG_OPTION_FORCE            = ("Disable prompting the user for overwriting files as well as for missing input content.")
+MSG_OPTION_FORCE            = ("Will force overwriting existing output files rather than returning an error message.")
 
 ERR_INVALID_DEBUG_LEVEL     = ("Invalid level for debug message. Only "
                                 "'DEBUG', 'INFO', 'WARNING', 'ERROR', "

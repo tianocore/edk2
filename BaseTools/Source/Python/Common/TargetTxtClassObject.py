@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define each component of Target.txt file
 #
-# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -37,7 +37,6 @@ class TargetTxtClassObject(object):
             DataType.TAB_TAT_DEFINES_ACTIVE_PLATFORM                            : '',
             DataType.TAB_TAT_DEFINES_ACTIVE_MODULE                              : '',
             DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF                            : '',
-            DataType.TAB_TAT_DEFINES_MULTIPLE_THREAD                            : '',
             DataType.TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER               : '',
             DataType.TAB_TAT_DEFINES_TARGET                                     : [],
             DataType.TAB_TAT_DEFINES_TOOL_CHAIN_TAG                             : [],
@@ -102,12 +101,6 @@ class TargetTxtClassObject(object):
             elif Key in [DataType.TAB_TAT_DEFINES_TARGET, DataType.TAB_TAT_DEFINES_TARGET_ARCH, \
                          DataType.TAB_TAT_DEFINES_TOOL_CHAIN_TAG]:
                 self.TargetTxtDictionary[Key] = Value.split()
-            elif Key == DataType.TAB_TAT_DEFINES_MULTIPLE_THREAD:
-                if Value not in ["Enable", "Disable"]:
-                    EdkLogger.error("build", FORMAT_INVALID, "Invalid setting of [%s]: %s." % (Key, Value),
-                                    ExtraData="\tSetting must be one of [Enable, Disable]",
-                                    File=FileName)
-                self.TargetTxtDictionary[Key] = Value
             elif Key == DataType.TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER:
                 try:
                     V = int(Value, 0)

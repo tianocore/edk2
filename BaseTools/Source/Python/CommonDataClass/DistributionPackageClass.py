@@ -150,7 +150,6 @@ class DistributionPackageClass(object):
 # script.
 #
 if __name__ == '__main__':
-    pass
     D = DistributionPackageClass()
     D.GetDistributionPackage(os.getenv('WORKSPACE'), ['MdePkg/MdePkg.dec', 'TianoModulePkg/TianoModulePkg.dec'], ['MdeModulePkg/Application/HelloWorld/HelloWorld.inf'])
     Xml = DistributionPackageXml()

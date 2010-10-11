@@ -23,6 +23,9 @@ import EdkLogger as EdkLogger
 from GlobalData import *
 from BuildToolError import *
 
+gHexVerPatt = re.compile('0x[a-f0-9]{4}[a-f0-9]{4}$',re.IGNORECASE)
+gHumanReadableVerPatt = re.compile(r'([1-9][0-9]*|0)\.[0-9]{1,2}$')
+
 ## GetSplitValueList
 #
 # Get a value list from a string with multiple values splited with SplitTag
@@ -376,6 +379,34 @@ def GetMultipleValuesOfKeyFromLines(Lines, Key, KeyValues, CommentCharacter):
 def GetDefineValue(String, Key, CommentCharacter):
     String = CleanString(String)
     return String[String.find(Key + ' ') + len(Key + ' ') : ]
+
+## GetHexVerValue
+#
+# Get a Hex Version Value
+#
+# @param VerString:         The version string to be parsed
+#
+#
+# @retval:      If VerString is incorrectly formatted, return "None" which will break the build.
+#               If VerString is correctly formatted, return a Hex value of the Version Number (0xmmmmnnnn)
+#                   where mmmm is the major number and nnnn is the adjusted minor number.
+#
+def GetHexVerValue(VerString):
+    VerString = CleanString(VerString)
+
+    if gHumanReadableVerPatt.match(VerString):
+        ValueList = VerString.split('.')
+        Major = ValueList[0]
+        Minor = ValueList[1]
+        if len(Minor) == 1:
+            Minor += '0'
+        DeciValue = (int(Major) << 16) + int(Minor);
+        return "0x%08x"%DeciValue
+    elif gHexVerPatt.match(VerString):
+        return VerString
+    else:
+        return None
+
 
 ## GetSingleValueOfKeyFromLines
 #

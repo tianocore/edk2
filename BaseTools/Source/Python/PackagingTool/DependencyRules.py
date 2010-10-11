@@ -1,7 +1,7 @@
 ## @file
 # This file is for installed package information database operations
 #
-# Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -25,7 +25,7 @@ DEPEX_CHECK_PACKAGE_NOT_FOUND, DEPEX_CHECK_DP_NOT_FOUND) = (0, 1, 2, 3)
 
 ## IpiDb
 #
-# This class represents the installed package information databse
+# This class represents the installed package information database
 # Add/Remove/Get installed distribution package information here.
 # 
 # 
@@ -57,7 +57,7 @@ class DependencyRules(object):
             return False
         
 
-    ## Check whether a module depex satified by current workspace.
+    ## Check whether a module depex satisfied by current workspace.
     #
     # @param ModuleObj:  
     # @param DpObj:
@@ -103,7 +103,7 @@ class DependencyRules(object):
         
         EdkLogger.verbose("Check package exists in workspace ... DONE!")
         
-    ## Check whether a package depex satified by current workspace.
+    ## Check whether a package depex satisfied by current workspace.
     #
     # @param ModuleObj:  
     # @param DpObj:
@@ -135,7 +135,7 @@ class DependencyRules(object):
         
         EdkLogger.verbose("Check DP exists in workspace ... DONE!")
         
-    ## Check whether a DP depex satified by current workspace.
+    ## Check whether a DP depex satisfied by current workspace.
     #
     # @param ModuleObj:  
     # @param DpObj:
@@ -158,7 +158,7 @@ class DependencyRules(object):
         
         return True
     
-    ## Check whether a DP depex satified by current workspace.
+    ## Check whether a DP depex satisfied by current workspace.
     #
     # @param ModuleObj:  
     # @param DpObj:

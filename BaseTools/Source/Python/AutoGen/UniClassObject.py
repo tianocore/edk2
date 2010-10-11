@@ -444,6 +444,13 @@ class UniFileClassObject(object):
     # Add a string to list
     #
     def AddStringToList(self, Name, Language, Value, Token = None, Referenced = False, UseOtherLangDef = '', Index = -1):
+        for LangNameItem in self.LanguageDef:
+            if Language == LangNameItem[0]:
+                break
+        else:
+            EdkLogger.error('Unicode File Parser', FORMAT_NOT_SUPPORTED, "The language '%s' for %s is not defined in Unicode file %s." \
+                            % (Language, Name, self.File))
+            
         if Language not in self.OrderedStringList:
             self.OrderedStringList[Language] = []
 

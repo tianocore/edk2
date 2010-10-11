@@ -474,11 +474,11 @@ class InfParser(MetaFileParser):
     def _DefineParser(self):
         TokenList = GetSplitValueList(self._CurrentLine, TAB_EQUAL_SPLIT, 1)
         self._ValueList[0:len(TokenList)] = TokenList
-        self._Macros[TokenList[0]] = ReplaceMacro(TokenList[1], self._Macros, False)
         if self._ValueList[1] == '':
             EdkLogger.error('Parser', FORMAT_INVALID, "No value specified",
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex+1)
-
+        self._Macros[TokenList[0]] = ReplaceMacro(TokenList[1], self._Macros, False)
+        
     ## [nmake] section parser (R8.x style only)
     def _NmakeParser(self):
         TokenList = GetSplitValueList(self._CurrentLine, TAB_EQUAL_SPLIT, 1)
@@ -655,6 +655,11 @@ class DscParser(MetaFileParser):
                 continue
             # file private macros
             elif Line.upper().startswith('DEFINE '):
+                if self._Enabled < 0:
+                    # Do not parse the macro and add it to self._Macros dictionary if directives
+                    # statement is evaluated to false.
+                    continue
+                
                 (Name, Value) = self._MacroParser()
                 # Make the defined macro in DSC [Defines] section also
                 # available for FDF file.
@@ -676,6 +681,11 @@ class DscParser(MetaFileParser):
                     )
                 continue
             elif Line.upper().startswith('EDK_GLOBAL '):
+                if self._Enabled < 0:
+                    # Do not parse the macro and add it to self._Macros dictionary
+                    # if previous directives statement is evaluated to false.
+                    continue
+                
                 (Name, Value) = self._MacroParser()
                 for Arch, ModuleType in self._Scope:
                     self._LastItem = self._Store(
@@ -802,8 +812,8 @@ class DscParser(MetaFileParser):
             if not self._SectionName in self._IncludeAllowedSection:
                 EdkLogger.error("Parser", FORMAT_INVALID, File=self.MetaFile, Line=self._LineIndex+1,
                                 ExtraData="'!include' is not allowed under section [%s]" % self._SectionName)
-            # the included file must be relative to the parsing file
-            IncludedFile = os.path.join(self._FileDir, NormPath(self._ValueList[1], self._Macros))
+            # the included file must be relative to workspace
+            IncludedFile = os.path.join(os.environ["WORKSPACE"], NormPath(self._ValueList[1], self._Macros))
             Parser = DscParser(IncludedFile, self._FileType, self._Table, self._Macros, From=self._LastItem)
             # set the parser status with current status
             Parser._SectionName = self._SectionName

@@ -33,7 +33,6 @@ class TargetTool():
         self.TargetTxtDictionary = {
             TAB_TAT_DEFINES_ACTIVE_PLATFORM                            : None,
             TAB_TAT_DEFINES_TOOL_CHAIN_CONF                            : None,
-            TAB_TAT_DEFINES_MULTIPLE_THREAD                            : None,
             TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER               : None,
             TAB_TAT_DEFINES_TARGET                                     : None,
             TAB_TAT_DEFINES_TOOL_CHAIN_TAG                             : None,
@@ -44,7 +43,7 @@ class TargetTool():
 
     def LoadTargetTxtFile(self, filename):
         if os.path.exists(filename) and os.path.isfile(filename):
-             return self.ConvertTextFileToDict(filename, '#', '=')
+            return self.ConvertTextFileToDict(filename, '#', '=')
         else:
             raise ParseError('LoadTargetTxtFile() : No Target.txt file exists.')
             return 1
@@ -64,7 +63,7 @@ class TargetTool():
                     Key = LineList[0].strip()
                     if Key.startswith(CommentCharacter) == False and Key in self.TargetTxtDictionary.keys():
                         if Key == TAB_TAT_DEFINES_ACTIVE_PLATFORM or Key == TAB_TAT_DEFINES_TOOL_CHAIN_CONF \
-                          or Key == TAB_TAT_DEFINES_MULTIPLE_THREAD or Key == TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER \
+                          or Key == TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER \
                           or Key == TAB_TAT_DEFINES_ACTIVE_MODULE:
                             self.TargetTxtDictionary[Key] = LineList[1].replace('\\', '/').strip()
                         elif Key == TAB_TAT_DEFINES_TARGET or Key == TAB_TAT_DEFINES_TARGET_ARCH \
@@ -149,15 +148,13 @@ def GetConfigureKeyValue(self, Key):
         else:
             EdkLogger.error("TagetTool", BuildToolError.FILE_NOT_FOUND, 
                             "Tooldef file %s does not exist!" % self.Opt.TOOL_DEFINITION_FILE, RaiseError=False)
-    elif Key == TAB_TAT_DEFINES_MULTIPLE_THREAD and self.Opt.NUM != None:
-        if self.Opt.NUM >= 2:
-            Line = "%-30s = %s\n" % (Key, 'Enable')
-        else:
-            Line = "%-30s = %s\n" % (Key, 'Disable')
+
+    elif self.Opt.NUM >= 2:
+        Line = "%-30s = %s\n" % (Key, 'Enable')
+    elif self.Opt.NUM <= 1:
+        Line = "%-30s = %s\n" % (Key, 'Disable')        
     elif Key == TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER and self.Opt.NUM != None:
         Line = "%-30s = %s\n" % (Key, str(self.Opt.NUM))
-    elif Key == TAB_TAT_DEFINES_MULTIPLE_THREAD and self.Opt.ENABLE_MULTI_THREAD != None:
-        Line = "%-30s = %s\n" % (Key, self.Opt.ENABLE_MULTI_THREAD)
     elif Key == TAB_TAT_DEFINES_TARGET and self.Opt.TARGET != None:
         Line = "%-30s = %s\n" % (Key, ''.join(elem + ' ' for elem in self.Opt.TARGET))
     elif Key == TAB_TAT_DEFINES_TARGET_ARCH and self.Opt.TARGET_ARCH != None:
@@ -216,8 +213,6 @@ def MyOptionParser():
         help="Specify the build rule configure file, which replaces target.txt's BUILD_RULE_CONF definition. If not specified, the default value Conf/build_rule.txt will be set.")
     parser.add_option("-m", "--multithreadnum", action="callback", type="int", dest="NUM", callback=RangeCheckCallback,
         help="Specify the multi-thread number which replace target.txt's MAX_CONCURRENT_THREAD_NUMBER. If the value is less than 2, MULTIPLE_THREAD will be disabled. If the value is larger than 1, MULTIPLE_THREAD will be enabled.")
-    parser.add_option("-e", "--enablemultithread", action="store", type="choice", choices=['Enable', 'Disable'], dest="ENABLE_MULTI_THREAD", 
-        help="Specify whether enable multi-thread! If Enable, multi-thread is enabled; If Disable, mutli-thread is disable")
     (opt, args)=parser.parse_args()
     return (opt, args)
 

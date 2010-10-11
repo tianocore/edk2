@@ -18,22 +18,22 @@ DEFINE VS2003_BIN       = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7
 DEFINE VS2003_DLL       = C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\IDE
 
 DEFINE VS2005_BIN       = C:\Program Files\Microsoft Visual Studio 8\Vc\bin
-DEFINE VS2005_DLL       = C:\Program Files\Microsoft Visual Studio 8\Common7\IDE
+DEFINE VS2005_DLL       = C:\Program Files\Microsoft Visual Studio 8\Common7\IDE;DEF(VS2005_BIN)
 DEFINE VS2005_BINX64    = C:\Program Files\Microsoft Visual Studio 8\Vc\bin\x86_amd64
 DEFINE VS2005_BIN64     = C:\Program Files\Microsoft Visual Studio 8\Vc\bin\x86_ia64
 
 DEFINE VS2005x86_BIN    = C:\Program Files (x86)\Microsoft Visual Studio 8\Vc\bin
-DEFINE VS2005x86_DLL    = C:\Program Files (x86)\Microsoft Visual Studio 8\Common7\IDE
+DEFINE VS2005x86_DLL    = C:\Program Files (x86)\Microsoft Visual Studio 8\Common7\IDE;DEF(VS2005x86_BIN)
 DEFINE VS2005x86_BINX64 = DEF(VS2005x86_BIN)\x86_amd64
 DEFINE VS2005x86_BIN64  = DEF(VS2005x86_BIN)\x86_ia64
 
 DEFINE VS2008_BIN      = C:\Program Files\Microsoft Visual Studio 9.0\Vc\bin
-DEFINE VS2008_DLL      = C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE
+DEFINE VS2008_DLL      = C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE;DEF(VS2008_BIN)
 DEFINE VS2008_BINX64   = DEF(VS2008_BIN)\x86_amd64
 DEFINE VS2008_BIN64    = DEF(VS2008_BIN)\x86_ia64
 
 DEFINE VS2008x86_BIN    = C:\Program Files (x86)\Microsoft Visual Studio 9.0\Vc\bin
-DEFINE VS2008x86_DLL    = C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE
+DEFINE VS2008x86_DLL    = C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE;DEF(VS2008x86_BIN)
 DEFINE VS2008x86_BINX64 = DEF(VS2008x86_BIN)\x86_amd64
 DEFINE VS2008x86_BIN64  = DEF(VS2008x86_BIN)\x86_ia64
 
@@ -149,11 +149,11 @@ DEFINE DEFAULT_WIN_ASL_OUTFLAGS = DEF(IASL_OUTFLAGS)
 #DEFINE DEFAULT_WIN_ASL_FLAGS    = DEF(MS_ASL_FLAGS)
 #DEFINE DEFAULT_WIN_ASL_OUTFLAGS = DEF(MS_ASL_OUTFLAGS)
 
-DEFINE MSFT_ASLPP_FLAGS        = /nologo /EP /C
+DEFINE MSFT_ASLPP_FLAGS        = /nologo /E /C /FIAutoGen.h
 DEFINE MSFT_ASLCC_FLAGS        = /GL- /Y- /TC /Dmain=ReferenceAcpiTable
 DEFINE MSFT_ASLDLINK_FLAGS     = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:CONSOLE
 
-DEFINE ICC_WIN_ASLPP_FLAGS     = /nologo /EP /C
+DEFINE ICC_WIN_ASLPP_FLAGS     = /nologo /E /C /FIAutoGen.h
 DEFINE ICC_WIN_ASLCC_FLAGS     = /Y- /TC /WX- /Od /Dmain=ReferenceAcpiTable
 DEFINE ICC_WIN_ASLDLINK_FLAGS  = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:CONSOLE /NODEFAULTLIB:libmmt /NODEFAULTLIB:libirc
 

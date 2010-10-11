@@ -23,7 +23,7 @@ from BuildToolError import *
 from TargetTxtClassObject import *
 
 ##
-# Static vailabes used for pattern
+# Static variables used for pattern
 #
 gMacroRefPattern = re.compile('(DEF\([^\(\)]+\))')
 gEnvRefPattern = re.compile('(ENV\([^\(\)]+\))')

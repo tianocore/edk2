@@ -26,7 +26,7 @@ from BuildEngine import *
 import Common.GlobalData as GlobalData
 
 ## Regular expression for finding header file inclusions
-gIncludePattern = re.compile(r"^[ \t]*#?[ \t]*include(?:[ \t]*(?:\\(?:\r\n|\r|\n))*[ \t]*)*(?:[\"<]?[ \t]*)([\w.\\/() \t]+)(?:[ \t]*[\">]?)", re.MULTILINE|re.UNICODE|re.IGNORECASE)
+gIncludePattern = re.compile(r"^[ \t]*#?[ \t]*include(?:[ \t]*(?:\\(?:\r\n|\r|\n))*[ \t]*)*(?:\(?[\"<]?[ \t]*)([-\w.\\/() \t]+)(?:[ \t]*[\">]?\)?)", re.MULTILINE|re.UNICODE|re.IGNORECASE)
 
 ## Regular expression for matching macro used in header file inclusion
 gMacroPattern = re.compile("([_A-Z][_A-Z0-9]*)[ \t]*\((.+)\)", re.UNICODE)
@@ -769,7 +769,7 @@ cleanlib:
                     Inc = os.path.normpath(Inc)
                     for SearchPath in [CurrentFilePath] + SearchPathList:
                         FilePath = os.path.join(SearchPath, Inc)
-                        if not os.path.exists(FilePath) or FilePath in CurrentFileDependencyList:
+                        if not os.path.isfile(FilePath) or FilePath in CurrentFileDependencyList:
                             continue
                         FilePath = PathClass(FilePath)
                         CurrentFileDependencyList.append(FilePath)

@@ -219,28 +219,23 @@ class VpdInfoFile:
 #  @param ToolPath      The string path name for BPDG tool
 #  @param VpdFileName   The string path name for VPD information guid.txt
 # 
-def CallExtenalBPDGTool(ToolPath, VpdFilePath, VpdFileName):
+def CallExtenalBPDGTool(ToolPath, VpdFileName):
     assert ToolPath != None, "Invalid parameter ToolPath"
-    assert VpdFilePath != None and os.path.exists(VpdFilePath), "Invalid parameter VpdFileName"
+    assert VpdFileName != None and os.path.exists(VpdFileName), "Invalid parameter VpdFileName"
     
-    OutputDir = os.path.dirname(VpdFilePath)
-    if (VpdFileName == None or VpdFileName == "") :
-        FileName = os.path.basename(VpdFilePath)
-        BaseName, ext = os.path.splitext(FileName)
-        OutputMapFileName = os.path.join(OutputDir, "%s.map" % BaseName)
-        OutputBinFileName = os.path.join(OutputDir, "%s.bin" % BaseName)
-    else :
-        OutputMapFileName = os.path.join(OutputDir, "%s.map" % VpdFileName)
-        OutputBinFileName = os.path.join(OutputDir, "%s.bin" % VpdFileName)
+    OutputDir = os.path.dirname(VpdFileName)
+    FileName = os.path.basename(VpdFileName)
+    BaseName, ext = os.path.splitext(FileName)
+    OutputMapFileName = os.path.join(OutputDir, "%s.map" % BaseName)
+    OutputBinFileName = os.path.join(OutputDir, "%s.bin" % BaseName)
           
     try:
         PopenObject = subprocess.Popen([ToolPath,
                                         '-o', OutputBinFileName, 
                                         '-m', OutputMapFileName,
-                                        '-s',
+                                        '-q',
                                         '-f',
-                                        '-v',
-                                        VpdFilePath],
+                                        VpdFileName],
                                         stdout=subprocess.PIPE, 
                                         stderr= subprocess.PIPE)
     except Exception, X:
