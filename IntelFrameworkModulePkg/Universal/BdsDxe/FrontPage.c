@@ -677,7 +677,11 @@ GetOptionalStringByIndex (
     StrSize           = AsciiStrSize (OptionalStrStart);
   } while (OptionalStrStart[StrSize] != 0 && Index != 0);
 
-  if (Index != 0) {
+  if ((Index != 0) || (StrSize == 1)) {
+    //
+    // Meet the end of strings set but Index is non-zero, or
+    // Find an empty string
+    //
     *String = GetStringById (STRING_TOKEN (STR_MISSING_STRING));
   } else {
     *String = AllocatePool (StrSize * sizeof (CHAR16));
