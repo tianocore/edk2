@@ -62,7 +62,7 @@ Returns:
   EFI_PHYSICAL_ADDRESS    FdFixUp;
   UINT64                  FdSize;
 
-  DEBUG ((EFI_D_ERROR, "NT 32 Flash Map PEIM Loaded\n"));
+  DEBUG ((EFI_D_ERROR, "UnixPkg Flash Map PEIM Loaded\n"));
 
   //
   // Get the Fwh Information PPI
