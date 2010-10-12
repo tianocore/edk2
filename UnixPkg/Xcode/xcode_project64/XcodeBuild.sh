@@ -11,4 +11,4 @@ set -e
 #
 cd ../..
 echo `pwd`
-./build64.sh
+./build64.sh $1 $2 $3 $4 $5 $6 $8
