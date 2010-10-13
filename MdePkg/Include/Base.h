@@ -1,8 +1,8 @@
 /** @file
   Root include file for Mde Package Base type modules
 
-  This is the include file for any module of type base. Base modules only use 
-  types defined via this include file and can be ported easily to any 
+  This is the include file for any module of type base. Base modules only use
+  types defined via this include file and can be ported easily to any
   environment. There are a set of base libraries in the Mde Package that can
   be used to implement base modules.
 
@@ -30,7 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Verifies the storage size of a given data type.
-  
+
   This macro generates a divide by zero error or a zero size array declaration in
   the preprocessor if the size is incorrect.  These are declared as "extern" so
   the space for these arrays will not be in the modules.
@@ -42,8 +42,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define VERIFY_SIZE_OF(TYPE, Size) extern UINT8 _VerifySizeof##TYPE[(sizeof(TYPE) == (Size)) / (sizeof(TYPE) == (Size))]
 
 //
-// Verify that ProcessorBind.h produced UEFI Data Types that are compliant with 
-// Section 2.3.1 of the UEFI 2.3 Specification.  
+// Verify that ProcessorBind.h produced UEFI Data Types that are compliant with
+// Section 2.3.1 of the UEFI 2.3 Specification.
 //
 VERIFY_SIZE_OF (BOOLEAN, 1);
 VERIFY_SIZE_OF (INT8, 1);
@@ -59,19 +59,19 @@ VERIFY_SIZE_OF (CHAR16, 2);
 
 //
 // The Microsoft* C compiler can removed references to unreferenced data items
-//  if the /OPT:REF linker option is used. We defined a macro as this is a 
+//  if the /OPT:REF linker option is used. We defined a macro as this is a
 //  a non standard extension
 //
 #if defined(_MSC_EXTENSIONS) && !defined (MDE_CPU_EBC)
   ///
-  /// Remove global variable from the linked image if there are no references to 
+  /// Remove global variable from the linked image if there are no references to
   /// it after all compiler and linker optimizations have been performed.
   ///
   ///
   #define GLOBAL_REMOVE_IF_UNREFERENCED __declspec(selectany)
 #else
   ///
-  /// Remove the global variable from the linked image if there are no references 
+  /// Remove the global variable from the linked image if there are no references
   ///  to it after all compiler and linker optimizations have been performed.
   ///
   ///
@@ -97,7 +97,7 @@ VERIFY_SIZE_OF (CHAR16, 2);
 
 #if __APPLE__
   //
-  // Apple extension that is used by the linker to optimize code size 
+  // Apple extension that is used by the linker to optimize code size
   // with assembly functions. Put at the end of your .S files
   //
   #define ASM_FUNCTION_REMOVE_IF_UNREFERENCED  .subsections_via_symbols
@@ -107,7 +107,7 @@ VERIFY_SIZE_OF (CHAR16, 2);
 
 #ifdef __CC_ARM
   //
-  // Older RVCT ARM compilers don't fully support #pragma pack and require __packed 
+  // Older RVCT ARM compilers don't fully support #pragma pack and require __packed
   // as a prefix for the structure.
   //
   #define PACKED  __packed
@@ -116,7 +116,7 @@ VERIFY_SIZE_OF (CHAR16, 2);
 #endif
 
 ///
-/// 128 bit buffer containing a unique identifier value.  
+/// 128 bit buffer containing a unique identifier value.
 /// Unless otherwise specified, aligned on a 64 bit boundary.
 ///
 typedef struct {
@@ -185,7 +185,7 @@ struct _LIST_ENTRY {
 #define OPTIONAL
 
 //
-//  UEFI specification claims 1 and 0. We are concerned about the 
+//  UEFI specification claims 1 and 0. We are concerned about the
 //  complier portability so we did it this way.
 //
 
@@ -326,7 +326,7 @@ struct _LIST_ENTRY {
 #define  SIZE_2EB    0x2000000000000000ULL
 #define  SIZE_4EB    0x4000000000000000ULL
 #define  SIZE_8EB    0x8000000000000000ULL
- 
+
 #define  BASE_1KB    0x00000400
 #define  BASE_2KB    0x00000800
 #define  BASE_4KB    0x00001000
@@ -384,7 +384,7 @@ struct _LIST_ENTRY {
 
 //
 //  Support for variable length argument lists using the ANSI standard.
-//  
+//
 //  Since we are using the ANSI standard we used the standard naming and
 //  did not follow the coding convention
 //
@@ -437,8 +437,8 @@ struct _LIST_ENTRY {
 //
 
 ///
-/// Variable used to traverse the list of arguments. This type can vary by 
-/// implementation and could be an array or structure. 
+/// Variable used to traverse the list of arguments. This type can vary by
+/// implementation and could be an array or structure.
 ///
 #ifdef __APCS_ADSABI
   typedef int         *va_list[1];
@@ -460,8 +460,8 @@ struct _LIST_ENTRY {
 //
 
 ///
-/// Variable used to traverse the list of arguments. This type can vary by 
-/// implementation and could be an array or structure. 
+/// Variable used to traverse the list of arguments. This type can vary by
+/// implementation and could be an array or structure.
 ///
 typedef __builtin_va_list VA_LIST;
 
@@ -473,42 +473,42 @@ typedef __builtin_va_list VA_LIST;
 
 #else
 ///
-/// Variable used to traverse the list of arguments. This type can vary by 
-/// implementation and could be an array or structure. 
+/// Variable used to traverse the list of arguments. This type can vary by
+/// implementation and could be an array or structure.
 ///
 typedef CHAR8 *VA_LIST;
 
 /**
-  Retrieves a pointer to the beginning of a variable argument list, based on 
-  the name of the parameter that immediately precedes the variable argument list. 
+  Retrieves a pointer to the beginning of a variable argument list, based on
+  the name of the parameter that immediately precedes the variable argument list.
 
-  This function initializes Marker to point to the beginning of the variable  
-  argument list that immediately follows Parameter.  The method for computing the 
-  pointer to the next argument in the argument list is CPU-specific following the 
+  This function initializes Marker to point to the beginning of the variable
+  argument list that immediately follows Parameter.  The method for computing the
+  pointer to the next argument in the argument list is CPU-specific following the
   EFIAPI ABI.
 
   @param   Marker       The VA_LIST used to traverse the list of arguments.
-  @param   Parameter    The name of the parameter that immediately precedes 
+  @param   Parameter    The name of the parameter that immediately precedes
                         the variable argument list.
-  
+
   @return  A pointer to the beginning of a variable argument list.
 
 **/
 #define VA_START(Marker, Parameter) (Marker = (VA_LIST) ((UINTN) & (Parameter) + _INT_SIZE_OF (Parameter)))
 
 /**
-  Returns an argument of a specified type from a variable argument list and updates 
-  the pointer to the variable argument list to point to the next argument. 
+  Returns an argument of a specified type from a variable argument list and updates
+  the pointer to the variable argument list to point to the next argument.
 
-  This function returns an argument of the type specified by TYPE from the beginning 
-  of the variable argument list specified by Marker.  Marker is then updated to point 
-  to the next argument in the variable argument list.  The method for computing the 
+  This function returns an argument of the type specified by TYPE from the beginning
+  of the variable argument list specified by Marker.  Marker is then updated to point
+  to the next argument in the variable argument list.  The method for computing the
   pointer to the next argument in the argument list is CPU-specific following the EFIAPI ABI.
 
   @param   Marker   VA_LIST used to traverse the list of arguments.
-  @param   TYPE     The type of argument to retrieve from the beginning 
+  @param   TYPE     The type of argument to retrieve from the beginning
                     of the variable argument list.
-  
+
   @return  An argument of the type specified by TYPE.
 
 **/
@@ -517,12 +517,12 @@ typedef CHAR8 *VA_LIST;
 /**
   Terminates the use of a variable argument list.
 
-  This function initializes Marker so it can no longer be used with VA_ARG().  
-  After this macro is used, the only way to access the variable argument list is 
+  This function initializes Marker so it can no longer be used with VA_ARG().
+  After this macro is used, the only way to access the variable argument list is
   by using VA_START() again.
 
   @param   Marker   VA_LIST used to traverse the list of arguments.
-  
+
 **/
 #define VA_END(Marker)      (Marker = (VA_LIST) 0)
 
@@ -543,130 +543,138 @@ typedef UINTN  *BASE_LIST;
 #define _BASE_INT_SIZE_OF(TYPE) ((sizeof (TYPE) + sizeof (UINTN) - 1) / sizeof (UINTN))
 
 /**
-  Returns an argument of a specified type from a variable argument list and updates 
-  the pointer to the variable argument list to point to the next argument. 
+  Returns an argument of a specified type from a variable argument list and updates
+  the pointer to the variable argument list to point to the next argument.
 
-  This function returns an argument of the type specified by TYPE from the beginning 
-  of the variable argument list specified by Marker.  Marker is then updated to point 
-  to the next argument in the variable argument list.  The method for computing the 
+  This function returns an argument of the type specified by TYPE from the beginning
+  of the variable argument list specified by Marker.  Marker is then updated to point
+  to the next argument in the variable argument list.  The method for computing the
   pointer to the next argument in the argument list is CPU specific following the EFIAPI ABI.
 
   @param   Marker   The pointer to the beginning of a variable argument list.
-  @param   TYPE     The type of argument to retrieve from the beginning 
+  @param   TYPE     The type of argument to retrieve from the beginning
                     of the variable argument list.
-  
+
   @return  An argument of the type specified by TYPE.
 
 **/
 #define BASE_ARG(Marker, TYPE)   (*(TYPE *) ((Marker += _BASE_INT_SIZE_OF (TYPE)) - _BASE_INT_SIZE_OF (TYPE)))
 
 /**
-  The macro that returns the byte offset of a field in a data structure. 
+  The macro that returns the byte offset of a field in a data structure.
 
-  This function returns the offset, in bytes, of field specified by Field from the 
-  beginning of the  data structure specified by TYPE. If TYPE does not contain Field, 
-  the module will not compile.  
+  This function returns the offset, in bytes, of field specified by Field from the
+  beginning of the  data structure specified by TYPE. If TYPE does not contain Field,
+  the module will not compile.
 
-  @param   TYPE     The name of the data structure that contains the field specified by Field. 
+  @param   TYPE     The name of the data structure that contains the field specified by Field.
   @param   Field    The name of the field in the data structure.
-  
+
   @return  Offset, in bytes, of field.
-  
+
 **/
+#ifdef __GNUC__
+#if __GNUC__ >= 4
+#define OFFSET_OF(TYPE, Field) ((UINTN) __builtin_offsetof(TYPE, Field))
+#endif
+#endif
+
+#ifndef OFFSET_OF
 #define OFFSET_OF(TYPE, Field) ((UINTN) &(((TYPE *)0)->Field))
+#endif
 
 /**
-  Macro that returns a pointer to the data structure that contains a specified field of 
-  that data structure.  This is a lightweight method to hide information by placing a 
-  public data structure inside a larger private data structure and using a pointer to 
+  Macro that returns a pointer to the data structure that contains a specified field of
+  that data structure.  This is a lightweight method to hide information by placing a
+  public data structure inside a larger private data structure and using a pointer to
   the public data structure to retrieve a pointer to the private data structure.
 
-  This function computes the offset, in bytes, of field specified by Field from the beginning 
-  of the  data structure specified by TYPE.  This offset is subtracted from Record, and is 
-  used to return a pointer to a data structure of the type specified by TYPE. If the data type 
-  specified by TYPE does not contain the field specified by Field, then the module will not compile. 
-   
-  @param   Record   Pointer to the field specified by Field within a data structure of type TYPE. 
-  @param   TYPE     The name of the data structure type to return.  This data structure must 
-                    contain the field specified by Field. 
+  This function computes the offset, in bytes, of field specified by Field from the beginning
+  of the  data structure specified by TYPE.  This offset is subtracted from Record, and is
+  used to return a pointer to a data structure of the type specified by TYPE. If the data type
+  specified by TYPE does not contain the field specified by Field, then the module will not compile.
+
+  @param   Record   Pointer to the field specified by Field within a data structure of type TYPE.
+  @param   TYPE     The name of the data structure type to return.  This data structure must
+                    contain the field specified by Field.
   @param   Field    The name of the field in the data structure specified by TYPE to which Record points.
-  
+
   @return  A pointer to the structure from one of it's elements.
-  
+
 **/
 #define BASE_CR(Record, TYPE, Field)  ((TYPE *) ((CHAR8 *) (Record) - (CHAR8 *) &(((TYPE *) 0)->Field)))
 
 /**
-  Rounds a value up to the next boundary using a specified alignment.  
+  Rounds a value up to the next boundary using a specified alignment.
 
-  This function rounds Value up to the next boundary using the specified Alignment.  
-  This aligned value is returned.  
+  This function rounds Value up to the next boundary using the specified Alignment.
+  This aligned value is returned.
 
   @param   Value      The value to round up.
   @param   Alignment  The alignment boundary used to return the aligned value.
-  
+
   @return  A value up to the next boundary.
-  
+
 **/
 #define ALIGN_VALUE(Value, Alignment) ((Value) + (((Alignment) - (Value)) & ((Alignment) - 1)))
 
 /**
-  Adjust a pointer by adding the minimum offset required for it to be aligned on 
-  a specified alignment boundary.  
+  Adjust a pointer by adding the minimum offset required for it to be aligned on
+  a specified alignment boundary.
 
-  This function rounds the pointer specified by Pointer to the next alignment boundary 
-  specified by Alignment. The pointer to the aligned address is returned.  
+  This function rounds the pointer specified by Pointer to the next alignment boundary
+  specified by Alignment. The pointer to the aligned address is returned.
 
   @param   Pointer    The pointer to round up.
   @param   Alignment  The alignment boundary to use to return an aligned pointer.
-  
+
   @return  Pointer to the aligned address.
-  
+
 **/
 #define ALIGN_POINTER(Pointer, Alignment) ((VOID *) (ALIGN_VALUE ((UINTN)(Pointer), (Alignment))))
 
 /**
-  Rounds a value up to the next natural boundary for the current CPU.  
-  This is 4-bytes for 32-bit CPUs and 8-bytes for 64-bit CPUs.   
+  Rounds a value up to the next natural boundary for the current CPU.
+  This is 4-bytes for 32-bit CPUs and 8-bytes for 64-bit CPUs.
 
-  This function rounds the value specified by Value up to the next natural boundary for the 
-  current CPU. This rounded value is returned.  
+  This function rounds the value specified by Value up to the next natural boundary for the
+  current CPU. This rounded value is returned.
 
   @param   Value      The value to round up.
 
   @return  Rounded value specified by Value.
-  
+
 **/
 #define ALIGN_VARIABLE(Value)  ALIGN_VALUE ((Value), sizeof (UINTN))
-  
+
 
 /**
-  Return the maximum of two operands. 
+  Return the maximum of two operands.
 
-  This macro returns the maximum of two operand specified by a and b.  
+  This macro returns the maximum of two operand specified by a and b.
   Both a and b must be the same numerical types, signed or unsigned.
 
   @param   a        The first operand with any numerical type.
-  @param   b        The second operand. Can be any numerical type as long as is 
+  @param   b        The second operand. Can be any numerical type as long as is
                     the same type as a.
-  
+
   @return  Maximum of two operands.
-  
+
 **/
 #define MAX(a, b)                       \
   (((a) > (b)) ? (a) : (b))
 
 /**
-  Return the minimum of two operands. 
+  Return the minimum of two operands.
 
-  This macro returns the minimal of two operand specified by a and b.  
+  This macro returns the minimal of two operand specified by a and b.
   Both a and b must be the same numerical types, signed or unsigned.
 
   @param   a        The first operand with any numerical type.
   @param   b        The second operand. It should be the same any numerical type with a.
-  
+
   @return  Minimum of two operands.
-  
+
 **/
 
 #define MIN(a, b)                       \
@@ -678,9 +686,9 @@ typedef UINTN  *BASE_LIST;
 typedef UINTN RETURN_STATUS;
 
 /**
-  Produces a RETURN_STATUS code with the highest bit set. 
+  Produces a RETURN_STATUS code with the highest bit set.
 
-  @param  StatusCode    The status code value to convert into a warning code.  
+  @param  StatusCode    The status code value to convert into a warning code.
                         StatusCode must be in the range 0x00000000..0x7FFFFFFF.
 
   @return The value specified by StatusCode with the highest bit set.
@@ -689,9 +697,9 @@ typedef UINTN RETURN_STATUS;
 #define ENCODE_ERROR(StatusCode)     ((RETURN_STATUS)(MAX_BIT | (StatusCode)))
 
 /**
-  Produces a RETURN_STATUS code with the highest bit clear. 
+  Produces a RETURN_STATUS code with the highest bit clear.
 
-  @param  StatusCode    The status code value to convert into a warning code.  
+  @param  StatusCode    The status code value to convert into a warning code.
                         StatusCode must be in the range 0x00000000..0x7FFFFFFF.
 
   @return The value specified by StatusCode with the highest bit clear.
@@ -700,10 +708,10 @@ typedef UINTN RETURN_STATUS;
 #define ENCODE_WARNING(StatusCode)   ((RETURN_STATUS)(StatusCode))
 
 /**
-  Returns TRUE if a specified RETURN_STATUS code is an error code. 
+  Returns TRUE if a specified RETURN_STATUS code is an error code.
 
-  This function returns TRUE if StatusCode has the high bit set.  Otherwise, FALSE is returned.  
-  
+  This function returns TRUE if StatusCode has the high bit set.  Otherwise, FALSE is returned.
+
   @param  StatusCode    The status code value to evaluate.
 
   @retval TRUE          The high bit of StatusCode is set.
@@ -766,7 +774,7 @@ typedef UINTN RETURN_STATUS;
 #define RETURN_OUT_OF_RESOURCES      ENCODE_ERROR (9)
 
 ///
-/// An inconsistency was detected on the file system causing the 
+/// An inconsistency was detected on the file system causing the
 /// operation to fail.
 ///
 #define RETURN_VOLUME_CORRUPTED      ENCODE_ERROR (10)
@@ -777,7 +785,7 @@ typedef UINTN RETURN_STATUS;
 #define RETURN_VOLUME_FULL           ENCODE_ERROR (11)
 
 ///
-/// The device does not contain any medium to perform the 
+/// The device does not contain any medium to perform the
 /// operation.
 ///
 #define RETURN_NO_MEDIA              ENCODE_ERROR (12)
@@ -893,17 +901,17 @@ typedef UINTN RETURN_STATUS;
 #define RETURN_WARN_WRITE_FAILURE    ENCODE_WARNING (3)
 
 ///
-/// The resulting buffer was too small, and the data was 
+/// The resulting buffer was too small, and the data was
 /// truncated to the buffer size.
 ///
 #define RETURN_WARN_BUFFER_TOO_SMALL ENCODE_WARNING (4)
 
 /**
   Returns a 16-bit signature built from 2 ASCII characters.
-  
-  This macro returns a 16-bit value built from the two ASCII characters specified 
+
+  This macro returns a 16-bit value built from the two ASCII characters specified
   by A and B.
-  
+
   @param  A    The first ASCII character.
   @param  B    The second ASCII character.
 
@@ -914,10 +922,10 @@ typedef UINTN RETURN_STATUS;
 
 /**
   Returns a 32-bit signature built from 4 ASCII characters.
-  
-  This macro returns a 32-bit value built from the four ASCII characters specified 
+
+  This macro returns a 32-bit value built from the four ASCII characters specified
   by A, B, C, and D.
-  
+
   @param  A    The first ASCII character.
   @param  B    The second ASCII character.
   @param  C    The third ASCII character.
@@ -931,10 +939,10 @@ typedef UINTN RETURN_STATUS;
 
 /**
   Returns a 64-bit signature built from 8 ASCII characters.
-  
-  This macro returns a 64-bit value built from the eight ASCII characters specified 
+
+  This macro returns a 64-bit value built from the eight ASCII characters specified
   by A, B, C, D, E, F, G,and H.
-  
+
   @param  A    The first ASCII character.
   @param  B    The second ASCII character.
   @param  C    The third ASCII character.
