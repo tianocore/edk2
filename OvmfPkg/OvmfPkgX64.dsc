@@ -30,9 +30,9 @@
   FLASH_DEFINITION               = OvmfPkg/OvmfPkgX64.fdf
 
 [BuildOptions]
-  GCC:*_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
-  INTEL:*_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
-  MSFT:*_*_*_CC_FLAGS            = /D MDEPKG_NDEBUG
+  GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
+  INTEL:RELEASE_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
+  MSFT:RELEASE_*_*_CC_FLAGS            = /D MDEPKG_NDEBUG
 
 ################################################################################
 #
@@ -93,10 +93,10 @@
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
 !endif
-  
+
   ResetSystemLib|PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
   LocalApicLib|UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
-  
+
 [LibraryClasses.common.SEC]
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
@@ -381,4 +381,4 @@
   MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
 !endif
-  
+
