@@ -2,13 +2,13 @@
 
 Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -16,7 +16,7 @@ Module Name:
 
 Abstract:
 
-  Since the SEC is the only program in our emulation we 
+  Since the SEC is the only program in our emulation we
   must use a Tiano mechanism to export APIs to other modules.
   This is the role of the EFI_UNIX_THUNK_PROTOCOL.
 
@@ -25,7 +25,7 @@ Abstract:
   are not added. It looks like adding a element to end and not initializing
   it may cause the table to be initaliized with the members at the end being
   set to zero. This is bad as jumping to zero will crash.
-  
+
 
   gUnix is a a public exported global that contains the initialized
   data.
@@ -36,7 +36,7 @@ Abstract:
 #include "Uefi.h"
 #include "Library/UnixLib.h"
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(MDE_CPU_X64)
 #include "Gasket.h"
 #endif
 
@@ -52,12 +52,12 @@ settimer_handler (int sig)
 
   gettimeofday (&timeval, NULL);
   delta = ((UINT64)timeval.tv_sec * 1000) + (timeval.tv_usec / 1000)
-    - ((UINT64)settimer_timeval.tv_sec * 1000) 
+    - ((UINT64)settimer_timeval.tv_sec * 1000)
     - (settimer_timeval.tv_usec / 1000);
   settimer_timeval = timeval;
-  
+
   if (settimer_callback) {
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(MDE_CPU_X64)
    ReverseGasketUint64 (settimer_callback, delta);
 #else
    (*settimer_callback)(delta);
@@ -90,7 +90,7 @@ SetTimer (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs))
   timerval.it_value.tv_usec = remainder * 1000;
   timerval.it_value.tv_sec = DivU64x32(PeriodMs, 1000);
   timerval.it_interval = timerval.it_value;
-  
+
   if (setitimer (ITIMER_REAL, &timerval, NULL) != 0) {
     printf ("SetTimer: setitimer error %s\n", strerror (errno));
   }
@@ -110,8 +110,8 @@ msSleep (unsigned long Milliseconds)
       break;
     }
     rq = rm;
-  } 
-    
+  }
+
 }
 
 void
@@ -171,10 +171,10 @@ UgaCreate(struct _EFI_UNIX_UGA_IO_PROTOCOL **UgaIo, CONST CHAR16 *Title);
 
 EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   EFI_UNIX_THUNK_PROTOCOL_SIGNATURE,
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(MDE_CPU_X64)
 //
 // Mac OS X requires the stack to be 16-byte aligned for IA-32. So on an OS X build
-// we add an assembly wrapper that makes sure the stack ges aligned. 
+// we add an assembly wrapper that makes sure the stack ges aligned.
 // This has the nice benfit of being able to run EFI ABI code, like the EFI shell
 // that is checked in to source control in the OS X version of the emulator
 //
@@ -217,9 +217,9 @@ EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   Gasketcfsetospeed,
   Gaskettcgetattr,
   Gaskettcsetattr,
-  GasketUnixPeCoffGetEntryPoint,                
-  GasketUnixPeCoffRelocateImageExtraAction,     
-  GasketUnixPeCoffUnloadImageExtraAction  
+  GasketUnixPeCoffGetEntryPoint,
+  GasketUnixPeCoffRelocateImageExtraAction,
+  GasketUnixPeCoffUnloadImageExtraAction
 
 #else
   msSleep, /* Sleep */
