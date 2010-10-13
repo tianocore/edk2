@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +22,10 @@ shopt -s nocasematch
 if [ -z "$WORKSPACE" ]
 then
   echo Initializing workspace
-  cd ..
+  if [ ! -e `pwd`/edksetup.sh ]
+  then
+    cd ..
+  fi
 # This version is for the tools in the BaseTools project.
 # this assumes svn pulls have the same root dir
 #  export EDK_TOOLS_PATH=`pwd`/../BaseTools
@@ -101,13 +106,10 @@ do
     exit $?
   fi
 
-
   if [[ $arg == shell ]]; then
-    build -p $WORKSPACE/GccShellPkg/GccShellPkg.dsc -a X64 -t $UNIXPKG_TOOLS -n 3  $2 $3 $4 $5 $6 $7 $8
+    build -p $WORKSPACE/GccShellPkg/GccShellPkg.dsc -a X64 -t $UNIXPKG_TOOLS -n 3 $2 $3 $4 $5 $6 $7 $8
     exit $?
   fi
-
-
 done
 
 
