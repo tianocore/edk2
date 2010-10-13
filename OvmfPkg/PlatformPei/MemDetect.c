@@ -54,7 +54,7 @@ GetSystemMemorySize (
   Cmos0x34 = (UINT8) CmosRead8 (0x34);
   Cmos0x35 = (UINT8) CmosRead8 (0x35);
 
-  return ((((Cmos0x35 << 8) + Cmos0x34) << 16) + SIZE_16MB);
+  return (((UINTN)((Cmos0x35 << 8) + Cmos0x34) << 16) + SIZE_16MB);
 }
 
 
@@ -64,7 +64,7 @@ GetSystemMemorySize (
   @return EFI_SUCCESS     The PEIM initialized successfully.
 
 **/
-EFI_STATUS
+EFI_PHYSICAL_ADDRESS
 MemDetect (
   )
 {
@@ -103,6 +103,6 @@ MemDetect (
   AddMemoryRangeHob (BASE_1MB, MemoryBase);
   AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
 
-  return EFI_SUCCESS;
+  return MemoryBase + MemorySize;
 }
 

@@ -39,7 +39,7 @@ AddMemoryRangeHob (
   EFI_PHYSICAL_ADDRESS        MemoryLimit
   );
 
-EFI_STATUS
+EFI_PHYSICAL_ADDRESS
 MemDetect (
   VOID
   );
