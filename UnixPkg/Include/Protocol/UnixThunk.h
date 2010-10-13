@@ -2,13 +2,13 @@
 
 Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -58,7 +58,7 @@ Abstract:
 #else
 #include <termio.h>
 #include <sys/vfs.h>
-#endif 
+#endif
 
 #include <utime.h>
 
@@ -79,21 +79,21 @@ Abstract:
 #if __DARWIN_64_BIT_INO_T
 
 typedef struct stat_fix { \
-	dev_t		st_dev;			/* [XSI] ID of device containing file */ 
-	mode_t		st_mode;		/* [XSI] Mode of file (see below) */ 
-	nlink_t		st_nlink;		/* [XSI] Number of hard links */ 
-	__darwin_ino64_t st_ino;		/* [XSI] File serial number */ 
-	uid_t		st_uid;			/* [XSI] User ID of the file */ 
-	gid_t		st_gid;			/* [XSI] Group ID of the file */ 
-	dev_t		st_rdev;		/* [XSI] Device ID */ 
-	__DARWIN_STRUCT_STAT64_TIMES 
-	off_t		st_size;		/* [XSI] file size, in bytes */ 
-	blkcnt_t	st_blocks;		/* [XSI] blocks allocated for file */ 
-	blksize_t	st_blksize;		/* [XSI] optimal blocksize for I/O */ 
-	__uint32_t	st_flags;		/* user defined flags for file */ 
-	__uint32_t	st_gen;			/* file generation number */ 
-	__int32_t	st_lspare;		/* RESERVED: DO NOT USE! */ 
-	__int64_t	st_qspare[2];		/* RESERVED: DO NOT USE! */ 
+	dev_t		st_dev;			/* [XSI] ID of device containing file */
+	mode_t		st_mode;		/* [XSI] Mode of file (see below) */
+	nlink_t		st_nlink;		/* [XSI] Number of hard links */
+	__darwin_ino64_t st_ino;		/* [XSI] File serial number */
+	uid_t		st_uid;			/* [XSI] User ID of the file */
+	gid_t		st_gid;			/* [XSI] Group ID of the file */
+	dev_t		st_rdev;		/* [XSI] Device ID */
+	__DARWIN_STRUCT_STAT64_TIMES
+	off_t		st_size;		/* [XSI] file size, in bytes */
+	blkcnt_t	st_blocks;		/* [XSI] blocks allocated for file */
+	blksize_t	st_blksize;		/* [XSI] optimal blocksize for I/O */
+	__uint32_t	st_flags;		/* user defined flags for file */
+	__uint32_t	st_gen;			/* file generation number */
+	__int32_t	st_lspare;		/* RESERVED: DO NOT USE! */
+	__int64_t	st_qspare[2];		/* RESERVED: DO NOT USE! */
 } STAT_FIX;
 
 #else /* !__DARWIN_64_BIT_INO_T */
@@ -133,7 +133,7 @@ typedef struct stat_fix {
 #pragma pack(4)
 #endif
 
-#else 
+#else
 
   typedef struct stat STAT_FIX;
 
@@ -146,192 +146,192 @@ typedef struct stat_fix {
 
 typedef
 VOID
-(*UnixSleep) (
+(EFIAPI *UnixSleep) (
   unsigned long Milliseconds
   );
 
 typedef
 VOID
-(*UnixExit) (
+(EFIAPI *UnixExit) (
   int status  // exit code for all threads
   );
 
 typedef
 VOID
-(*UnixSetTimer) (
-  UINT64 PeriodMs, 
-  VOID (*CallBack)(UINT64 DeltaMs)
+(EFIAPI *UnixSetTimer) (
+  UINT64 PeriodMs,
+  VOID (EFIAPI *CallBack)(UINT64 DeltaMs)
   );
 
 typedef
 VOID
-(*UnixGetLocalTime) (
+(EFIAPI *UnixGetLocalTime) (
   EFI_TIME *Time
   );
 
 typedef
 struct tm *
-(*UnixGmTime)(
+(EFIAPI *UnixGmTime)(
   const time_t *timep
   );
 
 typedef
 long
-(*UnixGetTimeZone)(
+(EFIAPI *UnixGetTimeZone)(
   void
   );
 
 typedef
 int
-(*UnixGetDayLight)(
+(EFIAPI *UnixGetDayLight)(
   void
   );
 
 typedef
 int
-(*UnixPoll)(
-  struct pollfd *pfd, 
-  unsigned int  nfds, 
+(EFIAPI *UnixPoll)(
+  struct pollfd *pfd,
+  unsigned int  nfds,
   int           timeout
   );
 
 typedef
 long
-(*UnixRead) (
-  int  fd, 
-  void *buf, 
+(EFIAPI *UnixRead) (
+  int  fd,
+  void *buf,
   int  count
   );
 
 typedef
 long
-(*UnixWrite) (
-  int         fd, 
-  const void  *buf, 
+(EFIAPI *UnixWrite) (
+  int         fd,
+  const void  *buf,
   int         count
   );
 
 typedef
 char *
-(*UnixGetenv) (const char *var);
+(EFIAPI *UnixGetenv) (const char *var);
 
 typedef
 int
-(*UnixOpen) (const char *name, int flags, int mode);
+(EFIAPI *UnixOpen) (const char *name, int flags, int mode);
 
 typedef
 off_t
-(*UnixSeek) (int fd, off_t off, int whence);
+(EFIAPI *UnixSeek) (int fd, off_t off, int whence);
 
 typedef
 int
-(*UnixFtruncate) (int fd, long int len);
+(EFIAPI *UnixFtruncate) (int fd, long int len);
 
 typedef
 int
-(*UnixClose) (int fd);
+(EFIAPI *UnixClose) (int fd);
 
 typedef
 int
-(*UnixMkdir)(const char *pathname, mode_t mode);
+(EFIAPI *UnixMkdir)(const char *pathname, mode_t mode);
 
 typedef
 int
-(*UnixRmDir)(const char *pathname);
+(EFIAPI *UnixRmDir)(const char *pathname);
 
 typedef
 int
-(*UnixUnLink)(const char *pathname);
+(EFIAPI *UnixUnLink)(const char *pathname);
 
 typedef
 int
-(*UnixGetErrno)(VOID);
+(EFIAPI *UnixGetErrno)(VOID);
 
 typedef
 DIR *
-(*UnixOpenDir)(const char *pathname);
+(EFIAPI *UnixOpenDir)(const char *pathname);
 
 typedef
 void
-(*UnixRewindDir)(DIR *dir);
+(EFIAPI *UnixRewindDir)(DIR *dir);
 
 typedef
 struct dirent *
-(*UnixReadDir)(DIR *dir);
+(EFIAPI *UnixReadDir)(DIR *dir);
 
 typedef
 int
-(*UnixCloseDir)(DIR *dir);
+(EFIAPI *UnixCloseDir)(DIR *dir);
 
 typedef
 int
-(*UnixStat)(const char *path, STAT_FIX *buf);
+(EFIAPI *UnixStat)(const char *path, STAT_FIX *buf);
 
 typedef
 int
-(*UnixStatFs)(const char *path, struct statfs *buf);
+(EFIAPI *UnixStatFs)(const char *path, struct statfs *buf);
 
 typedef
 int
-(*UnixRename)(const char *oldpath, const char *newpath);
+(EFIAPI *UnixRename)(const char *oldpath, const char *newpath);
 
 typedef
 time_t
-(*UnixMkTime)(struct tm *tm);
+(EFIAPI *UnixMkTime)(struct tm *tm);
 
 typedef
 int
-(*UnixFSync)(int fd);
+(EFIAPI *UnixFSync)(int fd);
 
 typedef
 int
-(*UnixChmod)(const char *path, mode_t mode);
+(EFIAPI *UnixChmod)(const char *path, mode_t mode);
 
 typedef
 int
-(*UnixUTime)(const char *filename, const struct utimbuf *buf);
+(EFIAPI *UnixUTime)(const char *filename, const struct utimbuf *buf);
 
 struct _EFI_UNIX_UGA_IO_PROTOCOL;
 typedef
 EFI_STATUS
-(*UnixUgaCreate)(struct _EFI_UNIX_UGA_IO_PROTOCOL **UgaIo,
+(EFIAPI *UnixUgaCreate)(struct _EFI_UNIX_UGA_IO_PROTOCOL **UgaIo,
 		 CONST CHAR16 *Title);
 
 typedef
 int
-(*UnixTcflush) (int fildes, int queue_selector);
+(EFIAPI *UnixTcflush) (int fildes, int queue_selector);
 
 typedef
 void
-(*UnixPerror) (__const char *__s);
+(EFIAPI *UnixPerror) (__const char *__s);
 
-typedef 
-int 
+typedef
+int
 #if __CYGWIN__
-(*UnixIoCtl) (int fd, int __request, UINTN Arg);
+(EFIAPI *UnixIoCtl) (int fd, int __request, UINTN Arg);
 #else
-(*UnixIoCtl) (int fd, unsigned long int __request, void *Arg);
+(EFIAPI *UnixIoCtl) (int fd, unsigned long int __request, void *Arg);
 #endif
 
-typedef 
-int 
-(*UnixFcntl) (int __fd, int __cmd, void *Arg);
+typedef
+int
+(EFIAPI *UnixFcntl) (int __fd, int __cmd, void *Arg);
 
 typedef
-int 
-(*UnixCfsetispeed) (struct termios *__termios_p, speed_t __speed);
-
-typedef 
-int 
-(*UnixCfsetospeed) (struct termios *__termios_p, speed_t __speed);
+int
+(EFIAPI *UnixCfsetispeed) (struct termios *__termios_p, speed_t __speed);
 
 typedef
-int 
-(*UnixTcgetattr) (int __fd, struct termios *__termios_p);
+int
+(EFIAPI *UnixCfsetospeed) (struct termios *__termios_p, speed_t __speed);
 
-typedef 
-int 
-(*UnixTcsetattr) (int __fd, int __optional_actions,
+typedef
+int
+(EFIAPI *UnixTcgetattr) (int __fd, struct termios *__termios_p);
+
+typedef
+int
+(EFIAPI *UnixTcsetattr) (int __fd, int __optional_actions,
 		      __const struct termios *__termios_p);
 
 
@@ -339,20 +339,20 @@ int
 // Worker functions to enable source level debug in the emulator
 //
 
-typedef 
+typedef
 RETURN_STATUS
 (EFIAPI *UnixPeCoffGetEntryPoint) (
   IN     VOID  *Pe32Data,
   IN OUT VOID  **EntryPoint
   );
 
-typedef 
+typedef
 VOID
 (EFIAPI *UnixPeCoffRelocateImageExtraAction) (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   );
 
-typedef 
+typedef
 VOID
 (EFIAPI *UnixPeCoffLoaderUnloadImageExtraAction) (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
@@ -407,8 +407,8 @@ typedef struct _EFI_UNIX_THUNK_PROTOCOL {
   UnixPeCoffGetEntryPoint                 PeCoffGetEntryPoint;
   UnixPeCoffRelocateImageExtraAction      PeCoffRelocateImageExtraAction;
   UnixPeCoffLoaderUnloadImageExtraAction  PeCoffUnloadImageExtraAction;
-	
-	
+
+
 } EFI_UNIX_THUNK_PROTOCOL;
 
 extern EFI_GUID gEfiUnixThunkProtocolGuid;
