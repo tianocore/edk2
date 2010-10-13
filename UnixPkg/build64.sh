@@ -36,21 +36,21 @@ fi
 # Pick a default tool type for a given OS
 #
 TARGET_TOOLS=MYTOOLS
-UNIXPKG_TOOLS=UNIXPKG
+UNIXPKG_TOOLS=GCC44
 case `uname` in
   CYGWIN*) echo Cygwin not fully supported yet. ;;
-  Darwin*) 
+  Darwin*)
       Major=$(uname -r | cut -f 1 -d '.')
       if [[ $Major == 9 ]]
       then
         echo UnixPkg requires Snow Leopard or later OS
         exit 1
-      else 
+      else
         TARGET_TOOLS=XCODE32
-      fi  
+      fi
       ;;
   Linux*) TARGET_TOOLS=ELFGCC ;;
-    
+
 esac
 
 BUILD_ROOT_ARCH=$WORKSPACE/Build/UnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
@@ -74,7 +74,7 @@ for arg in "$@"
 do
   if [[ $arg == run ]]; then
     case `uname` in
-      Darwin*) 
+      Darwin*)
         #
         # On Darwin we can't use dlopen, so we have to load the real PE/COFF images.
         # This .gdbinit script sets a breakpoint that loads symbols for the PE/COFFEE
@@ -82,14 +82,14 @@ do
         #
         cp $WORKSPACE/UnixPkg/.gdbinit $WORKSPACE/Build/UnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
         ;;
-    esac 
+    esac
 
     /usr/bin/gdb $BUILD_ROOT_ARCH/SecMain -q -cd=$BUILD_ROOT_ARCH
     exit
   fi
 
   if [[ $arg == cleanall ]]; then
-    make -C $WORKSPACE/BaseTools clean  
+    make -C $WORKSPACE/BaseTools clean
     build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc -a X64 -t $TARGET_TOOLS -D SEC_ONLY -n 3 clean
     build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc -a X64 -t $UNIXPKG_TOOLS -n 3 clean
     exit $?
@@ -100,14 +100,14 @@ do
     build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc -a X64 -t $UNIXPKG_TOOLS -n 3 clean
     exit $?
   fi
-  
-  
+
+
   if [[ $arg == shell ]]; then
     build -p $WORKSPACE/GccShellPkg/GccShellPkg.dsc -a X64 -t $UNIXPKG_TOOLS -n 3  $2 $3 $4 $5 $6 $7 $8
     exit $?
   fi
-  
-  
+
+
 done
 
 
