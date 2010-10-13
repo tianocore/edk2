@@ -366,7 +366,7 @@ Returns:
   // If Width is EfiPciIoWidthFifoUintX then convert to EfiPciIoWidthUintX
   // If Width is EfiPciIoWidthFillUintX then convert to EfiPciIoWidthUintX
   //
-  if (Width >= EfiPciWidthFifoUint8 && Width <= EfiPciWidthFifoUint64) {
+  if (Width >= EfiPciIoWidthFifoUint8 && Width <= EfiPciIoWidthFifoUint64) {
     Count = 1;
   }
 

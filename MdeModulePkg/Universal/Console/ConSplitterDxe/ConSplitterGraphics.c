@@ -535,7 +535,7 @@ ConSplitterUgaDrawBlt (
                               );
       if (EFI_ERROR (Status)) {
         ReturnStatus = Status;
-      } else if (BltOperation == EfiBltVideoToBltBuffer) {
+      } else if (BltOperation == EfiUgaVideoToBltBuffer) {
         //
         // Only need to read the data into buffer one time
         //
