@@ -1,7 +1,7 @@
 /** @file
   handles console redirection from boot manager
 
-Copyright (c) 2004 - 2009, Intel Corporation. <BR>
+Copyright (c) 2004 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,6 +13,27 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "BootMaint.h"
+
+/**
+  Check whether the device path node is ISA Serial Node.
+
+  @param Acpi           Device path node to be checked
+
+  @retval TRUE          It's ISA Serial Node.
+  @retval FALSE         It's NOT ISA Serial Node.
+
+**/
+BOOLEAN
+IsIsaSerialNode (
+  IN ACPI_HID_DEVICE_PATH *Acpi
+  )
+{
+  return (BOOLEAN) (
+      (DevicePathType (Acpi) == ACPI_DEVICE_PATH) &&
+      (DevicePathSubType (Acpi) == ACPI_DP) &&
+      (ReadUnaligned32 (&Acpi->HID) == EISA_PNP_ID (0x0501))
+      );
+}
 
 /**
   Update Com Ports attributes from DevicePath
@@ -51,20 +72,16 @@ ChangeTerminalDevicePath (
   UART_DEVICE_PATH          *Uart;
   UART_DEVICE_PATH          *Uart1;
   UINTN                     Com;
-  UINT32                    Match;
   BM_TERMINAL_CONTEXT       *NewTerminalContext;
   BM_MENU_ENTRY             *NewMenuEntry;
 
-  Match = EISA_PNP_ID (0x0501);
   Node  = DevicePath;
   Node  = NextDevicePathNode (Node);
   Com   = 0;
   while (!IsDevicePathEnd (Node)) {
-    if ((DevicePathType (Node) == ACPI_DEVICE_PATH) && (DevicePathSubType (Node) == ACPI_DP)) {
-      Acpi = (ACPI_HID_DEVICE_PATH *) Node;
-      if (CompareMem (&Acpi->HID, &Match, sizeof (UINT32)) == 0) {
-        CopyMem (&Com, &Acpi->UID, sizeof (UINT32));
-      }
+    Acpi = (ACPI_HID_DEVICE_PATH *) Node;
+    if (IsIsaSerialNode (Acpi)) {
+      CopyMem (&Com, &Acpi->UID, sizeof (UINT32));
     }
 
     NewMenuEntry = BOpt_GetMenuEntry (&TerminalMenu, Com);
@@ -165,20 +182,16 @@ ChangeVariableDevicePath (
   ACPI_HID_DEVICE_PATH      *Acpi;
   UART_DEVICE_PATH          *Uart;
   UINTN                     Com;
-  UINT32                    Match;
   BM_TERMINAL_CONTEXT       *NewTerminalContext;
   BM_MENU_ENTRY             *NewMenuEntry;
 
-  Match = EISA_PNP_ID (0x0501);
   Node  = DevicePath;
   Node  = NextDevicePathNode (Node);
   Com   = 0;
   while (!IsDevicePathEnd (Node)) {
-    if ((DevicePathType (Node) == ACPI_DEVICE_PATH) && (DevicePathSubType (Node) == ACPI_DP)) {
-      Acpi = (ACPI_HID_DEVICE_PATH *) Node;
-      if (CompareMem (&Acpi->HID, &Match, sizeof (UINT32)) == 0) {
-        CopyMem (&Com, &Acpi->UID, sizeof (UINT32));
-      }
+    Acpi = (ACPI_HID_DEVICE_PATH *) Node;
+    if (IsIsaSerialNode (Acpi)) {
+      CopyMem (&Com, &Acpi->UID, sizeof (UINT32));
     }
 
     if ((DevicePathType (Node) == MESSAGING_DEVICE_PATH) && (DevicePathSubType (Node) == MSG_UART_DP)) {
@@ -234,29 +247,33 @@ RetrieveUartUid (
   IN OUT UINT32   *AcpiUid
   )
 {
-  UINT32                    Match;
-  UINT8                     *Ptr;
+  EFI_STATUS                Status;
   ACPI_HID_DEVICE_PATH      *Acpi;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
-  gBS->HandleProtocol (
-        Handle,
-        &gEfiDevicePathProtocolGuid,
-        (VOID **) &DevicePath
-        );
-  Ptr = (UINT8 *) DevicePath;
-
-  while (*Ptr != END_DEVICE_PATH_TYPE) {
-    Ptr++;
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &DevicePath
+                  );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
   }
 
-  Ptr   = Ptr - sizeof (UART_DEVICE_PATH) - sizeof (ACPI_HID_DEVICE_PATH);
-  Acpi  = (ACPI_HID_DEVICE_PATH *) Ptr;
-  Match = EISA_PNP_ID (0x0501);
+  Acpi = NULL;
+  for (; !IsDevicePathEnd (DevicePath); DevicePath = NextDevicePathNode (DevicePath)) {
+    if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) && (DevicePathSubType (DevicePath) == MSG_UART_DP)) {
+      break;
+    }
+    //
+    // Acpi points to the node before the Uart node
+    //
+    Acpi = (ACPI_HID_DEVICE_PATH *) DevicePath;
+  }
 
-  if (CompareMem (&Acpi->HID, &Match, sizeof (UINT32)) == 0) {
+  if ((Acpi != NULL) && IsIsaSerialNode (Acpi)) {
     if (AcpiUid != NULL) {
-      *AcpiUid = Acpi->UID;
+      CopyMem (AcpiUid, &Acpi->UID, sizeof (UINT32));
     }
     return TRUE;
   } else {
@@ -339,7 +356,6 @@ LocateSerialIo (
   VOID
   )
 {
-  UINT8                     *Ptr;
   UINTN                     Index;
   UINTN                     Index2;
   UINTN                     NoHandles;
@@ -347,8 +363,8 @@ LocateSerialIo (
   EFI_STATUS                Status;
   ACPI_HID_DEVICE_PATH      *Acpi;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  UINT32                    Match;
   EFI_SERIAL_IO_PROTOCOL    *SerialIo;
+  EFI_DEVICE_PATH_PROTOCOL  *Node;
   EFI_DEVICE_PATH_PROTOCOL  *OutDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *InpDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *ErrDevicePath;
@@ -390,16 +406,19 @@ LocateSerialIo (
           &gEfiDevicePathProtocolGuid,
           (VOID **) &DevicePath
           );
-    Ptr = (UINT8 *) DevicePath;
-    while (*Ptr != END_DEVICE_PATH_TYPE) {
-      Ptr++;
+
+    Acpi = NULL;
+    for (Node = DevicePath; !IsDevicePathEnd (Node); Node = NextDevicePathNode (Node)) {
+      if ((DevicePathType (Node) == MESSAGING_DEVICE_PATH) && (DevicePathSubType (Node) == MSG_UART_DP)) {
+        break;
+      }
+      //
+      // Acpi points to the node before Uart node
+      //
+      Acpi = (ACPI_HID_DEVICE_PATH *) Node;
     }
 
-    Ptr   = Ptr - sizeof (UART_DEVICE_PATH) - sizeof (ACPI_HID_DEVICE_PATH);
-    Acpi  = (ACPI_HID_DEVICE_PATH *) Ptr;
-    Match = EISA_PNP_ID (0x0501);
-
-    if (CompareMem (&Acpi->HID, &Match, sizeof (UINT32)) == 0) {
+    if ((Acpi != NULL) && IsIsaSerialNode (Acpi)) {
       NewMenuEntry = BOpt_CreateMenuEntry (BM_TERMINAL_CONTEXT_SELECT);
       if (NewMenuEntry == NULL) {
         FreePool (Handles);
@@ -547,23 +566,19 @@ UpdateComAttributeFromVariable (
   ACPI_HID_DEVICE_PATH      *Acpi;
   UART_DEVICE_PATH          *Uart;
   UART_DEVICE_PATH          *Uart1;
-  UINT32                    Match;
   UINTN                     TerminalNumber;
   BM_MENU_ENTRY             *NewMenuEntry;
   BM_TERMINAL_CONTEXT       *NewTerminalContext;
   UINTN                     Index;
 
-  Match           = EISA_PNP_ID (0x0501);
   Node            = DevicePath;
   Node            = NextDevicePathNode (Node);
   TerminalNumber  = 0;
   for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
     while (!IsDevicePathEnd (Node)) {
-      if ((DevicePathType (Node) == ACPI_DEVICE_PATH) && (DevicePathSubType (Node) == ACPI_DP)) {
-        Acpi = (ACPI_HID_DEVICE_PATH *) Node;
-        if (CompareMem (&Acpi->HID, &Match, sizeof (UINT32)) == 0) {
-          CopyMem (&TerminalNumber, &Acpi->UID, sizeof (UINT32));
-        }
+      Acpi = (ACPI_HID_DEVICE_PATH *) Node;
+      if (IsIsaSerialNode (Acpi)) {
+        CopyMem (&TerminalNumber, &Acpi->UID, sizeof (UINT32));
       }
 
       if ((DevicePathType (Node) == MESSAGING_DEVICE_PATH) && (DevicePathSubType (Node) == MSG_UART_DP)) {
@@ -837,46 +852,60 @@ IsTerminalDevicePath (
   OUT UINTN                    *Com
   )
 {
-  UINT8                 *Ptr;
-  BOOLEAN               IsTerminal;
-  VENDOR_DEVICE_PATH    *Vendor;
-  ACPI_HID_DEVICE_PATH  *Acpi;
-  UINT32                Match;
-  EFI_GUID              TempGuid;
+  BOOLEAN                   IsTerminal;
+  EFI_DEVICE_PATH_PROTOCOL  *Node;
+  VENDOR_DEVICE_PATH        *Vendor;
+  UART_DEVICE_PATH          *Uart;
+  ACPI_HID_DEVICE_PATH      *Acpi;
 
   IsTerminal = FALSE;
 
-  //
-  // Parse the Device Path, should be change later!!!
-  //
-  Ptr = (UINT8 *) DevicePath;
-  while (*Ptr != END_DEVICE_PATH_TYPE) {
-    Ptr++;
+  Uart   = NULL;
+  Vendor = NULL;
+  Acpi   = NULL;
+  for (Node = DevicePath; !IsDevicePathEnd (Node); Node = NextDevicePathNode (Node)) {
+    //
+    // Vendor points to the node before the End node
+    //
+    Vendor = (VENDOR_DEVICE_PATH *) Node;
+
+    if ((DevicePathType (Node) == MESSAGING_DEVICE_PATH) && (DevicePathSubType (Node) == MSG_UART_DP)) {
+      Uart = (UART_DEVICE_PATH *) Node;
+    }
+
+    if (Uart == NULL) {
+      //
+      // Acpi points to the node before the UART node
+      //
+      Acpi = (ACPI_HID_DEVICE_PATH *) Node;
+    }
   }
 
-  Ptr     = Ptr - sizeof (VENDOR_DEVICE_PATH);
-  Vendor  = (VENDOR_DEVICE_PATH *) Ptr;
+  if (Vendor == NULL ||
+      DevicePathType (Vendor) != MESSAGING_DEVICE_PATH ||
+      DevicePathSubType (Vendor) != MSG_VENDOR_DP ||
+      Uart == NULL) {
+    return FALSE;
+  }
 
   //
   // There are four kinds of Terminal types
   // check to see whether this devicepath
   // is one of that type
   //
-  CopyMem (&TempGuid, &Vendor->Guid, sizeof (EFI_GUID));
-
-  if (CompareGuid (&TempGuid, &TerminalTypeGuid[0])) {
+  if (CompareGuid (&Vendor->Guid, &TerminalTypeGuid[0])) {
     *Termi      = TerminalTypePcAnsi;
     IsTerminal  = TRUE;
   } else {
-    if (CompareGuid (&TempGuid, &TerminalTypeGuid[1])) {
+    if (CompareGuid (&Vendor->Guid, &TerminalTypeGuid[1])) {
       *Termi      = TerminalTypeVt100;
       IsTerminal  = TRUE;
     } else {
-      if (CompareGuid (&TempGuid, &TerminalTypeGuid[2])) {
+      if (CompareGuid (&Vendor->Guid, &TerminalTypeGuid[2])) {
         *Termi      = TerminalTypeVt100Plus;
         IsTerminal  = TRUE;
       } else {
-        if (CompareGuid (&TempGuid, &TerminalTypeGuid[3])) {
+        if (CompareGuid (&Vendor->Guid, &TerminalTypeGuid[3])) {
           *Termi      = TerminalTypeVtUtf8;
           IsTerminal  = TRUE;
         } else {
@@ -890,10 +919,7 @@ IsTerminalDevicePath (
     return FALSE;
   }
 
-  Ptr   = Ptr - sizeof (UART_DEVICE_PATH) - sizeof (ACPI_HID_DEVICE_PATH);
-  Acpi  = (ACPI_HID_DEVICE_PATH *) Ptr;
-  Match = EISA_PNP_ID (0x0501);
-  if (CompareMem (&Acpi->HID, &Match, sizeof (UINT32)) == 0) {
+  if ((Acpi != NULL) && IsIsaSerialNode (Acpi)) {
     CopyMem (Com, &Acpi->UID, sizeof (UINT32));
   } else {
     return FALSE;

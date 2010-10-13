@@ -120,12 +120,15 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gWinNtSerialIoComponentName2;
 #define SERIAL_PARITY_DEFAULT   DefaultParity
 #define SERIAL_STOPBITS_DEFAULT DefaultStopBits
 
-#define SERIAL_CONTROL_MASK     (EFI_SERIAL_CLEAR_TO_SEND       | \
-                                 EFI_SERIAL_DATA_SET_READY      | \
-                                 EFI_SERIAL_RING_INDICATE       | \
-                                 EFI_SERIAL_CARRIER_DETECT      | \
-                                 EFI_SERIAL_REQUEST_TO_SEND     | \
-                                 EFI_SERIAL_DATA_TERMINAL_READY | \
+#define SERIAL_CONTROL_MASK     (EFI_SERIAL_CLEAR_TO_SEND                | \
+                                 EFI_SERIAL_DATA_SET_READY               | \
+                                 EFI_SERIAL_RING_INDICATE                | \
+                                 EFI_SERIAL_CARRIER_DETECT               | \
+                                 EFI_SERIAL_REQUEST_TO_SEND              | \
+                                 EFI_SERIAL_DATA_TERMINAL_READY          | \
+                                 EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE     | \
+                                 EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE     | \
+                                 EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE | \
                                  EFI_SERIAL_INPUT_BUFFER_EMPTY)
 
 #define ConvertBaud2Nt(x)       (DWORD) x

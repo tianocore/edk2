@@ -41,7 +41,7 @@ SERIAL_DEV  gSerialDevTempate = {
     NULL
   },
   { // SerialMode
-    SERIAL_PORT_DEFAULT_CONTROL_MASK,
+    SERIAL_PORT_SUPPORT_CONTROL_MASK,
     SERIAL_PORT_DEFAULT_TIMEOUT,
     FixedPcdGet64 (PcdUartDefaultBaudRate),     // BaudRate
     SERIAL_PORT_DEFAULT_RECEIVE_FIFO_DEPTH,
@@ -85,6 +85,51 @@ SERIAL_DEV  gSerialDevTempate = {
   Uart16550A,
   NULL
 };
+
+/**
+  Check the device path node whether it's the Flow Control node or not.
+
+  @param[in] FlowControl    The device path node to be checked.
+  
+  @retval TRUE              It's the Flow Control node.
+  @retval FALSE             It's not.
+
+**/
+BOOLEAN
+IsUartFlowControlNode (
+  IN UART_FLOW_CONTROL_DEVICE_PATH *FlowControl
+  )
+{
+  return (BOOLEAN) (
+           (DevicePathType (FlowControl) == MESSAGING_DEVICE_PATH) &&
+           (DevicePathSubType (FlowControl) == MSG_VENDOR_DP) &&
+           (CompareGuid (&FlowControl->Guid, &gEfiUartDevicePathGuid))
+           );
+}
+
+/**
+  Check the device path node whether it contains Flow Control node or not.
+
+  @param[in] DevicePath     The device path to be checked.
+  
+  @retval TRUE              It contains the Flow Control node.
+  @retval FALSE             It doesn't.
+
+**/
+BOOLEAN
+ContainsFlowControl (
+  IN EFI_DEVICE_PATH_PROTOCOL      *DevicePath
+  )
+{
+  while (!IsDevicePathEnd (DevicePath)) {
+    if (IsUartFlowControlNode ((UART_FLOW_CONTROL_DEVICE_PATH *) DevicePath)) {
+      return TRUE;
+    }
+    DevicePath = NextDevicePathNode (DevicePath);
+  }
+
+  return FALSE;
+}
 
 /**
   The user Entry Point for module IsaSerial. The user code starts with this function.
@@ -145,6 +190,11 @@ SerialControllerDriverSupported (
   EFI_DEVICE_PATH_PROTOCOL                  *ParentDevicePath;
   EFI_ISA_IO_PROTOCOL                       *IsaIo;
   UART_DEVICE_PATH                          *UartNode;
+  EFI_DEVICE_PATH_PROTOCOL                  *DevicePath;
+  UART_FLOW_CONTROL_DEVICE_PATH             *FlowControlNode;
+  EFI_OPEN_PROTOCOL_INFORMATION_ENTRY       *OpenInfoBuffer;
+  UINTN                                     EntryCount;
+  UINTN                                     Index;
 
   //
   // Check RemainingDevicePath validation
@@ -192,8 +242,17 @@ SerialControllerDriverSupported (
       if ((UartNode->DataBits >= 6) && (UartNode->DataBits <= 8) && (UartNode->StopBits == OneFiveStopBits)) {
         goto Error;
       }
-  
-      Status = EFI_SUCCESS;
+
+      FlowControlNode = (UART_FLOW_CONTROL_DEVICE_PATH *) NextDevicePathNode (UartNode);
+      if (IsUartFlowControlNode (FlowControlNode)) {
+        //
+        // If the second node is Flow Control Node,
+        //   return error when it request other than hardware flow control.
+        //
+        if ((ReadUnaligned32 (&FlowControlNode->FlowControlMap) & ~UART_FLOW_CONTROL_HARDWARE) != 0) {
+          goto Error;
+        }
+      }
     }
   }
 
@@ -209,7 +268,45 @@ SerialControllerDriverSupported (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (Status == EFI_ALREADY_STARTED) {
-    return EFI_SUCCESS;
+    if (RemainingDevicePath == NULL || IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // If RemainingDevicePath is NULL or is the End of Device Path Node
+      //
+      return EFI_SUCCESS;
+    }
+    //
+    // When the driver has produced device path with flow control node but RemainingDevicePath only contains UART node,
+    //   return unsupported, and vice versa.
+    //
+    Status = gBS->OpenProtocolInformation (
+                    Controller,
+                    &gEfiIsaIoProtocolGuid,
+                    &OpenInfoBuffer,
+                    &EntryCount
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    for (Index = 0; Index < EntryCount; Index++) {
+      if ((OpenInfoBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
+        Status = gBS->OpenProtocol (
+                        OpenInfoBuffer[Index].ControllerHandle,
+                        &gEfiDevicePathProtocolGuid,
+                        (VOID **) &DevicePath,
+                        This->DriverBindingHandle,
+                        Controller,
+                        EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                        );
+        if (!EFI_ERROR (Status) &&
+            (ContainsFlowControl (RemainingDevicePath) ^ ContainsFlowControl (DevicePath))) {
+          Status = EFI_UNSUPPORTED;
+        }
+        break;
+      }
+    }
+    FreePool (OpenInfoBuffer);
+    return Status;
   }
 
   if (EFI_ERROR (Status)) {
@@ -295,7 +392,11 @@ SerialControllerDriverStart (
   EFI_OPEN_PROTOCOL_INFORMATION_ENTRY *OpenInfoBuffer;
   UINTN                               EntryCount;
   EFI_SERIAL_IO_PROTOCOL              *SerialIo;
-  UART_DEVICE_PATH                    *UartNode;
+  UART_DEVICE_PATH                    *Uart;
+  UINT32                              FlowControlMap;
+  UART_FLOW_CONTROL_DEVICE_PATH       *FlowControl;
+  EFI_DEVICE_PATH_PROTOCOL            *TempDevicePath;
+  UINT32                              Control;
 
   SerialDevice = NULL;
   //
@@ -371,16 +472,35 @@ SerialControllerDriverStart (
                         EFI_OPEN_PROTOCOL_GET_PROTOCOL
                         );
         if (!EFI_ERROR (Status)) {
-          UartNode = (UART_DEVICE_PATH *) RemainingDevicePath;
+          Uart   = (UART_DEVICE_PATH *) RemainingDevicePath;
           Status = SerialIo->SetAttributes (
                                SerialIo,
-                               UartNode->BaudRate,
+                               Uart->BaudRate,
                                SerialIo->Mode->ReceiveFifoDepth,
                                SerialIo->Mode->Timeout,
-                               (EFI_PARITY_TYPE) UartNode->Parity,
-                               UartNode->DataBits,
-                               (EFI_STOP_BITS_TYPE) UartNode->StopBits
+                               (EFI_PARITY_TYPE) Uart->Parity,
+                               Uart->DataBits,
+                               (EFI_STOP_BITS_TYPE) Uart->StopBits
                                );
+
+          FlowControl = (UART_FLOW_CONTROL_DEVICE_PATH *) NextDevicePathNode (Uart);
+          if (!EFI_ERROR (Status) && IsUartFlowControlNode (FlowControl)) {
+            Status = SerialIo->GetControl (SerialIo, &Control);
+            if (!EFI_ERROR (Status)) {
+              if (ReadUnaligned32 (&FlowControl->FlowControlMap) == UART_FLOW_CONTROL_HARDWARE) {
+                Control |= EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE;
+              } else {
+                Control &= ~EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE;
+              }
+              //
+              // Clear the bits that are not allowed to pass to SetControl
+              //
+              Control &= (EFI_SERIAL_REQUEST_TO_SEND | EFI_SERIAL_DATA_TERMINAL_READY |
+                          EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE | EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE | 
+                          EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE);
+              Status = SerialIo->SetControl (SerialIo, Control);
+            }
+          }
         }
         break;
       }
@@ -412,6 +532,8 @@ SerialControllerDriverStart (
   SerialDevice->SerialIo.Mode       = &(SerialDevice->SerialMode);
   SerialDevice->IsaIo               = IsaIo;
   SerialDevice->ParentDevicePath    = ParentDevicePath;
+  FlowControl                       = NULL;
+  FlowControlMap                    = 0;
 
   //
   // Check if RemainingDevicePath is NULL, 
@@ -426,6 +548,12 @@ SerialControllerDriverStart (
     // that we can support.
     //
     CopyMem (&SerialDevice->UartDevicePath, RemainingDevicePath, sizeof (UART_DEVICE_PATH));
+    FlowControl = (UART_FLOW_CONTROL_DEVICE_PATH *) NextDevicePathNode (RemainingDevicePath);
+    if (IsUartFlowControlNode (FlowControl)) {
+      FlowControlMap = ReadUnaligned32 (&FlowControl->FlowControlMap);
+    } else {
+      FlowControl    = NULL;
+    }
   }
 
   AddName (SerialDevice, IsaIo);
@@ -435,6 +563,9 @@ SerialControllerDriverStart (
       SerialDevice->BaseAddress = (UINT16) SerialDevice->IsaIo->ResourceList->ResourceItem[Index].StartRange;
     }
   }
+  
+  SerialDevice->HardwareFlowControl = (BOOLEAN) (FlowControlMap == UART_FLOW_CONTROL_HARDWARE);
+
   //
   // Report status code the serial present
   //
@@ -456,15 +587,28 @@ SerialControllerDriverStart (
 
   //
   // Build the device path by appending the UART node to the ParentDevicePath.
-  //The Uart setings are zero here, since  SetAttribute() will update them to match 
+  // The Uart setings are zero here, since  SetAttribute() will update them to match 
   // the default setings.
   //
   SerialDevice->DevicePath = AppendDevicePathNode (
                                ParentDevicePath,
-                               (EFI_DEVICE_PATH_PROTOCOL *)&SerialDevice->UartDevicePath
+                               (EFI_DEVICE_PATH_PROTOCOL *) &SerialDevice->UartDevicePath
                                );
+  //
+  // Only produce the Flow Control node when remaining device path has it
+  //
+  if (FlowControl != NULL) {
+    TempDevicePath = SerialDevice->DevicePath;
+    if (TempDevicePath != NULL) {
+      SerialDevice->DevicePath = AppendDevicePathNode (
+                                   TempDevicePath,
+                                   (EFI_DEVICE_PATH_PROTOCOL *) FlowControl
+                                   );
+      FreePool (TempDevicePath);
+    }
+  }
   if (SerialDevice->DevicePath == NULL) {
-    Status = EFI_DEVICE_ERROR;
+    Status = EFI_OUT_OF_RESOURCES;
     goto Error;
   }
 
@@ -968,6 +1112,7 @@ IsaSerialReset (
   SERIAL_PORT_MCR Mcr;
   SERIAL_PORT_FCR Fcr;
   EFI_TPL         Tpl;
+  UINT32          Control;
 
   SerialDevice = SERIAL_DEV_FROM_THIS (This);
 
@@ -1039,9 +1184,16 @@ IsaSerialReset (
   //
   // Go set the current control bits
   //
+  Control = 0;
+  if (SerialDevice->HardwareFlowControl) {
+    Control |= EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE;
+  }
+  if (SerialDevice->SoftwareLoopbackEnable) {
+    Control |= EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE;
+  }
   Status = This->SetControl (
                    This,
-                   This->Mode->ControlMask
+                   Control
                    );
 
   if (EFI_ERROR (Status)) {
@@ -1108,7 +1260,7 @@ IsaSerialSetAttributes (
   UINT32                    Divisor;
   UINT32                    Remained;
   SERIAL_PORT_LCR           Lcr;
-  EFI_DEVICE_PATH_PROTOCOL  *NewDevicePath;
+  UART_DEVICE_PATH          *Uart;
   EFI_TPL                   Tpl;
 
   SerialDevice = SERIAL_DEV_FROM_THIS (This);
@@ -1347,37 +1499,25 @@ IsaSerialSetAttributes (
   SerialDevice->UartDevicePath.Parity   = (UINT8) Parity;
   SerialDevice->UartDevicePath.StopBits = (UINT8) StopBits;
 
-  NewDevicePath = AppendDevicePathNode (
-                    SerialDevice->ParentDevicePath,
-                    (EFI_DEVICE_PATH_PROTOCOL *) &SerialDevice->UartDevicePath
-                    );
-  if (NewDevicePath == NULL) {
-    gBS->RestoreTPL (Tpl);
-    return EFI_DEVICE_ERROR;
-  }
-
+  Status = EFI_SUCCESS;
   if (SerialDevice->Handle != NULL) {
+    Uart = (UART_DEVICE_PATH *) (
+             (UINTN) SerialDevice->DevicePath
+             + GetDevicePathSize (SerialDevice->ParentDevicePath)
+             - END_DEVICE_PATH_LENGTH
+             );
+    CopyMem (Uart, &SerialDevice->UartDevicePath, sizeof (UART_DEVICE_PATH));
     Status = gBS->ReinstallProtocolInterface (
                     SerialDevice->Handle,
                     &gEfiDevicePathProtocolGuid,
                     SerialDevice->DevicePath,
-                    NewDevicePath
+                    SerialDevice->DevicePath
                     );
-    if (EFI_ERROR (Status)) {
-      gBS->RestoreTPL (Tpl);
-      return Status;
-    }
   }
-
-  if (SerialDevice->DevicePath != NULL) {
-    gBS->FreePool (SerialDevice->DevicePath);
-  }
-
-  SerialDevice->DevicePath = NewDevicePath;
 
   gBS->RestoreTPL (Tpl);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -1397,9 +1537,11 @@ IsaSerialSetControl (
   IN UINT32                  Control
   )
 {
-  SERIAL_DEV      *SerialDevice;
-  SERIAL_PORT_MCR Mcr;
-  EFI_TPL         Tpl;
+  SERIAL_DEV                    *SerialDevice;
+  SERIAL_PORT_MCR               Mcr;
+  EFI_TPL                       Tpl;
+  UART_FLOW_CONTROL_DEVICE_PATH *FlowControl;
+  EFI_STATUS                    Status;
 
   //
   // The control bits that can be set are :
@@ -1407,13 +1549,16 @@ IsaSerialSetControl (
   //     EFI_SERIAL_REQUEST_TO_SEND: 0x0002  // WO
   //     EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE: 0x1000  // RW
   //     EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE: 0x2000  // RW
+  //     EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE: 0x4000 // RW
   //
   SerialDevice = SERIAL_DEV_FROM_THIS (This);
 
   //
   // first determine the parameter is invalid
   //
-  if ((Control & 0xffff8ffc) != 0) {
+  if (Control & (~(EFI_SERIAL_REQUEST_TO_SEND | EFI_SERIAL_DATA_TERMINAL_READY |
+                   EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE | EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE | 
+                   EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE))) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1448,9 +1593,32 @@ IsaSerialSetControl (
     SerialDevice->SoftwareLoopbackEnable = TRUE;
   }
 
+  Status = EFI_SUCCESS;
+  if (SerialDevice->Handle != NULL) {
+    FlowControl = (UART_FLOW_CONTROL_DEVICE_PATH *) (
+                    (UINTN) SerialDevice->DevicePath
+                    + GetDevicePathSize (SerialDevice->ParentDevicePath)
+                    - END_DEVICE_PATH_LENGTH
+                    + sizeof (UART_DEVICE_PATH)
+                    );
+    if (IsUartFlowControlNode (FlowControl) &&
+        ((ReadUnaligned32 (&FlowControl->FlowControlMap) == UART_FLOW_CONTROL_HARDWARE) ^ SerialDevice->HardwareFlowControl)) {
+      //
+      // Flow Control setting is changed, need to reinstall device path protocol
+      //
+      WriteUnaligned32 (&FlowControl->FlowControlMap, SerialDevice->HardwareFlowControl ? UART_FLOW_CONTROL_HARDWARE : 0);
+      Status = gBS->ReinstallProtocolInterface (
+                      SerialDevice->Handle,
+                      &gEfiDevicePathProtocolGuid,
+                      SerialDevice->DevicePath,
+                      SerialDevice->DevicePath
+                      );
+    }
+  }
+
   gBS->RestoreTPL (Tpl);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
