@@ -90,6 +90,8 @@ Abstract:
 
 #define VA_END(Marker)                ((void)0)
 
+#define VA_COPY(Dest, Start)          __va_copy (Dest, Start)
+
 #elif defined(__GNUC__) && !defined(NO_BUILTIN_VA_FUNCS)
 //
 // Use GCC built-in macros for variable argument lists.
@@ -106,6 +108,8 @@ typedef __builtin_va_list VA_LIST;
 #define VA_ARG(Marker, TYPE)         ((sizeof (TYPE) < sizeof (UINTN)) ? (TYPE)(__builtin_va_arg (Marker, UINTN)) : (TYPE)(__builtin_va_arg (Marker, TYPE)))
 
 #define VA_END(Marker)               __builtin_va_end (Marker)
+
+#define VA_COPY(Dest, Start)         __builtin_va_copy (Dest, Start)
 
 #else
 
@@ -164,6 +168,8 @@ typedef CHAR8 *VA_LIST;
   
 **/
 #define VA_END(Marker)      (Marker = (VA_LIST) 0)
+
+#define VA_COPY(dest, src) ((void)((dest) = (src)))
 
 #endif
 
