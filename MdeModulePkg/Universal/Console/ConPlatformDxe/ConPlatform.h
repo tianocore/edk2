@@ -20,6 +20,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/SimpleTextIn.h>
+#include <Protocol/PciIo.h>
+#include <Protocol/GraphicsOutput.h>
 
 #include <Guid/GlobalVariable.h>
 #include <Guid/ConsoleInDevice.h>
@@ -422,5 +424,19 @@ ConPlatformComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   );
 
+/**
+  Update ConOutDev and ErrOutDev variables to add the device path of
+  GOP controller itself and the sibling controllers.
+
+  @param  DevicePath            Pointer to device's device path.
+
+  @retval TRUE                  The devcie is a GOP device.
+  @retval FALSE                 The devcie is not a GOP device.
+
+**/
+BOOLEAN
+ConPlatformUpdateGopCandidate (
+  IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath
+  );
 
 #endif

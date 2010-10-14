@@ -450,22 +450,25 @@ ConPlatformTextOutDriverBindingStart (
     }
   } else {
     //
-    // If it is not a hot-plug device, first append the device path to the
-    // ConOutDev environment variable
+    // If it is not a hot-plug device, append the device path to 
+    // the ConOutDev and ErrOutDev environment variable.
+    // For GOP device path, append the sibling device path as well.
     //
-    ConPlatformUpdateDeviceVariable (
-      L"ConOutDev",
-      DevicePath,
-      Append
-      );
-    //
-    // Then append the device path to the ErrOutDev environment variable
-    //
-    ConPlatformUpdateDeviceVariable (
-      L"ErrOutDev",
-      DevicePath,
-      Append
-      );
+    if (!ConPlatformUpdateGopCandidate (DevicePath)) {
+      ConPlatformUpdateDeviceVariable (
+        L"ConOutDev",
+        DevicePath,
+        Append
+        );
+      //
+      // Then append the device path to the ErrOutDev environment variable
+      //
+      ConPlatformUpdateDeviceVariable (
+        L"ErrOutDev",
+        DevicePath,
+        Append
+        );
+    }
 
     //
     // If the device path is an instance in the ConOut environment variable,
@@ -1022,3 +1025,79 @@ IsHotPlugDevice (
   return FALSE;
 }
 
+/**
+  Update ConOutDev and ErrOutDev variables to add the device path of
+  GOP controller itself and the sibling controllers.
+
+  @param  DevicePath            Pointer to device's device path.
+
+  @retval TRUE                  The devcie is a GOP device.
+  @retval FALSE                 The devcie is not a GOP device.
+
+**/
+BOOLEAN
+ConPlatformUpdateGopCandidate (
+  IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath
+  )
+{
+  EFI_STATUS                           Status;
+  EFI_HANDLE                           PciHandle;
+  EFI_HANDLE                           GopHandle;
+  EFI_OPEN_PROTOCOL_INFORMATION_ENTRY  *OpenInfoBuffer;
+  UINTN                                EntryCount;
+  UINTN                                Index;
+  EFI_DEVICE_PATH_PROTOCOL             *ChildDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL             *TempDevicePath;
+
+  //
+  // Check whether it's a GOP device.
+  //
+  TempDevicePath = DevicePath;
+  Status = gBS->LocateDevicePath (&gEfiGraphicsOutputProtocolGuid, &TempDevicePath, &GopHandle);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+  //
+  // Get the parent PciIo handle in order to find all the children
+  //
+  Status = gBS->LocateDevicePath (&gEfiPciIoProtocolGuid, &DevicePath, &PciHandle);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  Status = gBS->OpenProtocolInformation (
+                  PciHandle,
+                  &gEfiPciIoProtocolGuid,
+                  &OpenInfoBuffer,
+                  &EntryCount
+                  );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  for (Index = 0; Index < EntryCount; Index++) {
+    //
+    // Query all the children created by the GOP driver
+    //
+    if ((OpenInfoBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
+      Status = gBS->OpenProtocol (
+                      OpenInfoBuffer[Index].ControllerHandle,
+                      &gEfiDevicePathProtocolGuid,
+                      (VOID **) &ChildDevicePath,
+                      NULL,
+                      NULL,
+                      EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                      );
+      if (!EFI_ERROR (Status)) {
+        //
+        // Append the device path to ConOutDev and ErrOutDev
+        //
+        ConPlatformUpdateDeviceVariable (L"ConOutDev", ChildDevicePath, Append);
+        ConPlatformUpdateDeviceVariable (L"ErrOutDev", ChildDevicePath, Append);
+      }
+    }
+  }
+  FreePool (OpenInfoBuffer);
+
+  return TRUE;
+}

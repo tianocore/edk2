@@ -87,4 +87,5 @@
   gEfiDevicePathProtocolGuid                    ## TO_START
   gEfiSimpleTextInProtocolGuid                  ## TO_START
   gEfiSimpleTextOutProtocolGuid                 ## TO_START
-  
+  gEfiPciIoProtocolGuid                         ## TO_START
+  gEfiGraphicsOutputProtocolGuid                ## TO_START
