@@ -1172,14 +1172,15 @@ def ParseConsoleLog(Filename):
 #
 def CheckPcdDatum(Type, Value):
     if Type == "VOID*":
-        if not ((Value.startswith('L"') or Value.startswith('"') and Value.endswith('"'))
+        if not (((Value.startswith('L"') or Value.startswith('"')) and Value.endswith('"'))
                 or (Value.startswith('{') and Value.endswith('}'))
                ):
             return False, "Invalid value [%s] of type [%s]; must be in the form of {...} for array"\
                           ", or \"...\" for string, or L\"...\" for unicode string" % (Value, Type)
     elif Type == 'BOOLEAN':
-        if Value not in ['TRUE', 'FALSE']:
-            return False, "Invalid value [%s] of type [%s]; must be TRUE or FALSE" % (Value, Type)
+        if Value not in ['TRUE', 'True', 'true', '0x1', '0x01', '1', 'FALSE', 'False', 'false', '0x0', '0x00', '0']:
+            return False, "Invalid value [%s] of type [%s]; must be one of TRUE, True, true, 0x1, 0x01, 1"\
+                          ", FALSE, False, false, 0x0, 0x00, 0" % (Value, Type)
     elif type(Value) == type(""):
         try:
             Value = long(Value, 0)

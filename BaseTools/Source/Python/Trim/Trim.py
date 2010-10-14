@@ -41,7 +41,7 @@ gHexNumberPattern = re.compile("0[xX]([0-9a-fA-F]+)")
 ## Regular expression for matching "Include ()" in asl file
 gAslIncludePattern = re.compile("^(\s*)[iI]nclude\s*\(\"?([^\"\(\)]+)\"\)", re.MULTILINE)
 ## Regular expression for matching C style #include "XXX.asl" in asl file
-gAslCIncludePattern = re.compile(r'^(\s*)#include\s*[<"]\s*([-\\/\w.]+)\s*[>"]', re.MULTILINE)
+gAslCIncludePattern = re.compile(r'^(\s*)#include\s*[<"]\s*([-\\/\w.]+)\s*([>"])', re.MULTILINE)
 ## Regular expression for matching constant with 'ULL' and 'UL', 'LL', 'L' postfix
 gLongNumberPattern = re.compile("(0[xX][0-9a-fA-F]+|[0-9]+)U?LL", re.MULTILINE)
 ## Patterns used to convert EDK conventions to EDK2 ECP conventions
@@ -273,12 +273,23 @@ def TrimPreprocessedVfr(Source, Target):
 # @param  Source            File to be read
 # @param  Indent            Spaces before the Include() statement
 # @param  IncludePathList   The list of external include file
+# @param  LocalSearchPath   If LocalSearchPath is specified, this path will be searched
+#                           first for the included file; otherwise, only the path specified
+#                           in the IncludePathList will be searched.
 #
-def DoInclude(Source, Indent='', IncludePathList=[]):
+def DoInclude(Source, Indent='', IncludePathList=[], LocalSearchPath=None):
     NewFileContent = []
 
     try:
-        for IncludePath in IncludePathList:
+        #
+        # Search LocalSearchPath first if it is specified.
+        #
+        if LocalSearchPath:
+            SearchPathList = [LocalSearchPath] + IncludePathList
+        else:
+            SearchPathList = IncludePathList
+  
+        for IncludePath in SearchPathList:
             IncludeFile = os.path.join(IncludePath, Source)
             if os.path.isfile(IncludeFile):
                 F = open(IncludeFile, "r")
@@ -298,15 +309,21 @@ def DoInclude(Source, Indent='', IncludePathList=[]):
     gIncludedAslFile.append(IncludeFile)
     
     for Line in F:
+        LocalSearchPath = None
         Result = gAslIncludePattern.findall(Line)
         if len(Result) == 0:
             Result = gAslCIncludePattern.findall(Line)
             if len(Result) == 0 or os.path.splitext(Result[0][1])[1].lower() not in [".asl", ".asi"]:
                 NewFileContent.append("%s%s" % (Indent, Line))
                 continue
+            #
+            # We should first search the local directory if current file are using pattern #include "XXX" 
+            #
+            if Result[0][2] == '"':
+                LocalSearchPath = os.path.dirname(IncludeFile)
         CurrentIndent = Indent + Result[0][0]
         IncludedFile = Result[0][1]
-        NewFileContent.extend(DoInclude(IncludedFile, CurrentIndent, IncludePathList))
+        NewFileContent.extend(DoInclude(IncludedFile, CurrentIndent, IncludePathList, LocalSearchPath))
         NewFileContent.append("\n")
 
     gIncludedAslFile.pop()
