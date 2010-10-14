@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FrameworkDatabase xmlns="http://www.TianoCore.org/2006/Edk2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <FdbHeader>
+    <DatabaseName>FrameworkDatabase</DatabaseName>
+    <GuidValue>DD6913E0-3E4E-4B83-8838-57EE7FB71DD1</GuidValue>
+    <Version>0.3</Version>
+    <Abstract>The Framework Module Development Packaging System Database</Abstract>
+    <Description>
+      This Database tracks all packages and archives installed in this workspace.
+    </Description>
+    <Copyright>Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.</Copyright>
+    <License>
+      This program and the accompanying materials are licensed and made available
+      under the terms and conditions of the BSD License which accompanies this
+      distribution.  The full text of the license may be found at:
+        http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
+      WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>FRAMEWORK_PACKAGING_SPECIFICATION 0x00090000</Specification>
+  </FdbHeader>
+  <PackageList>
+    <Filename>MdePkg/MdePkg.dec</Filename>
+    <Filename>MdeModulePkg/MdeModulePkg.dec</Filename>
+    <Filename>IntelFrameworkPkg/IntelFrameworkPkg.dec</Filename>
+    <Filename>IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec</Filename>
+  </PackageList>
+</FrameworkDatabase>

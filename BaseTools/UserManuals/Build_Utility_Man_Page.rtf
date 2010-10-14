@@ -1,0 +1,122 @@
+{\rtf1\ansi\ansicpg1252\deff0\deflang1033\deflangfe2052{\fonttbl{\f0\fswiss\fprq2\fcharset0 Verdana;}{\f1\froman\fprq2\fcharset0 Times New Roman;}}
+{\colortbl ;\red8\green96\blue168;\red0\green0\blue0;}
+{\stylesheet{ Normal;}{\s1 heading 1;}{\s2 heading 2;}}
+{\*\generator Msftedit 5.41.15.1515;}\viewkind4\uc1\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\cf1\b\f0\fs28 Name\par
+\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 Build.exe \endash  the master command that provides the developer with a single command for selecting various options of a build\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\cf1\b\fs28 Synopsis\par
+\pard\nowidctlpar\li360\sb200\cf2\fs18 Build.exe [options] [target]\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\cf1\fs28 Description\par
+\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 Build.exe is the master command line (CLI) tool that provides the developer with a single command for selecting various options of a build.  In general, it checks the environment variables, gets the user\rquote s configuration from either the CLI or target.txt, parses the dsc, dec, inf, target.txt, tools_def.txt, generates .C, .H files and the Makefiles for one or more modules and/or the active platform, calls a make (NMake or make) program to process these Makefiles, then optionally calls GenFds to generate an fd file.\par
+The build tool supports two kinds of path specifications on command line - an absolutely path or a relative (to the WORKSPACE environment variable) path \endash  in command line.\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\b\fs28 Options\par
+\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 There are no required options. \par
+\b -a, --arch <ARCH>\par
+\pard\nowidctlpar\li720\sb200\b0 ARCH is one of list: IA32, X64, IPF or EBC,  which overrides target.txt's TARGET_ARCH  definition. To specify more ARCH, please  repeat this option.\par
+\pard\nowidctlpar\li360\sb200\b -p, --platform PlatformName.dsc\par
+\pard\nowidctlpar\li720\sb200\b0 Build the platform specified by the DSC file  name argument, overrides target.txt's  ACTIVE_PLATFORM definition.\par
+\pard\nowidctlpar\li360\sb200\b -m, --module ModuleName.inf\par
+\pard\nowidctlpar\li720\sb200\b0 Build the module specified by the INF file name argument.\par
+\pard\nowidctlpar\li360\sb200\b -b, --buildtarget <TARGET>\par
+\pard\nowidctlpar\li720\sb200\b0 TARGET is one of list: DEBUG, RELEASE,  which overrides target.txt's TARGET definition. To specify more TARGET, please repeat this option.\par
+\pard\nowidctlpar\li360\sb200\b -t, --tagname Tagname\par
+\pard\nowidctlpar\li720\sb200\b0 Using the Tool Chain Tagname to build the platform, overrides target.txt's TOOL_CHAIN_TAG definition.\par
+\pard\nowidctlpar\li360\sb200\b -f --fdf Filename.fdf\par
+\pard\nowidctlpar\li720\sb200\b0 The name of the FDF file to use, which overrides the setting in the DSC file.\par
+\pard\nowidctlpar\li360\sb200\b -r --rom-image ROM_IMAGE_NAME\par
+\pard\nowidctlpar\li720\sb200\b0 The name of FD to be generated. The name must be from [FD] section in FDF file.\par
+\pard\nowidctlpar\li360\sb200\b -i --fv-image FV_IMAGE_NAME\par
+\pard\nowidctlpar\li720\sb200\b0 The name of FV to be generated. The name must be from [FV] section in FDF file.\par
+\pard\nowidctlpar\li360\sb200\b -n NUM\par
+\pard\nowidctlpar\li720\sb200\b0 Build the platform using multi-threaded compiler. The value overrides target.txt's MULTIPLE_THREAD and MAX_CONCURRENT_THREAD_NUMBER. Less than 2 will disable multi-thread builds.\par
+\pard\nowidctlpar\li360\sb200\b -x --sku-id SKU_ID\f1\par
+\pard\nowidctlpar\li720\sb200\b0\f0 Using this name of SKU ID to build the platform, overriding SKUID_IDENTIFIER in DSC file.\par
+\pard\nowidctlpar\li360\sb200\b -u --skip-autogen\f1\par
+\pard\nowidctlpar\li720\sb200\b0\f0 Skip AutoGen step. Note the build may fail if there\rquote s no AutoGen-ed files before.\par
+\pard\nowidctlpar\li360\sb200\b -e --re-parse\f1\par
+\pard\nowidctlpar\li720\sb200\b0\f0 Re-parse all meta-data files. Use this option if you encounter inconsistency issue.\f1\par
+\pard\nowidctlpar\li360\sb200\b\f0 -w --warning-as-error\f1\par
+\pard\nowidctlpar\li720\sb200\b0\f0 Treat warning in tools as error.\par
+\pard\nowidctlpar\li360\sb200\b -j --log LOGFILE\f1\par
+\pard\nowidctlpar\li720\sb200\b0\f0 Put screen output in specified file.\par
+\pard\nowidctlpar\li360\sb200\b -s \endash silent\par
+\pard\nowidctlpar\li720\sb200\b0 Tell \ldblquote make\rdblquote  tool to run \ldblquote silently\rdblquote . Internally, a \lquote -s\rquote  switch will be passed to \ldblquote make\rdblquote  tool. Don\rquote t use this option if your \ldblquote make\rdblquote  tool doesn\rquote t support \lquote -s\rquote . Instead, if your \ldblquote make\rdblquote  tool uses other option to do the same, you could add it to the XX_XX_XX_MAKE_FLAGS in tools_def.txt.\par
+\pard\nowidctlpar\li360\sb200\b -d, --debug [#]\par
+\pard\nowidctlpar\li720\sb200\b0 Enable debug messages at specified level. It is used by Tool itself.\par
+\pard\nowidctlpar\li360\sb200\b -q, --quiet\par
+\pard\nowidctlpar\li720\sb200\b0 Disable all messages except FATAL ERRORS.\par
+\pard\nowidctlpar\li360\sb200\b -v, --verbose\par
+\pard\nowidctlpar\li720\sb200\b0 Turn on verbose output with informational messages printed.\par
+\pard\nowidctlpar\li360\sb200\b -D, --define MACROS\par
+\pard\nowidctlpar\li720\sb200\b0 Macro: "Name [= Value]".\par
+\pard\nowidctlpar\li360\sb200\b -y, --report-file REPORTFILE\f1\par
+\pard\nowidctlpar\li720\sb200\b0\f0 Create/overwrite the report to the specified filename.\par
+\pard\nowidctlpar\li360\sb200\b -Y, --report-type REPORTTYPE\par
+\pard\nowidctlpar\li720\sb200\b0 Flags that control the type of build report to generate.  Must be one of: [PCD, LIBRARY, FLASH, DEPEX, BUILD_FLAGS, FIXED_ADDRESS, EXECUTION_ORDER].  To specify more than one flag, repeat this option on the command line and the default flag set is [PCD, LIBRARY, FLASH, DEPEX, BUILD_FLAGS, FIXED_ADDRESS]\f1\par
+\pard\nowidctlpar\li360\sb200\b\f0 -F FLAG, --flag=FLAG\f1\par
+\pard\nowidctlpar\li720\sb200\b0\f0 Specify the specific option to parse EDK UNI file. Must be one of: [-c, -s]. -c is for EDK framework UNI file, and -s is for EDK UEFI UNI file. This option can also be specified by setting *_*_*_BUILD_FLAGS in [BuildOptions] section of platform DSC. If they are both specified, this value will override the setting in [BuildOptions] section of platform DSC.\par
+\pard\nowidctlpar\li360\sb200\b --version\par
+\pard\nowidctlpar\li720\sb200\b0 Show program's copyright and version number then exit.\par
+\pard\nowidctlpar\li360\sb200\b -h, --help\par
+\pard\nowidctlpar\li720\sb200\b0 Print the copyright, version and usage of this program then exit.\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\b\fs28 Target\par
+\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 If no target is given, then default target is ALL.\par
+\b ALL\b0            Build everything for either the platform or module.\par
+\b GenC\b0          Auto-generate all C files for either the platform or module.\par
+\b GenMake\b0      Generate the Makefiles \endash  if auto-generated files are missing,\par
+\pard\nowidctlpar\li360                     then auto-generate all C files first for either the platform or module.\par
+\pard\nowidctlpar\li360\sb200\b Fds\b0             Create the FD Image files.\par
+\b Libraries\b0       Build all EDK Libraries and EDK II Library Instances which are specified.\par
+\b Modules\b0        Build all EDK components and EDK II modules which are specified.\par
+\b Clean\b0          Remove intermediate files generated by the NMAKE command (leaving\par
+\pard\nowidctlpar\li360                     the auto-generated C format, FD image files, PE32 output files, PCH \par
+                    files and LIB files).\par
+\pard\nowidctlpar\li360\sb200\b CleanAll\b0       Remove all intermmediate, auto-generated, FV and FD image files \endash  \par
+\pard\nowidctlpar\li360                    state of the tree should be exactly as if a fresh checkout or install has \par
+                   occurred.\par
+\pard\nowidctlpar\li360\sb200\b CleanLib\b0      Remove intermediate files generated by the NMAKE command AND LIB \par
+\pard\nowidctlpar\li360                    files (leaving the auto-generated, FV and FD image files, PE32 output \par
+                   files and PCH files)\par
+\pard\nowidctlpar\li360\sb200\b run\b0            Run platform (for emulator platform only)\par
+\pard\nowidctlpar\li360\f1\par
+\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\b\f0\fs28 Examples\par
+\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 Assume that $(WORKSPACE) is C:\\MyWorkspace\par
+\pard\nowidctlpar\li180\sb200 Build platform: Nt32Pkg.dsc\par
+\pard\nowidctlpar\li360\sb200 Specify the platform description file on the command line.\par
+\pard\nowidctlpar\li720\sb200\b C:\\MyWorkspace>build -p Nt32Pkg\\Nt32Pkg.dsc \endash a IA32\par
+\pard\nowidctlpar\li360\sb200\b0 Build the platform in the current working directory if it contains a platform description file.\par
+\pard\nowidctlpar\li720\sb200\b C:\\MyWorkspace\\Nt32Pkg>build \endash a IA32\par
+\pard\nowidctlpar\li360\sb200\b0 Build the active platform specified in the target.txt file.\par
+\pard\nowidctlpar\li720\sb200\b C:\\ MyWorkspace>build \endash a Ia32\par
+\pard\nowidctlpar\li360\sb200\b0\f1\par
+\pard\nowidctlpar\li180\sb200\f0 Build Module: HelloWorld.inf\par
+\pard\nowidctlpar\li360\sb200 Specify the platform and Module on the command line.\par
+\pard\nowidctlpar\li720\sb200\b C:\\MyWorkspace>build -p Nt32Pkg\\Nt32Pkg.dsc \endash a IA32 \\\par
+\pard\nowidctlpar\li720  \endash m MdeModulePkg/Application/HelloWorld/HelloWorld.inf\par
+\pard\nowidctlpar\li360\sb200\b0 Specify the Module on the command line and use the active platform specified in the target.txt file.\par
+\pard\nowidctlpar\li720\sb200\b C:\\MyWorkspace>build \endash a IA32 \\\par
+\pard\nowidctlpar\li720\endash m MdeModulePkg/Application/HelloWorld/HelloWorld.inf\par
+\pard\nowidctlpar\li360\sb200\b0 Build the module in the current working directory if it contains a module description file and specify the platform on the command line.\par
+\pard\nowidctlpar\li720\sb200\b C:\\ MyWorkspace\\MdeModulePkg\\Application\\HelloWorld>build \endash a Ia32 \\\par
+\pard\nowidctlpar\li720\endash p Nt32Pkg\\Nt32Pkg.dsc\par
+\pard\nowidctlpar\li360\sb200\b0 Build the module in the current working directory and use the active platform specified in the target.txt file.\par
+\pard\nowidctlpar\li720\sb200\b C:\\ MyWorkspace\\MdeModulePkg\\Application\\HelloWorld>build \endash a Ia32 \par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\fs28 Bugs \par
+\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 No known bugs.\par
+Report bugs to edk2-buildtools-devel@lists.sourceforge.net\f1\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\b\f0\fs28 Files \par
+\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 target.txt, tools_def.txt, platform.dsc, flashmap.fdf, package.dec and module.inf.\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\b\fs28 See also\par
+\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 GenFds.exe\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\b\fs28 License\par
+\pard\nowidctlpar\li360\cf2\b0\fs18 Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.\par
+\par
+This program and the accompanying materials are licensed and made available under the terms and\par
+conditions of the BSD License which accompanies this distribution.  The full text of the license may be\par
+found at:\par
+http://opensource.org/licenses/bsd-license.php\par
+\par
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES\par
+OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.\par
+}
+ 

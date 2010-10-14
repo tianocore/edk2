@@ -1,0 +1,60 @@
+## @file
+#
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.    The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+!IFNDEF EDK_TOOLS_PATH
+!ERROR "Please set your EDK_TOOLS_PATH!"
+!ENDIF
+
+!IFNDEF BASE_TOOLS_PATH
+!ERROR "BASE_TOOLS_PATH is not set! Please run build_tools.bat at first!"
+!ENDIF
+
+!IFNDEF ARCH
+ARCH = IA32
+!ENDIF
+
+MAKE        = nmake -nologo
+
+SOURCE_PATH = $(BASE_TOOLS_PATH)\Source\C
+BIN_PATH    = $(BASE_TOOLS_PATH)\Bin
+LIB_PATH    = $(BASE_TOOLS_PATH)\Lib
+
+SYS_BIN_PATH=$(EDK_TOOLS_PATH)\Bin
+SYS_LIB_PATH=$(EDK_TOOLS_PATH)\Lib
+
+!IF "$(ARCH)"=="IA32"
+ARCH_INCLUDE = $(SOURCE_PATH)\Include\Ia32
+BIN_PATH     = $(BASE_TOOLS_PATH)\Bin\Win32
+LIB_PATH     = $(BASE_TOOLS_PATH)\Lib\Win32
+SYS_BIN_PATH = $(EDK_TOOLS_PATH)\Bin\Win32
+SYS_LIB_PATH = $(EDK_TOOLS_PATH)\Lib\Win32
+!ENDIF
+
+!IF "$(ARCH)"=="X64"
+ARCH_INCLUDE = $(SOURCE_PATH)\Include\X64
+BIN_PATH     = $(BASE_TOOLS_PATH)\Bin\Win64
+LIB_PATH     = $(BASE_TOOLS_PATH)\Lib\Win64
+SYS_BIN_PATH = $(EDK_TOOLS_PATH)\Bin\Win64
+SYS_LIB_PATH = $(EDK_TOOLS_PATH)\Lib\Win64
+!ENDIF
+
+CC = cl.exe
+CXX = cl.exe
+AS = ml.exe
+AR = lib.exe
+LD = link.exe
+LINKER = $(LD)
+
+INC = -I . -I $(SOURCE_PATH)\Include -I $(ARCH_INCLUDE) -I $(SOURCE_PATH)\Common $(INC)
+
+CFLAGS = $(CFLAGS) /nologo /c /Zi /Od /RTC1 /D _DEBUG /MTd /W4 /WX /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE 
+CPPFLAGS = $(CPPFLAGS) /EHsc /nologo /c /Zi /Od /RTC1 /D _DEBUG /MTd /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE 
+
