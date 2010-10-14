@@ -425,7 +425,7 @@ AhciBuildCommand (
     AhciAndReg (PciIo, Offset, (UINT32)~(EFI_AHCI_PORT_CMD_DLAE | EFI_AHCI_PORT_CMD_ATAPI));
   }
   
-  RemainedData = DataLength;
+  RemainedData = (UINTN) DataLength;
   MemAddr      = (UINTN) DataPhysicalAddr;
   CommandList->AhciCmdPrdtl = (UINT32)PrdtNumber;
   
@@ -1569,7 +1569,7 @@ AhciCreateTransferDescriptor (
                     PciIo,
                     AllocateAnyPages,
                     EfiBootServicesData,
-                    EFI_SIZE_TO_PAGES (MaxReceiveFisSize),
+                    (UINTN)EFI_SIZE_TO_PAGES (MaxReceiveFisSize),
                     &Buffer,
                     0
                     );
@@ -1578,11 +1578,11 @@ AhciCreateTransferDescriptor (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  ZeroMem (Buffer, MaxReceiveFisSize);
+  ZeroMem (Buffer, (UINTN)MaxReceiveFisSize);
 
   AhciRegisters->AhciRFis          = Buffer;
   AhciRegisters->MaxReceiveFisSize = MaxReceiveFisSize;
-  Bytes  = MaxReceiveFisSize;
+  Bytes  = (UINTN)MaxReceiveFisSize;
 
   Status = PciIo->Map (
                     PciIo,
@@ -1619,7 +1619,7 @@ AhciCreateTransferDescriptor (
                     PciIo,
                     AllocateAnyPages,
                     EfiBootServicesData,
-                    EFI_SIZE_TO_PAGES (MaxCommandListSize),
+                    (UINTN)EFI_SIZE_TO_PAGES (MaxCommandListSize),
                     &Buffer,
                     0
                     );
@@ -1632,11 +1632,11 @@ AhciCreateTransferDescriptor (
     goto Error5;
   }
 
-  ZeroMem (Buffer, MaxCommandListSize);
+  ZeroMem (Buffer, (UINTN)MaxCommandListSize);
 
   AhciRegisters->AhciCmdList        = Buffer;
   AhciRegisters->MaxCommandListSize = MaxCommandListSize;
-  Bytes  = MaxCommandListSize;
+  Bytes  = (UINTN)MaxCommandListSize;
 
   Status = PciIo->Map (
                     PciIo,
@@ -1674,7 +1674,7 @@ AhciCreateTransferDescriptor (
                     PciIo,
                     AllocateAnyPages,
                     EfiBootServicesData,
-                    EFI_SIZE_TO_PAGES (MaxCommandTableSize),
+                    (UINTN)EFI_SIZE_TO_PAGES (MaxCommandTableSize),
                     &Buffer,
                     0
                     );
@@ -1687,11 +1687,11 @@ AhciCreateTransferDescriptor (
     goto Error3;
   }
 
-  ZeroMem (Buffer, MaxCommandTableSize);
+  ZeroMem (Buffer, (UINTN)MaxCommandTableSize);
 
   AhciRegisters->AhciCommandTable    = Buffer;
   AhciRegisters->MaxCommandTableSize = MaxCommandTableSize;
-  Bytes  = MaxCommandTableSize;
+  Bytes  = (UINTN)MaxCommandTableSize;
 
   Status = PciIo->Map (
                     PciIo,
@@ -1730,7 +1730,7 @@ Error1:
 Error2:
   PciIo->FreeBuffer (
            PciIo,
-           EFI_SIZE_TO_PAGES (MaxCommandTableSize),
+           (UINTN)EFI_SIZE_TO_PAGES (MaxCommandTableSize),
            AhciRegisters->AhciCommandTable
            );
 Error3:
@@ -1741,7 +1741,7 @@ Error3:
 Error4:
   PciIo->FreeBuffer (
            PciIo,
-           EFI_SIZE_TO_PAGES (MaxCommandListSize),
+           (UINTN)EFI_SIZE_TO_PAGES (MaxCommandListSize),
            AhciRegisters->AhciCmdList
            );
 Error5:
@@ -1752,7 +1752,7 @@ Error5:
 Error6:
   PciIo->FreeBuffer (
            PciIo,
-           EFI_SIZE_TO_PAGES (MaxReceiveFisSize),
+           (UINTN)EFI_SIZE_TO_PAGES (MaxReceiveFisSize),
            AhciRegisters->AhciRFis
            );
 

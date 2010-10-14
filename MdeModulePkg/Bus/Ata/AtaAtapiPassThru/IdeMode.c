@@ -1448,7 +1448,7 @@ AtaUdmaInOut (
     PciIoOperation = EfiPciIoOperationBusMasterRead;
   }
 
-  ByteCount = DataLength;
+  ByteCount = (UINTN)DataLength;
   Status    = PciIo->Map (
                        PciIo,
                        PciIoOperation,
