@@ -2631,8 +2631,8 @@ Returns:
         FreePool (TempFileName);
       }
     } else {
+      Status    = EFI_ACCESS_DENIED;
 Reopen: ;
-      Status    = EFI_DEVICE_ERROR;
 
       NtStatus  = PrivateFile->WinNtThunk->SetFileAttributes (OldFileName, OldAttr);
 
@@ -2829,6 +2829,7 @@ Reopen: ;
   NtStatus = PrivateFile->WinNtThunk->SetFileAttributes (NewFileName, NewAttr);
 
   if (!NtStatus) {
+    Status    = EFI_DEVICE_ERROR;
     goto Reopen;
   }
 
