@@ -463,14 +463,14 @@ Ip4IpSecFree (
   outbound IP packets. The process routine handls the packet with following
   actions: bypass the packet, discard the packet, or protect the packet.       
 
-  @param[in]       IpSb          The IP4 service instance
-  @param[in]       Head          The The caller supplied IP4 header.
-  @param[in, out]  Netbuf        The IP4 packet to be processed by IPsec
-  @param[in]       Options       The caller supplied options
-  @param[in]       OptionsLen    The length of the option
+  @param[in]       IpSb          The IP4 service instance.
+  @param[in, out]  Head          The The caller supplied IP4 header.
+  @param[in, out]  Netbuf        The IP4 packet to be processed by IPsec.
+  @param[in, out]  Options       The caller supplied options.
+  @param[in, out]  OptionsLen    The length of the option.
   @param[in]       Direction     The directionality in an SPD entry, 
-                                 EfiIPsecInBound or EfiIPsecOutBound
-  @param[in]       Context       The token's wrap
+                                 EfiIPsecInBound or EfiIPsecOutBound.
+  @param[in]       Context       The token's wrap.
 
   @retval EFI_SUCCESS            The IPsec protocol is not available or disabled.
   @retval EFI_SUCCESS            The packet was bypassed and all buffers remain the same.
@@ -483,22 +483,25 @@ Ip4IpSecFree (
 **/
 EFI_STATUS
 Ip4IpSecProcessPacket (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_HEAD               *Head,
-  IN OUT NET_BUF            **Netbuf,
-  IN UINT8                  *Options,
-  IN UINT32                 OptionsLen,
-  IN EFI_IPSEC_TRAFFIC_DIR  Direction,
-  IN VOID                   *Context
+  IN     IP4_SERVICE            *IpSb,
+  IN OUT IP4_HEAD               **Head,
+  IN OUT NET_BUF                **Netbuf,
+  IN OUT UINT8                  **Options,
+  IN OUT UINT32                 *OptionsLen,
+  IN     EFI_IPSEC_TRAFFIC_DIR  Direction,
+  IN     VOID                   *Context
   )
 {
   NET_FRAGMENT              *FragmentTable;
+  NET_FRAGMENT              *OriginalFragmentTable;
   UINT32                    FragmentCount;
+  UINT32                    OriginalFragmentCount;
   EFI_EVENT                 RecycleEvent;
   NET_BUF                   *Packet;
   IP4_TXTOKEN_WRAP          *TxWrap;
   IP4_IPSEC_WRAP            *IpSecWrap;
   EFI_STATUS                Status;
+  IP4_HEAD                  ZeroHead;
 
   Status        = EFI_SUCCESS;
   Packet        = *Netbuf;
@@ -507,6 +510,8 @@ Ip4IpSecProcessPacket (
   FragmentTable = NULL;
   TxWrap        = (IP4_TXTOKEN_WRAP *) Context; 
   FragmentCount = Packet->BlockOpNum;
+
+  ZeroMem (&ZeroHead, sizeof (IP4_HEAD));
   
   if (mIpSec == NULL) {
     gBS->LocateProtocol (&gEfiIpSecProtocolGuid, NULL, (VOID **) &mIpSec);
@@ -542,6 +547,12 @@ Ip4IpSecProcessPacket (
   }
  
   Status = NetbufBuildExt (Packet, FragmentTable, &FragmentCount);
+  
+  //
+  // Record the original FragmentTable and count.
+  //
+  OriginalFragmentTable = FragmentTable;
+  OriginalFragmentCount = FragmentCount;
 
   if (EFI_ERROR (Status)) {
     FreePool (FragmentTable);
@@ -551,16 +562,16 @@ Ip4IpSecProcessPacket (
   //
   // Convert host byte order to network byte order
   //
-  Ip4NtohHead (Head);
+  Ip4NtohHead (*Head);
   
-  Status = mIpSec->Process (
+  Status = mIpSec->ProcessExt (
                      mIpSec,
                      IpSb->Controller,
                      IP_VERSION_4,
-                     (VOID *) Head,
-                     &Head->Protocol,
-                     NULL,
-                     0,
+                     (VOID *) (*Head),
+                     &(*Head)->Protocol,
+                     Options,
+                     OptionsLen,
                      (EFI_IPSEC_FRAGMENT_DATA **) (&FragmentTable),
                      &FragmentCount,
                      Direction,
@@ -569,9 +580,13 @@ Ip4IpSecProcessPacket (
   //
   // Convert back to host byte order
   //
-  Ip4NtohHead (Head);
+  Ip4NtohHead (*Head);
   
   if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+
+  if (OriginalFragmentTable == FragmentTable && OriginalFragmentCount == FragmentCount) {
     goto ON_EXIT;
   }
 
@@ -591,6 +606,10 @@ Ip4IpSecProcessPacket (
       goto ON_EXIT;
     }
 
+    //
+    // Free orginal Netbuf.
+    //
+    NetIpSecNetbufFree (*Netbuf);
     *Netbuf = TxWrap->Packet;
     
   } else {
@@ -617,10 +636,10 @@ Ip4IpSecProcessPacket (
       goto ON_EXIT;
     }
 
-    if (Direction == EfiIPsecInBound) {
-      Ip4PrependHead (Packet, Head, Options, OptionsLen);
+    if (Direction == EfiIPsecInBound && 0 != CompareMem (*Head, &ZeroHead, sizeof (IP4_HEAD))) {
+      Ip4PrependHead (Packet, *Head, *Options, *OptionsLen);
       Ip4NtohHead (Packet->Ip.Ip4);
-      NetbufTrim (Packet, (Head->HeadLen << 2), TRUE);
+      NetbufTrim (Packet, ((*Head)->HeadLen << 2), TRUE);
 
       CopyMem (
         IP4_GET_CLIP_INFO (Packet),
@@ -628,12 +647,142 @@ Ip4IpSecProcessPacket (
         sizeof (IP4_CLIP_INFO)
         );
     }
-
     *Netbuf = Packet;
   }
 
 ON_EXIT:
   return Status;
+}
+
+/**
+  Pre-process the IPv4 packet. First validates the IPv4 packet, and
+  then reassembles packet if it is necessary.
+  
+  @param[in]       IpSb            Pointer to IP4_SERVICE.
+  @param[in, out]  Packet          Pointer to the Packet to be processed.
+  @param[in]       Head            Pointer to the IP4_HEAD.
+  @param[in]       Option          Pointer to a buffer which contains the IPv4 option.
+  @param[in]       OptionLen       The length of Option in bytes.
+  @param[in]       Flag            The link layer flag for the packet received, such
+                                   as multicast.
+
+  @retval     EFI_SEUCCESS               The recieved packet is in well form.
+  @retval     EFI_INVAILD_PARAMETER      The recieved packet is malformed.  
+
+**/
+EFI_STATUS
+Ip4PreProcessPacket (
+  IN     IP4_SERVICE    *IpSb,
+  IN OUT NET_BUF        **Packet,
+  IN     IP4_HEAD       *Head,
+  IN     UINT8          *Option,
+  IN     UINT32         OptionLen, 
+  IN     UINT32         Flag
+  ) 
+{
+  IP4_CLIP_INFO             *Info;
+  UINT32                    HeadLen;
+  UINT32                    TotalLen;
+  UINT16                    Checksum;
+
+  //
+  // Check that the IP4 header is correctly formatted
+  //
+  if ((*Packet)->TotalSize < IP4_MIN_HEADLEN) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  HeadLen  = (Head->HeadLen << 2);
+  TotalLen = NTOHS (Head->TotalLen);
+
+  //
+  // Mnp may deliver frame trailer sequence up, trim it off.
+  //
+  if (TotalLen < (*Packet)->TotalSize) {
+    NetbufTrim (*Packet, (*Packet)->TotalSize - TotalLen, FALSE);
+  }
+
+  if ((Head->Ver != 4) || (HeadLen < IP4_MIN_HEADLEN) ||
+      (TotalLen < HeadLen) || (TotalLen != (*Packet)->TotalSize)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Some OS may send IP packets without checksum.
+  //
+  Checksum = (UINT16) (~NetblockChecksum ((UINT8 *) Head, HeadLen));
+
+  if ((Head->Checksum != 0) && (Checksum != 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Convert the IP header to host byte order, then get the per packet info.
+  //
+  (*Packet)->Ip.Ip4  = Ip4NtohHead (Head);
+
+  Info            = IP4_GET_CLIP_INFO (*Packet);
+  Info->LinkFlag  = Flag;
+  Info->CastType  = Ip4GetHostCast (IpSb, Head->Dst, Head->Src);
+  Info->Start     = (Head->Fragment & IP4_HEAD_OFFSET_MASK) << 3;
+  Info->Length    = Head->TotalLen - HeadLen;
+  Info->End       = Info->Start + Info->Length;
+  Info->Status    = EFI_SUCCESS;
+
+  //
+  // The packet is destinated to us if the CastType is non-zero.
+  //
+  if ((Info->CastType == 0) || (Info->End > IP4_MAX_PACKET_SIZE)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Validate the options. Don't call the Ip4OptionIsValid if
+  // there is no option to save some CPU process.
+  //
+  
+  if ((OptionLen > 0) && !Ip4OptionIsValid (Option, OptionLen, TRUE)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Trim the head off, after this point, the packet is headless.
+  // and Packet->TotalLen == Info->Length.
+  //
+  NetbufTrim (*Packet, HeadLen, TRUE);
+
+  //
+  // Reassemble the packet if this is a fragment. The packet is a
+  // fragment if its head has MF (more fragment) set, or it starts
+  // at non-zero byte.
+  //
+  if (((Head->Fragment & IP4_HEAD_MF_MASK) != 0) || (Info->Start != 0)) {
+    //
+    // Drop the fragment if DF is set but it is fragmented. Gateway
+    // need to send a type 4 destination unreache ICMP message here.
+    //
+    if ((Head->Fragment & IP4_HEAD_DF_MASK) != 0) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
+    // The length of all but the last fragments is in the unit of 8 bytes.
+    //
+    if (((Head->Fragment & IP4_HEAD_MF_MASK) != 0) && (Info->Length % 8 != 0)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    *Packet = Ip4Reassemble (&IpSb->Assemble, *Packet);
+
+    //
+    // Packet assembly isn't complete, start receive more packet.
+    //
+    if (*Packet == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+  
+  return EFI_SUCCESS;
 }
 
 /**
@@ -659,117 +808,39 @@ Ip4AccpetFrame (
   )
 {
   IP4_SERVICE               *IpSb;
-  IP4_CLIP_INFO             *Info;
   IP4_HEAD                  *Head;
-  UINT32                    HeadLen;
-  UINT32                    OptionLen;
-  UINT32                    TotalLen;
-  UINT16                    Checksum;
   EFI_STATUS                Status;
-
-  IpSb = (IP4_SERVICE *) Context;
+  IP4_HEAD                  ZeroHead;
+  UINT8                     *Option;
+  UINT32                    OptionLen;
+  
+  IpSb   = (IP4_SERVICE *) Context;
+  Option = NULL;
 
   if (EFI_ERROR (IoStatus) || (IpSb->State == IP4_SERVICE_DESTORY)) {
     goto DROP;
   }
 
+  Head      = (IP4_HEAD *) NetbufGetByte (Packet, 0, NULL); 
+  OptionLen = (Head->HeadLen << 2) - IP4_MIN_HEADLEN;
+  if (OptionLen > 0) {
+    Option = (UINT8 *) (Head + 1);
+  }
+
   //
-  // Check that the IP4 header is correctly formatted
+  // Validate packet format and reassemble packet if it is necessary.
   //
-  if (Packet->TotalSize < IP4_MIN_HEADLEN) {
+  Status = Ip4PreProcessPacket (
+             IpSb, 
+             &Packet, 
+             Head, 
+             Option,
+             OptionLen,  
+             Flag
+             );
+
+  if (EFI_ERROR (Status)) {
     goto RESTART;
-  }
-
-  Head     = (IP4_HEAD *) NetbufGetByte (Packet, 0, NULL);
-  HeadLen  = (Head->HeadLen << 2);
-  TotalLen = NTOHS (Head->TotalLen);
-
-  //
-  // Mnp may deliver frame trailer sequence up, trim it off.
-  //
-  if (TotalLen < Packet->TotalSize) {
-    NetbufTrim (Packet, Packet->TotalSize - TotalLen, FALSE);
-  }
-
-  if ((Head->Ver != 4) || (HeadLen < IP4_MIN_HEADLEN) ||
-      (TotalLen < HeadLen) || (TotalLen != Packet->TotalSize)) {
-    goto RESTART;
-  }
-
-  //
-  // Some OS may send IP packets without checksum.
-  //
-  Checksum = (UINT16) (~NetblockChecksum ((UINT8 *) Head, HeadLen));
-
-  if ((Head->Checksum != 0) && (Checksum != 0)) {
-    goto RESTART;
-  }
-
-  //
-  // Convert the IP header to host byte order, then get the per packet info.
-  //
-  Packet->Ip.Ip4  = Ip4NtohHead (Head);
-
-  Info            = IP4_GET_CLIP_INFO (Packet);
-  Info->LinkFlag  = Flag;
-  Info->CastType  = Ip4GetHostCast (IpSb, Head->Dst, Head->Src);
-  Info->Start     = (Head->Fragment & IP4_HEAD_OFFSET_MASK) << 3;
-  Info->Length    = Head->TotalLen - HeadLen;
-  Info->End       = Info->Start + Info->Length;
-  Info->Status    = EFI_SUCCESS;
-
-  //
-  // The packet is destinated to us if the CastType is non-zero.
-  //
-  if ((Info->CastType == 0) || (Info->End > IP4_MAX_PACKET_SIZE)) {
-    goto RESTART;
-  }
-
-  //
-  // Validate the options. Don't call the Ip4OptionIsValid if
-  // there is no option to save some CPU process.
-  //
-  OptionLen = HeadLen - IP4_MIN_HEADLEN;
-
-  if ((OptionLen > 0) && !Ip4OptionIsValid ((UINT8 *) (Head + 1), OptionLen, TRUE)) {
-    goto RESTART;
-  }
-
-  //
-  // Trim the head off, after this point, the packet is headless.
-  // and Packet->TotalLen == Info->Length.
-  //
-  NetbufTrim (Packet, HeadLen, TRUE);
-
-  //
-  // Reassemble the packet if this is a fragment. The packet is a
-  // fragment if its head has MF (more fragment) set, or it starts
-  // at non-zero byte.
-  //
-  if (((Head->Fragment & IP4_HEAD_MF_MASK) != 0) || (Info->Start != 0)) {
-    //
-    // Drop the fragment if DF is set but it is fragmented. Gateway
-    // need to send a type 4 destination unreache ICMP message here.
-    //
-    if ((Head->Fragment & IP4_HEAD_DF_MASK) != 0) {
-      goto RESTART;
-    }
-
-    //
-    // The length of all but the last fragments is in the unit of 8 bytes.
-    //
-    if (((Head->Fragment & IP4_HEAD_MF_MASK) != 0) && (Info->Length % 8 != 0)) {
-      goto RESTART;
-    }
-
-    Packet = Ip4Reassemble (&IpSb->Assemble, Packet);
-
-    //
-    // Packet assembly isn't complete, start receive more packet.
-    //
-    if (Packet == NULL) {
-      goto RESTART;
-    }
   }
 
   //
@@ -778,21 +849,40 @@ Ip4AccpetFrame (
   //
   Status = Ip4IpSecProcessPacket (
              IpSb, 
-             Head, 
+             &Head, 
              &Packet, 
-             NULL,
-             0, 
+             &Option,
+             &OptionLen, 
              EfiIPsecInBound,
              NULL
              );
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     goto RESTART;
   }
+  
+  //
+  // If the packet is protected by tunnel mode, parse the inner Ip Packet.
+  //
+  ZeroMem (&ZeroHead, sizeof (IP4_HEAD));
+  if (0 == CompareMem (Head, &ZeroHead, sizeof (IP4_HEAD))) {
   // Packet may have been changed. Head, HeadLen, TotalLen, and
   // info must be reloaded bofore use. The ownership of the packet
   // is transfered to the packet process logic.
   //
+    Head = (IP4_HEAD *) NetbufGetByte (Packet, 0, NULL);
+    Status = Ip4PreProcessPacket (
+               IpSb, 
+               &Packet, 
+               Head, 
+               Option,
+               OptionLen,  
+               Flag
+               );
+    if (EFI_ERROR (Status)) {
+      goto RESTART;
+    }
+  }
   Head  = Packet->Ip.Ip4;
   IP4_GET_CLIP_INFO (Packet)->Status = EFI_SUCCESS;
 

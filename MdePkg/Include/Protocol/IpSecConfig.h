@@ -303,38 +303,6 @@ typedef struct _EFI_IPSEC_PROCESS_POLICY {
 } EFI_IPSEC_PROCESS_POLICY;
 
 ///
-/// IPsec Authentication Algorithm Definition
-///   The number value definition is aligned to IANA assignment
-///
-#define EFI_IPSEC_AALG_NONE                0x00
-#define EFI_IPSEC_AALG_MD5HMAC             0x02
-#define EFI_IPSEC_AALG_SHA1HMAC            0x03
-#define EFI_IPSEC_AALG_SHA2_256HMAC        0x05
-#define EFI_IPSEC_AALG_SHA2_384HMAC        0x06
-#define EFI_IPSEC_AALG_SHA2_512HMAC        0x07
-#define EFI_IPSEC_AALG_AES_XCBC_MAC        0x09
-#define EFI_IPSEC_AALG_NULL                0xFB
-
-///
-/// IPsec Encryption Algorithm Definition
-///   The number value definition is aligned to IANA assignment
-///
-#define EFI_IPSEC_EALG_NONE                0x00
-#define EFI_IPSEC_EALG_DESCBC              0x02
-#define EFI_IPSEC_EALG_3DESCBC             0x03
-#define EFI_IPSEC_EALG_CASTCBC             0x06
-#define EFI_IPSEC_EALG_BLOWFISHCBC         0x07
-#define EFI_IPSEC_EALG_NULL                0x0B
-#define EFI_IPSEC_EALG_AESCBC              0x0C
-#define EFI_IPSEC_EALG_AESCTR              0x0D
-#define EFI_IPSEC_EALG_AES_CCM_ICV8        0x0E
-#define EFI_IPSEC_EALG_AES_CCM_ICV12       0x0F
-#define EFI_IPSEC_EALG_AES_CCM_ICV16       0x10
-#define EFI_IPSEC_EALG_AES_GCM_ICV8        0x12
-#define EFI_IPSEC_EALG_AES_GCM_ICV12       0x13
-#define EFI_IPSEC_EALG_AES_GCM_ICV16       0x14
-
-///
 /// EFI_IPSEC_SA_ID
 /// A triplet to identify an SA, consisting of the following members.
 ///
@@ -485,6 +453,58 @@ typedef struct _EFI_IPSEC_SA_DATA {
   ///
   BOOLEAN                         ManualSet;
 } EFI_IPSEC_SA_DATA;
+
+///
+/// EFI_IPSEC_SA_DATA2
+///
+typedef struct _EFI_IPSEC_SA_DATA2 { 
+  ///
+  /// IPsec mode: tunnel or transport
+  ///
+  EFI_IPSEC_MODE             Mode; 
+  ///
+  /// Sequence Number Counter. A 64-bit counter used to generate the sequence 
+  /// number field in AH or ESP headers. 
+  ///
+  UINT64                     SNCount; 
+  ///
+  /// Anti-Replay Window. A 64-bit counter and a bit-map used to determine 
+  /// whether an inbound AH or ESP packet is a replay.
+  ///
+  UINT8                      AntiReplayWindows; 
+  ///
+  /// AH/ESP cryptographic algorithm, key and parameters.
+  ///
+  EFI_IPSEC_ALGO_INFO        AlgoInfo; 
+  ///
+  /// Lifetime of this SA.
+  ///
+  EFI_IPSEC_SA_LIFETIME      SaLifetime; 
+  ///
+  /// Any observed path MTU and aging variables. The Path MTU processing is 
+  /// defined in section 8 of RFC 4301.
+  ///
+  UINT32                     PathMTU; 
+  ///
+  /// Link to one SPD entry
+  ///
+  EFI_IPSEC_SPD_SELECTOR     *SpdSelector; 
+  ///
+  /// Indication of whether it's manually set or negotiated automatically. 
+  /// If ManualSet is FALSE, the corresponding SA entry is inserted through IKE 
+  /// protocol negotiation
+  ///
+  BOOLEAN                    ManualSet;
+  ///
+  /// The tunnel header IP source address.
+  ///
+  EFI_IP_ADDRESS             TunnelSourceAddress;
+  ///
+  /// The tunnel header IP destination address.
+  ///
+  EFI_IP_ADDRESS             TunnelDestinationAddress;
+} EFI_IPSEC_SA_DATA2; 
+
 
 ///
 /// EFI_IPSEC_PAD_ID

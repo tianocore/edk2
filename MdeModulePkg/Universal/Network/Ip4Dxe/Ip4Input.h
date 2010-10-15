@@ -212,14 +212,14 @@ Ip4PacketTimerTicking (
   outbound IP packets. The process routine handls the packet with following
   actions: bypass the packet, discard the packet, or protect the packet.       
 
-  @param[in]       IpSb          The IP4 service instance
-  @param[in]       Head          The The caller supplied IP4 header.
-  @param[in, out]  Netbuf        The IP4 packet to be processed by IPsec
-  @param[in]       Options       The caller supplied options
-  @param[in]       OptionsLen    The length of the option
+  @param[in]       IpSb          The IP4 service instance.
+  @param[in, out]  Head          The The caller supplied IP4 header.
+  @param[in, out]  Netbuf        The IP4 packet to be processed by IPsec.
+  @param[in, out]  Options       The caller supplied options.
+  @param[in, out]  OptionsLen    The length of the option.
   @param[in]       Direction     The directionality in an SPD entry, 
-                                 EfiIPsecInBound or EfiIPsecOutBound
-  @param[in]       Context       The token's wrap
+                                 EfiIPsecInBound or EfiIPsecOutBound.
+  @param[in]       Context       The token's wrap.
 
   @retval EFI_SUCCESS            The IPsec protocol is not available or disabled.
   @retval EFI_SUCCESS            The packet was bypassed and all buffers remain the same.
@@ -232,13 +232,13 @@ Ip4PacketTimerTicking (
 **/
 EFI_STATUS
 Ip4IpSecProcessPacket (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_HEAD               *Head,
-  IN OUT NET_BUF            **Netbuf,
-  IN UINT8                  *Options,
-  IN UINT32                 OptionsLen,
-  IN EFI_IPSEC_TRAFFIC_DIR  Direction,
-  IN VOID                   *Context
+  IN     IP4_SERVICE            *IpSb,
+  IN OUT IP4_HEAD               **Head,
+  IN OUT NET_BUF                **Netbuf,
+  IN OUT UINT8                  **Options,
+  IN OUT UINT32                 *OptionsLen,
+  IN     EFI_IPSEC_TRAFFIC_DIR  Direction,
+  IN     VOID                   *Context
   );
 
 #endif

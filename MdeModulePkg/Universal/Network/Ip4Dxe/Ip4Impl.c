@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Ip4Impl.h"
 
-EFI_IPSEC_PROTOCOL    *mIpSec = NULL;
+EFI_IPSEC2_PROTOCOL    *mIpSec = NULL;
 
 /**
   Gets the current operational settings for this instance of the EFI IPv4 Protocol driver.

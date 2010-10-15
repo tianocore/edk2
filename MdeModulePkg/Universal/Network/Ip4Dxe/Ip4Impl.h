@@ -379,6 +379,6 @@ Ip4FreeTxToken (
   IN VOID                   *Context
   );
 
-extern EFI_IPSEC_PROTOCOL   *mIpSec;
+extern EFI_IPSEC2_PROTOCOL   *mIpSec;
 
 #endif

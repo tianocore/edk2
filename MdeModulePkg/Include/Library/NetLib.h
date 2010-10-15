@@ -2003,4 +2003,20 @@ NetIp6PseudoHeadChecksum (
   IN UINT8                  NextHeader,
   IN UINT32                 Len
   );
+
+/**
+  The function frees the net buffer which allocated by the IP protocol. It releases 
+  only the net buffer and doesn't call the external free function. 
+
+  This function should be called after finishing the process of mIpSec->ProcessExt() 
+  for outbound traffic. The (EFI_IPSEC2_PROTOCOL)->ProcessExt() allocates a new 
+  buffer for the ESP, so there needs a function to free the old net buffer.
+
+  @param[in]  Nbuf       The network buffer to be freed.
+
+**/
+VOID
+NetIpSecNetbufFree (
+  NET_BUF   *Nbuf
+  );
 #endif

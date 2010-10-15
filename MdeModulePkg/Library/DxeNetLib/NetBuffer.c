@@ -1842,3 +1842,51 @@ NetIp6PseudoHeadChecksum (
   return NetblockChecksum ((UINT8 *) &Hdr, sizeof (Hdr));
 }
 
+/**
+  The function frees the net buffer which allocated by the IP protocol. It releases 
+  only the net buffer and doesn't call the external free function. 
+
+  This function should be called after finishing the process of mIpSec->ProcessExt() 
+  for outbound traffic. The (EFI_IPSEC2_PROTOCOL)->ProcessExt() allocates a new 
+  buffer for the ESP, so there needs a function to free the old net buffer.
+
+  @param[in]  Nbuf       The network buffer to be freed.
+
+**/
+VOID
+NetIpSecNetbufFree (
+  NET_BUF   *Nbuf
+  )
+{
+  NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
+  ASSERT (Nbuf->RefCnt > 0);
+
+  Nbuf->RefCnt--;
+
+  if (Nbuf->RefCnt == 0) {
+    
+    //
+    // Update Vector only when NBuf is to be released. That is,
+    // all the sharing of Nbuf increse Vector's RefCnt by one
+    //
+    NET_CHECK_SIGNATURE (Nbuf->Vector, NET_VECTOR_SIGNATURE);
+    ASSERT (Nbuf->Vector->RefCnt > 0);
+
+    Nbuf->Vector->RefCnt--;
+
+    if (Nbuf->Vector->RefCnt > 0) {
+      return;
+    }
+
+    //
+    // If NET_VECTOR_OWN_FIRST is set, release the first block since it is 
+    // allocated by us
+    //
+    if ((Nbuf->Vector->Flag & NET_VECTOR_OWN_FIRST) != 0) {
+      FreePool (Nbuf->Vector->Block[0].Bulk);
+    }
+    FreePool (Nbuf->Vector);
+    FreePool (Nbuf); 
+  } 
+}
+

@@ -251,6 +251,31 @@ Ip4Output (
   }
 
   //
+  // Before IPsec process, prepared the IP head.
+  //
+  HeadLen        = sizeof (IP4_HEAD) + ((OptLen + 3) & (~0x03));
+  Head->HeadLen  = (UINT8) HeadLen >> 2;
+  Head->Id       = mIp4Id++;
+  Head->Ver      = 4;
+  
+  //
+  // Call IPsec process.
+  //
+  Status = Ip4IpSecProcessPacket (
+             IpSb, 
+             &Head, 
+             &Packet, 
+             &Option, 
+             &OptLen, 
+             EfiIPsecOutBound,
+             Context
+             );
+
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
+  //
   // Route the packet unless overrided, that is, GateWay isn't zero.
   //
   if (GateWay == IP4_ALLZERO_ADDRESS) {
@@ -292,29 +317,10 @@ Ip4Output (
   }
 
   //
-  // TODO: currently Option/OptLen are not included into encryption scope.
-  //
-  Status = Ip4IpSecProcessPacket (
-             IpSb, 
-             Head, 
-             &Packet, 
-             Option, 
-             OptLen, 
-             EfiIPsecOutBound,
-             Context
-             );
-
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
-
-  //
   // OK, selected the source and route, fragment the packet then send
   // them. Tag each fragment other than the first one as spawn from it.
   //
-  Mtu            = IpSb->MaxPacketSize + sizeof (IP4_HEAD);
-  HeadLen        = sizeof (IP4_HEAD) + ((OptLen + 3) & (~0x03));
-  Head->Id       = mIp4Id++;
+  Mtu = IpSb->MaxPacketSize + sizeof (IP4_HEAD);  
 
   if (Packet->TotalSize + HeadLen > Mtu) {
     //
