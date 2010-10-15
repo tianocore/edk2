@@ -52,6 +52,7 @@ case `uname` in
         exit 1
       else
         TARGET_TOOLS=XCODE32
+        UNIXPKG_TOOLS=UNIXPKG
       fi
       ;;
   Linux*) TARGET_TOOLS=ELFGCC ;;
