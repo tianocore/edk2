@@ -20,6 +20,7 @@ Revision History:
 
 #include "DxeIpl.h"
 #include "SerialStatusCode.h"
+#include "Debug.h"
 
 UINT8 *mCursor;
 UINT8 mHeaderIndex = 10;
@@ -55,16 +56,20 @@ PrintValue (
   )
 {
   UINT32 Index;
-  UINT8  Char;
+  CHAR8  Char;
+  CHAR8  String[9];
 
   for (Index = 0; Index < 8; Index++) {
     Char = (UINT8)(((Value >> ((7 - Index) * 4)) & 0x0f) + '0');
     if (Char > '9') {
       Char = (UINT8) (Char - '0' - 10 + 'A');
     }
-    *mCursor = Char;
-    mCursor += 2;
+    String[Index] = Char;
   }
+
+  String[sizeof (String) - 1] = '\0';
+
+  PrintString (String);
 }
 
 VOID
@@ -80,7 +85,7 @@ PrintValue64 (
 
 VOID
 PrintString (
-  UINT8 *String
+  CHAR8 *String
   )
 {
   UINT32 Index;
