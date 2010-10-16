@@ -33,6 +33,7 @@
   BaseLib
   BaseMemoryLib
   PrintLib
+  SerialPortLib
 
 [Sources]
   Debug.h

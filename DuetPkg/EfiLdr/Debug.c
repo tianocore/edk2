@@ -19,6 +19,7 @@ Revision History:
 --*/
 #include "EfiLdr.h"
 #include "Debug.h"
+#include <Library/SerialPortLib.h>
 
 UINT8 *mCursor;
 UINT8 mHeaderIndex = 10;
@@ -47,14 +48,38 @@ ClearScreen (
   mCursor = (UINT8 *)(UINTN)(0x000b8000 + 160);
 }
 
-VOID
-PrintValue64 (
-  UINT64 Value
+
+VOID 
+PrintU32Base10 (
+  UINT32 Value
   )
 {
-  PrintValue ((UINT32) RShiftU64 (Value, 32));
-  PrintValue ((UINT32) Value);
+  UINT32 Index;
+  CHAR8  Char;
+  CHAR8  String[11];
+  UINTN  StringPos;
+  UINT32 B10Div;
+
+  B10Div = 1000000000;
+  for (Index = 0, StringPos = 0; Index < 10; Index++) {
+    Char = ((Value / B10Div) % 10) + '0';
+    if ((StringPos > 0) || (Char != '0')) {
+      String[StringPos] = Char;
+      StringPos++;
+    }
+    B10Div = B10Div / 10;
+  }
+
+  if (StringPos == 0) {
+      String[0] = '0';
+      StringPos++;
+  }
+
+  String[StringPos] = '\0';
+
+  PrintString (String);
 }
+
 
 VOID
 PrintValue (
@@ -62,16 +87,29 @@ PrintValue (
   )
 {
   UINT32 Index;
-  UINT8  Char;
+  CHAR8  Char;
+  CHAR8  String[9];
 
   for (Index = 0; Index < 8; Index++) {
     Char = (UINT8)(((Value >> ((7 - Index) * 4)) & 0x0f) + '0');
     if (Char > '9') {
       Char = (UINT8) (Char - '0' - 10 + 'A');
     }
-    *mCursor = Char;
-    mCursor += 2;
+    String[Index] = Char;
   }
+
+  String[sizeof (String) - 1] = '\0';
+
+  PrintString (String);
+}
+
+VOID
+PrintValue64 (
+  UINT64 Value
+  )
+{
+  PrintValue ((UINT32) RShiftU64 (Value, 32));
+  PrintValue ((UINT32) Value);
 }
 
 VOID
@@ -89,5 +127,10 @@ PrintString (
       mCursor += 2;
     }
   }
+
+  //
+  // All information also output to serial port.
+  //
+  SerialPortWrite ((UINT8*) String, Index);
 }
 

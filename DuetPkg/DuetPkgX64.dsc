@@ -98,6 +98,7 @@
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
+  SerialPortLib|PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
   
   #
   # To save size, use NULL library for DebugLib and ReportStatusCodeLib.
@@ -166,7 +167,6 @@
     <LibraryClasses>
       DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
       ReportStatusCodeLib|DuetPkg/Library/DxeCoreReportStatusCodeLibFromHob/DxeCoreReportStatusCodeLibFromHob.inf
-      SerialPortLib|PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
   }
 
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
