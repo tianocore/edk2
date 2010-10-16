@@ -16,7 +16,13 @@
 
 # Set up environment at fisrt.
 
+if [ -z "$EDK_TOOLS_PATH" ]
+then
 export BASETOOLS_DIR=$WORKSPACE/Conf/BaseToolsSource/Source/C/bin
+else
+export BASETOOLS_DIR=$EDK_TOOLS_PATH/Source/C/bin
+fi
+
 export BOOTSECTOR_BIN_DIR=$WORKSPACE/DuetPkg/BootSector/bin
 export DISK_LABEL=DUET
 export PROCESS_MARK=TRUE
@@ -28,7 +34,7 @@ if [ \
      "$*" = "--help" \
    ]
 then
-	echo "Usage: CreateBootDisk [usb|floppy|ide] MediaPath DevicePath [FAT12|FAT16|FAT32] [IA32|X64]"
+	echo "Usage: CreateBootDisk [usb|floppy|ide|file] MediaPath DevicePath [FAT12|FAT16|FAT32] [IA32|X64] [GCC44|UNIXGCC]"
 	echo "e.g. : CreateBootDisk floppy /media/floppy0 /dev/fd0 FAT12 IA32"
 	PROCESS_MARK=FALSE
 fi
@@ -45,7 +51,14 @@ case "$5" in
      return 1
 esac
 
-export BUILD_DIR=$WORKSPACE/Build/DuetPkg$PROCESSOR/DEBUG_UNIXGCC
+if [ -z "$6" ]
+then
+  TOOLCHAIN=GCC44
+else
+  TOOLCHAIN=$6
+fi
+
+export BUILD_DIR=$WORKSPACE/Build/DuetPkg$PROCESSOR/DEBUG_$TOOLCHAIN
 
 
 export EFI_BOOT_MEDIA=$2
@@ -94,11 +107,26 @@ then
 			if [ "$4" = FAT12 ]
 				then
 				echo "Start to create file boot disk ..."
-				echo Create boot sector ...	
-	
+				dd bs=512 count=2880 if=/dev/zero of=$EFI_BOOT_MEDIA
+				mkfs.msdos -F 12 $EFI_BOOT_MEDIA
+
+				mcopy -i $EFI_BOOT_MEDIA $BUILD_DIR/FV/Efildr ::/Efildr
+				mmd -i $EFI_BOOT_MEDIA ::/efi ::/efi/boot
+				if [ "$5" = IA32 ]
+				then
+					mcopy -i $EFI_BOOT_MEDIA $WORKSPACE/EdkShellBinPkg/MinimumShell/Ia32/Shell.efi ::/efi/boot/bootia32.efi
+				elif [ "$5" = X64 ]
+				then
+					mcopy -i $EFI_BOOT_MEDIA $WORKSPACE/EdkShellBinPkg/MinimumShell/X64/Shell.efi ::/efi/boot/bootx64.efi
+				else
+					echo Wrong Arch!
+				fi
+				mdir -i $EFI_BOOT_MEDIA -s ::
+
 				## Linux version of GenBootSector has not pass build yet.
-				$BASETOOLS_DIR/GnuGenBootSector -i $EFI_BOOT_MEDIA -o FDBs.com
-				$BASETOOLS_DIR/BootSectImage -g FDBs.com $BOOTSECTOR_BIN_DIR/bootsect.com -f
+				$BASETOOLS_DIR/GnuGenBootSector -i $EFI_BOOT_MEDIA -o $EFI_BOOT_MEDIA.bs0
+				cp $EFI_BOOT_MEDIA.bs0 $EFI_BOOT_MEDIA.bs1
+				$BASETOOLS_DIR/BootSectImage -g $EFI_BOOT_MEDIA.bs1 $BOOTSECTOR_BIN_DIR/bootsect.com
 				$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_MEDIA -i $BOOTSECTOR_BIN_DIR/bootsect.com
 				echo Done.
 			else
