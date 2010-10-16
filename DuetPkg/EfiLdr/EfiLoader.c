@@ -50,7 +50,7 @@ EfiLoader (
   UINTN                 BfvBase;
   EFI_MAIN_ENTRYPOINT   EfiMainEntrypoint;
   CHAR8                 PrintBuffer[256];
-  STATIC EFILDRHANDOFF  Handoff;
+  EFILDRHANDOFF         Handoff;
 
   ClearScreen();
   

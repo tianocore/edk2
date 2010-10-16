@@ -138,7 +138,11 @@ Returns:
   VOID                  *MemoryDescriptor;
   VOID                  *NvStorageBase;
   CHAR8                 PrintBuffer[256];
-  
+  EFILDRHANDOFF         HandoffCopy;
+
+  CopyMem ((VOID*) &HandoffCopy, (VOID*) Handoff, sizeof (EFILDRHANDOFF));
+  Handoff = &HandoffCopy;
+
   ClearScreen();
   PrintString("Enter DxeIpl ...\n");
   
