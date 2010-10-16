@@ -84,7 +84,7 @@ EFILDR_LOADED_IMAGE    DxeIplImage;
 
 typedef
 VOID
-(* EFI_MAIN_ENTRYPOINT) (
+(EFIAPI * EFI_MAIN_ENTRYPOINT) (
     IN EFILDRHANDOFF  *Handoff
     );
 

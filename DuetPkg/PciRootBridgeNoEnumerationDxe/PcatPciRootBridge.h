@@ -209,6 +209,26 @@ GetPciExpressBaseAddressForRootBridge (
   IN UINTN    RootBridgeNumber
   );
 
+EFI_STATUS
+EFIAPI
+PcatRootBridgeIoIoRead (
+  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
+  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
+  IN     UINT64                                 UserAddress,
+  IN     UINTN                                  Count,
+  IN OUT VOID                                   *UserBuffer
+  );
+
+EFI_STATUS
+EFIAPI
+PcatRootBridgeIoIoWrite (
+  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
+  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
+  IN     UINT64                                 UserAddress,
+  IN     UINTN                                  Count,
+  IN OUT VOID                                   *UserBuffer
+  );
+
 //
 // Driver entry point prototype
 //
