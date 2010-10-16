@@ -17,9 +17,13 @@
 #
 ##
 
-
-
+if [ -z "$EDK_TOOLS_PATH" ]
+then
 export BASETOOLS_DIR=$WORKSPACE/Conf/BaseToolsSource/Source/C/bin
+else
+export BASETOOLS_DIR=$EDK_TOOLS_PATH/Source/C/bin
+fi
+
 export BOOTSECTOR_BIN_DIR=$WORKSPACE/DuetPkg/BootSector/bin
 export PROCESSOR=""
 if [ \
