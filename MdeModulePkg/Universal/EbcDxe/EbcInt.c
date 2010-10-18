@@ -747,7 +747,7 @@ EbcDebugSignalException (
   // Save the exception in the context passed in
   //
   VmPtr->ExceptionFlags |= ExceptionFlags;
-  VmPtr->LastException = ExceptionType;
+  VmPtr->LastException = (UINTN) ExceptionType;
   //
   // If it's a fatal exception, then flag it in the VM context in case an
   // attached debugger tries to return from it.

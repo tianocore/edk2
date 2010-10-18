@@ -36,9 +36,9 @@ GetInterruptHandleFromIdt (
   // InterruptHandle 16-31 : OffsetHigh
   // InterruptHandle 32-63 : OffsetUpper
   //
-  ((UINT16 *) &InterruptHandle)[0] = (UINT16) IdtGateDecriptor->Bits.OffsetLow;
-  ((UINT16 *) &InterruptHandle)[1] = (UINT16) IdtGateDecriptor->Bits.OffsetHigh;
-  ((UINT32 *) &InterruptHandle)[1] = (UINT32) IdtGateDecriptor->Bits.OffsetUpper;
+  InterruptHandle = ((UINTN) IdtGateDecriptor->Bits.OffsetLow) |
+                    (((UINTN) IdtGateDecriptor->Bits.OffsetHigh)  << 16) |
+                    (((UINTN) IdtGateDecriptor->Bits.OffsetUpper) << 32) ;
 
   return InterruptHandle;
 }

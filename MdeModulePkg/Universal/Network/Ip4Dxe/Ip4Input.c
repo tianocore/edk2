@@ -883,6 +883,8 @@ Ip4AccpetFrame (
       goto RESTART;
     }
   }
+  
+  ASSERT (Packet != NULL);
   Head  = Packet->Ip.Ip4;
   IP4_GET_CLIP_INFO (Packet)->Status = EFI_SUCCESS;
 

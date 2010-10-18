@@ -2367,7 +2367,7 @@ ExecuteMOVIn (
     // Get the address
     //
     Op1 = (UINT64) VmPtr->Gpr[OPERAND1_REGNUM (Operands)] + Index16;
-    VmWriteMemN (VmPtr, (UINTN) Op1, (INTN) ImmedIndex64);
+    VmWriteMemN (VmPtr, (UINTN) Op1, (UINTN)(INTN) ImmedIndex64);
   }
   //
   // Advance the instruction pointer

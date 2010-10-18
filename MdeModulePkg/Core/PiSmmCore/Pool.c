@@ -185,7 +185,7 @@ InternalFreePoolByIndex (
   ASSERT (((UINTN)FreePoolHdr & (FreePoolHdr->Header.Size - 1)) == 0);
   ASSERT (FreePoolHdr->Header.Size >= MIN_POOL_SIZE);
 
-  PoolIndex = HighBitSet32 ((UINT32)FreePoolHdr->Header.Size) - MIN_POOL_SHIFT;
+  PoolIndex = (UINTN) (HighBitSet32 ((UINT32)FreePoolHdr->Header.Size) - MIN_POOL_SHIFT);
   FreePoolHdr->Header.Available = TRUE;
   ASSERT (PoolIndex < MAX_POOL_INDEX);
   InsertHeadList (&mSmmPoolLists[PoolIndex], &FreePoolHdr->Link);
@@ -240,7 +240,7 @@ SmmAllocatePool (
   }
 
   Size = (Size + MIN_POOL_SIZE - 1) >> MIN_POOL_SHIFT;
-  PoolIndex = HighBitSet32 ((UINT32)Size);
+  PoolIndex = (UINTN) HighBitSet32 ((UINT32)Size);
   if ((Size & (Size - 1)) != 0) {
     PoolIndex++;
   }
