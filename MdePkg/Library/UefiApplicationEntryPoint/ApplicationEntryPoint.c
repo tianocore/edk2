@@ -14,6 +14,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Uefi.h>
 #include <Library/UefiApplicationEntryPoint.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 

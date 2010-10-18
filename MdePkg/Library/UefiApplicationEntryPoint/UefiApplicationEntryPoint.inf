@@ -34,4 +34,6 @@
 
 [LibraryClasses]
   UefiBootServicesTableLib
+  DebugLib
+  BaseLib
 

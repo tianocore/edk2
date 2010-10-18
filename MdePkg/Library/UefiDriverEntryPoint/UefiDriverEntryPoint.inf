@@ -39,6 +39,7 @@
 [LibraryClasses]
   UefiBootServicesTableLib
   DebugLib
+  BaseLib
 
 
 [Protocols]
