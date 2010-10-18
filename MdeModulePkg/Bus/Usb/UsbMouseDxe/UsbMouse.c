@@ -605,7 +605,7 @@ InitializeUsbMouseDevice (
   if (Protocol != BOOT_PROTOCOL) {
     Status = UsbSetProtocolRequest (
                UsbIo,
-               0,
+               UsbMouseDev->InterfaceDescriptor.InterfaceNumber,
                BOOT_PROTOCOL
                );
 
