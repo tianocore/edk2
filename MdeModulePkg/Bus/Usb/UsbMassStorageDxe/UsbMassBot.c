@@ -2,7 +2,7 @@
   Implementation of the USB mass storage Bulk-Only Transport protocol,
   according to USB Mass Storage Class Bulk-Only Transport, Revision 1.0.
 
-Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -484,7 +484,7 @@ UsbBotResetDevice (
     //
     Status = UsbBot->UsbIo->UsbPortReset (UsbBot->UsbIo);
     if (EFI_ERROR (Status)) {
-      return Status;
+      return EFI_DEVICE_ERROR;
     }
   }
 
@@ -510,7 +510,7 @@ UsbBotResetDevice (
                             );
 
   if (EFI_ERROR (Status)) {
-    return Status;
+    return EFI_DEVICE_ERROR;
   }
 
   //
