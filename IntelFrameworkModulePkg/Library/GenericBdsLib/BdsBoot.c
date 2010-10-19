@@ -628,7 +628,9 @@ BdsExpandPartitionPartialDevicePathToFull (
     }
   }
 
-  FreePool (CachedDevicePath);
+  if (CachedDevicePath != NULL) {
+    FreePool (CachedDevicePath);
+  }
   if (BlockIoBuffer != NULL) {
     FreePool (BlockIoBuffer);
   }
