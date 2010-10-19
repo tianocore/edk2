@@ -837,7 +837,7 @@ F2UCreateBannerOpCode (
 
   @param ThunkContext         The HII Thunk Context.
   @param FwUpdateData         The Framework Update Data.
-  @param UefiUpdateData       The UEFI Update Data.
+  @param UefiOpCodeHandle     The UEFI opcode hanlde.
 
   @retval EFI_SUCCESS       The UEFI Update Data is created successfully.
   @retval EFI_UNSUPPORTED   There is unsupported opcode in FwUpdateData.
@@ -855,8 +855,18 @@ FwUpdateDataToUefiUpdateData (
   UINTN                                Index;
   UINTN                                DataCount;
   UINT8                                *OpCodeBuffer;
+  LIST_ENTRY                           *StorageList;
+  FORMSET_STORAGE                      *Storage;
+  FORM_BROWSER_FORMSET                 *FormSet;
+  CHAR16                               *DefaultVarStoreName;
+  UINT16                               DefaultVarStoreId;
+  EFI_IFR_VARSTORE_SELECT              *SelectVarOp;
 
   FwOpCode = (FRAMEWORK_EFI_IFR_OP_HEADER *) &FwUpdateData->Data;
+
+  FormSet = ThunkContext->FormSet;
+  DefaultVarStoreId   = FormSet->DefaultVarStoreId;
+  DefaultVarStoreName = FormSet->OriginalDefaultVarStoreName;
 
   for (Index = 0; Index < FwUpdateData->DataCount; Index += DataCount) {
     switch (FwOpCode->OpCode) {
@@ -921,6 +931,31 @@ FwUpdateDataToUefiUpdateData (
         OpCodeBuffer = F2UCreateNumericOpCode (UefiOpCodeHandle, ThunkContext, (FRAMEWORK_EFI_IFR_NUMERIC *) FwOpCode);
         DataCount = 1;
         break;
+      
+      case EFI_IFR_VARSTORE_SELECT_OP:
+        OpCodeBuffer = (UINT8 *) FwOpCode;
+        SelectVarOp  = (EFI_IFR_VARSTORE_SELECT *) FwOpCode;
+        //
+        // Check whether the selected VarId is in StorageList.
+        //
+        StorageList = GetFirstNode (&FormSet->StorageListHead);
+        while (!IsNull (&FormSet->StorageListHead, StorageList)) {
+          Storage = FORMSET_STORAGE_FROM_LINK (StorageList);
+          if (Storage->VarStoreId == SelectVarOp->VarId) {
+            break;
+          }
+          StorageList = GetNextNode (&FormSet->StorageListHead, StorageList);
+        }
+        ASSERT (!IsNull (&FormSet->StorageListHead, StorageList));
+        //
+        // Change VarStoreId to the selected VarId.
+        //
+        FormSet->DefaultVarStoreId = SelectVarOp->VarId;
+        if (SelectVarOp->VarId == DefaultVarStoreId)  {
+          FormSet->OriginalDefaultVarStoreName = DefaultVarStoreName;
+        }
+        DataCount = 1;
+        break;
 
       default:
         ASSERT (FALSE);
@@ -934,6 +969,11 @@ FwUpdateDataToUefiUpdateData (
     FwOpCode = (FRAMEWORK_EFI_IFR_OP_HEADER *)((UINT8 *) FwOpCode + FwOpCode->Length);
   }
 
+  //
+  // Revert FromSet default varstore ID.
+  //
+  FormSet->DefaultVarStoreId           = DefaultVarStoreId;
+  FormSet->OriginalDefaultVarStoreName = DefaultVarStoreName;
   return EFI_SUCCESS;
 }
 
