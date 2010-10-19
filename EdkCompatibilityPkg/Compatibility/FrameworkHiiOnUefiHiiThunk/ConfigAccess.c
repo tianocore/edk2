@@ -551,7 +551,6 @@ ThunkRouteConfig (
   VOID                                        *Data;
   UINTN                                       DataSize;
   UINTN                                       DataSize2;
-  UINTN                                       LastModifiedByteIndex;
   BOOLEAN                                     ResetRequired;
   BOOLEAN                                     DataAllocated;
 
@@ -602,11 +601,12 @@ ThunkRouteConfig (
     }
   }
 
+  DataSize = DataSize2;
   Status = mHiiConfigRoutingProtocol->ConfigToBlock (
                                           mHiiConfigRoutingProtocol,
                                           Configuration,
                                           Data,
-                                          &LastModifiedByteIndex,
+                                          &DataSize,
                                           Progress
                                           );
   if (EFI_ERROR (Status)) {
@@ -633,7 +633,6 @@ ThunkRouteConfig (
                     Data,
                     &ResetRequired
                     );
-      
     }
   }
 
