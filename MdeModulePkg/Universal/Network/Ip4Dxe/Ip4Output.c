@@ -254,7 +254,7 @@ Ip4Output (
   // Before IPsec process, prepared the IP head.
   //
   HeadLen        = sizeof (IP4_HEAD) + ((OptLen + 3) & (~0x03));
-  Head->HeadLen  = (UINT8) HeadLen >> 2;
+  Head->HeadLen  = (UINT8) (HeadLen >> 2);
   Head->Id       = mIp4Id++;
   Head->Ver      = 4;
   

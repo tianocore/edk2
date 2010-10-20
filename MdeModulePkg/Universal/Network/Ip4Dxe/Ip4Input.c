@@ -570,7 +570,7 @@ Ip4IpSecProcessPacket (
                      IP_VERSION_4,
                      (VOID *) (*Head),
                      &(*Head)->Protocol,
-                     (VOID **)Options,
+                     (VOID **) Options,
                      OptionsLen,
                      (EFI_IPSEC_FRAGMENT_DATA **) (&FragmentTable),
                      &FragmentCount,
