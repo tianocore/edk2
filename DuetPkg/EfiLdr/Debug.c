@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -62,7 +62,7 @@ PrintU32Base10 (
 
   B10Div = 1000000000;
   for (Index = 0, StringPos = 0; Index < 10; Index++) {
-    Char = ((Value / B10Div) % 10) + '0';
+    Char = (UINT8) (((Value / B10Div) % 10) + '0');
     if ((StringPos > 0) || (Char != '0')) {
       String[StringPos] = Char;
       StringPos++;
