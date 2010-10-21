@@ -3649,7 +3649,7 @@ ConSplitterTextInRegisterKeyNotify (
   NewNotify->Signature         = TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
   NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
-  CopyMem (&NewNotify->KeyData, KeyData, sizeof (KeyData));
+  CopyMem (&NewNotify->KeyData, KeyData, sizeof (EFI_KEY_DATA));
 
   //
   // Return the wrong status of registering key notify of
