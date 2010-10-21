@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -759,7 +759,7 @@ WinNtGopSimpleTextInExRegisterKeyNotify (
   NewNotify->Signature         = WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE;     
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
   NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
-  CopyMem (&NewNotify->KeyData, KeyData, sizeof (KeyData));
+  CopyMem (&NewNotify->KeyData, KeyData, sizeof (EFI_KEY_DATA));
   InsertTailList (&Private->NotifyList, &NewNotify->NotifyEntry);
 
   *NotifyHandle = NewNotify->NotifyHandle;  
