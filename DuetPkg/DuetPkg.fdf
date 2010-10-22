@@ -70,7 +70,7 @@ INF  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
 INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
 INF  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
-INF  DuetPkg/CpuDxe/Cpu.inf
+INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
 
 INF  PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
 INF  DuetPkg/AcpiResetDxe/Reset.inf
