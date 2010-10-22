@@ -398,11 +398,21 @@ ScsiDiskReset (
 
   Status          = ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
 
+  if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
   if (!ExtendedVerification) {
     goto Done;
   }
 
   Status = ScsiDiskDevice->ScsiIo->ResetBus (ScsiDiskDevice->ScsiIo);
+
+  if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
+  }
 
 Done:
   gBS->RestoreTPL (OldTpl);
