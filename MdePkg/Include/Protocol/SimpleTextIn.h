@@ -5,13 +5,13 @@
   terminal.
 
   Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -27,12 +27,12 @@ typedef struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL  EFI_SIMPLE_TEXT_INPUT_PROTOCOL;
 
 ///
 /// Protocol GUID name defined in EFI1.1.
-/// 
+///
 #define SIMPLE_INPUT_PROTOCOL   EFI_SIMPLE_TEXT_INPUT_PROTOCOL_GUID
 
 ///
 /// Protocol name in EFI1.1 for backward-compatible.
-/// 
+///
 typedef struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL  SIMPLE_INPUT_INTERFACE;
 
 ///
@@ -98,11 +98,12 @@ EFI_STATUS
   );
 
 /**
-  Reads the next keystroke from the input device. The WaitForKey Event can 
+  Reads the next keystroke from the input device. The WaitForKey Event can
   be used to test for existence of a keystroke via WaitForEvent () call.
 
-  @param  This Protocol instance pointer.
-  @param  Key  Driver may perform diagnostics on reset.
+  @param  This  Protocol instance pointer.
+  @param  Key   A pointer to a buffer that is filled in with the keystroke
+                information for the key that was pressed.
 
   @retval EFI_SUCCESS      The keystroke information was returned.
   @retval EFI_NOT_READY    There was no keystroke data available.
@@ -118,7 +119,7 @@ EFI_STATUS
   );
 
 ///
-/// The EFI_SIMPLE_TEXT_INPUT_PROTOCOL is used on the ConsoleIn device. 
+/// The EFI_SIMPLE_TEXT_INPUT_PROTOCOL is used on the ConsoleIn device.
 /// It is the minimum required protocol for ConsoleIn.
 ///
 struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL {
