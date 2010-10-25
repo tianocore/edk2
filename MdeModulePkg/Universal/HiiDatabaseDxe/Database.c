@@ -3287,13 +3287,13 @@ HiiExportPackageLists (
   HII_DATABASE_RECORD                 *Node;
   UINTN                               UsedSize;
 
-  if (This == NULL || BufferSize == NULL || Handle == NULL) {
+  if (This == NULL || BufferSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   if (*BufferSize > 0 && Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  if (!IsHiiHandleValid (Handle)) {
+  if ((Handle != NULL) && (!IsHiiHandleValid (Handle))) {
     return EFI_NOT_FOUND;
   }
 
