@@ -1134,7 +1134,7 @@ GetWidth (
     Width -= SUBTITLE_INDENT;
   }
 
-  return Width;
+  return Width - LEFT_SKIPPED_COLUMNS;
 }
 
 /**
@@ -1704,7 +1704,7 @@ UiDisplayMenu (
     Row     = LocalScreen.TopRow + NONE_FRONT_PAGE_HEADER_HEIGHT + SCROLL_ARROW_HEIGHT;
   }
 
-  Col = LocalScreen.LeftColumn;
+  Col = LocalScreen.LeftColumn + LEFT_SKIPPED_COLUMNS;
   BottomRow = LocalScreen.BottomRow - STATUS_BAR_HEIGHT - FOOTER_HEIGHT - SCROLL_ARROW_HEIGHT - 1;
 
   Selection->TopRow = TopRow;
