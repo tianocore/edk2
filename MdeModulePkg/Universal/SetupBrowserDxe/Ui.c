@@ -1833,7 +1833,6 @@ UiDisplayMenu (
           Temp  = 0;
           Row   = OriginalRow;
 
-          gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
           Status = ProcessOptions (Selection, MenuOption, FALSE, &OptionString);
           if (EFI_ERROR (Status)) {
             //
@@ -1981,6 +1980,7 @@ UiDisplayMenu (
             Row = OriginalRow;
             FreePool (StringPtr);
           }
+          gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
 
           //
           // Need to handle the bottom of the display
@@ -2813,6 +2813,7 @@ UiDisplayMenu (
           NewPos = NewPos->BackLink;
         }
 
+        Difference = MoveToNextStatement (TRUE, &NewPos);
         PreviousMenuOption = MENU_OPTION_FROM_LINK (NewPos);
         DistanceValue = PreviousMenuOption->Skip;
 
@@ -2824,31 +2825,6 @@ UiDisplayMenu (
         //
         DistanceValue += AdjustDateAndTimePosition (TRUE, &NewPos);
 
-        //
-        // Check the previous menu entry to see if it was a zero-length advance.  If it was,
-        // don't worry about a redraw.
-        //
-        ASSERT(MenuOption != NULL);
-        if ((INTN) MenuOption->Row - (INTN) DistanceValue < (INTN) TopRow) {
-          Repaint     = TRUE;
-          TopOfScreen = NewPos;
-        }
-
-        Difference = MoveToNextStatement (TRUE, &NewPos);
-        PreviousMenuOption = MENU_OPTION_FROM_LINK (NewPos);
-        DistanceValue += PreviousMenuOption->Skip;
-
-        if ((INTN) MenuOption->Row - (INTN) DistanceValue  < (INTN) TopRow) {
-          if (Difference > 0) {
-            //
-            // Previous focus MenuOption is above the TopOfScreen, so we need to scroll
-            //
-            TopOfScreen = NewPos;
-            Repaint     = TRUE;
-            SkipValue = 0;
-            OldSkipValue = 0;
-          }
-        }
         if (Difference < 0) {
           //
           // We want to goto previous MenuOption, but finally we go down.
@@ -2859,6 +2835,14 @@ UiDisplayMenu (
             TopOfScreen = gMenuOption.ForwardLink;
             Repaint     = TRUE;
           }
+        } else if ((INTN) MenuOption->Row - (INTN) DistanceValue - Difference < (INTN) TopRow) {
+          //
+          // Previous focus MenuOption is above the TopOfScreen, so we need to scroll
+          //
+          TopOfScreen = NewPos;
+          Repaint     = TRUE;
+          SkipValue = 0;
+          OldSkipValue = 0;
         }
 
         //
@@ -3002,14 +2986,15 @@ UiDisplayMenu (
         MenuOption      = MENU_OPTION_FROM_LINK (NewPos);
         NewLine         = TRUE;
         NewPos          = NewPos->ForwardLink;
+
+        DistanceValue  += MoveToNextStatement (FALSE, &NewPos);
         NextMenuOption  = MENU_OPTION_FROM_LINK (NewPos);
 
-        DistanceValue  += NextMenuOption->Skip;
-        DistanceValue  += MoveToNextStatement (FALSE, &NewPos);
         //
         // An option might be multi-line, so we need to reflect that data in the overall skip value
         //
         UpdateOptionSkipLines (Selection, NextMenuOption, &OptionString, (UINTN) SkipValue);
+        DistanceValue  += NextMenuOption->Skip;
 
         Temp = MenuOption->Row + MenuOption->Skip + DistanceValue - 1;
         if ((MenuOption->Row + MenuOption->Skip == BottomRow + 1) &&
@@ -3051,26 +3036,13 @@ UiDisplayMenu (
                 //
                 // If we have a remainder, skip that many more op-codes until we drain the remainder
                 //
-                for (;
-                     Difference >= (INTN) SavedMenuOption->Skip;
-                     Difference = Difference - (INTN) SavedMenuOption->Skip
-                    ) {
+                while (Difference >= (INTN) SavedMenuOption->Skip) {
                   //
                   // Since the Difference is greater than or equal to this op-code's skip value, skip it
                   //
+                  Difference      = Difference - (INTN) SavedMenuOption->Skip;
                   TopOfScreen     = TopOfScreen->ForwardLink;
                   SavedMenuOption = MENU_OPTION_FROM_LINK (TopOfScreen);
-                  if (Difference < (INTN) SavedMenuOption->Skip) {
-                    Difference = SavedMenuOption->Skip - Difference - 1;
-                    break;
-                  } else {
-                    if (Difference == (INTN) SavedMenuOption->Skip) {
-                      TopOfScreen     = TopOfScreen->ForwardLink;
-                      SavedMenuOption = MENU_OPTION_FROM_LINK (TopOfScreen);
-                      Difference      = SavedMenuOption->Skip - Difference;
-                      break;
-                    }
-                  }
                 }
                 //
                 // Since we will act on this op-code in the next routine, and increment the
@@ -3103,6 +3075,8 @@ UiDisplayMenu (
               } else {
                 SkipValue++;
               }
+            } else if (SavedMenuOption->Skip == 1) {
+              SkipValue   = 0;
             } else {
               SkipValue   = 0;
               TopOfScreen = TopOfScreen->ForwardLink;
