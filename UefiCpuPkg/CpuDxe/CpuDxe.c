@@ -513,7 +513,7 @@ CpuRegisterInterruptHandler (
     return EFI_ALREADY_STARTED;
   }
 
-  SetInterruptDescriptorTableHandlerAddress (InterruptType, NULL);
+  SetInterruptDescriptorTableHandlerAddress ((UINTN)InterruptType, NULL);
   ExternalVectorTable[InterruptType] = InterruptHandler;
   return EFI_SUCCESS;
 }
