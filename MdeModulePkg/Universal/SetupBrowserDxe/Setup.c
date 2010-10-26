@@ -269,8 +269,8 @@ SendForm (
 
   gOptionBlockWidth = (CHAR16) ((gScreenDimensions.RightColumn - gScreenDimensions.LeftColumn) / 3);
   gHelpBlockWidth   = gOptionBlockWidth;
-  gPromptBlockWidth = gOptionBlockWidth + LEFT_SKIPPED_COLUMNS;
-  gOptionBlockWidth = gOptionBlockWidth - LEFT_SKIPPED_COLUMNS;
+  gPromptBlockWidth = (CHAR16) (gOptionBlockWidth + LEFT_SKIPPED_COLUMNS);
+  gOptionBlockWidth = (CHAR16) (gOptionBlockWidth - LEFT_SKIPPED_COLUMNS);
 
   //
   // Initialize the strings for the browser, upon exit of the browser, the strings will be freed

@@ -1134,7 +1134,7 @@ GetWidth (
     Width -= SUBTITLE_INDENT;
   }
 
-  return Width - LEFT_SKIPPED_COLUMNS;
+  return (UINT16) (Width - LEFT_SKIPPED_COLUMNS);
 }
 
 /**
