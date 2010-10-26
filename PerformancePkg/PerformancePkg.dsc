@@ -64,6 +64,7 @@
 
 [LibraryClasses.IPF]
   PalLib|MdePkg/Library/UefiPalLib/UefiPalLib.inf
+  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
 
 [Components.IA32, Components.X64]
   PerformancePkg/Library/TscTimerLib/TscTimerLib.inf
