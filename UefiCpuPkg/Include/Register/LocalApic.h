@@ -62,12 +62,13 @@
 
 typedef union {
   struct {
-    UINT64  Reserved0:8;   ///< Reserved.
-    UINT64  Bsp:1;         ///< Processor is BSP.
-    UINT64  Reserved1:1;   ///< Reserved.
-    UINT64  Extd:1;        ///< Enable x2APIC mode.
-    UINT64  En:1;          ///< xAPIC global enable/disable.
-    UINT64  ApicBase:52;   ///< APIC Base physical address. The actual field width depends on physical address width.
+    UINT32  Reserved0:8;     ///< Reserved.
+    UINT32  Bsp:1;           ///< Processor is BSP.
+    UINT32  Reserved1:1;     ///< Reserved.
+    UINT32  Extd:1;          ///< Enable x2APIC mode.
+    UINT32  En:1;            ///< xAPIC global enable/disable.
+    UINT32  ApicBaseLow:20;  ///< APIC Base physical address. The actual field width depends on physical address width.
+    UINT32  ApicBaseHigh:32;
   } Bits;
   UINT64    Uint64;
 } MSR_IA32_APIC_BASE;
