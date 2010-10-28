@@ -842,7 +842,7 @@ F2UCreateBannerOpCode (
 
   @param ThunkContext         The HII Thunk Context.
   @param FwUpdateData         The Framework Update Data.
-  @param UefiOpCodeHandle     The UEFI opcode hanlde.
+  @param UefiOpCodeHandle     The UEFI opcode handle.
 
   @retval EFI_SUCCESS       The UEFI Update Data is created successfully.
   @retval EFI_UNSUPPORTED   There is unsupported opcode in FwUpdateData.
