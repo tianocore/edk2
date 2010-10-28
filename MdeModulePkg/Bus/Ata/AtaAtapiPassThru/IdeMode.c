@@ -2091,6 +2091,170 @@ SetDriveParameters (
 }
 
 /**
+  Send SMART Return Status command to check if the execution of SMART cmd is successful or not.
+
+  @param Instance         A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
+  @param Channel          The channel number of device.
+  @param Device           The device number of device.
+  @param AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
+
+  @retval EFI_SUCCESS     Successfully get the return status of S.M.A.R.T command execution.
+  @retval Others          Fail to get return status data.
+
+**/
+EFI_STATUS
+EFIAPI
+IdeAtaSmartReturnStatusCheck (
+  IN     ATA_ATAPI_PASS_THRU_INSTANCE  *Instance,
+  IN     UINT8                         Channel,
+  IN     UINT8                         Device,
+  IN OUT EFI_ATA_STATUS_BLOCK          *AtaStatusBlock
+  )
+{
+  EFI_STATUS              Status;
+  EFI_ATA_COMMAND_BLOCK   AtaCommandBlock;
+  UINT8                   LBAMid;
+  UINT8                   LBAHigh;
+
+  ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
+
+  AtaCommandBlock.AtaCommand      = ATA_CMD_SMART;
+  AtaCommandBlock.AtaFeatures     = ATA_SMART_RETURN_STATUS;
+  AtaCommandBlock.AtaCylinderLow  = ATA_CONSTANT_4F;
+  AtaCommandBlock.AtaCylinderHigh = ATA_CONSTANT_C2;
+  AtaCommandBlock.AtaDeviceHead   = (UINT8) ((Device << 0x4) | 0xe0);
+
+  //
+  // Send S.M.A.R.T Read Return Status command to device
+  //
+  Status = AtaNonDataCommandIn (
+             Instance->PciIo,
+             &Instance->IdeRegisters[Channel],
+             &AtaCommandBlock,
+             AtaStatusBlock,
+             ATA_ATAPI_TIMEOUT
+             );
+
+  if (EFI_ERROR (Status)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  LBAMid  = IdeReadPortB (Instance->PciIo, Instance->IdeRegisters[Channel].CylinderLsb);
+  LBAHigh = IdeReadPortB (Instance->PciIo, Instance->IdeRegisters[Channel].CylinderMsb);
+
+  if ((LBAMid == 0x4f) && (LBAHigh == 0xc2)) {
+    //
+    // The threshold exceeded condition is not detected by the device
+    //
+    DEBUG ((EFI_D_INFO, "The S.M.A.R.T threshold exceeded condition is not detected\n"));
+
+  } else if ((LBAMid == 0xf4) && (LBAHigh == 0x2c)) {
+    //
+    // The threshold exceeded condition is detected by the device
+    //
+    DEBUG ((EFI_D_INFO, "The S.M.A.R.T threshold exceeded condition is detected\n"));
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Enable SMART command of the disk if supported.
+
+  @param Instance         A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
+  @param Channel          The channel number of device.
+  @param Device           The device number of device.
+  @param IdentifyData     A pointer to data buffer which is used to contain IDENTIFY data.
+  @param AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
+
+**/
+VOID
+EFIAPI
+IdeAtaSmartSupport (
+  IN     ATA_ATAPI_PASS_THRU_INSTANCE  *Instance,
+  IN     UINT8                         Channel,
+  IN     UINT8                         Device,
+  IN     EFI_IDENTIFY_DATA             *IdentifyData,
+  IN OUT EFI_ATA_STATUS_BLOCK          *AtaStatusBlock
+  )
+{
+  EFI_STATUS              Status;
+  EFI_ATA_COMMAND_BLOCK   AtaCommandBlock;
+
+  //
+  // Detect if the device supports S.M.A.R.T.
+  //
+  if ((IdentifyData->AtaData.command_set_supported_82 & 0x0001) != 0x0001) {
+    //
+    // S.M.A.R.T is not supported by the device
+    //
+    DEBUG ((EFI_D_INFO, "S.M.A.R.T feature is not supported at [%a] channel [%a] device!\n", 
+            (Channel == 1) ? "secondary" : "primary", (Device == 1) ? "slave" : "master"));
+  } else {
+    //
+    // Check if the feature is enabled. If not, then enable S.M.A.R.T.
+    //
+    if ((IdentifyData->AtaData.command_set_feature_enb_85 & 0x0001) != 0x0001) {
+
+      ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
+
+      AtaCommandBlock.AtaCommand      = ATA_CMD_SMART;
+      AtaCommandBlock.AtaFeatures     = ATA_SMART_ENABLE_OPERATION;
+      AtaCommandBlock.AtaCylinderLow  = ATA_CONSTANT_4F;
+      AtaCommandBlock.AtaCylinderHigh = ATA_CONSTANT_C2;
+      AtaCommandBlock.AtaDeviceHead   = (UINT8) ((Device << 0x4) | 0xe0);
+
+      //
+      // Send S.M.A.R.T Enable command to device
+      //
+      Status = AtaNonDataCommandIn (
+                 Instance->PciIo,
+                 &Instance->IdeRegisters[Channel],
+                 &AtaCommandBlock,
+                 AtaStatusBlock,
+                 ATA_ATAPI_TIMEOUT
+                 );
+
+      if (!EFI_ERROR (Status)) {
+        //
+        // Send S.M.A.R.T AutoSave command to device
+        //
+        ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
+
+        AtaCommandBlock.AtaCommand      = ATA_CMD_SMART;
+        AtaCommandBlock.AtaFeatures     = 0xD2;
+        AtaCommandBlock.AtaSectorCount  = 0xF1;
+        AtaCommandBlock.AtaCylinderLow  = ATA_CONSTANT_4F;
+        AtaCommandBlock.AtaCylinderHigh = ATA_CONSTANT_C2;
+        AtaCommandBlock.AtaDeviceHead   = (UINT8) ((Device << 0x4) | 0xe0);
+
+        Status = AtaNonDataCommandIn (
+                   Instance->PciIo,
+                   &Instance->IdeRegisters[Channel],
+                   &AtaCommandBlock,
+                   AtaStatusBlock,
+                   ATA_ATAPI_TIMEOUT
+                   );
+        if (!EFI_ERROR (Status)) {
+          Status = IdeAtaSmartReturnStatusCheck (
+                     Instance,
+                     Channel,
+                     Device,
+                     AtaStatusBlock
+                     );
+        }
+      }
+    }
+
+    DEBUG ((EFI_D_INFO, "Enabled S.M.A.R.T feature at [%a] channel [%a] device!\n", 
+           (Channel == 1) ? "secondary" : "primary", (Device == 1) ? "slave" : "master"));
+
+  }
+
+  return ;
+}
+
+/**
   Sends out an ATA Identify Command to the specified device.
 
   This function is called by DiscoverIdeDevice() during its device
@@ -2332,6 +2496,19 @@ DetectAndConfigIdeDevice (
     DEBUG ((EFI_D_INFO, "[%a] channel [%a] [%a] device\n", 
             (IdeChannel == 1) ? "secondary" : "primary  ", (IdeDevice == 1) ? "slave " : "master",
             DeviceType == EfiIdeCdrom ? "cdrom   " : "harddisk"));
+
+    //
+    // If the device is a hard disk, then try to enable S.M.A.R.T feature
+    //
+    if (DeviceType == EfiIdeHarddisk) {
+      IdeAtaSmartSupport (
+        Instance,
+        IdeChannel,
+        IdeDevice,
+        &Buffer,
+        NULL
+        );
+    }
 
     //
     // Submit identify data to IDE controller init driver

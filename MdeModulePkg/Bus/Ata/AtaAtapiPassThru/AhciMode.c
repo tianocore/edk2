@@ -1250,6 +1250,191 @@ AhciReset (
 }
 
 /**
+  Send SMART Return Status command to check if the execution of SMART cmd is successful or not.
+
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
+  @param  PortMultiplier      The timeout value of stop.
+  @param  AtaStatusBlock      A pointer to EFI_ATA_STATUS_BLOCK data structure.
+
+  @retval EFI_SUCCESS     Successfully get the return status of S.M.A.R.T command execution.
+  @retval Others          Fail to get return status data.
+
+**/
+EFI_STATUS
+EFIAPI
+AhciAtaSmartReturnStatusCheck (
+  IN EFI_PCI_IO_PROTOCOL         *PciIo,
+  IN EFI_AHCI_REGISTERS          *AhciRegisters,
+  IN UINT8                       Port,
+  IN UINT8                       PortMultiplier,
+  IN OUT EFI_ATA_STATUS_BLOCK    *AtaStatusBlock
+  )
+{
+  EFI_STATUS              Status;
+  EFI_ATA_COMMAND_BLOCK   AtaCommandBlock;
+  UINT8                   LBAMid;
+  UINT8                   LBAHigh;
+  UINTN                   FisBaseAddr;
+  UINT32                  Value;
+
+  ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
+
+  AtaCommandBlock.AtaCommand      = ATA_CMD_SMART;
+  AtaCommandBlock.AtaFeatures     = ATA_SMART_RETURN_STATUS;
+  AtaCommandBlock.AtaCylinderLow  = ATA_CONSTANT_4F;
+  AtaCommandBlock.AtaCylinderHigh = ATA_CONSTANT_C2;
+
+  //
+  // Send S.M.A.R.T Read Return Status command to device
+  //
+  Status = AhciNonDataTransfer (
+             PciIo,
+             AhciRegisters,
+             (UINT8)Port,
+             (UINT8)PortMultiplier,
+             NULL,
+             0,
+             &AtaCommandBlock,
+             AtaStatusBlock,
+             ATA_ATAPI_TIMEOUT
+             );
+
+  if (EFI_ERROR (Status)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  FisBaseAddr = (UINTN)AhciRegisters->AhciRFis + Port * sizeof (EFI_AHCI_RECEIVED_FIS);
+
+  Value = *(UINT32 *) (FisBaseAddr + EFI_AHCI_D2H_FIS_OFFSET);
+
+  if ((Value & EFI_AHCI_FIS_TYPE_MASK) == EFI_AHCI_FIS_REGISTER_D2H) {
+    LBAMid  = ((UINT8 *)(UINTN)(FisBaseAddr + EFI_AHCI_D2H_FIS_OFFSET))[5];
+    LBAHigh = ((UINT8 *)(UINTN)(FisBaseAddr + EFI_AHCI_D2H_FIS_OFFSET))[6];
+
+    if ((LBAMid == 0x4f) && (LBAHigh == 0xc2)) {
+      //
+      // The threshold exceeded condition is not detected by the device
+      //
+      DEBUG ((EFI_D_INFO, "The S.M.A.R.T threshold exceeded condition is not detected\n"));
+
+    } else if ((LBAMid == 0xf4) && (LBAHigh == 0x2c)) {
+      //
+      // The threshold exceeded condition is detected by the device
+      //
+      DEBUG ((EFI_D_INFO, "The S.M.A.R.T threshold exceeded condition is detected\n"));
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Enable SMART command of the disk if supported.
+
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
+  @param  PortMultiplier      The timeout value of stop.
+  @param  IdentifyData        A pointer to data buffer which is used to contain IDENTIFY data.
+  @param  AtaStatusBlock      A pointer to EFI_ATA_STATUS_BLOCK data structure.
+
+**/
+VOID
+EFIAPI
+AhciAtaSmartSupport (
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_AHCI_REGISTERS            *AhciRegisters,
+  IN UINT8                         Port,
+  IN UINT8                         PortMultiplier,
+  IN EFI_IDENTIFY_DATA             *IdentifyData,  
+  IN OUT EFI_ATA_STATUS_BLOCK      *AtaStatusBlock
+  )
+{
+  EFI_STATUS               Status;
+  EFI_ATA_COMMAND_BLOCK    AtaCommandBlock;
+
+  //
+  // Detect if the device supports S.M.A.R.T.
+  //
+  if ((IdentifyData->AtaData.command_set_supported_82 & 0x0001) != 0x0001) {
+    //
+    // S.M.A.R.T is not supported by the device
+    //
+    DEBUG ((EFI_D_INFO, "S.M.A.R.T feature is not supported at port [%d] PortMultiplier [%d]!\n", 
+            Port, PortMultiplier));
+  } else {
+    //
+    // Check if the feature is enabled. If not, then enable S.M.A.R.T.
+    //
+    if ((IdentifyData->AtaData.command_set_feature_enb_85 & 0x0001) != 0x0001) {
+      ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
+
+      AtaCommandBlock.AtaCommand      = ATA_CMD_SMART;
+      AtaCommandBlock.AtaFeatures     = ATA_SMART_ENABLE_OPERATION;
+      AtaCommandBlock.AtaCylinderLow  = ATA_CONSTANT_4F;
+      AtaCommandBlock.AtaCylinderHigh = ATA_CONSTANT_C2;
+
+      //
+      // Send S.M.A.R.T Enable command to device
+      //
+      Status = AhciNonDataTransfer (
+                 PciIo,
+                 AhciRegisters,
+                 (UINT8)Port,
+                 (UINT8)PortMultiplier,
+                 NULL,
+                 0,
+                 &AtaCommandBlock,
+                 AtaStatusBlock,
+                 ATA_ATAPI_TIMEOUT
+                 );
+
+
+      if (!EFI_ERROR (Status)) {
+        //
+        // Send S.M.A.R.T AutoSave command to device
+        //
+        ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
+
+        AtaCommandBlock.AtaCommand      = ATA_CMD_SMART;
+        AtaCommandBlock.AtaFeatures     = 0xD2;
+        AtaCommandBlock.AtaSectorCount  = 0xF1;
+        AtaCommandBlock.AtaCylinderLow  = ATA_CONSTANT_4F;
+        AtaCommandBlock.AtaCylinderHigh = ATA_CONSTANT_C2;
+
+        Status = AhciNonDataTransfer (
+                   PciIo,
+                   AhciRegisters,
+                   (UINT8)Port,
+                   (UINT8)PortMultiplier,
+                   NULL,
+                   0,
+                   &AtaCommandBlock,
+                   AtaStatusBlock,
+                   ATA_ATAPI_TIMEOUT
+                   );
+
+        if (!EFI_ERROR (Status)) {
+          Status = AhciAtaSmartReturnStatusCheck (
+                     PciIo,
+                     AhciRegisters,
+                     (UINT8)Port,
+                     (UINT8)PortMultiplier,
+                     AtaStatusBlock
+                     );
+        }
+      }
+    }
+    DEBUG ((EFI_D_INFO, "Enabled S.M.A.R.T feature at port [%d] PortMultiplier [%d]!\n", 
+            Port, PortMultiplier));
+  }
+
+  return ;
+}
+
+/**
   Send Buffer cmd to specific device.
     
   @param  PciIo               The PCI IO protocol instance.
@@ -1946,6 +2131,20 @@ AhciModeInitialization (
 
         DEBUG ((EFI_D_INFO, "port [%d] port mulitplier [%d] has a [%a]\n", 
             Port, 0, DeviceType == EfiIdeCdrom ? "cdrom" : "harddisk"));
+
+        //
+        // If the device is a hard disk, then try to enable S.M.A.R.T feature
+        //
+        if (DeviceType == EfiIdeHarddisk) {
+          AhciAtaSmartSupport (
+            PciIo,
+            AhciRegisters,
+            Port,
+            0,
+            &Buffer,
+            NULL
+            );
+        }
 
         //
         // Submit identify data to IDE controller init driver
