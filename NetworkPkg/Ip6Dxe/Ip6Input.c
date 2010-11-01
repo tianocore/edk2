@@ -481,11 +481,11 @@ Ip6IpSecFree (
   actions: bypass the packet, discard the packet, or protect the packet.
 
   @param[in]       IpSb          The IP6 service instance.
-  @param[in]       Head          The caller-supplied IP6 header.
+  @param[in, out]  Head          The caller-supplied IP6 header.
   @param[in, out]  LastHead      The next header field of last IP header.
   @param[in, out]  Netbuf        The IP6 packet to be processed by IPsec.
-  @param[in]       ExtHdrs       The caller-supplied options.
-  @param[in]       ExtHdrsLen    The length of the option.
+  @param[in, out]  ExtHdrs       The caller-supplied options.
+  @param[in, out]  ExtHdrsLen    The length of the option.
   @param[in]       Direction     The directionality in an SPD entry,
                                  EfiIPsecInBound, or EfiIPsecOutBound.
   @param[in]       Context       The token's wrap.
@@ -501,18 +501,20 @@ Ip6IpSecFree (
 **/
 EFI_STATUS
 Ip6IpSecProcessPacket (
-  IN IP6_SERVICE            *IpSb,
-  IN EFI_IP6_HEADER         *Head,
-  IN OUT UINT8              *LastHead,
-  IN OUT NET_BUF            **Netbuf,
-  IN VOID                   *ExtHdrs,
-  IN UINT32                 ExtHdrsLen,
-  IN EFI_IPSEC_TRAFFIC_DIR  Direction,
-  IN VOID                   *Context
+  IN     IP6_SERVICE            *IpSb,
+  IN OUT EFI_IP6_HEADER         **Head,
+  IN OUT UINT8                  *LastHead,
+  IN OUT NET_BUF                **Netbuf,
+  IN OUT UINT8                  **ExtHdrs,
+  IN OUT UINT32                 *ExtHdrsLen,
+  IN     EFI_IPSEC_TRAFFIC_DIR  Direction,
+  IN     VOID                   *Context
   )
 {
   NET_FRAGMENT              *FragmentTable;
+  NET_FRAGMENT              *OriginalFragmentTable;
   UINT32                    FragmentCount;
+  UINT32                    OriginalFragmentCount;
   EFI_EVENT                 RecycleEvent;
   NET_BUF                   *Packet;
   IP6_TXTOKEN_WRAP          *TxWrap;
@@ -520,6 +522,7 @@ Ip6IpSecProcessPacket (
   EFI_STATUS                Status;
   EFI_IP6_HEADER            *PacketHead;
   UINT8                     *Buf;
+  EFI_IP6_HEADER            ZeroHead;
 
   Status        = EFI_SUCCESS;
   Packet        = *Netbuf;
@@ -530,6 +533,7 @@ Ip6IpSecProcessPacket (
   Buf           = NULL;
   TxWrap        = (IP6_TXTOKEN_WRAP *) Context;
   FragmentCount = Packet->BlockOpNum;
+  ZeroMem (&ZeroHead, sizeof (EFI_IP6_HEADER));
 
   if (mIpSec == NULL) {
     gBS->LocateProtocol (&gEfiIpSecProtocolGuid, NULL, (VOID **) &mIpSec);
@@ -562,7 +566,7 @@ Ip6IpSecProcessPacket (
   //
   // Bypass all multicast inbound or outbound traffic.
   //
-  if (IP6_IS_MULTICAST (&Head->DestinationAddress) || IP6_IS_MULTICAST (&Head->SourceAddress)) {
+  if (IP6_IS_MULTICAST (&(*Head)->DestinationAddress) || IP6_IS_MULTICAST (&(*Head)->SourceAddress)) {
     goto ON_EXIT;
   }
 
@@ -577,6 +581,8 @@ Ip6IpSecProcessPacket (
   }
 
   Status = NetbufBuildExt (Packet, FragmentTable, &FragmentCount);
+  OriginalFragmentTable = FragmentTable;
+  OriginalFragmentCount = FragmentCount;
 
   if (EFI_ERROR(Status)) {
     FreePool (FragmentTable);
@@ -586,16 +592,16 @@ Ip6IpSecProcessPacket (
   //
   // Convert host byte order to network byte order
   //
-  Ip6NtohHead (Head);
+  Ip6NtohHead (*Head);
 
-  Status = mIpSec->Process (
+  Status = mIpSec->ProcessExt (
                      mIpSec,
                      IpSb->Controller,
                      IP_VERSION_6,
-                     (VOID *) Head,
+                     (VOID *) (*Head),
                      LastHead,
-                     NULL,
-                     0,
+                     (VOID **) ExtHdrs,
+                     ExtHdrsLen,
                      (EFI_IPSEC_FRAGMENT_DATA  **) (&FragmentTable),
                      &FragmentCount,
                      Direction,
@@ -604,14 +610,20 @@ Ip6IpSecProcessPacket (
   //
   // Convert back to host byte order
   //
-  Ip6NtohHead (Head);
+  Ip6NtohHead (*Head);
 
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
 
-  if (Direction == EfiIPsecOutBound && TxWrap != NULL) {
+  if (OriginalFragmentCount == FragmentCount && OriginalFragmentTable == FragmentTable) {
+    //
+    // For ByPass Packet
+    //
+    goto ON_EXIT;
+  }
 
+  if (Direction == EfiIPsecOutBound && TxWrap != NULL) {
     TxWrap->IpSecRecycleSignal = RecycleEvent;
     TxWrap->Packet             = NetbufFromExt (
                                    FragmentTable,
@@ -626,6 +638,13 @@ Ip6IpSecProcessPacket (
       goto ON_EXIT;
     }
 
+    CopyMem (
+      IP6_GET_CLIP_INFO (TxWrap->Packet),
+      IP6_GET_CLIP_INFO (Packet),
+      sizeof (IP6_CLIP_INFO)
+      );
+    
+    NetIpSecNetbufFree(Packet);
     *Netbuf = TxWrap->Packet;
 
   } else {
@@ -652,11 +671,11 @@ Ip6IpSecProcessPacket (
       goto ON_EXIT;
     }
 
-    if (Direction == EfiIPsecInBound) {
+    if (Direction == EfiIPsecInBound && 0 != CompareMem (&ZeroHead, *Head, sizeof (EFI_IP6_HEADER))) {
 
       PacketHead = (EFI_IP6_HEADER *) NetbufAllocSpace (
                                         Packet,
-                                        sizeof (EFI_IP6_HEADER) + ExtHdrsLen,
+                                        sizeof (EFI_IP6_HEADER) + *ExtHdrsLen,
                                         NET_BUF_HEAD
                                         );
       if (PacketHead == NULL) {
@@ -664,22 +683,22 @@ Ip6IpSecProcessPacket (
         goto ON_EXIT;
       }
 
-      CopyMem (PacketHead, Head, sizeof (EFI_IP6_HEADER));
+      CopyMem (PacketHead, *Head, sizeof (EFI_IP6_HEADER));
+      *Head = PacketHead;
       Packet->Ip.Ip6 = PacketHead;
 
-      if (ExtHdrs != NULL) {
+      if (*ExtHdrs != NULL) {
         Buf = (UINT8 *) (PacketHead + 1);
-        CopyMem (Buf, ExtHdrs, ExtHdrsLen);
+        CopyMem (Buf, *ExtHdrs, *ExtHdrsLen);
       }
 
-      NetbufTrim (Packet, sizeof (EFI_IP6_HEADER) + ExtHdrsLen, TRUE);
+      NetbufTrim (Packet, sizeof (EFI_IP6_HEADER) + *ExtHdrsLen, TRUE);
       CopyMem (
         IP6_GET_CLIP_INFO (Packet),
         IP6_GET_CLIP_INFO (IpSecWrap->Packet),
         sizeof (IP6_CLIP_INFO)
         );
     }
-
     *Netbuf = Packet;
   }
 
@@ -688,73 +707,72 @@ ON_EXIT:
 }
 
 /**
-  The IP6 input routine. It is called by the IP6_INTERFACE when an
-  IP6 fragment is received from MNP.
+  Pre-process the IPv6 packet. First validates the IPv6 packet, and
+  then reassembles packet if it is necessary.
 
-  @param[in]  Packet             The IP6 packet received.
-  @param[in]  IoStatus           The return status of receive request.
-  @param[in]  Flag               The link layer flag for the packet received, such
-                                 as multicast.
-  @param[in]  Context            The IP6 service instance that owns the MNP.
+  @param[in]      IpSb          The IP6 service instance.
+  @param[in, out] Packet        The received IP6 packet to be processed.
+  @param[in]      Flag          The link layer flag for the packet received, such
+                                as multicast.
+  @param[out]     Payload       The pointer to the payload of the recieved packet. 
+                                it starts from the first byte of the extension header.                                 
+  @param[out]     LastHead      The pointer of NextHeader of the last extension
+                                header processed by IP6.
+  @param[out]     ExtHdrsLen    The length of the whole option.
+  @param[out]     UnFragmentLen The length of unfragmented length of extension headers.
+  @param[out]     Fragmented    Indicate whether the packet is fragmented. 
+  @param[out]     Head          The pointer to the EFI_IP6_Header.
+
+  @retval     EFI_SUCCESS              The received packet is well format.
+  @retval     EFI_INVALID_PARAMETER    The received packet is malformed.
 
 **/
-VOID
-Ip6AcceptFrame (
-  IN NET_BUF                *Packet,
-  IN EFI_STATUS             IoStatus,
-  IN UINT32                 Flag,
-  IN VOID                   *Context
+EFI_STATUS
+Ip6PreProcessPacket (
+  IN     IP6_SERVICE     *IpSb,
+  IN OUT NET_BUF         **Packet,
+  IN     UINT32          Flag,
+     OUT UINT8           **Payload,
+     OUT UINT8           **LastHead,
+     OUT UINT32          *ExtHdrsLen,
+     OUT UINT32          *UnFragmentLen,
+     OUT BOOLEAN         *Fragmented, 
+     OUT EFI_IP6_HEADER  **Head
+     
+     
   )
 {
-  IP6_SERVICE               *IpSb;
-  IP6_CLIP_INFO             *Info;
-  EFI_IP6_HEADER            *Head;
   UINT16                    PayloadLen;
-  UINT8                     *Payload;
   UINT16                    TotalLen;
-  UINT8                     *LastHead;
   UINT32                    FormerHeadOffset;
-  UINT32                    UnFragmentLen;
-  UINT32                    ExtHdrsLen;
   UINT32                    HeadLen;
-  BOOLEAN                   Fragmented;
   IP6_FRAGMENT_HEADER       *FragmentHead;
   UINT16                    FragmentOffset;
-  EFI_STATUS                Status;
+  IP6_CLIP_INFO             *Info;
   EFI_IPv6_ADDRESS          Loopback;
 
-  IpSb = (IP6_SERVICE *) Context;
-  NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
-
-  Payload = NULL;
-
-  //
-  // Check input parameters
-  //
-  if (EFI_ERROR (IoStatus) || (IpSb->State == IP6_SERVICE_DESTROY)) {
-    goto Drop;
-  }
-
+  HeadLen    = 0;
+  PayloadLen = 0;
   //
   // Check whether the input packet is a valid packet
   //
-  if (Packet->TotalSize < IP6_MIN_HEADLEN) {
-    goto Restart;
+  if ((*Packet)->TotalSize < IP6_MIN_HEADLEN) {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
   // Get header information of the packet.
   //
-  Head = (EFI_IP6_HEADER *) NetbufGetByte (Packet, 0, NULL);
-  if (Head == NULL) {
-    goto Restart;
+  *Head = (EFI_IP6_HEADER *) NetbufGetByte (*Packet, 0, NULL);
+  if (*Head == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
   // Multicast addresses must not be used as source addresses in IPv6 packets.
   //
-  if ((Head->Version != 6) || (IP6_IS_MULTICAST (&Head->SourceAddress))) {
-    goto Restart;
+  if (((*Head)->Version != 6) || (IP6_IS_MULTICAST (&(*Head)->SourceAddress))) {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
@@ -762,20 +780,20 @@ Ip6AcceptFrame (
   //
   ZeroMem (&Loopback, sizeof (EFI_IPv6_ADDRESS));
   Loopback.Addr[15] = 0x1;
-  if ((CompareMem (&Loopback, &Head->DestinationAddress, sizeof (EFI_IPv6_ADDRESS)) == 0) ||
-      (NetIp6IsUnspecifiedAddr (&Head->DestinationAddress))) {
-    goto Restart;
+  if ((CompareMem (&Loopback, &(*Head)->DestinationAddress, sizeof (EFI_IPv6_ADDRESS)) == 0) ||
+      (NetIp6IsUnspecifiedAddr (&(*Head)->DestinationAddress))) {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
   // Convert the IP header to host byte order.
   //
-  Packet->Ip.Ip6 = Ip6NtohHead (Head);
+  (*Packet)->Ip.Ip6 = Ip6NtohHead (*Head);
 
   //
   // Get the per packet info.
   //
-  Info           = IP6_GET_CLIP_INFO (Packet);
+  Info           = IP6_GET_CLIP_INFO (*Packet);
   Info->LinkFlag = Flag;
   Info->CastType = 0;
 
@@ -783,10 +801,10 @@ Ip6AcceptFrame (
     Info->CastType = Ip6Promiscuous;
   }
 
-  if (Ip6IsOneOfSetAddress (IpSb, &Head->DestinationAddress, NULL, NULL)) {
+  if (Ip6IsOneOfSetAddress (IpSb, &(*Head)->DestinationAddress, NULL, NULL)) {
     Info->CastType = Ip6Unicast;
-  } else if (IP6_IS_MULTICAST (&Head->DestinationAddress)) {
-    if (Ip6FindMldEntry (IpSb, &Head->DestinationAddress) != NULL) {
+  } else if (IP6_IS_MULTICAST (&(*Head)->DestinationAddress)) {
+    if (Ip6FindMldEntry (IpSb, &(*Head)->DestinationAddress) != NULL) {
       Info->CastType = Ip6Multicast;
     }
   }
@@ -795,11 +813,11 @@ Ip6AcceptFrame (
   // Drop the packet that is not delivered to us.
   //
   if (Info->CastType == 0) {
-    goto Restart;
+    return EFI_INVALID_PARAMETER;
   }
 
 
-  PayloadLen = Head->PayloadLength;
+  PayloadLen = (*Head)->PayloadLength;
 
   Info->Start    = 0;
   Info->Length   = PayloadLen;
@@ -813,52 +831,51 @@ Ip6AcceptFrame (
   //
   // Mnp may deliver frame trailer sequence up, trim it off.
   //
-  if (TotalLen < Packet->TotalSize) {
-    NetbufTrim (Packet, Packet->TotalSize - TotalLen, FALSE);
+  if (TotalLen < (*Packet)->TotalSize) {
+    NetbufTrim (*Packet, (*Packet)->TotalSize - TotalLen, FALSE);
   }
 
-  if (TotalLen != Packet->TotalSize) {
-    goto Restart;
+  if (TotalLen != (*Packet)->TotalSize) {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
   // Check the extension headers, if exist validate them
   //
   if (PayloadLen != 0) {
-    Payload = AllocatePool ((UINTN) PayloadLen);
-    if (Payload == NULL) {
-      goto Restart;
+    *Payload = AllocatePool ((UINTN) PayloadLen);
+    if (*Payload == NULL) {
+      return EFI_INVALID_PARAMETER;
     }
 
-    NetbufCopy (Packet, sizeof (EFI_IP6_HEADER), PayloadLen, Payload);
+    NetbufCopy (*Packet, sizeof (EFI_IP6_HEADER), PayloadLen, *Payload);
   }
 
-  LastHead   = NULL;
   if (!Ip6IsExtsValid (
          IpSb,
-         Packet,
-         &Head->NextHeader,
-         Payload,
+         *Packet,
+         &(*Head)->NextHeader,
+         *Payload,
          (UINT32) PayloadLen,
          TRUE,
          &FormerHeadOffset,
-         &LastHead,
-         &ExtHdrsLen,
-         &UnFragmentLen,
-         &Fragmented
+         LastHead,
+         ExtHdrsLen,
+         UnFragmentLen,
+         Fragmented
          )) {
-    goto Restart;
+    return EFI_INVALID_PARAMETER;
   }
 
-  HeadLen        = sizeof (EFI_IP6_HEADER) + UnFragmentLen;
+  HeadLen        = sizeof (EFI_IP6_HEADER) + *UnFragmentLen;
 
-  if (Fragmented) {
+  if (*Fragmented) {
     //
     // Get the fragment offset from the Fragment header
     //
-    FragmentHead = (IP6_FRAGMENT_HEADER *) NetbufGetByte (Packet, HeadLen, NULL);
+    FragmentHead = (IP6_FRAGMENT_HEADER *) NetbufGetByte (*Packet, HeadLen, NULL);
     if (FragmentHead == NULL) {
-      goto Restart;
+      return EFI_INVALID_PARAMETER;
     }
 
     FragmentOffset = NTOHS (FragmentHead->FragmentOffset);
@@ -888,49 +905,49 @@ Ip6AcceptFrame (
     // Fragments should in the unit of 8 octets long except the last one.
     //
     if ((Info->LastFrag == 0) && (Info->Length % 8 != 0)) {
-      goto Restart;
+      return EFI_INVALID_PARAMETER;
     }
 
     //
     // Reassemble the packet.
     //
-    Packet = Ip6Reassemble (&IpSb->Assemble, Packet);
-    if (Packet == NULL) {
-      goto Restart;
+    *Packet = Ip6Reassemble (&IpSb->Assemble, *Packet);
+    if (*Packet == NULL) {
+      return EFI_INVALID_PARAMETER;
     }
 
     //
     // Re-check the assembled packet to get the right values.
     //
-    Head       = Packet->Ip.Ip6;
-    PayloadLen = Head->PayloadLength;
+    *Head       = (*Packet)->Ip.Ip6;
+    PayloadLen  = (*Head)->PayloadLength;
     if (PayloadLen != 0) {
-      if (Payload != NULL) {
-        FreePool (Payload);
+      if (*Payload != NULL) {
+        FreePool (*Payload);
       }
 
-      Payload = AllocatePool ((UINTN) PayloadLen);
-      if (Payload == NULL) {
-        goto Restart;
+      *Payload = AllocatePool ((UINTN) PayloadLen);
+      if (*Payload == NULL) {
+        return EFI_INVALID_PARAMETER;
       }
 
-      NetbufCopy (Packet, sizeof (EFI_IP6_HEADER), PayloadLen, Payload);
+      NetbufCopy (*Packet, sizeof (EFI_IP6_HEADER), PayloadLen, *Payload);
     }
 
     if (!Ip6IsExtsValid (
            IpSb,
-           Packet,
-           &Head->NextHeader,
-           Payload,
+           *Packet,
+           &(*Head)->NextHeader,
+           *Payload,
            (UINT32) PayloadLen,
            TRUE,
            NULL,
-           &LastHead,
-           &ExtHdrsLen,
-           &UnFragmentLen,
-           &Fragmented
+           LastHead,
+           ExtHdrsLen,
+           UnFragmentLen,
+           Fragmented
            )) {
-      goto Restart;
+      return EFI_INVALID_PARAMETER;
     }
   }
 
@@ -938,30 +955,109 @@ Ip6AcceptFrame (
   // Trim the head off, after this point, the packet is headless.
   // and Packet->TotalLen == Info->Length.
   //
-  NetbufTrim (Packet, sizeof (EFI_IP6_HEADER) + ExtHdrsLen, TRUE);
+  NetbufTrim (*Packet, sizeof (EFI_IP6_HEADER) + *ExtHdrsLen, TRUE);
+  
+  return EFI_SUCCESS;
+}
 
+/**
+  The IP6 input routine. It is called by the IP6_INTERFACE when an
+  IP6 fragment is received from MNP.
+
+  @param[in]  Packet             The IP6 packet received.
+  @param[in]  IoStatus           The return status of receive request.
+  @param[in]  Flag               The link layer flag for the packet received, such
+                                 as multicast.
+  @param[in]  Context            The IP6 service instance that owns the MNP.
+
+**/
+VOID
+Ip6AcceptFrame (
+  IN NET_BUF                *Packet,
+  IN EFI_STATUS             IoStatus,
+  IN UINT32                 Flag,
+  IN VOID                   *Context
+  )
+{
+  IP6_SERVICE               *IpSb;
+  EFI_IP6_HEADER            *Head;
+  UINT8                     *Payload;
+  UINT8                     *LastHead;
+  UINT32                    UnFragmentLen;
+  UINT32                    ExtHdrsLen;
+  BOOLEAN                   Fragmented;
+  EFI_STATUS                Status;
+  EFI_IP6_HEADER            ZeroHead;
+
+  IpSb = (IP6_SERVICE *) Context;
+  NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
+
+  Payload  = NULL;
+  LastHead = NULL;
+
+  //
+  // Check input parameters
+  //
+  if (EFI_ERROR (IoStatus) || (IpSb->State == IP6_SERVICE_DESTROY)) {
+    goto Drop;
+  }
+  
+  //
+  // Pre-Process the Ipv6 Packet and then reassemble if it is necessary.
+  //
+  Status = Ip6PreProcessPacket (
+             IpSb, 
+             &Packet, 
+             Flag, 
+             &Payload, 
+             &LastHead, 
+             &ExtHdrsLen, 
+             &UnFragmentLen, 
+             &Fragmented,
+             &Head
+             );
+  if (EFI_ERROR (Status)) {
+    goto Restart;
+  }
   //
   // After trim off, the packet is a esp/ah/udp/tcp/icmp6 net buffer,
   // and no need consider any other ahead ext headers.
   //
   Status = Ip6IpSecProcessPacket (
              IpSb,
-             Head,
+             &Head,
              LastHead, // need get the lasthead value for input
              &Packet,
-             NULL,
-             0,
+             &Payload,
+             &ExtHdrsLen,
              EfiIPsecInBound,
              NULL
              );
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     goto Restart;
   }
 
   //
-  // TODO: may check the last head again, the same as the output routine
+  // If the packet is protected by IPsec Tunnel Mode, Check the Inner Ip Packet.
   //
+  ZeroMem (&ZeroHead, sizeof (EFI_IP6_HEADER));
+  if (0 == CompareMem (Head, &ZeroHead, sizeof (EFI_IP6_HEADER))) {
+    Status = Ip6PreProcessPacket (
+               IpSb, 
+               &Packet, 
+               Flag, 
+               &Payload, 
+               &LastHead, 
+               &ExtHdrsLen, 
+               &UnFragmentLen, 
+               &Fragmented, 
+               &Head
+               );
+    if (EFI_ERROR (Status)) {
+      goto Restart;
+    }
+  }
 
   //
   // Packet may have been changed. The ownership of the packet

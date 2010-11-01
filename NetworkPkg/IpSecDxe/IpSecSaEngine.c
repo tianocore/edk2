@@ -124,8 +124,8 @@ IpSecAuthPayload (
   )
 {
   switch (AuthAlgId) {
-    case EFI_IPSEC_AALG_NONE :
-    case EFI_IPSEC_AALG_NULL :
+    case IKE_AALG_NONE :
+    case IKE_AALG_NULL :
         return EFI_SUCCESS;
 
     default:
@@ -222,15 +222,15 @@ IpSecEspDecryptPayload (
   EFI_ESP_TAIL *EspTail;
 
   switch (SadEntry->Data->AlgoInfo.EspAlgoInfo.EncAlgoId) {
-    case EFI_IPSEC_EALG_NULL:
+    case IKE_EALG_NULL:
       EspTail            = (EFI_ESP_TAIL *) (PayloadBuffer + EncryptSize - sizeof (EFI_ESP_TAIL));
       *PaddingSize       = EspTail->PaddingLength;
       *NextHeader        = EspTail->NextHeader;
       *PlainPayloadSize  = EncryptSize - EspTail->PaddingLength - sizeof (EFI_ESP_TAIL);
       break;
 
-    case EFI_IPSEC_EALG_3DESCBC:
-    case EFI_IPSEC_EALG_AESCBC:
+    case IKE_EALG_3DESCBC:
+    case IKE_EALG_AESCBC:
       //
       // TODO: support these algorithm
       //
@@ -269,11 +269,11 @@ IpSecEspEncryptPayload (
   )
 {
   switch (SadEntry->Data->AlgoInfo.EspAlgoInfo.EncAlgoId) {
-    case EFI_IPSEC_EALG_NULL:
+    case IKE_EALG_NULL:
       return EFI_SUCCESS;
 
-    case EFI_IPSEC_EALG_3DESCBC:
-    case EFI_IPSEC_EALG_AESCBC:
+    case IKE_EALG_3DESCBC:
+    case IKE_EALG_AESCBC:
       //
       // TODO: support these algorithms
       //
@@ -296,12 +296,12 @@ IpSecEspEncryptPayload (
                                      to be trimed on input, and without ESP header
                                      on return.
   @param[out]     LastHead           The Last Header in IP header on return.
-  @param[in]      OptionsBuffer      Pointer to the options buffer. It is optional.
-  @param[in]      OptionsLength      Length of the options buffer. It is optional.
+  @param[in, out] OptionsBuffer      Pointer to the options buffer. It is optional.
+  @param[in, out] OptionsLength      Length of the options buffer. It is optional.
   @param[in, out] FragmentTable      Pointer to a list of fragments in the form of IPsec
                                      protected on input, and without IPsec protected
                                      on return.
-  @param[in]      FragmentCount      The number of fragments.
+  @param[in, out] FragmentCount      The number of fragments.
   @param[out]     SpdEntry           Pointer to contain the address of SPD entry on return.
   @param[out]     RecycleEvent       The event for recycling of resources.
 
@@ -318,10 +318,10 @@ IpSecEspInboundPacket (
   IN     UINT8                       IpVersion,
   IN OUT VOID                        *IpHead,
      OUT UINT8                       *LastHead,
-  IN     VOID                        *OptionsBuffer, OPTIONAL
-  IN     UINT32                      OptionsLength,  OPTIONAL
+  IN OUT VOID                        **OptionsBuffer, OPTIONAL
+  IN OUT UINT32                      *OptionsLength,  OPTIONAL
   IN OUT EFI_IPSEC_FRAGMENT_DATA     **FragmentTable,
-  IN     UINT32                      *FragmentCount,
+  IN OUT UINT32                      *FragmentCount,
      OUT IPSEC_SPD_ENTRY             **SpdEntry,
      OUT EFI_EVENT                   *RecycleEvent
   )
@@ -558,13 +558,13 @@ ON_EXIT:
   @param[in, out] IpHead             Points to IP header containing the orginal IP header
                                      to be processed on input, and inserted ESP header
                                      on return.
-  @param[in]      LastHead           The Last Header in IP header.
-  @param[in]      OptionsBuffer      Pointer to the options buffer. It is optional.
-  @param[in]      OptionsLength      Length of the options buffer. It is optional.
+  @param[in, out] LastHead           The Last Header in IP header.
+  @param[in, out] OptionsBuffer      Pointer to the options buffer. It is optional.
+  @param[in, out] OptionsLength      Length of the options buffer. It is optional.
   @param[in, out] FragmentTable      Pointer to a list of fragments to be protected by
                                      IPsec on input, and with IPsec protected
                                      on return.
-  @param[in]      FragmentCount      The number of fragments.
+  @param[in, out] FragmentCount      The number of fragments.
   @param[in]      SadEntry           The related SAD entry.
   @param[out]     RecycleEvent       The event for recycling of resources.
 
@@ -576,11 +576,11 @@ EFI_STATUS
 IpSecEspOutboundPacket (
   IN UINT8                           IpVersion,
   IN OUT VOID                        *IpHead,
-  IN     UINT8                       *LastHead,
-  IN     VOID                        *OptionsBuffer, OPTIONAL
-  IN     UINT32                      OptionsLength,  OPTIONAL
+  IN OUT UINT8                       *LastHead,
+  IN OUT VOID                        **OptionsBuffer, OPTIONAL
+  IN OUT UINT32                      *OptionsLength,  OPTIONAL
   IN OUT EFI_IPSEC_FRAGMENT_DATA     **FragmentTable,
-  IN     UINT32                      *FragmentCount,
+  IN OUT UINT32                      *FragmentCount,
   IN     IPSEC_SAD_ENTRY             *SadEntry,
      OUT EFI_EVENT                   *RecycleEvent
   )
@@ -825,29 +825,29 @@ ON_EXIT:
   @param[in, out] IpHead             Points to IP header containing the ESP/AH header
                                      to be trimed on input, and without ESP/AH header
                                      on return.
-  @param[in]      LastHead           The Last Header in IP header on return.
-  @param[in]      OptionsBuffer      Pointer to the options buffer. It is optional.
-  @param[in]      OptionsLength      Length of the options buffer. It is optional.
-  @param[in, out] FragmentTable      Pointer to a list of fragments in form of IPsec
+  @param[out]     LastHead           The Last Header in IP header on return.
+  @param[in, out] OptionsBuffer      Pointer to the options buffer. It is optional.
+  @param[in, out] OptionsLength      Length of the options buffer. It is optional.
+  @param[in, out] FragmentTable      Pointer to a list of fragments in the form of IPsec
                                      protected on input, and without IPsec protected
                                      on return.
-  @param[in]      FragmentCount      The number of fragments.
+  @param[in, out] FragmentCount      Number of fragments.
   @param[out]     SpdEntry           Pointer to contain the address of SPD entry on return.
-  @param[out]     RecycleEvent       The event for recycling of resources.
+  @param[out]     RecycleEvent       Event for recycling of resources.
 
-  @retval EFI_SUCCESS              The operation was successful.
-  @retval EFI_UNSUPPORTED          The IPSEC protocol is not supported.
+  @retval EFI_SUCCESS              The operation is successful.
+  @retval EFI_UNSUPPORTED          If the IPSEC protocol is not supported.
 
 **/
 EFI_STATUS
 IpSecProtectInboundPacket (
   IN     UINT8                       IpVersion,
   IN OUT VOID                        *IpHead,
-  IN     UINT8                       *LastHead,
-  IN     VOID                        *OptionsBuffer, OPTIONAL
-  IN     UINT32                      OptionsLength,  OPTIONAL
+     OUT UINT8                       *LastHead,
+  IN OUT VOID                        **OptionsBuffer, OPTIONAL
+  IN OUT UINT32                      *OptionsLength,  OPTIONAL
   IN OUT EFI_IPSEC_FRAGMENT_DATA     **FragmentTable,
-  IN     UINT32                      *FragmentCount,
+  IN OUT UINT32                      *FragmentCount,
      OUT IPSEC_SPD_ENTRY             **SpdEntry,
      OUT EFI_EVENT                   *RecycleEvent
   )
@@ -875,26 +875,26 @@ IpSecProtectInboundPacket (
 }
 
 /**
-  This function processes the output traffic with IPsec.
+  This fucntion processes the output traffic with IPsec.
 
   It protected the sending packet by encrypting it payload and inserting ESP/AH header
-  in the orginal IP header, then returns the IpHeader and IPsec protected Fragmentable.
+  in the orginal IP header, then return the IpHeader and IPsec protected Fragmentable.
 
   @param[in]      IpVersion          The version of IP.
-  @param[in, out] IpHead             Points to IP header containing the orginal IP header
+  @param[in, out] IpHead             Point to IP header containing the orginal IP header
                                      to be processed on input, and inserted ESP/AH header
                                      on return.
-  @param[in]      LastHead           The Last Header in the IP header.
-  @param[in]      OptionsBuffer      Pointer to the options buffer. It is optional.
-  @param[in]      OptionsLength      Length of the options buffer. It is optional.
+  @param[in, out] LastHead           The Last Header in IP header.
+  @param[in, out] OptionsBuffer      Pointer to the options buffer. It is optional.
+  @param[in, out] OptionsLength      Length of the options buffer. It is optional.
   @param[in, out] FragmentTable      Pointer to a list of fragments to be protected by
                                      IPsec on input, and with IPsec protected
                                      on return.
-  @param[in]      FragmentCount      The number of fragments.
-  @param[in]      SadEntry           The related SAD entry.
-  @param[out]     RecycleEvent       The event for recycling of resources.
+  @param[in, out] FragmentCount      Number of fragments.
+  @param[in]      SadEntry           Related SAD entry.
+  @param[out]     RecycleEvent       Event for recycling of resources.
 
-  @retval EFI_SUCCESS              The operation was successful.
+  @retval EFI_SUCCESS              The operation is successful.
   @retval EFI_UNSUPPORTED          If the IPSEC protocol is not supported.
 
 **/
@@ -902,11 +902,11 @@ EFI_STATUS
 IpSecProtectOutboundPacket (
   IN     UINT8                       IpVersion,
   IN OUT VOID                        *IpHead,
-  IN     UINT8                       *LastHead,
-  IN     VOID                        *OptionsBuffer, OPTIONAL
-  IN     UINT32                      OptionsLength,  OPTIONAL
+  IN OUT UINT8                       *LastHead,
+  IN OUT VOID                        **OptionsBuffer, OPTIONAL
+  IN OUT UINT32                      *OptionsLength,  OPTIONAL
   IN OUT EFI_IPSEC_FRAGMENT_DATA     **FragmentTable,
-  IN     UINT32                      *FragmentCount,
+  IN OUT UINT32                      *FragmentCount,
   IN     IPSEC_SAD_ENTRY             *SadEntry,
      OUT EFI_EVENT                   *RecycleEvent
   )

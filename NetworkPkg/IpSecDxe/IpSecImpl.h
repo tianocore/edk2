@@ -88,16 +88,19 @@ struct _IPSEC_SPD_ENTRY {
 };
 
 typedef struct _IPSEC_SAD_DATA {
-  EFI_IPSEC_MODE        Mode;
-  UINT64                SequenceNumber;
-  UINT8                 AntiReplayWindowSize;
-  UINT64                AntiReplayBitmap[4];  // bitmap for received packet
-  EFI_IPSEC_ALGO_INFO   AlgoInfo;
-  EFI_IPSEC_SA_LIFETIME SaLifetime;
-  UINT32                PathMTU;
-  IPSEC_SPD_ENTRY       *SpdEntry;
-  BOOLEAN               ESNEnabled;           // Extended (64-bit) SN enabled
-  BOOLEAN               ManualSet;
+  EFI_IPSEC_MODE         Mode;
+  UINT64                 SequenceNumber;
+  UINT8                  AntiReplayWindowSize;
+  UINT64                 AntiReplayBitmap[4];  // bitmap for received packet
+  EFI_IPSEC_ALGO_INFO    AlgoInfo;
+  EFI_IPSEC_SA_LIFETIME  SaLifetime;
+  UINT32                 PathMTU;
+  IPSEC_SPD_ENTRY        *SpdEntry;
+  EFI_IPSEC_SPD_SELECTOR *SpdSelector;
+  BOOLEAN                ESNEnabled;           // Extended (64-bit) SN enabled
+  BOOLEAN                ManualSet;
+  EFI_IP_ADDRESS         TunnelDestAddress;
+  EFI_IP_ADDRESS         TunnelSourceAddress;
 } IPSEC_SAD_DATA;
 
 typedef struct _IPSEC_SAD_ENTRY {
@@ -122,7 +125,7 @@ struct _IPSEC_PRIVATE_DATA {
   UINT32                    Signature;
   EFI_HANDLE                Handle;           // Virtual handle to install private prtocol
   EFI_HANDLE                ImageHandle;
-  EFI_IPSEC_PROTOCOL        IpSec;
+  EFI_IPSEC2_PROTOCOL       IpSec;
   EFI_IPSEC_CONFIG_PROTOCOL IpSecConfig;
   BOOLEAN                   SetBySelf;
   LIST_ENTRY                Udp4List;
@@ -146,13 +149,13 @@ struct _IPSEC_PRIVATE_DATA {
   @param[in, out] IpHead             Points to IP header containing the ESP/AH header
                                      to be trimed on input, and without ESP/AH header
                                      on return.
-  @param[in]      LastHead           The Last Header in IP header on return.
-  @param[in]      OptionsBuffer      Pointer to the options buffer. It is optional.
-  @param[in]      OptionsLength      Length of the options buffer. It is optional.
+  @param[out]     LastHead           The Last Header in IP header on return.
+  @param[in, out] OptionsBuffer      Pointer to the options buffer. It is optional.
+  @param[in, out] OptionsLength      Length of the options buffer. It is optional.
   @param[in, out] FragmentTable      Pointer to a list of fragments in the form of IPsec
                                      protected on input, and without IPsec protected
                                      on return.
-  @param[in]      FragmentCount      Number of fragments.
+  @param[in, out] FragmentCount      Number of fragments.
   @param[out]     SpdEntry           Pointer to contain the address of SPD entry on return.
   @param[out]     RecycleEvent       Event for recycling of resources.
 
@@ -164,11 +167,11 @@ EFI_STATUS
 IpSecProtectInboundPacket (
   IN     UINT8                       IpVersion,
   IN OUT VOID                        *IpHead,
-  IN     UINT8                       *LastHead,
-  IN     VOID                        *OptionsBuffer, OPTIONAL
-  IN     UINT32                      OptionsLength,  OPTIONAL
+     OUT UINT8                       *LastHead,
+  IN OUT VOID                        **OptionsBuffer, OPTIONAL
+  IN OUT UINT32                      *OptionsLength,  OPTIONAL
   IN OUT EFI_IPSEC_FRAGMENT_DATA     **FragmentTable,
-  IN     UINT32                      *FragmentCount,
+  IN OUT UINT32                      *FragmentCount,
      OUT IPSEC_SPD_ENTRY             **SpdEntry,
      OUT EFI_EVENT                   *RecycleEvent
   );
@@ -184,13 +187,13 @@ IpSecProtectInboundPacket (
   @param[in, out] IpHead             Point to IP header containing the orginal IP header
                                      to be processed on input, and inserted ESP/AH header
                                      on return.
-  @param[in]      LastHead           The Last Header in IP header.
-  @param[in]      OptionsBuffer      Pointer to the options buffer. It is optional.
-  @param[in]      OptionsLength      Length of the options buffer. It is optional.
+  @param[in, out] LastHead           The Last Header in IP header.
+  @param[in, out] OptionsBuffer      Pointer to the options buffer. It is optional.
+  @param[in, out] OptionsLength      Length of the options buffer. It is optional.
   @param[in, out] FragmentTable      Pointer to a list of fragments to be protected by
                                      IPsec on input, and with IPsec protected
                                      on return.
-  @param[in]      FragmentCount      Number of fragments.
+  @param[in, out] FragmentCount      Number of fragments.
   @param[in]      SadEntry           Related SAD entry.
   @param[out]     RecycleEvent       Event for recycling of resources.
 
@@ -202,11 +205,11 @@ EFI_STATUS
 IpSecProtectOutboundPacket (
   IN     UINT8                       IpVersion,
   IN OUT VOID                        *IpHead,
-  IN     UINT8                       *LastHead,
-  IN     VOID                        *OptionsBuffer, OPTIONAL
-  IN     UINT32                      OptionsLength,  OPTIONAL
+  IN OUT UINT8                       *LastHead,
+  IN OUT VOID                        **OptionsBuffer, OPTIONAL
+  IN OUT UINT32                      *OptionsLength,  OPTIONAL
   IN OUT EFI_IPSEC_FRAGMENT_DATA     **FragmentTable,
-  IN     UINT32                      *FragmentCount,
+  IN OUT UINT32                      *FragmentCount,
   IN     IPSEC_SAD_ENTRY             *SadEntry,
      OUT EFI_EVENT                   *RecycleEvent
   );
@@ -274,11 +277,11 @@ IpSecLookupSadBySpi (
   @param[in]      NicHandle        Instance of the network interface.
   @param[in]      IpVersion        IPV4 or IPV6.
   @param[in, out] IpHead           Pointer to the IP Header.
-  @param[in]      LastHead         The protocol of the next layer to be processed by IPsec.
-  @param[in]      OptionsBuffer    Pointer to the options buffer.
-  @param[in]      OptionsLength    Length of the options buffer.
+  @param[in, out] LastHead         The protocol of the next layer to be processed by IPsec.
+  @param[in, out] OptionsBuffer    Pointer to the options buffer.
+  @param[in, out] OptionsLength    Length of the options buffer.
   @param[in, out] FragmentTable    Pointer to a list of fragments.
-  @param[in]      FragmentCount    Number of fragments.
+  @param[in, out] FragmentCount    Number of fragments.
   @param[in]      TrafficDirection Traffic direction.
   @param[out]     RecycleSignal    Event for recycling of resources.
 
@@ -290,21 +293,21 @@ IpSecLookupSadBySpi (
 EFI_STATUS
 EFIAPI
 IpSecProcess (
-  IN     EFI_IPSEC_PROTOCOL              *This,
+  IN     EFI_IPSEC2_PROTOCOL              *This,
   IN     EFI_HANDLE                      NicHandle,
   IN     UINT8                           IpVersion,
   IN OUT VOID                            *IpHead,
-  IN     UINT8                           *LastHead,
-  IN     VOID                            *OptionsBuffer,
-  IN     UINT32                          OptionsLength,
+  IN OUT UINT8                           *LastHead,
+  IN OUT VOID                            **OptionsBuffer,
+  IN OUT UINT32                          *OptionsLength,
   IN OUT EFI_IPSEC_FRAGMENT_DATA         **FragmentTable,
-  IN     UINT32                          *FragmentCount,
+  IN OUT UINT32                          *FragmentCount,
   IN     EFI_IPSEC_TRAFFIC_DIR           TrafficDirection,
      OUT EFI_EVENT                       *RecycleSignal
   );
 
 extern EFI_DPC_PROTOCOL    *mDpc;
-extern EFI_IPSEC_PROTOCOL  mIpSecInstance;
+extern EFI_IPSEC2_PROTOCOL  mIpSecInstance;
 
 extern EFI_COMPONENT_NAME2_PROTOCOL gIpSecComponentName2;
 extern EFI_COMPONENT_NAME_PROTOCOL  gIpSecComponentName;

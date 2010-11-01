@@ -18,15 +18,15 @@
 // Alogrithm's informations for the Encrypt/Decrpt Alogrithm.
 //
 ENCRYPT_ALGORITHM mIpsecEncryptAlgorithmList[IPSEC_ENCRYPT_ALGORITHM_LIST_SIZE] = {
-  {EFI_IPSEC_EALG_NULL, 0, 0, 1, NULL, NULL, NULL, NULL},
+  {IKE_EALG_NULL, 0, 0, 1, NULL, NULL, NULL, NULL},
   {(UINT8)-1,           0, 0, 0, NULL, NULL, NULL, NULL}
 };
 //
 // Alogrithm's informations for the Authentication algorithm
 //
 AUTH_ALGORITHM mIpsecAuthAlgorithmList[IPSEC_AUTH_ALGORITHM_LIST_SIZE] = {
-  {EFI_IPSEC_AALG_NONE, 0, 0, 0, NULL, NULL, NULL, NULL},
-  {EFI_IPSEC_AALG_NULL, 0, 0, 0, NULL, NULL, NULL, NULL},
+  {IKE_AALG_NONE, 0, 0, 0, NULL, NULL, NULL, NULL},
+  {IKE_AALG_NULL, 0, 0, 0, NULL, NULL, NULL, NULL},
   {(UINT8)-1,           0, 0, 0, NULL, NULL, NULL, NULL}
 };
 

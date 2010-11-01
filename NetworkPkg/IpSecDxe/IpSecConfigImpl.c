@@ -2365,7 +2365,7 @@ EfiIpSecConfigGetNextSelector (
   NET_LIST_FOR_EACH (Link, &mConfigData[DataType]) {
     CommonEntry = BASE_CR (Link, IPSEC_COMMON_POLICY_ENTRY, List);
 
-    if (IsFound || mIsZeroSelector[DataType](Selector)) {
+    if (IsFound || (BOOLEAN)(mIsZeroSelector[DataType](Selector))) {
       //
       // If found the appointed entry, then duplicate the next one and return,
       // or if the appointed entry is zero, then return the first one directly.

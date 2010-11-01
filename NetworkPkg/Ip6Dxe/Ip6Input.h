@@ -137,39 +137,39 @@ Ip6InstanceDeliverPacket (
   );
 
 /**
-  The work function to locate IPsec protocol to process the inbound or
-  outbound IP packets. The process routine handls the packet with the following
+  The work function to locate the IPsec protocol to process the inbound or
+  outbound IP packets. The process routine handles the packet with the following
   actions: bypass the packet, discard the packet, or protect the packet.
 
   @param[in]       IpSb          The IP6 service instance.
-  @param[in]       Head          The caller supplied IP6 header.
+  @param[in, out]  Head          The caller-supplied IP6 header.
   @param[in, out]  LastHead      The next header field of last IP header.
   @param[in, out]  Netbuf        The IP6 packet to be processed by IPsec.
-  @param[in]       ExtHdrs       The caller supplied options.
-  @param[in]       ExtHdrsLen    The length of the option.
+  @param[in, out]  ExtHdrs       The caller-supplied options.
+  @param[in, out]  ExtHdrsLen    The length of the option.
   @param[in]       Direction     The directionality in an SPD entry,
-                                 EfiIPsecInBound or EfiIPsecOutBound.
+                                 EfiIPsecInBound, or EfiIPsecOutBound.
   @param[in]       Context       The token's wrap.
 
   @retval EFI_SUCCESS            The IPsec protocol is not available or disabled.
-  @retval EFI_SUCCESS            The packet was bypassed and all buffers remain the same.
+  @retval EFI_SUCCESS            The packet was bypassed, and all buffers remain the same.
   @retval EFI_SUCCESS            The packet was protected.
   @retval EFI_ACCESS_DENIED      The packet was discarded.
   @retval EFI_OUT_OF_RESOURCES   There are not suffcient resources to complete the operation.
-  @retval EFI_BUFFER_TOO_SMALL   The number of non-empty block is bigger than the
+  @retval EFI_BUFFER_TOO_SMALL   The number of non-empty blocks is bigger than the
                                  number of input data blocks when building a fragment table.
 
 **/
 EFI_STATUS
 Ip6IpSecProcessPacket (
-  IN IP6_SERVICE            *IpSb,
-  IN EFI_IP6_HEADER         *Head,
-  IN OUT UINT8              *LastHead,
-  IN OUT NET_BUF            **Netbuf,
-  IN VOID                   *ExtHdrs,
-  IN UINT32                 ExtHdrsLen,
-  IN EFI_IPSEC_TRAFFIC_DIR  Direction,
-  IN VOID                   *Context
+  IN     IP6_SERVICE            *IpSb,
+  IN OUT EFI_IP6_HEADER         **Head,
+  IN OUT UINT8                  *LastHead,
+  IN OUT NET_BUF                **Netbuf,
+  IN OUT UINT8                  **ExtHdrs,
+  IN OUT UINT32                 *ExtHdrsLen,
+  IN     EFI_IPSEC_TRAFFIC_DIR  Direction,
+  IN     VOID                   *Context
   );
 
 /**

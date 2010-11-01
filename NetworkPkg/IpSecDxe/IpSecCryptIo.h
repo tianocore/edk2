@@ -22,6 +22,23 @@
 #define IPSEC_ENCRYPT_ALGORITHM_LIST_SIZE 2
 #define IPSEC_AUTH_ALGORITHM_LIST_SIZE    3
 
+///
+/// Authentication Algorithm Definition
+///   The number value definition is aligned to IANA assignment
+///
+#define IKE_AALG_NONE                0x00
+#define IKE_AALG_SHA1HMAC            0x02
+#define IKE_AALG_NULL                0xFB
+
+///
+/// Encryption Algorithm Definition
+///   The number value definition is aligned to IANA assignment
+///
+#define IKE_EALG_NONE                0x00
+#define IKE_EALG_3DESCBC             0x03
+#define IKE_EALG_NULL                0x0B
+#define IKE_EALG_AESCBC              0x0C
+
 /**
   Prototype of Hash GetContextSize.
 

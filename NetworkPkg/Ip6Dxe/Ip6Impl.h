@@ -89,7 +89,7 @@
 
 #define IP6_NO_MAPPING(IpInstance) (!(IpInstance)->Interface->Configured)
 
-extern EFI_IPSEC_PROTOCOL *mIpSec;
+extern EFI_IPSEC2_PROTOCOL *mIpSec;
 
 //
 // IP6_TXTOKEN_WRAP wraps the upper layer's transmit token.

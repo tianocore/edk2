@@ -174,7 +174,7 @@ IpSecDriverEntryPoint (
 {
   EFI_STATUS          Status;
   IPSEC_PRIVATE_DATA  *Private;
-  EFI_IPSEC_PROTOCOL  *IpSec;
+  EFI_IPSEC2_PROTOCOL *IpSec;
 
   //
   // Check whether ipsec protocol has already been installed.
@@ -218,7 +218,7 @@ IpSecDriverEntryPoint (
 
   Private->Signature    = IPSEC_PRIVATE_DATA_SIGNATURE;
   Private->ImageHandle  = ImageHandle;
-  CopyMem (&Private->IpSec, &mIpSecInstance, sizeof (EFI_IPSEC_PROTOCOL));
+  CopyMem (&Private->IpSec, &mIpSecInstance, sizeof (EFI_IPSEC2_PROTOCOL));
 
   //
   // Initilize Private's members. Thess members is used for IKE.

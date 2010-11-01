@@ -15,7 +15,7 @@
 
 #include "Ip6Impl.h"
 
-EFI_IPSEC_PROTOCOL    *mIpSec = NULL;
+EFI_IPSEC2_PROTOCOL    *mIpSec = NULL;
 
 EFI_IP6_PROTOCOL mEfiIp6ProtocolTemplete = {
   EfiIp6GetModeData,

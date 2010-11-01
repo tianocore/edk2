@@ -638,11 +638,11 @@ Ip6Output (
 
   Status = Ip6IpSecProcessPacket (
              IpSb,
-             Head,
+             &Head,
              LastHeader, // no need get the lasthead value for output
              &Packet,
-             ExtHdrs,
-             ExtHdrsLen,
+             &ExtHdrs,
+             &ExtHdrsLen,
              EfiIPsecOutBound,
              Context
              );

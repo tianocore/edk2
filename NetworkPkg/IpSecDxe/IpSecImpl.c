@@ -15,7 +15,7 @@
 
 #include "IpSecConfigImpl.h"
 
-EFI_IPSEC_PROTOCOL  mIpSecInstance = { IpSecProcess, NULL, TRUE };
+EFI_IPSEC2_PROTOCOL  mIpSecInstance = { IpSecProcess, NULL, TRUE };
 
 extern LIST_ENTRY   mConfigData[IPsecConfigDataTypeMaximum];
 
@@ -656,11 +656,11 @@ IpSecLookupSpdEntry (
   @param[in]      NicHandle        Instance of the network interface.
   @param[in]      IpVersion        IPV4 or IPV6.
   @param[in, out] IpHead           Pointer to the IP Header.
-  @param[in]      LastHead         The protocol of the next layer to be processed by IPsec.
-  @param[in]      OptionsBuffer    Pointer to the options buffer.
-  @param[in]      OptionsLength    Length of the options buffer.
+  @param[in, out] LastHead         The protocol of the next layer to be processed by IPsec.
+  @param[in, out] OptionsBuffer    Pointer to the options buffer.
+  @param[in, out] OptionsLength    Length of the options buffer.
   @param[in, out] FragmentTable    Pointer to a list of fragments.
-  @param[in]      FragmentCount    Number of fragments.
+  @param[in, out] FragmentCount    Number of fragments.
   @param[in]      TrafficDirection Traffic direction.
   @param[out]     RecycleSignal    Event for recycling of resources.
 
@@ -672,15 +672,15 @@ IpSecLookupSpdEntry (
 EFI_STATUS
 EFIAPI
 IpSecProcess (
-  IN     EFI_IPSEC_PROTOCOL              *This,
+  IN     EFI_IPSEC2_PROTOCOL              *This,
   IN     EFI_HANDLE                      NicHandle,
   IN     UINT8                           IpVersion,
   IN OUT VOID                            *IpHead,
-  IN     UINT8                           *LastHead,
-  IN     VOID                            *OptionsBuffer,
-  IN     UINT32                          OptionsLength,
+  IN OUT UINT8                           *LastHead,
+  IN OUT VOID                            **OptionsBuffer,
+  IN OUT UINT32                          *OptionsLength,
   IN OUT EFI_IPSEC_FRAGMENT_DATA         **FragmentTable,
-  IN     UINT32                          *FragmentCount,
+  IN OUT UINT32                          *FragmentCount,
   IN     EFI_IPSEC_TRAFFIC_DIR           TrafficDirection,
      OUT EFI_EVENT                       *RecycleSignal
   )
