@@ -2824,7 +2824,8 @@ UiDisplayMenu (
         // checking can be done.
         //
         DistanceValue += AdjustDateAndTimePosition (TRUE, &NewPos);
-
+        
+        ASSERT (MenuOption != NULL);
         if (Difference < 0) {
           //
           // We want to goto previous MenuOption, but finally we go down.
