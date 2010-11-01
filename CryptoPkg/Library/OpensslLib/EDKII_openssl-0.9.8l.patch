@@ -1,0 +1,92 @@
+--- crypto/bio/bss_file.c	Thu Jan 15 17:14:12 1970
++++ crypto/bio/bss_file.c	Thu Jan 15 17:14:12 1970
+@@ -421,6 +421,23 @@
+ 	return(ret);
+ 	}
+ 
++#else
++
++BIO_METHOD *BIO_s_file(void)
++	{
++	return NULL;
++	}
++
++BIO *BIO_new_file(const char *filename, const char *mode)
++	{
++	return NULL;
++	}
++
++BIO *BIO_new_fp(FILE *stream, int close_flag)
++	{
++	return NULL;
++	}
++
+ #endif /* OPENSSL_NO_STDIO */
+ 
+ #endif /* HEADER_BSS_FILE_C */
+--- crypto/rand/rand_egd.c	Thu Jan 15 17:14:12 1970
++++ crypto/rand/rand_egd.c	Thu Jan 15 17:14:12 1970
+@@ -95,7 +95,7 @@
+  *   RAND_egd() is a wrapper for RAND_egd_bytes() with numbytes=255.
+  */
+ 
+-#if defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_MSDOS) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE) || defined(OPENSSL_SYS_VOS)
++#if defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_MSDOS) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE) || defined(OPENSSL_SYS_VOS) || defined(OPENSSL_SYS_UEFI)
+ int RAND_query_egd_bytes(const char *path, unsigned char *buf, int bytes)
+ 	{
+ 	return(-1);
+--- crypto/rand/rand_unix.c	Thu Jan 15 17:14:12 1970
++++ crypto/rand/rand_unix.c	Thu Jan 15 17:14:12 1970
+@@ -116,7 +116,7 @@
+ #include <openssl/rand.h>
+ #include "rand_lcl.h"
+ 
+-#if !(defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE))
++#if !(defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE) || defined(OPENSSL_SYS_UEFI))
+ 
+ #include <sys/types.h>
+ #include <sys/time.h>
+@@ -322,7 +322,7 @@
+ #endif /* !(defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE)) */
+ 
+ 
+-#if defined(OPENSSL_SYS_VXWORKS)
++#if defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_UEFI)
+ int RAND_poll(void)
+ 	{
+ 	return 0;
+--- crypto/x509/x509_vfy.c	Thu Jan 15 17:14:12 1970
++++ crypto/x509/x509_vfy.c	Thu Jan 15 17:14:12 1970
+@@ -391,7 +391,12 @@
+ 
+ static int check_chain_extensions(X509_STORE_CTX *ctx)
+ {
+-#ifdef OPENSSL_NO_CHAIN_VERIFY
++//#ifdef OPENSSL_NO_CHAIN_VERIFY
++#if defined(OPENSSL_NO_CHAIN_VERIFY) || defined(OPENSSL_SYS_UEFI)
++  /* 
++    NOTE: Bypass KU Flags Checking for UEFI version. There are incorrect KU flag setting
++          in Authenticode Signing Certificates. 
++  */
+ 	return 1;
+ #else
+ 	int i, ok=0, must_be_ca, plen = 0;
+@@ -904,6 +909,10 @@
+ 
+ static int check_cert_time(X509_STORE_CTX *ctx, X509 *x)
+ 	{
++#if defined(OPENSSL_SYS_UEFI)
++  /* Bypass Certificate Time Checking for UEFI version. */
++  return 1;
++#else
+ 	time_t *ptime;
+ 	int i;
+ 
+@@ -947,6 +956,7 @@
+ 		}
+ 
+ 	return 1;
++#endif  
+ 	}
+ 
+ static int internal_verify(X509_STORE_CTX *ctx)

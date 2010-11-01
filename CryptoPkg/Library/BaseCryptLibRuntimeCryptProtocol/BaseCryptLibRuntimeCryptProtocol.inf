@@ -1,0 +1,49 @@
+## @file
+#  Cryptographic Library Instance based on Runtime Crypt Protocol.
+#  This instance will be only used by the Authenticated Variable driver for IPF.
+#
+#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseCryptLibRuntimeCryptProtocol
+  FILE_GUID                      = BBB31581-855A-44D7-A550-8A585D9B2DE9
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BaseCryptLib|DXE_RUNTIME_DRIVER DXE_SAL_DRIVER
+  CONSTRUCTOR                    = RuntimeDxeIpfCryptLibConstructor
+  DESTRUCTOR                     = RuntimeDxeIpfCryptLibDestructor
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IPF
+#
+
+[Sources]
+  RuntimeDxeIpfCryptLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid      ## CONSUMES ## Event
+
+[Protocols]
+  gEfiRuntimeCryptProtocolGuid           ## CONSUMES
+
+[Depex]
+  gEfiRuntimeCryptProtocolGuid
