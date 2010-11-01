@@ -114,6 +114,14 @@ UINT32 mErrorCodeFlag = 0x00027d00;
 //
 // Local function prototypes
 //
+
+/**
+  Set Interrupt Descriptor Table Handler Address.
+
+  @param Index        The Index of the interrupt descriptor table handle.
+  @param Handler      Handler address.
+
+**/
 VOID
 SetInterruptDescriptorTableHandlerAddress (
   IN UINTN Index,
@@ -1014,7 +1022,13 @@ RefreshGcdMemoryAttributes (
   mIsFlushingGCD = FALSE;
 }
 
+/**
+  Set Interrupt Descriptor Table Handler Address.
 
+  @param Index        The Index of the interrupt descriptor table handle.
+  @param Handler      Handler address.
+
+**/
 VOID
 SetInterruptDescriptorTableHandlerAddress (
   IN UINTN Index,
