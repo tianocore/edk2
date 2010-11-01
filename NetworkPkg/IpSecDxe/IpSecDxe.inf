@@ -1,0 +1,63 @@
+## @file
+#  Component description file for IpSec module.
+#
+#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IpSecDxe
+  FILE_GUID                      = EE8367C0-A1D6-4565-8F89-EF628547B722
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = IpSecDriverEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  IpSecConfigImpl.c
+  IpSecConfigImpl.h
+  IpSecCryptIo.h
+  IpSecCryptIo.c
+  IpSecDebug.h
+  ComponentName.c
+  IpSecImpl.c
+  IpSecDebug.c
+  IpSecSaEngine.c
+  IpSecDriver.c
+  IpSecImpl.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  DpcLib
+  NetLib
+
+[Protocols]
+  gEfiIp4ConfigProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiIpSecConfigProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
+  gEfiIpSecProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED

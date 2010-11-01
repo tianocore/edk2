@@ -1,0 +1,69 @@
+## @file
+#  Component description file for Dhcp6 module.
+#
+#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Dhcp6Dxe
+  FILE_GUID                      = 95E3669D-34BE-4775-A651-7EA41B69D89E
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Dhcp6DriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gDhcp6DriverBinding
+#  COMPONENT_NAME                =  gDhcp6ComponentName
+#  COMPONENT_NAME2               =  gDhcp6ComponentName2
+#
+
+[Sources]
+  Dhcp6Driver.c
+  Dhcp6Driver.h
+  Dhcp6Impl.c
+  Dhcp6Impl.h
+  Dhcp6Io.c
+  Dhcp6Io.h
+  Dhcp6Utility.c
+  Dhcp6Utility.h
+  ComponentName.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  UefiLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  DebugLib
+  NetLib
+  UdpIoLib
+
+
+[Protocols]
+  gEfiUdp6ServiceBindingProtocolGuid
+  gEfiUdp6ProtocolGuid
+  gEfiDhcp6ServiceBindingProtocolGuid
+  gEfiDhcp6ProtocolGuid
+
