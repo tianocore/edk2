@@ -932,7 +932,7 @@ CreateSadEntry (
             L"--auth-algo"
             );
           ReturnStatus = EFI_INVALID_PARAMETER;
-        } else if ((*Data)->AlgoInfo.EspAlgoInfo.AuthAlgoId != EFI_IPSEC_AALG_NONE && (*Mask & AUTH_KEY) == 0) {
+        } else if ((*Data)->AlgoInfo.EspAlgoInfo.AuthAlgoId != IPSEC_AALG_NONE && (*Mask & AUTH_KEY) == 0) {
           ShellPrintHiiEx (
             -1,
             -1,
@@ -956,7 +956,7 @@ CreateSadEntry (
             L"--encrypt-algo"
             );
           ReturnStatus = EFI_INVALID_PARAMETER;
-        } else if ((*Data)->AlgoInfo.EspAlgoInfo.EncAlgoId != EFI_IPSEC_EALG_NONE && (*Mask & ENCRYPT_KEY) == 0) {
+        } else if ((*Data)->AlgoInfo.EspAlgoInfo.EncAlgoId != IPSEC_EALG_NONE && (*Mask & ENCRYPT_KEY) == 0) {
           ShellPrintHiiEx (
             -1,
             -1,
@@ -999,7 +999,7 @@ CreatePadEntry (
 {
   EFI_STATUS         Status;
   EFI_STATUS         ReturnStatus;
-  EFI_FILE_HANDLE    FileHandle;
+  SHELL_FILE_HANDLE  FileHandle;
   UINT64             FileSize;
   UINTN              AuthDataLength;
   UINTN              RevocationDataLength;
@@ -1588,7 +1588,7 @@ CombineSadEntry (
     //
     // Encrypt_key should be provided if algorithm is not NONE.
     //
-    if (NewData->AlgoInfo.EspAlgoInfo.EncAlgoId != EFI_IPSEC_EALG_NONE && (Mask & ENCRYPT_KEY) == 0) {
+    if (NewData->AlgoInfo.EspAlgoInfo.EncAlgoId != IPSEC_EALG_NONE && (Mask & ENCRYPT_KEY) == 0) {
       ShellPrintHiiEx (
         -1,
         -1,

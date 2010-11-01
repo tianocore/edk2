@@ -178,14 +178,14 @@ STR2INT mMapIpSecProtocol[] = {
 // --auth-algo
 //
 STR2INT mMapAuthAlgo[] = {
-  { L"NONE",         EFI_IPSEC_AALG_NONE },
-  { L"MD5HMAC",      EFI_IPSEC_AALG_MD5HMAC },
-  { L"SHA1HMAC",     EFI_IPSEC_AALG_SHA1HMAC },
-  { L"SHA2-256HMAC", EFI_IPSEC_AALG_SHA2_256HMAC },
-  { L"SHA2-384HMAC", EFI_IPSEC_AALG_SHA2_384HMAC },
-  { L"SHA2-512HMAC", EFI_IPSEC_AALG_SHA2_512HMAC },
-  { L"AES-XCBC-MAC", EFI_IPSEC_AALG_AES_XCBC_MAC },
-  { L"NULL",         EFI_IPSEC_AALG_NULL },
+  { L"NONE",         IPSEC_AALG_NONE },
+  { L"MD5HMAC",      IPSEC_AALG_MD5HMAC },
+  { L"SHA1HMAC",     IPSEC_AALG_SHA1HMAC },
+  { L"SHA2-256HMAC", IPSEC_AALG_SHA2_256HMAC },
+  { L"SHA2-384HMAC", IPSEC_AALG_SHA2_384HMAC },
+  { L"SHA2-512HMAC", IPSEC_AALG_SHA2_512HMAC },
+  { L"AES-XCBC-MAC", IPSEC_AALG_AES_XCBC_MAC },
+  { L"NULL",         IPSEC_AALG_NULL },
   { NULL,            0 },
 };
 
@@ -193,20 +193,20 @@ STR2INT mMapAuthAlgo[] = {
 // --encrypt-algo
 //
 STR2INT mMapEncAlgo[] = {
-  { L"NONE",         EFI_IPSEC_EALG_NONE },
-  { L"DESCBC",       EFI_IPSEC_EALG_DESCBC },
-  { L"3DESCBC",      EFI_IPSEC_EALG_3DESCBC },
-  { L"CASTCBC",      EFI_IPSEC_EALG_CASTCBC },
-  { L"BLOWFISHCBC",  EFI_IPSEC_EALG_BLOWFISHCBC },
-  { L"NULL",         EFI_IPSEC_EALG_NULL },
-  { L"AESCBC",       EFI_IPSEC_EALG_AESCBC },
-  { L"AESCTR",       EFI_IPSEC_EALG_AESCTR },
-  { L"AES-CCM-ICV8", EFI_IPSEC_EALG_AES_CCM_ICV8 },
-  { L"AES-CCM-ICV12",EFI_IPSEC_EALG_AES_CCM_ICV12 },
-  { L"AES-CCM-ICV16",EFI_IPSEC_EALG_AES_CCM_ICV16 },
-  { L"AES-GCM-ICV8", EFI_IPSEC_EALG_AES_GCM_ICV8 },
-  { L"AES-GCM-ICV12",EFI_IPSEC_EALG_AES_GCM_ICV12 },
-  { L"AES-GCM-ICV16",EFI_IPSEC_EALG_AES_GCM_ICV16 },
+  { L"NONE",         IPSEC_EALG_NONE },
+  { L"DESCBC",       IPSEC_EALG_DESCBC },
+  { L"3DESCBC",      IPSEC_EALG_3DESCBC },
+  { L"CASTCBC",      IPSEC_EALG_CASTCBC },
+  { L"BLOWFISHCBC",  IPSEC_EALG_BLOWFISHCBC },
+  { L"NULL",         IPSEC_EALG_NULL },
+  { L"AESCBC",       IPSEC_EALG_AESCBC },
+  { L"AESCTR",       IPSEC_EALG_AESCTR },
+  { L"AES-CCM-ICV8", IPSEC_EALG_AES_CCM_ICV8 },
+  { L"AES-CCM-ICV12",IPSEC_EALG_AES_CCM_ICV12 },
+  { L"AES-CCM-ICV16",IPSEC_EALG_AES_CCM_ICV16 },
+  { L"AES-GCM-ICV8", IPSEC_EALG_AES_GCM_ICV8 },
+  { L"AES-GCM-ICV12",IPSEC_EALG_AES_GCM_ICV12 },
+  { L"AES-GCM-ICV16",IPSEC_EALG_AES_GCM_ICV16 },
   { NULL,            0 },
 };
 
@@ -228,7 +228,7 @@ STR2INT mMapAuthMethod[] = {
   { NULL,               0 },
 };
 
-EFI_IPSEC_PROTOCOL           *mIpSec;
+EFI_IPSEC2_PROTOCOL          *mIpSec;
 EFI_IPSEC_CONFIG_PROTOCOL    *mIpSecConfig;
 EFI_HII_HANDLE               mHiiHandle;
 EFI_GUID                     mEfiIpSecConfigGuid = EFI_IPSEC_CONFIG_GUID;
@@ -711,7 +711,6 @@ InitializeIpSecConfig (
     } else {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IPSEC_CONFIG_STATUS_ENABLE), mHiiHandle, mAppName);
     }
-
     goto Done;
   }
 
@@ -754,7 +753,7 @@ InitializeIpSecConfig (
     goto Done;
   }
 
-  NonOptionCount = ShellCommandLineGetCount ();
+  NonOptionCount = ShellCommandLineGetCount (ParamPackage);
   if ((NonOptionCount - 1) > 0) {
     ValueStr = ShellCommandLineGetRawValue (ParamPackage, (UINT32) (NonOptionCount - 1));
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IPSEC_REDUNDANCY_MANY), mHiiHandle, mAppName, ValueStr);

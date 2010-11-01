@@ -1136,7 +1136,7 @@ InitializePing6 (
   //
   // Parse the paramter of destination ip address.
   //
-  NonOptionCount = ShellCommandLineGetCount();
+  NonOptionCount = ShellCommandLineGetCount(ParamPackage);
   ValueStr = ShellCommandLineGetRawValue (ParamPackage, (UINT32)(NonOptionCount-1));
   if (NonOptionCount != 2) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_INVALID_INPUT), mHiiHandle);
