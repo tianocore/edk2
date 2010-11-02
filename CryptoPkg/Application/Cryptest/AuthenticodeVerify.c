@@ -12,11 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-
-#include <Library/BaseCryptLib.h>
+#include "Cryptest.h"
 
 //
 // DER encoding of SpcIndirectDataContent (Authenticode-specific Structure)
@@ -655,4 +651,31 @@ AuthenticodeVerify (
   FreePool (SpcIndirectDataContent);
 
   return Status;
+}
+
+/**
+  Validate UEFI-OpenSSL PKCS#7 Verification Interfaces.
+
+  @retval  EFI_SUCCESS  Validation succeeded.
+  @retval  EFI_ABORTED  Validation failed.
+
+**/
+EFI_STATUS
+ValidateAuthenticode (
+  VOID
+  )
+{
+  Print (L"\nUEFI-OpenSSL PKCS#7-Signed-Data Testing: ");
+
+  Print (L"\n- Authenticode (PKCS#7 Signed Data) Verification ... ");
+
+  if (AuthenticodeVerify ()) {
+    Print (L"[Pass]");
+  } else {
+    Print (L"[Fail]");
+  }   
+
+  Print (L"\n");
+
+  return EFI_SUCCESS;
 }

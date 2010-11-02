@@ -12,10 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-
-#include <Library/BaseCryptLib.h>
+#include "InternalCryptLib.h"
 #include <openssl/sha.h>
 
 
@@ -37,23 +34,22 @@ Sha1GetContextSize (
   return (UINTN)(sizeof (SHA_CTX));
 }
 
-
 /**
-  Initializes user-supplied memory pointed by Sha1Context as the SHA-1 hash context for
+  Initializes user-supplied memory pointed by Sha1Context as SHA-1 hash context for
   subsequent use.
 
   If Sha1Context is NULL, then ASSERT().
 
-  @param[in, out]  Sha1Context  Pointer to the SHA-1 Context being initialized.
+  @param[out]  Sha1Context  Pointer to SHA-1 context being initialized.
 
-  @retval TRUE   SHA-1 initialization succeeded.
-  @retval FALSE  SHA-1 initialization failed.
+  @retval TRUE   SHA-1 context initialization succeeded.
+  @retval FALSE  SHA-1 context initialization failed.
 
 **/
 BOOLEAN
 EFIAPI
 Sha1Init (
-  IN OUT  VOID  *Sha1Context
+  OUT  VOID  *Sha1Context
   )
 {
   //
@@ -67,20 +63,47 @@ Sha1Init (
   return (BOOLEAN) (SHA1_Init ((SHA_CTX *)Sha1Context));
 }
 
+/**
+  Makes a copy of an existing SHA-1 context.
+
+  If Sha1Context is NULL, then ASSERT().
+  If NewSha1Context is NULL, then ASSERT().
+
+  @param[in]  Sha1Context     Pointer to SHA-1 context being copied.
+  @param[out] NewSha1Context  Pointer to new SHA-1 context.
+
+  @retval TRUE   SHA-1 context copy succeeded.
+  @retval FALSE  SHA-1 context copy failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha1Duplicate (
+  IN   CONST VOID  *Sha1Context,
+  OUT  VOID        *NewSha1Context
+  )
+{
+  CopyMem (NewSha1Context, Sha1Context, sizeof (SHA_CTX));
+
+  return TRUE;
+}
 
 /**
-  Performs SHA-1 digest on a data buffer of the specified length. This function can
-  be called multiple times to compute the digest of long or discontinuous data streams.
+  Digests the input data and updates SHA-1 context.
+
+  This function performs SHA-1 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  SHA-1 context should be already correctly intialized by Sha1Init(), and should not be finalized
+  by Sha1Final(). Behavior with invalid context is undefined.
 
   If Sha1Context is NULL, then ASSERT().
 
   @param[in, out]  Sha1Context  Pointer to the SHA-1 context.
   @param[in]       Data         Pointer to the buffer containing the data to be hashed.
-  @param[in]       DataLength   Length of Data buffer in bytes.
+  @param[in]       DataSize     Size of Data buffer in bytes.
 
   @retval TRUE   SHA-1 data digest succeeded.
-  @retval FALSE  Invalid SHA-1 context. After Sha1Final function has been called, the
-                 SHA-1 context cannot be reused.
+  @retval FALSE  SHA-1 data digest failed.
 
 **/
 BOOLEAN
@@ -88,7 +111,7 @@ EFIAPI
 Sha1Update (
   IN OUT  VOID        *Sha1Context,
   IN      CONST VOID  *Data,
-  IN      UINTN       DataLength
+  IN      UINTN       DataSize
   )
 {
   //
@@ -100,24 +123,28 @@ Sha1Update (
   // ASSERT if invalid parameters, in case that only DataLength was checked in OpenSSL
   //
   if (Data == NULL) {
-    ASSERT (DataLength == 0);
+    ASSERT (DataSize == 0);
   }
 
   //
   // OpenSSL SHA-1 Hash Update
   //
-  return (BOOLEAN) (SHA1_Update ((SHA_CTX *)Sha1Context, Data, DataLength));
+  return (BOOLEAN) (SHA1_Update ((SHA_CTX *)Sha1Context, Data, DataSize));
 }
 
-
 /**
-  Completes SHA-1 hash computation and retrieves the digest value into the specified
-  memory. After this function has been called, the SHA-1 context cannot be used again.
+  Completes computation of the SHA-1 digest value.
+
+  This function completes SHA-1 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the SHA-1 context cannot
+  be used again.
+  SHA-1 context should be already correctly intialized by Sha1Init(), and should not be
+  finalized by Sha1Final(). Behavior with invalid SHA-1 context is undefined.
 
   If Sha1Context is NULL, then ASSERT().
   If HashValue is NULL, then ASSERT().
 
-  @param[in, out]  Sha1Context  Pointer to the SHA-1 context
+  @param[in, out]  Sha1Context  Pointer to the SHA-1 context.
   @param[out]      HashValue    Pointer to a buffer that receives the SHA-1 digest
                                 value (20 bytes).
 

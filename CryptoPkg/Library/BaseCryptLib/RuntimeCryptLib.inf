@@ -57,8 +57,6 @@
   SysCall/Ia32/MathLShiftS64.S      | GCC
   SysCall/Ia32/MathRShiftU64.S      | GCC
 
-  SysCall/Ia32/Alloca.S             | GCC
-
 [Packages]
   MdePkg/MdePkg.dec
   CryptoPkg/CryptoPkg.dec

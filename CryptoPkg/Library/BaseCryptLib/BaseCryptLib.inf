@@ -27,11 +27,19 @@
 #
 
 [Sources]
+  InternalCryptLib.h
   Hash/CryptMd5.c
   Hash/CryptSha1.c
   Hash/CryptSha256.c
+  Hmac/CryptHmacMd5.c
+  Hmac/CryptHmacSha1.c
+  Cipher/CryptAes.c
+  Cipher/CryptTdes.c
+  Cipher/CryptArc4.c
+  Rand/CryptRand.c
   Pk/CryptRsa.c
   Pk/CryptPkcs7.c
+  Pk/CryptDh.c
 
   SysCall/CrtWrapper.c
   SysCall/TimerWrapper.c
@@ -57,8 +65,6 @@
   SysCall/Ia32/MathReminderU64x64.S | GCC
   SysCall/Ia32/MathLShiftS64.S      | GCC
   SysCall/Ia32/MathRShiftU64.S      | GCC
-
-  SysCall/Ia32/Alloca.S             | GCC
 
 [Packages]
   MdePkg/MdePkg.dec

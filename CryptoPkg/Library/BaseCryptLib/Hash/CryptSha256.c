@@ -12,17 +12,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-
-#include <Library/BaseCryptLib.h>
+#include "InternalCryptLib.h"
 #include <openssl/sha.h>
 
-
 /**
-  Retrieves the size, in bytes, of the context buffer required for SHA-256 operations.
+  Retrieves the size, in bytes, of the context buffer required for SHA-256 hash operations.
 
-  @return  The size, in bytes, of the context buffer required for SHA-256 operations.
+  @return  The size, in bytes, of the context buffer required for SHA-256 hash operations.
 
 **/
 UINTN
@@ -37,14 +33,13 @@ Sha256GetContextSize (
   return (UINTN)(sizeof (SHA256_CTX));
 }
 
-
 /**
   Initializes user-supplied memory pointed by Sha256Context as SHA-256 hash context for
   subsequent use.
 
   If Sha256Context is NULL, then ASSERT().
 
-  @param[in, out]  Sha256Context  Pointer to SHA-256 Context being initialized.
+  @param[out]  Sha256Context  Pointer to SHA-256 context being initialized.
 
   @retval TRUE   SHA-256 context initialization succeeded.
   @retval FALSE  SHA-256 context initialization failed.
@@ -53,7 +48,7 @@ Sha256GetContextSize (
 BOOLEAN
 EFIAPI
 Sha256Init (
-  IN OUT  VOID  *Sha256Context
+  OUT  VOID  *Sha256Context
   )
 {
   //
@@ -67,20 +62,47 @@ Sha256Init (
   return (BOOLEAN) (SHA256_Init ((SHA256_CTX *)Sha256Context));
 }
 
+/**
+  Makes a copy of an existing SHA-256 context.
+
+  If Sha256Context is NULL, then ASSERT().
+  If NewSha256Context is NULL, then ASSERT().
+
+  @param[in]  Sha256Context     Pointer to SHA-256 context being copied.
+  @param[out] NewSha256Context  Pointer to new SHA-256 context.
+
+  @retval TRUE   SHA-256 context copy succeeded.
+  @retval FALSE  SHA-256 context copy failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha256Duplicate (
+  IN   CONST VOID  *Sha256Context,
+  OUT  VOID        *NewSha256Context
+  )
+{
+  CopyMem (NewSha256Context, Sha256Context, sizeof (SHA256_CTX));
+
+  return TRUE;
+}
 
 /**
-  Performs SHA-256 digest on a data buffer of the specified length. This function can
-  be called multiple times to compute the digest of long or discontinuous data streams.
+  Digests the input data and updates SHA-256 context.
+
+  This function performs SHA-256 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  SHA-256 context should be already correctly intialized by Sha256Init(), and should not be finalized
+  by Sha256Final(). Behavior with invalid context is undefined.
 
   If Sha256Context is NULL, then ASSERT().
 
   @param[in, out]  Sha256Context  Pointer to the SHA-256 context.
   @param[in]       Data           Pointer to the buffer containing the data to be hashed.
-  @param[in]       DataLength     Length of Data buffer in bytes.
+  @param[in]       DataSize       Size of Data buffer in bytes.
 
   @retval TRUE   SHA-256 data digest succeeded.
-  @retval FALSE  Invalid SHA-256 context. After Sha256Final function has been called, the
-                 SHA-256 context cannot be reused.
+  @retval FALSE  SHA-256 data digest failed.
 
 **/
 BOOLEAN
@@ -88,7 +110,7 @@ EFIAPI
 Sha256Update (
   IN OUT  VOID        *Sha256Context,
   IN      CONST VOID  *Data,
-  IN      UINTN       DataLength
+  IN      UINTN       DataSize
   )
 {
   //
@@ -100,24 +122,28 @@ Sha256Update (
   // ASSERT if invalid parameters, in case that only DataLength was checked in OpenSSL
   //
   if (Data == NULL) {
-    ASSERT (DataLength == 0);
+    ASSERT (DataSize == 0);
   }
 
   //
   // OpenSSL SHA-256 Hash Update
   //
-  return (BOOLEAN) (SHA256_Update ((SHA256_CTX *)Sha256Context, Data, DataLength));
+  return (BOOLEAN) (SHA256_Update ((SHA256_CTX *)Sha256Context, Data, DataSize));
 }
 
-
 /**
-  Completes SHA-256 hash computation and retrieves the digest value into the specified
-  memory. After this function has been called, the SHA-256 context cannot be used again.
+  Completes computation of the SHA-256 digest value.
+
+  This function completes SHA-256 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the SHA-256 context cannot
+  be used again.
+  SHA-256 context should be already correctly intialized by Sha256Init(), and should not be
+  finalized by Sha256Final(). Behavior with invalid SHA-256 context is undefined.
 
   If Sha256Context is NULL, then ASSERT().
   If HashValue is NULL, then ASSERT().
 
-  @param[in, out]  Sha256Context  Pointer to SHA-256 context
+  @param[in, out]  Sha256Context  Pointer to the SHA-256 context.
   @param[out]      HashValue      Pointer to a buffer that receives the SHA-256 digest
                                   value (32 bytes).
 

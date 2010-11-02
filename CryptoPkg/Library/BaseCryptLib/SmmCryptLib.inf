@@ -1,5 +1,5 @@
 ## @file
-#  Cryptographic Library Instance for PEIM.
+#  Cryptographic Library Instance for SMM driver.
 #
 #  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
@@ -14,11 +14,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PeiCryptLib
-  FILE_GUID                      = 9a2a4375-194c-4e97-9f67-547ec98d96ca
-  MODULE_TYPE                    = PEIM
+  BASE_NAME                      = SmmCryptLib
+  FILE_GUID                      = 028080a3-8958-4a62-a1a8-0fa1da162007
+  MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = BaseCryptLib|PEIM PEI_CORE SEC
+  LIBRARY_CLASS                  = BaseCryptLib|DXE_SMM_DRIVER SMM_CORE
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -31,12 +31,15 @@
   Hash/CryptSha1.c
   Hash/CryptSha256.c
   Pk/CryptRsa.c
+  Pk/CryptPkcs7.c
 
   SysCall/CrtWrapper.c
-  SysCall/HelperWrapper.c
+  SysCall/RealTimeClock.c
   SysCall/BaseMemAllocation.c
 
 [Sources.Ia32]
+  SysCall/HelperWrapper.c
+
   SysCall/Ia32/MathMultS64x64.c     | MSFT
   SysCall/Ia32/MathDivU64x64.c      | MSFT
   SysCall/Ia32/MathReminderU64x64.c | MSFT
@@ -61,9 +64,9 @@
 
 [LibraryClasses]
   BaseLib
+  IoLib
   BaseMemoryLib
   MemoryAllocationLib
-  DebugLib
   OpensslLib
   IntrinsicLib
 

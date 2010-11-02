@@ -29,9 +29,16 @@
 #
 
 [Sources]
+  Cryptest.h
   Cryptest.c
+  HashVerify.c
+  HmacVerify.c
+  BlockCipherVerify.c
+  RsaVerify.c
   AuthenticodeVerify.c
-
+  DhVerify.c
+  RandVerify.c
+  
 [Packages]
   MdePkg/MdePkg.dec
   CryptoPkg/CryptoPkg.dec

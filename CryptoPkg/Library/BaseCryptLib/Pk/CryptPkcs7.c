@@ -12,11 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
+#include "InternalCryptLib.h"
 
-#include <Library/BaseCryptLib.h>
 #include <openssl/objects.h>
 #include <openssl/x509.h>
 #include <openssl/pkcs7.h>
@@ -36,8 +33,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param[in]  InData       Pointer to the content to be verified.
   @param[in]  DataLength   Length of InData in bytes.
 
-  @return  TRUE  The specified PKCS#7 signed data is valid.
-  @return  FALSE Invalid PKCS#7 signed data.
+  @retval  TRUE  The specified PKCS#7 signed data is valid.
+  @retval  FALSE Invalid PKCS#7 signed data.
 
 **/
 BOOLEAN
