@@ -676,17 +676,17 @@ CoreExitBootServices (
   EFI_STATUS                Status;
 
   //
+  // Disable Timer
+  //
+  gTimer->SetTimerPeriod (gTimer, 0);
+
+  //
   // Terminate memory services if the MapKey matches
   //
   Status = CoreTerminateMemoryMap (MapKey);
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  //
-  // Disable Timer
-  //
-  gTimer->SetTimerPeriod (gTimer, 0);
 
   //
   // Notify other drivers that we are exiting boot services.
