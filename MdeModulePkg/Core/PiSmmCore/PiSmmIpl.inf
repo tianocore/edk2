@@ -56,7 +56,7 @@
   gEfiSmmConfigurationProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
   gEfiSmmControl2ProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
   gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiCpuArchProtocolGuid                       # PROTOCOL SIMETIMES_CONSUMED
 
 [Guids]
   gEfiEventDxeDispatchGuid                      # ALWAYS_CONSUMED
@@ -71,4 +71,4 @@
 
  
 [Depex]
-  gEfiSmmAccess2ProtocolGuid AND gEfiSmmControl2ProtocolGuid AND gEfiCpuArchProtocolGuid
+  gEfiSmmAccess2ProtocolGuid AND gEfiSmmControl2ProtocolGuid

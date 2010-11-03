@@ -20,6 +20,7 @@
 #include <Protocol/SmmConfiguration.h>
 #include <Protocol/SmmControl2.h>
 #include <Protocol/DxeSmmReadyToLock.h>
+#include <Protocol/Cpu.h>
 
 #include <Guid/EventGroup.h>
 #include <Guid/EventLegacyBios.h>
@@ -963,8 +964,9 @@ SmmIplEntry (
   EFI_SMM_RESERVED_SMRAM_REGION   *SmramResRegion;
   UINT64                          MaxSize;
   VOID                            *Registration;
-  UINT64                           SmmCodeSize;
+  UINT64                          SmmCodeSize;
   EFI_LOAD_FIXED_ADDRESS_CONFIGURATION_TABLE    *LMFAConfigurationTable;
+  EFI_CPU_ARCH_PROTOCOL           *CpuArch;
 
   //
   // Fill in the image handle of the SMM IPL so the SMM Core can use this as the 
@@ -1063,16 +1065,21 @@ SmmIplEntry (
 
     GetSmramCacheRange (mCurrentSmramRange, &mSmramCacheBase, &mSmramCacheSize);
     //
-    // Attempt to set SMRAM cacheability to WB
+    // If CPU AP is present, attempt to set SMRAM cacheability to WB
+    // Note that it is expected that cacheability of SMRAM has been set to WB if CPU AP
+    // is not available here.
     //
-    Status = gDS->SetMemorySpaceAttributes(
-                    mSmramCacheBase, 
-                    mSmramCacheSize,
-                    EFI_MEMORY_WB
-                    );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN, "SMM IPL failed to set SMRAM window to EFI_MEMORY_WB\n"));
-    }  
+    Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&CpuArch);
+    if (!EFI_ERROR (Status)) {
+      Status = gDS->SetMemorySpaceAttributes(
+                      mSmramCacheBase, 
+                      mSmramCacheSize,
+                      EFI_MEMORY_WB
+                      );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_WARN, "SMM IPL failed to set SMRAM window to EFI_MEMORY_WB\n"));
+      }  
+    }
     //
     // if Loading module at Fixed Address feature is enabled, save the SMRAM base to Load
     // Modules At Fixed Address Configuration Table.
