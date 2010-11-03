@@ -3133,14 +3133,14 @@ ConSplitterTextOutDeleteDevice (
   TextOutList           = Private->TextOutList;
   while (Index >= 0) {
     if (TextOutList->TextOut == TextOut) {
-      CopyMem (TextOutList, TextOutList + 1, sizeof (TEXT_OUT_AND_GOP_DATA) * Index);
-      CurrentNumOfConsoles--;
       if (TextOutList->UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
         Private->CurrentNumberOfUgaDraw--;
       }
       if (TextOutList->GraphicsOutput != NULL) {
         Private->CurrentNumberOfGraphicsOutput--;
       }
+      CopyMem (TextOutList, TextOutList + 1, sizeof (TEXT_OUT_AND_GOP_DATA) * Index);
+      CurrentNumOfConsoles--;
       break;
     }
 
