@@ -470,6 +470,11 @@ ReportStatusCodeEx (
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
   if (ExtendedDataSize > (MAX_EXTENDED_DATA_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
+    //
+    // The local variable Buffer not large enough to hold the extended data associated
+    // with the status code being  reported.
+    //
+    ASSERT (FALSE);
     return EFI_OUT_OF_RESOURCES;
   }
   StatusCodeData = (EFI_STATUS_CODE_DATA  *) Buffer;
