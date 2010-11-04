@@ -567,6 +567,7 @@ SmmIplSmmConfigurationEventNotify (
 
   //
   // Attempt to reset SMRAM cacheability to UC
+  // Assume CPU AP is available at this time
   //
   Status = gDS->SetMemorySpaceAttributes(
                   mSmramCacheBase, 
@@ -1069,6 +1070,7 @@ SmmIplEntry (
     // Note that it is expected that cacheability of SMRAM has been set to WB if CPU AP
     // is not available here.
     //
+    CpuArch = NULL;
     Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&CpuArch);
     if (!EFI_ERROR (Status)) {
       Status = gDS->SetMemorySpaceAttributes(
@@ -1121,14 +1123,16 @@ SmmIplEntry (
       //
       // Attempt to reset SMRAM cacheability to UC
       //
-      Status = gDS->SetMemorySpaceAttributes(
-                      mSmramCacheBase, 
-                      mSmramCacheSize,
-                      EFI_MEMORY_UC
-                      );
-      if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_WARN, "SMM IPL failed to reset SMRAM window to EFI_MEMORY_UC\n"));
-      }  
+      if (CpuArch != NULL) {
+        Status = gDS->SetMemorySpaceAttributes(
+                        mSmramCacheBase, 
+                        mSmramCacheSize,
+                        EFI_MEMORY_UC
+                        );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "SMM IPL failed to reset SMRAM window to EFI_MEMORY_UC\n"));
+        }  
+      }
     }
   } else {
     //
