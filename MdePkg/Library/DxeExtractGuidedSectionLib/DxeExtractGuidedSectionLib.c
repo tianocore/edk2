@@ -363,3 +363,66 @@ ExtractGuidedSectionDecode (
   //
   return RETURN_UNSUPPORTED;
 }
+
+/**
+  Retrieves handlers of type EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER and 
+  EXTRACT_GUIDED_SECTION_DECODE_HANDLER for a specific GUID section type.
+  
+  Retrieves the handlers associated with SectionGuid and returns them in 
+  GetInfoHandler and DecodeHandler.
+
+  If the GUID value specified by SectionGuid has not been registered, then 
+  return RETURN_NOT_FOUND.
+  
+  If SectionGuid is NULL, then ASSERT().
+
+  @param[in]  SectionGuid    A pointer to the GUID associated with the handlersof the GUIDed 
+                             section type being retrieved.
+  @param[out] GetInfoHandler Pointer to a function that examines a GUIDed section and returns 
+                             the size of the decoded buffer and the size of an optional scratch 
+                             buffer required to actually decode the data in a GUIDed section.  
+                             This is an optional parameter that may be NULL. If it is NULL, then 
+                             the previously registered handler is not returned.
+  @param[out] DecodeHandler  Pointer to a function that decodes a GUIDed section into a caller
+                             allocated output buffer. This is an optional parameter that may be NULL.
+                             If it is NULL, then the previously registered handler is not returned.
+
+  @retval  RETURN_SUCCESS     The handlers were retrieved.
+  @retval  RETURN_NOT_FOUND   No handlers have been registered with the specified GUID.
+
+**/
+RETURN_STATUS
+EFIAPI
+ExtractGuidedSectionGetHandlers (
+  IN CONST   GUID                                     *SectionGuid,
+  OUT        EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER  *GetInfoHandler,  OPTIONAL
+  OUT        EXTRACT_GUIDED_SECTION_DECODE_HANDLER    *DecodeHandler    OPTIONAL
+  )
+{
+  UINT32 Index; 
+
+  //
+  // Check input parameter.
+  //
+  ASSERT (SectionGuid != NULL);
+
+  //
+  // Search the match registered GetInfo handler for the input guided section.
+  //
+  for (Index = 0; Index < mNumberOfExtractHandler; Index ++) {
+    if (CompareGuid (&mExtractHandlerGuidTable[Index], SectionGuid)) {
+      
+      //
+      // If the guided handler has been registered before, then return the registered handlers.
+      //
+      if (GetInfoHandler != NULL) {
+        *GetInfoHandler = mExtractGetInfoHandlerTable[Index];
+      }
+      if (DecodeHandler != NULL) {
+        *DecodeHandler = mExtractDecodeHandlerTable[Index];
+      }
+      return RETURN_SUCCESS;
+    }
+  }
+  return RETURN_NOT_FOUND;
+}

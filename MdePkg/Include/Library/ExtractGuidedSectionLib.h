@@ -10,7 +10,7 @@
   EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI or a EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL 
   providing a simple method to extend the number of GUIDed sections types a platform supports.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -244,6 +244,41 @@ ExtractGuidedSectionDecode (
   OUT       VOID    **OutputBuffer,
   IN        VOID    *ScratchBuffer,        OPTIONAL
   OUT       UINT32  *AuthenticationStatus  
+  );
+
+/**
+  Retrieves handlers of type EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER and 
+  EXTRACT_GUIDED_SECTION_DECODE_HANDLER for a specific GUID section type.
+  
+  Retrieves the handlers associated with SectionGuid and returns them in 
+  GetInfoHandler and DecodeHandler.
+
+  If the GUID value specified by SectionGuid has not been registered, then 
+  return RETURN_NOT_FOUND.
+  
+  If SectionGuid is NULL, then ASSERT().
+
+  @param[in]  SectionGuid    A pointer to the GUID associated with the handlersof the GUIDed 
+                             section type being retrieved.
+  @param[out] GetInfoHandler Pointer to a function that examines a GUIDed section and returns 
+                             the size of the decoded buffer and the size of an optional scratch 
+                             buffer required to actually decode the data in a GUIDed section.  
+                             This is an optional parameter that may be NULL. If it is NULL, then 
+                             the previously registered handler is not returned.
+  @param[out] DecodeHandler  Pointer to a function that decodes a GUIDed section into a caller
+                             allocated output buffer. This is an optional parameter that may be NULL.
+                             If it is NULL, then the previously registered handler is not returned.
+
+  @retval  RETURN_SUCCESS     The handlers were retrieved.
+  @retval  RETURN_NOT_FOUND   No handlers have been registered with the specified GUID.
+
+**/
+RETURN_STATUS
+EFIAPI
+ExtractGuidedSectionGetHandlers (
+  IN CONST   GUID                                     *SectionGuid,
+  OUT        EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER  *GetInfoHandler,  OPTIONAL
+  OUT        EXTRACT_GUIDED_SECTION_DECODE_HANDLER    *DecodeHandler    OPTIONAL
   );
 
 #endif
