@@ -188,8 +188,12 @@ typedef union {
 #define EFI_PAGE_MASK             0xFFF
 #define EFI_PAGE_SHIFT            12
 
+//
+// It is expected that a parameter for the following two macros is of type UINTN.
+// Be careful to pass a UINT64 parameter because 32-bit build break may happen
+// if << or >> shift operations are performed on a 64-bit integer with 32-bit C compiler.
+//
 #define EFI_SIZE_TO_PAGES(a)  (((a) >> EFI_PAGE_SHIFT) + (((a) & EFI_PAGE_MASK) ? 1 : 0))
-
 #define EFI_PAGES_TO_SIZE(a)   ( (a) << EFI_PAGE_SHIFT)
 
 ///
