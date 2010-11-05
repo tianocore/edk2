@@ -1,7 +1,7 @@
 /** @file
   The data hub protocol is used both by agents wishing to log
   data and those wishing to be made aware of all information that
-  has been logged.
+  has been logged.  This protocol may only be called <= TPL_NOTIFY.
 
 Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
