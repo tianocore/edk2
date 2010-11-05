@@ -50,7 +50,7 @@ GatherStatistics(
   MEASUREMENT_RECORD        Measurement;
   UINT64                    Duration;
   UINTN                     LogEntryKey;
-  UINTN                     TIndex;
+  INTN                      TIndex;
 
   LogEntryKey = 0;
   while ((LogEntryKey = GetPerformanceMeasurement (
@@ -143,11 +143,14 @@ DumpAllTrace(
   // Get Handle information
   //
   Size = 0;
-  HandleBuffer = NULL;
+  HandleBuffer = &TempHandle;
   Status  = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, &TempHandle);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HandleBuffer = AllocatePool (Size);
     ASSERT (HandleBuffer != NULL);
+    if (HandleBuffer == NULL) {
+      return;
+    }
     Status  = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, HandleBuffer);
   }
   if (EFI_ERROR (Status)) {
@@ -222,7 +225,9 @@ DumpAllTrace(
       );
     }
   }
-  FreePool (HandleBuffer);
+  if (HandleBuffer != &TempHandle) {
+    FreePool (HandleBuffer);
+  }
 }
 
 /** Gather and print Raw Trace Records.
@@ -457,11 +462,14 @@ ProcessHandles(
               (StringPtr == NULL) ? ALit_UNKNOWN: StringPtr);
 
   Size = 0;
-  HandleBuffer = NULL;
+  HandleBuffer = &TempHandle;
   Status  = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, &TempHandle);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HandleBuffer = AllocatePool (Size);
     ASSERT (HandleBuffer != NULL);
+    if (HandleBuffer == NULL) {
+      return;
+    }
     Status  = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, HandleBuffer);
   }
   if (EFI_ERROR (Status)) {
@@ -520,7 +528,9 @@ ProcessHandles(
       }
     }
   }
-  FreePool (HandleBuffer);
+  if (HandleBuffer != &TempHandle) {
+    FreePool (HandleBuffer);
+  }
   return Status;
 }
 
