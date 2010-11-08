@@ -694,7 +694,7 @@ StartPciDevicesOnBridge (
       //
       // If it is a PPB
       //
-      if (!IsListEmpty (&PciIoDevice->ChildList)) {
+      if (IS_PCI_BRIDGE (&PciIoDevice->Pci)) {
         Status = StartPciDevicesOnBridge (
                    Controller,
                    PciIoDevice,
@@ -746,7 +746,7 @@ StartPciDevicesOnBridge (
         (*NumberOfChildren)++;
       }
 
-      if (!IsListEmpty (&PciIoDevice->ChildList)) {
+      if (IS_PCI_BRIDGE (&PciIoDevice->Pci)) {
         Status = StartPciDevicesOnBridge (
                    Controller,
                    PciIoDevice,
