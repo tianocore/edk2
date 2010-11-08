@@ -19,7 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _GENERIC_BDS_LIB_H_
 
 #include <Protocol/UserManager.h>
-extern EFI_HANDLE mBdsImageHandle;
 
 ///
 /// Constants which are variable names used to access variables.
@@ -569,7 +568,6 @@ DevicePathToStr (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
   );
 
-
 //
 // Internal definitions
 //
@@ -592,16 +590,11 @@ typedef struct {
   DEV_PATH_FUNCTION Function;
 } DEVICE_PATH_STRING_TABLE;
 
-extern EFI_GUID mEfiDevicePathMessagingUartFlowControlGuid;
-
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;
   EFI_GUID                  Guid;
   UINT8                     VendorDefinedData[1];
 } VENDOR_DEVICE_PATH_WITH_DATA;
-
-
-extern EFI_GUID mEfiDevicePathMessagingSASGuid;
 
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;

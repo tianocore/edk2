@@ -5,7 +5,7 @@
   After DxeCore finish DXE phase, gEfiBdsArchProtocolGuid->BdsEntry will be invoked
   to enter BDS phase.
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,8 +38,6 @@ EFI_BDS_ARCH_PROTOCOL  gBds = {
 
 UINT16                          *mBootNext = NULL;
 
-EFI_HANDLE                      mBdsImageHandle;
-
 /**
 
   Install Boot Device Selection Protocol
@@ -60,8 +58,6 @@ BdsInitialize (
   )
 {
   EFI_STATUS  Status;
-
-  mBdsImageHandle = ImageHandle;
 
   //
   // Install protocol interface

@@ -292,7 +292,7 @@ BdsLibBootViaBootOption (
   
   Status = gBS->LoadImage (
                   TRUE,
-                  mBdsImageHandle,
+                  gImageHandle,
                   DevicePath,
                   NULL,
                   0,
@@ -320,7 +320,7 @@ BdsLibBootViaBootOption (
     if (FilePath != NULL) {
       Status = gBS->LoadImage (
                       TRUE,
-                      mBdsImageHandle,
+                      gImageHandle,
                       FilePath,
                       NULL,
                       0,
@@ -2072,7 +2072,7 @@ BdsLibUpdateFvFileDevicePath (
   FindFvFile = FALSE;
   FoundFvHandle = NULL;
   Status = gBS->HandleProtocol (
-             mBdsImageHandle,
+             gImageHandle,
              &gEfiLoadedImageProtocolGuid,
              (VOID **) &LoadedImage
              );

@@ -79,7 +79,7 @@ BdsLibLoadDrivers (
     //
     Status = gBS->LoadImage (
                     FALSE,
-                    mBdsImageHandle,
+                    gImageHandle,
                     Option->DevicePath,
                     NULL,
                     0,
