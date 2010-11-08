@@ -42,7 +42,7 @@
 
 //
 /// Module-Global Variables
-/// @{
+///@{
 EFI_HII_HANDLE   gHiiHandle;
 CHAR16           *mPrintTokenBuffer = NULL;
 CHAR16           mGaugeString[DXE_PERFORMANCE_STRING_SIZE];
@@ -83,9 +83,11 @@ SHELL_PARAM_ITEM  DpParamList[] = {
   {NULL, TypeMax}
   };
 
-/// @}
+///@}
 
-/// Display Usage and Help information.
+/**
+   Display Usage and Help information.
+**/
 VOID
 ShowHelp( void )
 {
@@ -111,7 +113,9 @@ ShowHelp( void )
   Print(L"\n");
 }
 
-/// Display the trailing Verbose information.
+/**
+   Display the trailing Verbose information.
+**/
 VOID
 DumpStatistics( void )
 {
@@ -132,15 +136,16 @@ DumpStatistics( void )
 #endif // PROFILING_IMPLEMENTED
 }
 
-/** Dump performance data.
-  *
-  * @param[in]  ImageHandle     The image handle.
-  * @param[in]  SystemTable     The system table.
-  *
-  * @retval EFI_SUCCESS            Command completed successfully.
-  * @retval EFI_INVALID_PARAMETER  Command usage error.
-  * @retval value                  Unknown error.
-  *
+/** 
+  Dump performance data.
+  
+  @param[in]  ImageHandle     The image handle.
+  @param[in]  SystemTable     The system table.
+  
+  @retval EFI_SUCCESS            Command completed successfully.
+  @retval EFI_INVALID_PARAMETER  Command usage error.
+  @retval value                  Unknown error.
+  
 **/
 EFI_STATUS
 EFIAPI
@@ -158,15 +163,21 @@ InitializeDp (
   UINTN                     Number2Display;
 
   EFI_STATUS                Status;
-  BOOLEAN                   SummaryMode     = FALSE;
-  BOOLEAN                   VerboseMode     = FALSE;
-  BOOLEAN                   AllMode         = FALSE;
-  BOOLEAN                   RawMode         = FALSE;
-  BOOLEAN                   TraceMode       = FALSE;
-  BOOLEAN                   ProfileMode     = FALSE;
-  BOOLEAN                   ExcludeMode     = FALSE;
+  BOOLEAN                   SummaryMode;
+  BOOLEAN                   VerboseMode;
+  BOOLEAN                   AllMode;
+  BOOLEAN                   RawMode;
+  BOOLEAN                   TraceMode;
+  BOOLEAN                   ProfileMode;
+  BOOLEAN                   ExcludeMode;
 
-
+  SummaryMode     = FALSE;
+  VerboseMode     = FALSE;
+  AllMode         = FALSE;
+  RawMode         = FALSE;
+  TraceMode       = FALSE;
+  ProfileMode     = FALSE;
+  ExcludeMode     = FALSE;
   // Get DP's entry time as soon as possible.
   // This is used as the Shell-Phase end time.
   //

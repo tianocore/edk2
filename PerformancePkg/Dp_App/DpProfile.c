@@ -29,22 +29,23 @@
 #include "Literals.h"
 #include "DpInternal.h"
 
-/** Gather and print ALL Profiling Records.
-  *
-  * Displays all "interesting" Profile measurements in order.
-  * The number of records displayed is controlled by:
-  *   - records with a duration less than mInterestThreshold microseconds are not displayed.
-  *   - No more than Limit records are displayed.  A Limit of zero will not limit the output.
-  *   - If the ExcludeFlag is TRUE, records matching entries in the CumData array are not
-  *     displayed.
-  *
-  * @pre    The mInterestThreshold global variable is set to the shortest duration to be printed.
-  *         The mGaugeString and mUnicodeToken global arrays are used for temporary string storage.
-  *         They must not be in use by a calling function.
-  *
-  * @param[in]    Limit         The number of records to print.  Zero is ALL.
-  * @param[in]    ExcludeFlag   TRUE to exclude individual Cumulative items from display.
-  *
+/** 
+  Gather and print ALL Profiling Records.
+  
+  Displays all "interesting" Profile measurements in order.
+  The number of records displayed is controlled by:
+     - records with a duration less than mInterestThreshold microseconds are not displayed.
+     - No more than Limit records are displayed.  A Limit of zero will not limit the output.
+     - If the ExcludeFlag is TRUE, records matching entries in the CumData array are not
+       displayed.
+  
+  @pre    The mInterestThreshold global variable is set to the shortest duration to be printed.
+           The mGaugeString and mUnicodeToken global arrays are used for temporary string storage.
+           They must not be in use by a calling function.
+  
+  @param[in]    Limit         The number of records to print.  Zero is ALL.
+  @param[in]    ExcludeFlag   TRUE to exclude individual Cumulative items from display.
+  
 **/
 VOID
 DumpAllProfile(
@@ -60,22 +61,23 @@ DumpAllProfile(
   return;
 }
 
-/** Gather and print Raw Profile Records.
-  *
-  * All Profile measurements with a duration greater than or equal to
-  * mInterestThreshold are printed without interpretation.
-  *
-  * The number of records displayed is controlled by:
-  *   - records with a duration less than mInterestThreshold microseconds are not displayed.
-  *   - No more than Limit records are displayed.  A Limit of zero will not limit the output.
-  *   - If the ExcludeFlag is TRUE, records matching entries in the CumData array are not
-  *     displayed.
-  *
-  * @pre    The mInterestThreshold global variable is set to the shortest duration to be printed.
-  *
-  * @param[in]    Limit         The number of records to print.  Zero is ALL.
-  * @param[in]    ExcludeFlag   TRUE to exclude individual Cumulative items from display.
-  *
+/** 
+  Gather and print Raw Profile Records.
+  
+  All Profile measurements with a duration greater than or equal to
+  mInterestThreshold are printed without interpretation.
+  
+  The number of records displayed is controlled by:
+     - records with a duration less than mInterestThreshold microseconds are not displayed.
+     - No more than Limit records are displayed.  A Limit of zero will not limit the output.
+     - If the ExcludeFlag is TRUE, records matching entries in the CumData array are not
+       displayed.
+  
+  @pre    The mInterestThreshold global variable is set to the shortest duration to be printed.
+  
+  @param[in]    Limit         The number of records to print.  Zero is ALL.
+  @param[in]    ExcludeFlag   TRUE to exclude individual Cumulative items from display.
+  
 **/
 VOID
 DumpRawProfile(

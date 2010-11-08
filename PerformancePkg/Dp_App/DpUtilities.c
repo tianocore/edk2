@@ -31,27 +31,25 @@
 #include "Literals.h"
 #include "DpInternal.h"
 
-/** Calculate an event's duration in timer ticks.
-  *
-  * Given the count direction and the event's start and end timer values,
-  * calculate the duration of the event in timer ticks.  Information for
-  * the current measurement is pointed to by the parameter.
-  *
-  * If the measurement's start time is 1, it indicates that the developer
-  * is indicating that the measurement began at the release of reset.
-  * The start time is adjusted to the timer's starting count before performing
-  * the elapsed time calculation.
-  *
-  * The calculated duration, in ticks, is the absolute difference between
-  * the measurement's ending and starting counts.
-  *
-  * @pre  The global TimerInfo structure must have already been initialized
-  *       before this function is called.
-  *
-  * @param[in,out]    Measurement   Pointer to a MEASUREMENT_RECORD structure containing
-  *                   data for the current measurement.
-  *
-  * @return       The 64-bit duration of the event.
+/** 
+  Calculate an event's duration in timer ticks.
+  
+  Given the count direction and the event's start and end timer values,
+  calculate the duration of the event in timer ticks.  Information for
+  the current measurement is pointed to by the parameter.
+  
+  If the measurement's start time is 1, it indicates that the developer
+  is indicating that the measurement began at the release of reset.
+  The start time is adjusted to the timer's starting count before performing
+  the elapsed time calculation.
+  
+  The calculated duration, in ticks, is the absolute difference between
+  the measurement's ending and starting counts.
+  
+  @param Measurement   Pointer to a MEASUREMENT_RECORD structure containing
+                       data for the current measurement.
+  
+  @return              The 64-bit duration of the event.
 **/
 UINT64
 GetDuration (
@@ -85,15 +83,16 @@ GetDuration (
   return Duration;
 }
 
-/** Determine whether the Measurement record is for an EFI Phase.
-  *
-  * The Token and Module members of the measurement record are checked.
-  * Module must be empty and Token must be one of SEC, PEI, DXE, BDS, or SHELL.
-  *
-  * @param[in]  Measurement A pointer to the Measurement record to test.
-  *
-  * @retval     TRUE        The measurement record is for an EFI Phase.
-  * @retval     FALSE       The measurement record is NOT for an EFI Phase.
+/** 
+  Determine whether the Measurement record is for an EFI Phase.
+  
+  The Token and Module members of the measurement record are checked.
+  Module must be empty and Token must be one of SEC, PEI, DXE, BDS, or SHELL.
+  
+  @param[in]  Measurement A pointer to the Measurement record to test.
+  
+  @retval     TRUE        The measurement record is for an EFI Phase.
+  @retval     FALSE       The measurement record is NOT for an EFI Phase.
 **/
 BOOLEAN
 IsPhase(
@@ -111,16 +110,17 @@ IsPhase(
   return RetVal;
 }
 
-/** Get the file name portion of the Pdb File Name.
-  *
-  * The portion of the Pdb File Name between the last backslash and
-  * either a following period or the end of the string is converted
-  * to Unicode and copied into UnicodeBuffer.  The name is truncated,
-  * if necessary, to ensure that UnicodeBuffer is not overrun.
-  *
-  * @param[in]  PdbFileName     Pdb file name.
-  * @param[out] UnicodeBuffer   The resultant Unicode File Name.
-  *
+/** 
+  Get the file name portion of the Pdb File Name.
+  
+  The portion of the Pdb File Name between the last backslash and
+  either a following period or the end of the string is converted
+  to Unicode and copied into UnicodeBuffer.  The name is truncated,
+  if necessary, to ensure that UnicodeBuffer is not overrun.
+  
+  @param[in]  PdbFileName     Pdb file name.
+  @param[out] UnicodeBuffer   The resultant Unicode File Name.
+  
 **/
 VOID
 GetShortPdbFileName (
@@ -163,13 +163,14 @@ GetShortPdbFileName (
   }
 }
 
-/** Get a human readable name for an image handle.
-  *
-  * @param[in]    Handle
-  *
-  * @post   The resulting Unicode name string is stored in the
-  *         mGaugeString global array.
-  *
+/** 
+  Get a human readable name for an image handle.
+  
+  @param[in]    Handle
+  
+  @post   The resulting Unicode name string is stored in the
+          mGaugeString global array.
+  
 **/
 VOID
 GetNameFromHandle (
@@ -227,17 +228,18 @@ GetNameFromHandle (
   return ;
 }
 
-/** Calculate the Duration in microseconds.
-  *
-  * Duration is multiplied by 1000, instead of Frequency being divided by 1000 or
-  * multiplying the result by 1000, in order to maintain precision.  Since Duration is
-  * a 64-bit value, multiplying it by 1000 is unlikely to produce an overflow.
-  *
-  * The time is calculated as (Duration * 1000) / Timer_Frequency.
-  *
-  * @param[in]  Duration   The event duration in timer ticks.
-  *
-  * @return     A 64-bit value which is the Elapsed time in microseconds.
+/** 
+  Calculate the Duration in microseconds.
+  
+  Duration is multiplied by 1000, instead of Frequency being divided by 1000 or
+  multiplying the result by 1000, in order to maintain precision.  Since Duration is
+  a 64-bit value, multiplying it by 1000 is unlikely to produce an overflow.
+  
+  The time is calculated as (Duration * 1000) / Timer_Frequency.
+  
+  @param[in]  Duration   The event duration in timer ticks.
+  
+  @return     A 64-bit value which is the Elapsed time in microseconds.
 **/
 UINT64
 DurationInMicroSeconds (
@@ -250,12 +252,14 @@ DurationInMicroSeconds (
   return DivU64x32 (Temp, TimerInfo.Frequency);
 }
 
-/** Formatted Print using a Hii Token to reference the localized format string.
-  *
-  * @param[in]  Token   A HII token associated with a localized Unicode string.
-  *
-  * @return             The number of characters converted by UnicodeVSPrint().
-  *
+/** 
+  Formatted Print using a Hii Token to reference the localized format string.
+  
+  @param[in]  Token   A HII token associated with a localized Unicode string.
+  @param[in]  ...     The variable argument list.
+  
+  @return             The number of characters converted by UnicodeVSPrint().
+  
 **/
 UINTN
 PrintToken (
@@ -288,17 +292,18 @@ PrintToken (
   return Return;
 }
 
-/** Get index of Measurement Record's match in the CumData array.
-  *
-  * If the Measurement's Token value matches a Token in one of the CumData
-  * records, the index of the matching record is returned.  The returned
-  * index is a signed value so that negative values can indicate that
-  * the Measurement didn't match any entry in the CumData array.
-  *
-  * @param[in]  Measurement A pointer to a Measurement Record to match against the CumData array.
-  *
-  * @retval     <0    Token is not in the CumData array.
-  * @retval     >=0   Return value is the index into CumData where Token is found.
+/** 
+  Get index of Measurement Record's match in the CumData array.
+  
+  If the Measurement's Token value matches a Token in one of the CumData
+  records, the index of the matching record is returned.  The returned
+  index is a signed value so that negative values can indicate that
+  the Measurement didn't match any entry in the CumData array.
+  
+  @param[in]  Measurement A pointer to a Measurement Record to match against the CumData array.
+  
+  @retval     <0    Token is not in the CumData array.
+  @retval     >=0   Return value is the index into CumData where Token is found.
 **/
 INTN
 GetCumulativeItem(

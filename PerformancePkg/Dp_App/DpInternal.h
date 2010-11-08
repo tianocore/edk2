@@ -15,10 +15,11 @@
   * THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   * WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
-
+#ifndef _DP_INTELNAL_H_
+#define _DP_INTELNAL_H_
 //
 /// Module-Global Variables
-/// @{
+///@{
 extern EFI_HII_HANDLE     gHiiHandle;
 extern CHAR16             *mPrintTokenBuffer;
 extern CHAR16             mGaugeString[DXE_PERFORMANCE_STRING_SIZE];
@@ -36,7 +37,7 @@ extern PERF_CUM_DATA      CumData[];
 /// Number of items for which we are gathering cumulative statistics.
 extern UINT32 const       NumCum;
 
-/// @}
+///@}
 
 /** Calculate an event's duration in timer ticks.
   *
@@ -287,3 +288,4 @@ DumpRawProfile(
   IN UINTN          Limit,
   IN BOOLEAN        ExcludeFlag
 );
+#endif

@@ -39,10 +39,6 @@
 
 STATIC UINT64   mTscFrequency;
 
-#ifndef R_ICH_ACPI_PM1_TMR
-#define R_ICH_ACPI_PM1_TMR  R_ACPI_PM1_TMR
-#endif
-
 /** The constructor function determines the actual TSC frequency.
 
   The TSC counting frequency is determined by comparing how far it counts
@@ -108,7 +104,6 @@ TscTimerLibConstructor (
   @param[in]  Delay     A period of time to delay in ticks.
 
 **/
-STATIC
 VOID
 InternalX86Delay (
   IN      UINT64                    Delay
