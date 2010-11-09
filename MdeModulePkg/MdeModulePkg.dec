@@ -269,6 +269,11 @@
   ## This PCD specified whether ACPI SDT protocol is installed.
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|FALSE|BOOLEAN|0x0001004d
 
+  ## If TRUE, then unaligned I/O, MMIO, and PCI Configuration cycles through the PCI I/O Protocol are enabled.
+  #  If FALSE, then unaligned I/O, MMIO, and PCI Configuration cycles through the PCI I/O Protocol are disabled.
+  #  The default value for this PCD is to disable support for unaligned PCI I/O Protocol requests.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnalignedPciIoEnable|FALSE|BOOLEAN|0x0001003e
+  
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
   ##
   # This feature flag specifies whether DxeIpl switches to long mode to enter DXE phase.

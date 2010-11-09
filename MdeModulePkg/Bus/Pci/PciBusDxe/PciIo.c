@@ -248,6 +248,39 @@ PciIoPollMem (
     return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
+  //  
+  if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
+    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+      Status  = PciIoMemRead (This, Width, BarIndex, Offset, 1, Result);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+      if ((*Result & Mask) == Value || Delay == 0) {
+        return EFI_SUCCESS;
+      }
+      do {
+        //
+        // Stall 10 us = 100 * 100ns
+        //
+        gBS->Stall (10);
+
+        Status  = PciIoMemRead (This, Width, BarIndex, Offset, 1, Result);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+        if ((*Result & Mask) == Value) {
+          return EFI_SUCCESS;
+        }
+        if (Delay <= 100) {
+          return EFI_TIMEOUT;
+        }
+        Delay -= 100;
+      } while (TRUE);
+    }
+  }
+  
   Status = PciIoDevice->PciRootBridgeIo->PollMem (
                                            PciIoDevice->PciRootBridgeIo,
                                            (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
@@ -314,6 +347,39 @@ PciIoPollIo (
     return EFI_UNSUPPORTED;
   }
 
+  //
+  // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
+  //  
+  if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
+    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+      Status  = PciIoIoRead (This, Width, BarIndex, Offset, 1, Result);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+      if ((*Result & Mask) == Value || Delay == 0) {
+        return EFI_SUCCESS;
+      }
+      do {
+        //
+        // Stall 10 us = 100 * 100ns
+        //
+        gBS->Stall (10);
+
+        Status  = PciIoIoRead (This, Width, BarIndex, Offset, 1, Result);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+        if ((*Result & Mask) == Value) {
+          return EFI_SUCCESS;
+        }
+        if (Delay <= 100) {
+          return EFI_TIMEOUT;
+        }
+        Delay -= 100;
+      } while (TRUE);
+    }
+  }
+  
   Status = PciIoDevice->PciRootBridgeIo->PollIo (
                                            PciIoDevice->PciRootBridgeIo,
                                            (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
@@ -380,6 +446,17 @@ PciIoMemRead (
     return EFI_UNSUPPORTED;
   }
 
+  //
+  // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
+  //  
+  if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
+    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+      Width &= (~0x03);
+      Count *=  (UINTN)(1 << (Width & 0x03));
+    }
+  }  
+  
+
   Status = PciIoDevice->PciRootBridgeIo->Mem.Read (
                                               PciIoDevice->PciRootBridgeIo,
                                               (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
@@ -442,6 +519,16 @@ PciIoMemWrite (
   Status = PciIoVerifyBarAccess (PciIoDevice, BarIndex, PciBarTypeMem, Width, Count, &Offset);
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
+  }
+
+  //
+  // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
+  //  
+  if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
+    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+      Width &= (~0x03);
+      Count *=  (UINTN)(1 << (Width & 0x03));
+    }
   }
 
   Status = PciIoDevice->PciRootBridgeIo->Mem.Write (
@@ -508,6 +595,16 @@ PciIoIoRead (
     return EFI_UNSUPPORTED;
   }
 
+  //
+  // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
+  //  
+  if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
+    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+      Width &= (~0x03);
+      Count *=  (UINTN)(1 << (Width & 0x03));
+    }
+  }    
+
   Status = PciIoDevice->PciRootBridgeIo->Io.Read (
                                               PciIoDevice->PciRootBridgeIo,
                                               (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
@@ -572,6 +669,16 @@ PciIoIoWrite (
     return EFI_UNSUPPORTED;
   }
 
+  //
+  // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
+  //  
+  if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
+    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+      Width &= (~0x03);
+      Count *=  (UINTN)(1 << (Width & 0x03));
+    }
+  }  
+
   Status = PciIoDevice->PciRootBridgeIo->Io.Write (
                                               PciIoDevice->PciRootBridgeIo,
                                               (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
@@ -626,6 +733,16 @@ PciIoConfigRead (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  
+  //
+  // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
+  //  
+  if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
+    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+      Width &= (~0x03);
+      Count *=  (UINTN)(1 << (Width & 0x03));
+    }
+  }    
 
   Status = PciIoDevice->PciRootBridgeIo->Pci.Read (
                                                PciIoDevice->PciRootBridgeIo,
@@ -682,6 +799,16 @@ PciIoConfigWrite (
     return Status;
   }
 
+  //
+  // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
+  //  
+  if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
+    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+      Width &= (~0x03);
+      Count *=  (UINTN)(1 << (Width & 0x03));
+    }
+  }  
+  
   Status = PciIoDevice->PciRootBridgeIo->Pci.Write (
                                               PciIoDevice->PciRootBridgeIo,
                                               (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
@@ -766,6 +893,16 @@ PciIoCopyMem (
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
+
+  //
+  // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
+  //  
+  if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
+    if ((SrcOffset & ((1 << (Width & 0x03)) - 1)) != 0 || (DestOffset & ((1 << (Width & 0x03)) - 1)) != 0) {
+      Width &= (~0x03);
+      Count *=  (UINTN)(1 << (Width & 0x03));
+    }
+  }  
 
   Status = PciIoDevice->PciRootBridgeIo->CopyMem (
                                           PciIoDevice->PciRootBridgeIo,

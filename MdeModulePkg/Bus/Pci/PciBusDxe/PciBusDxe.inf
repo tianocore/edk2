@@ -101,6 +101,7 @@
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnalignedPciIoEnable
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize
