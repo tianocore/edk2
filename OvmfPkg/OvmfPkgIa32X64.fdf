@@ -209,7 +209,7 @@ FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
   }
 
 FILE APPLICATION = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile) {
-    SECTION PE32 = EdkShellBinPkg/FullShell/X64/Shell_full.efi
+    SECTION PE32 = EdkShellBinPkg/FullShell/X64/Shell_Full.efi
   }
 
 FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
