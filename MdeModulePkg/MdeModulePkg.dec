@@ -77,6 +77,7 @@
   ##  @libraryclass  Debug Agent is used to provide soft debug capability.
   #
   DebugAgentLib|Include/Library/DebugAgentLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -369,6 +370,17 @@
   ## RTC Update Timeout Value
   gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout|100000|UINT32|0x00010034
 
+  ## Maximum address that the DXE Core will allocate the EFI_SYSTEM_TABLE_POINTER
+  #  structure.  The default value for this PCD is 0, which means that the DXE Core
+  #  will allocate the buffer from the EFI_SYSTEM_TABLE_POINTER structure on a 4MB
+  #  boundary as close to the top of memory as feasible.  If this PCD is set to a 
+  #  value other than 0, then the DXE Core will first attempt to allocate the 
+  #  EFI_SYSTEM_TABLE_POINTER structure on a 4MB boundary below the address specified
+  #  by this PCD, and if that allocation fails, retry the allocation on a 4MB
+  #  boundary as close to the top of memory as feasible.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxEfiSystemTablePointerAddress|0x0|UINT64|0x30001027
+  
 [PcdsPatchableInModule,PcdsDynamic]
   ## This PCD defines the Console output column and the default value is 25 according to UEFI spec
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|25|UINT32|0x40000006

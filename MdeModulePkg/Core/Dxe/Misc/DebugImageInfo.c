@@ -2,7 +2,7 @@
   Support functions for managing debug image info table when loading and unloading
   images.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -24,9 +24,7 @@ EFI_DEBUG_IMAGE_INFO_TABLE_HEADER  mDebugInfoTableHeader = {
 
 UINTN mMaxTableEntries = 0;
 
-EFI_SYSTEM_TABLE_POINTER *mDebugTable = NULL;
-
-#define FOUR_MEG_ALIGNMENT   0x400000
+EFI_SYSTEM_TABLE_POINTER  *mDebugTable = NULL;
 
 #define EFI_DEBUG_TABLE_ENTRY_SIZE       (sizeof (VOID *))
 
@@ -40,18 +38,98 @@ CoreInitializeDebugImageInfoTable (
   VOID
   )
 {
-  EFI_STATUS                          Status;
+  EFI_STATUS            Status;
+  UINTN                 Pages;
+  EFI_PHYSICAL_ADDRESS  Memory;
+  UINTN                 AlignedMemory;
+  UINTN                 AlignmentMask;
+  UINTN                 UnalignedPages;
+  UINTN                 RealPages;
 
   //
   // Allocate 4M aligned page for the structure and fill in the data.
   // Ideally we would update the CRC now as well, but the service may not yet be available.
   // See comments in the CoreUpdateDebugTableCrc32() function below for details.
   //
-  mDebugTable = AllocateAlignedPages (EFI_SIZE_TO_PAGES (sizeof (EFI_SYSTEM_TABLE_POINTER)), FOUR_MEG_ALIGNMENT); 
+  Pages          = EFI_SIZE_TO_PAGES (sizeof (EFI_SYSTEM_TABLE_POINTER));
+  AlignmentMask  = SIZE_4MB - 1;
+  RealPages      = Pages + EFI_SIZE_TO_PAGES (SIZE_4MB);
+
+  //
+  // Attempt to allocate memory below PcdMaxEfiSystemTablePointerAddress
+  // If PcdMaxEfiSystemTablePointerAddress is 0, then allocate memory below
+  // MAX_ADDRESS
+  //
+  Memory = PcdGet64 (PcdMaxEfiSystemTablePointerAddress);
+  if (Memory == 0) {
+    Memory = MAX_ADDRESS;
+  }
+  Status = CoreAllocatePages (
+             AllocateMaxAddress, 
+             EfiBootServicesData,
+             RealPages, 
+             &Memory
+             );
+  if (EFI_ERROR (Status)) {
+    if (PcdGet64 (PcdMaxEfiSystemTablePointerAddress) != 0) {
+      DEBUG ((EFI_D_INFO, "Allocate memory for EFI_SYSTEM_TABLE_POINTER below PcdMaxEfiSystemTablePointerAddress failed. \
+                          Retry to allocate memroy as close to the top of memory as feasible.\n"));
+    }
+    //
+    // If the initial memory allocation fails, then reattempt allocation
+    // as close to the top of memory as feasible.
+    //
+    Status = CoreAllocatePages (
+               AllocateAnyPages, 
+               EfiBootServicesData,
+               RealPages, 
+               &Memory
+               );
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      return;
+    }
+  }  
+
+  //
+  // Free overallocated pages
+  //
+  AlignedMemory  = ((UINTN) Memory + AlignmentMask) & ~AlignmentMask;
+  UnalignedPages = EFI_SIZE_TO_PAGES (AlignedMemory - (UINTN)Memory);
+  if (UnalignedPages > 0) {
+    //
+    // Free first unaligned page(s).
+    //
+    Status = CoreFreePages (Memory, UnalignedPages);
+    ASSERT_EFI_ERROR (Status);
+  }
+  Memory         = (EFI_PHYSICAL_ADDRESS)(AlignedMemory + EFI_PAGES_TO_SIZE (Pages));
+  UnalignedPages = RealPages - Pages - UnalignedPages;
+  if (UnalignedPages > 0) {
+    //
+    // Free last unaligned page(s).
+    //
+    Status = CoreFreePages (Memory, UnalignedPages);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  //
+  // Set mDebugTable to the 4MB aligned allocated pages
+  //
+  mDebugTable = (EFI_SYSTEM_TABLE_POINTER  *)(AlignedMemory);
   ASSERT (mDebugTable != NULL);
-  mDebugTable->Signature = EFI_SYSTEM_TABLE_SIGNATURE;
+
+  //
+  // Initialize EFI_SYSTEM_TABLE_POINTER structure
+  //  
+  mDebugTable->Signature          = EFI_SYSTEM_TABLE_SIGNATURE;
   mDebugTable->EfiSystemTableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) gDxeCoreST;
-  mDebugTable->Crc32 = 0;
+  mDebugTable->Crc32              = 0;
+  
+  //
+  // Install the EFI_SYSTEM_TABLE_POINTER structure in the EFI System 
+  // Configuration Table
+  //
   Status = CoreInstallConfigurationTable (&gEfiDebugImageInfoTableGuid, &mDebugInfoTableHeader);
   ASSERT_EFI_ERROR (Status);
 }
