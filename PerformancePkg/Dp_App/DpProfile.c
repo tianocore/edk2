@@ -54,10 +54,15 @@ DumpAllProfile(
   )
 {
   EFI_STRING    StringPtr;
+  EFI_STRING    StringPtrUnknown;
 
+  StringPtrUnknown = HiiGetString (gHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);   
   StringPtr = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_SECTION_PROFILE), NULL);
+
   PrintToken( STRING_TOKEN (STR_DP_SECTION_HEADER),
-              (StringPtr == NULL) ? ALit_UNKNOWN: StringPtr);
+              (StringPtr == NULL) ? StringPtrUnknown: StringPtr);
+  FreePool (StringPtr);
+  FreePool (StringPtrUnknown);
   return;
 }
 
@@ -86,9 +91,13 @@ DumpRawProfile(
   )
 {
   EFI_STRING    StringPtr;
+  EFI_STRING    StringPtrUnknown;
 
+  StringPtrUnknown = HiiGetString (gHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);   
   StringPtr = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_SECTION_RAWPROFILE), NULL);
   PrintToken( STRING_TOKEN (STR_DP_SECTION_HEADER),
-              (StringPtr == NULL) ? ALit_UNKNOWN: StringPtr);
+              (StringPtr == NULL) ? StringPtrUnknown: StringPtr);
+  FreePool (StringPtr);
+  FreePool (StringPtrUnknown);
   return;
 }

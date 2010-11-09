@@ -44,6 +44,7 @@
 /// Module-Global Variables
 ///@{
 EFI_HII_HANDLE   gHiiHandle;
+SHELL_PARAM_ITEM *DpParamList       = NULL;
 CHAR16           *mPrintTokenBuffer = NULL;
 CHAR16           mGaugeString[DXE_PERFORMANCE_STRING_SIZE];
 CHAR16           mUnicodeToken[PERF_TOKEN_LENGTH + 1];
@@ -65,25 +66,50 @@ PERF_CUM_DATA CumData[] = {
 /// Number of items for which we are gathering cumulative statistics.
 UINT32 const      NumCum = sizeof(CumData) / sizeof(PERF_CUM_DATA);
 
-SHELL_PARAM_ITEM  DpParamList[] = {
-  {STR_DP_OPTION_QH, TypeFlag},   // -?   Help
-  {STR_DP_OPTION_LH, TypeFlag},   // -h   Help
-  {STR_DP_OPTION_UH, TypeFlag},   // -H   Help
-  {STR_DP_OPTION_LV, TypeFlag},   // -v   Verbose Mode
-  {STR_DP_OPTION_UA, TypeFlag},   // -A   All, Cooked
-  {STR_DP_OPTION_UR, TypeFlag},   // -R   RAW All
-  {STR_DP_OPTION_LS, TypeFlag},   // -s   Summary
+PARAM_ITEM_LIST  ParamList[] = {
+  {STRING_TOKEN (STR_DP_OPTION_QH), TypeFlag},   // -?   Help
+  {STRING_TOKEN (STR_DP_OPTION_LH), TypeFlag},   // -h   Help
+  {STRING_TOKEN (STR_DP_OPTION_UH), TypeFlag},   // -H   Help
+  {STRING_TOKEN (STR_DP_OPTION_LV), TypeFlag},   // -v   Verbose Mode
+  {STRING_TOKEN (STR_DP_OPTION_UA), TypeFlag},   // -A   All, Cooked
+  {STRING_TOKEN (STR_DP_OPTION_UR), TypeFlag},   // -R   RAW All
+  {STRING_TOKEN (STR_DP_OPTION_LS), TypeFlag},   // -s   Summary
 #if PROFILING_IMPLEMENTED
-  {STR_DP_OPTION_UP, TypeFlag},   // -P   Dump Profile Data
-  {STR_DP_OPTION_UT, TypeFlag},   // -T   Dump Trace Data
+  {STRING_TOKEN (STR_DP_OPTION_UP), TypeFlag},   // -P   Dump Profile Data
+  {STRING_TOKEN (STR_DP_OPTION_UT), TypeFlag},   // -T   Dump Trace Data
 #endif
-  {STR_DP_OPTION_LX, TypeFlag},   // -x   eXclude Cumulative Items
-  {STR_DP_OPTION_LN, TypeValue},  // -n # Number of records to display for A and R
-  {STR_DP_OPTION_LT, TypeValue},  // -t # Threshold of interest
-  {NULL, TypeMax}
+  {STRING_TOKEN (STR_DP_OPTION_LX), TypeFlag},   // -x   eXclude Cumulative Items
+  {STRING_TOKEN (STR_DP_OPTION_LN), TypeValue},  // -n # Number of records to display for A and R
+  {STRING_TOKEN (STR_DP_OPTION_LT), TypeValue}   // -t # Threshold of interest
   };
 
 ///@}
+
+/**
+  Transfer the param list value and get the command line parse.
+
+**/
+VOID
+InitialShellParamList( void )
+{
+  UINT32            ListIndex;
+  UINT32            ListLength;  
+
+  //
+  // Allocate one more for the end tag.
+  //
+  ListLength = sizeof (ParamList) / sizeof (ParamList[0]) + 1;  
+  DpParamList = AllocatePool (sizeof (SHELL_PARAM_ITEM) * ListLength);
+  ASSERT (DpParamList != NULL);
+  
+  for (ListIndex = 0; ListIndex < ListLength - 1; ListIndex ++)
+  { 
+    DpParamList[ListIndex].Name = HiiGetString (gHiiHandle, ParamList[ListIndex].Token, NULL);      
+    DpParamList[ListIndex].Type = ParamList[ListIndex].Type;
+  }
+  DpParamList[ListIndex].Name = NULL;
+  DpParamList[ListIndex].Type = TypeMax;
+}
 
 /**
    Display Usage and Help information.
@@ -120,10 +146,11 @@ VOID
 DumpStatistics( void )
 {
   EFI_STRING                StringPtr;
-
-  StringPtr = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_SECTION_STATISTICS), NULL);
+  EFI_STRING                StringPtrUnknown;
+  StringPtr        = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_SECTION_STATISTICS), NULL);
+  StringPtrUnknown = HiiGetString (gHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
   PrintToken( STRING_TOKEN (STR_DP_SECTION_HEADER),
-              (StringPtr == NULL) ? ALit_UNKNOWN: StringPtr);
+              (StringPtr == NULL) ? StringPtrUnknown : StringPtr);
 
   PrintToken( STRING_TOKEN (STR_DP_STATS_NUMTRACE),       SummaryData.NumTrace);
   PrintToken( STRING_TOKEN (STR_DP_STATS_NUMINCOMPLETE),  SummaryData.NumIncomplete);
@@ -134,6 +161,8 @@ DumpStatistics( void )
 #if PROFILING_IMPLEMENTED
   PrintToken( STRING_TOKEN (STR_DP_STATS_NUMPROFILE),     SummaryData.NumProfile);
 #endif // PROFILING_IMPLEMENTED
+  FreePool (StringPtr);
+  FreePool (StringPtrUnknown);
 }
 
 /** 
@@ -156,7 +185,8 @@ InitializeDp (
 {
   UINT64                    Freq;
   UINT64                    Ticker;
-
+  UINT32                    ListIndex;
+  
   LIST_ENTRY                *ParamPackage;
   CONST CHAR16              *CmdLineArg;
   EFI_STRING                StringPtr;
@@ -171,6 +201,20 @@ InitializeDp (
   BOOLEAN                   ProfileMode;
   BOOLEAN                   ExcludeMode;
 
+  EFI_STRING                StringDpOptionQh;
+  EFI_STRING                StringDpOptionLh;
+  EFI_STRING                StringDpOptionUh;
+  EFI_STRING                StringDpOptionLv;
+  EFI_STRING                StringDpOptionUs;
+  EFI_STRING                StringDpOptionLs;
+  EFI_STRING                StringDpOptionUa;
+  EFI_STRING                StringDpOptionUr;
+  EFI_STRING                StringDpOptionUt;
+  EFI_STRING                StringDpOptionUp;
+  EFI_STRING                StringDpOptionLx;
+  EFI_STRING                StringDpOptionLn;
+  EFI_STRING                StringDpOptionLt;
+  
   SummaryMode     = FALSE;
   VerboseMode     = FALSE;
   AllMode         = FALSE;
@@ -178,6 +222,22 @@ InitializeDp (
   TraceMode       = FALSE;
   ProfileMode     = FALSE;
   ExcludeMode     = FALSE;
+
+  StringDpOptionQh = NULL;
+  StringDpOptionLh = NULL;
+  StringDpOptionUh = NULL;
+  StringDpOptionLv = NULL;
+  StringDpOptionUs = NULL;
+  StringDpOptionLs = NULL;
+  StringDpOptionUa = NULL;
+  StringDpOptionUr = NULL;
+  StringDpOptionUt = NULL;
+  StringDpOptionUp = NULL;
+  StringDpOptionLx = NULL;
+  StringDpOptionLn = NULL;
+  StringDpOptionLt = NULL;
+  StringPtr        = NULL;
+
   // Get DP's entry time as soon as possible.
   // This is used as the Shell-Phase end time.
   //
@@ -188,6 +248,10 @@ InitializeDp (
   gHiiHandle = HiiAddPackages (&gEfiCallerIdGuid, ImageHandle, DPStrings, NULL);
   ASSERT (gHiiHandle != NULL);
 
+  // Initial the command list
+  //
+  InitialShellParamList ();
+  
 /****************************************************************************
 ****            Process Command Line arguments                           ****
 ****************************************************************************/
@@ -198,27 +262,43 @@ InitializeDp (
     ShowHelp();
   }
   else {
-    if (ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_QH)  ||
-        ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_LH)  ||
-        ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_UH))
+    StringDpOptionQh = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_QH), NULL);
+    StringDpOptionLh = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_LH), NULL);
+    StringDpOptionUh = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_UH), NULL);
+    
+    if (ShellCommandLineGetFlag (ParamPackage, StringDpOptionQh)  ||
+        ShellCommandLineGetFlag (ParamPackage, StringDpOptionLh)  ||
+        ShellCommandLineGetFlag (ParamPackage, StringDpOptionUh))
     {
       ShowHelp();
     }
     else {
+      StringDpOptionLv = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_LV), NULL);
+      StringDpOptionUs = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_US), NULL);
+      StringDpOptionLs = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_LS), NULL);
+      StringDpOptionUa = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_UA), NULL);
+      StringDpOptionUr = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_UR), NULL);
+      StringDpOptionUt = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_UT), NULL);
+      StringDpOptionUp = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_UP), NULL);
+      StringDpOptionLx = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_LX), NULL);
+      StringDpOptionLn = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_LN), NULL);
+      StringDpOptionLt = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_LT), NULL);
+      
       // Boolean Options
-      VerboseMode = (ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_LV));
-      SummaryMode = (ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_US) ||
-                     ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_LS));
-      AllMode     = (ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_UA));
-      RawMode     = (ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_UR));
+      // 
+      VerboseMode = ShellCommandLineGetFlag (ParamPackage, StringDpOptionLv);
+      SummaryMode = ShellCommandLineGetFlag (ParamPackage, StringDpOptionUs) ||
+                    ShellCommandLineGetFlag (ParamPackage, StringDpOptionLs);
+      AllMode     = ShellCommandLineGetFlag (ParamPackage, StringDpOptionUa);
+      RawMode     = ShellCommandLineGetFlag (ParamPackage, StringDpOptionUr);
 #if PROFILING_IMPLEMENTED
-      TraceMode   = (ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_UT));
-      ProfileMode = (ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_UP));
+      TraceMode   = ShellCommandLineGetFlag (ParamPackage, StringDpOptionUt);
+      ProfileMode = ShellCommandLineGetFlag (ParamPackage, StringDpOptionUp);
 #endif  // PROFILING_IMPLEMENTED
-      ExcludeMode = (ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_LX));
+      ExcludeMode = ShellCommandLineGetFlag (ParamPackage, StringDpOptionLx);
 
       // Options with Values
-      CmdLineArg  = ( ShellCommandLineGetValue (ParamPackage, STR_DP_OPTION_LN));
+      CmdLineArg  = ShellCommandLineGetValue (ParamPackage, StringDpOptionLn);
       if (CmdLineArg == NULL) {
         Number2Display = DEFAULT_DISPLAYCOUNT;
       }
@@ -228,7 +308,7 @@ InitializeDp (
           Number2Display = MAXIMUM_DISPLAYCOUNT;
         }
       }
-      CmdLineArg  = (ShellCommandLineGetValue (ParamPackage, STR_DP_OPTION_LT));
+      CmdLineArg  = ShellCommandLineGetValue (ParamPackage, StringDpOptionLt);
       if (CmdLineArg == NULL) {
         mInterestThreshold = DEFAULT_THRESHOLD;  // 1ms := 1,000 us
       }
@@ -344,7 +424,32 @@ InitializeDp (
       }
     }
   }
-  (void) FreePool (mPrintTokenBuffer);
+
+  // Free the memory allocate from HiiGetString
+  //
+  ListIndex = 0;
+  while (DpParamList[ListIndex].Name != NULL) {
+    FreePool (DpParamList[ListIndex].Name);
+    ListIndex ++;
+  }  
+  FreePool (DpParamList);
+  
+  FreePool (StringDpOptionQh);
+  FreePool (StringDpOptionLh);
+  FreePool (StringDpOptionUh);
+  FreePool (StringDpOptionLv);
+  FreePool (StringDpOptionUs);
+  FreePool (StringDpOptionLs);
+  FreePool (StringDpOptionUa);
+  FreePool (StringDpOptionUr);
+  FreePool (StringDpOptionUt);
+  FreePool (StringDpOptionUp);
+  FreePool (StringDpOptionLx);
+  FreePool (StringDpOptionLn);
+  FreePool (StringDpOptionLt);  
+  FreePool (StringPtr);
+  FreePool (mPrintTokenBuffer);
+  
   HiiRemovePackages (gHiiHandle);
   return Status;
 }

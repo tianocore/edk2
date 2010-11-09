@@ -206,6 +206,7 @@ GetNameFromHandle (
                   );
     if (EFI_ERROR (Status)) {
       StrCpy (mGaugeString, StringPtr);
+      FreePool (StringPtr);
       return ;
     }
 
@@ -225,6 +226,7 @@ GetNameFromHandle (
   } else {
     StrCpy (mGaugeString, StringPtr);
   }
+  FreePool (StringPtr);
   return ;
 }
 
@@ -289,6 +291,7 @@ PrintToken (
   if (Return > 0 && gST->ConOut != NULL) {
     gST->ConOut->OutputString (gST->ConOut, mPrintTokenBuffer);
   }
+  FreePool (StringPtr);
   return Return;
 }
 

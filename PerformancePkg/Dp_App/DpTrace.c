@@ -137,10 +137,13 @@ DumpAllTrace(
   UINTN                     Size;
   EFI_HANDLE                TempHandle;
   EFI_STATUS                Status;
+  EFI_STRING                StringPtrUnknown;
 
+  StringPtrUnknown = HiiGetString (gHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
   IncFlag = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_SECTION_ALL), NULL);
   PrintToken( STRING_TOKEN (STR_DP_SECTION_HEADER),
-              (IncFlag == NULL) ? ALit_UNKNOWN: IncFlag);
+              (IncFlag == NULL) ? StringPtrUnknown : IncFlag);
+  FreePool (StringPtrUnknown);
 
   // Get Handle information
   //
@@ -183,13 +186,16 @@ DumpAllTrace(
     {
       ++Index;    // Count every record.  First record is 1.
       ElapsedTime = 0;
+      if (IncFlag != NULL) {
+        FreePool ((void *)IncFlag);
+      }
       if (Measurement.EndTimeStamp != 0) {
         Duration = GetDuration (&Measurement);
         ElapsedTime = DurationInMicroSeconds ( Duration );
-        IncFlag = STR_DP_COMPLETE;
+        IncFlag = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_COMPLETE), NULL);
       }
       else {
-        IncFlag = STR_DP_INCOMPLETE;  // Mark incomplete records
+        IncFlag = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_INCOMPLETE), NULL);  // Mark incomplete records
       }
       if ((ElapsedTime < mInterestThreshold)                 ||
           ((ExcludeFlag) && (GetCumulativeItem(&Measurement) >= 0))
@@ -230,6 +236,7 @@ DumpAllTrace(
   if (HandleBuffer != &TempHandle) {
     FreePool (HandleBuffer);
   }
+  FreePool ((void *)IncFlag);
 }
 
 /** 
@@ -264,10 +271,14 @@ DumpRawTrace(
   UINTN                     Index;
 
   EFI_STRING    StringPtr;
+  EFI_STRING    StringPtrUnknown;
 
+  StringPtrUnknown = HiiGetString (gHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
   StringPtr = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_SECTION_RAWTRACE), NULL);
   PrintToken( STRING_TOKEN (STR_DP_SECTION_HEADER),
-              (StringPtr == NULL) ? ALit_UNKNOWN: StringPtr);
+              (StringPtr == NULL) ? StringPtrUnknown : StringPtr);
+  FreePool (StringPtr);
+  FreePool (StringPtrUnknown);
 
   PrintToken (STRING_TOKEN (STR_DP_RAW_HEADR) );
   PrintToken (STRING_TOKEN (STR_DP_RAW_DASHES) );
@@ -331,6 +342,7 @@ ProcessPhases(
   UINT64                    Total;
   EFI_STRING                StringPtr;
   UINTN                     LogEntryKey;
+  EFI_STRING                StringPtrUnknown;
 
   BdsTimeoutValue = 0;
   SecTime         = 0;
@@ -341,9 +353,12 @@ ProcessPhases(
   //
   // Get Execution Phase Statistics
   //
+  StringPtrUnknown = HiiGetString (gHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);   
   StringPtr = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_SECTION_PHASES), NULL);
   PrintToken( STRING_TOKEN (STR_DP_SECTION_HEADER),
-              (StringPtr == NULL) ? ALit_UNKNOWN: StringPtr);
+              (StringPtr == NULL) ? StringPtrUnknown : StringPtr);
+  FreePool (StringPtr);
+  FreePool (StringPtrUnknown);
 
   LogEntryKey = 0;
   while ((LogEntryKey = GetPerformanceMeasurement (
@@ -467,10 +482,14 @@ ProcessHandles(
   UINTN                     Size;
   EFI_HANDLE                TempHandle;
   EFI_STATUS                Status;
+  EFI_STRING                StringPtrUnknown;
 
+  StringPtrUnknown = HiiGetString (gHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
   StringPtr = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_SECTION_DRIVERS), NULL);
   PrintToken( STRING_TOKEN (STR_DP_SECTION_HEADER),
-              (StringPtr == NULL) ? ALit_UNKNOWN: StringPtr);
+              (StringPtr == NULL) ? StringPtrUnknown : StringPtr);
+  FreePool (StringPtr);
+  FreePool (StringPtrUnknown);
 
   Size = 0;
   HandleBuffer = &TempHandle;
@@ -562,11 +581,14 @@ ProcessPeims(
   EFI_STRING                StringPtr;
   UINTN                     LogEntryKey;
   UINTN                     TIndex;
+  EFI_STRING                StringPtrUnknown;
 
-
+  StringPtrUnknown = HiiGetString (gHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
   StringPtr = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_SECTION_PEIMS), NULL);
   PrintToken( STRING_TOKEN (STR_DP_SECTION_HEADER),
-              (StringPtr == NULL) ? ALit_UNKNOWN: StringPtr);
+              (StringPtr == NULL) ? StringPtrUnknown : StringPtr);
+  FreePool (StringPtr);
+  FreePool (StringPtrUnknown);
 
   PrintToken (STRING_TOKEN (STR_DP_PEIM_SECTION));
   PrintToken (STRING_TOKEN (STR_DP_DASHES));
@@ -621,10 +643,14 @@ ProcessGlobal(
   EFI_STRING                StringPtr;
   UINTN                     LogEntryKey;
   UINTN                     Index;        // Index, or number, of the measurement record being processed
+  EFI_STRING                StringPtrUnknown;
 
+  StringPtrUnknown = HiiGetString (gHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
   StringPtr = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_SECTION_GENERAL), NULL);
   PrintToken( STRING_TOKEN (STR_DP_SECTION_HEADER),
-              (StringPtr == NULL) ? ALit_UNKNOWN: StringPtr);
+              (StringPtr == NULL) ? StringPtrUnknown: StringPtr);
+  FreePool (StringPtr);
+  FreePool (StringPtrUnknown);
 
   PrintToken (STRING_TOKEN (STR_DP_GLOBAL_SECTION));
   PrintToken (STRING_TOKEN (STR_DP_DASHES));
@@ -680,11 +706,14 @@ ProcessCumulative(
   UINT64                    Avgval;         // the computed average duration
   EFI_STRING                StringPtr;
   UINTN                     TIndex;
+  EFI_STRING                StringPtrUnknown;
 
-
+  StringPtrUnknown = HiiGetString (gHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
   StringPtr = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_SECTION_CUMULATIVE), NULL);
   PrintToken( STRING_TOKEN (STR_DP_SECTION_HEADER),
-              (StringPtr == NULL) ? ALit_UNKNOWN: StringPtr);
+              (StringPtr == NULL) ? StringPtrUnknown: StringPtr);
+  FreePool (StringPtr);
+  FreePool (StringPtrUnknown);
 
   PrintToken (STRING_TOKEN (STR_DP_CUMULATIVE_SECT_1));
   PrintToken (STRING_TOKEN (STR_DP_CUMULATIVE_SECT_2));

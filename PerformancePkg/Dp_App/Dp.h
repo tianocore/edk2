@@ -14,6 +14,8 @@
 #ifndef _EFI_APP_DP_H_
 #define _EFI_APP_DP_H_
 
+#include <Library/ShellLib.h>
+
 #define DP_MAJOR_VERSION        2
 #define DP_MINOR_VERSION        3
 
@@ -91,4 +93,8 @@ typedef struct {
   UINT32                Count;            ///< Number of measurements accumulated.
 } PROFILE_RECORD;
 
+typedef struct {
+  UINT16             Token;
+  SHELL_PARAM_TYPE   Type;
+} PARAM_ITEM_LIST;
 #endif  // _EFI_APP_DP_H_
