@@ -479,7 +479,7 @@ ProcessHandles(
     HandleBuffer = AllocatePool (Size);
     ASSERT (HandleBuffer != NULL);
     if (HandleBuffer == NULL) {
-      return;
+      return Status;
     }
     Status  = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, HandleBuffer);
   }
