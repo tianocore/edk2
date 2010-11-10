@@ -575,7 +575,7 @@ PcRtcSetWakeupTime (
   UINT8                 Century;
   EFI_TIME_CAPABILITIES Capabilities;
 
-  ZeroMem (RtcTime);
+  ZeroMem (&RtcTime, sizeof (RtcTime));
 
   if (Enable) {
 
