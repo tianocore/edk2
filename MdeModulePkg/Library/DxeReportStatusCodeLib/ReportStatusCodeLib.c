@@ -1,7 +1,7 @@
 /** @file
   Report Status Code Library for DXE Phase.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -24,12 +24,6 @@
 
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
-
-//
-// Define the maximum extended data size that is supported when a status code is 
-// reported at TPL_HIGH_LEVEL.
-//
-#define MAX_EXTENDED_DATA_SIZE  0x200
 
 EFI_STATUS_CODE_PROTOCOL  *mReportStatusCodeLibStatusCodeProtocol = NULL;
 
@@ -491,7 +485,7 @@ ReportStatusCodeEx (
   EFI_STATUS            Status;
   EFI_STATUS_CODE_DATA  *StatusCodeData;
   EFI_TPL               Tpl;
-  UINT64                Buffer[MAX_EXTENDED_DATA_SIZE / sizeof (UINT64)];
+  UINT64                Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)];
 
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
@@ -518,10 +512,10 @@ ReportStatusCodeEx (
     //
     // If a buffer could not be allocated, then see if the local variable Buffer can be used
     //
-    if (ExtendedDataSize > (MAX_EXTENDED_DATA_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
+    if (ExtendedDataSize > (EFI_STATUS_CODE_DATA_MAX_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
       //
       // The local variable Buffer not large enough to hold the extended data associated
-      // with the status code being  reported.
+      // with the status code being reported.
       //
       ASSERT (FALSE);
       return EFI_OUT_OF_RESOURCES;
