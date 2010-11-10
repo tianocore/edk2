@@ -134,7 +134,7 @@ InitializePcRtc (
 {
   EFI_STATUS  Status;
 
-  EfiInitializeLock (&mModuleGlobal.RtcLock, TPL_HIGH_LEVEL);
+  EfiInitializeLock (&mModuleGlobal.RtcLock, TPL_CALLBACK);
 
   Status = PcRtcInit (&mModuleGlobal);
   if (EFI_ERROR (Status)) {
