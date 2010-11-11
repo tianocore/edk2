@@ -1811,6 +1811,18 @@ UiDisplayMenu (
           Width       = GetWidth (Statement, MenuOption->Handle);
           OriginalRow = Row;
 
+          if (Statement->Operand == EFI_IFR_REF_OP && ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP)) {
+            //
+            // Print Arrow for Goto button.
+            //
+            PrintAt (
+              MenuOption->Col - LEFT_SKIPPED_COLUMNS,
+              Row,
+              L"%c",
+              GEOMETRICSHAPE_RIGHT_TRIANGLE
+              );
+          }
+
           for (Index = 0; GetLineByWidth (MenuOption->Description, Width, &Index, &OutputString) != 0x0000;) {
             if ((Temp == 0) && (Row <= BottomRow)) {
               PrintStringAt (MenuOption->Col, Row, OutputString);
