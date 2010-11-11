@@ -1,7 +1,7 @@
 /** @file
   The data hub protocol is used both by agents wishing to log
   data and those wishing to be made aware of all information that
-  has been logged.
+  has been logged. This protocol may only be called <= TPL_NOTIFY.
 
   This protocol is defined in Framework for EFI Data Hub Specification.
   Version 0.9.
