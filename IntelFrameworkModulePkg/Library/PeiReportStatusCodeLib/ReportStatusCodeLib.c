@@ -25,11 +25,6 @@
 #include <Library/OemHookStatusCodeLib.h>
 #include <Library/PcdLib.h>
 
-//
-// Define the maximum extended data size that is supported in the PEI phase
-//
-#define MAX_EXTENDED_DATA_SIZE  0x200
-
 /**
   Internal worker function that reports a status code through the PEI Status Code Service or
   OEM Hook Status Code Library.
@@ -460,7 +455,7 @@ ReportStatusCodeEx (
   )
 {
   EFI_STATUS_CODE_DATA  *StatusCodeData;
-  UINT64                Buffer[MAX_EXTENDED_DATA_SIZE / sizeof (UINT64)];
+  UINT64                Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)];
 
   //
   // If ExtendedData is NULL and ExtendedDataSize is not zero, then ASSERT().
@@ -471,7 +466,12 @@ ReportStatusCodeEx (
   //
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
-  if (ExtendedDataSize > (MAX_EXTENDED_DATA_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
+  if (ExtendedDataSize > (EFI_STATUS_CODE_DATA_MAX_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
+    //
+    // The local variable Buffer not large enough to hold the extended data associated
+    // with the status code being reported.
+    //
+    ASSERT (FALSE);
     return EFI_OUT_OF_RESOURCES;
   }
   StatusCodeData = (EFI_STATUS_CODE_DATA  *)Buffer;
