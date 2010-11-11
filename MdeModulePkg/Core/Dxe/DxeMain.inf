@@ -140,4 +140,5 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueBootServiceExit
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverBegin
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverEnd
-
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxEfiSystemTablePointerAddress         ## CONSUMES
+  
