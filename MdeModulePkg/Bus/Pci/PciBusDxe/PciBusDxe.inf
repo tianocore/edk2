@@ -104,6 +104,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnalignedPciIoEnable
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize
