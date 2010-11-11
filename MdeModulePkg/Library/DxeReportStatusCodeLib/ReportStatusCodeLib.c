@@ -1,7 +1,7 @@
 /** @file
   Report Status Code Library for DXE Phase.
 
-  Copyright (c) 2006 - 2009, Intel Corporation<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -484,6 +484,8 @@ ReportStatusCodeEx (
 {
   EFI_STATUS            Status;
   EFI_STATUS_CODE_DATA  *StatusCodeData;
+  EFI_TPL               Tpl;
+  UINT64                Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)];
 
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
@@ -493,12 +495,32 @@ ReportStatusCodeEx (
   }
 
   //
-  // Allocate space for the Status Code Header and its buffer
+  // Retrieve the current TPL
   //
+  Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  gBS->RestoreTPL (Tpl);
+  
   StatusCodeData = NULL;
-  gBS->AllocatePool (EfiBootServicesData, sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize, (VOID **)&StatusCodeData);
+  if (Tpl <= TPL_NOTIFY) {
+    //
+    // Allocate space for the Status Code Header and its buffer
+    //
+    gBS->AllocatePool (EfiBootServicesData, sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize, (VOID **)&StatusCodeData);
+  }
+
   if (StatusCodeData == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    //
+    // If a buffer could not be allocated, then see if the local variable Buffer can be used
+    //
+    if (ExtendedDataSize > (EFI_STATUS_CODE_DATA_MAX_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
+      //
+      // The local variable Buffer not large enough to hold the extended data associated
+      // with the status code being reported.
+      //
+      ASSERT (FALSE);
+      return EFI_OUT_OF_RESOURCES;
+    }
+    StatusCodeData = (EFI_STATUS_CODE_DATA  *)Buffer;
   }
 
   //
@@ -529,7 +551,9 @@ ReportStatusCodeEx (
   //
   // Free the allocated buffer
   //
-  gBS->FreePool (StatusCodeData);
+  if (StatusCodeData != (EFI_STATUS_CODE_DATA  *)Buffer) {
+    gBS->FreePool (StatusCodeData);
+  }
 
   return Status;
 }
