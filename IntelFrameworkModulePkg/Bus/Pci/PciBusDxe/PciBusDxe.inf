@@ -102,6 +102,7 @@
 [FeaturePcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnalignedPciIoEnable
 
 # [Event]
 #   ##
