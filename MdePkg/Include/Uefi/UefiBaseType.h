@@ -181,16 +181,38 @@ typedef union {
 
 //
 // The EFI memory allocation functions work in units of EFI_PAGEs that are
-// 4K. This should in no way be confused with the page size of the processor.
+// 4KB. This should in no way be confused with the page size of the processor.
 // An EFI_PAGE is just the quanta of memory in EFI.
 //
-#define EFI_PAGE_SIZE             0x1000
+#define EFI_PAGE_SIZE             SIZE_4KB
 #define EFI_PAGE_MASK             0xFFF
 #define EFI_PAGE_SHIFT            12
 
-#define EFI_SIZE_TO_PAGES(a)  (((a) >> EFI_PAGE_SHIFT) + (((a) & EFI_PAGE_MASK) ? 1 : 0))
+/**
+  Macro that converts a size, in bytes, to a number of EFI_PAGESs.
 
-#define EFI_PAGES_TO_SIZE(a)   ( (a) << EFI_PAGE_SHIFT)
+  @param  Size      A size in bytes.  This parameter is assumed to be type UINTN.  
+                    Passing in a parameter that is larger than UINTN may produce 
+                    unexpected results.
+
+  @return  The number of EFI_PAGESs associated with the number of bytes specified
+           by Size.
+
+**/
+#define EFI_SIZE_TO_PAGES(Size)  (((Size) >> EFI_PAGE_SHIFT) + (((Size) & EFI_PAGE_MASK) ? 1 : 0))
+
+/**
+  Macro that converts a number of EFI_PAGEs to a size in bytes.
+
+  @param  Pages     The number of EFI_PAGES.  This parameter is assumed to be 
+                    type UINTN.  Passing in a parameter that is larger than 
+                    UINTN may produce unexpected results.
+
+  @return  The number of bytes associated with the number of EFI_PAGEs specified 
+           by Pages.
+  
+**/
+#define EFI_PAGES_TO_SIZE(Pages)  ((Pages) << EFI_PAGE_SHIFT)
 
 ///
 /// PE32+ Machine type for IA32 UEFI images.
