@@ -29,7 +29,10 @@
 [Sources]
   DpStrings.uni
   Dp.c
+  Dp.h
+  Literals.h
   Literals.c
+  DpInternal.h
   DpUtilities.c
   DpTrace.c
   DpProfile.c
