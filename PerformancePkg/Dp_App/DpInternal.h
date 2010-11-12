@@ -26,7 +26,7 @@ extern CHAR16             mGaugeString[DXE_PERFORMANCE_STRING_SIZE];
 extern CHAR16             mUnicodeToken[PERF_TOKEN_LENGTH + 1];
 extern UINT64             mInterestThreshold;
 
-extern PERF_SUMMARY_DATA  SummaryData;;    ///< Create the SummaryData structure and init. to ZERO.
+extern PERF_SUMMARY_DATA  SummaryData;    ///< Create the SummaryData structure and init. to ZERO.
 
 /// Timer Specific Information.
 extern TIMER_INFO         TimerInfo;
