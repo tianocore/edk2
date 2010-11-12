@@ -451,8 +451,8 @@ PciIoMemRead (
   //  
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
-      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
       Count *=  (UINTN)(1 << (Width & 0x03));
+      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
     }
   }  
   
@@ -526,8 +526,8 @@ PciIoMemWrite (
   //  
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
-      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
       Count *=  (UINTN)(1 << (Width & 0x03));
+      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
     }
   }
 
@@ -600,8 +600,8 @@ PciIoIoRead (
   //  
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
-      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
       Count *=  (UINTN)(1 << (Width & 0x03));
+      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
     }
   }    
 
@@ -674,8 +674,8 @@ PciIoIoWrite (
   //  
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
-      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
       Count *=  (UINTN)(1 << (Width & 0x03));
+      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
     }
   }  
 
@@ -739,8 +739,8 @@ PciIoConfigRead (
   //  
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
-      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
       Count *=  (UINTN)(1 << (Width & 0x03));
+      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
     }
   }    
 
@@ -804,8 +804,8 @@ PciIoConfigWrite (
   //  
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
-      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
       Count *=  (UINTN)(1 << (Width & 0x03));
+      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
     }
   }  
   
@@ -899,8 +899,8 @@ PciIoCopyMem (
   //  
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((SrcOffset & ((1 << (Width & 0x03)) - 1)) != 0 || (DestOffset & ((1 << (Width & 0x03)) - 1)) != 0) {
-      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
       Count *=  (UINTN)(1 << (Width & 0x03));
+      Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
     }
   }  
 
