@@ -115,7 +115,7 @@ ValidOptionsOnAll(
   Status = gBS->LocateProtocol(&gEfiHiiDatabaseProtocolGuid, NULL, (VOID**)&HiiDb);
   if (EFI_ERROR(Status)) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROTOCOL_NF), gShellDriver1HiiHandle, L"gEfiHiiDatabaseProtocolGuid", &gEfiHiiDatabaseProtocolGuid);
-    return (Status);
+    return (SHELL_NOT_FOUND);
   }
 
   ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DRVCFG_HEADER), gShellDriver1HiiHandle);
