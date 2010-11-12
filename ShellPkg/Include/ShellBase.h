@@ -20,8 +20,9 @@ typedef VOID *SHELL_FILE_HANDLE;
 #ifndef SHELL_FREE_NON_NULL
 #define SHELL_FREE_NON_NULL(Pointer)  \
   do {                                \
-    if (Pointer != NULL) {            \
-      FreePool(Pointer);              \
+    if ((Pointer) != NULL) {          \
+      FreePool((Pointer));            \
+      (Pointer) = NULL;               \
     }                                 \
   } while(FALSE)
 #endif //SHELL_FREE_NON_NULL
