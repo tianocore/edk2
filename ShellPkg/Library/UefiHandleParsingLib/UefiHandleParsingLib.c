@@ -1105,7 +1105,9 @@ ParseHandleDatabaseForChildControllers(
   BOOLEAN     Found;
   EFI_HANDLE  *HandleBufferForReturn;
 
-  ASSERT (MatchingHandleCount != NULL);
+  if (MatchingHandleCount == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   Status = PARSE_HANDLE_DATABASE_UEFI_DRIVERS (
             ControllerHandle,
@@ -1116,10 +1118,13 @@ ParseHandleDatabaseForChildControllers(
     return Status;
   }
 
-  HandleBufferForReturn = GetHandleListByProtocol(&gEfiDriverBindingProtocolGuid);
+  //
+  // Get a buffer big enough for all the controllers.
+  //
+  HandleBufferForReturn = GetHandleListByProtocol(&gEfiDevicePathProtocolGuid);
   if (HandleBufferForReturn == NULL) {
     FreePool (DriverBindingHandleBuffer);
-    return Status;
+    return (EFI_NOT_FOUND);
   }
 
   *MatchingHandleCount = 0;
@@ -1361,7 +1366,8 @@ GetHandleListByProtocol (
   @param[in] ProtocolGuids  A NULL terminated list of protocol GUIDs.
 
   @retval NULL              A memory allocation failed.
-  @return                   A NULL terminated list of handles.
+  @retval NULL              ProtocolGuids was NULL.
+  @return                   A NULL terminated list of EFI_HANDLEs.
 **/
 EFI_HANDLE*
 EFIAPI
@@ -1397,7 +1403,6 @@ GetHandleListByProtocolList (
   }
 
   HandleList = AllocateZeroPool(TotalSize);
-  ASSERT(HandleList != NULL);
   if (HandleList == NULL) {
     return (NULL);
   }
@@ -1405,16 +1410,16 @@ GetHandleListByProtocolList (
   Size = 0;
   for (GuidWalker = ProtocolGuids ; GuidWalker != NULL && *GuidWalker != NULL ; GuidWalker++){
     TempSize = TotalSize - Size;
-    Status = gBS->LocateHandle(ByProtocol, (EFI_GUID*)(*GuidWalker), NULL, &TempSize, HandleList+((TotalSize - Size)/sizeof(EFI_HANDLE)));
+    Status = gBS->LocateHandle(ByProtocol, (EFI_GUID*)(*GuidWalker), NULL, &TempSize, HandleList+(Size/sizeof(EFI_HANDLE)));
 
     //
     // Allow for missing protocols... Only update the 'used' size upon success.
     //
     if (!EFI_ERROR(Status)) {
-      Size = TempSize;
+      Size += TempSize;
     }
   }
-  HandleList[(TotalSize/sizeof(EFI_HANDLE))-1] = NULL;
+  ASSERT(HandleList[(TotalSize/sizeof(EFI_HANDLE))-1] == NULL);
 
   for (HandleWalker1 = HandleList ; HandleWalker1 != NULL && *HandleWalker1 != NULL ; HandleWalker1++) {
     for (HandleWalker2 = HandleWalker1 + 1; HandleWalker2 != NULL && *HandleWalker2 != NULL ; HandleWalker2++) {

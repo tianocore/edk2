@@ -331,7 +331,8 @@ GetHandleListByProtocol (
   @param[in] ProtocolGuids  A NULL terminated list of protocol GUIDs.
 
   @retval NULL              A memory allocation failed.
-  @return                   A NULL terminated list of handles.
+  @retval NULL              ProtocolGuids was NULL.
+  @return                   A NULL terminated list of EFI_HANDLEs.
 **/
 EFI_HANDLE*
 EFIAPI

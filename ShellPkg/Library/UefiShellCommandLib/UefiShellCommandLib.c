@@ -1171,7 +1171,8 @@ ConvertShellHandleToEfiFileProtocol(
   @param[in] Handle     The pointer to EFI_FILE_PROTOCOL to convert.
   @param[in] Path       The path to the file for verification.
 
-  @return a SHELL_FILE_HANDLE representing the same file.
+  @return               A SHELL_FILE_HANDLE representing the same file.
+  @retval NULL          There was not enough memory.
 **/
 SHELL_FILE_HANDLE
 EFIAPI
@@ -1185,11 +1186,18 @@ ConvertEfiFileProtocolToShellHandle(
 
   if (Path != NULL) {
     Buffer              = AllocateZeroPool(sizeof(SHELL_COMMAND_FILE_HANDLE));
-    ASSERT(Buffer  != NULL);
+    if (Buffer == NULL) {
+      return (NULL);
+    }
     NewNode             = AllocatePool(sizeof(BUFFER_LIST));
-    ASSERT(NewNode != NULL);
+    if (NewNode == NULL) {
+      return (NULL);
+    }
     Buffer->FileHandle  = (EFI_FILE_PROTOCOL*)Handle;
     Buffer->Path        = StrnCatGrow(&Buffer->Path, NULL, Path, 0);
+    if (Buffer->Path == NULL) {
+      return (NULL);
+    }
     NewNode->Buffer     = Buffer;
 
     InsertHeadList(&mFileHandleList.Link, &NewNode->Link);
@@ -1244,8 +1252,10 @@ ShellFileHandleRemove(
     ;  Node = (BUFFER_LIST*)GetNextNode(&mFileHandleList.Link, &Node->Link)
    ){
     if ((Node->Buffer) && (((SHELL_COMMAND_FILE_HANDLE *)Node->Buffer)->FileHandle == Handle)){
-      SHELL_FREE_NON_NULL(((SHELL_COMMAND_FILE_HANDLE *)Node->Buffer)->Path);
       RemoveEntryList(&Node->Link);
+      SHELL_FREE_NON_NULL(((SHELL_COMMAND_FILE_HANDLE *)Node->Buffer)->Path);
+      SHELL_FREE_NON_NULL(Node->Buffer);
+      SHELL_FREE_NON_NULL(Node);
       return (TRUE);
     }
   }
