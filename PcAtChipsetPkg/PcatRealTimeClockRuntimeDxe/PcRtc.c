@@ -234,7 +234,6 @@ PcRtcInit (
 
 **/
 EFI_STATUS
-EFIAPI
 PcRtcGetTime (
   OUT  EFI_TIME               *Time,
   OUT  EFI_TIME_CAPABILITIES  *Capabilities,  OPTIONAL
@@ -339,7 +338,6 @@ PcRtcGetTime (
 
 **/
 EFI_STATUS
-EFIAPI
 PcRtcSetTime (
   IN EFI_TIME                *Time,
   IN PC_RTC_MODULE_GLOBALS   *Global
@@ -562,7 +560,6 @@ PcRtcGetWakeupTime (
 
 **/
 EFI_STATUS
-EFIAPI
 PcRtcSetWakeupTime (
   IN BOOLEAN                Enable,
   IN EFI_TIME               *Time,   OPTIONAL
