@@ -149,13 +149,13 @@ typedef INT64   INTN;
 //
 // Processor specific defines
 //
-#define MAX_BIT     0x8000000000000000
-#define MAX_2_BITS  0xC000000000000000
+#define MAX_BIT     0x8000000000000000ULL
+#define MAX_2_BITS  0xC000000000000000ULL
 
 //
 // Maximum legal Itanium-based address
 //
-#define MAX_ADDRESS   0xFFFFFFFFFFFFFFFF
+#define MAX_ADDRESS   0xFFFFFFFFFFFFFFFFULL
 
 //
 // Modifier to ensure that all protocol member functions and EFI intrinsics

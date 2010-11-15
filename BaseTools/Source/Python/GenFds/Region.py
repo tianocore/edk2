@@ -1,7 +1,7 @@
 ## @file
 # process FD Region generation
 #
-#  Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -62,9 +62,6 @@ class Region(RegionClassObject):
             #
             # Get Fv from FvDict
             #
-            RegionBlockSize = self.BlockSizeOfRegion(BlockSizeList)
-            RegionBlockNum = self.BlockNumOfRegion(RegionBlockSize)
-
             self.FvAddress = int(BaseAddress, 16) + self.Offset
             FvBaseAddress  = '0x%X' %self.FvAddress
             FvOffset       = 0
@@ -95,13 +92,7 @@ class Region(RegionClassObject):
                         #
                         # Call GenFv tool
                         #
-                        BlockSize = RegionBlockSize
-                        BlockNum = RegionBlockNum
-                        if FvObj.BlockSizeList != []:
-                            if FvObj.BlockSizeList[0][0] != None:
-                                BlockSize = FvObj.BlockSizeList[0][0]
-                            if FvObj.BlockSizeList[0][1] != None:
-                                BlockNum = FvObj.BlockSizeList[0][1]
+                        self.BlockInfoOfRegion(BlockSizeList, FvObj)
                         self.FvAddress = self.FvAddress + FvOffset
                         FvAlignValue = self.GetFvAlignValue(FvObj.FvAlignment)
                         if self.FvAddress % FvAlignValue != 0:
@@ -109,6 +100,8 @@ class Region(RegionClassObject):
                                             "FV (%s) is NOT %s Aligned!" % (FvObj.UiFvName, FvObj.FvAlignment))
                         FvBuffer = StringIO.StringIO('')
                         FvBaseAddress = '0x%X' %self.FvAddress
+                        BlockSize = None
+                        BlockNum = None
                         FvObj.AddToBuffer(FvBuffer, FvBaseAddress, BlockSize, BlockNum, ErasePolarity, vtfDict)
                         if FvBuffer.len > Size:
                             FvBuffer.close()
@@ -288,38 +281,74 @@ class Region(RegionClassObject):
 
         AlignValue = int(Str)*Granu
         return AlignValue
+ 
     ## BlockSizeOfRegion()
     #
     #   @param  BlockSizeList        List of block information
-    #   @retval int                  Block size of region
+    #   @param  FvObj                The object for FV
     #
-    def BlockSizeOfRegion(self, BlockSizeList):
-        Offset = 0x00
-        BlockSize = 0
-        for item in BlockSizeList:
-            Offset = Offset + item[0]  * item[1]
-            GenFdsGlobalVariable.VerboseLogger ("Offset = 0x%X" %Offset)
-            GenFdsGlobalVariable.VerboseLogger ("self.Offset 0x%X" %self.Offset)
+    def BlockInfoOfRegion(self, BlockSizeList, FvObj):
+        Start = 0
+        End = 0
+        RemindingSize = self.Size
+        ExpectedList = []
+        for (BlockSize, BlockNum, pcd) in BlockSizeList:
+            End = Start + BlockSize * BlockNum
+            # region not started yet
+            if self.Offset >= End:
+                Start = End
+                continue
+            # region located in current blocks 
+            else:
+                # region ended within current blocks
+                if self.Offset + self.Size <= End:
+                    ExpectedList.append((BlockSize, (RemindingSize + BlockSize - 1)/BlockSize))
+                    break
+                # region not ended yet
+                else:
+                    # region not started in middle of current blocks
+                    if self.Offset <= Start:
+                        UsedBlockNum = BlockNum
+                    # region started in middle of current blocks
+                    else:
+                        UsedBlockNum = (End - self.Offset)/BlockSize
+                    Start = End
+                    ExpectedList.append((BlockSize, UsedBlockNum))
+                    RemindingSize -= BlockSize * UsedBlockNum
+                   
+        if FvObj.BlockSizeList == []:
+            FvObj.BlockSizeList = ExpectedList
+        else:
+            # first check whether FvObj.BlockSizeList items have only "BlockSize" or "NumBlocks",
+            # if so, use ExpectedList
+            for Item in FvObj.BlockSizeList:
+                if Item[0] == None or Item[1] == None:
+                    FvObj.BlockSizeList = ExpectedList
+                    break
+            # make sure region size is no smaller than the summed block size in FV
+            Sum = 0
+            for Item in FvObj.BlockSizeList:
+                Sum += Item[0] * Item[1]
+            if self.Size < Sum:
+                EdkLogger.error("GenFds", GENFDS_ERROR, "Total Size of FV %s 0x%x is larger than Region Size 0x%x "
+                                %(FvObj.UiFvName, Sum, self.Size))
+            # check whether the BlockStatements in FV section is appropriate
+            ExpectedListData = ''
+            for Item in ExpectedList:
+                ExpectedListData += "BlockSize = 0x%x\n\tNumBlocks = 0x%x\n\t"%Item 
+            Index = 0
+            for Item in FvObj.BlockSizeList:
+                if Item[0] != ExpectedList[Index][0]:
+                    EdkLogger.error("GenFds", GENFDS_ERROR, "BlockStatements of FV %s are not align with FD's, suggested FV BlockStatement"
+                                    %FvObj.UiFvName, ExtraData = ExpectedListData)
+                elif Item[1] != ExpectedList[Index][1]:
+                    if (Item[1] < ExpectedList[Index][1]) and (Index == len(FvObj.BlockSizeList) - 1):
+                        break;
+                    else:
+                        EdkLogger.error("GenFds", GENFDS_ERROR, "BlockStatements of FV %s are not align with FD's, suggested FV BlockStatement"
+                                        %FvObj.UiFvName, ExtraData = ExpectedListData)
+                else:
+                    Index += 1
 
-            if self.Offset < Offset :
-                if Offset - self.Offset < self.Size:
-                    EdkLogger.error("GenFds", GENFDS_ERROR,
-                                    "Region at Offset 0x%X can NOT fit into Block array with BlockSize %X" \
-                                    % (self.Offset, item[0]))
-                BlockSize = item[0]
-                GenFdsGlobalVariable.VerboseLogger ("BlockSize = %X" %BlockSize)
-                return BlockSize
-        return BlockSize
-
-    ## BlockNumOfRegion()
-    #
-    #   @param  BlockSize            block size of region
-    #   @retval int                  Block number of region
-    #
-    def BlockNumOfRegion (self, BlockSize):
-        if BlockSize == 0 :
-            EdkLogger.error("GenFds", GENFDS_ERROR, "Region: %s is not in the FD address scope!" % self.Offset)
-        BlockNum = self.Size / BlockSize
-        GenFdsGlobalVariable.VerboseLogger ("BlockNum = 0x%X" %BlockNum)
-        return BlockNum
+            
 

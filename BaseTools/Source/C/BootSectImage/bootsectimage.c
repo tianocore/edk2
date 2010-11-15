@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "fat.h"
 #include "mbr.h"
 #include "EfiUtilityMsgs.h"
+#include "ParseInf.h"
 
 #define DEBUG_WARN  0x1
 #define DEBUG_ERROR 0x2
@@ -845,7 +846,9 @@ main (
   BOOLEAN ProcessMbr;    // -m
   BOOLEAN DoParse;       // -p SrcImage or -g SrcImage DstImage
   BOOLEAN Verbose;       // -v
-  
+  UINT64  LogLevel;
+  EFI_STATUS EfiStatus;
+
   SrcImage = DstImage = NULL;
   ForcePatch = FALSE;
   ProcessMbr = FALSE;
@@ -886,6 +889,23 @@ main (
       ProcessMbr = TRUE;
     } else if (strcmp (*argv, "-v") == 0 || strcmp (*argv, "--verbose") == 0) {
       Verbose    = TRUE;
+    } else if ((stricmp (*argv, "-d") == 0) || (stricmp (*argv, "--debug") == 0)) {
+      argc--; argv++;
+      if (argc < 1) {
+        Usage ();
+        return -1;
+      }
+      EfiStatus = AsciiStringToUint64 (*argv, FALSE, &LogLevel);
+      if (EFI_ERROR (EfiStatus)) {
+        Error (NULL, 0, 1003, "Invalid option value", "%s = %s", "--debug", *argv);
+        return 1;
+      }
+      if (LogLevel > 9) {
+        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0-9, currnt input level is %d", (int) LogLevel);
+        return 1;
+      }
+      SetPrintLevel (LogLevel);
+      DebugMsg (NULL, 0, 9, "Debug Mode Set", "Debug Output Mode Level %s is set!", *argv);
     } else {
       Usage ();
       return -1;

@@ -351,16 +351,14 @@ class GenFds :
             FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(GenFds.OnlyGenerateThisFv.upper())
             if FvObj != None:
                 Buffer = StringIO.StringIO()
-                # Get FV base Address
-                FvObj.AddToBuffer(Buffer, None, GenFds.GetFvBlockSize(FvObj))
+                FvObj.AddToBuffer(Buffer)
                 Buffer.close()
                 return
         elif GenFds.OnlyGenerateThisFv == None:
             for FvName in GenFdsGlobalVariable.FdfParser.Profile.FvDict.keys():
                 Buffer = StringIO.StringIO('')
                 FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict[FvName]
-                # Get FV base Address
-                FvObj.AddToBuffer(Buffer, None, GenFds.GetFvBlockSize(FvObj))
+                FvObj.AddToBuffer(Buffer)
                 Buffer.close()
         
         if GenFds.OnlyGenerateThisFv == None and GenFds.OnlyGenerateThisFd == None:
@@ -453,7 +451,12 @@ class GenFds :
             TotalSizeValue = long(FvSpaceInfo[1], 0)
             UsedSizeValue = long(FvSpaceInfo[2], 0)
             FreeSizeValue = long(FvSpaceInfo[3], 0)
-            GenFdsGlobalVariable.InfLogger(Name + ' ' + '[' + str((UsedSizeValue+0.0)/TotalSizeValue)[0:4].lstrip('0.') + '%Full] ' + str(TotalSizeValue) + ' total, ' + str(UsedSizeValue) + ' used, ' + str(FreeSizeValue) + ' free')
+            if UsedSizeValue == TotalSizeValue:
+                Percentage = '100'
+            else:
+                Percentage = str((UsedSizeValue+0.0)/TotalSizeValue)[0:4].lstrip('0.') 
+            
+            GenFdsGlobalVariable.InfLogger(Name + ' ' + '[' + Percentage + '%Full] ' + str(TotalSizeValue) + ' total, ' + str(UsedSizeValue) + ' used, ' + str(FreeSizeValue) + ' free')
 
     ## PreprocessImage()
     #

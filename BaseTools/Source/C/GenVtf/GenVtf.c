@@ -105,23 +105,22 @@ ConvertVersionInfo (
 /*++
 Routine Description:
 
-  This function converts GUID string to GUID
+  This function split version to major version and minor version
 
 Arguments:
 
   Str      - String representing in form XX.XX
-  MajorVer - The major vertion
-  MinorVer - The minor vertion
+  MajorVer - The major version
+  MinorVer - The minor version
 
 Returns:
 
-  EFI_SUCCESS  - The fuction completed successfully.
+  EFI_SUCCESS  - The function completed successfully.
 
 --*/
 {
   CHAR8  StrPtr[40];
   CHAR8  *Token;
-  UINTN  Length;
   unsigned Major;
   unsigned Minor;
 
@@ -135,10 +134,9 @@ Returns:
     Token = strtok (NULL, ".");
   }
 
-  Length = strlen (StrPtr);
   sscanf (
     StrPtr,
-    "%01x%02x",
+    "%02d%02d",
     &Major,
     &Minor
     );

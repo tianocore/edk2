@@ -999,7 +999,7 @@ class Build():
                 EdkLogger.error("build", FILE_DELETE_FAILURE, ExtraData=str(X))
         return True
 
-    ## Rebase module image and Get function address for the inpug module list.
+    ## Rebase module image and Get function address for the input module list.
     #
     def _RebaseModule (self, MapBuffer, BaseAddress, ModuleList, AddrIsOffset = True, ModeIsSmm = False):
         if ModeIsSmm:
@@ -1786,7 +1786,8 @@ def Main():
     else:
         GlobalData.gIsWindows = False
 
-    EdkLogger.quiet(time.strftime("%H:%M:%S, %b.%d %Y ", time.localtime()) + "[%s]\n" % platform.platform())
+    EdkLogger.quiet("Build environment: %s" % platform.platform())
+    EdkLogger.quiet(time.strftime("Build start time: %H:%M:%S, %b.%d %Y\n", time.localtime()));
     ReturnCode = 0
     MyBuild = None
     try:
@@ -1918,8 +1919,9 @@ def Main():
         MyBuild.BuildReport.GenerateReport(BuildDuration)
         MyBuild.Db.Close()
     EdkLogger.SetLevel(EdkLogger.QUIET)
-    EdkLogger.quiet("\n- %s -\n%s [%s]" % (Conclusion, time.strftime("%H:%M:%S, %b.%d %Y", time.localtime()), BuildDuration))
-
+    EdkLogger.quiet("\n- %s -" % Conclusion)
+    EdkLogger.quiet(time.strftime("Build end time: %H:%M:%S, %b.%d %Y", time.localtime()))
+    EdkLogger.quiet("Build total time: %s\n" % BuildDuration)
     return ReturnCode
 
 if __name__ == '__main__':

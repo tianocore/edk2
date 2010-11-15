@@ -364,7 +364,7 @@
         $(MAKE_FILE)
 
     <Command.MSFT, Command.INTEL>
-        "$(ASLCC)" /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(ASLCC_FLAGS) $(INC) ${src}
+        "$(ASLCC)" /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASLCC_FLAGS) $(INC) ${src}
         "$(ASLDLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
         "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
 
@@ -384,7 +384,7 @@
         $(MAKE_FILE)
 
     <Command.MSFT, Command.INTEL>
-        "$(ASLCC)" /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(ASLCC_FLAGS) $(INC) ${src}
+        "$(ASLCC)" /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASLCC_FLAGS) $(INC) ${src}
         "$(ASLDLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
         "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
 

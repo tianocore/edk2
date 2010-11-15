@@ -135,7 +135,9 @@ class VpdInfoFile:
             fd.write(FILE_COMMENT_TEMPLATE)
 
             # write each of PCD in VPD type
-            for Pcd in self._VpdArray.keys():
+            Pcds = self._VpdArray.keys()
+            Pcds.sort()
+            for Pcd in Pcds:
                 for Offset in self._VpdArray[Pcd]:
                     PcdValue = str(Pcd.SkuInfoList[Pcd.SkuInfoList.keys()[0]].DefaultValue).strip()
                     if PcdValue == "" :

@@ -235,10 +235,13 @@ ProcessBsOrMbr (
   } 
   
   //Process Floppy Disk
-  OutputFile = fopen(OutputInfo->PhysicalPath, "w");
+  OutputFile = fopen(OutputInfo->PhysicalPath, "r+");
   if (OutputFile == NULL) {
-    return ErrorFileReadWrite;
-  }  
+    OutputFile = fopen(OutputInfo->PhysicalPath, "w");
+    if (OutputFile == NULL) {
+      return ErrorFileReadWrite;
+    }
+  }
   
   if (OutputInfo->Type != PathFile) {
     if (ProcessMbr) {

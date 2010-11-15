@@ -284,6 +284,65 @@ def CreateCFileStringValue(Value):
 
     return Str
 
+## GetFilteredLanguage
+#
+# apply get best language rules to the UNI language code list
+#
+# @param UniLanguageList:  language code definition list in *.UNI file
+# @param LanguageFilterList:  language code filter list of RFC4646 format in DSC file
+#
+# @retval UniLanguageListFiltered:   the filtered language code
+#
+def GetFilteredLanguage(UniLanguageList, LanguageFilterList):
+    UniLanguageListFiltered = []
+    # if filter list is empty, then consider there is no filter
+    if LanguageFilterList == []:
+        UniLanguageListFiltered = UniLanguageList
+        return UniLanguageListFiltered
+    for Language in LanguageFilterList:
+        # first check for exact match
+        if Language in UniLanguageList:
+            if Language not in UniLanguageListFiltered:
+                UniLanguageListFiltered += [Language]
+        # find the first one with the same/equivalent primary tag
+        else:
+            if Language.find('-') != -1:
+                PrimaryTag = Language[0:Language.find('-')].lower()
+            else:
+                PrimaryTag = Language
+            
+            if len(PrimaryTag) == 3:
+                PrimaryTag = LangConvTable.get(PrimaryTag)
+            
+            for UniLanguage in UniLanguageList:
+                if UniLanguage.find('-') != -1:
+                    UniLanguagePrimaryTag = UniLanguage[0:UniLanguage.find('-')].lower()
+                else:
+                    UniLanguagePrimaryTag = UniLanguage
+                
+                if len(UniLanguagePrimaryTag) == 3:
+                    UniLanguagePrimaryTag = LangConvTable.get(UniLanguagePrimaryTag)
+
+                if PrimaryTag == UniLanguagePrimaryTag:
+                    if UniLanguage not in UniLanguageListFiltered:
+                        UniLanguageListFiltered += [UniLanguage]    
+                    break
+            else:
+                # Here is rule 3 for "get best language"
+                # If tag is not listed in the Unicode file, the default ("en") tag should be used for that language
+                # for better processing, find the one that best suit for it.
+                DefaultTag = 'en'
+                if DefaultTag not in UniLanguageListFiltered:
+                    # check whether language code with primary code equivalent with DefaultTag already in the list, if so, use that
+                    for UniLanguage in UniLanguageList:
+                        if UniLanguage.startswith('en-') or UniLanguage.startswith('eng-'):
+                            if UniLanguage not in UniLanguageListFiltered:
+                                UniLanguageListFiltered += [UniLanguage]
+                            break
+                    else:
+                        UniLanguageListFiltered += [DefaultTag]
+    return  UniLanguageListFiltered
+
 
 ## Create content of .c file
 #
@@ -293,10 +352,11 @@ def CreateCFileStringValue(Value):
 # @param UniObjectClass   A UniObjectClass instance
 # @param IsCompatibleMode Compatible mode
 # @param UniBinBuffer     UniBinBuffer to contain UniBinary data.
+# @param FilterInfo       Platform language filter information 
 #
 # @retval Str:           A string of .c file content
 #
-def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer=None):
+def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer, FilterInfo):
     #
     # Init array length
     #
@@ -304,13 +364,29 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer=
     Str = ''
     Offset = 0
 
+    EDK2Module = FilterInfo[0]
+    if EDK2Module:
+        LanguageFilterList = FilterInfo[1]
+    else:
+        # EDK module is using ISO639-2 format filter, convert to the RFC4646 format
+        LanguageFilterList = [LangConvTable.get(F.lower()) for F in FilterInfo[1]]
+    
+    UniLanguageList = []
+    for IndexI in range(len(UniObjectClass.LanguageDef)):
+        UniLanguageList += [UniObjectClass.LanguageDef[IndexI][0]]           
+
+    UniLanguageListFiltered = GetFilteredLanguage(UniLanguageList, LanguageFilterList)
+ 
+        
     #
     # Create lines for each language's strings
     #
     for IndexI in range(len(UniObjectClass.LanguageDef)):
         Language = UniObjectClass.LanguageDef[IndexI][0]
         LangPrintName = UniObjectClass.LanguageDef[IndexI][1]
-
+        if Language not in UniLanguageListFiltered:
+            continue
+        
         StringBuffer = StringIO()
         StrStringValue = ''
         ArrayLength = 0
@@ -428,13 +504,14 @@ def CreateCFileEnd():
 # @param BaseName:        The basename of strings
 # @param UniObjectClass   A UniObjectClass instance
 # @param IsCompatibleMode Compatible Mode
+# @param FilterInfo       Platform language filter information 
 #
-# @retval CFile:         A string of complete .c file
+# @retval CFile:          A string of complete .c file
 #
-def CreateCFile(BaseName, UniObjectClass, IsCompatibleMode):
+def CreateCFile(BaseName, UniObjectClass, IsCompatibleMode, FilterInfo):
     CFile = ''
     #CFile = WriteLine(CFile, CreateCFileHeader())
-    CFile = WriteLine(CFile, CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode))
+    CFile = WriteLine(CFile, CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, None, FilterInfo))
     CFile = WriteLine(CFile, CreateCFileEnd())
     return CFile
 
@@ -518,7 +595,7 @@ def SearchString(UniObjectClass, FileList, IsCompatibleMode):
 # This function is used for UEFI2.1 spec
 #
 #
-def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, SkipList, BaseName, IsCompatibleMode = False, ShellMode = False, UniGenCFlag = True, UniGenBinBuffer = None):
+def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, SkipList, BaseName, IsCompatibleMode = False, ShellMode = False, UniGenCFlag = True, UniGenBinBuffer = None, FilterInfo = [True, []]):
     Status = True
     ErrorMessage = ''
 
@@ -540,9 +617,9 @@ def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, Ski
     HFile = CreateHFile(BaseName, Uni, IsCompatibleMode, UniGenCFlag)
     CFile = None
     if IsCompatibleMode or UniGenCFlag:
-        CFile = CreateCFile(BaseName, Uni, IsCompatibleMode)
+        CFile = CreateCFile(BaseName, Uni, IsCompatibleMode, FilterInfo)
     if UniGenBinBuffer:
-        CreateCFileContent(BaseName, Uni, IsCompatibleMode, UniGenBinBuffer)
+        CreateCFileContent(BaseName, Uni, IsCompatibleMode, UniGenBinBuffer, FilterInfo)
 
     return HFile, CFile
 

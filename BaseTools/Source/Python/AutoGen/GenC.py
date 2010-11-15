@@ -1860,8 +1860,10 @@ def CreateUnicodeStringCode(Info, AutoGenC, AutoGenH, UniGenCFlag, UniGenBinBuff
 
     IncList = [Info.MetaFile.Dir]
     # Get all files under [Sources] section in inf file for EDK-II module
+    EDK2Module = True
     SrcList = [F for F in Info.SourceFileList]
     if Info.AutoGenVersion < 0x00010005:
+        EDK2Module = False
         # Get all files under the module directory for EDK-I module
         Cwd = os.getcwd()
         os.chdir(Info.MetaFile.Dir)
@@ -1883,7 +1885,7 @@ def CreateUnicodeStringCode(Info, AutoGenC, AutoGenH, UniGenCFlag, UniGenBinBuff
         CompatibleMode = False
 
     #
-    # -s is a temporary option dedicated for building .UNI files with ISO 639-2 lanauge codes of EDK Shell in EDK2
+    # -s is a temporary option dedicated for building .UNI files with ISO 639-2 language codes of EDK Shell in EDK2
     #
     if 'BUILD' in Info.BuildOption and Info.BuildOption['BUILD']['FLAGS'].find('-s') > -1:
         if CompatibleMode:
@@ -1894,7 +1896,12 @@ def CreateUnicodeStringCode(Info, AutoGenC, AutoGenH, UniGenCFlag, UniGenBinBuff
     else:
         ShellMode = False
 
-    Header, Code = GetStringFiles(Info.UnicodeFileList, SrcList, IncList, Info.IncludePathList, ['.uni', '.inf'], Info.Name, CompatibleMode, ShellMode, UniGenCFlag, UniGenBinBuffer)
+    #RFC4646 is only for EDKII modules and ISO639-2 for EDK modules
+    if EDK2Module:
+        FilterInfo = [EDK2Module] + [Info.PlatformInfo.Platform.RFCLanguages]
+    else:
+        FilterInfo = [EDK2Module] + [Info.PlatformInfo.Platform.ISOLanguages]
+    Header, Code = GetStringFiles(Info.UnicodeFileList, SrcList, IncList, Info.IncludePathList, ['.uni', '.inf'], Info.Name, CompatibleMode, ShellMode, UniGenCFlag, UniGenBinBuffer, FilterInfo)
     if CompatibleMode or UniGenCFlag:
         AutoGenC.Append("\n//\n//Unicode String Pack Definition\n//\n")
         AutoGenC.Append(Code)

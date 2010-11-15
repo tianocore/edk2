@@ -1,7 +1,7 @@
 ## @file
 # Common routines used by all tools
 #
-# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -28,7 +28,7 @@ from UserList import UserList
 
 from Common import EdkLogger as EdkLogger
 from Common import GlobalData as GlobalData
-
+from DataType import *
 from BuildToolError import *
 
 ## Regular expression used to find out place holders in string template
@@ -1165,6 +1165,93 @@ def ParseConsoleLog(Filename):
 
     Opr.close()
     Opw.close()
+
+## AnalyzePcdData
+#
+#  Analyze the pcd Value, Datum type and TokenNumber.
+#  Used to avoid split issue while the value string contain "|" character
+#
+#  @param[in] Setting:  A String contain value/datum type/token number information;
+#  
+#  @retval   ValueList: A List contain value, datum type and toke number. 
+#
+def AnalyzePcdData(Setting):   
+    ValueList = ['', '', '']    
+    
+    ValueRe  = re.compile(r'^\s*L?\".*\|.*\"')
+    PtrValue = ValueRe.findall(Setting)
+    
+    ValueUpdateFlag = False
+    
+    if len(PtrValue) >= 1:
+        Setting = re.sub(ValueRe, '', Setting)
+        ValueUpdateFlag = True   
+
+    TokenList = Setting.split(TAB_VALUE_SPLIT)
+    ValueList[0:len(TokenList)] = TokenList
+    
+    if ValueUpdateFlag:
+        ValueList[0] = PtrValue[0]
+        
+    return ValueList   
+ 
+## AnalyzeHiiPcdData
+#
+#  Analyze the pcd Value, variable name, variable Guid and variable offset.
+#  Used to avoid split issue while the value string contain "|" character
+#
+#  @param[in] Setting:  A String contain VariableName, VariableGuid, VariableOffset, DefaultValue information;
+#  
+#  @retval   ValueList: A List contaian VariableName, VariableGuid, VariableOffset, DefaultValue. 
+#
+def AnalyzeHiiPcdData(Setting):   
+    ValueList = ['', '', '', '']    
+    
+    ValueRe  = re.compile(r'^\s*L?\".*\|.*\"')
+    PtrValue = ValueRe.findall(Setting)
+    
+    ValueUpdateFlag = False
+    
+    if len(PtrValue) >= 1:
+        Setting = re.sub(ValueRe, '', Setting)
+        ValueUpdateFlag = True   
+
+    TokenList = Setting.split(TAB_VALUE_SPLIT)
+    ValueList[0:len(TokenList)] = TokenList
+    
+    if ValueUpdateFlag:
+        ValueList[0] = PtrValue[0]
+        
+    return ValueList     
+
+## AnalyzeVpdPcdData
+#
+#  Analyze the vpd pcd Value, Datum type and TokenNumber.
+#  Used to avoid split issue while the value string contain "|" character
+#
+#  @param[in] Setting:  A String contain value/datum type/token number information;
+#  
+#  @retval   ValueList: A List contain value, datum type and toke number. 
+#
+def AnalyzeVpdPcdData(Setting):   
+    ValueList = ['', '', '']    
+    
+    ValueRe  = re.compile(r'\s*L?\".*\|.*\"\s*$')
+    PtrValue = ValueRe.findall(Setting)
+    
+    ValueUpdateFlag = False
+    
+    if len(PtrValue) >= 1:
+        Setting = re.sub(ValueRe, '', Setting)
+        ValueUpdateFlag = True   
+
+    TokenList = Setting.split(TAB_VALUE_SPLIT)
+    ValueList[0:len(TokenList)] = TokenList
+    
+    if ValueUpdateFlag:
+        ValueList[2] = PtrValue[0]
+        
+    return ValueList     
 
 ## check format of PCD value against its the datum type
 #

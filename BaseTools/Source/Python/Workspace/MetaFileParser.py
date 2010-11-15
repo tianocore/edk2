@@ -1209,7 +1209,19 @@ class DecParser(MetaFileParser):
                                       " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
                             File=self.MetaFile, Line=self._LineIndex+1)
 
-        ValueList = GetSplitValueList(TokenList[1])
+        
+        ValueRe  = re.compile(r'^\s*L?\".*\|.*\"')
+        PtrValue = ValueRe.findall(TokenList[1])
+        
+        # Has VOID* type string, may contain "|" character in the string. 
+        if len(PtrValue) != 0:
+            ptrValueList = re.sub(ValueRe, '', TokenList[1])
+            ValueList    = GetSplitValueList(ptrValueList)
+            ValueList[0] = PtrValue[0]
+        else:
+            ValueList = GetSplitValueList(TokenList[1])
+            
+        
         # check if there's enough datum information given
         if len(ValueList) != 3:
             EdkLogger.error('Parser', FORMAT_INVALID, "Invalid PCD Datum information given",
