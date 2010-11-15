@@ -703,7 +703,10 @@ ProcessCumulative(
   VOID
 )
 {
-  UINT64                    Avgval;         // the computed average duration
+  UINT64                    AvgDur;         // the computed average duration
+  UINT64                    Dur;
+  UINT64                    MinDur;
+  UINT64                    MaxDur;
   EFI_STRING                StringPtr;
   UINTN                     TIndex;
   EFI_STRING                StringPtrUnknown;
@@ -720,14 +723,19 @@ ProcessCumulative(
   PrintToken (STRING_TOKEN (STR_DP_DASHES));
 
   for ( TIndex = 0; TIndex < NumCum; ++TIndex) {
-    Avgval = DivU64x32 (CumData[TIndex].Duration, CumData[TIndex].Count);
+    AvgDur = DivU64x32 (CumData[TIndex].Duration, CumData[TIndex].Count);
+    AvgDur = DurationInMicroSeconds(AvgDur);
+    Dur    = DurationInMicroSeconds(CumData[TIndex].Duration);
+    MaxDur = DurationInMicroSeconds(CumData[TIndex].MaxDur);
+    MinDur = DurationInMicroSeconds(CumData[TIndex].MinDur);
+    
     PrintToken (STRING_TOKEN (STR_DP_CUMULATIVE_STATS),
                 CumData[TIndex].Name,
                 CumData[TIndex].Count,
-                DurationInMicroSeconds(CumData[TIndex].Duration),
-                DurationInMicroSeconds(Avgval),
-                DurationInMicroSeconds(CumData[TIndex].MinDur),
-                DurationInMicroSeconds(CumData[TIndex].MaxDur)
+                Dur,
+                AvgDur,
+                MinDur,
+                MaxDur
                );
   }
 }
