@@ -320,7 +320,7 @@ HiiSetToDefaults (
                     If it is NULL, all current configurations for the
                     entirety of the current HII database will be validated.
   
-  @retval TURE    The current configuration is valid.
+  @retval TRUE    The current configuration is valid.
   @retval FALSE   The current configuration is invalid.
 **/
 BOOLEAN

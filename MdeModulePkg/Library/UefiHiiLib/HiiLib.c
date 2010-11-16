@@ -2032,7 +2032,7 @@ Done:
                     If it is NULL, all current configuration for the
                     entirety of the current HII database will be validated.
   
-  @retval TURE    Current configuration is valid.
+  @retval TRUE    Current configuration is valid.
   @retval FALSE   Current configuration is invalid.
 **/
 BOOLEAN
