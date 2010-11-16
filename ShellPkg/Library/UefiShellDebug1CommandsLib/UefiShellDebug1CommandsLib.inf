@@ -1,0 +1,84 @@
+##  @file
+# Provides shell Debug1 profile functions
+#
+# Copyright (c) 2010, Intel Corporation.All rights reserved. <BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiShellDebug1CommandsLib
+  FILE_GUID                      = 90330D51-A99B-4cc8-A2EB-AE22542A3F45
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = UefiShellDebug1CommandsLibConstructor
+  DESTRUCTOR                     = UefiShellDebug1CommandsLibDestructor
+
+[Sources]
+  SetSize.c
+  Comp.c
+  Mode.c
+  MemMap.c
+  Compress.h
+  Compress.c
+  EfiCompress.c
+  EfiDecompress.c
+  Dmem.c
+  LoadPciRom.c
+  Mm.c
+  SetVar.c
+  SerMode.c
+  Bcfg.c
+  Pci.c
+  Pci.h
+  DmpStore.c
+  Dblk.c
+  ./SmbiosView/EventLogInfo.c
+  ./SmbiosView/PrintInfo.c
+  ./SmbiosView/QueryTable.c
+  ./SmbiosView/SmbiosView.c
+  ./SmbiosView/Smbios.c
+  ./SmbiosView/SmbiosViewStrings.uni
+  ./SmbiosView/LibSmbiosView.c
+  UefiShellDebug1CommandsLib.c
+  UefiShellDebug1CommandsLib.h
+  UefiShellDebug1CommandsLib.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellCommandLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  SortLib
+  PrintLib
+
+[Pcd]
+  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask        # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize  # ALWAYS_CONSUMED
+
+[Protocols]
+  gEfiPciRootBridgeIoProtocolGuid
+  gEfiBlockIoProtocolGuid
+
+[Guids]
+  gEfiGlobalVariableGuid
+  gEfiSmbiosTableGuid
+
