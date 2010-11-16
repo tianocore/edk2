@@ -105,6 +105,10 @@ typedef struct {
   EFI_SHELL_PARAMETERS_PROTOCOL *OldShellParameters;  ///< old shell parameters to reinstall upon exiting.
   SHELL_PROTOCOL_HANDLE_LIST    OldShellList;         ///< List of other instances to reinstall when closing.
   SPLIT_LIST                    SplitList;            ///< List of Splits in FILO stack.
+  EFI_HANDLE                    CtrlCNotifyHandle1;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  EFI_HANDLE                    CtrlCNotifyHandle2;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  EFI_HANDLE                    CtrlCNotifyHandle3;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  EFI_HANDLE                    CtrlCNotifyHandle4;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
 } SHELL_INFO;
 
 extern SHELL_INFO ShellInfoObject;

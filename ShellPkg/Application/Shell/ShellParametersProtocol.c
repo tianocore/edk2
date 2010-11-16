@@ -14,6 +14,7 @@
 **/
 
 #include "ShellParametersProtocol.h"
+#include "ConsoleWrappers.h"
 
 /**
   return the next parameter from a command line string;
@@ -423,13 +424,14 @@ CleanUpShellParametersProtocol (
   structure by parsing NewCommandLine.  The current values are returned to the
   user.
 
-  If OldStdIn or OldStdOut is NULL then that value is not returned.
+  This will also update the system table.
 
   @param[in,out] ShellParameters        Pointer to parameter structure to modify.
   @param[in] NewCommandLine             The new command line to parse and use.
   @param[out] OldStdIn                  Pointer to old StdIn.
   @param[out] OldStdOut                 Pointer to old StdOut.
   @param[out] OldStdErr                 Pointer to old StdErr.
+  @param[out] SystemTableInfo           Pointer to old system table information.
 
   @retval   EFI_SUCCESS                 Operation was sucessful, Argv and Argc are valid.
   @retval   EFI_OUT_OF_RESOURCES        A memory allocation failed.
@@ -441,7 +443,8 @@ UpdateStdInStdOutStdErr(
   IN CONST CHAR16                       *NewCommandLine,
   OUT SHELL_FILE_HANDLE                 *OldStdIn,
   OUT SHELL_FILE_HANDLE                 *OldStdOut,
-  OUT SHELL_FILE_HANDLE                 *OldStdErr
+  OUT SHELL_FILE_HANDLE                 *OldStdErr,
+  OUT SYSTEM_TABLE_INFO                 *SystemTableInfo
   )
 {
   CHAR16            *CommandLineCopy;
@@ -464,7 +467,6 @@ UpdateStdInStdOutStdErr(
   CHAR16            TagBuffer[2];
   SPLIT_LIST        *Split;
 
-  ASSERT(ShellParameters != NULL);
   OutUnicode      = TRUE;
   InUnicode       = TRUE;
   ErrUnicode      = TRUE;
@@ -478,15 +480,19 @@ UpdateStdInStdOutStdErr(
   OutAppend       = FALSE;
   CommandLineCopy = NULL;
 
-  if (OldStdIn != NULL) {
-    *OldStdIn = ShellParameters->StdIn;
+  if (ShellParameters == NULL || SystemTableInfo == NULL || OldStdIn == NULL || OldStdOut == NULL || OldStdErr == NULL) {
+    return (EFI_INVALID_PARAMETER);
   }
-  if (OldStdOut != NULL) {
-    *OldStdOut = ShellParameters->StdOut;
-  }
-  if (OldStdErr != NULL) {
-    *OldStdErr = ShellParameters->StdErr;
-  }
+
+  SystemTableInfo->ConIn          = gST->ConIn;
+  SystemTableInfo->ConInHandle    = gST->ConsoleInHandle;
+  SystemTableInfo->ConOut         = gST->ConOut;
+  SystemTableInfo->ConOutHandle   = gST->ConsoleOutHandle;
+  SystemTableInfo->ConErr         = gST->StdErr;
+  SystemTableInfo->ConErrHandle   = gST->StandardErrorHandle;
+  *OldStdIn                       = ShellParameters->StdIn;
+  *OldStdOut                      = ShellParameters->StdOut;
+  *OldStdErr                      = ShellParameters->StdErr;
 
   if (NewCommandLine == NULL) {
     return (EFI_SUCCESS);
@@ -726,6 +732,7 @@ UpdateStdInStdOutStdErr(
         }
         if (!EFI_ERROR(Status)) {
           ShellParameters->StdErr = TempHandle;
+          gST->StdErr = CreateSimpleTextOutOnFile(TempHandle, &gST->StandardErrorHandle);
         }
       }
 
@@ -766,6 +773,7 @@ UpdateStdInStdOutStdErr(
           }
           if (!EFI_ERROR(Status)) {
             ShellParameters->StdOut = TempHandle;
+            gST->ConOut = CreateSimpleTextOutOnFile(TempHandle, &gST->ConsoleOutHandle);
           }
         }
       }
@@ -787,6 +795,7 @@ UpdateStdInStdOutStdErr(
           ASSERT(TempHandle != NULL);
         }
         ShellParameters->StdOut = TempHandle;
+        gST->ConOut = CreateSimpleTextOutOnFile(TempHandle, &gST->ConsoleOutHandle);
       }
 
       //
@@ -806,6 +815,7 @@ UpdateStdInStdOutStdErr(
           ASSERT(TempHandle != NULL);
         }
         ShellParameters->StdErr = TempHandle;
+        gST->StdErr = CreateSimpleTextOutOnFile(TempHandle, &gST->StandardErrorHandle);
       }
 
       //
@@ -822,6 +832,7 @@ UpdateStdInStdOutStdErr(
           Status = EFI_INVALID_PARAMETER;
         } else {
           ShellParameters->StdIn = TempHandle;
+          gST->ConIn = CreateSimpleTextInOnFile(TempHandle, &gST->ConsoleInHandle);
         }
       }
 
@@ -839,11 +850,16 @@ UpdateStdInStdOutStdErr(
         }
         if (!EFI_ERROR(Status)) {
           ShellParameters->StdIn = TempHandle;
+          gST->ConIn = CreateSimpleTextInOnFile(TempHandle, &gST->ConsoleInHandle);
         }
       }
     }
   }
   FreePool(CommandLineCopy);
+
+  if (gST->ConIn == NULL ||gST->ConOut == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
   return (Status);
 }
 
@@ -851,38 +867,69 @@ UpdateStdInStdOutStdErr(
   Funcion will replace the current StdIn and StdOut in the ShellParameters protocol
   structure with StdIn and StdOut.  The current values are de-allocated.
 
-  @param[in,out] ShellParameters       pointer to parameter structure to modify
-  @param[out] OldStdIn                 Pointer to old StdIn.
-  @param[out] OldStdOut                Pointer to old StdOut.
-  @param[out] OldStdErr                Pointer to old StdErr.
+  @param[in,out] ShellParameters      Pointer to parameter structure to modify.
+  @param[in] OldStdIn                 Pointer to old StdIn.
+  @param[in] OldStdOut                Pointer to old StdOut.
+  @param[in] OldStdErr                Pointer to old StdErr.
+  @param[in] SystemTableInfo          Pointer to old system table information.
 **/
 EFI_STATUS
 EFIAPI
 RestoreStdInStdOutStdErr (
   IN OUT EFI_SHELL_PARAMETERS_PROTOCOL  *ShellParameters,
-  OUT SHELL_FILE_HANDLE                 *OldStdIn OPTIONAL,
-  OUT SHELL_FILE_HANDLE                 *OldStdOut OPTIONAL,
-  OUT SHELL_FILE_HANDLE                 *OldStdErr OPTIONAL
+  IN  SHELL_FILE_HANDLE                 *OldStdIn,
+  IN  SHELL_FILE_HANDLE                 *OldStdOut,
+  IN  SHELL_FILE_HANDLE                 *OldStdErr,
+  IN  SYSTEM_TABLE_INFO                 *SystemTableInfo
   )
 {
   SPLIT_LIST        *Split;
+
+  if (ShellParameters == NULL 
+    ||OldStdIn        == NULL
+    ||OldStdOut       == NULL
+    ||OldStdErr       == NULL
+    ||SystemTableInfo == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
   if (!IsListEmpty(&ShellInfoObject.SplitList.Link)) {
     Split = (SPLIT_LIST*)GetFirstNode(&ShellInfoObject.SplitList.Link);
   } else {
     Split = NULL;
   }
-  if (OldStdIn  != NULL && ShellParameters->StdIn  != *OldStdIn) {
+  if (ShellParameters->StdIn  != *OldStdIn) {
     if ((Split != NULL && Split->SplitStdIn != ShellParameters->StdIn) || Split == NULL) {
       gEfiShellProtocol->CloseFile(ShellParameters->StdIn);
     }
-    ShellParameters->StdIn = OldStdIn==NULL?NULL:*OldStdIn;
+    ShellParameters->StdIn = *OldStdIn;
   }
-  if (OldStdOut != NULL && ShellParameters->StdOut != *OldStdOut) {
+  if (ShellParameters->StdOut != *OldStdOut) {
     if ((Split != NULL && Split->SplitStdOut != ShellParameters->StdOut) || Split == NULL) {
       gEfiShellProtocol->CloseFile(ShellParameters->StdOut);
     }
-    ShellParameters->StdOut = OldStdOut==NULL?NULL:*OldStdOut;
+    ShellParameters->StdOut = *OldStdOut;
   }
+  if (ShellParameters->StdErr != *OldStdErr) {
+    gEfiShellProtocol->CloseFile(ShellParameters->StdErr);
+    ShellParameters->StdErr = *OldStdErr;
+  }
+
+  if (gST->ConIn != SystemTableInfo->ConIn) {
+    CloseSimpleTextInOnFile(gST->ConIn);
+    gST->ConIn                = SystemTableInfo->ConIn;
+    gST->ConsoleInHandle      = SystemTableInfo->ConInHandle;
+  }
+  if (gST->ConOut != SystemTableInfo->ConOut) {
+    CloseSimpleTextOutOnFile(gST->ConOut);
+    gST->ConOut               = SystemTableInfo->ConOut;
+    gST->ConsoleOutHandle     = SystemTableInfo->ConOutHandle;
+  }
+  if (gST->StdErr != SystemTableInfo->ConErr) {
+    CloseSimpleTextOutOnFile(gST->StdErr);
+    gST->StdErr               = SystemTableInfo->ConErr;
+    gST->StandardErrorHandle  = SystemTableInfo->ConErrHandle;
+  }
+
   return (EFI_SUCCESS);
 }
 /**

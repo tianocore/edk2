@@ -76,10 +76,19 @@ ConsoleLoggerInstall(
 
   Status = ConsoleLoggerResetBuffers(*ConsoleInfo);
   if (EFI_ERROR(Status)) {
+    SHELL_FREE_NON_NULL((*ConsoleInfo));
+    *ConsoleInfo = NULL;
     return (Status);
   }
 
   Status = gBS->InstallProtocolInterface(&gImageHandle, &gEfiSimpleTextOutProtocolGuid, EFI_NATIVE_INTERFACE, (VOID*)&((*ConsoleInfo)->OurConOut));
+  if (EFI_ERROR(Status)) {
+    SHELL_FREE_NON_NULL((*ConsoleInfo)->Buffer);
+    SHELL_FREE_NON_NULL((*ConsoleInfo)->Attributes);
+    SHELL_FREE_NON_NULL((*ConsoleInfo));
+    *ConsoleInfo = NULL;
+    return (Status);
+  }
 
   (*ConsoleInfo)->OldConOut = gST->ConOut;
   (*ConsoleInfo)->OldConHandle = gST->ConsoleOutHandle;

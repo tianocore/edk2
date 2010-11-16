@@ -13,6 +13,7 @@
 **/
 
 #include <Uefi.h>
+#include <ShellBase.h>
 
 #include <Guid/ShellVariableGuid.h>
 
@@ -23,7 +24,6 @@
 #include <Library/BaseMemoryLib.h>
 
 #include "ShellEnvVar.h"
-
 
 /**
   Reports whether an environment variable is Volatile or Non-Volatile.
@@ -169,18 +169,31 @@ GetEnvironmentVariableList(
     }
     if (!EFI_ERROR(Status) && CompareGuid(&Guid, &gShellVariableGuid)){
       VarList = AllocateZeroPool(sizeof(ENV_VAR_LIST));
-      ValSize = 0;
-      Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(VariableName, &VarList->Atts, &ValSize, VarList->Val);
-      if (Status == EFI_BUFFER_TOO_SMALL){
-        VarList->Val = AllocatePool(ValSize);
-        ASSERT(VarList->Val != NULL);
+      if (VarList == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+      } else {
+        ValSize = 0;
         Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(VariableName, &VarList->Atts, &ValSize, VarList->Val);
-      }
-      if (!EFI_ERROR(Status)) {
-        VarList->Key = AllocatePool(StrSize(VariableName));
-        ASSERT(VarList->Key != NULL);
-        StrCpy(VarList->Key, VariableName);
-        InsertTailList(ListHead, &VarList->Link);
+        if (Status == EFI_BUFFER_TOO_SMALL){
+          VarList->Val = AllocatePool(ValSize);
+          if (VarList->Val == NULL) {
+            SHELL_FREE_NON_NULL(VarList);
+            Status = EFI_OUT_OF_RESOURCES;
+          } else {
+            Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(VariableName, &VarList->Atts, &ValSize, VarList->Val);
+          }
+        }
+        if (!EFI_ERROR(Status)) {
+          VarList->Key = AllocatePool(StrSize(VariableName));
+          if (VarList->Key == NULL) {
+            SHELL_FREE_NON_NULL(VarList->Val);
+            SHELL_FREE_NON_NULL(VarList);
+            Status = EFI_OUT_OF_RESOURCES;
+          } else {
+            StrCpy(VarList->Key, VariableName);
+            InsertTailList(ListHead, &VarList->Link);
+          }
+        }
       }
     } // compare guid
   } // while

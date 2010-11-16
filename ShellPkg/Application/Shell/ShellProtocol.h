@@ -31,6 +31,7 @@
 #include <Protocol/LoadedImage.h>
 #include <Protocol/UnicodeCollation.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/SimpleTextInEx.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseLib.h>
@@ -946,5 +947,17 @@ InternalEfiShellSetEnv(
   IN BOOLEAN Volatile
   );
 
+/**
+  Function to start monitoring for CTRL-C using SimpleTextInputEx.  This 
+  feature's enabled state was not known when the shell initially launched.
+
+  @retval EFI_SUCCESS           The feature is enabled.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough mnemory available.
+**/
+EFI_STATUS
+EFIAPI
+InernalEfiShellStartMonitor(
+  VOID
+  );
 #endif //_SHELL_PROTOCOL_HEADER_
 

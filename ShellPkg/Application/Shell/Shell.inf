@@ -44,6 +44,8 @@
   Shell.uni
   ConsoleLogger.c
   ConsoleLogger.h
+  ConsoleWrappers.c
+  ConsoleWrappers.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -75,12 +77,16 @@
 
 [Protocols]
   gEfiShellProtocolGuid                                   # ALWAYS_PRODUCED
+                                                          # SOMETIMES_CONSUMED
   gEfiShellParametersProtocolGuid                         # ALWAYS_PRODUCED
-  gEfiShellEnvironment2Guid                               # SOMETIMES_PRODUCED
-  gEfiShellInterfaceGuid                                  # SOMETIMES_PRODUCED
+                                                          # SOMETIMES_CONSUMED
+
+#  gEfiShellEnvironment2Guid                               # SOMETIMES_PRODUCED
+#  gEfiShellInterfaceGuid                                  # SOMETIMES_PRODUCED
 
   gEfiLoadedImageProtocolGuid                             # ALWAYS_CONSUMED
   gEfiSimpleTextInputExProtocolGuid                       # ALWAYS_CONSUMED
+  gEfiSimpleTextInProtocolGuid                            # ALWAYS_CONSUMED
   gEfiSimpleTextOutProtocolGuid                           # ALWAYS_CONSUMED
   gEfiSimpleFileSystemProtocolGuid                        # ALWAYS_CONSUMED
   gEfiLoadedImageProtocolGuid                             # ALWAYS_CONSUMED

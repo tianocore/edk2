@@ -52,6 +52,10 @@ SHELL_INFO ShellInfoObject = {
   NULL,
   {0,0,NULL,NULL},
   {0,0},
+  NULL,
+  NULL,
+  NULL,
+  NULL
 };
 
 STATIC CONST CHAR16 mScriptExtension[]      = L".NSH";
@@ -271,9 +275,7 @@ UefiMain (
         //
         // Set up the event for CTRL-C monitoring...
         //
-
-        ///@todo add support for using SimpleInputEx here
-        //  if SimpleInputEx is not available display a warning.
+        Status = InernalEfiShellStartMonitor();
       }
 
       if (!EFI_ERROR(Status) && PcdGet8(PcdShellSupportLevel) >= 1) {
@@ -304,6 +306,11 @@ UefiMain (
           ShellInfoObject.ConsoleInfo->RowCounter = 0;
 
           //
+          // Reset the CTRL-C event (yes we ignore the return values)
+          //
+          Status = gBS->CheckEvent (ShellInfoObject.NewEfiShellProtocol->ExecutionBreak);
+
+          //
           // Display Prompt
           //
           Status = DoShellPrompt();
@@ -319,11 +326,6 @@ UefiMain (
     gBS->CloseEvent(ShellInfoObject.UserBreakTimer);
     DEBUG_CODE(ShellInfoObject.UserBreakTimer = NULL;);
   }
-
-  if (ShellInfoObject.NewEfiShellProtocol->IsRootShell()){
-    ShellInfoObject.NewEfiShellProtocol->SetEnv(L"cwd", L"", TRUE);
-  }
-
   if (ShellInfoObject.ImageDevPath != NULL) {
     FreePool(ShellInfoObject.ImageDevPath);
     DEBUG_CODE(ShellInfoObject.ImageDevPath = NULL;);
@@ -337,6 +339,9 @@ UefiMain (
     DEBUG_CODE(ShellInfoObject.NewShellParametersProtocol = NULL;);
   }
   if (ShellInfoObject.NewEfiShellProtocol != NULL){
+    if (ShellInfoObject.NewEfiShellProtocol->IsRootShell()){
+      ShellInfoObject.NewEfiShellProtocol->SetEnv(L"cwd", L"", TRUE);
+    }
     CleanUpShellProtocol(ShellInfoObject.NewEfiShellProtocol);
     DEBUG_CODE(ShellInfoObject.NewEfiShellProtocol = NULL;);
   }
@@ -1186,6 +1191,7 @@ RunCommand(
   SHELL_FILE_HANDLE         OriginalStdIn;
   SHELL_FILE_HANDLE         OriginalStdOut;
   SHELL_FILE_HANDLE         OriginalStdErr;
+  SYSTEM_TABLE_INFO         OriginalSystemTableInfo;
   CHAR16                    *TempLocation3;
   UINTN                     Count;
   UINTN                     Count2;
@@ -1311,7 +1317,7 @@ RunCommand(
 
 
 
-    Status = UpdateStdInStdOutStdErr(ShellInfoObject.NewShellParametersProtocol, PostVariableCmdLine, &OriginalStdIn, &OriginalStdOut, &OriginalStdErr);
+    Status = UpdateStdInStdOutStdErr(ShellInfoObject.NewShellParametersProtocol, PostVariableCmdLine, &OriginalStdIn, &OriginalStdOut, &OriginalStdErr, &OriginalSystemTableInfo);
     if (EFI_ERROR(Status)) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_REDIR), ShellInfoObject.HiiHandle);
     } else {
@@ -1430,7 +1436,7 @@ RunCommand(
 
       RestoreArgcArgv(ShellInfoObject.NewShellParametersProtocol, &Argv, &Argc);
 
-      RestoreStdInStdOutStdErr(ShellInfoObject.NewShellParametersProtocol, &OriginalStdIn, &OriginalStdOut, &OriginalStdErr);
+      RestoreStdInStdOutStdErr(ShellInfoObject.NewShellParametersProtocol, &OriginalStdIn, &OriginalStdOut, &OriginalStdErr, &OriginalSystemTableInfo);
     }
     if (CommandName != NULL) {
       if (ShellCommandGetCurrentScriptFile() != NULL &&  !IsScriptOnlyCommand(CommandName)) {

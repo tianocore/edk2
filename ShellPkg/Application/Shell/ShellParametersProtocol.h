@@ -21,6 +21,8 @@
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/EfiShellParameters.h>
 #include <Protocol/LoadedImage.h>
+#include <Protocol/SimpleTextOut.h>
+#include <Protocol/SimpleTextIn.h>
 
 #include <Guid/ShellVariableGuid.h>
 
@@ -116,6 +118,15 @@ RestoreArgcArgv(
   IN UINTN                              *OldArgc
   );
 
+typedef struct {
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL        *ConIn;
+  EFI_HANDLE                            ConInHandle;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL       *ConOut;
+  EFI_HANDLE                            ConOutHandle;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL       *ConErr;
+  EFI_HANDLE                            ConErrHandle;
+} SYSTEM_TABLE_INFO;
+
 /**
   Funcion will replace the current StdIn and StdOut in the ShellParameters protocol
   structure by parsing NewCommandLine.  The current values are returned to the
@@ -128,6 +139,7 @@ RestoreArgcArgv(
   @param[out] OldStdIn                  Pointer to old StdIn.
   @param[out] OldStdOut                 Pointer to old StdOut.
   @param[out] OldStdErr                 Pointer to old StdErr.
+  @param[out] SystemTableInfo           Pointer to old system table information.
 
   @retval   EFI_SUCCESS                 Operation was sucessful, Argv and Argc are valid.
   @retval   EFI_OUT_OF_RESOURCES        A memory allocation failed.
@@ -137,27 +149,30 @@ EFIAPI
 UpdateStdInStdOutStdErr(
   IN OUT EFI_SHELL_PARAMETERS_PROTOCOL  *ShellParameters,
   IN CONST CHAR16                       *NewCommandLine,
-  OUT SHELL_FILE_HANDLE                 *OldStdIn OPTIONAL,
-  OUT SHELL_FILE_HANDLE                 *OldStdOut OPTIONAL,
-  OUT SHELL_FILE_HANDLE                 *OldStdErr OPTIONAL
+  OUT SHELL_FILE_HANDLE                 *OldStdIn,
+  OUT SHELL_FILE_HANDLE                 *OldStdOut,
+  OUT SHELL_FILE_HANDLE                 *OldStdErr,
+  OUT SYSTEM_TABLE_INFO                 *SystemTableInfo
   );
 
 /**
   Funcion will replace the current StdIn and StdOut in the ShellParameters protocol
   structure with StdIn and StdOut.  The current values are de-allocated.
 
-  @param[in,out] ShellParameters       pointer to parameter structure to modify
-  @param[out] OldStdIn                 Pointer to old StdIn.
-  @param[out] OldStdOut                Pointer to old StdOut.
-  @param[out] OldStdErr                Pointer to old StdErr.
+  @param[in,out] ShellParameters      Pointer to parameter structure to modify.
+  @param[in] OldStdIn                 Pointer to old StdIn.
+  @param[in] OldStdOut                Pointer to old StdOut.
+  @param[in] OldStdErr                Pointer to old StdErr.
+  @param[in] SystemTableInfo          Pointer to old system table information.
 **/
 EFI_STATUS
 EFIAPI
 RestoreStdInStdOutStdErr (
   IN OUT EFI_SHELL_PARAMETERS_PROTOCOL  *ShellParameters,
-  OUT SHELL_FILE_HANDLE                 *OldStdIn OPTIONAL,
-  OUT SHELL_FILE_HANDLE                 *OldStdOut OPTIONAL,
-  OUT SHELL_FILE_HANDLE                 *OldStdErr OPTIONAL
+  IN  SHELL_FILE_HANDLE                 *OldStdIn,
+  IN  SHELL_FILE_HANDLE                 *OldStdOut,
+  IN  SHELL_FILE_HANDLE                 *OldStdErr,
+  IN  SYSTEM_TABLE_INFO                 *SystemTableInfo
   );
 
 /**

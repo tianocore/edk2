@@ -34,7 +34,7 @@ EfiShellClose (
   )
 {
   ShellFileHandleRemove(FileHandle);
-  return (FileHandleClose(FileHandle));
+  return (FileHandleClose(ConvertShellHandleToEfiFileProtocol(FileHandle)));
 }
 
 /**
@@ -475,8 +475,12 @@ EfiShellGetDevicePathFromFilePath(
   EFI_HANDLE                      Handle;
   EFI_STATUS                      Status;
 
+  if (Path == NULL) {
+    return (NULL);
+  }
+
   MapName = NULL;
-  ASSERT(Path != NULL);
+  NewPath = NULL;
 
   if (StrStr(Path, L":") == NULL) {
     Cwd = EfiShellGetCurDir(NULL);
@@ -488,7 +492,7 @@ EfiShellGetDevicePathFromFilePath(
     NewPath = AllocateZeroPool(Size);
     ASSERT(NewPath != NULL);
     StrCpy(NewPath, Cwd);
-    if ((NewPath[0] == (CHAR16)L'\\') &&
+    if ((Path[0] == (CHAR16)L'\\') &&
         (NewPath[StrLen(NewPath)-1] == (CHAR16)L'\\')
        ) {
       ((CHAR16*)NewPath)[StrLen(NewPath)-1] = CHAR_NULL;
@@ -803,6 +807,7 @@ EfiShellOpenRootByHandle(
                                 could not be opened.
   @retval EFI_VOLUME_CORRUPTED  The data structures in the volume were corrupted.
   @retval EFI_DEVICE_ERROR      The device had an error
+  @retval EFI_INVALID_PARAMETER FileHandle is NULL.
 **/
 EFI_STATUS
 EFIAPI
@@ -813,6 +818,10 @@ EfiShellOpenRoot(
 {
   EFI_STATUS Status;
   EFI_HANDLE Handle;
+
+  if (FileHandle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   //
   // find the handle of the device with that device handle and the file system
@@ -876,11 +885,19 @@ InternalOpenFileDevicePath(
   EFI_FILE_PROTOCOL               *Handle1;
   EFI_FILE_PROTOCOL               *Handle2;
   EFI_DEVICE_PATH_PROTOCOL        *DpCopy;
+  FILEPATH_DEVICE_PATH            *AlignedNode;
 
-  ASSERT(FileHandle != NULL);
-  *FileHandle = NULL;
-  Handle1     = NULL;
-  DpCopy      = DevicePath;
+  if (FileHandle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
+  *FileHandle   = NULL;
+  Handle1       = NULL;
+  Handle2       = NULL;
+  Handle        = NULL;
+  DpCopy        = DevicePath;
+  ShellHandle   = NULL;
+  FilePathNode  = NULL;
+  AlignedNode   = NULL;
 
   Status = EfiShellOpenRoot(DevicePath, &ShellHandle);
 
@@ -903,6 +920,8 @@ InternalOpenFileDevicePath(
           ; !IsDevicePathEnd (&FilePathNode->Header)
           ; FilePathNode = (FILEPATH_DEVICE_PATH *) NextDevicePathNode (&FilePathNode->Header)
          ){
+        SHELL_FREE_NON_NULL(AlignedNode);
+        AlignedNode = AllocateCopyPool (DevicePathNodeLength(FilePathNode), FilePathNode);
         //
         // For file system access each node should be a file path component
         //
@@ -926,7 +945,7 @@ InternalOpenFileDevicePath(
           Status = Handle2->Open (
                                 Handle2,
                                 &Handle1,
-                                FilePathNode->PathName,
+                                AlignedNode->PathName,
                                 OpenMode,
                                 Attributes
                                );
@@ -944,7 +963,7 @@ InternalOpenFileDevicePath(
           Status = Handle2->Open (
                                 Handle2,
                                 &Handle1,
-                                FilePathNode->PathName,
+                                AlignedNode->PathName,
                                 OpenMode &~EFI_FILE_MODE_CREATE,
                                 Attributes
                                );
@@ -956,7 +975,7 @@ InternalOpenFileDevicePath(
             Status = Handle2->Open (
                                   Handle2,
                                   &Handle1,
-                                  FilePathNode->PathName,
+                                  AlignedNode->PathName,
                                   OpenMode,
                                   Attributes
                                  );
@@ -965,7 +984,7 @@ InternalOpenFileDevicePath(
         //
         // Close the last node
         //
-        Handle2->Close (Handle2);
+        ShellInfoObject.NewEfiShellProtocol->CloseFile (Handle2);
 
         //
         // If there's been an error, stop
@@ -976,9 +995,10 @@ InternalOpenFileDevicePath(
       } // for loop
     }
   }
+  SHELL_FREE_NON_NULL(AlignedNode);
   if (EFI_ERROR(Status)) {
     if (Handle1 != NULL) {
-      Handle1->Close(Handle1);
+      ShellInfoObject.NewEfiShellProtocol->CloseFile(Handle1);
     }
   } else {
     *FileHandle = ConvertEfiFileProtocolToShellHandle(Handle1, ShellFileHandleGetPath(ShellHandle));
@@ -1867,11 +1887,6 @@ UpdateFileName(
   If FileHandle is a file and matches all of the remaining Pattern (which would be
   on its last node), then add a EFI_SHELL_FILE_INFO object for this file to fileList.
 
-  if FileList is NULL, then ASSERT
-  if FilePattern is NULL, then ASSERT
-  if UnicodeCollation is NULL, then ASSERT
-  if FileHandle is NULL, then ASSERT
-
   Upon a EFI_SUCCESS return fromt he function any the caller is responsible to call
   FreeFileList with FileList.
 
@@ -1880,6 +1895,7 @@ UpdateFileName(
   @param[in] FileHandle         The FileHandle to start with
   @param[in,out] FileList       pointer to pointer to list of found files.
   @param[in] ParentNode         The node for the parent. Same file as identified by HANDLE.
+  @param[in] MapName            The file system name this file is on.
 
   @retval EFI_SUCCESS           all files were found and the FileList contains a list.
   @retval EFI_NOT_FOUND         no files were found
@@ -1892,7 +1908,8 @@ ShellSearchHandle(
   IN           EFI_UNICODE_COLLATION_PROTOCOL *UnicodeCollation,
   IN           SHELL_FILE_HANDLE              FileHandle,
   IN OUT       EFI_SHELL_FILE_INFO            **FileList,
-  IN     CONST EFI_SHELL_FILE_INFO            *ParentNode OPTIONAL
+  IN     CONST EFI_SHELL_FILE_INFO            *ParentNode OPTIONAL,
+  IN     CONST CHAR16                         *MapName
   )
 {
   EFI_STATUS          Status;
@@ -1902,6 +1919,8 @@ ShellSearchHandle(
   EFI_SHELL_FILE_INFO *ShellInfoNode;
   EFI_SHELL_FILE_INFO *NewShellNode;
   BOOLEAN             Directory;
+  CHAR16              *NewFullName;
+  UINTN               Size;
 
   if ( FilePattern      == NULL
     || UnicodeCollation == NULL
@@ -1965,7 +1984,20 @@ ShellSearchHandle(
           ; ShellInfoNode = (EFI_SHELL_FILE_INFO*)GetNextNode(&ShellInfo->Link, &ShellInfoNode->Link)
          ){
         if (UnicodeCollation->MetaiMatch(UnicodeCollation, (CHAR16*)ShellInfoNode->FileName, CurrentFilePattern)){
-          if (Directory){
+          if (ShellInfoNode->FullName != NULL && StrStr(ShellInfoNode->FullName, L":") == NULL) {
+            Size = StrSize(ShellInfoNode->FullName);
+            Size += StrSize(MapName) + sizeof(CHAR16);
+            NewFullName = AllocateZeroPool(Size);
+            if (NewFullName == NULL) {
+              Status = EFI_OUT_OF_RESOURCES;
+            } else {
+              StrCpy(NewFullName, MapName);
+              StrCat(NewFullName, ShellInfoNode->FullName+1);
+              FreePool((VOID*)ShellInfoNode->FullName);
+              ShellInfoNode->FullName = NewFullName;
+            }
+          }
+          if (Directory && !EFI_ERROR(Status)){
             //
             // should be a directory
             //
@@ -1991,9 +2023,9 @@ ShellSearchHandle(
               //
               // recurse with the next part of the pattern
               //
-              Status = ShellSearchHandle(NextFilePatternStart, UnicodeCollation, ShellInfoNode->Handle, FileList, ShellInfoNode);
+              Status = ShellSearchHandle(NextFilePatternStart, UnicodeCollation, ShellInfoNode->Handle, FileList, ShellInfoNode, MapName);
             }
-          } else {
+          } else if (!EFI_ERROR(Status)) {
             //
             // should be a file
             //
@@ -2109,18 +2141,14 @@ EfiShellFindFiles(
             ; *PatternCurrentLocation != ':'
             ; PatternCurrentLocation++);
         PatternCurrentLocation++;
-        Status = ShellSearchHandle(PatternCurrentLocation, gUnicodeCollation, RootFileHandle, FileList, NULL);
+        Status = ShellSearchHandle(PatternCurrentLocation, gUnicodeCollation, RootFileHandle, FileList, NULL, MapName);
       }
       FreePool(RootDevicePath);
     }
   }
 
-  if (PatternCopy != NULL) {
-    FreePool(PatternCopy);
-  }
-  if (MapName != NULL) {
-    FreePool(MapName);
-  }
+  SHELL_FREE_NON_NULL(PatternCopy);
+  SHELL_FREE_NON_NULL(MapName);
 
   return(Status);
 }
@@ -2996,23 +3024,26 @@ CreatePopulateInstallShellProtocol (
   UINTN                       HandleCounter;
   SHELL_PROTOCOL_HANDLE_LIST  *OldProtocolNode;
 
+  if (NewShell == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
+
   BufferSize = 0;
   Buffer = NULL;
   OldProtocolNode = NULL;
   InitializeListHead(&ShellInfoObject.OldShellList.Link);
 
-  ASSERT(NewShell != NULL);
-
   //
   // Initialize EfiShellProtocol object...
   //
-  *NewShell = &mShellProtocol;
   Status = gBS->CreateEvent(0,
                             0,
                             NULL,
                             NULL,
                             &mShellProtocol.ExecutionBreak);
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR(Status)) {
+    return (Status);
+  }
 
   //
   // Get the size of the buffer we need.
@@ -3027,13 +3058,18 @@ CreatePopulateInstallShellProtocol (
     // Allocate and recall with buffer of correct size
     //
     Buffer = AllocateZeroPool(BufferSize);
-    ASSERT(Buffer != NULL);
+    if (Buffer == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
     Status = gBS->LocateHandle(ByProtocol,
                                &gEfiShellProtocolGuid,
                                NULL,
                                &BufferSize,
                                Buffer);
-    ASSERT_EFI_ERROR(Status);
+    if (EFI_ERROR(Status)) {
+      FreePool(Buffer);
+      return (Status);
+    }
     //
     // now overwrite each of them, but save the info to restore when we end.
     //
@@ -3056,7 +3092,7 @@ CreatePopulateInstallShellProtocol (
                             OldProtocolNode->Handle,
                             &gEfiShellProtocolGuid,
                             OldProtocolNode->Interface,
-                            (VOID*)(*NewShell));
+                            (VOID*)(&mShellProtocol));
         if (!EFI_ERROR(Status)) {
           //
           // we reinstalled sucessfully.  log this so we can reverse it later.
@@ -3079,7 +3115,7 @@ CreatePopulateInstallShellProtocol (
                       &gImageHandle,
                       &gEfiShellProtocolGuid,
                       EFI_NATIVE_INTERFACE,
-                      (VOID*)(*NewShell));
+                      (VOID*)(&mShellProtocol));
   }
 
   if (PcdGetBool(PcdShellSupportOldProtocols)){
@@ -3087,6 +3123,9 @@ CreatePopulateInstallShellProtocol (
     ///@todo do we need to support ShellEnvironment (not ShellEnvironment2) also?
   }
 
+  if (!EFI_ERROR(Status)) {
+    *NewShell = &mShellProtocol;
+  }
   return (Status);
 }
 
@@ -3106,8 +3145,9 @@ CleanUpShellProtocol (
   IN OUT EFI_SHELL_PROTOCOL  *NewShell
   )
 {
-  EFI_STATUS Status;
-  SHELL_PROTOCOL_HANDLE_LIST  *Node2;
+  EFI_STATUS                        Status;
+  SHELL_PROTOCOL_HANDLE_LIST        *Node2;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *SimpleEx;
 
   //
   // if we need to restore old protocols...
@@ -3122,7 +3162,6 @@ CleanUpShellProtocol (
                                                &gEfiShellProtocolGuid,
                                                NewShell,
                                                Node2->Interface);
-      ASSERT_EFI_ERROR(Status);
       FreePool(Node2);
     }
   } else {
@@ -3132,11 +3171,116 @@ CleanUpShellProtocol (
     Status = gBS->UninstallProtocolInterface(gImageHandle,
                                              &gEfiShellProtocolGuid,
                                              NewShell);
-    ASSERT_EFI_ERROR(Status);
   }
   Status = gBS->CloseEvent(NewShell->ExecutionBreak);
+  NewShell->ExecutionBreak = NULL;
+
+  Status = gBS->OpenProtocol(
+    gST->ConsoleInHandle,
+    &gEfiSimpleTextInputExProtocolGuid,
+    (VOID**)&SimpleEx,
+    gImageHandle,
+    NULL,
+    EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+
+  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle1);
+  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle2);
 
   return (Status);
 }
 
+/**
+  Notification function for keystrokes.
 
+  @param[in] KeyData    The key that was pressed.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
+EFI_STATUS
+EFIAPI
+NotificationFunction(
+  IN EFI_KEY_DATA *KeyData
+  )
+{
+  if (ShellInfoObject.NewEfiShellProtocol->ExecutionBreak == NULL) {
+    return (EFI_UNSUPPORTED);
+  }
+  return (gBS->SignalEvent(ShellInfoObject.NewEfiShellProtocol->ExecutionBreak));
+}
+
+/**
+  Function to start monitoring for CTRL-C using SimpleTextInputEx.  This 
+  feature's enabled state was not known when the shell initially launched.
+
+  @retval EFI_SUCCESS           The feature is enabled.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough mnemory available.
+**/
+EFI_STATUS
+EFIAPI
+InernalEfiShellStartMonitor(
+  VOID
+  )
+{
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *SimpleEx;
+  EFI_KEY_DATA                      KeyData;
+  EFI_STATUS                        Status;
+
+  Status = gBS->OpenProtocol(
+    gST->ConsoleInHandle,
+    &gEfiSimpleTextInputExProtocolGuid,
+    (VOID**)&SimpleEx,
+    gImageHandle,
+    NULL,
+    EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  if (EFI_ERROR(Status)) {
+    ShellPrintHiiEx(
+      -1, 
+      -1, 
+      NULL,
+      STRING_TOKEN (STR_SHELL_NO_IN_EX),
+      ShellInfoObject.HiiHandle);
+    return (EFI_SUCCESS);
+  }
+
+  if (ShellInfoObject.NewEfiShellProtocol->ExecutionBreak == NULL) {
+    return (EFI_UNSUPPORTED);
+  }
+
+  KeyData.KeyState.KeyToggleState = 0;
+  KeyData.Key.ScanCode            = 0;
+  KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED;
+  KeyData.Key.UnicodeChar         = L'c';
+
+  Status = SimpleEx->RegisterKeyNotify(
+    SimpleEx,
+    &KeyData,
+    NotificationFunction,
+    &ShellInfoObject.CtrlCNotifyHandle1);
+  
+  KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED;
+  if (!EFI_ERROR(Status)) {
+    Status = SimpleEx->RegisterKeyNotify(
+      SimpleEx,
+      &KeyData,
+      NotificationFunction,
+      &ShellInfoObject.CtrlCNotifyHandle2);
+  }
+  KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED;
+  KeyData.Key.UnicodeChar         = 3;
+  if (!EFI_ERROR(Status)) {
+    Status = SimpleEx->RegisterKeyNotify(
+      SimpleEx,
+      &KeyData,
+      NotificationFunction,
+      &ShellInfoObject.CtrlCNotifyHandle3);
+  }
+  KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED;
+  if (!EFI_ERROR(Status)) {
+    Status = SimpleEx->RegisterKeyNotify(
+      SimpleEx,
+      &KeyData,
+      NotificationFunction,
+      &ShellInfoObject.CtrlCNotifyHandle4);
+  }
+  return (Status);
+}
