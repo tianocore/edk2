@@ -15,12 +15,9 @@
 #include "SmmDebugAgentLib.h"
 
 DEBUG_AGENT_MAILBOX         *mMailboxPointer = NULL;
-
-GLOBAL_REMOVE_IF_UNREFERENCED DEBUG_AGENT_MAILBOX         mLocalMailbox;
-
-GLOBAL_REMOVE_IF_UNREFERENCED UINTN    mSavedDebugRegisters[6];
-
-CONST BOOLEAN                    MultiProcessorDebugSupport = FALSE;
+DEBUG_AGENT_MAILBOX         mLocalMailbox;
+UINTN                       mSavedDebugRegisters[6];
+CONST BOOLEAN               MultiProcessorDebugSupport = FALSE;
 
 
 /**
