@@ -20,7 +20,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:          
-  This Protocol is introduced in UEFI Specification 2.3
+  The EFI_IPSEC2_PROTOCOL is introduced in UEFI Specification 2.3D.
 
 **/
 
