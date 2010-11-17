@@ -738,8 +738,6 @@ Ip6PreProcessPacket (
      OUT UINT32          *UnFragmentLen,
      OUT BOOLEAN         *Fragmented, 
      OUT EFI_IP6_HEADER  **Head
-     
-     
   )
 {
   UINT16                    PayloadLen;
@@ -1059,6 +1057,13 @@ Ip6AcceptFrame (
     }
   }
 
+  //
+  // Check the Packet again.
+  //
+  if (Packet == NULL) {
+    goto Restart;
+  }
+  
   //
   // Packet may have been changed. The ownership of the packet
   // is transfered to the packet process logic.
