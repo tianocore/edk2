@@ -734,6 +734,30 @@ NetLibDestroyServiceChild (
   );
 
 /**
+  Get MAC address associated with the network service handle.
+
+  There should be MNP Service Binding Protocol installed on the input ServiceHandle.
+  If SNP is installed on the ServiceHandle or its parent handle, MAC address will
+  be retrieved from SNP. If no SNP found, try to get SNP mode data use MNP.
+
+  @param[in]   ServiceHandle    The handle where network service binding protocols are
+                                installed on.
+  @param[out]  MacAddress       The pointer to store the returned MAC address.
+  @param[out]  AddressSize      The length of returned MAC address.
+
+  @retval EFI_SUCCESS           MAC address was returned successfully.
+  @retval Others                Failed to get SNP mode data.
+
+**/
+EFI_STATUS
+EFIAPI
+NetLibGetMacAddress (
+  IN  EFI_HANDLE            ServiceHandle,
+  OUT EFI_MAC_ADDRESS       *MacAddress,
+  OUT UINTN                 *AddressSize
+  );
+
+/**
   Convert the mac address of the simple network protocol installed on
   SnpHandle to a unicode string. Callers are responsible for freeing the
   string storage.

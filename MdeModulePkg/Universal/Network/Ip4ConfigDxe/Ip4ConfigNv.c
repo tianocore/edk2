@@ -1,8 +1,8 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to Ip4.
 
-Copyright (c) 2009 - 2010, Intel Corporation.<BR>
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -13,45 +13,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "Ip4ConfigNv.h"
-
-GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  Ip4HexString[] = "0123456789ABCDEFabcdef";
+#include "NicIp4Variable.h"
 
 EFI_GUID  mNicIp4ConfigNvDataGuid = EFI_NIC_IP4_CONFIG_NVDATA_GUID;
 
-//
-// Template used to mark the end of a list of packages 
-//
-GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_HII_PACKAGE_HEADER  mEndOfPakageList = {
-  sizeof (EFI_HII_PACKAGE_HEADER),
-  EFI_HII_PACKAGE_END
-};
-
-
-/**
-  Convert the mac address into a hexadecimal encoded "-" seperated string.
-
-  @param[in]  Mac The mac address.
-  @param[in]  Len  Length in bytes of the mac address.
-  @param[out] Str The storage to return the mac string.
-
-**/
-VOID
-Ip4MacAddrToStr (
-  IN  EFI_MAC_ADDRESS  *Mac,
-  IN  UINT32           Len,
-  OUT CHAR16           *Str
-  )
-{
-  UINT32  Index;
-
-  for (Index = 0; Index < Len; Index++) {
-    Str[3 * Index]      = (CHAR16) Ip4HexString[(Mac->Addr[Index] >> 4) & 0x0F];
-    Str[3 * Index + 1]  = (CHAR16) Ip4HexString[Mac->Addr[Index] & 0x0F];
-    Str[3 * Index + 2]  = L'-';
-  }
-
-  Str[3 * Index - 1] = L'\0';
-}
 
 /**
   Calculate the prefix length of the IPv4 subnet mask.
@@ -72,7 +37,7 @@ GetSubnetMaskPrefixLength (
   //
   // The SubnetMask is in network byte order.
   //
-  ReverseMask = (SubnetMask->Addr[0] << 24) | (SubnetMask->Addr[1] << 16) | (SubnetMask->Addr[2] << 8) | (SubnetMask->Addr[3]);
+  ReverseMask = SwapBytes32 (*(UINT32 *)&SubnetMask[0]);
 
   //
   // Reverse it.
@@ -97,14 +62,14 @@ GetSubnetMaskPrefixLength (
   Convert the decimal dotted IPv4 address into the binary IPv4 address.
 
   @param[in]   Str             The UNICODE string.
-  @param[out]  Ip              The storage to return the ASCII string.
+  @param[out]  Ip              The storage to return the IPv4 address.
 
   @retval EFI_SUCCESS           The binary IP address is returned in Ip.
   @retval EFI_INVALID_PARAMETER The IP string is malformatted.
 **/
 EFI_STATUS
-Ip4AsciiStrToIp (
-  IN  CHAR8             *Str,
+Ip4StrToIp (
+  IN  CHAR16            *Str,
   OUT EFI_IPv4_ADDRESS  *Ip
   )
 {
@@ -113,15 +78,15 @@ Ip4AsciiStrToIp (
 
   Index = 0;
 
-  while (*Str != 0) {
+  while (*Str != L'\0') {
 
     if (Index > 3) {
       return EFI_INVALID_PARAMETER;
     }
 
     Number = 0;
-    while (NET_IS_DIGIT (*Str)) {
-      Number = Number * 10 + (*Str - '0');
+    while ((*Str >= L'0') && (*Str <= L'9')) {
+      Number = Number * 10 + (*Str - L'0');
       Str++;
     }
 
@@ -131,7 +96,7 @@ Ip4AsciiStrToIp (
 
     Ip->Addr[Index] = (UINT8) Number;
 
-    if ((*Str != '\0') && (*Str != '.')) {
+    if ((*Str != L'\0') && (*Str != L'.')) {
       //
       // The current character should be either the NULL terminator or
       // the dot delimiter.
@@ -139,7 +104,7 @@ Ip4AsciiStrToIp (
       return EFI_INVALID_PARAMETER;
     }
 
-    if (*Str == '.') {
+    if (*Str == L'.') {
       //
       // Skip the delimiter.
       //
@@ -184,35 +149,39 @@ Ip4ConfigConvertDeviceConfigDataToIfrNvData (
   OUT IP4_CONFIG_IFR_NVDATA     *IfrFormNvData
   )
 {
-  EFI_STATUS                    Status;
-  NIC_IP4_CONFIG_INFO           *NicConfig;
-  UINTN                         ConfigLen;
+  NIC_IP4_CONFIG_INFO  *NicConfig;
 
-  ConfigLen = sizeof (NIC_IP4_CONFIG_INFO) + sizeof (EFI_IP4_ROUTE_TABLE) * 2;
-  NicConfig = AllocateZeroPool (ConfigLen);
-  ASSERT (NicConfig != NULL);
-  Status = EfiNicIp4ConfigGetInfo (Ip4ConfigInstance, &ConfigLen, NicConfig);
-  if (!EFI_ERROR (Status)) {
+  NicConfig = EfiNicIp4ConfigGetInfo (Ip4ConfigInstance);
+  if (NicConfig != NULL) {
     IfrFormNvData->Configure = 1;
+    Ip4ConfigInstance->Ip4ConfigCallbackInfo.Configured = TRUE;
     if (NicConfig->Source == IP4_CONFIG_SOURCE_DHCP) {
       IfrFormNvData->DhcpEnable = 1;
+      Ip4ConfigInstance->Ip4ConfigCallbackInfo.DhcpEnabled = TRUE;
     } else {
       IfrFormNvData->DhcpEnable = 0;
       Ip4ConfigIpToStr (&NicConfig->Ip4Info.StationAddress, IfrFormNvData->StationAddress);
       Ip4ConfigIpToStr (&NicConfig->Ip4Info.SubnetMask, IfrFormNvData->SubnetMask);
       Ip4ConfigIpToStr (&NicConfig->Ip4Info.RouteTable[1].GatewayAddress, IfrFormNvData->GatewayAddress);
+
+      Ip4ConfigInstance->Ip4ConfigCallbackInfo.DhcpEnabled = FALSE;
+      CopyMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.LocalIp, &NicConfig->Ip4Info.StationAddress, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.SubnetMask, &NicConfig->Ip4Info.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.Gateway, &NicConfig->Ip4Info.RouteTable[1].GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
     }
+
+    FreePool (NicConfig);
   } else {
     IfrFormNvData->Configure = 0;
+    Ip4ConfigInstance->Ip4ConfigCallbackInfo.Configured = FALSE;
   }
-
-  FreePool (NicConfig);
 }
 
 /**
   Convert the IFR data into the network configuration data and set the IP
   configure parameters for the NIC.
 
+  @param[in]       IfrFormNvData     The IFR NV data.
   @param[in, out]  Ip4ConfigInstance The IP4Config instance.
 
   @retval EFI_SUCCESS            The configure parameter for this NIC was
@@ -223,6 +192,7 @@ Ip4ConfigConvertDeviceConfigDataToIfrNvData (
 **/
 EFI_STATUS
 Ip4ConfigConvertIfrNvDataToDeviceConfigData (
+  IN     IP4_CONFIG_IFR_NVDATA     *IfrFormNvData,
   IN OUT IP4_CONFIG_INSTANCE       *Ip4ConfigInstance
   )
 {
@@ -233,6 +203,14 @@ Ip4ConfigConvertIfrNvDataToDeviceConfigData (
   EFI_INPUT_KEY             Key;
   NIC_IP4_CONFIG_INFO       *NicInfo;
   EFI_IP_ADDRESS            Ip;
+
+  ZeroMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo, sizeof (IP4_SETTING_INFO));
+
+  Ip4ConfigInstance->Ip4ConfigCallbackInfo.Configured = IfrFormNvData->Configure;
+  Ip4ConfigInstance->Ip4ConfigCallbackInfo.DhcpEnabled = IfrFormNvData->DhcpEnable;
+  Ip4StrToIp (IfrFormNvData->StationAddress, &Ip4ConfigInstance->Ip4ConfigCallbackInfo.LocalIp);
+  Ip4StrToIp (IfrFormNvData->SubnetMask, &Ip4ConfigInstance->Ip4ConfigCallbackInfo.SubnetMask);
+  Ip4StrToIp (IfrFormNvData->GatewayAddress, &Ip4ConfigInstance->Ip4ConfigCallbackInfo.Gateway);
 
   if (!Ip4ConfigInstance->Ip4ConfigCallbackInfo.Configured) {
     //
@@ -343,12 +321,6 @@ Ip4ConfigConvertIfrNvDataToDeviceConfigData (
                                   parts of the results that must be
                                   stored awaiting possible future
                                   protocols.
-  @retval EFI_INVALID_PARAMETER   For example, passing in a NULL
-                                  for the Request parameter
-                                  would result in this type of
-                                  error. In this case, the
-                                  Progress parameter would be
-                                  set to NULL.
   @retval EFI_NOT_FOUND           Routing data doesn't match any
                                   known driver. Progress set to the
                                   first character in the routing header.
@@ -374,76 +346,173 @@ Ip4DeviceExtractConfig (
   )
 {
   EFI_STATUS                       Status;
-  UINTN                            ConfigLen;
   NIC_IP4_CONFIG_INFO              *IfrDeviceNvData;
+  NIC_IP4_CONFIG_INFO              *NicConfig;
   IP4_CONFIG_INSTANCE              *Ip4ConfigInstance;
   IP4_CONFIG_IFR_NVDATA            *IfrFormNvData;
+  EFI_STRING                       ConfigRequestHdr;
+  EFI_STRING                       ConfigRequest;
+  EFI_STRING                       DeviceResult;
+  EFI_STRING                       FormResult;
+  CHAR16                           *StrPointer;
+  BOOLEAN                          AllocatedRequest;
+  UINTN                            Size;
+  UINTN                            BufferSize;
 
-  if (Request == NULL || Progress == NULL || Results == NULL) {
+  if (Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  *Progress = Request;
-
+  *Progress     = Request;
+  Size          = 0;
+  DeviceResult  = NULL;
+  FormResult    = NULL;
+  ConfigRequest = NULL;
+  Status        = EFI_SUCCESS;
+  AllocatedRequest  = FALSE;
   Ip4ConfigInstance = IP4_CONFIG_INSTANCE_FROM_CONFIG_ACCESS (This);
 
   //
   // Check Request data in <ConfigHdr>.
   //
-  if (HiiIsConfigHdrMatch (Request, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+  if ((Request == NULL) || HiiIsConfigHdrMatch (Request, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
     IfrDeviceNvData = AllocateZeroPool (NIC_ITEM_CONFIG_SIZE);
     if (IfrDeviceNvData == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
 
-    ConfigLen = sizeof (NIC_IP4_CONFIG_INFO) + sizeof (EFI_IP4_ROUTE_TABLE) * 2;
-    Status = EfiNicIp4ConfigGetInfo (Ip4ConfigInstance, &ConfigLen, IfrDeviceNvData);
-    if (EFI_ERROR (Status)) {
-      FreePool (IfrDeviceNvData);
+    NicConfig = EfiNicIp4ConfigGetInfo (Ip4ConfigInstance);
+    if (NicConfig == NULL) {
       return EFI_NOT_FOUND;
     }
-  
+    CopyMem (IfrDeviceNvData, NicConfig, SIZEOF_NIC_IP4_CONFIG_INFO (NicConfig));
+    FreePool (NicConfig);
+
+    ConfigRequest = Request;
+    if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
+      //
+      // Request has no request element, construct full request string.
+      // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
+      // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
+      //
+      ConfigRequestHdr = HiiConstructConfigHdr (&gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE, Ip4ConfigInstance->ChildHandle);
+      Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+      ConfigRequest = AllocateZeroPool (Size);
+      ASSERT (ConfigRequest != NULL);
+      AllocatedRequest = TRUE;
+      BufferSize = NIC_ITEM_CONFIG_SIZE;
+      UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+      FreePool (ConfigRequestHdr);
+    }
+
     //
     // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
     //
     Status = gHiiConfigRouting->BlockToConfig (
                                   gHiiConfigRouting,
-                                  Request,
+                                  ConfigRequest,
                                   (UINT8 *) IfrDeviceNvData,
                                   NIC_ITEM_CONFIG_SIZE,
-                                  Results,
+                                  &DeviceResult,
                                   Progress
                                   );
-  
+
     FreePool (IfrDeviceNvData);
+    //
+    // Free the allocated config request string.
+    //
+    if (AllocatedRequest) {
+      FreePool (ConfigRequest);
+      ConfigRequest = NULL;
+    }
 
-  } else if (HiiIsConfigHdrMatch (Request, &mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+    if (EFI_ERROR (Status)) {
+      goto Failure;
+    }
+  }
 
-    IfrFormNvData = AllocateZeroPool (NIC_ITEM_CONFIG_SIZE);
+  if ((Request == NULL) || HiiIsConfigHdrMatch (Request, &mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+
+    IfrFormNvData = AllocateZeroPool (sizeof (IP4_CONFIG_IFR_NVDATA));
     if (IfrFormNvData == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-  
+
     Ip4ConfigConvertDeviceConfigDataToIfrNvData (Ip4ConfigInstance, IfrFormNvData);
-  
+
+    ConfigRequest = Request;
+    if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
+      //
+      // Request has no request element, construct full request string.
+      // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
+      // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
+      //
+      ConfigRequestHdr = HiiConstructConfigHdr (&mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE, Ip4ConfigInstance->ChildHandle);
+      Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+      ConfigRequest = AllocateZeroPool (Size);
+      ASSERT (ConfigRequest != NULL);
+      AllocatedRequest = TRUE;
+      BufferSize = sizeof (IP4_CONFIG_IFR_NVDATA);
+      UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+      FreePool (ConfigRequestHdr);
+    }
+
     //
     // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
     //
     Status = gHiiConfigRouting->BlockToConfig (
                                   gHiiConfigRouting,
-                                  Request,
+                                  ConfigRequest,
                                   (UINT8 *) IfrFormNvData,
                                   sizeof (IP4_CONFIG_IFR_NVDATA),
-                                  Results,
+                                  &FormResult,
                                   Progress
                                   );
-  
-    FreePool (IfrFormNvData);
 
+    FreePool (IfrFormNvData);
+    //
+    // Free the allocated config request string.
+    //
+    if (AllocatedRequest) {
+      FreePool (ConfigRequest);
+      ConfigRequest = NULL;
+    }
+
+    if (EFI_ERROR (Status)) {
+      goto Failure;
+    }
+  }
+
+  if (Request == NULL) {
+    Size = StrLen (DeviceResult);
+    Size = Size + 1;
+    Size = Size + StrLen (FormResult) + 1;
+    *Results = AllocateZeroPool (Size * sizeof (CHAR16));
+    ASSERT (*Results != NULL);
+    StrPointer  = *Results;
+    StrCpy (StrPointer, DeviceResult);
+    StrPointer  = StrPointer + StrLen (StrPointer);
+    *StrPointer = L'&';
+    StrCpy (StrPointer + 1, FormResult);
+    FreePool (DeviceResult);
+    FreePool (FormResult);
+  } else if (HiiIsConfigHdrMatch (Request, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+    *Results = DeviceResult;
+  } else if (HiiIsConfigHdrMatch (Request, &mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+    *Results = FormResult;
   } else {
     return EFI_NOT_FOUND;
   }
 
+Failure:
+  //
+  // Set Progress string to the original request string.
+  //
+  if (Request == NULL) {
+    *Progress = NULL;
+  } else if (StrStr (Request, L"OFFSET") == NULL) {
+    *Progress = Request + StrLen (Request);
+  }
 
   return Status;
 }
@@ -492,7 +561,7 @@ Ip4DeviceRouteConfig (
   EFI_STATUS                       Status;
   UINTN                            BufferSize;
   NIC_IP4_CONFIG_INFO              *IfrDeviceNvData;
-  IP4_CONFIG_IFR_NVDATA            *IfrFormNvData; 
+  IP4_CONFIG_IFR_NVDATA            *IfrFormNvData;
   NIC_IP4_CONFIG_INFO              *NicInfo;
   IP4_CONFIG_INSTANCE              *Ip4ConfigInstance;
   EFI_MAC_ADDRESS                  ZeroMac;
@@ -500,6 +569,11 @@ Ip4DeviceRouteConfig (
   if (Configuration == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  //
+  // Reclaim Ip4Config variable
+  //
+  Ip4ConfigReclaimVariable ();
 
   *Progress = Configuration;
 
@@ -526,9 +600,9 @@ Ip4DeviceRouteConfig (
                                   Progress
                                   );
     if (!EFI_ERROR (Status)) {
-      Status = Ip4ConfigConvertIfrNvDataToDeviceConfigData (Ip4ConfigInstance);
+      Status = Ip4ConfigConvertIfrNvDataToDeviceConfigData (IfrFormNvData, Ip4ConfigInstance);
     }
-    
+
     FreePool (IfrFormNvData);
 
   } else if (HiiIsConfigHdrMatch (Configuration, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
@@ -549,9 +623,13 @@ Ip4DeviceRouteConfig (
     if (!EFI_ERROR (Status)) {
       ZeroMem (&ZeroMac, sizeof (EFI_MAC_ADDRESS));
       if (CompareMem (&IfrDeviceNvData->NicAddr.MacAddr, &ZeroMac, IfrDeviceNvData->NicAddr.Len) != 0) {
-        BufferSize = sizeof (NIC_IP4_CONFIG_INFO) + sizeof (EFI_IP4_ROUTE_TABLE) * IfrDeviceNvData->Ip4Info.RouteTableSize;
-        NicInfo = AllocateCopyPool (BufferSize, IfrDeviceNvData); 
+        BufferSize = SIZEOF_NIC_IP4_CONFIG_INFO (IfrDeviceNvData);
+        NicInfo = AllocateCopyPool (BufferSize, IfrDeviceNvData);
+        if (NicInfo == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }
         Status = EfiNicIp4ConfigSetInfo (Ip4ConfigInstance, NicInfo, TRUE);
+        FreePool (NicInfo);
       } else {
         ZeroMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo, sizeof (IP4_SETTING_INFO));
         Status = EfiNicIp4ConfigSetInfo (Ip4ConfigInstance, NULL, TRUE);
@@ -564,7 +642,7 @@ Ip4DeviceRouteConfig (
 
     return EFI_NOT_FOUND;
   }
-  
+
   return Status;
 
 }
@@ -607,7 +685,6 @@ Ip4FormCallback (
   )
 {
   IP4_CONFIG_INSTANCE       *Ip4ConfigInstance;
-  CHAR8                     Ip4String[IP4_STR_MAX_SIZE];
   IP4_CONFIG_IFR_NVDATA     *IfrFormNvData;
   EFI_IP_ADDRESS            HostIp;
   EFI_IP_ADDRESS            SubnetMask;
@@ -633,27 +710,8 @@ Ip4FormCallback (
   Status = EFI_SUCCESS;
 
   switch (QuestionId) {
-
-  case KEY_ENABLE:
-    if (IfrFormNvData->Configure == 0) {
-      Ip4ConfigInstance->Ip4ConfigCallbackInfo.Configured = FALSE;
-    } else {
-      Ip4ConfigInstance->Ip4ConfigCallbackInfo.Configured = TRUE;
-    }
-    break;
-
-  case KEY_DHCP_ENABLE:
-    if (IfrFormNvData->DhcpEnable == 0) {
-      Ip4ConfigInstance->Ip4ConfigCallbackInfo.DhcpEnabled = FALSE;
-    } else {
-      Ip4ConfigInstance->Ip4ConfigCallbackInfo.DhcpEnabled = TRUE;
-    }
-
-    break;
-
   case KEY_LOCAL_IP:
-    UnicodeStrToAsciiStr (IfrFormNvData->StationAddress, Ip4String);
-    Status = Ip4AsciiStrToIp (Ip4String, &HostIp.v4);
+    Status = Ip4StrToIp (IfrFormNvData->StationAddress, &HostIp.v4);
     if (EFI_ERROR (Status) || !Ip4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
       CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
       Status = EFI_INVALID_PARAMETER;
@@ -664,10 +722,9 @@ Ip4FormCallback (
     break;
 
   case KEY_SUBNET_MASK:
-    UnicodeStrToAsciiStr (IfrFormNvData->SubnetMask, Ip4String);
-    Status = Ip4AsciiStrToIp (Ip4String, &SubnetMask.v4);
+    Status = Ip4StrToIp (IfrFormNvData->SubnetMask, &SubnetMask.v4);
     if (EFI_ERROR (Status) || ((SubnetMask.Addr[0] != 0) && (GetSubnetMaskPrefixLength (&SubnetMask.v4) == 0))) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid SubnetMask!", NULL);
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Subnet Mask!", NULL);
       Status = EFI_INVALID_PARAMETER;
     } else {
       CopyMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.SubnetMask, &SubnetMask.v4, sizeof (SubnetMask.v4));
@@ -676,8 +733,7 @@ Ip4FormCallback (
     break;
 
   case KEY_GATE_WAY:
-    UnicodeStrToAsciiStr (IfrFormNvData->GatewayAddress, Ip4String);
-    Status = Ip4AsciiStrToIp (Ip4String, &Gateway.v4);
+    Status = Ip4StrToIp (IfrFormNvData->GatewayAddress, &Gateway.v4);
     if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !Ip4IsUnicast (NTOHL (Gateway.Addr[0]), 0))) {
       CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Gateway!", NULL);
       Status = EFI_INVALID_PARAMETER;
@@ -688,22 +744,12 @@ Ip4FormCallback (
     break;
 
   case KEY_SAVE_CHANGES:
-    Status = Ip4ConfigConvertIfrNvDataToDeviceConfigData (Ip4ConfigInstance);
- 
+    Status = Ip4ConfigConvertIfrNvDataToDeviceConfigData (IfrFormNvData, Ip4ConfigInstance);
     *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-
     break;
 
   default:
-   
     break;
-  }
-
-  if (!EFI_ERROR (Status)) {
-    //
-    // Pass changed uncommitted data back to Form Browser
-    //
-    HiiSetBrowserData (&gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE, sizeof (IP4_CONFIG_IFR_NVDATA), (UINT8 *) IfrFormNvData, NULL);
   }
 
   FreePool (IfrFormNvData);
@@ -729,7 +775,7 @@ Ip4ConfigDeviceInit (
   EFI_HII_CONFIG_ACCESS_PROTOCOL *ConfigAccess;
   VENDOR_DEVICE_PATH             VendorDeviceNode;
   EFI_SERVICE_BINDING_PROTOCOL   *MnpSb;
-  CHAR16                         MacString[95];
+  CHAR16                         *MacString;
   CHAR16                         MenuString[128];
   CHAR16                         PortString[128];
   CHAR16                         *OldMenuString;
@@ -763,7 +809,7 @@ Ip4ConfigDeviceInit (
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Instance->ChildHandle,
                   &gEfiDevicePathProtocolGuid,
-                  Instance->HiiVendorDevicePath,      
+                  Instance->HiiVendorDevicePath,
                   &gEfiHiiConfigAccessProtocolGuid,
                   ConfigAccess,
                   NULL
@@ -777,13 +823,13 @@ Ip4ConfigDeviceInit (
                     &gEfiManagedNetworkServiceBindingProtocolGuid,
                     (VOID **) &MnpSb,
                     Instance->Image,
-                    Instance->ChildHandle, 
+                    Instance->ChildHandle,
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                     );
   }
 
   ASSERT_EFI_ERROR (Status);
- 
+
   //
   // Publish our HII data
   //
@@ -801,14 +847,16 @@ Ip4ConfigDeviceInit (
   //
   // Append MAC string in the menu string and tile string
   //
-  Ip4MacAddrToStr (&Instance->NicAddr.MacAddr, Instance->NicAddr.Len, MacString);
-
-  OldMenuString = HiiGetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_CONFIG_FORM_TITLE), NULL);
+  Status = NetLibGetMacString (Instance->Controller, Instance->Image, &MacString);
+  if (!EFI_ERROR (Status)) {
+    OldMenuString = HiiGetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_CONFIG_FORM_TITLE), NULL);
     UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
-  HiiSetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_CONFIG_FORM_TITLE), MenuString, NULL);
+    HiiSetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_CONFIG_FORM_TITLE), MenuString, NULL);
 
     UnicodeSPrint (PortString, 128, L"MAC:%s", MacString);
-  HiiSetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_DEVICE_FORM_TITLE), PortString, NULL);
+    HiiSetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_DEVICE_FORM_TITLE), PortString, NULL);
+    FreePool (MacString);
+  }
 
   return Status;
 }
@@ -847,7 +895,7 @@ Ip4ConfigDeviceUnload (
   gBS->UninstallMultipleProtocolInterfaces (
          Instance->ChildHandle,
          &gEfiDevicePathProtocolGuid,
-         Instance->HiiVendorDevicePath, 
+         Instance->HiiVendorDevicePath,
          &gEfiHiiConfigAccessProtocolGuid,
          &Instance->HiiConfigAccessProtocol,
          NULL

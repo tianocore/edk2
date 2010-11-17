@@ -16,6 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/SimpleNetwork.h>
+#include <Protocol/ManagedNetwork.h>
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
@@ -1151,6 +1152,175 @@ NetLibDestroyServiceChild (
   return Status;
 }
 
+/**
+  Get handle with Simple Network Protocol installed on it.
+
+  There should be MNP Service Binding Protocol installed on the input ServiceHandle.
+  If Simple Network Protocol is already installed on the ServiceHandle, the
+  ServiceHandle will be returned. If SNP is not installed on the ServiceHandle,
+  try to find its parent handle with SNP installed.
+
+  @param[in]   ServiceHandle    The handle where network service binding protocols are
+                                installed on.
+  @param[out]  Snp              The pointer to store the address of the SNP instance.
+                                This is an optional parameter that may be NULL.
+
+  @return The SNP handle, or NULL if not found.
+
+**/
+EFI_HANDLE
+EFIAPI
+NetLibGetSnpHandle (
+  IN   EFI_HANDLE                  ServiceHandle,
+  OUT  EFI_SIMPLE_NETWORK_PROTOCOL **Snp  OPTIONAL
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *SnpInstance;
+  EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
+  EFI_HANDLE                   SnpHandle;
+
+  //
+  // Try to open SNP from ServiceHandle
+  //
+  SnpInstance = NULL;
+  Status = gBS->HandleProtocol (ServiceHandle, &gEfiSimpleNetworkProtocolGuid, (VOID **) &SnpInstance);
+  if (!EFI_ERROR (Status)) {
+    if (Snp != NULL) {
+      *Snp = SnpInstance;
+    }
+    return ServiceHandle;
+  }
+
+  //
+  // Failed to open SNP, try to get SNP handle by LocateDevicePath()
+  //
+  DevicePath = DevicePathFromHandle (ServiceHandle);
+  if (DevicePath == NULL) {
+    return NULL;
+  }
+
+  SnpHandle = NULL;
+  Status = gBS->LocateDevicePath (&gEfiSimpleNetworkProtocolGuid, &DevicePath, &SnpHandle);
+  if (EFI_ERROR (Status)) {
+    //
+    // Failed to find SNP handle
+    //
+    return NULL;
+  }
+
+  Status = gBS->HandleProtocol (SnpHandle, &gEfiSimpleNetworkProtocolGuid, (VOID **) &SnpInstance);
+  if (!EFI_ERROR (Status)) {
+    if (Snp != NULL) {
+      *Snp = SnpInstance;
+    }
+    return SnpHandle;
+  }
+
+  return NULL;
+}
+
+
+/**
+  Get MAC address associated with the network service handle.
+
+  There should be MNP Service Binding Protocol installed on the input ServiceHandle.
+  If SNP is installed on the ServiceHandle or its parent handle, MAC address will
+  be retrieved from SNP. If no SNP found, try to get SNP mode data use MNP.
+
+  @param[in]   ServiceHandle    The handle where network service binding protocols are
+                                installed on.
+  @param[out]  MacAddress       The pointer to store the returned MAC address.
+  @param[out]  AddressSize      The length of returned MAC address.
+
+  @retval EFI_SUCCESS           MAC address is returned successfully.
+  @retval Others                Failed to get SNP mode data.
+
+**/
+EFI_STATUS
+EFIAPI
+NetLibGetMacAddress (
+  IN  EFI_HANDLE            ServiceHandle,
+  OUT EFI_MAC_ADDRESS       *MacAddress,
+  OUT UINTN                 *AddressSize
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
+  EFI_SIMPLE_NETWORK_MODE      *SnpMode;
+  EFI_SIMPLE_NETWORK_MODE      SnpModeData;
+  EFI_MANAGED_NETWORK_PROTOCOL *Mnp;
+  EFI_SERVICE_BINDING_PROTOCOL *MnpSb;
+  EFI_HANDLE                   *SnpHandle;
+  EFI_HANDLE                   MnpChildHandle;
+
+  ASSERT (MacAddress != NULL);
+  ASSERT (AddressSize != NULL);
+
+  //
+  // Try to get SNP handle
+  //
+  Snp = NULL;
+  SnpHandle = NetLibGetSnpHandle (ServiceHandle, &Snp);
+  if (SnpHandle != NULL) {
+    //
+    // SNP found, use it directly
+    //
+    SnpMode = Snp->Mode;
+  } else {
+    //
+    // Failed to get SNP handle, try to get MAC address from MNP
+    //
+    MnpChildHandle = NULL;
+    Status = gBS->HandleProtocol (
+                    ServiceHandle,
+                    &gEfiManagedNetworkServiceBindingProtocolGuid,
+                    (VOID **) &MnpSb
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Create a MNP child
+    //
+    Status = MnpSb->CreateChild (MnpSb, &MnpChildHandle);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Open MNP protocol
+    //
+    Status = gBS->HandleProtocol (
+                    MnpChildHandle,
+                    &gEfiManagedNetworkProtocolGuid,
+                    (VOID **) &Mnp
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Try to get SNP mode from MNP
+    //
+    Status = Mnp->GetModeData (Mnp, NULL, &SnpModeData);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    SnpMode = &SnpModeData;
+
+    //
+    // Destroy the MNP child
+    //
+    MnpSb->DestroyChild (MnpSb, MnpChildHandle);
+  }
+
+  *AddressSize = SnpMode->HwAddressSize;
+  CopyMem (MacAddress->Addr, SnpMode->CurrentAddress.Addr, SnpMode->HwAddressSize);
+
+  return EFI_SUCCESS;
+}
 
 /**
   Convert the mac address of the simple network protocol installed on

@@ -1,8 +1,8 @@
 /** @file
   Routines used to operate the Ip4 configure variable.
 
-Copyright (c) 2009 - 2010, Intel Corporation.<BR>
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
 http://opensource.org/licenses/bsd-license.php
@@ -40,7 +40,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// of variable length.
 ///
 typedef struct {
-  UINT16          NicAddr[3];                        ///< NIC MAC address
   UINT8           Configure;                         ///< NIC configure status
   UINT8           DhcpEnable;                        ///< Static or DHCP
   CHAR16          StationAddress[IP4_STR_MAX_SIZE];  ///< IP addresses
