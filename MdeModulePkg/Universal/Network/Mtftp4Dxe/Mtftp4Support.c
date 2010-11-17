@@ -1,7 +1,7 @@
 /** @file
   Support routines for Mtftp.
   
-Copyright (c) 2006 - 2009, Intel Corporation<BR>
+Copyright (c) 2006 - 2010, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -32,7 +32,7 @@ Mtftp4AllocateRange (
 {
   MTFTP4_BLOCK_RANGE        *Range;
 
-  Range = AllocatePool (sizeof (MTFTP4_BLOCK_RANGE));
+  Range = AllocateZeroPool (sizeof (MTFTP4_BLOCK_RANGE));
 
   if (Range == NULL) {
     return NULL;
@@ -41,6 +41,7 @@ Mtftp4AllocateRange (
   InitializeListHead (&Range->Link);
   Range->Start  = Start;
   Range->End    = End;
+  Range->Bound  = End;
 
   return Range;
 }
@@ -157,6 +158,8 @@ Mtftp4SetLastBlockNum (
 
   @param  Head                  The block range list to remove from
   @param  Num                   The block number to remove
+  @param  Completed             Whether Num is the last block number
+  @param  TotalBlock            The continuous block number in all 
 
   @retval EFI_NOT_FOUND         The block number isn't in the block range list
   @retval EFI_SUCCESS           The block number has been removed from the list
@@ -166,7 +169,9 @@ Mtftp4SetLastBlockNum (
 EFI_STATUS
 Mtftp4RemoveBlockNum (
   IN LIST_ENTRY             *Head,
-  IN UINT16                 Num
+  IN UINT16                 Num,
+  IN BOOLEAN                Completed,
+  OUT UINT64                *TotalBlock
   )
 {
   MTFTP4_BLOCK_RANGE        *Range;
@@ -207,9 +212,28 @@ Mtftp4RemoveBlockNum (
     } else if (Range->Start == Num) {
       Range->Start++;
 
-      if (Range->Start > Range->End) {
+      //
+      // Note that: RFC 1350 does not mention block counter roll-over, 
+      // but several TFTP hosts implement the roll-over be able to accept 
+      // transfers of unlimited size. There is no consensus, however, whether 
+      // the counter should wrap around to zero or to one. Many implementations 
+      // wrap to zero, because this is the simplest to implement. Here we choose 
+      // this solution.
+      //
+	  *TotalBlock  = Num;
+	  
+      if (Range->Round > 0) {
+	    *TotalBlock += Range->Bound +  MultU64x32 ((UINTN) (Range->Round -1), (UINT32) (Range->Bound + 1)) + 1;
+	  }
+
+      if (Range->Start > Range->Bound) {
+	  	  Range->Start = 0;
+		  Range->Round ++;
+      }
+
+      if ((Range->Start > Range->End) || Completed) {
         RemoveEntryList (&Range->Link);
-        gBS->FreePool (Range);
+        FreePool (Range);
       }
 
       return EFI_SUCCESS;
