@@ -59,7 +59,7 @@ EFI_HII_HANDLE    mHiiHandle;
 CONST CHAR16      *mIp6DstString;
 CONST CHAR16      *mIp6SrcString;
 EFI_GUID          mEfiPing6Guid = EFI_PING6_GUID;
-UINT32            mFrequency = 0;
+UINT64            mFrequency = 0;
 /**
   Get and caculate the frequency in tick/ms.
   The result is saved in the globle variable mFrequency
@@ -76,7 +76,7 @@ Ping6GetFrequency (
   EFI_STATUS               Status;
   EFI_CPU_ARCH_PROTOCOL    *Cpu;
   UINT64                   CurrentTick;
-  UINT32                   TimerPeriod;
+  UINT64                   TimerPeriod;
 
   Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **) &Cpu);
 
@@ -84,20 +84,20 @@ Ping6GetFrequency (
     return Status;
   }
 
-  Status = Cpu->GetTimerValue (Cpu, 0, &CurrentTick, (UINT64 *) &TimerPeriod);
+  Status = Cpu->GetTimerValue (Cpu, 0, &CurrentTick, &TimerPeriod);
 
   if (EFI_ERROR (Status)) {
     //
     // For NT32 Simulator only. 358049 is a similar value to keep timer granularity.
     // Set the timer period by ourselves.
     //
-    TimerPeriod = NTTIMERPERIOD;
+    TimerPeriod = (UINT64) NTTIMERPERIOD;
   }
   //
   // The timer period is in femtosecond (1 femtosecond is 1e-15 second).
   // So 1e+12 is divided by timer period to produce the freq in tick/ms.
   //
-  mFrequency = (UINT32) DivU64x32 (1000000000000ULL, TimerPeriod);
+  mFrequency = DivU64x64Remainder (1000000000000ULL, TimerPeriod, NULL);
 
   return EFI_SUCCESS;
 }
@@ -111,14 +111,14 @@ Ping6GetFrequency (
   @return The duration in ms.
 
 **/
-UINT32
+UINT64
 Ping6CalculateTick (
   IN UINT64    Begin,
   IN UINT64    End
   )
 {
   ASSERT (End > Begin);
-  return (UINT32) DivU64x32 (End - Begin, mFrequency);
+  return DivU64x64Remainder (End - Begin, mFrequency, NULL);
 }
 
 /**
@@ -242,7 +242,7 @@ Ping6OnEchoReplyReceived (
   EFI_IP6_RECEIVE_DATA        *RxData;
   ICMP6_ECHO_REQUEST_REPLY    *Reply;
   UINT32                      PayLoad;
-  UINT32                      Rtt;
+  UINT64                      Rtt;
   CHAR8                       Near;
 
   Private = (PING6_PRIVATE_DATA *) Context;
@@ -524,7 +524,7 @@ Ping6OnTimerRoutine (
   PING6_ICMP6_TX_INFO    *TxInfo;
   LIST_ENTRY             *Entry;
   LIST_ENTRY             *NextEntry;
-  UINT32                 Time;
+  UINT64                 Time;
 
   Private = (PING6_PRIVATE_DATA *) Context;
 
@@ -870,7 +870,7 @@ Ping6 (
   Private->ImageHandle = ImageHandle;
   Private->SendNum     = SendNumber;
   Private->BufferSize  = BufferSize;
-  Private->RttMin      = 0xFFFF;
+  Private->RttMin      = ~((UINT64 )(0x0));
   Private->Status      = EFI_NOT_READY;
 
   InitializeListHead (&Private->TxList);
@@ -989,7 +989,7 @@ ON_STAT:
       mHiiHandle,
       Private->RttMin,
       Private->RttMax,
-      Private->RttSum / Private->RxCount
+      DivU64x64Remainder (Private->RttSum, Private->RxCount, NULL)
       );
   }
 

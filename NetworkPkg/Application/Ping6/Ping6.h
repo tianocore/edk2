@@ -65,9 +65,9 @@ typedef struct _PING6_PRIVATE_DATA {
   EFI_IP6_COMPLETION_TOKEN    RxToken;
   UINT16                      RxCount;
   UINT16                      TxCount;
-  UINT32                      RttSum;
-  UINT32                      RttMin;
-  UINT32                      RttMax;
+  UINT64                      RttSum;
+  UINT64                      RttMin;
+  UINT64                      RttMax;
   UINT32                      SequenceNum;
 
   EFI_IPv6_ADDRESS            SrcAddress;
