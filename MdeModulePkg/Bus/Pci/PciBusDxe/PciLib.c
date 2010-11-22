@@ -783,6 +783,7 @@ PciScanBus (
           // Check if it is a Hotplug PCI controller
           //
           if (IsRootPciHotPlugController (PciDevice->DevicePath, &HpIndex)) {
+            gPciRootHpcData[HpIndex].Found = TRUE;
 
             if (!gPciRootHpcData[HpIndex].Initialized) {
 
@@ -1235,6 +1236,7 @@ PciHostBridgeEnumerator (
     Status = AllRootHPCInitialized (STALL_1_SECOND * 15);
 
     if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "Some root HPC failed to initialize\n"));
       return Status;
     }
 
