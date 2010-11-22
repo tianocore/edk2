@@ -10,7 +10,7 @@
   This library is mainly used by DxeCore to start performance logging to ensure that
   Performance Protocol is installed at the very beginning of DXE phase.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -92,8 +92,8 @@ InternalSearchForGaugeEntry (
 
   for (Index = 0; Index < NumberOfEntries; Index++) {
     if ((GaugeEntryArray[Index].Handle == (EFI_PHYSICAL_ADDRESS) (UINTN) Handle) &&
-         AsciiStrnCmp (GaugeEntryArray[Index].Token, Token, PEI_PERFORMANCE_STRING_LENGTH) == 0 &&
-         AsciiStrnCmp (GaugeEntryArray[Index].Module, Module, PEI_PERFORMANCE_STRING_LENGTH) == 0 &&
+         AsciiStrnCmp (GaugeEntryArray[Index].Token, Token, DXE_PERFORMANCE_STRING_LENGTH) == 0 &&
+         AsciiStrnCmp (GaugeEntryArray[Index].Module, Module, DXE_PERFORMANCE_STRING_LENGTH) == 0 &&
          GaugeEntryArray[Index].EndTimeStamp == 0
        ) {
       break;
