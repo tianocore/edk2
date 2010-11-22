@@ -185,7 +185,7 @@ PerformQuickSort (
 }
 
 /**
-  function to compare 2 device paths for use in QuickSort
+  Function to compare 2 device paths for use in QuickSort.
 
   @param[in] Buffer1            pointer to Device Path poiner to compare
   @param[in] Buffer2            pointer to second DevicePath pointer to compare
