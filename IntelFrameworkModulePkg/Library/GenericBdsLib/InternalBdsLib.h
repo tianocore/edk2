@@ -111,4 +111,13 @@ BdsLibGetImageHeader (
   OUT EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr
   );
 
+/**
+  This routine adjust the memory information for different memory type and 
+  save them into the variables for next boot.
+**/
+VOID
+BdsSetMemoryTypeInformationVariable (
+  VOID
+  );
+
 #endif // _BDS_LIB_H_

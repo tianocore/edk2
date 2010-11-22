@@ -1096,21 +1096,12 @@ BdsLibGetImageHeader (
 }
 
 /**
-
-  This routine is a notification function for legayc boot or exit boot
-  service event. It will adjust the memory information for different
-  memory type and save them into the variables for next boot.
-
-
-  @param Event           The event that triggered this notification function.
-  @param Context         Pointer to the notification functions context.
-
+  This routine adjust the memory information for different memory type and 
+  save them into the variables for next boot.
 **/
 VOID
-EFIAPI
 BdsSetMemoryTypeInformationVariable (
-  EFI_EVENT  Event,
-  VOID       *Context
+  VOID
   )
 {
   EFI_STATUS                   Status;
@@ -1238,17 +1229,15 @@ BdsSetMemoryTypeInformationVariable (
     // so the new Memory Type Information setting will be used to guarantee that an S4
     // entry/resume cycle will not fail.
     //
-    if (MemoryTypeInformationModified) {
-      DEBUG ((EFI_D_ERROR, "Memory Type Information settings change. Warm Reset!!!\n"));
+    if (MemoryTypeInformationModified && PcdGetBool (PcdResetOnMemoryTypeInformationChange)) {
+      DEBUG ((EFI_D_INFO, "Memory Type Information settings change. Warm Reset!!!\n"));
       gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
     }
   }
 }
 
 /**
-  This routine register a function to adjust the different type memory page number
-  just before booting and save the updated info into the variable for next boot to use.
-
+  This routine is kept for backward compatibility.
 **/
 VOID
 EFIAPI
@@ -1256,18 +1245,6 @@ BdsLibSaveMemoryTypeInformation (
   VOID
   )
 {
-  EFI_STATUS                   Status;
-  EFI_EVENT                    ReadyToBootEvent;
-
-  Status = EfiCreateEventReadyToBootEx (
-           TPL_CALLBACK,
-           BdsSetMemoryTypeInformationVariable,
-           NULL,
-           &ReadyToBootEvent
-           );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR,"Bds Set Memory Type Informationa Variable Fails\n"));
-  }
 }
 
 

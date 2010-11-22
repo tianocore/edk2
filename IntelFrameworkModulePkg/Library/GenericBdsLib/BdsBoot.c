@@ -227,6 +227,12 @@ BdsLibBootViaBootOption (
   //
   EfiSignalEventReadyToBoot();
 
+  //
+  // Adjust the different type memory page number just before booting
+  // and save the updated info into the variable for next boot to use
+  //
+  BdsSetMemoryTypeInformationVariable ();
+
 
   //
   // Set Boot Current
