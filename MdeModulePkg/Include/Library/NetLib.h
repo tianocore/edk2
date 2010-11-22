@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Ip6.h>
 
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 
 typedef UINT32          IP4_ADDR;
 typedef UINT32          TCP_SEQNO;
