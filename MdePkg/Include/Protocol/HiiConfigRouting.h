@@ -328,7 +328,10 @@ EFI_STATUS
                                  value pair. Block is left updated and
                                  Progress points at the '&' preceding the first
                                  non-<BlockName>.
-
+  @retval EFI_DEVICE_ERROR       Block not large enough. Progress undefined.
+  @retval EFI_NOT_FOUND          Target for the specified routing data was not found.
+                                 Progress points to the "G" in "GUID" of the errant
+                                 routing data.
 **/
 typedef
 EFI_STATUS
