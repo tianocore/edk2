@@ -3224,6 +3224,10 @@ Exit:
                                  value pair. Block is left updated and
                                  Progress points at the '&' preceding the first
                                  non-<BlockName>.
+  @retval EFI_DEVICE_ERROR       Block not large enough. Progress undefined.
+  @retval EFI_NOT_FOUND          Target for the specified routing data was not found.
+                                 Progress points to the "G" in "GUID" of the errant
+                                 routing data.
 
 **/
 EFI_STATUS
@@ -3245,13 +3249,14 @@ HiiConfigToBlock (
   UINTN                               Width;
   UINT8                               *Value;
   UINTN                               BufferSize;
+  UINTN                               MaxBlockSize;
 
   if (This == NULL || BlockSize == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (ConfigResp == NULL || Block == NULL) {
-    *Progress = ConfigResp;
+  *Progress = ConfigResp;
+  if (ConfigResp == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -3261,6 +3266,7 @@ HiiConfigToBlock (
   StringPtr  = ConfigResp;
   BufferSize = *BlockSize;
   Value      = NULL;
+  MaxBlockSize = 0;
 
   //
   // Jump <ConfigHdr>
@@ -3366,13 +3372,12 @@ HiiConfigToBlock (
     //
     // Update the Block with configuration info
     //
-
-    if (Offset + Width > BufferSize) {
-      return EFI_DEVICE_ERROR;
+    if ((Block != NULL) && (Offset + Width <= BufferSize)) {
+      CopyMem (Block + Offset, Value, Width);
     }
-
-    CopyMem (Block + Offset, Value, Width);
-    *BlockSize = Offset + Width - 1;
+    if (Offset + Width > MaxBlockSize) {
+      MaxBlockSize = Offset + Width;
+    }
 
     FreePool (Value);
     Value = NULL;
@@ -3397,6 +3402,17 @@ HiiConfigToBlock (
   }
 
   *Progress = StringPtr + StrLen (StringPtr);
+  *BlockSize = MaxBlockSize - 1;
+
+  if (MaxBlockSize > BufferSize) {
+    *BlockSize = MaxBlockSize;
+    if (Block == NULL) {
+      return EFI_INVALID_PARAMETER;
+    } else {
+      return EFI_DEVICE_ERROR;
+    }
+  }
+
   return EFI_SUCCESS;
 
 Exit:
