@@ -386,6 +386,7 @@ EfiShellGetFilePathFromDevicePath(
   EFI_HANDLE                      MapHandle;
   EFI_STATUS                      Status;
   FILEPATH_DEVICE_PATH            *FilePath;
+  FILEPATH_DEVICE_PATH            *AlignedNode;
 
   PathForReturn = NULL;
   PathSize = 0;
@@ -436,7 +437,10 @@ EfiShellGetFilePathFromDevicePath(
           //
           ASSERT((PathForReturn == NULL && PathSize == 0) || (PathForReturn != NULL));
           PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, L"\\", 1);
-          PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, FilePath->PathName, 0);
+
+          AlignedNode = AllocateCopyPool (DevicePathNodeLength(FilePath), FilePath);
+          PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, AlignedNode->PathName, 0);
+          FreePool(AlignedNode);
         }
       } // for loop of remaining nodes
     }
