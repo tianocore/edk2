@@ -3,7 +3,7 @@
   Implment all four UEFI runtime variable services and 
   install variable architeture protocol.
   
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -178,6 +178,9 @@ VariableClassAddressChangeEvent (
   IN VOID             *Context
   )
 {
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->PlatformLangCodes);
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->LangCodes);
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->PlatformLang);
   EfiConvertPointer (
     0x0,
     (VOID **) &mVariableModuleGlobal->VariableGlobal[Physical].NonVolatileVariableBase

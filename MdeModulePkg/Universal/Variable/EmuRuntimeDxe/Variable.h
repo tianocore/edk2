@@ -3,7 +3,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by EmuVariable module.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,6 +38,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define GET_VARIABLE_NAME_PTR(a)  (CHAR16 *) ((UINTN) (a) + sizeof (VARIABLE_HEADER))
 
+///
+/// The size of a 3 character ISO639 language code.
+///
+#define ISO_639_2_ENTRY_SIZE    3
+
 typedef enum {
   Physical,
   Virtual
@@ -62,10 +67,10 @@ typedef struct {
   UINTN           NonVolatileLastVariableOffset;
   UINTN           CommonVariableTotalSize;
   UINTN           HwErrVariableTotalSize;
-  CHAR8           PlatformLangCodes[256]; //Pre-allocate 256 bytes space to accommodate the PlatformlangCodes.
-  CHAR8           LangCodes[256]; //Pre-allocate 256 bytes space to accommodate the langCodes.
-  CHAR8           PlatformLang[8]; //Pre-allocate 8 bytes space to accommodate the Platformlang variable.
-  CHAR8           Lang[4]; //Pre-allocate 4 bytes space to accommodate the lang variable.
+  CHAR8           *PlatformLangCodes;
+  CHAR8           *LangCodes;
+  CHAR8           *PlatformLang;
+  CHAR8           Lang[ISO_639_2_ENTRY_SIZE + 1];
 } ESAL_VARIABLE_GLOBAL;
 
 ///
