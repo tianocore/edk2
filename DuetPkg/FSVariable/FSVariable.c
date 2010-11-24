@@ -576,7 +576,6 @@ Returns:
 
 **/
 UINTN
-EFIAPI
 GetIndexFromSupportedLangCodes(
   IN  CHAR8            *SupportedLang,
   IN  CHAR8            *Lang,
@@ -584,13 +583,11 @@ GetIndexFromSupportedLangCodes(
   ) 
 {
   UINTN    Index;
-  UINT32   CompareLength;
-  CHAR8    *Supported;
+  UINTN    CompareLength;
+  UINTN    LanguageLength;
 
-  Index = 0;
-  Supported = SupportedLang;
   if (Iso639Language) {
-    CompareLength = 3;
+    CompareLength = ISO_639_2_ENTRY_SIZE;
     for (Index = 0; Index < AsciiStrLen (SupportedLang); Index += CompareLength) {
       if (AsciiStrnCmp (Lang, SupportedLang + Index, CompareLength) == 0) {
         //
@@ -606,20 +603,26 @@ GetIndexFromSupportedLangCodes(
     //
     // Compare RFC4646 language code
     //
-    while (*Supported != '\0') {
+    Index = 0;
+    for (LanguageLength = 0; Lang[LanguageLength] != '\0'; LanguageLength++);
+
+    for (Index = 0; *SupportedLang != '\0'; Index++, SupportedLang += CompareLength) {
       //
-      // take semicolon as delimitation, sequentially traverse supported language codes.
+      // Skip ';' characters in SupportedLang
       //
-      for (CompareLength = 0; *Supported != ';' && *Supported != '\0'; CompareLength++) {
-        Supported++;
-      }
-      if (AsciiStrnCmp (Lang, Supported - CompareLength, CompareLength) == 0) {
+      for (; *SupportedLang != '\0' && *SupportedLang == ';'; SupportedLang++);
+      //
+      // Determine the length of the next language code in SupportedLang
+      //
+      for (CompareLength = 0; SupportedLang[CompareLength] != '\0' && SupportedLang[CompareLength] != ';'; CompareLength++);
+      
+      if ((CompareLength == LanguageLength) && 
+          (AsciiStrnCmp (Lang, SupportedLang, CompareLength) == 0)) {
         //
         // Successfully find the index of Lang string in SupportedLang string.
         //
         return Index;
       }
-      Index++;
     }
     ASSERT (FALSE);
     return 0;
@@ -653,7 +656,6 @@ GetIndexFromSupportedLangCodes(
 
 **/
 CHAR8 *
-EFIAPI
 GetLangFromSupportedLangCodes (
   IN  CHAR8            *SupportedLang,
   IN  UINTN            Index,
@@ -661,7 +663,7 @@ GetLangFromSupportedLangCodes (
 )
 {
   UINTN    SubIndex;
-  UINT32   CompareLength;
+  UINTN    CompareLength;
   CHAR8    *Supported;
 
   SubIndex  = 0;
@@ -672,10 +674,10 @@ GetLangFromSupportedLangCodes (
     // As this code will be invoked in RUNTIME, therefore there is not memory allocate/free operation.
     // In driver entry, it pre-allocates a runtime attribute memory to accommodate this string.
     //
-    CompareLength = 3;
-    SetMem (mGlobal->Lang, sizeof(mGlobal->Lang), 0);
+    CompareLength = ISO_639_2_ENTRY_SIZE;
+    mGlobal->Lang[CompareLength] = '\0';
     return CopyMem (mGlobal->Lang, SupportedLang + Index * CompareLength, CompareLength);
-      
+
   } else {
     while (TRUE) {
       //
@@ -698,12 +700,142 @@ GetLangFromSupportedLangCodes (
         // As this code will be invoked in RUNTIME, therefore there is not memory allocate/free operation.
         // In driver entry, it pre-allocates a runtime attribute memory to accommodate this string.
         //
-        SetMem (mGlobal->PlatformLang, sizeof (mGlobal->PlatformLang), 0);
+        mGlobal->PlatformLang[CompareLength] = '\0';
         return CopyMem (mGlobal->PlatformLang, Supported - CompareLength, CompareLength);
       }
       SubIndex++;
     }
   }
+}
+
+/**
+  Returns a pointer to an allocated buffer that contains the best matching language 
+  from a set of supported languages.  
+  
+  This function supports both ISO 639-2 and RFC 4646 language codes, but language 
+  code types may not be mixed in a single call to this function. This function
+  supports a variable argument list that allows the caller to pass in a prioritized
+  list of language codes to test against all the language codes in SupportedLanguages.
+
+  If SupportedLanguages is NULL, then ASSERT().
+
+  @param[in]  SupportedLanguages  A pointer to a Null-terminated ASCII string that
+                                  contains a set of language codes in the format 
+                                  specified by Iso639Language.
+  @param[in]  Iso639Language      If TRUE, then all language codes are assumed to be
+                                  in ISO 639-2 format.  If FALSE, then all language
+                                  codes are assumed to be in RFC 4646 language format
+  @param[in]  ...                 A variable argument list that contains pointers to 
+                                  Null-terminated ASCII strings that contain one or more
+                                  language codes in the format specified by Iso639Language.
+                                  The first language code from each of these language
+                                  code lists is used to determine if it is an exact or
+                                  close match to any of the language codes in 
+                                  SupportedLanguages.  Close matches only apply to RFC 4646
+                                  language codes, and the matching algorithm from RFC 4647
+                                  is used to determine if a close match is present.  If 
+                                  an exact or close match is found, then the matching
+                                  language code from SupportedLanguages is returned.  If
+                                  no matches are found, then the next variable argument
+                                  parameter is evaluated.  The variable argument list 
+                                  is terminated by a NULL.
+
+  @retval NULL   The best matching language could not be found in SupportedLanguages.
+  @retval NULL   There are not enough resources available to return the best matching 
+                 language.
+  @retval Other  A pointer to a Null-terminated ASCII string that is the best matching 
+                 language in SupportedLanguages.
+
+**/
+CHAR8 *
+VariableGetBestLanguage (
+  IN CONST CHAR8  *SupportedLanguages, 
+  IN BOOLEAN      Iso639Language,
+  ...
+  )
+{
+  VA_LIST      Args;
+  CHAR8        *Language;
+  UINTN        CompareLength;
+  UINTN        LanguageLength;
+  CONST CHAR8  *Supported;
+  CHAR8        *Buffer;
+
+  ASSERT (SupportedLanguages != NULL);
+
+  VA_START (Args, Iso639Language);
+  while ((Language = VA_ARG (Args, CHAR8 *)) != NULL) {
+    //
+    // Default to ISO 639-2 mode
+    //
+    CompareLength  = 3;
+    LanguageLength = MIN (3, AsciiStrLen (Language));
+
+    //
+    // If in RFC 4646 mode, then determine the length of the first RFC 4646 language code in Language
+    //
+    if (!Iso639Language) {
+      for (LanguageLength = 0; Language[LanguageLength] != 0 && Language[LanguageLength] != ';'; LanguageLength++);
+    }
+
+    //
+    // Trim back the length of Language used until it is empty
+    //
+    while (LanguageLength > 0) {
+      //
+      // Loop through all language codes in SupportedLanguages
+      //
+      for (Supported = SupportedLanguages; *Supported != '\0'; Supported += CompareLength) {
+        //
+        // In RFC 4646 mode, then Loop through all language codes in SupportedLanguages
+        //
+        if (!Iso639Language) {
+          //
+          // Skip ';' characters in Supported
+          //
+          for (; *Supported != '\0' && *Supported == ';'; Supported++);
+          //
+          // Determine the length of the next language code in Supported
+          //
+          for (CompareLength = 0; Supported[CompareLength] != 0 && Supported[CompareLength] != ';'; CompareLength++);
+          //
+          // If Language is longer than the Supported, then skip to the next language
+          //
+          if (LanguageLength > CompareLength) {
+            continue;
+          }
+        }
+        //
+        // See if the first LanguageLength characters in Supported match Language
+        //
+        if (AsciiStrnCmp (Supported, Language, LanguageLength) == 0) {
+          VA_END (Args);
+
+          Buffer = Iso639Language ? mGlobal->Lang : mGlobal->PlatformLang;
+          Buffer[CompareLength] = '\0';
+          return CopyMem (Buffer, Supported, CompareLength);
+        }
+      }
+
+      if (Iso639Language) {
+        //
+        // If ISO 639 mode, then each language can only be tested once
+        //
+        LanguageLength = 0;
+      } else {
+        //
+        // If RFC 4646 mode, then trim Language from the right to the next '-' character 
+        //
+        for (LanguageLength--; LanguageLength > 0 && Language[LanguageLength] != '-'; LanguageLength--);
+      }
+    }
+  }
+  VA_END (Args);
+
+  //
+  // No matches were found 
+  //
+  return NULL;
 }
 
 /**
@@ -720,101 +852,186 @@ GetLangFromSupportedLangCodes (
 
   @param[in] DataSize           Size of data. 0 means delete
 
-  @retval EFI_SUCCESS  auto update operation is successful.
-
 **/
-EFI_STATUS
-EFIAPI
+VOID
 AutoUpdateLangVariable(
   IN  CHAR16             *VariableName,
   IN  VOID               *Data,
   IN  UINTN              DataSize
   )
 {
-  EFI_STATUS     Status;
-  CHAR8          *BestPlatformLang;
-  CHAR8          *BestLang;
-  UINTN          Index;
-  UINT32         Attributes;
+  EFI_STATUS             Status;
+  CHAR8                  *BestPlatformLang;
+  CHAR8                  *BestLang;
+  UINTN                  Index;
+  UINT32                 Attributes;
   VARIABLE_POINTER_TRACK Variable;
+  BOOLEAN                SetLanguageCodes;
 
+  //
+  // Don't do updates for delete operation
+  //
+  if (DataSize == 0) {
+    return;
+  }
+
+  SetLanguageCodes = FALSE;
+
+  if (StrCmp (VariableName, L"PlatformLangCodes") == 0) {
+    //
+    // PlatformLangCodes is a volatile variable, so it can not be updated at runtime.
+    //
+    if (EfiAtRuntime ()) {
+      return;
+    }
+
+    SetLanguageCodes = TRUE;
+
+    //
+    // According to UEFI spec, PlatformLangCodes is only set once in firmware initialization, and is read-only
+    // Therefore, in variable driver, only store the original value for other use.
+    //
+    if (mGlobal->PlatformLangCodes != NULL) {
+      FreePool (mGlobal->PlatformLangCodes);
+    }
+    mGlobal->PlatformLangCodes = AllocateRuntimeCopyPool (DataSize, Data);
+    ASSERT (mGlobal->PlatformLangCodes != NULL);
+
+    //
+    // PlatformLang holds a single language from PlatformLangCodes, 
+    // so the size of PlatformLangCodes is enough for the PlatformLang.
+    //
+    if (mGlobal->PlatformLang != NULL) {
+      FreePool (mGlobal->PlatformLang);
+    }
+    mGlobal->PlatformLang = AllocateRuntimePool (DataSize);
+    ASSERT (mGlobal->PlatformLang != NULL);
+
+  } else if (StrCmp (VariableName, L"LangCodes") == 0) {
+    //
+    // LangCodes is a volatile variable, so it can not be updated at runtime.
+    //
+    if (EfiAtRuntime ()) {
+      return;
+    }
+
+    SetLanguageCodes = TRUE;
+
+    //
+    // According to UEFI spec, LangCodes is only set once in firmware initialization, and is read-only
+    // Therefore, in variable driver, only store the original value for other use.
+    //
+    if (mGlobal->LangCodes != NULL) {
+      FreePool (mGlobal->LangCodes);
+    }
+    mGlobal->LangCodes = AllocateRuntimeCopyPool (DataSize, Data);
+    ASSERT (mGlobal->LangCodes != NULL);
+  }
+
+  if (SetLanguageCodes 
+      && (mGlobal->PlatformLangCodes != NULL)
+      && (mGlobal->LangCodes != NULL)) {
+    //
+    // Update Lang if PlatformLang is already set
+    // Update PlatformLang if Lang is already set
+    //
+    Status = FindVariable (L"PlatformLang", &gEfiGlobalVariableGuid, &Variable);
+    if (!EFI_ERROR (Status)) {
+      //
+      // Update Lang
+      //
+      VariableName = L"PlatformLang";
+      Data         = GetVariableDataPtr (Variable.CurrPtr);
+      DataSize     = Variable.CurrPtr->DataSize;
+    } else {
+      Status = FindVariable (L"Lang", &gEfiGlobalVariableGuid, &Variable);
+      if (!EFI_ERROR (Status)) {
+        //
+        // Update PlatformLang
+        //
+        VariableName = L"Lang";
+        Data         = GetVariableDataPtr (Variable.CurrPtr);
+        DataSize     = Variable.CurrPtr->DataSize;
+      } else {
+        //
+        // Neither PlatformLang nor Lang is set, directly return
+        //
+        return;
+      }
+    }
+  }
+  
   //
   // According to UEFI spec, "Lang" and "PlatformLang" is NV|BS|RT attributions.
   //
   Attributes = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS;
 
-  if (StrCmp (VariableName, L"PlatformLangCodes") == 0) {
+  if (StrCmp (VariableName, L"PlatformLang") == 0) {
     //
-    // According to UEFI spec, PlatformLangCodes is only set once in firmware initialization, and is read-only
-    // Therefore, in variable driver, only store the original value for other use.
+    // Update Lang when PlatformLangCodes/LangCodes were set.
     //
-    AsciiStrnCpy (mGlobal->PlatformLangCodes, Data, DataSize);
-  } else if (StrCmp (VariableName, L"LangCodes") == 0) {
-    //
-    // According to UEFI spec, LangCodes is only set once in firmware initialization, and is read-only
-    // Therefore, in variable driver, only store the original value for other use.
-    //
-    AsciiStrnCpy (mGlobal->LangCodes, Data, DataSize);
-  } else if ((StrCmp (VariableName, L"PlatformLang") == 0) && (DataSize != 0)) {
-    ASSERT (AsciiStrLen (mGlobal->PlatformLangCodes) != 0);
+    if ((mGlobal->PlatformLangCodes != NULL) && (mGlobal->LangCodes != NULL)) {
+      //
+      // When setting PlatformLang, firstly get most matched language string from supported language codes.
+      //
+      BestPlatformLang = VariableGetBestLanguage (mGlobal->PlatformLangCodes, FALSE, Data, NULL);
+      if (BestPlatformLang != NULL) {
+        //
+        // Get the corresponding index in language codes.
+        //
+        Index = GetIndexFromSupportedLangCodes (mGlobal->PlatformLangCodes, BestPlatformLang, FALSE);
 
-    //
-    // When setting PlatformLang, firstly get most matched language string from supported language codes.
-    //
-    BestPlatformLang = GetBestLanguage(mGlobal->PlatformLangCodes, FALSE, Data, NULL);
+        //
+        // Get the corresponding ISO639 language tag according to RFC4646 language tag.
+        //
+        BestLang = GetLangFromSupportedLangCodes (mGlobal->LangCodes, Index, TRUE);
 
-    //
-    // Get the corresponding index in language codes.
-    //
-    Index = GetIndexFromSupportedLangCodes(mGlobal->PlatformLangCodes, BestPlatformLang, FALSE);
+        //
+        // Successfully convert PlatformLang to Lang, and set the BestLang value into Lang variable simultaneously.
+        //
+        FindVariable(L"Lang", &gEfiGlobalVariableGuid, &Variable);
 
-    //
-    // Get the corresponding ISO639 language tag according to RFC4646 language tag.
-    //
-    BestLang = GetLangFromSupportedLangCodes(mGlobal->LangCodes, Index, TRUE);
+        Status = UpdateVariable (L"Lang", &gEfiGlobalVariableGuid, BestLang, ISO_639_2_ENTRY_SIZE + 1, Attributes, &Variable);
 
-    //
-    // Successfully convert PlatformLang to Lang, and set the BestLang value into Lang variable simultaneously.
-    //
-    FindVariable(L"Lang", &gEfiGlobalVariableGuid, &Variable);
+        DEBUG ((EFI_D_INFO, "Variable Driver Auto Update PlatformLang, PlatformLang:%a, Lang:%a\n", BestPlatformLang, BestLang));
 
-    Status = UpdateVariable(L"Lang", &gEfiGlobalVariableGuid, 
-                    BestLang, ISO_639_2_ENTRY_SIZE + 1, Attributes, &Variable);
+        ASSERT_EFI_ERROR(Status);
+      }
+    }
 
-    DEBUG((EFI_D_INFO, "Variable Driver Auto Update PlatformLang, PlatformLang:%a, Lang:%a\n", BestPlatformLang, BestLang));
+  } else if (StrCmp (VariableName, L"Lang") == 0) {
+    //
+    // Update PlatformLang when PlatformLangCodes/LangCodes were set.
+    //
+    if ((mGlobal->PlatformLangCodes != NULL) && (mGlobal->LangCodes != NULL)) {
+      //
+      // When setting Lang, firstly get most matched language string from supported language codes.
+      //
+      BestLang = VariableGetBestLanguage (mGlobal->LangCodes, TRUE, Data, NULL);
+      if (BestLang != NULL) {
+        //
+        // Get the corresponding index in language codes.
+        //
+        Index = GetIndexFromSupportedLangCodes (mGlobal->LangCodes, BestLang, TRUE);
 
-    ASSERT_EFI_ERROR(Status);
-    
-  } else if ((StrCmp (VariableName, L"Lang") == 0) && (DataSize != 0)) {
-    ASSERT (AsciiStrLen (mGlobal->LangCodes) != 0);
+        //
+        // Get the corresponding RFC4646 language tag according to ISO639 language tag.
+        //
+        BestPlatformLang = GetLangFromSupportedLangCodes (mGlobal->PlatformLangCodes, Index, FALSE);
 
-    //
-    // When setting Lang, firstly get most matched language string from supported language codes.
-    //
-    BestLang = GetBestLanguage(mGlobal->LangCodes, TRUE, Data, NULL);
+        //
+        // Successfully convert Lang to PlatformLang, and set the BestPlatformLang value into PlatformLang variable simultaneously.
+        //
+        FindVariable(L"PlatformLang", &gEfiGlobalVariableGuid, &Variable);
 
-    //
-    // Get the corresponding index in language codes.
-    //
-    Index = GetIndexFromSupportedLangCodes(mGlobal->LangCodes, BestLang, TRUE);
+        Status = UpdateVariable (L"PlatformLang", &gEfiGlobalVariableGuid, BestPlatformLang, 
+                                 AsciiStrSize (BestPlatformLang), Attributes, &Variable);
 
-    //
-    // Get the corresponding RFC4646 language tag according to ISO639 language tag.
-    //
-    BestPlatformLang = GetLangFromSupportedLangCodes(mGlobal->PlatformLangCodes, Index, FALSE);
-
-    //
-    // Successfully convert Lang to PlatformLang, and set the BestPlatformLang value into PlatformLang variable simultaneously.
-    //
-    FindVariable(L"PlatformLang", &gEfiGlobalVariableGuid, &Variable);
-
-    Status = UpdateVariable(L"PlatformLang", &gEfiGlobalVariableGuid, 
-                    BestPlatformLang, AsciiStrSize (BestPlatformLang), Attributes, &Variable);
-
-    DEBUG((EFI_D_INFO, "Variable Driver Auto Update Lang, Lang:%a, PlatformLang:%a\n", BestLang, BestPlatformLang));
-    ASSERT_EFI_ERROR(Status);
+        DEBUG ((EFI_D_INFO, "Variable Driver Auto Update Lang, Lang:%a, PlatformLang:%a\n", BestLang, BestPlatformLang));
+        ASSERT_EFI_ERROR (Status);
+      }
+    }
   }
-  return EFI_SUCCESS;
 }
 
 /**
@@ -1723,6 +1940,9 @@ OnVirtualAddressChangeFsv (
     EfiConvertPointer (0, (VOID**) &mGlobal->VariableStore[Index]);
     EfiConvertPointer (0, &mGlobal->VariableBase[Index]);
   }
+  EfiConvertPointer (0, (VOID **) &mGlobal->PlatformLangCodes);
+  EfiConvertPointer (0, (VOID **) &mGlobal->LangCodes);
+  EfiConvertPointer (0, (VOID **) &mGlobal->PlatformLang);
   EfiConvertPointer (0, &mGlobal->Scratch);
   EfiConvertPointer (0, (VOID**) &mGlobal);
 }

@@ -28,6 +28,7 @@ Abstract:
 #include <Library/BaseLib.h>
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
 #include <Library/DebugLib.h>
@@ -91,10 +92,10 @@ typedef struct {
   VOID               *Scratch;                      // Buffer used during reclaim
   UINTN              CommonVariableTotalSize;
   UINTN              HwErrVariableTotalSize;
-  CHAR8              PlatformLangCodes[256]; //Pre-allocate 256 bytes space to accommodate the PlatformlangCodes.
-  CHAR8              LangCodes[256];         //Pre-allocate 256 bytes space to accommodate the langCodes.
-  CHAR8              PlatformLang[8];        //Pre-allocate 8 bytes space to accommodate the Platformlang variable.
-  CHAR8              Lang[4];                //Pre-allocate 4 bytes space to accommodate the lang variable.
+  CHAR8              *PlatformLangCodes;
+  CHAR8              *LangCodes;
+  CHAR8              *PlatformLang;
+  CHAR8              Lang[ISO_639_2_ENTRY_SIZE + 1];
 } VARIABLE_GLOBAL;
 
 //
