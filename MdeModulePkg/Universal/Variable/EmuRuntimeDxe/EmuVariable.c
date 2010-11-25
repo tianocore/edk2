@@ -523,6 +523,11 @@ GetLangFromSupportedLangCodes (
         return CopyMem (mVariableModuleGlobal->PlatformLang, Supported - CompareLength, CompareLength);
       }
       SubIndex++;
+      
+      //
+      // Skip ';' characters in Supported
+      //
+      for (; *Supported != '\0' && *Supported == ';'; Supported++);
     }
   }
 }
