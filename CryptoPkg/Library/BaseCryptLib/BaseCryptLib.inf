@@ -46,8 +46,6 @@
   SysCall/BaseMemAllocation.c
 
 [Sources.Ia32]
-  SysCall/HelperWrapper.c
-
   SysCall/Ia32/MathMultS64x64.c     | MSFT
   SysCall/Ia32/MathDivU64x64.c      | MSFT
   SysCall/Ia32/MathReminderU64x64.c | MSFT

@@ -259,7 +259,12 @@
   $(OPENSSL_PATH)/crypto/bio/bss_file.c
   $(OPENSSL_PATH)/crypto/bio/bf_null.c
   $(OPENSSL_PATH)/crypto/bio/bf_buff.c
-  $(OPENSSL_PATH)/crypto/bio/b_print.c
+
+  #
+  # Not required for UEFI.
+  #
+  # $(OPENSSL_PATH)/crypto/bio/b_print.c
+  
   $(OPENSSL_PATH)/crypto/bio/b_dump.c
   $(OPENSSL_PATH)/crypto/bio/bf_nbio.c
   $(OPENSSL_PATH)/crypto/bio/bss_log.c
@@ -575,16 +580,22 @@
   DebugLib
 
 [BuildOptions]
-   # Override MSFT build option to remove /GL
-   MSFT:DEBUG_VS2003_IA32_CC_FLAGS       == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /FIAutoGen.h /EHs-c- /GR- /GF /GX- /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
-   MSFT:RELEASE_VS2003_IA32_CC_FLAGS     == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /FIAutoGen.h /EHs-c- /GR- /GF /GX- -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
-   MSFT:DEBUG_VS2003xASL_IA32_CC_FLAGS   == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /FIAutoGen.h /EHs-c- /GR- /GF /GX- /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
-   MSFT:RELEASE_VS2003xASL_IA32_CC_FLAGS == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /FIAutoGen.h /EHs-c- /GR- /GF /GX- -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
-   MSFT:DEBUG_*_IA32_CC_FLAGS            == /nologo /c /WX /GS- /Gs32768 /D UNICODE /O1ib2 /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
-   MSFT:RELEASE_*_IA32_CC_FLAGS          == /nologo /c /WX /GS- /Gs32768 /D UNICODE /O1ib2 /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
-   MSFT:DEBUG_*_X64_CC_FLAGS             == /nologo /c /WX /GS- /X /Gs32768 /D UNICODE /O1ib2s /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
-   MSFT:RELEASE_*_X64_CC_FLAGS           == /nologo /c /WX /GS- /X /Gs32768 /D UNICODE /O1ib2s /Gy /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
-   MSFT:DEBUG_*_IPF_CC_FLAGS             == /nologo /c /WX /GS- /X /EHs-c- /GR- /Gy /Os /FIAutoGen.h /QIPF_fr32 /Zi -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
-   MSFT:RELEASE_*_IPF_CC_FLAGS           == /nologo /c /WX /GS- /X /EHs-c- /GR- /Gy /Os /FIAutoGen.h /QIPF_fr32 -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
-  INTEL:*_*_*_CC_FLAGS                   = -U_WIN32 -U_WIN64 -U_MSC_VER -U__ICC $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
-    GCC:*_*_*_CC_FLAGS                   = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) -w
+   #
+   # Override MSFT build option to remove /W4 (to silence warning messages when building OpenSSL).
+   #
+   MSFT:DEBUG_VS2003_IA32_CC_FLAGS        == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /GX- /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT:RELEASE_VS2003_IA32_CC_FLAGS      == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /GX- -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT:DEBUG_VS2003xASL_IA32_CC_FLAGS    == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /GX- /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT:RELEASE_VS2003xASL_IA32_CC_FLAGS  == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /GX- -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT:DEBUG_DDK3790_IA32_CC_FLAGS       == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT RELEASE_DDK3790_IA32_CC_FLAGS     == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT:DEBUG_DDK3790xASL_IA32_CC_FLAGS   == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT RELEASE_DDK3790xASL_IA32_CC_FLAGS == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT:DEBUG_*_IA32_CC_FLAGS             == /nologo /c /WX /GS- /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT:RELEASE_*_IA32_CC_FLAGS           == /nologo /c /WX /GS- /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT:DEBUG_*_X64_CC_FLAGS              == /nologo /c /WX /GS- /X /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT:RELEASE_*_X64_CC_FLAGS            == /nologo /c /WX /GS- /X /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT:DEBUG_*_IPF_CC_FLAGS              == /nologo /c /WX /GS- /X /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32 /Zi -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT:RELEASE_*_IPF_CC_FLAGS            == /nologo /c /WX /GS- /X /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32 -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+  INTEL:*_*_*_CC_FLAGS                    = -U_WIN32 -U_WIN64 -U_MSC_VER -U__ICC $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+    GCC:*_*_*_CC_FLAGS                    = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) -w

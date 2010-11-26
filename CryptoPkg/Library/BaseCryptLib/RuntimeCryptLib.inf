@@ -35,7 +35,6 @@
   
   SysCall/CrtWrapper.c
   SysCall/TimerWrapper.c
-  SysCall/HelperWrapper.c
   SysCall/RuntimeMemAllocation.c
 
 [Sources.Ia32]

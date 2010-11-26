@@ -33,7 +33,6 @@
   Pk/CryptRsa.c
 
   SysCall/CrtWrapper.c
-  SysCall/HelperWrapper.c
   SysCall/BaseMemAllocation.c
 
 [Sources.Ia32]
