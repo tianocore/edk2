@@ -1020,18 +1020,26 @@ BdsLibEnumerateAllBootOption (
   if (mEnumBootDevice) {
     LastLang = GetVariable (L"LastEnumLang", &mBdsLibLastLangGuid);
     PlatLang = GetEfiGlobalVariable (L"PlatformLang");
-    if (LastLang == PlatLang) {
+    ASSERT (PlatLang != NULL);
+    if ((LastLang != NULL) && (AsciiStrCmp (LastLang, PlatLang) == 0)) {
       Status = BdsLibBuildOptionFromVar (BdsBootOptionList, L"BootOrder");
+      FreePool (LastLang);
+      FreePool (PlatLang);
       return Status;
     } else {
       Status = gRT->SetVariable (
         L"LastEnumLang",
         &mBdsLibLastLangGuid,
         EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-        sizeof (PlatLang),
+        AsciiStrSize (PlatLang),
         PlatLang
         );
       ASSERT_EFI_ERROR (Status);
+
+      if (LastLang != NULL) {
+        FreePool (LastLang);
+      }
+      FreePool (PlatLang);
     }
   }
 
