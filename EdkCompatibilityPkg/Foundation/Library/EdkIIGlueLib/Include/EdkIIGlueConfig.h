@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -33,10 +33,15 @@ Abstract:
 //  0x6000  - support EBC. Feb, 2007
 //  0x7000  - size reduction, Jun, 2007
 //  0x7100  - backward compatibility supported, Jun, 2007
+//  0x8000  - Driver model protocols2 supported, May, 2008
+//  0x9000  - add SmmRuntimeDxeReportStatusCodeLib and OemHookStatusCodeLibNull, Feb, 2009
+//  0x9100  - change to use unique member RT variable names in various library instances, June, 2009
+//  0x9200  - Update LEGACY_BOOT and READY_TO_BOOT event handling in UefiLib, July, 2009
+//  0x9300  - Remove OemHookStatusCodeLibNull. SmmRuntimeDxeReportStatusCodeLib uses SMM StatusCode Protocol, Oct, 2009
 //
 //  For reference only, don't change the value
 //
-#define EDKII_GLUE_LIBRARY_VERSION 0x7100
+#define EDKII_GLUE_LIBRARY_VERSION 0x9300
 
 
 //
@@ -120,7 +125,9 @@ Abstract:
 // This value is FSB Clock frequency. Its unit is Hz and its 
 // default value is 200000000, that means FSB frequency is 200Mhz.
 //
+#ifndef EDKII_GLUE_FSBClock
 #define EDKII_GLUE_FSBClock                     200000000
+#endif
 
 //
 // post code property mask
@@ -142,7 +149,9 @@ Abstract:
 // The base address of IPF IO Block
 //
 #ifdef MDE_CPU_IPF
+#ifndef EDKII_GLUE_IoBlockBaseAddressForIpf
 #define EDKII_GLUE_IoBlockBaseAddressForIpf     0x0ffffc000000
+#endif
 #endif
 
 #endif

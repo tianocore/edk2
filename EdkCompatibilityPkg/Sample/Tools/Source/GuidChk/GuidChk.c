@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -37,6 +37,9 @@ Abstract:
 #undef MAX_PATH
 #define MAX_PATH  1024
 #endif
+
+#define UTILITY_NAME    "GuidChk"
+#define UTILITY_VERSION "v1.0"
 
 typedef struct {
   INT8  *Extension;
@@ -593,25 +596,32 @@ Usage (
   VOID
   )
 {
-  int   Index;
-  char  *Str[] = {
-    "GuidChk - scan files for duplicate GUID or signature definitions",
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel GUID Check Utility",
+    "  Copyright (C), 2004 - 2008 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
     "",
-    "Usage:  GuidChk {options}\n",
-    "  Options: ",
-    "    -d dirname     exclude searching of a directory",
-    "    -f filename    exclude searching of a file",
-    "    -e extension   exclude searching of files by extension",
-    "    -p             print all GUIDS found",
-    "    -g             check for duplicate guids",
-    "    -s             check for duplicate signatures",
-    "    -x             print guid+defined symbol name",
-    "    -b outfile     write internal GUID+basename list to outfile",
-    "    -u dirname     exclude searching all subdirectories of a directory",
-    "    -h -?          print this help text",
-    " ",
-    "   Example: GuidChk -g -u build -d fv -f make.inf -e .pkg",
-    "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION]...",
+    "Description:",
+    "  Scan files for duplicate GUID or signature definitions.",
+    "Options:",
+    "  -d dirname     exclude searching of a directory",
+    "  -f filename    exclude searching of a file",
+    "  -e extension   exclude searching of files by extension",
+    "  -p             print all GUIDS found",
+    "  -g             check for duplicate guids",
+    "  -s             check for duplicate signatures",
+    "  -x             print guid+defined symbol name",
+    "  -b outfile     write internal GUID+basename list to outfile",
+    "  -u dirname     exclude searching all subdirectories of a directory",
+    "  -h -?          print this help text",
+    "Example Usage:",
+    "  GuidChk -g -u build -d fv -f make.inf -e .pkg",
     NULL
   };
   for (Index = 0; Str[Index] != NULL; Index++) {

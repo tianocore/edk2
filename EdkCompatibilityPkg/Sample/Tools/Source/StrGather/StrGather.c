@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -29,7 +29,8 @@ Abstract:
 #include "StrGather.h"
 #include "StringDB.h"
 
-#define TOOL_VERSION  "0.31"
+#define UTILITY_NAME     "StrGather"
+#define UTILITY_VERSION  "v1.0"
 
 typedef UINT16  WCHAR;
 
@@ -281,11 +282,6 @@ ParseIndirectionFiles (
   TEXT_STRING_LIST    *Files
   );
 
-STATUS
-StringDBCreateHiiExportPack (
-  INT8                *OutputFileName
-  );
-
 int
 main (
   int   Argc,
@@ -311,7 +307,7 @@ Returns:
 {
   STATUS  Status;
 
-  SetUtilityName (PROGRAM_NAME);
+  SetUtilityName (UTILITY_NAME);
   //
   // Process the command-line arguments
   //
@@ -405,7 +401,7 @@ Returns:
   // Dump the string data as HII binary string pack if requested
   //
   if ((mGlobals.HiiExportPackFileName[0] != 0) && (GetUtilityStatus () < STATUS_ERROR)) {
-    StringDBCreateHiiExportPack (mGlobals.HiiExportPackFileName);
+    StringDBCreateHiiExportPack (mGlobals.HiiExportPackFileName, mGlobals.Language);
   }
   //
   // Always update the database if no errors and not in dump mode. If they specified -od
@@ -1481,7 +1477,7 @@ FindFile (
     // Put the path and filename together
     //
     if (strlen (List->Str) + strlen (FileName) + 1 > FoundFileNameLen) {
-      Error (PROGRAM_NAME, 0, 0, NULL, "internal error - cannot concatenate path+filename");
+      Error (UTILITY_NAME, 0, 0, NULL, "internal error - cannot concatenate path+filename");
       return NULL;
     }
     //
@@ -1581,7 +1577,7 @@ ProcessArgs (
       // check for one more arg
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing include path");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing include path");
         return STATUS_ERROR;
       }
       //
@@ -1591,7 +1587,7 @@ ProcessArgs (
       //
       NewList = malloc (sizeof (TEXT_STRING_LIST));
       if (NewList == NULL) {
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1599,7 +1595,7 @@ ProcessArgs (
       NewList->Str = malloc (strlen (Argv[1]) + 2);
       if (NewList->Str == NULL) {
         free (NewList);
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1624,7 +1620,7 @@ ProcessArgs (
       // Indirection file -- check for one more arg
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing indirection file name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing indirection file name");
         return STATUS_ERROR;
       }
       //
@@ -1634,7 +1630,7 @@ ProcessArgs (
       //
       NewList = malloc (sizeof (TEXT_STRING_LIST));
       if (NewList == NULL) {
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1642,7 +1638,7 @@ ProcessArgs (
       NewList->Str = malloc (strlen (Argv[1]) + 1);
       if (NewList->Str == NULL) {
         free (NewList);
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1665,13 +1661,13 @@ ProcessArgs (
       // Check for one more arg (the database file name)
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing database file name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing database file name");
         return STATUS_ERROR;
       }
 
       NewList = malloc (sizeof (TEXT_STRING_LIST));
       if (NewList == NULL) {
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1679,7 +1675,7 @@ ProcessArgs (
       NewList->Str = malloc (strlen (Argv[1]) + 1);
       if (NewList->Str == NULL) {
         free (NewList);
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1702,14 +1698,14 @@ ProcessArgs (
       // which we can dump our database.
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing database dump output file name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing database dump output file name");
         return STATUS_ERROR;
       }
 
       if (mGlobals.DumpUFileName[0] == 0) {
         strcpy (mGlobals.DumpUFileName, Argv[1]);
       } else {
-        Error (PROGRAM_NAME, 0, 0, Argv[1], "-ou option already specified with '%s'", mGlobals.DumpUFileName);
+        Error (UTILITY_NAME, 0, 0, Argv[1], "-ou option already specified with '%s'", mGlobals.DumpUFileName);
         return STATUS_ERROR;
       }
 
@@ -1720,14 +1716,14 @@ ProcessArgs (
       // -hpk option to create an HII export pack of the input database file
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing raw string data dump output file name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing raw string data dump output file name");
         return STATUS_ERROR;
       }
 
       if (mGlobals.HiiExportPackFileName[0] == 0) {
         strcpy (mGlobals.HiiExportPackFileName, Argv[1]);
       } else {
-        Error (PROGRAM_NAME, 0, 0, Argv[1], "-or option already specified with '%s'", mGlobals.HiiExportPackFileName);
+        Error (UTILITY_NAME, 0, 0, Argv[1], "-or option already specified with '%s'", mGlobals.HiiExportPackFileName);
         return STATUS_ERROR;
       }
 
@@ -1751,7 +1747,7 @@ ProcessArgs (
       // check for one more arg
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing output C filename");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing output C filename");
         return STATUS_ERROR;
       }
 
@@ -1763,7 +1759,7 @@ ProcessArgs (
       // check for one more arg
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing base name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing base name");
         Usage ();
         return STATUS_ERROR;
       }
@@ -1776,7 +1772,7 @@ ProcessArgs (
       // -oh to specify output .h defines file name
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing output .h filename");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing output .h filename");
         return STATUS_ERROR;
       }
 
@@ -1788,7 +1784,7 @@ ProcessArgs (
       // -dep to specify output dependency file name
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing output dependency filename");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing output dependency filename");
         return STATUS_ERROR;
       }
 
@@ -1800,7 +1796,7 @@ ProcessArgs (
       // -skipext to skip scanning of files with certain filename extensions
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing filename extension");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing filename extension");
         return STATUS_ERROR;
       }
       //
@@ -1810,7 +1806,7 @@ ProcessArgs (
       //
       NewList = malloc (sizeof (TEXT_STRING_LIST));
       if (NewList == NULL) {
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1818,7 +1814,7 @@ ProcessArgs (
       NewList->Str = malloc (strlen (Argv[1]) + 2);
       if (NewList->Str == NULL) {
         free (NewList);
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1845,7 +1841,7 @@ ProcessArgs (
       // "-lang eng" or "-lang spa+cat" to only output certain languages
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing language name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing language name");
         Usage ();
         return STATUS_ERROR;
       }
@@ -1861,7 +1857,7 @@ ProcessArgs (
       // Output database file name -- check for another arg
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing output database file name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing output database file name");
         return STATUS_ERROR;
       }
 
@@ -1872,7 +1868,7 @@ ProcessArgs (
       //
       // Unrecognized arg
       //
-      Error (PROGRAM_NAME, 0, 0, Argv[0], "unrecognized option");
+      Error (UTILITY_NAME, 0, 0, Argv[0], "unrecognized option");
       Usage ();
       return STATUS_ERROR;
     }
@@ -1919,7 +1915,7 @@ ProcessArgs (
   //
   if (mGlobals.Mode == MODE_SCAN) {
     if (Argc < 1) {
-      Error (PROGRAM_NAME, 0, 0, NULL, "must specify at least one source file to scan with -scan");
+      Error (UTILITY_NAME, 0, 0, NULL, "must specify at least one source file to scan with -scan");
       Usage ();
       return STATUS_ERROR;
     }
@@ -1929,14 +1925,14 @@ ProcessArgs (
     while (Argc > 0) {
       NewList = malloc (sizeof (TEXT_STRING_LIST));
       if (NewList == NULL) {
-        Error (PROGRAM_NAME, 0, 0, "memory allocation failure", NULL);
+        Error (UTILITY_NAME, 0, 0, "memory allocation failure", NULL);
         return STATUS_ERROR;
       }
 
       memset (NewList, 0, sizeof (TEXT_STRING_LIST));
       NewList->Str = (UINT8 *) malloc (strlen (Argv[0]) + 1);
       if (NewList->Str == NULL) {
-        Error (PROGRAM_NAME, 0, 0, "memory allocation failure", NULL);
+        Error (UTILITY_NAME, 0, 0, "memory allocation failure", NULL);
         return STATUS_ERROR;
       }
 
@@ -1956,7 +1952,7 @@ ProcessArgs (
     // Parse mode -- must specify an input unicode file name
     //
     if (Argc < 1) {
-      Error (PROGRAM_NAME, 0, 0, NULL, "must specify input unicode string file name with -parse");
+      Error (UTILITY_NAME, 0, 0, NULL, "must specify input unicode string file name with -parse");
       Usage ();
       return STATUS_ERROR;
     }
@@ -1989,7 +1985,7 @@ AddCommandLineLanguage (
     //
     WNewList = MALLOC (sizeof (WCHAR_STRING_LIST));
     if (WNewList == NULL) {
-      Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+      Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
       return STATUS_ERROR;
     }
 
@@ -1997,7 +1993,7 @@ AddCommandLineLanguage (
     WNewList->Str = malloc ((strlen (Language) + 1) * sizeof (WCHAR));
     if (WNewList->Str == NULL) {
       free (WNewList);
-      Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+      Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
       return STATUS_ERROR;
     }
     //
@@ -2024,7 +2020,7 @@ AddCommandLineLanguage (
               (From[LANGUAGE_IDENTIFIER_NAME_LEN] != L',')
             )
           ) {
-        Error (PROGRAM_NAME, 0, 0, Language, "invalid format for language name on command line");
+        Error (UTILITY_NAME, 0, 0, Language, "invalid format for language name on command line");
         FREE (WNewList->Str);
         FREE (WNewList);
         return STATUS_ERROR;
@@ -2523,48 +2519,56 @@ Returns:
   
 --*/
 {
-  int               Index;
-  static const char *Str[] = {
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel String Gather Utility",
+    "  Copyright (C), 2004 - 2008 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
     "",
-    PROGRAM_NAME " version "TOOL_VERSION " -- process unicode strings file",
-    "  Usage: "PROGRAM_NAME " -parse {parse options} [FileNames]",
-    "         "PROGRAM_NAME " -scan {scan options} [FileName]",
-    "         "PROGRAM_NAME " -dump {dump options}",
-    "    Common options include:",
-    "      -h or -?         for this help information",
-    "      -db Database     required name of output/input database file",
-    "      -bn BaseName     for use in the .h and .c output files",
-    "                       Default = "DEFAULT_BASE_NAME,
-    "      -v               for verbose output",
-    "      -vdbw            for verbose output when writing database",
-    "      -vdbr            for verbose output when reading database",
-    "      -od FileName     to specify an output database file name",
-    "    Parse options include:",
-    "      -i IncludePath   add IncludePath to list of search paths",
-    "      -dep FileName    to specify an output dependency file name",
-    "      -newdb           to not read in existing database file",
-    "      -uqs             to indicate that unquoted strings are used",
-    "      FileNames        name of one or more unicode files to parse",
-    "    Scan options include:",
-    "      -scan            scan text file(s) for STRING_TOKEN() usage",
-    "      -skipext .ext    to skip scan of files with .ext filename extension",
-    "      -ignorenotfound  ignore if a given STRING_TOKEN(STR) is not ",
-    "                       found in the database",
-    "      FileNames        one or more files to scan",
-    "    Dump options include:",
-    "      -oc FileName     write string data to FileName",
-    "      -oh FileName     write string defines to FileName",
-    "      -ou FileName     dump database to unicode file FileName",
-    "      -lang Lang       only dump for the language 'Lang'",
-    "      -if FileName     to specify an indirection file",
-    "      -hpk FileName    to create an HII export pack of the strings",
+    "Usage:",
+    "  "UTILITY_NAME" -parse [OPTION] FILE",
+    "  "UTILITY_NAME" -scan  [OPTION] FILE",
+    "  "UTILITY_NAME" -dump  [OPTION]",
+    "Description:",
+    "  Process unicode strings file.",
+    "Common options include:",
+    "  -h or -?         for this help information",
+    "  -db Database     required name of output/input database file",
+    "  -bn BaseName     for use in the .h and .c output files",
+    "                   Default = "DEFAULT_BASE_NAME,
+    "  -v               for verbose output",
+    "  -vdbw            for verbose output when writing database",
+    "  -vdbr            for verbose output when reading database",
+    "  -od FileName     to specify an output database file name",
+    "Parse options include:",
+    "  -i IncludePath   add IncludePath to list of search paths",
+    "  -dep FileName    to specify an output dependency file name",
+    "  -newdb           to not read in existing database file",
+    "  -uqs             to indicate that unquoted strings are used",
+    "  FileNames        name of one or more unicode files to parse",
+    "Scan options include:",
+    "  -scan            scan text file(s) for STRING_TOKEN() usage",
+    "  -skipext .ext    to skip scan of files with .ext filename extension",
+    "  -ignorenotfound  ignore if a given STRING_TOKEN(STR) is not ",
+    "                   found in the database",
+    "  FileNames        one or more files to scan",
+    "Dump options include:",
+    "  -oc FileName     write string data to FileName",
+    "  -oh FileName     write string defines to FileName",
+    "  -ou FileName     dump database to unicode file FileName",
+    "  -lang Lang       only dump for the language 'Lang'",
+    "  -if FileName     to specify an indirection file",
+    "  -hpk FileName    to create an HII export pack of the strings",
     "",
-    "  The expected process is to parse a unicode string file to create an initial",
-    "  database of string identifier names and string definitions. Then text files",
-    "  should be scanned for STRING_TOKEN() usages, and the referenced",
-    "  strings will be tagged as used in the database. After all files have been",
-    "  scanned, then the database should be dumped to create the necessary output",
-    "  files.",
+    "The expected process is to parse a unicode string file to create an initial",
+    "database of string identifier names and string definitions. Then text files",
+    "should be scanned for STRING_TOKEN() usages, and the referenced",
+    "strings will be tagged as used in the database. After all files have been",
+    "scanned, then the database should be dumped to create the necessary output",
+    "files.",
     "",
     NULL
   };

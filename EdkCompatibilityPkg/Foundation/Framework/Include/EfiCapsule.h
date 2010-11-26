@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -59,6 +59,11 @@ typedef struct {
   VOID*    CapsulePtr[1];
 } EFI_CAPSULE_TABLE;
 
+//
+// This struct is deprecated because VendorTable entries physical address will not be fixed up when 
+// transitioning from preboot to runtime phase. So we don't need CapsuleInfoTable to record capsule
+// GUIDs any more for runtime convert.
+//
 typedef struct {
   UINT32      CapsuleGuidNumber;
   EFI_GUID    CapsuleGuidPtr[1];
@@ -66,6 +71,7 @@ typedef struct {
 
 //
 // This GUID is used for collecting all capsules' Guids who install in ConfigTable.
+// This GUID is deprecated as well.
 //
 #define EFI_CAPSULE_INFO_GUID \
   { \

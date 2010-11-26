@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -28,6 +28,7 @@ Abstract:
     0x3c699197, 0x93c, 0x4c69, {0xb0, 0x6b, 0x12, 0x8a, 0xe3, 0x48, 0x1d, 0xc9} \
   }
 
+#pragma pack(1)
 typedef struct {
   UINT8   AddressSpaceId;
   UINT8   RegisterBitWidth;
@@ -52,7 +53,6 @@ typedef struct {
 // Following structure defines ACPI Description information.
 // This information is platform specific, may be consumed by DXE generic driver.
 //
-#pragma pack(1)
 typedef struct _EFI_ACPI_DESCRIPTION {
   //
   // For Timer

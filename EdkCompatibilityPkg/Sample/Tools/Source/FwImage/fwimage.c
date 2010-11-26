@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -29,7 +29,8 @@ Abstract:
 #include "EfiImage.h"
 #include "EfiUtilityMsgs.c"
 
-#define UTILITY_NAME  "FwImage"
+#define UTILITY_NAME    "FwImage"
+#define UTILITY_VERSION "v1.0"
 
 typedef union {
   IMAGE_NT_HEADERS32 PeHeader32;
@@ -41,10 +42,33 @@ Usage (
   VOID
   )
 {
-  printf ("Usage: " UTILITY_NAME "  {-t time-date} {-e} {-r} [APPLICATION|BS_DRIVER|RT_DRIVER|SAL_RT_DRIVER|COMBINED_PEIM_DRIVER|SECURITY_CORE|PEI_CORE|PE32_PEIM|RELOCATABLE_PEIM] peimage [outimage]\n");
-  printf ("  -t: Add Time Stamp for output image\n");
-  printf ("  -e: Not clear ExceptionTable for output image\n");
-  printf ("  -r: Not strip zero pending of .reloc for output image\n");
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel Firmware Image Utility",
+    "  Copyright (C), 2004 - 2008 Intel Corporation",
+
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
+
+    "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION]... FWTYPE SOURCE [DEST]",
+    "Description:",
+    "  Converts a pe32/pe32+ SOURCE to DEST with FWTYPE image type.",
+    "Options:",
+    "  FWTYPE        Can be one of APPLICATION, BS_DRIVER, RT_DRIVER, SAL_RT_DRIVER,",
+    "                COMBINED_PEIM_DRIVER, SECURITY_CORE, PEI_CORE, PE32_PEIM and",
+    "                RELOCATABLE_PEIM",
+    "  -t time-date  Add Time Stamp for output image",
+    "  -e            Not clear ExceptionTable for output image",
+    "  -r            Not strip zero pending of .reloc for output image",
+    NULL
+  };
+
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
+  }  
 }
 
 static

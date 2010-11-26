@@ -73,16 +73,16 @@ EfiCommonLibCopyMem PROC
   mov   eax, esi
   add   eax, ecx                      ; Source + Count
   cmp   eax, edi
-  jle   _StartByteCopy
+  jbe   _StartByteCopy
 
   mov   eax, edi
   add   eax, ecx                      ; Dest + Count
   cmp   eax, esi
-  jle   _StartByteCopy
+  jbe   _StartByteCopy
 
   cmp   esi, edi
   je    _CopyMemDone         
-  jl    _CopyOverlapped               ; too bad -- overlaps
+  jb    _CopyOverlapped               ; too bad -- overlaps
 
   ; Pick up misaligned start bytes to get destination pointer 4-byte aligned
 _StartByteCopy:

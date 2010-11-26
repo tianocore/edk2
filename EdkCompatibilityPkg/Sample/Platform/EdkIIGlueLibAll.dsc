@@ -1,5 +1,5 @@
 #/*++
-#  Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
 #  which accompanies this distribution.  The full text of the license may be found at        
@@ -54,3 +54,4 @@ $(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\DxeSmbusLib\DxeSmbusLib.inf
 $(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\PeiSmbusLib\PeiSmbusLib.inf
 $(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\DxePerformanceLib\DxePerformanceLib.inf
 $(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\PeiPerformanceLib\PeiPerformanceLib.inf
+$(EDK_PREFIX)Foundation\Library\EdkIIGlueLib\Library\SmmRuntimeDxeReportStatusCodeLib\SmmRuntimeDxeReportStatusCodeLib.inf

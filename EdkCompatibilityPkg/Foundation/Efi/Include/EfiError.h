@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -58,6 +58,9 @@ Abstract:
 #define EFI_INCOMPATIBLE_VERSION  EFIERR (25)
 #define EFI_SECURITY_VIOLATION    EFIERR (26)
 #define EFI_CRC_ERROR             EFIERR (27)
+#define EFI_END_OF_MEDIA          EFIERR (28)
+#define EFI_END_OF_FILE           EFIERR (31)
+#define EFI_INVALID_LANGUAGE      EFIERR (32)
 
 #define EFI_WARN_UNKNOWN_GLYPH    EFIWARN (1)
 #define EFI_WARN_DELETE_FAILURE   EFIWARN (2)

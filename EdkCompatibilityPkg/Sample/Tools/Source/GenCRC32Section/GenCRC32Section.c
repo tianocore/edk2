@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -35,9 +35,9 @@ Abstract:
 
 #include EFI_PROTOCOL_DEFINITION (GuidedSectionExtraction)
 
-#define TOOLVERSION   "0.2"
+#define UTILITY_VERSION "v1.0"
 
-#define UTILITY_NAME  "GenCrc32Section"
+#define UTILITY_NAME    "GenCrc32Section"
 
 EFI_GUID  gEfiCrc32SectionGuid = EFI_CRC32_GUIDED_SECTION_EXTRACTION_PROTOCOL_GUID;
 
@@ -134,12 +134,26 @@ PrintUsage (
   VOID
   )
 {
-  printf ("Usage:\n");
-  printf (UTILITY_NAME " -i \"inputfile1\" \"inputfile2\" -o \"outputfile\" \n");
-  printf ("   -i \"inputfile\":\n ");
-  printf ("       specifies the input files that would be signed to CRC32 Guided section.\n");
-  printf ("   -o \"outputfile\":\n");
-  printf ("       specifies the output file that is a CRC32 Guided section.\n");
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel Generate CRC32 Section Utility",
+    "  Copyright (C), 2004 - 2008 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
+    "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION]",
+    "Options:",
+    "  -i Input1 ...  specifies the input file(s) that would be signed to CRC32",
+    "                 Guided section.",
+    "  -o Output      specifies the output file that is a CRC32 Guided section",
+    NULL
+  };
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
+  }
 }
 
 INT32

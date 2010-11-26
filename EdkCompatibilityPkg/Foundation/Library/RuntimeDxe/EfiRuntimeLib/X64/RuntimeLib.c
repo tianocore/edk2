@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -21,9 +21,11 @@ Abstract:
 
 #include "Tiano.h"
 #include "EfiRuntimeLib.h"
+#include "PeiHob.h"
 #include EFI_PROTOCOL_DEFINITION (CpuIo)
 #include EFI_PROTOCOL_DEFINITION (FirmwareVolumeBlock)
 #include EFI_GUID_DEFINITION (StatusCodeCallerId)
+#include EFI_GUID_DEFINITION (Hob)
 #include EFI_ARCH_PROTOCOL_DEFINITION (StatusCode)
 
 //
@@ -43,7 +45,81 @@ BOOLEAN                     mEfiAtRuntime = FALSE;
 FVB_ENTRY                   *mFvbEntry;
 
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-static EFI_STATUS_CODE_PROTOCOL  *gStatusCode = NULL;
+
+EFI_REPORT_STATUS_CODE      gReportStatusCode         = NULL;
+EFI_EVENT                   gEfiStatusCodeNotifyEvent = NULL;
+
+VOID
+EFIAPI
+OnStatusCodeInstall (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+{
+  EFI_STATUS                Status;
+  EFI_STATUS_CODE_PROTOCOL  *StatusCode;
+
+  Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID **) &StatusCode);
+  if (!EFI_ERROR (Status)) {
+    gReportStatusCode = StatusCode->ReportStatusCode;
+  }
+}
+
+EFI_STATUS
+GetPeiProtocol (
+  IN EFI_GUID  *ProtocolGuid,
+  IN VOID      **Interface
+  )
+/*++
+
+Routine Description:
+
+  Searches for a Protocol Interface passed from PEI through a HOB
+
+Arguments:
+
+  ProtocolGuid - The Protocol GUID to search for in the HOB List
+
+  Interface    - A pointer to the interface for the Protocol GUID
+
+Returns:
+
+  EFI_SUCCESS   - The Protocol GUID was found and its interface is returned in Interface
+
+  EFI_NOT_FOUND - The Protocol GUID was not found in the HOB List
+
+--*/
+{
+  EFI_STATUS            Status;
+  EFI_PEI_HOB_POINTERS  GuidHob;
+
+  //
+  // Get Hob list
+  //
+  Status = EfiLibGetSystemConfigurationTable (&gEfiHobListGuid, (VOID **) &GuidHob.Raw);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  for (Status = EFI_NOT_FOUND; EFI_ERROR (Status);) {
+    if (END_OF_HOB_LIST (GuidHob)) {
+      Status = EFI_NOT_FOUND;
+      break;
+    }
+
+    if (GET_HOB_TYPE (GuidHob) == EFI_HOB_TYPE_GUID_EXTENSION) {
+      if (EfiCompareGuid (ProtocolGuid, &GuidHob.Guid->Name)) {
+        Status     = EFI_SUCCESS;
+        *Interface = (VOID *) *(UINTN *) ((UINT8 *) (&GuidHob.Guid->Name) + sizeof (EFI_GUID));
+      }
+    }
+
+    GuidHob.Raw = GET_NEXT_HOB (GuidHob);
+  }
+
+  return Status;
+}
+
 #endif
 
 EFI_STATUS
@@ -214,9 +290,8 @@ Returns:
   //
   EfiConvertInternalPointer ((VOID **) &gCpuIo);
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  if (gStatusCode != NULL) {
-    EfiConvertInternalPointer ((VOID **) &gStatusCode->ReportStatusCode);
-    EfiConvertInternalPointer ((VOID **) &gStatusCode);
+  if (gReportStatusCode != NULL) {
+    EfiConvertInternalPointer ((VOID **) &gReportStatusCode);
   }
 #endif
   EfiConvertInternalPointer ((VOID **) &mRT);
@@ -256,6 +331,9 @@ Returns:
 --*/
 {
   EFI_STATUS  Status;
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  VOID *Registration;
+#endif
 
   if (mRuntimeLibInitialized) {
     return EFI_ALREADY_STARTED;
@@ -275,10 +353,26 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID **)&gStatusCode);
-  if (EFI_ERROR (Status)) {
-    gStatusCode = NULL;
-  }
+  //
+  // Register EFI_STATUS_CODE_PROTOCOL notify function
+  //
+  Status = gBS->CreateEvent (
+                  EFI_EVENT_NOTIFY_SIGNAL,
+                  EFI_TPL_CALLBACK,
+                  OnStatusCodeInstall,
+                  NULL,
+                  &gEfiStatusCodeNotifyEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->RegisterProtocolNotify (
+                  &gEfiStatusCodeRuntimeProtocolGuid,
+                  gEfiStatusCodeNotifyEvent,
+                  &Registration
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  gBS->SignalEvent (gEfiStatusCodeNotifyEvent);
 #endif
 
   Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID **) &gCpuIo);
@@ -363,6 +457,16 @@ Returns:
     ASSERT_EFI_ERROR (Status);
   }
 
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  //
+  // Close EfiStatusCodeRuntimeProtocol notify function
+  //
+  if (gEfiStatusCodeNotifyEvent != NULL) {
+    Status = gBS->CloseEvent (gEfiStatusCodeNotifyEvent);
+    ASSERT_EFI_ERROR (Status);
+  }
+#endif
+
   return EFI_SUCCESS;
 }
 
@@ -390,6 +494,9 @@ Returns:
 --*/
 {
   EFI_STATUS  Status;
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  VOID *Registration;
+#endif
 
   if (mRuntimeLibInitialized) {
     return EFI_ALREADY_STARTED;
@@ -406,10 +513,26 @@ Returns:
   ASSERT (mRT != NULL);
 
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID **)&gStatusCode);
-  if (EFI_ERROR (Status)) {
-    gStatusCode = NULL;
-  }
+  //
+  // Register EFI_STATUS_CODE_PROTOCOL notify function
+  //
+  Status = gBS->CreateEvent (
+                  EFI_EVENT_NOTIFY_SIGNAL,
+                  EFI_TPL_CALLBACK,
+                  OnStatusCodeInstall,
+                  NULL,
+                  &gEfiStatusCodeNotifyEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->RegisterProtocolNotify (
+                  &gEfiStatusCodeRuntimeProtocolGuid,
+                  gEfiStatusCodeNotifyEvent,
+                  &Registration
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  gBS->SignalEvent (gEfiStatusCodeNotifyEvent);
 #endif
 
   Status  = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID **) &gCpuIo);
@@ -761,8 +884,8 @@ EfiReportStatusCode (
   IN EFI_STATUS_CODE_TYPE     CodeType,
   IN EFI_STATUS_CODE_VALUE    Value,
   IN UINT32                   Instance,
-  IN EFI_GUID                 * CallerId,
-  IN EFI_STATUS_CODE_DATA     * Data OPTIONAL
+  IN EFI_GUID                 *CallerId OPTIONAL,
+  IN EFI_STATUS_CODE_DATA     *Data     OPTIONAL  
   )
 /*++
 
@@ -788,19 +911,30 @@ Returns:
 
 --*/
 {
-  EFI_STATUS  Status;
+  EFI_STATUS               Status;
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000) 
-  if (gStatusCode == NULL) {
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  if (gReportStatusCode == NULL) {
+    //
+    // Because we've installed the protocol notification on EfiStatusCodeRuntimeProtocol,
+    //   running here indicates that the StatusCode driver has not started yet.
+    //
     if (EfiAtRuntime ()) {
+      //
+      // Running here only when StatusCode driver never starts.
+      //
       return EFI_UNSUPPORTED;
     }
-    Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID **)&gStatusCode);
-    if (EFI_ERROR (Status) || gStatusCode == NULL) {
+
+    //
+    // Try to get the PEI version of ReportStatusCode.
+    //
+    Status = GetPeiProtocol (&gEfiStatusCodeRuntimeProtocolGuid, (VOID **) &gReportStatusCode);
+    if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
     }
   }
-  Status = gStatusCode->ReportStatusCode (CodeType, Value, Instance, CallerId, Data);
+  Status = gReportStatusCode (CodeType, Value, Instance, CallerId, Data);
 #else
   if (mRT == NULL) {
     return EFI_UNSUPPORTED;

@@ -1,6 +1,6 @@
 #/*++
 #
-#  Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
 #  which accompanies this distribution.  The full text of the license may be found at        
@@ -44,9 +44,11 @@ MAKEFILES = $(EDK_TOOLS_SOURCE)\Common\Makefile             \
 !IF "$(EFI_SPECIFICATION_VERSION)" >= "0x0002000A"
             $(EDK_TOOLS_SOURCE)\UefiVfrCompile\makefile     \
             $(EDK_TOOLS_SOURCE)\UefiStrGather\makefile      \
+            $(EDK_TOOLS_SOURCE)\UefiHiiPack\Makefile        \
 !ELSE
             $(EDK_TOOLS_SOURCE)\VfrCompile\makefile         \
             $(EDK_TOOLS_SOURCE)\StrGather\makefile          \
+            $(EDK_TOOLS_SOURCE)\HiiPack\Makefile            \
 !ENDIF
             $(EDK_TOOLS_SOURCE)\SplitFile\Makefile          \
             $(EDK_TOOLS_SOURCE)\Strip\Makefile              \

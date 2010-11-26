@@ -3,7 +3,7 @@
 # in UEFI 2.0 + Framework 0.9x mode. This package also provides Thunk modules that enable Framework 0.9x modules to work with UEFI2.3/PI1.2 EDK II Cores.
 # EdkCompatibilityPkg is based on the EDK 1.01 release, found at http://edk.tianocore.org. This package only 
 # contains the header files and libraries found in the original EDK. EdkCompatibilityPkg code is ANSI C compliant, so the modules can be built with GCC tool-chains. 
-# This package also incorporates bug fixes released in EDK 1.04.
+# This package also incorporates bug fixes released in EDK 1.06.
 # 
 # Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
 #

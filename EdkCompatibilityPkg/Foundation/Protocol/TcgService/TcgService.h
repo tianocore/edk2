@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -111,8 +111,8 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_TCG_PASS_THROUGH_TO_TPM) (
   IN      EFI_TCG_PROTOCOL          *This,
-  IN      UINT32                    TpmInputParamterBlockSize,
-  IN      UINT8                     *TpmInputParamterBlock,
+  IN      UINT32                    TpmInputParameterBlockSize,
+  IN      UINT8                     *TpmInputParameterBlock,
   IN      UINT32                    TpmOutputParameterBlockSize,
   IN      UINT8                     *TpmOutputParameterBlock
   );
@@ -121,7 +121,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_TCG_HASH_LOG_EXTEND_EVENT) (
   IN      EFI_TCG_PROTOCOL          *This,
-  IN      UINT8                     *HashData,
+  IN      EFI_PHYSICAL_ADDRESS      HashData,
   IN      UINT64                    HashDataLen,
   IN      TCG_ALGORITHM_ID          AlgorithmId,
   IN OUT  TCG_PCR_EVENT             *TCGLogData,
@@ -160,9 +160,16 @@ EFI_STATUS
   IN      CHAR8                     *ActionString
   );
 
-typedef struct tdEFI_TCG_PLATFORM_PROTOCOL {
+typedef
+EFI_STATUS
+(EFIAPI *EFI_TCG_MEASURE_GPT_TABLE) (
+  IN      EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  );
+
+typedef struct _EFI_TCG_PLATFORM_PROTOCOL {
   EFI_TCG_MEASURE_PE_IMAGE          MeasurePeImage;
   EFI_TCG_MEASURE_ACTION            MeasureAction;
+  EFI_TCG_MEASURE_GPT_TABLE         MeasureGptTable;
 } EFI_TCG_PLATFORM_PROTOCOL;
 
 extern EFI_GUID                     gEfiTcgPlatformProtocolGuid;

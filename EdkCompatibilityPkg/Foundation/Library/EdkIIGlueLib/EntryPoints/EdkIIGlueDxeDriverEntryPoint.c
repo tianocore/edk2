@@ -23,6 +23,81 @@ Abstract:
 #include "EdkIIGlueDxe.h"
 #include "Common/EdkIIGlueDependencies.h"
 
+//
+// Check definitions in .inf file to determine __EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__
+//
+// __EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__
+//    1: only install ComponentName, DriverConfiguration and DriverDiagnostics
+//    2: only install ComponentName2, DriverConfiguration2 and DriverDiagnostics2
+//    3: install all including ComponentName, DriverConfiguration, DriverDiagnostics AND
+//                             ComponentName2, DriverConfiguration2 and DriverDiagnostics2
+//    4: install automatically according to EFI_SPECIFICATION_VERSION:
+//        if EFI_SPECIFICATION_VERSION <  0x00020000: only install ComponentName, DriverConfiguration and DriverDiagnostics
+//        if EFI_SPECIFICATION_VERSION >= 0x00020000: only install ComponentName2, DriverConfiguration2 and DriverDiagnostics2
+//
+#ifdef __EDKII_GLUE_DRIVER_MODEL_VERSION_1_DEFINED__
+#undef __EDKII_GLUE_DRIVER_MODEL_VERSION_1_DEFINED__
+#endif
+
+#ifdef __EDKII_GLUE_DRIVER_MODEL_VERSION_2_DEFINED__
+#undef __EDKII_GLUE_DRIVER_MODEL_VERSION_2_DEFINED__
+#endif
+
+#ifdef  __EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__
+#undef  __EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__
+#endif
+
+#if defined(__EDKII_GLUE_COMPONENT_NAME_PROTOCOL_INSTANCE__) || defined(__EDKII_GLUE_DRIVER_CONFIGURATION_PROTOCOL_INSTANCE__) || defined(__EDKII_GLUE_DRIVER_DIAGNOSTICS_PROTOCOL_INSTANCE__)
+#define __EDKII_GLUE_DRIVER_MODEL_VERSION_1_DEFINED__
+#endif
+
+#if defined(__EDKII_GLUE_COMPONENT_NAME2_PROTOCOL_INSTANCE__) || defined(__EDKII_GLUE_DRIVER_CONFIGURATION2_PROTOCOL_INSTANCE__) || defined(__EDKII_GLUE_DRIVER_DIAGNOSTICS2_PROTOCOL_INSTANCE__)
+#define __EDKII_GLUE_DRIVER_MODEL_VERSION_2_DEFINED__
+#endif
+
+#if defined(__EDKII_GLUE_DRIVER_MODEL_VERSION_1_DEFINED__) && !defined(__EDKII_GLUE_DRIVER_MODEL_VERSION_2_DEFINED__) && !defined(__EDKII_GLUE_DRIVER_MODEL_AUTO_SELECT_PROTOCOLS_BY_EFI_VERSION__)
+#define __EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ 1
+#endif
+
+#if !defined(__EDKII_GLUE_DRIVER_MODEL_VERSION_1_DEFINED__) && defined(__EDKII_GLUE_DRIVER_MODEL_VERSION_2_DEFINED__) && !defined(__EDKII_GLUE_DRIVER_MODEL_AUTO_SELECT_PROTOCOLS_BY_EFI_VERSION__)
+#define __EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ 2
+#endif
+
+#if defined(__EDKII_GLUE_DRIVER_MODEL_VERSION_1_DEFINED__) && defined(__EDKII_GLUE_DRIVER_MODEL_VERSION_2_DEFINED__) && !defined(__EDKII_GLUE_DRIVER_MODEL_AUTO_SELECT_PROTOCOLS_BY_EFI_VERSION__)
+#define __EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ 3
+#endif
+
+//
+//  To use Auto-Select, it must be:
+//    1. both Protocol and Protocol2 are defined
+//    2. The Protocol and Protocol2 must use same names, for example, gDriverControllerName as __EDKII_GLUE_COMPONENT_NAME_PROTOCOL_INSTANCE__ and __EDKII_GLUE_COMPONENT_NAME2_PROTOCOL_INSTANCE__
+//
+#if defined(__EDKII_GLUE_DRIVER_MODEL_AUTO_SELECT_PROTOCOLS_BY_EFI_VERSION__)
+#if !(defined(__EDKII_GLUE_DRIVER_MODEL_VERSION_1_DEFINED__) && defined(__EDKII_GLUE_DRIVER_MODEL_VERSION_2_DEFINED__))
+#error "To use Auto-Select please define both Protocol and Protocol2 instances"
+#endif
+#define __EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ 4
+#endif
+
+#if (__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 4)
+#undef  __EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+#define __EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__  2
+#else
+#define __EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__  1
+#endif
+#endif
+
+#if (__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 1)
+UINT8 _gEdkIIGlueDriverModelProtocolSelection = 1;
+#elif (__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 2)
+UINT8 _gEdkIIGlueDriverModelProtocolSelection = 2;
+#elif (__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 3)
+UINT8 _gEdkIIGlueDriverModelProtocolSelection = 3;
+#else
+UINT8 _gEdkIIGlueDriverModelProtocolSelection = 0;
+#endif
+
 STATIC EFI_EVENT  _mDriverExitBootServicesNotifyEvent;
 
 //
@@ -31,25 +106,36 @@ STATIC EFI_EVENT  _mDriverExitBootServicesNotifyEvent;
 // In case where multiple Driver Model protocols need to be installed in a single driver,
 // manually edit this file and compile/link the modified file with the driver.
 //
-
-#ifdef __EDKII_GLUE_DRIVER_BINDING_PROTOCOL_INSTANCE__
+#if defined(__EDKII_GLUE_DRIVER_BINDING_PROTOCOL_INSTANCE__)
 extern EFI_DRIVER_BINDING_PROTOCOL __EDKII_GLUE_DRIVER_BINDING_PROTOCOL_INSTANCE__;
 #endif
 
-#ifdef __EDKII_GLUE_COMPONENT_NAME_PROTOCOL_INSTANCE__
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-extern EFI_COMPONENT_NAME2_PROTOCOL  __EDKII_GLUE_COMPONENT_NAME_PROTOCOL_INSTANCE__;
-#else
+#if (__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 1) || (__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 3)
+#if defined(__EDKII_GLUE_COMPONENT_NAME_PROTOCOL_INSTANCE__)
 extern EFI_COMPONENT_NAME_PROTOCOL   __EDKII_GLUE_COMPONENT_NAME_PROTOCOL_INSTANCE__;
 #endif
-#endif
 
-#ifdef __EDKII_GLUE_DRIVER_CONFIGURATION_PROTOCOL_INSTANCE__
+#if defined(__EDKII_GLUE_DRIVER_CONFIGURATION_PROTOCOL_INSTANCE__)
 extern EFI_DRIVER_CONFIGURATION_PROTOCOL __EDKII_GLUE_DRIVER_CONFIGURATION_PROTOCOL_INSTANCE__;
 #endif
+#endif
 
-#ifdef __EDKII_GLUE_DRIVER_DIAGNOSTICS_PROTOCOL_INSTANCE__
+#if defined(__EDKII_GLUE_DRIVER_DIAGNOSTICS_PROTOCOL_INSTANCE__)
 extern EFI_DRIVER_DIAGNOSTICS_PROTOCOL __EDKII_GLUE_DRIVER_DIAGNOSTICS_PROTOCOL_INSTANCE__;
+#endif
+
+#if (__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 2) || (__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 3)
+#if defined(__EDKII_GLUE_COMPONENT_NAME2_PROTOCOL_INSTANCE__)
+extern EFI_COMPONENT_NAME2_PROTOCOL  __EDKII_GLUE_COMPONENT_NAME2_PROTOCOL_INSTANCE__;
+#endif
+
+#if defined(__EDKII_GLUE_DRIVER_CONFIGURATION2_PROTOCOL_INSTANCE__)
+extern EFI_DRIVER_CONFIGURATION2_PROTOCOL __EDKII_GLUE_DRIVER_CONFIGURATION2_PROTOCOL_INSTANCE__;
+#endif
+
+#if defined(__EDKII_GLUE_DRIVER_DIAGNOSTICS2_PROTOCOL_INSTANCE__)
+extern EFI_DRIVER_DIAGNOSTICS2_PROTOCOL __EDKII_GLUE_DRIVER_DIAGNOSTICS2_PROTOCOL_INSTANCE__;
+#endif
 #endif
 
 GLOBAL_REMOVE_IF_UNREFERENCED const EFI_DRIVER_MODEL_PROTOCOL_LIST  _gDriverModelProtocolList[] = {
@@ -60,20 +146,38 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EFI_DRIVER_MODEL_PROTOCOL_LIST  _gDriverMode
   NULL,
 #endif
 
-#ifdef __EDKII_GLUE_COMPONENT_NAME_PROTOCOL_INSTANCE__
+#if defined(__EDKII_GLUE_COMPONENT_NAME_PROTOCOL_INSTANCE__) && !(__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 2)
   &__EDKII_GLUE_COMPONENT_NAME_PROTOCOL_INSTANCE__,
 #else
   NULL,
 #endif
 
-#ifdef __EDKII_GLUE_DRIVER_CONFIGURATION_PROTOCOL_INSTANCE__
+#if defined(__EDKII_GLUE_DRIVER_CONFIGURATION_PROTOCOL_INSTANCE__) && !(__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 2)
   &__EDKII_GLUE_DRIVER_CONFIGURATION_PROTOCOL_INSTANCE__,
 #else
   NULL,
 #endif
 
-#ifdef __EDKII_GLUE_DRIVER_DIAGNOSTICS_PROTOCOL_INSTANCE__
+#if defined(__EDKII_GLUE_DRIVER_DIAGNOSTICS_PROTOCOL_INSTANCE__) && !(__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 2)
  &__EDKII_GLUE_DRIVER_DIAGNOSTICS_PROTOCOL_INSTANCE__,
+#else
+  NULL,
+#endif
+
+#if defined(__EDKII_GLUE_COMPONENT_NAME2_PROTOCOL_INSTANCE__) && !(__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 1)
+  &__EDKII_GLUE_COMPONENT_NAME2_PROTOCOL_INSTANCE__,
+#else
+  NULL,
+#endif
+
+#if defined(__EDKII_GLUE_DRIVER_CONFIGURATION2_PROTOCOL_INSTANCE__) && !(__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 1)
+  &__EDKII_GLUE_DRIVER_CONFIGURATION2_PROTOCOL_INSTANCE__,
+#else
+  NULL,
+#endif
+
+#if defined(__EDKII_GLUE_DRIVER_DIAGNOSTICS2_PROTOCOL_INSTANCE__) && !(__EDKII_GLUE_DRIVER_MODEL_PROTOCOL_SELECTION__ == 1)
+ &__EDKII_GLUE_DRIVER_DIAGNOSTICS2_PROTOCOL_INSTANCE__,
 #else
   NULL,
 #endif
@@ -249,20 +353,30 @@ ProcessLibraryConstructorList (
 // NOTE: the constructors must be called according to dependency order
 //
 // UefiBootServicesTableLib     UefiBootServicesTableLibConstructor()
+// UefiRuntimeServicesTableLib  UefiRuntimeServicesTableLibConstructor() 
+// DxeServicesTableLib          DxeServicesTableLibConstructor()
 // DxeIoLibCpuIo                IoLibConstructor()
 // DxeSalLib                    DxeSalLibConstructor(), IPF only
 // EdkDxeRuntimeDriverLib       RuntimeDriverLibConstruct()
-// DxeHobLib                    HobLibConstructor()
-// UefiDriverModelLib           UefiDriverModelLibConstructor()
-// DxeSmbusLib                  SmbusLibConstructor()    
-// DxeServicesTableLib          DxeServicesTableLibConstructor()
-// UefiRuntimeServicesTableLib  UefiRuntimeServicesTableLibConstructor() 
 // SmmRuntimeDxeReportStatusCodeLib ReportStatusCodeLibConstruct()
+// UefiDriverModelLib           UefiDriverModelLibConstructor()
+// DxeHobLib                    HobLibConstructor()
+// DxeSmbusLib                  SmbusLibConstructor()    
 // 
 
 #ifdef __EDKII_GLUE_UEFI_BOOT_SERVICES_TABLE_LIB__
   Status = UefiBootServicesTableLibConstructor (ImageHandle, SystemTable);
   ASSERT_EFI_ERROR (Status);
+#endif
+
+#ifdef __EDKII_GLUE_UEFI_RUNTIME_SERVICES_TABLE_LIB__
+  Status = UefiRuntimeServicesTableLibConstructor (ImageHandle, SystemTable);
+  ASSERT_EFI_ERROR (Status);
+#endif
+
+#ifdef __EDKII_GLUE_DXE_SERVICES_TABLE_LIB__
+  Status = DxeServicesTableLibConstructor (ImageHandle, SystemTable);
+  ASSERT_EFI_ERROR (Status); 
 #endif
 
 #ifdef __EDKII_GLUE_DXE_IO_LIB_CPU_IO__
@@ -280,23 +394,13 @@ ProcessLibraryConstructorList (
   ASSERT_EFI_ERROR (Status);
 #endif
 
-#ifdef __EDKII_GLUE_UEFI_RUNTIME_SERVICES_TABLE_LIB__
-  Status = UefiRuntimeServicesTableLibConstructor (ImageHandle, SystemTable);
+#ifdef __EDKII_GLUE_SMM_RUNTIME_DXE_REPORT_STATUS_CODE_LIB__
+  Status = ReportStatusCodeLibConstruct (ImageHandle, SystemTable);
   ASSERT_EFI_ERROR (Status);
 #endif
 
 #ifdef __EDKII_GLUE_UEFI_DRIVER_MODEL_LIB__
   Status = UefiDriverModelLibConstructor (ImageHandle, SystemTable);
-  ASSERT_EFI_ERROR (Status);
-#endif
-
-#ifdef __EDKII_GLUE_DXE_SERVICES_TABLE_LIB__
-  Status = DxeServicesTableLibConstructor (ImageHandle, SystemTable);
-  ASSERT_EFI_ERROR (Status); 
-#endif
-
-#ifdef __EDKII_GLUE_SMM_RUNTIME_DXE_REPORT_STATUS_CODE_LIB__
-  Status = ReportStatusCodeLibConstruct (ImageHandle, SystemTable);
   ASSERT_EFI_ERROR (Status);
 #endif
 

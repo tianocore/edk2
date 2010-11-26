@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -77,7 +77,15 @@ Abstract:
 
 #include "GenDepex.h"
 
-#define TOOL_NAME "GenDepex"
+//
+// Utility Name
+//
+#define UTILITY_NAME  "GenDepex"
+
+//
+// Utility version information
+//
+#define UTILITY_VERSION "v1.0"
 
 extern
 BOOLEAN
@@ -106,13 +114,19 @@ Returns:
 
 --*/
 {
-  printf (
-    "%s, Tiano Dependency Expression Generation Utility. Version %d.%d.\n",
-    UTILITY_NAME,
-    UTILITY_MAJOR_VERSION,
-    UTILITY_MINOR_VERSION
-    );
-  printf ("Copyright (C) 1996-2002 Intel Corporation.  All rights reserved.\n\n");
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel Generate Dependency Expression Utility",
+    "  Copyright (C), 1996 - 2008 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
+    NULL
+  };
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
+  }
 }
 
 VOID
@@ -135,15 +149,22 @@ Returns:
 
 --*/
 {
-  printf (
-    "Usage: %s -I <INFILE> -O <OUTFILE> [-P <Optional Boundary for padding up>] \n",
-    UTILITY_NAME
-    );
-  printf (" Where:\n");
-  printf ("  <INFILE> is the input pre-processed dependency text files name.\n");
-  printf ("  <OUTFILE> is the output binary dependency files name.\n");
-  printf ("  <Optional Boundary for padding up> is the padding integer value.\n");
-  printf ("    This is the boundary to align the output file size to.\n");
+  int         Index;
+  const char  *Str[] = {
+    "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION]...",
+    "Options:",
+    "  -I INFILE    The input pre-processed dependency text files name",
+    "  -O OUTFILE   The output binary dependency files name",
+    "  -P BOUNDARY  The padding integer value to align the output file size",
+    NULL
+  };
+
+  PrintGenDepexUtilityInfo ();
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
+  }
 }
 
 DEPENDENCY_OPCODE
@@ -742,7 +763,7 @@ Returns:
       // print an error message.
       //
       *(Ptrx + 20) = 0;
-      printf (TOOL_NAME " ERROR: Unrecognized input at: \"%s\"...\n", Ptrx);
+      printf (UTILITY_NAME" ERROR: Unrecognized input at: \"%s\"...\n", Ptrx);
       return EFI_INVALID_PARAMETER;
     }
   }

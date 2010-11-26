@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -49,6 +49,7 @@ typedef STRING_REF            EFI_PROCESSOR_MANUFACTURER_DATA;
 typedef STRING_REF            EFI_PROCESSOR_SERIAL_NUMBER_DATA;
 
 typedef STRING_REF            EFI_PROCESSOR_ASSET_TAG_DATA;
+
 typedef STRING_REF            EFI_PROCESSOR_PART_NUMBER_DATA;
 
 typedef struct {
@@ -159,6 +160,10 @@ typedef enum {
   EfiProcessorFamilyPowerPC620   = 0x25,
   EfiProcessorFamilyPowerPC704   = 0x26,
   EfiProcessorFamilyPowerPC750   = 0x27,
+  EfiProcessorFamilyIntelCoreDuo = 0x28,
+  EfiProcessorFamilyIntelCoreDuoMobile = 0x29,
+  EfiProcessorFamilyIntelCoreSoloMobile = 0x2A,
+  EfiProcessorFamilyIntelAtom    = 0x2B,
   EfiProcessorFamilyAlpha2       = 0x30,
   EfiProcessorFamilyAlpha21064   = 0x31,
   EfiProcessorFamilyAlpha21066   = 0x32,
@@ -201,6 +206,12 @@ typedef enum {
   EfiProcessorFamilyDualCoreAmdOpteron = 0x87,
   EfiProcessorFamilyAmdAthlon64X2DualCore = 0x88,
   EfiProcessorFamilyAmdTurion64X2Mobile   = 0x89,
+  EfiProcessorFamilyQuadCoreAmdOpteron = 0x8A,
+  EfiProcessorFamilyThirdGenerationAmdOpteron = 0x8B,
+  EfiProcessorFamilyAmdPhenomFxQuadCore = 0x8C,
+  EfiProcessorFamilyAmdPhenomX4QuadCore = 0x8D,
+  EfiProcessorFamilyAmdPhenomX2DualCore = 0x8E,
+  EfiProcessorFamilyAmdAthlonX2DualCore = 0x8F,
   EfiProcessorFamilyPARISC       = 0x90,
   EfiProcessorFamilyPaRisc8500   = 0x91,
   EfiProcessorFamilyPaRisc8000   = 0x92,
@@ -209,6 +220,21 @@ typedef enum {
   EfiProcessorFamilyPaRisc7100LC = 0x95,
   EfiProcessorFamilyPaRisc7100   = 0x96,
   EfiProcessorFamilyV30          = 0xA0,
+  EfiProcessorFamilyQuadCoreIntelXeon3200Series  = 0xA1,
+  EfiProcessorFamilyDualCoreIntelXeon3000Series  = 0xA2,
+  EfiProcessorFamilyQuadCoreIntelXeon5300Series  = 0xA3,
+  EfiProcessorFamilyDualCoreIntelXeon5100Series  = 0xA4,
+  EfiProcessorFamilyDualCoreIntelXeon5000Series  = 0xA5,
+  EfiProcessorFamilyDualCoreIntelXeonLV          = 0xA6,
+  EfiProcessorFamilyDualCoreIntelXeonULV         = 0xA7,
+  EfiProcessorFamilyDualCoreIntelXeon7100Series  = 0xA8,
+  EfiProcessorFamilyQuadCoreIntelXeon5400Series  = 0xA9,
+  EfiProcessorFamilyQuadCoreIntelXeon            = 0xAA,
+  EfiProcessorFamilyDualCoreIntelXeon5200Series  = 0xAB,
+  EfiProcessorFamilyDualCoreIntelXeon7200Series  = 0xAC,
+  EfiProcessorFamilyQuadCoreIntelXeon7300Series  = 0xAD,
+  EfiProcessorFamilyQuadCoreIntelXeon7400Series  = 0xAE,
+  EfiProcessorFamilyMultiCoreIntelXeon7400Series = 0xAF,
   EfiProcessorFamilyPentiumIIIXeon = 0xB0,
   EfiProcessorFamilyPentiumIIISpeedStep = 0xB1,
   EfiProcessorFamilyPentium4     = 0xB2,
@@ -222,9 +248,17 @@ typedef enum {
   EfiProcessorFamilyIntelCeleronD = 0xBA,
   EfiProcessorFamilyIntelPentiumD = 0xBB,
   EfiProcessorFamilyIntelPentiumEx = 0xBC,
-  EfiProcessorFamilyIntelCoreBrand = 0xBD,
+  EfiProcessorFamilyIntelCoreSolo  = 0xBD,  // SMBIOS spec 2.6 correct this value
   EfiProcessorFamilyReserved       = 0xBE,
   EfiProcessorFamilyIntelCore2     = 0xBF,
+  EfiProcessorFamilyIntelCore2Solo          = 0xC0,
+  EfiProcessorFamilyIntelCore2Extreme       = 0xC1,
+  EfiProcessorFamilyIntelCore2Quad          = 0xC2,
+  EfiProcessorFamilyIntelCore2ExtremeMobile = 0xC3,
+  EfiProcessorFamilyIntelCore2DuoMobile     = 0xC4,
+  EfiProcessorFamilyIntelCore2SoloMobile    = 0xC5,
+  EfiProcessorFamilyIntelCoreI7             = 0xC6,
+  EfiProcessorFamilyDualCoreIntelCeleron    = 0xC7,
   EfiProcessorFamilyIBM390       = 0xC8,
   EfiProcessorFamilyG4           = 0xC9,
   EfiProcessorFamilyG5           = 0xCA,
@@ -234,6 +268,20 @@ typedef enum {
   EfiProcessorFamilyViaC7D      = 0xD3,
   EfiProcessorFamilyViaC7       = 0xD4,
   EfiProcessorFamilyViaEden     = 0xD5,
+  EfiProcessorFamilyMultiCoreIntelXeon           = 0xD6,
+  EfiProcessorFamilyDualCoreIntelXeon3Series     = 0xD7,
+  EfiProcessorFamilyQuadCoreIntelXeon3Series     = 0xD8,
+  EfiProcessorFamilyDualCoreIntelXeon5Series     = 0xDA,
+  EfiProcessorFamilyQuadCoreIntelXeon5Series     = 0xDB,
+  EfiProcessorFamilyDualCoreIntelXeon7Series     = 0xDD,
+  EfiProcessorFamilyQuadCoreIntelXeon7Series     = 0xDE,
+  EfiProcessorFamilyMultiCoreIntelXeon7Series    = 0xDF,
+  EfiProcessorFamilyEmbeddedAmdOpteronQuadCore   = 0xE6,
+  EfiProcessorFamilyAmdPhenomTripleCore          = 0xE7,
+  EfiProcessorFamilyAmdTurionUltraDualCoreMobile = 0xE8,
+  EfiProcessorFamilyAmdTurionDualCoreMobile      = 0xE9,
+  EfiProcessorFamilyAmdAthlonDualCore            = 0xEA,
+  EfiProcessorFamilyAmdSempronSI                 = 0xEB,
   EfiProcessorFamilyi860         = 0xFA,
   EfiProcessorFamilyi960         = 0xFB,
   EfiProcessorFamilyIndicatorFamily2    = 0xFE
@@ -314,7 +362,8 @@ typedef enum {
   EfiProcessorSocketLGA775 = 0x15,
   EfiProcessorSocketS1 = 0x16,
   EfiProcessorSocketAm2 = 0x17,
-  EfiProcessorSocketF   = 0x18
+  EfiProcessorSocketF   = 0x18,
+  EfiProcessorSocketLGA1366 = 0x19
 } EFI_PROCESSOR_SOCKET_TYPE_DATA;
 
 typedef STRING_REF EFI_PROCESSOR_SOCKET_NAME_DATA;

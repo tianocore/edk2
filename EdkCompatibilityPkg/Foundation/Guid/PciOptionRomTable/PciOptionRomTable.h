@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -20,6 +20,7 @@ Abstract:
 --*/
 
 #ifndef _PCI_OPTION_ROM_TABLE_GUID_H_
+#define _PCI_OPTION_ROM_TABLE_GUID_H_
 
 #define EFI_PCI_OPTION_ROM_TABLE_GUID \
   { 0x7462660f, 0x1cbd, 0x48da, {0xad, 0x11, 0x91, 0x71, 0x79, 0x13, 0x83, 0x1c} }

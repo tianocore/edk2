@@ -1,6 +1,6 @@
 ;*****************************************************************************
 ;*
-;*   Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+;*   Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 ;*   This program and the accompanying materials                          
 ;*   are licensed and made available under the terms and conditions of the BSD License         
 ;*   which accompanies this distribution.  The full text of the license may be found at        
@@ -48,6 +48,8 @@ _16Gdtr         LABEL   FWORD
                 DQ      offset NullSegSel
 
     .code
+
+STACK_PARAM_SIZE  EQU  16
 
 IA32_REGS   STRUC   4t
 _EDI        DD      ?
@@ -98,6 +100,11 @@ _Thunk16    PROC    USES    rbp rbx rsi rdi r12 r13 r14 r15
     push    sizeof (IA32_REGS) / 4
     pop     rcx
     rep     movsd
+
+    ; copy eflags to stack frame
+    mov     rax, (IA32_REGS ptr [rsi - sizeof(IA32_REGS)])._RFLAGS
+    mov     [rdi - sizeof(IA32_REGS) - STACK_PARAM_SIZE - 8], rax
+
     pop     rbx                         ; rbx <- 16-bit stack offset
     lea     eax, @F                     ; return offset
     stosd
@@ -165,22 +172,27 @@ RealMode    PROC
     DB      7                           ; pop es
     pop     fs
     pop     gs
+    sub     esp, (sizeof(IA32_REGS) - 16) + STACK_PARAM_SIZE + 8
 
-    add     esp, 8                      ; skip RFLAGS
-    DB      67h, 0f7h, 44h, 24h, 0eh, 1, 0  ; test [esp + 0eh], 1
+    DB      66h, 9Dh                    ; popfd
+    add     esp, 4                      ; skip high part of RFLAGS
+    DB      67h, 0f7h, 44h, 24h         ; test    (_STK16 ptr [esp + STACK_PARAM_SIZE + sizeof(IA32_REGS)]).ThunkFlags, 1
+    DB      (STACK_PARAM_SIZE + sizeof(IA32_REGS) + 6)
+    DB      1, 0
     jz      @F
-    pushfq                              ; pushf, actually
+    pushfq                              ; pushf, actually, when it's INT#
 @@:
     DB      0eh                         ; push cs
     DB      68h                         ; push /iw
     DW      @FarCallRet - _Code16Addr
     jz      @F
     DB      66h
-    jmp     fword ptr [esp + 6]
+    jmp     fword ptr [esp + 6 + STACK_PARAM_SIZE + sizeof(IA32_REGS) - 8]
 @@:
     DB      66h
-    jmp     fword ptr [esp + 4]
+    jmp     fword ptr [esp + 4 + STACK_PARAM_SIZE + sizeof(IA32_REGS) - 8]
 @FarCallRet:
+    add     esp, (sizeof(IA32_REGS) - 16) + STACK_PARAM_SIZE + 8
     DB      66h
     push    0                           ; push a dword of zero
     pushf                               ; pushfd, actually

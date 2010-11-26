@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -28,11 +28,13 @@ Abstract:
 void
 StringDBConstructor (
   void
-  );
+  )
+;
 void
 StringDBDestructor (
   void
-  );
+  )
+;
 
 STATUS
 StringDBAddString (
@@ -42,12 +44,14 @@ StringDBAddString (
   WCHAR   *String,
   BOOLEAN Format,
   UINT16  Flags
-  );
+  )
+;
 
 STATUS
 StringDBSetScope (
   WCHAR   *Scope
-  );
+  )
+;
 
 #define STRING_FLAGS_REFERENCED           0x0001  // if referenced somewhere
 #define STRING_FLAGS_UNDEFINED            0x0002  // if we added it for padding purposes
@@ -61,33 +65,38 @@ StringDBAddStringIdentifier (
   WCHAR     *StringIdentifier,
   UINT16    *NewId,
   UINT16    Flags
-  );
+  )
+;
 
 STATUS
 StringDBReadDatabase (
   INT8    *DBFileName,
   BOOLEAN IgnoreIfNotExist,
   BOOLEAN Verbose
-  );
+  )
+;
 
 STATUS
 StringDBWriteDatabase (
   INT8    *DBFileName,
   BOOLEAN Verbose
-  );
+  )
+;
 
 STATUS
 StringDBDumpDatabase (
   INT8                *DBFileName,
   INT8                *OutputFileName,
   BOOLEAN             Verbose
-  );
+  )
+;
 
 STATUS
 StringDBAddLanguage (
   WCHAR *LanguageName,
   WCHAR *PrintableLanguageName
-  );
+  )
+;
 
 STATUS
 StringDBDumpCStrings (
@@ -95,28 +104,40 @@ StringDBDumpCStrings (
   INT8                        *BaseName,
   WCHAR_STRING_LIST           *LanguagesOfInterest,
   WCHAR_MATCHING_STRING_LIST  *IndirectionList
-  );
+  )
+;
 
 STATUS
 StringDBDumpStringDefines (
   INT8                *FileName,
   INT8                *BaseName
-  );
+  )
+;
 
 STATUS
 StringDBSetCurrentLanguage (
   WCHAR *LanguageName
-  );
+  )
+;
 
 STATUS
 StringDBSetStringReferenced (
   INT8      *StringIdentifierName,
   BOOLEAN   IgnoreNotFound
-  );
+  )
+;
 
 void
 StringDBFormatString (
   WCHAR   *String
+  )
+;
+
+STATUS
+StringDBCreateHiiExportPack (
+  INT8                *OutputFileName,
+  WCHAR_STRING_LIST   *LanguagesOfInterest
   );
+
 
 #endif // #ifndef _STRING_DB_H_

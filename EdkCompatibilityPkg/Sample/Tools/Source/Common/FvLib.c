@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -707,8 +707,13 @@ Returns:
     //
     FileLength          = GetLength (FfsHeader->Size);
     OccupiedFileLength  = (FileLength + 0x07) & (-1 << 3);
+#if (PI_SPECIFICATION_VERSION < 0x00010000)  
     Checksum            = CalculateSum8 ((UINT8 *) FfsHeader, FileLength - TailSize);
     Checksum            = (UINT8) (Checksum - FfsHeader->State);
+#else
+    Checksum            = CalculateSum8 ((UINT8 *) ((UINTN)FfsHeader + sizeof (EFI_FFS_FILE_HEADER)), FileLength - TailSize - sizeof (EFI_FFS_FILE_HEADER));
+    Checksum            =  Checksum + (UINT8)FfsHeader->IntegrityCheck.Checksum.File;
+#endif
     if (Checksum != 0) {
       Error (NULL, 0, 0, FileGuidString, "invalid FFS file checksum");
       return EFI_ABORTED;
@@ -716,10 +721,10 @@ Returns:
   } else {
     //
     // File does not have a checksum
-    // Verify contents are 0x5A as spec'd
+    // Verify contents are 0x5A(Framework) and 0xAA(PI 1.0) as spec'd
     //
     if (FfsHeader->IntegrityCheck.Checksum.File != FFS_FIXED_CHECKSUM) {
-      Error (NULL, 0, 0, FileGuidString, "invalid fixed FFS file header checksum");
+      Error (NULL, 0, 0, FileGuidString, "invalid fixed file checksum");
       return EFI_ABORTED;
     }
   }

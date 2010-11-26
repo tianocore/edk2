@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -70,7 +70,7 @@ Returns:
 
 
 //
-// The following functions hide the mRT local global from the call to
+// The following functions hide the mRTEdkDxeRuntimeDriverLib local global from the call to
 // runtime service in the EFI system table.
 //
 EFI_STATUS
@@ -415,7 +415,7 @@ Returns:
 
 --*/
 {
-  return mRT->ConvertPointer (DebugDisposition, Address);
+  return mRTEdkDxeRuntimeDriverLib->ConvertPointer (DebugDisposition, Address);
 }
 
 EFI_STATUS

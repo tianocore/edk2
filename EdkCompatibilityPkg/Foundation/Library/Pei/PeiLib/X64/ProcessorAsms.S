@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials                          
 # are licensed and made available under the terms and conditions of the BSD License         
 # which accompanies this distribution.  The full text of the license may be found at        
@@ -99,6 +99,19 @@ ASM_PFX(TransferControlSetJump):
       mov    %r13,0x40(%rdx)
       mov    %r14,0x48(%rdx)
       mov    %r15,0x50(%rdx)
+      #; save non-volatile fp registers
+      stmxcsr 0x60(%rdx)
+      lea     0x68(%rdx), %rax
+      movdqu  %xmm6, (%rax) 
+      movdqu  %xmm7, 0x10(%rax)
+      movdqu  %xmm8, 0x20(%rax)
+      movdqu  %xmm9, 0x30(%rax)
+      movdqu  %xmm10, 0x40(%rax)
+      movdqu  %xmm11, 0x50(%rax)
+      movdqu  %xmm12, 0x60(%rax)
+      movdqu  %xmm13, 0x70(%rax)
+      movdqu  %xmm14, 0x80(%rax)
+      movdqu  %xmm15, 0x90(%rax)
       mov    (%rsp),%rax
       mov    %rax,0x58(%rdx)
       mov    $0x0,%rax
@@ -115,7 +128,20 @@ ASM_PFX(TransferControlSetJump):
 #
 #
 ASM_PFX(TransferControlLongJump):
-  # set return from SetJump to EFI_WARN_RETURN_FROM_LONG_JUMP
+      # set return from SetJump to EFI_WARN_RETURN_FROM_LONG_JUMP
+      #; load non-volatile fp registers
+      ldmxcsr 0x60(%rdx)
+      lea     0x68(%rdx), %rax
+      movdqu  (%rax), %xmm6
+      movdqu  0x10(%rax), %xmm7
+      movdqu  0x20(%rax), %xmm8
+      movdqu  0x30(%rax), %xmm9
+      movdqu  0x40(%rax), %xmm10
+      movdqu  0x50(%rax), %xmm11
+      movdqu  0x60(%rax), %xmm12
+      movdqu  0x70(%rax), %xmm13
+      movdqu  0x80(%rax), %xmm14
+      movdqu  0x90(%rax), %xmm15
       mov    $0x5,%rax
       mov    (%rdx),%rbx
       mov    0x8(%rdx),%rsp

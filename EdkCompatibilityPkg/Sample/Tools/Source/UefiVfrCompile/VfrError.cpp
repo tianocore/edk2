@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-VfrError.cpp
+  VfrError.cpp
 
 Abstract:
 
@@ -25,33 +25,36 @@ Abstract:
 static SVFR_ERROR_HANDLE VFR_ERROR_HANDLE_TABLE [] = {
   { VFR_RETURN_SUCCESS, NULL },
   { VFR_RETURN_ERROR_SKIPED, NULL },
-  { VFR_RETURN_FATAL_ERROR, "fatal error!!" },
+  { VFR_RETURN_FATAL_ERROR, ": fatal error!!" },
 
-  { VFR_RETURN_MISMATCHED, "unexpected token" },
-  { VFR_RETURN_INVALID_PARAMETER, "Invalid parameter" },
-  { VFR_RETURN_OUT_FOR_RESOURCES, "system out of memory" },
-  { VFR_RETURN_UNSUPPORTED, "unsupported" },
-  { VFR_RETURN_REDEFINED, "already defined" },
-  { VFR_RETURN_FORMID_REDEFINED, "form id already defined" },
-  { VFR_RETURN_QUESTIONID_REDEFINED, "question id already defined" },
-  { VFR_RETURN_VARSTOREID_REDEFINED, "varstore id already defined" },
-  { VFR_RETURN_UNDEFINED, "undefined" },
-  { VFR_RETURN_VAR_NOTDEFINED_BY_QUESTION, "some variable has not defined by a question"},
-  { VFR_RETURN_GET_EFIVARSTORE_ERROR, "get efi varstore error"},
-  { VFR_RETURN_EFIVARSTORE_USE_ERROR, "can not use the efi varstore like this" },
-  { VFR_RETURN_EFIVARSTORE_SIZE_ERROR, "unsupport efi varstore size should be <= 8 bytes" },
-  { VFR_RETURN_GET_NVVARSTORE_ERROR, "get name value varstore error" },
-  { VFR_RETURN_QVAR_REUSE, "variable reused by more than one question" }, 
-  { VFR_RETURN_FLAGS_UNSUPPORTED, "flags unsupported" }, 
-  { VFR_RETURN_ERROR_ARRARY_NUM, "array number error" },
-  { VFR_RETURN_DATA_STRING_ERROR, "data field string error or not support"},
-  { VFR_RETURN_CODEUNDEFINED, "Undefined Error Code" }
+  { VFR_RETURN_MISMATCHED, ": unexpected token" },
+  { VFR_RETURN_INVALID_PARAMETER, ": invalid parameter" },
+  { VFR_RETURN_OUT_FOR_RESOURCES, ": system out of memory" },
+  { VFR_RETURN_UNSUPPORTED, ": unsupported" },
+  { VFR_RETURN_REDEFINED, ": already defined" },
+  { VFR_RETURN_FORMID_REDEFINED, ": form id already defined" },
+  { VFR_RETURN_QUESTIONID_REDEFINED, ": question id already defined" },
+  { VFR_RETURN_VARSTOREID_REDEFINED, ": varstore id already defined" },
+  { VFR_RETURN_UNDEFINED, ": undefined" },
+  { VFR_RETURN_VAR_NOTDEFINED_BY_QUESTION, ": some variable has not defined by a question"},
+  { VFR_RETURN_GET_EFIVARSTORE_ERROR, ": get efi varstore error"},
+  { VFR_RETURN_EFIVARSTORE_USE_ERROR, ": can not use the efi varstore like this" },
+  { VFR_RETURN_EFIVARSTORE_SIZE_ERROR, ": unsupport efi varstore size should be <= 8 bytes" },
+  { VFR_RETURN_GET_NVVARSTORE_ERROR, ": get name value varstore error" },
+  { VFR_RETURN_QVAR_REUSE, ": variable reused by more than one question" },
+  { VFR_RETURN_FLAGS_UNSUPPORTED, ": flags unsupported" },
+  { VFR_RETURN_ERROR_ARRARY_NUM, ": array number error" },
+  { VFR_RETURN_DATA_STRING_ERROR, ": data field string error or not support"},
+  { VFR_RETURN_DEFAULT_VALUE_REDEFINED, ": default value re-defined with different value"},
+  { VFR_RETURN_CONSTANT_ONLY, ": only constant is allowed in the expression"},
+  { VFR_RETURN_CODEUNDEFINED, ": undefined Error Code" }
 };
 
 CVfrErrorHandle::CVfrErrorHandle (
   VOID
   )
 {
+  mInputFileName       = NULL;
   mScopeRecordListHead = NULL;
   mScopeRecordListTail = NULL;
   mVfrErrorHandleTable = VFR_ERROR_HANDLE_TABLE;
@@ -62,6 +65,10 @@ CVfrErrorHandle::~CVfrErrorHandle (
   )
 {
   SVfrFileScopeRecord *pNode = NULL;
+
+  if (mInputFileName != NULL) {
+    delete mInputFileName;
+  }
 
   while (mScopeRecordListHead != NULL) {
     pNode = mScopeRecordListHead;
@@ -74,8 +81,19 @@ CVfrErrorHandle::~CVfrErrorHandle (
   mVfrErrorHandleTable = NULL;
 }
 
+VOID
+CVfrErrorHandle::SetInputFile (
+  IN INT8     *InputFile
+  )
+{
+  if (InputFile != NULL) {
+    mInputFileName = new INT8[strlen(InputFile) + 1];
+    strcpy (mInputFileName, InputFile);
+  }
+}
+
 SVfrFileScopeRecord::SVfrFileScopeRecord (
-  IN INT8     *Record, 
+  IN INT8     *Record,
   IN UINT32   LineNum
   )
 {
@@ -116,7 +134,7 @@ SVfrFileScopeRecord::~SVfrFileScopeRecord (
 
 VOID
 CVfrErrorHandle::ParseFileScopeRecord (
-  IN INT8      *Record, 
+  IN INT8      *Record,
   IN UINT32    WholeScopeLine
   )
 {
@@ -155,6 +173,15 @@ CVfrErrorHandle::GetFileNameLineNum (
   *FileName = NULL;
   *FileLine = 0xFFFFFFFF;
 
+  //
+  // Some errors occur before scope record list been built.
+  //
+  if (mScopeRecordListHead == NULL) {
+    *FileLine = LineNum;
+    *FileName = mInputFileName;
+    return ;
+  }
+
   for (pNode = mScopeRecordListHead; pNode->mNext != NULL; pNode = pNode->mNext) {
     if ((LineNum > pNode->mWholeScopeLine) && (pNode->mNext->mWholeScopeLine > LineNum)) {
       *FileName = pNode->mFileName;
@@ -168,9 +195,10 @@ CVfrErrorHandle::GetFileNameLineNum (
 }
 
 VOID
-CVfrErrorHandle::PrintError (
+CVfrErrorHandle::PrintMsg (
   IN UINT32               LineNum,
   IN INT8                 *TokName,
+  IN INT8                 *MsgType,
   IN INT8                 *ErrorMsg
   )
 {
@@ -178,7 +206,7 @@ CVfrErrorHandle::PrintError (
   UINT32                 FileLine;
 
   GetFileNameLineNum (LineNum, &FileName, &FileLine);
-  printf ("%s line %d: error %s %s\n", FileName, FileLine, TokName, ErrorMsg);
+  printf ("%s line %d: %s %s %s\n", FileName, FileLine, MsgType, TokName, ErrorMsg);
 }
 
 UINT8

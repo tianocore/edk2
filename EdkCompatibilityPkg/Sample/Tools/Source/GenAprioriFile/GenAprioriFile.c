@@ -1,6 +1,6 @@
 /*++
 
- Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+ Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
  This program and the accompanying materials                          
  are licensed and made available under the terms and conditions of the BSD License         
  which accompanies this distribution.  The full text of the license may be found at        
@@ -39,7 +39,8 @@ Abstract:
 // #define STATUS_WARNING        1
 // #define STATUS_ERROR          2
 //
-#define UTILITY_NAME  "GenAprioriFile"
+#define UTILITY_NAME    "GenAprioriFile"
+#define UTILITY_VERSION "v1.0"
 //
 // Here's all our globals.
 //
@@ -447,18 +448,26 @@ Returns:
   
 --*/
 {
-  int               Index;
-  static const char *Str[] = {
-    UTILITY_NAME " -- create an Apriori file consumable by the DXE dispatcher",
-    "  Usage: "UTILITY_NAME " [Options]",
-    "  Options include:",
-    "    -h or -?         for this help information",
-    "    -f AprioriFile   parse the GUID'ed files in AprioriFile (required)",
-    "    -o OutputFile    write output to OutputFile (required)",
-    "    -i               for intelligent re-creation of OutputFile",
-    "    -null            to terminate the output file with a NULL GUID",
-    "    -v               verbose option",
+  int        Index;
+  const char *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel Generate Apriori File Utility",
+    "  Copyright (C), 2006 - 2008 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
     "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION]...",
+    "Description:",
+    "  Generate an Apriori file consumable by the DXE or PEI dispatcher.",
+    "Options:",
+    "  -h or -?         for this help information",
+    "  -f AprioriFile   parse the GUID'ed files in AprioriFile (required)",
+    "  -o OutputFile    write output to OutputFile (required)",
+    "  -i               for intelligent re-creation of OutputFile",
+    "  -null            to terminate the output file with a NULL GUID",
+    "  -v               verbose option",
     NULL
   };
   for (Index = 0; Str[Index] != NULL; Index++) {

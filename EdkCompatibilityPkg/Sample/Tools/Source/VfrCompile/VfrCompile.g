@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -130,7 +130,7 @@ Returns:
   // Set our program name for the error printing routines.
   // Then set printing limits.
   //
-  SetUtilityName (PROGRAM_NAME);
+  SetUtilityName (UTILITY_NAME);
   SetPrintLimits (20, 20, 30);
   //
   // Process the command-line arguments
@@ -145,7 +145,7 @@ Returns:
   // Verify the VFR script file exists
   //
   if ((VfrFptr = fopen (gOptions.VfrFileName, "r")) == NULL) {
-    Error (PROGRAM_NAME, 0, 0, gOptions.VfrFileName, "could not open input VFR file");
+    Error (UTILITY_NAME, 0, 0, gOptions.VfrFileName, "could not open input VFR file");
     Cleanup();
     return STATUS_ERROR;
   }
@@ -164,7 +164,7 @@ Returns:
   }
   Cmd = (char *)malloc (Len);
   if (Cmd == NULL) {
-    Error (PROGRAM_NAME, 0, 0, NULL, "could not allocate memory");
+    Error (UTILITY_NAME, 0, 0, NULL, "could not allocate memory");
     Cleanup();
     return STATUS_ERROR;
   }  
@@ -182,7 +182,7 @@ Returns:
   strcat (Cmd, gOptions.PreprocessorOutputFileName);
   Status = system (Cmd);
   if (Status != 0) {
-    Error (PROGRAM_NAME, 0, 0, gOptions.VfrFileName, "failed to spawn C preprocessor on VFR file");
+    Error (UTILITY_NAME, 0, 0, gOptions.VfrFileName, "failed to spawn C preprocessor on VFR file");
     printf ("Command: '%s %s'\n", PREPROCESSOR_COMMAND, Cmd);
     Cleanup();
     return STATUS_ERROR;
@@ -192,7 +192,7 @@ Returns:
   // Open the preprocessor output file
   //
   if ((VfrFptr = fopen (gOptions.PreprocessorOutputFileName, "r")) == NULL) {
-    Error (PROGRAM_NAME, 0, 0, "failed to open input VFR preprocessor output file", 
+    Error (UTILITY_NAME, 0, 0, "failed to open input VFR preprocessor output file", 
       gOptions.PreprocessorOutputFileName);
     Cleanup();
     return STATUS_ERROR;
@@ -339,7 +339,7 @@ Returns:
     //
     } else if (_stricmp (Argv[0], "-i") == 0) {
       if ((Argc < 2) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing path argument");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing path argument");
         return STATUS_ERROR;
       }
       Argc--;
@@ -351,7 +351,7 @@ Returns:
       }
       IncludePaths = (INT8 *)malloc (Len);
       if (IncludePaths == NULL) {
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
       IncludePaths[0] = 0;
@@ -367,7 +367,7 @@ Returns:
     //
     } else if (_stricmp (Argv[0], "-od") == 0) {
       if ((Argc < 2) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing output directory name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing output directory name");
         return STATUS_ERROR;
       }
       Argc--;
@@ -383,7 +383,7 @@ Returns:
     //
     } else if (_stricmp (Argv[0], "-ppflag") == 0) {
       if (Argc < 2) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing C-preprocessor argument");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing C-preprocessor argument");
         return STATUS_ERROR;
       }
       Argc--;
@@ -394,7 +394,7 @@ Returns:
       }
       CPreprocessorOptions = (INT8 *)malloc (Len);
       if (CPreprocessorOptions == NULL) {
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
       CPreprocessorOptions[0] = 0;
@@ -406,7 +406,7 @@ Returns:
       strcat (CPreprocessorOptions, Argv[0]);
       gOptions.CPreprocessorOptions = CPreprocessorOptions;
     } else {
-      Error (PROGRAM_NAME, 0, 0, Argv[0], "unrecognized option");
+      Error (UTILITY_NAME, 0, 0, Argv[0], "unrecognized option");
       return STATUS_ERROR;
     }
     Argc--;
@@ -416,10 +416,10 @@ Returns:
   // Must specify at least the vfr file name
   //
   if (Argc > 1) {
-    Error (PROGRAM_NAME, 0, 0, Argv[1], "unrecognized argument after VFR file name");
+    Error (UTILITY_NAME, 0, 0, Argv[1], "unrecognized argument after VFR file name");
     return STATUS_ERROR;
   } else if (Argc < 1) {
-    Error (PROGRAM_NAME, 0, 0, NULL, "must specify VFR file name");
+    Error (UTILITY_NAME, 0, 0, NULL, "must specify VFR file name");
     return STATUS_ERROR;
   }
   strcpy (gOptions.VfrFileName, Argv[0]);
@@ -501,26 +501,31 @@ Returns:
 
 --*/
 {
-  int Index;
-  const char *Help[] = {
-    " ", 
-    "VfrCompile version " VFR_COMPILER_VERSION,
-    " ",
-    "  Usage: VfrCompile {options} [VfrFile]",
-    " ",
-    "    where options include:",
-    "      -? or -h       prints this help",
-    "      -l             create an output IFR listing file",
-    "      -i IncPath     add IncPath to the search path for VFR included files",
-    "      -od OutputDir  deposit all output files to directory OutputDir (default=cwd)",
-    "      -ibin          create an IFR HII pack file",
-    "    where parameters include:",
-    "      VfrFile        name of the input VFR script file",
-    " ",
+  int          Index;
+  const char   *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel VFR Compiler Utility",
+    "  Copyright (C), 2004 - 2008 Intel Corporation",
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
+    "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION] VFRFILE",
+    "Description:",
+    "  Compile VFRFILE.",
+    "Options:",
+    "  -? or -h        print this help",
+    "  -l              create an output IFR listing file",
+    "  -i IncPath      add IncPath to the search path for VFR included files",
+    "  -od OutputDir   deposit all output files to directory OutputDir (default=cwd)",
+    "  -ibin           create an IFR HII pack file",
+    "  -ppflag CFlags  pass Flags as C-preprocessor-flag",
+    "  -v or -version  print version information",
     NULL
-    };
-  for (Index = 0; Help[Index] != NULL; Index++) {
-    fprintf (stdout, "%s\n", Help[Index]);
+  };
+
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
   }
 }
     
@@ -591,7 +596,7 @@ Returns:
     }
     gLastLineDefinition = LineDef;
   } else {
-    Error (PROGRAM_NAME, 0, 0, "invalid line definition in preprocessor output file", TokenString);
+    Error (UTILITY_NAME, 0, 0, "invalid line definition in preprocessor output file", TokenString);
     free (LineDef);
     return;
   }
@@ -2318,7 +2323,7 @@ EfiVfrParser::QueueIdEqValList (
   
   U16 = (UINT16_LIST *)malloc (sizeof (UINT16_LIST));
   if (U16 == NULL) {
-    Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failed");
+    Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failed");
   } else {
     memset ((char *)U16, 0, sizeof (UINT16_LIST));
     U16->Value = Value;
@@ -2378,7 +2383,7 @@ EfiVfrParser::PrintErrorMessage (
     FileName = ConvertLineNumber ((UINT32 *)&LineNum);
     Error (FileName, LineNum, 0, Msg1, Msg2);
   } else {
-    Error (PROGRAM_NAME, 0, 0, Msg1, Msg2);
+    Error (UTILITY_NAME, 0, 0, Msg1, Msg2);
   }
 }
 VOID 
@@ -2394,7 +2399,7 @@ EfiVfrParser::PrintWarningMessage (
     FileName = ConvertLineNumber ((UINT32 *)&LineNum);
     Warning (FileName, LineNum, 0, Msg1, Msg2);
   } else {
-    Warning (PROGRAM_NAME, 0, 0, Msg1, Msg2);
+    Warning (UTILITY_NAME, 0, 0, Msg1, Msg2);
   }
 }
 VOID 
@@ -3357,7 +3362,7 @@ Returns:
   
   NewRef = (GOTO_REFERENCE *)malloc (sizeof (GOTO_REFERENCE));
   if (NewRef == NULL) {
-    Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+    Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
     return;
   }
   memset ((char *)NewRef, 0, sizeof (GOTO_REFERENCE));
@@ -3423,7 +3428,7 @@ Returns:
   //
   NewFormId = (FORM_ID_VALUE *)malloc (sizeof (FORM_ID_VALUE));
   if (NewFormId == NULL) {
-    Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+    Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
     return;
   }
   memset ((char *)NewFormId, 0, sizeof (FORM_ID_VALUE));

@@ -1,5 +1,4 @@
 /*++
-
 Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -10,8 +9,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
-
-VfrUtilityLib.h
+  VfrUtilityLib.h
 
 Abstract:
 
@@ -28,7 +26,7 @@ Abstract:
 
 #define MAX_NAME_LEN                       64
 #define DEFAULT_ALIGN                      1
-#define DEFAULT_PACK_ALIGN                 0xFFFFFFFF
+#define DEFAULT_PACK_ALIGN                 0x8
 #define DEFAULT_NAME_TABLE_ITEMS           1024
 
 #define EFI_BITS_SHIFT_PER_UINT32          0x5
@@ -58,9 +56,9 @@ struct SConfigInfo {
 };
 
 struct SConfigItem {
-  INT8          *mId;
-  INT8          *mInfo;
-  SConfigInfo   *mInfoStrList;
+  INT8          *mName;         // varstore name
+  INT8          *mId;           // varstore ID
+  SConfigInfo   *mInfoStrList;  // list of Offset/Value in the varstore
   SConfigItem   *mNext;
 
 public:
@@ -115,10 +113,59 @@ struct SVfrDataType {
   SVfrDataType              *mNext;
 };
 
+#define VFR_PACK_ASSIGN     0x01
+#define VFR_PACK_SHOW       0x02
+#define VFR_PACK_PUSH       0x04
+#define VFR_PACK_POP        0x08
+
+#define PACKSTACK_MAX_SIZE  0x400
+
+struct SVfrPackStackNode {
+  INT8                      *mIdentifier;
+  UINT32                    mNumber;
+  SVfrPackStackNode         *mNext;
+
+  SVfrPackStackNode (IN INT8 *Identifier, IN UINT32 Number) {
+    mIdentifier = NULL;
+    mNumber     = Number;
+    mNext       = NULL;
+
+    if (Identifier != NULL) {
+      mIdentifier = new INT8[strlen (Identifier) + 1];
+      strcpy (mIdentifier, Identifier);
+    }
+  }
+
+  ~SVfrPackStackNode (VOID) {
+    if (mIdentifier != NULL) {
+      delete mIdentifier;
+    }
+    mNext = NULL;
+  }
+
+  bool Match (IN INT8 *Identifier) {
+    if (Identifier == NULL) {
+      return TRUE;
+    } else if (mIdentifier == NULL) {
+      return FALSE;
+    } else if (strcmp (Identifier, mIdentifier) == 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+};
+
 class CVfrVarDataTypeDB {
 private:
-  SVfrDataType              *mDataTypeList;
   UINT32                    mPackAlign;
+  SVfrPackStackNode         *mPackStack;
+
+public:
+  EFI_VFR_RETURN_CODE       Pack (IN UINT32, IN UINT8, IN INT8 *Identifier = NULL, IN UINT32 Number = DEFAULT_PACK_ALIGN);
+
+private:
+  SVfrDataType              *mDataTypeList;
 
   SVfrDataType              *mNewDataType;
   SVfrDataType              *mCurrDataType;
@@ -138,9 +185,6 @@ public:
   CVfrVarDataTypeDB (VOID);
   ~CVfrVarDataTypeDB (VOID);
 
-  EFI_VFR_RETURN_CODE Pack (IN UINT32);
-  VOID                UnPack (VOID);
-
   VOID                DeclareDataTypeBegin (VOID);
   EFI_VFR_RETURN_CODE SetNewTypeName (IN INT8 *);
   EFI_VFR_RETURN_CODE DataTypeAddField (IN INT8 *, IN INT8 *, IN UINT32);
@@ -148,6 +192,7 @@ public:
 
   EFI_VFR_RETURN_CODE GetDataType (IN INT8 *, OUT SVfrDataType **);
   EFI_VFR_RETURN_CODE GetDataTypeSize (IN INT8 *, OUT UINT32 *);
+  EFI_VFR_RETURN_CODE GetDataTypeSize (IN UINT8, OUT UINT32 *);
   EFI_VFR_RETURN_CODE GetDataFieldInfo (IN INT8 *, OUT UINT16 &, OUT UINT8 &, OUT UINT32 &);
 
   EFI_VFR_RETURN_CODE GetUserDefinedTypeNameList (OUT INT8 ***, OUT UINT32 *);
@@ -245,6 +290,7 @@ public:
 
   EFI_VFR_RETURN_CODE GetVarStoreId (IN INT8 *, OUT EFI_VARSTORE_ID *);
   EFI_VFR_RETURN_CODE GetVarStoreType (IN INT8 *, OUT EFI_VFR_VARSTORE_TYPE &);
+  EFI_VFR_VARSTORE_TYPE GetVarStoreType (IN EFI_VARSTORE_ID);
   EFI_VFR_RETURN_CODE GetVarStoreName (IN EFI_VARSTORE_ID, OUT INT8 **);
 
   EFI_VFR_RETURN_CODE GetBufferVarStoreDataTypeName (IN INT8 *, OUT INT8 **);

@@ -555,20 +555,37 @@ IfrLibNewString (
   if (Languages == NULL) {
     return EFI_NOT_FOUND;
   }
+  
+  if (StringId == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  *StringId = 0;
 
   LangStrings = Languages;
   while (*LangStrings != 0) {
     GetNextLanguage (&LangStrings, Lang);
 
-    Status = gIfrLibHiiString->NewString (
-                                 gIfrLibHiiString,
-                                 PackageList,
-                                 StringId,
-                                 Lang,
-                                 NULL,
-                                 String,
-                                 NULL
-                                 );
+    if (*StringId == 0) {
+      Status = gIfrLibHiiString->NewString (
+                                   gIfrLibHiiString,
+                                   PackageList,
+                                   StringId,
+                                   Lang,
+                                   NULL,
+                                   String,
+                                   NULL
+                                   );
+    } else {
+      Status = gIfrLibHiiString->SetString (
+                                   gIfrLibHiiString,
+                                   PackageList,
+                                   *StringId,
+                                   Lang,
+                                   String,
+                                   NULL
+                                   );
+    }
+
     if (EFI_ERROR (Status)) {
       break;
     }

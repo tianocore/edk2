@@ -64,11 +64,13 @@ Power10U64 PROC
   jcxz   _Power10U64_Done
   
 _Power10U64_Wend:
+  push   ecx
   push   10
   push   [ebp + 0Ch]; dword ptr Operand[4]
   push   [ebp + 8]; dword ptr Operand[0]
   call   MultU64x32
   add    esp, 0cH
+  pop    ecx
   mov    [ebp + 8] , eax; dword ptr Operand[0]
   mov    [ebp + 0Ch] , edx; dword ptr Operand[4]
   loop   _Power10U64_Wend

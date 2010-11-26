@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -45,7 +45,8 @@ Abstract:
 //
 // Version of this utility
 //
-#define UTILITY_VERSION "v2.6"
+#define UTILITY_NAME    "EfiRom"
+#define UTILITY_VERSION "v2.7"
 
 //
 // Define some status return values
@@ -1311,39 +1312,42 @@ Returns:
 
 --*/
 {
-  int               Index;
-  static const char *Msg[] = {
-    "EfiRom "UTILITY_VERSION" - Intel EFI Make Option ROM utility",
-    "  Copyright (C), 1999 - 2002 Intel Coproration\n",
+  int        Index;
+  const char *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel EFI Make Option ROM Utility",
+    "  Copyright (C), 1999 - 2008 Intel Coproration",
+
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
+
+    "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION]... SOURCE ...",
+    "Description:",
     "  Create an option ROM image from a list of input files",
-    "  Usage: efirom {-p} [-v VendorId] [-d DeviceId] {-o OutFileName} ",
-    "                [-e|-b] [FileName(s)]",
-    "    where:",
-    "      VendorId       - required hex PCI Vendor ID for the device",
-    "      DeviceId       - required hex PCI Device ID for the device",
-    "      OutFileName    - optional output file name. Default is the first input",
-    "                       file name with a "DEFAULT_OUTPUT_EXTENSION" file extension",
-    "      FileNames      - input PE32 or binary file name(s)",
-    "      BinFileName    - input binary file name(s)",
-    "      -p             - for verbose output",
-    "      -l             - to not automatically set the LAST bit on the last file",
-    "      -b             - following FileNames are binary files",
-    "      -e             - following FileNames are EFI PE32 image files",
-    "      -ec            - following FileNames are EFI PE32 image files, and should",
-    "                       be compressed by this utility",
-    "      -cc ClassCode  - to use hex ClassCode in the PCI data structure header for",
-    "                       the following FileName",
-    "      -rev Revision  - to use hex Revision in the PCI data structure header for",
-    "                       the following FileName",
-    "      -dump          - to dump the headers of an existing option ROM image",
-    "",
-    "Example usage: EfiRom -v 0xABCD -d 0x1234 -b File1.bin File2.bin -e File1.efi File2.efi",
-    "",
+    "Options:",
+    "  -v  VendorId      - required hex PCI Vendor ID for the device",
+    "  -d  DeviceId      - required hex PCI Device ID for the device",
+    "  -o  OutFileName   - optional output file name. Default is the first input",
+    "                      file name with a "DEFAULT_OUTPUT_EXTENSION" file extension",
+    "  -e  SOURCE ...    - input are EFI PE32 image file(s)",
+    "  -b  SOURCE ...    - input are Legacy binary file(s)",
+    "  -ec SOURCE ...    - input are EFI PE32 image file(s) and should be compressed",
+    "  -p                - for verbose output",
+    "  -l                - to not automatically set the LAST bit on the last file",
+    "  -cc ClassCode     - to use hex ClassCode in the PCI data structure header for",
+    "                      the following SOURCE(s)",
+    "  -rev Revision     - to use hex Revision in the PCI data structure header for",
+    "                      the following one SOURCE",
+    "  -dump             - to dump the headers of an existing option ROM image",
+    "Example Usage:",
+    "  EfiRom -v 0xABCD -d 0x1234 -b File1.bin File2.bin -e File1.efi File2.efi",
     NULL
   };
 
-  for (Index = 0; Msg[Index] != NULL; Index++) {
-    fprintf (stdout, "%s\n", Msg[Index]);
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
   }
 }
 

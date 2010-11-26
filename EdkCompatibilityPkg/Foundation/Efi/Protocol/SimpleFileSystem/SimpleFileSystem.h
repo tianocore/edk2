@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -35,6 +35,8 @@ Abstract:
 
 EFI_FORWARD_DECLARATION (EFI_SIMPLE_FILE_SYSTEM_PROTOCOL);
 EFI_FORWARD_DECLARATION (EFI_FILE);
+typedef struct _EFI_FILE *EFI_FILE_HANDLE;
+typedef struct _EFI_FILE EFI_FILE_PROTOCOL;
 
 typedef
 EFI_STATUS
@@ -356,7 +358,7 @@ EFI_STATUS
 ;
 
 #define EFI_FILE_HANDLE_REVISION  0x00010000
-typedef struct _EFI_FILE {
+struct _EFI_FILE {
   UINT64                Revision;
   EFI_FILE_OPEN         Open;
   EFI_FILE_CLOSE        Close;
@@ -368,7 +370,7 @@ typedef struct _EFI_FILE {
   EFI_FILE_GET_INFO     GetInfo;
   EFI_FILE_SET_INFO     SetInfo;
   EFI_FILE_FLUSH        Flush;
-} *EFI_FILE_HANDLE;
+};
 
 extern EFI_GUID gEfiSimpleFileSystemProtocolGuid;
 

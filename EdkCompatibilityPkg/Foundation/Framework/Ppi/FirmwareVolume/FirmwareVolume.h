@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -77,7 +77,7 @@ EFI_STATUS
 (EFIAPI *EFI_PEI_FV_FIND_FILE_NAME) (
   IN CONST EFI_PEI_FIRMWARE_VOLUME_PPI     *This,
   IN CONST EFI_GUID                        *FileName,
-  IN EFI_PEI_FV_HANDLE                     FvHandle,
+  IN OUT EFI_PEI_FV_HANDLE                 *FvHandle,
   OUT EFI_PEI_FILE_HANDLE                  *FileHandle
   );
 

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -43,6 +43,8 @@ Abstract:
 //
 #define MAX_NUMBER_OF_FILES_IN_FV       1000
 #define MAX_NUMBER_OF_COMPONENTS_IN_FV  10
+
+#define FV_CAPACITY_INCREASE_UNIT       0x100000
 
 //
 // INF file strings
@@ -150,6 +152,7 @@ Abstract:
 #define TRUE_STRING               "TRUE"
 #define FALSE_STRING              "FALSE"
 #define NULL_STRING               "NULL"
+#define AUTO_STRING               "AUTO"
 
 //
 // Defines to calculate the offset for PEI CORE entry points
@@ -206,6 +209,7 @@ EFI_STATUS
 ParseFvInf (
   IN MEMORY_FILE  *InfFile,
   IN FV_INFO      *FvInfo
-  );
+  )
+;
 
 #endif

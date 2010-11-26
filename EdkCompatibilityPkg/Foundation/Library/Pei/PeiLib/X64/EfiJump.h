@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -35,6 +35,8 @@ typedef struct {
   UINT64 R14;
   UINT64 R15;
   UINT64 Rip;
+  UINT32 MxCsr;
+  UINT8  XmmBuffer[160]; // XMM6-XMM15
 } EFI_JUMP_BUFFER;
 
 #endif

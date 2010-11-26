@@ -70,7 +70,7 @@ PeCoffLoaderLoadImage (
 EFI_STATUS
 EFIAPI
 PeCoffLoaderUnloadImage (
-  IN OUT EFI_PEI_PE_COFF_LOADER_IMAGE_CONTEXT   *ImageContext
+  IN EFI_PEI_PE_COFF_LOADER_IMAGE_CONTEXT   *ImageContext
   );
 
 #if defined (EFI_DEBUG_ITP_BREAK) && !defined (_CONSOLE)
@@ -565,7 +565,10 @@ Returns:
     // Pe image and in Te image header there is not a field to describe the imagesize,
     // we use the largest VirtualAddress plus Size in each directory entry to describe the imagesize
     //
-    ImageContext->ImageSize         = (UINT64) (Hdr.Te->DataDirectory[0].VirtualAddress + Hdr.Te->DataDirectory[0].Size);
+    ImageContext->ImageSize = (UINT64) (Hdr.Te->DataDirectory[0].VirtualAddress + Hdr.Te->DataDirectory[0].Size);
+    if(Hdr.Te->DataDirectory[1].VirtualAddress > Hdr.Te->DataDirectory[0].VirtualAddress) {
+      ImageContext->ImageSize = (UINT64) (Hdr.Te->DataDirectory[1].VirtualAddress + Hdr.Te->DataDirectory[1].Size);
+    }
     ImageContext->SectionAlignment  = 4096;
     ImageContext->SizeOfHeaders     = sizeof (EFI_TE_IMAGE_HEADER) + (UINTN) Hdr.Te->BaseOfCode - (UINTN) Hdr.Te->StrippedSize;
 
@@ -1013,6 +1016,12 @@ Returns:
   UINT32                                TempDebugEntryRva;
   UINT32                                NumberOfRvaAndSizes;
   UINT16                                Magic;
+#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
+  EFI_IMAGE_RESOURCE_DIRECTORY          *ResourceDirectory;
+  EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY    *ResourceDirectoryEntry;
+  EFI_IMAGE_RESOURCE_DIRECTORY_STRING   *ResourceDirectoryString;
+  EFI_IMAGE_RESOURCE_DATA_ENTRY         *ResourceDataEntry;
+#endif
 
   if (NULL == ImageContext) {
     return EFI_INVALID_PARAMETER;
@@ -1368,6 +1377,73 @@ Returns:
     }
   }
 
+#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
+  //
+  // Get Image's HII resource section
+  //
+  if (!(ImageContext->IsTeImage)) {
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      //
+      // Use PE32 offset
+      //
+      DirectoryEntry = (EFI_IMAGE_DATA_DIRECTORY *)&Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE];
+    } else {
+      //
+      // Use PE32+ offset
+      //
+      DirectoryEntry = (EFI_IMAGE_DATA_DIRECTORY *)&Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE];
+    }
+
+    if (DirectoryEntry->Size != 0) {
+      Base = PeCoffLoaderImageAddress (ImageContext, DirectoryEntry->VirtualAddress);
+
+      ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) Base;
+      ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
+
+      for (Index = 0; Index < ResourceDirectory->NumberOfNamedEntries; Index++) {
+        if (ResourceDirectoryEntry->u1.s.NameIsString) {
+          ResourceDirectoryString = (EFI_IMAGE_RESOURCE_DIRECTORY_STRING *) (Base + ResourceDirectoryEntry->u1.s.NameOffset);
+
+          if (ResourceDirectoryString->Length == 3 &&
+              ResourceDirectoryString->String[0] == L'H' &&
+              ResourceDirectoryString->String[1] == L'I' &&
+              ResourceDirectoryString->String[2] == L'I') {
+            //
+            // Resource Type "HII" found
+            //
+            if (ResourceDirectoryEntry->u2.s.DataIsDirectory) {
+              //
+              // Move to next level - resource Name
+              //
+              ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) (Base + ResourceDirectoryEntry->u2.s.OffsetToDirectory);
+              ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
+
+              if (ResourceDirectoryEntry->u2.s.DataIsDirectory) {
+                //
+                // Move to next level - resource Language
+                //
+                ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) (Base + ResourceDirectoryEntry->u2.s.OffsetToDirectory);
+                ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
+              }
+            }
+
+            //
+            // Now it ought to be resource Data
+            //
+            if (!ResourceDirectoryEntry->u2.s.DataIsDirectory) {
+              ResourceDataEntry = (EFI_IMAGE_RESOURCE_DATA_ENTRY *) (Base + ResourceDirectoryEntry->u2.OffsetToData);
+              ImageContext->HiiResourceData = (EFI_PHYSICAL_ADDRESS) (UINTN) PeCoffLoaderImageAddress (ImageContext, ResourceDataEntry->OffsetToData);
+              break;
+            }
+          }
+        }
+
+        ResourceDirectoryEntry++;
+      }
+    }
+  }
+#endif
+
 #if defined (EFI_DEBUG_ITP_BREAK) && !defined (_CONSOLE)
   AsmEfiSetBreakSupport ((UINTN)(ImageContext->ImageAddress));
 #endif
@@ -1378,7 +1454,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeCoffLoaderUnloadImage (
-  IN OUT EFI_PEI_PE_COFF_LOADER_IMAGE_CONTEXT   *ImageContext
+  IN EFI_PEI_PE_COFF_LOADER_IMAGE_CONTEXT   *ImageContext
   )
 /*++
 

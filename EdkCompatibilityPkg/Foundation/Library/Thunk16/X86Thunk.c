@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -53,6 +53,18 @@ AsmFxSave (
   OUT IA32_FX_BUFFER *Buffer
   );
 
+UINTN
+EFIAPI
+AsmGetEflags (
+  VOID
+  );
+
+VOID
+EFIAPI
+AsmSetEflags (
+  IN UINTN   Eflags
+  );
+
 //
 // Implementation
 //
@@ -98,6 +110,7 @@ Returns:
 {
   IA32_FX_BUFFER                    *FpSavedState;
   UINT8                             FpBuffer[sizeof (*FpSavedState) + 0x10];
+  UINTN                             Eflags;
 
   FpSavedState = (IA32_FX_BUFFER*)(((UINTN)FpBuffer + 0xf) & ~0xf);
 
@@ -110,6 +123,8 @@ Returns:
     AsmFxSave (FpSavedState);
   }
 
+  Eflags = AsmGetEflags ();
+
   EfiCommonLibCopyMem (
     RegisterSet,
     _Thunk16 (
@@ -119,6 +134,8 @@ Returns:
       ),
     sizeof (*RegisterSet)
     );
+
+   AsmSetEflags (Eflags);
 
   if (ThunkFlags & THUNK_SAVE_FP_STATE) {
     AsmFxRestore (FpSavedState);
@@ -200,6 +217,67 @@ Returns:
   return ThunkContext;
 }
 
+#pragma pack (1)
+
+typedef struct {
+  UINT32                            EDI;
+  UINT32                            ESI;
+  UINT32                            EBP;
+  UINT32                            ESP;
+  UINT32                            EBX;
+  UINT32                            EDX;
+  UINT32                            ECX;
+  UINT32                            EAX;
+  UINT16                            DS;
+  UINT16                            ES;
+  UINT16                            FS;
+  UINT16                            GS;
+  UINTN                             EFLAGS;
+  UINT32                            EIP;
+  UINT16                            CS;
+  UINT16                            SS;
+} IA32_REGS;
+
+typedef struct {
+  UINT16  Limit;
+  UINT32  Base;
+} IA32_DESC;
+
+typedef struct {
+  UINT32    RetEip;
+  UINT16    RetCs;
+  UINT16    ThunkFlags;
+#ifdef EFI32
+  UINT32    SavedEsp;
+  UINT16    SavedSs;
+#endif
+  IA32_DESC SavedGdtr;
+#ifdef EFIX64
+  UINT16    Resvd1;
+#endif
+  UINT32    SavedCr0;
+  UINT32    SavedCr4;
+} _STK16;
+#pragma pack ()
+
+#define STACK_PARAM_SIZE  16
+
+BOOLEAN
+AsmThunk16SetUserStack (
+  IN THUNK_CONTEXT             *ThunkContext,
+  IN VOID                      *Stack,
+  IN UINTN                     StackSize
+  )
+{
+  if (StackSize > STACK_PARAM_SIZE) {
+    return FALSE;
+  }
+
+  EfiCommonLibCopyMem ((VOID *)(UINTN)(ThunkContext->DefaultStack - sizeof(_STK16) - sizeof(IA32_REGS) - STACK_PARAM_SIZE), Stack, StackSize);
+
+  return TRUE;
+}
+
 VOID
 EFIAPI
 AsmThunk16Destroy (
@@ -253,12 +331,8 @@ Arguments:
                   set on input, otherwise ignored.
                   EFlages is ignored on input.
                   On output, values of CS, EIP, SS and ESP should be ignored.
-  ThunkFlags    - 2 flags have currently been defined, THUNK_SAVE_FP_STATE and
-                  THUNK_USER_STACK.
-                  THUNK_SAVE_FP_STATE - FPU state would be saved/restored
-                                        before/after calling real mode code.
-                  THUNK_USER_STACK    - The stack specified by SS:ESP would be
-                                        used instead of the default stack.
+  ThunkFlags    - THUNK_USER_STACK: The stack specified by SS:ESP would be
+                  used instead of the default stack.
 
 Returns:
 
@@ -298,12 +372,8 @@ Arguments:
                   set on input, otherwise ignored.
                   EFlages is ignored on input.
                   On output, values of CS, EIP, SS and ESP should be ignored.
-  ThunkFlags    - 2 flags have currently been defined, THUNK_SAVE_FP_STATE and
-                  THUNK_USER_STACK.
-                  THUNK_SAVE_FP_STATE - FPU state would be saved/restored
-                                        before/after calling real mode code.
-                  THUNK_USER_STACK    - The stack specified by SS:ESP would be
-                                        used instead of the default stack.
+  ThunkFlags    - THUNK_USER_STACK: The stack specified by SS:ESP would be
+                  used instead of the default stack.
 
 Returns:
 

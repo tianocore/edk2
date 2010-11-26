@@ -25,7 +25,12 @@ Abstract:
 #define _EFI_TPM_H_
 
 #include "Tiano.h"
-#include "IndustryStandard/Tpm12.h"
+
+//
+// The start of TPM return codes
+//
+#define TPM_BASE                    (EFI_MAX_BIT + (EFI_MAX_BIT >> 1))
+#include "Tpm12.h"
 
 //
 // Standard event types

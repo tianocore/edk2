@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -50,11 +50,11 @@ Returns:
 
 --*/
 {
-  mRT->ResetSystem (ResetType, ResetStatus, DataSize, ResetData);
+  mRTEdkDxeRuntimeDriverLib->ResetSystem (ResetType, ResetStatus, DataSize, ResetData);
 }
 
 //
-// The following functions hide the mRT local global from the call to
+// The following functions hide the mRTEdkDxeRuntimeDriverLib local global from the call to
 // runtime service in the EFI system table.
 //
 EFI_STATUS
@@ -82,7 +82,7 @@ Returns:
 
 --*/
 {
-  return mRT->GetTime (Time, Capabilities);
+  return mRTEdkDxeRuntimeDriverLib->GetTime (Time, Capabilities);
 }
 
 EFI_STATUS
@@ -106,7 +106,7 @@ Returns:
 
 --*/
 {
-  return mRT->SetTime (Time);
+  return mRTEdkDxeRuntimeDriverLib->SetTime (Time);
 }
 
 EFI_STATUS
@@ -134,7 +134,7 @@ Returns:
 
 --*/
 {
-  return mRT->GetWakeupTime (Enabled, Pending, Time);
+  return mRTEdkDxeRuntimeDriverLib->GetWakeupTime (Enabled, Pending, Time);
 }
 
 EFI_STATUS
@@ -161,7 +161,7 @@ Returns:
 
 --*/
 {
-  return mRT->SetWakeupTime (Enable, Time);
+  return mRTEdkDxeRuntimeDriverLib->SetWakeupTime (Enable, Time);
 }
 
 
@@ -199,7 +199,7 @@ Returns:
 
 --*/
 {
-  return mRT->GetVariable (VariableName, VendorGuid, Attributes, DataSize, Data);
+  return mRTEdkDxeRuntimeDriverLib->GetVariable (VariableName, VendorGuid, Attributes, DataSize, Data);
 }
 
 EFI_STATUS
@@ -232,7 +232,7 @@ Returns:
 
 --*/
 {
-  return mRT->GetNextVariableName (VariableNameSize, VariableName, VendorGuid);
+  return mRTEdkDxeRuntimeDriverLib->GetNextVariableName (VariableNameSize, VariableName, VendorGuid);
 }
 
 EFI_STATUS
@@ -265,7 +265,7 @@ Returns:
 
 --*/
 {
-  return mRT->SetVariable (VariableName, VendorGuid, Attributes, DataSize, Data);
+  return mRTEdkDxeRuntimeDriverLib->SetVariable (VariableName, VendorGuid, Attributes, DataSize, Data);
 }
 
 EFI_STATUS
@@ -289,7 +289,7 @@ Returns:
 
 --*/
 {
-  return mRT->GetNextHighMonotonicCount (HighCount);
+  return mRTEdkDxeRuntimeDriverLib->GetNextHighMonotonicCount (HighCount);
 }
 
 EFI_STATUS
@@ -316,7 +316,7 @@ Returns:
 
 --*/
 {
-  return mRT->ConvertPointer (DebugDisposition, Address);
+  return mRTEdkDxeRuntimeDriverLib->ConvertPointer (DebugDisposition, Address);
 }
 
 EFI_STATUS
@@ -399,7 +399,7 @@ EfiSetVirtualAddressMap (
   IN CONST EFI_MEMORY_DESCRIPTOR    *VirtualMap
   )
 {
-  return mRT->SetVirtualAddressMap (
+  return mRTEdkDxeRuntimeDriverLib->SetVirtualAddressMap (
                 MemoryMapSize,
                 DescriptorSize,
                 DescriptorVersion,
@@ -417,7 +417,7 @@ EfiUpdateCapsule (
   )
 {
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  return mRT->UpdateCapsule (
+  return mRTEdkDxeRuntimeDriverLib->UpdateCapsule (
                 CapsuleHeaderArray,
                 CapsuleCount,
                 ScatterGatherList
@@ -437,7 +437,7 @@ EfiQueryCapsuleCapabilities (
   )
 {
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  return mRT->QueryCapsuleCapabilities (
+  return mRTEdkDxeRuntimeDriverLib->QueryCapsuleCapabilities (
           CapsuleHeaderArray,
           CapsuleCount,
           MaximumCapsuleSize,
@@ -459,7 +459,7 @@ EfiQueryVariableInfo (
   )
 {
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  return mRT->QueryVariableInfo (
+  return mRTEdkDxeRuntimeDriverLib->QueryVariableInfo (
           Attributes,
           MaximumVariableStorageSize,
           RemainingVariableStorageSize,

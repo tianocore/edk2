@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -34,15 +34,14 @@ Abstract:
 // Data structure that declares pointers to the Driver Model 
 // Protocols.
 //
-typedef struct {
-  const EFI_DRIVER_BINDING_PROTOCOL        *DriverBinding;
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  const EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName;
-#else
-  const EFI_COMPONENT_NAME_PROTOCOL        *ComponentName;
-#endif
-  const EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration;
-  const EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics;
+typedef struct {  
+  const EFI_DRIVER_BINDING_PROTOCOL         *DriverBinding;
+  const EFI_COMPONENT_NAME_PROTOCOL         *ComponentName;
+  const EFI_DRIVER_CONFIGURATION_PROTOCOL   *DriverConfiguration;
+  const EFI_DRIVER_DIAGNOSTICS_PROTOCOL     *DriverDiagnostics;
+  const EFI_COMPONENT_NAME2_PROTOCOL        *ComponentName2;
+  const EFI_DRIVER_CONFIGURATION2_PROTOCOL  *DriverConfiguration2;
+  const EFI_DRIVER_DIAGNOSTICS2_PROTOCOL    *DriverDiagnostics2;
 } EFI_DRIVER_MODEL_PROTOCOL_LIST;
 
 //

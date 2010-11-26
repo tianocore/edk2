@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -23,7 +23,6 @@ Revision History:
 
 #define IS_DIGIT(Ch)  (((Ch) >= L'0') && ((Ch) <= L'9'))
 
-STATIC
 EFI_STATUS
 EfiStringToValue (
   OUT UINT64        *Val,
@@ -37,8 +36,6 @@ Routine Description:
   The returned value is 64-bit.
   The string is expected in decimal format,
   the string is parsed and format verified.
-  This function is missing from the libs. One day it maybe
-  replaced with a lib function when it'll become available.
 
 Arguments:
   Val    - pointer to the variable to store the value to

@@ -65,11 +65,13 @@ ASM_PFX(Power10U64):
   jcxz   _Power10U64_Done
 
 _Power10U64_Wend: 
+  pushl  %ecx
   pushl  $10
   push   0xC(%ebp)
   push   0x8(%ebp)
   call   ASM_PFX(MultU64x32)
   addl   $0xc, %esp
+  popl   %ecx
   movl   %eax, 8(%ebp)  # dword ptr Operand[0]
   movl   %edx, 0xC(%ebp)  # dword ptr Operand[4]
   loopl  _Power10U64_Wend

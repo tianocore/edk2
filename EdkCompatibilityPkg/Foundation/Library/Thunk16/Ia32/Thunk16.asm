@@ -1,6 +1,6 @@
 ;*****************************************************************************
 ;*
-;*   Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+;*   Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 ;*   This program and the accompanying materials                          
 ;*   are licensed and made available under the terms and conditions of the BSD License         
 ;*   which accompanies this distribution.  The full text of the license may be found at        
@@ -55,6 +55,8 @@ _DATA   ENDS
 
 _TEXT   SEGMENT FLAT    "CODE"  PARA
 
+STACK_PARAM_SIZE  EQU  16
+
 IA32_REGS   STRUC   4t
 _EDI        DD      ?
 _ESI        DD      ?
@@ -99,6 +101,11 @@ __Thunk16   PROC    USES    ebp ebx esi edi ds  es  fs  gs
     push    sizeof (IA32_REGS) / 4
     pop     ecx
     rep     movsd                       ; copy context to 16-bit stack
+
+    ; copy eflags to stack frame
+    mov     eax, [esi - sizeof(IA32_REGS)]._EFLAGS
+    mov     [edi - sizeof(IA32_REGS) - STACK_PARAM_SIZE - 4], eax
+
     pop     ebx                         ; ebx <- 16-bit stack offset
     mov     eax, offset @F              ; return offset
     stosd
@@ -158,20 +165,22 @@ RealMode    PROC
     pop     es
     pop     fs
     pop     gs
-    add     sp, 4                       ; skip EFlags
-    test    (_STK16 ptr [esp + 8]).ThunkFlags, 1
+    sub     esp, (sizeof(IA32_REGS) - 12) + STACK_PARAM_SIZE + 4
+    popfd
+    test    (_STK16 ptr [esp + STACK_PARAM_SIZE + sizeof(IA32_REGS)]).ThunkFlags, 1
     jz      @F
-    pushf
+    pushf                               ; push Flags when it's INT#
 @@:
     push    cs
 ;    push    @FarCallRet - _Code16Addr
     DB      68h                         ; push /iw
     DW      @FarCallRet - _Code16Addr
     jz      @F
-    jmp     fword ptr [esp + 6]
+    jmp     fword ptr [esp + 6 + STACK_PARAM_SIZE + sizeof(IA32_REGS) - 8]
 @@:
-    jmp     fword ptr [esp + 4]
+    jmp     fword ptr [esp + 4 + STACK_PARAM_SIZE + sizeof(IA32_REGS) - 8]
 @FarCallRet:
+    add     esp, (sizeof(IA32_REGS) - 12) + STACK_PARAM_SIZE + 4
     pushfd
     push    gs
     push    fs

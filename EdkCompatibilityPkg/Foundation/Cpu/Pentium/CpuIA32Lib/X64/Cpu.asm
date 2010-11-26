@@ -2,7 +2,7 @@ TITLE   Cpu.asm: Assembly code for the x64 resources
 
 ;------------------------------------------------------------------------------
 ;*
-;*   Copyright (c) 2005 - 2007, Intel Corporation. All rights reserved.<BR>
+;*   Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
 ;*   This program and the accompanying materials                          
 ;*   are licensed and made available under the terms and conditions of the BSD License         
 ;*   which accompanies this distribution.  The full text of the license may be found at        
@@ -150,7 +150,7 @@ EfiDisableCache ENDP
 ;   );
 ;------------------------------------------------------------------------------
 EfiEnableCache PROC    PUBLIC
-    invd
+    wbinvd
     mov   rax, cr0
     and   rax, 09fffffffh         
     mov   cr0, rax

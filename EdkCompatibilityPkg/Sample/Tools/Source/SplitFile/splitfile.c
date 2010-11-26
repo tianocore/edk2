@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -21,6 +21,9 @@ Abstract:
 #include "string.h"
 #include "stdlib.h"
 
+#define UTILITY_NAME    "SplitFile"
+#define UTILITY_VERSION "v1.0"
+
 void
 helpmsg (
   void
@@ -40,11 +43,24 @@ Returns:
 
 --*/
 {
-  printf (
-    "SplitFile Filename Offset\n""   Filename = Input file to split\n""   Offset = offset at which to split file\n"
-    "\n\n""SplitFile will break a file in two pieces at the requested offset\n"
-    "  outputting Filename1 and Filename2\n"
-    );
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel Split File Utility",
+    "  Copyright (C), 2006 - 2008 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
+    "",
+    "Usage:",
+    "  "UTILITY_NAME" FILE OFFSET",
+    "Description:",
+    "  Break the FILE in two pieces FILE1 and FILE2 at the requested OFFSET.",
+    NULL
+  };
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
+  }
 }
 
 int

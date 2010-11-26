@@ -1,6 +1,6 @@
 /*++
  
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -214,7 +214,6 @@ typedef struct {
   UINT8                           DeviceProtocol;
 } USB_CLASS_DEVICE_PATH;
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 #define MSG_USB_WWID_DP           0x10
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
@@ -231,7 +230,6 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   UINT8                           Lun;
 } DEVICE_LOGICAL_UNIT_DEVICE_PATH;
-#endif
 
 #define MSG_SATA_DP               0x12
 typedef struct {
@@ -330,8 +328,6 @@ typedef struct {
   UINT32                          FlowControlMap;
 } UART_FLOW_CONTROL_DEVICE_PATH;
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-
 #define DEVICE_PATH_MESSAGING_SAS \
     { 0xd487ddb4, 0x008b, 0x11d9, {0xaf, 0xdc, 0x00, 0x10, 0x83, 0xff, 0xca, 0x4d} }
 
@@ -344,8 +340,6 @@ typedef struct {
   UINT16                          DeviceTopology;
   UINT16                          RelativeTargetPort;
 } SAS_DEVICE_PATH;
-
-#endif
 
 #define MSG_ISCSI_DP              0x13
 typedef struct {
@@ -428,8 +422,6 @@ typedef struct {
   EFI_GUID                        Protocol;
 } MEDIA_PROTOCOL_DEVICE_PATH;
 
-#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
-
 #define MEDIA_FV_DP  0x07
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;
@@ -449,7 +441,6 @@ typedef struct {
   UINT64                    StartingOffset;
   UINT64                    EndingOffset;
 } MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH;
-#endif
 
 //
 // BBS Device Path
@@ -509,10 +500,8 @@ typedef union {
   F1394_DEVICE_PATH                    F1394;
   USB_DEVICE_PATH                      Usb;
   USB_CLASS_DEVICE_PATH                UsbClass;
-  #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   USB_WWID_DEVICE_PATH                 UsbWwid;
   DEVICE_LOGICAL_UNIT_DEVICE_PATH      LogicUnit;
-  #endif
   I2O_DEVICE_PATH                      I2O;
   MAC_ADDR_DEVICE_PATH                 MacAddr;
   IPv4_DEVICE_PATH                     Ipv4;
@@ -520,9 +509,7 @@ typedef union {
   INFINIBAND_DEVICE_PATH               InfiniBand;
   UART_DEVICE_PATH                     Uart;
   UART_FLOW_CONTROL_DEVICE_PATH        UartFlowControl;
-  #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   SAS_DEVICE_PATH                      Sas;
-  #endif
   ISCSI_DEVICE_PATH                    Iscsi;
   HARDDRIVE_DEVICE_PATH                HardDrive;
   CDROM_DEVICE_PATH                    CD;
@@ -530,12 +517,10 @@ typedef union {
   FILEPATH_DEVICE_PATH                 FilePath;
   MEDIA_PROTOCOL_DEVICE_PATH           MediaProtocol;
 
-  #if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
   MEDIA_FW_VOL_DEVICE_PATH             PiwgFirmwareVolume;
   MEDIA_FW_VOL_FILEPATH_DEVICE_PATH    PiwgFirmwareFile;
   MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH
                                        Offset;
-  #endif
 
   BBS_BBS_DEVICE_PATH                  Bbs;
 } EFI_DEV_PATH;
@@ -563,10 +548,8 @@ typedef union {
   F1394_DEVICE_PATH                    *F1394;
   USB_DEVICE_PATH                      *Usb;
   USB_CLASS_DEVICE_PATH                *UsbClass;
-  #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   USB_WWID_DEVICE_PATH                 *UsbWwid;
   DEVICE_LOGICAL_UNIT_DEVICE_PATH      *LogicUnit;
-  #endif
   I2O_DEVICE_PATH                      *I2O;
   MAC_ADDR_DEVICE_PATH                 *MacAddr;
   IPv4_DEVICE_PATH                     *Ipv4;
@@ -575,9 +558,7 @@ typedef union {
   UART_DEVICE_PATH                     *Uart;
   UART_FLOW_CONTROL_DEVICE_PATH        *UartFlowControl;
 
-  #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   SAS_DEVICE_PATH                      *Sas;
-  #endif
   ISCSI_DEVICE_PATH                    *Iscsi;
 
   HARDDRIVE_DEVICE_PATH                *HardDrive;
@@ -586,10 +567,10 @@ typedef union {
   FILEPATH_DEVICE_PATH                 *FilePath;
   MEDIA_PROTOCOL_DEVICE_PATH           *MediaProtocol;
 
-  #if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
   MEDIA_FW_VOL_DEVICE_PATH             *PiwgFirmwareVolume;
   MEDIA_FW_VOL_FILEPATH_DEVICE_PATH    *PiwgFirmwareFile;
-  #endif
+  MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH
+                                       *Offset;
 
   BBS_BBS_DEVICE_PATH                  *Bbs;
   UINT8                                *Raw;

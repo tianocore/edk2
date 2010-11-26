@@ -1,6 +1,6 @@
 #/*++
 #  
-#  Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
 #  which accompanies this distribution.  The full text of the license may be found at        
@@ -49,24 +49,30 @@ TARGET_EXE          = $(EDK_TOOLS_OUTPUT)\ProcessDsc.exe
 
 all: $(TARGET_EXE)
 
-INC_DEPS  = $(TARGET_SRC_DIR)\DSCFile.h    $(INC_DEPS)
-INC_DEPS  = $(TARGET_SRC_DIR)\FWVolume.h   $(INC_DEPS)
-INC_DEPS  = $(TARGET_SRC_DIR)\Exceptions.h $(INC_DEPS)
-INC_DEPS  = $(TARGET_SRC_DIR)\Common.h     $(INC_DEPS)
+INC_DEPS  = $(TARGET_SRC_DIR)\DSCFile.h     $(INC_DEPS)
+INC_DEPS  = $(TARGET_SRC_DIR)\MultiThread.h $(INC_DEPS)
+INC_DEPS  = $(TARGET_SRC_DIR)\FWVolume.h    $(INC_DEPS)
+INC_DEPS  = $(TARGET_SRC_DIR)\Exceptions.h  $(INC_DEPS)
+INC_DEPS  = $(TARGET_SRC_DIR)\Common.h      $(INC_DEPS)
 
 LIBS      = $(LIBS) "$(EDK_TOOLS_OUTPUT)\Common.lib"
 
-OBJECTS   = $(EDK_TOOLS_OUTPUT)\DSCFile.obj  \
-            $(EDK_TOOLS_OUTPUT)\FWVolume.obj   \
-            $(EDK_TOOLS_OUTPUT)\ProcessDsc.obj \
+OBJECTS   = $(EDK_TOOLS_OUTPUT)\DSCFile.obj     \
+            $(EDK_TOOLS_OUTPUT)\MultiThread.obj \
+            $(EDK_TOOLS_OUTPUT)\FWVolume.obj    \
+            $(EDK_TOOLS_OUTPUT)\ProcessDsc.obj  \
             $(EDK_TOOLS_OUTPUT)\Exceptions.obj
 
 #
 # Compile each source file
 #
+C_FLAGS   = $(C_FLAGS) /MT /wd4201
 
 $(EDK_TOOLS_OUTPUT)\DSCFile.obj : $(TARGET_SRC_DIR)\DSCFile.c $(INC_DEPS)
   $(CC) $(C_FLAGS) $(TARGET_SRC_DIR)\DSCFile.c /Fo$@
+
+$(EDK_TOOLS_OUTPUT)\MultiThread.obj : $(TARGET_SRC_DIR)\MultiThread.c $(INC_DEPS)
+  $(CC) $(C_FLAGS) $(TARGET_SRC_DIR)\MultiThread.c /Fo$@
 
 $(EDK_TOOLS_OUTPUT)\FWVolume.obj : $(TARGET_SRC_DIR)\FWVolume.c $(INC_DEPS)
   $(CC) $(C_FLAGS) $(TARGET_SRC_DIR)\FWVolume.c /Fo$@
@@ -88,7 +94,9 @@ $(TARGET_EXE): $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).exe
   copy $(EFI_PLATFORM_BIN)\Tools\$(TARGET_NAME).pdb $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).pdb /Y
 !ELSE
 $(TARGET_EXE) : $(OBJECTS) $(LIBS)
-  $(LINK) $(MSVS_LINK_LIBPATHS) $(L_FLAGS) $(LIBS) /out:$(TARGET_EXE) $(OBJECTS)
+  $(LINK) $(MSVS_LINK_LIBPATHS) $(L_FLAGS) $(LIBS) /out:$(TARGET_EXE) $(OBJECTS) shlwapi.lib \
+  /NODEFAULTLIB:libc.lib  /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcd.lib \
+  /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib
 !IF ("$(EFI_BINARY_BUILD)" == "YES")
   if not exist $(EFI_PLATFORM_BIN)\Tools mkdir $(EFI_PLATFORM_BIN)\Tools
   if exist $(TARGET_EXE) copy $(TARGET_EXE) $(EFI_PLATFORM_BIN)\tools\$(TARGET_NAME).exe /Y
@@ -100,5 +108,6 @@ $(TARGET_EXE) : $(OBJECTS) $(LIBS)
 clean:
   @if exist $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).* del $(EDK_TOOLS_OUTPUT)\$(TARGET_NAME).* > NUL
   @if exist $(EDK_TOOLS_OUTPUT)\DscFile.* del $(EDK_TOOLS_OUTPUT)\DscFile.* > NUL
+  @if exist $(EDK_TOOLS_OUTPUT)\MultiThread.* del $(EDK_TOOLS_OUTPUT)\MultiThread.* > NUL
   @if exist $(EDK_TOOLS_OUTPUT)\Exceptions* del $(EDK_TOOLS_OUTPUT)\Exceptions.* > NUL
   @if exist $(EDK_TOOLS_OUTPUT)\FwVolume.* del $(EDK_TOOLS_OUTPUT)\FwVolume.* > NUL

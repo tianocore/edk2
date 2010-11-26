@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -21,6 +21,18 @@ Abstract:
 
 #include "Tiano.h"
 #include "EfiDriverLib.h"
+#include EFI_ARCH_PROTOCOL_DEFINITION (StatusCode)
+
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+
+VOID
+EFIAPI
+OnStatusCodeInstall (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  );
+
+#endif
 
 //
 // Global Interface for Debug Mask Protocol
@@ -50,6 +62,10 @@ Returns:
 
 --*/
 {
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  VOID *Registration;
+#endif
+  
   gST = SystemTable;
 
   ASSERT (gST != NULL);
@@ -70,6 +86,21 @@ Returns:
         (VOID *) &gDebugMaskInterface
         );
 #endif
+
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  //
+  // Register EFI_STATUS_CODE_PROTOCOL notify function
+  //
+  EfiLibCreateProtocolNotifyEvent (
+    &gEfiStatusCodeRuntimeProtocolGuid,
+    EFI_TPL_CALLBACK,
+    OnStatusCodeInstall,
+    NULL,
+    &Registration
+    );
+
+#endif
+
   //
   // Should be at EFI_D_INFO, but lets us know things are running
   //
@@ -78,55 +109,107 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
 BOOLEAN
-EfiLibCompareLanguage (
-  IN  CHAR8  *Language1,
-  IN  CHAR8  *Language2
+IsIso639LanguageCode (
+  IN CHAR8                *Languages
   )
 /*++
 
 Routine Description:
 
-  Compare whether two names of languages are identical.
+  Tests whether a language code has format of ISO639-2.
 
 Arguments:
 
-  Language1 - Name of language 1
-  Language2 - Name of language 2
+  Languages - The language code to be tested.
 
 Returns:
 
-  TRUE      - same
-  FALSE     - not same
+  TRUE      - Language code format is ISO 639-2.
+  FALSE     - Language code format is not ISO 639-2.
+
+--*/
+{
+  UINTN  Index;
+
+  //
+  // Find out format of Languages
+  //
+  for (Index = 0; Languages[Index] != 0 && Languages[Index] != ';' && Languages[Index] != '-'; Index++);
+  if (Languages[Index] != 0) {
+    //
+    // RFC4646 language code
+    //
+    return FALSE;
+  }
+
+  //
+  // No ';' and '-', it's either ISO639-2 code (list) or single RFC4646 code
+  //
+  if (Index == 2) {
+    //
+    // Single RFC4646 language code without country code, e.g. "en"
+    //
+    return FALSE;
+  }
+
+  //
+  // Languages in format of ISO639-2
+  //
+  return TRUE;
+}
+
+BOOLEAN
+EfiLibCompareLanguage (
+  IN  CHAR8               *Language1,
+  IN  CHAR8               *Language2
+  )
+/*++
+
+Routine Description:
+
+  Compare the first language instance of two language codes, either could be a
+  single language code or a language code list. This function assume Language1
+  and Language2 has the same language code format, i.e. either ISO639-2 or RFC4646.
+
+Arguments:
+
+  Language1 - The first language code to be tested.
+  Language2 - The second language code to be tested.
+
+Returns:
+
+  TRUE      - Language code match.
+  FALSE     - Language code mismatch.
 
 --*/
 {
   UINTN Index;
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  for (Index = 0; (Language1[Index] != 0) && (Language2[Index] != 0); Index++) {
-    if (Language1[Index] != Language2[Index]) {
-      return FALSE;
-    }
+  //
+  // Compare first two bytes of language tag
+  //
+  if ((Language1[0] != Language2[0]) || (Language1[1] != Language2[1])) {
+    return FALSE;
   }
 
-  if (((Language1[Index] == 0) && (Language2[Index] == 0))   || 
-  	  ((Language1[Index] == 0) && (Language2[Index] != ';')) ||
-  	  ((Language1[Index] == ';') && (Language2[Index] != 0)) ||
-  	  ((Language1[Index] == ';') && (Language2[Index] != ';'))) {
+  if (IsIso639LanguageCode (Language1)) {
+    //
+    // ISO639-2 language code, compare the third byte of language tag
+    //
+    return (BOOLEAN) ((Language1[2] == Language2[2]) ? TRUE : FALSE);
+  }
+
+  //
+  // RFC4646 language code
+  //
+  for (Index = 0; Language1[Index] != 0 && Language1[Index] != ';'; Index++);
+  if ((EfiAsciiStrnCmp (Language1, Language2, Index) == 0) && (Language2[Index] == 0 || Language2[Index] == ';')) {
     return TRUE;
   }
 
   return FALSE;
-#else
-  for (Index = 0; Index < 3; Index++) {
-    if (Language1[Index] != Language2[Index]) {
-      return FALSE;
-    }
-  }
-
-  return TRUE;
-#endif
 }
 
 STATIC
@@ -134,19 +217,39 @@ CHAR8 *
 NextSupportedLanguage (
   IN CHAR8                *Languages
   )
-{
-#ifdef LANGUAGE_RFC_3066   // LANGUAGE_RFC_3066
-  for (; (*Languages != 0) && (*Languages != ';'); Languages++)
-    ;
+/*++
 
-  if (*Languages == ';') {
-    Languages++;
+Routine Description:
+
+  Step to next language code of a language code list.
+
+Arguments:
+
+  Languages - The language code list to traverse.
+
+Returns:
+
+  Pointer to next language code or NULL terminator if it's the last one.
+
+--*/
+{
+  UINTN    Index;
+
+  if (IsIso639LanguageCode (Languages)) {
+    //
+    // ISO639-2 language code
+    //
+    return (Languages + 3);
   }
 
-  return Languages;
-#else                      // LANGUAGE_ISO_639_2
-  return (Languages + 3);
-#endif
+  //
+  // Search in RFC4646 language code list
+  //
+  for (Index = 0; Languages[Index] != 0 && Languages[Index] != ';'; Index++);
+  if (Languages[Index] == ';') {
+    Index++;
+  }
+  return (Languages + Index);
 }
 
 EFI_STATUS
@@ -217,7 +320,7 @@ Returns:
       return EFI_UNSUPPORTED;
     }
 
-    SupportedLanguages = NextSupportedLanguage(SupportedLanguages);
+    SupportedLanguages = NextSupportedLanguage (SupportedLanguages);
   }
 
   return EFI_UNSUPPORTED;
@@ -326,7 +429,7 @@ Returns:
       //
       // Allocate space for a copy of the Language specifier
       //
-      NewUnicodeStringTable[NumberOfEntries].Language = EfiLibAllocateCopyPool (EfiAsciiStrLen(Language) + 1, Language);
+      NewUnicodeStringTable[NumberOfEntries].Language = EfiLibAllocateCopyPool (EfiAsciiStrSize (Language), Language);
       if (NewUnicodeStringTable[NumberOfEntries].Language == NULL) {
         gBS->FreePool (NewUnicodeStringTable);
         return EFI_OUT_OF_RESOURCES;
@@ -372,7 +475,7 @@ Returns:
       return EFI_SUCCESS;
     }
 
-    SupportedLanguages = NextSupportedLanguage(SupportedLanguages);
+    SupportedLanguages = NextSupportedLanguage (SupportedLanguages);
   }
 
   return EFI_UNSUPPORTED;

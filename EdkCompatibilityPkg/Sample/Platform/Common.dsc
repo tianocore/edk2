@@ -1,6 +1,6 @@
 #/*++
 #
-# Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials                          
 # are licensed and made available under the terms and conditions of the BSD License         
 # which accompanies this distribution.  The full text of the license may be found at        
@@ -268,7 +268,7 @@ $(DEST_DIR)\$(FILE).obj : $(SOURCE_FILE_NAME) $(INF_FILENAME) $(ALL_DEPS)
 # know how to create the .apr file, then you're missing (or mispelled) the
 # "APRIORI=" on the component lines in components section in the DSC file.
 #
-$(DEST_DIR)\$(BASE_NAME).bin : $(SOURCE_FILE_NAME)
+$(DEST_DIR)\$(BASE_NAME).bin : $(SOURCE_FILE_NAME) $(INF_FILENAME)
   $(GENAPRIORI) -v -f $(SOURCE_FILE_NAME) -o $(DEST_DIR)\$(BASE_NAME).bin
 
 $(DEST_DIR)\$(BASE_NAME).sec : $(DEST_DIR)\$(BASE_NAME).bin
@@ -299,34 +299,29 @@ clean :
 [Build.Ia32.Makefile,Build.Ipf.Makefile,Build.Ebc.Makefile,Build.x64.Makefile]
 
 #
-# Copy the makefile directly from the source directory, then make it
-# writable so we can copy over it later if we try to.
+# Set some required macros
 #
-$(DEST_DIR)\makefile.new : $(SOURCE_DIR)\makefile.new
-  copy $(SOURCE_DIR)\makefile.new $(DEST_DIR)\makefile.new
-  attrib -r $(DEST_DIR)\makefile.new
+MAKEFILE_MACROS = SOURCE_DIR=$(SOURCE_DIR)                \
+                  BUILD_DIR=$(BUILD_DIR)                  \
+                  FILE_GUID=$(FILE_GUID)                  \
+                  DEST_DIR=$(DEST_DIR)                    \
+                  PROCESSOR=$(PROCESSOR)                  \
+                  TOOLCHAIN=TOOLCHAIN_$(PROCESSOR)        \
+                  BASE_NAME=$(BASE_NAME)                  \
+                  PACKAGE_FILENAME=$(PACKAGE_FILENAME)
 
 #
-# Make the all target, set some required macros.
+# Just call the makefile from the source directory, passing in some
+# useful info.
 #
-call_makefile :
-  $(MAKE) -f $(DEST_DIR)\makefile.new all   \
-          SOURCE_DIR=$(SOURCE_DIR)          \
-          BUILD_DIR=$(BUILD_DIR)            \
-          FILE_GUID=$(FILE_GUID)            \
-          DEST_DIR=$(DEST_DIR)              \
-          PROCESSOR=$(PROCESSOR)            \
-          TOOLCHAIN=TOOLCHAIN_$(PROCESSOR)  \
-          BASE_NAME=$(BASE_NAME)            \
-          PACKAGE_FILENAME=$(PACKAGE_FILENAME)
-
-all : $(DEST_DIR)\makefile.new call_makefile
+all :
+  $(MAKE) -f $(SOURCE_DIR)\makefile.new all $(MAKEFILE_MACROS)
 
 #
 # Remove the generated temp and final files for this modules.
 #
 clean :
-  @- $(MAKE) -f $(DEST_DIR)\makefile.new clean > NUL 2>&1
+  @- $(MAKE) -f $(SOURCE_DIR)\makefile.new clean $(MAKEFILE_MACROS) > NUL 2>&1
 !IF ("$(FILE_GUID)" != "")
   @if exist $(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).* del $(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).*
 !ENDIF
@@ -345,27 +340,31 @@ clean :
 [Build.Ia32.Custom_Makefile,Build.Ipf.Custom_Makefile,Build.Ebc.Custom_Makefile,Build.x64.Custom_Makefile]
 
 #
+# Set some required macros
+#
+MAKEFILE_MACROS = SOURCE_DIR=$(SOURCE_DIR)                \
+                  BUILD_DIR=$(BUILD_DIR)                  \
+                  DEST_DIR=$(DEST_DIR)                    \
+                  FILE_GUID=$(FILE_GUID)                  \
+                  PROCESSOR=$(PROCESSOR)                  \
+                  TOOLCHAIN=TOOLCHAIN_$(PROCESSOR)        \
+                  BASE_NAME=$(BASE_NAME)                  \
+                  PLATFORM=$(PLATFORM)                    \
+                  SOURCE_FV=$(SOURCE_FV)                  \
+                  PACKAGE_FILENAME=$(PACKAGE_FILENAME)
+
+#
 # Just call the makefile from the source directory, passing in some
 # useful info.
 #
 all : 
-  $(MAKE) -f $(SOURCE_DIR)\makefile all    \
-          SOURCE_DIR=$(SOURCE_DIR)         \
-          BUILD_DIR=$(BUILD_DIR)           \
-          DEST_DIR=$(DEST_DIR)             \
-          FILE_GUID=$(FILE_GUID)           \
-          PROCESSOR=$(PROCESSOR)           \
-          TOOLCHAIN=TOOLCHAIN_$(PROCESSOR) \
-          BASE_NAME=$(BASE_NAME)           \
-          PLATFORM=$(PLATFORM)             \
-          SOURCE_FV=$(SOURCE_FV)           \
-          PACKAGE_FILENAME=$(PACKAGE_FILENAME)
+  $(MAKE) -f $(SOURCE_DIR)\makefile all $(MAKEFILE_MACROS)
 
 #
 # Remove the generated temp and final files for this modules.
 #
 clean :
-  @- $(MAKE) -f $(SOURCE_DIR)\makefile clean > NUL 2>&1
+  @- $(MAKE) -f $(SOURCE_DIR)\makefile clean $(MAKEFILE_MACROS) > NUL 2>&1
 !IF ("$(FILE_GUID)" != "")
   @if exist $(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).* del $(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).*
 !ENDIF
@@ -496,15 +495,44 @@ clean :
 
 !IF "$(LOCALIZE)" == "YES"
 
-!IF "$(EFI_GENERATE_HII_EXPORT)" == "YES"
-STRGATHER_FLAGS   = $(STRGATHER_FLAGS) -hpk $(DEST_DIR)\$(BASE_NAME)Strings.hpk
+!IF (("$(EFI_GENERATE_HII_RESOURCE)" == "YES") && ("$(EFI_SPECIFICATION_VERSION)" >= "0x0002000A"))
+#
+# This will generate HII resource section in PE/COFF image.
+#
+# Note: when HII package list is built into resource section, Driver no longer
+# refer to C array generated by VfrCompiler ($(FILE_NAME)Bin) and StrGather
+# ($(BASE_NAME)Strings); while in current build rule, those C array objects
+# will still be linked with the Driver, so please turn on link flag "/OPT:REF"
+# to minimize the code size.
+#
+HII_PACK_FILES   = $(HII_PACK_FILES) $(DEST_DIR)\$(BASE_NAME)Strings.hpk
+LOCALIZE_TARGETS = $(LOCALIZE_TARGETS) $(DEST_DIR)\$(BASE_NAME).res
+LINK_FLAGS_DLL   = $(LINK_FLAGS_DLL) $(DEST_DIR)\$(BASE_NAME).res
 
+$(DEST_DIR)\$(BASE_NAME).rc : $(HII_PACK_FILES)
+  $(HIIPACK) -g $(FILE_GUID) $(HII_PACK_FILES) -rc $(DEST_DIR)\$(BASE_NAME).rc -hii $(DEST_DIR)\$(BASE_NAME).hii
+
+$(DEST_DIR)\$(BASE_NAME).res : $(DEST_DIR)\$(BASE_NAME).rc
+  $(RC) /fo $(DEST_DIR)\$(BASE_NAME).res $(DEST_DIR)\$(BASE_NAME).rc
+
+!ENDIF
+
+!IF (("$(EFI_GENERATE_HII_EXPORT)" == "YES") && ("$(EFI_SPECIFICATION_VERSION)" < "0x0002000A"))
 #
 # There will be one HII pack containing all the strings. Add that file
 # to the list of HII pack files we'll use to create our final HII export file.
 #
 HII_PACK_FILES    = $(HII_PACK_FILES) $(DEST_DIR)\$(BASE_NAME)Strings.hpk
 LOCALIZE_TARGETS  = $(LOCALIZE_TARGETS) $(DEST_DIR)\$(BASE_NAME).hii
+!ENDIF
+
+!IF ("$(EFI_SPECIFICATION_VERSION)" >= "0x0002000A")
+#
+# Note: currently -ppflag option is only available for UefiStrGather
+# Note: /GS- will cause warning for preprocess, so filter it out from STRGATHER_PPFLAG
+#
+STRGATHER_PPFLAG = $(C_FLAGS: /GS-=)
+STRGATHER_FLAGS  = $(STRGATHER_FLAGS) -ppflag "$(STRGATHER_PPFLAG)" -oh $(DEST_DIR)\$(BASE_NAME)StrDefs.h
 !ENDIF
 
 $(DEST_DIR)\$(BASE_NAME).sdb : $(SDB_FILES) $(SOURCE_FILES)
@@ -528,7 +556,7 @@ OBJECTS = $(OBJECTS) $(DEST_DIR)\$(BASE_NAME)Strings.obj
 $(DEST_DIR)\$(BASE_NAME)Strings.obj : $(DEST_DIR)\$(BASE_NAME)Strings.c $(INF_FILENAME) $(ALL_DEPS)
   $(CC) $(C_FLAGS) $(DEST_DIR)\$(BASE_NAME)Strings.c
 
-LOCALIZE_TARGETS = $(LOCALIZE_TARGETS) $(DEST_DIR)\$(BASE_NAME)StrDefs.h
+LOCALIZE_TARGETS = $(DEST_DIR)\$(BASE_NAME)StrDefs.h $(LOCALIZE_TARGETS)
 
 !ENDIF
 
@@ -677,7 +705,7 @@ $(TARGET_VER) : $(INF_FILENAME)
   $(GENSECTION) -O $(TARGET_VER) -S EFI_SECTION_VERSION -V $(BUILD_NUMBER)
 !ENDIF
 !ELSE
-$(TARGET_VER) : 
+$(TARGET_VER) : $(INF_FILENAME)
   echo.>$(TARGET_VER)
   type $(TARGET_VER)>$(TARGET_VER)
 !ENDIF
@@ -741,7 +769,7 @@ $(TARGET_DPX) : $(DPX_SOURCE_FILE) $(INF_FILENAME)
 !ERROR Dependency expression source file "$(DPX_SOURCE_FILE)" does not exist.
 !ENDIF
 !ELSE
-$(TARGET_DPX) : 
+$(TARGET_DPX) : $(INF_FILENAME)
   echo. > $(TARGET_DPX)
   type $(TARGET_DPX) > $(TARGET_DPX)
 !ENDIF
@@ -796,7 +824,7 @@ $(TARGET_DXE_DPX) : $(SOURCE_DIR)\$(DXE_DPX_SOURCE) $(INF_FILENAME)
 !ERROR Dependency expression source file "$(SOURCE_DIR)\$(DXE_DPX_SOURCE)" does not exist.
 !ENDIF
 !ELSE
-$(TARGET_DXE_DPX) : 
+$(TARGET_DXE_DPX) : $(INF_FILENAME)
   echo. > $(TARGET_DXE_DPX)
   type $(TARGET_DXE_DPX) > $(TARGET_DXE_DPX)
 !ENDIF
@@ -963,7 +991,7 @@ $(TARGET_VER) : $(INF_FILENAME)
   $(GENSECTION) -O $(TARGET_VER) -S EFI_SECTION_VERSION -V $(BUILD_NUMBER)
 !ENDIF
 !ELSE
-$(TARGET_VER) : 
+$(TARGET_VER) : $(INF_FILENAME)
   echo.>$(TARGET_VER)
   type $(TARGET_VER)>$(TARGET_VER)
 !ENDIF
@@ -1027,7 +1055,7 @@ $(TARGET_DPX) : $(DPX_SOURCE_FILE) $(INF_FILENAME)
 !ERROR Dependency expression source file "$(DPX_SOURCE_FILE)" does not exist.
 !ENDIF
 !ELSE
-$(TARGET_DPX) : 
+$(TARGET_DPX) : $(INF_FILENAME)
   echo. > $(TARGET_DPX)
   type $(TARGET_DPX) > $(TARGET_DPX)
 !ENDIF
@@ -1069,9 +1097,29 @@ LIBS = $(LIBS) $(EBC_TOOLS_PATH)\lib\EbcLib.lib
 
 !IF "$(LOCALIZE)" == "YES"
 
-!IF "$(EFI_GENERATE_HII_EXPORT)" == "YES"
-STRGATHER_FLAGS   = $(STRGATHER_FLAGS) -hpk $(DEST_DIR)\$(BASE_NAME)Strings.hpk
+!IF (("$(EFI_GENERATE_HII_RESOURCE)" == "YES") && ("$(EFI_SPECIFICATION_VERSION)" >= "0x0002000A"))
+#
+# This will generate HII resource section in PE/COFF image.
+#
+# Note: when HII package list is built into resource section, Driver no longer
+# refer to C array generated by VfrCompiler ($(FILE_NAME)Bin) and StrGather
+# ($(BASE_NAME)Strings); while in current build rule, those C array objects
+# will still be linked with the Driver, so please turn on link flag "/OPT:REF"
+# to minimize the code size.
+#
+HII_PACK_FILES   = $(HII_PACK_FILES) $(DEST_DIR)\$(BASE_NAME)Strings.hpk
+LOCALIZE_TARGETS = $(LOCALIZE_TARGETS) $(DEST_DIR)\$(BASE_NAME).res
+OBJECTS          = $(OBJECTS) $(DEST_DIR)\$(BASE_NAME).res
 
+$(DEST_DIR)\$(BASE_NAME).rc : $(HII_PACK_FILES)
+  $(HIIPACK) -g $(FILE_GUID) $(HII_PACK_FILES) -rc $(DEST_DIR)\$(BASE_NAME).rc -hii $(DEST_DIR)\$(BASE_NAME).hii
+
+$(DEST_DIR)\$(BASE_NAME).res : $(DEST_DIR)\$(BASE_NAME).rc
+  $(RC) /fo $(DEST_DIR)\$(BASE_NAME).res $(DEST_DIR)\$(BASE_NAME).rc
+
+!ENDIF
+
+!IF (("$(EFI_GENERATE_HII_EXPORT)" == "YES") && ("$(EFI_SPECIFICATION_VERSION)" < "0x0002000A"))
 #
 # There will be one HII pack containing all the strings. Add that file
 # to the list of HII pack files we'll use to create our final HII export file.
@@ -1079,6 +1127,15 @@ STRGATHER_FLAGS   = $(STRGATHER_FLAGS) -hpk $(DEST_DIR)\$(BASE_NAME)Strings.hpk
 HII_PACK_FILES = $(HII_PACK_FILES) $(DEST_DIR)\$(BASE_NAME)Strings.hpk
 
 LOCALIZE_TARGETS  = $(LOCALIZE_TARGETS) $(DEST_DIR)\$(BASE_NAME).hii
+!ENDIF
+
+!IF ("$(EFI_SPECIFICATION_VERSION)" >= "0x0002000A")
+#
+# Note: currently -ppflag option is only available for UefiStrGather
+# Note: /GS- will cause warning for preprocess, so filter it out from STRGATHER_PPFLAG
+#
+STRGATHER_PPFLAG = $(EBC_C_FLAGS: /GS-=)
+STRGATHER_FLAGS  = $(STRGATHER_FLAGS) -ppflag "$(STRGATHER_PPFLAG)" -oh $(DEST_DIR)\$(BASE_NAME)StrDefs.h
 !ENDIF
 
 $(DEST_DIR)\$(BASE_NAME).sdb : $(SDB_FILES) $(SOURCE_FILES)
@@ -1102,7 +1159,7 @@ OBJECTS = $(OBJECTS) $(DEST_DIR)\$(BASE_NAME)Strings.obj
 $(DEST_DIR)\$(BASE_NAME)Strings.obj : $(DEST_DIR)\$(BASE_NAME)Strings.c $(INF_FILENAME) $(ALL_DEPS)
   $(EBC_CC) $(EBC_C_FLAGS) $(DEST_DIR)\$(BASE_NAME)Strings.c
 
-LOCALIZE_TARGETS = $(LOCALIZE_TARGETS) $(DEST_DIR)\$(BASE_NAME)StrDefs.h
+LOCALIZE_TARGETS = $(DEST_DIR)\$(BASE_NAME)StrDefs.h $(LOCALIZE_TARGETS)
 
 !ENDIF
 
@@ -1170,7 +1227,7 @@ $(TARGET_VER) : $(INF_FILENAME)
   $(GENSECTION) -O $(TARGET_VER) -S EFI_SECTION_VERSION -V $(BUILD_NUMBER)
 !ENDIF
 !ELSE
-$(TARGET_VER) : 
+$(TARGET_VER) : $(INF_FILENAME)
   echo. > $(TARGET_VER)
   type $(TARGET_VER) > $(TARGET_VER)
 !ENDIF
@@ -1234,7 +1291,7 @@ $(TARGET_DPX) : $(DPX_SOURCE_FILE) $(INF_FILENAME)
 !ERROR Dependency expression source file "$(DPX_SOURCE_FILE)" does not exist.
 !ENDIF
 !ELSE
-$(TARGET_DPX) : 
+$(TARGET_DPX) : $(INF_FILENAME)
   echo. > $(TARGET_DPX)
   type $(TARGET_DPX) > $(TARGET_DPX)
 !ENDIF
@@ -1293,7 +1350,7 @@ clean :
 # This section, as it now exists, only supports boot service drivers.
 #
 [=============================================================================]
-[Build.Ia32.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI,Build.Ipf.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI,Build.Ebc.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI,Build.x64.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI]
+[Build.Ia32.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI|PE32_PEIM_EFI,Build.Ipf.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI|PE32_PEIM_EFI,Build.Ebc.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI,Build.x64.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI|PE32_PEIM_EFI]
 #
 # Defines for standard intermediate files and build targets. For the source
 # .efi file, take the one in the source directory if it exists. If there's not
@@ -1320,6 +1377,8 @@ TARGET_DLL        = $(BIN_DIR)\$(BASE_NAME).dll
 #
 !IF "$(COMPONENT_TYPE)" == "APPLICATION"
 TARGET_FFS_FILE = $(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).app
+!ELSE IF "$(COMPONENT_TYPE)" == "PE32_PEIM"
+TARGET_FFS_FILE = $(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).pei
 !ELSE
 TARGET_FFS_FILE = $(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).dxe
 !ENDIF
@@ -1348,7 +1407,7 @@ $(TARGET_VER) : $(INF_FILENAME)
   $(GENSECTION) -O $(TARGET_VER) -S EFI_SECTION_VERSION -V $(BUILD_NUMBER)
 !ENDIF
 !ELSE
-$(TARGET_VER) : 
+$(TARGET_VER) : $(INF_FILENAME)
   echo. > $(TARGET_VER)
   type $(TARGET_VER) > $(TARGET_VER)
 !ENDIF
@@ -1412,7 +1471,7 @@ $(TARGET_DPX) : $(DPX_SOURCE_FILE) $(INF_FILENAME)
 !ERROR Dependency expression source file "$(DPX_SOURCE_FILE)" does not exist.
 !ENDIF
 !ELSE
-$(TARGET_DPX) : 
+$(TARGET_DPX) : $(INF_FILENAME)
   echo. > $(TARGET_DPX)
   type $(TARGET_DPX) > $(TARGET_DPX)
 !ENDIF
@@ -1438,18 +1497,17 @@ clean :
 [=============================================================================]
 [Compile.Ia32.Bin|Bmp,Compile.x64.Bin|Bmp,Compile.Ipf.Bin|Bmp]
 #
-# We simply copy the binary file from the source directory to the destination directory
+# We simply define the binary source file name
 #
-$(DEST_DIR)\$(BASE_NAME).bin : $(SOURCE_FILE_NAME)
-  copy $** $@
+BINARY_SOURCE_FILE = $(SOURCE_FILE_NAME)
 
 [=============================================================================]
 [Build.Ia32.BINARY|Legacy16|Logo,Build.Ipf.BINARY|Legacy16|Logo,Build.x64.BINARY|Legacy16|Logo]
 #
 # Use GenFfsFile to convert it to an FFS file
 #
-$(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).ffs : $(DEST_DIR)\$(BASE_NAME).bin $(PACKAGE_FILENAME)
-  $(GENSECTION) -I $(DEST_DIR)\$(BASE_NAME).bin -O $(DEST_DIR)\$(BASE_NAME).sec -S EFI_SECTION_RAW
+$(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).ffs : $(BINARY_SOURCE_FILE) $(PACKAGE_FILENAME) $(INF_FILENAME)
+  $(GENSECTION) -I $(BINARY_SOURCE_FILE) -O $(DEST_DIR)\$(BASE_NAME).sec -S EFI_SECTION_RAW
   $(GENFFSFILE) -B $(DEST_DIR) -P1 $(PACKAGE_FILENAME) -V
 
 all : $(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).ffs
@@ -1469,7 +1527,8 @@ clean :
 #
 # Use GenFfsFile to convert it to an raw FFS file
 #
-$(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).raw : $(DEST_DIR)\$(BASE_NAME).bin $(PACKAGE_FILENAME)
+$(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).raw : $(BINARY_SOURCE_FILE) $(PACKAGE_FILENAME) $(INF_FILENAME)
+  copy $(BINARY_SOURCE_FILE) $(DEST_DIR)\$(BASE_NAME).bin /Y
   $(GENFFSFILE) -B $(DEST_DIR) -P1 $(PACKAGE_FILENAME) -V
 
 all : $(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).raw
@@ -1515,6 +1574,8 @@ SDB_FILES       = $(SDB_FILES) $(DEST_DIR)\$(FILE).sdb
 STRGATHER_FLAGS = $(STRGATHER_FLAGS) -db $(DEST_DIR)\$(FILE).sdb
 LOCALIZE        = YES
 
+[=============================================================================]
+[Compile.Ia32.hfr,Compile.Ipf.hfr,Compile.Ebc.hfr,Compile.x64.hfr]
 [=============================================================================]
 [Compile.Ia32.Vfr,Compile.Ipf.Vfr,Compile.x64.Vfr]
 
@@ -1695,7 +1756,7 @@ HII_IFR_PACK_FILES = $(HII_IFR_PACK_FILES) $(DEST_DIR)\$(FILE).hpk
 #
 # Run GenSection on the firmware volume image.
 #
-$(DEST_DIR)\$(SOURCE_FV)Fv.sec : $(SOURCE_FILE_NAME)
+$(DEST_DIR)\$(SOURCE_FV)Fv.sec : $(SOURCE_FILE_NAME) $(INF_FILENAME)
   $(GENSECTION) -I $(SOURCE_FILE_NAME) -O $(DEST_DIR)\$(SOURCE_FV)Fv.sec -S EFI_SECTION_FIRMWARE_VOLUME_IMAGE
 
 [=============================================================================]

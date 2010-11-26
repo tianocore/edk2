@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -138,8 +138,7 @@ EFI_STATUS
   Returns:
     EFI_SUCCESS            - The data associated with the Handle was removed from 
                              the HII database.
-    EFI_NOT_FOUND          - The specified PackageList could not be found in database.
-    EFI_INVALID_PARAMETER  - The Handle was not valid.
+    EFI_NOT_FOUND          - The specified Handle is not in database.
      
 --*/
 ;
@@ -166,8 +165,8 @@ EFI_STATUS
   Returns:
     EFI_SUCCESS            - The HII database was successfully updated.
     EFI_OUT_OF_RESOURCES   - Unable to allocate enough memory for the updated database.
-    EFI_INVALID_PARAMETER  - Handle or PackageList was NULL.
-    EFI_NOT_FOUND          - The Handle was not valid or could not be found in database.
+    EFI_INVALID_PARAMETER  - PackageList was NULL.
+    EFI_NOT_FOUND          - The specified Handle is not in database.
      
 --*/
 ;
@@ -203,12 +202,16 @@ EFI_STATUS
         
   Returns:
     EFI_SUCCESS            - The matching handles are outputed successfully.
+                             HandleBufferLength is updated with the actual length.
     EFI_BUFFER_TO_SMALL    - The HandleBufferLength parameter indicates that
                              Handle is too small to support the number of handles.
                              HandleBufferLength is updated with a value that will 
                              enable the data to fit.
     EFI_NOT_FOUND          - No matching handle could not be found in database.
     EFI_INVALID_PARAMETER  - Handle or HandleBufferLength was NULL.
+    EFI_INVALID_PARAMETER  - PackageType is not a EFI_HII_PACKAGE_TYPE_GUID but
+                             PackageGuid is not NULL, PackageType is a EFI_HII_
+                             PACKAGE_TYPE_GUID but PackageGuid is NULL.
      
 --*/  
 ;
@@ -312,7 +315,8 @@ EFI_STATUS
                          
   Returns:
     EFI_SUCCESS            - Notification is unregistered successfully.    
-    EFI_INVALID_PARAMETER  - The Handle is invalid.
+    EFI_NOT_FOUND          - The incoming notification handle does not exist 
+                             in current hii database.
      
 --*/  
 ;  

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -198,6 +198,35 @@ Arguments:
 
 Returns:
   The address to the ASCII string - same as AsciiStr.
+
+--*/
+;
+
+EFI_STATUS
+EfiStringToValue (
+  OUT UINT64        *Val,
+  IN  CHAR16        *String,
+  OUT UINT8         *EndIdx OPTIONAL
+  )
+/*++
+
+Routine Description:
+  Parses and converts Unicode string to decimal value.
+  The returned value is 64-bit.
+  The string is expected in decimal format,
+  the string is parsed and format verified.
+
+Arguments:
+  Val    - pointer to the variable to store the value to
+  String - string that contains the value to parse and convert
+  EndIdx - index on which the parsing stopped. It points to the
+           first character that was not part of the returned Val.
+           It's valid only if the function returns success.
+           It's optional and it could be NULL.
+
+Returns:
+  EFI_SUCCESS           - if successful
+  EFI_INVALID_PARAMETER - if String is in unexpected format
 
 --*/
 ;

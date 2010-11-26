@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -968,13 +968,17 @@ Returns:
     Status = FindToken (InfFile, OPTIONS_SECTION_STRING, EFI_NUM_BLOCKS_STRING, Index, Value);
 
     if (Status == EFI_SUCCESS) {
-      //
-      // Update the number of blocks
-      //
-      Status = AsciiStringToUint64 (Value, FALSE, &Value64);
-      if (EFI_ERROR (Status)) {
-        Error (NULL, 0, 0, Value, "invalid value for %s", EFI_NUM_BLOCKS_STRING);
-        return EFI_ABORTED;
+      if (strcmp (Value, AUTO_STRING) == 0) {
+        Value64 = (UINT64) -1;
+      } else {
+        //
+        // Update the number of blocks
+        //
+        Status = AsciiStringToUint64 (Value, FALSE, &Value64);
+        if (EFI_ERROR (Status)) {
+          Error (NULL, 0, 0, Value, "invalid value for %s", EFI_NUM_BLOCKS_STRING);
+          return EFI_ABORTED;
+        }
       }
 
       FvInfo->FvBlocks[Index].NumBlocks = (UINT32) Value64;
@@ -1040,91 +1044,25 @@ Returns:
 
   if (FindSection (InfFile, COMPONENT_SECTION_STRING)) {
     Index = 0;
-    //
-    // Read component FV_VARIABLE
-    //
-    Status = FindToken (InfFile, COMPONENT_SECTION_STRING, EFI_NV_VARIABLE_STRING, 0, Value);
-
-    if (Status == EFI_SUCCESS) {
-      //
-      // Add the component
-      //
-      strcpy (FvInfo->FvComponents[Index].ComponentName, EFI_NV_VARIABLE_STRING);
+    while (TRUE) {
+      Status = FindTokenInstanceInSection (
+                 InfFile,
+                 COMPONENT_SECTION_STRING,
+                 Index,
+                 FvInfo->FvComponents[Index].ComponentName,
+                 Value
+                 );
+      if (EFI_ERROR (Status)) {
+        break;
+      }
       Status = AsciiStringToUint64 (Value, FALSE, &Value64);
       if (EFI_ERROR (Status)) {
-        printf ("ERROR: %s is not a valid integer.\n", EFI_NV_VARIABLE_STRING);
+        Error (NULL, 0, 0, Value, "not a valid integer");
         return EFI_ABORTED;
       }
 
       FvInfo->FvComponents[Index].Size = (UINTN) Value64;
-    } else {
-      printf ("WARNING: Could not read %s.\n", EFI_NV_VARIABLE_STRING);
-    }
-
-    Index++;
-    //
-    // Read component FV_EVENT_LOG
-    //
-    Status = FindToken (InfFile, COMPONENT_SECTION_STRING, EFI_NV_EVENT_LOG_STRING, 0, Value);
-
-    if (Status == EFI_SUCCESS) {
-      //
-      // Add the component
-      //
-      strcpy (FvInfo->FvComponents[Index].ComponentName, EFI_NV_EVENT_LOG_STRING);
-      Status = AsciiStringToUint64 (Value, FALSE, &Value64);
-      if (EFI_ERROR (Status)) {
-        printf ("ERROR: %s is not a valid integer.\n", EFI_NV_EVENT_LOG_STRING);
-        return EFI_ABORTED;
-      }
-
-      FvInfo->FvComponents[Index].Size = (UINTN) Value64;
-    } else {
-      printf ("WARNING: Could not read %s.\n", EFI_NV_EVENT_LOG_STRING);
-    }
-
-    Index++;
-    //
-    // Read component FV_FTW_WORKING
-    //
-    Status = FindToken (InfFile, COMPONENT_SECTION_STRING, EFI_NV_FTW_WORKING_STRING, 0, Value);
-
-    if (Status == EFI_SUCCESS) {
-      //
-      // Add the component
-      //
-      strcpy (FvInfo->FvComponents[Index].ComponentName, EFI_NV_FTW_WORKING_STRING);
-      Status = AsciiStringToUint64 (Value, FALSE, &Value64);
-      if (EFI_ERROR (Status)) {
-        printf ("ERROR: %s is not a valid integer.\n", EFI_NV_FTW_WORKING_STRING);
-        return EFI_ABORTED;
-      }
-
-      FvInfo->FvComponents[Index].Size = (UINTN) Value64;
-    } else {
-      printf ("WARNING: Could not read %s.\n", EFI_NV_FTW_WORKING_STRING);
-    }
-
-    Index++;
-    //
-    // Read component FV_FTW_SPARE
-    //
-    Status = FindToken (InfFile, COMPONENT_SECTION_STRING, EFI_NV_FTW_SPARE_STRING, 0, Value);
-
-    if (Status == EFI_SUCCESS) {
-      //
-      // Add the component
-      //
-      strcpy (FvInfo->FvComponents[Index].ComponentName, EFI_NV_FTW_SPARE_STRING);
-      Status = AsciiStringToUint64 (Value, FALSE, &Value64);
-      if (EFI_ERROR (Status)) {
-        printf ("ERROR: %s is not a valid integer.\n", EFI_NV_FTW_SPARE_STRING);
-        return EFI_ABORTED;
-      }
-
-      FvInfo->FvComponents[Index].Size = (UINTN) Value64;
-    } else {
-      printf ("WARNING: Could not read %s.\n", EFI_NV_FTW_SPARE_STRING);
+      Index++;
     }
   }
   //
@@ -1132,7 +1070,33 @@ Returns:
   //
   FvInfo->Size = 0;
   for (Index = 0; FvInfo->FvBlocks[Index].NumBlocks; Index++) {
-    FvInfo->Size += FvInfo->FvBlocks[Index].NumBlocks * FvInfo->FvBlocks[Index].BlockLength;
+    if ((FvInfo->Size == (UINTN) -1 && Index > 0) ||
+        (FvInfo->FvBlocks[Index].NumBlocks == (UINT32) -1 && Index > 0)
+        ) {
+      //
+      // Error 1. more pairs after AUTO
+      // Error 2. AUTO appear in non-first position
+      //
+      Error (NULL, 0, 0, NULL, "cannot have more than one pair of %s and %s if %s is set to %s", 
+        EFI_NUM_BLOCKS_STRING, EFI_BLOCK_SIZE_STRING,
+        EFI_NUM_BLOCKS_STRING, AUTO_STRING
+        );
+      return EFI_ABORTED;
+    }
+
+    if (FvInfo->FvBlocks[Index].NumBlocks == (UINT32) -1) {
+      FvInfo->Size = (UINTN) -1;
+    } else {
+      FvInfo->Size += FvInfo->FvBlocks[Index].NumBlocks * FvInfo->FvBlocks[Index].BlockLength;
+    }
+  }
+
+  if (FvInfo->Size == (UINTN) -1 && FvInfo->FvFiles[0][0] == 0) {
+    //
+    // Non FFS FV cannot set block number to AUTO
+    //
+    Error (NULL, 0, 0, "non-FFS FV", "cannot set %s to %s",   EFI_NUM_BLOCKS_STRING, AUTO_STRING);
+    return EFI_ABORTED;
   }
 
   return EFI_SUCCESS;
@@ -1372,7 +1336,11 @@ Returns:
   PadFile->State                          = 0;
   PadFile->IntegrityCheck.Checksum.Header = CalculateChecksum8 ((UINT8 *) PadFile, sizeof (EFI_FFS_FILE_HEADER));
   if (PadFile->Attributes & FFS_ATTRIB_CHECKSUM) {
+#if (PI_SPECIFICATION_VERSION < 0x00010000)  
     PadFile->IntegrityCheck.Checksum.File = CalculateChecksum8 ((UINT8 *) PadFile, PadFileSize);
+#else
+    PadFile->IntegrityCheck.Checksum.File = CalculateChecksum8 ((UINT8 *) ((UINTN)PadFile + sizeof (EFI_FFS_FILE_HEADER)), PadFileSize - sizeof (EFI_FFS_FILE_HEADER));
+#endif
   } else {
     PadFile->IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;
   }
@@ -1876,12 +1844,139 @@ Returns:
 }
 
 EFI_STATUS
+ReallocateFvImage (
+  IN OUT MEMORY_FILE         *FvImage,
+  IN OUT FV_INFO             *FvInfo,
+  IN OUT EFI_FFS_FILE_HEADER **VtfFileImage,
+  IN OUT UINTN               *FvImageCapacity
+  )
+/*++
+Routine Description:
+  Increase the size of FV image by 1 block. The routine may reallocate memory
+  depending on the capacity of the FV image.
+
+Arguments:
+  FvImage         The memory image of the FV to add it to.  The current offset
+                  must be valid.
+  FvInfo          Pointer to information about the FV.
+  VtfFileImage    A pointer to the VTF file within the FvImage.  If this is equal
+                  to the end of the FvImage then no VTF previously found.
+  FvImageCapacity Capacity of image buffer for FV.
+
+Returns:
+  EFI_SUCCESS              The function completed successfully.
+  EFI_OUT_OF_RESOURCES     Insufficient resources exist to complete the reallocation.
+
+--*/
+{
+  CHAR8                      *FileImage;
+  UINTN                      OldSize;
+  UINTN                      IncreaseSize;
+  EFI_FIRMWARE_VOLUME_HEADER *FvHeader;
+  BOOLEAN                    AllocateNewMemory;
+  EFI_FFS_FILE_HEADER        *NewVtfFileImage;
+  UINT32                     VtfFileLength;
+  UINT8                      TempByte;
+
+  OldSize      = (UINTN) FvImage->Eof - (UINTN) FvImage->FileImage;
+  IncreaseSize = FvInfo->FvBlocks[0].BlockLength;
+  assert (OldSize == FvInfo->FvBlocks[0].NumBlocks * FvInfo->FvBlocks[0].BlockLength);
+
+  //
+  // Assume we have enough capacity
+  //
+  AllocateNewMemory = FALSE;
+  
+
+  if (OldSize + IncreaseSize > *FvImageCapacity) {
+    AllocateNewMemory = TRUE;
+    //
+    // Increase capacity by one unit
+    //
+    *FvImageCapacity = OldSize + FV_CAPACITY_INCREASE_UNIT;
+    FileImage = malloc (*FvImageCapacity);
+
+    if (FileImage == NULL) {
+      Error (NULL, 0, 0, "memory allocation failure", NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    //
+    // Initialize the content per FV polarity
+    //
+    if (FvInfo->FvAttributes & EFI_FVB_ERASE_POLARITY) {
+      memset (FileImage, -1, *FvImageCapacity);
+    } else {
+      memset (FileImage, 0, *FvImageCapacity);
+    }
+
+    //
+    // Copy the FV content before VTF
+    //
+    memcpy (FileImage, FvImage->FileImage, (UINTN) *VtfFileImage - (UINTN) FvImage->FileImage);
+  } else {
+    FileImage = FvImage->FileImage;
+  }
+
+  //
+  // Move VTF if it exists
+  //
+  NewVtfFileImage = (EFI_FFS_FILE_HEADER *) (FileImage + ((UINTN) *VtfFileImage - (UINTN) FvImage->FileImage) + IncreaseSize);
+  if ((UINTN) *VtfFileImage != (UINTN) FvImage->Eof) {
+    //
+    // Exchange the VTF buffer from end to start for two purpose:
+    // 1. Exchange: Preserve the default value per FV polarity
+    // 2. End->Start: Avoid destroying the VTF data during exchanging
+    //
+    VtfFileLength = GetLength ((*VtfFileImage)->Size);
+    while (VtfFileLength-- != 0) {
+      TempByte = ((UINT8 *) VtfFileImage)[VtfFileLength];
+      ((UINT8 *) VtfFileImage)[VtfFileLength]    = ((UINT8 *) NewVtfFileImage)[VtfFileLength];
+      ((UINT8 *) NewVtfFileImage)[VtfFileLength] = TempByte;
+    }
+  }
+
+  //
+  // Update VTF Pointer
+  //
+  *VtfFileImage = NewVtfFileImage;
+
+  //
+  // Update FvInfo
+  //
+  FvInfo->FvBlocks[0].NumBlocks ++;
+
+  //
+  // Update FV Header
+  //
+  FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) FileImage;
+  FvHeader->FvBlockMap[0].NumBlocks = FvInfo->FvBlocks[0].NumBlocks;
+  FvHeader->FvLength                = OldSize + IncreaseSize;
+  FvHeader->Checksum                = 0;
+  FvHeader->Checksum                = CalculateChecksum16 ((UINT16 *) FvHeader, FvHeader->HeaderLength / sizeof (UINT16));
+      
+  //
+  // Update FvImage
+  //
+  if (AllocateNewMemory) {
+    free (FvImage->FileImage);
+    FvImage->CurrentFilePointer = FileImage + (FvImage->CurrentFilePointer - FvImage->FileImage);    
+    FvImage->FileImage          = FileImage;
+  }
+  FvImage->Eof                  = FvImage->FileImage + OldSize + IncreaseSize;
+
+  InitializeFvLib (FvImage->FileImage, OldSize + IncreaseSize);
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
 AddFile (
   IN OUT MEMORY_FILE          *FvImage,
   IN FV_INFO                  *FvInfo,
   IN UINTN                    Index,
   IN OUT EFI_FFS_FILE_HEADER  **VtfFileImage,
-  IN OUT MEMORY_FILE          *SymImage
+  IN OUT MEMORY_FILE          *SymImage,
+  IN OUT UINTN                *FvImageCapacity
   )
 /*++
 
@@ -1892,14 +1987,15 @@ Routine Description:
 
 Arguments:
 
-  FvImage       The memory image of the FV to add it to.  The current offset
-                must be valid.
-  FvInfo        Pointer to information about the FV.
-  Index         The file in the FvInfo file list to add.
-  VtfFileImage  A pointer to the VTF file within the FvImage.  If this is equal
-                to the end of the FvImage then no VTF previously found.
-  SymImage      The memory image of the Sym file to update if symbols are present.
-                The current offset must be valid.
+  FvImage         The memory image of the FV to add it to.  The current offset
+                  must be valid.
+  FvInfo          Pointer to information about the FV.
+  Index           The file in the FvInfo file list to add.
+  VtfFileImage    A pointer to the VTF file within the FvImage.  If this is equal
+                  to the end of the FvImage then no VTF previously found.
+  SymImage        The memory image of the Sym file to update if symbols are present.
+                  The current offset must be valid.
+  FvImageCapacity Capacity of image buffer for FV.
 
 Returns:
 
@@ -1964,16 +2060,28 @@ Returns:
   // Verify read successful
   //
   if (NumBytesRead != sizeof (UINT8) * FileSize) {
-    free (FileBuffer);
     Error (NULL, 0, 0, FvInfo->FvFiles[Index], "failed to read input file contents");
-    return EFI_ABORTED;
+    Status = EFI_ABORTED;
+    goto Exit;
   }
   //
   // Verify space exists to add the file
   //
-  if (FileSize > (UINTN) ((UINTN) *VtfFileImage - (UINTN) FvImage->CurrentFilePointer)) {
-    Error (NULL, 0, 0, FvInfo->FvFiles[Index], "insufficient space remains to add the file");
-    return EFI_OUT_OF_RESOURCES;
+  while (FileSize > (UINTN) ((UINTN) *VtfFileImage - (UINTN) FvImage->CurrentFilePointer)) {
+    if (FvInfo->Size != (UINTN) -1) {
+      Error (NULL, 0, 0, FvInfo->FvFiles[Index], "insufficient space remains to add the file");
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    } else {
+      //
+      // FV Size is AUTO, increase by one block
+      //
+      Status = ReallocateFvImage (FvImage, FvInfo, VtfFileImage, FvImageCapacity);
+      if (EFI_ERROR (Status)) {
+        Error (NULL, 0, 0, FvInfo->FvFiles[Index], "insufficient resources to add the file");
+        goto Exit;
+      }
+    }
   }
   //
   // Update the file state based on polarity of the FV.
@@ -2033,7 +2141,11 @@ Returns:
       }
 
       if ((*VtfFileImage)->Attributes & FFS_ATTRIB_CHECKSUM) {
+    #if (PI_SPECIFICATION_VERSION < 0x00010000)
         VtfFileChecksum = CalculateChecksum8 ((UINT8 *) *VtfFileImage, FileSize - TailSize);
+    #else
+        VtfFileChecksum = CalculateChecksum8 ((UINT8 *) ((UINTN)*VtfFileImage + sizeof (EFI_FFS_FILE_HEADER)), FileSize - TailSize - sizeof(EFI_FFS_FILE_HEADER));
+    #endif
         (*VtfFileImage)->IntegrityCheck.Checksum.File = VtfFileChecksum;
       } else {
         (*VtfFileImage)->IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;
@@ -2048,15 +2160,15 @@ Returns:
       }
     #endif  
       (*VtfFileImage)->State = FileState;
-      free (FileBuffer);
-      return EFI_SUCCESS;
+      Status = EFI_SUCCESS;
+      goto Exit;
     } else {
       //
       // Already found a VTF file.
       //
       Error (NULL, 0, 0, "multiple VTF files are illegal in a single FV", NULL);
-      free (FileBuffer);
-      return EFI_ABORTED;
+      Status = EFI_ABORTED;
+      goto Exit;
     }
   }
   //
@@ -2065,68 +2177,93 @@ Returns:
   Status = ReadFfsAlignment ((EFI_FFS_FILE_HEADER *) FileBuffer, &CurrentFileAlignment);
   if (EFI_ERROR (Status)) {
     printf ("ERROR: Could not determine alignment of file %s.\n", FvInfo->FvFiles[Index]);
-    free (FileBuffer);
-    return EFI_ABORTED;
+    Status = EFI_ABORTED;
+    goto Exit;
   }
   //
   // Add pad file if necessary
   //
-  Status = AddPadFile (FvImage, CurrentFileAlignment);
-  if (EFI_ERROR (Status)) {
-    printf ("ERROR: Could not align the file data properly.\n");
-    free (FileBuffer);
-    return EFI_ABORTED;
+  while (EFI_ERROR (AddPadFile (FvImage, CurrentFileAlignment))) {
+    if (FvInfo->Size != (UINTN) -1) {
+      printf ("ERROR: Could not align the file data properly.\n");
+      Status = EFI_ABORTED;
+      goto Exit;
+    } else {    
+      //
+      // FV Size is AUTO, increase by one block
+      //
+      Status = ReallocateFvImage (FvImage, FvInfo, VtfFileImage, FvImageCapacity);
+      if (EFI_ERROR (Status)) {
+        Error (NULL, 0, 0, FvInfo->FvFiles[Index], "insufficient resources to add the file");
+        goto Exit;
+      }      
+    }
   }
+
   //
   // Add file
   //
-  if ((FvImage->CurrentFilePointer + FileSize) < FvImage->Eof) {
-    //
-    // Copy the file
-    //
-    memcpy (FvImage->CurrentFilePointer, FileBuffer, FileSize);
-
-    //
-    // If the file is XIP, rebase
-    //
-    CurrentFileBaseAddress = FvInfo->BaseAddress + ((UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage);
-    //
-    //    Status = RebaseFfsFile ((EFI_FFS_FILE_HEADER*) FvImage->CurrentFilePointer, CurrentFileBaseAddress);
-    //    if (EFI_ERROR(Status)) {
-    //      printf ("ERROR: Could not rebase the file %s.\n", FvInfo->FvFiles[Index]);
-    //      return EFI_ABORTED;
-    //    }
-    //
-    // Update Symbol file
-    //
-    Status = AddSymFile (
-              CurrentFileBaseAddress,
-              (EFI_FFS_FILE_HEADER *) FvImage->CurrentFilePointer,
-              SymImage,
-              FvInfo->FvFiles[Index]
-              );
-    assert (!EFI_ERROR (Status));
-
-    //
-    // Update the current pointer in the FV image
-    //
-    FvImage->CurrentFilePointer += FileSize;
-  } else {
-    printf ("ERROR: The firmware volume is out of space, could not add file %s.\n", FvInfo->FvFiles[Index]);
-    return EFI_ABORTED;
+  while (FileSize > (UINTN) ((UINTN) *VtfFileImage - (UINTN) FvImage->CurrentFilePointer)) {
+    if (FvInfo->Size != (UINTN) -1) {
+      printf ("ERROR: The firmware volume is out of space, could not add file %s.\n", FvInfo->FvFiles[Index]);
+      Status = EFI_ABORTED;
+      goto Exit;
+    } else {      
+      //
+      // FV Size is AUTO, increase by one one block
+      //
+      Status = ReallocateFvImage (FvImage, FvInfo, VtfFileImage, FvImageCapacity);
+      if (EFI_ERROR (Status)) {
+        Error (NULL, 0, 0, FvInfo->FvFiles[Index], "insufficient resources to add the file");
+        goto Exit;
+      }
+    }
   }
+
+  //
+  // Copy the file
+  //
+  memcpy (FvImage->CurrentFilePointer, FileBuffer, FileSize);
+
+  //
+  // If the file is XIP, rebase
+  //
+  CurrentFileBaseAddress = FvInfo->BaseAddress + ((UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage);
+  //
+  //    Status = RebaseFfsFile ((EFI_FFS_FILE_HEADER*) FvImage->CurrentFilePointer, CurrentFileBaseAddress);
+  //    if (EFI_ERROR(Status)) {
+  //      printf ("ERROR: Could not rebase the file %s.\n", FvInfo->FvFiles[Index]);
+  //      return EFI_ABORTED;
+  //    }
+  //
+  // Update Symbol file
+  //
+  Status = AddSymFile (
+            CurrentFileBaseAddress,
+            (EFI_FFS_FILE_HEADER *) FvImage->CurrentFilePointer,
+            SymImage,
+            FvInfo->FvFiles[Index]
+            );
+  assert (!EFI_ERROR (Status));
+
+  //
+  // Update the current pointer in the FV image
+  //
+  FvImage->CurrentFilePointer += FileSize;
+
   //
   // Make next file start at QWord Boundry
   //
   while (((UINTN) FvImage->CurrentFilePointer & 0x07) != 0) {
     FvImage->CurrentFilePointer++;
   }
+
+Exit:
   //
   // Free allocated memory.
   //
   free (FileBuffer);
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
 EFI_STATUS
@@ -2250,8 +2387,7 @@ Returns:
     } else if (_stricmp (FvInfo->FvComponents[Index].ComponentName, EFI_NV_FTW_SPARE_STRING) == 0) {
       AddFTWSpareBlock (FvImage, FvInfo->FvComponents[Index].Size, FvInfo);
     } else {
-      printf ("Error. Unknown Non-FFS block %s \n", FvInfo->FvComponents[Index].ComponentName);
-      return EFI_ABORTED;
+      printf ("Warning: Unknown Non-FFS block %s \n", FvInfo->FvComponents[Index].ComponentName);
     }
 
     FvImage   = FvImage + FvInfo->FvComponents[Index].Size;
@@ -2332,7 +2468,11 @@ Returns:
   PadFile->State                          = 0;
   PadFile->IntegrityCheck.Checksum.Header = CalculateChecksum8 ((UINT8 *) PadFile, sizeof (EFI_FFS_FILE_HEADER));
   if (PadFile->Attributes & FFS_ATTRIB_CHECKSUM) {
+#if (PI_SPECIFICATION_VERSION < 0x00010000)
     PadFile->IntegrityCheck.Checksum.File = CalculateChecksum8 ((UINT8 *) PadFile, FileSize);
+#else
+    PadFile->IntegrityCheck.Checksum.File = CalculateChecksum8 ((UINT8 *) ((UINTN) PadFile + sizeof (EFI_FFS_FILE_HEADER)), FileSize - sizeof (EFI_FFS_FILE_HEADER));
+#endif
   } else {
     PadFile->IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;
   }
@@ -2611,10 +2751,18 @@ Returns:
   VtfFile->IntegrityCheck.Checksum.File = 0;
   VtfFile->State                        = 0;
   if (VtfFile->Attributes & FFS_ATTRIB_CHECKSUM) {
+#if (PI_SPECIFICATION_VERSION < 0x00010000)
     VtfFile->IntegrityCheck.Checksum.File = CalculateChecksum8 (
                                               (UINT8 *) VtfFile,
                                               GetLength (VtfFile->Size) - TailSize
                                               );
+
+#else
+    VtfFile->IntegrityCheck.Checksum.File = CalculateChecksum8 (
+                                              (UINT8 *) ((UINTN)VtfFile + sizeof (EFI_FFS_FILE_HEADER)),
+                                              GetLength (VtfFile->Size) - TailSize - sizeof (EFI_FFS_FILE_HEADER)
+                                              );
+#endif
   } else {
     VtfFile->IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;
   }
@@ -2780,6 +2928,7 @@ Returns:
   UINTN                       Index;
   EFI_FIRMWARE_VOLUME_HEADER  *FvHeader;
   EFI_FFS_FILE_HEADER         *VtfFileImage;
+  UINTN                       FvImageCapacity;
 
   //
   // Check for invalid parameter
@@ -2811,12 +2960,22 @@ Returns:
   //
   // Calculate the FV size
   //
-  *FvImageSize = FvInfo.Size;
+  if (FvInfo.Size != (UINTN) -1) {
+    *FvImageSize    = FvInfo.Size;
+    FvImageCapacity = FvInfo.Size;
+  } else {
+    //
+    // For auto size, set default as one block
+    //
+    FvInfo.FvBlocks[0].NumBlocks = 1;
+    *FvImageSize    = FvInfo.FvBlocks[0].BlockLength;
+    FvImageCapacity = FV_CAPACITY_INCREASE_UNIT;
+  }
 
   //
   // Allocate the FV
   //
-  *FvImage = malloc (*FvImageSize);
+  *FvImage = malloc (FvImageCapacity);
   if (*FvImage == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -2831,9 +2990,9 @@ Returns:
   // Initialize the FV to the erase polarity
   //
   if (FvInfo.FvAttributes & EFI_FVB_ERASE_POLARITY) {
-    memset (*FvImage, -1, *FvImageSize);
+    memset (*FvImage, -1, FvImageCapacity);
   } else {
-    memset (*FvImage, 0, *FvImageSize);
+    memset (*FvImage, 0, FvImageCapacity);
   }
   //
   // Initialize FV header
@@ -2913,7 +3072,7 @@ Returns:
   //
   // Initialize the FV library.
   //
-  InitializeFvLib (FvImageMemoryFile.FileImage, FvInfo.Size);
+  InitializeFvLib (FvImageMemoryFile.FileImage, *FvImageSize);
 
   //
   // Files start on 8 byte alignments, so move to the next 8 byte aligned
@@ -2935,7 +3094,15 @@ Returns:
     //
     // Add the file
     //
-    Status = AddFile (&FvImageMemoryFile, &FvInfo, Index, &VtfFileImage, &SymImageMemoryFile);
+    Status = AddFile (&FvImageMemoryFile, &FvInfo, Index, &VtfFileImage, &SymImageMemoryFile, &FvImageCapacity);
+
+    //
+    // Update FvImageSize and FvImage as they may be changed in AddFile routine
+    //
+    if (FvInfo.Size == (UINTN) -1) {
+      *FvImageSize = FvInfo.FvBlocks[0].NumBlocks * FvInfo.FvBlocks[0].BlockLength;
+      *FvImage     = FvImageMemoryFile.FileImage;
+    }
 
     //
     // Exit if error detected while adding the file
@@ -2966,7 +3133,7 @@ Returns:
     // reset vector. If the PEI Core is found, the VTF file will probably get  
     // corrupted by updating the entry point.                                  
     //
-    if ((FvInfo.BaseAddress + FvInfo.Size) == FV_IMAGES_TOP_ADDRESS) {       
+    if ((FvInfo.BaseAddress + *FvImageSize) == FV_IMAGES_TOP_ADDRESS) {       
       Status = UpdateResetVector (&FvImageMemoryFile, &FvInfo, VtfFileImage);
       if (EFI_ERROR(Status)) {                                               
         printf ("ERROR: Could not update the reset vector.\n");              
@@ -2974,7 +3141,7 @@ Returns:
         return EFI_ABORTED;                                                  
       }                                                                      
     }
-  } 
+  }
   //
   // Determine final Sym file size
   //

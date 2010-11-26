@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -37,6 +37,7 @@ typedef struct _STRING_LIST {
 } STRING_LIST;
 
 #define UTILITY_NAME      "MakeDeps"
+#define UTILITY_VERSION   "v1.0"
 
 #define MAX_LINE_LEN      2048
 #define MAX_PATH          2048
@@ -1488,30 +1489,36 @@ Returns:
   
 --*/
 {
-  int               Index;
-  static const char *Str[] = {
-    UTILITY_NAME " -- make dependencies",
-    "  Usage: MakeDeps [options]",
-    "    Options include:",
-    "      -h or -?         for this help information",
-    "      -f SourceFile    add SourceFile to list of files to scan",
-    "      -i IncludePath   add IncludePath to list of search paths",
-    "      -o OutputFile    write output dependencies to OutputFile",
-    "      -s SubDir        for each IncludePath, also search IncludePath\\SubDir",
-    "      -v               for verbose output",
-    "      -ignorenotfound  don't warn for files not found",
-    "      -target Target   for single SourceFile, target is Target, not SourceFile.obj",
-    "      -q               quiet mode to not report files not found if ignored",
-    "      -sub sym str     replace all occurrances of 'str' with 'sym' in the output",
-    "      -nosystem        not process system <include> files",
-    "      -neverfail       always return a success return code",
-    //
-    //    "      -nodupes         keep track of include files, don't rescan duplicates",
-    //
-    "      -usesumdeps path use summary dependency files in 'path' directory.",
-    "      -asm             The SourceFiles are assembler files",
-    "      -cl              The SourceFiles are the output of cl with /showIncludes",
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel Make Dependencies Utility",
+    "  Copyright (C), 2004 - 2008 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
     "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION]...",
+    "Options:",
+    "  -h or -?         for this help information",
+    "  -f SourceFile    add SourceFile to list of files to scan",
+    "  -i IncludePath   add IncludePath to list of search paths",
+    "  -o OutputFile    write output dependencies to OutputFile",
+    "  -s SubDir        for each IncludePath, also search IncludePath\\SubDir",
+    "  -v               for verbose output",
+    "  -ignorenotfound  don't warn for files not found",
+    "  -target Target   for single SourceFile, target is Target, not SourceFile.obj",
+    "  -q               quiet mode to not report files not found if ignored",
+    "  -sub sym str     replace all occurrances of 'str' with 'sym' in the output",
+    "  -nosystem        not process system <include> files",
+    "  -neverfail       always return a success return code",
+    //
+    //    "  -nodupes         keep track of include files, don't rescan duplicates",
+    //
+    "  -usesumdeps path use summary dependency files in 'path' directory.",
+    "  -asm             The SourceFiles are assembler files",
+    "  -cl              The SourceFiles are the output of cl with /showIncludes",
     NULL
   };
   for (Index = 0; Str[Index] != NULL; Index++) {

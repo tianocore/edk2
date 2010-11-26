@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -56,11 +56,13 @@ Returns:
   jcxz   _Power10U64_Done
   
 _Power10U64_Wend:
+  push   ecx
   push   10
   push   dword ptr Operand[4]
   push   dword ptr Operand[0]
   call   MultU64x32
   add    esp, 0Ch
+  pop    ecx
   mov    dword ptr Operand[0], eax
   mov    dword ptr Operand[4], edx
   loop   _Power10U64_Wend

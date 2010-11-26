@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -53,9 +53,9 @@ typedef struct _EFI_HII_ROW_INFO {
 } EFI_HII_ROW_INFO;
 
 typedef struct {
-  UINT32 FontStyle;
-  UINT16 FontSize; // character cell size in pixels
-  CHAR16 FontName[1];
+  EFI_HII_FONT_STYLE FontStyle;
+  UINT16             FontSize; // character cell height in pixels
+  CHAR16             FontName[1];
 } EFI_FONT_INFO;
 
 typedef struct _EFI_FONT_DISPLAY_INFO {
@@ -65,25 +65,25 @@ typedef struct _EFI_FONT_DISPLAY_INFO {
   EFI_FONT_INFO                 FontInfo;  
 } EFI_FONT_DISPLAY_INFO;
 
-#define EFI_HII_OUT_FLAG_CLIP        0x00000001
-#define EFI_HII_OUT_FLAG_WRAP        0x00000002
-#define EFI_HII_OUT_FLAG_CLEAN_Y     0x00000004
-#define EFI_HII_OUT_FLAG_CLEAN_X     0x00000008
-#define EFI_HII_OUT_FLAG_TRANSPARENT 0x00000010
-#define EFI_HII_IGNORE_IF_NO_GLYPH   0x00000020
-#define EFI_HII_IGNORE_LINE_BREAK    0x00000040
-#define EFI_HII_DIRECT_TO_SCREEN     0x00000080
+#define EFI_HII_OUT_FLAG_CLIP         0x00000001
+#define EFI_HII_OUT_FLAG_WRAP         0x00000002
+#define EFI_HII_OUT_FLAG_CLIP_CLEAN_Y 0x00000004
+#define EFI_HII_OUT_FLAG_CLIP_CLEAN_X 0x00000008
+#define EFI_HII_OUT_FLAG_TRANSPARENT  0x00000010
+#define EFI_HII_IGNORE_IF_NO_GLYPH    0x00000020
+#define EFI_HII_IGNORE_LINE_BREAK     0x00000040
+#define EFI_HII_DIRECT_TO_SCREEN      0x00000080
 
-#define EFI_FONT_INFO_SYS_FONT       0x00000001
-#define EFI_FONT_INFO_SYS_SIZE       0x00000002
-#define EFI_FONT_INFO_SYS_STYLE      0x00000004
-#define EFI_FONT_INFO_SYS_FORE_COLOR 0x00000010
-#define EFI_FONT_INFO_SYS_BACK_COLOR 0x00000020
-#define EFI_FONT_INFO_RESIZE         0x00001000
-#define EFI_FONT_INFO_RESTYLE        0x00002000
-#define EFI_FONT_INFO_ANY_FONT       0x00010000
-#define EFI_FONT_INFO_ANY_SIZE       0x00020000
-#define EFI_FONT_INFO_ANY_STYLE      0x00040000
+#define EFI_FONT_INFO_SYS_FONT        0x00000001
+#define EFI_FONT_INFO_SYS_SIZE        0x00000002
+#define EFI_FONT_INFO_SYS_STYLE       0x00000004
+#define EFI_FONT_INFO_SYS_FORE_COLOR  0x00000010
+#define EFI_FONT_INFO_SYS_BACK_COLOR  0x00000020
+#define EFI_FONT_INFO_RESIZE          0x00001000
+#define EFI_FONT_INFO_RESTYLE         0x00002000
+#define EFI_FONT_INFO_ANY_FONT        0x00010000
+#define EFI_FONT_INFO_ANY_SIZE        0x00020000
+#define EFI_FONT_INFO_ANY_STYLE       0x00040000
 
 typedef
 EFI_STATUS
@@ -109,7 +109,7 @@ EFI_STATUS
     Flags             - Describes how the string is to be drawn.                 
     String            - Points to the null-terminated string to be displayed.
     StringInfo        - Points to the string output information, including the color and font. 
-                        If NULL, then the string will be output in the default system font and color.                             
+                        If NULL, then the string will be output in the default system font and color.
     Blt               - If this points to a non-NULL on entry, this points to the image, which is Width pixels  
                         wide and Height pixels high. The string will be drawn onto this image and               
                         EFI_HII_OUT_FLAG_CLIP is implied. If this points to a NULL on entry, then a             
@@ -132,7 +132,8 @@ EFI_STATUS
   Returns:
     EFI_SUCCESS           - The string was successfully rendered.                           
     EFI_OUT_OF_RESOURCES  - Unable to allocate an output buffer for RowInfoArray or Blt.
-    EFI_INVALID_PARAMETER - The String was NULL.    
+    EFI_INVALID_PARAMETER - The String or Blt was NULL.
+    EFI_INVALID_PARAMETER - Flags were invalid combination.
         
 --*/
 ;
@@ -166,7 +167,7 @@ EFI_STATUS
     Language          - Points to the language for the retrieved string. If NULL, then the current system
                         language is used.                                                                
     StringInfo        - Points to the string output information, including the color and font. 
-                        If NULL, then the string will be output in the default system font and color.                             
+                        If NULL, then the string will be output in the default system font and color.
     Blt               - If this points to a non-NULL on entry, this points to the image, which is Width pixels  
                         wide and Height pixels high. The string will be drawn onto this image and               
                         EFI_HII_OUT_FLAG_CLIP is implied. If this points to a NULL on entry, then a             
@@ -187,9 +188,12 @@ EFI_STATUS
                         is possible when character display is normalized that some character cells overlap.           
                      
   Returns:
-    EFI_SUCCESS           - The string was successfully rendered.                           
+    EFI_SUCCESS           - The string was successfully rendered.
     EFI_OUT_OF_RESOURCES  - Unable to allocate an output buffer for RowInfoArray or Blt.
-    EFI_INVALID_PARAMETER - The String was NULL.    
+    EFI_INVALID_PARAMETER - The Blt or PackageList was NULL.
+    EFI_INVALID_PARAMETER - Flags were invalid combination.
+    EFI_NOT_FOUND         - The specified PackageList is not in the Database or the stringid is not 
+                            in the specified PackageList. 
         
 --*/
 ;
@@ -233,7 +237,7 @@ EFI_STATUS
 (EFIAPI *EFI_HII_GET_FONT_INFO) (
   IN  CONST EFI_HII_FONT_PROTOCOL    *This,
   IN  OUT   EFI_FONT_HANDLE          *FontHandle,
-  IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfoIn,
+  IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfoIn, OPTIONAL
   OUT       EFI_FONT_DISPLAY_INFO    **StringInfoOut,
   IN  CONST EFI_STRING               String OPTIONAL
   )
@@ -246,11 +250,13 @@ EFI_STATUS
     
   Arguments:          
     This              - A pointer to the EFI_HII_FONT_PROTOCOL instance.
-    FontHandle        - On entry, points to the font handle returned by a 
-                        previous call to GetFontInfo() or NULL to start with the 
+    FontHandle        - On entry, points to the font handle returned by a previous 
+                        call to GetFontInfo() or points to NULL to start with the 
                         first font. On return, points to the returned font handle or
-                        points to NULL if there are no more matching fonts.                                               
-    StringInfoIn      - Upon entry, points to the font to return information about.                        
+                        points to NULL if there are no more matching fonts.
+    StringInfoIn      - Upon entry, points to the font to return information about.
+                        If NULL, then the information about the system default 
+                        font will be returned.
     StringInfoOut     - Upon return, contains the matching font's information. 
                         If NULL, then no information is returned.
                         It's caller's responsibility to free this buffer.
@@ -261,10 +267,10 @@ EFI_STATUS
   Returns:
     EFI_SUCCESS            - Matching font returned successfully.
     EFI_NOT_FOUND          - No matching font was found.
-    EFI_INVALID_PARAMETER  - StringInfoIn is NULL.
+    EFI_INVALID_PARAMETER  - StringInfoIn->FontInfoMask is an invalid combination.
     EFI_OUT_OF_RESOURCES   - There were insufficient resources to complete the request.
             
---*/     
+--*/
 ;
 
 

@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2005 - 2007, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials                          
 ; are licensed and made available under the terms and conditions of the BSD License         
 ; which accompanies this distribution.  The full text of the license may be found at        
@@ -73,6 +73,8 @@ _r13            QWORD           ?
 _r14            QWORD           ?
 _r15            QWORD           ?
 _rip            QWORD           ?
+_MxCsr          DWORD           ?
+_XmmBuffer      DB              160 DUP (?)
 _EFI_JUMP_BUFFER                ENDS
 
 EFI_JUMP_BUFFER         TYPEDEF         _EFI_JUMP_BUFFER
@@ -116,6 +118,19 @@ TransferControlSetJump  PROC
   mov   (EFI_JUMP_BUFFER PTR [rdx])._r13, r13
   mov   (EFI_JUMP_BUFFER PTR [rdx])._r14, r14
   mov   (EFI_JUMP_BUFFER PTR [rdx])._r15, r15
+  ; save non-volatile fp registers
+  stmxcsr    (EFI_JUMP_BUFFER PTR [rdx])._MxCsr
+  lea   rax, (EFI_JUMP_BUFFER PTR [rdx])._XmmBuffer
+  movdqu [rax], xmm6
+  movdqu [rax + 10h], xmm7
+  movdqu [rax + 20h], xmm8
+  movdqu [rax + 30h], xmm9
+  movdqu [rax + 40h], xmm10
+  movdqu [rax + 50h], xmm11
+  movdqu [rax + 60h], xmm12
+  movdqu [rax + 70h], xmm13
+  movdqu [rax + 80h], xmm14
+  movdqu [rax + 90h], xmm15
   mov   rax, QWORD PTR [rsp+0]
   mov   (EFI_JUMP_BUFFER PTR [rdx])._rip, rax
   mov   rax, EFI_SUCCESS  
@@ -134,6 +149,19 @@ TransferControlSetJump      ENDP
 ;
 PUBLIC  TransferControlLongJump
 TransferControlLongJump  PROC  
+  ; load non-volatile fp registers
+  ldmxcsr    (EFI_JUMP_BUFFER PTR [rdx])._MxCsr
+  lea   rax, (EFI_JUMP_BUFFER PTR [rdx])._XmmBuffer
+  movdqu xmm6, [rax]
+  movdqu xmm7, [rax + 10h]
+  movdqu xmm8, [rax + 20h]
+  movdqu xmm9, [rax + 30h]
+  movdqu xmm10, [rax + 40h]
+  movdqu xmm11, [rax + 50h]
+  movdqu xmm12, [rax + 60h]
+  movdqu xmm13, [rax + 70h]
+  movdqu xmm14, [rax + 80h]
+  movdqu xmm15, [rax + 90h]
   ; set return from SetJump to EFI_WARN_RETURN_FROM_LONG_JUMP
   mov   rax, EFI_WARN_RETURN_FROM_LONG_JUMP          
   mov   rbx, (EFI_JUMP_BUFFER PTR [rdx])._rbx

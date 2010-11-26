@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -90,11 +90,11 @@ typedef UINT64 EFI_LBA;
 // EFI Constants. They may exist in other build structures, so #ifndef them.
 //
 #ifndef TRUE
-#define TRUE  ((BOOLEAN) 1 == 1)
+#define TRUE  ((BOOLEAN) (1 == 1))
 #endif
 
 #ifndef FALSE
-#define FALSE ((BOOLEAN) 0 == 1)
+#define FALSE ((BOOLEAN) (0 == 1))
 #endif
 
 #ifndef NULL

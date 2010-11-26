@@ -106,10 +106,8 @@ typedef struct {
   CHAR16  *UnicodeString;
 } EFI_UNICODE_STRING_TABLE;
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-#define LANGUAGE_RFC_3066
 #define LANGUAGE_CODE_ENGLISH    "en-US"
 #else
-#define LANGUAGE_ISO_639_2
 #define LANGUAGE_CODE_ENGLISH    "eng"
 #endif
 
@@ -1179,13 +1177,6 @@ EfiInitializeFwVolDevicepathNode (
 Routine Description:
   Initialize a Firmware Volume (FV) Media Device Path node.
   
-  Tiano extended the EFI 1.10 device path nodes. Tiano does not own this enum
-  so as we move to UEFI 2.0 support we must use a mechanism that conforms with
-  the UEFI 2.0 specification to define the FV device path. An UEFI GUIDed 
-  device path is defined for PIWG extensions of device path. If the code 
-  is compiled to conform with the UEFI 2.0 specification use the new device path
-  else use the old form for backwards compatability.
-
 Arguments:
   FvDevicePathNode   - Pointer to a FV device path node to initialize
   NameGuid           - FV file name to use in FvDevicePathNode
@@ -1202,15 +1193,6 @@ EfiGetNameGuidFromFwVolDevicePathNode (
 Routine Description:
   Check to see if the Firmware Volume (FV) Media Device Path is valid.
   
-  Tiano extended the EFI 1.10 device path nodes. Tiano does not own this enum
-  so as we move to UEFI 2.0 support we must use a mechanism that conforms with
-  the UEFI 2.0 specification to define the FV device path. An UEFI GUIDed 
-  device path is defined for PIWG extensions of device path. If the code 
-  is compiled to conform with the UEFI 2.0 specification use the new device path
-  else use the old form for backwards compatability. The return value to this
-  function points to a location in FvDevicePathNode and it does not allocate
-  new memory for the GUID pointer that is returned.
-
 Arguments:
   FvDevicePathNode   - Pointer to FV device path to check
 

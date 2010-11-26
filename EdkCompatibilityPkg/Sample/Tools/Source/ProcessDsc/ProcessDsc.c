@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -27,25 +27,18 @@ Abstract:
 #include <direct.h>   // for _mkdir()
 #include <errno.h>
 #include <stdlib.h>   // for getenv()
+#include <shlwapi.h>  // for PathCanonicalize()
 #include "DSCFile.h"
+#include "MultiThread.h"
 #include "FWVolume.h"
 #include "Exceptions.h"
 #include "Common.h"
 
 #include "EfiUtilityMsgs.h"
 #include "TianoBind.h"
-//
-// Disable warning for while(1) code
-//
-#pragma warning(disable : 4127)
-//
-// Disable warning for unreferenced function parameters
-//
-#pragma warning(disable : 4100)
 
-extern int  errno;
-
-#define PROGRAM_NAME  "ProcessDsc"
+#define UTILITY_NAME    "ProcessDsc"
+#define UTILITY_VERSION "v1.0"
 
 //
 // Common symbol name definitions. For example, the user can reference
@@ -220,25 +213,39 @@ typedef struct _SYMBOL {
 } SYMBOL;
 
 //
-// Define new SYMBOL list to record all module name used in the platform.dsc file.
+// Module globals for multi-thread build
 //
-SYMBOL *gModuleList = NULL;
+static BUILD_ITEM  **mCurrentBuildList;          // build list currently handling
+static BUILD_ITEM  *mCurrentBuildItem;           // build item currently handling
+
+//
+// Define masks for the build targets
+//
+#define BUILD_TARGET_COMPONENTS 0x01
+#define BUILD_TARGET_LIBRARIES  0x02
+#define BUILD_TARGET_FVS        0x04
+#define BUILD_TARGET_ALL        0xff
+
 
 //
 // This structure is used to save globals
 //
 struct {
-  INT8    *DscFilename;
-  SYMBOL  *Symbol;
-  INT8    MakefileName[MAX_PATH]; // output makefile name
-  INT8    XRefFileName[MAX_PATH];
-  INT8    GuidDatabaseFileName[MAX_PATH];
-  INT8    ModuleMakefileName[MAX_PATH];
-  FILE    *MakefileFptr;
-  FILE    *ModuleMakefileFptr;
-  SYMBOL  *ModuleList;
-  SYMBOL  *OutdirList;
-  UINT32  Verbose;
+  INT8                *DscFilename;
+  SYMBOL              *Symbol;
+  INT8                MakefileName[MAX_PATH]; // output makefile name
+  INT8                XRefFileName[MAX_PATH];
+  INT8                GuidDatabaseFileName[MAX_PATH];
+  INT8                ModuleMakefileName[MAX_PATH];
+  FILE                *MakefileFptr;
+  FILE                *ModuleMakefileFptr;
+  SYMBOL              *ModuleList;
+  SYMBOL              *OutdirList;
+  UINT32              Verbose;
+  UINT32              ThreadNumber;
+  UINT32              BuildTarget;
+  BUILD_ITEM          *LibraryList;
+  COMPONENTS_ITEM     *ComponentsList;
 } gGlobals;
 
 //
@@ -584,16 +591,18 @@ Returns:
 
 --*/
 {
-  int       i;
-  DSC_FILE  DSCFile;
-  SECTION   *Sect;
-  INT8      Line[MAX_LINE_LEN];
-  INT8      ExpLine[MAX_LINE_LEN];
-  INT8      *EMsg;
-  FILE      *FpModule;
-  SYMBOL    *TempSymbol;
+  int                   i;
+  DSC_FILE              DSCFile;
+  SECTION               *Sect;
+  INT8                  Line[MAX_LINE_LEN];
+  INT8                  ExpLine[MAX_LINE_LEN];
+  INT8                  *BuildDir;
+  INT8                  *EMsg;
+  FILE                  *FpModule;
+  SYMBOL                *TempSymbol;
+  COMPONENTS_ITEM       *TempComponents;
 
-  SetUtilityName (PROGRAM_NAME);
+  SetUtilityName (UTILITY_NAME);
 
   InitExceptions ();
 
@@ -710,6 +719,7 @@ Returns:
   //
   Sect = DSCFileFindSection (&DSCFile, LIBRARIES_SECTION_NAME);
   if (Sect != NULL) {
+    mCurrentBuildList = &gGlobals.LibraryList;
     ProcessSectionComponents (&DSCFile, DSC_SECTION_TYPE_LIBRARIES, 0);
   }
 
@@ -721,6 +731,7 @@ Returns:
   //
   Sect = DSCFileFindSection (&DSCFile, LIBRARIES_PLATFORM_SECTION_NAME);
   if (Sect != NULL) {
+    mCurrentBuildList = &gGlobals.LibraryList;
     ProcessSectionComponents (&DSCFile, DSC_SECTION_TYPE_PLATFORM_LIBRARIES, 0);
   }
 
@@ -735,6 +746,8 @@ Returns:
   Sect = DSCFileFindSection (&DSCFile, COMPONENTS_SECTION_NAME);
   if (Sect != NULL) {
     fprintf (gGlobals.MakefileFptr, "components_0 : \n");
+    TempComponents    = AddComponentsItem (&gGlobals.ComponentsList);
+    mCurrentBuildList = &TempComponents->BuildList;
     ProcessSectionComponents (&DSCFile, DSC_SECTION_TYPE_COMPONENTS, 0);
     fprintf (gGlobals.MakefileFptr, "\n");
   }
@@ -754,6 +767,8 @@ Returns:
     Sect = DSCFileFindSection (&DSCFile, Line);
     if (Sect != NULL) {
       fprintf (gGlobals.MakefileFptr, "components_%d : \n", i);
+      TempComponents    = AddComponentsItem (&gGlobals.ComponentsList);
+      mCurrentBuildList = &TempComponents->BuildList;
       ProcessSectionComponents (&DSCFile, DSC_SECTION_TYPE_COMPONENTS, i);
       fprintf (gGlobals.MakefileFptr, "\n");
     } else {
@@ -807,12 +822,52 @@ ProcessingError:
     fclose (gGlobals.ModuleMakefileFptr);
     gGlobals.ModuleMakefileFptr = NULL;
   }
-    
+  
+  //
+  // Start multi-thread build if ThreadNumber is specified and no error status
+  //
+  if ((gGlobals.ThreadNumber != 0) && (GetUtilityStatus () < STATUS_ERROR)) {
+    BuildDir = GetSymbolValue (BUILD_DIR);
+    if (gGlobals.BuildTarget & BUILD_TARGET_LIBRARIES) {
+      if (StartMultiThreadBuild (&gGlobals.LibraryList, gGlobals.ThreadNumber, BuildDir) != 0) {
+        Error (NULL, 0, 0, NULL, "Multi-thread build libraries failure");
+        goto Cleanup;
+      }
+    }
+    i = 0;
+    TempComponents = gGlobals.ComponentsList;
+    while (TempComponents != NULL) {
+      if (gGlobals.BuildTarget & BUILD_TARGET_COMPONENTS) {
+        if (StartMultiThreadBuild (&TempComponents->BuildList, gGlobals.ThreadNumber, BuildDir) != 0) {
+          Error (NULL, 0, 0, NULL, "Multi-thread build components %d failure", i);
+          goto Cleanup;
+        }
+      }
+      if (gGlobals.BuildTarget & BUILD_TARGET_FVS) {
+        sprintf (ExpLine, "nmake -nologo -f %s fvs_%d", gGlobals.MakefileName, i);
+        _flushall ();
+        if (system (ExpLine)) {
+          Error (NULL, 0, 0, NULL, "Build FVs for components %d failure", i);
+          goto Cleanup;
+        }
+      }
+      i++;
+      TempComponents = TempComponents->Next;
+    }
+  }
+
+Cleanup:    
   //
   // Clean up
   //
+  FreeBuildList (gGlobals.LibraryList);
+  gGlobals.LibraryList = NULL;
+  FreeComponentsList (gGlobals.ComponentsList);
+  gGlobals.ComponentsList = NULL;
   FreeSymbols (gGlobals.ModuleList);
+  gGlobals.ModuleList = NULL;
   FreeSymbols (gGlobals.OutdirList);
+  gGlobals.OutdirList = NULL;
   FreeSymbols (gGlobals.Symbol);
   gGlobals.Symbol = NULL;
   CFVDestructor ();
@@ -1312,6 +1367,16 @@ Returns:
   }
 
   //
+  // Add a new build item to mCurrentBuildList
+  //
+  mCurrentBuildItem = AddBuildItem (mCurrentBuildList, GetSymbolValue (BASE_NAME), Processor, FileName);
+  //
+  // ProcessDsc allows duplicate base name libraries. Make sure the duplicate 
+  // base name libraries will be built in the same order as listed in DSC file.
+  //
+  AddDependency (*mCurrentBuildList, mCurrentBuildItem, mCurrentBuildItem->BaseName, 1);
+
+  //
   // Add Module name to the global module list
   //
   AddModuleName (&gGlobals.ModuleList, GetSymbolValue (BASE_NAME), GetSymbolValue (INF_FILENAME));
@@ -1336,6 +1401,7 @@ Returns:
   // files in this component. This macro can then be used elsewhere to
   // process all the files making up the component. Required for scanning
   // files for string localization.
+  // Also add source files to mCurrentBuildItem.
   //
   ProcessSourceFiles (DSCFile, &ComponentFile, MakeFptr, SOURCE_MODE_SOURCE_FILES);
   //
@@ -1370,7 +1436,8 @@ Returns:
   // Process all the libraries to define "LIBS = x.lib y.lib..."
   // Be generous and append ".lib" if they forgot.
   // Make a macro definition: LIBS = $(LIBS) xlib.lib ylib.lib...
-  // Also add libs dependency for single module build: basenamebuild :: xlibbuild ylibbuild ...
+  // Add libs dependency for single module build: basenamebuild :: xlibbuild ylibbuild ...
+  // Also add libs dependency to mCurrentBuildItem.
   //
   ProcessLibs (&ComponentFile, MakeFptr);
 
@@ -1829,8 +1896,14 @@ Returns:
   OverridePath = GetSymbolValue (SOURCE_OVERRIDE_PATH);
   if (OverridePath != NULL) {
     ReplaceSlash (OverridePath);
+    fprintf (MakeFptr, "!IF EXIST(%s)\n", OverridePath);
     fprintf (MakeFptr, "INC = $(INC) -I %s\n", OverridePath);
-    fprintf (MakeFptr, "INC = $(INC) -I %s\\%s \n", OverridePath, Processor);
+    fprintf (MakeFptr, "!IF EXIST(%s\\%s)\n", OverridePath, Processor);
+    fprintf (MakeFptr, "INC = $(INC) -I %s\\%s\n", OverridePath, Processor);
+    fprintf (MakeFptr, "!ENDIF\n");
+    fprintf (MakeFptr, "!ELSE\n");
+    fprintf (MakeFptr, "!MESSAGE Warning: include dir %s does not exist\n", OverridePath);
+    fprintf (MakeFptr, "!ENDIF\n");
   }
   //
   // Try for an [includes.$(PROCESSOR).$(PLATFORM)]
@@ -1909,43 +1982,45 @@ ProcessIncludesSectionSingle (
           //
           if (Cptr[1] == 0) {
             fprintf (MakeFptr, "INC = $(INC) -I $(SOURCE_DIR)\n");
-            fprintf (
-              MakeFptr,
-              "INC = $(INC) -I $(SOURCE_DIR)\\%s \n",
-              Processor
-              );
+            fprintf (MakeFptr, "!IF EXIST($(SOURCE_DIR)\\%s)\n", Processor);
+            fprintf (MakeFptr, "INC = $(INC) -I $(SOURCE_DIR)\\%s\n", Processor);
+            fprintf (MakeFptr, "!ENDIF\n");
           } else {
             //
             // Handle case of ".\path\path\path" or "..\path\path\path"
             //
-            fprintf (
-              MakeFptr,
-              "INC = $(INC) -I $(SOURCE_DIR)\\%s \n",
-              Cptr
-              );
-            fprintf (
-              MakeFptr,
-              "INC = $(INC) -I $(SOURCE_DIR)\\%s\\%s \n",
-              Cptr,
-              Processor
-              );
+            fprintf (MakeFptr, "!IF EXIST($(SOURCE_DIR)\\%s)\n", Cptr);
+            fprintf (MakeFptr, "INC = $(INC) -I $(SOURCE_DIR)\\%s\n", Cptr);
+            fprintf (MakeFptr, "!IF EXIST($(SOURCE_DIR)\\%s\\%s)\n", Cptr, Processor);
+            fprintf (MakeFptr, "INC = $(INC) -I $(SOURCE_DIR)\\%s\\%s\n", Cptr, Processor);
+            fprintf (MakeFptr, "!ENDIF\n");
+            fprintf (MakeFptr, "!ELSE\n");
+            fprintf (MakeFptr, "!MESSAGE Warning: include dir $(SOURCE_DIR)\\%s does not exist\n", Cptr);
+            fprintf (MakeFptr, "!ENDIF\n");
           }
         } else if ((Cptr[1] != ':') && isalpha (*Cptr)) {
-          fprintf (MakeFptr, "INC = $(INC) -I $(EFI_SOURCE)\\%s \n", Cptr);
-          fprintf (
-            MakeFptr,
-            "INC = $(INC) -I $(EFI_SOURCE)\\%s\\%s \n",
-            Cptr,
-            Processor
-            );
+          fprintf (MakeFptr, "!IF EXIST($(EFI_SOURCE)\\%s)\n", Cptr);
+          fprintf (MakeFptr, "INC = $(INC) -I $(EFI_SOURCE)\\%s\n", Cptr);
+          fprintf (MakeFptr, "!IF EXIST($(EFI_SOURCE)\\%s\\%s)\n", Cptr, Processor);
+          fprintf (MakeFptr, "INC = $(INC) -I $(EFI_SOURCE)\\%s\\%s\n", Cptr, Processor);
+          fprintf (MakeFptr, "!ENDIF\n");
+          fprintf (MakeFptr, "!ELSE\n");
+          fprintf (MakeFptr, "!MESSAGE Warning: include dir $(EFI_SOURCE)\\%s does not exist\n", Cptr);
+          fprintf (MakeFptr, "!ENDIF\n");
         } else {
           //
           // The line is something like: $(EFI_SOURCE)\dxe\include. Add it to
           // the existing $(INC) definition. Add user includes before any
           // other existing paths.
           //
-          fprintf (MakeFptr, "INC = $(INC) -I %s \n", Cptr);
-          fprintf (MakeFptr, "INC = $(INC) -I %s\\%s \n", Cptr, Processor);
+          fprintf (MakeFptr, "!IF EXIST(%s)\n", Cptr);
+          fprintf (MakeFptr, "INC = $(INC) -I %s\n", Cptr);
+          fprintf (MakeFptr, "!IF EXIST(%s\\%s)\n", Cptr, Processor);
+          fprintf (MakeFptr, "INC = $(INC) -I %s\\%s\n", Cptr, Processor);
+          fprintf (MakeFptr, "!ENDIF\n");
+          fprintf (MakeFptr, "!ELSE\n");
+          fprintf (MakeFptr, "!MESSAGE Warning: include dir %s does not exist\n", Cptr);
+          fprintf (MakeFptr, "!ENDIF\n");
         }
       }
     }
@@ -2260,16 +2335,35 @@ ProcessSourceFilesSection (
             // SOURCE_FILES = $(SOURCE_FILES) c:\Path\ThisFile.c
             //
             fprintf (MakeFptr, "SOURCE_FILES = $(SOURCE_FILES) %s\n", TempFileName);
+            //
+            // Save the source absolute path
+            //
+            if (PathCanonicalize (FilePath, TempFileName)) {
+              AddSourceFile (mCurrentBuildItem, FilePath);
+            }
           } else if (IsAbsolutePath (FileName)) {
             //
             // For Absolute path, don't print $(SOURCE_FILE) directory.
             //
             fprintf (MakeFptr, "SOURCE_FILES = $(SOURCE_FILES) %s\n", FileName);
+            //
+            // Save the source absolute path
+            //
+            if (PathCanonicalize (FilePath, FileName)) {
+              AddSourceFile (mCurrentBuildItem, FilePath);
+            }
           } else {
             //
             // SOURCE_FILES = $(SOURCE_FILES) $(SOURCE_DIR)\ThisFile.c
             //
             fprintf (MakeFptr, "SOURCE_FILES = $(SOURCE_FILES) $(SOURCE_DIR)\\%s\n", FileName);
+            //
+            // Save the source absolute path
+            //
+            sprintf (Str, "%s\\%s", GetSymbolValue (SOURCE_DIR), FileName);
+            if (PathCanonicalize (FilePath, Str)) {
+              AddSourceFile (mCurrentBuildItem, FilePath);
+            }
           }
         } else if (Mode & SOURCE_MODE_BUILD_COMMANDS) {
           //
@@ -2612,6 +2706,10 @@ ProcessLibsSingle (
           Cptr[strlen (Cptr) - 4] = 0;
           fprintf (gGlobals.ModuleMakefileFptr, " %sbuild", Cptr);
         }
+        //
+        // Add libs dependency for mCurrentBuildItem 
+        //
+        AddDependency (*mCurrentBuildList, mCurrentBuildItem, Cptr, 0);
       }
     }
   }
@@ -2767,8 +2865,9 @@ ProcessIncludeFilesSingle (
               if (Cptr >= TempFileName) {
                 *Cptr = 0;
               }
-
+              fprintf (MakeFptr, "!IF EXIST(%s)\n", TempFileName);
               fprintf (MakeFptr, "INC = -I %s $(INC)\n", TempFileName);
+              fprintf (MakeFptr, "!ENDIF\n");
             }
           }
           //
@@ -4173,6 +4272,63 @@ Returns:
         }
         break;
 
+      //
+      // Enable multi-thread build and specify the thread number
+      //
+      case 'n':
+      case 'N':
+        //
+        // Skip to next arg
+        //
+        Argc--;
+        Argv++;
+        if (Argc == 0) {
+          Argv--;
+          Error (NULL, 0, 0, Argv[0], "missing input thread number with option");
+          Usage ();
+          return STATUS_ERROR;
+        } else {
+          gGlobals.ThreadNumber = atoi (Argv[0]);
+          if (gGlobals.ThreadNumber == 0) {
+            Argv--;
+            Error (NULL, 0, 0, Argv[0], "input thread number should not be %s", Argv[1]);
+            return STATUS_ERROR;
+          } else if (gGlobals.ThreadNumber > MAXIMUM_WAIT_OBJECTS) {
+            Argv--;
+            Error (NULL, 0, 0, Argv[0], "input thread number should not greater than %d", MAXIMUM_WAIT_OBJECTS);
+            return STATUS_ERROR;
+          }
+        }
+        break;
+
+      //
+      // Specify the multi-thread build target
+      //
+      case 't':
+      case 'T':
+        //
+        // Skip to next arg
+        //
+        Argc--;
+        Argv++;
+        if (Argc == 0) {
+          Argv--;
+          Error (NULL, 0, 0, Argv[0], "missing input build target with option");
+          Usage ();
+          return STATUS_ERROR;
+        } else if (_stricmp (Argv[0], "all") == 0) {
+          gGlobals.BuildTarget |= BUILD_TARGET_ALL;
+        } else if (_stricmp (Argv[0], "libraries") == 0) {
+          gGlobals.BuildTarget |= BUILD_TARGET_LIBRARIES;
+        } else if (_stricmp (Argv[0], "components") == 0) {
+          gGlobals.BuildTarget |= BUILD_TARGET_COMPONENTS;
+        } else {
+          Argv--;
+          Error (NULL, 0, 0, Argv[0], "input build target not supported");
+          Usage ();
+        }
+        break;
+
       case 'v':
       case 'V':
         gGlobals.Verbose = 1;
@@ -4228,7 +4384,14 @@ Returns:
   if (FreeCwd) {
     free (Cptr);
   }
-
+  
+  //
+  // Default build target is all
+  //
+  if (gGlobals.BuildTarget == 0) {
+    gGlobals.BuildTarget = BUILD_TARGET_ALL;
+  }
+  
   return 0;
 }
 
@@ -4426,18 +4589,29 @@ Usage (
   VOID
   )
 {
-  int               i;
-  static const INT8 *Help[] = {
-    "Usage:  ProcessDsc {options} [Dsc Filename]",
-    "    Options:",
-    "       -d var=value        to define symbol 'var' to 'value'",
-    "       -v                  for verbose mode",
-    "       -g filename         to preparse GUID listing file",
-    "       -x filename         to create a cross-reference file",
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel Process DSC File Utility",
+    "  Copyright (C), 2004 - 2008 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
+    "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION]... DSCFILE",
+    "Options:",
+    "  -d var=value        to define symbol 'var' to 'value'",
+    "  -v                  for verbose mode",
+    "  -g filename         to preparse GUID listing file",
+    "  -x filename         to create a cross-reference file",
+    "  -n threadnumber     to build with multi-thread",
+    "  -t target           to build the specified target:",
+    "                      all, libraries or components",
     NULL
   };
-  for (i = 0; Help[i] != NULL; i++) {
-    fprintf (stdout, "%s\n", Help[i]);
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
   }
 }
 
@@ -4562,7 +4736,7 @@ SmartOpen (
     if (SmartFile->FileContent != NULL) {
       memset (SmartFile->FileContent, 0, FileSize + 1);
       //
-      // Usually FileLength < FileSize, because in text mode, carriage return-linefeed
+      // Usually FileLength < FileSize, because in text mode, carriage return¨Clinefeed
       // combinations are translated into single linefeeds on input
       //       
       SmartFile->FileLength = fread (SmartFile->FileContent, sizeof(char), FileSize, Fptr);

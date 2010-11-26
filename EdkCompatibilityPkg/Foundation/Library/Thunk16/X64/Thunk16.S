@@ -1,6 +1,6 @@
 #*****************************************************************************
 #*
-#*   Copyright (c) 2008 - 2009, Intel Corporation. All rights reserved.<BR>
+#*   Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
 #*   This program and the accompanying materials                          
 #*   are licensed and made available under the terms and conditions of the BSD License         
 #*   which accompanies this distribution.  The full text of the license may be found at        
@@ -106,6 +106,9 @@ ASM_PFX(Thunk16):
       pushq  $0xe                       #push    sizeof (IA32_REGS) / 4
       pop    %rcx
       rep movsl %ds:(%rsi),%es:(%rdi)
+      #; copy eflags to stack frame
+      mov    -16(%rsi), %rax
+      mov    %rax, -80(%rsi)
       pop    %rbx                       #rbx <- 16-bit stack offset
       lea    Label,%eax                 #42 <_Thunk16+0x42>
       stos   %eax,%es:(%rdi)
@@ -183,27 +186,30 @@ ASM_PFX(RealMode):
    .byte   0x07                        #pop es
     popq   %fs
     popq   %gs
-    add    $0x8,%esp                   #skip RFLAGS
-   .byte   0x67                        #test [esp + 0eh], 1
+    sub    64, %esp
+    .byte  0x66, 0x9d                  #popfd
+    add    $0x4,%esp                   #skip high part of RFLAGS
+   .byte   0x67                        #; test    (_STK16 ptr [esp + STACK_PARAM_SIZE + sizeof(IA32_REGS)]).ThunkFlags, 1
    .byte   0xf7    
    .byte   0x44
    .byte   0x24
-   .byte   0x0e
+   .byte   0x4e
    .byte   0x01
    .byte   0x00
     jz      1f
-    pushfq                             #pushf, actually
+    pushfq                             #pushf, actually, when it's INT#
 1:
    .byte   0x0e                        #push cs
    .byte   0x68                        #push /iw
    .word   FarCallRet - _Code16Addr
     jz     2f
    .byte   0x66
-    ljmp   *6(%esp)
+    ljmp   *70(%esp)
 2:    
    .byte   0x66
-    ljmp   *4(%esp)
+    ljmp   *68(%esp)
 FarCallRet: 
+    add    64, %esp
    .byte   0x66
     push   $0x00                       #push a dword of zero
    .byte   0x66

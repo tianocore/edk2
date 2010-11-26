@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -54,6 +54,8 @@ EFI_STATUS
   Routine Description:
     This function adds the string String to the group of strings owned by PackageList, with the
     specified font information StringFontInfo and returns a new string id.                         
+    The new string identifier is guaranteed to be unique within the package list. 
+    That new string identifier is reserved for all languages in the package list. 
     
   Arguments:          
     This              - A pointer to the EFI_HII_STRING_PROTOCOL instance.
@@ -104,13 +106,19 @@ EFI_STATUS
     String            - Points to the new null-terminated string.            
     StringSize        - On entry, points to the size of the buffer pointed to by 
                         String, in bytes. On return,
-                        points to the length of the string, in bytes.                                                                                             
-    StringFontInfo    - If not NULL, points to the string's font information. 
-                        It's caller's responsibility to free this buffer.
+                        points to the length of the string, in bytes.
+    StringFontInfo    - Points to a buffer that will be callee allocated and will 
+                        have the string's font information into this buffer.  
+                        The caller is responsible for freeing this buffer.  
+                        If the parameter is NULL a buffer will not be allocated 
+                        and the string font information will not be returned.
 
   Returns:
     EFI_SUCCESS            - The string was returned successfully.
     EFI_NOT_FOUND          - The string specified by StringId is not available.
+                             The specified PackageList is not in the database.
+    EFI_INVALID_LANGUAGE   - The string specified by StringId is available but
+                             not in the specified language.                             
     EFI_BUFFER_TOO_SMALL   - The buffer specified by StringSize is too small to 
                              hold the string.                                                      
     EFI_INVALID_PARAMETER  - The String or Language or StringSize was NULL.
@@ -147,7 +155,8 @@ EFI_STATUS
 
   Returns:
     EFI_SUCCESS            - The string was updated successfully.
-    EFI_NOT_FOUND          - The string specified by StringId is not in the database.    
+    EFI_NOT_FOUND          - The string specified by StringId is not in the database.
+                             The specified PackageList is not in the database.
     EFI_INVALID_PARAMETER  - The String or Language was NULL.
     EFI_OUT_OF_RESOURCES   - The system is out of resources to accomplish the task.
     
@@ -182,6 +191,7 @@ EFI_STATUS
     EFI_BUFFER_TOO_SMALL   - The LanguagesSize is too small to hold the list of 
                              supported languages. LanguageSize is updated to
                              contain the required size.
+    EFI_NOT_FOUND          - The specified PackageList is not in the database.
     
 --*/
 ;
@@ -220,9 +230,12 @@ EFI_STATUS
     EFI_BUFFER_TOO_SMALL   - The buffer specified by SecondLanguagesSize is   
                              too small to hold the returned information.      
                              SecondLanguageSize is updated to hold the size of
-                             the buffer required.                             
-                             
---*/                         
+                             the buffer required.
+    EFI_INVALID_LANGUAGE   - The language specified by FirstLanguage is not
+                             present in the specified package list.
+    EFI_NOT_FOUND          - The specified PackageList is not in the Database.    
+    
+--*/
 ;
 //
 // Interface structure for the EFI_HII_STRING_PROTOCOL

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -220,7 +220,7 @@ Returns:
   //
   if (GetUtilityStatus () != STATUS_ERROR) {
     if ((IfrBinFptr = fopen (gOptions.IfrOutputFileName, "w")) == NULL) {
-      Error (PROGRAM_NAME, 0, 0, gOptions.IfrOutputFileName, "could not open file for writing");
+      Error (UTILITY_NAME, 0, 0, gOptions.IfrOutputFileName, "could not open file for writing");
       return;
     }
     //
@@ -290,7 +290,7 @@ Returns:
       strcat (gOptions.IfrOutputFileName, ".hpk");
     }
     if ((IfrBinFptr = fopen (gOptions.IfrOutputFileName, "wb")) == NULL) {
-      Error (PROGRAM_NAME, 0, 0, gOptions.IfrOutputFileName, "could not open file for writing");
+      Error (UTILITY_NAME, 0, 0, gOptions.IfrOutputFileName, "could not open file for writing");
       return;
     }
     //
@@ -329,10 +329,10 @@ Returns:
     // Open the input VFR file and the output list file
     //
     if ((InFptr = fopen (gOptions.PreprocessorOutputFileName, "r")) == NULL) {
-      Warning (PROGRAM_NAME, 0, 0, gOptions.PreprocessorOutputFileName, "could not open file for creating a list file");
+      Warning (UTILITY_NAME, 0, 0, gOptions.PreprocessorOutputFileName, "could not open file for creating a list file");
     } else {
       if ((OutFptr = fopen (gOptions.VfrListFileName, "w")) == NULL) {
-        Warning (PROGRAM_NAME, 0, 0, gOptions.VfrListFileName, "could not open output list file for writing");
+        Warning (UTILITY_NAME, 0, 0, gOptions.VfrListFileName, "could not open output list file for writing");
         fclose (InFptr);
         InFptr = NULL;
       } else {
@@ -350,7 +350,7 @@ Returns:
     //
     // Write out the VFR compiler version
     //
-    fprintf (OutFptr, "//\n//  VFR compiler version " VFR_COMPILER_VERSION "\n//\n");
+    fprintf (OutFptr, "//\n//  VFR compiler version " UTILITY_VERSION "\n//\n");
     Curr = mIfrBytes;
     while (Curr != NULL) {
       //
@@ -590,7 +590,7 @@ Returns:
   // Check for buffer overflow
   //
   if (mQueuedByteCount >= MAX_QUEUE_COUNT) {
-    Error (PROGRAM_NAME, 0, 0, NULL, "opcode queue overflow");
+    Error (UTILITY_NAME, 0, 0, NULL, "opcode queue overflow");
   } else {
     mQueuedBytes[mQueuedByteCount]    = ByteVal;
     mQueuedKeyBytes[mQueuedByteCount] = KeyByte;
@@ -750,5 +750,5 @@ Returns:
   //
   // Write out the VFR compiler version
   //
-  fprintf (OutFptr, "//  VFR compiler version " VFR_COMPILER_VERSION "\n//\n");
+  fprintf (OutFptr, "//  VFR compiler version " UTILITY_VERSION "\n//\n");
 }

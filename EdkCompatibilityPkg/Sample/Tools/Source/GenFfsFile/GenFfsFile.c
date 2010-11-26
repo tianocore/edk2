@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -43,7 +43,7 @@ Abstract:
 #include "SimpleFileParsing.h"
 
 #define UTILITY_NAME    "GenFfsFile"
-#define TOOLVERSION     "0.32"
+#define UTILITY_VERSION "v1.1"
 #define MAX_ARRAY_SIZE  100
 
 static
@@ -123,6 +123,7 @@ static struct {
   UINT8   BuildDirectory[_MAX_PATH];
   UINT8   PrimaryPackagePath[_MAX_PATH];
   UINT8   OverridePackagePath[_MAX_PATH];
+  UINT8   OutputFilePath[_MAX_PATH];
   BOOLEAN Verbose;
   MACRO   *MacroList;
 } mGlobals;
@@ -187,22 +188,33 @@ Returns:
 
 --*/
 {
-  printf ("Usage:\n");
-  printf (UTILITY_NAME " -b \"build directory\" -p1 \"package1.inf\" -p2 \"package2.inf\"\n");
-  printf ("           -d \"name=value\" -v\n");
-  printf ("   -b \"build directory\":\n");
-  printf ("       specifies the full path to the component build directory.\n");
-  printf ("   -p1 \"P1_path\":\n");
-  printf ("       specifies fully qualified file name to the primary package file.\n");
-  printf ("       This file will normally exist in the same directory as the makefile\n");
-  printf ("       for the component. Required.\n");
-  printf ("   -p2 \"P2_path\":\n");
-  printf ("       specifies fully qualified file name to the override package file.\n");
-  printf ("       This file will normally exist in the build tip. Optional.\n");
-  printf ("   -d \"name=value\":\n");
-  printf ("       add a macro definition for package file. Optional.\n");
-  printf ("   -v :\n");
-  printf ("       verbose. Optional.\n");
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel Generate FFS File Utility",
+    "  Copyright (C), 2004 - 2009 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
+    "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION]...",
+    "Options:",
+    "  -b BuildDirectory  Specifies the full path to the component build directory",
+    "  -p1 P1Path         Specifies fully qualified file name to the primary package",
+    "                     file. This file will normally exist in the same directory",
+    "                     as the makefile for the component. Required.",
+    "  -p2 P2Path         Specifies fully qualified file name to the override",
+    "                     package. This file will normally exist in the build tip.",
+    "                     Optional.",
+    "  -d Name=Value      Add a macro definition for the package file. Optional.",
+    "  -o OutputFile      Specifies the file name of output file. Optional.",
+    "  -v                 Verbose. Optional.",
+    NULL
+  };
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
+  }
 }
 
 static
@@ -2160,54 +2172,64 @@ here:
       StripQuotes (BaseName);
     }
 
-    if (BaseName[0] != 0) {
-      sprintf (InputString, "%s-%s", GuidString, BaseName);
+    if (mGlobals.OutputFilePath[0]) {
+      //
+      // Use user specified output file name
+      //
+      strcpy (InputString, mGlobals.OutputFilePath);
     } else {
-      strcpy (InputString, GuidString);
-    }
+      //
+      // Construct the output file name according to FileType
+      //
+      if (BaseName[0] != 0) {
+        sprintf (InputString, "%s-%s", GuidString, BaseName);
+      } else {
+        strcpy (InputString, GuidString);
+      }
 
-    switch (StringToType (FileType)) {
+      switch (StringToType (FileType)) {
 
-    case EFI_FV_FILETYPE_SECURITY_CORE:
-      strcat (InputString, ".SEC");
-      break;
+      case EFI_FV_FILETYPE_SECURITY_CORE:
+        strcat (InputString, ".SEC");
+        break;
 
-    case EFI_FV_FILETYPE_PEIM:
-    case EFI_FV_FILETYPE_PEI_CORE:
-    case EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER:
-      strcat (InputString, ".PEI");
-      break;
+      case EFI_FV_FILETYPE_PEIM:
+      case EFI_FV_FILETYPE_PEI_CORE:
+      case EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER:
+        strcat (InputString, ".PEI");
+        break;
 
-    case EFI_FV_FILETYPE_DRIVER:
-    case EFI_FV_FILETYPE_DXE_CORE:
-      strcat (InputString, ".DXE");
-      break;
+      case EFI_FV_FILETYPE_DRIVER:
+      case EFI_FV_FILETYPE_DXE_CORE:
+        strcat (InputString, ".DXE");
+        break;
 
-    case EFI_FV_FILETYPE_APPLICATION:
-      strcat (InputString, ".APP");
-      break;
+      case EFI_FV_FILETYPE_APPLICATION:
+        strcat (InputString, ".APP");
+        break;
 
-    case EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE:
-      strcat (InputString, ".FVI");
-      break;
+      case EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE:
+        strcat (InputString, ".FVI");
+        break;
 
-    case EFI_FV_FILETYPE_RAW:
-      strcat (InputString, ".RAW");
-      break;
+      case EFI_FV_FILETYPE_RAW:
+        strcat (InputString, ".RAW");
+        break;
 
-    case EFI_FV_FILETYPE_ALL:
-      Error (mGlobals.OverridePackagePath, 1, 0, "invalid FFS file type for this utility", NULL);
-      goto Done;
+      case EFI_FV_FILETYPE_ALL:
+        Error (mGlobals.OverridePackagePath, 1, 0, "invalid FFS file type for this utility", NULL);
+        goto Done;
 
-    default:
-      strcat (InputString, ".FFS");
-      break;
+      default:
+        strcat (InputString, ".FFS");
+        break;
+      }
     }
 
     if (ForceUncompress) {
       strcat (InputString, ".ORG");
     }
-
+	
     Out = fopen (InputString, "wb");
     if (Out == NULL) {
       Error (NULL, 0, 0, InputString, "could not open output file for writing");
@@ -2242,7 +2264,11 @@ here:
                                                   sizeof (EFI_FFS_FILE_HEADER)
                                                   );
     if (FileHeader.Attributes & FFS_ATTRIB_CHECKSUM) {
+#if (PI_SPECIFICATION_VERSION < 0x00010000)  
       FileHeader.IntegrityCheck.Checksum.File = CalculateChecksum8 ((UINT8 *) &FileHeader, FileSize);
+#else
+      FileHeader.IntegrityCheck.Checksum.File = CalculateChecksum8 ((UINT8 *) ((UINTN)&FileHeader + sizeof (EFI_FFS_FILE_HEADER)), FileSize - sizeof (EFI_FFS_FILE_HEADER));
+#endif
     } else {
       FileHeader.IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;
     }
@@ -2307,48 +2333,58 @@ here:
       StripQuotes (BaseName);
     }
 
-    if (BaseName[0] != 0) {
-      sprintf (InputString, "%s-%s", GuidString, BaseName);
+    if (mGlobals.OutputFilePath[0]) {
+      //
+      // Use user specified output file name
+      //
+      strcpy (InputString, mGlobals.OutputFilePath);
     } else {
-      strcpy (InputString, GuidString);
-    }
+      //
+      // Construct the output file name according to FileType
+      //
+      if (BaseName[0] != 0) {
+        sprintf (InputString, "%s-%s", GuidString, BaseName);
+      } else {
+        strcpy (InputString, GuidString);
+      }
 
-    switch (StringToType (FileType)) {
+      switch (StringToType (FileType)) {
 
-    case EFI_FV_FILETYPE_SECURITY_CORE:
-      strcat (InputString, ".SEC");
-      break;
+      case EFI_FV_FILETYPE_SECURITY_CORE:
+        strcat (InputString, ".SEC");
+        break;
 
-    case EFI_FV_FILETYPE_PEIM:
-    case EFI_FV_FILETYPE_PEI_CORE:
-    case EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER:
-      strcat (InputString, ".PEI");
-      break;
+      case EFI_FV_FILETYPE_PEIM:
+      case EFI_FV_FILETYPE_PEI_CORE:
+      case EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER:
+        strcat (InputString, ".PEI");
+        break;
 
-    case EFI_FV_FILETYPE_DRIVER:
-    case EFI_FV_FILETYPE_DXE_CORE:
-      strcat (InputString, ".DXE");
-      break;
+      case EFI_FV_FILETYPE_DRIVER:
+      case EFI_FV_FILETYPE_DXE_CORE:
+        strcat (InputString, ".DXE");
+        break;
 
-    case EFI_FV_FILETYPE_APPLICATION:
-      strcat (InputString, ".APP");
-      break;
+      case EFI_FV_FILETYPE_APPLICATION:
+        strcat (InputString, ".APP");
+        break;
 
-    case EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE:
-      strcat (InputString, ".FVI");
-      break;
+      case EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE:
+        strcat (InputString, ".FVI");
+        break;
 
-    case EFI_FV_FILETYPE_RAW:
-      strcat (InputString, ".RAW");
-      break;
+      case EFI_FV_FILETYPE_RAW:
+        strcat (InputString, ".RAW");
+        break;
 
-    case EFI_FV_FILETYPE_ALL:
-      Error (mGlobals.PrimaryPackagePath, 1, 0, "invalid FFS file type for this utility", NULL);
-      goto Done;
+      case EFI_FV_FILETYPE_ALL:
+        Error (mGlobals.PrimaryPackagePath, 1, 0, "invalid FFS file type for this utility", NULL);
+        goto Done;
 
-    default:
-      strcat (InputString, ".FFS");
-      break;
+      default:
+        strcat (InputString, ".FFS");
+        break;
+      }
     }
 
     if (ForceUncompress) {
@@ -2622,6 +2658,23 @@ Returns:
       }
       
       OriginalOverridePackagePath = Argv[1];
+      Argc--;
+      Argv++;
+    } else if (_strcmpi (Argv[0], "-o") == 0) {
+      //
+      // OPTION: -o OutputFilePath
+      // Make sure there is another argument, then save it to out globals.
+      //
+      if (Argc < 2) {
+        Error (NULL, 0, 0, Argv[0], "option requires the output file name");
+        return STATUS_ERROR;
+      }
+      if (mGlobals.OutputFilePath[0]) {
+        Error (NULL, 0, 0, Argv[0], "option can only be specified once");
+        return STATUS_ERROR;
+      }
+
+      strcpy (mGlobals.OutputFilePath, Argv[1]);
       Argc--;
       Argv++;
     } else if (_strcmpi (Argv[0], "-v") == 0) {

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 1999 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -33,7 +33,7 @@ Abstract:
 // Version of this utility
 //
 #define UTILITY_NAME    "GenTEImage"
-#define UTILITY_VERSION "v0.11"
+#define UTILITY_VERSION "v1.0"
 
 //
 // Define the max length of a filename
@@ -767,23 +767,28 @@ Returns:
 
 --*/
 {
-  int               Index;
-  static const char *Msg[] = {
-    UTILITY_NAME " version "UTILITY_VERSION " - TE image utility",
-    "  Generate a TE image from an EFI PE32 image",
-    "  Usage: "UTILITY_NAME " {-v} {-dump} {-h|-?} {-o OutFileName} InFileName",
-    "                [-e|-b] [FileName(s)]",
-    "    where:",
-    "      -v             - for verbose output",
-    "      -dump          - to dump the input file to a text file",
-    "      -h -?          - for this help information",
-    "      -o OutFileName - to write output to OutFileName rather than InFileName"DEFAULT_OUTPUT_EXTENSION,
-    "      InFileName     - name of the input PE32 file",
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel Generate TE Image Utility",
+    "  Copyright (C), 1999 - 2008 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
     "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION]... PE32IMAGE",
+    "Description:",
+    "  Generate a TE image from an EFI PE32 image.",
+    "Options:",
+    "  -v             - for verbose output",
+    "  -dump          - to dump the input file to a text file",
+    "  -h -?          - for this help information",
+    "  -o OutFileName - to write output to OutFileName rather than PE32IMAGE"DEFAULT_OUTPUT_EXTENSION,
     NULL
   };
-  for (Index = 0; Msg[Index] != NULL; Index++) {
-    fprintf (stdout, "%s\n", Msg[Index]);
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
   }
 }
 

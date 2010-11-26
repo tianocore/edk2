@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -2559,13 +2559,15 @@ ExportPackOut:
 
 STATUS
 StringDBCreateHiiExportPack (
-  INT8                        *FileName
+  INT8                        *FileName,
+  WCHAR_STRING_LIST           *LanguagesOfInterest
   )
 {
-  FILE                            *File       = NULL;
-  LANGUAGE_LIST                   *Lang       = NULL;
-  EFI_HII_STRING_PACKAGE_HDR      *StrPkgHdr  = NULL;
-  SPkgBlkBuffer                   *BlkList    = NULL;
+  FILE                            *File;
+  LANGUAGE_LIST                   *Lang;
+  EFI_HII_STRING_PACKAGE_HDR      *StrPkgHdr;
+  SPkgBlkBuffer                   *BlkList;
+  WCHAR_STRING_LIST               *LOIPtr;
 
   if (FileName == NULL) {
     return STATUS_ERROR;
@@ -2577,18 +2579,26 @@ StringDBCreateHiiExportPack (
   }
 
   for (Lang = mDBData.LanguageList; Lang != NULL; Lang = Lang->Next) {
-    if (StringDBGenStrPkgHdrAndBlkList(Lang, &StrPkgHdr, &BlkList) != STATUS_SUCCESS) {
-      fclose (File);
-      return STATUS_SUCCESS;
+    for (LOIPtr = LanguagesOfInterest; LOIPtr != NULL; LOIPtr = LOIPtr->Next) {
+      if (wcscmp (LOIPtr->Str, Lang->LanguageName) == 0) {
+        break;
+      }
     }
 
-    StrPkgWriteHdrBinary (File, StrPkgHdr);
-    StrPkgWriteBlkListBinary (File, BlkList);
+    if ((LanguagesOfInterest == NULL) ||
+        (LanguagesOfInterest != NULL && LOIPtr != NULL)) {
+      if (StringDBGenStrPkgHdrAndBlkList(Lang, &StrPkgHdr, &BlkList) != STATUS_SUCCESS) {
+        fclose (File);
+        return STATUS_SUCCESS;
+      }
 
-    StrPkgHdrFree (StrPkgHdr);
-    StrPkgBlkBufferListFree (BlkList);
+      StrPkgWriteHdrBinary (File, StrPkgHdr);
+      StrPkgWriteBlkListBinary (File, BlkList);
+
+      StrPkgHdrFree (StrPkgHdr);
+      StrPkgBlkBufferListFree (BlkList);
+    }
   }
-
   fclose (File);
   return STATUS_SUCCESS;
 }
@@ -2605,16 +2615,18 @@ static const char *gSourceFileHeader[] = {
 STATUS
 StringDBDumpCStrings (
   INT8                            *BaseName,
-  INT8                            *FileName
+  INT8                            *FileName,
+  WCHAR_STRING_LIST               *LanguagesOfInterest
   )
 {
   EFI_STATUS                      Status;
-  FILE                            *File       = NULL;
-  LANGUAGE_LIST                   *Lang       = NULL;
-  EFI_HII_STRING_PACKAGE_HDR      **StrPkgHdr = NULL;
-  SPkgBlkBuffer                   **BlkList   = NULL;
+  FILE                            *File;
+  LANGUAGE_LIST                   *Lang;
+  EFI_HII_STRING_PACKAGE_HDR      **StrPkgHdr;
+  SPkgBlkBuffer                   **BlkList;
   UINT32                          Index;
-  UINT32                          LangNumber  = 0;
+  UINT32                          LangNumber;
+  WCHAR_STRING_LIST               *LOIPtr;
 
   if ((BaseName == NULL) || (FileName == NULL)) {
     return STATUS_ERROR;
@@ -2631,14 +2643,36 @@ StringDBDumpCStrings (
   BlkList = (SPkgBlkBuffer **) malloc (sizeof (SPkgBlkBuffer *) * LangNumber);
   for (Index = 0; Index < LangNumber; Index++) {
     StrPkgHdr[Index] = NULL;
-    BlkList[Index] = NULL;
+    BlkList[Index]   = NULL;
   }
 
-  for (Index = 0, Lang = mDBData.LanguageList; Lang != NULL; Lang = Lang->Next, Index++) {
-    Status = StringDBGenStrPkgHdrAndBlkList(Lang, &StrPkgHdr[Index], &BlkList[Index]);
-    if (EFI_ERROR(Status)) {
-      return Status;
+  for (Index = 0, Lang = mDBData.LanguageList; Lang != NULL; Lang = Lang->Next) {
+    for (LOIPtr = LanguagesOfInterest; LOIPtr != NULL; LOIPtr = LOIPtr->Next) {
+      if (wcscmp (LOIPtr->Str, Lang->LanguageName) == 0) {
+        break;
+      }
     }
+    if ((LanguagesOfInterest == NULL) ||
+        (LanguagesOfInterest != NULL && LOIPtr != NULL)) {
+      Status = StringDBGenStrPkgHdrAndBlkList(Lang, &StrPkgHdr[Index], &BlkList[Index]);
+      Index++;
+      if (EFI_ERROR(Status)) {
+        free (StrPkgHdr);
+        free (BlkList);
+        return STATUS_ERROR;
+      }
+    }
+  }
+
+  //
+  // Update LangNumber after filter
+  //
+  LangNumber = Index;
+
+  if (LangNumber == 0) {
+    free (StrPkgHdr);
+    free (BlkList);
+    return STATUS_SUCCESS;
   }
 
   if ((File = fopen (FileName, "w")) == NULL) {
@@ -2657,11 +2691,9 @@ StringDBDumpCStrings (
   //
   StrPkgWirteArrayLength (File, LangNumber, StrPkgHdr);
 
-  for (Index = 0, Lang = mDBData.LanguageList; Lang != NULL; Lang = Lang->Next, Index++) {
-    if (StrPkgHdr[Index] != NULL) {
-      StrPkgWriteHdrCFile (File, StrPkgHdr[Index]);
-      StrPkgWriteBlkListCFile (File, BlkList[Index], (Lang->Next == NULL) ? TRUE : FALSE);
-    }
+  for (Index = 0; Index < LangNumber; Index++) {
+    StrPkgWriteHdrCFile (File, StrPkgHdr[Index]);
+    StrPkgWriteBlkListCFile (File, BlkList[Index], (Index == LangNumber - 1) ? TRUE : FALSE);
 
     StrPkgHdrFree (StrPkgHdr[Index]);
     StrPkgBlkBufferListFree (BlkList[Index]);
@@ -2670,5 +2702,7 @@ StringDBDumpCStrings (
   fprintf (File, "\n};\n");
 
   fclose (File);
+  free (StrPkgHdr);
+  free (BlkList);
   return STATUS_SUCCESS;
 }

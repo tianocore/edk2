@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -50,11 +50,10 @@ typedef enum {
 } EFI_PEI_PCI_CFG_PPI_WIDTH;
 
 #define EFI_PEI_PCI_CFG_ADDRESS(bus, dev, func, reg)   \
-            (   ((bus) << 24)  | \
-                ((dev) << 16)  | \
-                ((func) << 8)  | \
-                ((reg) < 256 ? (reg): ((UINT64)(reg) << 32))) 
-
+      (UINT64) ((((UINTN) (bus)) << 24) | \
+                (((UINTN) (dev)) << 16) | \
+                (((UINTN) (func)) << 8) | \
+                ((reg) < 256 ? ((UINTN) (reg)): ((UINT64) (reg) << 32)))
 
 #if (PI_SPECIFICATION_VERSION < 0x00010000)
 

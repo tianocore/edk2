@@ -33,19 +33,5 @@ Abstract:
 #include "EfiApi.h"
 #include "EfiDevicePath.h"
 
-//
-// Check to make sure EFI_SPECIFICATION_VERSION and TIANO_RELEASE_VERSION are defined.
-//
-#if !defined(EFI_SPECIFICATION_VERSION)
-  #error EFI_SPECIFICATION_VERSION not defined
-#elif !defined(TIANO_RELEASE_VERSION)
-  #error TIANO_RELEASE_VERSION not defined
-#elif (TIANO_RELEASE_VERSION == 0)
-//
-// UEFI mode with no Tiano extensions is legal
-//
-#elif ((TIANO_RELEASE_VERSION < 0x00080005) && (EFI_SPECIFICATION_VERSION >= 0x00020000))
-  #error Illegal combination of EFI_SPECIFICATION_VERSION and TIANO_RELEASE_VERSION versions
-#endif
 
 #endif

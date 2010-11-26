@@ -83,20 +83,15 @@ ProcessLibraryConstructorList (
 //       here
 //
 // UefiBootServicesTableLib     UefiBootServicesTableLibConstructor()
+// UefiRuntimeServicesTableLib  UefiRuntimeServicesTableLibConstructor() 
+// DxeServicesTableLib          DxeServicesTableLibConstructor()
 // DxeIoLibCpuIo                IoLibConstructor 
+// SmmRuntimeDxeReportStatusCodeLib ReportStatusCodeLibConstruct()
 // DxeHobLib                    HobLibConstructor()
 // DxeSmbusLib                  SmbusLibConstructor()    
-// DxeServicesTableLib          DxeServicesTableLibConstructor()
-// UefiRuntimeServicesTableLib  UefiRuntimeServicesTableLibConstructor() 
-// SmmRuntimeDxeReportStatusCodeLib ReportStatusCodeLibConstruct()
-// check here: check lib usage
+
 #ifdef __EDKII_GLUE_UEFI_BOOT_SERVICES_TABLE_LIB__
   Status = UefiBootServicesTableLibConstructor (ImageHandle, SystemTable);
-  ASSERT_EFI_ERROR (Status);
-#endif
-
-#ifdef __EDKII_GLUE_DXE_IO_LIB_CPU_IO__
-  Status = IoLibConstructor (ImageHandle, SystemTable);
   ASSERT_EFI_ERROR (Status);
 #endif
 
@@ -108,6 +103,11 @@ ProcessLibraryConstructorList (
 #ifdef __EDKII_GLUE_DXE_SERVICES_TABLE_LIB__
   Status = DxeServicesTableLibConstructor (ImageHandle, SystemTable);
   ASSERT_EFI_ERROR (Status); 
+#endif
+
+#ifdef __EDKII_GLUE_DXE_IO_LIB_CPU_IO__
+  Status = IoLibConstructor (ImageHandle, SystemTable);
+  ASSERT_EFI_ERROR (Status);
 #endif
 
 #ifdef __EDKII_GLUE_SMM_RUNTIME_DXE_REPORT_STATUS_CODE_LIB__
@@ -321,14 +321,26 @@ _ModuleEntryPoint (
   EFI_HANDLE                 Handle;
 
   //
-  // Call constructor for all libraries
-  //
-  ProcessLibraryConstructorList (ImageHandle, SystemTable);
-
-  //
   // Cache a pointer to the Boot Services Table 
   //
   mBS = SystemTable->BootServices;
+
+  //
+  // Initialize gBS as ASSERT needs it
+  // Both DxeReportStatusCodeLib and SmmRuntimeDxeReportStatusCodeLib implementations
+  // Can handle this cleanly before lib constructors are called.
+  //
+  gBS = mBS;
+
+  //
+  // Retrieve the Loaded Image Protocol
+  //
+  Status = mBS->HandleProtocol (
+                  ImageHandle, 
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID*)&LoadedImage
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Retrieve SMM Base Protocol
@@ -350,27 +362,6 @@ _ModuleEntryPoint (
   //
   if (!InSmm) {
     //
-    // Retrieve the Loaded Image Protocol
-    //
-    Status = mBS->HandleProtocol (
-                    ImageHandle, 
-                    &gEfiLoadedImageProtocolGuid,
-                    (VOID*)&LoadedImage
-                    );
-    ASSERT_EFI_ERROR (Status);
-
-    //
-    // Install the unload handler
-    //
-    Status = mBS->HandleProtocol (
-                      ImageHandle,
-                      &gEfiLoadedImageProtocolGuid,
-                      (VOID **)&LoadedImage
-                      );
-    ASSERT_EFI_ERROR (Status);
-    LoadedImage->Unload = _DriverUnloadHandler;
-
-    //
     // Retrieve the Device Path Protocol from the DeviceHandle tha this driver was loaded from
     //
     Status = mBS->HandleProtocol (
@@ -391,17 +382,33 @@ _ModuleEntryPoint (
     //
     Status = SmmBase->Register (SmmBase, CompleteFilePath, NULL, 0, &Handle, FALSE);
     ASSERT_EFI_ERROR (Status);
-  } else {
-
-    //
-    // Call the list of driver entry points
-    //
-    #ifdef __EDKII_GLUE_MODULE_ENTRY_POINT__
-    Status = (__EDKII_GLUE_MODULE_ENTRY_POINT__ (ImageHandle, SystemTable));
-    #else
-    Status = EFI_SUCCESS;
-    #endif
+    return Status;
   }
+
+  //
+  // Call constructor for all libraries
+  //
+  ProcessLibraryConstructorList (ImageHandle, SystemTable);
+
+  //
+  // Install the unload handler
+  //
+  Status = mBS->HandleProtocol (
+                    ImageHandle,
+                    &gEfiLoadedImageProtocolGuid,
+                    (VOID **)&LoadedImage
+                    );
+  ASSERT_EFI_ERROR (Status);
+  LoadedImage->Unload = _DriverUnloadHandler;
+
+  //
+  // Call the list of driver entry points
+  //
+  #ifdef __EDKII_GLUE_MODULE_ENTRY_POINT__
+  Status = (__EDKII_GLUE_MODULE_ENTRY_POINT__ (ImageHandle, SystemTable));
+  #else
+  Status = EFI_SUCCESS;
+  #endif
 
   if (EFI_ERROR (Status)) {
     ProcessLibraryDestructorList (ImageHandle, SystemTable);

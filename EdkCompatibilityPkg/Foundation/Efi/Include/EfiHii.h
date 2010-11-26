@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -59,13 +59,13 @@ typedef struct {
 
 #define EFI_HII_PACKAGE_TYPE_ALL             0x00
 #define EFI_HII_PACKAGE_TYPE_GUID            0x01
-#define EFI_HII_PACKAGE_FORM                 0x02
-#define EFI_HII_PACKAGE_KEYBOARD_LAYOUT      0x03
+#define EFI_HII_PACKAGE_FORMS                0x02
 #define EFI_HII_PACKAGE_STRINGS              0x04
 #define EFI_HII_PACKAGE_FONTS                0x05
 #define EFI_HII_PACKAGE_IMAGES               0x06
 #define EFI_HII_PACKAGE_SIMPLE_FONTS         0x07
 #define EFI_HII_PACKAGE_DEVICE_PATH          0x08
+#define EFI_HII_PACKAGE_KEYBOARD_LAYOUT      0x09
 #define EFI_HII_PACKAGE_END                  0xDF
 #define EFI_HII_PACKAGE_TYPE_SYSTEM_BEGIN    0xE0
 #define EFI_HII_PACKAGE_TYPE_SYSTEM_END      0xFF
@@ -108,6 +108,7 @@ typedef struct _EFI_HII_SIMPLE_FONT_PACKAGE_HDR {
 // Font Package
 //
 
+#define EFI_HII_FONT_STYLE_NORMAL            0x00000000
 #define EFI_HII_FONT_STYLE_BOLD              0x00000001
 #define EFI_HII_FONT_STYLE_ITALIC            0x00000002
 #define EFI_HII_FONT_STYLE_EMBOSS            0x00010000
@@ -237,8 +238,8 @@ typedef struct _EFI_HII_GUID_PACKAGE_HDR {
 // String Package
 //
 
-#define UEFI_CONFIG_LANG  L"x-UEFI"
-#define UEFI_CONFIG_LANG2 L"x-i-UEFI"     // BUGBUG, spec need to be updated.
+#define UEFI_CONFIG_LANG   "x-UEFI"
+#define UEFI_CONFIG_LANG_2 "x-i-UEFI"
 
 typedef struct _EFI_HII_STRING_PACKAGE_HDR {
   EFI_HII_PACKAGE_HEADER  Header;
@@ -697,14 +698,14 @@ typedef struct _EFI_IFR_VARSTORE {
 
 typedef struct _EFI_IFR_VARSTORE_EFI {
   EFI_IFR_OP_HEADER        Header;
-  UINT16                   VarStoreId;
+  EFI_VARSTORE_ID          VarStoreId;
   EFI_GUID                 Guid;
   UINT32                   Attributes;
 } EFI_IFR_VARSTORE_EFI;
 
 typedef struct _EFI_IFR_VARSTORE_NAME_VALUE {
   EFI_IFR_OP_HEADER        Header;
-  UINT16                   VarStoreId;
+  EFI_VARSTORE_ID          VarStoreId;
   EFI_GUID                 Guid;
 } EFI_IFR_VARSTORE_NAME_VALUE;
 
@@ -713,7 +714,12 @@ typedef struct _EFI_IFR_FORM_SET {
   EFI_GUID                 Guid;
   EFI_STRING_ID            FormSetTitle;
   EFI_STRING_ID            Help;
+  UINT8                    Flags;
+  EFI_GUID                 ClassGuid[1];
 } EFI_IFR_FORM_SET;
+
+#define EFI_HII_PLATFORM_SETUP_FORMSET_GUID \
+  { 0x93039971, 0x8545, 0x4b04, { 0xb4, 0x5e, 0x32, 0xeb, 0x83, 0x26, 0x4, 0xe } }
 
 typedef struct _EFI_IFR_END {
   EFI_IFR_OP_HEADER        Header;
@@ -805,7 +811,7 @@ typedef struct _EFI_IFR_REF4 {
 
 typedef struct _EFI_IFR_RESET_BUTTON {
   EFI_IFR_OP_HEADER        Header;
-  EFI_IFR_QUESTION_HEADER  Question;
+  EFI_IFR_STATEMENT_HEADER Statement;
   EFI_DEFAULT_ID           DefaultId;
 } EFI_IFR_RESET_BUTTON;
 
@@ -1273,7 +1279,7 @@ typedef enum {
   EfiKeyB8,
   EfiKeyB9,
   EfiKeyB10,
-  EfiKeyRshift,
+  EfiKeyRShift,
   EfiKeyUpArrow,
   EfiKeyOne,
   EfiKeyTwo,
@@ -1396,16 +1402,16 @@ typedef struct {
   // EFI_HII_KEYBOARD_LAYOUT Layout[];
 } EFI_HII_KEYBOARD_PACKAGE_HDR;
 
-typedef struct {
-  CHAR16                  Language[3];
-  CHAR16                  Space;
-  CHAR16                  DescriptionString[1];
-} EFI_DESCRIPTION_STRING;
+//typedef struct {
+//  CHAR16                  Language[];           // RFC4646 Language Code
+//  CHAR16                  Space;
+//  CHAR16                  DescriptionString[];
+//} EFI_DESCRIPTION_STRING;
 
-typedef struct {
-  UINT16                  DescriptionCount;
-  EFI_DESCRIPTION_STRING  DescriptionString[1];
-} EFI_DESCRIPTION_STRING_BUNDLE;
+//typedef struct {
+//  UINT16                  DescriptionCount;
+//  EFI_DESCRIPTION_STRING  DescriptionString[];
+//} EFI_DESCRIPTION_STRING_BUNDLE;
 
 //
 // Modifier values
@@ -1425,7 +1431,7 @@ typedef struct {
 #define EFI_LEFT_SHIFT_MODIFIER          0x000C
 #define EFI_RIGHT_SHIFT_MODIFIER         0x000D
 #define EFI_CAPS_LOCK_MODIFIER           0x000E
-#define EFI_NUM_LOCK _MODIFIER           0x000F
+#define EFI_NUM_LOCK_MODIFIER            0x000F
 #define EFI_LEFT_ARROW_MODIFIER          0x0010
 #define EFI_RIGHT_ARROW_MODIFIER         0x0011
 #define EFI_DOWN_ARROW_MODIFIER          0x0012
@@ -1457,6 +1463,10 @@ typedef struct {
 #define EFI_SCROLL_LOCK_MODIFIER         0x0024
 #define EFI_PAUSE_MODIFIER               0x0025
 #define EFI_BREAK_MODIFIER               0x0026
+
+#define EFI_LEFT_LOGO_MODIFIER           0x0027
+#define EFI_RIGHT_LOGO_MODIFIER          0x0028
+#define EFI_MENU_MODIFIER                0x0029
 
 #pragma pack()
 

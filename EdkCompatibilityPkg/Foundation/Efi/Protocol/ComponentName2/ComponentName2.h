@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -50,12 +50,13 @@ EFI_STATUS
     Retrieves a Unicode string that is the user readable name of the EFI Driver.
 
   Arguments:
-    This       - A pointer to the EFI_COMPONENT_NAME_PROTOCOL instance.
-    Language   - A pointer to a three character ISO 639-2 language identifier.
-                 This is the language of the driver name that that the caller 
-                 is requesting, and it must match one of the languages specified
-                 in SupportedLanguages.  The number of languages supported by a 
-                 driver is up to the driver writer.
+    This       - A pointer to the EFI_COMPONENT_NAME2_PROTOCOL instance.
+    Language   - A pointer to a Null-terminated ASCII string array indicating the 
+                 language.  This is the language of the driver name that the caller 
+                 is requesting, and it must match one of the languages specified in 
+                 SupportedLanguages. The number of languages supported by a 
+                 driver is up to the driver writer.  Language is specified in RFC 
+                 4646 language code format.
     DriverName - A pointer to the Unicode string to return.  This Unicode string
                  is the name of the driver specified by This in the language 
                  specified by Language.
@@ -86,7 +87,7 @@ EFI_STATUS
     that is being managed by an EFI Driver.
 
   Arguments:
-    This             - A pointer to the EFI_COMPONENT_NAME_PROTOCOL instance.
+    This             - A pointer to the EFI_COMPONENT_NAME2_PROTOCOL instance.
     ControllerHandle - The handle of a controller that the driver specified by 
                        This is managing.  This handle specifies the controller 
                        whose name is to be returned.
@@ -96,12 +97,12 @@ EFI_STATUS
                        for a bus drivers that wish to retrieve the name of the 
                        bus controller.  It will not be NULL for a bus driver 
                        that wishes to retrieve the name of a child controller.
-    Language         - A pointer to a three character ISO 639-2 language 
-                       identifier.  This is the language of the controller name 
-                       that that the caller is requesting, and it must match one
-                       of the languages specified in SupportedLanguages.  The 
-                       number of languages supported by a driver is up to the 
-                       driver writer.
+    Language         - A pointer to a Null-terminated ASCII string array indicating the 
+                       language.  This is the language of the driver name that the caller 
+                       is requesting, and it must match one of the languages specified in 
+                       SupportedLanguages. The number of languages supported by a 
+                       driver is up to the driver writer.  Language is specified in RFC 
+                       4646 language code format.
     ControllerName   - A pointer to the Unicode string to return.  This Unicode
                        string is the name of the controller specified by 
                        ControllerHandle and ChildHandle in the language specified

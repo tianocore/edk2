@@ -1,6 +1,6 @@
 #/*++
 #  
-#  Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
 #  which accompanies this distribution.  The full text of the license may be found at        
@@ -55,7 +55,8 @@ INC                = -I $(SRC) \
 ANTLR_FLAGS        = -CC -e3 -ck 3 -k 2
 DLG_FLAGS          = -C2 -i -CC
 LINK_FLAGS_PCCTS   = /DEBUG  /PDB:$*.pdb
-C_FLAGS_PCCTS      = -I. -I$(ANTLR_H) /WX /Od /EHsc /Zi /Fd$(ETO)\$(TARGET_NAME)Obj /D _CRT_SECURE_NO_DEPRECATE $(VERSION_FLAGS) /D PCCTS_USE_NAMESPACE_STD #/D CVFR_VARDATATYPEDB_DEBUG /D CIFROBJ_DEUBG /D VFREXP_DEBUG
+C_FLAGS_PCCTS      = -I. -I$(ANTLR_H) /WX /Od /EHsc /Zi /Fd$(ETO)\$(TARGET_NAME)Obj /D _CRT_SECURE_NO_DEPRECATE $(VERSION_FLAGS)  \
+                     $(BUILD_STRING_FLAGS) /D PCCTS_USE_NAMESPACE_STD #/D CVFR_VARDATATYPEDB_DEBUG /D CIFROBJ_DEUBG /D VFREXP_DEBUG
 
 VFR_GRAMMER_FILE   = $(SRC)\VfrSyntax.g
 

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -124,6 +124,42 @@ Returns:
   EFI_NOT_FOUND           Section/Token/Value not found.
 
 --*/
+
+EFI_STATUS
+FindTokenInstanceInSection (
+  IN MEMORY_FILE    *InputFile,
+  IN CHAR8          *Section,
+  IN UINTN          Instance,
+  OUT CHAR8         *Token,
+  OUT CHAR8         *Value
+  )
+;
+/*++
+
+Routine Description:
+
+  Finds the Instance-th token in a section.
+
+Arguments:
+
+  InputFile Memory file image.
+  Section   The section to search for, a string within [].
+  Instance  Specify the Instance-th token to search for, starting from zero
+  Token     The token name to return. Caller should allocate the buffer.
+            Must be _MAX_PATH in size.
+  Value     The token value to return. Caller should allocate the buffer.
+            Must be _MAX_PATH in size.
+
+Returns:
+
+  EFI_SUCCESS             Token and Value found.
+  EFI_ABORTED             Format error detected in INF file.
+  EFI_INVALID_PARAMETER   Input argument was null.
+  EFI_LOAD_ERROR          Error reading from the file.
+  EFI_NOT_FOUND           Section/Token/Value not found.
+
+--*/
+
 EFI_STATUS
 StringToGuid (
   IN CHAR8        *AsciiGuidBuffer,

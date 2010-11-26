@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -185,9 +185,16 @@ typedef struct {
   UINT32  IoAlign;
 
   EFI_LBA LastBlock;
+
+  EFI_LBA LowestAlignedLba;
+  UINT32  LogicalBlocksPerPhysicalBlock;
 } EFI_BLOCK_IO_MEDIA;
 
-#define EFI_BLOCK_IO_PROTOCOL_REVISION  0x00010000
+#define EFI_BLOCK_IO_PROTOCOL_REVISION     0x00010000
+#define EFI_BLOCK_IO_PROTOCOL_REVISION2    0x00020001
+
+#define SIZE_OF_EFI_BLOCK_IO_MEDIA_REV1  ((UINTN)&((EFI_BLOCK_IO_MEDIA *)0)->LastBlock + sizeof(EFI_LBA))
+#define SIZE_OF_EFI_BLOCK_IO_MEDIA_REV2  sizeof(EFI_BLOCK_IO_MEDIA)
 
 struct _EFI_BLOCK_IO_PROTOCOL {
   UINT64              Revision;

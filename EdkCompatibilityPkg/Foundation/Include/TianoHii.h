@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -50,6 +50,11 @@ Revision History
 //
 #define EFI_IFR_TIANO_GUID \
   { 0xf0b1735, 0x87a0, 0x4193, {0xb2, 0x66, 0x53, 0x8c, 0x38, 0xaf, 0x48, 0xce} }
+//
+// ClassGuid for Front Page
+//
+#define EFI_HII_FRONT_PAGE_CLASS_GUID \
+  { 0x94d411b7, 0x7669, 0x45c3, {0xba, 0x3b, 0xf3, 0xa5, 0x8a, 0x71, 0x56, 0x81} }
 
 #pragma pack(1)
 

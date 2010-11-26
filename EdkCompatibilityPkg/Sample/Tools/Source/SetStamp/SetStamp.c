@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -22,7 +22,8 @@ Abstract:
 #include <time.h>
 
 #define LINE_MAXLEN 80
-
+#define UTILITY_NAME    "SetStamp"
+#define UTILITY_VERSION "v1.0"
 void
 PrintUsage (
   void
@@ -38,10 +39,25 @@ Returns:
   None
 --*/
 {
-  //
-  // print usage of command
-  //
-  printf ("Usage: SetStamp <PE-File> <TIME-File>\n");
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel Set Time Stamp Utility",
+    "  Copyright (C), 2004 - 2008 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
+    "",
+    "Usage:",
+    "  "UTILITY_NAME" PEFILE TIMEFILE",
+    "Description:",
+    "  Set Date/Time Stamp of Portable Executable (PE) format file",
+    NULL
+  };
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
+  }
+  
 }
 
 int

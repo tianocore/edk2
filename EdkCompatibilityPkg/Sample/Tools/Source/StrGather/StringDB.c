@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -2508,7 +2508,8 @@ Returns:
 --*/
 STATUS
 StringDBCreateHiiExportPack (
-  INT8                        *FileName
+  INT8                        *FileName,
+  WCHAR_STRING_LIST           *LanguagesOfInterest
   )
 {
   FILE                        *Fptr;
@@ -2524,6 +2525,9 @@ StringDBCreateHiiExportPack (
   WCHAR                       *TempStringPtr;
   WCHAR                       *LangName;
   STRING_IDENTIFIER           *StringIdentifier;
+  WCHAR_STRING_LIST           *LOIPtr;
+  BOOLEAN                     LanguageOk;
+
 
   if ((Fptr = fopen (FileName, "wb")) == NULL) {
     Error (NULL, 0, 0, FileName, "failed to open output HII export file");
@@ -2544,6 +2548,25 @@ StringDBCreateHiiExportPack (
   //
   ZeroString[0] = 0;
   for (Lang = mDBData.LanguageList; Lang != NULL; Lang = Lang->Next) {
+    //
+    // If we have a language list, then make sure this language is in that
+    // list.
+    //
+    LanguageOk  = TRUE;
+    if (LanguagesOfInterest != NULL) {
+      LanguageOk = FALSE;
+      for (LOIPtr = LanguagesOfInterest; LOIPtr != NULL; LOIPtr = LOIPtr->Next) {
+        if (wcsncmp (LOIPtr->Str, Lang->LanguageName, LANGUAGE_IDENTIFIER_NAME_LEN) == 0) {
+          LanguageOk  = TRUE;
+          break;
+        }
+      }
+    }
+
+    if (!LanguageOk) {
+      continue;
+    }
+
     //
     // Process each string for this language. We have to make 3 passes on the strings:
     //   Pass1: computes sizes and fill in the string pack header

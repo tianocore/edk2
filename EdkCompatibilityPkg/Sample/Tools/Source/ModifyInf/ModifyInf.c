@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 1999 - 2002, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -23,6 +23,8 @@ Abstract:
 #include "stdio.h"
 #include "string.h"
 
+#define UTILITY_NAME    "ModifyInf"
+#define UTILITY_VERSION "v1.0"
 //
 // Read a line into buffer including '\r\n'
 //
@@ -263,7 +265,22 @@ Returns:
 
 --*/
 {
-  printf ("ModifyInf InputFVInfFileName OutputFVInfFileName [Pattern strings]\r\n");
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel Modify INF File Utility",
+    "  Copyright (C), 1999 - 2008 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
+    "",
+    "Usage:",
+    "  "UTILITY_NAME" SOURCE DEST [PATTERN]",
+    NULL
+  };
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
+  }  
 }
 
 int

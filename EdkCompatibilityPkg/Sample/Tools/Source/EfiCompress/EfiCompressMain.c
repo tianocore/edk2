@@ -1,6 +1,6 @@
 /*++ 
 
-Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -24,6 +24,9 @@ Abstract:
 #include <stdio.h>
 #include "TianoCommon.h"
 #include "Compress.h"
+
+#define UTILITY_VERSION "v1.0"
+#define UTILITY_NAME    "EfiCompress"
 
 typedef enum {
   EFI_COMPRESS   = 1,
@@ -365,22 +368,32 @@ Usage (
   CHAR8 *ExeName
   )
 {
-  fprintf (
-      stdout, 
-      "\n"
-      "Usage: %s [-tCompressType] InFileName OutFileName\n"
-      "       %*c [[-tCompressType] InFileName OutFileName ...]\n"
-      "\n"
-      "where:\n"
-      "  CompressType - optional compress algorithm (EFI | Tiano), case insensitive.\n"
-      "                 If ommitted, compress type specified ahead is used, \n"
-      "                 default is EFI\n"
-      "                 e.g.: EfiCompress a.in a.out -tTiano b.in b.out \\ \n"
-      "                                     c.in c.out -tEFI d.in d.out\n"
-      "                 a.in and d.in are compressed using EFI compress algorithm\n"
-      "                 b.in and c.in are compressed using Tiano compress algorithm\n"
-      "  InFileName   - input file path\n"
-      "  OutFileName  - output file path\n",
-      ExeName, strlen(ExeName), ' '
-      );
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel EFI Compress Utility",
+    "  Copyright (C), 2006 - 2008 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
+    "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION] SOURCE DEST ...",
+    "Description:",
+    "  Compress a list of SOURCE(s) to accordingly DEST(s) using the specified",
+    "  compress algorithm.",
+    "Options:",
+    "  -tCompressAlgo   Optional compress algorithm (EFI | Tiano), case insensitive.",
+    "                   If ommitted, compress type specified ahead is used,",
+    "                   default is EFI\n"
+    "                   e.g.: EfiCompress a.in a.out -tTiano b.in b.out \\",
+    "                                     c.in c.out -tEFI d.in d.out",
+    "                   a.in and d.in are compressed using EFI compress algorithm",
+    "                   b.in and c.in are compressed using Tiano compress algorithm",
+    NULL
+  };
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
+  }
+  
 }

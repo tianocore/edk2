@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -134,11 +134,13 @@ typedef struct _SPkgBlkBuffer {
 void
 StringDBConstructor (
   void
-  );
+  )
+;
 void
 StringDBDestructor (
   void
-  );
+  )
+;
 
 STATUS
 StringDBAddString (
@@ -148,12 +150,14 @@ StringDBAddString (
   WCHAR   *String,
   BOOLEAN Format,
   UINT16  Flags
-  );
+  )
+;
 
 STATUS
 StringDBSetScope (
   WCHAR   *Scope
-  );
+  )
+;
 
 #define STRING_FLAGS_REFERENCED           0x0001  // if referenced somewhere
 #define STRING_FLAGS_UNDEFINED            0x0002  // if we added it for padding purposes
@@ -167,72 +171,92 @@ StringDBAddStringIdentifier (
   WCHAR     *StringIdentifier,
   UINT16    *NewId,
   UINT16    Flags
-  );
+  )
+;
 
 STATUS
 StringDBReadDatabase (
   INT8    *DBFileName,
   BOOLEAN IgnoreIfNotExist,
   BOOLEAN Verbose
-  );
+  )
+;
 
 STATUS
 StringDBWriteDatabase (
   INT8    *DBFileName,
   BOOLEAN Verbose
-  );
+  )
+;
 
 STATUS
 StringDBDumpDatabase (
   INT8                *DBFileName,
   INT8                *OutputFileName,
   BOOLEAN             Verbose
-  );
+  )
+;
 
 STATUS
 StringDBAddLanguage (
   WCHAR *LanguageName,
   WCHAR *PrintableLanguageName,
   WCHAR *SecondaryLanguageList
-  );
+  )
+;
 
 STATUS
 StringDBAddSecondaryLanguage (
   WCHAR *LanguageName,
   WCHAR *SecondaryLanguageList
-  );
+  )
+;
 
 STATUS
 StringDBDumpCStrings (
   INT8                            *BaseName,
-  INT8                            *FileName
-  );
+  INT8                            *FileName,
+  WCHAR_STRING_LIST               *LanguagesOfInterests
+  )
+;
+
+STATUS
+StringDBCreateHiiExportPack (
+  INT8                            *OutputFileName,
+  WCHAR_STRING_LIST               *LanguagesOfInterests
+  )
+;
 
 STATUS
 StringDBDumpStringDefines (
   INT8                *FileName,
   INT8                *BaseName
-  );
+  )
+;
 
 STATUS
 StringDBSetCurrentLanguage (
   WCHAR *LanguageName
-  );
+  )
+;
 
 STATUS
 StringDBSetStringReferenced (
   INT8      *StringIdentifierName,
   BOOLEAN   IgnoreNotFound
-  );
+  )
+;
 
 void
 StringDBFormatString (
   WCHAR   *String
-  );
+  )
+;
 
 LANGUAGE_LIST *
 StringDBFindLanguageList (
   WCHAR *LanguageName
-  );
+  )
+;
 
 #endif // #ifndef _STRING_DB_H_

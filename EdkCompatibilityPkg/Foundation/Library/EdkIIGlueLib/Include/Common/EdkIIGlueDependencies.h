@@ -333,6 +333,15 @@ Abstract:
 #endif
 
 //
+// DxeServicesTableLib
+//
+#ifdef __EDKII_GLUE_DXE_SERVICES_TABLE_LIB__
+  #ifndef __EDKII_GLUE_UEFI_LIB__
+  #define __EDKII_GLUE_UEFI_LIB__
+  #endif
+#endif
+
+//
 // UefiLib
 //
 #ifdef  __EDKII_GLUE_UEFI_LIB__
@@ -486,15 +495,6 @@ Abstract:
 #ifdef  __EDKII_GLUE_UEFI_DRIVER_MODEL_LIB__
   #ifndef __EDKII_GLUE_UEFI_BOOT_SERVICES_TABLE_LIB__
   #define __EDKII_GLUE_UEFI_BOOT_SERVICES_TABLE_LIB__
-  #endif
-#endif
-
-//
-// DxeServicesTableLib
-//
-#ifdef __EDKII_GLUE_DXE_SERVICES_TABLE_LIB__
-  #ifndef __EDKII_GLUE_UEFI_LIB__
-  #define __EDKII_GLUE_UEFI_LIB__
   #endif
 #endif
 

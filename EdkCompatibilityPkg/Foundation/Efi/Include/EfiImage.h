@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -621,6 +621,48 @@ typedef struct {
   // Filename of .PDB goes here
   //
 } EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY;
+
+//
+// Resource Format
+//
+typedef struct {
+  UINT32  Characteristics;
+  UINT32  TimeDateStamp;
+  UINT16  MajorVersion;
+  UINT16  MinorVersion;
+  UINT16  NumberOfNamedEntries;
+  UINT16  NumberOfIdEntries;
+//  EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY DirectoryEntries[];
+} EFI_IMAGE_RESOURCE_DIRECTORY;
+
+typedef struct {
+  union {
+    struct {
+      UINT32  NameOffset:31;
+      UINT32  NameIsString:1;
+    } s;
+    UINT32  Id;
+  } u1;
+  union {
+    UINT32  OffsetToData;
+    struct {
+      UINT32  OffsetToDirectory:31;
+      UINT32  DataIsDirectory:1;
+    } s;
+  } u2;
+} EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY;
+
+typedef struct {
+  UINT16  Length;
+  CHAR16  String[1];
+} EFI_IMAGE_RESOURCE_DIRECTORY_STRING;
+
+typedef struct {
+  UINT32  OffsetToData;
+  UINT32  Size;
+  UINT32  CodePage;
+  UINT32  Reserved;
+} EFI_IMAGE_RESOURCE_DATA_ENTRY;
 
 //
 // Header format for TE images

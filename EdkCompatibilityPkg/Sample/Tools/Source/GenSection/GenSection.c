@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -35,6 +35,7 @@ Abstract:
 #include EFI_PROTOCOL_DEFINITION (GuidedSectionExtraction)
 
 #define UTILITY_NAME            "GenSection"
+#define UTILITY_VERSION         "v1.0"
 
 #define PARAMETER_NOT_SPECIFIED "Parameter not specified"
 #define MAXIMUM_INPUT_FILE_NUM  10
@@ -81,37 +82,52 @@ PrintUsageMessage (
   VOID
   )
 {
-  UINTN SectionType;
-  UINTN DisplayCount;
+  UINTN       SectionType;
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel Generate Section Utility",
+    "  Copyright (C), 2004 - 2008 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
+    "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION]",
+    "Common Options:",
+    "  -i InputFile    Specifies the input file",
+    "  -o OutputFile   Specifies the output file",
+    "  -s SectionType  Specifies the type of the section, which can be one of",
+    NULL
+  };
 
-  printf ("Usage: "UTILITY_NAME "  -i InputFile -o OutputFile -s SectionType [SectionType params]\n\n");
-  printf ("    Where SectionType is one of the following section types:\n\n");
-
-  DisplayCount = 0;
-  for (SectionType = 0; SectionType <= EFI_SECTION_LAST_SECTION_TYPE; SectionType++) {
-    if (SectionTypeName[SectionType] != NULL) {
-      printf ("       %s\n", SectionTypeName[SectionType]);
-    }
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
   }
 
-  printf ("\n    and SectionType dependent parameters are as follows:\n\n");
-  printf (
-    "       %s:       -t < %s | %s >\n",
+  for (SectionType = 0; SectionType <= EFI_SECTION_LAST_SECTION_TYPE; SectionType++) {
+    if (SectionTypeName[SectionType] != NULL) {
+      fprintf (stdout, "                  %s\n", SectionTypeName[SectionType]);
+    }
+  }
+  fprintf (stdout, "Section dependent options:\n");
+  fprintf (stdout, 
+    "  %s:       -t < %s | %s >\n",
     SectionTypeName[EFI_SECTION_COMPRESSION],
     CompressionTypeName[EFI_NOT_COMPRESSED],
     CompressionTypeName[EFI_STANDARD_COMPRESSION]
     );
-  printf (
-    "       %s:      -t < %s >\n""                          // Currently only CRC32 is supported\n\n",
+  fprintf (stdout,
+    "  %s:      -t < %s >  // Only CRC32 is supported\n",
     SectionTypeName[EFI_SECTION_GUID_DEFINED],
     GUIDedSectionTypeName[EFI_SECTION_CRC32_GUID_DEFINED]
     );
   printf (
-    "       %s:           -v VersionNumber\n""                          [-a \"Version string\"]\n\n",
+    "  %s:           -v VersionNumber [-a \"Version string\"]\n",
     SectionTypeName[EFI_SECTION_VERSION]
     );
   printf (
-    "       %s:    -a \"Human readable name\"\n\n",
+    "  %s:    -a \"Human readable name\"\n",
     SectionTypeName[EFI_SECTION_USER_INTERFACE]
     );
 }

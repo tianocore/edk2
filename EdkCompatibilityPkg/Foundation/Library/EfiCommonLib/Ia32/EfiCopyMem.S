@@ -75,16 +75,16 @@ ASM_PFX(EfiCommonLibCopyMem):
   movl  %esi, %eax
   addl  %ecx, %eax                    # Source + Count
   cmpl  %edi, %eax
-  jle   _StartByteCopy
+  jbe   _StartByteCopy
 
   movl  %edi, %eax
   addl  %ecx, %eax                    # Dest + Count
   cmpl  %esi, %eax
-  jle   _StartByteCopy
+  jbe   _StartByteCopy
 
   cmpl  %edi, %esi
   je    _CopyMemDone
-  jl    _CopyOverlapped               # too bad -- overlaps
+  jb    _CopyOverlapped               # too bad -- overlaps
 
   # Pick up misaligned start bytes to get destination pointer 4-byte aligned
 _StartByteCopy: 

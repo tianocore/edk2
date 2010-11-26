@@ -27,18 +27,6 @@ Abstract:
 #ifndef _TIANO_H_
 #define _TIANO_H_
 
-//
-// Check to make sure EFI_SPECIFICATION_VERSION and TIANO_RELEASE_VERSION are defined.
-//
-#if !defined(EFI_SPECIFICATION_VERSION)
-  #error EFI_SPECIFICATION_VERSION not defined
-#elif !defined(TIANO_RELEASE_VERSION)
-  #error TIANO_RELEASE_VERSION not defined
-#elif (TIANO_RELEASE_VERSION == 0)
-  #error TIANO_RELEASE_VERSION can not be zero
-#elif (EFI_SPECIFICATION_VERSION <= 0x00020000)
-  #define TIANO_EXTENSION_FLAG
-#endif
 
 #include "TianoCommon.h"
 #include "TianoApi.h"

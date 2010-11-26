@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -35,18 +35,7 @@ Abstract:
 #define EFI_BASE_ADDRESS    "EFI_BASE_ADDRESS"
 #define DEFAULT_FV_INF_DIR  "FV"            // default dir for where we create the FV INF file
 #define DEFAULT_FV_DIR      "$(BUILD_DIR)"  // where the FV file comes from
-#define MALLOC(size)        malloc (size)
-#define FREE(ptr)           free (ptr)
 
-//
-// Disable warning for unused function arguments
-//
-#pragma warning(disable : 4100)
-//
-// Disable warning for while(1) code
-//
-// #pragma warning (disable : 4127)
-//
 typedef struct {
   char  *ComponentType;
   char  *Extension;
@@ -196,8 +185,7 @@ static
 void
 AddFirmwareVolumes (
   char          *FVs,
-  int           ComponentsInstance,
-  FILE_LIST     *FileListPtr
+  int           ComponentsInstance
   );
 
 static
@@ -503,7 +491,7 @@ Returns:
   // Add these firmware volumes to the list of known firmware
   // volume names.
   //
-  AddFirmwareVolumes (FVs, ComponentsInstance, Ptr);
+  AddFirmwareVolumes (FVs, ComponentsInstance);
 
   return STATUS_SUCCESS;
 }
@@ -528,7 +516,7 @@ CFVDestructor (
   //
   while (mFVList != NULL) {
     mFVListLast = mFVList->Next;
-    FREE (mFVList);
+    free (mFVList);
     mFVList = mFVListLast;
   }
 }
@@ -957,10 +945,10 @@ Returns:
   //
   // Now go through the list of all NonFFS FVs they specified and search for
   // a [build.fv.$(FV)] or [build.fv] command and emit the commands to the
-  // output makefile. Add them to the "fvs" target as well.
+  // output makefile. Add them to the "fvs_0" target as well.
   //
   if (mNonFfsFVList != NULL) {
-    fprintf (MakeFptr, "fvs ::");
+    fprintf (MakeFptr, "fvs_0 ::");
     FVPtr = mNonFfsFVList;
     while (FVPtr != NULL) {
       fprintf (MakeFptr, " %s%s.fv", FVDir, FVPtr->FVFileName);
@@ -1022,43 +1010,40 @@ Returns:
       DSCFileRestorePosition (DSC);
     }
   }
-  //
-  // Go through our list of firmware volumes and create an "fvs" target that
-  // builds everything. It has to be a mix of components and FV's in order.
-  // For example:  fvs : components_0 fv\fv001.fv fv\fv002.fv components_1 fv\fv003.fv
-  //
-  ComponentsInstance  = 0;
-  ComponentCount      = 0;
-  fprintf (MakeFptr, "fvs ::");
-  for (;;) {
-    //
-    // First see if we have any components for this section. If we don't,
-    // then we're done
-    //
-    for (FileListPtr = mFileList; FileListPtr != NULL; FileListPtr = FileListPtr->Next) {
-      if (FileListPtr->ComponentsInstance == ComponentsInstance) {
-        break;
-      }
-    }
 
-    if (FileListPtr == NULL) {
-      break;
+  //
+  // Get the components count
+  //
+  ComponentCount = -1;
+  for (FileListPtr = mFileList; FileListPtr != NULL; FileListPtr = FileListPtr->Next) {
+    if (FileListPtr->ComponentsInstance > ComponentCount) {
+      ComponentCount = FileListPtr->ComponentsInstance;
     }
+  }
+  ComponentCount++;
 
-    fprintf (MakeFptr, " components_%d", ComponentsInstance);
-    ComponentCount++;
-    //
-    // Now print any firmware volumes that match this components instance
-    //
+  //
+  // Now print firmware volumes build targets fvs_0, fvs_1 etc.
+  //
+  for (ComponentsInstance = 0; ComponentsInstance < ComponentCount; ComponentsInstance++) {
+    fprintf (MakeFptr, "fvs_%d ::", ComponentsInstance);
     for (FVPtr = mFVList; FVPtr != NULL; FVPtr = FVPtr->Next) {
       if (FVPtr->ComponentsInstance == ComponentsInstance) {
         fprintf (MakeFptr, " %s%s.fv", FVDir, FVPtr->FVFileName);
       }
     }
-
-    ComponentsInstance++;
+    fprintf (MakeFptr, "\n\n");
   }
-
+      
+  //
+  // Create an "fvs" target that builds everything. It has to be a mix of 
+  // components and FV's in order. For example:
+  // fvs :: components_0 fvs_0 components_1 fvs_1
+  //
+  fprintf (MakeFptr, "fvs ::");
+  for (ComponentsInstance = 0; ComponentsInstance < ComponentCount; ComponentsInstance++) {
+    fprintf (MakeFptr, " components_%d fvs_%d", ComponentsInstance, ComponentsInstance);
+  }
   fprintf (MakeFptr, "\n\n");
 
   //
@@ -1351,8 +1336,7 @@ static
 void
 AddFirmwareVolumes (
   char          *FVs,
-  int           ComponentsInstance,
-  FILE_LIST     *FileListPtr
+  int           ComponentsInstance
   )
 {
   FV_LIST *FvPtr;
@@ -1386,7 +1370,7 @@ AddFirmwareVolumes (
       // If we didn't find a match, then create a new one
       //
       if (FvPtr == NULL) {
-        FvPtr = MALLOC (sizeof (FV_LIST));
+        FvPtr = malloc (sizeof (FV_LIST));
         if (FvPtr == NULL) {
           Error (__FILE__, __LINE__, 0, "application error", "memory allocation failed");
           return ;

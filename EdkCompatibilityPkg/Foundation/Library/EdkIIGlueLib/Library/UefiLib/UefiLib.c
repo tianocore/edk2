@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -15,32 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "EdkIIGlueUefi.h"
 #include "Library/EdkIIGlueMemoryAllocationLib.h"
 
-
-/**
-  Compare whether two names of languages are identical.
-
-  @param  Language1 Name of language 1.
-  @param  Language2 Name of language 2.
-
-  @retval TRUE      Language 1 and language 2 are the same.
-  @retval FALSE     Language 1 and language 2 are not the same.
-
-**/
-STATIC
-BOOLEAN
-CompareIso639LanguageCode (
-  IN CONST CHAR8  *Language1,
-  IN CONST CHAR8  *Language2
-  )
-{
-  UINT32  Name1;
-  UINT32  Name2;
-
-  Name1 = ReadUnaligned24 ((CONST UINT32 *) Language1);
-  Name2 = ReadUnaligned24 ((CONST UINT32 *) Language2);
-
-  return (BOOLEAN) (Name1 == Name2);
-}
 
 /**
   This function searches the list of configuration tables stored in the EFI System 
@@ -510,6 +484,130 @@ EfiTestChildHandle (
 }
 
 /**
+  Tests whether a language code has format of ISO639-2.
+
+  @param  Languages     The language code to be tested.
+
+  @retval TRUE          Language code format is ISO 639-2.
+  @retval FALSE         Language code format is not ISO639-2.
+
+**/
+STATIC
+BOOLEAN
+IsIso639LanguageCode (
+  IN CONST CHAR8          *Languages
+  )
+{
+  UINTN  Index;
+
+  //
+  // Find out format of Languages
+  //
+  for (Index = 0; Languages[Index] != 0 && Languages[Index] != ';' && Languages[Index] != '-'; Index++);
+  if (Languages[Index] != 0) {
+    //
+    // RFC4646 language code
+    //
+    return FALSE;
+  }
+
+  //
+  // No ';' and '-', it's either ISO639-2 code (list) or single RFC4646 code
+  //
+  if (Index == 2) {
+    //
+    // Single RFC4646 language code without country code, e.g. "en"
+    //
+    return FALSE;
+  }
+
+  //
+  // Languages in format of ISO639-2
+  //
+  return TRUE;
+}
+
+/**
+  Compare the first language instance of two language codes, either could be a
+  single language code or a language code list. This function assume Language1
+  and Language2 has the same language code format, i.e. either ISO639-2 or RFC4646.
+
+  @param  Language1     The first language code to be tested.
+  @param  Language2     The second language code to be tested.
+
+  @retval TRUE          Language code match.
+  @retval FALSE         Language code mismatch.
+
+**/
+STATIC
+BOOLEAN
+CompareLanguageCode (
+  IN CONST CHAR8          *Language1,
+  IN CONST CHAR8          *Language2
+  )
+{
+  UINTN Index;
+
+  //
+  // Compare first two bytes of language tag
+  //
+  if ((Language1[0] != Language2[0]) || (Language1[1] != Language2[1])) {
+    return FALSE;
+  }
+
+  if (IsIso639LanguageCode (Language1)) {
+    //
+    // ISO639-2 language code, compare the third byte of language tag
+    //
+    return (BOOLEAN) ((Language1[2] == Language2[2]) ? TRUE : FALSE);
+  }
+
+  //
+  // RFC4646 language code
+  //
+  for (Index = 0; Language1[Index] != 0 && Language1[Index] != ';'; Index++);
+  if ((AsciiStrnCmp (Language1, Language2, Index) == 0) && (Language2[Index] == 0 || Language2[Index] == ';')) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+  Step to next language code of a language code list.
+
+  @param  Languages     The language code list to traverse.
+
+  @return Pointer to next language code or NULL terminator if it's the last one.
+
+**/
+STATIC
+CONST
+CHAR8 *
+NextSupportedLanguage (
+  IN CONST CHAR8          *Languages
+  )
+{
+  UINTN    Index;
+
+  if (IsIso639LanguageCode (Languages)) {
+    //
+    // ISO639-2 language code
+    //
+    return (Languages + 3);
+  }
+
+  //
+  // Search in RFC4646 language code list
+  //
+  for (Index = 0; Languages[Index] != 0 && Languages[Index] != ';'; Index++);
+  if (Languages[Index] == ';') {
+    Index++;
+  }
+  return (Languages + Index);
+}
+
+/**
   This function looks up a Unicode string in UnicodeStringTable.  If Language is 
   a member of SupportedLanguages and a Unicode string is found in UnicodeStringTable
   that matches the language code specified by Language, then it is returned in 
@@ -566,13 +664,13 @@ LookupUnicodeString (
   // Make sure Language is in the set of Supported Languages
   //
   while (*SupportedLanguages != 0) {
-    if (CompareIso639LanguageCode (Language, SupportedLanguages)) {
+    if (CompareLanguageCode (Language, SupportedLanguages)) {
 
       //
       // Search the Unicode String Table for the matching Language specifier
       //
       while (UnicodeStringTable->Language != NULL) {
-        if (CompareIso639LanguageCode (Language, UnicodeStringTable->Language)) {
+        if (CompareLanguageCode (Language, UnicodeStringTable->Language)) {
 
           //
           // A matching string was found, so return it
@@ -587,7 +685,7 @@ LookupUnicodeString (
       return EFI_UNSUPPORTED;
     }
 
-    SupportedLanguages += 3;
+    SupportedLanguages = NextSupportedLanguage (SupportedLanguages);
   }
 
   return EFI_UNSUPPORTED;
@@ -664,7 +762,7 @@ AddUnicodeString (
   // Make sure Language is a member of SupportedLanguages
   //
   while (*SupportedLanguages != 0) {
-    if (CompareIso639LanguageCode (Language, SupportedLanguages)) {
+    if (CompareLanguageCode (Language, SupportedLanguages)) {
 
       //
       // Determine the size of the Unicode String Table by looking for a NULL Language entry
@@ -673,7 +771,7 @@ AddUnicodeString (
       if (*UnicodeStringTable != NULL) {
         OldUnicodeStringTable = *UnicodeStringTable;
         while (OldUnicodeStringTable->Language != NULL) {
-          if (CompareIso639LanguageCode (Language, OldUnicodeStringTable->Language)) {
+          if (CompareLanguageCode (Language, OldUnicodeStringTable->Language)) {
             return EFI_ALREADY_STARTED;
           }
 
@@ -707,7 +805,7 @@ AddUnicodeString (
       //
       // Allocate space for a copy of the Language specifier
       //
-      NewUnicodeStringTable[NumberOfEntries].Language = AllocateCopyPool (3, Language);
+      NewUnicodeStringTable[NumberOfEntries].Language = AllocateCopyPool (AsciiStrSize (Language), Language);
       if (NewUnicodeStringTable[NumberOfEntries].Language == NULL) {
         (gBS->FreePool) (NewUnicodeStringTable);
         return EFI_OUT_OF_RESOURCES;
@@ -753,7 +851,7 @@ AddUnicodeString (
       return EFI_SUCCESS;
     }
 
-    SupportedLanguages += 3;
+    SupportedLanguages = NextSupportedLanguage (SupportedLanguages);
   }
 
   return EFI_UNSUPPORTED;

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -49,12 +49,19 @@ Returns:
 
 --*/
 {
-  printf (
-    "%s - Tiano Firmware Volume Generation Utility."" Version %i.%i\n\n",
-    UTILITY_NAME,
-    UTILITY_MAJOR_VERSION,
-    UTILITY_MINOR_VERSION
-    );
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel Generate Firmware Volume Utility",
+    "  Copyright (C), 2004 - 2009 Intel Corporation",
+    
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
+    NULL
+  };
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
+  }
 }
 
 VOID
@@ -77,9 +84,19 @@ Returns:
 
 --*/
 {
-  printf ("Usage: %s -I FvInfFileName\n", UTILITY_NAME);
-  printf ("  Where:\n");
-  printf ("\tFvInfFileName is the name of the image description file.\n\n");
+  int         Index;
+  const char  *Str[] = {
+    "",
+    "Usage:",
+    "  "UTILITY_NAME" [OPTION]",
+    "Options:",
+    "  -I FvInfFileName  The name of the image description file.",
+    NULL
+  };
+
+  for (Index = 0; Str[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Str[Index]);
+  }
 }
 
 EFI_STATUS

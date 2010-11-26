@@ -1,5 +1,5 @@
 /*++
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -53,15 +53,5 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EVAL_STACK_SIZE             0x1024
 #define BUFFER_SIZE                 0x100
 
-//
-// Utility Name
-//
-#define UTILITY_NAME  "GenDepex"
-
-//
-// Utility version information
-//
-#define UTILITY_MAJOR_VERSION 0
-#define UTILITY_MINOR_VERSION 4
 
 #endif

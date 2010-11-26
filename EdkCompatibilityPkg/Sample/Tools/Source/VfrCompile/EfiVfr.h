@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2005, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -31,7 +31,8 @@ Abstract:
 // This number should be incremented with each change to the VFR compiler.
 // We write the version to the output list file for debug purposes.
 //
-#define VFR_COMPILER_VERSION  "1.88"
+#define UTILITY_VERSION  "v1.9"
+#define UTILITY_NAME     "VfrCompile"
 
 //
 // Maximum file path for filenames
@@ -39,7 +40,6 @@ Abstract:
 #define MAX_PATH        255
 #define MAX_QUEUE_COUNT 255
 #define MAX_LINE_LEN    1024
-#define PROGRAM_NAME    "VfrCompile"
 
 //
 // We parse C-style structure definitions which can then be referenced

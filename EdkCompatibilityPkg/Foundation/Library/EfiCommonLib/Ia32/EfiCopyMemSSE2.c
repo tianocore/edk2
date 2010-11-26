@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -104,13 +104,13 @@ _CopyBlocks:
 copyxmm:
   
   movdqu xmm0, OWORD PTR ds:[esi]
-  movdqu QWORD PTR ds:[edi], xmm0
+  movdqu OWORD PTR ds:[edi], xmm0
   movdqu xmm1, OWORD PTR ds:[esi+16]
-  movdqu QWORD PTR ds:[edi+16], xmm1
+  movdqu OWORD PTR ds:[edi+16], xmm1
   movdqu xmm2, OWORD PTR ds:[esi+32]
-  movdqu QWORD PTR ds:[edi+32], xmm2
+  movdqu OWORD PTR ds:[edi+32], xmm2
   movdqu xmm3, OWORD PTR ds:[esi+48]
-  movdqu QWORD PTR ds:[edi+48], xmm3
+  movdqu OWORD PTR ds:[edi+48], xmm3
   
   add   edi, 64
   add   esi, 64

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  StrGather.c  
+  StrGather.c
 
 Abstract:
 
@@ -29,7 +29,8 @@ Abstract:
 #include "StrGather.h"
 #include "StringDB.h"
 
-#define TOOL_VERSION  "0.31"
+#define UTILITY_NAME     "StrGather"
+#define UTILITY_VERSION  "v1.2"
 
 typedef UINT16  WCHAR;
 
@@ -46,6 +47,15 @@ typedef UINT16  WCHAR;
 #define MODE_PARSE    1
 #define MODE_SCAN     2
 #define MODE_DUMP     3
+
+//
+// This is how we invoke the C preprocessor on the source file
+// to resolve #if, #else, etc.
+//
+#define PREPROCESSOR_COMMAND                "cl"
+#define PREPROCESSOR_OPTIONS                "/nologo /EP /TC /DSTRGATHER"
+#define PREPROCESS_TEMP_FILE_EXTENSION      ".ii"
+#define PREPROCESS_OUTPUT_FILE_EXTENSION    ".iii"
 
 //
 // We keep a linked list of these for the source files we process
@@ -83,6 +93,8 @@ static struct {
   TEXT_STRING_LIST            *LastIndirectionFileName;
   TEXT_STRING_LIST            *DatabaseFileName;
   TEXT_STRING_LIST            *LastDatabaseFileName;
+  TEXT_STRING_LIST            *PreprocessFlags;
+  TEXT_STRING_LIST            *LastPreprocessFlags;
   WCHAR_STRING_LIST           *Language;
   WCHAR_STRING_LIST           *LastLanguage;
   WCHAR_MATCHING_STRING_LIST  *IndirectionList;                 // from indirection file(s)
@@ -94,6 +106,8 @@ static struct {
   BOOLEAN                     IgnoreNotFound;                   // when scanning
   BOOLEAN                     VerboseScan;
   BOOLEAN                     UnquotedStrings;                  // -uqs option
+  BOOLEAN                     Preprocess;                       // -ppflag option
+  INT8                        PreprocessFileName[MAX_PATH];
   INT8                        OutputDatabaseFileName[MAX_PATH];
   INT8                        StringHFileName[MAX_PATH];
   INT8                        StringCFileName[MAX_PATH];        // output .C filename
@@ -294,11 +308,6 @@ ParseIndirectionFiles (
   TEXT_STRING_LIST    *Files
   );
 
-STATUS
-StringDBCreateHiiExportPack (
-  INT8                *OutputFileName
-  );
-
 int
 main (
   int   Argc,
@@ -309,7 +318,7 @@ main (
 Routine Description:
 
   Call the routine to parse the command-line options, then process the file.
-  
+
 Arguments:
 
   Argc - Standard C main() argc and argv.
@@ -319,12 +328,12 @@ Returns:
 
   0       if successful
   nonzero otherwise
-  
+
 --*/
 {
   STATUS  Status;
 
-  SetUtilityName (PROGRAM_NAME);
+  SetUtilityName (UTILITY_NAME);
   //
   // Process the command-line arguments
   //
@@ -374,12 +383,12 @@ Returns:
       if ((mGlobals.OutputDependencyFptr = fopen (mGlobals.OutputDependencyFileName, "w")) == NULL) {
         Error (NULL, 0, 0, mGlobals.OutputDependencyFileName, "failed to open output dependency file");
         goto Finish;
-      }    
+      }
     }
     Status = ProcessIncludeFile (&mGlobals.SourceFiles, NULL);
     if (mGlobals.OutputDependencyFptr != NULL) {
       fclose (mGlobals.OutputDependencyFptr);
-    }    
+    }
     if (Status != STATUS_SUCCESS) {
       goto Finish;
     }
@@ -401,7 +410,8 @@ Returns:
   if ((mGlobals.StringCFileName[0] != 0) && (GetUtilityStatus () < STATUS_ERROR)) {
     Status = StringDBDumpCStrings (
               mGlobals.BaseName,
-              mGlobals.StringCFileName
+              mGlobals.StringCFileName,
+              mGlobals.Language
               );
     if (Status != EFI_SUCCESS) {
       goto Finish;
@@ -418,7 +428,7 @@ Returns:
   // Dump the string data as HII binary string pack if requested
   //
   if ((mGlobals.HiiExportPackFileName[0] != 0) && (GetUtilityStatus () < STATUS_ERROR)) {
-    StringDBCreateHiiExportPack (mGlobals.HiiExportPackFileName);
+    StringDBCreateHiiExportPack (mGlobals.HiiExportPackFileName, mGlobals.Language);
   }
   //
   // Always update the database if no errors and not in dump mode. If they specified -od
@@ -457,7 +467,7 @@ ProcessIncludeFile (
 Routine Description:
 
   Given a source file, open the file and parse it
-  
+
 Arguments:
 
   SourceFile        - name of file to parse
@@ -466,7 +476,7 @@ Arguments:
 Returns:
 
   Standard status.
-  
+
 --*/
 {
   static UINT32 NestDepth = 0;
@@ -513,18 +523,18 @@ Returns:
       goto Finish;
     }
   }
-  
+
   //
-  // Output the dependency 
+  // Output the dependency
   //
   if (mGlobals.OutputDependencyFptr != NULL) {
-    fprintf (mGlobals.OutputDependencyFptr, "%s : %s\n", mGlobals.DatabaseFileName->Str, FoundFileName);    
+    fprintf (mGlobals.OutputDependencyFptr, "%s : %s\n", mGlobals.DatabaseFileName->Str, FoundFileName);
     //
     // Add pseudo target to avoid incremental build failure when the file is deleted
     //
-    fprintf (mGlobals.OutputDependencyFptr, "%s : \n", FoundFileName); 
+    fprintf (mGlobals.OutputDependencyFptr, "%s : \n", FoundFileName);
   }
-   
+
   //
   // Process the file found
   //
@@ -695,13 +705,13 @@ PreprocessFile (
 Routine Description:
   Preprocess a file to replace all carriage returns with NULLs so
   we can print lines from the file to the screen.
-  
+
 Arguments:
   SourceFile - structure that we use to keep track of an input file.
 
 Returns:
   Nothing.
-  
+
 --*/
 {
   BOOLEAN InComment;
@@ -1736,7 +1746,7 @@ FindFile (
     // Put the path and filename together
     //
     if (strlen (List->Str) + strlen (FileName) + 1 > FoundFileNameLen) {
-      Error (PROGRAM_NAME, 0, 0, NULL, "internal error - cannot concatenate path+filename");
+      Error (UTILITY_NAME, 0, 0, NULL, "internal error - cannot concatenate path+filename");
       return NULL;
     }
     //
@@ -1770,6 +1780,9 @@ ProcessArgs (
   )
 {
   TEXT_STRING_LIST  *NewList;
+  char              *Cptr;
+  char              *Cptr2;
+
   //
   // Clear our globals
   //
@@ -1836,7 +1849,7 @@ ProcessArgs (
       // check for one more arg
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing include path");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing include path");
         return STATUS_ERROR;
       }
       //
@@ -1846,7 +1859,7 @@ ProcessArgs (
       //
       NewList = malloc (sizeof (TEXT_STRING_LIST));
       if (NewList == NULL) {
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1854,7 +1867,7 @@ ProcessArgs (
       NewList->Str = malloc (strlen (Argv[1]) + 2);
       if (NewList->Str == NULL) {
         free (NewList);
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1879,7 +1892,7 @@ ProcessArgs (
       // Indirection file -- check for one more arg
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing indirection file name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing indirection file name");
         return STATUS_ERROR;
       }
       //
@@ -1889,7 +1902,7 @@ ProcessArgs (
       //
       NewList = malloc (sizeof (TEXT_STRING_LIST));
       if (NewList == NULL) {
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1897,7 +1910,7 @@ ProcessArgs (
       NewList->Str = malloc (strlen (Argv[1]) + 1);
       if (NewList->Str == NULL) {
         free (NewList);
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1920,13 +1933,13 @@ ProcessArgs (
       // Check for one more arg (the database file name)
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing database file name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing database file name");
         return STATUS_ERROR;
       }
 
       NewList = malloc (sizeof (TEXT_STRING_LIST));
       if (NewList == NULL) {
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1934,7 +1947,7 @@ ProcessArgs (
       NewList->Str = malloc (strlen (Argv[1]) + 1);
       if (NewList->Str == NULL) {
         free (NewList);
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -1957,14 +1970,14 @@ ProcessArgs (
       // which we can dump our database.
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing database dump output file name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing database dump output file name");
         return STATUS_ERROR;
       }
 
       if (mGlobals.DumpUFileName[0] == 0) {
         strcpy (mGlobals.DumpUFileName, Argv[1]);
       } else {
-        Error (PROGRAM_NAME, 0, 0, Argv[1], "-ou option already specified with '%s'", mGlobals.DumpUFileName);
+        Error (UTILITY_NAME, 0, 0, Argv[1], "-ou option already specified with '%s'", mGlobals.DumpUFileName);
         return STATUS_ERROR;
       }
 
@@ -1975,14 +1988,14 @@ ProcessArgs (
       // -hpk option to create an HII export pack of the input database file
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing raw string data dump output file name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing raw string data dump output file name");
         return STATUS_ERROR;
       }
 
       if (mGlobals.HiiExportPackFileName[0] == 0) {
         strcpy (mGlobals.HiiExportPackFileName, Argv[1]);
       } else {
-        Error (PROGRAM_NAME, 0, 0, Argv[1], "-or option already specified with '%s'", mGlobals.HiiExportPackFileName);
+        Error (UTILITY_NAME, 0, 0, Argv[1], "-or option already specified with '%s'", mGlobals.HiiExportPackFileName);
         return STATUS_ERROR;
       }
 
@@ -2006,7 +2019,7 @@ ProcessArgs (
       // check for one more arg
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing output C filename");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing output C filename");
         return STATUS_ERROR;
       }
 
@@ -2018,7 +2031,7 @@ ProcessArgs (
       // check for one more arg
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing base name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing base name");
         Usage ();
         return STATUS_ERROR;
       }
@@ -2031,7 +2044,7 @@ ProcessArgs (
       // -oh to specify output .h defines file name
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing output .h filename");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing output .h filename");
         return STATUS_ERROR;
       }
 
@@ -2043,7 +2056,7 @@ ProcessArgs (
       // -dep to specify output dependency file name
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing output dependency filename");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing output dependency filename");
         return STATUS_ERROR;
       }
 
@@ -2055,7 +2068,7 @@ ProcessArgs (
       // -skipext to skip scanning of files with certain filename extensions
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing filename extension");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing filename extension");
         return STATUS_ERROR;
       }
       //
@@ -2065,7 +2078,7 @@ ProcessArgs (
       //
       NewList = malloc (sizeof (TEXT_STRING_LIST));
       if (NewList == NULL) {
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -2073,7 +2086,7 @@ ProcessArgs (
       NewList->Str = malloc (strlen (Argv[1]) + 2);
       if (NewList->Str == NULL) {
         free (NewList);
-        Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
         return STATUS_ERROR;
       }
 
@@ -2097,10 +2110,10 @@ ProcessArgs (
       Argv++;
     } else if (_stricmp (Argv[0], "-lang") == 0) {
       //
-      // "-lang eng" or "-lang spa+cat" to only output certain languages
+      // "-lang zh-Hans" or "-lang en-US" to only output certain languages
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing language name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing language name");
         Usage ();
         return STATUS_ERROR;
       }
@@ -2116,18 +2129,78 @@ ProcessArgs (
       // Output database file name -- check for another arg
       //
       if ((Argc <= 1) || (Argv[1][0] == '-')) {
-        Error (PROGRAM_NAME, 0, 0, Argv[0], "missing output database file name");
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing output database file name");
         return STATUS_ERROR;
       }
 
       strcpy (mGlobals.OutputDatabaseFileName, Argv[1]);
       Argv++;
       Argc--;
+    } else if (_stricmp (Argv[0], "-ppflag") == 0) {
+      //
+      // -ppflag "Preprocess flags" -- check for another arg
+      //
+      if ((Argc <= 1) || (Argv[1][0] == '-')) {
+        Error (UTILITY_NAME, 0, 0, Argv[0], "missing preprocess flags");
+        Usage ();
+        return STATUS_ERROR;
+      }
+
+      //
+      // Allocate memory for a new list element, fill it in, and
+      // add it to our list of preprocess flag.
+      //
+      NewList = malloc (sizeof (TEXT_STRING_LIST));
+      if (NewList == NULL) {
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
+        return STATUS_ERROR;
+      }
+
+      memset ((char *) NewList, 0, sizeof (TEXT_STRING_LIST));
+      NewList->Str = malloc (strlen (Argv[1]) * 2 + 1);
+      if (NewList->Str == NULL) {
+        free (NewList);
+        Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
+        return STATUS_ERROR;
+      }
+
+      //
+      // Convert '"' to '\"' in preprocess flag
+      //
+      Cptr = Argv[1];
+      Cptr2 = NewList->Str;
+      if (*Cptr == '"') {
+        *Cptr2++ = '\\';
+        *Cptr2++ = '"';
+        Cptr++;
+      }
+      while (*Cptr != '\0') {
+        if ((*Cptr == '"') && (*(Cptr - 1) != '\\')) {
+          *Cptr2++ = '\\';
+        }
+        *Cptr2++ = *Cptr++;
+      }
+      *Cptr2 = '\0';
+
+      //
+      // Add it to our linked list
+      //
+      if (mGlobals.PreprocessFlags == NULL) {
+        mGlobals.PreprocessFlags = NewList;
+      } else {
+        mGlobals.LastPreprocessFlags->Next = NewList;
+      }
+      mGlobals.LastPreprocessFlags = NewList;
+
+      mGlobals.Preprocess = TRUE;
+
+      Argv++;
+      Argc--;
     } else {
       //
       // Unrecognized arg
       //
-      Error (PROGRAM_NAME, 0, 0, Argv[0], "unrecognized option");
+      Error (UTILITY_NAME, 0, 0, Argv[0], "unrecognized option");
       Usage ();
       return STATUS_ERROR;
     }
@@ -2174,7 +2247,15 @@ ProcessArgs (
   //
   if (mGlobals.Mode == MODE_SCAN) {
     if (Argc < 1) {
-      Error (PROGRAM_NAME, 0, 0, NULL, "must specify at least one source file to scan with -scan");
+      Error (UTILITY_NAME, 0, 0, NULL, "must specify at least one source file to scan with -scan");
+      Usage ();
+      return STATUS_ERROR;
+    }
+    //
+    // If -ppflag is specified, -oh should also be specified for preprocess
+    //
+    if (mGlobals.Preprocess && (mGlobals.StringHFileName[0] == 0)) {
+      Error (UTILITY_NAME, 0, 0, NULL, "must specify string defines file name to preprocess before scan");
       Usage ();
       return STATUS_ERROR;
     }
@@ -2184,14 +2265,14 @@ ProcessArgs (
     while (Argc > 0) {
       NewList = malloc (sizeof (TEXT_STRING_LIST));
       if (NewList == NULL) {
-        Error (PROGRAM_NAME, 0, 0, "memory allocation failure", NULL);
+        Error (UTILITY_NAME, 0, 0, "memory allocation failure", NULL);
         return STATUS_ERROR;
       }
 
       memset (NewList, 0, sizeof (TEXT_STRING_LIST));
       NewList->Str = (UINT8 *) malloc (strlen (Argv[0]) + 1);
       if (NewList->Str == NULL) {
-        Error (PROGRAM_NAME, 0, 0, "memory allocation failure", NULL);
+        Error (UTILITY_NAME, 0, 0, "memory allocation failure", NULL);
         return STATUS_ERROR;
       }
 
@@ -2211,7 +2292,7 @@ ProcessArgs (
     // Parse mode -- must specify an input unicode file name
     //
     if (Argc < 1) {
-      Error (PROGRAM_NAME, 0, 0, NULL, "must specify input unicode string file name with -parse");
+      Error (UTILITY_NAME, 0, 0, NULL, "must specify input unicode string file name with -parse");
       Usage ();
       return STATUS_ERROR;
     }
@@ -2222,7 +2303,7 @@ ProcessArgs (
   return STATUS_SUCCESS;
 }
 //
-// Found "-lang eng,spa+cat" on the command line. Parse the
+// Found "-lang zh-Hans;en-US" on the command line. Parse the
 // language list and save the setting for later processing.
 //
 static
@@ -2231,69 +2312,33 @@ AddCommandLineLanguage (
   IN INT8          *Language
   )
 {
+  char              Separator[] = ";";
+  char              *Token;
   WCHAR_STRING_LIST *WNewList;
-  WCHAR             *From;
-  WCHAR             *To;
+
   //
   // Keep processing the input string until we find the end.
   //
-  while (*Language) {
-    //
-    // Allocate memory for a new list element, fill it in, and
-    // add it to our list.
-    //
+  Token = strtok (Language, Separator);
+  while (Token != NULL) {
     WNewList = MALLOC (sizeof (WCHAR_STRING_LIST));
     if (WNewList == NULL) {
-      Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+      Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
       return STATUS_ERROR;
     }
-
-    memset ((char *) WNewList, 0, sizeof (WCHAR_STRING_LIST));
-    WNewList->Str = malloc ((strlen (Language) + 1) * sizeof (WCHAR));
+    WNewList->Next = NULL;
+    WNewList->Str  = MALLOC ((strlen (Token) + 1) * sizeof (WCHAR));
     if (WNewList->Str == NULL) {
       free (WNewList);
-      Error (PROGRAM_NAME, 0, 0, NULL, "memory allocation failure");
+      Error (UTILITY_NAME, 0, 0, NULL, "memory allocation failure");
       return STATUS_ERROR;
     }
-    //
-    // Copy it as unicode to our new structure. Then remove the
-    // plus signs in it, and verify each language name is 3 characters
-    // long. If we find a comma, then we're done with this group, so
-    // break out.
-    //
 #ifdef USE_VC8
-    swprintf (WNewList->Str, (strlen (Language) + 1) * sizeof (WCHAR), L"%S", Language);
+    swprintf (WNewList->Str, (strlen (Token) + 1) * sizeof (WCHAR), L"%S", Token);
 #else
-    swprintf (WNewList->Str, L"%S", Language);
+    swprintf (WNewList->Str, L"%S", Token);
 #endif
-    From = To = WNewList->Str;
-    while (*From) {
-      if (*From == L',') {
-        break;
-      }
 
-      if ((wcslen (From) < LANGUAGE_IDENTIFIER_NAME_LEN) ||
-            (
-              (From[LANGUAGE_IDENTIFIER_NAME_LEN] != 0) &&
-              (From[LANGUAGE_IDENTIFIER_NAME_LEN] != UNICODE_PLUS_SIGN) &&
-              (From[LANGUAGE_IDENTIFIER_NAME_LEN] != L',')
-            )
-          ) {
-        Error (PROGRAM_NAME, 0, 0, Language, "invalid format for language name on command line");
-        FREE (WNewList->Str);
-        FREE (WNewList);
-        return STATUS_ERROR;
-      }
-
-      wcsncpy (To, From, LANGUAGE_IDENTIFIER_NAME_LEN);
-      To += LANGUAGE_IDENTIFIER_NAME_LEN;
-      From += LANGUAGE_IDENTIFIER_NAME_LEN;
-      if (*From == L'+') {
-        From++;
-      }
-    }
-
-    *To = 0;
     //
     // Add it to our linked list
     //
@@ -2304,17 +2349,7 @@ AddCommandLineLanguage (
     }
 
     mGlobals.LastLanguage = WNewList;
-    //
-    // Skip to next entry (comma-separated list)
-    //
-    while (*Language) {
-      if (*Language == L',') {
-        Language++;
-        break;
-      }
-
-      Language++;
-    }
+    Token = strtok (NULL, Separator);
   }
 
   return STATUS_SUCCESS;
@@ -2450,6 +2485,166 @@ Done:
 }
 
 static
+INTN
+PreprocessSourceFile (
+  UINT8 *SourceFileName
+  )
+{
+  char              *Cptr;
+  FILE              *InFptr;
+  FILE              *OutFptr;
+  UINT32            CmdLen;
+  char              *PreProcessCmd;
+  char              BaseName[MAX_PATH];
+  char              TempFileName[MAX_PATH];
+  char              SourceFileDir[MAX_PATH];
+  char              Line[MAX_LINE_LEN];
+  TEXT_STRING_LIST  *List;
+  char              InsertLine[] = "#undef STRING_TOKEN\n";
+  int               Status;
+
+  //
+  // Check whehter source file exist
+  //
+  InFptr = fopen (SourceFileName, "r");
+  if (InFptr == NULL) {
+    Error (NULL, 0, 0, SourceFileName, "failed to open input file for scanning");
+    return STATUS_ERROR;
+  }
+
+  //
+  // Get source file directory
+  //
+  strcpy (SourceFileDir, SourceFileName);
+  Cptr = strrchr (SourceFileDir, '\\');
+  if (Cptr != NULL) {
+    *Cptr = '\0';
+  }
+
+  //
+  // Generate preprocess output file name
+  //
+  strcpy (BaseName, mGlobals.OutputDatabaseFileName);
+  Cptr = strrchr (BaseName, '\\');
+  if (Cptr != NULL) {
+    *++Cptr = '\0';
+  }
+
+  Cptr = strrchr (SourceFileName, '\\');
+  if (Cptr != NULL) {
+    Cptr++;
+  }
+  strcat (BaseName, Cptr);
+
+  Cptr = strrchr (BaseName, '.');
+  if (Cptr != NULL) {
+    *Cptr = '\0';
+  }
+
+  strcpy (mGlobals.PreprocessFileName, BaseName);
+  strcat (mGlobals.PreprocessFileName, PREPROCESS_OUTPUT_FILE_EXTENSION);
+
+  strcpy (TempFileName, BaseName);
+  strcat (TempFileName, PREPROCESS_TEMP_FILE_EXTENSION);
+
+  //
+  // Insert "#undef STRING_TOKEN" after each line of "#include ...", so as to
+  // preserve the STRING_TOKEN() for scanning after preprocess
+  //
+  OutFptr = fopen (TempFileName, "w");
+  if (OutFptr == NULL) {
+    Error (NULL, 0, 0, TempFileName, "failed to open file for write");
+    fclose (InFptr);
+    return STATUS_ERROR;
+  }
+  while (fgets (Line, MAX_LINE_LEN, InFptr) != NULL) {
+    fputs (Line, OutFptr);
+    Cptr = Line;
+
+    //
+    // Skip leading blank space
+    //
+    while (*Cptr == ' ' || *Cptr == '\t') {
+      Cptr++;
+    }
+
+    if (*Cptr == '#' && strncmp (Cptr + 1, "include", 7) == 0){
+      fputs (InsertLine, OutFptr);
+    }
+  }
+  fclose (InFptr);
+  fclose (OutFptr);
+
+  //
+  // Prepare preprocess command
+  //
+  CmdLen = 1;
+  CmdLen += strlen (PREPROCESSOR_COMMAND);
+  CmdLen++;
+  CmdLen += strlen (PREPROCESSOR_OPTIONS);
+  CmdLen++;
+
+  //
+  // "-I SourceFileDir "
+  //
+  CmdLen += strlen (SourceFileDir);
+  CmdLen += 4;
+
+  List = mGlobals.PreprocessFlags;
+  while (List != NULL) {
+    CmdLen += strlen (List->Str);
+    CmdLen++;
+
+    List = List->Next;
+  }
+
+  CmdLen += strlen (TempFileName);
+  CmdLen += 3;
+  CmdLen += strlen (mGlobals.PreprocessFileName);
+
+  PreProcessCmd = malloc (CmdLen);
+  if (PreProcessCmd == NULL) {
+    Error (NULL, 0, 0, UTILITY_NAME, "memory allocation fail (%d bytes)\n", CmdLen);
+    return STATUS_ERROR;
+  }
+
+  strcpy (PreProcessCmd, PREPROCESSOR_COMMAND);
+  strcat (PreProcessCmd, " ");
+  strcat (PreProcessCmd, PREPROCESSOR_OPTIONS);
+  strcat (PreProcessCmd, " ");
+
+
+  strcat (PreProcessCmd, "-I ");
+  strcat (PreProcessCmd, SourceFileDir);
+  strcat (PreProcessCmd, " ");
+
+  List = mGlobals.PreprocessFlags;
+  while (List != NULL) {
+    strcat (PreProcessCmd, List->Str);
+    strcat (PreProcessCmd, " ");
+
+    List = List->Next;
+  }
+
+  strcat (PreProcessCmd, TempFileName);
+  strcat (PreProcessCmd, " > ");
+  strcat (PreProcessCmd, mGlobals.PreprocessFileName);
+
+  //
+  // Preprocess the source file
+  //
+  Status = system (PreProcessCmd);
+  if (Status != 0) {
+    Error (NULL, 0, 0, PreProcessCmd, "failed to spawn C preprocessor on source file\n");
+    free (PreProcessCmd);
+    return STATUS_ERROR;
+  }
+
+  free (PreProcessCmd);
+  return STATUS_SUCCESS;
+}
+
+static
 STATUS
 ScanFiles (
   TEXT_STRING_LIST *ScanFiles
@@ -2457,6 +2652,7 @@ ScanFiles (
 {
   char              Line[MAX_LINE_LEN];
   FILE              *Fptr;
+  char              *FileName;
   UINT32            LineNum;
   char              *Cptr;
   char              *SavePtr;
@@ -2464,6 +2660,7 @@ ScanFiles (
   char              *StringTokenPos;
   TEXT_STRING_LIST  *SList;
   BOOLEAN           SkipIt;
+  BOOLEAN           FileExist;
 
   //
   // Put a null-terminator at the end of the line. If we read in
@@ -2474,6 +2671,7 @@ ScanFiles (
   // Process each file. If they gave us a skip extension list, then
   // skip it if the extension matches.
   //
+  FileExist = FALSE;
   while (ScanFiles != NULL) {
     SkipIt = FALSE;
     for (SList = mGlobals.SkipExt; SList != NULL; SList = SList->Next) {
@@ -2493,9 +2691,36 @@ ScanFiles (
         printf ("Scanning %s\n", ScanFiles->Str);
       }
 
-      Fptr = fopen (ScanFiles->Str, "r");
+      if (mGlobals.Preprocess) {
+        //
+        // Create an empty string defines file for preprocessor
+        //
+        if (!FileExist) {
+          Fptr = fopen (mGlobals.StringHFileName, "w");
+          if (Fptr == NULL) {
+            Error (NULL, 0, 0, mGlobals.StringHFileName, "failed to open file for write");
+            return STATUS_ERROR;
+          }
+
+          fclose (Fptr);
+          FileExist = TRUE;
+        }
+
+        //
+        // Preprocess using C preprocessor
+        //
+        if (PreprocessSourceFile (ScanFiles->Str) != STATUS_SUCCESS) {
+          return STATUS_ERROR;
+        }
+
+        FileName = mGlobals.PreprocessFileName;
+      } else {
+        FileName = ScanFiles->Str;
+      }
+
+      Fptr = fopen (FileName, "r");
       if (Fptr == NULL) {
-        Error (NULL, 0, 0, ScanFiles->Str, "failed to open input file for scanning");
+        Error (NULL, 0, 0, FileName, "failed to open input file for scanning");
         return STATUS_ERROR;
       }
 
@@ -2613,6 +2838,13 @@ ScanFiles (
     ScanFiles = ScanFiles->Next;
   }
 
+  //
+  // Remove the empty string defines file
+  //
+  if (FileExist) {
+    remove (mGlobals.StringHFileName);
+  }
+
   return STATUS_SUCCESS;
 }
 //
@@ -2645,6 +2877,15 @@ FreeLists (
     free (mGlobals.ScanFileName->Str);
     free (mGlobals.ScanFileName);
     mGlobals.ScanFileName = Temp;
+  }
+  //
+  // Free up preprocess flags list
+  //
+  while (mGlobals.PreprocessFlags != NULL) {
+    Temp = mGlobals.PreprocessFlags->Next;
+    free (mGlobals.PreprocessFlags->Str);
+    free (mGlobals.PreprocessFlags);
+    mGlobals.PreprocessFlags = Temp;
   }
   //
   // If they gave us a list of filename extensions to
@@ -2767,7 +3008,7 @@ Usage (
 Routine Description:
 
   Print usage information for this utility.
-  
+
 Arguments:
 
   None.
@@ -2775,51 +3016,62 @@ Arguments:
 Returns:
 
   Nothing.
-  
+
 --*/
 {
-  int               Index;
-  static const char *Str[] = {
+  int         Index;
+  const char  *Str[] = {
+    UTILITY_NAME" "UTILITY_VERSION" - Intel UEFI String Gather Utility",
+    "  Copyright (C), 2004 - 2008 Intel Corporation",
+
+#if ( defined(UTILITY_BUILD) && defined(UTILITY_VENDOR) )
+    "  Built from "UTILITY_BUILD", project of "UTILITY_VENDOR,
+#endif
     "",
-    PROGRAM_NAME " version "TOOL_VERSION " -- process unicode strings file",
-    "  Usage: "PROGRAM_NAME " -parse {parse options} [FileNames]",
-    "         "PROGRAM_NAME " -scan {scan options} [FileName]",
-    "         "PROGRAM_NAME " -dump {dump options}",
-    "    Common options include:",
-    "      -h or -?         for this help information",
-    "      -db Database     required name of output/input database file",
-    "      -bn BaseName     for use in the .h and .c output files",
-    "                       Default = "DEFAULT_BASE_NAME,
-    "      -v               for verbose output",
-    "      -vdbw            for verbose output when writing database",
-    "      -vdbr            for verbose output when reading database",
-    "      -od FileName     to specify an output database file name",
-    "    Parse options include:",
-    "      -i IncludePath   add IncludePath to list of search paths",
-    "      -dep FileName    to specify an output dependency file name",
-    "      -newdb           to not read in existing database file",
-    "      -uqs             to indicate that unquoted strings are used",
-    "      FileNames        name of one or more unicode files to parse",
-    "    Scan options include:",
-    "      -scan            scan text file(s) for STRING_TOKEN() usage",
-    "      -skipext .ext    to skip scan of files with .ext filename extension",
-    "      -ignorenotfound  ignore if a given STRING_TOKEN(STR) is not ",
-    "                       found in the database",
-    "      FileNames        one or more files to scan",
-    "    Dump options include:",
-    "      -oc FileName     write string data to FileName",
-    "      -oh FileName     write string defines to FileName",
-    "      -ou FileName     dump database to unicode file FileName",
-    "      -lang Lang       only dump for the language 'Lang'",
-    "      -if FileName     to specify an indirection file",
-    "      -hpk FileName    to create an HII export pack of the strings",
+    "Usage:",
+    "  "UTILITY_NAME" -parse [OPTION] FILE",
+    "  "UTILITY_NAME" -scan  [OPTION] FILE",
+    "  "UTILITY_NAME" -dump  [OPTION]",
+    "Description:",
+    "  Process unicode strings file.",
+    "Common options include:",
+    "  -h or -?         for this help information",
+    "  -db Database     required name of output/input database file",
+    "  -bn BaseName     for use in the .h and .c output files",
+    "                   Default = "DEFAULT_BASE_NAME,
+    "  -v               for verbose output",
+    "  -vdbw            for verbose output when writing database",
+    "  -vdbr            for verbose output when reading database",
+    "  -od FileName     to specify an output database file name",
+    "Parse options include:",
+    "  -i IncludePath   add IncludePath to list of search paths",
+    "  -dep FileName    to specify an output dependency file name",
+    "  -newdb           to not read in existing database file",
+    "  -uqs             to indicate that unquoted strings are used",
+    "  FileNames        name of one or more unicode files to parse",
+    "Scan options include:",
+    "  -scan            scan text file(s) for STRING_TOKEN() usage",
+    "  -skipext .ext    to skip scan of files with .ext filename extension",
+    "  -ppflag \"Flags\"  to specify the C preprocessor flags",
+    "  -oh FileName     to specify string defines file name for preprocessor",
+    "  -ignorenotfound  ignore if a given STRING_TOKEN(STR) is not ",
+    "                   found in the database",
+    "  FileNames        one or more files to scan",
+    "Dump options include:",
+    "  -oc FileName     write string data to FileName",
+    "  -oh FileName     write string defines to FileName",
+    "  -ou FileName     dump database to unicode file FileName",
+    "  -lang Lang       only dump for the language 'Lang'",
+    "                   use ';' to separate multiple languages",
+    "  -if FileName     to specify an indirection file",
+    "  -hpk FileName    to create an HII export pack of the strings",
     "",
-    "  The expected process is to parse a unicode string file to create an initial",
-    "  database of string identifier names and string definitions. Then text files",
-    "  should be scanned for STRING_TOKEN() usages, and the referenced",
-    "  strings will be tagged as used in the database. After all files have been",
-    "  scanned, then the database should be dumped to create the necessary output",
-    "  files.",
+    "The expected process is to parse a unicode string file to create an initial",
+    "database of string identifier names and string definitions. Then text files",
+    "should be scanned for STRING_TOKEN() usages, and the referenced",
+    "strings will be tagged as used in the database. After all files have been",
+    "scanned, then the database should be dumped to create the necessary output",
+    "files.",
     "",
     NULL
   };

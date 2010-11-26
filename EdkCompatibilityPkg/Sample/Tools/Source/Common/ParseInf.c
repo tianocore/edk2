@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -342,6 +342,152 @@ Returns:
 
   return EFI_NOT_FOUND;
 }
+
+EFI_STATUS
+FindTokenInstanceInSection (
+  IN MEMORY_FILE    *InputFile,
+  IN CHAR8          *Section,
+  IN UINTN          Instance,
+  OUT CHAR8         *Token,
+  OUT CHAR8         *Value
+  )
+/*++
+
+Routine Description:
+
+  Finds the Instance-th token in a section.
+
+Arguments:
+
+  InputFile Memory file image.
+  Section   The section to search for, a string within [].
+  Instance  Specify the Instance-th token to search for, starting from zero
+  Token     The token name to return. Caller should allocate the buffer.
+            Must be _MAX_PATH in size.
+  Value     The token value to return. Caller should allocate the buffer.
+            Must be _MAX_PATH in size.
+
+Returns:
+
+  EFI_SUCCESS             Token and Value found.
+  EFI_ABORTED             Format error detected in INF file.
+  EFI_INVALID_PARAMETER   Input argument was null.
+  EFI_LOAD_ERROR          Error reading from the file.
+  EFI_NOT_FOUND           Section/Token/Value not found.
+
+--*/
+{
+  CHAR8   InputBuffer[_MAX_PATH];
+  CHAR8   *CurrentToken;
+  CHAR8   *CurrentValue;
+  BOOLEAN ParseError;
+  BOOLEAN ReadError;
+  UINTN   InstanceIndex;
+
+  //
+  // Check input parameters
+  //
+  if (InputFile->FileImage == NULL ||
+      InputFile->Eof == NULL ||
+      InputFile->CurrentFilePointer == NULL ||
+      Section == NULL ||
+      strlen (Section) == 0 ||
+      Value == NULL
+      ) {
+    return EFI_INVALID_PARAMETER;
+  }
+  //
+  // Initialize error codes
+  //
+  ParseError  = FALSE;
+  ReadError   = FALSE;
+
+  //
+  // Initialize our instance counter for the search token
+  //
+  InstanceIndex = 0;
+
+  if (FindSection (InputFile, Section)) {
+    //
+    // Found the desired section, find and read the desired token
+    //
+    do {
+      //
+      // Read a line from the file
+      //
+      if (ReadLine (InputFile, InputBuffer, _MAX_PATH) == NULL) {
+        //
+        // Error reading from input file
+        //
+        ReadError = TRUE;
+        break;
+      }
+      //
+      // Get the first non-whitespace string
+      //
+      CurrentToken = strtok (InputBuffer, " \t\n");
+      if (CurrentToken == NULL) {
+        //
+        // Whitespace line found (or comment) so continue
+        //
+        CurrentToken = InputBuffer;
+        continue;
+      }
+      //
+      // Make sure we have not reached the end of the current section
+      //
+      if (CurrentToken[0] == '[') {
+        break;
+      }
+      //
+      // Check if it is the correct instance
+      //
+      if (Instance == InstanceIndex) {
+        //
+        // Copy the contents following the =
+        //
+        CurrentValue = strtok (NULL, "= \t\n");
+        if (CurrentValue == NULL) {
+          //
+          // Nothing found, parsing error
+          //
+          ParseError = TRUE;
+        } else {
+          //
+          // Copy the current token to the output value
+          //
+          strcpy (Token, CurrentToken);
+          strcpy (Value, CurrentValue);
+          return EFI_SUCCESS;
+        }
+      } else {
+        //
+        // Increment the occurrance found
+        //
+        InstanceIndex++;
+      }
+    } while (
+      !ParseError &&
+      !ReadError &&
+      InputFile->CurrentFilePointer < InputFile->Eof &&
+      CurrentToken[0] != '[' &&
+      InstanceIndex <= Instance
+    );
+  }
+  //
+  // Distinguish between read errors and INF file format errors.
+  //
+  if (ReadError) {
+    return EFI_LOAD_ERROR;
+  }
+
+  if (ParseError) {
+    return EFI_ABORTED;
+  }
+
+  return EFI_NOT_FOUND;
+}
+
 
 EFI_STATUS
 StringToGuid (

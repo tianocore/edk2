@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -140,7 +140,9 @@ typedef enum _EFI_MEMORY_ARRAY_TYPE {
   EfiMemoryTypeRdram                          = 0x11,
   EfiMemoryTypeDdr                            = 0x12,
   EfiMemoryTypeDdr2                           = 0x13,
-  EfiMemoryTypeDdr2FbDimm                     = 0x14
+  EfiMemoryTypeDdr2FbDimm                     = 0x14,
+  EfiMemoryTypeDdr3                           = 0x18,
+  EfiMemoryTypeFbd2                           = 0x19
 } EFI_MEMORY_ARRAY_TYPE;
 
 typedef struct {
@@ -189,6 +191,8 @@ typedef struct {
   UINT16                      MemorySpeed;
   EFI_MEMORY_STATE            MemoryState;
   UINT8                       MemoryAttributes;
+  UINT8                       MemoryBankConnections;
+  UINT8                       MemoryErrorStatus;
 } EFI_MEMORY_ARRAY_LINK;
 
 
@@ -304,11 +308,15 @@ typedef struct {
 
 typedef struct {
   UINT8  Five                  :1;
-  UINT8  There                 :1;
+  UINT8  Three                 :1;
   UINT8  Two                   :1;
   UINT8  Reserved              :5;
 } EFI_MEMORY_MODULE_VOLTAGE_TYPE;
 
+//
+//  EFI_MEMORY_CONTROLLER_INFORMATION is obsolete
+//  Use EFI_MEMORY_CONTROLLER_INFORMATION_DATA instead
+//
 typedef struct {
   EFI_MEMORY_ERROR_DETECT_METHOD_TYPE   ErrorDetectingMethod;
   EFI_MEMORY_ERROR_CORRECT_CAPABILITY   ErrorCorrectingCapability;
@@ -322,6 +330,20 @@ typedef struct {
   EFI_MEMORY_ERROR_CORRECT_CAPABILITY   EnabledCorrectingCapability;
   UINT16                                *MemoryModuleConfigHandles;
 } EFI_MEMORY_CONTROLLER_INFORMATION;
+
+typedef struct {
+  EFI_MEMORY_ERROR_DETECT_METHOD_TYPE   ErrorDetectingMethod;
+  EFI_MEMORY_ERROR_CORRECT_CAPABILITY   ErrorCorrectingCapability;
+  EFI_MEMORY_SUPPORT_INTERLEAVE_TYPE    MemorySupportedInterleave;
+  EFI_MEMORY_SUPPORT_INTERLEAVE_TYPE    MemoryCurrentInterleave;
+  UINT8                                 MaxMemoryModuleSize;
+  EFI_MEMORY_SPEED_TYPE                 MemorySpeedType;
+  EFI_MEMORY_SUPPORTED_TYPE             MemorySupportedType;
+  EFI_MEMORY_MODULE_VOLTAGE_TYPE        MemoryModuleVoltage;
+  UINT8                                 NumberofMemorySlot;
+  EFI_MEMORY_ERROR_CORRECT_CAPABILITY   EnabledCorrectingCapability;
+  EFI_INTER_LINK_DATA                   MemoryModuleConfig[1];
+} EFI_MEMORY_CONTROLLER_INFORMATION_DATA;
 
 //
 //  Memory. Error Information - SMBIOS Type 18

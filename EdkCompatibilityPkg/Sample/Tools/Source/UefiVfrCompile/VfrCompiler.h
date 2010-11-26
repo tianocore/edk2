@@ -1,17 +1,17 @@
 /*++
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
 http://opensource.org/licenses/bsd-license.php                                            
-
+                                                                                          
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 Module Name:
 
-VfrCompiler.h
+  VfrCompiler.h
 
 Abstract:
 
@@ -26,8 +26,8 @@ Abstract:
 #include "VfrFormPkg.h"
 #include "VfrUtilityLib.h"
 
-#define PROGRAM_NAME                       "VfrCompile"
-#define VFR_COMPILER_VERSION               "UEFI 2.1"
+#define UTILITY_NAME                        "VfrCompile"
+#define UTILITY_VERSION                     "v1.1"
 
 //
 // This is how we invoke the C preprocessor on the VFR source file
@@ -56,6 +56,7 @@ typedef struct {
   INT8    PreprocessorOutputFileName[MAX_PATH];
   INT8    VfrBaseFileName[MAX_PATH];  // name of input VFR file with no path or extension
   INT8    *IncludePaths;
+  bool    SkipCPreprocessor;
   INT8    *CPreprocessorOptions;
 } OPTIONS;
 

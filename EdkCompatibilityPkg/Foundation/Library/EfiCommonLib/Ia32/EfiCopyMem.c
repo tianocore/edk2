@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -58,20 +58,21 @@ Returns:
   ;   if (Source == Destination)           => do nothing
   ;   if (Source + Count <= Destination)   => regular copy
   ;   if (Destination + Count <= Source)   => regular copy
+  ;   if (Source >= Destination)           => regular copy
   ;   otherwise, do a reverse copy
   mov   eax, esi
   add   eax, ecx                      ; Source + Count
   cmp   eax, edi
-  jle   _StartByteCopy
+  jbe   _StartByteCopy
 
   mov   eax, edi
   add   eax, ecx                      ; Dest + Count
   cmp   eax, esi
-  jle   _StartByteCopy
+  jbe   _StartByteCopy
 
   cmp   esi, edi
   je    _CopyMemDone         
-  jl    _CopyOverlapped               ; too bad -- overlaps
+  jb    _CopyOverlapped               ; too bad -- overlaps
 
   ; Pick up misaligned start bytes to get destination pointer 4-byte aligned
 _StartByteCopy:

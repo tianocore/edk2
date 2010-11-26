@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-VfrFormPkg.cpp
+  VfrFormPkg.cpp
 
 Abstract:
 
@@ -25,25 +25,34 @@ Abstract:
  */
 
 SPendingAssign::SPendingAssign (
-  IN INT8   *Key, 
-  IN VOID   *Addr, 
-  IN UINT32 Len, 
-  IN UINT32 LineNo
+  IN INT8   *Key,
+  IN VOID   *Addr,
+  IN UINT32 Len,
+  IN UINT32 LineNo,
+  IN INT8   *Msg
   )
 {
+  mKey    = NULL;
+  mAddr   = Addr;
+  mLen    = Len;
+  mFlag   = PENDING;
+  mLineNo = LineNo;
+  mMsg    = NULL;
+  mNext   = NULL;
+
   if (Key != NULL) {
     mKey = new INT8[strlen (Key) + 1];
     if (mKey != NULL) {
       strcpy (mKey, Key);
     }
-  } else {
-    mKey = NULL;
   }
-  mAddr   = Addr;
-  mLen    = Len;
-  mFlag   = PENDING;
-  mLineNo = LineNo;
-  mNext   = NULL;
+
+  if (Msg != NULL) {
+    mMsg = new INT8[strlen (Msg) + 1];
+    if (mMsg != NULL) {
+      strcpy (mMsg, Msg);
+    }
+  }
 }
 
 SPendingAssign::~SPendingAssign (
@@ -56,12 +65,15 @@ SPendingAssign::~SPendingAssign (
   mAddr   = NULL;
   mLen    = 0;
   mLineNo = 0;
+  if (mMsg != NULL) {
+    delete mMsg;
+  }
   mNext   = NULL;
 }
 
 VOID
 SPendingAssign::SetAddrAndLen (
-  IN VOID   *Addr, 
+  IN VOID   *Addr,
   IN UINT32 LineNo
   )
 {
@@ -71,7 +83,7 @@ SPendingAssign::SetAddrAndLen (
 
 VOID
 SPendingAssign::AssignValue (
-  IN VOID   *Addr, 
+  IN VOID   *Addr,
   IN UINT32 Len
   )
 {
@@ -227,7 +239,7 @@ CFormPkg::Close (
 
 UINT32
 CFormPkg::Read (
-  IN CHAR8     *Buffer, 
+  IN CHAR8     *Buffer,
   IN UINT32    Size
   )
 {
@@ -270,7 +282,7 @@ CFormPkg::BuildPkgHdr (
     return VFR_RETURN_OUT_FOR_RESOURCES;
   }
 
-  (*PkgHdr)->Type = EFI_HII_PACKAGE_FORM;
+  (*PkgHdr)->Type = EFI_HII_PACKAGE_FORMS;
   (*PkgHdr)->Length = mPkgLength + sizeof (EFI_HII_PACKAGE_HEADER);
   return VFR_RETURN_SUCCESS;
 }
@@ -357,7 +369,7 @@ CFormPkg::_WRITE_PKG_END (
 
 #define BYTES_PRE_LINE 0x10
 
-EFI_VFR_RETURN_CODE 
+EFI_VFR_RETURN_CODE
 CFormPkg::GenCFile (
   IN INT8 *BaseName,
   IN FILE *pFile
@@ -407,15 +419,16 @@ CFormPkg::GenCFile (
 
 EFI_VFR_RETURN_CODE
 CFormPkg::AssignPending (
-  IN INT8   *Key, 
-  IN VOID   *ValAddr, 
+  IN INT8   *Key,
+  IN VOID   *ValAddr,
   IN UINT32 ValLen,
-  IN UINT32 LineNo
+  IN UINT32 LineNo,
+  IN INT8   *Msg
   )
 {
   SPendingAssign *pNew;
 
-  pNew = new SPendingAssign (Key, ValAddr, ValLen, LineNo);
+  pNew = new SPendingAssign (Key, ValAddr, ValLen, LineNo, Msg);
   if (pNew == NULL) {
     return VFR_RETURN_OUT_FOR_RESOURCES;
   }
@@ -427,8 +440,8 @@ CFormPkg::AssignPending (
 
 VOID
 CFormPkg::DoPendingAssign (
-  IN INT8   *Key, 
-  IN VOID   *ValAddr, 
+  IN INT8   *Key,
+  IN VOID   *ValAddr,
   IN UINT32 ValLen
   )
 {
@@ -470,7 +483,7 @@ CFormPkg::PendingAssignPrintAll (
 
   for (pNode = PendingAssignList; pNode != NULL; pNode = pNode->mNext) {
     if (pNode->mFlag == PENDING) {
-      gCVfrErrorHandle.PrintError (pNode->mLineNo, pNode->mKey, "can not assign value because not defined");
+      gCVfrErrorHandle.PrintMsg (pNode->mLineNo, pNode->mKey, "Error", pNode->mMsg);
     }
   }
 }
@@ -492,10 +505,7 @@ SIfrRecord::~SIfrRecord (
   VOID
   )
 {
-  if (mIfrBinBuf != NULL) {
-    delete mIfrBinBuf;
-    mIfrBinBuf = NULL;
-  }
+  mIfrBinBuf   = NULL;
   mLineNo      = 0xFFFFFFFF;
   mOffset      = 0xFFFFFFFF;
   mBinBufLen   = 0;
@@ -537,8 +547,8 @@ CIfrRecordInfoDB::GetRecordInfoFromIdx (
     return NULL;
   }
 
-  for (Idx = (EFI_IFR_RECORDINFO_IDX_START + 1), pNode = mIfrRecordListHead; 
-       (Idx != RecordIdx) && (pNode != NULL); 
+  for (Idx = (EFI_IFR_RECORDINFO_IDX_START + 1), pNode = mIfrRecordListHead;
+       (Idx != RecordIdx) && (pNode != NULL);
        Idx++, pNode = pNode->mNext)
   ;
 
@@ -547,8 +557,8 @@ CIfrRecordInfoDB::GetRecordInfoFromIdx (
 
 UINT32
 CIfrRecordInfoDB::IfrRecordRegister (
-  IN UINT32 LineNo, 
-  IN CHAR8  *IfrBinBuf, 
+  IN UINT32 LineNo,
+  IN CHAR8  *IfrBinBuf,
   IN UINT8  BinBufLen,
   IN UINT32 Offset
   )
@@ -577,7 +587,7 @@ CIfrRecordInfoDB::IfrRecordRegister (
 
 VOID
 CIfrRecordInfoDB::IfrRecordInfoUpdate (
-  IN UINT32 RecordIdx, 
+  IN UINT32 RecordIdx,
   IN UINT32 LineNo,
   IN CHAR8  *BinBuf,
   IN UINT8  BinBufLen,
@@ -585,23 +595,25 @@ CIfrRecordInfoDB::IfrRecordInfoUpdate (
   )
 {
   SIfrRecord *pNode;
+  SIfrRecord *Prev;
 
   if ((pNode = GetRecordInfoFromIdx (RecordIdx)) == NULL) {
     return;
   }
 
+  if (LineNo == 0) {
+    //
+    // Line number is not specified explicitly, try to use line number of previous opcode
+    //
+    Prev = GetRecordInfoFromIdx (RecordIdx - 1);
+    if (Prev != NULL) {
+      LineNo = Prev->mLineNo;
+    }
+  }
   pNode->mLineNo    = LineNo;
   pNode->mOffset    = Offset;
   pNode->mBinBufLen = BinBufLen;
-  if (BinBuf != NULL) {
-    if (pNode->mIfrBinBuf != NULL) {
-      delete pNode->mIfrBinBuf;
-    }
-    pNode->mIfrBinBuf = new CHAR8[BinBufLen];
-    if (pNode->mIfrBinBuf != NULL) {
-      memcpy (pNode->mIfrBinBuf, BinBuf, BinBufLen);
-    }
-  }
+  pNode->mIfrBinBuf = BinBuf;
 }
 
 VOID
@@ -626,7 +638,7 @@ CIfrRecordInfoDB::IfrRecordOutput (
       fprintf (File, ">%08X: ", pNode->mOffset);
       if (pNode->mIfrBinBuf != NULL) {
         for (Index = 0; Index < pNode->mBinBufLen; Index++) {
-          fprintf (File, "%02X ", pNode->mIfrBinBuf[Index]);
+          fprintf (File, "%02X ", (UINT8)(pNode->mIfrBinBuf[Index]));
         }
       }
       fprintf (File, "\n");
@@ -650,6 +662,7 @@ CIfrObj::_EMIT_PENDING_OBJ (
 
   if (mObjBinBuf != NULL) {
     delete mObjBinBuf;
+    mObjBinBuf = ObjBinBuf;
   }
 }
 
@@ -689,7 +702,7 @@ static struct {
   { sizeof (EFI_IFR_DATE), 1 },                // EFI_IFR_DATE_OP
   { sizeof (EFI_IFR_TIME), 1 },                // EFI_IFR_TIME_OP
   { sizeof (EFI_IFR_STRING), 1 },              // EFI_IFR_STRING_OP
-  { sizeof (EFI_IFR_REFRESH), 1 },             // EFI_IFR_REFRESH_OP
+  { sizeof (EFI_IFR_REFRESH), 0 },             // EFI_IFR_REFRESH_OP
   { sizeof (EFI_IFR_DISABLE_IF), 1 },          // EFI_IFR_DISABLE_IF_OP - 0x1E
   { 0, 0 },                                    // 0x1F
   { sizeof (EFI_IFR_TO_LOWER), 0 },            // EFI_IFR_TO_LOWER_OP - 0x20
@@ -829,10 +842,10 @@ CIfrObj::~CIfrObj (
 UINT8 gScopeCount = 0;
 
 CIfrOpHeader::CIfrOpHeader (
-  IN UINT8 OpCode, 
+  IN UINT8 OpCode,
   IN VOID *StartAddr,
-  IN UINT8 Length 
-  ) : mHeader ((EFI_IFR_OP_HEADER *)StartAddr) 
+  IN UINT8 Length
+  ) : mHeader ((EFI_IFR_OP_HEADER *)StartAddr)
 {
   mHeader->OpCode = OpCode;
   mHeader->Length = (Length == 0) ? gOpcodeSizesScopeTable[OpCode].mSize : Length;
