@@ -28,6 +28,12 @@
 #include <Guid/StatusCodeDataTypeDebug.h>
 #include <Protocol/StatusCode.h>
 
+//
+// Define the maximum extended data size that is supported when a status code is
+// reported at TPL_HIGH_LEVEL.
+//
+#define MAX_EXTENDED_DATA_SIZE  0x200
+
 EFI_REPORT_STATUS_CODE  mReportStatusCode = NULL;
 
 /**
@@ -488,7 +494,7 @@ ReportStatusCodeEx (
   EFI_STATUS            Status;
   EFI_STATUS_CODE_DATA  *StatusCodeData;
   EFI_TPL               Tpl;
-  UINT64                Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)];
+  UINT64                Buffer[(MAX_EXTENDED_DATA_SIZE / sizeof (UINT64)) + 1];
 
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
@@ -515,12 +521,12 @@ ReportStatusCodeEx (
     //
     // If a buffer could not be allocated, then see if the local variable Buffer can be used
     //
-    if (ExtendedDataSize > (EFI_STATUS_CODE_DATA_MAX_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
+    if (ExtendedDataSize > (MAX_EXTENDED_DATA_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
       //
       // The local variable Buffer not large enough to hold the extended data associated
       // with the status code being reported.
       //
-      ASSERT (FALSE);
+      DEBUG ((EFI_D_ERROR, "Status code extended data is too large to be reported!\n"));
       return EFI_OUT_OF_RESOURCES;
     }
     StatusCodeData = (EFI_STATUS_CODE_DATA  *)Buffer;
