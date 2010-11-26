@@ -1438,6 +1438,14 @@ EhcCreateUsb2Hc (
   DEBUG ((EFI_D_INFO, "EhcCreateUsb2Hc: capability length %d\n", Ehc->CapLen));
 
   //
+  // EHCI Controllers with a CapLen of 0 are ignored.
+  //
+  if (Ehc->CapLen == 0) {
+    gBS->FreePool (Ehc);
+    return NULL;
+  }
+
+  //
   // Create AsyncRequest Polling Timer
   //
   Status = gBS->CreateEvent (
