@@ -394,6 +394,7 @@ ReportStatusCodeEx (
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
   if (ExtendedDataSize > EFI_STATUS_CODE_DATA_MAX_SIZE) {
+    DEBUG ((EFI_D_ERROR, "Status code extended data is too large to be reported!\n"));
     return EFI_OUT_OF_RESOURCES;
   }
 
