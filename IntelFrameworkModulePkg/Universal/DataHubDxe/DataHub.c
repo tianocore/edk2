@@ -58,6 +58,7 @@ DataHubLogData (
   DATA_HUB_FILTER_DRIVER  *FilterEntry;
   LIST_ENTRY              *Link;
   LIST_ENTRY              *Head;
+  EFI_TIME                LogTime;
 
   Private = DATA_HUB_INSTANCE_FROM_THIS (This);
 
@@ -69,10 +70,18 @@ DataHubLogData (
   //
   RecordSize  = sizeof (EFI_DATA_RECORD_HEADER) + RawDataSize;
   TotalSize   = sizeof (EFI_DATA_ENTRY) + RecordSize;
+  
+  //
+  // First try to get log time at TPL level <= TPL_CALLBACK.
+  //
+  ZeroMem (&LogTime, sizeof (LogTime));
+  if (EfiGetCurrentTpl() <= TPL_CALLBACK) {
+    gRT->GetTime (&LogTime, NULL);
+  }
 
   //
   // The Logging action is the critical section, so it is locked.
-  //  The MTC asignment & update, time, and logging must be an
+  //  The MTC asignment & update and logging must be an
   //  atomic operation, so use the lock.
   //
   Status = EfiAcquireLockOrFail (&Private->DataLock);
@@ -110,7 +119,7 @@ DataHubLogData (
   //
   Record->LogMonotonicCount = ++Private->GlobalMonotonicCount;
 
-  gRT->GetTime (&Record->LogTime, NULL);
+  CopyMem (&Record->LogTime, &LogTime, sizeof (LogTime));
 
   //
   // Insert log into the internal linked list.
@@ -551,7 +560,7 @@ DataHubInstall (
   InitializeListHead (&mPrivateData.DataListHead);
   InitializeListHead (&mPrivateData.FilterDriverListHead);
 
-  EfiInitializeLock (&mPrivateData.DataLock, TPL_CALLBACK);
+  EfiInitializeLock (&mPrivateData.DataLock, TPL_NOTIFY);
 
   //
   // Make sure we get a bigger MTC number on every boot!
