@@ -68,6 +68,7 @@
 [Components]
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
   UefiCpuPkg/CpuIoPei/CpuIoPei.inf
+  UefiCpuPkg/Library/SecPeiDxeTimerLibUefiCpu/SecPeiDxeTimerLibUefiCpu.inf
 
 [Components.IA32, Components.X64]
   UefiCpuPkg/CpuDxe/CpuDxe.inf
