@@ -52,6 +52,7 @@
   HiiLib
   DebugLib
   BaseLib
+  UnixLib
 
 [Protocols]
   gEfiUnixIoProtocolGuid                        # PROTOCOL_NOTIFY SOMETIMES_CONSUMED

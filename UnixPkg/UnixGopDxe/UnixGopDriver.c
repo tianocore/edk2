@@ -1,6 +1,7 @@
 /*++
 
 Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Portions copyright (c) 2010, Apple, Inc. All rights reserved.
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -11,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  UnixUgaDriver.c
+  UnixGopDriver.c
 
 Abstract:
 
@@ -25,21 +26,51 @@ Abstract:
 
 --*/
 
-#include "UnixUga.h"
+#include "UnixGop.h"
 
-EFI_DRIVER_BINDING_PROTOCOL gUnixUgaDriverBinding = {
-  UnixUgaDriverBindingSupported,
-  UnixUgaDriverBindingStart,
-  UnixUgaDriverBindingStop,
-  0xa,
-  NULL,
-  NULL
-};
+
+EFI_STATUS
+FreeNotifyList (
+  IN OUT LIST_ENTRY           *ListHead
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+
+  ListHead   - The list head
+
+Returns:
+
+  EFI_SUCCESS           - Free the notify list successfully
+  EFI_INVALID_PARAMETER - ListHead is invalid.
+
+--*/
+{
+  UNIX_GOP_SIMPLE_TEXTIN_EX_NOTIFY *NotifyNode;
+
+  if (ListHead == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  while (!IsListEmpty (ListHead)) {
+    NotifyNode = CR (
+                   ListHead->ForwardLink, 
+                   UNIX_GOP_SIMPLE_TEXTIN_EX_NOTIFY, 
+                   NotifyEntry, 
+                   UNIX_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE
+                   );
+    RemoveEntryList (ListHead->ForwardLink);
+    gBS->FreePool (NotifyNode);
+  }
+  
+  return EFI_SUCCESS;
+}
 
 
 EFI_STATUS
 EFIAPI
-UnixUgaDriverBindingSupported (
+UnixGopDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      Handle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
@@ -77,7 +108,7 @@ Returns:
     return Status;
   }
 
-  Status = UnixUgaSupported (UnixIo);
+  Status = UnixGopSupported (UnixIo);
 
   //
   // Close the I/O Abstraction(s) used to perform the supported test
@@ -94,7 +125,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-UnixUgaDriverBindingStart (
+UnixGopDriverBindingStart (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      Handle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
@@ -117,7 +148,7 @@ Returns:
 {
   EFI_UNIX_IO_PROTOCOL  *UnixIo;
   EFI_STATUS              Status;
-  UGA_PRIVATE_DATA        *Private;
+  GOP_PRIVATE_DATA        *Private;
 
   //
   // Grab the protocols we need
@@ -140,7 +171,7 @@ Returns:
   Private = NULL;
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
-                  sizeof (UGA_PRIVATE_DATA),
+                  sizeof (GOP_PRIVATE_DATA),
                   (VOID **)&Private
                   );
   if (EFI_ERROR (Status)) {
@@ -149,36 +180,41 @@ Returns:
   //
   // Set up context record
   //
-  Private->Signature            = UGA_PRIVATE_DATA_SIGNATURE;
-  Private->Handle               = Handle;
+  Private->Signature           = GOP_PRIVATE_DATA_SIGNATURE;
+  Private->Handle              = Handle;
   Private->UnixThunk           = UnixIo->UnixThunk;
 
   Private->ControllerNameTable  = NULL;
 
   AddUnicodeString (
     "eng",
-    gUnixUgaComponentName.SupportedLanguages,
+    gUnixGopComponentName.SupportedLanguages,
     &Private->ControllerNameTable,
     UnixIo->EnvString
+    );
+  AddUnicodeString2 (
+    "en",
+    gUnixGopComponentName2.SupportedLanguages,
+    &Private->ControllerNameTable,
+    UnixIo->EnvString,
+    FALSE
     );
 
   Private->WindowName = UnixIo->EnvString;
 
-  Status              = UnixUgaConstructor (Private);
+  Status              = UnixGopConstructor (Private);
   if (EFI_ERROR (Status)) {
     goto Done;
   }
   //
-  // Publish the Uga interface to the world
+  // Publish the Gop interface to the world
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Private->Handle,
-                  &gEfiUgaDrawProtocolGuid,
-                  &Private->UgaDraw,
-                  &gEfiSimpleTextInProtocolGuid,
-                  &Private->SimpleTextIn,
-                  &gEfiSimplePointerProtocolGuid,
-                  &Private->SimplePointer,
+                  &gEfiGraphicsOutputProtocolGuid,    &Private->GraphicsOutput,
+                  &gEfiSimpleTextInProtocolGuid,      &Private->SimpleTextIn,
+                  &gEfiSimplePointerProtocolGuid,     &Private->SimplePointer,
+//                  &gEfiSimpleTextInputExProtocolGuid, &Private->SimpleTextInEx,
                   NULL
                   );
 
@@ -199,6 +235,13 @@ Done:
       if (Private->ControllerNameTable != NULL) {
         FreeUnicodeStringTable (Private->ControllerNameTable);
       }
+      if (Private->SimpleTextIn.WaitForKey != NULL) {
+        gBS->CloseEvent (Private->SimpleTextIn.WaitForKey);
+      }
+      if (Private->SimpleTextInEx.WaitForKeyEx != NULL) {
+        gBS->CloseEvent (Private->SimpleTextInEx.WaitForKeyEx);
+      }
+      FreeNotifyList (&Private->NotifyList);
 
       gBS->FreePool (Private);
     }
@@ -209,7 +252,7 @@ Done:
 
 EFI_STATUS
 EFIAPI
-UnixUgaDriverBindingStop (
+UnixGopDriverBindingStop (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
   IN  UINTN                        NumberOfChildren,
@@ -233,21 +276,21 @@ Returns:
 // TODO:    EFI_NOT_STARTED - add return value to function comment
 // TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
-  EFI_UGA_DRAW_PROTOCOL *UgaDraw;
-  EFI_STATUS            Status;
-  UGA_PRIVATE_DATA      *Private;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL *GraphicsOutput;
+  EFI_STATUS                   Status;
+  GOP_PRIVATE_DATA             *Private;
 
   Status = gBS->OpenProtocol (
                   Handle,
-                  &gEfiUgaDrawProtocolGuid,
-                  (VOID **)&UgaDraw,
+                  &gEfiGraphicsOutputProtocolGuid,
+                  (VOID **)&GraphicsOutput,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
     //
-    // If the UGA interface does not exist the driver is not started
+    // If the GOP interface does not exist the driver is not started
     //
     return EFI_NOT_STARTED;
   }
@@ -255,26 +298,24 @@ Returns:
   //
   // Get our private context information
   //
-  Private = UGA_DRAW_PRIVATE_DATA_FROM_THIS (UgaDraw);
+  Private = GOP_PRIVATE_DATA_FROM_THIS (GraphicsOutput);
 
   //
   // Remove the SGO interface from the system
   //
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   Private->Handle,
-                  &gEfiUgaDrawProtocolGuid,
-                  &Private->UgaDraw,
-                  &gEfiSimpleTextInProtocolGuid,
-                  &Private->SimpleTextIn,
-                  &gEfiSimplePointerProtocolGuid,
-                  &Private->SimplePointer,
+                  &gEfiGraphicsOutputProtocolGuid,    &Private->GraphicsOutput,
+                  &gEfiSimpleTextInProtocolGuid,      &Private->SimpleTextIn,
+                  &gEfiSimplePointerProtocolGuid,     &Private->SimplePointer,
+//                  &gEfiSimpleTextInputExProtocolGuid, &Private->SimpleTextInEx,
                   NULL
                   );
   if (!EFI_ERROR (Status)) {
     //
     // Shutdown the hardware
     //
-    Status = UnixUgaDestructor (Private);
+    Status = UnixGopDestructor (Private);
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
@@ -290,10 +331,65 @@ Returns:
     // Free our instance data
     //
     FreeUnicodeStringTable (Private->ControllerNameTable);
+    
+    Status = gBS->CloseEvent (Private->SimpleTextIn.WaitForKey);
+    ASSERT_EFI_ERROR (Status);
+    
+    Status = gBS->CloseEvent (Private->SimpleTextInEx.WaitForKeyEx);
+    ASSERT_EFI_ERROR (Status);
+    
+    FreeNotifyList (&Private->NotifyList);
 
     gBS->FreePool (Private);
 
   }
+
+  return Status;
+}
+
+
+
+
+EFI_DRIVER_BINDING_PROTOCOL gUnixGopDriverBinding = {
+  UnixGopDriverBindingSupported,
+  UnixGopDriverBindingStart,
+  UnixGopDriverBindingStop,
+  0xa,
+  NULL,
+  NULL
+};
+
+
+
+/**
+  The user Entry Point for module UnixGop. The user code starts with this function.
+
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] SystemTable    A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+  @retval other             Some error occurs when executing this entry point.
+
+**/
+EFI_STATUS
+EFIAPI
+InitializeUnixGop (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
+  )
+{
+  EFI_STATUS              Status;
+
+  Status = EfiLibInstallDriverBindingComponentName2 (
+             ImageHandle,
+             SystemTable,
+             &gUnixGopDriverBinding,
+             ImageHandle,
+             &gUnixGopComponentName,
+             &gUnixGopComponentName2
+             );
+  ASSERT_EFI_ERROR (Status);
+
 
   return Status;
 }

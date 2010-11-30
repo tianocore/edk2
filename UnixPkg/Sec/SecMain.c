@@ -1,7 +1,7 @@
 /*++
 
 Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1114,6 +1114,18 @@ SecPeCoffRelocateImageExtraAction (
 {
 
 #ifdef __APPLE__
+  BOOLEAN EnabledOnEntry;
+
+   //
+   // Make sure writting of the file is an atomic operation
+   //
+   if (UnixInterruptEanbled ()) {
+     UnixDisableInterrupt ();
+     EnabledOnEntry = TRUE;
+   } else {
+     EnabledOnEntry = FALSE;
+   }
+
   PrintLoadAddress (ImageContext);
 
   //
@@ -1165,10 +1177,17 @@ SecPeCoffRelocateImageExtraAction (
       // Hey what can you say scripting in gdb is not that great....
       //
       SecGdbScriptBreak ();
+    } else {
+      ASSERT (FALSE);
     }
 
     AddHandle (ImageContext, ImageContext->PdbPointer);
 
+    if (EnabledOnEntry) {
+      UnixEnableInterrupt ();
+    }
+
+    
   }
 
 #else
@@ -1223,12 +1242,20 @@ SecPeCoffLoaderUnloadImageExtraAction (
 
 #ifdef __APPLE__
   FILE  *GdbTempFile;
+  BOOLEAN EnabledOnEntry;
 
   if (Handle != NULL) {
     //
     // Need to skip .PDB files created from VC++
     //
     if (!IsPdbFile (ImageContext->PdbPointer)) {
+       if (UnixInterruptEanbled ()) {
+         UnixDisableInterrupt ();
+         EnabledOnEntry = TRUE;
+       } else {
+         EnabledOnEntry = FALSE;
+       }
+       
       //
       // Write the file we need for the gdb script
       //
@@ -1242,6 +1269,12 @@ SecPeCoffLoaderUnloadImageExtraAction (
         // Hey what can you say scripting in gdb is not that great....
         //
         SecGdbScriptBreak ();
+      } else {
+        ASSERT (FALSE);
+      }
+      
+      if (EnabledOnEntry) {
+        UnixEnableInterrupt ();
       }
     }
   }

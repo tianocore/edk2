@@ -1,14 +1,14 @@
 /*++
 
 Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
-Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+This program and the accompanying materials                          
+are licensed and made available under the terms and conditions of the BSD License         
+which accompanies this distribution.  The full text of the license may be found at        
+http://opensource.org/licenses/bsd-license.php                                            
+                                                                                          
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 Module Name:
 
@@ -16,7 +16,7 @@ Module Name:
 
 Abstract:
 
-  Since the SEC is the only program in our emulation we
+  Since the SEC is the only program in our emulation we 
   must use a Tiano mechanism to export APIs to other modules.
   This is the role of the EFI_UNIX_THUNK_PROTOCOL.
 
@@ -25,7 +25,7 @@ Abstract:
   are not added. It looks like adding a element to end and not initializing
   it may cause the table to be initaliized with the members at the end being
   set to zero. This is bad as jumping to zero will crash.
-
+  
 
   gUnix is a a public exported global that contains the initialized
   data.
@@ -44,6 +44,9 @@ int settimer_initialized;
 struct timeval settimer_timeval;
 void (*settimer_callback)(UINT64 delta);
 
+BOOLEAN gEmulatorInterruptEnabled = FALSE;
+
+
 void
 settimer_handler (int sig)
 {
@@ -52,15 +55,15 @@ settimer_handler (int sig)
 
   gettimeofday (&timeval, NULL);
   delta = ((UINT64)timeval.tv_sec * 1000) + (timeval.tv_usec / 1000)
-    - ((UINT64)settimer_timeval.tv_sec * 1000)
+    - ((UINT64)settimer_timeval.tv_sec * 1000) 
     - (settimer_timeval.tv_usec / 1000);
   settimer_timeval = timeval;
-
+  
   if (settimer_callback) {
 #if defined(__APPLE__) || defined(MDE_CPU_X64)
    ReverseGasketUint64 (settimer_callback, delta);
 #else
-   (*settimer_callback)(delta);
+    (*settimer_callback)(delta);
 #endif
   }
 }
@@ -78,6 +81,7 @@ SetTimer (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs))
     act.sa_handler = settimer_handler;
     act.sa_flags = 0;
     sigemptyset (&act.sa_mask);
+    gEmulatorInterruptEnabled = TRUE;
     if (sigaction (SIGALRM, &act, NULL) != 0) {
       printf ("SetTimer: sigaction error %s\n", strerror (errno));
     }
@@ -90,12 +94,49 @@ SetTimer (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs))
   timerval.it_value.tv_usec = remainder * 1000;
   timerval.it_value.tv_sec = DivU64x32(PeriodMs, 1000);
   timerval.it_interval = timerval.it_value;
-
+  
   if (setitimer (ITIMER_REAL, &timerval, NULL) != 0) {
     printf ("SetTimer: setitimer error %s\n", strerror (errno));
   }
   settimer_callback = CallBack;
 }
+
+
+void
+UnixEnableInterrupt (void)
+{
+  sigset_t  sigset;
+
+  gEmulatorInterruptEnabled = TRUE;
+  // Since SetTimer() uses SIGALRM we emulate turning on and off interrupts 
+  // by enabling/disabling SIGALRM.
+  sigemptyset (&sigset);
+  sigaddset (&sigset, SIGALRM);
+  sigprocmask (SIG_UNBLOCK, &sigset, NULL);
+}
+
+
+void
+UnixDisableInterrupt (void)
+{
+  sigset_t  sigset;
+
+  // Since SetTimer() uses SIGALRM we emulate turning on and off interrupts 
+  // by enabling/disabling SIGALRM.
+  sigemptyset (&sigset);
+  sigaddset (&sigset, SIGALRM);
+  sigprocmask (SIG_BLOCK, &sigset, NULL);
+  gEmulatorInterruptEnabled = FALSE;
+}
+
+
+BOOLEAN
+UnixInterruptEanbled (void)
+{
+  return gEmulatorInterruptEnabled;
+}
+
+
 
 void
 msSleep (unsigned long Milliseconds)
@@ -110,7 +151,7 @@ msSleep (unsigned long Milliseconds)
       break;
     }
     rq = rm;
-  }
+  } 
 
 }
 
@@ -174,7 +215,7 @@ EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
 #if defined(__APPLE__) || defined(MDE_CPU_X64)
 //
 // Mac OS X requires the stack to be 16-byte aligned for IA-32. So on an OS X build
-// we add an assembly wrapper that makes sure the stack ges aligned.
+// we add an assembly wrapper that makes sure the stack ges aligned. 
 // This has the nice benfit of being able to run EFI ABI code, like the EFI shell
 // that is checked in to source control in the OS X version of the emulator
 //
@@ -217,9 +258,16 @@ EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   Gasketcfsetospeed,
   Gaskettcgetattr,
   Gaskettcsetattr,
-  GasketUnixPeCoffGetEntryPoint,
-  GasketUnixPeCoffRelocateImageExtraAction,
-  GasketUnixPeCoffUnloadImageExtraAction
+  GasketUnixPeCoffGetEntryPoint,                
+  GasketUnixPeCoffRelocateImageExtraAction,     
+  GasketUnixPeCoffUnloadImageExtraAction,  
+  
+  GasketUnixEnableInterrupt,
+  GasketUnixDisableInterrupt,
+
+  Gasketgetifaddrs,
+  Gasketfreeifaddrs,
+  Gasketsocket,
 
 #else
   msSleep, /* Sleep */
@@ -263,7 +311,12 @@ EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   tcsetattr,
   SecPeCoffGetEntryPoint,
   SecPeCoffRelocateImageExtraAction,
-  SecPeCoffLoaderUnloadImageExtraAction
+  SecPeCoffLoaderUnloadImageExtraAction,
+  UnixEnableInterrupt,
+  UnixDisableInterrupt,
+  getifaddrs,
+  freeifaddrs,
+  socket
 #endif
 };
 

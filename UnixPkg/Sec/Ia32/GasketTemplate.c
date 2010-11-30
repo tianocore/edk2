@@ -7,7 +7,7 @@
   the assembly functions. 
 
 Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
-Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -36,6 +36,7 @@ typedef UINT32    UINTN;
 typedef int (*GASKET_VOID) ();
 typedef int (*GASKET_UINTN) (UINTN);
 typedef int (*GASKET_UINT64) (UINT64);
+typedef int (*GASKET_UINT64UINT64) (UINT64, UINT64);
 typedef int (*GASKET_UINTN_UINTN) (UINTN, UINTN);
 typedef int (*GASKET_UINTN_UINTN_UINTN) (UINTN, UINTN, UINTN);
 typedef int (*GASKET_UINTN_UINTN_UINTN_UINTN) (UINTN, UINTN, UINTN, UINTN);
@@ -146,6 +147,16 @@ ReverseGasketUint64 (void *api, UINT64 a)
   
   func = (GASKET_UINT64)api;
   func (a);
+  return;
+}
+
+void
+ReverseGasketUint64UINT64 (void *api, UINT64 a, UINT64 b)
+{
+  GASKET_UINT64UINT64 func;
+  
+  func = (GASKET_UINT64UINT64)api;
+  func (a, b);
   return;
 }
 

@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 
 #include <Protocol/UgaDraw.h>
 #include <Protocol/SimpleTextIn.h>
+#include <Protocol/SimpleTextInEx.h>
 #include <Protocol/UnixUgaIo.h>
 
 
@@ -177,11 +178,17 @@ Gasketclosedir (
 
 int
 EFIAPI
-Gasketstat (const char *path, STAT_FIX *buf);
+Gasketstat (
+  const char  *path, 
+  STAT_FIX    *buf)
+  ;
 
 int
 EFIAPI
-Gasketstatfs (const char *path, struct statfs *buf);
+Gasketstatfs (
+  const char      *path, 
+  struct statfs   *buf
+  );
 
 int
 EFIAPI
@@ -292,6 +299,34 @@ Gasketsigaction (
   const struct sigaction *act,
   struct sigaction *oact
   );
+
+int 
+EFIAPI 
+Gasketgetifaddrs (
+  struct ifaddrs **ifap
+  );
+
+void 
+EFIAPI 
+Gasketfreeifaddrs (
+  struct ifaddrs *ifap
+  );
+
+int 
+EFIAPI 
+Gasketsocket (
+  int domain, 
+  int type, 
+  int protocol
+  );
+
+void 
+EFIAPI 
+GasketUnixEnableInterrupt (void);
+
+void 
+EFIAPI 
+GasketUnixDisableInterrupt (void);
 
 RETURN_STATUS
 EFIAPI
@@ -406,6 +441,13 @@ ReverseGasketUint64 (
   UINT64 a
   );
 
+UINTN
+ReverseGasketUint64Uint64 (
+  VOID      *CallBack,
+  VOID      *Context,
+  VOID      *Key
+  );
+
 //
 // Gasket functions for EFI_UNIX_UGA_IO_PROTOCOL
 //
@@ -435,23 +477,51 @@ EFI_STATUS
 EFIAPI
 GasketUgaGetKey (
   EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
-  EFI_INPUT_KEY *key
+  EFI_KEY_DATA              *key
   );
 
 EFI_STATUS
 EFIAPI
-GasketUgaBlt (
+GasketUgaKeySetState (
    EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
+  EFI_KEY_TOGGLE_STATE *KeyToggleState
+  );
+  
+EFI_STATUS
+EFIAPI  
+GasketUgaRegisterKeyNotify ( 
+  IN EFI_UNIX_UGA_IO_PROTOCOL           *UgaIo, 
+  IN UGA_REGISTER_KEY_NOTIFY_CALLBACK   CallBack,
+  IN VOID                               *Context
+  );
+  
+EFI_STATUS
+EFIAPI
+GasketUgaBlt (
+  IN  EFI_UNIX_UGA_IO_PROTOCOL                *UgaIo,
    IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
    IN  EFI_UGA_BLT_OPERATION                   BltOperation,
-   IN  UINTN                                   SourceX,
-   IN  UINTN                                   SourceY,
-   IN  UINTN                                   DestinationX,
-   IN  UINTN                                   DestinationY,
-   IN  UINTN                                   Width,
-   IN  UINTN                                   Height,
-   IN  UINTN                                   Delta OPTIONAL
+  IN  UGA_BLT_ARGS                            *Args
    );
+
+EFI_STATUS
+EFIAPI
+GasketUgaCheckPointer (
+  EFI_UNIX_UGA_IO_PROTOCOL *UgaIo
+  );
+
+EFI_STATUS 
+EFIAPI 
+GasketUgaGetPointerState (
+  EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, 
+  EFI_SIMPLE_POINTER_STATE *state
+  );
+
+
+//
+// Gasket functions for EFI_UNIX_UGA_IO_PROTOCOL C calls
+//
+
 
 EFI_STATUS
 EFIAPI
@@ -460,10 +530,6 @@ UgaCreate (
   CONST CHAR16 *Title
   );
 
-
-//
-// Gasket functions for EFI_UNIX_UGA_IO_PROTOCOL
-//
 EFI_STATUS
 EFIAPI
 UgaClose (
@@ -488,24 +554,39 @@ EFI_STATUS
 EFIAPI
 UgaGetKey (
   EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
-  EFI_INPUT_KEY *key
+  EFI_KEY_DATA             *key
   );
 
 EFI_STATUS
 EFIAPI
-UgaBlt (
-  EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
-  IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
-  IN  EFI_UGA_BLT_OPERATION                   BltOperation,
-  IN  UINTN                                   SourceX,
-  IN  UINTN                                   SourceY,
-  IN  UINTN                                   DestinationX,
-  IN  UINTN                                   DestinationY,
-  IN  UINTN                                   Width,
-  IN  UINTN                                   Height,
-  IN  UINTN                                   Delta OPTIONAL
+UgaRegisterKeyNotify (
+  IN EFI_UNIX_UGA_IO_PROTOCOL           *UgaIo, 
+  IN UGA_REGISTER_KEY_NOTIFY_CALLBACK   CallBack,
+  IN VOID                               *Context
   );
 
+
+EFI_STATUS
+EFIAPI
+UgaBlt (
+  IN  EFI_UNIX_UGA_IO_PROTOCOL                *UgaIo,
+  IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
+  IN  EFI_UGA_BLT_OPERATION                   BltOperation,
+  IN  UGA_BLT_ARGS                            *Args
+  );
+
+EFI_STATUS 
+EFIAPI
+UgaCheckPointer (
+  IN EFI_UNIX_UGA_IO_PROTOCOL *UgaIo
+  );
+  
+EFI_STATUS
+EFIAPI
+UgaGetPointerState (
+  IN EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, 
+  IN EFI_SIMPLE_POINTER_STATE *State
+  );
 
 
 #endif

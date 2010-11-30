@@ -6,6 +6,7 @@
 #  abstraction. For a PCI device UnixIo would be replaced with
 #  a PCI IO abstraction that abstracted a specific PCI device.
 # Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2010, Apple, Inc. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -24,7 +25,7 @@
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
 
-  ENTRY_POINT                    = InitializeUnixUga
+  ENTRY_POINT                    = InitializeUnixGop
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -37,11 +38,10 @@
 
 [Sources]
   ComponentName.c
-  UnixUgaScreen.c
-  UnixUgaDriver.c
-  UnixUgaInput.c
-  UnixUga.h
-  EntryPoint.c
+  UnixGopScreen.c
+  UnixGopDriver.c
+  UnixGopInput.c
+  UnixGop.h
 
 
 [Packages]
@@ -61,13 +61,13 @@
 
 [Guids]
   gEfiEventExitBootServicesGuid                 # SOMETIMES_CONSUMED  Create Event: EVENT_GROUP_GUID
-  gEfiUnixUgaGuid                              # ALWAYS_CONSUMED
+  gEfiUnixGopGuid                              # ALWAYS_CONSUMED
 
 
 [Protocols]
+  gEfiGraphicsOutputProtocolGuid
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
+  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
   gEfiSimplePointerProtocolGuid                 # PROTOCOL BY_START
-  gEfiUnixUgaIoProtocolGuid                     # PROTOCOL BY_START
-  gEfiUgaDrawProtocolGuid                       # PROTOCOL BY_START
   gEfiUnixIoProtocolGuid                        # PROTOCOL TO_START
 

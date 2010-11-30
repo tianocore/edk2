@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -369,9 +369,27 @@ GasketUgaCheckKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
 
 EFI_STATUS 
 EFIAPI 
-GasketUgaGetKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_INPUT_KEY *key)
+GasketUgaKeySetState (EFI_UNIX_UGA_IO_PROTOCOL   *UgaIo, EFI_KEY_TOGGLE_STATE *KeyToggleState)
+{
+  return GasketUintnUintn (UgaGetKey, (UINTN)UgaIo, (UINTN)KeyToggleState);
+}
+
+EFI_STATUS 
+EFIAPI 
+GasketUgaGetKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_KEY_DATA *key)
 {
   return GasketUintnUintn (UgaGetKey, (UINTN)UgaIo, (UINTN)key);
+}
+
+EFI_STATUS 
+EFIAPI 
+GasketUgaRegisterKeyNotify (
+  IN EFI_UNIX_UGA_IO_PROTOCOL           *UgaIo, 
+  IN UGA_REGISTER_KEY_NOTIFY_CALLBACK   CallBack,
+  IN VOID                               *Context
+  )
+{
+  return GasketUintnUintnUintn (UgaRegisterKeyNotify, (UINTN)UgaIo, (UINTN)CallBack, (UINTN)Context);  
 }
 
 EFI_STATUS 
@@ -380,17 +398,59 @@ GasketUgaBlt (
    EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
    IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
    IN  EFI_UGA_BLT_OPERATION                   BltOperation,
-   IN  UINTN                                   SourceX,
-   IN  UINTN                                   SourceY,
-   IN  UINTN                                   DestinationX,
-   IN  UINTN                                   DestinationY,
-   IN  UINTN                                   Width,
-   IN  UINTN                                   Height,
-   IN  UINTN                                   Delta OPTIONAL
+	 IN  UGA_BLT_ARGS                            *Args
    )
 {
-  return GasketUintn10Args (UgaBlt, (UINTN)UgaIo, (UINTN)BltBuffer, BltOperation, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
+  return GasketUintnUintnUintnUintn (UgaBlt, (UINTN)UgaIo, (UINTN)BltBuffer, (UINTN)BltOperation, (UINTN)Args);
 }
+
+EFI_STATUS 
+EFIAPI 
+GasketUgaCheckPointer (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
+{
+  return GasketUintn (UgaCheckPointer, (UINTN)UgaIo);
+}
+
+EFI_STATUS 
+EFIAPI 
+GasketUgaGetPointerState (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_SIMPLE_POINTER_STATE *state)
+{
+  return GasketUintnUintn (UgaGetPointerState, (UINTN)UgaIo, (UINTN)state);
+}
+
+void
+GasketUnixEnableInterrupt (void)
+{
+  GasketVoid (UnixEnableInterrupt);
+}
+
+void
+GasketUnixDisableInterrupt (void)
+{
+  GasketVoid (UnixDisableInterrupt);
+}
+
+
+int
+Gasketgetifaddrs (struct ifaddrs **ifap)
+{
+  return( GasketUintn( getifaddrs, ( UINTN ) ifap ) );
+}
+
+
+void
+Gasketfreeifaddrs (struct ifaddrs *ifap)
+{
+  GasketUintn( freeifaddrs, ( UINTN ) ifap );
+}
+
+
+int
+Gasketsocket (int domain, int type, int protocol )
+{
+  return( GasketUintnUintnUintn( socket, domain, type, protocol ) );
+}
+
 
 #endif
 

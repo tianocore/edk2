@@ -1,7 +1,7 @@
 /*++
 
 Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
-Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -51,10 +51,21 @@ Abstract:
 #include <stdlib.h>
 #include <sys/ioctl.h>
 
+#include <sys/socket.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <net/if.h>
+#include <net/if_dl.h>
+#include <ifaddrs.h>
+#include <net/bpf.h>
+
 #ifdef __APPLE__
 #include <sys/param.h>
 #include <sys/mount.h>
 #define _XOPEN_SOURCE
+#ifndef _Bool
+  #define _Bool char // for clang debug
+#endif
 #else
 #include <termio.h>
 #include <sys/vfs.h>
@@ -76,7 +87,15 @@ Abstract:
 #pragma pack(4)
 #endif
 
-#if __DARWIN_64_BIT_INO_T
+#if defined(__DARWIN_64_BIT_INO_T)
+
+
+typedef struct {
+  UINTN	tv_sec;		/* seconds */
+	UINTN	tv_nsec;	/* and nanoseconds */
+} EFI_timespec;
+
+
 
 typedef struct stat_fix { \
 	dev_t		st_dev;			/* [XSI] ID of device containing file */
@@ -86,7 +105,15 @@ typedef struct stat_fix { \
 	uid_t		st_uid;			/* [XSI] User ID of the file */
 	gid_t		st_gid;			/* [XSI] Group ID of the file */
 	dev_t		st_rdev;		/* [XSI] Device ID */
-	__DARWIN_STRUCT_STAT64_TIMES
+
+  // clang for X64 ABI follows Windows and a long is 32-bits
+  // this breaks system inlcude files so that is why we need
+  // to redefine timespec as EFI_timespec 
+  EFI_timespec  st_atimespec;
+  EFI_timespec  st_mtimespec;
+  EFI_timespec  st_ctimespec;
+  EFI_timespec  st_birthtimespec;
+
 	off_t		st_size;		/* [XSI] file size, in bytes */
 	blkcnt_t	st_blocks;		/* [XSI] blocks allocated for file */
 	blksize_t	st_blksize;		/* [XSI] optimal blocksize for I/O */
@@ -358,6 +385,35 @@ VOID
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   );
 
+typedef
+int
+(EFIAPI *UnixGetIfAddrs) (
+  struct ifaddrs **ifap
+  );
+
+typedef
+void
+(EFIAPI *UnixFreeIfAddrs) (
+  struct ifaddrs *ifap
+  );
+
+typedef
+int
+(EFIAPI *UnixSocket) (
+  int domain, 
+  int type, 
+  int protocol
+  );
+
+typedef 
+void
+(EFIAPI *UnixDisableInterruptEmulation) (void);
+
+typedef 
+void
+(EFIAPI *UnixEnableInterruptEmulation) (void);
+
+
 
 
 #define EFI_UNIX_THUNK_PROTOCOL_SIGNATURE SIGNATURE_32 ('L', 'N', 'X', 'T')
@@ -407,8 +463,12 @@ typedef struct _EFI_UNIX_THUNK_PROTOCOL {
   UnixPeCoffGetEntryPoint                 PeCoffGetEntryPoint;
   UnixPeCoffRelocateImageExtraAction      PeCoffRelocateImageExtraAction;
   UnixPeCoffLoaderUnloadImageExtraAction  PeCoffUnloadImageExtraAction;
+  UnixEnableInterruptEmulation        EnableInterrupt;
+  UnixDisableInterruptEmulation       DisableInterrupt;
 
-
+  UnixGetIfAddrs                      GetIfAddrs;
+  UnixFreeIfAddrs                     FreeIfAddrs;
+  UnixSocket                          Socket;
 } EFI_UNIX_THUNK_PROTOCOL;
 
 extern EFI_GUID gEfiUnixThunkProtocolGuid;

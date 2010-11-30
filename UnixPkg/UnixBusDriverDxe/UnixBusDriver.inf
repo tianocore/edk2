@@ -61,6 +61,7 @@
 [Guids]
   gEfiUnixConsoleGuid                          # ALWAYS_CONSUMED
   gEfiUnixUgaGuid                              # ALWAYS_CONSUMED
+  gEfiUnixGopGuid                              # ALWAYS_CONSUMED
   gEfiUnixSerialPortGuid                       # ALWAYS_CONSUMED
   gEfiUnixFileSystemGuid                       # ALWAYS_CONSUMED
   gEfiUnixPhysicalDisksGuid                    # ALWAYS_CONSUMED
@@ -68,6 +69,7 @@
   gEfiUnixCPUModelGuid
   gEfiUnixCPUSpeedGuid
   gEfiUnixMemoryGuid
+  gEfiUnixNetworkGuid
 
 
 [Protocols]
@@ -86,5 +88,7 @@
   gEfiUnixPkgTokenSpaceGuid.PcdUnixVirtualDisk
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFileSystem
   gEfiUnixPkgTokenSpaceGuid.PcdUnixUga
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixGop
   gEfiUnixPkgTokenSpaceGuid.PcdUnixConsole
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixNetworkInterface
 

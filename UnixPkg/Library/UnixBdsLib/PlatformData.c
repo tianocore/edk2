@@ -30,7 +30,7 @@ UINT16                      gPlatformBootTimeOutDefault = 10;
 //
 // Platform specific keyboard device path
 //
-UNIX_PLATFORM_UGA_DEVICE_PATH gUgaDevicePath0 = 
+UNIX_PLATFORM_UGA_DEVICE_PATH gUgaDevicePath = 
 {
   {
       HARDWARE_DEVICE_PATH,
@@ -54,7 +54,7 @@ UNIX_PLATFORM_UGA_DEVICE_PATH gUgaDevicePath0 =
   gEndEntire
 };
 
-UNIX_PLATFORM_UGA_DEVICE_PATH gUgaDevicePath1 = {
+UNIX_PLATFORM_UGA_DEVICE_PATH gGopDevicePath = {
   {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
@@ -71,8 +71,8 @@ UNIX_PLATFORM_UGA_DEVICE_PATH gUgaDevicePath1 = {
         (UINT8) (sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)),
         (UINT8) ((sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)) >> 8)
       },
-      EFI_UNIX_UGA_GUID,
-      1
+      EFI_UNIX_GOP_GUID,
+      0
   },
   gEndEntire
 };
@@ -108,11 +108,11 @@ BDS_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
     (CONSOLE_OUT | CONSOLE_IN)
   },
   {
-    (EFI_DEVICE_PATH_PROTOCOL *) &gUgaDevicePath0,
+    (EFI_DEVICE_PATH_PROTOCOL *) &gUgaDevicePath,
     (CONSOLE_OUT | CONSOLE_IN)
   },
   {
-    (EFI_DEVICE_PATH_PROTOCOL *) &gUgaDevicePath1,
+    (EFI_DEVICE_PATH_PROTOCOL *) &gGopDevicePath,
     (CONSOLE_OUT | CONSOLE_IN)
   },
   {

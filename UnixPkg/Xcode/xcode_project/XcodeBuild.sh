@@ -7,7 +7,7 @@
 set -e
 
 #
-# Source the workspace and set up the environment varaibles we need
+# Source the workspace and set up the environment variables we need
 #
 cd ../..
 ./build.sh $1 $2 $3 $4 $5 $6 $8

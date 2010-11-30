@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
-This following section documents the envirnoment variables for the Win UNIX 
+This following section documents the environment variables for the UNIX 
 build.  These variables are used to define the (virtual) hardware 
 configuration of the UNIX environment
 
@@ -118,15 +118,17 @@ EFI_DRIVER_BINDING_PROTOCOL           gUnixBusDriverBinding = {
 // device path.
 //
 UNIX_PCD_ENTRY  mPcdEnvironment[] = {
-  {PcdToken(PcdUnixConsole),       &gEfiUnixConsoleGuid},
-  {PcdToken(PcdUnixUga),           &gEfiUnixUgaGuid},
-  {PcdToken(PcdUnixFileSystem),    &gEfiUnixFileSystemGuid},
-  {PcdToken(PcdUnixSerialPort),    &gEfiUnixSerialPortGuid},
-  {PcdToken(PcdUnixVirtualDisk),   &gEfiUnixVirtualDisksGuid},
-  {PcdToken(PcdUnixPhysicalDisk),  &gEfiUnixPhysicalDisksGuid},
-  {PcdToken(PcdUnixCpuModel),      &gEfiUnixCPUModelGuid},
-  {PcdToken(PcdUnixCpuSpeed),      &gEfiUnixCPUSpeedGuid},
-  {PcdToken(PcdUnixMemorySize),    &gEfiUnixMemoryGuid}
+  {PcdToken(PcdUnixConsole),           &gEfiUnixConsoleGuid},
+  {PcdToken(PcdUnixUga),               &gEfiUnixUgaGuid},
+  {PcdToken(PcdUnixGop),               &gEfiUnixGopGuid},
+  {PcdToken(PcdUnixFileSystem),        &gEfiUnixFileSystemGuid},
+  {PcdToken(PcdUnixSerialPort),        &gEfiUnixSerialPortGuid},
+  {PcdToken(PcdUnixVirtualDisk),       &gEfiUnixVirtualDisksGuid},
+  {PcdToken(PcdUnixPhysicalDisk),      &gEfiUnixPhysicalDisksGuid},
+  {PcdToken(PcdUnixCpuModel),          &gEfiUnixCPUModelGuid},
+  {PcdToken(PcdUnixCpuSpeed),          &gEfiUnixCPUSpeedGuid},
+  {PcdToken(PcdUnixMemorySize),        &gEfiUnixMemoryGuid},
+  {PcdToken(PcdUnixNetworkInterface),  &gEfiUnixNetworkGuid}
 };
 
 VOID *
@@ -168,13 +170,6 @@ Returns:
   None
 
 --*/
-// TODO:    This - add argument and description to function comment
-// TODO:    ControllerHandle - add argument and description to function comment
-// TODO:    RemainingDevicePath - add argument and description to function comment
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
@@ -300,12 +295,6 @@ Returns:
   None
 
 --*/
-// TODO:    This - add argument and description to function comment
-// TODO:    ControllerHandle - add argument and description to function comment
-// TODO:    RemainingDevicePath - add argument and description to function comment
-// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
-// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS                      Status;
   EFI_STATUS                      InstallStatus;
@@ -403,7 +392,7 @@ Returns:
     StartString = TempStr;
 
     //
-    // Parse the envirnment variable into sub strings using '!' as a delimator.
+    // Parse the environment variable into sub strings using '!' as a delimator.
     // Each substring needs it's own handle to be added to the system. This code
     // does not understand the sub string. Thats the device drivers job.
     //
@@ -566,13 +555,6 @@ Returns:
     None
 
 --*/
-// TODO:    This - add argument and description to function comment
-// TODO:    ControllerHandle - add argument and description to function comment
-// TODO:    NumberOfChildren - add argument and description to function comment
-// TODO:    ChildHandleBuffer - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS                Status;
   UINTN                     Index;

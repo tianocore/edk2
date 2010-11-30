@@ -40,12 +40,9 @@ ASM_PFX(InternalSwitchStack):
     movq    %rcx, %rax
     movq    %rdx, %rcx
     movq    %r8,  %rdx
-    movq    %r9,  %rsp
-
     #
     # Reserve space for register parameters (rcx, rdx, r8 & r9) on the stack,
     # in case the callee wishes to spill them.
     #
-	  subq    $40, %rsp  // 32-byte shadow space plus alignment pad
-
+    lea     -0x20(%r9), %rsp
     call    *%rax

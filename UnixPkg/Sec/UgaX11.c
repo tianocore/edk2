@@ -1,7 +1,7 @@
 /*++
 
 Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
-Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -17,16 +17,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "PiPei.h"
-#include "Protocol/UnixThunk.h"
-#include "Protocol/SimpleTextIn.h"
-#include "Protocol/UgaDraw.h"
-#include "Protocol/UnixUgaIo.h"
+#include <PiPei.h>
+#include <Protocol/SimplePointer.h>
+#include <Protocol/SimpleTextIn.h>
+#include <Protocol/SimpleTextInEx.h>
+#include <Protocol/UgaDraw.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
 #include <X11/extensions/XShm.h>
 #include <X11/keysym.h>
+#include <X11/cursorfont.h>
+
+#include <Protocol/UnixThunk.h>
+#include <Protocol/UnixUgaIo.h>
 
 #include <Ppi/StatusCode.h>
 
@@ -37,20 +41,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 
+#include "Gasket.h"
+#include "SecMain.h"
+
+
 extern void msSleep (unsigned long Milliseconds);
 
 /* XQueryPointer  */
 
-struct uga_drv_shift_mask
-{
+struct uga_drv_shift_mask {
   unsigned char shift;
   unsigned char size;
   unsigned char csize;
 };
 
 #define NBR_KEYS 32
-typedef struct
-{
+typedef struct {
   EFI_UNIX_UGA_IO_PROTOCOL UgaIo;
 
   Display *display;
@@ -75,7 +81,17 @@ typedef struct
   unsigned int key_rd;
   unsigned int key_wr;
   unsigned int key_count;
-  EFI_INPUT_KEY keys[NBR_KEYS];
+  EFI_KEY_DATA keys[NBR_KEYS];
+
+  EFI_KEY_STATE KeyState;
+  
+  UGA_REGISTER_KEY_NOTIFY_CALLBACK RegisterdKeyCallback;
+  VOID                             *RegisterdKeyCallbackContext;
+  
+  int                        previous_x;
+  int                        previous_y;
+  EFI_SIMPLE_POINTER_STATE   pointer_state;
+  int                        pointer_state_changed;
 } UGA_IO_PRIVATE;
 
 void
@@ -246,49 +262,165 @@ handleKeyEvent(UGA_IO_PRIVATE *drv, XEvent *ev)
 {
   KeySym keysym;
   char str[4];
-  EFI_INPUT_KEY Key;
+  EFI_KEY_DATA KeyData;
   int res;
 
   if (drv->key_count == NBR_KEYS)
     return;
 
   res = XLookupString(&ev->xkey, str, sizeof(str), &keysym, NULL);
-  Key.ScanCode = 0;
-  Key.UnicodeChar = 0;
-  switch (keysym) {
-  case XK_Home:       Key.ScanCode = SCAN_HOME;       break;
-  case XK_End:        Key.ScanCode = SCAN_END;        break;
-  case XK_Left:       Key.ScanCode = SCAN_LEFT;       break;
-  case XK_Right:      Key.ScanCode = SCAN_RIGHT;      break;
-  case XK_Up:         Key.ScanCode = SCAN_UP;         break;
-  case XK_Down:       Key.ScanCode = SCAN_DOWN;       break;
-  case XK_Delete:     Key.ScanCode = SCAN_DELETE;     break;
-  case XK_Insert:     Key.ScanCode = SCAN_INSERT;     break;
-  case XK_Page_Up:    Key.ScanCode = SCAN_PAGE_UP;    break;
-  case XK_Page_Down:  Key.ScanCode = SCAN_PAGE_DOWN;  break;
-  case XK_Escape:     Key.ScanCode = SCAN_ESC;        break;
+  KeyData.Key.ScanCode = 0;
+  KeyData.Key.UnicodeChar = 0;
+  KeyData.KeyState.KeyShiftState = 0;
 
-  case XK_F1:   Key.ScanCode = SCAN_F1;   break;
-  case XK_F2:   Key.ScanCode = SCAN_F2;   break;
-  case XK_F3:   Key.ScanCode = SCAN_F3;   break;
-  case XK_F4:   Key.ScanCode = SCAN_F4;   break;
-  case XK_F5:   Key.ScanCode = SCAN_F5;   break;
-  case XK_F6:   Key.ScanCode = SCAN_F6;   break;
-  case XK_F7:   Key.ScanCode = SCAN_F7;   break;
-  case XK_F8:   Key.ScanCode = SCAN_F8;   break;
-  case XK_F9:   Key.ScanCode = SCAN_F9;   break;
+  //
+  // KeyRelease is not supported (on Mac) so we can not easily implement Ex functions.
+  // If a modifier key is hit by its self we get a keysym. If a modfifier and key is hit
+  // we get the state bit set and keysym is the modified key. 
+  //
+  // We use lack of state bits being set to clear ToggleState and KeyShiftState. We can 
+  // also use the stat bits to set ToggleState and KeyShiftState. 
+  // Skipping EFI_SCROLL_LOCK_ACTIVE & EFI_NUM_LOCK_ACTIVE since they are not on Macs  
+  //
+  if ((ev->xkey.state & LockMask) == 0) {
+    drv->KeyState.KeyToggleState &= ~EFI_CAPS_LOCK_ACTIVE;
+  } else {
+    drv->KeyState.KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
+  }
+  
+  if ((ev->xkey.state & ControlMask) == 0) {
+    drv->KeyState.KeyShiftState &= ~(EFI_RIGHT_CONTROL_PRESSED | EFI_LEFT_CONTROL_PRESSED);
+  } else if ((drv->KeyState.KeyShiftState & EFI_RIGHT_CONTROL_PRESSED) == 0) {
+    drv->KeyState.KeyShiftState |= EFI_LEFT_CONTROL_PRESSED;
+  }
+  
+  if ((ev->xkey.state & ShiftMask) == 0) {
+    drv->KeyState.KeyShiftState &= ~(EFI_RIGHT_SHIFT_PRESSED | EFI_LEFT_SHIFT_PRESSED);
+  } else if ((drv->KeyState.KeyShiftState & EFI_RIGHT_SHIFT_PRESSED) == 0) {
+    drv->KeyState.KeyShiftState |= EFI_LEFT_SHIFT_PRESSED;
+  }
+  
+  if ((ev->xkey.state & Mod2Mask) == 0) {
+    drv->KeyState.KeyShiftState &= ~(EFI_RIGHT_LOGO_PRESSED | EFI_LEFT_LOGO_PRESSED);
+  } else if ((drv->KeyState.KeyShiftState & EFI_RIGHT_LOGO_PRESSED) == 0) {
+    drv->KeyState.KeyShiftState |= EFI_LEFT_LOGO_PRESSED;
+  }
+
+  if ((ev->xkey.state & 0x2000) == 0) {
+    drv->KeyState.KeyShiftState &= ~(EFI_LEFT_ALT_PRESSED);
+  } else {
+    drv->KeyState.KeyShiftState |= EFI_LEFT_ALT_PRESSED;
+  }
+  
+  
+  switch (keysym) {
+  case XK_Control_R:
+    drv->KeyState.KeyShiftState |= EFI_RIGHT_CONTROL_PRESSED;
+    break;
+  case XK_Control_L:
+    drv->KeyState.KeyShiftState |= EFI_LEFT_CONTROL_PRESSED;
+    break;
+
+  case XK_Shift_R:
+    drv->KeyState.KeyShiftState |= EFI_RIGHT_SHIFT_PRESSED;
+    break;
+  case XK_Shift_L:
+    drv->KeyState.KeyShiftState |= EFI_LEFT_SHIFT_PRESSED;
+    break;
+  
+  case XK_Mode_switch:
+    drv->KeyState.KeyShiftState |= EFI_LEFT_ALT_PRESSED;
+    break;
+
+  case XK_Meta_R:
+    drv->KeyState.KeyShiftState |= EFI_RIGHT_LOGO_PRESSED;
+    break;
+  case XK_Meta_L:
+    drv->KeyState.KeyShiftState |= EFI_LEFT_LOGO_PRESSED;
+    break;
+
+  case XK_Home:       KeyData.Key.ScanCode = SCAN_HOME;       break;
+  case XK_End:        KeyData.Key.ScanCode = SCAN_END;        break;
+  case XK_Left:       KeyData.Key.ScanCode = SCAN_LEFT;       break;
+  case XK_Right:      KeyData.Key.ScanCode = SCAN_RIGHT;      break;
+  case XK_Up:         KeyData.Key.ScanCode = SCAN_UP;         break;
+  case XK_Down:       KeyData.Key.ScanCode = SCAN_DOWN;       break;
+  case XK_Delete:     KeyData.Key.ScanCode = SCAN_DELETE;     break;
+  case XK_Insert:     KeyData.Key.ScanCode = SCAN_INSERT;     break;
+  case XK_Page_Up:    KeyData.Key.ScanCode = SCAN_PAGE_UP;    break;
+  case XK_Page_Down:  KeyData.Key.ScanCode = SCAN_PAGE_DOWN;  break;
+  case XK_Escape:     KeyData.Key.ScanCode = SCAN_ESC;        break;
+
+  case XK_F1:   KeyData.Key.ScanCode = SCAN_F1;   break;
+  case XK_F2:   KeyData.Key.ScanCode = SCAN_F2;   break;
+  case XK_F3:   KeyData.Key.ScanCode = SCAN_F3;   break;
+  case XK_F4:   KeyData.Key.ScanCode = SCAN_F4;   break;
+  case XK_F5:   KeyData.Key.ScanCode = SCAN_F5;   break;
+  case XK_F6:   KeyData.Key.ScanCode = SCAN_F6;   break;
+  case XK_F7:   KeyData.Key.ScanCode = SCAN_F7;   break;
+  case XK_F8:   KeyData.Key.ScanCode = SCAN_F8;   break;
+  case XK_F9:   KeyData.Key.ScanCode = SCAN_F9;   break;
 
   default:
     if (res == 1) {
-      Key.UnicodeChar = str[0];
+      KeyData.Key.UnicodeChar = str[0];
     } else {
       return;
     }
   }
 
-  drv->keys[drv->key_wr] = Key;
+  // The global state is our state
+  KeyData.KeyState.KeyShiftState = drv->KeyState.KeyShiftState;
+  KeyData.KeyState.KeyToggleState = drv->KeyState.KeyToggleState;
+
+  CopyMem (&drv->keys[drv->key_wr], &KeyData, sizeof (EFI_KEY_DATA));
   drv->key_wr = (drv->key_wr + 1) % NBR_KEYS;
   drv->key_count++;
+  
+  
+#if defined(__APPLE__) || defined(MDE_CPU_X64)
+  ReverseGasketUint64Uint64 (drv->RegisterdKeyCallback ,drv->RegisterdKeyCallbackContext, &KeyData);
+#else
+  drv->RegisterdKeyCallback (drv->RegisterdKeyCallbackContext, &KeyData);
+#endif
+
+  
+}
+
+
+void
+handleMouseMoved(UGA_IO_PRIVATE *drv, XEvent *ev)
+{
+  if ( ev->xmotion.x != drv->previous_x )
+  {
+    drv->pointer_state.RelativeMovementX += ( ev->xmotion.x - drv->previous_x );
+	drv->previous_x = ev->xmotion.x;
+	drv->pointer_state_changed = 1;
+  }
+
+  if ( ev->xmotion.y != drv->previous_y )
+  {
+    drv->pointer_state.RelativeMovementY += ( ev->xmotion.y - drv->previous_y );
+    drv->previous_y = ev->xmotion.y;
+	drv->pointer_state_changed = 1;
+  }
+
+  drv->pointer_state.RelativeMovementZ = 0;
+}
+
+void
+handleMouseDown(UGA_IO_PRIVATE *drv, XEvent *ev, BOOLEAN Pressed)
+{
+  if ( ev->xbutton.button == Button1 )
+  {
+    drv->pointer_state_changed = ( drv->pointer_state.LeftButton != Pressed );
+	drv->pointer_state.LeftButton = Pressed;
+  }
+  if ( ev->xbutton.button == Button2 )
+  {
+    drv->pointer_state_changed = ( drv->pointer_state.RightButton != Pressed );
+	drv->pointer_state.RightButton = Pressed;
+  }
 }
 
 void
@@ -319,9 +451,20 @@ HandleEvent(UGA_IO_PRIVATE *drv, XEvent *ev)
     case KeyPress:
       handleKeyEvent(drv, ev);
       break;
+    case KeyRelease:
+      break;
     case MappingNotify:
       XRefreshKeyboardMapping(&ev->xmapping);
       break;
+    case MotionNotify:
+      handleMouseMoved(drv, ev);
+      break;
+    case ButtonPress:
+      handleMouseDown(drv, ev, TRUE);
+	  break;
+    case ButtonRelease:
+      handleMouseDown(drv, ev, FALSE);
+	  break;
 #if 0
     case DestroyNotify:
       XCloseDisplay (drv->display);
@@ -368,36 +511,86 @@ UgaColorToPixel (UGA_IO_PRIVATE *drv, unsigned long val)
   return res;
 }
 
-EFI_STATUS
-UgaCheckKey(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
+STATIC EFI_STATUS
+CheckKeyInternal( UGA_IO_PRIVATE *drv, BOOLEAN delay )
 {
-  UGA_IO_PRIVATE *drv = (UGA_IO_PRIVATE *)UgaIo;
   HandleEvents(drv);
-  
-  if (drv->key_count != 0) {
+  if (drv->key_count != 0)
     return EFI_SUCCESS;
-  } else {
-    /* EFI is certainly polling.  Be CPU-friendly.  */
+  if ( delay )
+    /* EFI is polling.  Be CPU-friendly.  */
     msSleep (20);
     return EFI_NOT_READY;
   }
+
+EFI_STATUS
+UgaCheckKey(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
+{
+  UGA_IO_PRIVATE  *drv = (UGA_IO_PRIVATE *)UgaIo;
+  return( CheckKeyInternal( drv, TRUE ) );
 }
 
 EFI_STATUS
-UgaGetKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_INPUT_KEY *key)
+EFIAPI
+UgaGetKey (
+  IN  EFI_UNIX_UGA_IO_PROTOCOL  *UgaIo, 
+  IN  EFI_KEY_DATA              *KeyData
+  )
 {
   UGA_IO_PRIVATE *drv = (UGA_IO_PRIVATE *)UgaIo;
   EFI_STATUS status;
 
-  status = UgaCheckKey(UgaIo);
+  status = CheckKeyInternal(drv, FALSE);
   if (status != EFI_SUCCESS)
     return status;
 
-  *key = drv->keys[drv->key_rd];
+  CopyMem (KeyData, &drv->keys[drv->key_rd], sizeof (EFI_KEY_DATA));
   drv->key_rd = (drv->key_rd + 1) % NBR_KEYS;
   drv->key_count--;
   return EFI_SUCCESS;
 }
+
+
+EFI_STATUS
+EFIAPI
+UgaKeySetState (
+  IN EFI_UNIX_UGA_IO_PROTOCOL   *UgaIo, 
+  IN EFI_KEY_TOGGLE_STATE       *KeyToggleState
+  )
+{
+  UGA_IO_PRIVATE  *drv = (UGA_IO_PRIVATE *)UgaIo;
+//  XKeyEvent       event;
+  
+  if (*KeyToggleState & EFI_CAPS_LOCK_ACTIVE) {
+    if ((drv->KeyState.KeyToggleState & EFI_CAPS_LOCK_ACTIVE) == 0) {
+      //
+      // We could create an XKeyEvent and send a XK_Caps_Lock to
+      // the UGA/GOP Window
+      //
+    }
+  }
+    
+  drv->KeyState.KeyToggleState = *KeyToggleState;
+  return EFI_SUCCESS;
+}
+
+
+EFI_STATUS
+EFIAPI
+UgaRegisterKeyNotify (
+  IN EFI_UNIX_UGA_IO_PROTOCOL           *UgaIo, 
+  IN UGA_REGISTER_KEY_NOTIFY_CALLBACK   CallBack,
+  IN VOID                               *Context
+  )
+{
+  UGA_IO_PRIVATE  *drv = (UGA_IO_PRIVATE *)UgaIo;
+
+  drv->RegisterdKeyCallback = CallBack;
+  drv->RegisterdKeyCallbackContext = Context;
+
+  return EFI_SUCCESS;
+}
+
 
 EFI_STATUS
 UgaBlt(
@@ -545,6 +738,44 @@ UgaBlt(
   return EFI_SUCCESS;
 }
 
+STATIC EFI_STATUS
+CheckPointerInternal( UGA_IO_PRIVATE *drv, BOOLEAN delay )
+{
+  HandleEvents(drv);
+  if (drv->pointer_state_changed != 0)
+    return EFI_SUCCESS;
+  if ( delay )
+    /* EFI is polling.  Be CPU-friendly.  */
+    msSleep (20);
+  return EFI_NOT_READY;
+}
+
+EFI_STATUS
+UgaCheckPointer(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
+{
+  UGA_IO_PRIVATE  *drv = (UGA_IO_PRIVATE *)UgaIo;
+  return( CheckPointerInternal( drv, TRUE ) );
+}
+
+EFI_STATUS
+UgaGetPointerState (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_SIMPLE_POINTER_STATE *state)
+{
+  UGA_IO_PRIVATE *drv = (UGA_IO_PRIVATE *)UgaIo;
+  EFI_STATUS status;
+
+  status = CheckPointerInternal( drv, FALSE );
+  if (status != EFI_SUCCESS)
+    return status;
+  
+  memcpy( state, &drv->pointer_state, sizeof( EFI_SIMPLE_POINTER_STATE ) );
+
+  drv->pointer_state.RelativeMovementX = 0;
+  drv->pointer_state.RelativeMovementY = 0;
+  drv->pointer_state.RelativeMovementZ = 0;
+  drv->pointer_state_changed = 0;
+  return EFI_SUCCESS;
+}
+
 EFI_STATUS
 UgaCreate (EFI_UNIX_UGA_IO_PROTOCOL **Uga, CONST CHAR16 *Title)
 {
@@ -557,32 +788,29 @@ UgaCreate (EFI_UNIX_UGA_IO_PROTOCOL **Uga, CONST CHAR16 *Title)
   if (drv == NULL)
     return EFI_OUT_OF_RESOURCES;
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(MDE_CPU_X64)
 //
 //
 //
-EFI_STATUS EFIAPI GasketUgaClose (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo);
-EFI_STATUS EFIAPI GasketUgaSize (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, UINT32 Width, UINT32 Height);
-EFI_STATUS EFIAPI GasketUgaCheckKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo);
-EFI_STATUS EFIAPI GasketUgaGetKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_INPUT_KEY *key);
-EFI_STATUS EFIAPI GasketUgaBlt (
-   EFI_UNIX_UGA_IO_PROTOCOL                    *UgaIo,
-   IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
-   IN  EFI_UGA_BLT_OPERATION                   BltOperation,
-   IN  UGA_BLT_ARGS                            *Args
-   );
-
   drv->UgaIo.UgaClose    = GasketUgaClose; 
   drv->UgaIo.UgaSize     = GasketUgaSize;
   drv->UgaIo.UgaCheckKey = GasketUgaCheckKey;
   drv->UgaIo.UgaGetKey   = GasketUgaGetKey;
+  drv->UgaIo.UgaKeySetState         = GasketUgaKeySetState;
+  drv->UgaIo.UgaRegisterKeyNotify   = GasketUgaRegisterKeyNotify;
   drv->UgaIo.UgaBlt      = GasketUgaBlt;
+  drv->UgaIo.UgaCheckPointer        = GasketUgaCheckPointer;
+  drv->UgaIo.UgaGetPointerState     = GasketUgaGetPointerState;
 #else
   drv->UgaIo.UgaClose = UgaClose;
   drv->UgaIo.UgaSize = UgaSize;
   drv->UgaIo.UgaCheckKey = UgaCheckKey;
   drv->UgaIo.UgaGetKey = UgaGetKey;
+  drv->UgaIo.UgaKeySetState         = UgaKeySetState;
+  drv->UgaIo.UgaRegisterKeyNotify   = UgaRegisterKeyNotify;
   drv->UgaIo.UgaBlt = UgaBlt;
+  drv->UgaIo.UgaCheckPointer        = UgaCheckPointer;
+  drv->UgaIo.UgaGetPointerState     = UgaGetPointerState;
 #endif
   
   
@@ -590,6 +818,12 @@ EFI_STATUS EFIAPI GasketUgaBlt (
   drv->key_count = 0;
   drv->key_rd = 0;
   drv->key_wr = 0;
+  drv->KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
+  drv->KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
+  drv->RegisterdKeyCallback = NULL;
+  drv->RegisterdKeyCallbackContext = NULL;
+  
+  
   drv->display = XOpenDisplay (display_name);
   if (drv->display == NULL)
     {
@@ -607,6 +841,7 @@ EFI_STATUS EFIAPI GasketUgaBlt (
                 BlackPixel (drv->display, drv->screen));
 
   drv->depth = DefaultDepth (drv->display, drv->screen);
+  XDefineCursor (drv->display, drv->win, XCreateFontCursor (drv->display, XC_pirate)); 
 
   /* Compute title len and convert to Ascii.  */
   for (title_len = 0; Title[title_len] != 0; title_len++)
@@ -621,8 +856,8 @@ EFI_STATUS EFIAPI GasketUgaBlt (
     XStoreName (drv->display, drv->win, title);
   }
 
-  XSelectInput (drv->display, drv->win, ExposureMask | KeyPressMask);
-  
+  XSelectInput (drv->display, drv->win,
+                 ExposureMask | KeyPressMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask );
   drv->gc = DefaultGC (drv->display, drv->screen);
 
   *Uga = (EFI_UNIX_UGA_IO_PROTOCOL *)drv;

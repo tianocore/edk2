@@ -5,6 +5,7 @@
 # The Emulation Platform can be used to debug individual modules, prior to creating
 #       a real platform. This also provides an example for how an DSC is created.
 # Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Portions copywrite (c) 2010, Apple, Inc. All rights reserved. 
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -199,6 +200,7 @@
   gEfiUnixPkgTokenSpaceGuid.PcdUnixCpuSpeed|L"3000"
   gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySize|L"128!128"
   gEfiUnixPkgTokenSpaceGuid.PcdUnixSerialPort|L"/dev/ttyS0!/dev/ttyS1"
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixNetworkInterface|L"en0"
 
 [PcdsDynamicHii.common.DEFAULT]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|L"Setup"|gEfiUnixSystemConfigGuid|0x0|80
@@ -223,7 +225,7 @@
 #       generated for it, but the binary will not be put into any firmware volume.
 #
 ###################################################################################################
-[Components.common]
+[Components]
 !if $(SEC_ONLY)
   ##
   #  SEC Phase modules
@@ -296,14 +298,15 @@
   UnixPkg/UnixBlockIoDxe/UnixBlockIo.inf
   UnixPkg/UnixSerialIoDxe/UnixSerialIo.inf
   UnixPkg/UnixUgaDxe/UnixUga.inf
+  UnixPkg/UnixGopDxe/UnixGop.inf
   UnixPkg/UnixConsoleDxe/UnixConsole.inf
   UnixPkg/UnixSimpleFileSystemDxe/UnixSimpleFileSystem.inf
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
   #
   # Network stack drivers
-  # To test network drivers, need network Io driver(SnpNt32Io.dll), please refer to NETWORK-IO Subproject.
   #
+  UnixPkg/UnixSnpDxe/UnixSnpDxe.inf
   MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
   MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
   MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf

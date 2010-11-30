@@ -7,7 +7,7 @@
 set -e
 
 #
-# Source the workspace and set up the environment varaibles we need
+# Source the workspace and set up the environment variables we need
 #
 cd ../..
 echo `pwd`

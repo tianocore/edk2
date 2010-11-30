@@ -1,6 +1,7 @@
 /*++
 
 Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Portions copyright (c) 2010, Apple, Inc. All rights reserved.
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -11,23 +12,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  UnixUga.h
+  UnixGop.h
 
 Abstract:
 
-  Private data for the Uga driver that is bound to the Unix Thunk protocol 
+  Private data for the Gop driver that is bound to the Unix Thunk protocol 
 
 --*/
 
 #ifndef _UNIX_UGA_H_
 #define _UNIX_UGA_H_
 
-#include "PiDxe.h"
-#include <Guid/EventGroup.h>
-#include <Protocol/SimpleTextIn.h>
-#include <Protocol/SimplePointer.h>
-#include <Protocol/UgaDraw.h>
-#include "Protocol/UnixUgaIo.h"
+#include <PiDxe.h>
+#include "UnixDxe.h"
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -35,67 +32,115 @@ Abstract:
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include "UnixDxe.h"
 
-extern EFI_DRIVER_BINDING_PROTOCOL gUnixUgaDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL gUnixUgaComponentName;
+#include <Protocol/GraphicsOutput.h>
+#include <Protocol/SimpleTextIn.h>
+#include <Protocol/SimpleTextInEx.h>
+#include <Protocol/SimplePointer.h>
+#include "Protocol/UnixUgaIo.h"
 
-#define UNIX_UGA_CLASS_NAME       L"UnixUgaWindow"
+#include <Guid/EventGroup.h>
 
-#define UGA_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('S', 'g', 'o', 'N')
+
+
+#define MAX_Q 256
+
+typedef struct {
+  UINTN         Front;
+  UINTN         Rear;
+  UINTN         Count;
+  EFI_INPUT_KEY Q[MAX_Q];
+} GOP_QUEUE_FIXED;
+
+#define UNIX_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE SIGNATURE_32 ('U', 'g', 'S', 'n')
+typedef struct _UNIX_GOP_SIMPLE_TEXTIN_EX_NOTIFY {
+  UINTN                                 Signature;
+  EFI_HANDLE                            NotifyHandle;
+  EFI_KEY_DATA                          KeyData;
+  EFI_KEY_NOTIFY_FUNCTION               KeyNotificationFn;
+  EFI_EVENT                             Event;
+  LIST_ENTRY                            NotifyEntry;
+} UNIX_GOP_SIMPLE_TEXTIN_EX_NOTIFY;
+  
+#define GRAPHICS_OUTPUT_INVALIDE_MODE_NUMBER 0xffff
+
+typedef struct {
+  UINT32                     HorizontalResolution;
+  UINT32                     VerticalResolution;
+  UINT32                     ColorDepth;
+  UINT32                     RefreshRate;
+} GOP_MODE_DATA;
+
+
+
+extern EFI_DRIVER_BINDING_PROTOCOL gUnixGopDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL gUnixGopComponentName;
+
+#define UNIX_UGA_CLASS_NAME       L"UnixGopWindow"
+
+#define GOP_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('G', 'o', 'p', 'N')
 typedef struct {
   UINT64                      Signature;
 
-  EFI_HANDLE                  Handle;
-  EFI_UGA_DRAW_PROTOCOL       UgaDraw;
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL SimpleTextIn;
-  EFI_SIMPLE_POINTER_PROTOCOL SimplePointer;
+  EFI_HANDLE                        Handle;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL      GraphicsOutput;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL    SimpleTextIn;
+  EFI_SIMPLE_POINTER_PROTOCOL       SimplePointer;
 
-  EFI_UNIX_THUNK_PROTOCOL   *UnixThunk;
+  EFI_UNIX_THUNK_PROTOCOL         *UnixThunk;
+  EFI_UNIX_UGA_IO_PROTOCOL        *UgaIo;
 
-  EFI_UNICODE_STRING_TABLE    *ControllerNameTable;
+  EFI_UNICODE_STRING_TABLE        *ControllerNameTable;
 
+  EFI_SIMPLE_POINTER_MODE         PointerMode;
   //
-  // UGA Private Data for GetMode ()
+  // GOP Private Data for QueryMode ()
   //
-  UINT32                      HorizontalResolution;
-  UINT32                      VerticalResolution;
-  UINT32                      ColorDepth;
-  UINT32                      RefreshRate;
+  GOP_MODE_DATA                   *ModeData;
 
-  EFI_SIMPLE_POINTER_MODE     PointerMode;
 
   //
   // UGA Private Data knowing when to start hardware
   //
-  BOOLEAN                     HardwareNeedsStarting;
+  BOOLEAN                           HardwareNeedsStarting;
 
-  CHAR16                      *WindowName;
+  CHAR16                            *WindowName;
 
-  EFI_UNIX_UGA_IO_PROTOCOL    *UgaIo;
+  GOP_QUEUE_FIXED                   Queue;
 
-} UGA_PRIVATE_DATA;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL SimpleTextInEx;
+  EFI_KEY_STATE                     KeyState;
+  LIST_ENTRY                        NotifyList;
 
-#define UGA_DRAW_PRIVATE_DATA_FROM_THIS(a)  \
-         CR(a, UGA_PRIVATE_DATA, UgaDraw, UGA_PRIVATE_DATA_SIGNATURE)
 
-#define UGA_PRIVATE_DATA_FROM_TEXT_IN_THIS(a)  \
-         CR(a, UGA_PRIVATE_DATA, SimpleTextIn, UGA_PRIVATE_DATA_SIGNATURE)
+} GOP_PRIVATE_DATA;
 
-#define UGA_PRIVATE_DATA_FROM_POINTER_THIS(a)  \
-         CR(a, UGA_PRIVATE_DATA, SimplePointer, UGA_PRIVATE_DATA_SIGNATURE)
+
+#define GOP_PRIVATE_DATA_FROM_THIS(a)  \
+         CR(a, GOP_PRIVATE_DATA, GraphicsOutput, GOP_PRIVATE_DATA_SIGNATURE)
+
+#define GOP_PRIVATE_DATA_FROM_TEXT_IN_THIS(a)  \
+         CR(a, GOP_PRIVATE_DATA, SimpleTextIn, GOP_PRIVATE_DATA_SIGNATURE)
+
+#define GOP_PRIVATE_DATA_FROM_TEXT_IN_EX_THIS(a)  \
+         CR(a, GOP_PRIVATE_DATA, SimpleTextInEx, GOP_PRIVATE_DATA_SIGNATURE)
+
+#define GOP_PRIVATE_DATA_FROM_POINTER_MODE_THIS(a)  \
+         CR(a, GOP_PRIVATE_DATA, SimplePointer, GOP_PRIVATE_DATA_SIGNATURE)
+
 
 //
 // Global Protocol Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gUnixUgaDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gUnixUgaComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL  gUnixGopDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL  gUnixGopComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL gUnixGopComponentName2;
 
 //
-// Uga Hardware abstraction internal worker functions
+// Gop Hardware abstraction internal worker functions
 //
 EFI_STATUS
-UnixUgaSupported (
+UnixGopSupported (
   IN  EFI_UNIX_IO_PROTOCOL  *UnixIo
   )
 /*++
@@ -116,8 +161,8 @@ Returns:
 ;
 
 EFI_STATUS
-UnixUgaConstructor (
-  IN  UGA_PRIVATE_DATA    *Private
+UnixGopConstructor (
+  IN  GOP_PRIVATE_DATA    *Private
   )
 /*++
 
@@ -137,8 +182,8 @@ Returns:
 ;
 
 EFI_STATUS
-UnixUgaDestructor (
-  IN  UGA_PRIVATE_DATA    *Private
+UnixGopDestructor (
+  IN  GOP_PRIVATE_DATA    *Private
   )
 /*++
 
@@ -163,7 +208,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-UnixUgaInitialize (
+UnixGopInitialize (
   IN EFI_HANDLE            ImageHandle,
   IN EFI_SYSTEM_TABLE      *SystemTable
   )
@@ -187,7 +232,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-UnixUgaDriverBindingSupported (
+UnixGopDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      Handle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
@@ -213,7 +258,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-UnixUgaDriverBindingStart (
+UnixGopDriverBindingStart (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      Handle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
@@ -239,7 +284,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-UnixUgaDriverBindingStop (
+UnixGopDriverBindingStop (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
   IN  UINTN                        NumberOfChildren,
@@ -266,8 +311,8 @@ Returns:
 ;
 
 EFI_STATUS
-UgaPrivateAddQ (
-  IN  UGA_PRIVATE_DATA    *Private,
+GopPrivateAddQ (
+  IN  GOP_PRIVATE_DATA    *Private,
   IN  EFI_INPUT_KEY       Key
   )
 /*++
@@ -289,8 +334,8 @@ Returns:
 ;
 
 EFI_STATUS
-UnixUgaInitializeSimpleTextInForWindow (
-  IN  UGA_PRIVATE_DATA    *Private
+UnixGopInitializeSimpleTextInForWindow (
+  IN  GOP_PRIVATE_DATA    *Private
   )
 /*++
 
@@ -310,8 +355,8 @@ Returns:
 ;
 
 EFI_STATUS
-UnixUgaInitializeSimplePointerForWindow (
-  IN  UGA_PRIVATE_DATA    *Private
+UnixGopInitializeSimplePointerForWindow (
+  IN  GOP_PRIVATE_DATA    *Private
   )
 /*++
 

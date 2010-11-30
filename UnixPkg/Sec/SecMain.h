@@ -1,7 +1,7 @@
 /*++
 
 Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -585,7 +585,6 @@ SecPeCoffLoaderUnloadImageExtraAction (
   );
 
 
-
 VOID SetTimer (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs));
 void msSleep (unsigned long Milliseconds);
 void GetLocalTime (EFI_TIME *Time);
@@ -593,6 +592,9 @@ void TzSet (void);
 long GetTimeZone(void);
 int GetDayLight(void);
 int GetErrno(void);
+void UnixEnableInterrupt (void);
+void UnixDisableInterrupt (void);
+BOOLEAN UnixInterruptEanbled (void);
 
 
 

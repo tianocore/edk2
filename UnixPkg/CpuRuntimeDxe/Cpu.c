@@ -28,6 +28,7 @@ Abstract:
 #include <Guid/DataHubRecords.h>
 #include <Protocol/CpuIo2.h>
 #include <Protocol/FrameworkHii.h>
+#include <Protocol/UnixThunk.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -37,6 +38,8 @@ Abstract:
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UnixLib.h>
+
 #include "CpuDriver.h"
 #include "UnixDxe.h"
 #include <Protocol/UnixIo.h>
@@ -151,6 +154,7 @@ Returns:
 
   Private                 = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
   Private->InterruptState = TRUE;
+  gUnix->EnableInterrupt ();
   return EFI_SUCCESS;
 }
 
@@ -184,6 +188,7 @@ Returns:
 
   Private                 = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
   Private->InterruptState = FALSE;
+  gUnix->DisableInterrupt ();
   return EFI_SUCCESS;
 }
 

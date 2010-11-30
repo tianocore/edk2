@@ -394,6 +394,8 @@ Returns:
 
   UnixUgaInitializeSimpleTextInForWindow (Private);
 
+  UnixUgaInitializeSimplePointerForWindow (Private);
+
   return EFI_SUCCESS;
 }
 

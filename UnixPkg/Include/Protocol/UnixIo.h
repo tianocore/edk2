@@ -20,6 +20,8 @@ Abstract:
 #ifndef _UNIX_IO_H_
 #define _UNIX_IO_H_
 
+#include <Protocol/UnixThunk.h>
+
 #define EFI_UNIX_IO_PROTOCOL_GUID \
   { \
     0xf2e23f54, 0x8985, 0x11db, {0xac, 0x79, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35 } \
@@ -138,5 +140,15 @@ extern EFI_GUID gEfiUnixCPUModelGuid;
   }
 
 extern EFI_GUID gEfiUnixCPUSpeedGuid;
+
+//
+// EFI_UNIX_NETWORK
+//
+#define EFI_UNIX_NETWORK_GUID \
+  { \
+    0x081603B4, 0x0F1D, 0x4022, {0xB6, 0xFD, 0x4C, 0xE3, 0x5E, 0x09, 0xA1, 0xA6 } \
+  }
+
+extern EFI_GUID gEfiUnixNetworkGuid;
 
 #endif
