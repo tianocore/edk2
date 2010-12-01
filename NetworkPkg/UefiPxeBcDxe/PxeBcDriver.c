@@ -25,6 +25,13 @@ EFI_DRIVER_BINDING_PROTOCOL gPxeBcDriverBinding = {
   NULL
 };
 
+//
+// PXE_PRIVATE_GUID is only used to keep the relationship between 
+// NIC handle and virtual child handles.
+//
+EFI_GUID mPxeBcPrivateGuid = PXEBC_PRIVATE_GUID;
+
+
 
 /**
   Get the Nic handle using any child handle in the IPv4 stack.
@@ -226,11 +233,11 @@ PxeBcDestroyIp4Children (
 
   if (Private->Ip4Nic != NULL) {
     //
-    // Close PxeBc from the parent Nic handle and destroy the virtual handle.
+    // Close PxeBcPrivate from the parent Nic handle and destroy the virtual handle.
     //
     gBS->CloseProtocol (
            Private->Controller,
-           &gEfiPxeBaseCodeProtocolGuid,
+           &mPxeBcPrivateGuid,
            This->DriverBindingHandle,
            Private->Ip4Nic->Controller
            );
@@ -241,8 +248,28 @@ PxeBcDestroyIp4Children (
            Private->Ip4Nic->DevicePath,
            &gEfiLoadFileProtocolGuid,
            &Private->Ip4Nic->LoadFile,
+           &gEfiPxeBaseCodeProtocolGuid,
+           &Private->PxeBc,
            NULL
            );
+
+    if (Private->Snp != NULL) { 
+      //
+      // Close SNP from the child virtual handle
+      //
+      gBS->CloseProtocol (
+             Private->Ip4Nic->Controller,
+             &gEfiSimpleNetworkProtocolGuid,
+             This->DriverBindingHandle,
+             Private->Ip4Nic->Controller
+             );
+             
+      gBS->UninstallProtocolInterface (
+             Private->Ip4Nic->Controller,
+             &gEfiSimpleNetworkProtocolGuid,
+             Private->Snp
+             );
+    }
     FreePool (Private->Ip4Nic);
   }
 
@@ -366,22 +393,41 @@ PxeBcDestroyIp6Children (
 
   if (Private->Ip6Nic != NULL) {
     //
-    // Close PxeBc from the parent Nic handle and destroy the virtual handle.
+    // Close PxeBcPrivate from the parent Nic handle and destroy the virtual handle.
     //
     gBS->CloseProtocol (
            Private->Controller,
-           &gEfiPxeBaseCodeProtocolGuid,
+           &mPxeBcPrivateGuid,
            This->DriverBindingHandle,
            Private->Ip6Nic->Controller
            );
+
     gBS->UninstallMultipleProtocolInterfaces (
            Private->Ip6Nic->Controller,
            &gEfiDevicePathProtocolGuid,
            Private->Ip6Nic->DevicePath,
            &gEfiLoadFileProtocolGuid,
            &Private->Ip6Nic->LoadFile,
+           &gEfiPxeBaseCodeProtocolGuid,
+           &Private->PxeBc,
            NULL
            );
+    if (Private->Snp != NULL) {
+      //
+      // Close SNP from the child virtual handle
+      //
+      gBS->CloseProtocol (
+             Private->Ip6Nic->Controller,
+             &gEfiSimpleNetworkProtocolGuid,
+             This->DriverBindingHandle,
+             Private->Ip6Nic->Controller
+             );
+      gBS->UninstallProtocolInterface (
+             Private->Ip6Nic->Controller,
+             &gEfiSimpleNetworkProtocolGuid,
+             Private->Snp
+             );
+    }
     FreePool (Private->Ip6Nic);
   }
 
@@ -415,11 +461,12 @@ PxeBcCreateIp4Children (
 {
   EFI_STATUS                      Status;
   IPv4_DEVICE_PATH                Ip4Node;
-  EFI_PXE_BASE_CODE_PROTOCOL      *PxeBc;
   EFI_PXE_BASE_CODE_MODE          *Mode;
   EFI_UDP4_CONFIG_DATA            *Udp4CfgData;
   EFI_IP4_CONFIG_DATA             *Ip4CfgData;
   EFI_IP4_MODE_DATA               Ip4ModeData;
+  PXEBC_PRIVATE_PROTOCOL          *Id;
+  EFI_SIMPLE_NETWORK_PROTOCOL     *Snp;
 
   if (Private->Ip4Nic != NULL) {
     //
@@ -629,20 +676,54 @@ PxeBcCreateIp4Children (
                   Private->Ip4Nic->DevicePath,
                   &gEfiLoadFileProtocolGuid,
                   &Private->Ip4Nic->LoadFile,
+                  &gEfiPxeBaseCodeProtocolGuid,
+                  &Private->PxeBc,
                   NULL
                   );
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
 
+  if (Private->Snp != NULL) {
+    //
+    // Install SNP protocol on purpose is for some OS loader backward
+    // compatibility consideration.
+    //
+    Status = gBS->InstallProtocolInterface (
+                    &Private->Ip4Nic->Controller,
+                    &gEfiSimpleNetworkProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    Private->Snp
+                    );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
+
+    //
+    // Open SNP on the child handle BY_DRIVER. It will prevent any additionally 
+    // layering to perform the experiment.
+    //
+    Status = gBS->OpenProtocol (
+                    Private->Ip4Nic->Controller,
+                    &gEfiSimpleNetworkProtocolGuid,
+                    (VOID **) &Snp,
+                    This->DriverBindingHandle,
+                    Private->Ip4Nic->Controller,
+                    EFI_OPEN_PROTOCOL_BY_DRIVER
+                    );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
+  }
+
   //
-  // Open PxeBaseCode protocol by child to setup a parent-child relationship between
+  // Open PxeBaseCodePrivate protocol by child to setup a parent-child relationship between
   // real NIC handle and the virtual IPv4 NIC handle.
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &gEfiPxeBaseCodeProtocolGuid,
-                  (VOID **) &PxeBc,
+                  &mPxeBcPrivateGuid,
+                  (VOID **) &Id,
                   This->DriverBindingHandle,
                   Private->Ip4Nic->Controller,
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -654,7 +735,7 @@ PxeBcCreateIp4Children (
   //
   // Set default configure data for Udp4Read and Ip4 instance.
   //
-  Mode                            = PxeBc->Mode;
+  Mode                            = Private->PxeBc.Mode;
   Udp4CfgData                     = &Private->Udp4CfgData;
   Ip4CfgData                      = &Private->Ip4CfgData;
 
@@ -701,10 +782,11 @@ PxeBcCreateIp6Children (
 {
   EFI_STATUS                      Status;
   IPv6_DEVICE_PATH                Ip6Node;
-  EFI_PXE_BASE_CODE_PROTOCOL      *PxeBc;
   EFI_UDP6_CONFIG_DATA            *Udp6CfgData;
   EFI_IP6_CONFIG_DATA             *Ip6CfgData;
   EFI_IP6_MODE_DATA               Ip6ModeData;
+  PXEBC_PRIVATE_PROTOCOL          *Id;
+  EFI_SIMPLE_NETWORK_PROTOCOL     *Snp;
 
   if (Private->Ip6Nic != NULL) {
     //
@@ -902,20 +984,54 @@ PxeBcCreateIp6Children (
                   Private->Ip6Nic->DevicePath,
                   &gEfiLoadFileProtocolGuid,
                   &Private->Ip6Nic->LoadFile,
+                  &gEfiPxeBaseCodeProtocolGuid,
+                  &Private->PxeBc,
                   NULL
                   );
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
+  
+  if (Private->Snp != NULL) {
+    //
+    // Install SNP protocol on purpose is for some OS loader backward
+    // compatibility consideration.
+    //
+    Status = gBS->InstallProtocolInterface (
+                    &Private->Ip6Nic->Controller,
+                    &gEfiSimpleNetworkProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    Private->Snp
+                    );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
+
+    //
+    // Open SNP on the child handle BY_DRIVER. It will prevent any additionally 
+    // layering to perform the experiment.
+    //
+    Status = gBS->OpenProtocol (
+                    Private->Ip6Nic->Controller,
+                    &gEfiSimpleNetworkProtocolGuid,
+                    (VOID **) &Snp,
+                    This->DriverBindingHandle,
+                    Private->Ip6Nic->Controller,
+                    EFI_OPEN_PROTOCOL_BY_DRIVER
+                    );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
+  }
 
   //
-  // Open PxeBaseCode protocol by child to setup a parent-child relationship between
+  // Open PxeBaseCodePrivate protocol by child to setup a parent-child relationship between
   // real NIC handle and the virtual IPv6 NIC handle.
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &gEfiPxeBaseCodeProtocolGuid,
-                  (VOID **) &PxeBc,
+                  &mPxeBcPrivateGuid,
+                  (VOID **) &Id,
                   This->DriverBindingHandle,
                   Private->Ip6Nic->Controller,
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -1091,15 +1207,15 @@ PxeBcDriverBindingStart (
   )
 {
   PXEBC_PRIVATE_DATA              *Private;
-  EFI_PXE_BASE_CODE_PROTOCOL      *PxeBc;
   EFI_STATUS                      Status;
   EFI_STATUS                      Ip4Status;
   EFI_STATUS                      Ip6Status;
+  PXEBC_PRIVATE_PROTOCOL          *Id;
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &gEfiPxeBaseCodeProtocolGuid,
-                  (VOID **) &PxeBc,
+                  &mPxeBcPrivateGuid,
+                  (VOID **) &Id,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -1108,7 +1224,7 @@ PxeBcDriverBindingStart (
     //
     // Skip the initialization if the driver has been started already.
     //
-    Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (PxeBc);
+    Private = PXEBC_PRIVATE_DATA_FROM_ID (Id);
   } else {
     //
     // If the driver has not been started yet, it should do initialization.
@@ -1165,17 +1281,22 @@ PxeBcDriverBindingStart (
     }
 
     //
-    // Install PxeBaseCode protocol onto the real NIC handler.
+    // Install PxeBaseCodePrivate protocol onto the real NIC handler.
     //
     Status = gBS->InstallProtocolInterface (
                     &ControllerHandle,
-                    &gEfiPxeBaseCodeProtocolGuid,
+                    &mPxeBcPrivateGuid,
                     EFI_NATIVE_INTERFACE,
-                    &Private->PxeBc
+                    &Private->Id
                     );
     if (EFI_ERROR (Status)) {
       goto ON_ERROR;
     }
+
+    //
+    // Try to locate SNP protocol.
+    //
+    NetLibGetSnpHandle(ControllerHandle, &Private->Snp);    
   }
 
   //
@@ -1201,8 +1322,8 @@ PxeBcDriverBindingStart (
 ON_ERROR:
   gBS->UninstallProtocolInterface (
          ControllerHandle,
-         &gEfiPxeBaseCodeProtocolGuid,
-         &Private->PxeBc
+         &mPxeBcPrivateGuid,
+         &Private->Id
          );
   PxeBcDestroyIp4Children (This, Private);
   PxeBcDestroyIp6Children (This, Private);
@@ -1242,17 +1363,17 @@ PxeBcDriverBindingStop (
 {
   PXEBC_PRIVATE_DATA              *Private;
   PXEBC_VIRTUAL_NIC               *VirtualNic;
-  EFI_PXE_BASE_CODE_PROTOCOL      *PxeBc;
   EFI_LOAD_FILE_PROTOCOL          *LoadFile;
   EFI_STATUS                      Status;
   EFI_HANDLE                      NicHandle;
   BOOLEAN                         IsIpv6;
+  PXEBC_PRIVATE_PROTOCOL          *Id;
 
   Private    = NULL;
   NicHandle  = NULL;
   VirtualNic = NULL;
   LoadFile   = NULL;
-  PxeBc      = NULL;
+  Id         = NULL;
   IsIpv6     = FALSE;
 
   Status = gBS->OpenProtocol (
@@ -1278,12 +1399,12 @@ PxeBcDriverBindingStop (
     }
 
     //
-    // Try to retrieve the private data by PxeBc protocol.
+    // Try to retrieve the private data by PxeBcPrivate protocol.
     //
     Status = gBS->OpenProtocol (
                     NicHandle,
-                    &gEfiPxeBaseCodeProtocolGuid,
-                    (VOID **) &PxeBc,
+                    &mPxeBcPrivateGuid,
+                    (VOID **) &Id,
                     This->DriverBindingHandle,
                     ControllerHandle,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -1291,7 +1412,7 @@ PxeBcDriverBindingStop (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (PxeBc);
+    Private = PXEBC_PRIVATE_DATA_FROM_ID (Id);
 
   } else {
     //
@@ -1329,8 +1450,8 @@ PxeBcDriverBindingStop (
   if (Private->Ip4Nic == NULL && Private->Ip6Nic == NULL) {
     gBS->UninstallProtocolInterface (
            NicHandle,
-           &gEfiPxeBaseCodeProtocolGuid,
-           &Private->PxeBc
+           &mPxeBcPrivateGuid,
+           &Private->Id
            );
     FreePool (Private);
   }
