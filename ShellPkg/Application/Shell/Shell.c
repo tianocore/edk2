@@ -285,7 +285,7 @@ UefiMain (
         Status = DoStartupScript(ShellInfoObject.ImageDevPath, ShellInfoObject.FileDevPath);
       }
 
-      if ((PcdGet8(PcdShellSupportLevel) >= 3 || PcdGetBool(PcdShellForceConsole)) && !EFI_ERROR(Status) && !ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoConsoleIn) {
+      if (!ShellCommandGetExit() && (PcdGet8(PcdShellSupportLevel) >= 3 || PcdGetBool(PcdShellForceConsole)) && !EFI_ERROR(Status) && !ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoConsoleIn) {
         //
         // begin the UI waiting loop
         //
