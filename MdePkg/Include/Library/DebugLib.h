@@ -42,7 +42,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define DEBUG_POOL      0x00000010  // Alloc & Free's
 #define DEBUG_PAGE      0x00000020  // Alloc & Free's
 #define DEBUG_INFO      0x00000040  // Verbose
-#define DEBUG_DISPATCH  0x00000080  // PEI/DXE Dispatchers
+#define DEBUG_DISPATCH  0x00000080  // PEI/DXE/SMM Dispatchers
 #define DEBUG_VARIABLE  0x00000100  // Variable
 #define DEBUG_BM        0x00000400  // Boot Manager
 #define DEBUG_BLKIO     0x00001000  // BlkIo Driver

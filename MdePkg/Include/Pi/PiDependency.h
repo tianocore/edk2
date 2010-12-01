@@ -19,13 +19,13 @@
 
 /// 
 /// If present, this must be the first and only opcode,
-/// EFI_DEP_BEFORE is only used by DXE driver.
+/// EFI_DEP_BEFORE may be used by DXE and SMM drivers.
 /// 
 #define EFI_DEP_BEFORE        0x00
 
 /// 
 /// If present, this must be the first and only opcode,
-/// EFI_DEP_AFTER is only used by DXE driver.
+/// EFI_DEP_AFTER may be used by DXE and SMM drivers.
 /// 
 #define EFI_DEP_AFTER         0x01
 
@@ -40,7 +40,7 @@
 
 /// 
 /// If present, this must be the first opcode,
-/// EFI_DEP_SOR is only used by DXE driver.
+/// EFI_DEP_SOR may be used by DXE and SMM drivers.
 /// 
 #define EFI_DEP_SOR           0x09
 
