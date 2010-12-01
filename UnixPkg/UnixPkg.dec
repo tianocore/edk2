@@ -82,7 +82,7 @@
   gEfiUnixPkgTokenSpaceGuid.PcdUnixPhysicalDisk|L"E:RW;245760;512"|VOID*|0x00001000
   gEfiUnixPkgTokenSpaceGuid.PcdUnixVirtualDisk|L"FW;40960;512"|VOID*|0x00001001
   gEfiUnixPkgTokenSpaceGuid.PcdUnixUga|L"UGA Window"|VOID*|0x00001003
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixGop|L"GOP Window"|VOID*|0x0000100e
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixGop|L"GOP Window"|VOID*|0x00001018
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFileSystem|L".!..\\..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"|VOID*|0x00001004
   gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySize|L"64!64"|VOID*|0x00001005
   gEfiUnixPkgTokenSpaceGuid.PcdUnixCpuModel|L"Intel(R) Processor Model"|VOID*|0x00001007
