@@ -256,9 +256,8 @@ PxeBcExtractBootFileUrl (
   //
 
   //
-  // Based upon RFC 5970 and UEFI errata that will appear in chapter 21.3 of UEFI 2.3
-  // specification after 2.3 errata B and future UEFI Specifications after 2.3.
-  // tftp://[SERVER_ADDRESS]/BOOTFILE_NAME
+  // Based upon RFC 5970 and UEFI 2.3 Errata D specification, bootfile-url format
+  // is tftp://[SERVER_ADDRESS]/BOOTFILE_NAME
   // As an example where the BOOTFILE_NAME is the EFI loader and
   // SERVER_ADDRESS is the ASCII encoding of an IPV6 address.
   //
