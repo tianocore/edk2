@@ -108,7 +108,8 @@ ConvertBaud2Unix (
 {
   switch (BaudRate) {
   case 0:
-    return B0;
+    return 0; // Don't use B0 as it is also used in EFI #includes as a name so termios.h #define 
+              // can break the build.
   case 50:
     return B50;
   case 75:

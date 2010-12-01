@@ -21,20 +21,10 @@ Abstract:
 
 #ifndef _UNIXPKG_SERIAL_IO_
 #define _UNIXPKG_SERIAL_IO_
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
 
-#ifdef __APPLE__
-#else
-#include <stdlib.h>
-#include <termio.h>
-#endif
+#include <Common/UnixInclude.h>
 
-#include <fcntl.h>
-#include <errno.h>
-
-#include "Uefi.h"
+#include <Uefi.h>
 #include <Protocol/SerialIo.h>
 #include <Protocol/DevicePath.h>
 

@@ -11,11 +11,10 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 --*/
+#include <Common/UnixInclude.h>
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #include <PiPei.h>
 #include <Protocol/SimplePointer.h>

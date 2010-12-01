@@ -30,31 +30,37 @@ ASM_GLOBAL ASM_PFX(mTransition)
 ASM_GLOBAL ASM_PFX(InternalAsmThunk16)
 
 # define the structure of IA32_REGS
-.set  _EDI, 0       #size 4
-.set  _ESI, 4       #size 4
-.set  _EBP, 8       #size 4
-.set  _ESP, 12      #size 4
-.set  _EBX, 16      #size 4
-.set  _EDX, 20      #size 4
-.set  _ECX, 24      #size 4
-.set  _EAX, 28      #size 4
-.set  _DS,  32      #size 2
-.set  _ES,  34      #size 2
-.set  _FS,  36      #size 2
-.set  _GS,  38      #size 2
-.set  _EFLAGS, 40   #size 8
-.set  _EIP, 48      #size 4
-.set  _CS, 52       #size 2
-.set  _SS, 54       #size 2
-.set  IA32_REGS_SIZE, 56
+#define  _EDI  0       // size 4
+#define  _ESI  4       // size 4
+#define  _EBP  8       // size 4
+#define  _ESP  12      // size 4
+#define  _EBX  16      // size 4
+#define  _EDX  20      // size 4
+#define  _ECX  24      // size 4
+#define  _EAX  28      // size 4
+#define  _DS   32      // size 2
+#define  _ES   34      // size 2
+#define  _FS   36      // size 2
+#define  _GS   38      // size 2
+#define  _EFLAGS  40   // size 8
+#define  _EIP  48      // size 4
+#define  _CS  52       // size 2
+#define  _SS  54       // size 2
+#define  IA32_REGS_SIZE  56
 
     .data
 
-ASM_PFX(m16Size):         .word      ASM_PFX(InternalAsmThunk16) - ASM_PFX(m16Start)
-ASM_PFX(mThunk16Attr):    .word      _ThunkAttr - ASM_PFX(m16Start)
-ASM_PFX(m16Gdt):          .word      ASM_PFX(NullSeg) - ASM_PFX(m16Start)
-ASM_PFX(m16GdtrBase):     .word      _16GdtrBase - ASM_PFX(m16Start)
-ASM_PFX(mTransition):     .word      _EntryPoint - ASM_PFX(m16Start)
+.set L_m16SizeSym,      ASM_PFX(InternalAsmThunk16) - ASM_PFX(m16Start)
+.set L_mThunk16AttrSym, _ThunkAttr - ASM_PFX(m16Start)
+.set L_m16GdtSym,       ASM_PFX(NullSeg) - ASM_PFX(m16Start)
+.set L_m16GdtrBaseSym,  _16GdtrBase - ASM_PFX(m16Start)
+.set L_mTransitionSym,  _EntryPoint - ASM_PFX(m16Start)
+
+ASM_PFX(m16Size):         .word      L_m16SizeSym
+ASM_PFX(mThunk16Attr):    .word      L_mThunk16AttrSym
+ASM_PFX(m16Gdt):          .word      L_m16GdtSym
+ASM_PFX(m16GdtrBase):     .word      L_m16GdtrBaseSym
+ASM_PFX(mTransition):     .word      L_mTransitionSym
 
     .text
 
@@ -118,7 +124,8 @@ L_2:
     shlw    $4,%ax
     lea     (L_64BitCode - L_Base)(%ebx, %eax), %ax
     .byte 0x66,0x2e,0x89,0x87           # mov cs:[bx + (L_64Eip - L_Base)], eax
-    .word   L_64Eip - L_Base
+.set EipOffset,  L_64Eip - L_Base
+    .word   EipOffset
     .byte 0x66,0xb8                     # mov eax, imm32
 SavedCr4:   .space  4
     movq    %rax, %cr4
@@ -147,7 +154,7 @@ SavedSp:    .space 4                   # restore stack
 
 _EntryPoint: .long      ASM_PFX(ToUserCode) - ASM_PFX(m16Start)
              .word      CODE16
-_16Gdtr:     .word      GDT_SIZE - 1
+_16Gdtr:     .word      L_GDT_SIZE - 1
 _16GdtrBase: .quad      ASM_PFX(NullSeg)
 _16Idtr:     .word      0x3ff
              .long      0
@@ -220,7 +227,7 @@ ASM_PFX(_32Data):
             .byte 0xcf                  # 16-bit segment, 4GB limit
             .byte 0
 
-.set  GDT_SIZE, . - ASM_PFX(NullSeg)
+.set  L_GDT_SIZE, . - ASM_PFX(NullSeg)
 
 #------------------------------------------------------------------------------
 # IA32_REGISTER_SET *
@@ -301,7 +308,8 @@ ASM_PFX(InternalAsmThunk16):
     movw    %r8w, (SavedCs - SavedCr4)(%rcx)
     movl    %esp, (SavedSp - SavedCr4)(%rcx)
     .byte   0xff, 0x69                  #  jmp (_EntryPoint - SavedCr4)(%rcx)
-    .byte   _EntryPoint - SavedCr4
+.set EntryPointSavedCr4Offset, _EntryPoint - SavedCr4
+    .byte   EntryPointSavedCr4Offset
 L_RetFromRealMode: 
     popfq
     lgdt    0x60(%rsp)                  # restore protected mode GDTR
