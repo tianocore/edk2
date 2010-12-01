@@ -143,6 +143,17 @@ BdsBootDeviceSelect (
   // Parse the boot order to get boot option
   //
   BdsLibBuildOptionFromVar (&BootLists, L"BootOrder");
+
+  //
+  // When we didn't have chance to build boot option variables in the first 
+  // full configuration boot (e.g.: Reset in the first page or in Device Manager),
+  // we have no boot options in the following mini configuration boot.
+  // Give the last chance to enumerate the boot options.
+  //
+  if (IsListEmpty (&BootLists)) {
+    BdsLibEnumerateAllBootOption (&BootLists);
+  }
+
   Link = BootLists.ForwardLink;
 
   //
