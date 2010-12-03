@@ -85,7 +85,6 @@ typedef struct {
   UINT8 Type;
   UINT8 MajorVer;
   UINT8 MinorVer;
-  UINT8 Reserved;
 } PXEBC_DHCP6_OPTION_UNDI;
 
 typedef struct {

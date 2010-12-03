@@ -97,7 +97,7 @@ PxeBcBuildDhcp6Options (
   // Append client network device interface option
   //
   OptList[Index]->OpCode     = HTONS (PXEBC_DHCP6_OPT_UNDI);
-  OptList[Index]->OpLen      = HTONS ((UINT16) sizeof (PXEBC_DHCP6_OPTION_UNDI));
+  OptList[Index]->OpLen      = HTONS ((UINT16)3);
   OptEnt.Undi                = (PXEBC_DHCP6_OPTION_UNDI *) OptList[Index]->Data;
 
   if (Private->Nii != NULL) {
@@ -110,7 +110,6 @@ PxeBcBuildDhcp6Options (
     OptEnt.Undi->MinorVer    = DEFAULT_UNDI_MINOR;
   }
 
-  OptEnt.Undi->Reserved      = 0;
   Index++;
   OptList[Index]             = GET_NEXT_DHCP6_OPTION (OptList[Index - 1]);
 
