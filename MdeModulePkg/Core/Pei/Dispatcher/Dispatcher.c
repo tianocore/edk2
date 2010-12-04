@@ -1078,11 +1078,20 @@ DepexSatisfied (
 {
   EFI_STATUS           Status;
   VOID                 *DepexData;
+  EFI_FV_FILE_INFO     FileInfo;
 
+  Status = PeiServicesFfsGetFileInfo (FileHandle, &FileInfo);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_DISPATCH, "Evaluate PEI DEPEX for FFS(Unknown)\n"));
+  } else {
+    DEBUG ((DEBUG_DISPATCH, "Evaluate PEI DEPEX for FFS(%g)\n", &FileInfo.FileName));
+  }
+  
   if (PeimCount < Private->AprioriCount) {
     //
     // If its in the A priori file then we set Depex to TRUE
     //
+    DEBUG ((DEBUG_DISPATCH, "  RESULT = TRUE (Apriori)\n"));
     return TRUE;
   }
 
@@ -1099,6 +1108,7 @@ DepexSatisfied (
     //
     // If there is no DEPEX, assume the module can be executed
     //
+    DEBUG ((DEBUG_DISPATCH, "  RESULT = TRUE (No DEPEX)\n"));
     return TRUE;
   }
 

@@ -782,9 +782,14 @@ SmmSchedule (
       DriverEntry->Unrequested  = FALSE;
       DriverEntry->Dependent    = TRUE;
 
+      DEBUG ((DEBUG_DISPATCH, "Schedule FFS(%g) - EFI_SUCCESS\n", DriverName));
+
       return EFI_SUCCESS;
     }
   }
+  
+  DEBUG ((DEBUG_DISPATCH, "Schedule FFS(%g) - EFI_NOT_FOUND\n", DriverName));
+  
   return EFI_NOT_FOUND;
 }
 
@@ -925,6 +930,12 @@ SmmDispatcher (
           SmmInsertOnScheduledQueueWhileProcessingBeforeAndAfter (DriverEntry);
           ReadyToRun = TRUE;
         }
+      } else {
+        if (DriverEntry->Unrequested) {
+          DEBUG ((DEBUG_DISPATCH, "Evaluate SMM DEPEX for FFS(%g)\n", &DriverEntry->FileName));
+          DEBUG ((DEBUG_DISPATCH, "  SOR                                             = Not Requested\n"));
+          DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE\n"));
+        }
       }
     }
   } while (ReadyToRun);
@@ -974,12 +985,17 @@ SmmInsertOnScheduledQueueWhileProcessingBeforeAndAfter (
   //
   for (Link = mDiscoveredList.ForwardLink; Link != &mDiscoveredList; Link = Link->ForwardLink) {
     DriverEntry = CR(Link, EFI_SMM_DRIVER_ENTRY, Link, EFI_SMM_DRIVER_ENTRY_SIGNATURE);
-    if (DriverEntry->Before && DriverEntry->Dependent) {
+    if (DriverEntry->Before && DriverEntry->Dependent && DriverEntry != InsertedDriverEntry) {
+      DEBUG ((DEBUG_DISPATCH, "Evaluate SMM DEPEX for FFS(%g)\n", &DriverEntry->FileName));
+      DEBUG ((DEBUG_DISPATCH, "  BEFORE FFS(%g) = ", &DriverEntry->BeforeAfterGuid));
       if (CompareGuid (&InsertedDriverEntry->FileName, &DriverEntry->BeforeAfterGuid)) {
         //
         // Recursively process BEFORE
         //
+        DEBUG ((DEBUG_DISPATCH, "TRUE\n  END\n  RESULT = TRUE\n"));
         SmmInsertOnScheduledQueueWhileProcessingBeforeAndAfter (DriverEntry);
+      } else {
+        DEBUG ((DEBUG_DISPATCH, "FALSE\n  END\n  RESULT = FALSE\n"));
       }
     }
   }
@@ -998,12 +1014,17 @@ SmmInsertOnScheduledQueueWhileProcessingBeforeAndAfter (
   //
   for (Link = mDiscoveredList.ForwardLink; Link != &mDiscoveredList; Link = Link->ForwardLink) {
     DriverEntry = CR(Link, EFI_SMM_DRIVER_ENTRY, Link, EFI_SMM_DRIVER_ENTRY_SIGNATURE);
-    if (DriverEntry->After && DriverEntry->Dependent) {
+    if (DriverEntry->After && DriverEntry->Dependent && DriverEntry != InsertedDriverEntry) {
+      DEBUG ((DEBUG_DISPATCH, "Evaluate SMM DEPEX for FFS(%g)\n", &DriverEntry->FileName));
+      DEBUG ((DEBUG_DISPATCH, "  AFTER FFS(%g) = ", &DriverEntry->BeforeAfterGuid));
       if (CompareGuid (&InsertedDriverEntry->FileName, &DriverEntry->BeforeAfterGuid)) {
         //
         // Recursively process AFTER
         //
+        DEBUG ((DEBUG_DISPATCH, "TRUE\n  END\n  RESULT = TRUE\n"));
         SmmInsertOnScheduledQueueWhileProcessingBeforeAndAfter (DriverEntry);
+      } else {
+        DEBUG ((DEBUG_DISPATCH, "FALSE\n  END\n  RESULT = FALSE\n"));
       }
     }
   }
@@ -1340,6 +1361,8 @@ SmmDriverDispatchHandler (
           DriverEntry->Dependent = FALSE;
           DriverEntry->Scheduled = TRUE;
           InsertTailList (&mScheduledQueue, &DriverEntry->ScheduledLink);
+          DEBUG ((DEBUG_DISPATCH, "Evaluate SMM DEPEX for FFS(%g)\n", &DriverEntry->FileName));
+          DEBUG ((DEBUG_DISPATCH, "  RESULT = TRUE (Apriori)\n"));
           break;
         }
       }

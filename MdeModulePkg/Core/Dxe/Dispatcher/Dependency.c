@@ -5,7 +5,7 @@
   if a driver can be scheduled for execution.  The criteria for
   schedulability is that the dependency expression is satisfied.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -220,6 +220,8 @@ CoreIsSchedulable (
   EFI_GUID    DriverGuid;
   VOID        *Interface;
 
+  DEBUG ((DEBUG_DISPATCH, "Evaluate DXE DEPEX for FFS(%g)\n", &DriverEntry->FileName));
+
   Operator = FALSE;
   Operator2 = FALSE;
 
@@ -236,9 +238,12 @@ CoreIsSchedulable (
     // A NULL Depex means treat the driver like an UEFI 2.0 thing.
     //
     Status = CoreAllEfiServicesAvailable ();
+    DEBUG ((DEBUG_DISPATCH, "  All UEFI Services Available                     = "));
     if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_DISPATCH, "FALSE\n  RESULT = FALSE\n"));
       return FALSE;
     }
+    DEBUG ((DEBUG_DISPATCH, "TRUE\n  RESULT = TRUE\n"));
     return TRUE;
   }
 
@@ -257,6 +262,7 @@ CoreIsSchedulable (
     // past the end of the dependency expression.
     //
     if (((UINTN)Iterator - (UINTN)DriverEntry->Depex) >= DriverEntry->DepexSize) {
+      DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Attempt to fetch past end of depex)\n"));
       return FALSE;
     }
 
@@ -272,6 +278,7 @@ CoreIsSchedulable (
       // If the code flow arrives at this point, there was a BEFORE or AFTER
       // that were not the first opcodes.
       //
+      DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected BEFORE or AFTER opcode)\n"));
       ASSERT (FALSE);
     case EFI_DEP_SOR:
       //
@@ -279,8 +286,11 @@ CoreIsSchedulable (
       // at any other location, then the dependency expression evaluates to FALSE
       //
       if (Iterator != DriverEntry->Depex) {
+        DEBUG ((DEBUG_DISPATCH, "  SOR\n"));
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected SOR opcode)\n"));
         return FALSE;
       }
+      DEBUG ((DEBUG_DISPATCH, "  SOR                                             = Requested\n"));
       //
       // Otherwise, it is the first opcode and should be treated as a NOP.
       //
@@ -296,12 +306,15 @@ CoreIsSchedulable (
       Status = CoreLocateProtocol (&DriverGuid, NULL, &Interface);
 
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  PUSH GUID(%g) = FALSE\n", &DriverGuid));
         Status = PushBool (FALSE);
       } else {
+        DEBUG ((DEBUG_DISPATCH, "  PUSH GUID(%g) = TRUE\n", &DriverGuid));
         *Iterator = EFI_DEP_REPLACE_TRUE;
         Status = PushBool (TRUE);
       }
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
         return FALSE;
       }
 
@@ -309,75 +322,97 @@ CoreIsSchedulable (
       break;
 
     case EFI_DEP_AND:
+      DEBUG ((DEBUG_DISPATCH, "  AND\n"));
       Status = PopBool (&Operator);
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
         return FALSE;
       }
 
       Status = PopBool (&Operator2);
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
         return FALSE;
       }
 
       Status = PushBool ((BOOLEAN)(Operator && Operator2));
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
         return FALSE;
       }
       break;
 
     case EFI_DEP_OR:
+      DEBUG ((DEBUG_DISPATCH, "  OR\n"));
       Status = PopBool (&Operator);
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
         return FALSE;
       }
 
       Status = PopBool (&Operator2);
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
         return FALSE;
       }
 
       Status = PushBool ((BOOLEAN)(Operator || Operator2));
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
         return FALSE;
       }
       break;
 
     case EFI_DEP_NOT:
+      DEBUG ((DEBUG_DISPATCH, "  NOT\n"));
       Status = PopBool (&Operator);
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
         return FALSE;
       }
 
       Status = PushBool ((BOOLEAN)(!Operator));
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
         return FALSE;
       }
       break;
 
     case EFI_DEP_TRUE:
+      DEBUG ((DEBUG_DISPATCH, "  TRUE\n"));
       Status = PushBool (TRUE);
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
         return FALSE;
       }
       break;
 
     case EFI_DEP_FALSE:
+      DEBUG ((DEBUG_DISPATCH, "  FALSE\n"));
       Status = PushBool (FALSE);
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
         return FALSE;
       }
       break;
 
     case EFI_DEP_END:
+      DEBUG ((DEBUG_DISPATCH, "  END\n"));
       Status = PopBool (&Operator);
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
         return FALSE;
       }
+      DEBUG ((DEBUG_DISPATCH, "  RESULT = %a\n", Operator ? "TRUE" : "FALSE"));
       return Operator;
 
     case EFI_DEP_REPLACE_TRUE:
+      CopyMem (&DriverGuid, Iterator + 1, sizeof (EFI_GUID));
+      DEBUG ((DEBUG_DISPATCH, "  PUSH GUID(%g) = TRUE\n", &DriverGuid));
+      
       Status = PushBool (TRUE);
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
         return FALSE;
       }
 
@@ -385,6 +420,7 @@ CoreIsSchedulable (
       break;
 
     default:
+      DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unknown opcode)\n"));
       goto Done;
     }
 

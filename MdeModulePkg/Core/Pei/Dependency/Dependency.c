@@ -5,7 +5,7 @@
   if a driver can be scheduled for execution.  The criteria for
   schedulability is that the dependency expression is satisfied.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -123,6 +123,7 @@ PeimDispatchReadiness (
         // EvalStack on the push
         //
         if (StackPtr > &EvalStack[MAX_GRAMMAR_SIZE-1]) {
+          DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Underflow Error)\n"));
           return FALSE;
         }
 
@@ -132,11 +133,17 @@ PeimDispatchReadiness (
         //
         StackPtr->Operator = (VOID *) Iterator;
         Iterator = Iterator + sizeof (EFI_GUID);
+        DEBUG ((DEBUG_DISPATCH, "  PUSH GUID(%g) = %a\n", StackPtr->Operator, IsPpiInstalled (PeiServices, StackPtr) ? "TRUE" : "FALSE"));
         StackPtr++;
         break;
 
       case (EFI_DEP_AND):    
       case (EFI_DEP_OR):     
+        if (*(Iterator - 1) == EFI_DEP_AND) {
+          DEBUG ((DEBUG_DISPATCH, "  AND\n"));
+        } else {
+          DEBUG ((DEBUG_DISPATCH, "  OR\n"));
+        }
         //
         // Check to make sure the dependency grammar doesn't underflow the
         // EvalStack on the two POPs for the AND operation.  Don't need to
@@ -144,6 +151,7 @@ PeimDispatchReadiness (
         // did two POPs.
         //
         if (StackPtr < &EvalStack[2]) {
+          DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Underflow Error)\n"));
           return FALSE;
         }
 
@@ -176,18 +184,22 @@ PeimDispatchReadiness (
         break;
         
       case (EFI_DEP_END):
+        DEBUG ((DEBUG_DISPATCH, "  END\n"));
         StackPtr--;
         //
         // Check to make sure EvalStack is balanced.  If not, then there is
         // an error in the dependency grammar, so return EFI_INVALID_PARAMETER.
         //
         if (StackPtr != &EvalStack[0]) {
+          DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Underflow Error)\n"));
           return FALSE;
         }
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = %a\n", IsPpiInstalled (PeiServices, StackPtr) ? "TRUE" : "FALSE"));
         return IsPpiInstalled (PeiServices, StackPtr);
         break;
 
       case (EFI_DEP_NOT):    
+        DEBUG ((DEBUG_DISPATCH, "  NOT\n"));
         //
         // Check to make sure the dependency grammar doesn't underflow the
         // EvalStack on the POP for the NOT operation.  Don't need to
@@ -195,6 +207,7 @@ PeimDispatchReadiness (
         // did a POP.
         //
         if (StackPtr < &EvalStack[1]) {
+          DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Underflow Error)\n"));
           return FALSE;
         }
         (StackPtr-1)->Result = (BOOLEAN) !IsPpiInstalled (PeiServices, (StackPtr-1));
@@ -203,11 +216,17 @@ PeimDispatchReadiness (
 
       case (EFI_DEP_TRUE):
       case (EFI_DEP_FALSE):
+        if (*(Iterator - 1) == EFI_DEP_TRUE) {
+          DEBUG ((DEBUG_DISPATCH, "  TRUE\n"));
+        } else {
+          DEBUG ((DEBUG_DISPATCH, "  FALSE\n"));
+        }
         //
         // Check to make sure the dependency grammar doesn't overflow the
         // EvalStack on the push
         //
         if (StackPtr > &EvalStack[MAX_GRAMMAR_SIZE-1]) {
+          DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Underflow Error)\n"));
           return FALSE;
         }
         //
@@ -225,6 +244,7 @@ PeimDispatchReadiness (
         break;
 
       default:
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Invalid opcode)\n"));
         //
         // The grammar should never arrive here
         //
