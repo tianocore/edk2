@@ -160,14 +160,14 @@ ASM_PFX(InternalAsmThunk16):
     movsl                               # copy RegSet
     movl    40(%esp), %eax              # eax <- address of transition code
     movl    %edx, %esi                  # esi <- 16-bit stack segment
-    lea     0x5e(%eax), %edx
+    lea     0x5f(%eax), %edx
     movl    %eax, %ecx
     andl    $0xf, %ecx
     shll    $12, %eax
     lea     0x6(%ecx), %ecx
     movw    %cx, %ax
     stosl                               # [edi] <- return address of user code
-    sgdtl   0xffffffa2(%edx)
+    sgdtl   0xffffffa1(%edx)
     sidtl   0x24(%esp)
     movl    %cr0, %eax
     movl    %eax, (%edx)                # save CR0 in SavedCr0
