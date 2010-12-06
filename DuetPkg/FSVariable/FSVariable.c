@@ -753,6 +753,7 @@ GetLangFromSupportedLangCodes (
 
 **/
 CHAR8 *
+EFIAPI
 VariableGetBestLanguage (
   IN CONST CHAR8  *SupportedLanguages, 
   IN BOOLEAN      Iso639Language,
