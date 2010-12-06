@@ -220,8 +220,6 @@ CoreIsSchedulable (
   EFI_GUID    DriverGuid;
   VOID        *Interface;
 
-  DEBUG ((DEBUG_DISPATCH, "Evaluate DXE DEPEX for FFS(%g)\n", &DriverEntry->FileName));
-
   Operator = FALSE;
   Operator2 = FALSE;
 
@@ -232,6 +230,8 @@ CoreIsSchedulable (
     //
     return FALSE;
   }
+
+  DEBUG ((DEBUG_DISPATCH, "Evaluate DXE DEPEX for FFS(%g)\n", &DriverEntry->FileName));
 
   if (DriverEntry->Depex == NULL) {
     //

@@ -161,8 +161,7 @@ PopBool (
 /**
   This is the POSTFIX version of the dependency evaluator.  This code does
   not need to handle Before or After, as it is not valid to call this
-  routine in this case. The SOR is just ignored and is a nop in the grammer.
-  POSTFIX means all the math is done on top of the stack.
+  routine in this case. POSTFIX means all the math is done on top of the stack.
 
   @param  DriverEntry           DriverEntry element to update.
 
@@ -183,8 +182,6 @@ SmmIsSchedulable (
   EFI_GUID    DriverGuid;
   VOID        *Interface;
 
-  DEBUG ((DEBUG_DISPATCH, "Evaluate SMM DEPEX for FFS(%g)\n", &DriverEntry->FileName));
-  
   Operator = FALSE;
   Operator2 = FALSE;
 
@@ -196,6 +193,8 @@ SmmIsSchedulable (
     return FALSE;
   }
 
+  DEBUG ((DEBUG_DISPATCH, "Evaluate SMM DEPEX for FFS(%g)\n", &DriverEntry->FileName));
+  
   if (DriverEntry->Depex == NULL) {
     //
     // A NULL Depex means that the SMM driver is not built correctly.  
@@ -239,21 +238,6 @@ SmmIsSchedulable (
       //
       DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected BEFORE or AFTER opcode)\n"));
       ASSERT (FALSE);
-    case EFI_DEP_SOR:
-      //
-      // These opcodes can only appear once as the first opcode.  If it is found
-      // at any other location, then the dependency expression evaluates to FALSE
-      //
-      if (Iterator != DriverEntry->Depex) {
-        DEBUG ((DEBUG_DISPATCH, "  SOR\n"));
-        DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected SOR opcode)\n"));
-        return FALSE;
-      }
-      DEBUG ((DEBUG_DISPATCH, "  SOR                                             = Requested\n"));
-      //
-      // Otherwise, it is the first opcode and should be treated as a NOP.
-      //
-      break;
 
     case EFI_DEP_PUSH:
       //

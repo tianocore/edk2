@@ -80,9 +80,7 @@ typedef struct {
   EFI_GUID                        BeforeAfterGuid;
 
   BOOLEAN                         Dependent;
-  BOOLEAN                         Unrequested;
   BOOLEAN                         Scheduled;
-  BOOLEAN                         Untrusted;
   BOOLEAN                         Initialized;
   BOOLEAN                         DepexProtocolError;
 
@@ -702,8 +700,7 @@ SmmRemoveInterfaceFromProtocol (
 /**
   This is the POSTFIX version of the dependency evaluator.  This code does
   not need to handle Before or After, as it is not valid to call this
-  routine in this case. The SOR is just ignored and is a nop in the grammer.
-  POSTFIX means all the math is done on top of the stack.
+  routine in this case. POSTFIX means all the math is done on top of the stack.
 
   @param  DriverEntry           DriverEntry element to update.
 
