@@ -69,7 +69,7 @@
   
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE|BOOLEAN|0x0000001b
   gEmbeddedTokenSpaceGuid.PcdCacheEnable|FALSE|BOOLEAN|0x00000042
-  gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x0000004d
+  gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x00000051
 
 
 [PcdsFixedAtBuild.common]
@@ -92,7 +92,7 @@
 
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|0x0|UINT32|0x00000043
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainOffset|0x0|UINT32|0x00000044
-  gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize|0x0|UINT32|0x000000045
+  gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize|0x0|UINT32|0x00000045
 
   
 # Used to help reduce fragmentation in the EFI memory map
