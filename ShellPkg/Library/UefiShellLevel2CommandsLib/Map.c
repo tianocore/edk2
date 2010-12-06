@@ -679,18 +679,19 @@ PerformMappingDelete(
     return (Status);
   }
 
-  //
-  // Get the map name(s) for each one.
-  //
-  for ( LoopVar = 0
-      ; LoopVar < BufferSize / sizeof(EFI_HANDLE)
-      ; LoopVar ++
-     ){
-    if (PerformSingleMappingDelete(Specific,HandleBuffer[LoopVar]) == SHELL_SUCCESS) {
-        Deleted = TRUE;
+  if (HandleBuffer != NULL) {
+    //
+    // Get the map name(s) for each one.
+    //
+    for ( LoopVar = 0
+        ; LoopVar < BufferSize / sizeof(EFI_HANDLE)
+        ; LoopVar ++
+       ){
+      if (PerformSingleMappingDelete(Specific,HandleBuffer[LoopVar]) == SHELL_SUCCESS) {
+          Deleted = TRUE;
+      }
     }
   }
-
   //
   // Look up all BlockIo in the platform
   //
@@ -718,30 +719,32 @@ PerformMappingDelete(
     return (Status);
   }
 
-  //
-  // Get the map name(s) for each one.
-  //
-  for ( LoopVar = 0
-      ; LoopVar < BufferSize / sizeof(EFI_HANDLE)
-      ; LoopVar ++
-     ){
+  if (HandleBuffer != NULL) {
     //
-    // Skip any that were already done...
+    // Get the map name(s) for each one.
     //
-    if (gBS->OpenProtocol(
-      HandleBuffer[LoopVar],
-      &gEfiDevicePathProtocolGuid,
-      NULL,
-      gImageHandle,
-      NULL,
-      EFI_OPEN_PROTOCOL_TEST_PROTOCOL) == EFI_SUCCESS) {
-        continue;
-    }
-    if (PerformSingleMappingDelete(Specific,HandleBuffer[LoopVar]) == SHELL_SUCCESS) {
-        Deleted = TRUE;
+    for ( LoopVar = 0
+        ; LoopVar < BufferSize / sizeof(EFI_HANDLE)
+        ; LoopVar ++
+       ){
+      //
+      // Skip any that were already done...
+      //
+      if (gBS->OpenProtocol(
+        HandleBuffer[LoopVar],
+        &gEfiDevicePathProtocolGuid,
+        NULL,
+        gImageHandle,
+        NULL,
+        EFI_OPEN_PROTOCOL_TEST_PROTOCOL) == EFI_SUCCESS) {
+          continue;
+      }
+      if (PerformSingleMappingDelete(Specific,HandleBuffer[LoopVar]) == SHELL_SUCCESS) {
+          Deleted = TRUE;
+      }
     }
   }
-  FreePool(HandleBuffer);
+  SHELL_FREE_NON_NULL(HandleBuffer);
   if (!Deleted) {
     return (EFI_NOT_FOUND);
   }

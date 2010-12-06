@@ -907,75 +907,46 @@ InternalOpenFileDevicePath(
 
   if (!EFI_ERROR(Status)) {
     Handle1 = ConvertShellHandleToEfiFileProtocol(ShellHandle);
-    //
-    // chop off the begining part before the file system part...
-    //
-    ///@todo BlockIo?
-    Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid,
-                                   &DevicePath,
-                                   &Handle);
-      if (!EFI_ERROR(Status)) {
+    if (Handle1 != NULL) {
       //
-      // To access as a file system, the file path should only
-      // contain file path components.  Follow the file path nodes
-      // and find the target file
+      // chop off the begining part before the file system part...
       //
-      for ( FilePathNode = (FILEPATH_DEVICE_PATH *)DevicePath
-          ; !IsDevicePathEnd (&FilePathNode->Header)
-          ; FilePathNode = (FILEPATH_DEVICE_PATH *) NextDevicePathNode (&FilePathNode->Header)
-         ){
-        SHELL_FREE_NON_NULL(AlignedNode);
-        AlignedNode = AllocateCopyPool (DevicePathNodeLength(FilePathNode), FilePathNode);
+      ///@todo BlockIo?
+      Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid,
+                                     &DevicePath,
+                                     &Handle);
+        if (!EFI_ERROR(Status)) {
         //
-        // For file system access each node should be a file path component
+        // To access as a file system, the file path should only
+        // contain file path components.  Follow the file path nodes
+        // and find the target file
         //
-        if (DevicePathType (&FilePathNode->Header) != MEDIA_DEVICE_PATH ||
-            DevicePathSubType (&FilePathNode->Header) != MEDIA_FILEPATH_DP
-           ) {
-          Status = EFI_UNSUPPORTED;
-          break;
-        }
-
-        //
-        // Open this file path node
-        //
-        Handle2 = Handle1;
-        Handle1 = NULL;
-
-        //
-        // if this is the last node in the DevicePath always create (if that was requested).
-        //
-        if (IsDevicePathEnd ((NextDevicePathNode (&FilePathNode->Header)))) {
-          Status = Handle2->Open (
-                                Handle2,
-                                &Handle1,
-                                AlignedNode->PathName,
-                                OpenMode,
-                                Attributes
-                               );
-        } else {
+        for ( FilePathNode = (FILEPATH_DEVICE_PATH *)DevicePath
+            ; !IsDevicePathEnd (&FilePathNode->Header)
+            ; FilePathNode = (FILEPATH_DEVICE_PATH *) NextDevicePathNode (&FilePathNode->Header)
+           ){
+          SHELL_FREE_NON_NULL(AlignedNode);
+          AlignedNode = AllocateCopyPool (DevicePathNodeLength(FilePathNode), FilePathNode);
+          //
+          // For file system access each node should be a file path component
+          //
+          if (DevicePathType (&FilePathNode->Header) != MEDIA_DEVICE_PATH ||
+              DevicePathSubType (&FilePathNode->Header) != MEDIA_FILEPATH_DP
+             ) {
+            Status = EFI_UNSUPPORTED;
+            break;
+          }
 
           //
-          //  This is not the last node and we dont want to 'create' existing
-          //  directory entries...
+          // Open this file path node
           //
+          Handle2 = Handle1;
+          Handle1 = NULL;
 
           //
-          // open without letting it create
-          // prevents error on existing files/directories
+          // if this is the last node in the DevicePath always create (if that was requested).
           //
-          Status = Handle2->Open (
-                                Handle2,
-                                &Handle1,
-                                AlignedNode->PathName,
-                                OpenMode &~EFI_FILE_MODE_CREATE,
-                                Attributes
-                               );
-          //
-          // if above failed now open and create the 'item'
-          // if OpenMode EFI_FILE_MODE_CREATE bit was on (but disabled above)
-          //
-          if ((EFI_ERROR (Status)) && ((OpenMode & EFI_FILE_MODE_CREATE) != 0)) {
+          if (IsDevicePathEnd ((NextDevicePathNode (&FilePathNode->Header)))) {
             Status = Handle2->Open (
                                   Handle2,
                                   &Handle1,
@@ -983,20 +954,51 @@ InternalOpenFileDevicePath(
                                   OpenMode,
                                   Attributes
                                  );
-          }
-        }
-        //
-        // Close the last node
-        //
-        ShellInfoObject.NewEfiShellProtocol->CloseFile (Handle2);
+          } else {
 
-        //
-        // If there's been an error, stop
-        //
-        if (EFI_ERROR (Status)) {
-          break;
-        }
-      } // for loop
+            //
+            //  This is not the last node and we dont want to 'create' existing
+            //  directory entries...
+            //
+
+            //
+            // open without letting it create
+            // prevents error on existing files/directories
+            //
+            Status = Handle2->Open (
+                                  Handle2,
+                                  &Handle1,
+                                  AlignedNode->PathName,
+                                  OpenMode &~EFI_FILE_MODE_CREATE,
+                                  Attributes
+                                 );
+            //
+            // if above failed now open and create the 'item'
+            // if OpenMode EFI_FILE_MODE_CREATE bit was on (but disabled above)
+            //
+            if ((EFI_ERROR (Status)) && ((OpenMode & EFI_FILE_MODE_CREATE) != 0)) {
+              Status = Handle2->Open (
+                                    Handle2,
+                                    &Handle1,
+                                    AlignedNode->PathName,
+                                    OpenMode,
+                                    Attributes
+                                   );
+            }
+          }
+          //
+          // Close the last node
+          //
+          ShellInfoObject.NewEfiShellProtocol->CloseFile (Handle2);
+
+          //
+          // If there's been an error, stop
+          //
+          if (EFI_ERROR (Status)) {
+            break;
+          }
+        } // for loop
+      }
     }
   }
   SHELL_FREE_NON_NULL(AlignedNode);
@@ -2001,7 +2003,7 @@ ShellSearchHandle(
               ShellInfoNode->FullName = NewFullName;
             }
           }
-          if (Directory && !EFI_ERROR(Status)){
+          if (Directory && !EFI_ERROR(Status) && ShellInfoNode->FullName != NULL && ShellInfoNode->FileName != NULL){
             //
             // should be a directory
             //
@@ -2015,7 +2017,6 @@ ShellSearchHandle(
               //
               //
               //
-              ASSERT_EFI_ERROR(Status);
               if (EFI_ERROR(Status)) {
                 break;
               }

@@ -183,7 +183,7 @@ GetEnvironmentVariableList(
             Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(VariableName, &VarList->Atts, &ValSize, VarList->Val);
           }
         }
-        if (!EFI_ERROR(Status)) {
+        if (!EFI_ERROR(Status) && VarList != NULL) {
           VarList->Key = AllocatePool(StrSize(VariableName));
           if (VarList->Key == NULL) {
             SHELL_FREE_NON_NULL(VarList->Val);
