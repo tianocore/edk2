@@ -40,7 +40,7 @@
 
 /// 
 /// If present, this must be the first opcode,
-/// EFI_DEP_SOR may be used by DXE and SMM drivers.
+/// EFI_DEP_SOR is only used by DXE driver.
 /// 
 #define EFI_DEP_SOR           0x09
 
