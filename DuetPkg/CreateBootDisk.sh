@@ -125,9 +125,10 @@ then
 
 				## Linux version of GenBootSector has not pass build yet.
 				$BASETOOLS_DIR/GnuGenBootSector -i $EFI_BOOT_MEDIA -o $EFI_BOOT_MEDIA.bs0
-				cp $EFI_BOOT_MEDIA.bs0 $EFI_BOOT_MEDIA.bs1
-				$BASETOOLS_DIR/BootSectImage -g $EFI_BOOT_MEDIA.bs1 $BOOTSECTOR_BIN_DIR/bootsect.com
-				$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_MEDIA -i $BOOTSECTOR_BIN_DIR/bootsect.com
+				cp $BOOTSECTOR_BIN_DIR/bootsect.com $EFI_BOOT_MEDIA.bs1
+				$BASETOOLS_DIR/BootSectImage -g $EFI_BOOT_MEDIA.bs0 $EFI_BOOT_MEDIA.bs1
+				$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_MEDIA -i $EFI_BOOT_MEDIA.bs1
+				rm $EFI_BOOT_MEDIA.bs[0-1]
 				echo Done.
 			else
 				echo "Wrong FAT type" $4 "for floppy!"
