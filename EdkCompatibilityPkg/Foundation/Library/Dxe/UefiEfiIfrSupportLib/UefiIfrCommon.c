@@ -700,7 +700,7 @@ Returns:
 
     Status = HiiDatabase->ExportPackageLists (HiiDatabase, Handle, &BufferSize, HiiPackageList);
   }
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (HiiPackageList == NULL)) {
     return Status;
   }
 

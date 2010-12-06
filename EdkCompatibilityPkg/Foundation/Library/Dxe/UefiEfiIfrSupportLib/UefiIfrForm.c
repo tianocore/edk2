@@ -958,7 +958,7 @@ ConstructConfigAltResp (
                );
   }
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (ConfigHdr == NULL)) {
     return Status;
   }
 

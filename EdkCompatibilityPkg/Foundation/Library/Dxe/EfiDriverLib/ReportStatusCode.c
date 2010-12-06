@@ -149,7 +149,7 @@ Returns:
     // Try to get the PEI version of ReportStatusCode.
     //      
     Status = GetPeiProtocol (&gEfiStatusCodeRuntimeProtocolGuid, (VOID **) &gReportStatusCode);
-    if (EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status) || (gReportStatusCode == NULL)) {
       return EFI_UNSUPPORTED;
     }
   }
