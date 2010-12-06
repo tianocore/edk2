@@ -506,11 +506,19 @@ Returns:
   //
   // Add each character to the result
   //
-  if (IsHex || (AsciiString[Index] == '0' && (AsciiString[Index + 1] == 'x' || AsciiString[Index + 1] == 'X'))) {
+  
+  //
+  // Skip first two chars only if the string starts with '0x' or '0X'
+  //
+  if (AsciiString[Index] == '0' && (AsciiString[Index + 1] == 'x' || AsciiString[Index + 1] == 'X')) {
+    IsHex = TRUE;
+    Index += 2;
+  }
+  if (IsHex) {
     //
     // Convert the hex string.
     //
-    for (Index = Index + 2; AsciiString[Index] != '\0'; Index++) {
+    for (; AsciiString[Index] != '\0'; Index++) {
       CurrentChar = AsciiString[Index];
       if (CurrentChar == ' ') {
         break;
