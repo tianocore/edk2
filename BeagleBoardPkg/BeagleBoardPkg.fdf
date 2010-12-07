@@ -53,7 +53,7 @@ NumBlocks     = 0x2000
 # 512 bytes of configuration header & 8 bytes of image header
 0x00000000|0x00000208
 
-0x00000208|0x0007FDF8
+0x00000208|0x0007FDC0
 gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize
 FV = FVMAIN_COMPACT
 
