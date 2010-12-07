@@ -29,6 +29,15 @@
   ##
   UefiCpuLib|Include/Library/UefiCpuLib.h
 
+[LibraryClasses.IA32, LibraryClasses.X64]
+  ##  @libraryclass  Provides functions to manage MTRR settings on IA32 and X64 CPUs.
+  ##
+  MtrrLib|Include/Library/MtrrLib.h
+
+  ##  @libraryclass  Provides functions to manage the Local APIC on IA32 and X64 CPUs.
+  ##
+  LocalApicLib|Include/Library/LocalApicLib.h
+  
 [Guids]
   gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}
 
