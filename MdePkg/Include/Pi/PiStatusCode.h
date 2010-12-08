@@ -751,6 +751,7 @@ typedef struct {
 
 ///
 /// Software Class PEI Module Subclass Progress Code definitions.
+/// Note: EFI_SW_PEI_PC_RECOVERY_BEGIN is different from PI 1.2 Specification.
 ///
 ///@{
 #define EFI_SW_PEI_PC_RECOVERY_BEGIN  (EFI_SUBCLASS_SPECIFIC | 0x00000000)
@@ -984,10 +985,11 @@ typedef struct {
 
 ///
 /// Software Class PEI Module Subclass Error Code definitions.
+/// Note: EFI_SW_PEI_EC_INVALID_CAPSULE_DESCRIPTOR is different from PI 1.2 Specification.
 ///
 ///@{
 #define EFI_SW_PEI_EC_NO_RECOVERY_CAPSULE          (EFI_SUBCLASS_SPECIFIC | 0x00000000)
-#define EFI_SW_PEIM_EC_INVALID_CAPSULE_DESCRIPTOR  (EFI_SUBCLASS_SPECIFIC | 0x00000001)
+#define EFI_SW_PEI_EC_INVALID_CAPSULE_DESCRIPTOR   (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_SW_PEI_EC_S3_RESUME_PPI_NOT_FOUND      (EFI_SUBCLASS_SPECIFIC | 0x00000002)
 #define EFI_SW_PEI_EC_S3_BOOT_SCRIPT_ERROR         (EFI_SUBCLASS_SPECIFIC | 0x00000003)
 #define EFI_SW_PEI_EC_S3_OS_WAKE_ERROR             (EFI_SUBCLASS_SPECIFIC | 0x00000004)
