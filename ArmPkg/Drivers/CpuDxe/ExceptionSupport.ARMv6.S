@@ -57,6 +57,7 @@ This is the stack constructed by the exception handler (low address to high addr
 .globl ASM_PFX(CommonCExceptionHandler)
 
 .text
+.fpu neon    @ makes vpush/vpop assemble
 .align 3
 
 
@@ -246,6 +247,8 @@ NoAdjustNeeded:
                                     @ R0 is ExceptionType 
   mov       R1,SP                   @ R1 is SystemContext 
 
+  vpush     {d0-d15}                @ save vstm registers in case they are used in optimizations
+
 /* 
 VOID
 EFIAPI
@@ -256,6 +259,8 @@ CommonCExceptionHandler (
 
 */  
   blx       ASM_PFX(CommonCExceptionHandler)  @ Call exception handler
+
+  vpop      {d0-d15}  
 
   ldr       R1, [SP, #0x4c]         @ Restore EFI_SYSTEM_CONTEXT_ARM.IFSR
   mcr       p15, 0, R1, c5, c0, 1   @ Write IFSR
