@@ -995,6 +995,9 @@ SnpNt32Receive (
   SNPNT32_INSTANCE_DATA *Instance;
   SNPNT32_GLOBAL_DATA   *GlobalData;
   INT32                 ReturnValue;
+  UINTN                 BufSize;
+  
+  BufSize     = *BuffSize;
 
   Instance    = SNP_NT32_INSTANCE_DATA_FROM_SNP_THIS (This);
 
@@ -1042,7 +1045,7 @@ SnpNt32Receive (
     *Protocol = NTOHS (*((UINT16 *) (((UINT8 *) Buffer) + 12)));
   }
 
-  return EFI_SUCCESS;
+  return (*BuffSize <= BufSize) ? EFI_SUCCESS : EFI_BUFFER_TOO_SMALL; 
 }
 
 /**
