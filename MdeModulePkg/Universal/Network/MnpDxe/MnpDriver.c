@@ -465,6 +465,7 @@ ErrorExit:
     if (Instance->Handle != NULL) {
 
       gBS->UninstallMultipleProtocolInterfaces (
+            Instance->Handle,
             &gEfiManagedNetworkProtocolGuid,
             &Instance->ManagedNetwork,
             NULL
