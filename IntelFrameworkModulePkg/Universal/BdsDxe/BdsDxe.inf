@@ -150,6 +150,7 @@
   gEfiSerialIoProtocolGuid                      ## PROTOCOL CONSUMES
   gEfiDevicePathProtocolGuid                    ## PROTOCOL CONSUMES
   gEfiDriverHealthProtocolGuid                  ## PROTOCOL SOMETIMES_CONSUMES
+  gEfiPciIoProtocolGuid                         ## PROTOCOL CONSUMES
 
 [FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate

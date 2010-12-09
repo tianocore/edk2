@@ -22,14 +22,17 @@
 #define EFI_ON_BOARD_DEVICE_CLASS          0x0010
 #define EFI_OTHER_DEVICE_CLASS             0x0020
 #define LABEL_VBIOS                        0x0040
-
-#define LABEL_DEVICES_LIST                 0x0080
+#define LABEL_DEVICES_LIST                 0x1100
+#define LABEL_NETWORK_DEVICE_LIST_ID       0x1101
+#define LABEL_NETWORK_DEVICE_ID            0x1102
 #define LABEL_END                          0xffff
 
 #define DEVICE_MANAGER_CLASS               0x0000
 #define FRONT_PAGE_SUBCLASS                0x0003
 
 #define DEVICE_MANAGER_FORM_ID             0x1000
+#define NETWORK_DEVICE_LIST_FORM_ID        0x1001
+#define NETWORK_DEVICE_FORM_ID             0x1002
 
 #define DEVICE_MANAGER_KEY_DRIVER_HEALTH   0x1111
 
@@ -44,6 +47,7 @@ formset
   form formid = DEVICE_MANAGER_FORM_ID,
        title  = STRING_TOKEN(STR_DEVICE_MANAGER_TITLE);
 
+    subtitle text = STRING_TOKEN(STR_DEVICES_LIST);
     //
     // This is where devices get added to the device manager hierarchy
     //
@@ -75,6 +79,28 @@ formset
     subtitle text = STRING_TOKEN(STR_EMPTY_STRING);
     subtitle text = STRING_TOKEN(STR_EXIT_STRING);
 
+  endform;
+
+  form formid = NETWORK_DEVICE_LIST_FORM_ID,
+       title = STRING_TOKEN(STR_FORM_NETWORK_DEVICE_LIST_TITLE);
+
+    subtitle text = STRING_TOKEN(STR_NETWORK_DEVICE_LIST_STRING);
+
+       label LABEL_NETWORK_DEVICE_LIST_ID;
+       label LABEL_END;
+       subtitle text = STRING_TOKEN(STR_EMPTY_STRING);
+    subtitle text = STRING_TOKEN(STR_EXIT_STRING);
+  endform;
+
+  form formid = NETWORK_DEVICE_FORM_ID,
+       title = STRING_TOKEN(STR_FORM_NETWORK_DEVICE_TITLE);
+
+    subtitle text = STRING_TOKEN(STR_NETWORK_DEVICE_STRING);
+
+       label LABEL_NETWORK_DEVICE_ID;
+       label LABEL_END;
+       subtitle text = STRING_TOKEN(STR_EMPTY_STRING);
+    subtitle text = STRING_TOKEN(STR_EXIT_STRING);
   endform;
 endformset;
 

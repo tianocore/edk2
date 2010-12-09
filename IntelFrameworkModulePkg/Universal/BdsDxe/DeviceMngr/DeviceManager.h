@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Bds.h"
 #include "FrontPage.h"
+#include <Protocol/PciIo.h>
 
 //
 // These are defined as the same with vfr file
@@ -31,8 +32,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   0xf76e0a70, 0xb5ed, 0x4c38, {0xac, 0x9a, 0xe5, 0xf5, 0x4b, 0xf1, 0x6e, 0x34} \
   }
 
-#define LABEL_DEVICES_LIST                   0x0080
+#define LABEL_DEVICES_LIST                   0x1100
+#define LABEL_NETWORK_DEVICE_LIST_ID         0x1101
+#define LABEL_NETWORK_DEVICE_ID              0x1102
 #define LABEL_END                            0xffff
+#define LABEL_FORM_ID_OFFSET                 0x0100
 
 #define LABEL_DRIVER_HEALTH                  0x2000
 #define LABEL_DRIVER_HEALTH_END              0x2001
@@ -43,16 +47,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define LABEL_VBIOS                          0x0040
 
 #define DEVICE_MANAGER_FORM_ID               0x1000
-#define DRIVER_HEALTH_FORM_ID                0x1001
-
-#define DEVICE_KEY_OFFSET                    0x1000
-#define DEVICE_MANAGER_KEY_VBIOS             0x2000
+#define NETWORK_DEVICE_LIST_FORM_ID          0x1001
+#define NETWORK_DEVICE_FORM_ID               0x1002
+#define DRIVER_HEALTH_FORM_ID                0x1003
+#define DEVICE_KEY_OFFSET                    0x4000
+#define NETWORK_DEVICE_LIST_KEY_OFFSET       0x2000
+#define DEVICE_MANAGER_KEY_VBIOS             0x3000
+#define MAX_KEY_SECTION_LEN                  0x1000
 
 #define DEVICE_MANAGER_KEY_DRIVER_HEALTH     0x1111
 #define DRIVER_HEALTH_KEY_OFFSET             0x2000
 #define DRIVER_HEALTH_REPAIR_ALL_KEY         0x3000
 #define DRIVER_HEALTH_RETURN_KEY             0x4000
 
+#define QUESTION_NETWORK_DEVICE_ID           0x3FFF
 //
 // These are the VFR compiler generated data representing our VFR data.
 //
@@ -123,6 +131,17 @@ typedef struct {
   ///
   EFI_DRIVER_HEALTH_STATUS        HealthStatus;
 } DRIVER_HEALTH_INFO;
+
+typedef struct {
+  EFI_STRING_ID    PromptId;
+  EFI_QUESTION_ID  QuestionId;
+}MENU_INFO_ITEM;
+
+typedef struct {
+  UINTN           CurListLen;
+  UINTN           MaxListLen;
+  MENU_INFO_ITEM  *NodeList;
+} MAC_ADDRESS_NODE_LIST;
 
 #define DEVICE_MANAGER_HEALTH_INFO_FROM_LINK(a) \
   CR (a, \
