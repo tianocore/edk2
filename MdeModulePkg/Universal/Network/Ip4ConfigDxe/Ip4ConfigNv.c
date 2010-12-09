@@ -852,7 +852,7 @@ Ip4ConfigDeviceInit (
   }
 
   //
-  // Append MAC string in the menu string and tile string
+  // Append MAC string in the menu help string and tile help string
   //
   Status = NetLibGetMacString (Instance->Controller, Instance->Image, &MacString);
   if (!EFI_ERROR (Status)) {
