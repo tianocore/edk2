@@ -1395,6 +1395,10 @@ Returns:
     return EFI_BUFFER_TOO_SMALL;
   }
 
+  if (ConfigHdr == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   *StrBufferLen = BufferSize;
 
   StrPtr = ConfigHdr;
