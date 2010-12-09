@@ -454,9 +454,9 @@ SmmCommunicationCommunicate (
   }
 
   //
-  // Don't allow call SmiManage() directly when SMRAM is closed or locked.
+  // If we are not in SMM, don't allow call SmiManage() directly when SMRAM is closed or locked.
   //
-  if (!mSmmAccess->OpenState || mSmmAccess->LockState) {
+  if ((!gSmmCorePrivate->InSmm) && (!mSmmAccess->OpenState || mSmmAccess->LockState)) {
     return EFI_INVALID_PARAMETER;
   }
  
