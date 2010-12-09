@@ -3406,11 +3406,14 @@ HiiConfigToBlock (
 
   if (MaxBlockSize > BufferSize) {
     *BlockSize = MaxBlockSize;
-    if (Block == NULL) {
-      return EFI_INVALID_PARAMETER;
-    } else {
+    if (Block != NULL) {
       return EFI_DEVICE_ERROR;
     }
+  }
+
+  if (Block == NULL) {
+    *Progress = ConfigResp;
+    return EFI_INVALID_PARAMETER;
   }
 
   return EFI_SUCCESS;
