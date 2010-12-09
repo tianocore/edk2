@@ -541,7 +541,7 @@ InstallVlanConfigForm (
   StrCat (Str, L")");
   HiiSetString (
     HiiHandle,
-    STRING_TOKEN (STR_VLAN_FORM_SET_TITLE),
+    STRING_TOKEN (STR_VLAN_FORM_SET_TITLE_HELP),
     Str,
     NULL
     );
@@ -551,7 +551,7 @@ InstallVlanConfigForm (
   //
   HiiSetString (
     HiiHandle,
-    STRING_TOKEN (STR_VLAN_FORM_TITLE),
+    STRING_TOKEN (STR_VLAN_FORM_HELP),
     Str,
     NULL
     );
