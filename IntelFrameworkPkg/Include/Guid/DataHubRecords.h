@@ -287,6 +287,7 @@ typedef STRING_REF                 EFI_PROCESSOR_VERSION_DATA;
 typedef STRING_REF                 EFI_PROCESSOR_MANUFACTURER_DATA;
 typedef STRING_REF                 EFI_PROCESSOR_SERIAL_NUMBER_DATA;
 typedef STRING_REF                 EFI_PROCESSOR_ASSET_TAG_DATA;
+typedef STRING_REF                 EFI_PROCESSOR_PART_NUMBER_DATA;
 
 typedef struct {
   UINT32                            ProcessorSteppingId:4;
@@ -574,6 +575,19 @@ typedef enum {
   EfiProcessorFamilyReserved1              = 0xFF
 } EFI_PROCESSOR_FAMILY_DATA;
 
+typedef enum {
+  EfiProcessorFamilySh3           = 0x104,
+  EfiProcessorFamilySh4           = 0x105,
+  EfiProcessorFamilyArm           = 0x118,
+  EfiProcessorFamilyStrongArm     = 0x119,
+  EfiProcessorFamily6x86          = 0x12C,
+  EfiProcessorFamilyMediaGx       = 0x12D,
+  EfiProcessorFamilyMii           = 0x12E,
+  EfiProcessorFamilyWinChip       = 0x140,
+  EfiProcessorFamilyDsp           = 0x15E,
+  EfiProcessorFamilyVideo         = 0x1F4
+} EFI_PROCESSOR_FAMILY2_DATA;
+
 ///
 /// This data record refers to the core voltage of the processor being defined. The unit of measurement 
 /// of this data record is in volts.  
@@ -711,6 +725,17 @@ typedef enum {
 ///
 typedef UINTN                       EFI_PROCESSOR_PACKAGE_NUMBER_DATA;
 
+typedef UINT8                       EFI_PROCESSOR_CORE_COUNT_DATA;
+typedef UINT8                       EFI_PROCESSOR_ENABLED_CORE_COUNT_DATA;
+typedef UINT8                       EFI_PROCESSOR_THREAD_COUNT_DATA;
+
+typedef struct {
+  UINT16  Reserved              :1;
+  UINT16  Unknown               :1;
+  UINT16  Capable64Bit          :1;
+  UINT16  Reserved2             :13;
+} EFI_PROCESSOR_CHARACTERISTICS_DATA;
+
 ///
 /// Inconsistent with specification here:
 /// In ProcSubclass specification 0.9, the enumeration type data structure is NOT defined.
@@ -765,7 +790,13 @@ typedef enum {
   ProcessorPackageNumberRecordType     = 21,
   ProcessorCoreFrequencyListRecordType = 22,
   ProcessorFsbFrequencyListRecordType  = 23,
-  ProcessorHealthStatusRecordType      = 24
+  ProcessorHealthStatusRecordType      = 24,
+  ProcessorCoreCountRecordType         = 25,
+  ProcessorEnabledCoreCountRecordType  = 26,
+  ProcessorThreadCountRecordType       = 27,
+  ProcessorCharacteristicsRecordType   = 28,
+  ProcessorFamily2RecordType           = 29,
+  ProcessorPartNumberRecordType        = 30,
 } EFI_CPU_VARIABLE_RECORD_TYPE;
 
 ///
@@ -795,8 +826,14 @@ typedef union {
   EFI_PROCESSOR_SOCKET_TYPE_DATA          ProcessorSocketType;
   EFI_PROCESSOR_SOCKET_NAME_DATA          ProcessorSocketName;
   EFI_PROCESSOR_ASSET_TAG_DATA            ProcessorAssetTag;
+  EFI_PROCESSOR_PART_NUMBER_DATA          ProcessorPartNumber;
   EFI_PROCESSOR_HEALTH_STATUS             ProcessorHealthStatus;
   EFI_PROCESSOR_PACKAGE_NUMBER_DATA       ProcessorPackageNumber;
+  EFI_PROCESSOR_CORE_COUNT_DATA           ProcessorCoreCount;
+  EFI_PROCESSOR_ENABLED_CORE_COUNT_DATA   ProcessorEnabledCoreCount;
+  EFI_PROCESSOR_THREAD_COUNT_DATA         ProcessorThreadCount;
+  EFI_PROCESSOR_CHARACTERISTICS_DATA      ProcessorCharacteristics;
+  EFI_PROCESSOR_FAMILY2_DATA              ProcessorFamily2;
 } EFI_CPU_VARIABLE_RECORD;
 
 typedef struct {
