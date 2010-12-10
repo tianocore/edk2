@@ -59,7 +59,7 @@ SMBIOS_TYPE_INFO_TABLE_ENTRY  mTypeInfoTable[] = {
   //
   {
     4,
-    0x25,
+    0x2C,
     TRUE,
     FALSE
   },
@@ -581,6 +581,84 @@ SMBIOS_CONVERSION_TABLE_ENTRY mConversionTable[] = {
     BySubclassInstanceSubinstanceProducer,
     ByFunctionWithOffsetSpecified,
     0x21,
+    SmbiosFldString
+  },
+
+  {
+    //
+    // Processor Sub Class -- Record Type 25: Core Count
+    //
+    EFI_PROCESSOR_SUBCLASS_GUID,
+    ProcessorCoreCountRecordType,
+    4,
+    BySubclassInstanceSubinstanceProducer,
+    ByFunctionWithOffsetSpecified,
+    0x23,
+    SmbiosFldTruncateToByte
+  },
+  
+  {
+    //
+    // Processor Sub Class -- Record Type 26: Enabled Core Count
+    //
+    EFI_PROCESSOR_SUBCLASS_GUID,
+    ProcessorEnabledCoreCountRecordType,
+    4,
+    BySubclassInstanceSubinstanceProducer,
+    ByFunctionWithOffsetSpecified,
+    0x24,
+    SmbiosFldTruncateToByte
+  },
+  
+  {
+    //
+    // Processor Sub Class -- Record Type 27: Thread Count
+    //
+    EFI_PROCESSOR_SUBCLASS_GUID,
+    ProcessorThreadCountRecordType,
+    4,
+    BySubclassInstanceSubinstanceProducer,
+    ByFunctionWithOffsetSpecified,
+    0x25,
+    SmbiosFldTruncateToByte
+  },
+
+  {
+    //
+    // Processor Sub Class -- Record Type 28: Processor Characteristics
+    //
+    EFI_PROCESSOR_SUBCLASS_GUID,
+    ProcessorCharacteristicsRecordType,
+    4,
+    BySubclassInstanceSubinstanceProducer,
+    ByFunctionWithOffsetSpecified,
+    0x26,
+    SmbiosFldTruncateToWord
+  },
+  
+  {
+    //
+    // Processor Sub Class -- Record Type 29: Family 2
+    //
+    EFI_PROCESSOR_SUBCLASS_GUID,
+    ProcessorFamily2RecordType,
+    4,
+    BySubclassInstanceSubinstanceProducer,
+    ByFunctionWithOffsetSpecified,
+    0x28,
+    SmbiosFldTruncateToWord
+  },
+  
+  {
+    //
+    // Processor Sub Class -- Record Type 30: Part Number
+    //
+    EFI_PROCESSOR_SUBCLASS_GUID,
+    ProcessorPartNumberRecordType,
+    4,
+    BySubclassInstanceSubinstanceProducer,
+    ByFunctionWithOffsetSpecified,
+    0x22,
     SmbiosFldString
   },
 
