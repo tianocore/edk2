@@ -257,6 +257,7 @@
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
 
   MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
@@ -278,6 +279,8 @@
 [Components.IA32, Components.X64]
   MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
   MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
   MdeModulePkg/Library/SmmReportStatusCodeLib/SmmReportStatusCodeLib.inf
   MdeModulePkg/Universal/StatusCodeHandler/Smm/StatusCodeHandlerSmm.inf
   MdeModulePkg/Universal/ReportStatusCodeRouter/Smm/ReportStatusCodeRouterSmm.inf

@@ -3,7 +3,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by FtwLite module.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -670,4 +670,71 @@ GetFvbByAddress (
   OUT EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL **FvBlock
   );
 
+/**
+  Retrive the proper Swap Address Range protocol interface.
+
+  @param[out] SarProtocol       The interface of SAR protocol
+
+  @retval EFI_SUCCESS           The SAR protocol instance was found and returned in SarProtocol.
+  @retval EFI_NOT_FOUND         The SAR protocol instance was not found.
+  @retval EFI_INVALID_PARAMETER SarProtocol is NULL.
+
+**/
+EFI_STATUS
+FtwGetSarProtocol (
+  OUT VOID                                **SarProtocol
+  );
+  
+/**
+  Function returns an array of handles that support the FVB protocol
+  in a buffer allocated from pool. 
+
+  @param[out]  NumberHandles    The number of handles returned in Buffer.
+  @param[out]  Buffer           A pointer to the buffer to return the requested
+                                array of  handles that support FVB protocol.
+
+  @retval EFI_SUCCESS           The array of handles was returned in Buffer, and the number of
+                                handles in Buffer was returned in NumberHandles.
+  @retval EFI_NOT_FOUND         No FVB handle was found.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough pool memory to store the matching results.
+  @retval EFI_INVALID_PARAMETER NumberHandles is NULL or Buffer is NULL.
+
+**/
+EFI_STATUS
+GetFvbCountAndBuffer (
+  OUT UINTN                               *NumberHandles,
+  OUT EFI_HANDLE                          **Buffer
+  );
+
+
+/**
+  Allocate private data for FTW driver and initialize it.
+
+  @param[out] FtwData           Pointer to the FTW device structure
+
+  @retval EFI_SUCCESS           Initialize the FTW device successfully.
+  @retval EFI_OUT_OF_RESOURCES  Allocate memory error
+  @retval EFI_INVALID_PARAMETER Workspace or Spare block does not exist
+
+**/
+EFI_STATUS
+InitFtwDevice (
+  OUT EFI_FTW_DEVICE               **FtwData 
+  );
+
+
+/**
+  Initialization for Fault Tolerant Write is done in this handler.
+
+  @param[in,out] FtwData        Pointer to the FTW device structure
+
+  @retval EFI_SUCCESS           Initialize the FTW protocol successfully.
+  @retval EFI_NOT_FOUND         No proper FVB protocol was found.
+  
+**/
+EFI_STATUS
+InitFtwProtocol (
+  IN OUT EFI_FTW_DEVICE               *FtwDevice
+  );
+ 
 #endif

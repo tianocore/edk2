@@ -33,6 +33,7 @@
 [Sources]
   Reclaim.c
   Variable.c
+  VariableDxe.c
   Variable.h
 
 [Packages]
@@ -76,7 +77,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## SOMETIME_CONSUMES (statistic the information of variable.)
 
 [Depex]
-  gEfiFirmwareVolumeBlockProtocolGuid AND gEfiFaultTolerantWriteProtocolGuid
+  TRUE
 
 # [Event]
 #   ##
@@ -85,3 +86,4 @@
 #   EVENT_TYPE_NOTIFY_SIGNAL                    ## PRODUCES
 #
 #
+    

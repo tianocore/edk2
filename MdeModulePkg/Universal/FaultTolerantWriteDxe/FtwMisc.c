@@ -2,7 +2,7 @@
 
   Internal generic functions to operate flash block.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -105,34 +105,6 @@ FtwEraseSpareBlock (
 }
 
 /**
-  Retrive the proper FVB protocol interface by HANDLE.
-
-
-  @param FvBlockHandle   The handle of FVB protocol that provides services for
-                         reading, writing, and erasing the target block.
-  @param FvBlock         The interface of FVB protocol
-
-  @retval  EFI_SUCCESS   The function completed successfully
-  @retval  EFI_ABORTED   The function could not complete successfully
-
-**/
-EFI_STATUS
-FtwGetFvbByHandle (
-  IN EFI_HANDLE                           FvBlockHandle,
-  OUT EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  **FvBlock
-  )
-{
-  //
-  // To get the FVB protocol interface on the handle
-  //
-  return gBS->HandleProtocol (
-                FvBlockHandle,
-                &gEfiFirmwareVolumeBlockProtocolGuid,
-                (VOID **) FvBlock
-                );
-}
-
-/**
 
   Is it in working block?
 
@@ -195,13 +167,7 @@ GetFvbByAddress (
   //
   // Locate all handles of Fvb protocol
   //
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiFirmwareVolumeBlockProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &HandleBuffer
-                  );
+  Status = GetFvbCountAndBuffer (&HandleCount, &HandleBuffer);
   if (EFI_ERROR (Status)) {
     return NULL;
   }
@@ -209,11 +175,7 @@ GetFvbByAddress (
   // Get the FVB to access variable store
   //
   for (Index = 0; Index < HandleCount; Index += 1) {
-    Status = gBS->HandleProtocol (
-                    HandleBuffer[Index],
-                    &gEfiFirmwareVolumeBlockProtocolGuid,
-                    (VOID **) &Fvb
-                    );
+    Status = FtwGetFvbByHandle (HandleBuffer[Index], &Fvb);
     if (EFI_ERROR (Status)) {
       break;
     }
@@ -269,7 +231,7 @@ IsBootBlock (
     return FALSE;
   }
 
-  Status = gBS->LocateProtocol (&gEfiSwapAddressRangeProtocolGuid, NULL, (VOID **) &SarProtocol);
+  Status = FtwGetSarProtocol ((VOID **) &SarProtocol);
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
@@ -358,7 +320,7 @@ FlushSpareBlockToBootBlock (
   //
   // Locate swap address range protocol
   //
-  Status = gBS->LocateProtocol (&gEfiSwapAddressRangeProtocolGuid, NULL, (VOID **) &SarProtocol);
+  Status = FtwGetSarProtocol ((VOID **) &SarProtocol);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -969,3 +931,371 @@ GetPreviousRecordOfWrites (
   *FtwRecord = (EFI_FAULT_TOLERANT_WRITE_RECORD *) Ptr;
   return EFI_SUCCESS;
 }
+
+/**
+  Allocate private data for FTW driver and initialize it.
+
+  @param[out] FtwData           Pointer to the FTW device structure
+
+  @retval EFI_SUCCESS           Initialize the FTW device successfully.
+  @retval EFI_OUT_OF_RESOURCES  Allocate memory error
+  @retval EFI_INVALID_PARAMETER Workspace or Spare block does not exist
+
+**/
+EFI_STATUS
+InitFtwDevice (
+  OUT EFI_FTW_DEVICE               **FtwData 
+  )
+{
+  EFI_FTW_DEVICE                   *FtwDevice;
+  
+  //
+  // Allocate private data of this driver,
+  // Including the FtwWorkSpace[FTW_WORK_SPACE_SIZE].
+  //
+  FtwDevice = AllocateZeroPool (sizeof (EFI_FTW_DEVICE) + PcdGet32 (PcdFlashNvStorageFtwWorkingSize));
+  if (FtwDevice == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Initialize other parameters, and set WorkSpace as FTW_ERASED_BYTE.
+  //
+  FtwDevice->WorkSpaceLength  = (UINTN) PcdGet32 (PcdFlashNvStorageFtwWorkingSize);
+  FtwDevice->SpareAreaLength  = (UINTN) PcdGet32 (PcdFlashNvStorageFtwSpareSize);
+  if ((FtwDevice->WorkSpaceLength == 0) || (FtwDevice->SpareAreaLength == 0)) {
+    DEBUG ((EFI_D_ERROR, "Ftw: Workspace or Spare block does not exist!\n"));
+    FreePool (FtwDevice);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  FtwDevice->Signature        = FTW_DEVICE_SIGNATURE;
+  FtwDevice->FtwFvBlock       = NULL;
+  FtwDevice->FtwBackupFvb     = NULL;
+  FtwDevice->FtwWorkSpaceLba  = (EFI_LBA) (-1);
+  FtwDevice->FtwSpareLba      = (EFI_LBA) (-1);
+
+  FtwDevice->WorkSpaceAddress = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageFtwWorkingBase64);
+  if (FtwDevice->WorkSpaceAddress == 0) {
+    FtwDevice->WorkSpaceAddress = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageFtwWorkingBase);
+  }
+  
+  FtwDevice->SpareAreaAddress = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageFtwSpareBase64);
+  if (FtwDevice->SpareAreaAddress == 0) {
+    FtwDevice->SpareAreaAddress = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageFtwSpareBase);
+  }  
+
+  *FtwData = FtwDevice;
+  return EFI_SUCCESS;
+}
+
+
+/**
+  Initialization for Fault Tolerant Write is done in this handler.
+
+  @param[in,out] FtwData        Pointer to the FTW device structure
+
+  @retval EFI_SUCCESS           Initialize the FTW device successfully.
+  @retval EFI_NOT_FOUND         No proper FVB protocol was found.
+  @retval EFI_ABORTED           Some data can not be got or be invalid.
+  
+**/
+EFI_STATUS
+FindFvbForFtw (
+  IN OUT EFI_FTW_DEVICE               *FtwDevice
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_HANDLE                          *HandleBuffer;
+  UINTN                               HandleCount;
+  UINTN                               Index;
+  EFI_PHYSICAL_ADDRESS                FvbBaseAddress;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
+  EFI_FIRMWARE_VOLUME_HEADER          *FwVolHeader;
+  EFI_FVB_ATTRIBUTES_2                Attributes;
+  EFI_FV_BLOCK_MAP_ENTRY              *FvbMapEntry;
+  UINT32                              LbaIndex;
+
+  //
+  // Get all FVB handle.
+  //
+  Status = GetFvbCountAndBuffer (&HandleCount, &HandleBuffer);
+  if (EFI_ERROR (Status)) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Get the FVB to access variable store
+  //
+  Fvb = NULL;
+  for (Index = 0; Index < HandleCount; Index += 1) {
+    Status = FtwGetFvbByHandle (HandleBuffer[Index], &Fvb);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_NOT_FOUND;
+      break;
+    }
+
+    //
+    // Ensure this FVB protocol support Write operation.
+    //
+    Status = Fvb->GetAttributes (Fvb, &Attributes);
+    if (EFI_ERROR (Status) || ((Attributes & EFI_FVB2_WRITE_STATUS) == 0)) {
+      continue;     
+    }
+    //
+    // Compare the address and select the right one
+    //
+    Status = Fvb->GetPhysicalAddress (Fvb, &FvbBaseAddress);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvbBaseAddress);
+    if ((FtwDevice->FtwFvBlock == NULL) && (FtwDevice->WorkSpaceAddress >= FvbBaseAddress) &&
+      ((FtwDevice->WorkSpaceAddress + FtwDevice->WorkSpaceLength) <= (FvbBaseAddress + FwVolHeader->FvLength))
+      ) {
+      FtwDevice->FtwFvBlock = Fvb;
+      //
+      // To get the LBA of work space
+      //
+      if ((FwVolHeader->FvLength) > (FwVolHeader->HeaderLength)) {
+        //
+        // Now, one FV has one type of BlockLength
+        //
+        FvbMapEntry = &FwVolHeader->BlockMap[0];
+        for (LbaIndex = 1; LbaIndex <= FvbMapEntry->NumBlocks; LbaIndex += 1) {
+          if ((FtwDevice->WorkSpaceAddress >= (FvbBaseAddress + FvbMapEntry->Length * (LbaIndex - 1)))
+              && (FtwDevice->WorkSpaceAddress < (FvbBaseAddress + FvbMapEntry->Length * LbaIndex))) {
+            FtwDevice->FtwWorkSpaceLba = LbaIndex - 1;
+            //
+            // Get the Work space size and Base(Offset)
+            //
+            FtwDevice->FtwWorkSpaceSize = FtwDevice->WorkSpaceLength;
+            FtwDevice->FtwWorkSpaceBase = (UINTN) (FtwDevice->WorkSpaceAddress - (FvbBaseAddress + FvbMapEntry->Length * (LbaIndex - 1)));
+            break;
+          }
+        }
+      }
+    }
+    
+    if ((FtwDevice->FtwBackupFvb == NULL) && (FtwDevice->SpareAreaAddress >= FvbBaseAddress) &&
+      ((FtwDevice->SpareAreaAddress + FtwDevice->SpareAreaLength) <= (FvbBaseAddress + FwVolHeader->FvLength))
+      ) {
+      FtwDevice->FtwBackupFvb = Fvb;
+      //
+      // To get the LBA of spare
+      //
+      if ((FwVolHeader->FvLength) > (FwVolHeader->HeaderLength)) {
+        //
+        // Now, one FV has one type of BlockLength
+        //
+        FvbMapEntry = &FwVolHeader->BlockMap[0];
+        for (LbaIndex = 1; LbaIndex <= FvbMapEntry->NumBlocks; LbaIndex += 1) {
+          if ((FtwDevice->SpareAreaAddress >= (FvbBaseAddress + FvbMapEntry->Length * (LbaIndex - 1)))
+              && (FtwDevice->SpareAreaAddress < (FvbBaseAddress + FvbMapEntry->Length * LbaIndex))) {
+            //
+            // Get the NumberOfSpareBlock and BlockSize
+            //
+            FtwDevice->FtwSpareLba   = LbaIndex - 1;
+            FtwDevice->BlockSize     = FvbMapEntry->Length;
+            FtwDevice->NumberOfSpareBlock = FtwDevice->SpareAreaLength / FtwDevice->BlockSize;
+            //
+            // Check the range of spare area to make sure that it's in FV range
+            //
+            if ((FtwDevice->FtwSpareLba + FtwDevice->NumberOfSpareBlock) > FvbMapEntry->NumBlocks) {
+              DEBUG ((EFI_D_ERROR, "Ftw: Spare area is out of FV range\n"));
+              FreePool (HandleBuffer);
+              ASSERT (FALSE);
+              return EFI_ABORTED;
+            }
+            break;
+          }
+        }
+      }
+    }
+  }
+  FreePool (HandleBuffer);
+ 
+  if ((FtwDevice->FtwBackupFvb == NULL) || (FtwDevice->FtwFvBlock == NULL) ||
+    (FtwDevice->FtwWorkSpaceLba == (EFI_LBA) (-1)) || (FtwDevice->FtwSpareLba == (EFI_LBA) (-1))) {
+    return EFI_ABORTED;
+  }
+    
+  return EFI_SUCCESS;
+}
+
+
+/**
+  Initialization for Fault Tolerant Write protocol.
+
+  @param[in,out] FtwData        Pointer to the FTW device structure
+
+  @retval EFI_SUCCESS           Initialize the FTW protocol successfully.
+  @retval EFI_NOT_FOUND         No proper FVB protocol was found.
+  
+**/
+EFI_STATUS
+InitFtwProtocol (
+  IN OUT EFI_FTW_DEVICE               *FtwDevice
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
+  UINTN                               Length;
+  EFI_FAULT_TOLERANT_WRITE_HEADER     *FtwHeader;
+  UINTN                               Offset;
+  EFI_HANDLE                          FvbHandle;
+
+  //
+  // Find the right SMM Fvb protocol instance for FTW.
+  //
+  Status = FindFvbForFtw (FtwDevice);
+  if (EFI_ERROR (Status)) {
+    return EFI_NOT_FOUND;
+  }  
+  
+  //
+  // Calculate the start LBA of working block. Working block is an area which
+  // contains working space in its last block and has the same size as spare
+  // block, unless there are not enough blocks before the block that contains
+  // working space.
+  //
+  FtwDevice->FtwWorkBlockLba = FtwDevice->FtwWorkSpaceLba - FtwDevice->NumberOfSpareBlock + 1;
+  ASSERT ((INT64) (FtwDevice->FtwWorkBlockLba) >= 0); 
+
+  //
+  // Initialize other parameters, and set WorkSpace as FTW_ERASED_BYTE.
+  //
+  FtwDevice->FtwWorkSpace = (UINT8 *) (FtwDevice + 1);
+  FtwDevice->FtwWorkSpaceHeader = (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *) FtwDevice->FtwWorkSpace;
+
+  FtwDevice->FtwLastWriteHeader = NULL;
+  FtwDevice->FtwLastWriteRecord = NULL;
+
+  //
+  // Refresh the working space data from working block
+  //
+  Status = WorkSpaceRefresh (FtwDevice);
+  ASSERT_EFI_ERROR (Status);
+  //
+  // If the working block workspace is not valid, try the spare block
+  //
+  if (!IsValidWorkSpace (FtwDevice->FtwWorkSpaceHeader)) {
+    //
+    // Read from spare block
+    //
+    Length = FtwDevice->FtwWorkSpaceSize;
+    Status = FtwDevice->FtwBackupFvb->Read (
+                    FtwDevice->FtwBackupFvb,
+                    FtwDevice->FtwSpareLba,
+                    FtwDevice->FtwWorkSpaceBase,
+                    &Length,
+                    FtwDevice->FtwWorkSpace
+                    );
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // If spare block is valid, then replace working block content.
+    //
+    if (IsValidWorkSpace (FtwDevice->FtwWorkSpaceHeader)) {
+      Status = FlushSpareBlockToWorkingBlock (FtwDevice);
+      DEBUG ((EFI_D_ERROR, "Ftw: Restart working block update in InitFtwProtocol() - %r\n", Status));
+      FtwAbort (&FtwDevice->FtwInstance);
+      //
+      // Refresh work space.
+      //
+      Status = WorkSpaceRefresh (FtwDevice);
+      ASSERT_EFI_ERROR (Status);
+    } else {
+      DEBUG ((EFI_D_ERROR, "Ftw: Both are invalid, init workspace\n"));
+      //
+      // If both are invalid, then initialize work space.
+      //
+      SetMem (
+        FtwDevice->FtwWorkSpace,
+        FtwDevice->FtwWorkSpaceSize,
+        FTW_ERASED_BYTE
+        );
+      InitWorkSpaceHeader (FtwDevice->FtwWorkSpaceHeader);
+      //
+      // Initialize the work space
+      //
+      Status = FtwReclaimWorkSpace (FtwDevice, FALSE);
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
+  //
+  // If the FtwDevice->FtwLastWriteRecord is 1st record of write header &&
+  // (! SpareComplete) THEN call Abort().
+  //
+  if ((FtwDevice->FtwLastWriteHeader->HeaderAllocated == FTW_VALID_STATE) &&
+    (FtwDevice->FtwLastWriteRecord->SpareComplete != FTW_VALID_STATE) &&
+    IsFirstRecordOfWrites (FtwDevice->FtwLastWriteHeader, FtwDevice->FtwLastWriteRecord)
+    ) {
+    DEBUG ((EFI_D_ERROR, "Ftw: Init.. find first record not SpareCompleted, abort()\n"));
+    FtwAbort (&FtwDevice->FtwInstance);
+  }
+  //
+  // If Header is incompleted and the last record has completed, then
+  // call Abort() to set the Header->Complete FLAG.
+  //
+  if ((FtwDevice->FtwLastWriteHeader->Complete != FTW_VALID_STATE) &&
+    (FtwDevice->FtwLastWriteRecord->DestinationComplete == FTW_VALID_STATE) &&
+    IsLastRecordOfWrites (FtwDevice->FtwLastWriteHeader, FtwDevice->FtwLastWriteRecord)
+    ) {
+    DEBUG ((EFI_D_ERROR, "Ftw: Init.. find last record completed but header not, abort()\n"));
+    FtwAbort (&FtwDevice->FtwInstance);
+  }
+  //
+  // To check the workspace buffer following last Write header/records is EMPTY or not.
+  // If it's not EMPTY, FTW also need to call reclaim().
+  //
+  FtwHeader = FtwDevice->FtwLastWriteHeader;
+  Offset    = (UINT8 *) FtwHeader - FtwDevice->FtwWorkSpace;
+  if (FtwDevice->FtwWorkSpace[Offset] != FTW_ERASED_BYTE) {
+    Offset += WRITE_TOTAL_SIZE (FtwHeader->NumberOfWrites, FtwHeader->PrivateDataSize);
+  }
+  
+  if (!IsErasedFlashBuffer (FtwDevice->FtwWorkSpace + Offset, FtwDevice->FtwWorkSpaceSize - Offset)) {
+    Status = FtwReclaimWorkSpace (FtwDevice, TRUE);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  //
+  // Restart if it's boot block
+  //
+  if ((FtwDevice->FtwLastWriteHeader->Complete != FTW_VALID_STATE) &&
+    (FtwDevice->FtwLastWriteRecord->SpareComplete == FTW_VALID_STATE)
+    ) {
+    if (FtwDevice->FtwLastWriteRecord->BootBlockUpdate == FTW_VALID_STATE) {
+      Status = FlushSpareBlockToBootBlock (FtwDevice);
+      DEBUG ((EFI_D_ERROR, "Ftw: Restart boot block update - %r\n", Status));
+      ASSERT_EFI_ERROR (Status);
+      FtwAbort (&FtwDevice->FtwInstance);
+    } else {
+      //
+      // if (SpareCompleted) THEN  Restart to fault tolerant write.
+      //
+      FvbHandle = NULL;
+      FvbHandle = GetFvbByAddress (FtwDevice->FtwLastWriteRecord->FvBaseAddress, &Fvb);
+      if (FvbHandle != NULL) {
+        Status = FtwRestart (&FtwDevice->FtwInstance, FvbHandle);
+        DEBUG ((EFI_D_ERROR, "FtwLite: Restart last write - %r\n", Status));
+        ASSERT_EFI_ERROR (Status);
+      }
+      FtwAbort (&FtwDevice->FtwInstance);
+    }
+  }
+  //
+  // Hook the protocol API
+  //
+  FtwDevice->FtwInstance.GetMaxBlockSize = FtwGetMaxBlockSize;
+  FtwDevice->FtwInstance.Allocate        = FtwAllocate;
+  FtwDevice->FtwInstance.Write           = FtwWrite;
+  FtwDevice->FtwInstance.Restart         = FtwRestart;
+  FtwDevice->FtwInstance.Abort           = FtwAbort;
+  FtwDevice->FtwInstance.GetLastWrite    = FtwGetLastWrite;
+    
+  return EFI_SUCCESS;
+}
+

@@ -171,9 +171,25 @@
   #  Include/Protocol/FaultTolerantWrite.h
   gEfiFaultTolerantWriteProtocolGuid = { 0x3EBD9E82, 0x2C78, 0x4DE6, { 0x97, 0x86, 0x8D, 0x4B, 0xFC, 0xB7, 0xC8, 0x81 }}
 
+  ## This protocol provides boot-time service to do fault tolerant write capability for block devices in SMM environment.
+  #  Include/Protocol/SmmFaultTolerantWrite.h
+  gEfiSmmFaultTolerantWriteProtocolGuid = { 0x3868fc3b, 0x7e45, 0x43a7, { 0x90, 0x6c, 0x4b, 0xa4, 0x7d, 0xe1, 0x75, 0x4d }}
+  
   ## This protocol is used to abstract the swap operation of boot block and backup block of boot FV.
   #  Include/Protocol/SwapAddressRange.h
   gEfiSwapAddressRangeProtocolGuid = { 0x1259F60D, 0xB754, 0x468E, { 0xA7, 0x89, 0x4D, 0xB8, 0x5D, 0x55, 0xE8, 0x7E }}
+  
+  ## This protocol is used to abstract the swap operation of boot block and backup block of boot FV in SMM environment.
+  #  Include/Protocol/SmmSwapAddressRange.h
+  gEfiSmmSwapAddressRangeProtocolGuid = { 0x67c4f112, 0x3385, 0x4e55, { 0x9c, 0x5b, 0xc0, 0x5b, 0x71, 0x7c, 0x42, 0x28 }}
+  
+  ## This protocol is intended for use as a means to store data in the EFI SMM environment.
+  #  Include/Protocol/SmmVariableProtocol.h
+  gEfiSmmVariableProtocolGuid = { 0xed32d533, 0x99e6, 0x4209, { 0x9c, 0xc0, 0x2d, 0x72, 0xcd, 0xd9, 0x98, 0xa7 }}
+
+  ## This protocol is similar with DXE FVB protocol and used in the UEFI SMM evvironment.
+  #  Include/Protocol/SmmFirmwareVolumeBlock.h
+  gEfiSmmFirmwareVolumeBlockProtocolGuid = { 0xd326d041, 0xbd31, 0x4c01, { 0xb5, 0xa8, 0x62, 0x8b, 0xe8, 0x7f, 0x6, 0x53 }}
 
 [PcdsFeatureFlag]
   ## Indicate whether platform can support update capsule across a system reset
@@ -224,6 +240,10 @@
   #  interrupt to access usb device in the case of absence of usb stack. 
   #  DUET platform requires the token to be TRUE.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|FALSE|BOOLEAN|0x00010047
+  
+  ## If TRUE, the variable services are provided in DXE_SMM. The SMM driver can use SMM variable protocol 
+  #  to access variable. Otherwise the variable services are provided in DXE_RUNTIME.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmmVariableEnable|TRUE|BOOLEAN|0x00010048
 
   ## If TRUE, HiiImageProtocol will be installed.
   #  FALSE is for size reduction.
