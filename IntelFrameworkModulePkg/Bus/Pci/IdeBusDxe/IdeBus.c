@@ -148,6 +148,8 @@ IDEBusDriverBindingSupported (
   EFI_DEVICE_PATH_PROTOCOL          *ParentDevicePath;
   EFI_DEV_PATH                      *Node;
   EFI_IDE_CONTROLLER_INIT_PROTOCOL  *IdeInit;
+  EFI_PCI_IO_PROTOCOL               *PciIo;
+  PCI_TYPE00                        PciData;
 
   if (RemainingDevicePath != NULL) {
     Node = (EFI_DEV_PATH *) RemainingDevicePath;
@@ -171,10 +173,6 @@ IDEBusDriverBindingSupported (
   //
   // Verify the Ide Controller Init Protocol, which installed by the
   // IdeController module.
-  // Note 1: PciIo protocol has been opened BY_DRIVER by ide_init, so We can't
-  //         open BY_DRIVER here) That's why we don't check pciio protocol
-  // Note 2: ide_init driver check ide controller's pci config space, so we dont
-  //         check here any more to save code size
   //
   Status = gBS->OpenProtocol (
                   Controller,
@@ -227,6 +225,45 @@ IDEBusDriverBindingSupported (
         This->DriverBindingHandle,
         Controller
         );
+
+  //
+  // Get the EfiPciIoProtocol
+  //
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiPciIoProtocolGuid,
+                  (VOID **) &PciIo,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  //
+  // Now further check the PCI header: Base class (offset 0x0B) and
+  // Sub Class (offset 0x0A). This controller should be an IDE controller
+  //
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint8,
+                        0,
+                        sizeof (PciData),
+                        &PciData
+                        );
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // Examine if it is IDE mode by class code
+    //
+    if ((PciData.Hdr.ClassCode[2] != PCI_CLASS_MASS_STORAGE) || (PciData.Hdr.ClassCode[1] != PCI_SUB_CLASS_IDE)) {     
+      Status = EFI_UNSUPPORTED;
+    } else {    
+      Status = EFI_SUCCESS;
+    } 
+  }
 
   return Status;
 }
