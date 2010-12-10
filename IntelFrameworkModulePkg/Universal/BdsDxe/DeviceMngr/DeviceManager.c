@@ -802,7 +802,8 @@ CallDeviceManager (
   //
   if (mNextShowFormId == NETWORK_DEVICE_FORM_ID) {
     String = HiiGetString (HiiHandle, STRING_TOKEN (STR_FORM_NETWORK_DEVICE_TITLE), NULL);
-    NewStringLen = (StrLen(String) + StrLen(mSelectedMacAddrString) + 2) * 2;
+    NewStringLen = StrLen(mSelectedMacAddrString);
+    NewStringLen += (StrLen(String) + 2) * 2;
     NewStringTitle = AllocatePool (NewStringLen);
     UnicodeSPrint (NewStringTitle, NewStringLen, L"%s %s", String, mSelectedMacAddrString);
     HiiSetString (HiiHandle, STRING_TOKEN (STR_FORM_NETWORK_DEVICE_TITLE), NewStringTitle, NULL);    
@@ -827,7 +828,7 @@ CallDeviceManager (
   //
   // According to the next show Form id(mNextShowFormId) to decide which form need to update.
   //
-  StartLabel->Number       = LABEL_FORM_ID_OFFSET + mNextShowFormId;
+  StartLabel->Number       = (UINT16) (LABEL_FORM_ID_OFFSET + mNextShowFormId);
 
   //
   // Create Hii Extend Label OpCode as the end opcode
@@ -1064,7 +1065,7 @@ CallDeviceManager (
   if(mNextShowFormId - 1 < DEVICE_MANAGER_FORM_ID) {
     mNextShowFormId = DEVICE_MANAGER_FORM_ID;
   } else {
-    mNextShowFormId = mNextShowFormId - 1;
+    mNextShowFormId = (UINT16) (mNextShowFormId - 1);
     gCallbackKey = FRONT_PAGE_KEY_DEVICE_MANAGER;
   }
 
