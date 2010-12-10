@@ -283,7 +283,7 @@ FtwNotificationEvent (
   //
   // Ensure FTW protocol is installed.
   //
-  Status = GetFtwProtocol (&FtwProtocol);
+  Status = GetFtwProtocol ((VOID**) &FtwProtocol);
   if (EFI_ERROR (Status)) {
     return ;
   }
@@ -305,7 +305,8 @@ FtwNotificationEvent (
   ASSERT_EFI_ERROR (Status);
  
   //
-  // Install the Variable Write Architectural protocol.  //
+  // Install the Variable Write Architectural protocol.
+  //
   Status = gBS->InstallProtocolInterface (
                   &mHandle,
                   &gEfiVariableWriteArchProtocolGuid, 
