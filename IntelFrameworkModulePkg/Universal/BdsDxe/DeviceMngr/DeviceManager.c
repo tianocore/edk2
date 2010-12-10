@@ -802,7 +802,7 @@ CallDeviceManager (
   //
   if (mNextShowFormId == NETWORK_DEVICE_FORM_ID) {
     String = HiiGetString (HiiHandle, STRING_TOKEN (STR_FORM_NETWORK_DEVICE_TITLE), NULL);
-    NewStringLen = StrLen(mSelectedMacAddrString);
+    NewStringLen = StrLen(mSelectedMacAddrString) * 2;
     NewStringLen += (StrLen(String) + 2) * 2;
     NewStringTitle = AllocatePool (NewStringLen);
     UnicodeSPrint (NewStringTitle, NewStringLen, L"%s %s", String, mSelectedMacAddrString);
