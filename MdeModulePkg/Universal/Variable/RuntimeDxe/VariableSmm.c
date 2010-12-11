@@ -471,7 +471,7 @@ SmmFtwNotificationEvent (
   //
   // Ensure SMM FTW protocol is installed.
   //
-  Status = GetFtwProtocol (&FtwProtocol);
+  Status = GetFtwProtocol ((VOID **)&FtwProtocol);
   if (EFI_ERROR (Status)) {
     return Status;
   }

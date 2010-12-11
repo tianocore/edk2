@@ -53,7 +53,6 @@
   BaseLib
   SynchronizationLib
   UefiLib
-  SmmLib
   SmmServicesTableLib
   BaseMemoryLib
   DebugLib
