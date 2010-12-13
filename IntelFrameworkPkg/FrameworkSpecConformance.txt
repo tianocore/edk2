@@ -226,11 +226,17 @@
       ProcessorPackageNumberRecordType     = 21,
       ProcessorCoreFrequencyListRecordType = 22,
       ProcessorFsbFrequencyListRecordType  = 23,
-      ProcessorHealthStatusRecordType      = 24
+      ProcessorHealthStatusRecordType      = 24,
+      ProcessorCoreCountRecordType         = 25,
+      ProcessorEnabledCoreCountRecordType  = 26,
+      ProcessorThreadCountRecordType       = 27,
+      ProcessorCharacteristicsRecordType   = 28,
+      ProcessorFamily2RecordType           = 29,
+      ProcessorPartNumberRecordType        = 30,
     } EFI_CPU_VARIABLE_RECORD_TYPE;
 
-    The data structure and all enumeration fields are *NOT* defined in ProcSubclass specification 0.9, which only
-    defines the following macros to specify the record number of the data record:
+    The enumeration fields from ProcessorCoreFrequencyRecordType to ProcessorHealthStatusRecordType are *NOT* defined 
+    in ProcSubclass specification 0.9, which only defines the following macros to specify the record number of the data record:
       #define EFI_PROCESSOR_FREQUENCY_RECORD_NUMBER           0x00000001
       #define EFI_PROCESSOR_BUS_FREQUENCY_RECORD_NUMBER       0x00000002
       #define EFI_PROCESSOR_VERSION_RECORD_NUMBER             0x00000003
@@ -257,11 +263,16 @@
       #define EFI_PROCESSOR_HEALTH_STATUS_RECORD_NUMBER       0x00000018
     Keeping this inconsistency for backward compatibility.
 
+    The enumeration fields from ProcessorCoreCountRecordType to ProcessorPartNumberRecordType are *NOT* defined 
+    in ProcSubclass specification 0.9. 
+    They are introduced to support new fields for type 4 defined in SmBios 2.6 specification.
+    Keeping this inconsistency to reflect the latest industry standard.
+
   8. Guid/DataHubRecords.h
     typedef union {
       EFI_PROCESSOR_CORE_FREQUENCY_LIST_DATA  ProcessorCoreFrequencyList;
       ...
-      EFI_PROCESSOR_PACKAGE_NUMBER_DATA       ProcessorPackageNumber;
+      EFI_PROCESSOR_FAMILY2_DATA              ProcessorFamily2;
     } EFI_CPU_VARIABLE_RECORD;
     
     typedef struct {
@@ -272,6 +283,39 @@
     The definitions above are *NOT* defined in ProcSubclass specification 0.9. EdkII introduces them to simplify the
     code logic. Therefore developer doesn't need to allocate memory dynamically to construct variable length data record.
     Keeping this inconsistency for backward compatibility.
+
+  9. Guid/DataHubRecords.h
+    typedef STRING_REF                  EFI_PROCESSOR_PART_NUMBER_DATA;
+
+    typedef enum {
+      EfiProcessorFamilySh3           = 0x104,
+      EfiProcessorFamilySh4           = 0x105,
+      EfiProcessorFamilyArm           = 0x118,
+      EfiProcessorFamilyStrongArm     = 0x119,
+      EfiProcessorFamily6x86          = 0x12C,
+      EfiProcessorFamilyMediaGx       = 0x12D,
+      EfiProcessorFamilyMii           = 0x12E,
+      EfiProcessorFamilyWinChip       = 0x140,
+      EfiProcessorFamilyDsp           = 0x15E,
+      EfiProcessorFamilyVideo         = 0x1F4
+    } EFI_PROCESSOR_FAMILY2_DATA;
+
+    typedef UINT8                       EFI_PROCESSOR_CORE_COUNT_DATA;
+
+    typedef UINT8                       EFI_PROCESSOR_ENABLED_CORE_COUNT_DATA;
+
+    typedef UINT8                       EFI_PROCESSOR_THREAD_COUNT_DATA;
+
+    typedef struct {
+      UINT16  Reserved              :1;
+      UINT16  Unknown               :1;
+      UINT16  Capable64Bit          :1;
+      UINT16  Reserved2             :13;
+    } EFI_PROCESSOR_CHARACTERISTICS_DATA;
+
+    The fields listed here are *NOT* defined in ProcSubclass specification 0.9. They are introduced to support
+    new fields for type 4 defined in SmBios 2.6 specification. 
+    Keeping this inconsistency to reflect the latest industry standard.
 
 ##
 # Mismatch with Intel Platform Innovation Framework for MemSubclass Specification (Version 0.90)
