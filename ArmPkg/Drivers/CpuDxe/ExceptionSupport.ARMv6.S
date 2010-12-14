@@ -57,7 +57,9 @@ This is the stack constructed by the exception handler (low address to high addr
 .globl ASM_PFX(CommonCExceptionHandler)
 
 .text
+#if !defined(__APPLE__)
 .fpu neon    @ makes vpush/vpop assemble
+#endif
 .align 3
 
 
@@ -248,6 +250,7 @@ NoAdjustNeeded:
   mov       R1,SP                   @ R1 is SystemContext 
 
   vpush     {d0-d15}                @ save vstm registers in case they are used in optimizations
+
 
 /* 
 VOID
