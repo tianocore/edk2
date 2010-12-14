@@ -39,6 +39,10 @@
   #   This library is only intended to be used by UEFI network stack modules.
   UdpIoLib|Include/Library/UdpIoLib.h
 
+  ##  @libraryclass  The helper routines to access TCP service.
+  #   This library is only intended to be used by UEFI network stack modules.
+  TcpIoLib|Include/Library/TcpIoLib.h
+
   ##  @libraryclass  Defines a set of methods to reset whole system.
   ResetSystemLib|Include/Library/ResetSystemLib.h
 
