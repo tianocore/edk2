@@ -1269,6 +1269,13 @@ ModifyRootBridgeAttributes (
   }
 
   //
+  // Mask off EFI_PCI_IO_ATTRIBUTE_EMBEDDED_DEVICE & 
+  // EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM, which are not supported by PCI root bridge.
+  //
+  Attributes &= ~(UINT64)(EFI_PCI_IO_ATTRIBUTE_EMBEDDED_DEVICE |
+                          EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM);
+
+  //
   // Record the new attribute of the Root Bridge
   //
   if (Operation == EfiPciIoAttributeOperationEnable) {

@@ -1063,6 +1063,9 @@ DetermineDeviceAttribute (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+    PciIoDevice->Supports |= (EFI_PCI_IO_ATTRIBUTE_EMBEDDED_DEVICE |
+                              EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM);
+
   } else {
 
     //
