@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -51,7 +51,7 @@ Revision History
 #define USB_PORT_STAT_POWER         0x0100
 #define USB_PORT_STAT_LOW_SPEED     0x0200
 #define USB_PORT_STAT_HIGH_SPEED    0x0400
-#define USB_PORT_STAT_OWNER         0x0800
+#define USB_PORT_STAT_OWNER         0x2000
 
 #define USB_PORT_STAT_C_CONNECTION  0x0001
 #define USB_PORT_STAT_C_ENABLE      0x0002
