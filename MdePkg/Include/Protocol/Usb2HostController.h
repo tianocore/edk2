@@ -4,7 +4,7 @@
   running in the EFI boot services environment, to perform data transactions over 
   a USB bus. In addition, it provides an abstraction for the root hub of the USB bus.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -47,7 +47,7 @@ typedef struct {
 #define USB_PORT_STAT_POWER         0x0100
 #define USB_PORT_STAT_LOW_SPEED     0x0200
 #define USB_PORT_STAT_HIGH_SPEED    0x0400
-#define USB_PORT_STAT_OWNER         0x0800
+#define USB_PORT_STAT_OWNER         0x2000
 
 ///
 /// EFI_USB_PORT_STATUS.PortChangeStatus bit definition 
