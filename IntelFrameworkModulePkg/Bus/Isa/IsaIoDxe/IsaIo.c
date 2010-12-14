@@ -327,24 +327,28 @@ AcpiResourceToIsaResource (
 
     case ACPI_IO_PORT_DESCRIPTOR:
       Io = (EFI_ACPI_IO_PORT_DESCRIPTOR *) AcpiResource.SmallHeader;
-      if (IsaResource != NULL) {
-        IsaResource[Count].Type       = EfiIsaAcpiResourceIo;
-        IsaResource[Count].Attribute  = IsaIoAttribute (Io->Information);
-        IsaResource[Count].StartRange = Io->BaseAddressMin;
-        IsaResource[Count].EndRange   = Io->BaseAddressMin + Io->Length - 1;
+      if (Io->Length != 0) {
+        if (IsaResource != NULL) {
+          IsaResource[Count].Type       = EfiIsaAcpiResourceIo;
+          IsaResource[Count].Attribute  = IsaIoAttribute (Io->Information);
+          IsaResource[Count].StartRange = Io->BaseAddressMin;
+          IsaResource[Count].EndRange   = Io->BaseAddressMin + Io->Length - 1;
+        }
+        Count ++;
       }
-      Count ++;
       break;
 
     case ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR:
       FixedIo = (EFI_ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR *) AcpiResource.SmallHeader;
-      if (IsaResource != NULL) {
-        IsaResource[Count].Type       = EfiIsaAcpiResourceIo;
-        IsaResource[Count].Attribute  = EFI_ISA_ACPI_IO_DECODE_10_BITS;
-        IsaResource[Count].StartRange = FixedIo->BaseAddress;
-        IsaResource[Count].EndRange   = FixedIo->BaseAddress + FixedIo->Length - 1;
+      if (FixedIo->Length != 0) {
+        if (IsaResource != NULL) {
+          IsaResource[Count].Type       = EfiIsaAcpiResourceIo;
+          IsaResource[Count].Attribute  = EFI_ISA_ACPI_IO_DECODE_10_BITS;
+          IsaResource[Count].StartRange = FixedIo->BaseAddress;
+          IsaResource[Count].EndRange   = FixedIo->BaseAddress + FixedIo->Length - 1;
+        }
+        Count ++;
       }
-      Count ++;
       break;
 
     case ACPI_IRQ_DESCRIPTOR:
@@ -377,24 +381,28 @@ AcpiResourceToIsaResource (
 
     case ACPI_32_BIT_MEMORY_RANGE_DESCRIPTOR:
       Memory = (EFI_ACPI_32_BIT_MEMORY_RANGE_DESCRIPTOR *) AcpiResource.LargeHeader;
-      if (IsaResource != NULL) {
-        IsaResource[Count].Type       = EfiIsaAcpiResourceMemory;
-        IsaResource[Count].Attribute  = IsaMemoryAttribute (Memory->Information);
-        IsaResource[Count].StartRange = Memory->BaseAddressMin;
-        IsaResource[Count].EndRange   = Memory->BaseAddressMin + Memory->Length - 1;
+      if (Memory->Length != 0) {
+        if (IsaResource != NULL) {
+          IsaResource[Count].Type       = EfiIsaAcpiResourceMemory;
+          IsaResource[Count].Attribute  = IsaMemoryAttribute (Memory->Information);
+          IsaResource[Count].StartRange = Memory->BaseAddressMin;
+          IsaResource[Count].EndRange   = Memory->BaseAddressMin + Memory->Length - 1;
+        }
+        Count ++;
       }
-      Count ++;
       break;
 
     case ACPI_32_BIT_FIXED_MEMORY_RANGE_DESCRIPTOR:
       FixedMemory = (EFI_ACPI_32_BIT_FIXED_MEMORY_RANGE_DESCRIPTOR *) AcpiResource.LargeHeader;
-      if (IsaResource != NULL) {
-        IsaResource[Count].Type       = EfiIsaAcpiResourceMemory;
-        IsaResource[Count].Attribute  = IsaMemoryAttribute (FixedMemory->Information);
-        IsaResource[Count].StartRange = FixedMemory->BaseAddress;
-        IsaResource[Count].EndRange   = FixedMemory->BaseAddress + FixedMemory->Length - 1;
+      if (FixedMemory->Length != 0) {
+        if (IsaResource != NULL) {
+          IsaResource[Count].Type       = EfiIsaAcpiResourceMemory;
+          IsaResource[Count].Attribute  = IsaMemoryAttribute (FixedMemory->Information);
+          IsaResource[Count].StartRange = FixedMemory->BaseAddress;
+          IsaResource[Count].EndRange   = FixedMemory->BaseAddress + FixedMemory->Length - 1;
+        }
+        Count ++;
       }
-      Count ++;
       break;
 
     case ACPI_END_TAG_DESCRIPTOR:
