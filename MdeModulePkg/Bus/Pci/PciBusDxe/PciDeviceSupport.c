@@ -268,6 +268,7 @@ RegisterPciDevice (
                                        &PlatformOpRomSize
                                        );
       if (!EFI_ERROR (Status)) {
+        PciIoDevice->EmbeddedRom    = FALSE;
         PciIoDevice->RomSize        = PlatformOpRomSize;
         PciIoDevice->PciIo.RomSize  = PlatformOpRomSize;
         PciIoDevice->PciIo.RomImage = PlatformOpRomBuffer;
@@ -293,6 +294,7 @@ RegisterPciDevice (
                                        &PlatformOpRomSize
                                        );
       if (!EFI_ERROR (Status)) {
+        PciIoDevice->EmbeddedRom    = FALSE;
         PciIoDevice->RomSize        = PlatformOpRomSize;
         PciIoDevice->PciIo.RomSize  = PlatformOpRomSize;
         PciIoDevice->PciIo.RomImage = PlatformOpRomBuffer;

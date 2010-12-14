@@ -224,6 +224,11 @@ struct _PCI_IO_DEVICE {
   UINT32                                    Decodes;
 
   //
+  // TRUE if the ROM image is from the PCI Option ROM BAR
+  //
+  BOOLEAN                                   EmbeddedRom;
+
+  //
   // The OptionRom Size
   //
   UINT64                                    RomSize;

@@ -500,6 +500,7 @@ LoadOpRomImage (
 
   RomDecode (PciDevice, RomBarIndex, RomBar, FALSE);
 
+  PciDevice->EmbeddedRom    = TRUE;
   PciDevice->PciIo.RomSize  = RomImageSize;
   PciDevice->PciIo.RomImage = RomInMemory;
 
