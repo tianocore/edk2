@@ -28,6 +28,7 @@
 #  VALID_ARCHITECTURES           = ARM
 #
 [Sources.ARM]
+  Arm/GccSemihost.S | GCC
   Arm/SemihostLib.c
 
 

@@ -42,7 +42,7 @@ typedef struct {
   UINT32  CommandLength;
 } SEMIHOST_SYSTEM_BLOCK;
 
-#ifdef __CC_ARM 
+#if defined(__CC_ARM) 
 
 #if defined(__thumb__)
 #define SWI 0xAB
@@ -140,6 +140,28 @@ _Semihost_SYS_SYSTEM(
 #define Semihost_SYS_FLEN(Handle)           _Semihost_SYS_FLEN(0x0C, Handle)
 #define Semihost_SYS_REMOVE(RemoveBlock)    _Semihost_SYS_REMOVE(0x0E, RemoveBlock)
 #define Semihost_SYS_SYSTEM(SystemBlock)    _Semihost_SYS_SYSTEM(0x12, SystemBlock)
+
+#elif defined(__GNUC__) // __CC_ARM
+
+#define SEMIHOST_SUPPORTED  TRUE
+
+UINT32
+GccSemihostCall (
+  IN UINT32   Operation,
+  IN UINTN    SystemBlockAddress
+  ); // __attribute__ ((interrupt ("SVC")));
+
+#define Semihost_SYS_OPEN(OpenBlock)        GccSemihostCall(0x01, (UINTN)(OpenBlock))
+#define Semihost_SYS_CLOSE(Handle)          GccSemihostCall(0x02, (UINTN)(Handle))
+#define Semihost_SYS_WRITE0(String)         GccSemihostCall(0x04, (UINTN)(String))
+#define Semihost_SYS_WRITEC(Character)      GccSemihostCall(0x03, (UINTN)(Character))
+#define Semihost_SYS_WRITE(WriteBlock)      GccSemihostCall(0x05, (UINTN)(WriteBlock))
+#define Semihost_SYS_READ(ReadBlock)        GccSemihostCall(0x06, (UINTN)(ReadBlock))
+#define Semihost_SYS_READC()                GccSemihostCall(0x07, (UINTN)(0))
+#define Semihost_SYS_SEEK(SeekBlock)        GccSemihostCall(0x0A, (UINTN)(SeekBlock))
+#define Semihost_SYS_FLEN(Handle)           GccSemihostCall(0x0C, (UINTN)(Handle))
+#define Semihost_SYS_REMOVE(RemoveBlock)    GccSemihostCall(0x0E, (UINTN)(RemoveBlock))
+#define Semihost_SYS_SYSTEM(SystemBlock)    GccSemihostCall(0x12, (UINTN)(SystemBlock))
 
 #else // __CC_ARM
 
