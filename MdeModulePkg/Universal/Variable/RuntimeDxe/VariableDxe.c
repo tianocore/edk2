@@ -20,12 +20,12 @@ extern VARIABLE_STORE_HEADER   *mNvVariableCache;
 VARIABLE_INFO_ENTRY            *gVariableInfo;
 EFI_HANDLE                     mHandle                    = NULL;
 EFI_EVENT                      mVirtualAddressChangeEvent = NULL;
-EFI_EVENT                           mFtwRegistration           = NULL;
+EFI_EVENT                      mFtwRegistration           = NULL;
 
 /**
-  Return TRUE if ExitBootServices () has been called
+  Return TRUE if ExitBootServices () has been called.
   
-  @retval TRUE If ExitBootServices () has been called
+  @retval TRUE If ExitBootServices () has been called.
 **/
 BOOLEAN
 AtRuntime (

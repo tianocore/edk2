@@ -726,7 +726,7 @@ InitFtwDevice (
 /**
   Initialization for Fault Tolerant Write is done in this handler.
 
-  @param[in,out] FtwData        Pointer to the FTW device structure
+  @param[in, out] FtwDevice     Pointer to the FTW device structure
 
   @retval EFI_SUCCESS           Initialize the FTW protocol successfully.
   @retval EFI_NOT_FOUND         No proper FVB protocol was found.

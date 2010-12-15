@@ -991,11 +991,11 @@ InitFtwDevice (
 
 
 /**
-  Initialization for Fault Tolerant Write is done in this handler.
+  Find the proper Firmware Volume Block protocol for FTW operation.
 
-  @param[in,out] FtwData        Pointer to the FTW device structure
+  @param[in, out] FtwDevice     Pointer to the FTW device structure
 
-  @retval EFI_SUCCESS           Initialize the FTW device successfully.
+  @retval EFI_SUCCESS           Find the FVB protocol successfully.
   @retval EFI_NOT_FOUND         No proper FVB protocol was found.
   @retval EFI_ABORTED           Some data can not be got or be invalid.
   
@@ -1128,7 +1128,7 @@ FindFvbForFtw (
 /**
   Initialization for Fault Tolerant Write protocol.
 
-  @param[in,out] FtwData        Pointer to the FTW device structure
+  @param[in, out] FtwDevice     Pointer to the FTW device structure
 
   @retval EFI_SUCCESS           Initialize the FTW protocol successfully.
   @retval EFI_NOT_FOUND         No proper FVB protocol was found.
