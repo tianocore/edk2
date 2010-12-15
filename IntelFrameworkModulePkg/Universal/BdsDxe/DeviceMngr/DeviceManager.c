@@ -429,7 +429,6 @@ GetMacAddressString(
   Save question id and prompt id to the mac device list.
   If the same mac address has saved yet, no need to add more.
 
-  @param NewQuestionId               New question id.
   @param MacAddrString               Mac address string.
 
   @retval  EFI_SUCCESS               Add the item is successful.
