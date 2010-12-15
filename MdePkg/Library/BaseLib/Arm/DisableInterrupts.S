@@ -17,6 +17,7 @@
 .text
 .p2align 2
 .globl ASM_PFX(DisableInterrupts)
+INTERWORK_FUNC(DisableInterrupts)
 
 #/**
 #  Disables CPU interrupts.

@@ -20,6 +20,8 @@
 	.text
 	.align 2
 	.globl ASM_PFX(InternalMathLShiftU64)
+	INTERWORK_FUNC(InternalMathLShiftU64)
+
 ASM_PFX(InternalMathLShiftU64):
 	stmfd	sp!, {r4, r5, r6}
 	mov	r6, r1
@@ -37,6 +39,8 @@ ASM_PFX(InternalMathLShiftU64):
 
 	.align 2
 	.globl ASM_PFX(InternalMathRShiftU64)
+	INTERWORK_FUNC(InternalMathRShiftU64)
+
 ASM_PFX(InternalMathRShiftU64):
 	stmfd	sp!, {r4, r5, r6}
 	mov	r5, r0
@@ -54,6 +58,8 @@ ASM_PFX(InternalMathRShiftU64):
 
 	.align 2
 	.globl ASM_PFX(InternalMathARShiftU64)
+	INTERWORK_FUNC(InternalMathARShiftU64)
+
 ASM_PFX(InternalMathARShiftU64):
 	stmfd	sp!, {r4, r5, r6}
 	mov	r5, r0
@@ -71,6 +77,8 @@ ASM_PFX(InternalMathARShiftU64):
 
 	.align 2
 	.globl ASM_PFX(InternalMathLRotU64)
+	INTERWORK_FUNC(InternalMathLRotU64)
+
 ASM_PFX(InternalMathLRotU64):
 	stmfd	sp!, {r4, r5, r6, r7, lr}
 	add	r7, sp, #12
@@ -96,6 +104,8 @@ ASM_PFX(InternalMathLRotU64):
 
 	.align 2
 	.globl ASM_PFX(InternalMathRRotU64)
+	INTERWORK_FUNC(InternalMathRRotU64)
+
 ASM_PFX(InternalMathRRotU64):
 	stmfd	sp!, {r4, r5, r6, r7, lr}
 	add	r7, sp, #12
@@ -120,6 +130,8 @@ ASM_PFX(InternalMathRRotU64):
 
 	.align 2
 	.globl ASM_PFX(InternalMathMultU64x32)
+	INTERWORK_FUNC(InternalMathMultU64x32)
+
 ASM_PFX(InternalMathMultU64x32):
 	stmfd	sp!, {r7, lr}
 	add	r7, sp, #0
@@ -133,6 +145,8 @@ ASM_PFX(InternalMathMultU64x32):
 
 	.align 2
 	.globl ASM_PFX(InternalMathMultU64x64)
+	INTERWORK_FUNC(InternalMathMultU64x64)
+
 ASM_PFX(InternalMathMultU64x64):
 	stmfd	sp!, {r7, lr}
 	add	r7, sp, #0
@@ -145,6 +159,8 @@ ASM_PFX(InternalMathMultU64x64):
 
 	.align 2
 	.globl ASM_PFX(InternalMathDivU64x32)
+	INTERWORK_FUNC(InternalMathDivU64x32)
+
 ASM_PFX(InternalMathDivU64x32):
 	stmfd	sp!, {r7, lr}
 	add	r7, sp, #0
@@ -155,6 +171,8 @@ ASM_PFX(InternalMathDivU64x32):
 	
 	.align 2
 	.globl ASM_PFX(InternalMathModU64x32)
+	INTERWORK_FUNC(InternalMathModU64x32)
+
 ASM_PFX(InternalMathModU64x32):
 	stmfd	sp!, {r7, lr}
 	add	r7, sp, #0
@@ -165,6 +183,8 @@ ASM_PFX(InternalMathModU64x32):
 	
 	.align 2
 	.globl ASM_PFX(InternalMathDivRemU64x32)
+	INTERWORK_FUNC(InternalMathDivRemU64x32)
+
 ASM_PFX(InternalMathDivRemU64x32):
 	stmfd	sp!, {r4, r5, r6, r7, lr}
 	add	r7, sp, #12
@@ -192,6 +212,8 @@ L22:
 	
 	.align 2
 	.globl ASM_PFX(InternalMathDivRemU64x64)
+	INTERWORK_FUNC(InternalMathDivRemU64x64)
+
 ASM_PFX(InternalMathDivRemU64x64):
 	stmfd	sp!, {r4, r5, r6, r7, lr}
 	add	r7, sp, #12
@@ -217,6 +239,8 @@ L26:
 	
 	.align 2
 	.globl ASM_PFX(InternalMathDivRemS64x64)
+	INTERWORK_FUNC(InternalMathDivRemS64x64)
+
 ASM_PFX(InternalMathDivRemS64x64):
 	stmfd	sp!, {r4, r5, r6, r7, lr}
 	add	r7, sp, #12
@@ -242,6 +266,8 @@ L30:
 	
 	.align 2
 	.globl ASM_PFX(InternalMathSwapBytes64)
+	INTERWORK_FUNC(InternalMathSwapBytes64)
+
 ASM_PFX(InternalMathSwapBytes64):
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 1, uses_anonymous_args = 0

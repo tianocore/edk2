@@ -110,6 +110,20 @@ typedef INT32   INTN;
   /// Define this macro to unify the usage.
   ///
   #define ASM_GLOBAL .globl
+
+  #if !defined(__APPLE__)
+    ///
+    /// ARM EABI defines that the linker should not manipulate call relocations
+    /// (do bl/blx conversion) unless the target symbol has function type.
+    /// CodeSourcery 2010.09 started requiring the .type to function properly
+    ///
+    #define INTERWORK_FUNC(func__)   .type ASM_PFX(func__), %function
+  #else
+    //
+    // .type not supported by Apple Xcode tools 
+    //
+    #define INTERWORK_FUNC(func__)
+  #endif
 #endif
 
 /**

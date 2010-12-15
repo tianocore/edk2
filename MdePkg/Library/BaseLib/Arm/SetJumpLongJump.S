@@ -15,7 +15,10 @@
 .p2align 2
 
 .globl ASM_PFX(SetJump)
+INTERWORK_FUNC(SetJump)
+
 .globl ASM_PFX(InternalLongJump)
+INTERWORK_FUNC(InternalLongJump)
 
 #/**
 #  Saves the current CPU context that can be restored with a call to LongJump() and returns 0.#

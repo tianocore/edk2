@@ -17,6 +17,7 @@
 .text
 .p2align 2
 .globl ASM_PFX(CpuFlushTlb)
+INTERWORK_FUNC(CpuFlushTlb)
 
 #/**
 #  Flushes all the Translation Lookaside Buffers(TLB) entries in a CPU.
