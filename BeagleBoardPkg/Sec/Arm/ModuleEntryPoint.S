@@ -20,6 +20,7 @@
 
 .globl ASM_PFX(CEntryPoint)
 .globl ASM_PFX(_ModuleEntryPoint)
+INTERWORK_FUNC(_ModuleEntryPoint)
 
 ASM_PFX(_ModuleEntryPoint):
 

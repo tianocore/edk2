@@ -17,6 +17,7 @@
 	.text
 	.align 2
 	.globl ASM_PFX(__aeabi_uldivmod)
+	INTERWORK_FUNC(__aeabi_uldivmod)
 
 //        
 //UINT64

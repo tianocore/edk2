@@ -15,6 +15,7 @@
 	.text
 	.align 2
 	.globl ASM_PFX(__divdi3)
+  INTERWORK_FUNC(__divdi3)
 	
 ASM_PFX(__divdi3):
 	@ args = 0, pretend = 0, frame = 0

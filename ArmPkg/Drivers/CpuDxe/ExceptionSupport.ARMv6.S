@@ -51,10 +51,15 @@ This is the stack constructed by the exception handler (low address to high addr
  
 
 .globl ASM_PFX(ExceptionHandlersStart)
+INTERWORK_FUNC(ExceptionHandlersStart)
 .globl ASM_PFX(ExceptionHandlersEnd)
+INTERWORK_FUNC(ExceptionHandlersEnd)
 .globl ASM_PFX(CommonExceptionEntry)
+INTERWORK_FUNC(CommonExceptionEntry)
 .globl ASM_PFX(AsmCommonExceptionEntry)
+INTERWORK_FUNC(AsmCommonExceptionEntry)
 .globl ASM_PFX(CommonCExceptionHandler)
+INTERWORK_FUNC(CommonCExceptionHandler)
 
 .text
 #if !defined(__APPLE__)

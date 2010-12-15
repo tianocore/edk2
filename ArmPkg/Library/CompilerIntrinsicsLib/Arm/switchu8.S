@@ -17,6 +17,7 @@
 .p2align 2
 
 .globl ASM_PFX(__switchu8)
+INTERWORK_FUNC(__switchu8)
 
 
 ASM_PFX(__switchu8):

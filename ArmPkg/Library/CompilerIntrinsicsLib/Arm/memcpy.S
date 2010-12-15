@@ -15,6 +15,7 @@
 	.text
 	.align 2
 	.globl ASM_PFX(memcpy)
+  INTERWORK_FUNC(memcpy)
 
 ASM_PFX(memcpy):
 	stmfd	sp!, {r7, lr}

@@ -364,7 +364,14 @@
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
   EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
-  EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
+  
+  EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf 
+#
+# This version uses semi-hosting console  
+#  EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf {
+#    <LibraryClasses>
+#      SerialPortLib|ArmPkg/Library/SemiHostingSerialPortLib/SemiHostingSerialPortLib.inf
+#  }
   
   EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf

@@ -15,8 +15,10 @@
 
   .text
 	.align 2
-	.globl _memset
-_memset:
+	.globl ASM_PFX(memset)
+  INTERWORK_FUNC(memset)
+
+ASM_PFX(memset):
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 1, uses_anonymous_args = 0
 	stmfd	sp!, {r7, lr}

@@ -15,6 +15,7 @@
 	.text
 	.align 2
 	.globl ASM_PFX(__ashrdi3)
+  INTERWORK_FUNC(__ashrdi3)
 
 ASM_PFX(__ashrdi3):
 	cmp	r2, #31

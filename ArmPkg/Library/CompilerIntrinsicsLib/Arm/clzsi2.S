@@ -15,6 +15,7 @@
 	.text
 	.align 2
 	.globl ASM_PFX(__clzsi2)
+  INTERWORK_FUNC(__clzsi2)
 
 ASM_PFX(__clzsi2):
 	@ frame_needed = 1, uses_anonymous_args = 0

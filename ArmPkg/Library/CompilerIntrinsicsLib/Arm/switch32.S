@@ -17,7 +17,7 @@
 .p2align 2
 
 .globl ASM_PFX(__switch32)
-
+INTERWORK_FUNC(__switch32)
 
 ASM_PFX(__switch32):    
     ldr     ip, [lr, #-1]

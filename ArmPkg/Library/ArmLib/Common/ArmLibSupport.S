@@ -15,19 +15,34 @@
 .text
 .align 2
 .globl ASM_PFX(Cp15IdCode)
+INTERWORK_FUNC(Cp15IdCode)
 .globl ASM_PFX(Cp15CacheInfo)
+INTERWORK_FUNC(Cp15CacheInfo)
 .globl ASM_PFX(ArmEnableInterrupts)
+INTERWORK_FUNC(ArmEnableInterrupts)
 .globl ASM_PFX(ArmDisableInterrupts)
+INTERWORK_FUNC(ArmDisableInterrupts)
 .globl ASM_PFX(ArmGetInterruptState)
+INTERWORK_FUNC(ArmGetInterruptState)
 .globl ASM_PFX(ArmEnableFiq)
+INTERWORK_FUNC(ArmEnableFiq)
 .globl ASM_PFX(ArmDisableFiq)
+INTERWORK_FUNC(ArmDisableFiq)
 .globl ASM_PFX(ArmGetFiqState)
+INTERWORK_FUNC(ArmGetFiqState)
 .globl ASM_PFX(ArmInvalidateTlb)
+INTERWORK_FUNC(ArmInvalidateTlb)
 .globl ASM_PFX(ArmSetTranslationTableBaseAddress)
+INTERWORK_FUNC(ArmSetTranslationTableBaseAddress)
 .globl ASM_PFX(ArmGetTranslationTableBaseAddress)
+INTERWORK_FUNC(ArmGetTranslationTableBaseAddress)
 .globl ASM_PFX(ArmSetDomainAccessControl)
+INTERWORK_FUNC(ArmSetDomainAccessControl)
 .globl ASM_PFX(CPSRMaskInsert)
+INTERWORK_FUNC(CPSRMaskInsert)
 .globl ASM_PFX(CPSRRead)
+INTERWORK_FUNC(CPSRRead)
+
 
 #------------------------------------------------------------------------------
 

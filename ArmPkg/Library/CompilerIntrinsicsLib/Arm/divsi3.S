@@ -15,6 +15,7 @@
 	.text
 	.align 2
 	.globl ASM_PFX(__divsi3)
+  INTERWORK_FUNC(__divsi3)
 	
 ASM_PFX(__divsi3):
 	eor	r3, r0, r0, asr #31
