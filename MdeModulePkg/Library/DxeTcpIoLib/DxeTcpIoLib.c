@@ -882,7 +882,6 @@ TcpIoReceive (
   Tcp6 = NULL;
 
   if (TcpIo->TcpVersion == TCP_VERSION_4) {
-    TcpIo->RxToken.Tcp4Token.Packet.RxData = &RxData;
     Tcp4 = TcpIo->Tcp.Tcp4;
 
     if (TcpIo->IsListenDone) {
@@ -893,8 +892,9 @@ TcpIoReceive (
       return EFI_DEVICE_ERROR;
     }
 
+    TcpIo->RxToken.Tcp4Token.Packet.RxData = &RxData;
+
   } else if (TcpIo->TcpVersion == TCP_VERSION_6) {
-    TcpIo->RxToken.Tcp6Token.Packet.RxData = (EFI_TCP6_RECEIVE_DATA *) &RxData;
     Tcp6 = TcpIo->Tcp.Tcp6;
 
     if (TcpIo->IsListenDone) {
@@ -904,6 +904,8 @@ TcpIoReceive (
     if (Tcp6 == NULL) {
       return EFI_DEVICE_ERROR; 
     }
+
+    TcpIo->RxToken.Tcp6Token.Packet.RxData = (EFI_TCP6_RECEIVE_DATA *) &RxData;
 
   } else {
     return EFI_UNSUPPORTED;
