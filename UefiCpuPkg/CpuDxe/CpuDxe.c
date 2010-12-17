@@ -1082,7 +1082,7 @@ InitInterruptDescriptorTable (
 
   if ((OldIdtPtr.Base != 0) && ((OldIdtPtr.Limit & 7) == 7)) {
     OldIdt = (IA32_IDT_GATE_DESCRIPTOR*) OldIdtPtr.Base;
-    OldIdtSize = (OldIdtPtr.Limit + 1) / 8;
+    OldIdtSize = (OldIdtPtr.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR);
   } else {
     OldIdt = NULL;
     OldIdtSize = 0;
