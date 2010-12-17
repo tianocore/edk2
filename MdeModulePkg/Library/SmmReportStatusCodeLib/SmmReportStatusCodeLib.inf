@@ -41,7 +41,6 @@
   BaseMemoryLib
   SmmServicesTableLib
   DebugLib
-  UefiDriverEntryPoint
   MemoryAllocationLib
 
 [Guids]
