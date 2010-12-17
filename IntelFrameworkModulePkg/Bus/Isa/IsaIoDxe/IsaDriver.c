@@ -106,12 +106,6 @@ IsaIoDriverSupported (
     // Get the PciIo protocol from its parent controller.
     //
     Status = gBS->LocateDevicePath (&gEfiPciIoProtocolGuid, &DevicePath, &PciHandle);
-    if (!EFI_ERROR (Status)) {
-      if ((DevicePathType (DevicePath) != ACPI_DEVICE_PATH) ||
-          ((DevicePathSubType (DevicePath) != ACPI_DP) && (DevicePathSubType (DevicePath) != ACPI_EXTENDED_DP))) {
-        Status = EFI_UNSUPPORTED;
-      }
-    }
   }
 
   if (EFI_ERROR (Status)) {
@@ -181,7 +175,7 @@ IsaIoDriverStart (
   EFI_HANDLE                            PciHandle;
   EFI_SIO_PROTOCOL                      *Sio;
   ACPI_RESOURCE_HEADER_PTR              Resources;
-  EFI_DEVICE_PATH_PROTOCOL              *AcpiNode;
+  EFI_DEVICE_PATH_PROTOCOL              *TempDevicePath;
   ISA_IO_DEVICE                         *IsaIoDevice;
 
   PciIo = NULL;
@@ -205,16 +199,9 @@ IsaIoDriverStart (
   //
   // Get the PciIo protocol from its parent controller.
   //
-  AcpiNode = DevicePath;
-  Status = gBS->LocateDevicePath (&gEfiPciIoProtocolGuid, &AcpiNode, &PciHandle);
+  TempDevicePath = DevicePath;
+  Status = gBS->LocateDevicePath (&gEfiPciIoProtocolGuid, &TempDevicePath, &PciHandle);
   if (!EFI_ERROR (Status)) {
-    //
-    // AcpiNode should point to the ACPI node now.
-    //
-    ASSERT ((DevicePathType (AcpiNode) == ACPI_DEVICE_PATH) &&
-            ((DevicePathSubType (AcpiNode) == ACPI_DP) || (DevicePathSubType (AcpiNode) == ACPI_EXTENDED_DP))
-           );
-
     Status = gBS->HandleProtocol (PciHandle, &gEfiPciIoProtocolGuid, (VOID **) &PciIo);
     ASSERT_EFI_ERROR (Status);
 
