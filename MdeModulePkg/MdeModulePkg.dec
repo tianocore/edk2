@@ -82,6 +82,10 @@
   #
   DebugAgentLib|Include/Library/DebugAgentLib.h
 
+  ##  @libraryclass  Provide platform specific hooks.
+  #
+  PlatformHookLib|Include/Library/PlatformHookLib.h
+  
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -393,6 +397,40 @@
 
   ## RTC Update Timeout Value
   gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout|100000|UINT32|0x00010034
+
+  ## If TRUE, then 16550 serial port registers are in MMIO space.  
+  #  If FALSE, then 16550 serial port registers are in I/O space.  Default value.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|FALSE|BOOLEAN|0x00020000
+  
+  ## If TRUE, then the 16550 serial port hardware flow control is enabled.
+  #  If FALSE, then the 16550 serial port hardware flow control is disabled.  Default value.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl|FALSE|BOOLEAN|0x00020001
+
+  ## Base address of 16550 serial port registers in MMIO or I/O space.  Default is 0x3F8.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x03F8|UINT64|0x00020002
+
+  ## Baud rate for the 16550 serial port.  Default is 115200 baud.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate|115200|UINT32|0x00020003
+
+  ## Line Control Register (LCR) for the 16550 serial port.  This encodes data bits, parity, and stop bits.  
+  #    BIT1..BIT0 - Data bits.  00b = 5 bits, 01b = 6 bits, 10b = 7 bits, 11b = 8 bits
+  #    BIT2       - Stop Bits.  0 = 1 stop bit.  1 = 1.5 stop bits if 5 data bits selected, otherwise 2 stop bits.
+  #    BIT5..BIT2 - Parity.  xx0b = No Parity, 001b = Odd Parity, 011b = Even Parity, 101b = Mark Parity, 111b=Stick Parity
+  #    BIT7..BIT6 - Reserved.  Must be 0.
+  #
+  # Default is No Parity, 8 Data Bits, 1 Stop Bit.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialLineControl|0x03|UINT8|0x00020004
+
+  ## FIFO Control Register (FCR) for the 16550 serial port.   
+  #    BIT0       - FIFO Enable.  0 = Disable FIFOs.  1 = Enable FIFOs.
+  #    BIT1       - Clear receive FIFO.  1 = Clear FIFO.
+  #    BIT2       - Clear transmit FIFO.  1 = Clear FIFO.
+  #    BIT7..BIT3 - Reserved.  Must be 0.
+  #
+  # Default is to enable and clear all FIFOs.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialFifoControl|0x07|UINT8|0x00020005
 
   ## Maximum address that the DXE Core will allocate the EFI_SYSTEM_TABLE_POINTER
   #  structure.  The default value for this PCD is 0, which means that the DXE Core
