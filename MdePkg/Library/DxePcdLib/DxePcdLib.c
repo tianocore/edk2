@@ -24,43 +24,53 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 
-PCD_PROTOCOL     *mPcd = NULL;
+PCD_PROTOCOL     *mPcd   = NULL;
 EFI_PCD_PROTOCOL *mPiPcd = NULL;
 
 /**
-  The constructor function caches the PCD_PROTOCOL pointer.
-
-  @param[in] ImageHandle The firmware allocated handle for the EFI image.  
-  @param[in] SystemTable A pointer to the EFI System Table.
-  
-  @retval EFI_SUCCESS The constructor always return EFI_SUCCESS.
-
+  Retrieves the PI PCD protocol from the handle database.
 **/
-EFI_STATUS
+EFI_PCD_PROTOCOL *
 EFIAPI
-PcdLibConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+GetPiPcdProtocol (
+  VOID
   )
 {
   EFI_STATUS  Status;
 
-  //
-  // PCD protocol need to be installed before the module access Dynamic type PCD.
-  // But dynamic type PCD is not required in PI 1.2 specification.
-  // 
-  gBS->LocateProtocol (&gPcdProtocolGuid, NULL, (VOID **)&mPcd);
-  
-  //
-  // PI Pcd protocol defined in PI 1.2 vol3 should be installed before the module 
-  // access DynamicEx type PCD.
-  //
-  Status = gBS->LocateProtocol (&gEfiPcdProtocolGuid, NULL, (VOID **) &mPiPcd);
-  
-  ASSERT_EFI_ERROR (Status);
-  ASSERT (mPiPcd!= NULL);
+  if (mPiPcd == NULL) {
+    //
+    // PI Pcd protocol defined in PI 1.2 vol3 should be installed before the module 
+    // access DynamicEx type PCD.
+    //
+    Status = gBS->LocateProtocol (&gEfiPcdProtocolGuid, NULL, (VOID **) &mPiPcd);
+    ASSERT_EFI_ERROR (Status);
+    ASSERT (mPiPcd != NULL);
+  }
+  return mPiPcd;
+}
 
-  return Status;
+/**
+  Retrieves the PCD protocol from the handle database.
+**/
+PCD_PROTOCOL *
+EFIAPI
+GetPcdProtocol (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+
+  if (mPcd == NULL) {
+    //
+    // PCD protocol need to be installed before the module access Dynamic type PCD.
+    // But dynamic type PCD is not required in PI 1.2 specification.
+    // 
+    Status = gBS->LocateProtocol (&gPcdProtocolGuid, NULL, (VOID **)&mPcd);
+    ASSERT_EFI_ERROR (Status);
+    ASSERT (mPcd != NULL);
+  }
+  return mPcd;
 }
 
 
@@ -82,10 +92,9 @@ LibPcdSetSku (
   IN UINTN   SkuId
   )
 {
-  ASSERT (mPcd != NULL);
   ASSERT (SkuId < PCD_MAX_SKU_ID);
 
-  mPcd->SetSku (SkuId);
+  GetPcdProtocol()->SetSku (SkuId);
 
   return SkuId;
 }
@@ -108,8 +117,7 @@ LibPcdGet8 (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (mPcd != NULL);
-  return mPcd->Get8 (TokenNumber);
+  return GetPcdProtocol()->Get8 (TokenNumber);
 }
 
 
@@ -130,8 +138,7 @@ LibPcdGet16 (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (mPcd != NULL);
-  return mPcd->Get16 (TokenNumber);
+  return GetPcdProtocol()->Get16 (TokenNumber);
 }
 
 
@@ -152,8 +159,7 @@ LibPcdGet32 (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (mPcd != NULL);
-  return mPcd->Get32 (TokenNumber);
+  return GetPcdProtocol()->Get32 (TokenNumber);
 }
 
 
@@ -174,8 +180,7 @@ LibPcdGet64 (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (mPcd != NULL);
-  return mPcd->Get64 (TokenNumber);
+  return GetPcdProtocol()->Get64 (TokenNumber);
 }
 
 
@@ -196,8 +201,7 @@ LibPcdGetPtr (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (mPcd != NULL);
-  return mPcd->GetPtr (TokenNumber);
+  return GetPcdProtocol()->GetPtr (TokenNumber);
 }
 
 
@@ -218,8 +222,7 @@ LibPcdGetBool (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (mPcd != NULL);
-  return mPcd->GetBool (TokenNumber);
+  return GetPcdProtocol()->GetBool (TokenNumber);
 }
 
 
@@ -238,8 +241,7 @@ LibPcdGetSize (
   IN UINTN             TokenNumber
   )
 {
-  ASSERT (mPcd != NULL);
-  return mPcd->GetSize (TokenNumber);
+  return GetPcdProtocol()->GetSize (TokenNumber);
 }
 
 
@@ -267,7 +269,7 @@ LibPcdGetEx8 (
 {
   ASSERT (Guid != NULL);
   
-  return mPiPcd->Get8 (Guid, TokenNumber);
+  return GetPiPcdProtocol()->Get8 (Guid, TokenNumber);
 }
 
 
@@ -294,7 +296,7 @@ LibPcdGetEx16 (
 {
   ASSERT (Guid != NULL);
 
-  return mPiPcd->Get16 (Guid, TokenNumber);
+  return GetPiPcdProtocol()->Get16 (Guid, TokenNumber);
 }
 
 
@@ -318,7 +320,7 @@ LibPcdGetEx32 (
 {
   ASSERT (Guid != NULL);
 
-  return mPiPcd->Get32 (Guid, TokenNumber);
+  return GetPiPcdProtocol()->Get32 (Guid, TokenNumber);
 }
 
 
@@ -346,7 +348,7 @@ LibPcdGetEx64 (
 {
   ASSERT (Guid != NULL);
   
-  return mPiPcd->Get64 (Guid, TokenNumber);
+  return GetPiPcdProtocol()->Get64 (Guid, TokenNumber);
 }
 
 
@@ -374,7 +376,7 @@ LibPcdGetExPtr (
 {
   ASSERT (Guid != NULL);
 
-  return mPiPcd->GetPtr (Guid, TokenNumber);
+  return GetPiPcdProtocol()->GetPtr (Guid, TokenNumber);
 }
 
 
@@ -402,7 +404,7 @@ LibPcdGetExBool (
 {
   ASSERT (Guid != NULL);
 
-  return mPiPcd->GetBool (Guid, TokenNumber);
+  return GetPiPcdProtocol()->GetBool (Guid, TokenNumber);
 }
 
 
@@ -430,7 +432,7 @@ LibPcdGetExSize (
 {
   ASSERT (Guid != NULL);
 
-  return mPiPcd->GetSize (Guid, TokenNumber);
+  return GetPiPcdProtocol()->GetSize (Guid, TokenNumber);
 }
 
 
@@ -456,9 +458,7 @@ LibPcdSet8 (
 {
   EFI_STATUS Status;
 
-  ASSERT (mPcd != NULL);
-  Status = mPcd->Set8 (TokenNumber, Value);
-
+  Status = GetPcdProtocol()->Set8 (TokenNumber, Value);
   ASSERT_EFI_ERROR (Status);
   
   return Value;
@@ -487,9 +487,7 @@ LibPcdSet16 (
 {
   EFI_STATUS Status;
 
-  ASSERT (mPcd != NULL);
-  Status = mPcd->Set16 (TokenNumber, Value);
-
+  Status = GetPcdProtocol()->Set16 (TokenNumber, Value);
   ASSERT_EFI_ERROR (Status);
   
   return Value;
@@ -518,9 +516,7 @@ LibPcdSet32 (
 {
   EFI_STATUS Status;
   
-  ASSERT (mPcd != NULL);
-  Status = mPcd->Set32 (TokenNumber, Value);
-
+  Status = GetPcdProtocol()->Set32 (TokenNumber, Value);
   ASSERT_EFI_ERROR (Status);
 
   return Value;
@@ -549,9 +545,7 @@ LibPcdSet64 (
 {
   EFI_STATUS Status;
 
-  ASSERT (mPcd != NULL);
-  Status = mPcd->Set64 (TokenNumber, Value);
-
+  Status = GetPcdProtocol()->Set64 (TokenNumber, Value);
   ASSERT_EFI_ERROR (Status);
 
   return Value;
@@ -591,20 +585,18 @@ LibPcdSetPtr (
 {
   EFI_STATUS Status;
 
-  ASSERT (mPcd != NULL);
   ASSERT (SizeOfBuffer != NULL);
 
   if (*SizeOfBuffer > 0) {
     ASSERT (Buffer != NULL);
   }
 
-  Status = mPcd->SetPtr (TokenNumber, SizeOfBuffer, (VOID *) Buffer);
-
+  Status = GetPcdProtocol()->SetPtr (TokenNumber, SizeOfBuffer, (VOID *) Buffer);
   if (EFI_ERROR (Status)) {
     return NULL;
   }
 
-  return (VOID *) Buffer;
+  return (VOID *)Buffer;
 }
 
 
@@ -630,9 +622,7 @@ LibPcdSetBool (
 {
   EFI_STATUS Status;
 
-  ASSERT (mPcd != NULL);
-  Status = mPcd->SetBool (TokenNumber, Value);
-
+  Status = GetPcdProtocol()->SetBool (TokenNumber, Value);
   ASSERT_EFI_ERROR (Status);
 
   return Value;
@@ -668,8 +658,7 @@ LibPcdSetEx8 (
 
   ASSERT (Guid != NULL);
 
-  Status = mPiPcd->Set8 (Guid, TokenNumber, Value);
-
+  Status = GetPiPcdProtocol()->Set8 (Guid, TokenNumber, Value);
   ASSERT_EFI_ERROR (Status);
 
   return Value;
@@ -705,8 +694,7 @@ LibPcdSetEx16 (
 
   ASSERT (Guid != NULL);
 
-  Status = mPiPcd->Set16 (Guid, TokenNumber, Value);
-
+  Status = GetPiPcdProtocol()->Set16 (Guid, TokenNumber, Value);
   ASSERT_EFI_ERROR (Status);
 
   return Value;
@@ -742,8 +730,7 @@ LibPcdSetEx32 (
 
   ASSERT (Guid != NULL);
 
-  Status = mPiPcd->Set32 (Guid, TokenNumber, Value);
-
+  Status = GetPiPcdProtocol()->Set32 (Guid, TokenNumber, Value);
   ASSERT_EFI_ERROR (Status);
 
   return Value;
@@ -778,8 +765,7 @@ LibPcdSetEx64 (
 
   ASSERT (Guid != NULL);
 
-  Status = mPiPcd->Set64 (Guid, TokenNumber, Value);
-
+  Status = GetPiPcdProtocol()->Set64 (Guid, TokenNumber, Value);
   ASSERT_EFI_ERROR (Status);
 
   return Value;
@@ -806,7 +792,7 @@ LibPcdSetEx64 (
   @param[in, out] SizeOfBuffer  The size, in bytes, of Buffer.
   @param[in]  Buffer            A pointer to the buffer to set.
 
-  @return Return the pinter to the buffer been set.
+  @return Return the pointer to the buffer been set.
 
 **/
 VOID *
@@ -828,8 +814,7 @@ LibPcdSetExPtr (
     ASSERT (Buffer != NULL);
   }
 
-  Status = mPiPcd->SetPtr (Guid, TokenNumber, SizeOfBuffer, Buffer);
-
+  Status = GetPiPcdProtocol()->SetPtr (Guid, TokenNumber, SizeOfBuffer, Buffer);
   if (EFI_ERROR (Status)) {
     return NULL;
   }
@@ -867,8 +852,7 @@ LibPcdSetExBool (
 
   ASSERT (Guid != NULL);
 
-  Status = mPiPcd->SetBool (Guid, TokenNumber, Value);
-
+  Status = GetPiPcdProtocol()->SetBool (Guid, TokenNumber, Value);
   ASSERT_EFI_ERROR (Status);
 
   return Value;
@@ -904,8 +888,7 @@ LibPcdCallbackOnSet (
 
   ASSERT (NotificationFunction != NULL);
 
-  Status = mPiPcd->CallbackOnSet (Guid, TokenNumber, (EFI_PCD_PROTOCOL_CALLBACK) NotificationFunction);
-
+  Status = GetPiPcdProtocol()->CallbackOnSet (Guid, TokenNumber, (EFI_PCD_PROTOCOL_CALLBACK) NotificationFunction);
   ASSERT_EFI_ERROR (Status);
 
   return;
@@ -938,8 +921,7 @@ LibPcdCancelCallback (
 
   ASSERT (NotificationFunction != NULL);
     
-  Status = mPiPcd->CancelCallback (Guid, TokenNumber, (EFI_PCD_PROTOCOL_CALLBACK) NotificationFunction);
-
+  Status = GetPiPcdProtocol()->CancelCallback (Guid, TokenNumber, (EFI_PCD_PROTOCOL_CALLBACK) NotificationFunction);
   ASSERT_EFI_ERROR (Status);
 
   return;
@@ -975,8 +957,7 @@ LibPcdGetNextToken (
 {
   EFI_STATUS Status;
 
-  Status = mPiPcd->GetNextToken (Guid, &TokenNumber);
-
+  Status = GetPiPcdProtocol()->GetNextToken (Guid, &TokenNumber);
   ASSERT_EFI_ERROR (Status);
 
   return TokenNumber;
@@ -1005,11 +986,10 @@ LibPcdGetNextTokenSpace (
 {
   EFI_STATUS Status;
 
-  Status = mPiPcd->GetNextTokenSpace (&TokenSpaceGuid);
-
+  Status = GetPiPcdProtocol()->GetNextTokenSpace (&TokenSpaceGuid);
   ASSERT_EFI_ERROR (Status);
 
-  return (GUID *) TokenSpaceGuid;
+  return (GUID *)TokenSpaceGuid;
 }
 
 
