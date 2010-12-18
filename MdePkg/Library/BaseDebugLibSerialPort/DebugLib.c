@@ -1,8 +1,13 @@
 /** @file
   Base Debug library instance base on Serial Port library.
   It uses PrintLib to send debug messages to serial port device.
+  
+  NOTE: If the Serial Port library enables hardware flow control, then a call 
+  to DebugPrint() or DebugAssert() may hang if writes to the serial port are 
+  being blocked.  This may occur if a key(s) are pressed in a terminal emulator
+  used to monitor the DEBUG() and ASSERT() messages. 
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -25,6 +30,21 @@
 // Define the maximum debug and assert message length that this library supports 
 //
 #define MAX_DEBUG_MESSAGE_LENGTH  0x100
+
+/**
+  The constructor function initialize the Serial Port Library
+
+  @retval EFI_SUCCESS   The constructor always returns RETURN_SUCCESS.
+
+**/
+RETURN_STATUS
+EFIAPI
+BaseDebugLibSerialPortConstructor (
+  VOID
+  )
+{
+  return SerialPortInitialize ();
+}
 
 /**
   Prints a debug message to the debug output device if the specified error level is enabled.
@@ -60,7 +80,7 @@ DebugPrint (
   //
   // Check driver debug mask value and global mask
   //
-  if ((ErrorLevel & PcdGet32(PcdDebugPrintErrorLevel)) == 0) {
+  if ((ErrorLevel & PcdGet32 (PcdDebugPrintErrorLevel)) == 0) {
     return;
   }
 
@@ -74,7 +94,7 @@ DebugPrint (
   //
   // Send the print string to a Serial Port 
   //
-  SerialPortWrite ((UINT8 *) Buffer, AsciiStrLen(Buffer));
+  SerialPortWrite ((UINT8 *)Buffer, AsciiStrLen (Buffer));
 }
 
 
@@ -117,7 +137,7 @@ DebugAssert (
   //
   // Send the print string to the Console Output device
   //
-  SerialPortWrite ((UINT8 *) Buffer, AsciiStrLen(Buffer));
+  SerialPortWrite ((UINT8 *)Buffer, AsciiStrLen (Buffer));
 
   //
   // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings

@@ -21,6 +21,7 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = DebugLib 
+  CONSTRUCTOR                    = BaseDebugLibSerialPortConstructor
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
