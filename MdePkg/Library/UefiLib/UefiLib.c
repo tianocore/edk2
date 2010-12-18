@@ -20,6 +20,28 @@
 #include "UefiLibInternal.h"
 
 /**
+  Empty constructor function that is required to resolve dependencies between 
+  libraries.
+  
+    ** DO NOT REMOVE **
+  
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS   The constructor executed correctly.
+
+**/
+EFI_STATUS
+EFIAPI
+UefiLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  return EFI_SUCCESS;
+}
+
+/**
   Compare whether two names of languages are identical.
 
   @param  Language1 Name of language 1.
