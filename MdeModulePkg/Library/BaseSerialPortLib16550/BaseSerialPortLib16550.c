@@ -128,9 +128,10 @@ SerialPortInitialize (
   if ((SerialPortReadRegister (R_UART_LCR) & 0x3F) != (PcdGet8 (PcdSerialLineControl) & 0x3F)) {
     Initialized = FALSE;
   }
-  SerialPortWriteRegister (R_UART_LCR, SerialPortReadRegister (R_UART_LCR) | B_UART_LCR_DLAB);
-  Divisor = (SerialPortReadRegister (R_UART_BAUD_HIGH) << 8) | SerialPortReadRegister (R_UART_BAUD_LOW);
-  SerialPortWriteRegister (R_UART_LCR, SerialPortReadRegister (R_UART_LCR) & ~B_UART_LCR_DLAB);
+  SerialPortWriteRegister (R_UART_LCR, (UINT8)(SerialPortReadRegister (R_UART_LCR) | B_UART_LCR_DLAB));
+  Divisor =  SerialPortReadRegister (R_UART_BAUD_HIGH) << 8;
+  Divisor |= SerialPortReadRegister (R_UART_BAUD_LOW);
+  SerialPortWriteRegister (R_UART_LCR, (UINT8)(SerialPortReadRegister (R_UART_LCR) & ~B_UART_LCR_DLAB));
   if (Divisor != 115200 / PcdGet32 (PcdSerialBaudRate)) {
     Initialized = FALSE;
   }
@@ -150,13 +151,13 @@ SerialPortInitialize (
   // Clear DLAB and configure Data Bits, Parity, and Stop Bits.
   // Strip reserved bits from PcdSerialLineControl
   //
-  SerialPortWriteRegister (R_UART_LCR, PcdGet8 (PcdSerialLineControl) & 0x3F);
+  SerialPortWriteRegister (R_UART_LCR, (UINT8)(PcdGet8 (PcdSerialLineControl) & 0x3F));
 
   //
   // Enable and reset FIFOs
   // Strip reserved bits from PcdSerialFifoControl
   //
-  SerialPortWriteRegister (R_UART_FCR, PcdGet8 (PcdSerialFifoControl) & 0x17);
+  SerialPortWriteRegister (R_UART_FCR, (UINT8)(PcdGet8 (PcdSerialFifoControl) & 0x17));
 
   //
   // Put Modem Control Register(MCR) into its reset state of 0x00.
@@ -265,7 +266,7 @@ SerialPortRead (
     return 0;
   }
 
-  Mcr = SerialPortReadRegister (R_UART_MCR) & ~B_UART_MCR_RTS;
+  Mcr = (UINT8)(SerialPortReadRegister (R_UART_MCR) & ~B_UART_MCR_RTS);
   
   for (Result = 0; NumberOfBytes-- != 0; Result++, Buffer++) {
     //
@@ -276,7 +277,7 @@ SerialPortRead (
         //
         // Set RTS to let the peer send some data
         //
-        SerialPortWriteRegister (R_UART_MCR, Mcr | B_UART_MCR_RTS);
+        SerialPortWriteRegister (R_UART_MCR, (UINT8)(Mcr | B_UART_MCR_RTS));
       }
     }
     if (PcdGetBool (PcdSerialUseHardwareFlowControl)) {
@@ -320,7 +321,7 @@ SerialPortPoll (
       //
       // Clear RTS to prevent peer from sending data
       //
-      SerialPortWriteRegister (R_UART_MCR, SerialPortReadRegister (R_UART_MCR) & ~B_UART_MCR_RTS);
+      SerialPortWriteRegister (R_UART_MCR, (UINT8)(SerialPortReadRegister (R_UART_MCR) & ~B_UART_MCR_RTS));
     }
     return TRUE;
   }    
@@ -329,7 +330,7 @@ SerialPortPoll (
     //
     // Set RTS to let the peer send some data
     //
-    SerialPortWriteRegister (R_UART_MCR, SerialPortReadRegister (R_UART_MCR) | B_UART_MCR_RTS);
+    SerialPortWriteRegister (R_UART_MCR, (UINT8)(SerialPortReadRegister (R_UART_MCR) | B_UART_MCR_RTS));
   }
   
   return FALSE;
