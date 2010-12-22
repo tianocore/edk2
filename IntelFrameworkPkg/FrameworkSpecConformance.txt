@@ -1193,6 +1193,20 @@
     The enumeration fields listed above are *NOT* defined in Framework SmmCis specification 0.91. EdkII introduces
     these fields to support new SMI types.
 
+  3. Include/Framework/SmmCis.h
+    typedef union {
+      ///
+      /// The processor save-state information for IA-32 processors. 
+      ///
+      EFI_SMI_CPU_SAVE_STATE     Ia32SaveState;
+      ///
+      /// Note: Inconsistency with the Framework SMM CIS spec - Itanium save state not included.
+      ///
+      /// The processor save-state information for Itanium processors.
+      ///
+      /// EFI_PMI_SYSTEM_CONTEXT ItaniumSaveState;
+    } EFI_SMM_CPU_SAVE_STATE;
+
 ##
 # Mismatch with Intel Platform Innovation Framework for EFI S3 Resume Boot Path Specification (Version 0.9)
 ##
