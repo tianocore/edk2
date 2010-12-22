@@ -20,6 +20,60 @@ EFI_BOOT_SCRIPT_SAVE_PROTOCOL mS3ScriptSave = {
                                   BootScriptCloseTable
                                  };
 EFI_S3_SAVE_STATE_PROTOCOL    *mS3SaveState;
+
+/**
+  Wrapper for a thunk  to transition from long mode to compatibility mode to execute 32-bit code and then transit back to
+  long mode.
+  
+  @param  Function     The 32bit code entry to be executed.
+  @param  Param1       The first parameter to pass to 32bit code
+  @param  Param2       The second parameter to pass to 32bit code
+  @retval EFI_SUCCESS  Execute 32bit code successfully.
+  @retval other        Something wrong when execute the 32bit code 
+              
+**/  
+EFI_STATUS
+Execute32BitCode (
+  IN UINT64      Function,
+  IN UINT64      Param1,
+  IN UINT64      Param2
+  );
+
+/**
+  A stub to convert framework boot script dispatch to PI boot script dispatch.
+  
+  @param  ImageHandle  It should be is NULL.
+  @param  Context      The first parameter to pass to 32bit code
+
+  @return dispatch value.
+              
+**/  
+EFI_STATUS
+EFIAPI
+FrameworkBootScriptDispatchStub (
+  IN EFI_HANDLE ImageHandle,
+  IN VOID       *Context
+  )
+{
+  EFI_STATUS                Status;
+  DISPATCH_ENTRYPOINT_FUNC  EntryFunc;
+  VOID                      *PeiServices;
+  IA32_DESCRIPTOR           Idtr;
+
+  DEBUG ((EFI_D_ERROR, "FrameworkBootScriptDispatchStub - 0x%08x\n", (UINTN)Context));
+
+  EntryFunc = (DISPATCH_ENTRYPOINT_FUNC) (UINTN) (Context);
+  AsmReadIdtr (&Idtr);
+  PeiServices = (VOID *)(UINTN)(*(UINT32 *)(Idtr.Base - sizeof (UINT32)));
+
+  //
+  // ECP assumes first parameter is NULL, and second parameter is PeiServices.
+  //
+  Status = Execute32BitCode ((UINT64)(UINTN)EntryFunc, 0, (UINT64)(UINTN)PeiServices);
+
+  return Status;
+}
+
 /**
   Internal function to add IO write opcode to the table.
 
@@ -396,6 +450,42 @@ BootScriptDispatch (
 }
 
 /**
+  Internal function to add Save jmp address according to DISPATCH_OPCODE. 
+  We ignore "Context" parameter.
+  We need create thunk stub to convert PEI entrypoint (used in Framework version)
+  to DXE entrypoint (defined in PI spec).
+
+  @param  Marker                The variable argument list to get the opcode
+                                and associated attributes.
+
+  @retval EFI_OUT_OF_RESOURCES  Not enough resource to do operation.
+  @retval EFI_SUCCESS           Opcode is added.
+
+**/
+EFI_STATUS
+FrameworkBootScriptDispatch (
+  IN VA_LIST                       Marker
+  )
+{
+  VOID           *EntryPoint;
+  VOID           *Context;
+
+  EntryPoint = (VOID*)(UINTN)VA_ARG (Marker, EFI_PHYSICAL_ADDRESS);
+
+  //
+  // Register callback
+  //
+  Context    = EntryPoint;
+  EntryPoint = (VOID *)(UINTN)FrameworkBootScriptDispatchStub;
+  return mS3SaveState->Write (
+                         mS3SaveState,
+                         EFI_BOOT_SCRIPT_DISPATCH_2_OPCODE,
+                         EntryPoint,
+                         Context
+                         );
+}
+
+/**
   Internal function to add memory pool operation to the table. 
  
   @param  Marker                The variable argument list to get the opcode
@@ -539,9 +629,9 @@ BootScriptWrite (
   VA_LIST                   Marker;
   
   if (TableName != FRAMEWORK_EFI_ACPI_S3_RESUME_SCRIPT_TABLE) {
-  	//
-  	// Only S3 boot script is supported for now
-  	//
+    //
+    // Only S3 boot script is supported for now
+    //
     return EFI_OUT_OF_RESOURCES;
   }
   //
@@ -600,7 +690,7 @@ BootScriptWrite (
 
   case EFI_BOOT_SCRIPT_DISPATCH_OPCODE:
     VA_START (Marker, OpCode);
-    Status = BootScriptDispatch (Marker);
+    Status = FrameworkBootScriptDispatch (Marker);
     VA_END (Marker);
     break;
 
@@ -705,24 +795,133 @@ InitializeScriptSaveOnS3SaveState (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-   EFI_STATUS                Status;
-  //
-  // Locate and cache PI S3 Save State Protocol.
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiS3SaveStateProtocolGuid, 
-                  NULL, 
-                  (VOID **) &mS3SaveState
-                  );
-  ASSERT_EFI_ERROR (Status);
+  UINT8                                         *Buffer;
+  UINTN                                         BufferSize;
+  VOID                                          *FfsBuffer;
+  PE_COFF_LOADER_IMAGE_CONTEXT                  ImageContext;
+  BOOT_SCRIPT_THUNK_DATA                        *BootScriptThunkData;
+  EFI_STATUS                                    Status;
+  VOID                                          *DevicePath;
 
-  return  gBS->InstallProtocolInterface (
+  //
+  // Test if the gEfiCallerIdGuid of this image is already installed. if not, the entry
+  // point is loaded by DXE code which is the first time loaded. or else, it is already
+  // be reloaded be itself.This is a work-around
+  //
+  Status = gBS->LocateProtocol (&gEfiCallerIdGuid, NULL, &DevicePath);
+  if (EFI_ERROR (Status)) {
+    //
+    // This is the first-time loaded by DXE core. reload itself to NVS mem
+    //
+    //
+    // A workarouond: Here we install a dummy handle
+    //
+    Status = gBS->InstallProtocolInterface (
+                    &ImageHandle,
+                    &gEfiCallerIdGuid,
+                    EFI_NATIVE_INTERFACE,
+                    DevicePath
+                    );
+
+    Status = GetSectionFromAnyFv  (
+               &gEfiCallerIdGuid,
+               EFI_SECTION_PE32,
+               0,
+               (VOID **) &Buffer,
+               &BufferSize
+               );
+    ImageContext.Handle    = Buffer;
+    ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
+    //
+    // Get information about the image being loaded
+    //
+    Status = PeCoffLoaderGetImageInfo (&ImageContext);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    Status = gBS->AllocatePool (
+                    EfiACPIMemoryNVS,
+                    BufferSize + ImageContext.SectionAlignment,
+                    &FfsBuffer
+                    );
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)FfsBuffer;
+    //
+    // Align buffer on section boundry
+    //
+    ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
+    ImageContext.ImageAddress &= ~(ImageContext.SectionAlignment - 1);
+    //
+    // Load the image to our new buffer
+    //
+    Status = PeCoffLoaderLoadImage (&ImageContext);
+    if (EFI_ERROR (Status)) {
+      gBS->FreePool (FfsBuffer);
+      return Status;
+    }
+
+    //
+    // Relocate the image in our new buffer
+    //
+    Status = PeCoffLoaderRelocateImage (&ImageContext);
+
+    if (EFI_ERROR (Status)) {
+      PeCoffLoaderUnloadImage (&ImageContext);
+      gBS->FreePool (FfsBuffer);
+      return Status;
+    }
+    //
+    // Flush the instruction cache so the image data is written before we execute it
+    //
+    InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
+    Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)(ImageContext.EntryPoint)) ((EFI_HANDLE)(UINTN)(ImageContext.ImageAddress), SystemTable);
+    if (EFI_ERROR (Status)) {
+      gBS->FreePool (FfsBuffer);
+      return Status;
+    }
+    //
+    // Additional step for BootScriptThunk integrity
+    //
+
+    //
+    // Allocate BootScriptThunkData
+    //
+    BootScriptThunkData = AllocatePool (sizeof (BOOT_SCRIPT_THUNK_DATA));
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    BootScriptThunkData->BootScriptThunkBase   = ImageContext.ImageAddress;
+    BootScriptThunkData->BootScriptThunkLength = ImageContext.ImageSize;
+    //
+    // Set BootScriptThunkData
+    //
+    PcdSet64 (BootScriptThunkDataPtr, (UINT64)(UINTN)BootScriptThunkData); 
+    return EFI_SUCCESS;
+  } else {
+    //
+    // the entry point is invoked after reloading. following code only run in  ACPI NVS
+    //
+
+    //
+    // Locate and cache PI S3 Save State Protocol.
+    //
+    Status = gBS->LocateProtocol (
+                    &gEfiS3SaveStateProtocolGuid, 
+                    NULL, 
+                    (VOID **) &mS3SaveState
+                    );
+    ASSERT_EFI_ERROR (Status);
+
+    return gBS->InstallProtocolInterface (
                   &mHandle,
                   &gEfiBootScriptSaveProtocolGuid,
                   EFI_NATIVE_INTERFACE,
                   &mS3ScriptSave
                   );
-
+  }
 }
 
 
