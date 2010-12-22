@@ -307,9 +307,11 @@ typedef union {
   ///
   EFI_SMI_CPU_SAVE_STATE     Ia32SaveState;
   ///
+  /// Note: Inconsistency with the Framework SMM CIS spec - Itanium save state not included.
+  ///
   /// The processor save-state information for Itanium processors.
   ///
-  EFI_PMI_SYSTEM_CONTEXT     ItaniumSaveState;
+  /// EFI_PMI_SYSTEM_CONTEXT ItaniumSaveState;
 } EFI_SMM_CPU_SAVE_STATE;
 
 ///
