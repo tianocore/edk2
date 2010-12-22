@@ -19,7 +19,7 @@
 
 /**
   Pass in a pointer to an ARM MOVT or MOVW immediate instruciton and 
-  return the immediate data encoded in the instruction
+  return the immediate data encoded in the instruction.
 
   @param  Instruction   Pointer to ARM MOVT or MOVW immediate instruction
 
@@ -45,7 +45,7 @@ ThumbMovtImmediateAddress (
   //         imm8 -> Bit7:Bit0
   Address  = (UINT16)(Movt & 0x000000ff);         // imm8
   Address |= (UINT16)((Movt >> 4) &  0x0000f700); // imm4 imm3
-  Address |= ((Movt & BIT26) ? BIT11 : 0);        // i
+  Address |= (((Movt & BIT26) != 0) ? BIT11 : 0); // i
   return Address;
 }
 
@@ -82,7 +82,7 @@ ThumbMovtImmediatePatch (
 
 /**
   Pass in a pointer to an ARM MOVW/MOVT instruciton pair and 
-  return the immediate data encoded in the two` instruction
+  return the immediate data encoded in the two` instruction.
 
   @param  Instructions  Pointer to ARM MOVW/MOVT insturction pair
 
