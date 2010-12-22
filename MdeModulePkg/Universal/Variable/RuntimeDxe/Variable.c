@@ -1363,34 +1363,33 @@ UpdateVariable (
   VARIABLE_STORE_HEADER               *VariableStoreHeader;
   UINTN                               CacheOffset;
 
-  if (CacheVariable->Volatile) {
+  if ((mVariableModuleGlobal->FvbInstance == NULL) && ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0)) {
+    //
+    // The FVB protocol is not ready. Trying to update NV variable prior to the installation
+    // of EFI_VARIABLE_WRITE_ARCH_PROTOCOL.
+    //
+    return EFI_NOT_AVAILABLE_YET;     
+  }
+
+  if ((CacheVariable->CurrPtr == NULL) || CacheVariable->Volatile) {
     Variable = CacheVariable;
   } else {
-    if (mVariableModuleGlobal->FvbInstance == NULL) {
-      //
-      // Trying to update NV variable prior to the installation of EFI_VARIABLE_WRITE_ARCH_PROTOCOL
-      //
-      return EFI_NOT_AVAILABLE_YET;
-    }
-    
     //
+    // Update/Delete existing NV variable.
     // CacheVariable points to the variable in the memory copy of Flash area
     // Now let Variable points to the same variable in Flash area.
     //
+    ASSERT ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0);
     VariableStoreHeader  = (VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
     Variable = &NvVariable;    
     Variable->StartPtr = GetStartPointer (VariableStoreHeader);
     Variable->EndPtr   = GetEndPointer (VariableStoreHeader);
-    if (CacheVariable->CurrPtr == NULL) {
-      Variable->CurrPtr = NULL;
-    } else {
-      Variable->CurrPtr = (VARIABLE_HEADER *)((UINTN)Variable->StartPtr + ((UINTN)CacheVariable->CurrPtr - (UINTN)CacheVariable->StartPtr));
-    }
-    Variable->Volatile  = FALSE;
-  }
-  
-  Fvb               = mVariableModuleGlobal->FvbInstance;
-  Reclaimed         = FALSE;
+    Variable->CurrPtr  = (VARIABLE_HEADER *)((UINTN)Variable->StartPtr + ((UINTN)CacheVariable->CurrPtr - (UINTN)CacheVariable->StartPtr));
+    Variable->Volatile = FALSE;
+  } 
+
+  Fvb       = mVariableModuleGlobal->FvbInstance;
+  Reclaimed = FALSE;
 
   if (Variable->CurrPtr != NULL) {
     //
