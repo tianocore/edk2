@@ -2412,6 +2412,8 @@ UiDisplayMenu (
             //
             Repaint = TRUE;
             NewLine = TRUE;
+          } else {
+            Selection->Action = UI_ACTION_REFRESH_FORM;
           }
           if (OptionString != NULL) {
             FreePool (OptionString);
