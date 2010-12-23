@@ -249,10 +249,6 @@
   #  DUET platform requires the token to be TRUE.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|FALSE|BOOLEAN|0x00010047
   
-  ## If TRUE, the variable services are provided in DXE_SMM. The SMM driver can use SMM variable protocol 
-  #  to access variable. Otherwise the variable services are provided in DXE_RUNTIME.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSmmVariableEnable|TRUE|BOOLEAN|0x00010048
-
   ## If TRUE, HiiImageProtocol will be installed.
   #  FALSE is for size reduction.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol|TRUE|BOOLEAN|0x00010100
