@@ -910,9 +910,6 @@ DriverCallback (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Type == EFI_IFR_TYPE_STRING) && (Value->string == 0)) {
-    return EFI_INVALID_PARAMETER;
-  }
 
   Status = EFI_SUCCESS;
   PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
@@ -1166,6 +1163,15 @@ DriverCallback (
     break;
 
   case 0x2000:
+    //
+    // Only used to update the state.
+    //
+    if ((Type == EFI_IFR_TYPE_STRING) && (Value->string == 0) && 
+      (PrivateData->PasswordState == BROWSER_STATE_SET_PASSWORD)) {
+      PrivateData->PasswordState = BROWSER_STATE_VALIDATE_PASSWORD;
+      return EFI_INVALID_PARAMETER;
+    }
+
     //
     // When try to set a new password, user will be chanlleged with old password.
     // The Callback is responsible for validating old password input by user,

@@ -285,6 +285,9 @@ formset
               key      = 0x1236,
               minsize  = 6,
               maxsize  = 40,
+              inconsistentif prompt = STRING_TOKEN(STR_STRING_CHECK_ERROR_POPUP),
+                pushthis != stringref(STRING_TOKEN(STR_STRING_CHECK))
+              endif
     endstring;
 
     //

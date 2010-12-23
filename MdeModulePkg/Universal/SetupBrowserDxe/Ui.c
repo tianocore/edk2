@@ -341,7 +341,6 @@ RefreshForm (
   UI_MENU_SELECTION               *Selection;
   FORM_BROWSER_STATEMENT          *Question;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
-  EFI_HII_VALUE                   *HiiValue;
   EFI_BROWSER_ACTION_REQUEST      ActionRequest;
 
   if (gMenuRefreshHead != NULL) {
@@ -384,31 +383,14 @@ RefreshForm (
       ConfigAccess = Selection->FormSet->ConfigAccess;
       if (((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) && (ConfigAccess != NULL)) {
         ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-
-        HiiValue = &Question->HiiValue;
-        if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
-          //
-          // Create String in HII database for Configuration Driver to retrieve
-          //
-          HiiValue->Value.string = NewString ((CHAR16 *) Question->BufferValue, Selection->FormSet->HiiHandle);
-        }
-
         Status = ConfigAccess->Callback (
                                  ConfigAccess,
                                  EFI_BROWSER_ACTION_CHANGING,
                                  Question->QuestionId,
-                                 HiiValue->Type,
-                                 &HiiValue->Value,
+                                 Question->HiiValue.Type,
+                                 &Question->HiiValue.Value,
                                  &ActionRequest
                                  );
-
-        if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
-          //
-          // Clean the String in HII Database
-          //
-          DeleteString (HiiValue->Value.string, Selection->FormSet->HiiHandle);
-        }
-
         if (!EFI_ERROR (Status)) {
           switch (ActionRequest) {
           case EFI_BROWSER_ACTION_REQUEST_RESET:

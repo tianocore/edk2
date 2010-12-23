@@ -1103,12 +1103,7 @@ SetupBrowser (
 
         HiiValue = &Statement->HiiValue;
         TypeValue = &HiiValue->Value;
-        if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
-          //
-          // Create String in HII database for Configuration Driver to retrieve
-          //
-          HiiValue->Value.string = NewString ((CHAR16 *) Statement->BufferValue, Selection->FormSet->HiiHandle);
-        } else if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
+        if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
           //
           // For OrderedList, passing in the value buffer to Callback()
           //
@@ -1123,13 +1118,6 @@ SetupBrowser (
                                  TypeValue,
                                  &ActionRequest
                                  );
-
-        if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
-          //
-          // Clean the String in HII Database
-          //
-          DeleteString (HiiValue->Value.string, Selection->FormSet->HiiHandle);
-        }
 
         if (!EFI_ERROR (Status)) {
           switch (ActionRequest) {

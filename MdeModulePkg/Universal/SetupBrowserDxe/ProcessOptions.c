@@ -302,9 +302,8 @@ PasswordCallback (
   EFI_STATUS                      Status;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
   EFI_BROWSER_ACTION_REQUEST      ActionRequest;
-  EFI_HII_VALUE                   *QuestionValue;
+  EFI_IFR_TYPE_VALUE              IfrTypeValue;
 
-  QuestionValue = &MenuOption->ThisTag->HiiValue;
   ConfigAccess = Selection->FormSet->ConfigAccess;
   if (ConfigAccess == NULL) {
     return EFI_UNSUPPORTED;
@@ -314,9 +313,9 @@ PasswordCallback (
   // Prepare password string in HII database
   //
   if (String != NULL) {
-    QuestionValue->Value.string = NewString (String, Selection->FormSet->HiiHandle);
+    IfrTypeValue.string = NewString (String, Selection->FormSet->HiiHandle);
   } else {
-    QuestionValue->Value.string = 0;
+    IfrTypeValue.string = 0;
   }
 
   //
@@ -326,8 +325,8 @@ PasswordCallback (
                            ConfigAccess,
                            EFI_BROWSER_ACTION_CHANGING,
                            MenuOption->ThisTag->QuestionId,
-                           QuestionValue->Type,
-                           &QuestionValue->Value,
+                           MenuOption->ThisTag->HiiValue.Type,
+                           &IfrTypeValue,
                            &ActionRequest
                            );
 
@@ -335,7 +334,7 @@ PasswordCallback (
   // Remove password string from HII database
   //
   if (String != NULL) {
-    DeleteString (QuestionValue->Value.string, Selection->FormSet->HiiHandle);
+    DeleteString (IfrTypeValue.string, Selection->FormSet->HiiHandle);
   }
 
   return Status;
@@ -402,12 +401,14 @@ ProcessOptions (
   UINTN                           Index2;
   UINT8                           *ValueArray;
   UINT8                           ValueType;
+  EFI_STRING_ID                   StringId;
 
   Status        = EFI_SUCCESS;
 
   StringPtr     = NULL;
   Character[1]  = L'\0';
   *OptionString = NULL;
+  StringId      = 0;
 
   ZeroMem (FormattedNumber, 21 * sizeof (CHAR16));
   BufferSize = (gOptionBlockWidth + 1) * 2 * gScreenDimensions.BottomRow;
@@ -742,10 +743,16 @@ ProcessOptions (
 
       Status = ReadString (MenuOption, gPromptForData, StringPtr);
       if (!EFI_ERROR (Status)) {
-        CopyMem (Question->BufferValue, StringPtr, Maximum * sizeof (CHAR16));
-        SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
+        HiiSetString(Selection->FormSet->HiiHandle, Question->HiiValue.Value.string, StringPtr, NULL);
+        Status = ValidateQuestion(Selection->FormSet, Selection->Form, Question, EFI_HII_EXPRESSION_INCONSISTENT_IF);
+        if (EFI_ERROR (Status)) {
+          HiiSetString(Selection->FormSet->HiiHandle, Question->HiiValue.Value.string, (CHAR16*)Question->BufferValue, NULL);
+        } else {
+          CopyMem (Question->BufferValue, StringPtr, Maximum * sizeof (CHAR16));
+          SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
 
-        UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
+          UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
+        }
       }
 
       FreePool (StringPtr);
@@ -890,13 +897,47 @@ ProcessOptions (
       //
       if (StrCmp (StringPtr, TempString) == 0) {
         //
-        // Two password match, send it to Configuration Driver
+        // Prepare the  Question->HiiValue.Value.string for ValidateQuestion use.
         //
-        if ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) {
-          PasswordCallback (Selection, MenuOption, StringPtr);
+        if((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) {
+          StringId = Question->HiiValue.Value.string;
+          Question->HiiValue.Value.string = NewString (StringPtr, Selection->FormSet->HiiHandle);
         } else {
-          CopyMem (Question->BufferValue, StringPtr, Maximum * sizeof (CHAR16));
-          SetQuestionValue (Selection->FormSet, Selection->Form, Question, FALSE);
+          HiiSetString(Selection->FormSet->HiiHandle, Question->HiiValue.Value.string, StringPtr, NULL);
+        }
+        
+        Status = ValidateQuestion(Selection->FormSet, Selection->Form, Question, EFI_HII_EXPRESSION_INCONSISTENT_IF);
+
+        //
+        //  Researve the Question->HiiValue.Value.string.
+        //
+        if((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) {
+          DeleteString(Question->HiiValue.Value.string, Selection->FormSet->HiiHandle);
+          Question->HiiValue.Value.string = StringId;
+        }   
+        
+        if (EFI_ERROR (Status)) {
+          //
+          // Reset state machine for interactive password
+          //
+          if ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) {
+            PasswordCallback (Selection, MenuOption, NULL);
+          } else {
+            //
+            // Researve the Question->HiiValue.Value.string.
+            //
+            HiiSetString(Selection->FormSet->HiiHandle, Question->HiiValue.Value.string, (CHAR16*)Question->BufferValue, NULL);            
+          }
+        } else {
+          //
+          // Two password match, send it to Configuration Driver
+          //
+          if ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) {
+            PasswordCallback (Selection, MenuOption, StringPtr);
+          } else {
+            CopyMem (Question->BufferValue, StringPtr, Maximum * sizeof (CHAR16));
+            SetQuestionValue (Selection->FormSet, Selection->Form, Question, FALSE);
+          }
         }
       } else {
         //

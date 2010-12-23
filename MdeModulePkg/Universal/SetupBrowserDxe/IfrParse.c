@@ -542,11 +542,13 @@ DestroyStorage (
 /**
   Free resources of a Statement.
 
+  @param  FormSet                Pointer of the FormSet
   @param  Statement              Pointer of the Statement
 
 **/
 VOID
 DestroyStatement (
+  IN     FORM_BROWSER_FORMSET    *FormSet,
   IN OUT FORM_BROWSER_STATEMENT  *Statement
   )
 {
@@ -608,18 +610,23 @@ DestroyStatement (
   if (Statement->BufferValue != NULL) {
     FreePool (Statement->BufferValue);
   }
+  if (Statement->Operand == EFI_IFR_STRING_OP || Statement->Operand == EFI_IFR_PASSWORD_OP) {
+    DeleteString(Statement->HiiValue.Value.string, FormSet->HiiHandle);
+  }
 }
 
 
 /**
   Free resources of a Form.
 
+  @param  FormSet                Pointer of the FormSet
   @param  Form                   Pointer of the Form.
 
 **/
 VOID
 DestroyForm (
-  IN OUT FORM_BROWSER_FORM  *Form
+  IN     FORM_BROWSER_FORMSET  *FormSet,
+  IN OUT FORM_BROWSER_FORM     *Form
   )
 {
   LIST_ENTRY              *Link;
@@ -645,7 +652,7 @@ DestroyForm (
     Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
     RemoveEntryList (&Statement->Link);
 
-    DestroyStatement (Statement);
+    DestroyStatement (FormSet, Statement);
   }
 
   //
@@ -731,7 +738,7 @@ DestroyFormSet (
       Form = FORM_BROWSER_FORM_FROM_LINK (Link);
       RemoveEntryList (&Form->Link);
 
-      DestroyForm (Form);
+      DestroyForm (FormSet, Form);
     }
   }
 
@@ -1580,6 +1587,7 @@ ParseOpCodes (
 
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_STRING;
       CurrentStatement->BufferValue = AllocateZeroPool (CurrentStatement->StorageWidth + sizeof (CHAR16));
+      CurrentStatement->HiiValue.Value.string = NewString ((CHAR16*) CurrentStatement->BufferValue, FormSet->HiiHandle);
 
       InitializeRequestElement (FormSet, CurrentStatement);
       break;
@@ -1598,6 +1606,7 @@ ParseOpCodes (
 
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_STRING;
       CurrentStatement->BufferValue = AllocateZeroPool ((CurrentStatement->StorageWidth + sizeof (CHAR16)));
+      CurrentStatement->HiiValue.Value.string = NewString ((CHAR16*) CurrentStatement->BufferValue, FormSet->HiiHandle);
 
       InitializeRequestElement (FormSet, CurrentStatement);
       break;
