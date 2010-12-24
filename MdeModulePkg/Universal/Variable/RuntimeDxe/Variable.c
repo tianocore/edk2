@@ -1379,7 +1379,6 @@ UpdateVariable (
     // CacheVariable points to the variable in the memory copy of Flash area
     // Now let Variable points to the same variable in Flash area.
     //
-    ASSERT ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0);
     VariableStoreHeader  = (VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
     Variable = &NvVariable;    
     Variable->StartPtr = GetStartPointer (VariableStoreHeader);
