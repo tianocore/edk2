@@ -111,9 +111,9 @@ ASM_PFX(AsmExecute32BitCode):
 
 Compatible:
     # reload DS/ES/SS to make sure they are correct referred to current GDT
-    movs    %ax, %ds
-    movs    %ax, %es
-    movs    %ax, %ss
+    movw    %ax, %ds
+    movw    %ax, %es
+    movw    %ax, %ss
 
     #
     # Disable paging
