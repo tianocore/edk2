@@ -2,7 +2,7 @@
 
     Usb Bus Driver Binding and Bus IO Protocol.
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -680,7 +680,7 @@ UsbIoGetEndpointDescriptor (
 
   @param  This                   The USB IO instance.
   @param  LangIDTable            The table to return the language IDs.
-  @param  TableSize              The number of supported languanges.
+  @param  TableSize              The size, in bytes, of the table LangIDTable.
 
   @retval EFI_SUCCESS            The language ID is return.
 
@@ -703,7 +703,7 @@ UsbIoGetSupportedLanguages (
   Dev           = UsbIf->Device;
 
   *LangIDTable  = Dev->LangId;
-  *TableSize    = Dev->TotalLangId;
+  *TableSize    = (UINT16) (Dev->TotalLangId * sizeof (UINT16));
 
   gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;

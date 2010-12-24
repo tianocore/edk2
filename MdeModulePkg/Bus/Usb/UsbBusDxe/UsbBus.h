@@ -596,7 +596,7 @@ UsbIoGetEndpointDescriptor (
 
   @param  This                   The USB IO instance.
   @param  LangIDTable            The table to return the language IDs.
-  @param  TableSize              The number of supported languanges.
+  @param  TableSize              The size, in bytes, of the table LangIDTable.
 
   @retval EFI_SUCCESS            The language ID is return.
 

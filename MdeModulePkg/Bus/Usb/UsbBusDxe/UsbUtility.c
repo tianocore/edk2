@@ -2,7 +2,7 @@
 
     Wrapper function for usb host controller interface.
 
-Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -950,12 +950,9 @@ MatchUsbClass (
       (UsbClassDevicePathPtr->ProductId == 0xffff || UsbClassDevicePathPtr->ProductId == DevDesc->IdProduct)) {
 
     //
-    // If class or subclass or protocol is 0, the counterparts in interface should be checked.
+    // If Class in Device Descriptor is set to 0, the counterparts in interface should be checked.
     //
-    if (DevDesc->DeviceClass == 0 ||
-        DevDesc->DeviceSubClass == 0 ||
-        DevDesc->DeviceProtocol == 0) {
-
+    if (DevDesc->DeviceClass == 0) {
       if ((UsbClassDevicePathPtr->DeviceClass == ActIfDesc->InterfaceClass ||
                                           UsbClassDevicePathPtr->DeviceClass == 0xff) &&
           (UsbClassDevicePathPtr->DeviceSubClass == ActIfDesc->InterfaceSubClass ||
@@ -1001,6 +998,10 @@ MatchUsbWwid (
   EFI_USB_DEVICE_DESCRIPTOR     *DevDesc;
   EFI_USB_STRING_DESCRIPTOR     *StrDesc;
   UINT16                        *SnString;
+  UINT16                        Index;
+  CHAR16                        *CompareStr;
+  UINTN                         CompareLen;
+  UINTN                         Length;
 
   if ((UsbWWIDDevicePathPtr->Header.Type != MESSAGING_DEVICE_PATH) ||
      (UsbWWIDDevicePathPtr->Header.SubType != MSG_USB_WWID_DP )){
@@ -1012,27 +1013,55 @@ MatchUsbWwid (
   ASSERT (IfDesc->ActiveIndex < USB_MAX_INTERFACE_SETTING);
   ActIfDesc    = &(IfDesc->Settings[IfDesc->ActiveIndex]->Desc);
   DevDesc      = &(UsbIf->Device->DevDesc->Desc);
-  StrDesc      = UsbGetOneString (UsbIf->Device, DevDesc->StrSerialNumber, USB_US_LAND_ID);
   SnString     = (UINT16 *) ((UINT8 *)UsbWWIDDevicePathPtr + 10);
 
   //
-  //In addtion, hub interface is always matched for this policy.
+  // In addition, Hub interface is always matched for this policy.
   //
   if ((ActIfDesc->InterfaceClass == USB_HUB_CLASS_CODE) &&
       (ActIfDesc->InterfaceSubClass == USB_HUB_SUBCLASS_CODE)) {
     return TRUE;
   }
-  //
-  // If connect wwid policy, determine the objective device by the serial number of
-  // device descriptor.
-  // Get serial number index from device descriptor, then get serial number by index
-  // and land id, compare the serial number with wwid device path node at last
-  //
-  // BugBug: only check serial number here, should check Interface Number, Device Vendor Id, Device Product Id  in later version
-  //
-  if (StrDesc != NULL && (StrnCmp (StrDesc->String, SnString, StrDesc->Length) == 0)) {
 
-    return TRUE;
+  //
+  // Check Vendor Id, Product Id and Interface Number.
+  //
+  if ((DevDesc->IdVendor != UsbWWIDDevicePathPtr->VendorId) ||
+      (DevDesc->IdProduct != UsbWWIDDevicePathPtr->ProductId) ||
+      (ActIfDesc->InterfaceNumber != UsbWWIDDevicePathPtr->InterfaceNumber)) {
+    return FALSE;
+  }
+
+  //
+  // Check SerialNumber.
+  //
+  if (DevDesc->StrSerialNumber == 0) {
+    return FALSE;
+  }
+
+  //
+  // Serial number in USB WWID device path is the last 64-or-less UTF-16 characters.
+  //
+  CompareStr = (CHAR16 *) (UINTN) (UsbWWIDDevicePathPtr + 1);
+  CompareLen = (DevicePathNodeLength (UsbWWIDDevicePathPtr) - sizeof (USB_WWID_DEVICE_PATH)) / sizeof (CHAR16);
+  if (CompareStr[CompareLen - 1] == L'\0') {
+    CompareLen--;
+  }
+
+  //
+  // Compare serial number in each supported language.
+  //
+  for (Index = 0; Index < UsbIf->Device->TotalLangId; Index++) {
+    StrDesc = UsbGetOneString (UsbIf->Device, DevDesc->StrSerialNumber, UsbIf->Device->LangId[Index]);
+    if (StrDesc == NULL) {
+      continue;
+    }
+
+    Length = (StrDesc->Length - 2) / sizeof (CHAR16);
+    if ((Length >= CompareLen) &&
+        (CompareMem (StrDesc->String + Length - CompareLen, CompareStr, CompareLen * sizeof (CHAR16)) == 0)) {
+      return TRUE;
+    }
   }
 
   return FALSE;
