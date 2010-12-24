@@ -158,6 +158,421 @@ IsBootOptionValidNVVarialbe (
 
   return Valid;
 }
+
+/**
+  Check whether a USB device match the specified USB Class device path. This
+  function follows "Load Option Processing" behavior in UEFI specification.
+
+  @param UsbIo       USB I/O protocol associated with the USB device.
+  @param UsbClass    The USB Class device path to match.
+
+  @retval TRUE       The USB device match the USB Class device path.
+  @retval FALSE      The USB device does not match the USB Class device path.
+
+**/
+BOOLEAN
+BdsMatchUsbClass (
+  IN EFI_USB_IO_PROTOCOL        *UsbIo,
+  IN USB_CLASS_DEVICE_PATH      *UsbClass
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_USB_DEVICE_DESCRIPTOR     DevDesc;
+  EFI_USB_INTERFACE_DESCRIPTOR  IfDesc;
+  UINT8                         DeviceClass;
+  UINT8                         DeviceSubClass;
+  UINT8                         DeviceProtocol;
+
+  if ((DevicePathType (UsbClass) != MESSAGING_DEVICE_PATH) ||
+      (DevicePathSubType (UsbClass) != MSG_USB_CLASS_DP)){
+    return FALSE;
+  }
+
+  //
+  // Check Vendor Id and Product Id.
+  //
+  Status = UsbIo->UsbGetDeviceDescriptor (UsbIo, &DevDesc);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  if ((UsbClass->VendorId != 0xffff) &&
+      (UsbClass->VendorId != DevDesc.IdVendor)) {
+    return FALSE;
+  }
+
+  if ((UsbClass->ProductId != 0xffff) &&
+      (UsbClass->ProductId != DevDesc.IdProduct)) {
+    return FALSE;
+  }
+
+  DeviceClass    = DevDesc.DeviceClass;
+  DeviceSubClass = DevDesc.DeviceSubClass;
+  DeviceProtocol = DevDesc.DeviceProtocol;
+  if (DeviceClass == 0) {
+    //
+    // If Class in Device Descriptor is set to 0, use the Class, SubClass and
+    // Protocol in Interface Descriptor instead.
+    //
+    Status = UsbIo->UsbGetInterfaceDescriptor (UsbIo, &IfDesc);
+    if (EFI_ERROR (Status)) {
+      return FALSE;
+    }
+
+    DeviceClass    = IfDesc.InterfaceClass;
+    DeviceSubClass = IfDesc.InterfaceSubClass;
+    DeviceProtocol = IfDesc.InterfaceProtocol;
+  }
+
+  //
+  // Check Class, SubClass and Protocol.
+  //
+  if ((UsbClass->DeviceClass != 0xff) &&
+      (UsbClass->DeviceClass != DeviceClass)) {
+    return FALSE;
+  }
+
+  if ((UsbClass->DeviceSubClass != 0xff) &&
+      (UsbClass->DeviceSubClass != DeviceSubClass)) {
+    return FALSE;
+  }
+
+  if ((UsbClass->DeviceProtocol != 0xff) &&
+      (UsbClass->DeviceProtocol != DeviceProtocol)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Check whether a USB device match the specified USB WWID device path. This
+  function follows "Load Option Processing" behavior in UEFI specification.
+
+  @param UsbIo       USB I/O protocol associated with the USB device.
+  @param UsbWwid     The USB WWID device path to match.
+
+  @retval TRUE       The USB device match the USB WWID device path.
+  @retval FALSE      The USB device does not match the USB WWID device path.
+
+**/
+BOOLEAN
+BdsMatchUsbWwid (
+  IN EFI_USB_IO_PROTOCOL        *UsbIo,
+  IN USB_WWID_DEVICE_PATH       *UsbWwid
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_USB_DEVICE_DESCRIPTOR    DevDesc;
+  EFI_USB_INTERFACE_DESCRIPTOR IfDesc;
+  UINT16                       *LangIdTable;
+  UINT16                       TableSize;
+  UINT16                       Index;
+  CHAR16                       *CompareStr;
+  UINTN                        CompareLen;
+  CHAR16                       *SerialNumberStr;
+  UINTN                        Length;
+
+  if ((DevicePathType (UsbWwid) != MESSAGING_DEVICE_PATH) ||
+      (DevicePathSubType (UsbWwid) != MSG_USB_WWID_DP )){
+    return FALSE;
+  }
+
+  //
+  // Check Vendor Id and Product Id.
+  //
+  Status = UsbIo->UsbGetDeviceDescriptor (UsbIo, &DevDesc);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+  if ((DevDesc.IdVendor != UsbWwid->VendorId) ||
+      (DevDesc.IdProduct != UsbWwid->ProductId)) {
+    return FALSE;
+  }
+
+  //
+  // Check Interface Number.
+  //
+  Status = UsbIo->UsbGetInterfaceDescriptor (UsbIo, &IfDesc);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+  if (IfDesc.InterfaceNumber != UsbWwid->InterfaceNumber) {
+    return FALSE;
+  }
+
+  //
+  // Check Serial Number.
+  //
+  if (DevDesc.StrSerialNumber == 0) {
+    return FALSE;
+  }
+
+  //
+  // Get all supported languages.
+  //
+  TableSize = 0;
+  LangIdTable = NULL;
+  Status = UsbIo->UsbGetSupportedLanguages (UsbIo, &LangIdTable, &TableSize);
+  if (EFI_ERROR (Status) || (TableSize == 0) || (LangIdTable == NULL)) {
+    return FALSE;
+  }
+
+  //
+  // Serial number in USB WWID device path is the last 64-or-less UTF-16 characters.
+  //
+  CompareStr = (CHAR16 *) (UINTN) (UsbWwid + 1);
+  CompareLen = (DevicePathNodeLength (UsbWwid) - sizeof (USB_WWID_DEVICE_PATH)) / sizeof (CHAR16);
+  if (CompareStr[CompareLen - 1] == L'\0') {
+    CompareLen--;
+  }
+
+  //
+  // Compare serial number in each supported language.
+  //
+  for (Index = 0; Index < TableSize / sizeof (UINT16); Index++) {
+    SerialNumberStr = NULL;
+    Status = UsbIo->UsbGetStringDescriptor (
+                      UsbIo,
+                      LangIdTable[Index],
+                      DevDesc.StrSerialNumber,
+                      &SerialNumberStr
+                      );
+    if (EFI_ERROR (Status) || (SerialNumberStr == NULL)) {
+      continue;
+    }
+
+    Length = StrLen (SerialNumberStr);
+    if ((Length >= CompareLen) &&
+        (CompareMem (SerialNumberStr + Length - CompareLen, CompareStr, CompareLen * sizeof (CHAR16)) == 0)) {
+      FreePool (SerialNumberStr);
+      return TRUE;
+    }
+
+    FreePool (SerialNumberStr);
+  }
+
+  return FALSE;
+}
+
+/**
+  Find a USB device which match the specified short-form device path start with 
+  USB Class or USB WWID device path. If ParentDevicePath is NULL, this function
+  will search in all USB devices of the platform. If ParentDevicePath is not NULL,
+  this function will only search in its child devices.
+
+  @param ParentDevicePath      The device path of the parent.
+  @param ShortFormDevicePath   The USB Class or USB WWID device path to match.
+
+  @return  The handle of matched USB device, or NULL if not found.
+
+**/
+EFI_HANDLE *
+BdsFindUsbDevice (
+  IN EFI_DEVICE_PATH_PROTOCOL   *ParentDevicePath,
+  IN EFI_DEVICE_PATH_PROTOCOL   *ShortFormDevicePath
+  )
+{
+  EFI_STATUS                Status;
+  UINTN                     UsbIoHandleCount;
+  EFI_HANDLE                *UsbIoHandleBuffer;
+  EFI_DEVICE_PATH_PROTOCOL  *UsbIoDevicePath;
+  EFI_USB_IO_PROTOCOL       *UsbIo;
+  UINTN                     Index;
+  UINTN                     ParentSize;
+  UINTN                     Size;
+  EFI_HANDLE                ReturnHandle;
+
+  //
+  // Get all UsbIo Handles.
+  //
+  UsbIoHandleCount = 0;
+  UsbIoHandleBuffer = NULL;
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiUsbIoProtocolGuid,
+                  NULL,
+                  &UsbIoHandleCount,
+                  &UsbIoHandleBuffer
+                  );
+  if (EFI_ERROR (Status) || (UsbIoHandleCount == 0) || (UsbIoHandleBuffer == NULL)) {
+    return NULL;
+  }
+
+  ReturnHandle = NULL;
+  ParentSize = (ParentDevicePath == NULL) ? 0 : GetDevicePathSize (ParentDevicePath);
+  for (Index = 0; Index < UsbIoHandleCount; Index++) {
+    //
+    // Get the Usb IO interface.
+    //
+    Status = gBS->HandleProtocol(
+                    UsbIoHandleBuffer[Index],
+                    &gEfiUsbIoProtocolGuid,
+                    (VOID **) &UsbIo
+                    );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    if (ParentDevicePath != NULL) {
+      //
+      // Compare starting part of UsbIoHandle's device path with ParentDevicePath.
+      //
+      UsbIoDevicePath = DevicePathFromHandle (UsbIoHandleBuffer[Index]);
+      ASSERT (UsbIoDevicePath != NULL);
+
+      Size = GetDevicePathSize (UsbIoDevicePath);
+      if ((Size < ParentSize) ||
+          (CompareMem (UsbIoDevicePath, ParentDevicePath, ParentSize - END_DEVICE_PATH_LENGTH) != 0)) {
+        continue;
+      }
+    }
+
+    if (BdsMatchUsbClass (UsbIo, (USB_CLASS_DEVICE_PATH *) ShortFormDevicePath) ||
+        BdsMatchUsbWwid (UsbIo, (USB_WWID_DEVICE_PATH *) ShortFormDevicePath)) {
+      ReturnHandle = UsbIoHandleBuffer[Index];
+      break;
+    }
+  }
+
+  FreePool (UsbIoHandleBuffer);
+  return ReturnHandle;
+}
+
+/**
+  Expand USB Class or USB WWID device path node to be full device path of a USB
+  device in platform.
+
+  This function support following 4 cases:
+  1) Boot Option device path starts with a USB Class or USB WWID device path,
+     and there is no Media FilePath device path in the end.
+     In this case, it will follow Removable Media Boot Behavior.
+  2) Boot Option device path starts with a USB Class or USB WWID device path,
+     and ended with Media FilePath device path.
+  3) Boot Option device path starts with a full device path to a USB Host Controller,
+     contains a USB Class or USB WWID device path node, while not ended with Media
+     FilePath device path. In this case, it will follow Removable Media Boot Behavior.
+  4) Boot Option device path starts with a full device path to a USB Host Controller,
+     contains a USB Class or USB WWID device path node, and ended with Media
+     FilePath device path.
+
+  @param  DevicePath    The Boot Option device path.
+
+  @return  The full device path after expanding, or NULL if there is no USB Class
+           or USB WWID device path found, or USB Class or USB WWID device path
+           was found but failed to expand it.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+BdsExpandUsbShortFormDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *FullDevicePath;
+  EFI_HANDLE                *UsbIoHandle;
+  EFI_DEVICE_PATH_PROTOCOL  *UsbIoDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *NextDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *ShortFormDevicePath;
+
+  //
+  // Search for USB Class or USB WWID device path node.
+  //
+  ShortFormDevicePath = NULL;
+  TempDevicePath = DevicePath;
+  while (!IsDevicePathEnd (TempDevicePath)) {
+    if ((DevicePathType (TempDevicePath) == MESSAGING_DEVICE_PATH) &&
+        ((DevicePathSubType (TempDevicePath) == MSG_USB_CLASS_DP) ||
+         (DevicePathSubType (TempDevicePath) == MSG_USB_WWID_DP))) {
+      ShortFormDevicePath = TempDevicePath;
+      break;
+    }
+
+    TempDevicePath = NextDevicePathNode (TempDevicePath);
+  }
+
+  if (ShortFormDevicePath == NULL) {
+    //
+    // No USB Class or USB WWID device path node found, do nothing.
+    //
+    return NULL;
+  }
+
+  if (ShortFormDevicePath == DevicePath) {
+    //
+    // Boot Option device path starts with USB Class or USB WWID device path.
+    //
+    UsbIoHandle = BdsFindUsbDevice (NULL, ShortFormDevicePath);
+    if (UsbIoHandle == NULL) {
+      //
+      // Failed to find a match in existing devices, connect the short form USB
+      // device path and try again.
+      //
+      BdsLibConnectUsbDevByShortFormDP (0xff, ShortFormDevicePath);
+      UsbIoHandle = BdsFindUsbDevice (NULL, ShortFormDevicePath);
+    }
+  } else {
+    //
+    // Boot Option device path contains USB Class or USB WWID device path node.
+    //
+
+    //
+    // Prepare the parent device path for search.
+    //
+    TempDevicePath = DuplicateDevicePath (DevicePath);
+    ASSERT (TempDevicePath != NULL);
+    SetDevicePathEndNode (((UINT8 *) TempDevicePath) + ((UINTN) ShortFormDevicePath - (UINTN) DevicePath));
+
+    //
+    // The USB Host Controller device path is in already in Boot Option device path
+    // and USB Bus driver already support RemainingDevicePath starts with USB
+    // Class or USB WWID device path, so just search in existing USB devices and
+    // doesn't perform ConnectController here.
+    //
+    UsbIoHandle = BdsFindUsbDevice (TempDevicePath, ShortFormDevicePath);
+    FreePool (TempDevicePath);
+  }
+
+  if (UsbIoHandle == NULL) {
+    //
+    // Failed to expand USB Class or USB WWID device path.
+    //
+    return NULL;
+  }
+
+  //
+  // Get device path of the matched USB device.
+  //
+  UsbIoDevicePath = DevicePathFromHandle (UsbIoHandle);
+  ASSERT (UsbIoDevicePath != NULL);
+
+  FullDevicePath = NULL;
+  //
+  // Advance to next device path node to skip the USB Class or USB WWID device path.
+  //
+  NextDevicePath = NextDevicePathNode (ShortFormDevicePath);
+  if (!IsDevicePathEnd (NextDevicePath)) {
+    //
+    // There is remaining device path after USB Class or USB WWID device path
+    // node, append it to the USB device path.
+    //
+    FullDevicePath = AppendDevicePath (UsbIoDevicePath, NextDevicePath);
+
+    //
+    // Connect the full device path, so that Simple File System protocol
+    // could be installed for this USB device.
+    //
+    BdsLibConnectDevicePath (FullDevicePath);
+  } else {
+    //
+    // USB Class or WWID device path is in the end.
+    //
+    FullDevicePath = UsbIoDevicePath;
+  }
+
+  return FullDevicePath;
+}
+
 /**
   Process the boot option follow the UEFI specification and
   special treat the legacy boot option with BBS_DEVICE_PATH.
@@ -222,6 +637,15 @@ BdsLibBootViaBootOption (
       DevicePath = WorkingDevicePath;
     }
   }
+
+  //
+  // Expand USB Class or USB WWID drive path node to full device path.
+  //
+  WorkingDevicePath = BdsExpandUsbShortFormDevicePath (DevicePath);
+  if (WorkingDevicePath != NULL) {
+    DevicePath = WorkingDevicePath;
+  }
+
   //
   // Signal the EVT_SIGNAL_READY_TO_BOOT event
   //
@@ -1882,8 +2306,19 @@ BdsLibIsValidEFIBootOptDevicePathExt (
   // and assume it is ready to boot now
   //
   while (!IsDevicePathEnd (TempDevicePath)) {
-     LastDeviceNode = TempDevicePath;
-     TempDevicePath = NextDevicePathNode (TempDevicePath);
+    //
+    // If there is USB Class or USB WWID device path node, treat it as valid EFI
+    // Boot Option. BdsExpandUsbShortFormDevicePath () will be used to expand it
+    // to full device path.
+    //
+    if ((DevicePathType (TempDevicePath) == MESSAGING_DEVICE_PATH) &&
+        ((DevicePathSubType (TempDevicePath) == MSG_USB_CLASS_DP) ||
+         (DevicePathSubType (TempDevicePath) == MSG_USB_WWID_DP))) {
+      return TRUE;
+    }
+
+    LastDeviceNode = TempDevicePath;
+    TempDevicePath = NextDevicePathNode (TempDevicePath);
   }
   if ((DevicePathType (LastDeviceNode) == MEDIA_DEVICE_PATH) &&
     (DevicePathSubType (LastDeviceNode) == MEDIA_FILEPATH_DP)) {

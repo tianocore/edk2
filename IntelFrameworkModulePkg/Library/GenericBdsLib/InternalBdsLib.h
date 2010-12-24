@@ -40,6 +40,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/UgaDraw.h>
 #include <Protocol/HiiFont.h>
 #include <Protocol/HiiImage.h>
+#include <Protocol/UsbIo.h>
 
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FileInfo.h>
