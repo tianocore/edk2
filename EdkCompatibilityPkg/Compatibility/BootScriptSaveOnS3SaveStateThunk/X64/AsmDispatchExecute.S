@@ -200,11 +200,11 @@ ReloadCS:
     #
     pop     %r9                 # get  CS
     shl     $32, %r9            # rcx[32..47] <- Cs       
-    lea     @F(%rip), %rcx
+    lea     ReturnToLongMode(%rip), %rcx
     orq     %r9, %rcx
     push    %rcx
     retf
-@@:        
+ReturnToLongMode:
     #
     # Reload original DS/ES/SS
     #
