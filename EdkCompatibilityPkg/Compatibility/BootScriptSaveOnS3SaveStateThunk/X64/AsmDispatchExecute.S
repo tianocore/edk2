@@ -107,7 +107,7 @@ ASM_PFX(AsmExecute32BitCode):
     lea     Compatible(%rip), %rdx # assume address < 4G
     orq     %rdx, %rcx
     push    %rcx
-    retf
+    .byte   0xcb                # retf
 
 Compatible:
     # reload DS/ES/SS to make sure they are correct referred to current GDT
@@ -173,7 +173,7 @@ ReturnBack:
     #
     # Reload cs register 
     #   
-    retf
+    .byte   0xcb                # retf
 ReloadCS:   
     #
     # Now we're in Long Mode
@@ -203,7 +203,7 @@ ReloadCS:
     lea     ReturnToLongMode(%rip), %rcx
     orq     %r9, %rcx
     push    %rcx
-    retf
+    .byte   0xcb                # retf
 ReturnToLongMode:
     #
     # Reload original DS/ES/SS
