@@ -69,7 +69,8 @@ SerialPortReadRegister (
   parameter Offset is added to the base address of the 16550 registers that is specified 
   by PcdSerialRegisterBase. 
   
-  @param  Offset  The offset of the 16550 register to read.
+  @param  Offset  The offset of the 16550 register to write.
+  @param  Value   The value to write to the 16550 register specified by Offset.
 
   @return The value written to the 16550 register.
 
