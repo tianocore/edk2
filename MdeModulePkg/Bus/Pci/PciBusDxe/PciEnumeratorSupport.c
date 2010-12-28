@@ -910,9 +910,10 @@ PciSetDeviceAttribute (
                   EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM         |
                   EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE;
 
-    if ((Attributes & EFI_PCI_IO_ATTRIBUTE_IO) != 0) {
-      Attributes |= EFI_PCI_IO_ATTRIBUTE_ISA_MOTHERBOARD_IO;
-      Attributes |= EFI_PCI_IO_ATTRIBUTE_ISA_IO;
+    if (IS_PCI_LPC (&PciIoDevice->Pci)) {
+        Attributes |= EFI_PCI_IO_ATTRIBUTE_ISA_MOTHERBOARD_IO;
+        Attributes |= (mReserveIsaAliases ? EFI_PCI_IO_ATTRIBUTE_ISA_IO : \
+                                            EFI_PCI_IO_ATTRIBUTE_ISA_IO_16);
     }
 
     if (IS_PCI_BRIDGE (&PciIoDevice->Pci) || IS_CARDBUS_BRIDGE (&PciIoDevice->Pci)) {
@@ -921,6 +922,14 @@ PciSetDeviceAttribute (
       //
       Attributes |= EFI_PCI_IO_ATTRIBUTE_IDE_SECONDARY_IO;
       Attributes |= EFI_PCI_IO_ATTRIBUTE_IDE_PRIMARY_IO;
+
+      if (mReserveVgaAliases) {
+        Attributes &= ~(UINT64)(EFI_PCI_IO_ATTRIBUTE_VGA_IO_16 | \
+                                EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16);
+      } else {
+        Attributes &= ~(UINT64)(EFI_PCI_IO_ATTRIBUTE_VGA_IO | \
+                                EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO);
+      }
     } else {
 
       if (IS_PCI_IDE (&PciIoDevice->Pci)) {
@@ -930,7 +939,8 @@ PciSetDeviceAttribute (
 
       if (IS_PCI_VGA (&PciIoDevice->Pci)) {
         Attributes |= EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY;
-        Attributes |= EFI_PCI_IO_ATTRIBUTE_VGA_IO;
+        Attributes |= (mReserveVgaAliases ? EFI_PCI_IO_ATTRIBUTE_VGA_IO : \
+                                            EFI_PCI_IO_ATTRIBUTE_VGA_IO_16);
       }
     }
 

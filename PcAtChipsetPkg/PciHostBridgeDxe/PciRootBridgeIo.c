@@ -674,8 +674,11 @@ RootBridgeConstructor (
 
   PrivateData->RootBridgeAttrib = Attri;
   
-  PrivateData->Attributes  = 0;
-  PrivateData->Supports    = 0;
+  PrivateData->Supports    = EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO | EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO | \
+                             EFI_PCI_ATTRIBUTE_ISA_IO_16 | EFI_PCI_ATTRIBUTE_ISA_MOTHERBOARD_IO | \
+                             EFI_PCI_ATTRIBUTE_VGA_MEMORY | \
+                             EFI_PCI_ATTRIBUTE_VGA_IO_16  | EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
+  PrivateData->Attributes  = PrivateData->Supports;
 
   Protocol->ParentHandle   = HostBridgeHandle;
   

@@ -11,7 +11,7 @@
   documentation on UGA for details on how to write a UGA driver that is able
   to function both in the EFI pre-boot environment and from the OS runtime.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -233,6 +233,7 @@ CirrusLogic5430ControllerDriverStart (
   BOOLEAN                         PciAttributesSaved;
   EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
   ACPI_ADR_DEVICE_PATH            AcpiDeviceNode;
+  UINT64                          Supports;
 
   PciAttributesSaved = FALSE;
   //
@@ -266,6 +267,25 @@ CirrusLogic5430ControllerDriverStart (
   }
 
   //
+  // Get supported PCI attributes
+  //
+  Status = Private->PciIo->Attributes (
+                             Private->PciIo,
+                             EfiPciIoAttributeOperationSupported,
+                             0,
+                             &Supports
+                             );
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
+  Supports &= (EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16);
+  if (Supports == 0 || Supports == (EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16)) {
+    Status = EFI_UNSUPPORTED;
+    goto Error;
+  }  
+
+  //
   // Save original PCI attributes
   //
   Status = Private->PciIo->Attributes (
@@ -281,11 +301,11 @@ CirrusLogic5430ControllerDriverStart (
   PciAttributesSaved = TRUE;
 
   Status = Private->PciIo->Attributes (
-                            Private->PciIo,
-                            EfiPciIoAttributeOperationEnable,
-                            EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | EFI_PCI_IO_ATTRIBUTE_VGA_IO,
-                            NULL
-                            );
+                             Private->PciIo,
+                             EfiPciIoAttributeOperationEnable,
+                             EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | Supports,
+                             NULL
+                             );
   if (EFI_ERROR (Status)) {
     goto Error;
   }

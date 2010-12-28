@@ -14,6 +14,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PciBus.h"
 
+//
+// The default policy for the PCI bus driver is NOT to reserve I/O ranges for both ISA aliases and VGA aliases.
+//
+BOOLEAN mReserveIsaAliases = FALSE;
+BOOLEAN mReserveVgaAliases = FALSE;
+BOOLEAN mPolicyDetermined  = FALSE;
+
 /**
   The function is used to skip VGA range.
 
@@ -188,46 +195,37 @@ CalculateApertureIo16 (
   LIST_ENTRY              *CurrentLink;
   PCI_RESOURCE_NODE       *Node;
   UINT64                  Offset;
-  BOOLEAN                 IsaEnable;
-  BOOLEAN                 VGAEnable;
   EFI_PCI_PLATFORM_POLICY PciPolicy;
 
-  //
-  // Always assume there is ISA device and VGA device on the platform
-  // will be customized later
-  //
-  IsaEnable = FALSE;
-  VGAEnable = FALSE;
+  if (!mPolicyDetermined) {
+    //
+    // Check PciPlatform policy
+    //
+    Status = EFI_NOT_FOUND;
+    PciPolicy = 0;
+    if (gPciPlatformProtocol != NULL) {
+      Status = gPciPlatformProtocol->GetPlatformPolicy (
+                                       gPciPlatformProtocol,
+                                       &PciPolicy
+                                       );
+    }
 
-  //
-  // Check PciPlatform policy
-  //
-  if (gPciPlatformProtocol != NULL) {
-    Status = gPciPlatformProtocol->GetPlatformPolicy (
-                                     gPciPlatformProtocol,
-                                     &PciPolicy
-                                     );
+    if (EFI_ERROR (Status) && gPciOverrideProtocol != NULL) {
+      Status = gPciOverrideProtocol->GetPlatformPolicy (
+                                       gPciOverrideProtocol,
+                                       &PciPolicy
+                                       );
+    }
+
     if (!EFI_ERROR (Status)) {
       if ((PciPolicy & EFI_RESERVE_ISA_IO_ALIAS) != 0) {
-        IsaEnable = TRUE;
+        mReserveIsaAliases = TRUE;
       }
       if ((PciPolicy & EFI_RESERVE_VGA_IO_ALIAS) != 0) {
-        VGAEnable = TRUE;
+        mReserveVgaAliases = TRUE;
       }
     }
-  } else if (gPciOverrideProtocol != NULL) {
-    Status = gPciOverrideProtocol->GetPlatformPolicy (
-                                     gPciOverrideProtocol,
-                                     &PciPolicy
-                                     );
-    if (!EFI_ERROR (Status)) {
-      if ((PciPolicy & EFI_RESERVE_ISA_IO_ALIAS) != 0) {
-        IsaEnable = TRUE;
-      }
-      if ((PciPolicy & EFI_RESERVE_VGA_IO_ALIAS) != 0) {
-        VGAEnable = TRUE;
-      }
-    }
+    mPolicyDetermined = TRUE;
   }
 
   Aperture = 0;
@@ -261,13 +259,13 @@ CalculateApertureIo16 (
     // If both of them are enabled, then the IO resource would
     // become too limited to meet the requirement of most of devices.
     //
-    if (IsaEnable || VGAEnable) {
+    if (mReserveIsaAliases || mReserveVgaAliases) {
       if (!IS_PCI_BRIDGE (&(Node->PciDev->Pci)) && !IS_CARDBUS_BRIDGE (&(Node->PciDev->Pci))) {
         //
         // Check if there is need to support ISA/VGA decoding
         // If so, we need to avoid isa/vga aliasing range
         //
-        if (IsaEnable) {
+        if (mReserveIsaAliases) {
           SkipIsaAliasAperture (
             &Aperture,
             Node->Length
@@ -276,7 +274,7 @@ CalculateApertureIo16 (
           if (Offset != 0) {
             Aperture = Aperture + (Node->Alignment + 1) - Offset;
           }
-        } else if (VGAEnable) {
+        } else if (mReserveVgaAliases) {
           SkipVGAAperture (
             &Aperture,
             Node->Length

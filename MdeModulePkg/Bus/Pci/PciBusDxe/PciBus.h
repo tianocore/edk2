@@ -309,8 +309,8 @@ extern UINT64                                       gAllOne;
 extern UINT64                                       gAllZero;
 extern EFI_PCI_PLATFORM_PROTOCOL                    *gPciPlatformProtocol;
 extern EFI_PCI_OVERRIDE_PROTOCOL                    *gPciOverrideProtocol;
-
-
+extern BOOLEAN                                      mReserveIsaAliases;
+extern BOOLEAN                                      mReserveVgaAliases;
 
 /**
   Macro that checks whether device is a GFX device.

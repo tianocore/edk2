@@ -1124,109 +1124,6 @@ GetProposedResources(
 }
 
 /**
-  Update attribute for PCI root bridge for specifc device.
-
-  @param RootBridge      Point to PCI root bridge.
-  @param PciAddress      The specific device PCI address
-**/
-VOID
-UpdateRootBridgeAttributes (
-  IN  PCI_ROOT_BRIDGE_INSTANCE                     *RootBridge,
-  IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS  PciAddress
-  )
-{
-  EFI_STATUS                 Status;
-  PCI_TYPE01                 PciConfigurationHeader;
-  UINT64                     Attributes;
-
-  //
-  // Read the PCI Configuration Header for the device
-  //
-  Status = RootBridge->Io.Pci.Read (
-    &RootBridge->Io,
-    EfiPciWidthUint16,
-    EFI_PCI_ADDRESS(
-      PciAddress.Bus,
-      PciAddress.Device,
-      PciAddress.Function,
-      0
-      ),
-    sizeof (PciConfigurationHeader) / sizeof (UINT16),
-    &PciConfigurationHeader
-    );
-  if (EFI_ERROR (Status)) {
-    return;
-  }
-
-  Attributes = RootBridge->Attributes;
-
-  //
-  // Look for devices with the VGA Palette Snoop enabled in the COMMAND register of the PCI Config Header
-  //
-  if (PciConfigurationHeader.Hdr.Command & 0x20) {
-    Attributes |= EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO;
-  }
-
-  //
-  // If the device is a PCI-PCI Bridge, then look at the Subordinate Bus Number
-  //
-  if (IS_PCI_BRIDGE(&PciConfigurationHeader)) {
-    //
-    // Look at the PPB Configuration for legacy decoding attributes
-    //
-    if (PciConfigurationHeader.Bridge.BridgeControl & 0x04) {
-      Attributes |= EFI_PCI_ATTRIBUTE_ISA_IO;
-      Attributes |= EFI_PCI_ATTRIBUTE_ISA_MOTHERBOARD_IO;
-    }
-    if (PciConfigurationHeader.Bridge.BridgeControl & 0x08) {
-      Attributes |= EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO;
-      Attributes |= EFI_PCI_ATTRIBUTE_VGA_MEMORY;
-      Attributes |= EFI_PCI_ATTRIBUTE_VGA_IO;
-    }
-  } else {
-    //
-    // See if the PCI device is an IDE controller
-    //
-    if (PciConfigurationHeader.Hdr.ClassCode[2] == 0x01 &&
-        PciConfigurationHeader.Hdr.ClassCode[1] == 0x01    ) {
-      if (PciConfigurationHeader.Hdr.ClassCode[0] & 0x80) {
-        Attributes |= EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO;
-        Attributes |= EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO;
-      }
-      if (PciConfigurationHeader.Hdr.ClassCode[0] & 0x01) {
-        Attributes |= EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO;
-      }
-      if (PciConfigurationHeader.Hdr.ClassCode[0] & 0x04) {
-        Attributes |= EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO;
-      }
-    }
-
-    //
-    // See if the PCI device is a legacy VGA controller
-    //
-    if (PciConfigurationHeader.Hdr.ClassCode[2] == 0x00 &&
-        PciConfigurationHeader.Hdr.ClassCode[1] == 0x01    ) {
-      Attributes |= EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO;
-      Attributes |= EFI_PCI_ATTRIBUTE_VGA_MEMORY;
-      Attributes |= EFI_PCI_ATTRIBUTE_VGA_IO;
-    }
-
-    //
-    // See if the PCI device is a standard VGA controller
-    //
-    if (PciConfigurationHeader.Hdr.ClassCode[2] == 0x03 &&
-        PciConfigurationHeader.Hdr.ClassCode[1] == 0x00    ) {
-      Attributes |= EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO;
-      Attributes |= EFI_PCI_ATTRIBUTE_VGA_MEMORY;
-      Attributes |= EFI_PCI_ATTRIBUTE_VGA_IO;
-    }
-  }
-
-  RootBridge->Attributes = Attributes;
-  RootBridge->Supports = Attributes;
-}
-
-/**
    Provides the hooks from the PCI bus driver to every PCI controller (device/function) at various
    stages of the PCI enumeration process that allow the host bridge driver to preinitialize individual
    PCI controllers before enumeration.
@@ -1275,14 +1172,17 @@ PreprocessController (
   while (List != &HostBridgeInstance->Head) {
     RootBridgeInstance = DRIVER_INSTANCE_FROM_LIST_ENTRY (List);
     if (RootBridgeHandle == RootBridgeInstance->Handle) {
-      UpdateRootBridgeAttributes (
-        RootBridgeInstance,
-        PciAddress
-        );
-      return EFI_SUCCESS;
+      break;
     }
     List = List->ForwardLink;
   }
+  if (List == &HostBridgeInstance->Head) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-  return EFI_INVALID_PARAMETER;
+  if (Phase < EfiPciBeforeChildBusEnumeration || Phase > EfiMaxPciHostBridgeEnumerationPhase) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
 }
