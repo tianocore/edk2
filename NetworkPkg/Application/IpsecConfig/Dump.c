@@ -347,10 +347,10 @@ DumpSpdEntry (
 }
 
 /**
-  Print EFI_IPSEC_SA_ID and EFI_IPSEC_SA_DATA content.
+  Print EFI_IPSEC_SA_ID and EFI_IPSEC_SA_DATA2 content.
 
   @param[in] SaId          The pointer to the EFI_IPSEC_SA_ID structure.
-  @param[in] Data          The pointer to the EFI_IPSEC_SA_DATA structure.
+  @param[in] Data          The pointer to the EFI_IPSEC_SA_DATA2 structure.
   @param[in] EntryIndex    The pointer to the Index in the SAD Database.
 
   @retval EFI_SUCCESS    Dump SAD information successfully.
@@ -358,13 +358,20 @@ DumpSpdEntry (
 EFI_STATUS
 DumpSadEntry (
   IN EFI_IPSEC_SA_ID      *SaId,
-  IN EFI_IPSEC_SA_DATA    *Data,
+  IN EFI_IPSEC_SA_DATA2   *Data,
   IN UINTN                *EntryIndex
   )
 {
   BOOLEAN    HasPre;
-  CHAR16     *String1;
-  CHAR16     *String2;
+  CHAR16     *AuthAlgoStr;
+  CHAR16     *EncAlgoStr;
+  CHAR8      *AuthKeyAsciiStr;
+  CHAR8      *EncKeyAsciiStr;
+
+  AuthAlgoStr      = NULL;
+  EncAlgoStr       = NULL;
+  AuthKeyAsciiStr  = NULL;
+  EncKeyAsciiStr   = NULL;
 
   //
   // SPI:1234 ESP Destination:xxx.xxx.xxx.xxx
@@ -375,9 +382,14 @@ DumpSadEntry (
 
   Print (L"%d.", (*EntryIndex)++);
   Print (L"0x%x %s ", (UINTN) SaId->Spi, MapIntegerToString (SaId->Proto, mMapIpSecProtocol));
-  Print (L"Destination:");
-  DumpIpAddress (&SaId->DestAddress);
-  Print (L"\n");
+  if (Data->Mode == EfiIPsecTunnel) {
+    Print (L"TunnelSourceAddress:");
+    DumpIpAddress (&Data->TunnelSourceAddress);
+    Print (L"\n");
+    Print (L"TunnelDestination:");
+    DumpIpAddress (&Data->TunnelDestinationAddress);
+    Print (L"\n");
+  }
 
   Print (
     L"  Mode:%s SeqNum:%lx AntiReplayWin:%d ",
@@ -418,15 +430,29 @@ DumpSadEntry (
       Data->AlgoInfo.AhAlgoInfo.AuthKey
       );
   } else {
-    String1 = MapIntegerToString (Data->AlgoInfo.EspAlgoInfo.AuthAlgoId, mMapAuthAlgo);
-    String2 = MapIntegerToString (Data->AlgoInfo.EspAlgoInfo.EncAlgoId, mMapEncAlgo);
+    AuthAlgoStr = MapIntegerToString (Data->AlgoInfo.EspAlgoInfo.AuthAlgoId, mMapAuthAlgo);
+    EncAlgoStr  = MapIntegerToString (Data->AlgoInfo.EspAlgoInfo.EncAlgoId, mMapEncAlgo);
+
+    AuthKeyAsciiStr    = AllocateZeroPool (Data->AlgoInfo.EspAlgoInfo.AuthKeyLength + 1);
+    ASSERT (AuthKeyAsciiStr != NULL);
+    CopyMem (AuthKeyAsciiStr, Data->AlgoInfo.EspAlgoInfo.AuthKey, Data->AlgoInfo.EspAlgoInfo.AuthKeyLength);
+    AuthKeyAsciiStr[Data->AlgoInfo.EspAlgoInfo.AuthKeyLength] = '\0';
+
+    EncKeyAsciiStr  = AllocateZeroPool (Data->AlgoInfo.EspAlgoInfo.EncKeyLength + 1);
+    ASSERT (EncKeyAsciiStr != NULL) ;
+    CopyMem (EncKeyAsciiStr, Data->AlgoInfo.EspAlgoInfo.EncKey, Data->AlgoInfo.EspAlgoInfo.EncKeyLength);
+    EncKeyAsciiStr[Data->AlgoInfo.EspAlgoInfo.EncKeyLength] = '\0';
+
     Print (
-      L"  Auth:%s/%s Encrypt:%s/%s\n",
-      String1,
-      Data->AlgoInfo.EspAlgoInfo.AuthKey,
-      String2,
-      Data->AlgoInfo.EspAlgoInfo.EncKey
+      L"  Auth:%s/%a Encrypt:%s/%a\n",
+      AuthAlgoStr,      
+      AuthKeyAsciiStr,
+      EncAlgoStr,
+      EncKeyAsciiStr
       );
+ 
+    FreePool (AuthKeyAsciiStr);
+    FreePool (EncKeyAsciiStr);
   }
 
   if (Data->SpdSelector != NULL) {

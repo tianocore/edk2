@@ -579,22 +579,22 @@ CreateSpdEntry (
 }
 
 /**
-  Fill in EFI_IPSEC_SA_ID and EFI_IPSEC_SA_DATA through ParamPackage list.
+  Fill in EFI_IPSEC_SA_ID and EFI_IPSEC_SA_DATA2 through ParamPackage list.
 
   @param[out] SaId            The pointer to the EFI_IPSEC_SA_ID structure.
-  @param[out] Data            The pointer to the EFI_IPSEC_SA_DATA structure.
+  @param[out] Data            The pointer to the EFI_IPSEC_SA_DATA2 structure.
   @param[in]  ParamPackage    The pointer to the ParamPackage list.
   @param[out] Mask            The pointer to the Mask.
   @param[in]  CreateNew       The switch to create new.
 
-  @retval EFI_SUCCESS              Fill in EFI_IPSEC_SA_ID and EFI_IPSEC_SA_DATA successfully.
+  @retval EFI_SUCCESS              Fill in EFI_IPSEC_SA_ID and EFI_IPSEC_SA_DATA2 successfully.
   @retval EFI_INVALID_PARAMETER    Invalid user input parameter.
 
 **/
 EFI_STATUS
 CreateSadEntry (
   OUT EFI_IPSEC_SA_ID      **SaId,
-  OUT EFI_IPSEC_SA_DATA    **Data,
+  OUT EFI_IPSEC_SA_DATA2   **Data,
   IN  LIST_ENTRY           *ParamPackage,
   OUT UINT32               *Mask,
   IN  BOOLEAN              CreateNew
@@ -605,6 +605,7 @@ CreateSadEntry (
   UINTN           AuthKeyLength;
   UINTN           EncKeyLength;
   CONST CHAR16    *ValueStr;
+  CHAR8           *AsciiStr;
   UINTN           DataSize;
 
   Status        = EFI_SUCCESS;
@@ -649,45 +650,22 @@ CreateSadEntry (
   }
 
   //
-  // Convert user imput from string to integer, and fill in the DestAddress in EFI_IPSEC_SA_ID.
-  //
-  ValueStr = ShellCommandLineGetValue (ParamPackage, L"--dest");
-  if (ValueStr != NULL) {
-    Status = EfiInetAddr2 ((CHAR16 *) ValueStr, &(*SaId)->DestAddress);
-    if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
-        STRING_TOKEN (STR_IPSEC_CONFIG_INCORRECT_PARAMETER_VALUE),
-        mHiiHandle,
-        mAppName,
-        L"--dest",
-        ValueStr
-        );
-      ReturnStatus = EFI_INVALID_PARAMETER;
-    } else {
-      *Mask |= DEST;
-    }
-  }
-
-  //
-  // Convert user imput from string to integer, and fill in EFI_IPSEC_SA_DATA.
+  // Convert user imput from string to integer, and fill in EFI_IPSEC_SA_DATA2.
   //
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"--auth-key");
   if (ValueStr != NULL) {
-    AuthKeyLength = (StrLen (ValueStr) + 1) * sizeof (CHAR16);
+    AuthKeyLength = StrLen (ValueStr);
   }
 
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"--encrypt-key");
   if (ValueStr != NULL) {
-    EncKeyLength = (StrLen (ValueStr) + 1) * sizeof (CHAR16);
+    EncKeyLength = StrLen (ValueStr);
   }
 
   //
-  // EFI_IPSEC_SA_DATA:
+  // EFI_IPSEC_SA_DATA2:
   //   +------------
-  //   | EFI_IPSEC_SA_DATA
+  //   | EFI_IPSEC_SA_DATA2
   //   +-----------------------
   //   | AuthKey
   //   +-------------------------
@@ -697,7 +675,7 @@ CreateSadEntry (
   //
   // Notes: To make sure the address alignment add padding after each data if needed.
   //
-  DataSize  = ALIGN_VARIABLE (sizeof (EFI_IPSEC_SA_DATA));
+  DataSize  = ALIGN_VARIABLE (sizeof (EFI_IPSEC_SA_DATA2));
   DataSize  = ALIGN_VARIABLE (DataSize + AuthKeyLength);
   DataSize  = ALIGN_VARIABLE (DataSize + EncKeyLength);
   DataSize  = ALIGN_VARIABLE (DataSize + sizeof (EFI_IPSEC_SPD_SELECTOR));
@@ -805,7 +783,10 @@ CreateSadEntry (
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"--encrypt-key");
   if (ValueStr != NULL ) {
     (*Data)->AlgoInfo.EspAlgoInfo.EncKeyLength = EncKeyLength;
-    CopyMem ((*Data)->AlgoInfo.EspAlgoInfo.EncKey, ValueStr, EncKeyLength);
+    AsciiStr = AllocateZeroPool (EncKeyLength + 1);
+    UnicodeStrToAsciiStr (ValueStr, AsciiStr);
+    CopyMem ((*Data)->AlgoInfo.EspAlgoInfo.EncKey,  AsciiStr, EncKeyLength);
+    FreePool (AsciiStr);
     *Mask |= ENCRYPT_KEY;
   } else {
     (*Data)->AlgoInfo.EspAlgoInfo.EncKey = NULL;
@@ -831,7 +812,10 @@ CreateSadEntry (
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"--auth-key");
   if (ValueStr != NULL) {
     (*Data)->AlgoInfo.EspAlgoInfo.AuthKeyLength = AuthKeyLength;
-    CopyMem ((*Data)->AlgoInfo.EspAlgoInfo.AuthKey, ValueStr, AuthKeyLength);
+    AsciiStr = AllocateZeroPool (AuthKeyLength + 1);
+    UnicodeStrToAsciiStr (ValueStr, AsciiStr);
+    CopyMem ((*Data)->AlgoInfo.EspAlgoInfo.AuthKey, AsciiStr, AuthKeyLength);
+    FreePool (AsciiStr);
     *Mask |= AUTH_KEY;
   } else {
     (*Data)->AlgoInfo.EspAlgoInfo.AuthKey = NULL;
@@ -905,10 +889,55 @@ CreateSadEntry (
     ReturnStatus = EFI_INVALID_PARAMETER;
   }
 
+  //
+  // Convert user imput from string to integer, and fill in the DestAddress in EFI_IPSEC_SA_ID.
+  //
+  ValueStr = ShellCommandLineGetValue (ParamPackage, L"--tunnel-dest");
+  if (ValueStr != NULL) {
+    Status = EfiInetAddr2 ((CHAR16 *) ValueStr, &(*Data)->TunnelDestinationAddress);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_IPSEC_CONFIG_INCORRECT_PARAMETER_VALUE),
+        mHiiHandle,
+        mAppName,
+        L"--tunnel-dest",
+        ValueStr
+        );
+      ReturnStatus = EFI_INVALID_PARAMETER;
+    } else {
+      *Mask |= DEST;
+    }
+  }
+
+  //
+  // Convert user imput from string to integer, and fill in the DestAddress in EFI_IPSEC_SA_ID.
+  //
+  ValueStr = ShellCommandLineGetValue (ParamPackage, L"--tunnel-source");
+  if (ValueStr != NULL) {
+    Status = EfiInetAddr2 ((CHAR16 *) ValueStr, &(*Data)->TunnelSourceAddress);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_IPSEC_CONFIG_INCORRECT_PARAMETER_VALUE),
+        mHiiHandle,
+        mAppName,
+        L"--tunnel-source",
+        ValueStr
+        );
+      ReturnStatus = EFI_INVALID_PARAMETER;
+    } else {
+      *Mask |= SOURCE;
+    }
+  }
   ReturnStatus = CreateSpdSelector ((*Data)->SpdSelector, ParamPackage, Mask);
 
   if (CreateNew) {
-    if ((*Mask & (SPI | IPSEC_PROTO | DEST)) != (SPI | IPSEC_PROTO | DEST)) {
+    if ((*Mask & (SPI | IPSEC_PROTO )) != (SPI | IPSEC_PROTO )) {
       ShellPrintHiiEx (
         -1,
         -1,
@@ -1178,7 +1207,7 @@ CreatePadEntry (
         (*Data)->AuthData = NULL;
       } else {
         DataLength = AuthDataLength;
-        Status = ShellReadFile (FileHandle, &DataLength, (*Data)->AuthData);
+        Status     = ShellReadFile (FileHandle, &DataLength, (*Data)->AuthData);
         ShellCloseFile (&FileHandle);
         if (EFI_ERROR (Status)) {
           ShellPrintHiiEx (
@@ -1475,9 +1504,9 @@ CombineSpdEntry (
   Combine old SAD entry with new SAD entry.
 
   @param[in, out] OldSaId      The pointer to the EFI_IPSEC_SA_ID structure.
-  @param[in, out] OldData      The pointer to the EFI_IPSEC_SA_DATA structure.
+  @param[in, out] OldData      The pointer to the EFI_IPSEC_SA_DATA2 structure.
   @param[in]      NewSaId      The pointer to the EFI_IPSEC_SA_ID structure.
-  @param[in]      NewData      The pointer to the EFI_IPSEC_SA_DATA structure.
+  @param[in]      NewData      The pointer to the EFI_IPSEC_SA_DATA2 structure.
   @param[in]      Mask         The pointer to the Mask.
   @param[out]     CreateNew    The switch to create new.
 
@@ -1488,9 +1517,9 @@ CombineSpdEntry (
 EFI_STATUS
 CombineSadEntry (
   IN OUT EFI_IPSEC_SA_ID      *OldSaId,
-  IN OUT EFI_IPSEC_SA_DATA    *OldData,
+  IN OUT EFI_IPSEC_SA_DATA2    *OldData,
   IN     EFI_IPSEC_SA_ID      *NewSaId,
-  IN     EFI_IPSEC_SA_DATA    *NewData,
+  IN     EFI_IPSEC_SA_DATA2    *NewData,
   IN     UINT32               Mask,
      OUT BOOLEAN              *CreateNew
   )
@@ -1511,11 +1540,16 @@ CombineSadEntry (
   }
 
   if ((Mask & DEST) == 0) {
-    CopyMem (&NewSaId->DestAddress, &OldSaId->DestAddress, sizeof (EFI_IP_ADDRESS));
-  } else if (CompareMem (&NewSaId->DestAddress, &OldSaId->DestAddress, sizeof (EFI_IP_ADDRESS)) != 0) {
+    CopyMem (&NewData->TunnelDestinationAddress, &OldData->TunnelDestinationAddress, sizeof (EFI_IP_ADDRESS));
+  } else if (CompareMem (&NewData->TunnelDestinationAddress, &OldData->TunnelDestinationAddress, sizeof (EFI_IP_ADDRESS)) != 0) {
     *CreateNew = TRUE;
   }
 
+  if ((Mask & SOURCE) == 0) {
+    CopyMem (&NewData->TunnelSourceAddress, &OldData->TunnelSourceAddress, sizeof (EFI_IP_ADDRESS));
+  } else if (CompareMem (&NewData->TunnelSourceAddress, &OldData->TunnelSourceAddress, sizeof (EFI_IP_ADDRESS)) != 0) {
+    *CreateNew = TRUE;
+  }
   //
   // Process SA_DATA.
   //

@@ -46,6 +46,7 @@
 #define AUTH_KEY           BIT(27)
 #define ENCRYPT_KEY        BIT(28)
 #define PATH_MTU           BIT(29)
+#define SOURCE             BIT(30)
 
 #define PEER_ID            BIT(0)
 #define PEER_ADDRESS       BIT(1)

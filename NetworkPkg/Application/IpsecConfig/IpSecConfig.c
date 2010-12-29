@@ -82,7 +82,8 @@ SHELL_PARAM_ITEM    mIpSecConfigParamList[] = {
   // --ipsec-proto
   //
   { L"--spi",                 TypeValue },
-  { L"--dest",                TypeValue },
+  { L"--tunnel-dest",         TypeValue },
+  { L"--tunnel-source",       TypeValue },
   { L"--lookup-spi",          TypeValue },
   { L"--lookup-ipsec-proto",  TypeValue },
   { L"--lookup-dest",         TypeValue },
@@ -292,7 +293,8 @@ VAR_CHECK_ITEM    mIpSecConfigVarCheckList[] = {
   // --ipsec-proto
   //
   { L"--spi",                0,              0,       BIT(1),               0 },
-  { L"--dest",               0,              0,       BIT(1),               0 },
+  { L"--tunnel-dest",        0,              0,       BIT(1),               0 },
+  { L"--tunnel-source",      0,              0,       BIT(1),               0 },
   { L"--lookup-spi",         0,              0,       BIT(1),               0 },
   { L"--lookup-ipsec-proto", 0,              0,       BIT(1),               0 },
   { L"--lookup-dest",        0,              0,       BIT(1),               0 },
@@ -548,7 +550,7 @@ IpSecConfigRetriveCheckListByName (
   for (Node = GetFirstNode (ParamPackage); !IsNull (ParamPackage, Node); Node = GetNextNode (ParamPackage, Node)) {
     if (((SHELL_PARAM_PACKAGE *) Node)->Name != NULL) {
       //
-	  // Enumerate the check list that defines the conflicted attributes of each flag.
+      // Enumerate the check list that defines the conflicted attributes of each flag.
       //
       for (; Item->VarName != NULL; Item++) {
         if (StrCmp (((SHELL_PARAM_PACKAGE *) Node)->Name, Item->VarName) == 0) {

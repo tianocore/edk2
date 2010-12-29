@@ -91,7 +91,7 @@ MatchSpdEntry (
 BOOLEAN
 MatchSadEntry (
   IN EFI_IPSEC_SA_ID      *SaId,
-  IN EFI_IPSEC_SA_DATA    *Data,
+  IN EFI_IPSEC_SA_DATA2   *Data,
   IN SAD_ENTRY_INDEXER    *Indexer
   )
 {
