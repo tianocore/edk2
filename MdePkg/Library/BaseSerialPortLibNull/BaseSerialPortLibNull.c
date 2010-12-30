@@ -14,8 +14,6 @@
 
 
 #include <Base.h>
-
-
 #include <Library/SerialPortLib.h>
 
 /**
@@ -35,7 +33,7 @@ SerialPortInitialize (
   VOID
   )
 {
-  return RETURN_UNSUPPORTED;
+  return RETURN_SUCCESS;
 }
 
 /**
