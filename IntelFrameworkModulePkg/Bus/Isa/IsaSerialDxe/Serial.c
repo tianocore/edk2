@@ -1744,6 +1744,8 @@ IsaSerialWrite (
   UINTN       Elapsed;
   UINTN       ActualWrite;
   EFI_TPL     Tpl;
+  UINTN       Timeout;
+  UINTN       BitsPerCharacter;
 
   SerialDevice  = SERIAL_DEV_FROM_THIS (This);
   Elapsed       = 0;
@@ -1767,6 +1769,36 @@ IsaSerialWrite (
 
   CharBuffer  = (UINT8 *) Buffer;
 
+  //
+  // Compute the number of bits in a single character.  This is a start bit,
+  // followed by the number of data bits, followed by the number of stop bits.
+  // The number of stop bits is specified by an enumeration that includes 
+  // support for 1.5 stop bits.  Treat 1.5 stop bits as 2 stop bits.
+  //
+  BitsPerCharacter = 
+    1 + 
+    This->Mode->DataBits + 
+    ((This->Mode->StopBits == TwoStopBits) ? 2 : This->Mode->StopBits);
+
+  //
+  // Compute the timeout in microseconds to wait for a single byte to be 
+  // transmitted.  The Mode structure contans a Timeout field that is the 
+  // maximum time to transmit or receive a character.  However, many UARTs 
+  // have a FIFO for transmits, so the time required to add one new character
+  // to the transmit FIFO may be the time required to flush a full FIFO.  If 
+  // the Timeout in the Mode structure is smaller than the time required to
+  // flush a full FIFO at the current baud rate, then use a timeout value that
+  // is required to flush a full transmit FIFO.
+  //
+  Timeout = MAX (
+              This->Mode->Timeout,
+              (UINTN)DivU64x64Remainder (
+                BitsPerCharacter * (SERIAL_PORT_MAX_RECEIVE_FIFO_DEPTH + 1) * 1000000,
+                This->Mode->BaudRate,
+                NULL
+                )
+              );
+  
   for (Index = 0; Index < *BufferSize; Index++) {
     IsaSerialFifoAdd (&SerialDevice->Transmit, CharBuffer[Index]);
 
@@ -1775,7 +1807,7 @@ IsaSerialWrite (
       //  Unsuccessful write so check if timeout has expired, if not,
       //  stall for a bit, increment time elapsed, and try again
       //
-      if (Elapsed >= This->Mode->Timeout) {
+      if (Elapsed >= Timeout) {
         *BufferSize = ActualWrite;
         gBS->RestoreTPL (Tpl);
         return EFI_TIMEOUT;
