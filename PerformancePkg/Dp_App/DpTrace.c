@@ -612,11 +612,11 @@ ProcessPeims(
     Duration = GetDuration (&Measurement);
     ElapsedTime = DurationInMicroSeconds ( Duration );  // Calculate elapsed time in microseconds
     if (ElapsedTime >= mInterestThreshold) {
-      GetNameFromHandle ((EFI_HANDLE) Measurement.Handle); // Name placed in mGaugeString
+      // PEIM FILE Handle is the start address of its FFS file that contains its file guid.
       PrintToken (STRING_TOKEN (STR_DP_PEIM_STAT2),
             TIndex,   // 1 based, Which measurement record is being printed
-            Measurement.Handle,
-            mGaugeString,
+            Measurement.Handle,  // base address
+            Measurement.Handle,  // file guid
             ElapsedTime
       );
     }
