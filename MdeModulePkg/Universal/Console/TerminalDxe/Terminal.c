@@ -737,29 +737,6 @@ TerminalDriverBindingStart (
       goto ReportError;
     }
 
-    Status = TerminalConOutReset (SimpleTextOutput, FALSE);
-    if (EFI_ERROR (Status)) {
-      goto ReportError;
-    }
-
-    Status = TerminalConOutSetMode (SimpleTextOutput, 0);
-    if (EFI_ERROR (Status)) {
-      goto ReportError;
-    }
-
-    Status = TerminalConOutEnableCursor (SimpleTextOutput, TRUE);
-    if (EFI_ERROR (Status)) {
-      goto ReportError;
-    }
-
-    Status = gBS->CreateEvent (
-                    EVT_TIMER,
-                    TPL_CALLBACK,
-                    NULL,
-                    NULL,
-                    &TerminalDevice->TwoSecondTimeOut
-                    );
-
     //
     // Build the component name for the child device
     //
@@ -849,6 +826,29 @@ TerminalDriverBindingStart (
     if (EFI_ERROR (Status)) {
       goto Error;
     }
+
+    Status = TerminalConOutReset (SimpleTextOutput, FALSE);
+    if (EFI_ERROR (Status)) {
+      goto ReportError;
+    }
+
+    Status = TerminalConOutSetMode (SimpleTextOutput, 0);
+    if (EFI_ERROR (Status)) {
+      goto ReportError;
+    }
+
+    Status = TerminalConOutEnableCursor (SimpleTextOutput, TRUE);
+    if (EFI_ERROR (Status)) {
+      goto ReportError;
+    }
+
+    Status = gBS->CreateEvent (
+                    EVT_TIMER,
+                    TPL_CALLBACK,
+                    NULL,
+                    NULL,
+                    &TerminalDevice->TwoSecondTimeOut
+                    );
 
     Status = gBS->InstallProtocolInterface (
                     &TerminalDevice->Handle,
