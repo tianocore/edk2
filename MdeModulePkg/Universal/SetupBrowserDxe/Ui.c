@@ -2497,10 +2497,7 @@ UiDisplayMenu (
 
       ASSERT(MenuOption != NULL);
       Statement = MenuOption->ThisTag;
-      if ((Statement->Operand == EFI_IFR_TEXT_OP) ||
-          (Statement->Operand == EFI_IFR_DATE_OP) ||
-          (Statement->Operand == EFI_IFR_TIME_OP) ||
-          (Statement->Operand == EFI_IFR_NUMERIC_OP && Statement->Step != 0)) {
+      if (Statement->Operand == EFI_IFR_TEXT_OP) {
         break;
       }
 

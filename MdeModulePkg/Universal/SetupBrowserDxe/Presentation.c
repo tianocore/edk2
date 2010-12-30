@@ -716,14 +716,14 @@ UpdateKeyHelp (
           ARROW_LEFT,
           gMoveHighlight
           );
-        PrintStringAt (SecCol, BottomRowOfHelp, gAdjustNumber);
+        PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
+        PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gAdjustNumber);
       } else {
         PrintAt (StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
         if (Statement->Operand == EFI_IFR_NUMERIC_OP && Statement->Step != 0) {
-          PrintStringAt (SecCol, BottomRowOfHelp, gAdjustNumber);
-        } else {
-          PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
-        }
+          PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gAdjustNumber);
+        } 
+        PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
       }
     } else {
       PrintStringAt (SecCol, BottomRowOfHelp, gEnterCommitString);
@@ -731,7 +731,9 @@ UpdateKeyHelp (
       //
       // If it is a selected numeric with manual input, display different message
       //
-      if ((Statement->Operand == EFI_IFR_NUMERIC_OP) && (Statement->Step == 0)) {
+      if ((Statement->Operand == EFI_IFR_NUMERIC_OP) || 
+          (Statement->Operand == EFI_IFR_DATE_OP) ||
+          (Statement->Operand == EFI_IFR_TIME_OP)) {
         PrintStringAt (
           SecCol,
           TopRowOfHelp,
