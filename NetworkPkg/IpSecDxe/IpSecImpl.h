@@ -121,6 +121,14 @@ typedef struct _IPSEC_RECYCLE_CONTEXT {
   UINT8                   *PayloadBuffer;
 } IPSEC_RECYCLE_CONTEXT;
 
+//
+// Struct used to store the Hash and its data.
+//
+typedef struct {
+  UINTN DataSize;
+  UINT8 *Data;
+} HASH_DATA_FRAGMENT;
+
 struct _IPSEC_PRIVATE_DATA {
   UINT32                    Signature;
   EFI_HANDLE                Handle;           // Virtual handle to install private prtocol
@@ -142,37 +150,37 @@ struct _IPSEC_PRIVATE_DATA {
 /**
   This function processes the inbound traffic with IPsec.
 
-  It checks the received packet security property, trims the ESP/AH header, and then
+  It checks the received packet security property, trims the ESP/AH header, and then 
   returns without an IPsec protected IP Header and FragmentTable.
-
+  
   @param[in]      IpVersion          The version of IP.
-  @param[in, out] IpHead             Points to IP header containing the ESP/AH header
+  @param[in, out] IpHead             Points to IP header containing the ESP/AH header 
                                      to be trimed on input, and without ESP/AH header
                                      on return.
-  @param[out]     LastHead           The Last Header in IP header on return.
+  @param[in, out] LastHead           The Last Header in IP header on return.
   @param[in, out] OptionsBuffer      Pointer to the options buffer. It is optional.
   @param[in, out] OptionsLength      Length of the options buffer. It is optional.
-  @param[in, out] FragmentTable      Pointer to a list of fragments in the form of IPsec
+  @param[in, out] FragmentTable      Pointer to a list of fragments in form of IPsec
                                      protected on input, and without IPsec protected
                                      on return.
-  @param[in, out] FragmentCount      Number of fragments.
+  @param[in, out] FragmentCount      The number of fragments.
   @param[out]     SpdEntry           Pointer to contain the address of SPD entry on return.
-  @param[out]     RecycleEvent       Event for recycling of resources.
+  @param[out]     RecycleEvent       The event for recycling of resources.
 
-  @retval EFI_SUCCESS              The operation is successful.
-  @retval EFI_UNSUPPORTED          If the IPSEC protocol is not supported.
+  @retval EFI_SUCCESS              The operation was successful.
+  @retval EFI_UNSUPPORTED          The IPSEC protocol is not supported.
 
 **/
 EFI_STATUS
 IpSecProtectInboundPacket (
   IN     UINT8                       IpVersion,
   IN OUT VOID                        *IpHead,
-     OUT UINT8                       *LastHead,
+  IN OUT UINT8                       *LastHead,
   IN OUT VOID                        **OptionsBuffer, OPTIONAL
   IN OUT UINT32                      *OptionsLength,  OPTIONAL
   IN OUT EFI_IPSEC_FRAGMENT_DATA     **FragmentTable,
   IN OUT UINT32                      *FragmentCount,
-     OUT IPSEC_SPD_ENTRY             **SpdEntry,
+     OUT EFI_IPSEC_SPD_SELECTOR      **SpdEntry,
      OUT EFI_EVENT                   *RecycleEvent
   );
 
@@ -251,10 +259,74 @@ IpSecLookupPadEntry (
   );
 
 /**
+  Check if the specified IP packet can be serviced by this SPD entry.
+
+  @param[in]  SpdEntry          Point to SPD entry.
+  @param[in]  IpVersion         Version of IP.
+  @param[in]  IpHead            Point to IP header.
+  @param[in]  IpPayload         Point to IP payload.
+  @param[in]  Protocol          The Last protocol of IP packet.
+  @param[in]  IsOutbound        Traffic direction.
+  @param[out] Action            The support action of SPD entry.
+
+  @retval EFI_SUCCESS       Find the related SPD.
+  @retval EFI_NOT_FOUND     Not find the related SPD entry;
+
+**/
+EFI_STATUS
+IpSecLookupSpdEntry (
+  IN     IPSEC_SPD_ENTRY         *SpdEntry,
+  IN     UINT8                   IpVersion,
+  IN     VOID                    *IpHead,
+  IN     UINT8                   *IpPayload,
+  IN     UINT8                   Protocol,
+  IN     BOOLEAN                 IsOutbound, 
+     OUT EFI_IPSEC_ACTION        *Action
+  );
+
+/**
+  Look up if there is existing SAD entry for specified IP packet sending.
+
+  This function is called by the IPsecProcess when there is some IP packet needed to
+  send out. This function checks if there is an existing SAD entry that can be serviced
+  to this IP packet sending. If no existing SAD entry could be used, this
+  function will invoke an IPsec Key Exchange Negotiation.
+
+  @param[in]  Private           Points to private data.
+  @param[in]  NicHandle         Points to a NIC handle.
+  @param[in]  IpVersion         The version of IP.
+  @param[in]  IpHead            The IP Header of packet to be sent out.
+  @param[in]  IpPayload         The IP Payload to be sent out.
+  @param[in]  OldLastHead       The Last protocol of the IP packet.
+  @param[in]  SpdEntry          Points to a related SPD entry.
+  @param[out] SadEntry          Contains the Point of a related SAD entry.
+
+  @retval EFI_DEVICE_ERROR  One of following conditions is TRUE:
+                            - If don't find related UDP service.
+                            - Sequence Number is used up.
+                            - Extension Sequence Number is used up.
+  @retval EFI_NOT_READY     No existing SAD entry could be used.
+  @retval EFI_SUCCESS       Find the related SAD entry.
+
+**/
+EFI_STATUS
+IpSecLookupSadEntry (
+  IN IPSEC_PRIVATE_DATA      *Private,
+  IN EFI_HANDLE              NicHandle,
+  IN UINT8                   IpVersion,
+  IN VOID                    *IpHead,
+  IN UINT8                   *IpPayload,
+  IN UINT8                   OldLastHead,
+  IN IPSEC_SPD_ENTRY         *SpdEntry,
+  OUT IPSEC_SAD_ENTRY        **SadEntry
+  );
+
+/**
   Find the SAD through whole SAD list.
 
   @param[in]  Spi               The SPI used to search the SAD entry.
   @param[in]  DestAddress       The destination used to search the SAD entry.
+  @param[in]  IpVersion         The IP version. Ip4 or Ip6.
 
   @return  The pointer to a certain SAD entry.
 
@@ -262,7 +334,8 @@ IpSecLookupPadEntry (
 IPSEC_SAD_ENTRY *
 IpSecLookupSadBySpi (
   IN UINT32                                 Spi,
-  IN EFI_IP_ADDRESS                         *DestAddress
+  IN EFI_IP_ADDRESS                         *DestAddress,
+  IN UINT8                                  IpVersion
   )
 ;
 

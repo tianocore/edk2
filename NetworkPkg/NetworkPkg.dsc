@@ -42,6 +42,9 @@
   NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
   IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
   UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf

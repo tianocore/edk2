@@ -1,5 +1,5 @@
 /** @file
-  Interface of IPsec printing debug information.
+  The Interfaces of IPsec debug information printing.
 
   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
 
@@ -19,7 +19,7 @@
 //
 // The print title for IKEv1 variety phase.
 //
-CHAR8 *mStateStr[] = {
+CHAR8 *mIkev1StateStr[] = {
   "IKEv1_MAIN_1",
   "IKEv1_MAIN_2",
   "IKEv1_MAIN_3",
@@ -28,6 +28,20 @@ CHAR8 *mStateStr[] = {
   "IKEv1_QUICK_2",
   "IKEv1_QUICK_ESTABLISHED"
 };
+
+//
+// The print title for IKEv2 variety phase.
+//
+CHAR8 *mIkev2StateStr[] = {
+  "IKEv2_STATE_INIT",
+  "IKEv2_STATE_AUTH",
+  "IKEv2_STATE_SA_ESTABLISH",
+  "IKEv2_STATE_CREATE_CHILD",
+  "IKEv2_STATE_SA_REKEYING",
+  "IKEv2_STATE_CHILD_SA_ESTABLISHED",
+  "IKEv2_STATE_SA_DELETING"
+};
+
 //
 // The print title for IKEv1 variety Exchagne.
 //
@@ -35,13 +49,17 @@ CHAR8 *mExchangeStr[] = {
   "IKEv1 Main Exchange",
   "IKEv1 Info Exchange",
   "IKEv1 Quick Exchange",
-  "IKEv1 Unknown Exchange"
+  "IKEv2 Initial Exchange",
+  "IKEv2 Auth Exchange",
+  "IKEv2 Create Child Exchange",
+  "IKEv2 Info Exchange",
+  "IKE   Unknow Exchange"
 };
 
 //
 // The print title for IKEv1 variety Payload.
 //
-CHAR8 *mPayloadStr[] = {
+CHAR8 *mIkev1PayloadStr[] = {
   "IKEv1 None Payload",
   "IKEv1 SA Payload",
   "IKEv1 Proposal Payload",
@@ -56,6 +74,28 @@ CHAR8 *mPayloadStr[] = {
   "IKEv1 Notify Payload",
   "IKEv1 Delete Payload",
   "IKEv1 Vendor Payload"
+};
+
+//
+// The print title for IKEv2 variety Payload.
+//
+CHAR8* mIkev2PayloadStr[] = {
+  "IKEv2 SA Payload",
+  "IKEv2 Key Payload",
+  "IKEv2 Identity Initial Payload",
+  "IKEv2 Identity Respond Payload",
+  "IKEv2 Certificate Payload",
+  "IKEv2 Certificate Request Payload",
+  "IKEv2 Auth Payload",
+  "IKEv2 Nonce Payload",
+  "IKEv2 Notify Payload",
+  "IKEv2 Delet Payload",
+  "IKEv2 Vendor Payload",
+  "IKEv2 Traffic Selector Initiator Payload",
+  "IKEv2 Traffic Selector Respond Payload",
+  "IKEv2 Encrypt Payload",
+  "IKEv2 Configuration Payload",
+  "IKEv2 Extensible Authentication Payload"
 };
 
 /**
@@ -112,24 +152,146 @@ IpSecDumpAddress (
 }
 
 /**
-  Print IKEv1 Current states.
+  Print IKE Current states.
 
-  @param[in]  Previous    The Previous state of IKEv1.
-  @param[in]  Current     The current state of IKEv1.
+  @param[in]  Previous    The Previous state of IKE.
+  @param[in]  Current     The current state of IKE.
+  @param[in]  IkeVersion  The version of IKE.
 
 **/
 VOID
-IpSecDumpState (
+IkeDumpState (
   IN UINT32              Previous,
-  IN UINT32              Current
+  IN UINT32              Current,
+  IN UINT8               IkeVersion
   )
 {
+  
   if (Previous == Current) {
-    DEBUG ((DEBUG_INFO, "\n****Current state is %a\n", mStateStr[Previous]));
+    if (IkeVersion == 1) {
+      DEBUG ((DEBUG_INFO, "\n****Current state is %a\n", mIkev1StateStr[Previous]));
+    } else if (IkeVersion == 2) {
+      DEBUG ((DEBUG_INFO, "\n****Current state is %a\n", mIkev2StateStr[Previous]));
+    }
+    
   } else {
-    DEBUG ((DEBUG_INFO, "\n****Change state from %a to %a\n", mStateStr[Previous], mStateStr[Current]));
+    if (IkeVersion == 1) {
+      DEBUG ((DEBUG_INFO, "\n****Change state from %a to %a\n", mIkev1StateStr[Previous], mIkev1StateStr[Current]));
+    } else {
+      DEBUG ((DEBUG_INFO, "\n****Change state from %a to %a\n", mIkev2StateStr[Previous], mIkev2StateStr[Current]));
+    }
+    
   }
 
+}
+
+/**
+  Print the IKE Packet.
+
+  @param[in]  Packet      Point to IKE packet to be printed.
+  @param[in]  Direction   Point to the IKE packet is inbound or outbound.
+  @param[in]  IpVersion   Specified IP Version.
+
+**/
+VOID
+IpSecDumpPacket (
+  IN IKE_PACKET            *Packet,
+  IN EFI_IPSEC_TRAFFIC_DIR Direction,
+  IN UINT8                 IpVersion
+  )
+{
+  CHAR8                     *TypeStr;
+  UINTN                     PacketSize;
+  UINT64                    InitCookie;
+  UINT64                    RespCookie;
+
+  ASSERT (Packet != NULL);
+
+  PacketSize = Packet->PayloadTotalSize + sizeof (IKE_HEADER);
+  InitCookie = (Direction == EfiIPsecOutBound) ? HTONLL (Packet->Header->InitiatorCookie) : Packet->Header->InitiatorCookie;
+  RespCookie = (Direction == EfiIPsecOutBound) ? HTONLL (Packet->Header->ResponderCookie) : Packet->Header->ResponderCookie;
+
+  switch (Packet->Header->ExchangeType) {
+  case IKE_XCG_TYPE_IDENTITY_PROTECT:
+    TypeStr = mExchangeStr[0];
+    break;
+
+  case IKE_XCG_TYPE_INFO:
+    TypeStr = mExchangeStr[1];
+    break;
+
+  case IKE_XCG_TYPE_QM:
+    TypeStr = mExchangeStr[2];
+    break;
+    
+  case IKE_XCG_TYPE_SA_INIT:
+    TypeStr = mExchangeStr[3];
+    break;
+
+  case IKE_XCG_TYPE_AUTH:
+    TypeStr = mExchangeStr[4];
+    break;
+
+  case IKE_XCG_TYPE_CREATE_CHILD_SA:
+    TypeStr = mExchangeStr[5];
+    break;
+
+  case IKE_XCG_TYPE_INFO2:
+    TypeStr = mExchangeStr[6];
+    break;
+    
+  default:
+    TypeStr = mExchangeStr[7];
+    break;
+  }
+
+  if (Direction == EfiIPsecOutBound) {
+    DEBUG ((DEBUG_INFO, "\n>>>Sending %d bytes %a to ", PacketSize, TypeStr));
+  } else {
+    DEBUG ((DEBUG_INFO, "\n>>>Receiving %d bytes %a from ", PacketSize, TypeStr));
+  }
+
+  IpSecDumpAddress (DEBUG_INFO, &Packet->RemotePeerIp, IpVersion);
+
+  DEBUG ((DEBUG_INFO, "   InitiatorCookie:0x%lx ResponderCookie:0x%lx\n", InitCookie, RespCookie));
+  DEBUG (
+    (DEBUG_INFO,
+    "   Version: 0x%x Flags:0x%x ExchangeType:0x%x\n",
+    Packet->Header->Version,
+    Packet->Header->Flags,
+    Packet->Header->ExchangeType)
+    );
+  DEBUG (
+    (DEBUG_INFO,
+    "   MessageId:0x%x NextPayload:0x%x\n",
+    Packet->Header->MessageId,
+    Packet->Header->NextPayload)
+    );
+
+}
+
+/**
+  Print the IKE Paylolad.
+
+  @param[in]  IkePayload  Point to payload to be printed.
+  @param[in]  IkeVersion  The specified version of IKE.
+ 
+**/
+VOID
+IpSecDumpPayload (
+  IN IKE_PAYLOAD           *IkePayload,
+  IN UINT8                 IkeVersion
+  )
+{
+  if (IkeVersion == 1) {
+    DEBUG ((DEBUG_INFO, "+%a\n", mIkev1PayloadStr[IkePayload->PayloadType]));
+  }  else {
+    //
+    // For IKEV2 the first Payload type is started from 33.
+    //
+    DEBUG ((DEBUG_INFO, "+%a\n", mIkev2PayloadStr[IkePayload->PayloadType - 33]));
+  }
+  IpSecDumpBuf ("Payload data", IkePayload->PayloadBuf, IkePayload->PayloadSize);
 }
 
 /**

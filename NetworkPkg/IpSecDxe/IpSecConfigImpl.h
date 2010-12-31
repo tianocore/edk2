@@ -342,21 +342,22 @@ IpSecDuplicateProcessPolicy (
   );
 
 /**
-  Compare two SPD Selectors.
+  Find if the two SPD Selectors has subordinative.
 
   Compare two SPD Selector by the fields of LocalAddressCount/RemoteAddressCount/
-  NextLayerProtocol/LocalPort/LocalPortRange/RemotePort/RemotePortRange and the
+  NextLayerProtocol/LocalPort/LocalPortRange/RemotePort/RemotePortRange and the 
   Local Addresses and remote Addresses.
 
-  @param[in]   Selector1           Pointer of the first SPD Selector.
-  @param[in]   Selector2           Pointer of the second SPD Selector.
+  @param[in]   Selector1           Pointer of first SPD Selector.
+  @param[in]   Selector2           Pointer of second SPD Selector.
 
-  @retval  TRUE    This two Selector have the same value in above fields.
-  @retval  FALSE   Not all of the above fields have the same value in these two Selectors.
-
+  @retval  TRUE    The first SPD Selector is subordinate Selector of second SPD Selector.
+  @retval  FALSE   The first SPD Selector is not subordinate Selector of second 
+                   SPD Selector.
+  
 **/
 BOOLEAN
-CompareSpdSelector (
+IsSubSpdSelector (
   IN EFI_IPSEC_CONFIG_SELECTOR        *Selector1,
   IN EFI_IPSEC_CONFIG_SELECTOR        *Selector2
   );
@@ -537,7 +538,7 @@ FixSpdEntry (
 VOID
 FixSadEntry (
   IN     EFI_IPSEC_SA_ID                  *SaId,
-  IN OUT EFI_IPSEC_SA_DATA                *Data
+  IN OUT EFI_IPSEC_SA_DATA2                *Data
   );
 
 /**
@@ -588,7 +589,7 @@ UnfixSpdEntry (
 VOID
 UnfixSadEntry (
   IN OUT EFI_IPSEC_SA_ID                     *SaId,
-  IN OUT EFI_IPSEC_SA_DATA                   *Data
+  IN OUT EFI_IPSEC_SA_DATA2                   *Data
   );
 
 /**
@@ -948,5 +949,7 @@ EfiIpSecConfigUnregisterNotify (
   IN EFI_IPSEC_CONFIG_DATA_TYPE       DataType,
   IN EFI_EVENT                        Event
   );
+
+extern LIST_ENTRY   mConfigData[IPsecConfigDataTypeMaximum];
 
 #endif

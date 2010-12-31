@@ -13,8 +13,10 @@
 
 **/
 
-#include <Library/UdpIoLib.h>
+#include <Library/BaseCryptLib.h>
+
 #include "IpSecConfigImpl.h"
+#include "IkeService.h"
 #include "IpSecDebug.h"
 
 /**
@@ -38,9 +40,34 @@ IpSecDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath  OPTIONAL
   )
 {
+  EFI_STATUS  Udp4Status;
+  EFI_STATUS  Udp6Status;
+
+  Udp4Status = gBS->OpenProtocol (
+                      ControllerHandle,
+                      &gEfiUdp4ServiceBindingProtocolGuid,
+                      NULL,
+                      This->DriverBindingHandle,
+                      ControllerHandle,
+                      EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                      );
+
+  Udp6Status = gBS->OpenProtocol (
+                      ControllerHandle,
+                      &gEfiUdp6ServiceBindingProtocolGuid,
+                      NULL,
+                      This->DriverBindingHandle,
+                      ControllerHandle,
+                      EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                      );
+
   //
-  //TODO: Add Udp4Protocol and Udp6Protocol testing.
+  // The controller with either Udp4Sb or Udp6Sb is supported.
   //
+  if (!EFI_ERROR (Udp4Status) || !EFI_ERROR (Udp6Status)) {
+    return EFI_SUCCESS;
+  }
+
   return EFI_UNSUPPORTED;
 }
 
@@ -54,7 +81,7 @@ IpSecDriverBindingSupported (
 
   @retval EFI_SUCCES           This driver is added to ControllerHandle
   @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
-  @retval EFI_DEVICE_ERROR     The device could not be started due to a device error.
+  @retval EFI_DEVICE_ERROR     The device could not be started due to a device error.  
                                Currently not implemented.
   @retval other                This driver does not support this device
 
@@ -67,10 +94,59 @@ IpSecDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
+  EFI_IPSEC_PROTOCOL  *IpSec;
+  EFI_STATUS          Status;
+  EFI_STATUS          Udp4Status;
+  EFI_STATUS          Udp6Status;
+  IPSEC_PRIVATE_DATA  *Private;
+
   //
-  //TODO: Add Udp4Io and Udp6Io creation for the IKE.
+  // Ipsec protocol should be installed when load image.
   //
-  return EFI_SUCCESS;
+  Status = gBS->LocateProtocol (&gEfiIpSecProtocolGuid, NULL, (VOID **) &IpSec);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Private = IPSEC_PRIVATE_DATA_FROM_IPSEC (IpSec);
+
+  //
+  // If udp4 sb is on the controller, try to open a udp4 io for input.
+  //
+  Udp4Status = gBS->OpenProtocol (
+                      ControllerHandle,
+                      &gEfiUdp4ServiceBindingProtocolGuid,
+                      NULL,
+                      This->DriverBindingHandle,
+                      ControllerHandle,
+                      EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                      );
+
+  if (!EFI_ERROR (Udp4Status)) {
+    Udp4Status = IkeOpenInputUdp4 (Private, ControllerHandle);
+  }
+  //
+  // If udp6 sb is on the controller, try to open a udp6 io for input.
+  //
+  Udp6Status = gBS->OpenProtocol (
+                      ControllerHandle,
+                      &gEfiUdp6ServiceBindingProtocolGuid,
+                      NULL,
+                      This->DriverBindingHandle,
+                      ControllerHandle,
+                      EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                      );
+
+  if (!EFI_ERROR (Udp6Status)) {
+    Udp6Status = IkeOpenInputUdp6 (Private, ControllerHandle);
+  }
+
+  if (!EFI_ERROR (Udp4Status) || !EFI_ERROR (Udp6Status)) {
+    return EFI_SUCCESS;
+  }
+
+  return EFI_DEVICE_ERROR;
 }
 
 /**
@@ -95,10 +171,78 @@ IpSecDriverBindingStop (
   IN EFI_HANDLE                   *ChildHandleBuffer
   )
 {
+  EFI_IPSEC_PROTOCOL  *IpSec;
+  EFI_STATUS          Status;
+  IPSEC_PRIVATE_DATA  *Private;
+  IKE_UDP_SERVICE     *UdpSrv;
+  LIST_ENTRY          *Entry;
+  LIST_ENTRY          *Next;
+
   //
-  //TODO: Add UdpIo4 and UdpIo6 destruction when the Udp driver unload or stop.
+  // Locate ipsec protocol to get private data.
   //
-  return EFI_UNSUPPORTED;
+  Status = gBS->LocateProtocol (&gEfiIpSecProtocolGuid, NULL, (VOID **) &IpSec);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Private = IPSEC_PRIVATE_DATA_FROM_IPSEC (IpSec);
+
+  //
+  // If has udp4 io opened on the controller, close and free it.
+  //
+  NET_LIST_FOR_EACH_SAFE (Entry, Next, &Private->Udp4List) {
+
+    UdpSrv = IPSEC_UDP_SERVICE_FROM_LIST (Entry);
+    //
+    // Find the right udp service which installed on the appointed nic handle.
+    //
+    if (UdpSrv->Input != NULL && ControllerHandle == UdpSrv->Input->UdpHandle) {
+      UdpIoFreeIo (UdpSrv->Input);
+      UdpSrv->Input = NULL;
+    }
+
+    if (UdpSrv->Output != NULL && ControllerHandle == UdpSrv->Output->UdpHandle) {
+      UdpIoFreeIo (UdpSrv->Output);
+      UdpSrv->Output = NULL;
+    }
+
+    if (UdpSrv->Input == NULL && UdpSrv->Output == NULL) {
+      RemoveEntryList (&UdpSrv->List);
+      FreePool (UdpSrv);
+      ASSERT (Private->Udp4Num > 0);
+      Private->Udp4Num--;
+    }
+  }
+  //
+  // If has udp6 io opened on the controller, close and free it.
+  //
+  NET_LIST_FOR_EACH_SAFE (Entry, Next, &Private->Udp6List) {
+
+    UdpSrv = IPSEC_UDP_SERVICE_FROM_LIST (Entry);
+    //
+    // Find the right udp service which installed on the appointed nic handle.
+    //
+    if (UdpSrv->Input != NULL && ControllerHandle == UdpSrv->Input->UdpHandle) {
+      UdpIoFreeIo (UdpSrv->Input);
+      UdpSrv->Input = NULL;
+    }
+
+    if (UdpSrv->Output != NULL && ControllerHandle == UdpSrv->Output->UdpHandle) {
+      UdpIoFreeIo (UdpSrv->Output);
+      UdpSrv->Output = NULL;
+    }
+
+    if (UdpSrv->Input == NULL && UdpSrv->Output == NULL) {
+      RemoveEntryList (&UdpSrv->List);
+      FreePool (UdpSrv);
+      ASSERT (Private->Udp6Num > 0);
+      Private->Udp6Num--;
+    }
+  }
+
+  return EFI_SUCCESS;
 }
 
 EFI_DRIVER_BINDING_PROTOCOL gIpSecDriverBinding = {
@@ -112,9 +256,9 @@ EFI_DRIVER_BINDING_PROTOCOL gIpSecDriverBinding = {
 
 /**
   This is a callback function when the mIpSecInstance.DisabledEvent is signaled.
-
+    
   @param[in]  Event        Event whose notification function is being invoked.
-  @param[in]  Context      Pointer to the notification function's context.
+  @param[in]  Context      Pointer to the notification function's context. 
 
 **/
 VOID
@@ -125,34 +269,17 @@ IpSecCleanupAllSa (
   )
 {
   IPSEC_PRIVATE_DATA  *Private;
-  UINT8               Value;
-  EFI_STATUS          Status;
-
-  Private = (IPSEC_PRIVATE_DATA *) Context;
-
-  //
-  // Set the Status Variable
-  //
-  Value  = IPSEC_STATUS_DISABLED;
-  Status = gRT->SetVariable (
-                  IPSECCONFIG_STATUS_NAME,
-                  &gEfiIpSecConfigProtocolGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                  sizeof (Value),
-                  &Value
-                  );
-  if (!EFI_ERROR (Status)) {
-    Private->IpSec.DisabledFlag = TRUE;
-  }
-
+  Private                   = (IPSEC_PRIVATE_DATA *) Context;
+  Private->IsIPsecDisabling = TRUE;
+  IkeDeleteAllSas (Private);
 }
 
 /**
   This is the declaration of an EFI image entry point. This entry point is
   the same for UEFI Applications, UEFI OS Loaders, and UEFI Drivers, including
   both device drivers and bus drivers.
-
-  The entry point for IPsec driver which installs the driver binding,
+  
+  The entry point for IPsec driver which installs the driver binding, 
   component name protocol, IPsec Config protcolon, and IPsec protocol in
   its ImageHandle.
 
@@ -162,7 +289,7 @@ IpSecCleanupAllSa (
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_ALREADY_STARTED   The IPsec driver has been already loaded.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
-  @retval Others                The operation is failed.
+  @retval Others                The operation is failed. 
 
 **/
 EFI_STATUS
@@ -174,7 +301,7 @@ IpSecDriverEntryPoint (
 {
   EFI_STATUS          Status;
   IPSEC_PRIVATE_DATA  *Private;
-  EFI_IPSEC2_PROTOCOL *IpSec;
+  EFI_IPSEC_PROTOCOL  *IpSec;
 
   //
   // Check whether ipsec protocol has already been installed.
@@ -202,7 +329,7 @@ IpSecDriverEntryPoint (
     goto ON_EXIT;
   }
   //
-  // Create disable event to cleanup all sa when ipsec disabled by user.
+  // Create disable event to cleanup all SA when ipsec disabled by user.
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
@@ -218,8 +345,8 @@ IpSecDriverEntryPoint (
 
   Private->Signature    = IPSEC_PRIVATE_DATA_SIGNATURE;
   Private->ImageHandle  = ImageHandle;
-  CopyMem (&Private->IpSec, &mIpSecInstance, sizeof (EFI_IPSEC2_PROTOCOL));
-
+  CopyMem (&Private->IpSec, &mIpSecInstance, sizeof (EFI_IPSEC_PROTOCOL));
+  
   //
   // Initilize Private's members. Thess members is used for IKE.
   //
@@ -229,7 +356,8 @@ IpSecDriverEntryPoint (
   InitializeListHead (&Private->Ikev1EstablishedList);
   InitializeListHead (&Private->Ikev2SessionList);
   InitializeListHead (&Private->Ikev2EstablishedList);
-
+  
+  RandomSeed (NULL, 0);
   //
   // Initialize the ipsec config data and restore it from variable.
   //
@@ -260,11 +388,17 @@ IpSecDriverEntryPoint (
              &gIpSecComponentName2
              );
   if (EFI_ERROR (Status)) {
-    goto ON_UNINSTALL_CONFIG;
+    goto ON_UNINSTALL_IPSEC;
   }
-
+  
   return Status;
 
+ON_UNINSTALL_IPSEC:
+  gBS->UninstallProtocolInterface (
+         Private->Handle,
+         &gEfiIpSecProtocolGuid,
+         &Private->IpSec
+         );
 ON_UNINSTALL_CONFIG:
   gBS->UninstallProtocolInterface (
         Private->Handle,

@@ -19,6 +19,7 @@
   FILE_GUID                      = EE8367C0-A1D6-4565-8F89-EF628547B722
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
+
   ENTRY_POINT                    = IpSecDriverEntryPoint
 
 #
@@ -34,15 +35,36 @@
   IpSecCryptIo.c
   IpSecDebug.h
   ComponentName.c
+  IkeCommon.h
   IpSecImpl.c
+  IkeService.c
+  Ike.h
+  IkePacket.h
+  IkePacket.c
   IpSecDebug.c
-  IpSecSaEngine.c
+  IpSecMain.c
   IpSecDriver.c
+  IkeCommon.c
+  IetfConstants.c
   IpSecImpl.h
+  IkeService.h
+  Ikev2/Ikev2.h
+  Ikev2/Payload.h
+  Ikev2/Utility.h
+  Ikev2/Utility.c
+  Ikev2/Sa.c
+  Ikev2/ChildSa.c
+  Ikev2/Info.c
+  Ikev2/Payload.c
+  Ikev2/Exchange.c
+  
+
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  LocalNetworkPkg/LocalNetworkPkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -54,10 +76,30 @@
   BaseMemoryLib
   DebugLib
   PrintLib
+  #CryptLib
+  BaseCryptLib
   DpcLib
-  NetLib
-
+  UdpIoLib
+  NetLib  
+  PcdLib
+  
 [Protocols]
   gEfiIp4ConfigProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiUdp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED  
+  gEfiUdp4ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
+  gEfiUdp6ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED  
+  gEfiUdp6ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
   gEfiIpSecConfigProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
   gEfiIpSecProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
+  
+[Pcd]
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecCertiifcateEnabled
+  gEfiMdeModulePkgTokenSpaceGuid.UefiCaFile
+  gEfiMdeModulePkgTokenSpaceGuid.UefiCaFileSize
+  gEfiMdeModulePkgTokenSpaceGuid.UefiCertificate
+  gEfiMdeModulePkgTokenSpaceGuid.UefiCertificateSize
+  gEfiMdeModulePkgTokenSpaceGuid.UefiCertificateKey
+  gEfiMdeModulePkgTokenSpaceGuid.UefiCertificateKeySize
+  
+[BuildOptions.common]
+#DEBUG_MYTOOLS_IA32_CC_FLAGS            = /Od /GL
