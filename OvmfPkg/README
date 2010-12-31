@@ -33,11 +33,6 @@ Pre-requisites:
       or
   * Microsoft ASL compiler: Available from http://www.acpi.info
 
-Optional Pre-requisites:
-* UEFI drivers for the e1000 NIC supported by QEMU
-  * http://downloadcenter.intel.com/Detail_Desc.aspx?agr=Y&DwnldID=17515&lang=eng
-  * Install the drivers into a directory called Intel3.5 in your WORKSPACE
-  
 Update Conf/target.txt ACTIVE_PLATFORM for OVMF:
                              PEI arch   DXE arch   UEFI interfaces
 * OvmfPkg/OvmfPkgIa32.dsc      IA32       IA32           IA32
@@ -58,9 +53,6 @@ these binary outputs:
   * Please note!  This filename has changed.  Older releases used OVMF.Fv.
 * CirrusLogic5446.rom
 
-To enable network support add -D NETWORK_ENABLE to the build.exe command
-* build -D NETWORK_ENABLE
-
 More information on building OVMF can be found at:
 
 http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=How_to_build_OVMF
@@ -79,18 +71,8 @@ http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=How_to_build_OVM
 * The EFI shell is built into OVMF builds at this time, so it should
   run automatically if a UEFI boot application is not found on the
   removable media.
-* On Linux, newer version of QEMU may enable KVM feature, and this might cause OVMF
-  to fail to boot.  The QEMU '-no-kvm' may allow OVMF to boot.
-* Use the QEMU -net parameter to enable NIC support.
-  * QEMU does not support UEFI DHCP or UEFI PXE Boot, so lomg timeouts will occur
-    when NICs are enabled.  The long timeouts can be avoided by interrupts the 
-    boot sequence by pressing a key when the logo appears. 
-  * Enable e1000 NIC with a DHCP server and restrict packet forwarding
-    -net nic,model=e1000 -net user,restrict=yes -net user,dhcpstart=10.0.2.10
-  * Enable e1000 NIC with a DHCP server, restrict packet forwarding, and generate PCAP file
-    -net nic,model=e1000 -net user,restrict=yes -net user,dhcpstart=10.0.2.10 -net dump,file=a.pcap
-  * Enable 2 e1000 NICs with a DHCP server and restrict packet forwarding
-    -net nic,model=e1000,addr=3 -net nic,model=e1000,addr=4 -net user,restrict=yes -net user,dhcpstart=10.0.2.10
+* On Linux, newer version of QEMU may enable KVM feature, and this might
+  cause OVMF to fail to boot.  The QEMU '-no-kvm' may allow OVMF to boot.
 
 === Build Scripts ===
 
@@ -103,4 +85,32 @@ $ OvmfPkg/build64.sh qemu
 
 And to run a 64-bit UEFI bootable ISO image:
 $ OvmfPkg/build64.sh qemu -cdrom /path/to/disk-image.iso
+
+=== Network Support ===
+
+To add network drivers to OVMF:
+
+* Download UEFI drivers for the e1000 NIC
+  - http://downloadcenter.intel.com/Detail_Desc.aspx?agr=Y&DwnldID=17515&lang=eng
+  - Install the drivers into a directory called Intel3.5 in your WORKSPACE
+
+* Include the drivers in OVMF during the build:
+  - Add '-D NETWORK_ENABLE' to your build command
+  - For example: build -D NETWORK_ENABLE
+
+* Use the QEMU -net parameter to enable NIC support.
+  - QEMU does not support UEFI DHCP or UEFI PXE Boot, so long timeouts will
+    occur when NICs are enabled.  The long timeouts can be avoided by
+    interrupts the boot sequence by pressing a key when the logo appears.
+  - Example: Enable e1000 NIC with a DHCP server and restrict packet
+    forwarding:
+    -net nic,model=e1000 -net user,restrict=yes -net user,dhcpstart=10.0.2.10
+  - Example: Enable e1000 NIC with a DHCP server, restrict packet forwarding,
+    and generate PCAP file:
+    -net nic,model=e1000 -net user,restrict=yes -net user,dhcpstart=10.0.2.10
+    -net dump,file=a.pcap
+  - Example: Enable 2 e1000 NICs with a DHCP server and restrict
+    packet forwarding:
+    -net nic,model=e1000,addr=3 -net nic,model=e1000,addr=4
+    -net user,restrict=yes -net user,dhcpstart=10.0.2.10
 
