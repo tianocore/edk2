@@ -89,6 +89,12 @@ HmacMd5Duplicate (
   OUT  VOID        *NewHmacMd5Context
   )
 {
+  //
+  // ASSERT if HmacMd5Context or NewHmacMd5Context is NULL.
+  //
+  ASSERT (HmacMd5Context    != NULL);
+  ASSERT (NewHmacMd5Context != NULL);
+  
   CopyMem (NewHmacMd5Context, HmacMd5Context, sizeof (HMAC_CTX));
 
   return TRUE;

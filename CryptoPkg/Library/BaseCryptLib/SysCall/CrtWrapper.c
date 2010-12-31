@@ -293,3 +293,8 @@ int BIO_snprintf(char *buf, size_t n, const char *format, ...)
 {
   return 0;
 }
+
+void *UI_OpenSSL(void)
+{
+  return NULL;
+}

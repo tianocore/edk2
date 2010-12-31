@@ -73,6 +73,18 @@ ValidateCryptRsa (
   );
 
 /**
+  Validate UEFI-OpenSSL RSA Key Retrieving (from PEM & X509) & Signature Interfaces.
+
+  @retval  EFI_SUCCESS  Validation succeeded.
+  @retval  EFI_ABORTED  Validation failed.
+
+**/
+EFI_STATUS
+ValidateCryptRsa2 (
+  VOID
+  );
+
+/**
   Validate UEFI-OpenSSL PKCS#7 Verification Interfaces.
 
   @retval  EFI_SUCCESS  Validation succeeded.

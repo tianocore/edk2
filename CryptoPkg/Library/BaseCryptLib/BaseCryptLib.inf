@@ -28,6 +28,7 @@
 
 [Sources]
   InternalCryptLib.h
+  Hash/CryptMd4.c
   Hash/CryptMd5.c
   Hash/CryptSha1.c
   Hash/CryptSha256.c
@@ -40,6 +41,8 @@
   Pk/CryptRsa.c
   Pk/CryptPkcs7.c
   Pk/CryptDh.c
+  Pk/CryptX509.c
+  Pem/CryptPem.c
 
   SysCall/CrtWrapper.c
   SysCall/TimerWrapper.c

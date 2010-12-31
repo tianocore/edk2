@@ -83,6 +83,12 @@ Sha1Duplicate (
   OUT  VOID        *NewSha1Context
   )
 {
+  //
+  // ASSERT if Sha1Context or NewSha1Context is NULL.
+  //
+  ASSERT (Sha1Context    != NULL);
+  ASSERT (NewSha1Context != NULL);
+
   CopyMem (NewSha1Context, Sha1Context, sizeof (SHA_CTX));
 
   return TRUE;

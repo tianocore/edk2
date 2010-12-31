@@ -58,6 +58,11 @@ CryptestMain (
     return Status;
   }
 
+  Status = ValidateCryptRsa2 ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   Status = ValidateAuthenticode ();
   if (EFI_ERROR (Status)) {
     return Status;

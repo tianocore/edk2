@@ -19,6 +19,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __BASE_CRYPT_LIB_H__
 
 ///
+/// MD4 digest size in bytes
+///
+#define MD4_DIGEST_SIZE     16
+
+///
 /// MD5 digest size in bytes
 ///
 #define MD5_DIGEST_SIZE     16
@@ -60,6 +65,109 @@ typedef enum {
 //=====================================================================================
 //    One-Way Cryptographic Hash Primitives
 //=====================================================================================
+
+/**
+  Retrieves the size, in bytes, of the context buffer required for MD4 hash operations.
+
+  @return  The size, in bytes, of the context buffer required for MD4 hash operations.
+
+**/
+UINTN
+EFIAPI
+Md4GetContextSize (
+  VOID
+  );
+
+/**
+  Initializes user-supplied memory pointed by Md4Context as MD4 hash context for
+  subsequent use.
+
+  If Md4Context is NULL, then ASSERT().
+
+  @param[out]  Md4Context  Pointer to MD4 context being initialized.
+
+  @retval TRUE   MD4 context initialization succeeded.
+  @retval FALSE  MD4 context initialization failed.
+
+**/
+BOOLEAN
+EFIAPI
+Md4Init (
+  OUT  VOID  *Md4Context
+  );
+
+/**
+  Makes a copy of an existing MD4 context.
+
+  If Md4Context is NULL, then ASSERT().
+  If NewMd4Context is NULL, then ASSERT().
+
+  @param[in]  Md4Context     Pointer to MD4 context being copied.
+  @param[out] NewMd4Context  Pointer to new MD4 context.
+
+  @retval TRUE   MD4 context copy succeeded.
+  @retval FALSE  MD4 context copy failed.
+
+**/
+BOOLEAN
+EFIAPI
+Md4Duplicate (
+  IN   CONST VOID  *Md4Context,
+  OUT  VOID        *NewMd4Context
+  );
+
+/**
+  Digests the input data and updates MD4 context.
+
+  This function performs MD4 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  MD4 context should be already correctly intialized by Md4Init(), and should not be finalized
+  by Md4Final(). Behavior with invalid context is undefined.
+
+  If Md4Context is NULL, then ASSERT().
+
+  @param[in, out]  Md4Context  Pointer to the MD4 context.
+  @param[in]       Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]       DataSize    Size of Data buffer in bytes.
+
+  @retval TRUE   MD4 data digest succeeded.
+  @retval FALSE  MD4 data digest failed.
+
+**/
+BOOLEAN
+EFIAPI
+Md4Update (
+  IN OUT  VOID        *Md4Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  );
+
+/**
+  Completes computation of the MD4 digest value.
+
+  This function completes MD4 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the MD4 context cannot
+  be used again.
+  MD4 context should be already correctly intialized by Md4Init(), and should not be
+  finalized by Md4Final(). Behavior with invalid MD4 context is undefined.
+
+  If Md4Context is NULL, then ASSERT().
+  If HashValue is NULL, then ASSERT().
+
+  @param[in, out]  Md4Context  Pointer to the MD4 context.
+  @param[out]      HashValue   Pointer to a buffer that receives the MD4 digest
+                               value (16 bytes).
+
+  @retval TRUE   MD4 digest computation succeeded.
+  @retval FALSE  MD4 digest computation failed.
+
+**/
+BOOLEAN
+EFIAPI
+Md4Final (
+  IN OUT  VOID   *Md4Context,
+  OUT     UINT8  *HashValue
+  );
 
 /**
   Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
@@ -1290,6 +1398,107 @@ RsaPkcs1Verify (
   IN  UINTN        HashSize,
   IN  UINT8        *Signature,
   IN  UINTN        SigSize
+  );
+
+/**
+  Retrieve the RSA Private Key from the password-protected PEM key data.
+
+  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize      Size of the PEM key data in bytes.
+  @param[in]  Password     NULL-terminated passphrase used for encrypted PEM key data.
+  @param[out] RsaContext   Pointer to new-generated RSA context which contain the retrieved
+                           RSA private key component. Use RsaFree() function to free the
+                           resource.
+
+  If PemData is NULL, then ASSERT().
+  If RsaContext is NULL, then ASSERT().
+
+  @retval  TRUE   RSA Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+RsaGetPrivateKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **RsaContext
+  );
+
+/**
+  Retrieve the RSA Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize     Size of the X509 certificate in bytes.
+  @param[out] RsaContext   Pointer to new-generated RSA context which contain the retrieved
+                           RSA public key component. Use RsaFree() function to free the
+                           resource.
+
+  If Cert is NULL, then ASSERT().
+  If RsaContext is NULL, then ASSERT().
+
+  @retval  TRUE   RSA Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve RSA public key from X509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+RsaGetPublicKeyFromX509 (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **RsaContext
+  );
+
+/**
+  Retrieve the subject bytes from one X.509 certificate.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     CertSubject  Pointer to the retrieved certificate subject bytes.
+  @param[in, out] SubjectSize  The size in bytes of the CertSubject buffer on input,
+                               and the size of buffer returned CertSubject on output.
+
+  If Cert is NULL, then ASSERT().
+  If SubjectSize is NULL, then ASSERT().
+
+  @retval  TRUE   The certificate subject retrieved successfully.
+  @retval  FALSE  Invalid certificate, or the SubjectSize is too small for the result.
+                  The SubjectSize will be updated with the required size.
+
+**/
+BOOLEAN
+EFIAPI
+X509GetSubjectName (
+  IN      CONST UINT8  *Cert,
+  IN      UINTN        CertSize,
+  OUT     UINT8        *CertSubject,
+  IN OUT  UINTN        *SubjectSize
+  );
+
+/**
+  Verify one X509 certificate was issued by the trusted CA.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate to be verified.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[in]      CACert       Pointer to the DER-encoded trusted CA certificate.
+  @param[in]      CACertSize   Size of the CA Certificate in bytes.
+
+  If Cert is NULL, then ASSERT().
+  If CACert is NULL, then ASSERT().
+
+  @retval  TRUE   The certificate was issued by the trusted CA.
+  @retval  FALSE  Invalid certificate or the certificate was not issued by the given
+                  trusted CA.
+
+**/
+BOOLEAN
+EFIAPI
+X509VerifyCert (
+  IN  CONST UINT8  *Cert,
+  IN  UINTN        CertSize,
+  IN  CONST UINT8  *CACert,
+  IN  UINTN        CACertSize
   );
 
 /**

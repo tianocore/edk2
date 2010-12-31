@@ -82,6 +82,12 @@ Sha256Duplicate (
   OUT  VOID        *NewSha256Context
   )
 {
+  //
+  // ASSERT if Sha256Context or NewSha256Context is NULL.
+  //
+  ASSERT (Sha256Context    != NULL);
+  ASSERT (NewSha256Context != NULL);
+
   CopyMem (NewSha256Context, Sha256Context, sizeof (SHA256_CTX));
 
   return TRUE;

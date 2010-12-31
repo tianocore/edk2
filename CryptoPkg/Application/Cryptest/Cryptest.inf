@@ -35,6 +35,7 @@
   HmacVerify.c
   BlockCipherVerify.c
   RsaVerify.c
+  RsaVerify2.c
   AuthenticodeVerify.c
   DhVerify.c
   RandVerify.c

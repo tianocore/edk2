@@ -84,6 +84,12 @@ Md5Duplicate (
   OUT  VOID        *NewMd5Context
   )
 {
+  //
+  // ASSERT if Md5Context or NewMd5Context is NULL.
+  //
+  ASSERT (Md5Context    != NULL);
+  ASSERT (NewMd5Context != NULL);
+
   CopyMem (NewMd5Context, Md5Context, sizeof (MD5_CTX));
 
   return TRUE;

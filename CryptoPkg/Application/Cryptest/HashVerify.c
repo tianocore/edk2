@@ -25,6 +25,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *HashData = "abc";
 
 //
+// Result for MD4("abc"). (From "A.5 Test suite" of IETF RFC1320)
+//
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8 Md4Digest[MD4_DIGEST_SIZE] = {
+  0xa4, 0x48, 0x01, 0x7a, 0xaf, 0x21, 0xd8, 0x52, 0x5f, 0xc1, 0x0a, 0xe8, 0x7a, 0xa6, 0x72, 0x9d
+  };
+
+//
 // Result for MD5("abc"). (From "A.5 Test suite" of IETF RFC1321)
 //
 GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8 Md5Digest[MD5_DIGEST_SIZE] = {
@@ -67,6 +74,46 @@ ValidateCryptDigest (
 
   Print (L" UEFI-OpenSSL Hash Engine Testing:\n");
   DataSize = AsciiStrLen (HashData);
+
+  Print (L"- MD4:    ");
+  
+  //
+  // MD4 Digest Validation
+  //
+  ZeroMem (Digest, MAX_DIGEST_SIZE);
+  CtxSize = Md4GetContextSize ();
+  HashCtx = AllocatePool (CtxSize);
+
+  Print (L"Init... ");
+  Status  = Md4Init (HashCtx);
+  if (!Status) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
+
+  Print (L"Update... ");
+  Status  = Md4Update (HashCtx, HashData, DataSize);
+  if (!Status) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
+
+  Print (L"Finalize... ");
+  Status  = Md4Final (HashCtx, Digest);
+  if (!Status) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
+
+  FreePool (HashCtx);
+
+  Print (L"Check Value... ");
+  if (CompareMem (Digest, Md4Digest, MD5_DIGEST_SIZE) != 0) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
+
+  Print (L"[Pass]\n");
 
   Print (L"- MD5:    ");
 

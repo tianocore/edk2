@@ -89,6 +89,12 @@ HmacSha1Duplicate (
   OUT  VOID        *NewHmacSha1Context
   )
 {
+  //
+  // ASSERT if HmacSha1Context or NewHmacSha1Context is NULL.
+  //
+  ASSERT (HmacSha1Context    != NULL);
+  ASSERT (NewHmacSha1Context != NULL);
+
   CopyMem (NewHmacSha1Context, HmacSha1Context, sizeof (HMAC_CTX));
 
   return TRUE;

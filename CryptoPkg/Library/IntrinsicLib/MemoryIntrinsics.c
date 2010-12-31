@@ -23,5 +23,17 @@ int _fltused = 1;
 /* Sets buffers to a specified character */
 void * memset (void *dest, char ch, unsigned int count)
 {
-  return SetMem (dest, (UINTN)count, (UINT8)ch);
+  //
+  // Declare the local variables that actually move the data elements as
+  // volatile to prevent the optimizer from replacing this function with
+  // the intrinsic memset()
+  //
+  volatile UINT8  *Pointer;
+
+  Pointer = (UINT8 *)dest;
+  while (count-- != 0) {
+    *(Pointer++) = ch;
+  }
+  
+  return dest;
 }
