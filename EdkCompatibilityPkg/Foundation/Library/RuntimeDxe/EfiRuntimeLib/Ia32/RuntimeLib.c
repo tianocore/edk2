@@ -27,6 +27,8 @@ Abstract:
 #include EFI_GUID_DEFINITION (StatusCodeCallerId)
 #include EFI_GUID_DEFINITION (Hob)
 #include EFI_ARCH_PROTOCOL_DEFINITION (StatusCode)
+#include EFI_PROTOCOL_DEFINITION (SmmStatusCode)
+#include EFI_PROTOCOL_DEFINITION (SmmBase)
 
 //
 // Driver Lib Module Globals
@@ -36,6 +38,7 @@ static EFI_EVENT            mRuntimeNotifyEvent     = NULL;
 static EFI_EVENT            mEfiVirtualNotifyEvent  = NULL;
 static BOOLEAN              mRuntimeLibInitialized  = FALSE;
 static BOOLEAN              mEfiGoneVirtual         = FALSE;
+static BOOLEAN              mInSmm                  = FALSE;
 
 //
 // Runtime Global, but you should use the Lib functions
@@ -43,6 +46,7 @@ static BOOLEAN              mEfiGoneVirtual         = FALSE;
 EFI_CPU_IO_PROTOCOL         *gCpuIo;
 BOOLEAN                     mEfiAtRuntime = FALSE;
 FVB_ENTRY                   *mFvbEntry;
+EFI_SMM_STATUS_CODE_PROTOCOL  *gSmmStatusCodeProtocol = NULL;
 
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 
@@ -493,10 +497,8 @@ Returns:
 
 --*/
 {
-  EFI_STATUS  Status;
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  VOID *Registration;
-#endif
+  EFI_STATUS               Status;
+  EFI_SMM_BASE_PROTOCOL    *SmmBase;
 
   if (mRuntimeLibInitialized) {
     return EFI_ALREADY_STARTED;
@@ -512,28 +514,21 @@ Returns:
   mRT = SystemTable->RuntimeServices;
   ASSERT (mRT != NULL);
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   //
-  // Register EFI_STATUS_CODE_PROTOCOL notify function
+  // Check whether it is in SMM mode.
   //
-  Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_SIGNAL,
-                  EFI_TPL_CALLBACK,
-                  OnStatusCodeInstall,
-                  NULL,
-                  &gEfiStatusCodeNotifyEvent
-                  );
-  ASSERT_EFI_ERROR (Status);
+  Status  = gBS->LocateProtocol (&gEfiSmmBaseProtocolGuid, NULL, &SmmBase);
+  if (!EFI_ERROR (Status)) {
+    SmmBase->InSmm (SmmBase, &mInSmm);
+  }
 
-  Status = gBS->RegisterProtocolNotify (
-                  &gEfiStatusCodeRuntimeProtocolGuid,
-                  gEfiStatusCodeNotifyEvent,
-                  &Registration
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  gBS->SignalEvent (gEfiStatusCodeNotifyEvent);
-#endif
+  //
+  // Directly locate SmmStatusCode protocol
+  //
+  Status = gBS->LocateProtocol (&gEfiSmmStatusCodeProtocolGuid, NULL, &gSmmStatusCodeProtocol);
+  if (EFI_ERROR (Status)) {
+    gSmmStatusCodeProtocol = NULL;
+  }
 
   Status  = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID **) &gCpuIo);
   if (EFI_ERROR (Status)) {
@@ -912,6 +907,14 @@ Returns:
 --*/
 {
   EFI_STATUS               Status;
+  
+  if (mInSmm) {
+    if (gSmmStatusCodeProtocol == NULL) {
+      return EFI_UNSUPPORTED;
+    }
+    Status = gSmmStatusCodeProtocol->ReportStatusCode (gSmmStatusCodeProtocol, CodeType, Value, Instance, CallerId, Data);
+    return Status;
+  }
 
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   if (gReportStatusCode == NULL) {
