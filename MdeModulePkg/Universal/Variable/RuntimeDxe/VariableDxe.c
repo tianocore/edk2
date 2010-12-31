@@ -255,6 +255,9 @@ OnReadyToBoot (
   )
 {
   ReclaimForOS ();
+  if (FeaturePcdGet (PcdVariableCollectStatistics)) {
+    gBS->InstallConfigurationTable (&gEfiVariableGuid, gVariableInfo);
+  }
 }
 
 
@@ -279,6 +282,11 @@ FtwNotificationEvent (
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL      *FvbProtocol;
   EFI_FAULT_TOLERANT_WRITE_PROTOCOL       *FtwProtocol;
   EFI_PHYSICAL_ADDRESS                    NvStorageVariableBase;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR         GcdDescriptor;
+  EFI_PHYSICAL_ADDRESS                    BaseAddress;
+  UINT64                                  Length;
+  EFI_PHYSICAL_ADDRESS                    VariableStoreBase;
+  UINT64                                  VariableStoreLength;
 
   //
   // Ensure FTW protocol is installed.
@@ -300,6 +308,29 @@ FtwNotificationEvent (
     return ;
   }
   mVariableModuleGlobal->FvbInstance = FvbProtocol;
+
+  //
+  // Mark the variable storage region of the FLASH as RUNTIME.
+  //
+  VariableStoreBase   = mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase;
+  VariableStoreLength = ((VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase)->Size;
+  BaseAddress = VariableStoreBase & (~EFI_PAGE_MASK);
+  Length      = VariableStoreLength + (VariableStoreBase - BaseAddress);
+  Length      = (Length + EFI_PAGE_SIZE - 1) & (~EFI_PAGE_MASK);
+
+  Status      = gDS->GetMemorySpaceDescriptor (BaseAddress, &GcdDescriptor);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "Variable driver failed to add EFI_MEMORY_RUNTIME attribute to Flash.\n"));
+  } else {
+    Status = gDS->SetMemorySpaceAttributes (
+                    BaseAddress,
+                    Length,
+                    GcdDescriptor.Attributes | EFI_MEMORY_RUNTIME
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "Variable driver failed to add EFI_MEMORY_RUNTIME attribute to Flash.\n"));
+    }
+  }
   
   Status = VariableWriteServiceInitialize ();
   ASSERT_EFI_ERROR (Status);
@@ -395,9 +426,6 @@ VariableServiceInitialize (
              &ReadyToBootEvent
              );
 
-  if (FeaturePcdGet (PcdVariableCollectStatistics)) {
-    gBS->InstallConfigurationTable (&gEfiVariableGuid, gVariableInfo);
-  }
   return EFI_SUCCESS;
 }
 

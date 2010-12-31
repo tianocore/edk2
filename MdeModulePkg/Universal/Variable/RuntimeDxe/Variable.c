@@ -2259,9 +2259,6 @@ VariableWriteServiceInitialize (
   VARIABLE_STORE_HEADER           *VariableStoreHeader;
   UINTN                           Index;
   UINT8                           Data;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR GcdDescriptor;
-  EFI_PHYSICAL_ADDRESS            BaseAddress;
-  UINT64                          Length;
   EFI_PHYSICAL_ADDRESS            VariableStoreBase;
   UINT64                          VariableStoreLength;
 
@@ -2291,26 +2288,6 @@ VariableWriteServiceInitialize (
     }
   }
 
-  //
-  // Mark the variable storage region of the FLASH as RUNTIME.
-  //
-  BaseAddress = VariableStoreBase & (~EFI_PAGE_MASK);
-  Length      = VariableStoreLength + (VariableStoreBase - BaseAddress);
-  Length      = (Length + EFI_PAGE_SIZE - 1) & (~EFI_PAGE_MASK);
-
-  Status      = gDS->GetMemorySpaceDescriptor (BaseAddress, &GcdDescriptor);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "Variable driver failed to add EFI_MEMORY_RUNTIME attribute to Flash.\n"));
-  } else {
-    Status = gDS->SetMemorySpaceAttributes (
-                    BaseAddress,
-                    Length,
-                    GcdDescriptor.Attributes | EFI_MEMORY_RUNTIME
-                    );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN, "Variable driver failed to add EFI_MEMORY_RUNTIME attribute to Flash.\n"));
-    }
-  }
   return EFI_SUCCESS;
 }
 
