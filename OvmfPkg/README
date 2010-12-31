@@ -91,3 +91,16 @@ http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=How_to_build_OVM
     -net nic,model=e1000 -net user,restrict=yes -net user,dhcpstart=10.0.2.10 -net dump,file=a.pcap
   * Enable 2 e1000 NICs with a DHCP server and restrict packet forwarding
     -net nic,model=e1000,addr=3 -net nic,model=e1000,addr=4 -net user,restrict=yes -net user,dhcpstart=10.0.2.10
+
+=== Build Scripts ===
+
+On environments with the bash shell you can use OvmfPkg/build32.sh and
+OvmfPkg/build64.sh to simplify building and running OVMF.
+
+So, for example, to build + run OVMF X64:
+$ OvmfPkg/build64.sh
+$ OvmfPkg/build64.sh qemu
+
+And to run a 64-bit UEFI bootable ISO image:
+$ OvmfPkg/build64.sh qemu -cdrom /path/to/disk-image.iso
+
