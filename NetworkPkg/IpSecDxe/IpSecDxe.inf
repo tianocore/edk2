@@ -64,7 +64,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   CryptoPkg/CryptoPkg.dec
-  LocalNetworkPkg/LocalNetworkPkg.dec
+  NetworkPkg/NetworkPkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -76,7 +76,6 @@
   BaseMemoryLib
   DebugLib
   PrintLib
-  #CryptLib
   BaseCryptLib
   DpcLib
   UdpIoLib
@@ -100,6 +99,3 @@
   gEfiMdeModulePkgTokenSpaceGuid.UefiCertificateSize
   gEfiMdeModulePkgTokenSpaceGuid.UefiCertificateKey
   gEfiMdeModulePkgTokenSpaceGuid.UefiCertificateKeySize
-  
-[BuildOptions.common]
-#DEBUG_MYTOOLS_IA32_CC_FLAGS            = /Od /GL
