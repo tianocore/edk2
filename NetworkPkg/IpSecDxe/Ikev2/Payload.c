@@ -3015,6 +3015,7 @@ Ikev2OnPacketAccepted (
 
 **/
 VOID
+EFIAPI
 Ikev2OnPacketSent (
   IN NET_BUF                   *Packet,
   IN UDP_END_POINT             *EndPoint,

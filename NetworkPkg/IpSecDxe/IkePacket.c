@@ -99,6 +99,7 @@ IkePacketFree (
 
 **/
 VOID
+EFIAPI
 IkePacketNetbufFree (
   IN VOID  *Arg
   )

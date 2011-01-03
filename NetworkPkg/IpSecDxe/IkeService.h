@@ -207,6 +207,7 @@ IkeNegotiate (
     
 **/
 VOID
+EFIAPI
 IkeDispatch (
   IN NET_BUF                        *Packet,
   IN UDP_END_POINT                  *EndPoint,

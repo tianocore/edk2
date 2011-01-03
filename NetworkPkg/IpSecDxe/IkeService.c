@@ -116,6 +116,7 @@ IkeLookupUdp (
 
 **/
 EFI_STATUS
+EFIAPI
 IkeConfigUdp4 (
   IN UDP_IO                 *UdpIo,
   IN VOID                   *Context
@@ -157,6 +158,7 @@ IkeConfigUdp4 (
 
 **/
 EFI_STATUS
+EFIAPI
 IkeConfigUdp6 (
   IN UDP_IO                 *UdpIo,
   IN VOID                   *Context
@@ -573,6 +575,7 @@ IkeNegotiate (
     
 **/
 VOID
+EFIAPI
 IkeDispatch (
   IN NET_BUF                        *Packet,
   IN UDP_END_POINT                  *EndPoint,
