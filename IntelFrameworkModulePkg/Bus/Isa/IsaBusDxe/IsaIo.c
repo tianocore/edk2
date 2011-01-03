@@ -1,7 +1,7 @@
 /** @file
   The implementation for EFI_ISA_IO_PROTOCOL. 
   
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -81,24 +81,6 @@ EFI_ISA_DMA_REGISTERS  mDmaRegisters[8] = {
 };
 
 /**
-  report a error Status code
-
-  @param Code          The error status code.
-  
-  @return EFI_SUCCESS  Success to report status code.
-**/
-EFI_STATUS
-ReportErrorStatusCode (
-  EFI_STATUS_CODE_VALUE Code
-  )
-{
-  return REPORT_STATUS_CODE (
-           EFI_ERROR_CODE | EFI_ERROR_MINOR,
-           Code
-           );
-}
-
-/**
   Initializes an ISA I/O Instance
 
   @param[in] IsaIoDevice            The iso device to be initialized.
@@ -176,7 +158,10 @@ IsaIoIoRead (
                                     );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR
+      );
   }
 
   return Status;
@@ -235,7 +220,10 @@ IsaIoIoWrite (
                                     );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR
+      );
   }
 
   return Status;
@@ -274,7 +262,10 @@ WritePort (
                                     &Value
                                     );
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR
+      );
     return Status;
   }
 
@@ -414,7 +405,10 @@ IsaIoFlush (
   Status = IsaIoDevice->PciIo->Flush (IsaIoDevice->PciIo);
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR
+      );
   }
 
   return Status;
@@ -544,7 +538,10 @@ IsaIoMemRead (
                                      );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR
+      );
   }
 
   return Status;
@@ -610,7 +607,10 @@ IsaIoMemWrite (
                                      );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR
+      );
   }
 
   return Status;
@@ -688,7 +688,10 @@ IsaIoCopyMem (
                                  );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR
+      );
   }
 
   return Status;
@@ -1404,7 +1407,10 @@ IsaIoAllocateBuffer (
 
   Status = gBS->AllocatePages (Type, MemoryType, Pages, &PhysicalAddress);
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR
+      );
     return Status;
   }
 
@@ -1447,7 +1453,10 @@ IsaIoFreeBuffer (
                   Pages
                   );
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_LPC | EFI_IOB_EC_CONTROLLER_ERROR
+      );
   }
 
   return Status;

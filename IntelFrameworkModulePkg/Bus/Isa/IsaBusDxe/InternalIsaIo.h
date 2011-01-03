@@ -1,7 +1,7 @@
 /** @file
   The header file for EFI_ISA_IO protocol implementation.
   
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -163,18 +163,6 @@ EFI_STATUS
 EFIAPI
 IsaIoFlush (
   IN EFI_ISA_IO_PROTOCOL  *This
-  );
-
-/**
-  report a error Status code
-
-  @param Code          The error status code.
-  
-  @return EFI_SUCCESS  Success to report status code.
-**/
-EFI_STATUS
-ReportErrorStatusCode (
-  EFI_STATUS_CODE_VALUE Code
   );
 
 /**
