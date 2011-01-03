@@ -1,7 +1,7 @@
 /** @file
   EFI PCI IO protocol functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -45,26 +45,6 @@ EFI_PCI_IO_PROTOCOL  mPciIoInterface = {
   0,
   NULL
 };
-
-/**
-  Report a error Status code of PCI bus driver controller.
-
-  @param PciIoDevice Pci device instance.
-  @param Code        Status code value.
-
-**/
-EFI_STATUS
-ReportErrorStatusCode (
-  IN PCI_IO_DEVICE               *PciIoDevice,
-  IN EFI_STATUS_CODE_VALUE       Code
-  )
-{
-  return REPORT_STATUS_CODE_WITH_DEVICE_PATH (
-          EFI_ERROR_CODE | EFI_ERROR_MINOR,
-          Code,
-          PciIoDevice->DevicePath
-          );
-}
 
 /**
   Initializes a PCI I/O Instance.
@@ -292,7 +272,11 @@ PciIoPollMem (
                                            );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -391,7 +375,11 @@ PciIoPollIo (
                                            );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -466,7 +454,11 @@ PciIoMemRead (
                                               );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_READ_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_READ_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -540,7 +532,11 @@ PciIoMemWrite (
                                               );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_WRITE_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_WRITE_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -614,7 +610,11 @@ PciIoIoRead (
                                               );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_READ_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_READ_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -688,7 +688,11 @@ PciIoIoWrite (
                                               );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_WRITE_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_WRITE_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -753,7 +757,11 @@ PciIoConfigRead (
                                                );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_READ_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_READ_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -818,7 +826,11 @@ PciIoConfigWrite (
                                               );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_WRITE_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_WRITE_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -913,7 +925,11 @@ PciIoCopyMem (
                                           );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -976,7 +992,11 @@ PciIoMap (
                                           );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -1010,7 +1030,11 @@ PciIoUnmap (
                                           );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -1071,7 +1095,11 @@ PciIoAllocateBuffer (
                                           );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -1109,7 +1137,11 @@ PciIoFreeBuffer (
                                           );
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -1141,7 +1173,11 @@ PciIoFlush (
                                            PciIoDevice->PciRootBridgeIo
                                            );
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
@@ -1720,7 +1756,11 @@ PciIoAttributes (
   }
 
   if (EFI_ERROR (Status)) {
-    ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR);
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR,
+      PciIoDevice->DevicePath
+      );
   }
 
   return Status;
