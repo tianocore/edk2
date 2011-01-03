@@ -517,7 +517,7 @@ Returns:
   //
   // Check whether it is in SMM mode.
   //
-  Status  = gBS->LocateProtocol (&gEfiSmmBaseProtocolGuid, NULL, &SmmBase);
+  Status  = gBS->LocateProtocol (&gEfiSmmBaseProtocolGuid, NULL, (VOID**) &SmmBase);
   if (!EFI_ERROR (Status)) {
     SmmBase->InSmm (SmmBase, &mInSmm);
   }
@@ -525,7 +525,7 @@ Returns:
   //
   // Directly locate SmmStatusCode protocol
   //
-  Status = gBS->LocateProtocol (&gEfiSmmStatusCodeProtocolGuid, NULL, &gSmmStatusCodeProtocol);
+  Status = gBS->LocateProtocol (&gEfiSmmStatusCodeProtocolGuid, NULL, (VOID**) &gSmmStatusCodeProtocol);
   if (EFI_ERROR (Status)) {
     gSmmStatusCodeProtocol = NULL;
   }
