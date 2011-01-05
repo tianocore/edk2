@@ -889,7 +889,7 @@ InitializeScriptSaveOnS3SaveState (
     // Allocate BootScriptThunkData
     //
     BootScriptThunkData = AllocatePool (sizeof (BOOT_SCRIPT_THUNK_DATA));
-    if (EFI_ERROR (Status)) {
+    if (BootScriptThunkData == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
 
