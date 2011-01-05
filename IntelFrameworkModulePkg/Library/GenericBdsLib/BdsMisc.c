@@ -1116,16 +1116,26 @@ BdsSetMemoryTypeInformationVariable (
   EFI_HOB_GUID_TYPE            *GuidHob;
   BOOLEAN                      MemoryTypeInformationModified;
   BOOLEAN                      MemoryTypeInformationVariableExists;
+  EFI_BOOT_MODE                BootMode;
 
   MemoryTypeInformationModified       = FALSE;
   MemoryTypeInformationVariableExists = FALSE;
+
+
+  BootMode = GetBootModeHob ();
+  //
+  // In BOOT_IN_RECOVERY_MODE, Variable region is not reliable.
+  //
+  if (BootMode == BOOT_IN_RECOVERY_MODE) {
+    return;
+  }
 
   //
   // Only get the the Memory Type Information variable in the boot mode 
   // other than BOOT_WITH_DEFAULT_SETTINGS because the Memory Type
   // Information is not valid in this boot mode.
   //
-  if (GetBootModeHob () != BOOT_WITH_DEFAULT_SETTINGS) {
+  if (BootMode != BOOT_WITH_DEFAULT_SETTINGS) {
     VariableSize = 0;
     Status = gRT->GetVariable (
                     EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
