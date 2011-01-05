@@ -1,7 +1,7 @@
 /** @file
   The implementation of dump policy entry function in IpSecConfig application.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -70,8 +70,29 @@ DumpAsciiString (
   )
 {
   UINTN    Index;
+  Print (L"\"");
   for (Index = 0; Index < Length; Index++) {
     Print (L"%c", (CHAR16) Str[Index]);
+  }
+  Print (L"\"");
+}
+
+/**
+  Private function called to print a buffer in Hex format.
+
+  @param[in] Data      The pointer to the buffer.
+  @param[in] Length    The size of the buffer.
+
+**/
+VOID
+DumpBuf (
+  IN UINT8    *Data,
+  IN UINTN    Length
+  )
+{
+  UINTN    Index;
+  for (Index = 0; Index < Length; Index++) {
+    Print (L"%02x ", Data[Index]); 
   }
 }
 
@@ -365,13 +386,9 @@ DumpSadEntry (
   BOOLEAN    HasPre;
   CHAR16     *AuthAlgoStr;
   CHAR16     *EncAlgoStr;
-  CHAR8      *AuthKeyAsciiStr;
-  CHAR8      *EncKeyAsciiStr;
 
   AuthAlgoStr      = NULL;
   EncAlgoStr       = NULL;
-  AuthKeyAsciiStr  = NULL;
-  EncKeyAsciiStr   = NULL;
 
   //
   // SPI:1234 ESP Destination:xxx.xxx.xxx.xxx
@@ -386,7 +403,7 @@ DumpSadEntry (
     Print (L"TunnelSourceAddress:");
     DumpIpAddress (&Data->TunnelSourceAddress);
     Print (L"\n");
-    Print (L"TunnelDestination:");
+    Print (L"  TunnelDestination:");
     DumpIpAddress (&Data->TunnelDestinationAddress);
     Print (L"\n");
   }
@@ -433,30 +450,35 @@ DumpSadEntry (
     AuthAlgoStr = MapIntegerToString (Data->AlgoInfo.EspAlgoInfo.AuthAlgoId, mMapAuthAlgo);
     EncAlgoStr  = MapIntegerToString (Data->AlgoInfo.EspAlgoInfo.EncAlgoId, mMapEncAlgo);
 
-    AuthKeyAsciiStr    = AllocateZeroPool (Data->AlgoInfo.EspAlgoInfo.AuthKeyLength + 1);
-    ASSERT (AuthKeyAsciiStr != NULL);
-    CopyMem (AuthKeyAsciiStr, Data->AlgoInfo.EspAlgoInfo.AuthKey, Data->AlgoInfo.EspAlgoInfo.AuthKeyLength);
-    AuthKeyAsciiStr[Data->AlgoInfo.EspAlgoInfo.AuthKeyLength] = '\0';
-
-    EncKeyAsciiStr  = AllocateZeroPool (Data->AlgoInfo.EspAlgoInfo.EncKeyLength + 1);
-    ASSERT (EncKeyAsciiStr != NULL) ;
-    CopyMem (EncKeyAsciiStr, Data->AlgoInfo.EspAlgoInfo.EncKey, Data->AlgoInfo.EspAlgoInfo.EncKeyLength);
-    EncKeyAsciiStr[Data->AlgoInfo.EspAlgoInfo.EncKeyLength] = '\0';
-
-    Print (
-      L"  Auth:%s/%a Encrypt:%s/%a\n",
-      AuthAlgoStr,      
-      AuthKeyAsciiStr,
-      EncAlgoStr,
-      EncKeyAsciiStr
-      );
- 
-    FreePool (AuthKeyAsciiStr);
-    FreePool (EncKeyAsciiStr);
+    if (Data->ManualSet) {
+      //
+      // if the SAD is set manually the key is a Ascii string in most of time.
+      // Print the Key in Ascii string format.
+      //
+      Print (L"  Auth:%s/",AuthAlgoStr);
+      DumpAsciiString (
+        Data->AlgoInfo.EspAlgoInfo.AuthKey, 
+        Data->AlgoInfo.EspAlgoInfo.AuthKeyLength
+        );
+      Print (L"\n  Encrypt:%s/",EncAlgoStr);
+      DumpAsciiString (
+        Data->AlgoInfo.EspAlgoInfo.EncKey, 
+        Data->AlgoInfo.EspAlgoInfo.EncKeyLength
+        );
+    } else {
+      //
+      // if the SAD is created by IKE, the key is a set of hex value in buffer.
+      // Print the Key in Hex format.
+      //
+      Print (L"  Auth:%s/",AuthAlgoStr);
+      DumpBuf ((UINT8 *)(Data->AlgoInfo.EspAlgoInfo.AuthKey), Data->AlgoInfo.EspAlgoInfo.AuthKeyLength);
+      
+      Print (L"\n  Encrypt:%s/",EncAlgoStr);
+      DumpBuf ((UINT8 *)(Data->AlgoInfo.EspAlgoInfo.EncKey), Data->AlgoInfo.EspAlgoInfo.EncKeyLength);      
+    }
   }
-
   if (Data->SpdSelector != NULL) {
-    Print (L"  ");
+    Print (L"\n  ");
     DumpSpdSelector (Data->SpdSelector);
     Print (L"\n");
   }

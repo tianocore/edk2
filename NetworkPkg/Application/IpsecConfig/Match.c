@@ -1,7 +1,7 @@
 /** @file
   The implementation of match policy entry function in IpSecConfig application.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -82,7 +82,7 @@ MatchSpdEntry (
   Find the matching SAD with Indexer.
 
   @param[in] SaId       The pointer to the EFI_IPSEC_SA_ID structure.
-  @param[in] Data       The pointer to the EFI_IPSEC_SA_DATA structure.
+  @param[in] Data       The pointer to the EFI_IPSEC_SA_DATA2 structure.
   @param[in] Indexer    The pointer to the SPD_ENTRY_INDEXER structure.
 
   @retval TRUE     The matched SAD is found.
