@@ -1,7 +1,7 @@
 /** @file
   CPU DXE Module.
 
-  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -612,8 +612,6 @@ CpuSetMemoryAttributes (
     return EFI_UNSUPPORTED;
   }
 
-  DEBUG((EFI_D_ERROR, "CpuAp: SetMemorySpaceAttributes(BA=%08x, Len=%08x, Attr=%08x)\n", BaseAddress, Length, Attributes));
-
   //
   // If this function is called because GCD SetMemorySpaceAttributes () is called
   // by RefreshGcdMemoryAttributes (), then we are just synchronzing GCD memory
@@ -652,14 +650,11 @@ CpuSetMemoryAttributes (
   //
   // call MTRR libary function
   //
-  DEBUG((EFI_D_ERROR, "  MtrrSetMemoryAttribute()\n"));
-  Status = MtrrSetMemoryAttribute(
+  Status = MtrrSetMemoryAttribute (
              BaseAddress,
              Length,
              CacheType
              );
-
-  MtrrDebugPrintAllMtrrs ();
 
   return (EFI_STATUS) Status;
 }
