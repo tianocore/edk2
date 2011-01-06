@@ -22,9 +22,9 @@ INTERWORK_FUNC(__switchu8)
 
 ASM_PFX(__switchu8):
     ldrb      ip,[lr,#-1]
-    cmp       r3,ip
-    ldrccb    r3,[lr,r3]
-    ldrcsb    r3,[lr,ip]
-    add       ip,lr,r3,LSL #1
+    cmp       r0,ip
+    ldrccb    r0,[lr,r0]
+    ldrcsb    r0,[lr,ip]
+    add       ip,lr,r0,LSL #1
     bx        ip
 
