@@ -1,7 +1,7 @@
 /** @file
   The file for AHCI mode of ATA host controller.
   
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -255,6 +255,42 @@ AhciClearPortStatus (
   //
   AhciWriteReg (PciIo, EFI_AHCI_IS_OFFSET, AhciReadReg (PciIo, EFI_AHCI_IS_OFFSET));
 }
+
+/**
+  This function is used to dump the Status Registers and if there is ERR bit set
+  in the Status Register, the Error Register's value is also be dumped.
+
+  @param  PciIo            The PCI IO protocol instance.
+  @param  Port             The number of port.
+  @param  AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
+
+**/
+VOID
+EFIAPI
+AhciDumpPortStatus (
+  IN     EFI_PCI_IO_PROTOCOL        *PciIo,
+  IN     UINT8                      Port,
+  IN OUT EFI_ATA_STATUS_BLOCK       *AtaStatusBlock
+  )
+{
+  UINT32               Offset;
+  UINT32               Data;
+
+  ASSERT (PciIo != NULL);
+
+  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
+  Data   = AhciReadReg (PciIo, Offset);
+
+  if (AtaStatusBlock != NULL) {
+    ZeroMem (AtaStatusBlock, sizeof (EFI_ATA_STATUS_BLOCK));
+
+    AtaStatusBlock->AtaStatus  = (UINT8)Data;
+    if ((AtaStatusBlock->AtaStatus & BIT0) != 0) {
+      AtaStatusBlock->AtaError = (UINT8)(Data >> 8);
+    }
+  }
+}
+
 
 /**
   Enable the FIS running for giving port.
@@ -621,7 +657,7 @@ AhciPioTransfer (
   //
   Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
   do {
-    Value = *(UINT32 *) (FisBaseAddr + EFI_AHCI_PIO_FIS_OFFSET);
+    Value = *(volatile UINT32 *) (FisBaseAddr + EFI_AHCI_PIO_FIS_OFFSET);
 
     if ((Value & EFI_AHCI_FIS_TYPE_MASK) == EFI_AHCI_FIS_PIO_SETUP) {
       break;
@@ -685,6 +721,8 @@ Exit:
     PciIo,
     Map
     );
+
+  AhciDumpPortStatus (PciIo, Port, AtaStatusBlock);
 
   return Status;
 }
@@ -855,6 +893,8 @@ Exit:
            Map
            );  
   
+  AhciDumpPortStatus (PciIo, Port, AtaStatusBlock);
+
   return Status;
 }
 
@@ -942,7 +982,7 @@ AhciNonDataTransfer (
   //
   Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
   do {
-    Value = *(UINT32 *) (FisBaseAddr + EFI_AHCI_D2H_FIS_OFFSET);
+    Value = *(volatile UINT32 *) (FisBaseAddr + EFI_AHCI_D2H_FIS_OFFSET);
 
     if ((Value & EFI_AHCI_FIS_TYPE_MASK) == EFI_AHCI_FIS_REGISTER_D2H) {
       break;
@@ -983,6 +1023,8 @@ Exit:
     Port,
     Timeout
     );
+
+  AhciDumpPortStatus (PciIo, Port, AtaStatusBlock);
 
   return Status;
 }
@@ -1082,17 +1124,6 @@ AhciStartCommand (
     return Status;
   }
 
-  //
-  // Setting the command
-  //
-  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SACT;
-  AhciAndReg (PciIo, Offset, 0);
-  AhciOrReg (PciIo, Offset, CmdSlotBit);
-
-  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CI;
-  AhciAndReg (PciIo, Offset, 0);
-  AhciOrReg (PciIo, Offset, CmdSlotBit);
-
   Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CMD;
   PortStatus = AhciReadReg (PciIo, Offset);
   
@@ -1123,6 +1154,17 @@ AhciStartCommand (
 
   Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CMD;
   AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_CMD_ST | StartCmd);
+
+  //
+  // Setting the command
+  //
+  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SACT;
+  AhciAndReg (PciIo, Offset, 0);
+  AhciOrReg (PciIo, Offset, CmdSlotBit);
+
+  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CI;
+  AhciAndReg (PciIo, Offset, 0);
+  AhciOrReg (PciIo, Offset, CmdSlotBit);
 
   return EFI_SUCCESS;
 }

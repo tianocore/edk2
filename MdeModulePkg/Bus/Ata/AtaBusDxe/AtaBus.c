@@ -4,7 +4,7 @@
   This file implements protocol interfaces: Driver Binding protocol,
   Block IO protocol and DiskInfo protocol.
     
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -173,15 +173,43 @@ RegisterAtaDevice (
   ATA_DEVICE                        *AtaDevice;
   EFI_ATA_PASS_THRU_PROTOCOL        *AtaPassThru;
   EFI_DEVICE_PATH_PROTOCOL          *NewDevicePathNode;
+  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL          *RemainingDevicePath;
+  EFI_HANDLE                        DeviceHandle;
 
+  AtaDevice         = NULL;
   NewDevicePathNode = NULL;
+  DevicePath        = NULL;
+  RemainingDevicePath = NULL;
+
+  //
+  // Build device path 
+  //
+  AtaPassThru = AtaBusDriverData->AtaPassThru;
+  Status = AtaPassThru->BuildDevicePath (AtaPassThru, Port, PortMultiplierPort, &NewDevicePathNode);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  DevicePath = AppendDevicePathNode (AtaBusDriverData->ParentDevicePath, NewDevicePathNode);
+  if (DevicePath == NULL) {
+    goto Done;
+  }
+
+  DeviceHandle = NULL;
+  Status = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &RemainingDevicePath, &DeviceHandle);
+  if (!EFI_ERROR (Status) && (DeviceHandle != NULL) && IsDevicePathEnd(RemainingDevicePath)) {
+    Status = EFI_ALREADY_STARTED;
+    goto Done;
+  }
 
   //
   // Allocate ATA device from the template.
   //
   AtaDevice = AllocateCopyPool (sizeof (gAtaDeviceTemplate), &gAtaDeviceTemplate);
   if (AtaDevice == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
   }
 
   //
@@ -189,6 +217,7 @@ RegisterAtaDevice (
   //
   AtaDevice->BlockIo.Media = &AtaDevice->BlockMedia;
   AtaDevice->AtaBusDriverData = AtaBusDriverData;
+  AtaDevice->DevicePath = DevicePath;
   AtaDevice->Port = Port;
   AtaDevice->PortMultiplierPort = PortMultiplierPort;
   AtaDevice->Asb = AllocateAlignedBuffer (AtaDevice, sizeof (*AtaDevice->Asb));
@@ -236,25 +265,11 @@ RegisterAtaDevice (
   }
 
   //
-  // Build device path 
-  //
-  AtaPassThru = AtaBusDriverData->AtaPassThru;
-  Status = AtaPassThru->BuildDevicePath (AtaPassThru, Port, PortMultiplierPort, &NewDevicePathNode);
-  if (EFI_ERROR (Status)) {
-    goto Done;
-  }
-
-  //
   // Update to AHCI interface GUID based on device path node. The default one
   // is IDE interface GUID copied from template.
   //
   if (NewDevicePathNode->SubType == MSG_SATA_DP) {
     CopyGuid (&AtaDevice->DiskInfo.Interface, &gEfiDiskInfoAhciInterfaceGuid);
-  }
-
-  AtaDevice->DevicePath = AppendDevicePathNode (AtaBusDriverData->ParentDevicePath, NewDevicePathNode);
-  if (AtaDevice->DevicePath == NULL) {
-    goto Done;
   }
 
   Status = gBS->InstallMultipleProtocolInterfaces (
@@ -279,13 +294,13 @@ RegisterAtaDevice (
          AtaDevice->Handle,
          EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
          );
-  
+
 Done:
   if (NewDevicePathNode != NULL) {
     FreePool (NewDevicePathNode);
   }
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && (AtaDevice != NULL)) {
     ReleaseAtaResources (AtaDevice);  
     DEBUG ((DEBUG_ERROR | DEBUG_INIT, "Failed to initialize Port %x PortMultiplierPort %x, status = %r\n", Port, PortMultiplierPort, Status));
   }
