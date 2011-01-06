@@ -1,7 +1,7 @@
 /** @file
 Dynamically update the pages.
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1310,21 +1310,13 @@ UpdateSetLegacyDeviceOrderPage (
 
   for (Index = 0; Index < OptionMenu->MenuNumber; Index++) {
     NewMenuEntry                = BOpt_GetMenuEntry (OptionMenu, Index);
-
-    if (Index == 0) {
-      HiiCreateOneOfOptionOpCode (
-        OptionsOpCodeHandle,
-        NewMenuEntry->DisplayStringToken,
-        EFI_IFR_OPTION_DEFAULT,
-        EFI_IFR_NUMERIC_SIZE_1,
-        (UINT8) ((BM_LEGACY_DEVICE_CONTEXT *) NewMenuEntry->VariableContext)->Index
-        );
-    }
-
+    //
+    // Create OneOf for each legacy device, select the first one by default
+    //
     HiiCreateOneOfOptionOpCode (
       OptionsOpCodeHandle,
       NewMenuEntry->DisplayStringToken,
-      0,
+      (Index == 0) ? EFI_IFR_OPTION_DEFAULT : 0,
       EFI_IFR_NUMERIC_SIZE_1,
       (UINT8) ((BM_LEGACY_DEVICE_CONTEXT *) NewMenuEntry->VariableContext)->Index
       );
