@@ -3,7 +3,7 @@
   The GCD services are used to manage the memory and I/O regions that
   are accessible to the CPU that is executing the DXE core.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -94,6 +94,108 @@ GCD_ATTRIBUTE_CONVERSION_ENTRY mAttributeConversionTable[] = {
   { EFI_RESOURCE_ATTRIBUTE_TESTED,                  EFI_MEMORY_TESTED,      FALSE },
   { 0,                                              0,                      FALSE }
 };
+
+///
+/// Lookup table used to print GCD Memory Space Map
+///
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *mGcdMemoryTypeNames[] = {
+  "NonExist ",  // EfiGcdMemoryTypeNonExistent
+  "Reserved ",  // EfiGcdMemoryTypeReserved
+  "SystemMem",  // EfiGcdMemoryTypeSystemMemory
+  "MMIO     ",  // EfiGcdMemoryTypeMemoryMappedIo
+  "Unknown  "   // EfiGcdMemoryTypeMaximum
+};
+
+///
+/// Lookup table used to print GCD I/O Space Map
+///
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *mGcdIoTypeNames[] = {
+  "NonExist",  // EfiGcdIoTypeNonExistent
+  "Reserved",  // EfiGcdIoTypeReserved
+  "I/O     ",  // EfiGcdIoTypeIo
+  "Unknown "   // EfiGcdIoTypeMaximum 
+};
+
+///
+/// Lookup table used to print GCD Allocation Types
+///
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *mGcdAllocationTypeNames[] = {
+  "AnySearchBottomUp        ",  // EfiGcdAllocateAnySearchBottomUp
+  "MaxAddressSearchBottomUp ",  // EfiGcdAllocateMaxAddressSearchBottomUp
+  "AtAddress                ",  // EfiGcdAllocateAddress
+  "AnySearchTopDown         ",  // EfiGcdAllocateAnySearchTopDown
+  "MaxAddressSearchTopDown  ",  // EfiGcdAllocateMaxAddressSearchTopDown
+  "Unknown                  "   // EfiGcdMaxAllocateType
+};
+
+/**
+  Dump the entire contents if the GCD Memory Space Map using DEBUG() macros when
+  PcdDebugPrintErrorLevel has the DEBUG_GCD bit set.
+
+**/
+VOID
+EFIAPI
+CoreDumpGcdMemorySpaceMap (
+  VOID
+  )
+{
+  EFI_STATUS                       Status;
+  UINTN                            NumberOfDescriptors;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
+  UINTN                            Index;
+  
+  Status = CoreGetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
+  ASSERT_EFI_ERROR (Status);
+  
+  DEBUG ((DEBUG_GCD, "GCDMemType Range                             Capabilities     Attributes      \n"));
+  DEBUG ((DEBUG_GCD, "========== ================================= ================ ================\n"));
+  for (Index = 0; Index < NumberOfDescriptors; Index++) {
+    DEBUG ((DEBUG_GCD, "%a  %016lx-%016lx %016lx %016lx%c\n", 
+      mGcdMemoryTypeNames[MIN (MemorySpaceMap[Index].GcdMemoryType, EfiGcdMemoryTypeMaximum)],
+      MemorySpaceMap[Index].BaseAddress, 
+      MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length - 1,
+      MemorySpaceMap[Index].Capabilities, 
+      MemorySpaceMap[Index].Attributes,
+      MemorySpaceMap[Index].ImageHandle == NULL ? ' ' : '*'
+      ));
+  }
+  DEBUG ((DEBUG_GCD, "\n"));
+  FreePool (MemorySpaceMap);
+}
+
+/**
+  Dump the entire contents if the GCD I/O Space Map using DEBUG() macros when 
+  PcdDebugPrintErrorLevel has the DEBUG_GCD bit set.
+
+**/
+VOID
+EFIAPI
+CoreDumpGcdIoSpaceMap (
+  VOID
+  )
+{
+  EFI_STATUS                   Status;
+  UINTN                        NumberOfDescriptors;
+  EFI_GCD_IO_SPACE_DESCRIPTOR  *IoSpaceMap;
+  UINTN                        Index;
+  
+  Status = CoreGetIoSpaceMap (&NumberOfDescriptors, &IoSpaceMap);
+  ASSERT_EFI_ERROR (Status);
+  
+  DEBUG ((DEBUG_GCD, "GCDIoType  Range                            \n"));
+  DEBUG ((DEBUG_GCD, "========== =================================\n"));
+  for (Index = 0; Index < NumberOfDescriptors; Index++) {
+    DEBUG ((DEBUG_GCD, "%a   %016lx-%016lx%c\n", 
+      mGcdIoTypeNames[MIN (IoSpaceMap[Index].GcdIoType, EfiGcdIoTypeMaximum)],
+      IoSpaceMap[Index].BaseAddress, 
+      IoSpaceMap[Index].BaseAddress + IoSpaceMap[Index].Length - 1,
+      IoSpaceMap[Index].ImageHandle == NULL ? ' ' : '*'
+      ));
+  }
+  DEBUG ((DEBUG_GCD, "\n"));
+  FreePool (IoSpaceMap);
+}
+  
 
 
 /**
@@ -571,11 +673,12 @@ CoreConvertSpace (
   EFI_GCD_MAP_ENTRY  *BottomEntry;
   LIST_ENTRY         *StartLink;
   LIST_ENTRY         *EndLink;
-
-  EFI_CPU_ARCH_PROTOCOL           *CpuArch;
-  UINT64                          CpuArchAttributes;
+  UINT64             CpuArchAttributes;
 
   if (Length == 0) {
+    DEBUG_CODE_BEGIN ();
+      DEBUG ((DEBUG_GCD, "  Status = %r\n", EFI_INVALID_PARAMETER));
+    DEBUG_CODE_END ();
     return EFI_INVALID_PARAMETER;
   }
 
@@ -692,24 +795,19 @@ CoreConvertSpace (
     // Call CPU Arch Protocol to attempt to set attributes on the range
     //
     CpuArchAttributes = ConverToCpuArchAttributes (Attributes);
-    if ( CpuArchAttributes != INVALID_CPU_ARCH_ATTRIBUTES ) {
-      Status = CoreLocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&CpuArch);
-      if (EFI_ERROR (Status) || CpuArch == NULL) {
-        Status = EFI_ACCESS_DENIED;
-        goto Done;
-      }
-
-      Status = CpuArch->SetMemoryAttributes (
-                          CpuArch,
-                          BaseAddress,
-                          Length,
-                          CpuArchAttributes
-                          );
-      if (EFI_ERROR (Status)) {
-        goto Done;
+    if (CpuArchAttributes != INVALID_CPU_ARCH_ATTRIBUTES) {
+      if (gCpu != NULL) {
+        Status = gCpu->SetMemoryAttributes (
+                         gCpu,
+                         BaseAddress,
+                         Length,
+                         CpuArchAttributes
+                         );
+        if (EFI_ERROR (Status)) {
+          goto Done;
+        }
       }
     }
-
   }
 
   //
@@ -768,11 +866,26 @@ CoreConvertSpace (
   Status = CoreCleanupGcdMapEntry (TopEntry, BottomEntry, StartLink, EndLink, Map);
 
 Done:
+  DEBUG_CODE_BEGIN ();
+    DEBUG ((DEBUG_GCD, "  Status = %r\n", Status));
+  DEBUG_CODE_END ();
+
   if ((Operation & GCD_MEMORY_SPACE_OPERATION) != 0) {
     CoreReleaseGcdMemoryLock ();
+    DEBUG_CODE_BEGIN ();
+      //
+      // Do not dump GCD Memory Space Map for GCD changes below 16 MB  
+      //
+      if (BaseAddress >= BASE_16MB) {
+        CoreDumpGcdMemorySpaceMap ();
+      }
+    DEBUG_CODE_END ();
   }
   if ((Operation & GCD_IO_SPACE_OPERATION) != 0) {
     CoreReleaseGcdIoLock ();
+    DEBUG_CODE_BEGIN ();
+      CoreDumpGcdIoSpaceMap ();
+    DEBUG_CODE_END ();
   }
 
   return Status;
@@ -871,24 +984,45 @@ CoreAllocateSpace (
   // Make sure parameters are valid
   //
   if (GcdAllocateType < 0 || GcdAllocateType >= EfiGcdMaxAllocateType) {
+    DEBUG_CODE_BEGIN ();
+      DEBUG ((DEBUG_GCD, "  Status = %r\n", EFI_INVALID_PARAMETER));
+    DEBUG_CODE_END ();
     return EFI_INVALID_PARAMETER;
   }
   if (GcdMemoryType < 0 || GcdMemoryType >= EfiGcdMemoryTypeMaximum) {
+    DEBUG_CODE_BEGIN ();
+      DEBUG ((DEBUG_GCD, "  Status = %r\n", EFI_INVALID_PARAMETER));
+    DEBUG_CODE_END ();
     return EFI_INVALID_PARAMETER;
   }
   if (GcdIoType < 0 || GcdIoType >= EfiGcdIoTypeMaximum) {
+    DEBUG_CODE_BEGIN ();
+      DEBUG ((DEBUG_GCD, "  Status = %r\n", EFI_INVALID_PARAMETER));
+    DEBUG_CODE_END ();
     return EFI_INVALID_PARAMETER;
   }
   if (BaseAddress == NULL) {
+    DEBUG_CODE_BEGIN ();
+      DEBUG ((DEBUG_GCD, "  Status = %r\n", EFI_INVALID_PARAMETER));
+    DEBUG_CODE_END ();
     return EFI_INVALID_PARAMETER;
   }
   if (ImageHandle == NULL) {
+    DEBUG_CODE_BEGIN ();
+      DEBUG ((DEBUG_GCD, "  Status = %r\n", EFI_INVALID_PARAMETER));
+    DEBUG_CODE_END ();
     return EFI_INVALID_PARAMETER;
   }
   if (Alignment >= 64) {
+    DEBUG_CODE_BEGIN ();
+      DEBUG ((DEBUG_GCD, "  Status = %r\n", EFI_NOT_FOUND));
+    DEBUG_CODE_END ();
     return EFI_NOT_FOUND;
   }
   if (Length == 0) {
+    DEBUG_CODE_BEGIN ();
+      DEBUG ((DEBUG_GCD, "  Status = %r\n", EFI_INVALID_PARAMETER));
+    DEBUG_CODE_END ();
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1068,13 +1202,32 @@ CoreAllocateSpace (
   Status = CoreCleanupGcdMapEntry (TopEntry, BottomEntry, StartLink, EndLink, Map);
 
 Done:
+  DEBUG_CODE_BEGIN ();
+    DEBUG ((DEBUG_GCD, "  Status = %r", Status));
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_GCD, "  (BaseAddress = %016lx)\n", *BaseAddress));
+    }
+    DEBUG ((DEBUG_GCD, "\n"));
+  DEBUG_CODE_END ();
+  
   if ((Operation & GCD_MEMORY_SPACE_OPERATION) != 0) {
     CoreReleaseGcdMemoryLock ();
+    DEBUG_CODE_BEGIN ();
+      //
+      // Do not dump GCD Memory Space Map for GCD changes below 16 MB  
+      //
+      if (*BaseAddress >= BASE_16MB) {
+        CoreDumpGcdMemorySpaceMap ();
+      }
+    DEBUG_CODE_END ();
   }
   if ((Operation & GCD_IO_SPACE_OPERATION) !=0) {
     CoreReleaseGcdIoLock ();
+    DEBUG_CODE_BEGIN ();
+      CoreDumpGcdIoSpaceMap ();
+    DEBUG_CODE_END ();
   }
-
+  
   return Status;
 }
 
@@ -1099,6 +1252,10 @@ CoreInternalAddMemorySpace (
   IN UINT64                Capabilities
   )
 {
+  DEBUG ((DEBUG_GCD, "GCD:AddMemorySpace(Base=%016lx,Length=%016lx)\n", BaseAddress, Length));
+  DEBUG ((DEBUG_GCD, "  GcdMemoryType   = %a\n", mGcdMemoryTypeNames[MIN (GcdMemoryType, EfiGcdMemoryTypeMaximum)]));
+  DEBUG ((DEBUG_GCD, "  Capabilities    = %016lx\n", Capabilities));
+
   //
   // Make sure parameters are valid
   //
@@ -1142,6 +1299,13 @@ CoreAllocateMemorySpace (
   IN     EFI_HANDLE             DeviceHandle OPTIONAL
   )
 {
+  DEBUG ((DEBUG_GCD, "GCD:AllocateMemorySpace(Base=%016lx,Length=%016lx)\n", *BaseAddress, Length));
+  DEBUG ((DEBUG_GCD, "  GcdAllocateType = %a\n", mGcdAllocationTypeNames[MIN (GcdAllocateType, EfiGcdMaxAllocateType)]));
+  DEBUG ((DEBUG_GCD, "  GcdMemoryType   = %a\n", mGcdMemoryTypeNames[MIN (GcdMemoryType, EfiGcdMemoryTypeMaximum)]));
+  DEBUG ((DEBUG_GCD, "  Alignment       = %016lx\n", LShiftU64 (1, Alignment)));
+  DEBUG ((DEBUG_GCD, "  ImageHandle     = %p\n", ImageHandle));
+  DEBUG ((DEBUG_GCD, "  DeviceHandle    = %p\n", DeviceHandle));
+  
   return CoreAllocateSpace (
            GCD_ALLOCATE_MEMORY_OPERATION,
            GcdAllocateType,
@@ -1249,6 +1413,8 @@ CoreFreeMemorySpace (
   IN UINT64                Length
   )
 {
+  DEBUG ((DEBUG_GCD, "GCD:FreeMemorySpace(Base=%016lx,Length=%016lx)\n", BaseAddress, Length));
+
   return CoreConvertSpace (GCD_FREE_MEMORY_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, 0, 0);
 }
 
@@ -1270,6 +1436,8 @@ CoreRemoveMemorySpace (
   IN UINT64                Length
   )
 {
+  DEBUG ((DEBUG_GCD, "GCD:RemoveMemorySpace(Base=%016lx,Length=%016lx)\n", BaseAddress, Length));
+  
   return CoreConvertSpace (GCD_REMOVE_MEMORY_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, 0, 0);
 }
 
@@ -1369,6 +1537,9 @@ CoreSetMemorySpaceAttributes (
   IN UINT64                Attributes
   )
 {
+  DEBUG ((DEBUG_GCD, "GCD:SetMemorySpaceAttributes(Base=%016lx,Length=%016lx)\n", BaseAddress, Length));
+  DEBUG ((DEBUG_GCD, "  Attributes  = %016lx\n", Attributes));
+
   return CoreConvertSpace (GCD_SET_ATTRIBUTES_MEMORY_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, 0, Attributes);
 }
 
@@ -1461,6 +1632,9 @@ CoreAddIoSpace (
   IN UINT64                Length
   )
 {
+  DEBUG ((DEBUG_GCD, "GCD:AddIoSpace(Base=%016lx,Length=%016lx)\n", BaseAddress, Length));
+  DEBUG ((DEBUG_GCD, "  GcdIoType    = %a\n", mGcdIoTypeNames[MIN (GcdIoType, EfiGcdIoTypeMaximum)]));
+  
   //
   // Make sure parameters are valid
   //
@@ -1500,6 +1674,13 @@ CoreAllocateIoSpace (
   IN     EFI_HANDLE             DeviceHandle OPTIONAL
   )
 {
+  DEBUG ((DEBUG_GCD, "GCD:AllocateIoSpace(Base=%016lx,Length=%016lx)\n", *BaseAddress, Length));
+  DEBUG ((DEBUG_GCD, "  GcdAllocateType = %a\n", mGcdAllocationTypeNames[MIN (GcdAllocateType, EfiGcdMaxAllocateType)]));
+  DEBUG ((DEBUG_GCD, "  GcdMemoryType   = %a\n", mGcdIoTypeNames[MIN (GcdIoType, EfiGcdMemoryTypeMaximum)]));
+  DEBUG ((DEBUG_GCD, "  Alignment       = %016lx\n", LShiftU64 (1, Alignment)));
+  DEBUG ((DEBUG_GCD, "  ImageHandle     = %p\n", ImageHandle));
+  DEBUG ((DEBUG_GCD, "  DeviceHandle    = %p\n", DeviceHandle));
+  
   return CoreAllocateSpace (
            GCD_ALLOCATE_IO_OPERATION,
            GcdAllocateType,
@@ -1531,6 +1712,8 @@ CoreFreeIoSpace (
   IN UINT64                Length
   )
 {
+  DEBUG ((DEBUG_GCD, "GCD:FreeIoSpace(Base=%016lx,Length=%016lx)\n", BaseAddress, Length));
+
   return CoreConvertSpace (GCD_FREE_IO_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, 0, 0);
 }
 
@@ -1552,6 +1735,8 @@ CoreRemoveIoSpace (
   IN UINT64                Length
   )
 {
+  DEBUG ((DEBUG_GCD, "GCD:RemoveIoSpace(Base=%016lx,Length=%016lx)\n", BaseAddress, Length));
+  
   return CoreConvertSpace (GCD_REMOVE_IO_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, 0, 0);
 }
 
@@ -1695,7 +1880,6 @@ Done:
   CoreReleaseGcdIoLock ();
   return Status;
 }
-
 
 /**
   Converts a Resource Descriptor HOB attributes mask to an EFI Memory Descriptor
@@ -2020,6 +2204,11 @@ CoreInitializeGcdServices (
 
   InsertHeadList (&mGcdMemorySpaceMap, &Entry->Link);
 
+  DEBUG_CODE_BEGIN ();
+    DEBUG ((DEBUG_GCD, "GCD:Initial GCD Memory Space Map\n"));
+    CoreDumpGcdMemorySpaceMap ();
+  DEBUG_CODE_END ();
+  
   //
   // Initialize the GCD I/O Space Map
   //
@@ -2030,6 +2219,11 @@ CoreInitializeGcdServices (
 
   InsertHeadList (&mGcdIoSpaceMap, &Entry->Link);
 
+  DEBUG_CODE_BEGIN ();
+    DEBUG ((DEBUG_GCD, "GCD:Initial GCD I/O Space Map\n"));
+    CoreDumpGcdIoSpaceMap ();
+  DEBUG_CODE_END ();
+  
   //
   // Walk the HOB list and add all resource descriptors to the GCD
   //
