@@ -1528,7 +1528,7 @@ MtrrDebugPrintAllMtrrs (
       for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
         Base = mMtrrLibFixedMtrrTable[Index].BaseAddress;
         for (Index1 = 0; Index1 < 8; Index1++) {
-          MemoryType = RShiftU64 (MtrrSettings.Fixed.Mtrr[Index], Index1 * 8) & 0xff;
+          MemoryType = (UINTN)RShiftU64 (MtrrSettings.Fixed.Mtrr[Index], Index1 * 8) & 0xff;
           if (MemoryType > CacheWriteBack) {
             MemoryType = MTRR_CACHE_INVALID_TYPE;
           }            
