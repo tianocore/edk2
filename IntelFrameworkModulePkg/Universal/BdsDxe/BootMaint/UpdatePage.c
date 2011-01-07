@@ -1316,7 +1316,7 @@ UpdateSetLegacyDeviceOrderPage (
     HiiCreateOneOfOptionOpCode (
       OptionsOpCodeHandle,
       NewMenuEntry->DisplayStringToken,
-      (Index == 0) ? EFI_IFR_OPTION_DEFAULT : 0,
+      (UINT8) ((Index == 0) ? EFI_IFR_OPTION_DEFAULT : 0),
       EFI_IFR_NUMERIC_SIZE_1,
       (UINT8) ((BM_LEGACY_DEVICE_CONTEXT *) NewMenuEntry->VariableContext)->Index
       );
