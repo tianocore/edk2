@@ -377,6 +377,8 @@ FvbProtocolEraseBlocks (
       EraseSize,
       ERASED_UINT8
       );
+    VA_START (args, This);
+    PlatformFvbBlocksErased (This, args);
   }
 
   return EFI_SUCCESS;
@@ -557,6 +559,7 @@ FvbProtocolRead (
 
   if (*NumBytes > 0) {
     CopyMem (Buffer, FvbDataPtr, *NumBytes);
+    PlatformFvbDataRead (This, Lba, Offset, *NumBytes, Buffer);
   }
 
   return EFI_SUCCESS;
