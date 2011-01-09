@@ -116,7 +116,7 @@ FvbVirtualAddressChangeEvent (
   a memory-mapped firmware volume. This function should be called
   only for memory-mapped firmware volumes.
 
-  @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
+  @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
   
   @param Address  Pointer to a caller-allocated
                   EFI_PHYSICAL_ADDRESS that, on successful
@@ -131,7 +131,7 @@ FvbVirtualAddressChangeEvent (
 EFI_STATUS
 EFIAPI
 FvbProtocolGetPhysicalAddress (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   OUT       EFI_PHYSICAL_ADDRESS                *Address
   )
 {
@@ -152,7 +152,7 @@ FvbProtocolGetPhysicalAddress (
   retrieve the block map (see EFI_FIRMWARE_VOLUME_HEADER).
 
 
-  @param This           Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
+  @param This           Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
 
   @param Lba            Indicates the block for which to return the size.
 
@@ -174,7 +174,7 @@ FvbProtocolGetPhysicalAddress (
 EFI_STATUS
 EFIAPI
 FvbProtocolGetBlockSize (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   IN        EFI_LBA                             Lba,
   OUT       UINTN                               *BlockSize,
   OUT       UINTN                               *NumberOfBlocks
@@ -199,7 +199,7 @@ FvbProtocolGetBlockSize (
   The GetAttributes() function retrieves the attributes and
   current settings of the block. Status Codes Returned
 
-  @param This       Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
+  @param This       Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
 
   @param Attributes Pointer to EFI_FVB_ATTRIBUTES_2 in which the
                     attributes and current settings are
@@ -213,7 +213,7 @@ FvbProtocolGetBlockSize (
 EFI_STATUS
 EFIAPI
 FvbProtocolGetAttributes (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   OUT       EFI_FVB_ATTRIBUTES_2                *Attributes
   )
 {
@@ -234,7 +234,7 @@ FvbProtocolGetAttributes (
   The SetAttributes() function sets configurable firmware volume
   attributes and returns the new settings of the firmware volume.
 
-  @param This         Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
+  @param This         Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
 
   @param Attributes   On input, Attributes is a pointer to
                       EFI_FVB_ATTRIBUTES_2 that contains the
@@ -255,7 +255,7 @@ FvbProtocolGetAttributes (
 EFI_STATUS
 EFIAPI
 FvbProtocolSetAttributes (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   IN OUT    EFI_FVB_ATTRIBUTES_2                *Attributes
   )
 {
@@ -281,7 +281,7 @@ FvbProtocolSetAttributes (
   flushed to the hardware before the EraseBlocks() service
   returns.
 
-  @param This   Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL
+  @param This   Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL
                 instance.
 
   @param ...    The variable argument list is a list of tuples.
@@ -314,7 +314,7 @@ FvbProtocolSetAttributes (
 EFI_STATUS
 EFIAPI
 FvbProtocolEraseBlocks (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   ...
   )
 {
@@ -413,7 +413,7 @@ FvbProtocolEraseBlocks (
   fully flushed to the hardware before the Write() service
   returns.
 
-  @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
+  @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
   
   @param Lba      The starting logical block index to write to.
   
@@ -445,7 +445,7 @@ FvbProtocolEraseBlocks (
 EFI_STATUS
 EFIAPI
 FvbProtocolWrite (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   IN        EFI_LBA                             Lba,
   IN        UINTN                               Offset,
   IN OUT    UINTN                               *NumBytes,
@@ -496,7 +496,7 @@ FvbProtocolWrite (
   indicate the number of bytes actually read. The caller must be
   aware that a read may be partially completed.
 
-  @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
+  @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
   
   @param Lba      The starting logical block index
                   from which to read.
@@ -530,7 +530,7 @@ FvbProtocolWrite (
 EFI_STATUS
 EFIAPI
 FvbProtocolRead (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   IN        EFI_LBA                             Lba,
   IN        UINTN                               Offset,
   IN OUT    UINTN                               *NumBytes,
@@ -846,7 +846,7 @@ FvbInitialize (
   Handle = 0;
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
-                  &gEfiFirmwareVolumeBlockProtocolGuid,
+                  &gEfiFirmwareVolumeBlock2ProtocolGuid,
                   &mEmuVarsFvb.FwVolBlockInstance,
                   &gEfiDevicePathProtocolGuid,
                   &mEmuVarsFvb.DevicePath,

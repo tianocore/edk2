@@ -34,7 +34,7 @@
 VOID
 EFIAPI
 PlatformFvbDataWritten (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   IN        EFI_LBA                             Lba,
   IN        UINTN                               Offset,
   IN        UINTN                               NumBytes,
