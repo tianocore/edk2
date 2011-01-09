@@ -37,15 +37,24 @@ else
   echo Building from: $WORKSPACE
 fi
 
-PROCESSOR=IA32
-Processor=Ia32
+#
+# Configure defaults for various options
+#
+
+PROCESSOR=X64
+BUILDTARGET=DEBUG
+BUILD_OPTIONS=
+LAST_ARG=
+RUN_QEMU=no
 
 #
 # Pick a default tool type for a given OS
 #
 TARGET_TOOLS=MYTOOLS
 case `uname` in
-  CYGWIN*) echo Cygwin not fully supported yet. ;;
+  CYGWIN*)
+    echo Cygwin not fully supported yet.
+    ;;
   Darwin*)
       Major=$(uname -r | cut -f 1 -d '.')
       if [[ $Major == 9 ]]
@@ -59,10 +68,87 @@ case `uname` in
   Linux*)
     TARGET_TOOLS=GCC44
     ;;
-
 esac
 
-BUILD_ROOT=$WORKSPACE/Build/Ovmf$Processor/DEBUG_"$TARGET_TOOLS"
+#
+# Scan command line to override defaults
+#
+
+for arg in "$@"
+do
+  if [ -z "$LAST_ARG" ]; then
+    case $arg in
+      -a|-b|-t)
+        LAST_ARG=$arg
+        ;;
+      qemu)
+        RUN_QEMU=yes
+        shift
+        break
+        ;;
+      *)
+        BUILD_OPTIONS="$BUILD_OPTIONS $arg"
+        ;;
+    esac
+  else
+    case $LAST_ARG in
+      -a)
+        PROCESSOR=$arg
+        ;;
+      -b)
+        BUILDTARGET=$arg
+        ;;
+      -t)
+        TARGET_TOOLS=$arg
+        ;;
+      *)
+        BUILD_OPTIONS="$BUILD_OPTIONS $arg"
+        ;;
+    esac
+    LAST_ARG=
+  fi
+  shift
+done
+
+case $PROCESSOR in
+  IA32)
+    Processor=Ia32
+    QEMU_COMMAND=qemu
+    ;;
+  X64)
+    Processor=X64
+    QEMU_COMMAND=qemu-system-x86_64
+    ;;
+  *)
+    echo Unsupported processor architecture: $PROCESSOR
+    echo Only IA32 or X64 is supported
+    exit 1
+    ;;
+esac
+
+ADD_QEMU_HDA=yes
+for arg in "$@"
+do
+  case $arg in
+    -hd[a-d]|-fd[ab]|-cdrom)
+      ADD_QEMU_HDA=no
+      break
+      ;;
+  esac
+done
+
+#
+# Uncomment this block for parameter parsing debug
+#
+#echo RUN_QEMU=$RUN_QEMU
+#echo BUILD_OPTIONS=$BUILD_OPTIONS
+#echo BUILDTARGET=$BUILDTARGET
+#echo TARGET_TOOLS=$TARGET_TOOLS
+#echo PROCESSOR=$PROCESSOR
+#echo Remaining for qemu: $*
+#exit 1
+
+BUILD_ROOT=$WORKSPACE/Build/Ovmf$Processor/"$BUILDTARGET"_"$TARGET_TOOLS"
 FV_DIR=$BUILD_ROOT/FV
 BUILD_ROOT_ARCH=$BUILD_ROOT/$PROCESSOR
 QEMU_FIRMWARE_DIR=$BUILD_ROOT/QEMU
@@ -82,38 +168,27 @@ else
 fi
 
 
-for arg in "$@"
-do
-  if [[ $arg == qemu ]]; then
-    shift
-    if [[ ! -d $QEMU_FIRMWARE_DIR ]]; then
-      mkdir $QEMU_FIRMWARE_DIR
-      ln -s $FV_DIR/OVMF.fd $QEMU_FIRMWARE_DIR/bios.bin
-      ln -s $FV_DIR/CirrusLogic5446.rom $QEMU_FIRMWARE_DIR/vgabios-cirrus.bin
-    fi
-    QEMU_COMMAND="qemu -L $QEMU_FIRMWARE_DIR -hda fat:$BUILD_ROOT_ARCH $*"
-    echo Running: $QEMU_COMMAND
-    $QEMU_COMMAND
-    exit
+if [[ "$RUN_QEMU" == "yes" ]]; then
+  if [[ ! -d $QEMU_FIRMWARE_DIR ]]; then
+    mkdir $QEMU_FIRMWARE_DIR
+    ln -s $FV_DIR/OVMF.fd $QEMU_FIRMWARE_DIR/bios.bin
+    ln -s $FV_DIR/CirrusLogic5446.rom $QEMU_FIRMWARE_DIR/vgabios-cirrus.bin
   fi
-
-  if [[ $arg == cleanall ]]; then
-    make -C $WORKSPACE/BaseTools clean
-    build -p $WORKSPACE/OvmfPkg/OvmfPkg$Processor.dsc -a $PROCESSOR -t $TARGET_TOOLS -n 3 clean
-    exit $?
+  if [[ "$ADD_QEMU_HDA" == "yes" ]]; then
+    AUTO_QEMU_HDA="-hda fat:$BUILD_ROOT_ARCH"
+  else
+    AUTO_QEMU_HDA=
   fi
-
-  if [[ $arg == clean ]]; then
-    build -p $WORKSPACE/OvmfPkg/OvmfPkg$Processor.dsc -a $PROCESSOR -t $TARGET_TOOLS -n 3 clean
-    exit $?
-  fi
-done
-
+  QEMU_COMMAND="$QEMU_COMMAND -L $QEMU_FIRMWARE_DIR $AUTO_QEMU_HDA $*"
+  echo Running: $QEMU_COMMAND
+  $QEMU_COMMAND
+  exit $?
+fi
 
 #
 # Build the edk2 OvmfPkg
 #
 echo Running edk2 build for OvmfPkg$Processor
-build -p $WORKSPACE/OvmfPkg/OvmfPkg$Processor.dsc -a $PROCESSOR -t $TARGET_TOOLS -n 3 $*
+build -p $WORKSPACE/OvmfPkg/OvmfPkg$Processor.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS
 exit $?
 

@@ -28,10 +28,9 @@ Current capabilities:
 
 Pre-requisites:
 * Build environment capable of build the edk2 MdeModulePkg.
-* A properly configured ASL compiler
-  * Intel ASL compiler: Available from http://www.acpica.org
-      or
-  * Microsoft ASL compiler: Available from http://www.acpi.info
+* A properly configured ASL compiler:
+  - Intel ASL compiler: Available from http://www.acpica.org
+  - Microsoft ASL compiler: Available from http://www.acpi.info
 
 Update Conf/target.txt ACTIVE_PLATFORM for OVMF:
                              PEI arch   DXE arch   UEFI interfaces
@@ -50,7 +49,7 @@ under the $WORKSPACE/Build/*/*/FV directory.  The actual path will
 depend on how your build is configured.  You can expect to find
 these binary outputs:
 * OVMF.FD
-  * Please note!  This filename has changed.  Older releases used OVMF.Fv.
+  - Please note!  This filename has changed.  Older releases used OVMF.Fv.
 * CirrusLogic5446.rom
 
 More information on building OVMF can be found at:
@@ -76,15 +75,18 @@ http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=How_to_build_OVM
 
 === Build Scripts ===
 
-On environments with the bash shell you can use OvmfPkg/build32.sh and
-OvmfPkg/build64.sh to simplify building and running OVMF.
+On systems with the bash shell you can use OvmfPkg/build.sh to simplify
+building and running OVMF.
 
 So, for example, to build + run OVMF X64:
-$ OvmfPkg/build64.sh
-$ OvmfPkg/build64.sh qemu
+$ OvmfPkg/build.sh -a X64
+$ OvmfPkg/build.sh -a X64 qemu
 
 And to run a 64-bit UEFI bootable ISO image:
-$ OvmfPkg/build64.sh qemu -cdrom /path/to/disk-image.iso
+$ OvmfPkg/build.sh -a X64 qemu -cdrom /path/to/disk-image.iso
+
+To build a 32-bit OVMF without debug serial messages using GCC 4.5:
+$ OvmfPkg/build.sh -a IA32 -b RELEASE -t GCC45
 
 === Network Support ===
 
