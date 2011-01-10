@@ -1,7 +1,7 @@
 /** @file
   The functions for Boot Maintainence Main menu.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -678,11 +678,11 @@ ApplyChangeHandler (
 
   case FORM_BOOT_DEL_ID:
     for (Index = 0; 
-         ((Index < BootOptionMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->BootOptionDel) / sizeof (UINT8)))); 
+         ((Index < BootOptionMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->OptionDel) / sizeof (CurrentFakeNVMap->OptionDel[0])))); 
          Index ++) {
       NewMenuEntry            = BOpt_GetMenuEntry (&BootOptionMenu, Index);
       NewLoadContext          = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
-      NewLoadContext->Deleted = CurrentFakeNVMap->BootOptionDel[Index];
+      NewLoadContext->Deleted = CurrentFakeNVMap->OptionDel[Index];
     }
 
     Var_DelBootOption ();
@@ -690,11 +690,11 @@ ApplyChangeHandler (
 
   case FORM_DRV_DEL_ID:
     for (Index = 0; 
-         ((Index < DriverOptionMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->DriverOptionDel) / sizeof (UINT8)))); 
+         ((Index < DriverOptionMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->OptionDel) / sizeof (CurrentFakeNVMap->OptionDel[0])))); 
          Index++) {
       NewMenuEntry            = BOpt_GetMenuEntry (&DriverOptionMenu, Index);
       NewLoadContext          = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
-      NewLoadContext->Deleted = CurrentFakeNVMap->DriverOptionDel[Index];
+      NewLoadContext->Deleted = CurrentFakeNVMap->OptionDel[Index];
     }
 
     Var_DelDriverOption ();
@@ -757,14 +757,14 @@ ApplyChangeHandler (
     for (Index = 0; Index < ConsoleInpMenu.MenuNumber; Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleInpMenu, Index);
       NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
-	  ASSERT (Index < MAX_MENU_NUMBER);
+      ASSERT (Index < MAX_MENU_NUMBER);
       NewConsoleContext->IsActive = CurrentFakeNVMap->ConsoleCheck[Index];
     }
 
     for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
       NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
-	  ASSERT (Index + ConsoleInpMenu.MenuNumber < MAX_MENU_NUMBER);
+      ASSERT (Index + ConsoleInpMenu.MenuNumber < MAX_MENU_NUMBER);
       NewTerminalContext->IsConIn = CurrentFakeNVMap->ConsoleCheck[Index + ConsoleInpMenu.MenuNumber];
     }
 
@@ -775,14 +775,14 @@ ApplyChangeHandler (
     for (Index = 0; Index < ConsoleOutMenu.MenuNumber; Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleOutMenu, Index);
       NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
-	  ASSERT (Index < MAX_MENU_NUMBER);
+      ASSERT (Index < MAX_MENU_NUMBER);
       NewConsoleContext->IsActive = CurrentFakeNVMap->ConsoleCheck[Index];
     }
 
     for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
       NewMenuEntry                  = BOpt_GetMenuEntry (&TerminalMenu, Index);
       NewTerminalContext            = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
-	  ASSERT (Index + ConsoleOutMenu.MenuNumber < MAX_MENU_NUMBER);
+      ASSERT (Index + ConsoleOutMenu.MenuNumber < MAX_MENU_NUMBER);
       NewTerminalContext->IsConOut  = CurrentFakeNVMap->ConsoleCheck[Index + ConsoleOutMenu.MenuNumber];
     }
 
@@ -793,14 +793,14 @@ ApplyChangeHandler (
     for (Index = 0; Index < ConsoleErrMenu.MenuNumber; Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleErrMenu, Index);
       NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
-	  ASSERT (Index < MAX_MENU_NUMBER);
+      ASSERT (Index < MAX_MENU_NUMBER);
       NewConsoleContext->IsActive = CurrentFakeNVMap->ConsoleCheck[Index];
     }
 
     for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
       NewMenuEntry                  = BOpt_GetMenuEntry (&TerminalMenu, Index);
       NewTerminalContext            = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
-	  ASSERT (Index + ConsoleErrMenu.MenuNumber < MAX_MENU_NUMBER);
+      ASSERT (Index + ConsoleErrMenu.MenuNumber < MAX_MENU_NUMBER);
       NewTerminalContext->IsStdErr  = CurrentFakeNVMap->ConsoleCheck[Index + ConsoleErrMenu.MenuNumber];
     }
 
@@ -850,20 +850,20 @@ DiscardChangeHandler (
   switch (Private->BmmPreviousPageId) {
   case FORM_BOOT_CHG_ID:
   case FORM_DRV_CHG_ID:
-    CopyMem (CurrentFakeNVMap->OptionOrder, Private->BmmOldFakeNVData.OptionOrder, 100);
+    CopyMem (CurrentFakeNVMap->OptionOrder, Private->BmmOldFakeNVData.OptionOrder, sizeof (CurrentFakeNVMap->OptionOrder));
     break;
 
   case FORM_BOOT_DEL_ID:
-    ASSERT (BootOptionMenu.MenuNumber <= (sizeof (CurrentFakeNVMap->BootOptionDel) / sizeof (CurrentFakeNVMap->BootOptionDel[0])));
+    ASSERT (BootOptionMenu.MenuNumber <= (sizeof (CurrentFakeNVMap->OptionDel) / sizeof (CurrentFakeNVMap->OptionDel[0])));
     for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
-      CurrentFakeNVMap->BootOptionDel[Index] = 0x00;
+      CurrentFakeNVMap->OptionDel[Index] = FALSE;
     }
     break;
 
   case FORM_DRV_DEL_ID:
-    ASSERT (DriverOptionMenu.MenuNumber <= (sizeof (CurrentFakeNVMap->DriverOptionDel) / sizeof (CurrentFakeNVMap->DriverOptionDel[0])));
+    ASSERT (DriverOptionMenu.MenuNumber <= (sizeof (CurrentFakeNVMap->OptionDel) / sizeof (CurrentFakeNVMap->OptionDel[0])));
     for (Index = 0; Index < DriverOptionMenu.MenuNumber; Index++) {
-      CurrentFakeNVMap->DriverOptionDel[Index] = 0x00;
+      CurrentFakeNVMap->OptionDel[Index] = FALSE;
     }
     break;
 

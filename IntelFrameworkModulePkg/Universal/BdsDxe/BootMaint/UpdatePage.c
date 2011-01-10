@@ -254,7 +254,7 @@ UpdateBootDelPage (
   UpdatePageStart (CallbackData);
   CreateMenuStringToken (CallbackData, CallbackData->BmmHiiHandle, &BootOptionMenu);
 
-  ASSERT (BootOptionMenu.MenuNumber <= (sizeof (CallbackData->BmmFakeNvData.BootOptionDel) / sizeof (CallbackData->BmmFakeNvData.BootOptionDel[0])));
+  ASSERT (BootOptionMenu.MenuNumber <= (sizeof (CallbackData->BmmFakeNvData.OptionDel) / sizeof (CallbackData->BmmFakeNvData.OptionDel[0])));
   for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
     NewMenuEntry    = BOpt_GetMenuEntry (&BootOptionMenu, Index);
     NewLoadContext  = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
@@ -263,13 +263,13 @@ UpdateBootDelPage (
     }
 
     NewLoadContext->Deleted = FALSE;
-    CallbackData->BmmFakeNvData.BootOptionDel[Index] = 0x00;
+    CallbackData->BmmFakeNvData.OptionDel[Index] = FALSE;
 
     HiiCreateCheckBoxOpCode (
       mStartOpCodeHandle,
-      (EFI_QUESTION_ID) (BOOT_OPTION_DEL_QUESTION_ID + Index),
+      (EFI_QUESTION_ID) (OPTION_DEL_QUESTION_ID + Index),
       VARSTORE_ID_BOOT_MAINT,
-      (UINT16) (BOOT_OPTION_DEL_VAR_OFFSET + Index),
+      (UINT16) (OPTION_DEL_VAR_OFFSET + Index),
       NewMenuEntry->DisplayStringToken,
       NewMenuEntry->HelpStringToken,
       0,
@@ -337,19 +337,19 @@ UpdateDrvDelPage (
 
   CreateMenuStringToken (CallbackData, CallbackData->BmmHiiHandle, &DriverOptionMenu);
   
-  ASSERT (DriverOptionMenu.MenuNumber <= (sizeof (CallbackData->BmmFakeNvData.DriverOptionDel) / sizeof (CallbackData->BmmFakeNvData.DriverOptionDel[0])));
+  ASSERT (DriverOptionMenu.MenuNumber <= (sizeof (CallbackData->BmmFakeNvData.OptionDel) / sizeof (CallbackData->BmmFakeNvData.OptionDel[0])));
   for (Index = 0; Index < DriverOptionMenu.MenuNumber; Index++) {
     NewMenuEntry            = BOpt_GetMenuEntry (&DriverOptionMenu, Index);
 
     NewLoadContext          = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
     NewLoadContext->Deleted = FALSE;
-    CallbackData->BmmFakeNvData.DriverOptionDel[Index] = 0x00;
+    CallbackData->BmmFakeNvData.OptionDel[Index] = FALSE;
 
     HiiCreateCheckBoxOpCode (
       mStartOpCodeHandle,
-      (EFI_QUESTION_ID) (DRIVER_OPTION_DEL_QUESTION_ID + Index),
+      (EFI_QUESTION_ID) (OPTION_DEL_QUESTION_ID + Index),
       VARSTORE_ID_BOOT_MAINT,
-      (UINT16) (DRIVER_OPTION_DEL_VAR_OFFSET + Index),
+      (UINT16) (OPTION_DEL_VAR_OFFSET + Index),
       NewMenuEntry->DisplayStringToken,
       NewMenuEntry->HelpStringToken,
       0,
@@ -545,7 +545,7 @@ UpdateOrderPage (
 
   CreateMenuStringToken (CallbackData, CallbackData->BmmHiiHandle, OptionMenu);
 
-  ZeroMem (CallbackData->BmmFakeNvData.OptionOrder, 100);
+  ZeroMem (CallbackData->BmmFakeNvData.OptionOrder, sizeof (CallbackData->BmmFakeNvData.OptionOrder));
 
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (OptionsOpCodeHandle != NULL);
@@ -557,7 +557,7 @@ UpdateOrderPage (
           (Index <
             (
               sizeof (CallbackData->BmmFakeNvData.OptionOrder) /
-              sizeof (UINT8)
+              sizeof (CallbackData->BmmFakeNvData.OptionOrder[0])
             )
           )
         );
@@ -568,10 +568,10 @@ UpdateOrderPage (
       OptionsOpCodeHandle,
       NewMenuEntry->DisplayStringToken,
       0,
-      EFI_IFR_NUMERIC_SIZE_1,
-      (UINT8) (NewMenuEntry->OptionNumber + 1)
+      EFI_IFR_TYPE_NUM_SIZE_32,
+      (UINT32) (NewMenuEntry->OptionNumber + 1)
       );
-    CallbackData->BmmFakeNvData.OptionOrder[Index] = (UINT8) (NewMenuEntry->OptionNumber + 1);
+    CallbackData->BmmFakeNvData.OptionOrder[Index] = (UINT32) (NewMenuEntry->OptionNumber + 1);
   }
 
   if (OptionMenu->MenuNumber > 0) {
@@ -584,7 +584,7 @@ UpdateOrderPage (
       STRING_TOKEN (STR_CHANGE_ORDER),             // Question help text                        
       0,                                           // Question flag                             
       0,                                           // Ordered list flag, e.g. EFI_IFR_UNIQUE_SET
-      EFI_IFR_NUMERIC_SIZE_1,                      // Data type of Question value               
+      EFI_IFR_TYPE_NUM_SIZE_32,                    // Data type of Question value               
       100,                                         // Maximum container                         
       OptionsOpCodeHandle,                         // Option Opcode list                        
       NULL                                         // Default Opcode is NULL                    
@@ -598,7 +598,7 @@ UpdateOrderPage (
   CopyMem (
     CallbackData->BmmOldFakeNVData.OptionOrder,
     CallbackData->BmmFakeNvData.OptionOrder,
-    100
+    sizeof (CallbackData->BmmOldFakeNVData.OptionOrder)
     );
 }
 
@@ -641,7 +641,7 @@ UpdateBootNextPage (
           OptionsOpCodeHandle,
           NewMenuEntry->DisplayStringToken,
           EFI_IFR_OPTION_DEFAULT,
-          EFI_IFR_NUMERIC_SIZE_2,
+          EFI_IFR_TYPE_NUM_SIZE_16,
           Index
           );
         CallbackData->BmmFakeNvData.BootNext = Index;
@@ -650,7 +650,7 @@ UpdateBootNextPage (
           OptionsOpCodeHandle,
           NewMenuEntry->DisplayStringToken,
           0,
-          EFI_IFR_NUMERIC_SIZE_2,
+          EFI_IFR_TYPE_NUM_SIZE_16,
           Index
           );
       }
@@ -661,7 +661,7 @@ UpdateBootNextPage (
         OptionsOpCodeHandle,
         STRING_TOKEN (STR_NONE),
         EFI_IFR_OPTION_DEFAULT,
-        EFI_IFR_NUMERIC_SIZE_2,
+        EFI_IFR_TYPE_NUM_SIZE_16,
         Index
         );
     } else {
@@ -669,7 +669,7 @@ UpdateBootNextPage (
         OptionsOpCodeHandle,
         STRING_TOKEN (STR_NONE),
         0,
-        EFI_IFR_NUMERIC_SIZE_2,
+        EFI_IFR_TYPE_NUM_SIZE_16,
         Index
         );
     }      
@@ -715,7 +715,7 @@ UpdateTimeOutPage (
 
   DefaultOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (DefaultOpCodeHandle != NULL);
-  HiiCreateDefaultOpCode (DefaultOpCodeHandle, EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_NUMERIC_SIZE_2, BootTimeOut);
+  HiiCreateDefaultOpCode (DefaultOpCodeHandle, EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_NUM_SIZE_16, BootTimeOut);
 
   HiiCreateNumericOpCode (
     mStartOpCodeHandle,
@@ -823,7 +823,7 @@ UpdateConModePage (
         OptionsOpCodeHandle,
         ModeToken[Index],
         EFI_IFR_OPTION_DEFAULT,
-        EFI_IFR_NUMERIC_SIZE_2,
+        EFI_IFR_TYPE_NUM_SIZE_16,
         (UINT16) Mode
         );
     } else {
@@ -831,7 +831,7 @@ UpdateConModePage (
         OptionsOpCodeHandle,
         ModeToken[Index],
         0,
-        EFI_IFR_NUMERIC_SIZE_2,
+        EFI_IFR_TYPE_NUM_SIZE_16,
         (UINT16) Mode
         );
     }
@@ -905,7 +905,7 @@ UpdateTerminalPage (
       OptionsOpCodeHandle,
       BaudRateList[Index].StringToken,
       CheckFlags,
-      EFI_IFR_NUMERIC_SIZE_1,
+      EFI_IFR_TYPE_NUM_SIZE_8,
       Index
       );
   }
@@ -940,7 +940,7 @@ UpdateTerminalPage (
       OptionsOpCodeHandle,
       DataBitsList[Index].StringToken,
       CheckFlags,
-      EFI_IFR_NUMERIC_SIZE_1,
+      EFI_IFR_TYPE_NUM_SIZE_8,
       Index
       );
   }
@@ -974,7 +974,7 @@ UpdateTerminalPage (
       OptionsOpCodeHandle,
       ParityList[Index].StringToken,
       CheckFlags,
-      EFI_IFR_NUMERIC_SIZE_1,
+      EFI_IFR_TYPE_NUM_SIZE_8,
       Index
       );
   }
@@ -1008,7 +1008,7 @@ UpdateTerminalPage (
       OptionsOpCodeHandle,
       StopBitsList[Index].StringToken,
       CheckFlags,
-      EFI_IFR_NUMERIC_SIZE_1,
+      EFI_IFR_TYPE_NUM_SIZE_8,
       Index
       );
   }
@@ -1041,7 +1041,7 @@ UpdateTerminalPage (
       OptionsOpCodeHandle,
       (EFI_STRING_ID) TerminalType[Index],
       CheckFlags,
-      EFI_IFR_NUMERIC_SIZE_1,
+      EFI_IFR_TYPE_NUM_SIZE_8,
       Index
       );
   }
@@ -1317,7 +1317,7 @@ UpdateSetLegacyDeviceOrderPage (
       OptionsOpCodeHandle,
       NewMenuEntry->DisplayStringToken,
       (UINT8) ((Index == 0) ? EFI_IFR_OPTION_DEFAULT : 0),
-      EFI_IFR_NUMERIC_SIZE_1,
+      EFI_IFR_TYPE_NUM_SIZE_8,
       (UINT8) ((BM_LEGACY_DEVICE_CONTEXT *) NewMenuEntry->VariableContext)->Index
       );
   }
@@ -1329,7 +1329,7 @@ UpdateSetLegacyDeviceOrderPage (
     OptionsOpCodeHandle,
     STRING_TOKEN (STR_DISABLE_LEGACY_DEVICE),
     0,
-    EFI_IFR_NUMERIC_SIZE_1,
+    EFI_IFR_TYPE_NUM_SIZE_8,
     0xFF
     );
 

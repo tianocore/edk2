@@ -1,7 +1,7 @@
 /** @file
   Formset guids, form id and VarStore data structure for Boot Maintenance Manager.
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -147,15 +147,15 @@ typedef struct {
 
   //
   // Boot or Driver Option Order storage
+  // The value is the OptionNumber+1 because the order list value cannot be 0
+  // Use UINT32 to hold the potential value 0xFFFF+1=0x10000
   //
-  UINT8   OptionOrder[MAX_MENU_NUMBER];
-  UINT8   DriverOptionToBeDeleted[MAX_MENU_NUMBER];
+  UINT32  OptionOrder[MAX_MENU_NUMBER];
 
   //
-  // Boot Option Delete storage
+  // Boot or Driver Option Delete storage
   //
-  UINT8   BootOptionDel[MAX_MENU_NUMBER];
-  UINT8   DriverOptionDel[MAX_MENU_NUMBER];
+  BOOLEAN OptionDel[MAX_MENU_NUMBER];
 
   //
   // This is the Terminal Attributes value storage

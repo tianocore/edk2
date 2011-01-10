@@ -1,7 +1,7 @@
 /** @file
   Header file for boot maintenance module.
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -189,9 +189,7 @@ typedef enum _FILE_EXPLORER_DISPLAY_CONTEXT {
 #define CON_MODE_VAR_OFFSET             VAR_OFFSET (ConsoleOutMode)
 #define CON_DEVICE_VAR_OFFSET           VAR_OFFSET (ConsoleCheck)
 #define OPTION_ORDER_VAR_OFFSET         VAR_OFFSET (OptionOrder)
-#define DRIVER_OPTION_ORDER_VAR_OFFSET  VAR_OFFSET (DriverOptionToBeDeleted)
-#define BOOT_OPTION_DEL_VAR_OFFSET      VAR_OFFSET (BootOptionDel)
-#define DRIVER_OPTION_DEL_VAR_OFFSET    VAR_OFFSET (DriverOptionDel)
+#define OPTION_DEL_VAR_OFFSET           VAR_OFFSET (OptionDel)
 #define DRIVER_ADD_OPTION_VAR_OFFSET    VAR_OFFSET (DriverAddHandleOptionalData)
 #define COM_BAUD_RATE_VAR_OFFSET        VAR_OFFSET (COMBaudRate)
 #define COM_DATA_RATE_VAR_OFFSET        VAR_OFFSET (COMDataRate)
@@ -228,9 +226,7 @@ typedef enum _FILE_EXPLORER_DISPLAY_CONTEXT {
 #define CON_MODE_QUESTION_ID            QUESTION_ID (ConsoleOutMode)
 #define CON_DEVICE_QUESTION_ID          QUESTION_ID (ConsoleCheck)
 #define OPTION_ORDER_QUESTION_ID        QUESTION_ID (OptionOrder)
-#define DRIVER_OPTION_ORDER_QUESTION_ID QUESTION_ID (DriverOptionToBeDeleted)
-#define BOOT_OPTION_DEL_QUESTION_ID     QUESTION_ID (BootOptionDel)
-#define DRIVER_OPTION_DEL_QUESTION_ID   QUESTION_ID (DriverOptionDel)
+#define OPTION_DEL_QUESTION_ID          QUESTION_ID (OptionDel)
 #define DRIVER_ADD_OPTION_QUESTION_ID   QUESTION_ID (DriverAddHandleOptionalData)
 #define COM_BAUD_RATE_QUESTION_ID       QUESTION_ID (COMBaudRate)
 #define COM_DATA_RATE_QUESTION_ID       QUESTION_ID (COMDataRate)
