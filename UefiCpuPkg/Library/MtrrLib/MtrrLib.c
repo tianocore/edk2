@@ -1480,80 +1480,57 @@ MtrrDebugPrintAllMtrrs (
   )
 {
   DEBUG_CODE (
-    {
-      MTRR_SETTINGS  MtrrSettings;
-      UINTN          Index;
-      UINTN          Index1;
-      UINTN          VariableMtrrCount;
-      UINT64         Base;
-      UINT64         Limit;
-      UINT64         MtrrBase;
-      UINT64         MtrrLimit;
-      UINT64         RangeBase;
-      UINT64         RangeLimit;
-      UINT64         NoRangeBase;
-      UINT64         NoRangeLimit;
-      UINT32         RegEax;
-      UINTN          MemoryType;
-      UINTN          PreviousMemoryType;
-      BOOLEAN        Found;
+    MTRR_SETTINGS  MtrrSettings;
+    UINTN          Index;
+    UINTN          Index1;
+    UINTN          VariableMtrrCount;
+    UINT64         Base;
+    UINT64         Limit;
+    UINT64         MtrrBase;
+    UINT64         MtrrLimit;
+    UINT64         RangeBase;
+    UINT64         RangeLimit;
+    UINT64         NoRangeBase;
+    UINT64         NoRangeLimit;
+    UINT32         RegEax;
+    UINTN          MemoryType;
+    UINTN          PreviousMemoryType;
+    BOOLEAN        Found;
 
-      if (!IsMtrrSupported ()) {
-        return;
-      }
+    if (!IsMtrrSupported ()) {
+      return;
+    }
 
-      DEBUG((DEBUG_CACHE, "MTRR Settings\n"));
-      DEBUG((DEBUG_CACHE, "=============\n"));
-      
-      MtrrGetAllMtrrs (&MtrrSettings);
-      DEBUG((DEBUG_CACHE, "MTRR Default Type: %016lx\n", MtrrSettings.MtrrDefType));
-      for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-        DEBUG((DEBUG_CACHE, "Fixed MTRR[%02d]   : %016lx\n", Index, MtrrSettings.Fixed.Mtrr[Index]));
-      }
+    DEBUG((DEBUG_CACHE, "MTRR Settings\n"));
+    DEBUG((DEBUG_CACHE, "=============\n"));
+    
+    MtrrGetAllMtrrs (&MtrrSettings);
+    DEBUG((DEBUG_CACHE, "MTRR Default Type: %016lx\n", MtrrSettings.MtrrDefType));
+    for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
+      DEBUG((DEBUG_CACHE, "Fixed MTRR[%02d]   : %016lx\n", Index, MtrrSettings.Fixed.Mtrr[Index]));
+    }
 
-      VariableMtrrCount = GetVariableMtrrCount ();
-      for (Index = 0; Index < VariableMtrrCount; Index++) {
-        DEBUG((DEBUG_CACHE, "Variable MTRR[%02d]: Base=%016lx Mask=%016lx\n",
-          Index,
-          MtrrSettings.Variables.Mtrr[Index].Base,
-          MtrrSettings.Variables.Mtrr[Index].Mask
-          ));
-      }
-      DEBUG((DEBUG_CACHE, "\n"));
-      DEBUG((DEBUG_CACHE, "MTRR Ranges\n"));
-      DEBUG((DEBUG_CACHE, "====================================\n"));
+    VariableMtrrCount = GetVariableMtrrCount ();
+    for (Index = 0; Index < VariableMtrrCount; Index++) {
+      DEBUG((DEBUG_CACHE, "Variable MTRR[%02d]: Base=%016lx Mask=%016lx\n",
+        Index,
+        MtrrSettings.Variables.Mtrr[Index].Base,
+        MtrrSettings.Variables.Mtrr[Index].Mask
+        ));
+    }
+    DEBUG((DEBUG_CACHE, "\n"));
+    DEBUG((DEBUG_CACHE, "MTRR Ranges\n"));
+    DEBUG((DEBUG_CACHE, "====================================\n"));
 
-      Base = 0;
-      PreviousMemoryType = MTRR_CACHE_INVALID_TYPE;
-      for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-        Base = mMtrrLibFixedMtrrTable[Index].BaseAddress;
-        for (Index1 = 0; Index1 < 8; Index1++) {
-          MemoryType = (UINTN)RShiftU64 (MtrrSettings.Fixed.Mtrr[Index], Index1 * 8) & 0xff;
-          if (MemoryType > CacheWriteBack) {
-            MemoryType = MTRR_CACHE_INVALID_TYPE;
-          }            
-          if (MemoryType != PreviousMemoryType) {
-            if (PreviousMemoryType != MTRR_CACHE_INVALID_TYPE) {
-              DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
-            }
-            PreviousMemoryType = MemoryType;
-            DEBUG((DEBUG_CACHE, "%a:%016lx-", mMtrrMemoryCacheTypeShortName[MemoryType], Base));
-          }
-          Base += mMtrrLibFixedMtrrTable[Index].Length;
-        }
-      }
-      DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
-
-      VariableMtrrCount = GetVariableMtrrCount ();
-
-      Base = BASE_1MB;
-      PreviousMemoryType = MTRR_CACHE_INVALID_TYPE;
-      do {
-        MemoryType = MtrrGetMemoryAttribute (Base);
+    Base = 0;
+    PreviousMemoryType = MTRR_CACHE_INVALID_TYPE;
+    for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
+      Base = mMtrrLibFixedMtrrTable[Index].BaseAddress;
+      for (Index1 = 0; Index1 < 8; Index1++) {
+      MemoryType = (UINTN)(RShiftU64 (MtrrSettings.Fixed.Mtrr[Index], Index1 * 8) & 0xff);
         if (MemoryType > CacheWriteBack) {
           MemoryType = MTRR_CACHE_INVALID_TYPE;
-        }
-
+        }            
         if (MemoryType != PreviousMemoryType) {
           if (PreviousMemoryType != MTRR_CACHE_INVALID_TYPE) {
             DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
@@ -1561,61 +1538,82 @@ MtrrDebugPrintAllMtrrs (
           PreviousMemoryType = MemoryType;
           DEBUG((DEBUG_CACHE, "%a:%016lx-", mMtrrMemoryCacheTypeShortName[MemoryType], Base));
         }
-        
-        RangeBase    = BASE_1MB;        
-        NoRangeBase  = BASE_1MB;
-        Limit        = BIT36 - 1;
-        AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-        if (RegEax >= 0x80000008) {
-          AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-          Limit = LShiftU64 (1, RegEax & 0xff) - 1;
-        }
-        RangeLimit   = Limit;
-        NoRangeLimit = Limit;
-        
-        for (Index = 0, Found = FALSE; Index < VariableMtrrCount; Index++) {
-          if ((MtrrSettings.Variables.Mtrr[Index].Mask & BIT11) == 0) {
-            //
-            // If mask is not valid, then do not display range
-            //
-            continue;
-          }
-          MtrrBase  = (MtrrSettings.Variables.Mtrr[Index].Base & (~(SIZE_4KB - 1)));
-          MtrrLimit = MtrrBase + ((~(MtrrSettings.Variables.Mtrr[Index].Mask & (~(SIZE_4KB - 1)))) & Limit);
-
-          if (Base >= MtrrBase && Base < MtrrLimit) {
-            Found = TRUE;
-          }
-          
-          if (Base >= MtrrBase && MtrrBase > RangeBase) {
-            RangeBase = MtrrBase;
-          }
-          if (Base > MtrrLimit && MtrrLimit > RangeBase) {
-            RangeBase = MtrrLimit + 1;
-          }
-          if (Base < MtrrBase && MtrrBase < RangeLimit) {
-            RangeLimit = MtrrBase - 1;
-          }
-          if (Base < MtrrLimit && MtrrLimit <= RangeLimit) {
-            RangeLimit = MtrrLimit;
-          }
-          
-          if (Base > MtrrLimit && NoRangeBase < MtrrLimit) {
-            NoRangeBase = MtrrLimit + 1;
-          }
-          if (Base < MtrrBase && NoRangeLimit > MtrrBase) {
-            NoRangeLimit = MtrrBase - 1;
-          }
-        }
-        
-        if (Found) {
-          Base = RangeLimit + 1;
-        } else {
-          Base = NoRangeLimit + 1;
-        }
-      } while (Found);
-      DEBUG((DEBUG_CACHE, "%016lx\n\n", Base - 1));
+        Base += mMtrrLibFixedMtrrTable[Index].Length;
+      }
     }
+    DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
+
+    VariableMtrrCount = GetVariableMtrrCount ();
+
+    Base = BASE_1MB;
+    PreviousMemoryType = MTRR_CACHE_INVALID_TYPE;
+    do {
+      MemoryType = MtrrGetMemoryAttribute (Base);
+      if (MemoryType > CacheWriteBack) {
+        MemoryType = MTRR_CACHE_INVALID_TYPE;
+      }
+
+      if (MemoryType != PreviousMemoryType) {
+        if (PreviousMemoryType != MTRR_CACHE_INVALID_TYPE) {
+          DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
+        }
+        PreviousMemoryType = MemoryType;
+        DEBUG((DEBUG_CACHE, "%a:%016lx-", mMtrrMemoryCacheTypeShortName[MemoryType], Base));
+      }
+      
+      RangeBase    = BASE_1MB;        
+      NoRangeBase  = BASE_1MB;
+      Limit        = BIT36 - 1;
+      AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+      if (RegEax >= 0x80000008) {
+        AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+        Limit = LShiftU64 (1, RegEax & 0xff) - 1;
+      }
+      RangeLimit   = Limit;
+      NoRangeLimit = Limit;
+      
+      for (Index = 0, Found = FALSE; Index < VariableMtrrCount; Index++) {
+        if ((MtrrSettings.Variables.Mtrr[Index].Mask & BIT11) == 0) {
+          //
+          // If mask is not valid, then do not display range
+          //
+          continue;
+        }
+        MtrrBase  = (MtrrSettings.Variables.Mtrr[Index].Base & (~(SIZE_4KB - 1)));
+        MtrrLimit = MtrrBase + ((~(MtrrSettings.Variables.Mtrr[Index].Mask & (~(SIZE_4KB - 1)))) & Limit);
+
+        if (Base >= MtrrBase && Base < MtrrLimit) {
+          Found = TRUE;
+        }
+        
+        if (Base >= MtrrBase && MtrrBase > RangeBase) {
+          RangeBase = MtrrBase;
+        }
+        if (Base > MtrrLimit && MtrrLimit > RangeBase) {
+          RangeBase = MtrrLimit + 1;
+        }
+        if (Base < MtrrBase && MtrrBase < RangeLimit) {
+          RangeLimit = MtrrBase - 1;
+        }
+        if (Base < MtrrLimit && MtrrLimit <= RangeLimit) {
+          RangeLimit = MtrrLimit;
+        }
+        
+        if (Base > MtrrLimit && NoRangeBase < MtrrLimit) {
+          NoRangeBase = MtrrLimit + 1;
+        }
+        if (Base < MtrrBase && NoRangeLimit > MtrrBase) {
+          NoRangeLimit = MtrrBase - 1;
+        }
+      }
+      
+      if (Found) {
+        Base = RangeLimit + 1;
+      } else {
+        Base = NoRangeLimit + 1;
+      }
+    } while (Found);
+    DEBUG((DEBUG_CACHE, "%016lx\n\n", Base - 1));
   );
 }
 
