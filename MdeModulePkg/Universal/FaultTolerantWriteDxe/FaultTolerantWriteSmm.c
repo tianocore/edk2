@@ -40,7 +40,7 @@
   If one of them is not satisfied, FtwWrite may fail.
   Usually, Spare area only takes one block. That's SpareAreaLength = BlockSize, NumberOfSpareBlock = 1.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -51,14 +51,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+#include <PiSmm.h>
 #include <Library/SmmServicesTableLib.h>
-#include "FaultTolerantWrite.h"
-#include <Protocol/SmmFirmwareVolumeBlock.h>
 #include <Protocol/SmmSwapAddressRange.h>
-#include <Protocol/SmmFaultTolerantWrite.h>
+#include "FaultTolerantWrite.h"
+#include "FaultTolerantWriteSmmCommon.h"
 
 EFI_EVENT                                 mFvbRegistration = NULL;
-EFI_FTW_DEVICE                            *gFtwDevice      = NULL;
+EFI_FTW_DEVICE                            *mFtwDevice      = NULL;
 
 /**
   Retrive the SMM FVB protocol interface by HANDLE.
@@ -181,6 +181,211 @@ GetFvbCountAndBuffer (
 
 
 /**
+  Get the handle of the SMM FVB protocol by the FVB base address and attributes.
+
+  @param[in]  Address       The base address of SMM FVB protocol.
+  @param[in]  Attributes    The attributes of the SMM FVB protocol.
+  @param[out] SmmFvbHandle  The handle of the SMM FVB protocol.
+
+  @retval  EFI_SUCCESS    The FVB handle is found.
+  @retval  EFI_ABORTED    The FVB protocol is not found.
+
+**/
+EFI_STATUS
+GetFvbByAddressAndAttribute (
+  IN  EFI_PHYSICAL_ADDRESS            Address,
+  IN  EFI_FVB_ATTRIBUTES_2            Attributes,
+  OUT EFI_HANDLE                      *SmmFvbHandle
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_HANDLE                          *HandleBuffer;
+  UINTN                               HandleCount;
+  UINTN                               Index;
+  EFI_PHYSICAL_ADDRESS                FvbBaseAddress;
+  EFI_FVB_ATTRIBUTES_2                FvbAttributes;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
+
+  //
+  // Locate all handles of SMM Fvb protocol.
+  //
+  Status = GetFvbCountAndBuffer (&HandleCount, &HandleBuffer);
+  if (EFI_ERROR (Status)) {
+    return EFI_ABORTED;
+  }
+  
+  //
+  // Find the proper SMM Fvb handle by the address and attributes.
+  //
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = FtwGetFvbByHandle (HandleBuffer[Index], &Fvb);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+    //
+    // Compare the address.
+    //
+    Status = Fvb->GetPhysicalAddress (Fvb, &FvbBaseAddress);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+    if (Address != FvbBaseAddress) {
+     continue;
+    }
+
+    //
+    // Compare the attribute.
+    //
+    Status = Fvb->GetAttributes (Fvb, &FvbAttributes);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+    if (Attributes != FvbAttributes) {
+     continue;
+    }
+
+    //
+    // Found the proper FVB handle.
+    //
+    *SmmFvbHandle = HandleBuffer[Index];
+    FreePool (HandleBuffer);
+    return EFI_SUCCESS;
+  }
+
+  FreePool (HandleBuffer);
+  return EFI_ABORTED;
+}
+
+/**
+  Communication service SMI Handler entry.
+
+  This SMI handler provides services for the fault tolerant write wrapper driver.
+
+  @param[in]     DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
+  @param[in]     RegisterContext Points to an optional handler context which was specified when the
+                                 handler was registered.
+  @param[in, out] CommBuffer     A pointer to a collection of data in memory that will be conveyed
+                                 from a non-SMM environment into an SMM environment.
+  @param[in, out] CommBufferSize The size of the CommBuffer.
+
+  @retval EFI_SUCCESS                         The interrupt was handled and quiesced. No other handlers 
+                                              should still be called.
+  @retval EFI_WARN_INTERRUPT_SOURCE_QUIESCED  The interrupt has been quiesced but other handlers should 
+                                              still be called.
+  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING   The interrupt is still pending and other handlers should still 
+                                              be called.
+  @retval EFI_INTERRUPT_PENDING               The interrupt could not be quiesced.
+  
+**/
+EFI_STATUS
+EFIAPI
+SmmFaultTolerantWriteHandler (
+  IN     EFI_HANDLE                                DispatchHandle,
+  IN     CONST VOID                                *RegisterContext,
+  IN OUT VOID                                      *CommBuffer,
+  IN OUT UINTN                                     *CommBufferSize
+  )
+{
+  EFI_STATUS                                       Status;
+  SMM_FTW_COMMUNICATE_FUNCTION_HEADER              *SmmFtwFunctionHeader;
+  SMM_FTW_GET_MAX_BLOCK_SIZE_HEADER                *SmmGetMaxBlockSizeHeader;
+  SMM_FTW_ALLOCATE_HEADER                          *SmmFtwAllocateHeader;
+  SMM_FTW_WRITE_HEADER                             *SmmFtwWriteHeader;
+  SMM_FTW_RESTART_HEADER                           *SmmFtwRestartHeader;
+  SMM_FTW_GET_LAST_WRITE_HEADER                    *SmmFtwGetLastWriteHeader;
+  VOID                                             *PrivateData;
+  EFI_HANDLE                                       SmmFvbHandle;
+
+  ASSERT (CommBuffer != NULL);
+  ASSERT (CommBufferSize != NULL);
+
+  SmmFtwFunctionHeader = (SMM_FTW_COMMUNICATE_FUNCTION_HEADER *)CommBuffer;
+  switch (SmmFtwFunctionHeader->Function) {
+    case FTW_FUNCTION_GET_MAX_BLOCK_SIZE:
+      SmmGetMaxBlockSizeHeader = (SMM_FTW_GET_MAX_BLOCK_SIZE_HEADER *) SmmFtwFunctionHeader->Data;     
+      Status = FtwGetMaxBlockSize (
+                 &mFtwDevice->FtwInstance,
+                 &SmmGetMaxBlockSizeHeader->BlockSize
+                 );
+      break;
+      
+    case FTW_FUNCTION_ALLOCATE:
+      SmmFtwAllocateHeader = (SMM_FTW_ALLOCATE_HEADER *) SmmFtwFunctionHeader->Data;
+      Status = FtwAllocate (
+                 &mFtwDevice->FtwInstance,
+                 &SmmFtwAllocateHeader->CallerId,
+                 SmmFtwAllocateHeader->PrivateDataSize,
+                 SmmFtwAllocateHeader->NumberOfWrites
+                 );
+      break;
+      
+    case FTW_FUNCTION_WRITE:
+      SmmFtwWriteHeader = (SMM_FTW_WRITE_HEADER *) SmmFtwFunctionHeader->Data;
+      if (SmmFtwWriteHeader->PrivateDataSize == 0) {
+        PrivateData = NULL;
+      } else {
+        PrivateData = (VOID *)&SmmFtwWriteHeader->Data[SmmFtwWriteHeader->Length];
+      }
+      Status = GetFvbByAddressAndAttribute (
+                 SmmFtwWriteHeader->FvbBaseAddress, 
+                 SmmFtwWriteHeader->FvbAttributes,
+                 &SmmFvbHandle
+                 );
+      if (!EFI_ERROR (Status)) {
+        Status = FtwWrite(
+                   &mFtwDevice->FtwInstance,
+                   SmmFtwWriteHeader->Lba,
+                   SmmFtwWriteHeader->Offset,
+                   SmmFtwWriteHeader->Length,
+                   PrivateData,
+                   SmmFvbHandle,
+                   SmmFtwWriteHeader->Data
+                   );
+      }
+      break;
+      
+    case FTW_FUNCTION_RESTART:
+      SmmFtwRestartHeader = (SMM_FTW_RESTART_HEADER *) SmmFtwFunctionHeader->Data;
+      Status = GetFvbByAddressAndAttribute (
+                 SmmFtwRestartHeader->FvbBaseAddress, 
+                 SmmFtwRestartHeader->FvbAttributes,
+                 &SmmFvbHandle
+                 );      
+      if (!EFI_ERROR (Status)) {
+        Status = FtwRestart (&mFtwDevice->FtwInstance, SmmFvbHandle);
+      }
+      break;
+
+    case FTW_FUNCTION_ABORT:
+      Status = FtwAbort (&mFtwDevice->FtwInstance);
+      break;
+      
+    case FTW_FUNCTION_GET_LAST_WRITE:
+      SmmFtwGetLastWriteHeader = (SMM_FTW_GET_LAST_WRITE_HEADER *) SmmFtwFunctionHeader->Data;
+      Status = FtwGetLastWrite (
+                 &mFtwDevice->FtwInstance,
+                 &SmmFtwGetLastWriteHeader->CallerId,
+                 &SmmFtwGetLastWriteHeader->Lba,
+                 &SmmFtwGetLastWriteHeader->Offset,
+                 &SmmFtwGetLastWriteHeader->Length,
+                 &SmmFtwGetLastWriteHeader->PrivateDataSize,
+                 (VOID *)SmmFtwGetLastWriteHeader->Data,
+                 &SmmFtwGetLastWriteHeader->Complete
+                 );
+      break;
+
+    default:
+      ASSERT (FALSE);
+      Status = EFI_UNSUPPORTED;
+  }
+
+  SmmFtwFunctionHeader->ReturnStatus = Status;
+
+  return EFI_SUCCESS;
+}
+
+
+/**
   SMM Firmware Volume Block Protocol notification event handler.
   
   @param[in]  Protocol      Points to the protocol's unique identifier
@@ -200,6 +405,7 @@ FvbNotificationEvent (
 {
   EFI_STATUS                              Status;
   EFI_SMM_FAULT_TOLERANT_WRITE_PROTOCOL   *FtwProtocol;
+  EFI_HANDLE                              SmmFtwHandle;
   
   //
   // Just return to avoid install SMM FaultTolerantWriteProtocol again
@@ -217,7 +423,7 @@ FvbNotificationEvent (
   //
   // Found proper FVB protocol and initialize FtwDevice for protocol installation
   //
-  Status = InitFtwProtocol (gFtwDevice);
+  Status = InitFtwProtocol (mFtwDevice);
   if (EFI_ERROR(Status)) {
     return Status;
   }
@@ -226,12 +432,24 @@ FvbNotificationEvent (
   // Install protocol interface
   //
   Status = gSmst->SmmInstallProtocolInterface (
-                    &gFtwDevice->Handle,
+                    &mFtwDevice->Handle,
                     &gEfiSmmFaultTolerantWriteProtocolGuid,
                     EFI_NATIVE_INTERFACE,
-                    &gFtwDevice->FtwInstance
+                    &mFtwDevice->FtwInstance
                     );
   ASSERT_EFI_ERROR (Status); 
+
+  //
+  // Notify the Ftw wrapper driver SMM Ftw is ready
+  //
+  SmmFtwHandle = NULL;
+  Status = gBS->InstallProtocolInterface (
+                  &SmmFtwHandle,
+                  &gEfiSmmFaultTolerantWriteProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
   
   return EFI_SUCCESS;
 }
@@ -256,11 +474,12 @@ SmmFaultTolerantWriteInitialize (
   )
 {
   EFI_STATUS                              Status;
-
+  EFI_HANDLE                              FtwHandle;
+  
   //
   // Allocate private data structure for SMM FTW protocol and do some initialization
   //
-  Status = InitFtwDevice (&gFtwDevice);
+  Status = InitFtwDevice (&mFtwDevice);
   if (EFI_ERROR(Status)) {
     return Status;
   }
@@ -276,6 +495,12 @@ SmmFaultTolerantWriteInitialize (
   ASSERT_EFI_ERROR (Status);
 
   FvbNotificationEvent (NULL, NULL, NULL);
+
+  ///
+  /// Register SMM FTW SMI handler
+  ///
+  Status = gSmst->SmiHandlerRegister (SmmFaultTolerantWriteHandler, &gEfiSmmFaultTolerantWriteProtocolGuid, &FtwHandle);
+  ASSERT_EFI_ERROR (Status);
   
   return EFI_SUCCESS;
 }
