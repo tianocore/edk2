@@ -199,6 +199,7 @@ UpdateVariableStore (
   // Check if the Data is Volatile.
   //
   if (!Volatile) {
+    ASSERT (Fvb != NULL);
     Status = Fvb->GetPhysicalAddress(Fvb, &FvVolHdr);
     ASSERT_EFI_ERROR (Status);
 
