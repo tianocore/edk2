@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -44,6 +44,7 @@ fi
 PROCESSOR=X64
 BUILDTARGET=DEBUG
 BUILD_OPTIONS=
+PLATFORMFILE=
 LAST_ARG=
 RUN_QEMU=no
 
@@ -78,7 +79,7 @@ for arg in "$@"
 do
   if [ -z "$LAST_ARG" ]; then
     case $arg in
-      -a|-b|-t)
+      -a|-b|-t|-p)
         LAST_ARG=$arg
         ;;
       qemu)
@@ -97,6 +98,9 @@ do
         ;;
       -b)
         BUILDTARGET=$arg
+        ;;
+      -p)
+        PLATFORMFILE=$arg
         ;;
       -t)
         TARGET_TOOLS=$arg
@@ -125,6 +129,10 @@ case $PROCESSOR in
     exit 1
     ;;
 esac
+
+if [ -z "$PLATFORMFILE" ]; then
+  PLATFORMFILE=$WORKSPACE/OvmfPkg/OvmfPkg$Processor.dsc
+fi
 
 ADD_QEMU_HDA=yes
 for arg in "$@"
@@ -189,6 +197,6 @@ fi
 # Build the edk2 OvmfPkg
 #
 echo Running edk2 build for OvmfPkg$Processor
-build -p $WORKSPACE/OvmfPkg/OvmfPkg$Processor.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS
+build -p $PLATFORMFILE $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS
 exit $?
 
