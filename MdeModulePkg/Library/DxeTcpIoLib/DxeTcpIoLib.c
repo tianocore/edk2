@@ -914,7 +914,8 @@ TcpIoReceive (
   FragmentCount = Packet->BlockOpNum;
   Fragment      = AllocatePool (FragmentCount * sizeof (NET_FRAGMENT));
   if (Fragment == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
   }
   //
   // Build the fragment table.
@@ -988,8 +989,10 @@ ON_EXIT:
   } else {
     TcpIo->RxToken.Tcp6Token.Packet.RxData = NULL;
   }
-
-  FreePool (Fragment);
+  
+  if (Fragment != NULL) {
+    FreePool (Fragment);
+  }
 
   return Status;
 }
