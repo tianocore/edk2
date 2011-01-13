@@ -214,7 +214,7 @@ ValidateCryptRsa2 (
   //
   Print (L"\n- Retrieve RSA Private Key for PEM ...");
   Status = RsaGetPrivateKeyFromPem (TestKeyPem, sizeof (TestKeyPem), PemPass, &RsaPrivKey);
-  if (Status == FALSE) {
+  if (!Status) {
     Print (L"[Fail]");
     return EFI_ABORTED;
   } else {
@@ -227,7 +227,7 @@ ValidateCryptRsa2 (
   Print (L"\n- Retrieve RSA Public Key from X509 ... ");
   RsaPubKey = NULL;
   Status    = RsaGetPublicKeyFromX509 (TestCert, sizeof (TestCert), &RsaPubKey);
-  if (Status == FALSE) {
+  if (!Status) {
     Print (L"[Fail]");
     return EFI_ABORTED;
   } else {

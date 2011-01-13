@@ -1,7 +1,7 @@
 /** @file
   PEM (Privacy Enhanced Mail) Format Handler Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -41,9 +41,9 @@ PasswordCallback (
     //
     // Duplicate key phrase directly.
     //
-    KeyLength = AsciiStrLen ((CHAR8 *)Key);
+    KeyLength = (INTN) AsciiStrLen ((CHAR8 *)Key);
     KeyLength = (KeyLength > Size ) ? Size : KeyLength;
-    CopyMem (Buf, Key, KeyLength);
+    CopyMem (Buf, Key, (UINTN) KeyLength);
     return KeyLength;
   } else {
     return 0;
