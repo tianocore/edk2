@@ -74,13 +74,13 @@ InitCommunicateBuffer (
 /**
   Send the data in communicate buffer to SMI handler and get response.
 
-  @param[out]      SmmCommunicateHeader    The communicate buffer.
+  @param[in, out]  SmmCommunicateHeader    The communicate buffer.
   @param[in]       DataSize                The payload size.
                       
 **/
 EFI_STATUS
 SendCommunicateBuffer (
-  IN      EFI_SMM_COMMUNICATE_HEADER        *SmmCommunicateHeader,
+  IN OUT  EFI_SMM_COMMUNICATE_HEADER        *SmmCommunicateHeader,
   IN      UINTN                             DataSize
   )
 {
@@ -100,9 +100,9 @@ SendCommunicateBuffer (
 /**
   Get the FvbBaseAddress and FvbAttributes from the FVB handle FvbHandle.
 
-  @param[in]   FvBlockHandle     The handle of FVB protocol that provides services.
-  @param[in]   FvbBaseAddress    The base address of the FVB attached with FvBlockHandle.
-  @param[out]  FvbAttributes     The attributes of the FVB attached with FvBlockHandle.
+  @param[in]   FvbHandle         The handle of FVB protocol that provides services.
+  @param[out]  FvbBaseAddress    The base address of the FVB attached with FvbHandle.
+  @param[out]  FvbAttributes     The attributes of the FVB attached with FvbHandle.
     
   @retval EFI_SUCCESS            The function completed successfully.
   @retval Others                 The function could not complete successfully.
