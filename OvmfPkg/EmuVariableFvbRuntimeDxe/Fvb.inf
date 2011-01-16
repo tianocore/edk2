@@ -63,7 +63,7 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved

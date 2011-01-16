@@ -818,7 +818,7 @@ FvbInitialize (
     SetMem (Ptr, EMU_FVB_SIZE, ERASED_UINT8);
     InitializeFvAndVariableStoreHeaders (Ptr);
   }
-  PcdSet32 (PcdFlashNvStorageVariableBase, (UINT32)(UINTN) Ptr);
+  PcdSet64 (PcdFlashNvStorageVariableBase64, (UINT32)(UINTN) Ptr);
 
   //
   // Initialize the Fault Tolerant Write data area
