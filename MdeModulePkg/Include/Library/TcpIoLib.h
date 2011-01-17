@@ -2,7 +2,7 @@
   This library is used to share code between UEFI network stack modules.
   It provides the helper routines to access TCP service.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -114,6 +114,7 @@ typedef struct {
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_UNSUPPORTED        One or more of the control options are not
                                  supported in the implementation.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
   @retval Others                 Failed to create the TCP socket or configure it.
 
 **/

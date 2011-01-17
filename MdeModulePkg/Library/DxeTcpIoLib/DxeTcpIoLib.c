@@ -2,7 +2,7 @@
   This library is used to share code between UEFI network stack modules.
   It provides the helper routines to access TCP service.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -123,6 +123,7 @@ ON_EXIT:
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_UNSUPPORTED        One or more of the control options are not
                                  supported in the implementation.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
   @retval Others                 Failed to create the TCP socket or configure it.
 
 **/
@@ -148,6 +149,7 @@ TcpIoCreateSocket (
   EFI_TCP6_CONFIG_DATA      Tcp6ConfigData;
   EFI_TCP6_ACCESS_POINT     *AccessPoint6;
   EFI_TCP6_PROTOCOL         *Tcp6;
+  EFI_TCP4_RECEIVE_DATA     *RxData;
 
   if ((Image == NULL) || (Controller == NULL) || (ConfigData == NULL) || (TcpIo == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -363,6 +365,14 @@ TcpIoCreateSocket (
 
   TcpIo->RxToken.Tcp4Token.CompletionToken.Event = Event;
 
+  RxData = (EFI_TCP4_RECEIVE_DATA *) AllocateZeroPool (sizeof (EFI_TCP4_RECEIVE_DATA));
+  if (RxData == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
+  }
+
+  TcpIo->RxToken.Tcp4Token.Packet.RxData = RxData;
+
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
@@ -444,6 +454,10 @@ TcpIoDestroySocket (
 
   if (Event != NULL) {
     gBS->CloseEvent (Event);
+  }
+
+  if (TcpIo->RxToken.Tcp4Token.Packet.RxData != NULL) {
+    FreePool (TcpIo->RxToken.Tcp4Token.Packet.RxData);
   }
 
   Tcp4 = NULL;
@@ -868,13 +882,18 @@ TcpIoReceive (
 {
   EFI_TCP4_PROTOCOL         *Tcp4;
   EFI_TCP6_PROTOCOL         *Tcp6;
-  EFI_TCP4_RECEIVE_DATA     RxData;
+  EFI_TCP4_RECEIVE_DATA     *RxData;
   EFI_STATUS                Status;
   NET_FRAGMENT              *Fragment;
   UINT32                    FragmentCount;
   UINT32                    CurrentFragment;
 
   if ((TcpIo == NULL) || (TcpIo->Tcp.Tcp4 == NULL)|| (Packet == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  RxData = TcpIo->RxToken.Tcp4Token.Packet.RxData;
+  if (RxData == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -892,8 +911,6 @@ TcpIoReceive (
       return EFI_DEVICE_ERROR;
     }
 
-    TcpIo->RxToken.Tcp4Token.Packet.RxData = &RxData;
-
   } else if (TcpIo->TcpVersion == TCP_VERSION_6) {
     Tcp6 = TcpIo->Tcp.Tcp6;
 
@@ -904,8 +921,6 @@ TcpIoReceive (
     if (Tcp6 == NULL) {
       return EFI_DEVICE_ERROR; 
     }
-
-    TcpIo->RxToken.Tcp6Token.Packet.RxData = (EFI_TCP6_RECEIVE_DATA *) &RxData;
 
   } else {
     return EFI_UNSUPPORTED;
@@ -922,14 +937,14 @@ TcpIoReceive (
   //
   NetbufBuildExt (Packet, Fragment, &FragmentCount);
 
-  RxData.FragmentCount          = 1;
+  RxData->FragmentCount         = 1;
   CurrentFragment               = 0;
   Status                        = EFI_SUCCESS;
 
   while (CurrentFragment < FragmentCount) {
-    RxData.DataLength                       = Fragment[CurrentFragment].Len;
-    RxData.FragmentTable[0].FragmentLength  = Fragment[CurrentFragment].Len;
-    RxData.FragmentTable[0].FragmentBuffer  = Fragment[CurrentFragment].Bulk;
+    RxData->DataLength                       = Fragment[CurrentFragment].Len;
+    RxData->FragmentTable[0].FragmentLength  = Fragment[CurrentFragment].Len;
+    RxData->FragmentTable[0].FragmentBuffer  = Fragment[CurrentFragment].Bulk;
 
     if (TcpIo->TcpVersion == TCP_VERSION_4) {
       Status = Tcp4->Receive (Tcp4, &TcpIo->RxToken.Tcp4Token);
@@ -974,22 +989,16 @@ TcpIoReceive (
       goto ON_EXIT;
     }
 
-    Fragment[CurrentFragment].Len -= RxData.FragmentTable[0].FragmentLength;
+    Fragment[CurrentFragment].Len -= RxData->FragmentTable[0].FragmentLength;
     if (Fragment[CurrentFragment].Len == 0) {
       CurrentFragment++;
     } else {
-      Fragment[CurrentFragment].Bulk += RxData.FragmentTable[0].FragmentLength;
+      Fragment[CurrentFragment].Bulk += RxData->FragmentTable[0].FragmentLength;
     }
   }
 
 ON_EXIT:
 
-  if (TcpIo->TcpVersion == TCP_VERSION_4) {
-    TcpIo->RxToken.Tcp4Token.Packet.RxData = NULL;
-  } else {
-    TcpIo->RxToken.Tcp6Token.Packet.RxData = NULL;
-  }
-  
   if (Fragment != NULL) {
     FreePool (Fragment);
   }
