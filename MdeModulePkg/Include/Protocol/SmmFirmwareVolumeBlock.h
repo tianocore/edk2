@@ -3,7 +3,7 @@
   FVB driver, provides control over block-oriented firmware devices and is intended 
   to use in the EFI SMM environment.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define EFI_SMM_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID \
   { \
-    0xf52fc9ff, 0x8025, 0x4432, { 0xa5, 0x3b, 0xb4, 0x7b, 0x5e, 0x9, 0xdb, 0xf9 } \
+    0xd326d041, 0xbd31, 0x4c01, { 0xb5, 0xa8, 0x62, 0x8b, 0xe8, 0x7f, 0x6, 0x53 } \
   }
 
 //
