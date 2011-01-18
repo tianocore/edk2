@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -92,17 +92,21 @@ Abstract:
 //
 // debug print level
 //
+#ifndef EDKII_GLUE_DebugPrintErrorLevel
 #define EDKII_GLUE_DebugPrintErrorLevel         (EFI_D_ERROR|EFI_D_INFO)
+#endif
 
 //
 // debug propery mask
 //
+#ifndef EDKII_GLUE_DebugPropertyMask
 #define EDKII_GLUE_DebugPropertyMask           (  DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED                \
                                                   | DEBUG_PROPERTY_DEBUG_PRINT_ENABLED               \
                                                   | DEBUG_PROPERTY_DEBUG_CODE_ENABLED                \
                                                   | DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED              \
                                                   | DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED           \
                                                )
+#endif
 
 //
 // clear memory value
