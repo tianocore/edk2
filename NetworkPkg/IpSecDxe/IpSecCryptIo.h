@@ -1,7 +1,7 @@
 /** @file
   Definitions related to the Cryptographic Operations in IPsec.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -55,7 +55,7 @@
 **/
 typedef
 UINTN
-(EFIAPI *CRYPTO_HMAC_GETCONTEXTSIZE) (
+(EFIAPI *CRYPTO_HMAC_GETCONTEXTSIZE)(
   VOID
   );
 
@@ -73,7 +73,7 @@ UINTN
 **/
 typedef
 BOOLEAN
-(EFIAPI *CRYPTO_HMAC_INIT) (
+(EFIAPI *CRYPTO_HMAC_INIT)(
   OUT           VOID     *Context,
   IN     CONST  UINT8    *Key,
   IN            UINTN    KeySize
@@ -97,7 +97,7 @@ BOOLEAN
 **/
 typedef
 BOOLEAN
-(EFIAPI *CRYPTO_HMAC_UPDATE) (
+(EFIAPI *CRYPTO_HMAC_UPDATE)(
   IN OUT       VOID  *Context,
   IN     CONST VOID  *Data,
   IN           UINTN DataLength
@@ -118,7 +118,7 @@ BOOLEAN
 **/
 typedef
 BOOLEAN
-(EFIAPI *CRYPTO_HMAC_FINAL) (
+(EFIAPI *CRYPTO_HMAC_FINAL)(
   IN OUT  VOID   *Context,
      OUT  UINT8  *HmacValue
   );
@@ -133,7 +133,7 @@ BOOLEAN
 **/
 typedef
 UINTN
-(EFIAPI *CRYPTO_CIPHER_GETCONTEXTSIZE) (
+(EFIAPI *CRYPTO_CIPHER_GETCONTEXTSIZE)(
   VOID
   );
 
@@ -154,7 +154,7 @@ UINTN
 **/
 typedef
 BOOLEAN
-(EFIAPI *CRYPTO_CIPHER_INIT) (
+(EFIAPI *CRYPTO_CIPHER_INIT)(
   IN OUT        VOID   *Context,
   IN      CONST UINT8  *Key,
   IN            UINTN  KeyBits
@@ -180,7 +180,7 @@ BOOLEAN
 **/
 typedef
 BOOLEAN
-(EFIAPI *CRYPTO_CIPHER_ENCRYPT) (
+(EFIAPI *CRYPTO_CIPHER_ENCRYPT)(
   IN            VOID   *Context,
   IN      CONST UINT8  *InData,
   IN            UINTN  InputSize,
@@ -207,7 +207,7 @@ BOOLEAN
 **/
 typedef
 BOOLEAN
-(EFIAPI *CRYPTO_CIPHER_DECRYPT) (
+(EFIAPI *CRYPTO_CIPHER_DECRYPT)(
   IN           VOID   *Context,
   IN     CONST UINT8  *InData,
   IN           UINTN  InputSize,
@@ -225,7 +225,7 @@ BOOLEAN
 **/
 typedef
 UINTN
-(EFIAPI *CRYPTO_HASH_GETCONTEXTSIZE) (
+(EFIAPI *CRYPTO_HASH_GETCONTEXTSIZE)(
   VOID
   );
 
@@ -245,7 +245,7 @@ UINTN
 **/
 typedef
 BOOLEAN
-(EFIAPI *CRYPTO_HASH_INIT) (
+(EFIAPI *CRYPTO_HASH_INIT)(
   OUT  VOID  *Context
   );
 
@@ -271,7 +271,7 @@ BOOLEAN
 **/
 typedef
 BOOLEAN
-(EFIAPI *CRYPTO_HASH_UPDATE) (
+(EFIAPI *CRYPTO_HASH_UPDATE)(
   IN OUT  VOID        *Context,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
@@ -301,7 +301,7 @@ BOOLEAN
 **/
 typedef
 BOOLEAN
-(EFIAPI *CRYPTO_HASH_FINAL) (
+(EFIAPI *CRYPTO_HASH_FINAL)(
   IN OUT  VOID   *Context,
   OUT     UINT8  *HashValue
   );
