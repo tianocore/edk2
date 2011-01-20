@@ -1,7 +1,7 @@
 /** @file
   The operations for IKEv2 SA.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -819,7 +819,7 @@ Ikev2InitCertGenerator (
   LIST_ENTRY         *Node;
   IKE_PAYLOAD        *NoncePayload;
 
-  if (!FeaturePcdGet (PcdIpsecCertiifcateEnabled)) {
+  if (!FeaturePcdGet (PcdIpsecCertificateEnabled)) {
     return NULL;
   }
 
@@ -835,8 +835,8 @@ Ikev2InitCertGenerator (
     CertReqPayload = Ikev2GenerateCertificatePayload (
                        (IKEV2_SA_SESSION *)SaSession,
                        IKEV2_PAYLOAD_TYPE_NONE,
-                       (UINT8*)PcdGetPtr(UefiCaFile),
-                       PcdGet32(UefiCaFileSize),
+                       (UINT8*)PcdGetPtr(PcdIpsecUefiCaFile),
+                       PcdGet32(PcdIpsecUefiCaFileSize),
                        IKEV2_CERT_ENCODEING_HASH_AND_URL_OF_X509_CERT,
                        TRUE
                        );
@@ -874,7 +874,7 @@ Ikev2InitCertParser (
   IN IKE_PACKET       *IkePacket
   )
 {
-  if (!FeaturePcdGet (PcdIpsecCertiifcateEnabled)) {
+  if (!FeaturePcdGet (PcdIpsecCertificateEnabled)) {
     return EFI_UNSUPPORTED;
   } 
   
@@ -913,7 +913,7 @@ Ikev2AuthCertGenerator (
   IKE_PAYLOAD            *CertReqPayload;
   IKEV2_CHILD_SA_SESSION *ChildSaSession;
 
-  if (!FeaturePcdGet (PcdIpsecCertiifcateEnabled)) {
+  if (!FeaturePcdGet (PcdIpsecCertificateEnabled)) {
     return NULL;
   }
 
@@ -962,8 +962,8 @@ Ikev2AuthCertGenerator (
   IdPayload = Ikev2GenerateCertIdPayload (
                 &IkeSaSession->SessionCommon,
                 IKEV2_PAYLOAD_TYPE_CERT,
-                (UINT8 *)PcdGetPtr (UefiCertificate),
-                PcdGet32 (UefiCertificateSize)
+                (UINT8 *)PcdGetPtr (PcdIpsecUefiCertificate),
+                PcdGet32 (PcdIpsecUefiCertificateSize)
                 );
 
   //
@@ -972,8 +972,8 @@ Ikev2AuthCertGenerator (
   CertPayload = Ikev2GenerateCertificatePayload (
                   IkeSaSession,
                   (UINT8)(IkeSaSession->SessionCommon.IsInitiator ? IKEV2_PAYLOAD_TYPE_CERTREQ : IKEV2_PAYLOAD_TYPE_AUTH),
-                  (UINT8 *)PcdGetPtr (UefiCertificate),
-                  PcdGet32 (UefiCertificateSize),
+                  (UINT8 *)PcdGetPtr (PcdIpsecUefiCertificate),
+                  PcdGet32 (PcdIpsecUefiCertificateSize),
                   IKEV2_CERT_ENCODEING_X509_CERT_SIGN,
                   FALSE
                   );
@@ -981,8 +981,8 @@ Ikev2AuthCertGenerator (
     CertReqPayload = Ikev2GenerateCertificatePayload (
                        IkeSaSession,
                        IKEV2_PAYLOAD_TYPE_AUTH,
-                       (UINT8 *)PcdGetPtr (UefiCertificate),
-                       PcdGet32 (UefiCertificateSize),
+                       (UINT8 *)PcdGetPtr (PcdIpsecUefiCertificate),
+                       PcdGet32 (PcdIpsecUefiCertificateSize),
                        IKEV2_CERT_ENCODEING_HASH_AND_URL_OF_X509_CERT,
                        TRUE
                        );
@@ -999,8 +999,8 @@ Ikev2AuthCertGenerator (
                     IdPayload,
                     IKEV2_PAYLOAD_TYPE_SA,
                     FALSE,
-                    (UINT8 *)PcdGetPtr (UefiCertificateKey),
-                    PcdGet32 (UefiCertificateKeySize),
+                    (UINT8 *)PcdGetPtr (PcdIpsecUefiCertificateKey),
+                    PcdGet32 (PcdIpsecUefiCertificateKeySize),
                     ChildSaSession->IkeSaSession->Pad->Data->AuthData,
                     ChildSaSession->IkeSaSession->Pad->Data->AuthDataSize
                     );
@@ -1010,8 +1010,8 @@ Ikev2AuthCertGenerator (
                     IdPayload,
                     IKEV2_PAYLOAD_TYPE_CP,
                     FALSE,
-                    (UINT8 *)PcdGetPtr (UefiCertificateKey),
-                    PcdGet32 (UefiCertificateKeySize),
+                    (UINT8 *)PcdGetPtr (PcdIpsecUefiCertificateKey),
+                    PcdGet32 (PcdIpsecUefiCertificateKeySize),
                     ChildSaSession->IkeSaSession->Pad->Data->AuthData,
                     ChildSaSession->IkeSaSession->Pad->Data->AuthDataSize
                     );
@@ -1137,7 +1137,7 @@ Ikev2AuthCertParser (
   LIST_ENTRY             *Entry;
   EFI_STATUS             Status;
 
-  if (!FeaturePcdGet (PcdIpsecCertiifcateEnabled)) {
+  if (!FeaturePcdGet (PcdIpsecCertificateEnabled)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1236,8 +1236,8 @@ Ikev2AuthCertParser (
       (!IpSecCryptoIoVerifySignDataByCertificate (
           CertPayload->PayloadBuf + sizeof (IKEV2_CERT),
           CertPayload->PayloadSize - sizeof (IKEV2_CERT),
-          (UINT8 *)PcdGetPtr (UefiCaFile),
-          PcdGet32 (UefiCaFileSize),
+          (UINT8 *)PcdGetPtr (PcdIpsecUefiCaFile),
+          PcdGet32 (PcdIpsecUefiCaFileSize),
           VerifiedAuthPayload->PayloadBuf + sizeof (IKEV2_AUTH),
           VerifiedAuthPayload->PayloadSize - sizeof (IKEV2_AUTH),
           AuthPayload->PayloadBuf + sizeof (IKEV2_AUTH),

@@ -1,7 +1,7 @@
 ## @file
 #  Component description file for IpSec module.
 #
-#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -92,10 +92,10 @@
   gEfiIpSecProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
   
 [Pcd]
-  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecCertiifcateEnabled
-  gEfiMdeModulePkgTokenSpaceGuid.UefiCaFile
-  gEfiMdeModulePkgTokenSpaceGuid.UefiCaFileSize
-  gEfiMdeModulePkgTokenSpaceGuid.UefiCertificate
-  gEfiMdeModulePkgTokenSpaceGuid.UefiCertificateSize
-  gEfiMdeModulePkgTokenSpaceGuid.UefiCertificateKey
-  gEfiMdeModulePkgTokenSpaceGuid.UefiCertificateKeySize
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecCertificateEnabled
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCaFile
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCaFileSize
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCertificate
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCertificateSize
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCertificateKey
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCertificateKeySize
