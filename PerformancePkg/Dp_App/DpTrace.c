@@ -723,19 +723,21 @@ ProcessCumulative(
   PrintToken (STRING_TOKEN (STR_DP_DASHES));
 
   for ( TIndex = 0; TIndex < NumCum; ++TIndex) {
-    AvgDur = DivU64x32 (CumData[TIndex].Duration, CumData[TIndex].Count);
-    AvgDur = DurationInMicroSeconds(AvgDur);
-    Dur    = DurationInMicroSeconds(CumData[TIndex].Duration);
-    MaxDur = DurationInMicroSeconds(CumData[TIndex].MaxDur);
-    MinDur = DurationInMicroSeconds(CumData[TIndex].MinDur);
+    if (CumData[TIndex].Count != 0) {
+      AvgDur = DivU64x32 (CumData[TIndex].Duration, CumData[TIndex].Count);
+      AvgDur = DurationInMicroSeconds(AvgDur);
+      Dur    = DurationInMicroSeconds(CumData[TIndex].Duration);
+      MaxDur = DurationInMicroSeconds(CumData[TIndex].MaxDur);
+      MinDur = DurationInMicroSeconds(CumData[TIndex].MinDur);
     
-    PrintToken (STRING_TOKEN (STR_DP_CUMULATIVE_STATS),
-                CumData[TIndex].Name,
-                CumData[TIndex].Count,
-                Dur,
-                AvgDur,
-                MinDur,
-                MaxDur
-               );
+      PrintToken (STRING_TOKEN (STR_DP_CUMULATIVE_STATS),
+                  CumData[TIndex].Name,
+                  CumData[TIndex].Count,
+                  Dur,
+                  AvgDur,
+                  MinDur,
+                  MaxDur
+                 );
+    }
   }
 }
