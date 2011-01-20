@@ -2,7 +2,7 @@
 Implementation for EFI_HII_STRING_PROTOCOL.
 
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -248,6 +248,7 @@ GetStringFontInfo (
   @param  StringTextOffset        Offset, relative to the found block address, of
                                   the  string text information.
   @param  LastStringId            Output the last string id when StringId = 0 or StringId = -1.
+  @param  StartStringId           The first id in the skip block which StringId in the block.
 
   @retval EFI_SUCCESS             The string text and font is retrieved
                                   successfully.
@@ -265,7 +266,8 @@ FindStringBlock (
   OUT UINT8                           *BlockType, OPTIONAL
   OUT UINT8                           **StringBlockAddr, OPTIONAL
   OUT UINTN                           *StringTextOffset, OPTIONAL
-  OUT EFI_STRING_ID                   *LastStringId OPTIONAL
+  OUT EFI_STRING_ID                   *LastStringId, OPTIONAL
+  OUT EFI_STRING_ID                   *StartStringId OPTIONAL
   )
 {
   UINT8                                *BlockHdr;
@@ -540,12 +542,21 @@ FindStringBlock (
       break;
     }
 
-    if (StringId > 0) {
+    if (StringId > 0 && StringId != (EFI_STRING_ID)(-1)) {
+      ASSERT (BlockType != NULL && StringBlockAddr != NULL && StringTextOffset != NULL);
+      *BlockType        = *BlockHdr;
+      *StringBlockAddr  = BlockHdr;
+      *StringTextOffset = Offset;
+
       if (StringId == CurrentStringId - 1) {
-        *BlockType        = *BlockHdr;
-        *StringBlockAddr  = BlockHdr;
-        *StringTextOffset = Offset;
-        return EFI_SUCCESS;
+        //
+        // if only one skip item, return EFI_NOT_FOUND.
+        //
+        if(*BlockType == EFI_HII_SIBT_SKIP2 || *BlockType == EFI_HII_SIBT_SKIP1) {
+          return EFI_NOT_FOUND;
+        } else {
+          return EFI_SUCCESS;
+        }
       }
 
       if (StringId < CurrentStringId - 1) {
@@ -553,7 +564,9 @@ FindStringBlock (
       }
     }
     BlockHdr  = StringPackage->StringBlock + BlockSize;
-
+    if (StartStringId != NULL) {
+        *StartStringId  = CurrentStringId;
+    }
   }
   
   //
@@ -623,6 +636,7 @@ GetStringWorker (
              &BlockType,
              &StringBlockAddr,
              &StringTextOffset,
+             NULL,
              NULL
              );
   if (EFI_ERROR (Status)) {
@@ -684,6 +698,153 @@ GetStringWorker (
   return EFI_SUCCESS;
 }
 
+/**
+  If GetStringBlock find the StringId's string is not saved in the exist string block,
+  this function will create the UCS2 string block to save the string; also split the 
+  skip block into two or one skip block.
+
+  This is a internal function.
+  
+  @param  StringPackage           Hii string package instance.
+  @param  StartStringId           The first id in the skip block which StringId in the block.
+  @param  StringId                The string's id, which is unique within
+                                  PackageList.  
+  @param  BlockType               Output the block type of found string block.  
+  @param  StringBlockAddr         Output the block address of found string block.  
+  @param  FontBlock               whether this string block has font info.
+
+  @retval EFI_SUCCESS            The string font is outputed successfully.
+  @retval EFI_OUT_OF_RESOURCES   NO resource for the memory to save the new string block.
+
+**/
+EFI_STATUS
+InsertLackStringBlock (
+  IN OUT HII_STRING_PACKAGE_INSTANCE         *StringPackage,
+  IN EFI_STRING_ID                           StartStringId,
+  IN EFI_STRING_ID                           StringId,
+  IN OUT UINT8                               *BlockType,
+  IN OUT UINT8                               **StringBlockAddr,
+  IN BOOLEAN                                 FontBlock
+  )
+{
+  UINT8                                *BlockPtr;
+  UINT8                                *StringBlock;
+  UINTN                                SkipLen;    
+  UINTN                                OldBlockSize;
+  UINTN                                NewBlockSize;
+  UINTN                                FrontSkipNum;
+  UINTN                                NewUCSBlockLen;
+  UINT8                                *OldStringAddr;
+  UINTN                                IdCount;
+
+  FrontSkipNum  = 0;
+  SkipLen       = 0;
+  OldStringAddr = *StringBlockAddr;
+  
+  ASSERT (*BlockType == EFI_HII_SIBT_SKIP1 || *BlockType == EFI_HII_SIBT_SKIP2);
+  //
+  // Old skip block size.
+  //
+  if (*BlockType == EFI_HII_SIBT_SKIP1) {
+    SkipLen = sizeof (EFI_HII_SIBT_SKIP1_BLOCK);
+    IdCount = *(UINT8*)(OldStringAddr + sizeof (EFI_HII_STRING_BLOCK));
+  } else {
+    SkipLen = sizeof (EFI_HII_SIBT_SKIP2_BLOCK);
+    IdCount = *(UINT16*)(OldStringAddr + sizeof (EFI_HII_STRING_BLOCK));
+  } 
+
+  //
+  // New create UCS or UCS2 block size.
+  //
+  if (FontBlock) {
+    NewUCSBlockLen = sizeof (EFI_HII_SIBT_STRING_UCS2_FONT_BLOCK);
+  } else {
+    NewUCSBlockLen = sizeof (EFI_HII_SIBT_STRING_UCS2_BLOCK);
+  }
+
+  OldBlockSize = StringPackage->StringPkgHdr->Header.Length - StringPackage->StringPkgHdr->HdrSize;
+
+  if (StartStringId == StringId) {
+    //
+    // New block + [Skip block]
+    //
+    if (IdCount > 1) {
+      NewBlockSize = OldBlockSize + NewUCSBlockLen;
+    } else {
+      NewBlockSize = OldBlockSize + NewUCSBlockLen - SkipLen;
+    }
+  } else if (StartStringId + IdCount - 1 == StringId){
+    //
+    // Skip block + New block
+    //
+    NewBlockSize = OldBlockSize + NewUCSBlockLen;
+    FrontSkipNum = StringId - StartStringId;
+  } else {
+    //
+    // Skip block + New block + [Skip block]
+    //
+    NewBlockSize = OldBlockSize + NewUCSBlockLen + SkipLen;
+    FrontSkipNum = StringId - StartStringId;
+  }
+
+  StringBlock = (UINT8 *) AllocateZeroPool (NewBlockSize);
+  if (StringBlock == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Copy old block in front of skip block.
+  //
+  CopyMem (StringBlock, StringPackage->StringBlock, OldStringAddr - StringPackage->StringBlock);  
+  BlockPtr = StringBlock + (OldStringAddr - StringPackage->StringBlock);
+
+  if (FrontSkipNum > 0) {
+    *BlockPtr = *BlockType;
+    if (*BlockType == EFI_HII_SIBT_SKIP1) {
+      (UINT8) (*(BlockPtr + sizeof (EFI_HII_STRING_BLOCK))) = (UINT8)FrontSkipNum;
+    } else {
+      (UINT16) (*(UINT16 *)(BlockPtr + sizeof (EFI_HII_STRING_BLOCK))) = (UINT16)FrontSkipNum;
+    }
+    BlockPtr += SkipLen;
+  }
+
+  //
+  // Create a EFI_HII_SIBT_STRING_UCS2_FONT_BLOCK
+  //
+  *StringBlockAddr = BlockPtr;
+  if (FontBlock) {
+    *BlockPtr = EFI_HII_SIBT_STRING_UCS2_FONT;
+  } else {
+    *BlockPtr = EFI_HII_SIBT_STRING_UCS2;
+  }
+  BlockPtr += NewUCSBlockLen;
+
+  if (IdCount > FrontSkipNum + 1) {
+    *BlockPtr = *BlockType;
+    if (*BlockType == EFI_HII_SIBT_SKIP1) {
+      (UINT8) (*(BlockPtr + sizeof (EFI_HII_STRING_BLOCK))) = (UINT8) (IdCount - FrontSkipNum - 1);
+    } else {
+      (UINT16) (*(UINT16 *)(BlockPtr + sizeof (EFI_HII_STRING_BLOCK))) = (UINT16) (IdCount - FrontSkipNum - 1);
+    }
+    BlockPtr += SkipLen;
+  }
+
+  //
+  // Append a EFI_HII_SIBT_END block to the end.
+  //
+  CopyMem (BlockPtr, OldStringAddr + SkipLen, OldBlockSize - (OldStringAddr - StringPackage->StringBlock) - SkipLen);  
+
+  if (FontBlock) {
+    *BlockType = EFI_HII_SIBT_STRING_UCS2_FONT;
+  } else {
+    *BlockType = EFI_HII_SIBT_STRING_UCS2;
+  }
+  FreePool (StringPackage->StringBlock);
+  StringPackage->StringBlock = StringBlock;
+  StringPackage->StringPkgHdr->Header.Length += NewBlockSize - OldBlockSize;
+
+  return EFI_SUCCESS;
+}
 
 /**
   Parse all string blocks to set a String specified by StringId.
@@ -731,8 +892,9 @@ SetStringWorker (
   EFI_HII_SIBT_EXT2_BLOCK              Ext2;
   UINTN                                StringSize;
   UINTN                                TmpSize;
+  EFI_STRING_ID                        StartStringId;
 
-
+  StartStringId = 0;
   ASSERT (Private != NULL && StringPackage != NULL && String != NULL);
   ASSERT (Private->Signature == HII_DATABASE_PRIVATE_DATA_SIGNATURE);
   //
@@ -745,10 +907,25 @@ SetStringWorker (
              &BlockType,
              &StringBlockAddr,
              &StringTextOffset,
-             NULL
+             NULL,
+             &StartStringId
              );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (EFI_ERROR (Status) && (BlockType == EFI_HII_SIBT_SKIP1 || BlockType == EFI_HII_SIBT_SKIP2)) {
+    Status = InsertLackStringBlock(StringPackage, 
+                          StartStringId, 
+                          StringId, 
+                          &BlockType,
+                          &StringBlockAddr,
+                          (BOOLEAN)(StringFontInfo != NULL)
+                          );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    if (StringFontInfo != NULL) {
+      StringTextOffset = sizeof (EFI_HII_SIBT_STRING_UCS2_FONT_BLOCK) - sizeof (CHAR16);
+    } else {
+      StringTextOffset = sizeof (EFI_HII_SIBT_STRING_UCS2_BLOCK) - sizeof (CHAR16);
+    }
   }
 
   LocalFont  = NULL;
@@ -806,7 +983,7 @@ SetStringWorker (
   case EFI_HII_SIBT_STRINGS_SCSU:
   case EFI_HII_SIBT_STRINGS_SCSU_FONT:
     BlockSize = OldBlockSize + StrLen (String);
-    BlockSize -= AsciiStrLen ((CHAR8 *) StringTextPtr);
+    BlockSize -= AsciiStrSize ((CHAR8 *) StringTextPtr);
     Block = AllocateZeroPool (BlockSize);
     if (Block == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -1048,7 +1225,8 @@ HiiNewString (
                NULL,
                NULL,
                NULL,
-               &NextStringId
+               &NextStringId,
+               NULL
                );
     if (EFI_ERROR (Status)) {
       goto Done;

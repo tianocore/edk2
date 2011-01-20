@@ -1,7 +1,7 @@
 /** @file
 Private structures definitions in HiiDatabase.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -436,6 +436,7 @@ GetSystemFont (
   @param  StringTextOffset        Offset, relative to the found block address, of
                                   the  string text information.
   @param  LastStringId            Output the last string id when StringId = 0 or StringId = -1.
+  @param  StartStringId           The first id in the skip block which StringId in the block.
 
   @retval EFI_SUCCESS             The string text and font is retrieved
                                   successfully.
@@ -453,7 +454,8 @@ FindStringBlock (
   OUT UINT8                           *BlockType, OPTIONAL
   OUT UINT8                           **StringBlockAddr, OPTIONAL
   OUT UINTN                           *StringTextOffset, OPTIONAL
-  OUT EFI_STRING_ID                   *LastStringId OPTIONAL
+  OUT EFI_STRING_ID                   *LastStringId, OPTIONAL
+  OUT EFI_STRING_ID                   *StartStringId OPTIONAL
   );
 
 
