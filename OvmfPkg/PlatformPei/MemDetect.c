@@ -36,7 +36,7 @@ Module Name:
 
 STATIC
 UINTN
-GetSystemMemorySize (
+GetSystemMemorySizeBelow4gb (
   )
 {
   UINT8 Cmos0x34;
@@ -58,6 +58,31 @@ GetSystemMemorySize (
 }
 
 
+STATIC
+UINT64
+GetSystemMemorySizeAbove4gb (
+  )
+{
+  UINT32 Size;
+  UINTN  CmosIndex;
+
+  //
+  // CMOS 0x5b-0x5d specifies the system memory above 4GB MB.
+  // * CMOS(0x5d) is the most significant size byte
+  // * CMOS(0x5c) is the middle size byte
+  // * CMOS(0x5b) is the least significant size byte
+  // * The size is specified in 64kb chunks
+  //
+
+  Size = 0;
+  for (CmosIndex = 0x5d; CmosIndex >= 0x5b; CmosIndex--) {
+    Size = (UINT32) (Size << 8) + (UINT32) CmosRead8 (CmosIndex);
+  }
+
+  return LShiftU64 (Size, 16);
+}
+
+
 /**
   Peform Memory Detection
 
@@ -71,23 +96,25 @@ MemDetect (
   EFI_STATUS                  Status;
   EFI_PHYSICAL_ADDRESS        MemoryBase;
   UINT64                      MemorySize;
-  UINT64                      TotalMemorySize;
+  UINT64                      LowerMemorySize;
+  UINT64                      UpperMemorySize;
 
   DEBUG ((EFI_D_ERROR, "MemDetect called\n"));
 
   //
   // Determine total memory size available
   //
-  TotalMemorySize = (UINT64)GetSystemMemorySize ();
+  LowerMemorySize = GetSystemMemorySizeBelow4gb ();
+  UpperMemorySize = GetSystemMemorySizeAbove4gb ();
 
   //
   // Determine the range of memory to use during PEI
   //
   MemoryBase = PcdGet32 (PcdOvmfMemFvBase) + PcdGet32 (PcdOvmfMemFvSize);
-  MemorySize = TotalMemorySize - MemoryBase;
-  if (MemorySize > SIZE_16MB) {
-    MemoryBase = TotalMemorySize - SIZE_16MB;
-    MemorySize = SIZE_16MB;
+  MemorySize = LowerMemorySize - MemoryBase;
+  if (MemorySize > SIZE_64MB) {
+    MemoryBase = LowerMemorySize - SIZE_64MB;
+    MemorySize = SIZE_64MB;
   }
 
   //
@@ -102,6 +129,10 @@ MemDetect (
   AddMemoryBaseSizeHob (MemoryBase, MemorySize);
   AddMemoryRangeHob (BASE_1MB, MemoryBase);
   AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
+
+  if (UpperMemorySize != 0) {
+    AddUntestedMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
+  }
 
   return MemoryBase + MemorySize;
 }

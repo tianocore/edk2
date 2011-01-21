@@ -103,6 +103,37 @@ AddMemoryRangeHob (
   AddMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
 }
 
+
+VOID
+AddUntestedMemoryBaseSizeHob (
+  EFI_PHYSICAL_ADDRESS        MemoryBase,
+  UINT64                      MemorySize
+  )
+{
+  BuildResourceDescriptorHob (
+    EFI_RESOURCE_SYSTEM_MEMORY,
+      EFI_RESOURCE_ATTRIBUTE_PRESENT |
+      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE,
+    MemoryBase,
+    MemorySize
+    );
+}
+
+
+VOID
+AddUntestedMemoryRangeHob (
+  EFI_PHYSICAL_ADDRESS        MemoryBase,
+  EFI_PHYSICAL_ADDRESS        MemoryLimit
+  )
+{
+  AddUntestedMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
+}
+
+
 VOID
 MemMapInitialization (
   EFI_PHYSICAL_ADDRESS  TopOfMemory
