@@ -1,7 +1,7 @@
 /** @file
   The implementation of policy entry operation function in IpSecConfig application.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1517,9 +1517,9 @@ CombineSpdEntry (
 EFI_STATUS
 CombineSadEntry (
   IN OUT EFI_IPSEC_SA_ID      *OldSaId,
-  IN OUT EFI_IPSEC_SA_DATA2    *OldData,
+  IN OUT EFI_IPSEC_SA_DATA2   *OldData,
   IN     EFI_IPSEC_SA_ID      *NewSaId,
-  IN     EFI_IPSEC_SA_DATA2    *NewData,
+  IN     EFI_IPSEC_SA_DATA2   *NewData,
   IN     UINT32               Mask,
      OUT BOOLEAN              *CreateNew
   )

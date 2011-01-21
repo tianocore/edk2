@@ -1,7 +1,7 @@
 /** @file
   The function declaration of policy entry operation in IpSecConfig application.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -115,12 +115,12 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (* COMBINE_POLICY_ENTRY) (
-  EFI_IPSEC_CONFIG_SELECTOR    *OldSelector,
-  VOID                         *OldData,
-  EFI_IPSEC_CONFIG_SELECTOR    *NewSelector,
-  VOID                         *NewData,
-  UINT32                       Mask,
-  BOOLEAN                      *CreateNew
+  IN OUT EFI_IPSEC_CONFIG_SELECTOR    *OldSelector,
+  IN OUT VOID                         *OldData,
+  IN     EFI_IPSEC_CONFIG_SELECTOR    *NewSelector,
+  IN     VOID                         *NewData,
+  IN     UINT32                       Mask,
+     OUT BOOLEAN                      *CreateNew
   );
 
 /**

@@ -1577,8 +1577,8 @@ ClearAllPayloads (
 **/
 IKEV2_SA*
 Ikev2EncodeSa (
-  IKEV2_SESSION_COMMON *SessionCommon,
-  IKEV2_SA_DATA        *SaData
+  IN IKEV2_SESSION_COMMON *SessionCommon,
+  IN IKEV2_SA_DATA        *SaData
   )
 {
   IKEV2_SA              *Sa;
@@ -1730,8 +1730,8 @@ Ikev2EncodeSa (
 **/
 IKEV2_SA_DATA *
 Ikev2DecodeSa (
-  IKEV2_SESSION_COMMON *SessionCommon,
-  IKEV2_SA             *Sa
+  IN IKEV2_SESSION_COMMON *SessionCommon,
+  IN IKEV2_SA             *Sa
   )
 {
   IKEV2_SA_DATA         *SaData;
