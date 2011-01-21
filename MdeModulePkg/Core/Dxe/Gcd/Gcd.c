@@ -1653,7 +1653,7 @@ CoreAllocateIoSpace (
 {
   DEBUG ((DEBUG_GCD, "GCD:AllocateIoSpace(Base=%016lx,Length=%016lx)\n", *BaseAddress, Length));
   DEBUG ((DEBUG_GCD, "  GcdAllocateType = %a\n", mGcdAllocationTypeNames[MIN (GcdAllocateType, EfiGcdMaxAllocateType)]));
-  DEBUG ((DEBUG_GCD, "  GcdMemoryType   = %a\n", mGcdIoTypeNames[MIN (GcdIoType, EfiGcdMemoryTypeMaximum)]));
+  DEBUG ((DEBUG_GCD, "  GcdIoType       = %a\n", mGcdIoTypeNames[MIN (GcdIoType, EfiGcdIoTypeMaximum)]));
   DEBUG ((DEBUG_GCD, "  Alignment       = %016lx\n", LShiftU64 (1, Alignment)));
   DEBUG ((DEBUG_GCD, "  ImageHandle     = %p\n", ImageHandle));
   DEBUG ((DEBUG_GCD, "  DeviceHandle    = %p\n", DeviceHandle));
