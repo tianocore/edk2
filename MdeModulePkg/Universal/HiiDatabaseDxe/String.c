@@ -729,13 +729,13 @@ InsertLackStringBlock (
 {
   UINT8                                *BlockPtr;
   UINT8                                *StringBlock;
-  UINTN                                SkipLen;    
-  UINTN                                OldBlockSize;
-  UINTN                                NewBlockSize;
-  UINTN                                FrontSkipNum;
-  UINTN                                NewUCSBlockLen;
+  UINT32                               SkipLen;    
+  UINT32                               OldBlockSize;
+  UINT32                               NewBlockSize;
+  UINT32                               FrontSkipNum;
+  UINT32                               NewUCSBlockLen;
   UINT8                                *OldStringAddr;
-  UINTN                                IdCount;
+  UINT32                               IdCount;
 
   FrontSkipNum  = 0;
   SkipLen       = 0;
