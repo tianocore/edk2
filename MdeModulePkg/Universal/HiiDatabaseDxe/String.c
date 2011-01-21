@@ -801,9 +801,9 @@ InsertLackStringBlock (
   if (FrontSkipNum > 0) {
     *BlockPtr = *BlockType;
     if (*BlockType == EFI_HII_SIBT_SKIP1) {
-      (UINT8) (*(BlockPtr + sizeof (EFI_HII_STRING_BLOCK))) = (UINT8)FrontSkipNum;
+      *(BlockPtr + sizeof (EFI_HII_STRING_BLOCK)) = (UINT8) FrontSkipNum;
     } else {
-      (UINT16) (*(UINT16 *)(BlockPtr + sizeof (EFI_HII_STRING_BLOCK))) = (UINT16)FrontSkipNum;
+      *(UINT16 *)(BlockPtr + sizeof (EFI_HII_STRING_BLOCK)) = (UINT16) FrontSkipNum;
     }
     BlockPtr += SkipLen;
   }
@@ -822,9 +822,9 @@ InsertLackStringBlock (
   if (IdCount > FrontSkipNum + 1) {
     *BlockPtr = *BlockType;
     if (*BlockType == EFI_HII_SIBT_SKIP1) {
-      (UINT8) (*(BlockPtr + sizeof (EFI_HII_STRING_BLOCK))) = (UINT8) (IdCount - FrontSkipNum - 1);
+      *(BlockPtr + sizeof (EFI_HII_STRING_BLOCK)) = (UINT8) (IdCount - FrontSkipNum - 1);
     } else {
-      (UINT16) (*(UINT16 *)(BlockPtr + sizeof (EFI_HII_STRING_BLOCK))) = (UINT16) (IdCount - FrontSkipNum - 1);
+      *(UINT16 *)(BlockPtr + sizeof (EFI_HII_STRING_BLOCK)) = (UINT16) (IdCount - FrontSkipNum - 1);
     }
     BlockPtr += SkipLen;
   }
