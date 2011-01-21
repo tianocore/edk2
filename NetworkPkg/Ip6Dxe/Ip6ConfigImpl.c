@@ -1,7 +1,7 @@
 /** @file
   The implementation of EFI IPv6 Configuration Protocol.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -710,7 +710,7 @@ Ip6ConfigSetPolicy (
   on a tentative address. A value of ZERO indicates that Duplicate Address Detection
   will not be performed on a tentative address.
 
-  @param[in]     The Instance Pointer to the IP6 config instance data.
+  @param[in]     Instance The Instance Pointer to the IP6 config instance data.
   @param[in]     DataSize Size of the buffer pointed to by Data in bytes.
   @param[in]     Data     The data buffer to set.
 

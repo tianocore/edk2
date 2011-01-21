@@ -1,7 +1,7 @@
 /** @file
   Dhcp6 support functions declaration.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -150,7 +150,7 @@ Dhcp6DummyExtFree (
 /**
   The callback routine once message transmitted.
 
-  @param[in]  Udp6Wrap      The pointer to the received net buffer.
+  @param[in]  Wrap          The pointer to the received net buffer.
   @param[in]  EndPoint      The pointer to the udp end point.
   @param[in]  IoStatus      The return status from udp io.
   @param[in]  Context       The opaque parameter to the function.

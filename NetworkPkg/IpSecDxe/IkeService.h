@@ -1,7 +1,7 @@
 /** @file
   Prototypes definitions of IKE service.
   
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -219,7 +219,7 @@ IkeDispatch (
   Check if the NIC handle is binded to a Udp service.
 
   @param[in]  Private    Pointer of IPSEC_PRIVATE_DATA
-  @param[in]  NicHandle  The Handle of the NIC card
+  @param[in]  Handle     The Handle of the NIC card
   @param[in]  IpVersion  The version of the IP stack.
 
   @return a pointer of IKE_UDP_SERVICE.

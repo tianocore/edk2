@@ -2,7 +2,7 @@
   Driver Binding functions and Service Binding functions
   declaration for Mtftp6 Driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -23,7 +23,7 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gMtftp6ComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL gMtftp6ComponentName2;
 
 /**
-  Test to see if this driver supports ControllerHandle. This service
+  Test to see if this driver supports Controller. This service
   is called by the EFI boot service ConnectController(). In
   order to make drivers as small as possible, there are a few calling
   restrictions for this service. ConnectController() must
@@ -31,7 +31,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gMtftp6ComponentName2;
   Supported(), it must also follow these calling restrictions.
 
   @param[in]  This                Protocol instance pointer.
-  @param[in]  ControllerHandle    Handle of device to test.
+  @param[in]  Controller          Handle of device to test.
   @param[in]  RemainingDevicePath Optional parameter use to pick a specific child
                                   device to start.
 
@@ -48,7 +48,7 @@ Mtftp6DriverBindingSupported (
   );
 
 /**
-  Start this driver on ControllerHandle. This service is called by the
+  Start this driver on Controller. This service is called by the
   EFI boot service ConnectController(). In order to make
   drivers as small as possible, there are calling restrictions for
   this service. ConnectController() must follow these
@@ -56,12 +56,12 @@ Mtftp6DriverBindingSupported (
   must also follow these calling restrictions.
 
   @param[in]  This                 Protocol instance pointer.
-  @param[in]  ControllerHandle     Handle of device to bind driver to.
+  @param[in]  Controller           Handle of device to bind driver to.
   @param[in]  RemainingDevicePath  Optional parameter use to pick a specific child
                                    device to start.
 
-  @retval EFI_SUCCESS          This driver is added to ControllerHandle.
-  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle.
+  @retval EFI_SUCCESS          This driver is added to Controller.
+  @retval EFI_ALREADY_STARTED  This driver is already running on Controller.
   @retval Others               This driver does not support this device.
 
 **/
@@ -74,7 +74,7 @@ Mtftp6DriverBindingStart (
   );
 
 /**
-  Stop this driver on ControllerHandle. This service is called by the
+  Stop this driver on Controller. This service is called by the
   EFI boot service DisconnectController(). In order to
   make drivers as small as possible, there are calling
   restrictions for this service. DisconnectController()
@@ -82,12 +82,12 @@ Mtftp6DriverBindingStart (
   to call Stop(), it must also follow these calling restrictions.
 
   @param[in]  This              Protocol instance pointer.
-  @param[in]  ControllerHandle  Handle of device to stop driver on
+  @param[in]  Controller        Handle of device to stop driver on
   @param[in]  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                                 children is zero, stop the entire bus driver.
   @param[in]  ChildHandleBuffer List of Child Handles to Stop.
 
-  @retval EFI_SUCCESS       This driver is removed ControllerHandle.
+  @retval EFI_SUCCESS       This driver is removed Controller.
   @retval EFI_DEVICE_ERROR  An unexpected error.
   @retval Others            This driver was not removed from this device.
 

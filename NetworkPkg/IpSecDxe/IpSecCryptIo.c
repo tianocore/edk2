@@ -1,7 +1,7 @@
 /** @file
   Common interfaces to call Security library.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -251,7 +251,7 @@ IpSecGetIndexFromAuthList (
 
   @param[in]       AlgorithmId    The Alogrithem identification defined in RFC.
   @param[in]       Key            Pointer to the buffer containing encrypting key.
-  @param[in}       KeyBits        The length of the key in bits.
+  @param[in]       KeyBits        The length of the key in bits.
   @param[in]       Ivec           Point to the buffer containning the Initializeion
                                   Vector (IV) data.
   @param[in]       InData         Point to the buffer containing the data to be
@@ -337,11 +337,11 @@ IpSecCryptoIoEncrypt (
 
   @param[in]       AlgorithmId    The Alogrithem identification defined in RFC.
   @param[in]       Key            Pointer to the buffer containing encrypting key.
-  @param[in}       KeyBits        The length of the key in bits.
+  @param[in]       KeyBits        The length of the key in bits.
   @param[in]       Ivec           Point to the buffer containning the Initializeion
                                   Vector (IV) data.
   @param[in]       InData         Point to the buffer containing the data to be
-                                  Decrypted.
+                                  decrypted.
   @param[in]       InDataLength   The length of InData in Bytes.
   @param[out]      OutData        Pointer to the buffer that receives the decryption
                                   output.
@@ -864,7 +864,7 @@ IpSecCryptoIoAuthDataWithCertificate (
 
   @param[in]     InCert          Pointer to the Certificate which contains the
                                  public key.
-  @param[in]     InCertLen       The size of Certificate in bytes.
+  @param[in]     CertLen         The size of Certificate in bytes.
   @param[in]     InCa            Pointer to the CA certificate
   @param[in]     CaLen           The size of CA certificate in bytes.
   @param[in]     InData          Pointer to octect message hash to be checked.

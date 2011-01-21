@@ -1,7 +1,7 @@
 /** @file
   The implementation for Shell application IfConfig6.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -236,8 +236,8 @@ IfConfig6RetriveCheckListByName(
 /**
   The notify function of create event when performing a manual config.
 
-  @param[in]    CheckList    The pointer of Event.
-  @param[in]    Context      The pointer of Context.
+  @param[in]    Event        The event this notify function registered to.
+  @param[in]    Context      Pointer to the context data registered to the event.
 
 **/
 VOID
@@ -346,7 +346,7 @@ IfConfig6PrintIpAddr (
 
   @param[in, out]    Arg        The pointer of the address of ARG_LIST which save Args with the "-s" option.
   @param[out]        Buf        The pointer of the address of EFI_IP6_CONFIG_MANUAL_ADDRESS.
-  @param[out]        Address    The pointer of BufSize that describes the size of Buf in bytes.
+  @param[out]        BufSize    The pointer of BufSize that describes the size of Buf in bytes.
 
   @retval EFI_SUCCESS    The convertion is successful.
   @retval Others         Does't find the host address, or it is an invalid IPv6 address in string format.
@@ -448,7 +448,7 @@ ON_ERROR:
 
   @param[in, out]    Arg        The pointer of the address of ARG_LIST that save Args with the "-s" option.
   @param[out]        Buf        The pointer of the address of EFI_IPv6_ADDRESS.
-  @param[out]        Address    The pointer of BufSize that describes the size of Buf in bytes.
+  @param[out]        BufSize    The pointer of BufSize that describes the size of Buf in bytes.
 
   @retval EFI_SUCCESS    The conversion is successful.
   @retval Others         Doesn't find the host address, or it is an invalid IPv6 address in string format.

@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for the TCP driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -196,7 +196,7 @@ TcpDriverEntryPoint (
   Create a new TCP4 or TCP6 driver service binding protocol
 
   @param[in]  Controller         Controller handle of device to bind driver to.
-  @param[in]  ImageHandle        The TCP driver's image handle.
+  @param[in]  Image              The TCP driver's image handle.
   @param[in]  IpVersion          IP_VERSION_4 or IP_VERSION_6.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate some resources.

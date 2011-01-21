@@ -1,7 +1,7 @@
 /** @file
   Definitions related to IPSEC_CONFIG_PROTOCOL implementations.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -75,11 +75,11 @@ typedef struct {
 /**
   The prototype of Copy Source Selector to the Destination Selector.
 
-  @param[in out]  DstSel             Pointer of Destination Selector. It would be
+  @param[in, out] DstSel             Pointer of Destination Selector. It would be
                                      SPD Selector, or SAD Selector or PAD Selector.
   @param[in]      SrcSel             Pointer of Source  Selector. It would be
                                      SPD Selector, or SAD Selector or PAD Selector.
-  @param[in out]  Size               The size of the Destination Selector. If it
+  @param[in, out] Size               The size of the Destination Selector. If it
                                      is not NULL and its value is less than the size of
                                      Source Selector, the value of Source Selector's
                                      size will be passed to the caller by this parameter.
@@ -155,7 +155,7 @@ VOID
                                     Data type is related to the Type.
   @param[in]      SelectorSize      The size of the Selector.
   @param[in]      DataSize          The size of the Data.
-  @param[in out]  Buffer            The buffer to store the Selector and Data.
+  @param[in, out] Buffer            The buffer to store the Selector and Data.
 
   @retval EFI_SUCCESS            Copied the Selector and Data to a buffer successfully.
   @retval EFI_OUT_OF_RESOURCES   The required system resource could not be allocated.

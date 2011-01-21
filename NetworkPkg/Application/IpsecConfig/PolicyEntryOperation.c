@@ -25,7 +25,7 @@
 
   @param[out]     Selector        The pointer to the EFI_IPSEC_SPD_SELECTOR structure.
   @param[in]      ParamPackage    The pointer to the ParamPackage list.
-  @param[in, out] ParamPackage    The pointer to the Mask.
+  @param[in, out] Mask            The pointer to the Mask.
 
   @retval EFI_SUCCESS              Fill in EFI_IPSEC_SPD_SELECTOR successfully.
   @retval EFI_INVALID_PARAMETER    Invalid user input parameter.
