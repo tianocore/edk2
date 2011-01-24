@@ -2,7 +2,7 @@
 Implementation for EFI_HII_FONT_PROTOCOL.
 
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -76,6 +76,9 @@ NewCell (
   //
   GlyphInfo->Signature = HII_GLYPH_INFO_SIGNATURE;
   GlyphInfo->CharId    = CharValue;
+  if (Cell->AdvanceX == 0) {
+    Cell->AdvanceX = Cell->Width;
+  }
   CopyMem (&GlyphInfo->Cell, Cell, sizeof (EFI_HII_GLYPH_INFO));
   InsertTailList (GlyphInfoList, &GlyphInfo->Entry);
 
@@ -221,7 +224,6 @@ GetGlyphBuffer (
             }
             Cell->Width    = EFI_GLYPH_WIDTH;
             Cell->Height   = EFI_GLYPH_HEIGHT;
-            Cell->OffsetY  = NARROW_BASELINE;
             Cell->AdvanceX = Cell->Width;
             CopyMem (*GlyphBuffer, Narrow.GlyphCol1, Cell->Height);
             if (Attributes != NULL) {
@@ -243,7 +245,6 @@ GetGlyphBuffer (
             }
             Cell->Width    = EFI_GLYPH_WIDTH * 2;
             Cell->Height   = EFI_GLYPH_HEIGHT;
-            Cell->OffsetY  = WIDE_BASELINE;
             Cell->AdvanceX = Cell->Width;
             CopyMem (*GlyphBuffer, Wide.GlyphCol1, EFI_GLYPH_HEIGHT);
             CopyMem (*GlyphBuffer + EFI_GLYPH_HEIGHT, Wide.GlyphCol2, EFI_GLYPH_HEIGHT);
@@ -270,16 +271,15 @@ GetGlyphBuffer (
                          bitmap.
   @param  Background     The color of the "off" pixels in the glyph in the
                          bitmap.
-  @param  ImageWidth     Width of the character or character cell, in
-                         pixels.
-  @param  ImageHeight    Height of the character or character cell, in
-                         pixels.
-  @param  Transparent             If TRUE, the Background color is ignored and all
-                                  "off" pixels in the character's drawn wil use the
-                                  pixel value from BltBuffer.
-  @param  Origin                  On input, points to the origin of the to be
-                                  displayed character, on output, points to the
-                                  next glyph's origin.
+  @param  ImageWidth     Width of the whole image in pixels.
+  @param  RowWidth       The width of the text on the line, in pixels.
+  @param  RowHeight      The height of the line, in pixels.
+  @param  Transparent    If TRUE, the Background color is ignored and all
+                         "off" pixels in the character's drawn wil use the
+                         pixel value from BltBuffer.
+  @param  Origin         On input, points to the origin of the to be
+                         displayed character, on output, points to the
+                         next glyph's origin.
 
 **/
 VOID
@@ -287,8 +287,9 @@ NarrowGlyphToBlt (
   IN     UINT8                         *GlyphBuffer,
   IN     EFI_GRAPHICS_OUTPUT_BLT_PIXEL Foreground,
   IN     EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background,
-  IN     UINTN                         ImageWidth,
-  IN     UINTN                         ImageHeight,
+  IN     UINT16                        ImageWidth,
+  IN     UINTN                         RowWidth,
+  IN     UINTN                         RowHeight,
   IN     BOOLEAN                       Transparent,
   IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL **Origin
   )
@@ -303,24 +304,35 @@ NarrowGlyphToBlt (
 
   Height = EFI_GLYPH_HEIGHT;
   Width  = EFI_GLYPH_WIDTH;
+  
+  //
+  // Move position to the left-top corner of char.
+  //
+  Buffer = *Origin - EFI_GLYPH_HEIGHT * ImageWidth;
 
-  ASSERT (Width <= ImageWidth && Height <= ImageHeight);
-
-  Buffer = *Origin;
+  //
+  // Char may be partially displayed when CLIP_X or CLIP_Y is not set. 
+  //
+  if (RowHeight < Height) {
+    Height = (UINT8) RowHeight;
+  }
+  if (RowWidth < Width) {
+    Width = (UINT8) RowWidth;
+  }
 
   for (Ypos = 0; Ypos < Height; Ypos++) {
     for (Xpos = 0; Xpos < Width; Xpos++) {
-      if ((GlyphBuffer[Ypos] & (1 << Xpos)) != 0) {
-        Buffer[Ypos * ImageWidth + (Width - Xpos - 1)] = Foreground;
+      if ((GlyphBuffer[Ypos] & (1 << (EFI_GLYPH_WIDTH - Xpos - 1))) != 0) {
+        Buffer[Ypos * ImageWidth + Xpos] = Foreground;
       } else {
         if (!Transparent) {
-          Buffer[Ypos * ImageWidth + (Width - Xpos - 1)] = Background;
+          Buffer[Ypos * ImageWidth + Xpos] = Background;
         }
       }
     }
   }
 
-  *Origin = Buffer + Width;
+  *Origin = *Origin + EFI_GLYPH_WIDTH;
 }
 
 
@@ -334,10 +346,10 @@ NarrowGlyphToBlt (
                                   bitmap.
   @param  Background              The color of the "off" pixels in the glyph in the
                                   bitmap.
-  @param  ImageWidth              Width of the character or character cell, in
-                                  pixels.
-  @param  ImageHeight             Height of the character or character cell, in
-                                  pixels.
+  @param  ImageWidth              Width of the whole image in pixels.
+  @param  BaseLine                BaseLine in the line.
+  @param  RowWidth                The width of the text on the line, in pixels.
+  @param  RowHeight               The height of the line, in pixels.
   @param  Transparent             If TRUE, the Background color is ignored and all
                                   "off" pixels in the character's drawn wil use the
                                   pixel value from BltBuffer.
@@ -354,25 +366,38 @@ GlyphToBlt (
   IN     UINT8                         *GlyphBuffer,
   IN     EFI_GRAPHICS_OUTPUT_BLT_PIXEL Foreground,
   IN     EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background,
-  IN     UINTN                         ImageWidth,
-  IN     UINTN                         ImageHeight,
+  IN     UINT16                        ImageWidth,
+  IN     UINT16                        BaseLine,
+  IN     UINTN                         RowWidth,
+  IN     UINTN                         RowHeight,
   IN     BOOLEAN                       Transparent,
   IN     CONST EFI_HII_GLYPH_INFO      *Cell,
   IN     UINT8                         Attributes,
   IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL **Origin
   )
 {
-  UINT8                                Xpos;
-  UINT8                                Ypos;
-  UINT8                                Data;
-  UINT8                                Index;
-  UINTN                                OffsetY;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL        *BltBuffer;
+  UINT16                                Xpos;
+  UINT16                                Ypos;
+  UINT8                                 Data;
+  UINT16                                Index;
+  UINT16                                YposOffset;
+  UINTN                                 OffsetY;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL         *BltBuffer;
 
-  ASSERT (GlyphBuffer != NULL && Origin != NULL && *Origin != NULL);
-  ASSERT (Cell->Width <= ImageWidth && Cell->Height <= ImageHeight);
+  ASSERT (Origin != NULL && *Origin != NULL && Cell != NULL);
 
-  BltBuffer = *Origin;
+  //
+  // Only adjust origin position if char has no bitmap.
+  //
+  if (GlyphBuffer == NULL) {
+    *Origin = *Origin + Cell->AdvanceX;
+    return;
+  }
+  //
+  // Move position to the left-top corner of char.
+  //
+  BltBuffer  = *Origin + Cell->OffsetX - (Cell->OffsetY + Cell->Height) * ImageWidth;
+  YposOffset = (UINT16) (BaseLine - (Cell->OffsetY + Cell->Height));
 
   //
   // Since non-spacing key will be printed OR'd with the previous glyph, don't
@@ -386,7 +411,7 @@ GlyphToBlt (
   // The glyph's upper left hand corner pixel is the most significant bit of the
   // first bitmap byte.
   //
-  for (Ypos = 0; Ypos < Cell->Height; Ypos++) {
+  for (Ypos = 0; Ypos < Cell->Height && ((UINTN) (Ypos + YposOffset) < RowHeight); Ypos++) {
     OffsetY = BITMAP_LEN_1_BIT (Cell->Width, Ypos);
 
     //
@@ -394,12 +419,12 @@ GlyphToBlt (
     //
     for (Xpos = 0; Xpos < Cell->Width / 8; Xpos++) {
       Data  = *(GlyphBuffer + OffsetY + Xpos);
-      for (Index = 0; Index < 8; Index++) {
-        if ((Data & (1 << Index)) != 0) {
-          BltBuffer[Ypos * ImageWidth + Xpos * 8 + (8 - Index - 1)] = Foreground;
+      for (Index = 0; Index < 8 && ((UINTN) (Xpos * 8 + Index + Cell->OffsetX) < RowWidth); Index++) {
+        if ((Data & (1 << (8 - Index - 1))) != 0) {
+          BltBuffer[Ypos * ImageWidth + Xpos * 8 + Index] = Foreground;
         } else {
           if (!Transparent) {
-            BltBuffer[Ypos * ImageWidth + Xpos * 8 + (8 - Index - 1)] = Background;
+            BltBuffer[Ypos * ImageWidth + Xpos * 8 + Index] = Background;
           }
         }
       }
@@ -410,7 +435,7 @@ GlyphToBlt (
       // There are some padding bits in this byte. Ignore them.
       //
       Data  = *(GlyphBuffer + OffsetY + Xpos);
-      for (Index = 0; Index < Cell->Width % 8; Index++) {
+      for (Index = 0; Index < Cell->Width % 8 && ((UINTN) (Xpos * 8 + Index + Cell->OffsetX) < RowWidth); Index++) {
         if ((Data & (1 << (8 - Index - 1))) != 0) {
           BltBuffer[Ypos * ImageWidth + Xpos * 8 + Index] = Foreground;
         } else {
@@ -423,7 +448,7 @@ GlyphToBlt (
 
   } // end of for (Ypos=0...)
 
-  *Origin = BltBuffer + Cell->Width;
+  *Origin = *Origin + Cell->AdvanceX;
 }
 
 
@@ -437,10 +462,10 @@ GlyphToBlt (
                                   bitmap.
   @param  Background              The color of the "off" pixels in the glyph in the
                                   bitmap.
-  @param  ImageWidth              Width of the character or character cell, in
-                                  pixels.
-  @param  ImageHeight             Height of the character or character cell, in
-                                  pixels.
+  @param  ImageWidth              Width of the whole image in pixels.
+  @param  BaseLine                BaseLine in the line.
+  @param  RowWidth                The width of the text on the line, in pixels.
+  @param  RowHeight               The height of the line, in pixels.
   @param  Transparent             If TRUE, the Background color is ignored and all
                                   "off" pixels in the character's drawn wil use the
                                   pixel value from BltBuffer.
@@ -458,8 +483,10 @@ GlyphToImage (
   IN     UINT8                         *GlyphBuffer,
   IN     EFI_GRAPHICS_OUTPUT_BLT_PIXEL Foreground,
   IN     EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background,
-  IN     UINTN                         ImageWidth,
-  IN     UINTN                         ImageHeight,
+  IN     UINT16                        ImageWidth,
+  IN     UINT16                        BaseLine,
+  IN     UINTN                         RowWidth,
+  IN     UINTN                         RowHeight,
   IN     BOOLEAN                       Transparent,
   IN     CONST EFI_HII_GLYPH_INFO      *Cell,
   IN     UINT8                         Attributes,
@@ -468,8 +495,7 @@ GlyphToImage (
 {
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL        *Buffer;
 
-  ASSERT (GlyphBuffer != NULL && Origin != NULL && *Origin != NULL);
-  ASSERT (Cell->Width <= ImageWidth && Cell->Height <= ImageHeight);
+  ASSERT (Origin != NULL && *Origin != NULL && Cell != NULL);
 
   Buffer = *Origin;
 
@@ -478,13 +504,15 @@ GlyphToImage (
     // This character is a non-spacing key, print it OR'd with the previous glyph.
     // without advancing cursor.
     //
-    Buffer -= Cell->Width;
+    Buffer -= Cell->AdvanceX;
     GlyphToBlt (
       GlyphBuffer,
       Foreground,
       Background,
       ImageWidth,
-      ImageHeight,
+      BaseLine,
+      RowWidth,
+      RowHeight,
       Transparent,
       Cell,
       Attributes,
@@ -501,7 +529,8 @@ GlyphToImage (
       Foreground,
       Background,
       ImageWidth,
-      ImageHeight,
+      RowWidth,
+      RowHeight,
       Transparent,
       Origin
       );
@@ -511,7 +540,8 @@ GlyphToImage (
       Foreground,
       Background,
       ImageWidth,
-      ImageHeight,
+      RowWidth,
+      RowHeight,
       Transparent,
       Origin
       );
@@ -525,7 +555,8 @@ GlyphToImage (
       Foreground,
       Background,
       ImageWidth,
-      ImageHeight,
+      RowWidth,
+      RowHeight,
       Transparent,
       Origin
       );
@@ -539,7 +570,9 @@ GlyphToImage (
       Foreground,
       Background,
       ImageWidth,
-      ImageHeight,
+      BaseLine,
+      RowWidth,
+      RowHeight,
       Transparent,
       Cell,
       Attributes,
@@ -581,7 +614,7 @@ WriteOutputParam (
   OUT UINTN                          *GlyphBufferLen OPTIONAL
   )
 {
-  if (BufferIn == NULL || BufferLen < 1 || InputCell == NULL) {
+  if (BufferIn == NULL || InputCell == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -589,7 +622,7 @@ WriteOutputParam (
     CopyMem (Cell, InputCell, sizeof (EFI_HII_GLYPH_INFO));
   }
 
-  if (GlyphBuffer != NULL) {
+  if (GlyphBuffer != NULL && BufferLen > 0) {
     *GlyphBuffer = (UINT8 *) AllocateZeroPool (BufferLen);
     if (*GlyphBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -645,10 +678,14 @@ FindGlyphBlock (
   UINT16                              Index;
   EFI_HII_GLYPH_INFO                  DefaultCell;
   EFI_HII_GLYPH_INFO                  LocalCell;
+  INT16                               MinOffsetY;
+  UINT16                              BaseLine;
 
   ASSERT (FontPackage != NULL);
   ASSERT (FontPackage->Signature == HII_FONT_PACKAGE_SIGNATURE);
-
+  BaseLine  = 0;
+  MinOffsetY = 0;
+  
   if (CharValue == (CHAR16) (-1)) {
     //
     // Collect the cell information specified in font package fixed header.
@@ -661,6 +698,15 @@ FindGlyphBlock (
                );
     if (EFI_ERROR (Status)) {
       return Status;
+    }
+    CopyMem (
+      &LocalCell,
+      (UINT8 *) FontPackage->FontPkgHdr + 3 * sizeof (UINT32),
+      sizeof (EFI_HII_GLYPH_INFO)
+      );
+    BaseLine = (UINT16) (LocalCell.Height + LocalCell.OffsetY);
+    if (MinOffsetY > LocalCell.OffsetY) {
+      MinOffsetY = LocalCell.OffsetY;
     }
   }
 
@@ -683,6 +729,17 @@ FindGlyphBlock (
                    );
         if (EFI_ERROR (Status)) {
           return Status;
+        }
+        CopyMem (
+          &LocalCell,
+          BlockPtr + sizeof (EFI_HII_GLYPH_BLOCK),
+          sizeof (EFI_HII_GLYPH_INFO)
+          );
+        if (BaseLine < LocalCell.Height + LocalCell.OffsetY) {
+          BaseLine = (UINT16) (LocalCell.Height + LocalCell.OffsetY);
+        }
+        if (MinOffsetY > LocalCell.OffsetY) {
+          MinOffsetY = LocalCell.OffsetY;
         }
       }
       BlockPtr += sizeof (EFI_HII_GIBT_DEFAULTS_BLOCK);
@@ -725,6 +782,14 @@ FindGlyphBlock (
         BlockPtr + sizeof (EFI_HII_GLYPH_BLOCK),
         sizeof (EFI_HII_GLYPH_INFO)
         );
+      if (CharValue == (CHAR16) (-1)) {
+        if (BaseLine < LocalCell.Height + LocalCell.OffsetY) {
+          BaseLine = (UINT16) (LocalCell.Height + LocalCell.OffsetY);
+        }
+        if (MinOffsetY > LocalCell.OffsetY) {
+          MinOffsetY = LocalCell.OffsetY;
+        }
+      }
       BufferLen = BITMAP_LEN_1_BIT (LocalCell.Width, LocalCell.Height);
       if (CharCurrent == CharValue) {
         return WriteOutputParam (
@@ -746,6 +811,15 @@ FindGlyphBlock (
       BlockPtr += sizeof (EFI_HII_GLYPH_INFO);
       CopyMem (&Glyphs.Count, BlockPtr, sizeof (UINT16));
       BlockPtr += sizeof (UINT16);
+
+      if (CharValue == (CHAR16) (-1)) {
+        if (BaseLine < Glyphs.Cell.Height + Glyphs.Cell.OffsetY) {
+          BaseLine = (UINT16) (Glyphs.Cell.Height + Glyphs.Cell.OffsetY);
+        }
+        if (MinOffsetY > Glyphs.Cell.OffsetY) {
+          MinOffsetY = Glyphs.Cell.OffsetY;
+        }
+      }
 
       BufferLen = BITMAP_LEN_1_BIT (Glyphs.Cell.Width, Glyphs.Cell.Height);
       for (Index = 0; Index < Glyphs.Count; Index++) {
@@ -829,6 +903,8 @@ FindGlyphBlock (
   }
 
   if (CharValue == (CHAR16) (-1)) {
+    FontPackage->BaseLine = BaseLine;
+    FontPackage->Height   = (UINT16) (BaseLine - MinOffsetY);
     return EFI_SUCCESS;
   }
 
@@ -1501,10 +1577,13 @@ HiiStringToImage (
   EFI_HII_ROW_INFO                    *RowInfo;
   UINTN                               LineWidth;
   UINTN                               LineHeight;
+  UINTN                               LineOffset;
+  UINTN                               LastLineHeight;
   UINTN                               BaseLineOffset;
   UINT16                              MaxRowNum;
   UINT16                              RowIndex;
   UINTN                               Index;
+  UINTN                               NextIndex;
   UINTN                               Index1;
   EFI_FONT_DISPLAY_INFO               *StringInfoOut;
   EFI_FONT_DISPLAY_INFO               *SystemDefault;
@@ -1512,6 +1591,7 @@ HiiStringToImage (
   EFI_STRING                          StringIn;
   EFI_STRING                          StringIn2;
   UINT16                              Height;
+  UINT16                              BaseLine;
   EFI_FONT_INFO                       *FontInfo;
   BOOLEAN                             SysFontFlag;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL       Foreground;
@@ -1522,6 +1602,8 @@ HiiStringToImage (
   UINTN                               RowInfoSize;
   BOOLEAN                             LineBreak;
   UINTN                               StrLength;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL       *RowBufferPtr;
+  HII_GLOBAL_FONT_INFO                *GlobalFont;
 
   //
   // Check incoming parameters.
@@ -1607,6 +1689,7 @@ HiiStringToImage (
   if (SysFontFlag) {
     FontInfo   = NULL;
     Height     = SystemDefault->FontInfo.FontSize;
+    BaseLine   = SystemDefault->FontInfo.FontSize;
     Foreground = SystemDefault->ForegroundColor;
     Background = SystemDefault->BackgroundColor;
 
@@ -1624,19 +1707,30 @@ HiiStringToImage (
       SysFontFlag = TRUE;
       FontInfo    = NULL;
       Height      = SystemDefault->FontInfo.FontSize;
+      BaseLine    = SystemDefault->FontInfo.FontSize;
       Foreground  = ((EFI_FONT_DISPLAY_INFO *) StringInfo)->ForegroundColor;
       Background  = ((EFI_FONT_DISPLAY_INFO *) StringInfo)->BackgroundColor;
 
     } else if (Status == EFI_SUCCESS) {
       FontInfo   = &StringInfoOut->FontInfo;
-      Height     = StringInfoOut->FontInfo.FontSize;
+      IsFontInfoExisted (Private, FontInfo, NULL, NULL, &GlobalFont);
+      Height     = GlobalFont->FontPackage->Height;
+      BaseLine   = GlobalFont->FontPackage->BaseLine;
       Foreground = StringInfoOut->ForegroundColor;
       Background = StringInfoOut->BackgroundColor;
     } else {
       goto Exit;
     }
   }
-
+  
+  //
+  // Use the maxinum height of font as the base line.
+  // And, use the maxinum height as line height.
+  //
+  LineHeight     = Height;
+  LastLineHeight = Height;
+  BaseLineOffset = Height - BaseLine;
+  
   //
   // Parse the string to be displayed to drop some ignored characters.
   //
@@ -1677,12 +1771,18 @@ HiiStringToImage (
   StringTmp = StringIn2;
   StrLength = StrLen(StringPtr);
   while (*StringPtr != 0 && Index < StrLength) {
+    if (IsLineBreak (*StringPtr) == 0) {
+      *StringTmp++ = *StringPtr++;
+      Index++;
+      continue;
+    }
+    
     Status = GetGlyphBuffer (Private, *StringPtr, FontInfo, &GlyphBuf[Index], &Cell[Index], &Attributes[Index]);
     if (Status == EFI_NOT_FOUND) {
       if ((Flags & EFI_HII_IGNORE_IF_NO_GLYPH) == EFI_HII_IGNORE_IF_NO_GLYPH) {
         GlyphBuf[Index] = NULL;
-        *StringTmp++ = *StringPtr++;
-        Index++;
+        ZeroMem (&Cell[Index], sizeof (Cell[Index]));
+        Status = EFI_SUCCESS;
       } else {
         //
         // Unicode 0xFFFD must exist in current hii database if this flag is not set.
@@ -1697,17 +1797,16 @@ HiiStringToImage (
                    );
         if (EFI_ERROR (Status)) {
           Status = EFI_INVALID_PARAMETER;
-          goto Exit;
         }
-        *StringTmp++ = *StringPtr++;
-        Index++;
       }
-    } else if (EFI_ERROR (Status)) {
-      goto Exit;
-    } else {
-      *StringTmp++ = *StringPtr++;
-      Index++;
     }
+
+    if (EFI_ERROR (Status)) {
+      goto Exit;
+    }
+
+    *StringTmp++ = *StringPtr++;
+    Index++;
   }
   *StringTmp = 0;
   StringPtr  = StringIn2;
@@ -1720,8 +1819,10 @@ HiiStringToImage (
   //
   Image     = *Blt;
   BufferPtr = Image->Image.Bitmap + Image->Width * BltY + BltX;
-  MaxRowNum = (UINT16) (Image->Height / Height);
-  if (Image->Height % Height != 0) {
+  ASSERT (Image->Height >= BltY);
+  MaxRowNum = (UINT16) ((Image->Height - BltY) / Height);
+  if ((Image->Height - BltY) % Height != 0) {
+    LastLineHeight = (Image->Height - BltY) % Height;
     MaxRowNum++;
   }
 
@@ -1734,24 +1835,25 @@ HiiStringToImage (
   //
   // Format the glyph buffer according to flags.
   //
-
   Transparent = (BOOLEAN) ((Flags & EFI_HII_OUT_FLAG_TRANSPARENT) == EFI_HII_OUT_FLAG_TRANSPARENT ? TRUE : FALSE);
-  if ((Flags & EFI_HII_OUT_FLAG_CLIP_CLEAN_Y) == EFI_HII_OUT_FLAG_CLIP_CLEAN_Y) {
-    //
-    // Don't draw at all if there is only one row and
-    // the row's bottom-most on pixel cannot fit.
-    //
-    if (MaxRowNum == 1 && SysFontFlag) {
-      Status = EFI_SUCCESS;
-      goto Exit;
-    }
-  }
 
   for (RowIndex = 0, Index = 0; RowIndex < MaxRowNum && StringPtr[Index] != 0; ) {
     LineWidth      = 0;
-    LineHeight     = 0;
-    BaseLineOffset = 0;
     LineBreak      = FALSE;
+
+    //
+    // Clip the final row if the row's bottom-most on pixel cannot fit when
+    // EFI_HII_OUT_FLAG_CLEAN_Y is set.
+    //
+    if (RowIndex == MaxRowNum - 1) {
+      if ((Flags & EFI_HII_OUT_FLAG_CLIP_CLEAN_Y) == EFI_HII_OUT_FLAG_CLIP_CLEAN_Y && LastLineHeight < LineHeight ) {
+        //
+        // Don't draw at all if the row's bottom-most on pixel cannot fit.
+        //
+        break;
+      }
+      LineHeight = LastLineHeight;
+    }
 
     //
     // Calculate how many characters there are in a row.
@@ -1760,7 +1862,6 @@ HiiStringToImage (
 
     while (LineWidth + BltX < Image->Width && StringPtr[Index] != 0) {
       if ((Flags & EFI_HII_IGNORE_LINE_BREAK) == 0 &&
-          (Flags & EFI_HII_OUT_FLAG_WRAP) == 0 &&
            IsLineBreak (StringPtr[Index]) == 0) {
         //
         // It forces a line break that ends this row.
@@ -1773,24 +1874,31 @@ HiiStringToImage (
       //
       // If the glyph of the character is existing, then accumulate the actual printed width
       //
-      if (GlyphBuf[Index] != NULL) {
-        LineWidth += (UINTN) Cell[Index].AdvanceX;
-        if (LineHeight < Cell[Index].Height) {
-          LineHeight = (UINTN) Cell[Index].Height;
-        }
-      }
+      LineWidth += (UINTN) Cell[Index].AdvanceX;
 
       Index++;
     }
 
     //
-    // If this character is the last character of a row, we need not
-    // draw its (AdvanceX - Width) for next character.
+    // Record index of next char.
+    //
+    NextIndex = Index;
+    //
+    // Return to the previous char.
     //
     Index--;
-    if (!SysFontFlag) {
-      LineWidth -= (UINTN) (Cell[Index].AdvanceX - Cell[Index].Width);
+    if (LineBreak && Index > 0 ) {
+      //
+      // Return the previous non line break char.
+      //
+      Index --;
     }
+
+    //
+    // If this character is the last character of a row, we need not
+    // draw its (AdvanceX - Width - OffsetX) for next character.
+    //
+    LineWidth -= (UINTN) (Cell[Index].AdvanceX - Cell[Index].Width - Cell[Index].OffsetX);
 
     //
     // Clip the right-most character if cannot fit when EFI_HII_OUT_FLAG_CLEAN_X is set.
@@ -1810,13 +1918,15 @@ HiiStringToImage (
       // if its right-most on pixel cannot fit.
       //
       if (Index > 0) {
+        //
+        // Don't draw the last char on this row. And, don't draw the second last char (AdvanceX - Width - OffsetX).
+        //
+        LineWidth -= (UINTN) (Cell[Index].Width + Cell[Index].OffsetX);
+        LineWidth -= (UINTN) (Cell[Index - 1].AdvanceX - Cell[Index - 1].Width - Cell[Index - 1].OffsetX);
         RowInfo[RowIndex].EndIndex       = Index - 1;
-        RowInfo[RowIndex].LineWidth      = LineWidth - Cell[Index].AdvanceX;
-        RowInfo[RowIndex].BaselineOffset = BaseLineOffset;
-        if (LineHeight > Cell[Index - 1].Height) {
-          LineHeight = Cell[Index - 1].Height;
-        }
+        RowInfo[RowIndex].LineWidth      = LineWidth;
         RowInfo[RowIndex].LineHeight     = LineHeight;
+        RowInfo[RowIndex].BaselineOffset = BaseLineOffset;
       } else {
         //
         // There is only one column and it can not be drawn so that return directly.
@@ -1831,16 +1941,24 @@ HiiStringToImage (
     // opportunity prior to a character whose right-most extent would exceed Width.
     // Search the right-most line-break opportunity here.
     //
-    if ((Flags & EFI_HII_OUT_FLAG_WRAP) == EFI_HII_OUT_FLAG_WRAP) {
+    if ((Flags & EFI_HII_OUT_FLAG_WRAP) == EFI_HII_OUT_FLAG_WRAP && StringPtr[NextIndex] != 0 && !LineBreak) {
       if ((Flags & EFI_HII_IGNORE_LINE_BREAK) == 0) {
+        LineWidth = RowInfo[RowIndex].LineWidth;
         for (Index1 = RowInfo[RowIndex].EndIndex; Index1 >= RowInfo[RowIndex].StartIndex; Index1--) {
+          if (Index1 == RowInfo[RowIndex].EndIndex) {
+            LineWidth -= (Cell[Index1].Width + Cell[Index1].OffsetX);
+          } else {
+            LineWidth -= Cell[Index1].AdvanceX;
+          }
           if (IsLineBreak (StringPtr[Index1]) > 0) {
             LineBreak = TRUE;
-            RowInfo[RowIndex].EndIndex = Index1 - 1;
+            if (Index1 > RowInfo[RowIndex].StartIndex) {
+              RowInfo[RowIndex].EndIndex = Index1 - 1;
+            }
             //
             // relocate to the character after the right-most line break opportunity of this line
             //
-            Index = Index1 + 1;
+            NextIndex = Index1 + 1;
             break;
           }
           //
@@ -1849,6 +1967,18 @@ HiiStringToImage (
           //
           if (Index1 == RowInfo[RowIndex].StartIndex)
             break;
+        }
+
+        //
+        // Update LineWidth to the real width
+        //
+        if (IsLineBreak (StringPtr[Index1]) > 0) {
+          if (Index1 == RowInfo[RowIndex].StartIndex) {
+            LineWidth = 0;
+          } else {
+            LineWidth -= (UINTN) (Cell[Index1 - 1].AdvanceX - Cell[Index1 - 1].Width - Cell[Index1 - 1].OffsetX);
+          }
+          RowInfo[RowIndex].LineWidth = LineWidth;
         }
       }
       //
@@ -1860,34 +1990,34 @@ HiiStringToImage (
         Flags |= EFI_HII_OUT_FLAG_CLIP_CLEAN_X;
       }
     }
-
+    
     //
-    // Clip the final row if the row's bottom-most on pixel cannot fit when
-    // EFI_HII_OUT_FLAG_CLEAN_Y is set.
+    // LineWidth can't exceed Image width.
     //
-    if (RowIndex == MaxRowNum - 1 && Image->Height < LineHeight) {
-      LineHeight = Image->Height;
-      if ((Flags & EFI_HII_OUT_FLAG_CLIP_CLEAN_Y) == EFI_HII_OUT_FLAG_CLIP_CLEAN_Y) {
-        //
-        // Don't draw at all if the row's bottom-most on pixel cannot fit.
-        //
-        break;
-      }
+    if (RowInfo[RowIndex].LineWidth + BltX > Image->Width) {
+      RowInfo[RowIndex].LineWidth = Image->Width - BltX;
     }
 
     //
     // Draw it to screen or existing bitmap depending on whether
     // EFI_HII_DIRECT_TO_SCREEN is set.
     //
+    LineOffset = 0;
     if ((Flags & EFI_HII_DIRECT_TO_SCREEN) == EFI_HII_DIRECT_TO_SCREEN) {
-      BltBuffer = AllocateZeroPool (RowInfo[RowIndex].LineWidth * RowInfo[RowIndex].LineHeight * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-      if (BltBuffer == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto Exit;
+      BltBuffer = NULL;
+      if (RowInfo[RowIndex].LineWidth != 0) {
+        BltBuffer = AllocateZeroPool (RowInfo[RowIndex].LineWidth * RowInfo[RowIndex].LineHeight * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+        if (BltBuffer == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Exit;
+        }
+        //
+        // Set BufferPtr to Origin by adding baseline to the starting position.
+        //
+        BufferPtr = BltBuffer + BaseLine * RowInfo[RowIndex].LineWidth;
       }
-      BufferPtr = BltBuffer;
       for (Index1 = RowInfo[RowIndex].StartIndex; Index1 <= RowInfo[RowIndex].EndIndex; Index1++) {
-        if (GlyphBuf[Index1] != NULL) {
+        if (RowInfo[RowIndex].LineWidth > 0 && RowInfo[RowIndex].LineWidth > LineOffset) {
           //
           // Only BLT these character which have corrsponding glyph in font basebase.
           //
@@ -1895,7 +2025,9 @@ HiiStringToImage (
             GlyphBuf[Index1],
             Foreground,
             Background,
-            RowInfo[RowIndex].LineWidth,
+            (UINT16) RowInfo[RowIndex].LineWidth,
+            BaseLine,
+            RowInfo[RowIndex].LineWidth - LineOffset,
             RowInfo[RowIndex].LineHeight,
             Transparent,
             &Cell[Index1],
@@ -1904,44 +2036,48 @@ HiiStringToImage (
           );
         }
         if (ColumnInfoArray != NULL) {
-          if (GlyphBuf[Index1] == NULL) {
-            *ColumnInfoArray = 0;
+          if ((GlyphBuf[Index1] == NULL && Cell[Index1].AdvanceX == 0) 
+              || RowInfo[RowIndex].LineWidth == 0) {
+            *ColumnInfoArray = (UINTN) ~0;
           } else {
-            *ColumnInfoArray = Cell[Index1 -1].AdvanceX;
+            *ColumnInfoArray = LineOffset + Cell[Index1].OffsetX + BltX;
           }
           ColumnInfoArray++;
         }
-      }
-      //
-      // Recalculate the start point of X/Y axis to draw multi-lines with the order of top-to-down
-      //
-      if (RowIndex != 0) {
-        BltX = 0;
-        BltY += RowInfo[RowIndex].LineHeight;
+        LineOffset += Cell[Index1].AdvanceX;
       }
 
-      Status = Image->Image.Screen->Blt (
-                                      Image->Image.Screen,
-                                      BltBuffer,
-                                      EfiBltBufferToVideo,
-                                      0,
-                                      0,
-                                      BltX,
-                                      BltY,
-                                      RowInfo[RowIndex].LineWidth,
-                                      RowInfo[RowIndex].LineHeight,
-                                      0
-                                      );
-      if (EFI_ERROR (Status)) {
+      if (BltBuffer != NULL) {
+        Status = Image->Image.Screen->Blt (
+                                        Image->Image.Screen,
+                                        BltBuffer,
+                                        EfiBltBufferToVideo,
+                                        0,
+                                        0,
+                                        BltX,
+                                        BltY,
+                                        RowInfo[RowIndex].LineWidth,
+                                        RowInfo[RowIndex].LineHeight,
+                                        0
+                                        );
+        if (EFI_ERROR (Status)) {
+          FreePool (BltBuffer);
+          goto Exit;
+        }
+  
         FreePool (BltBuffer);
-        goto Exit;
       }
-
-      FreePool (BltBuffer);
-
     } else {
+      //
+      // Save the starting position for calculate the starting postition of next row. 
+      //
+      RowBufferPtr = BufferPtr;
+      //
+      // Set BufferPtr to Origin by adding baseline to the starting position.
+      //
+      BufferPtr = BufferPtr + BaseLine * Image->Width;
       for (Index1 = RowInfo[RowIndex].StartIndex; Index1 <= RowInfo[RowIndex].EndIndex; Index1++) {
-        if (GlyphBuf[Index1] != NULL) {
+        if (RowInfo[RowIndex].LineWidth > 0 && RowInfo[RowIndex].LineWidth > LineOffset) {
           //
           // Only BLT these character which have corrsponding glyph in font basebase.
           //
@@ -1950,7 +2086,9 @@ HiiStringToImage (
             Foreground,
             Background,
             Image->Width,
-            Image->Height,
+            BaseLine,
+            RowInfo[RowIndex].LineWidth - LineOffset,
+            RowInfo[RowIndex].LineHeight,
             Transparent,
             &Cell[Index1],
             Attributes[Index1],
@@ -1958,22 +2096,35 @@ HiiStringToImage (
           );
         }
         if (ColumnInfoArray != NULL) {
-          if (GlyphBuf[Index1] == NULL) {
-            *ColumnInfoArray = 0;
+          if ((GlyphBuf[Index1] == NULL && Cell[Index1].AdvanceX == 0) 
+              || RowInfo[RowIndex].LineWidth == 0) {
+            *ColumnInfoArray = (UINTN) ~0;
           } else {
-            *ColumnInfoArray = Cell[Index1 -1].AdvanceX;
+            *ColumnInfoArray = LineOffset + Cell[Index1].OffsetX + BltX;
           }
           ColumnInfoArray++;
         }
+        LineOffset += Cell[Index1].AdvanceX;
       }
+
       //
-      // Jump to next row
+      // Jump to starting position of next row.
       //
-      BufferPtr += BltX + Image->Width * (LineHeight - 1);
+      if (RowIndex == 0) {
+        BufferPtr = RowBufferPtr - BltX + LineHeight * Image->Width;
+      } else {
+        BufferPtr = RowBufferPtr + LineHeight * Image->Width;
+      }
     }
 
-    Index++;
+    //
+    // Recalculate the start point of X/Y axis to draw multi-lines with the order of top-to-down
+    //
+    BltX = 0;
+    BltY += RowInfo[RowIndex].LineHeight;
+
     RowIndex++;
+    Index = NextIndex;
 
     if (!LineBreak) {
       //
@@ -1988,12 +2139,16 @@ HiiStringToImage (
   //
   RowInfoSize = RowIndex * sizeof (EFI_HII_ROW_INFO);
   if (RowInfoArray != NULL) {
-    *RowInfoArray = AllocateZeroPool (RowInfoSize);
-    if (*RowInfoArray == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto Exit;
+    if (RowInfoSize > 0) {
+      *RowInfoArray = AllocateZeroPool (RowInfoSize);
+      if (*RowInfoArray == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Exit;
+      }
+      CopyMem (*RowInfoArray, RowInfo, RowInfoSize);
+    } else {
+      *RowInfoArray = NULL;
     }
-    CopyMem (*RowInfoArray, RowInfo, RowInfoSize);
   }
   if (RowInfoArraySize != NULL) {
     *RowInfoArraySize = RowIndex;
@@ -2354,6 +2509,7 @@ HiiGetGlyph (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL      Foreground;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL      Background;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer;
+  UINT16                             BaseLine;
 
   if (This == NULL || Blt == NULL || *Blt != NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2414,25 +2570,36 @@ HiiGetGlyph (
   Image->Width   = Cell.Width;
   Image->Height  = Cell.Height;
 
-  Image->Image.Bitmap = AllocateZeroPool (Image->Width * Image->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-  if (Image->Image.Bitmap == NULL) {
-    FreePool (Image);
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Exit;
-  }
+  if (Image->Width * Image->Height > 0) {
+    Image->Image.Bitmap = AllocateZeroPool (Image->Width * Image->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+    if (Image->Image.Bitmap == NULL) {
+      FreePool (Image);
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }
 
-  BltBuffer = Image->Image.Bitmap;
-  GlyphToImage (
-    GlyphBuffer,
-    Foreground,
-    Background,
-    Image->Width,
-    Image->Height,
-    FALSE,
-    &Cell,
-    Attributes,
-    &BltBuffer
-    );
+    //
+    // Set BaseLine to the char height.
+    //
+    BaseLine  = (UINT16) (Cell.Height + Cell.OffsetY);
+    //
+    // Set BltBuffer to the position of Origin. 
+    //
+    BltBuffer = Image->Image.Bitmap + (Cell.Height + Cell.OffsetY) * Image->Width - Cell.OffsetX;
+    GlyphToImage (
+      GlyphBuffer,
+      Foreground,
+      Background,
+      Image->Width,
+      BaseLine,
+      Cell.Width + Cell.OffsetX,
+      BaseLine - Cell.OffsetY,
+      FALSE,
+      &Cell,
+      Attributes,
+      &BltBuffer
+      );
+  }
 
   *Blt = Image;
   if (Baseline != NULL) {

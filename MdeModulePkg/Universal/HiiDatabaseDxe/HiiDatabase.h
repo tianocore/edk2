@@ -158,6 +158,8 @@ typedef struct _HII_SIMPLE_FONT_PACKAGE_INSTANCE {
 typedef struct _HII_FONT_PACKAGE_INSTANCE {
   UINTN                                 Signature;
   EFI_HII_FONT_PACKAGE_HDR              *FontPkgHdr;
+  UINT16                                Height;
+  UINT16                                BaseLine;
   UINT8                                 *GlyphBlock;
   LIST_ENTRY                            FontEntry;
   LIST_ENTRY                            GlyphInfoList;
