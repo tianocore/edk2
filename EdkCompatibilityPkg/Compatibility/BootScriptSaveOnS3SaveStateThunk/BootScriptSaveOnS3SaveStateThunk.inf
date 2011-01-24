@@ -38,7 +38,7 @@
 
 [Sources.X64]
   X64/AsmDispatchExecute.asm
-  X64/AsmDispatchExecute.S
+  X64/AsmDispatchExecute.s
   X64/DispatchExecute.c
 
 [Sources.Ia32]  
