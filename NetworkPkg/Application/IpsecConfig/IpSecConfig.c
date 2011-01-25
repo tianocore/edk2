@@ -719,7 +719,7 @@ InitializeIpSecConfig (
   //
   // Try to get policy database type.
   //
-  DataType = (EFI_IPSEC_CONFIG_DATA_TYPE) -1;
+  DataType = (EFI_IPSEC_CONFIG_DATA_TYPE) - 1;
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"-p");
   if (ValueStr != NULL) {
     DataType = (EFI_IPSEC_CONFIG_DATA_TYPE) MapStringToInteger (ValueStr, mMapPolicy);
@@ -730,11 +730,12 @@ InitializeIpSecConfig (
   }
 
   if (ShellCommandLineGetFlag (ParamPackage, L"-?")) {
-    switch (DataType) {
-      case (EFI_IPSEC_CONFIG_DATA_TYPE) -1:
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IPSEC_CONFIG_HELP), mHiiHandle);
-        break;
+    if (DataType == -1) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IPSEC_CONFIG_HELP), mHiiHandle);
+      goto Done;
+    }
 
+    switch (DataType) {
       case IPsecConfigDataTypeSpd:
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IPSEC_CONFIG_SPD_HELP), mHiiHandle);
         break;
