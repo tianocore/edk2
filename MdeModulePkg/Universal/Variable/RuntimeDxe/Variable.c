@@ -3,7 +3,7 @@
   The common variable operation routines shared by DXE_RINTIME variable 
   module and DXE_SMM variable module.
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -2360,7 +2360,7 @@ VariableCommonInitialize (
   VolatileVariableStore->Reserved1   = 0;
 
   //
-  // Get non-volatile varaible store.
+  // Get non-volatile variable store.
   //
 
   TempVariableStoreHeader = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageVariableBase64);
