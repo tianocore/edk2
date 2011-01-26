@@ -5,7 +5,7 @@
   Cache subclass specification 0.9, DataHub SubClass specification 0.9, Memory SubClass Spec 0.9,
   Processor Subclass specification 0.9, and Misc SubClass specification 0.9.
   
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -2458,8 +2458,8 @@ typedef struct {
 typedef struct {
   EFI_MISC_COOLING_DEVICE_TYPE      CoolingDeviceType;
   EFI_INTER_LINK_DATA               CoolingDeviceTemperatureLink;
-  UINT16                            CoolingDeviceUnitGroup;
-  EFI_EXP_BASE10_DATA               CoolingDeviceNominalSpeed;
+  UINT8                             CoolingDeviceUnitGroup;
+  UINT16                            CoolingDeviceNominalSpeed;
   UINT32                            CoolingDeviceOemDefined;
 } EFI_MISC_COOLING_DEVICE_TEMP_LINK_DATA;
 

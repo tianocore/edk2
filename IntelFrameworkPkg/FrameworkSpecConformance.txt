@@ -864,6 +864,19 @@
     code logic. Therefore developer doesn't need to allocate memory dynamically to construct variable length data record.
     Keeping this inconsistency for backward compatibility.
 
+  21. Guid/DataHubRecords.h
+    typedef struct {
+      EFI_MISC_COOLING_DEVICE_TYPE      CoolingDeviceType;
+      EFI_INTER_LINK_DATA               CoolingDeviceTemperatureLink;
+      UINT8                             CoolingDeviceUnitGroup;
+      UINT16                            CoolingDeviceNominalSpeed;
+      UINT32                            CoolingDeviceOemDefined;
+    } EFI_MISC_COOLING_DEVICE_TEMP_LINK_DATA;
+
+    The "CoolingDeviceUnitGroup" field and "CoolingDeviceNominalSpeed" field are *NOT* consistent with 
+    MiscSubclass specification 0.9. These fields are aligned with SMBIOS 2.6 specification. And user can easily
+    assign any value to CoolingDeviceNominalSpeed.
+
 ##
 # Mismatch with Intel Platform Innovation Framework for Status Codes Specification (Version 0.92)
 ##
