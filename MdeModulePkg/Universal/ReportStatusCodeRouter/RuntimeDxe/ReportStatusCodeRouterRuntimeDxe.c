@@ -2,7 +2,7 @@
   Report Status Code Router Driver which produces Report Stataus Code Handler Protocol
   and Status Code Runtime Protocol.
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -130,7 +130,7 @@ Register (
     }
   }
 
-  CallbackEntry = AllocateZeroPool (sizeof (RSC_HANDLER_CALLBACK_ENTRY));
+  CallbackEntry = AllocateRuntimeZeroPool (sizeof (RSC_HANDLER_CALLBACK_ENTRY));
   ASSERT (CallbackEntry != NULL);
 
   CallbackEntry->Signature          = RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE;
