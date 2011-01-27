@@ -4,7 +4,7 @@
   This ppi Provides platform or chipset-specific access to 
   the PCI configuration space for a specific PCI segment.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -33,7 +33,7 @@ typedef struct _EFI_PEI_PCI_CFG2_PPI   EFI_PEI_PCI_CFG2_PPI;
   (((UINTN) bus) << 24) | \
   (((UINTN) dev) << 16) | \
   (((UINTN) func) << 8) | \
-  (((UINTN) (reg)) < 256 ? ((UINTN) (reg)) : (UINT64) (LShiftU64 ((UINT64) (reg), 32))));
+  (((UINTN) (reg)) < 256 ? ((UINTN) (reg)) : (UINT64) (LShiftU64 ((UINT64) (reg), 32))))
 
 ///
 /// EFI_PEI_PCI_CFG_PPI_WIDTH
