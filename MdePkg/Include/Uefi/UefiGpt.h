@@ -1,7 +1,7 @@
 /** @file
   EFI Guid Partition Table Format Definition.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -114,10 +114,14 @@ typedef struct {
   ///             potentially stop working if this partition is removed. Unless OS software or firmware
   ///             recognizes this partition, it should never be removed or modified as the UEFI firmware or
   ///             platform hardware may become non-functional.
-  /// Bit 1:      If this bit is set firmware must not produce an EFI_BLOCK_IO_PROTOCOL device for
-  ///             this partition. By not producing EFI_BLOCK_IO_PROTOCOL partition, file system
+  /// Bit 1:      If this bit is set, then firmware must not produce an EFI_BLOCK_IO_PROTOCOL device for
+  ///             this partition. By not producing an EFI_BLOCK_IO_PROTOCOL partition, file system
   ///             mappings will not be created for this partition in UEFI.
-  /// Bits 2-47:  Undefined and must be zero. Reserved for expansion by future versions of the UEFI
+  /// Bit 2:      This bit is set aside to let systems with traditional PC-AT BIOS firmware implementations
+  ///             inform certain limited, special-purpose software running on these systems that a GPT 
+  ///             partition may be bootable. The UEFI boot manager must ignore this bit when selecting
+  ///             a UEFI-compliant application, e.g., an OS loader.
+  /// Bits 3-47:  Undefined and must be zero. Reserved for expansion by future versions of the UEFI
   ///             specification.
   /// Bits 48-63: Reserved for GUID specific use. The use of these bits will vary depending on the
   ///             PartitionTypeGUID. Only the owner of the PartitionTypeGUID is allowed
