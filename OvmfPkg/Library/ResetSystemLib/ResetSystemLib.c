@@ -25,7 +25,7 @@ AcpiPmControl (
 {
   ASSERT (SuspendType < 6);
 
-  IoAndThenOr16 (0x404, ~0x3c00, SuspendType << 10);
+  IoAndThenOr16 (0x404, (UINT16) ~0x3c00, (UINT16) (SuspendType << 10));
   IoOr16 (0x404, BIT13);
   CpuDeadLoop ();
 }
