@@ -1180,7 +1180,7 @@ PreprocessController (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Phase < EfiPciBeforeChildBusEnumeration || Phase > EfiMaxPciHostBridgeEnumerationPhase) {
+  if (Phase < EfiPciBeforeChildBusEnumeration || Phase > EfiPciBeforeResourceCollection) {
     return EFI_INVALID_PARAMETER;
   }
 
