@@ -1,7 +1,7 @@
 /** @file
   The platform boot manager reference implementation
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +18,17 @@ UINT16             mKeyInput;
 EFI_GUID           mBootManagerGuid = BOOT_MANAGER_FORMSET_GUID;
 LIST_ENTRY         mBootOptionsList;
 BDS_COMMON_OPTION  *gOption;
+CHAR16             *mDeviceTypeStr[] = {
+  L"Legacy BEV",
+  L"Legacy Floppy",
+  L"Legacy Hard Drive",
+  L"Legacy CD ROM",
+  L"Legacy PCMCIA",
+  L"Legacy USB",
+  L"Legacy Embedded Network",
+  L"Legacy Unknown Device"
+};
+
 
 HII_VENDOR_DEVICE_PATH  mBootManagerHiiVendorDevicePath = {
   {
@@ -207,8 +218,12 @@ CallBootManager (
   VOID                        *EndOpCodeHandle;
   EFI_IFR_GUID_LABEL          *StartLabel;
   EFI_IFR_GUID_LABEL          *EndLabel;
+  UINT16                      DeviceType;
+  BOOLEAN                     IsLegacyOption;
+  BOOLEAN                     NeedEndOp;
 
-  gOption = NULL;
+  DeviceType = (UINT16) -1;
+  gOption    = NULL;
   InitializeListHead (&mBootOptionsList);
 
   //
@@ -247,7 +262,7 @@ CallBootManager (
   EndLabel->Number       = LABEL_BOOT_OPTION_END;
 
   mKeyInput = 0;
-
+  NeedEndOp = FALSE;
   for (Link = GetFirstNode (&mBootOptionsList); !IsNull (&mBootOptionsList, Link); Link = GetNextNode (&mBootOptionsList, Link)) {
     Option = CR (Link, BDS_COMMON_OPTION, Link, BDS_LOAD_OPTION_SIGNATURE);
 
@@ -262,7 +277,38 @@ CallBootManager (
     if ((Option->Attribute & LOAD_OPTION_HIDDEN) != 0) {
       continue;
     }
-      
+
+    //
+    // Group the legacy boot option in the sub title created dynamically
+    //
+    IsLegacyOption = (BOOLEAN) (
+                       (DevicePathType (Option->DevicePath) == BBS_DEVICE_PATH) &&
+                       (DevicePathSubType (Option->DevicePath) == BBS_BBS_DP)
+                       );
+
+    if (!IsLegacyOption && NeedEndOp) {
+      NeedEndOp = FALSE;
+      HiiCreateEndOpCode (StartOpCodeHandle);
+    }
+    
+    if (IsLegacyOption && DeviceType != ((BBS_BBS_DEVICE_PATH *) Option->DevicePath)->DeviceType) {
+      if (NeedEndOp) {
+        HiiCreateEndOpCode (StartOpCodeHandle);
+      }
+
+      DeviceType = ((BBS_BBS_DEVICE_PATH *) Option->DevicePath)->DeviceType;
+      Token      = HiiSetString (
+                     HiiHandle,
+                     0,
+                     mDeviceTypeStr[
+                       MIN (DeviceType & 0xF, sizeof (mDeviceTypeStr) / sizeof (mDeviceTypeStr[0]) - 1)
+                       ],
+                     NULL
+                     );
+      HiiCreateSubTitleOpCode (StartOpCodeHandle, Token, 0, 0, 1);
+      NeedEndOp = TRUE;
+    }
+
     ASSERT (Option->Description != NULL);
     
     Token = HiiSetString (HiiHandle, 0, Option->Description, NULL);
@@ -284,6 +330,10 @@ CallBootManager (
       EFI_IFR_FLAG_CALLBACK,
       0
       );
+  }
+
+  if (NeedEndOp) {
+    HiiCreateEndOpCode (StartOpCodeHandle);
   }
 
   HiiUpdateForm (

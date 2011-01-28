@@ -3,7 +3,7 @@
   and manage the legacy boot option, all legacy boot option is getting from
   the legacy BBS table.
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "BBSsupport.h"
+
+BOOT_OPTION_BBS_MAPPING  *mBootOptionBbsMapping     = NULL;
+UINTN                    mBootOptionBbsMappingCount = 0;
 
 /**
 
@@ -157,7 +160,7 @@ BdsBuildLegacyDevNameString (
   // BbsTable 16 entries are for onboard IDE.
   // Set description string for SATA harddisks, Harddisk 0 ~ Harddisk 11
   //
-  if (Index >= 5 && Index <= 16 && CurBBSEntry->DeviceType == BBS_HARDDISK) {
+  if (Index >= 5 && Index <= 16 && (CurBBSEntry->DeviceType == BBS_HARDDISK || CurBBSEntry->DeviceType == BBS_CDROM)) {
     Fmt = L"%s %d";
     UnicodeSPrint (BootString, BufSize, Fmt, Type, Index - 5);
   } else {
@@ -198,7 +201,7 @@ BdsCreateLegacyBootOption (
   EFI_STATUS           Status;
   UINT16               CurrentBootOptionNo;
   UINT16               BootString[10];
-  UINT16               BootDesc[100];
+  CHAR16               BootDesc[100];
   CHAR8                HelpString[100];
   UINT16               *NewBootOrderList;
   UINTN                BufferSize;
@@ -246,7 +249,7 @@ BdsCreateLegacyBootOption (
   //
   // Create new BBS device path node with description string
   //
-  UnicodeStrToAsciiStr ((CONST CHAR16*)&BootDesc, (CHAR8*)&HelpString);
+  UnicodeStrToAsciiStr (BootDesc, HelpString);
 
   StringLen = AsciiStrLen (HelpString);
   NewBbsDevPathNode = AllocateZeroPool (sizeof (BBS_BBS_DEVICE_PATH) + StringLen);
@@ -394,6 +397,164 @@ BdsIsLegacyBootOption (
 }
 
 /**
+  Re-order the Boot Option according to the DevOrder.
+
+  The routine re-orders the Boot Option in BootOption array according to
+  the order specified by DevOrder.
+
+  @param BootOption         Pointer to buffer containing the Boot Option Numbers
+  @param BootOptionCount    Count of the Boot Option Numbers
+  @param DevOrder           Pointer to buffer containing the BBS Index,
+                            high 8-bit value 0xFF indicating a disabled boot option
+  @param DevOrderCount      Count of the BBS Index
+  @param EnBootOption       Pointer to buffer receiving the enabled Boot Option Numbers
+  @param EnBootOptionCount  Count of the enabled Boot Option Numbers
+  @param DisBootOption      Pointer to buffer receiving the disabled Boot Option Numbers
+  @param DisBootOptionCount Count of the disabled Boot Option Numbers
+**/
+VOID
+OrderLegacyBootOption4SameType (
+  UINT16                   *BootOption,
+  UINTN                    BootOptionCount,
+  UINT16                   *DevOrder,
+  UINTN                    DevOrderCount,
+  UINT16                   *EnBootOption,
+  UINTN                    *EnBootOptionCount,
+  UINT16                   *DisBootOption,
+  UINTN                    *DisBootOptionCount
+  )
+{
+  UINTN                    Index;
+  UINTN                    MappingIndex;
+  UINT16                   *NewBootOption;
+  UINT16                   BbsType;
+  
+  *DisBootOptionCount = 0;
+  *EnBootOptionCount  = 0;
+  BbsType             = 0;
+
+  //
+  // Record the corresponding Boot Option Numbers according to the DevOrder
+  // Record the EnBootOption and DisBootOption according to the DevOrder
+  //
+  NewBootOption = AllocatePool (DevOrderCount * sizeof (UINT16));
+  while (DevOrderCount-- != 0) {
+    for (Index = 0; Index < mBootOptionBbsMappingCount; Index++) {
+      if (mBootOptionBbsMapping[Index].BbsIndex == (DevOrder[DevOrderCount] & 0xFF)) {
+        BbsType = mBootOptionBbsMapping[Index].BbsType;
+        NewBootOption[DevOrderCount] = mBootOptionBbsMapping[Index].BootOptionNumber;
+        
+        if ((DevOrder[DevOrderCount] & 0xFF00) == 0xFF00) {
+          DisBootOption[*DisBootOptionCount] = NewBootOption[DevOrderCount];
+          (*DisBootOptionCount)++;
+        } else {
+          EnBootOption[*EnBootOptionCount] = NewBootOption[DevOrderCount];
+          (*EnBootOptionCount)++;
+        }
+        break;
+      }
+    }
+  }
+
+  for (Index = 0; Index < BootOptionCount; Index++) {
+    //
+    // Find the start position for the BbsType in BootOption
+    //
+    for (MappingIndex = 0; MappingIndex < mBootOptionBbsMappingCount; MappingIndex++) {
+      if (mBootOptionBbsMapping[MappingIndex].BbsType == BbsType && mBootOptionBbsMapping[MappingIndex].BootOptionNumber == BootOption[Index]) {
+        break;
+      }
+    }
+
+    //
+    // Overwrite the old BootOption
+    //
+    if (MappingIndex < mBootOptionBbsMappingCount) {
+      CopyMem (&BootOption[Index], NewBootOption, (*DisBootOptionCount + *EnBootOptionCount) * sizeof (UINT16));
+      break;
+    }
+  }
+}
+
+/**
+  Group the legacy boot options in the BootOption.
+
+  The routine assumes the boot options in the beginning that covers all the device 
+  types are ordered properly and re-position the following boot options just after
+  the corresponding boot options with the same device type.
+  For example:
+  1. Input  = [Harddisk1 CdRom2 Efi1 Harddisk0 CdRom0 CdRom1 Harddisk2 Efi0]
+     Assuming [Harddisk1 CdRom2 Efi1] is ordered properly
+     Output = [Harddisk1 Harddisk0 Harddisk2 CdRom2 CdRom0 CdRom1 Efi1 Efi0]
+
+  2. Input  = [Efi1 Efi0 CdRom1 Harddisk0 Harddisk1 Harddisk2 CdRom0 CdRom2]
+     Assuming [Efi1 Efi0 CdRom1 Harddisk0] is ordered properly
+     Output = [Efi1 Efi0 CdRom1 CdRom0 CdRom2 Harddisk0 Harddisk1 Harddisk2]
+
+  @param BootOption      Pointer to buffer containing Boot Option Numbers
+  @param BootOptionCount Count of the Boot Option Numbers
+**/
+VOID
+GroupMultipleLegacyBootOption4SameType (
+  UINT16                   *BootOption,
+  UINTN                    BootOptionCount
+  )
+{
+  UINTN                    DeviceTypeIndex[7];
+  UINTN                    Index;
+  UINTN                    MappingIndex;
+  UINTN                    *NextIndex;
+  UINT16                   OptionNumber;
+  UINTN                    DeviceIndex;
+
+  SetMem (DeviceTypeIndex, sizeof (DeviceTypeIndex), 0xFF);
+
+  for (Index = 0; Index < BootOptionCount; Index++) {
+
+    //
+    // Find the DeviceType
+    //
+    for (MappingIndex = 0; MappingIndex < mBootOptionBbsMappingCount; MappingIndex++) {
+      if (mBootOptionBbsMapping[MappingIndex].BootOptionNumber == BootOption[Index]) {
+        break;
+      }
+    }
+    if (MappingIndex == mBootOptionBbsMappingCount) {
+      //
+      // Is not a legacy boot option
+      //
+      continue;
+    }
+
+    ASSERT ((mBootOptionBbsMapping[MappingIndex].BbsType & 0xF) < 
+             sizeof (DeviceTypeIndex) / sizeof (DeviceTypeIndex[0]));
+    NextIndex = &DeviceTypeIndex[mBootOptionBbsMapping[MappingIndex].BbsType & 0xF];
+    if (*NextIndex == (UINTN) -1) {
+      //
+      // *NextIndex is the index in BootOption to put the next Option Number for the same type
+      //
+      *NextIndex = Index + 1;
+    } else {
+      //
+      // insert the current boot option before *NextIndex, causing [*Next .. Index] shift right one position
+      //
+      OptionNumber = BootOption[Index];
+      CopyMem (&BootOption[*NextIndex + 1], &BootOption[*NextIndex], (Index - *NextIndex) * sizeof (UINT16));
+      BootOption[*NextIndex] = OptionNumber;
+
+      //
+      // Update the DeviceTypeIndex array to reflect the right shift operation
+      //
+      for (DeviceIndex = 0; DeviceIndex < sizeof (DeviceTypeIndex) / sizeof (DeviceTypeIndex[0]); DeviceIndex++) {
+        if (DeviceTypeIndex[DeviceIndex] != (UINTN) -1 && DeviceTypeIndex[DeviceIndex] >= *NextIndex) {
+          DeviceTypeIndex[DeviceIndex]++;
+        }
+      }
+    }
+  }
+}
+
+/**
   Delete all the invalid legacy boot options.
 
   @retval EFI_SUCCESS             All invalide legacy boot options are deleted.
@@ -450,8 +611,8 @@ BdsDeleteAllInvalidLegacyBootOptions (
                 &gEfiGlobalVariableGuid,
                 &BootOrderSize
                 );
-  if (NULL == BootOrder) {
-    return EFI_NOT_FOUND;
+  if (BootOrder == NULL) {
+    BootOrderSize = 0;
   }
 
   Index = 0;
@@ -463,14 +624,32 @@ BdsDeleteAllInvalidLegacyBootOptions (
                       &BootOptionSize
                       );
     if (NULL == BootOptionVar) {
-      if (BootOrder != NULL) {
+      BootOptionSize = 0;
+      Status = gRT->GetVariable (
+                      BootOption,
+                      &gEfiGlobalVariableGuid,
+                      NULL,
+                      &BootOptionSize,
+                      BootOptionVar
+                      );
+      if (Status == EFI_NOT_FOUND) {
+        //
+        // Update BootOrder
+        //
+        BdsDeleteBootOption (
+          BootOrder[Index],
+          BootOrder,
+          &BootOrderSize
+          );
+        continue;
+      } else {
         FreePool (BootOrder);
+        return EFI_OUT_OF_RESOURCES;
       }
-      return EFI_OUT_OF_RESOURCES;
     }
   
     //
-    // Skip Non-Legacy boot options
+    // Skip Non-Legacy boot option
     // 
     if (!BdsIsLegacyBootOption (BootOptionVar, &BbsEntry, &BbsIndex)) {
       if (BootOptionVar!= NULL) {
@@ -480,28 +659,29 @@ BdsDeleteAllInvalidLegacyBootOptions (
       continue;
     }
 
-    //
-    // Check if BBS Description String is changed
-    //
-    DescStringMatch = FALSE;
+    if (BbsIndex < BbsCount) {
+      //
+      // Check if BBS Description String is changed
+      //
+      DescStringMatch = FALSE;
+      BdsBuildLegacyDevNameString (
+        &LocalBbsTable[BbsIndex],
+        BbsIndex,
+        sizeof (BootDesc),
+        BootDesc
+        );
 
-    BdsBuildLegacyDevNameString (
-      &LocalBbsTable[BbsIndex],
-      BbsIndex,
-      sizeof(BootDesc),
-      BootDesc
-      );
+      if (StrCmp (BootDesc, (UINT16*)(BootOptionVar + sizeof (UINT32) + sizeof (UINT16))) == 0) {
+        DescStringMatch = TRUE;
+      }
 
-    if (StrCmp (BootDesc, (UINT16*)(BootOptionVar + sizeof (UINT32) + sizeof (UINT16))) == 0) {
-      DescStringMatch = TRUE;
-    }
-
-    if (!((LocalBbsTable[BbsIndex].BootPriority == BBS_IGNORE_ENTRY) ||
-          (LocalBbsTable[BbsIndex].BootPriority == BBS_DO_NOT_BOOT_FROM)) &&
-        (LocalBbsTable[BbsIndex].DeviceType == BbsEntry->DeviceType) &&
-        DescStringMatch) {
-      Index++;
-      continue;
+      if (!((LocalBbsTable[BbsIndex].BootPriority == BBS_IGNORE_ENTRY) ||
+            (LocalBbsTable[BbsIndex].BootPriority == BBS_DO_NOT_BOOT_FROM)) &&
+          (LocalBbsTable[BbsIndex].DeviceType == BbsEntry->DeviceType) &&
+          DescStringMatch) {
+        Index++;
+        continue;
+      }
     }
 
     if (BootOptionVar != NULL) {
@@ -545,6 +725,7 @@ BdsDeleteAllInvalidLegacyBootOptions (
   @param BootOrder       The boot order array.
   @param BootOptionNum   The number of boot option.
   @param DevType         Device type.
+  @param DevName         Device name.
   @param Attribute       The boot option attribute.
   @param BbsIndex        The BBS table index.
   @param OptionNumber    The boot option index.
@@ -554,18 +735,18 @@ BdsDeleteAllInvalidLegacyBootOptions (
 
 **/
 BOOLEAN
-BdsFindLegacyBootOptionByDevType (
+BdsFindLegacyBootOptionByDevTypeAndName (
   IN UINT16                 *BootOrder,
   IN UINTN                  BootOptionNum,
   IN UINT16                 DevType,
+  IN CHAR16                 *DevName,
   OUT UINT32                *Attribute,
   OUT UINT16                *BbsIndex,
-  OUT UINTN                 *OptionNumber
+  OUT UINT16                *OptionNumber
   )
 {
   UINTN     Index;
-  UINTN     BootOrderIndex;
-  UINT16    BootOption[100];
+  CHAR16    BootOption[9];
   UINTN     BootOptionSize;
   UINT8     *BootOptionVar;
   BBS_TABLE *BbsEntry;
@@ -581,9 +762,8 @@ BdsFindLegacyBootOptionByDevType (
   //
   // Loop all boot option from variable
   //
-  for (BootOrderIndex = 0; BootOrderIndex < BootOptionNum; BootOrderIndex++) {
-    Index = (UINTN) BootOrder[BootOrderIndex];
-    UnicodeSPrint (BootOption, sizeof (BootOption), L"Boot%04x", Index);
+  for (Index = 0; Index < BootOptionNum; Index++) {
+    UnicodeSPrint (BootOption, sizeof (BootOption), L"Boot%04x", (UINTN) BootOrder[Index]);
     BootOptionVar = BdsLibGetVariableAndSize (
                       BootOption,
                       &gEfiGlobalVariableGuid,
@@ -601,13 +781,16 @@ BdsFindLegacyBootOptionByDevType (
       continue;
     }
 
-    if (BbsEntry->DeviceType != DevType) {
+    if (
+        (BbsEntry->DeviceType != DevType) ||
+        (StrCmp (DevName, (CHAR16*)(BootOptionVar + sizeof (UINT32) + sizeof (UINT16))) != 0)
+       ) {
       FreePool (BootOptionVar);
       continue;
     }
 
     *Attribute    = *(UINT32 *) BootOptionVar;
-    *OptionNumber = Index;
+    *OptionNumber = BootOrder[Index];
     Found         = TRUE;
     FreePool (BootOptionVar);
     break;
@@ -692,18 +875,18 @@ BdsAddNonExistingLegacyBootOptions (
   UINT16                    *BootOrder;
   UINTN                     BootOrderSize;
   EFI_STATUS                Status;
+  CHAR16                    Desc[100];
   UINT16                    HddCount;
   UINT16                    BbsCount;
   HDD_INFO                  *LocalHddInfo;
   BBS_TABLE                 *LocalBbsTable;
   UINT16                    BbsIndex;
   EFI_LEGACY_BIOS_PROTOCOL  *LegacyBios;
-  UINTN                     Index;
+  UINT16                    Index;
   UINT32                    Attribute;
-  UINTN                     OptionNumber;
-  BOOLEAN                   Ret;
+  UINT16                    OptionNumber;
+  BOOLEAN                   Exist;
 
-  BootOrder     = NULL;
   HddCount      = 0;
   BbsCount      = 0;
   LocalHddInfo  = NULL;
@@ -712,6 +895,13 @@ BdsAddNonExistingLegacyBootOptions (
   Status        = EfiLibLocateProtocol (&gEfiLegacyBiosProtocolGuid, (VOID **) &LegacyBios);
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  if (mBootOptionBbsMapping != NULL) {
+    FreePool (mBootOptionBbsMapping);
+
+    mBootOptionBbsMapping      = NULL;
+    mBootOptionBbsMappingCount = 0;
   }
 
   LegacyBios->GetBbsInfo (
@@ -727,7 +917,7 @@ BdsAddNonExistingLegacyBootOptions (
                 &gEfiGlobalVariableGuid,
                 &BootOrderSize
                 );
-  if (NULL == BootOrder) {
+  if (BootOrder == NULL) {
     BootOrderSize = 0;
   }
 
@@ -738,32 +928,58 @@ BdsAddNonExistingLegacyBootOptions (
       continue;
     }
 
-    Ret = BdsFindLegacyBootOptionByDevType (
-            BootOrder,
-            BootOrderSize / sizeof (UINT16),
-            LocalBbsTable[Index].DeviceType,
-            &Attribute,
-            &BbsIndex,
-            &OptionNumber
-            );
-    if (Ret) {
-      continue;
+    BdsBuildLegacyDevNameString (&LocalBbsTable[Index], Index, sizeof (Desc), Desc);
+
+    Exist = BdsFindLegacyBootOptionByDevTypeAndName (
+              BootOrder,
+              BootOrderSize / sizeof (UINT16),
+              LocalBbsTable[Index].DeviceType,
+              Desc,
+              &Attribute,
+              &BbsIndex,
+              &OptionNumber
+              );
+    if (!Exist) {
+      //
+      // Not found such type of legacy device in boot options or we found but it's disabled
+      // so we have to create one and put it to the tail of boot order list
+      //
+      Status = BdsCreateOneLegacyBootOption (
+                &LocalBbsTable[Index],
+                Index,
+                &BootOrder,
+                &BootOrderSize
+                );
+      if (EFI_ERROR (Status)) {
+        break;
+      }
+      BbsIndex     = Index;
+      OptionNumber = BootOrder[BootOrderSize / sizeof (UINT16) - 1];
     }
 
+    ASSERT (BbsIndex == Index);
     //
-    // Not found such type of legacy device in boot options or we found but it's disabled
-    // so we have to create one and put it to the tail of boot order list
+    // Save the BbsIndex
     //
-    Status = BdsCreateOneLegacyBootOption (
-              &LocalBbsTable[Index],
-              Index,
-              &BootOrder,
-              &BootOrderSize
-              );
-    if (EFI_ERROR (Status)) {
-      break;
-    }
+    mBootOptionBbsMapping = ReallocatePool (
+                              mBootOptionBbsMappingCount * sizeof (BOOT_OPTION_BBS_MAPPING),
+                              (mBootOptionBbsMappingCount + 1) * sizeof (BOOT_OPTION_BBS_MAPPING),
+                              mBootOptionBbsMapping
+                              );
+    ASSERT (mBootOptionBbsMapping != NULL);
+    mBootOptionBbsMapping[mBootOptionBbsMappingCount].BootOptionNumber = OptionNumber;
+    mBootOptionBbsMapping[mBootOptionBbsMappingCount].BbsIndex         = Index;
+    mBootOptionBbsMapping[mBootOptionBbsMappingCount].BbsType          = LocalBbsTable[Index].DeviceType;
+    mBootOptionBbsMappingCount ++;
   }
+
+  //
+  // Group the Boot Option Number in BootOrder for the same type devices
+  //
+  GroupMultipleLegacyBootOption4SameType (
+    BootOrder,
+    BootOrderSize / sizeof (UINT16)
+    );
 
   if (BootOrderSize > 0) {
     Status = gRT->SetVariable (
@@ -800,7 +1016,7 @@ BdsFillDevOrderBuf (
   IN BBS_TABLE                    *BbsTable,
   IN BBS_TYPE                     BbsType,
   IN UINTN                        BbsCount,
-  OUT UINT16                       *Buf
+  OUT UINT16                      *Buf
   )
 {
   UINTN Index;
@@ -840,17 +1056,17 @@ BdsCreateDevOrder (
   IN UINT16                     BbsCount
   )
 {
-  UINTN       Index;
-  UINTN       FDCount;
-  UINTN       HDCount;
-  UINTN       CDCount;
-  UINTN       NETCount;
-  UINTN       BEVCount;
-  UINTN       TotalSize;
-  UINTN       HeaderSize;
-  UINT8       *DevOrder;
-  UINT8       *Ptr;
-  EFI_STATUS  Status;
+  UINTN                       Index;
+  UINTN                       FDCount;
+  UINTN                       HDCount;
+  UINTN                       CDCount;
+  UINTN                       NETCount;
+  UINTN                       BEVCount;
+  UINTN                       TotalSize;
+  UINTN                       HeaderSize;
+  BM_LEGACY_DEV_ORDER_CONTEXT *DevOrder;
+  BM_LEGACY_DEV_ORDER_CONTEXT *DevOrderPtr;
+  EFI_STATUS                  Status;
 
   FDCount     = 0;
   HDCount     = 0;
@@ -860,7 +1076,6 @@ BdsCreateDevOrder (
   TotalSize   = 0;
   HeaderSize  = sizeof (BBS_TYPE) + sizeof (UINT16);
   DevOrder    = NULL;
-  Ptr         = NULL;
   Status      = EFI_SUCCESS;
 
   //
@@ -910,48 +1125,29 @@ BdsCreateDevOrder (
   if (NULL == DevOrder) {
     return EFI_OUT_OF_RESOURCES;
   }
+  DevOrderPtr          = DevOrder;
 
-  Ptr                 = DevOrder;
+  DevOrderPtr->BbsType = BBS_FLOPPY;
+  DevOrderPtr->Length  = (UINT16) (sizeof (DevOrderPtr->Length) + FDCount * sizeof (UINT16));
+  DevOrderPtr          = (BM_LEGACY_DEV_ORDER_CONTEXT *) BdsFillDevOrderBuf (BbsTable, BBS_FLOPPY, BbsCount, DevOrderPtr->Data);
 
-  *((BBS_TYPE *) Ptr) = BBS_FLOPPY;
-  Ptr += sizeof (BBS_TYPE);
-  *((UINT16 *) Ptr) = (UINT16) (sizeof (UINT16) + FDCount * sizeof (UINT16));
-  Ptr += sizeof (UINT16);
-  if (FDCount != 0) {
-    Ptr = (UINT8 *) BdsFillDevOrderBuf (BbsTable, BBS_FLOPPY, BbsCount, (UINT16 *) Ptr);
-  }
+  DevOrderPtr->BbsType = BBS_HARDDISK;
+  DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + HDCount * sizeof (UINT16));
+  DevOrderPtr          = (BM_LEGACY_DEV_ORDER_CONTEXT *) BdsFillDevOrderBuf (BbsTable, BBS_HARDDISK, BbsCount, DevOrderPtr->Data);
+  
+  DevOrderPtr->BbsType = BBS_CDROM;
+  DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + CDCount * sizeof (UINT16));
+  DevOrderPtr          = (BM_LEGACY_DEV_ORDER_CONTEXT *) BdsFillDevOrderBuf (BbsTable, BBS_CDROM, BbsCount, DevOrderPtr->Data);
+  
+  DevOrderPtr->BbsType = BBS_EMBED_NETWORK;
+  DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + NETCount * sizeof (UINT16));
+  DevOrderPtr          = (BM_LEGACY_DEV_ORDER_CONTEXT *) BdsFillDevOrderBuf (BbsTable, BBS_EMBED_NETWORK, BbsCount, DevOrderPtr->Data);
 
-  *((BBS_TYPE *) Ptr) = BBS_HARDDISK;
-  Ptr += sizeof (BBS_TYPE);
-  *((UINT16 *) Ptr) = (UINT16) (sizeof (UINT16) + HDCount * sizeof (UINT16));
-  Ptr += sizeof (UINT16);
-  if (HDCount != 0) {
-    Ptr = (UINT8 *) BdsFillDevOrderBuf (BbsTable, BBS_HARDDISK, BbsCount, (UINT16 *) Ptr);
-  }
+  DevOrderPtr->BbsType = BBS_BEV_DEVICE;
+  DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + BEVCount * sizeof (UINT16));
+  DevOrderPtr          = (BM_LEGACY_DEV_ORDER_CONTEXT *) BdsFillDevOrderBuf (BbsTable, BBS_BEV_DEVICE, BbsCount, DevOrderPtr->Data);
 
-  *((BBS_TYPE *) Ptr) = BBS_CDROM;
-  Ptr += sizeof (BBS_TYPE);
-  *((UINT16 *) Ptr) = (UINT16) (sizeof (UINT16) + CDCount * sizeof (UINT16));
-  Ptr += sizeof (UINT16);
-  if (CDCount != 0) {
-    Ptr = (UINT8 *) BdsFillDevOrderBuf (BbsTable, BBS_CDROM, BbsCount, (UINT16 *) Ptr);
-  }
-
-  *((BBS_TYPE *) Ptr) = BBS_EMBED_NETWORK;
-  Ptr += sizeof (BBS_TYPE);
-  *((UINT16 *) Ptr) = (UINT16) (sizeof (UINT16) + NETCount * sizeof (UINT16));
-  Ptr += sizeof (UINT16);
-  if (NETCount != 0) {
-    Ptr = (UINT8 *) BdsFillDevOrderBuf (BbsTable, BBS_EMBED_NETWORK, BbsCount, (UINT16 *) Ptr);
-  }
-
-  *((BBS_TYPE *) Ptr) = BBS_BEV_DEVICE;
-  Ptr += sizeof (BBS_TYPE);
-  *((UINT16 *) Ptr) = (UINT16) (sizeof (UINT16) + BEVCount * sizeof (UINT16));
-  Ptr += sizeof (UINT16);
-  if (BEVCount != 0) {
-    Ptr = (UINT8 *) BdsFillDevOrderBuf (BbsTable, BBS_BEV_DEVICE, BbsCount, (UINT16 *) Ptr);
-  }
+  ASSERT (TotalSize == (UINTN) ((UINT8 *) DevOrderPtr - (UINT8 *) DevOrder));
 
   //
   // Save device order for legacy boot device to variable.
@@ -984,43 +1180,39 @@ BdsUpdateLegacyDevOrder (
   VOID
   )
 {
-  UINT8                     *DevOrder;
-  UINT8                     *NewDevOrder;
-  UINTN                     DevOrderSize;
-  EFI_LEGACY_BIOS_PROTOCOL  *LegacyBios;
-  EFI_STATUS                Status;
-  UINT16                    HddCount;
-  UINT16                    BbsCount;
-  HDD_INFO                  *LocalHddInfo;
-  BBS_TABLE                 *LocalBbsTable;
-  UINTN                     Index;
-  UINTN                     Index2;
-  UINTN                     *Idx;
-  UINTN                     FDCount;
-  UINTN                     HDCount;
-  UINTN                     CDCount;
-  UINTN                     NETCount;
-  UINTN                     BEVCount;
-  UINTN                     TotalSize;
-  UINTN                     HeaderSize;
-  UINT8                     *Ptr;
-  UINT8                     *NewPtr;
-  UINT16                    *NewFDPtr;
-  UINT16                    *NewHDPtr;
-  UINT16                    *NewCDPtr;
-  UINT16                    *NewNETPtr;
-  UINT16                    *NewBEVPtr;
-  UINT16                    *NewDevPtr;
-  UINT16                    Length;
-  UINT16                    Tmp;
-  UINTN                     FDIndex;
-  UINTN                     HDIndex;
-  UINTN                     CDIndex;
-  UINTN                     NETIndex;
-  UINTN                     BEVIndex;
+  BM_LEGACY_DEV_ORDER_CONTEXT *DevOrder;
+  BM_LEGACY_DEV_ORDER_CONTEXT *NewDevOrder;
+  BM_LEGACY_DEV_ORDER_CONTEXT *Ptr;
+  BM_LEGACY_DEV_ORDER_CONTEXT *NewPtr;
+  UINTN                       DevOrderSize;
+  EFI_LEGACY_BIOS_PROTOCOL    *LegacyBios;
+  EFI_STATUS                  Status;
+  UINT16                      HddCount;
+  UINT16                      BbsCount;
+  HDD_INFO                    *LocalHddInfo;
+  BBS_TABLE                   *LocalBbsTable;
+  UINTN                       Index;
+  UINTN                       Index2;
+  UINTN                       *Idx;
+  UINTN                       FDCount;
+  UINTN                       HDCount;
+  UINTN                       CDCount;
+  UINTN                       NETCount;
+  UINTN                       BEVCount;
+  UINTN                       TotalSize;
+  UINTN                       HeaderSize;
+  UINT16                      *NewFDPtr;
+  UINT16                      *NewHDPtr;
+  UINT16                      *NewCDPtr;
+  UINT16                      *NewNETPtr;
+  UINT16                      *NewBEVPtr;
+  UINT16                      *NewDevPtr;
+  UINTN                       FDIndex;
+  UINTN                       HDIndex;
+  UINTN                       CDIndex;
+  UINTN                       NETIndex;
+  UINTN                       BEVIndex;
 
-  LocalHddInfo  = NULL;
-  LocalBbsTable = NULL;
   Idx           = NULL;
   FDCount       = 0;
   HDCount       = 0;
@@ -1041,19 +1233,22 @@ BdsUpdateLegacyDevOrder (
     return Status;
   }
 
-  LegacyBios->GetBbsInfo (
-                LegacyBios,
-                &HddCount,
-                &LocalHddInfo,
-                &BbsCount,
-                &LocalBbsTable
-                );
+  Status = LegacyBios->GetBbsInfo (
+                         LegacyBios,
+                         &HddCount,
+                         &LocalHddInfo,
+                         &BbsCount,
+                         &LocalBbsTable
+                         );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
-  DevOrder = (UINT8 *) BdsLibGetVariableAndSize (
-                        VAR_LEGACY_DEV_ORDER,
-                        &EfiLegacyDevOrderGuid,
-                        &DevOrderSize
-                        );
+  DevOrder = BdsLibGetVariableAndSize (
+               VAR_LEGACY_DEV_ORDER,
+               &EfiLegacyDevOrderGuid,
+               &DevOrderSize
+               );
   if (NULL == DevOrder) {
     return BdsCreateDevOrder (LocalBbsTable, BbsCount);
   }
@@ -1104,137 +1299,111 @@ BdsUpdateLegacyDevOrder (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewFDPtr  = (UINT16 *) (NewDevOrder + HeaderSize);
-  NewHDPtr  = (UINT16 *) ((UINT8 *) NewFDPtr + FDCount * sizeof (UINT16) + HeaderSize);
-  NewCDPtr  = (UINT16 *) ((UINT8 *) NewHDPtr + HDCount * sizeof (UINT16) + HeaderSize);
-  NewNETPtr = (UINT16 *) ((UINT8 *) NewCDPtr + CDCount * sizeof (UINT16) + HeaderSize);
-  NewBEVPtr = (UINT16 *) ((UINT8 *) NewNETPtr + NETCount * sizeof (UINT16) + HeaderSize);
+
 
   //
   // copy FD
   //
-  Ptr                     = DevOrder;
-  NewPtr                  = NewDevOrder;
-  *((BBS_TYPE *) NewPtr)  = *((BBS_TYPE *) Ptr);
-  Ptr += sizeof (BBS_TYPE);
-  NewPtr += sizeof (BBS_TYPE);
-  Length                = *((UINT16 *) Ptr);
-  *((UINT16 *) NewPtr)  = (UINT16) (sizeof (UINT16) + FDCount * sizeof (UINT16));
-  Ptr += sizeof (UINT16);
-
-  for (Index = 0; Index < Length / sizeof (UINT16) - 1; Index++) {
-    if (LocalBbsTable[*Ptr].BootPriority == BBS_IGNORE_ENTRY ||
-        LocalBbsTable[*Ptr].BootPriority == BBS_DO_NOT_BOOT_FROM ||
-        LocalBbsTable[*Ptr].DeviceType != BBS_FLOPPY
+  Ptr             = DevOrder;
+  NewPtr          = NewDevOrder;
+  NewPtr->BbsType = Ptr->BbsType;
+  NewPtr->Length  = (UINT16) (sizeof (UINT16) + FDCount * sizeof (UINT16));
+  for (Index = 0; Index < Ptr->Length / sizeof (UINT16) - 1; Index++) {
+    if (LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_IGNORE_ENTRY ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_DO_NOT_BOOT_FROM ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].DeviceType != BBS_FLOPPY
         ) {
-      Ptr += sizeof (UINT16);
       continue;
     }
 
-    NewFDPtr[FDIndex] = *(UINT16 *) Ptr;
+    NewPtr->Data[FDIndex] = Ptr->Data[Index];
     FDIndex++;
-    Ptr += sizeof (UINT16);
   }
+  NewFDPtr = NewPtr->Data;
+
   //
   // copy HD
   //
-  NewPtr                  = (UINT8 *) NewHDPtr - HeaderSize;
-  *((BBS_TYPE *) NewPtr)  = *((BBS_TYPE *) Ptr);
-  Ptr += sizeof (BBS_TYPE);
-  NewPtr += sizeof (BBS_TYPE);
-  Length                = *((UINT16 *) Ptr);
-  *((UINT16 *) NewPtr)  = (UINT16) (sizeof (UINT16) + HDCount * sizeof (UINT16));
-  Ptr += sizeof (UINT16);
-
-  for (Index = 0; Index < Length / sizeof (UINT16) - 1; Index++) {
-    if (LocalBbsTable[*Ptr].BootPriority == BBS_IGNORE_ENTRY ||
-        LocalBbsTable[*Ptr].BootPriority == BBS_DO_NOT_BOOT_FROM ||
-        LocalBbsTable[*Ptr].BootPriority == BBS_LOWEST_PRIORITY ||
-        LocalBbsTable[*Ptr].DeviceType != BBS_HARDDISK
+  Ptr             = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&Ptr->Data[Ptr->Length / sizeof (UINT16) - 1]);
+  NewPtr          = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&NewPtr->Data[NewPtr->Length / sizeof (UINT16) -1]);
+  NewPtr->BbsType = Ptr->BbsType;
+  NewPtr->Length  = (UINT16) (sizeof (UINT16) + HDCount * sizeof (UINT16));
+  for (Index = 0; Index < Ptr->Length / sizeof (UINT16) - 1; Index++) {
+    if (LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_IGNORE_ENTRY ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_DO_NOT_BOOT_FROM ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_LOWEST_PRIORITY ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].DeviceType != BBS_HARDDISK
         ) {
-      Ptr += sizeof (UINT16);
       continue;
     }
 
-    NewHDPtr[HDIndex] = *(UINT16 *) Ptr;
+    NewPtr->Data[HDIndex] = Ptr->Data[Index];
     HDIndex++;
-    Ptr += sizeof (UINT16);
   }
+  NewHDPtr = NewPtr->Data;
+
   //
   // copy CD
   //
-  NewPtr                  = (UINT8 *) NewCDPtr - HeaderSize;
-  *((BBS_TYPE *) NewPtr)  = *((BBS_TYPE *) Ptr);
-  Ptr += sizeof (BBS_TYPE);
-  NewPtr += sizeof (BBS_TYPE);
-  Length                = *((UINT16 *) Ptr);
-  *((UINT16 *) NewPtr)  = (UINT16) (sizeof (UINT16) + CDCount * sizeof (UINT16));
-  Ptr += sizeof (UINT16);
-
-  for (Index = 0; Index < Length / sizeof (UINT16) - 1; Index++) {
-    if (LocalBbsTable[*Ptr].BootPriority == BBS_IGNORE_ENTRY ||
-        LocalBbsTable[*Ptr].BootPriority == BBS_DO_NOT_BOOT_FROM ||
-        LocalBbsTable[*Ptr].BootPriority == BBS_LOWEST_PRIORITY ||
-        LocalBbsTable[*Ptr].DeviceType != BBS_CDROM
+  Ptr    = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&Ptr->Data[Ptr->Length / sizeof (UINT16) - 1]);
+  NewPtr = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&NewPtr->Data[NewPtr->Length / sizeof (UINT16) -1]);
+  NewPtr->BbsType = Ptr->BbsType;
+  NewPtr->Length  = (UINT16) (sizeof (UINT16) + CDCount * sizeof (UINT16));
+  for (Index = 0; Index < Ptr->Length / sizeof (UINT16) - 1; Index++) {
+    if (LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_IGNORE_ENTRY ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_DO_NOT_BOOT_FROM ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_LOWEST_PRIORITY ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].DeviceType != BBS_CDROM
         ) {
-      Ptr += sizeof (UINT16);
       continue;
     }
 
-    NewCDPtr[CDIndex] = *(UINT16 *) Ptr;
+    NewPtr->Data[CDIndex] = Ptr->Data[Index];
     CDIndex++;
-    Ptr += sizeof (UINT16);
   }
+  NewCDPtr = NewPtr->Data;
+
   //
   // copy NET
   //
-  NewPtr                  = (UINT8 *) NewNETPtr - HeaderSize;
-  *((BBS_TYPE *) NewPtr)  = *((BBS_TYPE *) Ptr);
-  Ptr += sizeof (BBS_TYPE);
-  NewPtr += sizeof (BBS_TYPE);
-  Length                = *((UINT16 *) Ptr);
-  *((UINT16 *) NewPtr)  = (UINT16) (sizeof (UINT16) + NETCount * sizeof (UINT16));
-  Ptr += sizeof (UINT16);
-
-  for (Index = 0; Index < Length / sizeof (UINT16) - 1; Index++) {
-    if (LocalBbsTable[*Ptr].BootPriority == BBS_IGNORE_ENTRY ||
-        LocalBbsTable[*Ptr].BootPriority == BBS_DO_NOT_BOOT_FROM ||
-        LocalBbsTable[*Ptr].BootPriority == BBS_LOWEST_PRIORITY ||
-        LocalBbsTable[*Ptr].DeviceType != BBS_EMBED_NETWORK
+  Ptr    = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&Ptr->Data[Ptr->Length / sizeof (UINT16) - 1]);
+  NewPtr = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&NewPtr->Data[NewPtr->Length / sizeof (UINT16) -1]);
+  NewPtr->BbsType = Ptr->BbsType;
+  NewPtr->Length  = (UINT16) (sizeof (UINT16) + NETCount * sizeof (UINT16));
+  for (Index = 0; Index < Ptr->Length / sizeof (UINT16) - 1; Index++) {
+    if (LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_IGNORE_ENTRY ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_DO_NOT_BOOT_FROM ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_LOWEST_PRIORITY ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].DeviceType != BBS_EMBED_NETWORK
         ) {
-      Ptr += sizeof (UINT16);
       continue;
     }
 
-    NewNETPtr[NETIndex] = *(UINT16 *) Ptr;
+    NewPtr->Data[NETIndex] = Ptr->Data[Index];
     NETIndex++;
-    Ptr += sizeof (UINT16);
   }
+  NewNETPtr = NewPtr->Data;
+  
   //
   // copy BEV
   //
-  NewPtr                  = (UINT8 *) NewBEVPtr - HeaderSize;
-  *((BBS_TYPE *) NewPtr)  = *((BBS_TYPE *) Ptr);
-  Ptr += sizeof (BBS_TYPE);
-  NewPtr += sizeof (BBS_TYPE);
-  Length                = *((UINT16 *) Ptr);
-  *((UINT16 *) NewPtr)  = (UINT16) (sizeof (UINT16) + BEVCount * sizeof (UINT16));
-  Ptr += sizeof (UINT16);
-
-  for (Index = 0; Index < Length / sizeof (UINT16) - 1; Index++) {
-    if (LocalBbsTable[*Ptr].BootPriority == BBS_IGNORE_ENTRY ||
-        LocalBbsTable[*Ptr].BootPriority == BBS_DO_NOT_BOOT_FROM ||
-        LocalBbsTable[*Ptr].BootPriority == BBS_LOWEST_PRIORITY ||
-        LocalBbsTable[*Ptr].DeviceType != BBS_BEV_DEVICE
+  Ptr    = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&Ptr->Data[Ptr->Length / sizeof (UINT16) - 1]);
+  NewPtr = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&NewPtr->Data[NewPtr->Length / sizeof (UINT16) -1]);
+  NewPtr->BbsType = Ptr->BbsType;
+  NewPtr->Length  = (UINT16) (sizeof (UINT16) + BEVCount * sizeof (UINT16));
+  for (Index = 0; Index < Ptr->Length / sizeof (UINT16) - 1; Index++) {
+    if (LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_IGNORE_ENTRY ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_DO_NOT_BOOT_FROM ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].BootPriority == BBS_LOWEST_PRIORITY ||
+        LocalBbsTable[Ptr->Data[Index] & 0xFF].DeviceType != BBS_BEV_DEVICE
         ) {
-      Ptr += sizeof (UINT16);
       continue;
     }
 
-    NewBEVPtr[BEVIndex] = *(UINT16 *) Ptr;
+    NewPtr->Data[BEVIndex] = Ptr->Data[Index];
     BEVIndex++;
-    Ptr += sizeof (UINT16);
   }
+  NewBEVPtr = NewPtr->Data;
 
   for (Index = 0; Index < BbsCount; Index++) {
     if ((LocalBbsTable[Index].BootPriority == BBS_IGNORE_ENTRY) ||
@@ -1277,7 +1446,7 @@ BdsUpdateLegacyDevOrder (
     // at this point we have copied those valid indexes to new buffer
     // and we should check if there is any new appeared boot device
     //
-    if (Idx != 0) {
+    if (Idx != NULL) {
       for (Index2 = 0; Index2 < *Idx; Index2++) {
         if ((NewDevPtr[Index2] & 0xFF) == (UINT16) Index) {
           break;
@@ -1288,110 +1457,16 @@ BdsUpdateLegacyDevOrder (
         //
         // Index2 == *Idx means we didn't find Index
         // so Index is a new appeared device's index in BBS table
-        // save it.
+        // insert it before disabled indexes.
         //
-        NewDevPtr[*Idx] = (UINT16) (Index & 0xFF);
+        for (Index2 = 0; Index2 < *Idx; Index2++) {
+          if ((NewDevPtr[Index2] & 0xFF00) == 0xFF00) {
+            break;
+          }
+        }
+        CopyMem (&NewDevPtr[Index2 + 1], &NewDevPtr[Index2], (*Idx - Index2) * sizeof (UINT16));
+        NewDevPtr[Index2] = (UINT16) (Index & 0xFF);
         (*Idx)++;
-      }
-    }
-  }
-
-  if (FDCount != 0) {
-    //
-    // Just to make sure that disabled indexes are all at the end of the array
-    //
-    for (Index = 0; Index < FDIndex - 1; Index++) {
-      if (0xFF00 != (NewFDPtr[Index] & 0xFF00)) {
-        continue;
-      }
-
-      for (Index2 = Index + 1; Index2 < FDIndex; Index2++) {
-        if (0 == (NewFDPtr[Index2] & 0xFF00)) {
-          Tmp               = NewFDPtr[Index];
-          NewFDPtr[Index]   = NewFDPtr[Index2];
-          NewFDPtr[Index2]  = Tmp;
-          break;
-        }
-      }
-    }
-  }
-
-  if (HDCount != 0) {
-    //
-    // Just to make sure that disabled indexes are all at the end of the array
-    //
-    for (Index = 0; Index < HDIndex - 1; Index++) {
-      if (0xFF00 != (NewHDPtr[Index] & 0xFF00)) {
-        continue;
-      }
-
-      for (Index2 = Index + 1; Index2 < HDIndex; Index2++) {
-        if (0 == (NewHDPtr[Index2] & 0xFF00)) {
-          Tmp               = NewHDPtr[Index];
-          NewHDPtr[Index]   = NewHDPtr[Index2];
-          NewHDPtr[Index2]  = Tmp;
-          break;
-        }
-      }
-    }
-  }
-
-  if (CDCount != 0) {
-    //
-    // Just to make sure that disabled indexes are all at the end of the array
-    //
-    for (Index = 0; Index < CDIndex - 1; Index++) {
-      if (0xFF00 != (NewCDPtr[Index] & 0xFF00)) {
-        continue;
-      }
-
-      for (Index2 = Index + 1; Index2 < CDIndex; Index2++) {
-        if (0 == (NewCDPtr[Index2] & 0xFF00)) {
-          Tmp               = NewCDPtr[Index];
-          NewCDPtr[Index]   = NewCDPtr[Index2];
-          NewCDPtr[Index2]  = Tmp;
-          break;
-        }
-      }
-    }
-  }
-
-  if (NETCount != 0) {
-    //
-    // Just to make sure that disabled indexes are all at the end of the array
-    //
-    for (Index = 0; Index < NETIndex - 1; Index++) {
-      if (0xFF00 != (NewNETPtr[Index] & 0xFF00)) {
-        continue;
-      }
-
-      for (Index2 = Index + 1; Index2 < NETIndex; Index2++) {
-        if (0 == (NewNETPtr[Index2] & 0xFF00)) {
-          Tmp               = NewNETPtr[Index];
-          NewNETPtr[Index]  = NewNETPtr[Index2];
-          NewNETPtr[Index2] = Tmp;
-          break;
-        }
-      }
-    }
-  }
-
-  if (BEVCount!= 0) {
-    //
-    // Just to make sure that disabled indexes are all at the end of the array
-    //
-    for (Index = 0; Index < BEVIndex - 1; Index++) {
-      if (0xFF00 != (NewBEVPtr[Index] & 0xFF00)) {
-        continue;
-      }
-
-      for (Index2 = Index + 1; Index2 < BEVIndex; Index2++) {
-        if (0 == (NewBEVPtr[Index2] & 0xFF00)) {
-          Tmp               = NewBEVPtr[Index];
-          NewBEVPtr[Index]  = NewBEVPtr[Index2];
-          NewBEVPtr[Index2] = Tmp;
-          break;
-        }
       }
     }
   }
@@ -1414,6 +1489,7 @@ BdsUpdateLegacyDevOrder (
   Set Boot Priority for specified device type.
 
   @param DeviceType      The device type.
+  @param BbsIndex        The BBS index to set the highest priority. Ignore when -1.
   @param LocalBbsTable   The BBS table.
   @param Priority        The prority table.
 
@@ -1425,60 +1501,58 @@ BdsUpdateLegacyDevOrder (
 EFI_STATUS
 BdsSetBootPriority4SameTypeDev (
   IN UINT16                                              DeviceType,
+  IN UINTN                                               BbsIndex,
   IN OUT BBS_TABLE                                       *LocalBbsTable,
   IN OUT UINT16                                          *Priority
   )
 {
-  UINT8   *DevOrder;
-
-  UINT8   *OrigBuffer;
-  UINT16  *DevIndex;
-  UINTN   DevOrderSize;
-  UINTN   DevCount;
-  UINTN   Index;
+  BM_LEGACY_DEV_ORDER_CONTEXT *DevOrder;
+  BM_LEGACY_DEV_ORDER_CONTEXT *DevOrderPtr;
+  UINTN                       DevOrderSize;
+  UINTN                       Index;
 
   DevOrder = BdsLibGetVariableAndSize (
-              VAR_LEGACY_DEV_ORDER,
-              &EfiLegacyDevOrderGuid,
-              &DevOrderSize
-              );
+               VAR_LEGACY_DEV_ORDER,
+               &EfiLegacyDevOrderGuid,
+               &DevOrderSize
+               );
   if (NULL == DevOrder) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  OrigBuffer = DevOrder;
-  while (DevOrder < OrigBuffer + DevOrderSize) {
-    if (DeviceType == * (BBS_TYPE *) DevOrder) {
+  DevOrderPtr = DevOrder;
+  while ((UINT8 *) DevOrderPtr < (UINT8 *) DevOrder + DevOrderSize) {
+    if (DevOrderPtr->BbsType == DeviceType) {
       break;
     }
 
-    DevOrder += sizeof (BBS_TYPE);
-    DevOrder += *(UINT16 *) DevOrder;
+    DevOrderPtr = (BM_LEGACY_DEV_ORDER_CONTEXT *) ((UINT8 *) DevOrderPtr + sizeof (BBS_TYPE) + DevOrderPtr->Length);
   }
 
-  if (DevOrder >= OrigBuffer + DevOrderSize) {
-    FreePool (OrigBuffer);
+  if ((UINT8 *) DevOrderPtr >= (UINT8 *) DevOrder + DevOrderSize) {
+    FreePool (DevOrder);
     return EFI_NOT_FOUND;
   }
 
-  DevOrder += sizeof (BBS_TYPE);
-  DevCount  = (*((UINT16 *) DevOrder) - sizeof (UINT16)) / sizeof (UINT16);
-  DevIndex  = (UINT16 *) (DevOrder + sizeof (UINT16));
+  if (BbsIndex != (UINTN) -1) {
+    LocalBbsTable[BbsIndex].BootPriority = *Priority;
+    (*Priority)++;
+  }
   //
   // If the high byte of the DevIndex is 0xFF, it indicates that this device has been disabled.
   //
-  for (Index = 0; Index < DevCount; Index++) {
-    if ((DevIndex[Index] & 0xFF00) == 0xFF00) {
+  for (Index = 0; Index < DevOrderPtr->Length / sizeof (UINT16) - 1; Index++) {
+    if ((DevOrderPtr->Data[Index] & 0xFF00) == 0xFF00) {
       //
       // LocalBbsTable[DevIndex[Index] & 0xFF].BootPriority = BBS_DISABLED_ENTRY;
       //
-    } else {
-      LocalBbsTable[DevIndex[Index] & 0xFF].BootPriority = *Priority;
+    } else if (DevOrderPtr->Data[Index] != BbsIndex) {
+      LocalBbsTable[DevOrderPtr->Data[Index]].BootPriority = *Priority;
       (*Priority)++;
     }
   }
 
-  FreePool (OrigBuffer);
+  FreePool (DevOrder);
   return EFI_SUCCESS;
 }
 
@@ -1545,6 +1619,7 @@ BdsRefreshBbsTableForBoot (
   )
 {
   EFI_STATUS                Status;
+  UINT16                    BbsIndex;
   UINT16                    HddCount;
   UINT16                    BbsCount;
   HDD_INFO                  *LocalHddInfo;
@@ -1557,10 +1632,13 @@ BdsRefreshBbsTableForBoot (
   UINTN                     BootOrderSize;
   UINT8                     *BootOptionVar;
   UINTN                     BootOptionSize;
-  UINT16                    BootOption[100];
+  CHAR16                    BootOption[9];
   UINT8                     *Ptr;
   UINT16                    DevPathLen;
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
+  UINT16                    *DeviceType;
+  UINTN                     DeviceTypeCount;
+  UINTN                     DeviceTypeIndex;
 
   HddCount      = 0;
   BbsCount      = 0;
@@ -1599,9 +1677,11 @@ BdsRefreshBbsTableForBoot (
     //
     // If Entry stands for a legacy boot option, we prioritize the devices with the same type first.
     //
-    DevType = ((BBS_TABLE *) Entry->LoadOptions)->DeviceType;
+    DevType  = ((BBS_TABLE *) Entry->LoadOptions)->DeviceType;
+    BbsIndex = *(UINT16 *) ((BBS_TABLE *) Entry->LoadOptions + 1);
     Status = BdsSetBootPriority4SameTypeDev (
               DevType,
+              BbsIndex,
               LocalBbsTable,
               &Priority
               );
@@ -1612,11 +1692,16 @@ BdsRefreshBbsTableForBoot (
   //
   // we have to set the boot priority for other BBS entries with different device types
   //
-  BootOrder = (UINT16 *) BdsLibGetVariableAndSize (
-                          L"BootOrder",
-                          &gEfiGlobalVariableGuid,
-                          &BootOrderSize
-                          );
+  BootOrder = BdsLibGetVariableAndSize (
+                L"BootOrder",
+                &gEfiGlobalVariableGuid,
+                &BootOrderSize
+                );
+  DeviceType = AllocatePool (BootOrderSize + sizeof (UINT16));
+  ASSERT (DeviceType != NULL);
+
+  DeviceType[0]   = DevType;
+  DeviceTypeCount = 1;
   for (Index = 0; ((BootOrder != NULL) && (Index < BootOrderSize / sizeof (UINT16))); Index++) {
     UnicodeSPrint (BootOption, sizeof (BootOption), L"Boot%04x", BootOrder[Index]);
     BootOptionVar = BdsLibGetVariableAndSize (
@@ -1641,7 +1726,13 @@ BdsRefreshBbsTableForBoot (
     }
 
     Ptr += DevPathLen;
-    if (DevType == ((BBS_TABLE *) Ptr)->DeviceType) {
+    DevType = ((BBS_TABLE *) Ptr)->DeviceType;
+    for (DeviceTypeIndex = 0; DeviceTypeIndex < DeviceTypeCount; DeviceTypeIndex++) {
+      if (DeviceType[DeviceTypeIndex] == DevType) {
+        break;
+      }
+    }
+    if (DeviceTypeIndex < DeviceTypeCount) {
       //
       // We don't want to process twice for a device type
       //
@@ -1649,8 +1740,12 @@ BdsRefreshBbsTableForBoot (
       continue;
     }
 
+    DeviceType[DeviceTypeCount] = DevType;
+    DeviceTypeCount++;
+
     Status = BdsSetBootPriority4SameTypeDev (
-              ((BBS_TABLE *) Ptr)->DeviceType,
+              DevType,
+              (UINTN) -1,
               LocalBbsTable,
               &Priority
               );

@@ -5,7 +5,7 @@
 
   Boot option manipulation
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -529,6 +529,7 @@ BOpt_FreeMenu (
     RemoveEntryList (&MenuEntry->Link);
     BOpt_DestroyMenuEntry (MenuEntry);
   }
+  FreeMenu->MenuNumber = 0;
 }
 
 /**
@@ -707,7 +708,7 @@ BOpt_GetLegacyOptions (
   HDD_INFO                  *HddInfo;
   UINT16                    BbsCount;
   BBS_TABLE                 *BbsTable;
-  UINTN                     Index;
+  UINT16                    Index;
   CHAR16                    DescString[100];
   UINTN                     FDNum;
   UINTN                     HDNum;
@@ -766,8 +767,8 @@ BOpt_GetLegacyOptions (
     }
 
     NewLegacyDevContext           = (BM_LEGACY_DEVICE_CONTEXT *) NewMenuEntry->VariableContext;
-    NewLegacyDevContext->BbsTable = &BbsTable[Index];
-    NewLegacyDevContext->Index    = Index;
+    NewLegacyDevContext->BbsEntry = &BbsTable[Index];
+    NewLegacyDevContext->BbsIndex = Index;
     NewLegacyDevContext->BbsCount = BbsCount;
     BdsBuildLegacyDevNameString (
       &BbsTable[Index],
@@ -775,12 +776,11 @@ BOpt_GetLegacyOptions (
       sizeof (DescString),
       DescString
       );
-    NewLegacyDevContext->Description = AllocateZeroPool (StrSize (DescString));
+    NewLegacyDevContext->Description = AllocateCopyPool (StrSize (DescString), DescString);
     if (NULL == NewLegacyDevContext->Description) {
       break;
     }
 
-    CopyMem (NewLegacyDevContext->Description, DescString, StrSize (DescString));
     NewMenuEntry->DisplayString = NewLegacyDevContext->Description;
     NewMenuEntry->HelpString    = NULL;
 

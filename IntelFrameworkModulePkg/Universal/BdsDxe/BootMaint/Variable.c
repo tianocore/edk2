@@ -849,7 +849,6 @@ Var_UpdateBootOption (
   NewBootOrderList[BootOrderListSize / sizeof (UINT16)] = Index;
 
   if (BootOrderList != NULL) {
-    EfiLibDeleteVariable (L"BootOrder", &gEfiGlobalVariableGuid);
     FreePool (BootOrderList);
   }
 
@@ -949,9 +948,10 @@ Var_UpdateBootOrder (
 {
   EFI_STATUS  Status;
   UINT16      Index;
+  UINT16      OrderIndex;
   UINT16      *BootOrderList;
-  UINT16      *NewBootOrderList;
   UINTN       BootOrderListSize;
+  UINT16      OptionNumber;
 
   BootOrderList     = NULL;
   BootOrderListSize = 0;
@@ -964,41 +964,40 @@ Var_UpdateBootOrder (
                     &gEfiGlobalVariableGuid,
                     &BootOrderListSize
                     );
-
-  NewBootOrderList = AllocateZeroPool (BootOrderListSize);
-  if (NewBootOrderList == NULL) {
+  if (BootOrderList == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  //
-  // If exists, delete it to hold new BootOrder
-  //
-  if (BootOrderList != NULL) {
-    EfiLibDeleteVariable (L"BootOrder", &gEfiGlobalVariableGuid);
-    FreePool (BootOrderList);
+  ASSERT (BootOptionMenu.MenuNumber <= (sizeof (CallbackData->BmmFakeNvData.OptionOrder) / sizeof (CallbackData->BmmFakeNvData.OptionOrder[0])));
+
+  for (OrderIndex = 0; (OrderIndex < BootOptionMenu.MenuNumber) && (CallbackData->BmmFakeNvData.OptionOrder[OrderIndex] != 0); OrderIndex++) {
+    for (Index = OrderIndex; Index < BootOrderListSize / sizeof (UINT16); Index++) {
+      if ((BootOrderList[Index] == (UINT16) (CallbackData->BmmFakeNvData.OptionOrder[OrderIndex] - 1)) && (OrderIndex != Index)) {
+        OptionNumber = BootOrderList[Index];
+        CopyMem (&BootOrderList[OrderIndex + 1], &BootOrderList[OrderIndex], (Index - OrderIndex) * sizeof (UINT16));
+        BootOrderList[OrderIndex] = OptionNumber;
+      }
+    }
   }
 
-  ASSERT (BootOptionMenu.MenuNumber <= (sizeof (CallbackData->BmmFakeNvData.OptionOrder) / sizeof (CallbackData->BmmFakeNvData.OptionOrder[0])));
-  for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
-    NewBootOrderList[Index] = (UINT16) (CallbackData->BmmFakeNvData.OptionOrder[Index] - 1);
-  }
+  GroupMultipleLegacyBootOption4SameType (
+    BootOrderList,
+    BootOrderListSize / sizeof (UINT16)
+    );
 
   Status = gRT->SetVariable (
                   L"BootOrder",
                   &gEfiGlobalVariableGuid,
                   VAR_FLAG,
                   BootOrderListSize,
-                  NewBootOrderList
+                  BootOrderList
                   );
-  FreePool (NewBootOrderList);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  FreePool (BootOrderList);
 
   BOpt_FreeMenu (&BootOptionMenu);
   BOpt_GetBootOptions (CallbackData);
 
-  return EFI_SUCCESS;
+  return Status;
 
 }
 
@@ -1092,20 +1091,12 @@ Var_UpdateBBSOption (
   VOID                        *BootOptionVar;
   CHAR16                      VarName[100];
   UINTN                       OptionSize;
-  UINT8                       *Ptr;
   EFI_STATUS                  Status;
-  CHAR16                      DescString[100];
-  CHAR8                       DescAsciiString[100];
-  UINTN                       NewOptionSize;
-  UINT8                       *NewOptionPtr;
-  UINT8                       *TempPtr;
   UINT32                      *Attribute;
   BM_MENU_OPTION              *OptionMenu;
-  BM_LEGACY_DEVICE_CONTEXT    *LegacyDeviceContext;
   UINT8                       *LegacyDev;
   UINT8                       *VarData;
   UINTN                       VarSize;
-  BM_MENU_ENTRY               *NewMenuEntry;
   BM_LEGACY_DEV_ORDER_CONTEXT *DevOrder;
   UINT8                       *OriginalPtr;
   UINT8                       *DisMap;
@@ -1113,56 +1104,51 @@ Var_UpdateBBSOption (
   UINTN                       Bit;
   UINT16                      *NewOrder;
   UINT16                      Tmp;
+  UINT16                      *EnBootOption;
+  UINTN                       EnBootOptionCount;
+  UINT16                      *DisBootOption;
+  UINTN                       DisBootOptionCount;
+  UINT16                      *BootOrder;
 
-  LegacyDeviceContext = NULL;
   DisMap              = NULL;
   NewOrder            = NULL;
 
-  if (FORM_SET_FD_ORDER_ID == CallbackData->BmmPreviousPageId) {
-    OptionMenu            = (BM_MENU_OPTION *) &LegacyFDMenu;
-    LegacyDev             = CallbackData->BmmFakeNvData.LegacyFD;
-    CallbackData->BbsType = BBS_FLOPPY;
-  } else {
-    if (FORM_SET_HD_ORDER_ID == CallbackData->BmmPreviousPageId) {
+  switch (CallbackData->BmmPreviousPageId) {
+    case FORM_SET_FD_ORDER_ID:
+      OptionMenu            = (BM_MENU_OPTION *) &LegacyFDMenu;
+      LegacyDev             = CallbackData->BmmFakeNvData.LegacyFD;
+      CallbackData->BbsType = BBS_FLOPPY;
+      break;
+
+    case FORM_SET_HD_ORDER_ID:
       OptionMenu            = (BM_MENU_OPTION *) &LegacyHDMenu;
       LegacyDev             = CallbackData->BmmFakeNvData.LegacyHD;
       CallbackData->BbsType = BBS_HARDDISK;
-    } else {
-      if (FORM_SET_CD_ORDER_ID == CallbackData->BmmPreviousPageId) {
-        OptionMenu            = (BM_MENU_OPTION *) &LegacyCDMenu;
-        LegacyDev             = CallbackData->BmmFakeNvData.LegacyCD;
-        CallbackData->BbsType = BBS_CDROM;
-      } else {
-        if (FORM_SET_NET_ORDER_ID == CallbackData->BmmPreviousPageId) {
-          OptionMenu            = (BM_MENU_OPTION *) &LegacyNETMenu;
-          LegacyDev             = CallbackData->BmmFakeNvData.LegacyNET;
-          CallbackData->BbsType = BBS_EMBED_NETWORK;
-        } else {
-          OptionMenu            = (BM_MENU_OPTION *) &LegacyBEVMenu;
-          LegacyDev             = CallbackData->BmmFakeNvData.LegacyBEV;
-          CallbackData->BbsType = BBS_BEV_DEVICE;
-        }
-      }
-    }
+      break;
+
+    case FORM_SET_CD_ORDER_ID:
+      OptionMenu            = (BM_MENU_OPTION *) &LegacyCDMenu;
+      LegacyDev             = CallbackData->BmmFakeNvData.LegacyCD;
+      CallbackData->BbsType = BBS_CDROM;
+      break;
+
+    case FORM_SET_NET_ORDER_ID:
+      OptionMenu            = (BM_MENU_OPTION *) &LegacyNETMenu;
+      LegacyDev             = CallbackData->BmmFakeNvData.LegacyNET;
+      CallbackData->BbsType = BBS_EMBED_NETWORK;
+      break;
+
+    default:
+      ASSERT (FORM_SET_BEV_ORDER_ID == CallbackData->BmmPreviousPageId);
+      OptionMenu            = (BM_MENU_OPTION *) &LegacyBEVMenu;
+      LegacyDev             = CallbackData->BmmFakeNvData.LegacyBEV;
+      CallbackData->BbsType = BBS_BEV_DEVICE;
+      break;
   }
 
   DisMap  = CallbackData->BmmOldFakeNVData.DisableMap;
   Status  = EFI_SUCCESS;
 
-  //
-  // Find the first device's context
-  // If all devices are disabled( 0xFF == LegacyDev[0]), LegacyDeviceContext can be set to any VariableContext
-  // because we just use it to fill the desc string, and user can not see the string in UI
-  //
-  for (Index = 0; Index < OptionMenu->MenuNumber; Index++) {
-    NewMenuEntry        = BOpt_GetMenuEntry (OptionMenu, Index);
-    LegacyDeviceContext = (BM_LEGACY_DEVICE_CONTEXT *) NewMenuEntry->VariableContext;
-    if (0xFF != LegacyDev[0] && LegacyDev[0] == LegacyDeviceContext->Index) {
-      DEBUG ((DEBUG_ERROR, "DescStr: %s\n", LegacyDeviceContext->Description));
-      break;
-    }
-  }
-  ASSERT (LegacyDeviceContext != NULL);
 
   //
   // Update the Variable "LegacyDevOrder"
@@ -1180,24 +1166,23 @@ Var_UpdateBBSOption (
   OriginalPtr = VarData;
   DevOrder    = (BM_LEGACY_DEV_ORDER_CONTEXT *) VarData;
 
-  while (VarData < VarData + VarSize) {
+  while (VarData < OriginalPtr + VarSize) {
     if (DevOrder->BbsType == CallbackData->BbsType) {
       break;
     }
 
-    VarData += sizeof (BBS_TYPE);
-    VarData += *(UINT16 *) VarData;
+    VarData += sizeof (BBS_TYPE) + DevOrder->Length;
     DevOrder = (BM_LEGACY_DEV_ORDER_CONTEXT *) VarData;
   }
 
-  if (VarData >= VarData + VarSize) {
+  if (VarData >= OriginalPtr + VarSize) {
     FreePool (OriginalPtr);
     return EFI_NOT_FOUND;
   }
 
-  NewOrder = (UINT16 *) AllocateZeroPool (DevOrder->Length - sizeof (UINT16));
+  NewOrder = AllocateZeroPool (DevOrder->Length - sizeof (DevOrder->Length));
   if (NewOrder == NULL) {
-    FreePool (VarData);
+    FreePool (OriginalPtr);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1215,8 +1200,7 @@ Var_UpdateBBSOption (
   // so we use DisMap to set en/dis state of each item in NewOrder array
   //
   for (Index2 = 0; Index2 < OptionMenu->MenuNumber; Index2++) {
-    Tmp = *(UINT16 *) ((UINT8 *) DevOrder + sizeof (BBS_TYPE) + sizeof (UINT16) + Index2 * sizeof (UINT16));
-    Tmp &= 0xFF;
+    Tmp = (UINT16) (DevOrder->Data[Index2] & 0xFF);
     Pos = Tmp / 8;
     Bit = 7 - (Tmp % 8);
     if ((DisMap[Pos] & (1 << Bit)) != 0) {
@@ -1226,9 +1210,9 @@ Var_UpdateBBSOption (
   }
 
   CopyMem (
-    (UINT8 *) DevOrder + sizeof (BBS_TYPE) + sizeof (UINT16),
+    DevOrder->Data,
     NewOrder,
-    DevOrder->Length - sizeof (UINT16)
+    DevOrder->Length - sizeof (DevOrder->Length)
     );
   FreePool (NewOrder);
 
@@ -1240,143 +1224,101 @@ Var_UpdateBBSOption (
                   OriginalPtr
                   );
 
-  FreePool (OriginalPtr);
 
   //
-  // Update Optional Data of Boot####
+  // Update BootOrder and Boot####.Attribute
   //
-  BootOptionVar = GetLegacyBootOptionVar (CallbackData->BbsType, &Index, &OptionSize);
+  // 1. Re-order the Option Number in BootOrder according to Legacy Dev Order
+  //
+  ASSERT (OptionMenu->MenuNumber == DevOrder->Length / sizeof (UINT16) - 1);
+  BootOrder = BdsLibGetVariableAndSize (
+                L"BootOrder",
+                &gEfiGlobalVariableGuid,
+                &VarSize
+                );
+  ASSERT (BootOrder != NULL);
 
-  if (BootOptionVar != NULL) {
-    CopyMem (
-      DescString,
-      LegacyDeviceContext->Description,
-      StrSize (LegacyDeviceContext->Description)
-      );
-
-	UnicodeStrToAsciiStr((CONST CHAR16*)&DescString, (CHAR8 *)&DescAsciiString);
-
-    NewOptionSize = sizeof (UINT32) + sizeof (UINT16) + StrSize (DescString) +
-                    sizeof (BBS_BBS_DEVICE_PATH);
-    NewOptionSize += AsciiStrLen (DescAsciiString) +
-                    END_DEVICE_PATH_LENGTH + sizeof (BBS_TABLE) + sizeof (UINT16);
-
-    UnicodeSPrint (VarName, 100, L"Boot%04x", Index);
-
-    Ptr       = BootOptionVar;
-
-    Attribute = (UINT32 *) Ptr;
-    *Attribute |= LOAD_OPTION_ACTIVE;
-    if (LegacyDev[0] == 0xFF) {
-      //
-      // Disable this legacy boot option
-      //
-      *Attribute &= ~LOAD_OPTION_ACTIVE;
-    }
-
-    Ptr += sizeof (UINT32);
-
-    Ptr += sizeof (UINT16);
-    Ptr += StrSize ((CHAR16 *) Ptr);
-
-    NewOptionPtr = AllocateZeroPool (NewOptionSize);
-    if (NewOptionPtr == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    TempPtr = NewOptionPtr;
-
-    //
-    // Attribute
-    //
-    CopyMem (
-      TempPtr,
-      BootOptionVar,
-      sizeof (UINT32)
-      );
-
-    TempPtr += sizeof (UINT32);
-
-    //
-    // BBS device path Length
-    //
-    *((UINT16 *) TempPtr) = (UINT16) (sizeof (BBS_BBS_DEVICE_PATH) +
-                         AsciiStrLen (DescAsciiString) +
-                         END_DEVICE_PATH_LENGTH);
-
-    TempPtr += sizeof (UINT16);
-
-    //
-    // Description string
-    //
-    CopyMem (
-      TempPtr,
-      DescString,
-      StrSize (DescString)
-      );
-
-    TempPtr += StrSize (DescString);
-
-    //
-    // BBS device path
-    //
-    CopyMem (
-      TempPtr,
-      Ptr,
-      sizeof (BBS_BBS_DEVICE_PATH)
-      );
-
-    CopyMem (
-      ((BBS_BBS_DEVICE_PATH*) TempPtr)->String,
-      DescAsciiString,
-      AsciiStrSize (DescAsciiString)
-      );
-
-    SetDevicePathNodeLength (
-          (EFI_DEVICE_PATH_PROTOCOL *) TempPtr,
-          sizeof (BBS_BBS_DEVICE_PATH) + AsciiStrLen (DescAsciiString)
-          );
-
-    TempPtr += sizeof (BBS_BBS_DEVICE_PATH) + AsciiStrLen (DescAsciiString);
-
-    //
-    // End node
-    //
-    CopyMem (
-      TempPtr,
-      EndDevicePath,
-      END_DEVICE_PATH_LENGTH
-      );
-    TempPtr += END_DEVICE_PATH_LENGTH;
-
-    //
-    // Now TempPtr point to optional data, i.e. Bbs Table
-    //
-    CopyMem (
-      TempPtr,
-      LegacyDeviceContext->BbsTable,
-      sizeof (BBS_TABLE)
-      );
-
-    //
-    // Now TempPtr point to BBS index
-    //
-    TempPtr += sizeof (BBS_TABLE);
-    *((UINT16 *) TempPtr) = (UINT16) LegacyDeviceContext->Index;
-
-    Status = gRT->SetVariable (
-                    VarName,
+  DisBootOption = AllocatePool (VarSize);
+  ASSERT (DisBootOption != NULL);
+  EnBootOption  = AllocatePool (VarSize);
+  ASSERT (EnBootOption  != NULL);
+  
+  OrderLegacyBootOption4SameType (
+    BootOrder,
+    VarSize / sizeof (UINT16),
+    DevOrder->Data,
+    DevOrder->Length / sizeof (UINT16) - 1,
+    EnBootOption,
+    &EnBootOptionCount,
+    DisBootOption,
+    &DisBootOptionCount
+    );
+  
+  Status = gRT->SetVariable (
+                    L"BootOrder",
                     &gEfiGlobalVariableGuid,
                     VAR_FLAG,
-                    NewOptionSize,
-                    NewOptionPtr
+                    VarSize,
+                    BootOrder
                     );
+  ASSERT_EFI_ERROR (Status);
 
-    FreePool (NewOptionPtr);
-    FreePool (BootOptionVar);
+  FreePool (BootOrder);
+
+  //
+  // 2. Deactivate the DisBootOption and activate the EnBootOption
+  //
+  for (Index = 0; Index < DisBootOptionCount; Index++) {
+    UnicodeSPrint (VarName, sizeof (VarName), L"Boot%04x", DisBootOption[Index]);
+    BootOptionVar = BdsLibGetVariableAndSize (
+                      VarName,
+                      &gEfiGlobalVariableGuid,
+                      &OptionSize
+                      );
+    if (BootOptionVar != NULL) {
+      Attribute   = (UINT32 *) BootOptionVar;
+      *Attribute &= ~LOAD_OPTION_ACTIVE;
+
+      Status = gRT->SetVariable (
+                      VarName,
+                      &gEfiGlobalVariableGuid,
+                      VAR_FLAG,
+                      OptionSize,
+                      BootOptionVar
+                      );
+
+      FreePool (BootOptionVar);
+    }
+  }
+
+  for (Index = 0; Index < EnBootOptionCount; Index++) {
+    UnicodeSPrint (VarName, sizeof (VarName), L"Boot%04x", EnBootOption[Index]);
+    BootOptionVar = BdsLibGetVariableAndSize (
+                      VarName,
+                      &gEfiGlobalVariableGuid,
+                      &OptionSize
+                      );
+    if (BootOptionVar != NULL) {
+      Attribute   = (UINT32 *) BootOptionVar;
+      *Attribute |= LOAD_OPTION_ACTIVE;
+
+      Status = gRT->SetVariable (
+                      VarName,
+                      &gEfiGlobalVariableGuid,
+                      VAR_FLAG,
+                      OptionSize,
+                      BootOptionVar
+                      );
+
+      FreePool (BootOptionVar);
+    }
   }
 
   BOpt_GetBootOptions (CallbackData);
+
+  FreePool (OriginalPtr);
+  FreePool (EnBootOption);
+  FreePool (DisBootOption);
   return Status;
 }
 

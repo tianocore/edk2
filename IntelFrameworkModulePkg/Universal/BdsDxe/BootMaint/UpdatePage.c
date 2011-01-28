@@ -535,10 +535,14 @@ UpdateOrderPage (
   IN BMM_CALLBACK_DATA                *CallbackData
   )
 {
-  BM_MENU_ENTRY *NewMenuEntry;
-  UINT16        Index;
-  VOID          *OptionsOpCodeHandle;
+  BM_MENU_ENTRY   *NewMenuEntry;
+  UINT16          Index;
+  UINT16          OptionOrderIndex;
+  VOID            *OptionsOpCodeHandle;
+  UINTN           DeviceType;
+  BM_LOAD_CONTEXT *NewLoadContext;
 
+  DeviceType                    = (UINTN) -1;
   CallbackData->BmmAskSaveOrNot = TRUE;
 
   UpdatePageStart (CallbackData);
@@ -551,10 +555,10 @@ UpdateOrderPage (
   ASSERT (OptionsOpCodeHandle != NULL);
   
   for (
-        Index = 0;
+        Index = 0, OptionOrderIndex = 0;
         (
           (Index < OptionMenu->MenuNumber) &&
-          (Index <
+          (OptionOrderIndex <
             (
               sizeof (CallbackData->BmmFakeNvData.OptionOrder) /
               sizeof (CallbackData->BmmFakeNvData.OptionOrder[0])
@@ -563,7 +567,20 @@ UpdateOrderPage (
         );
         Index++
       ) {
-    NewMenuEntry = BOpt_GetMenuEntry (OptionMenu, Index);
+    NewMenuEntry   = BOpt_GetMenuEntry (OptionMenu, Index);
+    NewLoadContext = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
+
+    if (NewLoadContext->IsLegacy) {
+      if (((BBS_BBS_DEVICE_PATH *) NewLoadContext->FilePathList)->DeviceType != DeviceType) {
+        DeviceType = ((BBS_BBS_DEVICE_PATH *) NewLoadContext->FilePathList)->DeviceType;
+      } else {
+        //
+        // Only show one legacy boot option for the same device type
+        // assuming the boot options are grouped by the device type
+        //
+        continue;
+      }
+    }
     HiiCreateOneOfOptionOpCode (
       OptionsOpCodeHandle,
       NewMenuEntry->DisplayStringToken,
@@ -571,7 +588,7 @@ UpdateOrderPage (
       EFI_IFR_TYPE_NUM_SIZE_32,
       (UINT32) (NewMenuEntry->OptionNumber + 1)
       );
-    CallbackData->BmmFakeNvData.OptionOrder[Index] = (UINT32) (NewMenuEntry->OptionNumber + 1);
+    CallbackData->BmmFakeNvData.OptionOrder[OptionOrderIndex++] = (UINT32) (NewMenuEntry->OptionNumber + 1);
   }
 
   if (OptionMenu->MenuNumber > 0) {
@@ -1241,9 +1258,8 @@ UpdateSetLegacyDeviceOrderPage (
   CallbackData->BmmAskSaveOrNot = TRUE;
   UpdatePageStart (CallbackData);
 
-  DisMap = CallbackData->BmmOldFakeNVData.DisableMap;
+  DisMap = ZeroMem (CallbackData->BmmOldFakeNVData.DisableMap, sizeof (CallbackData->BmmOldFakeNVData.DisableMap));
 
-  SetMem (DisMap, 32, 0);
   //
   // Create oneof option list
   //
@@ -1311,19 +1327,19 @@ UpdateSetLegacyDeviceOrderPage (
   for (Index = 0; Index < OptionMenu->MenuNumber; Index++) {
     NewMenuEntry                = BOpt_GetMenuEntry (OptionMenu, Index);
     //
-    // Create OneOf for each legacy device, select the first one by default
+    // Create OneOf for each legacy device
     //
     HiiCreateOneOfOptionOpCode (
       OptionsOpCodeHandle,
       NewMenuEntry->DisplayStringToken,
-      (UINT8) ((Index == 0) ? EFI_IFR_OPTION_DEFAULT : 0),
+      0,
       EFI_IFR_TYPE_NUM_SIZE_8,
-      (UINT8) ((BM_LEGACY_DEVICE_CONTEXT *) NewMenuEntry->VariableContext)->Index
+      (UINT8) ((BM_LEGACY_DEVICE_CONTEXT *) NewMenuEntry->VariableContext)->BbsIndex
       );
   }
 
   //
-  // for item "Disabled"
+  // Create OneOf for item "Disabled"
   //
   HiiCreateOneOfOptionOpCode (
     OptionsOpCodeHandle,

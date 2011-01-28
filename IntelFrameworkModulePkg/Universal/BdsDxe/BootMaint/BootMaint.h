@@ -252,13 +252,23 @@ typedef struct {
 } COM_ATTR;
 
 #pragma pack(1)
+///
+/// For each legacy boot option in BBS table, a corresponding Boot#### variables is created.
+/// The structure saves the mapping relationship between #### and the index in the BBS table.
+///
+typedef struct {
+  UINT16    BootOptionNumber;
+  UINT16    BbsIndex;
+  UINT16    BbsType;
+} BOOT_OPTION_BBS_MAPPING;
+
 typedef struct {
   BBS_TYPE  BbsType;
   ///
   /// Length = sizeof (UINT16) + SIZEOF (Data)
   ///
   UINT16    Length;
-  UINT16    *Data;
+  UINT16    Data[1];
 } BM_LEGACY_DEV_ORDER_CONTEXT;
 #pragma pack()
 
@@ -304,10 +314,10 @@ typedef struct {
 } BM_LOAD_CONTEXT;
 
 typedef struct {
-  BBS_TABLE *BbsTable;
-  UINTN     Index;
-  UINTN     BbsCount;
-  UINT16    *Description;
+  BBS_TABLE *BbsEntry;
+  UINT16    BbsIndex;
+  UINT16    BbsCount;
+  CHAR16    *Description;
 } BM_LEGACY_DEVICE_CONTEXT;
 
 typedef struct {
