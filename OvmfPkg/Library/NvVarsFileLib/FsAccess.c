@@ -1,7 +1,7 @@
 /** @file
   File System Access for NvVarsFileLib
 
-  Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -233,6 +233,7 @@ ReadNvVarsFile (
   UINTN                       FileSize;
   BOOLEAN                     FileExists;
   VOID                        *FileContents;
+  EFI_HANDLE                  SerializedVariables;
 
   Status = GetNvVarsFile (FsHandle, TRUE, &File);
   if (EFI_ERROR (Status)) {
@@ -258,7 +259,14 @@ ReadNvVarsFile (
     FileSize
     ));
 
-  Status = SetVariablesFromBuffer (FileContents, FileSize);
+  Status = SerializeVariablesNewInstanceFromBuffer (
+             &SerializedVariables,
+             FileContents,
+             FileSize
+             );
+  if (!RETURN_ERROR (Status)) {
+    Status = SerializeVariablesSetSerializedVariables (SerializedVariables);
+  }
 
   FreePool (FileContents);
   FileHandleClose (File);
@@ -346,6 +354,40 @@ LoadNvVarsFromFs (
 }
 
 
+STATIC
+RETURN_STATUS
+EFIAPI
+IterateVariablesCallbackAddAllNvVariables (
+  IN  VOID                         *Context,
+  IN  CHAR16                       *VariableName,
+  IN  EFI_GUID                     *VendorGuid,
+  IN  UINT32                       Attributes,
+  IN  UINTN                        DataSize,
+  IN  VOID                         *Data
+  )
+{
+  EFI_HANDLE  Instance;
+
+  Instance = (EFI_HANDLE) Context;
+
+  //
+  // Only save non-volatile variables
+  //
+  if ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
+    return RETURN_SUCCESS;
+  }
+
+  return SerializeVariablesAddVariable (
+           Instance,
+           VariableName,
+           VendorGuid,
+           Attributes,
+           DataSize,
+           Data
+           );
+}
+
+
 /**
   Saves the non-volatile variables into the NvVars file on the
   given file system.
@@ -362,15 +404,49 @@ SaveNvVarsToFs (
 {
   EFI_STATUS                  Status;
   EFI_FILE_HANDLE             File;
-  UINTN                       VariableNameBufferSize;
-  UINTN                       VariableNameSize;
-  CHAR16                      *VariableName;
-  EFI_GUID                    VendorGuid;
-  UINTN                       VariableDataBufferSize;
+  UINTN                       WriteSize;
   UINTN                       VariableDataSize;
   VOID                        *VariableData;
-  UINT32                      VariableAttributes;
-  VOID                        *NewBuffer;
+  EFI_HANDLE                  SerializedVariables;
+
+  Status = SerializeVariablesNewInstance (&SerializedVariables);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = SerializeVariablesIterateSystemVariables (
+             IterateVariablesCallbackAddAllNvVariables,
+             (VOID*) SerializedVariables
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  VariableData = NULL;
+  VariableDataSize = 0;
+  Status = SerializeVariablesToBuffer (
+             SerializedVariables,
+             NULL,
+             &VariableDataSize
+             );
+  if (Status == RETURN_BUFFER_TOO_SMALL) {
+    VariableData = AllocatePool (VariableDataSize);
+    if (VariableData == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+    } else {
+      Status = SerializeVariablesToBuffer (
+                 SerializedVariables,
+                 VariableData,
+                 &VariableDataSize
+                 );
+    }
+  }
+
+  SerializeVariablesFreeInstance (SerializedVariables);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Open the NvVars file for writing.
@@ -390,141 +466,10 @@ SaveNvVarsToFs (
     return Status;
   }
 
-  //
-  // Initialize the variable name and data buffer variables.
-  //
-  VariableNameBufferSize = sizeof (CHAR16);
-  VariableName = AllocateZeroPool (VariableNameBufferSize);
-
-  VariableDataBufferSize = 0;
-  VariableData = NULL;
-
-  for (;;) {
-    //
-    // Get the next variable name and guid
-    //
-    VariableNameSize = VariableNameBufferSize;
-    Status = gRT->GetNextVariableName (
-                    &VariableNameSize,
-                    VariableName,
-                    &VendorGuid
-                    );
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      //
-      // The currently allocated VariableName buffer is too small,
-      // so we allocate a larger buffer, and copy the old buffer
-      // to it.
-      //
-      NewBuffer = AllocatePool (VariableNameSize);
-      if (NewBuffer == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        break;
-      }
-      CopyMem (NewBuffer, VariableName, VariableNameBufferSize);
-      if (VariableName != NULL) {
-        FreePool (VariableName);
-      }
-      VariableName = NewBuffer;
-      VariableNameBufferSize = VariableNameSize;
-
-      //
-      // Try to get the next variable name again with the larger buffer.
-      //
-      Status = gRT->GetNextVariableName (
-                      &VariableNameSize,
-                      VariableName,
-                      &VendorGuid
-                      );
-    }
-
-    if (EFI_ERROR (Status)) {
-      if (Status == EFI_NOT_FOUND) {
-        Status = EFI_SUCCESS;
-      }
-      break;
-    }
-
-    //
-    // Get the variable data and attributes
-    //
-    VariableDataSize = VariableDataBufferSize;
-    Status = gRT->GetVariable (
-                    VariableName,
-                    &VendorGuid,
-                    &VariableAttributes,
-                    &VariableDataSize,
-                    VariableData
-                    );
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      //
-      // The currently allocated VariableData buffer is too small,
-      // so we allocate a larger buffer.
-      //
-      if (VariableDataBufferSize != 0) {
-        FreePool (VariableData);
-        VariableData = NULL;
-        VariableDataBufferSize = 0;
-      }
-      VariableData = AllocatePool (VariableDataSize);
-      if (VariableData == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        break;
-      }
-      VariableDataBufferSize = VariableDataSize;
-
-      //
-      // Try to read the variable again with the larger buffer.
-      //
-      Status = gRT->GetVariable (
-                      VariableName,
-                      &VendorGuid,
-                      &VariableAttributes,
-                      &VariableDataSize,
-                      VariableData
-                      );
-    }
-    if (EFI_ERROR (Status)) {
-      break;
-    }
-
-    //
-    // Skip volatile variables.  We only preserve non-volatile variables.
-    //
-    if ((VariableAttributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
-      continue;
-    }
-
-    DEBUG ((
-      EFI_D_INFO,
-      "Saving variable %g:%s to file\n",
-      &VendorGuid,
-      VariableName
-      ));
-
-    //
-    // Write the variable information out to the file
-    //
-    Status = PackVariableIntoFile (
-               File,
-               VariableName,
-               (UINT32) VariableNameSize,
-               &VendorGuid,
-               VariableAttributes,
-               VariableData,
-               (UINT32) VariableDataSize
-               );
-    if (EFI_ERROR (Status)) {
-      break;
-    }
-
-  }
-
-  if (VariableName != NULL) {
-    FreePool (VariableName);
-  }
-
-  if (VariableData != NULL) {
-    FreePool (VariableData);
+  WriteSize = VariableDataSize;
+  Status = FileHandleWrite (File, &WriteSize, VariableData);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   FileHandleClose (File);
