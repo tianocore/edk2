@@ -438,6 +438,8 @@ OrderLegacyBootOption4SameType (
   // Record the EnBootOption and DisBootOption according to the DevOrder
   //
   NewBootOption = AllocatePool (DevOrderCount * sizeof (UINT16));
+  ASSERT (NewBootOption != NULL);
+
   while (DevOrderCount-- != 0) {
     for (Index = 0; Index < mBootOptionBbsMappingCount; Index++) {
       if (mBootOptionBbsMapping[Index].BbsIndex == (DevOrder[DevOrderCount] & 0xFF)) {
