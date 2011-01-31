@@ -4,7 +4,7 @@
   the Legacy BIOS protocol is generic and consumes this protocol.
   A driver that matches the Legacy16 produces this protocol
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -443,7 +443,7 @@ typedef struct {
   /// LEGACY_USED 0xFE. This IRQ has been used by an SIO legacy
   /// device and cannot be used by PCI.
   ///
-UINT8 Used;
+  UINT8 Used;
 } EFI_LEGACY_IRQ_PRIORITY_TABLE_ENTRY;
 
 //
@@ -505,20 +505,13 @@ typedef struct {
 
 typedef struct {
   ///
-  /// IRQ for this entry.
+  /// If nonzero, a value assigned by the IBV.
   ///
   UINT8   Pirq;
   ///
-  /// Status of this IRQ.
+  /// If nonzero, the IRQs that can be assigned to this device.
   ///
-  ///     PCI_UNUSED 0x00. This IRQ has not been assigned to PCI.
-  ///
-  ///     PCI_USED 0xFF. This IRQ has been assigned to PCI.
-  ///
-  ///     LEGACY_USED 0xFE. This IRQ has been used by an SIO legacy
-  ///       device and cannot be used by PCI.
-  ///
-UINT16  IrqMask;
+  UINT16  IrqMask;
 } EFI_LEGACY_PIRQ_ENTRY;
 
 typedef struct {
