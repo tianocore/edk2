@@ -16,8 +16,7 @@
 
 .text
 .p2align 2
-.globl ASM_PFX(EnableInterrupts)
-INTERWORK_FUNC(EnableInterrupts)
+GCC_ASM_EXPORT(EnableInterrupts)
 
 
 #/**

@@ -16,8 +16,7 @@
 
 .text
 .p2align 2
-.globl ASM_PFX(CpuBreakpoint)
-INTERWORK_FUNC(CpuBreakpoint)
+GCC_ASM_EXPORT(CpuBreakpoint)
 
 #/**
 #  Generates a breakpoint on the CPU.
