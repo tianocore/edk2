@@ -50,16 +50,11 @@ This is the stack constructed by the exception handler (low address to high addr
  */
  
 
-.globl ASM_PFX(ExceptionHandlersStart)
-INTERWORK_FUNC(ExceptionHandlersStart)
-.globl ASM_PFX(ExceptionHandlersEnd)
-INTERWORK_FUNC(ExceptionHandlersEnd)
-.globl ASM_PFX(CommonExceptionEntry)
-INTERWORK_FUNC(CommonExceptionEntry)
-.globl ASM_PFX(AsmCommonExceptionEntry)
-INTERWORK_FUNC(AsmCommonExceptionEntry)
-.globl ASM_PFX(GdbExceptionHandler)
-INTERWORK_FUNC(GdbExceptionHandler)
+GCC_ASM_EXPORT(ExceptionHandlersStart)
+GCC_ASM_EXPORT(ExceptionHandlersEnd)
+GCC_ASM_EXPORT(CommonExceptionEntry)
+GCC_ASM_EXPORT(AsmCommonExceptionEntry)
+GCC_ASM_EXPORT(GdbExceptionHandler)
 
 .text
 .align 3

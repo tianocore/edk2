@@ -165,6 +165,11 @@ EblInitializeNetworkCmd (
   VOID
   );
 
+VOID
+EblInitializeVariableCmds (
+  VOID
+  );
+
 CHAR8 *
 ParseArguments (
   IN  CHAR8  *CmdLine,

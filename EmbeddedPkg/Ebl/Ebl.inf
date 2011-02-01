@@ -43,6 +43,7 @@
   Script.c
   Ebl.h
   Network.c
+  Variable.c
   
 [Packages]
   MdePkg/MdePkg.dec

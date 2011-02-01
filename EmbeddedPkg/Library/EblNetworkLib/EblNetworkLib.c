@@ -45,7 +45,7 @@ EblGetCurrentIpAddress (
 
   CopyMem (Ip, &Pxe->Mode->StationIp, sizeof (EFI_IP_ADDRESS));
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 
@@ -63,7 +63,7 @@ EblGetCurrentMacAddress (
     return Status;
   }
 
-  CopyMem (SimpleNet->Mode->CurrentAddress.Addr, Mac, sizeof (EFI_MAC_ADDRESS));
+  CopyMem (Mac, SimpleNet->Mode->CurrentAddress.Addr, sizeof (EFI_MAC_ADDRESS));
   return Status;
 }
 

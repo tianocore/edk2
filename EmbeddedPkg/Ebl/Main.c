@@ -187,7 +187,7 @@ ParseArguments (
       break;
     }
 
-    // Perform any text coversion here
+    // Perform any text conversion here
     if (*Char == '\t') {
       // TAB to space
       *Char = ' ';
@@ -205,9 +205,14 @@ ParseArguments (
       } 
     } else {
       // Looking for the terminator of an Argv[] entry
-      if ((InQuote && (*Char == '"')) || (!InQuote && (*Char == ' '))) {
+      if (!InQuote && (*Char == ' ')) {
         *Char = '\0';
         LookingForArg = TRUE;
+      } else if (!InQuote && (*Char == '"') && (*(Char-1) != '\\')) {
+        InQuote = TRUE;
+      } else if (InQuote && (*Char == '"') && (*(Char-1) != '\\')) {
+        *Char = '\0';
+        InQuote = FALSE;
       }
     }    
   }
@@ -597,6 +602,7 @@ EdkBootLoaderEntry (
   EblInitializeScriptCmd ();
   EblInitializeExternalCmd ();
   EblInitializeNetworkCmd();
+  EblInitializeVariableCmds ();
   
   // Disable the 5 minute EFI watchdog time so we don't get automatically reset
   gBS->SetWatchdogTimer (0, 0, 0, NULL);
