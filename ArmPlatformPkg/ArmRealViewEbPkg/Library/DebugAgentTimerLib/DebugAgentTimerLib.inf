@@ -1,0 +1,38 @@
+#/** @file
+# Component description file for Base PCI Cf8 Library.
+#
+# PCI CF8 Library that uses I/O ports 0xCF8 and 0xCFC to perform PCI Configuration cycles.
+#  Layers on top of an I/O Library instance.
+# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmEbDebugAgentTimerLib
+  FILE_GUID                      = 80949BBB-68EE-4a4c-B434-D5DB5A232F0C
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugAgentTimerLib|SEC BASE DXE_CORE
+
+
+[Sources.common]
+  DebugAgentTimerLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPlatformPkg/ArmRealViewEbPkg/ArmRealViewEbPkg.dec
+
+[LibraryClasses]
+  IoLib
+

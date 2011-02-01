@@ -1,0 +1,41 @@
+Porting UEFI to a ARM platform
+------------------------------
+1. Create the new platform directory under ArmPlatformPkg
+
+2. Create its DSC and FDF files into this new directory. These files can be copied from ArmVExpress-CTA9x4.dsc and ArmVExpress-CTA9x4.fdf; and adapted following the requirement of your platform. 
+
+3. Set up the PCDs required by ArmPlatformPkg in your FDF or DSC files 
+
+PCD	Description
+gArmTokenSpaceGuid.PcdSecureFdBaseAddress : Base address of your Secure Firmware 
+gArmTokenSpaceGuid.PcdSecureFdSize        : Size in byte of your Secure Firmware gEmbeddedTokenSpaceGuid.
+PcdEmbeddedFdBaseAddress                  : Base Address of your Non-Secure Firmware gEmbeddedTokenSpaceGuid.
+PcdEmbeddedFdSize                         : Size in bytes of your Non-Secure Firmware 
+gArmTokenSpaceGuid.PcdL2x0ControllerBase  : Base Address of your L2x0 controller 
+gArmTokenSpaceGuid.PcdGicDistributorBase  : Base address of the Distributor of your General Interrupt Controller gArmTokenSpaceGuid.
+PcdGicInterruptInterfaceBase              : Base address of the Interface of your General Interrupt Controller gArmVExpressTokenSpaceGuid.
+PcdCPUCoresSecStackBase                   : Top of Secure Stack for Secure World gArmVExpressTokenSpaceGuid.
+PcdCPUCoreSecStackSize                    : Size of the stack for each of the 4 CPU cores gArmVExpressTokenSpaceGuid.
+PcdCPUCoresSecMonStackBase                : Top of Stack for Monitor World gArmVExpressTokenSpaceGuid.
+PcdCPUCoreSecMonStackSize                 : Size of the stack for each of the 4 CPU cores gArmVExpressTokenSpaceGuid.
+PcdCPUCoresNonSecStackBase                : Top of SEC Stack for Normal World gArmVExpressTokenSpaceGuid.
+PcdCPUCoresNonSecStackSize                : Size of the stack for each of the 4 CPU Cores gArmVExpressTokenSpaceGuid.
+PcdPeiServicePtrAddr                      : Cached value of PeiServicesTable 
+
+4. Implement 'ArmPlatformLib' for your platform following the interface defined by ArmPlatformPkg\Include\Library\ArmPlatformLib.h.
+
+Functions to implement:
+
+VOID ArmPlatformIsMemoryInitialized(VOID);
+VOID ArmPlatformInitializeBootMemory(VOID);
+VOID ArmPlatformInitializeSystemMemory(VOID);
+VOID ArmPlatformBootRemapping(VOID);
+UINTN ArmPlatformTrustzoneSupported(VOID);
+VOID ArmPlatformTrustzoneInit(VOID);
+VOID ArmPlatformGetPeiMemory (
+    OUT UINTN*                                   PeiMemoryBase,
+    OUT UINTN*                                   PeiMemorySize);
+VOID ArmPlatformGetVirtualMemoryMap (
+    OUT ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemoryMap);
+VOID ArmPlatformGetEfiMemoryMap (
+    OUT ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR** EfiMemoryMap)

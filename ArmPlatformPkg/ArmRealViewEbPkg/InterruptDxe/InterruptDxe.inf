@@ -1,0 +1,53 @@
+#/** @file
+#  
+#  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = GicInterruptDxe
+  FILE_GUID                      = A7496828-946E-43BF-97D6-AA0272001899
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InterruptDxeInitialize
+
+
+[Sources.common]
+  InterruptDxe.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPlatformPkg/ArmRealViewEbPkg/ArmRealViewEbPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  DebugLib
+  PrintLib
+  UefiDriverEntryPoint
+  IoLib
+
+[Guids]
+  
+
+[Protocols]
+  gHardwareInterruptProtocolGuid
+  gEfiCpuArchProtocolGuid
+  
+[FixedPcd.common]
+  gEmbeddedTokenSpaceGuid.PcdInterruptBaseAddress
+
+[depex]
+  TRUE

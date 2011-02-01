@@ -1,0 +1,59 @@
+#/** @file
+#  
+#  Component discription file for NorFlashDxe module
+#  
+#  Copyright (c) 2010, ARM Ltd. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmVeNorFlashDxe
+  FILE_GUID                      = 93E34C7E-B50E-11DF-9223-2443DFD72085
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = NorFlashInitialise
+
+[Sources.common]
+  NorFlashDxe.c
+  NorFlashFvbDxe.c
+  NorFlashBlockIoDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPlatformPkg/ArmVExpressPkg/ArmVExpressPkg.dec
+
+[LibraryClasses]
+  IoLib
+  BaseLib
+  UefiLib
+  DebugLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+
+[Guids]
+  gEfiSystemNvDataFvGuid
+  gEfiVariableGuid
+
+[Protocols]
+  gEfiBlockIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiFirmwareVolumeBlockProtocolGuid
+  
+[FixedPcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+
+[Pcd.common]
+
+
+[Depex]
+TRUE
