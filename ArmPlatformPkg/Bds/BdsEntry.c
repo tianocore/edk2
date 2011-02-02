@@ -13,7 +13,6 @@
 **/
 
 #include <PiDxe.h>
-#include <Library/BdsLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -21,6 +20,7 @@
 #include <Library/PerformanceLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/PcdLib.h>
+#include <Library/BdsLinuxLib.h>
 
 #include <Protocol/Bds.h>
 #include <Protocol/DevicePathToText.h>

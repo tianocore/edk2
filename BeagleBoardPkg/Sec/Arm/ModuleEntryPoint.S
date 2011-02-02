@@ -19,8 +19,7 @@
 .align 3
 
 .globl ASM_PFX(CEntryPoint)
-.globl ASM_PFX(_ModuleEntryPoint)
-INTERWORK_FUNC(_ModuleEntryPoint)
+GCC_ASM_EXPORT(_ModuleEntryPoint)
 
 ASM_PFX(_ModuleEntryPoint):
 
