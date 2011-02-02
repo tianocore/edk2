@@ -24,12 +24,12 @@ Abstract:
 
 EFI_DRIVER_BINDING_PROTOCOL gUnixSnpDriverBinding =
 {
-	UnixSnpDriverBindingSupported,
-	UnixSnpDriverBindingStart,
-	UnixSnpDriverBindingStop,
-	0xA,
-	NULL,
-	NULL
+  UnixSnpDriverBindingSupported,
+  UnixSnpDriverBindingStart,
+  UnixSnpDriverBindingStop,
+  0xA,
+  NULL,
+  NULL
 };
 
 /**
@@ -43,8 +43,8 @@ EFI_DRIVER_BINDING_PROTOCOL gUnixSnpDriverBinding =
 EFI_STATUS
 EFIAPI
 UnixSnpStart(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This
-	);
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This
+  );
   
 /**
   Changes the state of a network interface from "started" to "stopped".
@@ -57,8 +57,8 @@ UnixSnpStart(
 EFI_STATUS
 EFIAPI
 UnixSnpStop(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This
-	);
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This
+  );
   
 /**
   Resets a network adapter and allocates the transmit and receive buffers 
@@ -83,10 +83,10 @@ UnixSnpStop(
 EFI_STATUS
 EFIAPI
 UnixSnpInitialize(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN UINTN							ExtraRxBufferSize OPTIONAL,
-	IN UINTN							ExtraTxBufferSize OPTIONAL
-	);
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN UINTN              ExtraRxBufferSize OPTIONAL,
+  IN UINTN              ExtraTxBufferSize OPTIONAL
+  );
   
 /**
   Resets a network adapter and re-initializes it with the parameters that were 
@@ -103,9 +103,9 @@ UnixSnpInitialize(
 EFI_STATUS
 EFIAPI
 UnixSnpReset(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN BOOLEAN							ExtendedVerification
-	);
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN BOOLEAN              ExtendedVerification
+  );
 
 /**
   Resets a network adapter and leaves it in a state that is safe for 
@@ -119,8 +119,8 @@ UnixSnpReset(
 EFI_STATUS
 EFIAPI
 UnixSnpShutdown(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This
-	);
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This
+  );
 
 /**
   Manages the multicast receive filters of a network interface.
@@ -146,13 +146,13 @@ UnixSnpShutdown(
 EFI_STATUS
 EFIAPI
 UnixSnpReceiveFilters(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN UINT32							EnableBits,
-	IN UINT32							DisableBits,
-	IN BOOLEAN							ResetMcastFilter,
-	IN UINTN							McastFilterCount OPTIONAL,
-	IN EFI_MAC_ADDRESS*					McastFilter OPTIONAL
-	);
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN UINT32              EnableBits,
+  IN UINT32              DisableBits,
+  IN BOOLEAN              ResetMcastFilter,
+  IN UINTN              McastFilterCount OPTIONAL,
+  IN EFI_MAC_ADDRESS*          McastFilter OPTIONAL
+  );
 
 /**
   Modifies or resets the current station address, if supported.
@@ -168,10 +168,10 @@ UnixSnpReceiveFilters(
 EFI_STATUS
 EFIAPI
 UnixSnpStationAddress(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN BOOLEAN							Reset,
-	IN EFI_MAC_ADDRESS*					NewMacAddr OPTIONAL
-	);
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN BOOLEAN              Reset,
+  IN EFI_MAC_ADDRESS*          NewMacAddr OPTIONAL
+  );
 
 /**
   Resets or collects the statistics on a network interface.
@@ -195,11 +195,11 @@ UnixSnpStationAddress(
 EFI_STATUS
 EFIAPI
 UnixSnpStatistics(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN BOOLEAN							Reset,
-	IN OUT UINTN*						StatisticsSize OPTIONAL,
-	OUT EFI_NETWORK_STATISTICS*			StatisticsTable OPTIONAL
-	);
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN BOOLEAN              Reset,
+  IN OUT UINTN*            StatisticsSize OPTIONAL,
+  OUT EFI_NETWORK_STATISTICS*      StatisticsTable OPTIONAL
+  );
   
 /**
   Converts a multicast IP address to a multicast HW MAC address.
@@ -223,11 +223,11 @@ UnixSnpStatistics(
 EFI_STATUS
 EFIAPI
 UnixSnpMcastIptoMac(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN BOOLEAN							Ipv6,
-	IN EFI_IP_ADDRESS*					Ip,
-	OUT EFI_MAC_ADDRESS*				Mac
-	);
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN BOOLEAN              Ipv6,
+  IN EFI_IP_ADDRESS*          Ip,
+  OUT EFI_MAC_ADDRESS*        Mac
+  );
 
 /**
   Performs read and write operations on the NVRAM device attached to a 
@@ -248,12 +248,12 @@ UnixSnpMcastIptoMac(
 EFI_STATUS
 EFIAPI
 UnixSnpNvdata(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN BOOLEAN							ReadOrWrite,
-	IN UINTN							Offset,
-	IN UINTN							BufferSize,
-	IN OUT VOID*						Buffer
-	);
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN BOOLEAN              ReadOrWrite,
+  IN UINTN              Offset,
+  IN UINTN              BufferSize,
+  IN OUT VOID*            Buffer
+  );
 
 /**
   Reads the current interrupt status and recycled transmit buffer status from 
@@ -279,10 +279,10 @@ UnixSnpNvdata(
 EFI_STATUS
 EFIAPI
 UnixSnpGetStatus(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	OUT UINT32*							InterruptStatus,
-	OUT VOID**							TxBuffer
-	);
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  OUT UINT32*              InterruptStatus,
+  OUT VOID**              TxBuffer
+  );
 
 /**
   Places a packet in the transmit queue of a network interface.
@@ -316,14 +316,14 @@ UnixSnpGetStatus(
 EFI_STATUS
 EFIAPI
 UnixSnpTransmit(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN UINTN							HeaderSize,
-	IN UINTN							BufferSize,
-	IN VOID*							Buffer,
-	IN EFI_MAC_ADDRESS*					SrcAddr OPTIONAL,
-	IN EFI_MAC_ADDRESS*					DestAddr OPTIONAL,
-	IN UINT16*							Protocol OPTIONAL
-	);
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN UINTN              HeaderSize,
+  IN UINTN              BufferSize,
+  IN VOID*              Buffer,
+  IN EFI_MAC_ADDRESS*          SrcAddr OPTIONAL,
+  IN EFI_MAC_ADDRESS*          DestAddr OPTIONAL,
+  IN UINT16*              Protocol OPTIONAL
+  );
 
 /**
   Receives a packet from a network interface.
@@ -358,21 +358,21 @@ UnixSnpTransmit(
 EFI_STATUS
 EFIAPI
 UnixSnpReceive(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	OUT UINTN*							HeaderSize OPTIONAL,
-	IN OUT UINTN*						BuffSize,
-	OUT VOID*							Buffer,
-	OUT EFI_MAC_ADDRESS*				SourceAddr OPTIONAL,
-	OUT EFI_MAC_ADDRESS*				DestinationAddr OPTIONAL,
-	OUT UINT16*							Protocol OPTIONAL
-	);
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  OUT UINTN*              HeaderSize OPTIONAL,
+  IN OUT UINTN*            BuffSize,
+  OUT VOID*              Buffer,
+  OUT EFI_MAC_ADDRESS*        SourceAddr OPTIONAL,
+  OUT EFI_MAC_ADDRESS*        DestinationAddr OPTIONAL,
+  OUT UINT16*              Protocol OPTIONAL
+  );
 
 VOID
 EFIAPI
 UnixSnpWaitForPacketNotify(
-	IN EFI_EVENT						Event,
-	IN VOID*							Private
-	);
+  IN EFI_EVENT            Event,
+  IN VOID*              Private
+  );
 
 //
 // Strange, but there doesn't appear to be any structure for the Ethernet header in edk2...
@@ -380,171 +380,171 @@ UnixSnpWaitForPacketNotify(
 
 typedef struct
 {
-	UINT8								DstAddr[ NET_ETHER_ADDR_LEN ];
-	UINT8								SrcAddr[ NET_ETHER_ADDR_LEN ];
-	UINT16								Type;
+  UINT8                DstAddr[ NET_ETHER_ADDR_LEN ];
+  UINT8                SrcAddr[ NET_ETHER_ADDR_LEN ];
+  UINT16                Type;
 } EthernetHeader;
 
 UNIX_SNP_PRIVATE_DATA gUnixSnpPrivateTemplate =
 {
-	UNIX_SNP_PRIVATE_DATA_SIGNATURE,			// Signature
-	NULL,										// UnixThunk
-	NULL,										// DeviceHandle
-	NULL,										// DevicePath
-	{ 0 },										// MacAddress
-	NULL,										// InterfaceName
-	0,											// ReadBufferSize
-	NULL,										// ReadBuffer
-	NULL,										// CurrentReadPointer
-	NULL,										// EndReadPointer
-	0,											// BpfFd
-	{										// Snp
-		EFI_SIMPLE_NETWORK_PROTOCOL_REVISION,	// Revision
-		UnixSnpStart,							// Start
-		UnixSnpStop,							// Stop
-		UnixSnpInitialize,						// Initialize
-		UnixSnpReset,							// Reset
-		UnixSnpShutdown,						// Shutdown
-		UnixSnpReceiveFilters,					// ReceiveFilters
-		UnixSnpStationAddress,					// StationAddress
-		UnixSnpStatistics,						// Statistics
-		UnixSnpMcastIptoMac,					// MCastIpToMac
-		UnixSnpNvdata,							// NvData
-		UnixSnpGetStatus,						// GetStatus
-		UnixSnpTransmit,						// Transmit
-		UnixSnpReceive,							// Receive
-		NULL,									// WaitForPacket
-		NULL									// Mode
-	},
-	{										// Mode
-		EfiSimpleNetworkStopped,				//  State
-		NET_ETHER_ADDR_LEN,						//  HwAddressSize
-		NET_ETHER_HEADER_SIZE,					//  MediaHeaderSize
-		1500,									//  MaxPacketSize
-		0,										//  NvRamSize
-		0,										//  NvRamAccessSize
-		0,										//  ReceiveFilterMask
-		0,										//  ReceiveFilterSetting
-		MAX_MCAST_FILTER_CNT,					//  MaxMCastFilterCount
-		0,										//  MCastFilterCount
-		{
-			0
-		},										//  MCastFilter
-		{
-			0
-		},										//  CurrentAddress
-		{
-			0
-		},										//  BroadcastAddress
-		{
-			0
-		},										//  PermanentAddress
-		NET_IFTYPE_ETHERNET,					//  IfType
-		FALSE,									//  MacAddressChangeable
-		FALSE,									//  MultipleTxSupported
-		FALSE,									//  MediaPresentSupported
-		TRUE									//  MediaPresent
-	}
+  UNIX_SNP_PRIVATE_DATA_SIGNATURE,      // Signature
+  NULL,                    // UnixThunk
+  NULL,                    // DeviceHandle
+  NULL,                    // DevicePath
+  { 0 },                    // MacAddress
+  NULL,                    // InterfaceName
+  0,                      // ReadBufferSize
+  NULL,                    // ReadBuffer
+  NULL,                    // CurrentReadPointer
+  NULL,                    // EndReadPointer
+  0,                      // BpfFd
+  {                    // Snp
+    EFI_SIMPLE_NETWORK_PROTOCOL_REVISION,  // Revision
+    UnixSnpStart,              // Start
+    UnixSnpStop,              // Stop
+    UnixSnpInitialize,            // Initialize
+    UnixSnpReset,              // Reset
+    UnixSnpShutdown,            // Shutdown
+    UnixSnpReceiveFilters,          // ReceiveFilters
+    UnixSnpStationAddress,          // StationAddress
+    UnixSnpStatistics,            // Statistics
+    UnixSnpMcastIptoMac,          // MCastIpToMac
+    UnixSnpNvdata,              // NvData
+    UnixSnpGetStatus,            // GetStatus
+    UnixSnpTransmit,            // Transmit
+    UnixSnpReceive,              // Receive
+    NULL,                  // WaitForPacket
+    NULL                  // Mode
+  },
+  {                    // Mode
+    EfiSimpleNetworkStopped,        //  State
+    NET_ETHER_ADDR_LEN,            //  HwAddressSize
+    NET_ETHER_HEADER_SIZE,          //  MediaHeaderSize
+    1500,                  //  MaxPacketSize
+    0,                    //  NvRamSize
+    0,                    //  NvRamAccessSize
+    0,                    //  ReceiveFilterMask
+    0,                    //  ReceiveFilterSetting
+    MAX_MCAST_FILTER_CNT,          //  MaxMCastFilterCount
+    0,                    //  MCastFilterCount
+    {
+      0
+    },                    //  MCastFilter
+    {
+      0
+    },                    //  CurrentAddress
+    {
+      0
+    },                    //  BroadcastAddress
+    {
+      0
+    },                    //  PermanentAddress
+    NET_IFTYPE_ETHERNET,          //  IfType
+    FALSE,                  //  MacAddressChangeable
+    FALSE,                  //  MultipleTxSupported
+    FALSE,                  //  MediaPresentSupported
+    TRUE                  //  MediaPresent
+  }
 };
 
 STATIC EFI_STATUS
 GetInterfaceMacAddr(
-	IN UNIX_SNP_PRIVATE_DATA*			Private,
-	IN EFI_UNIX_IO_PROTOCOL*			UnixIo
-	)
+  IN UNIX_SNP_PRIVATE_DATA*      Private,
+  IN EFI_UNIX_IO_PROTOCOL*      UnixIo
+  )
 {
-	struct ifaddrs*						IfAddrs;
-	struct ifaddrs*						If;
-	struct sockaddr_dl*					IfSdl;
-	EFI_STATUS							Status;
-	INTN								Result;
+  struct ifaddrs*            IfAddrs;
+  struct ifaddrs*            If;
+  struct sockaddr_dl*          IfSdl;
+  EFI_STATUS              Status;
+  INTN                Result;
 
-	Result = UnixIo->UnixThunk->GetIfAddrs( &IfAddrs );
-	if ( Result != 0 )
-	{
-		return( EFI_UNSUPPORTED );
-	}
+  Result = UnixIo->UnixThunk->GetIfAddrs( &IfAddrs );
+  if ( Result != 0 )
+  {
+    return( EFI_UNSUPPORTED );
+  }
 
-	//
-	// Convert the interface name to ASCII so we can find it.
-	//
-	Private->InterfaceName = AllocateZeroPool( StrLen( UnixIo->EnvString ) );
+  //
+  // Convert the interface name to ASCII so we can find it.
+  //
+  Private->InterfaceName = AllocateZeroPool( StrLen( UnixIo->EnvString ) );
 
-	if ( !Private->InterfaceName )
-	{
-		Status = EFI_OUT_OF_RESOURCES;
-		goto Exit;
-	}
+  if ( !Private->InterfaceName )
+  {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
 
-	UnicodeStrToAsciiStr( UnixIo->EnvString, Private->InterfaceName );
+  UnicodeStrToAsciiStr( UnixIo->EnvString, Private->InterfaceName );
 
-	If = IfAddrs;
+  If = IfAddrs;
 
-	while ( If != NULL )
-	{
-		IfSdl = ( struct sockaddr_dl * ) If->ifa_addr;
+  while ( If != NULL )
+  {
+    IfSdl = ( struct sockaddr_dl * ) If->ifa_addr;
 
-		if ( IfSdl->sdl_family == AF_LINK )
-		{
-			if ( !AsciiStrCmp( Private->InterfaceName, If->ifa_name ) )
-			{
-				CopyMem( &Private->MacAddress, LLADDR( IfSdl ), NET_ETHER_ADDR_LEN );
+    if ( IfSdl->sdl_family == AF_LINK )
+    {
+      if ( !AsciiStrCmp( Private->InterfaceName, If->ifa_name ) )
+      {
+        CopyMem( &Private->MacAddress, LLADDR( IfSdl ), NET_ETHER_ADDR_LEN );
 
-				Status = EFI_SUCCESS;
-				break;
-			}
-		}
+        Status = EFI_SUCCESS;
+        break;
+      }
+    }
 
-		If = If->ifa_next;
-	}
+    If = If->ifa_next;
+  }
 
 Exit:
-	( VOID ) UnixIo->UnixThunk->FreeIfAddrs( IfAddrs );
+  ( VOID ) UnixIo->UnixThunk->FreeIfAddrs( IfAddrs );
 
-	return( Status );
+  return( Status );
 }
 
 
 STATIC EFI_STATUS
 OpenBpfFileDescriptor(
-	IN UNIX_SNP_PRIVATE_DATA*		Private,
-	OUT INTN*						Fd
-	)
+  IN UNIX_SNP_PRIVATE_DATA*    Private,
+  OUT INTN*            Fd
+  )
 {
-	CHAR8							BfpDeviceName[ 256 ];
-	INTN							Index;
-	EFI_STATUS						Status = EFI_OUT_OF_RESOURCES;
-	INTN							Result;
+  CHAR8              BfpDeviceName[ 256 ];
+  INTN              Index;
+  EFI_STATUS            Status = EFI_OUT_OF_RESOURCES;
+  INTN              Result;
 
-	//
-	// Open a Berkeley Packet Filter device.  This must be done as root, so this is probably
-	// the place which is most likely to fail...
-	//
-	for ( Index = 0; TRUE; Index++ )
-	{
-		AsciiSPrint( BfpDeviceName, sizeof( BfpDeviceName ), "/dev/bpf%d", Index );
+  //
+  // Open a Berkeley Packet Filter device.  This must be done as root, so this is probably
+  // the place which is most likely to fail...
+  //
+  for ( Index = 0; TRUE; Index++ )
+  {
+    AsciiSPrint( BfpDeviceName, sizeof( BfpDeviceName ), "/dev/bpf%d", Index );
 
-		*Fd = Private->UnixThunk->Open( BfpDeviceName, O_RDWR, 0 );
+    *Fd = Private->UnixThunk->Open( BfpDeviceName, O_RDWR, 0 );
 
-		if ( *Fd >= 0 )
-		{
-			Status = EFI_SUCCESS;
-			break;
-		}
+    if ( *Fd >= 0 )
+    {
+      Status = EFI_SUCCESS;
+      break;
+    }
 
-		Result = Private->UnixThunk->GetErrno();
+    Result = Private->UnixThunk->GetErrno();
     if ( Result == EACCES )
     {
       DEBUG( ( EFI_D_ERROR, "Permissions on '%a' are incorrect.  Fix with 'sudo chmod 666 %a'.\n",
           BfpDeviceName, BfpDeviceName ) );
     }
-		if ( Result != EBUSY )
-		{
-			break;
-		}
-	}
+    if ( Result != EBUSY )
+    {
+      break;
+    }
+  }
 
-	return( Status );
+  return( Status );
 }
 
 
@@ -568,51 +568,51 @@ OpenBpfFileDescriptor(
 EFI_STATUS
 EFIAPI
 UnixSnpDriverBindingSupported(
-	IN EFI_DRIVER_BINDING_PROTOCOL*		This,
-	IN EFI_HANDLE						ControllerHandle,
-	IN EFI_DEVICE_PATH_PROTOCOL*		RemainingDevicePath OPTIONAL
-	)
+  IN EFI_DRIVER_BINDING_PROTOCOL*    This,
+  IN EFI_HANDLE            ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL*    RemainingDevicePath OPTIONAL
+  )
 {
-	EFI_STATUS							Status;
-	EFI_UNIX_IO_PROTOCOL*				UnixIo;
+  EFI_STATUS              Status;
+  EFI_UNIX_IO_PROTOCOL*        UnixIo;
 
-	//
-	// Open the I/O abstraction needed to perform the supported test.
-	//
-	Status = gBS->OpenProtocol(
-					ControllerHandle,
-					&gEfiUnixIoProtocolGuid,
-					( VOID ** ) &UnixIo,
-					This->DriverBindingHandle,
-					ControllerHandle,
-					EFI_OPEN_PROTOCOL_BY_DRIVER
-					);
+  //
+  // Open the I/O abstraction needed to perform the supported test.
+  //
+  Status = gBS->OpenProtocol(
+          ControllerHandle,
+          &gEfiUnixIoProtocolGuid,
+          ( VOID ** ) &UnixIo,
+          This->DriverBindingHandle,
+          ControllerHandle,
+          EFI_OPEN_PROTOCOL_BY_DRIVER
+          );
 
-	if ( EFI_ERROR( Status ) )
-	{
-		return( Status );
-	}
+  if ( EFI_ERROR( Status ) )
+  {
+    return( Status );
+  }
 
-	//
-	// Validate GUID
-	//
-	Status = EFI_UNSUPPORTED;
-	if ( CompareGuid( UnixIo->TypeGuid, &gEfiUnixNetworkGuid ) )
-	{
-		Status = EFI_SUCCESS;
-	}
+  //
+  // Validate GUID
+  //
+  Status = EFI_UNSUPPORTED;
+  if ( CompareGuid( UnixIo->TypeGuid, &gEfiUnixNetworkGuid ) )
+  {
+    Status = EFI_SUCCESS;
+  }
 
-	//
-	// Close the I/O abstraction used to perform the supported test.
-	//
-	gBS->CloseProtocol(
-					ControllerHandle,
-					&gEfiUnixIoProtocolGuid,
-					This->DriverBindingHandle,
-					ControllerHandle
-					);
+  //
+  // Close the I/O abstraction used to perform the supported test.
+  //
+  gBS->CloseProtocol(
+          ControllerHandle,
+          &gEfiUnixIoProtocolGuid,
+          This->DriverBindingHandle,
+          ControllerHandle
+          );
 
-	return( Status );
+  return( Status );
 }
 
 
@@ -635,175 +635,175 @@ UnixSnpDriverBindingSupported(
 EFI_STATUS
 EFIAPI
 UnixSnpDriverBindingStart(
-	IN EFI_DRIVER_BINDING_PROTOCOL*		This,
-	IN EFI_HANDLE						ControllerHandle,
-	IN EFI_DEVICE_PATH_PROTOCOL*		RemainingDevicePath OPTIONAL
-	)
+  IN EFI_DRIVER_BINDING_PROTOCOL*    This,
+  IN EFI_HANDLE            ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL*    RemainingDevicePath OPTIONAL
+  )
 {
-	MAC_ADDR_DEVICE_PATH			Node;
-	EFI_DEVICE_PATH_PROTOCOL*		ParentDevicePath = NULL;
-	EFI_UNIX_IO_PROTOCOL*			UnixIo;
-	UNIX_SNP_PRIVATE_DATA*			Private = NULL;
-	EFI_STATUS						Status;
-	BOOLEAN							CreateDevice;
+  MAC_ADDR_DEVICE_PATH      Node;
+  EFI_DEVICE_PATH_PROTOCOL*    ParentDevicePath = NULL;
+  EFI_UNIX_IO_PROTOCOL*      UnixIo;
+  UNIX_SNP_PRIVATE_DATA*      Private = NULL;
+  EFI_STATUS            Status;
+  BOOLEAN              CreateDevice;
 
-	//
-	// Grab the protocols we need.
-	//
-	Status = gBS->OpenProtocol(
-					ControllerHandle,
-					&gEfiDevicePathProtocolGuid,
-					( VOID ** ) &ParentDevicePath,
-					This->DriverBindingHandle,
-					ControllerHandle,
-					EFI_OPEN_PROTOCOL_BY_DRIVER
-					);
-	if ( EFI_ERROR( Status ) )
-	{
-		goto ErrorExit;
-	}
+  //
+  // Grab the protocols we need.
+  //
+  Status = gBS->OpenProtocol(
+          ControllerHandle,
+          &gEfiDevicePathProtocolGuid,
+          ( VOID ** ) &ParentDevicePath,
+          This->DriverBindingHandle,
+          ControllerHandle,
+          EFI_OPEN_PROTOCOL_BY_DRIVER
+          );
+  if ( EFI_ERROR( Status ) )
+  {
+    goto ErrorExit;
+  }
 
-	//
-	// Open the I/O abstraction needed to perform the supported test.
-	//
-	Status = gBS->OpenProtocol(
-					ControllerHandle,
-					&gEfiUnixIoProtocolGuid,
-					( VOID ** ) &UnixIo,
-					This->DriverBindingHandle,
-					ControllerHandle,
-					EFI_OPEN_PROTOCOL_BY_DRIVER
-					);
-	if ( EFI_ERROR( Status ) )
-	{
-		goto ErrorExit;
-	}
+  //
+  // Open the I/O abstraction needed to perform the supported test.
+  //
+  Status = gBS->OpenProtocol(
+          ControllerHandle,
+          &gEfiUnixIoProtocolGuid,
+          ( VOID ** ) &UnixIo,
+          This->DriverBindingHandle,
+          ControllerHandle,
+          EFI_OPEN_PROTOCOL_BY_DRIVER
+          );
+  if ( EFI_ERROR( Status ) )
+  {
+    goto ErrorExit;
+  }
 
-	//
-	// Validate GUID
-	//
-	if ( !CompareGuid( UnixIo->TypeGuid, &gEfiUnixNetworkGuid ) )
-	{
-		Status = EFI_UNSUPPORTED;
-		goto ErrorExit;
-	}
+  //
+  // Validate GUID
+  //
+  if ( !CompareGuid( UnixIo->TypeGuid, &gEfiUnixNetworkGuid ) )
+  {
+    Status = EFI_UNSUPPORTED;
+    goto ErrorExit;
+  }
 
-	CreateDevice = TRUE;
-	if ( ( RemainingDevicePath != NULL ) && IsDevicePathEnd( RemainingDevicePath ) )
-	{
-		CreateDevice = FALSE;
-	}
+  CreateDevice = TRUE;
+  if ( ( RemainingDevicePath != NULL ) && IsDevicePathEnd( RemainingDevicePath ) )
+  {
+    CreateDevice = FALSE;
+  }
 
-	if ( CreateDevice )
-	{
-		//
-		//  Allocate the private data.
-		//
-		Private = AllocateCopyPool( sizeof( UNIX_SNP_PRIVATE_DATA ), &gUnixSnpPrivateTemplate );
-		if ( Private == NULL )
-		{
-			Status = EFI_OUT_OF_RESOURCES;
-			goto ErrorExit;
-		}
+  if ( CreateDevice )
+  {
+    //
+    //  Allocate the private data.
+    //
+    Private = AllocateCopyPool( sizeof( UNIX_SNP_PRIVATE_DATA ), &gUnixSnpPrivateTemplate );
+    if ( Private == NULL )
+    {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ErrorExit;
+    }
 
-		Status = GetInterfaceMacAddr( Private, UnixIo );
-		if ( EFI_ERROR( Status ) )
-		{
-			goto ErrorExit;
-		}
+    Status = GetInterfaceMacAddr( Private, UnixIo );
+    if ( EFI_ERROR( Status ) )
+    {
+      goto ErrorExit;
+    }
 
-		Private->UnixThunk = UnixIo->UnixThunk;
+    Private->UnixThunk = UnixIo->UnixThunk;
 
-		Private->Snp.Mode = &Private->Mode;
+    Private->Snp.Mode = &Private->Mode;
 
-		//
-		// Set the broadcast address.
-		//
-		SetMem( &Private->Mode.BroadcastAddress, sizeof( EFI_MAC_ADDRESS ), 0xFF );
+    //
+    // Set the broadcast address.
+    //
+    SetMem( &Private->Mode.BroadcastAddress, sizeof( EFI_MAC_ADDRESS ), 0xFF );
 
-		CopyMem( &Private->Mode.CurrentAddress, &Private->MacAddress, sizeof( EFI_MAC_ADDRESS ) );
-		CopyMem( &Private->Mode.PermanentAddress, &Private->MacAddress, sizeof( EFI_MAC_ADDRESS ) );
+    CopyMem( &Private->Mode.CurrentAddress, &Private->MacAddress, sizeof( EFI_MAC_ADDRESS ) );
+    CopyMem( &Private->Mode.PermanentAddress, &Private->MacAddress, sizeof( EFI_MAC_ADDRESS ) );
 
-		//
-		// Since the fake SNP is based on a real NIC, to avoid conflict with the host NIC
-		// network stack, we use a different MAC address.
-		// So just change the last byte of the MAC address for the real NIC.
-		//
-		Private->Mode.CurrentAddress.Addr[ NET_ETHER_ADDR_LEN - 1 ]++;
+    //
+    // Since the fake SNP is based on a real NIC, to avoid conflict with the host NIC
+    // network stack, we use a different MAC address.
+    // So just change the last byte of the MAC address for the real NIC.
+    //
+    Private->Mode.CurrentAddress.Addr[ NET_ETHER_ADDR_LEN - 1 ]++;
 
-		//
-		// Build the device path by appending the MAC node to the ParentDevicePath
-		// from the UnixIo handle.
-		//
-		ZeroMem( &Node, sizeof( MAC_ADDR_DEVICE_PATH ) );
+    //
+    // Build the device path by appending the MAC node to the ParentDevicePath
+    // from the UnixIo handle.
+    //
+    ZeroMem( &Node, sizeof( MAC_ADDR_DEVICE_PATH ) );
 
-		Node.Header.Type	= MESSAGING_DEVICE_PATH;
-		Node.Header.SubType	= MSG_MAC_ADDR_DP;
-		Node.IfType			= Private->Mode.IfType;
+    Node.Header.Type  = MESSAGING_DEVICE_PATH;
+    Node.Header.SubType  = MSG_MAC_ADDR_DP;
+    Node.IfType      = Private->Mode.IfType;
 
-		SetDevicePathNodeLength( ( EFI_DEVICE_PATH_PROTOCOL * ) &Node, sizeof( MAC_ADDR_DEVICE_PATH ) );
+    SetDevicePathNodeLength( ( EFI_DEVICE_PATH_PROTOCOL * ) &Node, sizeof( MAC_ADDR_DEVICE_PATH ) );
 
-		CopyMem( &Node.MacAddress, &Private->Mode.CurrentAddress, sizeof( EFI_MAC_ADDRESS ) );
+    CopyMem( &Node.MacAddress, &Private->Mode.CurrentAddress, sizeof( EFI_MAC_ADDRESS ) );
 
-		//
-		// Build the device path by appending the MAC node to the ParentDevicePath from the UnixIo handle.
-		//
-		Private->DevicePath = AppendDevicePathNode( ParentDevicePath, ( EFI_DEVICE_PATH_PROTOCOL * ) &Node );
-		if ( Private->DevicePath == NULL )
-		{
-			Status = EFI_OUT_OF_RESOURCES;
-			goto ErrorExit;
-		}
+    //
+    // Build the device path by appending the MAC node to the ParentDevicePath from the UnixIo handle.
+    //
+    Private->DevicePath = AppendDevicePathNode( ParentDevicePath, ( EFI_DEVICE_PATH_PROTOCOL * ) &Node );
+    if ( Private->DevicePath == NULL )
+    {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ErrorExit;
+    }
 
-		Status = gBS->InstallMultipleProtocolInterfaces(
-						&Private->DeviceHandle,
-						&gEfiSimpleNetworkProtocolGuid,
-						&Private->Snp,
-						&gEfiDevicePathProtocolGuid,
-						Private->DevicePath,
-						NULL
-						);
-		if ( EFI_ERROR( Status ) )
-		{
-			goto ErrorExit;
-		}
+    Status = gBS->InstallMultipleProtocolInterfaces(
+            &Private->DeviceHandle,
+            &gEfiSimpleNetworkProtocolGuid,
+            &Private->Snp,
+            &gEfiDevicePathProtocolGuid,
+            Private->DevicePath,
+            NULL
+            );
+    if ( EFI_ERROR( Status ) )
+    {
+      goto ErrorExit;
+    }
 
-		Status = gBS->OpenProtocol(
-						ControllerHandle,
-						&gEfiUnixIoProtocolGuid,
-						( VOID ** ) &UnixIo,
-						This->DriverBindingHandle,
-						Private->DeviceHandle,
-						EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
-						);
-		if ( EFI_ERROR( Status ) )
-		{
-			goto ErrorExit;
-		}
-	}
-	return( Status );
+    Status = gBS->OpenProtocol(
+            ControllerHandle,
+            &gEfiUnixIoProtocolGuid,
+            ( VOID ** ) &UnixIo,
+            This->DriverBindingHandle,
+            Private->DeviceHandle,
+            EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+            );
+    if ( EFI_ERROR( Status ) )
+    {
+      goto ErrorExit;
+    }
+  }
+  return( Status );
 
 ErrorExit:
-	if ( Private->InterfaceName != NULL )
-	{
-		FreePool( Private->InterfaceName );
-		Private->InterfaceName = NULL;
-	}
-	if ( Private != NULL )
-	{
-		FreePool( Private );
-	}
-	if ( ParentDevicePath != NULL )
-	{
-		gBS->CloseProtocol(
-					ControllerHandle,
-					&gEfiDevicePathProtocolGuid,
-					This->DriverBindingHandle,
-					ControllerHandle
-					);
-	}
+  if ( Private->InterfaceName != NULL )
+  {
+    FreePool( Private->InterfaceName );
+    Private->InterfaceName = NULL;
+  }
+  if ( Private != NULL )
+  {
+    FreePool( Private );
+  }
+  if ( ParentDevicePath != NULL )
+  {
+    gBS->CloseProtocol(
+          ControllerHandle,
+          &gEfiDevicePathProtocolGuid,
+          This->DriverBindingHandle,
+          ControllerHandle
+          );
+  }
 
-	return( Status );
+  return( Status );
 }
 
 /**
@@ -826,55 +826,55 @@ ErrorExit:
 EFI_STATUS
 EFIAPI
 UnixSnpDriverBindingStop(
-	IN EFI_DRIVER_BINDING_PROTOCOL*		This,
-	IN EFI_HANDLE						ControllerHandle,
-	IN UINTN							NumberOfChildren,
-	IN EFI_HANDLE*						ChildHandleBuffer
-	)
+  IN EFI_DRIVER_BINDING_PROTOCOL*    This,
+  IN EFI_HANDLE            ControllerHandle,
+  IN UINTN              NumberOfChildren,
+  IN EFI_HANDLE*            ChildHandleBuffer
+  )
 {
-	UNIX_SNP_PRIVATE_DATA*				Private = NULL;
-	EFI_SIMPLE_NETWORK_PROTOCOL*		Snp;
-	EFI_STATUS							Status;
+  UNIX_SNP_PRIVATE_DATA*        Private = NULL;
+  EFI_SIMPLE_NETWORK_PROTOCOL*    Snp;
+  EFI_STATUS              Status;
 
-	//
-	// Get our context back.
-	//
-	Status = gBS->OpenProtocol(
-				ControllerHandle,
-				&gEfiSimpleNetworkProtocolGuid,
-				( VOID ** ) &Snp,
-				This->DriverBindingHandle,
-				ControllerHandle,
-				EFI_OPEN_PROTOCOL_GET_PROTOCOL
-				);
-	if ( EFI_ERROR( Status ) )
-	{
-		return( EFI_UNSUPPORTED );
-	}
+  //
+  // Get our context back.
+  //
+  Status = gBS->OpenProtocol(
+        ControllerHandle,
+        &gEfiSimpleNetworkProtocolGuid,
+        ( VOID ** ) &Snp,
+        This->DriverBindingHandle,
+        ControllerHandle,
+        EFI_OPEN_PROTOCOL_GET_PROTOCOL
+        );
+  if ( EFI_ERROR( Status ) )
+  {
+    return( EFI_UNSUPPORTED );
+  }
 
-	Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( Snp );
+  Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( Snp );
 
-	Status = gBS->CloseProtocol(
-				ControllerHandle,
-				&gEfiUnixIoProtocolGuid,
-				This->DriverBindingHandle,
-				Private->DeviceHandle
-				);
+  Status = gBS->CloseProtocol(
+        ControllerHandle,
+        &gEfiUnixIoProtocolGuid,
+        This->DriverBindingHandle,
+        Private->DeviceHandle
+        );
 
-	Status = gBS->UninstallMultipleProtocolInterfaces(
-				Private->DeviceHandle,
-				&gEfiSimpleNetworkProtocolGuid,
-				&Private->Snp,
-				&gEfiDevicePathProtocolGuid,
-				Private->DevicePath,
-				NULL
-				);
+  Status = gBS->UninstallMultipleProtocolInterfaces(
+        Private->DeviceHandle,
+        &gEfiSimpleNetworkProtocolGuid,
+        &Private->Snp,
+        &gEfiDevicePathProtocolGuid,
+        Private->DevicePath,
+        NULL
+        );
 
-	FreePool( Private->InterfaceName );
-	FreePool( Private->DevicePath );
-	FreePool( Private );
+  FreePool( Private->InterfaceName );
+  FreePool( Private->DevicePath );
+  FreePool( Private );
 
-	return( EFI_SUCCESS );
+  return( EFI_SUCCESS );
 }
 
 
@@ -889,210 +889,210 @@ UnixSnpDriverBindingStop(
 EFI_STATUS
 EFIAPI
 UnixSnpStart(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This
-	)
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This
+  )
 {
-	STATIC struct bpf_insn				FilterInstructionTemplate[] =
-	{
-		// Load 4 bytes from the destination MAC address.
-		BPF_STMT( BPF_LD + BPF_W + BPF_ABS, OFFSET_OF( EthernetHeader, DstAddr[ 0 ] ) ),
+  STATIC struct bpf_insn        FilterInstructionTemplate[] =
+  {
+    // Load 4 bytes from the destination MAC address.
+    BPF_STMT( BPF_LD + BPF_W + BPF_ABS, OFFSET_OF( EthernetHeader, DstAddr[ 0 ] ) ),
 
-		// Compare to first 4 bytes of fake MAC address.
-		BPF_JUMP( BPF_JMP + BPF_JEQ + BPF_K, 0x12345678, 0, 3 ),
+    // Compare to first 4 bytes of fake MAC address.
+    BPF_JUMP( BPF_JMP + BPF_JEQ + BPF_K, 0x12345678, 0, 3 ),
 
-		// Load remaining 2 bytes from the destination MAC address.
-		BPF_STMT( BPF_LD + BPF_H + BPF_ABS, OFFSET_OF( EthernetHeader, DstAddr[ 4 ] ) ),
+    // Load remaining 2 bytes from the destination MAC address.
+    BPF_STMT( BPF_LD + BPF_H + BPF_ABS, OFFSET_OF( EthernetHeader, DstAddr[ 4 ] ) ),
 
-		// Compare to remaining 2 bytes of fake MAC address.
-		BPF_JUMP( BPF_JMP + BPF_JEQ + BPF_K, 0x9ABC, 5, 0 ),
+    // Compare to remaining 2 bytes of fake MAC address.
+    BPF_JUMP( BPF_JMP + BPF_JEQ + BPF_K, 0x9ABC, 5, 0 ),
 
-		// Load 4 bytes from the destination MAC address.
-		BPF_STMT( BPF_LD + BPF_W + BPF_ABS, OFFSET_OF( EthernetHeader, DstAddr[ 0 ] ) ),
+    // Load 4 bytes from the destination MAC address.
+    BPF_STMT( BPF_LD + BPF_W + BPF_ABS, OFFSET_OF( EthernetHeader, DstAddr[ 0 ] ) ),
 
-		// Compare to first 4 bytes of broadcast MAC address.
-		BPF_JUMP( BPF_JMP + BPF_JEQ + BPF_K, 0xFFFFFFFF, 0, 2 ),
+    // Compare to first 4 bytes of broadcast MAC address.
+    BPF_JUMP( BPF_JMP + BPF_JEQ + BPF_K, 0xFFFFFFFF, 0, 2 ),
 
-		// Load remaining 2 bytes from the destination MAC address.
-		BPF_STMT( BPF_LD + BPF_H + BPF_ABS, OFFSET_OF( EthernetHeader, DstAddr[ 4 ] ) ),
+    // Load remaining 2 bytes from the destination MAC address.
+    BPF_STMT( BPF_LD + BPF_H + BPF_ABS, OFFSET_OF( EthernetHeader, DstAddr[ 4 ] ) ),
 
-		// Compare to remaining 2 bytes of broadcast MAC address.
-		BPF_JUMP( BPF_JMP + BPF_JEQ + BPF_K, 0xFFFF, 1, 0 ),
+    // Compare to remaining 2 bytes of broadcast MAC address.
+    BPF_JUMP( BPF_JMP + BPF_JEQ + BPF_K, 0xFFFF, 1, 0 ),
 
-		// Reject packet.
-		BPF_STMT( BPF_RET + BPF_K, 0 ),
+    // Reject packet.
+    BPF_STMT( BPF_RET + BPF_K, 0 ),
 
-		// Receive entire packet.
-		BPF_STMT( BPF_RET + BPF_K, -1 )
-	};
-	struct ifreq						BoundIf;
-	struct bpf_program					BpfProgram;
-	struct bpf_insn*					FilterProgram;
-	UNIX_SNP_PRIVATE_DATA*				Private;
-	EFI_STATUS							Status;
-	UINT32								Temp32;
-	INTN								Fd;
-	INTN								Result;
-	INTN								Value;
-	UINT16								Temp16;
+    // Receive entire packet.
+    BPF_STMT( BPF_RET + BPF_K, -1 )
+  };
+  struct ifreq            BoundIf;
+  struct bpf_program          BpfProgram;
+  struct bpf_insn*          FilterProgram;
+  UNIX_SNP_PRIVATE_DATA*        Private;
+  EFI_STATUS              Status;
+  UINT32                Temp32;
+  INTN                Fd;
+  INTN                Result;
+  INTN                Value;
+  UINT16                Temp16;
 
-	Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
+  Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
 
-	switch ( Private->Snp.Mode->State )
-	{
-		case EfiSimpleNetworkStopped:
-			break;
+  switch ( Private->Snp.Mode->State )
+  {
+    case EfiSimpleNetworkStopped:
+      break;
 
-		case EfiSimpleNetworkStarted:
-		case EfiSimpleNetworkInitialized:
-			return( EFI_ALREADY_STARTED );
-			break;
+    case EfiSimpleNetworkStarted:
+    case EfiSimpleNetworkInitialized:
+      return( EFI_ALREADY_STARTED );
+      break;
 
-		default:
-			return( EFI_DEVICE_ERROR );
-			break;
-	}
+    default:
+      return( EFI_DEVICE_ERROR );
+      break;
+  }
 
-	if ( Private->BpfFd == 0 )
-	{
-		Status = OpenBpfFileDescriptor( Private, &Fd );
+  if ( Private->BpfFd == 0 )
+  {
+    Status = OpenBpfFileDescriptor( Private, &Fd );
 
-		if ( EFI_ERROR( Status ) )
-		{
-			goto ErrorExit;
-		}
+    if ( EFI_ERROR( Status ) )
+    {
+      goto ErrorExit;
+    }
 
-		Private->BpfFd = Fd;
+    Private->BpfFd = Fd;
 
-		//
-		// Associate our interface with this BPF file descriptor.
-		//
-		AsciiStrCpy( BoundIf.ifr_name, Private->InterfaceName );
-		Result = Private->UnixThunk->IoCtl( Private->BpfFd, BIOCSETIF, &BoundIf );
+    //
+    // Associate our interface with this BPF file descriptor.
+    //
+    AsciiStrCpy( BoundIf.ifr_name, Private->InterfaceName );
+    Result = Private->UnixThunk->IoCtl( Private->BpfFd, BIOCSETIF, &BoundIf );
 
-		if ( Result < 0 )
-		{
-			goto DeviceErrorExit;
-		}
+    if ( Result < 0 )
+    {
+      goto DeviceErrorExit;
+    }
 
-		//
-		// Enable immediate mode and find out the buffer size.
-		//
-		Value = 1;
-		Result = Private->UnixThunk->IoCtl( Private->BpfFd, BIOCIMMEDIATE, &Value );
+    //
+    // Enable immediate mode and find out the buffer size.
+    //
+    Value = 1;
+    Result = Private->UnixThunk->IoCtl( Private->BpfFd, BIOCIMMEDIATE, &Value );
 
-		if ( Result < 0 )
-		{
-			goto DeviceErrorExit;
-		}
+    if ( Result < 0 )
+    {
+      goto DeviceErrorExit;
+    }
 
-		//
-		// Enable non-blocking I/O.
-		//
+    //
+    // Enable non-blocking I/O.
+    //
 
-		Value = Private->UnixThunk->Fcntl( Private->BpfFd, F_GETFL, 0 );
+    Value = Private->UnixThunk->Fcntl( Private->BpfFd, F_GETFL, 0 );
 
-		if ( Value == -1 )
-		{
-			goto DeviceErrorExit;
-		}
+    if ( Value == -1 )
+    {
+      goto DeviceErrorExit;
+    }
 
-		Value |= O_NONBLOCK;
+    Value |= O_NONBLOCK;
 
-		Result = Private->UnixThunk->Fcntl( Private->BpfFd, F_SETFL, (void *) Value );
+    Result = Private->UnixThunk->Fcntl( Private->BpfFd, F_SETFL, (void *) Value );
 
-		if ( Result == -1 )
-		{
-			goto DeviceErrorExit;
-		}
+    if ( Result == -1 )
+    {
+      goto DeviceErrorExit;
+    }
 
-		//
-		// Disable "header complete" flag.  This means the supplied source MAC address is
-		// what goes on the wire.
-		//
-		Value = 1;
-		Result = Private->UnixThunk->IoCtl( Private->BpfFd, BIOCSHDRCMPLT, &Value );
+    //
+    // Disable "header complete" flag.  This means the supplied source MAC address is
+    // what goes on the wire.
+    //
+    Value = 1;
+    Result = Private->UnixThunk->IoCtl( Private->BpfFd, BIOCSHDRCMPLT, &Value );
 
-		if ( Result < 0 )
-		{
-			goto DeviceErrorExit;
-		}
+    if ( Result < 0 )
+    {
+      goto DeviceErrorExit;
+    }
 
-		Result = Private->UnixThunk->IoCtl( Private->BpfFd, BIOCGBLEN, &Value );
+    Result = Private->UnixThunk->IoCtl( Private->BpfFd, BIOCGBLEN, &Value );
 
-		if ( Result < 0 )
-		{
-			goto DeviceErrorExit;
-		}
+    if ( Result < 0 )
+    {
+      goto DeviceErrorExit;
+    }
 
-		//
-		// Allocate read buffer.
-		//
-		Private->ReadBufferSize = Value;
-		Private->ReadBuffer = AllocateZeroPool( Private->ReadBufferSize );
-		if ( Private->ReadBuffer == NULL )
-		{
-			Status = EFI_OUT_OF_RESOURCES;
-			goto ErrorExit;
-		}
+    //
+    // Allocate read buffer.
+    //
+    Private->ReadBufferSize = Value;
+    Private->ReadBuffer = AllocateZeroPool( Private->ReadBufferSize );
+    if ( Private->ReadBuffer == NULL )
+    {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ErrorExit;
+    }
 
-		Private->CurrentReadPointer = Private->EndReadPointer = Private->ReadBuffer;
+    Private->CurrentReadPointer = Private->EndReadPointer = Private->ReadBuffer;
 
-		//
-		// Install our packet filter: successful reads should only produce broadcast or unitcast
-		// packets directed to our fake MAC address.
-		//
-		FilterProgram = AllocateCopyPool( sizeof( FilterInstructionTemplate ), &FilterInstructionTemplate );
-		if ( FilterProgram == NULL )
-		{
-			goto ErrorExit;
-		}
+    //
+    // Install our packet filter: successful reads should only produce broadcast or unitcast
+    // packets directed to our fake MAC address.
+    //
+    FilterProgram = AllocateCopyPool( sizeof( FilterInstructionTemplate ), &FilterInstructionTemplate );
+    if ( FilterProgram == NULL )
+    {
+      goto ErrorExit;
+    }
 
-		//
-		// Insert out fake MAC address into the filter.  The data has to be host endian.
-		//
-		CopyMem( &Temp32, &Private->Mode.CurrentAddress.Addr[ 0 ], sizeof( UINT32 ) );
-		FilterProgram[ 1 ].k = NTOHL( Temp32 );
-		CopyMem( &Temp16, &Private->Mode.CurrentAddress.Addr[ 4 ], sizeof( UINT16 ) );
-		FilterProgram[ 3 ].k = NTOHS( Temp16 );
+    //
+    // Insert out fake MAC address into the filter.  The data has to be host endian.
+    //
+    CopyMem( &Temp32, &Private->Mode.CurrentAddress.Addr[ 0 ], sizeof( UINT32 ) );
+    FilterProgram[ 1 ].k = NTOHL( Temp32 );
+    CopyMem( &Temp16, &Private->Mode.CurrentAddress.Addr[ 4 ], sizeof( UINT16 ) );
+    FilterProgram[ 3 ].k = NTOHS( Temp16 );
 
-		BpfProgram.bf_len = sizeof( FilterInstructionTemplate ) / sizeof( struct bpf_insn );
-		BpfProgram.bf_insns = FilterProgram;
+    BpfProgram.bf_len = sizeof( FilterInstructionTemplate ) / sizeof( struct bpf_insn );
+    BpfProgram.bf_insns = FilterProgram;
 
-		Result = Private->UnixThunk->IoCtl( Private->BpfFd, BIOCSETF, &BpfProgram );
+    Result = Private->UnixThunk->IoCtl( Private->BpfFd, BIOCSETF, &BpfProgram );
 
-		if ( Result < 0 )
-		{
-			goto DeviceErrorExit;
-		}
+    if ( Result < 0 )
+    {
+      goto DeviceErrorExit;
+    }
 
-		FreePool( FilterProgram );
+    FreePool( FilterProgram );
 
-		//
-		// Enable promiscuous mode.
-		//
+    //
+    // Enable promiscuous mode.
+    //
 
-		Result = Private->UnixThunk->IoCtl( Private->BpfFd, BIOCPROMISC, 0 );
+    Result = Private->UnixThunk->IoCtl( Private->BpfFd, BIOCPROMISC, 0 );
 
-		if ( Result < 0 )
-		{
-			goto DeviceErrorExit;
-		}
+    if ( Result < 0 )
+    {
+      goto DeviceErrorExit;
+    }
 
 
-		Private->Snp.Mode->State = EfiSimpleNetworkStarted;			
-	}
+    Private->Snp.Mode->State = EfiSimpleNetworkStarted;      
+  }
 
-	return( Status );
+  return( Status );
 
 DeviceErrorExit:
-	Status = EFI_DEVICE_ERROR;
+  Status = EFI_DEVICE_ERROR;
 ErrorExit:
-	if ( Private->ReadBuffer != NULL )
-	{
-		FreePool( Private->ReadBuffer );
-		Private->ReadBuffer = NULL;
-	}
-	return( Status );
+  if ( Private->ReadBuffer != NULL )
+  {
+    FreePool( Private->ReadBuffer );
+    Private->ReadBuffer = NULL;
+  }
+  return( Status );
 }
 
 
@@ -1107,43 +1107,43 @@ ErrorExit:
 EFI_STATUS
 EFIAPI
 UnixSnpStop(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This
-	)
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This
+  )
 {
-	UNIX_SNP_PRIVATE_DATA*				Private = EFI_SUCCESS;
-	EFI_STATUS							Status;
+  UNIX_SNP_PRIVATE_DATA*        Private = EFI_SUCCESS;
+  EFI_STATUS              Status;
 
-	Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
+  Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
 
-	switch ( Private->Snp.Mode->State )
-	{
-		case EfiSimpleNetworkStarted:
-			break;
+  switch ( Private->Snp.Mode->State )
+  {
+    case EfiSimpleNetworkStarted:
+      break;
 
-		case EfiSimpleNetworkStopped:
-			return( EFI_NOT_STARTED );
-			break;
+    case EfiSimpleNetworkStopped:
+      return( EFI_NOT_STARTED );
+      break;
 
-		default:
-			return( EFI_DEVICE_ERROR );
-			break;
-	}
+    default:
+      return( EFI_DEVICE_ERROR );
+      break;
+  }
 
-	if ( Private->BpfFd != 0 )
-	{
-		Private->UnixThunk->Close( Private->BpfFd );
-		Private->BpfFd = 0;
-	}
+  if ( Private->BpfFd != 0 )
+  {
+    Private->UnixThunk->Close( Private->BpfFd );
+    Private->BpfFd = 0;
+  }
 
-	if ( Private->ReadBuffer != NULL )
-	{
-		FreePool( Private->ReadBuffer );
-		Private->CurrentReadPointer = Private->EndReadPointer = Private->ReadBuffer = NULL;
-	}
+  if ( Private->ReadBuffer != NULL )
+  {
+    FreePool( Private->ReadBuffer );
+    Private->CurrentReadPointer = Private->EndReadPointer = Private->ReadBuffer = NULL;
+  }
 
-	Private->Snp.Mode->State = EfiSimpleNetworkStopped;
+  Private->Snp.Mode->State = EfiSimpleNetworkStopped;
 
-	return( Status );
+  return( Status );
 }
 
 
@@ -1170,50 +1170,50 @@ UnixSnpStop(
 EFI_STATUS
 EFIAPI
 UnixSnpInitialize(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN UINTN							ExtraRxBufferSize OPTIONAL,
-	IN UINTN							ExtraTxBufferSize OPTIONAL
-	)
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN UINTN              ExtraRxBufferSize OPTIONAL,
+  IN UINTN              ExtraTxBufferSize OPTIONAL
+  )
 {
-	UNIX_SNP_PRIVATE_DATA*				Private = EFI_SUCCESS;
-	EFI_STATUS							Status;
+  UNIX_SNP_PRIVATE_DATA*        Private = EFI_SUCCESS;
+  EFI_STATUS              Status;
 
-	Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
+  Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
 
-	switch ( Private->Snp.Mode->State )
-	{
-		case EfiSimpleNetworkStarted:
-			break;
+  switch ( Private->Snp.Mode->State )
+  {
+    case EfiSimpleNetworkStarted:
+      break;
 
-		case EfiSimpleNetworkStopped:
-			return( EFI_NOT_STARTED );
-			break;
+    case EfiSimpleNetworkStopped:
+      return( EFI_NOT_STARTED );
+      break;
 
-		default:
-			return( EFI_DEVICE_ERROR );
-			break;
-	}
+    default:
+      return( EFI_DEVICE_ERROR );
+      break;
+  }
 
 #if 0
-	Status = gBS->CreateEvent(
-					EVT_NOTIFY_WAIT,
-					TPL_NOTIFY,
-					UnixSnpWaitForPacketNotify,
-					Private,
-					&Private->Snp.WaitForPacket
-					);
+  Status = gBS->CreateEvent(
+          EVT_NOTIFY_WAIT,
+          TPL_NOTIFY,
+          UnixSnpWaitForPacketNotify,
+          Private,
+          &Private->Snp.WaitForPacket
+          );
 #endif
 
-	if ( !EFI_ERROR( Status ) )
-	{
-		Private->Mode.MCastFilterCount = 0;
-		Private->Mode.ReceiveFilterSetting = 0;
-		ZeroMem( Private->Mode.MCastFilter, sizeof( Private->Mode.MCastFilter ) );
+  if ( !EFI_ERROR( Status ) )
+  {
+    Private->Mode.MCastFilterCount = 0;
+    Private->Mode.ReceiveFilterSetting = 0;
+    ZeroMem( Private->Mode.MCastFilter, sizeof( Private->Mode.MCastFilter ) );
 
-		Private->Snp.Mode->State = EfiSimpleNetworkInitialized;
-	}
+    Private->Snp.Mode->State = EfiSimpleNetworkInitialized;
+  }
 
-	return( Status );
+  return( Status );
 }
 
 /**
@@ -1231,30 +1231,30 @@ UnixSnpInitialize(
 EFI_STATUS
 EFIAPI
 UnixSnpReset(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN BOOLEAN							ExtendedVerification
-	)
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN BOOLEAN              ExtendedVerification
+  )
 {
-	UNIX_SNP_PRIVATE_DATA*				Private;
-	EFI_STATUS							Success = EFI_SUCCESS;
+  UNIX_SNP_PRIVATE_DATA*        Private;
+  EFI_STATUS              Success = EFI_SUCCESS;
 
-	Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
+  Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
 
-	switch ( Private->Snp.Mode->State )
-	{
-		case EfiSimpleNetworkInitialized:
-			break;
+  switch ( Private->Snp.Mode->State )
+  {
+    case EfiSimpleNetworkInitialized:
+      break;
 
-		case EfiSimpleNetworkStopped:
-			return( EFI_NOT_STARTED );
-			break;
+    case EfiSimpleNetworkStopped:
+      return( EFI_NOT_STARTED );
+      break;
 
-		default:
-			return( EFI_DEVICE_ERROR );
-			break;
-	}
+    default:
+      return( EFI_DEVICE_ERROR );
+      break;
+  }
 
-	return( Success );
+  return( Success );
 }
 
 /**
@@ -1269,53 +1269,53 @@ UnixSnpReset(
 EFI_STATUS
 EFIAPI
 UnixSnpShutdown(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This
-	)
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This
+  )
 {
-	UNIX_SNP_PRIVATE_DATA*				Private;
-	EFI_STATUS							Success = EFI_SUCCESS;
+  UNIX_SNP_PRIVATE_DATA*        Private;
+  EFI_STATUS              Success = EFI_SUCCESS;
 
-	Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
+  Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
 
-	switch ( Private->Snp.Mode->State )
-	{
-		case EfiSimpleNetworkInitialized:
-			break;
+  switch ( Private->Snp.Mode->State )
+  {
+    case EfiSimpleNetworkInitialized:
+      break;
 
-		case EfiSimpleNetworkStopped:
-			return( EFI_NOT_STARTED );
-			break;
+    case EfiSimpleNetworkStopped:
+      return( EFI_NOT_STARTED );
+      break;
 
-		default:
-			return( EFI_DEVICE_ERROR );
-			break;
-	}
+    default:
+      return( EFI_DEVICE_ERROR );
+      break;
+  }
 
-	Private->Snp.Mode->State = EfiSimpleNetworkStarted;
+  Private->Snp.Mode->State = EfiSimpleNetworkStarted;
 
-	Private->Mode.ReceiveFilterSetting = 0;
-	Private->Mode.MCastFilterCount = 0;
-	ZeroMem( Private->Mode.MCastFilter, sizeof( Private->Mode.MCastFilter ) );
+  Private->Mode.ReceiveFilterSetting = 0;
+  Private->Mode.MCastFilterCount = 0;
+  ZeroMem( Private->Mode.MCastFilter, sizeof( Private->Mode.MCastFilter ) );
 
-	if ( Private->Snp.WaitForPacket != NULL )
-	{
-		gBS->CloseEvent( Private->Snp.WaitForPacket );
-		Private->Snp.WaitForPacket = NULL;
-	}
+  if ( Private->Snp.WaitForPacket != NULL )
+  {
+    gBS->CloseEvent( Private->Snp.WaitForPacket );
+    Private->Snp.WaitForPacket = NULL;
+  }
 
-	if ( Private->BpfFd != 0 )
-	{
-		Private->UnixThunk->Close( Private->BpfFd );
-		Private->BpfFd = 0;
-	}
+  if ( Private->BpfFd != 0 )
+  {
+    Private->UnixThunk->Close( Private->BpfFd );
+    Private->BpfFd = 0;
+  }
 
-	if ( Private->ReadBuffer != NULL )
-	{
-		FreePool( Private->ReadBuffer );
-		Private->CurrentReadPointer = Private->EndReadPointer = Private->ReadBuffer = NULL;
-	}
+  if ( Private->ReadBuffer != NULL )
+  {
+    FreePool( Private->ReadBuffer );
+    Private->CurrentReadPointer = Private->EndReadPointer = Private->ReadBuffer = NULL;
+  }
 
-	return( Success );
+  return( Success );
 }
 
 /**
@@ -1342,17 +1342,17 @@ UnixSnpShutdown(
 EFI_STATUS
 EFIAPI
 UnixSnpReceiveFilters(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN UINT32							EnableBits,
-	IN UINT32							DisableBits,
-	IN BOOLEAN							ResetMcastFilter,
-	IN UINTN							McastFilterCount OPTIONAL,
-	IN EFI_MAC_ADDRESS*					McastFilter OPTIONAL
-	)
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN UINT32              EnableBits,
+  IN UINT32              DisableBits,
+  IN BOOLEAN              ResetMcastFilter,
+  IN UINTN              McastFilterCount OPTIONAL,
+  IN EFI_MAC_ADDRESS*          McastFilter OPTIONAL
+  )
 {
-	UNIX_SNP_PRIVATE_DATA*				Private;
+  UNIX_SNP_PRIVATE_DATA*        Private;
 
-	Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
+  Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
 
 //  ReturnValue = GlobalData->NtNetUtilityTable.SetReceiveFilter (
 //                                                Instance->InterfaceInfo.InterfaceIndex,
@@ -1361,8 +1361,8 @@ UnixSnpReceiveFilters(
 //                                                McastFilter
 //                                                );
 
-	// For now, just succeed...
-	return( EFI_SUCCESS );
+  // For now, just succeed...
+  return( EFI_SUCCESS );
 }
 
 /**
@@ -1379,12 +1379,12 @@ UnixSnpReceiveFilters(
 EFI_STATUS
 EFIAPI
 UnixSnpStationAddress(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN BOOLEAN							Reset,
-	IN EFI_MAC_ADDRESS*					NewMacAddr OPTIONAL
-	)
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN BOOLEAN              Reset,
+  IN EFI_MAC_ADDRESS*          NewMacAddr OPTIONAL
+  )
 {
-	return( EFI_UNSUPPORTED );
+  return( EFI_UNSUPPORTED );
 }
 
 /**
@@ -1409,13 +1409,13 @@ UnixSnpStationAddress(
 EFI_STATUS
 EFIAPI
 UnixSnpStatistics(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN BOOLEAN							Reset,
-	IN OUT UINTN*						StatisticsSize OPTIONAL,
-	OUT EFI_NETWORK_STATISTICS*			StatisticsTable OPTIONAL
-	)
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN BOOLEAN              Reset,
+  IN OUT UINTN*            StatisticsSize OPTIONAL,
+  OUT EFI_NETWORK_STATISTICS*      StatisticsTable OPTIONAL
+  )
 {
-	return( EFI_UNSUPPORTED );
+  return( EFI_UNSUPPORTED );
 }
 
 /**
@@ -1440,13 +1440,13 @@ UnixSnpStatistics(
 EFI_STATUS
 EFIAPI
 UnixSnpMcastIptoMac(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN BOOLEAN							Ipv6,
-	IN EFI_IP_ADDRESS*					Ip,
-	OUT EFI_MAC_ADDRESS*				Mac
-	)
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN BOOLEAN              Ipv6,
+  IN EFI_IP_ADDRESS*          Ip,
+  OUT EFI_MAC_ADDRESS*        Mac
+  )
 {
-	return( EFI_UNSUPPORTED );
+  return( EFI_UNSUPPORTED );
 }
 
 
@@ -1469,14 +1469,14 @@ UnixSnpMcastIptoMac(
 EFI_STATUS
 EFIAPI
 UnixSnpNvdata(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN BOOLEAN							ReadOrWrite,
-	IN UINTN							Offset,
-	IN UINTN							BufferSize,
-	IN OUT VOID*						Buffer
-	)
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN BOOLEAN              ReadOrWrite,
+  IN UINTN              Offset,
+  IN UINTN              BufferSize,
+  IN OUT VOID*            Buffer
+  )
 {
-	return( EFI_UNSUPPORTED );
+  return( EFI_UNSUPPORTED );
 }
 
 
@@ -1504,22 +1504,22 @@ UnixSnpNvdata(
 EFI_STATUS
 EFIAPI
 UnixSnpGetStatus(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	OUT UINT32*							InterruptStatus,
-	OUT VOID**							TxBuffer
-	)
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  OUT UINT32*              InterruptStatus,
+  OUT VOID**              TxBuffer
+  )
 {
-	if ( TxBuffer != NULL )
-	{
-		*( ( UINT8 ** ) TxBuffer ) = ( UINT8 * ) 1;
-	}
+  if ( TxBuffer != NULL )
+  {
+    *( ( UINT8 ** ) TxBuffer ) = ( UINT8 * ) 1;
+  }
 
-	if ( InterruptStatus != NULL )
-	{
-		*InterruptStatus = EFI_SIMPLE_NETWORK_TRANSMIT_INTERRUPT;
-	}
+  if ( InterruptStatus != NULL )
+  {
+    *InterruptStatus = EFI_SIMPLE_NETWORK_TRANSMIT_INTERRUPT;
+  }
 
-	return( EFI_SUCCESS );
+  return( EFI_SUCCESS );
 }
 
 
@@ -1556,56 +1556,56 @@ UnixSnpGetStatus(
 EFI_STATUS
 EFIAPI
 UnixSnpTransmit(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	IN UINTN							HeaderSize,
-	IN UINTN							BufferSize,
-	IN VOID*							Buffer,
-	IN EFI_MAC_ADDRESS*					SrcAddr OPTIONAL,
-	IN EFI_MAC_ADDRESS*					DestAddr OPTIONAL,
-	IN UINT16*							Protocol OPTIONAL
-	)
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  IN UINTN              HeaderSize,
+  IN UINTN              BufferSize,
+  IN VOID*              Buffer,
+  IN EFI_MAC_ADDRESS*          SrcAddr OPTIONAL,
+  IN EFI_MAC_ADDRESS*          DestAddr OPTIONAL,
+  IN UINT16*              Protocol OPTIONAL
+  )
 {
-	UNIX_SNP_PRIVATE_DATA*				Private;
-	EthernetHeader*						EnetHeader;
-	INTN								Result;
+  UNIX_SNP_PRIVATE_DATA*        Private;
+  EthernetHeader*            EnetHeader;
+  INTN                Result;
 
-	Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
+  Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
 
-	if ( This->Mode->State < EfiSimpleNetworkStarted )
-	{
-		return( EFI_NOT_STARTED );
-	}
+  if ( This->Mode->State < EfiSimpleNetworkStarted )
+  {
+    return( EFI_NOT_STARTED );
+  }
 
-	if ( HeaderSize != 0 )
-	{
-		if ( ( DestAddr == NULL ) || ( Protocol == NULL ) || ( HeaderSize != This->Mode->MediaHeaderSize ) )
-		{
-			return( EFI_INVALID_PARAMETER );
-		}
+  if ( HeaderSize != 0 )
+  {
+    if ( ( DestAddr == NULL ) || ( Protocol == NULL ) || ( HeaderSize != This->Mode->MediaHeaderSize ) )
+    {
+      return( EFI_INVALID_PARAMETER );
+    }
 
-		if ( SrcAddr == NULL )
-		{
-			SrcAddr = &This->Mode->CurrentAddress;
-		}
+    if ( SrcAddr == NULL )
+    {
+      SrcAddr = &This->Mode->CurrentAddress;
+    }
 
-		EnetHeader = ( EthernetHeader * ) Buffer;
+    EnetHeader = ( EthernetHeader * ) Buffer;
 
-		CopyMem( EnetHeader->DstAddr, DestAddr, NET_ETHER_ADDR_LEN );
-		CopyMem( EnetHeader->SrcAddr, SrcAddr, NET_ETHER_ADDR_LEN );
+    CopyMem( EnetHeader->DstAddr, DestAddr, NET_ETHER_ADDR_LEN );
+    CopyMem( EnetHeader->SrcAddr, SrcAddr, NET_ETHER_ADDR_LEN );
 
-		EnetHeader->Type = HTONS( *Protocol );
-	}
+    EnetHeader->Type = HTONS( *Protocol );
+  }
 
-	Result = Private->UnixThunk->Write( Private->BpfFd, Buffer, BufferSize );
+  Result = Private->UnixThunk->Write( Private->BpfFd, Buffer, BufferSize );
 
-	if ( Result < 0 )
-	{
-		return( EFI_DEVICE_ERROR );
-	}
-	else
-	{
-		return( EFI_SUCCESS );
-	}
+  if ( Result < 0 )
+  {
+    return( EFI_DEVICE_ERROR );
+  }
+  else
+  {
+    return( EFI_SUCCESS );
+  }
 }
 
 /**
@@ -1641,116 +1641,116 @@ UnixSnpTransmit(
 EFI_STATUS
 EFIAPI
 UnixSnpReceive(
-	IN EFI_SIMPLE_NETWORK_PROTOCOL*		This,
-	OUT UINTN*							HeaderSize OPTIONAL,
-	IN OUT UINTN*						BuffSize,
-	OUT VOID*							Buffer,
-	OUT EFI_MAC_ADDRESS*				SourceAddr OPTIONAL,
-	OUT EFI_MAC_ADDRESS*				DestinationAddr OPTIONAL,
-	OUT UINT16*							Protocol OPTIONAL
-	)
+  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
+  OUT UINTN*              HeaderSize OPTIONAL,
+  IN OUT UINTN*            BuffSize,
+  OUT VOID*              Buffer,
+  OUT EFI_MAC_ADDRESS*        SourceAddr OPTIONAL,
+  OUT EFI_MAC_ADDRESS*        DestinationAddr OPTIONAL,
+  OUT UINT16*              Protocol OPTIONAL
+  )
 {
-	UNIX_SNP_PRIVATE_DATA*				Private;
-	struct bpf_hdr*						BpfHeader;
-	EthernetHeader*						EnetHeader;
-	EFI_STATUS							Status = EFI_SUCCESS;
-	INTN								Result;
+  UNIX_SNP_PRIVATE_DATA*        Private;
+  struct bpf_hdr*            BpfHeader;
+  EthernetHeader*            EnetHeader;
+  EFI_STATUS              Status = EFI_SUCCESS;
+  INTN                Result;
 
-	if ( This->Mode->State < EfiSimpleNetworkStarted )
-	{
-		return( EFI_NOT_STARTED );
-	}
+  if ( This->Mode->State < EfiSimpleNetworkStarted )
+  {
+    return( EFI_NOT_STARTED );
+  }
 
-	Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
+  Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( This );
 
-	//
-	// Do we have any remaining packets from the previous read?
-	//
-	if ( Private->CurrentReadPointer >= Private->EndReadPointer )
-	{
-		Result = Private->UnixThunk->Read( Private->BpfFd, Private->ReadBuffer, Private->ReadBufferSize );
+  //
+  // Do we have any remaining packets from the previous read?
+  //
+  if ( Private->CurrentReadPointer >= Private->EndReadPointer )
+  {
+    Result = Private->UnixThunk->Read( Private->BpfFd, Private->ReadBuffer, Private->ReadBufferSize );
 
-		if ( Result < 0 )
-		{
-			Result = Private->UnixThunk->GetErrno();
+    if ( Result < 0 )
+    {
+      Result = Private->UnixThunk->GetErrno();
 
-			//
-			// EAGAIN means that there's no I/O outstanding against this file descriptor.
-			//
-			if ( Result == EAGAIN )
-			{
-				return( EFI_NOT_READY );
-			}
-			else
-			{
-				return( EFI_DEVICE_ERROR );
-			}
-		}
+      //
+      // EAGAIN means that there's no I/O outstanding against this file descriptor.
+      //
+      if ( Result == EAGAIN )
+      {
+        return( EFI_NOT_READY );
+      }
+      else
+      {
+        return( EFI_DEVICE_ERROR );
+      }
+    }
 
-		if ( Result == 0 )
-		{
-			return( EFI_NOT_READY );
-		}
+    if ( Result == 0 )
+    {
+      return( EFI_NOT_READY );
+    }
 
-		Private->CurrentReadPointer = Private->ReadBuffer;
-		Private->EndReadPointer = Private->CurrentReadPointer + Result;
-	}
+    Private->CurrentReadPointer = Private->ReadBuffer;
+    Private->EndReadPointer = Private->CurrentReadPointer + Result;
+  }
 
-	BpfHeader = Private->CurrentReadPointer;
-	EnetHeader = Private->CurrentReadPointer + BpfHeader->bh_hdrlen;
+  BpfHeader = Private->CurrentReadPointer;
+  EnetHeader = Private->CurrentReadPointer + BpfHeader->bh_hdrlen;
 
-	if ( BpfHeader->bh_caplen > *BuffSize )
-	{
-		*BuffSize = BpfHeader->bh_caplen;
-		return( EFI_BUFFER_TOO_SMALL );
-	}
+  if ( BpfHeader->bh_caplen > *BuffSize )
+  {
+    *BuffSize = BpfHeader->bh_caplen;
+    return( EFI_BUFFER_TOO_SMALL );
+  }
 
-	CopyMem( Buffer, EnetHeader, BpfHeader->bh_caplen );
-	*BuffSize = BpfHeader->bh_caplen;
+  CopyMem( Buffer, EnetHeader, BpfHeader->bh_caplen );
+  *BuffSize = BpfHeader->bh_caplen;
 
-	if ( HeaderSize != NULL )
-	{
-		*HeaderSize = sizeof( EthernetHeader );
-	}
+  if ( HeaderSize != NULL )
+  {
+    *HeaderSize = sizeof( EthernetHeader );
+  }
 
-	if ( DestinationAddr != NULL )
-	{
-		ZeroMem( DestinationAddr, sizeof( EFI_MAC_ADDRESS ) );
-		CopyMem( DestinationAddr, EnetHeader->DstAddr, NET_ETHER_ADDR_LEN );
-	}
+  if ( DestinationAddr != NULL )
+  {
+    ZeroMem( DestinationAddr, sizeof( EFI_MAC_ADDRESS ) );
+    CopyMem( DestinationAddr, EnetHeader->DstAddr, NET_ETHER_ADDR_LEN );
+  }
 
-	if ( SourceAddr != NULL )
-	{
-		ZeroMem( SourceAddr, sizeof( EFI_MAC_ADDRESS ) );
-		CopyMem( SourceAddr, EnetHeader->SrcAddr, NET_ETHER_ADDR_LEN );
-	}
+  if ( SourceAddr != NULL )
+  {
+    ZeroMem( SourceAddr, sizeof( EFI_MAC_ADDRESS ) );
+    CopyMem( SourceAddr, EnetHeader->SrcAddr, NET_ETHER_ADDR_LEN );
+  }
 
-	if ( Protocol != NULL )
-	{
-		*Protocol = NTOHS( EnetHeader->Type );
-	}
+  if ( Protocol != NULL )
+  {
+    *Protocol = NTOHS( EnetHeader->Type );
+  }
 
-	Private->CurrentReadPointer += BPF_WORDALIGN( BpfHeader->bh_hdrlen + BpfHeader->bh_caplen );
+  Private->CurrentReadPointer += BPF_WORDALIGN( BpfHeader->bh_hdrlen + BpfHeader->bh_caplen );
 
-	return( Status );
+  return( Status );
 }
 
 
 VOID
 EFIAPI
 UnixSnpWaitForPacketNotify(
-	IN EFI_EVENT						Event,
-	IN VOID*							Context
-	)
+  IN EFI_EVENT            Event,
+  IN VOID*              Context
+  )
 {
-	UNIX_SNP_PRIVATE_DATA*				Private;
+  UNIX_SNP_PRIVATE_DATA*        Private;
 
-	Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( Context );
+  Private = UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS( Context );
 
-	if ( Private->Snp.Mode->State < EfiSimpleNetworkStarted )
-	{
-		return;
-	}
+  if ( Private->Snp.Mode->State < EfiSimpleNetworkStarted )
+  {
+    return;
+  }
 }
 
 
@@ -1768,24 +1768,24 @@ UnixSnpWaitForPacketNotify(
 **/
 EFI_STATUS
 InitializeUnixSnpDriver(
-	IN EFI_HANDLE				ImageHandle,
-	IN EFI_SYSTEM_TABLE*		SystemTable
-	)
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE*    SystemTable
+  )
 {
-	EFI_STATUS						Status;
+  EFI_STATUS            Status;
 
-	//
-	// Install the Driver Protocols
-	//
+  //
+  // Install the Driver Protocols
+  //
 
-	Status = EfiLibInstallDriverBindingComponentName2(
-					ImageHandle,
-					SystemTable,
-					&gUnixSnpDriverBinding,
-					ImageHandle,
-					&gUnixSnpDriverComponentName,
-					&gUnixSnpDriverComponentName2
-					);
+  Status = EfiLibInstallDriverBindingComponentName2(
+          ImageHandle,
+          SystemTable,
+          &gUnixSnpDriverBinding,
+          ImageHandle,
+          &gUnixSnpDriverComponentName,
+          &gUnixSnpDriverComponentName2
+          );
 
-	return( Status );
+  return( Status );
 }

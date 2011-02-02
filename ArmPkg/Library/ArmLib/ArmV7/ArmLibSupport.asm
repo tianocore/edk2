@@ -70,17 +70,17 @@ ArmDisableAsynchronousAbort
 ArmEnableIrq
   cpsie   i
   isb
-\s\sbx      LR
+  bx      LR
 
 ArmDisableIrq
   cpsid   i
   isb
-\s\sbx      LR
+  bx      LR
 
 ArmEnableFiq
   cpsie   f
   isb
-\s\sbx      LR
+  bx      LR
 
 ArmDisableFiq
   cpsid   f
@@ -99,17 +99,17 @@ ArmDisableInterrupts
 
 ArmGetInterruptState
   mrs     R0,CPSR
-  tst     R0,#0x80\s\s    ;Check if IRQ is enabled.
+  tst     R0,#0x80      ;Check if IRQ is enabled.
   moveq   R0,#1
   movne   R0,#0
-\s\sbx      LR
+  bx      LR
 
 ArmGetFiqState
-\s\smrs     R0,CPSR
-\s\stst     R0,#0x40\s\s    ;Check if FIQ is enabled.
-\s\smoveq   R0,#1
-\s\smovne   R0,#0
-\s\sbx      LR
+  mrs     R0,CPSR
+  tst     R0,#0x40      ;Check if FIQ is enabled.
+  moveq   R0,#1
+  movne   R0,#0
+  bx      LR
   
 ArmInvalidateTlb
   mov     r0,#0
@@ -126,7 +126,7 @@ ArmSetTTBR0
 
 ArmGetTTBR0BaseAddress
   mrc     p15,0,r0,c2,c0,0
-  ldr\s\s  r1, = 0xFFFFC000
+  ldr    r1, = 0xFFFFC000
   and     r0, r0, r1
   isb
   bx      lr

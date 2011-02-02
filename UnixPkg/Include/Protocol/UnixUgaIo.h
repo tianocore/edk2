@@ -81,23 +81,23 @@ EFI_STATUS
 
 
 typedef struct {
-	  UINTN                                   SourceX;
-	  UINTN                                   SourceY;
-	  UINTN                                   DestinationX;
-	  UINTN                                   DestinationY;
-	  UINTN                                   Width;
-	  UINTN                                   Height;
-	  UINTN                                   Delta;
+    UINTN                                   SourceX;
+    UINTN                                   SourceY;
+    UINTN                                   DestinationX;
+    UINTN                                   DestinationY;
+    UINTN                                   Width;
+    UINTN                                   Height;
+    UINTN                                   Delta;
 } UGA_BLT_ARGS;
 
 typedef
 EFI_STATUS
 (EFIAPI *UGABlt)(
     IN  EFI_UNIX_UGA_IO_PROTOCOL                *Uga,
-	  IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
-	  IN  EFI_UGA_BLT_OPERATION                   BltOperation,
-	  IN  UGA_BLT_ARGS                            *Args
-	  );
+    IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
+    IN  EFI_UGA_BLT_OPERATION                   BltOperation,
+    IN  UGA_BLT_ARGS                            *Args
+    );
 
 typedef
 BOOLEAN

@@ -48,7 +48,7 @@ EFIAPI
 UnixPeCoffGetUnixThunkStucture (
   )
 {
-	PEI_UNIX_THUNK_PPI  *UnixThunkPpi;
+  PEI_UNIX_THUNK_PPI  *UnixThunkPpi;
   EFI_STATUS        Status;
 
   

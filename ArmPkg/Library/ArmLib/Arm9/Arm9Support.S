@@ -58,18 +58,18 @@ ASM_PFX(ArmEnableInstructionCache):
   orr    r0,r0,r1             @Set I bit
   mcr    p15,0,r0,c1,c0,0     @Write control register configuration data
   bx     LR
-\s\s
+  
 ASM_PFX(ArmDisableInstructionCache):
   ldr    r1,=IC_ON
   mrc    p15,0,r0,c1,c0,0     @Read control register configuration data
   bic    r0,r0,r1             @Clear I bit.
   mcr    p15,0,r0,c1,c0,0     @Write control register configuration data
   bx     LR
-\s\s
+  
 ASM_PFX(ArmInvalidateInstructionCache):
   mov     r0,#0
   mcr     p15,0,r0,c7,c5,0     @Invalidate entire Instruction cache. 
-\s\s                       @Also flushes the branch target cache.
+                         @Also flushes the branch target cache.
   mov     r0,#0
   mcr     p15,0,r0,c7,c10,4    @Data write buffer
   bx      LR
@@ -99,7 +99,7 @@ ASM_PFX(ArmEnableDataCache):
   orr     R0,R0,R1              @Set C bit
   mcr     p15,0,r0,c1,c0,0      @Write control register configuration data
   bx      LR
-\s\s
+  
 ASM_PFX(ArmDisableDataCache):
   ldr     R1,=DC_ON
   mrc     p15,0,R0,c1,c0,0      @Read control register configuration data
@@ -111,7 +111,7 @@ ASM_PFX(ArmCleanDataCache):
   mrc     p15,0,r15,c7,c10,3
   bne     ASM_PFX(ArmCleanDataCache)
   mov     R0,#0
-  mcr     p15,0,R0,c7,c10,4\s\s@Drain write buffer
+  mcr     p15,0,R0,c7,c10,4  @Drain write buffer
   bx      LR
     
 ASM_PFX(ArmInvalidateDataCache):
@@ -125,7 +125,7 @@ ASM_PFX(ArmCleanInvalidateDataCache):
   mrc     p15,0,r15,c7,c14,3
   bne     ASM_PFX(ArmCleanInvalidateDataCache)
   mov     R0,#0
-  mcr     p15,0,R0,c7,c10,4\s\s      @Drain write buffer
+  mcr     p15,0,R0,c7,c10,4        @Drain write buffer
   bx      LR
 
 ASM_PFX(ArmEnableBranchPrediction):

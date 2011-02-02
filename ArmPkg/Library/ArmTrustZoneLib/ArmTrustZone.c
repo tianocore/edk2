@@ -72,8 +72,8 @@ EFI_STATUS TZASCSetRegion(UINTN TzascBase, UINTN RegionId, UINTN Enabled, UINTN 
     Region = (UINT32*)((UINTN)TzascBase + TZASC_REGIONS_REG + (RegionId * 0x10));
 
     MmioWrite32((UINTN)(Region), LowAddress&0xFFFF8000);
-\s\sMmioWrite32((UINTN)(Region+1), HighAddress);
-\s\sMmioWrite32((UINTN)(Region+2), ((Security & 0xF) <<28) | ((Size & 0x3F) << 1) | (Enabled & 0x1));
+  MmioWrite32((UINTN)(Region+1), HighAddress);
+  MmioWrite32((UINTN)(Region+2), ((Security & 0xF) <<28) | ((Size & 0x3F) << 1) | (Enabled & 0x1));
 
     return EFI_SUCCESS;
 }

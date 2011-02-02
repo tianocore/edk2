@@ -338,11 +338,11 @@ UpdatePageEntries (
       // modify cacheability attributes
       EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
       if (FeaturePcdGet(PcdEfiUncachedMemoryToStronglyOrdered)) {
-\s\s\s\s    // map to strongly ordered
-\s\s\s\s    EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_STRONGLY_ORDERED; // TEX[2:0] = 0, C=0, B=0
+        // map to strongly ordered
+        EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_STRONGLY_ORDERED; // TEX[2:0] = 0, C=0, B=0
       } else {
-    \s\s  // map to normal non-cachable
-    \s\s  EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
+        // map to normal non-cachable
+        EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
       }
       break;
 
@@ -486,11 +486,11 @@ UpdateSectionEntries (
       // modify cacheability attributes
       EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
       if (FeaturePcdGet(PcdEfiUncachedMemoryToStronglyOrdered)) {
-\s\s\s\s    // map to strongly ordered
-\s\s\s\s    EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_STRONGLY_ORDERED; // TEX[2:0] = 0, C=0, B=0
+        // map to strongly ordered
+        EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_STRONGLY_ORDERED; // TEX[2:0] = 0, C=0, B=0
       } else {
-    \s\s  // map to normal non-cachable
-    \s\s  EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
+        // map to normal non-cachable
+        EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
       }
       break;
 

@@ -350,9 +350,9 @@ Done:
     if (Private != NULL) {
 
       if (Private->VolumeLabel != NULL)
-	gBS->FreePool (Private->VolumeLabel);
+  gBS->FreePool (Private->VolumeLabel);
       if (Private->FilePath != NULL)
-	gBS->FreePool (Private->FilePath);
+  gBS->FreePool (Private->FilePath);
       FreeUnicodeStringTable (Private->ControllerNameTable);
 
       gBS->FreePool (Private);
@@ -862,7 +862,7 @@ OpenRoot:
       // Create a directory
       //
       if (NewPrivateFile->UnixThunk->MkDir (NewPrivateFile->FileName, 0777) != 0) {
-	INTN LastError;
+  INTN LastError;
 
         LastError = PrivateFile->UnixThunk->GetErrno ();
         if (LastError != EEXIST) {
@@ -897,9 +897,9 @@ OpenRoot:
        0666);
     if (NewPrivateFile->fd < 0) {
       if (PrivateFile->UnixThunk->GetErrno () == ENOENT) {
-	Status = EFI_NOT_FOUND;
+  Status = EFI_NOT_FOUND;
       } else {
-	Status = EFI_ACCESS_DENIED;
+  Status = EFI_ACCESS_DENIED;
       }
     }
   }
@@ -1184,7 +1184,7 @@ Returns:
   }
   if (PrivateFile->UnixThunk->Stat (
           FileName == NULL ? PrivateFile->FileName : FileName,
-	  &buf) < 0)
+    &buf) < 0)
     return EFI_DEVICE_ERROR;
 
   Status  = EFI_SUCCESS;
@@ -1285,9 +1285,9 @@ Returns:
     }
 
     Res = PrivateFile->UnixThunk->Read (
-					 PrivateFile->fd,
-					 Buffer,
-					 *BufferSize);
+           PrivateFile->fd,
+           Buffer,
+           *BufferSize);
     if (Res < 0) {
       Status = EFI_DEVICE_ERROR;
       goto Done;
@@ -1336,14 +1336,14 @@ Returns:
   if (EFI_ERROR (Status)) {
     goto Done;
   }
-		  
+      
   AsciiStrCpy(FullFileName, PrivateFile->FileName);
   AsciiStrCat(FullFileName, "/");
   AsciiStrCat(FullFileName, PrivateFile->Dirent->d_name);
   Status = UnixSimpleFileSystemFileInfo (PrivateFile,
-					  FullFileName,
-					  BufferSize,
-					  Buffer);
+            FullFileName,
+            BufferSize,
+            Buffer);
   gBS->FreePool (FullFileName);
 
   PrivateFile->Dirent = NULL;
@@ -1423,9 +1423,9 @@ Returns:
   }
 
   Res = PrivateFile->UnixThunk->Write (
-					PrivateFile->fd,
-					Buffer,
-					*BufferSize);
+          PrivateFile->fd,
+          Buffer,
+          *BufferSize);
   if (Res == (UINTN)-1) {
     Status = EFI_DEVICE_ERROR;
     goto Done;
@@ -1850,7 +1850,7 @@ Returns:
   }
 
   Status = gBS->AllocatePool (EfiBootServicesData, OldInfoSize,
-			      (VOID **)&OldFileInfo);
+            (VOID **)&OldFileInfo);
 
   if (EFI_ERROR (Status)) {
     goto Done;

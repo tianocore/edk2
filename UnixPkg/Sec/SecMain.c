@@ -279,17 +279,17 @@ Returns:
     // Open the FD and remmeber where it got mapped into our processes address space
     //
     Status = MapFile (
-		      FileName,
-		      &gFdInfo[Index].Address,
-		      &gFdInfo[Index].Size
-		      );
+          FileName,
+          &gFdInfo[Index].Address,
+          &gFdInfo[Index].Size
+          );
     if (EFI_ERROR (Status)) {
       printf ("ERROR : Can not open Firmware Device File %s (%x).  Exiting.\n", FileName, (unsigned int)Status);
       exit (1);
     }
 
     printf ("  FD loaded from %s at 0x%08lx",
-	    FileName, (unsigned long)gFdInfo[Index].Address);
+      FileName, (unsigned long)gFdInfo[Index].Address);
 
     if (PeiCoreFile == NULL) {
       //
@@ -419,10 +419,10 @@ Returns:
       /* Read entry address.  */
       lseek (fd, FileSize - 0x20, SEEK_SET);
       if (read (fd, &EntryAddress, 4) != 4)
-	{
-	  close (fd);
-	  return EFI_DEVICE_ERROR;
-	}
+  {
+    close (fd);
+    return EFI_DEVICE_ERROR;
+  }
     }
 #endif
 
@@ -664,8 +664,8 @@ Returns:
 
   *MemoryBase = 0;
   res = MapMemory(0, gSystemMemory[Index].Size,
-		  PROT_READ | PROT_WRITE | PROT_EXEC,
-		  MAP_PRIVATE | MAP_ANONYMOUS);
+      PROT_READ | PROT_WRITE | PROT_EXEC,
+      MAP_PRIVATE | MAP_ANONYMOUS);
   if (res == MAP_FAILED)
     return EFI_DEVICE_ERROR;
   *MemorySize = gSystemMemory[Index].Size;

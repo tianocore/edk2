@@ -13,8 +13,8 @@
 //------------------------------------------------------------------------------
 
 
-  EXPORT\s\s__ARM_ll_mullu
-  EXPORT\s\s__aeabi_lmul
+  EXPORT  __ARM_ll_mullu
+  EXPORT  __aeabi_lmul
        
   AREA  Math, CODE, READONLY
 

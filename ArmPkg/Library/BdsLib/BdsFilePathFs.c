@@ -34,8 +34,8 @@ EFI_STATUS BdsLoadFileFromSimpleFileSystem(
     }
 
     //Try to Open the volume and get root directory
-\s\sStatus = FsProtocol->OpenVolume(FsProtocol, &Fs);
-\s\sif (EFI_ERROR(Status)) {
+  Status = FsProtocol->OpenVolume(FsProtocol, &Fs);
+  if (EFI_ERROR(Status)) {
         return Status;
     }
 

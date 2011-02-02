@@ -398,7 +398,7 @@ GasketUgaBlt (
    EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
    IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
    IN  EFI_UGA_BLT_OPERATION                   BltOperation,
-	 IN  UGA_BLT_ARGS                            *Args
+   IN  UGA_BLT_ARGS                            *Args
    )
 {
   return GasketUintnUintnUintnUintn (UgaBlt, (UINTN)UgaIo, (UINTN)BltBuffer, (UINTN)BltOperation, (UINTN)Args);

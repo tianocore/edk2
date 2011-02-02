@@ -12,23 +12,23 @@
 #
 #------------------------------------------------------------------------------
 
-\s\s.text
-\s\s.align 2
-\s\sGCC_ASM_EXPORT(memcpy)
+  .text
+  .align 2
+  GCC_ASM_EXPORT(memcpy)
 
 ASM_PFX(memcpy):
-\s\sstmfd\s\ssp!, {r7, lr}
-\s\smov\s\sip, #0
-\s\sadd\s\sr7, sp, #0
-\s\smov\s\slr, r0
-\s\sb\s\sL4
+  stmfd  sp!, {r7, lr}
+  mov  ip, #0
+  add  r7, sp, #0
+  mov  lr, r0
+  b  L4
 L5:
-\s\sldrb\s\sr3, [r1], #1\s\s@ zero_extendqisi2
-\s\sadd\s\sip, ip, #1
-\s\sand\s\sr3, r3, #255
-\s\sstrb\s\sr3, [lr], #1
+  ldrb  r3, [r1], #1  @ zero_extendqisi2
+  add  ip, ip, #1
+  and  r3, r3, #255
+  strb  r3, [lr], #1
 L4:
-\s\scmp\s\sip, r2
-\s\sbne\s\sL5
-\s\sldmfd\s\ssp!, {r7, pc}
+  cmp  ip, r2
+  bne  L5
+  ldmfd  sp!, {r7, pc}
 

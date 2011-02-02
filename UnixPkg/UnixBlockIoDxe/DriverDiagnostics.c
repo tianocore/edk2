@@ -149,7 +149,7 @@ UnixBlockIoDriverDiagnosticsRunDiagnostics (
     *ErrorType  = &gEfiBlockIoProtocolGuid;
     *BufferSize = 0x60;
     gBS->AllocatePool (EfiBootServicesData, (UINTN) (*BufferSize),
-		       (void *)Buffer);
+           (void *)Buffer);
     CopyMem (*Buffer, L"Unix Block I/O Driver Diagnostics Failed\n", *BufferSize);
     return EFI_DEVICE_ERROR;
   }

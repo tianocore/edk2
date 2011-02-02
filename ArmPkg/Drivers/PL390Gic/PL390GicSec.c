@@ -34,11 +34,11 @@ PL390GicSetupNonSecure (
    //Check if there are any pending interrupts
    while(0 != (MmioRead32(GicDistributorBase + GIC_ICDICPR) & 0xF))
    {
-\s\s   //Some of the SGI's are still pending, read Ack register and send End of Interrupt Signal
-\s\s   UINTN InterruptId = MmioRead32(GicInterruptInterfaceBase + GIC_ICCIAR);
+     //Some of the SGI's are still pending, read Ack register and send End of Interrupt Signal
+     UINTN InterruptId = MmioRead32(GicInterruptInterfaceBase + GIC_ICCIAR);
 
-\s\s   //Write to End of interrupt signal
-\s\s   MmioWrite32(GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
+     //Write to End of interrupt signal
+     MmioWrite32(GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
    }
 
   // Ensure all GIC interrupts are Non-Secure
@@ -56,19 +56,19 @@ PL390GicEnableInterruptInterface (
   IN  INTN          GicInterruptInterfaceBase
   )
 {
-\s\sMmioWrite32(GicInterruptInterfaceBase + GIC_ICCPMR, 0x000000FF);  /* Set Priority Mask to allow interrupts */
+  MmioWrite32(GicInterruptInterfaceBase + GIC_ICCPMR, 0x000000FF);  /* Set Priority Mask to allow interrupts */
 
-\s\s/*
-\s\s * Enable CPU interface in Secure world
+  /*
+   * Enable CPU interface in Secure world
      * Enable CPU inteface in Non-secure World
-\s\s * Signal Secure Interrupts to CPU using FIQ line *
-\s\s */
+   * Signal Secure Interrupts to CPU using FIQ line *
+   */
     MmioWrite32(GicInterruptInterfaceBase + GIC_ICCICR,
-    \s\s\s\sGIC_ICCICR_ENABLE_SECURE(1) |
-    \s\s\s\sGIC_ICCICR_ENABLE_NS(1) |
-    \s\s\s\sGIC_ICCICR_ACK_CTL(0) |
-    \s\s\s\sGIC_ICCICR_SIGNAL_SECURE_TO_FIQ(1) |
-    \s\s\s\sGIC_ICCICR_USE_SBPR(0));
+        GIC_ICCICR_ENABLE_SECURE(1) |
+        GIC_ICCICR_ENABLE_NS(1) |
+        GIC_ICCICR_ACK_CTL(0) |
+        GIC_ICCICR_SIGNAL_SECURE_TO_FIQ(1) |
+        GIC_ICCICR_USE_SBPR(0));
 }
 
 VOID
@@ -88,7 +88,7 @@ PL390GicSendSgiTo (
   IN  INTN          CPUTargetList
   )
 {
-\s\sMmioWrite32(GicDistributorBase + GIC_ICDSGIR, ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16));
+  MmioWrite32(GicDistributorBase + GIC_ICDSGIR, ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16));
 }
 
 UINT32
@@ -103,9 +103,9 @@ PL390GicAcknowledgeSgiFrom (
     InterruptId = MmioRead32(GicInterruptInterfaceBase + GIC_ICCIAR);
 
     //Check if the Interrupt ID is valid, The read from Interrupt Ack register returns CPU ID and Interrupt ID
-\s\sif (((CoreId & 0x7) << 10) == (InterruptId & 0x1C00)) {
-\s\s    //Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
-\s\s\s\sMmioWrite32(GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
+  if (((CoreId & 0x7) << 10) == (InterruptId & 0x1C00)) {
+      //Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
+    MmioWrite32(GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
         return 1;
     } else {
         return 0;
@@ -125,9 +125,9 @@ PL390GicAcknowledgeSgi2From (
     InterruptId = MmioRead32(GicInterruptInterfaceBase + GIC_ICCIAR);
 
     //Check if the Interrupt ID is valid, The read from Interrupt Ack register returns CPU ID and Interrupt ID
-\s\sif((((CoreId & 0x7) << 10) | (SgiId & 0x3FF)) == (InterruptId & 0x1FFF)) {
-\s\s    //Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
-\s\s\s\sMmioWrite32(GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
+  if((((CoreId & 0x7) << 10) | (SgiId & 0x3FF)) == (InterruptId & 0x1FFF)) {
+      //Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
+    MmioWrite32(GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
         return 1;
     } else {
         return 0;

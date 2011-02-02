@@ -12,25 +12,25 @@
 #
 #------------------------------------------------------------------------------
 
-\s\s.text
-\s\s.align 2
-\s\sGCC_ASM_EXPORT(__ashrdi3)
+  .text
+  .align 2
+  GCC_ASM_EXPORT(__ashrdi3)
 
 ASM_PFX(__ashrdi3):
-\s\scmp\s\sr2, #31
-\s\sbls\s\sL2
-\s\scmp\s\sr2, #63
-\s\ssubls\s\sr2, r2, #32
-\s\smov\s\sip, r1, asr #31
-\s\smovls\s\sr2, r1, asr r2
-\s\smovhi\s\sr2, ip
-\s\smov\s\sr0, r2
-\s\smov\s\sr1, ip
-\s\sbx\s\slr
+  cmp  r2, #31
+  bls  L2
+  cmp  r2, #63
+  subls  r2, r2, #32
+  mov  ip, r1, asr #31
+  movls  r2, r1, asr r2
+  movhi  r2, ip
+  mov  r0, r2
+  mov  r1, ip
+  bx  lr
 L2:
-\s\scmp\s\sr2, #0
-\s\srsbne\s\sr3, r2, #32
-\s\smovne\s\sr3, r1, asl r3
-\s\smovne\s\sr1, r1, asr r2
-\s\sorrne\s\sr0, r3, r0, lsr r2
-\s\sbx\s\slr
+  cmp  r2, #0
+  rsbne  r3, r2, #32
+  movne  r3, r1, asl r3
+  movne  r1, r1, asr r2
+  orrne  r0, r3, r0, lsr r2
+  bx  lr

@@ -55,7 +55,7 @@ Returns:
 
 --*/
 {
-	PEI_UNIX_THUNK_PPI      *UnixThunkPpi;
+  PEI_UNIX_THUNK_PPI      *UnixThunkPpi;
   EFI_STATUS              Status;
   EFI_UNIX_THUNK_PROTOCOL *Unix;
 

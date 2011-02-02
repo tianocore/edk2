@@ -64,7 +64,7 @@
 #define DMC_DIRECT_CMD_MEMCMD_NOP               (0x3 << 18)
 #define DMC_DIRECT_CMD_MEMCMD_DPD               (0x1 << 22)
 #define DMC_DIRECT_CMD_BANKADDR(n)              ((n & 0x3) << 16)
-#define DMC_DIRECT_CMD_CHIP_ADDR(n)\s\s\s\s((n & 0x3) << 20)
+#define DMC_DIRECT_CMD_CHIP_ADDR(n)    ((n & 0x3) << 20)
 
 
 //
@@ -163,25 +163,25 @@ VOID PL341DmcInit(struct pl341_dmc_config *config) {
     //
 
     if (config->has_qos) {
-\s\s// CLCD AXIID = 000
-\s\sDmcWriteReg(DMC_ID_0_CFG_REG, DMC_ID_CFG_QOS_ENABLE | DMC_ID_CFG_QOS_MIN);
+  // CLCD AXIID = 000
+  DmcWriteReg(DMC_ID_0_CFG_REG, DMC_ID_CFG_QOS_ENABLE | DMC_ID_CFG_QOS_MIN);
 
-\s\s// Default disable QoS
-\s\sDmcWriteReg(DMC_ID_1_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_2_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_3_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_4_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_5_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_6_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_7_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_8_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_9_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_10_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_11_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_12_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_13_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_14_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
-\s\sDmcWriteReg(DMC_ID_15_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  // Default disable QoS
+  DmcWriteReg(DMC_ID_1_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_2_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_3_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_4_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_5_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_6_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_7_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_8_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_9_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_10_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_11_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_12_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_13_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_14_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
+  DmcWriteReg(DMC_ID_15_CFG_REG, DMC_ID_CFG_QOS_DISABLE);
     }
 
     //
@@ -231,104 +231,104 @@ VOID PL341DmcInit(struct pl341_dmc_config *config) {
     // |======================================
     DmcWriteReg(DMC_MEMORY_CFG3_REG, config->memory_cfg3);
 
-\s\s// |========================================================
-\s\s// |Set Test Chip PHY Registers via PL341 User Config Reg
-\s\s// |Note that user_cfgX registers are Write Only
-\s\s// |
-\s\s// |DLL Freq set = 250MHz - 266MHz
-\s\s// |======================================================== 
-\s\sDmcWriteReg(DMC_USER_0_CFG_REG, 0x7C924924);
+  // |========================================================
+  // |Set Test Chip PHY Registers via PL341 User Config Reg
+  // |Note that user_cfgX registers are Write Only
+  // |
+  // |DLL Freq set = 250MHz - 266MHz
+  // |======================================================== 
+  DmcWriteReg(DMC_USER_0_CFG_REG, 0x7C924924);
  
-\s\s// user_config2
-\s\s// ------------
-\s\s// Set defaults before calibrating the DDR2 buffer impendence
-\s\s// -Disable ODT
-\s\s// -Default drive strengths
-\s\sDmcWriteReg(DMC_USER_2_CFG_REG, 0x40000198);
+  // user_config2
+  // ------------
+  // Set defaults before calibrating the DDR2 buffer impendence
+  // -Disable ODT
+  // -Default drive strengths
+  DmcWriteReg(DMC_USER_2_CFG_REG, 0x40000198);
  
-\s\s// |=======================================================
-\s\s// |Auto calibrate the DDR2 buffers impendence 
-\s\s// |=======================================================
-\s\sval32 = DmcReadReg(DMC_USER_STATUS_REG);
-\s\swhile (!(val32 & 0x100)) {
-\s\s    val32 = DmcReadReg(DMC_USER_STATUS_REG);
-\s\s}
+  // |=======================================================
+  // |Auto calibrate the DDR2 buffers impendence 
+  // |=======================================================
+  val32 = DmcReadReg(DMC_USER_STATUS_REG);
+  while (!(val32 & 0x100)) {
+      val32 = DmcReadReg(DMC_USER_STATUS_REG);
+  }
 
-\s\s// Set the output driven strength
-\s\sDmcWriteReg(DMC_USER_2_CFG_REG, 0x40800000 | 
-\s\s\s\s    (TC_UIOLHXC_VALUE << TC_UIOLHNC_SHIFT) | 
-\s\s\s\s    (TC_UIOLHXC_VALUE << TC_UIOLHPC_SHIFT) |
-\s\s\s\s    (0x1 << TC_UIOHOCT_SHIFT) | 
-\s\s\s\s    (0x1 << TC_UIOHSTOP_SHIFT));
+  // Set the output driven strength
+  DmcWriteReg(DMC_USER_2_CFG_REG, 0x40800000 | 
+        (TC_UIOLHXC_VALUE << TC_UIOLHNC_SHIFT) | 
+        (TC_UIOLHXC_VALUE << TC_UIOLHPC_SHIFT) |
+        (0x1 << TC_UIOHOCT_SHIFT) | 
+        (0x1 << TC_UIOHSTOP_SHIFT));
 
-\s\s// |======================================
-\s\s// | Set PL341 Feature Control Register 
-\s\s// |======================================
-\s\s// | Disable early BRESP - use to optimise CLCD performance
-\s\sDmcWriteReg(DMC_FEATURE_CRTL_REG, 0x00000001);
+  // |======================================
+  // | Set PL341 Feature Control Register 
+  // |======================================
+  // | Disable early BRESP - use to optimise CLCD performance
+  DmcWriteReg(DMC_FEATURE_CRTL_REG, 0x00000001);
  
     //=================
     // Config memories
     //=================
 
     for (chip = 0; chip <= config-> max_chip; chip++) {
-\s\s// send nop
-\s\sDmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | DMC_DIRECT_CMD_MEMCMD_NOP);
-\s\s// pre-charge all
-\s\sDmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | DMC_DIRECT_CMD_MEMCMD_PRECHARGEALL);
+  // send nop
+  DmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | DMC_DIRECT_CMD_MEMCMD_NOP);
+  // pre-charge all
+  DmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | DMC_DIRECT_CMD_MEMCMD_PRECHARGEALL);
 
-\s\s// delay
-\s\sfor (i = 0; i < 10; i++) {
-\s\s    val32 = DmcReadReg(DMC_STATUS_REG);
-\s\s}
+  // delay
+  for (i = 0; i < 10; i++) {
+      val32 = DmcReadReg(DMC_STATUS_REG);
+  }
 
-\s\s// set (EMR2) extended mode register 2
-\s\sDmcWriteReg(DMC_DIRECT_CMD_REG, 
-\s\s\s\s    DMC_DIRECT_CMD_CHIP_ADDR(chip) | 
-\s\s\s\s    DMC_DIRECT_CMD_BANKADDR(2) | 
-\s\s\s\s    DMC_DIRECT_CMD_MEMCMD_EXTMODEREG);
-\s\s// set (EMR3) extended mode register 3
-\s\sDmcWriteReg(DMC_DIRECT_CMD_REG, 
-\s\s\s\s    DMC_DIRECT_CMD_CHIP_ADDR(chip) | 
-\s\s\s\s    DMC_DIRECT_CMD_BANKADDR(3) | 
-\s\s\s\s    DMC_DIRECT_CMD_MEMCMD_EXTMODEREG);
+  // set (EMR2) extended mode register 2
+  DmcWriteReg(DMC_DIRECT_CMD_REG, 
+        DMC_DIRECT_CMD_CHIP_ADDR(chip) | 
+        DMC_DIRECT_CMD_BANKADDR(2) | 
+        DMC_DIRECT_CMD_MEMCMD_EXTMODEREG);
+  // set (EMR3) extended mode register 3
+  DmcWriteReg(DMC_DIRECT_CMD_REG, 
+        DMC_DIRECT_CMD_CHIP_ADDR(chip) | 
+        DMC_DIRECT_CMD_BANKADDR(3) | 
+        DMC_DIRECT_CMD_MEMCMD_EXTMODEREG);
 
-\s\s// =================================
-\s\s//  set (EMR) Extended Mode Register
-\s\s// ==================================
-\s\s// Put into OCD default state
-\s\sDmcWriteReg(DMC_DIRECT_CMD_REG, 
-\s\s\s\s    DMC_DIRECT_CMD_CHIP_ADDR(chip) | 
-\s\s\s\s    DMC_DIRECT_CMD_BANKADDR(1) | 
-\s\s\s\s    DMC_DIRECT_CMD_MEMCMD_EXTMODEREG);
+  // =================================
+  //  set (EMR) Extended Mode Register
+  // ==================================
+  // Put into OCD default state
+  DmcWriteReg(DMC_DIRECT_CMD_REG, 
+        DMC_DIRECT_CMD_CHIP_ADDR(chip) | 
+        DMC_DIRECT_CMD_BANKADDR(1) | 
+        DMC_DIRECT_CMD_MEMCMD_EXTMODEREG);
 
-\s\s// ===========================================================        
-\s\s// set (MR) mode register - With DLL reset
-\s\s// ===========================================================
-\s\s// Burst Length = 4 (010)
-\s\s// Burst Type   = Seq (0)
-\s\s// Latency      = 4 (100)
-\s\s// Test mode    = Off (0)
-\s\s// DLL reset    = Yes (1)
-\s\s// Wr Recovery  = 4  (011)      
-\s\s// PD           = Normal (0)
+  // ===========================================================        
+  // set (MR) mode register - With DLL reset
+  // ===========================================================
+  // Burst Length = 4 (010)
+  // Burst Type   = Seq (0)
+  // Latency      = 4 (100)
+  // Test mode    = Off (0)
+  // DLL reset    = Yes (1)
+  // Wr Recovery  = 4  (011)      
+  // PD           = Normal (0)
   DmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | 0x00080742);
         
-\s\s// pre-charge all 
-\s\sDmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | DMC_DIRECT_CMD_MEMCMD_PRECHARGEALL);
-\s\s// auto-refresh 
-\s\sDmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | DMC_DIRECT_CMD_MEMCMD_AUTOREFRESH);
-\s\s// auto-refresh 
-\s\sDmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | DMC_DIRECT_CMD_MEMCMD_AUTOREFRESH);
+  // pre-charge all 
+  DmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | DMC_DIRECT_CMD_MEMCMD_PRECHARGEALL);
+  // auto-refresh 
+  DmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | DMC_DIRECT_CMD_MEMCMD_AUTOREFRESH);
+  // auto-refresh 
+  DmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | DMC_DIRECT_CMD_MEMCMD_AUTOREFRESH);
 
-\s\s// delay
-\s\sfor (i = 0; i < 10; i++) {
-\s\s    val32 = DmcReadReg(DMC_STATUS_REG);
-\s\s}
+  // delay
+  for (i = 0; i < 10; i++) {
+      val32 = DmcReadReg(DMC_STATUS_REG);
+  }
 
-\s\s// ===========================================================        
-\s\s// set (MR) mode register - Without DLL reset
-\s\s// ===========================================================
+  // ===========================================================        
+  // set (MR) mode register - Without DLL reset
+  // ===========================================================
   // auto-refresh
   DmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | DMC_DIRECT_CMD_MEMCMD_AUTOREFRESH);
   DmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | 0x00080642);
@@ -338,26 +338,26 @@ VOID PL341DmcInit(struct pl341_dmc_config *config) {
     val32 = DmcReadReg(DMC_STATUS_REG);
   }
 
-\s\s// ======================================================        
-\s\s// set (EMR) extended mode register - Enable OCD defaults
-\s\s// ====================================================== 
-\s\sval32 = 0; //NOP
-\s\sDmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | 0x00090000 |
-\s\s\s\s    (DDR_EMR_OCD_DEFAULT << DDR_EMR_OCD_SHIFT) | 
-\s\s\s\s    DDR_EMR_RTT_75R | 
-\s\s\s\s    (DDR_EMR_ODS_VAL << DDR_EMR_ODS_MASK));
+  // ======================================================        
+  // set (EMR) extended mode register - Enable OCD defaults
+  // ====================================================== 
+  val32 = 0; //NOP
+  DmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | 0x00090000 |
+        (DDR_EMR_OCD_DEFAULT << DDR_EMR_OCD_SHIFT) | 
+        DDR_EMR_RTT_75R | 
+        (DDR_EMR_ODS_VAL << DDR_EMR_ODS_MASK));
 
-\s\s// delay
-\s\sfor (i = 0; i < 10; i++) {
-\s\s    val32 = DmcReadReg(DMC_STATUS_REG);
-\s\s}
+  // delay
+  for (i = 0; i < 10; i++) {
+      val32 = DmcReadReg(DMC_STATUS_REG);
+  }
 
-\s\s// Set (EMR) extended mode register - OCD Exit
-\s\sval32 = 0; //NOP
-\s\sDmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | 0x00090000 | 
-\s\s\s\s    (DDR_EMR_OCD_NS << DDR_EMR_OCD_SHIFT) | 
-\s\s\s\s    DDR_EMR_RTT_75R |
-\s\s\s\s    (DDR_EMR_ODS_VAL << DDR_EMR_ODS_MASK));
+  // Set (EMR) extended mode register - OCD Exit
+  val32 = 0; //NOP
+  DmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(chip) | 0x00090000 | 
+        (DDR_EMR_OCD_NS << DDR_EMR_OCD_SHIFT) | 
+        DDR_EMR_RTT_75R |
+        (DDR_EMR_ODS_VAL << DDR_EMR_ODS_MASK));
 
     }
 

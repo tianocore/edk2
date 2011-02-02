@@ -48,48 +48,48 @@ ArmIsMPCore
   bx      LR
 
 ArmEnableInterrupts
-\s\smrs     R0,CPSR
-\s\sbic     R0,R0,#0x80\s\s\s\s;Enable IRQ interrupts
-\s\smsr     CPSR_c,R0
-\s\sbx      LR
+  mrs     R0,CPSR
+  bic     R0,R0,#0x80    ;Enable IRQ interrupts
+  msr     CPSR_c,R0
+  bx      LR
 
 ArmDisableInterrupts
-\s\smrs     R0,CPSR
-\s\sorr     R1,R0,#0x80\s\s\s\s;Disable IRQ interrupts
-\s\smsr     CPSR_c,R1
+  mrs     R0,CPSR
+  orr     R1,R0,#0x80    ;Disable IRQ interrupts
+  msr     CPSR_c,R1
   tst     R0,#0x80
   moveq   R0,#1
   movne   R0,#0
-\s\sbx      LR
+  bx      LR
 
 ArmGetInterruptState
-\s\smrs     R0,CPSR
-\s\stst     R0,#0x80\s\s    ;Check if IRQ is enabled.
-\s\smoveq   R0,#1
-\s\smovne   R0,#0
-\s\sbx      LR
+  mrs     R0,CPSR
+  tst     R0,#0x80      ;Check if IRQ is enabled.
+  moveq   R0,#1
+  movne   R0,#0
+  bx      LR
 
 ArmEnableFiq
-\s\smrs     R0,CPSR
-\s\sbic     R0,R0,#0x40\s\s\s\s;Enable IRQ interrupts
-\s\smsr     CPSR_c,R0
-\s\sbx      LR
+  mrs     R0,CPSR
+  bic     R0,R0,#0x40    ;Enable IRQ interrupts
+  msr     CPSR_c,R0
+  bx      LR
 
 ArmDisableFiq
-\s\smrs     R0,CPSR
-\s\sorr     R1,R0,#0x40\s\s\s\s;Disable IRQ interrupts
-\s\smsr     CPSR_c,R1
+  mrs     R0,CPSR
+  orr     R1,R0,#0x40    ;Disable IRQ interrupts
+  msr     CPSR_c,R1
   tst     R0,#0x40
   moveq   R0,#1
   movne   R0,#0
-\s\sbx      LR
+  bx      LR
 
 ArmGetFiqState
-\s\smrs     R0,CPSR
-\s\stst     R0,#0x40\s\s    ;Check if IRQ is enabled.
-\s\smoveq   R0,#1
-\s\smovne   R0,#0
-\s\sbx      LR
+  mrs     R0,CPSR
+  tst     R0,#0x40      ;Check if IRQ is enabled.
+  moveq   R0,#1
+  movne   R0,#0
+  bx      LR
   
 ArmInvalidateTlb
   mov     r0,#0

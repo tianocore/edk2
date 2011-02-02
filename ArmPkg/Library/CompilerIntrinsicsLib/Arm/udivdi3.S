@@ -12,16 +12,16 @@
 #
 #------------------------------------------------------------------------------
 
-\s\s.text
-\s\s.align 2
-\s\sGCC_ASM_EXPORT(__udivdi3)
+  .text
+  .align 2
+  GCC_ASM_EXPORT(__udivdi3)
 
 ASM_PFX(__udivdi3):
-\s\sstmfd\s\ssp!, {r7, lr}
-\s\sadd\s\sr7, sp, #0
-\s\ssub\s\ssp, sp, #8
-\s\smov\s\sip, #0
-\s\sstr\s\sip, [sp, #0]
-\s\sbl\s\sASM_PFX(__udivmoddi4)
-\s\ssub\s\ssp, r7, #0
-\s\sldmfd\s\ssp!, {r7, pc}
+  stmfd  sp!, {r7, lr}
+  add  r7, sp, #0
+  sub  sp, sp, #8
+  mov  ip, #0
+  str  ip, [sp, #0]
+  bl  ASM_PFX(__udivmoddi4)
+  sub  sp, r7, #0
+  ldmfd  sp!, {r7, pc}

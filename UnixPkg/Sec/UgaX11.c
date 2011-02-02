@@ -59,7 +59,7 @@ typedef struct {
   EFI_UNIX_UGA_IO_PROTOCOL UgaIo;
 
   Display *display;
-  int screen;			/* values for window_size in main */
+  int screen;      /* values for window_size in main */
   Window win;
   GC gc;
   Visual *visual;
@@ -393,15 +393,15 @@ handleMouseMoved(UGA_IO_PRIVATE *drv, XEvent *ev)
   if ( ev->xmotion.x != drv->previous_x )
   {
     drv->pointer_state.RelativeMovementX += ( ev->xmotion.x - drv->previous_x );
-	drv->previous_x = ev->xmotion.x;
-	drv->pointer_state_changed = 1;
+  drv->previous_x = ev->xmotion.x;
+  drv->pointer_state_changed = 1;
   }
 
   if ( ev->xmotion.y != drv->previous_y )
   {
     drv->pointer_state.RelativeMovementY += ( ev->xmotion.y - drv->previous_y );
     drv->previous_y = ev->xmotion.y;
-	drv->pointer_state_changed = 1;
+  drv->pointer_state_changed = 1;
   }
 
   drv->pointer_state.RelativeMovementZ = 0;
@@ -413,12 +413,12 @@ handleMouseDown(UGA_IO_PRIVATE *drv, XEvent *ev, BOOLEAN Pressed)
   if ( ev->xbutton.button == Button1 )
   {
     drv->pointer_state_changed = ( drv->pointer_state.LeftButton != Pressed );
-	drv->pointer_state.LeftButton = Pressed;
+  drv->pointer_state.LeftButton = Pressed;
   }
   if ( ev->xbutton.button == Button2 )
   {
     drv->pointer_state_changed = ( drv->pointer_state.RightButton != Pressed );
-	drv->pointer_state.RightButton = Pressed;
+  drv->pointer_state.RightButton = Pressed;
   }
 }
 
@@ -460,10 +460,10 @@ HandleEvent(UGA_IO_PRIVATE *drv, XEvent *ev)
       break;
     case ButtonPress:
       handleMouseDown(drv, ev, TRUE);
-	  break;
+    break;
     case ButtonRelease:
       handleMouseDown(drv, ev, FALSE);
-	  break;
+    break;
 #if 0
     case DestroyNotify:
       XCloseDisplay (drv->display);

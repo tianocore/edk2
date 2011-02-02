@@ -192,7 +192,7 @@ struct _EFI_UNIX_UGA_IO_PROTOCOL;
 typedef
 EFI_STATUS
 (EFIAPI *UnixUgaCreate)(struct _EFI_UNIX_UGA_IO_PROTOCOL **UgaIo,
-		 CONST CHAR16 *Title);
+     CONST CHAR16 *Title);
 
 typedef
 int
@@ -229,7 +229,7 @@ int
 typedef
 int
 (EFIAPI *UnixTcsetattr) (int __fd, int __optional_actions,
-		      __const struct termios *__termios_p);
+          __const struct termios *__termios_p);
 
 
 //
@@ -292,13 +292,13 @@ typedef struct _EFI_UNIX_THUNK_PROTOCOL {
   UINT64                              Signature;
 
   UnixSleep                           Sleep;
-  UnixExit                    	      Exit;
+  UnixExit                            Exit;
   UnixSetTimer                        SetTimer;
-  UnixGetLocalTime		                GetLocalTime;
+  UnixGetLocalTime                    GetLocalTime;
   UnixGmTime                          GmTime;
   UnixGetTimeZone                     GetTimeZone;
   UnixGetDayLight                     GetDayLight;
-  UnixPoll	                          Poll;
+  UnixPoll                            Poll;
   UnixRead                            Read;
   UnixWrite                           Write;
   UnixGetenv                          Getenv;
@@ -322,7 +322,7 @@ typedef struct _EFI_UNIX_THUNK_PROTOCOL {
   UnixChmod                           Chmod;
   UnixUTime                           UTime;
   UnixTcflush                         Tcflush;
-  UnixUgaCreate			                  UgaCreate;
+  UnixUgaCreate                        UgaCreate;
   UnixPerror                          Perror;
   UnixIoCtl                           IoCtl;
   UnixFcntl                           Fcntl;

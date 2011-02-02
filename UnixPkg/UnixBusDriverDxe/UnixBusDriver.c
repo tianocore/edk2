@@ -468,7 +468,7 @@ Returns:
 
         UnixDevice->ControllerNameTable = NULL;
 
-	//  FIXME: check size
+  //  FIXME: check size
         StrCpy(ComponentName, UnixDevice->UnixIo.EnvString);
 
         UnixDevice->DevicePath = UnixBusCreateDevicePath (

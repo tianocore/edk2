@@ -29,7 +29,7 @@
 #define L230_TAG_LATENCY        0x108
 #define L230_DATA_LATENCY       0x10C
 #define L2X0_INTCLEAR           0x220
-#define L2X0_CACHE_SYNC\s\s\s\s\s\s0x730
+#define L2X0_CACHE_SYNC      0x730
 #define L2X0_INVWAY             0x77C
 #define L2X0_CLEAN_WAY          0x7BC
 #define L2X0_PFCTRL             0xF60

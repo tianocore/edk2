@@ -31,7 +31,7 @@ ArmGetScuBaseAddress
   // the Configuration BAR as a stack is not necessary setup. The SCU is at the
   // offset 0x0000 from the Private Memory Region.
   mrc   p15, 4, r0, c15, c0, 0
-  bx\s\slr
+  bx  lr
 
 // IN  None
 // OUT r1 = SCU enabled (boolean)

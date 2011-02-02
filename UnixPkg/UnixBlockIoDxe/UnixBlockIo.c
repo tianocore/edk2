@@ -410,7 +410,7 @@ Returns:
   BOOLEAN                     WriteProtected;
   UINTN                       NumberOfBlocks;
   UINTN                       BlockSize;
-  INTN	                      i;
+  INTN                        i;
 
   //
   // Grab the protocols we need

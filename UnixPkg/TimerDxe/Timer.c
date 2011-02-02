@@ -227,7 +227,7 @@ Returns:
   //
   if (TimerPeriod == 0
       || ((TimerPeriod > TIMER_MINIMUM_VALUE)
-	  && (TimerPeriod < TIMER_MAXIMUM_VALUE))) {
+    && (TimerPeriod < TIMER_MAXIMUM_VALUE))) {
     mTimerPeriodMs = DivU64x32 (TimerPeriod + 5000, 10000);
 
     gUnix->SetTimer (mTimerPeriodMs, TimerCallback);

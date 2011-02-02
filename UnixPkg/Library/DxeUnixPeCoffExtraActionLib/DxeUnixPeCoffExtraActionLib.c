@@ -56,7 +56,7 @@ DxeUnixPeCoffLibExtraActionConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-	 EFI_HOB_GUID_TYPE        *GuidHob;
+   EFI_HOB_GUID_TYPE        *GuidHob;
 
   //
   // Retrieve UnixThunkProtocol from GUID'ed HOB

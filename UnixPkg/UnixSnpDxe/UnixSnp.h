@@ -46,33 +46,33 @@ Abstract:
 
 typedef struct
 {
-	UINT32								Signature;
+  UINT32                Signature;
 
-	EFI_UNIX_THUNK_PROTOCOL*			UnixThunk;
+  EFI_UNIX_THUNK_PROTOCOL*      UnixThunk;
 
-	EFI_HANDLE							DeviceHandle;
-	EFI_DEVICE_PATH_PROTOCOL*			DevicePath;
+  EFI_HANDLE              DeviceHandle;
+  EFI_DEVICE_PATH_PROTOCOL*      DevicePath;
 
-	EFI_MAC_ADDRESS						MacAddress;
+  EFI_MAC_ADDRESS            MacAddress;
 
-	CHAR8*								InterfaceName;
-	INTN								ReadBufferSize;
-	VOID*								ReadBuffer;
-	//
-	// Two walking pointers to manage the multiple packets that can be returned
-	// in a single read.
-	//
-	VOID*								CurrentReadPointer;
-	VOID*								EndReadPointer;
+  CHAR8*                InterfaceName;
+  INTN                ReadBufferSize;
+  VOID*                ReadBuffer;
+  //
+  // Two walking pointers to manage the multiple packets that can be returned
+  // in a single read.
+  //
+  VOID*                CurrentReadPointer;
+  VOID*                EndReadPointer;
 
-	INTN								BpfFd;
+  INTN                BpfFd;
 
-	EFI_SIMPLE_NETWORK_PROTOCOL			Snp;
-	EFI_SIMPLE_NETWORK_MODE				Mode;
+  EFI_SIMPLE_NETWORK_PROTOCOL      Snp;
+  EFI_SIMPLE_NETWORK_MODE        Mode;
 } UNIX_SNP_PRIVATE_DATA;
 
 #define UNIX_SNP_PRIVATE_DATA_FROM_SNP_THIS(a) \
-			CR( a, UNIX_SNP_PRIVATE_DATA, Snp, UNIX_SNP_PRIVATE_DATA_SIGNATURE )
+      CR( a, UNIX_SNP_PRIVATE_DATA, Snp, UNIX_SNP_PRIVATE_DATA_SIGNATURE )
 
 extern EFI_DRIVER_BINDING_PROTOCOL    gUnixSnpDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL    gUnixSnpDriverComponentName;
@@ -153,4 +153,4 @@ UnixSnpDriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer
   );
 
-#endif	// _UNIX_SNP_H_
+#endif  // _UNIX_SNP_H_

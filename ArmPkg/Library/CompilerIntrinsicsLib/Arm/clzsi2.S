@@ -12,46 +12,46 @@
 #
 #------------------------------------------------------------------------------
 
-\s\s.text
-\s\s.align 2
-\s\sGCC_ASM_EXPORT(__clzsi2)
+  .text
+  .align 2
+  GCC_ASM_EXPORT(__clzsi2)
 
 ASM_PFX(__clzsi2):
-\s\s@ frame_needed = 1, uses_anonymous_args = 0
-\s\sstmfd\s\ssp!, {r7, lr}
-\s\sadd\s\sr7, sp, #0
-\s\smovs\s\sr3, r0, lsr #16
-\s\smovne\s\sr3, #16
-\s\smoveq\s\sr3, #0
-\s\smovne\s\sr9, #0
-\s\smoveq\s\sr9, #16
-\s\smov\s\sr3, r0, lsr r3
-\s\stst\s\sr3, #65280
-\s\smovne\s\sr0, #8
-\s\smoveq\s\sr0, #0
-\s\smovne\s\slr, #0
-\s\smoveq\s\slr, #8
-\s\smov\s\sr3, r3, lsr r0
-\s\stst\s\sr3, #240
-\s\smovne\s\sr0, #4
-\s\smoveq\s\sr0, #0
-\s\smovne\s\sip, #0
-\s\smoveq\s\sip, #4
-\s\smov\s\sr3, r3, lsr r0
-\s\stst\s\sr3, #12
-\s\smovne\s\sr0, #2
-\s\smoveq\s\sr0, #0
-\s\smovne\s\sr1, #0
-\s\smoveq\s\sr1, #2
-\s\smov\s\sr2, r3, lsr r0
-\s\sadd\s\sr3, lr, r9
-\s\sadd\s\sr0, r3, ip
-\s\sadd\s\sr1, r0, r1
-\s\smov\s\sr0, r2, lsr #1
-\s\seor\s\sr0, r0, #1
-\s\sands\s\sr0, r0, #1
-\s\smvnne\s\sr0, #0
-\s\srsb\s\sr3, r2, #2
-\s\sand\s\sr0, r0, r3
-\s\sadd\s\sr0, r1, r0
-\s\sldmfd\s\ssp!, {r7, pc}
+  @ frame_needed = 1, uses_anonymous_args = 0
+  stmfd  sp!, {r7, lr}
+  add  r7, sp, #0
+  movs  r3, r0, lsr #16
+  movne  r3, #16
+  moveq  r3, #0
+  movne  r9, #0
+  moveq  r9, #16
+  mov  r3, r0, lsr r3
+  tst  r3, #65280
+  movne  r0, #8
+  moveq  r0, #0
+  movne  lr, #0
+  moveq  lr, #8
+  mov  r3, r3, lsr r0
+  tst  r3, #240
+  movne  r0, #4
+  moveq  r0, #0
+  movne  ip, #0
+  moveq  ip, #4
+  mov  r3, r3, lsr r0
+  tst  r3, #12
+  movne  r0, #2
+  moveq  r0, #0
+  movne  r1, #0
+  moveq  r1, #2
+  mov  r2, r3, lsr r0
+  add  r3, lr, r9
+  add  r0, r3, ip
+  add  r1, r0, r1
+  mov  r0, r2, lsr #1
+  eor  r0, r0, #1
+  ands  r0, r0, #1
+  mvnne  r0, #0
+  rsb  r3, r2, #2
+  and  r0, r0, r3
+  add  r0, r1, r0
+  ldmfd  sp!, {r7, pc}

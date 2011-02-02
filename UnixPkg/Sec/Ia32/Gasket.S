@@ -264,21 +264,21 @@ _GasketUintnUint16:
   
 .globl _ReverseGasketUint64
 _ReverseGasketUint64:
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$40, %esp
-	movl	12(%ebp), %eax
-	movl	%eax, -16(%ebp)
-	movl	16(%ebp), %eax
-	movl	%eax, -12(%ebp)
-	movl	-16(%ebp), %eax
-	movl	-12(%ebp), %edx
-	movl	%eax, (%esp)
-	movl	%edx, 4(%esp)
-	movl	8(%ebp), %eax
-	call	*%eax
-	leave
-	ret
+  pushl  %ebp
+  movl  %esp, %ebp
+  subl  $40, %esp
+  movl  12(%ebp), %eax
+  movl  %eax, -16(%ebp)
+  movl  16(%ebp), %eax
+  movl  %eax, -12(%ebp)
+  movl  -16(%ebp), %eax
+  movl  -12(%ebp), %edx
+  movl  %eax, (%esp)
+  movl  %edx, 4(%esp)
+  movl  8(%ebp), %eax
+  call  *%eax
+  leave
+  ret
   
   
 .globl _ReverseGasketUint64Uint64
@@ -314,31 +314,31 @@ _ReverseGasketUint64Uint64:
 
 .globl _GasketSecUnixPeiLoadFile
 _GasketSecUnixPeiLoadFile:
-	jmp	  _SecUnixPeiLoadFile
+  jmp    _SecUnixPeiLoadFile
 
 
 .globl _GasketSecUnixPeiAutoScan
 _GasketSecUnixPeiAutoScan:
-	jmp	  _SecUnixPeiAutoScan
+  jmp    _SecUnixPeiAutoScan
 
 
 .globl _GasketSecUnixUnixThunkAddress
 _GasketSecUnixUnixThunkAddress:
-	jmp	  _SecUnixUnixThunkAddress
+  jmp    _SecUnixUnixThunkAddress
 
 
 .globl _GasketSecPeiReportStatusCode
 _GasketSecPeiReportStatusCode:
-	jmp	  _SecPeiReportStatusCode
+  jmp    _SecPeiReportStatusCode
 
 
 .globl _GasketSecUnixFdAddress
 _GasketSecUnixFdAddress:
-	jmp	  _SecUnixFdAddress
+  jmp    _SecUnixFdAddress
 
 
 .globl _GasketSecTemporaryRamSupport
 _GasketSecTemporaryRamSupport:
-	jmp	  _SecTemporaryRamSupport
+  jmp    _SecTemporaryRamSupport
   
   #endif

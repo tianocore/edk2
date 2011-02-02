@@ -134,7 +134,7 @@ OemHookStatusCodeReport (
               mStdOut,
               Buffer,
               CharCount
-	      );
+        );
 
     return EFI_SUCCESS;
 
