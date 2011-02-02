@@ -745,7 +745,7 @@ DmaBlocks (
   UINTN                 CmdInterruptEnable;
   UINTN                 CmdArgument;
   VOID                  *BufferMap;
-  EFI_PHYSICAL_ADDRESS	BufferAddress;
+  EFI_PHYSICAL_ADDRESS  BufferAddress;
   OMAP_DMA4             Dma4;
   DMA_MAP_OPERATION     DmaOperation;
   EFI_STATUS            MmcStatus;
@@ -761,15 +761,25 @@ CpuDeadLoop ();
 
   ZeroMem (&DmaOperation, sizeof (DMA_MAP_OPERATION));
   
+
   Dma4.DataType = 2;                      // DMA4_CSDPi[1:0]   32-bit elements from MMCHS_DATA
+
   Dma4.SourceEndiansim = 0;               // DMA4_CSDPi[21]    
+
   Dma4.DestinationEndianism = 0;          // DMA4_CSDPi[19]
+
   Dma4.SourcePacked = 0;                  // DMA4_CSDPi[6]
+
   Dma4.DestinationPacked = 0;             // DMA4_CSDPi[13]
+
   Dma4.NumberOfElementPerFrame = This->Media->BlockSize/4; // DMA4_CENi  (TRM 4K is optimum value)  
+
   Dma4.NumberOfFramePerTransferBlock = BlockCount;         // DMA4_CFNi    
+
   Dma4.ReadPriority = 0;                  // DMA4_CCRi[6]      Low priority read  
+
   Dma4.WritePriority = 0;                 // DMA4_CCRi[23]     Prefetech disabled
+
 
   //Populate the command information based on the operation type.
   if (OperationType == READ) {
@@ -778,19 +788,33 @@ CpuDeadLoop ();
     DmaOperation = MapOperationBusMasterCommonBuffer;
 
     Dma4.ReadPortAccessType =0 ;            // DMA4_CSDPi[8:7]   Can not burst MMCHS_DATA reg
+
     Dma4.WritePortAccessType = 3;           // DMA4_CSDPi[15:14] Memory burst 16x32
+
     Dma4.WriteMode = 1;                     // DMA4_CSDPi[17:16] Write posted
+
     
+
     Dma4.SourceStartAddress = MMCHS_DATA;                   // DMA4_CSSAi
+
     Dma4.DestinationStartAddress = (UINT32)BufferAddress;   // DMA4_CDSAi
+
     Dma4.SourceElementIndex = 1;                            // DMA4_CSEi
+
     Dma4.SourceFrameIndex = 0x200;                          // DMA4_CSFi
+
     Dma4.DestinationElementIndex = 1;                       // DMA4_CDEi
+
     Dma4.DestinationFrameIndex = 0;                         // DMA4_CDFi
 
+
+
     Dma4.ReadPortAccessMode = 0;            // DMA4_CCRi[13:12]  Always read MMCHS_DATA
+
     Dma4.WritePortAccessMode = 1;           // DMA4_CCRi[15:14]  Post increment memory address
+
     Dma4.ReadRequestNumber = 0x1e;          // DMA4_CCRi[4:0]    Syncro with MMCA_DMA_RX (61)  
+
     Dma4.WriteRequestNumber = 1;            // DMA4_CCRi[20:19]  Syncro upper 0x3e == 62 (one based)
 
   } else if (OperationType == WRITE) { 
@@ -799,19 +823,33 @@ CpuDeadLoop ();
     DmaOperation = MapOperationBusMasterRead;
 
     Dma4.ReadPortAccessType = 3;            // DMA4_CSDPi[8:7]   Memory burst 16x32
+
     Dma4.WritePortAccessType = 0;           // DMA4_CSDPi[15:14] Can not burst MMCHS_DATA reg
+
     Dma4.WriteMode = 1;                     // DMA4_CSDPi[17:16] Write posted ???
+
     
+
     Dma4.SourceStartAddress = (UINT32)BufferAddress;        // DMA4_CSSAi
+
     Dma4.DestinationStartAddress = MMCHS_DATA;              // DMA4_CDSAi
+
     Dma4.SourceElementIndex = 1;                            // DMA4_CSEi
+
     Dma4.SourceFrameIndex = 0x200;                          // DMA4_CSFi
+
     Dma4.DestinationElementIndex = 1;                       // DMA4_CDEi
+
     Dma4.DestinationFrameIndex = 0;                         // DMA4_CDFi
 
+
+
     Dma4.ReadPortAccessMode = 1;            // DMA4_CCRi[13:12]  Post increment memory address
+
     Dma4.WritePortAccessMode = 0;           // DMA4_CCRi[15:14]  Always write MMCHS_DATA
+
     Dma4.ReadRequestNumber = 0x1d;          // DMA4_CCRi[4:0]    Syncro with MMCA_DMA_TX (60)  
+
     Dma4.WriteRequestNumber = 1;            // DMA4_CCRi[20:19]  Syncro upper 0x3d == 61 (one based)
 
   } else {
@@ -1088,7 +1126,9 @@ SdReadWrite (
   UINTN      BytesToBeTranferedThisPass = 0;
   UINTN      BytesRemainingToBeTransfered;
   EFI_TPL    OldTpl;
+
   BOOLEAN    Update;
+
 
   
   Update               = FALSE;
@@ -1112,11 +1152,17 @@ SdReadWrite (
   if (Update) {
     DEBUG ((EFI_D_INFO, "SD Card ReinstallProtocolInterface ()\n"));
     gBS->ReinstallProtocolInterface (
+
           gImageHandle,
+
           &gEfiBlockIoProtocolGuid,
+
           &gBlockIo,
+
           &gBlockIo
+
           );
+
   }
 
   if (EFI_ERROR (Status)) {
@@ -1180,21 +1226,35 @@ SdReadWrite (
   }
 
 DoneRestoreTPL:
+
   gBS->RestoreTPL (OldTpl);
+
 Done:
+
   return Status;
+
 }
 
 
 /**
+
   Reset the Block Device.
 
+
+
   @param  This                 Indicates a pointer to the calling context.
+
   @param  ExtendedVerification Driver may perform diagnostics on reset.
 
+
+
   @retval EFI_SUCCESS          The device was reset.
+
   @retval EFI_DEVICE_ERROR     The device is not functioning properly and could
+
                                not be reset.
+
+
 
 **/
 EFI_STATUS
@@ -1209,22 +1269,39 @@ MMCHSReset (
 
 
 /**
+
   Read BufferSize bytes from Lba into Buffer.
 
+
+
   @param  This       Indicates a pointer to the calling context.
+
   @param  MediaId    Id of the media, changes every time the media is replaced.
+
   @param  Lba        The starting Logical Block Address to read from
+
   @param  BufferSize Size of Buffer, must be a multiple of device block size.
+
   @param  Buffer     A pointer to the destination buffer for the data. The caller is
+
                      responsible for either having implicit or explicit ownership of the buffer.
 
+
+
   @retval EFI_SUCCESS           The data was read correctly from the device.
+
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the read.
+
   @retval EFI_NO_MEDIA          There is no media in the device.
+
   @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
+
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
+
   @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+
                                 or the buffer is not on proper alignment.
+
 EFI_STATUS
 
 **/
@@ -1244,27 +1321,47 @@ MMCHSReadBlocks (
   Status = SdReadWrite (This, (UINTN)Lba, Buffer, BufferSize, READ);
 
   return Status;
+
 }
 
 
 /**
+
   Write BufferSize bytes from Lba into Buffer.
 
+
+
   @param  This       Indicates a pointer to the calling context.
+
   @param  MediaId    The media ID that the write request is for.
+
   @param  Lba        The starting logical block address to be written. The caller is
+
                      responsible for writing to only legitimate locations.
+
   @param  BufferSize Size of Buffer, must be a multiple of device block size.
+
   @param  Buffer     A pointer to the source buffer for the data.
 
+
+
   @retval EFI_SUCCESS           The data was written correctly to the device.
+
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
+
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
+
   @retval EFI_NO_MEDIA          There is no media in the device.
+
   @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
+
   @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+
                                 or the buffer is not on proper alignment.
+
+
 
 **/
 EFI_STATUS
@@ -1282,18 +1379,29 @@ MMCHSWriteBlocks (
   //Perform write operation.
   Status = SdReadWrite (This, (UINTN)Lba, Buffer, BufferSize, WRITE);
 
+
   return Status;
+
 }
 
 
 /**
+
   Flush the Block Device.
+
+
 
   @param  This              Indicates a pointer to the calling context.
 
+
+
   @retval EFI_SUCCESS       All outstanding data was written to the device
+
   @retval EFI_DEVICE_ERROR  The device reported an error while writting back the data
+
   @retval EFI_NO_MEDIA      There is no media in the device.
+
+
 
 **/
 EFI_STATUS
@@ -1317,15 +1425,26 @@ EFI_BLOCK_IO_PROTOCOL gBlockIo = {
 
 
 /**
+
   Timer callback to convert card present hardware into a boolean that indicates
+
   a media change event has happened. If you just check the GPIO you could see 
+
   card 1 and then check again after card 1 was removed and card 2 was inserted
+
   and you would still see media present. Thus you need the timer tick to catch
+
   the toggle event.
 
+
+
   @param  Event                 Event whose notification function is being invoked.
+
   @param  Context               The pointer to the notification function's context,
+
                                 which is implementation-dependent. Not used.
+
+
 
 **/
 VOID
