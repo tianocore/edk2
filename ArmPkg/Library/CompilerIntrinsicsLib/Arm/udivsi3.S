@@ -12,46 +12,46 @@
 #
 #------------------------------------------------------------------------------
 
-	.text
-	.align 2
-	GCC_ASM_EXPORT(__udivsi3)
+\s\s.text
+\s\s.align 2
+\s\sGCC_ASM_EXPORT(__udivsi3)
 
 ASM_PFX(__udivsi3):
-	cmp	r1, #0
-	cmpne	r0, #0
-	stmfd	sp!, {r4, r5, r7, lr}
-	add	r7, sp, #8
-	beq	L2
-	clz	r2, r1
-	clz	r3, r0
-	rsb	r3, r3, r2
-	cmp	r3, #31
-	bhi	L2
-	ldmeqfd	sp!, {r4, r5, r7, pc}
-	add	r5, r3, #1
-	rsb	r3, r3, #31
-	mov	lr, #0
-	mov	r2, r0, asl r3
-	mov	ip, r0, lsr r5
-	mov	r4, lr
-	b	L8
+\s\scmp\s\sr1, #0
+\s\scmpne\s\sr0, #0
+\s\sstmfd\s\ssp!, {r4, r5, r7, lr}
+\s\sadd\s\sr7, sp, #8
+\s\sbeq\s\sL2
+\s\sclz\s\sr2, r1
+\s\sclz\s\sr3, r0
+\s\srsb\s\sr3, r3, r2
+\s\scmp\s\sr3, #31
+\s\sbhi\s\sL2
+\s\sldmeqfd\s\ssp!, {r4, r5, r7, pc}
+\s\sadd\s\sr5, r3, #1
+\s\srsb\s\sr3, r3, #31
+\s\smov\s\slr, #0
+\s\smov\s\sr2, r0, asl r3
+\s\smov\s\sip, r0, lsr r5
+\s\smov\s\sr4, lr
+\s\sb\s\sL8
 L9:
-	mov	r0, r2, lsr #31
-	orr	ip, r0, ip, asl #1
-	orr	r2, r3, lr
-	rsb	r3, ip, r1
-	sub	r3, r3, #1
-	and	r0, r1, r3, asr #31
-	mov	lr, r3, lsr #31
-	rsb	ip, r0, ip
-	add	r4, r4, #1
+\s\smov\s\sr0, r2, lsr #31
+\s\sorr\s\sip, r0, ip, asl #1
+\s\sorr\s\sr2, r3, lr
+\s\srsb\s\sr3, ip, r1
+\s\ssub\s\sr3, r3, #1
+\s\sand\s\sr0, r1, r3, asr #31
+\s\smov\s\slr, r3, lsr #31
+\s\srsb\s\sip, r0, ip
+\s\sadd\s\sr4, r4, #1
 L8:
-	cmp	r4, r5
-	mov	r3, r2, asl #1
-	bne	L9
-	orr	r0, r3, lr
-	ldmfd	sp!, {r4, r5, r7, pc}
+\s\scmp\s\sr4, r5
+\s\smov\s\sr3, r2, asl #1
+\s\sbne\s\sL9
+\s\sorr\s\sr0, r3, lr
+\s\sldmfd\s\ssp!, {r4, r5, r7, pc}
 L2:
-	mov	r0, #0
-	ldmfd	sp!, {r4, r5, r7, pc}
+\s\smov\s\sr0, #0
+\s\sldmfd\s\ssp!, {r4, r5, r7, pc}
 

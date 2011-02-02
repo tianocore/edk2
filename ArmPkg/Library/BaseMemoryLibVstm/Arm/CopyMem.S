@@ -42,73 +42,73 @@ InternalMemCopyMem (
 GCC_ASM_EXPORT(InternalMemCopyMem)
 
 ASM_PFX(InternalMemCopyMem):
-	stmfd	sp!, {r4, r9, lr}
-	tst	r0, #3
-	mov	r4, r0
-	mov	r9, r0
-	mov	ip, r2
-	mov	lr, r1
-	movne	r0, #0
-	bne	L4
-	tst	r1, #3
-	movne	r3, #0
-	moveq	r3, #1
-	cmp	r2, #127
-	movls	r0, #0
-	andhi	r0, r3, #1
+\s\sstmfd\s\ssp!, {r4, r9, lr}
+\s\stst\s\sr0, #3
+\s\smov\s\sr4, r0
+\s\smov\s\sr9, r0
+\s\smov\s\sip, r2
+\s\smov\s\slr, r1
+\s\smovne\s\sr0, #0
+\s\sbne\s\sL4
+\s\stst\s\sr1, #3
+\s\smovne\s\sr3, #0
+\s\smoveq\s\sr3, #1
+\s\scmp\s\sr2, #127
+\s\smovls\s\sr0, #0
+\s\sandhi\s\sr0, r3, #1
 L4:
-	cmp	r4, r1
-	bcc	L26
-	bls	L7
-	rsb	r3, r1, r4
-	cmp	ip, r3
-	bcc	L26
-	cmp	ip, #0
-	beq	L7
-	add	r9, r4, ip
-	add	lr, ip, r1
-	b	L16
+\s\scmp\s\sr4, r1
+\s\sbcc\s\sL26
+\s\sbls\s\sL7
+\s\srsb\s\sr3, r1, r4
+\s\scmp\s\sip, r3
+\s\sbcc\s\sL26
+\s\scmp\s\sip, #0
+\s\sbeq\s\sL7
+\s\sadd\s\sr9, r4, ip
+\s\sadd\s\slr, ip, r1
+\s\sb\s\sL16
 L29:
-	sub	ip, ip, #8
-	cmp	ip, #7
-	ldrd	r2, [lr, #-8]!
-	movls	r0, #0
-	cmp	ip, #0
-	strd	r2, [r9, #-8]!
-	beq	L7
+\s\ssub\s\sip, ip, #8
+\s\scmp\s\sip, #7
+\s\sldrd\s\sr2, [lr, #-8]!
+\s\smovls\s\sr0, #0
+\s\scmp\s\sip, #0
+\s\sstrd\s\sr2, [r9, #-8]!
+\s\sbeq\s\sL7
 L16:
-	cmp	r0, #0
-	bne	L29
-	sub	r3, lr, #1
-	sub	ip, ip, #1
-	ldrb	r3, [r3, #0]	
-	sub	r2, r9, #1
-	cmp	ip, #0
-	sub	r9, r9, #1
-	sub	lr, lr, #1
-	strb	r3, [r2, #0]
-	bne	L16
-	b   L7
+\s\scmp\s\sr0, #0
+\s\sbne\s\sL29
+\s\ssub\s\sr3, lr, #1
+\s\ssub\s\sip, ip, #1
+\s\sldrb\s\sr3, [r3, #0]\s\s
+\s\ssub\s\sr2, r9, #1
+\s\scmp\s\sip, #0
+\s\ssub\s\sr9, r9, #1
+\s\ssub\s\slr, lr, #1
+\s\sstrb\s\sr3, [r2, #0]
+\s\sbne\s\sL16
+\s\sb   L7
 L11:
-	ldrb	r3, [lr], #1	
-	sub	ip, ip, #1
-	strb	r3, [r9], #1
+\s\sldrb\s\sr3, [lr], #1\s\s
+\s\ssub\s\sip, ip, #1
+\s\sstrb\s\sr3, [r9], #1
 L26:
-	cmp	ip, #0
-	beq	L7
+\s\scmp\s\sip, #0
+\s\sbeq\s\sL7
 L30:
-	cmp	r0, #0
-	beq	L11
-	sub	ip, ip, #128          // 32
-	cmp	ip, #127              // 31
-	vldm     lr!, {d0-d15}
-	movls	r0, #0
-	cmp	ip, #0
-	vstm  r9!, {d0-d15}
-	bne	L30
+\s\scmp\s\sr0, #0
+\s\sbeq\s\sL11
+\s\ssub\s\sip, ip, #128          // 32
+\s\scmp\s\sip, #127              // 31
+\s\svldm     lr!, {d0-d15}
+\s\smovls\s\sr0, #0
+\s\scmp\s\sip, #0
+\s\svstm  r9!, {d0-d15}
+\s\sbne\s\sL30
 L7:
   dsb
-  mov	r0, r4
-	ldmfd	sp!, {r4, r9, pc}
+  mov\s\sr0, r4
+\s\sldmfd\s\ssp!, {r4, r9, pc}
 
   

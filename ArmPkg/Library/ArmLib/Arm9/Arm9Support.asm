@@ -112,7 +112,7 @@ ArmCleanDataCache
   MRC     p15,0,r15,c7,c10,3
   BNE     ArmCleanDataCache
   MOV     R0,#0
-  MCR     p15,0,R0,c7,c10,4	    ;Drain write buffer
+  MCR     p15,0,R0,c7,c10,4\s\s    ;Drain write buffer
   BX      LR
 
 ArmInvalidateDataCache
@@ -126,7 +126,7 @@ ArmCleanInvalidateDataCache
   MRC     p15,0,r15,c7,c14,3
   BNE     ArmCleanInvalidateDataCache
   MOV     R0,#0
-  MCR     p15,0,R0,c7,c10,4	    ;Drain write buffer
+  MCR     p15,0,R0,c7,c10,4\s\s    ;Drain write buffer
   BX      LR
 
 ArmEnableBranchPrediction

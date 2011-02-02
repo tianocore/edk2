@@ -12,38 +12,38 @@
 #
 #------------------------------------------------------------------------------
 
-	.text
-	.align 2
-	GCC_ASM_EXPORT(__divdi3)
-	
+\s\s.text
+\s\s.align 2
+\s\sGCC_ASM_EXPORT(__divdi3)
+\s\s
 ASM_PFX(__divdi3):
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 1, uses_anonymous_args = 0
-	stmfd	sp!, {r4, r5, r7, lr}
-	mov	r4, r3, asr #31
-	add	r7, sp, #8
-	stmfd	sp!, {r10, r11}
-	mov	r10, r1, asr #31
-	sub	sp, sp, #8
-	mov	r11, r10
-	mov	r5, r4
-	eor	r0, r0, r10
-	eor	r1, r1, r10
-	eor	r2, r2, r4
-	eor	r3, r3, r4
-	subs	r2, r2, r4
-	sbc	r3, r3, r5
-	mov	ip, #0
-	subs	r0, r0, r10
-	sbc	r1, r1, r11
-	str	ip, [sp, #0]
-	bl	ASM_PFX(__udivmoddi4)
-	eor	r2, r10, r4
-	eor	r3, r10, r4
-	eor	r0, r0, r2
-	eor	r1, r1, r3
-	subs	r0, r0, r2
-	sbc	r1, r1, r3
-	sub	sp, r7, #16
-	ldmfd	sp!, {r10, r11}
-	ldmfd	sp!, {r4, r5, r7, pc}
+\s\s@ args = 0, pretend = 0, frame = 0
+\s\s@ frame_needed = 1, uses_anonymous_args = 0
+\s\sstmfd\s\ssp!, {r4, r5, r7, lr}
+\s\smov\s\sr4, r3, asr #31
+\s\sadd\s\sr7, sp, #8
+\s\sstmfd\s\ssp!, {r10, r11}
+\s\smov\s\sr10, r1, asr #31
+\s\ssub\s\ssp, sp, #8
+\s\smov\s\sr11, r10
+\s\smov\s\sr5, r4
+\s\seor\s\sr0, r0, r10
+\s\seor\s\sr1, r1, r10
+\s\seor\s\sr2, r2, r4
+\s\seor\s\sr3, r3, r4
+\s\ssubs\s\sr2, r2, r4
+\s\ssbc\s\sr3, r3, r5
+\s\smov\s\sip, #0
+\s\ssubs\s\sr0, r0, r10
+\s\ssbc\s\sr1, r1, r11
+\s\sstr\s\sip, [sp, #0]
+\s\sbl\s\sASM_PFX(__udivmoddi4)
+\s\seor\s\sr2, r10, r4
+\s\seor\s\sr3, r10, r4
+\s\seor\s\sr0, r0, r2
+\s\seor\s\sr1, r1, r3
+\s\ssubs\s\sr0, r0, r2
+\s\ssbc\s\sr1, r1, r3
+\s\ssub\s\ssp, r7, #16
+\s\sldmfd\s\ssp!, {r10, r11}
+\s\sldmfd\s\ssp!, {r4, r5, r7, pc}

@@ -21,11 +21,11 @@ EFIAPI
 PL390GicEnableInterruptInterface (
   IN  INTN          GicInterruptInterfaceBase
   )
-{	
-	/*
-	 * Enable the CPU interface in Non-Secure world
-	 * Note: The ICCICR register is banked when Security extensions are implemented	 
-	 */
+{\s\s
+\s\s/*
+\s\s * Enable the CPU interface in Non-Secure world
+\s\s * Note: The ICCICR register is banked when Security extensions are implemented\s\s 
+\s\s */
     MmioWrite32(GicInterruptInterfaceBase + GIC_ICCICR,0x00000001);
 }
 
@@ -50,7 +50,7 @@ PL390GicSendSgiTo (
   IN  INTN          CPUTargetList
   )
 {
-	MmioWrite32(GicDistributorBase + GIC_ICDSGIR, ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16));
+\s\sMmioWrite32(GicDistributorBase + GIC_ICDSGIR, ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16));
 }
 
 UINT32
@@ -65,9 +65,9 @@ PL390GicAcknowledgeSgiFrom (
     InterruptId = MmioRead32(GicInterruptInterfaceBase + GIC_ICCIAR);
 
     //Check if the Interrupt ID is valid, The read from Interrupt Ack register returns CPU ID and Interrupt ID
-	if (((CoreId & 0x7) << 10) == (InterruptId & 0x1C00)) {
-	    //Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
-		MmioWrite32(GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
+\s\sif (((CoreId & 0x7) << 10) == (InterruptId & 0x1C00)) {
+\s\s    //Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
+\s\s\s\sMmioWrite32(GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
         return 1;
     } else {
         return 0;
@@ -87,9 +87,9 @@ PL390GicAcknowledgeSgi2From (
     InterruptId = MmioRead32(GicInterruptInterfaceBase + GIC_ICCIAR);
 
     //Check if the Interrupt ID is valid, The read from Interrupt Ack register returns CPU ID and Interrupt ID
-	if((((CoreId & 0x7) << 10) | (SgiId & 0x3FF)) == (InterruptId & 0x1FFF)) {
-	    //Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
-		MmioWrite32(GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
+\s\sif((((CoreId & 0x7) << 10) | (SgiId & 0x3FF)) == (InterruptId & 0x1FFF)) {
+\s\s    //Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
+\s\s\s\sMmioWrite32(GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
         return 1;
     } else {
         return 0;

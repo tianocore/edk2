@@ -17,7 +17,7 @@
 #include <Library/IoLib.h>
 
 VOID ArmClearMPCoreMailbox() {
-	MmioWrite32(PcdGet32(PcdMPCoreMailboxClearAddress),PcdGet32(PcdMPCoreMailboxClearValue));
+\s\sMmioWrite32(PcdGet32(PcdMPCoreMailboxClearAddress),PcdGet32(PcdMPCoreMailboxClearValue));
 }
 
 UINTN ArmGetMPCoreMailbox() {

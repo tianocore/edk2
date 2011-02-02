@@ -12,16 +12,16 @@
 #
 #------------------------------------------------------------------------------
 
-	.text
-	.align 2
-	GCC_ASM_EXPORT(__modsi3)
+\s\s.text
+\s\s.align 2
+\s\sGCC_ASM_EXPORT(__modsi3)
 
 ASM_PFX(__modsi3):
-	stmfd	sp!, {r4, r5, r7, lr}
-	add	r7, sp, #8
-	mov	r5, r0
-	mov	r4, r1
-	bl	___divsi3
-	mul	r0, r4, r0
-	rsb	r0, r0, r5
-	ldmfd	sp!, {r4, r5, r7, pc}
+\s\sstmfd\s\ssp!, {r4, r5, r7, lr}
+\s\sadd\s\sr7, sp, #8
+\s\smov\s\sr5, r0
+\s\smov\s\sr4, r1
+\s\sbl\s\s___divsi3
+\s\smul\s\sr0, r4, r0
+\s\srsb\s\sr0, r0, r5
+\s\sldmfd\s\ssp!, {r4, r5, r7, pc}

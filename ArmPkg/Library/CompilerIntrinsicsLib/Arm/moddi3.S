@@ -12,35 +12,35 @@
 #
 #------------------------------------------------------------------------------
 
-	.text
-	.align 2
-	GCC_ASM_EXPORT(__moddi3)
+\s\s.text
+\s\s.align 2
+\s\sGCC_ASM_EXPORT(__moddi3)
 
 ASM_PFX(__moddi3):
-	stmfd	sp!, {r4, r5, r7, lr}
-	mov	r4, r1, asr #31
-	add	r7, sp, #8
-	stmfd	sp!, {r10, r11}
-	mov	r10, r3, asr #31
-	sub	sp, sp, #16
-	mov	r5, r4
-	mov	r11, r10
-	eor	r0, r0, r4
-	eor	r1, r1, r4
-	eor	r2, r2, r10
-	eor	r3, r3, r10
-	add	ip, sp, #8
-	subs	r0, r0, r4
-	sbc	r1, r1, r5
-	subs	r2, r2, r10
-	sbc	r3, r3, r11
-	str	ip, [sp, #0]
-	bl	ASM_PFX(__udivmoddi4)
-	ldrd	r0, [sp, #8]
-	eor	r0, r0, r4
-	eor	r1, r1, r4
-	subs	r0, r0, r4
-	sbc	r1, r1, r5
-	sub	sp, r7, #16
-	ldmfd	sp!, {r10, r11}
-	ldmfd	sp!, {r4, r5, r7, pc}
+\s\sstmfd\s\ssp!, {r4, r5, r7, lr}
+\s\smov\s\sr4, r1, asr #31
+\s\sadd\s\sr7, sp, #8
+\s\sstmfd\s\ssp!, {r10, r11}
+\s\smov\s\sr10, r3, asr #31
+\s\ssub\s\ssp, sp, #16
+\s\smov\s\sr5, r4
+\s\smov\s\sr11, r10
+\s\seor\s\sr0, r0, r4
+\s\seor\s\sr1, r1, r4
+\s\seor\s\sr2, r2, r10
+\s\seor\s\sr3, r3, r10
+\s\sadd\s\sip, sp, #8
+\s\ssubs\s\sr0, r0, r4
+\s\ssbc\s\sr1, r1, r5
+\s\ssubs\s\sr2, r2, r10
+\s\ssbc\s\sr3, r3, r11
+\s\sstr\s\sip, [sp, #0]
+\s\sbl\s\sASM_PFX(__udivmoddi4)
+\s\sldrd\s\sr0, [sp, #8]
+\s\seor\s\sr0, r0, r4
+\s\seor\s\sr1, r1, r4
+\s\ssubs\s\sr0, r0, r4
+\s\ssbc\s\sr1, r1, r5
+\s\ssub\s\ssp, r7, #16
+\s\sldmfd\s\ssp!, {r10, r11}
+\s\sldmfd\s\ssp!, {r4, r5, r7, pc}

@@ -12,27 +12,27 @@
 #
 #------------------------------------------------------------------------------
 
-	.text
-	.align 2
-	GCC_ASM_EXPORT(__ucmpdi2)
-	
+\s\s.text
+\s\s.align 2
+\s\sGCC_ASM_EXPORT(__ucmpdi2)
+\s\s
 ASM_PFX(__ucmpdi2):
-	stmfd	sp!, {r4, r5, r8, lr}
-	cmp	r1, r3
-	mov	r8, r0
-	mov	r4, r2
-	mov	r5, r3
-	bcc	L2
-	bhi	L4
-	cmp	r0, r2
-	bcc	L2
-	movls	r0, #1
-	bls	L8
-	b	L4
+\s\sstmfd\s\ssp!, {r4, r5, r8, lr}
+\s\scmp\s\sr1, r3
+\s\smov\s\sr8, r0
+\s\smov\s\sr4, r2
+\s\smov\s\sr5, r3
+\s\sbcc\s\sL2
+\s\sbhi\s\sL4
+\s\scmp\s\sr0, r2
+\s\sbcc\s\sL2
+\s\smovls\s\sr0, #1
+\s\sbls\s\sL8
+\s\sb\s\sL4
 L2:
-	mov	r0, #0
-	b	L8
+\s\smov\s\sr0, #0
+\s\sb\s\sL8
 L4:
-	mov	r0, #2
+\s\smov\s\sr0, #2
 L8:
-	ldmfd	sp!, {r4, r5, r8, pc}
+\s\sldmfd\s\ssp!, {r4, r5, r8, pc}

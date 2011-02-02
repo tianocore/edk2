@@ -12,38 +12,38 @@
 #
 #------------------------------------------------------------------------------
 
-	.text
-	.align 2
-	GCC_ASM_EXPORT(__ctzsi2)
-	
+\s\s.text
+\s\s.align 2
+\s\sGCC_ASM_EXPORT(__ctzsi2)
+\s\s
 ASM_PFX(__ctzsi2):
-	uxth	r3, r0
-	cmp	r3, #0
-	moveq	ip, #16
-	movne	ip, #0
-	@ lr needed for prologue
-	mov	r0, r0, lsr ip
-	tst	r0, #255
-	movne	r3, #0
-	moveq	r3, #8
-	mov	r0, r0, lsr r3
-	tst	r0, #15
-	movne	r1, #0
-	moveq	r1, #4
-	add	r3, r3, ip
-	mov	r0, r0, lsr r1
-	tst	r0, #3
-	movne	r2, #0
-	moveq	r2, #2
-	add	r3, r3, r1
-	mov	r0, r0, lsr r2
-	and	r0, r0, #3
-	add	r2, r3, r2
-	eor	r3, r0, #1
-	mov	r0, r0, lsr #1
-	ands	r3, r3, #1
-	mvnne	r3, #0
-	rsb	r0, r0, #2
-	and	r0, r3, r0
-	add	r0, r2, r0
-	bx	lr
+\s\suxth\s\sr3, r0
+\s\scmp\s\sr3, #0
+\s\smoveq\s\sip, #16
+\s\smovne\s\sip, #0
+\s\s@ lr needed for prologue
+\s\smov\s\sr0, r0, lsr ip
+\s\stst\s\sr0, #255
+\s\smovne\s\sr3, #0
+\s\smoveq\s\sr3, #8
+\s\smov\s\sr0, r0, lsr r3
+\s\stst\s\sr0, #15
+\s\smovne\s\sr1, #0
+\s\smoveq\s\sr1, #4
+\s\sadd\s\sr3, r3, ip
+\s\smov\s\sr0, r0, lsr r1
+\s\stst\s\sr0, #3
+\s\smovne\s\sr2, #0
+\s\smoveq\s\sr2, #2
+\s\sadd\s\sr3, r3, r1
+\s\smov\s\sr0, r0, lsr r2
+\s\sand\s\sr0, r0, #3
+\s\sadd\s\sr2, r3, r2
+\s\seor\s\sr3, r0, #1
+\s\smov\s\sr0, r0, lsr #1
+\s\sands\s\sr3, r3, #1
+\s\smvnne\s\sr3, #0
+\s\srsb\s\sr0, r0, #2
+\s\sand\s\sr0, r3, r0
+\s\sadd\s\sr0, r2, r0
+\s\sbx\s\slr

@@ -82,21 +82,21 @@ ArmCleanInvalidateDataCacheEntryByMVA
 
 
 ArmInvalidateDataCacheEntryBySetWay
-  mcr     p15, 0, r0, c7, c6, 2        ; Invalidate this line		
+  mcr     p15, 0, r0, c7, c6, 2        ; Invalidate this line\s\s\s\s
   dsb
   isb
   bx      lr
 
 
 ArmCleanInvalidateDataCacheEntryBySetWay
-  mcr     p15, 0, r0, c7, c14, 2       ; Clean and Invalidate this line		
+  mcr     p15, 0, r0, c7, c14, 2       ; Clean and Invalidate this line\s\s\s\s
   dsb
   isb
   bx      lr
 
 
 ArmCleanDataCacheEntryBySetWay
-  mcr     p15, 0, r0, c7, c10, 2       ; Clean this line		
+  mcr     p15, 0, r0, c7, c10, 2       ; Clean this line\s\s\s\s
   dsb
   isb
   bx      lr
@@ -125,7 +125,7 @@ ArmDisableMmu
   bic     R0,R0,#1              ; Clear SCTLR.M bit : Disable MMU
   mcr     p15,0,R0,c1,c0,0      ; Write R0 into SCTLR (Write control register configuration data)
 
-  mcr 	  p15,0,R0,c8,c7,0      ; TLBIALL : Invalidate unified TLB
+  mcr \s\s  p15,0,R0,c8,c7,0      ; TLBIALL : Invalidate unified TLB
   mcr     p15,0,R0,c7,c5,6      ; BPIALL  : Invalidate entire branch predictor array
   dsb
   isb
@@ -307,7 +307,7 @@ ArmCallWFI
 
 //Note: Return 0 in Uniprocessor implementation
 ArmReadCbar
-  mrc     p15, 4, r0, c15, c0, 0	//Read Configuration Base Address Register
+  mrc     p15, 4, r0, c15, c0, 0\s\s//Read Configuration Base Address Register
   bx      lr
 
 ArmInvalidateInstructionAndDataTlb
@@ -316,7 +316,7 @@ ArmInvalidateInstructionAndDataTlb
   bx lr
 
 ArmReadMpidr
-  mrc     p15, 0, r0, c0, c0, 5		; read MPIDR
+  mrc     p15, 0, r0, c0, c0, 5\s\s\s\s; read MPIDR
   bx      lr
 
   END

@@ -57,4 +57,4 @@ struct _VIRTUAL_UNCACHED_PAGES_PROTOCOL {
 
 extern EFI_GUID gVirtualUncachedPagesProtocolGuid;
 
-#endif	
+#endif\s\s
