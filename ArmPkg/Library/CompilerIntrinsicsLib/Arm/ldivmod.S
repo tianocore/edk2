@@ -15,8 +15,7 @@
 
 	.text
 	.align 2
-	.globl ASM_PFX(__aeabi_ldivmod)
-  INTERWORK_FUNC(__aeabi_ldivmod)
+	GCC_ASM_EXPORT(__aeabi_ldivmod)
 
 //
 // A pair of (unsigned) long longs is returned in {{r0, r1}, {r2, r3}}, 

@@ -86,22 +86,22 @@
 #define TT_DESCRIPTOR_SECTION_BASE_ADDRESS_MASK                 (0xFFF00000)
 #define TT_DESCRIPTOR_SECTION_BASE_ADDRESS(a)                   (a & TT_DESCRIPTOR_SECTION_BASE_ADDRESS_MASK)
 
-#define TT_DESCRIPTOR_SECTION_WRITE_BACK          (TT_DESCRIPTOR_TYPE_SECTION                              | \
-                                                   TT_DESCRIPTOR_SECTION_NS_NON_SECURE                         | \
+#define TT_DESCRIPTOR_SECTION_WRITE_BACK(Secure)       (TT_DESCRIPTOR_TYPE_SECTION                                                          | \
+                                                        (Secure ? TT_DESCRIPTOR_SECTION_NS_SECURE : TT_DESCRIPTOR_SECTION_NS_NON_SECURE )   | \
                                                    TT_DESCRIPTOR_SECTION_NG_GLOBAL                         | \
                                                    TT_DESCRIPTOR_SECTION_S_NOT_SHARED                      | \
                                                    TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
                                                    TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
                                                    TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC)
-#define TT_DESCRIPTOR_SECTION_WRITE_THROUGH       (TT_DESCRIPTOR_TYPE_SECTION                              | \
-                                                   TT_DESCRIPTOR_SECTION_NS_NON_SECURE                         | \
+#define TT_DESCRIPTOR_SECTION_WRITE_THROUGH(Secure)    (TT_DESCRIPTOR_TYPE_SECTION                                                          | \
+                                                        (Secure ? TT_DESCRIPTOR_SECTION_NS_SECURE : TT_DESCRIPTOR_SECTION_NS_NON_SECURE )   | \
                                                    TT_DESCRIPTOR_SECTION_NG_GLOBAL                         | \
                                                    TT_DESCRIPTOR_SECTION_S_NOT_SHARED                      | \
                                                    TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
                                                    TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
                                                    TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC)
-#define TT_DESCRIPTOR_SECTION_UNCACHED            (TT_DESCRIPTOR_TYPE_SECTION                              | \
-                                                   TT_DESCRIPTOR_SECTION_NS_NON_SECURE                         | \
+#define TT_DESCRIPTOR_SECTION_UNCACHED(Secure)         (TT_DESCRIPTOR_TYPE_SECTION                                                          | \
+                                                        (Secure ? TT_DESCRIPTOR_SECTION_NS_SECURE : TT_DESCRIPTOR_SECTION_NS_NON_SECURE )   | \
                                                    TT_DESCRIPTOR_SECTION_NG_GLOBAL                         | \
                                                    TT_DESCRIPTOR_SECTION_S_NOT_SHARED                      | \
                                                    TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \

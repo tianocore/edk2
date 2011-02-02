@@ -16,6 +16,7 @@
 #include <Library/ArmLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/DebugLib.h>
 
 VOID
 FillTranslationTable (
@@ -37,6 +38,12 @@ FillTranslationTable (
       Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH;
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED:
+      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED_UNBUFFERED;
+      break;
+    case ARM_MEMORY_REGION_ATTRIBUTE_SECURE_WRITE_BACK:
+    case ARM_MEMORY_REGION_ATTRIBUTE_SECURE_WRITE_THROUGH:
+    case ARM_MEMORY_REGION_ATTRIBUTE_SECURE_UNCACHED_UNBUFFERED:
+      ASSERT(0); // Trustzone is not supported on ARMv5
     default:
       Attributes = TT_DESCRIPTOR_SECTION_UNCACHED_UNBUFFERED;
       break;
@@ -93,7 +100,7 @@ ArmConfigureMmu (
     MemoryTable++;
   }
 
-  ArmSetTranslationTableBaseAddress(TranslationTable);
+  ArmSetTTBR0(TranslationTable);
     
   ArmSetDomainAccessControl(DOMAIN_ACCESS_CONTROL_NONE(15) |
                             DOMAIN_ACCESS_CONTROL_NONE(14) |

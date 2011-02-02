@@ -14,9 +14,8 @@
 
 	.text
 	.align 2
-	.globl ASM_PFX(__udivmoddi4)
-	INTERWORK_FUNC(__udivmoddi4)
-
+	GCC_ASM_EXPORT(__udivmoddi4)
+	
 ASM_PFX(__udivmoddi4):
 	stmfd	sp!, {r4, r5, r6, r7, lr}
 	add	r7, sp, #12

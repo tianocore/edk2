@@ -39,8 +39,7 @@ InternalMemCopyMem (
 **/
 .text
 .align 2
-.globl ASM_PFX(InternalMemCopyMem)
-INTERWORK_FUNC(InternalMemCopyMem)
+GCC_ASM_EXPORT(InternalMemCopyMem)
 
 ASM_PFX(InternalMemCopyMem):
 	stmfd	sp!, {r4, r9, lr}

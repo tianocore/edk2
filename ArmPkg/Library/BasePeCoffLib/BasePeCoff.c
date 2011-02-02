@@ -913,7 +913,7 @@ PeCoffLoaderLoadImage (
                             ImageContext->Handle,
                             0,
                             &ImageContext->SizeOfHeaders,
-                            (void *)(UINTN)ImageContext->ImageAddress
+                            (VOID*)(UINTN)ImageContext->ImageAddress
                             );
 
     Hdr.Te = (EFI_TE_IMAGE_HEADER *)(UINTN)(ImageContext->ImageAddress);

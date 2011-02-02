@@ -14,8 +14,7 @@
 
 	.text
 	.align 2
-	.globl ASM_PFX(__ashldi3)
-  INTERWORK_FUNC(__ashldi3)
+	GCC_ASM_EXPORT(__ashldi3)
 	
 ASM_PFX(__ashldi3):
 	cmp	r2, #31

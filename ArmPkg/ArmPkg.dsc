@@ -67,6 +67,24 @@
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
+  ArmTrustZoneLib|ArmPkg/Library/ArmTrustZoneLib/ArmTrustZoneLib.inf
+  ArmMPCoreMailBoxLib|ArmPkg/Library/ArmMPCoreMailBoxLib/ArmMPCoreMailBoxLib.inf
+  
+  PL354SmcSecLib|ArmPkg/Drivers/PL35xSmc/PL354SmcSec.inf
+  PL341DmcLib|ArmPkg/Drivers/PL34xDmc/PL341Dmc.inf
+  PL301AxiLib|ArmPkg/Drivers/PL301Axi/PL301Axi.inf
+  PL310L2CacheSecLib|ArmPkg/Drivers/PL310L2Cache/PL310L2CacheSec.inf
+  
+  BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
+  
+  IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+
+[LibraryClasses.common.PEIM]
+  HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
+  PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
+  MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+  PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+  PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
 
 [LibraryClasses.ARM]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
@@ -74,22 +92,47 @@
 
 [Components.common]
   ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
-##  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLib.inf
-##  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLibPrePi.inf
-##  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLib.inf
-##  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLibPrePi.inf
+  ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
+  ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
+  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLib.inf
+  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLibPrePi.inf
+  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLib.inf
+  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLibPrePi.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
+  ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
+  ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLib.inf
+  ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLibPrePi.inf
+  ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLibSec.inf
   ArmPkg/Library/ArmLib/Null/NullArmLib.inf
+  ArmPkg/Library/ArmMPCoreMailBoxLib/ArmMPCoreMailBoxLib.inf
+  ArmPkg/Library/ArmTrustZoneLib/ArmTrustZoneLib.inf
+  ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
+  ArmPkg/Library/BaseMemoryLibVstm/BaseMemoryLibVstm.inf
+  ArmPkg/Library/BasePeCoffLib/BasePeCoffLib.inf
+  ArmPkg/Library/BdsLib/BdsLib.inf
   ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+  ArmPkg/Library/DebugPeCoffExtraActionLib/DebugPeCoffExtraActionLib.inf
+  ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
+  ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
+  ArmPkg/Library/L2X0CacheLibNull/L2X0CacheLibNull.inf
+  ArmPkg/Library/RvdPeCoffExtraActionLib/RvdPeCoffExtraActionLib.inf
   ArmPkg/Library/SemiHostingDebugLib/SemiHostingDebugLib.inf
   ArmPkg/Library/SemiHostingSerialPortLib/SemiHostingSerialPortLib.inf
   ArmPkg/Library/SemihostLib/SemihostLib.inf
   ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
-  ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
-  ArmPkg/Library/RvdPeCoffExtraActionLib/RvdPeCoffExtraActionLib.inf
-  ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
-  ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
 
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  ArmPkg/Drivers/CpuPei/CpuPei.inf
+  ArmPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
+  ArmPkg/Drivers/PL301Axi/PL301Axi.inf
+  ArmPkg/Drivers/PL310L2Cache/PL310L2CacheSec.inf
+  ArmPkg/Drivers/PL34xDmc/PL341Dmc.inf
+  ArmPkg/Drivers/PL35xSmc/PL354SmcSec.inf
+  ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
+  ArmPkg/Drivers/PL390Gic/PL390GicNonSec.inf
+  ArmPkg/Drivers/PL390Gic/PL390GicSec.inf
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
+  ArmPkg/Universal/MmcDxe/MmcDxe.inf
+
+

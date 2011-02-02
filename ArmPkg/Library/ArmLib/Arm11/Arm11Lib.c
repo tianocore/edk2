@@ -31,14 +31,25 @@ FillTranslationTable (
   
   switch (MemoryRegion->Attributes) {
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK;
+      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK(0);
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH;
+      Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH(0);
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED:
+      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED(0);
+      break;
+    case ARM_MEMORY_REGION_ATTRIBUTE_SECURE_WRITE_BACK:
+      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK(1);
+      break;
+    case ARM_MEMORY_REGION_ATTRIBUTE_SECURE_WRITE_THROUGH:
+      Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH(1);
+      break;
+    case ARM_MEMORY_REGION_ATTRIBUTE_SECURE_UNCACHED_UNBUFFERED:
+      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED(1);
+      break;
     default:
-      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED;
+      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED(0);
       break;
   }
   
@@ -93,7 +104,7 @@ ArmConfigureMmu (
     MemoryTable++;
   }
 
-  ArmSetTranslationTableBaseAddress(TranslationTable);
+  ArmSetTTBR0(TranslationTable);
     
   ArmSetDomainAccessControl(DOMAIN_ACCESS_CONTROL_NONE(15) |
                             DOMAIN_ACCESS_CONTROL_NONE(14) |

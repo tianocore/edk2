@@ -14,8 +14,7 @@
 
 	.text
 	.align 2
-	.globl ASM_PFX(__udivsi3)
-	INTERWORK_FUNC(__udivsi3)
+	GCC_ASM_EXPORT(__udivsi3)
 
 ASM_PFX(__udivsi3):
 	cmp	r1, #0

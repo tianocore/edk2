@@ -14,6 +14,8 @@
 #
 #------------------------------------------------------------------------------
 
+#include <Library/PcdLib.h>
+
 /*
 
 This is the stack constructed by the exception handler (low address to high address)
@@ -50,22 +52,17 @@ This is the stack constructed by the exception handler (low address to high addr
  */
  
 
-.globl ASM_PFX(ExceptionHandlersStart)
-INTERWORK_FUNC(ExceptionHandlersStart)
-.globl ASM_PFX(ExceptionHandlersEnd)
-INTERWORK_FUNC(ExceptionHandlersEnd)
-.globl ASM_PFX(CommonExceptionEntry)
-INTERWORK_FUNC(CommonExceptionEntry)
-.globl ASM_PFX(AsmCommonExceptionEntry)
-INTERWORK_FUNC(AsmCommonExceptionEntry)
-.globl ASM_PFX(CommonCExceptionHandler)
-INTERWORK_FUNC(CommonCExceptionHandler)
+GCC_ASM_EXPORT(ExceptionHandlersStart)
+GCC_ASM_EXPORT(ExceptionHandlersEnd)
+GCC_ASM_EXPORT(CommonExceptionEntry)
+GCC_ASM_EXPORT(AsmCommonExceptionEntry)
+GCC_ASM_EXPORT(CommonCExceptionHandler)
 
 .text
 #if !defined(__APPLE__)
 .fpu neon    @ makes vpush/vpop assemble
 #endif
-.align 3
+.align 5
 
 
 //
@@ -198,10 +195,7 @@ ASM_PFX(FiqEntry):
 // This gets patched by the C code that patches in the vector table
 //
 ASM_PFX(CommonExceptionEntry):
-  .byte       0x12
-  .byte       0x34
-  .byte       0x56
-  .byte       0x78
+  .word       ASM_PFX(AsmCommonExceptionEntry)
 
 ASM_PFX(ExceptionHandlersEnd):
 
@@ -254,8 +248,9 @@ NoAdjustNeeded:
                                     @ R0 is ExceptionType 
   mov       R1,SP                   @ R1 is SystemContext 
 
+#if (FixedPcdGet32(PcdVFPEnabled))
   vpush     {d0-d15}                @ save vstm registers in case they are used in optimizations
-
+#endif
 
 /* 
 VOID
@@ -268,7 +263,9 @@ CommonCExceptionHandler (
 */  
   blx       ASM_PFX(CommonCExceptionHandler)  @ Call exception handler
 
+#if (FixedPcdGet32(PcdVFPEnabled))
   vpop      {d0-d15}  
+#endif
 
   ldr       R1, [SP, #0x4c]         @ Restore EFI_SYSTEM_CONTEXT_ARM.IFSR
   mcr       p15, 0, R1, c5, c0, 1   @ Write IFSR

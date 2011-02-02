@@ -14,7 +14,7 @@
 //
 //------------------------------------------------------------------------------
 
-
+#include <Library/PcdLib.h>
 
 /*
 
@@ -60,6 +60,8 @@ This is the stack constructed by the exception handler (low address to high addr
 
   PRESERVE8
   AREA  DxeExceptionHandlers, CODE, READONLY
+  
+  ALIGN   32
   
 //
 // This code gets copied to the ARM vector table
@@ -190,7 +192,7 @@ FiqEntry
 // This gets patched by the C code that patches in the vector table
 //
 CommonExceptionEntry
-  dcd       0x12345678
+  dcd       AsmCommonExceptionEntry
 
 ExceptionHandlersEnd
 
@@ -243,7 +245,9 @@ NoAdjustNeeded
                                     ; R0 is ExceptionType 
   mov       R1,SP                   ; R1 is SystemContext 
 
+#if (FixedPcdGet32(PcdVFPEnabled))
   vpush    {d0-d15}                  ; save vstm registers in case they are used in optimizations
+#endif
 
 /* 
 VOID
@@ -256,7 +260,9 @@ CommonCExceptionHandler (
 */
   blx       CommonCExceptionHandler ; Call exception handler
 
+#if (FixedPcdGet32(PcdVFPEnabled))
   vpop      {d0-d15}
+#endif
   
   ldr       R1, [SP, #0x4c]         ; Restore EFI_SYSTEM_CONTEXT_ARM.IFSR
   mcr       p15, 0, R1, c5, c0, 1   ; Write IFSR

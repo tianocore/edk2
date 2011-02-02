@@ -14,8 +14,7 @@
 
 	.text
 	.align 2
-	.globl ASM_PFX(__umoddi3)
-	INTERWORK_FUNC(__umoddi3)
+	GCC_ASM_EXPORT(__umoddi3)
 	
 ASM_PFX(__umoddi3):
 	stmfd	sp!, {r7, lr}

@@ -14,8 +14,7 @@
 
 	.text
 	.align 2
-	.globl ASM_PFX(__ctzsi2)
-  INTERWORK_FUNC(__ctzsi2)
+	GCC_ASM_EXPORT(__ctzsi2)
 	
 ASM_PFX(__ctzsi2):
 	uxth	r3, r0

@@ -16,8 +16,7 @@
 .text
 .p2align 2
 
-.globl ASM_PFX(__switch16)
-INTERWORK_FUNC(__switch16)
+GCC_ASM_EXPORT(__switch16)
 
 ASM_PFX(__switch16):
     ldrh      ip, [lr, #-1]

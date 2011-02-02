@@ -15,8 +15,7 @@
 
   .text
 	.align 2
-	.globl ASM_PFX(memset)
-  INTERWORK_FUNC(memset)
+	GCC_ASM_EXPORT (memset)
 
 ASM_PFX(memset):
 	@ args = 0, pretend = 0, frame = 0

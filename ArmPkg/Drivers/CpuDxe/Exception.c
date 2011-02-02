@@ -14,6 +14,8 @@
 
 #include "CpuDxe.h" 
 
+//FIXME: Will not compile on non-ARMv7 builds
+#include <Chipset/ArmV7.h>
 
 VOID
 ExceptionHandlersStart (
@@ -127,6 +129,7 @@ InitializeExceptions (
   EFI_PHYSICAL_ADDRESS Base;
   UINT32               *VectorBase;
 
+  Status = EFI_SUCCESS;
   //
   // Disable interrupts
   //
@@ -140,53 +143,62 @@ InitializeExceptions (
   FiqEnabled = ArmGetFiqState ();
   ArmDisableFiq ();
 
-  //
-  // Copy an implementation of the ARM exception vectors to PcdCpuVectorBaseAddress.
-  //
-  Length = (UINTN)ExceptionHandlersEnd - (UINTN)ExceptionHandlersStart;
+  if (FeaturePcdGet(PcdRelocateVectorTable) == TRUE) {
+      //
+      // Copy an implementation of the ARM exception vectors to PcdCpuVectorBaseAddress.
+      //
+      Length = (UINTN)ExceptionHandlersEnd - (UINTN)ExceptionHandlersStart;
+    
+      //
+      // Reserve space for the exception handlers
+      //
+      Base = (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdCpuVectorBaseAddress);
+      VectorBase = (UINT32 *)(UINTN)Base;
+      Status = gBS->AllocatePages (AllocateAddress, EfiBootServicesCode, EFI_SIZE_TO_PAGES (Length), &Base);
+      // If the request was for memory that's not in the memory map (which is often the case for 0x00000000
+      // on embedded systems, for example, we don't want to hang up.  So we'll check here for a status of 
+      // EFI_NOT_FOUND, and continue in that case.
+      if (EFI_ERROR(Status) && (Status != EFI_NOT_FOUND)) {
+        ASSERT_EFI_ERROR (Status);
+      }
+    
+      // Save existing vector table, in case debugger is already hooked in
+      CopyMem ((VOID *)gDebuggerExceptionHandlers, (VOID *)VectorBase, sizeof (gDebuggerExceptionHandlers));
+    
+      // Copy our assembly code into the page that contains the exception vectors. 
+      CopyMem ((VOID *)VectorBase, (VOID *)ExceptionHandlersStart, Length);
+    
+      //
+      // Patch in the common Assembly exception handler
+      //
+      Offset = (UINTN)CommonExceptionEntry - (UINTN)ExceptionHandlersStart;
+      *(UINTN *) ((UINT8 *)(UINTN)PcdGet32 (PcdCpuVectorBaseAddress) + Offset) = (UINTN)AsmCommonExceptionEntry;
+    
+      //
+      // Initialize the C entry points for interrupts
+      //
+      for (Index = 0; Index <= MAX_ARM_EXCEPTION; Index++) {
+        if ((gDebuggerExceptionHandlers[Index] == 0) || (gDebuggerExceptionHandlers[Index] == (VOID *)(UINTN)0xEAFFFFFE)) {
+          // Exception handler contains branch to vector location (jmp $) so no handler
+          // NOTE: This code assumes vectors are ARM and not Thumb code
+          Status = RegisterInterruptHandler (Index, NULL);
+          ASSERT_EFI_ERROR (Status);
+        } else {
+          // If the debugger has alread hooked put its vector back
+          VectorBase[Index] = (UINT32)(UINTN)gDebuggerExceptionHandlers[Index];
+        }
+      }
+    
+      // Flush Caches since we updated executable stuff
+      InvalidateInstructionCacheRange ((VOID *)PcdGet32(PcdCpuVectorBaseAddress), Length);
 
-  //
-  // Reserve space for the exception handlers
-  //
-  Base = (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdCpuVectorBaseAddress);
-  VectorBase = (UINT32 *)(UINTN)Base;
-  Status = gBS->AllocatePages (AllocateAddress, EfiBootServicesCode, EFI_SIZE_TO_PAGES (Length), &Base);
-  // If the request was for memory that's not in the memory map (which is often the case for 0x00000000
-  // on embedded systems, for example, we don't want to hang up.  So we'll check here for a status of 
-  // EFI_NOT_FOUND, and continue in that case.
-  if (EFI_ERROR(Status) && (Status != EFI_NOT_FOUND)) {
-    ASSERT_EFI_ERROR (Status);
+      //Note: On ARM processor with the Security Extension, the Vector Table can be located anywhere in the memory.
+      //      The Vector Base Address Register defines the location
+      ArmWriteVBar(PcdGet32(PcdCpuVectorBaseAddress));
+  } else {
+    // We do not copy the Exception Table at PcdGet32(PcdCpuVectorBaseAddress). We just set Vector Base Address to point into CpuDxe code.
+    ArmWriteVBar((UINT32)ExceptionHandlersStart);
   }
-
-  // Save existing vector table, in case debugger is already hooked in
-  CopyMem ((VOID *)gDebuggerExceptionHandlers, (VOID *)VectorBase, sizeof (gDebuggerExceptionHandlers));
-
-  // Copy our assembly code into the page that contains the exception vectors. 
-  CopyMem ((VOID *)VectorBase, (VOID *)ExceptionHandlersStart, Length);
-
-  //
-  // Patch in the common Assembly exception handler
-  //
-  Offset = (UINTN)CommonExceptionEntry - (UINTN)ExceptionHandlersStart;
-  *(UINTN *) ((UINT8 *)(UINTN)PcdGet32 (PcdCpuVectorBaseAddress) + Offset) = (UINTN)AsmCommonExceptionEntry;
-
-  //
-  // Initialize the C entry points for interrupts
-  //
-  for (Index = 0; Index <= MAX_ARM_EXCEPTION; Index++) {
-    if ((gDebuggerExceptionHandlers[Index] == 0) || (gDebuggerExceptionHandlers[Index] == (VOID *)(UINTN)0xEAFFFFFE)) {
-      // Exception handler contains branch to vector location (jmp $) so no handler
-      // NOTE: This code assumes vectors are ARM and not Thumb code
-      Status = RegisterInterruptHandler (Index, NULL);
-      ASSERT_EFI_ERROR (Status);
-    } else {
-      // If the debugger has alread hooked put its vector back
-      VectorBase[Index] = (UINT32)(UINTN)gDebuggerExceptionHandlers[Index];
-    }
-  }
-
-  // Flush Caches since we updated executable stuff
-  InvalidateInstructionCacheRange ((VOID *)PcdGet32(PcdCpuVectorBaseAddress), Length);
 
   if (FiqEnabled) {
     ArmEnableFiq ();

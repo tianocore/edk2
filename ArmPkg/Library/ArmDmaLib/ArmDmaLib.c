@@ -215,7 +215,7 @@ DmaAllocateBuffer (
   //
   if (MemoryType == EfiBootServicesData) {
     *HostAddress = UncachedAllocatePages (Pages);
-  } else if (MemoryType != EfiRuntimeServicesData) {
+  } else if (MemoryType == EfiRuntimeServicesData) {
     *HostAddress = UncachedAllocateRuntimePages (Pages);
   } else {
     return EFI_INVALID_PARAMETER;

@@ -14,8 +14,7 @@
 
 	.text
 	.align 2
-	.globl ASM_PFX(__ucmpdi2)
-  INTERWORK_FUNC(__ucmpdi2)
+	GCC_ASM_EXPORT(__ucmpdi2)
 	
 ASM_PFX(__ucmpdi2):
 	stmfd	sp!, {r4, r5, r8, lr}

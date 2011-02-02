@@ -67,10 +67,13 @@
   gEfiDebugImageInfoTableGuid
 
 [Pcd.common]
+  gArmTokenSpaceGuid.PcdVFPEnabled
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress
   
 [FeaturePcd.common]
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport
+  gArmTokenSpaceGuid.PcdRelocateVectorTable
+  gArmTokenSpaceGuid.PcdEfiUncachedMemoryToStronglyOrdered
 
 [depex]
   gHardwareInterruptProtocolGuid

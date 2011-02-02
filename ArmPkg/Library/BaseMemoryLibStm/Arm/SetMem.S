@@ -37,8 +37,7 @@ InternalMemSetMem (
 	
 .text
 .align 2
-.globl ASM_PFX(InternalMemSetMem)
-INTERWORK_FUNC(InternalMemSetMem)
+GCC_ASM_EXPORT(InternalMemSetMem)
 
 ASM_PFX(InternalMemSetMem):
 	stmfd	sp!, {r4-r11, lr}

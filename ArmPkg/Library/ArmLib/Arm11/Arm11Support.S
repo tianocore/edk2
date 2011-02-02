@@ -12,46 +12,29 @@
 #
 #------------------------------------------------------------------------------
 
+#include <AsmMacroIoLib.h>
+
 .text
 .align 2
-.globl ASM_PFX(ArmCleanInvalidateDataCache)
-INTERWORK_FUNC(ArmCleanInvalidateDataCache)
-.globl ASM_PFX(ArmCleanDataCache)
-INTERWORK_FUNC(ArmCleanDataCache)
-.globl ASM_PFX(ArmInvalidateDataCache)
-INTERWORK_FUNC(ArmInvalidateDataCache)
-.globl ASM_PFX(ArmInvalidateInstructionCache)
-INTERWORK_FUNC(ArmInvalidateInstructionCache)
-.globl ASM_PFX(ArmInvalidateDataCacheEntryByMVA)
-INTERWORK_FUNC(ArmInvalidateDataCacheEntryByMVA)
-.globl ASM_PFX(ArmCleanDataCacheEntryByMVA)
-INTERWORK_FUNC(ArmCleanDataCacheEntryByMVA)
-.globl ASM_PFX(ArmCleanInvalidateDataCacheEntryByMVA)
-INTERWORK_FUNC(ArmCleanInvalidateDataCacheEntryByMVA)
-.globl ASM_PFX(ArmEnableMmu)
-INTERWORK_FUNC(ArmEnableMmu)
-.globl ASM_PFX(ArmDisableMmu)
-INTERWORK_FUNC(ArmDisableMmu)
-.globl ASM_PFX(ArmMmuEnabled)
-INTERWORK_FUNC(ArmMmuEnabled)
-.globl ASM_PFX(ArmEnableDataCache)
-INTERWORK_FUNC(ArmEnableDataCache)
-.globl ASM_PFX(ArmDisableDataCache)
-INTERWORK_FUNC(ArmDisableDataCache)
-.globl ASM_PFX(ArmEnableInstructionCache)
-INTERWORK_FUNC(ArmEnableInstructionCache)
-.globl ASM_PFX(ArmDisableInstructionCache)
-INTERWORK_FUNC(ArmDisableInstructionCache)
-.globl ASM_PFX(ArmEnableBranchPrediction)
-INTERWORK_FUNC(ArmEnableBranchPrediction)
-.globl ASM_PFX(ArmDisableBranchPrediction)
-INTERWORK_FUNC(ArmDisableBranchPrediction)
-.globl ASM_PFX(ArmDataMemoryBarrier)
-INTERWORK_FUNC(ArmDataMemoryBarrier)
-.globl ASM_PFX(ArmDataSyncronizationBarrier) 
-INTERWORK_FUNC(ArmDataSyncronizationBarrier)
-.globl ASM_PFX(ArmInstructionSynchronizationBarrier)
-INTERWORK_FUNC(ArmInstructionSynchronizationBarrier)
+GCC_ASM_EXPORT(ArmCleanInvalidateDataCache)
+GCC_ASM_EXPORT(ArmCleanDataCache)
+GCC_ASM_EXPORT(ArmInvalidateDataCache)
+GCC_ASM_EXPORT(ArmInvalidateInstructionCache)
+GCC_ASM_EXPORT(ArmInvalidateDataCacheEntryByMVA)
+GCC_ASM_EXPORT(ArmCleanDataCacheEntryByMVA)
+GCC_ASM_EXPORT(ArmCleanInvalidateDataCacheEntryByMVA)
+GCC_ASM_EXPORT(ArmEnableMmu)
+GCC_ASM_EXPORT(ArmDisableMmu)
+GCC_ASM_EXPORT(ArmMmuEnabled)
+GCC_ASM_EXPORT(ArmEnableDataCache)
+GCC_ASM_EXPORT(ArmDisableDataCache)
+GCC_ASM_EXPORT(ArmEnableInstructionCache)
+GCC_ASM_EXPORT(ArmDisableInstructionCache)
+GCC_ASM_EXPORT(ArmEnableBranchPrediction)
+GCC_ASM_EXPORT(ArmDisableBranchPrediction)
+GCC_ASM_EXPORT(ArmDataMemoryBarrier)
+GCC_ASM_EXPORT(ArmDataSyncronizationBarrier)
+GCC_ASM_EXPORT(ArmInstructionSynchronizationBarrier)
 
 
 .set DC_ON, (0x1<<2)
@@ -116,14 +99,14 @@ ASM_PFX(ArmDisableMmu):
   bx      LR
 
 ASM_PFX(ArmEnableDataCache):
-  ldr     R1,=DC_ON
+  LoadConstantToReg(DC_ON, R1)  @ldr     R1,=DC_ON
   mrc     p15,0,R0,c1,c0,0      @Read control register configuration data
   orr     R0,R0,R1              @Set C bit
   mcr     p15,0,r0,c1,c0,0      @Write control register configuration data
   bx      LR
     
 ASM_PFX(ArmDisableDataCache):
-  ldr     R1,=DC_ON
+  LoadConstantToReg(DC_ON, R1)  @ldr     R1,=DC_ON
   mrc     p15,0,R0,c1,c0,0      @Read control register configuration data
   bic     R0,R0,R1              @Clear C bit
   mcr     p15,0,r0,c1,c0,0      @Write control register configuration data

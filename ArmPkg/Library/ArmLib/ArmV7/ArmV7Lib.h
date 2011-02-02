@@ -40,5 +40,41 @@ ArmCleanInvalidateDataCacheEntryBySetWay (
   IN  UINT32   SetWayFormat
   );
 
+VOID
+EFIAPI
+ArmEnableAsynchronousAbort (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmDisableAsynchronousAbort (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmEnableIrq (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmDisableIrq (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmEnableFiq (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmDisableFiq (
+  VOID
+  );
+
 #endif // __ARM_V7_LIB_H__
 

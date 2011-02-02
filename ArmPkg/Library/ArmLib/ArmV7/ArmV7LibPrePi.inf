@@ -30,6 +30,7 @@
   ArmV7Support.asm  | RVCT
 
   ArmV7Lib.c
+  ArmV7Mmu.c
 
 [Packages]
   ArmPkg/ArmPkg.dec

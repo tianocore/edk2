@@ -15,6 +15,7 @@
 
     EXPORT  Cp15IdCode
     EXPORT  Cp15CacheInfo
+    EXPORT  ArmIsMPCore
     EXPORT  ArmEnableInterrupts
     EXPORT  ArmDisableInterrupts
     EXPORT  ArmGetInterruptState
@@ -22,8 +23,8 @@
     EXPORT  ArmDisableFiq
     EXPORT  ArmGetFiqState
     EXPORT  ArmInvalidateTlb
-    EXPORT  ArmSetTranslationTableBaseAddress
-    EXPORT  ArmGetTranslationTableBaseAddress
+    EXPORT  ArmSetTTBR0
+    EXPORT  ArmGetTTBR0BaseAddress
     EXPORT  ArmSetDomainAccessControl
     EXPORT  CPSRMaskInsert
     EXPORT  CPSRRead
@@ -36,6 +37,14 @@ Cp15IdCode
 
 Cp15CacheInfo
   mrc     p15,0,R0,c0,c0,1
+  bx      LR
+
+ArmIsMPCore
+  mrc     p15,0,R0,c0,c0,5
+  # Get Multiprocessing extension (bit31) & U bit (bit30)
+  and     R0, R0, #0xC0000000
+  # if bit30 == 0 then the processor is part of a multiprocessor system)
+  and     R0, R0, #0x80000000
   bx      LR
 
 ArmEnableInterrupts
@@ -87,12 +96,13 @@ ArmInvalidateTlb
   mcr     p15,0,r0,c8,c7,0
   bx      lr
 
-ArmSetTranslationTableBaseAddress
+ArmSetTTBR0
   mcr     p15,0,r0,c2,c0,0
   bx      lr
 
-ArmGetTranslationTableBaseAddress
+ArmGetTTBR0BaseAddress
   mrc     p15,0,r0,c2,c0,0
+  and     r0, r0, #0xFFFFC000
   bx      lr
 
 ArmSetDomainAccessControl

@@ -15,8 +15,7 @@
 
        .text
        .align 2
-       .globl ASM_PFX(__aeabi_ulcmp)
- 	     INTERWORK_FUNC(__aeabi_ulcmp)
+       GCC_ASM_EXPORT(__aeabi_ulcmp)
 
 ASM_PFX(__aeabi_ulcmp):
        stmfd   sp!, {r4, r5, r8}

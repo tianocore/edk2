@@ -15,11 +15,11 @@
 .text
 .align 3
 
-.globl ASM_PFX(ExceptionHandlersStart)
-.globl ASM_PFX(ExceptionHandlersEnd)
-.globl ASM_PFX(CommonExceptionEntry)
-.globl ASM_PFX(AsmCommonExceptionEntry)
-.globl ASM_PFX(CommonCExceptionHandler)
+GCC_ASM_EXPORT(ExceptionHandlersStart)
+GCC_ASM_EXPORT(ExceptionHandlersEnd)
+GCC_ASM_EXPORT(CommonExceptionEntry)
+GCC_ASM_EXPORT(AsmCommonExceptionEntry)
+GCC_ASM_EXPORT(CommonCExceptionHandler)
 
 ASM_PFX(ExceptionHandlersStart):
 

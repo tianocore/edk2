@@ -32,37 +32,33 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 CHAR8 *
 DeCygwinPathIfNeeded (
-  IN  CHAR8   *Name
+  IN  CHAR8   *Name,
+  IN  CHAR8   *Temp,
+  IN  UINTN   Size
   )
 {
   CHAR8   *Ptr;
   UINTN   Index;
-  UINTN   Len;
+  UINTN   Index2;
   
   Ptr = AsciiStrStr (Name, "/cygdrive/");
   if (Ptr == NULL) {
     return Name;
   }
   
-  Len = AsciiStrLen (Ptr);
-  
-  // convert "/cygdrive" to spaces
-  for (Index = 0; Index < 9; Index++) {
-    Ptr[Index] = ' ';
+  for (Index = 9, Index2 = 0; (Index < (Size + 9)) && (Ptr[Index] != '\0'); Index++, Index2++) {
+    Temp[Index2] = Ptr[Index];
+    if (Temp[Index2] == '/') {
+      Temp[Index2] = '\\' ;
   }
 
-  // convert /c to c:
-  Ptr[9]  = Ptr[10];
-  Ptr[10] = ':';
-  
-  // switch path seperators
-  for (Index = 11; Index < Len; Index++) {
-    if (Ptr[Index] == '/') {
-      Ptr[Index] = '\\' ;
+    if (Index2 == 1) {
+      Temp[Index2 - 1] = Ptr[Index];
+      Temp[Index2] = ':';
     }
   }
 
-  return Name;
+  return Temp;
 }
 
 
@@ -81,12 +77,14 @@ PeCoffLoaderRelocateImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
+    CHAR8 Temp[512];
+
 #ifdef __CC_ARM
   // Print out the command for the RVD debugger to load symbols for this image
-  DEBUG ((EFI_D_ERROR, "load /a /ni /np %a &0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
+  DEBUG ((EFI_D_ERROR, "load /a /ni /np %a &0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
 #elif __GNUC__
   // This may not work correctly if you generate PE/COFF directlyas then the Offset would not be required
-  DEBUG ((EFI_D_ERROR, "add-symbol-file %a 0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
+  DEBUG ((EFI_D_ERROR, "add-symbol-file %a 0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
 #else
   DEBUG ((EFI_D_ERROR, "Loading driver at 0x%11p EntryPoint=0x%11p ", (VOID *)(UINTN) ImageContext->ImageAddress, FUNCTION_ENTRY_POINT (ImageContext->EntryPoint)));
 #endif
@@ -110,12 +108,16 @@ PeCoffLoaderUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
+  CHAR8 Temp[512];
+  
 #ifdef __CC_ARM
+  {  
   // Print out the command for the RVD debugger to load symbols for this image
-  DEBUG ((EFI_D_ERROR, "unload symbols_only %a", DeCygwinPathIfNeeded (ImageContext->PdbPointer)));
+    DEBUG ((EFI_D_ERROR, "unload symbols_only %a", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp))));
+  }
 #elif __GNUC__
   // This may not work correctly if you generate PE/COFF directlyas then the Offset would not be required
-  DEBUG ((EFI_D_ERROR, "remove-symbol-file %a 0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
+  DEBUG ((EFI_D_ERROR, "remove-symbol-file %a 0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
 #else
   DEBUG ((EFI_D_ERROR, "Unloading %a", ImageContext->PdbPointer));
 #endif
