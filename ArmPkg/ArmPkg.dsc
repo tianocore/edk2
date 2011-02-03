@@ -35,7 +35,7 @@
   XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
   
   GCC:*_*_ARM_ARCHCC_FLAGS     == -march=armv7-a -mthumb
-  GCC:*_*_ARM_ARCHASM_FLAGS    == -march=armv7-a
+  GCC:*_*_ARM_ARCHASM_FLAGS    == -march=armv7-a -mfpu=neon
   GCC:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
 
   RVCT:*_*_ARM_ARCHCC_FLAGS  == --cpu Cortex-A8 --thumb
@@ -94,10 +94,10 @@
   ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
-  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLib.inf
-  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLibPrePi.inf
-  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLib.inf
-  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLibPrePi.inf
+#  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLib.inf
+#  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLibPrePi.inf
+#  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLib.inf
+#  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLibPrePi.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf

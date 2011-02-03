@@ -12,6 +12,9 @@
 //
 //------------------------------------------------------------------------------
 
+#include <AsmMacroIoLib.h>
+    
+    INCLUDE AsmMacroIoLib.inc
 
     EXPORT  Cp15IdCode
     EXPORT  Cp15CacheInfo
@@ -41,9 +44,9 @@ Cp15CacheInfo
 
 ArmIsMPCore
   mrc     p15,0,R0,c0,c0,5
-  # Get Multiprocessing extension (bit31) & U bit (bit30)
+  // Get Multiprocessing extension (bit31) & U bit (bit30)
   and     R0, R0, #0xC0000000
-  # if bit30 == 0 then the processor is part of a multiprocessor system)
+  // if bit30 == 0 then the processor is part of a multiprocessor system)
   and     R0, R0, #0x80000000
   bx      LR
 
@@ -102,7 +105,8 @@ ArmSetTTBR0
 
 ArmGetTTBR0BaseAddress
   mrc     p15,0,r0,c2,c0,0
-  and     r0, r0, #0xFFFFC000
+  LoadConstantToReg(0xFFFFC000,r1)  // and     r0, r0, #0xFFFFC000
+  and     r0, r0, r1
   bx      lr
 
 ArmSetDomainAccessControl

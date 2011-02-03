@@ -34,24 +34,24 @@ MmcNotifyState (
 }
 
 VOID PrintOCR(UINT32 ocr) {
-    float minv, maxv, volts;
-    int loop;
+    UINTN minv, maxv, volts;
+    UINTN loop;
 
-    minv  = 3.6;
-    maxv  = 2.0;
-    volts = 2.0;
+    minv  = 36;  // 3.6
+    maxv  = 20;  // 2.0
+    volts = 20;  // 2.0
 
     // The MMC register bits [23:8] indicate the working range of the card
     for (loop = 8; loop < 24; loop++) {
         if (ocr & (1 << loop)) {
             if (minv > volts) minv = volts;
-            if (maxv < volts) maxv = volts + 0.1;
+            if (maxv < volts) maxv = volts + 1;
         }
-        volts = volts + 0.1;
+        volts = volts + 1;
     }
 
     DEBUG((EFI_D_ERROR, "- PrintOCR ocr (0x%X)\n",ocr));
-    //DEBUG((EFI_D_ERROR, "\t- Card operating voltage: %fV to %fV\n", minv, maxv));
+    DEBUG((EFI_D_ERROR, "\t- Card operating voltage: %d.%d to %d.%d\n", minv/10, minv % 10, maxv/10, maxv % 10));
     if (((ocr >> 29) & 3) == 0)
         DEBUG((EFI_D_ERROR, "\t- AccessMode: Byte Mode\n"));
     else
