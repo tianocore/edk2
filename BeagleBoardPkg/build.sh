@@ -59,7 +59,7 @@ case `uname` in
       ;;
   Linux*)  
       # Not tested
-      TARGET_TOOLS=ELFGCC 
+      TARGET_TOOLS=ARMGCC 
       ;;
   Darwin*) 
       Major=$(uname -r | cut -f 1 -d '.')
