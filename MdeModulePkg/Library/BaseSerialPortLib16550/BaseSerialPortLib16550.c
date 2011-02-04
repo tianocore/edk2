@@ -1,7 +1,7 @@
 /** @file
   16550 UART Serial Port library functions
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -38,7 +38,6 @@
 #define   B_UART_LSR_TEMT     BIT6
 #define R_UART_MSR            6
 #define   B_UART_MSR_CTS      BIT4
-#define   B_UART_MSR_DCD      BIT7
 
 /**
   Read an 8-bit 16550 register.  If PcdSerialUseMmio is TRUE, then the value is read from 
@@ -194,9 +193,9 @@ SerialPortWrite (
   IN UINTN     NumberOfBytes
 )
 {
-  UINTN  Result;
-  UINTN  Index;
-  UINTN  FifoSize;
+  UINTN    Result;
+  UINTN    Index;
+  UINTN    FifoSize;
 
   if (Buffer == NULL) {
     return 0;
@@ -213,7 +212,7 @@ SerialPortWrite (
       FifoSize = 64;
     }
   }
-  
+
   Result = NumberOfBytes;
   while (NumberOfBytes != 0) {
     //
@@ -230,7 +229,7 @@ SerialPortWrite (
         //
         // Wait for notification from peer to send data
         //
-        while ((SerialPortReadRegister (R_UART_MSR) & (B_UART_MSR_CTS | B_UART_MSR_DCD)) == B_UART_MSR_DCD);
+        while ((SerialPortReadRegister (R_UART_MSR) & (B_UART_MSR_CTS)) == 0);
       }
       
       //
