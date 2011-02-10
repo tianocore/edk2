@@ -4,7 +4,7 @@
 # It also provides the defintions(including PPIs/PROTOCOLs/GUIDs and library classes)
 # and libraries instances, which are used for those modules.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under 
 # the terms and conditions of the BSD License that accompanies this distribution.  
 # The full text of the license may be found at
@@ -402,6 +402,11 @@
   #  If FALSE, then the 16550 serial port hardware flow control is disabled.  Default value.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl|FALSE|BOOLEAN|0x00020001
 
+  ## If TRUE, then 16550 serial Tx operations will block if DSR is not asserted (no cable).
+  #  If FALSE, then the 16550 serial Tx operations will not be blocked if DSR is not asserted. Default value.
+  #  This PCD is ignored if PcdSerialUseHardwareFlowControl is FALSE.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialDetectCable|FALSE|BOOLEAN|0x00020006
+    
   ## Base address of 16550 serial port registers in MMIO or I/O space.  Default is 0x3F8.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x03F8|UINT64|0x00020002
 

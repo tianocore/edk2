@@ -38,6 +38,7 @@
 #define   B_UART_LSR_TEMT     BIT6
 #define R_UART_MSR            6
 #define   B_UART_MSR_CTS      BIT4
+#define   B_UART_MSR_DSR      BIT5
 
 /**
   Read an 8-bit 16550 register.  If PcdSerialUseMmio is TRUE, then the value is read from 
@@ -226,10 +227,35 @@ SerialPortWrite (
     //
     for (Index = 0; Index < FifoSize && NumberOfBytes != 0; Index++, NumberOfBytes--, Buffer++) {
       if (PcdGetBool (PcdSerialUseHardwareFlowControl)) {
-        //
-        // Wait for notification from peer to send data
-        //
-        while ((SerialPortReadRegister (R_UART_MSR) & (B_UART_MSR_CTS)) == 0);
+        if (PcdGetBool (PcdSerialDetectCable)) {
+          //
+          // Wait for both DSR and CTS to be set
+          //   DSR is set if a cable is connected.
+          //   CTS is set if it is ok to transmit data
+          //
+          //   DSR  CTS  Description                               Action
+          //   ===  ===  ========================================  ========
+          //    0    0   No cable connected.                       Wait
+          //    0    1   No cable connected.                       Wait
+          //    1    0   Cable connected, but not clear to send.   Wait
+          //    1    1   Cable connected, and clear to send.       Transmit
+          //
+          while ((SerialPortReadRegister (R_UART_MSR) & (B_UART_MSR_DSR | B_UART_MSR_CTS)) != (B_UART_MSR_DSR | B_UART_MSR_CTS));
+        } else {
+          //
+          // Wait for both DSR and CTS to be set OR for DSR to be clear.  
+          //   DSR is set if a cable is connected.
+          //   CTS is set if it is ok to transmit data
+          //
+          //   DSR  CTS  Description                               Action
+          //   ===  ===  ========================================  ========
+          //    0    0   No cable connected.                       Transmit
+          //    0    1   No cable connected.                       Transmit
+          //    1    0   Cable connected, but not clear to send.   Wait
+          //    1    1   Cable connected, and clar to send.        Transmit
+          //
+          while ((SerialPortReadRegister (R_UART_MSR) & (B_UART_MSR_DSR | B_UART_MSR_CTS)) == (B_UART_MSR_DSR));
+        }
       }
       
       //
