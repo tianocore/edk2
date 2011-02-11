@@ -1,7 +1,7 @@
 /** @file
   ACPI Table Protocol Implementation
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -614,12 +614,17 @@ AddTableToList (
   //
   // Allocation memory type depends on the type of the table
   //
-  if (CurrentTableSignature == EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE || 
-      CurrentTableSignature == EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) {
+  if ((CurrentTableSignature == EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) || 
+      (CurrentTableSignature == EFI_ACPI_4_0_UEFI_ACPI_DATA_TABLE_SIGNATURE)) {
     //
     // Allocate memory for the FACS.  This structure must be aligned
     // on a 64 byte boundary and must be ACPI NVS memory.
     // Using AllocatePages should ensure that it is always aligned.
+    // Do not change signature for new ACPI version because they are same.
+    //
+    // UEFI table also need to be in ACPI NVS memory, because some data field
+    // could be updated by OS present agent. For example, BufferPtrAddress in
+    // SMM communication ACPI table.
     //
     ASSERT ((EFI_PAGE_SIZE % 64) == 0);
     Status = gBS->AllocatePages (
