@@ -1,7 +1,7 @@
 ## @file
 # EFI/PI MdePkg Package
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
@@ -139,6 +139,7 @@
   MdePkg/Library/SmmPciLibPciRootBridgeIo/SmmPciLibPciRootBridgeIo.inf
   MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
   MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
+  MdePkg/Library/SmmPeriodicSmiLib/SmmPeriodicSmiLib.inf  
 
 [Components.IPF]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
@@ -148,7 +149,6 @@
   MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
   MdePkg/Library/UefiPalLib/UefiPalLib.inf
   MdePkg/Library/UefiSalLib/UefiSalLib.inf
-
 
 [Components.EBC]
   MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
