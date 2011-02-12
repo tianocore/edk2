@@ -27,7 +27,7 @@
 
   Depex - Dependency Expresion.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -587,7 +587,7 @@ SmmLoadImage (
 
 
     DEBUG ((DEBUG_INFO | DEBUG_LOAD,
-           "Loading driver at 0x%11p EntryPoint=0x%11p ",
+           "Loading SMM driver at 0x%11p EntryPoint=0x%11p ",
            (VOID *)(UINTN) ImageContext.ImageAddress,
            FUNCTION_ENTRY_POINT (ImageContext.EntryPoint)));
 
