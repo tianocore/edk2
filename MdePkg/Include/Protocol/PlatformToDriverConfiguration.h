@@ -5,7 +5,7 @@
   by a UEFI Driver in its Start() function. This protocol allows the driver to receive 
   configuration information as part of being started.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -289,14 +289,15 @@ struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL {
   used.
 **/
 typedef struct {
-  CHAR8   *CLPCommand;        ///<  A pointer to the DMTF SM CLP command line null-terminated string that the 
-                              ///<  driver is required to parse and process when this function is called. 
+  CHAR8   *CLPCommand;        ///<  A pointer to the null-terminated UTF-8 string that specifies the DMTF SM CLP command
+                              ///<  line that the driver is required to parse and process when this function is called. 
                               ///<  See the DMTF SM CLP Specification 1.0 Final Standard for details on the 
                               ///<  format and syntax of the CLP command line string. CLPCommand buffer
                               ///<  is allocated by the producer of the EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOOL.
   UINT32  CLPCommandLength;   ///< The length of the CLP Command in bytes.
-  CHAR8   *CLPReturnString;   ///<  A pointer to the CLP return status string that the driver is required to
-                              ///<  provide to the calling agent. The calling agent may parse and/ or pass
+  CHAR8   *CLPReturnString;   ///<  A pointer to the null-terminated UTF-8 string that indicates the CLP return status
+                              ///<  that the driver is required to provide to the calling agent.
+                              ///<  The calling agent may parse and/ or pass
                               ///<  this for processing and user feedback. The SM CLP Command Response string
                               ///<  buffer is filled in by the UEFI driver in the "keyword=value" format
                               ///<  described in the SM CLP Specification, unless otherwise requested via the SM

@@ -20,7 +20,7 @@
   may then need to be reconnected or the system may need to be rebooted for the 
   configuration changes to take affect. 
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -30,7 +30,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  This Protocol is defined in UEFI Specification 2.2 
+  This Protocol is defined in UEFI Specification 2.3d 
 
 **/
 
@@ -131,7 +131,7 @@ EFI_STATUS
                               containing a EFI_HII_HANDLE with a value of NULL.  The 
                               EFI_HII_STRING_PROTOCOL.GetString() function can be used to 
                               retrieve the warning or error message as a Null-terminated 
-                              Unicode string in a specific language.  Messages may be 
+                              string in a specific language.  Messages may be 
                               returned for any of the HealthStatus values except 
                               EfiDriverHealthStatusReconnectRequired and 
                               EfiDriverHealthStatusRebootRequired.

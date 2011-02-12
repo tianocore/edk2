@@ -5,7 +5,7 @@
   The definitions in this file are defined in UEFI Specification 2.3, which have
   not been verified by one implementation yet.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -83,8 +83,8 @@ EFI_STATUS
   
   If EapAuthType is an invalid EAP authentication type, then EFI_INVALID_PARAMETER is 
   returned.
-  If the EAP authentication method of EapAuthType is unsupported by the Ports, then this
-  function will return EFI_UNSUPPORTED.
+  If the EAP authentication method of EapAuthType is unsupported by the Ports, then it will
+  return EFI_UNSUPPORTED.
 
   @param[in] This                A pointer to the EFI_EAP_PROTOCOL instance that indicates 
                                  the calling context.
@@ -95,7 +95,8 @@ EFI_STATUS
   @retval EFI_SUCCESS            The EAP authentication method of EapAuthType is 
                                  registered successfully.
   @retval EFI_INVALID_PARAMETER  EapAuthType is an invalid EAP authentication type.
-  @retval EFI_OUT_OF_RESOURCES   There is not enough system memory to perform the registration.
+  @retval EFI_UNSUPPORTED        The EAP authentication method of EapAuthType is
+                                 unsupported by the Port.
 
 **/
 typedef

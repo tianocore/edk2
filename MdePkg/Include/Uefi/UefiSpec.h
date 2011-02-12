@@ -1,11 +1,11 @@
 /** @file
   Include file that supports UEFI.
 
-  This include file must only contain things defined in the UEFI 2.1 specification.
-  If a code construct is defined in the UEFI 2.1 specification it must be included
+  This include file must contain things defined in the UEFI 2.3 specification.
+  If a code construct is defined in the UEFI 2.3 specification it must be included
   by this include file.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -821,7 +821,11 @@ EFI_STATUS
   @retval EFI_LOAD_ERROR        Image was not loaded because the image format was corrupt or not
                                 understood.
   @retval EFI_DEVICE_ERROR      Image was not loaded because the device returned a read error.
-
+  @retval EFI_ACCESS_DENIED     Image was not loaded because the platform policy prohibits the 
+                                image from being loaded. NULL is returned in *ImageHandle.
+  @retval EFI_SECURITY_VIOLATION Image was loaded and an ImageHandle was created with a 
+                                valid EFI_LOADED_IMAGE_PROTOCOL. However, the current 
+                                platform policy specifies that the image should not be started.
 **/
 typedef
 EFI_STATUS
