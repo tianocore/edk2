@@ -1,7 +1,7 @@
 /** @file
   The firmware volume related definitions in PI.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -11,7 +11,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  PI Version 1.0
+  PI Version 1.2B
 
 **/
 
@@ -208,5 +208,24 @@ typedef struct {
   EFI_GUID  Types[1];
 } EFI_FIRMWARE_VOLUME_EXT_ENTRY_OEM_TYPE;
 
+#define EFI_FV_EXT_TYPE_GUID_TYPE 0x0002
+
+///
+/// This extension header provides a mapping between a GUID and an OEM file type.
+///
+typedef struct {
+  ///
+  /// Standard extension entry, with the type EFI_FV_EXT_TYPE_OEM_TYPE.
+  ///
+  EFI_FIRMWARE_VOLUME_EXT_ENTRY     Hdr;
+  ///
+  /// Vendor-specific GUID.
+  ///
+  EFI_GUID                          FormatType;
+  ///
+  /// An arry of bytes of length Length.
+  ///
+  UINT8                             Data[1];
+} EFI_FIRMWARE_VOLUME_EXT_ENTRY_GUID_TYPE;
 
 #endif
