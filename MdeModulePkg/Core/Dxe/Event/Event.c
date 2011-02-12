@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_TPL  gEfiCurrentTpl = TPL_APPLICATION;
 
 ///
-/// gEventQueueLock - Protects the event queus
+/// gEventQueueLock - Protects the event queues
 ///
 EFI_LOCK gEventQueueLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_HIGH_LEVEL);
 

@@ -1,7 +1,7 @@
 /** @file
   Implementations for Firmware Volume Block protocol.
 
-  It consumes FV HOBs and creates read-lonly Firmare Volume Block protocol
+  It consumes FV HOBs and creates read-only Firmare Volume Block protocol
   instances for each of them.
 
 Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>

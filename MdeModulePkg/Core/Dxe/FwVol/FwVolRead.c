@@ -325,7 +325,7 @@ FvReadFile (
 
   if (Buffer == NULL) {
     //
-    // If Buffer is NULL, we only want to get the information colected so far
+    // If Buffer is NULL, we only want to get the information collected so far
     //
     return EFI_SUCCESS;
   }

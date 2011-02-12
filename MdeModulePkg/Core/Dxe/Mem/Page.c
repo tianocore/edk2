@@ -28,7 +28,7 @@ typedef struct {
   UINTN                 InformationIndex;
   BOOLEAN               Special;
   BOOLEAN               Runtime;
-} EFI_MEMORY_TYPE_STAISTICS;
+} EFI_MEMORY_TYPE_STATISTICS;
 
 //
 // MemoryMap - The current memory map
@@ -52,7 +52,7 @@ UINTN         mFreeMapStack = 0;
 LIST_ENTRY   mFreeMemoryMapEntryList = INITIALIZE_LIST_HEAD_VARIABLE (mFreeMemoryMapEntryList);
 BOOLEAN      mMemoryTypeInformationInitialized = FALSE;
 
-EFI_MEMORY_TYPE_STAISTICS mMemoryTypeStatistics[EfiMaxMemoryType + 1] = {
+EFI_MEMORY_TYPE_STATISTICS mMemoryTypeStatistics[EfiMaxMemoryType + 1] = {
   { 0, MAX_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  FALSE },  // EfiReservedMemoryType
   { 0, MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiLoaderCode
   { 0, MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiLoaderData
