@@ -521,6 +521,78 @@
   ## This PCD specifies whether to reset system when memory type information changes.
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|TRUE|BOOLEAN|0x00010056
 
+  ## Specify the foreground color for Subtile text in HII Form Browser. The default value is EFI_BLUE.
+  #  Only following values defined in UEFI specification are valid:
+  #  0x00 (EFI_BLACK)
+  #  0x01 (EFI_BLUE)
+  #  0x02 (EFI_GREEN)
+  #  0x03 (EFI_CYAN)
+  #  0x04 (EFI_RED)
+  #  0x05 (EFI_MAGENTA)
+  #  0x06 (EFI_BROWN)
+  #  0x07 (EFI_LIGHTGRAY)
+  #  0x08 (EFI_DARKGRAY) 
+  #  0x09 (EFI_LIGHTBLUE)
+  #  0x0A (EFI_LIGHTGREEN)
+  #  0x0B (EFI_LIGHTCYAN)
+  #  0x0C (EFI_LIGHTRED)
+  #  0x0D (EFI_LIGHTMAGENTA)
+  #  0x0E (EFI_YELLOW)
+  #  0x0F (EFI_WHITE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserSubtitleTextColor|0x01|UINT8|0x00010057
+  
+  ## Specify the foreground color for prompt and Question value text in HII Form Browser. The default value is EFI_BLACK.
+  #  Only following values defined in UEFI specification are valid:
+  #  0x00 (EFI_BLACK)
+  #  0x01 (EFI_BLUE)
+  #  0x02 (EFI_GREEN)
+  #  0x03 (EFI_CYAN)
+  #  0x04 (EFI_RED)
+  #  0x05 (EFI_MAGENTA)
+  #  0x06 (EFI_BROWN)
+  #  0x07 (EFI_LIGHTGRAY)
+  #  0x08 (EFI_DARKGRAY) 
+  #  0x09 (EFI_LIGHTBLUE)
+  #  0x0A (EFI_LIGHTGREEN)
+  #  0x0B (EFI_LIGHTCYAN)
+  #  0x0C (EFI_LIGHTRED)
+  #  0x0D (EFI_LIGHTMAGENTA)
+  #  0x0E (EFI_YELLOW)
+  #  0x0F (EFI_WHITE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserFieldTextColor|0x00|UINT8|0x00010058
+  
+  ## Specify the foreground color for highlighted prompt and Question value text in HII Form Browser.
+  #  The default value is EFI_LIGHTGRAY. Only following values defined in UEFI specification are valid:
+  #  0x00 (EFI_BLACK)
+  #  0x01 (EFI_BLUE)
+  #  0x02 (EFI_GREEN)
+  #  0x03 (EFI_CYAN)
+  #  0x04 (EFI_RED)
+  #  0x05 (EFI_MAGENTA)
+  #  0x06 (EFI_BROWN)
+  #  0x07 (EFI_LIGHTGRAY)
+  #  0x08 (EFI_DARKGRAY) 
+  #  0x09 (EFI_LIGHTBLUE)
+  #  0x0A (EFI_LIGHTGREEN)
+  #  0x0B (EFI_LIGHTCYAN)
+  #  0x0C (EFI_LIGHTRED)
+  #  0x0D (EFI_LIGHTMAGENTA)
+  #  0x0E (EFI_YELLOW)
+  #  0x0F (EFI_WHITE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserFieldTextHighlightColor|0x07|UINT8|0x00010059
+  
+  ## Specify the background color for highlighted prompt and Question value text in HII Form Browser.
+  #  The default value is EFI_BACKGROUND_BLACK. Only following values defined in UEFI specification are valid:
+  #  0x00 (EFI_BACKGROUND_BLACK)
+  #  0x10 (EFI_BACKGROUND_BLUE)
+  #  0x20 (EFI_BACKGROUND_GREEN)
+  #  0x30 (EFI_BACKGROUND_CYAN)
+  #  0x40 (EFI_BACKGROUND_RED)
+  #  0x50 (EFI_BACKGROUND_MAGENTA)
+  #  0x60 (EFI_BACKGROUND_BROWN)
+  #  0x70 (EFI_BACKGROUND_LIGHTGRAY)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserFieldBackgroundHighlightColor|0x00|UINT8|0x0001005A
+
 [PcdsPatchableInModule]
   ## Specify  memory size with page number for PEI code when 
   #  the feature of Loading Module at Fixed Address is enabled

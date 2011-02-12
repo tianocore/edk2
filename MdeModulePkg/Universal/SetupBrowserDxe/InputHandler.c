@@ -1,7 +1,7 @@
 /** @file
 Implementation for handling user input from the User Interfaces.
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -540,11 +540,11 @@ TheKey2:
             PrintFormattedNumber (Question, FormattedNumber, 21 * sizeof (CHAR16));
           }
 
-          gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
+          gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND);
           for (Loop = 0; Loop < EraseLen; Loop++) {
             PrintAt (MenuOption->OptCol + Loop, MenuOption->Row, L" ");
           }
-          gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT_HIGHLIGHT | FIELD_BACKGROUND_HIGHLIGHT);
+          gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextHighlightColor) | PcdGet8 (PcdBrowserFieldBackgroundHighlightColor));
 
           if (MenuOption->Sequence == 0) {
             PrintCharAt (MenuOption->OptCol, Row, LEFT_NUMERIC_DELIMITER);

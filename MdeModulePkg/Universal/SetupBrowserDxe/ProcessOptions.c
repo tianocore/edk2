@@ -2,7 +2,7 @@
 Implementation for handling the User Interface option processing.
 
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -587,7 +587,7 @@ ProcessOptions (
             CopyMem (QuestionValue, &OneOfOption->Value, sizeof (EFI_HII_VALUE));
             SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
             UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
-            gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
+            gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND);
             break;
           }
 

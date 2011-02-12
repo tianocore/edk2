@@ -1,7 +1,7 @@
 /** @file
 MACRO definitions for color used in Setup Browser.
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -26,15 +26,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define TITLE_BACKGROUND              EFI_BACKGROUND_BLUE
 #define KEYHELP_TEXT                  EFI_LIGHTGRAY
 #define KEYHELP_BACKGROUND            EFI_BACKGROUND_BLACK
-#define SUBTITLE_TEXT                 EFI_BLUE
 #define SUBTITLE_BACKGROUND           EFI_BACKGROUND_LIGHTGRAY
 #define BANNER_TEXT                   EFI_BLUE
 #define BANNER_BACKGROUND             EFI_BACKGROUND_LIGHTGRAY
-#define FIELD_TEXT                    EFI_BLACK
 #define FIELD_TEXT_GRAYED             EFI_DARKGRAY
 #define FIELD_BACKGROUND              EFI_BACKGROUND_LIGHTGRAY
-#define FIELD_TEXT_HIGHLIGHT          EFI_LIGHTGRAY
-#define FIELD_BACKGROUND_HIGHLIGHT    EFI_BACKGROUND_BLACK
 #define POPUP_TEXT                    EFI_LIGHTGRAY
 #define POPUP_BACKGROUND              EFI_BACKGROUND_BLUE
 #define POPUP_INVERSE_TEXT            EFI_LIGHTGRAY

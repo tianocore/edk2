@@ -1,7 +1,7 @@
 /** @file
 Utility functions for User Interface functions.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1011,7 +1011,7 @@ UpdateStatusBar (
         );
       mInputError = TRUE;
     } else {
-      gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT_HIGHLIGHT);
+      gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextHighlightColor));
       for (Index = 0; Index < (GetStringWidth (InputErrorMessage) - 2) / 2; Index++) {
         PrintAt (gScreenDimensions.LeftColumn + gPromptBlockWidth + Index, gScreenDimensions.BottomRow - 1, L"  ");
       }
@@ -1033,7 +1033,7 @@ UpdateStatusBar (
 
         gNvUpdateRequired = TRUE;
       } else {
-        gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT_HIGHLIGHT);
+        gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextHighlightColor));
         for (Index = 0; Index < (GetStringWidth (NvUpdateMessage) - 2) / 2; Index++) {
           PrintAt (
             (gScreenDimensions.LeftColumn + gPromptBlockWidth + gOptionBlockWidth + Index),
@@ -1765,7 +1765,7 @@ UiDisplayMenu (
           LocalScreen.RightColumn,
           TopRow - SCROLL_ARROW_HEIGHT,
           BottomRow + SCROLL_ARROW_HEIGHT,
-          FIELD_TEXT | FIELD_BACKGROUND
+          PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND
           );
 
         UiFreeRefreshList ();
@@ -1786,7 +1786,7 @@ UiDisplayMenu (
             gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT_GRAYED | FIELD_BACKGROUND);
           } else {
             if (Statement->Operand == EFI_IFR_SUBTITLE_OP) {
-              gST->ConOut->SetAttribute (gST->ConOut, SUBTITLE_TEXT | FIELD_BACKGROUND);
+              gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserSubtitleTextColor) | FIELD_BACKGROUND);
             }
           }
 
@@ -1874,7 +1874,7 @@ UiDisplayMenu (
                 MenuRefreshEntry->Selection         = Selection;
                 MenuRefreshEntry->CurrentColumn     = MenuOption->OptCol;
                 MenuRefreshEntry->CurrentRow        = MenuOption->Row;
-                MenuRefreshEntry->CurrentAttribute  = FIELD_TEXT | FIELD_BACKGROUND;
+                MenuRefreshEntry->CurrentAttribute  = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
                 gMenuRefreshHead                    = MenuRefreshEntry;
               } else {
                 //
@@ -1892,7 +1892,7 @@ UiDisplayMenu (
                 MenuRefreshEntry->Selection         = Selection;
                 MenuRefreshEntry->CurrentColumn     = MenuOption->OptCol;
                 MenuRefreshEntry->CurrentRow        = MenuOption->Row;
-                MenuRefreshEntry->CurrentAttribute  = FIELD_TEXT | FIELD_BACKGROUND;
+                MenuRefreshEntry->CurrentAttribute  = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
               }
             }
 
@@ -1974,7 +1974,7 @@ UiDisplayMenu (
             Row = OriginalRow;
             FreePool (StringPtr);
           }
-          gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
+          gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND);
 
           //
           // Need to handle the bottom of the display
@@ -2008,7 +2008,7 @@ UiDisplayMenu (
             L"%c",
             ARROW_UP
             );
-          gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
+          gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND);
         }
 
         if (DownArrow) {
@@ -2019,7 +2019,7 @@ UiDisplayMenu (
             L"%c",
             ARROW_DOWN
             );
-          gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
+          gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND);
         }
 
         MenuOption = NULL;
@@ -2095,7 +2095,7 @@ UiDisplayMenu (
           //
           gST->ConOut->SetCursorPosition (gST->ConOut, MenuOption->Col, MenuOption->Row);
           ProcessOptions (Selection, MenuOption, FALSE, &OptionString);
-          gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
+          gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND);
           if (OptionString != NULL) {
             if ((MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP) ||
                 (MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP)
@@ -2139,7 +2139,7 @@ UiDisplayMenu (
               if (MenuOption->GrayOut) {
                 gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT_GRAYED | FIELD_BACKGROUND);
               } else if (MenuOption->ThisTag->Operand == EFI_IFR_SUBTITLE_OP) {
-                gST->ConOut->SetAttribute (gST->ConOut, SUBTITLE_TEXT | FIELD_BACKGROUND);
+                gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserSubtitleTextColor) | FIELD_BACKGROUND);
               }
 
               OriginalRow = MenuOption->Row;
@@ -2160,7 +2160,7 @@ UiDisplayMenu (
               }
 
               MenuOption->Row = OriginalRow;
-              gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
+              gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND);
             }
           }
         }
@@ -2190,7 +2190,7 @@ UiDisplayMenu (
         //
         // Set reverse attribute
         //
-        gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT_HIGHLIGHT | FIELD_BACKGROUND_HIGHLIGHT);
+        gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextHighlightColor) | PcdGet8 (PcdBrowserFieldBackgroundHighlightColor));
         gST->ConOut->SetCursorPosition (gST->ConOut, MenuOption->Col, MenuOption->Row);
 
         //
@@ -2200,9 +2200,9 @@ UiDisplayMenu (
         //
         if (gMenuRefreshHead != NULL) {
           for (MenuRefreshEntry = gMenuRefreshHead; MenuRefreshEntry != NULL; MenuRefreshEntry = MenuRefreshEntry->Next) {
-            MenuRefreshEntry->CurrentAttribute = FIELD_TEXT | FIELD_BACKGROUND;
+            MenuRefreshEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
             if (MenuRefreshEntry->MenuOption == MenuOption) {
-              MenuRefreshEntry->CurrentAttribute = FIELD_TEXT_HIGHLIGHT | FIELD_BACKGROUND_HIGHLIGHT;
+              MenuRefreshEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextHighlightColor) | PcdGet8 (PcdBrowserFieldBackgroundHighlightColor);
             }
           }
         }
@@ -2274,7 +2274,7 @@ UiDisplayMenu (
         //
         // Clear reverse attribute
         //
-        gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
+        gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND);
       }
       //
       // Repaint flag will be used when process CfUpdateHelpString, so restore its value
