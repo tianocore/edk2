@@ -1,7 +1,7 @@
 /** @file
   Data structure and functions to load and unload PeImage.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -116,6 +116,14 @@ typedef struct {
                                   protocol for loading the file.
   @retval EFI_OUT_OF_RESOURCES    Image was not loaded due to insufficient
                                   resources.
+  @retval EFI_LOAD_ERROR          Image was not loaded because the image format was corrupt or not
+                                  understood.
+  @retval EFI_DEVICE_ERROR        Image was not loaded because the device returned a read error.
+  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the 
+                                  image from being loaded. NULL is returned in *ImageHandle.
+  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a 
+                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current 
+                                  platform policy specifies that the image should not be started.
 
 **/
 EFI_STATUS

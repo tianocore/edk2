@@ -1,7 +1,7 @@
 /** @file
   Core image handling services to load and unload PeImage.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -959,6 +959,14 @@ CoreUnloadAndCloseImage (
                                   protocol for loading the file.
   @retval EFI_OUT_OF_RESOURCES    Image was not loaded due to insufficient
                                   resources.
+  @retval EFI_LOAD_ERROR          Image was not loaded because the image format was corrupt or not
+                                  understood.
+  @retval EFI_DEVICE_ERROR        Image was not loaded because the device returned a read error.
+  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the 
+                                  image from being loaded. NULL is returned in *ImageHandle.
+  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a 
+                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current 
+                                  platform policy specifies that the image should not be started.
 
 **/
 EFI_STATUS
@@ -1265,6 +1273,14 @@ Done:
                                   protocol for loading the file.
   @retval EFI_OUT_OF_RESOURCES    Image was not loaded due to insufficient
                                   resources.
+  @retval EFI_LOAD_ERROR          Image was not loaded because the image format was corrupt or not
+                                  understood.
+  @retval EFI_DEVICE_ERROR        Image was not loaded because the device returned a read error.
+  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the 
+                                  image from being loaded. NULL is returned in *ImageHandle.
+  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a 
+                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current 
+                                  platform policy specifies that the image should not be started.
 
 **/
 EFI_STATUS
@@ -1334,6 +1350,14 @@ CoreLoadImage (
                                   protocol for loading the file.
   @retval EFI_OUT_OF_RESOURCES    Image was not loaded due to insufficient
                                   resources.
+  @retval EFI_LOAD_ERROR          Image was not loaded because the image format was corrupt or not
+                                  understood.
+  @retval EFI_DEVICE_ERROR        Image was not loaded because the device returned a read error.
+  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the 
+                                  image from being loaded. NULL is returned in *ImageHandle.
+  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a 
+                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current 
+                                  platform policy specifies that the image should not be started.
 
 **/
 EFI_STATUS
@@ -1372,7 +1396,7 @@ CoreLoadImageEx (
   @param  ImageHandle             Handle of image to be started.
   @param  ExitDataSize            Pointer of the size to ExitData
   @param  ExitData                Pointer to a pointer to a data buffer that
-                                  includes a Null-terminated Unicode string,
+                                  includes a Null-terminated string,
                                   optionally followed by additional binary data.
                                   The string is a description that the caller may
                                   use to further indicate the reason for the

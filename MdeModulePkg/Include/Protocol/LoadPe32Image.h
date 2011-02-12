@@ -3,7 +3,7 @@
   Load Pe32 Image protocol enables loading and unloading EFI images into memory and executing those images.
   This protocol uses File Device Path to get an EFI image.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -49,6 +49,14 @@ typedef struct _EFI_PE32_IMAGE_PROTOCOL   EFI_PE32_IMAGE_PROTOCOL;
   @retval EFI_UNSUPPORTED       The image type is not supported, or the device path cannot be
                                 parsed to locate the proper protocol for loading the file.
   @retval EFI_OUT_OF_RESOURCES  The image was not loaded due to insufficient memory resources.
+  @retval EFI_LOAD_ERROR        Image was not loaded because the image format was corrupt or not
+                                understood.
+  @retval EFI_DEVICE_ERROR      Image was not loaded because the device returned a read error.
+  @retval EFI_ACCESS_DENIED     Image was not loaded because the platform policy prohibits the 
+                                image from being loaded. NULL is returned in *ImageHandle.
+  @retval EFI_SECURITY_VIOLATION Image was loaded and an ImageHandle was created with a 
+                                valid EFI_LOADED_IMAGE_PROTOCOL. However, the current 
+                                platform policy specifies that the image should not be started.
 **/
 typedef
 EFI_STATUS
