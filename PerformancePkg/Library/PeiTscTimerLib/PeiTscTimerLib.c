@@ -1,5 +1,5 @@
 /** @file
-  A Timer Library implementation which uses the Time Stamp Counter in the processor.
+  A Pei Timer Library implementation which uses the Time Stamp Counter in the processor.
 
   For Pentium 4 processors, Intel Xeon processors (family [0FH], models [03H and higher]);
     for Intel Core Solo and Intel Core Duo processors (family [06H], model [0EH]);
@@ -13,14 +13,14 @@
 
   The specific processor configuration determines the behavior. Constant TSC behavior ensures that the
   duration of each clock tick is uniform and supports the use of the TSC as a wall clock timer even if
-  the processor core changes frequency.  This is the architectural behavior moving forward.
+  the processor core changes frequency. This is the architectural behavior moving forward.
 
   A Processor's support for invariant TSC is indicated by CPUID.0x80000007.EDX[8].
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
+  which accompanies this distribution. The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -28,7 +28,7 @@
 
 **/
 
-#include <Base.h>
+#include <PiPei.h>
 #include <Ich/GenericIch.h>
 
 #include <Library/TimerLib.h>
@@ -36,34 +36,50 @@
 #include <Library/IoLib.h>
 #include <Library/PciLib.h>
 #include <Library/PcdLib.h>
+#include <Library/HobLib.h>
 
-STATIC UINT64   mTscFrequency;
+#include <Guid/TscFrequency.h>
 
-/** The constructor function determines the actual TSC frequency.
+/**  Get TSC frequency from TSC frequency GUID HOB, if the HOB is not found, build it.
 
   The TSC counting frequency is determined by comparing how far it counts
-  during a 1ms period as determined by the ACPI timer.  The ACPI timer is
+  during a 1ms period as determined by the ACPI timer. The ACPI timer is
   used because it counts at a known frequency.
-  If ACPI I/O space not enabled, this function will enable it.  Then the
+  If ACPI I/O space not enabled, this function will enable it. Then the
   TSC is sampled, followed by waiting for 3579 clocks of the ACPI timer, or 1ms.
   The TSC is then sampled again. The difference multiplied by 1000 is the TSC
-  frequency.  There will be a small error because of the overhead of reading
-  the ACPI timer.  An attempt is made to determine and compensate for this error.
-  This function will always return RETURN_SUCCESS.
+  frequency. There will be a small error because of the overhead of reading
+  the ACPI timer.
 
-  @retval RETURN_SUCCESS   The constructor always returns RETURN_SUCCESS.
+  @return The number of TSC counts per second.
 
 **/
-RETURN_STATUS
-EFIAPI
-TscTimerLibConstructor (
+UINT64
+InternalGetTscFrequency (
   VOID
   )
 {
+  EFI_HOB_GUID_TYPE       *GuidHob;
+  VOID        *DataInHob;
   UINT64      StartTSC;
   UINT64      EndTSC;
   UINT32      TimerAddr;
   UINT32      Ticks;
+  UINT64      TscFrequency;
+
+  //
+  // Get TSC frequency from TSC frequency GUID HOB.
+  //
+  GuidHob = GetFirstGuidHob (&gEfiTscFrequencyGuid);
+  if (GuidHob != NULL) {
+    DataInHob = GET_GUID_HOB_DATA (GuidHob);
+    TscFrequency = * (UINT64 *) DataInHob;
+    return TscFrequency;
+  }
+
+  //
+  // TSC frequency GUID HOB is not found, build it.
+  //
 
   //
   // If ACPI I/O space is not enabled yet, program ACPI I/O base address and enable it.
@@ -73,27 +89,38 @@ TscTimerLibConstructor (
     PciOr8 (PCI_ICH_LPC_ADDRESS (R_ICH_LPC_ACPI_CNT), B_ICH_LPC_ACPI_CNT_ACPI_EN);
   }
 
-  TimerAddr = PcdGet16 (PcdPerfPkgAcpiIoPortBaseAddress) + R_ACPI_PM1_TMR;  // Locate the ACPI Timer
-  Ticks    = IoRead32( TimerAddr) + (3579);   // Set Ticks to 1ms in the future
+  //
+  // ACPI I/O space should be enabled now, locate the ACPI Timer.
+  // ACPI I/O base address maybe have be initialized by other driver with different value,
+  // So get it from PCI space directly.
+  //
+  TimerAddr = ((PciRead16 (PCI_ICH_LPC_ADDRESS (R_ICH_LPC_ACPI_BASE))) & B_ICH_LPC_ACPI_BASE_BAR) + R_ACPI_PM1_TMR;
+  Ticks    = IoRead32 (TimerAddr) + (3579);   // Set Ticks to 1ms in the future
   StartTSC = AsmReadTsc();                    // Get base value for the TSC
   //
   // Wait until the ACPI timer has counted 1ms.
   // Timer wrap-arounds are handled correctly by this function.
   // When the current ACPI timer value is greater than 'Ticks', the while loop will exit.
   //
-  while (((Ticks - IoRead32( TimerAddr)) & BIT23) == 0) {
+  while (((Ticks - IoRead32 (TimerAddr)) & BIT23) == 0) {
     CpuPause();
   }
   EndTSC = AsmReadTsc();    // TSC value 1ms later
 
-  mTscFrequency =   MultU64x32 (
+  TscFrequency =   MultU64x32 (
                       (EndTSC - StartTSC),    // Number of TSC counts in 1ms
                       1000                    // Number of ms in a second
                     );
   //
-  // mTscFrequency is now equal to the number of TSC counts per second
+  // TscFrequency is now equal to the number of TSC counts per second, build GUID HOB for it.
   //
-  return RETURN_SUCCESS;
+  BuildGuidDataHob (
+    &gEfiTscFrequencyGuid,
+    &TscFrequency,
+    sizeof (UINT64)
+    );
+
+  return TscFrequency;
 }
 
 /**  Stalls the CPU for at least the given number of ticks.
@@ -141,7 +168,7 @@ MicroSecondDelay (
   InternalX86Delay (
     DivU64x32 (
       MultU64x64 (
-        mTscFrequency,
+        InternalGetTscFrequency (),
         MicroSeconds
       ),
       1000000u
@@ -166,7 +193,7 @@ NanoSecondDelay (
   InternalX86Delay (
     DivU64x32 (
       MultU64x32 (
-        mTscFrequency,
+        InternalGetTscFrequency (),
         (UINT32)NanoSeconds
       ),
     1000000000u
@@ -234,5 +261,5 @@ GetPerformanceCounterProperties (
     *EndValue = 0xFFFFFFFFFFFFFFFFull;
   }
 
-  return mTscFrequency;
+  return InternalGetTscFrequency ();
 }

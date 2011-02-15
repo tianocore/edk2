@@ -1,5 +1,5 @@
 #/** @file
-#  Timer Library which uses the Time Stamp Counter in the processor.
+#  Pei Timer Library which uses the Time Stamp Counter in the processor.
 #
 #  A version of the Timer Library using the processor's TSC.
 #  The time stamp counter in newer processors may support an enhancement, referred to as invariant TSC.
@@ -8,7 +8,7 @@
 #  TSC reads are much more efficient and do not incur the overhead associated with a ring transition or
 #  access to a platform resource.
 #
-#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -20,13 +20,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = TscTimerLib
-  FILE_GUID                      = 95ab030f-b4fd-4ee4-92a5-9e04e87634d9
-  MODULE_TYPE                    = BASE
+  BASE_NAME                      = PeiTscTimerLib
+  FILE_GUID                      = 342C36C0-15DF-43b4-9EC9-FBF748BFB3D1
+  MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = TimerLib
-
-  CONSTRUCTOR                    = TscTimerLibConstructor
+  LIBRARY_CLASS                  = TimerLib|SEC PEIM PEI_CORE
 
 
 #
@@ -34,7 +32,7 @@
 #
 
 [Sources.common]
-  TscTimerLib.c
+  PeiTscTimerLib.c
 
 
 [Packages]
@@ -47,6 +45,10 @@
   PciLib
   IoLib
   BaseLib
+  HobLib
+
+[Guids]
+  gEfiTscFrequencyGuid                          ## PRODUCES ## Hob
 
 [Pcd.common]
   gPerformancePkgTokenSpaceGuid.PcdPerfPkgAcpiIoPortBaseAddress

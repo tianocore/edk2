@@ -1,7 +1,7 @@
 #/** @file
 # Build description file to generate Shell DP application.
 #
-# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -35,6 +35,7 @@
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
@@ -60,14 +61,15 @@
   # that is different than the one below.
   #
   # TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-  TimerLib|PerformancePkg/Library/TscTimerLib/TscTimerLib.inf
+  TimerLib|PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
 
 [LibraryClasses.IPF]
   PalLib|MdePkg/Library/UefiPalLib/UefiPalLib.inf
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
 
 [Components.IA32, Components.X64]
-  PerformancePkg/Library/TscTimerLib/TscTimerLib.inf
+  PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
+  PerformancePkg/Library/PeiTscTimerLib/PeiTscTimerLib.inf
 
 [Components]
   PerformancePkg/Dp_App/Dp.inf

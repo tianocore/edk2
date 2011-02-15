@@ -3,7 +3,7 @@
 
   These definitions should work for any version of Ich.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -35,6 +35,7 @@ Definitions beginning with "V_" are meaningful values of bits within the registe
 /// IchAcpiCntr   Control for the ICH's ACPI Counter.
 ///@{
 #define R_ICH_LPC_ACPI_BASE                   0x40
+#define   B_ICH_LPC_ACPI_BASE_BAR                 0x0000FF80
 #define R_ICH_LPC_ACPI_CNT                    0x44
 #define   B_ICH_LPC_ACPI_CNT_ACPI_EN              0x80
 ///@}
