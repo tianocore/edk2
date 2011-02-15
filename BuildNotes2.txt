@@ -5,7 +5,7 @@ EFI Development Kit II (EDK II)
 Intel is a trademark or registered trademark of Intel Corporation or its
 subsidiaries in the United States and other countries.
 * Other names and brands may be claimed as the property of others.
-Copyright (c) 2007 - 2010, Intel Corporation  All rights reserved.
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.
 
 EDK II packages can be checked out from the following SVN address:
 http://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2 
