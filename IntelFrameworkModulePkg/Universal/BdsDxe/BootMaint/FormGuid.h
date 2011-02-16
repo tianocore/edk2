@@ -165,6 +165,7 @@ typedef struct {
   UINT8   COMStopBits;
   UINT8   COMParity;
   UINT8   COMTerminalType;
+  UINT8   COMFlowControl;
 
   //
   // Legacy Device Order Selection Storage

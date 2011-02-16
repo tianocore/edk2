@@ -196,6 +196,7 @@ typedef enum _FILE_EXPLORER_DISPLAY_CONTEXT {
 #define COM_STOP_BITS_VAR_OFFSET        VAR_OFFSET (COMStopBits)
 #define COM_PARITY_VAR_OFFSET           VAR_OFFSET (COMParity)
 #define COM_TERMINAL_VAR_OFFSET         VAR_OFFSET (COMTerminalType)
+#define COM_FLOWCONTROL_VAR_OFFSET      VAR_OFFSET (COMFlowControl)
 #define LEGACY_FD_VAR_OFFSET            VAR_OFFSET (LegacyFD)
 #define LEGACY_HD_VAR_OFFSET            VAR_OFFSET (LegacyHD)
 #define LEGACY_CD_VAR_OFFSET            VAR_OFFSET (LegacyCD)
@@ -233,6 +234,7 @@ typedef enum _FILE_EXPLORER_DISPLAY_CONTEXT {
 #define COM_STOP_BITS_QUESTION_ID       QUESTION_ID (COMStopBits)
 #define COM_PARITY_QUESTION_ID          QUESTION_ID (COMParity)
 #define COM_TERMINAL_QUESTION_ID        QUESTION_ID (COMTerminalType)
+#define COM_FLOWCONTROL_QUESTION_ID     QUESTION_ID (COMFlowControl)
 #define LEGACY_FD_QUESTION_ID           QUESTION_ID (LegacyFD)
 #define LEGACY_HD_QUESTION_ID           QUESTION_ID (LegacyHD)
 #define LEGACY_CD_QUESTION_ID           QUESTION_ID (LegacyCD)
@@ -282,6 +284,8 @@ typedef struct {
   UINT8                     DataBitsIndex;
   UINT8                     ParityIndex;
   UINT8                     StopBitsIndex;
+
+  UINT8                     FlowControl;
 
   UINT8                     IsConIn;
   UINT8                     IsConOut;
@@ -757,7 +761,7 @@ ChangeVariableDevicePath (
 **/
 EFI_STATUS
 ChangeTerminalDevicePath (
-  IN OUT EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePath,
   IN BOOLEAN                   ChangeTerminal
   );
 
@@ -1563,7 +1567,8 @@ extern STRING_DEPOSITORY          *DriverOptionHelpStrDepository;
 extern STRING_DEPOSITORY          *TerminalStrDepository;
 extern EFI_DEVICE_PATH_PROTOCOL   EndDevicePath[];
 extern EFI_GUID                   EfiLegacyDevOrderGuid;
-
+extern UINT16                     mFlowControlType[2];
+extern UINT32                     mFlowControlValue[2];
 //
 // Shared IFR form update data
 //

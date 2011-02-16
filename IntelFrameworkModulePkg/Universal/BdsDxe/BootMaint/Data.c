@@ -38,6 +38,19 @@ UINT16              TerminalType[] = {
 };
 
 ///
+/// Flow Control type string token storage
+///
+UINT16              mFlowControlType[2] = {
+  STRING_TOKEN(STR_NONE_FLOW_CONTROL),
+  STRING_TOKEN(STR_HARDWARE_FLOW_CONTROL)
+};
+
+UINT32              mFlowControlValue[2] = {
+  0,
+  UART_FLOW_CONTROL_HARDWARE
+};
+
+///
 /// File system selection menu
 ///
 BM_MENU_OPTION      FsOptionMenu = {

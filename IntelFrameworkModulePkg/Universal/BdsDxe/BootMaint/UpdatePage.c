@@ -1077,6 +1077,34 @@ UpdateTerminalPage (
     );
 
   HiiFreeOpCodeHandle (OptionsOpCodeHandle);
+  OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (OptionsOpCodeHandle != NULL);
+
+  CallbackData->BmmFakeNvData.COMFlowControl = NewTerminalContext->FlowControl;
+  for (Index = 0; Index < sizeof (mFlowControlType) / sizeof (mFlowControlType[0]); Index++) {
+    HiiCreateOneOfOptionOpCode (
+      OptionsOpCodeHandle,
+      (EFI_STRING_ID) mFlowControlType[Index],
+      0,
+      EFI_IFR_TYPE_NUM_SIZE_8,
+      mFlowControlValue[Index]
+      );
+  }
+
+  HiiCreateOneOfOpCode (
+    mStartOpCodeHandle,
+    (EFI_QUESTION_ID) COM_FLOWCONTROL_QUESTION_ID,
+    VARSTORE_ID_BOOT_MAINT,
+    COM_FLOWCONTROL_VAR_OFFSET,
+    STRING_TOKEN (STR_COM_FLOW_CONTROL),
+    STRING_TOKEN (STR_COM_FLOW_CONTROL),
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    OptionsOpCodeHandle,
+    NULL
+    );
+
+  HiiFreeOpCodeHandle (OptionsOpCodeHandle);
 
   UpdatePageEnd (CallbackData);
 }

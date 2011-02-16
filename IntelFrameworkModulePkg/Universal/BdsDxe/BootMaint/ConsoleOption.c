@@ -14,6 +14,37 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "BootMaint.h"
 
+UART_FLOW_CONTROL_DEVICE_PATH mFlowControlDevicePath =
+{ 
+  MESSAGING_DEVICE_PATH,
+  MSG_VENDOR_DP,
+  (UINT8)(sizeof(UART_FLOW_CONTROL_DEVICE_PATH)),
+  (UINT8)((sizeof(UART_FLOW_CONTROL_DEVICE_PATH)) >> 8),
+  DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL,
+  UART_FLOW_CONTROL_HARDWARE
+};
+
+/**
+  Check the device path node whether it's the Flow Control node or not.
+
+  @param[in] FlowControl    The device path node to be checked.
+  
+  @retval TRUE              It's the Flow Control node.
+  @retval FALSE             It's not.
+
+**/
+BOOLEAN
+IsUartFlowControlNode (
+  IN UART_FLOW_CONTROL_DEVICE_PATH *FlowControl
+  )
+{
+  return (BOOLEAN) (
+           (DevicePathType (FlowControl) == MESSAGING_DEVICE_PATH) &&
+           (DevicePathSubType (FlowControl) == MSG_VENDOR_DP) &&
+           (CompareGuid (&FlowControl->Guid, &gEfiUartDevicePathGuid))
+           );
+}
+
 /**
   Check whether the device path node is ISA Serial Node.
 
@@ -62,7 +93,7 @@ UpdateComAttributeFromVariable (
 **/
 EFI_STATUS
 ChangeTerminalDevicePath (
-  IN OUT    EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN OUT    EFI_DEVICE_PATH_PROTOCOL  **DevicePath,
   IN        BOOLEAN                   ChangeTerminal
   )
 {
@@ -74,8 +105,9 @@ ChangeTerminalDevicePath (
   UINTN                     Com;
   BM_TERMINAL_CONTEXT       *NewTerminalContext;
   BM_MENU_ENTRY             *NewMenuEntry;
+  UART_FLOW_CONTROL_DEVICE_PATH *FlowControlNode;
 
-  Node  = DevicePath;
+  Node  = *DevicePath;
   Node  = NextDevicePathNode (Node);
   Com   = 0;
   while (!IsDevicePathEnd (Node)) {
@@ -112,6 +144,23 @@ ChangeTerminalDevicePath (
         &NewTerminalContext->StopBits,
         sizeof (UINT8)
         );
+
+      FlowControlNode = (UART_FLOW_CONTROL_DEVICE_PATH *) NextDevicePathNode (Node);
+      if (IsUartFlowControlNode (FlowControlNode)) {
+        FlowControlNode->FlowControlMap = NewTerminalContext->FlowControl;
+      } else {
+        //
+        // Append the Flow control device node when user enable flow control.
+        //
+        if (NewTerminalContext->FlowControl != 0) {
+          mFlowControlDevicePath.FlowControlMap = NewTerminalContext->FlowControl;
+          *DevicePath = AppendDevicePathNode (
+                                       *DevicePath,
+                                       (EFI_DEVICE_PATH_PROTOCOL *) (&mFlowControlDevicePath)
+                                       );
+        }
+      }
+
       //
       // Change the device path in the ComPort
       //
@@ -372,6 +421,7 @@ LocateSerialIo (
   BM_TERMINAL_CONTEXT       *NewTerminalContext;
   EFI_DEVICE_PATH_PROTOCOL  *NewDevicePath;
   VENDOR_DEVICE_PATH        Vendor;
+  UINT32                    FlowControl;
   //
   // Get all handles that have SerialIo protocol installed
   //
@@ -470,6 +520,13 @@ LocateSerialIo (
         &SerialIo->Mode->StopBits,
         sizeof (UINT8)
         );
+
+      NewTerminalContext->FlowControl = 0;
+      SerialIo->GetControl(SerialIo, &FlowControl);
+      if ((FlowControl & EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE) != 0) {
+        NewTerminalContext->FlowControl = UART_FLOW_CONTROL_HARDWARE;
+      }
+
       InsertTailList (&TerminalMenu.Head, &NewMenuEntry->Link);
       TerminalMenu.MenuNumber++;
     }
@@ -570,7 +627,10 @@ UpdateComAttributeFromVariable (
   BM_MENU_ENTRY             *NewMenuEntry;
   BM_TERMINAL_CONTEXT       *NewTerminalContext;
   UINTN                     Index;
+  UART_FLOW_CONTROL_DEVICE_PATH *FlowControlNode;
+  BOOLEAN                   HasFlowControlNode;
 
+  HasFlowControlNode = FALSE;
   Node            = DevicePath;
   Node            = NextDevicePathNode (Node);
   TerminalNumber  = 0;
@@ -613,6 +673,17 @@ UpdateComAttributeFromVariable (
           sizeof (UINT8)
           );
 
+        FlowControlNode = (UART_FLOW_CONTROL_DEVICE_PATH *) NextDevicePathNode (Node);
+        if (IsUartFlowControlNode (FlowControlNode)) {
+          HasFlowControlNode = TRUE;
+          NewTerminalContext->FlowControl = (UINT8) ReadUnaligned32 (&FlowControlNode->FlowControlMap);
+        } else if (NewTerminalContext->FlowControl != 0) {
+          //
+          // No Flow Control device path node, assumption no Flow control
+          //
+          NewTerminalContext->FlowControl = 0;
+        }
+
         SerialNode  = NewTerminalContext->DevicePath;
         SerialNode  = NextDevicePathNode (SerialNode);
         while (!IsDevicePathEnd (SerialNode)) {
@@ -644,6 +715,18 @@ UpdateComAttributeFromVariable (
               sizeof (UINT8)
               );
 
+            FlowControlNode = (UART_FLOW_CONTROL_DEVICE_PATH *) NextDevicePathNode (SerialNode);
+            if (IsUartFlowControlNode (FlowControlNode)) {
+              FlowControlNode->FlowControlMap = NewTerminalContext->FlowControl;
+            } else {
+              if (HasFlowControlNode) {
+                mFlowControlDevicePath.FlowControlMap = NewTerminalContext->FlowControl;
+                NewTerminalContext->DevicePath = AppendDevicePathNode (
+                                             NewTerminalContext->DevicePath,
+                                             (EFI_DEVICE_PATH_PROTOCOL *) (&mFlowControlDevicePath)
+                                             );
+              }
+            }
             break;
           }
 

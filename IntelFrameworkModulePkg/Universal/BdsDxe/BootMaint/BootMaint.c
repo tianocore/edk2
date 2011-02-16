@@ -742,9 +742,10 @@ ApplyChangeHandler (
     ASSERT (CurrentFakeNVMap->COMParity < (sizeof (ParityList) / sizeof (ParityList[0])));
     NewTerminalContext->Parity        = (UINT8) ParityList[CurrentFakeNVMap->COMParity].Value;
     NewTerminalContext->TerminalType  = CurrentFakeNVMap->COMTerminalType;
+    NewTerminalContext->FlowControl   = CurrentFakeNVMap->COMFlowControl;
 
     ChangeTerminalDevicePath (
-      NewTerminalContext->DevicePath,
+      &(NewTerminalContext->DevicePath),
       FALSE
       );
 
