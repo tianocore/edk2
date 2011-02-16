@@ -1,7 +1,7 @@
 @REM @file
 @REM   Windows batch file to setup a WORKSPACE environment
 @REM
-@REM Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 @REM This program and the accompanying materials
 @REM are licensed and made available under the terms and conditions of the BSD License
 @REM which accompanies this distribution.  The full text of the license may be found at
