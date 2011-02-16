@@ -1,7 +1,7 @@
 /** @file
   GUID used to identify id for the caller who is initiating the Status Code.
 
-  Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -27,9 +27,7 @@
 ///
 #define EFI_STATUS_CODE_DATA_TYPE_STRING_GUID \
   { 0x92D11080, 0x496F, 0x4D95, { 0xBE, 0x7E, 0x03, 0x74, 0x88, 0x38, 0x2B, 0x0A } }
- 
-#pragma pack(1)
- 
+
 typedef enum {
   ///
   /// A NULL-terminated ASCII string.
@@ -104,8 +102,6 @@ typedef struct {
   EFI_STATUS_CODE_STRING         String;
 } EFI_STATUS_CODE_STRING_DATA;
 
-#pragma pack()
-
 extern EFI_GUID gEfiStatusCodeDataTypeStringGuid;
 
 ///
@@ -125,8 +121,6 @@ extern EFI_GUID gEfiStatusCodeDataTypeStringGuid;
 ///
 #define EFI_STATUS_CODE_SPECIFIC_DATA_GUID \
   { 0x335984bd, 0xe805, 0x409a, { 0xb8, 0xf8, 0xd2, 0x7e, 0xce, 0x5f, 0xf7, 0xa6 } }
-
-#pragma pack(1)
 
 ///
 /// Extended data about the device path, which is used for many errors and 
@@ -777,8 +771,6 @@ typedef struct {
   ///
   EFI_PHYSICAL_ADDRESS  RomImageBase;
 } EFI_LEGACY_OPROM_EXTENDED_DATA;
-
-#pragma pack()
 
 extern EFI_GUID gEfiStatusCodeSpecificDataGuid;
 
