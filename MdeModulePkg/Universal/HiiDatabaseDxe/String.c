@@ -1967,23 +1967,7 @@ HiiCompareLanguage (
   IN  CHAR8  *Language2
   )
 {
-  //
-  // Porting Guide:
-  // This library interface is simply obsolete.
-  // Include the source code to user code.
-  //
-  UINTN Index;
-
-  for (Index = 0; (Language1[Index] != 0) && (Language2[Index] != 0); Index++) {
-    if (Language1[Index] != Language2[Index]) {
-      return FALSE;
-    }
-  }
-
-  if (((Language1[Index] == 0) && (Language2[Index] == 0))   || 
-  	  ((Language1[Index] == 0) && (Language2[Index] != ';')) ||
-  	  ((Language1[Index] == ';') && (Language2[Index] != 0)) ||
-  	  ((Language1[Index] == ';') && (Language2[Index] != ';'))) {
+  if (GetBestLanguage (Language1, FALSE, Language2, NULL) != NULL) {
     return TRUE;
   }
 
