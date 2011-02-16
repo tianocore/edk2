@@ -2,7 +2,7 @@
 
    Internal functions to operate Working Block Space.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -337,7 +337,7 @@ FtwReclaimWorkSpace (
                &FtwDevice->FtwLastWriteHeader
                );
     Header = FtwDevice->FtwLastWriteHeader;
-    if (!EFI_ERROR (Status) && (Header != NULL) && (Header->Complete != FTW_VALID_STATE)) {
+    if (!EFI_ERROR (Status) && (Header != NULL) && (Header->Complete != FTW_VALID_STATE) && (Header->HeaderAllocated == FTW_VALID_STATE)) {
       CopyMem (
         Ptr + sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER),
         FtwDevice->FtwLastWriteHeader,
