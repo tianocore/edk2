@@ -110,7 +110,7 @@ VOID
 /**
   This function enables a periodic SMI handler.
   
-  @param[in,out] DispatchHandle    A pointer to the handle associated with the 
+  @param[in, out] DispatchHandle   A pointer to the handle associated with the 
                                    enabled periodic SMI handler.  This is an 
                                    optional parameter that may be NULL.  If it is 
                                    NULL, then the handle will not be returned, 

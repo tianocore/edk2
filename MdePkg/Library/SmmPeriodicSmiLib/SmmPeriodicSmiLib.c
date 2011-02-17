@@ -687,7 +687,7 @@ PeriodicSmiDispatchFunctionOnCpu (
   released to notify the CPU that is running the SMM Foundation that the periodic
   SMI handler execution has finished its execution.
 
-  @param[in] Buffer  A pointer to the context for the periodic SMI handler.
+  @param[in, out] Buffer  A pointer to the context for the periodic SMI handler.
 
 **/
 VOID
@@ -722,10 +722,10 @@ PeriodicSmiDispatchFunctionWithLock (
                                  SmiHandlerRegister().
   @param[in]     Context         Points to an optional handler context which was 
                                  specified when the handler was registered.
-  @param[in,out] CommBuffer      A pointer to a collection of data in memory that
+  @param[in, out] CommBuffer     A pointer to a collection of data in memory that
                                  will be conveyed from a non-SMM environment into 
                                  an SMM environment.
-  @param[in,out] CommBufferSize  The size of the CommBuffer.
+  @param[in, out] CommBufferSize The size of the CommBuffer.
 
   @retval EFI_SUCCESS                         The interrupt was handled and quiesced.
                                               No other handlers should still be called.
@@ -841,7 +841,7 @@ PeriodicSmiDispatchFunction (
 /**
   This function enables a periodic SMI handler.
   
-  @param[in,out] DispatchHandle    A pointer to the handle associated with the 
+  @param[in, out] DispatchHandle   A pointer to the handle associated with the 
                                    enabled periodic SMI handler.  This is an 
                                    optional parameter that may be NULL.  If it is 
                                    NULL, then the handle will not be returned, 
