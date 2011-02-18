@@ -327,7 +327,7 @@ DumpRawTrace(
 **/
 VOID
 ProcessPhases(
-  UINT64            Ticker
+  IN UINT64            Ticker
   )
 {
   MEASUREMENT_RECORD        Measurement;

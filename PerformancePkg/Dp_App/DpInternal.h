@@ -62,7 +62,7 @@ extern UINT32 const       NumCum;
 UINT64
 GetDuration (
   IN OUT MEASUREMENT_RECORD *Measurement
-);
+  );
 
 /** 
   Determine whether the Measurement record is for an EFI Phase.
@@ -78,7 +78,7 @@ GetDuration (
 BOOLEAN
 IsPhase(
   IN MEASUREMENT_RECORD *Measurement
-);
+  );
 
 /** 
   Get the file name portion of the Pdb File Name.
@@ -96,7 +96,7 @@ VOID
 GetShortPdbFileName (
   IN  CHAR8     *PdbFileName,
   OUT CHAR16    *UnicodeBuffer
-);
+  );
 
 /** 
   Get a human readable name for an image handle.
@@ -110,7 +110,7 @@ GetShortPdbFileName (
 VOID
 GetNameFromHandle (
   IN EFI_HANDLE Handle
-);
+  );
 
 /** 
   Calculate the Duration in microseconds.
@@ -128,7 +128,7 @@ GetNameFromHandle (
 UINT64
 DurationInMicroSeconds (
   IN UINT64 Duration
-);
+  );
 
 /** 
   Formatted Print using a Hii Token to reference the localized format string.
@@ -143,7 +143,7 @@ UINTN
 PrintToken (
   IN UINT16 Token,
   ...
-);
+  );
 
 /** 
   Get index of Measurement Record's match in the CumData array.
@@ -161,7 +161,7 @@ PrintToken (
 INTN
 GetCumulativeItem(
   IN MEASUREMENT_RECORD *Measurement
-);
+  );
 
 /** 
   Collect verbose statistics about the logged performance measurements.
@@ -180,7 +180,7 @@ GetCumulativeItem(
 VOID
 GatherStatistics(
   VOID
-);
+  );
 
 /** 
   Gather and print ALL Trace Records.
@@ -204,7 +204,7 @@ VOID
 DumpAllTrace(
   IN UINTN             Limit,
   IN BOOLEAN           ExcludeFlag
-);
+  );
 
 /** 
   Gather and print Raw Trace Records.
@@ -228,7 +228,7 @@ VOID
 DumpRawTrace(
   IN UINTN          Limit,
   IN BOOLEAN        ExcludeFlag
-);
+  );
 
 /** 
   Gather and print Major Phase metrics.
@@ -239,7 +239,7 @@ DumpRawTrace(
 VOID
 ProcessPhases(
   IN UINT64 Ticker
-);
+  );
 
 
 /** 
@@ -252,7 +252,7 @@ ProcessPhases(
 EFI_STATUS
 ProcessHandles(
   IN BOOLEAN ExcludeFlag
-);
+  );
 
 
 /** 
@@ -264,7 +264,7 @@ ProcessHandles(
 VOID
 ProcessPeims(
   VOID
-);
+  );
 
 /** 
   Gather and print global data.
@@ -278,7 +278,7 @@ ProcessPeims(
 VOID
 ProcessGlobal(
   VOID
-);
+  );
 
 /** 
   Gather and print cumulative data.
@@ -292,7 +292,7 @@ ProcessGlobal(
 VOID
 ProcessCumulative(
   VOID
-);
+  );
 
 /** 
   Gather and print ALL Profiling Records.
@@ -316,7 +316,7 @@ VOID
 DumpAllProfile(
   IN UINTN          Limit,
   IN BOOLEAN        ExcludeFlag
-);
+  );
 
 /** 
   Gather and print Raw Profile Records.
@@ -340,5 +340,5 @@ VOID
 DumpRawProfile(
   IN UINTN          Limit,
   IN BOOLEAN        ExcludeFlag
-);
+  );
 #endif
