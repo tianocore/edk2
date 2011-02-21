@@ -37,7 +37,7 @@
   DebugLib
 
 [Protocols]
-  gEfiSmmBase2ProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmmBase2ProtocolGuid                      ## CONSUMES
 
 [Depex]
   gEfiSmmBase2ProtocolGuid
