@@ -62,7 +62,7 @@ extern UINT8  SetupBrowserStrings[];
 
 #define FRONT_PAGE_HEADER_HEIGHT      6
 #define NONE_FRONT_PAGE_HEADER_HEIGHT 3
-#define LEFT_SKIPPED_COLUMNS          1
+#define LEFT_SKIPPED_COLUMNS          3
 #define FOOTER_HEIGHT                 4
 #define STATUS_BAR_HEIGHT             1
 #define SCROLL_ARROW_HEIGHT           1
