@@ -1876,7 +1876,11 @@ UiDisplayMenu (
                 MenuRefreshEntry->Selection         = Selection;
                 MenuRefreshEntry->CurrentColumn     = MenuOption->OptCol;
                 MenuRefreshEntry->CurrentRow        = MenuOption->Row;
-                MenuRefreshEntry->CurrentAttribute  = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
+                if (MenuOption->GrayOut) {
+                  MenuRefreshEntry->CurrentAttribute = FIELD_TEXT_GRAYED | FIELD_BACKGROUND;
+                } else {               
+                  MenuRefreshEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
+                }
                 gMenuRefreshHead                    = MenuRefreshEntry;
               } else {
                 //
@@ -1894,7 +1898,11 @@ UiDisplayMenu (
                 MenuRefreshEntry->Selection         = Selection;
                 MenuRefreshEntry->CurrentColumn     = MenuOption->OptCol;
                 MenuRefreshEntry->CurrentRow        = MenuOption->Row;
-                MenuRefreshEntry->CurrentAttribute  = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
+                if (MenuOption->GrayOut) {
+                  MenuRefreshEntry->CurrentAttribute = FIELD_TEXT_GRAYED | FIELD_BACKGROUND;
+                } else {               
+                  MenuRefreshEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
+                }
               }
             }
 
@@ -2202,7 +2210,11 @@ UiDisplayMenu (
         //
         if (gMenuRefreshHead != NULL) {
           for (MenuRefreshEntry = gMenuRefreshHead; MenuRefreshEntry != NULL; MenuRefreshEntry = MenuRefreshEntry->Next) {
-            MenuRefreshEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
+            if (MenuOption->GrayOut) {
+              MenuRefreshEntry->CurrentAttribute = FIELD_TEXT_GRAYED | FIELD_BACKGROUND;
+            } else {               
+              MenuRefreshEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
+            }
             if (MenuRefreshEntry->MenuOption == MenuOption) {
               MenuRefreshEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextHighlightColor) | PcdGet8 (PcdBrowserFieldBackgroundHighlightColor);
             }
