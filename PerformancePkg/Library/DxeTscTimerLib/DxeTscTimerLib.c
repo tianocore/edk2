@@ -57,6 +57,9 @@ UINT64   mTscFrequency;
   the ACPI timer. An attempt is made to determine and compensate for this error.
   This function will always return EFI_SUCCESS.
 
+  @param  ImageHandle       The firmware allocated handle for the EFI image.
+  @param  SystemTable       A pointer to the EFI System Table.
+
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/
