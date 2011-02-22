@@ -1,8 +1,7 @@
 /** @file
+  PI SMM Communication ACPI Table Definition.
 
-  Root include file for Mde Package SMM modules.
-
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -13,14 +12,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef __PI_SMM_H__
-#define __PI_SMM_H__
+#ifndef __PI_SMM_COMMUNICATION_ACPI_TABLE__
+#define __PI_SMM_COMMUNICATION_ACPI_TABLE__
 
-#include <Uefi/UefiBaseType.h>
-#include <Uefi/UefiSpec.h>
+#include <Uefi/UefiAcpiDataTable.h>
 
-#include <Pi/PiSmmCis.h>
-#include <Pi/PiSmmCommunicationAcpiTable.h>
+#pragma pack(1)
+typedef struct {
+  EFI_ACPI_DATA_TABLE  UefiAcpiDataTable;
+  UINT32               SwSmiNumber;
+  UINT64               BufferPtrAddress;
+} EFI_SMM_COMMUNICATION_ACPI_TABLE;
+#pragma pack()
 
 #endif
-
