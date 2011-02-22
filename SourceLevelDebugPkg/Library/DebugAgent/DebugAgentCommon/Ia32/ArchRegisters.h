@@ -1,7 +1,7 @@
 /** @file
   IA32 register defintions needed by debug transfer protocol.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,8 @@
 
 #ifndef _ARCH_REGISTERS_H_
 #define _ARCH_REGISTERS_H_
+
+#pragma pack(1)
 
 ///
 /// FXSAVE_STATE
@@ -152,5 +154,7 @@ typedef struct {
   UINT32         LdtBas;
   UINT32         TssBas;
 } DEBUG_DATA_REPONSE_READ_REGISTER_GROUP_SEGBASE_IA32;
+
+#pragma pack()
 
 #endif
