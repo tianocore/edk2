@@ -2299,7 +2299,6 @@ HiiStringIdToImage (
   CurrentLanguage    = NULL;
   BestLanguage       = NULL;
   String             = NULL;
-  StringInfo         = NULL;
   StringFontInfo     = NULL;
   NewStringInfo      = NULL;
 
