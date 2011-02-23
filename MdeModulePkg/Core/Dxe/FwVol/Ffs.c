@@ -217,6 +217,8 @@ IsValidFfsFile (
   )
 {
   EFI_FFS_FILE_STATE  FileState;
+  UINT8               DataCheckSum;
+  UINT32              FileLength;
 
   FileState = GetFileState (ErasePolarity, FfsHeader);
   switch (FileState) {
@@ -224,11 +226,14 @@ IsValidFfsFile (
   case EFI_FILE_DELETED:
   case EFI_FILE_DATA_VALID:
   case EFI_FILE_MARKED_FOR_UPDATE:
-    //
-    // Some other vliadation like file content checksum might be done here.
-    // For performance issue, Tiano only do FileState check.
-    //
-    return TRUE;
+    DataCheckSum = FFS_FIXED_CHECKSUM;
+    FileLength   = *(UINT32 *)(FfsHeader->Size) & 0x00FFFFFF;
+    if ((FfsHeader->Attributes & FFS_ATTRIB_CHECKSUM) == FFS_ATTRIB_CHECKSUM) {
+      DataCheckSum = CalculateCheckSum8 ((CONST UINT8 *)FfsHeader + sizeof(EFI_FFS_FILE_HEADER), FileLength - sizeof(EFI_FFS_FILE_HEADER));
+    }
+    if (FfsHeader->IntegrityCheck.Checksum.File == DataCheckSum) {
+      return TRUE;
+    }
 
   default:
     return FALSE;

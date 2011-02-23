@@ -162,6 +162,7 @@ FindFileEx (
   UINT64                                FvLength;
   UINT8                                 ErasePolarity;
   UINT8                                 FileState;
+  UINT8                                 DataCheckSum;
   
   //
   // Convert the handle of FV to FV header for memory-mapped firmware volume
@@ -218,6 +219,16 @@ FindFileEx (
 
       FileLength       = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
       FileOccupiedSize = GET_OCCUPIED_SIZE(FileLength, 8);
+
+      DataCheckSum = FFS_FIXED_CHECKSUM;
+      if ((FfsFileHeader->Attributes & FFS_ATTRIB_CHECKSUM) == FFS_ATTRIB_CHECKSUM) {
+        DataCheckSum = CalculateCheckSum8 ((CONST UINT8 *)FfsFileHeader + sizeof(EFI_FFS_FILE_HEADER), FileLength - sizeof(EFI_FFS_FILE_HEADER));
+      }
+      if (FfsFileHeader->IntegrityCheck.Checksum.File != DataCheckSum) {
+        ASSERT (FALSE);
+        *FileHeader = NULL;
+        return EFI_NOT_FOUND;
+      }
 
       if (FileName != NULL) {
         if (CompareGuid (&FfsFileHeader->Name, (EFI_GUID*)FileName)) {
