@@ -1967,9 +1967,8 @@ HiiCompareLanguage (
   IN  CHAR8  *Language2
   )
 {
-  if (GetBestLanguage (Language1, FALSE, Language2, NULL) != NULL) {
-    return TRUE;
-  }
+  UINTN Language2Len;
 
-  return FALSE;
+  Language2Len = AsciiStrLen (Language2);
+  return  (BOOLEAN) (AsciiStrnCmp (Language1, Language2, Language2Len) == 0);
 }
