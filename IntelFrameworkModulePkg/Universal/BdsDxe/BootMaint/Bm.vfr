@@ -55,12 +55,11 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL_STRING);
 
-    text
+    goto FORM_CON_MAIN_ID,
+         prompt = STRING_TOKEN(STR_BOOT_FROM_FILE),
          help   = STRING_TOKEN(STR_BOOT_FROM_FILE_HELP),
-         text   = STRING_TOKEN(STR_BOOT_FROM_FILE),
-         text   = STRING_TOKEN(STR_NULL_STRING),
-         flags  = INTERACTIVE,
-         key    = KEY_VALUE_BOOT_FROM_FILE;
+         flags = INTERACTIVE,
+         key = KEY_VALUE_BOOT_FROM_FILE;
 
     subtitle text = STRING_TOKEN(STR_NULL_STRING);
 
@@ -80,11 +79,12 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL_STRING);
 
-    goto FORM_MAIN_ID,
-         prompt = STRING_TOKEN(STR_RESET),
-         help = STRING_TOKEN(STR_RESET),
-         flags = INTERACTIVE,
-         key = FORM_RESET;
+    text
+         help   = STRING_TOKEN(STR_RESET),
+         text   = STRING_TOKEN(STR_RESET),
+         text   = STRING_TOKEN(STR_NULL_STRING),
+         flags  = INTERACTIVE,
+         key    = FORM_RESET;
 
   endform;
 

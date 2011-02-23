@@ -883,13 +883,13 @@ CallDeviceManager (
         //
         if (!AddNetworkMenu) {
           AddNetworkMenu = TRUE;
-          HiiCreateActionOpCode (
+          HiiCreateGotoOpCode (
             StartOpCodeHandle,
-            (EFI_QUESTION_ID) QUESTION_NETWORK_DEVICE_ID,
+            DEVICE_MANAGER_FORM_ID,
             STRING_TOKEN (STR_FORM_NETWORK_DEVICE_LIST_TITLE),
             STRING_TOKEN (STR_FORM_NETWORK_DEVICE_LIST_HELP),
             EFI_IFR_FLAG_CALLBACK,
-            0
+            (EFI_QUESTION_ID) QUESTION_NETWORK_DEVICE_ID
             );
         }
       } else if (mNextShowFormId == NETWORK_DEVICE_LIST_FORM_ID) {
@@ -897,13 +897,13 @@ CallDeviceManager (
         // In network device list form, same mac address device only show one menu.
         //
         while (AddItemCount > 0) {
-            HiiCreateActionOpCode (
+            HiiCreateGotoOpCode (
               StartOpCodeHandle,
-              mMacDeviceList.NodeList[mMacDeviceList.CurListLen - AddItemCount].QuestionId,
+              NETWORK_DEVICE_LIST_FORM_ID,
               mMacDeviceList.NodeList[mMacDeviceList.CurListLen - AddItemCount].PromptId,
               STRING_TOKEN (STR_NETWORK_DEVICE_HELP),
               EFI_IFR_FLAG_CALLBACK,
-              0
+              mMacDeviceList.NodeList[mMacDeviceList.CurListLen - AddItemCount].QuestionId
               );
             AddItemCount -= 1;
           }
@@ -911,13 +911,13 @@ CallDeviceManager (
         //
         // In network device form, only the selected mac address device need to be show.
         //
-        HiiCreateActionOpCode (
+        HiiCreateGotoOpCode (
           StartOpCodeHandle,
-          (EFI_QUESTION_ID) (Index + DEVICE_KEY_OFFSET),
+          NETWORK_DEVICE_FORM_ID,
           Token,
           TokenHelp,
           EFI_IFR_FLAG_CALLBACK,
-          0
+          (EFI_QUESTION_ID) (Index + DEVICE_KEY_OFFSET)
           );
       }
     } else {
@@ -926,13 +926,13 @@ CallDeviceManager (
       // Not network device process, only need to show at device manger form.
       //
       if (mNextShowFormId == DEVICE_MANAGER_FORM_ID) {
-        HiiCreateActionOpCode (
+        HiiCreateGotoOpCode (
           StartOpCodeHandle,
-          (EFI_QUESTION_ID) (Index + DEVICE_KEY_OFFSET),
+          DEVICE_MANAGER_FORM_ID,
           Token,
           TokenHelp,
           EFI_IFR_FLAG_CALLBACK,
-          0
+          (EFI_QUESTION_ID) (Index + DEVICE_KEY_OFFSET)
           );
       }
     }
@@ -954,14 +954,14 @@ CallDeviceManager (
     // If driver health protocol is installed, create Driver Health subtitle and entry
     //
     HiiCreateSubTitleOpCode (StartOpCodeHandle, STRING_TOKEN (STR_DM_DRIVER_HEALTH_TITLE), 0, 0, 0);
-    HiiCreateActionOpCode (
-      StartOpCodeHandle,                                // Container for dynamic created opcodes
-      DEVICE_MANAGER_KEY_DRIVER_HEALTH,                 // Question ID
+    HiiCreateGotoOpCode (
+      StartOpCodeHandle,
+      DRIVER_HEALTH_FORM_ID,
       STRING_TOKEN(STR_DRIVER_HEALTH_ALL_HEALTHY),      // Prompt text
       STRING_TOKEN(STR_DRIVER_HEALTH_STATUS_HELP),      // Help text
-      EFI_IFR_FLAG_CALLBACK,                            // Question flag
-      0                                                 // Action String ID
-    );
+      EFI_IFR_FLAG_CALLBACK,
+      DEVICE_MANAGER_KEY_DRIVER_HEALTH                  // Question ID
+      );
 
     //
     // Check All Driver health status

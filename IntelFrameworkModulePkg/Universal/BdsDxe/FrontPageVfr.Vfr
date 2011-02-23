@@ -49,27 +49,27 @@ formset
 
     banner
       title = STRING_TOKEN(STR_FRONT_PAGE_COMPUTER_MODEL),
-      line  0,
+      line  1,
       align left;
 
     banner
       title = STRING_TOKEN(STR_FRONT_PAGE_CPU_MODEL),
-      line  1,
+      line  2,
       align left;
 
     banner
       title = STRING_TOKEN(STR_FRONT_PAGE_CPU_SPEED),
-      line  1,
+      line  2,
       align right;
 
     banner
       title = STRING_TOKEN(STR_FRONT_PAGE_BIOS_VERSION),
-      line  2,
+      line  3,
       align left;
 
     banner
       title = STRING_TOKEN(STR_FRONT_PAGE_MEMORY_SIZE),
-      line  2,
+      line  3,
       align right;
 
 //    banner
@@ -102,9 +102,11 @@ formset
 //      line  3,
 //      align left;
 
-    goto FRONT_PAGE_ITEM_ONE,
-      prompt  = STRING_TOKEN(STR_CONTINUE_PROMPT),
+
+    text
       help    = STRING_TOKEN(STR_CONTINUE_HELP),
+      text    = STRING_TOKEN(STR_CONTINUE_PROMPT),
+      text    = STRING_TOKEN(STR_NULL_STRING),
       flags   = INTERACTIVE,
       key     = FRONT_PAGE_KEY_CONTINUE;
 
