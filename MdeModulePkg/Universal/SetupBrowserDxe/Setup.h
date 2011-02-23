@@ -59,6 +59,7 @@ extern UINT8  SetupBrowserStrings[];
 //
 #define BANNER_HEIGHT                 6
 #define BANNER_COLUMNS                3
+#define BANNER_LEFT_COLUMN_INDENT     1
 
 #define FRONT_PAGE_HEADER_HEIGHT      6
 #define NONE_FRONT_PAGE_HEADER_HEIGHT 3

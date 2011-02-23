@@ -259,7 +259,7 @@ DisplayPageFrame (
           //
           // Handle left column
           //
-          PrintStringAt (LocalScreen.LeftColumn, Line, StrFrontPageBanner);
+          PrintStringAt (LocalScreen.LeftColumn + BANNER_LEFT_COLUMN_INDENT, Line, StrFrontPageBanner);
           break;
 
         case 1:

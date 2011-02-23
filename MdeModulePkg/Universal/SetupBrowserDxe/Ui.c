@@ -1794,8 +1794,7 @@ UiDisplayMenu (
           OriginalRow = Row;
 
           if (Statement->Operand == EFI_IFR_REF_OP && 
-            ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) &&
-            MenuOption->Col > 2) {
+            MenuOption->Col >= 2) {
             //
             // Print Arrow for Goto button.
             //
