@@ -2,7 +2,7 @@
   The variable data structures are related to EDK II-specific implementation of UEFI variables.
   VariableFormat.h defines variable data headers and variable storage region headers.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -156,91 +156,5 @@ struct _VARIABLE_INFO_ENTRY {
   UINT32              CacheCount;  ///< Number of times that cache hits this variable.
   BOOLEAN             Volatile;    ///< TRUE if volatile, FALSE if non-volatile.
 };
-
-//
-// This structure is used for SMM variable. the collected statistics data is saved in SMRAM. It can be got from 
-// SMI handler. The communication buffer should be: 
-// EFI_SMM_COMMUNICATE_HEADER + SMM_VARIABLE_COMMUNICATE_HEADER + payload.
-//
-typedef struct {
-  UINTN       Function;
-  EFI_STATUS  ReturnStatus;
-  UINT8       Data[1];
-} SMM_VARIABLE_COMMUNICATE_HEADER;
-
-//
-// The payload for this function is SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE.
-//
-#define SMM_VARIABLE_FUNCTION_GET_VARIABLE            1
-//
-// The payload for this function is SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME.
-// 
-#define SMM_VARIABLE_FUNCTION_GET_NEXT_VARIABLE_NAME  2
-//
-// The payload for this function is SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE.
-// 
-#define SMM_VARIABLE_FUNCTION_SET_VARIABLE            3
-//
-// The payload for this function is SMM_VARIABLE_COMMUNICATE_QUERY_VARIABLE_INFO.
-// 
-#define SMM_VARIABLE_FUNCTION_QUERY_VARIABLE_INFO     4
-//
-// It is a notify event, no extra payload for this function.
-// 
-#define SMM_VARIABLE_FUNCTION_READY_TO_BOOT           5
-//
-// It is a notify event, no extra payload for this function.
-// 
-#define SMM_VARIABLE_FUNCTION_EXIT_BOOT_SERVICE       6
-//
-// The payload for this function is VARIABLE_INFO_ENTRY. The GUID in EFI_SMM_COMMUNICATE_HEADER 
-// is gEfiSmmVariableProtocolGuid.
-//
-#define SMM_VARIABLE_FUNCTION_GET_STATISTICS          7
-
-///
-/// Size of SMM communicate header, without including the payload.
-///
-#define SMM_COMMUNICATE_HEADER_SIZE  (OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data))
-
-///
-/// Size of SMM variable communicate header, without including the payload.
-///
-#define SMM_VARIABLE_COMMUNICATE_HEADER_SIZE  (OFFSET_OF (SMM_VARIABLE_COMMUNICATE_HEADER, Data))
-
-///
-/// This structure is used to communicate with SMI handler by SetVariable and GetVariable.
-///
-typedef struct {
-  EFI_GUID    Guid;
-  UINTN       DataSize;
-  UINTN       NameSize;
-  UINT32      Attributes;  
-  CHAR16      Name[1];
-} SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE;
-
-///
-/// This structure is used to communicate with SMI handler by GetNextVariableName.
-///
-typedef struct {
-  EFI_GUID    Guid;
-  UINTN       NameSize;
-  CHAR16      Name[1];
-} SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME;
-
-///
-/// This structure is used to communicate with SMI handler by QueryVariableInfo.
-///
-typedef struct {
-  UINT64          MaximumVariableStorageSize;
-  UINT64          RemainingVariableStorageSize;
-  UINT64          MaximumVariableSize;
-  UINT32          Attributes; 
-} SMM_VARIABLE_COMMUNICATE_QUERY_VARIABLE_INFO;
-
-///
-/// This structure is used to communicate with SMI handler to get variable statistics information.
-///
-typedef VARIABLE_INFO_ENTRY  SMM_VARIABLE_COMMUNICATE_VARIABLE_INFO_ENTRY;
 
 #endif // _EFI_VARIABLE_H_

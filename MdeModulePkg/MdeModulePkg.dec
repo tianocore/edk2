@@ -131,6 +131,10 @@
   #  Include/Guid/VariableFormat.h
   gEfiVariableGuid           = { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d }}
 
+  ## Guid is defined for SMM variable module to notify SMM variable wrapper module when variable write service was ready.
+  #  Include/Guid/SmmVariableCommon.h
+  gSmmVariableWriteGuid  = { 0x93ba1826, 0xdffb, 0x45dd, { 0x82, 0xa7, 0xe7, 0xdc, 0xaa, 0x3b, 0xbd, 0xf3 }}
+  
   ## Performance protocol guid that also acts as the performance HOB guid and performance variable GUID
   #  Include/Guid/Performance.h
   gPerformanceProtocolGuid       = { 0x76B6BDFA, 0x2ACD, 0x4462, { 0x9E, 0x3F, 0xCB, 0x58, 0xC9, 0x69, 0xD9, 0x37 }}

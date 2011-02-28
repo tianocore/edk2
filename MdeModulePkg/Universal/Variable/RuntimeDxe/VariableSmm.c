@@ -4,7 +4,7 @@
   implements  an SMI handler to communicate with the DXE runtime driver 
   to provide variable services.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -14,18 +14,20 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.  
 
 **/
+#include <Protocol/SmmVariable.h>
+#include <Protocol/SmmFirmwareVolumeBlock.h>
 #include <Protocol/SmmFaultTolerantWrite.h>
 #include <Library/SmmServicesTableLib.h>
 
+#include <Guid/VariableFormat.h>
+#include <Guid/SmmVariableCommon.h>
 #include "Variable.h"
-#include "VariableSmmCommon.h"
 
-extern SMM_VARIABLE_COMMUNICATE_VARIABLE_INFO_ENTRY  *gVariableInfo;
+extern VARIABLE_INFO_ENTRY                           *gVariableInfo;
 EFI_HANDLE                                           mSmmVariableHandle      = NULL;
 EFI_HANDLE                                           mVariableHandle         = NULL;
 BOOLEAN                                              mAtRuntime              = FALSE;
 EFI_GUID                                             mZeroGuid               = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
-EFI_GUID                                             mSmmVariableWriteGuid   = EFI_SMM_VARIABLE_WRITE_GUID;
   
 EFI_SMM_VARIABLE_PROTOCOL      gSmmVariable = {
   VariableServiceGetVariable,
@@ -254,11 +256,11 @@ GetFvbCountAndBuffer (
 **/
 EFI_STATUS
 SmmVariableGetStatistics (
-  IN OUT SMM_VARIABLE_COMMUNICATE_VARIABLE_INFO_ENTRY  *InfoEntry,
+  IN OUT VARIABLE_INFO_ENTRY                           *InfoEntry,
   IN OUT UINTN                                         *InfoSize
   )
 {
-  SMM_VARIABLE_COMMUNICATE_VARIABLE_INFO_ENTRY         *VariableInfo;
+  VARIABLE_INFO_ENTRY                                  *VariableInfo;
   UINTN                                                NameLength;
   UINTN                                                StatisticsInfoSize;
   CHAR16                                               *InfoName;
@@ -269,8 +271,8 @@ SmmVariableGetStatistics (
     return EFI_UNSUPPORTED;
   }
 
-  StatisticsInfoSize = sizeof (SMM_VARIABLE_COMMUNICATE_VARIABLE_INFO_ENTRY) + StrSize (VariableInfo->Name);
-  if (*InfoSize < sizeof (SMM_VARIABLE_COMMUNICATE_VARIABLE_INFO_ENTRY)) {
+  StatisticsInfoSize = sizeof (VARIABLE_INFO_ENTRY) + StrSize (VariableInfo->Name);
+  if (*InfoSize < sizeof (VARIABLE_INFO_ENTRY)) {
     *InfoSize = StatisticsInfoSize;
     return EFI_BUFFER_TOO_SMALL;
   }
@@ -280,7 +282,7 @@ SmmVariableGetStatistics (
     //
     // Return the first variable info
     //
-    CopyMem (InfoEntry, VariableInfo, sizeof (SMM_VARIABLE_COMMUNICATE_VARIABLE_INFO_ENTRY));
+    CopyMem (InfoEntry, VariableInfo, sizeof (VARIABLE_INFO_ENTRY));
     CopyMem (InfoName, VariableInfo->Name, StrSize (VariableInfo->Name));
     *InfoSize = StatisticsInfoSize;
     return EFI_SUCCESS;
@@ -313,13 +315,13 @@ SmmVariableGetStatistics (
   //
   // Output the new variable info
   //
-  StatisticsInfoSize = sizeof (SMM_VARIABLE_COMMUNICATE_VARIABLE_INFO_ENTRY) + StrSize (VariableInfo->Name);
+  StatisticsInfoSize = sizeof (VARIABLE_INFO_ENTRY) + StrSize (VariableInfo->Name);
   if (*InfoSize < StatisticsInfoSize) {
     *InfoSize = StatisticsInfoSize;
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  CopyMem (InfoEntry, VariableInfo, sizeof (SMM_VARIABLE_COMMUNICATE_VARIABLE_INFO_ENTRY));
+  CopyMem (InfoEntry, VariableInfo, sizeof (VARIABLE_INFO_ENTRY));
   CopyMem (InfoName, VariableInfo->Name, StrSize (VariableInfo->Name));
   *InfoSize = StatisticsInfoSize;
   
@@ -361,7 +363,7 @@ SmmVariableHandler (
   SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE         *SmmVariableHeader;
   SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME  *GetNextVariableName;
   SMM_VARIABLE_COMMUNICATE_QUERY_VARIABLE_INFO     *QueryVariableInfo;
-  SMM_VARIABLE_COMMUNICATE_VARIABLE_INFO_ENTRY     *VariableInfo;
+  VARIABLE_INFO_ENTRY                              *VariableInfo;
   UINTN                                            InfoSize;
 
   ASSERT (CommBuffer != NULL);
@@ -420,7 +422,7 @@ SmmVariableHandler (
       break;
 
     case SMM_VARIABLE_FUNCTION_GET_STATISTICS:
-      VariableInfo = (SMM_VARIABLE_COMMUNICATE_VARIABLE_INFO_ENTRY *) SmmVariableFunctionHeader->Data;
+      VariableInfo = (VARIABLE_INFO_ENTRY *) SmmVariableFunctionHeader->Data;
       InfoSize = *CommBufferSize - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_HEADER, Data);
       Status = SmmVariableGetStatistics (VariableInfo, &InfoSize);
       *CommBufferSize = InfoSize + OFFSET_OF (SMM_VARIABLE_COMMUNICATE_HEADER, Data);
@@ -498,7 +500,7 @@ SmmFtwNotificationEvent (
   //
   Status = gBS->InstallProtocolInterface (
                   &mSmmVariableHandle,
-                  &mSmmVariableWriteGuid,
+                  &gSmmVariableWriteGuid,
                   EFI_NATIVE_INTERFACE,
                   NULL
                   );
@@ -511,7 +513,7 @@ SmmFtwNotificationEvent (
 /**
   Variable Driver main entry point. The Variable driver places the 4 EFI
   runtime services in the EFI System Table and installs arch protocols 
-  for variable read and write services being availible. It also registers
+  for variable read and write services being available. It also registers
   a notification function for an EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
 
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.  

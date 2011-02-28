@@ -4,7 +4,7 @@
   and volatile storage space and install variable architecture protocol
   based on SMM variable module.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -14,10 +14,11 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
 
 **/
-
+#include <PiDxe.h>
 #include <Protocol/VariableWrite.h>
 #include <Protocol/Variable.h>
 #include <Protocol/SmmCommunication.h>
+#include <Protocol/SmmVariable.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -31,7 +32,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 
 #include <Guid/EventGroup.h>
-#include "VariableSmmCommon.h"
+#include <Guid/VariableFormat.h>
+#include <Guid/SmmVariableCommon.h>
 
 EFI_HANDLE                       mHandle                    = NULL; 
 EFI_SMM_VARIABLE_PROTOCOL       *mSmmVariable               = NULL;
@@ -39,7 +41,6 @@ EFI_EVENT                        mVirtualAddressChangeEvent = NULL;
 EFI_SMM_COMMUNICATION_PROTOCOL  *mSmmCommunication          = NULL;
 UINT8                           *mVariableBuffer            = NULL;
 UINT8                           *mVariableBufferPhysical    = NULL;
-EFI_GUID                         mSmmVariableWriteGuid      = EFI_SMM_VARIABLE_WRITE_GUID;
 UINTN                            mVariableBufferSize;
 
 
@@ -367,7 +368,7 @@ RuntimeServiceQueryVariableInfo (
   // Init the communicate buffer. The buffer data size is:
   // SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + PayloadSize;
   //
-  PayloadSize = sizeof (SMM_VARIABLE_COMMUNICATE_VARIABLE_INFO_ENTRY);
+  PayloadSize = sizeof (SMM_VARIABLE_COMMUNICATE_QUERY_VARIABLE_INFO);
   Status = InitCommunicateBuffer ((VOID **)&SmmQueryVariableInfo, PayloadSize, SMM_VARIABLE_FUNCTION_QUERY_VARIABLE_INFO);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -550,7 +551,7 @@ SmmVariableWriteReady (
   //
   // Check whether the protocol is installed or not.
   //
-  Status = gBS->LocateProtocol (&mSmmVariableWriteGuid, NULL, (VOID **) &ProtocolOps);
+  Status = gBS->LocateProtocol (&gSmmVariableWriteGuid, NULL, (VOID **) &ProtocolOps);
   if (EFI_ERROR (Status)) {
     return;
   }
@@ -568,7 +569,7 @@ SmmVariableWriteReady (
 /**
   Variable Driver main entry point. The Variable driver places the 4 EFI
   runtime services in the EFI System Table and installs arch protocols 
-  for variable read and write services being availible. It also registers
+  for variable read and write services being available. It also registers
   a notification function for an EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
 
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
@@ -604,7 +605,7 @@ VariableSmmRuntimeInitialize (
   // Smm Non-Volatile variable write service is ready
   //
   EfiCreateProtocolNotifyEvent (
-    &mSmmVariableWriteGuid, 
+    &gSmmVariableWriteGuid, 
     TPL_CALLBACK, 
     SmmVariableWriteReady, 
     NULL, 
