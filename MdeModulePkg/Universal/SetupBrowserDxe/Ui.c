@@ -3159,6 +3159,7 @@ UiDisplayMenu (
         // Show NV update flag on status bar
         //
         gNvUpdateRequired = TRUE;
+        gResetRequired = TRUE;
       }
       break;
 
