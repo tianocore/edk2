@@ -1,7 +1,7 @@
 /** @file
   The internal functions and routines to transmit the IP6 packet.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -603,15 +603,16 @@ Ip6Output (
     break;
 
   case IP6_ICMP:
+    IcmpHead = (IP6_ICMP_HEAD *) NetbufGetByte (Packet, 0, NULL);
+    ASSERT (IcmpHead != NULL);
+
     //
-    // Don't send ICMP packet to an IPv6 anycast address.
+    // Don't send ICMP packet to an IPv6 anycast address in case ICMP Error message.
     //
-    if (Ip6IsAnycast (IpSb, &Head->DestinationAddress)) {
+    if (Ip6IsAnycast (IpSb, &Head->DestinationAddress) && (IcmpHead->Type <= ICMP_V6_ERROR_MAX)) {
       return EFI_INVALID_PARAMETER;
     }
 
-    IcmpHead = (IP6_ICMP_HEAD *) NetbufGetByte (Packet, 0, NULL);
-    ASSERT (IcmpHead != NULL);
     if (IcmpHead->Checksum == 0) {
       Checksum = &IcmpHead->Checksum;
     }
