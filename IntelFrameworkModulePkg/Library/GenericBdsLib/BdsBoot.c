@@ -2326,14 +2326,17 @@ BdsLibIsValidEFIBootOptDevicePathExt (
   }
 
   //
-  // Check if it's a valid boot option for internal Shell
+  // Check if it's a valid boot option for internal FV application
   //
   if (EfiGetNameGuidFromFwVolDevicePathNode ((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) LastDeviceNode) != NULL) {
     //
-    // If the boot option point to Internal FV shell, make sure it is valid
+    // If the boot option point to internal FV application, make sure it is valid
     //
     TempDevicePath = DevPath;
-    Status = BdsLibUpdateFvFileDevicePath (&TempDevicePath, PcdGetPtr(PcdShellFile));
+    Status = BdsLibUpdateFvFileDevicePath (
+               &TempDevicePath,
+               EfiGetNameGuidFromFwVolDevicePathNode ((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) LastDeviceNode)
+               );
     if (Status == EFI_ALREADY_STARTED) {
       return TRUE;
     } else {
