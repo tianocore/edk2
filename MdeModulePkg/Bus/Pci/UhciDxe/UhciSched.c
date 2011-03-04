@@ -2,7 +2,7 @@
 
   The EHCI register operation routines.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -576,12 +576,23 @@ UhciExecuteTransfer (
   UINTN                   Delay;
   BOOLEAN                 Finished;
   EFI_STATUS              Status;
+  BOOLEAN                 InfiniteLoop;
 
-  Finished = FALSE;
-  Status   = EFI_SUCCESS;
-  Delay    = (TimeOut * UHC_1_MILLISECOND / UHC_SYNC_POLL_INTERVAL) + 1;
+  Finished     = FALSE;
+  Status       = EFI_SUCCESS;
+  Delay        = (TimeOut * UHC_1_MILLISECOND / UHC_SYNC_POLL_INTERVAL) + 1;
+  InfiniteLoop = FALSE;
 
-  for (Index = 0; Index < Delay; Index++) {
+  //
+  // According to UEFI spec section 16.2.4, If Timeout is 0, then the caller
+  // must wait for the function to be completed until EFI_SUCCESS or EFI_DEVICE_ERROR
+  // is returned.
+  //
+  if (TimeOut == 0) {
+    InfiniteLoop = TRUE;
+  }
+
+  for (Index = 0; InfiniteLoop || (Index < Delay); Index++) {
     Finished = UhciCheckTdStatus (Uhc, Td, IsLow, QhResult);
 
     //

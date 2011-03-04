@@ -2,7 +2,7 @@
 
   EHCI transfer scheduling routines.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -691,12 +691,23 @@ EhcExecTransfer (
   UINTN                   Index;
   UINTN                   Loop;
   BOOLEAN                 Finished;
+  BOOLEAN                 InfiniteLoop;
 
-  Status    = EFI_SUCCESS;
-  Loop      = (TimeOut * EHC_1_MILLISECOND / EHC_SYNC_POLL_INTERVAL) + 1;
-  Finished  = FALSE;
+  Status       = EFI_SUCCESS;
+  Loop         = (TimeOut * EHC_1_MILLISECOND / EHC_SYNC_POLL_INTERVAL) + 1;
+  Finished     = FALSE;
+  InfiniteLoop = FALSE;
 
-  for (Index = 0; Index < Loop; Index++) {
+  //
+  // According to UEFI spec section 16.2.4, If Timeout is 0, then the caller
+  // must wait for the function to be completed until EFI_SUCCESS or EFI_DEVICE_ERROR
+  // is returned.
+  //
+  if (TimeOut == 0) {
+    InfiniteLoop = TRUE;
+  }
+
+  for (Index = 0; InfiniteLoop || (Index < Loop); Index++) {
     Finished = EhcCheckUrbResult (Ehc, Urb);
 
     if (Finished) {
