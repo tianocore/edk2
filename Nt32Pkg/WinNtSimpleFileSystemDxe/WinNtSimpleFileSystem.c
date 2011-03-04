@@ -2350,12 +2350,12 @@ Returns:
   // Set file system information.
   //
   if (CompareGuid (InformationType, &gEfiFileSystemInfoGuid)) {
-    if (BufferSize < SIZE_OF_EFI_FILE_SYSTEM_INFO + StrSize (PrivateRoot->VolumeLabel)) {
+    NewFileSystemInfo = (EFI_FILE_SYSTEM_INFO *) Buffer;
+    if (BufferSize < SIZE_OF_EFI_FILE_SYSTEM_INFO + StrSize (NewFileSystemInfo->VolumeLabel)) {
       Status = EFI_BAD_BUFFER_SIZE;
       goto Done;
     }
 
-    NewFileSystemInfo = (EFI_FILE_SYSTEM_INFO *) Buffer;
 
     FreePool (PrivateRoot->VolumeLabel);
     PrivateRoot->VolumeLabel = AllocatePool (StrSize (NewFileSystemInfo->VolumeLabel));
