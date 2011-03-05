@@ -69,6 +69,6 @@ ASM_PFX(copy_cpsr_into_spsr):
     bx      lr
 
 dead:
-    B       dead
+    b       dead
     
-.end
+ASM_FUNCTION_REMOVE_IF_UNREFERENCED

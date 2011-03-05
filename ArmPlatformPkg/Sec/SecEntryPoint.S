@@ -41,8 +41,8 @@ GCC_ASM_IMPORT(SecVectorTable)
 GCC_ASM_IMPORT(ArmIsScuEnable)
 #endif
 
-StartupAddr: .word    		CEntryPoint
-SecVectorTableAddr: .word		SecVectorTable
+StartupAddr:        .word   ASM_PFX(CEntryPoint)
+SecVectorTableAddr: .word		ASM_PFX(SecVectorTable)
 
 ASM_PFX(_ModuleEntryPoint):
  #Set VBAR to the start of the exception vectors in Secure Mode
@@ -109,4 +109,4 @@ _SetupStack:
   #    r0 = core_id
   blx  r3
 
-.end
+

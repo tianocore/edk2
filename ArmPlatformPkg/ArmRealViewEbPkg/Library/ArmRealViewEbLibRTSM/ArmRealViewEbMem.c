@@ -16,6 +16,7 @@
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/IoLib.h>
 
 // DDR attributes
 #define DDR_ATTRIBUTES_CACHED           ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK
@@ -54,7 +55,6 @@ VOID ArmPlatformGetPeiMemory (
 
 **/
 VOID ArmPlatformGetVirtualMemoryMap(ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemoryMap) {
-    UINT32                        val32;
     UINT32                        CacheAttributes;
     BOOLEAN                       bTrustzoneSupport = FALSE;
     UINTN                         Index = 0;

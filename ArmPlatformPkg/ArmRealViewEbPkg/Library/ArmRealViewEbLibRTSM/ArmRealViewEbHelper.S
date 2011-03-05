@@ -59,4 +59,4 @@ ASM_PFX(ArmPlatformInitializeBootMemory):
   // The SMC does not need to be initialized for RTSM
   bx    lr
 
-.end
+ASM_FUNCTION_REMOVE_IF_UNREFERENCED

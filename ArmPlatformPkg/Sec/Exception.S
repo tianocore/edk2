@@ -103,4 +103,4 @@ _DefaultFiq:
   mov  r0, #7
   blx  SecCommonExceptionEntry
 
-.end
+
