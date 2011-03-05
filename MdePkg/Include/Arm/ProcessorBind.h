@@ -135,8 +135,7 @@ typedef INT32   INTN;
     #define GCC_ASM_EXPORT(func__)  \
              .globl  _CONCATENATE (__USER_LABEL_PREFIX__, func__)    \
   
-    #define GCC_ASM_IMPORT(name)  \
-             .extern  _CONCATENATE (__USER_LABEL_PREFIX__, name)
+    #define GCC_ASM_IMPORT(name)  
 
   #endif
 #endif
