@@ -327,5 +327,7 @@
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
 
-  #FatPkg/EnhancedFatDxe/Fat.inf
+!if $(COMPILE_BINS)
+  FatPkg/EnhancedFatDxe/Fat.inf
+!endif
 

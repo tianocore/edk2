@@ -247,8 +247,11 @@ INF  UnixPkg/UnixSnpDxe/UnixSnpDxe.inf
 #
 # Build from source or use checked in binary
 #
-#INF FatPkg/EnhancedFatDxe/Fat.inf
+!if $(COMPILE_BINS)
+INF FatPkg/EnhancedFatDxe/Fat.inf
+!else
 INF  RuleOverride = BINARY USE = IA32 FatBinPkg/EnhancedFatDxe/Fat.inf
+!endif
 
 # If  you build GccShellPkg you can source level debug shell
 #FILE APPLICATION = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile) {
