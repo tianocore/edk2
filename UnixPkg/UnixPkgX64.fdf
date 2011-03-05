@@ -232,7 +232,9 @@ INF  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 #
 # Network stack drivers
 #
+!if $(NETWORK_SUPPORT)
 INF  UnixPkg/UnixSnpDxe/UnixSnpDxe.inf
+!endif
 INF  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
 INF  MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
 INF  MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf

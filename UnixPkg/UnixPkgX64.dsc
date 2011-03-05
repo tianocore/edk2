@@ -307,7 +307,9 @@
   #
   # Network stack drivers
   #
+!if $(NETWORK_SUPPORT)
   UnixPkg/UnixSnpDxe/UnixSnpDxe.inf
+!endif
   MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
   MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
   MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf

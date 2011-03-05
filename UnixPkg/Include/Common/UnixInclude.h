@@ -62,11 +62,11 @@ Abstract:
 #include <netdb.h>
 #include <netinet/in.h>
 #include <net/if.h>
-#include <net/if_dl.h>
 #include <ifaddrs.h>
-#include <net/bpf.h>
 
 #ifdef __APPLE__
+#include <net/if_dl.h>
+#include <net/bpf.h>
 #include <sys/param.h>
 #include <sys/mount.h>
 #define _XOPEN_SOURCE

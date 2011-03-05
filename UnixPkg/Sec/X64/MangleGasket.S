@@ -889,9 +889,8 @@ ASM_PFX(Gasketgetifaddrs):
   ret
 
 
-
-ASM_GLOBAL _Gasketfreeifaddrs
-_Gasketfreeifaddrs:
+ASM_GLOBAL ASM_PFX(Gasketfreeifaddrs)
+ASM_PFX(Gasketfreeifaddrs):
   pushq   %rbp            // stack frame is for the debugger
   movq    %rsp, %rbp
 
@@ -900,16 +899,13 @@ _Gasketfreeifaddrs:
 
   movq    %rcx, %rdi    // Swizzle args 
 
-  call    _freeifaddrs
+  call    ASM_PFX(freeifaddrs)
   
 
   popq    %rdi          // restore state
   popq    %rsi
   popq    %rbp
   ret
-
-
-
 
 
 ASM_GLOBAL ASM_PFX(GasketUgaClose)

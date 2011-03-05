@@ -42,6 +42,7 @@ fi
 #
 TARGET_TOOLS=MYTOOLS
 UNIXPKG_TOOLS=GCC44
+NETWORK_SUPPORT=
 case `uname` in
   CYGWIN*) echo Cygwin not fully supported yet. ;;
   Darwin*)
@@ -54,6 +55,7 @@ case `uname` in
         TARGET_TOOLS=XCODE32
         UNIXPKG_TOOLS=UNIXPKG
       fi
+      NETWORK_SUPPORT="-D NETWORK_SUPPORT"
       ;;
   Linux*) TARGET_TOOLS=ELFGCC ;;
 
@@ -120,7 +122,7 @@ done
 echo $PATH
 echo `which build`
 build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc      -a X64 -t $TARGET_TOOLS -D SEC_ONLY -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
-build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc      -a X64 -t $UNIXPKG_TOOLS -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc      -a X64 -t $UNIXPKG_TOOLS $NETWORK_SUPPORT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
 cp $WORKSPACE/Build/UnixX64/DEBUG_"$TARGET_TOOLS"/X64/SecMain $WORKSPACE/Build/UnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
 exit $?
 
