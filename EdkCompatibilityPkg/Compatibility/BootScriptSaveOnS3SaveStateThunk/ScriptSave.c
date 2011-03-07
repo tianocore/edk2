@@ -797,11 +797,12 @@ InitializeScriptSaveOnS3SaveState (
 {
   UINT8                                         *Buffer;
   UINTN                                         BufferSize;
-  VOID                                          *FfsBuffer;
   PE_COFF_LOADER_IMAGE_CONTEXT                  ImageContext;
   BOOT_SCRIPT_THUNK_DATA                        *BootScriptThunkData;
   EFI_STATUS                                    Status;
   VOID                                          *DevicePath;
+  EFI_PHYSICAL_ADDRESS                          MemoryAddress;
+  UINTN                                         PageNumber;
 
   //
   // Test if the gEfiCallerIdGuid of this image is already installed. if not, the entry
@@ -839,15 +840,19 @@ InitializeScriptSaveOnS3SaveState (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    Status = gBS->AllocatePool (
-                    EfiACPIMemoryNVS,
-                    BufferSize + ImageContext.SectionAlignment,
-                    &FfsBuffer
-                    );
+
+    MemoryAddress = SIZE_4GB - 1;
+    PageNumber    = EFI_SIZE_TO_PAGES (BufferSize + ImageContext.SectionAlignment);
+    Status  = gBS->AllocatePages (
+                     AllocateMaxAddress,
+                     EfiACPIMemoryNVS,
+                     PageNumber,
+                     &MemoryAddress
+                     );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
-    ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)FfsBuffer;
+    ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)MemoryAddress;
     //
     // Align buffer on section boundry
     //
@@ -858,7 +863,7 @@ InitializeScriptSaveOnS3SaveState (
     //
     Status = PeCoffLoaderLoadImage (&ImageContext);
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (FfsBuffer);
+      gBS->FreePages (MemoryAddress, PageNumber);
       return Status;
     }
 
@@ -869,7 +874,7 @@ InitializeScriptSaveOnS3SaveState (
 
     if (EFI_ERROR (Status)) {
       PeCoffLoaderUnloadImage (&ImageContext);
-      gBS->FreePool (FfsBuffer);
+      gBS->FreePages (MemoryAddress, PageNumber);
       return Status;
     }
     //
@@ -878,7 +883,7 @@ InitializeScriptSaveOnS3SaveState (
     InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
     Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)(ImageContext.EntryPoint)) ((EFI_HANDLE)(UINTN)(ImageContext.ImageAddress), SystemTable);
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (FfsBuffer);
+      gBS->FreePages (MemoryAddress, PageNumber);
       return Status;
     }
     //
