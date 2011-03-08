@@ -342,6 +342,7 @@ RefreshForm (
   FORM_BROWSER_STATEMENT          *Question;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
   EFI_BROWSER_ACTION_REQUEST      ActionRequest;
+  CHAR16                          *PadString;
 
   if (gMenuRefreshHead != NULL) {
 
@@ -373,6 +374,11 @@ RefreshForm (
         for (Index = 0; OptionString[Index] == L' '; Index++)
           ;
 
+        PadString = AllocatePool (gOptionBlockWidth * sizeof (CHAR16));
+        SetMem16 (PadString, (gOptionBlockWidth - 1) * sizeof (CHAR16), CHAR_SPACE);
+        PadString[gOptionBlockWidth - 1] = 0;
+        PrintStringAt (MenuRefreshEntry->CurrentColumn, MenuRefreshEntry->CurrentRow, PadString);
+        FreePool (PadString);
         PrintStringAt (MenuRefreshEntry->CurrentColumn, MenuRefreshEntry->CurrentRow, &OptionString[Index]);
         FreePool (OptionString);
       }
@@ -2209,7 +2215,7 @@ UiDisplayMenu (
         //
         if (gMenuRefreshHead != NULL) {
           for (MenuRefreshEntry = gMenuRefreshHead; MenuRefreshEntry != NULL; MenuRefreshEntry = MenuRefreshEntry->Next) {
-            if (MenuOption->GrayOut) {
+            if (MenuRefreshEntry->MenuOption->GrayOut) {
               MenuRefreshEntry->CurrentAttribute = FIELD_TEXT_GRAYED | FIELD_BACKGROUND;
             } else {               
               MenuRefreshEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
