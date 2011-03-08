@@ -1,7 +1,7 @@
 /** @file
 Utility functions for UI presentation.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -773,6 +773,7 @@ UpdateKeyHelp (
   case EFI_IFR_TEXT_OP:
   case EFI_IFR_ACTION_OP:
   case EFI_IFR_RESET_BUTTON_OP:
+  case EFI_IFR_SUBTITLE_OP:
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
     if (!Selected) {
@@ -785,7 +786,7 @@ UpdateKeyHelp (
       }
 
       PrintAt (StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
-      if (Statement->Operand != EFI_IFR_TEXT_OP) {
+      if (Statement->Operand != EFI_IFR_TEXT_OP && Statement->Operand != EFI_IFR_SUBTITLE_OP) {
         PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
       }
     } else {

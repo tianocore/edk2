@@ -622,6 +622,15 @@ UiAddMenuOption (
       MenuOption->IsQuestion = TRUE;
       break;
 
+    case EFI_IFR_TEXT_OP:
+      if (FeaturePcdGet (PcdBrowserGrayOutTextStatement)) {
+        //
+        // Initializing GrayOut option as TRUE for Text setup options 
+        // so that those options will be Gray in colour and un selectable.
+        //
+        MenuOption->GrayOut = TRUE;
+      }
+
     default:
       MenuOption->IsQuestion = FALSE;
       break;
@@ -1338,7 +1347,6 @@ ValueIsScroll (
   )
 {
   LIST_ENTRY      *Temp;
-  UI_MENU_OPTION  *MenuOption;
 
   Temp = Direction ? CurrentPos->BackLink : CurrentPos->ForwardLink;
 
@@ -1346,14 +1354,7 @@ ValueIsScroll (
     return TRUE;
   }
 
-  for (; Temp != &gMenuOption; Temp = Direction ? Temp->BackLink : Temp->ForwardLink) {
-    MenuOption = MENU_OPTION_FROM_LINK (Temp);
-    if (IsSelectable (MenuOption)) {
-      return FALSE;
-    }
-  }
-
-  return TRUE;
+  return FALSE;
 }
 
 
@@ -1364,6 +1365,7 @@ ValueIsScroll (
 
   @param  GoUp                   The navigation direction. TRUE: up, FALSE: down.
   @param  CurrentPosition        Current position.
+  @param  GapToTop               Gap position to top or bottom.
 
   @return The row distance from current MenuOption to next selectable MenuOption.
 
@@ -1371,51 +1373,54 @@ ValueIsScroll (
 INTN
 MoveToNextStatement (
   IN     BOOLEAN                   GoUp,
-  IN OUT LIST_ENTRY                **CurrentPosition
+  IN OUT LIST_ENTRY                **CurrentPosition,
+  IN     UINTN                     GapToTop
   )
 {
   INTN             Distance;
   LIST_ENTRY       *Pos;
-  BOOLEAN          HitEnd;
   UI_MENU_OPTION   *NextMenuOption;
+  UI_MENU_OPTION   *PreMenuOption;
 
-  Distance = 0;
-  Pos      = *CurrentPosition;
-  HitEnd   = FALSE;
+  Distance      = 0;
+  Pos           = *CurrentPosition;
+  PreMenuOption = MENU_OPTION_FROM_LINK (Pos);
 
   while (TRUE) {
     NextMenuOption = MENU_OPTION_FROM_LINK (Pos);
+    if (GoUp && (PreMenuOption != NextMenuOption)) {
+      //
+      // Current Position doesn't need to be caculated when go up.
+      // Caculate distanct at first when go up
+      //
+      if ((UINTN) Distance + NextMenuOption->Skip > GapToTop) {
+        NextMenuOption = PreMenuOption;
+        break;
+      }
+      Distance += NextMenuOption->Skip;
+    }
     if (IsSelectable (NextMenuOption)) {
       break;
     }
     if ((GoUp ? Pos->BackLink : Pos->ForwardLink) == &gMenuOption) {
-      HitEnd = TRUE;
+      //
+      // Arrive at top.
+      //
+      Distance = -1;
       break;
     }
-    Distance += NextMenuOption->Skip;
-    Pos = (GoUp ? Pos->BackLink : Pos->ForwardLink);
-  }
-
-  if (HitEnd) {
-    //
-    // If we hit end there is still no statement can be focused,
-    // we go backwards to find the statement can be focused.
-    //
-    Distance = 0;
-    Pos = *CurrentPosition;
-
-    while (TRUE) {
-      NextMenuOption = MENU_OPTION_FROM_LINK (Pos);
-      if (IsSelectable (NextMenuOption)) {
+    if (!GoUp) {
+      //
+      // Caculate distanct at later when go down
+      //
+      if ((UINTN) Distance + NextMenuOption->Skip > GapToTop) {
+        NextMenuOption = PreMenuOption;
         break;
       }
-      if ((!GoUp ? Pos->BackLink : Pos->ForwardLink) == &gMenuOption) {
-        ASSERT (FALSE);
-        break;
-      }
-      Distance -= NextMenuOption->Skip;
-      Pos = (!GoUp ? Pos->BackLink : Pos->ForwardLink);
+      Distance += NextMenuOption->Skip;
     }
+    PreMenuOption = NextMenuOption;
+    Pos = (GoUp ? Pos->BackLink : Pos->ForwardLink);
   }
 
   *CurrentPosition = &NextMenuOption->Link;
@@ -1634,6 +1639,7 @@ UiDisplayMenu (
   BOOLEAN                         SavedValue;
   BOOLEAN                         UpArrow;
   BOOLEAN                         DownArrow;
+  BOOLEAN                         InitializedFlag;
   EFI_STATUS                      Status;
   EFI_INPUT_KEY                   Key;
   LIST_ENTRY                      *Link;
@@ -1725,8 +1731,9 @@ UiDisplayMenu (
   }
 
   //
-  // Get user's selection
+  // Init option as the current user's selection
   //
+  InitializedFlag = TRUE;
   NewPos = gMenuOption.ForwardLink;
 
   gST->ConOut->EnableCursor (gST->ConOut, FALSE);
@@ -1799,8 +1806,7 @@ UiDisplayMenu (
           Width       = GetWidth (Statement, MenuOption->Handle);
           OriginalRow = Row;
 
-          if (Statement->Operand == EFI_IFR_REF_OP && 
-            MenuOption->Col >= 2) {
+          if (Statement->Operand == EFI_IFR_REF_OP && MenuOption->Col >= 2) {
             //
             // Print Arrow for Goto button.
             //
@@ -2048,6 +2054,10 @@ UiDisplayMenu (
       // NewPos:     Current menu option that need to hilight
       //
       ControlFlag = CfUpdateHelpString;
+      if (InitializedFlag) {
+        InitializedFlag = FALSE;
+        MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+      }
 
       //
       // Repaint flag is normally reset when finish processing CfUpdateHelpString. Temporarily
@@ -2181,22 +2191,17 @@ UiDisplayMenu (
         }
 
         //
-        // This is only possible if we entered this page and the first menu option is
-        // a "non-menu" item.  In that case, force it UiDown
+        // This is the current selected statement
         //
         MenuOption = MENU_OPTION_FROM_LINK (NewPos);
+        Statement = MenuOption->ThisTag;
+        Selection->Statement = Statement;
         if (!IsSelectable (MenuOption)) {
-          ASSERT (ScreenOperation == UiNoOperation);
-          ScreenOperation = UiDown;
-          ControlFlag     = CfScreenOperation;
+          Repaint = SavedValue;
+          UpdateKeyHelp (Selection, MenuOption, FALSE);
           break;
         }
 
-        //
-        // This is the current selected statement
-        //
-        Statement = MenuOption->ThisTag;
-        Selection->Statement = Statement;
         //
         // Record highlight for current menu
         //
@@ -2305,12 +2310,12 @@ UiDisplayMenu (
     case CfUpdateHelpString:
       ControlFlag = CfPrepareToReadKey;
 
-        if (Repaint || NewLine) {
+      if (Repaint || NewLine) {
         //
         // Don't print anything if it is a NULL help token
         //
         ASSERT(MenuOption != NULL);
-        if (MenuOption->ThisTag->Help == 0) {
+        if (MenuOption->ThisTag->Help == 0 || !IsSelectable (MenuOption)) {
           StringPtr = L"\0";
         } else {
           StringPtr = GetToken (MenuOption->ThisTag->Help, MenuOption->Handle);
@@ -2482,20 +2487,6 @@ UiDisplayMenu (
         //
         if (IsListEmpty (&gMenuOption)) {
           ControlFlag = CfReadKey;
-          break;
-        }
-        //
-        // if there is nothing logical to place a cursor on, just move on to wait for a key.
-        //
-        for (Link = gMenuOption.ForwardLink; Link != &gMenuOption; Link = Link->ForwardLink) {
-          NextMenuOption = MENU_OPTION_FROM_LINK (Link);
-          if (IsSelectable (NextMenuOption)) {
-            break;
-          }
-        }
-
-        if (Link == &gMenuOption) {
-          ControlFlag = CfPrepareToReadKey;
           break;
         }
       }
@@ -2808,47 +2799,47 @@ UiDisplayMenu (
     case CfUiUp:
       ControlFlag = CfCheckSelection;
 
-      SavedListEntry = TopOfScreen;
+      SavedListEntry = NewPos;
 
       ASSERT(NewPos != NULL);
+      //
+      // Adjust Date/Time position before we advance forward.
+      //
+      AdjustDateAndTimePosition (TRUE, &NewPos);
       if (NewPos->BackLink != &gMenuOption) {
-        NewLine = TRUE;
-        //
-        // Adjust Date/Time position before we advance forward.
-        //
-        AdjustDateAndTimePosition (TRUE, &NewPos);
+        MenuOption = MENU_OPTION_FROM_LINK (NewPos);
+        NewLine    = TRUE;
+        NewPos     = NewPos->BackLink;
 
-        //
-        // Caution that we have already rewind to the top, don't go backward in this situation.
-        //
-        if (NewPos->BackLink != &gMenuOption) {
-          NewPos = NewPos->BackLink;
-        }
-
-        Difference = MoveToNextStatement (TRUE, &NewPos);
         PreviousMenuOption = MENU_OPTION_FROM_LINK (NewPos);
         DistanceValue = PreviousMenuOption->Skip;
-
-        //
-        // Since the behavior of hitting the up arrow on a Date/Time op-code is intended
-        // to be one that back to the previous set of op-codes, we need to advance to the sencond
-        // Date/Time op-code and leave the remaining logic in UiDown intact so the appropriate
-        // checking can be done.
-        //
-        DistanceValue += AdjustDateAndTimePosition (TRUE, &NewPos);
-        
+        Difference    = 0;
+        if (MenuOption->Row >= DistanceValue + TopRow) {
+          Difference = MoveToNextStatement (TRUE, &NewPos, MenuOption->Row - TopRow - DistanceValue);
+        }
+        NextMenuOption = MENU_OPTION_FROM_LINK (NewPos);
+       
         ASSERT (MenuOption != NULL);
         if (Difference < 0) {
           //
-          // We want to goto previous MenuOption, but finally we go down.
-          // it means that we hit the begining MenuOption that can be focused
-          // so we simply scroll to the top
+          // We hit the begining MenuOption that can be focused
+          // so we simply scroll to the top.
           //
-          if (SavedListEntry != gMenuOption.ForwardLink) {
+          if (TopOfScreen != gMenuOption.ForwardLink) {
             TopOfScreen = gMenuOption.ForwardLink;
             Repaint     = TRUE;
+          } else {
+            //
+            // Scroll up to the last page when we have arrived at top page.
+            //
+            NewPos          = &gMenuOption;
+            TopOfScreen     = &gMenuOption;
+            MenuOption      = MENU_OPTION_FROM_LINK (SavedListEntry);
+            ScreenOperation = UiPageUp;
+            ControlFlag     = CfScreenOperation;
+            break;
           }
-        } else if ((INTN) MenuOption->Row - (INTN) DistanceValue - Difference < (INTN) TopRow) {
+        } else if (MenuOption->Row < TopRow + DistanceValue + Difference) {
           //
           // Previous focus MenuOption is above the TopOfScreen, so we need to scroll
           //
@@ -2856,27 +2847,30 @@ UiDisplayMenu (
           Repaint     = TRUE;
           SkipValue = 0;
           OldSkipValue = 0;
+        } else if (!IsSelectable (NextMenuOption)) {
+          //
+          // Continue to go up until scroll to next page or the selectable option is found.
+          //
+          ScreenOperation = UiUp;
+          ControlFlag     = CfScreenOperation;
         }
 
         //
         // If we encounter a Date/Time op-code set, rewind to the first op-code of the set.
         //
         AdjustDateAndTimePosition (TRUE, &TopOfScreen);
-
+        AdjustDateAndTimePosition (TRUE, &NewPos);
+        MenuOption = MENU_OPTION_FROM_LINK (SavedListEntry);
         UpdateStatusBar (INPUT_ERROR, MenuOption->ThisTag->QuestionFlags, FALSE);
       } else {
-        SavedMenuOption = MenuOption;
-        MenuOption      = MENU_OPTION_FROM_LINK (NewPos);
-        if (!IsSelectable (MenuOption)) {
-          //
-          // If we are at the end of the list and sitting on a text op, we need to more forward
-          //
-          ScreenOperation = UiDown;
-          ControlFlag     = CfScreenOperation;
-          break;
-        }
-
-        MenuOption = SavedMenuOption;
+        //
+        // Scroll up to the last page.
+        //
+        NewPos          = &gMenuOption;
+        TopOfScreen     = &gMenuOption;
+        MenuOption      = MENU_OPTION_FROM_LINK (SavedListEntry);
+        ScreenOperation = UiPageUp;
+        ControlFlag     = CfScreenOperation;
       }
       break;
 
@@ -2893,38 +2887,59 @@ UiDisplayMenu (
       NewLine   = TRUE;
       Repaint   = TRUE;
       Link      = TopOfScreen;
-      PreviousMenuOption = MENU_OPTION_FROM_LINK (Link);
-      Index = BottomRow;
+      Index     = BottomRow;
       while ((Index >= TopRow) && (Link->BackLink != &gMenuOption)) {
-        Index = Index - PreviousMenuOption->Skip;
         Link = Link->BackLink;
         PreviousMenuOption = MENU_OPTION_FROM_LINK (Link);
+        if (Index < PreviousMenuOption->Skip) {
+          Index = 0;
+          break;
+        }
+        Index = Index - PreviousMenuOption->Skip;
       }
+      
+      if ((Link->BackLink == &gMenuOption) && (Index >= TopRow)) {
+        if (TopOfScreen == &gMenuOption) {
+          TopOfScreen = gMenuOption.ForwardLink;
+          NewPos      = gMenuOption.BackLink;
+          MoveToNextStatement (TRUE, &NewPos, BottomRow - TopRow);
+          Repaint = FALSE;
+        } else if (TopOfScreen != Link) {
+          TopOfScreen = Link;
+          NewPos      = Link;
+          MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+        } else {
+          //
+          // Finally we know that NewPos is the last MenuOption can be focused.
+          //
+          Repaint = FALSE;
+          NewPos  = Link;
+          MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+        }
+      } else {
+        if (Index + 1 < TopRow) {
+          //
+          // Back up the previous option.
+          //
+          Link = Link->ForwardLink;
+        }
 
-      TopOfScreen = Link;
-      Difference = MoveToNextStatement (TRUE, &Link);
-      if (Difference > 0) {
         //
-        // The focus MenuOption is above the TopOfScreen
+        // Move to the option in Next page.
+        //
+        if (TopOfScreen == &gMenuOption) {
+          NewPos = gMenuOption.BackLink;
+          MoveToNextStatement (TRUE, &NewPos, BottomRow - TopRow);
+        } else {
+          NewPos = Link;
+          MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+        }
+
+        //
+        // There are more MenuOption needing scrolling up.
         //
         TopOfScreen = Link;
-      } else if (Difference < 0) {
-        //
-        // This happens when there is no MenuOption can be focused from
-        // Current MenuOption to the first MenuOption
-        //
-        TopOfScreen = gMenuOption.ForwardLink;
-      }
-      Index += Difference;
-      if (Index < TopRow) {
-        MenuOption = NULL;
-      }
-
-      if (NewPos == Link) {
-        Repaint = FALSE;
-        NewLine = FALSE;
-      } else {
-        NewPos = Link;
+        MenuOption  = NULL;
       }
 
       //
@@ -2956,28 +2971,35 @@ UiDisplayMenu (
         NextMenuOption = MENU_OPTION_FROM_LINK (Link);
       }
 
-      Index += MoveToNextStatement (FALSE, &Link);
-      if (Index > BottomRow) {
-        //
-        // There are more MenuOption needing scrolling
-        //
-        TopOfScreen = Link;
-        MenuOption = NULL;
-      }
-      if (NewPos == Link && Index <= BottomRow) {
+      if ((Link->ForwardLink == &gMenuOption) && (Index <= BottomRow)) {
         //
         // Finally we know that NewPos is the last MenuOption can be focused.
         //
-        NewLine = FALSE;
         Repaint = FALSE;
+        MoveToNextStatement (TRUE, &Link, Index - TopRow);
       } else {
-        NewPos  = Link;
+        if (Index - 1 > BottomRow) {
+          //
+          // Back up the previous option.
+          //
+          Link = Link->BackLink;
+        }
+        //
+        // There are more MenuOption needing scrolling down.
+        //
+        TopOfScreen = Link;
+        MenuOption = NULL;
+        //
+        // Move to the option in Next page.
+        //
+        MoveToNextStatement (FALSE, &Link, BottomRow - TopRow);
       }
 
       //
       // If we encounter a Date/Time op-code set, rewind to the first op-code of the set.
       // Don't do this when we are already in the last page.
       //
+      NewPos  = Link;
       AdjustDateAndTimePosition (TRUE, &TopOfScreen);
       AdjustDateAndTimePosition (TRUE, &NewPos);
       break;
@@ -2993,21 +3015,49 @@ UiDisplayMenu (
       // the Date/Time op-code.
       //
       SavedListEntry = NewPos;
-      DistanceValue  = AdjustDateAndTimePosition (FALSE, &NewPos);
+      AdjustDateAndTimePosition (FALSE, &NewPos);
 
       if (NewPos->ForwardLink != &gMenuOption) {
         MenuOption      = MENU_OPTION_FROM_LINK (NewPos);
         NewLine         = TRUE;
         NewPos          = NewPos->ForwardLink;
 
-        DistanceValue  += MoveToNextStatement (FALSE, &NewPos);
+        Difference      = 0;
+        if (BottomRow >= MenuOption->Row + MenuOption->Skip) {
+          Difference    = MoveToNextStatement (FALSE, &NewPos, BottomRow - MenuOption->Row - MenuOption->Skip);
+          //
+          // We hit the end of MenuOption that can be focused
+          // so we simply scroll to the first page.
+          //
+          if (Difference < 0) {
+            //
+            // Scroll to the first page.
+            //
+            if (TopOfScreen != gMenuOption.ForwardLink) {
+              TopOfScreen = gMenuOption.ForwardLink;
+              Repaint     = TRUE;
+              MenuOption  = NULL;
+            } else {
+              MenuOption = MENU_OPTION_FROM_LINK (SavedListEntry);
+            }
+            NewPos        = gMenuOption.ForwardLink;
+            MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+    
+            //
+            // If we are at the end of the list and sitting on a Date/Time op, rewind to the head.
+            //
+            AdjustDateAndTimePosition (TRUE, &TopOfScreen);
+            AdjustDateAndTimePosition (TRUE, &NewPos);
+            break;
+          }
+        }
         NextMenuOption  = MENU_OPTION_FROM_LINK (NewPos);
 
         //
         // An option might be multi-line, so we need to reflect that data in the overall skip value
         //
         UpdateOptionSkipLines (Selection, NextMenuOption, &OptionString, (UINTN) SkipValue);
-        DistanceValue  += NextMenuOption->Skip;
+        DistanceValue  = Difference + NextMenuOption->Skip;
 
         Temp = MenuOption->Row + MenuOption->Skip + DistanceValue - 1;
         if ((MenuOption->Row + MenuOption->Skip == BottomRow + 1) &&
@@ -3098,6 +3148,12 @@ UiDisplayMenu (
 
           Repaint       = TRUE;
           OldSkipValue  = SkipValue;
+        } else if (!IsSelectable (NextMenuOption)) {
+          //
+          // Continue to go down until scroll to next page or the selectable option is found.
+          //
+          ScreenOperation = UiDown;
+          ControlFlag     = CfScreenOperation;
         }
 
         MenuOption = MENU_OPTION_FROM_LINK (SavedListEntry);
@@ -3105,23 +3161,26 @@ UiDisplayMenu (
         UpdateStatusBar (INPUT_ERROR, MenuOption->ThisTag->QuestionFlags, FALSE);
 
       } else {
-        SavedMenuOption = MenuOption;
-        MenuOption      = MENU_OPTION_FROM_LINK (NewPos);
-        if (!IsSelectable (MenuOption)) {
-          //
-          // If we are at the end of the list and sitting on a text op, we need to more forward
-          //
-          ScreenOperation = UiUp;
-          ControlFlag     = CfScreenOperation;
-          break;
+        //
+        // Scroll to the first page.
+        //
+        if (TopOfScreen != gMenuOption.ForwardLink) {
+          TopOfScreen = gMenuOption.ForwardLink;
+          Repaint     = TRUE;
+          MenuOption  = NULL;
+        } else {
+          MenuOption = MENU_OPTION_FROM_LINK (SavedListEntry);
         }
-
-        MenuOption = SavedMenuOption;
-        //
-        // If we are at the end of the list and sitting on a Date/Time op, rewind to the head.
-        //
-        AdjustDateAndTimePosition (TRUE, &NewPos);
+        NewLine       = TRUE;
+        NewPos        = gMenuOption.ForwardLink;
+        MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
       }
+
+      //
+      // If we are at the end of the list and sitting on a Date/Time op, rewind to the head.
+      //
+      AdjustDateAndTimePosition (TRUE, &TopOfScreen);
+      AdjustDateAndTimePosition (TRUE, &NewPos);
       break;
 
     case CfUiSave:

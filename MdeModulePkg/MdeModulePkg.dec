@@ -302,6 +302,11 @@
   #  If FALSE, then unaligned I/O, MMIO, and PCI Configuration cycles through the PCI I/O Protocol are disabled.
   #  The default value for this PCD is to disable support for unaligned PCI I/O Protocol requests.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUnalignedPciIoEnable|FALSE|BOOLEAN|0x0001003e
+
+  ## This PCD specifies whether TEXT statement is always set to GrayOut statement in HII Form Browser.
+  #  If TRUE,  TEXT statement will always be set to GrayOut.
+  #  If FALSE, TEXT statement will be set to GrayOut only when GrayOut condition is TRUE.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserGrayOutTextStatement|FALSE|BOOLEAN|0x0001004f
   
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
   ##
