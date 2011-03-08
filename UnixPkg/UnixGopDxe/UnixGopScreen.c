@@ -217,7 +217,7 @@ UnixGopBlt (
   Status = Private->UgaIo->UgaBlt (
                             Private->UgaIo,
                             (EFI_UGA_PIXEL *)BltBuffer,
-                            BltOperation,
+                            (EFI_UGA_BLT_OPERATION)BltOperation,
                             &GopBltArgs
                             );
 

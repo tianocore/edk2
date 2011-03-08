@@ -53,7 +53,7 @@ case `uname` in
         exit 1
       else
         TARGET_TOOLS=XCODE32
-        UNIXPKG_TOOLS=UNIXPKG
+        UNIXPKG_TOOLS=XCLANG
       fi
       NETWORK_SUPPORT="-D NETWORK_SUPPORT"
       ;;

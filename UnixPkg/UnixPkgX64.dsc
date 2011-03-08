@@ -208,6 +208,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|L"Setup"|gEfiUnixSystemConfigGuid|0x4|25
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10
 
+[BuildOptions]
+  # Magic to make system include files work
+  XCODE:*_XCLANG_*_CC_FLAGS = -U __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ -D __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__=1060 -D __APPLE__ -I/System/Library/Frameworks -I/Library/Frameworks
+  XCODE:*_XCLANG_*_PP_FLAGS = -U __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ -D __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__=1060 -D __APPLE__ -I/System/Library/Frameworks -I/Library/Frameworks
+
+
 ###################################################################################################
 #
 # Components Section - list of the modules and components that will be processed by compilation

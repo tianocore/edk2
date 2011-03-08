@@ -1012,7 +1012,7 @@ Returns:
 
   Array = mImageContextModHandleArray;
   for (Index = 0; Index < mImageContextModHandleArraySize; Index++, Array++) {
-    if ((Array->ImageContext == ImageContext)) {
+    if (Array->ImageContext == ImageContext) {
       //
       // If you find a match return it and delete the entry
       //
