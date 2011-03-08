@@ -1778,6 +1778,9 @@ AhciCreateTransferDescriptor (
   UINT64                MaxReceiveFisSize;
   UINT64                MaxCommandListSize;
   UINT64                MaxCommandTableSize;
+  EFI_PHYSICAL_ADDRESS  AhciRFisPciAddr;
+  EFI_PHYSICAL_ADDRESS  AhciCmdListPciAddr;
+  EFI_PHYSICAL_ADDRESS  AhciCommandTablePciAddr;
 
   Buffer = NULL;
   //
@@ -1796,7 +1799,7 @@ AhciCreateTransferDescriptor (
                     PciIo,
                     AllocateAnyPages,
                     EfiBootServicesData,
-                    (UINTN)EFI_SIZE_TO_PAGES (MaxReceiveFisSize),
+                    EFI_SIZE_TO_PAGES ((UINTN) MaxReceiveFisSize),
                     &Buffer,
                     0
                     );
@@ -1816,7 +1819,7 @@ AhciCreateTransferDescriptor (
                     EfiPciIoOperationBusMasterCommonBuffer,
                     Buffer,
                     &Bytes,
-                    (EFI_PHYSICAL_ADDRESS *) &AhciRegisters->AhciRFisPciAddr,
+                    &AhciRFisPciAddr,
                     &AhciRegisters->MapRFis
                     );
 
@@ -1828,13 +1831,14 @@ AhciCreateTransferDescriptor (
     goto Error6;
   }
 
-  if ((!Support64Bit) && ((EFI_PHYSICAL_ADDRESS)(UINTN)AhciRegisters->AhciRFisPciAddr > 0x100000000ULL)) {
+  if ((!Support64Bit) && (AhciRFisPciAddr > 0x100000000ULL)) {
     //
     // The AHCI HBA doesn't support 64bit addressing, so should not get a >4G pci bus master address.
     //
     Status = EFI_DEVICE_ERROR;
     goto Error5;
   }
+  AhciRegisters->AhciRFisPciAddr = (EFI_AHCI_RECEIVED_FIS *)(UINTN)AhciRFisPciAddr;
 
   //
   // Allocate memory for command list
@@ -1846,7 +1850,7 @@ AhciCreateTransferDescriptor (
                     PciIo,
                     AllocateAnyPages,
                     EfiBootServicesData,
-                    (UINTN)EFI_SIZE_TO_PAGES (MaxCommandListSize),
+                    EFI_SIZE_TO_PAGES ((UINTN) MaxCommandListSize),
                     &Buffer,
                     0
                     );
@@ -1870,7 +1874,7 @@ AhciCreateTransferDescriptor (
                     EfiPciIoOperationBusMasterCommonBuffer,
                     Buffer,
                     &Bytes,
-                    (EFI_PHYSICAL_ADDRESS *)&AhciRegisters->AhciCmdListPciAddr,
+                    &AhciCmdListPciAddr,
                     &AhciRegisters->MapCmdList
                     );
 
@@ -1882,13 +1886,14 @@ AhciCreateTransferDescriptor (
     goto Error4;
   }
 
-  if ((!Support64Bit) && ((EFI_PHYSICAL_ADDRESS)(UINTN)AhciRegisters->AhciCmdListPciAddr > 0x100000000ULL)) {
+  if ((!Support64Bit) && (AhciCmdListPciAddr > 0x100000000ULL)) {
     //
     // The AHCI HBA doesn't support 64bit addressing, so should not get a >4G pci bus master address.
     //
     Status = EFI_DEVICE_ERROR;
     goto Error3;
   }
+  AhciRegisters->AhciCmdListPciAddr = (EFI_AHCI_COMMAND_LIST *)(UINTN)AhciCmdListPciAddr;
 
   //
   // Allocate memory for command table
@@ -1901,7 +1906,7 @@ AhciCreateTransferDescriptor (
                     PciIo,
                     AllocateAnyPages,
                     EfiBootServicesData,
-                    (UINTN)EFI_SIZE_TO_PAGES (MaxCommandTableSize),
+                    EFI_SIZE_TO_PAGES ((UINTN) MaxCommandTableSize),
                     &Buffer,
                     0
                     );
@@ -1925,7 +1930,7 @@ AhciCreateTransferDescriptor (
                     EfiPciIoOperationBusMasterCommonBuffer,
                     Buffer,
                     &Bytes,
-                    (EFI_PHYSICAL_ADDRESS *)&AhciRegisters->AhciCommandTablePciAddr,
+                    &AhciCommandTablePciAddr,
                     &AhciRegisters->MapCommandTable
                     );
 
@@ -1937,13 +1942,14 @@ AhciCreateTransferDescriptor (
     goto Error2;
   }
 
-  if ((!Support64Bit) && ((EFI_PHYSICAL_ADDRESS)(UINTN)AhciRegisters->AhciCommandTablePciAddr > 0x100000000ULL)) {
+  if ((!Support64Bit) && (AhciCommandTablePciAddr > 0x100000000ULL)) {
     //
     // The AHCI HBA doesn't support 64bit addressing, so should not get a >4G pci bus master address.
     //
     Status = EFI_DEVICE_ERROR;
     goto Error1;
   }
+  AhciRegisters->AhciCommandTablePciAddr = (EFI_AHCI_COMMAND_TABLE *)(UINTN)AhciCommandTablePciAddr;
 
   return EFI_SUCCESS;
   //
@@ -1957,7 +1963,7 @@ Error1:
 Error2:
   PciIo->FreeBuffer (
            PciIo,
-           (UINTN)EFI_SIZE_TO_PAGES (MaxCommandTableSize),
+           EFI_SIZE_TO_PAGES ((UINTN) MaxCommandTableSize),
            AhciRegisters->AhciCommandTable
            );
 Error3:
@@ -1968,7 +1974,7 @@ Error3:
 Error4:
   PciIo->FreeBuffer (
            PciIo,
-           (UINTN)EFI_SIZE_TO_PAGES (MaxCommandListSize),
+           EFI_SIZE_TO_PAGES ((UINTN) MaxCommandListSize),
            AhciRegisters->AhciCmdList
            );
 Error5:
@@ -1979,7 +1985,7 @@ Error5:
 Error6:
   PciIo->FreeBuffer (
            PciIo,
-           (UINTN)EFI_SIZE_TO_PAGES (MaxReceiveFisSize),
+           EFI_SIZE_TO_PAGES ((UINTN) MaxReceiveFisSize),
            AhciRegisters->AhciRFis
            );
 

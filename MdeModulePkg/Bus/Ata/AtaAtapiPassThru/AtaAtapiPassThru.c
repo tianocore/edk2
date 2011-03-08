@@ -2,7 +2,7 @@
   This file implements ATA_PASSTHRU_PROCTOCOL and EXT_SCSI_PASSTHRU_PROTOCOL interfaces
   for managed ATA controllers.
     
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -610,7 +610,7 @@ AtaAtapiPassThruStop (
              );
     PciIo->FreeBuffer (
              PciIo,
-             (UINTN) EFI_SIZE_TO_PAGES (AhciRegisters->MaxCommandTableSize),
+             EFI_SIZE_TO_PAGES ((UINTN) AhciRegisters->MaxCommandTableSize),
              AhciRegisters->AhciCommandTable
              );
     PciIo->Unmap (
@@ -619,7 +619,7 @@ AtaAtapiPassThruStop (
              );
     PciIo->FreeBuffer (
              PciIo,
-             (UINTN) EFI_SIZE_TO_PAGES (AhciRegisters->MaxCommandListSize),
+             EFI_SIZE_TO_PAGES ((UINTN) AhciRegisters->MaxCommandListSize),
              AhciRegisters->AhciCmdList
              );
     PciIo->Unmap (
@@ -628,7 +628,7 @@ AtaAtapiPassThruStop (
              );
     PciIo->FreeBuffer (
              PciIo,
-             (UINTN) EFI_SIZE_TO_PAGES (AhciRegisters->MaxReceiveFisSize),
+             EFI_SIZE_TO_PAGES ((UINTN) AhciRegisters->MaxReceiveFisSize),
              AhciRegisters->AhciRFis
              );
   }
