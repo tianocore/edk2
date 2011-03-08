@@ -1757,8 +1757,8 @@ HiiGetAltCfg (
 /**
   Compare whether two names of languages are identical.
 
-  @param  Language1              Name of language 1
-  @param  Language2              Name of language 2
+  @param  Language1              Name of language 1 from StringPackage
+  @param  Language2              Name of language 2 to be compared with language 1.
 
   @retval TRUE                   same
   @retval FALSE                  not same

@@ -1954,8 +1954,8 @@ HiiGetSecondaryLanguages (
 /**
   Compare whether two names of languages are identical.
 
-  @param  Language1              Name of language 1
-  @param  Language2              Name of language 2
+  @param  Language1              Name of language 1 from StringPackage
+  @param  Language2              Name of language 2 to be compared with language 1.
 
   @retval TRUE                   same
   @retval FALSE                  not same
@@ -1969,6 +1969,22 @@ HiiCompareLanguage (
 {
   UINTN Language2Len;
 
+  //
+  // When languages are exactly same, they will be identical. 
+  //
   Language2Len = AsciiStrLen (Language2);
-  return  (BOOLEAN) (AsciiStrnCmp (Language1, Language2, Language2Len) == 0);
+  if (AsciiStrnCmp (Language2, Language1, Language2Len) == 0) {
+    return TRUE;
+  }
+  
+  //
+  // When Language1 is the sub tag of Language2, they will also be regarded as identical.
+  // This is added to support current Shell. Shell string package uses "en" as language name. 
+  // But, it may use platform language "en-US" to get string value.
+  //
+  if (AsciiStrStr (Language2, Language1) == Language2) {
+    return TRUE;
+  }
+  
+  return FALSE;
 }
