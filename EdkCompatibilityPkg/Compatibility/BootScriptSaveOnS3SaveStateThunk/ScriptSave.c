@@ -2,7 +2,7 @@
   Implementation for S3 Boot Script Save thunk driver.
   This thunk driver consumes PI S3SaveState protocol to produce framework S3BootScriptSave Protocol 
   
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -803,6 +803,7 @@ InitializeScriptSaveOnS3SaveState (
   VOID                                          *DevicePath;
   EFI_PHYSICAL_ADDRESS                          MemoryAddress;
   UINTN                                         PageNumber;
+  EFI_HANDLE                                    NewImageHandle;
 
   //
   // Test if the gEfiCallerIdGuid of this image is already installed. if not, the entry
@@ -817,11 +818,12 @@ InitializeScriptSaveOnS3SaveState (
     //
     // A workarouond: Here we install a dummy handle
     //
+    NewImageHandle = NULL;
     Status = gBS->InstallProtocolInterface (
-                    &ImageHandle,
+                    &NewImageHandle,
                     &gEfiCallerIdGuid,
                     EFI_NATIVE_INTERFACE,
-                    DevicePath
+                    NULL
                     );
 
     Status = GetSectionFromAnyFv  (
@@ -881,7 +883,7 @@ InitializeScriptSaveOnS3SaveState (
     // Flush the instruction cache so the image data is written before we execute it
     //
     InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
-    Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)(ImageContext.EntryPoint)) ((EFI_HANDLE)(UINTN)(ImageContext.ImageAddress), SystemTable);
+    Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)(ImageContext.EntryPoint)) (NewImageHandle, SystemTable);
     if (EFI_ERROR (Status)) {
       gBS->FreePages (MemoryAddress, PageNumber);
       return Status;
