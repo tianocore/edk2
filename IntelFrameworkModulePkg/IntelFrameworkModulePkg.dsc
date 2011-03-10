@@ -3,7 +3,7 @@
 #
 # This file is used to build all modules in IntelFrameworkModulePkg.
 #
-#Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 #This program and the accompanying materials are licensed and made available under 
 #the terms and conditions of the BSD License that accompanies this distribution.  
 #The full text of the license may be found at
@@ -40,6 +40,7 @@
 
 [LibraryClasses]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf  
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
