@@ -4,7 +4,7 @@
   * performance protocol interfaces.
   * performance variables.  
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -100,6 +100,35 @@ typedef struct {
   UINT32                Reserved;
 } GAUGE_DATA_HEADER;
 
+//
+// SMM Performance Protocol definitions
+//
+
+#define SMM_PERFORMANCE_PROTOCOL_GUID \
+  { 0xf866226a, 0xeaa5, 0x4f5a, { 0xa9, 0xa, 0x6c, 0xfb, 0xa5, 0x7c, 0x58, 0x8e } }
+
+//
+// SMM_PERFORMANCE_STRING_SIZE.
+//
+#define SMM_PERFORMANCE_STRING_SIZE     32
+#define SMM_PERFORMANCE_STRING_LENGTH   (SMM_PERFORMANCE_STRING_SIZE - 1)
+
+//
+// The default guage entries number for SMM phase.
+//
+#define INIT_SMM_GAUGE_DATA_ENTRIES     200
+
+typedef struct {
+  UINTN             Function;
+  EFI_STATUS        ReturnStatus;
+  UINTN             NumberOfEntries;
+  UINTN             LogEntryKey;
+  GAUGE_DATA_ENTRY  *GaugeData;
+} SMM_PERF_COMMUNICATE;
+
+#define SMM_PERF_FUNCTION_GET_GAUGE_ENTRY_NUMBER          1
+#define SMM_PERF_FUNCTION_GET_GAUGE_DATA                  2
+
 /**
   Adds a record at the end of the performance measurement log
   that records the start time of a performance measurement.
@@ -194,5 +223,6 @@ struct _PERFORMANCE_PROTOCOL {
 };
 
 extern EFI_GUID gPerformanceProtocolGuid;
+extern EFI_GUID gSmmPerformanceProtocolGuid;
 
 #endif

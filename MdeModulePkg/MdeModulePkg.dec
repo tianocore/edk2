@@ -138,6 +138,7 @@
   ## Performance protocol guid that also acts as the performance HOB guid and performance variable GUID
   #  Include/Guid/Performance.h
   gPerformanceProtocolGuid       = { 0x76B6BDFA, 0x2ACD, 0x4462, { 0x9E, 0x3F, 0xCB, 0x58, 0xC9, 0x69, 0xD9, 0x37 }}
+  gSmmPerformanceProtocolGuid    = { 0xf866226a, 0xeaa5, 0x4f5a, { 0xa9, 0xa, 0x6c, 0xfb, 0xa5, 0x7c, 0x58, 0x8e } }
 
   ## Guid is defined for CRC32 encapsulation scheme.
   #  Include/Guid/Crc32GuidedSectionExtraction.h

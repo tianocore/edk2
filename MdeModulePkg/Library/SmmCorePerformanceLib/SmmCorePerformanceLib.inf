@@ -1,0 +1,67 @@
+## @file
+#  Performance library instance used by SMM Core.
+#  
+#  This library provides the performance measurement interfaces and initializes performance
+#  logging for the SMM phase. 
+#  It initializes SMM phase performance logging by publishing the Performance Protocol,
+#  which is consumed by SmmPerformanceLib to logging performance data in SMM phase.
+#  This library is mainly used by SMM Core to start performance logging to ensure that
+#  SMM Performance Protocol is installed at the very beginning of SMM phase.
+#  
+#  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmCorePerformanceLib
+  FILE_GUID                      = 36290D10-0F47-42c1-BBCE-E191C7928DCF
+  MODULE_TYPE                    = SMM_CORE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  LIBRARY_CLASS                  = PerformanceLib|SMM_CORE
+
+  CONSTRUCTOR                    = SmmCorePerformanceLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmCorePerformanceLib.c
+  SmmCorePerformanceLibInternal.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  PcdLib
+  TimerLib
+  BaseMemoryLib
+  BaseLib
+  DebugLib
+  SynchronizationLib
+
+[Protocols]
+  gEfiSmmBase2ProtocolGuid                  ## CONSUMES
+  gEfiSmmAccess2ProtocolGuid                ## CONSUMES
+
+[Guids]
+  gSmmPerformanceProtocolGuid               ## PRODUCES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask

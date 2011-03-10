@@ -1,7 +1,7 @@
 ## @file
 # EFI/PI Reference Module Package for All Architectures
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -297,3 +297,7 @@
   MdeModulePkg/Library/SmmReportStatusCodeLib/SmmReportStatusCodeLib.inf
   MdeModulePkg/Universal/StatusCodeHandler/Smm/StatusCodeHandlerSmm.inf
   MdeModulePkg/Universal/ReportStatusCodeRouter/Smm/ReportStatusCodeRouterSmm.inf
+  MdeModulePkg/Library/SmmCorePerformanceLib/SmmCorePerformanceLib.inf
+  MdeModulePkg/Library/SmmPerformanceLib/SmmPerformanceLib.inf
+  MdeModulePkg/Library/DxeSmmPerformanceLib/DxeSmmPerformanceLib.inf
+
