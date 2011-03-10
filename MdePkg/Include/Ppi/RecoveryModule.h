@@ -8,7 +8,7 @@
        entities exist.
     -# If no capsules exist, then performing appropriate error handling.
     -# Allocating a buffer of MaxRecoveryCapsuleSize as determined by
-       EFI_PEI_DEVICE_RECOVERY_MODULE_PPI.GetNumberRecoveryCapsules() or
+       EFI_PEI_DEVICE_RECOVERY_MODULE_PPI.GetRecoveryCapsuleInfo() or
        larger.
     -# Determining the policy in which DXE recovery capsules are loaded.
     -# Calling the driver recovery PPI EFI_PEI_DEVICE_RECOVERY_MODULE_PPI.
@@ -31,7 +31,7 @@
        generated from the capsule decomposition.
     -# Returning to the PEI Dispatcher.  
   
-  Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -41,7 +41,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
-  This PPI is defined in UEFI Platform Initialization Specification 1.2 Volume 1: 
+  This PPI is defined in UEFI Platform Initialization Specification 1.2 Errata B Volume 1: 
   Pre-EFI Initalization Core Interface
 
 **/
