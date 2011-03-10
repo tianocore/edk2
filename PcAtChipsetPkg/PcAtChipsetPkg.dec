@@ -4,7 +4,7 @@
 # This package is designed to public interfaces and implementation which follows
 # PcAt defacto standard.
 #
-# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -44,7 +44,26 @@
   
   ## Pcd8259LegacyModeEdgeLevel defines the default edge level for legacy mode's interrrupt controller.
   gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0000|UINT16|0x00000002
-  
+
+[PcdsFixedAtBuild, PcdsDynamic, PcdsPatchableInModule]
+  ## This PCD specifies whether we need enable IsaAcpiCom1 device.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiCom1Enable|TRUE|BOOLEAN|0x00000003
+
+  ## This PCD specifies whether we need enable IsaAcpiCom2 device.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiCom2Enable|TRUE|BOOLEAN|0x00000004
+
+  ## This PCD specifies whether we need enable IsaAcpiPs2Keyboard device.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiPs2KeyboardEnable|TRUE|BOOLEAN|0x00000005
+
+  ## This PCD specifies whether we need enable IsaAcpiPs2Mouse device.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiPs2MouseEnable|TRUE|BOOLEAN|0x00000006
+
+  ## This PCD specifies whether we need enable IsaAcpiFloppyA device.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiFloppyAEnable|TRUE|BOOLEAN|0x00000007
+
+  ## This PCD specifies whether we need enable IsaAcpiFloppyB device.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiFloppyBEnable|TRUE|BOOLEAN|0x00000008
+
 [Guids]
   gPcAtChipsetPkgTokenSpaceGuid = { 0x326ae723, 0xae32, 0x4589, { 0x98, 0xb8, 0xca, 0xc2, 0x3c, 0xdc, 0xc1, 0xb1 } }
 

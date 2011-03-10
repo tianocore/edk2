@@ -1,7 +1,7 @@
 /** @file
   ISA ACPI Protocol Implementation
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // COM 1 UART Controller
 //
+GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiCom1DeviceResources[] = {
   {EfiIsaAcpiResourceIo,        0, 0x3f8, 0x3ff},
   {EfiIsaAcpiResourceInterrupt, 0, 4,     0},
@@ -29,6 +30,7 @@ EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiCom1DeviceResources[] = {
 //
 // COM 2 UART Controller
 //
+GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiCom2DeviceResources[] = {
   {EfiIsaAcpiResourceIo,        0, 0x2f8, 0x2ff},
   {EfiIsaAcpiResourceInterrupt, 0, 3,     0},
@@ -38,6 +40,7 @@ EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiCom2DeviceResources[] = {
 //
 // PS/2 Keyboard Controller
 //
+GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_ISA_ACPI_RESOURCE  mPcatIsaAcpiPs2KeyboardDeviceResources[] = {
   {EfiIsaAcpiResourceIo,        0, 0x60, 0x64},
   {EfiIsaAcpiResourceInterrupt, 0, 1,     0},
@@ -47,6 +50,7 @@ EFI_ISA_ACPI_RESOURCE  mPcatIsaAcpiPs2KeyboardDeviceResources[] = {
 //
 // PS/2 Mouse Controller
 //
+GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_ISA_ACPI_RESOURCE  mPcatIsaAcpiPs2MouseDeviceResources[] = {
   {EfiIsaAcpiResourceIo,        0, 0x60, 0x64},
   {EfiIsaAcpiResourceInterrupt, 0, 12,     0},
@@ -56,6 +60,7 @@ EFI_ISA_ACPI_RESOURCE  mPcatIsaAcpiPs2MouseDeviceResources[] = {
 //
 // Floppy Disk Controller
 //
+GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiFloppyResources[] = {
   {EfiIsaAcpiResourceIo,        0, 0x3f0, 0x3f7},
   {EfiIsaAcpiResourceInterrupt, 0, 6,     0},
@@ -63,18 +68,77 @@ EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiFloppyResources[] = {
   {EfiIsaAcpiResourceEndOfList, 0, 0,     0}
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED
+EFI_ISA_ACPI_RESOURCE_LIST mPcatIsaAcpiCom1Device = {
+  {EISA_PNP_ID(0x501), 0}, mPcatIsaAcpiCom1DeviceResources
+}; // COM 1 UART Controller
+
+GLOBAL_REMOVE_IF_UNREFERENCED
+EFI_ISA_ACPI_RESOURCE_LIST mPcatIsaAcpiCom2Device = {
+  {EISA_PNP_ID(0x501), 1}, mPcatIsaAcpiCom2DeviceResources
+}; // COM 2 UART Controller
+
+GLOBAL_REMOVE_IF_UNREFERENCED
+EFI_ISA_ACPI_RESOURCE_LIST mPcatIsaAcpiPs2KeyboardDevice = {
+  {EISA_PNP_ID(0x303), 0}, mPcatIsaAcpiPs2KeyboardDeviceResources
+}; // PS/2 Keyboard Controller
+
+GLOBAL_REMOVE_IF_UNREFERENCED
+EFI_ISA_ACPI_RESOURCE_LIST mPcatIsaAcpiPs2MouseDevice = {
+  {EISA_PNP_ID(0x303), 1}, mPcatIsaAcpiPs2MouseDeviceResources
+}; // PS/2 Mouse Controller
+
+GLOBAL_REMOVE_IF_UNREFERENCED
+EFI_ISA_ACPI_RESOURCE_LIST mPcatIsaAcpiFloppyADevice = {
+  {EISA_PNP_ID(0x604), 0}, mPcatIsaAcpiFloppyResources
+}; // Floppy Disk Controller A:
+
+GLOBAL_REMOVE_IF_UNREFERENCED
+EFI_ISA_ACPI_RESOURCE_LIST mPcatIsaAcpiFloppyBDevice = {
+  {EISA_PNP_ID(0x604), 1}, mPcatIsaAcpiFloppyResources
+}; // Floppy Disk Controller B:
+
 //
 // Table of ISA Controllers
 //
-EFI_ISA_ACPI_RESOURCE_LIST gPcatIsaAcpiDeviceList[] = {
-  {{EISA_PNP_ID(0x501), 0}, mPcatIsaAcpiCom1DeviceResources        }, // COM 1 UART Controller
-  {{EISA_PNP_ID(0x501), 1}, mPcatIsaAcpiCom2DeviceResources        }, // COM 2 UART Controller
-  {{EISA_PNP_ID(0x303), 0}, mPcatIsaAcpiPs2KeyboardDeviceResources }, // PS/2 Keyboard Controller
-  {{EISA_PNP_ID(0x303), 1}, mPcatIsaAcpiPs2MouseDeviceResources    }, // PS/2 Mouse Controller
-  {{EISA_PNP_ID(0x604), 0}, mPcatIsaAcpiFloppyResources            }, // Floppy Disk Controller A:
-  {{EISA_PNP_ID(0x604), 1}, mPcatIsaAcpiFloppyResources            }, // Floppy Disk Controller B:
-  {{0,                  0}, NULL                                   }  // End if ISA Controllers
-};
+EFI_ISA_ACPI_RESOURCE_LIST gPcatIsaAcpiDeviceList[7] = {0};
+
+/**
+  Initialize gPcatIsaAcpiDeviceList.
+**/
+VOID
+InitializePcatIsaAcpiDeviceList (
+  VOID
+  )
+{
+  UINTN  Index;
+
+  Index = 0;
+  if (PcdGetBool (PcdIsaAcpiCom1Enable)) {
+    CopyMem (&gPcatIsaAcpiDeviceList[Index], &mPcatIsaAcpiCom1Device, sizeof(mPcatIsaAcpiCom1Device));
+    Index++;
+  }
+  if (PcdGetBool (PcdIsaAcpiCom2Enable)) {
+    CopyMem (&gPcatIsaAcpiDeviceList[Index], &mPcatIsaAcpiCom2Device, sizeof(mPcatIsaAcpiCom2Device));
+    Index++;
+  }
+  if (PcdGetBool (PcdIsaAcpiPs2KeyboardEnable)) {
+    CopyMem (&gPcatIsaAcpiDeviceList[Index], &mPcatIsaAcpiPs2KeyboardDevice, sizeof(mPcatIsaAcpiPs2KeyboardDevice));
+    Index++;
+  }
+  if (PcdGetBool (PcdIsaAcpiPs2MouseEnable)) {
+    CopyMem (&gPcatIsaAcpiDeviceList[Index], &mPcatIsaAcpiPs2MouseDevice, sizeof(mPcatIsaAcpiPs2MouseDevice));
+    Index++;
+  }
+  if (PcdGetBool (PcdIsaAcpiFloppyAEnable)) {
+    CopyMem (&gPcatIsaAcpiDeviceList[Index], &mPcatIsaAcpiFloppyADevice, sizeof(mPcatIsaAcpiFloppyADevice));
+    Index++;
+  }
+  if (PcdGetBool (PcdIsaAcpiFloppyBEnable)) {
+    CopyMem (&gPcatIsaAcpiDeviceList[Index], &mPcatIsaAcpiFloppyBDevice, sizeof(mPcatIsaAcpiFloppyBDevice));
+    Index++;
+  }
+}
 
 //
 // ISA ACPI Protocol Functions
