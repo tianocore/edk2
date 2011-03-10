@@ -1,7 +1,7 @@
 ## @file
 # UEFI 2.2 Network Module Package for All Architectures
 #
-# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -45,6 +45,7 @@
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf  
 
 [LibraryClasses.common.UEFI_DRIVER]
   DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
