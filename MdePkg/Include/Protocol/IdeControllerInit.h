@@ -13,7 +13,7 @@
   
   A device handle for an IDE controller must contain an EFI_DEVICE_PATH_PROTOCOL.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -297,7 +297,7 @@ EFI_STATUS
   @param[in] Channel   Zero-based channel number.
 
   @retval EFI_SUCCESS             The notification was accepted without any errors.
-  @retval EFI_NOT_SUPPORTED       Phase is not supported.
+  @retval EFI_UNSUPPORTED         Phase is not supported.
   @retval EFI_INVALID_PARAMETER   Channel is invalid (Channel >= ChannelCount).
   @retval EFI_NOT_READY           This phase cannot be entered at this time; for 
                                   example, an attempt was made to enter a Phase 

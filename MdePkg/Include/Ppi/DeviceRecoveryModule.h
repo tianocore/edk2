@@ -10,7 +10,7 @@
   The module determines the internal search order, with capsule number 1 as the highest load
   priority and number N as the lowest priority.
 
-  Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -107,7 +107,7 @@ EFI_STATUS
   This function, by whatever mechanism, retrieves a DXE capsule from some device
   and loads it into memory. Note that the published interface is device neutral.
 
-  @param[in,out] PeiServices       General-purpose services that are available 
+  @param[in]     PeiServices       General-purpose services that are available 
                                    to every PEIM
   @param[in]     This              Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI
                                    instance.
@@ -123,7 +123,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_DEVICE_LOAD_RECOVERY_CAPSULE)(
-  IN OUT EFI_PEI_SERVICES                    **PeiServices,
+  IN     EFI_PEI_SERVICES                    **PeiServices,
   IN     EFI_PEI_DEVICE_RECOVERY_MODULE_PPI  *This,
   IN     UINTN                               CapsuleInstance,
   OUT    VOID                                *Buffer
