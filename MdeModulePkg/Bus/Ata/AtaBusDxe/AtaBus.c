@@ -193,13 +193,16 @@ RegisterAtaDevice (
 
   DevicePath = AppendDevicePathNode (AtaBusDriverData->ParentDevicePath, NewDevicePathNode);
   if (DevicePath == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
   DeviceHandle = NULL;
+  RemainingDevicePath = DevicePath;
   Status = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &RemainingDevicePath, &DeviceHandle);
   if (!EFI_ERROR (Status) && (DeviceHandle != NULL) && IsDevicePathEnd(RemainingDevicePath)) {
     Status = EFI_ALREADY_STARTED;
+    FreePool (DevicePath);
     goto Done;
   }
 
