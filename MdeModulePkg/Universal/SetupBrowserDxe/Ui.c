@@ -342,7 +342,6 @@ RefreshForm (
   FORM_BROWSER_STATEMENT          *Question;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
   EFI_BROWSER_ACTION_REQUEST      ActionRequest;
-  CHAR16                          *PadString;
 
   if (gMenuRefreshHead != NULL) {
 
@@ -354,8 +353,6 @@ RefreshForm (
     mHiiPackageListUpdated = FALSE;
 
     do {
-      gST->ConOut->SetAttribute (gST->ConOut, MenuRefreshEntry->CurrentAttribute);
-
       Selection = MenuRefreshEntry->Selection;
       Question = MenuRefreshEntry->MenuOption->ThisTag;
 
@@ -374,11 +371,22 @@ RefreshForm (
         for (Index = 0; OptionString[Index] == L' '; Index++)
           ;
 
-        PadString = AllocatePool (gOptionBlockWidth * sizeof (CHAR16));
-        SetMem16 (PadString, (gOptionBlockWidth - 1) * sizeof (CHAR16), CHAR_SPACE);
-        PadString[gOptionBlockWidth - 1] = 0;
-        PrintStringAt (MenuRefreshEntry->CurrentColumn, MenuRefreshEntry->CurrentRow, PadString);
-        FreePool (PadString);
+        //
+        // If old Text is longer than new string, need to clean the old string before paint the newer.
+        // This option is no need for time/date opcode, because time/data opcode has fixed string length.
+        //
+        if ((MenuRefreshEntry->MenuOption->ThisTag->Operand != EFI_IFR_DATE_OP) &&
+          (MenuRefreshEntry->MenuOption->ThisTag->Operand != EFI_IFR_TIME_OP)) {
+          ClearLines (
+            MenuRefreshEntry->CurrentColumn, 
+            MenuRefreshEntry->CurrentColumn + gOptionBlockWidth - 1,
+            MenuRefreshEntry->CurrentRow,
+            MenuRefreshEntry->CurrentRow,
+            PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND
+            );
+        }
+
+        gST->ConOut->SetAttribute (gST->ConOut, MenuRefreshEntry->CurrentAttribute);
         PrintStringAt (MenuRefreshEntry->CurrentColumn, MenuRefreshEntry->CurrentRow, &OptionString[Index]);
         FreePool (OptionString);
       }
