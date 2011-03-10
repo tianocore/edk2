@@ -1,8 +1,8 @@
 ## @file
-#  Instance of Debug Library based on Serial Port Library.
-#  It uses Print Library to produce formatted output strings.
+#  Debug Print Error Level library instance that retrieves the current error 
+#  level from PcdDebugPrintErrorLevel.  
 #
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -11,37 +11,28 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#
 ##
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = BaseDebugLibSerialPort
-  FILE_GUID                      = BB83F95F-EDBC-4884-A520-CD42AF388FAE
+  BASE_NAME                      = BaseDebugPrintErrorLevelLib
+  FILE_GUID                      = A2C09E18-E4D2-407e-AFCC-628B79113F72
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DebugLib 
-  CONSTRUCTOR                    = BaseDebugLibSerialPortConstructor
+  LIBRARY_CLASS                  = DebugPrintErrorLevelLib
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
 [Sources]
-  DebugLib.c
+  BaseDebugPrintErrorLevelLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
-  SerialPortLib
-  BaseMemoryLib
   PcdLib
-  PrintLib
-  BaseLib
-  DebugPrintErrorLevelLib
-
+  
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
-
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel

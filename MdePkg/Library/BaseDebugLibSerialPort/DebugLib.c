@@ -7,7 +7,7 @@
   being blocked.  This may occur if a key(s) are pressed in a terminal emulator
   used to monitor the DEBUG() and ASSERT() messages. 
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -25,6 +25,7 @@
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/DebugPrintErrorLevelLib.h>
 
 //
 // Define the maximum debug and assert message length that this library supports 
@@ -49,9 +50,9 @@ BaseDebugLibSerialPortConstructor (
 /**
   Prints a debug message to the debug output device if the specified error level is enabled.
 
-  If any bit in ErrorLevel is also set in PcdDebugPrintErrorLevel, then print 
-  the message specified by Format and the associated variable argument list to 
-  the debug output device.
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function 
+  GetDebugPrintErrorLevel (), then print the message specified by Format and the 
+  associated variable argument list to the debug output device.
 
   If Format is NULL, then ASSERT().
 
@@ -80,7 +81,7 @@ DebugPrint (
   //
   // Check driver debug mask value and global mask
   //
-  if ((ErrorLevel & PcdGet32 (PcdDebugPrintErrorLevel)) == 0) {
+  if ((ErrorLevel & GetDebugPrintErrorLevel ()) == 0) {
     return;
   }
 

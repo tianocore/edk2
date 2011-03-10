@@ -77,9 +77,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Prints a debug message to the debug output device if the specified error level is enabled.
 
-  If any bit in ErrorLevel is also set in PcdDebugPrintErrorLevel, then print 
-  the message specified by Format and the associated variable argument list to 
-  the debug output device.
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function 
+  GetDebugPrintErrorLevel (), then print the message specified by Format and the 
+  associated variable argument list to the debug output device.
 
   If Format is NULL, then ASSERT().
 
