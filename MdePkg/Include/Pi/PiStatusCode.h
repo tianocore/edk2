@@ -1,7 +1,7 @@
 /** @file
   StatusCode related definitions in PI.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -564,9 +564,9 @@ typedef struct {
 /// IO Bus Class PCI Subclass Progress Code definitions.
 ///
 ///@{
-#define EFI_IOB_PCI_PC_BUS_ENUM   (EFI_SUBCLASS_SPECIFIC | 0x00000000)
-#define EFI_IOB_PCI_PC_RES_ALLOC  (EFI_SUBCLASS_SPECIFIC | 0x00000001)
-#define EFI_IOB_PCI_PC_HPC_INIT   (EFI_SUBCLASS_SPECIFIC | 0x00000002)
+#define EFI_IOB_PCI_BUS_ENUM   (EFI_SUBCLASS_SPECIFIC | 0x00000000)
+#define EFI_IOB_PCI_RES_ALLOC  (EFI_SUBCLASS_SPECIFIC | 0x00000001)
+#define EFI_IOB_PCI_HPC_INIT   (EFI_SUBCLASS_SPECIFIC | 0x00000002)
 ///@}
 
 //
