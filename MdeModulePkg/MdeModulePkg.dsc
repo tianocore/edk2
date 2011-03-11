@@ -225,6 +225,7 @@
   MdeModulePkg/Library/RuntimeDxeReportStatusCodeLib/RuntimeDxeReportStatusCodeLib.inf
   MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
   MdeModulePkg/Library/BasePlatformHookLibNull/BasePlatformHookLibNull.inf
+  MdeModulePkg/Library/DxeDebugPrintErrorLevelLib/DxeDebugPrintErrorLevelLib.inf
 
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
