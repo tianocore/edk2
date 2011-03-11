@@ -537,7 +537,7 @@ PciHostBridgeResourceAllocator (
   //
   REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
         EFI_PROGRESS_CODE,
-        EFI_IO_BUS_PCI | EFI_IOB_PCI_PC_RES_ALLOC,
+        EFI_IO_BUS_PCI | EFI_IOB_PCI_RES_ALLOC,
         (VOID *) &HandleExtendedData,
         sizeof (HandleExtendedData)
         );
@@ -1036,7 +1036,7 @@ PciRootBridgeP2CProcess (
         //
         REPORT_STATUS_CODE_WITH_DEVICE_PATH (
           EFI_PROGRESS_CODE,
-          EFI_IO_BUS_PCI | EFI_IOB_PCI_PC_HPC_INIT,
+          EFI_IO_BUS_PCI | EFI_IOB_PCI_HPC_INIT,
           Temp->DevicePath
           );
 
