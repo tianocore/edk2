@@ -3,7 +3,7 @@
 #
 #  This PEIM produces of the CPU I/O PPI.
 #
-# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,7 @@
   BASE_NAME                      = CpuIoPei
   FILE_GUID                      = AE265864-CF5D-41a8-913D-71C155E76442
   MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0  
   ENTRY_POINT                    = CpuIoInitialize
 
 #
