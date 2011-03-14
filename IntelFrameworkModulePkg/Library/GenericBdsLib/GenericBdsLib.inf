@@ -107,7 +107,7 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL CONSUMES
   gEfiAcpiS3SaveProtocolGuid                    # PROTOCOL CONSUMES
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL SOMETIMES_CONSUMES
-  gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport # PROTOCOL SOMETIMES_CONSUMES
+  gEfiUgaDrawProtocolGuid |gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport # PROTOCOL SOMETIMES_CONSUMES
   gEfiOEMBadgingProtocolGuid                    # PROTOCOL CONSUMES
   gEfiHiiFontProtocolGuid                       # PROTOCOL CONSUMES
   gEfiUserManagerProtocolGuid                   # PROTOCOL CONSUMES
