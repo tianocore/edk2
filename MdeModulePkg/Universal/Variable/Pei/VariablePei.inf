@@ -56,7 +56,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64  ## CONSUMES
 
 [Depex]
-  gEfiPeiMasterBootModePpiGuid
+  TRUE
 
 #
 #  [BootMode]

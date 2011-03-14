@@ -32,19 +32,34 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
   &mVariablePpi
 };
 
-EFI_PEI_READ_ONLY_VARIABLE2_PPI mVariablePpiRecovery = {
-  PeiGetVariableRecovery,
-  PeiGetNextVariableNameRecovery
-};
-
-EFI_PEI_PPI_DESCRIPTOR     mPpiListVariableRecovery = {
-  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-  &gEfiPeiReadOnlyVariable2PpiGuid,
-  &mVariablePpiRecovery
-};
-
 EFI_GUID mEfiVariableIndexTableGuid = EFI_VARIABLE_INDEX_TABLE_GUID;
 
+
+/**
+  Check if it runs in Recovery mode.
+  
+  @param  PeiServices  General purpose services available to every PEIM.
+
+  @retval TRUE         It's in Recovery mode.
+  @retval FALSE        It's not in Recovery mode.
+
+**/
+BOOLEAN
+IsInRecoveryMode (
+  IN CONST EFI_PEI_SERVICES          **PeiServices
+  )
+{
+  EFI_STATUS              Status;
+  EFI_BOOT_MODE           BootMode;
+
+  Status = (*PeiServices)->GetBootMode (PeiServices, &BootMode);
+  ASSERT_EFI_ERROR (Status);
+  
+  if (BootMode == BOOT_IN_RECOVERY_MODE) {
+    return TRUE;
+  }
+  return FALSE;
+}
 
 /**
   Provide the functionality of the variable services.
@@ -64,24 +79,7 @@ PeimInitializeVariableServices (
   IN CONST EFI_PEI_SERVICES          **PeiServices
   )
 {
-  EFI_BOOT_MODE BootMode;
-  EFI_STATUS    Status;
-
-  //
-  // Check if this is recovery boot path.
-  // If no, provide other modules the access capability to variable area in NV storage.
-  // If yes, the content of variable area is not reliable. Therefore,
-  // we provide a dummy ReadOnlyVariable2Ppi interface to other pei modules.
-  // 
-  Status = (*PeiServices)->GetBootMode (PeiServices, &BootMode);
-  ASSERT_EFI_ERROR (Status);
-  
-  if (BootMode == BOOT_IN_RECOVERY_MODE) {
-    return PeiServicesInstallPpi (&mPpiListVariableRecovery);
-  }
-
   return PeiServicesInstallPpi (&mPpiListVariable);
-
 }
 
 /**
@@ -563,6 +561,16 @@ PeiGetVariable (
   if (VariableName == NULL || VariableGuid == NULL || DataSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  //
+  // Check if this is recovery boot path.
+  // If yes, the content of variable area is not reliable. Therefore we directly
+  // return EFI_NOT_FOUND. 
+  // 
+  if (IsInRecoveryMode(PeiServices)) {
+    return EFI_NOT_FOUND;
+  }
+
   //
   // Find existing variable
   //
@@ -641,6 +649,15 @@ PeiGetNextVariableName (
     return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // Check if this is recovery boot path.
+  // If yes, the content of variable area is not reliable. Therefore we directly
+  // return EFI_NOT_FOUND. 
+  //   
+  if (IsInRecoveryMode(PeiServices)) {
+    return EFI_NOT_FOUND;
+  }
+
   Status = FindVariable (PeiServices, VariableName, VariableGuid, &Variable);
   if (Variable.CurrPtr == NULL || Status != EFI_SUCCESS) {
     return Status;
@@ -682,86 +699,5 @@ PeiGetNextVariableName (
     }
   }
 
-  return EFI_NOT_FOUND;
-}
-
-/**
-  This service retrieves a variable's value using its name and GUID.
-
-  Read the specified variable from the UEFI variable store. If the Data 
-  buffer is too small to hold the contents of the variable, the error
-  EFI_BUFFER_TOO_SMALL is returned and DataSize is set to the required buffer
-  size to obtain the data.
-
-  @param  This                  A pointer to this instance of the EFI_PEI_READ_ONLY_VARIABLE2_PPI.
-  @param  VariableName          A pointer to a null-terminated string that is the variable's name.
-  @param  VariableGuid          A pointer to an EFI_GUID that is the variable's GUID. The combination of
-                                VariableGuid and VariableName must be unique.
-  @param  Attributes            If non-NULL, on return, points to the variable's attributes.
-  @param  DataSize              On entry, points to the size in bytes of the Data buffer.
-                                On return, points to the size of the data returned in Data.
-  @param  Data                  Points to the buffer which will hold the returned variable value.
-
-  @retval EFI_SUCCESS           The variable was read successfully.
-  @retval EFI_NOT_FOUND         The variable could not be found.
-  @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the resulting data. 
-                                DataSize is updated with the size required for 
-                                the specified variable.
-  @retval EFI_INVALID_PARAMETER VariableName, VariableGuid, DataSize or Data is NULL.
-  @retval EFI_DEVICE_ERROR      The variable could not be retrieved because of a device error.
-
-**/
-EFI_STATUS
-EFIAPI
-PeiGetVariableRecovery (
-  IN CONST  EFI_PEI_READ_ONLY_VARIABLE2_PPI *This,
-  IN CONST  CHAR16                          *VariableName,
-  IN CONST  EFI_GUID                        *VariableGuid,
-  OUT       UINT32                          *Attributes,
-  IN OUT    UINTN                           *DataSize,
-  OUT       VOID                            *Data
-  )
-{
-  return EFI_NOT_FOUND;
-}
-
-/**
-  Return the next variable name and GUID.
-
-  This function is called multiple times to retrieve the VariableName 
-  and VariableGuid of all variables currently available in the system. 
-  On each call, the previous results are passed into the interface, 
-  and, on return, the interface returns the data for the next 
-  interface. When the entire variable list has been returned, 
-  EFI_NOT_FOUND is returned.
-
-  @param  This              A pointer to this instance of the EFI_PEI_READ_ONLY_VARIABLE2_PPI.
-
-  @param  VariableNameSize  On entry, points to the size of the buffer pointed to by VariableName.
-  @param  VariableName      On entry, a pointer to a null-terminated string that is the variable's name.
-                            On return, points to the next variable's null-terminated name string.
-
-  @param  VariableGuid      On entry, a pointer to an UEFI _GUID that is the variable's GUID. 
-                            On return, a pointer to the next variable's GUID.
-
-  @retval EFI_SUCCESS           The variable was read successfully.
-  @retval EFI_NOT_FOUND         The variable could not be found.
-  @retval EFI_BUFFER_TOO_SMALL  The VariableNameSize is too small for the resulting
-                                data. VariableNameSize is updated with the size
-                                required for the specified variable.
-  @retval EFI_INVALID_PARAMETER VariableName, VariableGuid or
-                                VariableNameSize is NULL.
-  @retval EFI_DEVICE_ERROR      The variable could not be retrieved because of a device error.
-
-**/
-EFI_STATUS
-EFIAPI
-PeiGetNextVariableNameRecovery (
-  IN CONST  EFI_PEI_READ_ONLY_VARIABLE2_PPI *This,
-  IN OUT UINTN                              *VariableNameSize,
-  IN OUT CHAR16                             *VariableName,
-  IN OUT EFI_GUID                           *VariableGuid
-  )
-{
   return EFI_NOT_FOUND;
 }
