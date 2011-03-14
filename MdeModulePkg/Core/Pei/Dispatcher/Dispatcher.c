@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core dispatch services
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -635,7 +635,7 @@ PeiDispatcher (
   UINTN                               SaveCurrentFvCount;
   EFI_PEI_FILE_HANDLE                 SaveCurrentFileHandle;
   PEIM_FILE_HANDLE_EXTENDED_DATA      ExtendedData;
-  TEMPORARY_RAM_SUPPORT_PPI           *TemporaryRamSupportPpi;
+  EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   *TemporaryRamSupportPpi;
   UINT64                              NewStackSize;
   EFI_PHYSICAL_ADDRESS                TopOfNewStack;
   EFI_PHYSICAL_ADDRESS                TopOfOldStack;

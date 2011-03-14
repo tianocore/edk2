@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -54,14 +54,14 @@ PEI_UNIX_AUTOSCAN_PPI                     mSecUnixAutoScanPpi        = { GasketS
 PEI_UNIX_THUNK_PPI                        mSecUnixThunkPpi           = { GasketSecUnixUnixThunkAddress };
 EFI_PEI_PROGRESS_CODE_PPI                 mSecStatusCodePpi          = { GasketSecPeiReportStatusCode };
 UNIX_FWH_PPI                              mSecFwhInformationPpi      = { GasketSecUnixFdAddress };
-TEMPORARY_RAM_SUPPORT_PPI                 mSecTemporaryRamSupportPpi = { GasketSecTemporaryRamSupport };
+EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI         mSecTemporaryRamSupportPpi = { GasketSecTemporaryRamSupport };
 #else
 UNIX_PEI_LOAD_FILE_PPI                    mSecUnixLoadFilePpi        = { SecUnixPeiLoadFile };
 PEI_UNIX_AUTOSCAN_PPI                     mSecUnixAutoScanPpi        = { SecUnixPeiAutoScan };
 PEI_UNIX_THUNK_PPI                        mSecUnixThunkPpi           = { SecUnixUnixThunkAddress };
 EFI_PEI_PROGRESS_CODE_PPI                 mSecStatusCodePpi          = { SecPeiReportStatusCode };
 UNIX_FWH_PPI                              mSecFwhInformationPpi      = { SecUnixFdAddress };
-TEMPORARY_RAM_SUPPORT_PPI                 mSecTemporaryRamSupportPpi = { SecTemporaryRamSupport };
+EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI         mSecTemporaryRamSupportPpi = { SecTemporaryRamSupport };
 #endif
 
 EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {

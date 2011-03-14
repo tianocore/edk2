@@ -1,7 +1,7 @@
 /** @file
   Main SEC phase code.  Transitions to PEI.
 
-  Copyright (c) 2008 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -56,7 +56,7 @@ TemporaryRamMigration (
 //
 //
 //  
-TEMPORARY_RAM_SUPPORT_PPI mTemporaryRamSupportPpi = {
+EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI mTemporaryRamSupportPpi = {
   TemporaryRamMigration
 };
 
