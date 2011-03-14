@@ -54,7 +54,7 @@
   gEfiSystemNvDataFvGuid                        ## CONSUMES ## FV Signature of Working Space Header
 
 [Protocols]
-  gEfiSmmSwapAddressRangeProtocolGuid     | PcdFullFtwServiceEnable          ## CONSUMES
+  gEfiSmmSwapAddressRangeProtocolGuid     | gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable          ## CONSUMES
   gEfiSmmFirmwareVolumeBlockProtocolGuid           ## CONSUMES
   gEfiSmmFaultTolerantWriteProtocolGuid            ## PRODUCES
 

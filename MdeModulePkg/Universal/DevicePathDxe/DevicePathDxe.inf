@@ -33,8 +33,8 @@
 
 [Sources]
   DevicePathUtilities.c
-  DevicePathToText.c   ||||PcdDevicePathSupportDevicePathToText
-  DevicePathFromText.c ||||PcdDevicePathSupportDevicePathFromText
+  DevicePathToText.c   ||||gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText
+  DevicePathFromText.c ||||gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText
   DevicePath.h
   DevicePath.c
 
@@ -54,18 +54,18 @@
   DebugLib
 
 [Guids]
-  gEfiVTUTF8Guid         | PcdDevicePathSupportDevicePathFromText OR PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
-  gEfiVT100Guid          | PcdDevicePathSupportDevicePathFromText OR PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
-  gEfiVT100PlusGuid      | PcdDevicePathSupportDevicePathFromText OR PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
-  gEfiPcAnsiGuid         | PcdDevicePathSupportDevicePathFromText OR PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
-  gEfiUartDevicePathGuid | PcdDevicePathSupportDevicePathFromText OR PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
-  gEfiSasDevicePathGuid  | PcdDevicePathSupportDevicePathFromText OR PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
+  gEfiVTUTF8Guid         | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText OR gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
+  gEfiVT100Guid          | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText OR gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
+  gEfiVT100PlusGuid      | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText OR gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
+  gEfiPcAnsiGuid         | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText OR gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
+  gEfiUartDevicePathGuid | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText OR gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
+  gEfiSasDevicePathGuid  | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText OR gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
   
 [Protocols]
-  gEfiDevicePathToTextProtocolGuid   | PcdDevicePathSupportDevicePathFromText ## PRODUCES
-  gEfiDevicePathFromTextProtocolGuid | PcdDevicePathSupportDevicePathToText ## PRODUCES
+  gEfiDevicePathToTextProtocolGuid   | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText ## PRODUCES
+  gEfiDevicePathFromTextProtocolGuid | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText ## PRODUCES
   gEfiDevicePathUtilitiesProtocolGuid ## PRODUCES
-  gEfiDebugPortProtocolGuid          | PcdDevicePathSupportDevicePathFromText OR PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
+  gEfiDebugPortProtocolGuid          | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText OR gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText
