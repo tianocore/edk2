@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  Dxe Timer Library which uses the Time Stamp Counter in the processor.
 #
 #  A version of the Timer Library using the processor's TSC.
@@ -16,7 +16,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
