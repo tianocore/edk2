@@ -7,7 +7,7 @@
 #  EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers, 
 #  and print messages on the console output and standard error devices.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -67,13 +67,13 @@
   gEfiSimpleTextOutProtocolGuid                   ## CONSUMES
   gEfiGraphicsOutputProtocolGuid                  ## CONSUMES
   gEfiHiiFontProtocolGuid                         ## CONSUMES
-  gEfiUgaDrawProtocolGuid | PcdUgaConsumeSupport                 ## SOMETIMES_CONSUMES (Consumes if gEfiGraphicsOutputProtocolGuid uninstalled)
-  gEfiComponentNameProtocolGuid  | NOT PcdComponentNameDisable   ## SOMETIMES_PRODUCES (User chooses to produce it)
-  gEfiComponentName2ProtocolGuid | NOT PcdComponentName2Disable  ## SOMETIMES_PRODUCES (User chooses to produce it)
+  gEfiUgaDrawProtocolGuid | gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport                 ## SOMETIMES_CONSUMES (Consumes if gEfiGraphicsOutputProtocolGuid uninstalled)
+  gEfiComponentNameProtocolGuid  | NOT gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable   ## SOMETIMES_PRODUCES (User chooses to produce it)
+  gEfiComponentName2ProtocolGuid | NOT gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable  ## SOMETIMES_PRODUCES (User chooses to produce it)
   gEfiDriverConfigurationProtocolGuid                            ## SOMETIMES_CONSUMES (User chooses to produce it)
   gEfiDriverConfiguration2ProtocolGuid                           ## SOMETIMES_CONSUMES (User chooses to produce it)
-  gEfiDriverDiagnosticsProtocolGuid | NOT PcdDriverDiagnosticsDisable  ## SOMETIMES_CONSUMES (User chooses to produce it)
-  gEfiDriverDiagnostics2ProtocolGuid| NOT PcdDriverDiagnostics2Disable ## SOMETIMES_CONSUMES (User chooses to produce it)
+  gEfiDriverDiagnosticsProtocolGuid | NOT gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable  ## SOMETIMES_CONSUMES (User chooses to produce it)
+  gEfiDriverDiagnostics2ProtocolGuid| NOT gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable ## SOMETIMES_CONSUMES (User chooses to produce it)
 
 
 [Pcd]
