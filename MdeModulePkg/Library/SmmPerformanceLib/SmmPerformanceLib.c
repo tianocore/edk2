@@ -266,6 +266,7 @@ GetPerformanceMeasurement (
   *StartTimeStamp = GaugeData->StartTimeStamp;
   *EndTimeStamp   = GaugeData->EndTimeStamp;
 
+  return LogEntryKey;
 }
 
 /**
