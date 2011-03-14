@@ -1,7 +1,7 @@
 ## @file
 #  Framework SMM Status Code Protocol on PI SMM Status Code Protocol Thunk driver.
 #
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
   FILE_GUID                      = 88B49226-A63F-4505-9D3C-B5A67B846133
   MODULE_TYPE                    = DXE_SMM_DRIVER
   PI_SPECIFICATION_VERSION       = 0x0001000A
+  VERSION_STRING                 = 1.0  
   ENTRY_POINT                    = SmmStatusCodeThunkMain
 
 #
