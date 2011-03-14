@@ -2,7 +2,7 @@
 # Intel Framework Package Reference Implementations
 #
 # This package provides definitions and libraries that comply to Intel Framework Specifications.
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials are licensed and made available
 #    under the terms and conditions of the BSD License which accompanies this distribution.
@@ -50,7 +50,7 @@
   gEfiFirmwareFileSystemGuid     = { 0x7A9354D9, 0x0468, 0x444a, {0x81, 0xCE, 0x0B, 0xF6, 0x17, 0xD8, 0x90, 0xDF }}
 
   ## Include/Guid/BlockIo.h
-  gEfiPeiIdeBlockIoPpiGuid       = { 0x0964e5b22, 0x6459, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b }}
+  gEfiPeiIdeBlockIoPpiGuid       = { 0x964e5b22, 0x6459, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b }}
 
   ## Include/Guid/BlockIo.h
   gEfiPei144FloppyBlockIoPpiGuid = { 0xda6855bd, 0x07b7, 0x4c05, { 0x9e, 0xd8, 0xe2, 0x59, 0xfd, 0x36, 0x0e, 0x22 }}
