@@ -72,7 +72,7 @@
 
   ##  @libraryclass    Provides a set of interfaces to abstract the policy of security measurement.
   #
-  SecurityManagementLib|MdeModulePkg/Include/Library/SecurityManagementLib.h
+  SecurityManagementLib|Include/Library/SecurityManagementLib.h
 
   ##  @libraryclass  OEM status code libary is used to report status code to OEM device.
   #
