@@ -11,6 +11,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
+#ifndef _DEBUG_PRINT_ERROR_LEVEL_LIB_H_
+#define _DEBUG_PRINT_ERROR_LEVEL_LIB_H_
 
 /**
   Returns the debug print error level mask for the current module.
@@ -26,9 +28,11 @@ GetDebugPrintErrorLevel (
 
 /**
   Sets the global debug print error level mask fpr the entire platform.
-
-  @retval  TRUE   The debug print error level mask was sucessfully set.
-  @retval  FALSE  The debug print error level mask could not be set.
+  
+  @param   ErrorLevel     Global debug print error level
+  
+  @retval  TRUE           The debug print error level mask was sucessfully set.
+  @retval  FALSE          The debug print error level mask could not be set.
 
 **/
 BOOLEAN
@@ -36,3 +40,4 @@ EFIAPI
 SetDebugPrintErrorLevel (
   UINT32  ErrorLevel
   );
+#endif
