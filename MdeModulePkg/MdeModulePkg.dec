@@ -444,7 +444,9 @@
   #    BIT0       - FIFO Enable.  0 = Disable FIFOs.  1 = Enable FIFOs.
   #    BIT1       - Clear receive FIFO.  1 = Clear FIFO.
   #    BIT2       - Clear transmit FIFO.  1 = Clear FIFO.
-  #    BIT7..BIT3 - Reserved.  Must be 0.
+  #    BIT4..BIT3 - Reserved.  Must be 0.
+  #    BIT5       - Enable 64-byte FIFO.  0 = Disable 64-byte FIFO.  1 = Enable 64-byte FIFO
+  #    BIT7..BIT6 - Reserved.  Must be 0.
   #
   # Default is to enable and clear all FIFOs.
   #

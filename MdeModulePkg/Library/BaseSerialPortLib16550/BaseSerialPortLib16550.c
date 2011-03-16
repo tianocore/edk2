@@ -158,7 +158,7 @@ SerialPortInitialize (
   // Enable and reset FIFOs
   // Strip reserved bits from PcdSerialFifoControl
   //
-  SerialPortWriteRegister (R_UART_FCR, (UINT8)(PcdGet8 (PcdSerialFifoControl) & 0x17));
+  SerialPortWriteRegister (R_UART_FCR, (UINT8)(PcdGet8 (PcdSerialFifoControl) & 0x27));
 
   //
   // Put Modem Control Register(MCR) into its reset state of 0x00.
