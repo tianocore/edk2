@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -25,6 +25,7 @@ Abstract:
 
 #include "CpuDriver.h"
 
+UINT64  mTimerPeriod;
 
 CPU_ARCH_PROTOCOL_PRIVATE mCpuTemplate = {
   CPU_ARCH_PROT_PRIVATE_SIGNATURE,
@@ -38,7 +39,7 @@ CPU_ARCH_PROTOCOL_PRIVATE mCpuTemplate = {
     WinNtRegisterInterruptHandler,
     WinNtGetTimerValue,
     WinNtSetMemoryAttributes,
-    0,
+    1,
     4
   },
   {
@@ -321,11 +322,18 @@ Returns:
   if (TimerValue == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-
-  //
-  // No timer supported
-  //
-  return EFI_UNSUPPORTED;
+  
+  if (TimerIndex != 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  gWinNt->QueryPerformanceCounter (TimerValue);
+  
+  if (TimerPeriod != NULL) {
+    *TimerPeriod = mTimerPeriod;
+  }
+  
+  return EFI_SUCCESS;
 }
 
 
@@ -518,8 +526,19 @@ Returns:
 
 --*/
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
+  UINT64      Frequency;
 
+  //
+  // Retrieve the frequency of the performance counter in Hz.
+  //  
+  gWinNt->QueryPerformanceFrequency (&Frequency);
+  
+  //
+  // Convert frequency in Hz to a clock period in femtoseconds.
+  //
+  mTimerPeriod = DivU64x64Remainder (1000000000000000, Frequency, NULL);
+  
   CpuUpdateSmbios ();
 
   Status = gBS->InstallMultipleProtocolInterfaces (
