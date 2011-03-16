@@ -1,7 +1,7 @@
 /** @file
   Locate handle functions
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -406,18 +406,19 @@ CoreGetNextLocateByProtocol (
 
 
 /**
-  Locates the handle to a device on the device path that best matches the specified protocol.
+  Locates the handle to a device on the device path that supports the specified protocol.
 
-  @param  Protocol               The protocol to search for.
-  @param  DevicePath             On input, a pointer to a pointer to the device
-                                 path. On output, the device path pointer is
-                                 modified to point to the remaining part of the
-                                 devicepath.
-  @param  Device                 A pointer to the returned device handle.
+  @param  Protocol              Specifies the protocol to search for.
+  @param  DevicePath            On input, a pointer to a pointer to the device path. On output, the device
+                                path pointer is modified to point to the remaining part of the device
+                                path.
+  @param  Device                A pointer to the returned device handle.
 
-  @retval EFI_SUCCESS            The resulting handle was returned.
-  @retval EFI_NOT_FOUND          No handles matched the search.
-  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+  @retval EFI_SUCCESS           The resulting handle was returned.
+  @retval EFI_NOT_FOUND         No handles match the search.
+  @retval EFI_INVALID_PARAMETER Protocol is NULL.
+  @retval EFI_INVALID_PARAMETER DevicePath is NULL.
+  @retval EFI_INVALID_PARAMETER A handle matched the search and Device is NULL.
 
 **/
 EFI_STATUS
@@ -436,6 +437,7 @@ CoreLocateDevicePath (
   EFI_STATUS                  Status;
   EFI_HANDLE                  *Handles;
   EFI_HANDLE                  Handle;
+  EFI_HANDLE                  BestDevice;
   EFI_DEVICE_PATH_PROTOCOL    *SourcePath;
   EFI_DEVICE_PATH_PROTOCOL    *TmpDevicePath;
 
@@ -447,11 +449,7 @@ CoreLocateDevicePath (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Device == NULL) {
-    return  EFI_INVALID_PARAMETER;
-  }
-
-  *Device = NULL;
+  BestDevice = NULL;
   SourcePath = *DevicePath;
   TmpDevicePath = SourcePath;
   while (!IsDevicePathEnd (TmpDevicePath)) {
@@ -504,7 +502,7 @@ CoreLocateDevicePath (
       //
       if (Size > BestMatch) {
         BestMatch = Size;
-        *Device = Handle;
+        BestDevice = Handle;
       }
     }
   }
@@ -519,6 +517,11 @@ CoreLocateDevicePath (
     return EFI_NOT_FOUND;
   }
 
+  if (Device == NULL) {
+    return  EFI_INVALID_PARAMETER;
+  }
+  *Device = BestDevice;
+  
   //
   // Return the remaining part of the device path
   //
