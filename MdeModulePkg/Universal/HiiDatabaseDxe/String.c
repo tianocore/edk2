@@ -1967,11 +1967,25 @@ HiiCompareLanguage (
   IN  CHAR8  *Language2
   )
 {
-  UINTN Language2Len;
+  UINTN  Index;
 
   //
-  // When languages are exactly same, they will be identical. 
+  // Compare the Primary Language in Language1 to Language2
   //
-  Language2Len = AsciiStrLen (Language2);
-  return  (BOOLEAN) (AsciiStrnCmp (Language1, Language2, Language2Len) == 0);
+  for (Index = 0; Language1[Index] != 0 && Language1[Index] != ';'; Index++) {
+    if (Language1[Index] != Language2[Index]) {
+      //
+      // Return FALSE if any characters are different.
+      //
+      return FALSE;
+    }
+  }
+
+  //
+  // Only return TRUE if Language2[Index] is a Null-terminator which means
+  // the Primary Language in Language1 is the same length as Language2.  If
+  // Language2[Index] is not a Null-terminator, then Language2 is longer than
+  // the Primary Language in Language1, and FALSE must be returned.
+  //
+  return (Language2[Index] == 0);
 }
