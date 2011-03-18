@@ -1987,5 +1987,5 @@ HiiCompareLanguage (
   // Language2[Index] is not a Null-terminator, then Language2 is longer than
   // the Primary Language in Language1, and FALSE must be returned.
   //
-  return (Language2[Index] == 0);
+  return (BOOLEAN) (Language2[Index] == 0);
 }
