@@ -48,6 +48,7 @@
   IoLib
   PciLib
   PeiResourcePublicationLib
+  PeiServicesLib
   PeiServicesTablePointerLib
   PeimEntryPoint
 
@@ -58,6 +59,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
+
+[Ppis]
+  gEfiPeiMasterBootModePpiGuid
 
 [Depex]
   TRUE

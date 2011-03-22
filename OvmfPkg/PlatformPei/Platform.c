@@ -27,8 +27,10 @@
 #include <Library/PcdLib.h>
 #include <Library/PciLib.h>
 #include <Library/PeimEntryPoint.h>
+#include <Library/PeiServicesLib.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Guid/MemoryTypeInformation.h>
+#include <Ppi/MasterBootMode.h>
 
 #include "Platform.h"
 #include "Cmos.h"
@@ -42,6 +44,15 @@ EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {
   { EfiBootServicesCode,    0x180 },
   { EfiBootServicesData,    0xF00 },
   { EfiMaxMemoryType,       0x000 }
+};
+
+
+EFI_PEI_PPI_DESCRIPTOR   mPpiBootMode[] = {
+  {
+    EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+    &gEfiPeiMasterBootModePpiGuid,
+    NULL
+  }
 };
 
 
@@ -207,6 +218,15 @@ MiscInitialization (
 
 
 VOID
+BootModeInitialization (
+  )
+{
+  ASSERT_EFI_ERROR (PeiServicesSetBootMode (BOOT_WITH_FULL_CONFIGURATION));
+  ASSERT_EFI_ERROR (PeiServicesInstallPpi (mPpiBootMode));
+}
+
+
+VOID
 ReserveEmuVariableNvStore (
   )
 {
@@ -284,6 +304,8 @@ InitializePlatform (
   MemMapInitialization (TopOfMemory);
 
   MiscInitialization ();
+
+  BootModeInitialization ();
 
   return EFI_SUCCESS;
 }
