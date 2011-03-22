@@ -221,8 +221,13 @@ VOID
 BootModeInitialization (
   )
 {
-  ASSERT_EFI_ERROR (PeiServicesSetBootMode (BOOT_WITH_FULL_CONFIGURATION));
-  ASSERT_EFI_ERROR (PeiServicesInstallPpi (mPpiBootMode));
+  EFI_STATUS Status;
+
+  Status = PeiServicesSetBootMode (BOOT_WITH_FULL_CONFIGURATION);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = PeiServicesInstallPpi (mPpiBootMode);
+  ASSERT_EFI_ERROR (Status);
 }
 
 
