@@ -142,17 +142,36 @@ void
 msSleep (unsigned long Milliseconds)
 {
   struct timespec rq, rm;
-
+  struct timeval  start, end;
+  unsigned long  MicroSec;
+  
   rq.tv_sec = Milliseconds / 1000;
   rq.tv_nsec = (Milliseconds % 1000) * 1000000;
 
-  while (nanosleep (&rq, &rm) != -1) {
+  //
+  // nanosleep gets interrupted by our timer tic. 
+  // we need to track wall clock time or we will stall for way too long
+  //
+  gettimeofday (&start, NULL);
+  end.tv_sec  = start.tv_sec + rq.tv_sec;
+  MicroSec = (start.tv_usec + rq.tv_nsec/1000);
+  end.tv_usec = MicroSec % 1000000;
+  if (MicroSec > 1000000) {
+    end.tv_sec++;
+  }
+
+  while (nanosleep (&rq, &rm) == -1) {
     if (errno != EINTR) {
+      break;
+    }
+    gettimeofday (&start, NULL);
+    if (start.tv_sec > end.tv_sec) {
+      break;
+    } if ((start.tv_sec == end.tv_sec) && (start.tv_usec > end.tv_usec)) {
       break;
     }
     rq = rm;
   } 
-
 }
 
 void
