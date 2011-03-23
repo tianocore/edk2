@@ -51,6 +51,7 @@
   UefiDriverEntryPoint
   DebugLib
   HiiLib
+  PcdLib
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    ## CONSUMES
@@ -62,3 +63,8 @@
 
 [FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
+

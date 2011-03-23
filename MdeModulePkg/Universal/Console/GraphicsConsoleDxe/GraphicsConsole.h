@@ -69,7 +69,7 @@ typedef struct {
   UINT32  GopModeNumber;
 } GRAPHICS_CONSOLE_MODE_DATA;
 
-#define GRAPHICS_MAX_MODE 4
+#define GRAPHICS_MAX_MODE 5
 
 typedef struct {
   UINTN                            Signature;
