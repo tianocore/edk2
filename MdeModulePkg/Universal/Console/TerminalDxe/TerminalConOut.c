@@ -205,7 +205,7 @@ TerminalConOutOutputString (
   //
   Mode = This->Mode;
 
-  if (Mode->Mode > 2) {
+  if (Mode->Mode >= TERMINAL_MAX_MODE) {
     return EFI_UNSUPPORTED;
   }
 
@@ -414,7 +414,7 @@ TerminalConOutQueryMode (
   OUT UINTN                            *Rows
   )
 {
-  if (This->Mode->MaxMode > 3) {
+  if (This->Mode->MaxMode > TERMINAL_MAX_MODE) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -429,6 +429,16 @@ TerminalConOutQueryMode (
   } else if (ModeNumber == 2) {
     *Columns  = MODE2_COLUMN_COUNT;
     *Rows     = MODE2_ROW_COUNT;
+    return EFI_SUCCESS;
+  } else if (ModeNumber == 3) {
+    *Columns  = (UINTN) PcdGet32 (PcdConOutColumn);
+    if (*Columns == 0) {
+      *Columns = MODE0_COLUMN_COUNT;
+    }
+    *Rows  = (UINTN) PcdGet32 (PcdConOutRow);
+    if (*Rows == 0) {
+      *Rows     = MODE0_ROW_COUNT;
+    }
     return EFI_SUCCESS;
   }
 
@@ -466,7 +476,7 @@ TerminalConOutSetMode (
   //
   TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);
 
-  if (ModeNumber > 2) {
+  if (ModeNumber >= TERMINAL_MAX_MODE) {
     return EFI_UNSUPPORTED;
   }
 

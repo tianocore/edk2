@@ -143,6 +143,12 @@ typedef union {
 #define MODE2_COLUMN_COUNT        100
 #define MODE2_ROW_COUNT           31
 
+//
+// MODE3 is defined by PcdConOutColumn & PcdConOutRow
+//
+
+#define TERMINAL_MAX_MODE 4
+
 #define BACKSPACE                 8
 #define ESC                       27
 #define CSI                       0x9B

@@ -44,6 +44,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   DevicePathLib
@@ -74,6 +75,8 @@
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
 
 # [Event]
 #   ##
@@ -82,3 +85,4 @@
 #   EVENT_TYPE_RELATIVE_TIMER                   ## PRODUCES
 #
 #
+
