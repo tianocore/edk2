@@ -2,7 +2,7 @@
   Member functions of EFI_SHELL_PROTOCOL and functions for creation,
   manipulation, and initialization of EFI_SHELL_PROTOCOL.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -35,6 +35,36 @@ EfiShellClose (
 {
   ShellFileHandleRemove(FileHandle);
   return (FileHandleClose(ConvertShellHandleToEfiFileProtocol(FileHandle)));
+}
+
+/**
+  Internal worker to determine whether there is a BlockIo somewhere
+  upon the device path specified.
+
+  @param[in] DevicePath    The device path to test.
+
+  @retval TRUE      gEfiBlockIoProtocolGuid was installed on a handle with this device path
+  @retval FALSE     gEfiBlockIoProtocolGuid was not found.
+**/
+BOOLEAN
+EFIAPI
+InternalShellProtocolIsBlockIoPresent(
+  IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePathCopy;
+  EFI_STATUS                Status;
+  EFI_HANDLE                Handle;
+
+  Handle = NULL;
+
+  DevicePathCopy = (EFI_DEVICE_PATH_PROTOCOL*)DevicePath;
+  Status = gBS->LocateDevicePath(&gEfiBlockIoProtocolGuid, &DevicePathCopy, &Handle);
+
+  if ((Handle != NULL) && (!EFI_ERROR(Status))) {
+    return (TRUE);
+  }
+  return (FALSE);
 }
 
 /**
@@ -176,7 +206,8 @@ EfiShellSetMap(
   // make sure this is a valid to add device path
   //
   ///@todo add BlockIo to this test...
-  if (!InternalShellProtocolIsSimpleFileSystemPresent(DevicePath)) {
+  if (!InternalShellProtocolIsSimpleFileSystemPresent(DevicePath)
+    && !InternalShellProtocolIsBlockIoPresent(DevicePath)) {
     return (EFI_INVALID_PARAMETER);
   }
 
@@ -496,10 +527,9 @@ EfiShellGetDevicePathFromFilePath(
     NewPath = AllocateZeroPool(Size);
     ASSERT(NewPath != NULL);
     StrCpy(NewPath, Cwd);
-    if ((Path[0] == (CHAR16)L'\\') &&
-        (NewPath[StrLen(NewPath)-1] == (CHAR16)L'\\')
-       ) {
-      ((CHAR16*)NewPath)[StrLen(NewPath)-1] = CHAR_NULL;
+    if (*Path == L'\\') {
+      Path++;
+      while (ChopLastSlash(NewPath)) ;
     }
     StrCat(NewPath, Path);
     DevicePathForReturn = EfiShellGetDevicePathFromFilePath(NewPath);
@@ -621,6 +651,11 @@ EfiShellGetDeviceName(
   CHAR8                             *Lang;
   CHAR8                             *TempChar;
 
+  UINTN                             ParentControllerCount;
+  EFI_HANDLE                        *ParentControllerBuffer;
+  UINTN                             ParentDriverCount;
+  EFI_HANDLE                        *ParentDriverBuffer;
+
   if (BestDeviceName == NULL ||
       DeviceHandle   == NULL
      ){
@@ -673,7 +708,7 @@ EfiShellGetDeviceName(
         continue;
       }
       if (Language == NULL) {
-        Lang = AllocatePool(AsciiStrSize(CompName2->SupportedLanguages));
+        Lang = AllocateZeroPool(AsciiStrSize(CompName2->SupportedLanguages));
         if (Lang == NULL) {
           return (EFI_OUT_OF_RESOURCES);
         }
@@ -683,7 +718,7 @@ EfiShellGetDeviceName(
           *TempChar = CHAR_NULL;
         }
       } else {
-        Lang = AllocatePool(AsciiStrSize(Language));
+        Lang = AllocateZeroPool(AsciiStrSize(Language));
         if (Lang == NULL) {
           return (EFI_OUT_OF_RESOURCES);
         }
@@ -699,14 +734,80 @@ EfiShellGetDeviceName(
     if (HandleList != NULL) {
       FreePool(HandleList);
     }
+
+    //
+    // Now check the parent controller using this as the child.
+    //
+    if (DeviceNameToReturn == NULL){
+      PARSE_HANDLE_DATABASE_PARENTS(DeviceHandle, &ParentControllerCount, &ParentControllerBuffer);
+      for (LoopVar = 0 ; LoopVar < ParentControllerCount ; LoopVar++) {
+        PARSE_HANDLE_DATABASE_UEFI_DRIVERS(ParentControllerBuffer[LoopVar], &ParentDriverCount, &ParentDriverBuffer);
+        for (HandleCount = 0 ; HandleCount < ParentDriverCount ; HandleCount++) {
+          //
+          // try using that driver's component name with controller and our driver as the child.
+          //
+          Status = gBS->OpenProtocol(
+            ParentDriverBuffer[HandleCount],
+            &gEfiComponentName2ProtocolGuid,
+            (VOID**)&CompName2,
+            gImageHandle,
+            NULL,
+            EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+          if (EFI_ERROR(Status)) {
+            Status = gBS->OpenProtocol(
+              ParentDriverBuffer[HandleCount],
+              &gEfiComponentNameProtocolGuid,
+              (VOID**)&CompName2,
+              gImageHandle,
+              NULL,
+              EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+          }
+
+          if (EFI_ERROR(Status)) {
+            continue;
+          }
+          if (Language == NULL) {
+            Lang = AllocateZeroPool(AsciiStrSize(CompName2->SupportedLanguages));
+            if (Lang == NULL) {
+              return (EFI_OUT_OF_RESOURCES);
+            }
+            AsciiStrCpy(Lang, CompName2->SupportedLanguages);
+            TempChar = AsciiStrStr(Lang, ";");
+            if (TempChar != NULL){
+              *TempChar = CHAR_NULL;
+            }
+          } else {
+            Lang = AllocateZeroPool(AsciiStrSize(Language));
+            if (Lang == NULL) {
+              return (EFI_OUT_OF_RESOURCES);
+            }
+            AsciiStrCpy(Lang, Language);
+          }
+          Status = CompName2->GetControllerName(CompName2, ParentControllerBuffer[LoopVar], DeviceHandle, Lang, &DeviceNameToReturn);
+          FreePool(Lang);
+          Lang = NULL;
+          if (!EFI_ERROR(Status) && DeviceNameToReturn != NULL) {
+            break;
+          }
+
+
+
+        }
+        SHELL_FREE_NON_NULL(ParentDriverBuffer);
+        if (!EFI_ERROR(Status) && DeviceNameToReturn != NULL) {
+          break;
+        }
+      }
+      SHELL_FREE_NON_NULL(ParentControllerBuffer);
+    }
+    //
+    // dont return on fail since we will try device path if that bit is on
+    //
     if (DeviceNameToReturn != NULL){
       ASSERT(BestDeviceName != NULL);
       StrnCatGrow(BestDeviceName, NULL, DeviceNameToReturn, 0);
       return (EFI_SUCCESS);
     }
-    //
-    // dont return on fail since we will try device path if that bit is on
-    //
   }
   if ((Flags & EFI_DEVICE_NAME_USE_DEVICE_PATH) != 0) {
     Status = gBS->LocateProtocol(
@@ -1630,14 +1731,14 @@ InternalDuplicateShellFileInfo(
 {
   EFI_SHELL_FILE_INFO *NewNode;
 
-  NewNode = AllocatePool(sizeof(EFI_SHELL_FILE_INFO));
+  NewNode = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
   if (NewNode == NULL) {
     return (NULL);
   }
   NewNode->FullName = AllocateZeroPool(StrSize(Node->FullName));
 
   NewNode->FileName = AllocateZeroPool(StrSize(Node->FileName));
-  NewNode->Info     = AllocatePool((UINTN)Node->Info->Size);
+  NewNode->Info     = AllocateZeroPool((UINTN)Node->Info->Size);
   if ( NewNode->FullName == NULL
     || NewNode->FileName == NULL
     || NewNode->Info == NULL
@@ -1964,7 +2065,7 @@ ShellSearchHandle(
       } else {
         NewShellNode->Handle = NULL;
         if (*FileList == NULL) {
-          *FileList = AllocatePool(sizeof(EFI_SHELL_FILE_INFO));
+          *FileList = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
           InitializeListHead(&((*FileList)->Link));
         }
 
@@ -2044,7 +2145,7 @@ ShellSearchHandle(
               Status = EFI_OUT_OF_RESOURCES;
             }
             if (*FileList == NULL) {
-              *FileList = AllocatePool(sizeof(EFI_SHELL_FILE_INFO));
+              *FileList = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
               InitializeListHead(&((*FileList)->Link));
             }
 
@@ -2121,7 +2222,7 @@ EfiShellFindFiles(
   RootDevicePath = NULL;
   RootFileHandle = NULL;
   MapName        = NULL;
-  PatternCopy = AllocatePool(StrSize(FilePattern));
+  PatternCopy = AllocateZeroPool(StrSize(FilePattern));
   if (PatternCopy == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
@@ -2186,17 +2287,19 @@ EfiShellOpenFileList(
   CHAR16              *Path2;
   UINTN               Path2Size;
   CONST CHAR16        *CurDir;
+  BOOLEAN             Found;
 
   ShellCommandCleanPath(Path);
 
   Path2Size     = 0;
   Path2         = NULL;
 
-  ASSERT(FileList  != NULL);
-  ASSERT(*FileList != NULL);
+  if (FileList == NULL || *FileList == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   if (*Path == L'.' && *(Path+1) == L'\\') {
-    Path++;
+    Path+=2;
   }
 
   //
@@ -2208,6 +2311,7 @@ EfiShellOpenFileList(
     StrnCatGrow(&Path2, &Path2Size, CurDir, 0);
     if (*Path == L'\\') {
       Path++;
+      while (ChopLastSlash(Path2)) ;
     }
     ASSERT((Path2 == NULL && Path2Size == 0) || (Path2 != NULL));
     StrnCatGrow(&Path2, &Path2Size, Path, 0);
@@ -2229,6 +2333,7 @@ EfiShellOpenFileList(
     return (Status);
   }
 
+  Found = FALSE;
   //
   // We had no errors so open all the files (that are not already opened...)
   //
@@ -2238,9 +2343,13 @@ EfiShellOpenFileList(
      ){
     if (ShellFileListItem->Status == 0 && ShellFileListItem->Handle == NULL) {
       ShellFileListItem->Status = EfiShellOpenFileByName (ShellFileListItem->FullName, &ShellFileListItem->Handle, OpenMode);
+      Found = TRUE;
     }
   }
 
+  if (!Found) {
+    return (EFI_NOT_FOUND);
+  }
   return(EFI_SUCCESS);
 }
 
@@ -3190,6 +3299,12 @@ CleanUpShellProtocol (
 
   Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle1);
   Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle2);
+  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle3);
+  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle4);
+  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle1);
+  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle2);
+  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle3);
+  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle4);
 
   return (Status);
 }
@@ -3207,10 +3322,26 @@ NotificationFunction(
   IN EFI_KEY_DATA *KeyData
   )
 {
-  if (ShellInfoObject.NewEfiShellProtocol->ExecutionBreak == NULL) {
-    return (EFI_UNSUPPORTED);
+  EFI_INPUT_KEY Key;
+  UINTN         EventIndex;
+//  ShellPrintEx(-1,-1,L"  <Notify>  ");
+   if ((KeyData->Key.UnicodeChar == L'c' || KeyData->Key.UnicodeChar == 3) &&
+      (KeyData->KeyState.KeyShiftState == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))
+      ){ 
+    if (ShellInfoObject.NewEfiShellProtocol->ExecutionBreak == NULL) {
+      return (EFI_UNSUPPORTED);
+    }
+    return (gBS->SignalEvent(ShellInfoObject.NewEfiShellProtocol->ExecutionBreak));
+  } else if  ((KeyData->Key.UnicodeChar == L's') &&
+              (KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))
+              ){ 
+    //
+    // just get some key
+    //
+    gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
+    gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
   }
-  return (gBS->SignalEvent(ShellInfoObject.NewEfiShellProtocol->ExecutionBreak));
+  return (EFI_SUCCESS);
 }
 
 /**

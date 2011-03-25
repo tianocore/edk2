@@ -1,7 +1,7 @@
 /** @file
   function definitions for internal to shell functions.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -109,6 +109,10 @@ typedef struct {
   EFI_HANDLE                    CtrlCNotifyHandle2;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
   EFI_HANDLE                    CtrlCNotifyHandle3;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
   EFI_HANDLE                    CtrlCNotifyHandle4;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  EFI_HANDLE                    CtrlSNotifyHandle1;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  EFI_HANDLE                    CtrlSNotifyHandle2;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  EFI_HANDLE                    CtrlSNotifyHandle3;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  EFI_HANDLE                    CtrlSNotifyHandle4;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
 } SHELL_INFO;
 
 extern SHELL_INFO ShellInfoObject;

@@ -1,7 +1,7 @@
 /** @file
   Function definitions for shell simple text in and out on top of file handles.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -67,14 +67,14 @@ CreateSimpleTextOutOnFile(
   Function to close a EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL on top of a 
   SHELL_FILE_HANDLE to support redirecting output from a file.
 
-  @param[in]  SimpleTextOut  The pointer to the SimpleTextOUT to close.
+  @param[in] SimpleTextOut    The pointer to the SimpleTextOUT to close.
 
   @retval EFI_SUCCESS         The object was closed.
 **/
 EFI_STATUS
 EFIAPI
 CloseSimpleTextOutOnFile(
-  OUT EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *SimpleTextOut
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *SimpleTextOut
   );
 
 #endif //_SHELL_CONSOLE_WRAPPERS_HEADER_

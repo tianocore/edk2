@@ -2,7 +2,7 @@
   EFI_FILE_PROTOCOL wrappers for other items (Like Environment Variables,
   StdIn, StdOut, StdErr, etc...).
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -166,18 +166,18 @@ FileInterfaceStdOutWrite(
 /**
   File style interface for StdIn (Write).
   
-  @param[in] This       Ignored.
-  @param[in] BufferSize Ignored.
-  @param[in] Buffer     Ignored.
+  @param[in] This           Ignored.
+  @param[in,out] BufferSize Ignored.
+  @param[in] Buffer         Ignored.
   
   @retval EFI_UNSUPPORTED
 **/
 EFI_STATUS
 EFIAPI
 FileInterfaceStdInWrite(
-  IN EFI_FILE_PROTOCOL *This,
-  IN OUT UINTN *BufferSize,
-  IN VOID *Buffer
+  IN      EFI_FILE_PROTOCOL *This,
+  IN OUT  UINTN             *BufferSize,
+  IN      VOID              *Buffer
   )
 {
   return (EFI_UNSUPPORTED);
@@ -232,7 +232,7 @@ FileInterfaceStdOutRead(
   @param[in,out] BufferSize   Ignored.
   @param[out] Buffer          Ignored.
   
-  @retval EFI_UNSUPPORTED
+  @retval EFI_UNSUPPORTED Always.
 **/
 EFI_STATUS
 EFIAPI
@@ -250,16 +250,16 @@ FileInterfaceStdErrRead(
   
   @param[in] This             Ignored.
   @param[in,out] BufferSize   Ignored.
-  @param[in] Buffer           Ignored.
+  @param[out] Buffer          Ignored.
   
-  @retval EFI_SUCCESS
+  @retval EFI_SUCCESS Always.
 **/
 EFI_STATUS
 EFIAPI
 FileInterfaceNulRead(
-  IN EFI_FILE_PROTOCOL *This,
-  IN OUT UINTN *BufferSize,
-  OUT VOID *Buffer
+  IN      EFI_FILE_PROTOCOL *This,
+  IN OUT  UINTN             *BufferSize,
+  OUT     VOID              *Buffer
   )
 {
   return (EFI_SUCCESS);
@@ -1352,7 +1352,7 @@ FileInterfaceMemWrite(
     //
     // Ascii
     //
-    AsciiBuffer = AllocatePool(*BufferSize);
+    AsciiBuffer = AllocateZeroPool(*BufferSize);
     AsciiSPrint(AsciiBuffer, *BufferSize, "%S", Buffer);
     if ((UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->Position + AsciiStrSize(AsciiBuffer)) > (UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize)) {
       ((EFI_FILE_PROTOCOL_MEM*)This)->Buffer = ReallocatePool((UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize), (UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize) + AsciiStrSize(AsciiBuffer) + 10, ((EFI_FILE_PROTOCOL_MEM*)This)->Buffer);
@@ -1475,6 +1475,224 @@ typedef struct {
 } EFI_FILE_PROTOCOL_FILE;
 
 /**
+  Set a files current position
+
+  @param  This            Protocol instance pointer.
+  @param  Position        Byte position from the start of the file.
+                          
+  @retval EFI_SUCCESS     Data was written.
+  @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open.
+
+**/
+EFI_STATUS
+EFIAPI
+FileInterfaceFileSetPosition(
+  IN EFI_FILE_PROTOCOL        *This,
+  IN UINT64                   Position
+  )
+{
+  return ((EFI_FILE_PROTOCOL_FILE*)This)->Orig->SetPosition(((EFI_FILE_PROTOCOL_FILE*)This)->Orig, Position);
+}
+
+/**
+  Get a file's current position
+
+  @param  This            Protocol instance pointer.
+  @param  Position        Byte position from the start of the file.
+                          
+  @retval EFI_SUCCESS     Data was written.
+  @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open..
+
+**/
+EFI_STATUS
+EFIAPI
+FileInterfaceFileGetPosition(
+  IN EFI_FILE_PROTOCOL        *This,
+  OUT UINT64                  *Position
+  )
+{
+  return ((EFI_FILE_PROTOCOL_FILE*)This)->Orig->GetPosition(((EFI_FILE_PROTOCOL_FILE*)This)->Orig, Position);
+}
+
+/**
+  Get information about a file.
+
+  @param  This            Protocol instance pointer.
+  @param  InformationType Type of information to return in Buffer.
+  @param  BufferSize      On input size of buffer, on output amount of data in buffer.
+  @param  Buffer          The buffer to return data.
+
+  @retval EFI_SUCCESS          Data was returned.
+  @retval EFI_UNSUPPORT        InformationType is not supported.
+  @retval EFI_NO_MEDIA         The device has no media.
+  @retval EFI_DEVICE_ERROR     The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED  The device is write protected.
+  @retval EFI_ACCESS_DENIED    The file was open for read only.
+  @retval EFI_BUFFER_TOO_SMALL Buffer was too small; required size returned in BufferSize.
+
+**/
+EFI_STATUS
+EFIAPI
+FileInterfaceFileGetInfo(
+  IN EFI_FILE_PROTOCOL        *This,
+  IN EFI_GUID                 *InformationType,
+  IN OUT UINTN                *BufferSize,
+  OUT VOID                    *Buffer
+  )
+{
+  return ((EFI_FILE_PROTOCOL_FILE*)This)->Orig->GetInfo(((EFI_FILE_PROTOCOL_FILE*)This)->Orig, InformationType, BufferSize, Buffer);
+}
+
+/**
+  Set information about a file
+
+  @param  File            Protocol instance pointer.
+  @param  InformationType Type of information in Buffer.
+  @param  BufferSize      Size of buffer.
+  @param  Buffer          The data to write.
+
+  @retval EFI_SUCCESS          Data was returned.
+  @retval EFI_UNSUPPORT        InformationType is not supported.
+  @retval EFI_NO_MEDIA         The device has no media.
+  @retval EFI_DEVICE_ERROR     The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED  The device is write protected.
+  @retval EFI_ACCESS_DENIED    The file was open for read only.
+
+**/
+EFI_STATUS
+EFIAPI
+FileInterfaceFileSetInfo(
+  IN EFI_FILE_PROTOCOL        *This,
+  IN EFI_GUID                 *InformationType,
+  IN UINTN                    BufferSize,
+  IN VOID                     *Buffer
+  )
+{
+  return ((EFI_FILE_PROTOCOL_FILE*)This)->Orig->SetInfo(((EFI_FILE_PROTOCOL_FILE*)This)->Orig, InformationType, BufferSize, Buffer);
+}
+
+/**
+  Flush data back for the file handle.
+
+  @param  This Protocol instance pointer.
+
+  @retval EFI_SUCCESS          Data was written.
+  @retval EFI_UNSUPPORT        Writes to Open directory are not supported.
+  @retval EFI_NO_MEDIA         The device has no media.
+  @retval EFI_DEVICE_ERROR     The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED  The device is write protected.
+  @retval EFI_ACCESS_DENIED    The file was open for read only.
+  @retval EFI_VOLUME_FULL      The volume is full.
+
+**/
+EFI_STATUS
+EFIAPI
+FileInterfaceFileFlush(
+  IN EFI_FILE_PROTOCOL  *This
+  )
+{
+  return ((EFI_FILE_PROTOCOL_FILE*)This)->Orig->Flush(((EFI_FILE_PROTOCOL_FILE*)This)->Orig);
+}
+
+/**
+  Read data from the file.
+
+  @param  This       Protocol instance pointer.
+  @param  BufferSize On input size of buffer, on output amount of data in buffer.
+  @param  Buffer     The buffer in which data is read.
+
+  @retval EFI_SUCCESS          Data was read.
+  @retval EFI_NO_MEDIA         The device has no media.
+  @retval EFI_DEVICE_ERROR     The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
+  @retval EFI_BUFFER_TO_SMALL  BufferSize is too small. BufferSize contains required size.
+
+**/
+EFI_STATUS
+EFIAPI
+FileInterfaceFileRead(
+  IN EFI_FILE_PROTOCOL        *This,
+  IN OUT UINTN                *BufferSize,
+  OUT VOID                    *Buffer
+  )
+{
+  CHAR8       *AsciiBuffer;
+  UINTN       Size;
+  EFI_STATUS  Status;
+  if (((EFI_FILE_PROTOCOL_FILE*)This)->Unicode) {
+    //
+    // Unicode
+    //
+    return (((EFI_FILE_PROTOCOL_FILE*)This)->Orig->Read(((EFI_FILE_PROTOCOL_FILE*)This)->Orig, BufferSize, Buffer));
+  } else {
+    //
+    // Ascii
+    //
+    AsciiBuffer = AllocateZeroPool((Size = *BufferSize));
+    Status = (((EFI_FILE_PROTOCOL_FILE*)This)->Orig->Read(((EFI_FILE_PROTOCOL_FILE*)This)->Orig, &Size, AsciiBuffer));
+    UnicodeSPrint(Buffer, *BufferSize, L"%a", AsciiBuffer);
+    FreePool(AsciiBuffer);
+    return (Status);
+  }
+}
+
+/**
+  Opens a new file relative to the source file's location.
+
+  @param[in]  This       The protocol instance pointer.
+  @param[out]  NewHandle Returns File Handle for FileName.
+  @param[in]  FileName   Null terminated string. "\", ".", and ".." are supported.
+  @param[in]  OpenMode   Open mode for file.
+  @param[in]  Attributes Only used for EFI_FILE_MODE_CREATE.
+
+  @retval EFI_SUCCESS          The device was opened.
+  @retval EFI_NOT_FOUND        The specified file could not be found on the device.
+  @retval EFI_NO_MEDIA         The device has no media.
+  @retval EFI_MEDIA_CHANGED    The media has changed.
+  @retval EFI_DEVICE_ERROR     The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
+  @retval EFI_ACCESS_DENIED    The service denied access to the file.
+  @retval EFI_OUT_OF_RESOURCES The volume was not opened due to lack of resources.
+  @retval EFI_VOLUME_FULL      The volume is full.
+**/
+EFI_STATUS
+EFIAPI
+FileInterfaceFileOpen (
+  IN EFI_FILE_PROTOCOL        *This,
+  OUT EFI_FILE_PROTOCOL       **NewHandle,
+  IN CHAR16                   *FileName,
+  IN UINT64                   OpenMode,
+  IN UINT64                   Attributes
+  )
+{
+  return ((EFI_FILE_PROTOCOL_FILE*)This)->Orig->Open(((EFI_FILE_PROTOCOL_FILE*)This)->Orig, NewHandle, FileName, OpenMode, Attributes);
+}
+
+/**
+  Close and delete the file handle.
+
+  @param  This                     Protocol instance pointer.
+                                   
+  @retval EFI_SUCCESS              The device was opened.
+  @retval EFI_WARN_DELETE_FAILURE  The handle was closed but the file was not deleted.
+
+**/
+EFI_STATUS
+EFIAPI
+FileInterfaceFileDelete(
+  IN EFI_FILE_PROTOCOL  *This
+  )
+{
+  EFI_STATUS Status;
+  Status = ((EFI_FILE_PROTOCOL_FILE*)This)->Orig->Delete(((EFI_FILE_PROTOCOL_FILE*)This)->Orig);
+  FreePool(This);
+  return (Status);
+}
+
+/**
   File style interface for File (Close).
   
   @param[in] This       The pointer to the EFI_FILE_PROTOCOL object.
@@ -1487,9 +1705,10 @@ FileInterfaceFileClose(
   IN EFI_FILE_PROTOCOL *This
   )
 {
-  ((EFI_FILE_PROTOCOL_FILE*)This)->Orig->Close(((EFI_FILE_PROTOCOL_FILE*)This)->Orig);
+  EFI_STATUS Status;
+  Status = ((EFI_FILE_PROTOCOL_FILE*)This)->Orig->Close(((EFI_FILE_PROTOCOL_FILE*)This)->Orig);
   FreePool(This);
-  return (EFI_SUCCESS);
+  return (Status);
 }
 
 /**
@@ -1498,18 +1717,18 @@ FileInterfaceFileClose(
   If the file was opened with ASCII mode the data will be processed through 
   AsciiSPrint before writing.
   
-  @param[in] This       The pointer to the EFI_FILE_PROTOCOL object.
-  @param[in] BufferSize Size in bytes of Buffer.
-  @param[in] Buffer     The pointer to the buffer to write.
+  @param[in] This             The pointer to the EFI_FILE_PROTOCOL object.
+  @param[in,out] BufferSize   Size in bytes of Buffer.
+  @param[in] Buffer           The pointer to the buffer to write.
   
   @retval EFI_SUCCESS   The data was written.
 **/
 EFI_STATUS
 EFIAPI
 FileInterfaceFileWrite(
-  IN EFI_FILE_PROTOCOL *This,
-  IN OUT UINTN *BufferSize,
-  IN VOID *Buffer
+  IN     EFI_FILE_PROTOCOL  *This,
+  IN OUT UINTN              *BufferSize,
+  IN     VOID               *Buffer
   )
 {
   CHAR8       *AsciiBuffer;
@@ -1524,7 +1743,7 @@ FileInterfaceFileWrite(
     //
     // Ascii
     //
-    AsciiBuffer = AllocatePool(*BufferSize);
+    AsciiBuffer = AllocateZeroPool(*BufferSize);
     AsciiSPrint(AsciiBuffer, *BufferSize, "%S", Buffer);
     Size = AsciiStrSize(AsciiBuffer) - 1; // (we dont need the null terminator)
     Status = (((EFI_FILE_PROTOCOL_FILE*)This)->Orig->Write(((EFI_FILE_PROTOCOL_FILE*)This)->Orig, &Size, AsciiBuffer));
@@ -1552,15 +1771,23 @@ CreateFileInterfaceFile(
 {
   EFI_FILE_PROTOCOL_FILE *NewOne;
 
-  NewOne = AllocatePool(sizeof(EFI_FILE_PROTOCOL_FILE));
+  NewOne = AllocateZeroPool(sizeof(EFI_FILE_PROTOCOL_FILE));
   if (NewOne == NULL) {
     return (NULL);
   }
   CopyMem(NewOne, Template, sizeof(EFI_FILE_PROTOCOL_FILE));
-  NewOne->Orig    = (EFI_FILE_PROTOCOL *)Template;
-  NewOne->Unicode = Unicode;
-  NewOne->Close   = FileInterfaceFileClose;
-  NewOne->Write   = FileInterfaceFileWrite;
+  NewOne->Orig        = (EFI_FILE_PROTOCOL *)Template;
+  NewOne->Unicode     = Unicode;
+  NewOne->Open        = FileInterfaceFileOpen;
+  NewOne->Close       = FileInterfaceFileClose;
+  NewOne->Delete      = FileInterfaceFileDelete;
+  NewOne->Read        = FileInterfaceFileRead;
+  NewOne->Write       = FileInterfaceFileWrite;
+  NewOne->GetPosition = FileInterfaceFileGetPosition;
+  NewOne->SetPosition = FileInterfaceFileSetPosition;
+  NewOne->GetInfo     = FileInterfaceFileGetInfo;
+  NewOne->SetInfo     = FileInterfaceFileSetInfo;
+  NewOne->Flush       = FileInterfaceFileFlush;
 
   return ((EFI_FILE_PROTOCOL *)NewOne);
 }

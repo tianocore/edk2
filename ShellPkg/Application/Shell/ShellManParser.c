@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell MAN file parser.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -368,7 +368,7 @@ ManBufferFindTitleSection(
 
   Status    = EFI_SUCCESS;
 
-  TitleString = AllocatePool((7*sizeof(CHAR16)) + StrSize(Command));
+  TitleString = AllocateZeroPool((7*sizeof(CHAR16)) + StrSize(Command));
   if (TitleString == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
@@ -389,24 +389,27 @@ ManBufferFindTitleSection(
       ;  CurrentLocation++);
 
     TitleEnd = StrStr(CurrentLocation, L"\"");
-    ASSERT(TitleEnd != NULL);
-    if (BriefDesc != NULL) {
-      *BriefSize = StrSize(TitleEnd);
-      *BriefDesc = AllocateZeroPool(*BriefSize);
-      if (*BriefDesc == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-      } else {
-        StrnCpy(*BriefDesc, CurrentLocation, TitleEnd-CurrentLocation);
+    if (TitleEnd == NULL) {
+      Status = EFI_DEVICE_ERROR;
+    } else {
+      if (BriefDesc != NULL) {
+        *BriefSize = StrSize(TitleEnd);
+        *BriefDesc = AllocateZeroPool(*BriefSize);
+        if (*BriefDesc == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+        } else {
+          StrnCpy(*BriefDesc, CurrentLocation, TitleEnd-CurrentLocation);
+        }
       }
-    }
 
-    for (CurrentLocation = TitleEnd
-      ;  *CurrentLocation != L'\n'
-      ;  CurrentLocation++);
-    for (
-      ;  *CurrentLocation == L' ' || *CurrentLocation == L'\n' || *CurrentLocation == L'\r'
-      ;  CurrentLocation++);
-    *Buffer = CurrentLocation;
+      for (CurrentLocation = TitleEnd
+        ;  *CurrentLocation != L'\n'
+        ;  CurrentLocation++);
+      for (
+        ;  *CurrentLocation == L' ' || *CurrentLocation == L'\n' || *CurrentLocation == L'\r'
+        ;  CurrentLocation++);
+      *Buffer = CurrentLocation;
+    }
   }
 
   FreePool(TitleString);
@@ -465,7 +468,7 @@ ManFileFindTitleSection(
     return (EFI_OUT_OF_RESOURCES);
   }
 
-  TitleString = AllocatePool((4*sizeof(CHAR16)) + StrSize(Command));
+  TitleString = AllocateZeroPool((4*sizeof(CHAR16)) + StrSize(Command));
   if (TitleString == NULL) {
     FreePool(ReadLine);
     return (EFI_OUT_OF_RESOURCES);

@@ -1,7 +1,7 @@
 /** @file
   function declarations for shell environment functions.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -56,7 +56,7 @@ IsVolatileEnv (
                             &Size,
                             Buffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    Buffer = AllocatePool(Size);
+    Buffer = AllocateZeroPool(Size);
     ASSERT(Buffer != NULL);
     Status = gRT->GetVariable((CHAR16*)EnvVarName,
                               &gShellVariableGuid,
@@ -154,7 +154,7 @@ GetEnvironmentVariableList(
   }
 
   NameSize = (UINTN)MaxVarSize;
-  VariableName = AllocatePool(NameSize);
+  VariableName = AllocateZeroPool(NameSize);
   if (VariableName == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
@@ -175,7 +175,7 @@ GetEnvironmentVariableList(
         ValSize = 0;
         Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(VariableName, &VarList->Atts, &ValSize, VarList->Val);
         if (Status == EFI_BUFFER_TOO_SMALL){
-          VarList->Val = AllocatePool(ValSize);
+          VarList->Val = AllocateZeroPool(ValSize);
           if (VarList->Val == NULL) {
             SHELL_FREE_NON_NULL(VarList);
             Status = EFI_OUT_OF_RESOURCES;
@@ -184,7 +184,7 @@ GetEnvironmentVariableList(
           }
         }
         if (!EFI_ERROR(Status) && VarList != NULL) {
-          VarList->Key = AllocatePool(StrSize(VariableName));
+          VarList->Key = AllocateZeroPool(StrSize(VariableName));
           if (VarList->Key == NULL) {
             SHELL_FREE_NON_NULL(VarList->Val);
             SHELL_FREE_NON_NULL(VarList);
@@ -312,7 +312,7 @@ SetEnvironmentVariables(
       break;
     }
     ASSERT(StrStr(CurrentString, L"=") != NULL);
-    Node = AllocatePool(sizeof(ENV_VAR_LIST));
+    Node = AllocateZeroPool(sizeof(ENV_VAR_LIST));
     ASSERT(Node != NULL);
     Node->Key = AllocateZeroPool((StrStr(CurrentString, L"=") - CurrentString + 1) * sizeof(CHAR16));
     ASSERT(Node->Key != NULL);
