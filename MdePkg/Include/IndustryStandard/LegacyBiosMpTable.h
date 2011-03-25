@@ -1,4 +1,4 @@
-/*++
+/** @file
   Defives data structures per MultiProcessor Specification Ver 1.4.
   
   The MultiProcessor Specification defines an enhancement to the standard 
@@ -13,7 +13,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
---*/
+**/
 
 #ifndef _LEGACY_BIOS_MPTABLE_H_
 #define _LEGACY_BIOS_MPTABLE_H_
@@ -27,18 +27,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define EFI_LEGACY_MP_TABLE_FLOATING_POINTER_SIGNATURE  SIGNATURE_32 ('_', 'M', 'P', '_')
 typedef struct {
+  UINT32  Reserved1 : 6;
+  UINT32  MutipleClk : 1;
+  UINT32  Imcr : 1;
+  UINT32  Reserved2 : 24;
+} FRATUREBYTE2_5;
+
+typedef struct {
   UINT32  Signature;
   UINT32  PhysicalAddress;
   UINT8   Length;
   UINT8   SpecRev;
   UINT8   Checksum;
   UINT8   FeatureByte1;
-  struct {
-    UINT32  Reserved1 : 6;
-    UINT32  MutipleClk : 1;
-    UINT32  Imcr : 1;
-    UINT32  Reserved2 : 24;
-  } FeatureByte2_5;
+  FRATUREBYTE2_5 FeatureByte2_5;
 } EFI_LEGACY_MP_TABLE_FLOATING_POINTER;
 
 #define EFI_LEGACY_MP_TABLE_HEADER_SIGNATURE  SIGNATURE_32 ('P', 'C', 'M', 'P')
@@ -67,28 +69,34 @@ typedef struct {
 //
 #define EFI_LEGACY_MP_TABLE_ENTRY_TYPE_PROCESSOR  0x00
 typedef struct {
+  UINT8 Enabled : 1;
+  UINT8 Bsp : 1;
+  UINT8 Reserved : 6;
+} EFI_LEGACY_MP_TABLE_ENTRY_PROCESSOR_FLAGS;
+
+typedef struct {
+  UINT32  Stepping : 4;
+  UINT32  Model : 4;
+  UINT32  Family : 4;
+  UINT32  Reserved : 20;
+} EFI_LEGACY_MP_TABLE_ENTRY_PROCESSOR_SIGNATURE;
+
+typedef struct {
+  UINT32  Fpu : 1;
+  UINT32  Reserved1 : 6;
+  UINT32  Mce : 1;
+  UINT32  Cx8 : 1;
+  UINT32  Apic : 1;
+  UINT32  Reserved2 : 22;
+} EFI_LEGACY_MP_TABLE_ENTRY_PROCESSOR_FEATURES;
+
+typedef struct {
   UINT8 EntryType;
   UINT8 Id;
   UINT8 Ver;
-  struct {
-    UINT8 Enabled : 1;
-    UINT8 Bsp : 1;
-    UINT8 Reserved : 6;
-  } Flags;
-  struct {
-    UINT32  Stepping : 4;
-    UINT32  Model : 4;
-    UINT32  Family : 4;
-    UINT32  Reserved : 20;
-  } Signature;
-  struct {
-    UINT32  Fpu : 1;
-    UINT32  Reserved1 : 6;
-    UINT32  Mce : 1;
-    UINT32  Cx8 : 1;
-    UINT32  Apic : 1;
-    UINT32  Reserved2 : 22;
-  } Features;
+  EFI_LEGACY_MP_TABLE_ENTRY_PROCESSOR_FLAGS     Flags;
+  EFI_LEGACY_MP_TABLE_ENTRY_PROCESSOR_SIGNATURE Signature;
+  EFI_LEGACY_MP_TABLE_ENTRY_PROCESSOR_FEATURES  Features;
   UINT32  Reserved1;
   UINT32  Reserved2;
 } EFI_LEGACY_MP_TABLE_ENTRY_PROCESSOR;
@@ -126,13 +134,15 @@ typedef struct {
 //
 #define EFI_LEGACY_MP_TABLE_ENTRY_TYPE_IOAPIC 0x02
 typedef struct {
+  UINT8 Enabled : 1;
+  UINT8 Reserved : 7;
+} EFI_LEGACY_MP_TABLE_ENTRY_IOAPIC_FLAGS;
+
+typedef struct {
   UINT8 EntryType;
   UINT8 Id;
   UINT8 Ver;
-  struct {
-    UINT8 Enabled : 1;
-    UINT8 Reserved : 7;
-  } Flags;
+  EFI_LEGACY_MP_TABLE_ENTRY_IOAPIC_FLAGS Flags;
   UINT32  Address;
 } EFI_LEGACY_MP_TABLE_ENTRY_IOAPIC;
 
@@ -141,22 +151,28 @@ typedef struct {
 //
 #define EFI_LEGACY_MP_TABLE_ENTRY_TYPE_IO_INT 0x03
 typedef struct {
+  UINT16  Polarity : 2;
+  UINT16  Trigger : 2;
+  UINT16  Reserved : 12;
+} EFI_LEGACY_MP_TABLE_ENTRY_INT_FLAGS;
+
+typedef struct {
+  UINT8 IntNo : 2;
+  UINT8 Dev : 5;
+  UINT8 Reserved : 1;
+} EFI_LEGACY_MP_TABLE_ENTRY_INT_FIELDS;
+
+typedef union {
+  EFI_LEGACY_MP_TABLE_ENTRY_INT_FIELDS fields;
+  UINT8 byte;
+} EFI_LEGACY_MP_TABLE_ENTRY_INT_SOURCE_BUS_IRQ;
+
+typedef struct {
   UINT8 EntryType;
   UINT8 IntType;
-  struct {
-    UINT16  Polarity : 2;
-    UINT16  Trigger : 2;
-    UINT16  Reserved : 12;
-  } Flags;
+  EFI_LEGACY_MP_TABLE_ENTRY_INT_FLAGS Flags;
   UINT8 SourceBusId;
-  union {
-    struct {
-      UINT8 IntNo : 2;
-      UINT8 Dev : 5;
-      UINT8 Reserved : 1;
-    } fields;
-    UINT8 byte;
-  } SourceBusIrq;
+  EFI_LEGACY_MP_TABLE_ENTRY_INT_SOURCE_BUS_IRQ SourceBusIrq;
   UINT8 DestApicId;
   UINT8 DestApicIntIn;
 } EFI_LEGACY_MP_TABLE_ENTRY_IO_INT;
@@ -189,20 +205,9 @@ typedef enum {
 typedef struct {
   UINT8 EntryType;
   UINT8 IntType;
-  struct {
-    UINT16  Polarity : 2;
-    UINT16  Trigger : 2;
-    UINT16  Reserved : 12;
-  } Flags;
+  EFI_LEGACY_MP_TABLE_ENTRY_INT_FLAGS Flags;
   UINT8 SourceBusId;
-  union {
-    struct {
-      UINT8 IntNo : 2;
-      UINT8 Dev : 5;
-      UINT8 Reserved : 1;
-    } fields;
-    UINT8 byte;
-  } SourceBusIrq;
+  EFI_LEGACY_MP_TABLE_ENTRY_INT_SOURCE_BUS_IRQ SourceBusIrq;
   UINT8 DestApicId;
   UINT8 DestApicIntIn;
 } EFI_LEGACY_MP_TABLE_ENTRY_LOCAL_INT;
@@ -252,13 +257,15 @@ typedef enum {
 //
 #define EFI_LEGACY_MP_TABLE_ENTRY_EXT_TYPE_BUS_HIERARCHY  0x81
 typedef struct {
+  UINT8 SubtractiveDecode : 1;
+  UINT8 Reserved : 7;
+} EFI_LEGACY_MP_TABLE_ENTRY_EXT_BUS_HIERARCHY_BUSINFO;
+
+typedef struct {
   UINT8 EntryType;
   UINT8 Length;
   UINT8 BusId;
-  struct {
-    UINT8 SubtractiveDecode : 1;
-    UINT8 Reserved : 7;
-  } BusInfo;
+  EFI_LEGACY_MP_TABLE_ENTRY_EXT_BUS_HIERARCHY_BUSINFO BusInfo;
   UINT8 ParentBus;
   UINT8 Reserved1;
   UINT8 Reserved2;
@@ -270,13 +277,15 @@ typedef struct {
 //
 #define EFI_LEGACY_MP_TABLE_ENTRY_EXT_TYPE_COMPAT_BUS_ADDR_SPACE_MODIFIER 0x82
 typedef struct {
+  UINT8 RangeMode : 1;
+  UINT8 Reserved : 7;
+} EFI_LEGACY_MP_TABLE_ENTRY_EXT_COMPAT_BUS_ADDR_SPACE_MODIFIER_ADDR_MODE;
+
+typedef struct {
   UINT8 EntryType;
   UINT8 Length;
   UINT8 BusId;
-  struct {
-    UINT8 RangeMode : 1;
-    UINT8 Reserved : 7;
-  } AddrMode;
+  EFI_LEGACY_MP_TABLE_ENTRY_EXT_COMPAT_BUS_ADDR_SPACE_MODIFIER_ADDR_MODE AddrMode;
   UINT32  PredefinedRangeList;
 } EFI_LEGACY_MP_TABLE_ENTRY_EXT_COMPAT_BUS_ADDR_SPACE_MODIFIER;
 
