@@ -1,7 +1,7 @@
 /** @file
   Root include file for Shell Package modules that utilize the SHELL_RETURN type
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,8 @@
 
 #ifndef __SHELL_BASE__
 #define __SHELL_BASE__
+
+#define ABS(a) (a<0)?(-(a)):(a)
 
 typedef VOID *SHELL_FILE_HANDLE;
 
