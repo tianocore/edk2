@@ -1,7 +1,7 @@
 /** @file
   Main file for NULL named library for level 1 shell command functions.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,11 @@ CONST EFI_GUID gShellLevel1HiiGuid = \
   };
 
 
+/**
+  Return the help text filename.  Only used if no HII information found.
+
+  @retval the filename.
+**/
 CONST CHAR16*
 EFIAPI
 ShellCommandGetManFileNameLevel1 (
@@ -64,6 +69,7 @@ ShellLevel1CommandsLibConstructor (
   //
   // install our shell command handlers that are always installed
   //
+  ShellCommandRegisterCommandName(L"stall",  ShellCommandRunStall   , ShellCommandGetManFileNameLevel1, 1, L"", FALSE, gShellLevel1HiiHandle, (EFI_STRING_ID)(PcdGet8(PcdShellSupportLevel) < 3 ? 0 : STRING_TOKEN(STR_GET_HELP_STALL) ));
   ShellCommandRegisterCommandName(L"for",    ShellCommandRunFor     , ShellCommandGetManFileNameLevel1, 1, L"", FALSE, gShellLevel1HiiHandle, (EFI_STRING_ID)(PcdGet8(PcdShellSupportLevel) < 3 ? 0 : STRING_TOKEN(STR_GET_HELP_FOR)   ));
   ShellCommandRegisterCommandName(L"goto",   ShellCommandRunGoto    , ShellCommandGetManFileNameLevel1, 1, L"", FALSE, gShellLevel1HiiHandle, (EFI_STRING_ID)(PcdGet8(PcdShellSupportLevel) < 3 ? 0 : STRING_TOKEN(STR_GET_HELP_GOTO)  ));
   ShellCommandRegisterCommandName(L"if",     ShellCommandRunIf      , ShellCommandGetManFileNameLevel1, 1, L"", FALSE, gShellLevel1HiiHandle, (EFI_STRING_ID)(PcdGet8(PcdShellSupportLevel) < 3 ? 0 : STRING_TOKEN(STR_GET_HELP_IF)    ));
@@ -78,6 +84,9 @@ ShellLevel1CommandsLibConstructor (
 
 /**
   Destructor for the library.  free any resources.
+
+  @param ImageHandle            The image handle of the process.
+  @param SystemTable            The EFI System Table pointer.
 **/
 EFI_STATUS
 EFIAPI
@@ -92,6 +101,29 @@ ShellLevel1CommandsLibDestructor (
   return (EFI_SUCCESS);
 }
 
+/**
+  Test a node to see if meets the criterion.
+
+  It functions so that count starts at 1 and it increases or decreases when it
+  hits the specified tags.  when it hits zero the location has been found.
+
+  DecrementerTag and IncrementerTag are used to get around for/endfor and 
+  similar paired types where the entire middle should be ignored.
+
+  If label is used it will be used instead of the count.
+
+  @param[in] Function         The function to use to enumerate through the 
+                              list.  Normally GetNextNode or GetPreviousNode.
+  @param[in] DecrementerTag   The tag to decrement the count at.
+  @param[in] IncrementerTag   The tag to increment the count at.
+  @param[in] Label            A label to look for.
+  @param[in,out] ScriptFile   The pointer to the current script file structure.
+  @param[in] MovePast         TRUE makes function return 1 past the found 
+                              location.
+  @param[in] FindOnly         TRUE to not change the ScriptFile.
+  @param[in] CommandNode      The pointer to the Node to test.
+  @param[in,out] TargetCount  The pointer to the current count.
+**/
 BOOLEAN
 EFIAPI
 TestNodeForMove (
@@ -99,11 +131,11 @@ TestNodeForMove (
   IN CONST CHAR16               *DecrementerTag,
   IN CONST CHAR16               *IncrementerTag,
   IN CONST CHAR16               *Label OPTIONAL,
-  IN SCRIPT_FILE                *ScriptFile,
+  IN OUT SCRIPT_FILE            *ScriptFile,
   IN CONST BOOLEAN              MovePast,
   IN CONST BOOLEAN              FindOnly,
   IN CONST SCRIPT_COMMAND_LIST  *CommandNode,
-  IN UINTN                      *TargetCount
+  IN OUT UINTN                  *TargetCount
   )
 {
   BOOLEAN             Found;
@@ -186,6 +218,29 @@ TestNodeForMove (
   return (Found);
 }
 
+/**
+  Move the script pointer from 1 tag (line) to another.
+
+  It functions so that count starts at 1 and it increases or decreases when it
+  hits the specified tags.  when it hits zero the location has been found.
+
+  DecrementerTag and IncrementerTag are used to get around for/endfor and 
+  similar paired types where the entire middle should be ignored.
+
+  If label is used it will be used instead of the count.
+
+  @param[in] Function         The function to use to enumerate through the 
+                              list.  Normally GetNextNode or GetPreviousNode.
+  @param[in] DecrementerTag   The tag to decrement the count at.
+  @param[in] IncrementerTag   The tag to increment the count at.
+  @param[in] Label            A label to look for.
+  @param[in,out] ScriptFile   The pointer to the current script file structure.
+  @param[in] MovePast         TRUE makes function return 1 past the found 
+                              location.
+  @param[in] FindOnly         TRUE to not change the ScriptFile.
+  @param[in] WrapAroundScript TRUE to wrap end-to-begining or vise versa in 
+                              searching.
+**/
 BOOLEAN
 EFIAPI
 MoveToTag (
@@ -193,7 +248,7 @@ MoveToTag (
   IN CONST CHAR16               *DecrementerTag,
   IN CONST CHAR16               *IncrementerTag,
   IN CONST CHAR16               *Label OPTIONAL,
-  IN SCRIPT_FILE                *ScriptFile,
+  IN OUT SCRIPT_FILE            *ScriptFile,
   IN CONST BOOLEAN              MovePast,
   IN CONST BOOLEAN              FindOnly,
   IN CONST BOOLEAN              WrapAroundScript

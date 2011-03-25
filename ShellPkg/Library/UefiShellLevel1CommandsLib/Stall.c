@@ -1,7 +1,7 @@
 /** @file
-  Main file for exit shell level 1 function.
+  Main file for stall shell level 1 function.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,20 +14,15 @@
 
 #include "UefiShellLevel1CommandsLib.h"
 
-STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
-  {L"/b", TypeFlag},
-  {NULL, TypeMax}
-  };
-
 /**
-  Function for 'exit' command.
+  Function for 'stall' command.
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
   @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
 **/
 SHELL_STATUS
 EFIAPI
-ShellCommandRunExit (
+ShellCommandRunStall (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
@@ -36,8 +31,7 @@ ShellCommandRunExit (
   LIST_ENTRY          *Package;
   CHAR16              *ProblemParam;
   SHELL_STATUS        ShellStatus;
-  UINT64              RetVal;
-  CONST CHAR16        *Return;
+  UINT64              Intermediate;
 
   ShellStatus         = SHELL_SUCCESS;
 
@@ -53,7 +47,7 @@ ShellCommandRunExit (
   //
   // parse the command line
   //
-  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
+  Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel1HiiHandle, ProblemParam);
@@ -63,32 +57,25 @@ ShellCommandRunExit (
       ASSERT(FALSE);
     }
   } else {
-
-    //
-    // return the specified error code
-    //
-    Return = ShellCommandLineGetRawValue(Package, 1);
-    if (Return != NULL) {
-      Status = ShellConvertStringToUint64(Return, &RetVal, FALSE, FALSE);
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel1HiiHandle, Return);
+    if (ShellCommandLineGetRawValue(Package, 2) != NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else if (ShellCommandLineGetRawValue(Package, 1) == NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      Status = ShellConvertStringToUint64(ShellCommandLineGetRawValue(Package, 1), &Intermediate, FALSE, FALSE);
+      if (EFI_ERROR(Status) || ((UINT64)(UINTN)(Intermediate)) != Intermediate) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel1HiiHandle, ShellCommandLineGetRawValue(Package, 1));
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
-        //
-        // If we are in a batch file and /b then pass TRUE otherwise false...
-        //
-        ShellCommandRegisterExit((BOOLEAN)(gEfiShellProtocol->BatchIsActive() && ShellCommandLineGetFlag(Package, L"/b")));
-
-        ShellStatus = (SHELL_STATUS)(RetVal);
+        Status = gBS->Stall((UINTN)Intermediate);
+        if (EFI_ERROR(Status)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_STALL_FAILED), gShellLevel1HiiHandle, Status);
+          ShellStatus = SHELL_DEVICE_ERROR;
+        }
       }
-    } else {
-      // If we are in a batch file and /b then pass TRUE otherwise false...
-      //
-      ShellCommandRegisterExit((BOOLEAN)(gEfiShellProtocol->BatchIsActive() && ShellCommandLineGetFlag(Package, L"/b")));
-
-      ShellStatus = (SHELL_STATUS)0;
     }
-
     ShellCommandLineFreeVarList (Package);
   }
   return (ShellStatus);

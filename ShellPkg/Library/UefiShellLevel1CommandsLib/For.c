@@ -1,7 +1,7 @@
 /** @file
   Main file for endfor and for shell level 1 functions.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,14 @@
 #include "UefiShellLevel1CommandsLib.h"
 #include <Library/PrintLib.h>
 
+/**
+  Determine if a valid string is a valid number for the 'for' command.
+
+  @param[in] Number The pointer to the string representation of the number to test.
+
+  @retval TRUE    The number is valid.
+  @retval FALSE   The number is not valid.
+**/
 BOOLEAN
 EFIAPI
 ShellIsValidForNumber (
@@ -308,7 +316,7 @@ ShellCommandRunFor (
       ||!((gEfiShellParametersProtocol->Argv[1][1] >= L'a' && gEfiShellParametersProtocol->Argv[1][1] <= L'z')
        ||(gEfiShellParametersProtocol->Argv[1][1] >= L'A' && gEfiShellParametersProtocol->Argv[1][1] <= L'Z'))
      ) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_VAR), gShellLevel1HiiHandle, gEfiShellParametersProtocol->Argv[2]);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_VAR), gShellLevel1HiiHandle, gEfiShellParametersProtocol->Argv[1]);
       return (SHELL_INVALID_PARAMETER);
     }
 
@@ -379,7 +387,7 @@ ShellCommandRunFor (
         if (ArgSet == NULL) {
 //        ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L"\"", 0);
         } else {
-          ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L"  ", 0);
+          ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L" ", 0);
         }
         ArgSet = StrnCatGrow(&ArgSet, &ArgSize, gEfiShellParametersProtocol->Argv[LoopVar], 0);
 //        ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L" ", 0);
@@ -397,49 +405,60 @@ ShellCommandRunFor (
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), gShellLevel1HiiHandle, ArgSet, ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
-        ArgSetWalker++;
-        while (ArgSetWalker != NULL && ArgSetWalker[0] == L' ') {
-          ArgSetWalker++;
+        TempSpot = StrStr(ArgSetWalker, L")");
+        if (TempSpot != NULL) {
+          TempString = TempSpot+1;
+          if (*(TempString) != CHAR_NULL) {
+            while(TempString != NULL && *TempString == L' ') {
+              TempString++;
+            }
+            if (StrLen(TempString) > 0) {
+              TempSpot = NULL;
+            }
+          }
         }
-        if (!ShellIsValidForNumber(ArgSetWalker)) {
+        if (TempSpot == NULL) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), gShellLevel1HiiHandle, ArgSet, ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
-          if (ArgSetWalker[0] == L'-') {
-            Info->Current = 0 - (INTN)ShellStrToUintn(ArgSetWalker+1);
-          } else {
-            Info->Current = (INTN)ShellStrToUintn(ArgSetWalker);
-          }
-          ArgSetWalker  = StrStr(ArgSetWalker, L" ");
+          *TempSpot = CHAR_NULL;
+          ArgSetWalker++;
           while (ArgSetWalker != NULL && ArgSetWalker[0] == L' ') {
             ArgSetWalker++;
           }
-          if (ArgSetWalker == NULL || *ArgSetWalker == CHAR_NULL || !ShellIsValidForNumber(ArgSetWalker)){
+          if (!ShellIsValidForNumber(ArgSetWalker)) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), gShellLevel1HiiHandle, ArgSet, ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
             if (ArgSetWalker[0] == L'-') {
-              Info->End = 0 - (INTN)ShellStrToUintn(ArgSetWalker+1);
+              Info->Current = 0 - (INTN)ShellStrToUintn(ArgSetWalker+1);
             } else {
-              Info->End = (INTN)ShellStrToUintn(ArgSetWalker);
+              Info->Current = (INTN)ShellStrToUintn(ArgSetWalker);
             }
-            if (Info->Current < Info->End) {
-              Info->Step            = 1;
-            } else {
-              Info->Step            = -1;
-            }
-
             ArgSetWalker  = StrStr(ArgSetWalker, L" ");
             while (ArgSetWalker != NULL && ArgSetWalker[0] == L' ') {
               ArgSetWalker++;
             }
-            if (ArgSetWalker != NULL && *ArgSetWalker != CHAR_NULL) {
-              TempSpot = StrStr(ArgSetWalker, L")");
-              if (TempSpot == NULL) {
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), gShellLevel1HiiHandle, ArgSet, ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
-                ShellStatus = SHELL_INVALID_PARAMETER;
+            if (ArgSetWalker == NULL || *ArgSetWalker == CHAR_NULL || !ShellIsValidForNumber(ArgSetWalker)){
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), gShellLevel1HiiHandle, ArgSet, ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
+              ShellStatus = SHELL_INVALID_PARAMETER;
+            } else {
+              if (ArgSetWalker[0] == L'-') {
+                Info->End = 0 - (INTN)ShellStrToUintn(ArgSetWalker+1);
               } else {
-                *TempSpot = CHAR_NULL;
+                Info->End = (INTN)ShellStrToUintn(ArgSetWalker);
+              }
+              if (Info->Current < Info->End) {
+                Info->Step            = 1;
+              } else {
+                Info->Step            = -1;
+              }
+
+              ArgSetWalker  = StrStr(ArgSetWalker, L" ");
+              while (ArgSetWalker != NULL && ArgSetWalker[0] == L' ') {
+                ArgSetWalker++;
+              }
+              if (ArgSetWalker != NULL && *ArgSetWalker != CHAR_NULL) {
                 if (ArgSetWalker == NULL || *ArgSetWalker == CHAR_NULL || !ShellIsValidForNumber(ArgSetWalker)){
                   ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), gShellLevel1HiiHandle, ArgSet, ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
                   ShellStatus = SHELL_INVALID_PARAMETER;
@@ -452,8 +471,14 @@ ShellCommandRunFor (
                     } else {
                       Info->Step = (INTN)ShellStrToUintn(ArgSetWalker);
                     }
+
+                    if (StrStr(ArgSetWalker, L" ") != NULL) {
+                      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), gShellLevel1HiiHandle, ArgSet, ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
+                      ShellStatus = SHELL_INVALID_PARAMETER;
+                    }
                   }
                 }
+                
               }
             }
           }
@@ -529,9 +554,9 @@ ShellCommandRunFor (
         if (Info->CurrentValue[0] == L'\"') {
           Info->CurrentValue++;
         }
-        while (Info->CurrentValue[0] == L' ') {
-          Info->CurrentValue++;
-        }
+//        while (Info->CurrentValue[0] == L' ') {
+//          Info->CurrentValue++;
+//        }
         if (Info->CurrentValue[0] == L'\"') {
           Info->CurrentValue++;
         }
