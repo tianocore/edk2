@@ -1,7 +1,7 @@
 /** @file
   Main file for Dblk shell Debug1 function.
 
-  Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,15 @@
 #include "UefiShellDebug1CommandsLib.h"
 #include <Protocol/BlockIo.h>
 
+/**
+  Display blocks to the screen.
+
+  @param[in] DevPath      The device path to get the blocks from.
+  @param[in] Lba          The Lba number to start from.
+  @param[in] BlockCount   How many blocks to display.
+
+  @retval SHELL_SUCCESS   The display was successful.
+**/
 SHELL_STATUS
 EFIAPI
 DisplayTheBlocks(
@@ -24,7 +33,6 @@ DisplayTheBlocks(
   )
 {
   EFI_BLOCK_IO_PROTOCOL     *BlockIo;
-  EFI_DEVICE_PATH_PROTOCOL  *Copy;
   EFI_HANDLE                BlockIoHandle;
   EFI_STATUS                Status;
   SHELL_STATUS              ShellStatus;
@@ -32,23 +40,38 @@ DisplayTheBlocks(
   UINTN                     BufferSize;
 
   ShellStatus = SHELL_SUCCESS;
-  Copy = (EFI_DEVICE_PATH_PROTOCOL *)DevPath;
 
-  Status = gBS->LocateDevicePath(&gEfiBlockIoProtocolGuid, &Copy, &BlockIoHandle);
-  ASSERT_EFI_ERROR(Status);
+  Status = gBS->LocateDevicePath(&gEfiBlockIoProtocolGuid, &((EFI_DEVICE_PATH_PROTOCOL *)DevPath), &BlockIoHandle);
+  if (EFI_ERROR(Status)) {
+    return (SHELL_NOT_FOUND);
+  }
 
   Status = gBS->OpenProtocol(BlockIoHandle, &gEfiBlockIoProtocolGuid, (VOID**)&BlockIo, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR(Status)) {
+    return (SHELL_NOT_FOUND);
+  }
 
   BufferSize = BlockIo->Media->BlockSize * BlockCount;
   if (BufferSize > 0) {
-    Buffer     = AllocatePool(BufferSize);
+    Buffer     = AllocateZeroPool(BufferSize);
   } else {
+    ShellPrintEx(-1,-1,L"  BlockSize: 0x%08x, BlockCount: 0x%08x\r\n", BlockIo->Media->BlockSize, BlockCount);
     Buffer    = NULL;
   }
 
   Status = BlockIo->ReadBlocks(BlockIo, BlockIo->Media->MediaId, Lba, BufferSize, Buffer);
   if (!EFI_ERROR(Status) && Buffer != NULL) {
+    ShellPrintHiiEx(
+      -1, 
+      -1, 
+      NULL, 
+      STRING_TOKEN (STR_DBLK_HEADER), 
+      gShellDebug1HiiHandle, 
+      Lba,
+      BufferSize,
+      BlockIo
+      );
+
     DumpHex(2,0,BufferSize,Buffer);
   } else {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_READ_FAIL), gShellDebug1HiiHandle, L"BlockIo", Status);
@@ -63,6 +86,12 @@ DisplayTheBlocks(
   return (ShellStatus);
 }
 
+/**
+  Function for 'dblk' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunDblk (
@@ -70,15 +99,16 @@ ShellCommandRunDblk (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS          Status;
-  LIST_ENTRY          *Package;
-  CHAR16              *ProblemParam;
-  SHELL_STATUS        ShellStatus;
-  CONST CHAR16        *BlockName;
-  CONST CHAR16        *LbaString;
-  CONST CHAR16        *BlockCountString;
-  UINT64              Lba;
-  UINT8               BlockCount;
+  EFI_STATUS                Status;
+  LIST_ENTRY                *Package;
+  CHAR16                    *ProblemParam;
+  SHELL_STATUS              ShellStatus;
+  CONST CHAR16              *BlockName;
+  CONST CHAR16              *LbaString;
+  CONST CHAR16              *BlockCountString;
+  UINT64                    Lba;
+  UINT64                    BlockCount;
+  EFI_DEVICE_PATH_PROTOCOL  *DevPath;
 
   ShellStatus         = SHELL_SUCCESS;
   Status              = EFI_SUCCESS;
@@ -122,26 +152,45 @@ ShellCommandRunDblk (
       if (LbaString == NULL) {
         Lba = 0;
       } else {
-        Lba = (UINT64)StrHexToUintn(LbaString);
+        if (!ShellIsHexOrDecimalNumber(LbaString, TRUE, FALSE)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, LbaString);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
+        ShellConvertStringToUint64(LbaString, &Lba, TRUE, FALSE);
       }
 
       if (BlockCountString == NULL) {
         BlockCount = 1;
       } else {
-        BlockCount = (UINT8)StrHexToUintn(BlockCountString);
+        if (!ShellIsHexOrDecimalNumber(BlockCountString, TRUE, FALSE)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, BlockCountString);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
+        ShellConvertStringToUint64(BlockCountString, &BlockCount, TRUE, FALSE);
         if (BlockCount > 0x10) {
           BlockCount = 0x10;
+        } else if (BlockCount == 0) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, BlockCountString);
+          ShellStatus = SHELL_INVALID_PARAMETER;
         }
       }
-
-      //
-      // do the work if we have a valid block identifier
-      //
-      if (mEfiShellProtocol->GetDevicePathFromMap(BlockName) == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, BlockName);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        ShellStatus = DisplayTheBlocks(mEfiShellProtocol->GetDevicePathFromMap(BlockName), Lba, BlockCount);
+      
+      if (ShellStatus == SHELL_SUCCESS) {
+        //
+        // do the work if we have a valid block identifier
+        //
+        if (mEfiShellProtocol->GetDevicePathFromMap(BlockName) == NULL) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, BlockName);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          DevPath = (EFI_DEVICE_PATH_PROTOCOL*)mEfiShellProtocol->GetDevicePathFromMap(BlockName);
+          if (gBS->LocateDevicePath(&gEfiBlockIoProtocolGuid, &DevPath, NULL) == EFI_NOT_FOUND) {
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_MAP_PROTOCOL), gShellDebug1HiiHandle, BlockName, L"BlockIo");
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          } else {
+            ShellStatus = DisplayTheBlocks(mEfiShellProtocol->GetDevicePathFromMap(BlockName), Lba, (UINT8)BlockCount);
+          }
+        }
       }
     }
 

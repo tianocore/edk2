@@ -1,7 +1,7 @@
 /** @file
   Main file for SerMode shell Debug1 function.
 
-  Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,9 +16,20 @@
 #include <Library/ShellLib.h>
 #include <Protocol/SerialIo.h>
 
+/**
+  Display information about a serial device by it's handle.
+
+  If HandleValid is FALSE, do all devices.
+
+  @param[in] HandleIdx      The handle index for the device.
+  @param[in] HandleValid    TRUE if HandleIdx is valid.
+
+  @retval SHELL_INVALID_PARAMETER   A parameter was invalid.
+  @retval SHELL_SUCCESS             The operation was successful.
+**/
 SHELL_STATUS
 EFIAPI
-iDisplaySettings (
+DisplaySettings (
   IN UINTN                   HandleIdx,
   IN BOOLEAN                 HandleValid
   )
@@ -147,6 +158,12 @@ iDisplaySettings (
   return ShellStatus;
 }
 
+/**
+  Function for 'sermode' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunSerMode (
@@ -169,6 +186,7 @@ ShellCommandRunSerMode (
   LIST_ENTRY              *Package;
   CHAR16                  *ProblemParam;
   CONST CHAR16            *Temp;
+  UINT64                  Intermediate;
 
   ShellStatus = SHELL_SUCCESS;
   HandleIdx   = 0;
@@ -188,28 +206,29 @@ ShellCommandRunSerMode (
       ASSERT(FALSE);
     }
   } else {
-    if (ShellCommandLineGetCount(Package) < 5 && ShellCommandLineGetCount(Package) > 1) {
+    if (ShellCommandLineGetCount(Package) < 6 && ShellCommandLineGetCount(Package) > 2) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetCount(Package) > 5) {
+    } else if (ShellCommandLineGetCount(Package) > 6) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       Temp = ShellCommandLineGetRawValue(Package, 1);
       if (Temp != NULL) {
-        HandleIdx = StrHexToUintn(Temp);
+        Status = ShellConvertStringToUint64(Temp, &Intermediate, TRUE, FALSE);
+        HandleIdx = (UINTN)Intermediate;
         Temp = ShellCommandLineGetRawValue(Package, 2);
         if (Temp == NULL) {
-          ShellStatus = iDisplaySettings (HandleIdx, TRUE);
+          ShellStatus = DisplaySettings (HandleIdx, TRUE);
           goto Done;
         }
       } else {
-        ShellStatus = iDisplaySettings (0, FALSE);
+        ShellStatus = DisplaySettings (0, FALSE);
         goto Done;
       }
       Temp = ShellCommandLineGetRawValue(Package, 2);
       if (Temp != NULL) {
-        BaudRate = StrHexToUintn(Temp);
+        BaudRate = ShellStrToUintn(Temp);
       } else {
         ASSERT(FALSE);
         BaudRate = 0;
@@ -252,7 +271,7 @@ ShellCommandRunSerMode (
       }
       Temp = ShellCommandLineGetRawValue(Package, 4);
       if (Temp != NULL) {
-        DataBits = StrHexToUintn(Temp);
+        DataBits = ShellStrToUintn(Temp);
       } else {
         //
         // make sure this is some number not in the list below.
@@ -270,7 +289,7 @@ ShellCommandRunSerMode (
         goto Done;
       }
       Temp = ShellCommandLineGetRawValue(Package, 5);
-      Value = StrHexToUintn(Temp);
+      Value = ShellStrToUintn(Temp);
       switch (Value) {
       case 0:
         StopBits = DefaultStopBits;
@@ -328,7 +347,7 @@ ShellCommandRunSerMode (
     }
   }
 
-  if (Index == NoHandles) {
+  if (ShellStatus == SHELL_SUCCESS && Index == NoHandles) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SERMODE_BAD_HANDLE), gShellDebug1HiiHandle, HandleIdx);
     ShellStatus = SHELL_INVALID_PARAMETER;
   }

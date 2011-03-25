@@ -1,7 +1,7 @@
 /** @file
   Main file for Dmem shell Debug1 function.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,8 +14,22 @@
 
 #include "UefiShellDebug1CommandsLib.h"
 #include <Protocol/PciRootBridgeIo.h>
+#include <Guid/Acpi.h>
+#include <Guid/Mps.h>
+#include <Guid/SmBios.h>
+#include <Guid/SalSystemTable.h>
 
+/**
+  Make a printable character.
+
+  If Char is printable then return it, otherwise return a question mark.
+
+  @param[in] Char     The character to make printable.
+
+  @return A printable character representing Char.
+**/
 CHAR16
+EFIAPI
 MakePrintable(
   IN CONST CHAR16 Char
   )
@@ -26,6 +40,12 @@ MakePrintable(
   return (Char);
 }
 
+/**
+  Display some Memory-Mapped-IO memory.
+
+  @param[in] Address    The starting address to display.
+  @param[in] Size       The length of memory to display.
+**/
 SHELL_STATUS
 EFIAPI
 DisplayMmioMemory(
@@ -66,6 +86,12 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {NULL, TypeMax}
   };
 
+/**
+  Function for 'dmem' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunDmem (
@@ -78,8 +104,14 @@ ShellCommandRunDmem (
   CHAR16              *ProblemParam;
   SHELL_STATUS        ShellStatus;
   VOID                *Address;
-  UINTN               Size;
+  UINT64              Size;
   CONST CHAR16        *Temp1;
+  UINT64              AcpiTableAddress;
+  UINT64              Acpi20TableAddress;
+  UINT64              SalTableAddress;
+  UINT64              SmbiosTableAddress;
+  UINT64              MpsTableAddress;
+  UINTN               TableWalker;
 
   ShellStatus         = SHELL_SUCCESS;
   Status              = EFI_SUCCESS;
@@ -108,26 +140,27 @@ ShellCommandRunDmem (
       ASSERT(FALSE);
     }
   } else {
-    Temp1 = ShellCommandLineGetRawValue(Package, 1);
-    if (Temp1 == NULL) {
-      Address = gST;
-      Size = 512;
+    if (ShellCommandLineGetCount(Package) > 3) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+      ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      if (!ShellIsHexOrDecimalNumber(Temp1, TRUE, FALSE)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp1);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        Address = (VOID*)StrHexToUintn(Temp1);
-      }
-      Temp1 = ShellCommandLineGetRawValue(Package, 2);
+      Temp1 = ShellCommandLineGetRawValue(Package, 1);
       if (Temp1 == NULL) {
+        Address = gST;
         Size = 512;
       } else {
-        if (!ShellIsHexOrDecimalNumber(Temp1, FALSE, FALSE)) {
+        if (!ShellIsHexOrDecimalNumber(Temp1, TRUE, FALSE) || EFI_ERROR(ShellConvertStringToUint64(Temp1, (UINT64*)&Address, TRUE, FALSE))) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp1);
           ShellStatus = SHELL_INVALID_PARAMETER;
+        } 
+        Temp1 = ShellCommandLineGetRawValue(Package, 2);
+        if (Temp1 == NULL) {
+          Size = 512;
         } else {
-          Size = ShellStrToUintn(Temp1);
+          if (!ShellIsHexOrDecimalNumber(Temp1, FALSE, FALSE) || EFI_ERROR(ShellConvertStringToUint64(Temp1, &Size, TRUE, FALSE))) {
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp1);
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          }
         }
       }
     }
@@ -135,9 +168,54 @@ ShellCommandRunDmem (
     if (ShellStatus == SHELL_SUCCESS) {
       if (!ShellCommandLineGetFlag(Package, L"-mmio")) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)Address, Size);
-        DumpHex(2,0,Size,Address);
+        DumpHex(2,0,(UINTN)Size,Address);
+        if (Address == (VOID*)gST) {
+          Acpi20TableAddress  = 0;
+          AcpiTableAddress    = 0;
+          SalTableAddress     = 0;
+          SmbiosTableAddress  = 0;
+          MpsTableAddress     = 0;
+          for (TableWalker = 0 ; TableWalker < gST->NumberOfTableEntries ; TableWalker++) {
+            if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiAcpi20TableGuid)) {
+              Acpi20TableAddress = (UINT64)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+            if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiAcpi10TableGuid)) {
+              AcpiTableAddress = (UINT64)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+            if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSalSystemTableGuid)) {
+              SalTableAddress = (UINT64)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+            if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSmbiosTableGuid)) {
+              SmbiosTableAddress = (UINT64)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+            if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiMpsTableGuid)) {
+              MpsTableAddress = (UINT64)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+          }
+
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMEM_SYSTEM_TABLE), gShellDebug1HiiHandle, 
+            (UINT64)Address,
+            gST->Hdr.HeaderSize,
+            gST->Hdr.Revision,
+            (UINT64)gST->ConIn,
+            (UINT64)gST->ConOut,
+            (UINT64)gST->StdErr,
+            (UINT64)gST->RuntimeServices,
+            (UINT64)gST->BootServices,
+            SalTableAddress,
+            AcpiTableAddress,
+            Acpi20TableAddress,
+            MpsTableAddress,
+            SmbiosTableAddress
+            );
+        }
       } else {
-        ShellStatus = DisplayMmioMemory(Address, Size);
+        ShellStatus = DisplayMmioMemory(Address, (UINTN)Size);
       }
     }
 

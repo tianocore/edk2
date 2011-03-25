@@ -16,6 +16,12 @@
 #include <Protocol/Decompress.h>
 
 
+/**
+  Function for 'decompress' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunEfiDecompress (
@@ -27,8 +33,8 @@ ShellCommandRunEfiDecompress (
   LIST_ENTRY          *Package;
   CHAR16              *ProblemParam;
   SHELL_STATUS        ShellStatus;
-  SHELL_FILE_HANDLE              InFileHandle;
-  SHELL_FILE_HANDLE              OutFileHandle;
+  SHELL_FILE_HANDLE   InFileHandle;
+  SHELL_FILE_HANDLE   OutFileHandle;
   UINT32              OutSize;
   UINTN               OutSizeTemp;
   VOID                *OutBuffer;
@@ -36,7 +42,7 @@ ShellCommandRunEfiDecompress (
   VOID                *InBuffer;
   CHAR16              *InFileName;
   CONST CHAR16        *OutFileName;
-  UINT64              temp;
+  UINT64              Temp64Bit;
   UINT32              ScratchSize;
   VOID                *ScratchBuffer;
   EFI_DECOMPRESS_PROTOCOL *Decompress;
@@ -83,65 +89,72 @@ ShellCommandRunEfiDecompress (
     } else {
       InFileName = ShellFindFilePath(ShellCommandLineGetRawValue(Package, 1));
       OutFileName = ShellCommandLineGetRawValue(Package, 2);
-      Status = ShellOpenFileByName(InFileName, &InFileHandle, EFI_FILE_MODE_READ, 0);
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 1), Status);
+      if (InFileName == NULL) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 1));
         ShellStatus = SHELL_NOT_FOUND;
-      }
-      Status = ShellOpenFileByName(OutFileName, &OutFileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 2), Status);
-        ShellStatus = SHELL_NOT_FOUND;
-      }
-      if (FileHandleIsDirectory(InFileHandle) == EFI_SUCCESS){
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, InFileName);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      }
-      if (FileHandleIsDirectory(OutFileHandle) == EFI_SUCCESS){
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, OutFileName);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      }
-      Status = FileHandleGetSize(InFileHandle, &temp);
-      ASSERT(temp <= (UINT32)(-1));
-      InSize = (UINTN)temp;
-      ASSERT_EFI_ERROR(Status);
-      InBuffer = AllocatePool(InSize);
-      ASSERT(InBuffer != NULL);
-      Status = gEfiShellProtocol->ReadFile(InFileHandle, &InSize, InBuffer);
-      ASSERT_EFI_ERROR(Status);
-
-      Status = gBS->LocateProtocol(&gEfiDecompressProtocolGuid, NULL, (VOID**)&Decompress);
-      ASSERT_EFI_ERROR(Status);
-
-      Status = Decompress->GetInfo(Decompress, InBuffer, (UINT32)InSize, &OutSize, &ScratchSize);
-      ASSERT_EFI_ERROR(Status);
-
-      OutBuffer = AllocatePool(OutSize);
-      ScratchBuffer = AllocatePool(ScratchSize);
-      ASSERT(OutBuffer != NULL);
-      ASSERT(ScratchBuffer != NULL);
-
-      Status = Decompress->Decompress(Decompress, InBuffer, (UINT32)InSize, OutBuffer, OutSize, ScratchBuffer, ScratchSize);
-      ASSERT_EFI_ERROR(Status);
-
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_EFI_DECOMPRESS_FAIL), gShellDebug1HiiHandle, Status);
-        ShellStatus = SHELL_DEVICE_ERROR;
       } else {
-        OutSizeTemp = OutSize;
-        Status = gEfiShellProtocol->WriteFile(OutFileHandle, &OutSizeTemp, OutBuffer);
-        OutSize = (UINT32)OutSizeTemp;
-        if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_WRITE_FAIL), gShellDebug1HiiHandle, OutFileName, Status);
-          ShellStatus = SHELL_DEVICE_ERROR;
+        if (ShellIsDirectory(InFileName) == EFI_SUCCESS){
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, InFileName);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
+        if (ShellIsDirectory(OutFileName) == EFI_SUCCESS){
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, OutFileName);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
+        if (ShellStatus == SHELL_SUCCESS) {
+          Status = ShellOpenFileByName(InFileName, &InFileHandle, EFI_FILE_MODE_READ, 0);
+          if (EFI_ERROR(Status)) {
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 1), Status);
+            ShellStatus = SHELL_NOT_FOUND;
+          }
+          Status = ShellOpenFileByName(OutFileName, &OutFileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
+          if (EFI_ERROR(Status)) {
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 2), Status);
+            ShellStatus = SHELL_NOT_FOUND;
+          }
+        }
+
+        if (ShellStatus == SHELL_SUCCESS) {
+          Status = FileHandleGetSize(InFileHandle, &Temp64Bit);
+          ASSERT(Temp64Bit <= (UINT32)(-1));
+          InSize = (UINTN)Temp64Bit;
+          ASSERT_EFI_ERROR(Status);
+          InBuffer = AllocateZeroPool(InSize);
+          ASSERT(InBuffer != NULL);
+          Status = gEfiShellProtocol->ReadFile(InFileHandle, &InSize, InBuffer);
+          ASSERT_EFI_ERROR(Status);
+
+          Status = gBS->LocateProtocol(&gEfiDecompressProtocolGuid, NULL, (VOID**)&Decompress);
+          ASSERT_EFI_ERROR(Status);
+
+          Status = Decompress->GetInfo(Decompress, InBuffer, (UINT32)InSize, &OutSize, &ScratchSize);
+          ASSERT_EFI_ERROR(Status);
+
+          OutBuffer = AllocateZeroPool(OutSize);
+          ScratchBuffer = AllocateZeroPool(ScratchSize);
+          ASSERT(OutBuffer != NULL);
+          ASSERT(ScratchBuffer != NULL);
+
+          Status = Decompress->Decompress(Decompress, InBuffer, (UINT32)InSize, OutBuffer, OutSize, ScratchBuffer, ScratchSize);
+          ASSERT_EFI_ERROR(Status);
+
+          if (EFI_ERROR(Status)) {
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_EFI_DECOMPRESS_FAIL), gShellDebug1HiiHandle, Status);
+            ShellStatus = SHELL_DEVICE_ERROR;
+          } else {
+            OutSizeTemp = OutSize;
+            Status = gEfiShellProtocol->WriteFile(OutFileHandle, &OutSizeTemp, OutBuffer);
+            OutSize = (UINT32)OutSizeTemp;
+            if (EFI_ERROR(Status)) {
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_WRITE_FAIL), gShellDebug1HiiHandle, OutFileName, Status);
+              ShellStatus = SHELL_DEVICE_ERROR;
+            }
+          }
         }
       }
     }
 
     ShellCommandLineFreeVarList (Package);
-  }
-  if (InFileName != NULL) {
-    FreePool(InFileName);
   }
   if (InFileHandle != NULL) {
     gEfiShellProtocol->CloseFile(InFileHandle);
@@ -149,15 +162,11 @@ ShellCommandRunEfiDecompress (
   if (OutFileHandle != NULL) {
     gEfiShellProtocol->CloseFile(OutFileHandle);
   }
-  if (InBuffer != NULL) {
-    FreePool(InBuffer);
-  }
-  if (OutBuffer != NULL) {
-    FreePool(OutBuffer);
-  }
-  if (ScratchBuffer != NULL) {
-    FreePool(ScratchBuffer);
-  }
+
+  SHELL_FREE_NON_NULL(InFileName);
+  SHELL_FREE_NON_NULL(InBuffer);
+  SHELL_FREE_NON_NULL(OutBuffer);
+  SHELL_FREE_NON_NULL(ScratchBuffer);
 
   return (ShellStatus);
 }

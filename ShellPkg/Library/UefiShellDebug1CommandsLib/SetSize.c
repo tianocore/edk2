@@ -1,7 +1,7 @@
 /** @file
   Main file for SetSize shell Debug1 function.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,12 @@
 
 #include "UefiShellDebug1CommandsLib.h"
 
+/**
+  Function for 'setsize' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunSetSize (
@@ -55,20 +61,31 @@ ShellCommandRunSetSize (
       ASSERT(FALSE);
     }
   } else {
-    Temp1 = ShellCommandLineGetRawValue(Package, 1);
-    if (Temp1 == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SIZE_NOT_SPEC), gShellDebug1HiiHandle);
+    if (ShellCommandLineGetCount(Package) < 3) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
       NewSize = 0;
     } else {
-      NewSize = ShellStrToUintn(Temp1);
+      Temp1 = ShellCommandLineGetRawValue(Package, 1);
+      if (!ShellIsHexOrDecimalNumber(Temp1, FALSE, FALSE)) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SIZE_NOT_SPEC), gShellDebug1HiiHandle);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        NewSize = 0;
+      } else {
+        NewSize = ShellStrToUintn(Temp1);
+      }
     }
     for (LoopVar = 2 ; LoopVar < ShellCommandLineGetCount(Package) && ShellStatus == SHELL_SUCCESS ; LoopVar++) {
-      Status = ShellOpenFileByName(ShellCommandLineGetRawValue(Package, LoopVar), &FileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
+      Status = ShellOpenFileByName(ShellCommandLineGetRawValue(Package, LoopVar), &FileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 0);
+      if (EFI_ERROR(Status)) {
+        Status = ShellOpenFileByName(ShellCommandLineGetRawValue(Package, LoopVar), &FileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
+      }
       if (EFI_ERROR(Status) && LoopVar == 2) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_SPEC), gShellDebug1HiiHandle);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else if (EFI_ERROR(Status)) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, LoopVar), Status);
+        ShellStatus = SHELL_INVALID_PARAMETER;
         break;
       } else {
         Status = FileHandleSetSize(FileHandle, NewSize);
@@ -78,6 +95,8 @@ ShellCommandRunSetSize (
         } else if (EFI_ERROR(Status)) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SET_SIZE_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, LoopVar), Status);
           ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SET_SIZE_DONE), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, LoopVar));
         }
         ShellCloseFile(&FileHandle);
       }

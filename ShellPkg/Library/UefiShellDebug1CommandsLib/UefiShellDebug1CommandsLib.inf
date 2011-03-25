@@ -52,6 +52,48 @@
   UefiShellDebug1CommandsLib.h
   UefiShellDebug1CommandsLib.uni
 
+## Files shared by both editors
+  EditTitleBar.h
+  EditTitleBar.c
+  EditInputBar.h
+  EditInputBar.c
+  EditStatusBar.h
+  EditStatusBar.c
+  EditMenuBar.h
+  EditMenuBar.c
+  
+## Files specific to the text editor  
+  ./Edit/Edit.c
+  ./Edit/TextEditor.h
+  ./Edit/TextEditorTypes.h
+  ./Edit/FileBuffer.h
+  ./Edit/FileBuffer.c
+  ./Edit/MainTextEditor.h
+  ./Edit/MainTextEditor.c
+  ./Edit/Misc.h
+  ./Edit/Misc.c
+  ./Edit/TextEditStrings.uni
+  
+## Files specific to the HEX editor
+  ./HexEdit/BufferImage.h
+  ./HexEdit/BufferImage.c
+  ./HexEdit/Clipboard.h
+  ./HexEdit/Clipboard.c
+  ./HexEdit/DiskImage.h
+  ./HexEdit/DiskImage.c
+  ./HexEdit/FileImage.h
+  ./HexEdit/FileImage.c
+  ./HexEdit/HexEdit.c
+  ./HexEdit/HexEditor.h
+  ./HexEdit/HexEditorTypes.h
+  ./HexEdit/HexeditStrings.uni
+  ./HexEdit/MainHexEditor.h
+  ./HexEdit/MainHexEditor.c
+  ./HexEdit/MemImage.h
+  ./HexEdit/MemImage.c
+  ./HexEdit/Misc.h
+  ./HexEdit/Misc.c
+
 [Packages]
   MdePkg/MdePkg.dec
   ShellPkg/ShellPkg.dec
@@ -71,14 +113,20 @@
   PrintLib
 
 [Pcd]
-  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask        # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize  # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask              # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize        # ALWAYS_CONSUMED
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength      # ALWAYS_CONSUMED
 
 [Protocols]
   gEfiPciRootBridgeIoProtocolGuid
   gEfiBlockIoProtocolGuid
+  gEfiSimplePointerProtocolGuid
 
 [Guids]
   gEfiGlobalVariableGuid
   gEfiSmbiosTableGuid
+  gEfiMpsTableGuid
+  gEfiSalSystemTableGuid
+  gEfiAcpi10TableGuid
+  gEfiAcpi20TableGuid
 

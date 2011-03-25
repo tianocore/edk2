@@ -1,7 +1,7 @@
 /** @file
   Main file for DmpStore shell Debug1 function.
 
-  Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -25,6 +25,19 @@ STATIC CHAR16   *AttrType[] = {
   L"NV+RT+BS",  // 111
 };
 
+/**
+  Function to display or delete variables.
+
+  @param[in] VariableName   The variable name of the EFI variable (or NULL).
+  @param[in] Guid           The GUID of the variable set (or NULL).
+  @param[in] Delete         TRUE to delete, FALSE otherwise.
+
+  @retval SHELL_SUCCESS           The operation was successful.
+  @retval SHELL_OUT_OF_RESOURCES  A memorty allocation failed.
+  @retval SHELL_ABORTED           The abort message was received.
+  @retval SHELL_DEVICE_ERROR      UEFI Variable Services returned an error.
+  @retval SHELL_NOT_FOUND         the Name/Guid pair could not be found.
+**/
 SHELL_STATUS
 EFIAPI
 ProcessVariables (
@@ -44,21 +57,26 @@ ProcessVariables (
   UINTN                     DataSize;
   UINT32                    Atts;
   SHELL_STATUS              ShellStatus;
+  BOOLEAN                   Found;
 
+  Status = gRT->QueryVariableInfo(EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS|EFI_VARIABLE_NON_VOLATILE, &MaxStorSize, &RemStorSize, &MaxVarSize);
+  if (EFI_ERROR(Status)) {
+    return (SHELL_DEVICE_ERROR);
+  }
+
+  Found         = FALSE;
   ShellStatus   = SHELL_SUCCESS;
   Size          = PcdGet16(PcdShellFileOperationSize);
-  FoundVarName  = AllocatePool(Size);
+  FoundVarName  = AllocateZeroPool(Size);
 
   if (FoundVarName == NULL) {
     return (SHELL_OUT_OF_RESOURCES);
   }
   FoundVarName[0] = CHAR_NULL;
 
-  Status = gRT->QueryVariableInfo(EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS|EFI_VARIABLE_NON_VOLATILE, &MaxStorSize, &RemStorSize, &MaxVarSize);
-  ASSERT_EFI_ERROR(Status);
 
   DataSize = (UINTN)MaxVarSize;
-  DataBuffer = AllocatePool(DataSize);
+  DataBuffer = AllocateZeroPool(DataSize);
   if (DataBuffer == NULL) {
     FreePool(FoundVarName);
     return (SHELL_OUT_OF_RESOURCES);
@@ -98,6 +116,7 @@ ProcessVariables (
     //
     // do the print or delete
     //
+    Found = TRUE;
     if (!Delete) {
       ShellPrintHiiEx(
         -1,
@@ -135,8 +154,19 @@ ProcessVariables (
   if (DataBuffer != NULL) {
     FreePool(DataBuffer);
   }
-
-  return (SHELL_UNSUPPORTED);
+  if (!Found) {
+    if (VariableName != NULL && Guid == NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMPSTORE_NO_VAR_FOUND_N), gShellDebug1HiiHandle, VariableName);
+    } else if (VariableName != NULL && Guid != NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMPSTORE_NO_VAR_FOUND_GN), gShellDebug1HiiHandle, Guid, VariableName);
+    } else if (VariableName == NULL && Guid == NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMPSTORE_NO_VAR_FOUND), gShellDebug1HiiHandle);
+    } else if (VariableName == NULL && Guid != NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMPSTORE_NO_VAR_FOUND_G), gShellDebug1HiiHandle, Guid);
+    } 
+    return (SHELL_NOT_FOUND);
+  }
+  return (SHELL_SUCCESS);
 }
 
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
@@ -148,6 +178,12 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {NULL, TypeMax}
   };
 
+/**
+  Function for 'dmpstore' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunDmpStore (
@@ -177,10 +213,7 @@ ShellCommandRunDmpStore (
       ASSERT(FALSE);
     }
   } else {
-    if (ShellCommandLineGetCount(Package) < 1) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetCount(Package) > 2) {
+    if (ShellCommandLineGetCount(Package) > 2) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetFlag(Package, L"-all") && ShellCommandLineGetFlag(Package, L"-guid")) {
@@ -195,14 +228,14 @@ ShellCommandRunDmpStore (
         if (Temp != NULL) {
           Status = ConvertStringToGuid(Temp, &GuidData);
           if (EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"-guid");
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
             ShellStatus = SHELL_INVALID_PARAMETER;
           }
           Guid = &GuidData;
         } else  {
           Guid = &gEfiGlobalVariableGuid;
         }
-        VariableName = ShellCommandLineGetRawValue(Package, 2);
+        VariableName = ShellCommandLineGetRawValue(Package, 1);
       } else {
         VariableName  = NULL;
         Guid          = NULL;
@@ -210,9 +243,8 @@ ShellCommandRunDmpStore (
       if (ShellStatus == SHELL_SUCCESS) {
         if (ShellCommandLineGetFlag(Package, L"-s") || ShellCommandLineGetFlag(Package, L"-l")) {
           ///@todo fix this after Jordan makes lib...
-          ShellPrintEx(-1, -1, L"Not implemeneted yet (ASSERT follows).\r\n");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          ASSERT(FALSE);
+          ShellPrintEx(-1, -1, L"Not implemeneted yet.\r\n");
+          ShellStatus = SHELL_UNSUPPORTED;
         } else {
           ShellStatus = ProcessVariables (VariableName, Guid, ShellCommandLineGetFlag(Package, L"-d"));
         }

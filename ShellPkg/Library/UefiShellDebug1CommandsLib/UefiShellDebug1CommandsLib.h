@@ -1,7 +1,7 @@
 /** @file
   Main file for NULL named library for Profile1 shell command functions.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,12 +12,16 @@
 
 **/
 
+#if !defined (_UEFI_SHELL_DEBUG1_COMMANDS_LIB_H_)
+#define _UEFI_SHELL_DEBUG1_COMMANDS_LIB_H_
+
 #include <Uefi.h>
 #include <ShellBase.h>
 
 #include <Guid/GlobalVariable.h>
 #include <Guid/ConsoleInDevice.h>
 #include <Guid/ConsoleOutDevice.h>
+#include <Guid/FileSystemInfo.h>
 
 #include <Protocol/EfiShell.h>
 #include <Protocol/EfiShellParameters.h>
@@ -34,6 +38,8 @@
 #include <Protocol/DriverFamilyOverride.h>
 #include <Protocol/DriverHealth.h>
 #include <Protocol/DevicePathFromText.h>
+#include <Protocol/SimplePointer.h>
+#include <Protocol/PciRootBridgeIo.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -77,7 +83,7 @@ DumpHex (
   EFI System Table based on the provided GUID.
 
   @param[in]  TableGuid    A pointer to the table's GUID type.
-  @param[out] Table        On exit, a pointer to a system configuration table.
+  @param[in,out] Table     On exit, a pointer to a system configuration table.
 
   @retval EFI_SUCCESS      A configuration table matching TableGuid was found.
   @retval EFI_NOT_FOUND    A configuration table matching TableGuid was not found.
@@ -329,4 +335,135 @@ ShellCommandRunDblk (
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
+/**
+  Function for 'edit' command.
 
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunEdit (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  );
+
+/**
+  Function for 'hexedit' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunHexEdit (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  );
+
+/** 
+  Appends a formatted Unicode string to a Null-terminated Unicode string
+ 
+  This function appends a formatted Unicode string to the Null-terminated 
+  Unicode string specified by String.   String is optional and may be NULL.
+  Storage for the formatted Unicode string returned is allocated using 
+  AllocateZeroPool().  The pointer to the appended string is returned.  The caller
+  is responsible for freeing the returned string.
+ 
+  If String is not NULL and not aligned on a 16-bit boundary, then ASSERT().
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
+ 
+  @param String   A null-terminated Unicode string.
+  @param FormatString   A null-terminated Unicode format string.
+  @param ...      The variable argument list whose contents are accessed based 
+                  on the format string specified by Format.
+
+  @retval NULL    There was not enough available memory.
+  @return         Null terminated Unicode string is that is the formatted 
+                  string appended to String.
+  @sa CatVSPrint
+**/
+CHAR16*
+EFIAPI
+CatSPrint (
+  IN  CONST CHAR16  *String OPTIONAL,
+  IN  CONST CHAR16  *FormatString,
+  ...
+  );
+
+/**
+  Clear the line at the specified Row.
+  
+  @param[in] Row                The row number to be cleared ( start from 1 )
+  @param[in] LastCol            The last printable column.
+  @param[in] LastRow            The last printable row.
+**/
+VOID
+EFIAPI
+EditorClearLine (
+  IN UINTN Row,
+  IN UINTN LastCol,
+  IN UINTN LastRow
+  );
+
+/**
+  Check if file name has illegal characters.
+  
+  @param Name       The filename to check.
+
+  @retval TRUE      The filename is ok.
+  @retval FALSE     The filename is not ok.
+**/
+BOOLEAN
+EFIAPI
+IsValidFileName (
+  IN CONST CHAR16 *Name
+  );
+
+/**
+  Find a filename that is valid (not taken) with the given extension.
+
+  @param[in] Extension      The file extension.
+
+  @retval NULL  Something went wrong.
+  @return the valid filename.
+**/
+CHAR16 *
+EFIAPI
+EditGetDefaultFileName (
+  IN CONST CHAR16 *Extension
+  );
+
+/**
+  Read a file into an allocated buffer.  The buffer is the responsibility 
+  of the caller to free.
+
+  @param[in]  FileName          The filename of the file to open.
+  @param[out] Buffer            Upon successful return, the pointer to the 
+                                address of the allocated buffer.                                  
+  @param[out] BufferSize        If not NULL, then the pointer to the size
+                                of the allocated buffer.
+  @param[out] ReadOnly          Upon successful return TRUE if the file is
+                                read only.  FALSE otherwise.
+
+  @retval EFI_NOT_FOUND         The filename did not represent a file in the 
+                                file system.  Directories cannot be read with
+                                this method.
+  @retval EFI_SUCCESS           The file was read into the buffer.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+  @retval EFI_LOAD_ERROR        The file read operation failed.
+  @retval EFI_INVALID_PARAMETER A parameter was invalid.
+  @retval EFI_INVALID_PARAMETER FileName was NULL.
+  @retval EFI_INVALID_PARAMETER FileName was a directory.
+**/
+EFI_STATUS
+EFIAPI
+ReadFileIntoBuffer (
+  IN CONST CHAR16 *FileName,
+  OUT VOID        **Buffer,
+  OUT UINTN       *BufferSize OPTIONAL,
+  OUT BOOLEAN     *ReadOnly
+  );
+
+#endif

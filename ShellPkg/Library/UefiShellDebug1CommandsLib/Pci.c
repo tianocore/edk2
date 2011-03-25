@@ -1,7 +1,7 @@
 /** @file
   Main file for Pci shell Debug1 function.
 
-  Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1938,14 +1938,29 @@ ShellCommandRunPci (
     }
   } else {
 
+    if (ShellCommandLineGetCount(Package) == 2) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
 
+    if (ShellCommandLineGetCount(Package) > 4) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
+    if (ShellCommandLineGetFlag(Package, L"-s") && ShellCommandLineGetValue(Package, L"-s") == NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"-s");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
     //
     // Get all instances of PciRootBridgeIo. Allocate space for 1 EFI_HANDLE and
     // call LibLocateHandle(), if EFI_BUFFER_TOO_SMALL is returned, allocate enough
     // space for handles and call it again.
     //
     HandleBufSize = sizeof (EFI_HANDLE);
-    HandleBuf     = (EFI_HANDLE *) AllocatePool (HandleBufSize);
+    HandleBuf     = (EFI_HANDLE *) AllocateZeroPool (HandleBufSize);
     if (HandleBuf == NULL) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle);
       ShellStatus = SHELL_OUT_OF_RESOURCES;
@@ -1987,7 +2002,7 @@ ShellCommandRunPci (
     //
     // Argument Count == 1(no other argument): enumerate all pci functions
     //
-    if (ShellCommandLineGetCount(Package) == 0) {
+    if (ShellCommandLineGetCount(Package) == 1) {
       gST->ConOut->QueryMode (
                     gST->ConOut,
                     gST->ConOut->Mode->Mode,
@@ -2134,20 +2149,6 @@ ShellCommandRunPci (
       goto Done;
     }
 
-    if (ShellCommandLineGetCount(Package) == 1) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-    //
-    // Arg count >= 3, dump binary of specified function, interpret if necessary
-    //
-    if (ShellCommandLineGetCount(Package) > 3) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-
     ExplainData                   = FALSE;
     Segment                       = 0;
     Bus                           = 0;
@@ -2159,7 +2160,7 @@ ShellCommandRunPci (
 
     Temp = ShellCommandLineGetValue(Package, L"-s");
     if (Temp != NULL) {
-      Segment = (UINT16) StrHexToUintn (Temp);
+      Segment = (UINT16) ShellStrToUintn (Temp);
     }
 
     //
@@ -2168,7 +2169,7 @@ ShellCommandRunPci (
     //
     Temp = ShellCommandLineGetRawValue(Package, 1);
     if (Temp != NULL) {
-      Bus = (UINT16)StrHexToUintn(Temp);
+      Bus = (UINT16)ShellStrToUintn(Temp);
       if (Bus > MAX_BUS_NUMBER) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
@@ -2177,7 +2178,7 @@ ShellCommandRunPci (
     }
     Temp = ShellCommandLineGetRawValue(Package, 2);
     if (Temp != NULL) {
-      Device = (UINT16) StrHexToUintn(Temp);
+      Device = (UINT16) ShellStrToUintn(Temp);
       if (Device > MAX_DEVICE_NUMBER){
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
@@ -2187,7 +2188,7 @@ ShellCommandRunPci (
 
     Temp = ShellCommandLineGetRawValue(Package, 3);
     if (Temp != NULL) {
-      Func = (UINT16) StrHexToUintn(Temp);
+      Func = (UINT16) ShellStrToUintn(Temp);
       if (Func > MAX_FUNCTION_NUMBER){
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
@@ -2469,19 +2470,20 @@ Returns:
   // if a bus typed one is found and its bus range covers bus, this handle
   // is the handle we are looking for.
   //
-  if ((*Descriptors)->Desc == ACPI_END_TAG_DESCRIPTOR) {
-    *IsEnd = TRUE;
-  }
 
   while ((*Descriptors)->Desc != ACPI_END_TAG_DESCRIPTOR) {
     if ((*Descriptors)->ResType == ACPI_ADDRESS_SPACE_TYPE_BUS) {
       *MinBus = (UINT16) (*Descriptors)->AddrRangeMin;
       *MaxBus = (UINT16) (*Descriptors)->AddrRangeMax;
       (*Descriptors)++;
-      break;
+      return (EFI_SUCCESS);
     }
 
     (*Descriptors)++;
+  }
+
+  if ((*Descriptors)->Desc == ACPI_END_TAG_DESCRIPTOR) {
+    *IsEnd = TRUE;
   }
 
   return EFI_SUCCESS;
@@ -4496,7 +4498,7 @@ PciExplainPciExpress (
 
   ExtendRegSize = 0x1000 - 0x100;
 
-  ExRegBuffer   = (UINT8 *) AllocatePool (ExtendRegSize);
+  ExRegBuffer   = (UINT8 *) AllocateZeroPool (ExtendRegSize);
 
   //
   // PciRootBridgeIo protocol should support pci express extend space IO

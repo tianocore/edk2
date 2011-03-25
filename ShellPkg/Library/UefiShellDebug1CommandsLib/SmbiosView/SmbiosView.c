@@ -1,7 +1,7 @@
 /** @file
   Tools of clarify the content of the smbios table.
 
-  Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -52,7 +52,7 @@ ShellCommandRunSmbiosView (
   Package             = NULL;
   ShellStatus         = SHELL_SUCCESS;
 
-  Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
+  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, ProblemParam);
@@ -65,11 +65,21 @@ ShellCommandRunSmbiosView (
     if (ShellCommandLineGetCount(Package) > 1) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
+    } else if (
+        (ShellCommandLineGetFlag(Package, L"-t") && ShellCommandLineGetFlag(Package, L"-h")) ||
+        (ShellCommandLineGetFlag(Package, L"-t") && ShellCommandLineGetFlag(Package, L"-s")) ||
+        (ShellCommandLineGetFlag(Package, L"-t") && ShellCommandLineGetFlag(Package, L"-a")) ||
+        (ShellCommandLineGetFlag(Package, L"-h") && ShellCommandLineGetFlag(Package, L"-s")) ||
+        (ShellCommandLineGetFlag(Package, L"-h") && ShellCommandLineGetFlag(Package, L"-a")) ||
+        (ShellCommandLineGetFlag(Package, L"-s") && ShellCommandLineGetFlag(Package, L"-a"))
+      ) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+      ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
 
       //
       // Init Lib
-      //
+      
       Status = LibSmbiosInit ();
       if (EFI_ERROR (Status)) {
         ShellStatus = SHELL_NOT_FOUND;
@@ -370,7 +380,7 @@ InitSmbiosTableStatistics (
     mStatisticsTable = NULL;
   }
 
-  mStatisticsTable = (STRUCTURE_STATISTICS *) AllocatePool (SMBiosTable->NumberOfSmbiosStructures * sizeof (STRUCTURE_STATISTICS));
+  mStatisticsTable = (STRUCTURE_STATISTICS *) AllocateZeroPool (SMBiosTable->NumberOfSmbiosStructures * sizeof (STRUCTURE_STATISTICS));
 
   if (mStatisticsTable == NULL) {
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_OUT_OF_MEM), gShellDebug1HiiHandle);

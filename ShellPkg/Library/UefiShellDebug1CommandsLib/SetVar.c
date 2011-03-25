@@ -1,7 +1,7 @@
 /** @file
   Main file for SetVar shell Debug1 function.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,12 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {NULL, TypeMax}
   };
 
+/**
+  Function for 'setvar' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunSetVar (
@@ -38,6 +44,7 @@ ShellCommandRunSetVar (
   EFI_GUID            Guid;
   CONST CHAR16        *StringGuid;
   UINT32              Attributes;
+  UINT32              Attributes2;
   VOID                *Buffer;
   UINTN               Size;
   UINTN               LoopVar;
@@ -88,7 +95,8 @@ ShellCommandRunSetVar (
         StringGuid = ShellCommandLineGetValue(Package, L"-guid");
         Status = ConvertStringToGuid(StringGuid, &Guid);
         if (EFI_ERROR(Status)) {
-          ShellStatus = SHELL_NOT_FOUND;
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, StringGuid);
+          ShellStatus = SHELL_INVALID_PARAMETER;
         }
       }
       if (Data == NULL) {
@@ -97,7 +105,7 @@ ShellCommandRunSetVar (
         //
         Status = gRT->GetVariable((CHAR16*)VariableName, &Guid, &Attributes, &Size, Buffer);
         if (Status == EFI_BUFFER_TOO_SMALL) {
-          Buffer = AllocatePool(Size);
+          Buffer = AllocateZeroPool(Size);
           Status = gRT->GetVariable((CHAR16*)VariableName, &Guid, &Attributes, &Size, Buffer);
         }
         if (!EFI_ERROR(Status)&& Buffer != NULL) {
@@ -138,22 +146,36 @@ ShellCommandRunSetVar (
           Attributes |= EFI_VARIABLE_NON_VOLATILE;
         }
         if (ShellIsHexOrDecimalNumber(Data, TRUE, FALSE)) {
-          //
-          // arbitrary buffer
-          //
-          Buffer = AllocateZeroPool((StrLen(Data) / 2));
-          for (LoopVar = 0 ; LoopVar < (StrLen(Data) / 2) ; LoopVar++) {
-            ((UINT8*)Buffer)[LoopVar] = (UINT8)(HexCharToUintn(Data[LoopVar*2]) * 16);
-            ((UINT8*)Buffer)[LoopVar] = (UINT8)(((UINT8*)Buffer)[LoopVar] + HexCharToUintn(Data[LoopVar*2+1]));
-          }
-          Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, StrLen(Data) / 2, Buffer);
-          if (EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, &Guid, VariableName, Status);
-            ShellStatus = SHELL_ACCESS_DENIED;
+          if (StrLen(Data) % 2 != 0) {
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, Data);
+            ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
-            ASSERT(ShellStatus == SHELL_SUCCESS);
+            //
+            // arbitrary buffer
+            //
+            Buffer = AllocateZeroPool((StrLen(Data) / 2));
+            for (LoopVar = 0 ; LoopVar < (StrLen(Data) / 2) ; LoopVar++) {
+              ((UINT8*)Buffer)[LoopVar] = (UINT8)(HexCharToUintn(Data[LoopVar*2]) * 16);
+              ((UINT8*)Buffer)[LoopVar] = (UINT8)(((UINT8*)Buffer)[LoopVar] + HexCharToUintn(Data[LoopVar*2+1]));
+            }
+            Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, StrLen(Data) / 2, Buffer);
+            if (EFI_ERROR(Status)) {
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, &Guid, VariableName, Status);
+              ShellStatus = SHELL_ACCESS_DENIED;
+            } else {
+              ASSERT(ShellStatus == SHELL_SUCCESS);
+            }
           }
         } else if (StrnCmp(Data, L"\"", 1) == 0) {
+          Size = 0;
+          Attributes2 = 0;
+          Status = gRT->GetVariable((CHAR16*)VariableName, &Guid, &Attributes2, &Size, Buffer);
+          if (Status == EFI_BUFFER_TOO_SMALL) {
+            Buffer = AllocateZeroPool(Size);
+            Status = gRT->GetVariable((CHAR16*)VariableName, &Guid, &Attributes2, &Size, Buffer);
+            FreePool(Buffer);
+            Attributes = Attributes2;
+          }          
           //
           // ascii text
           //
@@ -162,6 +184,7 @@ ShellCommandRunSetVar (
           AsciiSPrint(Buffer, StrSize(Data) / 2, "%s", Data);
           ((CHAR8*)Buffer)[AsciiStrLen(Buffer)-1] = CHAR_NULL;
 
+          
           Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, AsciiStrSize(Buffer)-sizeof(CHAR8), Buffer);
           if (EFI_ERROR(Status)) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, &Guid, VariableName, Status);

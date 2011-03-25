@@ -1,7 +1,7 @@
 /** @file
   Main file for Mm shell Debug1 function.
 
-  Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -25,38 +25,6 @@ typedef enum {
   EfiPciEConfig
 } EFI_ACCESS_TYPE;
 
-EFI_STATUS
-EFIAPI
-DumpIoModify (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
-  );
-
-VOID
-EFIAPI
-ReadMem (
-  IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
-  IN  UINT64        Address,
-  IN  UINTN         Size,
-  IN  VOID          *Buffer
-  );
-
-VOID
-EFIAPI
-WriteMem (
-  IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
-  IN  UINT64        Address,
-  IN  UINTN         Size,
-  IN  VOID          *Buffer
-  );
-
-BOOLEAN
-EFIAPI
-GetHex (
-  IN  UINT16  *str,
-  OUT UINT64  *data
-  );
-
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"-mmio", TypeFlag},
   {L"-mem", TypeFlag},
@@ -69,6 +37,142 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   };
 
 STATIC CONST UINT64 MaxNum[9]      = { 0xff, 0xffff, 0xffffffff, 0xffffffffffffffff };
+
+/**
+  Read some data into a buffer from memory.
+
+  @param[in] Width    The width of each read.
+  @param[in] Addresss The memory location to start reading at.
+  @param[in] Size     The size of Buffer in Width sized units.
+  @param[out] Buffer  The buffer to read into.
+**/
+VOID
+EFIAPI
+ReadMem (
+  IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
+  IN  UINT64        Address,
+  IN  UINTN         Size,
+  OUT VOID          *Buffer
+  )
+{
+  //
+  // This function is defective.  This ASSERT prevents the defect from affecting anything.
+  //
+  ASSERT(Size == 1);
+  do {
+    if (Width == EfiPciWidthUint8) {
+      *(UINT8 *) Buffer = *(UINT8 *) (UINTN) Address;
+      Address -= 1;
+    } else if (Width == EfiPciWidthUint16) {
+      *(UINT16 *) Buffer = *(UINT16 *) (UINTN) Address;
+      Address -= 2;
+    } else if (Width == EfiPciWidthUint32) {
+      *(UINT32 *) Buffer = *(UINT32 *) (UINTN) Address;
+      Address -= 4;
+    } else if (Width == EfiPciWidthUint64) {
+      *(UINT64 *) Buffer = *(UINT64 *) (UINTN) Address;
+      Address -= 8;
+    } else {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_READ_ERROR), gShellDebug1HiiHandle);
+      break;
+    }
+    Size--;
+  } while (Size > 0);
+}
+
+/**
+  Write some data to memory.
+
+  @param[in] Width    The width of each write.
+  @param[in] Addresss The memory location to start writing at.
+  @param[in] Size     The size of Buffer in Width sized units.
+  @param[in] Buffer   The buffer to write from.
+**/
+VOID
+EFIAPI
+WriteMem (
+  IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
+  IN  UINT64        Address,
+  IN  UINTN         Size,
+  IN  VOID          *Buffer
+  )
+{
+  //
+  // This function is defective.  This ASSERT prevents the defect from affecting anything.
+  //
+  ASSERT(Size == 1);
+  do {
+    if (Width == EfiPciWidthUint8) {
+      *(UINT8 *) (UINTN) Address = *(UINT8 *) Buffer;
+      Address += 1;
+    } else if (Width == EfiPciWidthUint16) {
+      *(UINT16 *) (UINTN) Address = *(UINT16 *) Buffer;
+      Address += 2;
+    } else if (Width == EfiPciWidthUint32) {
+      *(UINT32 *) (UINTN) Address = *(UINT32 *) Buffer;
+      Address += 4;
+    } else if (Width == EfiPciWidthUint64) {
+      *(UINT64 *) (UINTN) Address = *(UINT64 *) Buffer;
+      Address += 8;
+    } else {
+      ASSERT (FALSE);
+    }
+    //
+    //
+    //
+    Size--;
+  } while (Size > 0);
+}
+
+/**
+  Convert a string to it's hex data.
+
+  @param[in] str    The pointer to the string of hex data.
+  @param[out] data  The pointer to the buffer to fill.  Valid upon a TRUE return.
+
+  @retval TRUE      The conversion was successful.
+  @retval FALSE     The conversion failed.
+**/
+BOOLEAN
+EFIAPI
+GetHex (
+  IN  UINT16  *str,
+  OUT UINT64  *data
+  )
+{
+  UINTN   TempUint;
+  CHAR16  TempChar;
+  BOOLEAN Find;
+
+  Find = FALSE;
+  //
+  // convert hex digits
+  //
+  TempUint = 0;
+  TempChar = *(str++);
+  while (TempChar != CHAR_NULL) {
+    if (TempChar >= 'a' && TempChar <= 'f') {
+      TempChar -= 'a' - 'A';
+    }
+
+    if (TempChar == ' ') {
+      break;
+    }
+
+    if ((TempChar >= '0' && TempChar <= '9') || (TempChar >= 'A' && TempChar <= 'F')) {
+      TempUint     = TempUint << 4 | TempChar - (TempChar >= 'A' ? 'A' - 10 : '0');
+
+      Find  = TRUE;
+    } else {
+      return FALSE;
+    }
+
+    TempChar = *(str++);
+  }
+
+  *data = TempUint;
+  return Find;
+}
 
 /**
   Get the PCI-E Address from a PCI address format 0x0000ssbbddffrrr
@@ -157,7 +261,7 @@ ShellCommandRunMm (
       ASSERT(FALSE);
     }
   } else {
-    if (ShellCommandLineGetCount(Package) < 1) {
+    if (ShellCommandLineGetCount(Package) < 2) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
@@ -165,15 +269,49 @@ ShellCommandRunMm (
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
+    } else if (ShellCommandLineGetFlag(Package, L"-w") && ShellCommandLineGetValue(Package, L"-w") == NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"-w");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
     } else {
       if (ShellCommandLineGetFlag(Package, L"-mmio")) {
         AccessType = EFIMemoryMappedIo;
+        if (ShellCommandLineGetFlag(Package, L"-mem")
+          ||ShellCommandLineGetFlag(Package, L"-io")
+          ||ShellCommandLineGetFlag(Package, L"-pci")
+          ||ShellCommandLineGetFlag(Package, L"-pcie")
+        ){
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          goto Done;
+        }
       } else if (ShellCommandLineGetFlag(Package, L"-mem")) {
         AccessType = EfiMemory;
+        if (ShellCommandLineGetFlag(Package, L"-io")
+          ||ShellCommandLineGetFlag(Package, L"-pci")
+          ||ShellCommandLineGetFlag(Package, L"-pcie")
+        ){
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          goto Done;
+        }
       } else if (ShellCommandLineGetFlag(Package, L"-io")) {
         AccessType = EfiIo;
+        if (ShellCommandLineGetFlag(Package, L"-pci")
+          ||ShellCommandLineGetFlag(Package, L"-pcie")
+        ){
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          goto Done;
+        }
       } else if (ShellCommandLineGetFlag(Package, L"-pci")) {
         AccessType = EfiPciConfig;
+        if (ShellCommandLineGetFlag(Package, L"-pcie")
+        ){
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          goto Done;
+        }
       } else if (ShellCommandLineGetFlag(Package, L"-pcie")) {
         AccessType = EfiPciEConfig;
       }
@@ -185,7 +323,7 @@ ShellCommandRunMm (
 
     Temp = ShellCommandLineGetValue(Package, L"-w");
     if (Temp != NULL) {
-      ItemValue = StrDecimalToUintn (Temp);
+      ItemValue = ShellStrToUintn (Temp);
 
       switch (ItemValue) {
       case 1:
@@ -209,20 +347,26 @@ ShellCommandRunMm (
         break;
 
       default:
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"-w");
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"-w");
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
     }
 
     Temp = ShellCommandLineGetRawValue(Package, 1);
-    if (Temp != NULL) {
-      Address = StrHexToUint64(Temp);
+    if (!ShellIsHexOrDecimalNumber(Temp, TRUE, FALSE) || EFI_ERROR(ShellConvertStringToUint64(Temp, (UINT64*)&Address, TRUE, FALSE))) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
     }
 
     Temp = ShellCommandLineGetRawValue(Package, 2);
     if (Temp != NULL) {
-      Value = StrHexToUint64(Temp);
+      if (!ShellIsHexOrDecimalNumber(Temp, TRUE, FALSE) || EFI_ERROR(ShellConvertStringToUint64(Temp, &Value, TRUE, FALSE))) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
       switch (Size) {
       case 1:
         if (Value > 0xFF) {
@@ -304,7 +448,6 @@ ShellCommandRunMm (
         }
       }
       if (IoDev == NULL) {
-        // TODO add token
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_SEGMENT_NOT_FOUND), gShellDebug1HiiHandle, SegmentNumber);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
@@ -357,10 +500,10 @@ ShellCommandRunMm (
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_PCI), gShellDebug1HiiHandle);
         IoDev->Pci.Read (IoDev, Width, Address, 1, &Buffer);
       } else if (AccessType == EfiPciEConfig) {
-         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_PCIE), gShellDebug1HiiHandle);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_PCIE), gShellDebug1HiiHandle);
         IoDev->Pci.Read (IoDev, Width, PciEAddress, 1, &Buffer);
       } else {
-         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_MEM), gShellDebug1HiiHandle);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_MEM), gShellDebug1HiiHandle);
         ReadMem (Width, Address, 1, &Buffer);
       }
 
@@ -387,68 +530,59 @@ ShellCommandRunMm (
     do {
       if (AccessType == EfiIo && Address + Size > 0x10000) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS_RANGE2), gShellDebug1HiiHandle);
-  //      PrintToken (STRING_TOKEN (STR_IOMOD_IO_ADDRESS_2), HiiHandle, L"mm");
         break;
       }
 
       Buffer = 0;
       if (AccessType == EFIMemoryMappedIo) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_MMIO), gShellDebug1HiiHandle);
-  //      PrintToken (STRING_TOKEN (STR_IOMOD_HMMIO), HiiHandle);
         IoDev->Mem.Read (IoDev, Width, Address, 1, &Buffer);
       } else if (AccessType == EfiIo) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_IO), gShellDebug1HiiHandle);
-  //      PrintToken (STRING_TOKEN (STR_IOMOD_HIO), HiiHandle);
         IoDev->Io.Read (IoDev, Width, Address, 1, &Buffer);
       } else if (AccessType == EfiPciConfig) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_PCI), gShellDebug1HiiHandle);
-  //      PrintToken (STRING_TOKEN (STR_IOMOD_HPCI), HiiHandle);
         IoDev->Pci.Read (IoDev, Width, Address, 1, &Buffer);
       } else if (AccessType == EfiPciEConfig) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_PCIE), gShellDebug1HiiHandle);
-  //      PrintToken (STRING_TOKEN (STR_IOMOD_HPCIE), HiiHandle);
         IoDev->Pci.Read (IoDev, Width, PciEAddress, 1, &Buffer);
       } else {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_MEM), gShellDebug1HiiHandle);
-  //      PrintToken (STRING_TOKEN (STR_IOMOD_HMEM), HiiHandle);
         ReadMem (Width, Address, 1, &Buffer);
       }
 
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
-  //    PrintToken (STRING_TOKEN (STR_IOMOD_ADDRESS), HiiHandle, Address);
 
       if (Size == 1) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF2), gShellDebug1HiiHandle, Buffer);
-  //      PrintToken (STRING_TOKEN (STR_IOMOD_BUFFER_2), HiiHandle, Buffer);
       } else if (Size == 2) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF4), gShellDebug1HiiHandle, Buffer);
-  //      PrintToken (STRING_TOKEN (STR_IOMOD_BUFFER_4), HiiHandle, Buffer);
       } else if (Size == 4) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF8), gShellDebug1HiiHandle, Buffer);
-  //      PrintToken (STRING_TOKEN (STR_IOMOD_BUFFER_8), HiiHandle, Buffer);
       } else if (Size == 8) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF16), gShellDebug1HiiHandle, Buffer);
-  //      PrintToken (STRING_TOKEN (STR_IOMOD_BUFFER_16), HiiHandle, Buffer);
       }
+      ShellPrintEx(-1, -1, L" > ");
       //
       // wait user input to modify
       //
       if (InputStr != NULL) {
         FreePool(InputStr);
+        InputStr = NULL;
       }
       ShellPromptForResponse(ShellPromptResponseTypeFreeform, NULL, (VOID**)&InputStr);
 
       //
       // skip space characters
       //
-      for (Index = 0; InputStr[Index] == ' '; Index++);
+      for (Index = 0; InputStr != NULL && InputStr[Index] == ' '; Index++);
 
       //
       // parse input string
       //
-      if (InputStr[Index] == '.' || InputStr[Index] == 'q' || InputStr[Index] == 'Q') {
+      if (InputStr != NULL && (InputStr[Index] == '.' || InputStr[Index] == 'q' || InputStr[Index] == 'Q')) {
         Complete = TRUE;
-      } else if (InputStr[Index] == CHAR_NULL) {
+      } else if (InputStr == NULL || InputStr[Index] == CHAR_NULL) {
         //
         // Continue to next address
         //
@@ -466,8 +600,8 @@ ShellCommandRunMm (
         }
       } else {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_ERROR), gShellDebug1HiiHandle);
-  //      PrintToken (STRING_TOKEN (STR_IOMOD_ERROR), HiiHandle);
         continue;
+  //      PrintToken (STRING_TOKEN (STR_IOMOD_ERROR), HiiHandle);
       }
 
       Address += Size;
@@ -491,112 +625,4 @@ Done:
     ShellCommandLineFreeVarList (Package);
   }
   return ShellStatus;
-}
-
-
-VOID
-EFIAPI
-ReadMem (
-  IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
-  IN  UINT64        Address,
-  IN  UINTN         Size,
-  IN  VOID          *Buffer
-  )
-{
-  do {
-    if (Width == EfiPciWidthUint8) {
-      *(UINT8 *) Buffer = *(UINT8 *) (UINTN) Address;
-      Address -= 1;
-    } else if (Width == EfiPciWidthUint16) {
-      *(UINT16 *) Buffer = *(UINT16 *) (UINTN) Address;
-      Address -= 2;
-    } else if (Width == EfiPciWidthUint32) {
-      *(UINT32 *) Buffer = *(UINT32 *) (UINTN) Address;
-      Address -= 4;
-    } else if (Width == EfiPciWidthUint64) {
-      *(UINT64 *) Buffer = *(UINT64 *) (UINTN) Address;
-      Address -= 8;
-    } else {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_READ_ERROR), gShellDebug1HiiHandle);
-//      PrintToken (STRING_TOKEN (STR_IOMOD_READ_MEM_ERROR), HiiHandle);
-      break;
-    }
-    //
-    //
-    //
-    Size--;
-  } while (Size > 0);
-}
-
-VOID
-EFIAPI
-WriteMem (
-  IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
-  IN  UINT64        Address,
-  IN  UINTN         Size,
-  IN  VOID          *Buffer
-  )
-{
-  do {
-    if (Width == EfiPciWidthUint8) {
-      *(UINT8 *) (UINTN) Address = *(UINT8 *) Buffer;
-      Address += 1;
-    } else if (Width == EfiPciWidthUint16) {
-      *(UINT16 *) (UINTN) Address = *(UINT16 *) Buffer;
-      Address += 2;
-    } else if (Width == EfiPciWidthUint32) {
-      *(UINT32 *) (UINTN) Address = *(UINT32 *) Buffer;
-      Address += 4;
-    } else if (Width == EfiPciWidthUint64) {
-      *(UINT64 *) (UINTN) Address = *(UINT64 *) Buffer;
-      Address += 8;
-    } else {
-      ASSERT (FALSE);
-    }
-    //
-    //
-    //
-    Size--;
-  } while (Size > 0);
-}
-
-BOOLEAN
-EFIAPI
-GetHex (
-  IN  UINT16  *str,
-  OUT UINT64  *data
-  )
-{
-  UINTN   u;
-  CHAR16  c;
-  BOOLEAN Find;
-
-  Find = FALSE;
-  //
-  // convert hex digits
-  //
-  u = 0;
-  c = *(str++);
-  while (c != CHAR_NULL) {
-    if (c >= 'a' && c <= 'f') {
-      c -= 'a' - 'A';
-    }
-
-    if (c == ' ') {
-      break;
-    }
-
-    if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')) {
-      u     = u << 4 | c - (c >= 'A' ? 'A' - 10 : '0');
-
-      Find  = TRUE;
-    } else {
-      return FALSE;
-    }
-
-    c = *(str++);
-  }
-
-  *data = u;
-  return Find;
 }

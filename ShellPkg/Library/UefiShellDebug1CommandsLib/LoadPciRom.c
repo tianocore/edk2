@@ -1,7 +1,7 @@
 /** @file
   Main file for LoadPciRom shell Debug1 function.
 
-  Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,19 +18,31 @@
 #include <IndustryStandard/PeImage.h>
 #include <Protocol/Decompress.h>
 
+/**
+  Connects all available drives and controllers.
+
+  @retval EFI_SUCCESS     The operation was successful.
+  @retval EFI_ABORTED     The abort mechanism was received.
+**/
 EFI_STATUS
 EFIAPI
 LoadPciRomConnectAllDriversToAllControllers (
   VOID
   );
 
-EFI_STATUS
-EFIAPI
-InitializeLoadPciRom (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  );
+/**
+  Command entry point.
 
+  @param[in] RomBar       The Rom Base address.
+  @param[in] RomSize      The Rom size.
+  @param[in] FileName     The file name.
+
+  @retval EFI_SUCCESS             The command completed successfully.
+  @retval EFI_INVALID_PARAMETER   Command usage error.
+  @retval EFI_UNSUPPORTED         Protocols unsupported.
+  @retval EFI_OUT_OF_RESOURCES    Out of memory.
+  @retval Other value             Unknown error.
+**/
 EFI_STATUS
 EFIAPI
 LoadEfiDriversFromRomImage (
@@ -44,6 +56,12 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {NULL, TypeMax}
   };
 
+/**
+  Function for 'loadpcirom' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunLoadPciRom (
@@ -83,11 +101,11 @@ ShellCommandRunLoadPciRom (
       ASSERT(FALSE);
     }
   } else {
-    if (ShellCommandLineGetCount(Package) < 1) {
+    if (ShellCommandLineGetCount(Package) < 2) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      if (!ShellCommandLineGetFlag(Package, L"-nc")) {
+      if (ShellCommandLineGetFlag(Package, L"-nc")) {
         Connect = FALSE;
       } else {
         Connect = TRUE;
@@ -103,15 +121,12 @@ ShellCommandRunLoadPciRom (
          ){
         Status = ShellOpenFileMetaArg((CHAR16*)Param, EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
         if (EFI_ERROR(Status)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, Param, Status);
           ShellStatus = SHELL_ACCESS_DENIED;
           break;
         }
       }
-      if (FileList == NULL || IsListEmpty(&FileList->Link)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle);
-      } else if (ShellStatus == SHELL_SUCCESS) {
-
-
+      if (ShellStatus == SHELL_SUCCESS  && FileList != NULL) {
         //
         // loop through the list and make sure we are not aborting...
         //
@@ -130,7 +145,7 @@ ShellCommandRunLoadPciRom (
             continue;
           }
           SourceSize  = (UINTN) Node->Info->FileSize;
-          File1Buffer = AllocatePool (SourceSize);
+          File1Buffer = AllocateZeroPool (SourceSize);
           ASSERT(File1Buffer != NULL);
           Status = gEfiShellProtocol->ReadFile(Node->Handle, &SourceSize, File1Buffer);
           if (EFI_ERROR(Status)) {
@@ -147,6 +162,9 @@ ShellCommandRunLoadPciRom (
           }
           FreePool(File1Buffer);
         }
+      } else if (ShellStatus == SHELL_SUCCESS) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_SPEC), gShellDebug1HiiHandle);
+        ShellStatus = SHELL_NOT_FOUND;
       }
       if (FileList != NULL && !IsListEmpty(&FileList->Link)) {
         Status = ShellCloseFileMetaArg(&FileList);
@@ -162,31 +180,27 @@ ShellCommandRunLoadPciRom (
   return (ShellStatus);
 }
 
+/**
+  Command entry point.
+
+  @param[in] RomBar       The Rom Base address.
+  @param[in] RomSize      The Rom size.
+  @param[in] FileName     The file name.
+
+  @retval EFI_SUCCESS             The command completed successfully.
+  @retval EFI_INVALID_PARAMETER   Command usage error.
+  @retval EFI_UNSUPPORTED         Protocols unsupported.
+  @retval EFI_OUT_OF_RESOURCES    Out of memory.
+  @retval Other value             Unknown error.
+**/
 EFI_STATUS
+EFIAPI
 LoadEfiDriversFromRomImage (
   VOID                      *RomBar,
   UINTN                     RomSize,
   CONST CHAR16              *FileName
   )
-/*++
 
-Routine Description:
-  Command entry point.
-
-Arguments:
-
-  RomBar   - Rom
-  RomSize  - Rom size
-  FileName - The file name
-
-Returns:
-  EFI_SUCCESS             - The command completed successfully
-  EFI_INVALID_PARAMETER   - Command usage error
-  EFI_UNSUPPORTED         - Protocols unsupported
-  EFI_OUT_OF_RESOURCES    - Out of memory
-  Other value             - Unknown error
-
-**/
 {
   EFI_PCI_EXPANSION_ROM_HEADER  *EfiRomHeader;
   PCI_DATA_STRUCTURE            *Pcir;
@@ -196,7 +210,7 @@ Returns:
   UINT16                        ImageOffset;
   EFI_HANDLE                    ImageHandle;
   EFI_STATUS                    Status;
-  EFI_STATUS                    retStatus;
+  EFI_STATUS                    ReturnStatus;
   CHAR16                        RomFileName[280];
   EFI_DEVICE_PATH_PROTOCOL      *FilePath;
   BOOLEAN                       SkipImage;
@@ -209,7 +223,7 @@ Returns:
   EFI_DECOMPRESS_PROTOCOL       *Decompress;
 
   ImageIndex    = 0;
-  retStatus     = EFI_NOT_FOUND;
+  ReturnStatus     = EFI_NOT_FOUND;
   RomBarOffset  = (UINTN) RomBar;
 
   do {
@@ -219,7 +233,7 @@ Returns:
     if (EfiRomHeader->Signature != 0xaa55) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_LOADPCIROM_CORRUPT), gShellDebug1HiiHandle, FileName, ImageIndex);
 //      PrintToken (STRING_TOKEN (STR_LOADPCIROM_IMAGE_CORRUPT), HiiHandle, ImageIndex);
-      return retStatus;
+      return ReturnStatus;
     }
 
     Pcir      = (PCI_DATA_STRUCTURE *) (UINTN) (RomBarOffset + EfiRomHeader->PcirOffset);
@@ -262,9 +276,9 @@ Returns:
                                   &ScratchSize
                                  );
             if (!EFI_ERROR (Status)) {
-              DecompressedImageBuffer = AllocatePool (DestinationSize);
+              DecompressedImageBuffer = AllocateZeroPool (DestinationSize);
               if (ImageBuffer != NULL) {
-                Scratch = AllocatePool (ScratchSize);
+                Scratch = AllocateZeroPool (ScratchSize);
                 if (Scratch != NULL) {
                   Status = Decompress->Decompress (
                                         Decompress,
@@ -312,7 +326,7 @@ Returns:
               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_LOADPCIROM_START_FAIL), gShellDebug1HiiHandle, FileName, ImageIndex, Status);
 //              PrintToken (STRING_TOKEN (STR_LOADPCIROM_START_IMAGE), HiiHandle, ImageIndex, Status);
             } else {
-              retStatus = Status;
+              ReturnStatus = Status;
             }
           }
         }
@@ -328,10 +342,17 @@ Returns:
     ImageIndex++;
   } while (((Pcir->Indicator & 0x80) == 0x00) && ((RomBarOffset - (UINTN) RomBar) < RomSize));
 
-  return retStatus;
+  return ReturnStatus;
 }
 
+/**
+  Connects all available drives and controllers.
+
+  @retval EFI_SUCCESS     The operation was successful.
+  @retval EFI_ABORTED     The abort mechanism was received.
+**/
 EFI_STATUS
+EFIAPI
 LoadPciRomConnectAllDriversToAllControllers (
   VOID
   )

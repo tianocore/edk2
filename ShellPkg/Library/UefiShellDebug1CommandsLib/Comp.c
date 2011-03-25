@@ -1,7 +1,7 @@
 /** @file
   Main file for Comp shell Debug1 function.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,12 @@
 
 #include "UefiShellDebug1CommandsLib.h"
 
+/**
+  Function for 'comp' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunComp (
@@ -83,24 +89,26 @@ ShellCommandRunComp (
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       FileName1 = ShellFindFilePath(ShellCommandLineGetRawValue(Package, 1));
+      if (FileName1 == NULL) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 1));
+        ShellStatus = SHELL_NOT_FOUND;
+      } else {
+        Status = ShellOpenFileByName(FileName1, &FileHandle1, EFI_FILE_MODE_READ, 0);
+        if (EFI_ERROR(Status)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 1), Status);
+          ShellStatus = SHELL_NOT_FOUND;
+        }
+      }
       FileName2 = ShellFindFilePath(ShellCommandLineGetRawValue(Package, 2));
-      Status = ShellOpenFileByName(FileName1, &FileHandle1, EFI_FILE_MODE_READ, 0);
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 1), Status);
+      if (FileName2 == NULL) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 2));
         ShellStatus = SHELL_NOT_FOUND;
-      }
-      Status = ShellOpenFileByName(FileName2, &FileHandle2, EFI_FILE_MODE_READ, 0);
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 2), Status);
-        ShellStatus = SHELL_NOT_FOUND;
-      }
-      if (FileHandleIsDirectory(FileHandle1) == EFI_SUCCESS){
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, FileName1);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      }
-      if (FileHandleIsDirectory(FileHandle2) == EFI_SUCCESS){
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, FileName2);
-        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else {
+        Status = ShellOpenFileByName(FileName2, &FileHandle2, EFI_FILE_MODE_READ, 0);
+        if (EFI_ERROR(Status)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 2), Status);
+          ShellStatus = SHELL_NOT_FOUND;
+        }
       }
       if (ShellStatus == SHELL_SUCCESS) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_COMP_HEADER), gShellDebug1HiiHandle, FileName1, FileName2);
@@ -228,22 +236,19 @@ ShellCommandRunComp (
             ShellStatus = SHELL_NOT_EQUAL;
           }
         }
-      }
-      if (ErrorCount == 0) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_COMP_FOOTER_PASS), gShellDebug1HiiHandle);
-      } else {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_COMP_FOOTER_FAIL), gShellDebug1HiiHandle);
+        if (ErrorCount == 0) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_COMP_FOOTER_PASS), gShellDebug1HiiHandle);
+        } else {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_COMP_FOOTER_FAIL), gShellDebug1HiiHandle);
+        }
       }
     }
 
     ShellCommandLineFreeVarList (Package);
   }
-  if (FileName1 != NULL) {
-    FreePool(FileName1);
-  }
-  if (FileName2 != NULL) {
-    FreePool(FileName2);
-  }
+  SHELL_FREE_NON_NULL(FileName1);
+  SHELL_FREE_NON_NULL(FileName2);
+
   if (FileHandle1 != NULL) {
     gEfiShellProtocol->CloseFile(FileHandle1);
   }
