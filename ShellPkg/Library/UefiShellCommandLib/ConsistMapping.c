@@ -1,7 +1,7 @@
 /** @file
   Main file for support of shell consist mapping.
 
-  Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution. The full text of the license may be found at
@@ -29,9 +29,9 @@ typedef struct {
 } POOL_PRINT;
 
 typedef struct {
-  UINTN       HI;
-  MTD_TYPE    MTD;
-  POOL_PRINT  CSD;
+  UINTN       Hi;
+  MTD_TYPE    Mtd;
+  POOL_PRINT  Csd;
   BOOLEAN     Digital;
 } DEVICE_CONSIST_MAPPING_INFO;
 
@@ -43,8 +43,8 @@ typedef struct {
 typedef struct {
   UINT8 Type;
   UINT8 SubType;
-  VOID (EFIAPI *SerialFun) (EFI_DEVICE_PATH_PROTOCOL *, DEVICE_CONSIST_MAPPING_INFO *);
-  INTN (EFIAPI *CompareFun) (EFI_DEVICE_PATH_PROTOCOL *, EFI_DEVICE_PATH_PROTOCOL *);
+  VOID (EFIAPI *SerialFun) (EFI_DEVICE_PATH_PROTOCOL *DevPath, DEVICE_CONSIST_MAPPING_INFO *MapInfo);
+  INTN (EFIAPI *CompareFun) (EFI_DEVICE_PATH_PROTOCOL *DevPath, EFI_DEVICE_PATH_PROTOCOL *DevPath2);
 } DEV_PATH_CONSIST_MAPPING_TABLE;
 
 
@@ -128,7 +128,17 @@ MTD_NAME  mMTDName[] = {
   }
 };
 
-VOID
+/**
+  Function to append a 64 bit number / 25 onto the string.
+
+  @param[in,out] Str          The string so append onto.
+  @param[in]     Num          The number to divide and append.
+
+  @retval EFI_INVALID_PARAMETER   A parameter was NULL.
+  @retval EFI_SUCCESS             The appending was successful.
+**/
+EFI_STATUS
+EFIAPI
 AppendCSDNum2 (
   IN OUT POOL_PRINT       *Str,
   IN UINT64               Num
@@ -137,7 +147,9 @@ AppendCSDNum2 (
   UINT64  Result;
   UINT32   Rem;
 
-  ASSERT(Str != NULL);
+  if (Str == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   Result = DivU64x32Remainder (Num, 25, &Rem);
   if (Result > 0) {
@@ -145,35 +157,61 @@ AppendCSDNum2 (
   }
 
   CatPrint (Str, L"%c", Rem + 'a');
+  return (EFI_SUCCESS);
 }
 
-VOID
+/**
+  Function to append a 64 bit number onto the mapping info.
+
+  @param[in,out] MappingItem  The mapping info object to append onto.
+  @param[in]     Num          The info to append.
+
+  @retval EFI_INVALID_PARAMETER   A parameter was NULL.
+  @retval EFI_SUCCESS             The appending was successful.
+**/
+EFI_STATUS
+EFIAPI
 AppendCSDNum (
-  DEVICE_CONSIST_MAPPING_INFO            *MappingItem,
-  UINT64                                 Num
+  IN OUT DEVICE_CONSIST_MAPPING_INFO            *MappingItem,
+  IN     UINT64                                 Num
   )
 {
-  ASSERT(MappingItem != NULL);
+  if (MappingItem == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (MappingItem->Digital) {
-    CatPrint (&MappingItem->CSD, L"%ld", Num);
+    CatPrint (&MappingItem->Csd, L"%ld", Num);
   } else {
-    AppendCSDNum2 (&MappingItem->CSD, Num);
+    AppendCSDNum2 (&MappingItem->Csd, Num);
   }
 
   MappingItem->Digital = (BOOLEAN)!(MappingItem->Digital);
+
+  return (EFI_SUCCESS);
 }
 
-VOID
+/**
+  Function to append string into the mapping info.
+
+  @param[in,out] MappingItem  The mapping info object to append onto.
+  @param[in]     Str          The info to append.
+
+  @retval EFI_INVALID_PARAMETER   A parameter was NULL.
+  @retval EFI_SUCCESS             The appending was successful.
+**/
+EFI_STATUS
+EFIAPI
 AppendCSDStr (
-  DEVICE_CONSIST_MAPPING_INFO            *MappingItem,
-  CHAR16                                 *Str
+  IN OUT DEVICE_CONSIST_MAPPING_INFO            *MappingItem,
+  IN     CHAR16                                 *Str
   )
 {
   CHAR16  *Index;
 
-  ASSERT(Str != NULL);
-  ASSERT(MappingItem != NULL);
+  if (Str == NULL || MappingItem == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   if (MappingItem->Digital) {
     //
@@ -192,11 +230,11 @@ AppendCSDStr (
       case '7':
       case '8':
       case '9':
-        CatPrint (&MappingItem->CSD, L"%c", *Index);
+        CatPrint (&MappingItem->Csd, L"%c", *Index);
         break;
 
       case '1':
-        CatPrint (&MappingItem->CSD, L"16");
+        CatPrint (&MappingItem->Csd, L"16");
         break;
 
       case 'a':
@@ -205,7 +243,7 @@ AppendCSDStr (
       case 'd':
       case 'e':
       case 'f':
-        CatPrint (&MappingItem->CSD, L"1%c", *Index - 'a' + '0');
+        CatPrint (&MappingItem->Csd, L"1%c", *Index - 'a' + '0');
         break;
 
       case 'A':
@@ -214,7 +252,7 @@ AppendCSDStr (
       case 'D':
       case 'E':
       case 'F':
-        CatPrint (&MappingItem->CSD, L"1%c", *Index - 'A' + '0');
+        CatPrint (&MappingItem->Csd, L"1%c", *Index - 'A' + '0');
         break;
       }
     }
@@ -226,27 +264,41 @@ AppendCSDStr (
       //  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p
       //
       if (*Index >= '0' && *Index <= '9') {
-        CatPrint (&MappingItem->CSD, L"%c", *Index - '0' + 'a');
+        CatPrint (&MappingItem->Csd, L"%c", *Index - '0' + 'a');
       } else if (*Index >= 'a' && *Index <= 'f') {
-        CatPrint (&MappingItem->CSD, L"%c", *Index - 'a' + 'k');
+        CatPrint (&MappingItem->Csd, L"%c", *Index - 'a' + 'k');
       } else if (*Index >= 'A' && *Index <= 'F') {
-        CatPrint (&MappingItem->CSD, L"%c", *Index - 'A' + 'k');
+        CatPrint (&MappingItem->Csd, L"%c", *Index - 'A' + 'k');
       }
     }
   }
 
   MappingItem->Digital = (BOOLEAN)!(MappingItem->Digital);
+
+  return (EFI_SUCCESS);
 }
 
-VOID
+/**
+  Function to append a Guid to the mapping item.
+
+  @param[in,out] MappingItem  The item to append onto.
+  @param[in]     Guid         The guid to append.
+
+  @retval EFI_SUCCESS           The appending operation was successful.
+  @retval EFI_INVALID_PARAMETER A parameter was NULL.
+**/
+EFI_STATUS
+EFIAPI
 AppendCSDGuid (
   DEVICE_CONSIST_MAPPING_INFO            *MappingItem,
   EFI_GUID                               *Guid
   )
 {
   CHAR16  Buffer[64];
-  ASSERT(Guid != NULL);
-  ASSERT(MappingItem != NULL);
+
+  if (Guid == NULL || MappingItem == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   UnicodeSPrint (
     Buffer,
@@ -254,13 +306,24 @@ AppendCSDGuid (
     L"%g",
     Guid
    );
-//  StrLwr (Buffer);
+
   AppendCSDStr (MappingItem, Buffer);
+
+  return (EFI_SUCCESS);
 }
 
+/**
+  Function to compare 2 APCI device paths.
+
+  @param[in] DevicePath1        The first device path to compare.
+  @param[in] DevicePath2        The second device path to compare.
+
+  @retval 0 The device paths represent the same device.
+  @return   Non zero if the devices are different, zero otherwise.
+**/
 INTN
 EFIAPI
-_DevPathCompareAcpi (
+DevPathCompareAcpi (
   IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath1,
   IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath2
   )
@@ -268,8 +331,9 @@ _DevPathCompareAcpi (
   ACPI_HID_DEVICE_PATH  *Acpi1;
   ACPI_HID_DEVICE_PATH  *Acpi2;
 
-  ASSERT(DevicePath1 != NULL);
-  ASSERT(DevicePath2 != NULL);
+  if (DevicePath1 == NULL || DevicePath2 == NULL) {
+    return (-2);
+  }
 
   Acpi1 = (ACPI_HID_DEVICE_PATH *) DevicePath1;
   Acpi2 = (ACPI_HID_DEVICE_PATH *) DevicePath2;
@@ -284,9 +348,18 @@ _DevPathCompareAcpi (
   return -1;
 }
 
+/**
+  Function to compare 2 PCI device paths.
+
+  @param[in] DevicePath1        The first device path to compare.
+  @param[in] DevicePath2        The second device path to compare.
+
+  @retval 0 The device paths represent the same device.
+  @return   Non zero if the devices are different, zero otherwise.
+**/
 INTN
 EFIAPI
-_DevPathComparePci (
+DevPathComparePci (
   IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath1,
   IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath2
   )
@@ -363,8 +436,8 @@ DevPathSerialHardDrive (
   ASSERT(MappingItem != NULL);
 
   Hd = (HARDDRIVE_DEVICE_PATH *) DevicePathNode;
-  if (MappingItem->MTD == MTDTypeUnknown) {
-    MappingItem->MTD = MTDTypeHardDisk;
+  if (MappingItem->Mtd == MTDTypeUnknown) {
+    MappingItem->Mtd = MTDTypeHardDisk;
   }
 
   AppendCSDNum (MappingItem, Hd->PartitionNumber);
@@ -411,7 +484,7 @@ DevPathSerialCdRom (
   ASSERT(MappingItem != NULL);
 
   Cd                = (CDROM_DEVICE_PATH *) DevicePathNode;
-  MappingItem->MTD  = MTDTypeCDRom;
+  MappingItem->Mtd  = MTDTypeCDRom;
   AppendCSDNum (MappingItem, Cd->BootEntry);
 }
 
@@ -491,6 +564,7 @@ DevPathSerialUsb (
 
   @param[in] DevicePathNode   The node to get info on.
   @param[in] MappingItem      The info item to populate.
+
 **/
 VOID
 EFIAPI
@@ -501,15 +575,15 @@ DevPathSerialVendor (
 {
   VENDOR_DEVICE_PATH  *Vendor;
   SAS_DEVICE_PATH     *Sas;
-  EFI_GUID            SasVendorGuid = DEVICE_PATH_MESSAGING_SAS;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  if (DevicePathNode == NULL || MappingItem == NULL) {
+    return;
+  }
 
   Vendor = (VENDOR_DEVICE_PATH *) DevicePathNode;
   AppendCSDGuid (MappingItem, &Vendor->Guid);
 
-  if (CompareGuid (&SasVendorGuid, &Vendor->Guid) == 0) {
+  if (CompareGuid (&gEfiSasDevicePathGuid, &Vendor->Guid)) {
     Sas = (SAS_DEVICE_PATH *) Vendor;
     AppendCSDNum (MappingItem, Sas->SasAddress);
     AppendCSDNum (MappingItem, Sas->Lun);
@@ -579,7 +653,7 @@ DevPathSerialIScsi (
 {
 ///@todo make this a PCD
 //
-// As CSD of ISCSI node is quite long, we comment
+// As Csd of ISCSI node is quite long, we comment
 // the code below to keep the consistent mapping
 // short. Uncomment if you really need it.
 //
@@ -626,13 +700,13 @@ DevPathSerialI2O (
   IN DEVICE_CONSIST_MAPPING_INFO  *MappingItem
   )
 {
-  I2O_DEVICE_PATH *I2O;
+  I2O_DEVICE_PATH *DevicePath_I20;
 
   ASSERT(DevicePathNode != NULL);
   ASSERT(MappingItem != NULL);
 
-  I2O = (I2O_DEVICE_PATH *) DevicePathNode;
-  AppendCSDNum (MappingItem, I2O->Tid);
+  DevicePath_I20 = (I2O_DEVICE_PATH *) DevicePathNode;
+  AppendCSDNum (MappingItem, DevicePath_I20->Tid);
 }
 
 /**
@@ -819,14 +893,14 @@ DevPathSerial1394 (
   IN DEVICE_CONSIST_MAPPING_INFO  *MappingItem
   )
 {
-  F1394_DEVICE_PATH *F1394;
+  F1394_DEVICE_PATH *DevicePath_F1394;
   CHAR16            Buffer[20];
 
   ASSERT(DevicePathNode != NULL);
   ASSERT(MappingItem != NULL);
 
-  F1394 = (F1394_DEVICE_PATH *) DevicePathNode;
-  UnicodeSPrint (Buffer, 0, L"%lx", F1394->Guid);
+  DevicePath_F1394 = (F1394_DEVICE_PATH *) DevicePathNode;
+  UnicodeSPrint (Buffer, 0, L"%lx", DevicePath_F1394->Guid);
   AppendCSDStr (MappingItem, Buffer);
 }
 
@@ -851,7 +925,7 @@ DevPathSerialAcpi (
   Acpi = (ACPI_HID_DEVICE_PATH *) DevicePathNode;
   if ((Acpi->HID & PNP_EISA_ID_MASK) == PNP_EISA_ID_CONST) {
     if (EISA_ID_TO_NUM (Acpi->HID) == 0x0604) {
-      MappingItem->MTD = MTDTypeFloppy;
+      MappingItem->Mtd = MTDTypeFloppy;
       AppendCSDNum (MappingItem, Acpi->UID);
     }
   }
@@ -859,6 +933,9 @@ DevPathSerialAcpi (
 
 /**
   Empty function used for unknown devices.
+
+  @param[in] DevicePathNode       Ignored.
+  @param[in] MappingItem          Ignored.
 
   Does nothing.
 **/
@@ -869,17 +946,18 @@ DevPathSerialDefault (
   IN DEVICE_CONSIST_MAPPING_INFO  *MappingItem
   )
 {
+  return;
 }
 
 DEV_PATH_CONSIST_MAPPING_TABLE  DevPathConsistMappingTable[] = {
   HARDWARE_DEVICE_PATH,
   HW_PCI_DP,
   DevPathSerialDefault,
-  _DevPathComparePci,
+  DevPathComparePci,
   ACPI_DEVICE_PATH,
   ACPI_DP,
   DevPathSerialAcpi,
-  _DevPathCompareAcpi,
+  DevPathCompareAcpi,
   MESSAGING_DEVICE_PATH,
   MSG_ATAPI_DP,
   DevPathSerialAtapi,
@@ -963,8 +1041,8 @@ DEV_PATH_CONSIST_MAPPING_TABLE  DevPathConsistMappingTable[] = {
 
   @param[in] DevicePathNode   The node to check.
 
-  @retval TRUE    The node is HI.
-  @retval FALSE   The node is not HI.
+  @retval TRUE    The node is Hi.
+  @retval FALSE   The node is not Hi.
 **/
 BOOLEAN
 EFIAPI
@@ -997,11 +1075,11 @@ IsHIDevicePathNode (
 }
 
 /**
-  Function to convert a standard device path structure into a HI version.
+  Function to convert a standard device path structure into a Hi version.
 
   @param[in] DevicePath   The device path to convert.
 
-  @return   the device path portion that is HI.
+  @return   the device path portion that is Hi.
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
@@ -1019,7 +1097,7 @@ GetHIDevicePath (
 
   NonHIDevicePathNodeCount  = 0;
 
-  HIDevicePath              = AllocatePool (sizeof (EFI_DEVICE_PATH_PROTOCOL));
+  HIDevicePath              = AllocateZeroPool (sizeof (EFI_DEVICE_PATH_PROTOCOL));
   SetDevicePathEndNode (HIDevicePath);
 
   Node.DevPath.Type       = END_DEVICE_PATH_TYPE;
@@ -1072,7 +1150,7 @@ GetDeviceConsistMappingInfo (
   ASSERT(DevicePath != NULL);
   ASSERT(MappingItem != NULL);
 
-  SetMem (&MappingItem->CSD, sizeof (POOL_PRINT), 0);
+  SetMem (&MappingItem->Csd, sizeof (POOL_PRINT), 0);
 
   while (!IsDevicePathEnd (DevicePath)) {
     //
@@ -1212,7 +1290,7 @@ ShellCommandConsistMappingUnInitialize (
   This must be called after ShellCommandConsistMappingInitialize() and
   before ShellCommandConsistMappingUnInitialize() is called.
 
-  @param[in] DeviecPath   The pointer to the dev path for the device.
+  @param[in] DevicePath   The pointer to the dev path for the device.
   @param[in] Table        The Table of mapping information.
 
   @retval NULL            A consistent mapped name could not be created.
@@ -1221,8 +1299,8 @@ ShellCommandConsistMappingUnInitialize (
 CHAR16 *
 EFIAPI
 ShellCommandConsistMappingGenMappingName (
-  EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
-  EFI_DEVICE_PATH_PROTOCOL    **Table
+  IN EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
+  IN EFI_DEVICE_PATH_PROTOCOL    **Table
   )
 {
   POOL_PRINT                  Str;
@@ -1250,15 +1328,15 @@ ShellCommandConsistMappingGenMappingName (
     return NULL;
   }
 
-  MappingInfo.HI      = Index;
-  MappingInfo.MTD     = MTDTypeUnknown;
+  MappingInfo.Hi      = Index;
+  MappingInfo.Mtd     = MTDTypeUnknown;
   MappingInfo.Digital = FALSE;
 
   GetDeviceConsistMappingInfo (&MappingInfo, DevicePath);
 
   SetMem (&Str, sizeof (Str), 0);
   for (Index = 0; mMTDName[Index].MTDType != MTDTypeEnd; Index++) {
-    if (MappingInfo.MTD == mMTDName[Index].MTDType) {
+    if (MappingInfo.Mtd == mMTDName[Index].MTDType) {
       break;
     }
   }
@@ -1267,10 +1345,10 @@ ShellCommandConsistMappingGenMappingName (
     CatPrint (&Str, L"%s", mMTDName[Index].Name);
   }
 
-  CatPrint (&Str, L"%d", (UINTN) MappingInfo.HI);
-  if (MappingInfo.CSD.Str != NULL) {
-    CatPrint (&Str, L"%s", MappingInfo.CSD.Str);
-    FreePool (MappingInfo.CSD.Str);
+  CatPrint (&Str, L"%d", (UINTN) MappingInfo.Hi);
+  if (MappingInfo.Csd.Str != NULL) {
+    CatPrint (&Str, L"%s", MappingInfo.Csd.Str);
+    FreePool (MappingInfo.Csd.Str);
   }
 
   if (Str.Str != NULL) {
