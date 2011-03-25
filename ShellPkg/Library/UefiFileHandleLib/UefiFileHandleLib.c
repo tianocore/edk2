@@ -1,7 +1,7 @@
 /** @file
   Provides interface to EFI_FILE_HANDLE functionality.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,7 @@
 #include <Uefi.h>
 
 #include <Protocol/SimpleFileSystem.h>
+#include <Protocol/UnicodeCollation.h>
 
 #include <Guid/FileInfo.h>
 
@@ -25,6 +26,8 @@
 #include <Library/FileHandleLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
+
+CONST UINT16 gUnicodeFileTag = EFI_UNICODE_BYTE_ORDER_MARK;
 
 #define MAX_FILE_NAME_LEN 522 // (20 * (6+5+2))+1) unicode characters from EFI FAT spec (doubled for bytes)
 #define FIND_XXXXX_FILE_BUFFER_SIZE (SIZE_OF_EFI_FILE_INFO + MAX_FILE_NAME_LEN)
@@ -53,10 +56,9 @@ FileHandleGetInfo (
   UINTN           FileInfoSize;
   EFI_STATUS      Status;
 
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
+  if (FileHandle == NULL) {
+    return (NULL);
+  }
 
   //
   // Get the required size to allocate
@@ -66,26 +68,26 @@ FileHandleGetInfo (
   Status = FileHandle->GetInfo(FileHandle,
                                &gEfiFileInfoGuid,
                                &FileInfoSize,
-                               FileInfo);
-  //
-  // error is expected.  getting size to allocate
-  //
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-  FileInfo = AllocateZeroPool(FileInfoSize);
-  ASSERT (FileInfo != NULL);
-  //
-  // now get the information
-  //
-  Status = FileHandle->GetInfo(FileHandle,
-                               &gEfiFileInfoGuid,
-                               &FileInfoSize,
-                               FileInfo);
-  //
-  // if we got an error free the memory and return NULL
-  //
-  if (EFI_ERROR(Status)) {
-    FreePool(FileInfo);
-    return NULL;
+                               NULL);
+  if (Status == EFI_BUFFER_TOO_SMALL){
+    //
+    // error is expected.  getting size to allocate
+    //
+    FileInfo = AllocateZeroPool(FileInfoSize);
+    //
+    // now get the information
+    //
+    Status = FileHandle->GetInfo(FileHandle,
+                                 &gEfiFileInfoGuid,
+                                 &FileInfoSize,
+                                 FileInfo);
+    //
+    // if we got an error free the memory and return NULL
+    //
+    if (EFI_ERROR(Status)) {
+      FreePool(FileInfo);
+      return NULL;
+    }
   }
   return (FileInfo);
 }
@@ -467,11 +469,9 @@ FileHandleFindFirstFile (
   EFI_STATUS    Status;
   UINTN         BufferSize;
 
-  //
-  // ASSERTs
-  //
-  ASSERT (DirHandle != NULL);
-  ASSERT (Buffer != NULL);
+  if (Buffer == NULL || DirHandle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   //
   // verify that DirHandle is a directory
@@ -482,19 +482,23 @@ FileHandleFindFirstFile (
   }
 
   //
-  // reset to the begining of the directory
-  //
-  Status = FileHandleSetPosition(DirHandle, 0);
-  if (EFI_ERROR(Status)) {
-    return (Status);
-  }
-
-  //
   // Allocate a buffer sized to struct size + enough for the string at the end
   //
   BufferSize = FIND_XXXXX_FILE_BUFFER_SIZE;
   *Buffer = AllocateZeroPool(BufferSize);
-  ASSERT (*Buffer != NULL);
+  if (*Buffer == NULL){
+    return (EFI_OUT_OF_RESOURCES);
+  }
+
+  //
+  // reset to the begining of the directory
+  //
+  Status = FileHandleSetPosition(DirHandle, 0);
+  if (EFI_ERROR(Status)) {
+    FreePool(*Buffer);
+    *Buffer = NULL;
+    return (Status);
+  }
 
   //
   // read in the info about the first file
@@ -898,7 +902,7 @@ FileHandleReturnLine(
 
   Status = FileHandleReadLine(Handle, RetVal, &Size, FALSE, Ascii);
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    RetVal = AllocatePool(Size);
+    RetVal = AllocateZeroPool(Size);
     Status = FileHandleReadLine(Handle, RetVal, &Size, FALSE, Ascii);
   }
   ASSERT_EFI_ERROR(Status);
@@ -963,7 +967,7 @@ FileHandleReadLine(
     CharSize = sizeof(CHAR16);
     Status = FileHandleRead(Handle, &CharSize, &CharBuffer);
     ASSERT_EFI_ERROR(Status);
-    if (CharBuffer == UnicodeFileTag) {
+    if (CharBuffer == gUnicodeFileTag) {
       *Ascii = FALSE;
     } else {
       *Ascii = TRUE;
