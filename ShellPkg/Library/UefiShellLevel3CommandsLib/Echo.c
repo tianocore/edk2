@@ -1,7 +1,7 @@
 /** @file
   Main file for Echo shell level 3 function.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -37,11 +37,11 @@ ShellCommandRunEcho (
 {
   EFI_STATUS          Status;
   LIST_ENTRY          *Package;
-//  CHAR16              *ProblemParam;
   SHELL_STATUS        ShellStatus;
   UINTN               ParamCount;
+  CHAR16              *ProblemParam;
 
-//  ProblemParam        = NULL;
+  ProblemParam        = NULL;
   ShellStatus         = SHELL_SUCCESS;
 
   //
@@ -53,16 +53,16 @@ ShellCommandRunEcho (
   //
   // parse the command line
   //
-  Status = ShellCommandLineParseEx (ParamList, &Package, NULL, TRUE, TRUE);
-//  if (EFI_ERROR(Status)) {
-//    if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-//      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, ProblemParam);
-//      FreePool(ProblemParam);
-//      ShellStatus = SHELL_INVALID_PARAMETER;
-//    } else {
-//      ASSERT(FALSE);
-//    }
-//  } else {
+  Status = ShellCommandLineParseEx (ParamList, &Package, &ProblemParam, TRUE, TRUE);
+  if (EFI_ERROR(Status)) {
+    if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, ProblemParam);
+      FreePool(ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT(FALSE);
+    }
+  } else {
     //
     // check for "-?"
     //
@@ -109,7 +109,7 @@ ShellCommandRunEcho (
     // free the command line package
     //
     ShellCommandLineFreeVarList (Package);
-//  }
+  }
 
   return (ShellStatus);
 }

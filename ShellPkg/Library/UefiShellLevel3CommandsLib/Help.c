@@ -1,7 +1,7 @@
 /** @file
   Main file for Help shell level 3 function.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,7 +18,7 @@
 
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"-usage", TypeFlag},
-  {L"-section", TypeValue},
+  {L"-section", TypeMaxValue},
   {L"-verbose", TypeFlag},
   {L"-v", TypeFlag},
   {NULL, TypeMax}
@@ -133,19 +133,24 @@ ShellCommandRunHelp (
         FreePool(HiiString);
         Found = TRUE;
       } else {
-        CommandList = ShellCommandGetCommandList();
+        CommandList = ShellCommandGetCommandList(TRUE);
         ASSERT(CommandList != NULL);
         for ( Node = (COMMAND_LIST*)GetFirstNode(&CommandList->Link)
             ; CommandList != NULL && !IsListEmpty(&CommandList->Link) && !IsNull(&CommandList->Link, &Node->Link)
             ; Node = (COMMAND_LIST*)GetNextNode(&CommandList->Link, &Node->Link)
            ){
-          if (gUnicodeCollation->MetaiMatch(gUnicodeCollation, Node->CommandString, CommandToGetHelpOn)) {
+          if ((gUnicodeCollation->MetaiMatch(gUnicodeCollation, Node->CommandString, CommandToGetHelpOn)) ||
+             (gEfiShellProtocol->GetAlias(CommandToGetHelpOn, NULL) != NULL && (gUnicodeCollation->MetaiMatch(gUnicodeCollation, Node->CommandString, (CHAR16*)(gEfiShellProtocol->GetAlias(CommandToGetHelpOn, NULL)))))) {
             //
             // We have a command to look for help on.
             //
             Status = gEfiShellProtocol->GetHelpText(Node->CommandString, SectionToGetHelpOn, &OutText);
             if (EFI_ERROR(Status) || OutText == NULL) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, Node->CommandString);
+              if (Status == EFI_DEVICE_ERROR) {
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, Node->CommandString);
+              } else {
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, Node->CommandString);
+              }
               ShellStatus = SHELL_NOT_FOUND;
             } else {
               while (OutText[StrLen(OutText)-1] == L'\r' || OutText[StrLen(OutText)-1] == L'\n' || OutText[StrLen(OutText)-1] == L' ') {

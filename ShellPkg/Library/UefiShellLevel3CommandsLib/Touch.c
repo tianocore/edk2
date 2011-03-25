@@ -1,7 +1,7 @@
 /** @file
   Main file for Touch shell level 3 function.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,14 @@
 
 #include <Library/ShellLib.h>
 
+/**
+  Do the touch operation on a single handle.
+
+  @param[in] Handle   The handle to update the date/time on.
+
+  @retval EFI_ACCESS_DENIED The file referenced by Handle is read only.
+  @retval EFI_SUCCESS       The operation was successful.
+**/
 EFI_STATUS
 EFIAPI
 TouchFileByHandle (
@@ -40,6 +48,17 @@ TouchFileByHandle (
   return (Status);
 }
 
+/**
+  Touch a given file and potantially recurse down if it was a directory.
+
+  @param[in] Name   The name of this file.
+  @param[in] FS     The name of the file system this file is on.
+  @param[in] Handle The handle of this file already opened.
+  @param[in] Rec    TRUE to recurse if possible.
+
+  @retval EFI_INVALID_PARAMETER A parameter was invalid.
+  @retval EFI_SUCCESS           The operation was successful.
+**/
 EFI_STATUS
 EFIAPI
 DoTouchByHandle (

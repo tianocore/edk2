@@ -1,7 +1,7 @@
 /** @file
   Main file for Type shell level 3 function.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,18 @@
 
 #include <Library/ShellLib.h>
 
+/**
+  Display a single file to StdOut.
+
+  If both Ascii and UCS2 are FALSE attempt to discover the file type.
+
+  @param[in] Handle   The handle to the file to display.
+  @param[in] Ascii    TRUE to force ASCII, FALSE othewise.
+  @param[in] UCS2     TRUE to force UCS2, FALSE othewise.
+
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+  @retval EFI_SUCCESS           The operation was successful.
+**/
 EFI_STATUS
 EFIAPI
 TypeFileByHandle (
@@ -31,7 +43,7 @@ TypeFileByHandle (
   CHAR16      AsciiChar;
 
   ReadSize = PcdGet16(PcdShellFileOperationSize);
-  Buffer = AllocatePool(ReadSize);
+  Buffer = AllocateZeroPool(ReadSize);
   if (Buffer == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
@@ -47,7 +59,7 @@ TypeFileByHandle (
     }
 
     if (!(Ascii|UCS2)){
-      if (*(UINT16*)Buffer == UnicodeFileTag) {
+      if (*(UINT16*)Buffer == gUnicodeFileTag) {
         UCS2 = TRUE;
         Buffer = ((UINT16*)Buffer) + 1;
       } else {
@@ -71,7 +83,7 @@ TypeFileByHandle (
       Print(L"%s", Buffer);
     }
   }
-  Status = Print(L"\r\n", Buffer);
+  Print(L"\r\n", Buffer);
   return (Status);
 }
 
@@ -161,6 +173,7 @@ ShellCommandRunType (
          ){
         Status = ShellOpenFileMetaArg((CHAR16*)Param, EFI_FILE_MODE_READ, &FileList);
         if (EFI_ERROR(Status)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, (CHAR16*)Param);
           ShellStatus = SHELL_NOT_FOUND;
           break;
         }

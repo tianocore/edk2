@@ -1,7 +1,7 @@
 /** @file
   Main file for attrib shell level 2 function.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -83,11 +83,11 @@ ShellCommandRunCls (
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
-        if (StrDecimalToUintn(Param1) > 7 || StrLen(Param1) > 1 || !ShellIsDecimalDigitCharacter(*Param1)) {
+        if (ShellStrToUintn(Param1) > 7 || StrLen(Param1) > 1 || !ShellIsDecimalDigitCharacter(*Param1)) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, Param1);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
-          switch (StrDecimalToUintn(Param1)) {
+          switch (ShellStrToUintn(Param1)) {
             case 0:
               Background = EFI_BACKGROUND_BLACK;
               break;
@@ -113,7 +113,7 @@ ShellCommandRunCls (
               Background = EFI_BACKGROUND_LIGHTGRAY;
               break;
           }
-          ForeColor = (~StrDecimalToUintn(Param1)) & 0xF;
+          ForeColor = (~ShellStrToUintn(Param1)) & 0xF;
           Status = gST->ConOut->SetAttribute (gST->ConOut, ForeColor | Background);
           ASSERT_EFI_ERROR(Status);
           Status = gST->ConOut->ClearScreen (gST->ConOut);

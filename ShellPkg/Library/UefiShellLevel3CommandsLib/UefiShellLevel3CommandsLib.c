@@ -1,7 +1,7 @@
 /** @file
   Main file for NULL named library for level 3 shell command functions.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,11 @@ STATIC CONST EFI_GUID gShellLevel3HiiGuid = \
     0x4344558d, 0x4ef9, 0x4725, { 0xb1, 0xe4, 0x33, 0x76, 0xe8, 0xd6, 0x97, 0x4f } \
   };
 
+/**
+  return the filename to get help from is not using HII.
+
+  @retval The filename.
+**/
 CONST CHAR16*
 EFIAPI
 ShellCommandGetManFileNameLevel3 (
@@ -79,6 +84,9 @@ ShellLevel3CommandsLibConstructor (
 
 /**
   Destructor for the library.  free any resources.
+
+  @param ImageHandle            The image handle of the process.
+  @param SystemTable            The EFI System Table pointer.
 **/
 EFI_STATUS
 EFIAPI
