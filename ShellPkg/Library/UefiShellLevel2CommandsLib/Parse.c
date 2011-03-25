@@ -1,7 +1,7 @@
 /** @file
   Main file for Parse shell level 2 function.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,19 @@
 
 #include "UefiShellLevel2CommandsLib.h"
 
+/**
+  Do the actual parsing of the file.  the file should be SFO output from a 
+  shell command or a similar format.
+
+  @param[in] FileName               The filename to open.
+  @param[in] TableName              The name of the table to find.
+  @param[in] ColumnIndex            The column number to get.
+  @param[in] TableNameInstance      Which instance of the table to get (row).
+  @param[in] ShellCommandInstance   Which instance of the command to get.
+
+  @retval SHELL_NOT_FOUND     The requested instance was not found.
+  @retval SHELL_SUCCESS       The operation was successful.
+**/
 SHELL_STATUS
 EFIAPI
 PerformParsing(

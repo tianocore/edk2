@@ -1,7 +1,7 @@
 /** @file
   Main file for mv shell level 2 function.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -116,12 +116,13 @@ IsValidMove(
 
   if the result is sucessful the caller must free *DestPathPointer.
 
-  @param[in] DestDir              The original path to the destination
-  @param[in,out] DestPathPointer  a pointer to the callee allocated final path.
+  @param[in] DestDir              The original path to the destination.
+  @param[in,out] DestPathPointer  A pointer to the callee allocated final path.
+  @param[in] Cwd                  A pointer to the current working directory.
 
-  @retval EFI_INVALID_PARAMETR  the DestDir could not be resolved to a location
-  @retval EFI_INVALID_PARAMETR  the DestDir could be resolved to more than 1 location
-  @retval EFI_SUCCESS           the operation was sucessful
+  @retval EFI_INVALID_PARAMETR  The DestDir could not be resolved to a location.
+  @retval EFI_INVALID_PARAMETR  The DestDir could be resolved to more than 1 location.
+  @retval EFI_SUCCESS           The operation was sucessful.
 **/
 SHELL_STATUS
 EFIAPI
@@ -140,6 +141,17 @@ GetDestinationLocation(
 
   DestList = NULL;
   DestPath = NULL;
+
+  if (StrStr(DestDir, L"\\") == DestDir) {
+    DestPath = AllocateZeroPool(StrSize(Cwd));
+    if (DestPath == NULL) {
+      return (SHELL_OUT_OF_RESOURCES);
+    }
+    StrCpy(DestPath, Cwd);
+    while (ChopLastSlash(DestPath)) ;
+    *DestPathPointer =  DestPath;
+    return (SHELL_SUCCESS);
+  }
   //
   // get the destination path
   //
@@ -211,6 +223,7 @@ GetDestinationLocation(
   will report any errors to the user and continue to move the rest of the files.
 
   @param[in] FileList           A LIST_ENTRY* based list of files to move
+  @param[out] Resp              pointer to response from question.  Pass back on looped calling
   @param[in] DestDir            the destination location
 
   @retval SHELL_SUCCESS             the files were all moved.
@@ -223,6 +236,7 @@ SHELL_STATUS
 EFIAPI
 ValidateAndMoveFiles(
   IN CONST EFI_SHELL_FILE_INFO  *FileList,
+  OUT VOID                      **Resp,
   IN CONST CHAR16               *DestDir
   )
 {
@@ -237,12 +251,15 @@ ValidateAndMoveFiles(
   CHAR16                    *TempLocation;
   UINTN                     NewSize;
   UINTN                     Length;
+  VOID                      *Response;
+  SHELL_FILE_HANDLE         DestHandle;
 
   ASSERT(FileList != NULL);
   ASSERT(DestDir  != NULL);
 
   DestPath = NULL;
   Cwd      = ShellGetCurrentDir(NULL);
+  Response = *Resp;
 
   //
   // Get and validate the destination location
@@ -251,6 +268,7 @@ ValidateAndMoveFiles(
   if (ShellStatus != SHELL_SUCCESS) {
     return (ShellStatus);
   }
+  DestPath = CleanPath(DestPath);
 
   HiiOutput   = HiiGetString (gShellLevel2HiiHandle, STRING_TOKEN (STR_MV_OUTPUT), NULL);
   HiiResultOk = HiiGetString (gShellLevel2HiiHandle, STRING_TOKEN (STR_GEN_RES_OK), NULL);
@@ -325,8 +343,44 @@ ValidateAndMoveFiles(
         StrCat(NewFileInfo->FileName, Node->FileName);
       }
       NewFileInfo->Size = sizeof(EFI_FILE_INFO) + StrSize(NewFileInfo->FileName);
-
       ShellPrintEx(-1, -1, HiiOutput, Node->FullName, NewFileInfo->FileName);
+
+      if (!EFI_ERROR(ShellFileExists(NewFileInfo->FileName))) {
+        if (Response == NULL) {
+          ShellPromptForResponseHii(ShellPromptResponseTypeYesNoAllCancel, STRING_TOKEN (STR_GEN_DEST_EXIST_OVR), gShellLevel2HiiHandle, &Response);
+        }
+        switch (*(SHELL_PROMPT_RESPONSE*)Response) {
+          case ShellPromptResponseNo:
+            FreePool(NewFileInfo);
+            continue;
+          case ShellPromptResponseCancel:
+            *Resp = Response;
+            //
+            // indicate to stop everything
+            //
+            FreePool(NewFileInfo);
+            FreePool(DestPath);
+            FreePool(HiiOutput);
+            FreePool(HiiResultOk);
+            return (SHELL_ABORTED);
+          case ShellPromptResponseAll:
+            *Resp = Response;
+            break;
+          case ShellPromptResponseYes:
+            FreePool(Response);
+            break;
+          default:
+            FreePool(Response);
+            FreePool(NewFileInfo);
+            FreePool(DestPath);
+            FreePool(HiiOutput);
+            FreePool(HiiResultOk);
+            return SHELL_ABORTED;
+        }
+        Status = ShellOpenFileByName(NewFileInfo->FileName, &DestHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 0);
+        ShellDeleteFile(&DestHandle);
+      }
+
 
       //
       // Perform the move operation
@@ -336,7 +390,6 @@ ValidateAndMoveFiles(
       //
       // Free the info object we used...
       //
-      ASSERT  (NewFileInfo != NULL);
       FreePool(NewFileInfo);
 
       //
@@ -373,6 +426,12 @@ ValidateAndMoveFiles(
   return (ShellStatus);
 }
 
+/**
+  Function for 'mv' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunMv (
@@ -387,11 +446,13 @@ ShellCommandRunMv (
   UINTN               ParamCount;
   UINTN               LoopCounter;
   EFI_SHELL_FILE_INFO *FileList;
+  VOID                *Response;
 
   ProblemParam        = NULL;
   ShellStatus         = SHELL_SUCCESS;
   ParamCount          = 0;
   FileList            = NULL;
+  Response            = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -444,20 +505,20 @@ ShellCommandRunMv (
             //
             // ValidateAndMoveFiles will report errors to the screen itself
             //
-            ShellStatus = ValidateAndMoveFiles(FileList, ShellGetCurrentDir(NULL));
+            ShellStatus = ValidateAndMoveFiles(FileList, &Response, ShellGetCurrentDir(NULL));
           }
         }
 
         break;
       default:
         ///@todo make sure this works with error half way through and continues...
-        for (ParamCount--, LoopCounter = 1 ; LoopCounter < ParamCount && ShellStatus == SHELL_SUCCESS ; LoopCounter++) {
+        for (ParamCount--, LoopCounter = 1 ; LoopCounter < ParamCount ; LoopCounter++) {
           if (ShellGetExecutionBreakFlag()) {
             break;
           }
           Status = ShellOpenFileMetaArg((CHAR16*)ShellCommandLineGetRawValue(Package, LoopCounter), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
           if (FileList == NULL || IsListEmpty(&FileList->Link) || EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, ShellCommandLineGetRawValue(Package, 1));
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, ShellCommandLineGetRawValue(Package, LoopCounter));
             ShellStatus = SHELL_NOT_FOUND;
           } else  {
             //
@@ -465,9 +526,9 @@ ShellCommandRunMv (
             // Only change ShellStatus if it's sucessful
             //
             if (ShellStatus == SHELL_SUCCESS) {
-              ShellStatus = ValidateAndMoveFiles(FileList, ShellCommandLineGetRawValue(Package, ParamCount));
+              ShellStatus = ValidateAndMoveFiles(FileList, &Response, ShellCommandLineGetRawValue(Package, ParamCount));
             } else {
-              ValidateAndMoveFiles(FileList, ShellCommandLineGetRawValue(Package, ParamCount));
+              ValidateAndMoveFiles(FileList, &Response, ShellCommandLineGetRawValue(Package, ParamCount));
             }
           }
           if (FileList != NULL && !IsListEmpty(&FileList->Link)) {
@@ -490,6 +551,8 @@ ShellCommandRunMv (
     //
     ShellCommandLineFreeVarList (Package);
   }
+
+  SHELL_FREE_NON_NULL(Response);
 
   if (ShellGetExecutionBreakFlag()) {
     return (SHELL_ABORTED);

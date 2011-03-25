@@ -1,7 +1,7 @@
 /** @file
   Main file for time, timezone, and date shell level 2 and shell level 3 functions.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,18 +14,18 @@
 
 #include "UefiShellLevel2CommandsLib.h"
 
-INT16
-EFIAPI
-AbsVal(
-  INT16 v
-  )
-{
-  if (v>0) {
-    return (v);
-  }
-  return ((INT16)(-v));
-}
+/**
+  Determine if String is a valid representation for a time or date.
 
+  @param[in] String     The pointer to the string to test.
+  @param[in] Char       The delimeter character.
+  @param[in] Min        The minimum value allowed.
+  @param[in] Max        The maximum value allowed.
+  @param[in] MinusOk    Whether negative numbers are permitted.
+
+  @retval TRUE    String is a valid representation.
+  @retval FALSE   String is invalid.
+**/
 BOOLEAN
 EFIAPI
 InternalIsTimeLikeString (
@@ -75,6 +75,16 @@ InternalIsTimeLikeString (
   return (TRUE);
 }
 
+/**
+  Verify that the DateString is valid and if so set that as the current 
+  date.
+
+  @param[in] DateString     The pointer to a string representation of the date.
+
+  @retval SHELL_INVALID_PARAMETER   DateString was NULL.
+  @retval SHELL_INVALID_PARAMETER   DateString was mis-formatted.
+  @retval SHELL_SUCCESS             The operation was successful.
+**/
 SHELL_STATUS
 EFIAPI
 CheckAndSetDate (
@@ -83,7 +93,9 @@ CheckAndSetDate (
 {
   EFI_TIME      TheTime;
   EFI_STATUS    Status;
-  CONST CHAR16  *Walker;
+  CHAR16        *DateStringCopy;
+  CHAR16        *Walker;
+  CHAR16        *Walker1;
 
   if (!InternalIsTimeLikeString(DateString, L'/', 2, 2, FALSE)) {
     return (SHELL_INVALID_PARAMETER);
@@ -92,25 +104,41 @@ CheckAndSetDate (
   Status = gRT->GetTime(&TheTime, NULL);
   ASSERT_EFI_ERROR(Status);
 
-  Walker = DateString;
+  DateStringCopy = NULL;
+  DateStringCopy = StrnCatGrow(&DateStringCopy, NULL, DateString, 0);
+  if (DateStringCopy == NULL) {
+    return (SHELL_OUT_OF_RESOURCES);
+  }
+  Walker = DateStringCopy;
 
   TheTime.Month = 0xFF;
   TheTime.Day   = 0xFF;
   TheTime.Year  = 0xFFFF;
 
-  TheTime.Month = (UINT8)StrDecimalToUintn (Walker);
-  Walker = StrStr(Walker, L"/");
-  if (Walker != NULL && *Walker == L'/') {
-    Walker = Walker + 1;
+  Walker1 = StrStr(Walker, L"/");
+  if (Walker1 != NULL && *Walker1 == L'/') {
+    *Walker1 = CHAR_NULL;
+  }
+
+  TheTime.Month = (UINT8)ShellStrToUintn (Walker);
+  if (Walker1 != NULL) {
+    Walker = Walker1 + 1;
+  }
+  Walker1 = StrStr(Walker, L"/");
+  if (Walker1 != NULL && *Walker1 == L'/') {
+    *Walker1 = CHAR_NULL;
   }
   if (Walker != NULL && Walker[0] != CHAR_NULL) {
-    TheTime.Day = (UINT8)StrDecimalToUintn (Walker);
-    Walker = StrStr(Walker, L"/");
-    if (Walker != NULL && *Walker == L'/') {
-      Walker = Walker + 1;
+    TheTime.Day = (UINT8)ShellStrToUintn (Walker);
+    if (Walker1 != NULL) {
+      Walker = Walker1 + 1;
+    }
+    Walker1 = StrStr(Walker, L"/");
+    if (Walker1 != NULL && *Walker1 == L'/') {
+      *Walker1 = CHAR_NULL;
     }
     if (Walker != NULL && Walker[0] != CHAR_NULL) {
-      TheTime.Year = (UINT16)StrDecimalToUintn (Walker);
+      TheTime.Year = (UINT16)ShellStrToUintn (Walker);
     }
   }
 
@@ -241,6 +269,18 @@ STATIC CONST SHELL_PARAM_ITEM TimeParamList3[] = {
   {NULL, TypeMax}
   };
 
+/**
+  Verify that the TimeString is valid and if so set that as the current 
+  time.
+
+  @param[in] TimeString     The pointer to a string representation of the time.
+  @param[in] Tz             The value to set for TimeZone.
+  @param[in] Daylight       The value to set for Daylight.
+
+  @retval SHELL_INVALID_PARAMETER   TimeString was NULL.
+  @retval SHELL_INVALID_PARAMETER   TimeString was mis-formatted.
+  @retval SHELL_SUCCESS             The operation was successful.
+**/
 SHELL_STATUS
 EFIAPI
 CheckAndSetTime (
@@ -251,7 +291,9 @@ CheckAndSetTime (
 {
   EFI_TIME      TheTime;
   EFI_STATUS    Status;
-  CONST CHAR16  *Walker;
+  CHAR16        *TimeStringCopy;
+  CHAR16        *Walker1;
+  CHAR16        *Walker2;
 
   if (TimeString != NULL && !InternalIsTimeLikeString(TimeString, L':', 1, 2, FALSE)) {
     return (SHELL_INVALID_PARAMETER);
@@ -259,30 +301,40 @@ CheckAndSetTime (
 
   Status = gRT->GetTime(&TheTime, NULL);
   ASSERT_EFI_ERROR(Status);
+  TimeStringCopy = NULL;
+  TimeStringCopy = StrnCatGrow(&TimeStringCopy, NULL, TimeString, 0);
 
   if (TimeString != NULL) {
-    Walker          = TimeString;
+    Walker1          = TimeStringCopy;
     TheTime.Hour    = 0xFF;
     TheTime.Minute  = 0xFF;
 
-    TheTime.Hour    = (UINT8)StrDecimalToUintn (Walker);
-    Walker          = StrStr(Walker, L":");
-    if (Walker != NULL && *Walker == L':') {
-      Walker = Walker + 1;
+    Walker2          = StrStr(Walker1, L":");
+    if (Walker2 != NULL && *Walker2 == L':') {
+      *Walker2 = CHAR_NULL;
     }
-    if (Walker != NULL && Walker[0] != CHAR_NULL) {
-      TheTime.Minute = (UINT8)StrDecimalToUintn (Walker);
-      Walker = StrStr(Walker, L":");
-      if (Walker != NULL && *Walker == L':') {
-        Walker = Walker + 1;
+    TheTime.Hour    = (UINT8)ShellStrToUintn (Walker1);
+    if (Walker2 != NULL) {
+      Walker1 = Walker2 + 1;
+    }
+    Walker2          = StrStr(Walker1, L":");
+    if (Walker2 != NULL && *Walker2 == L':') {
+      *Walker2 = CHAR_NULL;
+    }
+    if (Walker1 != NULL && Walker1[0] != CHAR_NULL) {
+      TheTime.Minute = (UINT8)ShellStrToUintn (Walker1);
+      if (Walker2 != NULL) {
+        Walker1 = Walker2 + 1;
       }
-      if (Walker != NULL && Walker[0] != CHAR_NULL) {
-        TheTime.Second = (UINT8)StrDecimalToUintn (Walker);
+      if (Walker1 != NULL && Walker1[0] != CHAR_NULL) {
+        TheTime.Second = (UINT8)ShellStrToUintn (Walker1);
       }
     }
   }
 
-  if ((Tz >= -1440 && Tz <= 1440)||(Tz == 2047)) {
+  FreePool(TimeStringCopy);
+
+  if ((Tz >= -1440 && Tz <= 1440)||(Tz == 0x7FF)) {
     TheTime.TimeZone = Tz;
   }
   if (Daylight <= 3 && Daylight != 2) {
@@ -376,7 +428,7 @@ ShellCommandRunTime (
         if (TheTime.TimeZone == 2047) {
           TzMinutes = 0;
         } else {
-          TzMinutes = AbsVal(TheTime.TimeZone) % 60;
+          TzMinutes = (ABS(TheTime.TimeZone)) % 60;
         }
 
         ShellPrintHiiEx (
@@ -389,7 +441,7 @@ ShellCommandRunTime (
           TheTime.Minute,
           TheTime.Second,
           TheTime.TimeZone==2047?L" ":(TheTime.TimeZone > 0?L"-":L"+"),
-          TheTime.TimeZone==2047?0:AbsVal(TheTime.TimeZone) / 60,
+          TheTime.TimeZone==2047?0:(ABS(TheTime.TimeZone)) / 60,
           TzMinutes
          );
          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CRLF), gShellLevel2HiiHandle);
@@ -397,7 +449,7 @@ ShellCommandRunTime (
         if (TheTime.TimeZone == 2047) {
           TzMinutes = 0;
         } else {
-          TzMinutes = AbsVal(TheTime.TimeZone) % 60;
+          TzMinutes = (ABS(TheTime.TimeZone)) % 60;
         }
 
         ShellPrintHiiEx (
@@ -410,18 +462,18 @@ ShellCommandRunTime (
           TheTime.Minute,
           TheTime.Second,
           TheTime.TimeZone==2047?L" ":(TheTime.TimeZone > 0?L"-":L"+"),
-          TheTime.TimeZone==2047?0:AbsVal(TheTime.TimeZone) / 60,
+          TheTime.TimeZone==2047?0:(ABS(TheTime.TimeZone)) / 60,
           TzMinutes
          );
           switch (TheTime.Daylight) {
-            case 0:
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_TIME_DSTNA), gShellLevel2HiiHandle);
-              break;
             case EFI_TIME_ADJUST_DAYLIGHT:
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_TIME_DSTST), gShellLevel2HiiHandle);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_TIME_DST1), gShellLevel2HiiHandle);
               break;
             case EFI_TIME_IN_DAYLIGHT:
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_TIME_DSTDT), gShellLevel2HiiHandle);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_TIME_DST2), gShellLevel2HiiHandle);
+              break;
+            case EFI_TIME_IN_DAYLIGHT|EFI_TIME_ADJUST_DAYLIGHT:
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_TIME_DST3), gShellLevel2HiiHandle);
               break;
             default:
               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_ERROR), gShellLevel2HiiHandle, L"gRT->GetTime", L"TheTime.Daylight", TheTime.Daylight);
@@ -436,9 +488,9 @@ ShellCommandRunTime (
           //
           if ((TempLocation = ShellCommandLineGetValue(Package, L"-tz")) != NULL) {
             if (TempLocation[0] == L'-') {
-              Tz = (INT16)(0 - StrDecimalToUintn(++TempLocation));
+              Tz = (INT16)(0 - ShellStrToUintn(++TempLocation));
             } else {
-              Tz = (INT16)StrDecimalToUintn(TempLocation);
+              Tz = (INT16)ShellStrToUintn(TempLocation);
             }
             if (!(Tz >= -1440 && Tz <= 1440) && Tz != 2047) {
               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"-d");
@@ -452,7 +504,7 @@ ShellCommandRunTime (
           }
           TempLocation = ShellCommandLineGetValue(Package, L"-d");
           if (TempLocation != NULL) {
-            Daylight = (UINT8)StrDecimalToUintn(TempLocation);
+            Daylight = (UINT8)ShellStrToUintn(TempLocation);
             if (Daylight != 0 && Daylight != 1 && Daylight != 3) {
               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"-d");
               ShellStatus = SHELL_INVALID_PARAMETER;
@@ -539,8 +591,18 @@ STATIC CONST SHELL_PARAM_ITEM TimeZoneParamList3[] = {
     {-720 , STRING_TOKEN (STR_TIMEZONE_P12)},
     {-780 , STRING_TOKEN (STR_TIMEZONE_P13)},
     {-840 , STRING_TOKEN (STR_TIMEZONE_P14)}
-  };
+};
 
+/**
+  Verify that the TimeZoneString is valid and if so set that as the current 
+  timezone.
+
+  @param[in] TimeZoneString     The pointer to a string representation of the timezone.
+
+  @retval SHELL_INVALID_PARAMETER   TimeZoneString was NULL.
+  @retval SHELL_INVALID_PARAMETER   TimeZoneString was mis-formatted.
+  @retval SHELL_SUCCESS             The operation was successful.
+**/
 SHELL_STATUS
 EFIAPI
 CheckAndSetTimeZone (
@@ -549,7 +611,9 @@ CheckAndSetTimeZone (
 {
   EFI_TIME      TheTime;
   EFI_STATUS    Status;
-  CONST CHAR16  *Walker;
+  CHAR16        *TimeZoneCopy;
+  CHAR16        *Walker;
+  CHAR16        *Walker2;
   UINTN         LoopVar;
 
   if (TimeZoneString == NULL) {
@@ -563,21 +627,26 @@ CheckAndSetTimeZone (
   Status = gRT->GetTime(&TheTime, NULL);
   ASSERT_EFI_ERROR(Status);
 
-  Walker = TimeZoneString;
-  if (*Walker == L'-') {
-    TheTime.TimeZone = (INT16)((StrDecimalToUintn (++Walker)) * 60);
-  } else {
-    TheTime.TimeZone = (INT16)((StrDecimalToUintn (Walker)) * -60);
+  TimeZoneCopy = NULL;
+  TimeZoneCopy = StrnCatGrow(&TimeZoneCopy, NULL, TimeZoneString, 0);
+  Walker = TimeZoneCopy;
+  Walker2 = StrStr(Walker, L":");
+  if (Walker2 != NULL && *Walker2 == L':') {
+    *Walker2 = CHAR_NULL;
   }
-  Walker = StrStr(Walker, L":");
-  if (Walker != NULL && *Walker == L':') {
-    Walker = Walker + 1;
+  if (*Walker == L'-') {
+    TheTime.TimeZone = (INT16)((ShellStrToUintn (++Walker)) * 60);
+  } else {
+    TheTime.TimeZone = (INT16)((ShellStrToUintn (Walker)) * -60);
+  }
+  if (Walker2 != NULL) {
+    Walker = Walker2 + 1;
   }
   if (Walker != NULL && Walker[0] != CHAR_NULL) {
     if (TheTime.TimeZone < 0) {
-      TheTime.TimeZone = (INT16)(TheTime.TimeZone - (UINT8)StrDecimalToUintn (Walker));
+      TheTime.TimeZone = (INT16)(TheTime.TimeZone - (UINT8)ShellStrToUintn (Walker));
     } else {
-      TheTime.TimeZone = (INT16)(TheTime.TimeZone + (UINT8)StrDecimalToUintn (Walker));
+      TheTime.TimeZone = (INT16)(TheTime.TimeZone + (UINT8)ShellStrToUintn (Walker));
     }
   }
 
@@ -592,6 +661,8 @@ CheckAndSetTimeZone (
         break;
     }
   }
+
+  FreePool(TimeZoneCopy);
 
   if (!EFI_ERROR(Status)){
     return (SHELL_SUCCESS);
@@ -716,7 +787,7 @@ ShellCommandRunTimeZone (
               if (TheTime.TimeZone == 2047) {
                 TzMinutes = 0;
               } else {
-                TzMinutes = AbsVal(TheTime.TimeZone) % 60;
+                TzMinutes = (ABS(TheTime.TimeZone)) % 60;
               }
 
               ShellPrintHiiEx (
@@ -726,7 +797,7 @@ ShellCommandRunTimeZone (
                 STRING_TOKEN(STR_TIMEZONE_SIMPLE),
                 gShellLevel2HiiHandle,
                 TheTime.TimeZone==2047?0:(TheTime.TimeZone > 0?L"-":L"+"),
-                TheTime.TimeZone==2047?0:AbsVal(TheTime.TimeZone) / 60,
+                TheTime.TimeZone==2047?0:(ABS(TheTime.TimeZone)) / 60,
                 TzMinutes);
             }
             Found = TRUE;
@@ -740,7 +811,7 @@ ShellCommandRunTimeZone (
           if (TheTime.TimeZone == 2047) {
             TzMinutes = 0;
           } else {
-            TzMinutes = AbsVal(TheTime.TimeZone) % 60;
+            TzMinutes = (ABS(TheTime.TimeZone)) % 60;
           }
           ShellPrintHiiEx (
             -1,
@@ -749,7 +820,7 @@ ShellCommandRunTimeZone (
             STRING_TOKEN(STR_TIMEZONE_SIMPLE),
             gShellLevel2HiiHandle,
             TheTime.TimeZone==2047?0:(TheTime.TimeZone > 0?L"-":L"+"),
-            TheTime.TimeZone==2047?0:AbsVal(TheTime.TimeZone) / 60,
+            TheTime.TimeZone==2047?0:(ABS(TheTime.TimeZone)) / 60,
             TzMinutes);
           if (ShellCommandLineGetFlag(Package, L"-f")) {
             ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN(STR_TIMEZONE_NI), gShellLevel2HiiHandle);

@@ -1,7 +1,7 @@
 /** @file
   Main file for map shell level 2 command.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,48 @@
 #include <Library/HandleParsingLib.h>
 #include <Library/SortLib.h>
 
+/**
+  Determine if a string has only numbers and letters.
+
+  This is useful for such things as Map names which can only be letters and numbers.
+
+  @param[in] String       pointer to the string to analyze,
+  @param[in] Len          Number of characters to analyze.
+
+  @retval TRUE            String has only numbers and letters
+  @retval FALSE           String has at least one other character.
+**/
+BOOLEAN
+EFIAPI
+IsNumberLetterOnly(
+  IN CONST CHAR16 *String,
+  IN CONST UINTN  Len
+  )
+{
+  UINTN Count;
+  for (Count = 0 ; Count < Len && String != NULL && *String != CHAR_NULL ; String++,Count++) {
+    if (! ((*String >= L'a' && *String <= L'z') ||
+           (*String >= L'A' && *String <= L'Z') ||
+           (*String >= L'0' && *String <= L'9'))
+        ){
+      return (FALSE);
+    }
+  }
+  return (TRUE);
+}
+
+/**
+  Do a search in the Target delimited list.
+
+  @param[in] List         The list to seatch in.
+  @param[in] MetaTarget   The item to search for. MetaMatching supported.
+  @param[out] FullName    Optional pointer to an allocated buffer containing 
+                          the match.
+  @param[in] Meta         TRUE to use MetaMatching.
+  @param[in] SkipTrailingNumbers  TRUE to allow for numbers after the MetaTarget.
+  @param[in] Target       The single character that delimits list 
+                          items (";" normally). 
+**/
 BOOLEAN
 EFIAPI
 SearchList(
@@ -75,6 +117,11 @@ SearchList(
   return (FALSE);
 }
 
+/**
+  Add mappings for any devices without one.  Do not change any existing maps.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
 EFIAPI
 UpdateMapping (
@@ -109,7 +156,7 @@ UpdateMapping (
     //
     // Get all Device Paths
     //
-    DevicePathList = AllocatePool(sizeof(EFI_DEVICE_PATH_PROTOCOL*) * Count);
+    DevicePathList = AllocateZeroPool(sizeof(EFI_DEVICE_PATH_PROTOCOL*) * Count);
     ASSERT(DevicePathList != NULL);
 
     for (Count = 0 ; HandleList[Count] != NULL ; Count++) {
@@ -172,6 +219,18 @@ UpdateMapping (
   return (Status);
 }
 
+/**
+  Determine what type of device is represented and return it's string.  The 
+  string is in allocated memory and must be callee freed.  The HII is is listed below.
+  The actual string cannot be determined.
+
+  @param[in] DevicePath     The device to analyze.
+
+  @retval STR_MAP_MEDIA_UNKNOWN   The media type is unknown.
+  @retval STR_MAP_MEDIA_HARDDISK  The media is a hard drive.
+  @retval STR_MAP_MEDIA_CDROM     The media is a CD ROM.
+  @retval STR_MAP_MEDIA_FLOPPY    The media is a floppy drive.
+**/
 CHAR16*
 EFIAPI
 GetDeviceMediaType (
@@ -265,18 +324,27 @@ MappingListHasType(
   IN CONST BOOLEAN    Consist
   )
 {
+  CHAR16 *NewSpecific;
   //
   // specific has priority
   //
-  if ( Specific != NULL
-    && SearchList(MapList, Specific, NULL, TRUE, FALSE, L";")) {
-    return (TRUE);
-  }
+  if (Specific != NULL) {
+    NewSpecific = AllocateZeroPool(StrSize(Specific) + sizeof(CHAR16));
+    StrCpy(NewSpecific, Specific);
+    if (NewSpecific[StrLen(NewSpecific)-1] != L':') {
+      StrCat(NewSpecific, L":");
+    }
 
+    if (SearchList(MapList, NewSpecific, NULL, TRUE, FALSE, L";")) {
+      FreePool(NewSpecific);
+      return (TRUE);
+    }
+    FreePool(NewSpecific);
+  }
   if (  Consist
     && (SearchList(MapList, L"HD*",  NULL, TRUE, TRUE, L";")
       ||SearchList(MapList, L"CD*",  NULL, TRUE, TRUE, L";")
-      ||SearchList(MapList, L"F*",   NULL, TRUE, TRUE, L";")
+      ||SearchList(MapList, L"AnyF*",   NULL, TRUE, TRUE, L";")
       ||SearchList(MapList, L"FP*",  NULL, TRUE, TRUE, L";"))){
     return (TRUE);
   }
@@ -294,7 +362,20 @@ MappingListHasType(
 }
 
 
-VOID
+/**
+  Display a single map line for device Handle if conditions are met.
+
+  @param[in] Verbose                TRUE to display (extra) verbose information.
+  @param[in] Consist                TRUE to display consistent mappings.
+  @param[in] Normal                 TRUE to display normal (not consist) mappings.
+  @param[in] TypeString             pointer to string of filter types.
+  @param[in] SFO                    TRUE to display output in Standard Output Format.
+  @param[in] Specific               pointer to string for specific map to display.
+  @param[in] Handle                 The handle to display from.
+
+  @retval EFI_SUCCESS               The mapping was displayed.
+**/
+EFI_STATUS
 EFIAPI
 PerformSingleMappingDisplay(
   IN CONST BOOLEAN    Verbose,
@@ -321,11 +402,11 @@ PerformSingleMappingDisplay(
   DevPathCopy = DevPath;
   MapList = gEfiShellProtocol->GetMapFromDevicePath(&DevPathCopy);
   if (MapList == NULL) {
-    return;
+    return EFI_NOT_FOUND;
   }
 
   if (!MappingListHasType(MapList, Specific, TypeString, Normal, Consist)){
-    return;
+    return EFI_NOT_FOUND;
   }
 
   CurrentName = NULL;
@@ -384,9 +465,18 @@ PerformSingleMappingDisplay(
   }
   FreePool(DevPathString);
   FreePool(CurrentName);
-  return;
+  return EFI_SUCCESS;
 }
 
+/**
+  Delete Specific from the list of maps for device Handle.
+
+  @param[in] Specific   The name to delete.
+  @param[in] Handle     The device to look on.
+
+  @retval EFI_SUCCESS     The delete was successful.
+  @retval EFI_NOT_FOUND   Name was not a map on Handle.
+**/
 EFI_STATUS
 EFIAPI
 PerformSingleMappingDelete(
@@ -416,6 +506,10 @@ PerformSingleMappingDelete(
   return (gEfiShellProtocol->SetMap(NULL, CurrentName));
 }
 
+CONST CHAR16 Cd[] = L"cd*";
+CONST CHAR16 Hd[] = L"hd*";
+CONST CHAR16 Fp[] = L"fp*";
+CONST CHAR16 AnyF[] = L"F*";
 /**
   Function to display mapping information to the user.
 
@@ -433,10 +527,6 @@ PerformSingleMappingDelete(
   @retval SHELL_INVALID_PARAMETER     one of Consist or Normal must be TRUE if no Specific
 
 **/
-CONST CHAR16 Cd[] = L"cd*";
-CONST CHAR16 Hd[] = L"hd*";
-CONST CHAR16 Fp[] = L"fp*";
-CONST CHAR16 F[] = L"F*";
 SHELL_STATUS
 EFIAPI
 PerformMappingDisplay(
@@ -454,6 +544,7 @@ PerformMappingDisplay(
   UINTN                     BufferSize;
   UINTN                     LoopVar;
   CHAR16                    *Test;
+  BOOLEAN                   Found;
 
   if (!Consist && !Normal && Specific == NULL && TypeString == NULL) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle);
@@ -471,7 +562,7 @@ PerformMappingDisplay(
           return (SHELL_INVALID_PARAMETER);
         }
       } else if (Test == NULL) {
-        Test = (CHAR16*)F;
+        Test = (CHAR16*)AnyF;
       }
     }
   } else {
@@ -497,33 +588,31 @@ PerformMappingDisplay(
   //
   Status = gBS->LocateHandle(
     ByProtocol,
-    &gEfiDevicePathProtocolGuid,
+    &gEfiSimpleFileSystemProtocolGuid,
     NULL,
     &BufferSize,
     HandleBuffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    HandleBuffer = AllocatePool(BufferSize);
+    HandleBuffer = AllocateZeroPool(BufferSize);
     if (HandleBuffer == NULL) {
       return (SHELL_OUT_OF_RESOURCES);
     }
     Status = gBS->LocateHandle(
       ByProtocol,
-      &gEfiDevicePathProtocolGuid,
+      &gEfiSimpleFileSystemProtocolGuid,
       NULL,
       &BufferSize,
       HandleBuffer);
   }
-  ASSERT_EFI_ERROR(Status);
-  ASSERT(HandleBuffer != NULL);
 
   //
   // Get the map name(s) for each one.
   //
-  for ( LoopVar = 0
+  for ( LoopVar = 0, Found = FALSE
       ; LoopVar < (BufferSize / sizeof(EFI_HANDLE))
       ; LoopVar ++
      ){
-    PerformSingleMappingDisplay(
+    Status = PerformSingleMappingDisplay(
       Verbose,
       Consist,
       Normal,
@@ -531,6 +620,9 @@ PerformMappingDisplay(
       SFO,
       Specific,
       HandleBuffer[LoopVar]);
+    if (!EFI_ERROR(Status)) {
+      Found = TRUE;
+    }
   }
 
   //
@@ -544,7 +636,7 @@ PerformMappingDisplay(
     HandleBuffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     FreePool(HandleBuffer);
-    HandleBuffer = AllocatePool(BufferSize);
+    HandleBuffer = AllocateZeroPool(BufferSize);
     if (HandleBuffer == NULL) {
       return (SHELL_OUT_OF_RESOURCES);
     }
@@ -568,14 +660,14 @@ PerformMappingDisplay(
       //
       if (gBS->OpenProtocol(
         HandleBuffer[LoopVar],
-        &gEfiDevicePathProtocolGuid,
+        &gEfiSimpleFileSystemProtocolGuid,
         NULL,
         gImageHandle,
         NULL,
         EFI_OPEN_PROTOCOL_TEST_PROTOCOL) == EFI_SUCCESS) {
           continue;
       }
-      PerformSingleMappingDisplay(
+      Status = PerformSingleMappingDisplay(
         Verbose,
         Consist,
         Normal,
@@ -583,12 +675,32 @@ PerformMappingDisplay(
         SFO,
         Specific,
         HandleBuffer[LoopVar]);
+      if (!EFI_ERROR(Status)) {
+        Found = TRUE;
+      }
     }
     FreePool(HandleBuffer);
+  }
+  if (!Found) {
+    ShellPrintHiiEx(gST->ConOut->Mode->CursorColumn, gST->ConOut->Mode->CursorRow-1, NULL, STRING_TOKEN (STR_MAP_NF), gShellLevel2HiiHandle, Specific);
   }
   return (SHELL_SUCCESS);
 }
 
+/**
+  Perform a mapping display and parse for multiple types in the TypeString.
+
+  @param[in] Verbose      TRUE to use verbose output.
+  @param[in] Consist      TRUE to display consistent names.
+  @param[in] Normal       TRUE to display normal names.
+  @param[in] TypeString   An optional comma-delimited list of types.
+  @param[in] SFO          TRUE to display in SFO format.  See Spec.
+  @param[in] Specific     An optional specific map name to display alone.
+
+  @retval SHELL_INVALID_PARAMETER   A parameter was invalid.
+  @retval SHELL_SUCCESS             The display was successful.
+  @sa PerformMappingDisplay
+**/
 SHELL_STATUS
 EFIAPI
 PerformMappingDisplay2(
@@ -633,6 +745,15 @@ PerformMappingDisplay2(
   return (ShellStatus);
 }
 
+/**
+  Delete a specific map.
+
+  @param[in] Specific  The pointer to the name of the map to delete.
+
+  @retval EFI_INVALID_PARAMETER     Specific was NULL.
+  @retval EFI_SUCCESS               The operation was successful.
+  @retval EFI_NOT_FOUND             Specific could not be found.
+**/
 EFI_STATUS
 EFIAPI
 PerformMappingDelete(
@@ -663,7 +784,7 @@ PerformMappingDelete(
     &BufferSize,
     HandleBuffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    HandleBuffer = AllocatePool(BufferSize);
+    HandleBuffer = AllocateZeroPool(BufferSize);
     if (HandleBuffer == NULL) {
       return (EFI_OUT_OF_RESOURCES);
     }
@@ -703,7 +824,7 @@ PerformMappingDelete(
     HandleBuffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     FreePool(HandleBuffer);
-    HandleBuffer = AllocatePool(BufferSize);
+    HandleBuffer = AllocateZeroPool(BufferSize);
     if (HandleBuffer == NULL) {
       return (EFI_OUT_OF_RESOURCES);
     }
@@ -773,52 +894,31 @@ AddMappingFromMapping(
 {
   CONST EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   EFI_STATUS                      Status;
+  CHAR16                          *NewSName;
+  
+  NewSName = AllocateZeroPool(StrSize(SName) + sizeof(CHAR16));
+  StrCpy(NewSName, SName);
+  if (NewSName[StrLen(NewSName)-1] != L':') {
+    StrCat(NewSName, L":");
+  }
 
-  if (StrStr(SName, L"*") != NULL
-    ||StrStr(SName, L"?") != NULL
-    ||StrStr(SName, L"[") != NULL
-    ||StrStr(SName, L"]") != NULL) {
+  if (!IsNumberLetterOnly(NewSName, StrLen(NewSName)-1)) {
+    FreePool(NewSName);
     return (SHELL_INVALID_PARAMETER);
   }
 
   DevPath = gEfiShellProtocol->GetDevicePathFromMap(Map);
   if (DevPath == NULL) {
+    FreePool(NewSName);
     return (SHELL_INVALID_PARAMETER);
   }
 
-  Status = gEfiShellProtocol->SetMap(DevPath, SName);
+  Status = gEfiShellProtocol->SetMap(DevPath, NewSName);
+  FreePool(NewSName);
   if (EFI_ERROR(Status)) {
     return (SHELL_DEVICE_ERROR);
   }
   return (SHELL_SUCCESS);
-}
-
-/**
-  function to determine if a string has only numbers and letters
-
-  This is useful for such things as Map names which can only be letters and numbers
-
-  @param[in] String       pointer to the string to analyze
-
-  @retval TRUE            String has only numbers and letters
-  @retval FALSE           String has at least one other character.
-**/
-BOOLEAN
-EFIAPI
-IsNumberLetterOnly(
-  IN CONST CHAR16 *String
-  )
-{
-  while(String != NULL && *String != CHAR_NULL) {
-    if (! ((*String >= L'a' && *String <= L'z') ||
-           (*String >= L'A' && *String <= L'Z') ||
-           (*String >= L'0' && *String <= L'9'))
-        ){
-      return (FALSE);
-    }
-    String++;
-  }
-  return (TRUE);
 }
 
 /**
@@ -844,8 +944,16 @@ AddMappingFromHandle(
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   EFI_STATUS                Status;
+  CHAR16                    *NewSName;
+  
+  NewSName = AllocateZeroPool(StrSize(SName) + sizeof(CHAR16));
+  StrCpy(NewSName, SName);
+  if (NewSName[StrLen(NewSName)-1] != L':') {
+    StrCat(NewSName, L":");
+  }
 
-  if (!IsNumberLetterOnly(SName)) {
+  if (!IsNumberLetterOnly(NewSName, StrLen(NewSName)-1)) {
+    FreePool(NewSName);
     return (SHELL_INVALID_PARAMETER);
   }
 
@@ -858,9 +966,11 @@ AddMappingFromHandle(
     EFI_OPEN_PROTOCOL_GET_PROTOCOL
    );
   if (EFI_ERROR(Status)) {
+    FreePool(NewSName);
     return (SHELL_DEVICE_ERROR);
   }
-  Status = gEfiShellProtocol->SetMap(DevPath, SName);
+  Status = gEfiShellProtocol->SetMap(DevPath, NewSName);
+  FreePool(NewSName);
   if (EFI_ERROR(Status)) {
     return (SHELL_DEVICE_ERROR);
   }
@@ -897,7 +1007,7 @@ ShellCommandRunMap (
   CHAR16        *ProblemParam;
   CONST CHAR16  *SName;
   CONST CHAR16  *Mapping;
-  EFI_HANDLE    MappingAsHandle;
+  EFI_HANDLE    MapAsHandle;
   CONST EFI_DEVICE_PATH_PROTOCOL *DevPath;
   SHELL_STATUS  ShellStatus;
   BOOLEAN       SfoMode;
@@ -905,13 +1015,14 @@ ShellCommandRunMap (
   BOOLEAN       NormlMode;
   CONST CHAR16  *Param1;
   CONST CHAR16  *TypeString;
+  UINTN         TempStringLength;
 
   ProblemParam  = NULL;
   Mapping       = NULL;
   SName         = NULL;
   DevPath       = NULL;
   ShellStatus   = SHELL_SUCCESS;
-  MappingAsHandle = NULL;
+  MapAsHandle = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -1082,18 +1193,30 @@ ShellCommandRunMap (
            );
         } else {
           if (ShellIsHexOrDecimalNumber(Mapping, TRUE, FALSE)) {
-            MappingAsHandle = ConvertHandleIndexToHandle(StrHexToUintn(Mapping));
+            MapAsHandle = ConvertHandleIndexToHandle(ShellStrToUintn(Mapping));
           } else {
-            MappingAsHandle = NULL;
+            MapAsHandle = NULL;
           }
-          if (MappingAsHandle == NULL && Mapping[StrLen(Mapping)-1] != L':') {
+          if (MapAsHandle == NULL && Mapping[StrLen(Mapping)-1] != L':') {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, Mapping);
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
-            if (MappingAsHandle != NULL) {
-              ShellStatus = AddMappingFromHandle(MappingAsHandle, SName);
+            if (MapAsHandle != NULL) {
+              TempStringLength = StrLen(SName);
+              if (!IsNumberLetterOnly(SName, TempStringLength-(SName[TempStringLength-1]==L':'?1:0))) {
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, SName);
+                ShellStatus = SHELL_INVALID_PARAMETER;
+              } else {
+                ShellStatus = AddMappingFromHandle(MapAsHandle, SName);
+              }
             } else {
-              ShellStatus = AddMappingFromMapping(Mapping, SName);
+              TempStringLength = StrLen(SName);
+              if (!IsNumberLetterOnly(SName, TempStringLength-(SName[TempStringLength-1]==L':'?1:0))) {
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, SName);
+                ShellStatus = SHELL_INVALID_PARAMETER;
+              } else {
+                ShellStatus = AddMappingFromMapping(Mapping, SName);
+              }
             }
             if (ShellStatus != SHELL_SUCCESS) {
               switch (ShellStatus) {
@@ -1102,6 +1225,9 @@ ShellCommandRunMap (
                   break;
                 case SHELL_INVALID_PARAMETER:
                   ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle);
+                  break;
+                case SHELL_DEVICE_ERROR:
+                  ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MAP_NOF), gShellLevel2HiiHandle, Mapping);
                   break;
                 default:
                   ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, ShellStatus|MAX_BIT);

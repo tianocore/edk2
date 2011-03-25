@@ -9,7 +9,7 @@
   * functions are non-interactive only
 
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,9 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
+
+#if !defined (_UEFI_SHELL_LEVEL2_COMMANDS_LIB_H_)
+#define _UEFI_SHELL_LEVEL2_COMMANDS_LIB_H_
 
 #include <Uefi.h>
 #include <ShellBase.h>
@@ -295,3 +298,19 @@ StrniCmp(
   IN CONST CHAR16 *Target,
   IN CONST UINTN  Count
   );
+
+/**
+  Function for 'Vol' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunVol (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  );
+
+#endif
+

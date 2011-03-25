@@ -1,7 +1,7 @@
 /** @file
   Main file for ls shell level 2 function.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -234,7 +234,7 @@ PrintLsOutput(
         //
         // exact match on all bits
         //
-        if ( Node->Info->Attribute != Attribs) {
+        if ( (Node->Info->Attribute|EFI_FILE_ARCHIVE) != (Attribs|EFI_FILE_ARCHIVE)) {
           continue;
         }
       }
@@ -348,7 +348,7 @@ PrintLsOutput(
   }
 
   if (Rec){
-    DirectoryName = AllocatePool(LongestPath + 2*sizeof(CHAR16));
+    DirectoryName = AllocateZeroPool(LongestPath + 2*sizeof(CHAR16));
     if (DirectoryName == NULL) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellLevel2HiiHandle);
       ShellStatus = SHELL_OUT_OF_RESOURCES;
@@ -417,7 +417,7 @@ ShellCommandRunLs (
   UINTN         Count;
   CHAR16        *FullPath;
   UINTN         Size;
-  EFI_TIME      theTime;
+  EFI_TIME      TheTime;
   BOOLEAN       SfoMode;
 
   Size                = 0;
@@ -532,7 +532,7 @@ ShellCommandRunLs (
           ASSERT(FullPath == NULL);
           StrnCatGrow(&FullPath, NULL, L"*", 0);
         }
-        Status = gRT->GetTime(&theTime, NULL);
+        Status = gRT->GetTime(&TheTime, NULL);
         ASSERT_EFI_ERROR(Status);
         SfoMode = ShellCommandLineGetFlag(Package, L"-sfo");
         if (ShellStatus == SHELL_SUCCESS) {
@@ -543,7 +543,7 @@ ShellCommandRunLs (
             FullPath,
             TRUE,
             Count,
-            (INT16)(theTime.TimeZone==2047?0:theTime.TimeZone)
+            (INT16)(TheTime.TimeZone==2047?0:TheTime.TimeZone)
            );
           if (ShellStatus == SHELL_NOT_FOUND) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_FILES), gShellLevel2HiiHandle);

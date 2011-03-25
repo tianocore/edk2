@@ -1,7 +1,7 @@
 /** @file
   Main file for attrib shell level 2 function.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -192,14 +192,20 @@ ShellCommandRunCd (
         } else {
           Drive = StrCpy(Drive, Param1);
           Path = StrStr(Drive, L":");
-          *(++Path) = CHAR_NULL;
-          if (Path == Drive + StrLen(Drive)) {
+          ASSERT(Path != NULL);
+          if (*(Path+1) == CHAR_NULL) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
             ShellStatus = SHELL_NOT_FOUND;
           } else {
-            Status = gEfiShellProtocol->SetCurDir(Drive, ++Path);
+            *(Path+1) = CHAR_NULL;
+            if (Path == Drive + StrLen(Drive)) {
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
+              ShellStatus = SHELL_NOT_FOUND;
+            } else {
+              Status = gEfiShellProtocol->SetCurDir(Drive, Path+2);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_PRINT), gShellLevel2HiiHandle, ShellGetCurrentDir(Drive));
+            }
           }
-
           if (Status == EFI_NOT_FOUND) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
             Status = SHELL_NOT_FOUND;

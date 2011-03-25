@@ -1,7 +1,7 @@
 /** @file
   Main file for attrib shell level 2 function.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,14 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {NULL, TypeMax}
   };
 
+/**
+  Determine if a directory has no files in it.
+
+  @param[in] FileHandle   The EFI_HANDLE to the directory.
+  
+  @retval TRUE  The directory has no files (or directories).
+  @retval FALSE The directory has at least 1 file or directory in it.
+**/
 BOOLEAN
 EFIAPI
 IsDirectoryEmpty (
@@ -45,6 +53,17 @@ IsDirectoryEmpty (
   return (RetVal);
 }
 
+/**
+  Delete a node and all nodes under it (including sub directories).
+
+  @param[in] Node   The node to start deleting with.
+  @param[in] Quiet  TRUE to print no messages.
+
+  @retval SHELL_SUCCESS       The operation was successful.
+  @retval SHELL_ACCESS_DENIED A file was read only.
+  @retval SHELL_ABORTED       The abort message was received.
+  @retval SHELL_DEVICE_ERROR  A device error occured reading this Node.
+**/
 SHELL_STATUS
 EFIAPI
 CascadeDelete(
@@ -126,7 +145,7 @@ CascadeDelete(
   }
 
   //
-  // We cant allow for the warning here!
+  // We cant allow for the warning here! (Dont use EFI_ERROR Macro).
   //
   if (Status != EFI_SUCCESS){
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE_ERR), gShellLevel2HiiHandle, Status);
@@ -137,6 +156,13 @@ CascadeDelete(
   }
 }
 
+/**
+  Determins if a Node is a valid delete target.  Will prevent deleting the root directory.
+
+  @param[in] List       RESERVED.  Not used.
+  @param[in] Node       The node to analyze.
+  @param[in] Package    RESERVED.  Not used.
+**/
 BOOLEAN
 EFIAPI
 IsValidDeleteTarget(

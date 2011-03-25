@@ -1,7 +1,7 @@
 /** @file
   Main file for cp shell level 2 function.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,7 +14,23 @@
 
 #include "UefiShellLevel2CommandsLib.h"
 
-// this is later in the file.
+/**
+  Function to take a list of files to copy and a destination location and do
+  the verification and copying of those files to that location.  This function
+  will report any errors to the user and halt.
+
+  @param[in] FileList           A LIST_ENTRY* based list of files to move.
+  @param[in] DestDir            The destination location.
+  @param[in] SilentMode         TRUE to eliminate screen output.
+  @param[in] RecursiveMode      TRUE to copy directories.
+  @param[in] Resp               The response to the overwrite query (if always).
+
+  @retval SHELL_SUCCESS             the files were all moved.
+  @retval SHELL_INVALID_PARAMETER   a parameter was invalid
+  @retval SHELL_SECURITY_VIOLATION  a security violation ocurred
+  @retval SHELL_WRITE_PROTECTED     the destination was write protected
+  @retval SHELL_OUT_OF_RESOURCES    a memory allocation failed
+**/
 SHELL_STATUS
 EFIAPI
 ValidateAndCopyFiles(
@@ -89,7 +105,7 @@ CopySingleFile(
   //
   if (!EFI_ERROR(Status)) {
     if (Response == NULL && !SilentMode) {
-      Status = ShellPromptForResponseHii(ShellPromptResponseTypeYesNoAllCancel, STRING_TOKEN (STR_CP_PROMPT), gShellLevel2HiiHandle, &Response);
+      Status = ShellPromptForResponseHii(ShellPromptResponseTypeYesNoAllCancel, STRING_TOKEN (STR_GEN_DEST_EXIST_OVR), gShellLevel2HiiHandle, &Response);
     }
     //
     // possibly return based on response
@@ -191,8 +207,11 @@ CopySingleFile(
   The key is to have this function called ONLY once.  this allows for the parameter
   verification to happen correctly.
 
-  @param[in] FileList           A LIST_ENTRY* based list of files to move
-  @param[in] DestDir            the destination location
+  @param[in] FileList           A LIST_ENTRY* based list of files to move.
+  @param[in] DestDir            The destination location.
+  @param[in] SilentMode         TRUE to eliminate screen output.
+  @param[in] RecursiveMode      TRUE to copy directories.
+  @param[in] Resp               The response to the overwrite query (if always).
 
   @retval SHELL_SUCCESS             the files were all moved.
   @retval SHELL_INVALID_PARAMETER   a parameter was invalid
@@ -257,7 +276,7 @@ ValidateAndCopyFiles(
     }
 
     NewSize =  StrSize(DestDir);
-    NewSize += StrSize(Node->FileName);
+    NewSize += StrSize(Node->FullName);
     NewSize += StrSize(Cwd);
     if (NewSize > PathLen) {
       PathLen = NewSize;
@@ -285,7 +304,7 @@ ValidateAndCopyFiles(
 
   HiiOutput   = HiiGetString (gShellLevel2HiiHandle, STRING_TOKEN (STR_CP_OUTPUT), NULL);
   HiiResultOk = HiiGetString (gShellLevel2HiiHandle, STRING_TOKEN (STR_GEN_RES_OK), NULL);
-  DestPath    = AllocatePool(PathLen);
+  DestPath    = AllocateZeroPool(PathLen);
 
   if (DestPath == NULL || HiiOutput == NULL || HiiResultOk == NULL) {
     SHELL_FREE_NON_NULL(DestPath);
@@ -317,17 +336,20 @@ ValidateAndCopyFiles(
     if (FileList->Link.ForwardLink == FileList->Link.BackLink // 1 item
       && EFI_ERROR(ShellIsDirectory(DestDir))                 // not an existing directory
      ) {
-      ASSERT(StrStr(DestDir, L":") == NULL);
-      //
-      // simple copy of a single file
-      //
-      StrCpy(DestPath, Cwd);
-      if (DestPath[StrLen(DestPath)-1] != L'\\' && DestDir[0] != L'\\') {
-        StrCat(DestPath, L"\\");
-      } else if (DestPath[StrLen(DestPath)-1] == L'\\' && DestDir[0] == L'\\') {
-        ((CHAR16*)DestPath)[StrLen(DestPath)-1] = CHAR_NULL;
+      if (StrStr(DestDir, L":") == NULL) {
+        //
+        // simple copy of a single file
+        //
+        StrCpy(DestPath, Cwd);
+        if (DestPath[StrLen(DestPath)-1] != L'\\' && DestDir[0] != L'\\') {
+          StrCat(DestPath, L"\\");
+        } else if (DestPath[StrLen(DestPath)-1] == L'\\' && DestDir[0] == L'\\') {
+          ((CHAR16*)DestPath)[StrLen(DestPath)-1] = CHAR_NULL;
+        }
+        StrCat(DestPath, DestDir);
+      } else {
+        StrCpy(DestPath, DestDir);
       }
-      StrCat(DestPath, DestDir);
     } else {
       //
       // we have multiple files or a directory in the DestDir
@@ -415,6 +437,18 @@ ValidateAndCopyFiles(
   return (ShellStatus);
 }
 
+/**
+  Validate and if successful copy all the files from the list into 
+  destination directory.
+
+  @param[in] FileList       The list of files to copy.
+  @param[in] DestDir        The directory to copy files to.
+  @param[in] SilentMode     TRUE to eliminate screen output.
+  @param[in] RecursiveMode  TRUE to copy directories.
+
+  @retval SHELL_INVALID_PARAMETER   A parameter was invalid.
+  @retval SHELL_SUCCESS             The operation was successful.
+**/
 SHELL_STATUS
 EFIAPI
 ProcessValidateAndCopyFiles(
@@ -437,7 +471,6 @@ ProcessValidateAndCopyFiles(
     ShellStatus = SHELL_INVALID_PARAMETER;
     ShellCloseFileMetaArg(&List);
   } else if (List != NULL) {
-    ASSERT(List != NULL);
     ASSERT(((EFI_SHELL_FILE_INFO *)List->Link.ForwardLink) != NULL);
     ASSERT(((EFI_SHELL_FILE_INFO *)List->Link.ForwardLink)->FullName != NULL);
     FileInfo    = NULL;
