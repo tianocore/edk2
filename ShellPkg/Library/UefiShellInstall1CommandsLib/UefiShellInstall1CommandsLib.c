@@ -1,7 +1,7 @@
 /** @file
   Main file for NULL named library for install1 shell command functions.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +21,11 @@ CONST EFI_GUID gShellInstall1HiiGuid = \
     0x7d574d54, 0xd364, 0x4d4a, { 0x95, 0xe3, 0x49, 0x45, 0xdb, 0x7a, 0xd3, 0xee } \
   };
 
+/**
+  Function to get the filename with help context if HII will not be used.
+
+  @return   The filename with help text in it.
+**/
 CONST CHAR16*
 EFIAPI
 ShellCommandGetManFileNameInstall1 (
@@ -70,6 +75,9 @@ ShellInstall1CommandsLibConstructor (
 
 /**
   Destructor for the library.  free any resources.
+
+  @param ImageHandle            The image handle of the process.
+  @param SystemTable            The EFI System Table pointer.
 **/
 EFI_STATUS
 EFIAPI
