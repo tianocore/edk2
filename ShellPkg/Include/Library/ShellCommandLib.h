@@ -4,7 +4,7 @@
   This library is for use ONLY by shell commands linked into the shell application.
   This library will not funciton if it is used for UEFI Shell 2.0 Applications.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -211,12 +211,14 @@ typedef struct {
   via the LIST_ENTRY structure.  Enumerate through it using the BaseLib linked
   list functions.  Do not modify the values.
 
+  @param[in] Sort       TRUE to alphabetically sort the values first.  FALSE otherwise.
+
   @return A linked list of all available shell commands.
 **/
 CONST COMMAND_LIST*
 EFIAPI
 ShellCommandGetCommandList (
-  VOID
+  IN CONST BOOLEAN Sort
   );
 
 typedef struct {
@@ -501,7 +503,7 @@ ShellCommandConsistMappingUnInitialize (
   This must be called after ShellCommandConsistMappingInitialize() and 
   before ShellCommandConsistMappingUnInitialize() is called.
 
-  @param[in] DeviecPath   The pointer to the dev path for the device.
+  @param[in] DevicePath   The pointer to the dev path for the device.
   @param[in] Table        The Table of mapping information.
 
   @retval NULL            A consistent mapped name could not be created.

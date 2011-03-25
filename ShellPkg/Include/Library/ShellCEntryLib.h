@@ -1,7 +1,7 @@
 /** @file
   Provides application point extension for "C" style main funciton.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,6 +11,9 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
+
+#if !defined (_SHELL_C_ENTRY_LIB_)
+#define _SHELL_C_ENTRY_LIB_
 
 /**
   UEFI application entry point which has an interface similar to a
@@ -32,3 +35,6 @@ ShellAppMain (
   IN UINTN Argc,
   IN CHAR16 **Argv
   );
+
+#endif
+

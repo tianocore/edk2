@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell functionality for shell commands and applications.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -988,9 +988,13 @@ ShellIsFileInPath(
   Function to determine whether a string is decimal or hex representation of a number
   and return the number converted from the string.
 
-  @param[in] String   String representation of a number
+  Note: this function cannot be used when (UINTN)(-1), (0xFFFFFFFF) may be a valid 
+  result.  Use ShellConvertStringToUint64 instead.
+
+  @param[in] String   String representation of a number.
 
   @return             The unsigned integer result of the conversion.
+  @retval (UINTN)(-1) An error occured.
 **/
 UINTN
 EFIAPI
@@ -1183,11 +1187,11 @@ ShellPromptForResponse (
   This function is the same as ShellPromptForResponse, except that the prompt is
   automatically pulled from HII.
 
-  @param Type     What type of question is asked.  This is used to filter the input
+  @param[in] Type What type of question is asked.  This is used to filter the input
                   to prevent invalid answers to question.
   @param[in] HiiFormatStringId  The format string Id for getting from Hii.
   @param[in] HiiFormatHandle    The format string Handle for getting from Hii.
-  @param Response               The pointer to Response, which will be populated upon return.
+  @param[out] Response          The pointer to Response, which will be populated upon return.
 
   @retval EFI_SUCCESS The operation was sucessful.
   @return other       The operation failed.
@@ -1206,7 +1210,7 @@ ShellPromptForResponseHii (
 /**
   Function to determin if an entire string is a valid number.
 
-  If Hex it must be preceeded with a 0x or has ForceHex, set TRUE.
+  If Hex it must be preceeded with a 0x, 0X, or has ForceHex set TRUE.
 
   @param[in] String       The string to evaluate.
   @param[in] ForceHex     TRUE - always assume hex.
@@ -1219,6 +1223,30 @@ BOOLEAN
 EFIAPI
 ShellIsHexOrDecimalNumber (
   IN CONST CHAR16   *String,
+  IN CONST BOOLEAN  ForceHex,
+  IN CONST BOOLEAN  StopAtSpace
+  );
+
+/**
+  Function to verify and convert a string to its numerical 64 bit representation.
+
+  If Hex it must be preceeded with a 0x, 0X, or has ForceHex set TRUE.
+
+  @param[in] String       The string to evaluate.
+  @param[out] Value       Upon a successful return the value of the conversion.
+  @param[in] ForceHex     TRUE - always assume hex.
+  @param[in] StopAtSpace  TRUE to halt upon finding a space, FALSE to 
+                          process the entire String.
+  
+  @retval EFI_SUCCESS             The conversion was successful.
+  @retval EFI_INVALID_PARAMETER   String contained an invalid character.
+  @retval EFI_NOT_FOUND           String was a number, but Value was NULL.
+**/
+EFI_STATUS
+EFIAPI
+ShellConvertStringToUint64(
+  IN CONST CHAR16   *String,
+     OUT   UINT64   *Value,
   IN CONST BOOLEAN  ForceHex,
   IN CONST BOOLEAN  StopAtSpace
   );
