@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,6 +11,9 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
+
+#if !defined (_UEFI_HANDLE_PARSING_LIB_INTERNAL_H_)
+#define _UEFI_HANDLE_PARSING_LIB_INTERNAL_H_
 
 #include <Uefi.h>
 
@@ -138,4 +141,6 @@ typedef struct {
   EFI_GUID                      *GuidId;
   DUMP_PROTOCOL_INFO            DumpInfo;
 } PROTOCOL_INFO_BLOCK;
+
+#endif
 

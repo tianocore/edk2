@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -265,7 +265,7 @@ DriverEfiVersionProtocolDumpInformation(
 
   ASSERT_EFI_ERROR(Status);
 
-  RetVal = AllocatePool(VersionStringSize);
+  RetVal = AllocateZeroPool(VersionStringSize);
   ASSERT(RetVal != NULL);
   UnicodeSPrint(RetVal, VersionStringSize, L"0x%08x", DriverEfiVersion->FirmwareVersion);
   return (RetVal);
@@ -306,7 +306,7 @@ DevicePathProtocolDumpInformation(
       gBS->CloseProtocol(TheHandle, &gEfiDevicePathProtocolGuid, gImageHandle, NULL);
     }
   }
-  if (Verbose && Temp != NULL && StrLen(Temp) > 30) {
+  if (!Verbose && Temp != NULL && StrLen(Temp) > 30) {
     Temp2 = NULL;
     Temp2 = StrnCatGrow(&Temp2, NULL, Temp+(StrLen(Temp) - 30), 30);
     FreePool(Temp);
@@ -680,7 +680,7 @@ InternalShellInitHandleList(
     return (Status);
   }
   for (mHandleList.NextIndex = 1 ; mHandleList.NextIndex <= HandleCount ; mHandleList.NextIndex++){
-    ListWalker = AllocatePool(sizeof(HANDLE_LIST));
+    ListWalker = AllocateZeroPool(sizeof(HANDLE_LIST));
     ASSERT(ListWalker != NULL);
     ListWalker->TheHandle = HandleBuffer[mHandleList.NextIndex-1];
     ListWalker->TheIndex  = mHandleList.NextIndex;
@@ -708,7 +708,9 @@ ConvertHandleToHandleIndex(
   )
 {
   HANDLE_LIST *ListWalker;
-  ASSERT(TheHandle!=NULL);
+  if (TheHandle == NULL) {
+    return 0;
+  }
 
   InternalShellInitHandleList();
 
@@ -720,7 +722,7 @@ ConvertHandleToHandleIndex(
       return (ListWalker->TheIndex);
     }
   }
-  ListWalker = AllocatePool(sizeof(HANDLE_LIST));
+  ListWalker = AllocateZeroPool(sizeof(HANDLE_LIST));
   ASSERT(ListWalker != NULL);
   ListWalker->TheHandle = TheHandle;
   ListWalker->TheIndex  = mHandleList.NextIndex++;
@@ -1038,7 +1040,7 @@ ParseHandleDatabaseByRelationship (
         //
         // Allocate a handle buffer for the number of handles that matched the attributes in Mask
         //
-        *MatchingHandleBuffer = AllocatePool ((*MatchingHandleCount +1)* sizeof (EFI_HANDLE));
+        *MatchingHandleBuffer = AllocateZeroPool ((*MatchingHandleCount +1)* sizeof (EFI_HANDLE));
         ASSERT(*MatchingHandleBuffer != NULL);
 
         for (HandleIndex = 0,*MatchingHandleCount = 0
@@ -1095,14 +1097,14 @@ ParseHandleDatabaseForChildControllers(
   )
 {
   EFI_STATUS  Status;
-  UINTN       HandleIndex;
+//  UINTN       HandleIndex;
   UINTN       DriverBindingHandleCount;
   EFI_HANDLE  *DriverBindingHandleBuffer;
   UINTN       DriverBindingHandleIndex;
   UINTN       ChildControllerHandleCount;
   EFI_HANDLE  *ChildControllerHandleBuffer;
   UINTN       ChildControllerHandleIndex;
-  BOOLEAN     Found;
+//  BOOLEAN     Found;
   EFI_HANDLE  *HandleBufferForReturn;
 
   if (MatchingHandleCount == NULL) {
@@ -1143,17 +1145,18 @@ ParseHandleDatabaseForChildControllers(
          ChildControllerHandleIndex < ChildControllerHandleCount;
          ChildControllerHandleIndex++
        ) {
-      Found = FALSE;
-      for (HandleIndex = 0; HandleBufferForReturn[HandleIndex] != NULL; HandleIndex++) {
-        if (HandleBufferForReturn[HandleIndex] == ChildControllerHandleBuffer[ChildControllerHandleIndex]) {
-          Found = TRUE;
-          break;
-        }
-      }
+//      Found = FALSE;
+      HandleBufferForReturn[(*MatchingHandleCount)++] = ChildControllerHandleBuffer[ChildControllerHandleIndex];
+//      for (HandleIndex = 0; HandleBufferForReturn[HandleIndex] != NULL; HandleIndex++) {
+//        if (HandleBufferForReturn[HandleIndex] == ChildControllerHandleBuffer[ChildControllerHandleIndex]) {
+//          Found = TRUE;
+//          break;
+//        }
+//      }
 
-      if (!Found) {
-        HandleBufferForReturn[(*MatchingHandleCount)++] = ChildControllerHandleBuffer[ChildControllerHandleIndex];
-      }
+//      if (Found) {
+//        HandleBufferForReturn[(*MatchingHandleCount)++] = ChildControllerHandleBuffer[ChildControllerHandleIndex];
+//      }
     }
 
     FreePool (ChildControllerHandleBuffer);
@@ -1217,7 +1220,7 @@ BuffernCatGrow (
 
   if (LocalDestinationSize == 0) {
     // allcoate
-    *DestinationBuffer = AllocatePool(LocalDestinationFinalSize);
+    *DestinationBuffer = AllocateZeroPool(LocalDestinationFinalSize);
   } else {
     // reallocate
     *DestinationBuffer = ReallocatePool(LocalDestinationSize, LocalDestinationFinalSize, *DestinationBuffer);
@@ -1333,7 +1336,7 @@ GetHandleListByProtocol (
   if (ProtocolGuid == NULL) {
     Status = gBS->LocateHandle(AllHandles, NULL, NULL, &Size, HandleList);
     if (Status == EFI_BUFFER_TOO_SMALL) {
-      HandleList = AllocatePool(Size + sizeof(EFI_HANDLE));
+      HandleList = AllocateZeroPool(Size + sizeof(EFI_HANDLE));
       if (HandleList == NULL) {
         return (NULL);
       }
@@ -1343,7 +1346,7 @@ GetHandleListByProtocol (
   } else {
     Status = gBS->LocateHandle(ByProtocol, (EFI_GUID*)ProtocolGuid, NULL, &Size, HandleList);
     if (Status == EFI_BUFFER_TOO_SMALL) {
-      HandleList = AllocatePool(Size + sizeof(EFI_HANDLE));
+      HandleList = AllocateZeroPool(Size + sizeof(EFI_HANDLE));
       if (HandleList == NULL) {
         return (NULL);
       }
