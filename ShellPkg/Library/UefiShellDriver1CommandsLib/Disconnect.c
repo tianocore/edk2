@@ -1,7 +1,7 @@
 /** @file
   Main file for Disconnect shell Driver1 function.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,11 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {NULL, TypeMax}
   };
 
+/**
+  Disconnect everything.
+
+  @retval EFI_SUCCESS     The operation was successful.
+**/
 EFI_STATUS
 EFIAPI
 DisconnectAll(
@@ -67,6 +72,12 @@ DisconnectAll(
   return (EFI_SUCCESS);
 }
 
+/**
+  Function for 'disconnect' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunDisconnect (
@@ -84,6 +95,9 @@ ShellCommandRunDisconnect (
   EFI_HANDLE          Handle1;
   EFI_HANDLE          Handle2;
   EFI_HANDLE          Handle3;
+  UINT64              Intermediate1;
+  UINT64              Intermediate2;
+  UINT64              Intermediate3;
 
   ShellStatus         = SHELL_SUCCESS;
 
@@ -133,9 +147,12 @@ ShellCommandRunDisconnect (
         Param1  = ShellCommandLineGetRawValue(Package, 1);
         Param2  = ShellCommandLineGetRawValue(Package, 2);
         Param3  = ShellCommandLineGetRawValue(Package, 3);
-        Handle1 = Param1!=NULL?ConvertHandleIndexToHandle(StrHexToUintn(Param1)):NULL;
-        Handle2 = Param2!=NULL?ConvertHandleIndexToHandle(StrHexToUintn(Param2)):NULL;
-        Handle3 = Param3!=NULL?ConvertHandleIndexToHandle(StrHexToUintn(Param3)):NULL;
+        ShellConvertStringToUint64(Param1, &Intermediate1, TRUE, FALSE);
+        Handle1 = Param1!=NULL?ConvertHandleIndexToHandle((UINTN)Intermediate1):NULL;
+        ShellConvertStringToUint64(Param2, &Intermediate2, TRUE, FALSE);
+        Handle2 = Param2!=NULL?ConvertHandleIndexToHandle((UINTN)Intermediate2):NULL;
+        ShellConvertStringToUint64(Param3, &Intermediate3, TRUE, FALSE);
+        Handle3 = Param3!=NULL?ConvertHandleIndexToHandle((UINTN)Intermediate3):NULL;
 
         if (Param1 != NULL && Handle1 == NULL) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param1);
@@ -148,18 +165,16 @@ ShellCommandRunDisconnect (
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else if (EFI_ERROR(gBS->OpenProtocol(Handle1, &gEfiDevicePathProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
           ASSERT(Param1 != NULL);
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_HANDLE_NOT), gShellDriver1HiiHandle, StrHexToUintn(Param1), L"controller handle");
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_HANDLE_NOT), gShellDriver1HiiHandle, ShellStrToUintn(Param1), L"controller handle");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else if (Handle2 != NULL && EFI_ERROR(gBS->OpenProtocol(Handle2, &gEfiDriverBindingProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
           ASSERT(Param2 != NULL);
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_HANDLE_NOT), gShellDriver1HiiHandle, StrHexToUintn(Param2), L"driver handle");
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_HANDLE_NOT), gShellDriver1HiiHandle, ShellStrToUintn(Param2), L"driver handle");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           ASSERT(Param1 != NULL);
-          ASSERT(Param2 != NULL);
-          ASSERT(Param3 != NULL);
           Status = gBS->DisconnectController(Handle1, Handle2, Handle3);
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_3P_RESULT), gShellDriver1HiiHandle, L"Disconnect", Handle1, Handle2, Handle3, Status);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_3P_RESULT), gShellDriver1HiiHandle, L"Disconnect", Intermediate1, Intermediate2, Intermediate3, Status);
         }
       }
     }

@@ -1,7 +1,7 @@
 /** @file
   Main file for DevTree shell Driver1 function.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,18 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {NULL, TypeMax}
   };
 
+/**
+  Display a tree starting from this handle.
+
+  @param[in] TheHandle      The handle to start with.
+  @param[in] Lang           Optionally, a UEFI defined language code.
+  @param[in] UseDevPaths    TRUE to display info from DevPath as identifiers.
+                            FALSE will use component name protocol instead.
+  @param[in] IndentCharCount   How many characters to indent (allows for recursion).
+  @param[in] HiiString      The string from HII to use for output.
+
+  @retval SHELL_SUCCESS     The operation was successful.
+**/
 SHELL_STATUS
 EFIAPI
 DoDevTreeForHandle(
@@ -156,6 +168,7 @@ ShellCommandRunDevTree (
   UINTN               LoopVar;
   EFI_HANDLE          TheHandle;
   BOOLEAN             FlagD;
+  UINT64              Intermediate;
 
   ShellStatus         = SHELL_SUCCESS;
   Status              = EFI_SUCCESS;
@@ -216,11 +229,12 @@ ShellCommandRunDevTree (
         ShellStatus = DoDevTreeForHandle(TheHandle, Language, FlagD, 0, HiiString);
       }
     } else {
-      if (!ShellIsHexOrDecimalNumber(Lang, TRUE, FALSE) || ConvertHandleIndexToHandle(StrHexToUintn(Lang)) == NULL) {
+      Status = ShellConvertStringToUint64(Lang, &Intermediate, TRUE, FALSE);
+      if (EFI_ERROR(Status) || ConvertHandleIndexToHandle((UINTN)Intermediate) == NULL) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Lang);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
-        ShellStatus = DoDevTreeForHandle(ConvertHandleIndexToHandle(StrHexToUintn(Lang)), Language, FlagD, 0, HiiString);
+        ShellStatus = DoDevTreeForHandle(ConvertHandleIndexToHandle((UINTN)Intermediate), Language, FlagD, 0, HiiString);
       }
     }
 

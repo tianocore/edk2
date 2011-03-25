@@ -1,7 +1,7 @@
 /** @file
   Main file for devices shell Driver1 function.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,16 +14,42 @@
 
 #include "UefiShellDriver1CommandsLib.h"
 
+/**
+  Get lots of info about a device from its handle.
+
+  @param[in] TheHandle      The device handle to get info on.
+  @param[in,out] Type       On successful return R, B, or D (root, bus, or 
+                            device) will be placed in this buffer.
+  @param[in,out] Cfg        On successful return this buffer will be 
+                            TRUE if the handle has configuration, FALSE
+                            otherwise.
+  @param[in,out] Diag       On successful return this buffer will be 
+                            TRUE if the handle has disgnostics, FALSE
+                            otherwise.
+  @param[in,out] Parents    On successful return this buffer will be 
+                            contain the number of parent handles.
+  @param[in,out] Devices    On successful return this buffer will be 
+                            contain the number of devices controlled.
+  @param[in,out] Children   On successful return this buffer will be 
+                            contain the number of child handles.
+  @param[out] Name          The pointer to a buffer that will be allocated
+                            and contain the string name of the handle.
+                            The caller must free this memory.
+  @param[in] Language       The language code as defined by the UEFI spec.
+
+  @retval EFI_SUCCESS           The info is there.
+  @retval EFI_INVALID_PARAMETER A parameter was invalid.
+**/
 EFI_STATUS
 EFIAPI
 GetDeviceHandleInfo (
   IN EFI_HANDLE   TheHandle,
-  IN CHAR16       *Type,
-  IN BOOLEAN      *Cfg,
-  IN BOOLEAN      *Diag,
-  IN UINTN        *Parents,
-  IN UINTN        *Devices,
-  IN UINTN        *Children,
+  IN OUT CHAR16   *Type,
+  IN OUT BOOLEAN  *Cfg,
+  IN OUT BOOLEAN  *Diag,
+  IN OUT UINTN    *Parents,
+  IN OUT UINTN    *Devices,
+  IN OUT UINTN    *Children,
   OUT CHAR16      **Name,
   IN CONST CHAR8  *Language
   )
@@ -31,6 +57,8 @@ GetDeviceHandleInfo (
   EFI_STATUS    Status;
   EFI_HANDLE    *HandleBuffer;
   UINTN         Count;
+
+  UINTN         TestHandle = 0x43;
 
   if (TheHandle == NULL 
     || Type == NULL
@@ -41,6 +69,10 @@ GetDeviceHandleInfo (
     || Children == NULL
     || Name == NULL ) {
     return (EFI_INVALID_PARAMETER);
+  }
+
+  if (ConvertHandleToHandleIndex(TheHandle) == TestHandle) {
+    TestHandle = TestHandle;
   }
 
   *Cfg          = FALSE;
@@ -56,7 +88,7 @@ GetDeviceHandleInfo (
   gEfiShellProtocol->GetDeviceName(TheHandle, EFI_DEVICE_NAME_USE_COMPONENT_NAME|EFI_DEVICE_NAME_USE_DEVICE_PATH, (CHAR8*)Language, Name);
 
   Status = ParseHandleDatabaseForChildControllers(TheHandle, Children, NULL);
-  if (!EFI_ERROR(Status)) {
+//  if (!EFI_ERROR(Status)) {
     Status = PARSE_HANDLE_DATABASE_PARENTS(TheHandle, Parents, NULL);
     if (/*!EFI_ERROR(Status) && */Parents != NULL && Children != NULL) {
       if (*Parents == 0) {
@@ -67,7 +99,7 @@ GetDeviceHandleInfo (
         *Type = L'D';
       }
     }
-  }
+//  }
   Status = PARSE_HANDLE_DATABASE_UEFI_DRIVERS(TheHandle, Devices, &HandleBuffer);
   if (!EFI_ERROR(Status) && Devices != NULL && HandleBuffer != NULL) {
     for (Count = 0 ; Count < *Devices ; Count++) {
@@ -195,7 +227,7 @@ ShellCommandRunDevices (
         //
         Name = NULL;
         Status = GetDeviceHandleInfo(*HandleListWalker, &Type, &Cfg, &Diag, &Parents, &Devices, &Children, &Name, Language);
-        if (Parents != 0 || Devices != 0 || Children != 0) {
+        if (Name != NULL && (Parents != 0 || Devices != 0 || Children != 0)) {
           ShellPrintHiiEx(
             -1,
             -1,

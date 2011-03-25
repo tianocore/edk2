@@ -1,7 +1,7 @@
 /** @file
   Main file for Drivers shell Driver1 function.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,15 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {NULL, TypeMax}
   };
 
+/**
+  Get a device path (in text format) for a given handle.
+
+  @param[in] TheHandle      The handle to get the device path for.
+
+  @retval NULL    An error occured.
+  @return         A pointer to the driver path as a string.  The callee must 
+                  free this memory.
+**/
 CHAR16*
 EFIAPI
 GetDevicePathTextForHandle(
@@ -77,6 +86,14 @@ GetDevicePathTextForHandle(
   return (RetVal);
 }
 
+/**
+  Determine if the given handle has Driver Configuration protocol.
+
+  @param[in] TheHandle      The handle to the driver to test.
+
+  @retval TRUE              The driver does have Driver Configuration.
+  @retval FALSE             The driver does not have Driver Configuration.
+**/
 BOOLEAN
 EFIAPI
 ReturnDriverConfig(
@@ -91,6 +108,14 @@ ReturnDriverConfig(
   return (TRUE);
 }
 
+/**
+  Determine if the given handle has DriverDiagnostics protocol.
+
+  @param[in] TheHandle      The handle to the driver to test.
+
+  @retval TRUE              The driver does have Driver Diasgnostics.
+  @retval FALSE             The driver does not have Driver Diagnostics.
+**/
 BOOLEAN
 EFIAPI
 ReturnDriverDiag(
@@ -108,6 +133,14 @@ ReturnDriverDiag(
   return (TRUE);
 }
 
+/**
+  Finds and returns the version of the driver specified by TheHandle.
+
+  @param[in] TheHandle      The driver handle to get the version of.
+
+  @return             The version of the driver.
+  @retval 0xFFFFFFFF  An error ocurred.
+**/
 UINT32
 EFIAPI
 ReturnDriverVersion(
@@ -128,6 +161,12 @@ ReturnDriverVersion(
   return (RetVal);
 }
 
+/**
+  Function for 'drivers' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunDrivers (

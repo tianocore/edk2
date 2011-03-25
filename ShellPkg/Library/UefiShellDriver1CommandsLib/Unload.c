@@ -1,7 +1,7 @@
 /** @file
   Main file for Unload shell Driver1 function.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -145,10 +145,13 @@ ShellCommandRunUnload (
   EFI_HANDLE            TheHandle;
   CONST CHAR16          *Param1;
   SHELL_PROMPT_RESPONSE *Resp;
+  UINT64                Value;
 
   ShellStatus         = SHELL_SUCCESS;
   Package             = NULL;
   Resp                = NULL;
+  Value               = 0;
+  TheHandle           = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -179,24 +182,28 @@ ShellCommandRunUnload (
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDriver1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      Param1 = ShellCommandLineGetRawValue(Package, 1);
-      if (Param1 == NULL || ConvertHandleIndexToHandle(StrHexToUintn(Param1)) == NULL){
+      Param1    = ShellCommandLineGetRawValue(Package, 1);
+      if (Param1 != NULL) {
+        Status    = ShellConvertStringToUint64(Param1, &Value, TRUE, FALSE);
+        TheHandle = ConvertHandleIndexToHandle((UINTN)Value);
+      }
+
+      if (EFI_ERROR(Status) || Param1 == NULL || TheHandle == NULL){
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param1);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
-        TheHandle = ConvertHandleIndexToHandle(StrHexToUintn(Param1));
         ASSERT(TheHandle != NULL);
         if (ShellCommandLineGetFlag(Package, L"-v") || ShellCommandLineGetFlag(Package, L"-verbose")) {
           DumpLoadedImageProtocolInfo(TheHandle);
         }
         
         if (!ShellCommandLineGetFlag(Package, L"-n")) {
-          Status = ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN(STR_UNLOAD_CONF), gShellDriver1HiiHandle, StrHexToUintn(Param1));
+          Status = ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN(STR_UNLOAD_CONF), gShellDriver1HiiHandle, (UINTN)TheHandle);
           Status = ShellPromptForResponse(ShellPromptResponseTypeYesNo, NULL, (VOID**)&Resp);
         }
         if (ShellCommandLineGetFlag(Package, L"-n") || (Resp != NULL && *Resp == ShellPromptResponseYes)) {
           Status = gBS->UnloadImage(TheHandle);
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HANDLE_RESULT), gShellDriver1HiiHandle, L"Unload", StrHexToUintn(Param1), Status);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HANDLE_RESULT), gShellDriver1HiiHandle, L"Unload", (UINTN)TheHandle, Status);
         }
         SHELL_FREE_NON_NULL(Resp);
       }

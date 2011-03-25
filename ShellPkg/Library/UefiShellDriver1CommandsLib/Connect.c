@@ -1,7 +1,7 @@
 /** @file
   Main file for connect shell Driver1 function.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,15 @@
 #include "UefiShellDriver1CommandsLib.h"
 
 /**
+  Connect controller(s) and driver(s).
+
+  @param[in] ControllerHandle     The handle to the controller.  Should have driver binding on it.
+  @param[in] DriverHandle         The handle to the driver.  Should have driver binding.
+  @param[in] Recursive            TRUE to connect recursively, FALSE otherwise.
+  @param[in] Output               TRUE to have info on the screen, FALSE otherwise.
+  @param[in] AlwaysOutput         Override Output for errors.
+
+  @retval EFI_SUCCESS             The operation was successful.
 **/
 EFI_STATUS
 EFIAPI
@@ -42,7 +51,7 @@ ConnectControllers (
   if (DriverHandle == NULL) {
     DriverHandleList = NULL;
   } else {
-    DriverHandleList = AllocatePool(2*sizeof(EFI_HANDLE));
+    DriverHandleList = AllocateZeroPool(2*sizeof(EFI_HANDLE));
     if (DriverHandleList == NULL) {
       return (EFI_OUT_OF_RESOURCES);
     }
@@ -90,6 +99,13 @@ ConnectControllers (
   return (Status2);
 }
 
+/**
+  Do a connect from an EFI variable via it's key name.
+
+  @param[in] Key      The name of the EFI Variable.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
 EFIAPI
 ConnectFromDevPaths (
@@ -110,7 +126,7 @@ ConnectFromDevPaths (
   //
   Status = gRT->GetVariable((CHAR16*)Key, (EFI_GUID*)&gEfiGlobalVariableGuid, NULL, &Length, DevPath);
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    DevPath = AllocatePool(Length);
+    DevPath = AllocateZeroPool(Length);
     Status = gRT->GetVariable((CHAR16*)Key, (EFI_GUID*)&gEfiGlobalVariableGuid, NULL, &Length, DevPath);
   }
 
@@ -150,32 +166,27 @@ ConnectFromDevPaths (
   return (Status);
 }
 
+/**
+  Convert the handle identifiers from strings and then connect them.
+
+  One of them should have driver binding and either can be NULL.
+
+  @param[in] Handle1            The first handle.
+  @param[in] Handle2            The second handle.
+  @param[in] Recursive          TRUE to do connect recursively. FALSE otherwise.
+  @param[in] Output             TRUE to have output to screen. FALSE otherwise.
+
+  @retval EFI_SUCCESS           The operation was successful.
+**/
 EFI_STATUS
 EFIAPI
 ConvertAndConnectControllers (
-  IN CONST CHAR16   *StringHandle1 OPTIONAL,
-  IN CONST CHAR16   *StringHandle2 OPTIONAL,
+  IN EFI_HANDLE     *Handle1 OPTIONAL,
+  IN EFI_HANDLE     *Handle2 OPTIONAL,
   IN CONST BOOLEAN  Recursive,
   IN CONST BOOLEAN  Output
   )
 {
-  EFI_HANDLE Handle1;
-  EFI_HANDLE Handle2;
-
-  //
-  // Convert the command line parameters to HANDLES.  They must be in HEX according to spec.
-  //
-  if (StringHandle1 != NULL) {
-    Handle1 = ConvertHandleIndexToHandle(StrHexToUintn(StringHandle1));
-  } else {
-    Handle1 = NULL;
-  }
-  if (StringHandle2 != NULL) {
-    Handle2 = ConvertHandleIndexToHandle(StrHexToUintn(StringHandle2));
-  } else {
-    Handle2 = NULL;
-  }
-
   //
   // if only one is NULL verify it's the proper one...
   //
@@ -206,7 +217,7 @@ ConvertAndConnectControllers (
     }
   }
 
-  return (ConnectControllers(Handle1, Handle2, Recursive, Output, FALSE));
+  return (ConnectControllers(Handle1, Handle2, Recursive, Output, (BOOLEAN)(Handle2 != NULL && Handle1 != NULL)));
 }
 
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
@@ -235,6 +246,9 @@ ShellCommandRunConnect (
   CONST CHAR16        *Param1;
   CONST CHAR16        *Param2;
   UINTN               Count;
+  EFI_HANDLE          Handle1;
+  EFI_HANDLE          Handle2;
+  UINT64              Intermediate;
 
   ShellStatus         = SHELL_SUCCESS;
 
@@ -310,19 +324,36 @@ ShellCommandRunConnect (
       //
       // 0, 1, or 2 specific handles and possibly recursive
       //
-      Param1 = ShellCommandLineGetRawValue(Package, 1);
-      Param2 = ShellCommandLineGetRawValue(Package, 2);
-      Count  = ShellCommandLineGetCount(Package);
-      if (Param1 != NULL && ConvertHandleIndexToHandle(StrHexToUintn(Param1)) == NULL){
+      Param1  = ShellCommandLineGetRawValue(Package, 1);
+      Param2  = ShellCommandLineGetRawValue(Package, 2);
+      Count   = ShellCommandLineGetCount(Package);
+
+      Status  = ShellConvertStringToUint64(Param1, &Intermediate, TRUE, FALSE);
+      Handle1 = ConvertHandleIndexToHandle((UINTN)Intermediate);
+      if (EFI_ERROR(Status)) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param1);
         ShellStatus = SHELL_INVALID_PARAMETER;
-      } else if (Param2 != NULL && ConvertHandleIndexToHandle(StrHexToUintn(Param2)) == NULL) {
+      }
+      Status  = ShellConvertStringToUint64(Param2, &Intermediate, TRUE, FALSE);
+      Handle2 = ConvertHandleIndexToHandle((UINTN)Intermediate);
+      if (EFI_ERROR(Status)) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param2);
         ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        Status = ConvertAndConnectControllers(Param1, Param2, ShellCommandLineGetFlag(Package, L"-r"), (BOOLEAN)(Count!=0));
-        if (EFI_ERROR(Status)) {
-          ShellStatus = SHELL_DEVICE_ERROR;
+      }
+      
+      if (ShellStatus == SHELL_SUCCESS) {
+        if (Param1 != NULL && Handle1 == NULL){
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param1);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else if (Param2 != NULL && Handle2 == NULL) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param2);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          Status = ConvertAndConnectControllers(Handle1, Handle2, ShellCommandLineGetFlag(Package, L"-r"), (BOOLEAN)(Count!=0));
+          if (EFI_ERROR(Status)) {
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CONNECT_NONE), gShellDriver1HiiHandle);
+            ShellStatus = SHELL_DEVICE_ERROR;
+          }
         }
       }
     }

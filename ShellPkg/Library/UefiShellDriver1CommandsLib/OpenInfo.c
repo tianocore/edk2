@@ -1,7 +1,7 @@
 /** @file
   Main file for OpenInfo shell Driver1 function.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -23,6 +23,14 @@ STATIC CONST CHAR16 StringExclusive[] = L"Exclusive";
 STATIC CONST CHAR16 StringDriverEx[]  = L"DriverEx ";
 STATIC CONST CHAR16 StringUnknown[]   = L"Unknown  ";
 
+/**
+  Open the database and print out all the info about TheHandle.
+
+  @param[in] TheHandle      The handle to print info on.
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_INVALID_PARAMETER TheHandle was NULL.
+**/
 EFI_STATUS
 EFIAPI
 TraverseHandleDatabase (
@@ -41,7 +49,9 @@ TraverseHandleDatabase (
   UINTN                               HandleIndex;
   CONST CHAR16                        *Name;
 
-  ASSERT(TheHandle != NULL);
+  if (TheHandle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   //
   // Retrieve the list of all the protocols on the handle
@@ -145,6 +155,7 @@ ShellCommandRunOpenInfo (
   SHELL_STATUS        ShellStatus;
   EFI_HANDLE          TheHandle;
   CONST CHAR16        *Param1;
+  UINT64              Intermediate;
 
   ShellStatus         = SHELL_SUCCESS;
 
@@ -181,13 +192,14 @@ ShellCommandRunOpenInfo (
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       Param1 = ShellCommandLineGetRawValue(Package, 1);
-      if (Param1 == NULL || ConvertHandleIndexToHandle(StrHexToUintn(Param1)) == NULL){
+      Status = ShellConvertStringToUint64(Param1, &Intermediate, TRUE, FALSE);
+      if (EFI_ERROR(Status) || Param1 == NULL || ConvertHandleIndexToHandle((UINTN)Intermediate) == NULL){
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param1);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
-        TheHandle = ConvertHandleIndexToHandle(StrHexToUintn(Param1));
+        TheHandle = ConvertHandleIndexToHandle((UINTN)Intermediate);
         ASSERT(TheHandle != NULL);
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_OPENINFO_HEADER_LINE), gShellDriver1HiiHandle, StrHexToUintn(Param1), TheHandle);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_OPENINFO_HEADER_LINE), gShellDriver1HiiHandle, (UINTN)Intermediate, TheHandle);
 
         Status = TraverseHandleDatabase (TheHandle);
         if (!EFI_ERROR(Status)) {
