@@ -108,12 +108,23 @@ HandleVol(
     }
   }
 
-  SysInfo = AllocateZeroPool(SysInfoSize);
+  SysInfoSize = 0;
+  SysInfo = NULL;
+
   Status = EfiFpHandle->GetInfo(
     EfiFpHandle,
     &gEfiFileSystemInfoGuid,
     &SysInfoSize,
     SysInfo);
+
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    SysInfo = AllocateZeroPool(SysInfoSize);
+    Status = EfiFpHandle->GetInfo(
+      EfiFpHandle,
+      &gEfiFileSystemInfoGuid,
+      &SysInfoSize,
+      SysInfo);
+  }
 
   gEfiShellProtocol->CloseFile(ShellFileHandle);
 
@@ -164,6 +175,7 @@ ShellCommandRunVol (
   CONST CHAR16  *CurDir;
   BOOLEAN       DeleteMode;
   CHAR16        *FullPath;
+  CHAR16        *TempSpot;
   UINTN         Length;
 
   Length              = 0;
@@ -220,10 +232,16 @@ ShellCommandRunVol (
         }
       }
       if (PathName != NULL) {
-        StrnCatGrow(&FullPath, &Length, PathName, StrStr(PathName, L"\\")==NULL?0:StrStr(PathName, L"\\")-PathName+1);
-        if (StrStr(FullPath, L":\\") == NULL) {
-          StrnCatGrow(&FullPath, &Length, L":\\", 0);
+        TempSpot = StrStr(PathName, L":");
+        if (TempSpot != NULL) {
+          *TempSpot = CHAR_NULL;
         }
+        TempSpot = StrStr(PathName, L"\\");
+        if (TempSpot != NULL) {
+          *TempSpot = CHAR_NULL;
+        }
+        StrnCatGrow(&FullPath, &Length, PathName, 0);
+        StrnCatGrow(&FullPath, &Length, L":\\", 0);
         DeleteMode = ShellCommandLineGetFlag(Package, L"-d");
         if (DeleteMode && ShellCommandLineGetFlag(Package, L"-n")) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel2HiiHandle);
