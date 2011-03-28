@@ -430,7 +430,7 @@ ValidateAndCopyFiles(
   SHELL_FREE_NON_NULL(DestPath);
   SHELL_FREE_NON_NULL(HiiOutput);
   SHELL_FREE_NON_NULL(HiiResultOk);
-  if (Resp != NULL) {
+  if (Resp == NULL) {
     SHELL_FREE_NON_NULL(Response);
   }
 
