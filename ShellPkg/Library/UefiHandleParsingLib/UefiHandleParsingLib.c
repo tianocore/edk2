@@ -1110,6 +1110,7 @@ ParseHandleDatabaseForChildControllers(
   if (MatchingHandleCount == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
+  *MatchingHandleCount = 0;
 
   Status = PARSE_HANDLE_DATABASE_UEFI_DRIVERS (
             ControllerHandle,
@@ -1129,7 +1130,6 @@ ParseHandleDatabaseForChildControllers(
     return (EFI_NOT_FOUND);
   }
 
-  *MatchingHandleCount = 0;
   for (DriverBindingHandleIndex = 0; DriverBindingHandleIndex < DriverBindingHandleCount; DriverBindingHandleIndex++) {
     Status = PARSE_HANDLE_DATABASE_MANAGED_CHILDREN (
               DriverBindingHandleBuffer[DriverBindingHandleIndex],
