@@ -523,10 +523,15 @@ ShellCommandRunLs (
           }
         }
         if (PathName != NULL) {
-          ASSERT((FullPath == NULL && Size == 0) || (FullPath != NULL));
-          StrnCatGrow(&FullPath, &Size, PathName, 0);
-          if  (ShellIsDirectory(PathName) == EFI_SUCCESS) {
-            StrnCatGrow(&FullPath, &Size, L"\\*", 0);
+          if (StrStr(PathName, L":") == NULL && gEfiShellProtocol->GetCurDir(NULL) == NULL) {
+            ShellStatus = SHELL_NOT_FOUND;
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle);
+          } else {
+            ASSERT((FullPath == NULL && Size == 0) || (FullPath != NULL));
+            StrnCatGrow(&FullPath, &Size, PathName, 0);
+            if  (ShellIsDirectory(PathName) == EFI_SUCCESS) {
+              StrnCatGrow(&FullPath, &Size, L"\\*", 0);
+            }
           }
         } else {
           ASSERT(FullPath == NULL);
