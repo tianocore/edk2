@@ -3134,7 +3134,7 @@ FileBufferReplace (
 
   FileBuffer.FileModified       = TRUE;
 
-  MainTitleBarRefresh (MainEditor.FileBuffer->FileName, MainEditor.FileBuffer->FileType, MainEditor.FileBuffer->ReadOnly, MainEditor.FileBuffer->FileModified, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row);
+  MainTitleBarRefresh (MainEditor.FileBuffer->FileName, MainEditor.FileBuffer->FileType, MainEditor.FileBuffer->ReadOnly, MainEditor.FileBuffer->FileModified, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row, 0, 0);
   FileBufferRestorePosition ();
   FileBufferRefresh ();
 

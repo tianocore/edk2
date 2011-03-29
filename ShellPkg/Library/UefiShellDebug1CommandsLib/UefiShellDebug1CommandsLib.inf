@@ -41,13 +41,13 @@
   Pci.h
   DmpStore.c
   Dblk.c
-  ./SmbiosView/EventLogInfo.c
-  ./SmbiosView/PrintInfo.c
-  ./SmbiosView/QueryTable.c
-  ./SmbiosView/SmbiosView.c
-  ./SmbiosView/Smbios.c
-  ./SmbiosView/SmbiosViewStrings.uni
-  ./SmbiosView/LibSmbiosView.c
+  SmbiosView/EventLogInfo.c
+  SmbiosView/PrintInfo.c
+  SmbiosView/QueryTable.c
+  SmbiosView/SmbiosView.c
+  SmbiosView/Smbios.c
+  SmbiosView/SmbiosViewStrings.uni
+  SmbiosView/LibSmbiosView.c
   UefiShellDebug1CommandsLib.c
   UefiShellDebug1CommandsLib.h
   UefiShellDebug1CommandsLib.uni
@@ -63,36 +63,36 @@
   EditMenuBar.c
   
 ## Files specific to the text editor  
-  ./Edit/Edit.c
-  ./Edit/TextEditor.h
-  ./Edit/TextEditorTypes.h
-  ./Edit/FileBuffer.h
-  ./Edit/FileBuffer.c
-  ./Edit/MainTextEditor.h
-  ./Edit/MainTextEditor.c
-  ./Edit/Misc.h
-  ./Edit/Misc.c
-  ./Edit/TextEditStrings.uni
+  Edit/Edit.c
+  Edit/TextEditor.h
+  Edit/TextEditorTypes.h
+  Edit/FileBuffer.h
+  Edit/FileBuffer.c
+  Edit/MainTextEditor.h
+  Edit/MainTextEditor.c
+  Edit/Misc.h
+  Edit/Misc.c
+  Edit/TextEditStrings.uni
   
 ## Files specific to the HEX editor
-  ./HexEdit/BufferImage.h
-  ./HexEdit/BufferImage.c
-  ./HexEdit/Clipboard.h
-  ./HexEdit/Clipboard.c
-  ./HexEdit/DiskImage.h
-  ./HexEdit/DiskImage.c
-  ./HexEdit/FileImage.h
-  ./HexEdit/FileImage.c
-  ./HexEdit/HexEdit.c
-  ./HexEdit/HexEditor.h
-  ./HexEdit/HexEditorTypes.h
-  ./HexEdit/HexeditStrings.uni
-  ./HexEdit/MainHexEditor.h
-  ./HexEdit/MainHexEditor.c
-  ./HexEdit/MemImage.h
-  ./HexEdit/MemImage.c
-  ./HexEdit/Misc.h
-  ./HexEdit/Misc.c
+  HexEdit/BufferImage.h
+  HexEdit/BufferImage.c
+  HexEdit/Clipboard.h
+  HexEdit/Clipboard.c
+  HexEdit/DiskImage.h
+  HexEdit/DiskImage.c
+  HexEdit/FileImage.h
+  HexEdit/FileImage.c
+  HexEdit/HexEdit.c
+  HexEdit/HexEditor.h
+  HexEdit/HexEditorTypes.h
+  HexEdit/HexeditStrings.uni
+  HexEdit/MainHexEditor.h
+  HexEdit/MainHexEditor.c
+  HexEdit/MemImage.h
+  HexEdit/MemImage.c
+  HexEdit/Misc.h
+  HexEdit/Misc.c
 
 [Packages]
   MdePkg/MdePkg.dec

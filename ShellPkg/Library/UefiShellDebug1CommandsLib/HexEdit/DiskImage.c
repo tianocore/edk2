@@ -219,6 +219,7 @@ Returns:
 {
   CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL        *DupDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL        *DupDevicePathForFree;
   EFI_HANDLE                      Handle;
   EFI_BLOCK_IO_PROTOCOL           *BlkIo;
   EFI_STATUS                      Status;
@@ -241,11 +242,12 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
   DupDevicePath = DuplicateDevicePath(DevicePath);
+  DupDevicePathForFree = DupDevicePath;
   //
   // get blkio interface
   //
   Status = gBS->LocateDevicePath(&gEfiBlockIoProtocolGuid,&DupDevicePath,&Handle);
-  FreePool(DupDevicePath);
+  FreePool(DupDevicePathForFree);
   if (EFI_ERROR (Status)) {
     StatusBarSetStatusString (L"Read Disk Failed");
     return Status;

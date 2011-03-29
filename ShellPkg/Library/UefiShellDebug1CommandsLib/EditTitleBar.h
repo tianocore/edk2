@@ -56,6 +56,8 @@ typedef enum {
   @param[in] Modified           TRUE if the file was modified.  FALSE otherwise.
   @param[in] LastCol            The last printable column.
   @param[in] LastRow            The last printable row.
+  @param[in] Offset             The offset into the file. (only for mem/disk)
+  @param[in] Size               The file's size. (only for mem/disk)
 
   @retval EFI_SUCCESS           The operation was successful.
 **/
@@ -64,10 +66,12 @@ EFIAPI
 MainTitleBarRefresh (
   IN CONST CHAR16                 *FileName OPTIONAL,
   IN CONST EDIT_FILE_TYPE         FileType,
-  IN BOOLEAN                      ReadOnly,
-  IN BOOLEAN                      Modified,
-  IN UINTN                        LastCol,
-  IN UINTN                        LastRow
+  IN CONST BOOLEAN                ReadOnly,
+  IN CONST BOOLEAN                Modified,
+  IN CONST UINTN                  LastCol,
+  IN CONST UINTN                  LastRow,
+  IN CONST UINTN                  Offset,
+  IN CONST UINTN                  Size
   );
 
 #endif

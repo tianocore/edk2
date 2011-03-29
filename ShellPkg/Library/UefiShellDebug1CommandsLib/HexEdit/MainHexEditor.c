@@ -933,7 +933,9 @@ Returns:
           HMainEditor.BufferImage->FileImage->ReadOnly,
           FALSE,
           HMainEditor.ScreenSize.Column,
-          HMainEditor.ScreenSize.Row
+          HMainEditor.ScreenSize.Row,
+          HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer?HMainEditor.BufferImage->DiskImage->Offset:HMainEditor.BufferImage->BufferType == FileTypeMemBuffer?HMainEditor.BufferImage->MemImage->Offset:0,
+          HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer?HMainEditor.BufferImage->DiskImage->Size  :HMainEditor.BufferImage->BufferType == FileTypeMemBuffer?HMainEditor.BufferImage->MemImage->Size  :0
           );
         Done = TRUE;
         break;
@@ -1158,7 +1160,9 @@ Returns:
           HMainEditor.BufferImage->FileImage->ReadOnly,
           FALSE,
           HMainEditor.ScreenSize.Column,
-          HMainEditor.ScreenSize.Row
+          HMainEditor.ScreenSize.Row,
+          HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer?HMainEditor.BufferImage->DiskImage->Offset:HMainEditor.BufferImage->BufferType == FileTypeMemBuffer?HMainEditor.BufferImage->MemImage->Offset:0,
+          HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer?HMainEditor.BufferImage->DiskImage->Size  :HMainEditor.BufferImage->BufferType == FileTypeMemBuffer?HMainEditor.BufferImage->MemImage->Size  :0
           );
         Done = TRUE;
         break;
@@ -1409,7 +1413,9 @@ Returns:
           HMainEditor.BufferImage->FileImage->ReadOnly,
           FALSE,
           HMainEditor.ScreenSize.Column,
-          HMainEditor.ScreenSize.Row
+          HMainEditor.ScreenSize.Row,
+          HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer?HMainEditor.BufferImage->DiskImage->Offset:HMainEditor.BufferImage->BufferType == FileTypeMemBuffer?HMainEditor.BufferImage->MemImage->Offset:0,
+          HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer?HMainEditor.BufferImage->DiskImage->Size  :HMainEditor.BufferImage->BufferType == FileTypeMemBuffer?HMainEditor.BufferImage->MemImage->Size  :0
           );
         Done = TRUE;
         break;
@@ -1827,6 +1833,25 @@ Returns:
 
 --*/
 {
+  BOOLEAN NameChange;
+  BOOLEAN ReadChange;
+
+  NameChange = FALSE;
+  ReadChange = FALSE;
+
+  if ( HMainEditor.BufferImage->FileImage != NULL && 
+       HMainEditor.BufferImage->FileImage->FileName != NULL && 
+       HBufferImageBackupVar.FileImage != NULL && 
+       HBufferImageBackupVar.FileImage->FileName != NULL && 
+       StrCmp (HMainEditor.BufferImage->FileImage->FileName, HBufferImageBackupVar.FileImage->FileName) != 0 ) {
+    NameChange = TRUE;
+  }
+  if ( HMainEditor.BufferImage->FileImage != NULL && 
+       HBufferImageBackupVar.FileImage != NULL && 
+       HMainEditor.BufferImage->FileImage->ReadOnly != HBufferImageBackupVar.FileImage->ReadOnly ) {
+    ReadChange = TRUE;
+  }
+
   //
   // to aVOID screen flicker
   // the stall value is from experience
@@ -1834,28 +1859,48 @@ Returns:
   gBS->Stall (50);
 
   //
-  // call the four components refresh function
+  // call the components refresh function
   //
-  MainTitleBarRefresh (
-    HMainEditor.BufferImage->BufferType == FileTypeFileBuffer?HMainEditor.BufferImage->FileImage->FileName:HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer?HMainEditor.BufferImage->DiskImage->Name:NULL,
-    HMainEditor.BufferImage->BufferType,
-    HMainEditor.BufferImage->FileImage->ReadOnly,
-    HMainEditor.BufferImage->Modified,
-    HMainEditor.ScreenSize.Column,
-    HMainEditor.ScreenSize.Row
-    );
-  HBufferImageRefresh ();
-  StatusBarRefresh (
-    HEditorFirst,
-    HMainEditor.ScreenSize.Row,
-    HMainEditor.ScreenSize.Column,
-    0,
-    0,
-    TRUE
-    );
-  MenuBarRefresh (    
-    HMainEditor.ScreenSize.Row,
-    HMainEditor.ScreenSize.Column);
+  if (HEditorFirst 
+    || NameChange
+    || HMainEditor.BufferImage->BufferType != HBufferImageBackupVar.BufferType 
+    || HBufferImageBackupVar.Modified != HMainEditor.BufferImage->Modified 
+    || ReadChange ) {
+
+    MainTitleBarRefresh (
+      HMainEditor.BufferImage->BufferType == FileTypeFileBuffer?HMainEditor.BufferImage->FileImage->FileName:HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer?HMainEditor.BufferImage->DiskImage->Name:NULL,
+      HMainEditor.BufferImage->BufferType,
+      HMainEditor.BufferImage->FileImage->ReadOnly,
+      HMainEditor.BufferImage->Modified,
+      HMainEditor.ScreenSize.Column,
+      HMainEditor.ScreenSize.Row,
+      HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer?HMainEditor.BufferImage->DiskImage->Offset:HMainEditor.BufferImage->BufferType == FileTypeMemBuffer?HMainEditor.BufferImage->MemImage->Offset:0,
+      HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer?HMainEditor.BufferImage->DiskImage->Size  :HMainEditor.BufferImage->BufferType == FileTypeMemBuffer?HMainEditor.BufferImage->MemImage->Size  :0
+      );
+    HBufferImageRefresh ();
+  }
+  if (HEditorFirst
+    || HBufferImageBackupVar.DisplayPosition.Row != HMainEditor.BufferImage->DisplayPosition.Row 
+    || HBufferImageBackupVar.DisplayPosition.Column != HMainEditor.BufferImage->DisplayPosition.Column 
+    || StatusBarGetRefresh()) {
+
+    StatusBarRefresh (
+      HEditorFirst,
+      HMainEditor.ScreenSize.Row,
+      HMainEditor.ScreenSize.Column,
+      0,
+      0,
+      TRUE
+      );
+    HBufferImageRefresh ();
+  }
+
+  if (HEditorFirst) {
+    MenuBarRefresh (    
+      HMainEditor.ScreenSize.Row,
+      HMainEditor.ScreenSize.Column);
+    HBufferImageRefresh ();
+  }
 
   //
   // EditorFirst is now set to FALSE

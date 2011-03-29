@@ -271,7 +271,7 @@ MainCommandOpenFile (
           return Status;
         }
 
-        MainTitleBarRefresh (MainEditor.FileBuffer->FileName, MainEditor.FileBuffer->FileType, MainEditor.FileBuffer->ReadOnly, MainEditor.FileBuffer->FileModified, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row);
+        MainTitleBarRefresh (MainEditor.FileBuffer->FileName, MainEditor.FileBuffer->FileType, MainEditor.FileBuffer->ReadOnly, MainEditor.FileBuffer->FileModified, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row, 0, 0);
         FileBufferRestorePosition ();
         Done = TRUE;
         break;
@@ -1510,7 +1510,7 @@ MainEditorRefresh (
     || FileBufferBackupVar.FileModified != FileBuffer.FileModified 
     || FileBufferBackupVar.ReadOnly != FileBuffer.ReadOnly) {
 
-    MainTitleBarRefresh (MainEditor.FileBuffer->FileName, MainEditor.FileBuffer->FileType, MainEditor.FileBuffer->ReadOnly, MainEditor.FileBuffer->FileModified, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row);
+    MainTitleBarRefresh (MainEditor.FileBuffer->FileName, MainEditor.FileBuffer->FileType, MainEditor.FileBuffer->ReadOnly, MainEditor.FileBuffer->FileModified, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row, 0, 0);
     FileBufferRestorePosition ();
     FileBufferRefresh ();
   }

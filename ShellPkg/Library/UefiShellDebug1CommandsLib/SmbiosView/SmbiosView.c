@@ -65,6 +65,12 @@ ShellCommandRunSmbiosView (
     if (ShellCommandLineGetCount(Package) > 1) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
+    } else if (ShellCommandLineGetFlag(Package, L"-t") && ShellCommandLineGetValue(Package, L"-t") == NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"-t");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else if (ShellCommandLineGetFlag(Package, L"-h") && ShellCommandLineGetValue(Package, L"-h") == NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"-h");
+      ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (
         (ShellCommandLineGetFlag(Package, L"-t") && ShellCommandLineGetFlag(Package, L"-h")) ||
         (ShellCommandLineGetFlag(Package, L"-t") && ShellCommandLineGetFlag(Package, L"-s")) ||

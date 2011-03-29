@@ -44,7 +44,7 @@ ShellCommandRunHexEdit (
   SHELL_STATUS            ShellStatus;
   LIST_ENTRY              *Package;
   CONST CHAR16            *Cwd;
-  CHAR16                  *NFS;
+  CHAR16                  *NewName;
   CHAR16                  *Spot;
   CONST CHAR16            *Name;
   UINTN                   Offset;
@@ -54,7 +54,7 @@ ShellCommandRunHexEdit (
 
   Buffer      = NULL;
   ShellStatus = SHELL_SUCCESS;
-  NFS         = NULL;
+  NewName         = NULL;
   Cwd         = NULL;
   Buffer      = NULL;
   Name        = NULL;
@@ -90,10 +90,7 @@ ShellCommandRunHexEdit (
     // Check for -d
     //
     if (ShellCommandLineGetFlag(Package, L"-d")){
-      if (ShellCommandLineGetCount(Package) < 4) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else if (ShellCommandLineGetCount(Package) > 4) {
+      if (ShellCommandLineGetCount(Package) > 4) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
@@ -138,7 +135,24 @@ ShellCommandRunHexEdit (
         Size    = ShellStrToUintn(ShellCommandLineGetRawValue(Package, 2));
       }
     }
-    ShellCommandLineFreeVarList (Package);
+    if (WhatToDo == FileTypeNone && ShellCommandLineGetRawValue(Package, 1) != NULL) {
+        Name      = ShellCommandLineGetRawValue(Package, 1);
+        if (!IsValidFileName(Name)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Name);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          WhatToDo  = FileTypeFileBuffer;
+        }
+    } else if (WhatToDo == FileTypeNone) {
+      if (gEfiShellProtocol->GetCurDir(NULL) == NULL) {
+        ShellStatus = SHELL_NOT_FOUND;
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellDebug1HiiHandle);
+      } else {
+        NewName = EditGetDefaultFileName(L"bin");
+        Name = NewName;
+        WhatToDo  = FileTypeFileBuffer;
+      }
+    }
 
     if (ShellStatus == SHELL_SUCCESS && WhatToDo == FileTypeNone) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
@@ -240,8 +254,10 @@ ShellCommandRunHexEdit (
         }
       }
     }
+    ShellCommandLineFreeVarList (Package);
   }
 
   SHELL_FREE_NON_NULL (Buffer);
+  SHELL_FREE_NON_NULL (NewName);
   return ShellStatus;
 }

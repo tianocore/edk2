@@ -301,6 +301,7 @@ Returns:
   HBufferImage.HighBits               = TRUE;
   HBufferImage.BufferPosition.Row     = 1;
   HBufferImage.BufferPosition.Column  = 1;
+  HBufferImage.BufferType = FileTypeFileBuffer;
 
   if (!Recover) {
     UnicodeBuffer = CatSPrint(NULL, L"%d Lines Read", HBufferImage.NumLines);

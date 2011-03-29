@@ -954,6 +954,7 @@ HBufferImageRead (
   // variable initialization
   //
   Status = EFI_SUCCESS;
+  HBufferImage.BufferType = BufferType;
 
   //
   // three types of buffer supported
