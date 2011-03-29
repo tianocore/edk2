@@ -31,7 +31,7 @@ typedef struct {
   UINT32  MutipleClk : 1;
   UINT32  Imcr : 1;
   UINT32  Reserved2 : 24;
-} FRATUREBYTE2_5;
+} FEATUREBYTE2_5;
 
 typedef struct {
   UINT32  Signature;
@@ -40,7 +40,7 @@ typedef struct {
   UINT8   SpecRev;
   UINT8   Checksum;
   UINT8   FeatureByte1;
-  FRATUREBYTE2_5 FeatureByte2_5;
+  FEATUREBYTE2_5 FeatureByte2_5;
 } EFI_LEGACY_MP_TABLE_FLOATING_POINTER;
 
 #define EFI_LEGACY_MP_TABLE_HEADER_SIGNATURE  SIGNATURE_32 ('P', 'C', 'M', 'P')
