@@ -1,7 +1,7 @@
 /** @file
   DevicePathFromText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1135,6 +1135,51 @@ DevPathFromTextAcpiExp (
   *AsciiStr = '\0';
 
   return (EFI_DEVICE_PATH_PROTOCOL *) AcpiEx;
+}
+
+/**
+  Converts a text device path node to ACPI _ADR device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created ACPI _ADR device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextAcpiAdr (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16                *DisplayDeviceStr;
+  ACPI_ADR_DEVICE_PATH  *AcpiAdr;
+  UINTN                 Index;
+
+  AcpiAdr = (ACPI_ADR_DEVICE_PATH *) CreateDeviceNode (
+                                       ACPI_DEVICE_PATH,
+                                       ACPI_ADR_DP,
+                                       sizeof (ACPI_ADR_DEVICE_PATH)
+                                       );
+  ASSERT (AcpiAdr != NULL);
+
+  for (Index = 0; ; Index++) {
+    DisplayDeviceStr = GetNextParamStr (&TextDeviceNode);
+    if (IS_NULL (*DisplayDeviceStr)) {
+      break;
+    }
+    if (Index > 0) {
+      AcpiAdr = ReallocatePool (
+                  DevicePathNodeLength (AcpiAdr),
+                  DevicePathNodeLength (AcpiAdr) + sizeof (UINT32),
+                  AcpiAdr
+                  );
+      ASSERT (AcpiAdr != NULL);
+      SetDevicePathNodeLength (AcpiAdr, DevicePathNodeLength (AcpiAdr) + sizeof (UINT32));
+    }
+    
+    (&AcpiAdr->ADR)[Index] = (UINT32) Strtoi (DisplayDeviceStr);
+  }
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) AcpiAdr;
 }
 
 /**
@@ -2769,6 +2814,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE DevPathFromTextTable[]
   {L"ParallelPort", DevPathFromTextParallelPort},
   {L"AcpiEx", DevPathFromTextAcpiEx},
   {L"AcpiExp", DevPathFromTextAcpiExp},
+  {L"AcpiAdr", DevPathFromTextAcpiAdr},
   {L"Ata", DevPathFromTextAta},
   {L"Scsi", DevPathFromTextScsi},
   {L"Fibre", DevPathFromTextFibre},
