@@ -298,13 +298,16 @@ CheckAndSetTime (
   if (TimeString != NULL && !InternalIsTimeLikeString(TimeString, L':', 1, 2, FALSE)) {
     return (SHELL_INVALID_PARAMETER);
   }
+  if (((Daylight & (EFI_TIME_IN_DAYLIGHT|EFI_TIME_ADJUST_DAYLIGHT)) != Daylight)) {
+    return (SHELL_INVALID_PARAMETER);
+  }
 
   Status = gRT->GetTime(&TheTime, NULL);
   ASSERT_EFI_ERROR(Status);
-  TimeStringCopy = NULL;
-  TimeStringCopy = StrnCatGrow(&TimeStringCopy, NULL, TimeString, 0);
 
   if (TimeString != NULL) {
+    TimeStringCopy = NULL;
+    TimeStringCopy = StrnCatGrow(&TimeStringCopy, NULL, TimeString, 0);
     Walker1          = TimeStringCopy;
     TheTime.Hour    = 0xFF;
     TheTime.Minute  = 0xFF;
@@ -330,16 +333,16 @@ CheckAndSetTime (
         TheTime.Second = (UINT8)ShellStrToUintn (Walker1);
       }
     }
+    SHELL_FREE_NON_NULL(TimeStringCopy);
   }
 
-  FreePool(TimeStringCopy);
 
   if ((Tz >= -1440 && Tz <= 1440)||(Tz == 0x7FF)) {
     TheTime.TimeZone = Tz;
   }
-  if (Daylight <= 3 && Daylight != 2) {
-    TheTime.Daylight = Daylight;
-  }
+
+  TheTime.Daylight = Daylight;
+
   Status = gRT->SetTime(&TheTime);
 
   if (!EFI_ERROR(Status)){
@@ -466,6 +469,9 @@ ShellCommandRunTime (
           TzMinutes
          );
           switch (TheTime.Daylight) {
+            case 0:
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_TIME_DST0), gShellLevel2HiiHandle);
+              break;
             case EFI_TIME_ADJUST_DAYLIGHT:
               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_TIME_DST1), gShellLevel2HiiHandle);
               break;
@@ -493,7 +499,7 @@ ShellCommandRunTime (
               Tz = (INT16)ShellStrToUintn(TempLocation);
             }
             if (!(Tz >= -1440 && Tz <= 1440) && Tz != 2047) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"-d");
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"-tz");
               ShellStatus = SHELL_INVALID_PARAMETER;
             }
           } else {
@@ -506,7 +512,7 @@ ShellCommandRunTime (
           if (TempLocation != NULL) {
             Daylight = (UINT8)ShellStrToUintn(TempLocation);
             if (Daylight != 0 && Daylight != 1 && Daylight != 3) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"-d");
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"-d");
               ShellStatus = SHELL_INVALID_PARAMETER;
             }
           } else {
