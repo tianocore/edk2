@@ -1153,6 +1153,7 @@ DevPathFromTextAcpiAdr (
   CHAR16                *DisplayDeviceStr;
   ACPI_ADR_DEVICE_PATH  *AcpiAdr;
   UINTN                 Index;
+  UINTN                 Length;
 
   AcpiAdr = (ACPI_ADR_DEVICE_PATH *) CreateDeviceNode (
                                        ACPI_DEVICE_PATH,
@@ -1167,13 +1168,14 @@ DevPathFromTextAcpiAdr (
       break;
     }
     if (Index > 0) {
+      Length  = DevicePathNodeLength (AcpiAdr);
       AcpiAdr = ReallocatePool (
-                  DevicePathNodeLength (AcpiAdr),
-                  DevicePathNodeLength (AcpiAdr) + sizeof (UINT32),
+                  Length,
+                  Length + sizeof (UINT32),
                   AcpiAdr
                   );
       ASSERT (AcpiAdr != NULL);
-      SetDevicePathNodeLength (AcpiAdr, DevicePathNodeLength (AcpiAdr) + sizeof (UINT32));
+      SetDevicePathNodeLength (AcpiAdr, Length + sizeof (UINT32));
     }
     
     (&AcpiAdr->ADR)[Index] = (UINT32) Strtoi (DisplayDeviceStr);
