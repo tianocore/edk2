@@ -1657,9 +1657,9 @@ ShellCommandRunIfconfig (
   ListOperation  = ShellCommandLineGetFlag(Package, L"-l");
   SetOperation   = ShellCommandLineGetFlag(Package, L"-s");
 
-  if (ClearOperation && ListOperation 
-    ||SetOperation   && ListOperation 
-    ||ClearOperation && SetOperation 
+  if ((ClearOperation && ListOperation)
+    ||(SetOperation   && ListOperation)
+    ||(ClearOperation && SetOperation)
     ) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellNetwork1HiiHandle);
     ShellStatus = SHELL_INVALID_PARAMETER;
