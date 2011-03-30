@@ -66,17 +66,15 @@
   PcdLib
   PerformanceLib
   TimerLib
-  PcdLib
   DxeServicesLib
   HiiLib
 
 [Guids]
   gEfiVT100PlusGuid                             ## CONSUMES ## GUID (The type of terminal)
   gEfiVT100Guid                                 ## CONSUMES ## GUID (The type of terminal)
-  gEfiMemoryTypeInformationGuid                 ## CONSUMES ## GUID (The identifier of memory type information type in system table)
                                                 ## CONSUMES ## GUID HOB (The hob holding memory type information)
+  gEfiMemoryTypeInformationGuid                 ## CONSUMES ## GUID (The identifier of memory type information type in system table)
   gEfiVTUTF8Guid                                ## CONSUMES ## GUID (The type of terminal)
-  gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"BootCurrent" (The boot option of current boot)
                                                 ## SOMETIMES_CONSUMES ## Variable:L"BootXX" (Boot option variable)
                                                 ## CONSUMES           ## Variable:L"Timeout" (The time out value in second of showing progress bar)
                                                 ## SOMETIMES_CONSUMES ## Variable:L"BootOrder" (The boot option array)
@@ -84,6 +82,7 @@
                                                 ## SOMETIMES_CONSUMES ## Variable:L"ConIn" (The device path of console in device)
                                                 ## SOMETIMES_CONSUMES ## Variable:L"ConOut" (The device path of console out device)
                                                 ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" (The device path of error out device)
+  gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"BootCurrent" (The boot option of current boot)
   gEfiFileInfoGuid                              ## CONSUMES ## GUID
   gEfiPcAnsiGuid                                ## CONSUMES ## GUID (The type of terminal)
   gPerformanceProtocolGuid                      ## SOMETIMES_PRODUCES ## Variable:L"PerfDataMemAddr" (The ACPI address of performance data)
