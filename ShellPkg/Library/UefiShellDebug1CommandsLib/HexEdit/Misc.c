@@ -256,10 +256,10 @@ Returns:
   //     do not set currentline to Line
   //
   if (Count <= 0) {
-    AbsCount  = -Count;
+    AbsCount  = (UINTN)ABS(Count);
     Line      = _HLineRetreat (AbsCount);
   } else {
-    Line = _HLineAdvance (Count);
+    Line = _HLineAdvance ((UINTN)Count);
   }
 
   return Line;
@@ -297,10 +297,10 @@ Returns:
   // >0: advance
   //
   if (Count <= 0) {
-    AbsCount  = -Count;
+    AbsCount  = (UINTN)ABS(Count);
     Line      = _HLineRetreat (AbsCount);
   } else {
-    Line = _HLineAdvance (Count);
+    Line = _HLineAdvance ((UINTN)Count);
   }
 
   if (Line == NULL) {
@@ -399,7 +399,10 @@ Returns:
   Lenp        = StrLen (Pat);
   Lens        = StrLen (Str);
 
-  Failure     = AllocateZeroPool (Lenp * sizeof (INTN));
+  Failure     = AllocateZeroPool ((UINTN)(Lenp * sizeof (INTN)));
+  if (Failure == NULL) {
+    return 0;
+  }
   Failure[0]  = -1;
   for (j = 1; j < Lenp; j++) {
     i = Failure[j - 1];

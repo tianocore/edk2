@@ -86,7 +86,17 @@ ShellCommandRunEndFor (
   Found = MoveToTag(GetPreviousNode, L"for", L"endfor", NULL, ShellCommandGetCurrentScriptFile(), FALSE, FALSE, FALSE);
 
   if (!Found) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_NO_MATCHING), gShellLevel1HiiHandle, L"For", L"EndFor", ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
+    ShellPrintHiiEx(
+      -1, 
+      -1, 
+      NULL, 
+      STRING_TOKEN (STR_SYNTAX_NO_MATCHING), 
+      gShellLevel1HiiHandle, 
+      L"For", 
+      L"EndFor", 
+      ShellCommandGetCurrentScriptFile()!=NULL
+        &&ShellCommandGetCurrentScriptFile()->CurrentCommand!=NULL
+          ?ShellCommandGetCurrentScriptFile()->CurrentCommand->Line:0);
     return (SHELL_NOT_FOUND);
   }
   return (SHELL_SUCCESS);
@@ -305,7 +315,16 @@ ShellCommandRunFor (
     // Make sure that an End exists.
     //
     if (!MoveToTag(GetNextNode, L"endfor", L"for", NULL, CurrentScriptFile, TRUE, TRUE, FALSE)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_NO_MATCHING), gShellLevel1HiiHandle, L"EndFor", L"For", ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
+      ShellPrintHiiEx(
+        -1, 
+        -1, 
+        NULL, 
+        STRING_TOKEN (STR_SYNTAX_NO_MATCHING), 
+        gShellLevel1HiiHandle, 
+        L"EndFor", 
+        L"For", 
+        CurrentScriptFile->CurrentCommand!=NULL
+          ?CurrentScriptFile->CurrentCommand->Line:0);
       return (SHELL_DEVICE_ERROR);
     }
 

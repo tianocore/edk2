@@ -731,7 +731,7 @@ ProcessCommandLine(
     ShellInfoObject.ShellInitSettings.Delay = 0;
   } else if (ShellInfoObject.ShellInitSettings.BitUnion.Bits.Delay) {
     TempConst = ShellCommandLineGetValue(Package, L"-delay");
-    if (*TempConst == L':') {
+    if (TempConst != NULL && *TempConst == L':') {
       TempConst++;
     }
     if (TempConst != NULL && !EFI_ERROR(ShellConvertStringToUint64(TempConst, &Intermediate, FALSE, FALSE))) {

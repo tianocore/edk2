@@ -265,27 +265,31 @@ BcfgAddInstall1(
     FilePathSize = GetDevicePathSize (FilePath);
 
     TempByteBuffer = AllocateZeroPool(sizeof(UINT32) + sizeof(UINT16) + DescSize + FilePathSize);
-    TempByteStart  = TempByteBuffer;
-    *((UINT32 *) TempByteBuffer) = LOAD_OPTION_ACTIVE;      // Attributes
-    TempByteBuffer += sizeof (UINT32);
+    if (TempByteBuffer != NULL) {
+      TempByteStart  = TempByteBuffer;
+      *((UINT32 *) TempByteBuffer) = LOAD_OPTION_ACTIVE;      // Attributes
+      TempByteBuffer += sizeof (UINT32);
 
-    *((UINT16 *) TempByteBuffer) = (UINT16)FilePathSize;    // FilePathListLength
-    TempByteBuffer += sizeof (UINT16);
+      *((UINT16 *) TempByteBuffer) = (UINT16)FilePathSize;    // FilePathListLength
+      TempByteBuffer += sizeof (UINT16);
 
-    CopyMem (TempByteBuffer, Desc, DescSize);
-    TempByteBuffer += DescSize;
-    CopyMem (TempByteBuffer, FilePath, FilePathSize);
+      CopyMem (TempByteBuffer, Desc, DescSize);
+      TempByteBuffer += DescSize;
+      CopyMem (TempByteBuffer, FilePath, FilePathSize);
 
-    UnicodeSPrint (OptionStr, sizeof(OptionStr), L"%s%04x", Target == BcfgTargetBootOrder?L"Boot":L"Driver", TargetLocation);
-    Status = gRT->SetVariable (
-          OptionStr,
-          &gEfiGlobalVariableGuid,
-          EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS,
-          sizeof(UINT32) + sizeof(UINT16) + DescSize + FilePathSize,
-          TempByteStart
-         );
+      UnicodeSPrint (OptionStr, sizeof(OptionStr), L"%s%04x", Target == BcfgTargetBootOrder?L"Boot":L"Driver", TargetLocation);
+      Status = gRT->SetVariable (
+            OptionStr,
+            &gEfiGlobalVariableGuid,
+            EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS,
+            sizeof(UINT32) + sizeof(UINT16) + DescSize + FilePathSize,
+            TempByteStart
+           );
 
-    FreePool(TempByteStart);
+      FreePool(TempByteStart);
+    } else {
+      Status = EFI_OUT_OF_RESOURCES;
+    }
 
     if (EFI_ERROR(Status)) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_SET_VAR_FAIL), gShellInstall1HiiHandle, OptionStr, Status);
@@ -385,22 +389,25 @@ BcfgRemoveInstall1(
     return (SHELL_INVALID_PARAMETER);
   }
   NewOrder = AllocateZeroPool(OrderCount*sizeof(CurrentOrder[0]));
-  NewCount = OrderCount;
-  CopyMem(NewOrder, CurrentOrder, OrderCount*sizeof(CurrentOrder[0]));
-  for (LoopVar = 0 ; LoopVar < OrderCount ; LoopVar++){
-    if (NewOrder[LoopVar] == Location) {
-      CopyMem(NewOrder+LoopVar, NewOrder+LoopVar+1, (OrderCount - LoopVar - 1)*sizeof(CurrentOrder[0]));
-      NewCount--;
+  if (NewOrder != NULL) {
+    NewCount = OrderCount;
+    CopyMem(NewOrder, CurrentOrder, OrderCount*sizeof(CurrentOrder[0]));
+    for (LoopVar = 0 ; LoopVar < OrderCount ; LoopVar++){
+      if (NewOrder[LoopVar] == Location) {
+        CopyMem(NewOrder+LoopVar, NewOrder+LoopVar+1, (OrderCount - LoopVar - 1)*sizeof(CurrentOrder[0]));
+        NewCount--;
+      }
     }
+    Status = gRT->SetVariable(
+      Target == BcfgTargetBootOrder?(CHAR16*)L"BootOrder":(CHAR16*)L"DriverOrder",
+      (EFI_GUID*)&gEfiGlobalVariableGuid,
+      EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS,
+      NewCount*sizeof(NewOrder[0]),
+      NewOrder);
+    FreePool(NewOrder);
+  } else {
+    Status = EFI_OUT_OF_RESOURCES;
   }
-  Status = gRT->SetVariable(
-    Target == BcfgTargetBootOrder?(CHAR16*)L"BootOrder":(CHAR16*)L"DriverOrder",
-    (EFI_GUID*)&gEfiGlobalVariableGuid,
-    EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS,
-    NewCount*sizeof(NewOrder[0]),
-    NewOrder);
-  FreePool(NewOrder);
-
   if (EFI_ERROR(Status)) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_WRITE_FAIL), gShellInstall1HiiHandle, Target == BcfgTargetBootOrder?(CHAR16*)L"BootOrder":(CHAR16*)L"DriverOrder", Status);
     return (SHELL_INVALID_PARAMETER);

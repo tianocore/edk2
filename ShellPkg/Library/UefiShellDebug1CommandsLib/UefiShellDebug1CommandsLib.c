@@ -310,7 +310,9 @@ ConvertStringToGuid (
   TempCopy = StrnCatGrow(&TempCopy, NULL, StringGuid, 0);
   Walker   = TempCopy;
   TempSpot = StrStr(Walker, L"-");
-  *TempSpot = CHAR_NULL;
+  if (TempSpot != NULL) {
+    *TempSpot = CHAR_NULL;
+  }
   Status = ShellConvertStringToUint64(Walker, &TempVal, TRUE, FALSE);
   if (EFI_ERROR(Status)) {
     FreePool(TempCopy);
@@ -319,7 +321,9 @@ ConvertStringToGuid (
   Guid->Data1 = (UINT32)TempVal;
   Walker += 9;
   TempSpot = StrStr(Walker, L"-");
-  *TempSpot = CHAR_NULL;
+  if (TempSpot != NULL) {
+    *TempSpot = CHAR_NULL;
+  }
   Status = ShellConvertStringToUint64(Walker, &TempVal, TRUE, FALSE);
   if (EFI_ERROR(Status)) {
     FreePool(TempCopy);
@@ -328,7 +332,9 @@ ConvertStringToGuid (
   Guid->Data2 = (UINT16)TempVal;
   Walker += 5;
   TempSpot = StrStr(Walker, L"-");
-  *TempSpot = CHAR_NULL;
+  if (TempSpot != NULL) {
+    *TempSpot = CHAR_NULL;
+  }
   Status = ShellConvertStringToUint64(Walker, &TempVal, TRUE, FALSE);
   if (EFI_ERROR(Status)) {
     FreePool(TempCopy);

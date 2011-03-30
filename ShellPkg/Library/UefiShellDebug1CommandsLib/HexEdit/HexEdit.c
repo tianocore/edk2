@@ -110,7 +110,7 @@ ShellCommandRunHexEdit (
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         Name      = ShellCommandLineGetRawValue(Package, 1);
-        if (!IsValidFileName(Name)) {
+        if (Name == NULL || !IsValidFileName(Name)) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Name);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {

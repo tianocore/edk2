@@ -883,7 +883,7 @@ PingCreateIpInstance (
                   &HandleNum,
                   &HandleBuffer
                   );
-  if (EFI_ERROR (Status) || (HandleNum == 0)) {
+  if (EFI_ERROR (Status) || (HandleNum == 0) || (HandleBuffer == NULL)) {
     return EFI_ABORTED;
   }
   //

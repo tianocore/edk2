@@ -154,11 +154,15 @@ ShellCommandRunSetVar (
             // arbitrary buffer
             //
             Buffer = AllocateZeroPool((StrLen(Data) / 2));
-            for (LoopVar = 0 ; LoopVar < (StrLen(Data) / 2) ; LoopVar++) {
-              ((UINT8*)Buffer)[LoopVar] = (UINT8)(HexCharToUintn(Data[LoopVar*2]) * 16);
-              ((UINT8*)Buffer)[LoopVar] = (UINT8)(((UINT8*)Buffer)[LoopVar] + HexCharToUintn(Data[LoopVar*2+1]));
+            if (Buffer == NULL) {
+              Status = EFI_OUT_OF_RESOURCES;
+            } else {
+              for (LoopVar = 0 ; LoopVar < (StrLen(Data) / 2) ; LoopVar++) {
+                ((UINT8*)Buffer)[LoopVar] = (UINT8)(HexCharToUintn(Data[LoopVar*2]) * 16);
+                ((UINT8*)Buffer)[LoopVar] = (UINT8)(((UINT8*)Buffer)[LoopVar] + HexCharToUintn(Data[LoopVar*2+1]));
+              }
+              Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, StrLen(Data) / 2, Buffer);
             }
-            Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, StrLen(Data) / 2, Buffer);
             if (EFI_ERROR(Status)) {
               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, &Guid, VariableName, Status);
               ShellStatus = SHELL_ACCESS_DENIED;
@@ -181,11 +185,13 @@ ShellCommandRunSetVar (
           //
           Data++;
           Buffer = AllocateZeroPool(StrSize(Data) / 2);
-          AsciiSPrint(Buffer, StrSize(Data) / 2, "%s", Data);
-          ((CHAR8*)Buffer)[AsciiStrLen(Buffer)-1] = CHAR_NULL;
-
-          
-          Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, AsciiStrSize(Buffer)-sizeof(CHAR8), Buffer);
+          if (Buffer == NULL) {
+            Status = EFI_OUT_OF_RESOURCES;
+          } else {
+            AsciiSPrint(Buffer, StrSize(Data) / 2, "%s", Data);
+            ((CHAR8*)Buffer)[AsciiStrLen(Buffer)-1] = CHAR_NULL;
+            Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, AsciiStrSize(Buffer)-sizeof(CHAR8), Buffer);
+          }
           if (EFI_ERROR(Status)) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, &Guid, VariableName, Status);
             ShellStatus = SHELL_ACCESS_DENIED;

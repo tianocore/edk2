@@ -2,7 +2,7 @@
   Build a table, each item is (key, info) pair.
   and give a interface of query a string out of a table.
 
-  Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -37,12 +37,37 @@ typedef struct TABLE_ITEM {
     } \
   } while (0);
 
+/**
+  Given a table and a Key, return the responding info.
+
+  Notes:
+    Table[Index].Key is change from UINT8 to UINT16,
+    in order to deal with "0xaa - 0xbb".
+
+    For example:
+      DisplaySELVariableDataFormatTypes(UINT8 Type, UINT8 Option)
+    has a item:
+      "0x07-0x7F,   Unused"
+    Now define Key = 0x7F07, that is to say: High = 0x7F, Low = 0x07.
+    Then all the Key Value between Low and High gets the same string
+    L"Unused".
+
+  @param[in] Table    The begin address of table.
+  @param[in] Number   The number of table items.
+  @param[in] Key      The query Key.
+  @param[in,out] Info Input as empty buffer; output as data buffer.
+  @param[in] InfoLen  The max number of characters for Info.
+
+  @return the found Key and Info is valid.
+  @retval QUERY_TABLE_UNFOUND and Info should be NULL.
+**/
 UINT8
 QueryTable (
   IN  TABLE_ITEM    *Table,
   IN  UINTN         Number,
   IN  UINT8         Key,
-  IN  OUT CHAR16    *Info
+  IN  OUT CHAR16    *Info,
+  IN  UINTN         InfoLen
   );
 
 VOID

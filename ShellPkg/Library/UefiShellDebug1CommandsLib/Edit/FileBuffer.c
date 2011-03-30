@@ -247,10 +247,10 @@ MoveLine (
   // if > 0, the advance
   //
   if (Count <= 0) {
-    AbsCount  = -Count;
+    AbsCount  = (UINTN)ABS(Count);
     Line      = InternalEditorMiscLineRetreat (AbsCount,MainEditor.FileBuffer->CurrentLine,MainEditor.FileBuffer->ListHead);
   } else {
-    Line = InternalEditorMiscLineAdvance (Count,MainEditor.FileBuffer->CurrentLine,MainEditor.FileBuffer->ListHead);
+    Line = InternalEditorMiscLineAdvance ((UINTN)Count,MainEditor.FileBuffer->CurrentLine,MainEditor.FileBuffer->ListHead);
   }
 
   return Line;
@@ -317,7 +317,7 @@ FileBufferRestoreMousePosition (
         CurrentLine = FileBuffer.CurrentLine;
         Line        = MoveLine (FRow - FileBuffer.FilePosition.Row);
 
-        if (FColumn > Line->Size) {
+        if (Line == NULL || FColumn > Line->Size) {
           HasCharacter = FALSE;
         }
 
@@ -500,7 +500,7 @@ FileBufferPrintLine (
     Limit = 0;
   }
 
-  StrnCpy (PrintLine, Buffer, Limit > MainEditor.ScreenSize.Column ? MainEditor.ScreenSize.Column : Limit);
+  StrnCpy (PrintLine, Buffer, MIN(MIN(Limit,MainEditor.ScreenSize.Column), 200));
   for (; Limit < MainEditor.ScreenSize.Column; Limit++) {
     PrintLine[Limit] = L' ';
   }
@@ -1446,7 +1446,7 @@ FileBufferSave (
   //
   // if is the old file
   //
-  if (StrCmp (FileName, FileBuffer.FileName) == 0) {
+  if (FileBuffer.FileName != NULL && StrCmp (FileName, FileBuffer.FileName) == 0) {
     //
     // file has not been modified
     //
@@ -2316,7 +2316,7 @@ FileBufferPageDown (
   //
   // if that line, is not that long, so move to the end of that line
   //
-  if (FCol > Line->Size) {
+  if (Line != NULL && FCol > Line->Size) {
     FCol = Line->Size + 1;
   }
 
@@ -2372,7 +2372,7 @@ FileBufferPageUp (
   //
   // if that line is not that long, so move to the end of that line
   //
-  if (FCol > Line->Size) {
+  if (Line != NULL && FCol > Line->Size) {
     FCol = Line->Size + 1;
   }
 
@@ -2650,10 +2650,10 @@ MoveCurrentLine (
   UINTN           AbsCount;
 
   if (Count <= 0) {
-    AbsCount  = -Count;
+    AbsCount  = (UINTN)ABS(Count);
     Line      = InternalEditorMiscLineRetreat (AbsCount,MainEditor.FileBuffer->CurrentLine,MainEditor.FileBuffer->ListHead);
   } else {
-    Line = InternalEditorMiscLineAdvance (Count,MainEditor.FileBuffer->CurrentLine,MainEditor.FileBuffer->ListHead);
+    Line = InternalEditorMiscLineAdvance ((UINTN)Count,MainEditor.FileBuffer->CurrentLine,MainEditor.FileBuffer->ListHead);
   }
 
   if (Line == NULL) {
@@ -2720,7 +2720,7 @@ FileBufferMovePosition (
       //
       FileBuffer.FilePosition.Row = NewFilePosRow;
       if (RowGap < 0) {
-        Abs = -RowGap;
+        Abs = (UINTN)ABS(RowGap);
         FileBuffer.DisplayPosition.Row -= Abs;
       } else {
         FileBuffer.DisplayPosition.Row += RowGap;

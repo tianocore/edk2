@@ -97,6 +97,8 @@ HandleVol(
       SysInfo);
   }
 
+  ASSERT(SysInfo != NULL);
+
   if (Delete) {
     StrCpy ((CHAR16 *) SysInfo->VolumeLabel, L"");
     SysInfo->Size = SIZE_OF_EFI_FILE_SYSTEM_INFO + StrSize(SysInfo->VolumeLabel);

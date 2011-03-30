@@ -383,7 +383,7 @@ Returns:
   //
   // if is the old file
   //
-  if (StrCmp (FileName, HFileImage.FileName) == 0) {
+  if (HFileImage.FileName != NULL && FileName != NULL && StrCmp (FileName, HFileImage.FileName) == 0) {
     //
     // check whether file exists on disk
     //

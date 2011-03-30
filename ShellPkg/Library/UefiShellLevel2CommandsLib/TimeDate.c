@@ -124,7 +124,7 @@ CheckAndSetDate (
   if (Walker1 != NULL) {
     Walker = Walker1 + 1;
   }
-  Walker1 = StrStr(Walker, L"/");
+  Walker1 = Walker!=NULL?StrStr(Walker, L"/"):NULL;
   if (Walker1 != NULL && *Walker1 == L'/') {
     *Walker1 = CHAR_NULL;
   }
@@ -133,7 +133,7 @@ CheckAndSetDate (
     if (Walker1 != NULL) {
       Walker = Walker1 + 1;
     }
-    Walker1 = StrStr(Walker, L"/");
+    Walker1 = Walker!=NULL?StrStr(Walker, L"/"):NULL;
     if (Walker1 != NULL && *Walker1 == L'/') {
       *Walker1 = CHAR_NULL;
     }
@@ -312,7 +312,7 @@ CheckAndSetTime (
     TheTime.Hour    = 0xFF;
     TheTime.Minute  = 0xFF;
 
-    Walker2          = StrStr(Walker1, L":");
+    Walker2          = Walker1!=NULL?StrStr(Walker1, L":"):NULL;
     if (Walker2 != NULL && *Walker2 == L':') {
       *Walker2 = CHAR_NULL;
     }
@@ -320,7 +320,7 @@ CheckAndSetTime (
     if (Walker2 != NULL) {
       Walker1 = Walker2 + 1;
     }
-    Walker2          = StrStr(Walker1, L":");
+    Walker2          = Walker1!=NULL?StrStr(Walker1, L":"):NULL;
     if (Walker2 != NULL && *Walker2 == L':') {
       *Walker2 = CHAR_NULL;
     }

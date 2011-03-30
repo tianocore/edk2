@@ -330,6 +330,9 @@ MappingListHasType(
   //
   if (Specific != NULL) {
     NewSpecific = AllocateZeroPool(StrSize(Specific) + sizeof(CHAR16));
+    if (NewSpecific == NULL){
+      return FALSE;
+    }
     StrCpy(NewSpecific, Specific);
     if (NewSpecific[StrLen(NewSpecific)-1] != L':') {
       StrCat(NewSpecific, L":");
@@ -609,7 +612,7 @@ PerformMappingDisplay(
   // Get the map name(s) for each one.
   //
   for ( LoopVar = 0, Found = FALSE
-      ; LoopVar < (BufferSize / sizeof(EFI_HANDLE))
+      ; LoopVar < (BufferSize / sizeof(EFI_HANDLE)) && HandleBuffer != NULL
       ; LoopVar ++
      ){
     Status = PerformSingleMappingDisplay(
@@ -635,7 +638,7 @@ PerformMappingDisplay(
     &BufferSize,
     HandleBuffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    FreePool(HandleBuffer);
+    SHELL_FREE_NON_NULL(HandleBuffer);
     HandleBuffer = AllocateZeroPool(BufferSize);
     if (HandleBuffer == NULL) {
       return (SHELL_OUT_OF_RESOURCES);
@@ -897,6 +900,9 @@ AddMappingFromMapping(
   CHAR16                          *NewSName;
   
   NewSName = AllocateZeroPool(StrSize(SName) + sizeof(CHAR16));
+  if (NewSName == NULL) {
+    return (SHELL_OUT_OF_RESOURCES);
+  }
   StrCpy(NewSName, SName);
   if (NewSName[StrLen(NewSName)-1] != L':') {
     StrCat(NewSName, L":");
@@ -947,6 +953,9 @@ AddMappingFromHandle(
   CHAR16                    *NewSName;
   
   NewSName = AllocateZeroPool(StrSize(SName) + sizeof(CHAR16));
+  if (NewSName == NULL) {
+    return (SHELL_OUT_OF_RESOURCES);
+  }
   StrCpy(NewSName, SName);
   if (NewSName[StrLen(NewSName)-1] != L':') {
     StrCat(NewSName, L":");

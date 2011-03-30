@@ -2,7 +2,7 @@
   Build a table, each item is (Key, Info) pair.
   And give a interface of query a string out of a table.
 
-  Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -2921,27 +2921,8 @@ TABLE_ITEM  StructureTypeInfoTable[] = {
 };
 
 
-UINT8
-QueryTable (
-  IN  TABLE_ITEM    *Table,
-  IN  UINTN         Number,
-  IN  UINT8         Key,
-  IN  OUT CHAR16    *Info
-  )
-/*++
-Routine Description:
-  Function Description
-    Given a table and a Key, return the responding info.
-
-  Arguments:
-    Table   -  The begin address of table
-    Number  -  The number of table items
-    Key     -  The query Key
-    Info    -  Input as empty buffer; output as data buffer.
-
-  Returns:
-    if Key found   - return found Key and Info
-    if Key unfound - return QUERY_TABLE_UNFOUND, Info=NULL
+/**
+  Given a table and a Key, return the responding info.
 
   Notes:
     Table[Index].Key is change from UINT8 to UINT16,
@@ -2955,7 +2936,23 @@ Routine Description:
     Then all the Key Value between Low and High gets the same string
     L"Unused".
 
+  @param[in] Table    The begin address of table.
+  @param[in] Number   The number of table items.
+  @param[in] Key      The query Key.
+  @param[in,out] Info Input as empty buffer; output as data buffer.
+  @param[in] InfoLen  The max number of characters for Info.
+
+  @return the found Key and Info is valid.
+  @retval QUERY_TABLE_UNFOUND and Info should be NULL.
 **/
+UINT8
+QueryTable (
+  IN  TABLE_ITEM    *Table,
+  IN  UINTN         Number,
+  IN  UINT8         Key,
+  IN  OUT CHAR16    *Info,
+  IN  UINTN         InfoLen
+  )
 {
   UINTN Index;
   //
@@ -2971,7 +2968,7 @@ Routine Description:
     // Check if Key is in the range
     //
     if (High > Low && Key >= Low && Key <= High) {
-      StrCpy (Info, Table[Index].Info);
+      StrnCpy (Info, Table[Index].Info, InfoLen-1);
       StrCat (Info, L"\n");
       return Key;
     }
@@ -2979,13 +2976,13 @@ Routine Description:
     // Check if Key == Value in the table
     //
     if (Table[Index].Key == Key) {
-      StrCpy (Info, Table[Index].Info);
+      StrnCpy (Info, Table[Index].Info, InfoLen-1);
       StrCat (Info, L"\n");
       return Key;
     }
   }
 
-  StrCpy (Info, L"Undefined Value\n");
+  StrnCpy (Info, L"Undefined Value\n", InfoLen);
   return QUERY_TABLE_UNFOUND;
 }
 
@@ -3069,7 +3066,7 @@ PrintBitsInfo (
     CHAR16  Info[66]; \
     Num = sizeof (Table) / sizeof (TABLE_ITEM); \
     ZeroMem (Info, sizeof (Info)); \
-    QueryTable (Table, Num, Key, Info); \
+    QueryTable (Table, Num, Key, Info, sizeof(Info)/sizeof(Info[0])); \
     Print (Info); \
   } while (0);
 

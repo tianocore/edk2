@@ -606,13 +606,19 @@ IfconfigGetAllNicInfoByHii (
     // Construct configuration request string header
     //
     ConfigHdr = ConstructConfigHdr (&gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE, ChildHandle);
-    Length = StrLen (ConfigHdr);
+    if (ConfigHdr != NULL) {
+      Length = StrLen (ConfigHdr);
+    } else {
+      Length = 0;
+    }
     ConfigResp = AllocateZeroPool ((Length + NIC_ITEM_CONFIG_SIZE * 2 + 100) * sizeof (CHAR16));
     if (ConfigResp == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_ERROR;
     }
-    StrCpy (ConfigResp, ConfigHdr);
+    if (ConfigHdr != NULL) {
+      StrCpy (ConfigResp, ConfigHdr);
+    }
  
     //
     // Append OFFSET/WIDTH pair
@@ -772,10 +778,15 @@ IfconfigSetNicAddrByHii (
   // Construct config request string header
   //
   ConfigHdr = ConstructConfigHdr (&gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE, ChildHandle);
-
-  Length = StrLen (ConfigHdr);
+  if (ConfigHdr != NULL) {
+    Length = StrLen (ConfigHdr);
+  } else {
+    Length = 0;
+  }
   ConfigResp = AllocateZeroPool ((Length + NIC_ITEM_CONFIG_SIZE * 2 + 100) * sizeof (CHAR16));
-  StrCpy (ConfigResp, ConfigHdr);
+  if (ConfigHdr != NULL) {
+    StrCpy (ConfigResp, ConfigHdr);
+  }
 
   NicConfig = AllocateZeroPool (NIC_ITEM_CONFIG_SIZE);
   if (NicConfig == NULL) {

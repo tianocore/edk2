@@ -79,7 +79,17 @@ ShellCommandRunGoto (
       // Check forwards and then backwards for a label...
       //
       if (!MoveToTag(GetNextNode, L"endfor", L"for", CompareString, ShellCommandGetCurrentScriptFile(), FALSE, FALSE, TRUE)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_NO_MATCHING), gShellLevel1HiiHandle, CompareString, L"Goto", ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
+        ShellPrintHiiEx(
+          -1, 
+          -1, 
+          NULL, 
+          STRING_TOKEN (STR_SYNTAX_NO_MATCHING), 
+          gShellLevel1HiiHandle, 
+          CompareString, 
+          L"Goto", 
+          ShellCommandGetCurrentScriptFile()!=NULL
+            &&ShellCommandGetCurrentScriptFile()->CurrentCommand!=NULL
+              ?ShellCommandGetCurrentScriptFile()->CurrentCommand->Line:0);
         ShellStatus = SHELL_NOT_FOUND;
       }
     FreePool(CompareString);

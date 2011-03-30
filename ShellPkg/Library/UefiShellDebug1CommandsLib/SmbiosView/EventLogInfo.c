@@ -340,55 +340,56 @@ DisplaySysEventLogData (
   //
   Offset  = 0;
   Log     = (LOG_RECORD_FORMAT *) LogData;
-  while (Log->Type != END_OF_LOG && Offset < LogAreaLength) {
+  while (Log != NULL && Log->Type != END_OF_LOG && Offset < LogAreaLength) {
     //
     // Get a Event Log Record
     //
     Log = (LOG_RECORD_FORMAT *) (LogData + Offset);
 
-    //
-    // Display Event Log Record Information
-    //
-    DisplaySELVarDataFormatType (Log->Type, SHOW_DETAIL);
-    DisplaySELLogHeaderLen (Log->Length, SHOW_DETAIL);
+    if (Log != NULL) {
+      //
+      // Display Event Log Record Information
+      //
+      DisplaySELVarDataFormatType (Log->Type, SHOW_DETAIL);
+      DisplaySELLogHeaderLen (Log->Length, SHOW_DETAIL);
 
-    Offset += Log->Length;
+      Offset += Log->Length;
+      //
+      // Display Log Header Date/Time Fields
+      // These fields contain the BCD representation of the date and time
+      // (as read from CMOS) of the occurrence of the event
+      // So Print as hex and represent decimal
+      //
+      ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_DATE), gShellDebug1HiiHandle);
+      if (Log != NULL && Log->Year >= 80 && Log->Year <= 99) {
+        Print (L"19");
+      } else if (Log != NULL && Log->Year <= 79) {
+        Print (L"20");
+      } else {
+        ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_ERROR), gShellDebug1HiiHandle);
+        continue;
+      }
 
-    //
-    // Display Log Header Date/Time Fields
-    // These fields contain the BCD representation of the date and time
-    // (as read from CMOS) of the occurrence of the event
-    // So Print as hex and represent decimal
-    //
-    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_DATE), gShellDebug1HiiHandle);
-    if (Log != NULL && Log->Year >= 80 && Log->Year <= 99) {
-      Print (L"19");
-    } else if (Log != NULL && Log->Year <= 79) {
-      Print (L"20");
-    } else {
-      ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_ERROR), gShellDebug1HiiHandle);
-      continue;
+      ShellPrintHiiEx(-1,-1,NULL,
+        STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_TIME_SIX_VARS),
+        gShellDebug1HiiHandle,
+        Log->Year,
+        Log->Month,
+        Log->Day,
+        Log->Hour,
+        Log->Minute,
+        Log->Second
+       );
+
+      //
+      // Display Variable Data Format
+      //
+      if (Log->Length <= (sizeof (LOG_RECORD_FORMAT) - 1)) {
+        continue;
+      }
+
+      ElVdfType = Log->LogVariableData[0];
+      DisplayElVdfInfo (ElVdfType, Log->LogVariableData);
     }
-
-    ShellPrintHiiEx(-1,-1,NULL,
-      STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_TIME_SIX_VARS),
-      gShellDebug1HiiHandle,
-      Log->Year,
-      Log->Month,
-      Log->Day,
-      Log->Hour,
-      Log->Minute,
-      Log->Second
-     );
-
-    //
-    // Display Variable Data Format
-    //
-    if (Log->Length <= (sizeof (LOG_RECORD_FORMAT) - 1)) {
-      continue;
-    }
-
-    ElVdfType = Log->LogVariableData[0];
-    DisplayElVdfInfo (ElVdfType, Log->LogVariableData);
   }
 }

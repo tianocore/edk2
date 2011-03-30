@@ -844,7 +844,17 @@ ShellCommandRunIf (
   // Make sure that an End exists.
   //
   if (!MoveToTag(GetNextNode, L"endif", L"if", NULL, ShellCommandGetCurrentScriptFile(), TRUE, TRUE, FALSE)) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_NO_MATCHING), gShellLevel1HiiHandle, L"EnfIf", L"If", ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
+    ShellPrintHiiEx(
+      -1, 
+      -1, 
+      NULL, 
+      STRING_TOKEN (STR_SYNTAX_NO_MATCHING), 
+      gShellLevel1HiiHandle, 
+      L"EnfIf", 
+      L"If", 
+      ShellCommandGetCurrentScriptFile()!=NULL
+        &&ShellCommandGetCurrentScriptFile()->CurrentCommand!=NULL
+          ?ShellCommandGetCurrentScriptFile()->CurrentCommand->Line:0);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -983,16 +993,46 @@ ShellCommandRunElse (
 
 
   if (!MoveToTag(GetPreviousNode, L"if", L"endif", NULL, ShellCommandGetCurrentScriptFile(), FALSE, TRUE, FALSE)) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_NO_MATCHING), gShellLevel1HiiHandle, L"If", L"Else", ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
+    ShellPrintHiiEx(
+      -1, 
+      -1, 
+      NULL, 
+      STRING_TOKEN (STR_SYNTAX_NO_MATCHING), 
+      gShellLevel1HiiHandle, 
+      L"If", 
+      L"Else", 
+      ShellCommandGetCurrentScriptFile()!=NULL
+        &&ShellCommandGetCurrentScriptFile()->CurrentCommand!=NULL
+          ?ShellCommandGetCurrentScriptFile()->CurrentCommand->Line:0);
     return (SHELL_DEVICE_ERROR);
   }
   if (!MoveToTag(GetPreviousNode, L"if", L"else", NULL, ShellCommandGetCurrentScriptFile(), FALSE, TRUE, FALSE)) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_NO_MATCHING), gShellLevel1HiiHandle, L"If", L"Else", ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
+    ShellPrintHiiEx(
+      -1, 
+      -1, 
+      NULL, 
+      STRING_TOKEN (STR_SYNTAX_NO_MATCHING), 
+      gShellLevel1HiiHandle, 
+      L"If", 
+      L"Else", 
+      ShellCommandGetCurrentScriptFile()!=NULL
+        &&ShellCommandGetCurrentScriptFile()->CurrentCommand!=NULL
+          ?ShellCommandGetCurrentScriptFile()->CurrentCommand->Line:0);
     return (SHELL_DEVICE_ERROR);
   }
 
   if (!MoveToTag(GetNextNode, L"endif", L"if", NULL, ShellCommandGetCurrentScriptFile(), FALSE, FALSE, FALSE)) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_NO_MATCHING), gShellLevel1HiiHandle, L"EndIf", "Else", ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
+    ShellPrintHiiEx(
+      -1, 
+      -1, 
+      NULL, 
+      STRING_TOKEN (STR_SYNTAX_NO_MATCHING), 
+      gShellLevel1HiiHandle, 
+      L"EndIf", 
+      "Else", 
+      ShellCommandGetCurrentScriptFile()!=NULL
+        &&ShellCommandGetCurrentScriptFile()->CurrentCommand!=NULL
+          ?ShellCommandGetCurrentScriptFile()->CurrentCommand->Line:0);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -1025,7 +1065,17 @@ ShellCommandRunEndIf (
   }
 
   if (!MoveToTag(GetPreviousNode, L"if", L"endif", NULL, ShellCommandGetCurrentScriptFile(), FALSE, TRUE, FALSE)) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_NO_MATCHING), gShellLevel1HiiHandle, L"If", L"EndIf", ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
+    ShellPrintHiiEx(
+      -1, 
+      -1, 
+      NULL, 
+      STRING_TOKEN (STR_SYNTAX_NO_MATCHING), 
+      gShellLevel1HiiHandle, 
+      L"If", 
+      L"EndIf", 
+      ShellCommandGetCurrentScriptFile()!=NULL
+        &&ShellCommandGetCurrentScriptFile()->CurrentCommand!=NULL
+          ?ShellCommandGetCurrentScriptFile()->CurrentCommand->Line:0);
     return (SHELL_DEVICE_ERROR);
   }
 

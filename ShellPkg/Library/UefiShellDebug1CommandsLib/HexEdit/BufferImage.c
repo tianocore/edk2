@@ -637,7 +637,7 @@ HBufferImageRestoreMousePosition (
         CurrentLine = HBufferImage.CurrentLine;
         Line        = HMoveLine (FRow - HBufferImage.BufferPosition.Row);
 
-        if (FColumn > Line->Size) {
+        if (Line == NULL || FColumn > Line->Size) {
           HasCharacter = FALSE;
         }
 
@@ -1620,7 +1620,7 @@ Returns:
       //
       HBufferImage.BufferPosition.Row = NewFilePosRow;
       if (RowGap <= 0) {
-        Abs = -RowGap;
+        Abs = (UINTN)ABS(RowGap);
         HBufferImage.DisplayPosition.Row -= Abs;
       } else {
         HBufferImage.DisplayPosition.Row += RowGap;
@@ -1931,7 +1931,7 @@ Returns:
   //
   // if that line, is not that long, so move to the end of that line
   //
-  if (FCol > Line->Size) {
+  if (Line != NULL && FCol > Line->Size) {
     FCol      = Line->Size + 1;
     HighBits  = TRUE;
   }
