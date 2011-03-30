@@ -1427,21 +1427,6 @@ RunCommand(
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_REDIR), ShellInfoObject.HiiHandle);
       }
     } else {
-      //
-      // remove the < and/or > from the command line now
-      //
-      for (TempLocation3 = PostVariableCmdLine ; TempLocation3 != NULL && *TempLocation3 != CHAR_NULL ; TempLocation3++) {
-        if (*TempLocation3 == L'^') {
-          if (*(TempLocation3+1) == L'<' || *(TempLocation3+1) == L'>') {
-            CopyMem(TempLocation3, TempLocation3+1, StrSize(TempLocation3) - sizeof(TempLocation3[0]));
-          }
-        } else if (*TempLocation3 == L'>') {
-          *TempLocation3 = CHAR_NULL;
-        } else if ((*TempLocation3 == L'1' || *TempLocation3 == L'2')&&(*(TempLocation3+1) == L'>')) {
-          *TempLocation3 = CHAR_NULL;
-        }
-      }
-
       while (PostVariableCmdLine[StrLen(PostVariableCmdLine)-1] == L' ') {
         PostVariableCmdLine[StrLen(PostVariableCmdLine)-1] = CHAR_NULL;
       }

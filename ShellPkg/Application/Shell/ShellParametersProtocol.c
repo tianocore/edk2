@@ -73,10 +73,6 @@ GetNextParameter(
         TempLoc++;
       } else if (*TempLoc == L'^' && *(TempLoc+1) == L'\"') {
         TempLoc++;
-      } else if (*TempLoc == L'^' && *(TempLoc+1) == L'|') {
-        TempLoc++;
-      } else if (*TempLoc == L'^') {
-        *TempLoc = L' ';
       } else if (*TempLoc == L'\"') {
         NextDelim = TempLoc;
         break;
@@ -448,6 +444,30 @@ IsUnicodeFile(
 }
 
 /**
+  Strips out quotes sections of a string.
+
+  All of the characters between quotes is replaced with spaces.
+**/
+VOID
+EFIAPI
+StripQuotes (
+  IN OUT CHAR16 *TheString
+  )
+{
+  BOOLEAN RemoveNow;
+
+  for (RemoveNow = FALSE ; TheString != NULL && *TheString != CHAR_NULL ; TheString++) {
+    if (*TheString == L'^' && *(TheString + 1) == L'\"') {
+      TheString++;
+    } else if (*TheString == L'\"') {
+      RemoveNow = (BOOLEAN)!RemoveNow;
+    } else if (RemoveNow) {
+      *TheString = L' ';
+    }
+  }
+}
+
+/**
   Funcion will replace the current StdIn and StdOut in the ShellParameters protocol
   structure by parsing NewCommandLine.  The current values are returned to the
   user.
@@ -468,7 +488,7 @@ EFI_STATUS
 EFIAPI
 UpdateStdInStdOutStdErr(
   IN OUT EFI_SHELL_PARAMETERS_PROTOCOL  *ShellParameters,
-  IN CONST CHAR16                       *NewCommandLine,
+  IN CHAR16                             *NewCommandLine,
   OUT SHELL_FILE_HANDLE                 *OldStdIn,
   OUT SHELL_FILE_HANDLE                 *OldStdOut,
   OUT SHELL_FILE_HANDLE                 *OldStdErr,
@@ -494,6 +514,7 @@ UpdateStdInStdOutStdErr(
   UINTN             Size;
   CHAR16            TagBuffer[2];
   SPLIT_LIST        *Split;
+  CHAR16            *FirstLocation;
 
   OutUnicode      = TRUE;
   InUnicode       = TRUE;
@@ -507,6 +528,7 @@ UpdateStdInStdOutStdErr(
   ErrAppend       = FALSE;
   OutAppend       = FALSE;
   CommandLineCopy = NULL;
+  FirstLocation   = (CHAR16*)(-1);
 
   if (ShellParameters == NULL || SystemTableInfo == NULL || OldStdIn == NULL || OldStdOut == NULL || OldStdErr == NULL) {
     return (EFI_INVALID_PARAMETER);
@@ -530,6 +552,8 @@ UpdateStdInStdOutStdErr(
   Status          = EFI_SUCCESS;
   Split           = NULL;
 
+  StripQuotes(CommandLineCopy);
+
   if (!IsListEmpty(&ShellInfoObject.SplitList.Link)) {
     Split = (SPLIT_LIST*)GetFirstNode(&ShellInfoObject.SplitList.Link);
     if (Split != NULL && Split->SplitStdIn != NULL) {
@@ -541,6 +565,7 @@ UpdateStdInStdOutStdErr(
   }
 
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" 2>>v ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 12, L' ');
     StdErrVarName   = CommandLineWalker += 6;
     ErrAppend       = TRUE;
@@ -549,6 +574,7 @@ UpdateStdInStdOutStdErr(
     }
   }
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" 1>>v ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 12, L' ');
     StdOutVarName   = CommandLineWalker += 6;
     OutAppend       = TRUE;
@@ -556,6 +582,7 @@ UpdateStdInStdOutStdErr(
       Status = EFI_NOT_FOUND;
     }
   } else if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" >>v ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 10, L' ');
     StdOutVarName   = CommandLineWalker += 5;
     OutAppend       = TRUE;
@@ -563,6 +590,7 @@ UpdateStdInStdOutStdErr(
       Status = EFI_NOT_FOUND;
     }
   } else if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" >v ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 8, L' ');
     StdOutVarName   = CommandLineWalker += 4;
     OutAppend       = FALSE;
@@ -571,6 +599,7 @@ UpdateStdInStdOutStdErr(
     }
   }
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" 1>>a ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 12, L' ');
     StdOutFileName  = CommandLineWalker += 6;
     OutAppend       = TRUE;
@@ -580,6 +609,7 @@ UpdateStdInStdOutStdErr(
     }
   }
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" 1>> ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 10, L' ');
     if (StdOutFileName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -592,6 +622,7 @@ UpdateStdInStdOutStdErr(
     }
   } 
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" >> ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 8, L' ');
     if (StdOutFileName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -604,6 +635,7 @@ UpdateStdInStdOutStdErr(
     }
   }
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" >>a ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 10, L' ');
     if (StdOutFileName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -617,6 +649,7 @@ UpdateStdInStdOutStdErr(
     }
   } 
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" 1>a ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 10, L' ');
     if (StdOutFileName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -630,6 +663,7 @@ UpdateStdInStdOutStdErr(
     }
   } 
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" >a ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 8, L' ');
     if (StdOutFileName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -643,6 +677,7 @@ UpdateStdInStdOutStdErr(
     }
   }
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" 2>> ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 10, L' ');
     if (StdErrFileName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -656,6 +691,7 @@ UpdateStdInStdOutStdErr(
   }
 
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" 2>v ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 10, L' ');
     if (StdErrVarName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -668,6 +704,7 @@ UpdateStdInStdOutStdErr(
     }
   }
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" 1>v ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 10, L' ');
     if (StdOutVarName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -680,6 +717,7 @@ UpdateStdInStdOutStdErr(
     }
   }
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" 2>a ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 10, L' ');
     if (StdErrFileName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -693,6 +731,7 @@ UpdateStdInStdOutStdErr(
     }
   }
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" 2> ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 8, L' ');
     if (StdErrFileName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -706,6 +745,7 @@ UpdateStdInStdOutStdErr(
   }
 
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" 1> ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 8, L' ');
     if (StdOutFileName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -719,6 +759,7 @@ UpdateStdInStdOutStdErr(
   }
 
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" > ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 6, L' ');
     if (StdOutFileName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -732,6 +773,7 @@ UpdateStdInStdOutStdErr(
   }
 
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" < ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 6, L' ');
     if (StdInFileName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -743,6 +785,7 @@ UpdateStdInStdOutStdErr(
     }
   }
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" <a ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 8, L' ');
     if (StdInFileName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -755,6 +798,7 @@ UpdateStdInStdOutStdErr(
     }
   }
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" <v ")) != NULL) {
+    FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 8, L' ');
     if (StdInVarName != NULL) {
       Status = EFI_INVALID_PARAMETER;
@@ -764,6 +808,12 @@ UpdateStdInStdOutStdErr(
     if (StrStr(CommandLineWalker, L" <v ") != NULL) {
       Status = EFI_NOT_FOUND;
     }
+  }
+
+  if (FirstLocation != (CHAR16*)(-1) 
+    && ((UINTN)(FirstLocation - CommandLineCopy) < StrLen(NewCommandLine))
+    ){
+    *(NewCommandLine + (UINTN)(FirstLocation - CommandLineCopy)) = CHAR_NULL;
   }
 
   if (!EFI_ERROR(Status)) {
@@ -786,14 +836,11 @@ UpdateStdInStdOutStdErr(
       CommandLineWalker[0] = CHAR_NULL;
     }
 
-    //
-    // Verify not the same and not duplicating something from a split
-    //
     if (
       //
       // Check that no 2 filenames are the same
       //
-        (StdErrFileName != NULL && StdOutFileName!= NULL && StringNoCaseCompare(&StdErrFileName, &StdOutFileName) == 0)
+      (StdErrFileName != NULL && StdOutFileName!= NULL && StringNoCaseCompare(&StdErrFileName, &StdOutFileName) == 0)
       ||(StdErrFileName != NULL && StdInFileName != NULL && StringNoCaseCompare(&StdErrFileName, &StdInFileName ) == 0)
       ||(StdOutFileName != NULL && StdInFileName != NULL && StringNoCaseCompare(&StdOutFileName, &StdInFileName ) == 0)
       //
@@ -814,11 +861,6 @@ UpdateStdInStdOutStdErr(
       ||(StdOutFileName != NULL && StdOutVarName != NULL)
       ||(StdInFileName  != NULL && StdInVarName  != NULL)
       //
-      // There should not be extra > or <
-      //
-      ||(StrStr(CommandLineCopy, L"<") != NULL)
-      ||(StrStr(CommandLineCopy, L">") != NULL)
-      //
       // Check for no volatile environment variables
       //
       ||(StdErrVarName  != NULL && !IsVolatileEnv(StdErrVarName))
@@ -837,7 +879,7 @@ UpdateStdInStdOutStdErr(
       ||(StdErrFileName != NULL && !ErrUnicode && ErrAppend && (!EFI_ERROR(ShellFileExists(StdErrFileName)) && !EFI_ERROR(IsUnicodeFile(StdErrFileName))))
       ){
       Status = EFI_INVALID_PARAMETER;
-    } else {
+    } else if (!EFI_ERROR(Status)){
       //
       // Open the Std<Whatever> and we should not have conflicts here...
       //

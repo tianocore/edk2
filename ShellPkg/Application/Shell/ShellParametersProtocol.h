@@ -132,7 +132,7 @@ typedef struct {
   structure by parsing NewCommandLine.  The current values are returned to the
   user.
 
-  If OldStdIn or OldStdOut is NULL then that value is not returned.
+  This will also update the system table.
 
   @param[in,out] ShellParameters        Pointer to parameter structure to modify.
   @param[in] NewCommandLine             The new command line to parse and use.
@@ -148,7 +148,7 @@ EFI_STATUS
 EFIAPI
 UpdateStdInStdOutStdErr(
   IN OUT EFI_SHELL_PARAMETERS_PROTOCOL  *ShellParameters,
-  IN CONST CHAR16                       *NewCommandLine,
+  IN CHAR16                             *NewCommandLine,
   OUT SHELL_FILE_HANDLE                 *OldStdIn,
   OUT SHELL_FILE_HANDLE                 *OldStdOut,
   OUT SHELL_FILE_HANDLE                 *OldStdErr,
