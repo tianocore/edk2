@@ -836,6 +836,9 @@ UpdateStdInStdOutStdErr(
       CommandLineWalker[0] = CHAR_NULL;
     }
 
+    //
+    // Verify not the same and not duplicating something from a split
+    //
     if (
       //
       // Check that no 2 filenames are the same
