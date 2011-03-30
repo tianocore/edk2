@@ -348,6 +348,9 @@ ShellCommandRunConnect (
         } else if (Param2 != NULL && Handle2 == NULL) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param2);
           ShellStatus = SHELL_INVALID_PARAMETER;
+        } else if (Handle2 != NULL && Handle1 != NULL && EFI_ERROR(gBS->OpenProtocol(Handle2, &gEfiDriverBindingProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param2);
+          ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           Status = ConvertAndConnectControllers(Handle1, Handle2, ShellCommandLineGetFlag(Package, L"-r"), (BOOLEAN)(Count!=0));
           if (EFI_ERROR(Status)) {

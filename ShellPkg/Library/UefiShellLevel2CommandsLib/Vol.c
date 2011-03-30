@@ -44,6 +44,28 @@ HandleVol(
 
   ShellStatus   = SHELL_SUCCESS;
 
+  if (
+      StrStr(Name, L"%") != NULL ||
+      StrStr(Name, L"^") != NULL ||
+      StrStr(Name, L"*") != NULL ||
+      StrStr(Name, L"+") != NULL ||
+      StrStr(Name, L"=") != NULL ||
+      StrStr(Name, L"[") != NULL ||
+      StrStr(Name, L"]") != NULL ||
+      StrStr(Name, L"|") != NULL ||
+      StrStr(Name, L":") != NULL ||
+      StrStr(Name, L";") != NULL ||
+      StrStr(Name, L"\"") != NULL ||
+      StrStr(Name, L"<") != NULL ||
+      StrStr(Name, L">") != NULL ||
+      StrStr(Name, L"?") != NULL ||
+      StrStr(Name, L"/") != NULL ||
+      StrStr(Name, L" ") != NULL
+      ){
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, Name);
+    return (SHELL_INVALID_PARAMETER);
+  }
+
   Status = gEfiShellProtocol->OpenFileByName(
     Path,
     &ShellFileHandle,
@@ -51,8 +73,7 @@ HandleVol(
 
   if (EFI_ERROR(Status) || ShellFileHandle == NULL) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, Path);
-    ShellStatus = SHELL_ACCESS_DENIED;
-    return (ShellStatus);
+    return (SHELL_ACCESS_DENIED);
   }
 
   //
