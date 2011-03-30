@@ -603,22 +603,25 @@ ShellCommandRunCp (
           }
           Status = ShellOpenFileMetaArg((CHAR16*)ShellCommandLineGetRawValue(Package, LoopCounter), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
           if (EFI_ERROR(Status) || FileList == NULL || IsListEmpty(&FileList->Link)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, ShellCommandLineGetRawValue(Package, 1));
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, ShellCommandLineGetRawValue(Package, LoopCounter));
             ShellStatus = SHELL_NOT_FOUND;
           }
         }
-        //
-        // now copy them all...
-        //
-        if (FileList != NULL && !IsListEmpty(&FileList->Link)) {
-          ShellStatus = ProcessValidateAndCopyFiles(FileList, ShellCommandCleanPath((CHAR16*)ShellCommandLineGetRawValue(Package, ParamCount)), SilentMode, RecursiveMode);
+        if (ShellStatus != SHELL_SUCCESS) {
           Status = ShellCloseFileMetaArg(&FileList);
-          if (EFI_ERROR(Status) && ShellStatus == SHELL_SUCCESS) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_FILE), gShellLevel2HiiHandle, ShellCommandLineGetRawValue(Package, 1), ShellStatus|MAX_BIT);
-            ShellStatus = SHELL_ACCESS_DENIED;
+        } else {
+          //
+          // now copy them all...
+          //
+          if (FileList != NULL && !IsListEmpty(&FileList->Link)) {
+            ShellStatus = ProcessValidateAndCopyFiles(FileList, ShellCommandCleanPath((CHAR16*)ShellCommandLineGetRawValue(Package, ParamCount)), SilentMode, RecursiveMode);
+            Status = ShellCloseFileMetaArg(&FileList);
+            if (EFI_ERROR(Status) && ShellStatus == SHELL_SUCCESS) {
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_FILE), gShellLevel2HiiHandle, ShellCommandLineGetRawValue(Package, ParamCount), ShellStatus|MAX_BIT);
+              ShellStatus = SHELL_ACCESS_DENIED;
+            }
           }
         }
-
         break;
     } // switch on parameter count
 
