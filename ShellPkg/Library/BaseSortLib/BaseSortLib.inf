@@ -38,8 +38,4 @@
   BaseMemoryLib
   DebugLib
 
-[Protocols]
 
-[Guids]
-
-[Pcd.common]

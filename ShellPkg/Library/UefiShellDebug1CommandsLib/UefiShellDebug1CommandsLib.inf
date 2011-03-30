@@ -42,12 +42,18 @@
   DmpStore.c
   Dblk.c
   SmbiosView/EventLogInfo.c
+  SmbiosView/EventLogInfo.h
   SmbiosView/PrintInfo.c
   SmbiosView/QueryTable.c
   SmbiosView/SmbiosView.c
   SmbiosView/Smbios.c
   SmbiosView/SmbiosViewStrings.uni
   SmbiosView/LibSmbiosView.c
+  SmbiosView/PrintInfo.h
+  SmbiosView/LibSmbiosView.h
+  SmbiosView/LibSmbios.h
+  SmbiosView/QueryTable.h
+  SmbiosView/smbiosview.h
   UefiShellDebug1CommandsLib.c
   UefiShellDebug1CommandsLib.h
   UefiShellDebug1CommandsLib.uni

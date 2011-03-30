@@ -84,7 +84,6 @@
   gEfiDiskIoProtocolGuid
   gEfiBlockIoProtocolGuid
   gEfiUnicodeCollationProtocolGuid
-  gEfiUnicodeCollation2ProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
   gEfiPciIoProtocolGuid
   gEfiScsiPassThruProtocolGuid

@@ -84,7 +84,6 @@
 #  gEfiShellEnvironment2Guid                               # SOMETIMES_PRODUCED
 #  gEfiShellInterfaceGuid                                  # SOMETIMES_PRODUCED
 
-  gEfiLoadedImageProtocolGuid                             # ALWAYS_CONSUMED
   gEfiSimpleTextInputExProtocolGuid                       # ALWAYS_CONSUMED
   gEfiSimpleTextInProtocolGuid                            # ALWAYS_CONSUMED
   gEfiSimpleTextOutProtocolGuid                           # ALWAYS_CONSUMED

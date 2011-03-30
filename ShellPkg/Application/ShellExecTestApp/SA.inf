@@ -39,12 +39,3 @@
   UefiApplicationEntryPoint
   UefiLib
 
-[Guids]
-
-[Ppis]
-
-[Protocols]
-
-[FeaturePcd]
-
-[Pcd]

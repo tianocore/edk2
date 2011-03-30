@@ -39,9 +39,3 @@
   UefiLib
   SortLib
 
-[Guids]
-
-[Protocols]
-
-
-[Pcd]
