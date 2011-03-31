@@ -18,6 +18,9 @@
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Drivers/PL341Dmc.h>
+#include <Library/SerialPortLib.h>
+
+#define SerialPrint(txt)  SerialPortWrite (txt, AsciiStrLen(txt)+1);
 
 // DDR2 timings
 struct pl341_dmc_config ddr_timings = {

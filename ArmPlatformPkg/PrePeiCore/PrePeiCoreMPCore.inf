@@ -45,6 +45,7 @@
   ArmPlatformLib
   ArmMPCoreMailBoxLib
   PL390GicNonSecLib
+  SerialPortLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid

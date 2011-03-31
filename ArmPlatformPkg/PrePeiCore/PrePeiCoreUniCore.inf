@@ -43,6 +43,7 @@
   IoLib
   ArmLib
   ArmPlatformLib
+  SerialPortLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid

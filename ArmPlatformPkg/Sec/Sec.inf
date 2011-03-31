@@ -44,6 +44,7 @@
   ArmPlatformLib
   L2X0CacheLib
   PL390GicSecLib
+  SerialPortLib
   
 [FeaturePcd]
   gArmPlatformTokenSpaceGuid.PcdStandalone
