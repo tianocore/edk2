@@ -64,11 +64,13 @@
 #define MCI_STATUS_CMD_DATACRCFAIL      0x2
 #define MCI_STATUS_CMD_CMDTIMEOUT       0x4
 #define MCI_STATUS_CMD_DATATIMEOUT      0x8
+#define MCI_STATUS_CMD_TX_UNDERRUN      0x10
 #define MCI_STATUS_CMD_RXOVERRUN        0x20
 #define MCI_STATUS_CMD_RESPEND          0x40
 #define MCI_STATUS_CMD_SENT             0x80
 #define MCI_STATUS_CMD_TXDONE           (MCI_STATUS_CMD_DATAEND | MCI_STATUS_CMD_DATABLOCKEND)
 #define MCI_STATUS_CMD_DATAEND          0x000100    // Command Status - Data end
+#define MCI_STATUS_CMD_START_BIT_ERROR  0x000200
 #define MCI_STATUS_CMD_DATABLOCKEND     0x000400    // Command Status - Data end
 #define MCI_STATUS_CMD_ACTIVE           0x800
 #define MCI_STATUS_CMD_RXACTIVE         (1 << 13)
@@ -86,7 +88,7 @@
 #define MCI_DATACTL_CARD_TO_CONT        2
 #define MCI_DATACTL_BLOCK_TRANS         0
 #define MCI_DATACTL_STREAM_TRANS        4
-#define MCI_DATACTL_DMA_ENABLE          8
+#define MCI_DATACTL_DMA_ENABLE          (1 << 3)
 
 #define INDX(CMD_INDX)    ((CMD_INDX & 0x3F) | MCI_CPSM_ENABLED)
 
