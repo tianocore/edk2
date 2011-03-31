@@ -41,6 +41,7 @@ CHAR8 *gCondition[] = {
 
 CHAR8 *gReg[] = {
   "r0",
+  "r1",
   "r2",
   "r3",
   "r4",
