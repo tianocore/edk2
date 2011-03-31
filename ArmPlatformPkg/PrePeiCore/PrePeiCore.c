@@ -37,7 +37,7 @@ SecSwitchStack (
   INTN    StackDelta
   );
 
-TEMPORARY_RAM_SUPPORT_PPI   mSecTemporaryRamSupportPpi = {SecTemporaryRamSupport};
+EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   mSecTemporaryRamSupportPpi = {SecTemporaryRamSupport};
 
 EFI_PEI_PPI_DESCRIPTOR      gSecPpiTable[] = {
   {
