@@ -33,6 +33,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
   PeimEntryPoint
@@ -44,8 +45,8 @@
   gEfiPeiBootInRecoveryModePpiGuid              # PPI SOMETIMES_PRODUCED
 
 [FixedPcd]
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress  #The base address of the FLASH Device.
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdSize         #The size in bytes of the FLASH Device
+  gArmTokenSpaceGuid.PcdNormalFdBaseAddress  # The base address of the FLASH Device.
+  gArmTokenSpaceGuid.PcdNormalFdSize         # The size in bytes of the FLASH Device
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize

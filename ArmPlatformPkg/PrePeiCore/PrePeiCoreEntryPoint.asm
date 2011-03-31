@@ -26,8 +26,6 @@
   
 StartupAddr        DCD      CEntryPoint
 
-SCC_SYS_SW         EQU      0x0004
-
 _ModuleEntryPoint
   // Identify CPU ID
   mrc   p15, 0, r0, c0, c0, 5
@@ -45,7 +43,7 @@ _SetupStack
   mov     sp, r3
 
   // The PEI Core Entry Point has been computed by GenFV and stored in the second entry of the Reset Vector
-  LoadConstantToReg (FixedPcdGet32(PcdEmbeddedFdBaseAddress), r2)
+  LoadConstantToReg (FixedPcdGet32(PcdNormalFdBaseAddress), r2)
   add   r2, r2, #4
   ldr   r1, [r2]
 
@@ -53,7 +51,7 @@ _SetupStack
   // ensure we're jumping to FV version of the code (not boot remapped alias)
   ldr   r2, StartupAddr
 
-  // jump to SEC C code
+  // jump to PrePeiCore C code
   //    r0 = core_id
   //    r1 = pei_core_address
   blx   r2

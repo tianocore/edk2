@@ -83,10 +83,16 @@
   gArmTokenSpaceGuid.PcdGicNumInterrupts|96|UINT32|0x00000023
 
   #
-  # ARM Secure SEC PCDs
+  # ARM Secure Firmware PCDs
   #
   gArmTokenSpaceGuid.PcdSecureFdBaseAddress|0|UINT32|0x00000015
   gArmTokenSpaceGuid.PcdSecureFdSize|0|UINT32|0x00000016
+
+  #
+  # ARM Normal (or Non Secure) Firmware PCDs
+  #
+  gArmTokenSpaceGuid.PcdNormalFdBaseAddress|0|UINT32|0x0000002B
+  gArmTokenSpaceGuid.PcdNormalFdSize|0|UINT32|0x0000002C
 
   #
   # ARM MPCore MailBox PCDs

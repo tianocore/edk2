@@ -179,14 +179,14 @@ VOID ArmPlatformGetEfiMemoryMap (
         // Chunk between the EFI Memory region and the firmware
         EfiMemoryTable[++Index].ResourceAttribute = Attributes;
         EfiMemoryTable[Index].PhysicalStart = MemoryBase;
-        EfiMemoryTable[Index].NumberOfBytes = PcdGet32(PcdEmbeddedFdBaseAddress) - MemoryBase;
+        EfiMemoryTable[Index].NumberOfBytes = PcdGet32(PcdNormalFdBaseAddress) - MemoryBase;
 
         // Chunk reserved by the firmware in DRAM
         EfiMemoryTable[++Index].ResourceAttribute = Attributes & (~EFI_RESOURCE_ATTRIBUTE_PRESENT);
-        EfiMemoryTable[Index].PhysicalStart = PcdGet32(PcdEmbeddedFdBaseAddress);
-        EfiMemoryTable[Index].NumberOfBytes = PcdGet32(PcdEmbeddedFdSize);
+        EfiMemoryTable[Index].PhysicalStart = PcdGet32(PcdNormalFdBaseAddress);
+        EfiMemoryTable[Index].NumberOfBytes = PcdGet32(PcdNormalFdSize);
 
-        MemoryBase = PcdGet32(PcdEmbeddedFdBaseAddress) + PcdGet32(PcdEmbeddedFdSize);
+        MemoryBase = PcdGet32(PcdNormalFdBaseAddress) + PcdGet32(PcdNormalFdSize);
     }
       
     // We allocate all the remain memory as untested system memory

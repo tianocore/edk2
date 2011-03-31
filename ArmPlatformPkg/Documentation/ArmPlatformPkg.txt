@@ -9,8 +9,8 @@ Porting UEFI to a ARM platform
 PCD	Description
 gArmTokenSpaceGuid.PcdSecureFdBaseAddress : Base address of your Secure Firmware 
 gArmTokenSpaceGuid.PcdSecureFdSize        : Size in byte of your Secure Firmware gEmbeddedTokenSpaceGuid.
-PcdEmbeddedFdBaseAddress                  : Base Address of your Non-Secure Firmware gEmbeddedTokenSpaceGuid.
-PcdEmbeddedFdSize                         : Size in bytes of your Non-Secure Firmware 
+gArmTokenSpaceGuid.PcdNormalFdBaseAddress : Base Address of your Non-Secure Firmware gEmbeddedTokenSpaceGuid.
+gArmTokenSpaceGuid.PcdNormalFdSize        : Size in bytes of your Non-Secure Firmware 
 gArmTokenSpaceGuid.PcdL2x0ControllerBase  : Base Address of your L2x0 controller 
 gArmTokenSpaceGuid.PcdGicDistributorBase  : Base address of the Distributor of your General Interrupt Controller gArmTokenSpaceGuid.
 PcdGicInterruptInterfaceBase              : Base address of the Interface of your General Interrupt Controller gArmVExpressTokenSpaceGuid.

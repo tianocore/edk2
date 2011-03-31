@@ -42,5 +42,5 @@
   gArmPlatformTokenSpaceGuid.PcdStandalone
 
 [FixedPcd]
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdSize
+  gArmTokenSpaceGuid.PcdNormalFdBaseAddress
+  gArmTokenSpaceGuid.PcdNormalFdSize

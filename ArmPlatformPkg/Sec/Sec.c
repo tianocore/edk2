@@ -195,7 +195,7 @@ CEntryPoint (
   // If ArmVe has not been built as Standalone then we need to patch the DRAM to add an infinite loop at the start address
   if (FeaturePcdGet(PcdStandalone) == FALSE) {
     if (CoreId == 0) {
-      UINTN*   StartAddress = (UINTN*)PcdGet32(PcdEmbeddedFdBaseAddress);
+      UINTN*   StartAddress = (UINTN*)PcdGet32(PcdNormalFdBaseAddress);
 
       // Patch the DRAM to make an infinite loop at the start address
       *StartAddress = 0xEAFFFFFE; // opcode for while(1)
@@ -204,7 +204,7 @@ CEntryPoint (
       SerialPortWrite ((UINT8 *) Buffer, CharCount);
 
       // To enter into Non Secure state, we need to make a return from exception
-      return_from_exception(PcdGet32(PcdEmbeddedFdBaseAddress));
+      return_from_exception(PcdGet32(PcdNormalFdBaseAddress));
     } else {
       // When the primary core is stopped by the hardware debugger to copy the firmware
       // into DRAM. The secondary cores are still running. As soon as the first bytes of
@@ -218,7 +218,7 @@ CEntryPoint (
     }
   } else {
     // To enter into Non Secure state, we need to make a return from exception
-    return_from_exception(PcdGet32(PcdEmbeddedFdBaseAddress));
+    return_from_exception(PcdGet32(PcdNormalFdBaseAddress));
   }
   //-------------------- Non Secure Mode ---------------------
 
@@ -232,7 +232,7 @@ VOID NonSecureWaitForFirmware() {
   VOID (*secondary_start)(VOID);
 
   // The secondary cores will execute the fimrware once wake from WFI.
-  secondary_start = (VOID (*)())PcdGet32(PcdEmbeddedFdBaseAddress);
+  secondary_start = (VOID (*)())PcdGet32(PcdNormalFdBaseAddress);
 
   ArmCallWFI();
 

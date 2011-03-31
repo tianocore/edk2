@@ -48,7 +48,7 @@ _SetupStack:
   # lr points to area in reset vector block containing PEI core address. lr needs to
   # be saved from the beginning as the _ModuleEntryPoint could call helper functions
   # that will overwrite 'lr'
-  LoadConstantToReg (FixedPcdGet32(PcdEmbeddedFdBaseAddress), r2)
+  LoadConstantToReg (FixedPcdGet32(PcdNormalFdBaseAddress), r2)
   add   r2, r2, #4
   ldr   r1, [r2]
 
@@ -56,10 +56,9 @@ _SetupStack:
   # ensure we're jumping to FV version of the code (not boot remapped alias)
   ldr   r2, StartupAddr
 
-  # jump to SEC C code
+  # jump to PrePeiCore C code
   #    r0 = core_id
   #    r1 = pei_core_address
   blx   r2
 
-#end of the file
 .end
