@@ -426,7 +426,7 @@ SyncCacheConfig (
     } else if (TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE(FirstLevelTable[i])) {
       Status = SyncCacheConfigPage (
           i,FirstLevelTable[i],
-          &NumberOfDescriptors, &MemorySpaceMap,
+          NumberOfDescriptors, MemorySpaceMap,
           &NextRegionBase,&NextRegionLength,&NextSectionAttributes);
       ASSERT_EFI_ERROR (Status);
     } else {
