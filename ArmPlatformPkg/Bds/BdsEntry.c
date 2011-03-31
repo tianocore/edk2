@@ -20,7 +20,7 @@
 #include <Library/PerformanceLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/PcdLib.h>
-#include <Library/BdsLinuxLib.h>
+#include <Library/BdsUnixLib.h>
 
 #include <Protocol/Bds.h>
 #include <Protocol/DevicePathToText.h>
