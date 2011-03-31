@@ -32,10 +32,10 @@
 # relocated in place (works, but not a great idea).
 #
 BaseAddress   = 0x41000000|gEfiUnixPkgTokenSpaceGuid.PcdUnixFdBaseAddress   #The base address of the FLASH Device.
-Size          = 0x002a0000|gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareFdSize  #The size in bytes of the FLASH Device
+Size          = 0x00300000|gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareFdSize  #The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x10000
-NumBlocks     = 0x2a
+NumBlocks     = 0x30
 
 ################################################################################
 #
@@ -52,11 +52,11 @@ NumBlocks     = 0x2a
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
-0x00000000|0x00280000
+0x00000000|0x002e0000
 gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoveryBase|gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoverySize
 FV = FvRecovery
 
-0x00280000|0x0000c000
+0x002e0000|0x0000c000
 gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 #NV_VARIABLE_STORE
 DATA = {
@@ -90,11 +90,11 @@ DATA = {
   0x5A, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-0x0028c000|0x00002000
+0x002ec000|0x00002000
 #NV_EVENT_LOG
 gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageEventLogBase|gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageEventLogSize
 
-0x0028e000|0x00002000
+0x002ee000|0x00002000
 gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
 #NV_FTW_WORKING
 DATA = {
@@ -108,7 +108,7 @@ DATA = {
   0xE0, 0x1F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-0x00290000|0x00010000
+0x002f0000|0x00010000
 #NV_FTW_SPARE
 gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 

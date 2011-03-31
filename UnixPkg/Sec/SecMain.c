@@ -1070,9 +1070,9 @@ IsPdbFile (
     return FALSE;
   }
 
-  if ((PdbFileName[Len - 3] == 'P' || PdbFileName[Len - 3] == 'p') &&
-      (PdbFileName[Len - 2] == 'D' || PdbFileName[Len - 2] == 'd') &&
-      (PdbFileName[Len - 1] == 'B' || PdbFileName[Len - 1] == 'b')) {
+  if ((PdbFileName[Len - 3] == 'D' || PdbFileName[Len - 3] == 'd') &&
+      (PdbFileName[Len - 2] == 'L' || PdbFileName[Len - 2] == 'l') &&
+      (PdbFileName[Len - 1] == 'L' || PdbFileName[Len - 1] == 'l')) {
     return TRUE;
   }
 
