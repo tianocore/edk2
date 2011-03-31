@@ -34,7 +34,16 @@ BdsLoadPeCoff (
 
     Status = gBS->LoadImage (TRUE, gImageHandle, DevicePath, NULL, 0, &ImageHandle);
     if (!EFI_ERROR (Status)) {
+        //
+        // Before calling the image, enable the Watchdog Timer for
+        // the 5 Minute period
+        //
+        gBS->SetWatchdogTimer (5 * 60, 0x0000, 0x00, NULL);
         Status = gBS->StartImage (ImageHandle, NULL, NULL);
+        //
+        // Clear the Watchdog Timer after the image returns
+        //
+        gBS->SetWatchdogTimer (0x0000, 0x0000, 0x0000, NULL);
     }
   
     return Status;
