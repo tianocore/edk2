@@ -32,7 +32,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
 
@@ -42,7 +41,6 @@
   IoLib
   ArmLib
   ArmPlatformLib
-  L2X0CacheLib
   PL390GicSecLib
   SerialPortLib
   
@@ -60,8 +58,6 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecStackSize
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize
-  
-  gArmTokenSpaceGuid.PcdL2x0ControllerBase
   
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase

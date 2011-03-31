@@ -33,6 +33,7 @@
   MemoryAllocationLib
   PL341DmcLib
   PL301AxiLib
+  L2X0CacheLib
 
 [Sources.common]
   CTA9x4.c
@@ -47,3 +48,5 @@
 [FixedPcd]
   gArmTokenSpaceGuid.PcdNormalFdBaseAddress
   gArmTokenSpaceGuid.PcdNormalFdSize
+
+  gArmTokenSpaceGuid.PcdL2x0ControllerBase

@@ -18,6 +18,8 @@
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Drivers/PL341Dmc.h>
+#include <Drivers/PL301Axi.h>
+#include <Library/L2X0CacheLib.h>
 #include <Library/SerialPortLib.h>
 
 #define SerialPrint(txt)  SerialPortWrite (txt, AsciiStrLen(txt)+1);
@@ -146,6 +148,21 @@ VOID ArmPlatformBootRemapping(VOID) {
     UINT32 val32  = MmioRead32(ARM_VE_SYS_CFGRW1_REG); //Scc - CFGRW1
     // we remap the DRAM to 0x0
     MmioWrite32(ARM_VE_SYS_CFGRW1_REG, (val32 & 0x0FFFFFFF) | ARM_VE_CFGRW1_REMAP_DRAM);
+}
+
+/**
+  Initialize controllers that must setup at the early stage
+
+  Some peripherals must be initialized in Secure World.
+  For example, some L2x0 requires to be initialized in Secure World
+
+**/
+VOID
+ArmPlatformInitialize (
+  VOID
+  ) {
+  // The L2x0 controller must be intialize in Secure World
+  L2x0CacheInit(PcdGet32(PcdL2x0ControllerBase), FALSE);
 }
 
 /**

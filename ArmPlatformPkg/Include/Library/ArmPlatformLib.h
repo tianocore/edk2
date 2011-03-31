@@ -68,6 +68,18 @@ VOID ArmPlatformIsMemoryInitialized(VOID);
 VOID ArmPlatformInitializeBootMemory(VOID);
 
 /**
+  Initialize controllers that must setup at the early stage
+
+  Some peripherals must be initialized in Secure World.
+  For example, some L2x0 requires to be initialized in Secure World
+
+**/
+VOID
+ArmPlatformInitialize (
+  VOID
+  );
+
+/**
   Initialize the system (or sometimes called permanent) memory
 
   This memory is generally represented by the DRAM.

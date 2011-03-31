@@ -21,7 +21,6 @@
 #include <Library/ArmLib.h>
 #include <Chipset/ArmV7.h>
 #include <Drivers/PL390Gic.h>
-#include <Library/L2X0CacheLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/ArmPlatformLib.h>
 
@@ -106,8 +105,9 @@ CEntryPoint (
   }
 
   if (CoreId == 0) {
-    // Initialize L2X0 but not enabled
-    L2x0CacheInit(PcdGet32(PcdL2x0ControllerBase), FALSE);
+    // Initialize peripherals that must be done at the early stage
+    // Example: Some L2x0 controllers must be initialized in Secure World
+    ArmPlatformInitialize ();
 
     // If we skip the PEI Core we could want to initialize the DRAM in the SEC phase.
     // If we are in standalone, we need the initialization to copy the UEFI firmware into DRAM
