@@ -58,6 +58,20 @@ VOID ArmPlatformBootRemapping(VOID) {
 }
 
 /**
+  Return the current Boot Mode
+
+  This function returns the boot reason on the platform
+
+**/
+EFI_BOOT_MODE
+ArmPlatformGetBootMode (
+  VOID
+  )
+{
+  return BOOT_WITH_FULL_CONFIGURATION;
+}
+
+/**
   Initialize controllers that must setup at the early stage
 
   Some peripherals must be initialized in Secure World.

@@ -68,6 +68,19 @@ VOID ArmPlatformIsMemoryInitialized(VOID);
 VOID ArmPlatformInitializeBootMemory(VOID);
 
 /**
+  Return the current Boot Mode
+
+  This function returns the boot reason on the platform
+
+  @return   Return the current Boot Mode of the platform
+
+**/
+EFI_BOOT_MODE
+ArmPlatformGetBootMode (
+  VOID
+  );
+
+/**
   Initialize controllers that must setup at the early stage
 
   Some peripherals must be initialized in Secure World.

@@ -77,12 +77,7 @@ Returns:
   
   BuildFvHob (FixedPcdGet32(PcdFlashFvMainBase), FixedPcdGet32(PcdFlashFvMainSize));
   
-  //
-  // Let's assume things are OK if not told otherwise
-  // Should we read an environment variable in order to easily change this?
-  //
-  BootMode  = BOOT_WITH_FULL_CONFIGURATION;
-
+  BootMode  = ArmPlatformGetBootMode ();
   Status    = (**PeiServices).SetBootMode (PeiServices, (UINT8) BootMode);
   ASSERT_EFI_ERROR (Status);
 

@@ -138,6 +138,22 @@ VOID ArmPlatformTrustzoneInit(VOID) {
 }
 
 /**
+  Return the current Boot Mode
+
+  This function returns the boot reason on the platform
+
+  @return   Return the current Boot Mode of the platform
+
+**/
+EFI_BOOT_MODE
+ArmPlatformGetBootMode (
+  VOID
+  )
+{
+  return BOOT_WITH_FULL_CONFIGURATION;
+}
+
+/**
   Remap the memory at 0x0
 
   Some platform requires or gives the ability to remap the memory at the address 0x0.

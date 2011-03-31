@@ -34,11 +34,13 @@
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
   PeimEntryPoint
   DebugLib
   HobLib
+  ArmPlatformLib
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid                  # PPI ALWAYS_PRODUCED
