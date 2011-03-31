@@ -35,27 +35,6 @@
 													TT_DESCRIPTOR_SECTION_CACHE_POLICY_STRONGLY_ORDERED)
 
 // Small Page
-#define TT_DESCRIPTOR_PAGE_WRITE_BACK              (TT_DESCRIPTOR_PAGE_TYPE_PAGE                                                           | \
-                                                        TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
-                                                        TT_DESCRIPTOR_PAGE_S_NOT_SHARED                                                   | \
-                                                        TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
-                                                        TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_BACK_ALLOC)
-#define TT_DESCRIPTOR_PAGE_WRITE_THROUGH           (TT_DESCRIPTOR_PAGE_TYPE_PAGE                                                           | \
-                                                        TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
-                                                        TT_DESCRIPTOR_PAGE_S_NOT_SHARED                                                   | \
-                                                        TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
-                                                        TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC)
-#define TT_DESCRIPTOR_PAGE_DEVICE                  (TT_DESCRIPTOR_PAGE_TYPE_PAGE                                                           | \
-                                                        TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
-                                                        TT_DESCRIPTOR_PAGE_S_NOT_SHARED                                                   | \
-                                                        TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
-                                                        TT_DESCRIPTOR_PAGE_CACHE_POLICY_SHAREABLE_DEVICE)
-#define TT_DESCRIPTOR_PAGE_UNCACHED                (TT_DESCRIPTOR_PAGE_TYPE_PAGE                                                           | \
-                                                        TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
-                                                        TT_DESCRIPTOR_PAGE_S_NOT_SHARED                                                   | \
-                                                        TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
-                                                        TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_CACHEABLE)
-
 #define TT_DESCRIPTOR_PAGE_STRONGLY_ORDER			(TT_DESCRIPTOR_PAGE_TYPE_PAGE 														   | \
 														TT_DESCRIPTOR_PAGE_NG_GLOBAL 													  | \
 														TT_DESCRIPTOR_PAGE_S_NOT_SHARED 												  | \

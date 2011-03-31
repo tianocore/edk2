@@ -88,6 +88,70 @@ SectionToGcdAttributes (
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+PageToGcdAttributes (
+  IN  UINT32  PageAttributes,
+  OUT UINT64  *GcdAttributes
+  )
+{
+  *GcdAttributes = 0;
+
+  // determine cacheability attributes
+  switch(PageAttributes & TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK) {
+    case TT_DESCRIPTOR_PAGE_CACHE_POLICY_STRONGLY_ORDERED:
+      *GcdAttributes |= EFI_MEMORY_UC;
+      break;
+    case TT_DESCRIPTOR_PAGE_CACHE_POLICY_SHAREABLE_DEVICE:
+      *GcdAttributes |= EFI_MEMORY_UC;
+      break;
+    case TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC:
+      *GcdAttributes |= EFI_MEMORY_WT;
+      break;
+    case TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_BACK_NO_ALLOC:
+      *GcdAttributes |= EFI_MEMORY_WB;
+      break;
+    case TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_CACHEABLE:
+      *GcdAttributes |= EFI_MEMORY_WC;
+      break;
+    case TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_BACK_ALLOC:
+      *GcdAttributes |= EFI_MEMORY_WB;
+      break;
+    case TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_SHAREABLE_DEVICE:
+      *GcdAttributes |= EFI_MEMORY_UC;
+      break;
+    default:
+      return EFI_UNSUPPORTED;
+  }
+
+  // determine protection attributes
+  switch(PageAttributes & TT_DESCRIPTOR_PAGE_AP_MASK) {
+    case TT_DESCRIPTOR_PAGE_AP_NO_NO: // no read, no write
+      //*GcdAttributes |= EFI_MEMORY_WP | EFI_MEMORY_RP;
+      break;
+
+    case TT_DESCRIPTOR_PAGE_AP_RW_NO:
+    case TT_DESCRIPTOR_PAGE_AP_RW_RW:
+      // normal read/write access, do not add additional attributes
+      break;
+
+    // read only cases map to write-protect
+    case TT_DESCRIPTOR_PAGE_AP_RO_NO:
+    case TT_DESCRIPTOR_PAGE_AP_RO_RO:
+      *GcdAttributes |= EFI_MEMORY_WP;
+      break;
+
+    default:
+      return EFI_UNSUPPORTED;
+  }
+
+  // now process eXectue Never attribute
+  if ((PageAttributes & TT_DESCRIPTOR_PAGE_XN_MASK) != 0 ) {
+    *GcdAttributes |= EFI_MEMORY_XP;
+  }
+
+  return EFI_SUCCESS;
+}
+
 /**
   Searches memory descriptors covered by given memory range.
 
@@ -215,6 +279,81 @@ SetGcdMemorySpaceAttributes (
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+SyncCacheConfigPage (
+  IN     UINT32                             SectionIndex,
+  IN     UINT32                             FirstLevelDescriptor,
+  IN     UINTN                              NumberOfDescriptors,
+  IN     EFI_GCD_MEMORY_SPACE_DESCRIPTOR    *MemorySpaceMap,
+  IN OUT EFI_PHYSICAL_ADDRESS               *NextRegionBase,
+  IN OUT UINT64                             *NextRegionLength,
+  IN OUT UINT32                             *NextSectionAttributes
+  )
+{
+  EFI_STATUS                          Status;
+  UINT32                              i;
+  volatile ARM_PAGE_TABLE_ENTRY       *SecondLevelTable;
+  UINT32                              NextPageAttributes = 0;
+  UINT32                              PageAttributes = 0;
+  UINT32                              BaseAddress;
+  UINT64                              GcdAttributes;
+
+  // Get the Base Address from FirstLevelDescriptor;
+  BaseAddress = TT_DESCRIPTOR_PAGE_BASE_ADDRESS(SectionIndex << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
+
+  // Convert SectionAttributes into PageAttributes
+  NextPageAttributes =
+      TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY(*NextSectionAttributes,0) |
+      TT_DESCRIPTOR_CONVERT_TO_PAGE_AP(*NextSectionAttributes);
+
+  // obtain page table base
+  SecondLevelTable = (ARM_PAGE_TABLE_ENTRY *)(FirstLevelDescriptor & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK);
+
+  for (i=0; i < TRANSLATION_TABLE_PAGE_COUNT; i++) {
+    if ((SecondLevelTable[i] & TT_DESCRIPTOR_PAGE_TYPE_MASK) == TT_DESCRIPTOR_PAGE_TYPE_PAGE) {
+      // extract attributes (cacheability and permissions)
+      PageAttributes = SecondLevelTable[i] & (TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK | TT_DESCRIPTOR_PAGE_AP_MASK);
+
+      if (NextPageAttributes == 0) {
+        // start on a new region
+        *NextRegionLength = 0;
+        *NextRegionBase = BaseAddress | (i << TT_DESCRIPTOR_PAGE_BASE_SHIFT);
+        NextPageAttributes = PageAttributes;
+      } else if (PageAttributes != NextPageAttributes) {
+        // Convert Section Attributes into GCD Attributes
+        Status = PageToGcdAttributes (NextPageAttributes, &GcdAttributes);
+        ASSERT_EFI_ERROR (Status);
+
+        // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
+        SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, *NextRegionBase, *NextRegionLength, GcdAttributes);
+
+        // start on a new region
+        *NextRegionLength = 0;
+        *NextRegionBase = BaseAddress | (i << TT_DESCRIPTOR_PAGE_BASE_SHIFT);
+        NextPageAttributes = PageAttributes;
+      }
+    } else if (NextPageAttributes != 0) {
+      // Convert Page Attributes into GCD Attributes
+      Status = PageToGcdAttributes (NextPageAttributes, &GcdAttributes);
+      ASSERT_EFI_ERROR (Status);
+
+      // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
+      SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, *NextRegionBase, *NextRegionLength, GcdAttributes);
+
+      *NextRegionLength = 0;
+      *NextRegionBase = BaseAddress | (i << TT_DESCRIPTOR_PAGE_BASE_SHIFT);
+      NextPageAttributes = 0;
+    }
+    *NextRegionLength += TT_DESCRIPTOR_PAGE_SIZE;
+  }
+
+  // Convert back PageAttributes into SectionAttributes
+  *NextSectionAttributes =
+      TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY(NextPageAttributes,0) |
+      TT_DESCRIPTOR_CONVERT_TO_SECTION_AP(NextPageAttributes);
+
+  return EFI_SUCCESS;
+}
 
 EFI_STATUS
 SyncCacheConfig (
@@ -223,12 +362,11 @@ SyncCacheConfig (
 {
   EFI_STATUS                          Status;
   UINT32                              i;
-  UINT32                              Descriptor;
-  UINT32                              SectionAttributes;
   EFI_PHYSICAL_ADDRESS                NextRegionBase;
   UINT64                              NextRegionLength;
+  UINT32                              NextSectionAttributes = 0;
+  UINT32                              SectionAttributes = 0;
   UINT64                              GcdAttributes;
-  UINT32                              NextRegionAttributes = 0;
   volatile ARM_FIRST_LEVEL_DESCRIPTOR   *FirstLevelTable;
   UINTN                               NumberOfDescriptors;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR     *MemorySpaceMap;
@@ -256,45 +394,70 @@ SyncCacheConfig (
   // obtain page table base
   FirstLevelTable = (ARM_FIRST_LEVEL_DESCRIPTOR *)(ArmGetTTBR0BaseAddress ());
 
+  // Get the first region
+  NextSectionAttributes = FirstLevelTable[0] & (TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK | TT_DESCRIPTOR_SECTION_AP_MASK);
 
   // iterate through each 1MB descriptor
   NextRegionBase = NextRegionLength = 0;
-  for (i=0; i< TRANSLATION_TABLE_SECTION_COUNT; i++) {
+  for (i=0; i < TRANSLATION_TABLE_SECTION_COUNT; i++) {
+    if ((FirstLevelTable[i] & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SECTION) {
+      // extract attributes (cacheability and permissions)
+      SectionAttributes = FirstLevelTable[i] & (TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK | TT_DESCRIPTOR_SECTION_AP_MASK);
 
-    // obtain existing descriptor and make sure it contains a valid Base Address even if it is a fault section
-    Descriptor = FirstLevelTable[i] | TT_DESCRIPTOR_SECTION_BASE_ADDRESS(i << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
-
-    // extract attributes (cacheability and permissions)
-    SectionAttributes = Descriptor & (TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK | TT_DESCRIPTOR_SECTION_AP_MASK);
-
-    // do we already have an existing region (or are we about to finish)?
-    // Skip the first entry, and make sure we close on the last entry
-    if ( (NextRegionLength > 0) || (i == (TRANSLATION_TABLE_SECTION_COUNT-1)) ) {
-      // attributes are changing, update attributes in GCD
-      if (SectionAttributes != NextRegionAttributes) {
-        
-        // convert section entry attributes to GCD bitmask
-        Status = SectionToGcdAttributes (NextRegionAttributes, &GcdAttributes);
+      if (NextSectionAttributes == 0) {
+        // start on a new region
+        NextRegionLength = 0;
+        NextRegionBase = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(i << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
+        NextSectionAttributes = SectionAttributes;
+      } else if (SectionAttributes != NextSectionAttributes) {
+        // Convert Section Attributes into GCD Attributes
+        Status = SectionToGcdAttributes (NextSectionAttributes, &GcdAttributes);
         ASSERT_EFI_ERROR (Status);
 
         // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
         SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, NextRegionBase, NextRegionLength, GcdAttributes);
 
-
         // start on a new region
         NextRegionLength = 0;
-        NextRegionBase = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(Descriptor);
+        NextRegionBase = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(i << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
+        NextSectionAttributes = SectionAttributes;
       }
+      NextRegionLength += TT_DESCRIPTOR_SECTION_SIZE;
+    } else if (TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE(FirstLevelTable[i])) {
+      Status = SyncCacheConfigPage (
+          i,FirstLevelTable[i],
+          &NumberOfDescriptors, &MemorySpaceMap,
+          &NextRegionBase,&NextRegionLength,&NextSectionAttributes);
+      ASSERT_EFI_ERROR (Status);
+    } else {
+      // We do not support yet 16MB sections
+      ASSERT ((FirstLevelTable[i] & TT_DESCRIPTOR_SECTION_TYPE_MASK) != TT_DESCRIPTOR_SECTION_TYPE_SUPERSECTION);
+
+      // start on a new region
+      if (NextSectionAttributes != 0) {
+        // Convert Section Attributes into GCD Attributes
+        Status = SectionToGcdAttributes (NextSectionAttributes, &GcdAttributes);
+        ASSERT_EFI_ERROR (Status);
+
+        // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
+        SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, NextRegionBase, NextRegionLength, GcdAttributes);
+
+        NextRegionLength = 0;
+        NextRegionBase = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(i << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
+        NextSectionAttributes = 0;
+      }
+      NextRegionLength += TT_DESCRIPTOR_SECTION_SIZE;
     }
-
-    // starting a new region?
-    if (NextRegionLength == 0) {
-      NextRegionAttributes = SectionAttributes;
-    }
-
-    NextRegionLength += TT_DESCRIPTOR_SECTION_SIZE;
-
   } // section entry loop
+
+  if (NextSectionAttributes != 0) {
+    // Convert Section Attributes into GCD Attributes
+    Status = SectionToGcdAttributes (NextSectionAttributes, &GcdAttributes);
+    ASSERT_EFI_ERROR (Status);
+
+    // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
+    SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, NextRegionBase, NextRegionLength, GcdAttributes);
+  }
 
   return EFI_SUCCESS;
 }
@@ -591,7 +754,7 @@ ConvertSectionToPages (
   UINT32                  SectionDescriptor;
   UINT32                  PageTableDescriptor;
   UINT32                  PageDescriptor;
-  UINT32                  i;
+  UINT32                  Index;
 
   volatile ARM_FIRST_LEVEL_DESCRIPTOR   *FirstLevelTable;
   volatile ARM_PAGE_TABLE_ENTRY         *PageTable;
@@ -623,8 +786,8 @@ ConvertSectionToPages (
   PageTable = (volatile ARM_PAGE_TABLE_ENTRY *)(UINTN)PageTableAddr;
 
   // write the page table entries out
-  for (i=0; i < TRANSLATION_TABLE_PAGE_COUNT; i++) {
-    PageTable[i] = TT_DESCRIPTOR_PAGE_BASE_ADDRESS(BaseAddress + (i << 12)) | PageDescriptor;
+  for (Index = 0; Index < TRANSLATION_TABLE_PAGE_COUNT; Index++) {
+    PageTable[Index] = TT_DESCRIPTOR_PAGE_BASE_ADDRESS(BaseAddress + (Index << 12)) | PageDescriptor;
   }
 
   // flush d-cache so descriptors make it back to uncached memory for subsequent table walks

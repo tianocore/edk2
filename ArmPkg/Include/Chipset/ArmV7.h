@@ -122,6 +122,8 @@
 #define TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC       ((1UL << 12) | (1UL << 3) | (1UL << 2))
 #define TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_SHAREABLE_DEVICE   ((2UL << 12) | (0UL << 3) | (0UL << 2))
 
+#define TT_DESCRIPTOR_PAGE_SIZE                               (0x00001000)
+
 #define TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK                   ((3UL << 6) | (1UL << 3) | (1UL << 2))
 #define TT_DESCRIPTOR_PAGE_CACHEABLE_MASK                       (1UL << 3)
 #define TT_DESCRIPTOR_PAGE_CACHE_POLICY_STRONGLY_ORDERED       ((0UL << 6) | (0UL << 3) | (0UL << 2))
@@ -150,6 +152,13 @@
 #define TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY(Desc,IsLargePage)      (IsLargePage? \
                                                                     (((Desc) & TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK) & TT_DESCRIPTOR_LARGEPAGE_CACHE_POLICY_MASK): \
                                                                     (((((Desc) & (0x3 << 12)) >> 6) | (Desc & (0x3 << 2)))))
+
+#define TT_DESCRIPTOR_CONVERT_TO_SECTION_AP(Desc)                  ((((Desc) & TT_DESCRIPTOR_PAGE_AP_MASK) << 6) & TT_DESCRIPTOR_SECTION_AP_MASK)
+
+#define TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY(Desc,IsLargePage)      (IsLargePage? \
+                                                                    (((Desc) & TT_DESCRIPTOR_LARGEPAGE_CACHE_POLICY_MASK) & TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK): \
+                                                                    (((((Desc) & (0x3 << 6)) << 6) | (Desc & (0x3 << 2)))))
+
 
 #define TT_DESCRIPTOR_SECTION_DOMAIN_MASK                       (0x0FUL << 5)
 #define TT_DESCRIPTOR_SECTION_DOMAIN(a)                         (((a) & 0x0FUL) << 5)
@@ -192,6 +201,27 @@
                                                                      TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
                                                                      TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
                                                                      TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE)
+
+#define TT_DESCRIPTOR_PAGE_WRITE_BACK              (TT_DESCRIPTOR_PAGE_TYPE_PAGE                                                           | \
+                                                        TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
+                                                        TT_DESCRIPTOR_PAGE_S_NOT_SHARED                                                   | \
+                                                        TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
+                                                        TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_BACK_ALLOC)
+#define TT_DESCRIPTOR_PAGE_WRITE_THROUGH           (TT_DESCRIPTOR_PAGE_TYPE_PAGE                                                           | \
+                                                        TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
+                                                        TT_DESCRIPTOR_PAGE_S_NOT_SHARED                                                   | \
+                                                        TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
+                                                        TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC)
+#define TT_DESCRIPTOR_PAGE_DEVICE                  (TT_DESCRIPTOR_PAGE_TYPE_PAGE                                                           | \
+                                                        TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
+                                                        TT_DESCRIPTOR_PAGE_S_NOT_SHARED                                                   | \
+                                                        TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
+                                                        TT_DESCRIPTOR_PAGE_CACHE_POLICY_SHAREABLE_DEVICE)
+#define TT_DESCRIPTOR_PAGE_UNCACHED                (TT_DESCRIPTOR_PAGE_TYPE_PAGE                                                           | \
+                                                        TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
+                                                        TT_DESCRIPTOR_PAGE_S_NOT_SHARED                                                   | \
+                                                        TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
+                                                        TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_CACHEABLE)
 
 // Cortex A9 feature bit definitions
 #define A9_FEATURE_PARITY  (1<<9)
