@@ -74,15 +74,17 @@ TimerInterruptHandler (
   //
   OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
-  // clear the periodic interrupt
+  // If the interrupt is shared then we must check if this interrupt source is the one associated to this Timer
+  if (MmioRead32 (SP804_TIMER0_BASE + SP804_TIMER_MSK_INT_STS_REG) != 0) {
+    // clear the periodic interrupt
+    MmioWrite32 (SP804_TIMER0_BASE + SP804_TIMER_INT_CLR_REG, 0);
 
-  MmioWrite32 (SP804_TIMER0_BASE + SP804_TIMER_INT_CLR_REG, 0);
+    // signal end of interrupt early to help avoid losing subsequent ticks from long duration handlers
+    gInterrupt->EndOfInterrupt (gInterrupt, Source);
 
-  // signal end of interrupt early to help avoid losing subsequent ticks from long duration handlers
-  gInterrupt->EndOfInterrupt (gInterrupt, Source);
-
-  if (mTimerNotifyFunction) {
-    mTimerNotifyFunction (mTimerPeriod);
+    if (mTimerNotifyFunction) {
+      mTimerNotifyFunction (mTimerPeriod);
+    }
   }
 
   gBS->RestoreTPL (OriginalTPL);
