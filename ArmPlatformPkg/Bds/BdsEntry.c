@@ -83,13 +83,17 @@ EFI_STATUS GetEnvironmentVariable (
     return EFI_SUCCESS;
 }
 
-VOID InitializeConsole (
+EFI_STATUS
+InitializeConsole (
   VOID                   
   )
 {
   EFI_STATUS                Status;
   UINTN                     NoHandles;
   EFI_HANDLE                *Buffer;
+  BOOLEAN                   AllDriversConnected;
+
+  AllDriversConnected = FALSE;
 
   //
   // Now we need to setup the EFI System Table with information about the console devices.
@@ -97,6 +101,12 @@ VOID InitializeConsole (
   // consoles at the same time
   //
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiSimpleTextOutProtocolGuid, NULL, &NoHandles, &Buffer);
+  if (EFI_ERROR (Status)) {
+    BdsConnectAllDrivers();
+    AllDriversConnected = TRUE;
+    Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiSimpleTextOutProtocolGuid, NULL, &NoHandles, &Buffer);
+  }
+
   if (!EFI_ERROR (Status)) {
     // Use the first SimpleTextOut we find and update the EFI System Table
     gST->ConsoleOutHandle = Buffer[0];
@@ -107,9 +117,16 @@ VOID InitializeConsole (
     gST->StdErr = gST->ConOut;
     
     FreePool (Buffer);
-  } 
+  } else {
+    return Status;
+  }
   
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiSimpleTextInProtocolGuid, NULL, &NoHandles, &Buffer);
+  if (EFI_ERROR (Status) && !AllDriversConnected) {
+    BdsConnectAllDrivers();
+    Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiSimpleTextInProtocolGuid, NULL, &NoHandles, &Buffer);
+  }
+
   if (!EFI_ERROR (Status)) {
     // Use the first SimpleTextIn we find and update the EFI System Table
     gST->ConsoleInHandle = Buffer[0];
@@ -117,7 +134,11 @@ VOID InitializeConsole (
     ASSERT_EFI_ERROR (Status);
     
     FreePool (Buffer);
+  } else {
+    return Status;
   }
+
+  return EFI_SUCCESS;
 }
 
 EFI_STATUS
@@ -238,7 +259,8 @@ BdsEntry (
     PERF_END   (NULL, "DXE", NULL, 0);
     PERF_START (NULL, "BDS", NULL, 0);
 
-    InitializeConsole();
+    Status = InitializeConsole();
+    ASSERT_EFI_ERROR(Status);
 
     while (1) {
       // Get the Linux Kernel Device Path from Environment Variable
