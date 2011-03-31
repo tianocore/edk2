@@ -52,6 +52,9 @@ FillTranslationTable (
   Entry    = TRANSLATION_TABLE_ENTRY_FOR_VIRTUAL_ADDRESS(TranslationTable, MemoryRegion->VirtualBase);
   Sections = MemoryRegion->Length / TT_DESCRIPTOR_SECTION_SIZE;
   
+  // The current code does not support memory region size that is not aligned on TT_DESCRIPTOR_SECTION_SIZE boundary
+  ASSERT (MemoryRegion->Length % TT_DESCRIPTOR_SECTION_SIZE == 0);
+  
   for (Index = 0; Index < Sections; Index++)
   {
     *Entry++     =  TT_DESCRIPTOR_SECTION_BASE_ADDRESS(PhysicalBase) | Attributes;
