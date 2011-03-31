@@ -257,6 +257,7 @@ IrqInterruptHandler (
   GicInterrupt = MmioRead32 (PcdGet32(PcdGicInterruptInterfaceBase) + GIC_ICCIAR);
   if (GicInterrupt >= PcdGet32(PcdGicNumInterrupts)) {
     MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + GIC_ICCEIOR, GicInterrupt);
+    return;
   }
   
   InterruptHandler = gRegisteredInterruptHandlers[GicInterrupt];
