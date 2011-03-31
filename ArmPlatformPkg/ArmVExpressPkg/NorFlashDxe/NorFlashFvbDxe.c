@@ -1,6 +1,6 @@
 /*++ @file  NorFlashFvbDxe.c
 
- Copyright (c) 2010, ARM Ltd. All rights reserved.<BR>
+ Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
  This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
@@ -60,8 +60,7 @@ InitializeFvAndVariableStoreHeaders (
   }
 
   HeadersLength = sizeof(EFI_FIRMWARE_VOLUME_HEADER) + sizeof(EFI_FV_BLOCK_MAP_ENTRY) + sizeof(VARIABLE_STORE_HEADER);
-  Headers = AllocatePool(HeadersLength);
-  ZeroMem (&Headers,HeadersLength);
+  Headers = AllocateZeroPool(HeadersLength);
 
   //
   // EFI_FIRMWARE_VOLUME_HEADER
@@ -85,7 +84,7 @@ InitializeFvAndVariableStoreHeaders (
   FirmwareVolumeHeader->BlockMap[0].Length      = Instance->Media.BlockSize;
   FirmwareVolumeHeader->BlockMap[1].NumBlocks = 0;
   FirmwareVolumeHeader->BlockMap[1].Length      = 0;
-  FirmwareVolumeHeader->Checksum = CalculateCheckSum16 (FirmwareVolumeHeader,FirmwareVolumeHeader->HeaderLength);
+  FirmwareVolumeHeader->Checksum = CalculateCheckSum16 ((UINT16*)FirmwareVolumeHeader,FirmwareVolumeHeader->HeaderLength);
 
   //
   // VARIABLE_STORE_HEADER
@@ -97,7 +96,7 @@ InitializeFvAndVariableStoreHeaders (
   VariableStoreHeader->State             = VARIABLE_STORE_HEALTHY;
 
   // Install the combined super-header in the NorFlash
-  Status = FvbWrite(&Instance->FvbProtocol, 0, 0, &FirmwareVolumeHeader, Headers );
+  Status = FvbWrite(&Instance->FvbProtocol, 0, 0, &HeadersLength, Headers );
 
   FreePool(Headers);
   return Status;
@@ -133,6 +132,7 @@ ValidateFvHeader (
         || ( FwVolHeader->Signature     != EFI_FVH_SIGNATURE    )
         || ( FwVolHeader->FvLength      != Instance->Media.BlockSize * (Instance->Media.LastBlock + 1) )
       ) {
+    DEBUG ((EFI_D_ERROR, "ValidateFvHeader: No Firmware Volume header present\n"));
     return EFI_NOT_FOUND;
   }
 
@@ -143,11 +143,11 @@ ValidateFvHeader (
   }
 
   // Verify the header checksum
-  /*Checksum = CalculateSum16((VOID*) FwVolHeader, FwVolHeader->HeaderLength);
+  Checksum = CalculateSum16((UINT16*)FwVolHeader, FwVolHeader->HeaderLength);
   if (Checksum != 0) {
     DEBUG ((EFI_D_ERROR, "ValidateFvHeader: FV checksum is invalid (Checksum:0x%X)\n",Checksum));
     return EFI_NOT_FOUND;
-  }*/
+  }
 
   VariableStoreHeader = (VARIABLE_STORE_HEADER*)((UINT32)FwVolHeader + FwVolHeader->HeaderLength);
 
@@ -383,7 +383,7 @@ FvbGetBlockSize(
  **/
 EFI_STATUS
 EFIAPI
-FvbRead(
+FvbRead (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL   *This,
   IN        EFI_LBA                               Lba,
   IN        UINTN                                 Offset,
@@ -407,12 +407,6 @@ FvbRead(
 
   Status = EFI_SUCCESS;
   TempStatus = Status;
-
-  if (FALSE) {
-    DEBUG ((EFI_D_ERROR, "FvbRead: Can not read: Device is in ReadDisabled state.\n"));
-    // It is in ReadDisabled state, return an error right away
-    return EFI_ACCESS_DENIED;
-  }
 
   // Cache the block size to avoid de-referencing pointers all the time
   BlockSize = Instance->Media.BlockSize;
@@ -520,7 +514,7 @@ FREE_MEMORY:
  **/
 EFI_STATUS
 EFIAPI
-FvbWrite(
+FvbWrite (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL   *This,
   IN        EFI_LBA                               Lba,
   IN        UINTN                                 Offset,
@@ -650,7 +644,7 @@ FREE_MEMORY:
  **/
 EFI_STATUS
 EFIAPI
-FvbEraseBlocks(
+FvbEraseBlocks (
   IN CONST EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   ...
   )
@@ -729,7 +723,7 @@ FvbEraseBlocks(
     while (NumOfLba > 0) {
 
       // Get the physical address of Lba to erase
-      BlockAddress = GET_NOR_BLOCK_ADDRESS(
+      BlockAddress = GET_NOR_BLOCK_ADDRESS (
           Instance->BaseAddress,
           StartingLba,
           Instance->Media.BlockSize
@@ -737,7 +731,7 @@ FvbEraseBlocks(
 
       // Erase it
       DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks: Erasing Lba=%ld @ 0x%08x.\n", StartingLba, BlockAddress));
-      Status = NorFlashUnlockAndEraseSingleBlock(BlockAddress);
+      Status = NorFlashUnlockAndEraseSingleBlock (BlockAddress);
       if (EFI_ERROR(Status)) {
         VA_END (args);
         Status = EFI_DEVICE_ERROR;
@@ -777,7 +771,7 @@ NorFlashFvbInitialize (
   Status = ValidateFvHeader (Instance);
   if (EFI_ERROR(Status)) {
     // There is no valid header, so time to install one.
-    DEBUG((EFI_D_ERROR,"NorFlashFvbInitialize: ERROR - The FVB Header is not valid. Install a correct one for this volume.\n"));
+    DEBUG((EFI_D_ERROR,"NorFlashFvbInitialize: ERROR - The FVB Header is not valid. Installing a correct one for this volume.\n"));
 
     // Erase all the NorFlash that is reserved for variable storage
     Status = FvbEraseBlocks ( &Instance->FvbProtocol, (EFI_LBA)0, (UINT32)(Instance->Media.LastBlock + 1), EFI_LBA_LIST_TERMINATOR );

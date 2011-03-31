@@ -124,7 +124,6 @@ typedef struct {
     UINTN                             BaseAddress;
     UINTN                             Size;
     UINTN                             BlockSize;
-    BOOLEAN                           SupportFvb;
     EFI_GUID                          Guid;
 } NOR_FLASH_DESCRIPTION;
 

@@ -1,6 +1,6 @@
 /** @file  NorFlashDxe.c
 
-  Copyright (c) 2010, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/PcdLib.h>
 
 #include "NorFlashDxe.h"
 
@@ -31,28 +32,24 @@ NOR_FLASH_DESCRIPTION mNorFlashDescription[NOR_FLASH_LAST_DEVICE] = {
     ARM_VE_SMB_NOR0_BASE,
     SIZE_256KB * 255,
     SIZE_256KB,
-    FALSE,
     {0xE7223039, 0x5836, 0x41E1, 0xB5, 0x42, 0xD7, 0xEC, 0x73, 0x6C, 0x5E, 0x59}
   },
   { // BootMon non-volatile storage
     ARM_VE_SMB_NOR0_BASE + SIZE_256KB * 255,
     SIZE_64KB * 4,
     SIZE_64KB,
-    FALSE,
     {0x02118005, 0x9DA7, 0x443A, 0x92, 0xD5, 0x78, 0x1F, 0x02, 0x2A, 0xED, 0xBB}
   },
   { // UEFI
     ARM_VE_SMB_NOR1_BASE,
     SIZE_256KB * 255,
     SIZE_256KB,
-    FALSE,
     {0x1F15DA3C, 0x37FF, 0x4070, 0xB4, 0x71, 0xBB, 0x4A, 0xF1, 0x2A, 0x72, 0x4A}
   },
   { // UEFI Variable Services non-volatile storage
     ARM_VE_SMB_NOR1_BASE + SIZE_256KB * 255,
     SIZE_64KB * 3, //FIXME: Set 3 blocks because I did not succeed to copy 4 blocks into the ARM Versastile Express NOR Falsh in the last NOR Flash. It should be 4 blocks
     SIZE_64KB,
-    TRUE,
     {0xCC2CBF29, 0x1498, 0x4CDD, 0x81, 0x71, 0xF8, 0xB6, 0xB4, 0x1D, 0x09, 0x09}
   }
 };
@@ -782,6 +779,7 @@ NorFlashInitialise (
 {
   EFI_STATUS    Status = EFI_SUCCESS;
   UINT32        Index;
+  UINTN NvStorageVariableBase = (UINTN) PcdGet32 (PcdFlashNvStorageVariableBase);
 
   for (Index = 0; Index < NOR_FLASH_LAST_DEVICE; Index++) {
     Status = NorFlashCreateInstance(
@@ -789,7 +787,7 @@ NorFlashInitialise (
       mNorFlashDescription[Index].Size,
       Index,
       mNorFlashDescription[Index].BlockSize,
-      mNorFlashDescription[Index].SupportFvb,
+      (mNorFlashDescription[Index].BaseAddress == NvStorageVariableBase),
       &mNorFlashDescription[Index].Guid,
       &mNorFlashInstances[Index]
     );

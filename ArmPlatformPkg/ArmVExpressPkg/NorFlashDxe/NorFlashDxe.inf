@@ -48,12 +48,13 @@
   gEfiDevicePathProtocolGuid
   gEfiFirmwareVolumeBlockProtocolGuid
   
-[FixedPcd.common]
+[Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
 
-[Pcd.common]
-
 
 [Depex]
-TRUE
+  #
+  # NorFlashDxe must be loaded before VariableRuntimeDxe in case empty flash needs populating with default values
+  # 
+  BEFORE gVariableRuntimeDxeFileGuid 
