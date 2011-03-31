@@ -16,6 +16,8 @@
 #ifndef __MMC_H
 #define __MMC_H
 
+#include <Uefi.h>
+
 #include <Protocol/DiskIo.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/DevicePath.h>
