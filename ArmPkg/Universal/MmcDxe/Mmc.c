@@ -155,9 +155,9 @@ EFI_STATUS DestroyMmcHostInstance(
 
     // Uninstall Protocol Interfaces
     Status = gBS->UninstallMultipleProtocolInterfaces(
-            &MmcHostInstance->MmcHandle,
+        MmcHostInstance->MmcHandle,
             &gEfiBlockIoProtocolGuid,&(MmcHostInstance->BlockIo),
-            &gEfiDevicePathProtocolGuid,&(MmcHostInstance->DevicePath),
+        &gEfiDevicePathProtocolGuid,MmcHostInstance->DevicePath,
             NULL
             );
     ASSERT_EFI_ERROR (Status);
