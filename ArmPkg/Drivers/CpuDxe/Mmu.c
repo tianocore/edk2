@@ -547,7 +547,7 @@ UpdatePageEntries (
   FirstLevelTable = (ARM_FIRST_LEVEL_DESCRIPTOR *)ArmGetTTBR0BaseAddress ();
 
   // calculate number of 4KB page table entries to change
-  NumPageEntries = Length/SIZE_4KB;
+  NumPageEntries = Length / TT_DESCRIPTOR_PAGE_SIZE;
   
   // iterate for the number of 4KB pages to change
   Offset = 0;
@@ -598,7 +598,7 @@ UpdatePageEntries (
       if ((CurrentPageTableEntry & TT_DESCRIPTOR_PAGE_CACHEABLE_MASK) == TT_DESCRIPTOR_PAGE_CACHEABLE_MASK) {
         // The current section mapping is cacheable so Clean/Invalidate the MVA of the page
         // Note assumes switch(Attributes), not ARMv7 possibilities
-        WriteBackInvalidateDataCacheRange (Mva, SIZE_4KB);
+        WriteBackInvalidateDataCacheRange (Mva, TT_DESCRIPTOR_PAGE_SIZE);
       }
 
       // Only need to update if we are changing the entry  
@@ -607,7 +607,7 @@ UpdatePageEntries (
     }
 
     Status = EFI_SUCCESS;
-    Offset += SIZE_4KB;
+    Offset += TT_DESCRIPTOR_PAGE_SIZE;
     
   } // end first level translation table loop
 
@@ -791,7 +791,7 @@ ConvertSectionToPages (
   }
 
   // flush d-cache so descriptors make it back to uncached memory for subsequent table walks
-  WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)PageTableAddr, SIZE_4KB);
+  WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)PageTableAddr, TT_DESCRIPTOR_PAGE_SIZE);
 
   // formulate page table entry, Domain=0, NS=0
   PageTableDescriptor = (((UINTN)PageTableAddr) & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK) | TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE;
@@ -868,7 +868,7 @@ CpuSetMemoryAttributes (
   )
 {
   DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(%lx, %lx, %lx)\n", BaseAddress, Length, Attributes));
-  if ( ((BaseAddress & (SIZE_4KB-1)) != 0) || ((Length & (SIZE_4KB-1)) != 0)){
+  if ( ((BaseAddress & ~TT_DESCRIPTOR_PAGE_BASE_ADDRESS_MASK) != 0) || ((Length & ~TT_DESCRIPTOR_PAGE_BASE_ADDRESS_MASK) != 0)){
     // minimum granularity is SIZE_4KB (4KB on ARM)
     DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(%lx, %lx, %lx): minimum ganularity is SIZE_4KB\n", BaseAddress, Length, Attributes));
     return EFI_UNSUPPORTED;
