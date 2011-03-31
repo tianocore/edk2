@@ -25,26 +25,6 @@
 #define DDR_ATTRIBUTES_SECURE_UNCACHED  ARM_MEMORY_REGION_ATTRIBUTE_SECURE_UNCACHED_UNBUFFERED
 
 /**
-  Return the information about the memory region in permanent memory used by PEI
-
-  One of the PEI Module must install the permament memory used by PEI. This function returns the
-  information about this region for your platform to this PEIM module.
-
-  @param[out]   PeiMemoryBase       Base of the memory region used by PEI core and modules
-  @param[out]   PeiMemorySize       Size of the memory region used by PEI core and modules
-
-**/
-VOID ArmPlatformGetPeiMemory (
-    OUT UINTN*                                   PeiMemoryBase,
-    OUT UINTN*                                   PeiMemorySize
-    ) {
-    ASSERT((PeiMemoryBase != NULL) && (PeiMemorySize != NULL));
-    
-    *PeiMemoryBase = ARM_EB_DRAM_BASE + ARM_EB_EFI_FIX_ADDRESS_REGION_SZ;
-    *PeiMemorySize = ARM_EB_EFI_MEMORY_REGION_SZ;
-}
-
-/**
   Return the Virtual Memory Map of your platform
 
   This Virtual Memory Map is used by MemoryInitPei Module to initialize the MMU on your platform.
@@ -136,67 +116,9 @@ VOID ArmPlatformGetVirtualMemoryMap(ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemory
                                     EFI Memory region. This array must be ended by a zero-filled entry
 
 **/
-VOID ArmPlatformGetEfiMemoryMap (
+EFI_STATUS
+ArmPlatformGetAdditionalSystemMemory (
     OUT ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR** EfiMemoryMap
 ) {
-    EFI_RESOURCE_ATTRIBUTE_TYPE     Attributes;
-    UINT64                          MemoryBase;
-    UINTN                           Index = 0;
-    ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR  *EfiMemoryTable;
-
-    ASSERT(EfiMemoryMap != NULL);
-
-    EfiMemoryTable = (ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR*)AllocatePages(sizeof(ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR) * 6);
-
-    Attributes =
-    (
-      EFI_RESOURCE_ATTRIBUTE_PRESENT |
-      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-      EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_TESTED
-    );
-    MemoryBase = ARM_EB_DRAM_BASE;
-  
-    // Memory Reserved for fixed address allocations (such as Exception Vector Table)
-    EfiMemoryTable[Index].ResourceAttribute = Attributes;
-    EfiMemoryTable[Index].PhysicalStart = MemoryBase;
-    EfiMemoryTable[Index].NumberOfBytes = ARM_EB_EFI_FIX_ADDRESS_REGION_SZ;
-    
-    MemoryBase += ARM_EB_EFI_FIX_ADDRESS_REGION_SZ;
-
-    // Memory declared to PEI as permanent memory for PEI and DXE
-    EfiMemoryTable[++Index].ResourceAttribute = Attributes;
-    EfiMemoryTable[Index].PhysicalStart = MemoryBase;
-    EfiMemoryTable[Index].NumberOfBytes = ARM_EB_EFI_MEMORY_REGION_SZ;
-
-    MemoryBase += ARM_EB_EFI_MEMORY_REGION_SZ;
-
-    // We must reserve the memory used by the Firmware Volume copied in DRAM at 0x80000000
-    if (FeaturePcdGet(PcdStandalone) == FALSE) {
-        // Chunk between the EFI Memory region and the firmware
-        EfiMemoryTable[++Index].ResourceAttribute = Attributes;
-        EfiMemoryTable[Index].PhysicalStart = MemoryBase;
-        EfiMemoryTable[Index].NumberOfBytes = PcdGet32(PcdNormalFdBaseAddress) - MemoryBase;
-
-        // Chunk reserved by the firmware in DRAM
-        EfiMemoryTable[++Index].ResourceAttribute = Attributes & (~EFI_RESOURCE_ATTRIBUTE_PRESENT);
-        EfiMemoryTable[Index].PhysicalStart = PcdGet32(PcdNormalFdBaseAddress);
-        EfiMemoryTable[Index].NumberOfBytes = PcdGet32(PcdNormalFdSize);
-
-        MemoryBase = PcdGet32(PcdNormalFdBaseAddress) + PcdGet32(PcdNormalFdSize);
-    }
-      
-    // We allocate all the remain memory as untested system memory
-    EfiMemoryTable[++Index].ResourceAttribute = Attributes & (~EFI_RESOURCE_ATTRIBUTE_TESTED);
-    EfiMemoryTable[Index].PhysicalStart = MemoryBase;
-    EfiMemoryTable[Index].NumberOfBytes = ARM_EB_DRAM_SZ - (MemoryBase-ARM_EB_DRAM_BASE);
-
-    EfiMemoryTable[++Index].ResourceAttribute = 0;
-    EfiMemoryTable[Index].PhysicalStart = 0;
-    EfiMemoryTable[Index].NumberOfBytes = 0;
-
-    *EfiMemoryMap = EfiMemoryTable;
+  return EFI_UNSUPPORTED;
 }

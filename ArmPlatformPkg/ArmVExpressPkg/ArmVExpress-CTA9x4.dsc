@@ -366,6 +366,11 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize|0x00020000	# Stack for each of the 4 CPU cores
   gArmPlatformTokenSpaceGuid.PcdPeiServicePtrAddr|0x48020004        # pei services ptr just above stack. Overlapped with the stack of CoreId 1
 
+
+  # System Memory (1GB) 
+  gArmTokenSpaceGuid.PcdSystemMemoryBase|0x60000000
+  gArmTokenSpaceGuid.PcdSystemMemorySize|0x40000000
+    
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000        # expressed in 100ns units, 100,000 x 100 ns = 10,000,000 ns = 10 ms
   
   #

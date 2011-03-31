@@ -55,3 +55,9 @@
   # Stack for CPU Cores in Non Secure Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase|0|UINT32|0x00000008
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize|0|UINT32|0x00000009
+    
+  # Size of the region used by UEFI in permanent memory (Reserved 128MB by default)
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x08000000|UINT32|0x00000015
+
+  # Size of the region reserved for fixed address allocations (Reserved 128MB by default)
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryFixRegionSize|0x08000000|UINT32|0x00000014

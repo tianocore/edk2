@@ -170,8 +170,9 @@ VOID ArmPlatformGetVirtualMemoryMap (
                                     EFI Memory region. This array must be ended by a zero-filled entry
 
 **/
-VOID ArmPlatformGetEfiMemoryMap (
-    OUT ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR** EfiMemoryMap
-);
+EFI_STATUS
+ArmPlatformGetAdditionalSystemMemory (
+  OUT ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR** EfiMemoryMap
+  );
 
 #endif
