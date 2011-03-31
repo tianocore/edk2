@@ -55,7 +55,7 @@ EblGetCmd (
   Size = 0;
   Status = gRT->GetVariable (VariableName, &gEfiGlobalVariableGuid, NULL, &Size, Value);
   if (Status == EFI_NOT_FOUND) {
-    AsciiPrint("Variable name '%a' not found.\n",VariableName);
+    AsciiPrint("Variable name '%s' not found.\n",VariableName);
   } else if (Status == EFI_BUFFER_TOO_SMALL) {
     // Get the environment variable value
     Value = AllocatePool (Size);
@@ -117,7 +117,27 @@ EblSetCmd (
   // Check if it is a valid variable setting
   AsciiValue = AsciiStrStr (AsciiVariableSetting,"=");
   if (AsciiValue == NULL) {
-    AsciiPrint("Variable setting is incorrect. It should be VariableName=Value\n");
+    //
+    // There is no value. It means this variable will be deleted
+    //
+
+    // Convert VariableName into Unicode
+    VariableName = AllocatePool((AsciiStrLen (AsciiVariableSetting) + 1) * sizeof (CHAR16));
+    AsciiStrToUnicodeStr (AsciiVariableSetting,VariableName);
+
+    Status = gRT->SetVariable (
+                          VariableName,
+                          &gEfiGlobalVariableGuid,
+                          ( !Volatile ? EFI_VARIABLE_NON_VOLATILE : 0) |
+                          EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                          0,
+                          NULL
+                          );
+    if (!EFI_ERROR(Status)) {
+      AsciiPrint("Variable '%s' deleted\n",VariableName);
+    } else {
+      AsciiPrint("Variable setting is incorrect. It should be VariableName=Value\n");
+    }
     return Status;
   }
 
@@ -158,8 +178,9 @@ EblSetCmd (
                       AsciiStrLen (AsciiValue)+1,
                       AsciiValue
                       );
-
-  AsciiPrint("'%a'='%a'\n",AsciiVariableName,AsciiValue);
+  if (!EFI_ERROR(Status)) {
+    AsciiPrint("'%a'='%a'\n",AsciiVariableName,AsciiValue);
+  }
 
   return Status;
 }
