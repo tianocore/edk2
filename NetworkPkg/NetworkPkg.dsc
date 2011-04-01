@@ -52,7 +52,8 @@
 
 [LibraryClasses.common.UEFI_APPLICATION]
   DebugLib|MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
-  FileHandleLib|ShellPkg/Library/BaseFileHandleLib/BaseFileHandleLib.inf
+  FileHandleLib|ShellPkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+  SortLib|ShellPkg/Library/UefiSortLib/UefiSortLib.inf
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
 
 [PcdsFeatureFlag]
