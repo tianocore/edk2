@@ -1940,6 +1940,15 @@ GetQuestionDefault (
   // For Questions without default
   //
   switch (Question->Operand) {
+  case EFI_IFR_NUMERIC_OP:
+    //
+    // Take minimum value as numeric default value
+    //
+    if ((HiiValue->Value.u64 < Question->Minimum) || (HiiValue->Value.u64 > Question->Maximum)) {
+      HiiValue->Value.u64 = Question->Minimum;
+    }
+    break;
+
   case EFI_IFR_ONE_OF_OP:
     //
     // Take first oneof option as oneof's default value

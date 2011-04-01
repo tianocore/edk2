@@ -1,7 +1,7 @@
 /** @file
 Implementation of interfaces function for EFI_HII_CONFIG_ROUTING_PROTOCOL.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -860,6 +860,7 @@ ParseIfrData (
   EFI_STRING               NameStr;
   EFI_STRING               TempStr;
   UINTN                    LengthString;
+  BOOLEAN                  FirstOneOfOption;
 
   LengthString     = 0;
   Status           = EFI_SUCCESS;
@@ -869,6 +870,7 @@ ParseIfrData (
   BlockData        = NULL;
   DefaultData      = NULL;
   VarDefaultName   = 0;
+  FirstOneOfOption = FALSE;
 
   //
   // Go through the form package to parse OpCode one by one.
@@ -1023,6 +1025,59 @@ ParseIfrData (
       // Add Block Data into VarStorageData BlockEntry
       //
       InsertBlockData (&VarStorageData->BlockEntry, &BlockData);
+      
+      if (IfrOpHdr->OpCode == EFI_IFR_ONE_OF_OP) {
+        //
+        // Set this flag to TRUE for the first oneof option.
+        //
+        FirstOneOfOption = TRUE;
+      } else if (IfrOpHdr->OpCode == EFI_IFR_NUMERIC_OP) {
+        //
+        // Numeric minimum value will be used as default value when no default is specified. 
+        //
+
+        //
+        // Set standard ID and Get DefaultName String ID
+        //
+        VarDefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
+        Status       = FindDefaultName (DefaultIdArray, VarDefaultId, &VarDefaultName);
+        if (EFI_ERROR (Status)) {
+          goto Done;
+        }
+        //
+        // Prepare new DefaultValue
+        //
+        DefaultData = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
+        if (DefaultData == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Done;
+        }
+        DefaultData->OpCode      = IfrOpHdr->OpCode;
+        DefaultData->DefaultId   = VarDefaultId;
+        DefaultData->DefaultName = VarDefaultName;
+
+        switch (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE) {
+        case EFI_IFR_NUMERIC_SIZE_1:
+          DefaultData->Value = (UINT64) IfrOneOf->data.u8.MinValue;
+          break;
+  
+        case EFI_IFR_NUMERIC_SIZE_2:
+          CopyMem (&DefaultData->Value, &IfrOneOf->data.u16.MinValue, sizeof (UINT16));
+          break;
+  
+        case EFI_IFR_NUMERIC_SIZE_4:
+          CopyMem (&DefaultData->Value, &IfrOneOf->data.u32.MinValue, sizeof (UINT32));
+          break;
+  
+        case EFI_IFR_NUMERIC_SIZE_8:
+          CopyMem (&DefaultData->Value, &IfrOneOf->data.u64.MinValue, sizeof (UINT64));
+          break;
+        }
+        //
+        // Add DefaultValue into current BlockData
+        //
+        InsertDefaultValue (BlockData, DefaultData);      
+      }
       break;
 
     case EFI_IFR_ORDERED_LIST_OP:
@@ -1402,7 +1457,13 @@ ParseIfrData (
         break;
       }
 
-      if ((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT) == EFI_IFR_OPTION_DEFAULT) {
+      if (((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT) == EFI_IFR_OPTION_DEFAULT) ||
+          (BlockData->OpCode == EFI_IFR_ONE_OF_OP && FirstOneOfOption)) {
+        //
+        // This flag is used to specify whether this option is the first. Set it to FALSE for the following options. 
+        // The first oneof option value will be used as default value when no default value is specified. 
+        //
+        FirstOneOfOption = FALSE;
         //
         // Set standard ID to Manufacture ID and Get DefaultName String ID
         //
