@@ -30,7 +30,7 @@ EFIAPI
 HandleVol(
   IN CONST CHAR16  *Path,
   IN CONST BOOLEAN Delete,
-  IN CONST CHAR16  *Name
+  IN CONST CHAR16  *Name OPTIONAL
   )
 {
   EFI_STATUS            Status;
@@ -45,6 +45,7 @@ HandleVol(
   ShellStatus   = SHELL_SUCCESS;
 
   if (
+      Name != NULL && (
       StrStr(Name, L"%") != NULL ||
       StrStr(Name, L"^") != NULL ||
       StrStr(Name, L"*") != NULL ||
@@ -60,7 +61,7 @@ HandleVol(
       StrStr(Name, L">") != NULL ||
       StrStr(Name, L"?") != NULL ||
       StrStr(Name, L"/") != NULL ||
-      StrStr(Name, L" ") != NULL
+      StrStr(Name, L" ") != NULL )
       ){
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, Name);
     return (SHELL_INVALID_PARAMETER);
@@ -150,6 +151,8 @@ HandleVol(
   }
 
   gEfiShellProtocol->CloseFile(ShellFileHandle);
+  
+  ASSERT(SysInfo != NULL);
 
   //
   // print VolumeInfo table
@@ -200,6 +203,7 @@ ShellCommandRunVol (
   CHAR16        *FullPath;
   CHAR16        *TempSpot;
   UINTN         Length;
+  CONST CHAR16  *NewName;
 
   Length              = 0;
   ProblemParam        = NULL;
@@ -266,20 +270,21 @@ ShellCommandRunVol (
         StrnCatGrow(&FullPath, &Length, PathName, 0);
         StrnCatGrow(&FullPath, &Length, L":\\", 0);
         DeleteMode = ShellCommandLineGetFlag(Package, L"-d");
+        NewName    = ShellCommandLineGetValue(Package, L"-n");
         if (DeleteMode && ShellCommandLineGetFlag(Package, L"-n")) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel2HiiHandle);
           ShellStatus = SHELL_INVALID_PARAMETER;
-        } else if (ShellCommandLineGetFlag(Package, L"-n") && ShellCommandLineGetValue(Package, L"-n") == NULL) {
+        } else if (ShellCommandLineGetFlag(Package, L"-n") && NewName == NULL) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"-n");
           ShellStatus = SHELL_INVALID_PARAMETER;
-        } else if (ShellCommandLineGetValue(Package, L"-n") != NULL && StrLen(ShellCommandLineGetValue(Package, L"-n")) > 11) {
+        } else if (NewName != NULL && StrLen(NewName) > 11) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"-n");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else if (ShellStatus == SHELL_SUCCESS) {
           ShellStatus = HandleVol(
             FullPath,
             DeleteMode,
-            ShellCommandLineGetValue(Package, L"-n")
+            NewName
            );
         }
       }

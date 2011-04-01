@@ -650,7 +650,7 @@ PerformMappingDisplay(
       &BufferSize,
       HandleBuffer);
   }
-  if (!EFI_ERROR(Status)) {
+  if (!EFI_ERROR(Status) && HandleBuffer != NULL) {
     //
     // Get the map name(s) for each one.
     //

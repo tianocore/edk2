@@ -781,9 +781,14 @@ IfconfigSetNicAddrByHii (
   if (ConfigHdr != NULL) {
     Length = StrLen (ConfigHdr);
   } else {
-    Length = 0;
+    ShellStatus = SHELL_OUT_OF_RESOURCES;
+    goto ON_EXIT;
   }
   ConfigResp = AllocateZeroPool ((Length + NIC_ITEM_CONFIG_SIZE * 2 + 100) * sizeof (CHAR16));
+  if (ConfigResp == NULL) {
+    ShellStatus = SHELL_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
   if (ConfigHdr != NULL) {
     StrCpy (ConfigResp, ConfigHdr);
   }

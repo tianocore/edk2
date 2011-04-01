@@ -1191,7 +1191,7 @@ ShellPromptForResponse (
                   to prevent invalid answers to question.
   @param[in] HiiFormatStringId  The format string Id for getting from Hii.
   @param[in] HiiFormatHandle    The format string Handle for getting from Hii.
-  @param[out] Response          The pointer to Response, which will be populated upon return.
+  @param[in,out] Response       The pointer to Response, which will be populated upon return.
 
   @retval EFI_SUCCESS The operation was sucessful.
   @return other       The operation failed.

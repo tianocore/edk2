@@ -489,7 +489,8 @@ Returns:
   //
   // now everything is ready , you can set the new file name to filebuffer
   //
-  if (BufferTypeBackup != FileTypeFileBuffer || StringNoCaseCompare (&FileName, &HFileImage.FileName) != 0) {
+  if ((BufferTypeBackup != FileTypeFileBuffer && FileName != NULL) ||
+     (FileName != NULL && HFileImage.FileName != NULL && StringNoCaseCompare (&FileName, &HFileImage.FileName) != 0)){
     //
     // not the same
     //

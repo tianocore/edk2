@@ -2969,7 +2969,7 @@ QueryTable (
     //
     if (High > Low && Key >= Low && Key <= High) {
       StrnCpy (Info, Table[Index].Info, InfoLen-1);
-      StrCat (Info, L"\n");
+      StrnCat (Info, L"\n", InfoLen - StrLen(Info));
       return Key;
     }
     //
@@ -2977,7 +2977,7 @@ QueryTable (
     //
     if (Table[Index].Key == Key) {
       StrnCpy (Info, Table[Index].Info, InfoLen-1);
-      StrCat (Info, L"\n");
+      StrnCat (Info, L"\n", InfoLen - StrLen(Info));
       return Key;
     }
   }

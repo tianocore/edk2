@@ -237,8 +237,7 @@ FreeMemory (
 }
 
 /**
-  Initialize String Info Log data structures
-
+  Initialize String Info Log data structures.
 **/
 VOID
 EFIAPI
@@ -1043,8 +1042,7 @@ WritePTLen (
 }
 
 /**
-  Outputs the code length array for Char&Length Set
-
+  Outputs the code length array for Char&Length Set.
 **/
 VOID
 EFIAPI

@@ -1868,9 +1868,9 @@ Returns:
     || ReadChange ) {
 
     MainTitleBarRefresh (
-      HMainEditor.BufferImage->BufferType == FileTypeFileBuffer?HMainEditor.BufferImage->FileImage->FileName:HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer?HMainEditor.BufferImage->DiskImage->Name:NULL,
+      HMainEditor.BufferImage->BufferType == FileTypeFileBuffer&&HMainEditor.BufferImage->FileImage!=NULL?HMainEditor.BufferImage->FileImage->FileName:HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer&&HMainEditor.BufferImage->DiskImage!=NULL?HMainEditor.BufferImage->DiskImage->Name:NULL,
       HMainEditor.BufferImage->BufferType,
-      HMainEditor.BufferImage->FileImage->ReadOnly,
+      (BOOLEAN)(HMainEditor.BufferImage->FileImage!=NULL?HMainEditor.BufferImage->FileImage->ReadOnly:FALSE),
       HMainEditor.BufferImage->Modified,
       HMainEditor.ScreenSize.Column,
       HMainEditor.ScreenSize.Row,

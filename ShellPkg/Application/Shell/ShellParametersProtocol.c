@@ -415,6 +415,14 @@ CleanUpShellParametersProtocol (
   return (Status);
 }
 
+/**
+  Determin if a file name represents a unicode file.
+
+  @param[in] FileName     Pointer to the filename to open.
+
+  @retval EFI_SUCCESS     The file is a unicode file.
+  @return An error upon failure.
+**/
 EFI_STATUS
 EFIAPI
 IsUnicodeFile(

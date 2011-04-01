@@ -188,10 +188,15 @@ HBufferImageReplace (
   UINTN
   );
 
+/**
+  Free the current image.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
 HBufferImageFree (
   VOID
-  ) ;
+  );
 
 EFI_STATUS
 HBufferImageDeleteCharacterFromBuffer (

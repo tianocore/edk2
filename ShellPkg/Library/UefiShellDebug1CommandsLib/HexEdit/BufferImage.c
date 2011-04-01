@@ -78,22 +78,19 @@ EFI_STATUS
 HBufferImageInit (
   VOID
   )
-/*++
-
-Routine Description: 
-
+/**
   Initialization function for HBufferImage
 
-Arguments:  
+  
 
   None
 
-Returns:  
+ 
 
   EFI_SUCCESS
   EFI_LOAD_ERROR
 
---*/
+**/
 {
   EFI_STATUS  Status;
 
@@ -151,24 +148,21 @@ EFI_STATUS
 HBufferImageBackup (
   VOID
   )
-/*++
-
-Routine Description: 
-
+/**
   Backup function for HBufferImage
   Only a few fields need to be backup. 
   This is for making the file buffer refresh 
   as few as possible.
 
-Arguments:  
+  
 
   None
 
-Returns:  
+ 
 
   EFI_SUCCESS
 
---*/
+**/
 {
   HBufferImageBackupVar.MousePosition   = HBufferImage.MousePosition;
 
@@ -207,10 +201,7 @@ EFI_STATUS
 HBufferImageFreeLines (
   VOID
   )
-/*++
-
-Routine Description: 
-
+/**
   Free all the lines in HBufferImage
     Fields affected:
     Lines
@@ -218,15 +209,15 @@ Routine Description:
     NumLines
     ListHead 
 
-Arguments:  
+  
 
   None
 
-Returns:  
+ 
 
   EFI_SUCCESS
 
---*/
+**/
 {
   HFreeLines (HBufferImage.ListHead, HBufferImage.Lines);
 
@@ -241,21 +232,18 @@ EFI_STATUS
 HBufferImageCleanup (
   VOID
   )
-/*++
-
-Routine Description: 
-
+/**
   Cleanup function for HBufferImage
 
-Arguments:  
+  
 
   None
 
-Returns:  
+ 
 
   EFI_SUCCESS
 
---*/
+**/
 {
   EFI_STATUS  Status;
 
@@ -284,13 +272,10 @@ HBufferImagePrintLine (
   IN HEFI_EDITOR_COLOR_UNION    New
 
   )
-/*++
-
-Routine Description: 
-
+/**
   Print Line on Row
 
-Arguments:  
+  
 
   Line - Line to print
   Row  - Row on screen ( begin from 1 )
@@ -298,11 +283,11 @@ Arguments:
   Orig - Orig
   New  - Light display
 
-Returns:  
+ 
 
   EFI_SUCCESS
 
---*/
+**/
 {
 
   UINTN   Index;
@@ -691,7 +676,7 @@ HBufferImageRestoreMousePosition (
         CurrentLine = HBufferImage.CurrentLine;
         Line        = HMoveLine (FRow - HBufferImage.BufferPosition.Row);
 
-        if (FColumn > Line->Size) {
+        if (Line == NULL || FColumn > Line->Size) {
           HasCharacter = FALSE;
         }
 
@@ -738,21 +723,18 @@ EFI_STATUS
 HBufferImageRestorePosition (
   VOID
   )
-/*++
-
-Routine Description: 
-
+/**
   Set cursor position according to HBufferImage.DisplayPosition.
 
-Arguments:  
+  
 
   None
 
-Returns:  
+ 
 
   EFI_SUCCESS
 
---*/
+**/
 {
   //
   // set cursor position
@@ -766,26 +748,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Refresh function for HBufferImage.
+
+  @retval EFI_SUCCESS     The operation was successful.
+  @retval EFI_LOAD_ERROR  A Load error occured.
+
+**/
 EFI_STATUS
 HBufferImageRefresh (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Refresh function for HBufferImage
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR 
-
---*/
 {
   LIST_ENTRY          *Link;
   HEFI_EDITOR_LINE        *Line;
@@ -811,8 +784,8 @@ Returns:
     // no definite required refresh
     // and file position displayed on screen has not been changed
     //
-    if (HBufferImageNeedRefresh == FALSE &&
-        HBufferImageOnlyLineNeedRefresh == FALSE &&
+    if (!HBufferImageNeedRefresh &&
+        !HBufferImageOnlyLineNeedRefresh &&
         HBufferImageBackupVar.LowVisibleRow == HBufferImage.LowVisibleRow
         ) {
       HBufferImageRestoreMousePosition ();
@@ -826,7 +799,7 @@ Returns:
   //
   // only need to refresh current line
   //
-  if (HBufferImageOnlyLineNeedRefresh == TRUE && HBufferImageBackupVar.LowVisibleRow == HBufferImage.LowVisibleRow) {
+  if (HBufferImageOnlyLineNeedRefresh && HBufferImageBackupVar.LowVisibleRow == HBufferImage.LowVisibleRow) {
 
     HBufferImagePrintLine (
       HBufferImage.CurrentLine,
@@ -935,7 +908,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Read an image into a buffer friom a source.
+
+  @param[in] FileName     Pointer to the file name.  OPTIONAL and ignored if not FileTypeFileBuffer.
+  @param[in] DiskName     Pointer to the disk name.  OPTIONAL and ignored if not FileTypeDiskBuffer.
+  @param[in] DiskOffset   Offset into the disk.  OPTIONAL and ignored if not FileTypeDiskBuffer.
+  @param[in] DiskSize     Size of the disk buffer.  OPTIONAL and ignored if not FileTypeDiskBuffer.
+  @param[in] MemoryOffset Offset into the Memory.  OPTIONAL and ignored if not FileTypeMemBuffer.
+  @param[in] MemorySize   Size of the Memory buffer.  OPTIONAL and ignored if not FileTypeMemBuffer.
+  @param[in] BufferType   The type of buffer to save.  IGNORED.
+  @param[in] Recover      TRUE for recovermode, FALSE otherwise.
+
+  @return EFI_SUCCESS     The operation was successful.
+**/
 EFI_STATUS
+EFIAPI
 HBufferImageRead (
   IN CONST CHAR16                   *FileName,
   IN CONST CHAR16                   *DiskName,
@@ -985,6 +973,19 @@ HBufferImageRead (
   return Status;
 }
 
+/**
+  Save the current image.
+
+  @param[in] FileName     Pointer to the file name.  OPTIONAL and ignored if not FileTypeFileBuffer.
+  @param[in] DiskName     Pointer to the disk name.  OPTIONAL and ignored if not FileTypeDiskBuffer.
+  @param[in] DiskOffset   Offset into the disk.  OPTIONAL and ignored if not FileTypeDiskBuffer.
+  @param[in] DiskSize     Size of the disk buffer.  OPTIONAL and ignored if not FileTypeDiskBuffer.
+  @param[in] MemoryOffset Offset into the Memory.  OPTIONAL and ignored if not FileTypeMemBuffer.
+  @param[in] MemorySize   Size of the Memory buffer.  OPTIONAL and ignored if not FileTypeMemBuffer.
+  @param[in] BufferType   The type of buffer to save.  IGNORED.
+
+  @return EFI_SUCCESS     The operation was successful.
+**/
 EFI_STATUS
 HBufferImageSave (
   IN CHAR16                         *FileName,
@@ -1035,29 +1036,20 @@ HBufferImageSave (
   return Status;
 }
 
-HEFI_EDITOR_LINE *
-HBufferImageCreateLine (
-  VOID
-  )
-/*++
-
-Routine Description: 
-
-  Create a new line and append it to the line list
+/**
+  Create a new line and append it to the line list.
     Fields affected:
     NumLines
     Lines 
 
-Arguments:  
+  @retval NULL    create line failed.
+  @return         the line created.
 
-  None
-
-Returns:  
-
-  NULL -- create line failed
-  Not NULL -- the line created
-
---*/
+**/
+HEFI_EDITOR_LINE *
+HBufferImageCreateLine (
+  VOID
+  )
 {
   HEFI_EDITOR_LINE  *Line;
 
@@ -1091,26 +1083,15 @@ Returns:
   return Line;
 }
 
+/**
+  Free the current image.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
 HBufferImageFree (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Function called when load a new file in. It will free all the old lines
-  and set FileModified field to FALSE
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
   //
   // free all lines
@@ -1120,33 +1101,25 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Dispatch input to different handler
+
+  @param[in] Key    The input key:
+                     the keys can be:
+                       ASCII KEY
+                        Backspace/Delete
+                        Direction key: up/down/left/right/pgup/pgdn
+                        Home/End
+                        INS
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_LOAD_ERROR        A load error occured.
+  @retval EFI_OUT_OF_RESOURCES  A Memory allocation failed.
+**/
 EFI_STATUS
 HBufferImageHandleInput (
   IN  EFI_INPUT_KEY *Key
   )
-/*++
-
-Routine Description: 
-
-  Dispatch input to different handler
-
-Arguments:  
-
-  Key -- input key
-   the keys can be:
-     ASCII KEY
-      Backspace/Delete
-      Direction key: up/down/left/right/pgup/pgdn
-      Home/End
-      INS
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-  EFI_OUT_OF_RESOURCES
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -1231,27 +1204,20 @@ Returns:
   return Status;
 }
 
+/**
+  ASCII key + Backspace + return.
+
+  @param[in] Char               The input char.
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_LOAD_ERROR        A load error occured.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+**/
 EFI_STATUS
+EFIAPI
 HBufferImageDoCharInput (
   IN  CHAR16  Char
   )
-/*++
-
-Routine Description: 
-
-  ASCII key + Backspace + return
-
-Arguments:  
-
-  Char -- input char
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-  EFI_OUT_OF_RESOURCES
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -1289,26 +1255,19 @@ Returns:
   return Status;
 }
 
+/**
+  change char to int value based on Hex.
+
+  @param[in] Char     The input char.
+
+  @return The character's index value.
+  @retval -1  The operation failed.
+**/
 INTN
+EFIAPI
 HBufferImageCharToHex (
   IN CHAR16 Char
   )
-/*++
-
-Routine Description: 
-
-  change char to int value based on Hex
-
-Arguments:  
-
-  Char -- input char
-
-Returns:  
-
-  int value;
-
-
---*/
 {
   //
   // change the character to hex
@@ -1328,26 +1287,19 @@ Returns:
   return -1;
 }
 
+/**
+  Add character.
+
+  @param[in] Char -- input char.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
+**/
 EFI_STATUS
+EFIAPI
 HBufferImageAddChar (
   IN  CHAR16  Char
   )
-/*++
-
-Routine Description: 
-
-  Add character
-
-Arguments:  
-
-  Char -- input char
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_OUT_OF_RESOURCES
-
---*/
 {
   HEFI_EDITOR_LINE  *Line;
   HEFI_EDITOR_LINE  *NewLine;
@@ -1403,7 +1355,7 @@ Returns:
     // at the low 4 bits of the last character of a full line
     // so if no next line, need to create a new line
     //
-    if (High == FALSE && FCol == 0x10) {
+    if (!High && FCol == 0x10) {
 
       HBufferImageOnlyLineNeedRefresh = FALSE;
       HBufferImageNeedRefresh         = TRUE;
@@ -1431,7 +1383,7 @@ Returns:
     //
     // if already at end of this line, scroll it to the start of next line
     //
-    if (FCol == 0x10 && High == FALSE) {
+    if (FCol == 0x10 && !High) {
       //
       // definitely has next line
       //
@@ -1469,27 +1421,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Check user specified FileRow and FileCol is in current screen.
+
+  @param[in] FileRow    Row of file position ( start from 1 ).
+
+  @retval TRUE   It's on the current screen.
+  @retval FALSE  It's not on the current screen.
+**/
 BOOLEAN
 HInCurrentScreen (
   IN  UINTN FileRow
   )
-/*++
-
-Routine Description: 
-
-  Check user specified FileRow and FileCol is in current screen
-
-Arguments:  
-
-  FileRow -- Row of file position ( start from 1 )
-
-
-Returns:  
-
-  TRUE
-  FALSE
-
---*/
 {
   if (FileRow >= HBufferImage.LowVisibleRow && FileRow <= HBufferImage.LowVisibleRow + (HMainEditor.ScreenSize.Row - 5) - 1) {
     return TRUE;
@@ -1498,26 +1441,19 @@ Returns:
   return FALSE;
 }
 
+/**
+  Check user specified FileRow is above current screen.
+
+  @param[in] FileRow  Row of file position ( start from 1 ).
+  
+  @retval TRUE   It is above the current screen.
+  @retval FALSE  It is not above the current screen.
+
+**/
 BOOLEAN
 HAboveCurrentScreen (
   IN  UINTN FileRow
   )
-/*++
-
-Routine Description: 
-
-  Check user specified FileRow is above current screen
-
-Arguments:  
-
-  FileRow -- Row of file position ( start from 1 )
-  
-Returns:  
-
-  TRUE
-  FALSE
-
---*/
 {
   if (FileRow < HBufferImage.LowVisibleRow) {
     return TRUE;
@@ -1526,26 +1462,19 @@ Returns:
   return FALSE;
 }
 
+/**
+  Check user specified FileRow is under current screen.
+
+  @param[in] FileRow    Row of file position ( start from 1 ).
+
+  @retval TRUE      It is under the current screen.
+  @retval FALSE     It is not under the current screen.
+
+**/
 BOOLEAN
 HUnderCurrentScreen (
   IN  UINTN FileRow
   )
-/*++
-
-Routine Description: 
-
-  Check user specified FileRow is under current screen
-
-Arguments:  
-
-  FileRow -- Row of file position ( start from 1 )
-
-Returns:  
-
-  TRUE
-  FALSE
-
---*/
 {
   if (FileRow > HBufferImage.LowVisibleRow + (HMainEditor.ScreenSize.Row - 5) - 1) {
     return TRUE;
@@ -1554,29 +1483,20 @@ Returns:
   return FALSE;
 }
 
+/**
+  According to cursor's file position, adjust screen display.
+
+  @param[in] NewFilePosRow    Row of file position ( start from 1 ).
+  @param[in] NewFilePosCol    Column of file position ( start from 1 ).
+  @param[in] HighBits         Cursor will on high4 bits or low4 bits.
+**/
 VOID
 HBufferImageMovePosition (
   IN UINTN    NewFilePosRow,
   IN UINTN    NewFilePosCol,
   IN BOOLEAN  HighBits
   )
-/*++
 
-Routine Description: 
-
-  According to cursor's file position, adjust screen display
-
-Arguments:  
-
-  NewFilePosRow -- Row of file position ( start from 1 )
-  NewFilePosCol -- Column of file position ( start from 1 )   
-  HighBits      -- cursor will on high4 bits or low4 bits
-
-Returns:  
-
-  None
-
---*/
 {
   INTN    RowGap;
   UINTN   Abs;
@@ -1641,7 +1561,7 @@ Returns:
     NewDisplayCol++;
   }
 
-  if (HighBits == FALSE) {
+  if (!HighBits) {
     NewDisplayCol++;
   }
 
@@ -1654,25 +1574,15 @@ Returns:
 
 }
 
+/**
+  Scroll cursor to right.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
 HBufferImageScrollRight (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Scroll cursor to right
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
   HEFI_EDITOR_LINE  *Line;
   UINTN             FRow;
@@ -1722,25 +1632,15 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Scroll cursor to left.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
 HBufferImageScrollLeft (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Scroll cursor to left
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
 
   HEFI_EDITOR_LINE  *Line;
@@ -1781,25 +1681,15 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Scroll cursor to the next line
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
 HBufferImageScrollDown (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Scroll cursor to the next line
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
   HEFI_EDITOR_LINE  *Line;
   UINTN             FRow;
@@ -1836,25 +1726,15 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Scroll cursor to previous line
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
 HBufferImageScrollUp (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Scroll cursor to previous line
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
   HEFI_EDITOR_LINE  *Line;
   UINTN             FRow;
@@ -1880,25 +1760,15 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Scroll cursor to next page
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
 HBufferImagePageDown (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Scroll cursor to next page
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
   HEFI_EDITOR_LINE  *Line;
   UINTN             FRow;
@@ -1943,25 +1813,15 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Scroll cursor to previous page
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
 HBufferImagePageUp (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Scroll cursor to previous page
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
   HEFI_EDITOR_LINE  *Line;
   UINTN             FRow;
@@ -2001,25 +1861,15 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Scroll cursor to start of line
+
+  @retval EFI_SUCCESS  The operation was successful.
+**/
 EFI_STATUS
 HBufferImageHome (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Scroll cursor to start of line
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
   HEFI_EDITOR_LINE  *Line;
   UINTN             FRow;
@@ -2043,25 +1893,15 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Scroll cursor to end of line.
+
+  @retval EFI_SUCCESS  Teh operation was successful.
+**/
 EFI_STATUS
 HBufferImageEnd (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Scroll cursor to end of line
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
   HEFI_EDITOR_LINE  *Line;
   UINTN             FRow;
@@ -2092,6 +1932,11 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Get the size of the open buffer.
+
+  @retval The size in bytes.
+**/
 UINTN
 HBufferImageGetTotalSize (
   VOID
@@ -2122,28 +1967,21 @@ HBufferImageGetTotalSize (
   return Size;
 }
 
+/**
+  Delete character from buffer.
+  
+  @param[in] Pos      Position, Pos starting from 0.
+  @param[in] Count    The Count of characters to delete.
+  @param[OUT] DeleteBuffer    The DeleteBuffer.
+
+  @retval EFI_SUCCESS Success 
+**/
 EFI_STATUS
 HBufferImageDeleteCharacterFromBuffer (
   IN  UINTN         Pos,
   IN  UINTN         Count,
   OUT UINT8         *DeleteBuffer
   )
-/*++
-Routine Description:
-
-  Delete character from buffer
-  
-Arguments:
-
-  Pos - Position, Pos starting from 0
-  Count - Count
-  DeleteBuffer - DeleteBuffer
-
-Returns:
-
-  EFI_SUCCESS Success
-  
---*/
 {
   UINTN             Index;
 
@@ -2264,28 +2102,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Add character to buffer, add before pos.
+
+  @param[in] Pos        Position, Pos starting from 0.
+  @param[in] Count      Count of characters to add.
+  @param[in] AddBuffer  Add buffer.
+
+  @retval EFI_SUCCESS   Success.  
+**/
 EFI_STATUS
 HBufferImageAddCharacterToBuffer (
   IN  UINTN          Pos,
   IN  UINTN          Count,
   IN  UINT8          *AddBuffer
   )
-/*++'
-Routine Description:
-
-  Add character to buffer, add before pos
-
-Arguments:
-
-  Pos - Position, Pos starting from 0
-  Count - Count
-  AddBuffer - Add buffer
-
-Returns:
-
-  EFI_SUCCESS Success
-  
---*/
 {
   INTN              Index;
 
@@ -2378,25 +2209,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Delete the previous character.
+
+  @retval EFI_SUCCESS   The operationw as successful.
+**/
 EFI_STATUS
+EFIAPI
 HBufferImageDoBackspace (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  delete the previous character
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
   HEFI_EDITOR_LINE  *Line;
 
@@ -2447,25 +2269,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Delete current character from line.
+
+  @retval EFI_SUCCESS   The operationw as successful.
+**/
 EFI_STATUS
+EFIAPI
 HBufferImageDoDelete (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Delete current character from line
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
 
   HEFI_EDITOR_LINE  *Line;
@@ -2513,30 +2326,40 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Change the raw buffer to a list of lines for the UI.
+  
+  @param[in] Buffer   The pointer to the buffer to fill.
+  @param[in] Bytes    The size of the buffer in bytes.
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+**/
 EFI_STATUS
+EFIAPI
 HBufferImageBufferToList (
   IN VOID   *Buffer,
   IN UINTN  Bytes
   )
 {
-  UINTN             i;
-  UINTN             j;
+  UINTN             TempI;
+  UINTN             TempJ;
   UINTN             Left;
   HEFI_EDITOR_LINE  *Line;
   UINT8             *BufferPtr;
 
-  i         = 0;
+  TempI         = 0;
   Left      = 0;
   BufferPtr = (UINT8 *) Buffer;
 
   //
   // parse file content line by line
   //
-  while (i < Bytes) {
-    if (Bytes - i >= 0x10) {
+  while (TempI < Bytes) {
+    if (Bytes - TempI >= 0x10) {
       Left = 0x10;
     } else {
-      Left = Bytes - i;
+      Left = Bytes - TempI;
     }
 
     //
@@ -2549,9 +2372,9 @@ HBufferImageBufferToList (
 
     Line->Size = Left;
 
-    for (j = 0; j < Left; j++) {
-      Line->Buffer[j] = BufferPtr[i];
-      i++;
+    for (TempJ = 0; TempJ < Left; TempJ++) {
+      Line->Buffer[TempJ] = BufferPtr[TempI];
+      TempI++;
     }
 
   }
@@ -2569,7 +2392,16 @@ HBufferImageBufferToList (
   return EFI_SUCCESS;
 }
 
+/**
+  Change the list of lines from the UI to a raw buffer.
+  
+  @param[in] Buffer   The pointer to the buffer to fill.
+  @param[in] Bytes    The size of the buffer in bytes.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
+EFIAPI
 HBufferImageListToBuffer (
   IN VOID   *Buffer,
   IN UINTN  Bytes
@@ -2599,6 +2431,7 @@ HBufferImageListToBuffer (
 
     Line = CR (Link, HEFI_EDITOR_LINE, Link, EFI_EDITOR_LINE_LIST);
 
+    //@todo shouldn't this be an error???
     if (Count + Line->Size > Bytes) {
       return EFI_SUCCESS;
     }
@@ -2616,14 +2449,21 @@ HBufferImageListToBuffer (
   return EFI_SUCCESS;
 }
 
+/**
+  Move the mouse in the image buffer.
+
+  @param[in] TextX    The x-coordinate.
+  @param[in] TextY    The y-coordinate.
+**/
 VOID
+EFIAPI
 HBufferImageAdjustMousePosition (
   IN INT32 TextX,
   IN INT32 TextY
   )
 {
-  UINTN X;
-  UINTN Y;
+  UINTN TempX;
+  UINTN TempY;
   UINTN AbsX;
   UINTN AbsY;
 
@@ -2632,7 +2472,7 @@ HBufferImageAdjustMousePosition (
   // This function will change it to MousePosition
   //
   //
-  // get absolute X value
+  // get absolute TempX value
   //
   if (TextX >= 0) {
     AbsX = TextX;
@@ -2640,7 +2480,7 @@ HBufferImageAdjustMousePosition (
     AbsX = -TextX;
   }
   //
-  // get absolute Y value
+  // get absolute TempY value
   //
   if (TextY >= 0) {
     AbsY = TextY;
@@ -2648,48 +2488,48 @@ HBufferImageAdjustMousePosition (
     AbsY = -TextY;
   }
 
-  X = HBufferImage.MousePosition.Column;
-  Y = HBufferImage.MousePosition.Row;
+  TempX = HBufferImage.MousePosition.Column;
+  TempY = HBufferImage.MousePosition.Row;
 
   if (TextX >= 0) {
-    X += TextX;
+    TempX += TextX;
   } else {
-    if (X >= AbsX) {
-      X -= AbsX;
+    if (TempX >= AbsX) {
+      TempX -= AbsX;
     } else {
-      X = 0;
+      TempX = 0;
     }
   }
 
   if (TextY >= 0) {
-    Y += TextY;
+    TempY += TextY;
   } else {
-    if (Y >= AbsY) {
-      Y -= AbsY;
+    if (TempY >= AbsY) {
+      TempY -= AbsY;
     } else {
-      Y = 0;
+      TempY = 0;
     }
   }
   //
   // check whether new mouse column position is beyond screen
   // if not, adjust it
   //
-  if (X >= 10 && X <= (10 + 0x10 * 3 - 1)) {
-    HBufferImage.MousePosition.Column = X;
-  } else if (X < 10) {
+  if (TempX >= 10 && TempX <= (10 + 0x10 * 3 - 1)) {
+    HBufferImage.MousePosition.Column = TempX;
+  } else if (TempX < 10) {
     HBufferImage.MousePosition.Column = 10;
-  } else if (X > (10 + 0x10 * 3 - 1)) {
+  } else if (TempX > (10 + 0x10 * 3 - 1)) {
     HBufferImage.MousePosition.Column = 10 + 0x10 * 3 - 1;
   }
   //
   // check whether new mouse row position is beyond screen
   // if not, adjust it
   //
-  if (Y >= 2 && Y <= (HMainEditor.ScreenSize.Row - 4)) {
-    HBufferImage.MousePosition.Row = Y;
-  } else if (Y < 2) {
+  if (TempY >= 2 && TempY <= (HMainEditor.ScreenSize.Row - 4)) {
+    HBufferImage.MousePosition.Row = TempY;
+  } else if (TempY < 2) {
     HBufferImage.MousePosition.Row = 2;
-  } else if (Y > (HMainEditor.ScreenSize.Row - 4)) {
+  } else if (TempY > (HMainEditor.ScreenSize.Row - 4)) {
     HBufferImage.MousePosition.Row = (HMainEditor.ScreenSize.Row - 4);
   }
 

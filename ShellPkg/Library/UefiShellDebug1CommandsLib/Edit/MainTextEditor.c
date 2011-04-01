@@ -91,7 +91,7 @@ MainCommandSearch (
   VOID
   );
 
-/*
+/**
   search string in file buffer, and replace it with another str
 
   @retval EFI_SUCCESS             The operation was successful.
@@ -589,8 +589,8 @@ MainCommandSearch (
   return EFI_SUCCESS;
 }
 
-/*
-  search string in file buffer, and replace it with another str
+/**
+  Search string in file buffer, and replace it with another str.
 
   @retval EFI_SUCCESS             The operation was successful.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
@@ -1589,7 +1589,6 @@ GetTextY (
   @retval EFI_SUCCESS       The operation was successful.
   @retval EFI_NOT_FOUND     There was no mouse support found.
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 MainEditorHandleMouseInput (

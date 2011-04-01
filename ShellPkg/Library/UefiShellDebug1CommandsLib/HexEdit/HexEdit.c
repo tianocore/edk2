@@ -135,8 +135,8 @@ ShellCommandRunHexEdit (
         Size    = ShellStrToUintn(ShellCommandLineGetRawValue(Package, 2));
       }
     }
-    if (WhatToDo == FileTypeNone && ShellCommandLineGetRawValue(Package, 1) != NULL) {
-        Name      = ShellCommandLineGetRawValue(Package, 1);
+    Name = ShellCommandLineGetRawValue(Package, 1);
+    if (WhatToDo == FileTypeNone && Name != NULL) {
         if (!IsValidFileName(Name)) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Name);
           ShellStatus = SHELL_INVALID_PARAMETER;

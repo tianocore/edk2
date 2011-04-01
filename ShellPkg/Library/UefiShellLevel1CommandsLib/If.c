@@ -825,7 +825,7 @@ ShellCommandRunIf (
   BOOLEAN             CurrentValue;
   END_TAG_TYPE        Ending;
   END_TAG_TYPE        PreviousEnding;
-
+  SCRIPT_FILE         *CurrentScriptFile;
 
   Status = CommandInit();
   ASSERT_EFI_ERROR(Status);
@@ -843,7 +843,8 @@ ShellCommandRunIf (
   //
   // Make sure that an End exists.
   //
-  if (!MoveToTag(GetNextNode, L"endif", L"if", NULL, ShellCommandGetCurrentScriptFile(), TRUE, TRUE, FALSE)) {
+  CurrentScriptFile = ShellCommandGetCurrentScriptFile();
+  if (!MoveToTag(GetNextNode, L"endif", L"if", NULL, CurrentScriptFile, TRUE, TRUE, FALSE)) {
     ShellPrintHiiEx(
       -1, 
       -1, 
@@ -852,9 +853,9 @@ ShellCommandRunIf (
       gShellLevel1HiiHandle, 
       L"EnfIf", 
       L"If", 
-      ShellCommandGetCurrentScriptFile()!=NULL
-        &&ShellCommandGetCurrentScriptFile()->CurrentCommand!=NULL
-          ?ShellCommandGetCurrentScriptFile()->CurrentCommand->Line:0);
+      CurrentScriptFile!=NULL 
+        && CurrentScriptFile->CurrentCommand!=NULL
+        ? CurrentScriptFile->CurrentCommand->Line:0);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -928,7 +929,18 @@ ShellCommandRunIf (
       // build up the next statement for analysis
       //
       if (!BuildNextStatement(CurrentParameter, &EndParameter, &Ending)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_NO_MATCHING), gShellLevel1HiiHandle, L"Then", L"If", ShellCommandGetCurrentScriptFile()->CurrentCommand->Line);
+        CurrentScriptFile = ShellCommandGetCurrentScriptFile();
+        ShellPrintHiiEx(
+          -1, 
+          -1, 
+          NULL, 
+          STRING_TOKEN (STR_SYNTAX_NO_MATCHING), 
+          gShellLevel1HiiHandle, 
+          L"Then", 
+          L"If",
+          CurrentScriptFile!=NULL 
+            && CurrentScriptFile->CurrentCommand!=NULL
+            ? CurrentScriptFile->CurrentCommand->Line:0);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         //
@@ -979,6 +991,7 @@ ShellCommandRunElse (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  SCRIPT_FILE *CurrentScriptFile;
   ASSERT_EFI_ERROR(CommandInit());
 
   if (gEfiShellParametersProtocol->Argc > 1) {
@@ -991,8 +1004,9 @@ ShellCommandRunElse (
     return (SHELL_UNSUPPORTED);
   }
 
+  CurrentScriptFile = ShellCommandGetCurrentScriptFile();
 
-  if (!MoveToTag(GetPreviousNode, L"if", L"endif", NULL, ShellCommandGetCurrentScriptFile(), FALSE, TRUE, FALSE)) {
+  if (!MoveToTag(GetPreviousNode, L"if", L"endif", NULL, CurrentScriptFile, FALSE, TRUE, FALSE)) {
     ShellPrintHiiEx(
       -1, 
       -1, 
@@ -1001,12 +1015,12 @@ ShellCommandRunElse (
       gShellLevel1HiiHandle, 
       L"If", 
       L"Else", 
-      ShellCommandGetCurrentScriptFile()!=NULL
-        &&ShellCommandGetCurrentScriptFile()->CurrentCommand!=NULL
-          ?ShellCommandGetCurrentScriptFile()->CurrentCommand->Line:0);
+      CurrentScriptFile!=NULL 
+        && CurrentScriptFile->CurrentCommand!=NULL
+        ? CurrentScriptFile->CurrentCommand->Line:0);
     return (SHELL_DEVICE_ERROR);
   }
-  if (!MoveToTag(GetPreviousNode, L"if", L"else", NULL, ShellCommandGetCurrentScriptFile(), FALSE, TRUE, FALSE)) {
+  if (!MoveToTag(GetPreviousNode, L"if", L"else", NULL, CurrentScriptFile, FALSE, TRUE, FALSE)) {
     ShellPrintHiiEx(
       -1, 
       -1, 
@@ -1015,13 +1029,13 @@ ShellCommandRunElse (
       gShellLevel1HiiHandle, 
       L"If", 
       L"Else", 
-      ShellCommandGetCurrentScriptFile()!=NULL
-        &&ShellCommandGetCurrentScriptFile()->CurrentCommand!=NULL
-          ?ShellCommandGetCurrentScriptFile()->CurrentCommand->Line:0);
+      CurrentScriptFile!=NULL 
+        && CurrentScriptFile->CurrentCommand!=NULL
+        ? CurrentScriptFile->CurrentCommand->Line:0);
     return (SHELL_DEVICE_ERROR);
   }
 
-  if (!MoveToTag(GetNextNode, L"endif", L"if", NULL, ShellCommandGetCurrentScriptFile(), FALSE, FALSE, FALSE)) {
+  if (!MoveToTag(GetNextNode, L"endif", L"if", NULL, CurrentScriptFile, FALSE, FALSE, FALSE)) {
     ShellPrintHiiEx(
       -1, 
       -1, 
@@ -1030,9 +1044,9 @@ ShellCommandRunElse (
       gShellLevel1HiiHandle, 
       L"EndIf", 
       "Else", 
-      ShellCommandGetCurrentScriptFile()!=NULL
-        &&ShellCommandGetCurrentScriptFile()->CurrentCommand!=NULL
-          ?ShellCommandGetCurrentScriptFile()->CurrentCommand->Line:0);
+      CurrentScriptFile!=NULL 
+        && CurrentScriptFile->CurrentCommand!=NULL
+        ? CurrentScriptFile->CurrentCommand->Line:0);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -1052,6 +1066,7 @@ ShellCommandRunEndIf (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  SCRIPT_FILE *CurrentScriptFile;
   ASSERT_EFI_ERROR(CommandInit());
 
   if (gEfiShellParametersProtocol->Argc > 1) {
@@ -1064,7 +1079,8 @@ ShellCommandRunEndIf (
     return (SHELL_UNSUPPORTED);
   }
 
-  if (!MoveToTag(GetPreviousNode, L"if", L"endif", NULL, ShellCommandGetCurrentScriptFile(), FALSE, TRUE, FALSE)) {
+  CurrentScriptFile = ShellCommandGetCurrentScriptFile();
+  if (!MoveToTag(GetPreviousNode, L"if", L"endif", NULL, CurrentScriptFile, FALSE, TRUE, FALSE)) {
     ShellPrintHiiEx(
       -1, 
       -1, 
@@ -1073,9 +1089,9 @@ ShellCommandRunEndIf (
       gShellLevel1HiiHandle, 
       L"If", 
       L"EndIf", 
-      ShellCommandGetCurrentScriptFile()!=NULL
-        &&ShellCommandGetCurrentScriptFile()->CurrentCommand!=NULL
-          ?ShellCommandGetCurrentScriptFile()->CurrentCommand->Line:0);
+      CurrentScriptFile!=NULL 
+        && CurrentScriptFile->CurrentCommand!=NULL
+        ? CurrentScriptFile->CurrentCommand->Line:0);
     return (SHELL_DEVICE_ERROR);
   }
 

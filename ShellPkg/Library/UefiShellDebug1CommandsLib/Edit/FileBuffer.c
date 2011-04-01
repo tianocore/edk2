@@ -357,7 +357,7 @@ FileBufferRestoreMousePosition (
         CurrentLine = FileBuffer.CurrentLine;
         Line        = MoveLine (FRow - FileBuffer.FilePosition.Row);
 
-        if (FColumn > Line->Size) {
+        if (Line == NULL || FColumn > Line->Size) {
           HasCharacter = FALSE;
         }
 
@@ -1367,7 +1367,7 @@ GetNewLine (
   Change a Unicode string to an ASCII string.
 
   @param[in] UStr     The Unicode string.
-  @param[in] Lenght   The maximum size of AStr.
+  @param[in] Length   The maximum size of AStr.
   @param[out] AStr    ASCII string to pass out.
 
   @return The actuall length.
@@ -1375,9 +1375,9 @@ GetNewLine (
 UINTN
 EFIAPI
 UnicodeToAscii (
-  IN CONST CHAR16  *UStr,
-  IN CONST UINTN   Length,
-  OUT CHAR8   *AStr
+  IN CONST CHAR16   *UStr,
+  IN CONST UINTN    Length,
+  OUT CHAR8         *AStr
   )
 {
   UINTN Index;
@@ -1621,7 +1621,7 @@ FileBufferSave (
   //
   // now everything is ready , you can set the new file name to filebuffer
   //
-  if (StrCmp (FileName, FileBuffer.FileName) != 0) {
+  if (FileName != NULL && FileBuffer.FileName != NULL && StrCmp (FileName, FileBuffer.FileName) != 0) {
     //
     // not the same
     //
