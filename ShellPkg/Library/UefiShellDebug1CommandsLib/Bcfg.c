@@ -324,14 +324,10 @@ BcfgAddDebug1(
       }
     }
   }
-  if (FileNode != NULL) {
-    FreePool (FileNode);
-  }
 
 //
 //If always Free FilePath, will free devicepath in system when use "addh"
 //
-
   if (FilePath!=NULL && !UseHandle) {
     FreePool (FilePath);
   }
@@ -467,6 +463,14 @@ BcfgMoveDebug1(
   return (SHELL_SUCCESS);
 }
 
+/**
+  Function to add optional data to an option.
+
+  @param[in] OptData      The optional data to add.
+  @param[in] Target       The target of the operation.
+
+  @retval SHELL_SUCCESS   The operation was succesful.
+**/
 SHELL_STATUS
 EFIAPI
 BcfgAddOptDebug1(
