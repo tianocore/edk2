@@ -2,7 +2,7 @@
 //  
 //    Driver Health formset.
 //  
-//  Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+//  Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
@@ -13,14 +13,7 @@
 //  
 //**/
 
-#define DRIVER_HEALTH_FORMSET_GUID  { 0xf76e0a70, 0xb5ed, 0x4c38, 0xac, 0x9a, 0xe5, 0xf5, 0x4b, 0xf1, 0x6e, 0x34 }
-
-#define LABEL_DRIVER_HEALTH                0x2000
-#define LABEL_DRIVER_HEALTH_END            0x2001
-#define LABEL_DRIVER_HEALTH_REAPIR_ALL     0x3000
-#define LABEL_DRIVER_HEALTH_REAPIR_ALL_END 0x3001
-
-#define DRIVER_HEALTH_FORM_ID              0x1001
+#include "DeviceManagerVfr.h"
 
 formset
   guid      = DRIVER_HEALTH_FORMSET_GUID,

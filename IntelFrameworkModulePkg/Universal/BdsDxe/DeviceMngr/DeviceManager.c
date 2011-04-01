@@ -1,7 +1,7 @@
 /** @file
   The platform device manager reference implementation
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1168,6 +1168,7 @@ CallDriverHealth (
   LIST_ENTRY                  *Link;
   EFI_DEVICE_PATH_PROTOCOL    *DriverDevicePath;
   UINTN                       Length;
+  BOOLEAN                     RebootRequired;
 
   Index               = 0;
   Length              = 0;
@@ -1304,30 +1305,31 @@ CallDriverHealth (
       //
       switch(DriverHealthInfo->HealthStatus) {
       case EfiDriverHealthStatusRepairRequired:
-        Length = StrLen (GetStringById (STRING_TOKEN (STR_REPAIR_REQUIRED)));
-        StrnCat (String, GetStringById (STRING_TOKEN (STR_REPAIR_REQUIRED)), Length);
+        TmpString = GetStringById (STRING_TOKEN (STR_REPAIR_REQUIRED));
+        StrCat (String, TmpString);
         break;
       case EfiDriverHealthStatusConfigurationRequired:
-        Length = StrLen (GetStringById (STRING_TOKEN (STR_CONFIGURATION_REQUIRED)));
-        StrnCat (String, GetStringById (STRING_TOKEN (STR_CONFIGURATION_REQUIRED)), Length);
+        TmpString = GetStringById (STRING_TOKEN (STR_CONFIGURATION_REQUIRED));
+        StrCat (String, TmpString);
         break;
       case EfiDriverHealthStatusFailed:
-        Length = StrLen (GetStringById (STRING_TOKEN (STR_OPERATION_FAILED)));
-        StrnCat (String, GetStringById (STRING_TOKEN (STR_OPERATION_FAILED)), Length);
+        TmpString = GetStringById (STRING_TOKEN (STR_OPERATION_FAILED));
+        StrCat (String, TmpString);
         break;
       case EfiDriverHealthStatusReconnectRequired:
-        Length = StrLen (GetStringById (STRING_TOKEN (STR_RECONNECT_REQUIRED)));
-        StrnCat (String, GetStringById (STRING_TOKEN (STR_RECONNECT_REQUIRED)), Length);
+        TmpString = GetStringById (STRING_TOKEN (STR_RECONNECT_REQUIRED));
+        StrCat (String, TmpString);
         break;
       case EfiDriverHealthStatusRebootRequired:
-        Length = StrLen (GetStringById (STRING_TOKEN (STR_REBOOT_REQUIRED)));
-        StrnCat (String, GetStringById (STRING_TOKEN (STR_REBOOT_REQUIRED)), Length);
+        TmpString = GetStringById (STRING_TOKEN (STR_REBOOT_REQUIRED));
+        StrCat (String, TmpString);
         break;
       default:
-        Length = StrLen (GetStringById (STRING_TOKEN (STR_DRIVER_HEALTH_HEALTHY)));
-        StrnCat (String, GetStringById (STRING_TOKEN (STR_DRIVER_HEALTH_HEALTHY)), Length);
+        TmpString = GetStringById (STRING_TOKEN (STR_DRIVER_HEALTH_HEALTHY));
+        StrCat (String, TmpString);
         break;
       }
+      FreePool (TmpString);
     }
 
     Token = HiiSetString (HiiHandle, 0, String, NULL);
@@ -1439,15 +1441,20 @@ CallDriverHealth (
         //
         // Process the driver's healthy status for the specify module
         //
+        RebootRequired = FALSE;
         ProcessSingleControllerHealth (
           DriverHealthInfo->DriverHealth,
           DriverHealthInfo->ControllerHandle,      
           DriverHealthInfo->ChildHandle,
           DriverHealthInfo->HealthStatus,
           &(DriverHealthInfo->MessageList),
-          DriverHealthInfo->HiiHandle
-       );  
-       break;
+          DriverHealthInfo->HiiHandle,
+          &RebootRequired
+          );
+        if (RebootRequired) {
+          gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+        }
+        break;
       }
       Index++;
       Link = GetNextNode (&DriverHealthList, Link);
@@ -1934,15 +1941,17 @@ PlaformHealthStatusCheck (
                             ChildHandle.  This is an optional parameter that may be NULL.
   @param FormHiiHandle      The HII handle for an HII form associated with the 
                             controller specified by ControllerHandle and ChildHandle.
+  @param RebootRequired     Indicate whether a reboot is required to repair the controller.
 **/
 VOID
 ProcessSingleControllerHealth (
-    IN  EFI_DRIVER_HEALTH_PROTOCOL         *DriverHealth,
-    IN  EFI_HANDLE                         ControllerHandle, OPTIONAL
-    IN  EFI_HANDLE                         ChildHandle,      OPTIONAL
-    IN  EFI_DRIVER_HEALTH_STATUS           HealthStatus,
-    IN  EFI_DRIVER_HEALTH_HII_MESSAGE      **MessageList,    OPTIONAL
-    IN  EFI_HII_HANDLE                     FormHiiHandle
+  IN  EFI_DRIVER_HEALTH_PROTOCOL         *DriverHealth,
+  IN  EFI_HANDLE                         ControllerHandle, OPTIONAL
+  IN  EFI_HANDLE                         ChildHandle,      OPTIONAL
+  IN  EFI_DRIVER_HEALTH_STATUS           HealthStatus,
+  IN  EFI_DRIVER_HEALTH_HII_MESSAGE      **MessageList,    OPTIONAL
+  IN  EFI_HII_HANDLE                     FormHiiHandle,
+  IN OUT BOOLEAN                         *RebootRequired
   )
 {
   EFI_STATUS                         Status;
@@ -1954,8 +1963,8 @@ ProcessSingleControllerHealth (
   // reach a terminal status. The status from EfiDriverHealthStatusRepairRequired after repair 
   // will be in (Health, Failed, Configuration Required).
   //
-  while( LocalHealthStatus == EfiDriverHealthStatusConfigurationRequired ||
-         LocalHealthStatus == EfiDriverHealthStatusRepairRequired) {
+  while(LocalHealthStatus == EfiDriverHealthStatusConfigurationRequired ||
+        LocalHealthStatus == EfiDriverHealthStatusRepairRequired) {
 
     if (LocalHealthStatus == EfiDriverHealthStatusRepairRequired) {
       Status = DriverHealth->Repair (
@@ -1971,16 +1980,23 @@ ProcessSingleControllerHealth (
     // (Healthy, Reboot Required, Failed, Reconnect Required, Repair Required).   
     //
     if (LocalHealthStatus == EfiDriverHealthStatusConfigurationRequired) {
-      Status = gFormBrowser2->SendForm (
-                                gFormBrowser2,
-                                &FormHiiHandle,
-                                1,
-                                &gEfiHiiDriverHealthFormsetGuid,
-                                0,
-                                NULL,
-                                NULL
-                                );
-      ASSERT( !EFI_ERROR (Status));
+      if (FormHiiHandle != NULL) {
+        Status = gFormBrowser2->SendForm (
+                                  gFormBrowser2,
+                                  &FormHiiHandle,
+                                  1,
+                                  &gEfiHiiDriverHealthFormsetGuid,
+                                  0,
+                                  NULL,
+                                  NULL
+                                  );
+        ASSERT( !EFI_ERROR (Status));
+      } else {
+        //
+        // Exit the loop in case no FormHiiHandle is supplied to prevent dead-loop
+        //
+        break;
+      }
     }
 
     Status = DriverHealth->GetHealthStatus (
@@ -1991,11 +2007,11 @@ ProcessSingleControllerHealth (
                               NULL,
                               &FormHiiHandle
                               );
-   ASSERT_EFI_ERROR (Status);
+    ASSERT_EFI_ERROR (Status);
 
-   if (*MessageList != NULL) {
+    if (*MessageList != NULL) {
       ProcessMessages (*MessageList);
-   }  
+    }  
   }
   
   //
@@ -2010,7 +2026,7 @@ ProcessSingleControllerHealth (
   // Check for RebootRequired or ReconnectRequired
   //
   if (LocalHealthStatus == EfiDriverHealthStatusRebootRequired) {
-    gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+    *RebootRequired = TRUE;
   }
   
   //
@@ -2019,12 +2035,13 @@ ProcessSingleControllerHealth (
   if (LocalHealthStatus == EfiDriverHealthStatusReconnectRequired) {
     Status = gBS->DisconnectController (ControllerHandle, NULL, NULL);
     if (EFI_ERROR (Status)) {
-        //
-        // Disconnect failed.  Need to promote reconnect to a reboot.
-        //
-        gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+      //
+      // Disconnect failed.  Need to promote reconnect to a reboot.
+      //
+      *RebootRequired = TRUE;
+    } else {
+      gBS->ConnectController (ControllerHandle, NULL, NULL, TRUE);
     }
-    gBS->ConnectController (ControllerHandle, NULL, NULL, TRUE);
   }
 }
 
@@ -2117,12 +2134,16 @@ PlatformRepairAll (
 { 
   DRIVER_HEALTH_INFO          *DriverHealthInfo;
   LIST_ENTRY                  *Link;
+  BOOLEAN                     RebootRequired;
 
   ASSERT (DriverHealthList != NULL);
 
-  Link = GetFirstNode (DriverHealthList);
+  RebootRequired = FALSE;
 
-  while (!IsNull (DriverHealthList, Link)) {   
+  for ( Link = GetFirstNode (DriverHealthList)
+      ; !IsNull (DriverHealthList, Link)
+      ; Link = GetNextNode (DriverHealthList, Link)
+      ) {
     DriverHealthInfo = DEVICE_MANAGER_HEALTH_INFO_FROM_LINK (Link);
     //
     // Do driver health status operation by each link node
@@ -2130,15 +2151,18 @@ PlatformRepairAll (
     ASSERT (DriverHealthInfo != NULL);
 
     ProcessSingleControllerHealth ( 
-        DriverHealthInfo->DriverHealth,
-        DriverHealthInfo->ControllerHandle,
-        DriverHealthInfo->ChildHandle,
-        DriverHealthInfo->HealthStatus,
-        &(DriverHealthInfo->MessageList),
-        DriverHealthInfo->HiiHandle
-        );
+      DriverHealthInfo->DriverHealth,
+      DriverHealthInfo->ControllerHandle,
+      DriverHealthInfo->ChildHandle,
+      DriverHealthInfo->HealthStatus,
+      &(DriverHealthInfo->MessageList),
+      DriverHealthInfo->HiiHandle,
+      &RebootRequired
+      );
+  }
 
-    Link = GetNextNode (DriverHealthList, Link);
+  if (RebootRequired) {
+    gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
   }
 }
 
