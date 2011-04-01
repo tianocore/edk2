@@ -528,7 +528,7 @@ UpdateStdInStdOutStdErr(
   ErrAppend       = FALSE;
   OutAppend       = FALSE;
   CommandLineCopy = NULL;
-  FirstLocation   = (CHAR16*)(-1);
+  FirstLocation   = NULL;
 
   if (ShellParameters == NULL || SystemTableInfo == NULL || OldStdIn == NULL || OldStdOut == NULL || OldStdErr == NULL) {
     return (EFI_INVALID_PARAMETER);
@@ -551,6 +551,7 @@ UpdateStdInStdOutStdErr(
   CommandLineCopy = StrnCatGrow(&CommandLineCopy, NULL, NewCommandLine, 0);
   Status          = EFI_SUCCESS;
   Split           = NULL;
+  FirstLocation   = CommandLineCopy + StrLen(CommandLineCopy);
 
   StripQuotes(CommandLineCopy);
 
@@ -810,7 +811,7 @@ UpdateStdInStdOutStdErr(
     }
   }
 
-  if (FirstLocation != (CHAR16*)(-1) 
+  if (FirstLocation != CommandLineCopy + StrLen(CommandLineCopy)
     && ((UINTN)(FirstLocation - CommandLineCopy) < StrLen(NewCommandLine))
     ){
     *(NewCommandLine + (UINTN)(FirstLocation - CommandLineCopy)) = CHAR_NULL;
