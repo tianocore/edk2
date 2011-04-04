@@ -35,8 +35,10 @@ ShellCommandRunEfiCompress (
   SHELL_FILE_HANDLE   InShellFileHandle;
   SHELL_FILE_HANDLE   OutShellFileHandle;
   UINT64              OutSize;
+  UINT64              OutSize2;
   VOID                *OutBuffer;
   UINT64              InSize;
+  UINT64              InSize2;
   VOID                *InBuffer;
   CHAR16              *InFileName;
   CONST CHAR16        *OutFileName;
@@ -111,7 +113,8 @@ ShellCommandRunEfiCompress (
           ASSERT_EFI_ERROR(Status);
           InBuffer = AllocateZeroPool((UINTN)InSize);
           ASSERT(InBuffer != NULL);
-          Status = gEfiShellProtocol->ReadFile(InShellFileHandle, &((UINTN)InSize), InBuffer);
+          InSize2 = (UINTN)InSize;
+          Status = gEfiShellProtocol->ReadFile(InShellFileHandle, &InSize2, InBuffer);
           ASSERT_EFI_ERROR(Status);
           Status = Compress(InBuffer, InSize, OutBuffer, &OutSize);
           if (Status == EFI_BUFFER_TOO_SMALL) {
@@ -123,7 +126,8 @@ ShellCommandRunEfiCompress (
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_EFI_COMPRESS_FAIL), gShellDebug1HiiHandle, Status);
             ShellStatus = SHELL_DEVICE_ERROR;
           } else {
-            Status = gEfiShellProtocol->WriteFile(OutShellFileHandle, &((UINTN)OutSize), OutBuffer);
+            OutSize2 = (UINTN)OutSize;
+            Status = gEfiShellProtocol->WriteFile(OutShellFileHandle, &OutSize2, OutBuffer);
             if (EFI_ERROR(Status)) {
               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_WRITE_FAIL), gShellDebug1HiiHandle, OutFileName, Status);
               ShellStatus = SHELL_DEVICE_ERROR;
