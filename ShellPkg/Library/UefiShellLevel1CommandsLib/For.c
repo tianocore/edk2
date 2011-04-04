@@ -565,7 +565,9 @@ ShellCommandRunFor (
           Info->RemoveSubstAlias  = TRUE;
         }
       }
-      CurrentScriptFile->CurrentCommand->Data = Info;
+      if (CurrentScriptFile->CurrentCommand != NULL) {
+        CurrentScriptFile->CurrentCommand->Data = Info;
+      }
     } else {
       ShellPrintHiiEx(
         -1, 

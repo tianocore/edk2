@@ -113,14 +113,20 @@ HandleVol(
     Size2 = StrSize(SysInfo->VolumeLabel);
     if (Size1 > Size2) {
       SysInfo = ReallocatePool((UINTN)SysInfo->Size, (UINTN)SysInfo->Size + Size1 - Size2, SysInfo);
+      if (SysInfo == NULL) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle);
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
+      } 
     }
-    StrCpy ((CHAR16 *) SysInfo->VolumeLabel, Name);
-    SysInfo->Size = SIZE_OF_EFI_FILE_SYSTEM_INFO + Size1;
-    Status = EfiFpHandle->SetInfo(
-      EfiFpHandle,
-      &gEfiFileSystemInfoGuid,
-      (UINTN)SysInfo->Size,
-      SysInfo);
+    if (SysInfo != NULL) {
+      StrCpy ((CHAR16 *) SysInfo->VolumeLabel, Name);
+      SysInfo->Size = SIZE_OF_EFI_FILE_SYSTEM_INFO + Size1;
+      Status = EfiFpHandle->SetInfo(
+        EfiFpHandle,
+        &gEfiFileSystemInfoGuid,
+        (UINTN)SysInfo->Size,
+        SysInfo);
+    }
   }  
 
   FreePool(SysInfo);
@@ -154,22 +160,24 @@ HandleVol(
   
   ASSERT(SysInfo != NULL);
 
-  //
-  // print VolumeInfo table
-  //
-  ShellPrintHiiEx (
-    0,
-    gST->ConOut->Mode->CursorRow,
-    NULL,
-    STRING_TOKEN (STR_VOL_VOLINFO),
-    gShellLevel2HiiHandle,
-    SysInfo->VolumeLabel,
-    SysInfo->ReadOnly?L"r":L"rw",
-    SysInfo->VolumeSize,
-    SysInfo->FreeSpace,
-    SysInfo->BlockSize
-   );
-  SHELL_FREE_NON_NULL(SysInfo);
+  if (SysInfo != NULL) {
+    //
+    // print VolumeInfo table
+    //
+    ShellPrintHiiEx (
+      0,
+      gST->ConOut->Mode->CursorRow,
+      NULL,
+      STRING_TOKEN (STR_VOL_VOLINFO),
+      gShellLevel2HiiHandle,
+      SysInfo->VolumeLabel,
+      SysInfo->ReadOnly?L"r":L"rw",
+      SysInfo->VolumeSize,
+      SysInfo->FreeSpace,
+      SysInfo->BlockSize
+     );
+    SHELL_FREE_NON_NULL(SysInfo);
+  }
 
   return (ShellStatus);
 }

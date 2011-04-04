@@ -205,15 +205,20 @@ ShellCommandRunSetVar (
           Data++;
           Data++;
           Buffer = AllocateZeroPool(StrSize(Data));
-          UnicodeSPrint(Buffer, StrSize(Data), L"%s", Data);
-          ((CHAR16*)Buffer)[StrLen(Buffer)-1] = CHAR_NULL;
-
-          Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, StrSize(Buffer)-sizeof(CHAR16), Buffer);
-          if (EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, &Guid, VariableName, Status);
-            ShellStatus = SHELL_ACCESS_DENIED;
+          if (Buffer == NULL) {
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle);
+            ShellStatus = SHELL_OUT_OF_RESOURCES;
           } else {
-            ASSERT(ShellStatus == SHELL_SUCCESS);
+            UnicodeSPrint(Buffer, StrSize(Data), L"%s", Data);
+            ((CHAR16*)Buffer)[StrLen(Buffer)-1] = CHAR_NULL;
+
+            Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, StrSize(Buffer)-sizeof(CHAR16), Buffer);
+            if (EFI_ERROR(Status)) {
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, &Guid, VariableName, Status);
+              ShellStatus = SHELL_ACCESS_DENIED;
+            } else {
+              ASSERT(ShellStatus == SHELL_SUCCESS);
+            }
           }
         } else if (StrnCmp(Data, L"--", 2) == 0) {
           //

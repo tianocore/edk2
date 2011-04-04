@@ -2760,7 +2760,7 @@ FileBufferMovePosition (
       //
       FileBuffer.FilePosition.Column = NewFilePosCol;
       if (ColGap < 0) {
-        Abs = -ColGap;
+        Abs = (UINTN)(-ColGap);
         FileBuffer.DisplayPosition.Column -= Abs;
       } else {
         FileBuffer.DisplayPosition.Column += ColGap;
