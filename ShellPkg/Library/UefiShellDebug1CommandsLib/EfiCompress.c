@@ -35,10 +35,10 @@ ShellCommandRunEfiCompress (
   SHELL_FILE_HANDLE   InShellFileHandle;
   SHELL_FILE_HANDLE   OutShellFileHandle;
   UINT64              OutSize;
-  UINT64              OutSize2;
+  UINTN               OutSize2;
   VOID                *OutBuffer;
   UINT64              InSize;
-  UINT64              InSize2;
+  UINTN               InSize2;
   VOID                *InBuffer;
   CHAR16              *InFileName;
   CONST CHAR16        *OutFileName;
@@ -113,8 +113,8 @@ ShellCommandRunEfiCompress (
           ASSERT_EFI_ERROR(Status);
           InBuffer = AllocateZeroPool((UINTN)InSize);
           ASSERT(InBuffer != NULL);
-          InSize2 = (UINTN)InSize;
           Status = gEfiShellProtocol->ReadFile(InShellFileHandle, &InSize2, InBuffer);
+          InSize = InSize2;
           ASSERT_EFI_ERROR(Status);
           Status = Compress(InBuffer, InSize, OutBuffer, &OutSize);
           if (Status == EFI_BUFFER_TOO_SMALL) {
