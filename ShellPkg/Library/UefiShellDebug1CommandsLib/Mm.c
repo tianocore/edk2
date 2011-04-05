@@ -160,7 +160,7 @@ GetHex (
     }
 
     if ((TempChar >= '0' && TempChar <= '9') || (TempChar >= 'A' && TempChar <= 'F')) {
-      TempUint     = TempUint << 4 | TempChar - (TempChar >= 'A' ? 'A' - 10 : '0');
+      TempUint     = (TempUint << 4) | (TempChar - (TempChar >= 'A' ? 'A' - 10 : '0'));
 
       Find  = TRUE;
     } else {
