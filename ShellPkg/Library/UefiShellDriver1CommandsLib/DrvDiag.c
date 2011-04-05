@@ -211,7 +211,7 @@ DoDiagnostics (
                 FreePool(Language);
               }
             } 
-            if (Found == FALSE && (Lang == NULL||(Lang!=NULL&&Lang[2]!='-'))){
+            if (!Found && (Lang == NULL||(Lang!=NULL&&(Lang[2]!='-')))){
               Status = gBS->OpenProtocol(
                 DriverHandleList[DriverHandleListLoop],
                 &gEfiDriverDiagnosticsProtocolGuid,

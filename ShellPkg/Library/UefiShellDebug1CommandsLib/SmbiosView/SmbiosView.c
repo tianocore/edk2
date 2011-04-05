@@ -14,7 +14,7 @@
 
 #include "../UefiShellDebug1CommandsLib.h"
 #include "LibSmbiosView.h"
-#include "smbiosview.h"
+#include "SmbiosView.h"
 #include "PrintInfo.h"
 #include "QueryTable.h"
 
@@ -32,6 +32,12 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {NULL, TypeMax}
   };
 
+/**
+  Function for 'smbiosview' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunSmbiosView (
@@ -197,7 +203,7 @@ SMBiosView (
   // structure table head.
   //
 
-  SMBIOS_STRUCTURE_POINTER  pStruct;
+  SMBIOS_STRUCTURE_POINTER  SmbiosStruct;
   SMBIOS_STRUCTURE_TABLE    *SMBiosTable;
 
   SMBiosTable = NULL;
@@ -269,14 +275,14 @@ SMBiosView (
         break;
       }
       Offset      = (UINT16) (Offset + Length);
-      pStruct.Raw = Buffer;
+      SmbiosStruct.Raw = Buffer;
 
       //
       // if QueryType==Random, print this structure.
       // if QueryType!=Random, but Hdr->Type==QueryType, also print it.
       // only if QueryType != Random and Hdr->Type != QueryType, skiped it.
       //
-      if (QueryType != STRUCTURE_TYPE_RANDOM && pStruct.Hdr->Type != QueryType) {
+      if (QueryType != STRUCTURE_TYPE_RANDOM && SmbiosStruct.Hdr->Type != QueryType) {
         continue;
       }
 
@@ -284,8 +290,8 @@ SMBiosView (
       ShellPrintHiiEx(-1,-1,NULL,
         STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_TYPE_HANDLE_DUMP_STRUCT),
         gShellDebug1HiiHandle,
-        pStruct.Hdr->Type,
-        pStruct.Hdr->Handle
+        SmbiosStruct.Hdr->Type,
+        SmbiosStruct.Hdr->Handle
        );
       ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_INDEX_LENGTH), gShellDebug1HiiHandle, Index, Length);
       //
@@ -312,12 +318,12 @@ SMBiosView (
         //
         // check structure legality
         //
-        SmbiosCheckStructure (&pStruct);
+        SmbiosCheckStructure (&SmbiosStruct);
 
         //
         // Print structure information
         //
-        SmbiosPrintStructure (&pStruct, gShowType);
+        SmbiosPrintStructure (&SmbiosStruct, gShowType);
         ShellPrintEx(-1,-1,L"\n");
 
 /*
@@ -363,9 +369,9 @@ InitSmbiosTableStatistics (
   UINT16                    Offset;
   UINT16                    Index;
 
-  SMBIOS_STRUCTURE_POINTER  pStruct;
+  SMBIOS_STRUCTURE_POINTER  SmbiosStruct;
   SMBIOS_STRUCTURE_TABLE    *SMBiosTable;
-  STRUCTURE_STATISTICS      *pStatistics;
+  STRUCTURE_STATISTICS      *StatisticsPointer;
 
   SMBiosTable = NULL;
   LibSmbiosGetEPS (&SMBiosTable);
@@ -394,7 +400,7 @@ InitSmbiosTableStatistics (
   }
 
   Offset      = 0;
-  pStatistics = mStatisticsTable;
+  StatisticsPointer = mStatisticsTable;
 
   //
   // search from the first one
@@ -415,19 +421,19 @@ InitSmbiosTableStatistics (
       break;
     }
 
-    pStruct.Raw = Buffer;
+    SmbiosStruct.Raw = Buffer;
     Offset      = (UINT16) (Offset + Length);
 
     //
     // general statistics
     //
-    pStatistics->Index  = Index;
-    pStatistics->Type   = pStruct.Hdr->Type;
-    pStatistics->Handle = pStruct.Hdr->Handle;
-    pStatistics->Length = Length;
-    pStatistics->Addr   = Offset;
+    StatisticsPointer->Index  = Index;
+    StatisticsPointer->Type   = SmbiosStruct.Hdr->Type;
+    StatisticsPointer->Handle = SmbiosStruct.Hdr->Handle;
+    StatisticsPointer->Length = Length;
+    StatisticsPointer->Addr   = Offset;
 
-    pStatistics         = &mStatisticsTable[Index];
+    StatisticsPointer         = &mStatisticsTable[Index];
   }
 
   return EFI_SUCCESS;
@@ -448,7 +454,7 @@ DisplayStatisticsTable (
 {
   UINTN                   Index;
   UINTN                   Num;
-  STRUCTURE_STATISTICS    *pStatistics;
+  STRUCTURE_STATISTICS    *StatisticsPointer;
   SMBIOS_STRUCTURE_TABLE  *SMBiosTable;
 
   SMBiosTable = NULL;
@@ -477,22 +483,22 @@ DisplayStatisticsTable (
   }
 
   ShellPrintEx(-1,-1,L"============================================================\n");
-  pStatistics = &mStatisticsTable[0];
+  StatisticsPointer = &mStatisticsTable[0];
   Num         = SMBiosTable->NumberOfSmbiosStructures;
   //
   // display statistics table content
   //
   for (Index = 1; Index <= Num; Index++) {
-    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_INDEX), gShellDebug1HiiHandle, pStatistics->Index);
-    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_TYPE), gShellDebug1HiiHandle, pStatistics->Type);
-    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_HANDLE), gShellDebug1HiiHandle, pStatistics->Handle);
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_INDEX), gShellDebug1HiiHandle, StatisticsPointer->Index);
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_TYPE), gShellDebug1HiiHandle, StatisticsPointer->Type);
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_HANDLE), gShellDebug1HiiHandle, StatisticsPointer->Handle);
     if (Option >= SHOW_DETAIL) {
-      ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_OFFSET), gShellDebug1HiiHandle, pStatistics->Addr);
-      ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_LENGTH), gShellDebug1HiiHandle, pStatistics->Length);
+      ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_OFFSET), gShellDebug1HiiHandle, StatisticsPointer->Addr);
+      ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_LENGTH), gShellDebug1HiiHandle, StatisticsPointer->Length);
     }
 
     ShellPrintEx(-1,-1,L"\n");
-    pStatistics = &mStatisticsTable[Index];
+    StatisticsPointer = &mStatisticsTable[Index];
 /*
     //
     // Display 20 lines and wait for a page break

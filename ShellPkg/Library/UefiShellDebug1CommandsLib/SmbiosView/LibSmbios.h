@@ -1,7 +1,7 @@
 /** @file
   Lib include  for SMBIOS services. Used to get system serial number and GUID
 
-  Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef _LIB_SMBIOS_H
-#define _LIB_SMBIOS_H
+#ifndef _LIB_SMBIOS_H_
+#define _LIB_SMBIOS_H_
 
 //
 // Define SMBIOS tables.
@@ -215,14 +215,14 @@ typedef struct {
   UINT8         DevFuncNum;
 } SMBIOS_TYPE9;
 
-typedef struct DeviceStruct {
+typedef struct _DEVICE_STRUCTURE {
   UINT8         DeviceType;
   SMBIOS_STRING DescriptionString;
-} DeviceStruct;
+} DEVICE_STRUCTURE;
 
 typedef struct {
   SMBIOS_HEADER Hdr;
-  DeviceStruct  Device[1];
+  DEVICE_STRUCTURE  Device[1];
 } SMBIOS_TYPE10;
 
 typedef struct {
@@ -239,7 +239,7 @@ typedef struct {
   SMBIOS_HEADER Hdr;
   UINT8         InstallableLanguages;
   UINT8         Flags;
-  UINT8         reserved[15];
+  UINT8         Reserved[15];
   SMBIOS_STRING CurrentLanguages;
 } SMBIOS_TYPE13;
 
@@ -622,17 +622,19 @@ typedef union {
 
 #pragma pack()
 
-CHAR8         *
+/**
+  Return SMBIOS string given the string number.
+
+  @param[in] Smbios         Pointer to SMBIOS structure.
+  @param[in] StringNumber   String number to return. -1 is used to skip all strings and
+                            point to the next SMBIOS structure.
+
+  @return Pointer to string, or pointer to next SMBIOS strcuture if StringNumber == -1
+**/
+CHAR8*
 LibGetSmbiosString (
-  IN  SMBIOS_STRUCTURE_POINTER      *Smbios,
-  IN  UINT16                        StringNumber
+  IN  SMBIOS_STRUCTURE_POINTER    *Smbios,
+  IN  UINT16                      StringNumber
   );
-
-EFI_STATUS
-LibGetSmbiosSystemGuidAndSerialNumber (
-  IN  EFI_GUID                      *SystemGuid,
-  OUT CHAR8                         **SystemSerialNumber
-  );
-
 
 #endif

@@ -12,7 +12,7 @@
 
 **/
 
-#if !defined (_SHELL_C_ENTRY_LIB_)
+#ifndef _SHELL_C_ENTRY_LIB_
 #define _SHELL_C_ENTRY_LIB_
 
 /**

@@ -14,6 +14,11 @@
 
 #include "HexEditor.h"
 
+typedef struct {
+  UINT8 *Buffer;
+  UINTN Size;
+} HEFI_EDITOR_CLIPBOARD;
+
 HEFI_EDITOR_CLIPBOARD HClipBoard;
 
 //
@@ -24,26 +29,16 @@ HEFI_EDITOR_CLIPBOARD HClipBoardConst = {
   0
 };
 
+/**
+  Initialization function for HDiskImage.
+
+  @param[in] EFI_SUCCESS      The operation was successful.
+  @param[in] EFI_LOAD_ERROR   A load error occured.
+**/
 EFI_STATUS
 HClipBoardInit (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Initialization function for HDiskImage
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-
---*/
 {
   //
   // basiclly initialize the HDiskImage
@@ -53,26 +48,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Initialization function for HDiskImage.
+
+  @param[in] EFI_SUCCESS      The operation was successful.
+  @param[in] EFI_LOAD_ERROR   A load error occured.
+**/
 EFI_STATUS
 HClipBoardCleanup (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Initialization function for HDiskImage
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-
---*/
 {
 
   SHELL_FREE_NON_NULL (HClipBoard.Buffer);
@@ -80,6 +65,14 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Set a buffer into the clipboard.
+
+  @param[in] Buffer   The buffer to add to the clipboard.
+  @param[in] Size     The size of Buffer in bytes.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
 HClipBoardSet (
   IN UINT8 *Buffer,
@@ -98,6 +91,13 @@ HClipBoardSet (
   return EFI_SUCCESS;
 }
 
+/**
+  Get a buffer from the clipboard.
+
+  @param[out] Buffer   The pointer to the buffer to add to the clipboard.
+
+  @return the size of the buffer.
+**/
 UINTN
 HClipBoardGet (
   OUT UINT8  **Buffer

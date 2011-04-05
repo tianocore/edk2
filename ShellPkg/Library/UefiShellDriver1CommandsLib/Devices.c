@@ -58,8 +58,6 @@ GetDeviceHandleInfo (
   EFI_HANDLE    *HandleBuffer;
   UINTN         Count;
 
-  UINTN         TestHandle = 0x43;
-
   if (TheHandle == NULL 
     || Type == NULL
     || Cfg == NULL
@@ -69,10 +67,6 @@ GetDeviceHandleInfo (
     || Children == NULL
     || Name == NULL ) {
     return (EFI_INVALID_PARAMETER);
-  }
-
-  if (ConvertHandleToHandleIndex(TheHandle) == TestHandle) {
-    TestHandle = TestHandle;
   }
 
   *Cfg          = FALSE;

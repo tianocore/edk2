@@ -20,7 +20,7 @@
 BOOLEAN                                 mIp4ConfigExist    = FALSE;
 STATIC EFI_HII_CONFIG_ROUTING_PROTOCOL  *mHiiConfigRouting = NULL;
 
-STATIC CONST UINTN SEC_TO_NS            = 10000000;
+STATIC CONST UINTN SecondsToNanoSeconds = 10000000;
 STATIC CONST CHAR16 DhcpString[5]       = L"DHCP";
 STATIC CONST CHAR16 StaticString[7]     = L"STATIC";
 STATIC CONST CHAR16 PermanentString[10] = L"PERMANENT";
@@ -173,7 +173,7 @@ TestChildHandle (
   Get the child handle of the NIC handle.
 
   @param[in] Controller     Routing information: GUID.
-  @param[in] ChildHandle    Returned child handle.
+  @param[out] ChildHandle   Returned child handle.
 
   @retval EFI_SUCCESS         Successfully to get child handle.
 **/
@@ -1128,7 +1128,7 @@ IfconfigStartIp4(
     Status = gBS->SetTimer (
                    TimerToGetMap,
                    TimerRelative,
-                   MultU64x32 (SEC_TO_NS, 5)
+                   MultU64x32 (SecondsToNanoSeconds, 5)
                    );
     
     if (EFI_ERROR (Status)) {

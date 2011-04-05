@@ -18,174 +18,149 @@
 
 #include "HexEditor.h"
 
+/**
+  Initialization function for HBufferImage
+
+  @retval EFI_SUCCESS       The operation was successful.
+  @retval EFI_LOAD_ERROR    A load error occured.
+**/
 EFI_STATUS
 HBufferImageInit (
   VOID
   );
+
+/**
+  Cleanup function for HBufferImage
+
+  @retval EFI_SUCCESS  The operation was successful.
+**/
 EFI_STATUS
 HBufferImageCleanup (
   VOID
   );
+
+/**
+  Refresh function for HBufferImage.
+
+  @retval EFI_SUCCESS     The operation was successful.
+  @retval EFI_LOAD_ERROR  A Load error occured.
+
+**/
 EFI_STATUS
 HBufferImageRefresh (
   VOID
   );
-EFI_STATUS
-HBufferImageHide (
-  VOID
-  );
+
+/**
+  Dispatch input to different handler
+
+  @param[in] Key    The input key:
+                     the keys can be:
+                       ASCII KEY
+                        Backspace/Delete
+                        Direction key: up/down/left/right/pgup/pgdn
+                        Home/End
+                        INS
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_LOAD_ERROR        A load error occured.
+  @retval EFI_OUT_OF_RESOURCES  A Memory allocation failed.
+**/
 EFI_STATUS
 HBufferImageHandleInput (
-  EFI_INPUT_KEY *
+  IN  EFI_INPUT_KEY *Key
   );
+
+/**
+  Backup function for HBufferImage. Only a few fields need to be backup. 
+  This is for making the file buffer refresh as few as possible.
+
+  @retval EFI_SUCCESS  The operation was successful.
+**/
 EFI_STATUS
 HBufferImageBackup (
   VOID
   );
 
+/**
+  Read an image into a buffer friom a source.
+
+  @param[in] FileName     Pointer to the file name.  OPTIONAL and ignored if not FileTypeFileBuffer.
+  @param[in] DiskName     Pointer to the disk name.  OPTIONAL and ignored if not FileTypeDiskBuffer.
+  @param[in] DiskOffset   Offset into the disk.  OPTIONAL and ignored if not FileTypeDiskBuffer.
+  @param[in] DiskSize     Size of the disk buffer.  OPTIONAL and ignored if not FileTypeDiskBuffer.
+  @param[in] MemOffset    Offset into the Memory.  OPTIONAL and ignored if not FileTypeMemBuffer.
+  @param[in] MemSize      Size of the Memory buffer.  OPTIONAL and ignored if not FileTypeMemBuffer.
+  @param[in] BufferType   The type of buffer to save.  IGNORED.
+  @param[in] Recover      TRUE for recovermode, FALSE otherwise.
+
+  @return EFI_SUCCESS     The operation was successful.
+**/
 EFI_STATUS
+EFIAPI
 HBufferImageRead (
-  IN CONST CHAR16   *,
-  IN CONST CHAR16   *,
-  IN          UINTN,
-  IN          UINTN,
-  IN          UINTN,
-  IN          UINTN,
-  IN          EDIT_FILE_TYPE,
-  IN          BOOLEAN
+  IN CONST CHAR16                   *FileName,
+  IN CONST CHAR16                   *DiskName,
+  IN UINTN                          DiskOffset,
+  IN UINTN                          DiskSize,
+  IN UINTN                          MemOffset,
+  IN UINTN                          MemSize,
+  IN EDIT_FILE_TYPE                 BufferType,
+  IN BOOLEAN                        Recover
   );
 
+/**
+  Save the current image.
+
+  @param[in] FileName     Pointer to the file name.  OPTIONAL and ignored if not FileTypeFileBuffer.
+  @param[in] DiskName     Pointer to the disk name.  OPTIONAL and ignored if not FileTypeDiskBuffer.
+  @param[in] DiskOffset   Offset into the disk.  OPTIONAL and ignored if not FileTypeDiskBuffer.
+  @param[in] DiskSize     Size of the disk buffer.  OPTIONAL and ignored if not FileTypeDiskBuffer.
+  @param[in] MemOffset    Offset into the Memory.  OPTIONAL and ignored if not FileTypeMemBuffer.
+  @param[in] MemSize      Size of the Memory buffer.  OPTIONAL and ignored if not FileTypeMemBuffer.
+  @param[in] BufferType   The type of buffer to save.  IGNORED.
+
+  @return EFI_SUCCESS     The operation was successful.
+**/
 EFI_STATUS
 HBufferImageSave (
-  IN CHAR16   *,
-  IN CHAR16   *,
-  IN          UINTN,
-  IN          UINTN,
-  IN          UINTN,
-  IN          UINTN,
-  IN          EDIT_FILE_TYPE
+  IN CHAR16                         *FileName,
+  IN CHAR16                         *DiskName,
+  IN UINTN                          DiskOffset,
+  IN UINTN                          DiskSize,
+  IN UINTN                          MemOffset,
+  IN UINTN                          MemSize,
+  IN EDIT_FILE_TYPE                 BufferType
   );
 
-INTN
-HBufferImageCharToHex (
-  IN CHAR16
-  );
+/**
+  According to cursor's file position, adjust screen display.
 
-EFI_STATUS
-HBufferImageRestoreMousePosition (
-  VOID
-  );
-EFI_STATUS
-HBufferImageRestorePosition (
-  VOID
-  );
-
+  @param[in] NewFilePosRow    Row of file position ( start from 1 ).
+  @param[in] NewFilePosCol    Column of file position ( start from 1 ).
+  @param[in] HighBits         Cursor will on high4 bits or low4 bits.
+**/
 VOID
 HBufferImageMovePosition (
-  IN UINTN,
-  IN UINTN,
-  IN BOOLEAN
+  IN UINTN    NewFilePosRow,
+  IN UINTN    NewFilePosCol,
+  IN BOOLEAN  HighBits
   );
 
-EFI_STATUS
-HBufferImageHandleInput (
-  EFI_INPUT_KEY *
-  );
 
+/**
+  Create a new line and append it to the line list.
+    Fields affected:
+    NumLines
+    Lines 
+
+  @retval NULL    create line failed.
+  @return         the line created.
+
+**/
 HEFI_EDITOR_LINE  *
 HBufferImageCreateLine (
   VOID
-  );
-
-EFI_STATUS
-HBufferImageDoCharInput (
-  CHAR16
-  );
-EFI_STATUS
-HBufferImageAddChar (
-  CHAR16
-  );
-
-BOOLEAN
-HInCurrentScreen (
-  UINTN
-  );
-BOOLEAN
-HAboveCurrentScreen (
-  UINTN
-  );
-BOOLEAN
-HUnderCurrentScreen (
-  UINTN
-  );
-
-EFI_STATUS
-HBufferImageScrollRight (
-  VOID
-  );
-EFI_STATUS
-HBufferImageScrollLeft (
-  VOID
-  );
-EFI_STATUS
-HBufferImageScrollDown (
-  VOID
-  );
-EFI_STATUS
-HBufferImageScrollUp (
-  VOID
-  );
-EFI_STATUS
-HBufferImagePageUp (
-  VOID
-  );
-EFI_STATUS
-HBufferImagePageDown (
-  VOID
-  );
-EFI_STATUS
-HBufferImageHome (
-  VOID
-  );
-EFI_STATUS
-HBufferImageEnd (
-  VOID
-  );
-
-EFI_STATUS
-HBufferImageDoBackspace (
-  VOID
-  );
-EFI_STATUS
-HBufferImageDoDelete (
-  VOID
-  );
-
-EFI_STATUS
-HBufferImageCutLine (
-  HEFI_EDITOR_LINE **
-  );
-EFI_STATUS
-HBufferImagePasteLine (
-  VOID
-  );
-
-EFI_STATUS
-HBufferImageGetFileInfo (
-  EFI_FILE_HANDLE,
-  CHAR16          *,
-  EFI_FILE_INFO   **
-  );
-
-EFI_STATUS
-HBufferImageSearch (
-  CHAR16  *,
-  UINTN
-  );
-EFI_STATUS
-HBufferImageReplace (
-  CHAR16  *,
-  UINTN
   );
 
 /**
@@ -198,58 +173,105 @@ HBufferImageFree (
   VOID
   );
 
+/**
+  Delete character from buffer.
+  
+  @param[in] Pos      Position, Pos starting from 0.
+  @param[in] Count    The Count of characters to delete.
+  @param[out] DeleteBuffer    The DeleteBuffer.
+
+  @retval EFI_SUCCESS Success 
+**/
 EFI_STATUS
 HBufferImageDeleteCharacterFromBuffer (
-  IN      UINTN,
-  IN      UINTN,
-  UINT8   *
+  IN  UINTN         Pos,
+  IN  UINTN         Count,
+  OUT UINT8         *DeleteBuffer
   );
 
+/**
+  Add character to buffer, add before pos.
+
+  @param[in] Pos        Position, Pos starting from 0.
+  @param[in] Count      Count of characters to add.
+  @param[in] AddBuffer  Add buffer.
+
+  @retval EFI_SUCCESS   Success.  
+**/
 EFI_STATUS
 HBufferImageAddCharacterToBuffer (
-  IN      UINTN,
-  IN      UINTN,
-  UINT8   *
+  IN  UINTN          Pos,
+  IN  UINTN          Count,
+  IN  UINT8          *AddBuffer
   );
 
+/**
+  Change the raw buffer to a list of lines for the UI.
+  
+  @param[in] Buffer   The pointer to the buffer to fill.
+  @param[in] Bytes    The size of the buffer in bytes.
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+**/
 EFI_STATUS
+EFIAPI
 HBufferImageBufferToList (
-  IN VOID   *,
-  IN        UINTN
+  IN VOID   *Buffer,
+  IN UINTN  Bytes
   );
 
+/**
+  Change the list of lines from the UI to a raw buffer.
+  
+  @param[in] Buffer   The pointer to the buffer to fill.
+  @param[in] Bytes    The size of the buffer in bytes.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
+EFIAPI
 HBufferImageListToBuffer (
-  IN VOID   *,
-  IN        UINTN
+  IN VOID   *Buffer,
+  IN UINTN  Bytes
   );
 
+/**
+  Move the mouse in the image buffer.
+
+  @param[in] TextX    The x-coordinate.
+  @param[in] TextY    The y-coordinate.
+**/
 VOID
+EFIAPI
 HBufferImageAdjustMousePosition (
-  INT32,
-  INT32
+  IN INT32 TextX,
+  IN INT32 TextY
   );
 
+/**
+  Function to decide if a column number is stored in the high bits.
+
+  @param[in] Column     The column to examine.
+  @param[out] FCol      The actual column number.
+
+  @retval TRUE      The actual column was in high bits and is now in FCol.
+  @retval FALSE     There was not a column number in the high bits.
+**/
 BOOLEAN
 HBufferImageIsAtHighBits (
-  UINTN,
-  UINTN *
-  ) ;
-
-EFI_STATUS
-HBufferImageCutLine (
-  HEFI_EDITOR_LINE **
+  IN  UINTN Column,
+  OUT UINTN *FCol
   );
 
+/**
+  Get the size of the open buffer.
+
+  @retval The size in bytes.
+**/
 UINTN
 HBufferImageGetTotalSize (
   VOID
-  );
-
-BOOLEAN
-HBufferImageIsInSelectedArea (
-  UINTN,
-  UINTN
   );
 
 #endif

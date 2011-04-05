@@ -134,29 +134,21 @@ typedef struct _PING_PRIVATE_DATA {
   PING_IPX_COMPLETION_TOKEN   RxToken;
 } PING_PRIVATE_DATA;
 
+/**
+  Calculate the internet checksum (see RFC 1071).
+
+  @param[in] Packet  Buffer which contains the data to be checksummed.
+  @param[in] Length  Length to be checksummed.
+
+  @retval Checksum     Returns the 16 bit ones complement of 
+                       ones complement sum of 16 bit words
+**/
 UINT16
 EFIAPI
 NetChecksum (
   IN UINT8   *Buffer,
   IN UINT32  Length
   )
-/*++
-
-Routine Description:
-
-  Calculate the internet checksum (see RFC 1071)
-
-Arguments:
-
-  Packet             - Buffer which contains the data to be checksummed
-  Length             - Length to be checksummed
-
-Returns:
-
-  Checksum           - Returns the 16 bit ones complement of 
-                       ones complement sum of 16 bit words
-
---*/
 {
   UINT32  Sum;
   UINT8   Odd;
@@ -167,11 +159,11 @@ Returns:
   Sum     = 0;
   Odd     = (UINT8) (Length & 1);
   Length >>= 1;
-  while (Length--) {
+  while ((Length--) != 0) {
     Sum += *Packet++;
   }
 
-  if (Odd) {
+  if (Odd != 0) {
     Sum += *(UINT8 *) Packet;
   }
 

@@ -516,18 +516,19 @@ CONST CHAR16 AnyF[] = L"F*";
 /**
   Function to display mapping information to the user.
 
-  if Specific is specified then Consist and Normal will be ignored since information will
+  If Specific is specified then Consist and Normal will be ignored since information will
   be printed for the specific item only.
 
-  @param[in] Verbose                TRUE to display (extra) verbose information
-  @param[in] Consist                TRUE to display consistent mappings
-  @param[in] Normal                 TRUE to display normal (not consist) mappings
-  @param[in] TypeString             pointer to string of filter types
-  @param[in] SFO                    TRUE to display output in Standard Output Format
-  @param[in] Specific               pointer to string for specific map to display
+  @param[in] Verbose                TRUE to display (extra) verbose information.
+  @param[in] Consist                TRUE to display consistent mappings.
+  @param[in] Normal                 TRUE to display normal (not consist) mappings.
+  @param[in] TypeString             Pointer to string of filter types.
+  @param[in] SFO                    TRUE to display output in Standard Output Format.
+  @param[in] Specific               Pointer to string for specific map to display.
+  @param[in] Header                 TRUE to print the header block.
 
-  @retval SHELL_SUCCESS               the display was printed
-  @retval SHELL_INVALID_PARAMETER     one of Consist or Normal must be TRUE if no Specific
+  @retval SHELL_SUCCESS               The display was printed.
+  @retval SHELL_INVALID_PARAMETER     One of Consist or Normal must be TRUE if no Specific.
 
 **/
 SHELL_STATUS

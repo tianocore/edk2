@@ -455,6 +455,8 @@ IsUnicodeFile(
   Strips out quotes sections of a string.
 
   All of the characters between quotes is replaced with spaces.
+
+  @param[in,out] TheString  A pointer to the string to update.
 **/
 VOID
 EFIAPI

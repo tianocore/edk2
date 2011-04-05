@@ -12,14 +12,13 @@
 
 **/
 
-#ifndef __SHELL_BASE__
-#define __SHELL_BASE__
+#ifndef _SHELL_BASE_
+#define _SHELL_BASE_
 
 #define ABS(a) ((a<0)?(-(a)):(a))
 
 typedef VOID *SHELL_FILE_HANDLE;
 
-#ifndef SHELL_FREE_NON_NULL
 #define SHELL_FREE_NON_NULL(Pointer)  \
   do {                                \
     if ((Pointer) != NULL) {          \
@@ -27,7 +26,6 @@ typedef VOID *SHELL_FILE_HANDLE;
       (Pointer) = NULL;               \
     }                                 \
   } while(FALSE)
-#endif //SHELL_FREE_NON_NULL
 
 typedef enum {
 ///

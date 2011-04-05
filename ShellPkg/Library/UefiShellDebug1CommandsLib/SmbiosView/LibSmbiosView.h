@@ -1,7 +1,7 @@
 /** @file
   API for SMBIOS Plug and Play functions, access to SMBIOS table and structures.
 
-  Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef _LIB_SMBIOS_VIEW_H
-#define _LIB_SMBIOS_VIEW_H
+#ifndef _LIB_SMBIOS_VIEW_H_
+#define _LIB_SMBIOS_VIEW_H_
 
 #include "LibSmbios.h"
 
@@ -39,49 +39,51 @@
 #define EFI_SMBIOSERR_TYPE_UNKNOWN      EFI_SMBIOSERR (3)
 #define EFI_SMBIOSERR_UNSUPPORTED       EFI_SMBIOSERR (4)
 
+/**
+  Init the SMBIOS VIEW API's environment.
+
+  @retval EFI_SUCCESS  Successful to init the SMBIOS VIEW Lib.
+**/
 EFI_STATUS
 LibSmbiosInit (
   VOID
   );
 
+/**
+  Cleanup the Smbios information.
+**/
 VOID
 LibSmbiosCleanup (
   VOID
   );
 
+/**
+  Get the entry point structure for the table.
+
+  @param[out] EntryPointStructure  The pointer to populate.
+**/
 VOID
 LibSmbiosGetEPS (
-  SMBIOS_STRUCTURE_TABLE **pEntryPointStructure
+  OUT SMBIOS_STRUCTURE_TABLE **EntryPointStructure
   );
 
-VOID
-LibSmbiosGetStructHead (
-  SMBIOS_STRUCTURE_POINTER *pHead
-  );
+/**
+    Get SMBIOS structure given the Handle,copy data to the Buffer,
+    Handle is changed to the next handle or 0xFFFF when the end is
+    reached or the handle is not found.
 
-EFI_STATUS
-LibGetSmbiosInfo (
-  OUT CHAR8   *dmiBIOSRevision,
-  OUT UINT16  *NumStructures,
-  OUT UINT16  *StructureSize,
-  OUT UINT32  *dmiStorageBase,
-  OUT UINT16  *dmiStorageSize
-  );
+    @param[in,out] Handle     0xFFFF: get the first structure
+                              Others: get a structure according to this value.
+    @param[in,out] Buffer     The pointer to the caller's memory buffer.
+    @param[out] Length        Length of return buffer in bytes.
 
-/*++
-  Description:
-    Get SMBIOS Information.
+    @retval DMI_SUCCESS   Buffer contains the required structure data
+                          Handle is updated with next structure handle or
+                          0xFFFF(end-of-list).
 
-  Arguments:
-    dmiBIOSRevision   - Revision of the SMBIOS Extensions.
-    NumStructures     - Max. Number of Structures the BIOS will return.
-    StructureSize     - Size of largest SMBIOS Structure.
-    dmiStorageBase    - 32-bit physical base address for memory mapped SMBIOS data.
-    dmiStorageSize    - Size of the memory-mapped SMBIOS data.
-
-  Returns:
-    DMI_SUCCESS                 - successful.
-    DMI_FUNCTION_NOT_SUPPORTED  - Does not support SMBIOS calling interface capability.
+    @retval DMI_INVALID_HANDLE  Buffer not contain the requiring structure data.
+                                Handle is updated with next structure handle or
+                                0xFFFF(end-of-list).
 **/
 EFI_STATUS
 LibGetSmbiosStructure (
@@ -90,20 +92,12 @@ LibGetSmbiosStructure (
   OUT UINT16      *Length
   );
 
-/*++
-  Description:
-    Get SMBIOS structure given the Handle,copy data to the Buffer,Handle is then the next.
+/**
+  Get a string from the smbios information.
 
-  Arguments:
-    Handle:         - 0x0: get the first structure
-                    - Others: get a certain structure according to this value.
-    Buffter:        - contains the pointer to the caller's memory buffer.
-
-  Returns:
-    DMI_SUCCESS         - Buffer contains the required structure data
-                        - Handle is updated with next structure handle or 0xFFFF(end-of-list).
-    DMI_INVALID_HANDLE  - Buffer not contain the requiring structure data
-                        - Handle is updated with next structure handle or 0xFFFF(end-of-list).
+  @param[in] Smbios         The pointer to the smbios information.
+  @param[in] StringNumber   The index to the string to get.
+  @param[out] Buffer        The buffer to fill with the string when retrieved.
 **/
 VOID
 SmbiosGetPendingString (
@@ -112,9 +106,17 @@ SmbiosGetPendingString (
   OUT CHAR8                         *Buffer
   );
 
+/**
+  Check the structure to see if it is legal.
+
+  @param[in] Smbios    - Pointer to the structure that will be checked.
+
+  @retval DMI_SUCCESS           Structure data is legal.
+  @retval DMI_BAD_PARAMETER     Structure data contains bad parameter.
+**/
 EFI_STATUS
 SmbiosCheckStructure (
-  IN  SMBIOS_STRUCTURE_POINTER      *Smbios
+  IN  SMBIOS_STRUCTURE_POINTER *Smbios
   );
 
 #endif

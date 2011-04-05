@@ -20,7 +20,7 @@
 
 **/
 
-#if !defined (_UEFI_SHELL_LEVEL2_COMMANDS_LIB_H_)
+#ifndef _UEFI_SHELL_LEVEL2_COMMANDS_LIB_H_
 #define _UEFI_SHELL_LEVEL2_COMMANDS_LIB_H_
 
 #include <Uefi.h>

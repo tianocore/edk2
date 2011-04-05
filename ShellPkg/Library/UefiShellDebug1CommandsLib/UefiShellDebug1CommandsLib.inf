@@ -53,7 +53,7 @@
   SmbiosView/LibSmbiosView.h
   SmbiosView/LibSmbios.h
   SmbiosView/QueryTable.h
-  SmbiosView/smbiosview.h
+  SmbiosView/SmbiosView.h
   UefiShellDebug1CommandsLib.c
   UefiShellDebug1CommandsLib.h
   UefiShellDebug1CommandsLib.uni

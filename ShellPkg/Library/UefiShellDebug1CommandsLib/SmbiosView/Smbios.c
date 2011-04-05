@@ -16,77 +16,20 @@
 #include <Guid/Smbios.h>
 #include "LibSmbios.h"
 
-EFI_STATUS
-LibGetSmbiosSystemGuidAndSerialNumber (
-  IN  EFI_GUID    *SystemGuid,
-  OUT CHAR8       **SystemSerialNumber
-  )
-{
-  EFI_STATUS                Status;
-  SMBIOS_STRUCTURE_TABLE    *SmbiosTable;
-  SMBIOS_STRUCTURE_POINTER  Smbios;
-  SMBIOS_STRUCTURE_POINTER  SmbiosEnd;
-  UINT16                    Index;
+/**
+  Return SMBIOS string given the string number.
 
-  Status = GetSystemConfigurationTable (&gEfiSmbiosTableGuid, (VOID **) &SmbiosTable);
-  if (EFI_ERROR (Status)) {
-    return EFI_NOT_FOUND;
-  }
+  @param[in] Smbios         Pointer to SMBIOS structure.
+  @param[in] StringNumber   String number to return. -1 is used to skip all strings and
+                            point to the next SMBIOS structure.
 
-  Smbios.Hdr    = (SMBIOS_HEADER *) ((UINTN) (SmbiosTable->TableAddress));
-
-  SmbiosEnd.Raw = (UINT8 *) ((UINTN) (SmbiosTable->TableAddress + SmbiosTable->TableLength));
-  for (Index = 0; Index < SmbiosTable->TableLength; Index++) {
-    if (Smbios.Hdr->Type == 1) {
-      if (Smbios.Hdr->Length < 0x19) {
-        //
-        // Older version did not support Guid and Serial number
-        //
-        continue;
-      }
-      //
-      // SMBIOS tables are byte packed so we need to do a byte copy to
-      //  prevend alignment faults on Itanium-based platform.
-      //
-      CopyMem (SystemGuid, &Smbios.Type1->Uuid, sizeof (EFI_GUID));
-      *SystemSerialNumber = LibGetSmbiosString (&Smbios, Smbios.Type1->SerialNumber);
-      return EFI_SUCCESS;
-    }
-    //
-    // Make Smbios point to the next record
-    //
-    LibGetSmbiosString (&Smbios, (UINT16) (-1));
-
-    if (Smbios.Raw >= SmbiosEnd.Raw) {
-      //
-      // SMBIOS 2.1 incorrectly stated the length of SmbiosTable as 0x1e.
-      // given this we must double check against the lenght of
-      // the structure. My home PC has this bug.ruthard
-      //
-      return EFI_SUCCESS;
-    }
-  }
-
-  return EFI_SUCCESS;
-}
-
-CHAR8 *
+  @return Pointer to string, or pointer to next SMBIOS strcuture if StringNumber == -1
+**/
+CHAR8*
 LibGetSmbiosString (
   IN  SMBIOS_STRUCTURE_POINTER    *Smbios,
   IN  UINT16                      StringNumber
   )
-/*++
-Routine Description:
-  Return SMBIOS string given the string number.
-
-  Arguments:
-      Smbios       - Pointer to SMBIOS structure
-      StringNumber - String number to return. -1 is used to skip all strings and
-                     point to the next SMBIOS structure.
-
-  Returns:
-      Pointer to string, or pointer to next SMBIOS strcuture if StringNumber == -1
-**/
 {
   UINT16  Index;
   CHAR8   *String;

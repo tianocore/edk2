@@ -20,18 +20,45 @@
 
 #include "HexEditor.h"
 
+/**
+  Init function for MainEditor
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_LOAD_ERROR          A load error occured.
+**/
 EFI_STATUS
 HMainEditorInit (
   VOID
   );
+
+/**
+  Cleanup function for MainEditor.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_LOAD_ERROR          A load error occured.
+**/
 EFI_STATUS
 HMainEditorCleanup (
   VOID
   );
+
+/**
+  Refresh function for MainEditor.
+
+  @retval EFI_SUCCESS             The operation was successful.
+**/
 EFI_STATUS
 HMainEditorRefresh (
   VOID
   );
+
+/**
+  Handle user key input. will route it to other components handle function.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation occured.
+  @retval EFI_LOAD_ERROR          A load error occured.
+**/
 EFI_STATUS
 HMainEditorKeyInput (
   VOID
@@ -45,4 +72,5 @@ EFIAPI
 HMainEditorBackup (
   VOID
   );
+
 #endif

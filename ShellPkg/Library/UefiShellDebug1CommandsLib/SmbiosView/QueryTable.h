@@ -13,8 +13,8 @@
 
 **/
 
-#ifndef _SMBIOS_QUERY_TABLE_H
-#define _SMBIOS_QUERY_TABLE_H
+#ifndef _SMBIOS_QUERY_TABLE_H_
+#define _SMBIOS_QUERY_TABLE_H_
 
 #define QUERY_TABLE_UNFOUND 0xFF
 
@@ -70,386 +70,665 @@ QueryTable (
   IN  UINTN         InfoLen
   );
 
-VOID
-PrintBitsInfo (
-  IN  TABLE_ITEM    *Table,
-  IN  UINTN         Number,
-  IN  UINT32        Bits
-  );
+/**
+  Display the structure type information.
 
-//
-// Display the element detail information
-//
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayStructureTypeInfo (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   );
 
-//
-// System Information (Type 1)
-//
+/**
+  Display System Information (Type 1) Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplaySystemWakeupType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
 
-//
-// System Enclosure (Type 3)
-//
+/**
+  Display System Enclosure (Type 3) Enclosure Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplaySystemEnclosureType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
+
+/**
+  Display System Enclosure (Type 3) Enclosure Status.
+
+  @param[in] Status         The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplaySystemEnclosureStatus (
-  UINT8 Status,
-  UINT8 Option
+  IN UINT8 Status,
+  IN UINT8 Option
   );
+
+/**
+  Display System Enclosure (Type 3) Security Status.
+
+  @param[in] Status         The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplaySESecurityStatus (
-  UINT8 Status,
-  UINT8 Option
-  );
+  IN UINT8 Status,
+  IN UINT8 Option
+  )
+;
 
-//
-// Processor Information (Type 4)
-//
+/**
+  Display Processor Information (Type 4) Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayProcessorType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
+
+/**
+  Display Processor Information (Type 4) Upgrade.
+
+  @param[in] Upgrade        The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayProcessorUpgrade (
-  UINT8 Upgrade,
-  UINT8 Option
+  IN UINT8 Upgrade,
+  IN UINT8 Option
   );
 
-//
-// Memory Controller Information (Type 5)
-//
+/**
+  Display Memory Controller Information (Type 5) method.
+
+  @param[in] Method         The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMcErrorDetectMethod (
-  UINT8 Method,
-  UINT8 Option
+  IN UINT8 Method,
+  IN UINT8 Option
   );
+
+/**
+  Display Memory Controller Information (Type 5) Capability.
+
+  @param[in] Capability     The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMcErrorCorrectCapability (
-  UINT8 Capability,
-  UINT8 Option
+  IN UINT8 Capability,
+  IN UINT8 Option
   );
+
+/**
+  Display Memory Controller Information (Type 5) Support.
+
+  @param[in] Support        The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMcInterleaveSupport (
-  UINT8 Support,
-  UINT8 Option
+  IN UINT8 Support,
+  IN UINT8 Option
   );
+
+/**
+  Display Memory Controller Information (Type 5) speeds.
+
+  @param[in] Speed          The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMcMemorySpeeds (
-  UINT16  Speed,
-  UINT8   Option
+  IN UINT16  Speed,
+  IN UINT8   Option
   );
+
+/**
+  Display Memory Controller Information (Type 5) voltage.
+
+  @param[in] Voltage        The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMemoryModuleVoltage (
-  UINT8 Voltage,
-  UINT8 Option
+  IN UINT8 Voltage,
+  IN UINT8 Option
   );
 
-//
-// Memory Module Information (Type 6)
-//
+/**
+  Display Memory Module Information (Type 6) type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMmMemoryType (
-  UINT16  Type,
-  UINT8   Option
+  IN UINT16  Type,
+  IN UINT8   Option
   );
+
+/**
+  Display Memory Module Information (Type 6) status.
+
+  @param[in] Status         The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMmErrorStatus (
-  UINT8 Status,
-  UINT8 Option
+  IN UINT8 Status,
+  IN UINT8 Option
   );
 
-//
-// Cache Information (Type 7)
-//
+/**
+  Display Cache Information (Type 7) SRAM Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayCacheSRAMType (
-  UINT16  Type,
-  UINT8   Option
+  IN UINT16  Type,
+  IN UINT8   Option
   );
+
+/**
+  Display Cache Information (Type 7) correcting Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayCacheErrCorrectingType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
+
+/**
+  Display Cache Information (Type 7) Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayCacheSystemCacheType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
+
+/**
+  Display Cache Information (Type 7) Associativity.
+
+  @param[in] Associativity  The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayCacheAssociativity (
-  UINT8 Associativity,
-  UINT8 Option
+  IN UINT8 Associativity,
+  IN UINT8 Option
   );
 
-//
-// Port Connector Information  (Type 8)
-//
+/**
+  Display Port Connector Information  (Type 8) type.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPortConnectorType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
+
+/**
+  Display Port Connector Information  (Type 8) port type.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPortType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
 
-//
-// System Slots (Type 9)
-//
+/**
+  Display System Slots (Type 9) slot type.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySystemSlotType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
+
+/**
+  Display System Slots (Type 9) data bus width.
+
+  @param[in] Width      The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySystemSlotDataBusWidth (
-  UINT8 Width,
-  UINT8 Option
+  IN UINT8 Width,
+  IN UINT8 Option
   );
+
+/**
+  Display System Slots (Type 9) usage information.
+
+  @param[in] Usage      The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySystemSlotCurrentUsage (
-  UINT8 Usage,
-  UINT8 Option
+  IN UINT8 Usage,
+  IN UINT8 Option
   );
+
+/**
+  Display System Slots (Type 9) slot length.
+
+  @param[in] Length     The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySystemSlotLength (
-  UINT8 Length,
-  UINT8 Option
+  IN UINT8 Length,
+  IN UINT8 Option
   );
+
+/**
+  Display System Slots (Type 9) characteristics.
+
+  @param[in] Chara1     The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySlotCharacteristics1 (
-  UINT8 Chara1,
-  UINT8 Option
+  IN UINT8 Chara1,
+  IN UINT8 Option
   );
+
+/**
+  Display System Slots (Type 9) characteristics.
+
+  @param[in] Chara2     The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySlotCharacteristics2 (
-  UINT8 Chara2,
-  UINT8 Option
+  IN UINT8 Chara2,
+  IN UINT8 Option
   );
 
-//
-// On Board Devices Information (Type 10)
-//
+/**
+  Display On Board Devices Information (Type 10) types.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayOnboardDeviceTypes (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
 
-//
-// System Event Log (Type 15)
-//
+/**
+  Display System Event Log (Type 15) types.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySELTypes (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
+
+/**
+  Display System Event Log (Type 15) format type.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySELVarDataFormatType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
+
+/**
+  Display System Event Log (Type 15) dw1.
+
+  @param[in] Key        The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPostResultsBitmapDw1 (
-  UINT32  Key,
-  UINT8   Option
+  IN UINT32  Key,
+  IN UINT8   Option
   );
+
+/**
+  Display System Event Log (Type 15) dw2.
+
+  @param[in] Key        The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPostResultsBitmapDw2 (
-  UINT32  Key,
-  UINT8   Option
+  IN UINT32  Key,
+  IN UINT8   Option
   );
+
+/**
+  Display System Event Log (Type 15) type.
+
+  @param[in] SMType     The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySELSysManagementTypes (
-  UINT32  SMType,
-  UINT8   Option
+  IN UINT32  SMType,
+  IN UINT8   Option
   );
 
-//
-// Physical Memory Array (Type 16)
-//
+/**
+  Display Physical Memory Array (Type 16) Location.
+
+  @param[in] Location   The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPMALocation (
-  UINT8 Location,
-  UINT8 Option
+  IN UINT8 Location,
+  IN UINT8 Option
   );
+
+/**
+  Display Physical Memory Array (Type 16) Use.
+
+  @param[in] Use        The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPMAUse (
-  UINT8 Use,
-  UINT8 Option
+  IN UINT8 Use,
+  IN UINT8 Option
   );
+
+/**
+  Display Physical Memory Array (Type 16) Types.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPMAErrorCorrectionTypes (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
 
-//
-// Memory Device (Type 17)
-//
+/**
+  Display Memory Device (Type 17) form factor.
+
+  @param[in] FormFactor The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayMemoryDeviceFormFactor (
-  UINT8 FormFactor,
-  UINT8 Option
+  IN UINT8 FormFactor,
+  IN UINT8 Option
   );
+
+/**
+  Display Memory Device (Type 17) type.
+
+  @param[in] Type     The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayMemoryDeviceType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
+
+/**
+  Display Memory Device (Type 17) details.
+
+  @param[in] Para     The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayMemoryDeviceTypeDetail (
-  UINT16  Parameter,
-  UINT8   Option
+  IN UINT16  Para,
+  IN UINT8   Option
   );
 
-//
-// 32-bit Memory Error Information (Type 18)
-//
+/**
+  Display 32-bit Memory Error Information (Type 18) type.
+
+  @param[in] ErrorType  The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayMemoryErrorType (
-  UINT8 ErrorType,
-  UINT8 Option
+  IN UINT8 ErrorType,
+  IN UINT8 Option
   );
+
+/**
+  Display 32-bit Memory Error Information (Type 18) error granularity.
+
+  @param[in] Granularity  The key of the structure.
+  @param[in] Option       The optional information.
+**/
 VOID
 DisplayMemoryErrorGranularity (
-  UINT8 Granularity,
-  UINT8 Option
+  IN UINT8 Granularity,
+  IN UINT8 Option
   );
+
+/**
+  Display 32-bit Memory Error Information (Type 18) error information.
+
+  @param[in] Operation  The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayMemoryErrorOperation (
-  UINT8 Operation,
-  UINT8 Option
+  IN UINT8 Operation,
+  IN UINT8 Option
   );
 
-//
-// Memory Array Mapped Address (Type 19)
-// Memory Device Mapped Address  (Type 20)
-//
-// Built-in Pointing Device  (Type 21)
-//
+/**
+  Display Built-in Pointing Device (Type 21) type information.
+
+  @param[in] Type     The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayPointingDeviceType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   );
+
+/**
+  Display Built-in Pointing Device (Type 21) information.
+
+  @param[in] Interface  The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPointingDeviceInterface (
-  UINT8   Interface,
-  UINT8   Option
+  IN UINT8   Interface,
+  IN UINT8   Option
   );
 
-//
-// Portable Battery  (Type 22)
-//
+/**
+  Display Portable Battery  (Type 22) information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayPBDeviceChemistry (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   );
 
-//
-// Voltage Probe (Type 26)
-//
+/**
+  Display Voltage Probe (Type 26) location information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayVPLocation (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   );
+
+/**
+  Display Voltage Probe (Type 26) status ype information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayVPStatus (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   );
 
-//
-// Voltage Probe (Type 27)
-//
+/**
+  Display Cooling (Type 27) status information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayCoolingDeviceStatus (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   );
+
+/**
+  Display Cooling (Type 27) type information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayCoolingDeviceType (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   );
 
-//
-// Temperature Probe  (Type 28)
-//
+/**
+  Display Temperature Probe (Type 28) status information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayTemperatureProbeStatus (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   );
+
+/**
+  Display Temperature Probe  (Type 28) location information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayTemperatureProbeLoc (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   );
 
-//
-// Electrical Current Probe (Type 29)
-//
+/**
+  Display Electrical Current Probe (Type 29)  status information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayECPStatus (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   );
+
+/**
+  Display Electrical Current Probe (Type 29) location information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayECPLoc (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   );
 
-//
-// Management Device  (Type 34)
-//
+/**
+  Display Management Device (Type 34) information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayMDType (
-  UINT8 Key,
-  UINT8 Option
-  );
-VOID
-DisplayMDAddressType (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   );
 
-//
-// Memory Channel  (Type 37)
-//
+/**
+  Display Memory Channel (Type 37) information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayMemoryChannelType (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   );
 
-//
-// IPMI Device Information  (Type 38)
-//
+/**
+  Display IPMI Device Information (Type 38) information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayIPMIDIBMCInterfaceType (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   );
 
 #endif

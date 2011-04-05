@@ -1,7 +1,7 @@
-/**
+/** @file
   Module to clarify system event log of smbios structure.
 
-  Copyright (c) 2005-2010, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005-2011, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution. The full text of the license may be found at
@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef _SMBIOS_EVENT_LOG_INFO_H
-#define _SMBIOS_EVENT_LOG_INFO_H
+#ifndef _SMBIOS_EVENT_LOG_INFO_H_
+#define _SMBIOS_EVENT_LOG_INFO_H_
 
 #define END_OF_LOG  0xFF
 
@@ -33,8 +33,8 @@ typedef struct {
 
 typedef struct {
   UINT8 OEMReserved[5];
-  UINT8 METW;           // Multiple Event Time Window
-  UINT8 MECI;           // Multiple Event Count Increment
+  UINT8 Metw;           // Multiple Event Time Window
+  UINT8 Meci;           // Multiple Event Count Increment
   UINT8 CMOSAddress;    // Pre-boot Event Log Reset - CMOS Address
   UINT8 CMOSBitIndex;   // Pre-boot Event Log Reset - CMOS Bit Index
   UINT8 StartingOffset; // CMOS Checksum - Starting Offset

@@ -100,9 +100,9 @@ typedef enum {
     (((PcieDeviceCap) >> 3) & 0x3)
 #define PCIE_CAP_EXTENDED_TAG(PcieDeviceCap) \
     (((PcieDeviceCap) >> 5) & 0x1)
-#define PCIE_CAP_L0sLatency(PcieDeviceCap) \
+#define PCIE_CAP_L0SLATENCY(PcieDeviceCap) \
     (((PcieDeviceCap) >> 6) & 0x7)
-#define PCIE_CAP_L1Latency(PcieDeviceCap) \
+#define PCIE_CAP_L1LATENCY(PcieDeviceCap) \
     (((PcieDeviceCap) >> 9) & 0x7)
 #define PCIE_CAP_ERR_REPORTING(PcieDeviceCap) \
     (((PcieDeviceCap) >> 15) & 0x1)
@@ -163,7 +163,7 @@ typedef enum {
     (((PcieLinkCap) >> 4) & 0x3f)
 #define PCIE_CAP_ASPM_SUPPORT(PcieLinkCap) \
     (((PcieLinkCap) >> 10) & 0x3)
-#define PCIE_CAP_L0s_LATENCY(PcieLinkCap) \
+#define PCIE_CAP_L0S_LATENCY(PcieLinkCap) \
     (((PcieLinkCap) >> 12) & 0x7)
 #define PCIE_CAP_L1_LATENCY(PcieLinkCap) \
     (((PcieLinkCap) >> 15) & 0x7)
@@ -334,7 +334,7 @@ typedef struct {
   UINT8   CacheLineSize;
   UINT8   PrimaryLatencyTimer;
   UINT8   HeaderType;
-  UINT8   BIST;
+  UINT8   Bist;
 
 } PCI_COMMON_HEADER;
 
@@ -427,13 +427,15 @@ typedef struct {
   UINT32  Data[46];
 } PCI_CARDBUS_DATA;
 
+typedef union {
+  PCI_DEVICE_HEADER   Device;
+  PCI_BRIDGE_HEADER   Bridge;
+  PCI_CARDBUS_HEADER  CardBus;
+} NON_COMMON_UNION;
+
 typedef struct {
   PCI_COMMON_HEADER Common;
-  union {
-    PCI_DEVICE_HEADER   Device;
-    PCI_BRIDGE_HEADER   Bridge;
-    PCI_CARDBUS_HEADER  CardBus;
-  } NonCommon;
+  NON_COMMON_UNION NonCommon;
   UINT32  Data[48];
 } PCI_CONFIG_SPACE;
 

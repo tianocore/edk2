@@ -12,7 +12,7 @@
 
 **/
 
-#if !defined (_UEFI_HANDLE_PARSING_LIB_INTERNAL_H_)
+#ifndef _UEFI_HANDLE_PARSING_LIB_INTERNAL_H_
 #define _UEFI_HANDLE_PARSING_LIB_INTERNAL_H_
 
 #include <Uefi.h>

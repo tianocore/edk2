@@ -38,6 +38,17 @@ HEFI_EDITOR_MEM_IMAGE             HMemImageConst = {
   0
 };
 
+/**
+  Empty function.  always returns the same.
+
+  @param[in] This       Ignored.
+  @param[in] Width      Ignored.
+  @param[in] Address    Ignored.
+  @param[in] Count      Ignored.
+  @param[in,out] Buffer Ignored.
+
+  @retval EFI_UNSUPPORTED.
+**/
 EFI_STATUS
 DummyMemRead (
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL              * This,
@@ -45,8 +56,22 @@ DummyMemRead (
   IN     UINT64                                   Address,
   IN     UINTN                                    Count,
   IN OUT VOID                                     *Buffer
-  );
+  )
+{
+  return EFI_UNSUPPORTED;
+}
 
+/**
+  Empty function.  always returns the same.
+
+  @param[in] This       Ignored.
+  @param[in] Width      Ignored.
+  @param[in] Address    Ignored.
+  @param[in] Count      Ignored.
+  @param[in,out] Buffer Ignored.
+
+  @retval EFI_UNSUPPORTED.
+**/
 EFI_STATUS
 DummyMemWrite (
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL              * This,
@@ -54,28 +79,21 @@ DummyMemWrite (
   IN     UINT64                                   Address,
   IN     UINTN                                    Count,
   IN OUT VOID                                     *Buffer
-  );
+  )
+{
+  return EFI_UNSUPPORTED;
+}
 
+/**
+  Initialization function for HDiskImage.
+
+  @retval EFI_SUCCESS       The operation was successful.
+  @retval EFI_LOAD_ERROR    A load error occured.
+**/
 EFI_STATUS
 HMemImageInit (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Initialization function for HDiskImage
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -107,28 +125,16 @@ Returns:
   }
 }
 
+/**
+  Backup function for HDiskImage. Only a few fields need to be backup. 
+  This is for making the Disk buffer refresh as few as possible.
+
+  @retval EFI_SUCCESS       The operation was successful.
+**/
 EFI_STATUS
 HMemImageBackup (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Backup function for HDiskImage
-  Only a few fields need to be backup. 
-  This is for making the Disk buffer refresh 
-  as few as possible.
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
   HMemImageBackupVar.Offset = HMemImage.Offset;
   HMemImageBackupVar.Size   = HMemImage.Size;
@@ -136,51 +142,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-HMemImageCleanup (
-  VOID
-  )
-/*++
+/**
+  Set FileName field in HFileImage.
 
-Routine Description: 
+  @param[in] Offset   The offset.
+  @param[in] Size     The size.
 
-  Cleanup function for HDiskImage
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
-{
-  return EFI_SUCCESS;
-}
-
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+**/
 EFI_STATUS
 HMemImageSetMemOffsetSize (
   IN UINTN Offset,
   IN UINTN Size
   )
-/*++
-
-Routine Description: 
-
-  Set FileName field in HFileImage
-
-Arguments:  
-
-  Offset - The offset
-  Size   - The size
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_OUT_OF_RESOURCES
-
---*/
 {
 
   HMemImage.Offset  = Offset;
@@ -189,31 +164,23 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Read a disk from disk into HBufferImage.
+
+  @param[in] Offset   The offset.
+  @param[in] Size     The size.
+  @param[in] Recover  if is for recover, no information print.
+
+  @retval EFI_LOAD_ERROR        A load error occured.
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+**/
 EFI_STATUS
 HMemImageRead (
-  IN UINTN  Offset,
-  IN UINTN  Size,
-  BOOLEAN   Recover
+  IN UINTN     Offset,
+  IN UINTN     Size,
+  IN BOOLEAN   Recover
   )
-/*++
-
-Routine Description: 
-
-  Read a disk from disk into HBufferImage
-
-Arguments:  
-
-  Offset  - The offset
-  Size    - The size
-  Recover - if is for recover, no information print
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-  EFI_OUT_OF_RESOURCES
-  
---*/
 {
 
   EFI_STATUS                      Status;
@@ -312,29 +279,21 @@ Returns:
 
 }
 
+/**
+  Save lines in HBufferImage to disk.
+
+  @param[in] Offset   The offset.
+  @param[in] Size     The size.
+
+  @retval EFI_LOAD_ERROR        A load error occured.
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+**/
 EFI_STATUS
 HMemImageSave (
   IN UINTN Offset,
   IN UINTN Size
   )
-/*++
-
-Routine Description: 
-
-  Save lines in HBufferImage to disk
-
-Arguments:  
-
-  Offset - The offset
-  Size   - The size
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-  EFI_OUT_OF_RESOURCES
-
---*/
 {
 
   EFI_STATUS                      Status;
@@ -387,26 +346,4 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-DummyMemRead (
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL              * This,
-  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH    Width,
-  IN     UINT64                                   Address,
-  IN     UINTN                                    Count,
-  IN OUT VOID                                     *Buffer
-  )
-{
-  return EFI_UNSUPPORTED;
-}
 
-EFI_STATUS
-DummyMemWrite (
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL              * This,
-  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH    Width,
-  IN     UINT64                                   Address,
-  IN     UINTN                                    Count,
-  IN OUT VOID                                     *Buffer
-  )
-{
-  return EFI_UNSUPPORTED;
-}

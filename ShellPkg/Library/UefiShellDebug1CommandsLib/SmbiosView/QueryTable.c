@@ -2986,27 +2986,19 @@ QueryTable (
   return QUERY_TABLE_UNFOUND;
 }
 
+/**
+  Given a table of bit info and a Key, return the responding info to the Key.
+
+  @param[in] Table     Point to a table which maintains a map of 'bit' to 'message'.
+  @param[in] Number    Number of table items.
+  @param[in] Bits      The Key of query the bit map information.
+**/
 VOID
 PrintBitsInfo (
   IN  TABLE_ITEM    *Table,
   IN  UINTN         Number,
   IN  UINT32        Bits
   )
-/*++
-
-  Routine Description:
-      Given a table of bit info and a Key,
-      return the responding info to the Key.
-
-  Arguments:
-    Table     - Point to a table which maintains a map of 'bit' to 'message'
-    Number    - Number of table items.
-    Bits      - The Key of query the bit map information.
-
-  Returns:
-    None
-
-**/
 {
   //
   // Get certain bit of 'Value':
@@ -3077,28 +3069,33 @@ PrintBitsInfo (
     PrintBitsInfo (Table, Num, (UINT32) bits); \
   } while (0);
 
-//
-////////////////////////////////////////////////////////////////////
-//
-// System Information (Type 1)
-//
+/**
+  Display System Information (Type 1) Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplaySystemWakeupType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_WAKEUP_TYPE), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Type, Option);
   PRINT_TABLE_ITEM (SystemWakeupTypeTable, Type);
 }
-//
-// System Enclosure (Type 3)
-//
+
+/**
+  Display System Enclosure (Type 3) Enclosure Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplaySystemEnclosureType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_CHASSIS_TYPE), gShellDebug1HiiHandle);
@@ -3113,10 +3110,16 @@ DisplaySystemEnclosureType (
   }
 }
 
+/**
+  Display System Enclosure (Type 3) Enclosure Status.
+
+  @param[in] Status         The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplaySystemEnclosureStatus (
-  UINT8 Status,
-  UINT8 Option
+  IN UINT8 Status,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_CHASSIS_STATUS), gShellDebug1HiiHandle);
@@ -3124,23 +3127,33 @@ DisplaySystemEnclosureStatus (
   PRINT_TABLE_ITEM (SystemEnclosureStatusTable, Status);
 }
 
+/**
+  Display System Enclosure (Type 3) Security Status.
+
+  @param[in] Status         The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplaySESecurityStatus (
-  UINT8 Status,
-  UINT8 Option
+  IN UINT8 Status,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_CHASSIS_SECURITY), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Status, Option);
   PRINT_TABLE_ITEM (SESecurityStatusTable, Status);
 }
-//
-// Processor Information (Type 4)
-//
+
+/**
+  Display Processor Information (Type 4) Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayProcessorType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_PROC_TYPE), gShellDebug1HiiHandle);
@@ -3148,23 +3161,33 @@ DisplayProcessorType (
   PRINT_TABLE_ITEM (ProcessorTypeTable, Type);
 }
 
+/**
+  Display Processor Information (Type 4) Upgrade.
+
+  @param[in] Upgrade        The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayProcessorUpgrade (
-  UINT8 Upgrade,
-  UINT8 Option
+  IN UINT8 Upgrade,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_PROC_UPDATE), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Upgrade, Option);
   PRINT_TABLE_ITEM (ProcessorUpgradeTable, Upgrade);
 }
-//
-// Memory Controller Information (Type 5)
-//
+
+/**
+  Display Memory Controller Information (Type 5) method.
+
+  @param[in] Method         The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMcErrorDetectMethod (
-  UINT8 Method,
-  UINT8 Option
+  IN UINT8 Method,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_DETECTMETHOD), gShellDebug1HiiHandle);
@@ -3172,10 +3195,16 @@ DisplayMcErrorDetectMethod (
   PRINT_TABLE_ITEM (McErrorDetectMethodTable, Method);
 }
 
+/**
+  Display Memory Controller Information (Type 5) Capability.
+
+  @param[in] Capability     The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMcErrorCorrectCapability (
-  UINT8 Capability,
-  UINT8 Option
+  IN UINT8 Capability,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_CORRECT_CAPABILITY), gShellDebug1HiiHandle);
@@ -3183,10 +3212,16 @@ DisplayMcErrorCorrectCapability (
   PRINT_BITS_INFO (McErrorCorrectCapabilityTable, Capability);
 }
 
+/**
+  Display Memory Controller Information (Type 5) Support.
+
+  @param[in] Support        The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMcInterleaveSupport (
-  UINT8 Support,
-  UINT8 Option
+  IN UINT8 Support,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_INTERLEAVE_SUPPORT), gShellDebug1HiiHandle);
@@ -3194,10 +3229,16 @@ DisplayMcInterleaveSupport (
   PRINT_TABLE_ITEM (McInterleaveSupportTable, Support);
 }
 
+/**
+  Display Memory Controller Information (Type 5) speeds.
+
+  @param[in] Speed          The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMcMemorySpeeds (
-  UINT16  Speed,
-  UINT8   Option
+  IN UINT16  Speed,
+  IN UINT8   Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_MEMORY_SPEED), gShellDebug1HiiHandle);
@@ -3205,23 +3246,33 @@ DisplayMcMemorySpeeds (
   PRINT_BITS_INFO (McMemorySpeedsTable, Speed);
 }
 
+/**
+  Display Memory Controller Information (Type 5) voltage.
+
+  @param[in] Voltage        The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMemoryModuleVoltage (
-  UINT8 Voltage,
-  UINT8 Option
+  IN UINT8 Voltage,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_REQUIRED_VOLTAGES), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Voltage, Option);
   PRINT_BITS_INFO (MemoryModuleVoltageTable, Voltage);
 }
-//
-// Memory Module Information (Type 6)
-//
+
+/**
+  Display Memory Module Information (Type 6) type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMmMemoryType (
-  UINT16  Type,
-  UINT8   Option
+  IN UINT16  Type,
+  IN UINT8   Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_MODULE_TYPE), gShellDebug1HiiHandle);
@@ -3229,23 +3280,33 @@ DisplayMmMemoryType (
   PRINT_BITS_INFO (MmMemoryTypeTable, Type);
 }
 
+/**
+  Display Memory Module Information (Type 6) status.
+
+  @param[in] Status         The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayMmErrorStatus (
-  UINT8 Status,
-  UINT8 Option
+  IN UINT8 Status,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_MODULE_ERROR_STATUS), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Status, Option);
   PRINT_BITS_INFO (MmErrorStatusTable, Status);
 }
-//
-// Cache Information (Type 7)
-//
+
+/**
+  Display Cache Information (Type 7) SRAM Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayCacheSRAMType (
-  UINT16  Type,
-  UINT8   Option
+  IN UINT16  Type,
+  IN UINT8   Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_CACHE_SRAM_TYPE), gShellDebug1HiiHandle);
@@ -3253,10 +3314,16 @@ DisplayCacheSRAMType (
   PRINT_BITS_INFO (CacheSRAMTypeTable, (UINT8) Type);
 }
 
+/**
+  Display Cache Information (Type 7) correcting Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayCacheErrCorrectingType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_CACHE_ERROR_CORRECTING), gShellDebug1HiiHandle);
@@ -3264,10 +3331,16 @@ DisplayCacheErrCorrectingType (
   PRINT_TABLE_ITEM (CacheErrCorrectingTypeTable, Type);
 }
 
+/**
+  Display Cache Information (Type 7) Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayCacheSystemCacheType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_CACHE_SYSTEM_TYPE), gShellDebug1HiiHandle);
@@ -3275,23 +3348,33 @@ DisplayCacheSystemCacheType (
   PRINT_TABLE_ITEM (CacheSystemCacheTypeTable, Type);
 }
 
+/**
+  Display Cache Information (Type 7) Associativity.
+
+  @param[in] Associativity  The key of the structure.
+  @param[in] Option         The optional information.
+**/
 VOID
 DisplayCacheAssociativity (
-  UINT8 Associativity,
-  UINT8 Option
+  IN UINT8 Associativity,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_CACHE_ASSOCIATIVITY), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Associativity, Option);
   PRINT_TABLE_ITEM (CacheAssociativityTable, Associativity);
 }
-//
-// Port Connector Information (Type 8)
-//
+
+/**
+  Display Port Connector Information  (Type 8) type.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPortConnectorType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_PORT_CONNECTOR_TYPE), gShellDebug1HiiHandle);
@@ -3299,23 +3382,33 @@ DisplayPortConnectorType (
   PRINT_TABLE_ITEM (PortConnectorTypeTable, Type);
 }
 
+/**
+  Display Port Connector Information  (Type 8) port type.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPortType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_PORT_TYPE), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Type, Option);
   PRINT_TABLE_ITEM (PortTypeTable, Type);
 }
-//
-// System Slots (Type 9)
-//
+
+/**
+  Display System Slots (Type 9) slot type.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySystemSlotType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_SLOT_TYPE), gShellDebug1HiiHandle);
@@ -3323,10 +3416,16 @@ DisplaySystemSlotType (
   PRINT_TABLE_ITEM (SystemSlotTypeTable, Type);
 }
 
+/**
+  Display System Slots (Type 9) data bus width.
+
+  @param[in] Width      The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySystemSlotDataBusWidth (
-  UINT8 Width,
-  UINT8 Option
+  IN UINT8 Width,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_SLOT_DATA), gShellDebug1HiiHandle);
@@ -3334,10 +3433,16 @@ DisplaySystemSlotDataBusWidth (
   PRINT_TABLE_ITEM (SystemSlotDataBusWidthTable, Width);
 }
 
+/**
+  Display System Slots (Type 9) usage information.
+
+  @param[in] Usage      The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySystemSlotCurrentUsage (
-  UINT8 Usage,
-  UINT8 Option
+  IN UINT8 Usage,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_SLOT_CURRENT_USAGE), gShellDebug1HiiHandle);
@@ -3345,10 +3450,16 @@ DisplaySystemSlotCurrentUsage (
   PRINT_TABLE_ITEM (SystemSlotCurrentUsageTable, Usage);
 }
 
+/**
+  Display System Slots (Type 9) slot length.
+
+  @param[in] Length     The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySystemSlotLength (
-  UINT8 Length,
-  UINT8 Option
+  IN UINT8 Length,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_SLOT_LENGTH), gShellDebug1HiiHandle);
@@ -3356,10 +3467,16 @@ DisplaySystemSlotLength (
   PRINT_TABLE_ITEM (SystemSlotLengthTable, Length);
 }
 
+/**
+  Display System Slots (Type 9) characteristics.
+
+  @param[in] Chara1     The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySlotCharacteristics1 (
-  UINT8 Chara1,
-  UINT8 Option
+  IN UINT8 Chara1,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_SLOT_CHARACTERISTICS), gShellDebug1HiiHandle);
@@ -3367,36 +3484,50 @@ DisplaySlotCharacteristics1 (
   PRINT_BITS_INFO (SlotCharacteristics1Table, Chara1);
 }
 
+/**
+  Display System Slots (Type 9) characteristics.
+
+  @param[in] Chara2     The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySlotCharacteristics2 (
-  UINT8 Chara2,
-  UINT8 Option
+  IN UINT8 Chara2,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_SLOT_CHARACTERISTICS_2), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Chara2, Option);
   PRINT_BITS_INFO (SlotCharacteristics2Table, Chara2);
 }
-//
-// On Board Devices Information (Type 10)
-//
+
+/**
+  Display On Board Devices Information (Type 10) types.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayOnboardDeviceTypes (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_ONBOARD_DEVICE_TYPE), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Type, Option);
   PRINT_TABLE_ITEM (OnboardDeviceTypesTable, Type);
 }
-//
-// System Event Log (Type 15)
-//
+
+/**
+  Display System Event Log (Type 15) types.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySELTypes (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_EVENT_LOG_TYPE), gShellDebug1HiiHandle);
@@ -3404,10 +3535,16 @@ DisplaySELTypes (
   PRINT_TABLE_ITEM (SELTypesTable, Type);
 }
 
+/**
+  Display System Event Log (Type 15) format type.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySELVarDataFormatType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_EVENT_LOG_VAR_DATA_FORMAT), gShellDebug1HiiHandle);
@@ -3415,10 +3552,16 @@ DisplaySELVarDataFormatType (
   PRINT_TABLE_ITEM (SELVarDataFormatTypeTable, Type);
 }
 
+/**
+  Display System Event Log (Type 15) dw1.
+
+  @param[in] Key        The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPostResultsBitmapDw1 (
-  UINT32  Key,
-  UINT8   Option
+  IN UINT32  Key,
+  IN UINT8   Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_POST_RESULTS_BITMAP), gShellDebug1HiiHandle);
@@ -3426,10 +3569,16 @@ DisplayPostResultsBitmapDw1 (
   PRINT_BITS_INFO (PostResultsBitmapDw1Table, Key);
 }
 
+/**
+  Display System Event Log (Type 15) dw2.
+
+  @param[in] Key        The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPostResultsBitmapDw2 (
-  UINT32  Key,
-  UINT8   Option
+  IN UINT32  Key,
+  IN UINT8   Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_POST_RESULTS_SECOND_DWORD), gShellDebug1HiiHandle);
@@ -3437,10 +3586,16 @@ DisplayPostResultsBitmapDw2 (
   PRINT_BITS_INFO (PostResultsBitmapDw2Table, Key);
 }
 
+/**
+  Display System Event Log (Type 15) type.
+
+  @param[in] SMType     The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplaySELSysManagementTypes (
-  UINT32  SMType,
-  UINT8   Option
+  IN UINT32  SMType,
+  IN UINT8   Option
   )
 {
   UINT8       Temp;
@@ -3467,13 +3622,17 @@ DisplaySELSysManagementTypes (
     PRINT_TABLE_ITEM (SELSysManagementTypesTable, Temp);
   }
 }
-//
-// Physical Memory Array (Type 16)
-//
+
+/**
+  Display Physical Memory Array (Type 16) Location.
+
+  @param[in] Location   The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPMALocation (
-  UINT8 Location,
-  UINT8 Option
+  IN UINT8 Location,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_PHYS_MEM_ARRAY_LOCATION), gShellDebug1HiiHandle);
@@ -3481,10 +3640,16 @@ DisplayPMALocation (
   PRINT_TABLE_ITEM (PMALocationTable, Location);
 }
 
+/**
+  Display Physical Memory Array (Type 16) Use.
+
+  @param[in] Use        The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPMAUse (
-  UINT8 Use,
-  UINT8 Option
+  IN UINT8 Use,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_PHYS_MEM_ARRAY_LOCATION), gShellDebug1HiiHandle);
@@ -3492,23 +3657,33 @@ DisplayPMAUse (
   PRINT_TABLE_ITEM (PMAUseTable, Use);
 }
 
+/**
+  Display Physical Memory Array (Type 16) Types.
+
+  @param[in] Type       The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPMAErrorCorrectionTypes (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_PHYS_MEM_ARRAY_ERROR), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Type, Option);
   PRINT_TABLE_ITEM (PMAErrorCorrectionTypesTable, Type);
 }
-//
-// Memory Device (Type 17)
-//
+
+/**
+  Display Memory Device (Type 17) form factor.
+
+  @param[in] FormFactor The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayMemoryDeviceFormFactor (
-  UINT8 FormFactor,
-  UINT8 Option
+  IN UINT8 FormFactor,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_FORM_FACTOR), gShellDebug1HiiHandle);
@@ -3516,10 +3691,16 @@ DisplayMemoryDeviceFormFactor (
   PRINT_TABLE_ITEM (MemoryDeviceFormFactorTable, FormFactor);
 }
 
+/**
+  Display Memory Device (Type 17) type.
+
+  @param[in] Type     The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayMemoryDeviceType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_TYPE), gShellDebug1HiiHandle);
@@ -3527,23 +3708,33 @@ DisplayMemoryDeviceType (
   PRINT_TABLE_ITEM (MemoryDeviceTypeTable, Type);
 }
 
+/**
+  Display Memory Device (Type 17) details.
+
+  @param[in] Para     The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayMemoryDeviceTypeDetail (
-  UINT16  para,
-  UINT8   Option
+  IN UINT16  Para,
+  IN UINT8   Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_TYPE_DETAIL), gShellDebug1HiiHandle);
-  PRINT_INFO_OPTION (para, Option);
-  PRINT_BITS_INFO (MemoryDeviceTypeDetailTable, para);
+  PRINT_INFO_OPTION (Para, Option);
+  PRINT_BITS_INFO (MemoryDeviceTypeDetailTable, Para);
 }
-//
-// 32-bit Memory Error Information (Type 18)
-//
+
+/**
+  Display 32-bit Memory Error Information (Type 18) type.
+
+  @param[in] ErrorType  The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayMemoryErrorType (
-  UINT8 ErrorType,
-  UINT8 Option
+  IN UINT8 ErrorType,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_ERROR_INFO), gShellDebug1HiiHandle);
@@ -3551,10 +3742,16 @@ DisplayMemoryErrorType (
   PRINT_TABLE_ITEM (MemoryErrorTypeTable, ErrorType);
 }
 
+/**
+  Display 32-bit Memory Error Information (Type 18) error granularity.
+
+  @param[in] Granularity  The key of the structure.
+  @param[in] Option       The optional information.
+**/
 VOID
 DisplayMemoryErrorGranularity (
-  UINT8 Granularity,
-  UINT8 Option
+  IN UINT8 Granularity,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_ERROR_GRANULARITY), gShellDebug1HiiHandle);
@@ -3562,23 +3759,33 @@ DisplayMemoryErrorGranularity (
   PRINT_TABLE_ITEM (MemoryErrorGranularityTable, Granularity);
 }
 
+/**
+  Display 32-bit Memory Error Information (Type 18) error information.
+
+  @param[in] Operation  The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayMemoryErrorOperation (
-  UINT8 Operation,
-  UINT8 Option
+  IN UINT8 Operation,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_ERROR_OP), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Operation, Option);
   PRINT_TABLE_ITEM (MemoryErrorOperationTable, Operation);
 }
-//
-// Built-in Pointing Device (Type 21)
-//
+
+/**
+  Display Built-in Pointing Device (Type 21) type information.
+
+  @param[in] Type     The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayPointingDeviceType (
-  UINT8 Type,
-  UINT8 Option
+  IN UINT8 Type,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_POINTING_DEVICE_TYPE), gShellDebug1HiiHandle);
@@ -3586,36 +3793,50 @@ DisplayPointingDeviceType (
   PRINT_TABLE_ITEM (PointingDeviceTypeTable, Type);
 }
 
+/**
+  Display Built-in Pointing Device (Type 21) information.
+
+  @param[in] Interface  The key of the structure.
+  @param[in] Option     The optional information.
+**/
 VOID
 DisplayPointingDeviceInterface (
-  UINT8   Interface,
-  UINT8   Option
+  IN UINT8   Interface,
+  IN UINT8   Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_POINTING_DEVICE_INTERFACE), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Interface, Option);
   PRINT_TABLE_ITEM (PointingDeviceInterfaceTable, Interface);
 }
-//
-// Portable Battery (Type 22)
-//
+
+/**
+  Display Portable Battery  (Type 22) information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayPBDeviceChemistry (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_PORTABLE_BATT_DEV_CHEM), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Key, Option);
   PRINT_TABLE_ITEM (PBDeviceChemistryTable, Key);
 }
-//
-// Voltage Probe (Type 26)
-//
+
+/**
+  Display Voltage Probe (Type 26) location information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayVPLocation (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   )
 {
   UINT8       Loc;
@@ -3626,10 +3847,16 @@ DisplayVPLocation (
   PRINT_TABLE_ITEM (VPLocationTable, Loc);
 }
 
+/**
+  Display Voltage Probe (Type 26) status ype information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayVPStatus (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   )
 {
   UINT8       Status;
@@ -3639,13 +3866,17 @@ DisplayVPStatus (
   PRINT_INFO_OPTION (Status, Option);
   PRINT_TABLE_ITEM (VPStatusTable, Status);
 }
-//
-// Voltage Probe (Type 27)
-//
+
+/**
+  Display Cooling (Type 27) status information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayCoolingDeviceStatus (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   )
 {
   UINT8       Status;
@@ -3656,10 +3887,16 @@ DisplayCoolingDeviceStatus (
   PRINT_TABLE_ITEM (CoolingDeviceStatusTable, Status);
 }
 
+/**
+  Display Cooling (Type 27) type information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayCoolingDeviceType (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   )
 {
   UINT8       Type;
@@ -3669,13 +3906,17 @@ DisplayCoolingDeviceType (
   PRINT_INFO_OPTION (Type, Option);
   PRINT_TABLE_ITEM (CoolingDeviceTypeTable, Type);
 }
-//
-// Temperature Probe  (Type 28)
-//
+
+/**
+  Display Temperature Probe (Type 28) status information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayTemperatureProbeStatus (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   )
 {
   UINT8       Status;
@@ -3686,10 +3927,16 @@ DisplayTemperatureProbeStatus (
   PRINT_TABLE_ITEM (TemperatureProbeStatusTable, Status);
 }
 
+/**
+  Display Temperature Probe  (Type 28) location information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayTemperatureProbeLoc (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   )
 {
   UINT8       Loc;
@@ -3699,13 +3946,17 @@ DisplayTemperatureProbeLoc (
   PRINT_INFO_OPTION (Loc, Option);
   PRINT_TABLE_ITEM (TemperatureProbeLocTable, Loc);
 }
-//
-// Electrical Current Probe (Type 29)
-//
+
+/**
+  Display Electrical Current Probe (Type 29)  status information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayECPStatus (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   )
 {
   UINT8       Status;
@@ -3716,10 +3967,16 @@ DisplayECPStatus (
   PRINT_TABLE_ITEM (ECPStatusTable, Status);
 }
 
+/**
+  Display Type 29 information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayECPLoc (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   )
 {
   UINT8       Loc;
@@ -3729,13 +3986,17 @@ DisplayECPLoc (
   PRINT_INFO_OPTION (Loc, Option);
   PRINT_TABLE_ITEM (ECPLocTable, Loc);
 }
-//
-// Management Device (Type 34)
-//
+
+/**
+  Display Management Device (Type 34) information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayMDType (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MANAGEMENT_DEV_TYPE), gShellDebug1HiiHandle);
@@ -3743,36 +4004,33 @@ DisplayMDType (
   PRINT_TABLE_ITEM (MDTypeTable, Key);
 }
 
-VOID
-DisplayMDAddressType (
-  UINT8 Key,
-  UINT8 Option
-  )
-{
-  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MANAGEMENT_DEV_ADDR_TYPE), gShellDebug1HiiHandle);
-  PRINT_INFO_OPTION (Key, Option);
-  PRINT_TABLE_ITEM (MDAddressTypeTable, Key);
-}
-//
-// Memory Channel (Type 37)
-//
+/**
+  Display Memory Channel (Type 37) information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayMemoryChannelType (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_CHANNEL_TYPE), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Key, Option);
   PRINT_TABLE_ITEM (MemoryChannelTypeTable, Key);
 }
-//
-// IPMI Device Information (Type 38)
-//
+
+/**
+  Display IPMI Device Information (Type 38) information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayIPMIDIBMCInterfaceType (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   )
 {
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_BMC_INTERFACE_TYPE), gShellDebug1HiiHandle);
@@ -3780,10 +4038,16 @@ DisplayIPMIDIBMCInterfaceType (
   PRINT_TABLE_ITEM (IPMIDIBMCInterfaceTypeTable, Key);
 }
 
+/**
+  Display the structure type information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
 VOID
 DisplayStructureTypeInfo (
-  UINT8 Key,
-  UINT8 Option
+  IN UINT8 Key,
+  IN UINT8 Option
   )
 {
   //

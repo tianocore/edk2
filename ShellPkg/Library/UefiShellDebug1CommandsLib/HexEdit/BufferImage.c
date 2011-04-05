@@ -74,23 +74,16 @@ BOOLEAN                           HBufferImageOnlyLineNeedRefresh;
 
 BOOLEAN                           HBufferImageMouseNeedRefresh;
 
+/**
+  Initialization function for HBufferImage
+
+  @retval EFI_SUCCESS       The operation was successful.
+  @retval EFI_LOAD_ERROR    A load error occured.
+**/
 EFI_STATUS
 HBufferImageInit (
   VOID
   )
-/**
-  Initialization function for HBufferImage
-
-  
-
-  None
-
- 
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-
-**/
 {
   EFI_STATUS  Status;
 
@@ -144,25 +137,16 @@ HBufferImageInit (
   return EFI_SUCCESS;
 }
 
+/**
+  Backup function for HBufferImage. Only a few fields need to be backup. 
+  This is for making the file buffer refresh as few as possible.
+
+  @retval EFI_SUCCESS  The operation was successful.
+**/
 EFI_STATUS
 HBufferImageBackup (
   VOID
   )
-/**
-  Backup function for HBufferImage
-  Only a few fields need to be backup. 
-  This is for making the file buffer refresh 
-  as few as possible.
-
-  
-
-  None
-
- 
-
-  EFI_SUCCESS
-
-**/
 {
   HBufferImageBackupVar.MousePosition   = HBufferImage.MousePosition;
 
@@ -197,27 +181,20 @@ HBufferImageBackup (
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-HBufferImageFreeLines (
-  VOID
-  )
 /**
-  Free all the lines in HBufferImage
+  Free all the lines in HBufferImage.
     Fields affected:
     Lines
     CurrentLine
     NumLines
     ListHead 
 
-  
-
-  None
-
- 
-
-  EFI_SUCCESS
-
+  @retval EFI_SUCCESS  The operation was successful.
 **/
+EFI_STATUS
+HBufferImageFreeLines (
+  VOID
+  )
 {
   HFreeLines (HBufferImage.ListHead, HBufferImage.Lines);
 
@@ -228,22 +205,15 @@ HBufferImageFreeLines (
   return EFI_SUCCESS;
 }
 
+/**
+  Cleanup function for HBufferImage
+
+  @retval EFI_SUCCESS  The operation was successful.
+**/
 EFI_STATUS
 HBufferImageCleanup (
   VOID
   )
-/**
-  Cleanup function for HBufferImage
-
-  
-
-  None
-
- 
-
-  EFI_SUCCESS
-
-**/
 {
   EFI_STATUS  Status;
 
@@ -257,12 +227,22 @@ HBufferImageCleanup (
 
   HFileImageCleanup ();
   HDiskImageCleanup ();
-  HMemImageCleanup ();
 
   return Status;
 
 }
 
+/**
+  Print Line on Row
+
+  @param[in] Line     The lline to print.
+  @param[in] Row      The row on screen ( begin from 1 ).
+  @param[in] FRow     The FRow.
+  @param[in] Orig     The original color.
+  @param[in] New      The color to print with.
+
+  @retval EFI_SUCCESS The operation was successful.
+**/
 EFI_STATUS
 HBufferImagePrintLine (
   IN HEFI_EDITOR_LINE           *Line,
@@ -272,22 +252,6 @@ HBufferImagePrintLine (
   IN HEFI_EDITOR_COLOR_UNION    New
 
   )
-/**
-  Print Line on Row
-
-  
-
-  Line - Line to print
-  Row  - Row on screen ( begin from 1 )
-  FRow - FRow
-  Orig - Orig
-  New  - Light display
-
- 
-
-  EFI_SUCCESS
-
-**/
 {
 
   UINTN   Index;
@@ -330,7 +294,7 @@ HBufferImagePrintLine (
 
   }
 
-  if (HEditorMouseAction == FALSE) {
+  if (!HEditorMouseAction) {
     ShellPrintEx (
       0,
       (INT32)Row - 1,
@@ -417,7 +381,7 @@ HBufferImagePrintLine (
   //
   // PRINT the buffer content
   //
-  if (HEditorMouseAction == FALSE) {
+  if (!HEditorMouseAction) {
     for (Index = 0; Index < 0x10 && Index < Line->Size; Index++) {
       Pos = ASCII_POSITION + Index;
 
@@ -456,6 +420,15 @@ HBufferImagePrintLine (
   return EFI_SUCCESS;
 }
 
+/**
+  Function to decide if a column number is stored in the high bits.
+
+  @param[in] Column     The column to examine.
+  @param[out] FCol      The actual column number.
+
+  @retval TRUE      The actual column was in high bits and is now in FCol.
+  @retval FALSE     There was not a column number in the high bits.
+**/
 BOOLEAN
 HBufferImageIsAtHighBits (
   IN  UINTN Column,
@@ -479,7 +452,7 @@ HBufferImageIsAtHighBits (
 
   *FCol = (Column / 3) + 1;
 
-  if (!(Column % 3)) {
+  if (Column % 3 == 0) {
     return TRUE;
   }
 
@@ -490,6 +463,15 @@ HBufferImageIsAtHighBits (
   return FALSE;
 }
 
+/**
+  Decide if a point is in the already selected area.
+
+  @param[in] MouseRow     The row of the point to test.
+  @param[in] MouseCol     The col of the point to test.
+
+  @retval TRUE      The point is in the selected area.
+  @retval FALSE     The point is not in the selected area.
+**/
 BOOLEAN
 HBufferImageIsInSelectedArea (
   IN UINTN MouseRow,
@@ -552,6 +534,11 @@ HBufferImageIsInSelectedArea (
   return TRUE;
 }
 
+/**
+  Set mouse position according to HBufferImage.MousePosition.
+
+  @retval EFI_SUCCESS  The operation was successful.
+**/
 EFI_STATUS
 HBufferImageRestoreMousePosition (
   VOID
@@ -719,22 +706,15 @@ HBufferImageRestoreMousePosition (
   return EFI_SUCCESS;
 }
 
+/**
+  Set cursor position according to HBufferImage.DisplayPosition.
+
+  @retval EFI_SUCCESS  The operation was successful.
+**/
 EFI_STATUS
 HBufferImageRestorePosition (
   VOID
   )
-/**
-  Set cursor position according to HBufferImage.DisplayPosition.
-
-  
-
-  None
-
- 
-
-  EFI_SUCCESS
-
-**/
 {
   //
   // set cursor position
@@ -890,7 +870,7 @@ HBufferImageRefresh (
     } while (Link != HBufferImage.ListHead && Row <= EndRow);
 
     while (Row <= EndRow) {
-      HEditorClearLine (Row);
+      EditorClearLine (Row, HMainEditor.ScreenSize.Column, HMainEditor.ScreenSize.Row);
       Row++;
     }
     //
@@ -915,8 +895,8 @@ HBufferImageRefresh (
   @param[in] DiskName     Pointer to the disk name.  OPTIONAL and ignored if not FileTypeDiskBuffer.
   @param[in] DiskOffset   Offset into the disk.  OPTIONAL and ignored if not FileTypeDiskBuffer.
   @param[in] DiskSize     Size of the disk buffer.  OPTIONAL and ignored if not FileTypeDiskBuffer.
-  @param[in] MemoryOffset Offset into the Memory.  OPTIONAL and ignored if not FileTypeMemBuffer.
-  @param[in] MemorySize   Size of the Memory buffer.  OPTIONAL and ignored if not FileTypeMemBuffer.
+  @param[in] MemOffset    Offset into the Memory.  OPTIONAL and ignored if not FileTypeMemBuffer.
+  @param[in] MemSize      Size of the Memory buffer.  OPTIONAL and ignored if not FileTypeMemBuffer.
   @param[in] BufferType   The type of buffer to save.  IGNORED.
   @param[in] Recover      TRUE for recovermode, FALSE otherwise.
 
@@ -980,8 +960,8 @@ HBufferImageRead (
   @param[in] DiskName     Pointer to the disk name.  OPTIONAL and ignored if not FileTypeDiskBuffer.
   @param[in] DiskOffset   Offset into the disk.  OPTIONAL and ignored if not FileTypeDiskBuffer.
   @param[in] DiskSize     Size of the disk buffer.  OPTIONAL and ignored if not FileTypeDiskBuffer.
-  @param[in] MemoryOffset Offset into the Memory.  OPTIONAL and ignored if not FileTypeMemBuffer.
-  @param[in] MemorySize   Size of the Memory buffer.  OPTIONAL and ignored if not FileTypeMemBuffer.
+  @param[in] MemOffset    Offset into the Memory.  OPTIONAL and ignored if not FileTypeMemBuffer.
+  @param[in] MemSize      Size of the Memory buffer.  OPTIONAL and ignored if not FileTypeMemBuffer.
   @param[in] BufferType   The type of buffer to save.  IGNORED.
 
   @return EFI_SUCCESS     The operation was successful.
@@ -1099,160 +1079,6 @@ HBufferImageFree (
   HBufferImageFreeLines ();
 
   return EFI_SUCCESS;
-}
-
-/**
-  Dispatch input to different handler
-
-  @param[in] Key    The input key:
-                     the keys can be:
-                       ASCII KEY
-                        Backspace/Delete
-                        Direction key: up/down/left/right/pgup/pgdn
-                        Home/End
-                        INS
-
-  @retval EFI_SUCCESS           The operation was successful.
-  @retval EFI_LOAD_ERROR        A load error occured.
-  @retval EFI_OUT_OF_RESOURCES  A Memory allocation failed.
-**/
-EFI_STATUS
-HBufferImageHandleInput (
-  IN  EFI_INPUT_KEY *Key
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = EFI_SUCCESS;
-
-  switch (Key->ScanCode) {
-  //
-  // ordinary key
-  //
-  case SCAN_NULL:
-    Status = HBufferImageDoCharInput (Key->UnicodeChar);
-    break;
-
-  //
-  // up arrow
-  //
-  case SCAN_UP:
-    Status = HBufferImageScrollUp ();
-    break;
-
-  //
-  // down arrow
-  //
-  case SCAN_DOWN:
-    Status = HBufferImageScrollDown ();
-    break;
-
-  //
-  // right arrow
-  //
-  case SCAN_RIGHT:
-    Status = HBufferImageScrollRight ();
-    break;
-
-  //
-  // left arrow
-  //
-  case SCAN_LEFT:
-    Status = HBufferImageScrollLeft ();
-    break;
-
-  //
-  // page up
-  //
-  case SCAN_PAGE_UP:
-    Status = HBufferImagePageUp ();
-    break;
-
-  //
-  // page down
-  //
-  case SCAN_PAGE_DOWN:
-    Status = HBufferImagePageDown ();
-    break;
-
-  //
-  // delete
-  //
-  case SCAN_DELETE:
-    Status = HBufferImageDoDelete ();
-    break;
-
-  //
-  // home
-  //
-  case SCAN_HOME:
-    Status = HBufferImageHome ();
-    break;
-
-  //
-  // end
-  //
-  case SCAN_END:
-    Status = HBufferImageEnd ();
-    break;
-
-  default:
-    Status = StatusBarSetStatusString (L"Unknown Command");
-    break;
-  }
-
-  return Status;
-}
-
-/**
-  ASCII key + Backspace + return.
-
-  @param[in] Char               The input char.
-
-  @retval EFI_SUCCESS           The operation was successful.
-  @retval EFI_LOAD_ERROR        A load error occured.
-  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
-**/
-EFI_STATUS
-EFIAPI
-HBufferImageDoCharInput (
-  IN  CHAR16  Char
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = EFI_SUCCESS;
-
-  switch (Char) {
-  case 0:
-    break;
-
-  case 0x08:
-    Status = HBufferImageDoBackspace ();
-    break;
-
-  case 0x09:
-  case 0x0a:
-  case 0x0d:
-    //
-    // Tabs, Returns are thought as nothing
-    //
-    break;
-
-  default:
-    //
-    // DEAL WITH ASCII CHAR, filter out thing like ctrl+f
-    //
-    if (Char > 127 || Char < 32) {
-      Status = StatusBarSetStatusString (L"Unknown Command");
-    } else {
-      Status = HBufferImageAddChar (Char);
-    }
-
-    break;
-  }
-
-  return Status;
 }
 
 /**
@@ -1422,23 +1248,114 @@ HBufferImageAddChar (
 }
 
 /**
-  Check user specified FileRow and FileCol is in current screen.
+  Delete the previous character.
 
-  @param[in] FileRow    Row of file position ( start from 1 ).
-
-  @retval TRUE   It's on the current screen.
-  @retval FALSE  It's not on the current screen.
+  @retval EFI_SUCCESS   The operationw as successful.
 **/
-BOOLEAN
-HInCurrentScreen (
-  IN  UINTN FileRow
+EFI_STATUS
+EFIAPI
+HBufferImageDoBackspace (
+  VOID
   )
 {
-  if (FileRow >= HBufferImage.LowVisibleRow && FileRow <= HBufferImage.LowVisibleRow + (HMainEditor.ScreenSize.Row - 5) - 1) {
-    return TRUE;
+  HEFI_EDITOR_LINE  *Line;
+
+  UINTN             FileColumn;
+  UINTN             FPos;
+  BOOLEAN           LastLine;
+
+  //
+  // variable initialization
+  //
+  LastLine = FALSE;
+
+  //
+  // already the first character
+  //
+  if (HBufferImage.BufferPosition.Row == 1 && HBufferImage.BufferPosition.Column == 1) {
+    return EFI_SUCCESS;
   }
 
-  return FALSE;
+  FPos        = (HBufferImage.BufferPosition.Row - 1) * 0x10 + HBufferImage.BufferPosition.Column - 1;
+
+  FileColumn  = HBufferImage.BufferPosition.Column;
+
+  Line        = HBufferImage.CurrentLine;
+  LastLine    = FALSE;
+  if (Line->Link.ForwardLink == HBufferImage.ListHead && FileColumn > 1) {
+    LastLine = TRUE;
+  }
+
+  HBufferImageDeleteCharacterFromBuffer (FPos - 1, 1, NULL);
+
+  //
+  // if is the last line
+  // then only this line need to be refreshed
+  //
+  if (LastLine) {
+    HBufferImageNeedRefresh         = FALSE;
+    HBufferImageOnlyLineNeedRefresh = TRUE;
+  } else {
+    HBufferImageNeedRefresh         = TRUE;
+    HBufferImageOnlyLineNeedRefresh = FALSE;
+  }
+
+  if (!HBufferImage.Modified) {
+    HBufferImage.Modified = TRUE;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  ASCII key + Backspace + return.
+
+  @param[in] Char               The input char.
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_LOAD_ERROR        A load error occured.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+HBufferImageDoCharInput (
+  IN  CHAR16  Char
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = EFI_SUCCESS;
+
+  switch (Char) {
+  case 0:
+    break;
+
+  case 0x08:
+    Status = HBufferImageDoBackspace ();
+    break;
+
+  case 0x09:
+  case 0x0a:
+  case 0x0d:
+    //
+    // Tabs, Returns are thought as nothing
+    //
+    break;
+
+  default:
+    //
+    // DEAL WITH ASCII CHAR, filter out thing like ctrl+f
+    //
+    if (Char > 127 || Char < 32) {
+      Status = StatusBarSetStatusString (L"Unknown Command");
+    } else {
+      Status = HBufferImageAddChar (Char);
+    }
+
+    break;
+  }
+
+  return Status;
 }
 
 /**
@@ -1496,7 +1413,6 @@ HBufferImageMovePosition (
   IN UINTN    NewFilePosCol,
   IN BOOLEAN  HighBits
   )
-
 {
   INTN    RowGap;
   UINTN   Abs;
@@ -1972,7 +1888,7 @@ HBufferImageGetTotalSize (
   
   @param[in] Pos      Position, Pos starting from 0.
   @param[in] Count    The Count of characters to delete.
-  @param[OUT] DeleteBuffer    The DeleteBuffer.
+  @param[out] DeleteBuffer    The DeleteBuffer.
 
   @retval EFI_SUCCESS Success 
 **/
@@ -2205,66 +2121,6 @@ HBufferImageAddCharacterToBuffer (
   }
 
   HBufferImageMovePosition (NewPos / 0x10 + 1, NewPos % 0x10 + 1, TRUE);
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Delete the previous character.
-
-  @retval EFI_SUCCESS   The operationw as successful.
-**/
-EFI_STATUS
-EFIAPI
-HBufferImageDoBackspace (
-  VOID
-  )
-{
-  HEFI_EDITOR_LINE  *Line;
-
-  UINTN             FileColumn;
-  UINTN             FPos;
-  BOOLEAN           LastLine;
-
-  //
-  // variable initialization
-  //
-  LastLine = FALSE;
-
-  //
-  // already the first character
-  //
-  if (HBufferImage.BufferPosition.Row == 1 && HBufferImage.BufferPosition.Column == 1) {
-    return EFI_SUCCESS;
-  }
-
-  FPos        = (HBufferImage.BufferPosition.Row - 1) * 0x10 + HBufferImage.BufferPosition.Column - 1;
-
-  FileColumn  = HBufferImage.BufferPosition.Column;
-
-  Line        = HBufferImage.CurrentLine;
-  LastLine    = FALSE;
-  if (Line->Link.ForwardLink == HBufferImage.ListHead && FileColumn > 1) {
-    LastLine = TRUE;
-  }
-
-  HBufferImageDeleteCharacterFromBuffer (FPos - 1, 1, NULL);
-
-  //
-  // if is the last line
-  // then only this line need to be refreshed
-  //
-  if (LastLine) {
-    HBufferImageNeedRefresh         = FALSE;
-    HBufferImageOnlyLineNeedRefresh = TRUE;
-  } else {
-    HBufferImageNeedRefresh         = TRUE;
-    HBufferImageOnlyLineNeedRefresh = FALSE;
-  }
-
-  if (!HBufferImage.Modified) {
-    HBufferImage.Modified = TRUE;
-  }
 
   return EFI_SUCCESS;
 }
@@ -2534,3 +2390,107 @@ HBufferImageAdjustMousePosition (
   }
 
 }
+
+/**
+  Dispatch input to different handler
+
+  @param[in] Key    The input key:
+                     the keys can be:
+                       ASCII KEY
+                        Backspace/Delete
+                        Direction key: up/down/left/right/pgup/pgdn
+                        Home/End
+                        INS
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_LOAD_ERROR        A load error occured.
+  @retval EFI_OUT_OF_RESOURCES  A Memory allocation failed.
+**/
+EFI_STATUS
+HBufferImageHandleInput (
+  IN  EFI_INPUT_KEY *Key
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = EFI_SUCCESS;
+
+  switch (Key->ScanCode) {
+  //
+  // ordinary key
+  //
+  case SCAN_NULL:
+    Status = HBufferImageDoCharInput (Key->UnicodeChar);
+    break;
+
+  //
+  // up arrow
+  //
+  case SCAN_UP:
+    Status = HBufferImageScrollUp ();
+    break;
+
+  //
+  // down arrow
+  //
+  case SCAN_DOWN:
+    Status = HBufferImageScrollDown ();
+    break;
+
+  //
+  // right arrow
+  //
+  case SCAN_RIGHT:
+    Status = HBufferImageScrollRight ();
+    break;
+
+  //
+  // left arrow
+  //
+  case SCAN_LEFT:
+    Status = HBufferImageScrollLeft ();
+    break;
+
+  //
+  // page up
+  //
+  case SCAN_PAGE_UP:
+    Status = HBufferImagePageUp ();
+    break;
+
+  //
+  // page down
+  //
+  case SCAN_PAGE_DOWN:
+    Status = HBufferImagePageDown ();
+    break;
+
+  //
+  // delete
+  //
+  case SCAN_DELETE:
+    Status = HBufferImageDoDelete ();
+    break;
+
+  //
+  // home
+  //
+  case SCAN_HOME:
+    Status = HBufferImageHome ();
+    break;
+
+  //
+  // end
+  //
+  case SCAN_END:
+    Status = HBufferImageEnd ();
+    break;
+
+  default:
+    Status = StatusBarSetStatusString (L"Unknown Command");
+    break;
+  }
+
+  return Status;
+}
+

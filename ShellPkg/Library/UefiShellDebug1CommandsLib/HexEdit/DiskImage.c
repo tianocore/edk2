@@ -37,26 +37,16 @@ HEFI_EDITOR_DISK_IMAGE            HDiskImageConst = {
   0
 };
 
+/**
+  Initialization function for HDiskImage.
+ 
+  @retval EFI_SUCCESS     The operation was successful.
+  @retval EFI_LOAD_ERROR  A load error occured.
+**/
 EFI_STATUS
 HDiskImageInit (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Initialization function for HDiskImage
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-
---*/
 {
   //
   // basically initialize the HDiskImage
@@ -68,29 +58,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Backup function for HDiskImage. Only a few fields need to be backup.   
+  This is for making the Disk buffer refresh as few as possible.
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES  gST->ConOut of resources.
+**/
 EFI_STATUS
 HDiskImageBackup (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Backup function for HDiskImage
-  Only a few fields need to be backup. 
-  This is for making the Disk buffer refresh 
-  as few as possible.
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS          - Success
-  EFI_OUT_OF_RESOURCES - gST->ConOut of resources
-
---*/
 {
   //
   // backup the disk name, offset and size
@@ -109,25 +87,15 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Cleanup function for HDiskImage.
+
+  @retval EFI_SUCCESS           The operation was successful.
+**/
 EFI_STATUS
 HDiskImageCleanup (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Cleanup function for HDiskImage
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
   SHELL_FREE_NON_NULL (HDiskImage.Name);
   SHELL_FREE_NON_NULL (HDiskImageBackupVar.Name);
@@ -135,6 +103,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Set FileName field in HFileImage.
+
+  @param[in] Str      File name to set.
+  @param[in] Offset   The offset.
+  @param[in] Size     The size.
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+**/
 EFI_STATUS
 EFIAPI
 HDiskImageSetDiskNameOffsetSize (
@@ -142,24 +120,6 @@ HDiskImageSetDiskNameOffsetSize (
   IN UINTN    Offset,
   IN UINTN    Size
   )
-/*++
-
-Routine Description: 
-
-  Set FileName field in HFileImage
-
-Arguments:  
-
-  Str    - File name to set
-  Offset - The offset
-  Size   - The size
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_OUT_OF_RESOURCES
-
---*/
 {
   UINTN Len;
   UINTN Index;
@@ -188,6 +148,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Read a disk from disk into HBufferImage.
+
+  @param[in] DeviceName   filename to read.
+  @param[in] Offset       The offset.
+  @param[in] Size         The size.
+  @param[in] Recover      if is for recover, no information print.
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+  @retval EFI_LOAD_ERROR        A load error occured.
+  @retval EFI_INVALID_PARAMETER A parameter was invalid.  
+**/
 EFI_STATUS
 HDiskImageRead (
   IN CONST CHAR16   *DeviceName,
@@ -195,27 +168,6 @@ HDiskImageRead (
   IN UINTN    Size,
   IN BOOLEAN  Recover
   )
-/*++
-
-Routine Description: 
-
-  Read a disk from disk into HBufferImage
-
-Arguments:  
-
-  DeviceName - filename to read
-  Offset     - The offset
-  Size       - The size
-  Recover    - if is for recover, no information print
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-  EFI_OUT_OF_RESOURCES
-  EFI_INVALID_PARAMETER 
-  
---*/
 {
   CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL        *DupDevicePath;
@@ -374,33 +326,25 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Save lines in HBufferImage to disk.
+  NOT ALLOW TO WRITE TO ANOTHER DISK!!!!!!!!!
+
+  @param[in] DeviceName   The device name.
+  @param[in] Offset       The offset.
+  @param[in] Size         The size.
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+  @retval EFI_LOAD_ERROR        A load error occured.
+  @retval EFI_INVALID_PARAMETER A parameter was invalid.  
+**/
 EFI_STATUS
 HDiskImageSave (
   IN CHAR16 *DeviceName,
   IN UINTN  Offset,
   IN UINTN  Size
   )
-/*++
-
-Routine Description: 
-
-  Save lines in HBufferImage to disk
-  NOT ALLOW TO WRITE TO ANOTHER DISK!!!!!!!!!
-
-Arguments:  
-
-  DeviceName - The device name
-  Offset     - The offset
-  Size       - The size
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-  EFI_OUT_OF_RESOURCES
-  EFI_INVALID_PARAMETER
-
---*/
 {
 
   CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath;

@@ -110,13 +110,7 @@ typedef struct {
 } HEFI_EDITOR_BUFFER_IMAGE;
 
 typedef struct {
-  UINT8 *Buffer;
-  UINTN Size;
-} HEFI_EDITOR_CLIPBOARD;
-
-typedef struct {
   HEFI_EDITOR_BUFFER_IMAGE    *BufferImage;
-  HEFI_EDITOR_CLIPBOARD       *Clipboard;
 
   HEFI_EDITOR_COLOR_UNION     ColorAttributes;
   HEFI_EDITOR_POSITION        ScreenSize;           // row number and column number

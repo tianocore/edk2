@@ -35,26 +35,15 @@ HEFI_EDITOR_BUFFER_IMAGE          HFileImageConst = {
   FALSE
 };
 
+/**
+  Initialization function for HFileImage
+ 
+  @retval EFI_SUCCESS     The operation was successful.
+**/
 EFI_STATUS
 HFileImageInit (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Initialization function for HFileImage
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-
---*/
 {
   //
   // basically initialize the HFileImage
@@ -70,29 +59,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Backup function for HFileImage. Only a few fields need to be backup. 
+  This is for making the file buffer refresh as few as possible.
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+**/
 EFI_STATUS
 HFileImageBackup (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Backup function for HFileImage
-  Only a few fields need to be backup. 
-  This is for making the file buffer refresh 
-  as few as possible.
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_OUT_OF_RESOURCES
-
---*/
 {
   SHELL_FREE_NON_NULL (HFileImageBackupVar.FileName);
   HFileImageBackupVar.FileName = CatSPrint(NULL, L"%s", HFileImage.FileName);
@@ -103,25 +80,15 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Cleanup function for HFileImage.
+
+  @retval EFI_SUCCESS           The operation was successful.
+**/
 EFI_STATUS
 HFileImageCleanup (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Cleanup function for HFileImage
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
 
   SHELL_FREE_NON_NULL (HFileImage.FileName);
@@ -130,26 +97,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Set FileName field in HFileImage
+
+  @param[in] Str  File name to set.
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+**/
 EFI_STATUS
 HFileImageSetFileName (
   IN CONST CHAR16 *Str
   )
-/*++
-
-Routine Description: 
-
-  Set FileName field in HFileImage
-
-Arguments:  
-
-  Str -- File name to set
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_OUT_OF_RESOURCES
-
---*/
 {
   UINTN Size;
   UINTN Index;
@@ -175,79 +134,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-HFileImageGetFileInfo (
-  IN  EFI_FILE_HANDLE Handle,
-  IN  CHAR16          *FileName,
-  OUT EFI_FILE_INFO   **InfoOut
-  )
-/*++
+/**
+  Read a file from disk into HBufferImage.
 
-Routine Description: 
+  @param[in] FileName     filename to read.
+  @param[in] Recover      if is for recover, no information print.
 
-  Get this file's information
-
-Arguments:  
-
-  Handle   - in NT32 mode Directory handle, in other mode File Handle
-  FileName - The file name
-  InfoOut  - parameter to pass file information out
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_OUT_OF_RESOURCES
-  EFI_LOAD_ERROR
-
---*/
-{
-
-  VOID        *Info;
-  UINTN       Size;
-  EFI_STATUS  Status;
-
-  Size  = SIZE_OF_EFI_FILE_INFO + 1024;
-  Info  = AllocateZeroPool (Size);
-  if (!Info) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  //
-  // get file information
-  //
-  Status = Handle->GetInfo (Handle, &gEfiFileInfoGuid, &Size, Info);
-  if (EFI_ERROR (Status)) {
-    return EFI_LOAD_ERROR;
-  }
-
-  *InfoOut = (EFI_FILE_INFO *) Info;
-
-  return EFI_SUCCESS;
-
-}
-
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+  @retval EFI_LOAD_ERROR        A load error occured.
+**/
 EFI_STATUS
 HFileImageRead (
   IN CONST CHAR16  *FileName,
   IN BOOLEAN Recover
   )
-/*++
-
-Routine Description: 
-
-  Read a file from disk into HBufferImage
-
-Arguments:  
-
-  FileName -- filename to read
-  Recover -- if is for recover, no information print
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-  EFI_OUT_OF_RESOURCES
-  
---*/
 {
   HEFI_EDITOR_LINE                *Line;
   UINT8                           *Buffer;
@@ -343,27 +244,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Save lines in HBufferImage to disk.
+
+  @param[in] FileName     The file name.
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+  @retval EFI_LOAD_ERROR        A load error occured.
+**/
 EFI_STATUS
 HFileImageSave (
   IN CHAR16 *FileName
   )
-/*++
-
-Routine Description: 
-
-  Save lines in HBufferImage to disk
-
-Arguments:  
-
-  FileName - The file name
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-  EFI_OUT_OF_RESOURCES
-
---*/
 {
 
   LIST_ENTRY                      *Link;

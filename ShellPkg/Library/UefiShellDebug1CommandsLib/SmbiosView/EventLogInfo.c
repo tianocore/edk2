@@ -1,7 +1,7 @@
-/**
+/** @file
   Module for clarifying the content of the smbios structure element info.
 
-  Copyright (c) 2005-2010, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution. The full text of the license may be found at
@@ -141,6 +141,12 @@ DisplaySysEventLogHeaderFormat (
   }
 }
 
+/**
+  Display the header information for SEL log items.
+
+  @param[in] Key      The information key.
+  @param[in] Option   The option index.
+**/
 VOID
 DisplaySELLogHeaderLen (
   UINT8 Key,
@@ -163,9 +169,14 @@ DisplaySELLogHeaderLen (
   }
 }
 
+/**
+  Display the header information for type 1 items.
+
+  @param[in] LogHeader      The buffer with the information.
+**/
 VOID
 DisplaySysEventLogHeaderType1 (
-  UINT8 *LogHeader
+  IN UINT8 *LogHeader
   )
 {
   LOG_HEADER_TYPE1_FORMAT *Header;
@@ -186,8 +197,8 @@ DisplaySysEventLogHeaderType1 (
     Header->OEMReserved[3],
     Header->OEMReserved[4]
    );
-  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULTIPLE_EVENT_TIME), gShellDebug1HiiHandle, Header->METW);
-  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULTIPLE_EVENT_COUNT), gShellDebug1HiiHandle, Header->MECI);
+  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULTIPLE_EVENT_TIME), gShellDebug1HiiHandle, Header->Metw);
+  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULTIPLE_EVENT_COUNT), gShellDebug1HiiHandle, Header->Meci);
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_PREBOOT_ADDRESS), gShellDebug1HiiHandle, Header->CMOSAddress);
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_PREBOOT_INDEX), gShellDebug1HiiHandle, Header->CMOSBitIndex);
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_CHECKSUM_STARTING_OFF), gShellDebug1HiiHandle, Header->StartingOffset);
@@ -235,6 +246,12 @@ DisplaySysEventLogHeader (
   }
 }
 
+/**
+  Display the El Vdf information.
+
+  @param[in] ElVdfType    The information type.
+  @param[in] VarData      The information buffer.
+**/
 VOID
 DisplayElVdfInfo (
   UINT8 ElVdfType,

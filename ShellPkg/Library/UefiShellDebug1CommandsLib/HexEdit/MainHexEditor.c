@@ -37,8 +37,6 @@ BOOLEAN                         HEditorMouseAction;
 extern HEFI_EDITOR_BUFFER_IMAGE HBufferImage;
 extern HEFI_EDITOR_BUFFER_IMAGE HBufferImageBackupVar;
 
-extern HEFI_EDITOR_CLIPBOARD    HClipBoard;
-
 extern BOOLEAN                  HBufferImageMouseNeedRefresh;
 extern BOOLEAN                  HBufferImageNeedRefresh;
 extern BOOLEAN                  HBufferImageOnlyLineNeedRefresh;
@@ -51,7 +49,6 @@ HEFI_EDITOR_GLOBAL_EDITOR       HMainEditorBackupVar;
 //
 HEFI_EDITOR_GLOBAL_EDITOR       HMainEditorConst = {
   &HBufferImage,
-  &HClipBoard,
   {
     0,
     0
@@ -68,25 +65,15 @@ HEFI_EDITOR_GLOBAL_EDITOR       HMainEditorConst = {
   1
 };
 
+/**
+  Move cursor to specified lines.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
 EFI_STATUS
 HMainCommandGoToOffset (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  move cursor to specified lines
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
   UINTN       Size;
   UINT64      Offset;
@@ -157,29 +144,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Save current opened buffer.
+  If is file buffer, you can save to current file name or 
+  save to another file name.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation occured.
+  @retval EFI_LOAD_ERROR          A load error occured.
+**/
 EFI_STATUS
 HMainCommandSaveBuffer (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  save current opened buffer . 
-  if is file buffer, you can save to current file name or 
-  save to another file name
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_OUT_OF_RESOURCES
-  EFI_LOAD_ERROR
-
---*/
 {
   EFI_STATUS          Status;
   BOOLEAN             Done;
@@ -190,7 +167,7 @@ Returns:
   SHELL_FILE_HANDLE   ShellFileHandle;
 
   if (HMainEditor.BufferImage->BufferType != FileTypeFileBuffer) {
-    if (HMainEditor.BufferImage->Modified == FALSE) {
+    if (!HMainEditor.BufferImage->Modified) {
       return EFI_SUCCESS;
     }
 
@@ -381,7 +358,7 @@ Returns:
     //
     // if the file is read only, so can not write back to it.
     //
-    if (HMainEditor.BufferImage->FileImage->ReadOnly == TRUE) {
+    if (HMainEditor.BufferImage->FileImage->ReadOnly) {
       StatusBarSetStatusString (L"Access Denied");
       SHELL_FREE_NON_NULL (FileName);
       return EFI_SUCCESS;
@@ -467,27 +444,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Load a disk buffer editor.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation occured.
+  @retval EFI_LOAD_ERROR          A load error occured.
+**/
 EFI_STATUS
 HMainCommandSelectStart (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Load a disk buffer editor
-
-Arguments:  
-
-  None
-
-Returns:  
-
-   EFI_SUCCESS
-   EFI_LOAD_ERROR
-   EFI_OUT_OF_RESOURCES
-
---*/
 {
   UINTN Start;
 
@@ -515,27 +482,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Load a disk buffer editor.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation occured.
+  @retval EFI_LOAD_ERROR          A load error occured.
+**/
 EFI_STATUS
 HMainCommandSelectEnd (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Load a disk buffer editor
-
-Arguments:  
-
-  None
-
-Returns:  
-
-   EFI_SUCCESS
-   EFI_LOAD_ERROR
-   EFI_OUT_OF_RESOURCES
-
---*/
 {
   UINTN End;
 
@@ -563,27 +520,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Cut current line to clipboard.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation occured.
+  @retval EFI_LOAD_ERROR          A load error occured.
+**/
 EFI_STATUS
 HMainCommandCut (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  cut current line to clipboard
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_OUT_OF_RESOURCES
-  EFI_LOAD_ERROR
-
---*/
 {
   UINTN             Index;
   HEFI_EDITOR_LINE  *Line;
@@ -648,28 +595,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Paste line to file buffer.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation occured.
+  @retval EFI_LOAD_ERROR          A load error occured.
+**/
 EFI_STATUS
 HMainCommandPaste (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  paste line to file buffer
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_OUT_OF_RESOURCES
-  EFI_LOAD_ERROR
-
-
---*/
 {
 
   BOOLEAN           OnlyLineRefresh;
@@ -719,27 +655,17 @@ Returns:
 
 }
 
+/**
+  Exit editor.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation occured.
+  @retval EFI_LOAD_ERROR          A load error occured.
+**/
 EFI_STATUS
 HMainCommandExit (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  exit editor
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_OUT_OF_RESOURCES
-  EFI_LOAD_ERROR
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -822,27 +748,17 @@ Returns:
 
 }
 
+/**
+  Load a file from disk to editor.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation occured.
+  @retval EFI_LOAD_ERROR          A load error occured.
+**/
 EFI_STATUS
 HMainCommandOpenFile (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Load a file from disk to editor
-
-Arguments:  
-
-  None
-
-Returns:  
-
-   EFI_SUCCESS
-   EFI_LOAD_ERROR
-   EFI_OUT_OF_RESOURCES
-
---*/
 {
   BOOLEAN                         Done;
   EFI_STATUS                      Status;
@@ -1065,28 +981,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Load a disk buffer editor.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation occured.
+  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_NOT_FOUND           The disk was not found.
+**/
 EFI_STATUS
 HMainCommandOpenDisk (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Load a disk buffer editor
-
-Arguments:  
-
-  None
-
-Returns:  
-
-   EFI_SUCCESS
-   EFI_LOAD_ERROR
-   EFI_OUT_OF_RESOURCES
-   EFI_NOT_FOUND
-
---*/
 {
   UINT64                          Size;
   UINT64                          Offset;
@@ -1320,28 +1226,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Load memory content to editor
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation occured.
+  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_NOT_FOUND           The disk was not found.
+**/
 EFI_STATUS
 HMainCommandOpenMemory (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Load memory content to editor
-
-Arguments:  
-
-  None
-
-Returns:  
-
-   EFI_SUCCESS
-   EFI_LOAD_ERROR
-   EFI_OUT_OF_RESOURCES
-   EFI_NOT_FOUND
-
---*/
 {
   UINT64                          Size;
   UINT64                          Offset;
@@ -1604,27 +1500,16 @@ CONST EDITOR_MENU_ITEM HexEditorMenuItems[] = {
   }
 };
 
+/**
+  Init function for MainEditor
 
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_LOAD_ERROR          A load error occured.
+**/
 EFI_STATUS
 HMainEditorInit (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Init function for MainEditor
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-
---*/
 {
   EFI_STATUS  Status;
   EFI_HANDLE  *HandleBuffer;
@@ -1754,26 +1639,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Cleanup function for MainEditor.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_LOAD_ERROR          A load error occured.
+**/
 EFI_STATUS
 HMainEditorCleanup (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  cleanup function for MainEditor
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -1813,25 +1688,15 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Refresh function for MainEditor.
+
+  @retval EFI_SUCCESS             The operation was successful.
+**/
 EFI_STATUS
 HMainEditorRefresh (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Refresh function for MainEditor
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-
---*/
 {
   BOOLEAN NameChange;
   BOOLEAN ReadChange;
@@ -1874,8 +1739,8 @@ Returns:
       HMainEditor.BufferImage->Modified,
       HMainEditor.ScreenSize.Column,
       HMainEditor.ScreenSize.Row,
-      HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer?HMainEditor.BufferImage->DiskImage->Offset:HMainEditor.BufferImage->BufferType == FileTypeMemBuffer?HMainEditor.BufferImage->MemImage->Offset:0,
-      HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer?HMainEditor.BufferImage->DiskImage->Size  :HMainEditor.BufferImage->BufferType == FileTypeMemBuffer?HMainEditor.BufferImage->MemImage->Size  :0
+      HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer&&HMainEditor.BufferImage->DiskImage!=NULL?HMainEditor.BufferImage->DiskImage->Offset:HMainEditor.BufferImage->BufferType == FileTypeMemBuffer&&HMainEditor.BufferImage->MemImage!=NULL?HMainEditor.BufferImage->MemImage->Offset:0,
+      HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer&&HMainEditor.BufferImage->DiskImage!=NULL?HMainEditor.BufferImage->DiskImage->Size  :HMainEditor.BufferImage->BufferType == FileTypeMemBuffer&&HMainEditor.BufferImage->MemImage!=NULL?HMainEditor.BufferImage->MemImage->Size  :0
       );
     HBufferImageRefresh ();
   }
@@ -1910,7 +1775,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
+/**
+  Handle the mouse input.
+
+  @param[in] MouseState             The current mouse state.
+  @param[out] BeforeLeftButtonDown  helps with selections.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation occured.
+  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_NOT_FOUND           The disk was not found.
+**/
 EFI_STATUS
 HMainEditorHandleMouseInput (
   IN  EFI_SIMPLE_POINTER_STATE       MouseState,
@@ -2046,7 +1921,7 @@ HMainEditorHandleMouseInput (
     //
     // release LButton
     //
-    if (*BeforeLeftButtonDown == TRUE) {
+    if (*BeforeLeftButtonDown) {
       Action = TRUE;
     }
     //
@@ -2062,27 +1937,17 @@ HMainEditorHandleMouseInput (
   return EFI_NOT_FOUND;
 }
 
+/**
+  Handle user key input. will route it to other components handle function.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation occured.
+  @retval EFI_LOAD_ERROR          A load error occured.
+**/
 EFI_STATUS
 HMainEditorKeyInput (
   VOID
   )
-/*++
-
-Routine Description: 
-
-  Handle user key input. will route it to other components handle function
-
-Arguments:  
-
-  None
-
-Returns:  
-
-  EFI_SUCCESS
-  EFI_LOAD_ERROR
-  EFI_OUT_OF_RESOURCES
-
---*/
 {
   EFI_INPUT_KEY             Key;
   EFI_STATUS                Status;
@@ -2142,11 +2007,11 @@ Returns:
         Status            = HMainEditorHandleMouseInput (MouseState, &MouseIsDown);
 
         if (!EFI_ERROR (Status)) {
-          if (BeforeMouseIsDown == FALSE) {
+          if (!BeforeMouseIsDown) {
             //
             // mouse down
             //
-            if (MouseIsDown == TRUE) {
+            if (MouseIsDown) {
               FRow              = HBufferImage.BufferPosition.Row;
               FCol              = HBufferImage.BufferPosition.Column;
               SelectStartBackup = HMainEditor.SelectStart;
@@ -2162,8 +2027,8 @@ Returns:
             //
             // begin to drag
             //
-            if (MouseIsDown == TRUE) {
-              if (FirstDown == TRUE) {
+            if (MouseIsDown) {
+              if (FirstDown) {
                 if (MouseState.RelativeMovementX || MouseState.RelativeMovementY) {
                   HMainEditor.SelectStart = 0;
                   HMainEditor.SelectEnd   = 0;
@@ -2301,7 +2166,7 @@ Returns:
           break;
         }
 
-        if (LengthChange == FALSE) {
+        if (!LengthChange) {
           if (OldSize != Size) {
             StatusBarSetStatusString (L"Disk/Mem Buffer Length should not be changed");
           }
