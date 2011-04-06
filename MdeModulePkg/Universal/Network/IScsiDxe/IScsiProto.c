@@ -1,7 +1,7 @@
 /** @file
   The implementation of iSCSI protocol based on RFC3720.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -301,6 +301,11 @@ IScsiSessionLogin (
   if (!MediaPresent) {
     return EFI_NO_MEDIA;
   }
+
+  //
+  // Set session identifier
+  //
+  CopyMem (Session->Isid, Session->ConfigData.NvData.IsId, 6);
 
   //
   // Create a connection for the session.
@@ -2681,20 +2686,9 @@ IScsiSessionInit (
   IN BOOLEAN            Recovery
   )
 {
-  UINT32  Random;
-
   if (!Recovery) {
     Session->Signature  = ISCSI_SESSION_SIGNATURE;
     Session->State      = SESSION_STATE_FREE;
-
-    Random              = NET_RANDOM (NetRandomInitSeed ());
-
-    Session->Isid[0]    = ISID_BYTE_0;
-    Session->Isid[1]    = ISID_BYTE_1;
-    Session->Isid[2]    = ISID_BYTE_2;
-    Session->Isid[3]    = ISID_BYTE_3;
-    Session->Isid[4]    = (UINT8) Random;
-    Session->Isid[5]    = (UINT8) (Random >> 8);
 
     InitializeListHead (&Session->Conns);
     InitializeListHead (&Session->TcbList);

@@ -1,7 +1,7 @@
 /** @file
   Define NVData structures used by the iSCSI configuration component
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -63,6 +63,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define KEY_SAVE_CHANGES          0x10b
 #define KEY_TARGET_NAME           0x10c
 #define KEY_BOOT_LUN              0x10d
+#define KEY_CONFIG_ISID           0x10e
 
 #define KEY_DEVICE_ENTRY_BASE     0x1000
 
@@ -75,6 +76,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define ISCSI_CHAP_SECRET_STORAGE 17
 
 #define ISCSI_CHAP_NAME_MAX_LEN   126
+
+#define ISID_CONFIGURABLE_MIN_LEN 6
+#define ISID_CONFIGURABLE_MAX_LEN 12
+#define ISID_CONFIGURABLE_STORAGE 13
 
 #pragma pack(1)
 typedef struct {
@@ -98,6 +103,8 @@ typedef struct {
   CHAR16  CHAPSecret[ISCSI_CHAP_SECRET_STORAGE];
   CHAR16  ReverseCHAPName[ISCSI_CHAP_NAME_MAX_LEN];
   CHAR16  ReverseCHAPSecret[ISCSI_CHAP_SECRET_STORAGE];
+
+  CHAR16  IsId[ISID_CONFIGURABLE_STORAGE];
 } ISCSI_CONFIG_IFR_NVDATA;
 #pragma pack()
 

@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to iSCSI.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -64,6 +64,121 @@ IScsiIpToStr (
 {
   UnicodeSPrint ( Str, 2 * IP4_STR_MAX_SIZE, L"%d.%d.%d.%d", Ip->Addr[0], Ip->Addr[1], Ip->Addr[2], Ip->Addr[3]);
 }
+
+
+/**
+  Parse IsId in string format and convert it to binary.
+
+  @param[in]        String  The buffer of the string to be parsed.
+  @param[in, out]   IsId    The buffer to store IsId.
+
+  @retval EFI_SUCCESS              The operation finished successfully.
+  @retval EFI_INVALID_PARAMETER    Any input parameter is invalid.
+
+**/
+EFI_STATUS
+IScsiParseIsIdFromString (
+  IN CONST CHAR16                    *String,
+  IN OUT   UINT8                     *IsId
+  )
+{
+  UINT8                          Index;
+  CHAR16                         *IsIdStr;
+  CHAR16                         TempStr[3];
+  UINTN                          NodeVal;
+  CHAR16                         PortString[ISCSI_NAME_IFR_MAX_SIZE];
+  EFI_INPUT_KEY                  Key;
+
+  if ((String == NULL) || (IsId == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  IsIdStr = (CHAR16 *) String;
+
+  if (StrLen (IsIdStr) != 6) {
+    UnicodeSPrint (
+      PortString,
+      (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
+      L"Error! Input is incorrect, please input 6 hex numbers!\n"
+      );
+
+    CreatePopUp (
+      EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+      &Key,
+      PortString,
+      NULL
+      );
+
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Index = 3; Index < 6; Index++) {
+    CopyMem (TempStr, IsIdStr, sizeof (TempStr));
+    TempStr[2] = L'\0';
+
+    //
+    // Convert the string to IsId. StrHexToUintn stops at the first character
+    // that is not a valid hex character, '\0' here.
+    //
+    NodeVal = StrHexToUintn (TempStr);
+
+    IsId[Index] = (UINT8) NodeVal;
+
+    IsIdStr = IsIdStr + 2;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Convert IsId from binary to string format.
+
+  @param[out]      String  The buffer to store the converted string.
+  @param[in]       IsId    The buffer to store IsId.
+
+  @retval EFI_SUCCESS              The string converted successfully.
+  @retval EFI_INVALID_PARAMETER    Any input parameter is invalid.
+
+**/
+EFI_STATUS
+IScsiConvertIsIdToString (
+  OUT CHAR16                         *String,
+  IN  UINT8                          *IsId
+  )
+{
+  UINT8                          Index;
+  UINTN                          Number;
+
+  if ((String == NULL) || (IsId == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Index = 0; Index < 6; Index++) {
+    if (IsId[Index] <= 0xF) {
+      Number = UnicodeSPrint (
+                 String,
+                 2 * ISID_CONFIGURABLE_STORAGE,
+                 L"0%X",
+                 (UINTN) IsId[Index]
+                 );
+    } else {
+      Number = UnicodeSPrint (
+                 String,
+                 2 * ISID_CONFIGURABLE_STORAGE,
+                 L"%X",
+                 (UINTN) IsId[Index]
+                 );
+
+    }
+
+    String = String + Number;
+  }
+
+  *String = L'\0';
+
+  return EFI_SUCCESS;
+}
+
 
 /**
   Update the list of iSCSI devices the iSCSI driver is controlling.
@@ -241,6 +356,7 @@ IScsiGetConfigFormEntryByIndex (
 
   @param[in]   ConfigFormEntry The iSCSI configuration form entry.
   @param[out]  IfrNvData       The IFR nv data.
+
 **/
 VOID
 IScsiConvertDeviceConfigDataToIfrNvData (
@@ -269,6 +385,8 @@ IScsiConvertDeviceConfigDataToIfrNvData (
   IScsiAsciiStrToUnicodeStr (SessionConfigData->TargetName, IfrNvData->TargetName);
 
   IScsiLunToUnicodeStr (SessionConfigData->BootLun, IfrNvData->BootLun);
+
+  IScsiConvertIsIdToString (IfrNvData->IsId, SessionConfigData->IsId);
 
   //
   // CHAP authentication parameters.
@@ -688,6 +806,12 @@ IScsiFormCallback (
     IScsiUnicodeStrToAsciiStr (IfrNvData->ReverseCHAPSecret, Private->Current->AuthConfigData.ReverseCHAPSecret);
     break;
 
+  case KEY_CONFIG_ISID:
+    IScsiParseIsIdFromString (IfrNvData->IsId, Private->Current->SessionConfigData.IsId);
+    IScsiConvertIsIdToString (IfrNvData->IsId, Private->Current->SessionConfigData.IsId);
+
+    break;
+
   case KEY_SAVE_CHANGES:
     //
     // First, update those fields which don't have INTERACTIVE set.
@@ -890,6 +1014,13 @@ IScsiConfigUpdateForm (
                       );
       if (EFI_ERROR (Status)) {
         ZeroMem (&ConfigFormEntry->SessionConfigData, sizeof (ConfigFormEntry->SessionConfigData));
+        
+        //
+        // Generate OUI-format ISID based on MAC address.
+        //
+        CopyMem (ConfigFormEntry->SessionConfigData.IsId, &MacAddress, 6);
+        ConfigFormEntry->SessionConfigData.IsId[0] = 
+          ConfigFormEntry->SessionConfigData.IsId[0] & 0x3F;
       }
       //
       // Get the CHAP authentication configuration data.
