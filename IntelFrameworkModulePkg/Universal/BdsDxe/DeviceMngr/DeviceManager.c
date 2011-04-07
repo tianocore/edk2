@@ -1293,12 +1293,6 @@ CallDriverHealth (
                      DriverHealthInfo->MessageList->StringId, 
                      NULL
                      );
-       //
-       // Assert if can not retrieve the message string
-       //
-       ASSERT (TmpString != NULL);
-       StrnCat (String, TmpString, StrLen (TmpString));
-       FreePool (TmpString);
     } else {
       //
       // Update the string will be displayed base on the driver's health status
@@ -1306,31 +1300,28 @@ CallDriverHealth (
       switch(DriverHealthInfo->HealthStatus) {
       case EfiDriverHealthStatusRepairRequired:
         TmpString = GetStringById (STRING_TOKEN (STR_REPAIR_REQUIRED));
-        StrCat (String, TmpString);
         break;
       case EfiDriverHealthStatusConfigurationRequired:
         TmpString = GetStringById (STRING_TOKEN (STR_CONFIGURATION_REQUIRED));
-        StrCat (String, TmpString);
         break;
       case EfiDriverHealthStatusFailed:
         TmpString = GetStringById (STRING_TOKEN (STR_OPERATION_FAILED));
-        StrCat (String, TmpString);
         break;
       case EfiDriverHealthStatusReconnectRequired:
         TmpString = GetStringById (STRING_TOKEN (STR_RECONNECT_REQUIRED));
-        StrCat (String, TmpString);
         break;
       case EfiDriverHealthStatusRebootRequired:
         TmpString = GetStringById (STRING_TOKEN (STR_REBOOT_REQUIRED));
-        StrCat (String, TmpString);
         break;
       default:
         TmpString = GetStringById (STRING_TOKEN (STR_DRIVER_HEALTH_HEALTHY));
-        StrCat (String, TmpString);
         break;
       }
-      FreePool (TmpString);
     }
+
+    ASSERT (TmpString != NULL);
+    StrCat (String, TmpString);
+    FreePool (TmpString);
 
     Token = HiiSetString (HiiHandle, 0, String, NULL);
     FreePool (String);
