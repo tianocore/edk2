@@ -1020,7 +1020,7 @@ IScsiConfigUpdateForm (
         //
         CopyMem (ConfigFormEntry->SessionConfigData.IsId, &MacAddress, 6);
         ConfigFormEntry->SessionConfigData.IsId[0] = 
-          ConfigFormEntry->SessionConfigData.IsId[0] & 0x3F;
+          (UINT8) (ConfigFormEntry->SessionConfigData.IsId[0] & 0x3F);
       }
       //
       // Get the CHAP authentication configuration data.
