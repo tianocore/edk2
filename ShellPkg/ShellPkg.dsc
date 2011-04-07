@@ -19,7 +19,7 @@
   PLATFORM_VERSION               = 0.50
   DSC_SPECIFICATION              = 0x00010006
   OUTPUT_DIRECTORY               = Build/Shell
-  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC
+  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC|ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -48,6 +48,15 @@
   HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
   
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
+
+[LibraryClasses.ARM]
+  #
+  # It is not possible to prevent the ARM compiler for generic intrinsic functions.
+  # This library provides the instrinsic functions generate by a given compiler.
+  # [LibraryClasses.ARM] and NULL mean link this library into all ARM images.
+  #
+  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+
 
 [PcdsFixedAtBuild.common]
 

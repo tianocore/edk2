@@ -36,7 +36,7 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {NULL, TypeMax}
   };
 
-STATIC CONST UINT64 MaxNum[9]      = { 0xff, 0xffff, 0xffffffff, 0xffffffffffffffff };
+STATIC CONST UINT64 MaxNum[9]      = { 0xff, 0xffff, 0xffffffff, 0xffffffffffffffffULL };
 
 /**
   Read some data into a buffer from memory.
@@ -424,7 +424,7 @@ ShellCommandRunMm (
       //
       if (AccessType == EfiPciEConfig) {
         SegmentNumber = (UINT32) RShiftU64 (Address, 36) & 0xff;
-        Address      &= 0xfffffffff;
+        Address      &= 0xfffffffffULL;
       } else {
         if (AccessType == EfiPciConfig) {
           SegmentNumber = (UINT32) RShiftU64 (Address, 32) & 0xff;

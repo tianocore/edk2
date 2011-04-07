@@ -41,7 +41,7 @@ DisplayTheBlocks(
 
   ShellStatus = SHELL_SUCCESS;
 
-  Status = gBS->LocateDevicePath(&gEfiBlockIoProtocolGuid, &((EFI_DEVICE_PATH_PROTOCOL *)DevPath), &BlockIoHandle);
+  Status = gBS->LocateDevicePath(&gEfiBlockIoProtocolGuid, (EFI_DEVICE_PATH_PROTOCOL **)&DevPath, &BlockIoHandle);
   if (EFI_ERROR(Status)) {
     return (SHELL_NOT_FOUND);
   }

@@ -2164,6 +2164,10 @@ HMainEditorKeyInput (
         case FileTypeMemBuffer:
           OldSize = HBufferImage.MemImage->Size;
           break;
+        
+        default:
+          OldSize = 0;
+          break;
         }
 
         if (!LengthChange) {

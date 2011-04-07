@@ -1807,21 +1807,21 @@ DisplayProcessorFamily2 (
   Display processor voltage information.
 
   @param[in] Voltage      The Voltage.
-                      Bit 7 Set to 0, indicating 'legacy' mode for processor voltage
-                      Bits 6:4  Reserved, must be zero
-                      Bits 3:0  Voltage Capability.
-                                A Set bit indicates that the voltage is supported.
-                        Bit 0 - 5V
-                        Bit 1 - 3.3V
-                        Bit 2 - 2.9V
-                        Bit 3 - Reserved, must be zero.
+  Bit 7 Set to 0, indicating 'legacy' mode for processor voltage
+  Bits 6:4  Reserved, must be zero
+  Bits 3:0  Voltage Capability.
+            A Set bit indicates that the voltage is supported.
+    Bit 0 - 5V
+    Bit 1 - 3.3V
+    Bit 2 - 2.9V
+    Bit 3 - Reserved, must be zero.
 
-                      Note:
-                        Setting of multiple bits indicates the socket is configurable
-                        If bit 7 is set to 1, the remaining seven bits of the field are set to
-                        contain the processor's current voltage times 10.
-                        For example, the field value for a processor voltage of 1.8 volts would be
-                        92h = 80h + (1.8 * 10) = 80h + 18 = 80h +12h.
+  Note:
+    Setting of multiple bits indicates the socket is configurable
+    If bit 7 is set to 1, the remaining seven bits of the field are set to
+    contain the processor's current voltage times 10.
+    For example, the field value for a processor voltage of 1.8 volts would be
+    92h = 80h + (1.8 * 10) = 80h + 18 = 80h +12h.
 
   @param[in] Option       The option.
 **/
@@ -1876,19 +1876,19 @@ DisplayProcessorVoltage (
   Display processor information.
 
   @param[in] Status   The status.
-                        Bit 7 Reserved, must be 0
-                        Bit 6   CPU Socket Populated
-                         1 - CPU Socket Populated
-                         0 - CPU Socket UnpopulatedBits
-                         5:3  Reserved, must be zero
-                         Bits 2:0 CPU Status
-                          0h - Unknown
-                          1h - CPU Enabled
-                          2h - CPU Disabled by User via BIOS Setup
-                          3h - CPU Disabled By BIOS (POST Error)
-                          4h - CPU is Idle, waiting to be enabled.
-                          5-6h - Reserved
-                          7h - Other
+Bit 7 Reserved, must be 0
+Bit 6   CPU Socket Populated
+ 1 - CPU Socket Populated
+ 0 - CPU Socket UnpopulatedBits
+ 5:3  Reserved, must be zero
+ Bits 2:0 CPU Status
+  0h - Unknown
+  1h - CPU Enabled
+  2h - CPU Disabled by User via BIOS Setup
+  3h - CPU Disabled By BIOS (POST Error)
+  4h - CPU is Idle, waiting to be enabled.
+  5-6h - Reserved
+  7h - Other
 
   @param[in] Option   The option
 **/
@@ -2225,7 +2225,7 @@ DisplaySystemBootStatus (
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_RSVD_FUTURE_ASSIGNMENT), gShellDebug1HiiHandle);
   } else if (Parameter >= 128 && Parameter <= 191) {
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_VENDOR_OEM_SPECIFIC), gShellDebug1HiiHandle);
-  } else if (Parameter >= 192 && Parameter <= 255) {
+  } else if (Parameter >= 192) {
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_PRODUCT_SPEC_IMPLMENTATION), gShellDebug1HiiHandle);
   } else {
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ERROR_VALUE), gShellDebug1HiiHandle);
@@ -2271,23 +2271,23 @@ DisplaySBDSManufactureDate (
   Display System Reset  (Type 23) information.
 
   
-  Identifies the system-reset capabilities for the system.
-   Bits 7:6 Reserved for future assignment via this specification, set to 00b.
-   Bit 5  System contains a watchdog timer, either True (1) or False (0).
-   Bits 4:3 Boot Option on Limit.
-    Identifies the system action to be taken when the Reset Limit is reached, one of:
-    00b Reserved, do not use.
-    01b Operating system
-    10b System utilities
-    11b Do not rebootBits
-   2:1  Boot Option.  Indicates the action to be taken following a watchdog reset, one of:
-    00b Reserved, do not use.
-    01b Operating system
-    10b System utilities
-    11b Do not reboot
-   Bit 0  Status.
-    1b The system reset is enabled by the user
-    0b The system reset is not enabled by the user
+Identifies the system-reset capabilities for the system.
+ Bits 7:6 Reserved for future assignment via this specification, set to 00b.
+ Bit 5  System contains a watchdog timer, either True (1) or False (0).
+ Bits 4:3 Boot Option on Limit.
+  Identifies the system action to be taken when the Reset Limit is reached, one of:
+  00b Reserved, do not use.
+  01b Operating system
+  10b System utilities
+  11b Do not rebootBits
+ 2:1  Boot Option.  Indicates the action to be taken following a watchdog reset, one of:
+  00b Reserved, do not use.
+  01b Operating system
+  10b System utilities
+  11b Do not reboot
+ Bit 0  Status.
+  1b The system reset is enabled by the user
+  0b The system reset is not enabled by the user
 
   @param[in] Reset   Reset
   @param[in] Option  The option
@@ -2375,28 +2375,28 @@ DisplaySystemResetCapabilities (
   Display Hardware Security (Type 24) information.
 
     
-    Identifies the password and reset status for the system:
+Identifies the password and reset status for the system:
 
-    Bits 7:6    Power-on Password Status, one of:
-      00b Disabled
-      01b Enabled
-      10b Not Implemented
-      11b Unknown
-    Bits 5:4    Keyboard Password Status, one of:
-      00b Disabled
-      01b Enabled
-      10b Not Implemented
-      11b Unknown
-    Bits 3:2    Administrator Password Status, one  of:
-      00b Disabled
-      01b Enabled
-      10b Not Implemented
-      11b Unknown
-    Bits 1:0    Front Panel Reset Status, one of:
-      00b Disabled
-      01b Enabled
-      10b Not Implemented
-      11b Unknown
+Bits 7:6    Power-on Password Status, one of:
+  00b Disabled
+  01b Enabled
+  10b Not Implemented
+  11b Unknown
+Bits 5:4    Keyboard Password Status, one of:
+  00b Disabled
+  01b Enabled
+  10b Not Implemented
+  11b Unknown
+Bits 3:2    Administrator Password Status, one  of:
+  00b Disabled
+  01b Enabled
+  10b Not Implemented
+  11b Unknown
+Bits 1:0    Front Panel Reset Status, one of:
+  00b Disabled
+  01b Enabled
+  10b Not Implemented
+  11b Unknown
 
   @param[in] Settings The device settings.
   @param[in] Option   The device options.

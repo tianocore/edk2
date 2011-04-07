@@ -30,15 +30,6 @@
   Ping.c
   Ifconfig.c
 
-[Sources.IA32]
-  Ia32/Tsc.c
-
-[Sources.X64]
-  X64/Tsc.c
-
-[Sources.IPF]
-  Ipf/Itc.c
-
 [Packages]
   MdePkg/MdePkg.dec
   ShellPkg/ShellPkg.dec

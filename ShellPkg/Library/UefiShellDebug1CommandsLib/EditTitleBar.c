@@ -188,6 +188,8 @@ MainTitleBarRefresh (
       ASSERT(FALSE);
     case FileTypeFileBuffer:
       break;
+    default:
+      break;
   }
   //
   // print modified field

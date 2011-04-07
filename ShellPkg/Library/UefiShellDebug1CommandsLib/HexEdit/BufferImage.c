@@ -176,6 +176,9 @@ HBufferImageBackup (
   case FileTypeMemBuffer:
     HMemImageBackup ();
     break;
+
+  default:
+    break;
   }
 
   return EFI_SUCCESS;
@@ -944,6 +947,10 @@ HBufferImageRead (
   case FileTypeMemBuffer:
     Status = HMemImageRead (MemOffset, MemSize, Recover);
     break;
+    
+  default:
+    Status = EFI_NOT_FOUND;
+    break;
   }
 
   if (EFI_ERROR (Status)) {
@@ -1006,6 +1013,10 @@ HBufferImageSave (
   //
   case FileTypeMemBuffer:
     Status = HMemImageSave (MemOffset, MemSize);
+    break;
+    
+  default:
+    Status = EFI_NOT_FOUND;
     break;
   }
 

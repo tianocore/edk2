@@ -68,12 +68,12 @@ DisplayMmioMemory(
   Buffer = AllocateZeroPool(Size);
   ASSERT(Buffer != NULL);
 
-  Status = PciRbIo->Mem.Read(PciRbIo, EfiPciWidthUint8, (UINT64)Address, Size, Buffer);
+  Status = PciRbIo->Mem.Read(PciRbIo, EfiPciWidthUint8, (UINT64)(UINTN)Address, Size, Buffer);
   if (EFI_ERROR(Status)) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PCIRBIO_ER), gShellDebug1HiiHandle, Status);
     ShellStatus = SHELL_NOT_FOUND;
   } else {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMEM_MMIO_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)Address, Size);
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMEM_MMIO_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
     DumpHex(2,0,Size,Buffer);
   }
 
@@ -167,7 +167,7 @@ ShellCommandRunDmem (
 
     if (ShellStatus == SHELL_SUCCESS) {
       if (!ShellCommandLineGetFlag(Package, L"-mmio")) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)Address, Size);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
         DumpHex(2,0,(UINTN)Size,Address);
         if (Address == (VOID*)gST) {
           Acpi20TableAddress  = 0;
@@ -177,36 +177,36 @@ ShellCommandRunDmem (
           MpsTableAddress     = 0;
           for (TableWalker = 0 ; TableWalker < gST->NumberOfTableEntries ; TableWalker++) {
             if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiAcpi20TableGuid)) {
-              Acpi20TableAddress = (UINT64)gST->ConfigurationTable[TableWalker].VendorTable;
+              Acpi20TableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
             if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiAcpi10TableGuid)) {
-              AcpiTableAddress = (UINT64)gST->ConfigurationTable[TableWalker].VendorTable;
+              AcpiTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
             if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSalSystemTableGuid)) {
-              SalTableAddress = (UINT64)gST->ConfigurationTable[TableWalker].VendorTable;
+              SalTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
             if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSmbiosTableGuid)) {
-              SmbiosTableAddress = (UINT64)gST->ConfigurationTable[TableWalker].VendorTable;
+              SmbiosTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
             if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiMpsTableGuid)) {
-              MpsTableAddress = (UINT64)gST->ConfigurationTable[TableWalker].VendorTable;
+              MpsTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
           }
 
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMEM_SYSTEM_TABLE), gShellDebug1HiiHandle, 
-            (UINT64)Address,
+            (UINT64)(UINTN)Address,
             gST->Hdr.HeaderSize,
             gST->Hdr.Revision,
-            (UINT64)gST->ConIn,
-            (UINT64)gST->ConOut,
-            (UINT64)gST->StdErr,
-            (UINT64)gST->RuntimeServices,
-            (UINT64)gST->BootServices,
+            (UINT64)(UINTN)gST->ConIn,
+            (UINT64)(UINTN)gST->ConOut,
+            (UINT64)(UINTN)gST->StdErr,
+            (UINT64)(UINTN)gST->RuntimeServices,
+            (UINT64)(UINTN)gST->BootServices,
             SalTableAddress,
             AcpiTableAddress,
             Acpi20TableAddress,

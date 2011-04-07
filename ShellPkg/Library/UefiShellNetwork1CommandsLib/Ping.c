@@ -185,11 +185,6 @@ NetChecksum (
   @return The current value of the register.
 
 **/
-UINT64
-EFIAPI
-ReadTime (
-  VOID
-  );
 
 STATIC CONST SHELL_PARAM_ITEM    PingParamList[] = {
   {
@@ -220,6 +215,32 @@ STATIC CONST SHELL_PARAM_ITEM    PingParamList[] = {
 STATIC CONST CHAR16      *mDstString;
 STATIC CONST CHAR16      *mSrcString;
 STATIC UINT64            mFrequency = 0;
+EFI_CPU_ARCH_PROTOCOL    *gCpu = NULL;
+
+UINT64
+EFIAPI
+ReadTime (
+  VOID
+  )
+{
+  static UINT64          CurrentTick = 0;
+  UINT64                 TimerPeriod;
+  EFI_STATUS             Status;
+
+  ASSERT (gCpu != NULL);
+
+  Status = gCpu->GetTimerValue (gCpu, 0, &CurrentTick, &TimerPeriod);
+  if (EFI_ERROR (Status)) {
+    //
+    // The WinntGetTimerValue will return EFI_UNSUPPORTED. Set the
+    // TimerPeriod by ourselves.
+    //
+    CurrentTick += 1000000;
+  }
+  
+  return CurrentTick;
+}
+
 
 /**
   Get and caculate the frequency in tick/ms.
@@ -236,17 +257,15 @@ GetFrequency (
   )
 {
   EFI_STATUS               Status;
-  EFI_CPU_ARCH_PROTOCOL    *Cpu;
   UINT64                   CurrentTick;
   UINT64                   TimerPeriod;
 
-  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **) &Cpu);
-
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **) &gCpu);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = Cpu->GetTimerValue (Cpu, 0, &CurrentTick, &TimerPeriod);
+  Status = gCpu->GetTimerValue (gCpu, 0, &CurrentTick, &TimerPeriod);
 
   if (EFI_ERROR (Status)) {
     TimerPeriod = DEFAULT_TIMER_PERIOD;

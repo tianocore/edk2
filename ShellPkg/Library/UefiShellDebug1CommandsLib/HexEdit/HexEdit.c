@@ -170,7 +170,7 @@ ShellCommandRunHexEdit (
     } else if (WhatToDo == FileTypeFileBuffer && ShellGetCurrentDir(NULL) == NULL) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellDebug1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
-    }    
+    }
 
     if (ShellStatus == SHELL_SUCCESS) {
       //
@@ -223,6 +223,9 @@ ShellCommandRunHexEdit (
                     );
           break;
 
+        default:
+          Status = EFI_NOT_FOUND;
+          break;
         }
         if (!EFI_ERROR (Status)) {
           HMainEditorRefresh ();
