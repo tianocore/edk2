@@ -90,7 +90,10 @@ ShellCommandRunHexEdit (
     // Check for -d
     //
     if (ShellCommandLineGetFlag(Package, L"-d")){
-      if (ShellCommandLineGetCount(Package) > 4) {
+      if (ShellCommandLineGetCount(Package) < 4) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else if (ShellCommandLineGetCount(Package) > 4) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
@@ -99,13 +102,20 @@ ShellCommandRunHexEdit (
         Offset  = ShellStrToUintn(ShellCommandLineGetRawValue(Package, 2));
         Size    = ShellStrToUintn(ShellCommandLineGetRawValue(Package, 3));
       }
+      if (Offset == (UINTN)-1 || Size == (UINTN)-1) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"-d");
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      }
     }
 
     //
     // check for -f
     //
     if (ShellCommandLineGetFlag(Package, L"-f") && (WhatToDo == FileTypeNone)){
-      if (ShellCommandLineGetCount(Package) > 2) {
+      if (ShellCommandLineGetCount(Package) < 2) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else if (ShellCommandLineGetCount(Package) > 2) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
@@ -157,7 +167,10 @@ ShellCommandRunHexEdit (
     if (ShellStatus == SHELL_SUCCESS && WhatToDo == FileTypeNone) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
-    }
+    } else if (WhatToDo == FileTypeFileBuffer && ShellGetCurrentDir(NULL) == NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellDebug1HiiHandle);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    }    
 
     if (ShellStatus == SHELL_SUCCESS) {
       //
