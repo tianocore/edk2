@@ -1158,7 +1158,7 @@ DevPathFromTextAcpiAdr (
   AcpiAdr = (ACPI_ADR_DEVICE_PATH *) CreateDeviceNode (
                                        ACPI_DEVICE_PATH,
                                        ACPI_ADR_DP,
-                                       sizeof (ACPI_ADR_DEVICE_PATH)
+                                       (UINT16) sizeof (ACPI_ADR_DEVICE_PATH)
                                        );
   ASSERT (AcpiAdr != NULL);
 
