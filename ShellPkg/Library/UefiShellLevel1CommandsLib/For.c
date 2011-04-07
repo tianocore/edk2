@@ -589,11 +589,16 @@ ShellCommandRunFor (
     ASSERT(ArgSet       == NULL);
   }
 
-  Info = (SHELL_FOR_INFO*)CurrentScriptFile->CurrentCommand->Data;
-  if (CurrentScriptFile->CurrentCommand->Reset) {
-    Info->CurrentValue  = (CHAR16*)Info->Set;
-    FirstPass = TRUE;
-    CurrentScriptFile->CurrentCommand->Reset = FALSE;
+  if (CurrentScriptFile != NULL && CurrentScriptFile->CurrentCommand != NULL) {
+    Info = (SHELL_FOR_INFO*)CurrentScriptFile->CurrentCommand->Data;
+    if (CurrentScriptFile->CurrentCommand->Reset) {
+      Info->CurrentValue  = (CHAR16*)Info->Set;
+      FirstPass = TRUE;
+      CurrentScriptFile->CurrentCommand->Reset = FALSE;
+    }
+  } else {
+    ShellStatus = SHELL_UNSUPPORTED;
+    Info = NULL;
   }
   if (ShellStatus == SHELL_SUCCESS) {
     ASSERT(Info != NULL);

@@ -2781,6 +2781,9 @@ PciExplainData (
              );
     CapPtr = ConfigSpace->NonCommon.CardBus.CapabilitiesPtr;
     break;
+  case PciUndefined:
+  default:
+    break;
   }
   //
   // If Status bit4 is 1, dump or explain capability structure
@@ -3405,7 +3408,7 @@ PciExplainCardBusData (
     INDEX_OF (&(CardBus->IoBase0)),
     Io32Bit ? L"          32 bit" : L"          16 bit",
     CardBus->IoBase0 & (Io32Bit ? 0xfffffffc : 0x0000fffc),
-    CardBus->IoLimit0 & (Io32Bit ? 0xffffffff : 0x0000ffff) | 0x00000003
+    (CardBus->IoLimit0 & (Io32Bit ? 0xffffffff : 0x0000ffff)) | 0x00000003
    );
 
   Io32Bit = (BOOLEAN) (CardBus->IoBase1 & PCI_BIT_0);
@@ -3415,7 +3418,7 @@ PciExplainCardBusData (
     INDEX_OF (&(CardBus->IoBase1)),
     Io32Bit ? L"          32 bit" : L"          16 bit",
     CardBus->IoBase1 & (Io32Bit ? 0xfffffffc : 0x0000fffc),
-    CardBus->IoLimit1 & (Io32Bit ? 0xffffffff : 0x0000ffff) | 0x00000003
+    (CardBus->IoLimit1 & (Io32Bit ? 0xffffffff : 0x0000ffff)) | 0x00000003
    );
 
   //
@@ -4690,14 +4693,16 @@ PciExplainPciExpress (
   //
   Print (L"\n%HStart dumping PCIex extended configuration space (0x100 - 0xFFF).%N\n\n");
 
-  DumpHex (
-    2,
-    0x100,
-    ExtendRegSize,
-    (VOID *) (ExRegBuffer)
-   );
+  if (ExRegBuffer != NULL) {
+    DumpHex (
+      2,
+      0x100,
+      ExtendRegSize,
+      (VOID *) (ExRegBuffer)
+     );
 
-  FreePool ((VOID *) ExRegBuffer);
+    FreePool ((VOID *) ExRegBuffer);
+  }
 
 Done:
   return EFI_SUCCESS;

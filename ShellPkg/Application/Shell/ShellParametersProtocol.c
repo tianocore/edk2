@@ -69,9 +69,7 @@ GetNextParameter(
   if ((*Walker)[0] == L'\"') {
     NextDelim = NULL;
     for (TempLoc = *Walker + 1 ; TempLoc != NULL && *TempLoc != CHAR_NULL ; TempLoc++) {
-      if (*TempLoc == L'^' && *(TempLoc+1) == L'^') {
-        TempLoc++;
-      } else if (*TempLoc == L'^' && *(TempLoc+1) == L'\"') {
+      if (*TempLoc == L'^' && *(TempLoc+1) == L'\"') {
         TempLoc++;
       } else if (*TempLoc == L'\"') {
         NextDelim = TempLoc;
@@ -96,10 +94,7 @@ GetNextParameter(
       *Walker = NULL;
     }
     for (TempLoc = *TempParameter ; TempLoc != NULL && *TempLoc != CHAR_NULL ; TempLoc++) {
-      if ((*TempLoc == L'^' && *(TempLoc+1) == L'^')
-       || (*TempLoc == L'^' && *(TempLoc+1) == L'|')
-       || (*TempLoc == L'^' && *(TempLoc+1) == L'\"')
-      ){
+      if (*TempLoc == L'^' && *(TempLoc+1) == L'\"') {
         CopyMem(TempLoc, TempLoc+1, StrSize(TempLoc) - sizeof(TempLoc[0]));
       }
     }
@@ -123,9 +118,7 @@ GetNextParameter(
     for (NextDelim = *TempParameter ; NextDelim != NULL && *NextDelim != CHAR_NULL ; NextDelim++) {
       if (*NextDelim == L'^' && *(NextDelim+1) == L'^') {
         CopyMem(NextDelim, NextDelim+1, StrSize(NextDelim) - sizeof(NextDelim[0]));
-      }/* else if (*NextDelim == L'^') {
-        *NextDelim = L' ';
-      }*/
+      }
     }
     while ((*TempParameter)[StrLen(*TempParameter)-1] == L' ') {
       (*TempParameter)[StrLen(*TempParameter)-1] = CHAR_NULL;
