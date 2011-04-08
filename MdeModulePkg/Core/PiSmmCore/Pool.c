@@ -1,7 +1,7 @@
 /** @file
   SMM Memory pool management functions.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -86,6 +86,13 @@ SmmInitializeMemoryServices (
     // Find the largest SMRAM range between 1MB and 4GB that is at least 256KB - 4K in size
     //
     for (Index = 0, MaxSize = SIZE_256KB - EFI_PAGE_SIZE; Index < SmramRangeCount; Index++) {
+      //
+      // Skip any SMRAM region that is already allocated, needs testing, or needs ECC initialization
+      //
+      if ((SmramRanges[Index].RegionState & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) != 0) {
+        continue;
+      }
+
       if (SmramRanges[Index].CpuStart >= BASE_1MB) {
         if ((SmramRanges[Index].CpuStart + SmramRanges[Index].PhysicalSize) <= BASE_4GB) {
           if (SmramRanges[Index].PhysicalSize >= MaxSize) {

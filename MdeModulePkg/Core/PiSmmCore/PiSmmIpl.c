@@ -1,7 +1,7 @@
 /** @file
   SMM IPL that produces SMM related runtime protocols and load the SMM Core into SMRAM
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -1045,6 +1045,13 @@ SmmIplEntry (
   //
   mCurrentSmramRange = NULL;
   for (Index = 0, MaxSize = SIZE_256KB - EFI_PAGE_SIZE; Index < gSmmCorePrivate->SmramRangeCount; Index++) {
+    //
+    // Skip any SMRAM region that is already allocated, needs testing, or needs ECC initialization
+    //
+    if ((gSmmCorePrivate->SmramRanges[Index].RegionState & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) != 0) {
+      continue;
+    }
+
     if (gSmmCorePrivate->SmramRanges[Index].CpuStart >= BASE_1MB) {
       if ((gSmmCorePrivate->SmramRanges[Index].CpuStart + gSmmCorePrivate->SmramRanges[Index].PhysicalSize) <= BASE_4GB) {
         if (gSmmCorePrivate->SmramRanges[Index].PhysicalSize >= MaxSize) {
