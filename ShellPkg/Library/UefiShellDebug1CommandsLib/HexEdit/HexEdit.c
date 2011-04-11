@@ -147,12 +147,15 @@ ShellCommandRunHexEdit (
     }
     Name = ShellCommandLineGetRawValue(Package, 1);
     if (WhatToDo == FileTypeNone && Name != NULL) {
-        if (!IsValidFileName(Name)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Name);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else {
-          WhatToDo  = FileTypeFileBuffer;
-        }
+      if (ShellCommandLineGetCount(Package) > 2) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else if (!IsValidFileName(Name)) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Name);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else {
+        WhatToDo  = FileTypeFileBuffer;
+      }
     } else if (WhatToDo == FileTypeNone) {
       if (gEfiShellProtocol->GetCurDir(NULL) == NULL) {
         ShellStatus = SHELL_NOT_FOUND;
@@ -235,7 +238,7 @@ ShellCommandRunHexEdit (
           //
           // back up the status string
           //
-          Buffer = CatSPrint (NULL, L"%s", StatusBarGetString());
+          Buffer = CatSPrint (NULL, L"%s\r\n", StatusBarGetString());
         }
       }
 
@@ -261,7 +264,7 @@ ShellCommandRunHexEdit (
             //
             // print out the status string
             //
-            ShellPrintEx(-1, -1, L"%s", gShellDebug1HiiHandle, Buffer);
+            ShellPrintEx(-1, -1, L"%s", Buffer);
           } else {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HEXEDIT_UNKNOWN_EDITOR), gShellDebug1HiiHandle);
           }

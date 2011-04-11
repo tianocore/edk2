@@ -185,7 +185,7 @@ MainTitleBarRefresh (
       //
       // Print the offset.
       //
-      ASSERT(FALSE);
+      ShellPrintEx (-1,-1, L"Offset %X | Size %X", Offset, Size);
     case FileTypeFileBuffer:
       break;
     default:
