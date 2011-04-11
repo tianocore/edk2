@@ -362,7 +362,7 @@ Returns:
   //
   NtFileHandle = CreateFile (
                   FileName,
-                  GENERIC_READ | GENERIC_WRITE,
+                  GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE,
                   FILE_SHARE_READ,
                   NULL,
                   CreationDisposition,
@@ -378,7 +378,7 @@ Returns:
   NtMapHandle = CreateFileMapping (
                   NtFileHandle,
                   NULL,
-                  PAGE_READWRITE,
+                  PAGE_EXECUTE_READWRITE,
                   0,
                   MapSize,
                   NULL
@@ -391,7 +391,7 @@ Returns:
   //
   VirtualAddress = MapViewOfFileEx (
                     NtMapHandle,
-                    FILE_MAP_ALL_ACCESS,
+                    FILE_MAP_EXECUTE | FILE_MAP_ALL_ACCESS,
                     0,
                     0,
                     MapSize,
