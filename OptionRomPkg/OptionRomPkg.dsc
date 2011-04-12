@@ -96,6 +96,8 @@
 ###################################################################################################
 
 [Components]
+  OptionRomPkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
+
   OptionRomPkg/AtapiPassThruDxe/AtapiPassThruDxe.inf
   OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
   OptionRomPkg/UndiRuntimeDxe/UndiRuntimeDxe.inf
