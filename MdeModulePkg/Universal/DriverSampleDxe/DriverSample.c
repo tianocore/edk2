@@ -840,15 +840,281 @@ DriverCallback (
   EFI_INPUT_KEY                   Key;
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
   UINTN                           MyVarSize;
+  
+  if (((Value == NULL) && (Action != EFI_BROWSER_ACTION_FORM_OPEN) && (Action != EFI_BROWSER_ACTION_FORM_CLOSE))||
+    (ActionRequest == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-  if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
-    if (QuestionId == 0x1234) {
+
+  Status = EFI_SUCCESS;
+  PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
+
+  switch (Action) {
+  case EFI_BROWSER_ACTION_FORM_OPEN:
+    {
+      if (QuestionId == 0x1234) {
+        //
+        // Sample CallBack for UEFI FORM_OPEN action:
+        //   Add Save action into Form 3 when Form 1 is opened.
+        //   This will be done only in FORM_OPEN CallBack of question with ID 0x1234 from Form 1.
+        //
+        PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
+
+        //
+        // Initialize the container for dynamic opcodes
+        //
+        StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+        ASSERT (StartOpCodeHandle != NULL);
+
+        //
+        // Create Hii Extend Label OpCode as the start opcode
+        //
+        StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+        StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+        StartLabel->Number       = LABEL_UPDATE2;
+
+        HiiCreateActionOpCode (
+          StartOpCodeHandle,                // Container for dynamic created opcodes
+          0x1238,                           // Question ID
+          STRING_TOKEN(STR_SAVE_TEXT),      // Prompt text
+          STRING_TOKEN(STR_SAVE_TEXT),      // Help text
+          EFI_IFR_FLAG_CALLBACK,            // Question flag
+          0                                 // Action String ID
+        );
+
+        HiiUpdateForm (
+          PrivateData->HiiHandle[0],  // HII handle
+          &mFormSetGuid,              // Formset GUID
+          0x3,                        // Form ID
+          StartOpCodeHandle,          // Label for where to insert opcodes
+          NULL                        // Insert data
+          );
+
+        HiiFreeOpCodeHandle (StartOpCodeHandle);
+      }
+    }
+    break;
+
+  case EFI_BROWSER_ACTION_FORM_CLOSE:
+    {
+      if (QuestionId == 0x5678) {
+        //
+        // Sample CallBack for UEFI FORM_CLOSE action:
+        //   Show up a pop-up to specify Form 3 will be closed when exit Form 3.
+        //
+        do {
+          CreatePopUp (
+            EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+            &Key,
+            L"",
+            L"You are going to leave third Form!",
+            L"Press ESC or ENTER to continue ...",
+            L"",
+            NULL
+            );
+        } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
+      }
+    }
+    break;
+    
+  case EFI_BROWSER_ACTION_RETRIEVE:
+    {
+      if (QuestionId == 0x1111) {
+        //
+        // EfiVarstore question takes sample action (print value as debug information) 
+        // after read/write question.
+        //
+        MyVarSize = 1;
+        Status = gRT->GetVariable(
+                        L"MyVar",
+                        &mFormSetGuid,
+                        NULL,
+                        &MyVarSize,
+                        &MyVar
+                        );
+        ASSERT_EFI_ERROR (Status);
+        DEBUG ((DEBUG_INFO, "EfiVarstore question: Tall value is %d with value width %d\n", MyVar, MyVarSize));
+      }
+    }
+    break;
+
+  case EFI_BROWSER_ACTION_CHANGING:
+  {
+    switch (QuestionId) {
+    case 0x1234:
       //
-      // Sample CallBack for UEFI FORM_OPEN action:
-      //   Add Save action into Form 3 when Form 1 is opened.
-      //   This will be done only in FORM_OPEN CallBack of question with ID 0x1234 from Form 1.
+      // Initialize the container for dynamic opcodes
       //
-      PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
+      StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+      ASSERT (StartOpCodeHandle != NULL);
+
+      EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+      ASSERT (EndOpCodeHandle != NULL);
+
+      //
+      // Create Hii Extend Label OpCode as the start opcode
+      //
+      StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+      StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+      StartLabel->Number       = LABEL_UPDATE1;
+
+      //
+      // Create Hii Extend Label OpCode as the end opcode
+      //
+      EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+      EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+      EndLabel->Number       = LABEL_END;
+
+      HiiCreateActionOpCode (
+        StartOpCodeHandle,                // Container for dynamic created opcodes
+        0x1237,                           // Question ID
+        STRING_TOKEN(STR_EXIT_TEXT),      // Prompt text
+        STRING_TOKEN(STR_EXIT_TEXT),      // Help text
+        EFI_IFR_FLAG_CALLBACK,            // Question flag
+        0                                 // Action String ID
+      );
+
+      //
+      // Create Option OpCode
+      //
+      OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
+      ASSERT (OptionsOpCodeHandle != NULL);
+
+      HiiCreateOneOfOptionOpCode (
+        OptionsOpCodeHandle,
+        STRING_TOKEN (STR_BOOT_OPTION1),
+        0,
+        EFI_IFR_NUMERIC_SIZE_1,
+        1
+        );
+
+      HiiCreateOneOfOptionOpCode (
+        OptionsOpCodeHandle,
+        STRING_TOKEN (STR_BOOT_OPTION2),
+        0,
+        EFI_IFR_NUMERIC_SIZE_1,
+        2
+        );
+
+      //
+      // Prepare initial value for the dynamic created oneof Question
+      //
+      PrivateData->Configuration.DynamicOneof = 2;
+      Status = gRT->SetVariable(
+                      VariableName,
+                      &mFormSetGuid,
+                      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                      sizeof (DRIVER_SAMPLE_CONFIGURATION),
+                      &PrivateData->Configuration
+                      );
+
+      //
+      // Set initial vlaue of dynamic created oneof Question in Form Browser
+      //
+      Configuration = AllocateZeroPool (sizeof (DRIVER_SAMPLE_CONFIGURATION));
+      ASSERT (Configuration != NULL);
+      if (HiiGetBrowserData (&mFormSetGuid, VariableName, sizeof (DRIVER_SAMPLE_CONFIGURATION), (UINT8 *) Configuration)) {
+        Configuration->DynamicOneof = 2;
+
+        //
+        // Update uncommitted data of Browser
+        //
+        HiiSetBrowserData (
+          &mFormSetGuid,
+          VariableName,
+          sizeof (DRIVER_SAMPLE_CONFIGURATION),
+          (UINT8 *) Configuration,
+          NULL
+          );
+      }
+      FreePool (Configuration);
+
+      HiiCreateOneOfOpCode (
+        StartOpCodeHandle,                         // Container for dynamic created opcodes
+        0x8001,                                    // Question ID (or call it "key")
+        CONFIGURATION_VARSTORE_ID,                 // VarStore ID
+        (UINT16) DYNAMIC_ONE_OF_VAR_OFFSET,        // Offset in Buffer Storage
+        STRING_TOKEN (STR_ONE_OF_PROMPT),          // Question prompt text
+        STRING_TOKEN (STR_ONE_OF_HELP),            // Question help text
+        EFI_IFR_FLAG_CALLBACK,                     // Question flag
+        EFI_IFR_NUMERIC_SIZE_1,                    // Data type of Question Value
+        OptionsOpCodeHandle,                       // Option Opcode list
+        NULL                                       // Default Opcode is NULl
+        );
+
+      HiiCreateOrderedListOpCode (
+        StartOpCodeHandle,                         // Container for dynamic created opcodes
+        0x8002,                                    // Question ID
+        CONFIGURATION_VARSTORE_ID,                 // VarStore ID
+        (UINT16) DYNAMIC_ORDERED_LIST_VAR_OFFSET,  // Offset in Buffer Storage
+        STRING_TOKEN (STR_BOOT_OPTIONS),           // Question prompt text
+        STRING_TOKEN (STR_BOOT_OPTIONS),           // Question help text
+        EFI_IFR_FLAG_RESET_REQUIRED,               // Question flag
+        0,                                         // Ordered list flag, e.g. EFI_IFR_UNIQUE_SET
+        EFI_IFR_NUMERIC_SIZE_1,                    // Data type of Question value
+        5,                                         // Maximum container
+        OptionsOpCodeHandle,                       // Option Opcode list
+        NULL                                       // Default Opcode is NULl
+        );
+
+      HiiCreateTextOpCode (
+        StartOpCodeHandle,
+        STRING_TOKEN(STR_TEXT_SAMPLE_HELP),
+        STRING_TOKEN(STR_TEXT_SAMPLE_HELP),
+        STRING_TOKEN(STR_TEXT_SAMPLE_STRING)
+      );
+
+      HiiCreateDateOpCode (
+        StartOpCodeHandle,
+        0x8004,
+        0x0,
+        0x0,
+        STRING_TOKEN(STR_DATE_SAMPLE_HELP),
+        STRING_TOKEN(STR_DATE_SAMPLE_HELP),
+        0,
+        QF_DATE_STORAGE_TIME,
+        NULL
+        );
+
+      HiiCreateTimeOpCode (
+        StartOpCodeHandle,
+        0x8005,
+        0x0,
+        0x0,
+        STRING_TOKEN(STR_TIME_SAMPLE_HELP),
+        STRING_TOKEN(STR_TIME_SAMPLE_HELP),
+        0,
+        QF_TIME_STORAGE_TIME,
+        NULL
+        );
+
+      HiiCreateGotoOpCode (
+        StartOpCodeHandle,                // Container for dynamic created opcodes
+        1,                                // Target Form ID
+        STRING_TOKEN (STR_GOTO_FORM1),    // Prompt text
+        STRING_TOKEN (STR_GOTO_HELP),     // Help text
+        0,                                // Question flag
+        0x8003                            // Question ID
+        );
+
+      HiiUpdateForm (
+        PrivateData->HiiHandle[0],  // HII handle
+        &mFormSetGuid,              // Formset GUID
+        0x1234,                     // Form ID
+        StartOpCodeHandle,          // Label for where to insert opcodes
+        EndOpCodeHandle             // Replace data
+        );
+
+      HiiFreeOpCodeHandle (StartOpCodeHandle);
+      HiiFreeOpCodeHandle (OptionsOpCodeHandle);
+      HiiFreeOpCodeHandle (EndOpCodeHandle);
+      break;
+
+    case 0x5678:
+      //
+      // We will reach here once the Question is refreshed
+      //
 
       //
       // Initialize the container for dynamic opcodes
@@ -865,9 +1131,9 @@ DriverCallback (
 
       HiiCreateActionOpCode (
         StartOpCodeHandle,                // Container for dynamic created opcodes
-        0x1238,                           // Question ID
-        STRING_TOKEN(STR_SAVE_TEXT),      // Prompt text
-        STRING_TOKEN(STR_SAVE_TEXT),      // Help text
+        0x1237,                           // Question ID
+        STRING_TOKEN(STR_EXIT_TEXT),      // Prompt text
+        STRING_TOKEN(STR_EXIT_TEXT),      // Help text
         EFI_IFR_FLAG_CALLBACK,            // Question flag
         0                                 // Action String ID
       );
@@ -881,337 +1147,105 @@ DriverCallback (
         );
 
       HiiFreeOpCodeHandle (StartOpCodeHandle);
-    }
-    return EFI_SUCCESS;
-  }
-
-  if (Action == EFI_BROWSER_ACTION_FORM_CLOSE) {
-    if (QuestionId == 0x5678) {
-      //
-      // Sample CallBack for UEFI FORM_CLOSE action:
-      //   Show up a pop-up to specify Form 3 will be closed when exit Form 3.
-      //
-      do {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"",
-          L"You are going to leave third Form!",
-          L"Press ESC or ENTER to continue ...",
-          L"",
-          NULL
-          );
-      } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
-    }
-    return EFI_SUCCESS;
-  }
-
-  if ((Value == NULL) || (ActionRequest == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-
-  Status = EFI_SUCCESS;
-  PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
-
-  switch (QuestionId) {
-  case 0x1234:
-    //
-    // Initialize the container for dynamic opcodes
-    //
-    StartOpCodeHandle = HiiAllocateOpCodeHandle ();
-    ASSERT (StartOpCodeHandle != NULL);
-
-    EndOpCodeHandle = HiiAllocateOpCodeHandle ();
-    ASSERT (EndOpCodeHandle != NULL);
-
-    //
-    // Create Hii Extend Label OpCode as the start opcode
-    //
-    StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
-    StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-    StartLabel->Number       = LABEL_UPDATE1;
-
-    //
-    // Create Hii Extend Label OpCode as the end opcode
-    //
-    EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
-    EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-    EndLabel->Number       = LABEL_END;
-
-    HiiCreateActionOpCode (
-      StartOpCodeHandle,                // Container for dynamic created opcodes
-      0x1237,                           // Question ID
-      STRING_TOKEN(STR_EXIT_TEXT),      // Prompt text
-      STRING_TOKEN(STR_EXIT_TEXT),      // Help text
-      EFI_IFR_FLAG_CALLBACK,            // Question flag
-      0                                 // Action String ID
-    );
-
-    //
-    // Create Option OpCode
-    //
-    OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
-    ASSERT (OptionsOpCodeHandle != NULL);
-
-    HiiCreateOneOfOptionOpCode (
-      OptionsOpCodeHandle,
-      STRING_TOKEN (STR_BOOT_OPTION1),
-      0,
-      EFI_IFR_NUMERIC_SIZE_1,
-      1
-      );
-
-    HiiCreateOneOfOptionOpCode (
-      OptionsOpCodeHandle,
-      STRING_TOKEN (STR_BOOT_OPTION2),
-      0,
-      EFI_IFR_NUMERIC_SIZE_1,
-      2
-      );
-
-    //
-    // Prepare initial value for the dynamic created oneof Question
-    //
-    PrivateData->Configuration.DynamicOneof = 2;
-    Status = gRT->SetVariable(
-                    VariableName,
-                    &mFormSetGuid,
-                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                    sizeof (DRIVER_SAMPLE_CONFIGURATION),
-                    &PrivateData->Configuration
-                    );
-
-    //
-    // Set initial vlaue of dynamic created oneof Question in Form Browser
-    //
-    Configuration = AllocateZeroPool (sizeof (DRIVER_SAMPLE_CONFIGURATION));
-    ASSERT (Configuration != NULL);
-    if (HiiGetBrowserData (&mFormSetGuid, VariableName, sizeof (DRIVER_SAMPLE_CONFIGURATION), (UINT8 *) Configuration)) {
-      Configuration->DynamicOneof = 2;
 
       //
-      // Update uncommitted data of Browser
+      // Refresh the Question value
       //
-      HiiSetBrowserData (
-        &mFormSetGuid,
-        VariableName,
-        sizeof (DRIVER_SAMPLE_CONFIGURATION),
-        (UINT8 *) Configuration,
-        NULL
-        );
-    }
-    FreePool (Configuration);
+      PrivateData->Configuration.DynamicRefresh++;
+      Status = gRT->SetVariable(
+                      VariableName,
+                      &mFormSetGuid,
+                      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                      sizeof (DRIVER_SAMPLE_CONFIGURATION),
+                      &PrivateData->Configuration
+                      );
 
-    HiiCreateOneOfOpCode (
-      StartOpCodeHandle,                         // Container for dynamic created opcodes
-      0x8001,                                    // Question ID (or call it "key")
-      CONFIGURATION_VARSTORE_ID,                 // VarStore ID
-      (UINT16) DYNAMIC_ONE_OF_VAR_OFFSET,        // Offset in Buffer Storage
-      STRING_TOKEN (STR_ONE_OF_PROMPT),          // Question prompt text
-      STRING_TOKEN (STR_ONE_OF_HELP),            // Question help text
-      EFI_IFR_FLAG_CALLBACK,                     // Question flag
-      EFI_IFR_NUMERIC_SIZE_1,                    // Data type of Question Value
-      OptionsOpCodeHandle,                       // Option Opcode list
-      NULL                                       // Default Opcode is NULl
-      );
+      //
+      // Change an EFI Variable storage (MyEfiVar) asynchronous, this will cause
+      // the first statement in Form 3 be suppressed
+      //
+      MyVarSize = 1;
+      MyVar = 111;
+      Status = gRT->SetVariable(
+                      L"MyVar",
+                      &mFormSetGuid,
+                      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                      MyVarSize,
+                      &MyVar
+                      );
+      break;
 
-    HiiCreateOrderedListOpCode (
-      StartOpCodeHandle,                         // Container for dynamic created opcodes
-      0x8002,                                    // Question ID
-      CONFIGURATION_VARSTORE_ID,                 // VarStore ID
-      (UINT16) DYNAMIC_ORDERED_LIST_VAR_OFFSET,  // Offset in Buffer Storage
-      STRING_TOKEN (STR_BOOT_OPTIONS),           // Question prompt text
-      STRING_TOKEN (STR_BOOT_OPTIONS),           // Question help text
-      EFI_IFR_FLAG_RESET_REQUIRED,               // Question flag
-      0,                                         // Ordered list flag, e.g. EFI_IFR_UNIQUE_SET
-      EFI_IFR_NUMERIC_SIZE_1,                    // Data type of Question value
-      5,                                         // Maximum container
-      OptionsOpCodeHandle,                       // Option Opcode list
-      NULL                                       // Default Opcode is NULl
-      );
+    case 0x1237:
+      //
+      // User press "Exit now", request Browser to exit
+      //
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+      break;
 
-    HiiCreateTextOpCode (
-      StartOpCodeHandle,
-      STRING_TOKEN(STR_TEXT_SAMPLE_HELP),
-      STRING_TOKEN(STR_TEXT_SAMPLE_HELP),
-      STRING_TOKEN(STR_TEXT_SAMPLE_STRING)
-    );
+    case 0x1238:
+      //
+      // User press "Save now", request Browser to save the uncommitted data.
+      //
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      break;
 
-    HiiCreateDateOpCode (
-      StartOpCodeHandle,
-      0x8004,
-      0x0,
-      0x0,
-      STRING_TOKEN(STR_DATE_SAMPLE_HELP),
-      STRING_TOKEN(STR_DATE_SAMPLE_HELP),
-      0,
-      QF_DATE_STORAGE_TIME,
-      NULL
-      );
-
-    HiiCreateTimeOpCode (
-      StartOpCodeHandle,
-      0x8005,
-      0x0,
-      0x0,
-      STRING_TOKEN(STR_TIME_SAMPLE_HELP),
-      STRING_TOKEN(STR_TIME_SAMPLE_HELP),
-      0,
-      QF_TIME_STORAGE_TIME,
-      NULL
-      );
-
-    HiiCreateGotoOpCode (
-      StartOpCodeHandle,                // Container for dynamic created opcodes
-      1,                                // Target Form ID
-      STRING_TOKEN (STR_GOTO_FORM1),    // Prompt text
-      STRING_TOKEN (STR_GOTO_HELP),     // Help text
-      0,                                // Question flag
-      0x8003                            // Question ID
-      );
-
-    HiiUpdateForm (
-      PrivateData->HiiHandle[0],  // HII handle
-      &mFormSetGuid,              // Formset GUID
-      0x1234,                     // Form ID
-      StartOpCodeHandle,          // Label for where to insert opcodes
-      EndOpCodeHandle             // Replace data
-      );
-
-    HiiFreeOpCodeHandle (StartOpCodeHandle);
-    HiiFreeOpCodeHandle (OptionsOpCodeHandle);
-    HiiFreeOpCodeHandle (EndOpCodeHandle);
-    break;
-
-  case 0x5678:
-    //
-    // We will reach here once the Question is refreshed
-    //
-
-    //
-    // Initialize the container for dynamic opcodes
-    //
-    StartOpCodeHandle = HiiAllocateOpCodeHandle ();
-    ASSERT (StartOpCodeHandle != NULL);
-
-    //
-    // Create Hii Extend Label OpCode as the start opcode
-    //
-    StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
-    StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-    StartLabel->Number       = LABEL_UPDATE2;
-
-    HiiCreateActionOpCode (
-      StartOpCodeHandle,                // Container for dynamic created opcodes
-      0x1237,                           // Question ID
-      STRING_TOKEN(STR_EXIT_TEXT),      // Prompt text
-      STRING_TOKEN(STR_EXIT_TEXT),      // Help text
-      EFI_IFR_FLAG_CALLBACK,            // Question flag
-      0                                 // Action String ID
-    );
-
-    HiiUpdateForm (
-      PrivateData->HiiHandle[0],  // HII handle
-      &mFormSetGuid,              // Formset GUID
-      0x3,                        // Form ID
-      StartOpCodeHandle,          // Label for where to insert opcodes
-      NULL                        // Insert data
-      );
-
-    HiiFreeOpCodeHandle (StartOpCodeHandle);
-
-    //
-    // Refresh the Question value
-    //
-    PrivateData->Configuration.DynamicRefresh++;
-    Status = gRT->SetVariable(
-                    VariableName,
-                    &mFormSetGuid,
-                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                    sizeof (DRIVER_SAMPLE_CONFIGURATION),
-                    &PrivateData->Configuration
-                    );
-
-    //
-    // Change an EFI Variable storage (MyEfiVar) asynchronous, this will cause
-    // the first statement in Form 3 be suppressed
-    //
-    MyVarSize = 1;
-    MyVar = 111;
-    Status = gRT->SetVariable(
-                    L"MyVar",
-                    &mFormSetGuid,
-                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                    MyVarSize,
-                    &MyVar
-                    );
-    break;
-
-  case 0x1237:
-    //
-    // User press "Exit now", request Browser to exit
-    //
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-    break;
-
-  case 0x1238:
-    //
-    // User press "Save now", request Browser to save the uncommitted data.
-    //
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-    break;
-
-  case 0x2000:
-    //
-    // Only used to update the state.
-    //
-    if ((Type == EFI_IFR_TYPE_STRING) && (Value->string == 0) && 
-      (PrivateData->PasswordState == BROWSER_STATE_SET_PASSWORD)) {
-      PrivateData->PasswordState = BROWSER_STATE_VALIDATE_PASSWORD;
-      return EFI_INVALID_PARAMETER;
-    }
-
-    //
-    // When try to set a new password, user will be chanlleged with old password.
-    // The Callback is responsible for validating old password input by user,
-    // If Callback return EFI_SUCCESS, it indicates validation pass.
-    //
-    switch (PrivateData->PasswordState) {
-    case BROWSER_STATE_VALIDATE_PASSWORD:
-      Status = ValidatePassword (PrivateData, Value->string);
-      if (Status == EFI_SUCCESS) {
-        PrivateData->PasswordState = BROWSER_STATE_SET_PASSWORD;
+    case 0x2000:
+      //
+      // Only used to update the state.
+      //
+      if ((Type == EFI_IFR_TYPE_STRING) && (Value->string == 0) && 
+        (PrivateData->PasswordState == BROWSER_STATE_SET_PASSWORD)) {
+        PrivateData->PasswordState = BROWSER_STATE_VALIDATE_PASSWORD;
+        return EFI_INVALID_PARAMETER;
       }
+
+      //
+      // When try to set a new password, user will be chanlleged with old password.
+      // The Callback is responsible for validating old password input by user,
+      // If Callback return EFI_SUCCESS, it indicates validation pass.
+      //
+      switch (PrivateData->PasswordState) {
+      case BROWSER_STATE_VALIDATE_PASSWORD:
+        Status = ValidatePassword (PrivateData, Value->string);
+        if (Status == EFI_SUCCESS) {
+          PrivateData->PasswordState = BROWSER_STATE_SET_PASSWORD;
+        }
+        break;
+
+      case BROWSER_STATE_SET_PASSWORD:
+        Status = SetPassword (PrivateData, Value->string);
+        PrivateData->PasswordState = BROWSER_STATE_VALIDATE_PASSWORD;
+        break;
+
+      default:
+        break;
+      }
+
       break;
 
-    case BROWSER_STATE_SET_PASSWORD:
-      Status = SetPassword (PrivateData, Value->string);
-      PrivateData->PasswordState = BROWSER_STATE_VALIDATE_PASSWORD;
-      break;
-
+    case 0x1111:
+      //
+      // EfiVarstore question takes sample action (print value as debug information) 
+      // after read/write question.
+      //
+      MyVarSize = 1;
+      Status = gRT->GetVariable(
+                      L"MyVar",
+                      &mFormSetGuid,
+                      NULL,
+                      &MyVarSize,
+                      &MyVar
+                      );
+      ASSERT_EFI_ERROR (Status);
+      DEBUG ((DEBUG_INFO, "EfiVarstore question: Tall value is %d with value width %d\n", MyVar, MyVarSize));
     default:
       break;
     }
+  }
+  break;
 
-    break;
-
-  case 0x1111:
-    //
-    // EfiVarstore question takes sample action (print value as debug information) 
-    // after read/write question.
-    //
-    MyVarSize = 1;
-    Status = gRT->GetVariable(
-                    L"MyVar",
-                    &mFormSetGuid,
-                    NULL,
-                    &MyVarSize,
-                    &MyVar
-                    );
-    ASSERT_EFI_ERROR (Status);
-    DEBUG ((DEBUG_INFO, "EfiVarstore question: Tall value is %d with value width %d\n", MyVar, MyVarSize));
   default:
+    Status = EFI_UNSUPPORTED;
     break;
   }
 
