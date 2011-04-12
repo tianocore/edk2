@@ -174,7 +174,7 @@ ShellCommandRunDisconnect (
         } else {
           ASSERT(Param1 != NULL);
           Status = gBS->DisconnectController(Handle1, Handle2, Handle3);
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_3P_RESULT), gShellDriver1HiiHandle, L"Disconnect", Intermediate1, Intermediate2, Intermediate3, Status);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_3P_RESULT), gShellDriver1HiiHandle, L"Disconnect", (UINTN)Intermediate1, (UINTN)Intermediate2, (UINTN)Intermediate3, Status);
         }
       }
     }

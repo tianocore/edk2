@@ -277,7 +277,8 @@ ShellCommandRunConnect (
     //
     // if more than 2 'value' parameters (plus the name one) or either -r or -c with any value parameters we have too many parameters
     //
-    if ((ShellCommandLineGetCount(Package) > 3)
+    Count = (gInReconnect?0x4:0x3);
+    if ((ShellCommandLineGetCount(Package) > Count)
       ||((ShellCommandLineGetFlag(Package, L"-r") || ShellCommandLineGetFlag(Package, L"-c")) && ShellCommandLineGetCount(Package)>1)
       ||(ShellCommandLineGetFlag(Package, L"-r") && ShellCommandLineGetFlag(Package, L"-c") )
      ){
@@ -328,17 +329,26 @@ ShellCommandRunConnect (
       Param2  = ShellCommandLineGetRawValue(Package, 2);
       Count   = ShellCommandLineGetCount(Package);
 
-      Status  = ShellConvertStringToUint64(Param1, &Intermediate, TRUE, FALSE);
-      Handle1 = ConvertHandleIndexToHandle((UINTN)Intermediate);
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param1);
-        ShellStatus = SHELL_INVALID_PARAMETER;
+      if (Param1 != NULL) {
+        Status  = ShellConvertStringToUint64(Param1, &Intermediate, TRUE, FALSE);
+        Handle1 = ConvertHandleIndexToHandle((UINTN)Intermediate);
+        if (EFI_ERROR(Status)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param1);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
+      } else {
+        Handle1 = NULL;
       }
-      Status  = ShellConvertStringToUint64(Param2, &Intermediate, TRUE, FALSE);
-      Handle2 = ConvertHandleIndexToHandle((UINTN)Intermediate);
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param2);
-        ShellStatus = SHELL_INVALID_PARAMETER;
+
+      if (Param2 != NULL) {
+        Status  = ShellConvertStringToUint64(Param2, &Intermediate, TRUE, FALSE);
+        Handle2 = ConvertHandleIndexToHandle((UINTN)Intermediate);
+        if (EFI_ERROR(Status)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param2);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
+      } else {
+        Handle2 = NULL;
       }
       
       if (ShellStatus == SHELL_SUCCESS) {

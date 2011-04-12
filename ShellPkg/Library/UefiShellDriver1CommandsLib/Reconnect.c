@@ -29,9 +29,14 @@ ShellCommandRunReconnect (
 {
   SHELL_STATUS        ShellStatus;
 
+  gInReconnect = TRUE;
+
   ShellStatus = ShellCommandRunDisconnect(ImageHandle, SystemTable);
   if (ShellStatus == SHELL_SUCCESS) {
     ShellStatus = ShellCommandRunConnect(ImageHandle, SystemTable);
   }
+
+  gInReconnect = FALSE;
+
   return (ShellStatus);
 }

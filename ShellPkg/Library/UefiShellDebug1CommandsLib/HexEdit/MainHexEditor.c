@@ -1704,12 +1704,28 @@ HMainEditorRefresh (
   NameChange = FALSE;
   ReadChange = FALSE;
 
-  if ( HMainEditor.BufferImage->FileImage != NULL && 
-       HMainEditor.BufferImage->FileImage->FileName != NULL && 
-       HBufferImageBackupVar.FileImage != NULL && 
-       HBufferImageBackupVar.FileImage->FileName != NULL && 
-       StrCmp (HMainEditor.BufferImage->FileImage->FileName, HBufferImageBackupVar.FileImage->FileName) != 0 ) {
-    NameChange = TRUE;
+  if (HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer) {
+    if (HMainEditor.BufferImage->DiskImage != NULL &&
+        HBufferImageBackupVar.DiskImage != NULL &&
+        (HMainEditor.BufferImage->DiskImage->Offset != HBufferImageBackupVar.DiskImage->Offset || 
+           HMainEditor.BufferImage->DiskImage->Size != HBufferImageBackupVar.DiskImage->Size) ){
+      NameChange = TRUE;
+    }
+  } else if (HMainEditor.BufferImage->BufferType == FileTypeMemBuffer) {
+    if (HMainEditor.BufferImage->MemImage != NULL &&
+        HBufferImageBackupVar.MemImage != NULL &&
+        (HMainEditor.BufferImage->MemImage->Offset != HBufferImageBackupVar.MemImage->Offset || 
+           HMainEditor.BufferImage->MemImage->Size != HBufferImageBackupVar.MemImage->Size) ){
+      NameChange = TRUE;
+    }
+  } else if (HMainEditor.BufferImage->BufferType == FileTypeFileBuffer) {
+    if ( HMainEditor.BufferImage->FileImage != NULL && 
+         HMainEditor.BufferImage->FileImage->FileName != NULL && 
+         HBufferImageBackupVar.FileImage != NULL && 
+         HBufferImageBackupVar.FileImage->FileName != NULL && 
+         StrCmp (HMainEditor.BufferImage->FileImage->FileName, HBufferImageBackupVar.FileImage->FileName) != 0 ) {
+      NameChange = TRUE;
+    }
   }
   if ( HMainEditor.BufferImage->FileImage != NULL && 
        HBufferImageBackupVar.FileImage != NULL && 
@@ -1753,9 +1769,9 @@ HMainEditorRefresh (
       HEditorFirst,
       HMainEditor.ScreenSize.Row,
       HMainEditor.ScreenSize.Column,
-      0,
-      0,
-      TRUE
+      (UINTN)(-1),
+      (UINTN)(-1),
+      FALSE
       );
     HBufferImageRefresh ();
   }

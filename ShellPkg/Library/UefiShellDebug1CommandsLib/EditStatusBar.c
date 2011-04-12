@@ -125,14 +125,23 @@ StatusBarRefresh (
   //
   // print row, column fields
   //
-  ShellPrintEx (
-    0,
-    (INT32)(LastRow) - 4,
-    L"  Row: %d  Col: %d       %s",
-    FileRow,
-    FileCol,
-    StatusString
-    );
+  if (FileRow != (UINTN)(-1) && FileCol != (UINTN)(-1)) {
+    ShellPrintEx (
+      0,
+      (INT32)(LastRow) - 4,
+      L"  Row: %d  Col: %d       %s",
+      FileRow,
+      FileCol,
+      StatusString
+      );
+  } else {
+    ShellPrintEx (
+      0,
+      (INT32)(LastRow) - 4,
+      L"  %s",
+      StatusString
+      );
+  }
 
   //
   // print insert mode field

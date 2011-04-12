@@ -58,6 +58,7 @@
 
 extern        EFI_HANDLE                        gShellDriver1HiiHandle;
 extern CONST  EFI_GUID                          gShellDriver1HiiGuid;
+extern        BOOLEAN                           gInReconnect;
 
 /**
   Function for 'connect' command.

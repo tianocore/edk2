@@ -48,6 +48,63 @@ typedef struct {
 } BGFG_OPERATION;
 
 /**
+  This function will populate the device path protocol parameter based on TheHandle.
+  
+  @param[in,out] DevPath       On a sucessful return the device path to the handle.
+
+  @retval EFI_SUCCESS           The device path was sucessfully returned.
+  @retval other                 A error from gBS->HandleProtocol.
+
+  @sa HandleProtocol
+**/
+EFI_STATUS
+EFIAPI
+GetDevicePathForDriverHandleDebug1 (
+  IN EFI_HANDLE                   TheHandle,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL **FilePath
+  )
+{
+  EFI_STATUS                Status;
+  EFI_LOADED_IMAGE_PROTOCOL *LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL  *ImageDevicePath;
+
+  Status = gBS->OpenProtocol (
+                TheHandle,
+                &gEfiLoadedImageProtocolGuid,
+                (VOID**)&LoadedImage,
+                gImageHandle,
+                NULL,
+                EFI_OPEN_PROTOCOL_GET_PROTOCOL
+               );
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->OpenProtocol (
+                  LoadedImage->DeviceHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID**)&ImageDevicePath,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                 );
+    if (!EFI_ERROR (Status)) {
+//      *DevPath  = DuplicateDevicePath (ImageDevicePath);
+//      *FilePath = DuplicateDevicePath (LoadedImage->FilePath);
+        *FilePath = AppendDevicePath(ImageDevicePath,LoadedImage->FilePath);
+      gBS->CloseProtocol(
+                  LoadedImage->DeviceHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  gImageHandle,
+                  NULL);
+    }
+    gBS->CloseProtocol(
+                TheHandle,
+                &gEfiLoadedImageProtocolGuid,
+                gImageHandle,
+                NULL);
+  }
+  return (Status);
+}
+
+/**
   Function to add a option.
 
   @param[in] Position       The position to add Target at.
@@ -81,9 +138,9 @@ BcfgAddDebug1(
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *FilePath;
   EFI_DEVICE_PATH_PROTOCOL  *FileNode;
-  EFI_DEVICE_PATH_PROTOCOL  *DevPath;
+//  EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   CHAR16                    *Str;
-  CONST CHAR16              *StringWalker;
+//  CONST CHAR16              *StringWalker;
   UINT8                     *TempByteBuffer;
   UINT8                     *TempByteStart;
   EFI_SHELL_FILE_INFO       *Arg;
@@ -100,7 +157,6 @@ BcfgAddDebug1(
   UINTN                     ChildControllerHandleCount;
   SHELL_STATUS              ShellStatus;
   UINT16                    *NewOrder;
-  UINT64                    Intermediate;
 
   if (!UseHandle) {
     if (File == NULL || Desc == NULL) {
@@ -125,42 +181,79 @@ BcfgAddDebug1(
   TargetLocation  = 0xFFFF;
 
   if (UseHandle) {
-    Status = ShellConvertStringToUint64(File, &Intermediate, TRUE, FALSE);
-    CurHandle = ConvertHandleIndexToHandle((UINTN)Intermediate);
-    if (CurHandle == NULL || EFI_ERROR(Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, File);
+    CurHandle = ConvertHandleIndexToHandle(HandleNumber);
+    if (CurHandle == NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"Handle Number");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      //
-      //Make sure that the handle should point to a real controller
-      //
-      Status = PARSE_HANDLE_DATABASE_UEFI_DRIVERS (
-                 CurHandle,
-                 &DriverBindingHandleCount,
-                 NULL);
+      if (Target == BcfgTargetBootOrder) {
+        //
+        //Make sure that the handle should point to a real controller
+        //
+        Status = PARSE_HANDLE_DATABASE_UEFI_DRIVERS (
+                   CurHandle,
+                   &DriverBindingHandleCount,
+                   NULL);
 
-      Status = PARSE_HANDLE_DATABASE_PARENTS (
-                 CurHandle,
-                 &ParentControllerHandleCount,
-                 NULL);
+        Status = PARSE_HANDLE_DATABASE_PARENTS (
+                   CurHandle,
+                   &ParentControllerHandleCount,
+                   NULL);
 
-      Status = ParseHandleDatabaseForChildControllers (
-                 CurHandle,
-                 &ChildControllerHandleCount,
-                 NULL);
+        Status = ParseHandleDatabaseForChildControllers (
+                   CurHandle,
+                   &ChildControllerHandleCount,
+                   NULL);
 
-      if (DriverBindingHandleCount > 0
-            || ParentControllerHandleCount > 0
-            || ChildControllerHandleCount > 0) {
-        FilePath = NULL;
+        if (DriverBindingHandleCount > 0
+              || ParentControllerHandleCount > 0
+              || ChildControllerHandleCount > 0) {
+          FilePath = NULL;
+          Status = gBS->HandleProtocol (
+                     CurHandle,
+                     &gEfiDevicePathProtocolGuid,
+                     (VOID**)&FilePath);
+        }
+        if (EFI_ERROR (Status)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_HANDLE), gShellDebug1HiiHandle, HandleNumber);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
+      } else {
+        //
+        //Make sure that the handle should point to driver, not a controller.
+        //
+        Status = PARSE_HANDLE_DATABASE_UEFI_DRIVERS (
+                   CurHandle,
+                   &DriverBindingHandleCount,
+                   NULL);
+
+        Status = PARSE_HANDLE_DATABASE_PARENTS (
+                   CurHandle,
+                   &ParentControllerHandleCount,
+                   NULL);
+
+        Status = ParseHandleDatabaseForChildControllers (
+                   CurHandle,
+                   &ChildControllerHandleCount,
+                   NULL);
+
         Status = gBS->HandleProtocol (
                    CurHandle,
                    &gEfiDevicePathProtocolGuid,
                    (VOID**)&FilePath);
-      }
-      if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_HANDLE), gShellDebug1HiiHandle, Intermediate);
-        ShellStatus = SHELL_INVALID_PARAMETER;
+
+        if (DriverBindingHandleCount > 0
+              || ParentControllerHandleCount > 0
+              || ChildControllerHandleCount > 0
+              || !EFI_ERROR(Status) ) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"Handle Number");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          //
+          // Get the DevicePath from the loaded image information.
+          //
+          Status = GetDevicePathForDriverHandleDebug1(CurHandle, &FilePath);
+        }
       }
     }
   } else {
@@ -199,6 +292,7 @@ BcfgAddDebug1(
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_FILE_DP), gShellDebug1HiiHandle, Arg->FullName);
           ShellStatus = SHELL_UNSUPPORTED;
         } else {
+/*
           if (UsePath) {
             DevPath = DevicePath;
             while (!IsDevicePathEnd(DevPath)) {
@@ -221,9 +315,11 @@ BcfgAddDebug1(
             FilePath = AppendDevicePath(DevicePath, FileNode);
             FreePool(FileNode);
           } else {
+*/
             FilePath = DuplicateDevicePath(DevicePath);
+/*
           }
-
+*/
           FreePool(DevicePath);
         }
       }
@@ -364,16 +460,15 @@ BcfgRemoveDebug1(
   IN CONST BCFG_OPERATION_TARGET  Target,
   IN CONST UINT16                 *CurrentOrder,
   IN CONST UINTN                  OrderCount,
-  IN CONST UINT16                  Location
+  IN CONST UINT16                 Location
   )
 {
   CHAR16      VariableName[12];
   UINT16      *NewOrder;
   EFI_STATUS  Status;
-  UINTN       LoopVar;
   UINTN       NewCount;
 
-  UnicodeSPrint(VariableName, sizeof(VariableName), L"%s%04x", Target == BcfgTargetBootOrder?L"Boot":L"Driver", Location);
+  UnicodeSPrint(VariableName, sizeof(VariableName), L"%s%04x", Target == BcfgTargetBootOrder?L"Boot":L"Driver", CurrentOrder[Location]);
   Status = gRT->SetVariable(
     VariableName,
     (EFI_GUID*)&gEfiGlobalVariableGuid,
@@ -388,12 +483,9 @@ BcfgRemoveDebug1(
   if (NewOrder != NULL) {
     NewCount = OrderCount;
     CopyMem(NewOrder, CurrentOrder, OrderCount*sizeof(CurrentOrder[0]));
-    for (LoopVar = 0 ; LoopVar < OrderCount ; LoopVar++){
-      if (NewOrder[LoopVar] == Location) {
-        CopyMem(NewOrder+LoopVar, NewOrder+LoopVar+1, (OrderCount - LoopVar - 1)*sizeof(CurrentOrder[0]));
-        NewCount--;
-      }
-    }
+    CopyMem(NewOrder+Location, NewOrder+Location+1, (OrderCount - Location - 1)*sizeof(CurrentOrder[0]));
+    NewCount--;
+
     Status = gRT->SetVariable(
       Target == BcfgTargetBootOrder?(CHAR16*)L"BootOrder":(CHAR16*)L"DriverOrder",
       (EFI_GUID*)&gEfiGlobalVariableGuid,
@@ -542,9 +634,14 @@ BcfgDisplayDumpDebug1(
       return (SHELL_INVALID_PARAMETER);
     }
 
-    DevPath = AllocateZeroPool(*(UINT16*)(Buffer+4));
-    CopyMem(DevPath, Buffer+6+StrSize((CHAR16*)(Buffer+6)), *(UINT16*)(Buffer+4));
-    DevPathString = gDevPathToText->ConvertDevicePathToText(DevPath, TRUE, FALSE);
+    if ((*(UINT16*)(Buffer+4)) != 0) {
+      DevPath = AllocateZeroPool(*(UINT16*)(Buffer+4));
+      CopyMem(DevPath, Buffer+6+StrSize((CHAR16*)(Buffer+6)), *(UINT16*)(Buffer+4));
+      DevPathString = gDevPathToText->ConvertDevicePathToText(DevPath, TRUE, FALSE);
+    } else {
+      DevPath       = NULL;
+      DevPathString = NULL;
+    }
     ShellPrintHiiEx(
       -1,
       -1,
