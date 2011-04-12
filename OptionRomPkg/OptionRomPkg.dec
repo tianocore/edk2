@@ -24,6 +24,15 @@
   PACKAGE_GUID                   = AA3865E8-7F30-4f59-8696-99F560101852
   PACKAGE_VERSION                = 0.1
 
+[Includes.common]
+  Include
+
+[LibraryClasses]
+  ##  @libraryclass  Provides an interface for performing UEFI Graphics
+  ##                 Output Protocol Video blt operations
+  ##
+  BltLib|Include/Library/BltLib.h
+
 [PcdsFeatureFlag]
   gOptionRomPkgTokenSpaceGuid.PcdSupportScsiPassThru|TRUE|BOOLEAN|0x00010001
   gOptionRomPkgTokenSpaceGuid.PcdSupportExtScsiPassThru|TRUE|BOOLEAN|0x00010002
