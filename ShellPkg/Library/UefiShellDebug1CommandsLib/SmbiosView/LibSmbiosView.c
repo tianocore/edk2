@@ -14,8 +14,8 @@
     
 
 #include "../UefiShellDebug1CommandsLib.h"
-#include <Guid/Smbios.h>
-#include "LIbSmbios.h"
+#include <Guid/SmBios.h>
+#include "LibSmbios.h"
 #include "LibSmbiosView.h"
 #include "SmbiosView.h"
 

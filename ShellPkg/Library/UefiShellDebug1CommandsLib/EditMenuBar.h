@@ -17,7 +17,7 @@
 
 typedef
 EFI_STATUS
-(EFIAPI *MENU_ITEM_FUNCTION) (
+(*MENU_ITEM_FUNCTION) (
   VOID
   );
 

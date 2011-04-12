@@ -3199,8 +3199,8 @@ PciExplainBar (
     } else if ((*Bar & PCI_BIT_1) == 0 && (*Bar & PCI_BIT_2) != 0) {
       Bar64 = 0x0;
       CopyMem (&Bar64, Bar, sizeof (UINT64));
-      ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_ONE_VAR_2), gShellDebug1HiiHandle, RShiftU64 ((Bar64 & 0xfffffffffffffff0), 32));
-      ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_ONE_VAR_3), gShellDebug1HiiHandle, (UINT32) (Bar64 & 0xfffffffffffffff0));
+      ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_ONE_VAR_2), gShellDebug1HiiHandle, RShiftU64 ((Bar64 & 0xfffffffffffffff0ULL), 32));
+      ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_ONE_VAR_3), gShellDebug1HiiHandle, (UINT32) (Bar64 & 0xfffffffffffffff0ULL));
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_MEM), gShellDebug1HiiHandle);
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_64_BITS), gShellDebug1HiiHandle);
       IsBar32 = FALSE;
@@ -3271,18 +3271,18 @@ PciExplainBar (
 
     OldBar64 = 0x0;
     CopyMem (&OldBar64, Bar, sizeof (UINT64));
-    NewBar64 = 0xffffffffffffffff;
+    NewBar64 = 0xffffffffffffffffULL;
 
     IoDev->Pci.Write (IoDev, EfiPciWidthUint32, RegAddress, 2, &NewBar64);
     IoDev->Pci.Read (IoDev, EfiPciWidthUint32, RegAddress, 2, &NewBar64);
     IoDev->Pci.Write (IoDev, EfiPciWidthUint32, RegAddress, 2, &OldBar64);
 
     if (IsMem) {
-      NewBar64  = NewBar64 & 0xfffffffffffffff0;
+      NewBar64  = NewBar64 & 0xfffffffffffffff0ULL;
       NewBar64  = (~NewBar64) + 1;
 
     } else {
-      NewBar64  = NewBar64 & 0xfffffffffffffffc;
+      NewBar64  = NewBar64 & 0xfffffffffffffffcULL;
       NewBar64  = (~NewBar64) + 1;
       NewBar64  = NewBar64 & 0x000000000000ffff;
     }
@@ -3305,9 +3305,9 @@ PciExplainBar (
       ShellPrintHiiEx(-1, -1, NULL,
         STRING_TOKEN (STR_PCI2_RSHIFT),
         gShellDebug1HiiHandle,
-        RShiftU64 ((NewBar64 + (Bar64 & 0xfffffffffffffff0) - 1), 32)
+        RShiftU64 ((NewBar64 + (Bar64 & 0xfffffffffffffff0ULL) - 1), 32)
        );
-      ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_RSHIFT), gShellDebug1HiiHandle, (UINT32) (NewBar64 + (Bar64 & 0xfffffffffffffff0) - 1));
+      ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_RSHIFT), gShellDebug1HiiHandle, (UINT32) (NewBar64 + (Bar64 & 0xfffffffffffffff0ULL) - 1));
 
     }
   } else {

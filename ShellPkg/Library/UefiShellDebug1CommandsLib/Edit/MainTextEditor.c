@@ -24,7 +24,6 @@
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandOpenFile (
   VOID
   );
@@ -35,7 +34,6 @@ MainCommandOpenFile (
   @retval EFI_SUCCESS           The switch was ok or a warning was presented.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandSwitchFileType (
   VOID
   );
@@ -46,7 +44,6 @@ MainCommandSwitchFileType (
   @retval EFI_SUCCESS             The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandGotoLine (
   VOID
   );
@@ -60,7 +57,6 @@ MainCommandGotoLine (
   @retval EFI_LOAD_ERROR          A file access error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandSaveFile (
   VOID
   );
@@ -73,7 +69,6 @@ MainCommandSaveFile (
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandExit (
   VOID
   );
@@ -86,7 +81,6 @@ MainCommandExit (
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandSearch (
   VOID
   );
@@ -99,7 +93,6 @@ MainCommandSearch (
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandSearchReplace (
   VOID
   );
@@ -112,7 +105,6 @@ MainCommandSearchReplace (
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandCutLine (
   VOID
   );
@@ -125,7 +117,6 @@ MainCommandCutLine (
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandPasteLine (
   VOID
   );
@@ -195,7 +186,6 @@ EDITOR_MENU_ITEM  MainMenuItems[] = {
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandOpenFile (
   VOID
   )
@@ -350,7 +340,6 @@ MainCommandOpenFile (
   @retval EFI_SUCCESS           The switch was ok or a warning was presented.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandSwitchFileType (
   VOID
   )
@@ -384,7 +373,6 @@ MainCommandSwitchFileType (
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandCutLine (
   VOID
   )
@@ -422,7 +410,6 @@ MainCommandCutLine (
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandPasteLine (
   VOID
   )
@@ -455,7 +442,6 @@ MainCommandPasteLine (
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandSearch (
   VOID
   )
@@ -597,7 +583,6 @@ MainCommandSearch (
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandSearchReplace (
   VOID
   )
@@ -901,7 +886,6 @@ MainCommandSearchReplace (
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandExit (
   VOID
   )
@@ -983,7 +967,6 @@ MainCommandExit (
   @retval EFI_SUCCESS             The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandGotoLine (
   VOID
   )
@@ -1057,7 +1040,6 @@ MainCommandGotoLine (
   @retval EFI_LOAD_ERROR          A file access error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainCommandSaveFile (
   VOID
   )

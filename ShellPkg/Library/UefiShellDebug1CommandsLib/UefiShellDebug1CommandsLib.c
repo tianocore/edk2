@@ -150,7 +150,6 @@ STATIC CONST CHAR8 Hex[] = {
   @param[in] UserData   The data to print out.
 **/
 VOID
-EFIAPI
 DumpHex (
   IN UINTN        Indent,
   IN UINTN        Offset,

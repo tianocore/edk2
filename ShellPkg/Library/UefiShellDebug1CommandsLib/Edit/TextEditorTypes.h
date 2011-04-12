@@ -42,7 +42,7 @@ typedef enum {
   NewLineTypeUnknown
 } EE_NEWLINE_TYPE;
 
-#define LINE_LIST_SIGNATURE  'eell'
+#define LINE_LIST_SIGNATURE  SIGNATURE_32 ('e', 'e', 'l', 'l')
 typedef struct _EFI_EDITOR_LINE {
   UINTN           Signature;
   CHAR16          *Buffer;

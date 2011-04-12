@@ -18,7 +18,7 @@
 #include "UefiShellDebug1CommandsLib.h"
 #include "EditTitleBar.h"
 
-#define EFI_EDITOR_LINE_LIST  'eell'
+#define EFI_EDITOR_LINE_LIST  SIGNATURE_32 ('e', 'e', 'l', 'l')
 
 #define ASCII_POSITION        ((0x10 * 3) + 12)
 
