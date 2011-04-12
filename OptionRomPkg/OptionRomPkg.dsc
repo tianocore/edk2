@@ -47,6 +47,7 @@
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf  
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  BltLib|OptionRomPkg/Library/GopBltLib/GopBltLib.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -56,6 +57,7 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
 ################################################################################
@@ -98,6 +100,8 @@
 [Components]
   OptionRomPkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
   OptionRomPkg/Library/GopBltLib/GopBltLib.inf
+
+  OptionRomPkg/Application/BltLibSample/BltLibSample.inf
 
   OptionRomPkg/AtapiPassThruDxe/AtapiPassThruDxe.inf
   OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
