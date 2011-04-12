@@ -201,7 +201,6 @@ INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
 INF  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
 INF  RuleOverride=ACPITABLE OvmfPkg/AcpiTables/AcpiTables.inf
-INF  OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
 
 INF  RuleOverride = BINARY USE = X64 FatBinPkg/EnhancedFatDxe/Fat.inf
 INF  RuleOverride = BINARY USE = X64 EdkShellBinPkg/FullShell/FullShell.inf
@@ -262,11 +261,11 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
-       SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
-          SECTION FV_IMAGE = MAINFV
-       }
-     }
-  
+   SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+     SECTION FV_IMAGE = MAINFV
+   }
+ }
+
 ################################################################################
 
 [Rule.Common.SEC]
@@ -355,7 +354,7 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     RAW RAW                |.raw
   }
 
-[OptionRom.CirrusLogic5446]
-INF  OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf {
+[OptionRom.OvmfVideo]
+INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf {
     PCI_DEVICE_ID  = 0x00B8
   }

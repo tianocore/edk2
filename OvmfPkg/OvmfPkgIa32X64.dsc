@@ -345,7 +345,10 @@
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 
-  OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
+  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf {
+    <LibraryClasses>
+      BltLib|OptionRomPkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
+  }
 
   #
   # ISA Support

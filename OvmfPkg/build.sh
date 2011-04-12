@@ -179,9 +179,9 @@ fi
 if [[ "$RUN_QEMU" == "yes" ]]; then
   if [[ ! -d $QEMU_FIRMWARE_DIR ]]; then
     mkdir $QEMU_FIRMWARE_DIR
-    ln -s $FV_DIR/OVMF.fd $QEMU_FIRMWARE_DIR/bios.bin
-    ln -s $FV_DIR/CirrusLogic5446.rom $QEMU_FIRMWARE_DIR/vgabios-cirrus.bin
   fi
+  ln -sf $FV_DIR/OVMF.fd $QEMU_FIRMWARE_DIR/bios.bin
+  ln -sf $FV_DIR/OvmfVideo.rom $QEMU_FIRMWARE_DIR/vgabios-cirrus.bin
   if [[ "$ADD_QEMU_HDA" == "yes" ]]; then
     AUTO_QEMU_HDA="-hda fat:$BUILD_ROOT_ARCH"
   else

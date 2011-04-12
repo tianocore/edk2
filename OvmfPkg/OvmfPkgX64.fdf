@@ -201,7 +201,6 @@ INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
 INF  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
 INF  RuleOverride=ACPITABLE OvmfPkg/AcpiTables/AcpiTables.inf
-INF  OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
 
 INF  RuleOverride = BINARY FatBinPkg/EnhancedFatDxe/Fat.inf
 INF  RuleOverride = BINARY EdkShellBinPkg/FullShell/FullShell.inf
@@ -214,7 +213,7 @@ FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
 # Network modules
 #
 !if $(NETWORK_ENABLE)
-  FILE DRIVER = A5C9C8B3-5ABB-4be2-8CA6-2FF06F405D04 {
+  FILE DRIVER = 5D695E11-9B3F-4b83-B25F-4A8D5D69BE07 {
     SECTION PE32 = Intel3.5/EFIX64/E3507X2.EFI
   }
   INF  MdeModulePkg/Universal/Network/SnpDxe/SnpDxe.inf
@@ -355,7 +354,7 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     RAW RAW                |.raw
   }
 
-[OptionRom.CirrusLogic5446]
-INF  OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf {
+[OptionRom.OvmfVideo]
+INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf {
     PCI_DEVICE_ID  = 0x00B8
   }
