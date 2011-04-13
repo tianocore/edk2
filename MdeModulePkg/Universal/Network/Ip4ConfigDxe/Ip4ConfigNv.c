@@ -852,16 +852,16 @@ Ip4ConfigDeviceInit (
   }
 
   //
-  // Append MAC string in the menu string and tile string
+  // Append MAC string in the menu help string and tile help string
   //
   Status = NetLibGetMacString (Instance->Controller, Instance->Image, &MacString);
   if (!EFI_ERROR (Status)) {
-    OldMenuString = HiiGetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_CONFIG_FORM_TITLE), NULL);
+    OldMenuString = HiiGetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_CONFIG_FORM_HELP), NULL);
     UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
-    HiiSetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_CONFIG_FORM_TITLE), MenuString, NULL);
+    HiiSetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_CONFIG_FORM_HELP), MenuString, NULL);
 
     UnicodeSPrint (PortString, 128, L"MAC:%s", MacString);
-    HiiSetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_DEVICE_FORM_TITLE), PortString, NULL);
+    HiiSetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_DEVICE_FORM_HELP), PortString, NULL);
     FreePool (MacString);
   }
 

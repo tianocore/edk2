@@ -527,7 +527,7 @@ InstallVlanConfigForm (
   PrivateData->HiiHandle = HiiHandle;
 
   //
-  // Update formset title
+  // Update formset title help string.
   //
   MacString = NULL;
   Status = NetLibGetMacString (PrivateData->ControllerHandle, PrivateData->ImageHandle, &MacString);
@@ -541,17 +541,17 @@ InstallVlanConfigForm (
   StrCat (Str, L")");
   HiiSetString (
     HiiHandle,
-    STRING_TOKEN (STR_VLAN_FORM_SET_TITLE),
+    STRING_TOKEN (STR_VLAN_FORM_SET_TITLE_HELP),
     Str,
     NULL
     );
 
   //
-  // Update form title
+  // Update form title help string.
   //
   HiiSetString (
     HiiHandle,
-    STRING_TOKEN (STR_VLAN_FORM_TITLE),
+    STRING_TOKEN (STR_VLAN_FORM_HELP),
     Str,
     NULL
     );

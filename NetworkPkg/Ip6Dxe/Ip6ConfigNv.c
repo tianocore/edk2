@@ -2010,26 +2010,26 @@ Ip6ConfigFormInit (
   }
 
   //
-  // Append MAC string in the menu string and tile string
+  // Append MAC string in the menu help string and tile help string
   //
   Status = NetLibGetMacString (IpSb->Controller, IpSb->Image, &MacString);
   if (!EFI_ERROR (Status)) {
     OldMenuString = HiiGetString (
                       CallbackInfo->RegisteredHandle,
-                      STRING_TOKEN (STR_IP6_CONFIG_FORM_TITLE),
+                      STRING_TOKEN (STR_IP6_CONFIG_FORM_HELP),
                       NULL)
                       ;
     UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
     HiiSetString (
       CallbackInfo->RegisteredHandle,
-      STRING_TOKEN (STR_IP6_CONFIG_FORM_TITLE),
+      STRING_TOKEN (STR_IP6_CONFIG_FORM_HELP),
       MenuString,
       NULL
       );
     UnicodeSPrint (PortString, 128, L"MAC:%s", MacString);
     HiiSetString (
       CallbackInfo->RegisteredHandle,
-      STRING_TOKEN (STR_IP6_DEVICE_FORM_TITLE),
+      STRING_TOKEN (STR_IP6_DEVICE_FORM_HELP),
       PortString,
       NULL
       );
