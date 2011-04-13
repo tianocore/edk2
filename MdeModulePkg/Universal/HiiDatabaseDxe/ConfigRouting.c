@@ -453,8 +453,9 @@ GetValueOfNumber (
   UINTN                    Index;
   CHAR16                   TemStr[2];
 
-  ASSERT (StringPtr != NULL && Number != NULL && Len != NULL);
-  ASSERT (*StringPtr != L'\0');
+  if (StringPtr == NULL || *StringPtr == L'\0' || Number == NULL || Len == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Buf = NULL;
 
@@ -3103,7 +3104,7 @@ HiiBlockToConfig (
     // Get Offset
     //
     Status = GetValueOfNumber (StringPtr, &TmpBuffer, &Length);
-    if (Status == EFI_OUT_OF_RESOURCES) {
+    if (EFI_ERROR (Status)) {
       *Progress = ConfigRequest;
       goto Exit;
     }
@@ -3127,7 +3128,7 @@ HiiBlockToConfig (
     // Get Width
     //
     Status = GetValueOfNumber (StringPtr, &TmpBuffer, &Length);
-    if (Status == EFI_OUT_OF_RESOURCES) {
+    if (EFI_ERROR (Status)) {
       *Progress = ConfigRequest;
       goto Exit;
     }
@@ -3394,7 +3395,7 @@ HiiConfigToBlock (
     // Get Width
     //
     Status = GetValueOfNumber (StringPtr, &TmpBuffer, &Length);
-    if (Status == EFI_OUT_OF_RESOURCES) {
+    if (EFI_ERROR (Status)) {
       *Progress = ConfigResp;
       goto Exit;
     }
