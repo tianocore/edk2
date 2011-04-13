@@ -21,8 +21,24 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/SmbusLib.h>
+#include <Library/PeCoffLib.h>
+#include <Library/PcdLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/DxeServicesLib.h>
+#include <Library/CacheMaintenanceLib.h>
+
+#include <Guid/BootScriptThunkData.h>
+
 #include <IndustryStandard/SmBus.h>
+
+typedef
+EFI_STATUS
+(EFIAPI *DISPATCH_ENTRYPOINT_FUNC) (
+  IN EFI_HANDLE ImageHandle,
+  IN VOID       *Context
+  );
 
 /**
   Adds a record into a specified Framework boot script table.
