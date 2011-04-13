@@ -172,27 +172,51 @@ IsValidDeleteTarget(
   )
 {
   CONST CHAR16        *TempLocation;
-  CHAR16              *Temp2;
+  BOOLEAN             RetVal;
+  CHAR16              *SearchString;
+  CHAR16              *Pattern;
   UINTN               Size;
 
+  if (Node == NULL || Node->FullName == NULL) {
+    return (FALSE);
+  }
+
   TempLocation = StrStr(Node->FullName, L":");
-  if (StrLen(TempLocation) == 2) {
+  if (StrLen(TempLocation) <= 2) {
     //
     // Deleting the root directory is invalid.
     //
     return (FALSE);
   }
-  TempLocation = ShellGetCurrentDir(NULL);
-  Size = 0;
-  Temp2 = NULL;
-  StrnCatGrow(&Temp2, &Size, TempLocation, 0);
-  if (StrStr(Temp2, Node->FullName) != NULL) {
-    FreePool(Temp2);
-    return (FALSE);
-  }
-  FreePool(Temp2);
 
-  return (TRUE);
+  TempLocation = ShellGetCurrentDir(NULL);
+  if (TempLocation == NULL) {
+    //
+    // No working directory is specified so whatever is left is ok.
+    //
+    return (TRUE);
+  }
+
+  Pattern       = NULL;
+  SearchString  = NULL;
+  Size          = 0;
+  Pattern       = StrnCatGrow(&Pattern     , NULL, TempLocation  , 0);
+  SearchString  = StrnCatGrow(&SearchString, &Size, Node->FullName, 0);
+  SearchString  = StrnCatGrow(&SearchString, &Size, L"*", 0);
+
+  if (Pattern == NULL || SearchString == NULL) {
+    RetVal = FALSE;
+  } else {
+    RetVal = TRUE;
+    if (gUnicodeCollation->MetaiMatch(gUnicodeCollation, Pattern, SearchString)) {
+      RetVal = FALSE;
+    }
+  }
+
+  SHELL_FREE_NON_NULL(Pattern     );
+  SHELL_FREE_NON_NULL(SearchString);
+
+  return (RetVal);
 }
 
 /**
