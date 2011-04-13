@@ -111,6 +111,7 @@ ShellLevel2CommandsLibConstructor (
   ShellCommandRegisterAlias(L"mkdir", L"md");
   ShellCommandRegisterAlias(L"cd ..", L"cd..");
   ShellCommandRegisterAlias(L"cd \\", L"cd\\");
+  ShellCommandRegisterAlias(L"ren", L"mv");
   //
   // These are installed in level 2 or 3...
   //
@@ -151,54 +152,6 @@ ShellLevel2CommandsLibDestructor (
     HiiRemovePackages(gShellLevel2HiiHandle);
   }
   return (EFI_SUCCESS);
-}
-
-/**
-  Function to clean up paths.  Removes the following items:
-    single periods in the path (no need for the current directory tag)
-    double periods in the path and removes a single parent directory.
-
-  This will be done inline and the resultant string may be be 'too big'.
-
-  @param[in] PathToReturn  The pointer to the string containing the path.
-
-  @return PathToReturn is always returned.
-**/
-CHAR16*
-EFIAPI
-CleanPath(
-  IN CHAR16 *PathToReturn
-  )
-{
-  CHAR16  *TempString;
-  UINTN   TempSize;
-  if (PathToReturn==NULL) {
-    return(NULL);
-  }
-  //
-  // Fix up the directory name
-  //
-  while ((TempString = StrStr(PathToReturn, L"\\..\\")) != NULL) {
-    *TempString = CHAR_NULL;
-    TempString  += 4;
-    ChopLastSlash(PathToReturn);
-    TempSize = StrSize(TempString);
-    CopyMem(PathToReturn+StrLen(PathToReturn), TempString, TempSize);
-  }
-  if ((TempString = StrStr(PathToReturn, L"\\..")) != NULL && *(TempString + 3) == CHAR_NULL) {
-    *TempString = CHAR_NULL;
-    ChopLastSlash(PathToReturn);
-  }
-  while ((TempString = StrStr(PathToReturn, L"\\.\\")) != NULL) {
-    *TempString = CHAR_NULL;
-    TempString  += 2;
-    TempSize = StrSize(TempString);
-    CopyMem(PathToReturn+StrLen(PathToReturn), TempString, TempSize);
-  }
-  if ((TempString = StrStr(PathToReturn, L"\\.")) != NULL && *(TempString + 2) == CHAR_NULL) {
-    *TempString = CHAR_NULL;
-  }
-  return (PathToReturn);
 }
 
 /**
