@@ -34,8 +34,6 @@ EFI_SHELL_PROTOCOL            *mEfiShellProtocol;
 EFI_SHELL_PARAMETERS_PROTOCOL *mEfiShellParametersProtocol;
 EFI_HANDLE                    mEfiShellEnvironment2Handle;
 FILE_HANDLE_FUNCTION_MAP      FileFunctionMap;
-CHAR16                        *mPostReplaceFormat;
-CHAR16                        *mPostReplaceFormat2;
 
 /**
   Check if a Unicode character is a hexadecimal character.
@@ -177,10 +175,6 @@ ShellLibConstructorWorker (
   )
 {
   EFI_STATUS  Status;
-  mPostReplaceFormat = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
-  ASSERT (mPostReplaceFormat != NULL);
-  mPostReplaceFormat2 = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
-  ASSERT (mPostReplaceFormat2 != NULL);
 
   //
   // UEFI 2.0 shell interfaces (used preferentially)
@@ -295,8 +289,6 @@ ShellLibConstructor (
   mEfiShellParametersProtocol = NULL;
   mEfiShellInterface          = NULL;
   mEfiShellEnvironment2Handle = NULL;
-  mPostReplaceFormat          = NULL;
-  mPostReplaceFormat2         = NULL;
 
   //
   // verify that auto initialize is not set false
@@ -353,15 +345,6 @@ ShellLibDestructor (
     mEfiShellParametersProtocol = NULL;
   }
   mEfiShellEnvironment2Handle = NULL;
-
-  if (mPostReplaceFormat != NULL) {
-    FreePool(mPostReplaceFormat);
-  }
-  if (mPostReplaceFormat2 != NULL) {
-    FreePool(mPostReplaceFormat2);
-  }
-  mPostReplaceFormat          = NULL;
-  mPostReplaceFormat2         = NULL;
 
   return (EFI_SUCCESS);
 }
@@ -1655,6 +1638,9 @@ ShellFindFilePath (
         if (TestPath[StrLen(TestPath)-1] != L'\\') {
           StrCat(TestPath, L"\\");
         }
+        if (FileName[0] == L'\\') {
+          FileName++;
+        }
         StrCat(TestPath, FileName);
         if (StrStr(Walker, L";") != NULL) {
           Walker = StrStr(Walker, L";") + 1;
@@ -2614,6 +2600,11 @@ InternalShellPrintWorker(
   CHAR16            *ResumeLocation;
   CHAR16            *FormatWalker;
   UINTN             OriginalAttribute;
+  CHAR16            *mPostReplaceFormat;
+  CHAR16            *mPostReplaceFormat2;
+
+  mPostReplaceFormat = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
+  mPostReplaceFormat2 = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
 
   Status            = EFI_SUCCESS;
   OriginalAttribute = gST->ConOut->Mode->Attribute;
@@ -2705,6 +2696,9 @@ InternalShellPrintWorker(
   }
 
   gST->ConOut->SetAttribute(gST->ConOut, OriginalAttribute);
+
+  SHELL_FREE_NON_NULL(mPostReplaceFormat);
+  SHELL_FREE_NON_NULL(mPostReplaceFormat2);
   return (Status);
 }
 
