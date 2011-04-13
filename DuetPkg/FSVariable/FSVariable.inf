@@ -51,6 +51,7 @@
   DxeServicesTableLib
   DevicePathLib
   UefiDriverEntryPoint
+  MemoryAllocationLib
 
 [Guids]
   gEfiFlashMapHobGuid

@@ -178,6 +178,9 @@ VariableClassAddressChangeEvent (
   IN VOID             *Context
   )
 {
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->PlatformLangCodes);
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->LangCodes);
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->PlatformLang);
   EfiConvertPointer (
     0x0,
     (VOID **) &mVariableModuleGlobal->VariableGlobal[Physical].NonVolatileVariableBase
