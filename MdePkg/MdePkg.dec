@@ -1109,7 +1109,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE|BOOLEAN|0x0000000e
 
   ## If TRUE, the component name2 protocol will not be installed.
-  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE|BOOLEAN|0x000000010
+  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE|BOOLEAN|0x00000010
 
   ## If TRUE, the driver diagnostics2 protocol will not be installed.
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE|BOOLEAN|0x00000011

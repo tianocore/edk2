@@ -30,10 +30,10 @@
 
 [PcdsFixedAtBuild]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase|0x0|UINT32|0
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize|0x0|UINT32|0
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize|0x0|UINT32|1
 
 [PcdsDynamic]
-  gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|0
+  gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
 
 [LibraryClasses]
   ##  @libraryclass  Save and restore variables using a file
