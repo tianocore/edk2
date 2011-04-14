@@ -1,0 +1,75 @@
+{\rtf1\ansi\ansicpg936\deff0\deflang1033\deflangfe2052\deftab360{\fonttbl{\f0\fswiss\fprq2\fcharset0 Verdana;}{\f1\froman\fprq2\fcharset0 Times New Roman;}}
+{\colortbl ;\red8\green96\blue168;\red0\green0\blue0;}
+{\stylesheet{ Normal;}{\s1 heading 1;}{\s2 heading 2;}}
+{\*\generator Msftedit 5.41.15.1515;}\viewkind4\uc1\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx1440\cf1\b\f0\fs28 Name\par
+\pard\nowidctlpar\sb200\cf2\b0\fs18  GenFds.exe\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx1440\cf1\b\fs28 Description\par
+\pard\nowidctlpar\li60\sb200\cf0\b0\fs18 GenFds will get platform, flash and module information from target.txt,platform.dsc, flashmap.fdf, package.dec and module.inf. it will generate Ffs, Fv, FD and Section data depending on command line options. The FDF file must be pointed out. And the FDF file must follow the format of FDF\rquote s specification otherwise tool will throw a exception and stop the build.\par
+\pard\nowidctlpar\sb200\cf2 The FDF file describes information about flash parts as well as rules for combining binaries (Firmware Image) built from a DSC file.  The output of the first phase of an EDK II build (as defined in the EDK II Build Specification) generates valid PE32/PE32+/Coff image files.  GenFds performs the second phase of the build process during which consumes the images generated during the first phase, using statements and rules defined in the FDF file to place the PE32/PE32+/Coff images files into one or more EFI sections, then the EFI sections may get combined with other optional sections (version, depex, user interface) sections, into EFI Firmware File system (FFS) Sections. FFS images are put into Firmware Volumes (FVs,) and finally, the FV sections are combined into one or more Flash Device binary image (FD.)\par
+The outputDir must be pointed out. Tool will generate a FV directory which includes a FFS directory, Fv file, Fv INf file and Fd file. The FFS directory contents all modules directory which contents Ffs files and section files. All output of GenFds tool output will be in FV directory. The FV directory structure is following. The outputDir should be point part of Efi file path. That mean for each of module which descript in the FDF file as the \lquote InfFIle\rquote  statement format  the GenFds tool would find out it\rquote s input files from the path of  \ldblquote  $(outputDir)\\ $(Arch) \\ $(ActivePlatfromName) \\$(ModuleName) \\$(ModuleName) \\DEBUG\par
+\pard\nowidctlpar\fi-360\li420\sb200\tx420 1.\tab If Arch list was pointed out, GenFds tool will use this Arch instead of Arch List in Target.txt file\par
+\pard\nowidctlpar\fi-360\li420\sb200 2.\tab If Workspace was not pointed out, GenFds tool will use the Workspace path which set in OS environment. \par
+3.\tab If ActivePlatform was pointed out, GenFds tool will use this active platform as the current platform instead of active platform which in Target.txt file.\par
+\pard\nowidctlpar\sb200 GenFds tool support 2 kinds of path in command line. Absolutely path and relative workspace path. The GenFds tool also support $(WORKSPACE) marco in path. For example, if the input Fdf like that $(WORKSPACE)\\NT32PKg\\Nt32.fdf, the tool will expand the $(WORKSPACE) macro with real path.\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx1440\cf1\b\fs28 Options\par
+\pard\nowidctlpar\sb200\cf2\b0\fs18 -a,  --arch <ARCHS>\par
+\pard\nowidctlpar\fi1\li425\sb200 ARCHS is a comma separated (no space) list containing one or more of: IA32, X64, IPF or EBC which should be built, overrides target.txt\rquote s TARGET_ARCH\par
+\pard\nowidctlpar\fi-425\li425\sb200 -p, --platform PlatformName.dsc\par
+\pard\nowidctlpar\li426\sb200 Build the platform specified by the DSC file name argument, over rides the ACTIVE_PLATFORM\par
+\pard\nowidctlpar\sb200 -f, --filename Filename\tab\tab\tab\par
+\pard\nowidctlpar\fi426\sb200 Input FDF file and its format must follow FDF specification.\par
+\pard\nowidctlpar\sb200 -r, --rom_image FdUiName\tab\tab\tab\tab\par
+\pard\nowidctlpar\fi425\sb200 Build the image using the [FD] section named by FdUiName.\par
+\pard\nowidctlpar\sb200 -i, --FvImage UiFvName\par
+\tab Buld the FV image using the [FV] section named by UiFvName\par
+-o, --output Dir\par
+\pard\nowidctlpar\li360\sb200 The output directory of Genfds tool. And this directory also should be the directory of the EFI file.\par
+\pard\nowidctlpar\sb200 -w \endash -workspace\par
+\tab The workspace path working on.\f1\par
+\f0 -b --buildtarget DEBUG|RELEASE\par
+\pard\nowidctlpar\li360\sb200 Build target is one of: DEBUG, RELEASE.\f1\par
+\pard\nowidctlpar\sb200\f0 -t --tagname TOOLCHAIN_TAG\par
+\pard\nowidctlpar\li360\sb200 Specify the tool chain to build the platform.\f1\par
+\pard\nowidctlpar\sb200\f0 -D --define MACRO=VALUE\par
+\pard\nowidctlpar\li360\sb200 Pass macro to this tool.\f1\par
+\pard\nowidctlpar\sb200\f0 -s --specifyaddress ADDRESS\par
+\pard\nowidctlpar\li360\sb200 Specify driver load address.\f1\par
+\pard\nowidctlpar\sb200\f0 [--version]\par
+\f1\tab\f0 Print version and copyright of this program and exit\par
+[-v, --verbose]\par
+\pard\nowidctlpar\li360\sb200 Turn on verbose output with informational messages printed. This is a count value, so specifying \endash vv can be used to increase the verbosity level.\par
+\pard\nowidctlpar\sb200 [-q, --quiet]\par
+\tab disable all messages except FATAL ERRORS\par
+[-d, --debug [#]]\par
+\tab Enable debug messages, at level #\par
+[-h, --help]\par
+\tab Print copyright, version and usage of this program and exit\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx1440\cf1\b\fs28 Example\par
+\pard\nowidctlpar\li60\sb200\cf2\b0\fs18 1. WORKSAPCE has already set. $(WORKSPACE) = c:\\work\\EdkII. The Fdf file is in c:\\work\\EdkII\\Nt32pkg\\Nt32pkg.fdf. Output directory is c:\\work\\EdkII\\Build\\Nt32\\Debug_MyTools.  ActivePlatform is C:\\work\\EdkII\\Nt32Pkg\\Nt32Pkg.dsc\par
+GenFds \endash f c:\\work\\EdkII\\Nt32pkg\\Nt32pkg.fdf \endash o c:\\work\\EdkII\\Build\\Nt32\\Debug_MyTools \endash p c:\\work\\EdkII\\Nt32pkg\\Nt32Pkg.dsc\par
+GenFds \endash f $(WORKSPACE)\\Nt32Pkg\\Nt32Pkg.fdf \endash o $(WORSPACE)\\Build\\Nt32\\Debug_MyTools \endash p $(WORKSAPCE)\\Nt32Pkg\\Nt32Pkg.dsc\par
+\par
+GenFds \endash f Nt32Pkg\\Nt32Pkg.fdf \endash o Build\\Nt32\\Debug_MyTools \endash p Nt32Pkg\\Nt32Pkg.dsc\par
+2. Generate one FD which defined in FDF file. Use \lquote -r\rquote  and Fd UIName. The Fd  UIName is the name which defined in the FDf file, for detail information refer to FDF specification\par
+GenFds \endash f GenFds \endash f c:\\work\\EdkII\\Nt32pkg\\Nt32pkg.fdf \endash o c:\\work\\EdkII\\Build\\Nt32\\Debug_MyTools \endash p c:\\work\\EdkII\\Nt32pkg\\Nt32Pkg.dsc \endash r Fv_Recovery\par
+3. Generate one FV which defined in FDF file. Use \lquote -i\rquote  and FV UiName. The FV UIName is the name which defined in the FDF file, for detail information refers to FDF specification.\par
+GenFds \endash f c:\\work\\EdkII\\Nt32pkg\\Nt32pkg.fdf \endash o c:\\work\\EdkII\\Build\\Nt32\\Debug_MyTools \endash p c:\\work\\EdkII\\Nt32pkg\\Nt32Pkg.dsc \endash I FVRecovery\par
+\par
+4. Use command line option to replace the Arch List in Target.txt. \par
+GenFds \endash f c:\\work\\EdkII\\Nt32pkg\\Nt32pkg.fdf \endash o c:\\work\\EdkII\\Build\\Nt32\\Debug_MyTools \endash p c:\\work\\EdkII\\Nt32pkg\\Nt32Pkg.dsc\par
+\pard\nowidctlpar\sb200 -a IA32, X64\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx1440\cf1\b\fs28 Bugs\par
+\pard\nowidctlpar\sb200\cf2\b0\fs18 Not found yet.\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx1440\cf1\b\fs28 Files \par
+\pard\nowidctlpar\sb200\cf2\b0\fs18 target.txt, platform.dsc, flashmap.fdf, package.dec and module.inf.\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx1440\cf1\b\fs28 See also\par
+\pard\nowidctlpar\sb200\cf2\b0\fs18  GenFv, GenFfs, GenSection, GenFw.\par
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx1440\cf1\b\fs28 License\par
+\pard\nowidctlpar\sb200\cf2\b0\fs18 Copyright (c) 1999 - 2009, Intel Corporation. All rights reserved.\par
+This program and the accompanying materials are licensed and made available \par
+under the terms and conditions of the BSD License which accompanies this \par
+distribution.  The full text of the license may be found at\par
+\pard\nowidctlpar\cf0 http://opensource.org/licenses/bsd-license.php\cf2 . THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.\par
+\pard\nowidctlpar\li60\sb200\f1\par
+}
+ 
