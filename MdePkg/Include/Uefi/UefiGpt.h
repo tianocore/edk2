@@ -69,7 +69,8 @@ typedef struct {
   ///
   /// The size, in bytes, of each the GUID Partition
   /// Entry structures in the GUID Partition Entry
-  /// array. Must be a multiple of 8.
+  /// array. This field shall be set to a value of 128 x 2^n where n is
+  /// an integer greater than or equal to zero (e.g., 128, 256, 512, etc.).
   ///
   UINT32            SizeOfPartitionEntry;
   ///
