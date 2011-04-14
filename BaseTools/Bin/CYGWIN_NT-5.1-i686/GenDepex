@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-PYTHONPATH="`dirname $0`/../../Source/Python" \
-    python "`dirname $0`/../../Source/Python"/AutoGen/`basename $0`.py $*
