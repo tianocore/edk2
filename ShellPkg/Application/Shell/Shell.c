@@ -55,7 +55,8 @@ SHELL_INFO ShellInfoObject = {
   NULL,
   NULL,
   NULL,
-  NULL
+  NULL,
+  FALSE
 };
 
 STATIC CONST CHAR16 mScriptExtension[]      = L".NSH";
@@ -155,17 +156,11 @@ UefiMain (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS  Status;
-  CHAR16      *TempString;
-  UINTN       Size;
-//    EFI_INPUT_KEY                 Key;
-
-//  gST->ConOut->OutputString(gST->ConOut, L"ReadKeyStroke Calling\r\n");
-//
-//  Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-//
-//  gST->ConOut->OutputString(gST->ConOut, L"ReadKeyStroke Done\r\n");
-//  gBS->Stall (1000000);
+  EFI_STATUS                      Status;
+  CHAR16                          *TempString;
+  UINTN                           Size;
+  EFI_HANDLE                      ConInHandle;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *OldConIn;
 
   if (PcdGet8(PcdShellSupportLevel) > 3) {
     return (EFI_UNSUPPORTED);
@@ -361,6 +356,18 @@ UefiMain (
         Status = InternalEfiShellStartCtrlSMonitor();
       }
 
+      if (!EFI_ERROR(Status) && ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoConsoleIn) {
+        //
+        // close off the gST->ConIn
+        //
+        OldConIn      = gST->ConIn;
+        ConInHandle   = gST->ConsoleInHandle;
+        gST->ConIn = CreateSimpleTextInOnFile((SHELL_FILE_HANDLE)&FileInterfaceNulFile, &gST->ConsoleInHandle);
+      } else {
+        OldConIn      = NULL;
+        ConInHandle   = NULL;
+      }
+
       if (!EFI_ERROR(Status) && PcdGet8(PcdShellSupportLevel) >= 1) {
         //
         // process the startup script or launch the called app.
@@ -398,6 +405,11 @@ UefiMain (
           //
           Status = DoShellPrompt();
         } while (!ShellCommandGetExit());
+      }
+      if (OldConIn != NULL && ConInHandle != NULL) {
+        CloseSimpleTextInOnFile (gST->ConIn);
+        gST->ConIn            = OldConIn;
+        gST->ConsoleInHandle  = ConInHandle;
       }
     }
   }
@@ -548,8 +560,6 @@ IsScriptOnlyCommand(
   return (FALSE);
 }
 
-
-
 /**
   This function will populate the 2 device path protocol parameters based on the
   global gImageHandle.  The DevPath will point to the device path for the handle that has
@@ -598,6 +608,11 @@ GetDevicePathsForImageAndFile (
     if (!EFI_ERROR (Status)) {
       *DevPath  = DuplicateDevicePath (ImageDevicePath);
       *FilePath = DuplicateDevicePath (LoadedImage->FilePath);
+      gBS->CloseProtocol(
+                  LoadedImage->DeviceHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  gImageHandle,
+                  NULL);
     }
     gBS->CloseProtocol(
                 gImageHandle,
@@ -620,6 +635,7 @@ STATIC CONST SHELL_PARAM_ITEM mShellParamList[] = {
   {L"-delay",         TypeValue},
   {NULL, TypeMax}
   };
+
 /**
   Process all Uefi Shell 2.0 command line options.
 

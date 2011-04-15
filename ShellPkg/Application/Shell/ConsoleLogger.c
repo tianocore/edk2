@@ -729,7 +729,7 @@ ConsoleLoggerPrintWithPageBreak(
       //
       // check if that is the last column
       //
-      if ((INTN)ConsoleInfo->ColsPerScreen == ConsoleInfo->OurConOut.Mode->CursorColumn - 1) {
+      if ((INTN)ConsoleInfo->ColsPerScreen == ConsoleInfo->OurConOut.Mode->CursorColumn + 1) {
         //
         // output a line similar to the linefeed character.
         //
@@ -753,7 +753,7 @@ ConsoleLoggerPrintWithPageBreak(
         //
         // Update LineStart Variable
         //
-        LineStart = Walker;
+        LineStart = Walker + 1;
 
         //
         // increment row count and zero the column
@@ -810,12 +810,22 @@ ConsoleLoggerOutputString (
   IN  CHAR16                          *WString
   )
 {
+  EFI_INPUT_KEY               Key;
+  UINTN                       EventIndex;
   CONSOLE_LOGGER_PRIVATE_DATA *ConsoleInfo;
   ConsoleInfo = CONSOLE_LOGGER_PRIVATE_DATA_FROM_THIS(This);
   if (ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoConsoleOut) {
     return (EFI_UNSUPPORTED);
   }
   ASSERT(ShellInfoObject.ConsoleInfo == ConsoleInfo);
+  if (ShellInfoObject.HaltOutput) {
+    //
+    // just get some key
+    //
+    gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
+    gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    ShellInfoObject.HaltOutput = FALSE;
+  }
   if (!ShellInfoObject.ConsoleInfo->Enabled) {
     return (EFI_DEVICE_ERROR);
   } else if (ShellInfoObject.PageBreakEnabled) {

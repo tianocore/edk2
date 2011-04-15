@@ -82,9 +82,8 @@ ShellCommandRunPause (
       } else {
         Status = ShellPromptForResponse(ShellPromptResponseTypeQuitContinue, NULL, (VOID**)&Resp);
       }
-      ASSERT_EFI_ERROR(Status);
 
-      if (Resp == NULL || *Resp == ShellPromptResponseQuit) {
+      if (EFI_ERROR(Status) || Resp == NULL || *Resp == ShellPromptResponseQuit) {
         ShellCommandRegisterExit(TRUE);
         ShellStatus = SHELL_ABORTED;
       }

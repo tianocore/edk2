@@ -50,6 +50,7 @@
 #include "ShellEnvVar.h"
 #include "ConsoleLogger.h"
 #include "ShellManParser.h"
+#include "ConsoleWrappers.h"
 
 typedef struct {
   LIST_ENTRY        Link;           ///< Standard linked list handler.
@@ -113,6 +114,7 @@ typedef struct {
   EFI_HANDLE                    CtrlSNotifyHandle2;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
   EFI_HANDLE                    CtrlSNotifyHandle3;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
   EFI_HANDLE                    CtrlSNotifyHandle4;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  BOOLEAN                       HaltOutput;           ///< TRUE to start a CTRL-S halt.
 } SHELL_INFO;
 
 extern SHELL_INFO ShellInfoObject;

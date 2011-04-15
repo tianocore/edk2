@@ -249,7 +249,7 @@ FileInterfaceStdErrRead(
   File style interface for NUL file (Read).
   
   @param[in] This             Ignored.
-  @param[in,out] BufferSize   Ignored.
+  @param[in,out] BufferSize   Poiner to 0 upon return.
   @param[out] Buffer          Ignored.
   
   @retval EFI_SUCCESS Always.
@@ -262,6 +262,7 @@ FileInterfaceNulRead(
   OUT     VOID              *Buffer
   )
 {
+  *BufferSize = 0;
   return (EFI_SUCCESS);
 }
 

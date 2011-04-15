@@ -3326,8 +3326,6 @@ NotificationFunction(
   IN EFI_KEY_DATA *KeyData
   )
 {
-  EFI_INPUT_KEY Key;
-  UINTN         EventIndex;
 //  ShellPrintEx(-1,-1,L"  <Notify>  ");
    if ((KeyData->Key.UnicodeChar == L'c' || KeyData->Key.UnicodeChar == 3) &&
       (KeyData->KeyState.KeyShiftState == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))
@@ -3339,11 +3337,7 @@ NotificationFunction(
   } else if  ((KeyData->Key.UnicodeChar == L's') &&
               (KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))
               ){ 
-    //
-    // just get some key
-    //
-    gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
-    gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    ShellInfoObject.HaltOutput = TRUE;
   }
   return (EFI_SUCCESS);
 }
