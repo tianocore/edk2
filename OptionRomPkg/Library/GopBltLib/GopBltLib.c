@@ -113,8 +113,6 @@ InternalGopBltCommon (
   IN  UINTN                                 Delta
   )
 {
-  EFI_STATUS                    Status;
-
   if (mGop == NULL) {
     return EFI_DEVICE_ERROR;
   }

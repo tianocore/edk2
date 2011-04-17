@@ -615,7 +615,7 @@ BltLibBufferToVideoEx (
     BltMemDst = (VOID*) (mBltLibFrameBuffer + Offset);
 
     if (mPixelFormat == PixelBlueGreenRedReserved8BitPerColor) {
-      BltMemSrc = (VOID *) (UINT8 *) BltBuffer + (SrcY * Delta);
+      BltMemSrc = (VOID *) ((UINT8 *) BltBuffer + (SrcY * Delta));
     } else {
       for (X = 0; X < Width; X++) {
         Blt =

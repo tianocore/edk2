@@ -43,7 +43,8 @@ Rand32 (
     if (Bits > 0) {
       Bits = Bits - 1;
     }
-    R32 = (R32 << Bits) | RShiftU64 (LShiftU64 (TscBits, 64 - Bits), 64 - Bits);
+    R32 = (UINT32)((R32 << Bits) |
+                   RShiftU64 (LShiftU64 (TscBits, 64 - Bits), 64 - Bits));
     Found = Found + Bits;
   } while (Found < 32);
 
@@ -101,9 +102,9 @@ TestColor1 (
 
   for (Y = 0; Y < Height; Y++) {
     for (X = 0; X < Width; X++) {
-      Color.Red = ((X * 0x100) / Width);
-      Color.Green = ((Y * 0x100) / Height);
-      Color.Blue = ((Y * 0x100) / Height);
+      Color.Red =   (UINT8) ((X * 0x100) / Width);
+      Color.Green = (UINT8) ((Y * 0x100) / Height);
+      Color.Blue =  (UINT8) ((Y * 0x100) / Height);
       BltLibVideoFill (&Color, X, Y, 1, 1);
     }
   }
@@ -115,7 +116,7 @@ Uint32SqRt (
   IN  UINT32  Uint32
   )
 {
-  UINTN  Mask;
+  UINT32 Mask;
   UINT32 SqRt;
   UINT32 SqRtMask;
   UINT32 Squared;
@@ -124,7 +125,7 @@ Uint32SqRt (
     return 0;
   }
 
-  for (SqRt = 0, Mask = 1 << (HighBitSet32 (Uint32) / 2);
+  for (SqRt = 0, Mask = (UINT32) (1 << (HighBitSet32 (Uint32) / 2));
        Mask != 0;
        Mask = Mask >> 1
       ) {
@@ -146,20 +147,20 @@ Uint32SqRt (
 
 UINT32
 Uint32Dist (
-  IN UINT32 X,
-  IN UINT32 Y
+  IN UINTN X,
+  IN UINTN Y
   )
 {
-  return Uint32SqRt ((X * X) + (Y * Y));
+  return Uint32SqRt ((UINT32) ((X * X) + (Y * Y)));
 }
 
-UINT32
+UINT8
 GetTriColor (
-  IN UINT32 ColorDist,
-  IN UINT32 TriWidth
+  IN UINTN ColorDist,
+  IN UINTN TriWidth
   )
 {
-  return (((TriWidth - ColorDist) * 0x100) / TriWidth);
+  return (UINT8) (((TriWidth - ColorDist) * 0x100) / TriWidth);
   //return (((TriWidth * TriWidth - ColorDist * ColorDist) * 0x100) / (TriWidth * TriWidth));
 }
 
@@ -174,14 +175,20 @@ TestColor (
   UINTN                          Y1, Y2;
   UINTN                          LineWidth, TriWidth, ScreenWidth;
   UINTN                          TriHeight, ScreenHeight;
-  UINTN                          ColorDist;
+  UINT32                         ColorDist;
 
   BltLibGetSizes (&ScreenWidth, &ScreenHeight);
   *(UINT32*) (&Color) = 0;
   BltLibVideoFill (&Color, 0, 0, ScreenWidth, ScreenHeight);
 
-  TriWidth = DivU64x32 (MultU64x32 (11547005, ScreenHeight), 10000000);
-  TriHeight = DivU64x32 (MultU64x32 (8660254, ScreenWidth), 10000000);
+  TriWidth = (UINTN) DivU64x32 (
+                       MultU64x32 (11547005, (UINT32) ScreenHeight),
+                       10000000
+                       );
+  TriHeight = (UINTN) DivU64x32 (
+                        MultU64x32 (8660254, (UINT32) ScreenWidth),
+                        10000000
+                        );
   if (TriWidth > ScreenWidth) {
     DEBUG ((EFI_D_INFO, "TriWidth at %d was too big\n", TriWidth));
     TriWidth = ScreenWidth;
@@ -200,10 +207,10 @@ TestColor (
 
   for (Y = Y2; Y <= Y1; Y++) {
     LineWidth =
-      DivU64x32 (
-        MultU64x32 (11547005, (Y - Y2)),
-        20000000
-        );
+      (UINTN) DivU64x32 (
+                MultU64x32 (11547005, (UINT32) (Y - Y2)),
+                20000000
+                );
     for (X = X2 - LineWidth; X < (X2 + LineWidth); X++) {
       ColorDist = Uint32Dist(X - X1, Y1 - Y);
       Color.Red = GetTriColor (ColorDist, TriWidth);
