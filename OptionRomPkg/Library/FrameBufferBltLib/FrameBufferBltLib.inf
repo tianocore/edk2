@@ -24,7 +24,8 @@
 [Sources.common]
   FrameBufferBltLib.c
 
-[Libraries]
+[LibraryClasses]
+  BaseLib
   BaseMemoryLib
   DebugLib
 

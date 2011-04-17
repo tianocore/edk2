@@ -24,7 +24,7 @@
 [Sources.common]
   GopBltLib.c
 
-[Libraries]
+[LibraryClasses]
   BaseLib
   BaseMemoryLib
   DebugLib
