@@ -21,22 +21,22 @@ ErasePolarity = 1
 BlockSize     = 0x1000
 NumBlocks     = 0x100
 
-0x00000000|0x000EE000
+0x00000000|0x000EC000
 FV = FVMAIN_COMPACT
 
-0x000EE000|0x12000
+0x000EC000|0x14000
 FV = SECFV
 
 ################################################################################
 
 [FD.MEMFD]
 BaseAddress   = 0x800000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase
-Size          = 0x400000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
+Size          = 0x500000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
 ErasePolarity = 1
 BlockSize     = 0x10000
-NumBlocks     = 0x40
+NumBlocks     = 0x50
 
-0x0|0x400000
+0x0|0x500000
 FV = MAINFV
 
 ################################################################################
