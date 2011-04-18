@@ -67,7 +67,7 @@ UsbGetHidDescriptor (
   Request.Request     = USB_REQ_GET_DESCRIPTOR;
   Request.Value       = (UINT16) (USB_DESC_TYPE_HID << 8);
   Request.Index       = Interface;
-  Request.Length      = sizeof (EFI_USB_HID_DESCRIPTOR);
+  Request.Length      = (UINT16) sizeof (EFI_USB_HID_DESCRIPTOR);
 
   Result = UsbIo->UsbControlTransfer (
                     UsbIo,
