@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -42,14 +42,13 @@ Abstract:
 **/
 EFI_STATUS
 GopPrivateCreateQ (
-  IN  GOP_PRIVATE_DATA    *Private
+  IN  GOP_PRIVATE_DATA    *Private,
+  IN  GOP_QUEUE_FIXED     *Queue
   )
 {
-  Private->WinNtThunk->InitializeCriticalSection (&Private->QCriticalSection);
-
-  Private->Queue.Front  = 0;
-  Private->Queue.Rear   = MAX_Q - 1;
-  Private->Queue.Count  = 0;
+  Private->WinNtThunk->InitializeCriticalSection (&Queue->Cs);
+  Queue->Front = 0;
+  Queue->Rear  = 0;
   return EFI_SUCCESS;
 }
 
@@ -64,11 +63,13 @@ GopPrivateCreateQ (
 **/
 EFI_STATUS
 GopPrivateDestroyQ (
-  IN  GOP_PRIVATE_DATA    *Private
+  IN  GOP_PRIVATE_DATA    *Private,
+  IN  GOP_QUEUE_FIXED     *Queue
   )
 {
-  Private->Queue.Count = 0;
-  Private->WinNtThunk->DeleteCriticalSection (&Private->QCriticalSection);
+  Queue->Front = 0;
+  Queue->Rear  = 0;
+  Private->WinNtThunk->DeleteCriticalSection (&Queue->Cs);
   return EFI_SUCCESS;
 }
 
@@ -85,22 +86,22 @@ GopPrivateDestroyQ (
 **/
 EFI_STATUS
 GopPrivateAddQ (
-  IN  GOP_PRIVATE_DATA    *Private,
-  IN  EFI_INPUT_KEY       Key
+  IN GOP_PRIVATE_DATA     *Private,
+  IN GOP_QUEUE_FIXED      *Queue,
+  IN EFI_KEY_DATA         *KeyData
   )
 {
-  Private->WinNtThunk->EnterCriticalSection (&Private->QCriticalSection);
+  Private->WinNtThunk->EnterCriticalSection (&Queue->Cs);
 
-  if (Private->Queue.Count == MAX_Q) {
-    Private->WinNtThunk->LeaveCriticalSection (&Private->QCriticalSection);
+  if ((Queue->Rear + 1) % MAX_Q == Queue->Front) {
+    Private->WinNtThunk->LeaveCriticalSection (&Queue->Cs);
     return EFI_NOT_READY;
   }
 
-  Private->Queue.Rear                   = (Private->Queue.Rear + 1) % MAX_Q;
-  Private->Queue.Q[Private->Queue.Rear] = Key;
-  Private->Queue.Count++;
+  CopyMem (&Queue->Q[Queue->Rear], KeyData, sizeof (EFI_KEY_DATA));
+  Queue->Rear           = (Queue->Rear + 1) % MAX_Q;
 
-  Private->WinNtThunk->LeaveCriticalSection (&Private->QCriticalSection);
+  Private->WinNtThunk->LeaveCriticalSection (&Queue->Cs);
   return EFI_SUCCESS;
 }
 
@@ -118,21 +119,21 @@ GopPrivateAddQ (
 EFI_STATUS
 GopPrivateDeleteQ (
   IN  GOP_PRIVATE_DATA    *Private,
-  OUT EFI_INPUT_KEY       *Key
+  IN  GOP_QUEUE_FIXED     *Queue,
+  OUT EFI_KEY_DATA        *Key
   )
 {
-  Private->WinNtThunk->EnterCriticalSection (&Private->QCriticalSection);
+  Private->WinNtThunk->EnterCriticalSection (&Queue->Cs);
 
-  if (Private->Queue.Count == 0) {
-    Private->WinNtThunk->LeaveCriticalSection (&Private->QCriticalSection);
+  if (Queue->Front == Queue->Rear) {
+    Private->WinNtThunk->LeaveCriticalSection (&Queue->Cs);
     return EFI_NOT_READY;
   }
 
-  *Key                  = Private->Queue.Q[Private->Queue.Front];
-  Private->Queue.Front  = (Private->Queue.Front + 1) % MAX_Q;
-  Private->Queue.Count--;
+  CopyMem (Key, &Queue->Q[Queue->Front], sizeof (EFI_KEY_DATA));
+  Queue->Front  = (Queue->Front + 1) % MAX_Q;
 
-  Private->WinNtThunk->LeaveCriticalSection (&Private->QCriticalSection);
+  Private->WinNtThunk->LeaveCriticalSection (&Queue->Cs);
   return EFI_SUCCESS;
 }
 
@@ -148,10 +149,10 @@ GopPrivateDeleteQ (
 **/
 EFI_STATUS
 GopPrivateCheckQ (
-  IN  GOP_PRIVATE_DATA    *Private
+  IN  GOP_QUEUE_FIXED     *Queue
   )
 {
-  if (Private->Queue.Count == 0) {
+  if (Queue->Front == Queue->Rear) {
     return EFI_NOT_READY;
   }
 
@@ -237,10 +238,128 @@ Returns:
                       NotifyEntry, 
                       WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE
                       );
-    if (GopPrivateIsKeyRegistered (&CurrentNotify->KeyData, KeyData)) { 
+    if (GopPrivateIsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
       CurrentNotify->KeyNotificationFn (KeyData);
     }
   }    
+}
+
+VOID
+WinNtGopSimpleTextInTimerHandler (
+  IN EFI_EVENT          Event,
+  IN GOP_PRIVATE_DATA   *Private
+  )
+{
+  EFI_KEY_DATA          KeyData;
+
+  while (GopPrivateDeleteQ (Private, &Private->QueueForNotify, &KeyData) == EFI_SUCCESS) {
+    GopPrivateInvokeRegisteredFunction (Private, &KeyData);
+  }
+}
+
+/**
+  TODO: Add function description
+
+  @param  Private               TODO: add argument description
+  @param  Key                   TODO: add argument description
+
+  @retval EFI_NOT_READY         TODO: Add description for return value
+  @retval EFI_SUCCESS           TODO: Add description for return value
+
+**/
+EFI_STATUS
+GopPrivateAddKey (
+  IN  GOP_PRIVATE_DATA    *Private,
+  IN  EFI_INPUT_KEY       Key
+  )
+{
+  EFI_KEY_DATA            KeyData;
+
+  KeyData.Key = Key;
+
+  KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
+  KeyData.KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
+
+  //
+  // Record Key shift state and toggle state
+  //
+  if (Private->LeftCtrl) {
+    KeyData.KeyState.KeyShiftState  |= EFI_LEFT_CONTROL_PRESSED;
+  }
+  if (Private->RightCtrl) {
+    KeyData.KeyState.KeyShiftState  |= EFI_RIGHT_CONTROL_PRESSED;
+  }
+  if (Private->LeftAlt) {
+    KeyData.KeyState.KeyShiftState  |= EFI_LEFT_ALT_PRESSED;
+  }
+  if (Private->RightAlt) {
+    KeyData.KeyState.KeyShiftState  |= EFI_RIGHT_ALT_PRESSED;
+  }
+  if (Private->LeftShift) {
+    KeyData.KeyState.KeyShiftState  |= EFI_LEFT_SHIFT_PRESSED;
+  }                                    
+  if (Private->RightShift) {
+    KeyData.KeyState.KeyShiftState  |= EFI_RIGHT_SHIFT_PRESSED;
+  }
+  if (Private->LeftLogo) {
+    KeyData.KeyState.KeyShiftState  |= EFI_LEFT_LOGO_PRESSED;
+  }
+  if (Private->RightLogo) {
+    KeyData.KeyState.KeyShiftState  |= EFI_RIGHT_LOGO_PRESSED;
+  }
+  if (Private->Menu) {
+    KeyData.KeyState.KeyShiftState  |= EFI_MENU_KEY_PRESSED;
+  }
+  if (Private->SysReq) {
+    KeyData.KeyState.KeyShiftState  |= EFI_SYS_REQ_PRESSED;
+  }  
+  if (Private->CapsLock) {
+    KeyData.KeyState.KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
+  }
+  if (Private->NumLock) {
+    KeyData.KeyState.KeyToggleState |= EFI_NUM_LOCK_ACTIVE;
+  }
+  if (Private->ScrollLock) {
+    KeyData.KeyState.KeyToggleState |= EFI_SCROLL_LOCK_ACTIVE;
+  }
+  
+  //
+  // Convert Ctrl+[1-26] to Ctrl+[A-Z]
+  //
+  if ((Private->LeftCtrl || Private->RightCtrl) && 
+      (KeyData.Key.UnicodeChar >= 1) && (KeyData.Key.UnicodeChar <= 26)
+     ) {
+    if ((Private->LeftShift || Private->RightShift) == Private->CapsLock) {
+      KeyData.Key.UnicodeChar = KeyData.Key.UnicodeChar + L'a' - 1;
+    } else {
+      KeyData.Key.UnicodeChar = KeyData.Key.UnicodeChar + L'A' - 1;
+    }
+  }
+
+  //
+  // Unmask the Shift bit for printable char
+  //
+  if (((KeyData.Key.UnicodeChar >= L'a') && (KeyData.Key.UnicodeChar <= L'z')) ||
+      ((KeyData.Key.UnicodeChar >= L'A') && (KeyData.Key.UnicodeChar <= L'Z'))
+     ) {
+    KeyData.KeyState.KeyShiftState &= ~(EFI_LEFT_SHIFT_PRESSED | EFI_RIGHT_SHIFT_PRESSED);
+  }
+
+  GopPrivateAddQ (Private, &Private->QueueForNotify, &KeyData);
+
+  //
+  // Convert Ctrl+[A-Z] to Ctrl+[1-26]
+  //
+  if (Private->LeftCtrl || Private->RightCtrl) {
+    if ((KeyData.Key.UnicodeChar >= L'a') && (KeyData.Key.UnicodeChar <= L'z')) {
+      KeyData.Key.UnicodeChar = KeyData.Key.UnicodeChar - L'a' + 1;
+    } else if ((KeyData.Key.UnicodeChar >= L'A') && (KeyData.Key.UnicodeChar <= L'Z')) {
+      KeyData.Key.UnicodeChar = KeyData.Key.UnicodeChar - L'A' + 1;
+    }
+  }
+  GopPrivateAddQ (Private, &Private->QueueForRead, &KeyData);
+
+  return EFI_SUCCESS;
 }
 
 EFI_STATUS
@@ -294,7 +413,7 @@ Returns:
 
 --*/
 {
-  EFI_INPUT_KEY     Key;
+  EFI_KEY_DATA      KeyData;
   EFI_TPL           OldTpl;
 
   //
@@ -305,7 +424,9 @@ Returns:
   //
   // A reset is draining the Queue
   //
-  while (GopPrivateDeleteQ (Private, &Key) == EFI_SUCCESS)
+  while (GopPrivateDeleteQ (Private, &Private->QueueForRead, &KeyData) == EFI_SUCCESS)
+    ;
+  while (GopPrivateDeleteQ (Private, &Private->QueueForNotify, &KeyData) == EFI_SUCCESS)
     ;
 
   Private->LeftShift               = FALSE;
@@ -371,69 +492,22 @@ GopPrivateReadKeyStrokeWorker (
   //
   OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
 
-  Status  = GopPrivateCheckQ (Private);
+  //
+  // Call hot key callback before telling caller there is a key available
+  //
+  WinNtGopSimpleTextInTimerHandler (NULL, Private);
+
+  Status  = GopPrivateCheckQ (&Private->QueueForRead);
   if (!EFI_ERROR (Status)) {
     //
     // If a Key press exists try and read it.
     //
-    Status = GopPrivateDeleteQ (Private, &KeyData->Key);
+    Status = GopPrivateDeleteQ (Private, &Private->QueueForRead, KeyData);
     if (!EFI_ERROR (Status)) {
-      //
-      // Record Key shift state and toggle state
-      //      
-      if (Private->LeftCtrl) {
-        Private->KeyState.KeyShiftState  |= EFI_LEFT_CONTROL_PRESSED;
-      }                                    
-      if (Private->RightCtrl) {
-        Private->KeyState.KeyShiftState  |= EFI_RIGHT_CONTROL_PRESSED;
-      }                                    
-      if (Private->LeftAlt) {                
-        Private->KeyState.KeyShiftState  |= EFI_LEFT_ALT_PRESSED;
-      }                                    
-      if (Private->RightAlt) {                
-        Private->KeyState.KeyShiftState  |= EFI_RIGHT_ALT_PRESSED;
-      }                                      
-      if (Private->LeftShift) {          
-        Private->KeyState.KeyShiftState  |= EFI_LEFT_SHIFT_PRESSED;
-      }                                    
-      if (Private->RightShift) {         
-        Private->KeyState.KeyShiftState  |= EFI_RIGHT_SHIFT_PRESSED;
-      }                                    
-      if (Private->LeftLogo) {           
-        Private->KeyState.KeyShiftState  |= EFI_LEFT_LOGO_PRESSED;
-      }                                    
-      if (Private->RightLogo) {          
-        Private->KeyState.KeyShiftState  |= EFI_RIGHT_LOGO_PRESSED;
-      }                                    
-      if (Private->Menu) {               
-        Private->KeyState.KeyShiftState  |= EFI_MENU_KEY_PRESSED;
-      }                                    
-      if (Private->SysReq) {             
-        Private->KeyState.KeyShiftState  |= EFI_SYS_REQ_PRESSED;
-      }  
-      if (Private->CapsLock) {
-        Private->KeyState.KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
-      }
-      if (Private->NumLock) {
-        Private->KeyState.KeyToggleState |= EFI_NUM_LOCK_ACTIVE;
-      }
-      if (Private->ScrollLock) {
-        Private->KeyState.KeyToggleState |= EFI_SCROLL_LOCK_ACTIVE;
-      }
-      
-      KeyData->KeyState.KeyShiftState  = Private->KeyState.KeyShiftState;
-      KeyData->KeyState.KeyToggleState = Private->KeyState.KeyToggleState;
-      
-      Private->KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
-      Private->KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
-  
       //
       // Leave critical section and return
       //
       gBS->RestoreTPL (OldTpl);
-      
-      GopPrivateInvokeRegisteredFunction (Private, KeyData);
-      
       return EFI_SUCCESS;
     }
   }
@@ -536,8 +610,13 @@ WinNtGopSimpleTextInWaitForKey (
   // Enter critical section
   //
   OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
+  
+  //
+  // Call hot key callback before telling caller there is a key available
+  //
+  WinNtGopSimpleTextInTimerHandler (NULL, Private);
 
-  Status  = GopPrivateCheckQ (Private);
+  Status  = GopPrivateCheckQ (&Private->QueueForRead);
   if (!EFI_ERROR (Status)) {
     //
     // If a there is a key in the queue signal our event.
@@ -827,6 +906,7 @@ WinNtGopSimpleTextInExUnregisterKeyNotify (
   return EFI_INVALID_PARAMETER;
 }
 
+
 /**
   TODO: Add function description
 
@@ -842,7 +922,8 @@ WinNtGopInitializeSimpleTextInForWindow (
 {
   EFI_STATUS  Status;
 
-  GopPrivateCreateQ (Private);
+  GopPrivateCreateQ (Private, &Private->QueueForRead);
+  GopPrivateCreateQ (Private, &Private->QueueForNotify);
 
   //
   // Initialize Simple Text In protoocol
@@ -878,6 +959,24 @@ WinNtGopInitializeSimpleTextInForWindow (
                   );
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Create the Timer to trigger hot key notifications
+  //
+  Status = gBS->CreateEvent (
+                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  WinNtGopSimpleTextInTimerHandler,
+                  Private,
+                  &Private->TimerEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+  
+  Status = gBS->SetTimer (
+                  Private->TimerEvent,
+                  TimerPeriodic,
+                  KEYBOARD_TIMER_INTERVAL
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
@@ -897,6 +996,10 @@ WinNtGopDestroySimpleTextInForWindow (
   IN  GOP_PRIVATE_DATA    *Private
   )
 {
-  GopPrivateDestroyQ (Private);
+  gBS->CloseEvent (Private->TimerEvent);
+
+  GopPrivateDestroyQ (Private, &Private->QueueForRead);
+  GopPrivateDestroyQ (Private, &Private->QueueForNotify);
+
   return EFI_SUCCESS;
 }

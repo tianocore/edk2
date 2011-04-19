@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -57,14 +57,15 @@ Abstract:
 #define GOP_EXTENDED_KEY         (0x1 << 24)
 #define GOP_ALT_KEY_PRESSED      (0x1 << 29)
 
+#define KEYBOARD_TIMER_INTERVAL         200000  // 0.02s
 
 #define MAX_Q 256
 
 typedef struct {
-  UINTN         Front;
-  UINTN         Rear;
-  UINTN         Count;
-  EFI_INPUT_KEY Q[MAX_Q];
+  UINTN             Front;
+  UINTN             Rear;
+  EFI_KEY_DATA      Q[MAX_Q];
+  CRITICAL_SECTION  Cs;
 } GOP_QUEUE_FIXED;
 
 #define WIN_NT_GOP_CLASS_NAME       L"WinNtGopWindow"
@@ -131,11 +132,12 @@ typedef struct {
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL *FillLine;
 
   //
-  // Keyboard Queue used by Simple Text In. WinProc thread adds, and main
-  // thread removes.
+  // Keyboard Queue used by Simple Text In. 
+  // QueueForRead:   WinProc thread adds, and main thread removes.
+  // QueueForNotify: WinProc thread adds, and timer thread removes.
   //
-  CRITICAL_SECTION              QCriticalSection;
-  GOP_QUEUE_FIXED               Queue;
+  GOP_QUEUE_FIXED               QueueForRead;
+  GOP_QUEUE_FIXED               QueueForNotify;
 
   EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL SimpleTextInEx;
   EFI_KEY_STATE                     KeyState;
@@ -152,7 +154,8 @@ typedef struct {
   BOOLEAN                           SysReq;  
   BOOLEAN                           NumLock;
   BOOLEAN                           ScrollLock;
-  BOOLEAN                           CapsLock;  
+  BOOLEAN                           CapsLock;
+  EFI_EVENT                         TimerEvent;
 } GOP_PRIVATE_DATA;
 
 #define GOP_PRIVATE_DATA_FROM_THIS(a)  \
@@ -308,7 +311,7 @@ WinNtGopDriverBindingStop (
 
 **/
 EFI_STATUS
-GopPrivateAddQ (
+GopPrivateAddKey (
   IN  GOP_PRIVATE_DATA    *Private,
   IN  EFI_INPUT_KEY       Key
   );
