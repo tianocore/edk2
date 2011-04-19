@@ -623,7 +623,7 @@ ShellOpenFileByName(
   //
   ASSERT(mEfiShellEnvironment2 != NULL);
   FilePath = mEfiShellEnvironment2->NameToPath ((CHAR16*)FileName);
-  if (FileDevicePath != NULL) {
+  if (FilePath != NULL) {
     return (ShellOpenFileByDevicePath(&FilePath,
                                       &DeviceHandle,
                                       FileHandle,
@@ -1522,6 +1522,10 @@ ShellFindFilePath (
     Size = StrSize(Path);
     Size += StrSize(FileName);
     TestPath = AllocateZeroPool(Size);
+    ASSERT(TestPath != NULL);
+    if (TestPath == NULL) {
+      return (NULL);
+    }
     Walker = (CHAR16*)Path;
     do {
       CopyMem(TestPath, Walker, StrSize(Walker));
@@ -1594,9 +1598,7 @@ ShellFindFilePathEx (
   }
   for (ExtensionWalker = FileExtension, TempChar2 = (CHAR16*)FileExtension;  TempChar2 != NULL ; ExtensionWalker = TempChar2 + 1 ){
     StrCpy(TestPath, FileName);
-    if (ExtensionWalker != NULL) {
-      StrCat(TestPath, ExtensionWalker);
-    }
+    StrCat(TestPath, ExtensionWalker);
     TempChar = StrStr(TestPath, L";");
     if (TempChar != NULL) {
       *TempChar = CHAR_NULL;
@@ -2850,6 +2852,7 @@ StrnCatGrow (
   @retval EFI_SUCCESS             The operation was sucessful.
   @retval EFI_UNSUPPORTED         The operation is not supported as requested.
   @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
   @return other                   The operation failed.
 **/
 EFI_STATUS
@@ -2867,6 +2870,9 @@ ShellPromptForResponse (
 
   Status = EFI_SUCCESS;
   Resp = (SHELL_PROMPT_RESPONSE*)AllocatePool(sizeof(SHELL_PROMPT_RESPONSE));
+  if (Resp == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   switch(Type) {
     case SHELL_PROMPT_REQUEST_TYPE_QUIT_CONTINUE:

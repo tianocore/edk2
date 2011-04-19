@@ -47,7 +47,6 @@
 
 [Components]
   ShellPkg/Application/ShellExecTestApp/SA.inf
-  ShellPkg/Application/ShellLibTestApp/SA3.inf
   ShellPkg/Library/BaseFileHandleLib/BaseFileHandleLib.inf
   ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
