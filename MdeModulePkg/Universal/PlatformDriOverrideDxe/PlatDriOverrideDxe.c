@@ -661,7 +661,7 @@ UpdateBindingDriverSelectPage (
   // Switch the item callback key value to its NO. in mDevicePathHandleBuffer
   //
   mSelectedCtrIndex = KeyValue - KEY_VALUE_DEVICE_OFFSET;
-  ASSERT (mSelectedCtrIndex < MAX_CHOICE_NUM);
+  ASSERT (mSelectedCtrIndex >= 0 && mSelectedCtrIndex < MAX_CHOICE_NUM);
 
   mLastSavedDriverImageNum = 0;
 
@@ -1661,26 +1661,7 @@ PlatDriOverrideDxeInit (
   return EFI_SUCCESS;
 
 Finish:
-  if (mCallbackInfo->DriverHandle != NULL) {
-    gBS->UninstallMultipleProtocolInterfaces (
-           mCallbackInfo->DriverHandle,
-           &gEfiDevicePathProtocolGuid,
-           &mHiiVendorDevicePath,
-           &gEfiHiiConfigAccessProtocolGuid,
-           &mCallbackInfo->ConfigAccess,
-           &gEfiPlatformDriverOverrideProtocolGuid,
-           &mCallbackInfo->PlatformDriverOverride,
-           NULL
-           );
-  }
-  
-  if (mCallbackInfo->RegisteredHandle != NULL) {
-    HiiRemovePackages (mCallbackInfo->RegisteredHandle);
-  }
-
-  if (mCallbackInfo != NULL) {
-    FreePool (mCallbackInfo);
-  }
+  PlatDriOverrideDxeUnload (ImageHandle);
 
   return Status;
 }
@@ -1698,6 +1679,8 @@ PlatDriOverrideDxeUnload (
   IN EFI_HANDLE  ImageHandle
   )
 {
+  ASSERT (mCallbackInfo != NULL);
+
   if (mCallbackInfo->DriverHandle != NULL) {
     gBS->UninstallMultipleProtocolInterfaces (
            mCallbackInfo->DriverHandle,
@@ -1715,9 +1698,7 @@ PlatDriOverrideDxeUnload (
     HiiRemovePackages (mCallbackInfo->RegisteredHandle);
   }
 
-  if (mCallbackInfo != NULL) {
-    FreePool (mCallbackInfo);
-  }
+  FreePool (mCallbackInfo);
 
   return EFI_SUCCESS;
 }

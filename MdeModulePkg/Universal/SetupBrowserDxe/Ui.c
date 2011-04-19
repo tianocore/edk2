@@ -1773,8 +1773,8 @@ UiDisplayMenu (
         UpArrow         = FALSE;
         Row             = TopRow;
 
-        Temp            = SkipValue;
-        Temp2           = SkipValue;
+        Temp            = (UINTN) SkipValue;
+        Temp2           = (UINTN) SkipValue;
 
         ClearLines (
           LocalScreen.LeftColumn,
@@ -2294,6 +2294,7 @@ UiDisplayMenu (
         //
         // Don't print anything if it is a NULL help token
         //
+        ASSERT(MenuOption != NULL);
         if (MenuOption->ThisTag->Help == 0) {
           StringPtr = L"\0";
         } else {
@@ -2370,6 +2371,16 @@ UiDisplayMenu (
       //
       case '+':
       case '-':
+        //
+        // If the screen has no menu items, and the user didn't select UiReset
+        // ignore the selection and go back to reading keys.
+        //
+        if(IsListEmpty (&gMenuOption)) {
+          ControlFlag = CfReadKey;
+          break;
+        }
+
+        ASSERT(MenuOption != NULL);
         Statement = MenuOption->ThisTag;
         if ((Statement->Operand == EFI_IFR_DATE_OP)
           || (Statement->Operand == EFI_IFR_TIME_OP)
@@ -2405,6 +2416,16 @@ UiDisplayMenu (
 
       case ' ':
         if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) != FORMSET_CLASS_FRONT_PAGE) {
+          //
+          // If the screen has no menu items, and the user didn't select UiReset
+          // ignore the selection and go back to reading keys.
+          //
+          if(IsListEmpty (&gMenuOption)) {
+            ControlFlag = CfReadKey;
+            break;
+          }
+          
+          ASSERT(MenuOption != NULL);
           if (MenuOption->ThisTag->Operand == EFI_IFR_CHECKBOX_OP && !MenuOption->GrayOut) {
             ScreenOperation = UiSelect;
           }
@@ -2476,6 +2497,7 @@ UiDisplayMenu (
     case CfUiSelect:
       ControlFlag = CfCheckSelection;
 
+      ASSERT(MenuOption != NULL);
       Statement = MenuOption->ThisTag;
       if ((Statement->Operand == EFI_IFR_TEXT_OP) ||
           (Statement->Operand == EFI_IFR_DATE_OP) ||
@@ -2508,6 +2530,7 @@ UiDisplayMenu (
           }
           BufferSize = StrLen (StringPtr) / 2;
           DevicePath = AllocatePool (BufferSize);
+          ASSERT (DevicePath != NULL);
 
           //
           // Convert from Device Path String to DevicePath Buffer in the reverse order.
@@ -2742,11 +2765,13 @@ UiDisplayMenu (
 
     case CfUiLeft:
       ControlFlag = CfCheckSelection;
+      ASSERT(MenuOption != NULL);
       if ((MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP) || (MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP)) {
         if (MenuOption->Sequence != 0) {
           //
           // In the middle or tail of the Date/Time op-code set, go left.
           //
+          ASSERT(NewPos != NULL);
           NewPos = NewPos->BackLink;
         }
       }
@@ -2754,11 +2779,13 @@ UiDisplayMenu (
 
     case CfUiRight:
       ControlFlag = CfCheckSelection;
+      ASSERT(MenuOption != NULL);
       if ((MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP) || (MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP)) {
         if (MenuOption->Sequence != 2) {
           //
           // In the middle or tail of the Date/Time op-code set, go left.
           //
+          ASSERT(NewPos != NULL);
           NewPos = NewPos->ForwardLink;
         }
       }
@@ -2769,6 +2796,7 @@ UiDisplayMenu (
 
       SavedListEntry = TopOfScreen;
 
+      ASSERT(NewPos != NULL);
       if (NewPos->BackLink != &gMenuOption) {
         NewLine = TRUE;
         //
@@ -2798,6 +2826,7 @@ UiDisplayMenu (
         // Check the previous menu entry to see if it was a zero-length advance.  If it was,
         // don't worry about a redraw.
         //
+        ASSERT(MenuOption != NULL);
         if ((INTN) MenuOption->Row - (INTN) DistanceValue < (INTN) TopRow) {
           Repaint     = TRUE;
           TopOfScreen = NewPos;
@@ -2855,6 +2884,7 @@ UiDisplayMenu (
     case CfUiPageUp:
       ControlFlag     = CfCheckSelection;
 
+      ASSERT(NewPos != NULL);
       if (NewPos->BackLink == &gMenuOption) {
         NewLine = FALSE;
         Repaint = FALSE;
@@ -2909,6 +2939,7 @@ UiDisplayMenu (
     case CfUiPageDown:
       ControlFlag     = CfCheckSelection;
 
+      ASSERT (NewPos != NULL);
       if (NewPos->ForwardLink == &gMenuOption) {
         NewLine = FALSE;
         Repaint = FALSE;
@@ -2976,7 +3007,7 @@ UiDisplayMenu (
         //
         // An option might be multi-line, so we need to reflect that data in the overall skip value
         //
-        UpdateOptionSkipLines (Selection, NextMenuOption, &OptionString, SkipValue);
+        UpdateOptionSkipLines (Selection, NextMenuOption, &OptionString, (UINTN) SkipValue);
 
         Temp = MenuOption->Row + MenuOption->Skip + DistanceValue - 1;
         if ((MenuOption->Row + MenuOption->Skip == BottomRow + 1) &&
@@ -3113,6 +3144,7 @@ UiDisplayMenu (
       Status = SubmitForm (Selection->FormSet, Selection->Form);
 
       if (!EFI_ERROR (Status)) {
+        ASSERT(MenuOption != NULL);
         UpdateStatusBar (INPUT_ERROR, MenuOption->ThisTag->QuestionFlags, FALSE);
         UpdateStatusBar (NV_UPDATE_REQUIRED, MenuOption->ThisTag->QuestionFlags, FALSE);
       } else {

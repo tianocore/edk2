@@ -84,8 +84,8 @@ PxeInit (
   Snp->Cdb.OpCode     = PXE_OPCODE_INITIALIZE;
   Snp->Cdb.OpFlags    = CableDetectFlag;
 
-  Snp->Cdb.CPBsize    = sizeof (PXE_CPB_INITIALIZE);
-  Snp->Cdb.DBsize     = sizeof (PXE_DB_INITIALIZE);
+  Snp->Cdb.CPBsize    = (UINT16) sizeof (PXE_CPB_INITIALIZE);
+  Snp->Cdb.DBsize     = (UINT16) sizeof (PXE_DB_INITIALIZE);
 
   Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Snp->Cpb;
   Snp->Cdb.DBaddr     = (UINT64)(UINTN) Snp->Db;

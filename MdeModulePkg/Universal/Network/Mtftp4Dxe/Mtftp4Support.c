@@ -223,7 +223,7 @@ Mtftp4RemoveBlockNum (
 	  *TotalBlock  = Num;
 	  
       if (Range->Round > 0) {
-	    *TotalBlock += Range->Bound +  MultU64x32 (Range->Round -1, (UINT32)(Range->Bound + 1)) + 1;
+	    *TotalBlock += Range->Bound +  MultU64x32 ((UINTN) (Range->Round -1), (UINT32) (Range->Bound + 1)) + 1;
 	  }
 
       if (Range->Start > Range->Bound) {

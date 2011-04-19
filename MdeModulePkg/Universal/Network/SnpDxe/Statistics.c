@@ -133,7 +133,7 @@ SnpUndi32Statistics (
     Db                = Snp->Db;
   } else {
     Snp->Cdb.OpFlags                = PXE_OPFLAGS_STATISTICS_READ;
-    Snp->Cdb.DBsize                 = sizeof (PXE_DB_STATISTICS);
+    Snp->Cdb.DBsize                 = (UINT16) sizeof (PXE_DB_STATISTICS);
     Snp->Cdb.DBaddr                 = (UINT64)(UINTN) (Db = Snp->Db);
   }
   //

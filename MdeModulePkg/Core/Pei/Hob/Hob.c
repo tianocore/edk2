@@ -110,7 +110,7 @@ PeiCreateHob (
   HandOffHob->EfiEndOfHobList = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
  
   HobEnd->HobType   = EFI_HOB_TYPE_END_OF_HOB_LIST;
-  HobEnd->HobLength = sizeof(EFI_HOB_GENERIC_HEADER);
+  HobEnd->HobLength = (UINT16) sizeof (EFI_HOB_GENERIC_HEADER);
   HobEnd->Reserved  = 0;
   HobEnd++;
   HandOffHob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
@@ -142,11 +142,11 @@ PeiCoreBuildHobHandoffInfoTable (
   Hob                      = (VOID *)(UINTN)MemoryBegin;
   HobEnd                   = (EFI_HOB_GENERIC_HEADER*) (Hob+1);
   Hob->Header.HobType      = EFI_HOB_TYPE_HANDOFF;
-  Hob->Header.HobLength    = sizeof(EFI_HOB_HANDOFF_INFO_TABLE);
+  Hob->Header.HobLength    = (UINT16) sizeof (EFI_HOB_HANDOFF_INFO_TABLE);
   Hob->Header.Reserved     = 0;
   
   HobEnd->HobType          = EFI_HOB_TYPE_END_OF_HOB_LIST;
-  HobEnd->HobLength        = sizeof(EFI_HOB_GENERIC_HEADER);
+  HobEnd->HobLength        = (UINT16) sizeof (EFI_HOB_GENERIC_HEADER);
   HobEnd->Reserved         = 0;
 
   Hob->Version             = EFI_HOB_HANDOFF_TABLE_VERSION;

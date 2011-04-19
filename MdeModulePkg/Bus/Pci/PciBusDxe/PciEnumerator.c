@@ -983,7 +983,7 @@ PciHostBridgeAdjustAllocation (
       // Have no way to get ReqRes, AllocRes & Bar here
       //
       ZeroMem (&AllocFailExtendedData, sizeof (AllocFailExtendedData));
-      AllocFailExtendedData.DevicePathSize = sizeof (EFI_DEVICE_PATH_PROTOCOL);
+      AllocFailExtendedData.DevicePathSize = (UINT16) sizeof (EFI_DEVICE_PATH_PROTOCOL);
       AllocFailExtendedData.DevicePath     = (UINT8 *) PciResNode->PciDev->DevicePath;
       AllocFailExtendedData.Bar            = PciResNode->Bar;
 
@@ -1108,7 +1108,7 @@ ConstructAcpiResourceRequestor (
     //
     if ((Aperture & 0x01) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-      Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+      Ptr->Len      = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
       //
       // Io
       //
@@ -1127,7 +1127,7 @@ ConstructAcpiResourceRequestor (
     //
     if ((Aperture & 0x02) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-      Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+      Ptr->Len      = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
       //
       // Mem
       //
@@ -1151,7 +1151,7 @@ ConstructAcpiResourceRequestor (
     //
     if ((Aperture & 0x04) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-      Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+      Ptr->Len      = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
       //
       // Mem
       //
@@ -1174,7 +1174,7 @@ ConstructAcpiResourceRequestor (
     //
     if ((Aperture & 0x08) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-      Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+      Ptr->Len      = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
       //
       // Mem
       //
@@ -1197,7 +1197,7 @@ ConstructAcpiResourceRequestor (
     //
     if ((Aperture & 0x10) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-      Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+      Ptr->Len      = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
       //
       // Mem
       //

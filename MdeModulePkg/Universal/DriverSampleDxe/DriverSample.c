@@ -1470,6 +1470,9 @@ DriverSampleUnload (
   )
 {
   UINTN Index;
+
+  ASSERT (PrivateData != NULL);
+
   if (DriverHandle[0] != NULL) {
     gBS->UninstallMultipleProtocolInterfaces (
             DriverHandle[0],
@@ -1500,15 +1503,13 @@ DriverSampleUnload (
     HiiRemovePackages (PrivateData->HiiHandle[1]);
   }
 
-  if (PrivateData != NULL) {
-    for (Index = 0; Index < NAME_VALUE_NAME_NUMBER; Index++) {
-      if (PrivateData->NameValueName[Index] != NULL) {
-        FreePool (PrivateData->NameValueName[Index]);
-      }
+  for (Index = 0; Index < NAME_VALUE_NAME_NUMBER; Index++) {
+    if (PrivateData->NameValueName[Index] != NULL) {
+      FreePool (PrivateData->NameValueName[Index]);
     }
-    FreePool (PrivateData);
-    PrivateData = NULL;
   }
+  FreePool (PrivateData);
+  PrivateData = NULL;
 
   return EFI_SUCCESS;
 }

@@ -1094,7 +1094,7 @@ TcpSendReset (
 
   Nhead->SrcPort  = Head->DstPort;
   Nhead->DstPort  = Head->SrcPort;
-  Nhead->HeadLen  = (sizeof (TCP_HEAD) >> 2);
+  Nhead->HeadLen  = (UINT8) (sizeof (TCP_HEAD) >> 2);
   Nhead->Res      = 0;
   Nhead->Wnd      = HTONS (0xFFFF);
   Nhead->Checksum = 0;

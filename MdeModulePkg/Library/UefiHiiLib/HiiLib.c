@@ -1411,7 +1411,7 @@ InternalHiiValidateCurrentSetting (
           // Get Offset by Question header
           //
           Offset = IfrCheckBox->Question.VarStoreInfo.VarOffset;
-          Width  = sizeof (BOOLEAN);
+          Width  = (UINT16) sizeof (BOOLEAN);
           //
           // Check whether this question is in current block array.
           //

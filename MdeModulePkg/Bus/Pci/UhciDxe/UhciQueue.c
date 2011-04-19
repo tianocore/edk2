@@ -355,7 +355,7 @@ UhciCreateSetupTd (
   Td->TdHw.DataBuffer   = (UINT32) (UINTN) RequestPhy;
 
   Td->Data              = Request;
-  Td->DataLen           = sizeof (EFI_USB_DEVICE_REQUEST);
+  Td->DataLen           = (UINT16) sizeof (EFI_USB_DEVICE_REQUEST);
 
   return Td;
 }

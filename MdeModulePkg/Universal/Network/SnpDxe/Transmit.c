@@ -90,7 +90,7 @@ PxeFillHeader (
   Snp->Cdb.DBsize     = PXE_DBSIZE_NOT_USED;
   Snp->Cdb.DBaddr     = PXE_DBADDR_NOT_USED;
 
-  Snp->Cdb.CPBsize    = sizeof (PXE_CPB_FILL_HEADER_FRAGMENTED);
+  Snp->Cdb.CPBsize    = (UINT16) sizeof (PXE_CPB_FILL_HEADER_FRAGMENTED);
   Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Cpb;
 
   Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
@@ -162,7 +162,7 @@ PxeTransmit (
 
   Snp->Cdb.OpFlags    = PXE_OPFLAGS_TRANSMIT_WHOLE;
 
-  Snp->Cdb.CPBsize    = sizeof (PXE_CPB_TRANSMIT);
+  Snp->Cdb.CPBsize    = (UINT16) sizeof (PXE_CPB_TRANSMIT);
   Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Cpb;
 
   Snp->Cdb.OpCode     = PXE_OPCODE_TRANSMIT;

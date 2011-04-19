@@ -747,7 +747,7 @@ EbcDebugSignalException (
   // Save the exception in the context passed in
   //
   VmPtr->ExceptionFlags |= ExceptionFlags;
-  VmPtr->LastException = ExceptionType;
+  VmPtr->LastException = (UINTN) ExceptionType;
   //
   // If it's a fatal exception, then flag it in the VM context in case an
   // attached debugger tries to return from it.
@@ -767,14 +767,14 @@ EbcDebugSignalException (
     //
     // Initialize the context structure
     //
-    EbcContext.R0                   = VmPtr->Gpr[0];
-    EbcContext.R1                   = VmPtr->Gpr[1];
-    EbcContext.R2                   = VmPtr->Gpr[2];
-    EbcContext.R3                   = VmPtr->Gpr[3];
-    EbcContext.R4                   = VmPtr->Gpr[4];
-    EbcContext.R5                   = VmPtr->Gpr[5];
-    EbcContext.R6                   = VmPtr->Gpr[6];
-    EbcContext.R7                   = VmPtr->Gpr[7];
+    EbcContext.R0                   = (UINT64) VmPtr->Gpr[0];
+    EbcContext.R1                   = (UINT64) VmPtr->Gpr[1];
+    EbcContext.R2                   = (UINT64) VmPtr->Gpr[2];
+    EbcContext.R3                   = (UINT64) VmPtr->Gpr[3];
+    EbcContext.R4                   = (UINT64) VmPtr->Gpr[4];
+    EbcContext.R5                   = (UINT64) VmPtr->Gpr[5];
+    EbcContext.R6                   = (UINT64) VmPtr->Gpr[6];
+    EbcContext.R7                   = (UINT64) VmPtr->Gpr[7];
     EbcContext.Ip                   = (UINT64)(UINTN)VmPtr->Ip;
     EbcContext.Flags                = VmPtr->Flags;
     EbcContext.ControlFlags         = 0;
@@ -937,14 +937,14 @@ EbcDebugPeriodic (
     //
     // Initialize the context structure
     //
-    EbcContext.R0                   = VmPtr->Gpr[0];
-    EbcContext.R1                   = VmPtr->Gpr[1];
-    EbcContext.R2                   = VmPtr->Gpr[2];
-    EbcContext.R3                   = VmPtr->Gpr[3];
-    EbcContext.R4                   = VmPtr->Gpr[4];
-    EbcContext.R5                   = VmPtr->Gpr[5];
-    EbcContext.R6                   = VmPtr->Gpr[6];
-    EbcContext.R7                   = VmPtr->Gpr[7];
+    EbcContext.R0                   = (UINT64) VmPtr->Gpr[0];
+    EbcContext.R1                   = (UINT64) VmPtr->Gpr[1];
+    EbcContext.R2                   = (UINT64) VmPtr->Gpr[2];
+    EbcContext.R3                   = (UINT64) VmPtr->Gpr[3];
+    EbcContext.R4                   = (UINT64) VmPtr->Gpr[4];
+    EbcContext.R5                   = (UINT64) VmPtr->Gpr[5];
+    EbcContext.R6                   = (UINT64) VmPtr->Gpr[6];
+    EbcContext.R7                   = (UINT64) VmPtr->Gpr[7];
     EbcContext.Ip                   = (UINT64)(UINTN)VmPtr->Ip;
     EbcContext.Flags                = VmPtr->Flags;
     EbcContext.ControlFlags         = 0;

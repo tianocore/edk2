@@ -39,7 +39,7 @@ PxeGetStnAddr (
   Snp->Cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
   Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
 
-  Snp->Cdb.DBsize     = sizeof (PXE_DB_STATION_ADDRESS);
+  Snp->Cdb.DBsize     = (UINT16) sizeof (PXE_DB_STATION_ADDRESS);
   Snp->Cdb.DBaddr     = (UINT64)(UINTN) Db;
 
   Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
@@ -124,11 +124,11 @@ PxeSetStnAddr (
     //
     CopyMem (&Cpb->StationAddr, NewMacAddr, Snp->Mode.HwAddressSize);
 
-    Snp->Cdb.CPBsize  = sizeof (PXE_CPB_STATION_ADDRESS);
+    Snp->Cdb.CPBsize  = (UINT16) sizeof (PXE_CPB_STATION_ADDRESS);
     Snp->Cdb.CPBaddr  = (UINT64)(UINTN) Cpb;
   }
 
-  Snp->Cdb.DBsize     = sizeof (PXE_DB_STATION_ADDRESS);
+  Snp->Cdb.DBsize     = (UINT16) sizeof (PXE_DB_STATION_ADDRESS);
   Snp->Cdb.DBaddr     = (UINT64)(UINTN) Db;
 
   Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;

@@ -483,8 +483,8 @@ SimpleNetworkDriverStart (
   Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
   Snp->Cdb.CPBaddr    = PXE_DBADDR_NOT_USED;
 
-  Snp->Cdb.DBsize     = sizeof Snp->InitInfo;
-  Snp->Cdb.DBaddr     = (UINT64)(UINTN) &Snp->InitInfo;
+  Snp->Cdb.DBsize     = (UINT16) sizeof (Snp->InitInfo);
+  Snp->Cdb.DBaddr     = (UINT64)(UINTN) (&Snp->InitInfo);
 
   Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
   Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
@@ -513,7 +513,7 @@ SimpleNetworkDriverStart (
   Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
   Snp->Cdb.CPBaddr    = PXE_DBADDR_NOT_USED;
 
-  Snp->Cdb.DBsize     = sizeof ConfigInfo;
+  Snp->Cdb.DBsize     = (UINT16) sizeof (ConfigInfo);
   Snp->Cdb.DBaddr     = (UINT64)(UINTN) &ConfigInfo;
 
   Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;

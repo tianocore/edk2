@@ -1099,7 +1099,7 @@ ParseIfrData (
       // Get Offset/Width by Question header and OneOf Flags
       //
       VarOffset = IfrCheckBox->Question.VarStoreInfo.VarOffset;
-      VarWidth  = sizeof (BOOLEAN);
+      VarWidth  = (UINT16) sizeof (BOOLEAN);
 
       //
       // Check whether this question is in requested block array.
