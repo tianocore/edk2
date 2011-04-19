@@ -2606,6 +2606,12 @@ InternalShellPrintWorker(
   mPostReplaceFormat = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
   mPostReplaceFormat2 = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
 
+  if (mPostReplaceFormat == NULL || mPostReplaceFormat2 == NULL) {
+    SHELL_FREE_NON_NULL(mPostReplaceFormat);
+    SHELL_FREE_NON_NULL(mPostReplaceFormat2);
+    return (EFI_OUT_OF_RESOURCES);
+  }
+
   Status            = EFI_SUCCESS;
   OriginalAttribute = gST->ConOut->Mode->Attribute;
 
