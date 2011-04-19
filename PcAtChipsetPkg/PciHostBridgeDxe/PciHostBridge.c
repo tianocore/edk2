@@ -298,7 +298,7 @@ Returns:
             //
             // Get the number of '1' in Alignment.
             //
-            BitsOfAlignment = HighBitSet64 (RootBridgeInstance->ResAllocNode[Index].Alignment) + 1;
+            BitsOfAlignment = (UINTN) (HighBitSet64 (RootBridgeInstance->ResAllocNode[Index].Alignment) + 1);
                                   
             switch (Index) {
 
