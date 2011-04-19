@@ -1062,7 +1062,7 @@ InitInterruptDescriptorTable (
   IdtPtrAlignmentBuffer = AllocatePool (sizeof (*IdtPtr) + 16);
   IdtPtr = ALIGN_POINTER (IdtPtrAlignmentBuffer, 16);
   IdtPtr->Base = (UINT32)(((UINTN)(VOID*) gIdtTable) & (BASE_4GB-1));
-  IdtPtr->Limit = sizeof (gIdtTable) - 1;
+  IdtPtr->Limit = (UINT16) (sizeof (gIdtTable) - 1);
 
   AsmWriteIdtr (IdtPtr);
 

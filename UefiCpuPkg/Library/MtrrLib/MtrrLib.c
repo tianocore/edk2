@@ -93,11 +93,16 @@ GetVariableMtrrCount (
   VOID
   )
 {
+  UINT32  VariableMtrrCount;
+
   if (!IsMtrrSupported ()) {
     return 0;
   }
 
-  return (UINT32)(AsmReadMsr64 (MTRR_LIB_IA32_MTRR_CAP) & MTRR_LIB_IA32_MTRR_CAP_VCNT_MASK);
+  VariableMtrrCount = (UINT32)(AsmReadMsr64 (MTRR_LIB_IA32_MTRR_CAP) & MTRR_LIB_IA32_MTRR_CAP_VCNT_MASK);
+  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
+
+  return VariableMtrrCount;
 }
 
 /**
