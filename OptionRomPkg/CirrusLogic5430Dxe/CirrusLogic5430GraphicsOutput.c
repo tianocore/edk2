@@ -523,6 +523,7 @@ CirrusLogic5430GraphicsOutputConstructor (
   // Initialize the hardware
   //
   GraphicsOutput->SetMode (GraphicsOutput, 0);
+  ASSERT (Private->GraphicsOutput.Mode->Mode < CIRRUS_LOGIC_5430_MODE_COUNT);
   DrawLogo (
     Private,
     Private->ModeData[Private->GraphicsOutput.Mode->Mode].HorizontalResolution,

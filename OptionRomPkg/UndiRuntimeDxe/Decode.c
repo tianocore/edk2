@@ -254,9 +254,9 @@ UNDI_GetInitInfo (
   DbPtr->MCastFilterCnt = MAX_MCAST_ADDRESS_CNT;
 
   DbPtr->TxBufCnt = TX_BUFFER_COUNT;
-  DbPtr->TxBufSize = sizeof (TxCB);
+  DbPtr->TxBufSize = (UINT16) sizeof (TxCB);
   DbPtr->RxBufCnt = RX_BUFFER_COUNT;
-  DbPtr->RxBufSize = sizeof (RxFD);
+  DbPtr->RxBufSize = (UINT16) sizeof (RxFD);
 
   DbPtr->IFtype = PXE_IFTYPE_ETHERNET;
   DbPtr->SupportedDuplexModes = PXE_DUPLEX_ENABLE_FULL_SUPPORTED |
@@ -1032,7 +1032,7 @@ UNDI_Status (
     //
     // We already filled in 2 UINT32s.
     //
-    CdbPtr->DBsize = sizeof (UINT32) * 2;
+    CdbPtr->DBsize = (UINT16) (sizeof (UINT32) * 2);
 
     //
     // will claim any hanging free CBs
@@ -1042,7 +1042,7 @@ UNDI_Status (
     if (AdapterInfo->xmit_done_head == AdapterInfo->xmit_done_tail) {
       CdbPtr->StatFlags |= PXE_STATFLAGS_GET_STATUS_TXBUF_QUEUE_EMPTY;
     } else {
-      for (Index = 0; NumEntries >= sizeof (UINT64); Index++, NumEntries -= sizeof (UINT64)) {
+      for (Index = 0; ((Index < MAX_XMIT_BUFFERS) && (NumEntries >= sizeof (UINT64))); Index++, NumEntries -= sizeof (UINT64)) {
         if (AdapterInfo->xmit_done_head != AdapterInfo->xmit_done_tail) {
           DbPtr->TxBuffer[Index]      = AdapterInfo->xmit_done[AdapterInfo->xmit_done_head];
           AdapterInfo->xmit_done_head = next (AdapterInfo->xmit_done_head);
@@ -1476,7 +1476,7 @@ PxeStructInit (
   // Initialize the !PXE structure
   //
   PxePtr->Signature = PXE_ROMID_SIGNATURE;
-  PxePtr->Len       = sizeof (PXE_SW_UNDI);
+  PxePtr->Len       = (UINT8) sizeof (PXE_SW_UNDI);
   //
   // cksum
   //

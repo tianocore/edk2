@@ -1749,10 +1749,12 @@ Returns:
 {
   UINT8 Index;
   UINT8 *OpCode;
+  UINT8 ArrayLen;
 
   OpCode = (UINT8 *) (Packet->Cdb);
+  ArrayLen = (UINT8) (sizeof (gSupportedATAPICommands) / sizeof (gSupportedATAPICommands[0]));
 
-  for (Index = 0; CompareMem (&gSupportedATAPICommands[Index], &gEndTable, sizeof (SCSI_COMMAND_SET)); Index++) {
+  for (Index = 0; (Index < ArrayLen) && (CompareMem (&gSupportedATAPICommands[Index], &gEndTable, sizeof (SCSI_COMMAND_SET)) != 0); Index++) {
 
     if (*OpCode == gSupportedATAPICommands[Index].OpCode) {
       //
@@ -1990,10 +1992,12 @@ Returns:
 {
   UINT8 Index;
   UINT8 *OpCode;
+  UINT8 ArrayLen;
 
   OpCode = (UINT8 *) (Packet->Cdb);
+  ArrayLen = (UINT8) (sizeof (gSupportedATAPICommands) / sizeof (gSupportedATAPICommands[0]));
 
-  for (Index = 0; CompareMem (&gSupportedATAPICommands[Index], &gEndTable, sizeof (SCSI_COMMAND_SET)); Index++) {
+  for (Index = 0; (Index < ArrayLen) && (CompareMem (&gSupportedATAPICommands[Index], &gEndTable, sizeof (SCSI_COMMAND_SET)) != 0); Index++) {
 
     if (*OpCode == gSupportedATAPICommands[Index].OpCode) {
       //

@@ -517,7 +517,8 @@ Configure (
   UINT8 my_filter;
 
   cmd_ptr   = GetFreeCB (AdapterInfo);
-  data_ptr  = (UINT8 *) (&cmd_ptr->PhysTBDArrayAddres);
+  ASSERT (cmd_ptr != NULL);
+  data_ptr  = (UINT8 *) cmd_ptr + sizeof (struct CB_Header);
 
   //
   // start the config data right after the command header
@@ -588,7 +589,8 @@ E100bSetupIAAddr (
   eaddrs    = (UINT16 *) AdapterInfo->CurrentNodeAddress;
 
   cmd_ptr   = GetFreeCB (AdapterInfo);
-  data_ptr  = (UINT16 *) (&cmd_ptr->PhysTBDArrayAddres);
+  ASSERT (cmd_ptr != NULL);
+  data_ptr  = (UINT16 *) ((UINT8 *) cmd_ptr +sizeof (struct CB_Header));
 
   //
   // AVOID a bug (?!) here by marking the command already completed.
@@ -1022,6 +1024,7 @@ E100bTransmit (
 
   tx_ptr_1  = (PXE_CPB_TRANSMIT *) (UINTN) cpb;
   tx_ptr_f  = (PXE_CPB_TRANSMIT_FRAGMENTS *) (UINTN) cpb;
+  Tmp_ptr = 0;
 
   //
   // stop reentrancy here
@@ -1387,7 +1390,7 @@ E100bReadEepromAndStationAddress (
   // in words
   //
   AdapterInfo->NVData_Len = eeprom_len = (UINT16) (1 << addr_len);
-  for (Index2 = 0, Index = 0; Index < eeprom_len; Index++) {
+  for (Index2 = 0, Index = 0; ((Index2 < PXE_MAC_LENGTH - 1) && (Index < eeprom_len)); Index++) {
     UINT16  value;
     value         = E100bReadEeprom (AdapterInfo, Index, addr_len);
     eedata[Index] = value;
@@ -2258,7 +2261,7 @@ E100bStatistics (
                   AdapterInfo->statistics->tx_lost_carrier;
 
   if (DBsize > sizeof db) {
-    DBsize = sizeof db;
+    DBsize = (UINT16) sizeof (db);
   }
 
   CopyMem ((VOID *) (UINTN) DBaddr, (VOID *) &db, (UINTN) DBsize);
