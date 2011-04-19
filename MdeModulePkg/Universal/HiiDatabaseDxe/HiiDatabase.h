@@ -89,7 +89,6 @@ typedef struct {
 typedef struct {
   LIST_ENTRY          Entry;
   UINT8               OpCode;
-  EFI_STRING_ID       DefaultName;
   UINT16              DefaultId;
   UINT64              Value;
 } IFR_DEFAULT_DATA;

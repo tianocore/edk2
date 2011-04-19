@@ -1629,15 +1629,10 @@ InternalHiiIfrValueAction (
   UINT32         Index;
   EFI_GUID       *VarGuid;
   EFI_STRING     VarName;
-  EFI_STRING_ID  DefaultName;
 
   UINT8                        *PackageData;
-  UINTN                        IfrOffset;
-  EFI_IFR_OP_HEADER            *IfrOpHdr;
   EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
-  UINT32                       PackageOffset;  
   UINTN                        PackageListLength;
-  EFI_HII_PACKAGE_HEADER       PacakgeHeader;
   EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL     *TempDevicePath;
   
@@ -1772,13 +1767,9 @@ InternalHiiIfrValueAction (
 	    Status = EFI_SUCCESS;
       goto NextConfigAltResp;
     }
-    
-    //
-    // 2. Get DefaultName string ID by parsing the PacakgeList 
-    //
 
     //
-    // Get HiiPackage by HiiHandle
+    // 2. Get HiiPackage by HiiHandle
     //
     PackageListLength  = 0;
     HiiPackageList     = NULL;
@@ -1807,58 +1798,8 @@ InternalHiiIfrValueAction (
     }
     
     //
-    // Parse the form package and get the default name string ID.
-    //
-    if (ActionType == ACTION_SET_DEFAUTL_VALUE) {
-      PackageOffset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-      Status = EFI_NOT_FOUND;
-      while (PackageOffset < PackageListLength) {
-        CopyMem (&PacakgeHeader, (UINT8 *) HiiPackageList + PackageOffset, sizeof (PacakgeHeader));
-        
-        //
-        // Parse IFR opcode to get default store opcode
-        //
-        if (PacakgeHeader.Type == EFI_HII_PACKAGE_FORMS) {
-          IfrOffset = sizeof (PacakgeHeader);
-          PackageData = (UINT8 *) HiiPackageList + PackageOffset;
-          while (IfrOffset < PacakgeHeader.Length) {
-            IfrOpHdr = (EFI_IFR_OP_HEADER *) (PackageData + IfrOffset);
-            //
-            // Match DefaultId to find its DefaultName
-            //
-            if (IfrOpHdr->OpCode == EFI_IFR_DEFAULTSTORE_OP) {
-              if (((EFI_IFR_DEFAULTSTORE *) IfrOpHdr)->DefaultId == DefaultId) {
-                DefaultName = ((EFI_IFR_DEFAULTSTORE *) IfrOpHdr)->DefaultName;
-                Status = EFI_SUCCESS;
-                break;
-              }
-            }
-            IfrOffset += IfrOpHdr->Length;
-          }
-          //
-          // Only one form is in a package list.
-          //
-          break;
-        }
-        
-        //
-        // Go to next package.
-        //
-        PackageOffset += PacakgeHeader.Length;      
-      }
-      
-      //
-      // Not found the matched default string ID
-      //
-      if (EFI_ERROR (Status)) {
-        Status = EFI_SUCCESS;
-        goto NextConfigAltResp;
-      }
-    }
-    
-    //
     // 3. Call ConfigRouting GetAltCfg(ConfigRoute, <ConfigResponse>, Guid, Name, DevicePath, AltCfgId, AltCfgResp)
-    //    Get the default configuration string according to the found default name string ID.
+    //    Get the default configuration string according to the default ID.
     //
     Status = gHiiConfigRouting->GetAltConfig (
                                   gHiiConfigRouting,
@@ -1866,7 +1807,7 @@ InternalHiiIfrValueAction (
                                   VarGuid,
                                   VarName,
                                   DevicePath,
-                                  (ActionType == ACTION_SET_DEFAUTL_VALUE) ? &DefaultName:NULL,  // it can be NULL to get the current setting.
+                                  (ActionType == ACTION_SET_DEFAUTL_VALUE) ? &DefaultId:NULL,  // it can be NULL to get the current setting.
                                   &ConfigResp
                                 );
     
