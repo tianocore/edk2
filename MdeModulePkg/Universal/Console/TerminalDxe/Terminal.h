@@ -1,7 +1,7 @@
 /** @file
   Header file for Terminal driver.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -61,6 +61,8 @@ typedef struct {
   EFI_INPUT_KEY Data[FIFO_MAX_NUMBER + 1];
 } EFI_KEY_FIFO;
 
+#define KEYBOARD_TIMER_INTERVAL         200000  // 0.02s
+
 #define TERMINAL_DEV_SIGNATURE  SIGNATURE_32 ('t', 'm', 'n', 'l')
 
 #define TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE SIGNATURE_32 ('t', 'm', 'e', 'n')
@@ -86,6 +88,7 @@ typedef struct {
   UNICODE_FIFO                        *UnicodeFiFo;
   EFI_KEY_FIFO                        *EfiKeyFiFo;
   EFI_UNICODE_STRING_TABLE            *ControllerNameTable;
+  EFI_EVENT                           TimerEvent;
   EFI_EVENT                           TwoSecondTimeOut;
   UINT32                              InputState;
   UINT32                              ResetState;
@@ -954,7 +957,7 @@ IsRawFiFoFull (
 BOOLEAN
 EfiKeyFiFoInsertOneKey (
   TERMINAL_DEV      *TerminalDevice,
-  EFI_INPUT_KEY     Key
+  EFI_INPUT_KEY     *Key
   );
 
 /**
@@ -1348,4 +1351,16 @@ IsHotPlugDevice (
   IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath
   );
 
+/**
+  Timer handler to poll the key from serial.
+
+  @param  Event                    Indicates the event that invoke this function.
+  @param  Context                  Indicates the calling context.
+**/
+VOID
+EFIAPI
+TerminalConInTimerHandler (
+  IN EFI_EVENT            Event,
+  IN VOID                 *Context
+  );
 #endif

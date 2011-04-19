@@ -1,7 +1,7 @@
 /** @file
   Implementation for EFI_SIMPLE_TEXT_INPUT_PROTOCOL protocol.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -26,8 +26,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @retval EFI_SUCCESS              The keystroke information was returned.
   @retval EFI_NOT_READY            There was no keystroke data available.
-  @retval EFI_DEVICE_ERROR         The keystroke information was not returned due
-                                   to hardware errors.
   @retval EFI_INVALID_PARAMETER    KeyData is NULL.
 
 **/
@@ -37,24 +35,8 @@ ReadKeyStrokeWorker (
   OUT EFI_KEY_DATA *KeyData
   )
 {
-  EFI_STATUS                      Status;
-  LIST_ENTRY                      *Link;
-  LIST_ENTRY                      *NotifyList;
-  TERMINAL_CONSOLE_IN_EX_NOTIFY   *CurrentNotify;
-
   if (KeyData == NULL) {
     return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Initialize *Key to nonsense value.
-  //
-  KeyData->Key.ScanCode    = SCAN_NULL;
-  KeyData->Key.UnicodeChar = 0;
-
-  Status = TerminalConInCheckForKey (&TerminalDevice->SimpleInput);
-  if (EFI_ERROR (Status)) {
-    return EFI_NOT_READY;
   }
 
   if (!EfiKeyFiFoRemoveOneKey (TerminalDevice, &KeyData->Key)) {
@@ -64,21 +46,6 @@ ReadKeyStrokeWorker (
   KeyData->KeyState.KeyShiftState  = 0;
   KeyData->KeyState.KeyToggleState = 0;
 
-  //
-  // Invoke notification functions if exist
-  //
-  NotifyList = &TerminalDevice->NotifyList;
-  for (Link = GetFirstNode (NotifyList); !IsNull (NotifyList,Link); Link = GetNextNode (NotifyList,Link)) {
-    CurrentNotify = CR (
-                      Link,
-                      TERMINAL_CONSOLE_IN_EX_NOTIFY,
-                      NotifyEntry,
-                      TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE
-                      );
-    if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
-      CurrentNotify->KeyNotificationFn (KeyData);
-    }
-  }
 
   return EFI_SUCCESS;
 
@@ -226,12 +193,7 @@ TerminalConInWaitForKeyEx (
   IN  VOID            *Context
   )
 {
-  TERMINAL_DEV            *TerminalDevice;
-
-  TerminalDevice  = TERMINAL_CON_IN_EX_DEV_FROM_THIS (Context);
-
-  TerminalConInWaitForKey (Event, &TerminalDevice->SimpleInput);
-
+  TerminalConInWaitForKey (Event, Context);
 }
 
 //
@@ -532,43 +494,37 @@ TerminalConInWaitForKey (
   // Someone is waiting on the keystroke event, if there's
   // a key pending, signal the event
   //
-  // Context is the pointer to EFI_SIMPLE_TEXT_INPUT_PROTOCOL
-  //
-  if (!EFI_ERROR (TerminalConInCheckForKey (Context))) {
+  if (!IsEfiKeyFiFoEmpty ((TERMINAL_DEV *) Context)) {
 
     gBS->SignalEvent (Event);
   }
 }
 
-
 /**
-  Check for a pending key in the Efi Key FIFO or Serial device buffer.
+  Timer handler to poll the key from serial.
 
-  @param  This                     Indicates the calling context.
-
-  @retval EFI_SUCCESS              There is key pending.
-  @retval EFI_NOT_READY            There is no key pending.
-  @retval EFI_DEVICE_ERROR         If Serial IO is not attached to serial device.
-
+  @param  Event                    Indicates the event that invoke this function.
+  @param  Context                  Indicates the calling context.
 **/
-EFI_STATUS
-TerminalConInCheckForKey (
-  IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This
+VOID
+EFIAPI
+TerminalConInTimerHandler (
+  IN EFI_EVENT            Event,
+  IN VOID                 *Context
   )
 {
   EFI_STATUS              Status;
   TERMINAL_DEV            *TerminalDevice;
-  UINT32                  Control;
   UINT8                   Input;
   EFI_SERIAL_IO_MODE      *Mode;
   EFI_SERIAL_IO_PROTOCOL  *SerialIo;
   UINTN                   SerialInTimeOut;
 
-  TerminalDevice  = TERMINAL_CON_IN_DEV_FROM_THIS (This);
+  TerminalDevice  = (TERMINAL_DEV *) Context;
 
   SerialIo        = TerminalDevice->SerialIo;
   if (SerialIo == NULL) {
-    return EFI_DEVICE_ERROR;
+    return ;
   }
   //
   //  if current timeout value for serial device is not identical with
@@ -602,28 +558,7 @@ TerminalConInCheckForKey (
       TerminalDevice->SerialInTimeOut = SerialInTimeOut;
     }
   }
-  //
-  //  Check whether serial buffer is empty.
-  //
-  Status = SerialIo->GetControl (SerialIo, &Control);
 
-  if ((Control & EFI_SERIAL_INPUT_BUFFER_EMPTY) != 0) {
-    //
-    // Translate all the raw data in RawFIFO into EFI Key,
-    // according to different terminal type supported.
-    //
-    TranslateRawDataToEfiKey (TerminalDevice);
-
-    //
-    //  if there is pre-fetched Efi Key in EfiKeyFIFO buffer,
-    //  return directly.
-    //
-    if (!IsEfiKeyFiFoEmpty (TerminalDevice)) {
-      return EFI_SUCCESS;
-    } else {
-      return EFI_NOT_READY;
-    }
-  }
   //
   // Fetch all the keys in the serial buffer,
   // and insert the byte stream into RawFIFO.
@@ -651,12 +586,6 @@ TerminalConInCheckForKey (
   // according to different terminal type supported.
   //
   TranslateRawDataToEfiKey (TerminalDevice);
-
-  if (IsEfiKeyFiFoEmpty (TerminalDevice)) {
-    return EFI_NOT_READY;
-  }
-
-  return EFI_SUCCESS;
 }
 
 /**
@@ -837,15 +766,37 @@ IsRawFiFoFull (
 **/
 BOOLEAN
 EfiKeyFiFoInsertOneKey (
-  TERMINAL_DEV      *TerminalDevice,
-  EFI_INPUT_KEY     Key
+  TERMINAL_DEV                    *TerminalDevice,
+  EFI_INPUT_KEY                   *Key
   )
 {
-  UINT8 Tail;
+  UINT8                           Tail;
+  LIST_ENTRY                      *Link;
+  LIST_ENTRY                      *NotifyList;
+  TERMINAL_CONSOLE_IN_EX_NOTIFY   *CurrentNotify;
+  EFI_KEY_DATA                    KeyData;
 
   Tail = TerminalDevice->EfiKeyFiFo->Tail;
-  ASSERT (Tail < FIFO_MAX_NUMBER + 1);
 
+  CopyMem (&KeyData.Key, Key, sizeof (EFI_INPUT_KEY));
+  KeyData.KeyState.KeyShiftState  = 0;
+  KeyData.KeyState.KeyToggleState = 0;
+
+  //
+  // Invoke notification functions if exist
+  //
+  NotifyList = &TerminalDevice->NotifyList;
+  for (Link = GetFirstNode (NotifyList); !IsNull (NotifyList,Link); Link = GetNextNode (NotifyList,Link)) {
+    CurrentNotify = CR (
+                      Link,
+                      TERMINAL_CONSOLE_IN_EX_NOTIFY,
+                      NotifyEntry,
+                      TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE
+                      );
+    if (IsKeyRegistered (&CurrentNotify->KeyData, &KeyData)) {
+      CurrentNotify->KeyNotificationFn (&KeyData);
+    }
+  }
   if (IsEfiKeyFiFoFull (TerminalDevice)) {
     //
     // Efi Key FIFO is full
@@ -853,9 +804,9 @@ EfiKeyFiFoInsertOneKey (
     return FALSE;
   }
 
-  TerminalDevice->EfiKeyFiFo->Data[Tail] = Key;
+  CopyMem (&TerminalDevice->EfiKeyFiFo->Data[Tail], Key, sizeof (EFI_INPUT_KEY));
 
-  TerminalDevice->EfiKeyFiFo->Tail       = (UINT8) ((Tail + 1) % (FIFO_MAX_NUMBER + 1));
+  TerminalDevice->EfiKeyFiFo->Tail = (UINT8) ((Tail + 1) % (FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -1113,31 +1064,31 @@ UnicodeToEfiKeyFlushState (
   if ((InputState & INPUT_STATE_ESC) != 0) {
     Key.ScanCode    = SCAN_ESC;
     Key.UnicodeChar = 0;
-    EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
+    EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
   }
 
   if ((InputState & INPUT_STATE_CSI) != 0) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = CSI;
-    EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
+    EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
   }
 
   if ((InputState & INPUT_STATE_LEFTOPENBRACKET) != 0) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = LEFTOPENBRACKET;
-    EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
+    EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
   }
 
   if ((InputState & INPUT_STATE_O) != 0) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = 'O';
-    EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
+    EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
   }
 
   if ((InputState & INPUT_STATE_2) != 0) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = '2';
-    EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
+    EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
   }
 
   //
@@ -1368,7 +1319,7 @@ UnicodeToEfiKey (
 
       if (Key.ScanCode != SCAN_NULL) {
         Key.UnicodeChar = 0;
-        EfiKeyFiFoInsertOneKey (TerminalDevice,Key);
+        EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
         TerminalDevice->InputState = INPUT_STATE_DEFAULT;
         UnicodeToEfiKeyFlushState (TerminalDevice);
         continue;
@@ -1423,7 +1374,7 @@ UnicodeToEfiKey (
 
       if (Key.ScanCode != SCAN_NULL) {
         Key.UnicodeChar = 0;
-        EfiKeyFiFoInsertOneKey (TerminalDevice,Key);
+        EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
         TerminalDevice->InputState = INPUT_STATE_DEFAULT;
         UnicodeToEfiKeyFlushState (TerminalDevice);
         continue;
@@ -1561,7 +1512,7 @@ UnicodeToEfiKey (
 
       if (Key.ScanCode != SCAN_NULL) {
         Key.UnicodeChar = 0;
-        EfiKeyFiFoInsertOneKey (TerminalDevice,Key);
+        EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
         TerminalDevice->InputState = INPUT_STATE_DEFAULT;
         UnicodeToEfiKeyFlushState (TerminalDevice);
         continue;
@@ -1613,6 +1564,6 @@ UnicodeToEfiKey (
       Key.UnicodeChar = UnicodeChar;
     }
 
-    EfiKeyFiFoInsertOneKey (TerminalDevice,Key);
+    EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
   }
 }

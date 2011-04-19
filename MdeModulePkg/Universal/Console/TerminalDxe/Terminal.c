@@ -2,7 +2,7 @@
   Produces Simple Text Input Protocol, Simple Text Input Extended Protocol and
   Simple Text Output Protocol upon Serial IO Protocol.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -75,6 +75,7 @@ TERMINAL_DEV  mTerminalDevTemplate = {
   NULL, // EfiKeyFiFo
 
   NULL, // ControllerNameTable
+  NULL, // TimerEvent
   NULL, // TwoSecondTimeOut
   INPUT_STATE_DEFAULT,
   RESET_STATE_DEFAULT,
@@ -648,7 +649,7 @@ TerminalDriverBindingStart (
                     EVT_NOTIFY_WAIT,
                     TPL_NOTIFY,
                     TerminalConInWaitForKeyEx,
-                    &TerminalDevice->SimpleInputEx,
+                    TerminalDevice,
                     &TerminalDevice->SimpleInputEx.WaitForKeyEx
                     );
     if (EFI_ERROR (Status)) {
@@ -659,7 +660,7 @@ TerminalDriverBindingStart (
                     EVT_NOTIFY_WAIT,
                     TPL_NOTIFY,
                     TerminalConInWaitForKey,
-                    &TerminalDevice->SimpleInput,
+                    TerminalDevice,
                     &TerminalDevice->SimpleInput.WaitForKey
                     );
     if (EFI_ERROR (Status)) {
@@ -843,12 +844,29 @@ TerminalDriverBindingStart (
     }
 
     Status = gBS->CreateEvent (
+                    EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                    TPL_NOTIFY,
+                    TerminalConInTimerHandler,
+                    TerminalDevice,
+                    &TerminalDevice->TimerEvent
+                    );
+    ASSERT_EFI_ERROR (Status);
+
+    Status = gBS->SetTimer (
+                    TerminalDevice->TimerEvent,
+                    TimerPeriodic,
+                    KEYBOARD_TIMER_INTERVAL
+                    );
+    ASSERT_EFI_ERROR (Status);
+
+    Status = gBS->CreateEvent (
                     EVT_TIMER,
                     TPL_CALLBACK,
                     NULL,
                     NULL,
                     &TerminalDevice->TwoSecondTimeOut
                     );
+    ASSERT_EFI_ERROR (Status);
 
     Status = gBS->InstallProtocolInterface (
                     &TerminalDevice->Handle,
@@ -1052,6 +1070,10 @@ Error:
         gBS->CloseEvent (TerminalDevice->TwoSecondTimeOut);
       }
 
+      if (TerminalDevice->TimerEvent != NULL) {
+        gBS->CloseEvent (TerminalDevice->TimerEvent);
+      }
+
       if (TerminalDevice->SimpleInput.WaitForKey != NULL) {
         gBS->CloseEvent (TerminalDevice->SimpleInput.WaitForKey);
       }
@@ -1245,6 +1267,7 @@ TerminalDriverBindingStop (
           FreeUnicodeStringTable (TerminalDevice->ControllerNameTable);
         }
 
+        gBS->CloseEvent (TerminalDevice->TimerEvent);
         gBS->CloseEvent (TerminalDevice->TwoSecondTimeOut);
         gBS->CloseEvent (TerminalDevice->SimpleInput.WaitForKey);
         gBS->CloseEvent (TerminalDevice->SimpleInputEx.WaitForKeyEx);
