@@ -58,7 +58,7 @@ Abstract:
 #define SetDevicePathEndNode(a)  {                       \
           (a)->Type = END_DEVICE_PATH_TYPE;              \
           (a)->SubType = END_ENTIRE_DEVICE_PATH_SUBTYPE; \
-          (a)->Length[0] = sizeof(EFI_DEVICE_PATH_PROTOCOL);      \
+          (a)->Length[0] = (UINT8) sizeof (EFI_DEVICE_PATH_PROTOCOL);      \
           (a)->Length[1] = 0;                            \
           }
 

@@ -319,7 +319,7 @@ InternalReportStatusCodeEx (
   //
   // Fill in the extended data header
   //
-  mStatusCodeData->HeaderSize = sizeof (EFI_STATUS_CODE_DATA);
+  mStatusCodeData->HeaderSize = (UINT16) sizeof (EFI_STATUS_CODE_DATA);
   mStatusCodeData->Size = (UINT16)ExtendedDataSize;
   if (ExtendedDataGuid == NULL) {
     ExtendedDataGuid = &gEfiStatusCodeSpecificDataGuid;

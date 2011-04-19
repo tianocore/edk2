@@ -353,7 +353,7 @@ InterlockedCompareExchangePointer (
 {
   UINT8  SizeOfValue;
 
-  SizeOfValue = sizeof (*Value);
+  SizeOfValue = (UINT8) sizeof (*Value);
 
   switch (SizeOfValue) {
     case sizeof (UINT32):

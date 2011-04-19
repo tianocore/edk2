@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -489,6 +489,7 @@ Returns:
   EFI_HII_HANDLE  *HiiHandleBuffer;
   EFI_GUID        Guid;
 
+  HiiHandleBuffer = NULL;
   Status = GetHiiHandles (&HandleBufferLen, &HiiHandleBuffer);
   if (EFI_ERROR(Status)) {
     return Status;
@@ -551,6 +552,9 @@ IfrLibNewString (
   LocateHiiProtocols ();
 
   Languages = GetSupportedLanguages (PackageList);
+  if (Languages == NULL) {
+    return EFI_NOT_FOUND;
+  }
 
   LangStrings = Languages;
   while (*LangStrings != 0) {
@@ -677,6 +681,9 @@ IfrLibSetString (
   LocateHiiProtocols ();
 
   Languages = GetSupportedLanguages (PackageList);
+  if (Languages == NULL) {
+    return EFI_NOT_FOUND;
+  }
 
   LangStrings = Languages;
   while (*LangStrings != 0) {

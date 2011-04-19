@@ -45,5 +45,5 @@ GetPowerOfTwo64 (
     return 0;
   }
 
-  return LShiftU64 (1, HighBitSet64 (Operand));
+  return LShiftU64 (1, (UINTN) HighBitSet64 (Operand));
 }

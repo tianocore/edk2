@@ -49,7 +49,7 @@ Returns:
 
 --*/
 {
-  Data->HeaderSize = sizeof (EFI_STATUS_CODE_DATA);
+  Data->HeaderSize = (UINT16) sizeof (EFI_STATUS_CODE_DATA);
   Data->Size = (UINT16)(DataSize - sizeof (EFI_STATUS_CODE_DATA));
   EfiCommonLibCopyMem (&Data->Type, TypeGuid, sizeof (EFI_GUID));
   
