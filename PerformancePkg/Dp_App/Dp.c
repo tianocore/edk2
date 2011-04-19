@@ -196,7 +196,7 @@ InitializeDp (
     else {
       // Boolean Options
       VerboseMode = (ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_LV));
-      SummaryMode = (ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_US) ||
+      SummaryMode = (BOOLEAN) (ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_US) ||
                      ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_LS));
       AllMode     = (ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_UA));
       RawMode     = (ShellCommandLineGetFlag (ParamPackage, STR_DP_OPTION_UR));
@@ -262,7 +262,7 @@ InitializeDp (
           (! RawMode)
          ) {
         StringPtr = HiiGetString (gHiiHandle,
-                      TimerInfo.CountUp ? STRING_TOKEN (STR_DP_UP) : STRING_TOKEN (STR_DP_DOWN),
+                      (EFI_STRING_ID) (TimerInfo.CountUp ? STRING_TOKEN (STR_DP_UP) : STRING_TOKEN (STR_DP_DOWN)),
                       NULL);
         ASSERT (StringPtr != NULL);
         PrintToken (STRING_TOKEN (STR_DP_TIMER_PROPERTIES),   // Print Timer count range and direction

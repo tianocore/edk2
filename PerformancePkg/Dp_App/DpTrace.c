@@ -50,7 +50,7 @@ GatherStatistics(
   MEASUREMENT_RECORD        Measurement;
   UINT64                    Duration;
   UINTN                     LogEntryKey;
-  UINTN                     TIndex;
+  INTN                      TIndex;
 
   LogEntryKey = 0;
   while ((LogEntryKey = GetPerformanceMeasurement (
@@ -143,11 +143,14 @@ DumpAllTrace(
   // Get Handle information
   //
   Size = 0;
-  HandleBuffer = NULL;
+  HandleBuffer = &TempHandle;
   Status  = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, &TempHandle);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HandleBuffer = AllocatePool (Size);
     ASSERT (HandleBuffer != NULL);
+    if (HandleBuffer == NULL) {
+      return;
+    }
     Status  = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, HandleBuffer);
   }
   if (EFI_ERROR (Status)) {
@@ -222,7 +225,9 @@ DumpAllTrace(
       );
     }
   }
-  FreePool (HandleBuffer);
+  if (HandleBuffer != &TempHandle) {
+    FreePool (HandleBuffer);
+  }
 }
 
 /** Gather and print Raw Trace Records.
@@ -457,11 +462,14 @@ ProcessHandles(
               (StringPtr == NULL) ? ALit_UNKNOWN: StringPtr);
 
   Size = 0;
-  HandleBuffer = NULL;
+  HandleBuffer = &TempHandle;
   Status  = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, &TempHandle);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HandleBuffer = AllocatePool (Size);
     ASSERT (HandleBuffer != NULL);
+    if (HandleBuffer == NULL) {
+      return Status;
+    }
     Status  = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, HandleBuffer);
   }
   if (EFI_ERROR (Status)) {
@@ -520,7 +528,9 @@ ProcessHandles(
       }
     }
   }
-  FreePool (HandleBuffer);
+  if (HandleBuffer != &TempHandle) {
+    FreePool (HandleBuffer);
+  }
   return Status;
 }
 
@@ -654,7 +664,10 @@ ProcessCumulative(
   VOID
 )
 {
-  UINT64                    avgval;         // the computed average duration
+  UINT64                    AvgDur;         // the computed average duration
+  UINT64                    Dur;
+  UINT64                    MinDur;
+  UINT64                    MaxDur;
   EFI_STRING                StringPtr;
   UINTN                     TIndex;
 
@@ -668,14 +681,19 @@ ProcessCumulative(
   PrintToken (STRING_TOKEN (STR_DP_DASHES));
 
   for ( TIndex = 0; TIndex < NumCum; ++TIndex) {
-    avgval = DivU64x32 (CumData[TIndex].Duration, CumData[TIndex].Count);
+    AvgDur = DivU64x32 (CumData[TIndex].Duration, CumData[TIndex].Count);
+    AvgDur = DurationInMicroSeconds(AvgDur);
+    Dur    = DurationInMicroSeconds(CumData[TIndex].Duration);
+    MaxDur = DurationInMicroSeconds(CumData[TIndex].MaxDur);
+    MinDur = DurationInMicroSeconds(CumData[TIndex].MinDur);
+    
     PrintToken (STRING_TOKEN (STR_DP_CUMULATIVE_STATS),
                 CumData[TIndex].Name,
                 CumData[TIndex].Count,
-                DurationInMicroSeconds(CumData[TIndex].Duration),
-                DurationInMicroSeconds(avgval),
-                DurationInMicroSeconds(CumData[TIndex].MinDur),
-                DurationInMicroSeconds(CumData[TIndex].MaxDur)
+                Dur,
+                AvgDur,
+                MinDur,
+                MaxDur
                );
   }
 }
