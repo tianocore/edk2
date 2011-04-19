@@ -1,7 +1,7 @@
 /** @file
   Entry point to a EFI/DXE driver.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -25,11 +25,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  Unload function that is registered in the LoadImage protocol.  It un-installs
-  protocols produced and deallocates pool used by the driver.  Called by the core
-  when unloading the driver.
+  Unloads an image from memory.
 
-  @param  ImageHandle ImageHandle of the loaded driver.
+  This function is a callback that a driver registers to do cleanup 
+  when the UnloadImage boot service function is called.
+
+  @param  ImageHandle The handle to the image to unload.
 
   @return Status returned by all unload().
 
