@@ -1162,6 +1162,8 @@ Var_UpdateBBSOption (
       break;
     }
   }
+  ASSERT (LegacyDeviceContext != NULL);
+
   //
   // Update the Variable "LegacyDevOrder"
   //

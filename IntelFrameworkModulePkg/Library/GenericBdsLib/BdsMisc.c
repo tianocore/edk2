@@ -499,7 +499,7 @@ BdsLibVariableToOption (
   // Unicode stream to ASCII without any loss in meaning.
   //
   if (*VariableName == 'B') {
-    NumOff = sizeof (L"Boot")/sizeof(CHAR16) -1 ;
+    NumOff = (UINT8) (sizeof (L"Boot") / sizeof(CHAR16) - 1);
     Option->BootCurrent = (UINT16) ((VariableName[NumOff]  -'0') * 0x1000);
     Option->BootCurrent = (UINT16) (Option->BootCurrent + ((VariableName[NumOff+1]-'0') * 0x100));
     Option->BootCurrent = (UINT16) (Option->BootCurrent +  ((VariableName[NumOff+2]-'0') * 0x10));
