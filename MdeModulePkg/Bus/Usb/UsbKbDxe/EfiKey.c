@@ -2,7 +2,7 @@
   USB Keyboard Driver that manages USB keyboard and produces Simple Text Input
   Protocol and Simple Text Input Ex Protocol.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -263,6 +263,20 @@ USBKeyboardDriverBindingStart (
   InitializeListHead (&UsbKeyboardDevice->NotifyList);
   
   Status = gBS->CreateEvent (
+                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  USBKeyboardTimerHandler,
+                  UsbKeyboardDevice,
+                  &UsbKeyboardDevice->TimerEvent
+                  );
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->SetTimer (UsbKeyboardDevice->TimerEvent, TimerPeriodic, KEYBOARD_TIMER_INTERVAL);
+  }
+  if (EFI_ERROR (Status)) {
+    goto ErrorExit;
+  }
+
+  Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
                   USBKeyboardWaitForKey,
@@ -391,6 +405,9 @@ USBKeyboardDriverBindingStart (
 //
 ErrorExit:
   if (UsbKeyboardDevice != NULL) {
+    if (UsbKeyboardDevice->TimerEvent != NULL) {
+      gBS->CloseEvent (UsbKeyboardDevice->TimerEvent);
+    }
     if (UsbKeyboardDevice->SimpleInput.WaitForKey != NULL) {
       gBS->CloseEvent (UsbKeyboardDevice->SimpleInput.WaitForKey);
     }
@@ -513,11 +530,12 @@ USBKeyboardDriverBindingStop (
   //
   // Free all resources.
   //
+  gBS->CloseEvent (UsbKeyboardDevice->TimerEvent);
   gBS->CloseEvent (UsbKeyboardDevice->RepeatTimer);
   gBS->CloseEvent (UsbKeyboardDevice->DelayedRecoveryEvent);
-  gBS->CloseEvent ((UsbKeyboardDevice->SimpleInput).WaitForKey);
-  gBS->CloseEvent (UsbKeyboardDevice->SimpleInputEx.WaitForKeyEx);  
-  KbdFreeNotifyList (&UsbKeyboardDevice->NotifyList);    
+  gBS->CloseEvent (UsbKeyboardDevice->SimpleInput.WaitForKey);
+  gBS->CloseEvent (UsbKeyboardDevice->SimpleInputEx.WaitForKeyEx);
+  KbdFreeNotifyList (&UsbKeyboardDevice->NotifyList);
 
   ReleaseKeyboardLayoutResources (UsbKeyboardDevice);
   gBS->CloseEvent (UsbKeyboardDevice->KeyboardLayoutEvent);
@@ -526,6 +544,9 @@ USBKeyboardDriverBindingStop (
     FreeUnicodeStringTable (UsbKeyboardDevice->ControllerNameTable);
   }
 
+  DestroyQueue (&UsbKeyboardDevice->UsbKeyQueue);
+  DestroyQueue (&UsbKeyboardDevice->EfiKeyQueue);
+  
   FreePool (UsbKeyboardDevice);
 
   return Status;
@@ -547,89 +568,20 @@ USBKeyboardDriverBindingStop (
 
 **/
 EFI_STATUS
-EFIAPI
 USBKeyboardReadKeyStrokeWorker (
   IN OUT USB_KB_DEV                 *UsbKeyboardDevice,
      OUT EFI_KEY_DATA               *KeyData
   )
 {
-  EFI_STATUS                        Status;
-  UINT8                             KeyCode;  
-  LIST_ENTRY                        *Link;
-  LIST_ENTRY                        *NotifyList;
-  KEYBOARD_CONSOLE_IN_EX_NOTIFY     *CurrentNotify;  
-  EFI_KEY_DATA                      OriginalKeyData;
-
   if (KeyData == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // If there is no saved USB keycode, fetch it
-  // by calling USBKeyboardCheckForKey().
-  //
-  if (UsbKeyboardDevice->CurKeyCode == 0) {
-    Status = USBKeyboardCheckForKey (UsbKeyboardDevice);
-    if (EFI_ERROR (Status)) {
-      return EFI_NOT_READY;
-    }
+  if (IsQueueEmpty (&UsbKeyboardDevice->EfiKeyQueue)) {
+    return EFI_NOT_READY;
   }
 
-  KeyData->Key.UnicodeChar = 0;
-  KeyData->Key.ScanCode    = SCAN_NULL;
-
-  //
-  // Store the current keycode and clear it.
-  //
-  KeyCode = UsbKeyboardDevice->CurKeyCode;
-  UsbKeyboardDevice->CurKeyCode = 0;
-
-  //
-  // Translate saved USB keycode into EFI_INPUT_KEY
-  //
-  Status = UsbKeyCodeToEfiInputKey (UsbKeyboardDevice, KeyCode, &KeyData->Key);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Get current state of various toggled attributes as well as input modifier values,
-  // and set them as valid.
-  //
-  CopyMem (&KeyData->KeyState, &UsbKeyboardDevice->KeyState, sizeof (KeyData->KeyState));
-  
-  UsbKeyboardDevice->KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
-  UsbKeyboardDevice->KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
-
-  //
-  // Switch the control value to their original characters.
-  // In UsbKeyCodeToEfiInputKey() the  CTRL-Alpha characters have been switched to 
-  // their corresponding control value (ctrl-a = 0x0001 through ctrl-Z = 0x001A),
-  // here switch them back for notification function.
-  //
-  CopyMem (&OriginalKeyData, KeyData, sizeof (EFI_KEY_DATA));
-  if (UsbKeyboardDevice->CtrlOn) {
-    if (OriginalKeyData.Key.UnicodeChar >= 0x01 && OriginalKeyData.Key.UnicodeChar <= 0x1A) {
-      if (UsbKeyboardDevice->CapsOn) {
-        OriginalKeyData.Key.UnicodeChar = (CHAR16)(OriginalKeyData.Key.UnicodeChar + 'A' - 1);
-      } else {
-        OriginalKeyData.Key.UnicodeChar = (CHAR16)(OriginalKeyData.Key.UnicodeChar + 'a' - 1);
-      } 
-    }
-  }
-  
-  //
-  // Invoke notification functions if the key is registered.
-  //
-  NotifyList = &UsbKeyboardDevice->NotifyList;
-  for (Link = GetFirstNode (NotifyList);
-       !IsNull (NotifyList, Link);
-       Link = GetNextNode (NotifyList, Link)) {
-    CurrentNotify = CR (Link, KEYBOARD_CONSOLE_IN_EX_NOTIFY, NotifyEntry, USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE);
-    if (IsKeyRegistered (&CurrentNotify->KeyData, &OriginalKeyData)) { 
-      CurrentNotify->KeyNotificationFn (&OriginalKeyData);
-    }
-  }
+  Dequeue (&UsbKeyboardDevice->EfiKeyQueue, KeyData, sizeof (*KeyData));
 
   return EFI_SUCCESS;
 }
@@ -680,8 +632,8 @@ USBKeyboardReset (
     //
     // Clear the key buffer of this USB keyboard
     //
-    InitUSBKeyBuffer (&(UsbKeyboardDevice->KeyboardBuffer));
-    UsbKeyboardDevice->CurKeyCode = 0;
+    InitQueue (&UsbKeyboardDevice->UsbKeyQueue, sizeof (USB_KEY));
+    InitQueue (&UsbKeyboardDevice->EfiKeyQueue, sizeof (EFI_KEY_DATA));
 
     return EFI_SUCCESS;
   }
@@ -690,7 +642,6 @@ USBKeyboardReset (
   // Exhaustive reset
   //
   Status = InitUSBKeyboard (UsbKeyboardDevice);
-  UsbKeyboardDevice->CurKeyCode = 0;
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
@@ -755,50 +706,55 @@ USBKeyboardWaitForKey (
 
   UsbKeyboardDevice = (USB_KB_DEV *) Context;
 
-  if (UsbKeyboardDevice->CurKeyCode == 0) {
-    if (EFI_ERROR (USBKeyboardCheckForKey (UsbKeyboardDevice))) {
-      //
-      // If no pending key, simply return.
-      //
-      return ;
-    }
+  if (!IsQueueEmpty (&UsbKeyboardDevice->EfiKeyQueue)) {
+    //
+    // If there is pending key, signal the event.
+    //
+    gBS->SignalEvent (Event);
   }
-  //
-  // If there is pending key, signal the event.
-  //
-  gBS->SignalEvent (Event);
 }
 
-
 /**
-  Check whether there is key pending in the keyboard buffer.
+  Timer handler to convert the key from USB.
 
-  @param  UsbKeyboardDevice    The USB_KB_DEV instance.
-
-  @retval EFI_SUCCESS          There is pending key to read.
-  @retval EFI_NOT_READY        No pending key to read.
-
+  @param  Event                    Indicates the event that invoke this function.
+  @param  Context                  Indicates the calling context.
 **/
-EFI_STATUS
+VOID
 EFIAPI
-USBKeyboardCheckForKey (
-  IN OUT  USB_KB_DEV    *UsbKeyboardDevice
+USBKeyboardTimerHandler (
+  IN  EFI_EVENT                 Event,
+  IN  VOID                      *Context
   )
 {
-  EFI_STATUS  Status;
-  UINT8       KeyCode;
+  EFI_STATUS                    Status;
+  USB_KB_DEV                    *UsbKeyboardDevice;
+  UINT8                         KeyCode;
+  EFI_KEY_DATA                  KeyData;
 
+  UsbKeyboardDevice = (USB_KB_DEV *) Context;
+  
   //
   // Fetch raw data from the USB keyboard buffer,
   // and translate it into USB keycode.
   //
   Status = USBParseKey (UsbKeyboardDevice, &KeyCode);
   if (EFI_ERROR (Status)) {
-    return EFI_NOT_READY;
+    return ;
   }
 
-  UsbKeyboardDevice->CurKeyCode = KeyCode;
-  return EFI_SUCCESS;
+  //
+  // Translate saved USB keycode into EFI_INPUT_KEY
+  //
+  Status = UsbKeyCodeToEfiInputKey (UsbKeyboardDevice, KeyCode, &KeyData);
+  if (EFI_ERROR (Status)) {
+    return ;
+  }
+
+  //
+  // Insert to the EFI Key queue
+  //
+  Enqueue (&UsbKeyboardDevice->EfiKeyQueue, &KeyData, sizeof (KeyData));
 }
 
 /**
@@ -811,7 +767,6 @@ USBKeyboardCheckForKey (
 
 **/
 EFI_STATUS
-EFIAPI
 KbdFreeNotifyList (
   IN OUT LIST_ENTRY           *NotifyList
   )
@@ -843,7 +798,6 @@ KbdFreeNotifyList (
 
 **/
 BOOLEAN
-EFIAPI
 IsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,
   IN EFI_KEY_DATA  *InputData
@@ -905,8 +859,6 @@ USBKeyboardResetEx (
 {
   EFI_STATUS                Status;
   USB_KB_DEV                *UsbKeyboardDevice;
-  EFI_TPL                   OldTpl;
-  
 
   UsbKeyboardDevice = TEXT_INPUT_EX_USB_KB_DEV_FROM_THIS (This);
 
@@ -914,11 +866,6 @@ USBKeyboardResetEx (
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
-
-  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-  UsbKeyboardDevice->KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
-  UsbKeyboardDevice->KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
-  gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
 
@@ -986,8 +933,7 @@ USBKeyboardSetState (
 
   UsbKeyboardDevice = TEXT_INPUT_EX_USB_KB_DEV_FROM_THIS (This);
 
-  if (((UsbKeyboardDevice->KeyState.KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID) ||
-      ((*KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID)) {
+  if ((*KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1010,8 +956,6 @@ USBKeyboardSetState (
   }
 
   SetKeyLED (UsbKeyboardDevice);
-
-  UsbKeyboardDevice->KeyState.KeyToggleState = *KeyToggleState;
 
   return EFI_SUCCESS;
   

@@ -1,7 +1,7 @@
 /** @file
   Header file for USB Keyboard Driver's Data Structures.
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -39,6 +39,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <IndustryStandard/Usb.h>
 
+#define KEYBOARD_TIMER_INTERVAL         200000  // 0.02s
+
 #define MAX_KEY_ALLOWED     32
 
 #define HZ                  1000 * 1000 * 10
@@ -58,10 +60,11 @@ typedef struct {
 } USB_KEY;
 
 typedef struct {
-  USB_KEY Buffer[MAX_KEY_ALLOWED + 1];
-  UINT8   BufferHead;
-  UINT8   BufferTail;
-} USB_KB_BUFFER;
+  VOID          *Buffer[MAX_KEY_ALLOWED + 1];
+  UINTN         Head;
+  UINTN         Tail;
+  UINTN         ItemSize;
+} USB_SIMPLE_QUEUE;
 
 #define USB_KB_DEV_SIGNATURE  SIGNATURE_32 ('u', 'k', 'b', 'd')
 #define USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE SIGNATURE_32 ('u', 'k', 'b', 'x')
@@ -109,7 +112,8 @@ typedef struct {
   EFI_USB_INTERFACE_DESCRIPTOR      InterfaceDescriptor;
   EFI_USB_ENDPOINT_DESCRIPTOR       IntEndpointDescriptor;
 
-  USB_KB_BUFFER                     KeyboardBuffer;
+  USB_SIMPLE_QUEUE                  UsbKeyQueue;
+  USB_SIMPLE_QUEUE                  EfiKeyQueue;
   BOOLEAN                           CtrlOn;
   BOOLEAN                           AltOn;
   BOOLEAN                           ShiftOn;
@@ -118,6 +122,8 @@ typedef struct {
   BOOLEAN                           ScrollOn;
   UINT8                             LastKeyCodeArray[8];
   UINT8                             CurKeyCode;
+
+  EFI_EVENT                         TimerEvent;
 
   UINT8                             RepeatKey;
   EFI_EVENT                         RepeatTimer;
@@ -135,8 +141,6 @@ typedef struct {
   BOOLEAN                           MenuKeyOn;
   BOOLEAN                           SysReqOn;
   BOOLEAN                           AltGrOn;
-
-  EFI_KEY_STATE                     KeyState;
   //
   // Notification function list
   //
@@ -555,24 +559,8 @@ USBKeyboardWaitForKey (
 
 **/
 EFI_STATUS
-EFIAPI
 KbdFreeNotifyList (
   IN OUT LIST_ENTRY           *NotifyList
-  );
-
-/**
-  Check whether there is key pending in the keyboard buffer.
-
-  @param  UsbKeyboardDevice    The USB_KB_DEV instance.
-
-  @retval EFI_SUCCESS          There is pending key to read.
-  @retval EFI_NOT_READY        No pending key to read.
-
-**/
-EFI_STATUS
-EFIAPI
-USBKeyboardCheckForKey (
-  IN OUT  USB_KB_DEV    *UsbKeyboardDevice
   );
 
 /**
@@ -586,10 +574,22 @@ USBKeyboardCheckForKey (
 
 **/
 BOOLEAN
-EFIAPI
 IsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,
   IN EFI_KEY_DATA  *InputData
+  );
+
+/**
+  Timer handler to convert the key from USB.
+
+  @param  Event                    Indicates the event that invoke this function.
+  @param  Context                  Indicates the calling context.
+**/
+VOID
+EFIAPI
+USBKeyboardTimerHandler (
+  IN  EFI_EVENT                 Event,
+  IN  VOID                      *Context
   );
 
 #endif

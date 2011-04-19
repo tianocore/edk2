@@ -1,7 +1,7 @@
 /** @file
   Function prototype for USB Keyboard Driver.
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -70,7 +70,6 @@ typedef struct {
 
 **/
 BOOLEAN
-EFIAPI
 IsUSBKeyboard (
   IN  EFI_USB_IO_PROTOCOL       *UsbIo
   );
@@ -85,7 +84,6 @@ IsUSBKeyboard (
 
 **/
 EFI_STATUS
-EFIAPI
 InitUSBKeyboard (
   IN OUT USB_KB_DEV   *UsbKeyboardDevice
   );
@@ -106,7 +104,6 @@ InitUSBKeyboard (
 
 **/
 EFI_STATUS
-EFIAPI
 InitKeyboardLayout (
   OUT USB_KB_DEV   *UsbKeyboardDevice
   );
@@ -118,7 +115,6 @@ InitKeyboardLayout (
 
 **/
 VOID
-EFIAPI
 ReleaseKeyboardLayoutResources (
   IN OUT USB_KB_DEV              *UsbKeyboardDevice
   );
@@ -184,7 +180,6 @@ USBKeyboardRecoveryHandler (
 
 **/
 EFI_STATUS
-EFIAPI
 USBParseKey (
   IN OUT  USB_KB_DEV  *UsbKeyboardDevice,
   OUT     UINT8       *KeyCode
@@ -195,7 +190,7 @@ USBParseKey (
 
   @param  UsbKeyboardDevice     The USB_KB_DEV instance.
   @param  KeyCode               Indicates the key code that will be interpreted.
-  @param  Key                   A pointer to a buffer that is filled in with
+  @param  KeyData               A pointer to a buffer that is filled in with
                                 the keystroke information for the key that
                                 was pressed.
 
@@ -207,87 +202,98 @@ USBParseKey (
 
 **/
 EFI_STATUS
-EFIAPI
 UsbKeyCodeToEfiInputKey (
   IN  USB_KB_DEV      *UsbKeyboardDevice,
   IN  UINT8           KeyCode,
-  OUT EFI_INPUT_KEY   *Key
+  OUT EFI_KEY_DATA    *KeyData
   );
 
-/**
-  Resets USB keyboard buffer.
 
-  @param  KeyboardBuffer     Points to the USB keyboard buffer.
+/**
+  Create the queue.
+
+  @param  Queue     Points to the queue.
+  @param  ItemSize  Size of the single item.
 
 **/
 VOID
-EFIAPI
-InitUSBKeyBuffer (
-  OUT  USB_KB_BUFFER   *KeyboardBuffer
+InitQueue (
+  IN OUT  USB_SIMPLE_QUEUE   *Queue,
+  IN      UINTN              ItemSize
   );
 
 /**
-  Check whether USB keyboard buffer is empty.
+  Destroy the queue
 
-  @param  KeyboardBuffer     USB keyboard buffer
-
-  @retval TRUE               Keyboard buffer is empty.
-  @retval FALSE              Keyboard buffer is not empty.
-
-**/
-BOOLEAN
-EFIAPI
-IsUSBKeyboardBufferEmpty (
-  IN  USB_KB_BUFFER   *KeyboardBuffer
-  );
-
-/**
-  Check whether USB keyboard buffer is full.
-
-  @param  KeyboardBuffer     USB keyboard buffer
-
-  @retval TRUE               Keyboard buffer is full.
-  @retval FALSE              Keyboard buffer is not full.
-
-**/
-BOOLEAN
-EFIAPI
-IsUSBKeyboardBufferFull (
-  IN  USB_KB_BUFFER   *KeyboardBuffer
-  );
-
-/**
-  Inserts a keycode into keyboard buffer.
-
-  @param  KeyboardBuffer     Points to the USB keyboard buffer.
-  @param  Key                Keycode to insert.
-  @param  Down               TRUE means key is pressed.
-                             FALSE means key is released.
-
+  @param Queue    Points to the queue.
 **/
 VOID
-EFIAPI
-InsertKeyCode (
-  IN OUT  USB_KB_BUFFER *KeyboardBuffer,
-  IN      UINT8         Key,
-  IN      BOOLEAN       Down
+DestroyQueue (
+  IN OUT USB_SIMPLE_QUEUE   *Queue
   );
 
+
 /**
-  Remove a keycode from keyboard buffer and return it.
+  Check whether the queue is empty.
 
-  @param  KeyboardBuffer     Points to the USB keyboard buffer.
-  @param  UsbKey             Points to the buffer that contains keycode for output.
+  @param  Queue     Points to the queue.
 
-  @retval EFI_SUCCESS        Keycode successfully removed from keyboard buffer.
-  @retval EFI_DEVICE_ERROR   Keyboard buffer is empty.
+  @retval TRUE      Queue is empty.
+  @retval FALSE     Queue is not empty.
+
+**/
+BOOLEAN
+IsQueueEmpty (
+  IN  USB_SIMPLE_QUEUE   *Queue
+  );
+
+
+/**
+  Check whether the queue is full.
+
+  @param  Queue     Points to the queue.
+
+  @retval TRUE      Queue is full.
+  @retval FALSE     Queue is not full.
+
+**/
+BOOLEAN
+IsQueueFull (
+  IN  USB_SIMPLE_QUEUE   *Queue
+  );
+
+
+/**
+  Enqueue the item to the queue.
+
+  @param  Queue     Points to the queue.
+  @param  Item      Points to the item to be enqueued.
+  @param  ItemSize  Size of the item.
+**/
+VOID
+Enqueue (
+  IN OUT  USB_SIMPLE_QUEUE *Queue,
+  IN      VOID             *Item,
+  IN      UINTN            ItemSize
+  );
+
+
+/**
+  Dequeue a item from the queue.
+
+  @param  Queue     Points to the queue.
+  @param  Item      Receives the item.
+  @param  ItemSize  Size of the item.
+
+  @retval EFI_SUCCESS        Item was successfully dequeued.
+  @retval EFI_DEVICE_ERROR   The queue is empty.
 
 **/
 EFI_STATUS
-EFIAPI
-RemoveKeyCode (
-  IN OUT  USB_KB_BUFFER *KeyboardBuffer,
-     OUT  USB_KEY       *UsbKey
+Dequeue (
+  IN OUT  USB_SIMPLE_QUEUE *Queue,
+     OUT  VOID             *Item,
+  IN      UINTN            ItemSize
   );
 
 /**
@@ -317,7 +323,6 @@ USBKeyboardRepeatHandler (
 
 **/
 VOID
-EFIAPI
 SetKeyLED (
   IN  USB_KB_DEV    *UsbKeyboardDevice
   );
