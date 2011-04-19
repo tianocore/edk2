@@ -1,7 +1,7 @@
 /** @file
 Private MACRO, structure and function definitions for Setup Browser module.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -152,10 +152,7 @@ typedef struct {
 //
 #define EXPRESSION_STACK_SIZE_INCREMENT    0x100
 
-#define EFI_SPECIFICATION_MAJOR_VERSION    0x2
-#define EFI_SPECIFICATION_MINOR_VERSION    0x1
-#define EFI_SPECIFICATION_ERRATA_VERSION   0x0
-#define EFI_IFR_SPECIFICATION_VERSION  (UINT16)((EFI_SPECIFICATION_MAJOR_VERSION << 8) | (EFI_SPECIFICATION_MINOR_VERSION << 4) | EFI_SPECIFICATION_ERRATA_VERSION)
+#define EFI_IFR_SPECIFICATION_VERSION  (UINT16) (((EFI_SYSTEM_TABLE_REVISION >> 16) << 8) | (((EFI_SYSTEM_TABLE_REVISION & 0xFFFF) / 10) << 4) | ((EFI_SYSTEM_TABLE_REVISION & 0xFFFF) % 10))
 
 
 #define SETUP_DRIVER_SIGNATURE SIGNATURE_32 ('F', 'B', 'D', 'V')
