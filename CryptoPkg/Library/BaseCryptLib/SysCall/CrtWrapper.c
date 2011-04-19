@@ -15,6 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <OpenSslSupport.h>
 
+int errno = 0;
+
 typedef
 INTN
 (*SORT_COMPARE)(
@@ -297,4 +299,114 @@ int BIO_snprintf(char *buf, size_t n, const char *format, ...)
 void *UI_OpenSSL(void)
 {
   return NULL;
+}
+
+int X509_load_cert_file (VOID *ctx, const char *file, int type)
+{
+  return 0;
+}
+
+int X509_load_crl_file (VOID *ctx, const char *file, int type)
+{
+  return 0;
+}
+
+int chmod (const char *c, mode_t m)
+{
+  return -1;
+}
+
+int close (int f)
+{
+  return -1;
+}
+
+void closelog (void)
+{
+
+}
+
+void exit (int e)
+{
+
+}
+
+int fclose (FILE *f)
+{
+  return 0;
+}
+
+FILE *fopen (const char *c, const char *m)
+{
+  return NULL;
+}
+
+size_t fread (void *b, size_t c, size_t i, FILE *f)
+{
+  return 0;
+}
+
+int fprintf (FILE *f, const char *s, ...)
+{
+  return 0;
+}
+
+uid_t getuid (void)
+{
+  return 0;
+}
+
+uid_t geteuid (void)
+{
+  return 0;
+}
+
+gid_t getgid (void)
+{
+  return 0;
+}
+
+gid_t getegid (void)
+{
+  return 0;
+}
+
+off_t lseek (int a, off_t o, int d)
+{
+  return 0;
+}
+
+void openlog (const char *c, int a, int b)
+{
+
+}
+
+ssize_t read (int f, void *b, size_t c)
+{
+  return 0;
+}
+
+int stat (const char *c, struct stat *s)
+{
+  return -1;
+}
+
+int strcasecmp (const char *c, const char *s)
+{
+  return 0;
+}
+
+int strncasecmp (const char *c, const char *s, size_t l)
+{
+  return 0;
+}
+
+void syslog (int a, const char *c, ...)
+{
+
+}
+
+ssize_t write (int f, const void *b, size_t l)
+{
+  return 0;
 }
