@@ -1,7 +1,7 @@
 /** @file
   PS/2 keyboard driver header file
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -44,18 +44,30 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gPs2KeyboardComponentName2;
 //
 // Driver Private Data
 //
-#define KEYBOARD_BUFFER_MAX_COUNT         32
-#define KEYBOARD_CONSOLE_IN_DEV_SIGNATURE SIGNATURE_32 ('k', 'k', 'e', 'y')
+#define KEYBOARD_CONSOLE_IN_DEV_SIGNATURE       SIGNATURE_32 ('k', 'k', 'e', 'y')
 #define KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE SIGNATURE_32 ('k', 'c', 'e', 'n')
 
 typedef struct _KEYBOARD_CONSOLE_IN_EX_NOTIFY {
-  UINTN                                 Signature;
-  EFI_HANDLE                            NotifyHandle;
-  EFI_KEY_DATA                          KeyData;
-  EFI_KEY_NOTIFY_FUNCTION               KeyNotificationFn;
-  LIST_ENTRY                            NotifyEntry;
+  UINTN                               Signature;
+  EFI_HANDLE                          NotifyHandle;
+  EFI_KEY_DATA                        KeyData;
+  EFI_KEY_NOTIFY_FUNCTION             KeyNotificationFn;
+  LIST_ENTRY                          NotifyEntry;
 } KEYBOARD_CONSOLE_IN_EX_NOTIFY;
 
+#define KEYBOARD_SCAN_CODE_MAX_COUNT  32
+typedef struct {
+  UINT8                               Buffer[KEYBOARD_SCAN_CODE_MAX_COUNT];
+  UINTN                               Head;
+  UINTN                               Tail;
+} SCAN_CODE_QUEUE;
+
+#define KEYBOARD_EFI_KEY_MAX_COUNT    256
+typedef struct {
+  EFI_KEY_DATA                        Buffer[KEYBOARD_EFI_KEY_MAX_COUNT];
+  UINTN                               Head;
+  UINTN                               Tail;
+} EFI_KEY_QUEUE;
 
 typedef struct {
   UINTN                               Signature;
@@ -70,9 +82,6 @@ typedef struct {
   UINT32                              DataRegisterAddress;
   UINT32                              StatusRegisterAddress;
   UINT32                              CommandRegisterAddress;
-
-  EFI_INPUT_KEY                       Key;
-  EFI_KEY_STATE                       KeyState;
 
   BOOLEAN                             LeftShift;
   BOOLEAN                             RightShift;  
@@ -89,18 +98,10 @@ typedef struct {
   BOOLEAN                             ScrollLock;
 
   //
-  // Buffer storing key scancodes
+  // Queue storing key scancodes
   //
-  UINT8                               ScancodeBuf[KEYBOARD_BUFFER_MAX_COUNT];
-  UINT32                              ScancodeBufStartPos;
-  UINT32                              ScancodeBufEndPos;
-  UINT32                              ScancodeBufCount;
-
-  //
-  // Indicators of the key pressing state, used in detecting Alt+Ctrl+Del
-  //
-  BOOLEAN                             Ctrled;
-  BOOLEAN                             Alted;
+  SCAN_CODE_QUEUE                     ScancodeQueue;
+  EFI_KEY_QUEUE                       EfiKeyQueue;
 
   //
   // Error state
@@ -171,6 +172,7 @@ InstallPs2KeyboardDriver (
 #define SCANCODE_CAPS_LOCK_MAKE         0x3A
 #define SCANCODE_NUM_LOCK_MAKE          0x45
 #define SCANCODE_SCROLL_LOCK_MAKE       0x46
+#define SCANCODE_DELETE_MAKE            0x53
 #define SCANCODE_LEFT_LOGO_MAKE         0x5B //GUI key defined in Keyboard scan code
 #define SCANCODE_LEFT_LOGO_BREAK        0xDB
 #define SCANCODE_RIGHT_LOGO_MAKE        0x5C
@@ -246,17 +248,14 @@ KeyboardRead (
   );
 
 /**
-  Get scancode from scancode buffer
-  and translate into EFI-scancode and unicode defined by EFI spec
-  The function is always called in TPL_NOTIFY
+  Get scancode from scancode buffer and translate into EFI-scancode and unicode defined by EFI spec.
+
+  The function is always called in TPL_NOTIFY.
 
   @param ConsoleIn KEYBOARD_CONSOLE_IN_DEV instance pointer
 
-  @retval EFI_NOT_READY - Input from console not ready yet.
-  @retval EFI_SUCCESS   - Function executed successfully.
-
 **/
-EFI_STATUS
+VOID
 KeyGetchar (
   IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
   );
@@ -511,4 +510,33 @@ KeyboardUnregisterKeyNotify (
   IN EFI_HANDLE                         NotificationHandle
   );
 
+/**
+  Push one key data to the EFI key buffer.
+
+  @param Queue     Pointer to instance of EFI_KEY_QUEUE.
+  @param KeyData   The key data to push.
+**/
+VOID
+PushEfikeyBufTail (
+  IN  EFI_KEY_QUEUE         *Queue,
+  IN  EFI_KEY_DATA          *KeyData
+  );
+
+/**
+  Judge whether is a registed key
+
+  @param RegsiteredData       A pointer to a buffer that is filled in with the keystroke 
+                              state data for the key that was registered.
+  @param InputData            A pointer to a buffer that is filled in with the keystroke 
+                              state data for the key that was pressed.
+
+  @retval TRUE                Key be pressed matches a registered key.
+  @retval FLASE               Match failed. 
+  
+**/
+BOOLEAN
+IsKeyRegistered (
+  IN EFI_KEY_DATA  *RegsiteredData,
+  IN EFI_KEY_DATA  *InputData
+  );
 #endif

@@ -2,7 +2,7 @@
   Routines implements SIMPLE_TEXT_IN protocol's interfaces based on 8042 interfaces
   provided by Ps2KbdCtrller.c.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,29 +17,66 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ps2Keyboard.h"
 
 /**
-  Check keyboard for given key value.
-  
-  @param  This  Point to instance of EFI_SIMPLE_TEXT_INPUT_PROTOCOL
-  
-  @retval EFI_SUCCESS   success check keyboard value
-  @retval !EFI_SUCCESS  Fail to get char from keyboard
+  Check whether the EFI key buffer is empty.
+
+  @param Queue     Pointer to instance of EFI_KEY_QUEUE.
+
+  @retval TRUE    The EFI key buffer is empty.
+  @retval FALSE   The EFI key buffer isn't empty.
 **/
-EFI_STATUS
-KeyboardCheckForKey (
-  IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This
+BOOLEAN
+IsEfikeyBufEmpty (
+  IN  EFI_KEY_QUEUE         *Queue
   )
 {
-  KEYBOARD_CONSOLE_IN_DEV *ConsoleIn;
+  return (BOOLEAN) (Queue->Head == Queue->Tail);
+}
 
-  ConsoleIn = KEYBOARD_CONSOLE_IN_DEV_FROM_THIS (This);
 
-  //
-  // If ready to read next key, check it
-  //
-  if (ConsoleIn->Key.ScanCode == SCAN_NULL && ConsoleIn->Key.UnicodeChar == 0x00) {
-    return KeyGetchar (ConsoleIn);
+
+/**
+  Push one key data to the EFI key buffer.
+
+  @param Queue     Pointer to instance of EFI_KEY_QUEUE.
+  @param KeyData   The key data to push.
+**/
+VOID
+PushEfikeyBufTail (
+  IN  EFI_KEY_QUEUE         *Queue,
+  IN  EFI_KEY_DATA          *KeyData
+  )
+{
+  if ((Queue->Tail + 1) % KEYBOARD_EFI_KEY_MAX_COUNT == Queue->Head) {
+    return;
   }
+  
+  CopyMem (&Queue->Buffer[Queue->Tail], KeyData, sizeof (EFI_KEY_DATA));
+  Queue->Tail = (Queue->Tail + 1) % KEYBOARD_EFI_KEY_MAX_COUNT;
+}
 
+/**
+  Read & remove one key data from the EFI key buffer.
+  
+  @param Queue     Pointer to instance of EFI_KEY_QUEUE.
+  @param KeyData   Receive the key data.
+
+  @retval EFI_SUCCESS   The key data is popped successfully.
+  @retval EFI_NOT_READY There is no key data available.
+**/
+EFI_STATUS
+PopEfikeyBufHead (
+  IN  EFI_KEY_QUEUE         *Queue,
+  OUT EFI_KEY_DATA          *KeyData
+  )
+{
+  if (IsEfikeyBufEmpty (Queue)) {
+    return EFI_NOT_READY;
+  }
+  //
+  // Retrieve and remove the values
+  //
+  CopyMem (KeyData, &Queue->Buffer[Queue->Head], sizeof (EFI_KEY_DATA));
+  Queue->Head = (Queue->Head + 1) % KEYBOARD_EFI_KEY_MAX_COUNT;
   return EFI_SUCCESS;
 }
 
@@ -110,9 +147,6 @@ KeyboardReadKeyStrokeWorker (
 {
   EFI_STATUS                            Status;
   EFI_TPL                               OldTpl;
-  LIST_ENTRY                            *Link;
-  KEYBOARD_CONSOLE_IN_EX_NOTIFY         *CurrentNotify;
-  EFI_KEY_DATA                          OriginalKeyData;
   
   if (KeyData == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -123,58 +157,16 @@ KeyboardReadKeyStrokeWorker (
   //
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  if (ConsoleInDev->KeyboardErr) {
-    gBS->RestoreTPL (OldTpl);
-    return EFI_DEVICE_ERROR;
-  }
-  //
-  // If there's no key, just return
-  //
-  Status = KeyboardCheckForKey (&ConsoleInDev->ConIn);
-  if (EFI_ERROR (Status)) {
-    gBS->RestoreTPL (OldTpl);
-    return EFI_NOT_READY;
-  }
+  KeyboardTimerHandler (NULL, ConsoleInDev);
   
-  CopyMem (&KeyData->Key, &ConsoleInDev->Key, sizeof (EFI_INPUT_KEY));
+  if (ConsoleInDev->KeyboardErr) {
+    Status = EFI_DEVICE_ERROR;
+  } else {
+    Status = PopEfikeyBufHead (&ConsoleInDev->EfiKeyQueue, KeyData);
+  }
 
-  ConsoleInDev->Key.ScanCode    = SCAN_NULL;          
-  ConsoleInDev->Key.UnicodeChar = 0x0000;     
-  CopyMem (&KeyData->KeyState, &ConsoleInDev->KeyState, sizeof (EFI_KEY_STATE));
-                                          
-  ConsoleInDev->KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
-  ConsoleInDev->KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
   gBS->RestoreTPL (OldTpl);
-  //
-  //Switch the control value to their original characters. In KeyGetchar() the  CTRL-Alpha characters have been switched to 
-  // their corresponding control value (ctrl-a = 0x0001 through ctrl-Z = 0x001A), here switch them back for notification function.
-  //
-  CopyMem (&OriginalKeyData, KeyData, sizeof (EFI_KEY_DATA));
-  if (ConsoleInDev->Ctrled) {
-    if (OriginalKeyData.Key.UnicodeChar >= 0x01 && OriginalKeyData.Key.UnicodeChar <= 0x1A) {
-      if (ConsoleInDev->CapsLock) {
-        OriginalKeyData.Key.UnicodeChar = (CHAR16)(OriginalKeyData.Key.UnicodeChar + L'A' - 1);
-      } else {
-        OriginalKeyData.Key.UnicodeChar = (CHAR16)(OriginalKeyData.Key.UnicodeChar + L'a' - 1);
-      } 
-    }
-  }
-  //
-  // Invoke notification functions if exist
-  //
-  for (Link = ConsoleInDev->NotifyList.ForwardLink; Link != &ConsoleInDev->NotifyList; Link = Link->ForwardLink) {
-    CurrentNotify = CR (
-                      Link, 
-                      KEYBOARD_CONSOLE_IN_EX_NOTIFY, 
-                      NotifyEntry, 
-                      KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE
-                      );
-    if (IsKeyRegistered (&CurrentNotify->KeyData, &OriginalKeyData)) { 
-      CurrentNotify->KeyNotificationFn (&OriginalKeyData);
-    }
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -224,11 +216,6 @@ KeyboardEfiReset (
     gBS->RestoreTPL (OldTpl);
     return EFI_DEVICE_ERROR;
   }
-  //
-  // Clear the status of ConsoleIn.Key
-  //
-  ConsoleIn->Key.ScanCode     = SCAN_NULL;
-  ConsoleIn->Key.UnicodeChar  = 0x0000;
 
   //
   // Leave critical section and return
@@ -304,36 +291,31 @@ KeyboardWaitForKey (
   IN  VOID                    *Context
   )
 {
-  EFI_TPL                 OldTpl;
-  KEYBOARD_CONSOLE_IN_DEV *ConsoleIn;
+  EFI_TPL                     OldTpl;
+  KEYBOARD_CONSOLE_IN_DEV     *ConsoleIn;
 
-  ConsoleIn = KEYBOARD_CONSOLE_IN_DEV_FROM_THIS (Context);
+  ConsoleIn = (KEYBOARD_CONSOLE_IN_DEV *) Context;
 
   //
   // Enter critical section
   //
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+  
+  KeyboardTimerHandler (NULL, ConsoleIn);
 
-  if (ConsoleIn->KeyboardErr) {
+  if (!ConsoleIn->KeyboardErr) {
     //
-    // Leave critical section and return
+    // Someone is waiting on the keyboard event, if there's
+    // a key pending, signal the event
     //
-    gBS->RestoreTPL (OldTpl);
-    return ;
-  }
-  //
-  // Someone is waiting on the keyboard event, if there's
-  // a key pending, signal the event
-  //
-  if (!EFI_ERROR (KeyboardCheckForKey (Context))) {
-    gBS->SignalEvent (Event);
+    if (!IsEfikeyBufEmpty (&ConsoleIn->EfiKeyQueue)) {
+      gBS->SignalEvent (Event);
+    }
   }
   //
   // Leave critical section and return
   //
   gBS->RestoreTPL (OldTpl);
-
-  return ;
 }
 
 /**
@@ -352,11 +334,7 @@ KeyboardWaitForKeyEx (
   )
 
 {
-  KEYBOARD_CONSOLE_IN_DEV               *ConsoleInDev;
-
-  ConsoleInDev = TEXT_INPUT_EX_KEYBOARD_CONSOLE_IN_DEV_FROM_THIS (Context); 
-  KeyboardWaitForKey (Event, &ConsoleInDev->ConIn);
-  
+  KeyboardWaitForKey (Event, Context);
 }
 
 /**
@@ -378,31 +356,14 @@ KeyboardEfiResetEx (
   )
 
 {
-  EFI_STATUS                            Status;
   KEYBOARD_CONSOLE_IN_DEV               *ConsoleInDev;
-  EFI_TPL                               OldTpl;
 
   ConsoleInDev = TEXT_INPUT_EX_KEYBOARD_CONSOLE_IN_DEV_FROM_THIS (This); 
-  if (ConsoleInDev->KeyboardErr) {
-    return EFI_DEVICE_ERROR;
-  }
 
-  Status = ConsoleInDev->ConIn.Reset (
-                                 &ConsoleInDev->ConIn, 
-                                 ExtendedVerification
-                                 );
-  if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-
-  ConsoleInDev->KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
-  ConsoleInDev->KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
-
-  gBS->RestoreTPL (OldTpl);  
-  
-  return EFI_SUCCESS;
+  return ConsoleInDev->ConIn.Reset (
+                               &ConsoleInDev->ConIn, 
+                               ExtendedVerification
+                               );
 }
 
 /**
@@ -482,8 +443,7 @@ KeyboardSetState (
     goto Exit;
   }
 
-  if (((ConsoleInDev->KeyState.KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID) ||
-      ((*KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID)) {
+  if ((*KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID) {
     Status = EFI_UNSUPPORTED;
     goto Exit;
   }
@@ -510,8 +470,6 @@ KeyboardSetState (
     Status = EFI_DEVICE_ERROR;    
   }
 
-  ConsoleInDev->KeyState.KeyToggleState = *KeyToggleState;
-  
 Exit:   
   //
   // Leave critical section and return

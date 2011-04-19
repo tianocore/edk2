@@ -3,7 +3,7 @@
   PS/2 Keyboard driver. Routines that interacts with callers,
   conforming to EFI driver model
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -243,11 +243,6 @@ KbdControllerDriverStart (
   ConsoleIn->StatusRegisterAddress  = KEYBOARD_8042_STATUS_REGISTER;
   ConsoleIn->CommandRegisterAddress = KEYBOARD_8042_COMMAND_REGISTER;
   ConsoleIn->IsaIo                  = IsaIo;
-  ConsoleIn->ScancodeBufStartPos    = 0;
-  ConsoleIn->ScancodeBufEndPos      = KEYBOARD_BUFFER_MAX_COUNT - 1;
-  ConsoleIn->ScancodeBufCount       = 0;
-  ConsoleIn->Ctrled                 = FALSE;
-  ConsoleIn->Alted                  = FALSE;
   ConsoleIn->DevicePath             = ParentDevicePath;
 
   ConsoleIn->ConInEx.Reset               = KeyboardEfiResetEx;
@@ -279,7 +274,7 @@ KbdControllerDriverStart (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
                   KeyboardWaitForKey,
-                  &(ConsoleIn->ConIn),
+                  ConsoleIn,
                   &((ConsoleIn->ConIn).WaitForKey)
                   );
   if (EFI_ERROR (Status)) {
@@ -294,7 +289,7 @@ KbdControllerDriverStart (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
                   KeyboardWaitForKeyEx,
-                  &(ConsoleIn->ConInEx),
+                  ConsoleIn,
                   &(ConsoleIn->ConInEx.WaitForKeyEx)
                   );
   if (EFI_ERROR (Status)) {

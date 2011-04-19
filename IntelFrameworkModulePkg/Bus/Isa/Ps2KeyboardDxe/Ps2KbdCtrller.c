@@ -1,7 +1,7 @@
 /** @file
   Routines that access 8042 keyboard controller
 
-Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -558,13 +558,128 @@ ConvertKeyboardScanCodeToEfiKey[] = {
   },
 };
 
-
 //
 // The WaitForValue time out
 //
 UINTN  mWaitForValueTimeOut = KEYBOARD_WAITFORVALUE_TIMEOUT;
 
 BOOLEAN          mEnableMouseInterface;
+
+
+
+/**
+  Return the count of scancode in the queue.
+  
+  @param Queue     Pointer to instance of SCAN_CODE_QUEUE.
+
+  @return          Count of the scancode.
+**/
+UINTN
+GetScancodeBufCount (
+  IN SCAN_CODE_QUEUE       *Queue
+  )
+{
+  if (Queue->Head <= Queue->Tail) {
+    return Queue->Tail - Queue->Head;
+  } else {
+    return Queue->Tail + KEYBOARD_SCAN_CODE_MAX_COUNT - Queue->Head;
+  }
+}
+
+/**
+  Read several bytes from the scancode buffer without removing them.
+  This function is called to see if there are enough bytes of scancode
+  representing a single key.
+  
+  @param Queue     Pointer to instance of SCAN_CODE_QUEUE.
+  @param Count     Number of bytes to be read
+  @param Buf       Store the results
+
+  @retval EFI_SUCCESS   success to scan the keyboard code
+  @retval EFI_NOT_READY invalid parameter
+**/
+EFI_STATUS
+GetScancodeBufHead (
+  IN  SCAN_CODE_QUEUE        *Queue,
+  IN  UINTN                  Count,
+  OUT UINT8                  *Buf
+  )
+{
+  UINTN                      Index;
+  UINTN                      Pos;
+
+  //
+  // check the valid range of parameter 'Count'
+  //
+  if (GetScancodeBufCount (Queue) < Count) {
+    return EFI_NOT_READY;
+  }
+  //
+  // retrieve the values
+  //
+  for (Index = 0, Pos = Queue->Head; Index < Count; Index++, Pos = (Pos + 1) % KEYBOARD_SCAN_CODE_MAX_COUNT) {
+    Buf[Index] = Queue->Buffer[Pos];
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Push one byte to the scancode buffer.
+
+  @param Queue     Pointer to instance of SCAN_CODE_QUEUE.
+  @param Scancode  The byte to push.
+**/
+VOID
+PushScancodeBufTail (
+  IN  SCAN_CODE_QUEUE       *Queue,
+  IN  UINT8                 Scancode
+  )
+{
+  if (GetScancodeBufCount (Queue) == KEYBOARD_SCAN_CODE_MAX_COUNT - 1) {
+    return;
+  }
+
+  Queue->Buffer[Queue->Tail] = Scancode;
+  Queue->Tail = (Queue->Tail + 1) % KEYBOARD_SCAN_CODE_MAX_COUNT;
+}
+
+/**
+
+  Read & remove several bytes from the scancode buffer.
+  This function is usually called after GetScancodeBufHead()
+  
+  @param Queue     Pointer to instance of SCAN_CODE_QUEUE.
+  @param Count     Number of bytes to be read
+  @param Buf       Store the results
+
+  @retval EFI_SUCCESS success to scan the keyboard code
+  @retval EFI_NOT_READY invalid parameter
+**/
+EFI_STATUS
+PopScancodeBufHead (
+  IN  SCAN_CODE_QUEUE       *Queue,
+  IN  UINTN                 Count,
+  OUT UINT8                 *Buf
+  )
+{
+  UINTN                     Index;
+
+  //
+  // Check the valid range of parameter 'Count'
+  //
+  if (GetScancodeBufCount (Queue) < Count) {
+    return EFI_NOT_READY;
+  }
+  //
+  // Retrieve and remove the values
+  //
+  for (Index = 0; Index < Count; Index++, Queue->Head = (Queue->Head + 1) % KEYBOARD_SCAN_CODE_MAX_COUNT) {
+    Buf[Index] = Queue->Buffer[Queue->Head];
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
   Read data register .
@@ -611,23 +726,14 @@ KeyWriteDataRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN UINT8                   Data
   )
-
 {
-  EFI_ISA_IO_PROTOCOL                 *IsaIo;
-
-  //
-  // Use IsaIo protocol to perform IO operations
-  //
-  IsaIo = ConsoleIn->IsaIo;
-
-  IsaIo->Io.Write (
-              IsaIo,
-              EfiIsaIoWidthUint8,
-              ConsoleIn->DataRegisterAddress,
-              1,
-              &Data
-              );
-
+  ConsoleIn->IsaIo->Io.Write (
+                         ConsoleIn->IsaIo,
+                         EfiIsaIoWidthUint8,
+                         ConsoleIn->DataRegisterAddress,
+                         1,
+                         &Data
+                         );
 }
 
 /**
@@ -643,24 +749,15 @@ KeyReadStatusRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
   )
 {
-  EFI_ISA_IO_PROTOCOL                 *IsaIo;
   UINT8                               Data;
-
-  //
-  // Use IsaIo protocol to perform IO operations
-  //
-  IsaIo = ConsoleIn->IsaIo;
-
-  IsaIo->Io.Read (
-              IsaIo,
-              EfiIsaIoWidthUint8,
-              ConsoleIn->StatusRegisterAddress,
-              1,
-              &Data
-              );
-
+  ConsoleIn->IsaIo->Io.Read (
+                         ConsoleIn->IsaIo,
+                         EfiIsaIoWidthUint8,
+                         ConsoleIn->StatusRegisterAddress,
+                         1,
+                         &Data
+                         );
   return Data;
-
 }
 
 /**
@@ -676,21 +773,13 @@ KeyWriteCommandRegister (
   IN UINT8                   Data
   )
 {
-  EFI_ISA_IO_PROTOCOL                 *IsaIo;
-
-  //
-  // Use IsaIo protocol to perform IO operations
-  //
-  IsaIo = ConsoleIn->IsaIo;
-
-  IsaIo->Io.Write (
-              IsaIo,
-              EfiIsaIoWidthUint8,
-              ConsoleIn->CommandRegisterAddress,
-              1,
-              &Data
-              );
-
+  ConsoleIn->IsaIo->Io.Write (
+                         ConsoleIn->IsaIo,
+                         EfiIsaIoWidthUint8,
+                         ConsoleIn->CommandRegisterAddress,
+                         1,
+                         &Data
+                         );
 }
 
 /**
@@ -732,7 +821,7 @@ KeyboardTimerHandler (
   EFI_TPL                 OldTpl;
   KEYBOARD_CONSOLE_IN_DEV *ConsoleIn;
 
-  ConsoleIn = Context;
+  ConsoleIn = (KEYBOARD_CONSOLE_IN_DEV *) Context;
 
   //
   // Enter critical section
@@ -749,182 +838,27 @@ KeyboardTimerHandler (
 
   //
   // To let KB driver support Hot plug, here should skip the 'resend' command  for the case that
-  // KB is not connected to system. If KB is not connected to system, driver will find there's  something
-  // error in the following code and wait for the input buffer empty, this waiting time shoulb be  short enough since
+  // KB is not connected to system. If KB is not connected to system, driver will find there's something
+  // error in the following code and wait for the input buffer empty, this waiting time shoulb be short enough since
   // this is a NOTIFY TPL period function, or the system performance will degrade hardly when KB is not connected.
   // Just skip the 'resend' process simply.
   //
 
-  Data = 0;
-
-  //
-  // if there is no key present, just return
-  //
-  if ((KeyReadStatusRegister (Context) & (KEYBOARD_STATUS_REGISTER_TRANSMIT_TIMEOUT|KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA)) != KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA) {
+  while ((KeyReadStatusRegister (ConsoleIn) & (KEYBOARD_STATUS_REGISTER_TRANSMIT_TIMEOUT|KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA)) ==
+      KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA
+     ) {
     //
-    // Leave critical section and return
+    // Read one byte of the scan code and store it into the memory buffer
     //
-    gBS->RestoreTPL (OldTpl);
-
-    return ;
+    Data = KeyReadDataRegister (ConsoleIn);
+    PushScancodeBufTail (&ConsoleIn->ScancodeQueue, Data);
   }
-  //
-  // Read one byte of the scan code and store it into the memory buffer
-  //
-  if (ConsoleIn->ScancodeBufCount < KEYBOARD_BUFFER_MAX_COUNT) {
+  KeyGetchar (ConsoleIn);
 
-    Data = KeyReadDataRegister (Context);
-    //
-    // put the scancode into the memory scancode buffer
-    //
-    ConsoleIn->ScancodeBufCount++;
-    ConsoleIn->ScancodeBufEndPos++;
-    if (ConsoleIn->ScancodeBufEndPos >= KEYBOARD_BUFFER_MAX_COUNT) {
-      ConsoleIn->ScancodeBufEndPos = 0;
-    }
-
-    ConsoleIn->ScancodeBuf[ConsoleIn->ScancodeBufEndPos] = Data;
-
-    //
-    // Handle Alt+Ctrl+Del Key combination
-    //
-    switch (Data) {
-    case SCANCODE_CTRL_MAKE:
-      ConsoleIn->Ctrled = TRUE;
-      break;
-
-    case SCANCODE_CTRL_BREAK:
-      ConsoleIn->Ctrled = FALSE;
-      break;
-
-    case SCANCODE_ALT_MAKE:
-      ConsoleIn->Alted = TRUE;
-      break;
-
-    case SCANCODE_ALT_BREAK:
-      ConsoleIn->Alted = FALSE;
-      break;
-    }
-    //
-    // if Alt+Ctrl+Del, Reboot the System
-    //
-    if (ConsoleIn->Ctrled && ConsoleIn->Alted && Data == 0x53) {
-      gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
-    }
-  }
   //
   // Leave critical section and return
   //
   gBS->RestoreTPL (OldTpl);
-
-  return ;
-}
-
-/**
-  Read several bytes from the scancode buffer without removing them.
-  This function is called to see if there are enough bytes of scancode
-  representing a single key.
-
-  @param ConsoleIn  Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
-  @param Count      Number of bytes to be read
-  @param Buf        Store the results
-
-  @retval EFI_SUCCESS success to scan the keyboard code
-  @retval EFI_NOT_READY invalid parameter
-**/
-EFI_STATUS
-GetScancodeBufHead (
-  KEYBOARD_CONSOLE_IN_DEV    *ConsoleIn,
-  IN UINT32                  Count,
-  OUT UINT8                  *Buf
-  )
-{
-  UINT32  Index;
-  UINT32  Pos;
-
-  Index = 0;
-  Pos   = 0;
-
-  //
-  // check the valid range of parameter 'Count'
-  //
-  if (Count <= 0 || ConsoleIn->ScancodeBufCount < Count) {
-    return EFI_NOT_READY;
-  }
-  //
-  // retrieve the values
-  //
-  for (Index = 0; Index < Count; Index++) {
-
-    if (Index == 0) {
-
-      Pos = ConsoleIn->ScancodeBufStartPos;
-    } else {
-
-      Pos = Pos + 1;
-      if (Pos >= KEYBOARD_BUFFER_MAX_COUNT) {
-        Pos = 0;
-      }
-    }
-
-    Buf[Index] = ConsoleIn->ScancodeBuf[Pos];
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
-
-  Read & remove several bytes from the scancode buffer.
-  This function is usually called after GetScancodeBufHead()
-
-  @param ConsoleIn  Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
-  @param Count      Number of bytes to be read
-  @param Buf        Store the results
-
-  @retval EFI_SUCCESS success to scan the keyboard code
-  @retval EFI_NOT_READY invalid parameter
-**/
-EFI_STATUS
-PopScancodeBufHead (
-  KEYBOARD_CONSOLE_IN_DEV   *ConsoleIn,
-  IN UINT32                 Count,
-  OUT UINT8                 *Buf
-  )
-{
-  UINT32  Index;
-
-  Index = 0;
-
-  //
-  // Check the valid range of parameter 'Count'
-  //
-  if (Count <= 0 || ConsoleIn->ScancodeBufCount < Count) {
-    return EFI_NOT_READY;
-  }
-  //
-  // Retrieve and remove the values
-  //
-  for (Index = 0; Index < Count; Index++) {
-
-    if (Index != 0) {
-
-      ConsoleIn->ScancodeBufStartPos++;
-      if (ConsoleIn->ScancodeBufStartPos >= KEYBOARD_BUFFER_MAX_COUNT) {
-        ConsoleIn->ScancodeBufStartPos = 0;
-      }
-    }
-
-    Buf[Index] = ConsoleIn->ScancodeBuf[ConsoleIn->ScancodeBufStartPos];
-    ConsoleIn->ScancodeBufCount--;
-  }
-
-  ConsoleIn->ScancodeBufStartPos++;
-  if (ConsoleIn->ScancodeBufStartPos >= KEYBOARD_BUFFER_MAX_COUNT) {
-    ConsoleIn->ScancodeBufStartPos = 0;
-  }
-
-  return EFI_SUCCESS;
 }
 
 /**
@@ -1205,115 +1139,55 @@ UpdateStatusLights (
 }
 
 /**
-  Get scancode from scancode buffer
-  and translate into EFI-scancode and unicode defined by EFI spec
-  The function is always called in TPL_NOTIFY
+  Get scancode from scancode buffer and translate into EFI-scancode and unicode defined by EFI spec.
+
+  The function is always called in TPL_NOTIFY.
 
   @param ConsoleIn KEYBOARD_CONSOLE_IN_DEV instance pointer
 
-  @retval EFI_NOT_READY  Input from console not ready yet.
-  @retval EFI_SUCCESS    Function executed successfully.
-
 **/
-EFI_STATUS
+VOID
 KeyGetchar (
   IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
   )
 {
-  EFI_STATUS  Status;
-  UINT8       ScanCode;
-  UINT8       Readed;
-  BOOLEAN     Extended;
-  UINT8       ScancodeArr[4];
-  UINTN       Index;
+  EFI_STATUS                     Status;
+  UINT8                          ScanCode;
+  BOOLEAN                        Extended;
+  UINTN                          Index;
+  EFI_KEY_DATA                   KeyData;
+  LIST_ENTRY                     *Link;
+  KEYBOARD_CONSOLE_IN_EX_NOTIFY  *CurrentNotify;
   //
   // 4 bytes most
   //
-  UINT32      ScancodeArrPos;
+  UINT8                          ScancodeArr[4];
+  UINT32                         ScancodeArrPos;
   //
   // point to the current position in ScancodeArr
   //
 
-  Readed          = 0;
   Extended        = FALSE;
   ScancodeArrPos  = 0;
-
-  //
-  // Read one byte of the scan code and store it into the memory buffer
-  // This block of code is added to insert an action that is equivalent to
-  // the timer event handling function, so as to increase the frequency of
-  // detecting the availability of keys. Timer event has a max frequency of
-  // 18Hz which is insufficient
-  //
-  //
-  // To let KB driver support Hot plug, here should skip the 'resend' command  for the case that
-  // KB is not connected to system. If KB is not connected to system, driver will find there's  something
-  // error in the following code and wait for the input buffer empty, this waiting time shoulb be  short enough since
-  // this is a NOTIFY TPL period function, or the system performance will degrade hardly when KB is not connected.
-  // Just skip the 'resend' process simply.
-  //
-
-
-  if (((KeyReadStatusRegister (ConsoleIn) & 0x21) == 0x1) && (ConsoleIn->ScancodeBufCount < KEYBOARD_BUFFER_MAX_COUNT)) {
-
-    Readed = KeyReadDataRegister (ConsoleIn);
-    //
-    // put the scancode into the memory scancode buffer
-    //
-    ConsoleIn->ScancodeBufCount++;
-    ConsoleIn->ScancodeBufEndPos++;
-    if (ConsoleIn->ScancodeBufEndPos >= KEYBOARD_BUFFER_MAX_COUNT) {
-      ConsoleIn->ScancodeBufEndPos = 0;
-    }
-
-    ConsoleIn->ScancodeBuf[ConsoleIn->ScancodeBufEndPos] = Readed;
-
-    //
-    // Handle Alt+Ctrl+Del Key combination
-    //
-    switch (Readed) {
-
-    case SCANCODE_CTRL_MAKE:
-      ConsoleIn->Ctrled = TRUE;
-      break;
-
-    case SCANCODE_CTRL_BREAK:
-      ConsoleIn->Ctrled = FALSE;
-      break;
-
-    case SCANCODE_ALT_MAKE:
-      ConsoleIn->Alted = TRUE;
-      break;
-
-    case SCANCODE_ALT_BREAK:
-      ConsoleIn->Alted = FALSE;
-      break;
-    }
-    //
-    // if Alt+Ctrl+Del, Reboot the System
-    //
-    if (ConsoleIn->Ctrled && ConsoleIn->Alted && Readed == 0x53) {
-      gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
-    }
-  }
+  
   //
   // Check if there are enough bytes of scancode representing a single key
   // available in the buffer
   //
   while (TRUE) {
 
-    Status          = GetScancodeBufHead (ConsoleIn, 1, ScancodeArr);
-    ScancodeArrPos  = 0;
+    Status            = GetScancodeBufHead (&ConsoleIn->ScancodeQueue, 1, ScancodeArr);
+    ScancodeArrPos    = 0;
     if (EFI_ERROR (Status)) {
-      return EFI_NOT_READY;
+      return ;
     }
 
     if (ScancodeArr[ScancodeArrPos] == SCANCODE_EXTENDED) {
       Extended        = TRUE;
-      Status          = GetScancodeBufHead (ConsoleIn, 2, ScancodeArr);
+      Status          = GetScancodeBufHead (&ConsoleIn->ScancodeQueue, 2, ScancodeArr);
       ScancodeArrPos  = 1;
       if (EFI_ERROR (Status)) {
-        return EFI_NOT_READY;
+        return ;
       }
     }
     //
@@ -1322,29 +1196,29 @@ KeyGetchar (
     //
     if (ScancodeArr[ScancodeArrPos] == SCANCODE_EXTENDED1) {
 
-      Status          = GetScancodeBufHead (ConsoleIn, 2, ScancodeArr);
+      Status          = GetScancodeBufHead (&ConsoleIn->ScancodeQueue, 2, ScancodeArr);
       ScancodeArrPos  = 1;
 
       if (EFI_ERROR (Status)) {
-        return EFI_NOT_READY;
+        return ;
       }
 
-      Status          = GetScancodeBufHead (ConsoleIn, 3, ScancodeArr);
+      Status          = GetScancodeBufHead (&ConsoleIn->ScancodeQueue, 3, ScancodeArr);
       ScancodeArrPos  = 2;
 
       if (EFI_ERROR (Status)) {
-        return EFI_NOT_READY;
+        return ;
       }
 
-      PopScancodeBufHead (ConsoleIn, 3, ScancodeArr);
-      return EFI_NOT_READY;
+      PopScancodeBufHead (&ConsoleIn->ScancodeQueue, 3, ScancodeArr);
+      return ;
     }
     //
     // if we reach this position, scancodes for a key is in buffer now,pop them
     //
-    Status = PopScancodeBufHead (ConsoleIn, ScancodeArrPos + 1, ScancodeArr);
+    Status = PopScancodeBufHead (&ConsoleIn->ScancodeQueue, ScancodeArrPos + 1, ScancodeArr);
     if (EFI_ERROR (Status)) {
-      return EFI_NOT_READY;
+      return ;
     }
     //
     // store the last available byte, this byte of scancode will be checked
@@ -1446,55 +1320,56 @@ KeyGetchar (
       break;
     }
   }
+
+  //
+  // Handle Ctrl+Alt+Del hotkey
+  //
+  if (ConsoleIn->Alt && ConsoleIn->Ctrl && ScanCode == SCANCODE_DELETE_MAKE) {
+    gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+  }
+
+  KeyData.Key.ScanCode            = SCAN_NULL;
+  KeyData.Key.UnicodeChar         = CHAR_NULL;
+  KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
+  KeyData.KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
+
   //
   // Treat Numeric Key Pad "/" specially
   //
   if (Extended && ScanCode == 0x35) {
-    ConsoleIn->Key.ScanCode     = SCAN_NULL;
-    ConsoleIn->Key.UnicodeChar  = L'/';
-    return EFI_SUCCESS;
-  }
-  //
-  // Convert Keyboard ScanCode into an EFI Key
-  //
-  for (Index = 0; ConvertKeyboardScanCodeToEfiKey[Index].ScanCode != TABLE_END; Index += 1) {
-    if (ScanCode == ConvertKeyboardScanCodeToEfiKey[Index].ScanCode) {
-      ConsoleIn->Key.ScanCode = ConvertKeyboardScanCodeToEfiKey[Index].EfiScanCode;
-      if (ConsoleIn->Shift) {
-        ConsoleIn->Key.UnicodeChar = ConvertKeyboardScanCodeToEfiKey[Index].ShiftUnicodeChar;
-        //
-        // Need not return associated shift state if a class of printable characters that
-        // are normally adjusted by shift modifiers. e.g. Shift Key + 'f' key = 'F'
-        //
-        if (ConsoleIn->Key.UnicodeChar >= L'A' && ConsoleIn->Key.UnicodeChar <= L'Z') {
+    KeyData.Key.UnicodeChar = L'/';
+    KeyData.Key.ScanCode    = SCAN_NULL;
+  } else {
+    //
+    // Convert Keyboard ScanCode into an EFI Key
+    //
+    for (Index = 0; ConvertKeyboardScanCodeToEfiKey[Index].ScanCode != TABLE_END; Index += 1) {
+      if (ScanCode == ConvertKeyboardScanCodeToEfiKey[Index].ScanCode) {
+        KeyData.Key.ScanCode    = ConvertKeyboardScanCodeToEfiKey[Index].EfiScanCode;
+        KeyData.Key.UnicodeChar = ConvertKeyboardScanCodeToEfiKey[Index].UnicodeChar;
+
+        if (ConsoleIn->Shift && 
+            (ConvertKeyboardScanCodeToEfiKey[Index].UnicodeChar != ConvertKeyboardScanCodeToEfiKey[Index].ShiftUnicodeChar)) {
+          KeyData.Key.UnicodeChar = ConvertKeyboardScanCodeToEfiKey[Index].ShiftUnicodeChar;
+          //
+          // Need not return associated shift state if a class of printable characters that
+          // are normally adjusted by shift modifiers. e.g. Shift Key + 'f' key = 'F'
+          //
           ConsoleIn->LeftShift  = FALSE;
           ConsoleIn->RightShift = FALSE;
         }
-      } else {
-        ConsoleIn->Key.UnicodeChar = ConvertKeyboardScanCodeToEfiKey[Index].UnicodeChar;
-      }
-      //
-      // alphabetic key is affected by CapsLock State
-      //
-      if (ConsoleIn->CapsLock) {
-        if (ConsoleIn->Key.UnicodeChar >= L'a' && ConsoleIn->Key.UnicodeChar <= L'z') {
-          ConsoleIn->Key.UnicodeChar = ConvertKeyboardScanCodeToEfiKey[Index].ShiftUnicodeChar;
-        } else if (ConsoleIn->Key.UnicodeChar >= L'A' && ConsoleIn->Key.UnicodeChar <= L'Z') {
-          ConsoleIn->Key.UnicodeChar = ConvertKeyboardScanCodeToEfiKey[Index].UnicodeChar;
+        //
+        // alphabetic key is affected by CapsLock State
+        //
+        if (ConsoleIn->CapsLock) {
+          if (KeyData.Key.UnicodeChar >= L'a' && KeyData.Key.UnicodeChar <= L'z') {
+            KeyData.Key.UnicodeChar = (UINT16) (KeyData.Key.UnicodeChar - L'a' + L'A');
+          } else if (KeyData.Key.UnicodeChar >= L'A' && KeyData.Key.UnicodeChar <= L'Z') {
+            KeyData.Key.UnicodeChar = (UINT16) (KeyData.Key.UnicodeChar - L'A' + L'a');
+          }
         }
+        break;
       }
-      //
-      // Translate the CTRL-Alpha characters to their corresponding control value (ctrl-a = 0x0001 through ctrl-Z = 0x001A)
-      //
-      if (ConsoleIn->Ctrled) {
-        if (ConsoleIn->Key.UnicodeChar >= L'a' && ConsoleIn->Key.UnicodeChar <= L'z') {
-          ConsoleIn->Key.UnicodeChar = (UINT16) (ConsoleIn->Key.UnicodeChar - L'a' + 1);
-        } else if (ConsoleIn->Key.UnicodeChar >= L'A' && ConsoleIn->Key.UnicodeChar <= L'Z') {
-          ConsoleIn->Key.UnicodeChar = (UINT16) (ConsoleIn->Key.UnicodeChar - L'A' + 1);
-        }
-      }
-
-      break;
     }
   }
 
@@ -1502,58 +1377,83 @@ KeyGetchar (
   // distinguish numeric key pad keys' 'up symbol' and 'down symbol'
   //
   if (ScanCode >= 0x47 && ScanCode <= 0x53) {
-
     if (ConsoleIn->NumLock && !ConsoleIn->Shift && !Extended) {
-      ConsoleIn->Key.ScanCode = SCAN_NULL;
+      KeyData.Key.ScanCode = SCAN_NULL;
     } else if (ScanCode != 0x4a && ScanCode != 0x4e) {
-      ConsoleIn->Key.UnicodeChar = 0x0000;
+      KeyData.Key.UnicodeChar = CHAR_NULL;
     }
   }
   //
   // If the key can not be converted then just return.
   //
-  if (ConsoleIn->Key.ScanCode == SCAN_NULL && ConsoleIn->Key.UnicodeChar == 0x0000) {
-    return EFI_NOT_READY;
+  if (KeyData.Key.ScanCode == SCAN_NULL && KeyData.Key.UnicodeChar == CHAR_NULL) {
+    return ;
   }
 
   //
   // Save the Shift/Toggle state
   //
   if (ConsoleIn->Ctrl) {
-    ConsoleIn->KeyState.KeyShiftState  |= (Extended) ? EFI_RIGHT_CONTROL_PRESSED : EFI_LEFT_CONTROL_PRESSED;
+    KeyData.KeyState.KeyShiftState  |= (Extended) ? EFI_RIGHT_CONTROL_PRESSED : EFI_LEFT_CONTROL_PRESSED;
   }                                    
   if (ConsoleIn->Alt) {                
-    ConsoleIn->KeyState.KeyShiftState  |= (Extended) ? EFI_RIGHT_ALT_PRESSED : EFI_LEFT_ALT_PRESSED;
+    KeyData.KeyState.KeyShiftState  |= (Extended) ? EFI_RIGHT_ALT_PRESSED : EFI_LEFT_ALT_PRESSED;
   }                                    
   if (ConsoleIn->LeftShift) {          
-    ConsoleIn->KeyState.KeyShiftState  |= EFI_LEFT_SHIFT_PRESSED;
+    KeyData.KeyState.KeyShiftState  |= EFI_LEFT_SHIFT_PRESSED;
   }                                    
   if (ConsoleIn->RightShift) {         
-    ConsoleIn->KeyState.KeyShiftState  |= EFI_RIGHT_SHIFT_PRESSED;
+    KeyData.KeyState.KeyShiftState  |= EFI_RIGHT_SHIFT_PRESSED;
   }                                    
   if (ConsoleIn->LeftLogo) {           
-    ConsoleIn->KeyState.KeyShiftState  |= EFI_LEFT_LOGO_PRESSED;
+    KeyData.KeyState.KeyShiftState  |= EFI_LEFT_LOGO_PRESSED;
   }                                    
   if (ConsoleIn->RightLogo) {          
-    ConsoleIn->KeyState.KeyShiftState  |= EFI_RIGHT_LOGO_PRESSED;
+    KeyData.KeyState.KeyShiftState  |= EFI_RIGHT_LOGO_PRESSED;
   }                                    
   if (ConsoleIn->Menu) {               
-    ConsoleIn->KeyState.KeyShiftState  |= EFI_MENU_KEY_PRESSED;
+    KeyData.KeyState.KeyShiftState  |= EFI_MENU_KEY_PRESSED;
   }                                    
   if (ConsoleIn->SysReq) {             
-    ConsoleIn->KeyState.KeyShiftState  |= EFI_SYS_REQ_PRESSED;
+    KeyData.KeyState.KeyShiftState  |= EFI_SYS_REQ_PRESSED;
   }  
   if (ConsoleIn->CapsLock) {
-    ConsoleIn->KeyState.KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
+    KeyData.KeyState.KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
   }
   if (ConsoleIn->NumLock) {
-    ConsoleIn->KeyState.KeyToggleState |= EFI_NUM_LOCK_ACTIVE;
+    KeyData.KeyState.KeyToggleState |= EFI_NUM_LOCK_ACTIVE;
   }
   if (ConsoleIn->ScrollLock) {
-    ConsoleIn->KeyState.KeyToggleState |= EFI_SCROLL_LOCK_ACTIVE;
+    KeyData.KeyState.KeyToggleState |= EFI_SCROLL_LOCK_ACTIVE;
   }
 
-  return EFI_SUCCESS;
+  //
+  // Invoke notification functions if exist
+  //
+  for (Link = GetFirstNode (&ConsoleIn->NotifyList); !IsNull (&ConsoleIn->NotifyList, Link); Link = GetNextNode (&ConsoleIn->NotifyList, Link)) {
+    CurrentNotify = CR (
+                      Link, 
+                      KEYBOARD_CONSOLE_IN_EX_NOTIFY, 
+                      NotifyEntry, 
+                      KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE
+                      );
+    if (IsKeyRegistered (&CurrentNotify->KeyData, &KeyData)) { 
+      CurrentNotify->KeyNotificationFn (&KeyData);
+    }
+  }
+  
+  //
+  // Translate the CTRL-Alpha characters to their corresponding control value (ctrl-a = 0x0001 through ctrl-Z = 0x001A)
+  //
+  if (ConsoleIn->Ctrl) {
+    if (KeyData.Key.UnicodeChar >= L'a' && KeyData.Key.UnicodeChar <= L'z') {
+      KeyData.Key.UnicodeChar = (UINT16) (KeyData.Key.UnicodeChar - L'a' + 1);
+    } else if (KeyData.Key.UnicodeChar >= L'A' && KeyData.Key.UnicodeChar <= L'Z') {
+      KeyData.Key.UnicodeChar = (UINT16) (KeyData.Key.UnicodeChar - L'A' + 1);
+    }
+  }
+
+  PushEfikeyBufTail (&ConsoleIn->EfiKeyQueue, &KeyData);
 }
 
 /**
@@ -1737,11 +1637,10 @@ InitKeyboard (
   //
   // Clear Memory Scancode Buffer
   //
-  ConsoleIn->ScancodeBufStartPos  = 0;
-  ConsoleIn->ScancodeBufEndPos    = KEYBOARD_BUFFER_MAX_COUNT - 1;
-  ConsoleIn->ScancodeBufCount     = 0;
-  ConsoleIn->Ctrled               = FALSE;
-  ConsoleIn->Alted                = FALSE;
+  ConsoleIn->ScancodeQueue.Head = 0;
+  ConsoleIn->ScancodeQueue.Tail = 0;
+  ConsoleIn->EfiKeyQueue.Head   = 0;
+  ConsoleIn->EfiKeyQueue.Tail   = 0;
 
   //
   // Reset the status indicators
