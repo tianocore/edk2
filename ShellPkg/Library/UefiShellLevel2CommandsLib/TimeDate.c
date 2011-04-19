@@ -298,7 +298,7 @@ CheckAndSetTime (
   if (TimeString != NULL && !InternalIsTimeLikeString(TimeString, L':', 1, 2, FALSE)) {
     return (SHELL_INVALID_PARAMETER);
   }
-  if (((Daylight & (EFI_TIME_IN_DAYLIGHT|EFI_TIME_ADJUST_DAYLIGHT)) != Daylight)) {
+  if (Daylight != 0xFF &&((Daylight & (EFI_TIME_IN_DAYLIGHT|EFI_TIME_ADJUST_DAYLIGHT)) != Daylight)) {
     return (SHELL_INVALID_PARAMETER);
   }
 
@@ -341,7 +341,9 @@ CheckAndSetTime (
     TheTime.TimeZone = Tz;
   }
 
-  TheTime.Daylight = Daylight;
+  if (Daylight != 0xFF) {
+    TheTime.Daylight = Daylight;
+  }
 
   Status = gRT->SetTime(&TheTime);
 
