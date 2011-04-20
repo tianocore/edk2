@@ -2,7 +2,7 @@
   Provides a way for 3rd party applications to register themselves for launch by the
   Boot Manager based on hot key
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,10 +16,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Hotkey.h"
 
 
-LIST_ENTRY      mHotkeyList = INITIALIZE_LIST_HEAD_VARIABLE (mHotkeyList);
-BOOLEAN         mHotkeyCallbackPending = FALSE;
-EFI_EVENT       mHotkeyEvent;
-VOID            *mHotkeyRegistration;
+LIST_ENTRY        mHotkeyList = INITIALIZE_LIST_HEAD_VARIABLE (mHotkeyList);
+BDS_COMMON_OPTION *mHotkeyBootOption = NULL;
+EFI_EVENT         mHotkeyEvent;
+VOID              *mHotkeyRegistration;
 
 
 /**
@@ -301,6 +301,50 @@ UnregisterHotkey (
 }
 
 /**
+  Try to boot the boot option triggered by hotkey.
+**/
+VOID
+HotkeyBoot (
+  VOID
+  )
+{
+  EFI_STATUS           Status;
+  UINTN                ExitDataSize;
+  CHAR16               *ExitData;
+  
+  if (mHotkeyBootOption != NULL) {
+    BdsLibConnectDevicePath (mHotkeyBootOption->DevicePath);
+
+    //
+    // Clear the screen before launch this BootOption
+    //
+    gST->ConOut->Reset (gST->ConOut, FALSE);
+
+    Status = BdsLibBootViaBootOption (mHotkeyBootOption, mHotkeyBootOption->DevicePath, &ExitDataSize, &ExitData);
+
+    if (EFI_ERROR (Status)) {
+      //
+      // Call platform action to indicate the boot fail
+      //
+      mHotkeyBootOption->StatusString = GetStringById (STRING_TOKEN (STR_BOOT_FAILED));
+      PlatformBdsBootFail (mHotkeyBootOption, Status, ExitData, ExitDataSize);
+    } else {
+      //
+      // Call platform action to indicate the boot success
+      //
+      mHotkeyBootOption->StatusString = GetStringById (STRING_TOKEN (STR_BOOT_SUCCEEDED));
+      PlatformBdsBootSuccess (mHotkeyBootOption);
+    }
+    FreePool (mHotkeyBootOption->Description);
+    FreePool (mHotkeyBootOption->DevicePath);
+    FreePool (mHotkeyBootOption->LoadOptions);
+    FreePool (mHotkeyBootOption);
+
+    mHotkeyBootOption = NULL;
+  }
+}
+
+/**
 
   This is the common notification function for HotKeys, it will be registered
   with SimpleTextInEx protocol interface - RegisterKeyNotify() of ConIn handle.
@@ -322,24 +366,22 @@ HotkeyCallback (
   LIST_ENTRY         *Link;
   BDS_HOTKEY_OPTION  *Hotkey;
   UINT16             Buffer[10];
-  BDS_COMMON_OPTION  *BootOption;
-  UINTN              ExitDataSize;
-  CHAR16             *ExitData;
   EFI_STATUS         Status;
   EFI_KEY_DATA       *HotkeyData;
 
-  if (mHotkeyCallbackPending) {
+  if (mHotkeyBootOption != NULL) {
     //
-    // When responsing to a Hotkey, ignore sequential hotkey stroke until
-    // the current Boot#### load option returned
+    // Do not process sequential hotkey stroke until the current boot option returns
     //
     return EFI_SUCCESS;
   }
 
-  Status = EFI_SUCCESS;
-  Link = GetFirstNode (&mHotkeyList);
+  Status                 = EFI_SUCCESS;
 
-  while (!IsNull (&mHotkeyList, Link)) {
+  for ( Link = GetFirstNode (&mHotkeyList)
+      ; !IsNull (&mHotkeyList, Link)
+      ; Link = GetNextNode (&mHotkeyList, Link)
+      ) {
     HotkeyCatched = FALSE;
     Hotkey = BDS_HOTKEY_OPTION_FROM_LINK (Link);
 
@@ -349,26 +391,19 @@ HotkeyCallback (
     ASSERT (Hotkey->WaitingKey < (sizeof (Hotkey->KeyData) / sizeof (Hotkey->KeyData[0])));
     HotkeyData = &Hotkey->KeyData[Hotkey->WaitingKey];
     if ((KeyData->Key.ScanCode == HotkeyData->Key.ScanCode) &&
-       (KeyData->Key.UnicodeChar == HotkeyData->Key.UnicodeChar) &&
-       (((HotkeyData->KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) != 0) ? (KeyData->KeyState.KeyShiftState == HotkeyData->KeyState.KeyShiftState) : TRUE)) {
+        (KeyData->Key.UnicodeChar == HotkeyData->Key.UnicodeChar) &&
+        (((KeyData->KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) != 0) ? 
+          (KeyData->KeyState.KeyShiftState == HotkeyData->KeyState.KeyShiftState) : TRUE
+        )
+       ) {
       //
-      // Receive an expecting key stroke
+      // For hotkey of key combination, transit to next waiting state
       //
-      if (Hotkey->CodeCount > 1) {
-        //
-        // For hotkey of key combination, transit to next waiting state
-        //
-        Hotkey->WaitingKey++;
+      Hotkey->WaitingKey++;
 
-        if (Hotkey->WaitingKey == Hotkey->CodeCount) {
-          //
-          // Received the whole key stroke sequence
-          //
-          HotkeyCatched = TRUE;
-        }
-      } else {
+      if (Hotkey->WaitingKey == Hotkey->CodeCount) {
         //
-        // For hotkey of single key stroke
+        // Received the whole key stroke sequence
         //
         HotkeyCatched = TRUE;
       }
@@ -391,38 +426,8 @@ HotkeyCallback (
       InitializeListHead (&BootLists);
 
       UnicodeSPrint (Buffer, sizeof (Buffer), L"Boot%04x", Hotkey->BootOptionNumber);
-      BootOption = BdsLibVariableToOption (&BootLists, Buffer);
-      if (BootOption == NULL) {
-        return EFI_NOT_FOUND;
-      }
-      BootOption->BootCurrent = Hotkey->BootOptionNumber;
-      BdsLibConnectDevicePath (BootOption->DevicePath);
-
-      //
-      // Clear the screen before launch this BootOption
-      //
-      gST->ConOut->Reset (gST->ConOut, FALSE);
-
-      mHotkeyCallbackPending = TRUE;
-      Status = BdsLibBootViaBootOption (BootOption, BootOption->DevicePath, &ExitDataSize, &ExitData);
-      mHotkeyCallbackPending = FALSE;
-
-      if (EFI_ERROR (Status)) {
-        //
-        // Call platform action to indicate the boot fail
-        //
-        BootOption->StatusString = GetStringById (STRING_TOKEN (STR_BOOT_FAILED));
-        PlatformBdsBootFail (BootOption, Status, ExitData, ExitDataSize);
-      } else {
-        //
-        // Call platform action to indicate the boot success
-        //
-        BootOption->StatusString = GetStringById (STRING_TOKEN (STR_BOOT_SUCCEEDED));
-        PlatformBdsBootSuccess (BootOption);
-      }
+      mHotkeyBootOption = BdsLibVariableToOption (&BootLists, Buffer);
     }
-
-    Link = GetNextNode (&mHotkeyList, Link);
   }
 
   return Status;

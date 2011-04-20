@@ -1,7 +1,7 @@
 /** @file
   FrontPage routines to handle the callbacks and browser calls
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Bds.h"
 #include "FrontPage.h"
 #include "Language.h"
+#include "Hotkey.h"
 
 EFI_GUID  mFrontPageGuid      = FRONT_PAGE_FORMSET_GUID;
 
@@ -971,8 +972,10 @@ PlatformBdsEnterFrontPage (
     gConnectAllHappened = TRUE;
   }
 
+  HotkeyBoot ();
   if (TimeoutDefault != 0xffff) {
     Status = ShowProgress (TimeoutDefault);
+    HotkeyBoot ();
 
     //
     // Ensure screen is clear when switch Console from Graphics mode to Text mode
