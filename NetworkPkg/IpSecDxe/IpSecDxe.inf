@@ -89,7 +89,7 @@
   gEfiUdp6ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED  
   gEfiUdp6ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
   gEfiIpSecConfigProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
-  gEfiIpSecProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
+  gEfiIpSec2ProtocolGuid                        # PROTOCOL ALWAYS_PRODUCED
   
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdIpsecCertificateEnabled

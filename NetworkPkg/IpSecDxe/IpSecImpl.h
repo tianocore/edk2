@@ -346,7 +346,7 @@ IpSecLookupSadBySpi (
   The behavior is that it can perform one of the following actions:
   bypass the packet, discard the packet, or protect the packet.
 
-  @param[in]      This             Pointer to the EFI_IPSEC_PROTOCOL instance.
+  @param[in]      This             Pointer to the EFI_IPSEC2_PROTOCOL instance.
   @param[in]      NicHandle        Instance of the network interface.
   @param[in]      IpVersion        IPV4 or IPV6.
   @param[in, out] IpHead           Pointer to the IP Header.

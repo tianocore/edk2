@@ -80,5 +80,5 @@
   gEfiIp4ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
   gEfiManagedNetworkProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiArpProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
-  gEfiIpSecProtocolGuid
+  gEfiIpSec2ProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
   

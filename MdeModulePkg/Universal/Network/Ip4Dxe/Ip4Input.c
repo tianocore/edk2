@@ -514,7 +514,7 @@ Ip4IpSecProcessPacket (
   ZeroMem (&ZeroHead, sizeof (IP4_HEAD));
   
   if (mIpSec == NULL) {
-    gBS->LocateProtocol (&gEfiIpSecProtocolGuid, NULL, (VOID **) &mIpSec);
+    gBS->LocateProtocol (&gEfiIpSec2ProtocolGuid, NULL, (VOID **) &mIpSec);
     if (mIpSec == NULL) {
       goto ON_EXIT;
     }

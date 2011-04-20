@@ -57,5 +57,5 @@
   UefiLib
 
 [Protocols]
-  gEfiIpSecProtocolGuid                         ##CONSUMS
+  gEfiIpSec2ProtocolGuid                        ##CONSUMS
   gEfiIpSecConfigProtocolGuid                   ##CONSUMS

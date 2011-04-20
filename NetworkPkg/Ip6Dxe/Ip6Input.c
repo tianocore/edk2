@@ -536,7 +536,7 @@ Ip6IpSecProcessPacket (
   ZeroMem (&ZeroHead, sizeof (EFI_IP6_HEADER));
 
   if (mIpSec == NULL) {
-    gBS->LocateProtocol (&gEfiIpSecProtocolGuid, NULL, (VOID **) &mIpSec);
+    gBS->LocateProtocol (&gEfiIpSec2ProtocolGuid, NULL, (VOID **) &mIpSec);
 
     //
     // Check whether the ipsec protocol is available.

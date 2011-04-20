@@ -648,7 +648,7 @@ InitializeIpSecConfig (
     goto Done;
   }
 
-  Status = LocateProtocol (&gEfiIpSecProtocolGuid, (VOID **) &mIpSec);
+  Status = LocateProtocol (&gEfiIpSec2ProtocolGuid, (VOID **) &mIpSec);
   if (EFI_ERROR (Status) || mIpSec == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IPSEC_CONFIG_PROTOCOL_INEXISTENT), mHiiHandle, mAppName);
     goto Done;

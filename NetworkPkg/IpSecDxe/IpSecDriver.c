@@ -94,7 +94,7 @@ IpSecDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
-  EFI_IPSEC_PROTOCOL  *IpSec;
+  EFI_IPSEC2_PROTOCOL *IpSec;
   EFI_STATUS          Status;
   EFI_STATUS          Udp4Status;
   EFI_STATUS          Udp6Status;
@@ -103,7 +103,7 @@ IpSecDriverBindingStart (
   //
   // Ipsec protocol should be installed when load image.
   //
-  Status = gBS->LocateProtocol (&gEfiIpSecProtocolGuid, NULL, (VOID **) &IpSec);
+  Status = gBS->LocateProtocol (&gEfiIpSec2ProtocolGuid, NULL, (VOID **) &IpSec);
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -171,7 +171,7 @@ IpSecDriverBindingStop (
   IN EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_IPSEC_PROTOCOL  *IpSec;
+  EFI_IPSEC2_PROTOCOL *IpSec;
   EFI_STATUS          Status;
   IPSEC_PRIVATE_DATA  *Private;
   IKE_UDP_SERVICE     *UdpSrv;
@@ -181,7 +181,7 @@ IpSecDriverBindingStop (
   //
   // Locate ipsec protocol to get private data.
   //
-  Status = gBS->LocateProtocol (&gEfiIpSecProtocolGuid, NULL, (VOID **) &IpSec);
+  Status = gBS->LocateProtocol (&gEfiIpSec2ProtocolGuid, NULL, (VOID **) &IpSec);
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -301,12 +301,12 @@ IpSecDriverEntryPoint (
 {
   EFI_STATUS          Status;
   IPSEC_PRIVATE_DATA  *Private;
-  EFI_IPSEC_PROTOCOL  *IpSec;
+  EFI_IPSEC2_PROTOCOL *IpSec;
 
   //
   // Check whether ipsec protocol has already been installed.
   //
-  Status = gBS->LocateProtocol (&gEfiIpSecProtocolGuid, NULL, (VOID **) &IpSec);
+  Status = gBS->LocateProtocol (&gEfiIpSec2ProtocolGuid, NULL, (VOID **) &IpSec);
 
   if (!EFI_ERROR (Status)) {
     DEBUG ((DEBUG_WARN, "_ModuleEntryPoint: IpSec has been already loaded\n"));
@@ -345,7 +345,7 @@ IpSecDriverEntryPoint (
 
   Private->Signature    = IPSEC_PRIVATE_DATA_SIGNATURE;
   Private->ImageHandle  = ImageHandle;
-  CopyMem (&Private->IpSec, &mIpSecInstance, sizeof (EFI_IPSEC_PROTOCOL));
+  CopyMem (&Private->IpSec, &mIpSecInstance, sizeof (EFI_IPSEC2_PROTOCOL));
   
   //
   // Initilize Private's members. Thess members is used for IKE.
@@ -371,7 +371,7 @@ IpSecDriverEntryPoint (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Private->Handle,
-                  &gEfiIpSecProtocolGuid,
+                  &gEfiIpSec2ProtocolGuid,
                   &Private->IpSec,
                   NULL
                   );
@@ -396,7 +396,7 @@ IpSecDriverEntryPoint (
 ON_UNINSTALL_IPSEC:
   gBS->UninstallProtocolInterface (
          Private->Handle,
-         &gEfiIpSecProtocolGuid,
+         &gEfiIpSec2ProtocolGuid,
          &Private->IpSec
          );
 ON_UNINSTALL_CONFIG:

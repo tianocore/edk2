@@ -93,7 +93,7 @@
   gEfiIp6ConfigProtocolGuid
   gEfiDhcp6ServiceBindingProtocolGuid
   gEfiDhcp6ProtocolGuid
-  gEfiIpSecProtocolGuid
+  gEfiIpSec2ProtocolGuid
   gEfiHiiConfigAccessProtocolGuid
 
 [Guids]
