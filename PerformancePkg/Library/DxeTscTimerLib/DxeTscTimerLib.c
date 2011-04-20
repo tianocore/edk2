@@ -31,21 +31,22 @@
 #include <PiDxe.h>
 #include <Ich/GenericIch.h>
 
+#include <Library/UefiBootServicesTableLib.h>
 #include <Library/TimerLib.h>
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
 #include <Library/PciLib.h>
 #include <Library/PcdLib.h>
-#include <Library/HobLib.h>
+#include <Library/UefiLib.h>
 
 #include <Guid/TscFrequency.h>
 
-UINT64   mTscFrequency;
+UINT64 mTscFrequency;
 
 /** The constructor function determines the actual TSC frequency.
 
-  First, Get TSC frequency from TSC frequency GUID HOB,
-  If the HOB is not found, calculate it.
+  First, Get TSC frequency from system configuration table with TSC frequency GUID,
+  if the table is not found, install it.
 
   The TSC counting frequency is determined by comparing how far it counts
   during a 1ms period as determined by the ACPI timer. The ACPI timer is
@@ -70,25 +71,24 @@ DxeTscTimerLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_HOB_GUID_TYPE       *GuidHob;
-  VOID        *DataInHob;
+  EFI_STATUS  Status;
+  UINT64      *TscFrequency;
   UINT64      StartTSC;
   UINT64      EndTSC;
   UINT32      TimerAddr;
   UINT32      Ticks;
 
   //
-  // Get TSC frequency from TSC frequency GUID HOB.
+  // Get TSC frequency from system configuration table with TSC frequency GUID.
   //
-  GuidHob = GetFirstGuidHob (&gEfiTscFrequencyGuid);
-  if (GuidHob != NULL) {
-    DataInHob = GET_GUID_HOB_DATA (GuidHob);
-    mTscFrequency = * (UINT64 *) DataInHob;
+  Status = EfiGetSystemConfigurationTable (&gEfiTscFrequencyGuid, (VOID **) &TscFrequency);
+  if (Status == EFI_SUCCESS) {
+    mTscFrequency = *TscFrequency;
     return EFI_SUCCESS;
   }
 
   //
-  // TSC frequency GUID HOB is not found, calculate it.
+  // TSC frequency GUID system configuration table is not found, install it.
   //
 
   //
@@ -122,8 +122,10 @@ DxeTscTimerLibConstructor (
                       1000                    // Number of ms in a second
                     );
   //
-  // mTscFrequency is now equal to the number of TSC counts per second
+  // mTscFrequency is now equal to the number of TSC counts per second, install system configuration table for it.
   //
+  gBS->InstallConfigurationTable (&gEfiTscFrequencyGuid, &mTscFrequency);
+
   return EFI_SUCCESS;
 }
 

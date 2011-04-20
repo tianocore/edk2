@@ -43,14 +43,15 @@
 
 
 [LibraryClasses]
+  UefiBootServicesTableLib
   PcdLib
   PciLib
   IoLib
   BaseLib
-  HobLib
+  UefiLib
 
 [Guids]
-  gEfiTscFrequencyGuid                          ## SOMETIMES_CONSUMES ## Hob
+  gEfiTscFrequencyGuid                          ## CONSUMES ## System Configuration Table
 
 [Pcd.common]
   gPerformancePkgTokenSpaceGuid.PcdPerfPkgAcpiIoPortBaseAddress
