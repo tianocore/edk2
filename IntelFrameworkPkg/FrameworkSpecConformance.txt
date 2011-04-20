@@ -658,11 +658,14 @@
     typedef struct {
       ...
       EFI_INTER_LINK_DATA               ManagementDeviceThresholdLink;
+      UINT8                             ComponentType;
     } EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION_DATA;
 
-    The field listed above is *NOT* defined in MiscSubclass specification 0.9. It is introduced to support
-    new management device component (type 35) defined in SmBios 2.6 specification. 
-    Keeping this inconsistency to reflect the latest industry standard.
+    a. The field "ManagementDeviceThresholdLink" above is *NOT* defined in MiscSubclass specification 0.9. It is introduced to support
+       new management device component (type 35) defined in SmBios 2.6 specification. 
+       Keeping this inconsistency to reflect the latest industry standard.
+    b. The field "ComponentType" above is *NOT* defined in MiscSubclass specifications 0.9. It's implementation-specific to simplify the code logic.
+       Keeping this inconsistency for backward compatibility.
 
   6. Guid/DataHubRecords.h
     typedef struct {
@@ -680,14 +683,19 @@
       ...
       EfiSlotTypeAgp2X                  = 0x10,
       ...
-      EfiSlotTypePciExpress             = 0xA5
+      EfiSlotTypePciExpress             = 0xA5,
+      EfiSlotTypePciExpressX1           = 0xA6,
+      EfiSlotTypePciExpressX2           = 0xA7,
+      EfiSlotTypePciExpressX4           = 0xA8,
+      EfiSlotTypePciExpressX8           = 0xA9,
+      EfiSlotTypePciExpressX16          = 0xAA
     } EFI_MISC_SLOT_TYPE;
 
     a. The field name "EfiSlotTypeAgp2X" is *NOT* consistent with MiscSubclass specification 0.9, in which it is named
        "EfiSlotTypeApg2X".
        From its literal sense, this field represents a AGP type display card, so it should be named as "EfiSlotTypeAgp2X".
-    b. The "EfiSlotTypePciExpress" field is *NOT* defined in MiscSubclass specification 0.9. It isintroduced to support
-       new system slots (type 9) defined in SmBios 2.6 specification.
+    b. The enumeration fields from "EfiSlotTypePciExpress" to "EfiSlotTypePciExpressX16" are *NOT* defined in MiscSubclass specification 0.9.
+       They are introduced to support new system slots (type 9) defined in SmBios 2.6 specification.
        Keeping this inconsistency to reflect the latest industry standard.
 
   8. Guid/DataHubRecords.h
@@ -876,6 +884,49 @@
     The "CoolingDeviceUnitGroup" field and "CoolingDeviceNominalSpeed" field are *NOT* consistent with 
     MiscSubclass specification 0.9. These fields are aligned with SMBIOS 2.6 specification. And user can easily
     assign any value to CoolingDeviceNominalSpeed.
+
+  22. Guid/DataHubRecords.h
+    typedef enum {
+      ...
+      EfiSlotDataBusWidth1xOrx1         = 0x8,
+      EfiSlotDataBusWidth2xOrx2         = 0x9,
+      EfiSlotDataBusWidth4xOrx4         = 0xA,
+      EfiSlotDataBusWidth8xOrx8         = 0xB,
+      EfiSlotDataBusWidth12xOrx12       = 0xC,
+      EfiSlotDataBusWidth16xOrx16       = 0xD,
+      EfiSlotDataBusWidth32xOrx32       = 0xE
+    } EFI_MISC_SLOT_DATA_BUS_WIDTH;
+
+    The enumeration fields from "EfiSlotDataBusWidth1xOrx1" to "EfiSlotDataBusWidth32xOrx32" are *NOT* defined in MiscSubclass specification 0.9.
+    They are introduced to support new system slots (type 9) defined in SmBios 2.6 specification.
+    Keeping this inconsistency to reflect the latest industry standard.
+
+  23. Guid/DataHubRecords.h
+    typedef struct {
+      ...
+      UINT16                            TemperatureProbeMaximumValue;
+      UINT16                            TemperatureProbeMinimumValue;
+      UINT16                            TemperatureProbeResolution;
+      UINT16                            TemperatureProbeTolerance;
+      UINT16                            TemperatureProbeAccuracy;
+      UINT16                            TemperatureProbeNominalValue;
+      UINT16                            MDLowerNoncriticalThreshold;
+      UINT16                            MDUpperNoncriticalThreshold;
+      UINT16                            MDLowerCriticalThreshold;
+      UINT16                            MDUpperCriticalThreshold;
+      UINT16                            MDLowerNonrecoverableThreshold;
+      UINT16                            MDUpperNonrecoverableThreshold;
+      ...
+    } EFI_MISC_TEMPERATURE_PROBE_DESCRIPTION_DATA;
+
+    The structure fields from "TemperatureProbeMaximumValue" to "MDUpperNonrecoverableThreshold" are *NOT* consistent with MiscSubclass specification 0.9.
+    The specification defines the fields type as EFI_EXP_BASE10_DATA. In fact, they should be UINT16 type because they refer to 16bit width data.
+    Keeping this inconsistency for backward compatibility.
+
+  24. Guid/DataHubRecords.h
+    #define EFI_MISC_IPMI_INTERFACE_TYPE_DATA_RECORD_NUMBER EFI_MISC_IPMI_INTERFACE_TYPE_RECORD_NUMBER
+
+    The definition above is *NOT* defined in MiscSubclass specifications 0.9. It's defined for backward compatibility.
 
 ##
 # Mismatch with Intel Platform Innovation Framework for Status Codes Specification (Version 0.92)

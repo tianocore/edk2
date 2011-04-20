@@ -2095,10 +2095,15 @@ typedef enum {
   EfiSlotTypePC98Card                     = 0xA4,
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass specification 0.9, this field isn't defined.
-  /// It's introduced for SmBios 2.6 specification type 9.
+  /// In MiscSubclass specification 0.9, these fields aren't defined.
+  /// They're introduced for SmBios 2.6 specification type 9.
   ///
-  EfiSlotTypePciExpress                   = 0xA5
+  EfiSlotTypePciExpress                   = 0xA5,
+  EfiSlotTypePciExpressX1                 = 0xA6,
+  EfiSlotTypePciExpressX2                 = 0xA7,
+  EfiSlotTypePciExpressX4                 = 0xA8,
+  EfiSlotTypePciExpressX8                 = 0xA9,
+  EfiSlotTypePciExpressX16                = 0xAA
 } EFI_MISC_SLOT_TYPE;
 
 typedef enum {
@@ -2108,7 +2113,19 @@ typedef enum {
   EfiSlotDataBusWidth16Bit      = 0x04,
   EfiSlotDataBusWidth32Bit      = 0x05,
   EfiSlotDataBusWidth64Bit      = 0x06,
-  EfiSlotDataBusWidth128Bit     = 0x07
+  EfiSlotDataBusWidth128Bit     = 0x07,
+  ///
+  /// Inconsistent with specification here:  
+  /// In MiscSubclass specification 0.9, these fields aren't defined.
+  /// They're introduced for SmBios 2.6 specification type 9.
+  ///
+  EfiSlotDataBusWidth1xOrx1     = 0x8,
+  EfiSlotDataBusWidth2xOrx2     = 0x9,
+  EfiSlotDataBusWidth4xOrx4     = 0xA,
+  EfiSlotDataBusWidth8xOrx8     = 0xB,
+  EfiSlotDataBusWidth12xOrx12   = 0xC,
+  EfiSlotDataBusWidth16xOrx16   = 0xD,
+  EfiSlotDataBusWidth32xOrx32   = 0xE
 } EFI_MISC_SLOT_DATA_BUS_WIDTH;
 
 typedef enum {
@@ -2478,18 +2495,24 @@ typedef struct {
   STRING_REF                        TemperatureProbeDescription;
   EFI_MISC_TEMPERATURE_PROBE_LOCATION
                                     TemperatureProbeLocation;
-  EFI_EXP_BASE10_DATA               TemperatureProbeMaximumValue;
-  EFI_EXP_BASE10_DATA               TemperatureProbeMinimumValue;
-  EFI_EXP_BASE10_DATA               TemperatureProbeResolution;
-  EFI_EXP_BASE10_DATA               TemperatureProbeTolerance;
-  EFI_EXP_BASE10_DATA               TemperatureProbeAccuracy;
-  EFI_EXP_BASE10_DATA               TemperatureProbeNominalValue;
-  EFI_EXP_BASE10_DATA               MDLowerNoncriticalThreshold;
-  EFI_EXP_BASE10_DATA               MDUpperNoncriticalThreshold;
-  EFI_EXP_BASE10_DATA               MDLowerCriticalThreshold;
-  EFI_EXP_BASE10_DATA               MDUpperCriticalThreshold;
-  EFI_EXP_BASE10_DATA               MDLowerNonrecoverableThreshold;
-  EFI_EXP_BASE10_DATA               MDUpperNonrecoverableThreshold;
+  ///
+  /// Inconsistent with specification here:  
+  /// MiscSubclass 0.9 specification defines the fields type as EFI_EXP_BASE10_DATA.
+  /// In fact, they should be UINT16 type because they refer to 16bit width data.
+  /// Keeping this inconsistency for backward compatibility.
+  ///
+  UINT16                            TemperatureProbeMaximumValue;
+  UINT16                            TemperatureProbeMinimumValue;
+  UINT16                            TemperatureProbeResolution;
+  UINT16                            TemperatureProbeTolerance;
+  UINT16                            TemperatureProbeAccuracy;
+  UINT16                            TemperatureProbeNominalValue;
+  UINT16                            MDLowerNoncriticalThreshold;
+  UINT16                            MDUpperNoncriticalThreshold;
+  UINT16                            MDLowerCriticalThreshold;
+  UINT16                            MDUpperCriticalThreshold;
+  UINT16                            MDLowerNonrecoverableThreshold;
+  UINT16                            MDUpperNonrecoverableThreshold;
   UINT32                            TemperatureProbeOemDefined;
 } EFI_MISC_TEMPERATURE_PROBE_DESCRIPTION_DATA;
 
@@ -2638,6 +2661,12 @@ typedef struct {
   /// It's introduced for SmBios 2.6 specification type 35.
   ///
   EFI_INTER_LINK_DATA               ManagementDeviceThresholdLink;
+  ///
+  /// Inconsistent with specification here:  
+  /// In MiscSubclass specification 0.9, this field is NOT defined.
+  /// It's implementation-specific to simplify the code logic.
+  ///
+  UINT8                             ComponentType;
 } EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION_DATA;
 
 //
@@ -2667,6 +2696,11 @@ typedef struct {
 } EFI_MISC_IPMI_INTERFACE_TYPE_DATA;
 
 #define EFI_MISC_IPMI_INTERFACE_TYPE_RECORD_NUMBER    0x0000001D
+///
+/// The definition above is *NOT* defined in MiscSubclass specifications 0.9.
+/// It's defined for backward compatibility.
+///
+#define EFI_MISC_IPMI_INTERFACE_TYPE_DATA_RECORD_NUMBER EFI_MISC_IPMI_INTERFACE_TYPE_RECORD_NUMBER
 
 ///
 /// System Power supply Record - SMBIOS Type 39
@@ -2824,6 +2858,8 @@ typedef EFI_MISC_REMOTE_ACCESS_MANUFACTURER_DESCRIPTION_DATA
                                                           EFI_MISC_REMOTE_ACCESS_MANUFACTURER_DESCRIPTION;
 typedef EFI_MISC_MANAGEMENT_DEVICE_DESCRIPTION_DATA       EFI_MISC_MANAGEMENT_DEVICE_DESCRIPTION;
 typedef EFI_MISC_ELECTRICAL_CURRENT_PROBE_DESCRIPTION_DATA EFI_MISC_ELECTRICAL_CURRENT_PROBE_DESCRIPTION;
+typedef EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION_DATA
+                                                          EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION;
 
 ///
 /// Inconsistent with specification here:  
