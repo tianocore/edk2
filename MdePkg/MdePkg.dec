@@ -1103,7 +1103,10 @@
 
   ## Include/Protocol/IpSec.h
   gEfiIpSecProtocolGuid                = { 0xdfb386f7, 0xe100, 0x43ad, {0x9c, 0x9a, 0xed, 0x90, 0xd0, 0x8a, 0x5e, 0x12 }}
-
+  
+  ## Include/Protocol/IpSec.h
+  gEfiIpSec2ProtocolGuid               = { 0xa3979e64, 0xace8, 0x4ddc, {0xbc, 0x7, 0x4d, 0x66, 0xb8, 0xfd, 0x9, 0x77 }}
+  
 [PcdsFeatureFlag]
   ## If TRUE, the component name protocol will not be installed.
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE|BOOLEAN|0x0000000d
