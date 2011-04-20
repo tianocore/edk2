@@ -1258,6 +1258,24 @@ SmbiosFldMiscType34 (
   );
 
 /**
+  Field Filling Function for Misc SubClass record type 35 -- Management Device Component.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
+EFI_STATUS
+SmbiosFldMiscType35 (
+  IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
+  IN      UINT32                    Offset,
+  IN      VOID                      *RecordData,
+  IN      UINT32                    RecordDataSize
+  );
+
+/**
   Field Filling Function for Misc SubClass record type 36 -- Management Device Threshold.
   
   @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.

@@ -325,6 +325,15 @@ SMBIOS_TYPE_INFO_TABLE_ENTRY  mTypeInfoTable[] = {
     FALSE
   },
   //
+  // Type 35: Management Device Component
+  //
+  {
+    35,
+    0x0d,
+    FALSE,
+    FALSE
+  },
+  //
   // Type 36: Management Device Threshold
   //
   {
@@ -1232,6 +1241,19 @@ SMBIOS_CONVERSION_TABLE_ENTRY mConversionTable[] = {
     ByFunction,
     0,
     SmbiosFldMiscType34
+  },
+
+  {
+    //
+    // Misc SubClass -- Record Type 0x1C: Management Device Component (SMBIOS Type 35)
+    //
+    EFI_MISC_SUBCLASS_GUID,
+    EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION_RECORD_NUMBER, // 35,
+    35,
+    BySubclassInstanceSubinstanceProducer,
+    ByFunction,
+    0,
+    SmbiosFldMiscType35
   },
 
   {

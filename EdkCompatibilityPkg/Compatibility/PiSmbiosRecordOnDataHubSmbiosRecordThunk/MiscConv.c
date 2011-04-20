@@ -913,12 +913,12 @@ SmbiosFldMiscType13 (
 
   //
   // Current Language Number
+  // It's the index of multiple languages. Languages are filled by SmbiosFldMiscType14.
   //
-  SmbiosFldString (
-    StructureNode,
-    OFFSET_OF (SMBIOS_TABLE_TYPE13, CurrentLanguages),
-    &(InstallableLanguage->CurrentLanguageNumber),
-    2 // 64 * sizeof(CHAR16)
+  CopyMem (
+    (UINT8 *) (StructureNode->Structure) + OFFSET_OF (SMBIOS_TABLE_TYPE13, CurrentLanguages),
+    &InstallableLanguage->CurrentLanguageNumber,
+    1
     );
 
   return EFI_SUCCESS;
@@ -2037,6 +2037,91 @@ SmbiosFldMiscType34 (
     1
     );  
   
+  return EFI_SUCCESS;
+}
+
+/**
+  Field Filling Function for Misc SubClass record type 35 -- Management Device Component.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
+EFI_STATUS
+SmbiosFldMiscType35 (
+  IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
+  IN      UINT32                    Offset,
+  IN      VOID                      *RecordData,
+  IN      UINT32                    RecordDataSize
+  )
+{
+  EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION  *ManagementDeviceComponent;
+  EFI_INTER_LINK_DATA                               ManagementDeviceLink;
+  EFI_INTER_LINK_DATA                               ManagementDeviceComponentLink;
+  EFI_INTER_LINK_DATA                               ManagementDeviceThresholdLink;
+  
+  ManagementDeviceComponent = (EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION *)RecordData;
+  CopyMem (
+    &ManagementDeviceLink,
+    &ManagementDeviceComponent->ManagementDeviceLink,
+    sizeof (EFI_INTER_LINK_DATA)
+    );
+  CopyMem (
+    &ManagementDeviceComponentLink,
+    &ManagementDeviceComponent->ManagementDeviceComponentLink,
+    sizeof (EFI_INTER_LINK_DATA)
+    );
+  CopyMem (&ManagementDeviceThresholdLink,
+    &ManagementDeviceComponent->ManagementDeviceThresholdLink,
+    sizeof (EFI_INTER_LINK_DATA)
+    );
+
+  //
+  // ManagementDeviceComponentDescription
+  //
+  SmbiosFldString (
+    StructureNode,
+    OFFSET_OF (SMBIOS_TABLE_TYPE35, Description),
+    &ManagementDeviceComponent->ManagementDeviceComponentDescription,
+    2       // 64 * sizeof(CHAR16)
+    );
+
+  //
+  // ManagementDeviceLink
+  //
+  SmbiosFldInterLink (
+    StructureNode,
+    (UINT16) OFFSET_OF (SMBIOS_TABLE_TYPE35, ManagementDeviceHandle),
+    34,     // SMBIOS type 34 - Management Device
+    &ManagementDeviceLink,
+    &gEfiMiscSubClassGuid
+    );
+
+  //
+  // ManagementDeviceComponentLink
+  //
+  SmbiosFldInterLink (
+    StructureNode,
+    (UINT16) OFFSET_OF (SMBIOS_TABLE_TYPE35, ComponentHandle),
+    ManagementDeviceComponent->ComponentType,   // SMBIOS type, according to SMBIOS spec, it can be Type 26, 27, 28, 29
+    &ManagementDeviceComponentLink,
+    &gEfiMiscSubClassGuid
+    );
+
+  //
+  // ManagementDeviceThresholdLink
+  //
+  SmbiosFldInterLink (
+    StructureNode,
+    (UINT16) OFFSET_OF (SMBIOS_TABLE_TYPE35, ThresholdHandle),
+    36,     // SMBIOS type 36 - Management Device Threshold Data
+    &ManagementDeviceThresholdLink,
+    &gEfiMiscSubClassGuid
+    );
+
   return EFI_SUCCESS;
 }
 
