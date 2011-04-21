@@ -473,7 +473,7 @@ IScsiFormExtractConfig (
   )
 {
   EFI_STATUS                       Status;
-  CHAR8                            InitiatorName[ISCSI_NAME_IFR_MAX_SIZE];
+  CHAR8                            InitiatorName[ISCSI_NAME_MAX_SIZE];
   UINTN                            BufferSize;
   ISCSI_CONFIG_IFR_NVDATA          *IfrNvData;
   ISCSI_FORM_CALLBACK_INFO         *Private;
@@ -512,7 +512,7 @@ IScsiFormExtractConfig (
     IScsiConvertDeviceConfigDataToIfrNvData (Private->Current, IfrNvData);
   }
 
-  BufferSize  = ISCSI_NAME_IFR_MAX_SIZE;
+  BufferSize  = ISCSI_NAME_MAX_SIZE;
   Status      = gIScsiInitiatorName.Get (&gIScsiInitiatorName, &BufferSize, InitiatorName);
   if (EFI_ERROR (Status)) {
     IfrNvData->InitiatorName[0] = L'\0';
@@ -666,7 +666,7 @@ IScsiFormCallback (
 {
   ISCSI_FORM_CALLBACK_INFO  *Private;
   UINTN                     BufferSize;
-  CHAR8                     IScsiName[ISCSI_NAME_IFR_MAX_SIZE];
+  CHAR8                     IScsiName[ISCSI_NAME_MAX_SIZE];
   CHAR16                    PortString[128];
   CHAR8                     Ip4String[IP4_STR_MAX_SIZE];
   CHAR8                     LunString[ISCSI_LUN_STR_MAX_LEN];
@@ -704,7 +704,7 @@ IScsiFormCallback (
   switch (QuestionId) {
   case KEY_INITIATOR_NAME:
     IScsiUnicodeStrToAsciiStr (IfrNvData->InitiatorName, IScsiName);
-    BufferSize  = AsciiStrLen (IScsiName) + 1;
+    BufferSize  = AsciiStrSize (IScsiName);
 
     Status      = gIScsiInitiatorName.Set (&gIScsiInitiatorName, &BufferSize, IScsiName);
     if (EFI_ERROR (Status)) {
