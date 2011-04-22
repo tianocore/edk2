@@ -20,6 +20,20 @@
 #include <Library/UefiBootServicesTableLib.h>
 
 
+UINT64
+ReadTimestamp (
+  VOID
+  )
+{
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+  return AsmReadTsc ();
+#elif defined (MDE_CPU_IPF)
+  return AsmReadItc ();
+#else
+#error ReadTimestamp not supported for this architecture!
+#endif
+}
+
 UINT32
 Rand32 (
   VOID
@@ -34,10 +48,10 @@ Rand32 (
 
   R32 = 0;
   Found = 0;
-  Tsc1 = AsmReadTsc ();
-  Tsc2 = AsmReadTsc ();
+  Tsc1 = ReadTimestamp ();
+  Tsc2 = ReadTimestamp ();
   do {
-    Tsc2 = AsmReadTsc ();
+    Tsc2 = ReadTimestamp ();
     TscBits = Tsc2 ^ Tsc1;
     Bits = HighBitSet64 (TscBits);
     if (Bits > 0) {
