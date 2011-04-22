@@ -234,8 +234,8 @@
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoveryBase|0x0
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoverySize|0x280000
 
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySizeForSecMain|L"64!64"|VOID*|10
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareVolume|L"../FV/FV_RECOVERY.fd"|VOID*|52
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySizeForSecMain|L"64!64"
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareVolume|L"../FV/FV_RECOVERY.fd"
 
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
@@ -338,15 +338,15 @@
   gEfiGenericPlatformTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x0|UINT32|4
   gEfiGenericPlatformTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x0|UINT32|4
   gEfiGenericPlatformTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x0|UINT32|4
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixConsole|L"Bus Driver Console Window"|VOID*|50
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixUga|L"UGA Window"|VOID*|50
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixFileSystem|L".!../../../../EdkShellBinPkg/Bin/Ia32/Apps"|VOID*|106
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixVirtualDisk|L"disk1.img:FW"|VOID*|24
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixPhysicalDisk|L"E:RW;245760;512"|VOID*|30
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixCpuModel|L"Intel(R) Processor Model"|VOID*|48
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixCpuSpeed|L"3000"|VOID*|8
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySize|L"64!64"|VOID*|10
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixSerialPort|L"/dev/ttyS0!/dev/ttyS1"|VOID*|20
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixConsole|L"Bus Driver Console Window"
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixUga|L"UGA Window"
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFileSystem|L".!../../../../EdkShellBinPkg/Bin/Ia32/Apps"
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixVirtualDisk|L"disk1.img:FW"
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixPhysicalDisk|L"E:RW;245760;512"
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixCpuModel|L"Intel(R) Processor Model"|VOID*
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixCpuSpeed|L"3000"
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySize|L"64!64"
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixSerialPort|L"/dev/ttyS0!/dev/ttyS1"
 
 [PcdsDynamicHii.common.DEFAULT]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|L"Setup"|gEfiUnixSystemConfigGuid|0x0|80
