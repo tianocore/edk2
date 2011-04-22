@@ -65,9 +65,8 @@ ConfigurePixelBitMaskFormat (
   }
   MergedMasks = (UINT32) (MergedMasks | Masks[3]);
 
-  mBltLibBytesPerPixel = HighBitSet32 (MergedMasks);
-  ASSERT (mBltLibBytesPerPixel >= 0);
-  mBltLibBytesPerPixel = (mBltLibBytesPerPixel + 7) / 8;
+  ASSERT (MergedMasks != 0);
+  mBltLibBytesPerPixel = (HighBitSet32 (MergedMasks) + 7) / 8;
 
   DEBUG ((EFI_D_INFO, "Bytes per pixel: %d\n", mBltLibBytesPerPixel));
 
