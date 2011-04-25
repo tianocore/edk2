@@ -225,16 +225,7 @@ FddReadWriteBlocks (
       FdcFreeCache (FdcDev);
     }
   }
-  //
-  // Check the Parameter is valid
-  //
-  if (Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
 
-  if (BufferSize == 0) {
-    return EFI_SUCCESS;
-  }
   //
   // Set the drive motor on
   //
@@ -268,6 +259,11 @@ FddReadWriteBlocks (
     return EFI_MEDIA_CHANGED;
   }
 
+  if (BufferSize == 0) {
+    MotorOff (FdcDev);
+    return EFI_SUCCESS;
+  }
+
   if (Operation == WRITE) {
     if (Media->ReadOnly) {
       MotorOff (FdcDev);
@@ -277,6 +273,11 @@ FddReadWriteBlocks (
   //
   // Check the parameters for this read/write operation
   //
+  if (Buffer == NULL) {
+    MotorOff (FdcDev);
+    return EFI_INVALID_PARAMETER;
+  }
+
   if (BufferSize % BlockSize != 0) {
     MotorOff (FdcDev);
     return EFI_BAD_BUFFER_SIZE;
