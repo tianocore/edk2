@@ -1,7 +1,7 @@
 /** @file
   This code implements the IP4Config and NicIp4Config protocols.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -129,6 +129,17 @@ EfiNicIp4ConfigSetInfo (
     DispatchDpc ();
   }
 
+  //
+  // A dedicated timer is used to poll underlying media status.In case of
+  // cable swap, a new round auto configuration will be initiated. The timer
+  // starts in DHCP policy only. STATIC policy stops the timer.
+  // 
+  if (NicConfig->Source == IP4_CONFIG_SOURCE_DHCP) {
+    gBS->SetTimer (Instance->Timer, TimerPeriodic, TICKS_PER_SECOND);
+  } else if (NicConfig->Source == IP4_CONFIG_SOURCE_STATIC) {
+    gBS->SetTimer (Instance->Timer, TimerCancel, 0);
+  }
+  
   return Status;
 }
 
@@ -659,3 +670,57 @@ Ip4ConfigCleanConfig (
   Ip4ConfigCleanDhcp4 (Instance);
 }
 
+
+/**
+  A dedicated timer is used to poll underlying media status. In case of
+  cable swap, a new round auto configuration will be initiated. The timer 
+  will signal the IP4 to run the auto configuration again. IP4 driver will free
+  old IP address related resource, such as route table and Interface, then
+  initiate a DHCP process by IP4Config->Start to acquire new IP, eventually
+  create route table for new IP address.
+
+  @param[in]  Event                  The IP4 service instance's heart beat timer.
+  @param[in]  Context                The IP4 service instance.
+
+**/
+VOID
+EFIAPI
+MediaChangeDetect (
+  IN EFI_EVENT              Event,
+  IN VOID                   *Context
+  )
+{
+  BOOLEAN                      OldMediaPresent;
+  EFI_STATUS                   Status;
+  EFI_SIMPLE_NETWORK_MODE      SnpModeData;
+  IP4_CONFIG_INSTANCE         *Instance;  
+
+  Instance = (IP4_CONFIG_INSTANCE *) Context;
+
+  OldMediaPresent = Instance->MediaPresent;
+  
+  //
+  // Get fresh mode data from MNP, since underlying media status may change
+  //
+  Status = Instance->Mnp->GetModeData (Instance->Mnp, NULL, &SnpModeData);
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_STARTED)) {
+    return;
+  }
+
+  Instance->MediaPresent = SnpModeData.MediaPresent;
+  //
+  // Media transimit Unpresent to Present means new link movement is detected.
+  //
+  if (!OldMediaPresent && Instance->MediaPresent) {
+    //
+    // Signal the IP4 to run the auto configuration again. IP4 driver will free
+    // old IP address related resource, such as route table and Interface, then 
+    // initiate a DHCP round by IP4Config->Start to acquire new IP, eventually 
+    // create route table for new IP address.
+    //
+    if (Instance->ReconfigEvent != NULL) {
+      Status = gBS->SignalEvent (Instance->ReconfigEvent);
+      DispatchDpc ();
+    }
+  }
+}
