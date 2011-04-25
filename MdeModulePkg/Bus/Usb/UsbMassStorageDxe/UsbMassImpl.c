@@ -1,7 +1,7 @@
 /** @file
   USB Mass Storage Driver that manages USB Mass Storage Device and produces Block I/O Protocol.
 
-Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -114,13 +114,6 @@ UsbMassReadBlocks (
   UINTN               TotalBlock;
 
   //
-  // First, validate the parameters
-  //
-  if ((Buffer == NULL) || (BufferSize == 0)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
   // Raise TPL to TPL_NOTIFY to serialize all its operations
   // to protect shared data structures.
   //
@@ -140,6 +133,26 @@ UsbMassReadBlocks (
     }
   }
 
+  if (!(Media->MediaPresent)) {
+    Status = EFI_NO_MEDIA;
+    goto ON_EXIT;
+  }
+
+  if (MediaId != Media->MediaId) {
+    Status = EFI_MEDIA_CHANGED;
+    goto ON_EXIT;
+  }
+
+  if (BufferSize == 0) {
+    Status = EFI_SUCCESS;
+    goto ON_EXIT;
+  }
+
+  if (Buffer == NULL) {
+    Status = EFI_INVALID_PARAMETER;
+    goto ON_EXIT;
+  }
+
   //
   // BufferSize must be a multiple of the intrinsic block size of the device.
   //
@@ -155,16 +168,6 @@ UsbMassReadBlocks (
   //
   if (Lba + TotalBlock - 1 > Media->LastBlock) {
     Status = EFI_INVALID_PARAMETER;
-    goto ON_EXIT;
-  }
-
-  if (!(Media->MediaPresent)) {
-    Status = EFI_NO_MEDIA;
-    goto ON_EXIT;
-  }
-
-  if (MediaId != Media->MediaId) {
-    Status = EFI_MEDIA_CHANGED;
     goto ON_EXIT;
   }
 
@@ -222,13 +225,6 @@ UsbMassWriteBlocks (
   UINTN               TotalBlock;
 
   //
-  // First, validate the parameters
-  //
-  if ((Buffer == NULL) || (BufferSize == 0)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
   // Raise TPL to TPL_NOTIFY to serialize all its operations
   // to protect shared data structures.
   //
@@ -248,6 +244,26 @@ UsbMassWriteBlocks (
     }
   }
 
+  if (!(Media->MediaPresent)) {
+    Status = EFI_NO_MEDIA;
+    goto ON_EXIT;
+  }
+
+  if (MediaId != Media->MediaId) {
+    Status = EFI_MEDIA_CHANGED;
+    goto ON_EXIT;
+  }
+
+  if (BufferSize == 0) {
+    Status = EFI_SUCCESS;
+    goto ON_EXIT;
+  }
+
+  if (Buffer == NULL) {
+    Status = EFI_INVALID_PARAMETER;
+    goto ON_EXIT;
+  }
+
   //
   // BufferSize must be a multiple of the intrinsic block size of the device.
   //
@@ -263,16 +279,6 @@ UsbMassWriteBlocks (
   //
   if (Lba + TotalBlock - 1 > Media->LastBlock) {
     Status = EFI_INVALID_PARAMETER;
-    goto ON_EXIT;
-  }
-
-  if (!(Media->MediaPresent)) {
-    Status = EFI_NO_MEDIA;
-    goto ON_EXIT;
-  }
-
-  if (MediaId != Media->MediaId) {
-    Status = EFI_MEDIA_CHANGED;
     goto ON_EXIT;
   }
 

@@ -465,6 +465,37 @@ PartitionReset (
                                   );
 }
 
+/**
+  Probe the media status and return EFI_NO_MEDIA or EFI_MEDIA_CHANGED
+  for no media or media change case. Otherwise DefaultStatus is returned.
+
+  @param DiskIo             Pointer to the DiskIo instance.
+  @param MediaId            Id of the media, changes every time the media is replaced.
+  @param DefaultStatus      The default status to return when it's not the no media
+                            or media change case.
+
+  @retval EFI_NO_MEDIA      There is no media.
+  @retval EFI_MEDIA_CHANGED The media was changed.
+  @retval others            The default status to return.
+**/
+EFI_STATUS
+ProbeMediaStatus (
+  IN EFI_DISK_IO_PROTOCOL    *DiskIo,
+  IN UINT32                  MediaId,
+  IN EFI_STATUS              DefaultStatus
+  )
+{
+  EFI_STATUS                 Status;
+
+  //
+  // Read 1 byte from offset 0 but passing NULL as buffer pointer
+  //
+  Status = DiskIo->ReadDisk (DiskIo, MediaId, 0, 1, NULL);
+  if ((Status == EFI_NO_MEDIA) || (Status == EFI_MEDIA_CHANGED)) {
+    return Status;
+  }
+  return DefaultStatus;
+}
 
 /**
   Read by using the Disk IO protocol on the parent device. Lba addresses
@@ -501,12 +532,12 @@ PartitionReadBlocks (
   Private = PARTITION_DEVICE_FROM_BLOCK_IO_THIS (This);
 
   if (BufferSize % Private->BlockSize != 0) {
-    return EFI_BAD_BUFFER_SIZE;
+    return ProbeMediaStatus (Private->DiskIo, MediaId, EFI_BAD_BUFFER_SIZE);
   }
 
   Offset = MultU64x32 (Lba, Private->BlockSize) + Private->Start;
   if (Offset + BufferSize > Private->End) {
-    return EFI_INVALID_PARAMETER;
+    return ProbeMediaStatus (Private->DiskIo, MediaId, EFI_INVALID_PARAMETER);
   }
   //
   // Because some kinds of partition have different block size from their parent
@@ -552,12 +583,12 @@ PartitionWriteBlocks (
   Private = PARTITION_DEVICE_FROM_BLOCK_IO_THIS (This);
 
   if (BufferSize % Private->BlockSize != 0) {
-    return EFI_BAD_BUFFER_SIZE;
+    return ProbeMediaStatus (Private->DiskIo, MediaId, EFI_BAD_BUFFER_SIZE);
   }
 
   Offset = MultU64x32 (Lba, Private->BlockSize) + Private->Start;
   if (Offset + BufferSize > Private->End) {
-    return EFI_INVALID_PARAMETER;
+    return ProbeMediaStatus (Private->DiskIo, MediaId, EFI_INVALID_PARAMETER);
   }
   //
   // Because some kinds of partition have different block size from their parent

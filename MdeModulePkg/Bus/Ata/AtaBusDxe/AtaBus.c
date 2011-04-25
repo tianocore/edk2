@@ -842,17 +842,17 @@ BlockIoReadWrite (
   //
   // Check parameters.
   //
+  Media = This->Media;
+  if (MediaId != Media->MediaId) {
+    return EFI_MEDIA_CHANGED;
+  }
+
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   if (BufferSize == 0) {
     return EFI_SUCCESS;
-  }
-
-  Media = This->Media;
-  if (MediaId != Media->MediaId) {
-    return EFI_MEDIA_CHANGED;
   }
 
   BlockSize = Media->BlockSize;

@@ -1,7 +1,7 @@
 /** @file
   SCSI disk driver that layers on every SCSI IO protocol in the system.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -454,17 +454,8 @@ ScsiDiskReadBlocks (
   BOOLEAN             MediaChange;
   EFI_TPL             OldTpl;
 
-  MediaChange = FALSE;
-  if (Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (BufferSize == 0) {
-    return EFI_SUCCESS;
-  }
-
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-
+  MediaChange    = FALSE;
+  OldTpl         = gBS->RaiseTPL (TPL_CALLBACK);
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_THIS (This);
 
   if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
@@ -499,6 +490,16 @@ ScsiDiskReadBlocks (
 
   if (MediaId != Media->MediaId) {
     Status = EFI_MEDIA_CHANGED;
+    goto Done;
+  }
+
+  if (Buffer == NULL) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if (BufferSize == 0) {
+    Status = EFI_SUCCESS;
     goto Done;
   }
 
@@ -569,17 +570,8 @@ ScsiDiskWriteBlocks (
   BOOLEAN             MediaChange;
   EFI_TPL             OldTpl;
 
-  MediaChange = FALSE;
-  if (Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (BufferSize == 0) {
-    return EFI_SUCCESS;
-  }
-
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-
+  MediaChange    = FALSE;
+  OldTpl         = gBS->RaiseTPL (TPL_CALLBACK);
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_THIS (This);
 
   if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
@@ -614,6 +606,16 @@ ScsiDiskWriteBlocks (
 
   if (MediaId != Media->MediaId) {
     Status = EFI_MEDIA_CHANGED;
+    goto Done;
+  }
+
+  if (BufferSize == 0) {
+    Status = EFI_SUCCESS;
+    goto Done;
+  }
+
+  if (Buffer == NULL) {
+    Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
 
