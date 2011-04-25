@@ -40,7 +40,7 @@ Rand32 (
   )
 {
   UINTN    Found;
-  UINTN    Bits;
+  INTN     Bits;
   UINT64   Tsc1;
   UINT64   Tsc2;
   UINT64   TscBits;
