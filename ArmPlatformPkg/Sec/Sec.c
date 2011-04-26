@@ -192,6 +192,9 @@ CEntryPoint (
     }
 
     // Trustzone is not enabled, just enable the Distributor and CPU interface
+    if (CoreId == ARM_PRIMARY_CORE) {
+      PL390GicEnableDistributor (PcdGet32(PcdGicDistributorBase));
+    }
     PL390GicEnableInterruptInterface(PcdGet32(PcdGicInterruptInterfaceBase));
 
     // With Trustzone support the transition from Sec to Normal world is done by return_from_exception().
