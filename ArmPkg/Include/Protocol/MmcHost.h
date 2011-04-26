@@ -39,14 +39,16 @@ typedef UINT32 MMC_CMD;
 
 #define MMC_CMD_WAIT_RESPONSE      (1 << 16)
 #define MMC_CMD_LONG_RESPONSE      (1 << 17)
+#define MMC_CMD_NO_CRC_RESPONSE    (1 << 18)
 
-#define MMC_INDX(CMD_INDX)    (CMD_INDX & 0xFFFF)
+#define MMC_INDX(Index)       ((Index) & 0xFFFF)
+#define MMC_GET_INDX(MmcCmd)  ((MmcCmd) & 0xFFFF)
 
-#define MMC_CMD0              MMC_INDX(0)
-#define MMC_CMD1              (MMC_INDX(1) | MMC_CMD_WAIT_RESPONSE)
+#define MMC_CMD0              (MMC_INDX(0) | MMC_CMD_NO_CRC_RESPONSE)
+#define MMC_CMD1              (MMC_INDX(1) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_NO_CRC_RESPONSE)
 #define MMC_CMD2              (MMC_INDX(2) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_LONG_RESPONSE)
 #define MMC_CMD3              (MMC_INDX(3) | MMC_CMD_WAIT_RESPONSE)
-#define MMC_CMD5              (MMC_INDX(5) | MMC_CMD_WAIT_RESPONSE)
+#define MMC_CMD5              (MMC_INDX(5) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_NO_CRC_RESPONSE)
 #define MMC_CMD7              (MMC_INDX(7) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD8              (MMC_INDX(8) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD9              (MMC_INDX(9) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_LONG_RESPONSE)
@@ -60,7 +62,7 @@ typedef UINT32 MMC_CMD;
 #define MMC_CMD23             (MMC_INDX(23) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD24             (MMC_INDX(24) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD55             (MMC_INDX(55) | MMC_CMD_WAIT_RESPONSE)
-#define MMC_ACMD41            (MMC_INDX(41) | MMC_CMD_WAIT_RESPONSE)
+#define MMC_ACMD41            (MMC_INDX(41) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_NO_CRC_RESPONSE)
 
 typedef enum _MMC_STATE {
     MmcInvalidState = 0,
