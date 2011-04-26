@@ -118,7 +118,7 @@ MciSendCommand (
   }
 
   // Create Command for PL180
-  Cmd = INDX(MmcCmd);
+  Cmd = (MMC_GET_INDX(MmcCmd) & INDX_MASK)  | MCI_CPSM_ENABLED;
   if (MmcCmd & MMC_CMD_WAIT_RESPONSE) {
     Cmd |= MCI_CPSM_WAIT_RESPONSE;
   }
@@ -150,8 +150,8 @@ MciSendCommand (
       //DEBUG ((EFI_D_ERROR, "MciSendCommand(CmdIndex:%d) TIMEOUT! Response:0x%X Status:0x%x\n",(Cmd & 0x3F),MmioRead32(MCI_RESPONSE0_REG),Status));
       RetVal = EFI_TIMEOUT;
       goto Exit;
-    } else if (!((Cmd & 0x3F) == INDX(1)) && (Status & MCI_STATUS_CMD_CMDCRCFAIL)) {
-      // The CMD1 does not contain CRC. We should ignore the CRC failed Status.
+    } else if ((!(MmcCmd & MMC_CMD_NO_CRC_RESPONSE)) && (Status & MCI_STATUS_CMD_CMDCRCFAIL)) {
+      // The CMD1 and response type R3 do not contain CRC. We should ignore the CRC failed Status.
       RetVal = EFI_CRC_ERROR;
       goto Exit;
     } else {
@@ -173,7 +173,7 @@ MciSendCommand (
       RetVal = EFI_TIMEOUT;
       goto Exit;
     } else
-    if (!((Cmd & 0x3F) == INDX(1)) && (Status & MCI_STATUS_CMD_CMDCRCFAIL)) {
+    if ((!(MmcCmd & MMC_CMD_NO_CRC_RESPONSE)) && (Status & MCI_STATUS_CMD_CMDCRCFAIL)) {
         // The CMD1 does not contain CRC. We should ignore the CRC failed Status.
       RetVal = EFI_CRC_ERROR;
       goto Exit;
@@ -257,8 +257,8 @@ MciReadBlockData (
       Buffer[Loop] = MmioRead32(MCI_FIFO_REG);
       Loop++;
     } else if (Status & MCI_STATUS_CMD_RXDATAAVAILBL) {
-        Buffer[Loop] = MmioRead32(MCI_FIFO_REG);
-        Loop++;
+      Buffer[Loop] = MmioRead32(MCI_FIFO_REG);
+      Loop++;
     } else {
       //Check for error conditions and timeouts
       if(Status & MCI_STATUS_CMD_DATATIMEOUT) {
