@@ -29,9 +29,6 @@ GCC_ASM_EXPORT(SecVectorTable)
 //Default Exception Handlers
 //============================================================
   
-//FIXME: One of the EDK2 tool is broken. It does not look to respect the alignment. Even, if we specify 32-byte alignment for this file.
-Dummy1: .word      0
-Dummy2: .word      0
   
 ASM_PFX(SecVectorTable):
   b _DefaultResetHandler

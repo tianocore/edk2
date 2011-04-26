@@ -254,7 +254,7 @@ READ_LOCK_STATUS   = TRUE
 
 [Rule.Common.SEC]
   FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED {
-    TE  TE    Align = 8      |.efi
+    TE  TE    Align = 32      |.efi
   }
 
 [Rule.Common.PEI_CORE]

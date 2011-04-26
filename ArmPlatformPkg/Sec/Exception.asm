@@ -25,9 +25,6 @@
 //Default Exception Handlers
 //============================================================
   
-//FIXME: One of the EDK2 tool is broken. It does not look to respect the alignment. Even, if we specify 32-byte alignment for this file.
-Dummy1        DCD      0
-Dummy2        DCD      0
   
 SecVectorTable
   b _DefaultResetHandler
