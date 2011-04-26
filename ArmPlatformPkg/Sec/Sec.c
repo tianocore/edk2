@@ -19,24 +19,32 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/ArmLib.h>
-#include <Chipset/ArmV7.h>
-#include <Drivers/PL390Gic.h>
 #include <Library/SerialPortLib.h>
 #include <Library/ArmPlatformLib.h>
+
+#include <Chipset/ArmV7.h>
+#include <Drivers/PL390Gic.h>
+
+#define ARM_PRIMARY_CORE  0
 
 #define SerialPrint(txt)  SerialPortWrite (txt, AsciiStrLen(txt)+1);
 
 extern VOID *monitor_vector_table;
 
-VOID ArmSetupGicNonSecure (
-        IN  INTN          GicDistributorBase,
-        IN  INTN          GicInterruptInterfaceBase
+VOID
+ArmSetupGicNonSecure (
+  IN  INTN          GicDistributorBase,
+  IN  INTN          GicInterruptInterfaceBase
 );
 
 // Vector Table for Sec Phase
-VOID  SecVectorTable (VOID);
+VOID
+SecVectorTable (
+  VOID
+  );
 
-VOID NonSecureWaitForFirmware (
+VOID
+NonSecureWaitForFirmware (
   VOID
   );
 
@@ -64,7 +72,7 @@ CEntryPoint (
   UINTN           CharCount;
 
   // Primary CPU clears out the SCU tag RAMs, secondaries wait
-  if (CoreId == 0) {
+  if (CoreId == ARM_PRIMARY_CORE) {
     if (FixedPcdGet32(PcdMPCoreSupport)) {
       ArmInvalidScu();
     }
@@ -104,7 +112,7 @@ CEntryPoint (
     ArmEnableVFP();
   }
 
-  if (CoreId == 0) {
+  if (CoreId == ARM_PRIMARY_CORE) {
     // Initialize peripherals that must be done at the early stage
     // Example: Some L2x0 controllers must be initialized in Secure World
     ArmPlatformInitialize ();
@@ -116,7 +124,7 @@ CEntryPoint (
       ArmPlatformInitializeSystemMemory();
     }
 
-    // Turn Off NOR flash remapping to 0. We can will now see DRAM in low memory
+    // Some platform can change their physical memory mapping
     ArmPlatformBootRemapping();
   }
 
@@ -134,8 +142,8 @@ CEntryPoint (
     ArmWriteVMBar((UINT32) &monitor_vector_table);
 
     //-------------------- Monitor Mode ---------------------
-    // setup the Trustzone Chipsets
-    if (CoreId == 0) {
+    // Setup the Trustzone Chipsets
+    if (CoreId == ARM_PRIMARY_CORE) {
       ArmPlatformTrustzoneInit();
 
       // Wake up the secondary cores by sending a interrupt to everyone else
@@ -153,7 +161,7 @@ CEntryPoint (
       PL390GicSendSgiTo (PcdGet32(PcdGicDistributorBase), GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
     } else {
       // The secondary cores need to wait until the Trustzone chipsets configuration is done
-      // before swtching to Non Secure World
+      // before switching to Non Secure World
 
       // Enabled GIC CPU Interface
       PL390GicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
@@ -161,8 +169,8 @@ CEntryPoint (
       // Waiting for the SGI from the primary core
       ArmCallWFI();
 
-      //Acknowledge the interrupt and send End of Interrupt signal.
-      PL390GicAcknowledgeSgiFrom(PcdGet32(PcdGicInterruptInterfaceBase),0/*CoreId*/);
+      // Acknowledge the interrupt and send End of Interrupt signal.
+      PL390GicAcknowledgeSgiFrom(PcdGet32(PcdGicInterruptInterfaceBase), ARM_PRIMARY_CORE);
     }
 
     // Transfer the interrupt to Non-secure World
@@ -179,11 +187,11 @@ CEntryPoint (
     // security state (SCR_AW), CPSR.F modified in any security state (SCR_FW)
     ArmWriteScr(SCR_NS | SCR_FW | SCR_AW);
   } else {
-    if(0 == CoreId){
+    if (CoreId == ARM_PRIMARY_CORE) {
       SerialPrint ("Trust Zone Configuration is disabled\n\r");
     }
 
-    //Trustzone is not enabled, just enable the Distributor and CPU interface
+    // Trustzone is not enabled, just enable the Distributor and CPU interface
     PL390GicEnableInterruptInterface(PcdGet32(PcdGicInterruptInterfaceBase));
 
     // With Trustzone support the transition from Sec to Normal world is done by return_from_exception().
@@ -194,7 +202,7 @@ CEntryPoint (
 
   // If ArmVe has not been built as Standalone then we need to patch the DRAM to add an infinite loop at the start address
   if (FeaturePcdGet(PcdStandalone) == FALSE) {
-    if (CoreId == 0) {
+    if (CoreId == ARM_PRIMARY_CORE) {
       UINTN*   StartAddress = (UINTN*)PcdGet32(PcdNormalFdBaseAddress);
 
       // Patch the DRAM to make an infinite loop at the start address
@@ -228,18 +236,22 @@ CEntryPoint (
 
 // When the firmware is built as not Standalone, the secondary cores need to wait the firmware
 // entirely written into DRAM. It is the firmware from DRAM which will wake up the secondary cores.
-VOID NonSecureWaitForFirmware() {
+VOID
+NonSecureWaitForFirmware (
+  VOID
+  )
+{
   VOID (*secondary_start)(VOID);
 
-  // The secondary cores will execute the fimrware once wake from WFI.
+  // The secondary cores will execute the firmware once wake from WFI.
   secondary_start = (VOID (*)())PcdGet32(PcdNormalFdBaseAddress);
 
   ArmCallWFI();
 
-  //Acknowledge the interrupt and send End of Interrupt signal.
-  PL390GicAcknowledgeSgiFrom(PcdGet32(PcdGicInterruptInterfaceBase),0/*CoreId*/);
+  // Acknowledge the interrupt and send End of Interrupt signal.
+  PL390GicAcknowledgeSgiFrom(PcdGet32(PcdGicInterruptInterfaceBase),ARM_PRIMARY_CORE);
 
-  //Jump to secondary core entry point.
+  // Jump to secondary core entry point.
   secondary_start();
 
   // PEI Core should always load and never return
