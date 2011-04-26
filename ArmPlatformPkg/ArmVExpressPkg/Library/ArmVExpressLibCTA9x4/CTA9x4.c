@@ -63,8 +63,12 @@ struct pl341_dmc_config ddr_timings = {
   @return   A non-zero value if Trustzone supported.
 
 **/
-UINTN ArmPlatformTrustzoneSupported(VOID) {
-    return (MmioRead32(ARM_VE_SYS_CFGRW1_REG) & ARM_VE_CFGRW1_TZASC_EN_BIT_MASK);
+UINTN
+ArmPlatformTrustzoneSupported (
+  VOID
+  )
+{
+  return (MmioRead32(ARM_VE_SYS_CFGRW1_REG) & ARM_VE_CFGRW1_TZASC_EN_BIT_MASK);
 }
 
 /**
@@ -160,7 +164,11 @@ ArmPlatformGetBootMode (
   This function can do nothing if this feature is not relevant to your platform.
 
 **/
-VOID ArmPlatformBootRemapping(VOID) {
+VOID
+ArmPlatformBootRemapping (
+  VOID
+  )
+{
     UINT32 val32  = MmioRead32(ARM_VE_SYS_CFGRW1_REG); //Scc - CFGRW1
     // we remap the DRAM to 0x0
     MmioWrite32(ARM_VE_SYS_CFGRW1_REG, (val32 & 0x0FFFFFFF) | ARM_VE_CFGRW1_REMAP_DRAM);
@@ -174,11 +182,26 @@ VOID ArmPlatformBootRemapping(VOID) {
 
 **/
 VOID
-ArmPlatformInitialize (
+ArmPlatformSecInitialize (
   VOID
   ) {
   // The L2x0 controller must be intialize in Secure World
   L2x0CacheInit(PcdGet32(PcdL2x0ControllerBase), FALSE);
+}
+
+/**
+  Initialize controllers that must setup in the normal world
+
+  This function is called by the ArmPlatformPkg/Pei or ArmPlatformPkg/Pei/PlatformPeim
+  in the PEI phase.
+
+**/
+VOID
+ArmPlatformNormalInitialize (
+  VOID
+  )
+{
+  // Nothing to do here
 }
 
 /**
@@ -187,7 +210,11 @@ ArmPlatformInitialize (
   This memory is generally represented by the DRAM.
 
 **/
-VOID ArmPlatformInitializeSystemMemory(VOID) {
-    PL341DmcInit(&ddr_timings);
-    PL301AxiInit(ARM_VE_FAXI_BASE);
+VOID
+ArmPlatformInitializeSystemMemory (
+  VOID
+  )
+{
+  PL341DmcInit(&ddr_timings);
+  PL301AxiInit(ARM_VE_FAXI_BASE);
 }

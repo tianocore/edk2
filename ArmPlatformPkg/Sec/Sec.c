@@ -115,7 +115,7 @@ CEntryPoint (
   if (CoreId == ARM_PRIMARY_CORE) {
     // Initialize peripherals that must be done at the early stage
     // Example: Some L2x0 controllers must be initialized in Secure World
-    ArmPlatformInitialize ();
+    ArmPlatformSecInitialize ();
 
     // If we skip the PEI Core we could want to initialize the DRAM in the SEC phase.
     // If we are in standalone, we need the initialization to copy the UEFI firmware into DRAM

@@ -73,6 +73,9 @@ Returns:
 
   DEBUG ((EFI_D_ERROR, "Platform PEIM Loaded\n"));
 
+  // Initialize the platform specific controllers
+  ArmPlatformNormalInitialize ();
+
   BuildCpuHob (PcdGet8 (PcdPrePiCpuMemorySize), PcdGet8 (PcdPrePiCpuIoSize));
   
   BuildFvHob (FixedPcdGet32(PcdFlashFvMainBase), FixedPcdGet32(PcdFlashFvMainSize));

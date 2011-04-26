@@ -65,7 +65,10 @@ VOID ArmPlatformIsMemoryInitialized(VOID);
   pointer is not used (probably required to use assembly language)
 
 **/
-VOID ArmPlatformInitializeBootMemory(VOID);
+VOID
+ArmPlatformInitializeBootMemory (
+  VOID
+  );
 
 /**
   Return the current Boot Mode
@@ -88,7 +91,19 @@ ArmPlatformGetBootMode (
 
 **/
 VOID
-ArmPlatformInitialize (
+ArmPlatformSecInitialize (
+  VOID
+  );
+
+/**
+  Initialize controllers that must setup in the normal world
+
+  This function is called by the ArmPlatformPkg/Pei or ArmPlatformPkg/Pei/PlatformPeim
+  in the PEI phase.
+
+**/
+VOID
+ArmPlatformNormalInitialize (
   VOID
   );
 
@@ -98,7 +113,10 @@ ArmPlatformInitialize (
   This memory is generally represented by the DRAM.
 
 **/
-VOID ArmPlatformInitializeSystemMemory(VOID);
+VOID
+ArmPlatformInitializeSystemMemory (
+  VOID
+  );
 
 /**
   Remap the memory at 0x0
@@ -107,7 +125,10 @@ VOID ArmPlatformInitializeSystemMemory(VOID);
   This function can do nothing if this feature is not relevant to your platform.
 
 **/
-VOID ArmPlatformBootRemapping(VOID);
+VOID
+ArmPlatformBootRemapping (
+  VOID
+  );
 
 /**
   Return if Trustzone is supported by your platform
@@ -120,7 +141,10 @@ VOID ArmPlatformBootRemapping(VOID);
   @return   A non-zero value if Trustzone supported.
 
 **/
-UINTN ArmPlatformTrustzoneSupported(VOID);
+UINTN
+ArmPlatformTrustzoneSupported (
+  VOID
+  );
 
 /**
   Initialize the Secure peripherals and memory regions
@@ -129,7 +153,10 @@ UINTN ArmPlatformTrustzoneSupported(VOID);
   of the secure peripherals and memory regions.
 
 **/
-VOID ArmPlatformTrustzoneInit(VOID);
+VOID
+ArmPlatformTrustzoneInit (
+  VOID
+  );
 
 /**
   Return the information about the memory region in permanent memory used by PEI
@@ -156,9 +183,10 @@ VOID ArmPlatformGetPeiMemory (
                                     entry
 
 **/
-VOID ArmPlatformGetVirtualMemoryMap (
-    OUT ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemoryMap
-);
+VOID
+ArmPlatformGetVirtualMemoryMap (
+  OUT ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemoryMap
+  );
 
 /**
   Return the EFI Memory Map of your platform

@@ -29,9 +29,13 @@
   @return   A non-zero value if Trustzone supported.
 
 **/
-UINTN ArmPlatformTrustzoneSupported(VOID) {
+UINTN
+ArmPlatformTrustzoneSupported (
+  VOID
+  )
+{
   // There is no Trustzone controllers (TZPC & TZASC) and no Secure Memory on RTSM
-	return FALSE;
+  return FALSE;
 }
 
 /**
@@ -41,8 +45,12 @@ UINTN ArmPlatformTrustzoneSupported(VOID) {
   of the secure peripherals and memory regions.
 
 **/
-VOID ArmPlatformTrustzoneInit(VOID) {
-	ASSERT(FALSE);
+VOID
+ArmPlatformTrustzoneInit (
+  VOID
+  )
+{
+  ASSERT(FALSE);
 }
 
 /**
@@ -52,9 +60,13 @@ VOID ArmPlatformTrustzoneInit(VOID) {
   This function can do nothing if this feature is not relevant to your platform.
 
 **/
-VOID ArmPlatformBootRemapping(VOID) {
+VOID
+ArmPlatformBootRemapping (
+  VOID
+  )
+{
   // Disable memory remapping and return to normal mapping
-	MmioOr32 (ARM_EB_SYSCTRL, BIT8); //EB_SP810_CTRL_BASE
+  MmioOr32 (ARM_EB_SYSCTRL, BIT8); //EB_SP810_CTRL_BASE
 }
 
 /**
@@ -79,10 +91,25 @@ ArmPlatformGetBootMode (
 
 **/
 VOID
-ArmPlatformInitialize (
+ArmPlatformSecInitialize (
   VOID
   ) {
   // Do nothing yet
+}
+
+/**
+  Initialize controllers that must setup in the normal world
+
+  This function is called by the ArmPlatformPkg/Pei or ArmPlatformPkg/Pei/PlatformPeim
+  in the PEI phase.
+
+**/
+VOID
+ArmPlatformNormalInitialize (
+  VOID
+  )
+{
+  // Nothing to do here
 }
 
 /**
@@ -91,6 +118,10 @@ ArmPlatformInitialize (
   This memory is generally represented by the DRAM.
 
 **/
-VOID ArmPlatformInitializeSystemMemory(VOID) {
-    // We do not need to initialize the System Memory on RTSM
+VOID
+ArmPlatformInitializeSystemMemory (
+  VOID
+  )
+{
+  // We do not need to initialize the System Memory on RTSM
 }
