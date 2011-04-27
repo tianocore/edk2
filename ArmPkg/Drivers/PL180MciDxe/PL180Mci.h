@@ -90,11 +90,11 @@
 #define MCI_DATACTL_STREAM_TRANS        4
 #define MCI_DATACTL_DMA_ENABLE          (1 << 3)
 
-#define INDX(CMD_INDX)    ((CMD_INDX & 0x3F) | MCI_CPSM_ENABLED)
+#define INDX_MASK                       0x3F
 
-#define MCI_CPSM_ENABLED            (1 << 10)
-#define MCI_CPSM_WAIT_RESPONSE      (1 << 6)
-#define MCI_CPSM_LONG_RESPONSE      (1 << 7)
+#define MCI_CPSM_ENABLED                (1 << 10)
+#define MCI_CPSM_WAIT_RESPONSE          (1 << 6)
+#define MCI_CPSM_LONG_RESPONSE          (1 << 7)
 
 #define MCI_TRACE(txt)  DEBUG((EFI_D_BLKIO, "ARM_MCI: " txt "\n"))
 
