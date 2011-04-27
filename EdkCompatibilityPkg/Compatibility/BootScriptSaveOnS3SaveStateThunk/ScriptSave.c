@@ -514,15 +514,29 @@ BootScriptMemPoll (
   BitValue    = VA_ARG (Marker, UINT8 *);
   Duration    = (UINT64)VA_ARG (Marker, UINT64);
   LoopTimes   = (UINT64)VA_ARG (Marker, UINT64);
-  Delay       = MultU64x64 (DivU64x32(Duration, 100), LoopTimes);
+  //
+  // Framework version: Duration is used for Stall(), which is Microseconds.
+  //                    Total time is: Duration(Microseconds) * LoopTimes.
+  // PI version:        Duration is always 100ns. Delay is LoopTimes.
+  //                    Total time is: 100ns * Delay.
+  // So Delay = Duration(Microseconds) * LoopTimes / 100ns
+  //          = Duration * 1000ns * LoopTimes / 100ns
+  //          = Duration * 10 * LoopTimes
+  //
+  Delay       = MultU64x64 (MultU64x32 (Duration, 10), LoopTimes);
   
+  //
+  // Framework version: First BitMask, then BitValue
+  // PI version: First Data, then DataMask
+  // So we revert their order in function call
+  //
   return mS3SaveState->Write (
                           mS3SaveState,
                           EFI_BOOT_SCRIPT_MEM_POLL_OPCODE,
-                          Width, 
-                          Address, 
-                          BitMask, 
-                          BitValue, 
+                          Width,
+                          Address,
+                          BitValue,
+                          BitMask,
                           Delay
                           );
 }
