@@ -2,7 +2,7 @@
   Platform Key, Key Exchange Key, and Image signature database are defined 
   for the signed image validation.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -107,8 +107,9 @@ typedef struct {
 #pragma pack()
 
 ///
-/// This identifies a signature containing a SHA-256 hash. The SignatureHeader size should 
-/// always be 0.  The SignatureSize should always be 32 bytes.
+/// This identifies a signature containing a SHA-256 hash. The SignatureHeader size shall
+/// always be 0. The SignatureSize shall always be 16 (size of SignatureOwner component) +
+/// 32 bytes.
 ///
 #define EFI_CERT_SHA256_GUID \
   { \
@@ -116,8 +117,11 @@ typedef struct {
   }
 
 ///
-/// This identifies a signature containing an RSA-2048 key. The SignatureHeader size should 
-/// always be 0. The SignatureSize should always be 256 bytes.
+/// This identifies a signature containing an RSA-2048 key. The key (only the modulus
+/// since the public key exponent is known to be 0x10001) shall be stored in big-endian
+/// order.
+/// The SignatureHeader size shall always be 0. The SignatureSize shall always be 16 (size 
+/// of SignatureOwner component) + 32 bytes.
 ///
 #define EFI_CERT_RSA2048_GUID \
   { \
@@ -125,8 +129,9 @@ typedef struct {
   }
 
 ///
-/// This identifies a signature containing a RSA-2048 signature of a SHA-256 hash. The 
-/// SignatureHeader size should always be 0. The SignatureSize should always be 256 bytes.
+/// This identifies a signature containing a RSA-2048 signature of a SHA-256 hash.  The 
+/// SignatureHeader size shall always be 0. The SignatureSize shall always be 16 (size of 
+/// SignatureOwner component) + 32 bytes.
 ///
 #define EFI_CERT_RSA2048_SHA256_GUID \
   { \
@@ -134,8 +139,8 @@ typedef struct {
   }
 
 ///
-/// This identifies a signature containing a SHA-1 hash.  The SignatureHeader size should always
-/// be 0. The SignatureSize should always be 20 bytes
+/// This identifies a signature containing a SHA-1 hash.  The SignatureSize shall always
+/// be 16 (size of SignatureOwner component) + 32 bytes.
 ///
 #define EFI_CERT_SHA1_GUID \
   { \
@@ -143,8 +148,9 @@ typedef struct {
   }
 
 ///
-/// This identifies a signature containing a RSA-2048 signature of a SHA-1 hash. The 
-/// SignatureHeader size should always be 0. The SignatureSize should always be 256 bytes.
+/// TThis identifies a signature containing a RSA-2048 signature of a SHA-1 hash.  The 
+/// SignatureHeader size shall always be 0. The SignatureSize shall always be 16 (size of 
+/// SignatureOwner component) + 32 bytes.
 ///
 #define EFI_CERT_RSA2048_SHA1_GUID \
   { \
@@ -152,15 +158,49 @@ typedef struct {
   }
 
 ///
-/// This identifies a signature based on an X.509 certificate. If the signature is an X.509 certificate then 
-/// verification of the signature of an image should validate the public key certificate in the image using 
-/// certificate path verification, up to this X.509 certificate as a trusted root.
+/// This identifies a signature based on an X.509 certificate. If the signature is an X.509
+/// certificate then verification of the signature of an image should validate the public 
+/// key certificate in the image using certificate path verification, up to this X.509 
+/// certificate as a trusted root.  The SignatureHeader size shall always be 0. The
+/// SignatureSize may vary but shall always be 16 (size of the SignatureOwner component) + 
+/// the size of the certificate itself. 
+/// Note: This means that each certificate will normally be in a separate EFI_SIGNATURE_LIST.
 ///
-#define EFI_CERT_X509 \
+#define EFI_CERT_X509_GUID \
   { \
     0xa5c059a1, 0x94e4, 0x4aa7, {0x87, 0xb5, 0xab, 0x15, 0x5c, 0x2b, 0xf0, 0x72} \
   }
 
+///
+/// This identifies a signature containing a SHA-224 hash. The SignatureHeader size shall
+/// always be 0. The SignatureSize shall always be 16 (size of SignatureOwner component) +
+/// 28 bytes.
+///
+#define EFI_CERT_SHA224_GUID \
+  { \
+    0xb6e5233, 0xa65c, 0x44c9, {0x94, 0x7, 0xd9, 0xab, 0x83, 0xbf, 0xc8, 0xbd} \
+  }
+
+///
+/// This identifies a signature containing a SHA-384 hash. The SignatureHeader size shall
+/// always be 0. The SignatureSize shall always be 16 (size of SignatureOwner component) +
+/// 48 bytes.
+///
+#define EFI_CERT_SHA384_GUID \
+  { \
+    0xff3e5307, 0x9fd0, 0x48c9, {0x85, 0xf1, 0x8a, 0xd5, 0x6c, 0x70, 0x1e, 0x1} \
+  }  
+
+///
+/// This identifies a signature containing a SHA-512 hash. The SignatureHeader size shall
+/// always be 0. The SignatureSize shall always be 16 (size of SignatureOwner component) +
+/// 64 bytes.
+///
+#define EFI_CERT_SHA512_GUID \
+  { \
+    0x93e0fae, 0xa6c4, 0x4f50, {0x9f, 0x1b, 0xd4, 0x1e, 0x2b, 0x89, 0xc1, 0x9a} \
+  }
+  
 //***********************************************************************
 // Image Execution Information Table Definition
 //***********************************************************************
