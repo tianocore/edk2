@@ -3,7 +3,7 @@
   Emulation Variable services operate on the runtime volatile memory.
   The nonvolatile variable space doesn't exist.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1565,7 +1565,7 @@ EmuQueryVariableInfo (
     }
     VariableSize = (UINT64) (UINTN) NextVariable - (UINT64) (UINTN) Variable;
 
-    if ((NextVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+    if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
       HwErrVariableTotalSize += VariableSize;
     } else {
       CommonVariableTotalSize += VariableSize;

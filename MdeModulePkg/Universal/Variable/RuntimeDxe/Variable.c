@@ -2164,7 +2164,7 @@ VariableServiceQueryVariableInfo (
       // since the space occupied by variables not marked with
       // VAR_ADDED is not allowed to be reclaimed in Runtime.
       //
-      if ((NextVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+      if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
         HwErrVariableTotalSize += VariableSize;
       } else {
         CommonVariableTotalSize += VariableSize;
@@ -2175,7 +2175,7 @@ VariableServiceQueryVariableInfo (
       // the space not marked as VAR_ADDED is reclaimable now.
       //
       if (Variable->State == VAR_ADDED) {
-        if ((NextVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+        if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
           HwErrVariableTotalSize += VariableSize;
         } else {
           CommonVariableTotalSize += VariableSize;
