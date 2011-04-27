@@ -84,20 +84,20 @@ _DefaultReserved:
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #5
-  blx  PeiCommonExceptionEntry
+  blx  ASM_PFX(PeiCommonExceptionEntry)
 
 _DefaultIrq:
   sub  r1, LR, #4
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #6
-  blx  PeiCommonExceptionEntry
+  blx  ASM_PFX(PeiCommonExceptionEntry)
 
 _DefaultFiq:
   sub  r1, LR, #4
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #7
-  blx  PeiCommonExceptionEntry
+  blx  ASM_PFX(PeiCommonExceptionEntry)
 
-.end
+  END

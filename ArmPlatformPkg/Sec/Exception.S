@@ -84,20 +84,20 @@ _DefaultReserved:
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #5
-  blx  SecCommonExceptionEntry
+  blx  ASM_PFX(SecCommonExceptionEntry)
 
 _DefaultIrq:
   sub  r1, LR, #4
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #6
-  blx  SecCommonExceptionEntry
+  blx  ASM_PFX(SecCommonExceptionEntry)
 
 _DefaultFiq:
   sub  r1, LR, #4
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #7
-  blx  SecCommonExceptionEntry
+  blx  ASM_PFX(SecCommonExceptionEntry)
 
-
+  END
