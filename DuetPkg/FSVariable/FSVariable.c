@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1688,7 +1688,7 @@ Returns:
       // since the space occupied by variables not marked with
       // VAR_ADDED is not allowed to be reclaimed in Runtime.
       //
-      if ((NextVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+      if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
         HwErrVariableTotalSize += VariableSize;
       } else {
         CommonVariableTotalSize += VariableSize;
@@ -1699,7 +1699,7 @@ Returns:
       // the space not marked as VAR_ADDED is reclaimable now.
       //
       if ((Variable->State == VAR_ADDED) || (Variable->State == (VAR_ADDED & VAR_IN_DELETED_TRANSITION))) {
-        if ((NextVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+        if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
           HwErrVariableTotalSize += VariableSize;
         } else {
           CommonVariableTotalSize += VariableSize;
