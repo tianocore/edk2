@@ -1,0 +1,131 @@
+;
+; Copyright (c) 2011, Hewlett-Packard Company. All rights reserved.<BR>
+; 
+; This program and the accompanying materials                          
+; are licensed and made available under the terms and conditions of the BSD License         
+; which accompanies this distribution.  The full text of the license may be found at        
+; http://opensource.org/licenses/bsd-license.php                                            
+; 
+; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+; 
+
+  LOCAL &fvbase &fvsig &fvsig &ffsoffset &ffsfilesize &ffsfileaddr
+  ENTRY &fvbase
+
+  &fvsig=Data.Long(a:&fvbase+0x28)
+  if &fvsig!=0x4856465F
+  (
+	  print "FV does not have proper signature, exiting"
+	  return
+  )
+  
+  print "FV signature found"
+  
+  &fvlen=Data.Long(a:&fvbase+0x20)
+  
+  ; first ffs file is after fv header, use headerlength field
+  &ffsoffset=(Data.Long(a:&fvbase+0x30)&0xffff)
+  
+  ; loop through ffs files
+  &ffsfilesize=1
+  while (&ffsfilesize!=0)&&(&ffsoffset<(&fvlen))
+	(
+	  &ffsfileaddr=&fvbase+&ffsoffset
+	  ;print "found ffs file at &ffsfileaddr"
+	  
+		; process ffs file and increment by ffs file size field
+ 		gosub ProcessFfsFile &ffsfileaddr
+ 		
+ 		&ffsfilesize=(Data.Long(a:&ffsfileaddr+0x14)&0x00ffffff)
+ 		;print "ffsfilesize is &ffsfilesize"
+ 		
+	  &ffsoffset=&ffsoffset+&ffsfilesize
+
+    &ffsfilesize=(Data.Long(a:&fvbase+&ffsoffset+0x14)&0x00ffffff)
+    ;print "ffsfilesize now is &ffsfilesize"
+    if &ffsfilesize==0xffffff
+ 		(
+ 		  enddo
+ 		)
+ 		
+	  ; align to next 8 byte boundary
+    if (&ffsoffset&0x7)!=0
+	  (
+		  &ffsoffset=&ffsoffset+(0x8-(&ffsoffset&0x7))
+	  )
+	  
+  ) ; end fv ffs loop
+
+enddo
+
+ProcessFfsFile:
+  LOCAL &ffsfilestart &ffsfilesize &ffsfiletype &secoffset &secsize
+  ENTRY &ffsfilestart
+
+  ;print "processing ffs file at &ffsfilestart"
+  &ffsfilesize=Data.Long(a:&ffsfilestart+0x14)
+  &ffsfiletype=(&ffsfilesize&0xff000000)>>24.
+  &ffsfilesize=&ffsfilesize&0x00ffffff
+
+  if &ffsfiletype==0
+  (
+    return
+  )
+
+	print "ffs file at &ffsfilestart size &ffsfilesize type &ffsfiletype"
+
+  &secoffset=&ffsfilestart+0x18
+  
+  ; loop through sections in file
+  while &secoffset<(&ffsfilestart+&ffsfilesize)
+	(
+	  print "secoffset at &secoffset"
+	  
+		; process fv section and increment section offset by size
+    &secsize=(Data.Long(a:&secoffset)&0x00ffffff)
+    
+    gosub ProcessFvSection &secoffset
+    
+    
+		&secoffset=(&secoffset+&secsize)
+
+    ;print "secsize is &secsize"
+    ;print "secoffset at &secoffset"
+    
+	  ; align to next 4 byte boundary
+    if (&secoffset&0x3)!=0
+		(
+			&secoffset=&secoffset+(0x4-(&secoffset&0x3))
+		)
+	) ; end section loop
+  return
+  
+  
+ProcessFvSection:
+  LOCAL &secstart &sectionsize &sectiontype &secoffset &secsize
+  ENTRY &secstart
+
+	&sectionsize=Data.Long(a:&secstart)
+  &sectiontype=((&sectionsize&0xff000000)>>24.)
+  &sectionsize=&sectionsize&0x00ffffff;
+
+	print "fv section at &secstart size &sectionsize type &sectiontype"
+
+	if &sectiontype==0x10 ; PE32
+  (
+    do EfiProcessPeImage (&secstart+0x4)
+	)
+	else
+	(
+	  if &sectiontype==0x12 ; TE
+	  (
+		  do EfiProcessTeImage (&secstart+0x4)
+ 	  )
+ 	  else
+    (
+      print "unknown section type"
+    )
+ 	)
+  
+  return

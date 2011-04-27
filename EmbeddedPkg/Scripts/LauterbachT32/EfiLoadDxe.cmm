@@ -1,0 +1,135 @@
+;
+; Copyright (c) 2011, Hewlett-Packard Company. All rights reserved.<BR>
+; 
+; This program and the accompanying materials                          
+; are licensed and made available under the terms and conditions of the BSD License         
+; which accompanies this distribution.  The full text of the license may be found at        
+; http://opensource.org/licenses/bsd-license.php                                            
+; 
+; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+; 
+
+  LOCAL &maxmem &systbl &memsize
+  
+  &memsize=0x20000000   ; default to 512MB
+  
+  gosub FindSystemTable &memsize
+  ENTRY &systbl
+  
+  if &systbl!=0
+  (
+    print "found system table at &systbl"
+    gosub FindDebugInfo &systbl
+  )
+  else
+  (
+    print "ERROR: system table not found, check memory size"
+  )
+  enddo
+
+FindSystemTable:
+  LOCAL   &TopOfRam &offset
+  ENTRY   &TopOfRam
+  
+  print "FindSystemTable"
+  print "top of mem is &TopOfRam$"
+  
+  &offset=&TopOfRam
+  
+  ; align to highest 4MB boundary
+  &offset=&offset&0xFFC00000
+  
+  ; start at top and look on 4MB boundaries for system table ptr structure
+  while &offset>0
+  (
+    ; low signature match
+    if Data.Long(a:&offset)==0x20494249
+    (
+      ; high signature match
+      if Data.Long(a:&offset+4)==0x54535953
+      (
+        ; less than 4GB?
+        if Data.Long(a:&offset+0x0c)==0
+        (
+          ; less than top of ram?
+          if Data.Long(a:&offset+8)<&TopOfRam
+          (
+            return Data.Long(a:&offset+8)
+          )
+        )
+      )
+    )
+   
+    if &offset<0x400000
+    (
+      return 0
+    )
+    &offset=&offset-0x400000
+  )
+  
+  return 0
+
+
+FindDebugInfo:
+  LOCAL   &SystemTable &CfgTableEntries &ConfigTable &i &offset &dbghdr &dbgentries &dbgptr &dbginfo &loadedimg
+  ENTRY   &SystemTable
+  
+  print "FindDebugInfo"
+  
+  &dbgentries=0
+  &CfgTableEntries=Data.Long(a:&SystemTable+0x40)
+  &ConfigTable=Data.Long(a:&SystemTable+0x44)
+  
+  print "config table is at &ConfigTable (&CfgTableEntries entries)"
+  
+  ; now search for debug info entry with guid 49152E77-1ADA-4764-B7A2-7AFEFED95E8B
+  ;	0x49152E77	0x47641ADA	0xFE7AA2B7	0x8B5ED9FE
+  &i=0
+  while &i<&CfgTableEntries
+  (
+    &offset=&ConfigTable+(&i*0x14)
+    if Data.Long(a:&offset)==0x49152E77
+    (
+      if Data.Long(a:&offset+4)==0x47641ADA
+      (
+        if Data.Long(a:&offset+8)==0xFE7AA2B7
+        (
+          if Data.Long(a:&offset+0xc)==0x8B5ED9FE
+          (
+            &dbghdr=Data.Long(a:&offset+0x10)
+            &dbgentries=Data.Long(a:&dbghdr+4)
+            &dbgptr=Data.Long(a:&dbghdr+8)
+          )
+        )
+      )
+    )
+    
+    &i=&i+1
+  )
+  
+  if &dbgentries==0
+  (
+    print "no debug entries found"
+    return
+  )
+  
+  print "debug table at &dbgptr (&dbgentries entries)"
+  
+  symbol.reset
+  
+  &i=0
+  while &i<&dbgentries
+  (
+    &dbginfo=Data.Long(a:&dbgptr+(&i*4))
+    if &dbginfo!=0
+    (
+      if Data.Long(a:&dbginfo)==1 ; normal debug info type
+      (
+        &loadedimg=Data.Long(a:&dbginfo+4)
+        do EfiProcessPeImage Data.Long(a:&loadedimg+0x20)
+      )
+    )
+    &i=&i+1
+  )
+  return

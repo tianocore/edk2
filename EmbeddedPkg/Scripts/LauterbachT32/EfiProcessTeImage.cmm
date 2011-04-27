@@ -1,0 +1,70 @@
+;
+; Copyright (c) 2011, Hewlett-Packard Company. All rights reserved.<BR>
+; 
+; This program and the accompanying materials                          
+; are licensed and made available under the terms and conditions of the BSD License         
+; which accompanies this distribution.  The full text of the license may be found at        
+; http://opensource.org/licenses/bsd-license.php                                            
+; 
+; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+; 
+
+  LOCAL &imgstart &strippedsize &debugdirentryrva &debugtype &debugrva &dwarfsig &elfbase &elfpath &pathoffset
+  ENTRY &imgstart
+  
+  &imgstart=&imgstart
+  print "TE image found at &imgstart"
+
+  ; determine pe header bytes removed to account for in rva references
+  &strippedsize=(Data.Long(a:&imgstart+0x4)&0xffff0000)>>16.
+  &strippedsize=&strippedsize-0x28
+
+  &debugdirentryrva=Data.Long(a:&imgstart+0x20)
+  if &debugdirentryrva==0
+  (
+    print "no debug dir for image at &imgstart"
+    enddo
+  )
+  &debugdirentryrva=&debugdirentryrva-&strippedsize
+
+  &debugtype=Data.Long(a:&imgstart+&debugdirentryrva+0xc)
+  if (&debugtype!=0xdf)&&(&debugtype!=0x02)
+  (
+    print "debug type is not dwarf for image at &imgstart, it's &debugtype"
+    enddo
+  )
+  
+  &debugrva=Data.Long(a:&imgstart+&debugdirentryrva+0x14)
+  &debugrva=&debugrva-&strippedsize;
+  &dwarfsig=Data.Long(a:&imgstart+&debugrva);
+  if &dwarfsig==0x66727764
+  (
+    &pathoffset=0xc
+  )
+  else
+  (
+    if &dwarfsig==0x3031424E
+    (
+      &pathoffset=0x10
+    )
+    else
+    (
+      print "debug signature not found for image at &imgstart, its &dwarfsig"
+      enddo
+    )
+  )
+
+  &elfpath=Data.String(c:&imgstart+&debugrva+&pathoffset)
+
+  ; elf base is baseofcode (we hope that for TE images it's not baseofdata)
+  &elfbase=&imgstart+Data.Long(a:&imgstart+0xc)-&strippedsize
+
+  print "found path &elfpath"
+  ; $fprintf 50, "load /ni /np /a %s &0x%x\n",elfpath,elfbase$;
+         ON ERROR GOSUB
+              return
+  data.load.elf &elfpath &elfbase /NOCODE /NOCLEAR
+        ON error
+
+enddo

@@ -1,0 +1,40 @@
+;
+; Copyright (c) 2011, Hewlett-Packard Company. All rights reserved.<BR>
+; 
+; This program and the accompanying materials                          
+; are licensed and made available under the terms and conditions of the BSD License         
+; which accompanies this distribution.  The full text of the license may be found at        
+; http://opensource.org/licenses/bsd-license.php                                            
+; 
+; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+; 
+
+;choose hex mode for input
+ radix hex
+
+  menu.rp
+ (
+  add
+  toolbar
+  (
+   separator
+   toolitem "Reset Target"              "RS"      "sys.ResetTarget"
+   separator
+   toolitem "Load EFI DXE Symbols"      "DX"      "do EfiLoadDxe"
+   toolitem "Load EFI Runtime Symbols"  "RT"      "do EfiLoadRuntimeDxe"
+  )
+ )
+ 
+  system.config.debugaccessport 0
+  system.config.corebase 0x80001000
+  system.attach
+  break.sel.program onchip
+  
+  setup.var %hex.on
+  setup.var %decimal.OFF
+
+
+enddo
+
+
