@@ -1,0 +1,53 @@
+## @file
+#  Enquire application for system integer and floating point characteristics
+#  enquiry.
+#
+#   Due to the level of hardware introspection, this application MUST be built
+#   with optimizations disabled.
+#
+# COPYRIGHT(c) 1993-9 Steven Pemberton, CWI. All rights reserved.
+# NOTE: Improvements gratefully received. Please mention the version.
+#       "http://www.cwi.nl/~steven/enquire.html"
+#
+#  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = Enquire
+  FILE_GUID                      = 42f58b27-5dc3-4fa7-844d-5a7dbff06432
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 0.1
+  ENTRY_POINT                    = ShellCEntryLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+
+[Sources]
+  Enquire.c
+
+[Packages]
+  StdLib/StdLib.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiLib
+  LibC
+  LibString
+  LibStdio
+  LibGdtoa
+  LibWchar
+
+[BuildOptions]
+  INTEL:*_*_*_CC_FLAGS    = /Qdiag-disable:181,186
+   MSFT:*_*_*_CC_FLAGS    = /Od
+    GCC:*_*_*_CC_FLAGS    = -O0 -Wno-unused-variable

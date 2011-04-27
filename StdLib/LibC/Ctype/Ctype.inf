@@ -1,0 +1,50 @@
+## @file
+#
+# Character Classification library implementing the functionality described
+# by the <ctype.h> header of the C Standard Library, ISO/IEC 9899:1990 with
+# Amendment 1 (C95).
+#
+# Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THIS PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LibCtype
+  FILE_GUID                      = dcc64575-fa7d-4b7b-b1ad-48427c97c74d
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LibCtype
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+
+[Sources]
+  iCtype.c
+  CClass.c
+  CConv.c
+
+[Packages]
+  StdLib/StdLib.dec
+  StdLibPrivateInternalFiles/DoNotUse.dec
+  MdePkg/MdePkg.dec
+
+################################################################
+#
+# The Build Options, below, are only used when building the C library.
+# DO NOT use them when building your application!
+# Nasty things could happen if you do.
+#
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS    = /GL-

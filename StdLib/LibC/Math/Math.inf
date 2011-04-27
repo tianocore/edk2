@@ -1,0 +1,101 @@
+## @file
+#  Standard C library: Math Library.
+#
+#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LibMath
+  FILE_GUID                      = a9dc6f60-f861-47d1-8751-ecaae7d27291
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LibMath
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+
+[Sources]
+  # ieee 754 specific
+  e_acos.c
+  e_asin.c
+  e_atan2.c
+  e_cosh.c
+  e_exp.c
+  e_sinh.c
+  e_log.c
+  e_log2.c
+  e_log10.c
+  e_pow.c
+  e_sqrt.c
+  e_fmod.c
+  e_rem_pio2.c
+
+  # kernel functions
+  k_cos.c
+  k_sin.c
+  k_tan.c
+  k_rem_pio2.c
+
+  # Simple, unadorned, functions
+  s_atan.c
+  s_cos.c
+  s_sin.c
+  s_tan.c
+  s_expm1.c
+  s_tanh.c
+  s_frexp.c
+  s_ldexp.c
+  s_scalbn.c
+  s_copysign.c
+  s_finite.c
+  s_infinity.c
+  s_modf.c
+  s_fabs.c
+  s_ceil.c
+  s_floor.c
+
+  # wrapper functions
+  w_acos.c
+  w_asin.c
+  w_atan2.c
+  w_cosh.c
+  w_sinh.c
+  w_exp.c
+  w_log.c
+  w_log2.c
+  w_log10.c
+  w_pow.c
+  w_sqrt.c
+  w_fmod.c
+
+[Packages]
+  StdLib/StdLib.dec
+  StdLibPrivateInternalFiles/DoNotUse.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  LibC
+
+################################################################
+# The Build Options, below, are only used when building the C library.
+# DO NOT use them when building your application!
+# Nasty things could happen if you do.
+#
+# /Oi- is required for Microsoft VC++ to allow "intrinsic" functions to be
+# defined in this library.
+# /GL- is required so that LTCG generated references to functions in this library,
+# such as memcpy(), can be resolved.
+#
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS     = /Oi- /GL-

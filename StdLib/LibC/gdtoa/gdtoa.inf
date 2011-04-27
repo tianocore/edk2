@@ -1,0 +1,77 @@
+## @file
+#  This module contains source for a library of binary -> decimal
+#  and decimal -> binary conversion routines, for single-, double-,
+#  and extended-precision IEEE binary floating-point arithmetic, and
+#  other IEEE-like binary floating-point, including "double double".
+#
+#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LibGdtoa
+  FILE_GUID                      = 5c98de6e-cb69-465f-b6b9-f661e26e6f9d
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LibGdtoa
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+
+[Sources.X64]
+  strtof.c
+  strtold_px.c
+  strtopx.c
+
+[Sources.IPF]
+  strtof.c
+  Ipf/strtold.c
+
+[Sources.IA32]
+  strtof.c
+  strtold_px.c
+  strtopx.c
+
+[Sources.ARM]
+  strtof.c
+
+[Sources]
+  strtod.c      # Public interfaces
+  atof.c
+
+  # Private interfaces interfacing to libc
+  dtoa.c
+  ldtoa.c
+  gdtoa.c
+
+  # private interfaces
+  dmisc.c
+  gmisc.c
+  hd_init.c
+  hexnan.c
+  misc.c
+  smisc.c
+  strtodg.c
+  sum.c
+  ulp.c
+
+[Packages]
+  StdLib/StdLib.dec
+  StdLibPrivateInternalFiles/DoNotUse.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  LibC
+  LibLocale
+  LibStdLib
+  LibString
