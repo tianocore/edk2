@@ -308,19 +308,7 @@ Ip4ConfigDriverBindingStart (
   //
   NicConfig = Ip4ConfigReadVariable (Instance);
   if (NicConfig != NULL) {
-    if (NicConfig->Perment) {
-      if (NicConfig->Source == IP4_CONFIG_SOURCE_STATIC) {
-        //
-        // Don't modify the permanent static configuration.
-        //
-      } else if (NicConfig->Source == IP4_CONFIG_SOURCE_DHCP) {
-        //
-        // Remove the previous acquired DHCP parameters.
-        //
-        ZeroMem (&NicConfig->Ip4Info, sizeof (EFI_IP4_IPCONFIG_DATA));
-        Ip4ConfigWriteVariable (Instance, NicConfig);
-      }
-    } else {
+    if (!NicConfig->Perment) {
       //
       // Delete the non-permanent configuration.
       //
