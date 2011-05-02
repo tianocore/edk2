@@ -313,7 +313,7 @@ SmbiosPrintStructure (
   // Processor Information (Type 4)
   //
   case 4:
-    PRINT_STRUCT_VALUE (Struct, Type4, Socket);
+    PRINT_PENDING_STRING (Struct, Type4, Socket);
     DisplayProcessorType (Struct->Type4->ProcessorType, Option);
     if ((SmbiosMajorVersion > 0x2 || (SmbiosMajorVersion == 0x2 && SmbiosMinorVersion >= 0x6)) &&
         (Struct->Type4->ProcessorFamily == 0xFE)) {
