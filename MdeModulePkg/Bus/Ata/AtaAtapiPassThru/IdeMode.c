@@ -1,7 +1,7 @@
 /** @file
   Header file for AHCI mode of ATA host controller.
   
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -1123,16 +1123,20 @@ AtaIssueCommand (
 /**
   This function is used to send out ATA commands conforms to the PIO Data In Protocol.
 
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
-  @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Buffer           A pointer to the source buffer for the data.
-  @param ByteCount        The length of  the data.
-  @param Read             Flag used to determine the data transfer direction.
-                          Read equals 1, means data transferred from device to host;
-                          Read equals 0, means data transferred from host to device.  
-  @param AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
-  @param AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
-  @param Timeout          The time to complete the command.
+  @param[in]      PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data
+                                   structure.
+  @param[in]      IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
+  @param[in, out] Buffer           A pointer to the source buffer for the data.
+  @param[in]      ByteCount        The length of the data.
+  @param[in] Read                  Flag used to determine the data transfer direction.
+                                   Read equals 1, means data transferred from device
+                                   to host;Read equals 0, means data transferred
+                                   from host to device.
+  @param[in]      AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
+  @param[in]      AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
+  @param[in]      Timeout          The time to complete the command.
+  @param[in]      Task             Optional. Pointer to the ATA_NONBLOCK_TASK
+                                   used by non-blocking mode.
   
   @retval EFI_SUCCESS      send out the ATA command and device send required data successfully.
   @retval EFI_DEVICE_ERROR command sent failed.
@@ -1148,7 +1152,8 @@ AtaPioDataInOut (
   IN     BOOLEAN                   Read,
   IN     EFI_ATA_COMMAND_BLOCK     *AtaCommandBlock,
   IN OUT EFI_ATA_STATUS_BLOCK      *AtaStatusBlock,
-  IN     UINT64                    Timeout
+  IN     UINT64                    Timeout,
+  IN     ATA_NONBLOCK_TASK         *Task
   )
 {
   UINTN       WordCount;
@@ -1248,17 +1253,24 @@ Exit:
   //
   DumpAllIdeRegisters (PciIo, IdeRegisters, AtaStatusBlock);
 
+  //
+  // Not support the Non-blocking now,just do the blocking process.
+  //
   return Status;
 }
 
 /**
   Send ATA command into device with NON_DATA protocol
 
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
-  @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
-  @param AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
-  @param Timeout          The time to complete the command.
+  @param[in]      PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE
+                                   data structure.
+  @param[in]      IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
+  @param[in]      AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data
+                                   structure.
+  @param[in, out] AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
+  @param[in]      Timeout          The time to complete the command.
+  @param[in]      Task             Optional. Pointer to the ATA_NONBLOCK_TASK
+                                   used by non-blocking mode.
 
   @retval  EFI_SUCCESS Reading succeed
   @retval  EFI_ABORTED Command failed
@@ -1272,7 +1284,8 @@ AtaNonDataCommandIn (
   IN     EFI_IDE_REGISTERS         *IdeRegisters,
   IN     EFI_ATA_COMMAND_BLOCK     *AtaCommandBlock,
   IN OUT EFI_ATA_STATUS_BLOCK      *AtaStatusBlock,
-  IN     UINT64                    Timeout
+  IN     UINT64                    Timeout,
+  IN     ATA_NONBLOCK_TASK         *Task
   )
 {
   EFI_STATUS  Status;
@@ -1310,24 +1323,123 @@ Exit:
   // Dump All Ide registers to ATA_STATUS_BLOCK
   //
   DumpAllIdeRegisters (PciIo, IdeRegisters, AtaStatusBlock);
+  
+  //
+  // Not support the Non-blocking now,just do the blocking process.
+  //
+  return Status;
+}
+
+/**
+  Wait for memory to be set.
+    
+  @param[in]  PciIo           The PCI IO protocol instance.
+  @param[in]  PortNum         The IDE Port number.
+
+  @retval EFI_DEVICE_ERROR  The memory is not set.
+  @retval EFI_TIMEOUT       The memory setting is time out.
+  @retval EFI_SUCCESS       The memory is correct set.
+
+**/
+EFI_STATUS
+AtaUdmStatusWait (
+  IN     EFI_PCI_IO_PROTOCOL       *PciIo,
+  IN     UINT16                    PortNum
+ ) 
+{
+  UINT8                         RegisterValue;
+  EFI_STATUS                    Status;
+  UINT64                        Timeout;
+
+  Timeout = 2000;
+
+  while (TRUE) {
+    RegisterValue  = IdeReadPortB (PciIo, PortNum);
+
+    if (((RegisterValue & BMIS_ERROR) != 0) || (Timeout == 0)) {
+      DEBUG ((EFI_D_ERROR, "ATA UDMA operation fails\n"));
+      Status = EFI_DEVICE_ERROR;
+      break;
+    }
+
+    if ((RegisterValue & BMIS_INTERRUPT) != 0) {
+      Status = EFI_SUCCESS;
+      DEBUG ((DEBUG_INFO, "Task->RetryTimes = %x\n", Timeout));      
+      break;
+    }
+    //
+    // Stall for 1 milliseconds.
+    //
+    MicroSecondDelay (1000);
+    Timeout--;
+  }
 
   return Status;
 }
 
+/**
+  Check if the memory to be set.
+    
+  @param[in]  PciIo           The PCI IO protocol instance.
+  @param[in]  Task            Optional. Pointer to the ATA_NONBLOCK_TASK
+                              used by non-blocking mode.
+  @param[in]  PortForBit      The bit to be checked.
+
+  @retval EFI_DEVICE_ERROR  The memory setting met a issue.
+  @retval EFI_NOT_READY     The memory is not set.
+  @retval EFI_TIMEOUT       The memory setting is time out.
+  @retval EFI_SUCCESS       The memory is correct set.
+
+**/
+EFI_STATUS
+AtaUdmStatusCheck (
+  IN     EFI_PCI_IO_PROTOCOL        *PciIo,
+  IN     ATA_NONBLOCK_TASK          *Task,
+  IN     UINT16                     PortForBit
+ )
+{
+  UINT8                         RegisterValue;
+
+  Task->RetryTimes--;
+  RegisterValue  = IdeReadPortB(PciIo, PortForBit);
+
+  if ((RegisterValue & BMIS_ERROR) != 0) {
+    DEBUG ((EFI_D_ERROR, "ATA UDMA operation fails\n"));
+    return EFI_DEVICE_ERROR;
+  }
+
+  if ((RegisterValue & BMIS_INTERRUPT) != 0) {
+    DEBUG ((DEBUG_INFO, "Task->RetryTimes = %x\n", Task->RetryTimes));
+    return EFI_SUCCESS;
+  }
+
+  if (Task->RetryTimes == 0) {
+    return EFI_TIMEOUT;
+  } else {
+    //
+    // The memory is not set.
+    //
+    return EFI_NOT_READY;
+  }
+}
 
 /**
   Perform an ATA Udma operation (Read, ReadExt, Write, WriteExt).
 
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
-  @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Read             Flag used to determine the data transfer direction.
-                          Read equals 1, means data transferred from device to host;
-                          Read equals 0, means data transferred from host to device.
-  @param DataBuffer       A pointer to the source buffer for the data.
-  @param DataLength       The length of  the data.
-  @param AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
-  @param AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
-  @param Timeout          The time to complete the command.
+  @param[in]      Instance         A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data
+                                   structure.
+  @param[in]      IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
+  @param[in]      Read             Flag used to determine the data transfer
+                                   direction. Read equals 1, means data transferred
+                                   from device to host;Read equals 0, means data
+                                   transferred from host to device.
+  @param[in]      DataBuffer       A pointer to the source buffer for the data.
+  @param[in]      DataLength       The length of  the data.
+  @param[in]      AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
+  @param[in, out] AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
+  @param[in]      Timeout          The time to complete the command.
+  @param[in]      Task             Optional. Pointer to the ATA_NONBLOCK_TASK
+                                   used by non-blocking mode.
 
   @retval EFI_SUCCESS          the operation is successful.
   @retval EFI_OUT_OF_RESOURCES Build PRD table failed
@@ -1338,14 +1450,15 @@ Exit:
 EFI_STATUS
 EFIAPI
 AtaUdmaInOut (
-  IN     EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN     EFI_IDE_REGISTERS         *IdeRegisters,
-  IN     BOOLEAN                   Read,
-  IN     VOID                      *DataBuffer,
-  IN     UINT64                    DataLength,
-  IN     EFI_ATA_COMMAND_BLOCK     *AtaCommandBlock,
-  IN OUT EFI_ATA_STATUS_BLOCK      *AtaStatusBlock,
-  IN     UINT64                    Timeout
+  IN     ATA_ATAPI_PASS_THRU_INSTANCE  *Instance,
+  IN     EFI_IDE_REGISTERS             *IdeRegisters,
+  IN     BOOLEAN                       Read,
+  IN     VOID                          *DataBuffer,
+  IN     UINT64                        DataLength,
+  IN     EFI_ATA_COMMAND_BLOCK         *AtaCommandBlock,
+  IN OUT EFI_ATA_STATUS_BLOCK          *AtaStatusBlock,
+  IN     UINT64                        Timeout,
+  IN     ATA_NONBLOCK_TASK             *Task
   )
 {
   EFI_STATUS                    Status;
@@ -1353,18 +1466,16 @@ AtaUdmaInOut (
   UINT16                        IoPortForBmis;
   UINT16                        IoPortForBmid;
 
-  UINT8                         RegisterValue;
-
-  EFI_ATA_DMA_PRD               *PrdBaseAddr;
-  UINTN                         PrdTableNum;
   UINTN                         PrdTableSize;
   EFI_PHYSICAL_ADDRESS          PrdTableMapAddr;
   VOID                          *PrdTableMap;
+  EFI_ATA_DMA_PRD               *PrdBaseAddr;
+  UINTN                         PrdTableNum;
 
+  UINT8                         RegisterValue;
   UINTN                         PageCount;
   UINTN                         ByteCount;
   UINTN                         ByteRemaining;
-
   UINT8                         DeviceControl;
 
   VOID                          *BufferMap;
@@ -1373,13 +1484,35 @@ AtaUdmaInOut (
 
   UINT8                         DeviceHead;
   UINT8                         AtaCommand;
+  EFI_PCI_IO_PROTOCOL           *PciIo;
+  EFI_TPL                       OldTpl;
 
-  Status      = EFI_SUCCESS;
-  PrdBaseAddr = NULL;
+
+  Status        = EFI_SUCCESS;
+  PrdBaseAddr   = NULL;
+  PrdTableMap   = NULL;
+  BufferMap     = NULL;
+  PageCount     = 0;
+  PciIo         = Instance->PciIo;
 
   if ((PciIo == NULL) || (IdeRegisters == NULL) || (DataBuffer == NULL) || (AtaCommandBlock == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
+  //
+  // Before starting the Blocking BlockIO operation, push to finish all non-blocking
+  // BlockIO tasks.
+  // Delay 1ms to simulate the blocking time out checking.
+  //
+  while ((Task == NULL) && (!IsListEmpty (&Instance->NonBlockingTaskList))) {
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    AsyncNonBlockingTransferRoutine (NULL, Instance);
+    gBS->RestoreTPL (OldTpl);
+    //
+    // Stall for 1 milliseconds.
+    //
+    MicroSecondDelay (1000);
+  } 
 
   //
   // The data buffer should be even alignment
@@ -1389,163 +1522,187 @@ AtaUdmaInOut (
   }
 
   //
-  // Calculate the number of PRD entry.
-  // Every entry in PRD table can specify a 64K memory region.
+  // Set relevant IO Port address.
   //
-  PrdTableNum   = (UINTN)(RShiftU64(DataLength, 16) + 1);
-
-  //
-  // Make sure that the memory region of PRD table is not cross 64K boundary
-  //
-  PrdTableSize = PrdTableNum * sizeof (EFI_ATA_DMA_PRD);
-  if (PrdTableSize > 0x10000) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Allocate buffer for PRD table initialization.
-  //
-  PageCount = EFI_SIZE_TO_PAGES (PrdTableSize);
-  Status    = PciIo->AllocateBuffer (
-                       PciIo,
-                       AllocateAnyPages,
-                       EfiBootServicesData,
-                       PageCount,
-                       (VOID **)&PrdBaseAddr,
-                       0
-                       );
-  if (EFI_ERROR (Status)) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  ByteCount = EFI_PAGES_TO_SIZE (PageCount);
-  Status    = PciIo->Map (
-                       PciIo,
-                       EfiPciIoOperationBusMasterCommonBuffer,
-                       PrdBaseAddr,
-                       &ByteCount,
-                       &PrdTableMapAddr,
-                       &PrdTableMap
-                       );
-  if (EFI_ERROR (Status) || (ByteCount != EFI_PAGES_TO_SIZE (PageCount))) {
-    //
-    // If the data length actually mapped is not equal to the requested amount,
-    // it means the DMA operation may be broken into several discontinuous smaller chunks.
-    // Can't handle this case.
-    //
-    PciIo->FreeBuffer (PciIo, PageCount, PrdBaseAddr);
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  ZeroMem ((VOID *) ((UINTN) PrdBaseAddr), ByteCount);
-
-  //
-  // Map the host address of DataBuffer to DMA master address.
-  //
-  if (Read) {
-    PciIoOperation = EfiPciIoOperationBusMasterWrite;
-  } else {
-    PciIoOperation = EfiPciIoOperationBusMasterRead;
-  }
-
-  ByteCount = (UINTN)DataLength;
-  Status    = PciIo->Map (
-                       PciIo,
-                       PciIoOperation,
-                       DataBuffer,
-                       &ByteCount,
-                       &BufferMapAddress,
-                       &BufferMap
-                       );
-  if (EFI_ERROR (Status) || (ByteCount != DataLength)) {
-    PciIo->Unmap (PciIo, PrdTableMap);
-    PciIo->FreeBuffer (PciIo, PageCount, PrdBaseAddr);
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // According to Ata spec, it requires the buffer address and size to be even.
-  //
-  ASSERT ((BufferMapAddress & 0x1) == 0);
-  ASSERT ((ByteCount & 0x1) == 0);
-
-  //
-  // Fill the PRD table with appropriate bus master address of data buffer and data length.
-  //
-  ByteRemaining = ByteCount;
-  while (ByteRemaining != 0) {
-    if (ByteRemaining <= 0x10000) {
-      PrdBaseAddr->RegionBaseAddr = (UINT32) ((UINTN) BufferMapAddress);
-      PrdBaseAddr->ByteCount      = (UINT16) ByteRemaining;
-      PrdBaseAddr->EndOfTable     = 0x8000;
-      break;
-    }
-
-    PrdBaseAddr->RegionBaseAddr = (UINT32) ((UINTN) BufferMapAddress);
-    PrdBaseAddr->ByteCount      = (UINT16) 0x0;
-
-    ByteRemaining    -= 0x10000;
-    BufferMapAddress += 0x10000;
-    PrdBaseAddr++;
-  }
-
-  //
-  // Start to enable the DMA operation
-  //
-  DeviceHead = AtaCommandBlock->AtaDeviceHead;
-  AtaCommand = AtaCommandBlock->AtaCommand;
-
-  IdeWritePortB (PciIo, IdeRegisters->Head, (UINT8)(0xe0 | DeviceHead));
-
-  //
-  // Enable interrupt to support UDMA
-  //
-  DeviceControl = 0;
-  IdeWritePortB (PciIo, IdeRegisters->AltOrDev, DeviceControl);
-
   IoPortForBmic = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMIC_OFFSET);
   IoPortForBmis = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMIS_OFFSET);
   IoPortForBmid = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMID_OFFSET);
 
   //
-  // Read BMIS register and clear ERROR and INTR bit
-  //
-  RegisterValue  = IdeReadPortB(PciIo, IoPortForBmis);
-  RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
-  IdeWritePortB(PciIo, IoPortForBmis, RegisterValue);
+  // For Blocking mode, start the command. 
+  // For non-blocking mode, when the command is not started, start it, otherwise
+  // go to check the status.
+  //  
+  if (((Task != NULL) && (!Task->IsStart)) || (Task == NULL)) {
+    //
+    // Calculate the number of PRD entry.
+    // Every entry in PRD table can specify a 64K memory region.
+    //
+    PrdTableNum   = (UINTN)(RShiftU64(DataLength, 16) + 1);
 
-  //
-  // Set the base address to BMID register
-  //
-  IdeWritePortDW(PciIo, IoPortForBmid, (UINT32)PrdTableMapAddr);
+    //
+    // Make sure that the memory region of PRD table is not cross 64K boundary
+    //
+    PrdTableSize = PrdTableNum * sizeof (EFI_ATA_DMA_PRD);
+    if (PrdTableSize > 0x10000) {
+      return EFI_INVALID_PARAMETER;
+    }
 
-  //
-  // Set BMIC register to identify the operation direction
-  //
-  RegisterValue = IdeReadPortB(PciIo, IoPortForBmic);
-  if (Read) {
-    RegisterValue |= BMIC_NREAD;
-  } else {
-    RegisterValue &= ~((UINT8) BMIC_NREAD);
+    //
+    // Allocate buffer for PRD table initialization.
+    //
+    PageCount = EFI_SIZE_TO_PAGES (PrdTableSize);
+    Status    = PciIo->AllocateBuffer (
+                         PciIo,
+                         AllocateAnyPages,
+                         EfiBootServicesData,
+                         PageCount,
+                         (VOID **)&PrdBaseAddr,
+                         0
+                         );
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    ByteCount = EFI_PAGES_TO_SIZE (PageCount);
+    Status    = PciIo->Map (
+                         PciIo,
+                         EfiPciIoOperationBusMasterCommonBuffer,
+                         PrdBaseAddr,
+                         &ByteCount,
+                         &PrdTableMapAddr,
+                         &PrdTableMap
+                         );
+    if (EFI_ERROR (Status) || (ByteCount != EFI_PAGES_TO_SIZE (PageCount))) {
+      //
+      // If the data length actually mapped is not equal to the requested amount,
+      // it means the DMA operation may be broken into several discontinuous smaller chunks.
+      // Can't handle this case.
+      //
+      PciIo->FreeBuffer (PciIo, PageCount, PrdBaseAddr);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    ZeroMem ((VOID *) ((UINTN) PrdBaseAddr), ByteCount);
+
+    //
+    // Map the host address of DataBuffer to DMA master address.
+    //
+    if (Read) {
+      PciIoOperation = EfiPciIoOperationBusMasterWrite;
+    } else {
+      PciIoOperation = EfiPciIoOperationBusMasterRead;
+    }
+
+    ByteCount = (UINTN)DataLength;
+    Status    = PciIo->Map (
+                         PciIo,
+                         PciIoOperation,
+                         DataBuffer,
+                         &ByteCount,
+                         &BufferMapAddress,
+                         &BufferMap
+                         );
+    if (EFI_ERROR (Status) || (ByteCount != DataLength)) {
+      PciIo->Unmap (PciIo, PrdTableMap);
+      PciIo->FreeBuffer (PciIo, PageCount, PrdBaseAddr);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    //
+    // According to Ata spec, it requires the buffer address and size to be even.
+    //
+    ASSERT ((BufferMapAddress & 0x1) == 0);
+    ASSERT ((ByteCount & 0x1) == 0);
+
+    //
+    // Fill the PRD table with appropriate bus master address of data buffer and data length.
+    //
+    ByteRemaining = ByteCount;
+    while (ByteRemaining != 0) {
+      if (ByteRemaining <= 0x10000) {
+        PrdBaseAddr->RegionBaseAddr = (UINT32) ((UINTN) BufferMapAddress);
+        PrdBaseAddr->ByteCount      = (UINT16) ByteRemaining;
+        PrdBaseAddr->EndOfTable     = 0x8000;
+        break;
+      }
+
+      PrdBaseAddr->RegionBaseAddr = (UINT32) ((UINTN) BufferMapAddress);
+      PrdBaseAddr->ByteCount      = (UINT16) 0x0;
+
+      ByteRemaining    -= 0x10000;
+      BufferMapAddress += 0x10000;
+      PrdBaseAddr++;
+    }
+
+    //
+    // Start to enable the DMA operation
+    //
+    DeviceHead = AtaCommandBlock->AtaDeviceHead;
+    AtaCommand = AtaCommandBlock->AtaCommand;
+
+    IdeWritePortB (PciIo, IdeRegisters->Head, (UINT8)(0xe0 | DeviceHead));
+
+    //
+    // Enable interrupt to support UDMA
+    //
+    DeviceControl = 0;
+    IdeWritePortB (PciIo, IdeRegisters->AltOrDev, DeviceControl);
+
+    //
+    // Read BMIS register and clear ERROR and INTR bit
+    //
+    RegisterValue  = IdeReadPortB(PciIo, IoPortForBmis);
+    RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
+    IdeWritePortB(PciIo, IoPortForBmis, RegisterValue);
+
+    //
+    // Set the base address to BMID register
+    //
+    IdeWritePortDW (PciIo, IoPortForBmid, (UINT32)PrdTableMapAddr);
+
+    //
+    // Set BMIC register to identify the operation direction
+    //
+    RegisterValue = IdeReadPortB(PciIo, IoPortForBmic);
+    if (Read) {
+      RegisterValue |= BMIC_NREAD;
+    } else {
+      RegisterValue &= ~((UINT8) BMIC_NREAD);
+    }
+    IdeWritePortB (PciIo, IoPortForBmic, RegisterValue);
+
+    //
+    // Issue ATA command
+    //
+    Status = AtaIssueCommand (PciIo, IdeRegisters, AtaCommandBlock, Timeout);
+
+    if (EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
+      goto Exit;
+    }
+
+    //
+    // Set START bit of BMIC register
+    //
+    RegisterValue  = IdeReadPortB(PciIo, IoPortForBmic);
+    RegisterValue |= BMIC_START;
+    IdeWritePortB(PciIo, IoPortForBmic, RegisterValue);
+
+    if (Task != NULL) {
+      //
+      // Max transfer number of sectors for one command is 65536(32Mbyte),
+      // it will cost 1 second to transfer these data in UDMA mode 2(33.3MBps).
+      // So set the variable Count to 2000, for about 2 second Timeout time.
+      //
+      Task->RetryTimes     = 2000;
+      Task->Map            = BufferMap;
+      Task->TableMap       = PrdTableMap;
+      Task->MapBaseAddress = PrdBaseAddr;
+      Task->PageCount      = PageCount;
+      Task->IsStart        = TRUE;
+    }
   }
-  IdeWritePortB(PciIo, IoPortForBmic, RegisterValue);
-
-  //
-  // Issue ATA command
-  //
-  Status = AtaIssueCommand (PciIo, IdeRegisters, AtaCommandBlock, Timeout);
-
-  if (EFI_ERROR (Status)) {
-    Status = EFI_DEVICE_ERROR;
-    goto Exit;
-  }
-
-  //
-  // Set START bit of BMIC register
-  //
-  RegisterValue  = IdeReadPortB(PciIo, IoPortForBmic);
-  RegisterValue |= BMIC_START;
-  IdeWritePortB(PciIo, IoPortForBmic, RegisterValue);
 
   //
   // Check the INTERRUPT and ERROR bit of BMIS
@@ -1553,70 +1710,72 @@ AtaUdmaInOut (
   // it will cost 1 second to transfer these data in UDMA mode 2(33.3MBps).
   // So set the variable Count to 2000, for about 2 second Timeout time.
   //
-  Timeout = 2000;
-  while (TRUE) {
-    RegisterValue  = IdeReadPortB(PciIo, IoPortForBmis);
-
-    if (((RegisterValue & BMIS_ERROR) != 0) || (Timeout == 0)) {
-      DEBUG ((EFI_D_ERROR, "ATA UDMA operation fails\n"));
-      Status = EFI_DEVICE_ERROR;
-      break;
-    }
-
-    if ((RegisterValue & BMIS_INTERRUPT) != 0) {
-      Status = EFI_SUCCESS;
-      break;
-    }
-    //
-    // Stall for 1 milliseconds.
-    //
-    MicroSecondDelay (1000);
-    Timeout--;
+  if (Task != NULL) {
+    Status = AtaUdmStatusCheck (PciIo, Task, IoPortForBmis);
+  } else {
+    Status = AtaUdmStatusWait (PciIo, IoPortForBmis);
   }
 
   //
-  // Read BMIS register and clear ERROR and INTR bit
+  // For blocking mode, clear registers and free buffers.
+  // For non blocking mode, when the related registers have been set or time
+  // out, or a error has been happened, it needs to clear the register and free
+  // buffer.
   //
-  RegisterValue  = IdeReadPortB(PciIo, IoPortForBmis);
-  RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
-  IdeWritePortB(PciIo, IoPortForBmis, RegisterValue);
+  if ((Task == NULL) || Status != EFI_NOT_READY) {
+    //
+    // Read BMIS register and clear ERROR and INTR bit
+    //
+    RegisterValue  = IdeReadPortB (PciIo, IoPortForBmis);
+    RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
+    IdeWritePortB (PciIo, IoPortForBmis, RegisterValue);
 
-  //
-  // Read Status Register of IDE device to clear interrupt
-  //
-  RegisterValue  = IdeReadPortB(PciIo, IdeRegisters->CmdOrStatus);
+    //
+    // Read Status Register of IDE device to clear interrupt
+    //
+    RegisterValue  = IdeReadPortB(PciIo, IdeRegisters->CmdOrStatus);
 
-  //
-  // Clear START bit of BMIC register
-  //
-  RegisterValue  = IdeReadPortB(PciIo, IoPortForBmic);
-  RegisterValue &= ~((UINT8) BMIC_START);
-  IdeWritePortB(PciIo, IoPortForBmic, RegisterValue);
+    //
+    // Clear START bit of BMIC register
+    //
+    RegisterValue  = IdeReadPortB(PciIo, IoPortForBmic);
+    RegisterValue &= ~((UINT8) BMIC_START);
+    IdeWritePortB (PciIo, IoPortForBmic, RegisterValue);
 
-  //
-  // Disable interrupt of Select device
-  //
-  DeviceControl  = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
-  DeviceControl |= ATA_CTLREG_IEN_L;
-  IdeWritePortB (PciIo, IdeRegisters->AltOrDev, DeviceControl);
-  //
-  // Stall for 10 milliseconds.
-  //
-  MicroSecondDelay (10000);
+    //
+    // Disable interrupt of Select device
+    //
+    DeviceControl  = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
+    DeviceControl |= ATA_CTLREG_IEN_L;
+    IdeWritePortB (PciIo, IdeRegisters->AltOrDev, DeviceControl);
+    //
+    // Stall for 10 milliseconds.
+    //
+    MicroSecondDelay (10000);
+
+  }
 
 Exit:
   //
   // Free all allocated resource
   //
-  PciIo->Unmap (PciIo, PrdTableMap);
-  PciIo->FreeBuffer (PciIo, PageCount, PrdBaseAddr);
-  PciIo->Unmap (PciIo, BufferMap);
+  if ((Task == NULL) || Status != EFI_NOT_READY) {
+    if (Task != NULL) {
+      PciIo->Unmap (PciIo, Task->TableMap);
+      PciIo->FreeBuffer (PciIo, Task->PageCount, Task->MapBaseAddress);
+      PciIo->Unmap (PciIo, Task->Map);
+    } else {
+      PciIo->Unmap (PciIo, PrdTableMap);
+      PciIo->FreeBuffer (PciIo, PageCount, PrdBaseAddr);
+      PciIo->Unmap (PciIo, BufferMap);
+    }
 
-  //
-  // Dump All Ide registers to ATA_STATUS_BLOCK
-  //
-  DumpAllIdeRegisters (PciIo, IdeRegisters, AtaStatusBlock);
-
+    //
+    // Dump All Ide registers to ATA_STATUS_BLOCK
+    //
+    DumpAllIdeRegisters (PciIo, IdeRegisters, AtaStatusBlock);
+  }
+  
   return Status;
 }
 
@@ -2021,7 +2180,8 @@ SetDeviceTransferMode (
              &Instance->IdeRegisters[Channel],
              &AtaCommandBlock,
              AtaStatusBlock,
-             ATA_ATAPI_TIMEOUT
+             ATA_ATAPI_TIMEOUT,
+             NULL
              );
 
   return Status;
@@ -2069,7 +2229,8 @@ SetDriveParameters (
              &Instance->IdeRegisters[Channel],
              &AtaCommandBlock,
              AtaStatusBlock,
-             ATA_ATAPI_TIMEOUT
+             ATA_ATAPI_TIMEOUT, 
+             NULL
              );
 
   //
@@ -2084,7 +2245,8 @@ SetDriveParameters (
              &Instance->IdeRegisters[Channel],
              &AtaCommandBlock,
              AtaStatusBlock,
-             ATA_ATAPI_TIMEOUT
+             ATA_ATAPI_TIMEOUT, 
+             NULL
              );
 
   return Status;
@@ -2132,7 +2294,8 @@ IdeAtaSmartReturnStatusCheck (
              &Instance->IdeRegisters[Channel],
              &AtaCommandBlock,
              AtaStatusBlock,
-             ATA_ATAPI_TIMEOUT
+             ATA_ATAPI_TIMEOUT,
+             NULL
              );
 
   if (EFI_ERROR (Status)) {
@@ -2212,7 +2375,8 @@ IdeAtaSmartSupport (
                  &Instance->IdeRegisters[Channel],
                  &AtaCommandBlock,
                  AtaStatusBlock,
-                 ATA_ATAPI_TIMEOUT
+                 ATA_ATAPI_TIMEOUT,
+                 NULL
                  );
 
       if (!EFI_ERROR (Status)) {
@@ -2233,7 +2397,8 @@ IdeAtaSmartSupport (
                    &Instance->IdeRegisters[Channel],
                    &AtaCommandBlock,
                    AtaStatusBlock,
-                   ATA_ATAPI_TIMEOUT
+                   ATA_ATAPI_TIMEOUT,
+                   NULL
                    );
         if (!EFI_ERROR (Status)) {
           Status = IdeAtaSmartReturnStatusCheck (
@@ -2253,6 +2418,7 @@ IdeAtaSmartSupport (
 
   return ;
 }
+
 
 /**
   Sends out an ATA Identify Command to the specified device.
@@ -2274,6 +2440,7 @@ IdeAtaSmartSupport (
   @retval EFI_SUCCESS          Identify ATA device successfully.
   @retval EFI_DEVICE_ERROR     ATA Identify Device Command failed or device is not ATA device.
   @retval EFI_OUT_OF_RESOURCES Allocate memory failed.
+
 **/
 EFI_STATUS
 EFIAPI
@@ -2286,10 +2453,10 @@ AtaIdentify (
   )
 {
   EFI_STATUS             Status;
-  EFI_ATA_COMMAND_BLOCK  AtaCommandBlock;  
+  EFI_ATA_COMMAND_BLOCK  AtaCommandBlock;
 
   ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
-  
+
   AtaCommandBlock.AtaCommand    = ATA_CMD_IDENTIFY_DRIVE;
   AtaCommandBlock.AtaDeviceHead = (UINT8)(Device << 0x4);
 
@@ -2301,7 +2468,8 @@ AtaIdentify (
              TRUE,
              &AtaCommandBlock,
              AtaStatusBlock,
-             ATA_ATAPI_TIMEOUT
+             ATA_ATAPI_TIMEOUT,
+             NULL
              );
 
   return Status;
@@ -2368,7 +2536,8 @@ AtaIdentifyPacket (
              TRUE,
              &AtaCommandBlock,
              AtaStatusBlock,
-             ATA_ATAPI_TIMEOUT
+             ATA_ATAPI_TIMEOUT,
+             NULL
              );
 
   return Status;
@@ -2425,7 +2594,7 @@ DetectAndConfigIdeDevice (
   IdeInit      = Instance->IdeControllerInit;
   PciIo        = Instance->PciIo;
 
-  for (IdeDevice = 0; IdeDevice < EfiIdeMaxDevice; IdeDevice++) {    
+  for (IdeDevice = 0; IdeDevice < EfiIdeMaxDevice; IdeDevice++) {
     //
     // Send ATA Device Execut Diagnostic command.
     // This command should work no matter DRDY is ready or not
@@ -2483,7 +2652,7 @@ DetectAndConfigIdeDevice (
       if (EFI_ERROR (Status)) {
         DeviceType = EfiIdeHarddisk;
         Status     = AtaIdentify (Instance, IdeChannel, IdeDevice, &Buffer, NULL);
-      } 
+      }
     }
 
     if (EFI_ERROR (Status)) {
@@ -2491,12 +2660,11 @@ DetectAndConfigIdeDevice (
       // No device is found at this port
       //
       continue;
-    } 
-  
+    }
+
     DEBUG ((EFI_D_INFO, "[%a] channel [%a] [%a] device\n", 
             (IdeChannel == 1) ? "secondary" : "primary  ", (IdeDevice == 1) ? "slave " : "master",
             DeviceType == EfiIdeCdrom ? "cdrom   " : "harddisk"));
-
     //
     // If the device is a hard disk, then try to enable S.M.A.R.T feature
     //
@@ -2548,7 +2716,7 @@ DetectAndConfigIdeDevice (
         continue;
       }
     }
-    
+
     //
     // Set supported DMA mode on this IDE device. Note that UDMA & MDMA cann't
     // be set together. Only one DMA mode can be set to a device. If setting
@@ -2559,7 +2727,7 @@ DetectAndConfigIdeDevice (
       TransferMode.ModeCategory = EFI_ATA_MODE_UDMA;
       TransferMode.ModeNumber   = (UINT8) (SupportedModes->UdmaMode.Mode);
       Status = SetDeviceTransferMode (Instance, IdeChannel, IdeDevice, &TransferMode, NULL);
-    
+
       if (EFI_ERROR (Status)) {
         DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
         continue;
@@ -2568,13 +2736,13 @@ DetectAndConfigIdeDevice (
       TransferMode.ModeCategory = EFI_ATA_MODE_MDMA;
       TransferMode.ModeNumber   = (UINT8) SupportedModes->MultiWordDmaMode.Mode;
       Status = SetDeviceTransferMode (Instance, IdeChannel, IdeDevice, &TransferMode, NULL);
-    
+
       if (EFI_ERROR (Status)) {
         DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
         continue;
       }
     }
-    
+
     //
     // Set Parameters for the device:
     // 1) Init
@@ -2587,10 +2755,10 @@ DetectAndConfigIdeDevice (
       DriveParameters.Sector         = (UINT8) ((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->sectors_per_track;
       DriveParameters.Heads          = (UINT8) (((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->heads - 1);
       DriveParameters.MultipleSector = (UINT8) ((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->multi_sector_cmd_max_sct_cnt;
-    
+
       Status = SetDriveParameters (Instance, IdeChannel, IdeDevice, &DriveParameters, NULL);
     }
-    
+
     //
     // Set IDE controller Timing Blocks in the PCI Configuration Space
     //

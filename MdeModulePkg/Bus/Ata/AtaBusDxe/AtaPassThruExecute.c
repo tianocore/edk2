@@ -5,7 +5,7 @@
   It transforms the high level identity, read/write, reset command to ATA pass
   through command and protocol. 
     
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -75,14 +75,25 @@ UINTN mMaxTransferBlockNumber[] = {
   for an ATA device. It assembles the ATA pass through command packet for ATA
   transaction.
 
-  @param  AtaDevice         The ATA child device involved for the operation.
+  @param[in, out]  AtaDevice   The ATA child device involved for the operation.
+  @param[in, out]  TaskPacket  Pointer to a Pass Thru Command Packet. Optional, 
+                               if it is NULL, blocking mode, and use the packet
+                               in AtaDevice. If it is not NULL, non blocking mode,
+                               and pass down this Packet.
+  @param[in]       Event       If Event is NULL, then blocking I/O is performed.
+                               If Event is not NULL and non-blocking I/O is
+                               supported,then non-blocking I/O is performed,
+                               and Event will be signaled when the write
+                               request is completed.
 
   @return The return status from EFI_ATA_PASS_THRU_PROTOCOL.PassThru().
 
 **/
 EFI_STATUS
 AtaDevicePassThru (
-  IN OUT ATA_DEVICE                       *AtaDevice
+  IN OUT ATA_DEVICE                       *AtaDevice,
+  IN OUT EFI_ATA_PASS_THRU_COMMAND_PACKET *TaskPacket, OPTIONAL
+  IN OUT EFI_EVENT                        Event OPTIONAL
   )
 {
   EFI_STATUS                              Status;
@@ -90,12 +101,19 @@ AtaDevicePassThru (
   EFI_ATA_PASS_THRU_COMMAND_PACKET        *Packet;
 
   //
-  // Assemble packet
+  // Assemble packet. If it is non blocking mode, the Ata driver should keep each 
+  // subtask and clean them when the event is signaled.
   //
-  Packet = &AtaDevice->Packet;
-  Packet->Asb = AtaDevice->Asb;
-  Packet->Acb = &AtaDevice->Acb;
-  Packet->Timeout = ATA_TIMEOUT;
+  if (TaskPacket != NULL) {
+    Packet = TaskPacket;
+    Packet->Asb = AllocateAlignedBuffer (AtaDevice, sizeof (*AtaDevice->Asb));
+    CopyMem (Packet->Asb, AtaDevice->Asb, sizeof (*AtaDevice->Asb));
+    Packet->Acb = AllocateCopyPool(sizeof (EFI_ATA_COMMAND_BLOCK), &AtaDevice->Acb);
+  } else {
+    Packet = &AtaDevice->Packet;
+    Packet->Asb = AtaDevice->Asb;
+    Packet->Acb = &AtaDevice->Acb;
+  }
 
   AtaPassThru = AtaDevice->AtaBusDriverData->AtaPassThru;
 
@@ -104,7 +122,7 @@ AtaDevicePassThru (
                           AtaDevice->Port,
                           AtaDevice->PortMultiplierPort,
                           Packet,
-                          NULL
+                          Event
                           );
   //
   // Ensure ATA pass through caller and callee have the same
@@ -257,6 +275,8 @@ IdentifyAtaDevice (
     return EFI_UNSUPPORTED;
   }
 
+  DEBUG ((EFI_D_INFO, "AtaBus - Identify Device (%x %x)\n", (UINTN)AtaDevice->Port, (UINTN)AtaDevice->PortMultiplierPort));
+
   //
   // Check whether the WORD 88 (supported UltraDMA by drive) is valid
   //
@@ -319,7 +339,7 @@ IdentifyAtaDevice (
   //
   // Get ATA model name from identify data structure. 
   //
-  PrintAtaModelName (AtaDevice); 
+  PrintAtaModelName (AtaDevice);
 
   return EFI_SUCCESS;
 }
@@ -354,7 +374,7 @@ DiscoverAtaDevice (
   //
   Acb = ZeroMem (&AtaDevice->Acb, sizeof (*Acb));
   Acb->AtaCommand = ATA_CMD_IDENTIFY_DRIVE;
-  Acb->AtaDeviceHead = (UINT8) (BIT7 | BIT6 | BIT5 | (AtaDevice->PortMultiplierPort << 4)); 
+  Acb->AtaDeviceHead = (UINT8) (BIT7 | BIT6 | BIT5 | (AtaDevice->PortMultiplierPort << 4));
 
   //
   // Prepare for ATA pass through packet.
@@ -363,11 +383,12 @@ DiscoverAtaDevice (
   Packet->InDataBuffer = AtaDevice->IdentifyData;
   Packet->InTransferLength = sizeof (*AtaDevice->IdentifyData);
   Packet->Protocol = EFI_ATA_PASS_THRU_PROTOCOL_PIO_DATA_IN;
-  Packet->Length = EFI_ATA_PASS_THRU_LENGTH_BYTES | EFI_ATA_PASS_THRU_LENGTH_SECTOR_COUNT;
+  Packet->Length   = EFI_ATA_PASS_THRU_LENGTH_BYTES | EFI_ATA_PASS_THRU_LENGTH_SECTOR_COUNT;
+  Packet->Timeout  = ATA_TIMEOUT;
 
   Retry = MAX_RETRY_TIMES;
   do {
-    Status = AtaDevicePassThru (AtaDevice);
+    Status = AtaDevicePassThru (AtaDevice, NULL, NULL);
     if (!EFI_ERROR (Status)) {
       //
       // The command is issued successfully
@@ -389,11 +410,20 @@ DiscoverAtaDevice (
   ATA device. It chooses the appropriate ATA command and protocol to invoke PassThru
   interface of ATA pass through.
 
-  @param  AtaDevice         The ATA child device involved for the operation.
-  @param  Buffer            The pointer to the current transaction buffer.
-  @param  StartLba          The starting logical block address to be accessed.
-  @param  TransferLength    The block number or sector count of the transfer.
-  @param  IsWrite           Indicates whether it is a write operation.
+  @param[in, out]  AtaDevice       The ATA child device involved for the operation.
+  @param[in, out]  TaskPacket      Pointer to a Pass Thru Command Packet. Optional, 
+                                   if it is NULL, blocking mode, and use the packet
+                                   in AtaDevice. If it is not NULL, non blocking mode,
+                                   and pass down this Packet.
+  @param[in, out]  Buffer          The pointer to the current transaction buffer.
+  @param[in]       StartLba        The starting logical block address to be accessed.
+  @param[in]       TransferLength  The block number or sector count of the transfer.
+  @param[in]       IsWrite         Indicates whether it is a write operation.
+  @param[in]       Event           If Event is NULL, then blocking I/O is performed.
+                                   If Event is not NULL and non-blocking I/O is
+                                   supported,then non-blocking I/O is performed,
+                                   and Event will be signaled when the write
+                                   request is completed.
 
   @retval EFI_SUCCESS       The data transfer is complete successfully.
   @return others            Some error occurs when transferring data. 
@@ -401,11 +431,13 @@ DiscoverAtaDevice (
 **/
 EFI_STATUS
 TransferAtaDevice (
-  IN OUT ATA_DEVICE                 *AtaDevice,
-  IN OUT VOID                       *Buffer,
-  IN EFI_LBA                        StartLba,
-  IN UINT32                         TransferLength,
-  IN BOOLEAN                        IsWrite
+  IN OUT ATA_DEVICE                       *AtaDevice,
+  IN OUT EFI_ATA_PASS_THRU_COMMAND_PACKET *TaskPacket, OPTIONAL
+  IN OUT VOID                             *Buffer,
+  IN EFI_LBA                              StartLba,
+  IN UINT32                               TransferLength,
+  IN BOOLEAN                              IsWrite, 
+  IN EFI_EVENT                            Event OPTIONAL
   )
 {
   EFI_ATA_COMMAND_BLOCK             *Acb;
@@ -425,7 +457,7 @@ TransferAtaDevice (
   Acb->AtaSectorNumber = (UINT8) StartLba;
   Acb->AtaCylinderLow = (UINT8) RShiftU64 (StartLba, 8);
   Acb->AtaCylinderHigh = (UINT8) RShiftU64 (StartLba, 16);
-  Acb->AtaDeviceHead = (UINT8) (BIT7 | BIT6 | BIT5 | (AtaDevice->PortMultiplierPort << 4)); 
+  Acb->AtaDeviceHead = (UINT8) (BIT7 | BIT6 | BIT5 | (AtaDevice->PortMultiplierPort << 4));
   Acb->AtaSectorCount = (UINT8) TransferLength;
   if (AtaDevice->Lba48Bit) {
     Acb->AtaSectorNumberExp = (UINT8) RShiftU64 (StartLba, 24);
@@ -439,7 +471,12 @@ TransferAtaDevice (
   //
   // Prepare for ATA pass through packet.
   //
-  Packet = ZeroMem (&AtaDevice->Packet, sizeof (*Packet));
+  if (TaskPacket != NULL) {
+    Packet = ZeroMem (TaskPacket, sizeof (*Packet));
+  } else {
+    Packet = ZeroMem (&AtaDevice->Packet, sizeof (*Packet));
+  }
+
   if (IsWrite) {
     Packet->OutDataBuffer = Buffer;
     Packet->OutTransferLength = TransferLength;
@@ -447,10 +484,109 @@ TransferAtaDevice (
     Packet->InDataBuffer = Buffer;
     Packet->InTransferLength = TransferLength;
   }
+
   Packet->Protocol = mAtaPassThruCmdProtocols[AtaDevice->UdmaValid][IsWrite];
   Packet->Length = EFI_ATA_PASS_THRU_LENGTH_SECTOR_COUNT;
+  Packet->Timeout  = ATA_TIMEOUT;
 
-  return AtaDevicePassThru (AtaDevice); 
+  return AtaDevicePassThru (AtaDevice, TaskPacket, Event);
+}
+
+/**
+  Free SubTask. 
+
+  @param[in, out]  Task      Pointer to task to be freed.
+
+**/
+VOID
+EFIAPI 
+FreeAtaSubTask (
+  IN ATA_BUS_ASYN_TASK  *Task
+  )
+{
+  if (Task->Packet.Asb != NULL) {
+    FreeAlignedBuffer (Task->Packet.Asb, sizeof (Task->Packet.Asb));
+  }
+  if (Task->Packet.Acb != NULL) {
+    FreePool (Task->Packet.Acb);
+  }
+
+  FreePool (Task);
+}
+
+/**
+  Call back funtion when the event is signaled.
+
+  @param[in]  Event     The Event this notify function registered to.
+  @param[in]  Context   Pointer to the context data registerd to the
+                        Event.
+
+**/
+VOID
+EFIAPI 
+AtaNonBlockingCallBack (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  ATA_BUS_ASYN_TASK *Task;
+
+  Task = (ATA_BUS_ASYN_TASK *) Context;
+  gBS->CloseEvent (Event);
+
+  //
+  // Check the command status.
+  // If there is error during the sub task source allocation, the error status
+  // should be returned to the caller directly, so here the Task->Token may already
+  // be deleted by the caller and no need to update the status.
+  //
+  if ((!(*Task->IsError)) && (Task->Packet.Asb->AtaStatus & 0x01) == 0x01) {
+    Task->Token->TransactionStatus = EFI_DEVICE_ERROR;
+  }
+  DEBUG ((
+    DEBUG_INFO, 
+    "NON-BLOCKING EVENT FINISHED!- STATUS = %r\n", 
+    Task->Token->TransactionStatus
+    ));
+
+  //
+  // Reduce the SubEventCount, till it comes to zero.
+  //
+  (*Task->UnsignalledEventCount) --;
+  DEBUG ((DEBUG_INFO, "UnsignalledEventCount = %x\n", *Task->UnsignalledEventCount));
+
+  //
+  // Remove the SubTask from the Task list.
+  //
+  RemoveEntryList (&Task->TaskEntry);
+  if ((*Task->UnsignalledEventCount) == 0) {
+    //
+    // All Sub tasks are done, then signal the upper layyer event.
+    // Except there is error during the sub task source allocation.
+    //
+    if (!(*Task->IsError)) {
+      gBS->SignalEvent (Task->Token->Event);
+      DEBUG ((DEBUG_INFO, "Signal Up Level Event UnsignalledEventCount = %x!\n", *Task->UnsignalledEventCount));
+    }
+    
+    FreePool (Task->UnsignalledEventCount);
+    FreePool (Task->IsError);
+  }
+
+  DEBUG ((
+    DEBUG_INFO, 
+    "PACKET INFO: Write=%s, Lenght=%x, LowCylinder=%x, HighCylinder=%x,SectionNumber=%x",
+    Task->Packet.OutDataBuffer != NULL ? L"YES" : L"NO",
+    Task->Packet.OutDataBuffer != NULL ? Task->Packet.OutTransferLength : Task->Packet.InTransferLength,
+    Task->Packet.Acb->AtaCylinderLow,
+    Task->Packet.Acb->AtaCylinderHigh,
+    Task->Packet.Acb->AtaSectorCount
+    ));
+
+  //
+  // Free the buffer of SubTask.
+  //
+  FreeAtaSubTask (Task);
 }
 
 /**
@@ -460,11 +596,12 @@ TransferAtaDevice (
   ATA device. It may separate the read/write request into several ATA pass through
   transactions.
 
-  @param  AtaDevice         The ATA child device involved for the operation.
-  @param  Buffer            The pointer to the current transaction buffer.
-  @param  StartLba          The starting logical block address to be accessed.
-  @param  NumberOfBlocks    The block number or sector count of the transfer.
-  @param  IsWrite           Indicates whether it is a write operation.
+  @param[in, out]  AtaDevice       The ATA child device involved for the operation.
+  @param[in, out]  Buffer          The pointer to the current transaction buffer.
+  @param[in]       StartLba        The starting logical block address to be accessed.
+  @param[in]       NumberOfBlocks  The block number or sector count of the transfer.
+  @param[in]       IsWrite         Indicates whether it is a write operation.
+  @param[in, out]  Token           A pointer to the token associated with the transaction.
 
   @retval EFI_SUCCESS       The data transfer is complete successfully.
   @return others            Some error occurs when transferring data. 
@@ -476,36 +613,146 @@ AccessAtaDevice(
   IN OUT UINT8                      *Buffer,
   IN EFI_LBA                        StartLba,
   IN UINTN                          NumberOfBlocks,
-  IN BOOLEAN                        IsWrite
+  IN BOOLEAN                        IsWrite,
+  IN OUT EFI_BLOCK_IO2_TOKEN        *Token
   )
 {
   EFI_STATUS                        Status;
   UINTN                             MaxTransferBlockNumber;
   UINTN                             TransferBlockNumber;
   UINTN                             BlockSize;
- 
+  UINTN                             *EventCount;
+  UINTN                             TempCount;
+  ATA_BUS_ASYN_TASK                 *Task;
+  EFI_EVENT                         SubEvent;
+  UINTN                             Index;
+  BOOLEAN                           *IsError;
+  EFI_TPL                           OldTpl;
+
+  SubEvent  = NULL;
+  TempCount = 0;
+  Status    = EFI_SUCCESS;
+
+  EventCount = AllocateZeroPool (sizeof (UINTN));
+  if (EventCount == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  
+  IsError = AllocateZeroPool (sizeof (BOOLEAN));
+  if (IsError == NULL) {
+    goto EXIT;
+  }
+  *IsError = FALSE;
+
+  //
+  // Initial the return status for Non Blocking.
+  //
+  if (Token != NULL && Token->Event != NULL) {
+    Token->TransactionStatus = EFI_SUCCESS;
+  }
   //
   // Ensure AtaDevice->Lba48Bit is a valid boolean value 
   //
   ASSERT ((UINTN) AtaDevice->Lba48Bit < 2);
   MaxTransferBlockNumber = mMaxTransferBlockNumber[AtaDevice->Lba48Bit];
-  BlockSize = AtaDevice->BlockMedia.BlockSize;
+  BlockSize              = AtaDevice->BlockMedia.BlockSize;
+
+  TempCount     = (NumberOfBlocks + MaxTransferBlockNumber - 1) / MaxTransferBlockNumber;
+  *EventCount   = TempCount;
+  Index         = 0;
+
   do {
     if (NumberOfBlocks > MaxTransferBlockNumber) {
       TransferBlockNumber = MaxTransferBlockNumber;
-      NumberOfBlocks -= MaxTransferBlockNumber;
+      NumberOfBlocks     -= MaxTransferBlockNumber;
     } else  {
       TransferBlockNumber = NumberOfBlocks;
       NumberOfBlocks  = 0;
     }
 
-    Status = TransferAtaDevice (AtaDevice, Buffer, StartLba, (UINT32) TransferBlockNumber, IsWrite);
-    if (EFI_ERROR (Status)) {
-      return Status;
+    //
+    // Create sub event for the sub Ata task. Non-Blocking Mode.
+    //
+    if (Token != NULL && Token->Event != NULL) {
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+      Task   = AllocateZeroPool (sizeof (ATA_BUS_ASYN_TASK));
+      if (Task == NULL) {
+        //
+        // If resource allocation fail, reduce the total sub event counts.
+        //
+        *EventCount              = (*EventCount) - (TempCount - Index);
+        *IsError                 = TRUE;
+        Token->TransactionStatus = EFI_OUT_OF_RESOURCES;
+        Status                   = EFI_OUT_OF_RESOURCES;
+
+        gBS->RestoreTPL (OldTpl);
+        goto EXIT;
+      }
+
+      Task->UnsignalledEventCount = EventCount;
+      Task->Token                 = Token;
+      Task->IsError               = IsError;
+
+      InsertTailList (&AtaDevice->AtaTaskList, &Task->TaskEntry);
+
+      Status = gBS->CreateEvent (
+                      EVT_NOTIFY_SIGNAL,
+                      TPL_NOTIFY,
+                      AtaNonBlockingCallBack,
+                      Task,
+                      &SubEvent
+                      );
+      //
+      // If resource allocation fail, the un-signalled event count should equal to
+      // the original one minus the unassigned subtasks number.
+      //
+      if (EFI_ERROR (Status)) {
+        *EventCount = (*EventCount) - (TempCount - Index);
+        *IsError    = TRUE;
+        gBS->RestoreTPL (OldTpl);
+        goto EXIT;
+      }
+      Index++;
+      gBS->RestoreTPL (OldTpl); 
+
+      DEBUG ((EFI_D_INFO, "NON-BLOCKING SET EVENT START: WRITE = %d\n", IsWrite));
+      Status = TransferAtaDevice (AtaDevice, &Task->Packet, Buffer, StartLba, (UINT32) TransferBlockNumber, IsWrite, SubEvent);
+      DEBUG ((
+        EFI_D_INFO,
+        "NON-BLOCKING SET EVENT END:StartLba=%x, TransferBlockNumbers=%x, Status=%r\n",
+        StartLba,
+        TransferBlockNumber,
+        Status
+        ));
+    }else {
+      //
+      // Blocking Mode.
+      //
+      DEBUG ((EFI_D_INFO, "BLOCKING BLOCK I/O START: WRITE = %d\n", IsWrite));
+      Status = TransferAtaDevice (AtaDevice, NULL, Buffer, StartLba, (UINT32) TransferBlockNumber, IsWrite, NULL);
+      DEBUG ((
+        EFI_D_INFO,
+        "BLOCKING BLOCK I/O FINISHE - StartLba = %x; TransferBlockNumbers = %x, status = %r\n", 
+        StartLba,
+        TransferBlockNumber,
+        Status
+        ));
     }
+
+    if (EFI_ERROR (Status)) {
+      goto EXIT;
+    }
+
     StartLba += TransferBlockNumber;
     Buffer   += TransferBlockNumber * BlockSize;
   } while (NumberOfBlocks > 0);
+
+EXIT:
+
+  if (*EventCount == 0) {
+    FreePool (EventCount);
+    FreePool (IsError);
+  }
 
   return Status;
 }

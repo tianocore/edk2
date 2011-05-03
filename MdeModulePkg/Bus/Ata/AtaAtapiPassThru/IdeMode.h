@@ -1,7 +1,7 @@
 /** @file
   Header file for IDE mode of ATA host controller.
   
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -199,95 +199,6 @@ AtaPacketCommandExecute (
   IN  UINT8                                         Device,
   IN  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET    *Packet
   );
-
-/**
-  Send ATA command into device with NON_DATA protocol
-
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
-  @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
-  @param AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
-  @param Timeout          The time to complete the command.
-
-  @retval  EFI_SUCCESS Reading succeed
-  @retval  EFI_ABORTED Command failed
-  @retval  EFI_DEVICE_ERROR Device status error.
-
-**/
-EFI_STATUS
-EFIAPI
-AtaNonDataCommandIn (  
-  IN     EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN     EFI_IDE_REGISTERS         *IdeRegisters,
-  IN     EFI_ATA_COMMAND_BLOCK     *AtaCommandBlock,
-  IN OUT EFI_ATA_STATUS_BLOCK      *AtaStatusBlock,
-  IN     UINT64                    Timeout
-  );
-
-/**
-  Perform an ATA Udma operation (Read, ReadExt, Write, WriteExt).
-
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
-  @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Read             Flag used to determine the data transfer direction.
-                          Read equals 1, means data transferred from device to host;
-                          Read equals 0, means data transferred from host to device.
-  @param DataBuffer       A pointer to the source buffer for the data.
-  @param DataLength       The length of  the data.
-  @param AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
-  @param AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
-  @param Timeout          The time to complete the command.
-
-  @retval EFI_SUCCESS          the operation is successful.
-  @retval EFI_OUT_OF_RESOURCES Build PRD table failed
-  @retval EFI_UNSUPPORTED      Unknown channel or operations command
-  @retval EFI_DEVICE_ERROR     Ata command execute failed
-
-**/
-EFI_STATUS
-EFIAPI
-AtaUdmaInOut (
-  IN     EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN     EFI_IDE_REGISTERS         *IdeRegisters,
-  IN     BOOLEAN                   Read,
-  IN     VOID                      *DataBuffer,
-  IN     UINT64                    DataLength,
-  IN     EFI_ATA_COMMAND_BLOCK     *AtaCommandBlock,
-  IN OUT EFI_ATA_STATUS_BLOCK      *AtaStatusBlock,
-  IN     UINT64                    Timeout
-  );
-
-/**
-  This function is used to send out ATA commands conforms to the PIO Data In Protocol.
-
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
-  @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Buffer           A pointer to the source buffer for the data.
-  @param ByteCount        The length of  the data.
-  @param Read             Flag used to determine the data transfer direction.
-                          Read equals 1, means data transferred from device to host;
-                          Read equals 0, means data transferred from host to device.  
-  @param AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
-  @param AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
-  @param Timeout          The time to complete the command.
-  
-  @retval EFI_SUCCESS      send out the ATA command and device send required data successfully.
-  @retval EFI_DEVICE_ERROR command sent failed.
-
-**/
-EFI_STATUS
-EFIAPI
-AtaPioDataInOut (  
-  IN     EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN     EFI_IDE_REGISTERS         *IdeRegisters,
-  IN OUT VOID                      *Buffer,
-  IN     UINT64                    ByteCount,
-  IN     BOOLEAN                   Read,
-  IN     EFI_ATA_COMMAND_BLOCK     *AtaCommandBlock,
-  IN OUT EFI_ATA_STATUS_BLOCK      *AtaStatusBlock,
-  IN     UINT64                    Timeout
-  );
-
 
 #endif
 

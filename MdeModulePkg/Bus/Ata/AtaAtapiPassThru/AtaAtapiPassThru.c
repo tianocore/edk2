@@ -39,7 +39,7 @@ ATA_ATAPI_PASS_THRU_INSTANCE gAtaAtapiPassThruInstanceTemplate = {
     // bits.
     // Note that the driver doesn't support AtaPassThru non blocking I/O.
     //
-    EFI_ATA_PASS_THRU_ATTRIBUTES_PHYSICAL | EFI_ATA_PASS_THRU_ATTRIBUTES_LOGICAL,
+    EFI_ATA_PASS_THRU_ATTRIBUTES_PHYSICAL | EFI_ATA_PASS_THRU_ATTRIBUTES_LOGICAL | EFI_ATA_PASS_THRU_ATTRIBUTES_NONBLOCKIO,
     //
     // IoAlign
     //
@@ -98,7 +98,12 @@ ATA_ATAPI_PASS_THRU_INSTANCE gAtaAtapiPassThruInstanceTemplate = {
   0,                  // PreviousPort
   0,                  // PreviousPortMultiplier
   0,                  // PreviousTargetId
-  0                   // PreviousLun
+  0,                  // PreviousLun
+  NULL,               // Timer event
+  {                   // NonBlocking TaskList
+    NULL,             
+    NULL
+  }
 };
 
 ATAPI_DEVICE_PATH    mAtapiDevicePathTemplate = {
@@ -133,11 +138,303 @@ UINT8 mScsiId[TARGET_MAX_BYTES] = {
 };
 
 /**
+  Sends an ATA command to an ATA device that is attached to the ATA controller. This function
+  supports both blocking I/O and non-blocking I/O. The blocking I/O functionality is required,
+  and the non-blocking I/O functionality is optional.
+
+  @param[in]      Port               The port number of the ATA device to send the command. 
+  @param[in]      PortMultiplierPort The port multiplier port number of the ATA device to send the command.
+                                     If there is no port multiplier, then specify 0.
+  @param[in, out] Packet             A pointer to the ATA command to send to the ATA device specified by Port
+                                     and PortMultiplierPort.
+  @param[in]      Instance           Pointer to the ATA_ATAPI_PASS_THRU_INSTANCE.
+  @param[in]      Task               Optional. Pointer to the ATA_NONBLOCK_TASK
+                                     used by non-blocking mode.
+
+  @retval EFI_SUCCESS                The ATA command was sent by the host. For
+                                     bi-directional commands, InTransferLength bytes
+                                     were transferred from InDataBuffer. For
+                                     write and bi-directional commands, OutTransferLength
+                                     bytes were transferred by OutDataBuffer.
+  @retval EFI_BAD_BUFFER_SIZE        The ATA command was not executed. The number
+                                     of bytes that could be transferred is returned
+                                     in InTransferLength. For write and bi-directional
+                                     commands, OutTransferLength bytes were transferred
+                                     by OutDataBuffer.
+  @retval EFI_NOT_READY              The ATA command could not be sent because
+                                     there are too many ATA commands already
+                                     queued. The caller may retry again later.
+  @retval EFI_DEVICE_ERROR           A device error occurred while attempting
+                                     to send the ATA command.
+  @retval EFI_INVALID_PARAMETER      Port, PortMultiplierPort, or the contents
+                                     of Acb are invalid. The ATA command was
+                                     not sent, so no additional status information
+                                     is available.
+
+**/
+EFI_STATUS
+EFIAPI
+AtaPassThruPassThruExecute (
+  IN     UINT16                           Port,
+  IN     UINT16                           PortMultiplierPort,
+  IN OUT EFI_ATA_PASS_THRU_COMMAND_PACKET *Packet,
+  IN     ATA_ATAPI_PASS_THRU_INSTANCE     *Instance, 
+  IN     ATA_NONBLOCK_TASK                *Task OPTIONAL
+  )
+{
+  EFI_ATA_PASS_THRU_CMD_PROTOCOL  Protocol;
+  EFI_ATA_HC_WORK_MODE            Mode;
+  EFI_STATUS                      Status;
+  
+  Protocol = Packet->Protocol;
+
+  Mode = Instance->Mode;
+  switch (Mode) {
+    case EfiAtaIdeMode:
+      //
+      // Reassign IDE mode io port registers' base addresses
+      //
+      Status = GetIdeRegisterIoAddr (Instance->PciIo, Instance->IdeRegisters);
+      
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+      
+      switch (Protocol) {
+        case EFI_ATA_PASS_THRU_PROTOCOL_ATA_NON_DATA:
+          Status = AtaNonDataCommandIn (
+                     Instance->PciIo,
+                     &Instance->IdeRegisters[Port],
+                     Packet->Acb,
+                     Packet->Asb,
+                     Packet->Timeout, 
+                     Task
+                     );
+          break;
+        case EFI_ATA_PASS_THRU_PROTOCOL_PIO_DATA_IN:
+          Status = AtaPioDataInOut (
+                     Instance->PciIo,
+                     &Instance->IdeRegisters[Port],
+                     Packet->InDataBuffer,
+                     Packet->InTransferLength,
+                     TRUE,
+                     Packet->Acb,
+                     Packet->Asb,
+                     Packet->Timeout,
+                     Task
+                     );
+          break;
+        case EFI_ATA_PASS_THRU_PROTOCOL_PIO_DATA_OUT:
+          Status = AtaPioDataInOut (
+                     Instance->PciIo,
+                     &Instance->IdeRegisters[Port],
+                     Packet->OutDataBuffer,
+                     Packet->OutTransferLength,
+                     FALSE,
+                     Packet->Acb,
+                     Packet->Asb,
+                     Packet->Timeout,
+                     Task
+                     );
+          break;
+        case EFI_ATA_PASS_THRU_PROTOCOL_UDMA_DATA_IN:
+          Status = AtaUdmaInOut (
+                     Instance,
+                     &Instance->IdeRegisters[Port],
+                     TRUE,
+                     Packet->InDataBuffer,
+                     Packet->InTransferLength,
+                     Packet->Acb,
+                     Packet->Asb,
+                     Packet->Timeout,
+                     Task
+                     );
+          break;
+        case EFI_ATA_PASS_THRU_PROTOCOL_UDMA_DATA_OUT:
+          Status = AtaUdmaInOut (
+                     Instance,
+                     &Instance->IdeRegisters[Port],
+                     FALSE,
+                     Packet->OutDataBuffer,
+                     Packet->OutTransferLength,
+                     Packet->Acb,
+                     Packet->Asb,
+                     Packet->Timeout,
+                     Task
+                     );
+          break;
+        default :
+          return EFI_UNSUPPORTED;
+      }
+      break;
+    case EfiAtaAhciMode :
+      switch (Protocol) {
+        case EFI_ATA_PASS_THRU_PROTOCOL_ATA_NON_DATA:
+          Status = AhciNonDataTransfer (
+                     Instance->PciIo,
+                     &Instance->AhciRegisters,
+                     (UINT8)Port,
+                     (UINT8)PortMultiplierPort,
+                     NULL,
+                     0,
+                     Packet->Acb,
+                     Packet->Asb,
+                     Packet->Timeout,
+                     Task
+                     );
+          break;
+        case EFI_ATA_PASS_THRU_PROTOCOL_PIO_DATA_IN:
+          Status = AhciPioTransfer (
+                     Instance->PciIo,
+                     &Instance->AhciRegisters,
+                     (UINT8)Port,
+                     (UINT8)PortMultiplierPort,
+                     NULL,
+                     0,
+                     TRUE,
+                     Packet->Acb,
+                     Packet->Asb,
+                     Packet->InDataBuffer,
+                     Packet->InTransferLength,
+                     Packet->Timeout,
+                     Task
+                     );
+          break;
+        case EFI_ATA_PASS_THRU_PROTOCOL_PIO_DATA_OUT:
+          Status = AhciPioTransfer (
+                     Instance->PciIo,
+                     &Instance->AhciRegisters,
+                     (UINT8)Port,
+                     (UINT8)PortMultiplierPort,
+                     NULL,
+                     0,
+                     FALSE,
+                     Packet->Acb,
+                     Packet->Asb,
+                     Packet->OutDataBuffer,
+                     Packet->OutTransferLength,
+                     Packet->Timeout, 
+                     Task
+                     );
+          break;
+        case EFI_ATA_PASS_THRU_PROTOCOL_UDMA_DATA_IN:
+          Status = AhciDmaTransfer (
+                     Instance,
+                     &Instance->AhciRegisters,
+                     (UINT8)Port,
+                     (UINT8)PortMultiplierPort,
+                     NULL,
+                     0,
+                     TRUE,
+                     Packet->Acb,
+                     Packet->Asb,
+                     Packet->InDataBuffer,
+                     Packet->InTransferLength,
+                     Packet->Timeout,
+                     Task
+                     );
+          break;
+        case EFI_ATA_PASS_THRU_PROTOCOL_UDMA_DATA_OUT:
+          Status = AhciDmaTransfer (
+                     Instance,
+                     &Instance->AhciRegisters,
+                     (UINT8)Port,
+                     (UINT8)PortMultiplierPort,
+                     NULL,
+                     0,
+                     FALSE,
+                     Packet->Acb,
+                     Packet->Asb,
+                     Packet->OutDataBuffer,
+                     Packet->OutTransferLength,
+                     Packet->Timeout,
+                     Task
+                     );
+          break;
+        default :
+          return EFI_UNSUPPORTED;
+      }
+      break;
+
+    default:
+      Status = EFI_DEVICE_ERROR;
+      break;
+  }
+  
+  return Status;
+}
+
+/**
+  Call back function when the timer event is signaled.
+
+  @param[in]  Event     The Event this notify function registered to.
+  @param[in]  Context   Pointer to the context data registered to the
+                        Event. 
+ 
+**/
+VOID
+EFIAPI 
+AsyncNonBlockingTransferRoutine (
+  EFI_EVENT  Event,
+  VOID*      Context
+  )
+{
+  LIST_ENTRY                   *Entry;
+  LIST_ENTRY                   *EntryHeader;
+  ATA_NONBLOCK_TASK            *Task;
+  EFI_STATUS                   Status;
+  ATA_ATAPI_PASS_THRU_INSTANCE *Instance;
+
+  Instance   = (ATA_ATAPI_PASS_THRU_INSTANCE *) Context;
+  EntryHeader = &Instance->NonBlockingTaskList;
+  //
+  // Get the Taks from the Taks List and execute it, until there is 
+  // no task in the list or the device is busy with task (EFI_NOT_READY).
+  //
+  while (TRUE) {
+    if (!IsListEmpty (EntryHeader)) {
+      Entry = GetFirstNode (EntryHeader);
+      Task  = ATA_NON_BLOCK_TASK_FROM_ENTRY (Entry);
+    } else {
+      return;
+    }
+
+    Status = AtaPassThruPassThruExecute (
+               Task->Port,
+               Task->PortMultiplier,
+               Task->Packet,
+               Instance,
+               Task
+               );
+
+    //
+    // If the data transfer meet a error which is not dumped into the status block
+    // set the Status block related bit.
+    //
+    if ((Status != EFI_NOT_READY) && (Status != EFI_SUCCESS)) {
+      Task->Packet->Asb->AtaStatus = 0x01;
+    }
+    //
+    // For Non blocking mode, the Status of EFI_NOT_READY means the operation
+    // is not finished yet. Other Status indicate the operation is either
+    // successful or failed. 
+    //
+    if (Status != EFI_NOT_READY) {
+      RemoveEntryList (&Task->Link);
+      gBS->SignalEvent (Task->Event);
+      FreePool (Task);
+    } else {
+      break;
+    }
+  }
+}
+
+/**
   The Entry Point of module.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -266,7 +563,7 @@ AtaAtapiPassThruSupported (
     //
     return Status;
   }
-  
+
   //
   // Close the I/O Abstraction(s) used to perform the supported test
   //
@@ -324,7 +621,7 @@ AtaAtapiPassThruSupported (
   2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
      EFI_DEVICE_PATH_PROTOCOL.
   3. Prior to calling Start(), the Supported() function for the driver specified by This must
-     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.  
+     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param[in]  ControllerHandle     The handle of the controller to start. This handle 
@@ -333,7 +630,7 @@ AtaAtapiPassThruSupported (
   @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
                                    parameter is ignored by device drivers, and is optional for bus 
                                    drivers. For a bus driver, if this parameter is NULL, then handles 
-                                   for all the children of Controller are created by this driver.  
+                                   for all the children of Controller are created by this driver.
                                    If this parameter is not NULL and the first Device Path Node is 
                                    not the End of Device Path Node, then only the handle for the 
                                    child device specified by the first Device Path Node of 
@@ -446,6 +743,28 @@ AtaAtapiPassThruStart (
   Instance->AtaPassThru.Mode      = &Instance->AtaPassThruMode;
   Instance->ExtScsiPassThru.Mode  = &Instance->ExtScsiPassThruMode;
   InitializeListHead(&Instance->DeviceList);
+  InitializeListHead(&Instance->NonBlockingTaskList);
+
+  Instance->TimerEvent = NULL;
+
+  Status = gBS->CreateEvent (
+                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  AsyncNonBlockingTransferRoutine,
+                  Instance,
+                  &Instance->TimerEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ErrorExit;
+  }
+  
+  //
+  // Set 1ms timer.
+  //
+  Status = gBS->SetTimer (Instance->TimerEvent, TimerPeriodic, 10000);
+  if (EFI_ERROR (Status)) {
+    goto ErrorExit;
+  }
 
   //
   // Enumerate all inserted ATA devices.
@@ -473,6 +792,10 @@ ErrorExit:
            This->DriverBindingHandle,
            Controller
            );
+  }
+
+  if (Instance->TimerEvent != NULL) {
+    gBS->CloseEvent (Instance->TimerEvent);
   }
 
   //
@@ -542,13 +865,22 @@ AtaAtapiPassThruStop (
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
-  
-  Instance = ATA_PASS_THRU_PRIVATE_DATA_FROM_THIS(AtaPassThru);
-  PciIo    = Instance->PciIo;
+
+  Instance = ATA_PASS_THRU_PRIVATE_DATA_FROM_THIS (AtaPassThru);
+
+  //
+  // Close Non-Blocking timer and free Task list.
+  //
+  if (Instance->TimerEvent != NULL) {
+    gBS->CloseEvent (Instance->TimerEvent);
+    Instance->TimerEvent = NULL;
+  }
+  DestroyAsynTaskList (Instance);
 
   //
   // Disable this ATA host controller.
   //
+  PciIo  = Instance->PciIo;
   Status = PciIo->Attributes (
                     PciIo,
                     EfiPciIoAttributeOperationSupported,
@@ -672,7 +1004,7 @@ SearchDeviceInfoList (
     }
 
     Node = GetNextNode (&Instance->DeviceList, Node);
-  }  
+  }
 
   return NULL;
 }
@@ -755,6 +1087,42 @@ DestroyDeviceInfoList (
     }
     FreePool (DeviceInfo);
   }
+}
+
+/**
+  Destroy all pending non blocking tasks.
+  
+  @param[in]  Instance  A pointer to the ATA_ATAPI_PASS_THRU_INSTANCE instance.
+
+**/
+VOID
+EFIAPI
+DestroyAsynTaskList (
+  IN ATA_ATAPI_PASS_THRU_INSTANCE *Instance
+  )
+{
+  LIST_ENTRY           *Entry;
+  LIST_ENTRY           *DelEntry;
+  ATA_NONBLOCK_TASK    *Task;
+  EFI_TPL              OldTpl;
+
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+  if (!IsListEmpty (&Instance->NonBlockingTaskList)) {
+    //
+    // Free the Subtask list.
+    //
+    for (Entry = (&Instance->NonBlockingTaskList)->ForwardLink; 
+        Entry != (&Instance->NonBlockingTaskList);
+       ) {
+      DelEntry = Entry;
+      Entry    = Entry->ForwardLink;
+      Task     = ATA_NON_BLOCK_TASK_FROM_ENTRY (DelEntry);
+
+      RemoveEntryList (DelEntry);
+      FreePool (Task);
+    }
+  }
+  gBS->RestoreTPL (OldTpl);
 }
 
 /**
@@ -863,17 +1231,16 @@ AtaPassThruPassThru (
   IN     UINT16                           PortMultiplierPort,
   IN OUT EFI_ATA_PASS_THRU_COMMAND_PACKET *Packet,
   IN     EFI_EVENT                        Event OPTIONAL
-  ) 
+  )
 {
-  EFI_STATUS                      Status;
   ATA_ATAPI_PASS_THRU_INSTANCE    *Instance;
-  EFI_ATA_PASS_THRU_CMD_PROTOCOL  Protocol;
-  EFI_ATA_HC_WORK_MODE            Mode;
   LIST_ENTRY                      *Node;
   EFI_ATA_DEVICE_INFO             *DeviceInfo;
   EFI_IDENTIFY_DATA               *IdentifyData;
   UINT64                          Capacity;
   UINT32                          MaxSectorCount;
+  ATA_NONBLOCK_TASK               *Task;
+  EFI_TPL                         OldTpl;
 
   Instance = ATA_PASS_THRU_PRIVATE_DATA_FROM_THIS (This);
 
@@ -940,173 +1307,37 @@ AtaPassThruPassThru (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  Status   = EFI_UNSUPPORTED;
-  Protocol = Packet->Protocol;
+  //
+  // For non-blocking mode, queue the Task into the list.
+  //
+  if (Event != NULL) {
+    Task = AllocateZeroPool (sizeof (ATA_NONBLOCK_TASK));
+    if (Task == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    
+    Task->Signature      = ATA_NONBLOCKING_TASK_SIGNATURE;
+    Task->Port           = Port;
+    Task->PortMultiplier = PortMultiplierPort;
+    Task->Packet         = Packet;
+    Task->Event          = Event;
+    Task->IsStart        = FALSE;
+    Task->RetryTimes     = 0;
 
-  Mode = Instance->Mode;
-  switch (Mode) {
-    case EfiAtaIdeMode:
-      //
-      // Reassign IDE mode io port registers' base addresses
-      //
-      Status = GetIdeRegisterIoAddr (Instance->PciIo, Instance->IdeRegisters);
-      
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-      
-      switch (Protocol) {
-        case EFI_ATA_PASS_THRU_PROTOCOL_ATA_NON_DATA:
-          Status = AtaNonDataCommandIn(
-                     Instance->PciIo,
-                     &Instance->IdeRegisters[Port],
-                     Packet->Acb,
-                     Packet->Asb,
-                     Packet->Timeout
-                     );
-          break;
-        case EFI_ATA_PASS_THRU_PROTOCOL_PIO_DATA_IN:
-          Status = AtaPioDataInOut(
-                     Instance->PciIo,
-                     &Instance->IdeRegisters[Port],
-                     Packet->InDataBuffer,
-                     Packet->InTransferLength,
-                     TRUE,
-                     Packet->Acb,
-                     Packet->Asb,
-                     Packet->Timeout
-                     );
-          break;
-        case EFI_ATA_PASS_THRU_PROTOCOL_PIO_DATA_OUT:
-          Status = AtaPioDataInOut(
-                     Instance->PciIo,
-                     &Instance->IdeRegisters[Port],
-                     Packet->OutDataBuffer,
-                     Packet->OutTransferLength,
-                     FALSE,
-                     Packet->Acb,
-                     Packet->Asb,
-                     Packet->Timeout
-                     );
-          break;
-        case EFI_ATA_PASS_THRU_PROTOCOL_UDMA_DATA_IN:
-          Status = AtaUdmaInOut(
-                     Instance->PciIo,
-                     &Instance->IdeRegisters[Port],
-                     TRUE,
-                     Packet->InDataBuffer,
-                     Packet->InTransferLength,
-                     Packet->Acb,
-                     Packet->Asb,
-                     Packet->Timeout
-                     );
-          break;
-        case EFI_ATA_PASS_THRU_PROTOCOL_UDMA_DATA_OUT:
-          Status = AtaUdmaInOut(
-                     Instance->PciIo,
-                     &Instance->IdeRegisters[Port],
-                     FALSE,
-                     Packet->OutDataBuffer,
-                     Packet->OutTransferLength,
-                     Packet->Acb,
-                     Packet->Asb,
-                     Packet->Timeout
-                     );
-          break;
-        default :
-          return EFI_UNSUPPORTED;
-      }
-      break;
-    case EfiAtaAhciMode :
-      switch (Protocol) {
-        case EFI_ATA_PASS_THRU_PROTOCOL_ATA_NON_DATA:
-          Status = AhciNonDataTransfer(
-                     Instance->PciIo,
-                     &Instance->AhciRegisters,
-                     (UINT8)Port,
-                     (UINT8)PortMultiplierPort,
-                     NULL,
-                     0,
-                     Packet->Acb,
-                     Packet->Asb,
-                     Packet->Timeout
-                     );
-          break;
-        case EFI_ATA_PASS_THRU_PROTOCOL_PIO_DATA_IN:
-          Status = AhciPioTransfer(
-                     Instance->PciIo,
-                     &Instance->AhciRegisters,
-                     (UINT8)Port,
-                     (UINT8)PortMultiplierPort,
-                     NULL,
-                     0,
-                     TRUE,
-                     Packet->Acb,
-                     Packet->Asb,
-                     Packet->InDataBuffer,
-                     Packet->InTransferLength,
-                     Packet->Timeout
-                     );
-          break;
-        case EFI_ATA_PASS_THRU_PROTOCOL_PIO_DATA_OUT:
-          Status = AhciPioTransfer(
-                     Instance->PciIo,
-                     &Instance->AhciRegisters,
-                     (UINT8)Port,
-                     (UINT8)PortMultiplierPort,
-                     NULL,
-                     0,
-                     FALSE,
-                     Packet->Acb,
-                     Packet->Asb,
-                     Packet->OutDataBuffer,
-                     Packet->OutTransferLength,
-                     Packet->Timeout
-                     );
-          break;
-        case EFI_ATA_PASS_THRU_PROTOCOL_UDMA_DATA_IN:
-          Status = AhciDmaTransfer(
-                     Instance->PciIo,
-                     &Instance->AhciRegisters,
-                     (UINT8)Port,
-                     (UINT8)PortMultiplierPort,
-                     NULL,
-                     0,
-                     TRUE,
-                     Packet->Acb,
-                     Packet->Asb,
-                     Packet->InDataBuffer,
-                     Packet->InTransferLength,
-                     Packet->Timeout
-                     );
-          break;
-        case EFI_ATA_PASS_THRU_PROTOCOL_UDMA_DATA_OUT:
-          Status = AhciDmaTransfer(
-                     Instance->PciIo,
-                     &Instance->AhciRegisters,
-                     (UINT8)Port,
-                     (UINT8)PortMultiplierPort,
-                     NULL,
-                     0,
-                     FALSE,
-                     Packet->Acb,
-                     Packet->Asb,
-                     Packet->OutDataBuffer,
-                     Packet->OutTransferLength,
-                     Packet->Timeout
-                     );
-          break;
-        default :
-          return EFI_UNSUPPORTED;
-      }
-      break;
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    InsertTailList (&Instance->NonBlockingTaskList, &Task->Link);
+    gBS->RestoreTPL (OldTpl);
 
-    default:
-      Status = EFI_DEVICE_ERROR;
-      break;
+    return EFI_SUCCESS;
+  } else {
+    return AtaPassThruPassThruExecute (
+             Port,
+             PortMultiplierPort,
+             Packet,
+             Instance,
+             NULL
+             );
   }
-
-  return Status;
 }
 
 /**
@@ -1197,7 +1428,7 @@ AtaPassThruGetNextPort (
     //
     return EFI_INVALID_PARAMETER;
   }
-  
+
 Exit:
   //
   // Update the PreviousPort and PreviousPortMultiplier.
@@ -1216,20 +1447,20 @@ Exit:
 
   The GetNextDevice() function retrieves the port multiplier port number of an ATA device 
   present on a port of an ATA controller.
-  
+
   If PortMultiplierPort points to a port multiplier port number value that was returned on a 
   previous call to GetNextDevice(), then the port multiplier port number of the next ATA device
   on the port of the ATA controller is returned in PortMultiplierPort, and EFI_SUCCESS is
   returned.
-  
+
   If PortMultiplierPort points to 0xFFFF, then the port multiplier port number of the first 
   ATA device on port of the ATA controller is returned in PortMultiplierPort and 
   EFI_SUCCESS is returned.
-  
+
   If PortMultiplierPort is not 0xFFFF and the value pointed to by PortMultiplierPort
   was not returned on a previous call to GetNextDevice(), then EFI_INVALID_PARAMETER
   is returned.
-  
+
   If PortMultiplierPort is the port multiplier port number of the last ATA device on the port of 
   the ATA controller, then EFI_NOT_FOUND is returned.
 
@@ -1309,7 +1540,7 @@ AtaPassThruGetNextDevice (
     //
     return EFI_INVALID_PARAMETER;
   }
-  
+
 Exit:
   //
   // Update the PreviousPort and PreviousPortMultiplier.
@@ -1377,7 +1608,7 @@ AtaPassThruBuildDevicePath (
   if (Node == NULL) {
     return EFI_NOT_FOUND;
   }
-  
+
   if (Instance->Mode == EfiAtaIdeMode) {
     DevicePathNode = AllocateCopyPool (sizeof (ATAPI_DEVICE_PATH), &mAtapiDevicePathTemplate);
     if (DevicePathNode == NULL) {
@@ -1719,7 +1950,7 @@ ExtScsiPassThruPassThru (
   can either be the list SCSI devices that are actually present on the SCSI channel, or the list of legal
   Target Ids and LUNs for the SCSI channel. Regardless, the caller of this function must probe the       
   Target ID and LUN returned to see if a SCSI device is actually present at that location on the SCSI    
-  channel.                                                                                               
+  channel.
 
   @param  This   A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
   @param  Target On input, a pointer to the Target ID (an array of size
@@ -1840,7 +2071,7 @@ Exit:
   Instance->PreviousLun      = *Lun;
   
   return EFI_SUCCESS;
-}   
+}
 
 /**
   Used to allocate and build a device path node for a SCSI device on a SCSI channel.
@@ -2031,8 +2262,8 @@ ExtScsiPassThruResetChannel (
   )
 {
   return EFI_UNSUPPORTED;
-}    
-  
+}
+
 /**
   Resets a SCSI logical unit that is connected to a SCSI channel.
 
@@ -2061,7 +2292,7 @@ ExtScsiPassThruResetTargetLun (
   )
 {
   return EFI_UNSUPPORTED;
-}         
+}
 
 /**
   Used to retrieve the list of legal Target IDs for SCSI devices on a SCSI channel. These can either     
@@ -2176,5 +2407,5 @@ Exit:
   Instance->PreviousTargetId = *Target16;
 
   return EFI_SUCCESS;
-}    
+}
 

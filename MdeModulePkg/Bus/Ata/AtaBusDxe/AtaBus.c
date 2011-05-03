@@ -44,6 +44,13 @@ ATA_DEVICE gAtaDeviceTemplate = {
     AtaBlockIoWriteBlocks,
     AtaBlockIoFlushBlocks
   },
+  {                            // BlockIo2
+    NULL,
+    AtaBlockIoResetEx,
+    AtaBlockIoReadBlocksEx,
+    AtaBlockIoWriteBlocksEx,
+    AtaBlockIoFlushBlocksEx
+  },
   {                            // BlockMedia
     0,                         // MediaId
     FALSE,                     // RemovableMedia
@@ -75,7 +82,8 @@ ATA_DEVICE gAtaDeviceTemplate = {
   FALSE,                       // Lba48Bit
   NULL,                        // IdentifyData
   NULL,                        // ControllerNameTable
-  {L'\0', }                    // ModelName
+  {L'\0', },                   // ModelName
+  {NULL, NULL}                 // AtaTaskList
 };
 
 /**
@@ -135,12 +143,34 @@ ReleaseAtaResources (
   IN ATA_DEVICE  *AtaDevice
   )
 {
+  ATA_BUS_ASYN_TASK *Task;
+  LIST_ENTRY        *Entry;
+  LIST_ENTRY        *DelEntry;
+  EFI_TPL           OldTpl;
+
   FreeUnicodeStringTable (AtaDevice->ControllerNameTable);
   FreeAlignedBuffer (AtaDevice->Asb, sizeof (*AtaDevice->Asb));
   FreeAlignedBuffer (AtaDevice->IdentifyData, sizeof (*AtaDevice->IdentifyData));
   if (AtaDevice->DevicePath != NULL) {
     FreePool (AtaDevice->DevicePath);
   }
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+  if (!IsListEmpty (&AtaDevice->AtaTaskList)) {
+    //
+    // Free the Subtask list.
+    //
+    for(Entry = (&AtaDevice->AtaTaskList)->ForwardLink; 
+        Entry != (&AtaDevice->AtaTaskList);
+       ) {
+      DelEntry = Entry;
+      Entry    = Entry->ForwardLink;
+      Task     = ATA_AYNS_TASK_FROM_ENTRY (DelEntry);
+      
+      RemoveEntryList (DelEntry);
+      FreeAtaSubTask (Task);
+    }
+  }
+  gBS->RestoreTPL (OldTpl);
   FreePool (AtaDevice);
 }
 
@@ -218,10 +248,11 @@ RegisterAtaDevice (
   //
   // Initializes ATA device structures and allocates the required buffer.
   //
-  AtaDevice->BlockIo.Media = &AtaDevice->BlockMedia;
-  AtaDevice->AtaBusDriverData = AtaBusDriverData;
-  AtaDevice->DevicePath = DevicePath;
-  AtaDevice->Port = Port;
+  AtaDevice->BlockIo.Media      = &AtaDevice->BlockMedia;
+  AtaDevice->BlockIo2.Media     = &AtaDevice->BlockMedia;
+  AtaDevice->AtaBusDriverData   = AtaBusDriverData;
+  AtaDevice->DevicePath         = DevicePath;
+  AtaDevice->Port               = Port;
   AtaDevice->PortMultiplierPort = PortMultiplierPort;
   AtaDevice->Asb = AllocateAlignedBuffer (AtaDevice, sizeof (*AtaDevice->Asb));
   if (AtaDevice->Asb == NULL) {
@@ -235,13 +266,18 @@ RegisterAtaDevice (
   }
 
   //
+  // Initial Ata Task List
+  //
+  InitializeListHead (&AtaDevice->AtaTaskList);
+
+  //
   // Try to identify the ATA device via the ATA pass through command. 
   //
   Status = DiscoverAtaDevice (AtaDevice);
   if (EFI_ERROR (Status)) {
     goto Done;
   }
-  
+
   //
   // Build controller name for Component Name (2) protocol.
   //
@@ -281,6 +317,8 @@ RegisterAtaDevice (
                   AtaDevice->DevicePath,
                   &gEfiBlockIoProtocolGuid,
                   &AtaDevice->BlockIo,
+                  &gEfiBlockIo2ProtocolGuid,
+                  &AtaDevice->BlockIo2,
                   &gEfiDiskInfoProtocolGuid,
                   &AtaDevice->DiskInfo,
                   NULL
@@ -334,8 +372,11 @@ UnregisterAtaDevice (
 {
   EFI_STATUS                  Status;
   EFI_BLOCK_IO_PROTOCOL       *BlockIo;
+  EFI_BLOCK_IO2_PROTOCOL      *BlockIo2;
   ATA_DEVICE                  *AtaDevice;
   EFI_ATA_PASS_THRU_PROTOCOL  *AtaPassThru;
+  BlockIo2 = NULL;
+  BlockIo  = NULL;
 
   Status = gBS->OpenProtocol (
                   Handle,
@@ -346,10 +387,30 @@ UnregisterAtaDevice (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    //
+    // Locate BlockIo2 protocol
+    //
+    Status = gBS->OpenProtocol (
+                    Handle,
+                    &gEfiBlockIo2ProtocolGuid,
+                    (VOID **) &BlockIo2,
+                    This->DriverBindingHandle,
+                    Controller,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
-  AtaDevice = ATA_DEVICE_FROM_BLOCK_IO (BlockIo);
+  //
+  // Get AtaDevice data.
+  //
+  if (BlockIo != NULL) {
+    AtaDevice = ATA_DEVICE_FROM_BLOCK_IO (BlockIo);
+  } else {
+    AtaDevice = ATA_DEVICE_FROM_BLOCK_IO2 (BlockIo2);
+  } 
 
   //
   // Close the child handle
@@ -361,12 +422,18 @@ UnregisterAtaDevice (
          Handle
          );
 
+  //
+  // The Ata Bus driver installs the BlockIo and BlockIo2 in the DriverBindingStart().
+  // Here should uninstall both of them.
+  //
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   Handle,
                   &gEfiDevicePathProtocolGuid,
                   AtaDevice->DevicePath,
                   &gEfiBlockIoProtocolGuid,
                   &AtaDevice->BlockIo,
+                  &gEfiBlockIo2ProtocolGuid,
+                  &AtaDevice->BlockIo2,
                   &gEfiDiskInfoProtocolGuid,
                   &AtaDevice->DiskInfo,
                   NULL
@@ -385,7 +452,6 @@ UnregisterAtaDevice (
   }
 
   ReleaseAtaResources (AtaDevice);
-
   return Status;
 }
 
@@ -446,7 +512,7 @@ AtaBusDriverBindingSupported (
   EFI_ATA_PASS_THRU_PROTOCOL        *AtaPassThru;
   UINT16                            Port;
   UINT16                            PortMultiplierPort;
- 
+
   //
   // Test EFI_ATA_PASS_THRU_PROTOCOL on controller handle.
   //
@@ -522,7 +588,7 @@ AtaBusDriverBindingSupported (
   @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
                                    parameter is ignored by device drivers, and is optional for bus 
                                    drivers. For a bus driver, if this parameter is NULL, then handles 
-                                   for all the children of Controller are created by this driver.  
+                                   for all the children of Controller are created by this driver.
                                    If this parameter is not NULL and the first Device Path Node is 
                                    not the End of Device Path Node, then only the handle for the 
                                    child device specified by the first Device Path Node of 
@@ -589,7 +655,7 @@ AtaBusDriverBindingStart (
     }
 
     AtaBusDriverData->AtaPassThru = AtaPassThru;
-    AtaBusDriverData->Controller = Controller;
+    AtaBusDriverData->Controller  = Controller;
     AtaBusDriverData->ParentDevicePath = ParentDevicePath;
     AtaBusDriverData->DriverBindingHandle = This->DriverBindingHandle;
 
@@ -628,7 +694,7 @@ AtaBusDriverBindingStart (
         //
         break;
       }
-      
+
       PortMultiplierPort = 0xFFFF;
       while (TRUE) {
         Status = AtaPassThru->GetNextDevice (AtaPassThru, Port, &PortMultiplierPort);
@@ -649,7 +715,7 @@ AtaBusDriverBindingStart (
       Status = RegisterAtaDevice (AtaBusDriverData,Port, PortMultiplierPort);
     }
   }
-  
+
   return Status;
 
 ErrorExit:
@@ -789,7 +855,7 @@ AtaBlockIoReset (
 
   AtaDevice = ATA_DEVICE_FROM_BLOCK_IO (This);
 
-  Status = ResetAtaDevice (AtaDevice);  
+  Status = ResetAtaDevice (AtaDevice);
 
   if (EFI_ERROR (Status)) {
     Status = EFI_DEVICE_ERROR;
@@ -803,13 +869,18 @@ AtaBlockIoReset (
 /**
   Read/Write BufferSize bytes from Lba from/into Buffer.
 
-  @param  This       Indicates a pointer to the calling context.
-  @param  MediaId    The media ID that the read/write request is for.
-  @param  Lba        The starting logical block address to be read/written. The caller is
-                     responsible for reading/writing to only legitimate locations.
-  @param  BufferSize Size of Buffer, must be a multiple of device block size.
-  @param  Buffer     A pointer to the destination/source buffer for the data.
-  @param  IsWrite    Indicates whether it is a write operation.
+  @param[in]       This       Indicates a pointer to the calling context. Either be
+                              block I/O or block I/O2. 
+  @param[in]       MediaId    The media ID that the read/write request is for.
+  @param[in]       Lba        The starting logical block address to be read/written.
+                              The caller is responsible for reading/writing to only
+                              legitimate locations.
+  @param[in, out]  Token      A pointer to the token associated with the transaction.
+  @param[in]       BufferSize Size of Buffer, must be a multiple of device block size.
+  @param[out]      Buffer     A pointer to the destination/source buffer for the data.
+  @param[in]       IsBlockIo2 Indicate the calling is from BlockIO or BlockIO2. TURE is
+                              from BlockIO2, FALSE is for BlockIO.
+  @param[in]       IsWrite    Indicates whether it is a write operation.
 
   @retval EFI_SUCCESS           The data was read/written correctly to the device.
   @retval EFI_WRITE_PROTECTED   The device can not be read/written to.
@@ -823,12 +894,14 @@ AtaBlockIoReset (
 **/
 EFI_STATUS
 BlockIoReadWrite (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This,
-  IN  UINT32                  MediaId,
-  IN  EFI_LBA                 Lba,
-  IN  UINTN                   BufferSize,
-  OUT VOID                    *Buffer,
-  IN  BOOLEAN                 IsWrite
+  IN     VOID                    *This,
+  IN     UINT32                  MediaId,
+  IN     EFI_LBA                 Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN     *Token,
+  IN     UINTN                   BufferSize,
+  OUT    VOID                    *Buffer,
+  IN     BOOLEAN                 IsBlockIo2,
+  IN     BOOLEAN                 IsWrite
   )
 {
   ATA_DEVICE                        *AtaDevice;
@@ -839,21 +912,28 @@ BlockIoReadWrite (
   UINTN                             NumberOfBlocks;
   UINTN                             IoAlign;
 
-  //
-  // Check parameters.
-  //
-  Media = This->Media;
+  if (IsBlockIo2) {
+   Media     = ((EFI_BLOCK_IO2_PROTOCOL *) This)->Media;
+   AtaDevice = ATA_DEVICE_FROM_BLOCK_IO2 (This);
+  } else {
+   Media     = ((EFI_BLOCK_IO_PROTOCOL *) This)->Media;
+   AtaDevice = ATA_DEVICE_FROM_BLOCK_IO (This);
+  }
+
   if (MediaId != Media->MediaId) {
     return EFI_MEDIA_CHANGED;
   }
 
+  //
+  // Check parameters.
+  //
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   if (BufferSize == 0) {
     return EFI_SUCCESS;
-  }
+  }  
 
   BlockSize = Media->BlockSize;
   if ((BufferSize % BlockSize) != 0) {
@@ -871,13 +951,11 @@ BlockIoReadWrite (
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-
-  AtaDevice = ATA_DEVICE_FROM_BLOCK_IO (This);
   
   //
   // Invoke low level AtaDevice Access Routine.
   //
-  Status = AccessAtaDevice (AtaDevice, Buffer, Lba, NumberOfBlocks, IsWrite);
+  Status = AccessAtaDevice (AtaDevice, Buffer, Lba, NumberOfBlocks, IsWrite, Token);
  
   gBS->RestoreTPL (OldTpl);
 
@@ -914,7 +992,7 @@ AtaBlockIoReadBlocks (
   OUT VOID                    *Buffer
   )
 {
-  return BlockIoReadWrite (This, MediaId, Lba, BufferSize, Buffer, FALSE);
+  return BlockIoReadWrite ((VOID *) This, MediaId, Lba, NULL, BufferSize, Buffer, FALSE, FALSE);
 }
 
 
@@ -948,7 +1026,7 @@ AtaBlockIoWriteBlocks (
   IN  VOID                    *Buffer
   )
 {
-  return BlockIoReadWrite (This, MediaId, Lba, BufferSize, Buffer, TRUE);
+  return BlockIoReadWrite ((VOID *) This, MediaId, Lba, NULL, BufferSize, Buffer, FALSE, TRUE);
 }
 
 
@@ -974,7 +1052,147 @@ AtaBlockIoFlushBlocks (
   return EFI_SUCCESS;
 }
 
+/**
+  Reset the Block Device.
 
+  @param[in]  This                 Indicates a pointer to the calling context.
+  @param[in]  ExtendedVerification Driver may perform diagnostics on reset.
+
+  @retval EFI_SUCCESS          The device was reset.
+  @retval EFI_DEVICE_ERROR     The device is not functioning properly and could
+                               not be reset.
+
+**/
+EFI_STATUS
+EFIAPI
+AtaBlockIoResetEx (
+  IN  EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN  BOOLEAN                 ExtendedVerification
+  )
+{
+  EFI_STATUS      Status;
+  ATA_DEVICE      *AtaDevice;
+  EFI_TPL         OldTpl;
+
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+
+  AtaDevice = ATA_DEVICE_FROM_BLOCK_IO2 (This);
+
+  Status = ResetAtaDevice (AtaDevice);
+
+  if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+  }
+
+  gBS->RestoreTPL (OldTpl);
+  return Status;
+}
+
+/**
+  Read BufferSize bytes from Lba into Buffer.
+
+  @param[in]       This       Indicates a pointer to the calling context.
+  @param[in]       MediaId    Id of the media, changes every time the media is replaced.
+  @param[in]       Lba        The starting Logical Block Address to read from.
+  @param[in, out]  Token      A pointer to the token associated with the transaction.
+  @param[in]       BufferSize Size of Buffer, must be a multiple of device block size.
+  @param[out]      Buffer     A pointer to the destination buffer for the data. The caller is
+                              responsible for either having implicit or explicit ownership of the buffer.
+
+  @retval EFI_SUCCESS           The read request was queued if Event is not NULL.
+                                The data was read correctly from the device if
+                                the Event is NULL.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing
+                                the read.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHANGED     The MediaId is not for the current media.
+  @retval EFI_BAD_BUFFER_SIZE   The BufferSize parameter is not a multiple of the
+                                intrinsic block size of the device.
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+                                or the buffer is not on proper alignment.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack
+                                of resources.
+
+**/
+EFI_STATUS
+EFIAPI
+AtaBlockIoReadBlocksEx (
+  IN  EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN  UINT32                  MediaId,
+  IN  EFI_LBA                 Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN  *Token,
+  IN  UINTN                   BufferSize,
+  OUT VOID                    *Buffer
+  )
+{
+  return BlockIoReadWrite ((VOID *) This, MediaId, Lba, Token, BufferSize, Buffer, TRUE, FALSE);
+}
+
+
+/**
+  Write BufferSize bytes from Lba into Buffer.
+
+  @param[in]       This       Indicates a pointer to the calling context.
+  @param[in]       MediaId    The media ID that the write request is for.
+  @param[in]       Lba        The starting logical block address to be written. The
+                              caller is responsible for writing to only legitimate
+                              locations.
+  @param[in, out]  Token      A pointer to the token associated with the transaction.
+  @param[in]       BufferSize Size of Buffer, must be a multiple of device block size.
+  @param[in]       Buffer     A pointer to the source buffer for the data.
+
+  @retval EFI_SUCCESS           The data was written correctly to the device.
+  @retval EFI_WRITE_PROTECTED   The device can not be written to.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+                                or the buffer is not on proper alignment.
+
+**/
+EFI_STATUS
+EFIAPI
+AtaBlockIoWriteBlocksEx (
+  IN  EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN  UINT32                  MediaId,
+  IN  EFI_LBA                 Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN  *Token,
+  IN  UINTN                   BufferSize,
+  IN  VOID                    *Buffer
+  )
+{
+  return BlockIoReadWrite ((VOID *) This, MediaId, Lba, Token, BufferSize, Buffer, TRUE, TRUE);
+}
+
+
+/**
+  Flush the Block Device.
+
+  @param[in]       This       Indicates a pointer to the calling context.
+  @param[in, out]  Token      A pointer to the token associated with the transaction.
+
+  @retval EFI_SUCCESS       All outstanding data was written to the device
+  @retval EFI_DEVICE_ERROR  The device reported an error while writing back the data
+  @retval EFI_NO_MEDIA      There is no media in the device.
+
+**/
+EFI_STATUS
+EFIAPI
+AtaBlockIoFlushBlocksEx (
+  IN  EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN OUT EFI_BLOCK_IO2_TOKEN  *Token
+  )
+{
+  //
+  // Signla event and return directly.
+  //
+  if (Token != NULL && Token->Event != NULL) {
+    Token->TransactionStatus = EFI_SUCCESS;
+    gBS->SignalEvent (Token->Event);
+  }
+  return EFI_SUCCESS;
+}
 /**
   Provides inquiry information for the controller type.
   

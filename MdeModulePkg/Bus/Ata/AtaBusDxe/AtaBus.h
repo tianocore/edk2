@@ -22,6 +22,7 @@
 
 #include <Protocol/AtaPassThru.h>
 #include <Protocol/BlockIo.h>
+#include <Protocol/BlockIo2.h>
 #include <Protocol/DiskInfo.h>
 #include <Protocol/DevicePath.h>
 
@@ -59,13 +60,37 @@
 //
 // The maximum ATA transaction sector count in 48 bit addressing mode. 
 //
-#define MAX_48BIT_TRANSFER_BLOCK_NUM      0x10000
+//#define MAX_48BIT_TRANSFER_BLOCK_NUM      0x10000
+
+//
+// BugBug: if the TransferLength is equal with 0x10000 (the 48bit max length),
+// there is a bug that even the register interrupt bit has been sit, the buffer
+// seems not ready. Change the Maximum Sector Numbers to 0xFFFF to work round
+// this issue.
+//
+#define MAX_48BIT_TRANSFER_BLOCK_NUM      0xFFFF
 
 //
 // The maximum model name in ATA identify data  
 //
 #define MAX_MODEL_NAME_LEN                40
 
+#define ATA_TASK_SIGNATURE    SIGNATURE_32 ('A', 'T', 'S', 'K')
+#define ATA_DEVICE_SIGNATURE  SIGNATURE_32 ('A', 'B', 'I', 'D')
+
+#define IS_ALIGNED(addr, size)      (((UINTN) (addr) & (size - 1)) == 0)
+
+//
+// Task for the non blocking I/O
+//
+typedef struct {
+  UINT32                            Signature;
+  EFI_BLOCK_IO2_TOKEN               *Token;
+  UINTN                             *UnsignalledEventCount;
+  EFI_ATA_PASS_THRU_COMMAND_PACKET  Packet;
+  BOOLEAN                           *IsError;// Indicate whether meeting error during source allocation for new task.
+  LIST_ENTRY                        TaskEntry;
+} ATA_BUS_ASYN_TASK;
 
 //
 // ATA bus data structure for ATA controller
@@ -77,46 +102,48 @@ typedef struct {
   EFI_HANDLE                  DriverBindingHandle;
 } ATA_BUS_DRIVER_DATA;
 
-#define ATA_DEVICE_SIGNATURE  SIGNATURE_32 ('A', 'B', 'I', 'D')
-
 //
 // ATA device data structure for each child device
 //
 typedef struct {
-  UINT32                            Signature;
+  UINT32                                Signature;
 
-  EFI_HANDLE                        Handle;
-  EFI_BLOCK_IO_PROTOCOL             BlockIo;
-  EFI_BLOCK_IO_MEDIA                BlockMedia;
-  EFI_DISK_INFO_PROTOCOL            DiskInfo;
-  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
+  EFI_HANDLE                            Handle;
+  EFI_BLOCK_IO_PROTOCOL                 BlockIo;
+  EFI_BLOCK_IO2_PROTOCOL                BlockIo2;
+  EFI_BLOCK_IO_MEDIA                    BlockMedia;
+  EFI_DISK_INFO_PROTOCOL                DiskInfo;
+  EFI_DEVICE_PATH_PROTOCOL              *DevicePath;
 
-  ATA_BUS_DRIVER_DATA               *AtaBusDriverData;
-  UINT16                            Port;
-  UINT16                            PortMultiplierPort;
+  ATA_BUS_DRIVER_DATA                   *AtaBusDriverData;
+  UINT16                                Port;
+  UINT16                                PortMultiplierPort;
 
   //
   // Buffer for the execution of ATA pass through protocol
   //
-  EFI_ATA_PASS_THRU_COMMAND_PACKET  Packet;
-  EFI_ATA_COMMAND_BLOCK             Acb;
-  EFI_ATA_STATUS_BLOCK              *Asb;
+  EFI_ATA_PASS_THRU_COMMAND_PACKET      Packet;
+  EFI_ATA_COMMAND_BLOCK                 Acb;
+  EFI_ATA_STATUS_BLOCK                  *Asb;
 
-  BOOLEAN                           UdmaValid;
-  BOOLEAN                           Lba48Bit;
+  BOOLEAN                               UdmaValid;
+  BOOLEAN                               Lba48Bit;
 
   //
   // Cached data for ATA identify data
   //
-  ATA_IDENTIFY_DATA                 *IdentifyData;
+  ATA_IDENTIFY_DATA                     *IdentifyData;
 
-  EFI_UNICODE_STRING_TABLE          *ControllerNameTable;
-  CHAR16                            ModelName[MAX_MODEL_NAME_LEN + 1];
+  EFI_UNICODE_STRING_TABLE              *ControllerNameTable;
+  CHAR16                                ModelName[MAX_MODEL_NAME_LEN + 1];
 
+  LIST_ENTRY                        AtaTaskList;
 } ATA_DEVICE;
 
-#define ATA_DEVICE_FROM_BLOCK_IO(a)  CR (a, ATA_DEVICE, BlockIo, ATA_DEVICE_SIGNATURE)
-#define ATA_DEVICE_FROM_DISK_INFO(a) CR (a, ATA_DEVICE, DiskInfo, ATA_DEVICE_SIGNATURE)
+#define ATA_DEVICE_FROM_BLOCK_IO(a)         CR (a, ATA_DEVICE, BlockIo, ATA_DEVICE_SIGNATURE)
+#define ATA_DEVICE_FROM_BLOCK_IO2(a)        CR (a, ATA_DEVICE, BlockIo2, ATA_DEVICE_SIGNATURE)
+#define ATA_DEVICE_FROM_DISK_INFO(a)        CR (a, ATA_DEVICE, DiskInfo, ATA_DEVICE_SIGNATURE)
+#define ATA_AYNS_TASK_FROM_ENTRY(a)         CR (a, ATA_BUS_ASYN_TASK, TaskEntry, ATA_TASK_SIGNATURE)
 
 //
 // Global Variables
@@ -125,6 +152,52 @@ extern EFI_DRIVER_BINDING_PROTOCOL        gAtaBusDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL        gAtaBusComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL       gAtaBusComponentName2;
 
+/**
+  Allocates an aligned buffer for ATA device.
+
+  This function allocates an aligned buffer for the ATA device to perform
+  ATA pass through operations. The alignment requirement is from ATA pass
+  through interface.
+
+  @param  AtaDevice         The ATA child device involved for the operation.
+  @param  BufferSize        The request buffer size.
+
+  @return A pointer to the aligned buffer or NULL if the allocation fails.
+
+**/
+VOID *
+AllocateAlignedBuffer (
+  IN ATA_DEVICE               *AtaDevice,
+  IN UINTN                    BufferSize
+  );
+
+/**
+  Frees an aligned buffer for ATA device.
+
+  This function frees an aligned buffer for the ATA device to perform
+  ATA pass through operations.
+
+  @param  Buffer            The aligned buffer to be freed.
+  @param  BufferSize        The request buffer size.
+
+**/
+VOID
+FreeAlignedBuffer (
+  IN VOID                     *Buffer,
+  IN UINTN                    BufferSize
+  );
+
+/**
+  Free SubTask. 
+
+  @param[in, out]  Task      Pointer to task to be freed.
+ 
+**/
+VOID
+EFIAPI 
+FreeAtaSubTask (
+  IN ATA_BUS_ASYN_TASK  *Task
+  );
 
 /**
   Wrapper for EFI_ATA_PASS_THRU_PROTOCOL.ResetDevice().
@@ -162,7 +235,6 @@ DiscoverAtaDevice (
   IN OUT ATA_DEVICE                 *AtaDevice
   );
 
-
 /**
   Read or write a number of blocks from ATA device.
 
@@ -170,11 +242,12 @@ DiscoverAtaDevice (
   ATA device. It may separate the read/write request into several ATA pass through
   transactions.
 
-  @param  AtaDevice         The ATA child device involved for the operation.
-  @param  Buffer            The pointer to the current transaction buffer.
-  @param  StartLba          The starting logical block address to be accessed.
-  @param  NumberOfBlocks    The block number or sector count of the transfer.
-  @param  IsWrite           Indicates whether it is a write operation.
+  @param[in, out]  AtaDevice       The ATA child device involved for the operation.
+  @param[in, out]  Buffer          The pointer to the current transaction buffer.
+  @param[in]       StartLba        The starting logical block address to be accessed.
+  @param[in]       NumberOfBlocks  The block number or sector count of the transfer.
+  @param[in]       IsWrite         Indicates whether it is a write operation.
+  @param[in, out]  Token           A pointer to the token associated with the transaction.
 
   @retval EFI_SUCCESS       The data transfer is complete successfully.
   @return others            Some error occurs when transferring data. 
@@ -186,7 +259,8 @@ AccessAtaDevice(
   IN OUT UINT8                      *Buffer,
   IN EFI_LBA                        StartLba,
   IN UINTN                          NumberOfBlocks,
-  IN BOOLEAN                        IsWrite
+  IN BOOLEAN                        IsWrite,
+  IN OUT EFI_BLOCK_IO2_TOKEN        *Token
   );
 
 //
@@ -544,6 +618,111 @@ AtaBlockIoFlushBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL   *This
   );
 
+/**
+  Reset the Block Device throught Block I/O2 protocol.
+
+  @param[in]  This                 Indicates a pointer to the calling context.
+  @param[in]  ExtendedVerification Driver may perform diagnostics on reset.
+
+  @retval EFI_SUCCESS          The device was reset.
+  @retval EFI_DEVICE_ERROR     The device is not functioning properly and could
+                               not be reset.
+
+**/
+EFI_STATUS
+EFIAPI
+AtaBlockIoResetEx (
+  IN  EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN  BOOLEAN                 ExtendedVerification
+  );
+
+/**
+  Read BufferSize bytes from Lba into Buffer.
+
+  @param[in]       This       Indicates a pointer to the calling context.
+  @param[in]       MediaId    Id of the media, changes every time the media is replaced.
+  @param[in]       Lba        The starting Logical Block Address to read from.
+  @param[in, out]  Token      A pointer to the token associated with the transaction.
+  @param[in]       BufferSize Size of Buffer, must be a multiple of device block size.
+  @param[out]      Buffer     A pointer to the destination buffer for the data. The caller is
+                              responsible for either having implicit or explicit ownership of the buffer.
+
+  @retval EFI_SUCCESS           The read request was queued if Event is not NULL.
+                                The data was read correctly from the device if
+                                the Event is NULL.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing
+                                the read.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHANGED     The MediaId is not for the current media.
+  @retval EFI_BAD_BUFFER_SIZE   The BufferSize parameter is not a multiple of the
+                                intrinsic block size of the device.
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+                                or the buffer is not on proper alignment.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack
+                                of resources.
+
+**/
+EFI_STATUS
+EFIAPI
+AtaBlockIoReadBlocksEx (
+  IN  EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN  UINT32                  MediaId,
+  IN  EFI_LBA                 Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN  *Token,
+  IN  UINTN                   BufferSize,
+  OUT VOID                    *Buffer
+  );
+
+/**
+  Write BufferSize bytes from Lba into Buffer.
+
+  @param[in]       This       Indicates a pointer to the calling context.
+  @param[in]       MediaId    The media ID that the write request is for.
+  @param[in]       Lba        The starting logical block address to be written. The
+                              caller is responsible for writing to only legitimate
+                              locations.
+  @param[in, out]  Token      A pointer to the token associated with the transaction.
+  @param[in]       BufferSize Size of Buffer, must be a multiple of device block size.
+  @param[in]       Buffer     A pointer to the source buffer for the data.
+
+  @retval EFI_SUCCESS           The data was written correctly to the device.
+  @retval EFI_WRITE_PROTECTED   The device can not be written to.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+                                or the buffer is not on proper alignment.
+
+**/
+EFI_STATUS
+EFIAPI
+AtaBlockIoWriteBlocksEx (
+  IN  EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN  UINT32                  MediaId,
+  IN  EFI_LBA                 Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN  *Token,
+  IN  UINTN                   BufferSize,
+  IN  VOID                    *Buffer
+  );
+
+/**
+  Flush the Block Device.
+
+  @param[in]       This       Indicates a pointer to the calling context.
+  @param[in, out]  Token      A pointer to the token associated with the transaction.
+
+  @retval EFI_SUCCESS       All outstanding data was written to the device
+  @retval EFI_DEVICE_ERROR  The device reported an error while writing back the data
+  @retval EFI_NO_MEDIA      There is no media in the device.
+
+**/
+EFI_STATUS
+EFIAPI
+AtaBlockIoFlushBlocksEx (
+  IN  EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN OUT EFI_BLOCK_IO2_TOKEN  *Token
+  );
 
 /**
   Provides inquiry information for the controller type.

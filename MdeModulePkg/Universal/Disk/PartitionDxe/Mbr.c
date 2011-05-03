@@ -11,7 +11,7 @@
         always on the first sector of a media. The first sector also contains
         the legacy boot strap code.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -101,11 +101,12 @@ PartitionValidMbr (
 /**
   Install child handles if the Handle supports MBR format.
 
-  @param  This              Calling context.
-  @param  Handle            Parent Handle.
-  @param  DiskIo            Parent DiskIo interface.
-  @param  BlockIo           Parent BlockIo interface.
-  @param  DevicePath        Parent Device Path.
+  @param[in]  This              Calling context.
+  @param[in]  Handle            Parent Handle.
+  @param[in]  DiskIo            Parent DiskIo interface.
+  @param[in]  BlockIo           Parent BlockIo interface.
+  @param[in]  BlockIo2          Parent BlockIo2 interface.
+  @param[in]  DevicePath        Parent Device Path.
    
   @retval EFI_SUCCESS       A child handle was added.
   @retval EFI_MEDIA_CHANGED Media change was detected.
@@ -118,6 +119,7 @@ PartitionInstallMbrChildHandles (
   IN  EFI_HANDLE                   Handle,
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
+  IN  EFI_BLOCK_IO2_PROTOCOL       *BlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
@@ -131,26 +133,33 @@ PartitionInstallMbrChildHandles (
   UINT32                    PartitionNumber;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode;
   EFI_DEVICE_PATH_PROTOCOL  *LastDevicePathNode;
+  UINT32                    BlockSize;
+  UINT32                    MediaId;
+  EFI_LBA                   LastBlock;
 
   Found           = EFI_NOT_FOUND;
 
-  Mbr             = AllocatePool (BlockIo->Media->BlockSize);
+  BlockSize = BlockIo->Media->BlockSize;
+  MediaId   = BlockIo->Media->MediaId;
+  LastBlock = BlockIo->Media->LastBlock;
+
+  Mbr = AllocatePool (BlockSize);
   if (Mbr == NULL) {
     return Found;
   }
 
   Status = DiskIo->ReadDisk (
                      DiskIo,
-                     BlockIo->Media->MediaId,
+                     MediaId,
                      0,
-                     BlockIo->Media->BlockSize,
+                     BlockSize,
                      Mbr
                      );
   if (EFI_ERROR (Status)) {
     Found = Status;
     goto Done;
   }
-  if (!PartitionValidMbr (Mbr, BlockIo->Media->LastBlock)) {
+  if (!PartitionValidMbr (Mbr, LastBlock)) {
     goto Done;
   }
   //
@@ -218,6 +227,7 @@ PartitionInstallMbrChildHandles (
                 Handle,
                 DiskIo,
                 BlockIo,
+                BlockIo2,
                 DevicePath,
                 (EFI_DEVICE_PATH_PROTOCOL *) &HdDev,
                 HdDev.PartitionStart,
@@ -241,9 +251,9 @@ PartitionInstallMbrChildHandles (
 
       Status = DiskIo->ReadDisk (
                          DiskIo,
-                         BlockIo->Media->MediaId,
-                         MultU64x32 (ExtMbrStartingLba, BlockIo->Media->BlockSize),
-                         BlockIo->Media->BlockSize,
+                         MediaId,
+                         MultU64x32 (ExtMbrStartingLba, BlockSize),
+                         BlockSize,
                          Mbr
                          );
       if (EFI_ERROR (Status)) {
@@ -274,17 +284,18 @@ PartitionInstallMbrChildHandles (
       *((UINT32 *) &HdDev.Signature[0]) = 0;
 
       Status = PartitionInstallChildHandle (
-                This,
-                Handle,
-                DiskIo,
-                BlockIo,
-                DevicePath,
-                (EFI_DEVICE_PATH_PROTOCOL *) &HdDev,
-                HdDev.PartitionStart - ParentHdDev.PartitionStart,
-                HdDev.PartitionStart - ParentHdDev.PartitionStart + HdDev.PartitionSize - 1,
-                MBR_SIZE,
-                (BOOLEAN) (Mbr->Partition[0].OSIndicator == EFI_PARTITION)
-                );
+                 This,
+                 Handle,
+                 DiskIo,
+                 BlockIo,
+                 BlockIo2,
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *) &HdDev,
+                 HdDev.PartitionStart - ParentHdDev.PartitionStart,
+                 HdDev.PartitionStart - ParentHdDev.PartitionStart + HdDev.PartitionSize - 1,
+                 MBR_SIZE,
+                 (BOOLEAN) (Mbr->Partition[0].OSIndicator == EFI_PARTITION)
+                 );
       if (!EFI_ERROR (Status)) {
         Found = EFI_SUCCESS;
       }

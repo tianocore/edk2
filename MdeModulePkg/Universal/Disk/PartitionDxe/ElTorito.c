@@ -1,7 +1,7 @@
 /** @file
   Decode an El Torito formatted CD-ROM
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,15 +20,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Install child handles if the Handle supports El Torito format.
 
   @param[in]  This        Calling context.
-  @param[in]  Handle      Parent Handle
-  @param[in]  DiskIo      Parent DiskIo interface
-  @param[in]  BlockIo     Parent BlockIo interface
+  @param[in]  Handle      Parent Handle.
+  @param[in]  DiskIo      Parent DiskIo interface.
+  @param[in]  BlockIo     Parent BlockIo interface.
+  @param[in]  BlockIo2    Parent BlockIo2 interface.
   @param[in]  DevicePath  Parent Device Path
 
 
-  @retval EFI_SUCCESS         Child handle(s) was added
-  @retval EFI_MEDIA_CHANGED   Media changed Detected
-  @retval other               no child handle was added
+  @retval EFI_SUCCESS         Child handle(s) was added.
+  @retval EFI_MEDIA_CHANGED   Media changed Detected.
+  @retval other               no child handle was added.
 
 **/
 EFI_STATUS
@@ -37,6 +38,7 @@ PartitionInstallElToritoChildHandles (
   IN  EFI_HANDLE                   Handle,
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
+  IN  EFI_BLOCK_IO2_PROTOCOL       *BlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
@@ -59,6 +61,7 @@ PartitionInstallElToritoChildHandles (
 
   Found         = EFI_NOT_FOUND;
   Media         = BlockIo->Media;
+
   VolSpaceSize  = 0;
 
   //
@@ -256,6 +259,7 @@ PartitionInstallElToritoChildHandles (
                 Handle,
                 DiskIo,
                 BlockIo,
+                BlockIo2,
                 DevicePath,
                 (EFI_DEVICE_PATH_PROTOCOL *) &CdDev,
                 Catalog->Boot.Lba,

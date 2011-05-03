@@ -1,7 +1,7 @@
 /** @file
   Header file for ATA/ATAPI PASS THRU driver.
   
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -47,6 +47,9 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gAtaAtapiPassThruComponentName2;
 
 #define ATA_ATAPI_PASS_THRU_SIGNATURE  SIGNATURE_32 ('a', 'a', 'p', 't')
 #define ATA_ATAPI_DEVICE_SIGNATURE     SIGNATURE_32 ('a', 'd', 'e', 'v')
+#define ATA_NONBLOCKING_TASK_SIGNATURE  SIGNATURE_32 ('a', 't', 's', 'k')
+
+typedef struct _ATA_NONBLOCK_TASK ATA_NONBLOCK_TASK;
 
 typedef enum {
   EfiAtaIdeMode,
@@ -111,8 +114,32 @@ typedef struct {
   //
   UINT16                            PreviousTargetId;
   UINT64                            PreviousLun;
-
+ 
+  //
+  // For Non-blocking.
+  //
+  EFI_EVENT                         TimerEvent;
+  LIST_ENTRY                        NonBlockingTaskList;
 } ATA_ATAPI_PASS_THRU_INSTANCE;
+
+//
+// Task for Non-blocking mode.
+//
+struct _ATA_NONBLOCK_TASK {
+  UINT32                            Signature;
+  LIST_ENTRY                        Link;
+
+  UINT16                            Port;
+  UINT16                            PortMultiplier;
+  EFI_ATA_PASS_THRU_COMMAND_PACKET  *Packet;
+  BOOLEAN                           IsStart;
+  EFI_EVENT                         Event;
+  UINT64                            RetryTimes;
+  VOID                              *Map; // Pointer to map.
+  VOID                              *TableMap;// Pointer to PRD table map. 
+  EFI_ATA_DMA_PRD                   *MapBaseAddress; //  Pointer to range Base address for Map.
+  UINTN                             PageCount;      //  The page numbers used by PCIO freebuffer.
+};
 
 //
 // Timeout value which uses 100ns as a unit.
@@ -142,6 +169,14 @@ typedef struct {
       Link, \
       ATA_ATAPI_DEVICE_SIGNATURE \
       );
+
+#define ATA_NON_BLOCK_TASK_FROM_ENTRY(a) \
+  CR (a, \
+      ATA_NONBLOCK_TASK, \
+      Link, \
+      ATA_NONBLOCKING_TASK_SIGNATURE \
+      );
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -454,6 +489,18 @@ DestroyDeviceInfoList (
   );
 
 /**
+  Destroy all pending non blocking tasks.
+  
+  @param[in]  Instance  A pointer to the ATA_ATAPI_PASS_THRU_INSTANCE instance.
+
+**/
+VOID
+EFIAPI
+DestroyAsynTaskList (
+  IN ATA_ATAPI_PASS_THRU_INSTANCE *Instance
+  );
+
+/**
   Enumerate all attached ATA devices at IDE mode or AHCI mode separately.
   
   The function is designed to enumerate all attached ATA devices. 
@@ -468,6 +515,21 @@ EFI_STATUS
 EFIAPI
 EnumerateAttachedDevice (
   IN  ATA_ATAPI_PASS_THRU_INSTANCE      *Instance
+  );
+
+/**
+  Call back funtion when the timer event is signaled.
+
+  @param[in]  Event     The Event this notify function registered to.
+  @param[in]  Context   Pointer to the context data registered to the
+                        Event.
+
+**/
+VOID
+EFIAPI 
+AsyncNonBlockingTransferRoutine (
+  EFI_EVENT  Event, 
+  VOID*      Context
   );
 
 /**
@@ -556,16 +618,16 @@ AtaPassThruGetNextPort (
 
   The GetNextDevice() function retrieves the port multiplier port number of an ATA device 
   present on a port of an ATA controller.
-  
+
   If PortMultiplierPort points to a port multiplier port number value that was returned on a 
   previous call to GetNextDevice(), then the port multiplier port number of the next ATA device
   on the port of the ATA controller is returned in PortMultiplierPort, and EFI_SUCCESS is
   returned.
-  
+
   If PortMultiplierPort points to 0xFFFF, then the port multiplier port number of the first 
   ATA device on port of the ATA controller is returned in PortMultiplierPort and 
   EFI_SUCCESS is returned.
-  
+
   If PortMultiplierPort is not 0xFFFF and the value pointed to by PortMultiplierPort
   was not returned on a previous call to GetNextDevice(), then EFI_INVALID_PARAMETER
   is returned.
@@ -673,6 +735,7 @@ AtaPassThruBuildDevicePath (
   @retval EFI_UNSUPPORTED         This driver does not support the device path node type in DevicePath.
   @retval EFI_NOT_FOUND           A valid translation from DevicePath to a port number and port multiplier
                                   port number does not exist.
+
 **/
 EFI_STATUS
 EFIAPI
@@ -809,7 +872,7 @@ ExtScsiPassThruPassThru (
   can either be the list SCSI devices that are actually present on the SCSI channel, or the list of legal
   Target Ids and LUNs for the SCSI channel. Regardless, the caller of this function must probe the       
   Target ID and LUN returned to see if a SCSI device is actually present at that location on the SCSI    
-  channel.                                                                                               
+  channel.
 
   @param  This   A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
   @param  Target On input, a pointer to the Target ID (an array of size
@@ -918,7 +981,7 @@ EFIAPI
 ExtScsiPassThruResetChannel (
   IN  EFI_EXT_SCSI_PASS_THRU_PROTOCOL   *This
   );
-  
+
 /**
   Resets a SCSI logical unit that is connected to a SCSI channel.
 
@@ -1001,6 +1064,232 @@ EFI_STATUS
 EFIAPI
 AhciModeInitialization (
   IN  ATA_ATAPI_PASS_THRU_INSTANCE    *Instance
+  );
+
+/**
+  Start a non data transfer on specific port.
+    
+  @param[in]       PciIo               The PCI IO protocol instance.
+  @param[in]       AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param[in]       Port                The number of port.
+  @param[in]       PortMultiplier      The timeout value of stop.
+  @param[in]       AtapiCommand        The atapi command will be used for the
+                                       transfer.
+  @param[in]       AtapiCommandLength  The length of the atapi command.
+  @param[in]       AtaCommandBlock     The EFI_ATA_COMMAND_BLOCK data.
+  @param[in, out]  AtaStatusBlock      The EFI_ATA_STATUS_BLOCK data.
+  @param[in]       Timeout             The timeout value of non data transfer.
+  @param[in]       Task                Optional. Pointer to the ATA_NONBLOCK_TASK
+                                       used by non-blocking mode.
+
+  @retval EFI_DEVICE_ERROR    The non data transfer abort with error occurs.
+  @retval EFI_TIMEOUT         The operation is time out.
+  @retval EFI_UNSUPPORTED     The device is not ready for transfer.
+  @retval EFI_SUCCESS         The non data transfer executes successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+AhciNonDataTransfer (
+  IN     EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN     EFI_AHCI_REGISTERS            *AhciRegisters,
+  IN     UINT8                         Port,
+  IN     UINT8                         PortMultiplier,
+  IN     EFI_AHCI_ATAPI_COMMAND        *AtapiCommand OPTIONAL,
+  IN     UINT8                         AtapiCommandLength,
+  IN     EFI_ATA_COMMAND_BLOCK         *AtaCommandBlock,
+  IN OUT EFI_ATA_STATUS_BLOCK          *AtaStatusBlock,
+  IN     UINT64                        Timeout, 
+  IN     ATA_NONBLOCK_TASK             *Task
+  );
+
+/**
+  Start a DMA data transfer on specific port
+
+  @param[in]       Instance            The ATA_ATAPI_PASS_THRU_INSTANCE protocol instance.
+  @param[in]       AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param[in]       Port                The number of port.
+  @param[in]       PortMultiplier      The timeout value of stop.
+  @param[in]       AtapiCommand        The atapi command will be used for the
+                                       transfer.
+  @param[in]       AtapiCommandLength  The length of the atapi command.
+  @param[in]       Read                The transfer direction.
+  @param[in]       AtaCommandBlock     The EFI_ATA_COMMAND_BLOCK data.
+  @param[in, out]  AtaStatusBlock      The EFI_ATA_STATUS_BLOCK data.
+  @param[in, out]  MemoryAddr          The pointer to the data buffer.
+  @param[in]       DataCount           The data count to be transferred.
+  @param[in]       Timeout             The timeout value of non data transfer.
+  @param[in]       Task                Optional. Pointer to the ATA_NONBLOCK_TASK
+                                       used by non-blocking mode.
+
+  @retval EFI_DEVICE_ERROR    The DMA data transfer abort with error occurs.
+  @retval EFI_TIMEOUT         The operation is time out.
+  @retval EFI_UNSUPPORTED     The device is not ready for transfer.
+  @retval EFI_SUCCESS         The DMA data transfer executes successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+AhciDmaTransfer (
+  IN     ATA_ATAPI_PASS_THRU_INSTANCE *Instance, 
+  IN     EFI_AHCI_REGISTERS           *AhciRegisters,
+  IN     UINT8                        Port,
+  IN     UINT8                        PortMultiplier,
+  IN     EFI_AHCI_ATAPI_COMMAND       *AtapiCommand OPTIONAL,
+  IN     UINT8                        AtapiCommandLength,
+  IN     BOOLEAN                      Read,  
+  IN     EFI_ATA_COMMAND_BLOCK        *AtaCommandBlock,
+  IN OUT EFI_ATA_STATUS_BLOCK         *AtaStatusBlock,
+  IN OUT VOID                         *MemoryAddr,
+  IN     UINTN                        DataCount,
+  IN     UINT64                       Timeout, 
+  IN     ATA_NONBLOCK_TASK            *Task
+  );
+
+/**
+  Start a PIO data transfer on specific port.
+    
+  @param[in]       PciIo               The PCI IO protocol instance.
+  @param[in]       AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param[in]       Port                The number of port.
+  @param[in]       PortMultiplier      The timeout value of stop.
+  @param[in]       AtapiCommand        The atapi command will be used for the
+                                       transfer.
+  @param[in]       AtapiCommandLength  The length of the atapi command.
+  @param[in]       Read                The transfer direction.
+  @param[in]       AtaCommandBlock     The EFI_ATA_COMMAND_BLOCK data.
+  @param[in, out]  AtaStatusBlock      The EFI_ATA_STATUS_BLOCK data.
+  @param[in, out]  MemoryAddr          The pointer to the data buffer.
+  @param[in]       DataCount           The data count to be transferred.
+  @param[in]       Timeout             The timeout value of non data transfer.
+  @param[in]       Task                Optional. Pointer to the ATA_NONBLOCK_TASK
+                                       used by non-blocking mode.
+
+  @retval EFI_DEVICE_ERROR    The PIO data transfer abort with error occurs.
+  @retval EFI_TIMEOUT         The operation is time out.
+  @retval EFI_UNSUPPORTED     The device is not ready for transfer.
+  @retval EFI_SUCCESS         The PIO data transfer executes successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+AhciPioTransfer (
+  IN     EFI_PCI_IO_PROTOCOL        *PciIo,
+  IN     EFI_AHCI_REGISTERS         *AhciRegisters,
+  IN     UINT8                      Port,
+  IN     UINT8                      PortMultiplier,
+  IN     EFI_AHCI_ATAPI_COMMAND     *AtapiCommand OPTIONAL,
+  IN     UINT8                      AtapiCommandLength,  
+  IN     BOOLEAN                    Read,  
+  IN     EFI_ATA_COMMAND_BLOCK      *AtaCommandBlock,
+  IN OUT EFI_ATA_STATUS_BLOCK       *AtaStatusBlock,
+  IN OUT VOID                       *MemoryAddr,
+  IN     UINT32                     DataCount,
+  IN     UINT64                     Timeout, 
+  IN     ATA_NONBLOCK_TASK          *Task
+  );
+
+/**
+  Send ATA command into device with NON_DATA protocol
+
+  @param[in]      PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE
+                                   data structure.
+  @param[in]      IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
+  @param[in]      AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data
+                                   structure.
+  @param[in, out] AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
+  @param[in]      Timeout          The time to complete the command.
+  @param[in]      Task             Optional. Pointer to the ATA_NONBLOCK_TASK
+                                   used by non-blocking mode.
+
+  @retval  EFI_SUCCESS Reading succeed
+  @retval  EFI_ABORTED Command failed
+  @retval  EFI_DEVICE_ERROR Device status error.
+
+**/
+EFI_STATUS
+EFIAPI
+AtaNonDataCommandIn (
+  IN     EFI_PCI_IO_PROTOCOL       *PciIo,
+  IN     EFI_IDE_REGISTERS         *IdeRegisters,
+  IN     EFI_ATA_COMMAND_BLOCK     *AtaCommandBlock,
+  IN OUT EFI_ATA_STATUS_BLOCK      *AtaStatusBlock,
+  IN     UINT64                    Timeout,
+  IN     ATA_NONBLOCK_TASK         *Task
+  );
+
+/**
+  Perform an ATA Udma operation (Read, ReadExt, Write, WriteExt).
+
+  @param[in]      Instance         A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data
+                                   structure.
+  @param[in]      IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
+  @param[in]      Read             Flag used to determine the data transfer
+                                   direction. Read equals 1, means data transferred
+                                   from device to host;Read equals 0, means data
+                                   transferred from host to device.
+  @param[in]      DataBuffer       A pointer to the source buffer for the data.
+  @param[in]      DataLength       The length of  the data.
+  @param[in]      AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
+  @param[in, out] AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
+  @param[in]      Timeout          The time to complete the command.
+  @param[in]      Task             Optional. Pointer to the ATA_NONBLOCK_TASK
+                                   used by non-blocking mode.
+
+  @retval EFI_SUCCESS          the operation is successful.
+  @retval EFI_OUT_OF_RESOURCES Build PRD table failed
+  @retval EFI_UNSUPPORTED      Unknown channel or operations command
+  @retval EFI_DEVICE_ERROR     Ata command execute failed
+
+**/
+EFI_STATUS
+EFIAPI
+AtaUdmaInOut (
+  IN     ATA_ATAPI_PASS_THRU_INSTANCE  *Instance,
+  IN     EFI_IDE_REGISTERS             *IdeRegisters,
+  IN     BOOLEAN                       Read,
+  IN     VOID                          *DataBuffer,
+  IN     UINT64                        DataLength,
+  IN     EFI_ATA_COMMAND_BLOCK         *AtaCommandBlock,
+  IN OUT EFI_ATA_STATUS_BLOCK          *AtaStatusBlock,
+  IN     UINT64                        Timeout,
+  IN     ATA_NONBLOCK_TASK             *Task
+  );
+
+/**
+  This function is used to send out ATA commands conforms to the PIO Data In Protocol.
+
+  @param[in]      PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data
+                                   structure.
+  @param[in]      IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
+  @param[in, out] Buffer           A pointer to the source buffer for the data.
+  @param[in]      ByteCount        The length of  the data.
+  @param[in] Read                  Flag used to determine the data transfer direction.
+                                   Read equals 1, means data transferred from device
+                                   to host;Read equals 0, means data transferred
+                                   from host to device.
+  @param[in]      AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
+  @param[in]      AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
+  @param[in]      Timeout          The time to complete the command.
+  @param[in]      Task             Optional. Pointer to the ATA_NONBLOCK_TASK
+                                   used by non-blocking mode.
+  
+  @retval EFI_SUCCESS      send out the ATA command and device send required data successfully.
+  @retval EFI_DEVICE_ERROR command sent failed.
+
+**/
+EFI_STATUS
+EFIAPI
+AtaPioDataInOut (
+  IN     EFI_PCI_IO_PROTOCOL       *PciIo,
+  IN     EFI_IDE_REGISTERS         *IdeRegisters,
+  IN OUT VOID                      *Buffer,
+  IN     UINT64                    ByteCount,
+  IN     BOOLEAN                   Read,
+  IN     EFI_ATA_COMMAND_BLOCK     *AtaCommandBlock,
+  IN OUT EFI_ATA_STATUS_BLOCK      *AtaStatusBlock,
+  IN     UINT64                    Timeout, 
+  IN     ATA_NONBLOCK_TASK         *Task
   );
 
 #endif

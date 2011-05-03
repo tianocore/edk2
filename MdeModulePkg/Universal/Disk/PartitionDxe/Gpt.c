@@ -2,7 +2,7 @@
   Decode a hard disk partitioned with the GPT scheme in the UEFI 2.0
   specification.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,11 +16,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Partition.h"
 
-
 /**
   Install child handles if the Handle supports GPT partition structure.
 
-  @param[in]  BlockIo     Parent BlockIo interface
+  @param[in]  BlockIo     Parent BlockIo interface.
   @param[in]  DiskIo      Disk Io protocol.
   @param[in]  Lba         The starting Lba of the Partition Table
   @param[out] PartHeader  Stores the partition table that is read
@@ -36,7 +35,6 @@ PartitionValidGptTable (
   IN  EFI_LBA                     Lba,
   OUT EFI_PARTITION_TABLE_HEADER  *PartHeader
   );
-
 
 /**
   Check if the CRC field in the Partition table header is valid
@@ -60,11 +58,11 @@ PartitionCheckGptEntryArrayCRC (
 
 /**
   Restore Partition Table to its alternate place
-  (Primary -> Backup or Backup -> Primary)
+  (Primary -> Backup or Backup -> Primary).
 
-  @param[in]  BlockIo     Parent BlockIo interface
+  @param[in]  BlockIo     Parent BlockIo interface.
   @param[in]  DiskIo      Disk Io Protocol.
-  @param[in]  PartHeader  Partition table header structure
+  @param[in]  PartHeader  Partition table header structure.
 
   @retval TRUE      Restoring succeeds
   @retval FALSE     Restoring failed
@@ -160,15 +158,16 @@ PartitionSetCrc (
 /**
   Install child handles if the Handle supports GPT partition structure.
 
-  @param[in]  This       - Calling context.
-  @param[in]  Handle     - Parent Handle
-  @param[in]  DiskIo     - Parent DiskIo interface
-  @param[in]  BlockIo    - Parent BlockIo interface
-  @param[in]  DevicePath - Parent Device Path
+  @param[in]  This       Calling context.
+  @param[in]  Handle     Parent Handle.
+  @param[in]  DiskIo     Parent DiskIo interface.
+  @param[in]  BlockIo    Parent BlockIo interface.
+  @param[in]  BlockIo2   Parent BlockIo2 interface.
+  @param[in]  DevicePath Parent Device Path.
 
-  @retval EFI_SUCCESS         Valid GPT disk
-  @retval EFI_MEDIA_CHANGED   Media changed Detected
-  @retval other               Not a valid GPT disk
+  @retval EFI_SUCCESS           Valid GPT disk.
+  @retval EFI_MEDIA_CHANGED     Media changed Detected.
+  @retval other                 Not a valid GPT disk.
 
 **/
 EFI_STATUS
@@ -177,6 +176,7 @@ PartitionInstallGptChildHandles (
   IN  EFI_HANDLE                   Handle,
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
+  IN  EFI_BLOCK_IO2_PROTOCOL       *BlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
@@ -191,6 +191,7 @@ PartitionInstallGptChildHandles (
   UINTN                       Index;
   EFI_STATUS                  GptValidStatus;
   HARDDRIVE_DEVICE_PATH       HdDev;
+  UINT32                      MediaId;
 
   ProtectiveMbr = NULL;
   PrimaryHeader = NULL;
@@ -200,6 +201,7 @@ PartitionInstallGptChildHandles (
 
   BlockSize     = BlockIo->Media->BlockSize;
   LastBlock     = BlockIo->Media->LastBlock;
+  MediaId       = BlockIo->Media->MediaId;
 
   DEBUG ((EFI_D_INFO, " BlockSize : %d \n", BlockSize));
   DEBUG ((EFI_D_INFO, " LastBlock : %lx \n", LastBlock));
@@ -219,15 +221,16 @@ PartitionInstallGptChildHandles (
   //
   Status = DiskIo->ReadDisk (
                      DiskIo,
-                     BlockIo->Media->MediaId,
+                     MediaId,
                      0,
-                     BlockIo->Media->BlockSize,
+                     BlockSize,
                      ProtectiveMbr
                      );
   if (EFI_ERROR (Status)) {
     GptValidStatus = Status;
     goto Done;
   }
+
   //
   // Verify that the Protective MBR is valid
   //
@@ -302,7 +305,7 @@ PartitionInstallGptChildHandles (
 
   Status = DiskIo->ReadDisk (
                      DiskIo,
-                     BlockIo->Media->MediaId,
+                     MediaId,
                      MultU64x32(PrimaryHeader->PartitionEntryLBA, BlockSize),
                      PrimaryHeader->NumberOfPartitionEntries * (PrimaryHeader->SizeOfPartitionEntry),
                      PartEntry
@@ -369,17 +372,18 @@ PartitionInstallGptChildHandles (
     DEBUG ((EFI_D_INFO, " End : %lx\n", MultU64x32 (PartEntry[Index].EndingLBA, BlockSize)));
 
     Status = PartitionInstallChildHandle (
-              This,
-              Handle,
-              DiskIo,
-              BlockIo,
-              DevicePath,
-              (EFI_DEVICE_PATH_PROTOCOL *) &HdDev,
-              PartEntry[Index].StartingLBA,
-              PartEntry[Index].EndingLBA,
-              BlockSize,
-              CompareGuid(&PartEntry[Index].PartitionTypeGUID, &gEfiPartTypeSystemPartGuid)
-              );
+               This,
+               Handle,
+               DiskIo,
+               BlockIo,
+               BlockIo2,
+               DevicePath,
+               (EFI_DEVICE_PATH_PROTOCOL *) &HdDev,
+               PartEntry[Index].StartingLBA,
+               PartEntry[Index].EndingLBA,
+               BlockSize,
+               CompareGuid(&PartEntry[Index].PartitionTypeGUID, &gEfiPartTypeSystemPartGuid)
+               );
   }
 
   DEBUG ((EFI_D_INFO, "Prepare to Free Pool\n"));
@@ -404,11 +408,10 @@ Done:
   return GptValidStatus;
 }
 
-
 /**
   Install child handles if the Handle supports GPT partition structure.
 
-  @param[in]  BlockIo     Parent BlockIo interface
+  @param[in]  BlockIo     Parent BlockIo interface.
   @param[in]  DiskIo      Disk Io protocol.
   @param[in]  Lba         The starting Lba of the Partition Table
   @param[out] PartHeader  Stores the partition table that is read
@@ -428,9 +431,10 @@ PartitionValidGptTable (
   EFI_STATUS                  Status;
   UINT32                      BlockSize;
   EFI_PARTITION_TABLE_HEADER  *PartHdr;
+  UINT32                      MediaId;
 
   BlockSize = BlockIo->Media->BlockSize;
-
+  MediaId   = BlockIo->Media->MediaId;
   PartHdr   = AllocateZeroPool (BlockSize);
 
   if (PartHdr == NULL) {
@@ -442,7 +446,7 @@ PartitionValidGptTable (
   //
   Status = DiskIo->ReadDisk (
                      DiskIo,
-                     BlockIo->Media->MediaId,
+                     MediaId,
                      MultU64x32 (Lba, BlockSize),
                      BlockSize,
                      PartHdr
@@ -472,12 +476,12 @@ PartitionValidGptTable (
   return TRUE;
 }
 
-
 /**
   Check if the CRC field in the Partition table header is valid
   for Partition entry array.
 
   @param[in]  BlockIo     Parent BlockIo interface
+  @param[in]  BlockIo2    Parent BlockIo2 interface.
   @param[in]  DiskIo      Disk Io Protocol.
   @param[in]  PartHeader  Partition table header structure
 
@@ -535,11 +539,11 @@ PartitionCheckGptEntryArrayCRC (
 
 /**
   Restore Partition Table to its alternate place
-  (Primary -> Backup or Backup -> Primary)
+  (Primary -> Backup or Backup -> Primary).
 
-  @param[in]  BlockIo     Parent BlockIo interface
+  @param[in]  BlockIo     Parent BlockIo interface.
   @param[in]  DiskIo      Disk Io Protocol.
-  @param[in]  PartHeader  Partition table header structure
+  @param[in]  PartHeader  Partition table header structure.
 
   @retval TRUE      Restoring succeeds
   @retval FALSE     Restoring failed
@@ -557,11 +561,13 @@ PartitionRestoreGptTable (
   EFI_PARTITION_TABLE_HEADER  *PartHdr;
   EFI_LBA                     PEntryLBA;
   UINT8                       *Ptr;
+  UINT32                      MediaId;
 
   PartHdr   = NULL;
   Ptr       = NULL;
 
   BlockSize = BlockIo->Media->BlockSize;
+  MediaId   = BlockIo->Media->MediaId;
 
   PartHdr   = AllocateZeroPool (BlockSize);
 
@@ -583,8 +589,8 @@ PartitionRestoreGptTable (
 
   Status = DiskIo->WriteDisk (
                      DiskIo,
-                     BlockIo->Media->MediaId,
-                     MultU64x32 (PartHdr->MyLBA, BlockIo->Media->BlockSize),
+                     MediaId,
+                     MultU64x32 (PartHdr->MyLBA, (UINT32) BlockSize),
                      BlockSize,
                      PartHdr
                      );
@@ -601,8 +607,8 @@ PartitionRestoreGptTable (
 
   Status = DiskIo->ReadDisk (
                     DiskIo,
-                    BlockIo->Media->MediaId,
-                    MultU64x32(PartHeader->PartitionEntryLBA, BlockIo->Media->BlockSize),
+                    MediaId,
+                    MultU64x32(PartHeader->PartitionEntryLBA, (UINT32) BlockSize),
                     PartHeader->NumberOfPartitionEntries * PartHeader->SizeOfPartitionEntry,
                     Ptr
                     );
@@ -612,8 +618,8 @@ PartitionRestoreGptTable (
 
   Status = DiskIo->WriteDisk (
                     DiskIo,
-                    BlockIo->Media->MediaId,
-                    MultU64x32(PEntryLBA, BlockIo->Media->BlockSize),
+                    MediaId,
+                    MultU64x32(PEntryLBA, (UINT32) BlockSize),
                     PartHeader->NumberOfPartitionEntries * PartHeader->SizeOfPartitionEntry,
                     Ptr
                     );

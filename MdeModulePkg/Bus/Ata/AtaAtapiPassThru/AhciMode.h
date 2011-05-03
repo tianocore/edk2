@@ -1,7 +1,7 @@
 /** @file
   Header file for AHCI mode of ATA host controller.
   
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -154,7 +154,7 @@ typedef union {
 #define   EFI_AHCI_PORT_SERR_BDE               BIT19
 #define   EFI_AHCI_PORT_SERR_DE                BIT20
 #define   EFI_AHCI_PORT_SERR_CRCE              BIT21
-#define   EFI_AHCI_PORT_SERR_HE                BIT22          
+#define   EFI_AHCI_PORT_SERR_HE                BIT22
 #define   EFI_AHCI_PORT_SERR_LSE               BIT23
 #define   EFI_AHCI_PORT_SERR_TSTE              BIT24
 #define   EFI_AHCI_PORT_SERR_UFT               BIT25
@@ -347,118 +347,6 @@ AhciStopCommand (
   IN  UINT8                     Port,
   IN  UINT64                    Timeout
   );
-
-/**
-  Start a non data transfer on specific port.
-    
-  @param  PciIo               The PCI IO protocol instance.
-  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
-  @param  Port                The number of port.
-  @param  PortMultiplier      The timeout value of stop.
-  @param  AtapiCommand        The atapi command will be used for the transfer.
-  @param  AtapiCommandLength  The length of the atapi command.
-  @param  AtaCommandBlock     The EFI_ATA_COMMAND_BLOCK data.
-  @param  AtaStatusBlock      The EFI_ATA_STATUS_BLOCK data.
-  @param  Timeout             The timeout value of non data transfer.
-
-  @retval EFI_DEVICE_ERROR    The non data transfer abort with error occurs.
-  @retval EFI_TIMEOUT         The operation is time out.
-  @retval EFI_UNSUPPORTED     The device is not ready for transfer.
-  @retval EFI_SUCCESS         The non data transfer executes successfully.
-
-**/ 
-EFI_STATUS
-EFIAPI
-AhciNonDataTransfer (
-  IN     EFI_PCI_IO_PROTOCOL           *PciIo,
-  IN     EFI_AHCI_REGISTERS            *AhciRegisters,
-  IN     UINT8                         Port,
-  IN     UINT8                         PortMultiplier,
-  IN     EFI_AHCI_ATAPI_COMMAND        *AtapiCommand OPTIONAL,
-  IN     UINT8                         AtapiCommandLength,
-  IN     EFI_ATA_COMMAND_BLOCK         *AtaCommandBlock,
-  IN OUT EFI_ATA_STATUS_BLOCK          *AtaStatusBlock,
-  IN     UINT64                        Timeout
-  );
-
-/**
-  Start a DMA data transfer on specific port
-
-  @param  PciIo               The PCI IO protocol instance.
-  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
-  @param  Port                The number of port.
-  @param  PortMultiplier      The timeout value of stop.
-  @param  AtapiCommand        The atapi command will be used for the transfer.
-  @param  AtapiCommandLength  The length of the atapi command.
-  @param  Read                The transfer direction.
-  @param  AtaCommandBlock     The EFI_ATA_COMMAND_BLOCK data.
-  @param  AtaStatusBlock      The EFI_ATA_STATUS_BLOCK data.
-  @param  MemoryAddr          The pointer to the data buffer.
-  @param  DataCount           The data count to be transferred.
-  @param  Timeout             The timeout value of non data transfer.
-
-  @retval EFI_DEVICE_ERROR    The DMA data transfer abort with error occurs.
-  @retval EFI_TIMEOUT         The operation is time out.
-  @retval EFI_UNSUPPORTED     The device is not ready for transfer.
-  @retval EFI_SUCCESS         The DMA data transfer executes successfully.
-   
-**/
-EFI_STATUS
-EFIAPI
-AhciDmaTransfer (
-  IN     EFI_PCI_IO_PROTOCOL        *PciIo,
-  IN     EFI_AHCI_REGISTERS         *AhciRegisters,
-  IN     UINT8                      Port,
-  IN     UINT8                      PortMultiplier,
-  IN     EFI_AHCI_ATAPI_COMMAND     *AtapiCommand OPTIONAL,
-  IN     UINT8                      AtapiCommandLength,
-  IN     BOOLEAN                    Read,  
-  IN     EFI_ATA_COMMAND_BLOCK      *AtaCommandBlock,
-  IN OUT EFI_ATA_STATUS_BLOCK       *AtaStatusBlock,
-  IN OUT VOID                       *MemoryAddr,
-  IN     UINTN                      DataCount,
-  IN     UINT64                     Timeout
-  );
-
-/**
-  Start a PIO data transfer on specific port.
-    
-  @param  PciIo               The PCI IO protocol instance.
-  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
-  @param  Port                The number of port.
-  @param  PortMultiplier      The timeout value of stop.
-  @param  AtapiCommand        The atapi command will be used for the transfer.
-  @param  AtapiCommandLength  The length of the atapi command.
-  @param  Read                The transfer direction.
-  @param  AtaCommandBlock     The EFI_ATA_COMMAND_BLOCK data.
-  @param  AtaStatusBlock      The EFI_ATA_STATUS_BLOCK data.
-  @param  MemoryAddr          The pointer to the data buffer.
-  @param  DataCount           The data count to be transferred.
-  @param  Timeout             The timeout value of non data transfer.
-
-  @retval EFI_DEVICE_ERROR    The PIO data transfer abort with error occurs.
-  @retval EFI_TIMEOUT         The operation is time out.
-  @retval EFI_UNSUPPORTED     The device is not ready for transfer.
-  @retval EFI_SUCCESS         The PIO data transfer executes successfully.
-
-**/
-EFI_STATUS
-EFIAPI
-AhciPioTransfer (
-  IN     EFI_PCI_IO_PROTOCOL        *PciIo,
-  IN     EFI_AHCI_REGISTERS         *AhciRegisters,
-  IN     UINT8                      Port,
-  IN     UINT8                      PortMultiplier,
-  IN     EFI_AHCI_ATAPI_COMMAND     *AtapiCommand OPTIONAL,
-  IN     UINT8                      AtapiCommandLength,  
-  IN     BOOLEAN                    Read,  
-  IN     EFI_ATA_COMMAND_BLOCK      *AtaCommandBlock,
-  IN OUT EFI_ATA_STATUS_BLOCK       *AtaStatusBlock,
-  IN OUT VOID                       *MemoryAddr,
-  IN     UINT32                     DataCount,
-  IN     UINT64                     Timeout 
-  );
-
 
 #endif
 

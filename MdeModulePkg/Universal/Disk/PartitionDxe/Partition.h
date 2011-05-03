@@ -4,7 +4,7 @@
   of the raw block devices media. Currently "El Torito CD-ROM", Legacy 
   MBR, and GPT partition schemes are supported.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Uefi.h>
 #include <Protocol/BlockIo.h>
+#include <Protocol/BlockIo2.h>
 #include <Guid/Gpt.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/DevicePath.h>
@@ -48,10 +49,13 @@ typedef struct {
   EFI_HANDLE                Handle;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   EFI_BLOCK_IO_PROTOCOL     BlockIo;
+  EFI_BLOCK_IO2_PROTOCOL    BlockIo2;
   EFI_BLOCK_IO_MEDIA        Media;
+  EFI_BLOCK_IO_MEDIA        Media2;//For BlockIO2
 
   EFI_DISK_IO_PROTOCOL      *DiskIo;
   EFI_BLOCK_IO_PROTOCOL     *ParentBlockIo;
+  EFI_BLOCK_IO2_PROTOCOL    *ParentBlockIo2;
   UINT64                    Start;
   UINT64                    End;
   UINT32                    BlockSize;
@@ -61,6 +65,7 @@ typedef struct {
 } PARTITION_PRIVATE_DATA;
 
 #define PARTITION_DEVICE_FROM_BLOCK_IO_THIS(a)  CR (a, PARTITION_PRIVATE_DATA, BlockIo, PARTITION_PRIVATE_DATA_SIGNATURE)
+#define PARTITION_DEVICE_FROM_BLOCK_IO2_THIS(a) CR (a, PARTITION_PRIVATE_DATA, BlockIo2, PARTITION_PRIVATE_DATA_SIGNATURE)
 
 //
 // Global Variables
@@ -300,19 +305,20 @@ PartitionComponentNameGetControllerName (
   Create a child handle for a logical block device that represents the
   bytes Start to End of the Parent Block IO device.
 
-  @param[in]  This              Protocol instance pointer
-  @param[in]  ParentHandle      Parent Handle for new child
-  @param[in]  ParentDiskIo      Parent DiskIo interface
-  @param[in]  ParentBlockIo     Parent BlockIo interface
-  @param[in]  ParentDevicePath  Parent Device Path
-  @param[in]  DevicePathNode    Child Device Path node
-  @param[in]  Start             Start Block
-  @param[in]  End               End Block
-  @param[in]  BlockSize         Child block size
-  @param[in]  InstallEspGuid    Flag to install EFI System Partition GUID on handle
+  @param[in]  This              Protocol instance pointer.
+  @param[in]  ParentHandle      Parent Handle for new child.
+  @param[in]  ParentDiskIo      Parent DiskIo interface.
+  @param[in]  ParentBlockIo     Parent BlockIo interface.
+  @param[in]  ParentBlockIo2    Parent BlockIo2 interface.
+  @param[in]  ParentDevicePath  Parent Device Path.
+  @param[in]  DevicePathNode    Child Device Path node.
+  @param[in]  Start             Start Block.
+  @param[in]  End               End Block.
+  @param[in]  BlockSize         Child block size.
+  @param[in]  InstallEspGuid    Flag to install EFI System Partition GUID on handle.
 
-  @retval EFI_SUCCESS       A child handle was added
-  @retval other             A child handle was not added
+  @retval EFI_SUCCESS       A child handle was added.
+  @retval other             A child handle was not added.
 
 **/
 EFI_STATUS
@@ -321,6 +327,7 @@ PartitionInstallChildHandle (
   IN  EFI_HANDLE                   ParentHandle,
   IN  EFI_DISK_IO_PROTOCOL         *ParentDiskIo,
   IN  EFI_BLOCK_IO_PROTOCOL        *ParentBlockIo,
+  IN  EFI_BLOCK_IO2_PROTOCOL       *ParentBlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *ParentDevicePath,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePathNode,
   IN  EFI_LBA                      Start,
@@ -332,15 +339,17 @@ PartitionInstallChildHandle (
 /**
   Install child handles if the Handle supports GPT partition structure.
 
-  @param[in]  This       - Calling context.
-  @param[in]  Handle     - Parent Handle
-  @param[in]  DiskIo     - Parent DiskIo interface
-  @param[in]  BlockIo    - Parent BlockIo interface
-  @param[in]  DevicePath - Parent Device Path
+  @param[in]  This       Calling context.
+  @param[in]  Handle     Parent Handle.
+  @param[in]  DiskIo     Parent DiskIo interface.
+  @param[in]  BlockIo    Parent BlockIo interface.
+  @param[in]  BlockIo2   Parent BlockIo2 interface.
+  @param[in]  DevicePath Parent Device Path.
 
-  @retval EFI_SUCCESS         Valid GPT disk
-  @retval EFI_MEDIA_CHANGED   Media changed Detected
-  @retval other               Not a valid GPT disk
+  @retval EFI_SUCCESS           Valid GPT disk.
+  @retval EFI_MEDIA_CHANGED     Media changed Detected.
+  @retval EFI_INVALID_PARAMETER If both BlockIo and BlockIo2 are NULL;
+  @retval other                 Not a valid GPT disk.
 
 **/
 EFI_STATUS
@@ -349,6 +358,7 @@ PartitionInstallGptChildHandles (
   IN  EFI_HANDLE                   Handle,
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
+  IN  EFI_BLOCK_IO2_PROTOCOL       *BlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   );
 
@@ -356,15 +366,16 @@ PartitionInstallGptChildHandles (
   Install child handles if the Handle supports El Torito format.
 
   @param[in]  This        Calling context.
-  @param[in]  Handle      Parent Handle
-  @param[in]  DiskIo      Parent DiskIo interface
-  @param[in]  BlockIo     Parent BlockIo interface
+  @param[in]  Handle      Parent Handle.
+  @param[in]  DiskIo      Parent DiskIo interface.
+  @param[in]  BlockIo     Parent BlockIo interface.
+  @param[in]  BlockIo2    Parent BlockIo2 interface.
   @param[in]  DevicePath  Parent Device Path
 
 
-  @retval EFI_SUCCESS         Child handle(s) was added
-  @retval EFI_MEDIA_CHANGED   Media changed Detected
-  @retval other               no child handle was added
+  @retval EFI_SUCCESS         Child handle(s) was added.
+  @retval EFI_MEDIA_CHANGED   Media changed Detected.
+  @retval other               no child handle was added.
 
 **/
 EFI_STATUS
@@ -373,17 +384,19 @@ PartitionInstallElToritoChildHandles (
   IN  EFI_HANDLE                   Handle,
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
+  IN  EFI_BLOCK_IO2_PROTOCOL       *BlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   );
 
 /**
   Install child handles if the Handle supports MBR format.
 
-  @param  This              Calling context.
-  @param  Handle            Parent Handle.
-  @param  DiskIo            Parent DiskIo interface.
-  @param  BlockIo           Parent BlockIo interface.
-  @param  DevicePath        Parent Device Path.
+  @param[in]  This              Calling context.
+  @param[in]  Handle            Parent Handle.
+  @param[in]  DiskIo            Parent DiskIo interface.
+  @param[in]  BlockIo           Parent BlockIo interface.
+  @param[in]  BlockIo2          Parent BlockIo2 interface.
+  @param[in]  DevicePath        Parent Device Path.
    
   @retval EFI_SUCCESS       A child handle was added.
   @retval EFI_MEDIA_CHANGED Media change was detected.
@@ -396,6 +409,7 @@ PartitionInstallMbrChildHandles (
   IN  EFI_HANDLE                   Handle,
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
+  IN  EFI_BLOCK_IO2_PROTOCOL       *BlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   );
 
@@ -406,6 +420,7 @@ EFI_STATUS
   IN  EFI_HANDLE                   Handle,
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
+  IN  EFI_BLOCK_IO2_PROTOCOL       *BlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   );
 
