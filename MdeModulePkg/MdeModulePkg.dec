@@ -463,14 +463,14 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxEfiSystemTablePointerAddress|0x0|UINT64|0x30001027
   
-[PcdsPatchableInModule,PcdsDynamic]
+[PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output column and the default value is 25 according to UEFI spec
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|25|UINT32|0x40000006
 
   ## This PCD defines the Console output row and the default value is 80 according to UEFI spec
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|80|UINT32|0x40000007
 
-[PcdsFixedAtBuild,PcdsDynamic]
+[PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx]
   ## Base address of the NV variable range in flash device
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x0|UINT32|0x30000001
 
@@ -506,7 +506,7 @@
   ## This PCD specifies whether the Multi Root I/O virtualization support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport|FALSE|BOOLEAN|0x10000046
 
-[PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the times to print hello world string.
   #  This PCD is a sample to explain FixedAtBuild UINT32 PCD usage.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
