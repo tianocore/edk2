@@ -1314,7 +1314,7 @@
   ## Indicates the default timeouts for USB transfers in milliseconds
   gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue|3000|UINT32|0x00000026
 
-[PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This value is used to set the base address of pci express hierarchy
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
 
