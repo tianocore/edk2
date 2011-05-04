@@ -1,7 +1,7 @@
 /** @file
   This contains the installation function for the driver.
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,9 +38,9 @@ UINT8                     mMasterBase             = 0xff;
 UINT8                     mSlaveBase              = 0xff;
 EFI_8259_MODE             mMode                   = Efi8259ProtectedMode;
 UINT16                    mProtectedModeMask      = 0xffff;
-UINT16                    mLegacyModeMask         = FixedPcdGet16(Pcd8259LegacyModeMask);
+UINT16                    mLegacyModeMask;
 UINT16                    mProtectedModeEdgeLevel = 0x0000;
-UINT16                    mLegacyModeEdgeLevel    = FixedPcdGet16(Pcd8259LegacyModeEdgeLevel);
+UINT16                    mLegacyModeEdgeLevel;
 
 //
 // Worker Functions
@@ -587,6 +587,12 @@ Install8259 (
 {
   EFI_STATUS   Status;
   EFI_8259_IRQ Irq;
+
+  //
+  // Initialze mask values from PCDs
+  //
+  mLegacyModeMask      = PcdGet16 (Pcd8259LegacyModeMask);
+  mLegacyModeEdgeLevel = PcdGet16 (Pcd8259LegacyModeEdgeLevel);
 
   //
   // Clear all pending interrupt

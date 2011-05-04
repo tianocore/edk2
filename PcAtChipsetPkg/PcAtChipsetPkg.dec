@@ -22,7 +22,7 @@
   PACKAGE_GUID                   = B728689A-52D3-4b8c-AE89-2CE5514CC6DC
   PACKAGE_VERSION                = 0.1
 
-[PcdsFixedAtBuild]
+[PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx, PcdsPatchableInModule]
   ## Pcd8259LegacyModeMask defines the default mask value for platform. This value is determined
   #  1) If platform only support pure UEFI, value should be set to 0xFFFF or 0xFFFE;
   #     Because only clock interrupt is allowed in legacy mode in pure UEFI platform.
@@ -34,8 +34,6 @@
   #     b) If all thunk call provied by CSM binary do not require legacy interrupt support, value should be set
   #        to 0xFFFF or 0xFFFE.
   #
-  #  Because the value is used as intialization value, PCD's type should be FixedAtBuild.
-  #
   #  The default value of legacy mode mask could be changed by EFI_LEGACY_8259_PROTOCOL->SetMask(). But it is rarely
   #  need change it except some special cases such as when initializing the CSM binary, it should be set to 0xFFFF to 
   #  mask all legacy interrupt. Please restore the original legacy mask value if changing is made for these special case.
@@ -45,7 +43,6 @@
   ## Pcd8259LegacyModeEdgeLevel defines the default edge level for legacy mode's interrrupt controller.
   gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0000|UINT16|0x00000002
 
-[PcdsFixedAtBuild, PcdsDynamic, PcdsPatchableInModule]
   ## This PCD specifies whether we need enable IsaAcpiCom1 device.
   gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiCom1Enable|TRUE|BOOLEAN|0x00000003
 
