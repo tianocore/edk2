@@ -2,7 +2,7 @@
 # Intel Framework Module Package contains the definitions and module implementation
 # which follows Intel EFI Framework Specification.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -91,7 +91,7 @@
   #  BIT2 indicates if ISA memory is supported
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportedFeatures|0x05|UINT8|0x00010040
 
-[PcdsDynamic]
+[PcdsDynamic, PcdsDynamicEx]
   ## PCD is used to mark if the machine has complete one boot cycle before.
   #  After the complete boot, the variable BootState will be set to TRUE.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState|TRUE|BOOLEAN|0x0001002f
