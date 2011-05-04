@@ -129,6 +129,9 @@ EfiNicIp4ConfigSetInfo (
     DispatchDpc ();
   }
 
+  if (NicConfig == NULL) {
+    return Status;
+  }
   //
   // A dedicated timer is used to poll underlying media status.In case of
   // cable swap, a new round auto configuration will be initiated. The timer
