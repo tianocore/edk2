@@ -58,7 +58,7 @@ Rand32 (
       Bits = Bits - 1;
     }
     R32 = (UINT32)((R32 << Bits) |
-                   RShiftU64 (LShiftU64 (TscBits, 64 - Bits), 64 - Bits));
+                   RShiftU64 (LShiftU64 (TscBits, (UINTN) (64 - Bits)), (UINTN) (64 - Bits)));
     Found = Found + Bits;
   } while (Found < 32);
 
