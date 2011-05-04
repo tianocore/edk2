@@ -501,10 +501,6 @@ KbdControllerDriverStop (
     gBS->CloseEvent (ConsoleIn->TimerEvent);
     ConsoleIn->TimerEvent = NULL;
   }
-  //
-  // Disable the keyboard interface
-  //
-  Status = DisableKeyboard (ConsoleIn);
 
   //
   // Since there will be no timer handler for keyboard input any more,
