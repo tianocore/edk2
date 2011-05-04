@@ -5,7 +5,7 @@
   which exposes much more state and modifier information from the input device,
   also allows one to register a notification for a particular keystroke.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -18,6 +18,8 @@
 
 #ifndef __SIMPLE_TEXT_IN_EX_H__
 #define __SIMPLE_TEXT_IN_EX_H__
+
+#include <Protocol/SimpleTextIn.h>
 
 #define EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL_GUID \
   {0xdd9e7534, 0x7762, 0x4698, { 0x8c, 0x14, 0xf5, 0x85, 0x17, 0xa6, 0x25, 0xaa } }
@@ -121,7 +123,9 @@ typedef struct {
                               
 //                            
 // EFI Scan codes             
-//                            
+//
+#define SCAN_F11                  0x0015
+#define SCAN_F12                  0x0016
 #define SCAN_F13                  0x0068
 #define SCAN_F14                  0x0069
 #define SCAN_F15                  0x006A
