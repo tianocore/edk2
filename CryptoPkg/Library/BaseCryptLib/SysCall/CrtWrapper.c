@@ -330,10 +330,41 @@ void closelog (void)
 
 }
 
+#ifdef __GNUC__
+
+typedef
+VOID
+(EFIAPI *NoReturnFuncPtr)(
+  VOID
+  ) __attribute__((__noreturn__));
+
+
+STATIC
+VOID
+EFIAPI
+NopFunction (
+  VOID
+  )
+{
+}
+
+
 void exit (int e)
 {
+  NoReturnFuncPtr NoReturnFunc;
 
+  NoReturnFunc = (NoReturnFuncPtr) NopFunction;
+
+  NoReturnFunc ();
 }
+
+#else
+
+void exit (int e)
+{
+}
+
+#endif
 
 int fclose (FILE *f)
 {
