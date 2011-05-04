@@ -686,6 +686,18 @@ typedef union {
   /// EFI_DEBUG_SUPPORT_PROTOCOL in the UEFI Specification.
   ///
   EFI_SYSTEM_CONTEXT_IPF  SystemContextIpf;
+  ///
+  /// The context of the X64 processor when the exception was generated. Type
+  /// EFI_SYSTEM_CONTEXT_X64 is defined in the
+  /// EFI_DEBUG_SUPPORT_PROTOCOL in the UEFI Specification.
+  ///
+  EFI_SYSTEM_CONTEXT_X64  SystemContextX64; 
+  ///
+  /// The context of the ARM processor when the exception was generated. Type
+  /// EFI_SYSTEM_CONTEXT_ARM is defined in the
+  /// EFI_DEBUG_SUPPORT_PROTOCOL in the UEFI Specification.
+  ///
+  EFI_SYSTEM_CONTEXT_ARM  SystemContextArm;
 } EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT;
 
 ///
