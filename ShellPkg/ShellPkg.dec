@@ -2,7 +2,7 @@
 #
 # This Package provides all definitions for EFI and UEFI Shell
 #
-# Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
@@ -97,7 +97,7 @@
   ## This flag forces the shell to present a user console.  Allows for earlier debugging of platforms.
   gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole|FALSE|BOOLEAN|0x0000000F
 
-[PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This flag is used to control the protocols produced by the shell
   #  If TRUE the shell will produce EFI_SHELL_ENVIRONMENT2 and EFI_SHELL_INTERFACE
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportOldProtocols|FALSE|BOOLEAN|0x00000002
