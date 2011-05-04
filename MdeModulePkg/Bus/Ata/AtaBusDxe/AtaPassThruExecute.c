@@ -3,7 +3,12 @@
 
   This file implements the low level execution of ATA pass through transaction.
   It transforms the high level identity, read/write, reset command to ATA pass
-  through command and protocol. 
+  through command and protocol.
+
+  NOTE: This file aslo implements the StorageSecurityCommandProtocol(SSP). For input
+  parameter SecurityProtocolSpecificData, ATA spec has no explicitly definition 
+  for Security Protocol Specific layout. This implementation uses big edian for 
+  Cylinder register.
     
   Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
@@ -18,6 +23,12 @@
 **/
 
 #include "AtaBus.h"
+
+#define ATA_CMD_TRUST_NON_DATA    0x5B
+#define ATA_CMD_TRUST_RECEIVE     0x5C
+#define ATA_CMD_TRUST_RECEIVE_DMA 0x5D
+#define ATA_CMD_TRUST_SEND        0x5E
+#define ATA_CMD_TRUST_SEND_DMA    0x5F
 
 //
 // Look up table (UdmaValid, IsWrite) for EFI_ATA_PASS_THRU_CMD_PROTOCOL
@@ -58,6 +69,21 @@ UINT8 mAtaCommands[][2][2] = {
     }
   }
 };
+
+//
+// Look up table (UdmaValid, IsTrustSend) for ATA_CMD
+//
+UINT8 mAtaTrustCommands[2][2] = {	
+  {
+    ATA_CMD_TRUST_RECEIVE,            // PIO read
+    ATA_CMD_TRUST_SEND                // PIO write
+  },
+  {
+    ATA_CMD_TRUST_RECEIVE_DMA,        // DMA read
+    ATA_CMD_TRUST_SEND_DMA            // DMA write
+  }
+};
+
 
 //
 // Look up table (Lba48Bit) for maximum transfer block number
@@ -754,5 +780,115 @@ EXIT:
     FreePool (IsError);
   }
 
+  return Status;
+}
+
+/**
+  Trust transfer data from/to ATA device.
+
+  This function performs one ATA pass through transaction to do a trust transfer from/to
+  ATA device. It chooses the appropriate ATA command and protocol to invoke PassThru
+  interface of ATA pass through.
+
+  @param  AtaDevice                    The ATA child device involved for the operation.
+  @param  Buffer                       The pointer to the current transaction buffer.
+  @param  SecurityProtocolId           The value of the "Security Protocol" parameter of
+                                       the security protocol command to be sent.
+  @param  SecurityProtocolSpecificData The value of the "Security Protocol Specific" parameter
+                                       of the security protocol command to be sent.
+  @param  TransferLength               The block number or sector count of the transfer.
+  @param  IsTrustSend                  Indicates whether it is a trust send operation or not.
+  @param  Timeout                      The timeout, in 100ns units, to use for the execution
+                                       of the security protocol command. A Timeout value of 0
+                                       means that this function will wait indefinitely for the
+                                       security protocol command to execute. If Timeout is greater
+                                       than zero, then this function will return EFI_TIMEOUT
+                                       if the time required to execute the receive data command
+                                       is greater than Timeout.
+
+  @retval EFI_SUCCESS       The data transfer is complete successfully.
+  @return others            Some error occurs when transferring data. 
+
+**/
+EFI_STATUS
+EFIAPI
+TrustTransferAtaDevice (
+  IN OUT ATA_DEVICE                 *AtaDevice,
+  IN OUT VOID                       *Buffer,
+  IN UINT8                          SecurityProtocolId,
+  IN UINT16                         SecurityProtocolSpecificData,
+  IN UINTN                          TransferLength,
+  IN BOOLEAN                        IsTrustSend,
+  IN UINT64                         Timeout,
+  OUT UINTN                         *TransferLengthOut
+  )
+{
+  EFI_ATA_COMMAND_BLOCK             *Acb;
+  EFI_ATA_PASS_THRU_COMMAND_PACKET  *Packet;
+  EFI_STATUS                        Status;
+  VOID                              *NewBuffer;
+  EFI_ATA_PASS_THRU_PROTOCOL        *AtaPassThru;
+
+  //
+  // Ensure AtaDevice->UdmaValid and IsTrustSend are valid boolean values 
+  //
+  ASSERT ((UINTN) AtaDevice->UdmaValid < 2);
+  ASSERT ((UINTN) IsTrustSend < 2);
+  //
+  // Prepare for ATA command block.
+  //
+  Acb = ZeroMem (&AtaDevice->Acb, sizeof (*Acb));
+  if (TransferLength == 0) {
+    Acb->AtaCommand    = ATA_CMD_TRUST_NON_DATA;
+  } else {
+    Acb->AtaCommand    = mAtaTrustCommands[AtaDevice->UdmaValid][IsTrustSend];
+  }
+  Acb->AtaFeatures      = SecurityProtocolId;
+  Acb->AtaSectorCount   = (UINT8) (TransferLength / 512);
+  Acb->AtaSectorNumber  = (UINT8) ((TransferLength / 512) >> 8);
+  //
+  // NOTE: ATA Spec has no explicitly definition for Security Protocol Specific layout. 
+  // Here use big edian for Cylinder register. 
+  //
+  Acb->AtaCylinderHigh  = (UINT8) SecurityProtocolSpecificData;
+  Acb->AtaCylinderLow   = (UINT8) (SecurityProtocolSpecificData >> 8);
+  Acb->AtaDeviceHead    = (UINT8) (BIT7 | BIT6 | BIT5 | (AtaDevice->PortMultiplierPort << 4)); 
+
+  //
+  // Prepare for ATA pass through packet.
+  //
+  Packet = ZeroMem (&AtaDevice->Packet, sizeof (*Packet));
+  if (TransferLength == 0) {
+    Packet->InTransferLength  = 0;
+    Packet->OutTransferLength = 0;
+    Packet->Protocol = EFI_ATA_PASS_THRU_PROTOCOL_ATA_NON_DATA;
+  } else if (IsTrustSend) {
+    //
+    // Check the alignment of the incoming buffer prior to invoking underlying ATA PassThru
+    //
+    AtaPassThru = AtaDevice->AtaBusDriverData->AtaPassThru;
+    if ((AtaPassThru->Mode->IoAlign > 1) && !IS_ALIGNED (Buffer, AtaPassThru->Mode->IoAlign)) {
+      NewBuffer = AllocateAlignedBuffer (AtaDevice, TransferLength);
+      CopyMem (NewBuffer, Buffer, TransferLength);
+      FreePool (Buffer);
+      Buffer = NewBuffer;
+    } 
+    Packet->OutDataBuffer = Buffer;
+    Packet->OutTransferLength = (UINT32) TransferLength;
+    Packet->Protocol = mAtaPassThruCmdProtocols[AtaDevice->UdmaValid][IsTrustSend];
+  } else {
+    Packet->InDataBuffer = Buffer;
+    Packet->InTransferLength = (UINT32) TransferLength;
+    Packet->Protocol = mAtaPassThruCmdProtocols[AtaDevice->UdmaValid][IsTrustSend];
+  }
+  Packet->Length   = EFI_ATA_PASS_THRU_LENGTH_BYTES;
+  Packet->Timeout  = Timeout;
+
+  Status = AtaDevicePassThru (AtaDevice, NULL, NULL);
+  if (TransferLengthOut != NULL) {
+    if (! IsTrustSend) {
+      *TransferLengthOut = Packet->InTransferLength;
+    }
+  }
   return Status;
 }

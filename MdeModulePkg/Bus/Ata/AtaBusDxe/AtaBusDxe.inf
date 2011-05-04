@@ -66,6 +66,6 @@
   gEfiBlockIo2ProtocolGuid                      # BY_START
   gEfiAtaPassThruProtocolGuid                   # TO_START
   gEfiDevicePathProtocolGuid                    # TO_START
-  
+  gEfiStorageSecurityCommandProtocolGuid        # BY_START
 
 

@@ -25,6 +25,7 @@
 #include <Protocol/BlockIo2.h>
 #include <Protocol/DiskInfo.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/StorageSecurityCommand.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -75,10 +76,10 @@
 //
 #define MAX_MODEL_NAME_LEN                40
 
-#define ATA_TASK_SIGNATURE    SIGNATURE_32 ('A', 'T', 'S', 'K')
-#define ATA_DEVICE_SIGNATURE  SIGNATURE_32 ('A', 'B', 'I', 'D')
+#define ATA_TASK_SIGNATURE                SIGNATURE_32 ('A', 'T', 'S', 'K')
+#define ATA_DEVICE_SIGNATURE              SIGNATURE_32 ('A', 'B', 'I', 'D')
 
-#define IS_ALIGNED(addr, size)      (((UINTN) (addr) & (size - 1)) == 0)
+#define IS_ALIGNED(addr, size)            (((UINTN) (addr) & (size - 1)) == 0)
 
 //
 // Task for the non blocking I/O
@@ -114,6 +115,7 @@ typedef struct {
   EFI_BLOCK_IO_MEDIA                    BlockMedia;
   EFI_DISK_INFO_PROTOCOL                DiskInfo;
   EFI_DEVICE_PATH_PROTOCOL              *DevicePath;
+  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL StorageSecurity;
 
   ATA_BUS_DRIVER_DATA                   *AtaBusDriverData;
   UINT16                                Port;
@@ -137,12 +139,13 @@ typedef struct {
   EFI_UNICODE_STRING_TABLE              *ControllerNameTable;
   CHAR16                                ModelName[MAX_MODEL_NAME_LEN + 1];
 
-  LIST_ENTRY                        AtaTaskList;
+  LIST_ENTRY                            AtaTaskList;
 } ATA_DEVICE;
 
 #define ATA_DEVICE_FROM_BLOCK_IO(a)         CR (a, ATA_DEVICE, BlockIo, ATA_DEVICE_SIGNATURE)
 #define ATA_DEVICE_FROM_BLOCK_IO2(a)        CR (a, ATA_DEVICE, BlockIo2, ATA_DEVICE_SIGNATURE)
 #define ATA_DEVICE_FROM_DISK_INFO(a)        CR (a, ATA_DEVICE, DiskInfo, ATA_DEVICE_SIGNATURE)
+#define ATA_DEVICE_FROM_STORAGE_SECURITY(a) CR (a, ATA_DEVICE, StorageSecurity, ATA_DEVICE_SIGNATURE)
 #define ATA_AYNS_TASK_FROM_ENTRY(a)         CR (a, ATA_BUS_ASYN_TASK, TaskEntry, ATA_TASK_SIGNATURE)
 
 //
@@ -261,6 +264,45 @@ AccessAtaDevice(
   IN UINTN                          NumberOfBlocks,
   IN BOOLEAN                        IsWrite,
   IN OUT EFI_BLOCK_IO2_TOKEN        *Token
+  );
+/**
+  Trust transfer data from/to ATA device.
+
+  This function performs one ATA pass through transaction to do a trust transfer from/to
+  ATA device. It chooses the appropriate ATA command and protocol to invoke PassThru
+  interface of ATA pass through.
+
+  @param  AtaDevice                    The ATA child device involved for the operation.
+  @param  Buffer                       The pointer to the current transaction buffer.
+  @param  SecurityProtocolId           The value of the "Security Protocol" parameter of
+                                       the security protocol command to be sent.
+  @param  SecurityProtocolSpecificData The value of the "Security Protocol Specific" parameter
+                                       of the security protocol command to be sent.
+  @param  TransferLength               The block number or sector count of the transfer.
+  @param  IsTrustSend                  Indicates whether it is a trust send operation or not.
+  @param  Timeout                      The timeout, in 100ns units, to use for the execution
+                                       of the security protocol command. A Timeout value of 0
+                                       means that this function will wait indefinitely for the
+                                       security protocol command to execute. If Timeout is greater
+                                       than zero, then this function will return EFI_TIMEOUT
+                                       if the time required to execute the receive data command
+                                       is greater than Timeout.
+
+  @retval EFI_SUCCESS       The data transfer is complete successfully.
+  @return others            Some error occurs when transferring data. 
+
+**/
+EFI_STATUS
+EFIAPI
+TrustTransferAtaDevice (
+  IN OUT ATA_DEVICE                 *AtaDevice,
+  IN OUT VOID                       *Buffer,
+  IN UINT8                          SecurityProtocolId,
+  IN UINT16                         SecurityProtocolSpecificData,
+  IN UINTN                          TransferLength,
+  IN BOOLEAN                        IsTrustSend,
+  IN UINT64                         Timeout,
+  OUT UINTN                         *TransferLengthOut
   );
 
 //
@@ -821,5 +863,163 @@ AtaDiskInfoWhichIde (
   OUT UINT32                   *IdeChannel,
   OUT UINT32                   *IdeDevice
   );
+
+/**
+  Send a security protocol command to a device that receives data and/or the result
+  of one or more commands sent by SendData.
+
+  The ReceiveData function sends a security protocol command to the given MediaId.
+  The security protocol command sent is defined by SecurityProtocolId and contains
+  the security protocol specific data SecurityProtocolSpecificData. The function
+  returns the data from the security protocol command in PayloadBuffer.
+
+  For devices supporting the SCSI command set, the security protocol command is sent
+  using the SECURITY PROTOCOL IN command defined in SPC-4.
+
+  For devices supporting the ATA command set, the security protocol command is sent
+  using one of the TRUSTED RECEIVE commands defined in ATA8-ACS if PayloadBufferSize
+  is non-zero.
+
+  If the PayloadBufferSize is zero, the security protocol command is sent using the
+  Trusted Non-Data command defined in ATA8-ACS.
+
+  If PayloadBufferSize is too small to store the available data from the security
+  protocol command, the function shall copy PayloadBufferSize bytes into the
+  PayloadBuffer and return EFI_WARN_BUFFER_TOO_SMALL.
+
+  If PayloadBuffer or PayloadTransferSize is NULL and PayloadBufferSize is non-zero,
+  the function shall return EFI_INVALID_PARAMETER.
+
+  If the given MediaId does not support security protocol commands, the function shall
+  return EFI_UNSUPPORTED. If there is no media in the device, the function returns
+  EFI_NO_MEDIA. If the MediaId is not the ID for the current media in the device,
+  the function returns EFI_MEDIA_CHANGED.
+
+  If the security protocol fails to complete within the Timeout period, the function
+  shall return EFI_TIMEOUT.
+
+  If the security protocol command completes without an error, the function shall
+  return EFI_SUCCESS. If the security protocol command completes with an error, the
+  function shall return EFI_DEVICE_ERROR.
+
+  @param  This		                     Indicates a pointer to the calling context.
+  @param  MediaId	                     ID of the medium to receive data from.
+  @param  Timeout		                   The timeout, in 100ns units, to use for the execution
+                                       of the security protocol command. A Timeout value of 0
+                                       means that this function will wait indefinitely for the
+                                       security protocol command to execute. If Timeout is greater
+                                       than zero, then this function will return EFI_TIMEOUT
+				                               if the time required to execute the receive data command
+				                               is greater than Timeout.
+  @param  SecurityProtocolId           The value of the "Security Protocol" parameter of
+                                       the security protocol command to be sent.
+  @param  SecurityProtocolSpecificData The value of the "Security Protocol Specific" parameter
+                                       of the security protocol command to be sent.
+  @param  PayloadBufferSize		         Size in bytes of the payload data buffer.
+  @param  PayloadBuffer                A pointer to a destination buffer to store the security
+                                       protocol command specific payload data for the security
+                                       protocol command. The caller is responsible for having
+                                       either implicit or explicit ownership of the buffer.
+  @param  PayloadTransferSize          A pointer to a buffer to store the size in bytes of the
+                                       data written to the payload data buffer.
+
+  @retval EFI_SUCCESS                  The security protocol command completed successfully.
+  @retval EFI_WARN_BUFFER_TOO_SMALL    The PayloadBufferSize was too small to store the available
+                                       data from the device. The PayloadBuffer contains the truncated data.
+  @retval EFI_UNSUPPORTED              The given MediaId does not support security protocol commands.
+  @retval EFI_DEVICE_ERROR             The security protocol command completed with an error.
+  @retval EFI_NO_MEDIA                 There is no media in the device.
+  @retval EFI_MEDIA_CHANGED            The MediaId is not for the current media.
+  @retval EFI_INVALID_PARAMETER        The PayloadBuffer or PayloadTransferSize is NULL and
+                                       PayloadBufferSize is non-zero.
+  @retval EFI_TIMEOUT                  A timeout occurred while waiting for the security
+                                       protocol command to execute.
+
+**/
+EFI_STATUS
+EFIAPI
+AtaStorageSecurityReceiveData (
+  IN EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *This,
+  IN UINT32                                   MediaId,
+  IN UINT64                                   Timeout,
+  IN UINT8                                    SecurityProtocolId,
+  IN UINT16                                   SecurityProtocolSpecificData,
+  IN UINTN                                    PayloadBufferSize,
+  OUT VOID                                    *PayloadBuffer,
+  OUT UINTN                                   *PayloadTransferSize
+);
+
+/**
+  Send a security protocol command to a device.
+
+  The SendData function sends a security protocol command containing the payload
+  PayloadBuffer to the given MediaId. The security protocol command sent is
+  defined by SecurityProtocolId and contains the security protocol specific data
+  SecurityProtocolSpecificData. If the underlying protocol command requires a
+  specific padding for the command payload, the SendData function shall add padding
+  bytes to the command payload to satisfy the padding requirements.
+
+  For devices supporting the SCSI command set, the security protocol command is sent
+  using the SECURITY PROTOCOL OUT command defined in SPC-4.
+
+  For devices supporting the ATA command set, the security protocol command is sent
+  using one of the TRUSTED SEND commands defined in ATA8-ACS if PayloadBufferSize
+  is non-zero. If the PayloadBufferSize is zero, the security protocol command is
+  sent using the Trusted Non-Data command defined in ATA8-ACS.
+
+  If PayloadBuffer is NULL and PayloadBufferSize is non-zero, the function shall
+  return EFI_INVALID_PARAMETER.
+
+  If the given MediaId does not support security protocol commands, the function
+  shall return EFI_UNSUPPORTED. If there is no media in the device, the function
+  returns EFI_NO_MEDIA. If the MediaId is not the ID for the current media in the
+  device, the function returns EFI_MEDIA_CHANGED.
+
+  If the security protocol fails to complete within the Timeout period, the function
+  shall return EFI_TIMEOUT.
+
+  If the security protocol command completes without an error, the function shall return
+  EFI_SUCCESS. If the security protocol command completes with an error, the function
+  shall return EFI_DEVICE_ERROR.
+
+  @param  This		                     Indicates a pointer to the calling context.
+  @param  MediaId	                     ID of the medium to receive data from.
+  @param  Timeout		                   The timeout, in 100ns units, to use for the execution
+                                       of the security protocol command. A Timeout value of 0
+                                       means that this function will wait indefinitely for the
+                                       security protocol command to execute. If Timeout is greater
+                                       than zero, then this function will return EFI_TIMEOUT
+				                               if the time required to execute the receive data command
+				                               is greater than Timeout.
+  @param  SecurityProtocolId           The value of the "Security Protocol" parameter of
+                                       the security protocol command to be sent.
+  @param  SecurityProtocolSpecificData The value of the "Security Protocol Specific" parameter
+                                       of the security protocol command to be sent.
+  @param  PayloadBufferSize		         Size in bytes of the payload data buffer.
+  @param  PayloadBuffer                A pointer to a destination buffer to store the security
+                                       protocol command specific payload data for the security
+                                       protocol command.
+
+  @retval EFI_SUCCESS                  The security protocol command completed successfully.
+  @retval EFI_UNSUPPORTED              The given MediaId does not support security protocol commands.
+  @retval EFI_DEVICE_ERROR             The security protocol command completed with an error.
+  @retval EFI_NO_MEDIA                 There is no media in the device.
+  @retval EFI_MEDIA_CHANGED            The MediaId is not for the current media.
+  @retval EFI_INVALID_PARAMETER        The PayloadBuffer is NULL and PayloadBufferSize is non-zero.
+  @retval EFI_TIMEOUT                  A timeout occurred while waiting for the security
+                                       protocol command to execute.
+
+**/
+EFI_STATUS
+EFIAPI
+AtaStorageSecuritySendData (
+  IN EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *This,
+  IN UINT32                                   MediaId,
+  IN UINT64                                   Timeout,
+  IN UINT8                                    SecurityProtocolId,
+  IN UINT16                                   SecurityProtocolSpecificData,
+  IN UINTN                                    PayloadBufferSize,
+  IN VOID                                     *PayloadBuffer
+);
 
 #endif
