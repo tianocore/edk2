@@ -12,7 +12,7 @@
 # |- Include        : Include files for Nt32Pkg
 # 
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -91,10 +91,6 @@
 # changed after customized in DSC file.
 #
 [PcdsFixedAtBuild]
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode|1|UINT32|0x00001006
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain|L"64!64"|VOID*|0x0000100c
-
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogBase|0x0|UINT32|0x0000100e
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogSize|0x0|UINT32|0x0000100f
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoveryBase|0x0|UINT32|0x00001010
@@ -107,12 +103,22 @@
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwWorkingBase|0x0|UINT32|0x00001016
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddress|0x0|UINT32|0x00001017
 
+## This section list all "PatchableInModule" type PCD produced by NT32 package.
+# "PatchableInModule" type PCD can be seems as global variable and its value is 
+# stored in PE file data section of module. This type PCD mainly is designed for 
+# binary module. 
+#
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode|1|UINT32|0x00001006
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain|L"64!64"|VOID*|0x0000100c
+
 ## This section list all "Dynamic" type PCD produced by NT32 package.
 # 
 # "Dynamic" type PCD will be managed by PCD database driver at execution time.
 # its value can be modified by PCD_PPI/PCD_PROTOCOL at execution time.
 #
-[PcdsDynamic]
+[PcdsDynamic, PcdsDynamicEx]
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtPhysicalDisk|L"E:RW;245760;512"|VOID*|0x00001000
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtVirtualDisk|L"FW;40960;512"|VOID*|0x00001001
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtSerialPort|L"COM1!COM2"|VOID*|0x00001002
@@ -122,12 +128,3 @@
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtConsole|L"Bus Driver Console Window"|VOID*|0x0000100a
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtGop|L"UGA Window 1!UGA Window 2"|VOID*|0x0000100d
 
-## This section list all "PatchableInModule" type PCD produced by NT32 package.
-# "PatchableInModule" type PCD can be seems as global variable and its value is 
-# stored in PE file data section of module. This type PCD mainly is designed for 
-# binary module. 
-#
-[PcdsPatchableInModule]
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode|1|UINT32|0x00001006
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain|L"64!64"|VOID*|0x0000100c
