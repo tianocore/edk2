@@ -3,7 +3,7 @@
 # This is the Unix Emulation Environment Platform
 #
 # Reference platform implementation using an emulator.
-# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials are licensed and made available 
 #    under the terms and conditions of the BSD License which accompanies this distribution.
@@ -78,7 +78,7 @@
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageEventLogSize|0x0|UINT32|0x0000100f
 
 
-[PcdsDynamic]
+[PcdsDynamic, PcdsDynamicEx]
   gEfiUnixPkgTokenSpaceGuid.PcdUnixPhysicalDisk|L"E:RW;245760;512"|VOID*|0x00001000
   gEfiUnixPkgTokenSpaceGuid.PcdUnixVirtualDisk|L"FW;40960;512"|VOID*|0x00001001
   gEfiUnixPkgTokenSpaceGuid.PcdUnixUga|L"UGA Window"|VOID*|0x00001003
