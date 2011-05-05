@@ -32,7 +32,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase|0x0|UINT32|0
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize|0x0|UINT32|1
 
-[PcdsDynamic]
+[PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
 
 [LibraryClasses]
