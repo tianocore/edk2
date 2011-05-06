@@ -794,7 +794,7 @@ ErrorExit:
            );
   }
 
-  if (Instance->TimerEvent != NULL) {
+  if ((Instance != NULL) && (Instance->TimerEvent != NULL)) {
     gBS->CloseEvent (Instance->TimerEvent);
   }
 

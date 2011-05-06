@@ -457,13 +457,8 @@ PartitionDriverBindingStop (
            EFI_OPEN_PROTOCOL_GET_PROTOCOL
            ); 
 
-    if (BlockIo != NULL) {
-      Private = PARTITION_DEVICE_FROM_BLOCK_IO_THIS (BlockIo);
-    } else if (BlockIo2 != NULL) {
-      Private = PARTITION_DEVICE_FROM_BLOCK_IO2_THIS (BlockIo2);
-    } else {
-      ASSERT (FALSE);
-    }
+
+    Private = PARTITION_DEVICE_FROM_BLOCK_IO_THIS (BlockIo);
 
     Status = gBS->CloseProtocol (
                     ControllerHandle,
@@ -1008,19 +1003,22 @@ PartitionInstallChildHandle (
   Private->ParentBlockIo2   = ParentBlockIo2;
   Private->DiskIo           = ParentDiskIo;
 
-  if (Private->ParentBlockIo != NULL) {
-    Private->BlockIo.Revision = ParentBlockIo->Revision;
+  //
+  // Set the BlockIO into Private Data.
+  //
+  Private->BlockIo.Revision = ParentBlockIo->Revision;
+  
+  Private->BlockIo.Media    = &Private->Media;
+  CopyMem (Private->BlockIo.Media, ParentBlockIo->Media, sizeof (EFI_BLOCK_IO_MEDIA));
 
-    Private->BlockIo.Media    = &Private->Media;
-    CopyMem (Private->BlockIo.Media, ParentBlockIo->Media, sizeof (EFI_BLOCK_IO_MEDIA));
+  Private->BlockIo.Reset        = PartitionReset;
+  Private->BlockIo.ReadBlocks   = PartitionReadBlocks;
+  Private->BlockIo.WriteBlocks  = PartitionWriteBlocks;
+  Private->BlockIo.FlushBlocks  = PartitionFlushBlocks;
 
-
-    Private->BlockIo.Reset        = PartitionReset;
-    Private->BlockIo.ReadBlocks   = PartitionReadBlocks;
-    Private->BlockIo.WriteBlocks  = PartitionWriteBlocks;
-    Private->BlockIo.FlushBlocks  = PartitionFlushBlocks;
-  }
-
+  //
+  // Set the BlockIO2 into Private Data.
+  //
   if (Private->ParentBlockIo2 != NULL) {
     Private->BlockIo2.Media    = &Private->Media2;
     CopyMem (Private->BlockIo2.Media, ParentBlockIo2->Media, sizeof (EFI_BLOCK_IO_MEDIA));
@@ -1036,7 +1034,7 @@ PartitionInstallChildHandle (
   Private->Media.LastBlock = DivU64x32 (
                                MultU64x32 (
                                  End - Start + 1,
-                                 (ParentBlockIo != NULL) ? ParentBlockIo->Media->BlockSize : ParentBlockIo2->Media->BlockSize
+                                 ParentBlockIo->Media->BlockSize
                                  ),
                                 BlockSize
                                ) - 1;
@@ -1085,8 +1083,7 @@ PartitionInstallChildHandle (
   // here.
   //
   Private->Handle = NULL;
-  if ((Private->ParentBlockIo != NULL) &&
-      (Private->ParentBlockIo2 != NULL) &&
+  if ((Private->ParentBlockIo2 != NULL) &&
       (Private->ParentBlockIo2->Media->BlockSize == BlockSize)
      ) {
     Status = gBS->InstallMultipleProtocolInterfaces (
@@ -1101,33 +1098,17 @@ PartitionInstallChildHandle (
                     NULL,
                     NULL
                     );
-  } else {
-    if (Private->ParentBlockIo != NULL) {
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &Private->Handle,
-                      &gEfiDevicePathProtocolGuid,
-                      Private->DevicePath,
-                      &gEfiBlockIoProtocolGuid,
-                      &Private->BlockIo,
-                      Private->EspGuid,
-                      NULL,
-                      NULL
-                      );
-    }
-    if (Private->ParentBlockIo2 != NULL && 
-        Private->ParentBlockIo2->Media->BlockSize == BlockSize
-       ) {
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &Private->Handle,
-                      &gEfiDevicePathProtocolGuid,
-                      Private->DevicePath,
-                      &gEfiBlockIo2ProtocolGuid,
-                      &Private->BlockIo2,
-                      Private->EspGuid,
-                      NULL,
-                      NULL
-                      );
-    }
+  } else {    
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &Private->Handle,
+                    &gEfiDevicePathProtocolGuid,
+                    Private->DevicePath,
+                    &gEfiBlockIoProtocolGuid,
+                    &Private->BlockIo,
+                    Private->EspGuid,
+                    NULL,
+                    NULL
+                    );
   }
 
   if (!EFI_ERROR (Status)) {
