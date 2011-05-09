@@ -19,10 +19,10 @@
   PACKAGE_VERSION                = 0.1
   DEC_SPECIFICATION              = 0x00010005
 
-[Includes.common]
+[Includes]
   Include
 
-[Guids.common]
+[Guids]
   ## Performance Package token space guid
   # Include/Guid/PerformancePkgTokenSpace.h
   # 669346ef-fdad-4aeb-a608-7def3f2d4621
@@ -31,7 +31,7 @@
   ## Include/Guid/TscFrequency.h
   gEfiTscFrequencyGuid                = { 0xdba6a7e3, 0xbb57, 0x4be7, { 0x8a, 0xf8, 0xd5, 0x78, 0xdb, 0x7e, 0x56, 0x87 }}
 
-[PcdsFixedAtBuild.common]
+[PcdsFixedAtBuild]
   ##  The base address of the ACPI registers within the ICH PCI space.
   #   This space must be 128-byte aligned.
   gPerformancePkgTokenSpaceGuid.PcdPerfPkgAcpiIoPortBaseAddress|0x400|UINT16|1
