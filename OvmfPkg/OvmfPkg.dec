@@ -22,6 +22,15 @@
 [Includes]
   Include
 
+[LibraryClasses]
+  ##  @libraryclass  Save and restore variables using a file
+  #
+  NvVarsFileLib|Include/Library/NvVarsFileLib.h
+
+  ##  @libraryclass  Serialize (and deserialize) variables
+  #
+  SerializeVariablesLib|Include/Library/SerializeVariablesLib.h
+
 [Guids]
   gUefiOvmfPkgTokenSpaceGuid      = {0x93bb96af, 0xb9f2, 0x4eb8, {0x94, 0x62, 0xe0, 0xba, 0x74, 0x56, 0x42, 0x36}}
 
@@ -34,13 +43,4 @@
 
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
-
-[LibraryClasses]
-  ##  @libraryclass  Save and restore variables using a file
-  #
-  NvVarsFileLib|Include/Library/NvVarsFileLib.h
-
-  ##  @libraryclass  Serialize (and deserialize) variables
-  #
-  SerializeVariablesLib|Include/Library/SerializeVariablesLib.h
 
