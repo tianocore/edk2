@@ -22,6 +22,9 @@
   PACKAGE_GUID                   = B728689A-52D3-4b8c-AE89-2CE5514CC6DC
   PACKAGE_VERSION                = 0.1
 
+[Guids]
+  gPcAtChipsetPkgTokenSpaceGuid = { 0x326ae723, 0xae32, 0x4589, { 0x98, 0xb8, 0xca, 0xc2, 0x3c, 0xdc, 0xc1, 0xb1 } }
+
 [PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx, PcdsPatchableInModule]
   ## Pcd8259LegacyModeMask defines the default mask value for platform. This value is determined
   #  1) If platform only support pure UEFI, value should be set to 0xFFFF or 0xFFFE;
@@ -60,7 +63,3 @@
 
   ## This PCD specifies whether we need enable IsaAcpiFloppyB device.
   gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiFloppyBEnable|TRUE|BOOLEAN|0x00000008
-
-[Guids]
-  gPcAtChipsetPkgTokenSpaceGuid = { 0x326ae723, 0xae32, 0x4589, { 0x98, 0xb8, 0xca, 0xc2, 0x3c, 0xdc, 0xc1, 0xb1 } }
-
