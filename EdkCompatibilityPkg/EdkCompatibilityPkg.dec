@@ -17,37 +17,15 @@
 #
 ##
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
-
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = EdkCompatibilityPkg
   PACKAGE_GUID                   = 98EDD7B0-2A6C-4b4a-AC72-4AAE0F95A3F8
   PACKAGE_VERSION                = 0.91
   
-  
-################################################################################
-#
-# Include Section - list of Include Paths that are provided by this package.
-#                   Comments are used for Keywords and Module Types.
-#
-# Supported Module Types:
-#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
-#
-################################################################################
 [Includes]
   Compatibility/Include
 
-################################################################################
-#
-# Library Class Header section - list of Library Class header files that are
-#                                provided by this package.
-#
-################################################################################
 [LibraryClasses]
   ##  @libraryclass  Provides functions for language conversion between
   #                  ISO 639-2 and RFC 4646 styles.
