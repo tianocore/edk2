@@ -24,7 +24,7 @@
   PACKAGE_GUID                   = AA3865E8-7F30-4f59-8696-99F560101852
   PACKAGE_VERSION                = 0.1
 
-[Includes.common]
+[Includes]
   Include
 
 [LibraryClasses]
@@ -33,18 +33,15 @@
   ##
   BltLib|Include/Library/BltLib.h
 
+[Guids]
+  gOptionRomPkgTokenSpaceGuid = { 0x1e43298f, 0x3478, 0x41a7, { 0xb5, 0x77, 0x86, 0x6, 0x46, 0x35, 0xc7, 0x28 } }
+
 [PcdsFeatureFlag]
   gOptionRomPkgTokenSpaceGuid.PcdSupportScsiPassThru|TRUE|BOOLEAN|0x00010001
   gOptionRomPkgTokenSpaceGuid.PcdSupportExtScsiPassThru|TRUE|BOOLEAN|0x00010002
   gOptionRomPkgTokenSpaceGuid.PcdSupportGop|TRUE|BOOLEAN|0x00010004
   gOptionRomPkgTokenSpaceGuid.PcdSupportUga|TRUE|BOOLEAN|0x00010005
 
-[PcdsFixedAtBuild]
+[PcdsFixedAtBuild, PcdsPatchableInModule]
   gOptionRomPkgTokenSpaceGuid.PcdDriverSupportedEfiVersion|0x0002000a|UINT32|0x00010003
-
-[PcdsPatchableInModule]
-  gOptionRomPkgTokenSpaceGuid.PcdDriverSupportedEfiVersion|0x0002000a|UINT32|0x00010003
-
-[Guids]
-  gOptionRomPkgTokenSpaceGuid = { 0x1e43298f, 0x3478, 0x41a7, { 0xb5, 0x77, 0x86, 0x6, 0x46, 0x35, 0xc7, 0x28 } }
 
