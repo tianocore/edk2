@@ -62,7 +62,6 @@
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoverySize|0x0|UINT32|0x00001011
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareFdSize|0x0|UINT32|0x00001012
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareBlockSize|0|UINT32|0x00001013
-  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageEventLogSize|0x0|UINT32|0x0000100f
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   gEfiUnixPkgTokenSpaceGuid.PcdUnixBootMode|1|UINT32|0x00001006
