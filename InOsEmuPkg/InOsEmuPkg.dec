@@ -1,0 +1,85 @@
+## @file
+#
+# This is the Emu Emulation Environment Platform
+#
+# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved. 
+#
+#    This program and the accompanying materials are licensed and made available 
+#    under the terms and conditions of the BSD License which accompanies this distribution.
+#    The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
+#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
+#    OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  DEC_VERSION                    = 0x00010005
+  PACKAGE_NAME                   = InOsEmuPkg
+  PACKAGE_GUID                   = 36E48BD7-7D92-5A47-A2CD-513F072E3300
+  PACKAGE_VERSION                = 0.1
+
+
+[Includes]
+  Include
+
+
+[LibraryClasses]
+  ThunkPpiList|Include/Library/ThunkPpiList.h
+  ThunkProtocolList|Include/Library/ThunkProtocolList.h
+  EmuThunkLib|Include/Library/EmuThunkLib.h
+  KeyMap|Include/Library/KeyMapLib.h
+
+[Protocols]
+  gEmuThunkProtocolGuid          = { 0x398DCA31, 0x3505, 0xDB47, { 0xBD, 0x93, 0x1D, 0x38, 0x5F, 0x79, 0x13, 0x15 } }
+  gEmuIoThunkProtocolGuid        = { 0x453368F6, 0x7C85, 0x434A, { 0xA9, 0x8A, 0x72, 0xD1, 0xB7, 0xFF, 0xA9, 0x26 } }
+  gEmuGraphicsWindowProtocolGuid = { 0x30FD316A, 0x6728, 0x2E41, { 0xA6, 0x90, 0x0D, 0x13, 0x33, 0xD8, 0xCA, 0xC1 } }
+  gEmuPthreadThunkProtocolGuid   = { 0x3B1E4B7C, 0x09D8, 0x944F, { 0xA4, 0x08, 0x13, 0x09, 0xEB, 0x8B, 0x44, 0x27 } }
+
+[Ppis]
+  gEmuThunkPpiGuid                  = { 0xE113F896, 0x75CF, 0xF640, { 0x81, 0x7F, 0xC8, 0x5A, 0x79, 0xE8, 0xAE, 0x67 } }
+  gEmuPeiServicesTableUpdatePpiGuid =  { 0xFA93020C, 0x6CDF, 0x1946, { 0x86, 0x35, 0x72, 0xCB, 0x51, 0x9E, 0xCF, 0xFD } }
+
+
+[Guids]
+  gInOsEmuPkgTokenSpaceGuid  = { 0x4F792E68, 0xE8C8, 0x794E, { 0xB1, 0xD8, 0x37, 0x03, 0xF3, 0xF2, 0xD5, 0xA5 } }
+  gEmuSystemConfigGuid       = { 0xF8626165, 0x6CEB, 0x924A, { 0xBA, 0xFC, 0xF1, 0x3A, 0xB9, 0xD6, 0x57, 0x28 } }
+
+#  gEmuVirtualDisksGuid       = {0xf2ba331a, 0x8985, 0x11db, {0xa4, 0x06, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+#  gEmuPhysicalDisksGuid      = {0xf2bdcc96, 0x8985, 0x11db, {0x87, 0x19, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+#  gEmuFileSystemGuid         = {0xf2c16b9e, 0x8985, 0x11db, {0x92, 0xc8, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+#  gEmuSerialPortGuid         = {0x6d3a727d, 0x66c8, 0x4d19, {0x87, 0xe6, 0x02, 0x15, 0x86, 0x14, 0x90, 0xf3}}
+#  gEmuNetworkGuid            = {0x081603B4, 0x0F1D, 0x4022, {0xB6, 0xFD, 0x4C, 0xE3, 0x5E, 0x09, 0xA1, 0xA6}}
+
+[PcdsFixedAtBuild]
+   gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageVariableBase|0x0|UINT64|0x00001014
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwSpareBase|0x0|UINT64|0x00001015
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwWorkingBase|0x0|UINT64|0x00001016
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFdBaseAddress|0x0|UINT64|0x00001017
+
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogBase|0x0|UINT64|0x0000100e
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogSize|0x0|UINT32|0x0000100f
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashFvRecoveryBase|0x0|UINT64|0x00001010
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashFvRecoverySize|0x0|UINT32|0x00001011
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFirmwareFdSize|0x0|UINT32|0x00001012
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFirmwareBlockSize|0|UINT32|0x00001013
+ 
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuApCount|L"0"|VOID*|0x00001019
+
+[PcdsFixedAtBuild, PcdsPatchableInModule] 
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuBootMode|1|UINT32|0x00001006
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuMemorySize|L"64!64"|VOID*|0x0000100c
+  
+
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuPhysicalDisk|L"E:RW;245760;512"|VOID*|0x00001000
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"FW;40960;512"|VOID*|0x00001001
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"|VOID*|0x00001018
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFileSystem|L".!../../../../../EdkShellBinPkg/bin/ia32/Apps"|VOID*|0x00001004
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuSerialPort|L"/dev/ttyS0"|VOID*|0x00001002
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuNetworkInterface|L"en0"|VOID*|0x0000100d
+
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuCpuModel|L"Intel(R) Processor Model"|VOID*|0x00001007
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuCpuSpeed|L"3000"|VOID*|0x00001008
+
+
