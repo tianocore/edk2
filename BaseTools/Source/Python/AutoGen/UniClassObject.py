@@ -121,7 +121,7 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
         if length == 3 and LangName.isalpha():
             TempLangName = LangConvTable.get(LangName.lower())
             if TempLangName != None:
-               return TempLangName
+                return TempLangName
             return LangName
         else:
             EdkLogger.error("Unicode File Parser", FORMAT_INVALID, "Invalid ISO 639-2 language code : %s" % LangName, File)
@@ -298,13 +298,36 @@ class UniFileClassObject(object):
         #
         # Use unique identifier
         #
+        FindFlag = -1
+        LineCount = 0
         for Line in FileIn:
+            Line = FileIn[LineCount]
+            LineCount += 1
             Line = Line.strip()
             #
             # Ignore comment line and empty line
             #
             if Line == u'' or Line.startswith(u'//'):
                 continue
+            
+            #
+            # Process comment embeded in string define lines
+            #
+            FindFlag = Line.find(u'//')
+            if FindFlag != -1:
+                Line = Line.replace(Line[FindFlag:], u' ')
+                if FileIn[LineCount].strip().startswith('#language'):
+                    Line = Line + FileIn[LineCount]
+                    FileIn[LineCount-1] = Line
+                    FileIn[LineCount] = os.linesep
+                    LineCount -= 1
+                    for Index in xrange (LineCount + 1, len (FileIn) - 1):
+                        if (Index == len(FileIn) -1):
+                            FileIn[Index] = os.linesep
+                        else:
+                            FileIn[Index] = FileIn[Index + 1]
+                    continue
+                              
             Line = Line.replace(u'/langdef', u'#langdef')
             Line = Line.replace(u'/string', u'#string')
             Line = Line.replace(u'/language', u'#language')
@@ -566,6 +589,6 @@ class UniFileClassObject(object):
 if __name__ == '__main__':
     EdkLogger.Initialize()
     EdkLogger.SetLevel(EdkLogger.DEBUG_0)
-    a = UniFileClassObject(['C:\\Edk\\Strings.uni', 'C:\\Edk\\Strings2.uni'])
+    a = UniFileClassObject([PathClass("C:\\Edk\\Strings.uni"), PathClass("C:\\Edk\\Strings2.uni")])
     a.ReToken()
     a.ShowMe()

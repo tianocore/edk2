@@ -13,12 +13,9 @@ SECTIONS
     *(
       .rodata .rodata.* .gnu.linkonce.r.*
       .data .data.* .gnu.linkonce.d.*
+      .bss .bss.*
+      *COM*
     )
-    . = ALIGN(0x20);
-  }
-  .bss ALIGN(0x20) :
-  {
-    *(.bss .bss.*)
     . = ALIGN(0x20);
   }
   .got ALIGN(0x20) :

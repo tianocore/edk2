@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -263,6 +263,7 @@ ScanSections32 (
   EFI_IMAGE_DOS_HEADER            *DosHdr;
   EFI_IMAGE_OPTIONAL_HEADER_UNION *NtHdr;
   UINT32                          CoffEntry;
+  UINT32                          SectionCount;
 
   CoffEntry = 0;
   mCoffOffset = 0;
@@ -291,6 +292,7 @@ ScanSections32 (
   //
   mCoffOffset = CoffAlign(mCoffOffset);
   mTextOffset = mCoffOffset;
+  SectionCount = 0;
   for (i = 0; i < mEhdr->e_shnum; i++) {
     Elf_Shdr *shdr = GetShdrByIndex(i);
     if (IsTextShdr(shdr)) {
@@ -315,6 +317,7 @@ ScanSections32 (
       }
       mCoffSectionsOffset[i] = mCoffOffset;
       mCoffOffset += shdr->sh_size;
+      SectionCount ++;
     }
   }
 
@@ -322,10 +325,15 @@ ScanSections32 (
     mCoffOffset = CoffAlign(mCoffOffset);
   }
 
+  if (SectionCount > 1 && mOutImageType == FW_EFI_IMAGE) {
+    Warning (NULL, 0, 0, NULL, "Mulitple sections in %s are merged into 1 text section. Source level debug might not work correctly.", mInImageName);
+  }
+
   //
   //  Then data sections.
   //
   mDataOffset = mCoffOffset;
+  SectionCount = 0;
   for (i = 0; i < mEhdr->e_shnum; i++) {
     Elf_Shdr *shdr = GetShdrByIndex(i);
     if (IsDataShdr(shdr)) {
@@ -344,9 +352,14 @@ ScanSections32 (
       }
       mCoffSectionsOffset[i] = mCoffOffset;
       mCoffOffset += shdr->sh_size;
+      SectionCount ++;
     }
   }
   mCoffOffset = CoffAlign(mCoffOffset);
+
+  if (SectionCount > 1 && mOutImageType == FW_EFI_IMAGE) {
+    Warning (NULL, 0, 0, NULL, "Mulitple sections in %s are merged into 1 data section. Source level debug might not work correctly.", mInImageName);
+  }
 
   //
   //  The HII resource sections.
@@ -704,6 +717,8 @@ WriteSections32 (
   return TRUE;
 }
 
+UINTN gMovwOffset = 0;
+
 STATIC
 VOID
 WriteRelocations32 (
@@ -812,19 +827,18 @@ WriteRelocations32 (
               CoffAddFixup (
                 mCoffSectionsOffset[RelShdr->sh_info]
                 + (Rel->r_offset - SecShdr->sh_addr),
-                EFI_IMAGE_REL_BASED_ARM_THUMB_MOVW
+                EFI_IMAGE_REL_BASED_ARM_MOV32T
                 );
+
+              // PE/COFF treats MOVW/MOVT relocation as single 64-bit instruction
+              // Track this address so we can log an error for unsupported sequence of MOVW/MOVT
+              gMovwOffset = mCoffSectionsOffset[RelShdr->sh_info] + (Rel->r_offset - SecShdr->sh_addr);
               break;
 
             case R_ARM_THM_MOVT_ABS:
-              CoffAddFixup (
-                mCoffSectionsOffset[RelShdr->sh_info]
-                + (Rel->r_offset - SecShdr->sh_addr),
-                EFI_IMAGE_REL_BASED_ARM_THUMB_MOVT
-                );
-
-              // The relocation entry needs to contain the lower 16-bits so we can do math
-              CoffAddFixupEntry ((UINT16)(Sym->st_value - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx]));
+              if ((gMovwOffset + 4) !=  (mCoffSectionsOffset[RelShdr->sh_info] + (Rel->r_offset - SecShdr->sh_addr))) {
+                Error (NULL, 0, 3000, "Not Supported", "PE/COFF requires MOVW+MOVT instruction sequence %x +4 != %x.", gMovwOffset, mCoffSectionsOffset[RelShdr->sh_info] + (Rel->r_offset - SecShdr->sh_addr));
+              }
               break;
 
             case R_ARM_ABS32:

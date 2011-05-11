@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
@@ -27,6 +27,7 @@ extern CHAR8  *mInImageName;
 extern UINT32 mImageTimeStamp;
 extern UINT8  *mCoffFile;
 extern UINT32 mTableOffset;
+extern UINT32 mOutImageType;
 
 //
 // Common EFI specific data.

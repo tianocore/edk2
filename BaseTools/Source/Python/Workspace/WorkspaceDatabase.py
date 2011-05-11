@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1425,7 +1425,17 @@ class InfBuildData(ModuleBuildClassObject):
             if not self._ModuleType:
                 EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE,
                                 "MODULE_TYPE is not given", File=self.MetaFile)
-            if (self._Specification == None) or (not 'PI_SPECIFICATION_VERSION' in self._Specification) or (self._Specification['PI_SPECIFICATION_VERSION'] < 0x0001000A):
+            if self._ModuleType not in SUP_MODULE_LIST:
+                RecordList = self._RawData[MODEL_META_DATA_HEADER, self._Arch, self._Platform]
+                for Record in RecordList:
+                    Name = Record[0]
+                    if Name == "MODULE_TYPE":
+                        LineNo = Record[6]
+                        break
+                EdkLogger.error("build", FORMAT_NOT_SUPPORTED,
+                                "MODULE_TYPE %s is not supported for EDK II, valid values are:\n %s" % (self._ModuleType,' '.join(l for l in SUP_MODULE_LIST)), 
+                                File=self.MetaFile, Line=LineNo)             
+            if (self._Specification == None) or (not 'PI_SPECIFICATION_VERSION' in self._Specification) or (int(self._Specification['PI_SPECIFICATION_VERSION'], 16) < 0x0001000A):
                 if self._ModuleType == SUP_MODULE_SMM_CORE:
                     EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "SMM_CORE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x0001000A", File=self.MetaFile)                
             if self._Defs and 'PCI_DEVICE_ID' in self._Defs and 'PCI_VENDOR_ID' in self._Defs \
@@ -1894,7 +1904,12 @@ class InfBuildData(ModuleBuildClassObject):
         if self._Depex == None:
             self._Depex = tdict(False, 2)
             RecordList = self._RawData[MODEL_EFI_DEPEX, self._Arch]
-
+            
+            # If the module has only Binaries and no Sources, then ignore [Depex] 
+            if self.Sources == None or self.Sources == []:
+              if self.Binaries <> None and self.Binaries <> []:
+                return self._Depex
+                
             # PEIM and DXE drivers must have a valid [Depex] section
             if len(self.LibraryClass) == 0 and len(RecordList) == 0:
                 if self.ModuleType == 'DXE_DRIVER' or self.ModuleType == 'PEIM' or self.ModuleType == 'DXE_SMM_DRIVER' or \

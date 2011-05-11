@@ -1,7 +1,7 @@
 ## @file
 # Routines for generating AutoGen.h and AutoGen.c
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1098,6 +1098,10 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
                         ExtraData="[%s]" % str(Info))
     TokenNumber = PcdTokenNumber[TokenCName, TokenSpaceGuidCName]
 
+    # If PCD is DynamicEx, then use TokenNumber declared in DEC file
+    if Pcd.Type in gDynamicExPcd:
+        TokenNumber = int(Pcd.TokenValue, 0)
+
     if Pcd.Type not in gItemTypeStringDatabase:
         EdkLogger.error("build", AUTOGEN_ERROR,
                         "Unknown PCD type [%s] of PCD %s.%s" % (Pcd.Type, Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
@@ -1677,11 +1681,11 @@ def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
     if 'PI_SPECIFICATION_VERSION' in Info.Module.Specification:
         PiSpecVersion = Info.Module.Specification['PI_SPECIFICATION_VERSION']
     else:
-        PiSpecVersion = 0
+        PiSpecVersion = '0x00000000'
     if 'UEFI_SPECIFICATION_VERSION' in Info.Module.Specification:
         UefiSpecVersion = Info.Module.Specification['UEFI_SPECIFICATION_VERSION']
     else:
-        UefiSpecVersion = 0
+        UefiSpecVersion = '0x00000000'
     Dict = {
         'Function'       :   Info.Module.ModuleEntryPointList,
         'PiSpecVersion'  :   PiSpecVersion,
@@ -1689,14 +1693,15 @@ def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
     }
 
     if Info.ModuleType in ['PEI_CORE', 'DXE_CORE', 'SMM_CORE']:
-        if NumEntryPoints != 1:
-            EdkLogger.error(
-                "build",
-                AUTOGEN_ERROR,
-                '%s must have exactly one entry point' % Info.ModuleType,
-                File=str(Info),
-                ExtraData= ", ".join(Info.Module.ModuleEntryPointList)
-                )
+        if Info.SourceFileList <> None and Info.SourceFileList <> []:
+          if NumEntryPoints != 1:
+              EdkLogger.error(
+                  "build",
+                  AUTOGEN_ERROR,
+                  '%s must have exactly one entry point' % Info.ModuleType,
+                  File=str(Info),
+                  ExtraData= ", ".join(Info.Module.ModuleEntryPointList)
+                  )
     if Info.ModuleType == 'PEI_CORE':
         AutoGenC.Append(gPeiCoreEntryPointString.Replace(Dict))
         AutoGenH.Append(gPeiCoreEntryPointPrototype.Replace(Dict))
@@ -1827,6 +1832,23 @@ def CreatePpiDefinitionCode(Info, AutoGenC, AutoGenH):
 #   @param      AutoGenH    The TemplateString object for header file
 #
 def CreatePcdCode(Info, AutoGenC, AutoGenH):
+
+    # Collect Token Space GUIDs used by DynamicEc PCDs
+    TokenSpaceList = []
+    for Pcd in Info.ModulePcdList:
+       if Pcd.Type in gDynamicExPcd and Pcd.TokenSpaceGuidCName not in TokenSpaceList:
+            TokenSpaceList += [Pcd.TokenSpaceGuidCName]
+            
+    # Add extern declarations to AutoGen.h if one or more Token Space GUIDs were found
+    if TokenSpaceList <> []:            
+        AutoGenH.Append("\n// Definition of PCD Token Space GUIDs used in this module\n\n")
+        if Info.ModuleType in ["USER_DEFINED", "BASE"]:
+            GuidType = "GUID"
+        else:
+            GuidType = "EFI_GUID"              
+        for Item in TokenSpaceList:
+            AutoGenH.Append('extern %s %s;\n' % (GuidType, Item))
+
     if Info.IsLibrary:
         if Info.ModulePcdList:
             AutoGenH.Append("\n// PCD definitions\n")

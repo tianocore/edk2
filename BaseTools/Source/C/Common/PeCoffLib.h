@@ -159,6 +159,7 @@ PeCoffLoaderGetEntryPoint (
 
 **/
 UINT16
+EFIAPI
 ThumbMovtImmediateAddress (
   IN UINT16 *Instruction
   );
@@ -171,9 +172,39 @@ ThumbMovtImmediateAddress (
 
 **/
 VOID
+EFIAPI
 ThumbMovtImmediatePatch (
   IN OUT UINT16 *Instruction,
   IN     UINT16 Address
+  );
+
+
+/**
+  Pass in a pointer to an ARM MOVW/MOVT instruciton pair and 
+  return the immediate data encoded in the two` instruction
+
+  @param  Instructions  Pointer to ARM MOVW/MOVT insturction pair
+
+  @return Immediate address encoded in the instructions
+
+**/
+UINT32
+EFIAPI
+ThumbMovwMovtImmediateAddress (
+  IN UINT16 *Instructions
+  );
+
+/**
+  Update an ARM MOVW/MOVT immediate instruction instruction pair.
+
+  @param  Instructions  Pointer to ARM MOVW/MOVT instruction pair
+  @param  Address       New addres to patch into the instructions
+**/
+VOID
+EFIAPI
+ThumbMovwMovtImmediatePatch (
+  IN OUT UINT16 *Instructions,
+  IN     UINT32 Address
   );
 
 

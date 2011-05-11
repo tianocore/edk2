@@ -24,6 +24,8 @@ Revision History
 #include <Common/UefiBaseTypes.h>
 #include <IndustryStandard/PeImage.h>
 #include "PeCoffLib.h"
+#include "CommonLib.h"
+
 
 #define EXT_IMM64(Value, Address, Size, InstPos, ValPos)  \
     Value |= (((UINT64)((*(Address) >> InstPos) & (((UINT64)1 << Size) - 1))) << ValPos)
@@ -375,6 +377,55 @@ ThumbMovtImmediatePatch (
 }
 
 /**
+  Pass in a pointer to an ARM MOVW/MOVT instruciton pair and 
+  return the immediate data encoded in the two` instruction
+
+  @param  Instructions  Pointer to ARM MOVW/MOVT insturction pair
+
+  @return Immediate address encoded in the instructions
+
+**/
+UINT32
+EFIAPI
+ThumbMovwMovtImmediateAddress (
+  IN UINT16 *Instructions
+  )
+{
+  UINT16  *Word;
+  UINT16  *Top;
+  
+  Word = Instructions;  // MOVW
+  Top  = Word + 2;      // MOVT
+  
+  return (ThumbMovtImmediateAddress (Top) << 16) + ThumbMovtImmediateAddress (Word);
+}
+
+
+/**
+  Update an ARM MOVW/MOVT immediate instruction instruction pair.
+
+  @param  Instructions  Pointer to ARM MOVW/MOVT instruction pair
+  @param  Address       New addres to patch into the instructions
+**/
+VOID
+EFIAPI
+ThumbMovwMovtImmediatePatch (
+  IN OUT UINT16 *Instructions,
+  IN     UINT32 Address
+  )
+{
+  UINT16  *Word;
+  UINT16  *Top;
+  
+  Word = (UINT16 *)Instructions;  // MOVW
+  Top  = Word + 2;                // MOVT
+
+  ThumbMovtImmediatePatch (Word, (UINT16)(Address & 0xffff));
+  ThumbMovtImmediatePatch (Top, (UINT16)(Address >> 16));
+}
+
+
+/**
   Performs an ARM-based specific relocation fixup and is a no-op on other
   instruction sets.
 
@@ -395,38 +446,26 @@ PeCoffLoaderRelocateArmImage (
   )
 {
   UINT16      *Fixup16;
-  UINT16      FixupVal;
-  UINT16      *Addend;
+  UINT32      FixupVal;
 
-  Fixup16    = (UINT16 *) Fixup;
+  Fixup16   = (UINT16 *) Fixup;
 
   switch ((**Reloc) >> 12) {
-  case EFI_IMAGE_REL_BASED_ARM_THUMB_MOVW:
-    FixupVal = ThumbMovtImmediateAddress (Fixup16) + (UINT16)Adjust;
-    ThumbMovtImmediatePatch (Fixup16, FixupVal);
-
+  
+  case EFI_IMAGE_REL_BASED_ARM_MOV32T:
+    FixupVal = ThumbMovwMovtImmediateAddress (Fixup16) + (UINT32)Adjust;
+    ThumbMovwMovtImmediatePatch (Fixup16, FixupVal);
+    
+    
     if (*FixupData != NULL) {
-      *FixupData             = ALIGN_POINTER (*FixupData, sizeof (UINT16));
-      *(UINT16 *)*FixupData  = *Fixup16;
-      *FixupData             = *FixupData + sizeof (UINT16);
-    }
-    break;
-
-  case EFI_IMAGE_REL_BASED_ARM_THUMB_MOVT:
-    // For MOVT you need to know the lower 16-bits do do the math
-    // So this relocation entry is really two entries.
-    *Reloc = *Reloc + 1;
-    Addend = *Reloc; 
-    FixupVal = (UINT16)(((ThumbMovtImmediateAddress (Fixup16) << 16) + Adjust + *Addend) >> 16);
-    ThumbMovtImmediatePatch (Fixup16, FixupVal);
-
-    if (*FixupData != NULL) {
-      *FixupData             = ALIGN_POINTER (*FixupData, sizeof (UINT16));
-      *(UINT16 *)*FixupData  = *Fixup16;
-      *FixupData             = *FixupData + sizeof (UINT16);
+      *FixupData = ALIGN_POINTER(*FixupData, sizeof(UINT64));
+      *(UINT64 *)(*FixupData) = *Fixup16;
+      CopyMem (*FixupData, Fixup16, sizeof (UINT64));
     }
     break;
   
+  case EFI_IMAGE_REL_BASED_ARM_MOV32A:
+     // break omitted - ARM instruction encoding not implemented
   default:
     return RETURN_UNSUPPORTED;
   }

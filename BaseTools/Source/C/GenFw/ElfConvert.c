@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
@@ -170,7 +170,7 @@ ConvertElf (
   //
   // Determine ELF type and set function table pointer correctly.
   //
-  VerboseMsg ("Check Efl Image Header");
+  VerboseMsg ("Check Elf Image Header");
   EiClass = (*FileBuffer)[EI_CLASS];
   if (EiClass == ELFCLASS32) {
     if (!InitializeElf32 (*FileBuffer, &ElfFunctions)) {

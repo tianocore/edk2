@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -62,25 +62,6 @@ Abstract:
 
 #define HII_RESOURCE_SECTION_INDEX  1
 #define HII_RESOURCE_SECTION_NAME   "HII"
-//
-// Action for this tool.
-//
-#define FW_DUMMY_IMAGE                0
-#define FW_EFI_IMAGE                  1
-#define FW_TE_IMAGE                   2
-#define FW_ACPI_IMAGE                 3
-#define FW_BIN_IMAGE                  4
-#define FW_ZERO_DEBUG_IMAGE           5
-#define FW_SET_STAMP_IMAGE            6
-#define FW_MCI_IMAGE                  7
-#define FW_MERGE_IMAGE                8
-#define FW_RELOC_STRIPEED_IMAGE       9
-#define FW_HII_PACKAGE_LIST_RCIMAGE   10
-#define FW_HII_PACKAGE_LIST_BINIMAGE  11
-#define FW_REBASE_IMAGE               12
-#define FW_SET_ADDRESS_IMAGE          13
-
-#define DUMP_TE_HEADER  0x11
 
 #define DEFAULT_MC_PAD_BYTE_VALUE  0xFF
 #define DEFAULT_MC_ALIGNMENT       16
@@ -121,6 +102,7 @@ static const char *gHiiPackageRCFileHeader[] = {
 CHAR8  *mInImageName;
 UINT32 mImageTimeStamp = 0;
 UINT32 mImageSize = 0;
+UINT32 mOutImageType = FW_DUMMY_IMAGE;
 
 
 STATIC
@@ -1080,7 +1062,6 @@ Returns:
   char                             *OutImageName;
   char                             *ModuleType;
   CHAR8                            *TimeStamp;
-  UINT32                           OutImageType;
   FILE                             *fpIn;
   FILE                             *fpOut;
   FILE                             *fpInOut;
@@ -1147,7 +1128,6 @@ Returns:
   mInImageName      = NULL;
   OutImageName      = NULL;
   ModuleType        = NULL;
-  OutImageType      = FW_DUMMY_IMAGE;
   Type              = 0;
   Status            = STATUS_SUCCESS;
   FileBuffer        = NULL;
@@ -1221,8 +1201,8 @@ Returns:
         goto Finish;
       }
       ModuleType = argv[1];
-      if (OutImageType != FW_TE_IMAGE) {
-        OutImageType = FW_EFI_IMAGE;
+      if (mOutImageType != FW_TE_IMAGE) {
+        mOutImageType = FW_EFI_IMAGE;
       }
       argc -= 2;
       argv += 2;
@@ -1230,49 +1210,49 @@ Returns:
     }
 
     if ((stricmp (argv[0], "-l") == 0) || (stricmp (argv[0], "--stripped") == 0)) {
-      OutImageType = FW_RELOC_STRIPEED_IMAGE;
+      mOutImageType = FW_RELOC_STRIPEED_IMAGE;
       argc --;
       argv ++;
       continue;
     }
 
     if ((stricmp (argv[0], "-c") == 0) || (stricmp (argv[0], "--acpi") == 0)) {
-      OutImageType = FW_ACPI_IMAGE;
+      mOutImageType = FW_ACPI_IMAGE;
       argc --;
       argv ++;
       continue;
     }
 
     if ((stricmp (argv[0], "-t") == 0) || (stricmp (argv[0], "--terse") == 0)) {
-      OutImageType = FW_TE_IMAGE;
+      mOutImageType = FW_TE_IMAGE;
       argc --;
       argv ++;
       continue;
     }
 
     if ((stricmp (argv[0], "-u") == 0) || (stricmp (argv[0], "--dump") == 0)) {
-      OutImageType = DUMP_TE_HEADER;
+      mOutImageType = DUMP_TE_HEADER;
       argc --;
       argv ++;
       continue;
     }
 
     if ((stricmp (argv[0], "-b") == 0) || (stricmp (argv[0], "--exe2bin") == 0)) {
-      OutImageType = FW_BIN_IMAGE;
+      mOutImageType = FW_BIN_IMAGE;
       argc --;
       argv ++;
       continue;
     }
 
     if ((stricmp (argv[0], "-z") == 0) || (stricmp (argv[0], "--zero") == 0)) {
-      OutImageType = FW_ZERO_DEBUG_IMAGE;
+      mOutImageType = FW_ZERO_DEBUG_IMAGE;
       argc --;
       argv ++;
       continue;
     }
 
     if ((stricmp (argv[0], "-s") == 0) || (stricmp (argv[0], "--stamp") == 0)) {
-      OutImageType = FW_SET_STAMP_IMAGE;
+      mOutImageType = FW_SET_STAMP_IMAGE;
       if (argv[1] == NULL || argv[1][0] == '-') {
         Error (NULL, 0, 1003, "Invalid option value", "time stamp is missing for -s option");
         goto Finish;
@@ -1305,14 +1285,14 @@ Returns:
     }
 
     if ((stricmp (argv[0], "-m") == 0) || (stricmp (argv[0], "--mcifile") == 0)) {
-      OutImageType = FW_MCI_IMAGE;
+      mOutImageType = FW_MCI_IMAGE;
       argc --;
       argv ++;
       continue;
     }
 
     if ((stricmp (argv[0], "-j") == 0) || (stricmp (argv[0], "--join") == 0)) {
-      OutImageType = FW_MERGE_IMAGE;
+      mOutImageType = FW_MERGE_IMAGE;
       argc --;
       argv ++;
       continue;
@@ -1341,7 +1321,7 @@ Returns:
         Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
         goto Finish;
       }
-      OutImageType = FW_REBASE_IMAGE;
+      mOutImageType = FW_REBASE_IMAGE;
       NewBaseAddress = (UINT64) Temp64;
       argc -= 2;
       argv += 2;
@@ -1360,7 +1340,7 @@ Returns:
         Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
         goto Finish;
       }
-      OutImageType = FW_SET_ADDRESS_IMAGE;
+      mOutImageType = FW_SET_ADDRESS_IMAGE;
       NewBaseAddress = (UINT64) Temp64;
       argc -= 2;
       argv += 2;
@@ -1423,14 +1403,14 @@ Returns:
     }
 
     if (stricmp (argv[0], "--hiipackage") == 0) {
-      OutImageType = FW_HII_PACKAGE_LIST_RCIMAGE;
+      mOutImageType = FW_HII_PACKAGE_LIST_RCIMAGE;
       argc --;
       argv ++;
       continue;
     }
 
     if (stricmp (argv[0], "--hiibinpackage") == 0) {
-      OutImageType = FW_HII_PACKAGE_LIST_BINIMAGE;
+      mOutImageType = FW_HII_PACKAGE_LIST_BINIMAGE;
       argc --;
       argv ++;
       continue;
@@ -1475,7 +1455,7 @@ Returns:
 
   VerboseMsg ("%s tool start.", UTILITY_NAME);
 
-  if (OutImageType == FW_DUMMY_IMAGE) {
+  if (mOutImageType == FW_DUMMY_IMAGE) {
     Error (NULL, 0, 1001, "Missing option", "No create file action specified; pls specify -e, -c or -t option to create efi image, or acpi table or TeImage!");
     if (ReplaceFlag) {
       Error (NULL, 0, 1001, "Missing option", "-r option is not supported as the independent option. It can be used together with other create file option specified at the above.");
@@ -1494,7 +1474,7 @@ Returns:
   //
   // Combine MciBinary files to one file
   //
-  if ((OutImageType == FW_MERGE_IMAGE) && ReplaceFlag) {
+  if ((mOutImageType == FW_MERGE_IMAGE) && ReplaceFlag) {
     Error (NULL, 0, 1002, "Conflicting option", "-r replace option cannot be used with -j merge files option.");
     goto Finish;
   }
@@ -1502,12 +1482,12 @@ Returns:
   //
   // Combine HiiBinary packages to a single package list
   //
-  if ((OutImageType == FW_HII_PACKAGE_LIST_RCIMAGE) && ReplaceFlag) {
+  if ((mOutImageType == FW_HII_PACKAGE_LIST_RCIMAGE) && ReplaceFlag) {
     Error (NULL, 0, 1002, "Conflicting option", "-r replace option cannot be used with --hiipackage merge files option.");
     goto Finish;
   }
 
-  if ((OutImageType == FW_HII_PACKAGE_LIST_BINIMAGE) && ReplaceFlag) {
+  if ((mOutImageType == FW_HII_PACKAGE_LIST_BINIMAGE) && ReplaceFlag) {
     Error (NULL, 0, 1002, "Conflicting option", "-r replace option cannot be used with --hiibinpackage merge files option.");
     goto Finish;
   }
@@ -1521,7 +1501,7 @@ Returns:
   //
   // Action will be taken for the input file.
   //
-  switch (OutImageType) {
+  switch (mOutImageType) {
   case FW_EFI_IMAGE:
     VerboseMsg ("Create efi image on module type %s based on the input PE image.", ModuleType);
     break;
@@ -1599,7 +1579,7 @@ Returns:
       fpOut = NULL;
     }
     VerboseMsg ("Output file name is %s", OutImageName);
-  } else if (!ReplaceFlag && OutImageType != DUMP_TE_HEADER) {
+  } else if (!ReplaceFlag && mOutImageType != DUMP_TE_HEADER) {
     Error (NULL, 0, 1001, "Missing option", "output file");
     goto Finish;
   }
@@ -1634,7 +1614,7 @@ Returns:
   //
   // Combine multi binary HII package files.
   //
-  if (OutImageType == FW_HII_PACKAGE_LIST_RCIMAGE || OutImageType == FW_HII_PACKAGE_LIST_BINIMAGE) {
+  if (mOutImageType == FW_HII_PACKAGE_LIST_RCIMAGE || mOutImageType == FW_HII_PACKAGE_LIST_BINIMAGE) {
     //
     // Open output file handle.
     //
@@ -1711,7 +1691,7 @@ Returns:
     //
     // write the hii package into the binary package list file with the resource section header
     //
-    if (OutImageType == FW_HII_PACKAGE_LIST_BINIMAGE) {
+    if (mOutImageType == FW_HII_PACKAGE_LIST_BINIMAGE) {
       //
       // Create the resource section header
       //
@@ -1735,7 +1715,7 @@ Returns:
     //
     // write the hii package into the text package list rc file.
     //
-    if (OutImageType == FW_HII_PACKAGE_LIST_RCIMAGE) {
+    if (mOutImageType == FW_HII_PACKAGE_LIST_RCIMAGE) {
       for (Index = 0; gHiiPackageRCFileHeader[Index] != NULL; Index++) {
         fprintf (fpOut, "%s\n", gHiiPackageRCFileHeader[Index]);
       }
@@ -1770,7 +1750,7 @@ Returns:
   //
   // Combine MciBinary files to one file
   //
-  if (OutImageType == FW_MERGE_IMAGE) {
+  if (mOutImageType == FW_MERGE_IMAGE) {
     //
     // Open output file handle.
     //
@@ -1821,7 +1801,7 @@ Returns:
   //
   // Convert MicroCode.txt file to MicroCode.bin file
   //
-  if (OutImageType == FW_MCI_IMAGE) {
+  if (mOutImageType == FW_MCI_IMAGE) {
     fpIn = fopen (mInImageName, "r");
     if (fpIn == NULL) {
       Error (NULL, 0, 0001, "Error opening file", mInImageName);
@@ -1935,7 +1915,7 @@ Returns:
   //
   // Dump TeImage Header into output file.
   //
-  if (OutImageType == DUMP_TE_HEADER) {
+  if (mOutImageType == DUMP_TE_HEADER) {
     memcpy (&TEImageHeader, FileBuffer, sizeof (TEImageHeader));
     if (TEImageHeader.Signature != EFI_TE_IMAGE_HEADER_SIGNATURE) {
       Error (NULL, 0, 3000, "Invalid", "TE header signature of file %s is not correct.", mInImageName);
@@ -1994,12 +1974,12 @@ Returns:
   // Following code to convert dll to efi image or te image.
   // Get new image type
   //
-  if ((OutImageType == FW_EFI_IMAGE) || (OutImageType == FW_TE_IMAGE)) {
+  if ((mOutImageType == FW_EFI_IMAGE) || (mOutImageType == FW_TE_IMAGE)) {
     if (ModuleType == NULL) {
-      if (OutImageType == FW_EFI_IMAGE) {
+      if (mOutImageType == FW_EFI_IMAGE) {
         Error (NULL, 0, 1001, "Missing option", "EFI_FILETYPE");
         goto Finish;
-      } else if (OutImageType == FW_TE_IMAGE) {
+      } else if (mOutImageType == FW_TE_IMAGE) {
         //
         // Default TE Image Type is Boot service driver
         //
@@ -2047,7 +2027,7 @@ Returns:
   }
 
   //
-  // Convert EFL image to PeImage
+  // Convert ELF image to PeImage
   //
   if (IsElfHeader(FileBuffer)) {
     VerboseMsg ("Convert %s from ELF to PE/COFF.", mInImageName);
@@ -2066,7 +2046,7 @@ Returns:
   //
   // Remove reloc section from PE or TE image
   //
-  if (OutImageType == FW_RELOC_STRIPEED_IMAGE) {
+  if (mOutImageType == FW_RELOC_STRIPEED_IMAGE) {
     //
     // Check TeImage
     //
@@ -2184,7 +2164,7 @@ Returns:
   //
   // Set new base address into image
   //
-  if (OutImageType == FW_REBASE_IMAGE || OutImageType == FW_SET_ADDRESS_IMAGE) {
+  if (mOutImageType == FW_REBASE_IMAGE || mOutImageType == FW_SET_ADDRESS_IMAGE) {
     if ((PeHdr->Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) && (PeHdr->Pe32.FileHeader.Machine != IMAGE_FILE_MACHINE_IA64)) {
       if (NewBaseAddress >= 0x100000000ULL) {
         Error (NULL, 0, 3000, "Invalid", "New base address is larger than 4G for 32bit PE image");
@@ -2198,7 +2178,7 @@ Returns:
       //
       NewBaseAddress = (UINT64) (0 - NewBaseAddress);
     }
-    if (OutImageType == FW_REBASE_IMAGE) {
+    if (mOutImageType == FW_REBASE_IMAGE) {
       Status = RebaseImage (mInImageName, FileBuffer, NewBaseAddress);
     } else {
       Status = SetAddressToSectionHeader (mInImageName, FileBuffer, NewBaseAddress);
@@ -2221,7 +2201,7 @@ Returns:
   //
   // Extract bin data from Pe image.
   //
-  if (OutImageType == FW_BIN_IMAGE) {
+  if (mOutImageType == FW_BIN_IMAGE) {
     if (FileLength < PeHdr->Pe32.OptionalHeader.SizeOfHeaders) {
       Error (NULL, 0, 3000, "Invalid", "FileSize of %s is not a legal size.", mInImageName);
       goto Finish;
@@ -2230,7 +2210,7 @@ Returns:
     // Output bin data from exe file
     //
     FileLength = FileLength - PeHdr->Pe32.OptionalHeader.SizeOfHeaders;
-    memcpy (FileBuffer, FileBuffer + PeHdr->Pe32.OptionalHeader.SizeOfHeaders, FileLength);
+    memmove (FileBuffer, FileBuffer + PeHdr->Pe32.OptionalHeader.SizeOfHeaders, FileLength);
     VerboseMsg ("the size of output file is %u bytes", (unsigned) FileLength);
     goto WriteFile;
   }
@@ -2238,7 +2218,7 @@ Returns:
   //
   // Zero Debug Information of Pe Image
   //
-  if (OutImageType == FW_ZERO_DEBUG_IMAGE) {
+  if (mOutImageType == FW_ZERO_DEBUG_IMAGE) {
     Status = ZeroDebugData (FileBuffer, TRUE);
     if (EFI_ERROR (Status)) {
       Error (NULL, 0, 3000, "Invalid", "Zero DebugData Error status is 0x%x", (int) Status);
@@ -2255,7 +2235,7 @@ Returns:
   //
   // Set Time Stamp of Pe Image
   //
-  if (OutImageType == FW_SET_STAMP_IMAGE) {
+  if (mOutImageType == FW_SET_STAMP_IMAGE) {
     Status = SetStamp (FileBuffer, TimeStamp);
     if (EFI_ERROR (Status)) {
       goto Finish;
@@ -2271,7 +2251,7 @@ Returns:
   //
   // Extract acpi data from pe image.
   //
-  if (OutImageType == FW_ACPI_IMAGE) {
+  if (mOutImageType == FW_ACPI_IMAGE) {
     SectionHeader = (EFI_IMAGE_SECTION_HEADER *) ((UINT8 *) &(PeHdr->Pe32.OptionalHeader) + PeHdr->Pe32.FileHeader.SizeOfOptionalHeader);
     for (Index = 0; Index < PeHdr->Pe32.FileHeader.NumberOfSections; Index ++, SectionHeader ++) {
       if (strcmp ((char *)SectionHeader->Name, ".data") == 0 || strcmp ((char *)SectionHeader->Name, ".sdata") == 0) {
@@ -2292,7 +2272,7 @@ Returns:
         //
         // Output Apci data to file
         //
-        memcpy (FileBuffer, FileBuffer + SectionHeader->PointerToRawData, FileLength);
+        memmove (FileBuffer, FileBuffer + SectionHeader->PointerToRawData, FileLength);
         VerboseMsg ("the size of output file is %u bytes", (unsigned) FileLength);
         goto WriteFile;
       }
@@ -2599,7 +2579,7 @@ Returns:
   //
   ZeroDebugData (FileBuffer, FALSE);
 
-  if (OutImageType == FW_TE_IMAGE) {
+  if (mOutImageType == FW_TE_IMAGE) {
     if ((PeHdr->Pe32.FileHeader.NumberOfSections &~0xFF) || (Type &~0xFF)) {
       //
       // Pack the subsystem and NumberOfSections into 1 byte. Make sure they fit both.
@@ -2622,7 +2602,7 @@ Returns:
     // Update Image to TeImage
     //
     FileLength = FileLength - TEImageHeader.StrippedSize;
-    memcpy (FileBuffer + sizeof (EFI_TE_IMAGE_HEADER), FileBuffer + TEImageHeader.StrippedSize, FileLength);
+    memmove (FileBuffer + sizeof (EFI_TE_IMAGE_HEADER), FileBuffer + TEImageHeader.StrippedSize, FileLength);
     FileLength = FileLength + sizeof (EFI_TE_IMAGE_HEADER);
     memcpy (FileBuffer, &TEImageHeader, sizeof (EFI_TE_IMAGE_HEADER));
     VerboseMsg ("the size of output file is %u bytes", (unsigned) (FileLength));

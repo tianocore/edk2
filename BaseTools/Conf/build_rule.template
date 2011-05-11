@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -299,9 +299,15 @@
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
 
     <Command.GCC>
-        $(OBJCOPY) --only-keep-debug ${src} $(BIN_DIR)(+)$(MODULE_NAME).debug
+        $(OBJCOPY) --only-keep-debug ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
         $(OBJCOPY) --strip-unneeded ${src}
-        $(OBJCOPY) --add-gnu-debuglink=$(BIN_DIR)(+)$(MODULE_NAME).debug ${src}
+
+        #
+        #The below 2 lines are only needed for UNIXGCC tool chain, which genereates PE image directly
+        #
+        -$(OBJCOPY) --add-gnu-debuglink=$(DEBUG_DIR)(+)$(MODULE_NAME).debug ${src}
+        -$(CP) $(DEBUG_DIR)(+)$(MODULE_NAME).debug $(BIN_DIR)
+
         "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
         $(CP) ${dst} $(OUTPUT_DIR)
         $(CP) ${dst} $(BIN_DIR)

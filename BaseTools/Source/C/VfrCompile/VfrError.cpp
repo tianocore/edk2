@@ -2,7 +2,7 @@
   
   VfrCompiler error handler.
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -34,6 +34,7 @@ static SVFR_ERROR_HANDLE VFR_ERROR_HANDLE_TABLE [] = {
   { VFR_RETURN_VARSTOREID_REDEFINED, ": varstore id already defined" },
   { VFR_RETURN_UNDEFINED, ": undefined" },
   { VFR_RETURN_VAR_NOTDEFINED_BY_QUESTION, ": some variable has not defined by a question"},
+  { VFR_RETURN_VARSTORE_DATATYPE_REDEFINED_ERROR, ": Data Structure is defined by more than one varstores, it can't be referred as varstore, only varstore name could be used."},
   { VFR_RETURN_GET_EFIVARSTORE_ERROR, ": get efi varstore error"},
   { VFR_RETURN_EFIVARSTORE_USE_ERROR, ": can not use the efi varstore like this" },
   { VFR_RETURN_EFIVARSTORE_SIZE_ERROR, ": unsupport efi varstore size should be <= 8 bytes" },

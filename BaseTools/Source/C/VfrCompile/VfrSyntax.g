@@ -1,5 +1,5 @@
 /*++
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -233,6 +233,11 @@ VfrParserStart (
 #token Refresh("refresh")                       "refresh"
 #token Interval("interval")                     "interval"
 #token VarstoreDevice("varstoredevice")         "varstoredevice"
+#token GuidOp("guidop")                         "guidop"
+#token EndGuidOp("endguidop")                   "endguidop"
+#token DataType("datatype")                     "datatype"
+#token Data("data")                             "data"
+
 //
 // Define the class and subclass tokens
 //
@@ -559,9 +564,194 @@ vfrFormSetList :
     vfrStatementVarStoreNameValue |
     vfrStatementDefaultStore      |
     vfrStatementDisableIfFormSet  |
-    vfrStatementSuppressIfFormSet
+    vfrStatementSuppressIfFormSet |
+    vfrStatementExtension
   )*
   ;
+
+vfrStatementExtension:
+  << 
+     EFI_GUID Guid;
+     CIfrGuid *GuidObj = NULL;
+     CHAR8    *TypeName = NULL;
+     UINT32   TypeSize = 0;
+     UINT8    *DataBuff = NULL;
+     UINT32   Size = 0;
+     UINT8    Idx = 0;
+     UINT32   LineNum;
+     BOOLEAN  IsStruct = FALSE;
+     UINT32   ArrayNum = 0;
+  >>
+  L:GuidOp
+  Uuid "=" guidDefinition[Guid]
+  {"," DataType "=" 
+    (
+        U64:"UINT64" {OpenBracket AN1:Number CloseBracket <<ArrayNum = _STOU32(AN1->getText());>>}
+                                                      << TypeName = U64->getText(); LineNum = U64->getLine(); >>
+      | U32:"UINT32" {OpenBracket AN2:Number CloseBracket <<ArrayNum = _STOU32(AN2->getText());>>}
+                                                      << TypeName = U32->getText(); LineNum = U32->getLine(); >>
+      | U16:"UINT16" {OpenBracket AN3:Number CloseBracket <<ArrayNum = _STOU32(AN3->getText());>>}
+                                                      << TypeName = U16->getText(); LineNum = U16->getLine(); >>
+      | U8:"UINT8"   {OpenBracket AN4:Number CloseBracket <<ArrayNum = _STOU32(AN4->getText());>>}
+                                                      << TypeName = U8->getText(); LineNum = U8->getLine(); >>
+      | BL:"BOOLEAN" {OpenBracket AN5:Number CloseBracket <<ArrayNum = _STOU32(AN5->getText());>>}
+                                                      << TypeName = BL->getText(); LineNum = BL->getLine(); >>
+      | SI:"EFI_STRING_ID" {OpenBracket AN6:Number CloseBracket <<ArrayNum = _STOU32(AN6->getText());>>}
+                                                      << TypeName = SI->getText(); LineNum = SI->getLine(); >>
+      | D:"EFI_HII_DATE" {OpenBracket AN7:Number CloseBracket <<ArrayNum = _STOU32(AN7->getText());>>}
+                                                      << TypeName = D->getText(); LineNum = D->getLine(); IsStruct = TRUE;>>
+      | T:"EFI_HII_TIME" {OpenBracket AN8:Number CloseBracket <<ArrayNum = _STOU32(AN8->getText());>>}
+                                                      << TypeName = T->getText(); LineNum = T->getLine(); IsStruct = TRUE;>>
+      | TN:StringIdentifier {OpenBracket AN9:Number CloseBracket <<ArrayNum = _STOU32(AN9->getText());>>}
+                                                      << TypeName = TN->getText(); LineNum = TN->getLine(); IsStruct = TRUE;>>
+    )
+                                                      <<
+                                                        _PCATCH(gCVfrVarDataTypeDB.GetDataTypeSize(TypeName, &TypeSize), LineNum);
+                                                        if (ArrayNum > 0) {
+                                                          Size = TypeSize*ArrayNum;
+                                                        } else {
+                                                          Size = TypeSize;
+                                                        }
+                                                        if (Size > (128 - sizeof (EFI_IFR_GUID))) return;
+                                                        DataBuff = (UINT8 *)malloc(Size);
+                                                        for (Idx = 0; Idx < Size; Idx++) {
+                                                          DataBuff[Idx] = 0;
+                                                        }
+                                                      >>
+    vfrExtensionData [DataBuff, Size, TypeName, TypeSize, IsStruct, ArrayNum]
+  }
+                                                      <<
+                                                        {
+                                                         GuidObj = new CIfrGuid(Size);
+                                                         if (GuidObj != NULL) {
+                                                           GuidObj->SetLineNo(L->getLine());
+                                                           GuidObj->SetGuid (&Guid);
+                                                         }
+                                                        }
+                                                        if (TypeName != NULL) {
+                                                          GuidObj->SetData(DataBuff, Size);
+                                                        }
+                                                      >>
+  {","
+    (
+      vfrStatementExtension
+    )*
+  E:EndGuidOp                                         << GuidObj->SetScope(1); CRT_END_OP (E); >>
+  }
+                                                      <<
+                                                         if (GuidObj != NULL) delete GuidObj;
+                                                         if (DataBuff != NULL) free(DataBuff);
+                                                      >>
+  ";"
+;
+
+vfrExtensionData[UINT8 *DataBuff, UINT32 Size, CHAR8 *TypeName, UINT32 TypeSize, BOOLEAN IsStruct, UINT32 ArrayNum]:
+  <<
+     CHAR8    *TFName = NULL;
+     UINT32   ArrayIdx = 0;
+     UINT16   FieldOffset;
+     UINT8    FieldType;
+     UINT32   FieldSize;
+     UINT64   Data_U64 = 0;
+     UINT32   Data_U32 = 0;
+     UINT16   Data_U16 = 0;
+     UINT8    Data_U8 = 0;
+     BOOLEAN  Data_BL = 0;
+     EFI_STRING_ID Data_SID = 0;
+     BOOLEAN  IsArray = FALSE;
+     UINT8    *ByteOffset = NULL;
+  >>
+(
+  ("," "data" {OpenBracket IDX1:Number CloseBracket <<IsArray = TRUE;>>}
+          <<
+            ArrayIdx = 0;
+            if (IsArray == TRUE) {
+              ArrayIdx = _STOU8(IDX1->getText());
+              if (ArrayIdx >= ArrayNum) return;
+              IsArray = FALSE;
+            }
+            ByteOffset = DataBuff + (ArrayIdx * TypeSize);
+            if (IsStruct == TRUE) {
+              _STRCAT(&TFName, TypeName);
+            }
+          >>
+    ("." FN:StringIdentifier
+          <<
+            if (IsStruct == TRUE) {
+              _STRCAT(&TFName, ".");
+              _STRCAT(&TFName, FN->getText());
+            }
+          >>
+        {
+          OpenBracket IDX2:Number CloseBracket
+            <<
+              if (IsStruct == TRUE) {
+                _STRCAT(&TFName, "[");
+                _STRCAT(&TFName, IDX2->getText());
+                _STRCAT(&TFName, "]");
+              }
+            >>
+        }
+    )*
+    "=" RD:Number
+          <<
+            if (IsStruct == FALSE) {
+              if (strcmp ("UINT64", TypeName) == 0) {
+                Data_U64 = _STOU64(RD->getText());
+                memcpy (ByteOffset, &Data_U64, TypeSize);
+              }else if (strcmp ("UINT32", TypeName) == 0) {
+                Data_U32 = _STOU32(RD->getText());
+                memcpy (ByteOffset, &Data_U32, TypeSize);                                                    
+              }else if (strcmp ("UINT16", TypeName) == 0) {
+                Data_U16 = _STOU16(RD->getText());
+                memcpy (ByteOffset, &Data_U16, TypeSize);                                                    
+              }else if (strcmp ("UINT8", TypeName) == 0) {
+                Data_U8 = _STOU8(RD->getText());
+                memcpy (ByteOffset, &Data_U8, TypeSize);                                                    
+              }else if (strcmp ("BOOLEAN", TypeName)== 0) {
+                Data_BL = _STOU8(RD->getText());
+                memcpy (ByteOffset, &Data_BL, TypeSize);                                                    
+              }else if (strcmp ("EFI_STRING_ID", TypeName) == 0) {
+                Data_SID = _STOSID(RD->getText());
+                memcpy (ByteOffset, &Data_SID, TypeSize);                                                    
+              }
+            } else {
+              gCVfrVarDataTypeDB.GetDataFieldInfo(TFName, FieldOffset, FieldType, FieldSize);
+              switch (FieldType) {
+              case EFI_IFR_TYPE_NUM_SIZE_8:
+                 Data_U8 = _STOU8(RD->getText());
+                 memcpy (ByteOffset + FieldOffset, &Data_U8, FieldSize);
+                 break;
+              case EFI_IFR_TYPE_NUM_SIZE_16:
+                 Data_U16 = _STOU16(RD->getText());
+                 memcpy (ByteOffset + FieldOffset, &Data_U16, FieldSize);
+                 break;
+              case EFI_IFR_TYPE_NUM_SIZE_32:
+                 Data_U32 = _STOU32(RD->getText());
+                 memcpy (ByteOffset + FieldOffset, &Data_U32, FieldSize);
+                 break;
+              case EFI_IFR_TYPE_NUM_SIZE_64:
+                 Data_U64 = _STOU64(RD->getText());
+                 memcpy (ByteOffset + FieldOffset, &Data_U64, FieldSize);
+                 break;
+              case EFI_IFR_TYPE_BOOLEAN:
+                 Data_BL = _STOU8(RD->getText());
+                 memcpy (ByteOffset + FieldOffset, &Data_BL, FieldSize);
+                 break;
+              case EFI_IFR_TYPE_STRING:
+                 Data_SID = _STOSID(RD->getText());
+                 memcpy (ByteOffset + FieldOffset, &Data_SID, FieldSize);
+                 break;
+              default:
+                 break;
+              }
+            }
+            if (TFName != NULL) { delete TFName; TFName = NULL; }
+          >>
+  )*
+)
+;
+
 
 vfrStatementDefaultStore :
   << UINT16  DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD; >>
@@ -1060,7 +1250,8 @@ vfrFormDefinition :
     vfrStatementLabel                        |
     vfrStatementBanner                       |
     // Just for framework vfr compatibility
-    vfrStatementInvalid
+    vfrStatementInvalid                      |
+    vfrStatementExtension
   )*
   E:EndForm                                         <<
                                                       if (mCompatibleMode) {
@@ -1118,7 +1309,8 @@ vfrFormMapDefinition :
     vfrStatementQuestions                    |
     vfrStatementConditional                  |
     vfrStatementLabel                        |
-    vfrStatementBanner
+    vfrStatementBanner                       |
+    vfrStatementExtension
   )*
   E:EndForm                                         << CRT_END_OP (E); >>
   ";"
@@ -2146,7 +2338,8 @@ vfrStatementQuestionTag :
   vfrStatementNoSubmitIf        |
   vfrStatementDisableIfQuest    |
   vfrStatementRefresh           |
-  vfrStatementVarstoreDevice
+  vfrStatementVarstoreDevice    |
+  vfrStatementExtension
   ;
 
 vfrStatementQuestionTagList :
@@ -2175,6 +2368,7 @@ vfrStatementStatList :
   vfrStatementQuestions                   |
   vfrStatementConditionalNew              |
   vfrStatementLabel                       |
+  vfrStatementExtension                   |
   // Just for framework vfr compatibility
   vfrStatementInvalid
   ;

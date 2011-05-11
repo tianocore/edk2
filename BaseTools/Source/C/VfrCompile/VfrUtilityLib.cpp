@@ -2,7 +2,7 @@
   
   Vfr common library functions.
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -620,6 +620,9 @@ CVfrVarDataTypeDB::ExtractFieldNameAndArrary (
     }
     ArrayIdx = _STR2U32 (ArrayStr);
     if (*VarStr == ']') {
+      VarStr++;
+    }
+    if (*VarStr == '.') {
       VarStr++;
     }
     return VFR_RETURN_SUCCESS;
@@ -1456,10 +1459,8 @@ CVfrDataStorage::DeclareNameVarStoreBegin (
     return VFR_RETURN_FATAL_ERROR;
   }
 
-  for (pNode = mNameVarStoreList; pNode != NULL; pNode = pNode->mNext) {
-    if (strcmp (pNode->mVarStoreName, StoreName) == 0) {
-      return VFR_RETURN_REDEFINED;
-    }
+  if (GetVarStoreId (StoreName, &VarStoreId) == VFR_RETURN_SUCCESS) {
+    return VFR_RETURN_REDEFINED;
   }
 
   VarStoreId = GetFreeVarStoreId (EFI_VFR_VARSTORE_NAME);
@@ -1531,10 +1532,8 @@ CVfrDataStorage::DeclareEfiVarStore (
     return VFR_RETURN_EFIVARSTORE_SIZE_ERROR;
   }
 
-  for (pNode = mEfiVarStoreList; pNode != NULL; pNode = pNode->mNext) {
-    if (strcmp (pNode->mVarStoreName, StoreName) == 0) {
-      return VFR_RETURN_REDEFINED;
-    }
+  if (GetVarStoreId (StoreName, &VarStoreId) == VFR_RETURN_SUCCESS) {
+    return VFR_RETURN_REDEFINED;
   }
 
   VarStoreId = GetFreeVarStoreId (EFI_VFR_VARSTORE_EFI);
@@ -1560,9 +1559,14 @@ CVfrDataStorage::DeclareBufferVarStore (
 {
   SVfrVarStorageNode   *pNew = NULL;
   SVfrDataType         *pDataType = NULL;
+  EFI_VARSTORE_ID      TempVarStoreId;
 
   if ((StoreName == NULL) || (Guid == NULL) || (DataTypeDB == NULL)) {
     return VFR_RETURN_FATAL_ERROR;
+  }
+
+  if (GetVarStoreId (StoreName, &TempVarStoreId) == VFR_RETURN_SUCCESS) {
+    return VFR_RETURN_REDEFINED;
   }
 
   CHECK_ERROR_RETURN(DataTypeDB->GetDataType (TypeName, &pDataType), VFR_RETURN_SUCCESS);
@@ -1591,11 +1595,50 @@ CVfrDataStorage::DeclareBufferVarStore (
 }
 
 EFI_VFR_RETURN_CODE 
+CVfrDataStorage::GetVarStoreByDataType (
+  IN  CHAR8              *DataTypeName,
+  OUT SVfrVarStorageNode **VarNode
+  )
+{
+  SVfrVarStorageNode    *pNode;
+  SVfrVarStorageNode    *MatchNode;
+  
+  //
+  // Framework VFR uses Data type name as varstore name, so don't need check again.
+  //
+  if (VfrCompatibleMode) {
+    return VFR_RETURN_UNDEFINED;
+  }
+
+  MatchNode = NULL;
+  for (pNode = mBufferVarStoreList; pNode != NULL; pNode = pNode->mNext) {
+    if (strcmp (pNode->mStorageInfo.mDataType->mTypeName, DataTypeName) == 0) {
+      if (MatchNode == NULL) {
+        MatchNode = pNode;
+      } else {
+        //
+        // More than one varstores referred the same data structures.
+        //
+        return VFR_RETURN_VARSTORE_DATATYPE_REDEFINED_ERROR;
+      }
+    }
+  }
+  
+  if (MatchNode == NULL) {
+    return VFR_RETURN_UNDEFINED;
+  }
+
+  *VarNode = MatchNode;
+  return VFR_RETURN_SUCCESS;
+}
+
+EFI_VFR_RETURN_CODE 
 CVfrDataStorage::GetVarStoreId (
   IN  CHAR8           *StoreName,
   OUT EFI_VARSTORE_ID *VarStoreId
   )
 {
+  EFI_VFR_RETURN_CODE   ReturnCode;
   SVfrVarStorageNode    *pNode;
 
   for (pNode = mBufferVarStoreList; pNode != NULL; pNode = pNode->mNext) {
@@ -1623,8 +1666,18 @@ CVfrDataStorage::GetVarStoreId (
   }
 
   mCurrVarStorageNode = NULL;
-  *VarStoreId        = EFI_VARSTORE_ID_INVALID;
-  return VFR_RETURN_UNDEFINED;
+  *VarStoreId         = EFI_VARSTORE_ID_INVALID;
+
+  //
+  // Assume that Data strucutre name is used as StoreName, and check again. 
+  //
+  ReturnCode = GetVarStoreByDataType (StoreName, &pNode);
+  if (pNode != NULL) {
+    mCurrVarStorageNode = pNode;
+    *VarStoreId = pNode->mVarStoreId;
+  }
+  
+  return ReturnCode;
 }
 
 EFI_VFR_RETURN_CODE
@@ -1634,6 +1687,7 @@ CVfrDataStorage::GetBufferVarStoreDataTypeName (
   )
 {
   SVfrVarStorageNode    *pNode;
+  EFI_VFR_RETURN_CODE   ReturnCode;
 
   if ((StoreName == NULL) || (DataTypeName == NULL)) {
     return VFR_RETURN_FATAL_ERROR;
@@ -1645,8 +1699,16 @@ CVfrDataStorage::GetBufferVarStoreDataTypeName (
     }
   }
 
+  ReturnCode = VFR_RETURN_UNDEFINED;
+  //
+  // Assume that Data strucutre name is used as StoreName, and check again. 
+  //
   if (pNode == NULL) {
-    return VFR_RETURN_UNDEFINED;
+    ReturnCode = GetVarStoreByDataType (StoreName, &pNode);
+  }
+
+  if (pNode == NULL) {
+    return ReturnCode;
   }
 
   if (pNode->mStorageInfo.mDataType == NULL) {
@@ -1664,6 +1726,7 @@ CVfrDataStorage::GetVarStoreType (
   )
 {
   SVfrVarStorageNode    *pNode;
+  EFI_VFR_RETURN_CODE   ReturnCode;
 
   if (StoreName == NULL) {
     return VFR_RETURN_FATAL_ERROR;
@@ -1691,7 +1754,16 @@ CVfrDataStorage::GetVarStoreType (
   }
 
   VarStoreType = EFI_VFR_VARSTORE_INVALID;
-  return VFR_RETURN_UNDEFINED;
+
+  //
+  // Assume that Data strucutre name is used as StoreName, and check again. 
+  //
+  ReturnCode = GetVarStoreByDataType (StoreName, &pNode);
+  if (pNode != NULL) {
+    VarStoreType = pNode->mVarStoreType;
+  }
+  
+  return ReturnCode;
 }
 
 EFI_VFR_VARSTORE_TYPE
@@ -1841,6 +1913,7 @@ CVfrDataStorage::BufferVarStoreRequestElementAdd (
 {
   SVfrVarStorageNode    *pNode = NULL;
   EFI_IFR_TYPE_VALUE    Value = gZeroEfiIfrTypeValue;
+  EFI_VFR_RETURN_CODE   ReturnCode;
 
   for (pNode = mBufferVarStoreList; pNode != NULL; pNode = pNode->mNext) {
     if (strcmp (pNode->mVarStoreName, StoreName) == 0) {
@@ -1848,8 +1921,16 @@ CVfrDataStorage::BufferVarStoreRequestElementAdd (
     }
   }
 
+  ReturnCode = VFR_RETURN_UNDEFINED;
+  //
+  // Assume that Data strucutre name is used as StoreName, and check again. 
+  //
   if (pNode == NULL) {
-    return VFR_RETURN_UNDEFINED;
+    ReturnCode = GetVarStoreByDataType (StoreName, &pNode);
+  }
+
+  if (pNode == NULL) {
+    return ReturnCode;
   }
 
   gCVfrBufferConfig.Open ();

@@ -4,7 +4,7 @@
 # This module contains the functionality to generate build report after
 # build all target completes successfully.
 #
-# Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -486,7 +486,7 @@ class ModuleReport(object):
             #
             if ModuleType == "DXE_SMM_DRIVER":
                 PiSpec =  M.Module.Specification.get("PI_SPECIFICATION_VERSION", "0x00010000")
-                if int(PiSpec, 0) >= 0x0001000A:
+                if int(PiSpec, 16) >= 0x0001000A:
                     ModuleType = "SMM_DRIVER"
             self.DriverType = gDriverTypeMap.get(ModuleType, "0x2 (FREE_FORM)")
         self.UefiSpecVersion = M.Module.Specification.get("UEFI_SPECIFICATION_VERSION", "")

@@ -180,8 +180,10 @@ class ToolDefClassObject(object):
         EnvReference = gEnvRefPattern.findall(Value)
         for Ref in EnvReference:
             if Ref not in self.MacroDictionary:
-                return False, Ref
-            Value = Value.replace(Ref, self.MacroDictionary[Ref])
+                Value = Value.replace(Ref, "")
+            else:
+                Value = Value.replace(Ref, self.MacroDictionary[Ref])
+ 
 
         MacroReference = gMacroRefPattern.findall(Value)
         for Ref in MacroReference:

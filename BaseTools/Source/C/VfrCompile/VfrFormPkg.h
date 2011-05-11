@@ -2,7 +2,7 @@
   
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1694,6 +1694,25 @@ public:
 
   VOID SetTimeout (IN UINT16 Timeout) {
     mTimeout->TimeOut = Timeout;
+  }
+};
+
+class CIfrGuid : public CIfrObj, public CIfrOpHeader {
+private:
+  EFI_IFR_GUID *mGuid;
+
+public:
+  CIfrGuid (UINT8 Size) : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)&mGuid, sizeof (EFI_IFR_GUID)+Size),
+                  CIfrOpHeader (EFI_IFR_GUID_OP, &mGuid->Header, sizeof (EFI_IFR_GUID)+Size) {
+    memset (&mGuid->Guid, 0, sizeof (EFI_GUID));
+  }
+
+  VOID SetGuid (IN EFI_GUID *Guid) {
+    memcpy (&mGuid->Guid, Guid, sizeof (EFI_GUID));
+  }
+
+  VOID SetData (IN UINT8* DataBuff, IN UINT8 Size) {
+    memcpy ((UINT8 *)mGuid + sizeof (EFI_IFR_GUID), DataBuff, Size);
   }
 };
 

@@ -2,7 +2,7 @@
   
   VfrCompiler internal defintions.
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -23,7 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define PROGRAM_NAME                       "VfrCompile"
 #define VFR_COMPILER_VERSION               " 1.95 (UEFI 2.1)"
-#define VFR_COMPILER_UPDATE_TIME           " updated on 2009/05/20"
+#define VFR_COMPILER_UPDATE_TIME           " updated on 2011/02/25"
 //
 // This is how we invoke the C preprocessor on the VFR source file
 // to resolve #defines, #includes, etc. To make C source files

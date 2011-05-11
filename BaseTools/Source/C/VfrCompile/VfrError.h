@@ -2,7 +2,7 @@
   
   VfrCompiler Error definition
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -32,6 +32,7 @@ typedef enum {
   VFR_RETURN_VARSTOREID_REDEFINED,
   VFR_RETURN_UNDEFINED,
   VFR_RETURN_VAR_NOTDEFINED_BY_QUESTION,
+  VFR_RETURN_VARSTORE_DATATYPE_REDEFINED_ERROR,
   VFR_RETURN_GET_EFIVARSTORE_ERROR,
   VFR_RETURN_EFIVARSTORE_USE_ERROR,
   VFR_RETURN_EFIVARSTORE_SIZE_ERROR,

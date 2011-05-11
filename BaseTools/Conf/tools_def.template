@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -154,11 +154,11 @@ DEFINE DEFAULT_WIN_ASL_OUTFLAGS = DEF(IASL_OUTFLAGS)
 
 DEFINE MSFT_ASLPP_FLAGS        = /nologo /E /C /FIAutoGen.h
 DEFINE MSFT_ASLCC_FLAGS        = /nologo /c /FIAutoGen.h /TC /Dmain=ReferenceAcpiTable
-DEFINE MSFT_ASLDLINK_FLAGS     = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER
+DEFINE MSFT_ASLDLINK_FLAGS     = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:CONSOLE
 
 DEFINE ICC_WIN_ASLPP_FLAGS     = /nologo /E /C /FIAutoGen.h
 DEFINE ICC_WIN_ASLCC_FLAGS     = /nologo /c /FIAutoGen.h /TC /Dmain=ReferenceAcpiTable
-DEFINE ICC_WIN_ASLDLINK_FLAGS  = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /NODEFAULTLIB:libmmt /NODEFAULTLIB:libirc
+DEFINE ICC_WIN_ASLDLINK_FLAGS  = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:CONSOLE /NODEFAULTLIB:libmmt /NODEFAULTLIB:libirc
 
 DEFINE IPHONE_TOOLS            = /Developer/Platforms/iPhoneOS.platform/Developer
 DEFINE RVCT31_TOOLS_PATH       = c:/Program Files/ARM/RVCT/Programs/3.1/569/win_32-pentium
@@ -166,6 +166,11 @@ DEFINE RVCT31CYGWIN_TOOLS_PATH = /cygdrive/c/Program Files/ARM/RVCT/Programs/3.1
 
 DEFINE SOURCERY_TOOLS        = c:/Program Files/CodeSourcery/Sourcery G++ Lite/bin
 DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G++ Lite/bin
+
+#
+# Change to the location clang was built
+#
+DEFINE CLANG_BIN = /usr/bin/
 
 ####################################################################################
 #
@@ -1598,10 +1603,10 @@ DEFINE GCC_IPF_RC_FLAGS            = -I binary -O elf64-ia64-little -B ia64 --re
 DEFINE GCC44_ALL_CC_FLAGS            = -g -fshort-wchar -fno-stack-protector -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-array-bounds -ffunction-sections -fdata-sections -c -include AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
 DEFINE GCC44_IA32_CC_FLAGS           = DEF(GCC44_ALL_CC_FLAGS) -m32 -malign-double -D EFI32
 DEFINE GCC44_X64_CC_FLAGS            = DEF(GCC44_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -DNO_BUILTIN_VA_FUNCS -mno-red-zone -Wno-address -mcmodel=large
-DEFINE GCC44_IA32_X64_DLINK_COMMON   = -nostdlib -n -q --gc-sections
+DEFINE GCC44_IA32_X64_DLINK_COMMON   = -nostdlib -n -q --gc-sections --script=$(EDK_TOOLS_PATH)/Scripts/gcc4.4-ld-script
 DEFINE GCC44_IA32_X64_ASLDLINK_FLAGS = DEF(GCC44_IA32_X64_DLINK_COMMON) --entry ReferenceAcpiTable -u ReferenceAcpiTable
 DEFINE GCC44_IA32_X64_DLINK_FLAGS    = DEF(GCC44_IA32_X64_DLINK_COMMON) --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-DEFINE GCC44_X64_DLINK_FLAGS         = DEF(GCC44_IA32_X64_DLINK_FLAGS)  -melf_x86_64 --oformat=elf64-x86-64 --script=$(EDK_TOOLS_PATH)/Scripts/gcc4.4-ld-script
+DEFINE GCC44_X64_DLINK_FLAGS         = DEF(GCC44_IA32_X64_DLINK_FLAGS)  -melf_x86_64 --oformat=elf64-x86-64
 DEFINE GCC44_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 
 DEFINE GCC45_IA32_CC_FLAGS           = DEF(GCC44_IA32_CC_FLAGS)
@@ -1720,6 +1725,7 @@ DEFINE GCC45_ASM_FLAGS               = DEF(GCC44_ASM_FLAGS)
 ##################
 # GCC44 IA32 definitions
 ##################
+*_GCC44_IA32_OBJCOPY_PATH         = DEF(GCC44_IA32_PREFIX)objcopy
 *_GCC44_IA32_CC_PATH              = DEF(GCC44_IA32_PREFIX)gcc
 *_GCC44_IA32_SLINK_PATH           = DEF(GCC44_IA32_PREFIX)ar
 *_GCC44_IA32_DLINK_PATH           = DEF(GCC44_IA32_PREFIX)ld
@@ -1737,10 +1743,12 @@ DEFINE GCC45_ASM_FLAGS               = DEF(GCC44_ASM_FLAGS)
 *_GCC44_IA32_CC_FLAGS             = DEF(GCC44_IA32_CC_FLAGS) -Os
 *_GCC44_IA32_DLINK_FLAGS          = DEF(GCC44_IA32_X64_DLINK_FLAGS) -m elf_i386 --oformat=elf32-i386
 *_GCC44_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
+*_GCC44_IA32_OBJCOPY_FLAGS        = 
 
 ##################
 # GCC44 X64 definitions
 ##################
+*_GCC44_X64_OBJCOPY_PATH         = DEF(GCC44_X64_PREFIX)objcopy
 *_GCC44_X64_CC_PATH              = DEF(GCC44_X64_PREFIX)gcc
 *_GCC44_X64_SLINK_PATH           = DEF(GCC44_X64_PREFIX)ar
 *_GCC44_X64_DLINK_PATH           = DEF(GCC44_X64_PREFIX)ld
@@ -1758,7 +1766,7 @@ DEFINE GCC45_ASM_FLAGS               = DEF(GCC44_ASM_FLAGS)
 *_GCC44_X64_CC_FLAGS             = DEF(GCC44_X64_CC_FLAGS)
 *_GCC44_X64_DLINK_FLAGS          = DEF(GCC44_X64_DLINK_FLAGS)
 *_GCC44_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
-
+*_GCC44_X64_OBJCOPY_FLAGS        = 
 
 ####################################################################################
 #
@@ -1782,6 +1790,7 @@ DEFINE GCC45_ASM_FLAGS               = DEF(GCC44_ASM_FLAGS)
 ##################
 # GCC45 IA32 definitions
 ##################
+*_GCC45_IA32_OBJCOPY_PATH         = DEF(GCC45_IA32_PREFIX)objcopy
 *_GCC45_IA32_CC_PATH              = DEF(GCC45_IA32_PREFIX)gcc
 *_GCC45_IA32_SLINK_PATH           = DEF(GCC45_IA32_PREFIX)ar
 *_GCC45_IA32_DLINK_PATH           = DEF(GCC45_IA32_PREFIX)ld
@@ -1799,10 +1808,12 @@ DEFINE GCC45_ASM_FLAGS               = DEF(GCC44_ASM_FLAGS)
 *_GCC45_IA32_CC_FLAGS             = DEF(GCC45_IA32_CC_FLAGS) -Os
 *_GCC45_IA32_DLINK_FLAGS          = DEF(GCC45_IA32_X64_DLINK_FLAGS) -m elf_i386 --oformat=elf32-i386
 *_GCC45_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
+*_GCC45_IA32_OBJCOPY_FLAGS        = 
 
 ##################
 # GCC45 X64 definitions
 ##################
+*_GCC45_X64_OBJCOPY_PATH         = DEF(GCC45_X64_PREFIX)objcopy
 *_GCC45_X64_CC_PATH              = DEF(GCC45_X64_PREFIX)gcc
 *_GCC45_X64_SLINK_PATH           = DEF(GCC45_X64_PREFIX)ar
 *_GCC45_X64_DLINK_PATH           = DEF(GCC45_X64_PREFIX)ld
@@ -1820,7 +1831,7 @@ DEFINE GCC45_ASM_FLAGS               = DEF(GCC44_ASM_FLAGS)
 *_GCC45_X64_CC_FLAGS             = DEF(GCC45_X64_CC_FLAGS)
 *_GCC45_X64_DLINK_FLAGS          = DEF(GCC45_X64_DLINK_FLAGS)
 *_GCC45_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
-
+*_GCC45_X64_OBJCOPY_FLAGS        = 
 
 ####################################################################################
 #
@@ -3387,6 +3398,71 @@ RELEASE_XCODE32_ARM_CC_FLAGS   = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mthumb-inter
 
 ####################################################################################
 #
+# Clang Support for building on Mac OS X
+#
+####################################################################################
+#   CLANG         - clang that produce Mach-O with EFI x86_64 ABI
+*_XCLANG_*_*_FAMILY            = GCC
+*_XCLANG_*_*_BUILDRULEFAMILY   = XCODE
+
+*_XCLANG_*_ASL_PATH          = /usr/bin/iasl
+
+*_XCLANG_*_MAKE_PATH        = make
+*_XCLANG_*_DSYMUTIL_PATH    = /usr/bin/dsymutil
+
+      *_*_*_MTOC_PATH  = /usr/local/bin/mtoc
+
+  DEBUG_XCLANG_*_MTOC_FLAGS = -align 0x20 -d $(DEBUG_DIR)/$(MODULE_NAME).dll
+RELEASE_XCLANG_*_MTOC_FLAGS = -align 0x20
+
+
+*_XCLANG_*_CC_PATH      = DEF(CLANG_BIN)clang
+*_XCLANG_*_SLINK_PATH   = libtool
+*_XCLANG_*_DLINK_PATH   = ld
+*_XCLANG_*_ASM_PATH     = as
+*_XCLANG_*_PP_PATH      = DEF(CLANG_BIN)clang
+*_XCLANG_*_VFRPP_PATH   = DEF(CLANG_BIN)clang
+*_XCLANG_*_ASL_PATH     = iasl
+*_XCLANG_*_ASLCC_PATH   = DEF(CLANG_BIN)clang
+*_XCLANG_*_ASLPP_PATH   = DEF(CLANG_BIN)clang
+*_XCLANG_*_ASLDLINK_PATH  = ld
+
+####################
+# IA-32 definitions
+####################
+  DEBUG_XCLANG_IA32_DLINK_FLAGS      = -arch i386 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x240 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+RELEASE_XCLANG_IA32_DLINK_FLAGS      = -arch i386 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x220 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+*_XCLANG_IA32_SLINK_FLAGS      = -static -o
+  DEBUG_XCLANG_IA32_ASM_FLAGS  = -arch i386 -g
+RELEASE_XCLANG_IA32_ASM_FLAGS  = -arch i386 
+
+
+  DEBUG_XCLANG_IA32_CC_FLAGS   = -arch i386 -c -g -O0  -Wall -Werror -include AutoGen.h -fno-stack-protector -fno-builtin -fshort-wchar -mdynamic-no-pic -mno-sse -mno-mmx -Wno-empty-body -Wno-pointer-sign -Wno-unused-function -Wno-unused-value -Wno-missing-braces -Wno-tautological-compare -Wreturn-type -Wno-unused-variable 
+RELEASE_XCLANG_IA32_CC_FLAGS   = -arch i386 -c    -Os  -Wall -Werror -include AutoGen.h -fno-stack-protector -fno-builtin -fshort-wchar -mdynamic-no-pic -mno-sse -mno-mmx -Wno-empty-body -Wno-pointer-sign -Wno-unused-function -Wno-unused-value -Wno-missing-braces -Wno-tautological-compare -Wreturn-type -Wno-unused-variable 
+
+
+##################
+# X64 definitions
+##################
+  DEBUG_XCLANG_X64_DLINK_FLAGS      = -arch x86_64 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x240 -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+RELEASE_XCLANG_X64_DLINK_FLAGS      = -arch x86_64 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x220 -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+*_XCLANG_X64_SLINK_FLAGS      = -static -o
+  DEBUG_XCLANG_X64_ASM_FLAGS  = -arch x86_64 -g
+RELEASE_XCLANG_X64_ASM_FLAGS  = -arch x86_64 
+*_XCLANG_*_PP_FLAGS         = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h 
+*_XCLANG_*_VFRPP_FLAGS      = -x c -E -P -DVFRCOMPILE -include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h 
+
+
+  DEBUG_XCLANG_X64_CC_FLAGS   = -ccc-host-triple x86_64-pc-win32-macho -c -g -O0  -Wall -Werror -include AutoGen.h -fno-stack-protector -fno-builtin -fshort-wchar -mdynamic-no-pic -mno-sse -mno-mmx -Wno-empty-body -Wno-pointer-sign -Wno-unused-function -Wno-unused-value -Wno-missing-braces -Wno-tautological-compare -Wreturn-type -Wno-unused-variable 
+RELEASE_XCLANG_X64_CC_FLAGS   = -ccc-host-triple x86_64-pc-win32-macho -c    -Os  -Wall -Werror -include AutoGen.h -fno-stack-protector -fno-builtin -fshort-wchar -mdynamic-no-pic -mno-sse -mno-mmx -Wno-empty-body -Wno-pointer-sign -Wno-unused-function -Wno-unused-value -Wno-missing-braces -Wno-tautological-compare -Wreturn-type -Wno-unused-variable 
+*_XCLANG_*_ASLCC_FLAGS      = -x c -save-temps -g -O0 -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -c -include AutoGen.h -mdynamic-no-pic
+*_XCLANG_*_ASLDLINK_FLAGS   = -e _main -preload -segalign 0x20  -pie -seg1addr 0x240 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+*_XCLANG_*_ASLPP_FLAGS      = -x c -E 
+*_XCLANG_*_ASL_FLAGS        =
+
+
+####################################################################################
+#
 # ARM Tools
 #
 ####################################################################################
@@ -3527,14 +3603,10 @@ RELEASE_ARMGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) -mlittle-endian
 *_ARMGCC_ARM_VFRPP_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS)  -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
 
 *_ARMGCC_ARM_SLINK_FLAGS =  -rc
-*_ARMGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS)  --oformat=elf32-littlearm -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-#
-# Had to remove --emit-relocs to get compile working. Images don't work correctly (linked at 0, no relocations)
-# --emit-relocs
-#
+*_ARMGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS)  --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
 
-  DEBUG_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mfpu=fpa -mlittle-endian -g -O2 -mabi=aapcs -mapcs -fno-short-enums -save-temps -combine -fsigned-char -fshort-wchar -fno-strict-aliasing -ffunction-sections -fdata-sections -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h
-RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mfpu=fpa -mlittle-endian    -O2 -mabi=aapcs -mapcs -fno-short-enums -save-temps -combine -fsigned-char -fshort-wchar -fno-strict-aliasing -ffunction-sections -fdata-sections -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h
+  DEBUG_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mlittle-endian -g -O0 -mabi=aapcs -mapcs -fno-short-enums -save-temps -combine -fsigned-char -fshort-wchar -fno-strict-aliasing -ffunction-sections -fdata-sections -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h
+RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mlittle-endian    -Os -mabi=aapcs -mapcs -fno-short-enums -save-temps -combine -fsigned-char -fshort-wchar -fno-strict-aliasing -ffunction-sections -fdata-sections -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h
 
 #################
 # ASM 16 linker defintions
@@ -3564,7 +3636,7 @@ RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mfpu=fpa -mlitt
 # Asl Compiler definitions
 ##################
 *_*_*_ASLCC_FLAGS                  = /nologo /c /FIAutoGen.h /TC /Dmain=ReferenceAcpiTable
-*_*_*_ASLDLINK_FLAGS               = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER
+*_*_*_ASLDLINK_FLAGS               = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:CONSOLE
 *_*_*_ASLPP_FLAGS                  = /nologo /EP /C
 *_*_*_ASL_FLAGS                    =
 

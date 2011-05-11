@@ -2,7 +2,7 @@
 <!--
 Filename: DistributionPackage.xsd
 
-Copyright (c) 2008, Intel Corporation. All rights reserved.
+Copyright (c) 2008, 2011 Intel Corporation. All rights reserved.
 
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which may be found at 
@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	elementFormDefault="qualified" targetNamespace="http://www.uefi.org/2008/1.0"
-	xmlns="http://www.uefi.org/2008/1.0">
+	elementFormDefault="qualified" targetNamespace="http://www.uefi.org/2011/1.1"
+	xmlns="http://www.uefi.org/2011/1.1">
 	<xs:element name="DistributionPackage">
 		<xs:annotation>
 			<xs:documentation xml:lang="en-us"> This schema defines the UEFI/PI
@@ -253,18 +253,29 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 				</xs:element>
 				<xs:element minOccurs="0" maxOccurs="1" name="Signature" type="Md5Sum">
 					<xs:annotation>
-						<xs:documentation xml:lang="en-us"> The packaging utilities will use
-							this MD5 sum value of the included ZIP file containing files
-							and/or code. If this element is not present, then installation
-							tools should assume that the content is correct, or that other
-							methods may be needed to verify content. </xs:documentation>
+						<xs:documentation xml:lang="en-us"> The packaging utilities will use this
+							MD5 sum value of the included ZIP file containing files and/or code. If
+							this element is not present, then installation tools should assume that
+							the content is correct, or that other methods may be needed to verify
+							content. </xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element minOccurs="1" maxOccurs="1" name="XmlSpecification"
-					type="xs:decimal" default="1.0">
+				<xs:element minOccurs="1" maxOccurs="1" name="XmlSpecification" type="xs:decimal"
+					default="1.1">
 					<xs:annotation>
-						<xs:documentation xml:lang="en-us"> This version of this XML Schema
-							is 1.0 </xs:documentation>
+						<xs:documentation xml:lang="en-us"> This version of this XML Schema is 1.1 </xs:documentation>
+						<xs:documentation xml:lang="en-us"> Changes to 1.1 from 1.0 </xs:documentation>
+						<xs:documentation xml:lang="en-us"> #1 Updated to present date and new
+							version which is important to reflect the present state of the
+							matter</xs:documentation>
+						<xs:documentation xml:lang="en-us"> #2 Added definition/enumeration of
+							UNDEFIND type 2 is important since there is a large body of legacy code
+							for which the GUID’s and other code/data objects were not decorated with
+							their usage. This document will allow for importing today’s source
+							artifacts and producing decorations using the ‘Undefined’ versus having
+							an error</xs:documentation>
+						<xs:documentation xml:lang="en-us">#3 Allow for inclusion of ARM and future
+							architecture types</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 			</xs:sequence>
@@ -1088,7 +1099,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 								<xs:annotation>
 									<xs:documentation xml:lang="en-us"> This is only required if
 										the Copyright is different from either the Package or
-										Distribution copyright. </xs:documentation>
+										Distribution copyright. Multiple copyright lines are 
+										permitted within this section. </xs:documentation>
 								</xs:annotation>
 							</xs:element>
 							<xs:element minOccurs="0" maxOccurs="1" name="License"
@@ -1096,7 +1108,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 								<xs:annotation>
 									<xs:documentation xml:lang="en-us"> This is only required if
 										the license is different from either the Package or
-										Distribution license. </xs:documentation>
+										Distribution license. Multiple licenses are permitted
+										within this section. </xs:documentation>
 								</xs:annotation>
 							</xs:element>
 							<xs:element minOccurs="0" maxOccurs="1" name="Abstract"
@@ -1226,6 +1239,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 															<xs:enumeration value="RECOVERY_S4_RESUME" />
 															<xs:enumeration value="RECOVERY_S5_RESUME" />
 															<xs:enumeration value="RECOVERY_FLASH_UPDATE" />
+                                                            <xs:enumeration value="UNDEFINED" />
 														</xs:restriction>
 													</xs:simpleType>
 												</xs:list>
@@ -1264,6 +1278,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 															change the boot mode on some exection paths.
 														</xs:documentation>
 													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="UNDEFINED">
+													<xs:annotation>
+														<xs:documentation xml:lang="en-us"> The package
+															creator does not know how the boot mode is used.
+														</xs:documentation>
+													<xs:/annotation>
 												</xs:enumeration>
 											</xs:restriction>
 										</xs:simpleType>
@@ -1322,6 +1343,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 															execution paths. </xs:documentation>
 													</xs:annotation>
 												</xs:enumeration>
+												<xs:enumeration value="UNDEFINED">
+													<xs:annotation>
+														<xs:documentation xml:lang="en-us"> The package
+															creator does not know how an event is used.
+														</xs:documentation>
+													<xs:/annotation>
+												</xs:enumeration>
 											</xs:restriction>
 										</xs:simpleType>
 									</xs:attribute>
@@ -1330,6 +1358,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 											<xs:restriction base="xs:NCName">
 												<xs:enumeration value="EVENT_TYPE_PERIODIC_TIMER" />
 												<xs:enumeration value="EVENT_TYPE_RELATIVE_TIMER" />
+												<xs:enumeration value="UNDEFINED"/>
 											</xs:restriction>
 										</xs:simpleType>
 
@@ -1362,6 +1391,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 												<xs:enumeration value="RESOURCE_DESCRIPTOR" />
 												<xs:enumeration value="FIRMWARE_VOLUME" />
 												<xs:enumeration value="LOAD_PEIM" />
+												<xs:enumeratino value="UNDEFINED" />
 											</xs:restriction>
 										</xs:simpleType>
 									</xs:attribute>
@@ -1392,6 +1422,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 															produced by the module under some execution paths.
 														</xs:documentation>
 													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="UNDEFINED">
+													<xs:annotation>
+														<xs:documentation xml:lang="en-us"> The package
+															creator knows that a HOB is used, but does not 
+                                                            know how it is used.
+														</xs:documentation>
+													<xs:/annotation>
 												</xs:enumeration>
 											</xs:restriction>
 										</xs:simpleType>
@@ -1513,6 +1551,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 												<xs:enumeration value="PRODUCES" />
 												<xs:enumeration value="CONSUMES" />
 												<xs:enumeration value="SOMETIMES_CONSUMES" />
+                                                <xs:enumeration value="UNDEFINED" />
 											</xs:restriction>
 										</xs:simpleType>
 									</xs:attribute>
@@ -1993,6 +2032,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 														</xs:documentation>
 													</xs:annotation>
 												</xs:enumeration>
+												<xs:enumeration value="UNDEFINED">
+													<xs:annotation>
+														<xs:documentation xml:lang="en-us"> The package
+															creator knows that a GUID is used, but does not
+															know how it is used. </xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
 											</xs:restriction>
 										</xs:simpleType>
 									</xs:attribute>
@@ -2034,6 +2080,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 												<xs:enumeration value="SOMETIMES_CONSUMES" />
 												<xs:enumeration value="TO_START" />
 												<xs:enumeration value="BY_START" />
+                                                <xs:enumeration value="UNDEFINED" />
 											</xs:restriction>
 										</xs:simpleType>
 									</xs:attribute>
@@ -2072,6 +2119,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 												<xs:enumeration value="SOMETIMES_PRODUCES" />
 												<xs:enumeration value="CONSUMES" />
 												<xs:enumeration value="SOMETIMES_CONSUMES" />
+                                                <xs:enumeration value="UNDEFINED" />
 											</xs:restriction>
 										</xs:simpleType>
 									</xs:attribute>
@@ -2154,6 +2202,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 												<xs:enumeration value="SOMETIMES_PRODUCES" />
 												<xs:enumeration value="CONSUMES" />
 												<xs:enumeration value="SOMETIMES_CONSUMES" />
+                                                <xs:enumeration value="UNDEFINED" />
 											</xs:restriction>
 										</xs:simpleType>
 
@@ -2583,6 +2632,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 			<xs:enumeration value="SystemTable" />
 			<xs:enumeration value="TokenSpaceGuid" />
 			<xs:enumeration value="Variable" />
+            <xs:enumeration value="UNDEFINED" />
 		</xs:restriction>
 	</xs:simpleType>
 
@@ -2682,12 +2732,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 						applications. </xs:documentation>
 				</xs:annotation>
 			</xs:enumeration>
-			<xs:enumeration value="USER_DEFINED">
+			<xs:enumeration value="SMM_CORE">
 				<xs:annotation>
-					<xs:documentation xml:lang="en-us"> This content is restricted to a
-						specific implementation. </xs:documentation>
+					<xs:documentation xml:lang="en-us"> This module is only applicable to the SMM
+						core.</xs:documentation>
 				</xs:annotation>
 			</xs:enumeration>
+			<xs:enumeration value="USER_DEFINED">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-us"> This content is restricted to a specific
+						implementation. </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UNDEFINED">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-us"> This enumeration is for use in a list that
+						where the package creator does not know the what module types are supported
+						by a module. </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:pattern value="([A-Z])([a-zA-Z0-9])*">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-us"> This pattern has been added for use in a
+						module lists - for future expansion. </xs:documentation>
+				</xs:annotation>
+			</xs:pattern>
 		</xs:restriction>
 	</xs:simpleType>
 
