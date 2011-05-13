@@ -52,7 +52,7 @@
 #  gEmuNetworkGuid            = {0x081603B4, 0x0F1D, 0x4022, {0xB6, 0xFD, 0x4C, 0xE3, 0x5E, 0x09, 0xA1, 0xA6}}
 
 [PcdsFixedAtBuild]
-   gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageVariableBase|0x0|UINT64|0x00001014
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageVariableBase|0x0|UINT64|0x00001014
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwSpareBase|0x0|UINT64|0x00001015
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwWorkingBase|0x0|UINT64|0x00001016
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFdBaseAddress|0x0|UINT64|0x00001017
@@ -81,5 +81,5 @@
 
   gInOsEmuPkgTokenSpaceGuid.PcdEmuCpuModel|L"Intel(R) Processor Model"|VOID*|0x00001007
   gInOsEmuPkgTokenSpaceGuid.PcdEmuCpuSpeed|L"3000"|VOID*|0x00001008
-
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuMpServicesPollingInterval|0x100|UINT64|0x0000101a
 

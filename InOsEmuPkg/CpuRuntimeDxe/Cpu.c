@@ -326,6 +326,8 @@ InitializeCpu (
   mTimerPeriod = DivU64x64Remainder (1000000000000000, Frequency, NULL);
 
   CpuUpdateSmbios ();
+  
+  CpuMpServicesInit ();
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mCpuTemplate.Handle,

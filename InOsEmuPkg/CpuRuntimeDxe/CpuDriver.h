@@ -18,11 +18,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <FrameworkDxe.h>
 #include <IndustryStandard/SmBios.h>
+
 #include <Protocol/Cpu.h>
 #include <Protocol/Smbios.h>
 #include <Protocol/FrameworkHii.h>
-#include <Guid/DataHubRecords.h>
+#include <Protocol/MpService.h>
+#include <Protocol/EmuPthreadThunk.h>
 #include <Protocol/CpuIo2.h>
+
+#include <Guid/DataHubRecords.h>
+
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HiiLib.h>
@@ -31,6 +36,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/EmuThunkLib.h>
+#include <Library/UefiLib.h>
+#include <Library/PcdLib.h>
 
 
 extern UINT8  CpuStrings[];
@@ -60,6 +67,52 @@ typedef struct {
       Cpu, \
       CPU_ARCH_PROT_PRIVATE_SIGNATURE \
       )
+
+
+
+typedef enum {
+  CPU_STATE_IDLE,
+  CPU_STATE_BLOCKED,
+  CPU_STATE_READY,
+  CPU_STATE_BUSY,
+  CPU_STATE_FINISHED
+} PROCESSOR_STATE;
+
+
+//
+// Define Individual Processor Data block.
+//
+typedef struct {
+  EFI_PROCESSOR_INFORMATION   Info;
+  EFI_AP_PROCEDURE            Procedure;
+  VOID                        *Parameter;
+  VOID                        *StateLock;
+  VOID                        *ProcedureLock;
+  PROCESSOR_STATE             State;
+  EFI_EVENT                   CheckThisAPEvent;   
+} PROCESSOR_DATA_BLOCK;
+
+
+//
+// Define MP data block which consumes individual processor block.
+//
+typedef struct {
+  UINTN                       NumberOfProcessors;
+  UINTN                       NumberOfEnabledProcessors;
+  EFI_EVENT                   CheckAllAPsEvent;
+  EFI_EVENT                   WaitEvent;
+  UINTN                       FinishCount;
+  UINTN                       StartCount;
+  EFI_AP_PROCEDURE            Procedure;
+  VOID                        *ProcedureArgument;
+  BOOLEAN                     SingleThread;
+  UINTN                       StartedNumber;
+  PROCESSOR_DATA_BLOCK        *ProcessorData;
+} MP_SYSTEM_DATA;
+
+
+
+
 
 EFI_STATUS
 EFIAPI
@@ -168,5 +221,20 @@ EmuSetMemoryAttributes (
   IN UINT64                 Length,
   IN UINT64                 Attributes
   );
+
+EFI_STATUS
+CpuMpServicesInit (
+  VOID
+  );
+
+EFI_STATUS
+EFIAPI
+CpuMpServicesWhoAmI (
+  IN EFI_MP_SERVICES_PROTOCOL  *This,
+  OUT UINTN                    *ProcessorNumber
+  );
+
+extern EFI_MP_SERVICES_PROTOCOL  mMpSercicesTemplate;
+
 
 #endif

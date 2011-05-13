@@ -34,7 +34,8 @@
   Cpu.c
   CpuDriver.h
   Strings.uni
-
+  MpService.c
+  
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -53,6 +54,7 @@
   DebugLib
   BaseLib
   EmuThunkLib
+  PcdLib
 
 [Protocols]
   gEmuIoThunkProtocolGuid                       # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
@@ -60,6 +62,11 @@
   gEfiHiiProtocolGuid                           # PROTOCOL SOMETIMES_CONSUMED
   gEfiCpuIo2ProtocolGuid                        # PROTOCOL ALWAYS_PRODUCED
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
+  gEmuPthreadThunkProtocolGuid
+  gEfiMpServiceProtocolGuid
+
+[Pcd]
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuMpServicesPollingInterval
 
 [Depex]
   gEfiSmbiosProtocolGuid

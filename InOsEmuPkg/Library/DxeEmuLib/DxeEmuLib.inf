@@ -38,6 +38,7 @@
 [LibraryClasses]
   HobLib
   DebugLib
+  BaseMemoryLib
 
 
 [Protocols]
