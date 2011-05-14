@@ -20,7 +20,7 @@
   FILE_GUID                      = E4541241-8897-411a-91F8-7D7E45837146
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = SerialPortLib| PEI_CORE PEIM
+  LIBRARY_CLASS                  = SerialPortLib| PEI_CORE PEIM SEC
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC

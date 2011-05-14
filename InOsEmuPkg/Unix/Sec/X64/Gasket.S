@@ -727,30 +727,6 @@ ASM_PFX(ReverseGasketUint64Uint64):
   ret
   
 
-// Sec PPI Callbacks - Check Me
-
-ASM_GLOBAL ASM_PFX(GasketSecUnixPeiLoadFile)
-ASM_PFX(GasketSecUnixPeiLoadFile):
-  pushq   %rbp            // stack frame is for the debugger
-  movq    %rsp, %rbp
-
-  pushq   %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
-  pushq   %rdi
-
-  movq    %rcx, %rdi    // Swizzle args 
-  movq    %rdx, %rsi     
-  movq    %r8,  %rdx
-  movq    %r9,  %rcx
-
-  call    ASM_PFX(SecUnixPeiLoadFile)
-  
-  popq    %rdi          // restore state
-  popq    %rsi
-  popq    %rbp
-  ret
-
-
-
 ASM_GLOBAL ASM_PFX(GasketSecUnixPeiAutoScan)
 ASM_PFX(GasketSecUnixPeiAutoScan):
   pushq   %rbp            // stack frame is for the debugger

@@ -27,13 +27,9 @@ char *gGdbWorkingFileName = NULL;
 EMU_THUNK_PPI mSecEmuThunkPpi = {
   GasketSecUnixPeiAutoScan,
   GasketSecUnixFdAddress,
-  GasketSecEmuThunkAddress,
-  GasketSecUnixPeiLoadFile
+  GasketSecEmuThunkAddress
 };
 
-EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI mSecTemporaryRamSupportPpi = { 
-  GasketSecTemporaryRamSupport
-};
 
 
 
@@ -44,8 +40,8 @@ EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI mSecTemporaryRamSupportPpi = {
 //  The number of array elements is allocated base on parsing
 //  EFI_FIRMWARE_VOLUMES and the memory is never freed.
 //
-UINTN                                     gFdInfoCount = 0;
-EMU_FD_INFO                              *gFdInfo;
+UINTN       gFdInfoCount = 0;
+EMU_FD_INFO *gFdInfo;
 
 //
 // Array that supports seperate memory rantes.
@@ -53,8 +49,8 @@ EMU_FD_INFO                              *gFdInfo;
 //  The number of array elements is allocated base on parsing
 //  EFI_MEMORY_SIZE and the memory is never freed.
 //
-UINTN                                     gSystemMemoryCount = 0;
-EMU_SYSTEM_MEMORY                       *gSystemMemory;
+UINTN              gSystemMemoryCount = 0;
+EMU_SYSTEM_MEMORY  *gSystemMemory;
 
 
 
@@ -63,33 +59,6 @@ IMAGE_CONTEXT_TO_MOD_HANDLE  *mImageContextModHandleArray = NULL;
 
 
 
-EFI_PHYSICAL_ADDRESS *
-MapMemory (
-  INTN fd,
-  UINT64 length,
-  INTN   prot,
-  INTN   flags);
-
-EFI_STATUS
-MapFile (
-  IN  CHAR8                     *FileName,
-  IN OUT  EFI_PHYSICAL_ADDRESS  *BaseAddress,
-  OUT UINT64                    *Length
-  );
-
-EFI_STATUS
-EFIAPI
-SecNt32PeCoffRelocateImage (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  );
-
-
-int
-main (
-  IN  int   Argc,
-  IN  char  **Argv,
-  IN  char  **Envp
-  )
 /*++
 
 Routine Description:
@@ -105,6 +74,12 @@ Returns:
   1 - Abnormal exit
 
 **/
+int
+main (
+  IN  int   Argc,
+  IN  char  **Argv,
+  IN  char  **Envp
+  )
 {
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  InitialStackMemory;
@@ -115,25 +90,24 @@ Returns:
   UINTN                 PeiIndex;
   CHAR8                 *FileName;
   BOOLEAN               Done;
-  VOID                  *PeiCoreFile;
+  EFI_PEI_FILE_HANDLE   FileHandle;
+  VOID                  *SecFile;
   CHAR16                *MemorySizeStr;
   CHAR16                *FirmwareVolumesStr;
   UINTN                 *StackPointer;
 
-  setbuf(stdout, 0);
-  setbuf(stderr, 0);
+  setbuf (stdout, 0);
+  setbuf (stderr, 0);
 
   MemorySizeStr      = (CHAR16 *) PcdGetPtr (PcdEmuMemorySize);
   FirmwareVolumesStr = (CHAR16 *) PcdGetPtr (PcdEmuFirmwareVolume);
 
-  printf ("\nEDK SEC Main UNIX Emulation Environment from edk2.sourceforge.net\n");
+  printf ("\nEDK II UNIX Emulation Environment from edk2.sourceforge.net\n");
 
   //
   // PPIs pased into PEI_CORE
   //
-  AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEfiTemporaryRamSupportPpiGuid, &mSecTemporaryRamSupportPpi);
   AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEmuThunkPpiGuid, &mSecEmuThunkPpi);
-  AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEmuPeiServicesTableUpdatePpiGuid, NULL);
 
   SecInitThunkProtocol ();
   
@@ -149,6 +123,10 @@ Returns:
   AddThunkProtocol (&gPthreadThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuApCount), FALSE); 
 
   // EmuSecLibConstructor ();
+  
+  
+  gPpiList = GetThunkPpiList (); 
+
 
 #ifdef __APPLE__
   //
@@ -185,23 +163,24 @@ Returns:
   printf ("  BootMode 0x%02x\n", (unsigned int)PcdGet32 (PcdEmuBootMode));
 
   //
-  // Open up a 128K file to emulate temp memory for PEI.
+  // Open up a 128K file to emulate temp memory for SEC.
   //  on a real platform this would be SRAM, or using the cache as RAM.
   //  Set InitialStackMemory to zero so UnixOpenFile will allocate a new mapping
   //
   InitialStackMemorySize  = STACK_SIZE;
-  InitialStackMemory = (UINTN)MapMemory(0,
-          (UINT32) InitialStackMemorySize,
-          PROT_READ | PROT_WRITE | PROT_EXEC,
-          MAP_ANONYMOUS | MAP_PRIVATE);
+  InitialStackMemory = (UINTN)MapMemory (
+                                0, (UINT32) InitialStackMemorySize,
+                                PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE
+                                );
   if (InitialStackMemory == 0) {
     printf ("ERROR : Can not open SecStack Exiting\n");
     exit (1);
   }
 
-  printf ("  SEC passing in %u KB of temp RAM at 0x%08lx to PEI\n",
+  printf ("  OS Emulator passing in %u KB of temp RAM at 0x%08lx to SEC\n",
     (unsigned int)(InitialStackMemorySize / 1024),
-    (unsigned long)InitialStackMemory);
+    (unsigned long)InitialStackMemory
+    );
 
   for (StackPointer = (UINTN*) (UINTN) InitialStackMemory;
      StackPointer < (UINTN*)(UINTN)((UINTN) InitialStackMemory + (UINT64) InitialStackMemorySize);
@@ -219,40 +198,49 @@ Returns:
   }
 
   Index2 = 0;
-  for (Done = FALSE, Index = 0, PeiIndex = 0, PeiCoreFile = NULL;
+  for (Done = FALSE, Index = 0, PeiIndex = 0, SecFile = NULL;
        FirmwareVolumesStr[Index2] != 0;
        Index++) {
-    for (Index1 = 0; (FirmwareVolumesStr[Index2] != '!') && (FirmwareVolumesStr[Index2] != 0); Index2++)
+    for (Index1 = 0; (FirmwareVolumesStr[Index2] != '!') && (FirmwareVolumesStr[Index2] != 0); Index2++) {
       FileName[Index1++] = FirmwareVolumesStr[Index2];
-    if (FirmwareVolumesStr[Index2] == '!')
+    }
+    if (FirmwareVolumesStr[Index2] == '!') {
       Index2++;
+    }
     FileName[Index1]  = '\0';
 
     //
     // Open the FD and remmeber where it got mapped into our processes address space
     //
     Status = MapFile (
-          FileName,
-          &gFdInfo[Index].Address,
-          &gFdInfo[Index].Size
-          );
+              FileName,
+              &gFdInfo[Index].Address,
+              &gFdInfo[Index].Size
+              );
     if (EFI_ERROR (Status)) {
       printf ("ERROR : Can not open Firmware Device File %s (%x).  Exiting.\n", FileName, (unsigned int)Status);
       exit (1);
     }
 
-    printf ("  FD loaded from %s at 0x%08lx",
-      FileName, (unsigned long)gFdInfo[Index].Address);
+    printf ("  FD loaded from %s at 0x%08lx",FileName, (unsigned long)gFdInfo[Index].Address);
 
-    if (PeiCoreFile == NULL) {
+    if (SecFile == NULL) {
       //
-      // Assume the beginning of the FD is an FV and look for the PEI Core.
+      // Assume the beginning of the FD is an FV and look for the SEC Core.
       // Load the first one we find.
       //
-      Status = SecFfsFindPeiCore ((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) gFdInfo[Index].Address, &PeiCoreFile);
+      FileHandle = NULL;
+      Status = PeiServicesFfsFindNextFile (
+                  EFI_FV_FILETYPE_SECURITY_CORE, 
+                  (EFI_PEI_FV_HANDLE)(UINTN)gFdInfo[Index].Address, 
+                  &FileHandle
+                  );
       if (!EFI_ERROR (Status)) {
-        PeiIndex = Index;
-        printf (" contains SEC Core");
+        Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, &SecFile);
+        if (!EFI_ERROR (Status)) {
+          PeiIndex = Index;
+          printf (" contains SEC Core");
+        }
       }
     }
 
@@ -275,25 +263,27 @@ Returns:
       Index1++;
     }
     gSystemMemory[Index++].Size = val * 0x100000;
-    if (MemorySizeStr[Index1] == 0)
+    if (MemorySizeStr[Index1] == 0) {
       break;
+    }
     Index1++;
   }
 
   printf ("\n");
 
   //
-  // Hand off to PEI Core
+  // Hand off to SEC
   //
-  SecLoadFromCore ((UINTN) InitialStackMemory, (UINTN) InitialStackMemorySize, (UINTN) gFdInfo[0].Address, PeiCoreFile);
+  SecLoadFromCore ((UINTN) InitialStackMemory, (UINTN) InitialStackMemorySize, (UINTN) gFdInfo[0].Address, SecFile);
 
   //
-  // If we get here, then the PEI Core returned. This is an error as PEI should
-  //  always hand off to DXE.
+  // If we get here, then the SEC Core returned. This is an error as SEC should
+  //  always hand off to PEI Core and then on to DXE Core.
   //
-  printf ("ERROR : PEI Core returned\n");
+  printf ("ERROR : SEC returned\n");
   exit (1);
 }
+
 
 EFI_PHYSICAL_ADDRESS *
 MapMemory (
@@ -318,8 +308,7 @@ MapMemory (
     }
     if ((((UINTN)res) & ~(align-1)) == (UINTN)res) {
       isAligned=1;
-    }
-    else {
+    } else {
       munmap(res, length);
       base += align;
     }
@@ -327,12 +316,7 @@ MapMemory (
   return res;
 }
 
-EFI_STATUS
-MapFile (
-  IN  CHAR8                     *FileName,
-  IN OUT  EFI_PHYSICAL_ADDRESS  *BaseAddress,
-  OUT UINT64                    *Length
-  )
+
 /*++
 
 Routine Description:
@@ -356,24 +340,32 @@ Returns:
   EFI_DEVICE_ERROR - An error occured attempting to map the opened file
 
 **/
+EFI_STATUS
+MapFile (
+  IN  CHAR8                     *FileName,
+  IN OUT  EFI_PHYSICAL_ADDRESS  *BaseAddress,
+  OUT UINT64                    *Length
+  )
 {
   int fd;
   VOID    *res;
   UINTN   FileSize;
 
   fd = open (FileName, O_RDONLY);
-  if (fd < 0)
+  if (fd < 0) {
     return EFI_NOT_FOUND;
+  }
   FileSize = lseek (fd, 0, SEEK_END);
 
 
-  res = MapMemory(fd, FileSize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE);
+  res = MapMemory (fd, FileSize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE);
 
   close (fd);
 
-  if (res == MAP_FAILED)
+  if (res == MAP_FAILED) {
     return EFI_DEVICE_ERROR;
-
+  }
+  
   *Length = (UINT64) FileSize;
   *BaseAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) res;
 
@@ -382,6 +374,21 @@ Returns:
 
 
 
+/*++
+
+Routine Description:
+  This is the service to load the SEC Core from the Firmware Volume
+
+Arguments:
+  LargestRegion           - Memory to use for SEC.
+  LargestRegionSize       - Size of Memory to use for PEI
+  BootFirmwareVolumeBase  - Start of the Boot FV
+  PeiCorePe32File         - SEC PE32
+
+Returns:
+  Success means control is transfered and thus we should never return
+
+**/
 VOID
 SecLoadFromCore (
   IN  UINTN   LargestRegion,
@@ -389,28 +396,11 @@ SecLoadFromCore (
   IN  UINTN   BootFirmwareVolumeBase,
   IN  VOID    *PeiCorePe32File
   )
-/*++
-
-Routine Description:
-  This is the service to load the PEI Core from the Firmware Volume
-
-Arguments:
-  LargestRegion           - Memory to use for PEI.
-  LargestRegionSize       - Size of Memory to use for PEI
-  BootFirmwareVolumeBase  - Start of the Boot FV
-  PeiCorePe32File         - PEI Core PE32
-
-Returns:
-  Success means control is transfered and thus we should never return
-
-**/
 {
   EFI_STATUS                  Status;
   EFI_PHYSICAL_ADDRESS        TopOfMemory;
   VOID                        *TopOfStack;
-  UINT64                      PeiCoreSize;
   EFI_PHYSICAL_ADDRESS        PeiCoreEntryPoint;
-  EFI_PHYSICAL_ADDRESS        PeiImageAddress;
   EFI_SEC_PEI_HAND_OFF        *SecCoreData;
   UINTN                       PeiStackSize;
 
@@ -442,7 +432,7 @@ Returns:
   //
   // Bind this information into the SEC hand-off state
   //
-  SecCoreData                        = (EFI_SEC_PEI_HAND_OFF*)(UINTN) TopOfStack;
+  SecCoreData                         = (EFI_SEC_PEI_HAND_OFF*)(UINTN) TopOfStack;
   SecCoreData->DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
   SecCoreData->BootFirmwareVolumeBase = (VOID*)BootFirmwareVolumeBase;
   SecCoreData->BootFirmwareVolumeSize = PcdGet32 (PcdEmuFirmwareFdSize);
@@ -454,41 +444,30 @@ Returns:
   SecCoreData->PeiTemporaryRamSize    = STACK_SIZE - PeiStackSize;
 
   //
-  // Load the PEI Core from a Firmware Volume
+  // Find the SEC Core Entry Point
   //
-  Status = SecUnixPeiLoadFile (
-            PeiCorePe32File,
-            &PeiImageAddress,
-            &PeiCoreSize,
-            &PeiCoreEntryPoint
-            );
+  Status = SecPeCoffGetEntryPoint (PeiCorePe32File, (VOID **)&PeiCoreEntryPoint);
   if (EFI_ERROR (Status)) {
     return ;
   }
 
   //
-  // Transfer control to the PEI Core
+  // Transfer control to the SEC Core
   //
   PeiSwitchStacks (
     (SWITCH_STACK_ENTRY_POINT) (UINTN) PeiCoreEntryPoint,
     SecCoreData,
-    (VOID *)GetThunkPpiList (),
+    (VOID *)gPpiList,
     NULL,
     TopOfStack
     );
   //
-  // If we get here, then the PEI Core returned.  This is an error
+  // If we get here, then the SEC Core returned.  This is an error
   //
   return ;
 }
 
-EFI_STATUS
-EFIAPI
-SecUnixPeiAutoScan (
-  IN  UINTN                 Index,
-  OUT EFI_PHYSICAL_ADDRESS  *MemoryBase,
-  OUT UINT64                *MemorySize
-  )
+
 /*++
 
 Routine Description:
@@ -509,6 +488,13 @@ Returns:
   EFI_UNSUPPORTED - If Index is not supported
 
 **/
+EFI_STATUS
+EFIAPI
+SecUnixPeiAutoScan (
+  IN  UINTN                 Index,
+  OUT EFI_PHYSICAL_ADDRESS  *MemoryBase,
+  OUT UINT64                *MemorySize
+  )
 {
   void *res;
 
@@ -517,11 +503,14 @@ Returns:
   }
 
   *MemoryBase = 0;
-  res = MapMemory(0, gSystemMemory[Index].Size,
-      PROT_READ | PROT_WRITE | PROT_EXEC,
-      MAP_PRIVATE | MAP_ANONYMOUS);
-  if (res == MAP_FAILED)
+  res = MapMemory (
+          0, gSystemMemory[Index].Size,
+          PROT_READ | PROT_WRITE | PROT_EXEC,
+          MAP_PRIVATE | MAP_ANONYMOUS
+          );
+  if (res == MAP_FAILED) {
     return EFI_DEVICE_ERROR;
+  }
   *MemorySize = gSystemMemory[Index].Size;
   *MemoryBase = (UINTN)res;
   gSystemMemory[Index].Memory = *MemoryBase;
@@ -529,11 +518,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
-VOID *
-EFIAPI
-SecEmuThunkAddress (
-  VOID
-  )
+
 /*++
 
 Routine Description:
@@ -548,92 +533,15 @@ Returns:
   EFI_SUCCESS - Data returned
 
 **/
+VOID *
+EFIAPI
+SecEmuThunkAddress (
+  VOID
+  )
 {
   return &gEmuThunkProtocol;
 }
 
-
-EFI_STATUS
-SecUnixPeiLoadFile (
-  IN  VOID                    *Pe32Data,
-  OUT EFI_PHYSICAL_ADDRESS    *ImageAddress,
-  OUT UINT64                  *ImageSize,
-  OUT EFI_PHYSICAL_ADDRESS    *EntryPoint
-  )
-/*++
-
-Routine Description:
-  Loads and relocates a PE/COFF image into memory.
-
-Arguments:
-  Pe32Data         - The base address of the PE/COFF file that is to be loaded and relocated
-  ImageAddress     - The base address of the relocated PE/COFF image
-  ImageSize        - The size of the relocated PE/COFF image
-  EntryPoint       - The entry point of the relocated PE/COFF image
-
-Returns:
-  EFI_SUCCESS   - The file was loaded and relocated
-  EFI_OUT_OF_RESOURCES - There was not enough memory to load and relocate the PE/COFF file
-
-**/
-{
-  EFI_STATUS                            Status;
-  PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
-
-  ZeroMem (&ImageContext, sizeof (ImageContext));
-  ImageContext.Handle     = Pe32Data;
-
-  ImageContext.ImageRead  = (PE_COFF_LOADER_READ_FILE) SecImageRead;
-
-  Status                  = PeCoffLoaderGetImageInfo (&ImageContext);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-
-  //
-  // Allocate space in UNIX (not emulator) memory. Extra space is for alignment
-  //
-  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) MapMemory (
-    0,
-    (UINT32) (ImageContext.ImageSize + (ImageContext.SectionAlignment * 2)),
-    PROT_READ | PROT_WRITE | PROT_EXEC,
-    MAP_ANONYMOUS | MAP_PRIVATE
-    );
-  if (ImageContext.ImageAddress == 0) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // Align buffer on section boundry
-  //
-  ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
-  ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)(ImageContext.SectionAlignment - 1));
-
-
-  Status = PeCoffLoaderLoadImage (&ImageContext);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = PeCoffLoaderRelocateImage (&ImageContext);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-
-  SecPeCoffRelocateImageExtraAction (&ImageContext);
-
-  //
-  // BugBug: Flush Instruction Cache Here when CPU Lib is ready
-  //
-
-  *ImageAddress = ImageContext.ImageAddress;
-  *ImageSize    = ImageContext.ImageSize;
-  *EntryPoint   = ImageContext.EntryPoint;
-
-  return EFI_SUCCESS;
-}
 
 
 RETURN_STATUS
@@ -643,27 +551,28 @@ SecPeCoffGetEntryPoint (
   IN OUT VOID  **EntryPoint
   )
 {
-  EFI_STATUS              Status;
-  EFI_PHYSICAL_ADDRESS    ImageAddress;
-  UINT64                  ImageSize;
-  EFI_PHYSICAL_ADDRESS    PhysEntryPoint;
+  EFI_STATUS                    Status;
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
+  
+  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)Pe32Data;
+  ImageContext.SizeOfHeaders = PeCoffGetSizeOfHeaders (Pe32Data);
+  ImageContext.PdbPointer = PeCoffLoaderGetPdbPointer (Pe32Data);
+  Status = PeCoffLoaderGetEntryPoint (Pe32Data, EntryPoint);
+  if (!EFI_ERROR (Status)) {
+    return Status;
+  }
 
-  Status = SecUnixPeiLoadFile (Pe32Data, &ImageAddress, &ImageSize, &PhysEntryPoint);
+  ImageContext.EntryPoint = (UINTN)EntryPoint;
 
-  *EntryPoint = (VOID *)(UINTN)PhysEntryPoint;
+  // On Unix a dlopen is done that will change the entry point
+  SecPeCoffRelocateImageExtraAction (&ImageContext);
+  *EntryPoint = (VOID *)(UINTN)ImageContext.EntryPoint;
+  
   return Status;
 }
 
 
 
-EFI_STATUS
-EFIAPI
-SecUnixFdAddress (
-  IN     UINTN                 Index,
-  IN OUT EFI_PHYSICAL_ADDRESS  *FdBase,
-  IN OUT UINT64                *FdSize,
-  IN OUT EFI_PHYSICAL_ADDRESS  *FixUp
-  )
 /*++
 
 Routine Description:
@@ -681,6 +590,14 @@ Returns:
   EFI_UNSUPPORTED - Index does nto map to an FD in the system
 
 **/
+EFI_STATUS
+EFIAPI
+SecUnixFdAddress (
+  IN     UINTN                 Index,
+  IN OUT EFI_PHYSICAL_ADDRESS  *FdBase,
+  IN OUT UINT64                *FdSize,
+  IN OUT EFI_PHYSICAL_ADDRESS  *FixUp
+  )
 {
   if (Index >= gFdInfoCount) {
     return EFI_UNSUPPORTED;
@@ -706,49 +623,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-EFIAPI
-SecImageRead (
-  IN     VOID    *FileHandle,
-  IN     UINTN   FileOffset,
-  IN OUT UINTN   *ReadSize,
-  OUT    VOID    *Buffer
-  )
-/*++
 
-Routine Description:
-  Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file
-
-Arguments:
-  FileHandle - The handle to the PE/COFF file
-  FileOffset - The offset, in bytes, into the file to read
-  ReadSize   - The number of bytes to read from the file starting at FileOffset
-  Buffer     - A pointer to the buffer to read the data into.
-
-Returns:
-  EFI_SUCCESS - ReadSize bytes of data were read into Buffer from the PE/COFF file starting at FileOffset
-
-**/
-{
-  CHAR8 *Destination8;
-  CHAR8 *Source8;
-  UINTN Length;
-
-  Destination8  = Buffer;
-  Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
-  Length        = *ReadSize;
-  while (Length--) {
-    *(Destination8++) = *(Source8++);
-  }
-
-  return EFI_SUCCESS;
-}
-
-UINTN
-CountSeperatorsInString (
-  IN  const CHAR16   *String,
-  IN  CHAR16         Seperator
-  )
 /*++
 
 Routine Description:
@@ -762,6 +637,11 @@ Returns:
   Number of Seperator in String
 
 **/
+UINTN
+CountSeperatorsInString (
+  IN  const CHAR16   *String,
+  IN  CHAR16         Seperator
+  )
 {
   UINTN Count;
 
@@ -775,11 +655,6 @@ Returns:
 }
 
 
-EFI_STATUS
-AddHandle (
-  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext,
-  IN  VOID                                 *ModHandle
-  )
 /*++
 
 Routine Description:
@@ -796,6 +671,11 @@ Returns:
   EFI_SUCCESS - ModHandle was stored.
 
 **/
+EFI_STATUS
+AddHandle (
+  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext,
+  IN  VOID                                 *ModHandle
+  )
 {
   UINTN                       Index;
   IMAGE_CONTEXT_TO_MOD_HANDLE *Array;
@@ -835,10 +715,6 @@ Returns:
 }
 
 
-VOID *
-RemoveHandle (
-  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  )
 /*++
 
 Routine Description:
@@ -853,6 +729,10 @@ Returns:
   NULL      - No ModHandle associated with ImageContext
 
 **/
+VOID *
+RemoveHandle (
+  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  )
 {
   UINTN                        Index;
   IMAGE_CONTEXT_TO_MOD_HANDLE  *Array;
@@ -890,7 +770,7 @@ Returns:
 // b SecGdbScriptBreak
 // command
 // silent
-// source SecMain.dll.gdb
+// source SecMain.gdb
 // c
 // end
 //
@@ -1057,11 +937,13 @@ SecPeCoffRelocateImageExtraAction (
     return;
   }
 
-  fprintf (stderr,
+  fprintf (
+     stderr,
      "Loading %s 0x%08lx - entry point 0x%08lx\n",
      ImageContext->PdbPointer,
      (unsigned long)ImageContext->ImageAddress,
-     (unsigned long)ImageContext->EntryPoint);
+     (unsigned long)ImageContext->EntryPoint
+     );
 
   Handle = dlopen (ImageContext->PdbPointer, RTLD_NOW);
 
@@ -1073,7 +955,7 @@ SecPeCoffRelocateImageExtraAction (
 
   if (Entry != NULL) {
     ImageContext->EntryPoint = (UINTN)Entry;
-    printf("Change %s Entrypoint to :0x%08lx\n", ImageContext->PdbPointer, (unsigned long)Entry);
+    printf ("Change %s Entrypoint to :0x%08lx\n", ImageContext->PdbPointer, (unsigned long)Entry);
   }
 
   SecUnixLoaderBreak ();

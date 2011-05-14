@@ -120,7 +120,6 @@ typedef struct {
   EMU_PEI_AUTOSCAN                  MemoryAutoScan;
   EMU_PEI_FD_INFORMATION            FirmwareDevices;
   EMU_PEI_THUNK_INTERFACE           Thunk;
-  EMU_PEI_LOAD_FILE                 LoadFile;
 } EMU_THUNK_PPI;
 
 extern EFI_GUID gEmuThunkPpiGuid;

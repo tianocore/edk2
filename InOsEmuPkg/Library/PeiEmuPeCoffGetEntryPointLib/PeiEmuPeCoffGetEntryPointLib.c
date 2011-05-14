@@ -56,7 +56,7 @@ PeCoffLoaderGetEntryPoint (
   //
   Status = PeiServicesLocatePpi (
               &gEmuThunkPpiGuid,
-             0,
+              0,
               NULL,
               (VOID **) &ThunkPpi
              );

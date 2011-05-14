@@ -1,13 +1,10 @@
 /** @file
-  PEI Services Table Pointer Library for PEI Core.
+  PEI Services Table Pointer Library.
   
-  This library is used for PEI Core which does executed from flash device directly but
-  executed in memory. When the PEI Core does a Set of the PEI Service table pointer 
-  a PPI is reinstalled so that PEIMs can update the copy of the PEI Services table 
-  they have cached. 
+  This library is used for PEIM which does executed from flash device directly but
+  executed in memory.
 
   Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-  Portiions copyrigth (c) 2011, Apple Inc. All rights reserved. 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,10 +19,7 @@
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/DebugLib.h>
 
-#include <Ppi/EmuPeiServicesTableUpdate.h>
-
-
-CONST EFI_PEI_SERVICES  **gPeiServices = NULL;
+CONST EFI_PEI_SERVICES  **gPeiServices;
 
 /**
   Caches a pointer PEI Services Table. 
@@ -41,39 +35,11 @@ CONST EFI_PEI_SERVICES  **gPeiServices = NULL;
 VOID
 EFIAPI
 SetPeiServicesTablePointer (
-  IN CONST EFI_PEI_SERVICES **PeiServicesTablePointer
+  IN CONST EFI_PEI_SERVICES ** PeiServicesTablePointer
   )
 {
-  EFI_STATUS              Status;
-  EFI_PEI_PPI_DESCRIPTOR  *PpiDescriptor;
-  VOID                    *NotUsed;
-
-  gPeiServices = PeiServicesTablePointer; 
-  
-  Status = (*PeiServicesTablePointer)->LocatePpi (
-                                        PeiServicesTablePointer,
-                                        &gEmuPeiServicesTableUpdatePpiGuid, // GUID
-                                        0,                 // INSTANCE
-                                        &PpiDescriptor,    // EFI_PEI_PPI_DESCRIPTOR
-                                        &NotUsed           // PPI
-                                        );
-  if (!EFI_ERROR (Status)) {
-    //
-    // Standard PI Mechanism is to use negative offset from IDT. 
-    // We can't do that in the emulator, so we make up a constant location
-    // that every one can use. The first try may fail as the PEI Core is still
-    // initializing its self, but that is OK. 
-    //
-
-    // Reinstall PPI to consumers know to update PEI Services pointer
-    Status = (*PeiServicesTablePointer)->ReInstallPpi (
-                                            PeiServicesTablePointer,
-                                            PpiDescriptor,
-                                            PpiDescriptor
-                                            );
-
-  }
-
+  ASSERT (PeiServicesTablePointer != NULL);
+  gPeiServices = PeiServicesTablePointer;
 }
 
 /**
@@ -95,8 +61,31 @@ GetPeiServicesTablePointer (
   )
 {
   ASSERT (gPeiServices != NULL);
-  ASSERT (*gPeiServices != NULL);
   return gPeiServices;
+}
+
+
+/**
+  The constructor function caches the pointer to PEI services.
+  
+  The constructor function caches the pointer to PEI services.
+  It will always return EFI_SUCCESS.
+
+  @param  FileHandle   The handle of FFS header the loaded driver.
+  @param  PeiServices  The pointer to the PEI services.
+
+  @retval EFI_SUCCESS  The constructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+PeiServicesTablePointerLibConstructor (
+  IN EFI_PEI_FILE_HANDLE        FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
+  )
+{
+  gPeiServices = PeiServices;
+  return EFI_SUCCESS;
 }
 
 

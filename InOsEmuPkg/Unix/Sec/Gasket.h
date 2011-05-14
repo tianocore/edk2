@@ -109,15 +109,6 @@ GasketSecGetNextProtocol (
 
 // PPIs produced by SEC  
 
-
-EFI_STATUS
-EFIAPI
-GasketSecUnixPeiLoadFile (
-  IN  VOID                  *Pe32Data,  
-  IN  EFI_PHYSICAL_ADDRESS  *ImageAddress,  
-  IN  UINT64                *ImageSize,  
-  OUT EFI_PHYSICAL_ADDRESS  *EntryPoint  
-  );
   
 EFI_STATUS
 EFIAPI

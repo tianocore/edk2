@@ -37,11 +37,10 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  InOsEmuPkg/InOsEmuPkg.dec
 
 [LibraryClasses]
   DebugLib
 
 [Ppis]
-  gEmuPeiServicesTableUpdatePpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid
 

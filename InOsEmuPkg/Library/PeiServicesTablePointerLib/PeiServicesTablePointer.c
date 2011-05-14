@@ -20,7 +20,7 @@
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/DebugLib.h>
 
-#include <Ppi/EmuPeiServicesTableUpdate.h>
+#include <Ppi/MemoryDiscovered.h>
 
 
 CONST EFI_PEI_SERVICES  **gPeiServices = NULL;
@@ -100,7 +100,7 @@ PeiServicesTablePointerNotifyCallback (
 
 EFI_PEI_NOTIFY_DESCRIPTOR mNotifyOnThunkList = {
   (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-  &gEmuPeiServicesTableUpdatePpiGuid,
+  &gEfiPeiMemoryDiscoveredPpiGuid,
   PeiServicesTablePointerNotifyCallback 
 };
 
@@ -124,6 +124,8 @@ PeiServicesTablePointerLibConstructor (
   )
 {
   EFI_STATUS              Status;
+
+  gPeiServices = (CONST EFI_PEI_SERVICES  **)PeiServices;
 
   // register to be told when PeiServices pointer is updated
   Status = (*PeiServices)->NotifyPpi (PeiServices, &mNotifyOnThunkList);

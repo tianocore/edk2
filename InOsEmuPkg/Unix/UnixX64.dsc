@@ -110,15 +110,27 @@
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 
 
+[LibraryClasses.common.SEC]
+  PeiServicesLib|InOsEmuPkg/Library/SecPeiServicesLib/SecPeiServicesLib.inf
+  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  PeCoffGetEntryPointLib|InOsEmuPkg/Library/PeiEmuPeCoffGetEntryPointLib/PeiEmuPeCoffGetEntryPointLib.inf
+  PeCoffExtraActionLib|InOsEmuPkg/Library/PeiEmuPeCoffExtraActionLib/PeiEmuPeCoffExtraActionLib.inf
+  SerialPortLib|InOsEmuPkg/Library/PeiEmuSerialPortLib/PeiEmuSerialPortLib.inf
+  PpiListLib|InOsEmuPkg/Library/SecPpiListLib/SecPpiListLib.inf
+
 [LibraryClasses.common.USER_DEFINED, LibraryClasses.common.BASE]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-
+  PpiListLib|InOsEmuPkg/Library/SecPpiListLib/SecPpiListLib.inf
   ThunkPpiList|InOsEmuPkg/Library/ThunkPpiList/ThunkPpiList.inf
   ThunkProtocolList|InOsEmuPkg/Library/ThunkProtocolList/ThunkProtocolList.inf
+  PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
+  PpiListLib|InOsEmuPkg/Library/SecPpiListLib/SecPpiListLib.inf
+  PeiServicesLib|InOsEmuPkg/Library/SecPeiServicesLib/SecPeiServicesLib.inf
+
+#  PeCoffExtraActionLib|InOsEmuPkg/Library/PeiEmuPeCoffExtraActionLib/PeiEmuPeCoffExtraActionLib.inf
 
 
 [LibraryClasses.common.PEIM, LibraryClasses.common.PEI_CORE]
@@ -128,11 +140,11 @@
   PeCoffGetEntryPointLib|InOsEmuPkg/Library/PeiEmuPeCoffGetEntryPointLib/PeiEmuPeCoffGetEntryPointLib.inf
   PeCoffExtraActionLib|InOsEmuPkg/Library/PeiEmuPeCoffExtraActionLib/PeiEmuPeCoffExtraActionLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
+  SerialPortLib|InOsEmuPkg/Library/PeiEmuSerialPortLib/PeiEmuSerialPortLib.inf
 
 [LibraryClasses.common.PEI_CORE]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PeiServicesTablePointerLib|InOsEmuPkg/Library/PeiCoreServicesTablePointerLib/PeiCoreServicesTablePointerLib.inf
-  SerialPortLib|InOsEmuPkg/Library/PeiEmuSerialPortLib/PeiEmuSerialPortLib.inf
 
 [LibraryClasses.common.PEIM]
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
@@ -252,6 +264,11 @@
   ##
   InOsEmuPkg/Unix/Sec/SecMain.inf
 !else
+  #
+  # Generic SEC
+  #
+  InOsEmuPkg/Sec/Sec.inf
+
   ##
   #  PEI Phase modules
   ##
@@ -261,10 +278,7 @@
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
   MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
-  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf {
-   <LibraryClasses>
-      SerialPortLib|InOsEmuPkg/Library/PeiEmuSerialPortLib/PeiEmuSerialPortLib.inf
-  }
+  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf 
   
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
   InOsEmuPkg/BootModePei/BootModePei.inf

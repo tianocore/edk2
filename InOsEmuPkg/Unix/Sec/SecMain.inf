@@ -32,7 +32,6 @@
 [Sources]
   SecMain.c
   EmuThunk.c
-  FwVol.c
   X11GraphicsWindow.c
   Pthreads.c
   PosixFileSystem.c
@@ -46,7 +45,6 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   InOsEmuPkg/InOsEmuPkg.dec
-  InOsEmuPkg/InOsEmuPkg.dec
 
 [LibraryClasses]
   DebugLib
@@ -57,13 +55,13 @@
   PeCoffLib
   ThunkPpiList
   ThunkProtocolList
-
+  PpiListLib
+  PeiServicesLib
+  PeCoffGetEntryPointLib
 
 [Ppis]
   gEfiPeiStatusCodePpiGuid                      # PPI ALWAYS_PRODUCED
-  gEfiTemporaryRamSupportPpiGuid
   gEmuThunkPpiGuid
-  gEmuPeiServicesTableUpdatePpiGuid
 
 [Protocols]
   gEmuIoThunkProtocolGuid

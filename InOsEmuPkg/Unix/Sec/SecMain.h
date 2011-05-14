@@ -28,11 +28,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Library/ThunkPpiList.h>
 #include <Library/ThunkProtocolList.h>
+#include <Library/PpiListLib.h>
+#include <Library/PeiServicesLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
 
 #include <Ppi/EmuThunk.h>
 #include <Ppi/StatusCode.h>
-#include <Ppi/TemporaryRamSupport.h>
-#include <Ppi/EmuPeiServicesTableUpdate.h>
 
 #include <Protocol/SimplePointer.h>
 #include <Protocol/SimpleTextIn.h>
@@ -289,7 +290,23 @@ VOID
 SecInitThunkProtocol (
   VOID
   );
+ 
   
+EFI_PHYSICAL_ADDRESS *
+MapMemory (
+  INTN fd,
+  UINT64 length,
+  INTN   prot,
+  INTN   flags);
+
+EFI_STATUS
+MapFile (
+  IN  CHAR8                     *FileName,
+  IN OUT  EFI_PHYSICAL_ADDRESS  *BaseAddress,
+  OUT UINT64                    *Length
+  );
+
+ 
 
 VOID SecSleep (UINT64 Milliseconds);
 VOID SecEnableInterrupt (VOID);
