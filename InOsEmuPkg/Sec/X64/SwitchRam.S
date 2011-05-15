@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 # Portitions copyright (c) 2011, Apple Inc. All rights reserved.
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -35,7 +35,7 @@ ASM_PFX(SecTemporaryRamSupport):
   pushq   %rdx          // Save TemporaryMemoryBase
   pushq   %r8           // Save PermanentMemoryBase
   pushq   %r9           // Save CopySize
-  
+
   //
   // Copy all of temp RAM to permanent memory, including stack
   //
@@ -43,9 +43,11 @@ ASM_PFX(SecTemporaryRamSupport):
   //          %rcx,                %rdx,                %r8
   movq    %r8,  %rcx    // Shift arguments
   movq    %r9,  %r8
+  subq    $0x28, %rsp   // Allocate register spill area & 16-byte align stack
   call    ASM_PFX(CopyMem)
   // Temp mem stack now copied to permanent location. %esp still in temp memory
-  
+  addq    $0x28, %rsp
+
   popq    %r9           // CopySize (old stack)
   popq    %r8           // PermanentMemoryBase (old stack)
   popq    %rdx          // TemporaryMemoryBase (old stack)
@@ -59,7 +61,9 @@ ASM_PFX(SecTemporaryRamSupport):
   // ZeroMem (TemporaryMemoryBase /* rcx */, CopySize /* rdx */);
   movq    %rdx, %rcx
   movq    %r9,  %rdx
+  subq    $0x28, %rsp   // Allocate register spill area & 16-byte align stack
   call    ASM_PFX(ZeroMem)
+  addq    $0x28, %rsp
 
   // This data comes off the NEW stack
   popq    %rbp
