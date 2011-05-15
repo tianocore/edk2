@@ -566,7 +566,7 @@ SecPeCoffGetEntryPoint (
   //
   // Relocate image to match the address where it resides
   //
-  ImageContext.ImageAddress = Pe32Data;
+  ImageContext.ImageAddress = (UINTN)Pe32Data;
   Status = PeCoffLoaderLoadImage (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
