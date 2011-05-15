@@ -27,17 +27,17 @@
   APs to help test system memory in parallel with other device initialization.
   Diagnostics applications may also use this protocol for multi-processor.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 Portitions Copyright (c) 2011, Apple Inc. All rights reserved.
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  
+
 **/
 
 #include "CpuDriver.h"
@@ -929,6 +929,8 @@ CpuCheckAllAPsStatus (
   EFI_STATUS            Status;
   PROCESSOR_STATE       ProcessorState;
 
+  ProcessorData = (PROCESSOR_DATA_BLOCK *) Context;
+
   for (ProcessorNumber = 0; ProcessorNumber < gMPSystem.NumberOfProcessors; ProcessorNumber++) {
     if ((ProcessorData[ProcessorNumber].Info.StatusFlag & PROCESSOR_AS_BSP_BIT) == PROCESSOR_AS_BSP_BIT) {
      // Skip BSP
@@ -1212,7 +1214,6 @@ CpuMpServicesInit (
   EFI_HANDLE              Handle;
   EMU_IO_THUNK_PROTOCOL   *IoThunk;
   UINTN                   MaxCpus;
-  char                    *Str;
 
   MaxCpus = 1; // BSP
   

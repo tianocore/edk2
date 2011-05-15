@@ -1,15 +1,15 @@
 /** @file
  Emu Bus driver
- 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 **/
@@ -43,7 +43,6 @@ EmuBusDriverBindingSupported (
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
   EMU_THUNK_PROTOCOL        *EmuThunk;
-  UINTN                     Index;
 
   //
   // Check the contents of the first Device Path Node of RemainingDevicePath to make sure
@@ -145,17 +144,9 @@ EmuBusDriverBindingStart (
   EMU_IO_DEVICE                   *EmuDevice;
   EMU_BUS_DEVICE                  *EmuBusDevice;
   EMU_IO_THUNK_PROTOCOL           *EmuIoThunk;
-  UINTN                           Index;
-  CHAR16                          *StartString;
-  CHAR16                          *SubString;
-  UINTN                           StringSize;
   UINT16                          ComponentName[512];
   EMU_VENDOR_DEVICE_PATH_NODE     *Node;
   BOOLEAN                         CreateDevice;
-  CHAR16                          *TempStr;
-  CHAR16                          *PcdTempStr;
-  UINTN                           TempStrSize;
-
 
   Status = EFI_UNSUPPORTED;
 
