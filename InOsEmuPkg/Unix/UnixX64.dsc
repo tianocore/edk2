@@ -193,7 +193,7 @@
 
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFirmwareFdSize|0x002a0000
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFirmwareBlockSize|0x10000
-  gInOsEmuPkgTokenSpaceGuid.PcdEmuFirmwareVolume|L"../Fv/Fv_Recovery.fd"
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFirmwareVolume|L"../FV/FV_RECOVERY.fd"
   
   gInOsEmuPkgTokenSpaceGuid.PcdEmuMemorySizeForSecMain|L"64!64"
   
