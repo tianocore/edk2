@@ -1,7 +1,7 @@
 ## @file
 # This is Unix FDF file with UEFI HII features enabled
 #
-# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2009 - 2011, Apple Inc. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
@@ -249,18 +249,29 @@ INF  MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
 INF  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
 
  
-!if $(COMPILE_BINS)
+!if $(BUILD_FAT)
 INF FatPkg/EnhancedFatDxe/Fat.inf
 !else
 # Used checked in Visual Studio binaries
 INF  RuleOverride = BINARY USE = X64 FatBinPkg/EnhancedFatDxe/Fat.inf
 !endif
 
+!if $(BUILD_NEW_SHELL)
+INF  ShellPkg/Application/Shell/Shell.inf
+!else
+!if $(USE_NEW_SHELL)
+INF  ShellBinPkg/UefiShell/UefiShell.inf
+!else
  FILE APPLICATION = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile) {
-#  SECTION PE32 = ShellBinPkg/UefiShell/X64/Shell.efi
+!if $(BUILD_OLD_SHELL)
   SECTION PE32 = Build/GccShellPkg/DEBUG_XCLANG/X64/ShellFull.efi
+!else
+  SECTION PE32 = EdkShellBinPkg/FullShell/X64/Shell_Full.efi
+!endif
   SECTION UI = "Shell"
  }
+!endif
+!endif
 
 FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
   SECTION RAW = MdeModulePkg/Logo/Logo.bmp
