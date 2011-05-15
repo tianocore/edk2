@@ -553,16 +553,29 @@ SecPeCoffGetEntryPoint (
 {
   EFI_STATUS                    Status;
   PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
-  
-  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)Pe32Data;
-  ImageContext.SizeOfHeaders = PeCoffGetSizeOfHeaders (Pe32Data);
-  ImageContext.PdbPointer = PeCoffLoaderGetPdbPointer (Pe32Data);
-  Status = PeCoffLoaderGetEntryPoint (Pe32Data, EntryPoint);
-  if (!EFI_ERROR (Status)) {
+
+  ZeroMem (&ImageContext, sizeof (ImageContext));
+  ImageContext.Handle     = Pe32Data;
+  ImageContext.ImageRead  = (PE_COFF_LOADER_READ_FILE) SecImageRead;
+
+  Status                  = PeCoffLoaderGetImageInfo (&ImageContext);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  ImageContext.EntryPoint = (UINTN)EntryPoint;
+  //
+  // Relocate image to match the address where it resides
+  //
+  ImageContext.ImageAddress = Pe32Data;
+  Status = PeCoffLoaderLoadImage (&ImageContext);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = PeCoffLoaderRelocateImage (&ImageContext);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   // On Unix a dlopen is done that will change the entry point
   SecPeCoffRelocateImageExtraAction (&ImageContext);
@@ -652,6 +665,45 @@ CountSeperatorsInString (
   }
 
   return Count;
+}
+
+
+EFI_STATUS
+EFIAPI
+SecImageRead (
+  IN     VOID    *FileHandle,
+  IN     UINTN   FileOffset,
+  IN OUT UINTN   *ReadSize,
+  OUT    VOID    *Buffer
+  )
+/*++
+
+Routine Description:
+  Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file
+
+Arguments:
+  FileHandle - The handle to the PE/COFF file
+  FileOffset - The offset, in bytes, into the file to read
+  ReadSize   - The number of bytes to read from the file starting at FileOffset
+  Buffer     - A pointer to the buffer to read the data into.
+
+Returns:
+  EFI_SUCCESS - ReadSize bytes of data were read into Buffer from the PE/COFF file starting at FileOffset
+
+**/
+{
+  CHAR8 *Destination8;
+  CHAR8 *Source8;
+  UINTN Length;
+
+  Destination8  = Buffer;
+  Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
+  Length        = *ReadSize;
+  while (Length--) {
+    *(Destination8++) = *(Source8++);
+  }
+
+  return EFI_SUCCESS;
 }
 
 
