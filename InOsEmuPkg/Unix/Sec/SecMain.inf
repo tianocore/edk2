@@ -2,7 +2,7 @@
 # Entry Point of Emu Emulator
 #
 # Main executable file of Unix Emulator that loads PEI core after initialization finished.
-# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -94,7 +94,7 @@
 
 [BuildOptions]
    GCC:*_*_IA32_DLINK_FLAGS == -o $(BIN_DIR)/SecMain -m elf_i386 -dynamic-linker /lib/ld-linux.so.2 /usr/lib/crt1.o /usr/lib/crti.o -L/usr/X11R6/lib -lXext -lX11 /usr/lib/crtn.o
-   GCC:*_*_*_DLINK2_FLAGS == -lc
+   GCC:*_*_*_DLINK2_FLAGS == -lpthread -lc
    GCC:*_*_IA32_CC_FLAGS == -m32 -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -idirafter/usr/include -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
    GCC:*_*_IA32_PP_FLAGS == -m32 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
    GCC:*_*_IA32_ASM_FLAGS == -m32 -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
