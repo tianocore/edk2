@@ -126,6 +126,7 @@ typedef struct {
 //
 #define SCAN_F11                  0x0015
 #define SCAN_F12                  0x0016
+#define SCAN_PAUSE                0x0048
 #define SCAN_F13                  0x0068
 #define SCAN_F14                  0x0069
 #define SCAN_F15                  0x006A
