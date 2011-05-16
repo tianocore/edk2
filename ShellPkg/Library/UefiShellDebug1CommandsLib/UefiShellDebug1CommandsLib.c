@@ -56,7 +56,7 @@ UefiShellDebug1CommandsLibConstructor (
   // check our bit of the profiles mask
   //
   if ((PcdGet8(PcdShellProfileMask) & BIT1) == 0) {
-    return (EFI_UNSUPPORTED);
+    return (EFI_SUCCESS);
   }
 
   //

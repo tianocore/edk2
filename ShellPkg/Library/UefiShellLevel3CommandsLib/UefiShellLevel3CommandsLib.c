@@ -57,7 +57,7 @@ ShellLevel3CommandsLibConstructor (
   // if shell level is less than 3 do nothing
   //
   if (PcdGet8(PcdShellSupportLevel) < 3) {
-    return (EFI_UNSUPPORTED);
+    return (EFI_SUCCESS);
   }
 
   gShellLevel3HiiHandle = HiiAddPackages (&gShellLevel3HiiGuid, gImageHandle, UefiShellLevel3CommandsLibStrings, NULL);

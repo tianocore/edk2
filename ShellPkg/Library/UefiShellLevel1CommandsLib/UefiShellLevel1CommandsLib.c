@@ -58,7 +58,7 @@ ShellLevel1CommandsLibConstructor (
   // if shell level is less than 2 do nothing
   //
   if (PcdGet8(PcdShellSupportLevel) < 1) {
-    return (EFI_UNSUPPORTED);
+    return (EFI_SUCCESS);
   }
 
   gShellLevel1HiiHandle = HiiAddPackages (&gShellLevel1HiiGuid, gImageHandle, UefiShellLevel1CommandsLibStrings, NULL);

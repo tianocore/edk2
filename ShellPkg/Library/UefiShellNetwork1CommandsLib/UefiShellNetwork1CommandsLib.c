@@ -58,7 +58,7 @@ ShellNetwork1CommandsLibConstructor (
   // check our bit of the profiles mask
   //
   if ((PcdGet8(PcdShellProfileMask) & BIT3) == 0) {
-    return (EFI_UNSUPPORTED);
+    return (EFI_SUCCESS);
   }
 
   gShellNetwork1HiiHandle = HiiAddPackages (&gShellNetwork1HiiGuid, gImageHandle, UefiShellNetwork1CommandsLibStrings, NULL);
