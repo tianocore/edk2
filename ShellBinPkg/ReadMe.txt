@@ -1,16 +1,19 @@
 ============================================================================
                                  OVERVIEW
 ============================================================================
-The binaries of ShellBinPkg are generated with ShellPkg project and built with
-BaseTools Package. The binaries are built with no debug information by building
-with "RELEASE" target. The EDKII revision 11595 was used for both.
+The binaries of ShellBinPkg are generated with ShellPkg project and built with 
+BaseTools Package (r11666). The binaries are built with no debug information 
+by building with "RELEASE" target.
 
 The following steps can help to re-generate these binaries for customization:
 1. Check out EDK II to $(WORKSPACE) 
-   (svn https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2).
+(svn https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2).
+
 2. Under $(WORKSPACE) directory (i.e. c:\EdkII),
-   To generate Shell, execute: 
-      "build -a IA32 -a X64 -p ShellPkg\ShellPkg.dsc -b RELEASE".
+   To generate Shell, execute:
+        "build -a IA32 -a X64 -p ShellPkg\ShellPkg.dsc -b RELEASE"
+   To generate Minimal Shell, execute:
+        "build -a IA32 -a X64 -p ShellPkg\ShellPkg.dsc -b RELEASE -D NO_SHELL_PROFILES"
 
 ============================================================================
                     HOW TO INCORPORATE THIS SHELL INTO NT32
@@ -36,7 +39,7 @@ developer may integrate this code into an existing platform:
                           KNOWN LIMITATIONS
 ============================================================================
 1. RM can delete current working directory via other map name.
-2. DrvCfg is not functional.
+2. DrvCfg does not overlap boot manager functionality.
 3. ifConfig permanent settings are under investigation (may not function correctly)
 4. Shell documentation is in development and forthcoming.
 
