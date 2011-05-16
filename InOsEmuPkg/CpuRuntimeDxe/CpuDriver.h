@@ -1,7 +1,8 @@
 /*++ @file
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
+
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -23,7 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Smbios.h>
 #include <Protocol/FrameworkHii.h>
 #include <Protocol/MpService.h>
-#include <Protocol/EmuPthreadThunk.h>
+#include <Protocol/EmuThread.h>
 #include <Protocol/CpuIo2.h>
 
 #include <Guid/DataHubRecords.h>

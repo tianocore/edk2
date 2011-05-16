@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -277,7 +278,7 @@ EFIAPI
 GasketPthreadCreate (
   IN  VOID                      *Thread,
   IN  VOID                      *Attribute,
-  IN  PTREAD_THUNK_THEAD_ENTRY  Start,
+  IN  THREAD_THUNK_THREAD_ENTRY Start,
   IN  VOID                      *Context
   );
  

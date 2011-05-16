@@ -1,6 +1,7 @@
 /** @file
-  Construct MP Services Protocol on top of pthreads. This code makes APs show up 
-  in the emulator. PcdEmuApCount is the number of APs the emulator should produce.
+  Construct MP Services Protocol on top of the EMU Thread protocol.
+  This code makes APs show up in the emulator. PcdEmuApCount is the
+  number of APs the emulator should produce.
 
   The MP Services Protocol provides a generalized way of performing following tasks:
     - Retrieving information of multi-processor environment and MP-related status of
@@ -44,7 +45,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 MP_SYSTEM_DATA                gMPSystem;
-EMU_PTREAD_THUNK_PROTOCOL     *gPthread = NULL; 
+EMU_THREAD_THUNK_PROTOCOL     *gThread = NULL; 
 EFI_EVENT                     gReadToBootEvent;
 BOOLEAN                       gReadToBoot = FALSE;
 UINTN                         gPollInterval;
@@ -74,10 +75,10 @@ SetApProcedure (
   IN   VOID                  *ProcedureArgument
   )
 {
-  gPthread->MutextLock (Processor->ProcedureLock);
+  gThread->MutexLock (Processor->ProcedureLock);
   Processor->Parameter  = ProcedureArgument;
   Processor->Procedure  = Procedure;
-  gPthread->MutexUnlock (Processor->ProcedureLock);
+  gThread->MutexUnlock (Processor->ProcedureLock);
 }
 
 
@@ -97,9 +98,9 @@ GetNextBlockedNumber (
       continue;
     }
 
-    gPthread->MutextLock (Data->StateLock);
+    gThread->MutexLock (Data->StateLock);
     ProcessorState = Data->State;
-    gPthread->MutexUnlock (Data->StateLock);
+    gThread->MutexUnlock (Data->StateLock);
 
     if (ProcessorState == CPU_STATE_BLOCKED) {
       *NextNumber = Number;
@@ -433,9 +434,9 @@ CpuMpServicesStartupAllAps (
     if (ProcessorData->State == CPU_STATE_IDLE) {
       gMPSystem.StartCount++;
 
-      gPthread->MutextLock (&ProcessorData->StateLock);
+      gThread->MutexLock (&ProcessorData->StateLock);
       ProcessorData->State = APInitialState;
-      gPthread->MutexUnlock (&ProcessorData->StateLock);
+      gThread->MutexUnlock (&ProcessorData->StateLock);
 
       if (SingleThread) {
         APInitialState = CPU_STATE_BLOCKED;
@@ -462,9 +463,9 @@ CpuMpServicesStartupAllAps (
         continue;
       }
 
-      gPthread->MutextLock (ProcessorData->StateLock);
+      gThread->MutexLock (ProcessorData->StateLock);
       ProcessorState = ProcessorData->State;
-      gPthread->MutexUnlock (ProcessorData->StateLock);
+      gThread->MutexUnlock (ProcessorData->StateLock);
 
       switch (ProcessorState) {
       case CPU_STATE_READY:
@@ -649,14 +650,14 @@ CpuMpServicesStartupThisAP (
   SetApProcedure (&gMPSystem.ProcessorData[ProcessorNumber], Procedure, ProcedureArgument);
 
   while (TRUE) {
-    gPthread->MutextLock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+    gThread->MutexLock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
     if (gMPSystem.ProcessorData[ProcessorNumber].State == CPU_STATE_FINISHED) {
       gMPSystem.ProcessorData[ProcessorNumber].State = CPU_STATE_IDLE;
-      gPthread->MutexUnlock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+      gThread->MutexUnlock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
       break;
     }
 
-    gPthread->MutexUnlock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+    gThread->MutexUnlock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
 
     if ((TimeoutInMicroseconds != 0) && (Timeout < 0)) {
       gMPSystem.WaitEvent = WaitEvent;
@@ -821,7 +822,7 @@ CpuMpServicesEnableDisableAP (
     return EFI_UNSUPPORTED;
   }
 
-  gPthread->MutextLock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+  gThread->MutexLock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
   
   if (EnableAP) {
     if ((gMPSystem.ProcessorData[ProcessorNumber].Info.StatusFlag & PROCESSOR_ENABLED_BIT) == 0 ) {
@@ -840,7 +841,7 @@ CpuMpServicesEnableDisableAP (
     gMPSystem.ProcessorData[ProcessorNumber].Info.StatusFlag |= (*HealthFlag & PROCESSOR_HEALTH_STATUS_BIT);
   }
   
-  gPthread->MutexUnlock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+  gThread->MutexUnlock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
   
   return EFI_SUCCESS;
 }
@@ -884,7 +885,7 @@ CpuMpServicesWhoAmI (
     return EFI_INVALID_PARAMETER;
   }
   
-  ProcessorId = gPthread->Self ();
+  ProcessorId = gThread->Self ();
   for (Index = 0; Index < gMPSystem.NumberOfProcessors; Index++) {
     if (gMPSystem.ProcessorData[Index].Info.ProcessorId == ProcessorId) {
       break;
@@ -942,12 +943,12 @@ CpuCheckAllAPsStatus (
     // context. Meaning deadlock. Which is a bad thing.
     // So, try lock it. If we can get it, cool, do our thing.
     // otherwise, just dump out & try again on the next iteration.
-    Status = gPthread->MutexTryLock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+    Status = gThread->MutexTryLock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
     if (EFI_ERROR(Status)) {
       return;
     }
     ProcessorState = gMPSystem.ProcessorData[ProcessorNumber].State;
-    gPthread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+    gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
 
     switch (ProcessorState) {
     case CPU_STATE_READY:
@@ -960,9 +961,9 @@ CpuCheckAllAPsStatus (
         if (!EFI_ERROR (Status)) {
           NextData = &gMPSystem.ProcessorData[NextNumber];
 
-          gPthread->MutextLock (&NextData->ProcedureLock);
+          gThread->MutexLock (&NextData->ProcedureLock);
           NextData->State = CPU_STATE_READY;
-          gPthread->MutexUnlock (&NextData->ProcedureLock);
+          gThread->MutexUnlock (&NextData->ProcedureLock);
 
           SetApProcedure (NextData, gMPSystem.Procedure, gMPSystem.ProcedureArgument);
         }
@@ -1009,12 +1010,12 @@ CpuCheckThisAPStatus (
   // So, try lock it. If we can get it, cool, do our thing.
   // otherwise, just dump out & try again on the next iteration.
   //
-  Status = gPthread->MutexTryLock (ProcessorData->StateLock);
+  Status = gThread->MutexTryLock (ProcessorData->StateLock);
   if (EFI_ERROR(Status)) {
     return;
   }
   ProcessorState = ProcessorData->State;
-  gPthread->MutexUnlock (ProcessorData->StateLock);
+  gThread->MutexUnlock (ProcessorData->StateLock);
 
   if (ProcessorState == CPU_STATE_FINISHED) {
     Status = gBS->SetTimer (ProcessorData->CheckThisAPEvent, TimerCancel, 0);
@@ -1023,9 +1024,9 @@ CpuCheckThisAPStatus (
     Status = gBS->SignalEvent (gMPSystem.WaitEvent);
     ASSERT_EFI_ERROR (Status);
     
-    gPthread->MutextLock (ProcessorData->StateLock);
+    gThread->MutexLock (ProcessorData->StateLock);
     ProcessorData->State = CPU_STATE_IDLE;
-    gPthread->MutexUnlock (ProcessorData->StateLock);
+    gThread->MutexUnlock (ProcessorData->StateLock);
   }
 
   return ;
@@ -1051,7 +1052,7 @@ FillInProcessorInformation (
 
   ProcessorData = &gMPSystem.ProcessorData[ProcessorNumber];
   
-  gMPSystem.ProcessorData[ProcessorNumber].Info.ProcessorId  = gPthread->Self ();
+  gMPSystem.ProcessorData[ProcessorNumber].Info.ProcessorId  = gThread->Self ();
   gMPSystem.ProcessorData[ProcessorNumber].Info.StatusFlag   = PROCESSOR_ENABLED_BIT | PROCESSOR_HEALTH_STATUS_BIT;
   if (BSP) {
     gMPSystem.ProcessorData[ProcessorNumber].Info.StatusFlag |= PROCESSOR_AS_BSP_BIT;
@@ -1064,8 +1065,8 @@ FillInProcessorInformation (
   
   gMPSystem.ProcessorData[ProcessorNumber].Procedure        = NULL;
   gMPSystem.ProcessorData[ProcessorNumber].Parameter        = NULL;
-  gMPSystem.ProcessorData[ProcessorNumber].StateLock        = gPthread->MutexInit ();
-  gMPSystem.ProcessorData[ProcessorNumber].ProcedureLock    = gPthread->MutexInit ();
+  gMPSystem.ProcessorData[ProcessorNumber].StateLock        = gThread->MutexInit ();
+  gMPSystem.ProcessorData[ProcessorNumber].ProcedureLock    = gThread->MutexInit ();
 
   return EFI_SUCCESS;
 }
@@ -1084,31 +1085,31 @@ CpuDriverApIdolLoop (
   ProcessorNumber = (UINTN)Context;
   ProcessorData = &gMPSystem.ProcessorData[ProcessorNumber];
     
-  ProcessorData->Info.ProcessorId = gPthread->Self ();
+  ProcessorData->Info.ProcessorId = gThread->Self ();
  
   while (TRUE) {
     //
     // Make a local copy on the stack to be extra safe
     //
-    gPthread->MutextLock (ProcessorData->ProcedureLock);
+    gThread->MutexLock (ProcessorData->ProcedureLock);
     Procedure = ProcessorData->Procedure;
     Parameter = ProcessorData->Parameter;
-    gPthread->MutexUnlock (ProcessorData->ProcedureLock);
+    gThread->MutexUnlock (ProcessorData->ProcedureLock);
   
     if (Procedure != NULL) {
-      gPthread->MutextLock (ProcessorData->StateLock);
+      gThread->MutexLock (ProcessorData->StateLock);
       ProcessorData->State = CPU_STATE_BUSY;
-      gPthread->MutexUnlock (ProcessorData->StateLock);
+      gThread->MutexUnlock (ProcessorData->StateLock);
   
       Procedure (Parameter);
     
-      gPthread->MutextLock (ProcessorData->ProcedureLock);
+      gThread->MutexLock (ProcessorData->ProcedureLock);
       ProcessorData->Procedure = NULL;
-      gPthread->MutexUnlock (ProcessorData->ProcedureLock);
+      gThread->MutexUnlock (ProcessorData->ProcedureLock);
   
-      gPthread->MutextLock (ProcessorData->StateLock);
+      gThread->MutexLock (ProcessorData->StateLock);
       ProcessorData->State = CPU_STATE_FINISHED;
-      gPthread->MutexUnlock (ProcessorData->StateLock);  
+      gThread->MutexUnlock (ProcessorData->StateLock);  
     }
     
     // Poll 5 times a seconds, 200ms
@@ -1163,7 +1164,7 @@ InitializeMpSystemData (
     
     FillInProcessorInformation (FALSE, Index);
     
-    Status = gPthread->CreateThread (
+    Status = gThread->CreateThread (
                         (VOID *)&gMPSystem.ProcessorData[Index].Info.ProcessorId, 
                         NULL,
                         CpuDriverApIdolLoop,
@@ -1217,13 +1218,13 @@ CpuMpServicesInit (
 
   MaxCpus = 1; // BSP
   
-  IoThunk = GetIoThunkInstance (&gEmuPthreadThunkProtocolGuid, 0);
+  IoThunk = GetIoThunkInstance (&gEmuThreadThunkProtocolGuid, 0);
   if (IoThunk != NULL) {
     Status = IoThunk->Open (IoThunk);
     if (!EFI_ERROR (Status)) {
       if (IoThunk->ConfigString != NULL) {
         MaxCpus += StrDecimalToUintn (IoThunk->ConfigString);
-        gPthread = IoThunk->Interface;
+        gThread = IoThunk->Interface;
       }
     }
   }

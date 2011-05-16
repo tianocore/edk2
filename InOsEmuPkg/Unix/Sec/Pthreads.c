@@ -2,6 +2,8 @@
  POSIX Pthreads to emulate APs and implement threads
 
 Copyright (c) 2011, Apple Inc. All rights reserved.
+Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -81,7 +83,7 @@ PthreadMutexDestroy (
 // Can't store this data on PthreadCreate stack so we need a global
 typedef struct {
   pthread_mutex_t             Mutex;
-  PTREAD_THUNK_THEAD_ENTRY    Start;
+  THREAD_THUNK_THREAD_ENTRY   Start;
 } THREAD_MANGLE;
 
 THREAD_MANGLE mThreadMangle = {
@@ -94,7 +96,7 @@ SecFakePthreadStart (
   VOID  *Context
   )
 {
-  PTREAD_THUNK_THEAD_ENTRY  Start;
+  THREAD_THUNK_THREAD_ENTRY Start;
   sigset_t                  SigMask;
   
   // Save global on the stack before we unlock
@@ -120,7 +122,7 @@ UINTN
 PthreadCreate (
   IN  VOID                      *Thread,
   IN  VOID                      *Attribute,
-  IN  PTREAD_THUNK_THEAD_ENTRY  Start,
+  IN  THREAD_THUNK_THREAD_ENTRY Start,
   IN  VOID                      *Context
   )
 {
@@ -178,7 +180,7 @@ PthreadSelf (
 }
 
 
-EMU_PTREAD_THUNK_PROTOCOL gPthreadThunk = {
+EMU_THREAD_THUNK_PROTOCOL gPthreadThunk = {
   GasketPthreadMutexLock,
   GasketPthreadMutexUnLock,
   GasketPthreadMutexTryLock,
@@ -221,7 +223,7 @@ PthreadClose (
 
 
 EMU_IO_THUNK_PROTOCOL gPthreadThunkIo = {
-  &gEmuPthreadThunkProtocolGuid,
+  &gEmuThreadThunkProtocolGuid,
   NULL,
   NULL,
   0,
