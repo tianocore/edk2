@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -349,6 +349,7 @@ handleKeyEvent(UGA_IO_PRIVATE *drv, XEvent *ev)
   case XK_Page_Up:    KeyData.Key.ScanCode = SCAN_PAGE_UP;    break;
   case XK_Page_Down:  KeyData.Key.ScanCode = SCAN_PAGE_DOWN;  break;
   case XK_Escape:     KeyData.Key.ScanCode = SCAN_ESC;        break;
+  case XK_Pause:      KeyData.Key.ScanCode = SCAN_PAUSE;      break;
 
   case XK_F1:   KeyData.Key.ScanCode = SCAN_F1;   break;
   case XK_F2:   KeyData.Key.ScanCode = SCAN_F2;   break;
