@@ -1,7 +1,7 @@
 ;/** @file
 ;  Low leve IA32 specific debug support functions.
 ;
-;  Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+;  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 ;  This program and the accompanying materials
 ;  are licensed and made available under the terms and conditions of the BSD License
 ;  which accompanies this distribution.  The full text of the license may be found at
@@ -362,6 +362,9 @@ CommonIdtEntry::
                 ; insure that esp and edi are 16 byte aligned when we get here.
                 ; They MUST be.  If they are not, a GP fault will occur.
                 FXSTOR_EDI
+
+;; UEFI calling convention for IA32 requires that Direction flag in EFLAGs is clear
+                cld
 
 ;; UINT32  ExceptionData;
                 mov     eax, ExceptData

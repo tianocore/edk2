@@ -1,7 +1,7 @@
 ;/** @file
 ;  Low level x64 routines used by the debug support driver.
 ;
-;  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+;  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 ;  This program and the accompanying materials
 ;  are licensed and made available under the terms and conditions of the BSD License
 ;  which accompanies this distribution.  The full text of the license may be found at
@@ -392,6 +392,9 @@ ExtraPushDone:
                 ; insure that rsp and rdi are 16 byte aligned when we get here.
                 ; They MUST be.  If they are not, a GP fault will occur.
                 FXSTOR_RDI
+
+;; UEFI calling convention for x64 requires that Direction flag in EFLAGs is clear
+                cld
 
 ;; UINT64  ExceptionData;
                 mov     rax, ExceptData
