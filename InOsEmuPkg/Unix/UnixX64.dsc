@@ -223,7 +223,7 @@
   gInOsEmuPkgTokenSpaceGuid.PcdEmuPhysicalDisk|L"E:RW;245760;512"
   gInOsEmuPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"FW;40960;512"
   gInOsEmuPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"
-  gInOsEmuPkgTokenSpaceGuid.PcdEmuFileSystem|L".!../../../../EdkShellBinPkg/Bin/Ia32/Apps"
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFileSystem|L".!../../../../EdkShellBinPkg/Bin"
   gInOsEmuPkgTokenSpaceGuid.PcdEmuSerialPort|L"/dev/ttyS0"
   gInOsEmuPkgTokenSpaceGuid.PcdEmuNetworkInterface|L"en0"
 
