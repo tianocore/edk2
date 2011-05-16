@@ -1493,7 +1493,7 @@ PosixFileSystmeThunkOpen (
   Private->FilePath[i] = 0;
 
 
-  Private->VolumeLabel = malloc (StrLen (L"EFI_EMULATED"));
+  Private->VolumeLabel = malloc (StrSize (L"EFI_EMULATED"));
   if (Private->VolumeLabel == NULL) {
     free (Private->FilePath);
     free (Private);
