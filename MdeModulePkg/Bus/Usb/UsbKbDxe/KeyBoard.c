@@ -299,6 +299,10 @@ UINT8 ModifierValueToEfiScanCodeConvertionTable[] = {
   SCAN_F10,        // EFI_FUNCTION_KEY_TEN_MODIFIER
   SCAN_F11,        // EFI_FUNCTION_KEY_ELEVEN_MODIFIER
   SCAN_F12,        // EFI_FUNCTION_KEY_TWELVE_MODIFIER
+  SCAN_NULL,       // EFI_PRINT_MODIFIER
+  SCAN_NULL,       // EFI_SYS_REQUEST_MODIFIER
+  SCAN_NULL,       // EFI_SCROLL_LOCK_MODIFIER
+  SCAN_PAUSE       // EFI_PAUSE_MODIFIER
 };
 
 /**
@@ -1476,17 +1480,6 @@ USBParseKey (
       continue;
       break;
 
-    //
-    // PrintScreen, Pause/Break could not be retrieved via SimpleTextInEx protocol
-    //
-    case EFI_PAUSE_MODIFIER:
-    case EFI_BREAK_MODIFIER:
-      //
-      // Fall through
-      //
-      continue;
-      break;
-
     default:
       break;
     }
@@ -1569,7 +1562,7 @@ UsbKeyCodeToEfiInputKey (
   //
   // Make sure modifier of Key Descriptor is in the valid range according to UEFI spec.
   //
-  if (KeyDescriptor->Modifier > EFI_FUNCTION_KEY_TWELVE_MODIFIER) {
+  if (KeyDescriptor->Modifier > (sizeof (ModifierValueToEfiScanCodeConvertionTable) / sizeof (UINT8))) {
     return EFI_DEVICE_ERROR;
   }
 
