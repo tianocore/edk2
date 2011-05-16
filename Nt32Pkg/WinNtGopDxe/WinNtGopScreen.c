@@ -135,6 +135,7 @@ WinNtGopConvertParamToEfiKey (
   case VK_F22:        Key->ScanCode = SCAN_F22;        break;
   case VK_F23:        Key->ScanCode = SCAN_F23;        break;
   case VK_F24:        Key->ScanCode = SCAN_F24;        break;
+  case VK_PAUSE:      Key->ScanCode = SCAN_PAUSE;      break;
 
   //
   // Set toggle state
