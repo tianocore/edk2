@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ps2Keyboard.h"
 
 struct {
-  UINT8   ScanCode;             ///< follows value defined in Scan Code Set1
+  UINT16  ScanCode;             ///< follows value defined in Scan Code Set1
   UINT16  EfiScanCode;
   CHAR16  UnicodeChar;
   CHAR16  ShiftUnicodeChar;
@@ -549,7 +549,13 @@ ConvertKeyboardScanCodeToEfiKey[] = {
     SCAN_NULL,
     0x0000,
     0x0000
-  },    
+  },  
+  {
+    0x1D45,  //Pause key
+    SCAN_PAUSE,
+    0x0000,
+    0x0000
+  }, 
   {
     TABLE_END,
     TABLE_END,
@@ -1152,8 +1158,9 @@ KeyGetchar (
   )
 {
   EFI_STATUS                     Status;
-  UINT8                          ScanCode;
+  UINT16                         ScanCode;
   BOOLEAN                        Extended;
+  BOOLEAN                        Extended1;
   UINTN                          Index;
   EFI_KEY_DATA                   KeyData;
   LIST_ENTRY                     *Link;
@@ -1163,20 +1170,18 @@ KeyGetchar (
   //
   UINT8                          ScancodeArr[4];
   UINT32                         ScancodeArrPos;
-  //
-  // point to the current position in ScancodeArr
-  //
-
-  Extended        = FALSE;
-  ScancodeArrPos  = 0;
   
   //
   // Check if there are enough bytes of scancode representing a single key
   // available in the buffer
   //
   while (TRUE) {
-
+    Extended          = FALSE;
+    Extended1         = FALSE;
     Status            = GetScancodeBufHead (&ConsoleIn->ScancodeQueue, 1, ScancodeArr);
+    //
+    // point to the current position in ScancodeArr
+    //
     ScancodeArrPos    = 0;
     if (EFI_ERROR (Status)) {
       return ;
@@ -1195,7 +1200,7 @@ KeyGetchar (
     // if present, ignore them
     //
     if (ScancodeArr[ScancodeArrPos] == SCANCODE_EXTENDED1) {
-
+      Extended1       = TRUE;
       Status          = GetScancodeBufHead (&ConsoleIn->ScancodeQueue, 2, ScancodeArr);
       ScancodeArrPos  = 1;
 
@@ -1209,9 +1214,6 @@ KeyGetchar (
       if (EFI_ERROR (Status)) {
         return ;
       }
-
-      PopScancodeBufHead (&ConsoleIn->ScancodeQueue, 3, ScancodeArr);
-      return ;
     }
     //
     // if we reach this position, scancodes for a key is in buffer now,pop them
@@ -1220,104 +1222,114 @@ KeyGetchar (
     if (EFI_ERROR (Status)) {
       return ;
     }
-    //
-    // store the last available byte, this byte of scancode will be checked
-    //
-    ScanCode = ScancodeArr[ScancodeArrPos];
 
-    //
-    // Check for special keys and update the driver state.
-    //
-    switch (ScanCode) {
-
-    case SCANCODE_CTRL_MAKE:
-      ConsoleIn->Ctrl = TRUE;
-      break;
-
-    case SCANCODE_CTRL_BREAK:
-      ConsoleIn->Ctrl = FALSE;
-      break;
-
-    case SCANCODE_ALT_MAKE:
-      ConsoleIn->Alt = TRUE;
-      break;
-
-    case SCANCODE_ALT_BREAK:
-      ConsoleIn->Alt = FALSE;
-      break;
-
-    case SCANCODE_LEFT_SHIFT_MAKE:
-      if (!Extended) {
-        ConsoleIn->Shift     = TRUE;
-        ConsoleIn->LeftShift = TRUE;
-      }      
-      break;
-    case SCANCODE_RIGHT_SHIFT_MAKE:
-      if (!Extended) {
-        ConsoleIn->Shift = TRUE;
-        ConsoleIn->RightShift = TRUE;
+    if (!Extended1) {
+      //
+      // store the last available byte, this byte of scancode will be checked
+      //
+      ScanCode = ScancodeArr[ScancodeArrPos];
+      
+      //
+      // Check for special keys and update the driver state.
+      //
+      switch (ScanCode) {
+      
+      case SCANCODE_CTRL_MAKE:
+        ConsoleIn->Ctrl = TRUE;
+        break;
+      
+      case SCANCODE_CTRL_BREAK:
+        ConsoleIn->Ctrl = FALSE;
+        break;
+      
+      case SCANCODE_ALT_MAKE:
+        ConsoleIn->Alt = TRUE;
+        break;
+      
+      case SCANCODE_ALT_BREAK:
+        ConsoleIn->Alt = FALSE;
+        break;
+      
+      case SCANCODE_LEFT_SHIFT_MAKE:
+        if (!Extended) {
+          ConsoleIn->Shift     = TRUE;
+          ConsoleIn->LeftShift = TRUE;
+        }      
+        break;
+      case SCANCODE_RIGHT_SHIFT_MAKE:
+        if (!Extended) {
+          ConsoleIn->Shift = TRUE;
+          ConsoleIn->RightShift = TRUE;
+        }
+        break;
+      
+      case SCANCODE_LEFT_SHIFT_BREAK:
+        if (!Extended) {
+          ConsoleIn->Shift     = FALSE;
+          ConsoleIn->LeftShift = FALSE;
+        } else {
+          ConsoleIn->SysReq    = FALSE;
+        }      
+        break;
+      case SCANCODE_RIGHT_SHIFT_BREAK:
+        if (!Extended) {
+          ConsoleIn->Shift = FALSE;
+          ConsoleIn->RightShift = FALSE;
+        }
+        break;
+      
+      case SCANCODE_LEFT_LOGO_MAKE:
+        ConsoleIn->LeftLogo = TRUE;
+        break;    
+      case SCANCODE_LEFT_LOGO_BREAK:
+        ConsoleIn->LeftLogo = FALSE;
+        break;          
+      case SCANCODE_RIGHT_LOGO_MAKE:
+        ConsoleIn->RightLogo = TRUE;
+        break;
+      case SCANCODE_RIGHT_LOGO_BREAK:
+        ConsoleIn->RightLogo = FALSE;
+        break;      
+      case SCANCODE_MENU_MAKE:
+        ConsoleIn->Menu = TRUE;
+        break;
+      case SCANCODE_MENU_BREAK:
+        ConsoleIn->Menu = FALSE;
+        break;      
+      case SCANCODE_SYS_REQ_MAKE:
+        if (Extended) {
+          ConsoleIn->SysReq = TRUE;
+        }
+        break;
+      case SCANCODE_CAPS_LOCK_MAKE:
+        ConsoleIn->CapsLock = (BOOLEAN)!ConsoleIn->CapsLock;
+        UpdateStatusLights (ConsoleIn);
+        break;
+      case SCANCODE_NUM_LOCK_MAKE:
+        ConsoleIn->NumLock = (BOOLEAN)!ConsoleIn->NumLock;
+        UpdateStatusLights (ConsoleIn);
+        break;
+      case SCANCODE_SCROLL_LOCK_MAKE:
+        ConsoleIn->ScrollLock = (BOOLEAN)!ConsoleIn->ScrollLock;
+        UpdateStatusLights (ConsoleIn);
+        break;
       }
-      break;
-
-    case SCANCODE_LEFT_SHIFT_BREAK:
-      if (!Extended) {
-        ConsoleIn->Shift     = FALSE;
-        ConsoleIn->LeftShift = FALSE;
+      //
+      // If this is above the valid range, ignore it
+      //
+      if (ScanCode >= SCANCODE_MAX_MAKE) {
+        continue;
       } else {
-        ConsoleIn->SysReq    = FALSE;
-      }      
-      break;
-    case SCANCODE_RIGHT_SHIFT_BREAK:
-      if (!Extended) {
-        ConsoleIn->Shift = FALSE;
-        ConsoleIn->RightShift = FALSE;
+        break;
       }
-      break;
-
-    case SCANCODE_LEFT_LOGO_MAKE:
-      ConsoleIn->LeftLogo = TRUE;
-      break;    
-    case SCANCODE_LEFT_LOGO_BREAK:
-      ConsoleIn->LeftLogo = FALSE;
-      break;          
-    case SCANCODE_RIGHT_LOGO_MAKE:
-      ConsoleIn->RightLogo = TRUE;
-      break;
-    case SCANCODE_RIGHT_LOGO_BREAK:
-      ConsoleIn->RightLogo = FALSE;
-      break;      
-    case SCANCODE_MENU_MAKE:
-      ConsoleIn->Menu = TRUE;
-      break;
-    case SCANCODE_MENU_BREAK:
-      ConsoleIn->Menu = FALSE;
-      break;      
-    case SCANCODE_SYS_REQ_MAKE:
-      if (Extended) {
-        ConsoleIn->SysReq = TRUE;
-      }
-    case SCANCODE_CAPS_LOCK_MAKE:
-      ConsoleIn->CapsLock = (BOOLEAN)!ConsoleIn->CapsLock;
-      UpdateStatusLights (ConsoleIn);
-      break;
-
-    case SCANCODE_NUM_LOCK_MAKE:
-      ConsoleIn->NumLock = (BOOLEAN)!ConsoleIn->NumLock;
-      UpdateStatusLights (ConsoleIn);
-      break;
-
-    case SCANCODE_SCROLL_LOCK_MAKE:
-      ConsoleIn->ScrollLock = (BOOLEAN)!ConsoleIn->ScrollLock;
-      UpdateStatusLights (ConsoleIn);
-      break;
-    }
-    //
-    // If this is a BREAK Key or above the valid range, ignore it
-    //
-    if (ScanCode >= SCANCODE_MAX_MAKE) {
-      continue;
     } else {
-      break;
+      //
+      // Store the last 2 available byte to check if it is Pause key
+      //
+      ScanCode = (UINT16) (ScancodeArr[ScancodeArrPos] + (ScancodeArr[ScancodeArrPos - 1] << 8));
+      if (ScanCode == SCANCODE_PAUSE_MAKE) {
+        break;
+      }
     }
   }
 
