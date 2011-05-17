@@ -1639,7 +1639,7 @@ ParseOpCodes (
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_TIME;
 
       if ((CurrentStatement->Flags & QF_TIME_STORAGE) == QF_TIME_STORAGE_NORMAL) {
-        CurrentStatement->StorageWidth = (UINT16) sizeof (EFI_IFR_TIME);
+        CurrentStatement->StorageWidth = (UINT16) sizeof (EFI_HII_TIME);
 
         InitializeRequestElement (FormSet, CurrentStatement);
       } else {
