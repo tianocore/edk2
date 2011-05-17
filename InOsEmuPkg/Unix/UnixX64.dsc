@@ -218,7 +218,7 @@
 #define BOOT_IN_RECOVERY_MODE                         0x20
   gInOsEmuPkgTokenSpaceGuid.PcdEmuBootMode|0
   
-  gInOsEmuPkgTokenSpaceGuid.PcdEmuApCount|L"0"
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuApCount|L"1"
 
   gInOsEmuPkgTokenSpaceGuid.PcdEmuPhysicalDisk|L"E:RW;245760;512"
   gInOsEmuPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"FW;40960;512"

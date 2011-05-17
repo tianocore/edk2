@@ -109,6 +109,10 @@ typedef struct {
   BOOLEAN                     SingleThread;
   UINTN                       StartedNumber;
   PROCESSOR_DATA_BLOCK        *ProcessorData;
+  UINTN                       Timeout;
+  UINTN                       *FailedList;
+  UINTN                       FailedListIndex;
+  BOOLEAN                     TimeoutActive;
 } MP_SYSTEM_DATA;
 
 

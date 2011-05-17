@@ -402,26 +402,36 @@ CpuMpServicesStartupAllAps (
   
   
   if (FailedCpuList != NULL) {
-    FailledList = AllocatePool ((gMPSystem.NumberOfProcessors + 1) * sizeof (UINTN));
-    SetMemN (FailledList, (gMPSystem.NumberOfProcessors + 1) * sizeof (UINTN), END_OF_CPU_LIST);
-    FailedListIndex = 0;
-    *FailedCpuList = FailledList;
+    gMPSystem.FailedList = AllocatePool ((gMPSystem.NumberOfProcessors + 1) * sizeof (UINTN));
+    if (gMPSystem.FailedList == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    SetMemN (gMPSystem.FailedList, (gMPSystem.NumberOfProcessors + 1) * sizeof (UINTN), END_OF_CPU_LIST);
+    gMPSystem.FailedListIndex = 0;
+    *FailedCpuList = gMPSystem.FailedList;
   }
 
   Timeout = TimeoutInMicroseconds;
 
   ListIndex                   = 0;
-  ProcessorData                     = NULL;
+  ProcessorData               = NULL;
 
-  gMPSystem.FinishCount  = 0;
-  gMPSystem.StartCount   = 0;
-  APInitialState              = CPU_STATE_READY;
+  gMPSystem.FinishCount   = 0;
+  gMPSystem.StartCount    = 0;
+  gMPSystem.SingleThread  = SingleThread;
+  APInitialState          = CPU_STATE_READY;
 
   for (Number = 0; Number < gMPSystem.NumberOfProcessors; Number++) {
     ProcessorData = &gMPSystem.ProcessorData[Number];
 
     if ((ProcessorData->Info.StatusFlag & PROCESSOR_AS_BSP_BIT) == PROCESSOR_AS_BSP_BIT) {
       // Skip BSP
+      continue;
+    }
+
+    if ((ProcessorData->Info.StatusFlag & PROCESSOR_ENABLED_BIT) == 0) {
+      // Skip Disabled processors
+      gMPSystem.FailedList[gMPSystem.FailedListIndex++] = Number;
       continue;
     }
 
@@ -441,18 +451,42 @@ CpuMpServicesStartupAllAps (
       if (SingleThread) {
         APInitialState = CPU_STATE_BLOCKED;
       }
-
-    } else if (FailedCpuList != NULL) {
-      FailledList[FailedListIndex++] = Number;
-      ListIndex++;
+    } else {
+      return EFI_NOT_READY;
     }
   }
   
-  if (FailedCpuList != NULL) {
-    if (FailedListIndex == 0) {
-      FreePool (*FailedCpuList);
-      *FailedCpuList = NULL;
+  if (WaitEvent != NULL) {
+    for (Number = 0; Number < gMPSystem.NumberOfProcessors; Number++) {
+      ProcessorData = &gMPSystem.ProcessorData[Number];  
+      if ((ProcessorData->Info.StatusFlag & PROCESSOR_AS_BSP_BIT) == PROCESSOR_AS_BSP_BIT) {
+       // Skip BSP
+        continue;
+      }
+
+      if ((ProcessorData->Info.StatusFlag & PROCESSOR_ENABLED_BIT) == 0) {
+        // Skip Disabled processors
+        continue;
+      }
+    
+      SetApProcedure (ProcessorData, Procedure, ProcedureArgument);
     }
+
+    //
+    // Save data into private data structure, and create timer to poll AP state before exiting
+    //
+    gMPSystem.Procedure         = Procedure;
+    gMPSystem.ProcedureArgument = ProcedureArgument;
+    gMPSystem.WaitEvent         = WaitEvent;
+    gMPSystem.Timeout           = TimeoutInMicroseconds;
+    gMPSystem.TimeoutActive     = (BOOLEAN)(TimeoutInMicroseconds != 0);
+    Status = gBS->SetTimer (
+                    gMPSystem.CheckAllAPsEvent,
+                    TimerPeriodic,
+                    gPollInterval
+                    );
+    return Status;
+
   }
 
   while (TRUE) {
@@ -460,6 +494,11 @@ CpuMpServicesStartupAllAps (
       ProcessorData = &gMPSystem.ProcessorData[Number];  
       if ((ProcessorData->Info.StatusFlag & PROCESSOR_AS_BSP_BIT) == PROCESSOR_AS_BSP_BIT) {
        // Skip BSP
+        continue;
+      }
+
+      if ((ProcessorData->Info.StatusFlag & PROCESSOR_ENABLED_BIT) == 0) {
+        // Skip Disabled processors
         continue;
       }
 
@@ -490,27 +529,25 @@ CpuMpServicesStartupAllAps (
     }
 
     if (gMPSystem.FinishCount == gMPSystem.StartCount) {
-      return EFI_SUCCESS;
+      Status = EFI_SUCCESS;
+      goto Done;
     }
 
     if ((TimeoutInMicroseconds != 0) && (Timeout < 0)) {
-      //
-      // Save data into private data structure, and create timer to poll AP state before exiting
-      //
-      gMPSystem.Procedure         = Procedure;
-      gMPSystem.ProcedureArgument = ProcedureArgument;
-      gMPSystem.WaitEvent         = WaitEvent;
-
-      Status = gBS->SetTimer (
-                      gMPSystem.CheckAllAPsEvent,
-                      TimerPeriodic,
-                      gPollInterval
-                      );
-      return EFI_TIMEOUT;
+      Status = EFI_TIMEOUT;
+      goto Done;
     }
 
     gBS->Stall (gPollInterval);
     Timeout -= gPollInterval;
+  }
+
+Done:
+  if (FailedCpuList != NULL) {
+    if (gMPSystem.FailedListIndex == 0) {
+      FreePool (*FailedCpuList);
+      *FailedCpuList = NULL;
+    }
   }
 
   return EFI_SUCCESS;
@@ -649,6 +686,18 @@ CpuMpServicesStartupThisAP (
 
   SetApProcedure (&gMPSystem.ProcessorData[ProcessorNumber], Procedure, ProcedureArgument);
 
+  if (WaitEvent != NULL) {
+      // Non Blocking
+      gMPSystem.WaitEvent = WaitEvent;
+      Status = gBS->SetTimer (
+                      gMPSystem.ProcessorData[ProcessorNumber].CheckThisAPEvent,
+                      TimerPeriodic,
+                      gPollInterval
+                      );
+    return EFI_SUCCESS;
+  }
+
+  // Blocking
   while (TRUE) {
     gThread->MutexLock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
     if (gMPSystem.ProcessorData[ProcessorNumber].State == CPU_STATE_FINISHED) {
@@ -660,12 +709,6 @@ CpuMpServicesStartupThisAP (
     gThread->MutexUnlock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
 
     if ((TimeoutInMicroseconds != 0) && (Timeout < 0)) {
-      gMPSystem.WaitEvent = WaitEvent;
-      Status = gBS->SetTimer (
-                      gMPSystem.ProcessorData[ProcessorNumber].CheckThisAPEvent,
-                      TimerPeriodic,
-                      gPollInterval
-                      );
       return EFI_TIMEOUT;
     }
 
@@ -929,12 +972,23 @@ CpuCheckAllAPsStatus (
   PROCESSOR_DATA_BLOCK  *NextData;
   EFI_STATUS            Status;
   PROCESSOR_STATE       ProcessorState;
+  UINTN                 Cpu;
+  BOOLEAN               Found;
 
+  if (gMPSystem.TimeoutActive) {
+    gMPSystem.Timeout -= gPollInterval;
+  }
+  
   ProcessorData = (PROCESSOR_DATA_BLOCK *) Context;
 
   for (ProcessorNumber = 0; ProcessorNumber < gMPSystem.NumberOfProcessors; ProcessorNumber++) {
     if ((ProcessorData[ProcessorNumber].Info.StatusFlag & PROCESSOR_AS_BSP_BIT) == PROCESSOR_AS_BSP_BIT) {
      // Skip BSP
+      continue;
+    }
+
+    if ((ProcessorData->Info.StatusFlag & PROCESSOR_ENABLED_BIT) == 0) {
+      // Skip Disabled processors
       continue;
     }
 
@@ -977,15 +1031,70 @@ CpuCheckAllAPsStatus (
       break;
     }
   }
+  
+  if (gMPSystem.TimeoutActive && gMPSystem.Timeout < 0) {
+    //
+    // Timeout
+    //
+    if (gMPSystem.FailedList != NULL) {
+      for (ProcessorNumber = 0; ProcessorNumber < gMPSystem.NumberOfProcessors; ProcessorNumber++) {
+        if ((ProcessorData[ProcessorNumber].Info.StatusFlag & PROCESSOR_AS_BSP_BIT) == PROCESSOR_AS_BSP_BIT) {
+         // Skip BSP
+          continue;
+        }
 
-  if (gMPSystem.FinishCount == gMPSystem.StartCount) {
-    gBS->SetTimer (
-           gMPSystem.CheckAllAPsEvent,
-           TimerCancel,
-           0
-           );
-    Status = gBS->SignalEvent (gMPSystem.WaitEvent);
+        if ((ProcessorData->Info.StatusFlag & PROCESSOR_ENABLED_BIT) == 0) {
+          // Skip Disabled processors
+          continue;
+        }
+    
+        // Mark the 
+        Status = gThread->MutexTryLock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+        if (EFI_ERROR(Status)) {
+          return;
+        }
+        ProcessorState = gMPSystem.ProcessorData[ProcessorNumber].State;
+        gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+    
+        if (ProcessorState != CPU_STATE_IDLE) {
+          // If we are retrying make sure we don't double count
+          for (Cpu = 0, Found = FALSE; Cpu < gMPSystem.NumberOfProcessors; Cpu++) {
+            if (gMPSystem.FailedList[Cpu] == END_OF_CPU_LIST) {
+              break;
+            }
+            if (gMPSystem.FailedList[ProcessorNumber] == Cpu) {
+              Found = TRUE;
+              break;
+            }
+          }
+          if (!Found) {
+            gMPSystem.FailedList[gMPSystem.FailedListIndex++] = Cpu;
+          }
+        }
+      }
+    }
+    // Force terminal exit
+    gMPSystem.FinishCount = gMPSystem.StartCount;
   }
+
+  if (gMPSystem.FinishCount != gMPSystem.StartCount) {
+    return;
+  }
+  
+  gBS->SetTimer (
+         gMPSystem.CheckAllAPsEvent,
+         TimerCancel,
+         0
+         );
+
+  if (gMPSystem.FailedListIndex == 0) {
+    if (gMPSystem.FailedList != NULL) {
+      FreePool (gMPSystem.FailedList);
+      gMPSystem.FailedList = NULL;
+    }
+  }
+
+  Status = gBS->SignalEvent (gMPSystem.WaitEvent);
 
   return ;
 }
@@ -1004,8 +1113,8 @@ CpuCheckThisAPStatus (
   ProcessorData = (PROCESSOR_DATA_BLOCK *) Context;
 
   //
-  // rdar://6260979 - This is an Interrupt Service routine.
-  // this can grab a lock that is held in a non-interrupt
+  // This is an Interrupt Service routine.
+  // that can grab a lock that is held in a non-interrupt
   // context. Meaning deadlock. Which is a badddd thing.
   // So, try lock it. If we can get it, cool, do our thing.
   // otherwise, just dump out & try again on the next iteration.
