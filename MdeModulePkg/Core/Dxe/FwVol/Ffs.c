@@ -1,7 +1,7 @@
 /** @file
   FFS file access utilities.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -105,18 +105,9 @@ VerifyFvHeaderChecksum (
   IN EFI_FIRMWARE_VOLUME_HEADER *FvHeader
   )
 {
-  UINT32  Index;
-  UINT32  HeaderLength;
   UINT16  Checksum;
-  UINT16  *Ptr;
 
-  HeaderLength = FvHeader->HeaderLength;
-  Ptr = (UINT16 *)FvHeader;
-  Checksum = 0;
-
-  for (Index = 0; Index < HeaderLength / sizeof (UINT16); Index++) {
-    Checksum = (UINT16)(Checksum + Ptr[Index]);
-  }
+  Checksum = CalculateSum16 ((UINT16 *) FvHeader, FvHeader->HeaderLength);
 
   if (Checksum == 0) {
     return TRUE;
@@ -140,16 +131,9 @@ VerifyHeaderChecksum (
   IN EFI_FFS_FILE_HEADER  *FfsHeader
   )
 {
-  UINT32            Index;
-  UINT8             *Ptr;
-  UINT8             HeaderChecksum;
+  UINT8 HeaderChecksum;
 
-  Ptr = (UINT8 *)FfsHeader;
-  HeaderChecksum = 0;
-  for (Index = 0; Index < sizeof(EFI_FFS_FILE_HEADER); Index++) {
-    HeaderChecksum = (UINT8)(HeaderChecksum + Ptr[Index]);
-  }
-
+  HeaderChecksum = CalculateSum8 ((UINT8 *) FfsHeader, sizeof (EFI_FFS_FILE_HEADER));
   HeaderChecksum = (UINT8) (HeaderChecksum - FfsHeader->State - FfsHeader->IntegrityCheck.Checksum.File);
 
   if (HeaderChecksum == 0) {
