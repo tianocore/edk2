@@ -6,7 +6,7 @@
   but not in the same format. These so-called pseudo-registers provide this information in a standard 
   format.  
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -151,9 +151,7 @@ typedef struct _EFI_SMM_SAVE_STATE_IO_INFO {
   /// instructions (OUT, OUTS) this is data that was written before the SMI occurred. The 
   /// width of the data is specified by IoWidth.
   ///
-  /// Note: inconsistency with PI 1.2 spec here. wait for spec update.
-  ///
-  UINTN                         IoData;
+  UINT64                        IoData;
   ///
   /// The I/O port that was being accessed when the SMI was triggered.
   ///
