@@ -347,7 +347,7 @@ MappingListHasType(
   if (  Consist
     && (SearchList(MapList, L"HD*",  NULL, TRUE, TRUE, L";")
       ||SearchList(MapList, L"CD*",  NULL, TRUE, TRUE, L";")
-      ||SearchList(MapList, L"AnyF*",   NULL, TRUE, TRUE, L";")
+      ||SearchList(MapList, L"F*",   NULL, TRUE, TRUE, L";")
       ||SearchList(MapList, L"FP*",  NULL, TRUE, TRUE, L";"))){
     return (TRUE);
   }
@@ -686,7 +686,11 @@ PerformMappingDisplay(
     FreePool(HandleBuffer);
   }
   if (!Found) {
-    ShellPrintHiiEx(gST->ConOut->Mode->CursorColumn, gST->ConOut->Mode->CursorRow-1, NULL, STRING_TOKEN (STR_MAP_NF), gShellLevel2HiiHandle, Specific);
+    if (Specific != NULL) {
+      ShellPrintHiiEx(gST->ConOut->Mode->CursorColumn, gST->ConOut->Mode->CursorRow-1, NULL, STRING_TOKEN (STR_MAP_NF), gShellLevel2HiiHandle, Specific);
+    } else {
+      ShellPrintHiiEx(gST->ConOut->Mode->CursorColumn, gST->ConOut->Mode->CursorRow-1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
+    }
   }
   return (SHELL_SUCCESS);
 }
