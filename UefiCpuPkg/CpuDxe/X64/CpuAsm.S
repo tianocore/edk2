@@ -2,7 +2,7 @@
 
 #------------------------------------------------------------------------------
 #*
-#*   Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+#*   Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 #*   This program and the accompanying materials
 #*   are licensed and made available under the terms and conditions of the BSD License
 #*   which accompanies this distribution.  The full text of the license may be found at
@@ -233,6 +233,9 @@ CommonInterruptEntry_al_0000:
     subq    $512, %rsp
     movq    %rsp, %rdi
     .byte 0x0f, 0x0ae, 0x07 #fxsave [rdi]
+
+#; UEFI calling convention for x64 requires that Direction flag in EFLAGs is clear
+    cld
 
 #; UINT32  ExceptionData;
     pushq   16(%rbp)

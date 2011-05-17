@@ -1,7 +1,7 @@
 #/**@file
 # Low leve IA32 specific debug support functions.
 #
-# Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -276,6 +276,9 @@ ASM_PFX(CommonIdtEntry):
         # They MUST be.  If they are not, a GP fault will occur.
         fxsave (%edi)
 
+## UEFI calling convention for IA32 requires that Direction flag in EFLAGs is clear
+        cld
+                
 ## UINT32  ExceptionData;
         mov    0x0,%eax
         push   %eax
