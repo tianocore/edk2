@@ -529,6 +529,7 @@ BOpt_FreeMenu (
     RemoveEntryList (&MenuEntry->Link);
     BOpt_DestroyMenuEntry (MenuEntry);
   }
+  FreeMenu->MenuNumber = 0;
 }
 
 /**
