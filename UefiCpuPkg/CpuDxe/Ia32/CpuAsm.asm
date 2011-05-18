@@ -1,7 +1,7 @@
       TITLE   CpuAsm.asm:
 ;------------------------------------------------------------------------------
 ;*
-;*   Copyright 2006 - 2009, Intel Corporation
+;*   Copyright 2006 - 2011, Intel Corporation
 ;*   All rights reserved. This program and the accompanying materials
 ;*   are licensed and made available under the terms and conditions of the BSD License
 ;*   which accompanies this distribution.  The full text of the license may be found at
@@ -279,6 +279,9 @@ ErrorCodeAndVectorOnStack:
     sub     esp, 512
     mov     edi, esp
     db      0fh, 0aeh, 07h ;fxsave [edi]
+
+;; UEFI calling convention for IA32 requires that Direction flag in EFLAGs is clear
+    cld
 
 ;; UINT32  ExceptionData;
     push    dword ptr [ebp + 2 * 4]
