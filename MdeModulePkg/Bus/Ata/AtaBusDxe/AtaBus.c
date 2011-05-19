@@ -153,8 +153,8 @@ ReleaseAtaResources (
   EFI_TPL           OldTpl;
 
   FreeUnicodeStringTable (AtaDevice->ControllerNameTable);
-  FreeAlignedBuffer (AtaDevice->Asb, sizeof (*AtaDevice->Asb));
-  FreeAlignedBuffer (AtaDevice->IdentifyData, sizeof (*AtaDevice->IdentifyData));
+  FreeAlignedBuffer (AtaDevice->Asb, sizeof (EFI_ATA_STATUS_BLOCK));
+  FreeAlignedBuffer (AtaDevice->IdentifyData, sizeof (ATA_IDENTIFY_DATA));
   if (AtaDevice->DevicePath != NULL) {
     FreePool (AtaDevice->DevicePath);
   }
@@ -163,7 +163,7 @@ ReleaseAtaResources (
     //
     // Free the Subtask list.
     //
-    for(Entry = (&AtaDevice->AtaTaskList)->ForwardLink; 
+    for(Entry = AtaDevice->AtaTaskList.ForwardLink; 
         Entry != (&AtaDevice->AtaTaskList);
        ) {
       DelEntry = Entry;
@@ -243,7 +243,7 @@ RegisterAtaDevice (
   //
   // Allocate ATA device from the template.
   //
-  AtaDevice = AllocateCopyPool (sizeof (gAtaDeviceTemplate), &gAtaDeviceTemplate);
+  AtaDevice = AllocateCopyPool (sizeof (ATA_DEVICE), &gAtaDeviceTemplate);
   if (AtaDevice == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
@@ -258,12 +258,12 @@ RegisterAtaDevice (
   AtaDevice->DevicePath         = DevicePath;
   AtaDevice->Port               = Port;
   AtaDevice->PortMultiplierPort = PortMultiplierPort;
-  AtaDevice->Asb = AllocateAlignedBuffer (AtaDevice, sizeof (*AtaDevice->Asb));
+  AtaDevice->Asb = AllocateAlignedBuffer (AtaDevice, sizeof (EFI_ATA_STATUS_BLOCK));
   if (AtaDevice->Asb == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
-  AtaDevice->IdentifyData = AllocateAlignedBuffer (AtaDevice, sizeof (*AtaDevice->IdentifyData));
+  AtaDevice->IdentifyData = AllocateAlignedBuffer (AtaDevice, sizeof (ATA_IDENTIFY_DATA));
   if (AtaDevice->IdentifyData == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
@@ -501,7 +501,7 @@ UnregisterAtaDevice (
         Handle,
         EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
         );
-    return Status;
+      return Status;
     }
   }
 
@@ -1239,7 +1239,7 @@ AtaBlockIoFlushBlocksEx (
   )
 {
   //
-  // Signla event and return directly.
+  // Signal event and return directly.
   //
   if (Token != NULL && Token->Event != NULL) {
     Token->TransactionStatus = EFI_SUCCESS;
@@ -1307,11 +1307,11 @@ AtaDiskInfoIdentify (
   AtaDevice = ATA_DEVICE_FROM_DISK_INFO (This);
 
   Status = EFI_BUFFER_TOO_SMALL;
-  if (*IdentifyDataSize >= sizeof (*AtaDevice->IdentifyData)) {
+  if (*IdentifyDataSize >= sizeof (ATA_IDENTIFY_DATA)) {
     Status = EFI_SUCCESS;
-    CopyMem (IdentifyData, AtaDevice->IdentifyData, sizeof (*AtaDevice->IdentifyData));
+    CopyMem (IdentifyData, AtaDevice->IdentifyData, sizeof (ATA_IDENTIFY_DATA));
   }
-  *IdentifyDataSize = sizeof (*AtaDevice->IdentifyData);
+  *IdentifyDataSize = sizeof (ATA_IDENTIFY_DATA);
 
   return Status;
 }
@@ -1462,6 +1462,7 @@ AtaStorageSecurityReceiveData (
 {
   EFI_STATUS                       Status;
   ATA_DEVICE                       *Private;
+  EFI_TPL                          OldTpl;
 
   DEBUG ((EFI_D_INFO, "EFI Storage Security Protocol - Read"));
   if ((PayloadBuffer == NULL || PayloadTransferSize == NULL) && PayloadBufferSize != 0) {
@@ -1479,6 +1480,8 @@ AtaStorageSecurityReceiveData (
     return EFI_NO_MEDIA;
   }
 
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+
   Status = TrustTransferAtaDevice (
              Private,
              PayloadBuffer,
@@ -1490,6 +1493,7 @@ AtaStorageSecurityReceiveData (
              PayloadTransferSize
              );
 
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -1568,6 +1572,7 @@ AtaStorageSecuritySendData (
 {
   EFI_STATUS                       Status;
   ATA_DEVICE                       *Private;
+  EFI_TPL                          OldTpl;
 
   DEBUG ((EFI_D_INFO, "EFI Storage Security Protocol - Send"));
   if ((PayloadBuffer == NULL) && (PayloadBufferSize != 0)) {
@@ -1581,6 +1586,7 @@ AtaStorageSecuritySendData (
     return EFI_MEDIA_CHANGED;
   }
 
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   Status = TrustTransferAtaDevice (
              Private,
              PayloadBuffer,
@@ -1592,6 +1598,7 @@ AtaStorageSecuritySendData (
              NULL
              );
 
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
