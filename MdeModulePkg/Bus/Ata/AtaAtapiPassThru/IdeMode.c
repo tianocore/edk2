@@ -1128,12 +1128,12 @@ AtaIssueCommand (
   @param[in]      IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
   @param[in, out] Buffer           A pointer to the source buffer for the data.
   @param[in]      ByteCount        The length of the data.
-  @param[in] Read                  Flag used to determine the data transfer direction.
+  @param[in]      Read             Flag used to determine the data transfer direction.
                                    Read equals 1, means data transferred from device
                                    to host;Read equals 0, means data transferred
                                    from host to device.
   @param[in]      AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
-  @param[in]      AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
+  @param[in, out] AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
   @param[in]      Timeout          The time to complete the command.
   @param[in]      Task             Optional. Pointer to the ATA_NONBLOCK_TASK
                                    used by non-blocking mode.

@@ -199,7 +199,7 @@ FreeAlignedBuffer (
 VOID
 EFIAPI 
 FreeAtaSubTask (
-  IN ATA_BUS_ASYN_TASK  *Task
+  IN OUT ATA_BUS_ASYN_TASK  *Task
   );
 
 /**
@@ -287,6 +287,8 @@ AccessAtaDevice(
                                        than zero, then this function will return EFI_TIMEOUT
                                        if the time required to execute the receive data command
                                        is greater than Timeout.
+  @param  TransferLengthOut            A pointer to a buffer to store the size in bytes of the data
+                                       written to the buffer. Ignore it when IsTrustSend is TRUE.
 
   @retval EFI_SUCCESS       The data transfer is complete successfully.
   @return others            Some error occurs when transferring data. 
@@ -947,7 +949,7 @@ AtaStorageSecurityReceiveData (
   IN UINTN                                    PayloadBufferSize,
   OUT VOID                                    *PayloadBuffer,
   OUT UINTN                                   *PayloadTransferSize
-);
+  );
 
 /**
   Send a security protocol command to a device.
@@ -1020,6 +1022,6 @@ AtaStorageSecuritySendData (
   IN UINT16                                   SecurityProtocolSpecificData,
   IN UINTN                                    PayloadBufferSize,
   IN VOID                                     *PayloadBuffer
-);
+  );
 
 #endif

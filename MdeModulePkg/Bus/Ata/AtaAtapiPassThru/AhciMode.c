@@ -201,11 +201,11 @@ AhciWaitMemSet (
 EFI_STATUS
 EFIAPI
 AhciCheckMemSet (
-  IN  EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN  UINT32                    Offset,
-  IN  UINT32                    MaskValue,
-  IN  UINT32                    TestValue,
-  IN  UINTN                     *RetryTimes
+  IN     EFI_PCI_IO_PROTOCOL       *PciIo,
+  IN     UINT32                    Offset,
+  IN     UINT32                    MaskValue,
+  IN     UINT32                    TestValue,
+  IN OUT UINTN                     *RetryTimes
   )
 {
   UINT32     Value;

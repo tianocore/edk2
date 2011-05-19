@@ -912,7 +912,7 @@ PartitionWriteBlocksEx (
   this request will not be signaled.  
 
   @param[in]      This     Indicates a pointer to the calling context.
-  @param[in,out]  Token    A pointer to the token associated with the transaction
+  @param[in, out] Token    A pointer to the token associated with the transaction
 
   @retval EFI_SUCCESS          The flush request was queued if Event is not NULL.
                                All outstanding data was written correctly to the

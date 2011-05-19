@@ -1269,7 +1269,7 @@ AtaUdmaInOut (
                                    to host;Read equals 0, means data transferred
                                    from host to device.
   @param[in]      AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
-  @param[in]      AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
+  @param[in, out] AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
   @param[in]      Timeout          The time to complete the command.
   @param[in]      Task             Optional. Pointer to the ATA_NONBLOCK_TASK
                                    used by non-blocking mode.

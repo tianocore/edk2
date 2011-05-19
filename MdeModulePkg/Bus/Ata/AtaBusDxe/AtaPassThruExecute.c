@@ -106,7 +106,7 @@ UINTN mMaxTransferBlockNumber[] = {
                                if it is NULL, blocking mode, and use the packet
                                in AtaDevice. If it is not NULL, non blocking mode,
                                and pass down this Packet.
-  @param[in]       Event       If Event is NULL, then blocking I/O is performed.
+  @param[in, out]  Event       If Event is NULL, then blocking I/O is performed.
                                If Event is not NULL and non-blocking I/O is
                                supported,then non-blocking I/O is performed,
                                and Event will be signaled when the write
@@ -527,7 +527,7 @@ TransferAtaDevice (
 VOID
 EFIAPI 
 FreeAtaSubTask (
-  IN ATA_BUS_ASYN_TASK  *Task
+  IN OUT ATA_BUS_ASYN_TASK  *Task
   )
 {
   if (Task->Packet.Asb != NULL) {
@@ -805,6 +805,8 @@ EXIT:
                                        than zero, then this function will return EFI_TIMEOUT
                                        if the time required to execute the receive data command
                                        is greater than Timeout.
+  @param  TransferLengthOut            A pointer to a buffer to store the size in bytes of the data
+                                       written to the buffer. Ignore it when IsTrustSend is TRUE.
 
   @retval EFI_SUCCESS       The data transfer is complete successfully.
   @return others            Some error occurs when transferring data. 

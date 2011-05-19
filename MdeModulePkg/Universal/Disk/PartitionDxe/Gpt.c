@@ -481,7 +481,6 @@ PartitionValidGptTable (
   for Partition entry array.
 
   @param[in]  BlockIo     Parent BlockIo interface
-  @param[in]  BlockIo2    Parent BlockIo2 interface.
   @param[in]  DiskIo      Disk Io Protocol.
   @param[in]  PartHeader  Partition table header structure
 
