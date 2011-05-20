@@ -74,6 +74,9 @@ typedef struct {
   UINT8   SerialPortStatus;
   UINT16  SerialPortIo;
   UINT8   SerialPortIrq;
+  UINT8   GetDefaultValueFromCallBack;
+  UINT8   GetDefaultValueFromAccess;
+  EFI_HII_TIME  Time;
 } DRIVER_SAMPLE_CONFIGURATION;
 
 //

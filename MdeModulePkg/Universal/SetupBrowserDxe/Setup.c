@@ -1804,6 +1804,221 @@ SubmitForm (
   return EFI_SUCCESS;
 }
 
+/**
+  Get Question default value from AltCfg string.
+
+  @param  FormSet                The form set.
+  @param  Question               The question.
+  @param  DefaultId              The default Id.
+
+  @retval EFI_SUCCESS            Question is reset to default value.
+
+**/
+EFI_STATUS
+GetDefaultValueFromAltCfg (
+  IN     FORM_BROWSER_FORMSET             *FormSet,
+  IN OUT FORM_BROWSER_STATEMENT           *Question,
+  IN     UINT16                           DefaultId
+  )
+{
+  BOOLEAN             IsBufferStorage;
+  BOOLEAN             IsString;  
+  UINTN               Length;
+  FORMSET_STORAGE     *Storage;
+  CHAR16              *ConfigRequest;
+  CHAR16              *Progress;
+  CHAR16              *Result;
+  CHAR16              *ConfigResp;
+  CHAR16              *Value;
+  CHAR16              *StringPtr;
+  UINTN               LengthStr;
+  UINT8               *Dst;
+  CHAR16              TemStr[5];
+  UINTN               Index;
+  UINT8               DigitUint8;
+  EFI_STATUS          Status;
+
+  Status        = EFI_NOT_FOUND;
+  Length        = 0;
+  Dst           = NULL;
+  ConfigRequest = NULL;
+  Result        = NULL;
+  ConfigResp    = NULL;
+  Storage       = Question->Storage;
+
+  if ((Storage == NULL) || (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE)) {
+    return Status;
+  }
+
+  //
+  // Question Value is provided by Buffer Storage or NameValue Storage
+  //
+  if (Question->BufferValue != NULL) {
+    //
+    // This Question is password or orderedlist
+    //
+    Dst = Question->BufferValue;
+  } else {
+    //
+    // Other type of Questions
+    //
+    Dst = (UINT8 *) &Question->HiiValue.Value;
+  }
+
+  IsBufferStorage = (BOOLEAN) ((Storage->Type == EFI_HII_VARSTORE_BUFFER) ? TRUE : FALSE);
+  IsString = (BOOLEAN) ((Question->HiiValue.Type == EFI_IFR_TYPE_STRING) ?  TRUE : FALSE);
+
+  //
+  // <ConfigRequest> ::= <ConfigHdr> + <BlockName> ||
+  //                   <ConfigHdr> + "&" + <VariableName>
+  //
+  if (IsBufferStorage) {
+    Length  = StrLen (Storage->ConfigHdr);
+    Length += StrLen (Question->BlockName);
+  } else {
+    Length  = StrLen (Storage->ConfigHdr);
+    Length += StrLen (Question->VariableName) + 1;
+  }
+  ConfigRequest = AllocateZeroPool ((Length + 1) * sizeof (CHAR16));
+  ASSERT (ConfigRequest != NULL);
+
+  StrCpy (ConfigRequest, Storage->ConfigHdr);
+  if (IsBufferStorage) {
+    StrCat (ConfigRequest, Question->BlockName);
+  } else {
+    StrCat (ConfigRequest, L"&");
+    StrCat (ConfigRequest, Question->VariableName);
+  }
+
+  Status = FormSet->ConfigAccess->ExtractConfig (
+                                    FormSet->ConfigAccess,
+                                    ConfigRequest,
+                                    &Progress,
+                                    &Result
+                                    );
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  //
+  // Call ConfigRouting GetAltCfg(ConfigRoute, <ConfigResponse>, Guid, Name, DevicePath, AltCfgId, AltCfgResp)
+  //    Get the default configuration string according to the default ID.
+  //
+  Status = mHiiConfigRouting->GetAltConfig (
+                                mHiiConfigRouting,
+                                Result,
+                                &Storage->Guid,
+                                Storage->Name,
+                                NULL,
+                                &DefaultId,  // it can be NULL to get the current setting.
+                                &ConfigResp
+                              );
+  
+  //
+  // The required setting can't be found. So, it is not required to be validated and set.
+  //
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  //
+  // Skip <ConfigRequest>
+  //
+  Value = StrStr (ConfigResp, L"&VALUE");
+  if (IsBufferStorage) {
+    //
+    // Skip "&VALUE"
+    //
+    Value = Value + 6;
+  }
+  if (*Value != '=') {
+    Status = EFI_NOT_FOUND;
+    goto Done;
+  }
+  //
+  // Skip '=', point to value
+  //
+  Value = Value + 1;
+
+  //
+  // Suppress <AltResp> if any
+  //
+  StringPtr = Value;
+  while (*StringPtr != L'\0' && *StringPtr != L'&') {
+    StringPtr++;
+  }
+  *StringPtr = L'\0';
+
+  LengthStr = StrLen (Value);
+  if (!IsBufferStorage && IsString) {
+    StringPtr = (CHAR16 *) Dst;
+    ZeroMem (TemStr, sizeof (TemStr));
+    for (Index = 0; Index < LengthStr; Index += 4) {
+      StrnCpy (TemStr, Value + Index, 4);
+      StringPtr[Index/4] = (CHAR16) StrHexToUint64 (TemStr);
+    }
+    //
+    // Add tailing L'\0' character
+    //
+    StringPtr[Index/4] = L'\0';
+  } else {
+    ZeroMem (TemStr, sizeof (TemStr));
+    for (Index = 0; Index < LengthStr; Index ++) {
+      TemStr[0] = Value[LengthStr - Index - 1];
+      DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+      if ((Index & 1) == 0) {
+        Dst [Index/2] = DigitUint8;
+      } else {
+        Dst [Index/2] = (UINT8) ((DigitUint8 << 4) + Dst [Index/2]);
+      }
+    }
+  }
+
+Done:
+  if (ConfigRequest != NULL){
+    FreePool (ConfigRequest);
+  }
+
+  if (ConfigResp != NULL) {
+    FreePool (ConfigResp);
+  }
+  
+  if (Result != NULL) {
+    FreePool (Result);
+  }
+
+  return Status;
+}
+
+/**
+  Get default Id value used for browser.
+
+  @param  DefaultId              The default id value used by hii.
+
+  @retval Browser used default value.
+
+**/
+INTN
+GetDefaultIdForCallBack (
+  UINTN DefaultId
+  )
+{ 
+  if (DefaultId == EFI_HII_DEFAULT_CLASS_STANDARD) {
+    return EFI_BROWSER_ACTION_DEFAULT_STANDARD;
+  } else if (DefaultId == EFI_HII_DEFAULT_CLASS_MANUFACTURING) {
+    return EFI_BROWSER_ACTION_DEFAULT_MANUFACTURING;
+  } else if (DefaultId == EFI_HII_DEFAULT_CLASS_SAFE) {
+    return EFI_BROWSER_ACTION_DEFAULT_SAFE;
+  } else if (DefaultId >= EFI_HII_DEFAULT_CLASS_PLATFORM_BEGIN && DefaultId < EFI_HII_DEFAULT_CLASS_PLATFORM_BEGIN + 0x1000) {
+    return EFI_BROWSER_ACTION_DEFAULT_PLATFORM + DefaultId - EFI_HII_DEFAULT_CLASS_PLATFORM_BEGIN;
+  } else if (DefaultId >= EFI_HII_DEFAULT_CLASS_HARDWARE_BEGIN && DefaultId < EFI_HII_DEFAULT_CLASS_HARDWARE_BEGIN + 0x1000) {
+    return EFI_BROWSER_ACTION_DEFAULT_HARDWARE + DefaultId - EFI_HII_DEFAULT_CLASS_HARDWARE_BEGIN;
+  } else if (DefaultId >= EFI_HII_DEFAULT_CLASS_FIRMWARE_BEGIN && DefaultId < EFI_HII_DEFAULT_CLASS_FIRMWARE_BEGIN + 0x1000) {
+    return EFI_BROWSER_ACTION_DEFAULT_FIRMWARE + DefaultId - EFI_HII_DEFAULT_CLASS_FIRMWARE_BEGIN;
+  } else {
+    return -1;
+  }
+}
 
 /**
   Reset Question to its default value.
@@ -1831,6 +2046,9 @@ GetQuestionDefault (
   EFI_HII_VALUE           *HiiValue;
   UINT8                   Index;
   EFI_STRING              StrValue;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
+  EFI_BROWSER_ACTION_REQUEST      ActionRequest;
+  INTN                            Action;
 
   Status   = EFI_SUCCESS;
   StrValue = NULL;
@@ -1843,12 +2061,44 @@ GetQuestionDefault (
   }
 
   //
-  // There are three ways to specify default value for a Question:
-  //  1, use nested EFI_IFR_DEFAULT (highest priority)
-  //  2, set flags of EFI_ONE_OF_OPTION (provide Standard and Manufacturing default)
-  //  3, set flags of EFI_IFR_CHECKBOX (provide Standard and Manufacturing default) (lowest priority)
+  // There are Five ways to specify default value for a Question:
+  //  1, use call back function (highest priority)
+  //  2, use ExtractConfig function
+  //  3, use nested EFI_IFR_DEFAULT 
+  //  4, set flags of EFI_ONE_OF_OPTION (provide Standard and Manufacturing default)
+  //  5, set flags of EFI_IFR_CHECKBOX (provide Standard and Manufacturing default) (lowest priority)
   //
   HiiValue = &Question->HiiValue;
+
+  //
+  // Get Question defaut value from call back function.
+  //
+  ConfigAccess = FormSet->ConfigAccess;
+  Action = GetDefaultIdForCallBack (DefaultId);
+  if ((Action > 0) && ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) && (ConfigAccess != NULL)) {
+    ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+    Status = ConfigAccess->Callback (
+                             ConfigAccess,
+                             Action,
+                             Question->QuestionId,
+                             HiiValue->Type,
+                             &HiiValue->Value,
+                             &ActionRequest
+                             );
+    if (!EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  //
+  // Get default value from altcfg string.
+  //
+  if (ConfigAccess != NULL) {  
+    Status = GetDefaultValueFromAltCfg(FormSet, Question, DefaultId);
+    if (!EFI_ERROR (Status)) {
+        return Status;
+    }
+  }
 
   //
   // EFI_IFR_DEFAULT has highest priority

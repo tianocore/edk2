@@ -385,6 +385,28 @@ formset
         
       endnumeric;
     endif;
+
+    numeric varid   = MyIfrNVData.GetDefaultValueFromAccess,
+            questionid = 0x1239,
+            prompt  = STRING_TOKEN(STR_DEFAULT_VALUE_FROM_ACCESS_PROMPT),
+            help    = STRING_TOKEN(STR_DEFAULT_VALUE_FROM_ACCESS_HELP),
+            flags   = DISPLAY_UINT_HEX | INTERACTIVE, 
+            minimum = 0,
+            maximum = 255,
+            step    = 1,
+            default = 18,
+    endnumeric;
+
+    numeric varid   = MyIfrNVData.GetDefaultValueFromCallBack,
+            questionid = 0x1240,
+            prompt  = STRING_TOKEN(STR_DEFAULT_VALUE_FROM_CALLBACK_PROMPT),
+            help    = STRING_TOKEN(STR_DEFAULT_VALUE_FROM_CALLBACK_HELP),
+            flags   = DISPLAY_UINT_HEX | INTERACTIVE, 
+            minimum = 0,
+            maximum = 255,
+            step    = 1,
+            default = 18,
+    endnumeric;
         
     resetbutton
       defaultstore = MyStandardDefault,
@@ -533,7 +555,16 @@ formset
               default       = 0,
 
       endtime;
-
+      
+      time 
+            name    = MyTime, 
+            varid   = MyIfrNVData.Time, 
+            prompt  = STRING_TOKEN(STR_TIME_PROMPT), 
+            help    = STRING_TOKEN(STR_TIME_PROMPT), 
+            flags   = STORAGE_NORMAL, 
+            default = 15:33:33, 
+      endtime;
+      
       checkbox varid   = MyIfrNVData.ChooseToActivateNuclearWeaponry,
               prompt   = STRING_TOKEN(STR_CHECK_BOX_PROMPT),
               help     = STRING_TOKEN(STR_CHECK_BOX_HELP),

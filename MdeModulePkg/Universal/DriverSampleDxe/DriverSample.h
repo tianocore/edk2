@@ -65,6 +65,9 @@ extern UINT8  DriverSampleStrings[];
 #define DYNAMIC_ONE_OF_VAR_OFFSET        OFFSET_OF (DRIVER_SAMPLE_CONFIGURATION, DynamicOneof)
 #define DYNAMIC_ORDERED_LIST_VAR_OFFSET  OFFSET_OF (DRIVER_SAMPLE_CONFIGURATION, DynamicOrderedList)
 
+#define DEFAULT_CLASS_MANUFACTURING_VALUE     0xFF
+#define DEFAULT_CLASS_STANDARD_VALUE          0x0
+
 //
 // Number of name in Name/Value storage
 //

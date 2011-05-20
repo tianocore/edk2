@@ -1027,6 +1027,11 @@ SetupBrowser (
           default:
             break;
           }
+        } else if (Status == EFI_UNSUPPORTED) {
+          //
+          // If return EFI_UNSUPPORTED, also consider Hii driver suceess deal with it.
+          //
+          Status = EFI_SUCCESS;
         }
       }
       if (SubmitFormIsRequired) {
@@ -1151,6 +1156,11 @@ SetupBrowser (
             Selection->FormId = Selection->Form->FormId;
             Selection->QuestionId = 0;
           }
+        } else {
+          //
+          // If return EFI_UNSUPPORTED, also consider Hii driver suceess deal with it.
+          //
+          Status = EFI_SUCCESS;
         }
       }
 
@@ -1216,6 +1226,11 @@ SetupBrowser (
           default:
             break;
           }
+        } else if (Status == EFI_UNSUPPORTED) {
+          //
+          // If return EFI_UNSUPPORTED, also consider Hii driver suceess deal with it.
+          //
+          Status = EFI_SUCCESS;
         }
       }
       if (SubmitFormIsRequired) {
