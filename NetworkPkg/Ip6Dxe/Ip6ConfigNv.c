@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or obtaining the parameters relating to IP6.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1775,126 +1775,133 @@ Exit:
     return EFI_SUCCESS;
   }
 
-  if ((Value == NULL) || (ActionRequest == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Retrieve uncommitted data from Browser
-  //
-
-  BufferSize = sizeof (IP6_CONFIG_IFR_NVDATA);
-  IfrNvData = AllocateZeroPool (BufferSize);
-  if (IfrNvData == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  Status = EFI_SUCCESS;
-
-  ZeroMem (&OldIfrNvData, BufferSize);
-
-  HiiGetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData);
-
-  CopyMem (&OldIfrNvData, IfrNvData, BufferSize);
-
-  switch (QuestionId) {
-  case KEY_INTERFACE_ID:
-    Status = Ip6ParseInterfaceIdFromString (IfrNvData->InterfaceId, &Ip6NvData->InterfaceId);
-    if (EFI_ERROR (Status)) {
-      CreatePopUp (
-        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-        &Key,
-        L"Invalid Interface ID!",
-        NULL
-        );
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    if ((Value == NULL) || (ActionRequest == NULL)) {
+      return EFI_INVALID_PARAMETER;
     }
 
-    break;
+    //
+    // Retrieve uncommitted data from Browser
+    //
 
-  case KEY_MANUAL_ADDRESS:
-    Status = Ip6ParseAddressListFromString (
-               IfrNvData->ManualAddress,
-               &Ip6NvData->ManualAddress,
-               &Ip6NvData->ManualAddressCount
-               );
-    if (EFI_ERROR (Status)) {
-      CreatePopUp (
-        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-        &Key,
-        L"Invalid Host Addresses!",
-        NULL
-        );
+    BufferSize = sizeof (IP6_CONFIG_IFR_NVDATA);
+    IfrNvData = AllocateZeroPool (BufferSize);
+    if (IfrNvData == NULL) {
+      return EFI_OUT_OF_RESOURCES;
     }
 
-    break;
+    Status = EFI_SUCCESS;
 
-  case KEY_GATEWAY_ADDRESS:
-    Status = Ip6ParseAddressListFromString (
-               IfrNvData->GatewayAddress,
-               &Ip6NvData->GatewayAddress,
-               &Ip6NvData->GatewayAddressCount
-               );
-    if (EFI_ERROR (Status)) {
-      CreatePopUp (
-        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-        &Key,
-        L"Invalid Gateway Addresses!",
-        NULL
-        );
-    }
+    ZeroMem (&OldIfrNvData, BufferSize);
 
-    break;
+    HiiGetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData);
 
-  case KEY_DNS_ADDRESS:
-    Status = Ip6ParseAddressListFromString (
-               IfrNvData->DnsAddress,
-               &Ip6NvData->DnsAddress,
-               &Ip6NvData->DnsAddressCount
-               );
-    if (EFI_ERROR (Status)) {
-      CreatePopUp (
-        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-        &Key,
-        L"Invalid DNS Addresses!",
-        NULL
-        );
-    }
+    CopyMem (&OldIfrNvData, IfrNvData, BufferSize);
 
-    break;
+    switch (QuestionId) {
+    case KEY_INTERFACE_ID:
+      Status = Ip6ParseInterfaceIdFromString (IfrNvData->InterfaceId, &Ip6NvData->InterfaceId);
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"Invalid Interface ID!",
+          NULL
+          );
+      }
 
-  case KEY_SAVE_CONFIG_CHANGES:
-    CopyMem (&OldIfrNvData, IfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-    break;
+      break;
 
-  case KEY_IGNORE_CONFIG_CHANGES:
-    CopyMem (IfrNvData, &OldIfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-    break;
+    case KEY_MANUAL_ADDRESS:
+      Status = Ip6ParseAddressListFromString (
+                 IfrNvData->ManualAddress,
+                 &Ip6NvData->ManualAddress,
+                 &Ip6NvData->ManualAddressCount
+                 );
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"Invalid Host Addresses!",
+          NULL
+          );
+      }
 
-  case KEY_SAVE_CHANGES:
-    Status = Ip6ConvertIfrNvDataToConfigNvData (IfrNvData, Instance);
-    if (EFI_ERROR (Status)) {
+      break;
+
+    case KEY_GATEWAY_ADDRESS:
+      Status = Ip6ParseAddressListFromString (
+                 IfrNvData->GatewayAddress,
+                 &Ip6NvData->GatewayAddress,
+                 &Ip6NvData->GatewayAddressCount
+                 );
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"Invalid Gateway Addresses!",
+          NULL
+          );
+      }
+
+      break;
+
+    case KEY_DNS_ADDRESS:
+      Status = Ip6ParseAddressListFromString (
+                 IfrNvData->DnsAddress,
+                 &Ip6NvData->DnsAddress,
+                 &Ip6NvData->DnsAddressCount
+                 );
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"Invalid DNS Addresses!",
+          NULL
+          );
+      }
+
+      break;
+
+    case KEY_SAVE_CONFIG_CHANGES:
+      CopyMem (&OldIfrNvData, IfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      break;
+
+    case KEY_IGNORE_CONFIG_CHANGES:
+      CopyMem (IfrNvData, &OldIfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      break;
+
+    case KEY_SAVE_CHANGES:
+      Status = Ip6ConvertIfrNvDataToConfigNvData (IfrNvData, Instance);
+      if (EFI_ERROR (Status)) {
+        break;
+      }
+
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+      break;
+
+    default:
       break;
     }
 
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-    break;
+    if (!EFI_ERROR (Status)) {
+      //
+      // Pass changed uncommitted data back to Form Browser.
+      //
+      BufferSize = sizeof (IP6_CONFIG_IFR_NVDATA);
+      HiiSetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData, NULL);
+    }
 
-  default:
-    break;
+    FreePool (IfrNvData);
+    return Status;
   }
 
-  if (!EFI_ERROR (Status)) {
-    //
-    // Pass changed uncommitted data back to Form Browser.
-    //
-    BufferSize = sizeof (IP6_CONFIG_IFR_NVDATA);
-    HiiSetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData, NULL);
-  }
-
-  FreePool (IfrNvData);
-  return Status;
+  //
+  // All other action return unsupported.
+  //
+  return EFI_UNSUPPORTED;
 }
 
 /**
