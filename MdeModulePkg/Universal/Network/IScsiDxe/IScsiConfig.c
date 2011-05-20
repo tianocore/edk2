@@ -680,255 +680,254 @@ IScsiFormCallback (
   EFI_STATUS                Status;
   EFI_INPUT_KEY             Key;
 
-  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    Private   = ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (This);
     //
-    // Do nothing for UEFI OPEN/CLOSE Action
+    // Retrive uncommitted data from Browser
     //
-    return EFI_SUCCESS;
-  }
-
-  Private   = ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (This);
-
-  //
-  // Retrive uncommitted data from Browser
-  //
-  IfrNvData = AllocateZeroPool (sizeof (ISCSI_CONFIG_IFR_NVDATA));
-  ASSERT (IfrNvData != NULL);
-  if (!HiiGetBrowserData (&mVendorGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData)) {
-    FreePool (IfrNvData);
-    return EFI_NOT_FOUND;
-  }
-  
-  Status = EFI_SUCCESS;
-
-  switch (QuestionId) {
-  case KEY_INITIATOR_NAME:
-    IScsiUnicodeStrToAsciiStr (IfrNvData->InitiatorName, IScsiName);
-    BufferSize  = AsciiStrSize (IScsiName);
-
-    Status      = gIScsiInitiatorName.Set (&gIScsiInitiatorName, &BufferSize, IScsiName);
-    if (EFI_ERROR (Status)) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid iSCSI Name!", NULL);
+    IfrNvData = AllocateZeroPool (sizeof (ISCSI_CONFIG_IFR_NVDATA));
+    ASSERT (IfrNvData != NULL);
+    if (!HiiGetBrowserData (&mVendorGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData)) {
+      FreePool (IfrNvData);
+      return EFI_NOT_FOUND;
     }
+    Status = EFI_SUCCESS;
 
-    break;
+    switch (QuestionId) {
+    case KEY_INITIATOR_NAME:
+      IScsiUnicodeStrToAsciiStr (IfrNvData->InitiatorName, IScsiName);
+      BufferSize  = AsciiStrSize (IScsiName);
 
-  case KEY_LOCAL_IP:
-    IScsiUnicodeStrToAsciiStr (IfrNvData->LocalIp, Ip4String);
-    Status = IScsiAsciiStrToIp (Ip4String, &HostIp.v4);
-    if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
-      Status = EFI_INVALID_PARAMETER;
-    } else {
-      CopyMem (&Private->Current->SessionConfigData.LocalIp, &HostIp.v4, sizeof (HostIp.v4));
-    }
+      Status      = gIScsiInitiatorName.Set (&gIScsiInitiatorName, &BufferSize, IScsiName);
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid iSCSI Name!", NULL);
+      }
 
-    break;
+      break;
 
-  case KEY_SUBNET_MASK:
-    IScsiUnicodeStrToAsciiStr (IfrNvData->SubnetMask, Ip4String);
-    Status = IScsiAsciiStrToIp (Ip4String, &SubnetMask.v4);
-    if (EFI_ERROR (Status) || ((SubnetMask.Addr[0] != 0) && (IScsiGetSubnetMaskPrefixLength (&SubnetMask.v4) == 0))) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Subnet Mask!", NULL);
-      Status = EFI_INVALID_PARAMETER;
-    } else {
-      CopyMem (&Private->Current->SessionConfigData.SubnetMask, &SubnetMask.v4, sizeof (SubnetMask.v4));
-    }
+    case KEY_LOCAL_IP:
+      IScsiUnicodeStrToAsciiStr (IfrNvData->LocalIp, Ip4String);
+      Status = IScsiAsciiStrToIp (Ip4String, &HostIp.v4);
+      if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
+        Status = EFI_INVALID_PARAMETER;
+      } else {
+        CopyMem (&Private->Current->SessionConfigData.LocalIp, &HostIp.v4, sizeof (HostIp.v4));
+      }
 
-    break;
+      break;
 
-  case KEY_GATE_WAY:
-    IScsiUnicodeStrToAsciiStr (IfrNvData->Gateway, Ip4String);
-    Status = IScsiAsciiStrToIp (Ip4String, &Gateway.v4);
-    if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), 0))) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Gateway!", NULL);
-      Status = EFI_INVALID_PARAMETER;
-    } else {
-      CopyMem (&Private->Current->SessionConfigData.Gateway, &Gateway.v4, sizeof (Gateway.v4));
-    }
+    case KEY_SUBNET_MASK:
+      IScsiUnicodeStrToAsciiStr (IfrNvData->SubnetMask, Ip4String);
+      Status = IScsiAsciiStrToIp (Ip4String, &SubnetMask.v4);
+      if (EFI_ERROR (Status) || ((SubnetMask.Addr[0] != 0) && (IScsiGetSubnetMaskPrefixLength (&SubnetMask.v4) == 0))) {
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Subnet Mask!", NULL);
+        Status = EFI_INVALID_PARAMETER;
+      } else {
+        CopyMem (&Private->Current->SessionConfigData.SubnetMask, &SubnetMask.v4, sizeof (SubnetMask.v4));
+      }
 
-    break;
+      break;
 
-  case KEY_TARGET_IP:
-    IScsiUnicodeStrToAsciiStr (IfrNvData->TargetIp, Ip4String);
-    Status = IScsiAsciiStrToIp (Ip4String, &HostIp.v4);
-    if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
-      Status = EFI_INVALID_PARAMETER;
-    } else {
-      CopyMem (&Private->Current->SessionConfigData.TargetIp, &HostIp.v4, sizeof (HostIp.v4));
-    }
+    case KEY_GATE_WAY:
+      IScsiUnicodeStrToAsciiStr (IfrNvData->Gateway, Ip4String);
+      Status = IScsiAsciiStrToIp (Ip4String, &Gateway.v4);
+      if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), 0))) {
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Gateway!", NULL);
+        Status = EFI_INVALID_PARAMETER;
+      } else {
+        CopyMem (&Private->Current->SessionConfigData.Gateway, &Gateway.v4, sizeof (Gateway.v4));
+      }
 
-    break;
+      break;
 
-  case KEY_TARGET_NAME:
-    IScsiUnicodeStrToAsciiStr (IfrNvData->TargetName, IScsiName);
-    Status = IScsiNormalizeName (IScsiName, AsciiStrLen (IScsiName));
-    if (EFI_ERROR (Status)) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid iSCSI Name!", NULL);
-    } else {
-      AsciiStrCpy (Private->Current->SessionConfigData.TargetName, IScsiName);
-    }
+    case KEY_TARGET_IP:
+      IScsiUnicodeStrToAsciiStr (IfrNvData->TargetIp, Ip4String);
+      Status = IScsiAsciiStrToIp (Ip4String, &HostIp.v4);
+      if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
+        Status = EFI_INVALID_PARAMETER;
+      } else {
+        CopyMem (&Private->Current->SessionConfigData.TargetIp, &HostIp.v4, sizeof (HostIp.v4));
+      }
 
-    break;
+      break;
 
-  case KEY_DHCP_ENABLE:
-    if (IfrNvData->InitiatorInfoFromDhcp == 0) {
-      IfrNvData->TargetInfoFromDhcp = 0;
-    }
+    case KEY_TARGET_NAME:
+      IScsiUnicodeStrToAsciiStr (IfrNvData->TargetName, IScsiName);
+      Status = IScsiNormalizeName (IScsiName, AsciiStrLen (IScsiName));
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid iSCSI Name!", NULL);
+      } else {
+        AsciiStrCpy (Private->Current->SessionConfigData.TargetName, IScsiName);
+      }
 
-    break;
+      break;
 
-  case KEY_BOOT_LUN:
-    IScsiUnicodeStrToAsciiStr (IfrNvData->BootLun, LunString);
-    Status = IScsiAsciiStrToLun (LunString, (UINT8 *) &Lun);
-    if (EFI_ERROR (Status)) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid LUN string!", NULL);
-    } else {
-      CopyMem (Private->Current->SessionConfigData.BootLun, &Lun, sizeof (Lun));
-    }
+    case KEY_DHCP_ENABLE:
+      if (IfrNvData->InitiatorInfoFromDhcp == 0) {
+        IfrNvData->TargetInfoFromDhcp = 0;
+      }
 
-    break;
+      break;
 
-  case KEY_CHAP_NAME:
-    IScsiUnicodeStrToAsciiStr (IfrNvData->CHAPName, Private->Current->AuthConfigData.CHAPName);
-    break;
+    case KEY_BOOT_LUN:
+      IScsiUnicodeStrToAsciiStr (IfrNvData->BootLun, LunString);
+      Status = IScsiAsciiStrToLun (LunString, (UINT8 *) &Lun);
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid LUN string!", NULL);
+      } else {
+        CopyMem (Private->Current->SessionConfigData.BootLun, &Lun, sizeof (Lun));
+      }
 
-  case KEY_CHAP_SECRET:
-    IScsiUnicodeStrToAsciiStr (IfrNvData->CHAPSecret, Private->Current->AuthConfigData.CHAPSecret);
-    break;
+      break;
 
-  case KEY_REVERSE_CHAP_NAME:
-    IScsiUnicodeStrToAsciiStr (IfrNvData->ReverseCHAPName, Private->Current->AuthConfigData.ReverseCHAPName);
-    break;
+    case KEY_CHAP_NAME:
+      IScsiUnicodeStrToAsciiStr (IfrNvData->CHAPName, Private->Current->AuthConfigData.CHAPName);
+      break;
 
-  case KEY_REVERSE_CHAP_SECRET:
-    IScsiUnicodeStrToAsciiStr (IfrNvData->ReverseCHAPSecret, Private->Current->AuthConfigData.ReverseCHAPSecret);
-    break;
+    case KEY_CHAP_SECRET:
+      IScsiUnicodeStrToAsciiStr (IfrNvData->CHAPSecret, Private->Current->AuthConfigData.CHAPSecret);
+      break;
 
-  case KEY_CONFIG_ISID:
-    IScsiParseIsIdFromString (IfrNvData->IsId, Private->Current->SessionConfigData.IsId);
-    IScsiConvertIsIdToString (IfrNvData->IsId, Private->Current->SessionConfigData.IsId);
+    case KEY_REVERSE_CHAP_NAME:
+      IScsiUnicodeStrToAsciiStr (IfrNvData->ReverseCHAPName, Private->Current->AuthConfigData.ReverseCHAPName);
+      break;
 
-    break;
+    case KEY_REVERSE_CHAP_SECRET:
+      IScsiUnicodeStrToAsciiStr (IfrNvData->ReverseCHAPSecret, Private->Current->AuthConfigData.ReverseCHAPSecret);
+      break;
 
-  case KEY_SAVE_CHANGES:
-    //
-    // First, update those fields which don't have INTERACTIVE set.
-    //
-    Private->Current->SessionConfigData.Enabled               = IfrNvData->Enabled;
-    Private->Current->SessionConfigData.InitiatorInfoFromDhcp = IfrNvData->InitiatorInfoFromDhcp;
-    Private->Current->SessionConfigData.TargetPort            = IfrNvData->TargetPort;
-    if (Private->Current->SessionConfigData.TargetPort == 0) {
-      Private->Current->SessionConfigData.TargetPort = ISCSI_WELL_KNOWN_PORT;
-    }
+    case KEY_CONFIG_ISID:
+      IScsiParseIsIdFromString (IfrNvData->IsId, Private->Current->SessionConfigData.IsId);
+      IScsiConvertIsIdToString (IfrNvData->IsId, Private->Current->SessionConfigData.IsId);
 
-    Private->Current->SessionConfigData.TargetInfoFromDhcp  = IfrNvData->TargetInfoFromDhcp;
-    Private->Current->AuthConfigData.CHAPType               = IfrNvData->CHAPType;
+      break;
 
-    //
-    // Only do full parameter validation if iSCSI is enabled on this device.
-    //
-    if (Private->Current->SessionConfigData.Enabled) {
+    case KEY_SAVE_CHANGES:
       //
-      // Validate the address configuration of the Initiator if DHCP isn't
-      // deployed.
+      // First, update those fields which don't have INTERACTIVE set.
       //
-      if (!Private->Current->SessionConfigData.InitiatorInfoFromDhcp) {
-        CopyMem (&HostIp.v4, &Private->Current->SessionConfigData.LocalIp, sizeof (HostIp.v4));
-        CopyMem (&SubnetMask.v4, &Private->Current->SessionConfigData.SubnetMask, sizeof (SubnetMask.v4));
-        CopyMem (&Gateway.v4, &Private->Current->SessionConfigData.Gateway, sizeof (Gateway.v4));
+      Private->Current->SessionConfigData.Enabled               = IfrNvData->Enabled;
+      Private->Current->SessionConfigData.InitiatorInfoFromDhcp = IfrNvData->InitiatorInfoFromDhcp;
+      Private->Current->SessionConfigData.TargetPort            = IfrNvData->TargetPort;
+      if (Private->Current->SessionConfigData.TargetPort == 0) {
+        Private->Current->SessionConfigData.TargetPort = ISCSI_WELL_KNOWN_PORT;
+      }
 
-        if ((Gateway.Addr[0] != 0)) {
-          if (SubnetMask.Addr[0] == 0) {
-            CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Gateway address is set but subnet mask is zero.", NULL);
+      Private->Current->SessionConfigData.TargetInfoFromDhcp  = IfrNvData->TargetInfoFromDhcp;
+      Private->Current->AuthConfigData.CHAPType               = IfrNvData->CHAPType;
+
+      //
+      // Only do full parameter validation if iSCSI is enabled on this device.
+      //
+      if (Private->Current->SessionConfigData.Enabled) {
+        //
+        // Validate the address configuration of the Initiator if DHCP isn't
+        // deployed.
+        //
+        if (!Private->Current->SessionConfigData.InitiatorInfoFromDhcp) {
+          CopyMem (&HostIp.v4, &Private->Current->SessionConfigData.LocalIp, sizeof (HostIp.v4));
+          CopyMem (&SubnetMask.v4, &Private->Current->SessionConfigData.SubnetMask, sizeof (SubnetMask.v4));
+          CopyMem (&Gateway.v4, &Private->Current->SessionConfigData.Gateway, sizeof (Gateway.v4));
+
+          if ((Gateway.Addr[0] != 0)) {
+            if (SubnetMask.Addr[0] == 0) {
+              CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Gateway address is set but subnet mask is zero.", NULL);
+              Status = EFI_INVALID_PARAMETER;
+              break;
+            } else if (!IP4_NET_EQUAL (HostIp.Addr[0], Gateway.Addr[0], SubnetMask.Addr[0])) {
+              CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Local IP and Gateway are not in the same subnet.", NULL);
+              Status = EFI_INVALID_PARAMETER;
+              break;
+            }
+          }
+        }
+        //
+        // Validate target configuration if DHCP isn't deployed.
+        //
+        if (!Private->Current->SessionConfigData.TargetInfoFromDhcp) {
+          CopyMem (&HostIp.v4, &Private->Current->SessionConfigData.TargetIp, sizeof (HostIp.v4));
+          if (!NetIp4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
+            CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Target IP is invalid!", NULL);
             Status = EFI_INVALID_PARAMETER;
             break;
-          } else if (!IP4_NET_EQUAL (HostIp.Addr[0], Gateway.Addr[0], SubnetMask.Addr[0])) {
-            CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Local IP and Gateway are not in the same subnet.", NULL);
+          }
+        }
+
+        if (IfrNvData->CHAPType != ISCSI_CHAP_NONE) {
+          if ((IfrNvData->CHAPName[0] == '\0') || (IfrNvData->CHAPSecret[0] == '\0')) {
+            CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"CHAP Name or CHAP Secret is invalid!", NULL);
+            Status = EFI_INVALID_PARAMETER;
+            break;
+          }
+
+          if ((IfrNvData->CHAPType == ISCSI_CHAP_MUTUAL) &&
+              ((IfrNvData->ReverseCHAPName[0] == '\0') || (IfrNvData->ReverseCHAPSecret[0] == '\0'))
+              ) {
+            CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Reverse CHAP Name or Reverse CHAP Secret is invalid!", NULL);
             Status = EFI_INVALID_PARAMETER;
             break;
           }
         }
       }
-      //
-      // Validate target configuration if DHCP isn't deployed.
-      //
-      if (!Private->Current->SessionConfigData.TargetInfoFromDhcp) {
-        CopyMem (&HostIp.v4, &Private->Current->SessionConfigData.TargetIp, sizeof (HostIp.v4));
-        if (!NetIp4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
-          CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Target IP is invalid!", NULL);
-          Status = EFI_INVALID_PARAMETER;
-          break;
-        }
+
+      BufferSize = sizeof (Private->Current->SessionConfigData);
+      gRT->SetVariable (
+            Private->Current->MacString,
+            &gEfiIScsiInitiatorNameProtocolGuid,
+            ISCSI_CONFIG_VAR_ATTR,
+            BufferSize,
+            &Private->Current->SessionConfigData
+            );
+
+      BufferSize = sizeof (Private->Current->AuthConfigData);
+      gRT->SetVariable (
+            Private->Current->MacString,
+            &mIScsiCHAPAuthInfoGuid,
+            ISCSI_CONFIG_VAR_ATTR,
+            BufferSize,
+            &Private->Current->AuthConfigData
+            );
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      break;
+
+    default:
+      if ((QuestionId >= KEY_DEVICE_ENTRY_BASE) && (QuestionId < (mNumberOfIScsiDevices + KEY_DEVICE_ENTRY_BASE))) {
+        //
+        // In case goto the device configuration form, update the device form title.
+        //
+        ConfigFormEntry = IScsiGetConfigFormEntryByIndex ((UINT32) (QuestionId - KEY_DEVICE_ENTRY_BASE));
+        ASSERT (ConfigFormEntry != NULL);
+
+        UnicodeSPrint (PortString, (UINTN) 128, L"Port %s", ConfigFormEntry->MacString);
+        DeviceFormTitleToken = (EFI_STRING_ID) STR_ISCSI_DEVICE_FORM_TITLE;
+        HiiSetString (Private->RegisteredHandle, DeviceFormTitleToken, PortString, NULL);
+
+        IScsiConvertDeviceConfigDataToIfrNvData (ConfigFormEntry, IfrNvData);
+
+        Private->Current = ConfigFormEntry;
       }
 
-      if (IfrNvData->CHAPType != ISCSI_CHAP_NONE) {
-        if ((IfrNvData->CHAPName[0] == '\0') || (IfrNvData->CHAPSecret[0] == '\0')) {
-          CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"CHAP Name or CHAP Secret is invalid!", NULL);
-          Status = EFI_INVALID_PARAMETER;
-          break;
-        }
-
-        if ((IfrNvData->CHAPType == ISCSI_CHAP_MUTUAL) &&
-            ((IfrNvData->ReverseCHAPName[0] == '\0') || (IfrNvData->ReverseCHAPSecret[0] == '\0'))
-            ) {
-          CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Reverse CHAP Name or Reverse CHAP Secret is invalid!", NULL);
-          Status = EFI_INVALID_PARAMETER;
-          break;
-        }
-      }
+      break;
     }
 
-    BufferSize = sizeof (Private->Current->SessionConfigData);
-    gRT->SetVariable (
-          Private->Current->MacString,
-          &gEfiIScsiInitiatorNameProtocolGuid,
-          ISCSI_CONFIG_VAR_ATTR,
-          BufferSize,
-          &Private->Current->SessionConfigData
-          );
-
-    BufferSize = sizeof (Private->Current->AuthConfigData);
-    gRT->SetVariable (
-          Private->Current->MacString,
-          &mIScsiCHAPAuthInfoGuid,
-          ISCSI_CONFIG_VAR_ATTR,
-          BufferSize,
-          &Private->Current->AuthConfigData
-          );
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-    break;
-
-  default:
-    if ((QuestionId >= KEY_DEVICE_ENTRY_BASE) && (QuestionId < (mNumberOfIScsiDevices + KEY_DEVICE_ENTRY_BASE))) {
+    if (!EFI_ERROR (Status)) {
       //
-      // In case goto the device configuration form, update the device form title.
+      // Pass changed uncommitted data back to Form Browser
       //
-      ConfigFormEntry = IScsiGetConfigFormEntryByIndex ((UINT32) (QuestionId - KEY_DEVICE_ENTRY_BASE));
-      ASSERT (ConfigFormEntry != NULL);
-
-      UnicodeSPrint (PortString, (UINTN) 128, L"Port %s", ConfigFormEntry->MacString);
-      DeviceFormTitleToken = (EFI_STRING_ID) STR_ISCSI_DEVICE_FORM_TITLE;
-      HiiSetString (Private->RegisteredHandle, DeviceFormTitleToken, PortString, NULL);
-
-      IScsiConvertDeviceConfigDataToIfrNvData (ConfigFormEntry, IfrNvData);
-
-      Private->Current = ConfigFormEntry;
+      HiiSetBrowserData (&mVendorGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData, NULL);
     }
+    
+    FreePool (IfrNvData);
 
-    break;
+    return Status;
   }
 
-  if (!EFI_ERROR (Status)) {
-    //
-    // Pass changed uncommitted data back to Form Browser
-    //
-    HiiSetBrowserData (&mVendorGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData, NULL);
-  }
-
-  FreePool (IfrNvData);
-  return Status;
+  //
+  // All other action return unsupported.
+  //
+  return EFI_UNSUPPORTED;
 }
 
 /**

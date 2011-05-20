@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to Ip4.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -692,76 +692,76 @@ Ip4FormCallback (
   EFI_STATUS                Status;
   EFI_INPUT_KEY             Key;
 
-  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    Ip4ConfigInstance = IP4_CONFIG_INSTANCE_FROM_CONFIG_ACCESS (This);
+
+    IfrFormNvData = AllocateZeroPool (sizeof (IP4_CONFIG_IFR_NVDATA));
+    if (IfrFormNvData == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     //
-    // Do nothing for UEFI OPEN/CLOSE Action
+    // Retrive uncommitted data from Browser
     //
-    return EFI_SUCCESS;
-  }
+    if (!HiiGetBrowserData (&mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE, sizeof (IP4_CONFIG_IFR_NVDATA), (UINT8 *) IfrFormNvData)) {
+      FreePool (IfrFormNvData);
+      return EFI_NOT_FOUND;
+    }
 
-  Ip4ConfigInstance = IP4_CONFIG_INSTANCE_FROM_CONFIG_ACCESS (This);
+    Status = EFI_SUCCESS;
 
-  IfrFormNvData = AllocateZeroPool (sizeof (IP4_CONFIG_IFR_NVDATA));
-  if (IfrFormNvData == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
+    switch (QuestionId) {
+    case KEY_LOCAL_IP:
+      Status = Ip4StrToIp (IfrFormNvData->StationAddress, &HostIp.v4);
+      if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
+        Status = EFI_INVALID_PARAMETER;
+      } else {
+        CopyMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.LocalIp, &HostIp.v4, sizeof (HostIp.v4));
+      }
 
-  //
-  // Retrive uncommitted data from Browser
-  //
-  if (!HiiGetBrowserData (&mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE, sizeof (IP4_CONFIG_IFR_NVDATA), (UINT8 *) IfrFormNvData)) {
+      break;
+
+    case KEY_SUBNET_MASK:
+      Status = Ip4StrToIp (IfrFormNvData->SubnetMask, &SubnetMask.v4);
+      if (EFI_ERROR (Status) || ((SubnetMask.Addr[0] != 0) && (GetSubnetMaskPrefixLength (&SubnetMask.v4) == 0))) {
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Subnet Mask!", NULL);
+        Status = EFI_INVALID_PARAMETER;
+      } else {
+        CopyMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.SubnetMask, &SubnetMask.v4, sizeof (SubnetMask.v4));
+      }
+
+      break;
+
+    case KEY_GATE_WAY:
+      Status = Ip4StrToIp (IfrFormNvData->GatewayAddress, &Gateway.v4);
+      if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), 0))) {
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Gateway!", NULL);
+        Status = EFI_INVALID_PARAMETER;
+      } else {
+        CopyMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.Gateway, &Gateway.v4, sizeof (Gateway.v4));
+      }
+
+      break;
+
+    case KEY_SAVE_CHANGES:
+      Status = Ip4ConfigConvertIfrNvDataToDeviceConfigData (IfrFormNvData, Ip4ConfigInstance);
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      break;
+
+    default:
+      break;
+    }
+
     FreePool (IfrFormNvData);
-    return EFI_NOT_FOUND;
+
+    return Status;
   }
 
-  Status = EFI_SUCCESS;
-
-  switch (QuestionId) {
-  case KEY_LOCAL_IP:
-    Status = Ip4StrToIp (IfrFormNvData->StationAddress, &HostIp.v4);
-    if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
-      Status = EFI_INVALID_PARAMETER;
-    } else {
-      CopyMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.LocalIp, &HostIp.v4, sizeof (HostIp.v4));
-    }
-
-    break;
-
-  case KEY_SUBNET_MASK:
-    Status = Ip4StrToIp (IfrFormNvData->SubnetMask, &SubnetMask.v4);
-    if (EFI_ERROR (Status) || ((SubnetMask.Addr[0] != 0) && (GetSubnetMaskPrefixLength (&SubnetMask.v4) == 0))) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Subnet Mask!", NULL);
-      Status = EFI_INVALID_PARAMETER;
-    } else {
-      CopyMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.SubnetMask, &SubnetMask.v4, sizeof (SubnetMask.v4));
-    }
-
-    break;
-
-  case KEY_GATE_WAY:
-    Status = Ip4StrToIp (IfrFormNvData->GatewayAddress, &Gateway.v4);
-    if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), 0))) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Gateway!", NULL);
-      Status = EFI_INVALID_PARAMETER;
-    } else {
-      CopyMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.Gateway, &Gateway.v4, sizeof (Gateway.v4));
-    }
-
-    break;
-
-  case KEY_SAVE_CHANGES:
-    Status = Ip4ConfigConvertIfrNvDataToDeviceConfigData (IfrFormNvData, Ip4ConfigInstance);
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-    break;
-
-  default:
-    break;
-  }
-
-  FreePool (IfrFormNvData);
-
-  return Status;
+  //
+  // All other action return unsupported.
+  //
+  return EFI_UNSUPPORTED;
 }
 
 /**

@@ -1,7 +1,7 @@
 /** @file
   HII Config Access protocol implementation of VLAN configuration module.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -254,77 +254,84 @@ VlanCallback (
     return EFI_SUCCESS;
   }
 
-  //
-  // Get Browser data
-  //
-  Configuration = AllocateZeroPool (sizeof (VLAN_CONFIGURATION));
-  ASSERT (Configuration != NULL);
-  HiiGetBrowserData (&mVlanFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration);
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    //
+    // Get Browser data
+    //
+    Configuration = AllocateZeroPool (sizeof (VLAN_CONFIGURATION));
+    ASSERT (Configuration != NULL);
+    HiiGetBrowserData (&mVlanFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration);
 
-  VlanConfig = PrivateData->VlanConfig;
+    VlanConfig = PrivateData->VlanConfig;
 
-  switch (QuestionId) {
-  case VLAN_ADD_QUESTION_ID:
-    //
-    // Add a VLAN
-    //
-    VlanConfig->Set (VlanConfig, Configuration->VlanId, Configuration->Priority);
-    VlanUpdateForm (PrivateData);
-
-    //
-    // Connect the newly created VLAN device
-    //
-    VlanHandle = NetLibGetVlanHandle (PrivateData->ControllerHandle, Configuration->VlanId);
-    if (VlanHandle == NULL) {
+    switch (QuestionId) {
+    case VLAN_ADD_QUESTION_ID:
       //
-      // There may be no child handle created for VLAN ID 0, connect the parent handle
+      // Add a VLAN
       //
-      VlanHandle = PrivateData->ControllerHandle;
-    }
-    gBS->ConnectController (VlanHandle, NULL, NULL, TRUE);
+      VlanConfig->Set (VlanConfig, Configuration->VlanId, Configuration->Priority);
+      VlanUpdateForm (PrivateData);
 
-    //
-    // Clear UI data
-    //
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-    Configuration->VlanId = 0;
-    Configuration->Priority = 0;
-    break;
-
-  case VLAN_REMOVE_QUESTION_ID:
-    //
-    // Remove VLAN
-    //
-    ASSERT (PrivateData->NumberOfVlan <= MAX_VLAN_NUMBER);
-    for (Index = 0; Index < PrivateData->NumberOfVlan; Index++) {
-      if (Configuration->VlanList[Index] != 0) {
+      //
+      // Connect the newly created VLAN device
+      //
+      VlanHandle = NetLibGetVlanHandle (PrivateData->ControllerHandle, Configuration->VlanId);
+      if (VlanHandle == NULL) {
         //
-        // Checkbox is selected, need remove this VLAN
+        // There may be no child handle created for VLAN ID 0, connect the parent handle
         //
-        VlanConfig->Remove (VlanConfig, PrivateData->VlanId[Index]);
+        VlanHandle = PrivateData->ControllerHandle;
       }
+      gBS->ConnectController (VlanHandle, NULL, NULL, TRUE);
+
+      //
+      // Clear UI data
+      //
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      Configuration->VlanId = 0;
+      Configuration->Priority = 0;
+      break;
+
+    case VLAN_REMOVE_QUESTION_ID:
+      //
+      // Remove VLAN
+      //
+      ASSERT (PrivateData->NumberOfVlan <= MAX_VLAN_NUMBER);
+      for (Index = 0; Index < PrivateData->NumberOfVlan; Index++) {
+        if (Configuration->VlanList[Index] != 0) {
+          //
+          // Checkbox is selected, need remove this VLAN
+          //
+          VlanConfig->Remove (VlanConfig, PrivateData->VlanId[Index]);
+        }
+      }
+
+      VlanUpdateForm (PrivateData);
+      if (PrivateData->NumberOfVlan == 0) {
+        //
+        // No VLAN device now, connect the physical NIC handle.
+        // Note: PrivateData->NumberOfVlan has been updated by VlanUpdateForm()
+        //
+        gBS->ConnectController (PrivateData->ControllerHandle, NULL, NULL, TRUE);
+      }
+
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      ZeroMem (Configuration->VlanList, MAX_VLAN_NUMBER);
+      break;
+
+    default:
+      break;
     }
 
-    VlanUpdateForm (PrivateData);
-    if (PrivateData->NumberOfVlan == 0) {
-      //
-      // No VLAN device now, connect the physical NIC handle.
-      // Note: PrivateData->NumberOfVlan has been updated by VlanUpdateForm()
-      //
-      gBS->ConnectController (PrivateData->ControllerHandle, NULL, NULL, TRUE);
-    }
-
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-    ZeroMem (Configuration->VlanList, MAX_VLAN_NUMBER);
-    break;
-
-  default:
-    break;
+    HiiSetBrowserData (&mVlanFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration, NULL);
+    FreePool (Configuration);
+    return EFI_SUCCESS;
   }
 
-  HiiSetBrowserData (&mVlanFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration, NULL);
-  FreePool (Configuration);
-  return EFI_SUCCESS;
+  //
+  // All other action return unsupported.
+  //
+  return EFI_UNSUPPORTED;
 }
 
 

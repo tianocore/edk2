@@ -13,7 +13,7 @@
   4. It save all the mapping info in NV variables which will be consumed
      by platform override protocol driver to publish the platform override protocol.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1335,81 +1335,81 @@ PlatOverMngrCallback (
   EFI_INPUT_KEY                             Key;
   PLAT_OVER_MNGR_DATA                       *FakeNvData;
 
-  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    Private = EFI_CALLBACK_INFO_FROM_THIS (This);
+    FakeNvData = &Private->FakeNvData;
+    if (!HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
+      return EFI_NOT_FOUND;
+    }
+
+    if (KeyValue == KEY_VALUE_DEVICE_REFRESH ||
+        KeyValue == KEY_VALUE_DEVICE_FILTER ||
+        KeyValue == KEY_VALUE_DRIVER_GOTO_PREVIOUS
+        ) {
+      UpdateDeviceSelectPage (Private, KeyValue, FakeNvData);
+      //
+      // Update page title string
+      //
+      NewStringToken = STRING_TOKEN (STR_TITLE);
+      if (HiiSetString (Private->RegisteredHandle, NewStringToken, L"First, Select the controller by device path", NULL) == 0) {
+        ASSERT (FALSE);
+      }
+    }
+
+    if (((KeyValue >= KEY_VALUE_DEVICE_OFFSET) && (KeyValue < KEY_VALUE_DEVICE_MAX)) || (KeyValue == KEY_VALUE_ORDER_GOTO_PREVIOUS)) {
+      if (KeyValue == KEY_VALUE_ORDER_GOTO_PREVIOUS) {
+        KeyValue = (EFI_QUESTION_ID) (mSelectedCtrIndex + KEY_VALUE_DEVICE_OFFSET);
+      }
+      UpdateBindingDriverSelectPage (Private, KeyValue, FakeNvData);
+      //
+      // Update page title string
+      //
+      NewStringToken = STRING_TOKEN (STR_TITLE);
+      if (HiiSetString (Private->RegisteredHandle, NewStringToken, L"Second, Select drivers for the previous selected controller", NULL) == 0) {
+        ASSERT (FALSE);
+      }
+    }
+
+    if (KeyValue == KEY_VALUE_DRIVER_GOTO_ORDER) {
+      UpdatePrioritySelectPage (Private, KeyValue, FakeNvData);
+      //
+      // Update page title string
+      //
+      NewStringToken = STRING_TOKEN (STR_TITLE);
+      if (HiiSetString (Private->RegisteredHandle, NewStringToken, L"Finally, Set the priority order for the drivers and save them", NULL) == 0) {
+        ASSERT (FALSE);
+      }
+    }
+
+    if (KeyValue == KEY_VALUE_ORDER_SAVE_AND_EXIT) {
+      Status = CommintChanges (Private, KeyValue, FakeNvData);
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Single Override Info too large, Saving Error!", NULL);
+        return EFI_DEVICE_ERROR;
+      }
+    }
+
+    if (KeyValue == KEY_VALUE_DEVICE_CLEAR) {
+      //
+      // Deletes all environment variable(s) that contain the override mappings info
+      //
+      FreeMappingDatabase (&mMappingDataBase);
+      Status = SaveOverridesMapping (&mMappingDataBase);
+      UpdateDeviceSelectPage (Private, KeyValue, FakeNvData);
+    }
     //
-    // Do nothing for UEFI OPEN/CLOSE Action
+    // Pass changed uncommitted data back to Form Browser
     //
+    HiiSetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData, NULL);
+
     return EFI_SUCCESS;
-  }
+  } 
 
-  Private = EFI_CALLBACK_INFO_FROM_THIS (This);
-  FakeNvData = &Private->FakeNvData;
-  if (!HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
-    return EFI_NOT_FOUND;
-  }
-
-  if (KeyValue == KEY_VALUE_DEVICE_REFRESH ||
-      KeyValue == KEY_VALUE_DEVICE_FILTER ||
-      KeyValue == KEY_VALUE_DRIVER_GOTO_PREVIOUS
-      ) {
-    UpdateDeviceSelectPage (Private, KeyValue, FakeNvData);
-    //
-    // Update page title string
-    //
-    NewStringToken = STRING_TOKEN (STR_TITLE);
-    if (HiiSetString (Private->RegisteredHandle, NewStringToken, L"First, Select the controller by device path", NULL) == 0) {
-      ASSERT (FALSE);
-    }
-  }
-
-  if (((KeyValue >= KEY_VALUE_DEVICE_OFFSET) && (KeyValue < KEY_VALUE_DEVICE_MAX)) || (KeyValue == KEY_VALUE_ORDER_GOTO_PREVIOUS)) {
-    if (KeyValue == KEY_VALUE_ORDER_GOTO_PREVIOUS) {
-      KeyValue = (EFI_QUESTION_ID) (mSelectedCtrIndex + KEY_VALUE_DEVICE_OFFSET);
-    }
-    UpdateBindingDriverSelectPage (Private, KeyValue, FakeNvData);
-    //
-    // Update page title string
-    //
-    NewStringToken = STRING_TOKEN (STR_TITLE);
-    if (HiiSetString (Private->RegisteredHandle, NewStringToken, L"Second, Select drivers for the previous selected controller", NULL) == 0) {
-      ASSERT (FALSE);
-    }
-  }
-
-  if (KeyValue == KEY_VALUE_DRIVER_GOTO_ORDER) {
-    UpdatePrioritySelectPage (Private, KeyValue, FakeNvData);
-    //
-    // Update page title string
-    //
-    NewStringToken = STRING_TOKEN (STR_TITLE);
-    if (HiiSetString (Private->RegisteredHandle, NewStringToken, L"Finally, Set the priority order for the drivers and save them", NULL) == 0) {
-      ASSERT (FALSE);
-    }
-  }
-
-  if (KeyValue == KEY_VALUE_ORDER_SAVE_AND_EXIT) {
-    Status = CommintChanges (Private, KeyValue, FakeNvData);
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-    if (EFI_ERROR (Status)) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Single Override Info too large, Saving Error!", NULL);
-      return EFI_DEVICE_ERROR;
-    }
-  }
-
-  if (KeyValue == KEY_VALUE_DEVICE_CLEAR) {
-    //
-    // Deletes all environment variable(s) that contain the override mappings info
-    //
-    FreeMappingDatabase (&mMappingDataBase);
-    Status = SaveOverridesMapping (&mMappingDataBase);
-    UpdateDeviceSelectPage (Private, KeyValue, FakeNvData);
-  }
   //
-  // Pass changed uncommitted data back to Form Browser
+  // All other action return unsupported.
   //
-  HiiSetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData, NULL);
-
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 /**
