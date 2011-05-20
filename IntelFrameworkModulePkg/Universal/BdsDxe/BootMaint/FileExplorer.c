@@ -1,7 +1,7 @@
 /** @file
   File explorer related functions.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -249,73 +249,72 @@ FileExplorerCallback (
   FILE_EXPLORER_NV_DATA *NvRamMap;
   EFI_STATUS            Status;
 
-  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
-    //
-    // Do nothing for UEFI OPEN/CLOSE Action
-    //
-    return EFI_SUCCESS;
-  }
-
-  if ((Value == NULL) || (ActionRequest == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Status         = EFI_SUCCESS;
-  Private        = FE_CALLBACK_DATA_FROM_THIS (This);
-  *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-
-  //
-  // Retrieve uncommitted data from Form Browser
-  //
-  NvRamMap = &Private->FeFakeNvData;
-  HiiGetBrowserData (&mFileExplorerGuid, mFileExplorerStorageName, sizeof (FILE_EXPLORER_NV_DATA), (UINT8 *) NvRamMap);
-
-  if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_BOOT || QuestionId == KEY_VALUE_SAVE_AND_EXIT_DRIVER) {
-    //
-    // Apply changes and exit formset
-    //
-    if (FileExplorerStateAddBootOption == Private->FeCurrentState) {
-      Status = Var_UpdateBootOption (Private, NvRamMap);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-
-      BOpt_GetBootOptions (Private);
-      CreateMenuStringToken (Private, Private->FeHiiHandle, &BootOptionMenu);
-    } else if (FileExplorerStateAddDriverOptionState == Private->FeCurrentState) {
-      Status = Var_UpdateDriverOption (
-                Private,
-                Private->FeHiiHandle,
-                NvRamMap->DescriptionData,
-                NvRamMap->OptionalData,
-                NvRamMap->ForceReconnect
-                );
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-
-      BOpt_GetDriverOptions (Private);
-      CreateMenuStringToken (Private, Private->FeHiiHandle, &DriverOptionMenu);
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    if ((Value == NULL) || (ActionRequest == NULL)) {
+      return EFI_INVALID_PARAMETER;
     }
 
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-  } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_BOOT || QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_DRIVER) {
+    Status         = EFI_SUCCESS;
+    Private        = FE_CALLBACK_DATA_FROM_THIS (This);
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+
     //
-    // Discard changes and exit formset
+    // Retrieve uncommitted data from Form Browser
     //
-    NvRamMap->OptionalData[0]     = 0x0000;
-    NvRamMap->DescriptionData[0]  = 0x0000;
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-  } else if (QuestionId < FILE_OPTION_OFFSET) {
-    //
-    // Exit File Explorer formset
-    //
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-  } else {
-    if (UpdateFileExplorer (Private, QuestionId)) {
+    NvRamMap = &Private->FeFakeNvData;
+    HiiGetBrowserData (&mFileExplorerGuid, mFileExplorerStorageName, sizeof (FILE_EXPLORER_NV_DATA), (UINT8 *) NvRamMap);
+
+    if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_BOOT || QuestionId == KEY_VALUE_SAVE_AND_EXIT_DRIVER) {
+      //
+      // Apply changes and exit formset
+      //
+      if (FileExplorerStateAddBootOption == Private->FeCurrentState) {
+        Status = Var_UpdateBootOption (Private, NvRamMap);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+
+        BOpt_GetBootOptions (Private);
+        CreateMenuStringToken (Private, Private->FeHiiHandle, &BootOptionMenu);
+      } else if (FileExplorerStateAddDriverOptionState == Private->FeCurrentState) {
+        Status = Var_UpdateDriverOption (
+                  Private,
+                  Private->FeHiiHandle,
+                  NvRamMap->DescriptionData,
+                  NvRamMap->OptionalData,
+                  NvRamMap->ForceReconnect
+                  );
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+
+        BOpt_GetDriverOptions (Private);
+        CreateMenuStringToken (Private, Private->FeHiiHandle, &DriverOptionMenu);
+      }
+
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_BOOT || QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_DRIVER) {
+      //
+      // Discard changes and exit formset
+      //
+      NvRamMap->OptionalData[0]     = 0x0000;
+      NvRamMap->DescriptionData[0]  = 0x0000;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    } else if (QuestionId < FILE_OPTION_OFFSET) {
+      //
+      // Exit File Explorer formset
+      //
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    } else {
+      if (UpdateFileExplorer (Private, QuestionId)) {
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+      }
     }
-  }
 
-  return Status;
+    return Status;
+  }
+  //
+  // All other action return unsupported.
+  //
+  return EFI_UNSUPPORTED;
 }

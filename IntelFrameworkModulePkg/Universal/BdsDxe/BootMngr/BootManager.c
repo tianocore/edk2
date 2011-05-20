@@ -99,47 +99,47 @@ BootManagerCallback (
   LIST_ENTRY              *Link;
   UINT16                  KeyCount;
 
-  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    if ((Value == NULL) || (ActionRequest == NULL)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     //
-    // Do nothing for UEFI OPEN/CLOSE Action
+    // Initialize the key count
     //
+    KeyCount = 0;
+
+    for (Link = GetFirstNode (&mBootOptionsList); !IsNull (&mBootOptionsList, Link); Link = GetNextNode (&mBootOptionsList, Link)) {
+      Option = CR (Link, BDS_COMMON_OPTION, Link, BDS_LOAD_OPTION_SIGNATURE);
+
+      KeyCount++;
+
+      gOption = Option;
+
+      //
+      // Is this device the one chosen?
+      //
+      if (KeyCount == QuestionId) {
+        //
+        // Assigning the returned Key to a global allows the original routine to know what was chosen
+        //
+        mKeyInput = QuestionId;
+
+        //
+        // Request to exit SendForm(), so that we could boot the selected option
+        //
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+        break;
+      }
+    }
+
     return EFI_SUCCESS;
   }
 
-  if ((Value == NULL) || (ActionRequest == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   //
-  // Initialize the key count
+  // All other action return unsupported.
   //
-  KeyCount = 0;
-
-  for (Link = GetFirstNode (&mBootOptionsList); !IsNull (&mBootOptionsList, Link); Link = GetNextNode (&mBootOptionsList, Link)) {
-    Option = CR (Link, BDS_COMMON_OPTION, Link, BDS_LOAD_OPTION_SIGNATURE);
-
-    KeyCount++;
-
-    gOption = Option;
-
-    //
-    // Is this device the one chosen?
-    //
-    if (KeyCount == QuestionId) {
-      //
-      // Assigning the returned Key to a global allows the original routine to know what was chosen
-      //
-      mKeyInput = QuestionId;
-
-      //
-      // Request to exit SendForm(), so that we could boot the selected option
-      //
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-      break;
-    }
-  }
-
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 /**

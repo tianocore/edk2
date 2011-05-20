@@ -174,118 +174,118 @@ FrontPageCallback (
   CHAR8                         *PlatformSupportedLanguages;
   CHAR8                         *BestLanguage;
 
-  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    if ((Value == NULL) || (ActionRequest == NULL)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    gCallbackKey = QuestionId;
+
     //
-    // Do nothing for UEFI OPEN/CLOSE Action
+    // The first 4 entries in the Front Page are to be GUARANTEED to remain constant so IHV's can
+    // describe to their customers in documentation how to find their setup information (namely
+    // under the device manager and specific buckets)
     //
+    switch (QuestionId) {
+    case FRONT_PAGE_KEY_CONTINUE:
+      //
+      // This is the continue - clear the screen and return an error to get out of FrontPage loop
+      //
+      break;
+
+    case FRONT_PAGE_KEY_LANGUAGE:
+      //
+      // Collect the languages from what our current Language support is based on our VFR
+      //
+      LanguageString = HiiGetSupportedLanguages (gFrontPagePrivate.HiiHandle);
+      ASSERT (LanguageString != NULL);
+      //
+      // Allocate working buffer for RFC 4646 language in supported LanguageString.
+      //
+      Lang = AllocatePool (AsciiStrSize (LanguageString));
+      ASSERT (Lang != NULL);
+
+      Index = 0;
+      LangCode = LanguageString;
+      while (*LangCode != 0) {
+        GetNextLanguage (&LangCode, Lang);
+
+        if (Index == Value->u8) {
+          break;
+        }
+
+        Index++;
+      }
+
+      PlatformSupportedLanguages = GetEfiGlobalVariable (L"PlatformLangCodes");
+      if (PlatformSupportedLanguages == NULL) {
+        PlatformSupportedLanguages = AllocateCopyPool (
+                                       AsciiStrSize ((CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes)),
+                                       (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes)
+                                       );
+        ASSERT (PlatformSupportedLanguages != NULL);
+      }
+
+      //
+      // Select the best language in platform supported Language.
+      //
+      BestLanguage = GetBestLanguage (
+                       PlatformSupportedLanguages,
+                       FALSE,
+                       Lang,
+                       NULL
+                       );
+      if (BestLanguage != NULL) {
+        Status = gRT->SetVariable (
+                        L"PlatformLang",
+                        &gEfiGlobalVariableGuid,
+                        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                        AsciiStrSize (BestLanguage),
+                        Lang
+                        );
+        ASSERT_EFI_ERROR(Status);
+        FreePool (BestLanguage);
+      } else {
+        ASSERT (FALSE);
+      }
+
+      FreePool (PlatformSupportedLanguages);
+      FreePool (Lang);
+      FreePool (LanguageString);
+      break;
+
+    case FRONT_PAGE_KEY_BOOT_MANAGER:
+      //
+      // Boot Manager
+      //
+      break;
+
+    case FRONT_PAGE_KEY_DEVICE_MANAGER:
+      //
+      // Device Manager
+      //
+      break;
+
+    case FRONT_PAGE_KEY_BOOT_MAINTAIN:
+      //
+      // Boot Maintenance Manager
+      //
+      break;
+
+    default:
+      gCallbackKey = 0;
+      break;
+    }
+
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+
     return EFI_SUCCESS;
   }
 
-  if ((Value == NULL) || (ActionRequest == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  gCallbackKey = QuestionId;
-
   //
-  // The first 4 entries in the Front Page are to be GUARANTEED to remain constant so IHV's can
-  // describe to their customers in documentation how to find their setup information (namely
-  // under the device manager and specific buckets)
+  // All other action return unsupported.
   //
-  switch (QuestionId) {
-  case FRONT_PAGE_KEY_CONTINUE:
-    //
-    // This is the continue - clear the screen and return an error to get out of FrontPage loop
-    //
-    break;
-
-  case FRONT_PAGE_KEY_LANGUAGE:
-    //
-    // Collect the languages from what our current Language support is based on our VFR
-    //
-    LanguageString = HiiGetSupportedLanguages (gFrontPagePrivate.HiiHandle);
-    ASSERT (LanguageString != NULL);
-    //
-    // Allocate working buffer for RFC 4646 language in supported LanguageString.
-    //
-    Lang = AllocatePool (AsciiStrSize (LanguageString));
-    ASSERT (Lang != NULL);
-
-    Index = 0;
-    LangCode = LanguageString;
-    while (*LangCode != 0) {
-      GetNextLanguage (&LangCode, Lang);
-
-      if (Index == Value->u8) {
-        break;
-      }
-
-      Index++;
-    }
-
-    PlatformSupportedLanguages = GetEfiGlobalVariable (L"PlatformLangCodes");
-    if (PlatformSupportedLanguages == NULL) {
-      PlatformSupportedLanguages = AllocateCopyPool (
-                                     AsciiStrSize ((CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes)),
-                                     (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes)
-                                     );
-      ASSERT (PlatformSupportedLanguages != NULL);
-    }
-
-    //
-    // Select the best language in platform supported Language.
-    //
-    BestLanguage = GetBestLanguage (
-                     PlatformSupportedLanguages,
-                     FALSE,
-                     Lang,
-                     NULL
-                     );
-    if (BestLanguage != NULL) {
-      Status = gRT->SetVariable (
-                      L"PlatformLang",
-                      &gEfiGlobalVariableGuid,
-                      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                      AsciiStrSize (BestLanguage),
-                      Lang
-                      );
-      ASSERT_EFI_ERROR(Status);
-      FreePool (BestLanguage);
-    } else {
-      ASSERT (FALSE);
-    }
-
-    FreePool (PlatformSupportedLanguages);
-    FreePool (Lang);
-    FreePool (LanguageString);
-    break;
-
-  case FRONT_PAGE_KEY_BOOT_MANAGER:
-    //
-    // Boot Manager
-    //
-    break;
-
-  case FRONT_PAGE_KEY_DEVICE_MANAGER:
-    //
-    // Device Manager
-    //
-    break;
-
-  case FRONT_PAGE_KEY_BOOT_MAINTAIN:
-    //
-    // Boot Maintenance Manager
-    //
-    break;
-
-  default:
-    gCallbackKey = 0;
-    break;
-  }
-
-  *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 /**

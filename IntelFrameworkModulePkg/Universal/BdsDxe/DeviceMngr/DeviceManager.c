@@ -141,37 +141,36 @@ DeviceManagerCallback (
   )
 {
   UINTN CurIndex;
+
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    if ((Value == NULL) || (ActionRequest == NULL)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    gCallbackKey = QuestionId;
+    if ((QuestionId < MAX_KEY_SECTION_LEN + NETWORK_DEVICE_LIST_KEY_OFFSET) && (QuestionId >= NETWORK_DEVICE_LIST_KEY_OFFSET)) {
+      //
+      // If user select the mac address, need to record mac address string to support next form show.
+      //
+      for (CurIndex = 0; CurIndex < mMacDeviceList.CurListLen; CurIndex ++) {
+        if (mMacDeviceList.NodeList[CurIndex].QuestionId == QuestionId) {
+           mSelectedMacAddrString = HiiGetString (gDeviceManagerPrivate.HiiHandle, mMacDeviceList.NodeList[CurIndex].PromptId, NULL);
+        }
+      }
+    }
   
-  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
     //
-    // Do nothing for UEFI OPEN/CLOSE Action
+    // Request to exit SendForm(), so as to switch to selected form
     //
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+
     return EFI_SUCCESS;
   }
 
-  if ((Value == NULL) || (ActionRequest == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  gCallbackKey = QuestionId;
-
-  if ((QuestionId < MAX_KEY_SECTION_LEN + NETWORK_DEVICE_LIST_KEY_OFFSET) && (QuestionId >= NETWORK_DEVICE_LIST_KEY_OFFSET)) {
-    //
-    // If user select the mac address, need to record mac address string to support next form show.
-    //
-    for (CurIndex = 0; CurIndex < mMacDeviceList.CurListLen; CurIndex ++) {
-      if (mMacDeviceList.NodeList[CurIndex].QuestionId == QuestionId) {
-         mSelectedMacAddrString = HiiGetString (gDeviceManagerPrivate.HiiHandle, mMacDeviceList.NodeList[CurIndex].PromptId, NULL);
-      }
-    }
-  }
-  
   //
-  // Request to exit SendForm(), so as to switch to selected form
+  // All other action return unsupported.
   //
-  *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 /**
@@ -1109,25 +1108,25 @@ DriverHealthCallback (
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
 {
-  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    if ((Value == NULL) || (ActionRequest == NULL)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    gCallbackKey = QuestionId;
+
     //
-    // Do nothing for UEFI OPEN/CLOSE Action
+    // Request to exit SendForm(), so as to switch to selected form
     //
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+
     return EFI_SUCCESS;
   }
 
-  if ((Value == NULL) || (ActionRequest == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  gCallbackKey = QuestionId;
-
   //
-  // Request to exit SendForm(), so as to switch to selected form
+  // All other action return unsupported.
   //
-  *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 /**

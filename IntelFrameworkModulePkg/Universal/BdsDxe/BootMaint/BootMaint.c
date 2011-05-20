@@ -296,348 +296,348 @@ BootMaintCallback (
   UINT8             *NewLegacyDev;
   UINT8             *DisMap;
   EFI_FORM_ID       FormId;
-  
-  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
-    //
-    // Do nothing for UEFI OPEN/CLOSE Action
-    //
-    return EFI_SUCCESS;
-  }
+  Status = EFI_SUCCESS;
 
-  if ((Value == NULL) || (ActionRequest == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  OldValue       = 0;
-  NewValue       = 0;
-  Number         = 0;
-  OldLegacyDev   = NULL;
-  NewLegacyDev   = NULL;
-  NewValuePos    = 0;
-  DisMap         = NULL;
-  *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-
-  Private        = BMM_CALLBACK_DATA_FROM_THIS (This);
-  UpdatePageId (Private, QuestionId);
-
-  //
-  // Retrive uncommitted data from Form Browser
-  //
-  CurrentFakeNVMap = &Private->BmmFakeNvData;
-  HiiGetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap);
-
-  //
-  // need to be subtituded.
-  //
-  // Update Select FD/HD/CD/NET/BEV Order Form
-  //
-  if (FORM_SET_FD_ORDER_ID == Private->BmmPreviousPageId ||
-      FORM_SET_HD_ORDER_ID == Private->BmmPreviousPageId ||
-      FORM_SET_CD_ORDER_ID == Private->BmmPreviousPageId ||
-      FORM_SET_NET_ORDER_ID == Private->BmmPreviousPageId ||
-      FORM_SET_BEV_ORDER_ID == Private->BmmPreviousPageId ||
-      ((FORM_BOOT_SETUP_ID == Private->BmmPreviousPageId) &&
-      (QuestionId >= LEGACY_FD_QUESTION_ID) &&
-       (QuestionId < (LEGACY_BEV_QUESTION_ID + 100)) )
-      ) {
-
-    DisMap  = Private->BmmOldFakeNVData.DisableMap;
-
-    FormId  = Private->BmmPreviousPageId;
-    if (FormId == FORM_BOOT_SETUP_ID) {
-      FormId = Private->BmmCurrentPageId;
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    if ((Value == NULL) || (ActionRequest == NULL)) {
+      return EFI_INVALID_PARAMETER;
     }
 
-    switch (FormId) {
-    case FORM_SET_FD_ORDER_ID:
-      Number        = (UINT16) LegacyFDMenu.MenuNumber;
-      OldLegacyDev  = Private->BmmOldFakeNVData.LegacyFD;
-      NewLegacyDev  = CurrentFakeNVMap->LegacyFD;
-      break;
+    OldValue       = 0;
+    NewValue       = 0;
+    Number         = 0;
+    OldLegacyDev   = NULL;
+    NewLegacyDev   = NULL;
+    NewValuePos    = 0;
+    DisMap         = NULL;
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
 
-    case FORM_SET_HD_ORDER_ID:
-      Number        = (UINT16) LegacyHDMenu.MenuNumber;
-      OldLegacyDev  = Private->BmmOldFakeNVData.LegacyHD;
-      NewLegacyDev  = CurrentFakeNVMap->LegacyHD;
-      break;
+    Private        = BMM_CALLBACK_DATA_FROM_THIS (This);
+    UpdatePageId (Private, QuestionId);
 
-    case FORM_SET_CD_ORDER_ID:
-      Number        = (UINT16) LegacyCDMenu.MenuNumber;
-      OldLegacyDev  = Private->BmmOldFakeNVData.LegacyCD;
-      NewLegacyDev  = CurrentFakeNVMap->LegacyCD;
-      break;
-
-    case FORM_SET_NET_ORDER_ID:
-      Number        = (UINT16) LegacyNETMenu.MenuNumber;
-      OldLegacyDev  = Private->BmmOldFakeNVData.LegacyNET;
-      NewLegacyDev  = CurrentFakeNVMap->LegacyNET;
-      break;
-
-    case FORM_SET_BEV_ORDER_ID:
-      Number        = (UINT16) LegacyBEVMenu.MenuNumber;
-      OldLegacyDev  = Private->BmmOldFakeNVData.LegacyBEV;
-      NewLegacyDev  = CurrentFakeNVMap->LegacyBEV;
-      break;
-
-    default:
-      break;
-    }
     //
-    //  First, find the different position
-    //  if there is change, it should be only one
+    // Retrive uncommitted data from Form Browser
     //
-    for (Index = 0; Index < Number; Index++) {
-      if (OldLegacyDev[Index] != NewLegacyDev[Index]) {
-        OldValue  = OldLegacyDev[Index];
-        NewValue  = NewLegacyDev[Index];
-        break;
-      }
-    }
+    CurrentFakeNVMap = &Private->BmmFakeNvData;
+    HiiGetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap);
 
-    if (Index != Number) {
-      //
-      // there is change, now process
-      //
-      if (0xFF == NewValue) {
-        //
-        // This item will be disable
-        // Just move the items behind this forward to overlap it
-        //
-        Pos = OldValue / 8;
-        Bit = 7 - (OldValue % 8);
-        DisMap[Pos] = (UINT8) (DisMap[Pos] | (UINT8) (1 << Bit));
-        for (Index2 = Index; Index2 < Number - 1; Index2++) {
-          NewLegacyDev[Index2] = NewLegacyDev[Index2 + 1];
-        }
+    //
+    // need to be subtituded.
+    //
+    // Update Select FD/HD/CD/NET/BEV Order Form
+    //
+    if (FORM_SET_FD_ORDER_ID == Private->BmmPreviousPageId ||
+        FORM_SET_HD_ORDER_ID == Private->BmmPreviousPageId ||
+        FORM_SET_CD_ORDER_ID == Private->BmmPreviousPageId ||
+        FORM_SET_NET_ORDER_ID == Private->BmmPreviousPageId ||
+        FORM_SET_BEV_ORDER_ID == Private->BmmPreviousPageId ||
+        ((FORM_BOOT_SETUP_ID == Private->BmmPreviousPageId) &&
+        (QuestionId >= LEGACY_FD_QUESTION_ID) &&
+         (QuestionId < (LEGACY_BEV_QUESTION_ID + 100)) )
+        ) {
 
-        NewLegacyDev[Index2] = 0xFF;
-      } else {
-        for (Index2 = 0; Index2 < Number; Index2++) {
-          if (Index2 == Index) {
-            continue;
-          }
+      DisMap  = Private->BmmOldFakeNVData.DisableMap;
 
-          if (OldLegacyDev[Index2] == NewValue) {
-            //
-            // If NewValue is in OldLegacyDev array
-            // remember its old position
-            //
-            NewValuePos = Index2;
-            break;
-          }
-        }
-
-        if (Index2 != Number) {
-          //
-          // We will change current item to an existing item
-          // (It's hard to describe here, please read code, it's like a cycle-moving)
-          //
-          for (Index2 = NewValuePos; Index2 != Index;) {
-            if (NewValuePos < Index) {
-              NewLegacyDev[Index2] = OldLegacyDev[Index2 + 1];
-              Index2++;
-            } else {
-              NewLegacyDev[Index2] = OldLegacyDev[Index2 - 1];
-              Index2--;
-            }
-          }
-        } else {
-          //
-          // If NewValue is not in OldlegacyDev array, we are changing to a disabled item
-          // so we should modify DisMap to reflect the change
-          //
-          Pos = NewValue / 8;
-          Bit = 7 - (NewValue % 8);
-          DisMap[Pos] = (UINT8) (DisMap[Pos] & (~ (UINT8) (1 << Bit)));
-          if (0xFF != OldValue) {
-            //
-            // Because NewValue is a item that was disabled before
-            // so after changing the OldValue should be disabled
-            // actually we are doing a swap of enable-disable states of two items
-            //
-            Pos = OldValue / 8;
-            Bit = 7 - (OldValue % 8);
-            DisMap[Pos] = (UINT8) (DisMap[Pos] | (UINT8) (1 << Bit));
-          }
-        }
-      }
-      //
-      // To prevent DISABLE appears in the middle of the list
-      // we should perform a re-ordering
-      //
-      Index = 0;
-      while (Index < Number) {
-        if (0xFF != NewLegacyDev[Index]) {
-          Index++;
-          continue;
-        }
-
-        Index2 = Index;
-        Index2++;
-        while (Index2 < Number) {
-          if (0xFF != NewLegacyDev[Index2]) {
-            break;
-          }
-
-          Index2++;
-        }
-
-        if (Index2 < Number) {
-          NewLegacyDev[Index]   = NewLegacyDev[Index2];
-          NewLegacyDev[Index2]  = 0xFF;
-        }
-
-        Index++;
+      FormId  = Private->BmmPreviousPageId;
+      if (FormId == FORM_BOOT_SETUP_ID) {
+        FormId = Private->BmmCurrentPageId;
       }
 
-      CopyMem (
-        OldLegacyDev,
-        NewLegacyDev,
-        Number
-        );
-    }
-  }
-
-  if (QuestionId < FILE_OPTION_OFFSET) {
-    if (QuestionId < CONFIG_OPTION_OFFSET) {
-      switch (QuestionId) {
-      case KEY_VALUE_BOOT_FROM_FILE:
-        Private->FeCurrentState = FileExplorerStateBootFromFile;
-
-        //
-        // Exit Bmm main formset to send File Explorer formset.
-        //
-        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-        break;
-
-      case FORM_BOOT_ADD_ID:
-        Private->FeCurrentState = FileExplorerStateAddBootOption;
-
-        //
-        // Exit Bmm main formset to send File Explorer formset.
-        //
-        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-        break;
-
-      case FORM_DRV_ADD_FILE_ID:
-        Private->FeCurrentState = FileExplorerStateAddDriverOptionState;
-
-        //
-        // Exit Bmm main formset to send File Explorer formset.
-        //
-        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-        break;
-
-      case FORM_DRV_ADD_HANDLE_ID:
-        CleanUpPage (FORM_DRV_ADD_HANDLE_ID, Private);
-        UpdateDrvAddHandlePage (Private);
-        break;
-
-      case FORM_BOOT_DEL_ID:
-        CleanUpPage (FORM_BOOT_DEL_ID, Private);
-        UpdateBootDelPage (Private);
-        break;
-
-      case FORM_BOOT_CHG_ID:
-      case FORM_DRV_CHG_ID:
-        UpdatePageBody (QuestionId, Private);
-        break;
-
-      case FORM_DRV_DEL_ID:
-        CleanUpPage (FORM_DRV_DEL_ID, Private);
-        UpdateDrvDelPage (Private);
-        break;
-
-      case FORM_BOOT_NEXT_ID:
-        CleanUpPage (FORM_BOOT_NEXT_ID, Private);
-        UpdateBootNextPage (Private);
-        break;
-
-      case FORM_TIME_OUT_ID:
-        CleanUpPage (FORM_TIME_OUT_ID, Private);
-        UpdateTimeOutPage (Private);
-        break;
-
-      case FORM_RESET:
-        gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
-        return EFI_UNSUPPORTED;
-
-      case FORM_CON_IN_ID:
-      case FORM_CON_OUT_ID:
-      case FORM_CON_ERR_ID:
-        UpdatePageBody (QuestionId, Private);
-        break;
-
-      case FORM_CON_MODE_ID:
-        CleanUpPage (FORM_CON_MODE_ID, Private);
-        UpdateConModePage (Private);
-        break;
-
-      case FORM_CON_COM_ID:
-        CleanUpPage (FORM_CON_COM_ID, Private);
-        UpdateConCOMPage (Private);
-        break;
-
+      switch (FormId) {
       case FORM_SET_FD_ORDER_ID:
-      case FORM_SET_HD_ORDER_ID:
-      case FORM_SET_CD_ORDER_ID:
-      case FORM_SET_NET_ORDER_ID:
-      case FORM_SET_BEV_ORDER_ID:
-        CleanUpPage (QuestionId, Private);
-        UpdateSetLegacyDeviceOrderPage (QuestionId, Private);
+        Number        = (UINT16) LegacyFDMenu.MenuNumber;
+        OldLegacyDev  = Private->BmmOldFakeNVData.LegacyFD;
+        NewLegacyDev  = CurrentFakeNVMap->LegacyFD;
         break;
 
-      case KEY_VALUE_SAVE_AND_EXIT:
-      case KEY_VALUE_NO_SAVE_AND_EXIT:
+      case FORM_SET_HD_ORDER_ID:
+        Number        = (UINT16) LegacyHDMenu.MenuNumber;
+        OldLegacyDev  = Private->BmmOldFakeNVData.LegacyHD;
+        NewLegacyDev  = CurrentFakeNVMap->LegacyHD;
+        break;
 
-        if (QuestionId == KEY_VALUE_SAVE_AND_EXIT) {
-          Status = ApplyChangeHandler (Private, CurrentFakeNVMap, Private->BmmPreviousPageId);
-          if (EFI_ERROR (Status)) {
-            return Status;
-          }
-        } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT) {
-          DiscardChangeHandler (Private, CurrentFakeNVMap);
-        }
+      case FORM_SET_CD_ORDER_ID:
+        Number        = (UINT16) LegacyCDMenu.MenuNumber;
+        OldLegacyDev  = Private->BmmOldFakeNVData.LegacyCD;
+        NewLegacyDev  = CurrentFakeNVMap->LegacyCD;
+        break;
 
-        //
-        // Tell browser not to ask for confirmation of changes,
-        // since we have already applied or discarded.
-        //
-        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      case FORM_SET_NET_ORDER_ID:
+        Number        = (UINT16) LegacyNETMenu.MenuNumber;
+        OldLegacyDev  = Private->BmmOldFakeNVData.LegacyNET;
+        NewLegacyDev  = CurrentFakeNVMap->LegacyNET;
+        break;
+
+      case FORM_SET_BEV_ORDER_ID:
+        Number        = (UINT16) LegacyBEVMenu.MenuNumber;
+        OldLegacyDev  = Private->BmmOldFakeNVData.LegacyBEV;
+        NewLegacyDev  = CurrentFakeNVMap->LegacyBEV;
         break;
 
       default:
         break;
       }
-    } else if ((QuestionId >= TERMINAL_OPTION_OFFSET) && (QuestionId < CONSOLE_OPTION_OFFSET)) {
-      Index2                    = (UINT16) (QuestionId - TERMINAL_OPTION_OFFSET);
-      Private->CurrentTerminal  = Index2;
+      //
+      //  First, find the different position
+      //  if there is change, it should be only one
+      //
+      for (Index = 0; Index < Number; Index++) {
+        if (OldLegacyDev[Index] != NewLegacyDev[Index]) {
+          OldValue  = OldLegacyDev[Index];
+          NewValue  = NewLegacyDev[Index];
+          break;
+        }
+      }
 
-      CleanUpPage (FORM_CON_COM_SETUP_ID, Private);
-      UpdateTerminalPage (Private);
+      if (Index != Number) {
+        //
+        // there is change, now process
+        //
+        if (0xFF == NewValue) {
+          //
+          // This item will be disable
+          // Just move the items behind this forward to overlap it
+          //
+          Pos = OldValue / 8;
+          Bit = 7 - (OldValue % 8);
+          DisMap[Pos] = (UINT8) (DisMap[Pos] | (UINT8) (1 << Bit));
+          for (Index2 = Index; Index2 < Number - 1; Index2++) {
+            NewLegacyDev[Index2] = NewLegacyDev[Index2 + 1];
+          }
 
-    } else if (QuestionId >= HANDLE_OPTION_OFFSET) {
-      Index2                  = (UINT16) (QuestionId - HANDLE_OPTION_OFFSET);
+          NewLegacyDev[Index2] = 0xFF;
+        } else {
+          for (Index2 = 0; Index2 < Number; Index2++) {
+            if (Index2 == Index) {
+              continue;
+            }
 
-      NewMenuEntry            = BOpt_GetMenuEntry (&DriverMenu, Index2);
-      ASSERT (NewMenuEntry != NULL);
-      Private->HandleContext  = (BM_HANDLE_CONTEXT *) NewMenuEntry->VariableContext;
+            if (OldLegacyDev[Index2] == NewValue) {
+              //
+              // If NewValue is in OldLegacyDev array
+              // remember its old position
+              //
+              NewValuePos = Index2;
+              break;
+            }
+          }
 
-      CleanUpPage (FORM_DRV_ADD_HANDLE_DESC_ID, Private);
+          if (Index2 != Number) {
+            //
+            // We will change current item to an existing item
+            // (It's hard to describe here, please read code, it's like a cycle-moving)
+            //
+            for (Index2 = NewValuePos; Index2 != Index;) {
+              if (NewValuePos < Index) {
+                NewLegacyDev[Index2] = OldLegacyDev[Index2 + 1];
+                Index2++;
+              } else {
+                NewLegacyDev[Index2] = OldLegacyDev[Index2 - 1];
+                Index2--;
+              }
+            }
+          } else {
+            //
+            // If NewValue is not in OldlegacyDev array, we are changing to a disabled item
+            // so we should modify DisMap to reflect the change
+            //
+            Pos = NewValue / 8;
+            Bit = 7 - (NewValue % 8);
+            DisMap[Pos] = (UINT8) (DisMap[Pos] & (~ (UINT8) (1 << Bit)));
+            if (0xFF != OldValue) {
+              //
+              // Because NewValue is a item that was disabled before
+              // so after changing the OldValue should be disabled
+              // actually we are doing a swap of enable-disable states of two items
+              //
+              Pos = OldValue / 8;
+              Bit = 7 - (OldValue % 8);
+              DisMap[Pos] = (UINT8) (DisMap[Pos] | (UINT8) (1 << Bit));
+            }
+          }
+        }
+        //
+        // To prevent DISABLE appears in the middle of the list
+        // we should perform a re-ordering
+        //
+        Index = 0;
+        while (Index < Number) {
+          if (0xFF != NewLegacyDev[Index]) {
+            Index++;
+            continue;
+          }
 
-      Private->MenuEntry                  = NewMenuEntry;
-      Private->LoadContext->FilePathList  = Private->HandleContext->DevicePath;
+          Index2 = Index;
+          Index2++;
+          while (Index2 < Number) {
+            if (0xFF != NewLegacyDev[Index2]) {
+              break;
+            }
 
-      UpdateDriverAddHandleDescPage (Private);
+            Index2++;
+          }
+
+          if (Index2 < Number) {
+            NewLegacyDev[Index]   = NewLegacyDev[Index2];
+            NewLegacyDev[Index2]  = 0xFF;
+          }
+
+          Index++;
+        }
+
+        CopyMem (
+          OldLegacyDev,
+          NewLegacyDev,
+          Number
+          );
+      }
     }
+
+    if (QuestionId < FILE_OPTION_OFFSET) {
+      if (QuestionId < CONFIG_OPTION_OFFSET) {
+        switch (QuestionId) {
+        case KEY_VALUE_BOOT_FROM_FILE:
+          Private->FeCurrentState = FileExplorerStateBootFromFile;
+
+          //
+          // Exit Bmm main formset to send File Explorer formset.
+          //
+          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+          break;
+
+        case FORM_BOOT_ADD_ID:
+          Private->FeCurrentState = FileExplorerStateAddBootOption;
+
+          //
+          // Exit Bmm main formset to send File Explorer formset.
+          //
+          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+          break;
+
+        case FORM_DRV_ADD_FILE_ID:
+          Private->FeCurrentState = FileExplorerStateAddDriverOptionState;
+
+          //
+          // Exit Bmm main formset to send File Explorer formset.
+          //
+          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+          break;
+
+        case FORM_DRV_ADD_HANDLE_ID:
+          CleanUpPage (FORM_DRV_ADD_HANDLE_ID, Private);
+          UpdateDrvAddHandlePage (Private);
+          break;
+
+        case FORM_BOOT_DEL_ID:
+          CleanUpPage (FORM_BOOT_DEL_ID, Private);
+          UpdateBootDelPage (Private);
+          break;
+
+        case FORM_BOOT_CHG_ID:
+        case FORM_DRV_CHG_ID:
+          UpdatePageBody (QuestionId, Private);
+          break;
+
+        case FORM_DRV_DEL_ID:
+          CleanUpPage (FORM_DRV_DEL_ID, Private);
+          UpdateDrvDelPage (Private);
+          break;
+
+        case FORM_BOOT_NEXT_ID:
+          CleanUpPage (FORM_BOOT_NEXT_ID, Private);
+          UpdateBootNextPage (Private);
+          break;
+
+        case FORM_TIME_OUT_ID:
+          CleanUpPage (FORM_TIME_OUT_ID, Private);
+          UpdateTimeOutPage (Private);
+          break;
+
+        case FORM_RESET:
+          gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+          return EFI_UNSUPPORTED;
+
+        case FORM_CON_IN_ID:
+        case FORM_CON_OUT_ID:
+        case FORM_CON_ERR_ID:
+          UpdatePageBody (QuestionId, Private);
+          break;
+
+        case FORM_CON_MODE_ID:
+          CleanUpPage (FORM_CON_MODE_ID, Private);
+          UpdateConModePage (Private);
+          break;
+
+        case FORM_CON_COM_ID:
+          CleanUpPage (FORM_CON_COM_ID, Private);
+          UpdateConCOMPage (Private);
+          break;
+
+        case FORM_SET_FD_ORDER_ID:
+        case FORM_SET_HD_ORDER_ID:
+        case FORM_SET_CD_ORDER_ID:
+        case FORM_SET_NET_ORDER_ID:
+        case FORM_SET_BEV_ORDER_ID:
+          CleanUpPage (QuestionId, Private);
+          UpdateSetLegacyDeviceOrderPage (QuestionId, Private);
+          break;
+
+        case KEY_VALUE_SAVE_AND_EXIT:
+        case KEY_VALUE_NO_SAVE_AND_EXIT:
+
+          if (QuestionId == KEY_VALUE_SAVE_AND_EXIT) {
+            Status = ApplyChangeHandler (Private, CurrentFakeNVMap, Private->BmmPreviousPageId);
+            if (EFI_ERROR (Status)) {
+              return Status;
+            }
+          } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT) {
+            DiscardChangeHandler (Private, CurrentFakeNVMap);
+          }
+
+          //
+          // Tell browser not to ask for confirmation of changes,
+          // since we have already applied or discarded.
+          //
+          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+          break;
+
+        default:
+          break;
+        }
+      } else if ((QuestionId >= TERMINAL_OPTION_OFFSET) && (QuestionId < CONSOLE_OPTION_OFFSET)) {
+        Index2                    = (UINT16) (QuestionId - TERMINAL_OPTION_OFFSET);
+        Private->CurrentTerminal  = Index2;
+
+        CleanUpPage (FORM_CON_COM_SETUP_ID, Private);
+        UpdateTerminalPage (Private);
+
+      } else if (QuestionId >= HANDLE_OPTION_OFFSET) {
+        Index2                  = (UINT16) (QuestionId - HANDLE_OPTION_OFFSET);
+
+        NewMenuEntry            = BOpt_GetMenuEntry (&DriverMenu, Index2);
+        ASSERT (NewMenuEntry != NULL);
+        Private->HandleContext  = (BM_HANDLE_CONTEXT *) NewMenuEntry->VariableContext;
+
+        CleanUpPage (FORM_DRV_ADD_HANDLE_DESC_ID, Private);
+
+        Private->MenuEntry                  = NewMenuEntry;
+        Private->LoadContext->FilePathList  = Private->HandleContext->DevicePath;
+
+        UpdateDriverAddHandleDescPage (Private);
+      }
+    }
+
+    //
+    // Pass changed uncommitted data back to Form Browser
+    //
+    Status = HiiSetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap, NULL);
+    return Status;
   }
 
   //
-  // Pass changed uncommitted data back to Form Browser
+  // All other action return unsupported.
   //
-  Status = HiiSetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap, NULL);
-
-  return Status;
+  return EFI_UNSUPPORTED;
 }
 
 /**
