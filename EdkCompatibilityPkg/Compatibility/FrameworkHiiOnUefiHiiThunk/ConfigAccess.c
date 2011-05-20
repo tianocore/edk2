@@ -3,7 +3,7 @@
   by HII Thunk Modules. These Config access Protocols are used to thunk UEFI Config 
   Access Callback to Framework HII Callback and EFI Variable Set/Get operations.
   
-Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1107,132 +1107,131 @@ ThunkCallback (
   EFI_INPUT_KEY                               Key;  
   BOOLEAN                                     NvMapAllocated;
 
-  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
-    //
-    // Ignore UEFI OPEN/CLOSE Action for FrameworkCallback
-    //
-    return EFI_SUCCESS;
-  }
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    ASSERT (This != NULL);
+    ASSERT (Value != NULL);
+    ASSERT (ActionRequest != NULL);
 
-  ASSERT (This != NULL);
-  ASSERT (Value != NULL);
-  ASSERT (ActionRequest != NULL);
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
 
-  *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+    ConfigAccess = CONFIG_ACCESS_PRIVATE_FROM_PROTOCOL (This);
 
-  ConfigAccess = CONFIG_ACCESS_PRIVATE_FROM_PROTOCOL (This);
-
-  FormCallbackProtocol = ConfigAccess->FormCallbackProtocol;
-  if (FormCallbackProtocol == NULL) {
-    ASSERT (FALSE);
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Check if the QuestionId match a OneOfOption.
-  //
-  OneOfOptionMapEntry = GetOneOfOptionMapEntry (ConfigAccess->ThunkContext, QuestionId, Type, Value);
-
-  if (OneOfOptionMapEntry == NULL) {
-    //
-    // This is not a One-Of-Option opcode. QuestionId is the KeyValue
-    //
-    KeyValue = QuestionId;
-  } else {
-    //
-    // Otherwise, use the original Key specified in One Of Option in the Framework VFR syntax.
-    //
-    KeyValue = OneOfOptionMapEntry->FwKey;
-  }
-
-  //
-  // Build the EFI_IFR_DATA_ARRAY
-  //
-  Data = CreateIfrDataArray (ConfigAccess, QuestionId, Type, Value, &NvMapAllocated);
-
-  Status = mHiiDatabase->RegisterPackageNotify (
-                           mHiiDatabase,
-                           EFI_HII_PACKAGE_FORMS,
-                           NULL,
-                           FormUpdateNotify,
-                           EFI_HII_DATABASE_NOTIFY_REMOVE_PACK,
-                           &NotifyHandle
-                           );
-  //
-  //Call the Framework Callback function.
-  //
-  Packet =  NULL;
-  Status =  FormCallbackProtocol->Callback (
-              FormCallbackProtocol,
-              KeyValue,
-              Data,
-              &Packet
-              );
-  SyncBrowserDataForNvMapOverride (ConfigAccess, QuestionId);
-
-  //
-  // Callback require browser to perform action
-  //
-  if (EFI_ERROR (Status)) {
-    if (Packet != NULL) {
-      do {
-        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, Packet->String, NULL);
-      } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+    FormCallbackProtocol = ConfigAccess->FormCallbackProtocol;
+    if (FormCallbackProtocol == NULL) {
+      ASSERT (FALSE);
+      return EFI_UNSUPPORTED;
     }
+
     //
-    // Error Code in Status is discarded.
+    // Check if the QuestionId match a OneOfOption.
     //
-  } else {
-    if (Packet != NULL) {
-        if (Packet->DataArray.EntryCount  == 1 && Packet->DataArray.NvRamMap == NULL) {
-          DataEntry = (EFI_IFR_DATA_ENTRY *) ((UINT8 *) Packet + sizeof (EFI_IFR_DATA_ARRAY));
-          if ((DataEntry->Flags & EXIT_REQUIRED) == EXIT_REQUIRED) {
-              *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    OneOfOptionMapEntry = GetOneOfOptionMapEntry (ConfigAccess->ThunkContext, QuestionId, Type, Value);
+
+    if (OneOfOptionMapEntry == NULL) {
+      //
+      // This is not a One-Of-Option opcode. QuestionId is the KeyValue
+      //
+      KeyValue = QuestionId;
+    } else {
+      //
+      // Otherwise, use the original Key specified in One Of Option in the Framework VFR syntax.
+      //
+      KeyValue = OneOfOptionMapEntry->FwKey;
+    }
+
+    //
+    // Build the EFI_IFR_DATA_ARRAY
+    //
+    Data = CreateIfrDataArray (ConfigAccess, QuestionId, Type, Value, &NvMapAllocated);
+
+    Status = mHiiDatabase->RegisterPackageNotify (
+                             mHiiDatabase,
+                             EFI_HII_PACKAGE_FORMS,
+                             NULL,
+                             FormUpdateNotify,
+                             EFI_HII_DATABASE_NOTIFY_REMOVE_PACK,
+                             &NotifyHandle
+                             );
+    //
+    //Call the Framework Callback function.
+    //
+    Packet =  NULL;
+    Status =  FormCallbackProtocol->Callback (
+                FormCallbackProtocol,
+                KeyValue,
+                Data,
+                &Packet
+                );
+    SyncBrowserDataForNvMapOverride (ConfigAccess, QuestionId);
+
+    //
+    // Callback require browser to perform action
+    //
+    if (EFI_ERROR (Status)) {
+      if (Packet != NULL) {
+        do {
+          CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, Packet->String, NULL);
+        } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+      }
+      //
+      // Error Code in Status is discarded.
+      //
+    } else {
+      if (Packet != NULL) {
+          if (Packet->DataArray.EntryCount  == 1 && Packet->DataArray.NvRamMap == NULL) {
+            DataEntry = (EFI_IFR_DATA_ENTRY *) ((UINT8 *) Packet + sizeof (EFI_IFR_DATA_ARRAY));
+            if ((DataEntry->Flags & EXIT_REQUIRED) == EXIT_REQUIRED) {
+                *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+            }
+
+            if ((DataEntry->Flags & SAVE_REQUIRED) == SAVE_REQUIRED) {
+              Status = ConfigAccess->ConfigAccessProtocol.RouteConfig (
+                                        &ConfigAccess->ConfigAccessProtocol,
+                                        NULL,
+                                        NULL
+                                        );
+            }
           }
-
-          if ((DataEntry->Flags & SAVE_REQUIRED) == SAVE_REQUIRED) {
-            Status = ConfigAccess->ConfigAccessProtocol.RouteConfig (
-                                      &ConfigAccess->ConfigAccessProtocol,
-                                      NULL,
-                                      NULL
-                                      );
-          }
-        }
-        FreePool (Packet);
+          FreePool (Packet);
+      }
     }
+
+    //
+    // Unregister notify for Form package update
+    //
+    Status = mHiiDatabase->UnregisterPackageNotify (
+                             mHiiDatabase,
+                             NotifyHandle
+                             );
+    //
+    // UEFI SetupBrowser behaves differently with Framework SetupBrowser when call back function 
+    // update any forms in HII database. UEFI SetupBrowser will re-parse the displaying form package and load
+    // the values from variable storages. Framework SetupBrowser will only re-parse the displaying form packages.
+    // To make sure customer's previous changes is saved and the changing question behaves as expected, we
+    // issue a EFI_BROWSER_ACTION_REQUEST_SUBMIT to ask UEFI SetupBrowser to save the changes proceed to re-parse
+    // the form and load all the variable storages.
+    //
+    if (*ActionRequest == EFI_BROWSER_ACTION_REQUEST_NONE && mHiiPackageListUpdated) {
+      mHiiPackageListUpdated= FALSE;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+    } else {
+      if (ConfigAccess->ThunkContext->FormSet->SubClass == EFI_FRONT_PAGE_SUBCLASS ||
+          ConfigAccess->ThunkContext->FormSet->SubClass == EFI_SINGLE_USE_SUBCLASS) {
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+      }
+    }
+
+    //
+    // Clean up.
+    //
+    DestroyIfrDataArray (Data, NvMapAllocated);
+
+    return Status;
   }
 
   //
-  // Unregister notify for Form package update
+  // All other action return unsupported.
   //
-  Status = mHiiDatabase->UnregisterPackageNotify (
-                           mHiiDatabase,
-                           NotifyHandle
-                           );
-  //
-  // UEFI SetupBrowser behaves differently with Framework SetupBrowser when call back function 
-  // update any forms in HII database. UEFI SetupBrowser will re-parse the displaying form package and load
-  // the values from variable storages. Framework SetupBrowser will only re-parse the displaying form packages.
-  // To make sure customer's previous changes is saved and the changing question behaves as expected, we
-  // issue a EFI_BROWSER_ACTION_REQUEST_SUBMIT to ask UEFI SetupBrowser to save the changes proceed to re-parse
-  // the form and load all the variable storages.
-  //
-  if (*ActionRequest == EFI_BROWSER_ACTION_REQUEST_NONE && mHiiPackageListUpdated) {
-    mHiiPackageListUpdated= FALSE;
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-  } else {
-    if (ConfigAccess->ThunkContext->FormSet->SubClass == EFI_FRONT_PAGE_SUBCLASS ||
-        ConfigAccess->ThunkContext->FormSet->SubClass == EFI_SINGLE_USE_SUBCLASS) {
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-    }
-  }
-
-
-  //
-  // Clean up.
-  //
-  DestroyIfrDataArray (Data, NvMapAllocated);
-  
-  return Status;
+  return EFI_UNSUPPORTED;
 }
 
