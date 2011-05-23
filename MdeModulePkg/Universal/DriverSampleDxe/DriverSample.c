@@ -444,7 +444,10 @@ CreateAltCfgString (
   EFI_STRING TmpStr;
   UINTN      NewLen;
 
-  NewLen = (((1 + StrLen (ConfigHdr) + 8 + 4) + (8 + 4 + 7 + 4 + 7 + 4)) * 2 + StrLen (Result)) * sizeof (CHAR16);
+  //
+  // String Len = ConfigResp + AltConfig + AltConfig + 1("\0")
+  //
+  NewLen = (StrLen (Result) + ((1 + StrLen (ConfigHdr) + 8 + 4) + (8 + 4 + 7 + 4 + 7 + 4)) * 2 + 1) * sizeof (CHAR16);
   StringPtr = AllocateZeroPool (NewLen);
   if (StringPtr == NULL) {
     return NULL;
@@ -599,8 +602,8 @@ AppendAltCfgString (
     }
 
     if (Offset <= ValueOffset && Offset + Width >= ValueOffset + ValueWidth) {
-      *RequestResult = CreateAltCfgString(*RequestResult, ConfigRequestHdr, Offset, Width);
-	    return;
+      *RequestResult = CreateAltCfgString(*RequestResult, ConfigRequestHdr, ValueOffset, ValueWidth);
+      return;
     }
   }
 }
@@ -829,8 +832,10 @@ ExtractConfig (
                                   Results,
                                   Progress
                                   );
-    ConfigRequestHdr = HiiConstructConfigHdr (&mFormSetGuid, VariableName, PrivateData->DriverHandle[0]);
-    AppendAltCfgString(Results, ConfigRequestHdr);
+    if (!EFI_ERROR (Status)) {
+      ConfigRequestHdr = HiiConstructConfigHdr (&mFormSetGuid, VariableName, PrivateData->DriverHandle[0]);
+      AppendAltCfgString(Results, ConfigRequestHdr);
+    }
   }
 
   //
