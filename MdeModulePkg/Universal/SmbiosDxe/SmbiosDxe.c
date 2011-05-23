@@ -2,7 +2,7 @@
   This code produces the Smbios protocol. It also responsible for constructing 
   SMBIOS table into system table.
   
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -107,6 +107,7 @@ SMBIOS_TABLE_ENTRY_POINT EntryPointStructureData = {
 
   Get the full size of smbios structure including optional strings that follow the formatted structure.
 
+  @param This                   The EFI_SMBIOS_PROTOCOL instance.
   @param Head                   Pointer to the beginning of smbios structure.
   @param Size                   The returned size.
   @param NumberOfStrings        The returned number of optional strings that follow the formatted structure.
@@ -118,6 +119,7 @@ SMBIOS_TABLE_ENTRY_POINT EntryPointStructureData = {
 EFI_STATUS
 EFIAPI
 GetSmbiosStructureSize (
+  IN   CONST EFI_SMBIOS_PROTOCOL        *This,
   IN   EFI_SMBIOS_TABLE_HEADER          *Head,
   OUT  UINTN                            *Size,
   OUT  UINTN                            *NumberOfStrings
@@ -145,15 +147,27 @@ GetSmbiosStructureSize (
       CharInStr++;
     }
 
-    for (StrLen = 0 ; StrLen < SMBIOS_STRING_MAX_LENGTH; StrLen++) {
-      if (*(CharInStr+StrLen) == 0) {
-        break;
-      }  
+    if (This->MajorVersion < 2 || (This->MajorVersion == 2 && This->MinorVersion < 7)){
+      for (StrLen = 0 ; StrLen < SMBIOS_STRING_MAX_LENGTH; StrLen++) {
+        if (*(CharInStr+StrLen) == 0) {
+          break;
+        }
+      }
+
+      if (StrLen == SMBIOS_STRING_MAX_LENGTH) {
+        return EFI_INVALID_PARAMETER;
+      }
+    } else {
+      //
+      // Reference SMBIOS 2.7, chapter 6.1.3, it will have no limit on the length of each individual text string
+      //
+      for (StrLen = 0 ;; StrLen++) {
+        if (*(CharInStr+StrLen) == 0) {
+          break;
+        }
+      }
     }
 
-    if (StrLen == SMBIOS_STRING_MAX_LENGTH) {
-      return EFI_INVALID_PARAMETER;
-    }
     //
     // forward the pointer
     //
@@ -166,7 +180,7 @@ GetSmbiosStructureSize (
   // count ending two zeros.
   //
   *Size += 2;
-  return EFI_SUCCESS;  
+  return EFI_SUCCESS;
 }
 
 /**
@@ -335,7 +349,7 @@ SmbiosAdd (
   //
   // Calculate record size and string number
   //
-  Status = GetSmbiosStructureSize(Record, &StructureSize, &NumberOfStrings);
+  Status = GetSmbiosStructureSize(This, Record, &StructureSize, &NumberOfStrings);
   if (EFI_ERROR(Status)) {
     return Status;
   }
@@ -459,8 +473,14 @@ SmbiosUpdateString (
   }
 
   InputStrLen = AsciiStrLen(String);
-  if (InputStrLen > SMBIOS_STRING_MAX_LENGTH) {
-    return EFI_UNSUPPORTED;
+
+  //
+  // Reference SMBIOS 2.7, chapter 6.1.3, it will have no limit on the length of each individual text string
+  //
+  if (This->MajorVersion < 2 || (This->MajorVersion == 2 && This->MinorVersion < 7)) {
+    if (InputStrLen > SMBIOS_STRING_MAX_LENGTH) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   Private = SMBIOS_INSTANCE_FROM_THIS (This);
@@ -477,7 +497,7 @@ SmbiosUpdateString (
     SmbiosEntry = SMBIOS_ENTRY_FROM_LINK(Link);
     Record = (EFI_SMBIOS_TABLE_HEADER*)(SmbiosEntry->RecordHeader + 1);
 
-    if ((UINTN)Record->Handle == *SmbiosHandle) {
+    if (Record->Handle == *SmbiosHandle) {
       //
       // Find out the specified Smbios record
       //
@@ -488,7 +508,7 @@ SmbiosUpdateString (
       //
       // Point to unformed string section
       //
-      StrStart = (CHAR8*)Record + Record->Length;
+      StrStart = (CHAR8 *) Record + Record->Length;
      
       for (StrIndex = 1, TargetStrOffset = 0; StrIndex < *StringNumber; StrStart++, TargetStrOffset++) {
         //
@@ -508,8 +528,8 @@ SmbiosUpdateString (
       }
 
       if (*StrStart == 0) {
-        StrStart ++;
-        TargetStrOffset ++;
+        StrStart++;
+        TargetStrOffset++;
       }
       
       //
@@ -625,7 +645,7 @@ SmbiosRemove (
   for (Link = Head->ForwardLink; Link != Head; Link = Link->ForwardLink) {
     SmbiosEntry = SMBIOS_ENTRY_FROM_LINK(Link);
     Record = (EFI_SMBIOS_TABLE_HEADER*)(SmbiosEntry->RecordHeader + 1);
-    if ((UINTN)Record->Handle == SmbiosHandle) {
+    if (Record->Handle == SmbiosHandle) {
       //
       // Remove specified smobios record from DataList
       //
@@ -637,7 +657,7 @@ SmbiosRemove (
       Head = &Private->AllocatedHandleListHead;
       for (Link = Head->ForwardLink; Link != Head; Link = Link->ForwardLink) {
         HandleEntry = SMBIOS_HANDLE_ENTRY_FROM_LINK(Link);
-        if ((UINTN)HandleEntry->SmbiosHandle == SmbiosHandle) {
+        if (HandleEntry->SmbiosHandle == SmbiosHandle) {
           RemoveEntryList(Link);
           FreePool(HandleEntry);
           break;
@@ -765,9 +785,7 @@ SmbiosCreateTable (
   OUT VOID    **TableEntryPointStructure
   )
 {
-  UINT8                           CheckSum;
   UINT8                           *BufferPointer;
-  UINTN                           Index;
   UINTN                           RecordSize;
   UINTN                           NumOfStr;
   EFI_STATUS                      Status;
@@ -779,7 +797,6 @@ SmbiosCreateTable (
   
   Status            = EFI_SUCCESS;
   BufferPointer     = NULL;
-  CheckSum          = 0;
 
   //
   // Initialize the EntryPointStructure with initial values.
@@ -847,11 +864,11 @@ SmbiosCreateTable (
                                );
                                
     if (Status == EFI_SUCCESS) {
-      GetSmbiosStructureSize(SmbiosRecord, &RecordSize, &NumOfStr);
+      GetSmbiosStructureSize(SmbiosProtocol, SmbiosRecord, &RecordSize, &NumOfStr);
       //
       // Record NumberOfSmbiosStructures, TableLength and MaxStructureSize
       //
-      EntryPointStructure->NumberOfSmbiosStructures ++;
+      EntryPointStructure->NumberOfSmbiosStructures++;
       EntryPointStructure->TableLength = (UINT16) (EntryPointStructure->TableLength + RecordSize);
       if (RecordSize > EntryPointStructure->MaxStructureSize) {
         EntryPointStructure->MaxStructureSize = (UINT16) RecordSize;
@@ -885,7 +902,7 @@ SmbiosCreateTable (
                   &PhysicalAddress
                   );
   if (EFI_ERROR (Status)) {
-    FreePages ((VOID*)(UINTN)EntryPointStructure, EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength));
+    FreePages ((VOID*) EntryPointStructure, EFI_SIZE_TO_PAGES (sizeof (SMBIOS_TABLE_ENTRY_POINT)));
     EntryPointStructure = NULL;
     return EFI_OUT_OF_RESOURCES;
   }
@@ -906,7 +923,7 @@ SmbiosCreateTable (
                                NULL
                                );
     if (Status == EFI_SUCCESS) {
-      GetSmbiosStructureSize(SmbiosRecord, &RecordSize, &NumOfStr);
+      GetSmbiosStructureSize(SmbiosProtocol, SmbiosRecord, &RecordSize, &NumOfStr);
       CopyMem (BufferPointer, SmbiosRecord, RecordSize);
       BufferPointer = BufferPointer + RecordSize;
     }
@@ -920,21 +937,10 @@ SmbiosCreateTable (
   //
   // Fixup checksums in the Entry Point Structure
   //
-  CheckSum  = 0;
-  EntryPointStructure->IntermediateChecksum = 0;
-  for (Index = 0x10; Index < EntryPointStructure->EntryPointLength; Index++) {
-    CheckSum = (UINT8) (CheckSum + ((UINT8 *) (EntryPointStructure))[Index]);
-  }
-
-  EntryPointStructure->IntermediateChecksum         = (UINT8) (0 - CheckSum);
-
-  CheckSum = 0;
-  EntryPointStructure->EntryPointStructureChecksum = 0;
-  for (Index = 0x0; Index < EntryPointStructure->EntryPointLength; Index++) {
-    CheckSum = (UINT8) (CheckSum + ((UINT8 *) (EntryPointStructure))[Index]);
-  }
-
-  EntryPointStructure->EntryPointStructureChecksum = (UINT8) (0 - CheckSum);
+  EntryPointStructure->IntermediateChecksum =
+    CalculateCheckSum8 ((UINT8 *) EntryPointStructure + 0x10, EntryPointStructure->EntryPointLength - 0x10);
+  EntryPointStructure->EntryPointStructureChecksum =
+    CalculateCheckSum8 ((UINT8 *) EntryPointStructure, EntryPointStructure->EntryPointLength);
 
   //
   // Returns the pointer
