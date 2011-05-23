@@ -4,7 +4,7 @@
   The Block IO protocol is used to abstract block devices like hard drives,
   DVD-ROMs and floppy drives.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -196,10 +196,18 @@ typedef struct {
   /// per physical block.
   ///
   UINT32 LogicalBlocksPerPhysicalBlock;
+
+  ///
+  /// Only present if EFI_BLOCK_IO_PROTOCOL.Revision is greater than or equal to
+  /// EFI_BLOCK_IO_PROTOCOL_REVISION3. Returns the optimal transfer length
+  /// granularity as a number of logical blocks.
+  ///
+  UINT32 OptimalTransferLengthGranularity;
 } EFI_BLOCK_IO_MEDIA;
 
 #define EFI_BLOCK_IO_PROTOCOL_REVISION  0x00010000
 #define EFI_BLOCK_IO_PROTOCOL_REVISION2 0x00020001
+#define EFI_BLOCK_IO_PROTOCOL_REVISION3 0x00020031
 
 ///
 /// Revision defined in EFI1.1.

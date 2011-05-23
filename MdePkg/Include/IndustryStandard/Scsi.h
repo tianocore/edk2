@@ -1,7 +1,7 @@
 /** @file
   Support for SCSI-2 standard
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -194,6 +194,12 @@
 //
 #define EFI_SCSI_TYPE_UNKNOWN       0x1F  ///< Unknown or no device type
 
+//
+// Page Codes for INQUIRY command
+//
+#define EFI_SCSI_PAGE_CODE_SUPPORTED_VPD    0x00
+#define EFI_SCSI_PAGE_CODE_BLOCK_LIMITS_VPD 0xB0
+
 #pragma pack(1)
 ///
 /// Standard INQUIRY data format
@@ -208,6 +214,44 @@ typedef struct {
   UINT8 Addnl_Length;
   UINT8 Reserved_5_95[95 - 5 + 1];
 } EFI_SCSI_INQUIRY_DATA;
+
+///
+/// Supported VPD Pages VPD page
+///
+typedef struct {
+  UINT8 Peripheral_Type : 5;
+  UINT8 Peripheral_Qualifier : 3;
+  UINT8 PageCode;
+  UINT8 PageLength2;
+  UINT8 PageLength1;
+  UINT8 SupportedVpdPageList[0x100];
+} EFI_SCSI_SUPPORTED_VPD_PAGES_VPD_PAGE;
+
+///
+/// Block Limits VPD page
+///
+typedef struct {
+  UINT8 Peripheral_Type : 5;
+  UINT8 Peripheral_Qualifier : 3;
+  UINT8 PageCode;
+  UINT8 Reserved_2;
+  UINT8 PageLength;
+  UINT8 Reserved_4_5[2];
+  UINT8 OptimalTransferLengthGranularity2;
+  UINT8 OptimalTransferLengthGranularity1;
+  UINT8 MaximumTransferLength4;
+  UINT8 MaximumTransferLength3;
+  UINT8 MaximumTransferLength2;
+  UINT8 MaximumTransferLength1;
+  UINT8 OptimalTransferLength4;
+  UINT8 OptimalTransferLength3;
+  UINT8 OptimalTransferLength2;
+  UINT8 OptimalTransferLength1;
+  UINT8 MaximumPrefetchXdreadXdwriteTransferLength4;
+  UINT8 MaximumPrefetchXdreadXdwriteTransferLength3;
+  UINT8 MaximumPrefetchXdreadXdwriteTransferLength2;
+  UINT8 MaximumPrefetchXdreadXdwriteTransferLength1;
+} EFI_SCSI_BLOCK_LIMITS_VPD_PAGE;
 
 ///
 /// Error codes 70h and 71h sense data format

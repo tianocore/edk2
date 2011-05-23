@@ -1,7 +1,7 @@
 /** @file
   UEFI SCSI Library implementation
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -209,6 +209,153 @@ ScsiTestUnitReadyCommand (
                                          On output, a pointer to the number of bytes
                                          written to the InquiryDataBuffer buffer.
   @param[in]      EnableVitalProductData If TRUE, then the supported vital product
+                                         data for the PageCode is returned in InquiryDataBuffer.
+                                         If FALSE, then the standard inquiry data is
+                                         returned in InquiryDataBuffer and PageCode is ignored.
+  @param[in]      PageCode               The page code of the vital product data.
+                                         It's ignored if EnableVitalProductData is FALSE.
+
+  @retval EFI_SUCCESS          The command executed successfully. See HostAdapterStatus,
+                               TargetStatus, SenseDataLength, and SenseData in that order
+                               for additional status information.
+  @retval EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire
+                               InquiryDataBuffer could not be transferred. The actual
+                               number of bytes transferred is returned in InquiryDataLength.
+  @retval EFI_NOT_READY        The SCSI Request Packet could not be sent because there
+                               are too many SCSI Command Packets already queued.
+                               The SCSI Request Packet was not sent, so no additional
+                               status information is available. The caller may retry again later.
+  @retval EFI_DEVICE_ERROR     A device error occurred while attempting to send SCSI
+                               Request Packet.  See HostAdapterStatus, TargetStatus,
+                               SenseDataLength, and SenseData in that order for additional
+                               status information.
+  @retval EFI_UNSUPPORTED      The command described by the SCSI Request Packet is not
+                               supported by the SCSI initiator(i.e., SCSI  Host Controller).
+                               The SCSI Request Packet was not sent, so no additional
+                               status information is available.
+  @retval EFI_TIMEOUT          A timeout occurred while waiting for the SCSI Request
+                               Packet to execute.  See HostAdapterStatus, TargetStatus,
+                               SenseDataLength, and SenseData in that order for
+                               additional status information.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiInquiryCommandEx (
+  IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN     UINT64                Timeout,
+  IN OUT VOID                  *SenseData,  OPTIONAL
+  IN OUT UINT8                 *SenseDataLength,
+     OUT UINT8                 *HostAdapterStatus,
+     OUT UINT8                 *TargetStatus,
+  IN OUT VOID                  *InquiryDataBuffer,    OPTIONAL
+  IN OUT UINT32                *InquiryDataLength,
+  IN     BOOLEAN               EnableVitalProductData,
+  IN     UINT8                 PageCode
+  )
+{
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
+  UINT64                          Lun;
+  UINT8                           *Target;
+  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
+  EFI_STATUS                      Status;
+  UINT8                           Cdb[EFI_SCSI_OP_LENGTH_SIX];
+
+  ASSERT (SenseDataLength != NULL);
+  ASSERT (HostAdapterStatus != NULL);
+  ASSERT (TargetStatus != NULL);
+  ASSERT (InquiryDataLength != NULL);
+  ASSERT (ScsiIo != NULL);
+
+  ZeroMem (&CommandPacket, sizeof (EFI_SCSI_IO_SCSI_REQUEST_PACKET));
+  ZeroMem (Cdb, EFI_SCSI_OP_LENGTH_SIX);
+
+  CommandPacket.Timeout         = Timeout;
+  CommandPacket.InDataBuffer    = InquiryDataBuffer;
+  CommandPacket.InTransferLength= *InquiryDataLength;
+  CommandPacket.SenseData       = SenseData;
+  CommandPacket.SenseDataLength = *SenseDataLength;
+  CommandPacket.Cdb             = Cdb;
+
+  Target = &TargetArray[0];
+  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
+
+  Cdb[0]  = EFI_SCSI_OP_INQUIRY;
+  Cdb[1]  = (UINT8) (LShiftU64 (Lun, 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
+  if (EnableVitalProductData) {
+    Cdb[1] |= 0x01;
+    Cdb[2]  = PageCode;
+  }
+
+  if (*InquiryDataLength > 0xff) {
+    *InquiryDataLength = 0xff;
+  }
+
+  Cdb[4]                      = (UINT8) (*InquiryDataLength);
+  CommandPacket.CdbLength     = (UINT8) EFI_SCSI_OP_LENGTH_SIX;
+  CommandPacket.DataDirection = EFI_SCSI_DATA_IN;
+
+  Status                      = ScsiIo->ExecuteScsiCommand (ScsiIo, &CommandPacket, NULL);
+
+  *HostAdapterStatus          = CommandPacket.HostAdapterStatus;
+  *TargetStatus               = CommandPacket.TargetStatus;
+  *SenseDataLength            = CommandPacket.SenseDataLength;
+  *InquiryDataLength          = CommandPacket.InTransferLength;
+
+  return Status;
+}
+
+
+/**
+  Execute Inquiry SCSI command on a specific SCSI target.
+
+  Executes the Inquiry command on the SCSI target specified by ScsiIo.
+  If Timeout is zero, then this function waits indefinitely for the command to complete.
+  If Timeout is greater than zero, then the command is executed and will timeout after Timeout 100 ns units.
+  If ScsiIo is NULL, then ASSERT().
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If InquiryDataLength is NULL, then ASSERT().
+
+  @param[in]      ScsiIo                 A pointer to the SCSI I/O Protocol instance
+                                         for the specific SCSI target.
+  @param[in]      Timeout                The timeout in 100 ns units to use for the
+                                         execution of this SCSI Request Packet. A Timeout
+                                         value of zero means that this function will wait
+                                         indefinitely for the SCSI Request Packet to execute.
+                                         If Timeout is greater than zero, then this function
+                                         will return EFI_TIMEOUT if the time required to
+                                         execute the SCSI Request Packet is greater than Timeout.
+  @param[in, out] SenseData              A pointer to sense data that was generated
+                                         by the execution of the SCSI Request Packet.
+                                         This buffer must be allocated by the caller.
+                                         If SenseDataLength is 0, then this parameter
+                                         is optional and may be NULL.
+  @param[in, out] SenseDataLength        On input, the length in bytes of the SenseData buffer.
+                                         On output, the number of bytes written to the SenseData buffer. 
+  @param[out]     HostAdapterStatus      The status of the SCSI Host Controller that
+                                         produces the SCSI bus containing the SCSI
+                                         target specified by ScsiIo when the SCSI
+                                         Request Packet was executed.  See the EFI
+                                         SCSI I/O Protocol in the UEFI Specification
+                                         for details on the possible return values.
+  @param[out]     TargetStatus           The status returned by the SCSI target specified
+                                         by ScsiIo when the SCSI Request Packet was
+                                         executed on the SCSI Host Controller.
+                                         See the EFI SCSI I/O Protocol in the UEFI
+                                         Specification for details on the possible
+                                         return values. 
+  @param[in, out] InquiryDataBuffer      A pointer to inquiry data that was generated
+                                         by the execution of the SCSI Request Packet.
+                                         This buffer must be allocated by the caller.
+                                         If InquiryDataLength is 0, then this parameter
+                                         is optional and may be NULL. 
+  @param[in, out] InquiryDataLength      On input, a pointer to the length in bytes
+                                         of the InquiryDataBuffer buffer.
+                                         On output, a pointer to the number of bytes
+                                         written to the InquiryDataBuffer buffer.
+  @param[in]      EnableVitalProductData If TRUE, then the supported vital product
                                          data is returned in InquiryDataBuffer.
                                          If FALSE, then the standard inquiry data is
                                          returned in InquiryDataBuffer. 
@@ -251,56 +398,19 @@ ScsiInquiryCommand (
   IN     BOOLEAN               EnableVitalProductData
   )
 {
-  EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
-  UINT64                          Lun;
-  UINT8                           *Target;
-  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
-  EFI_STATUS                      Status;
-  UINT8                           Cdb[EFI_SCSI_OP_LENGTH_SIX];
-
-  ASSERT (SenseDataLength != NULL);
-  ASSERT (HostAdapterStatus != NULL);
-  ASSERT (TargetStatus != NULL);
-  ASSERT (InquiryDataLength != NULL);
-  ASSERT (ScsiIo != NULL);
-
-  ZeroMem (&CommandPacket, sizeof (EFI_SCSI_IO_SCSI_REQUEST_PACKET));
-  ZeroMem (Cdb, EFI_SCSI_OP_LENGTH_SIX);
-
-  CommandPacket.Timeout         = Timeout;
-  CommandPacket.InDataBuffer    = InquiryDataBuffer;
-  CommandPacket.InTransferLength= *InquiryDataLength;
-  CommandPacket.SenseData       = SenseData;
-  CommandPacket.SenseDataLength = *SenseDataLength;
-  CommandPacket.Cdb             = Cdb;
-
-  Target = &TargetArray[0];
-  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
-
-  Cdb[0]  = EFI_SCSI_OP_INQUIRY;
-  Cdb[1]  = (UINT8) (LShiftU64 (Lun, 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
-  if (EnableVitalProductData) {
-    Cdb[1] |= 0x01;
-  }
-
-  if (*InquiryDataLength > 0xff) {
-    *InquiryDataLength = 0xff;
-  }
-
-  Cdb[4]                      = (UINT8) (*InquiryDataLength);
-  CommandPacket.CdbLength     = (UINT8) EFI_SCSI_OP_LENGTH_SIX;
-  CommandPacket.DataDirection = EFI_SCSI_DATA_IN;
-
-  Status                      = ScsiIo->ExecuteScsiCommand (ScsiIo, &CommandPacket, NULL);
-
-  *HostAdapterStatus          = CommandPacket.HostAdapterStatus;
-  *TargetStatus               = CommandPacket.TargetStatus;
-  *SenseDataLength            = CommandPacket.SenseDataLength;
-  *InquiryDataLength          = CommandPacket.InTransferLength;
-
-  return Status;
+  return ScsiInquiryCommandEx (
+           ScsiIo,
+           Timeout,
+           SenseData,
+           SenseDataLength,
+           HostAdapterStatus,
+           TargetStatus,
+           InquiryDataBuffer,
+           InquiryDataLength,
+           EnableVitalProductData,
+           0
+           );
 }
-
 
 /**
   Execute Mode Sense(10) SCSI command on a specific SCSI target.
