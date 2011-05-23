@@ -1049,12 +1049,18 @@ PartitionInstallChildHandle (
   Private->Media2.BlockSize = (UINT32) BlockSize;
 
   //
-  // Per UEFI Spec, LowestAlignedLba and LogicalBlocksPerPhysicalBlock must be 0
+  // Per UEFI Spec, LowestAlignedLba, LogicalBlocksPerPhysicalBlock and OptimalTransferLengthGranularity must be 0
   //  for logical partitions.
   //
   if (Private->BlockIo.Revision >= EFI_BLOCK_IO_PROTOCOL_REVISION2) {
-    Private->BlockIo.Media->LowestAlignedLba              = 0;
-    Private->BlockIo.Media->LogicalBlocksPerPhysicalBlock = 0;
+    Private->BlockIo.Media->LowestAlignedLba               = 0;
+    Private->BlockIo.Media->LogicalBlocksPerPhysicalBlock  = 0;
+    Private->BlockIo2.Media->LowestAlignedLba              = 0;
+    Private->BlockIo2.Media->LogicalBlocksPerPhysicalBlock = 0;
+    if (Private->BlockIo.Revision >= EFI_BLOCK_IO_PROTOCOL_REVISION3) {
+      Private->BlockIo.Media->OptimalTransferLengthGranularity  = 0;
+      Private->BlockIo2.Media->OptimalTransferLengthGranularity = 0;
+    }
   }
 
   Private->DevicePath     = AppendDevicePathNode (ParentDevicePath, DevicePathNode);
