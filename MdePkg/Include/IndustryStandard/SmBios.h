@@ -1,7 +1,7 @@
 /** @file
-  Industry Standard Definitions of SMBIOS Table Specification v2.6.1
+  Industry Standard Definitions of SMBIOS Table Specification v2.7.1
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -23,8 +23,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define SMBIOS_HANDLE_RESERVED_BEGIN 0xFF00
 
 ///
+/// Reference SMBIOS 2.7, chapter 6.1.2.
+/// The UEFI Platform Initialization Specification reserves handle number FFFEh for its
+/// EFI_SMBIOS_PROTOCOL.Add() function to mean "assign an unused handle number automatically."
+/// This number is not used for any other purpose by the SMBIOS specification.
+///
+#define SMBIOS_HANDLE_PI_RESERVED 0xFFFE
+
+///
 /// Reference SMBIOS 2.6, chapter 3.1.3.
 /// Each text string is limited to 64 significant characters due to system MIF limitations.
+/// Reference SMBIOS 2.7, chapter 6.1.3.
+/// It will have no limit on the length of each individual text string.
 ///
 #define SMBIOS_STRING_MAX_LENGTH     64
 
@@ -77,14 +87,14 @@ typedef struct {
 typedef UINT8 SMBIOS_TABLE_STRING;
 
 ///
-/// BIOS Characteristics  
-/// Defines which functions the BIOS supports. PCI, PCMCIA, Flash, etc. 
+/// BIOS Characteristics
+/// Defines which functions the BIOS supports. PCI, PCMCIA, Flash, etc.
 ///
 typedef struct {
   UINT32  Reserved                          :2;  ///< Bits 0-1.
-  UINT32  Unknown                           :1; 
-  UINT32  BiosCharacteristicsNotSupported   :1; 
-  UINT32  IsaIsSupported                    :1;  
+  UINT32  Unknown                           :1;
+  UINT32  BiosCharacteristicsNotSupported   :1;
+  UINT32  IsaIsSupported                    :1;
   UINT32  McaIsSupported                    :1;
   UINT32  EisaIsSupported                   :1;
   UINT32  PciIsSupported                    :1;
@@ -117,14 +127,14 @@ typedef struct {
 } MISC_BIOS_CHARACTERISTICS;
 
 ///
-/// BIOS Characteristics Extension Byte 1 .
-/// This information, available for SMBIOS version 2.1 and later, appears at offset 12h 
-/// within the BIOS Information  structure.
+/// BIOS Characteristics Extension Byte 1.
+/// This information, available for SMBIOS version 2.1 and later, appears at offset 12h
+/// within the BIOS Information structure.
 ///
 typedef struct {
   UINT8  AcpiIsSupported                   :1;
-  UINT8  UsbLegacyIsSupported              :1; 
-  UINT8  AgpIsSupported                    :1; 
+  UINT8  UsbLegacyIsSupported              :1;
+  UINT8  AgpIsSupported                    :1;
   UINT8  I20BootIsSupported                :1;
   UINT8  Ls120BootIsSupported              :1;
   UINT8  AtapiZipDriveBootIsSupported      :1;
@@ -134,14 +144,16 @@ typedef struct {
 
 ///
 /// BIOS Characteristics Extension Byte 2.
-/// This information, available for SMBIOS version 2.3 and later, appears at offset 13h 
+/// This information, available for SMBIOS version 2.3 and later, appears at offset 13h
 /// within the BIOS Information structure.
 ///
 typedef struct {
   UINT8  BiosBootSpecIsSupported              :1;
-  UINT8  FunctionKeyNetworkBootIsSupported    :1; 
-  UINT8  TargetContentDistributionEnabled     :1; 
-  UINT8  ExtensionByte2Reserved               :1;
+  UINT8  FunctionKeyNetworkBootIsSupported    :1;
+  UINT8  TargetContentDistributionEnabled     :1;
+  UINT8  UefiSpecificationSupported           :1;
+  UINT8  VirtualMachineSupported              :1;
+  UINT8  ExtensionByte2Reserved               :3;
 } MBCE_SYSTEM_RESERVED;
 
 ///
@@ -150,7 +162,6 @@ typedef struct {
 typedef struct {
   MBCE_BIOS_RESERVED    BiosReserved;
   MBCE_SYSTEM_RESERVED  SystemReserved;
-  UINT8                 Reserved;
 } MISC_BIOS_CHARACTERISTICS_EXTENSION;
 
 ///
@@ -421,12 +432,23 @@ typedef enum {
   ProcessorFamilyAlpha21164a            = 0x35,
   ProcessorFamilyAlpha21264             = 0x36,
   ProcessorFamilyAlpha21364             = 0x37,
+  ProcessorFamilyAmdTurionIIUltraDualCoreMobileM    = 0x38,
+  ProcessorFamilyAmdTurionIIDualCoreMobileM         = 0x39,
+  ProcessorFamilyAmdAthlonIIDualCoreM   = 0x3A,
+  ProcessorFamilyAmdOpteron6100Series   = 0x3B,
+  ProcessorFamilyAmdOpteron4100Series   = 0x3C,
+  ProcessorFamilyAmdOpteron6200Series   = 0x3D,
+  ProcessorFamilyAmdOpteron4200Series   = 0x3E,
   ProcessorFamilyMips                   = 0x40,
   ProcessorFamilyMIPSR4000              = 0x41,
   ProcessorFamilyMIPSR4200              = 0x42,
   ProcessorFamilyMIPSR4400              = 0x43,
   ProcessorFamilyMIPSR4600              = 0x44,
   ProcessorFamilyMIPSR10000             = 0x45,
+  ProcessorFamilyAmdCSeries             = 0x46,
+  ProcessorFamilyAmdESeries             = 0x47,
+  ProcessorFamilyAmdSSeries             = 0x48,
+  ProcessorFamilyAmdGSeries             = 0x49,
   ProcessorFamilySparc                  = 0x50,
   ProcessorFamilySuperSparc             = 0x51,
   ProcessorFamilymicroSparcII           = 0x52,
@@ -513,6 +535,8 @@ typedef enum {
   ProcessorFamilyG5                     = 0xCA,
   ProcessorFamilyG6                     = 0xCB,
   ProcessorFamilyzArchitectur           = 0xCC,
+  ProcessorFamilyIntelCoreI5            = 0xCD,
+  ProcessorFamilyIntelCoreI3            = 0xCE,
   ProcessorFamilyViaC7M                 = 0xD2,
   ProcessorFamilyViaC7D                 = 0xD3,
   ProcessorFamilyViaC7                  = 0xD4,
@@ -520,17 +544,23 @@ typedef enum {
   ProcessorFamilyMultiCoreIntelXeon           = 0xD6,
   ProcessorFamilyDualCoreIntelXeon3Series     = 0xD7,
   ProcessorFamilyQuadCoreIntelXeon3Series     = 0xD8,
+  ProcessorFamilyViaNano                      = 0xD9,
   ProcessorFamilyDualCoreIntelXeon5Series     = 0xDA,
   ProcessorFamilyQuadCoreIntelXeon5Series     = 0xDB,
   ProcessorFamilyDualCoreIntelXeon7Series     = 0xDD,
   ProcessorFamilyQuadCoreIntelXeon7Series     = 0xDE,
   ProcessorFamilyMultiCoreIntelXeon7Series    = 0xDF,
+  ProcessorFamilyMultiCoreIntelXeon3400Series = 0xE0,
   ProcessorFamilyEmbeddedAmdOpteronQuadCore   = 0xE6,
   ProcessorFamilyAmdPhenomTripleCore          = 0xE7,
   ProcessorFamilyAmdTurionUltraDualCoreMobile = 0xE8,
   ProcessorFamilyAmdTurionDualCoreMobile      = 0xE9,
   ProcessorFamilyAmdAthlonDualCore            = 0xEA,
   ProcessorFamilyAmdSempronSI                 = 0xEB,
+  ProcessorFamilyAmdPhenomII                  = 0xEC,
+  ProcessorFamilyAmdAthlonII                  = 0xED,
+  ProcessorFamilySixCoreAmdOpteron            = 0xEE,
+  ProcessorFamilyAmdSempronM                  = 0xEF,
   ProcessorFamilyi860                   = 0xFA,
   ProcessorFamilyi960                   = 0xFB,
   ProcessorFamilyIndicatorFamily2       = 0xFE,
@@ -577,7 +607,24 @@ typedef enum {
   ProcessorUpgradeSocketS1      = 0x16,
   ProcessorUpgradeAM2           = 0x17,
   ProcessorUpgradeF1207         = 0x18,
-  ProcessorSocketLGA1366        = 0x19
+  ProcessorSocketLGA1366        = 0x19,
+  ProcessorUpgradeSocketG34     = 0x1A,
+  ProcessorUpgradeSocketAM3     = 0x1B,
+  ProcessorUpgradeSocketC32     = 0x1C,
+  ProcessorUpgradeSocketLGA1156 = 0x1D,
+  ProcessorUpgradeSocketLGA1567 = 0x1E,
+  ProcessorUpgradeSocketPGA988A = 0x1F,
+  ProcessorUpgradeSocketBGA1288 = 0x20,
+  ProcessorUpgradeSocketrPGA988B = 0x21,
+  ProcessorUpgradeSocketBGA1023 = 0x22,
+  ProcessorUpgradeSocketBGA1224 = 0x23,
+  ProcessorUpgradeSocketBGA1155 = 0x24,
+  ProcessorUpgradeSocketLGA1356 = 0x25,
+  ProcessorUpgradeSocketLGA2011 = 0x26,
+  ProcessorUpgradeSocketFS1     = 0x27,
+  ProcessorUpgradeSocketFS2     = 0x28,
+  ProcessorUpgradeSocketFM1     = 0x29,
+  ProcessorUpgradeSocketFM2     = 0x2A
 } PROCESSOR_UPGRADE;
 
 ///
@@ -854,7 +901,8 @@ typedef enum {
   CacheAssociativity24Way        = 0x0A,
   CacheAssociativity32Way        = 0x0B,
   CacheAssociativity48Way        = 0x0C,
-  CacheAssociativity64Way        = 0x0D
+  CacheAssociativity64Way        = 0x0D,
+  CacheAssociativity20Way        = 0x0E
 } CACHE_ASSOCIATIVITY_DATA;
 
 ///
@@ -1021,7 +1069,13 @@ typedef enum {
   SlotTypePciExpressGen2X2             = 0xAD,
   SlotTypePciExpressGen2X4             = 0xAE,
   SlotTypePciExpressGen2X8             = 0xAF,
-  SlotTypePciExpressGen2X16            = 0xB0
+  SlotTypePciExpressGen2X16            = 0xB0,
+  SlotTypePciExpressGen3               = 0xB1,
+  SlotTypePciExpressGen3X1             = 0xB2,
+  SlotTypePciExpressGen3X2             = 0xB3,
+  SlotTypePciExpressGen3X4             = 0xB4,
+  SlotTypePciExpressGen3X8             = 0xB5,
+  SlotTypePciExpressGen3X16            = 0xB6
 } MISC_SLOT_TYPE;
 
 ///
@@ -1342,6 +1396,10 @@ typedef struct {
   UINT32                    MaximumCapacity;
   UINT16                    MemoryErrorInformationHandle;
   UINT16                    NumberOfMemoryDevices;
+  //
+  // Add for smbios 2.7
+  //
+  UINT64                    ExtendedMaximumCapacity;
 } SMBIOS_TABLE_TYPE16;
 
 ///
@@ -1407,7 +1465,9 @@ typedef struct {
   UINT16    WindowDram      :1;
   UINT16    CacheDram       :1;
   UINT16    Nonvolatile     :1;
-  UINT16    Reserved1       :3;
+  UINT16    Registered      :1;
+  UINT16    Unbuffered      :1;
+  UINT16    Reserved1       :1;
 } MEMORY_DEVICE_TYPE_DETAIL;
 
 ///
@@ -1440,7 +1500,12 @@ typedef struct {
   //
   // Add for smbios 2.6
   //  
-  UINT8                 Attributes;
+  UINT8                     Attributes;
+  //
+  // Add for smbios 2.7
+  //
+  UINT32                    ExtendedSize;
+  UINT16                    ConfiguredMemoryClockSpeed;
 } SMBIOS_TABLE_TYPE17;
 
 ///
@@ -1513,6 +1578,11 @@ typedef struct {
   UINT32                EndingAddress;
   UINT16                MemoryArrayHandle;
   UINT8                 PartitionWidth;
+  //
+  // Add for smbios 2.7
+  //
+  UINT64                ExtendedStartingAddress;
+  UINT64                ExtendedEndingAddress;
 } SMBIOS_TABLE_TYPE19;
 
 ///
@@ -1530,6 +1600,11 @@ typedef struct {
   UINT8                 PartitionRowPosition;
   UINT8                 InterleavePosition;
   UINT8                 InterleavedDataDepth;
+  //
+  // Add for smbios 2.7
+  //
+  UINT64                ExtendedStartingAddress;
+  UINT64                ExtendedEndingAddress;
 } SMBIOS_TABLE_TYPE20;
 
 ///
@@ -1711,6 +1786,10 @@ typedef struct {
   UINT8                             CoolingUnitGroup;
   UINT32                            OEMDefined;
   UINT16                            NominalSpeed;
+  //
+  // Add for smbios 2.7
+  //
+  SMBIOS_TABLE_STRING               Description;
 } SMBIOS_TABLE_TYPE27;
 
 ///
@@ -1970,9 +2049,14 @@ typedef enum {
 ///
 /// IPMI Device Information (Type 38).
 ///
-/// The information in this structure defines the attributes of an 
+/// The information in this structure defines the attributes of an
 /// Intelligent Platform Management Interface (IPMI) Baseboard Management Controller (BMC).
-/// 
+///
+/// The Type 42 structure can also be used to describe a physical management controller
+/// host interface and one or more protocols that share that interface. If IPMI is not
+/// shared with other protocols, either the Type 38 or Type 42 structures can be used.
+/// Providing Type 38 is recommended for backward compatibility.
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 InterfaceType;              ///< The enumeration value from BMC_INTERFACE_TYPE.
@@ -2000,8 +2084,8 @@ typedef struct {
 ///
 /// System Power Supply (Type 39).
 ///
-/// This structure identifies attributes of a system power supply.  One instance
-/// of this record is present for each possible power supply in a system.  
+/// This structure identifies attributes of a system power supply. One instance
+/// of this record is present for each possible power supply in a system.
 ///
 typedef struct {
   SMBIOS_STRUCTURE                  Hdr;
@@ -2074,8 +2158,31 @@ typedef struct {
   UINT8                             DeviceTypeInstance;
   UINT16                            SegmentGroupNum;
   UINT8                             BusNum;
-  UINT8                             DevFuncNum;  
+  UINT8                             DevFuncNum;
 } SMBIOS_TABLE_TYPE41;
+
+///
+/// Management Controller Host Interface (Type 42).
+///
+/// The information in this structure defines the attributes of a Management
+/// Controller Host Interface that is not discoverable by "Plug and Play" mechanisms.
+///
+/// Type 42 should be used for management controller host interfaces that use protocols
+/// other than IPMI or that use multiple protocols on a single host interface type.
+///
+/// This structure should also be provided if IPMI is shared with other protocols
+/// over the same interface hardware. If IPMI is not shared with other protocols,
+/// either the Type 38 or Type 42 structures can be used. Providing Type 38 is
+/// recommended for backward compatibility. The structures are not required to
+/// be mutually exclusive. Type 38 and Type 42 structures may be implemented
+/// simultaneously to provide backward compatibility with IPMI applications or drivers
+/// that do not yet recognize the Type 42 structure.
+///
+typedef struct {
+  SMBIOS_STRUCTURE                  Hdr;
+  UINT8                             InterfaceType;
+  UINT8                             MCHostInterfaceData[1]; ///< This field has a minimum of four bytes
+} SMBIOS_TABLE_TYPE42;
 
 ///
 /// Inactive (Type 126)
