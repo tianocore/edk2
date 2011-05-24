@@ -1,7 +1,7 @@
 #/**@file
 # Low leve x64 specific debug support functions.
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2011, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -359,6 +359,9 @@ ExtraPushDone:
           
                 #     FXSTOR_RDI
                 fxsave      [rdi]
+
+// UEFI calling convention for x64 requires that Direction flag in EFLAGs is clear
+                cld
 
 ## UINT64  ExceptionData;
                 mov     rax, ASM_PFX(ExceptData)
