@@ -1,7 +1,7 @@
 /** @file
   Print Library internal worker functions.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -636,9 +636,9 @@ BasePrintLibSPrintMarker (
             MAXIMUM_VALUE_CHARACTERS, 
             0,
             "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-            TmpGuid->Data1,
-            TmpGuid->Data2,
-            TmpGuid->Data3,
+            ReadUnaligned32 (&(TmpGuid->Data1)),
+            ReadUnaligned16 (&(TmpGuid->Data2)),
+            ReadUnaligned16 (&(TmpGuid->Data3)),
             TmpGuid->Data4[0],
             TmpGuid->Data4[1],
             TmpGuid->Data4[2],
