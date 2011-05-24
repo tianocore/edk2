@@ -1,7 +1,7 @@
 /** @file
   Support functions to connect/disconnect UEFI Driver model Protocol
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -352,8 +352,10 @@ CoreConnectSingleController (
   UINTN                                      NewDriverBindingHandleCount;
   EFI_HANDLE                                 *NewDriverBindingHandleBuffer;
   EFI_DRIVER_BINDING_PROTOCOL                *DriverBinding;
+  EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL        *DriverFamilyOverride;
   UINTN                                      NumberOfSortedDriverBindingProtocols;
   EFI_DRIVER_BINDING_PROTOCOL                **SortedDriverBindingProtocols;
+  UINT32                                     DriverFamilyOverrideVersion;
   UINT32                                     HighestVersion;
   UINTN                                      HighestIndex;
   UINTN                                      SortIndex;
@@ -434,6 +436,41 @@ CoreConnectSingleController (
           );
       }
     } while (!EFI_ERROR (Status));
+  }
+
+  //
+  // Add the Driver Family Override Protocol drivers for ControllerHandle
+  //
+  while (TRUE) {
+    HighestIndex   = DriverBindingHandleCount;
+    HighestVersion = 0;
+    for (Index = 0; Index < DriverBindingHandleCount; Index++) {
+      Status = CoreHandleProtocol (
+                 DriverBindingHandleBuffer[Index],
+                 &gEfiDriverFamilyOverrideProtocolGuid,
+                 (VOID **) &DriverFamilyOverride
+                 );
+      if (!EFI_ERROR (Status) && (DriverFamilyOverride != NULL)) {
+        DriverFamilyOverrideVersion = DriverFamilyOverride->GetVersion (DriverFamilyOverride);
+        if ((HighestIndex == DriverBindingHandleCount) || (DriverFamilyOverrideVersion > HighestVersion)) {
+          HighestVersion = DriverFamilyOverrideVersion;
+          HighestIndex   = Index;
+        }
+      }
+    }
+
+    if (HighestIndex == DriverBindingHandleCount) {
+      break;
+    }
+
+    AddSortedDriverBindingProtocol (
+      DriverBindingHandleBuffer[HighestIndex],
+      &NumberOfSortedDriverBindingProtocols,
+      SortedDriverBindingProtocols,
+      DriverBindingHandleCount,
+      DriverBindingHandleBuffer,
+      FALSE
+      );
   }
 
   //

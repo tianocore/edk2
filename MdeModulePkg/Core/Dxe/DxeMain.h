@@ -48,6 +48,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/FirmwareVolumeBlock.h>
 #include <Protocol/Capsule.h>
 #include <Protocol/BusSpecificDriverOverride.h>
+#include <Protocol/DriverFamilyOverride.h>
 #include <Protocol/TcgService.h>
 #include <Protocol/HiiPackageList.h>
 #include <Protocol/SmmBase2.h>
