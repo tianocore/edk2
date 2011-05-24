@@ -5,7 +5,7 @@
 
   Boot option manipulation
 
-Copyright (c) 2004 - 2009, Intel Corporation. <BR>
+Copyright (c) 2004 - 2011, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -529,6 +529,7 @@ BOpt_FreeMenu (
     RemoveEntryList (&MenuEntry->Link);
     BOpt_DestroyMenuEntry (MenuEntry);
   }
+  FreeMenu->MenuNumber = 0;
 }
 
 /**
