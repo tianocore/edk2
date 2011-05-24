@@ -3,7 +3,7 @@
 
   This code abstracts the DXE core from processor implementation details.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -244,6 +244,8 @@ EFI_STATUS
   @retval EFI_ACCESS_DENIED     The attributes for the memory resource range specified by
                                 BaseAddress and Length cannot be modified.
   @retval EFI_INVALID_PARAMETER Length is zero.
+                                Attributes specified an illegal combination of attributes that
+                                cannot be set together.
   @retval EFI_OUT_OF_RESOURCES  There are not enough system resources to modify the attributes of
                                 the memory resource range.
   @retval EFI_UNSUPPORTED       The processor does not support one or more bytes of the memory
