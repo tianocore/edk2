@@ -3630,7 +3630,7 @@ class FdfParser:
         if not self.__GetNextToken():
             raise Warning("expected Component version", self.FileName, self.CurrentLineNumber)
 
-        Pattern = re.compile('-$|[0-9]{0,1}[0-9]{1}\.[0-9]{0,1}[0-9]{1}')
+        Pattern = re.compile('-$|[0-9a-fA-F]{1,2}\.[0-9a-fA-F]{1,2}$', re.DOTALL)
         if Pattern.match(self.__Token) == None:
             raise Warning("Unknown version format '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
         CompStatementObj.CompVer = self.__Token

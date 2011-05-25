@@ -119,27 +119,36 @@ Returns:
 
 --*/
 {
-  CHAR8  StrPtr[40];
-  CHAR8  *Token;
+  CHAR8  TemStr[5] = "0000";
   unsigned Major;
   unsigned Minor;
+  UINTN Length;
 
   Major = 0;
   Minor = 0;
-  memset (StrPtr, 0, 40);
-  Token = strtok (Str, ".");
 
-  while (Token != NULL) {
-    strcat (StrPtr, Token);
-    Token = strtok (NULL, ".");
+  if (strstr (Str, ".") != NULL) {
+    sscanf (
+      Str,
+      "%02x.%02x",
+      &Major,
+      &Minor
+      );
+  } else {
+    Length = strlen(Str);
+    if (Length < 4) {
+      strncpy (TemStr + 4 - Length, Str, Length);
+    } else {
+      strncpy (TemStr, Str + Length - 4, 4);
+    }
+  
+    sscanf (
+      TemStr,
+      "%02x%02x",
+      &Major,
+      &Minor
+      );
   }
-
-  sscanf (
-    StrPtr,
-    "%02d%02d",
-    &Major,
-    &Minor
-    );
 
   *MajorVer = (UINT8) Major;
   *MinorVer = (UINT8) Minor;
