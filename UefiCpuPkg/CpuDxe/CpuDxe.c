@@ -1141,7 +1141,7 @@ InitInterruptDescriptorTable (
   //
   // Initialize Exception Handlers
   //
-  for (Index = 0; Index < 32; Index++) {
+  for (Index = OldIdtSize; Index < 32; Index++) {
     Status = CpuRegisterInterruptHandler (&gCpu, Index, CommonExceptionHandler);
     ASSERT_EFI_ERROR (Status);
   }
