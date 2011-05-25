@@ -538,7 +538,11 @@ ShellCommandRunLs (
           StrnCatGrow(&FullPath, NULL, L"*", 0);
         }
         Status = gRT->GetTime(&TheTime, NULL);
-        ASSERT_EFI_ERROR(Status);
+        if (EFI_ERROR(Status)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"gRT->GetTime", Status);
+          TheTime.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
+        }
+
         SfoMode = ShellCommandLineGetFlag(Package, L"-sfo");
         if (ShellStatus == SHELL_SUCCESS) {
           ShellStatus = PrintLsOutput(
@@ -548,7 +552,7 @@ ShellCommandRunLs (
             FullPath,
             TRUE,
             Count,
-            (INT16)(TheTime.TimeZone==2047?0:TheTime.TimeZone)
+            (INT16)(TheTime.TimeZone==EFI_UNSPECIFIED_TIMEZONE?0:TheTime.TimeZone)
            );
           if (ShellStatus == SHELL_NOT_FOUND) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_FILES), gShellLevel2HiiHandle);

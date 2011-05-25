@@ -430,7 +430,7 @@ ShellCommandRunTime (
         //
         // ShellPrintEx the current time
         //
-        if (TheTime.TimeZone == 2047) {
+        if (TheTime.TimeZone == EFI_UNSPECIFIED_TIMEZONE) {
           TzMinutes = 0;
         } else {
           TzMinutes = (ABS(TheTime.TimeZone)) % 60;
@@ -445,13 +445,13 @@ ShellCommandRunTime (
           TheTime.Hour,
           TheTime.Minute,
           TheTime.Second,
-          TheTime.TimeZone==2047?L" ":(TheTime.TimeZone > 0?L"-":L"+"),
-          TheTime.TimeZone==2047?0:(ABS(TheTime.TimeZone)) / 60,
+          TheTime.TimeZone==EFI_UNSPECIFIED_TIMEZONE?L" ":(TheTime.TimeZone > 0?L"-":L"+"),
+          TheTime.TimeZone==EFI_UNSPECIFIED_TIMEZONE?0:(ABS(TheTime.TimeZone)) / 60,
           TzMinutes
          );
          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CRLF), gShellLevel2HiiHandle);
       } else if (ShellCommandLineGetFlag(Package, L"-d") && ShellCommandLineGetValue(Package, L"-d") == NULL) {
-        if (TheTime.TimeZone == 2047) {
+        if (TheTime.TimeZone == EFI_UNSPECIFIED_TIMEZONE) {
           TzMinutes = 0;
         } else {
           TzMinutes = (ABS(TheTime.TimeZone)) % 60;
@@ -466,8 +466,8 @@ ShellCommandRunTime (
           TheTime.Hour,
           TheTime.Minute,
           TheTime.Second,
-          TheTime.TimeZone==2047?L" ":(TheTime.TimeZone > 0?L"-":L"+"),
-          TheTime.TimeZone==2047?0:(ABS(TheTime.TimeZone)) / 60,
+          TheTime.TimeZone==EFI_UNSPECIFIED_TIMEZONE?L" ":(TheTime.TimeZone > 0?L"-":L"+"),
+          TheTime.TimeZone==EFI_UNSPECIFIED_TIMEZONE?0:(ABS(TheTime.TimeZone)) / 60,
           TzMinutes
          );
           switch (TheTime.Daylight) {
@@ -500,7 +500,7 @@ ShellCommandRunTime (
             } else {
               Tz = (INT16)ShellStrToUintn(TempLocation);
             }
-            if (!(Tz >= -1440 && Tz <= 1440) && Tz != 2047) {
+            if (!(Tz >= -1440 && Tz <= 1440) && Tz != EFI_UNSPECIFIED_TIMEZONE) {
               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"-tz");
               ShellStatus = SHELL_INVALID_PARAMETER;
             }
@@ -776,7 +776,7 @@ ShellCommandRunTimeZone (
       Status = gRT->GetTime(&TheTime, NULL);
       ASSERT_EFI_ERROR(Status);
 
-      if (TheTime.TimeZone != 2047) {
+      if (TheTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) {
         Found = FALSE;
         for ( LoopVar = 0
             ; LoopVar < sizeof(TimeZoneList) / sizeof(TimeZoneList[0])
@@ -792,7 +792,7 @@ ShellCommandRunTimeZone (
               //
               // Print basic info only
               //
-              if (TheTime.TimeZone == 2047) {
+              if (TheTime.TimeZone == EFI_UNSPECIFIED_TIMEZONE) {
                 TzMinutes = 0;
               } else {
                 TzMinutes = (ABS(TheTime.TimeZone)) % 60;
@@ -804,8 +804,8 @@ ShellCommandRunTimeZone (
                 NULL,
                 STRING_TOKEN(STR_TIMEZONE_SIMPLE),
                 gShellLevel2HiiHandle,
-                TheTime.TimeZone==2047?0:(TheTime.TimeZone > 0?L"-":L"+"),
-                TheTime.TimeZone==2047?0:(ABS(TheTime.TimeZone)) / 60,
+                TheTime.TimeZone==EFI_UNSPECIFIED_TIMEZONE?0:(TheTime.TimeZone > 0?L"-":L"+"),
+                TheTime.TimeZone==EFI_UNSPECIFIED_TIMEZONE?0:(ABS(TheTime.TimeZone)) / 60,
                 TzMinutes);
             }
             Found = TRUE;
@@ -816,7 +816,7 @@ ShellCommandRunTimeZone (
           //
           // Print basic info only
           //
-          if (TheTime.TimeZone == 2047) {
+          if (TheTime.TimeZone == EFI_UNSPECIFIED_TIMEZONE) {
             TzMinutes = 0;
           } else {
             TzMinutes = (ABS(TheTime.TimeZone)) % 60;
@@ -827,8 +827,8 @@ ShellCommandRunTimeZone (
             NULL,
             STRING_TOKEN(STR_TIMEZONE_SIMPLE),
             gShellLevel2HiiHandle,
-            TheTime.TimeZone==2047?0:(TheTime.TimeZone > 0?L"-":L"+"),
-            TheTime.TimeZone==2047?0:(ABS(TheTime.TimeZone)) / 60,
+            TheTime.TimeZone==EFI_UNSPECIFIED_TIMEZONE?0:(TheTime.TimeZone > 0?L"-":L"+"),
+            TheTime.TimeZone==EFI_UNSPECIFIED_TIMEZONE?0:(ABS(TheTime.TimeZone)) / 60,
             TzMinutes);
           if (ShellCommandLineGetFlag(Package, L"-f")) {
             ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN(STR_TIMEZONE_NI), gShellLevel2HiiHandle);
@@ -836,7 +836,7 @@ ShellCommandRunTimeZone (
         }
       } else {
         //
-        // TimeZone was 2047 (unknown) from GetTime()
+        // TimeZone was EFI_UNSPECIFIED_TIMEZONE (unknown) from GetTime()
         //
       }
     }
