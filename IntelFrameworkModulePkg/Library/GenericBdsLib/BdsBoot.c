@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which relate with create or process the boot option.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1406,6 +1406,8 @@ BdsLibEnumerateAllBootOption (
   UINTN                         NumberBlockIoHandles;
   EFI_HANDLE                    *BlockIoHandles;
   EFI_BLOCK_IO_PROTOCOL         *BlkIo;
+  BOOLEAN                       Removable[2];
+  UINTN                         RemovableIndex;
   UINTN                         Index;
   UINTN                         NumOfLoadFileHandles;
   EFI_HANDLE                    *LoadFileHandles;
@@ -1428,6 +1430,8 @@ BdsLibEnumerateAllBootOption (
   EFI_IMAGE_OPTIONAL_HEADER_UNION       HdrData;
   EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr;
 
+  Removable[0]  = FALSE;
+  Removable[1]  = TRUE;
   FloppyNumber  = 0;
   CdromNumber   = 0;
   UsbNumber     = 0;
@@ -1480,7 +1484,7 @@ BdsLibEnumerateAllBootOption (
   BdsDeleteAllInvalidEfiBootOption ();
 
   //
-  // Parse removable media
+  // Parse removable media followed by fixed media
   //
   gBS->LocateHandleBuffer (
         ByProtocol,
@@ -1490,81 +1494,81 @@ BdsLibEnumerateAllBootOption (
         &BlockIoHandles
         );
 
-  for (Index = 0; Index < NumberBlockIoHandles; Index++) {
-    Status = gBS->HandleProtocol (
-                    BlockIoHandles[Index],
-                    &gEfiBlockIoProtocolGuid,
-                    (VOID **) &BlkIo
-                    );
-    if (!EFI_ERROR (Status)) {
-      if (!BlkIo->Media->RemovableMedia) {
-        //
-        // skip the non-removable block devices
-        //
+  for (RemovableIndex = 0; RemovableIndex < 2; RemovableIndex++) {
+    for (Index = 0; Index < NumberBlockIoHandles; Index++) {
+      Status = gBS->HandleProtocol (
+                      BlockIoHandles[Index],
+                      &gEfiBlockIoProtocolGuid,
+                      (VOID **) &BlkIo
+                      );
+      //
+      // skip the fixed block io then the removable block io
+      //
+      if (EFI_ERROR (Status) || (BlkIo->Media->RemovableMedia == Removable[RemovableIndex])) {
         continue;
       }
-    }
-    DevicePath  = DevicePathFromHandle (BlockIoHandles[Index]);
-    DevicePathType = BdsGetBootTypeFromDevicePath (DevicePath);
+      DevicePath  = DevicePathFromHandle (BlockIoHandles[Index]);
+      DevicePathType = BdsGetBootTypeFromDevicePath (DevicePath);
 
-    switch (DevicePathType) {
-    case BDS_EFI_ACPI_FLOPPY_BOOT:
-      if (FloppyNumber != 0) {
-        UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_FLOPPY)), FloppyNumber);
-      } else {
-        UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_FLOPPY)));
+      switch (DevicePathType) {
+      case BDS_EFI_ACPI_FLOPPY_BOOT:
+        if (FloppyNumber != 0) {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_FLOPPY)), FloppyNumber);
+        } else {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_FLOPPY)));
+        }
+        BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
+        FloppyNumber++;
+        break;
+
+      //
+      // Assume a removable SATA device should be the DVD/CD device
+      //
+      case BDS_EFI_MESSAGE_ATAPI_BOOT:
+      case BDS_EFI_MESSAGE_SATA_BOOT:
+        if (CdromNumber != 0) {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_CD_DVD)), CdromNumber);
+        } else {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_CD_DVD)));
+        }
+        DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Buffer: %S\n", Buffer));
+        BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
+        CdromNumber++;
+        break;
+
+      case BDS_EFI_MESSAGE_USB_DEVICE_BOOT:
+        if (UsbNumber != 0) {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_USB)), UsbNumber);
+        } else {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_USB)));
+        }
+        BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
+        UsbNumber++;
+        break;
+
+      case BDS_EFI_MESSAGE_SCSI_BOOT:
+        if (ScsiNumber != 0) {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_SCSI)), ScsiNumber);
+        } else {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_SCSI)));
+        }
+        BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
+        ScsiNumber++;
+        break;
+
+      case BDS_EFI_MESSAGE_MISC_BOOT:
+        if (MiscNumber != 0) {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_MISC)), MiscNumber);
+        } else {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_MISC)));
+        }
+        BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
+        MiscNumber++;
+        break;
+
+      default:
+        break;
       }
-      BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
-      FloppyNumber++;
-      break;
-
-    //
-    // Assume a removable SATA device should be the DVD/CD device
-    //
-    case BDS_EFI_MESSAGE_ATAPI_BOOT:
-    case BDS_EFI_MESSAGE_SATA_BOOT:
-      if (CdromNumber != 0) {
-        UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_CD_DVD)), CdromNumber);
-      } else {
-        UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_CD_DVD)));
-      }
-      DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Buffer: %S\n", Buffer));
-      BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
-      CdromNumber++;
-      break;
-
-    case BDS_EFI_MESSAGE_USB_DEVICE_BOOT:
-      if (UsbNumber != 0) {
-        UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_USB)), UsbNumber);
-      } else {
-        UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_USB)));
-      }
-      BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
-      UsbNumber++;
-      break;
-
-    case BDS_EFI_MESSAGE_SCSI_BOOT:
-      if (ScsiNumber != 0) {
-        UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_SCSI)), ScsiNumber);
-      } else {
-        UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_SCSI)));
-      }
-      BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
-      ScsiNumber++;
-      break;
-
-    case BDS_EFI_MESSAGE_MISC_BOOT:
-      if (MiscNumber != 0) {
-        UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_MISC)), MiscNumber);
-      } else {
-        UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_MISC)));
-      }
-      BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
-      MiscNumber++;
-      break;
-
-    default:
-      break;
     }
   }
 
@@ -1600,7 +1604,7 @@ BdsLibEnumerateAllBootOption (
     // Do the removable Media thing. \EFI\BOOT\boot{machinename}.EFI
     //  machinename is ia32, ia64, x64, ...
     //
-    Hdr.Union = &HdrData;
+    Hdr.Union  = &HdrData;
     NeedDelete = TRUE;
     Status     = BdsLibGetImageHeader (
                    FileSystemHandles[Index],
