@@ -389,6 +389,11 @@ class WorkspaceAutoGen(AutoGen):
         for Pa in self.AutoGenObjectList:
             Pa.CreateCodeFile(CreateDepsCodeFile)
 
+    ## Create AsBuilt INF file the platform
+    #
+    def CreateAsBuiltInf(self):
+        return
+
     Name                = property(_GetName)
     Guid                = property(_GetGuid)
     Version             = property(_GetVersion)
