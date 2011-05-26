@@ -323,6 +323,9 @@ BasePrintLibSPrintMarker (
   UINTN             Digits;
   UINTN             Radix;
   RETURN_STATUS     Status;
+  UINT32            GuidData1;
+  UINT16            GuidData2;
+  UINT16            GuidData3;
 
   if (BufferSize == 0) {
     return 0;
@@ -631,14 +634,17 @@ BasePrintLibSPrintMarker (
         if (TmpGuid == NULL) {
           ArgumentString = "<null guid>";
         } else {
+          GuidData1 = ReadUnaligned32 (&(TmpGuid->Data1));
+          GuidData2 = ReadUnaligned16 (&(TmpGuid->Data2));
+          GuidData3 = ReadUnaligned16 (&(TmpGuid->Data3));
           BasePrintLibSPrint (
             ValueBuffer,
             MAXIMUM_VALUE_CHARACTERS, 
             0,
             "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-            ReadUnaligned32 (&(TmpGuid->Data1)),
-            ReadUnaligned16 (&(TmpGuid->Data2)),
-            ReadUnaligned16 (&(TmpGuid->Data3)),
+            GuidData1,
+            GuidData2,
+            GuidData3,
             TmpGuid->Data4[0],
             TmpGuid->Data4[1],
             TmpGuid->Data4[2],
