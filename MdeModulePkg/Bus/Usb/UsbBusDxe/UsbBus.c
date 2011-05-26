@@ -2,7 +2,7 @@
 
     Usb Bus Driver Binding and Bus IO Protocol.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1279,6 +1279,7 @@ UsbBusControllerDriverStart (
     //
     // If first start, build the bus execute environment and install bus protocol
     //
+    REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_IO_BUS_USB | EFI_P_PC_ENABLE));
     Status = UsbBusBuildProtocol (This, Controller, RemainingDevicePath);
     if (EFI_ERROR (Status)) {
       return Status;

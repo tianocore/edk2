@@ -2309,6 +2309,7 @@ AhciModeInitialization (
           Status = AhciIdentify (PciIo, AhciRegisters, Port, 0, &Buffer);
 
           if (EFI_ERROR (Status)) {
+            REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_EC_NOT_DETECTED));
             continue;
           }
 
@@ -2388,6 +2389,9 @@ AhciModeInitialization (
         // Found a ATA or ATAPI device, add it into the device list.
         //
         CreateNewDeviceInfo (Instance, Port, 0, DeviceType, &Buffer);
+        if (DeviceType == EfiIdeHarddisk) {
+          REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_PC_ENABLE));
+        }
       }
     }
   }

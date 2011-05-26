@@ -2641,6 +2641,8 @@ DetectAndConfigIdeDevice (
       // if identifying ata device is failure, then try to send identify packet cmd.
       //
       if (EFI_ERROR (Status)) {
+        REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_EC_NOT_DETECTED));
+
         DeviceType = EfiIdeCdrom;
         Status     = AtaIdentifyPacket (Instance, IdeChannel, IdeDevice, &Buffer, NULL);
       }
@@ -2771,6 +2773,10 @@ DetectAndConfigIdeDevice (
     Status = CreateNewDeviceInfo (Instance, IdeChannel, IdeDevice, DeviceType, &Buffer);
     if (EFI_ERROR (Status)) {
       continue;
+    }
+
+    if (DeviceType == EfiIdeHarddisk) {
+      REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_PC_ENABLE));
     }
   }
   return EFI_SUCCESS;

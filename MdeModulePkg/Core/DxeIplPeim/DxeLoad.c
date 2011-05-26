@@ -2,7 +2,7 @@
   Last PEIM.
   Responsibility of this module is to load the DXE Core from a Firmware Volume.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -318,6 +318,9 @@ DxeIplFindDxeCore (
     // If some error occurs here, then we cannot find any firmware
     // volume that may contain DxeCore.
     //
+    if (EFI_ERROR (Status)) {
+      REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_CORE_EC_DXE_CORRUPT));
+    }
     ASSERT_EFI_ERROR (Status);
     
     //
