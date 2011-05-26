@@ -230,6 +230,12 @@ PS2MouseAbsolutePointerDriverStart (
   //
   // Initialize keyboard controller if necessary
   //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (  
+    EFI_PROGRESS_CODE,
+    EFI_PERIPHERAL_MOUSE | EFI_P_MOUSE_PC_SELF_TEST,
+    ParentDevicePath
+    );
+
   IsaIo->Io.Read (IsaIo, EfiIsaIoWidthUint8, KBC_CMD_STS_PORT, 1, &Data);
   if ((Data & KBC_SYSF) != KBC_SYSF) {
     Status = KbcSelfTest (IsaIo);

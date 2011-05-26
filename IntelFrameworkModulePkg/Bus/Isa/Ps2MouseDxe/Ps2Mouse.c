@@ -240,6 +240,13 @@ PS2MouseDriverStart (
     StatusCode = EFI_PERIPHERAL_MOUSE | EFI_P_EC_NOT_DETECTED;
     goto ErrorExit;
   } 
+
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    EFI_PERIPHERAL_MOUSE | EFI_P_MOUSE_PC_SELF_TEST,
+    ParentDevicePath
+    );
+
   if ((Data & KBC_SYSF) != KBC_SYSF) {
     Status = KbcSelfTest (IsaIo);
     if (EFI_ERROR (Status)) {
