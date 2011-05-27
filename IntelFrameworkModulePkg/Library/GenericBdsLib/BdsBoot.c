@@ -1430,8 +1430,6 @@ BdsLibEnumerateAllBootOption (
   EFI_IMAGE_OPTIONAL_HEADER_UNION       HdrData;
   EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr;
 
-  Removable[0]  = FALSE;
-  Removable[1]  = TRUE;
   FloppyNumber  = 0;
   CdromNumber   = 0;
   UsbNumber     = 0;
@@ -1484,8 +1482,13 @@ BdsLibEnumerateAllBootOption (
   BdsDeleteAllInvalidEfiBootOption ();
 
   //
-  // Parse removable media followed by fixed media
+  // Parse removable media followed by fixed media.
+  // The Removable[] array is used by the for-loop below to create removable media boot options 
+  // at first, and then to create fixed media boot options.
   //
+  Removable[0]  = FALSE;
+  Removable[1]  = TRUE;
+
   gBS->LocateHandleBuffer (
         ByProtocol,
         &gEfiBlockIoProtocolGuid,
