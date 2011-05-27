@@ -815,7 +815,7 @@ GraphicsConsoleConOutOutputString (
   //
   GetTextColors (This, &Foreground, &Background);
 
-  EraseCursor (This);
+  FlushCursor (This);
 
   Warning = FALSE;
 
@@ -835,7 +835,7 @@ GraphicsConsoleConOutOutputString (
         This->Mode->CursorRow--;
         This->Mode->CursorColumn = (INT32) (MaxColumn - 1);
         This->OutputString (This, SpaceStr);
-        EraseCursor (This);
+        FlushCursor (This);
         This->Mode->CursorRow--;
         This->Mode->CursorColumn = (INT32) (MaxColumn - 1);
       } else if (This->Mode->CursorColumn > 0) {
@@ -845,7 +845,7 @@ GraphicsConsoleConOutOutputString (
         //
         This->Mode->CursorColumn--;
         This->OutputString (This, SpaceStr);
-        EraseCursor (This);
+        FlushCursor (This);
         This->Mode->CursorColumn--;
       }
 
@@ -1004,16 +1004,16 @@ GraphicsConsoleConOutOutputString (
       }
 
       if (This->Mode->CursorColumn >= (INT32) MaxColumn) {
-        EraseCursor (This);
+        FlushCursor (This);
         This->OutputString (This, mCrLfString);
-        EraseCursor (This);
+        FlushCursor (This);
       }
     }
   }
 
   This->Mode->Attribute = OriginAttribute;
 
-  EraseCursor (This);
+  FlushCursor (This);
 
   if (Warning) {
     Status = EFI_WARN_UNKNOWN_GLYPH;
@@ -1222,7 +1222,7 @@ GraphicsConsoleConOutSetMode (
     // Otherwise, the size of the text console and/or the GOP/UGA mode will be changed,
     // so erase the cursor, and free the LineBuffer for the current mode
     //
-    EraseCursor (This);
+    FlushCursor (This);
 
     FreePool (Private->LineBuffer);
   }
@@ -1313,9 +1313,12 @@ GraphicsConsoleConOutSetMode (
   This->Mode->Mode = (INT32) ModeNumber;
 
   //
-  // Move the text cursor to the upper left hand corner of the display and enable it
+  // Move the text cursor to the upper left hand corner of the display and flush it
   //
-  This->SetCursorPosition (This, 0, 0);
+  This->Mode->CursorColumn  = 0;
+  This->Mode->CursorRow     = 0;
+
+  FlushCursor (This);  
 
   Status = EFI_SUCCESS;
 
@@ -1360,11 +1363,11 @@ GraphicsConsoleConOutSetAttribute (
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  EraseCursor (This);
+  FlushCursor (This);
 
   This->Mode->Attribute = (INT32) Attribute;
 
-  EraseCursor (This);
+  FlushCursor (This);
 
   gBS->RestoreTPL (OldTpl);
 
@@ -1441,7 +1444,7 @@ GraphicsConsoleConOutClearScreen (
   This->Mode->CursorColumn  = 0;
   This->Mode->CursorRow     = 0;
 
-  EraseCursor (This);
+  FlushCursor (This);
 
   gBS->RestoreTPL (OldTpl);
 
@@ -1498,12 +1501,12 @@ GraphicsConsoleConOutSetCursorPosition (
     goto Done;
   }
 
-  EraseCursor (This);
+  FlushCursor (This);
 
   This->Mode->CursorColumn  = (INT32) Column;
   This->Mode->CursorRow     = (INT32) Row;
 
-  EraseCursor (This);
+  FlushCursor (This);
 
 Done:
   gBS->RestoreTPL (OldTpl);
@@ -1535,11 +1538,11 @@ GraphicsConsoleConOutEnableCursor (
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  EraseCursor (This);
+  FlushCursor (This);
 
   This->Mode->CursorVisible = Visible;
 
-  EraseCursor (This);
+  FlushCursor (This);
 
   gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
@@ -1724,7 +1727,12 @@ DrawUnicodeWeightAtCursorN (
 }
 
 /**
-  Erase the cursor on the screen.
+  Flush the cursor on the screen.
+  
+  If CursorVisible is FALSE, nothing to do and return directly.
+  If CursorVisible is TRUE, 
+     i) If the cursor shows on screen, it will be erased.
+    ii) If the cursor does not show on screen, it will be shown. 
 
   @param  This                  Protocol instance pointer.
 
@@ -1732,7 +1740,7 @@ DrawUnicodeWeightAtCursorN (
 
 **/
 EFI_STATUS
-EraseCursor (
+FlushCursor (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This
   )
 {

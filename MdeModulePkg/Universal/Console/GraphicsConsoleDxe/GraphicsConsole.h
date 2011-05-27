@@ -561,7 +561,12 @@ DrawUnicodeWeightAtCursorN (
   );
 
 /**
-  Erase the cursor on the screen.
+  Flush the cursor on the screen.
+  
+  If CursorVisible is FALSE, nothing to do and return directly.
+  If CursorVisible is TRUE, 
+     i) If the cursor shows on screen, it will be erased.
+    ii) If the cursor does not show on screen, it will be shown. 
 
   @param  This                  Protocol instance pointer.
 
@@ -569,7 +574,7 @@ DrawUnicodeWeightAtCursorN (
 
 **/
 EFI_STATUS
-EraseCursor (
+FlushCursor (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This
   );
 
