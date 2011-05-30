@@ -1,7 +1,7 @@
 ## @file
 # OpenSSL Library implementation.
 # 
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -588,9 +588,9 @@
    MSFT:DEBUG_VS2003xASL_IA32_CC_FLAGS    == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /GX- /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
    MSFT:RELEASE_VS2003xASL_IA32_CC_FLAGS  == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /GX- -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
    MSFT:DEBUG_DDK3790_IA32_CC_FLAGS       == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
-   MSFT RELEASE_DDK3790_IA32_CC_FLAGS     == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT:RELEASE_DDK3790_IA32_CC_FLAGS     == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
    MSFT:DEBUG_DDK3790xASL_IA32_CC_FLAGS   == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
-   MSFT RELEASE_DDK3790xASL_IA32_CC_FLAGS == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
+   MSFT:RELEASE_DDK3790xASL_IA32_CC_FLAGS == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
    MSFT:DEBUG_*_IA32_CC_FLAGS             == /nologo /c /WX /GS- /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
    MSFT:RELEASE_*_IA32_CC_FLAGS           == /nologo /c /WX /GS- /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
    MSFT:DEBUG_*_X64_CC_FLAGS              == /nologo /c /WX /GS- /X /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w
@@ -602,4 +602,3 @@
    RVCT:DEBUG_*_*_CC_FLAGS                = $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) --library_interface=aeabi_clib99 --fpu=vfpv3
    RVCT:RELEASE_*_*_CC_FLAGS              = $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) --library_interface=aeabi_clib99 --fpu=vfpv3
 
-   

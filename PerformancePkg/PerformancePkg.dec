@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Build description file to generate Shell DP application and
 # Performance Libraries.
 #
@@ -11,7 +11,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-# **/
+##
 
 [Defines]
   PACKAGE_NAME                   = PerformancePkg

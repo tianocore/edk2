@@ -59,8 +59,6 @@
   TimerLib
   ReportStatusCodeLib
 
-[Guids]
-
 [Protocols]
   gEfiIdeControllerInitProtocolGuid             # BY_START
   gEfiAtaPassThruProtocolGuid                   # BY_START

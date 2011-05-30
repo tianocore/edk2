@@ -1,5 +1,5 @@
 ## @file
-# Module produce EFI_PEI_READ_ONLY_VARIABLE_PPI top of EFI_PEI_READ_ONLY_VARIABLE2_PPI .
+# Module produce EFI_PEI_READ_ONLY_VARIABLE2_PPI on top of EFI_PEI_READ_ONLY_VARIABLE_PPI .
 #
 # UEFI PI Spec supersedes Intel's Framework Specs. 
 # EFI_PEI_READ_ONLY_VARIABLE_PPI defined in Intel Framework Pkg is replaced by EFI_PEI_READ_ONLY_VARIABLE2_PPI
@@ -9,11 +9,10 @@
 # 1) Framework module produces EFI_PEI_READ_ONLY_VARIABLE_PPI is present.
 # 2) The platform has PI modules that consumes EFI_PEI_READ_ONLY_VARIABLE2_PPI.
 #
-# This module can't be used together with ReadOnlyVariableToReadOnlyVariable2Thunk module.
+# This module can't be used together with ReadOnlyVariableOnReadOnlyVariable2Thunk module.
 #
 #
-# PEIM to provide the Variable functionality.
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

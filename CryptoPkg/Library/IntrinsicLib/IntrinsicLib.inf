@@ -1,7 +1,7 @@
 ## @file
 #  Intrinsic Routines Wrapper Library Instance.
 #
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -59,9 +59,9 @@
    MSFT:DEBUG_VS2003xASL_IA32_CC_FLAGS    == /nologo /c /WX /W4 /Gs32768 /Gy /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF /GX- /Zi /Gm
    MSFT:RELEASE_VS2003xASL_IA32_CC_FLAGS  == /nologo /c /WX /W4 /Gs32768 /Gy /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF /GX-
    MSFT:DEBUG_DDK3790_IA32_CC_FLAGS       == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
-   MSFT RELEASE_DDK3790_IA32_CC_FLAGS     == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF
+   MSFT:RELEASE_DDK3790_IA32_CC_FLAGS     == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF
    MSFT:DEBUG_DDK3790xASL_IA32_CC_FLAGS   == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
-   MSFT RELEASE_DDK3790xASL_IA32_CC_FLAGS == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF
+   MSFT:RELEASE_DDK3790xASL_IA32_CC_FLAGS == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF
    MSFT:DEBUG_*_IA32_CC_FLAGS             == /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
    MSFT:RELEASE_*_IA32_CC_FLAGS           == /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF
    MSFT:DEBUG_*_X64_CC_FLAGS              == /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1b2s /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
