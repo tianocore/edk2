@@ -1,7 +1,7 @@
 /** @file
   UEFI Miscellaneous boot Services InstallConfigurationTable service
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -28,7 +28,7 @@ UINTN mSystemTableAllocateSize = 0;
                          update, or remove, may be NULL.
 
   @return EFI_SUCCESS               Guid, Table pair added, updated, or removed.
-  @return EFI_INVALID_PARAMETER     Input GUID not valid.
+  @return EFI_INVALID_PARAMETER     Input GUID is NULL.
   @return EFI_NOT_FOUND             Attempted to delete non-existant entry
   @return EFI_OUT_OF_RESOURCES      Not enough memory available
 
