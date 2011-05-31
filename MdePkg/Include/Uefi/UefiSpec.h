@@ -1492,7 +1492,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The (Guid, Table) pair was added, updated, or removed.
   @retval EFI_NOT_FOUND         An attempt was made to delete a nonexistent entry.
-  @retval EFI_INVALID_PARAMETER Guid is not valid.
+  @retval EFI_INVALID_PARAMETER Guid is NULL.
   @retval EFI_OUT_OF_RESOURCES  There is not enough memory available to complete the operation.
 
 **/
