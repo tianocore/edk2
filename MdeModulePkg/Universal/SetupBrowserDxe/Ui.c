@@ -340,8 +340,6 @@ RefreshForm (
   EFI_STATUS                      Status;
   UI_MENU_SELECTION               *Selection;
   FORM_BROWSER_STATEMENT          *Question;
-  EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
-  EFI_BROWSER_ACTION_REQUEST      ActionRequest;
 
   if (gMenuRefreshHead != NULL) {
 
@@ -394,36 +392,9 @@ RefreshForm (
       //
       // Question value may be changed, need invoke its Callback()
       //
-      ConfigAccess = Selection->FormSet->ConfigAccess;
-      if (((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) && (ConfigAccess != NULL)) {
-        ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-        Status = ConfigAccess->Callback (
-                                 ConfigAccess,
-                                 EFI_BROWSER_ACTION_CHANGING,
-                                 Question->QuestionId,
-                                 Question->HiiValue.Type,
-                                 &Question->HiiValue.Value,
-                                 &ActionRequest
-                                 );
-        if (!EFI_ERROR (Status)) {
-          switch (ActionRequest) {
-          case EFI_BROWSER_ACTION_REQUEST_RESET:
-            gResetRequired = TRUE;
-            break;
-
-          case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
-            SubmitForm (Selection->FormSet, Selection->Form);
-            break;
-
-          case EFI_BROWSER_ACTION_REQUEST_EXIT:
-            Selection->Action = UI_ACTION_EXIT;
-            gNvUpdateRequired = FALSE;
-            break;
-
-          default:
-            break;
-          }
-        }
+      Status = ProcessCallBackFunction(Selection, Question, EFI_BROWSER_ACTION_CHANGING, FALSE);
+      if (EFI_ERROR (Status)) {
+        return Status;
       }
 
       MenuRefreshEntry = MenuRefreshEntry->Next;
@@ -1004,6 +975,7 @@ CreateMultiStringPopUp (
 /**
   Update status bar on the bottom of menu.
 
+  @param  Selection              Current Selction info.
   @param  MessageType            The type of message to be shown.
   @param  Flags                  The flags in Question header.
   @param  State                  Set or clear.
@@ -1011,6 +983,7 @@ CreateMultiStringPopUp (
 **/
 VOID
 UpdateStatusBar (
+  IN  UI_MENU_SELECTION           *Selection,
   IN  UINTN                       MessageType,
   IN  UINT8                       Flags,
   IN  BOOLEAN                     State
@@ -1054,7 +1027,9 @@ UpdateStatusBar (
           );
         gResetRequired    = (BOOLEAN) (gResetRequired | ((Flags & EFI_IFR_FLAG_RESET_REQUIRED) == EFI_IFR_FLAG_RESET_REQUIRED));
 
-        gNvUpdateRequired = TRUE;
+        if (Selection != NULL) {
+          Selection->Form->NvUpdateRequired = TRUE;
+        }
       } else {
         gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextHighlightColor));
         for (Index = 0; Index < (GetStringWidth (NvUpdateMessage) - 2) / 2; Index++) {
@@ -1065,18 +1040,20 @@ UpdateStatusBar (
             );
         }
 
-        gNvUpdateRequired = FALSE;
+        if (Selection != NULL) {
+          Selection->Form->NvUpdateRequired = FALSE;
+        }
       }
     }
     break;
 
   case REFRESH_STATUS_BAR:
     if (mInputError) {
-      UpdateStatusBar (INPUT_ERROR, Flags, TRUE);
+      UpdateStatusBar (Selection, INPUT_ERROR, Flags, TRUE);
     }
 
-    if (gNvUpdateRequired) {
-      UpdateStatusBar (NV_UPDATE_REQUIRED, Flags, TRUE);
+    if (IsNvUpdateRequired(Selection->FormSet)) {
+      UpdateStatusBar (NULL, NV_UPDATE_REQUIRED, Flags, TRUE);
     }
     break;
 
@@ -1640,8 +1617,6 @@ UiDisplayMenu (
   CHAR16                          *OptionString;
   CHAR16                          *OutputString;
   CHAR16                          *FormattedString;
-  CHAR16                          YesResponse;
-  CHAR16                          NoResponse;
   BOOLEAN                         NewLine;
   BOOLEAN                         Repaint;
   BOOLEAN                         SavedValue;
@@ -1730,6 +1705,7 @@ UiDisplayMenu (
     CurrentMenu = UiAddMenuList (NULL, &Selection->FormSetGuid, Selection->FormId);
   }
   ASSERT (CurrentMenu != NULL);
+  Selection->CurrentMenu = CurrentMenu;
 
   if (Selection->QuestionId == 0) {
     //
@@ -1745,7 +1721,7 @@ UiDisplayMenu (
   NewPos = gMenuOption.ForwardLink;
 
   gST->ConOut->EnableCursor (gST->ConOut, FALSE);
-  UpdateStatusBar (REFRESH_STATUS_BAR, (UINT8) 0, TRUE);
+  UpdateStatusBar (Selection, REFRESH_STATUS_BAR, (UINT8) 0, TRUE);
 
   ControlFlag = CfInitialization;
   Selection->Action = UI_ACTION_NONE;
@@ -2697,84 +2673,10 @@ UiDisplayMenu (
       // We come here when someone press ESC
       //
       ControlFlag = CfCheckSelection;
-
-      if (CurrentMenu->Parent != NULL) {
-        //
-        // we have a parent, so go to the parent menu
-        //
-        if (CompareGuid (&CurrentMenu->FormSetGuid, &CurrentMenu->Parent->FormSetGuid)) {
-          //
-          // The parent menu and current menu are in the same formset
-          //
-          Selection->Action = UI_ACTION_REFRESH_FORM;
-        } else {
-          Selection->Action = UI_ACTION_REFRESH_FORMSET;
-        }
-        Selection->Statement = NULL;
-
-        Selection->FormId = CurrentMenu->Parent->FormId;
-        Selection->QuestionId = CurrentMenu->Parent->QuestionId;
-
-        //
-        // Clear highlight record for this menu
-        //
-        CurrentMenu->QuestionId = 0;
-        break;
-      }
-
-      if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) == FORMSET_CLASS_FRONT_PAGE) {
-        //
-        // We never exit FrontPage, so skip the ESC
-        //
-        Selection->Action = UI_ACTION_NONE;
-        break;
-      }
-
-      //
-      // We are going to leave current FormSet, so check uncommited data in this FormSet
-      //
-      if (gNvUpdateRequired) {
-        Status      = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-
-        YesResponse = gYesResponse[0];
-        NoResponse  = gNoResponse[0];
-
-        //
-        // If NV flag is up, prompt user
-        //
-        do {
-          CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gSaveChanges, gAreYouSure, gEmptyString);
-        } while
-        (
-          (Key.ScanCode != SCAN_ESC) &&
-          ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (NoResponse | UPPER_LOWER_CASE_OFFSET)) &&
-          ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (YesResponse | UPPER_LOWER_CASE_OFFSET))
-        );
-
-        if (Key.ScanCode == SCAN_ESC) {
-          //
-          // User hits the ESC key
-          //
-          Repaint = TRUE;
-          NewLine = TRUE;
-
-          Selection->Action = UI_ACTION_NONE;
-          break;
-        }
-
-        //
-        // If the user hits the YesResponse key
-        //
-        if ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) == (YesResponse | UPPER_LOWER_CASE_OFFSET)) {
-          Status = SubmitForm (Selection->FormSet, Selection->Form);
-        }
-      }
-
-      Selection->Action = UI_ACTION_EXIT;
-      Selection->Statement = NULL;
-      CurrentMenu->QuestionId = 0;
-
-      return EFI_SUCCESS;
+      if (FindNextMenu (Selection, &Repaint, &NewLine)) {
+        return EFI_SUCCESS;
+      } 
+      break;
 
     case CfUiLeft:
       ControlFlag = CfCheckSelection;
@@ -2869,7 +2771,7 @@ UiDisplayMenu (
         AdjustDateAndTimePosition (TRUE, &TopOfScreen);
         AdjustDateAndTimePosition (TRUE, &NewPos);
         MenuOption = MENU_OPTION_FROM_LINK (SavedListEntry);
-        UpdateStatusBar (INPUT_ERROR, MenuOption->ThisTag->QuestionFlags, FALSE);
+        UpdateStatusBar (Selection, INPUT_ERROR, MenuOption->ThisTag->QuestionFlags, FALSE);
       } else {
         //
         // Scroll up to the last page.
@@ -3166,7 +3068,7 @@ UiDisplayMenu (
 
         MenuOption = MENU_OPTION_FROM_LINK (SavedListEntry);
 
-        UpdateStatusBar (INPUT_ERROR, MenuOption->ThisTag->QuestionFlags, FALSE);
+        UpdateStatusBar (Selection, INPUT_ERROR, MenuOption->ThisTag->QuestionFlags, FALSE);
 
       } else {
         //
@@ -3197,12 +3099,12 @@ UiDisplayMenu (
       //
       // Submit the form
       //
-      Status = SubmitForm (Selection->FormSet, Selection->Form);
+      Status = SubmitForm (Selection->FormSet, Selection->Form, FALSE);
 
       if (!EFI_ERROR (Status)) {
         ASSERT(MenuOption != NULL);
-        UpdateStatusBar (INPUT_ERROR, MenuOption->ThisTag->QuestionFlags, FALSE);
-        UpdateStatusBar (NV_UPDATE_REQUIRED, MenuOption->ThisTag->QuestionFlags, FALSE);
+        UpdateStatusBar (Selection, INPUT_ERROR, MenuOption->ThisTag->QuestionFlags, FALSE);
+        UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, MenuOption->ThisTag->QuestionFlags, FALSE);
       } else {
         do {
           CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gSaveFailed, gPressEnter, gEmptyString);
@@ -3231,7 +3133,7 @@ UiDisplayMenu (
         //
         // Show NV update flag on status bar
         //
-        gNvUpdateRequired = TRUE;
+        UpdateNvInfoInForm(Selection->FormSet, TRUE);
         gResetRequired = TRUE;
       }
       break;

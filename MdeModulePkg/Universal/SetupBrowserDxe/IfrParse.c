@@ -1,7 +1,7 @@
 /** @file
 Parser for IFR binary encoding.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -357,6 +357,7 @@ InitializeConfigHdr (
 
   @param  FormSet                Pointer of the current FormSet.
   @param  Question               The Question to be initialized.
+  @param  Form                   Pointer of the current form.
 
   @retval EFI_SUCCESS            Function success.
   @retval EFI_INVALID_PARAMETER  No storage associated with the Question.
@@ -365,7 +366,8 @@ InitializeConfigHdr (
 EFI_STATUS
 InitializeRequestElement (
   IN OUT FORM_BROWSER_FORMSET     *FormSet,
-  IN OUT FORM_BROWSER_STATEMENT   *Question
+  IN OUT FORM_BROWSER_STATEMENT   *Question,
+  IN OUT FORM_BROWSER_FORM        *Form
   )
 {
   FORMSET_STORAGE  *Storage;
@@ -373,6 +375,9 @@ InitializeRequestElement (
   UINTN            StringSize;
   CHAR16           *NewStr;
   CHAR16           RequestElement[30];
+  LIST_ENTRY       *Link;
+  BOOLEAN          Find;
+  FORM_BROWSER_CONFIG_REQUEST  *ConfigInfo;
 
   Storage = Question->Storage;
   if (Storage == NULL) {
@@ -433,6 +438,53 @@ InitializeRequestElement (
   Storage->ElementCount++;
   Storage->SpareStrLen -= StrLen;
 
+  //
+  // Update the Config Request info saved in the form.
+  //
+  ConfigInfo = NULL;
+  Find       = FALSE;
+  Link = GetFirstNode (&Form->ConfigRequestHead);
+  while (!IsNull (&Form->ConfigRequestHead, Link)) {
+    ConfigInfo = FORM_BROWSER_CONFIG_REQUEST_FROM_LINK (Link);
+
+    if (ConfigInfo != NULL && ConfigInfo->Storage->VarStoreId == Storage->VarStoreId) {
+      Find = TRUE;
+      break;
+    }
+
+    Link = GetNextNode (&Form->ConfigRequestHead, Link);
+  }
+
+  if (!Find) {
+    ConfigInfo = AllocateZeroPool(sizeof (FORM_BROWSER_CONFIG_REQUEST));
+    ConfigInfo->Signature     = FORM_BROWSER_CONFIG_REQUEST_SIGNATURE;
+    ConfigInfo->ConfigRequest = AllocateCopyPool (StrSize (Storage->ConfigHdr), Storage->ConfigHdr);
+    ConfigInfo->SpareStrLen   = 0;
+    ConfigInfo->Storage       = Storage;
+    InsertTailList(&Form->ConfigRequestHead, &ConfigInfo->Link);
+  }
+
+  //
+  // Append <RequestElement> to <ConfigRequest>
+  //
+  if (StrLen > ConfigInfo->SpareStrLen) {
+    //
+    // Old String buffer is not sufficient for RequestElement, allocate a new one
+    //
+    StringSize = (ConfigInfo->ConfigRequest != NULL) ? StrSize (ConfigInfo->ConfigRequest) : sizeof (CHAR16);
+    NewStr = AllocateZeroPool (StringSize + CONFIG_REQUEST_STRING_INCREMENTAL * sizeof (CHAR16));
+    ASSERT (NewStr != NULL);
+    if (ConfigInfo->ConfigRequest != NULL) {
+      CopyMem (NewStr, ConfigInfo->ConfigRequest, StringSize);
+      FreePool (ConfigInfo->ConfigRequest);
+    }
+    ConfigInfo->ConfigRequest = NewStr;
+    ConfigInfo->SpareStrLen   = CONFIG_REQUEST_STRING_INCREMENTAL;
+  }
+
+  StrCat (ConfigInfo->ConfigRequest, RequestElement);
+  ConfigInfo->ElementCount++;
+  ConfigInfo->SpareStrLen -= StrLen;
   return EFI_SUCCESS;
 }
 
@@ -632,6 +684,7 @@ DestroyForm (
   LIST_ENTRY              *Link;
   FORM_EXPRESSION         *Expression;
   FORM_BROWSER_STATEMENT  *Statement;
+  FORM_BROWSER_CONFIG_REQUEST  *ConfigInfo;
 
   //
   // Free Form Expressions
@@ -653,6 +706,18 @@ DestroyForm (
     RemoveEntryList (&Statement->Link);
 
     DestroyStatement (FormSet, Statement);
+  }
+
+  //
+  // Free ConfigRequest string.
+  //
+  while (!IsListEmpty (&Form->ConfigRequestHead)) {
+    Link = GetFirstNode (&Form->ConfigRequestHead);
+    ConfigInfo = FORM_BROWSER_CONFIG_REQUEST_FROM_LINK (Link);
+    RemoveEntryList (&ConfigInfo->Link);
+
+    FreePool (ConfigInfo->ConfigRequest);
+    FreePool (ConfigInfo);
   }
 
   //
@@ -1273,8 +1338,10 @@ ParseOpCodes (
       CurrentForm->Signature = FORM_BROWSER_FORM_SIGNATURE;
       InitializeListHead (&CurrentForm->ExpressionListHead);
       InitializeListHead (&CurrentForm->StatementListHead);
+      InitializeListHead (&CurrentForm->ConfigRequestHead);
 
       CurrentForm->FormType = STANDARD_MAP_FORM_TYPE;
+      CurrentForm->NvUpdateRequired = FALSE;
       CopyMem (&CurrentForm->FormId,    &((EFI_IFR_FORM *) OpCodeData)->FormId,    sizeof (UINT16));
       CopyMem (&CurrentForm->FormTitle, &((EFI_IFR_FORM *) OpCodeData)->FormTitle, sizeof (EFI_STRING_ID));
 
@@ -1305,8 +1372,10 @@ ParseOpCodes (
       CurrentForm = AllocateZeroPool (sizeof (FORM_BROWSER_FORM));
       ASSERT (CurrentForm != NULL);
       CurrentForm->Signature = FORM_BROWSER_FORM_SIGNATURE;
+      CurrentForm->NvUpdateRequired = FALSE;
       InitializeListHead (&CurrentForm->ExpressionListHead);
       InitializeListHead (&CurrentForm->StatementListHead);
+      InitializeListHead (&CurrentForm->ConfigRequestHead);
       CopyMem (&CurrentForm->FormId, &((EFI_IFR_FORM *) OpCodeData)->FormId, sizeof (UINT16));
 
       MapMethod = (EFI_IFR_FORM_MAP_METHOD *) (OpCodeData + sizeof (EFI_IFR_FORM_MAP));
@@ -1538,7 +1607,7 @@ ParseOpCodes (
         break;
       }
 
-      InitializeRequestElement (FormSet, CurrentStatement);
+      InitializeRequestElement (FormSet, CurrentStatement, CurrentForm);
 
       if ((Operand == EFI_IFR_ONE_OF_OP) && Scope != 0) {
         SuppressForOption = TRUE;
@@ -1568,7 +1637,7 @@ ParseOpCodes (
       CurrentStatement->StorageWidth = (UINT16) sizeof (BOOLEAN);
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_BOOLEAN;
 
-      InitializeRequestElement (FormSet, CurrentStatement);
+      InitializeRequestElement (FormSet, CurrentStatement, CurrentForm);
 
       break;
 
@@ -1589,7 +1658,7 @@ ParseOpCodes (
       CurrentStatement->BufferValue = AllocateZeroPool (CurrentStatement->StorageWidth + sizeof (CHAR16));
       CurrentStatement->HiiValue.Value.string = NewString ((CHAR16*) CurrentStatement->BufferValue, FormSet->HiiHandle);
 
-      InitializeRequestElement (FormSet, CurrentStatement);
+      InitializeRequestElement (FormSet, CurrentStatement, CurrentForm);
       break;
 
     case EFI_IFR_PASSWORD_OP:
@@ -1608,7 +1677,7 @@ ParseOpCodes (
       CurrentStatement->BufferValue = AllocateZeroPool ((CurrentStatement->StorageWidth + sizeof (CHAR16)));
       CurrentStatement->HiiValue.Value.string = NewString ((CHAR16*) CurrentStatement->BufferValue, FormSet->HiiHandle);
 
-      InitializeRequestElement (FormSet, CurrentStatement);
+      InitializeRequestElement (FormSet, CurrentStatement, CurrentForm);
       break;
 
     case EFI_IFR_DATE_OP:
@@ -1621,7 +1690,7 @@ ParseOpCodes (
       if ((CurrentStatement->Flags & EFI_QF_DATE_STORAGE) == QF_DATE_STORAGE_NORMAL) {
         CurrentStatement->StorageWidth = (UINT16) sizeof (EFI_HII_DATE);
 
-        InitializeRequestElement (FormSet, CurrentStatement);
+        InitializeRequestElement (FormSet, CurrentStatement, CurrentForm);
       } else {
         //
         // Don't assign storage for RTC type of date/time
@@ -1641,7 +1710,7 @@ ParseOpCodes (
       if ((CurrentStatement->Flags & QF_TIME_STORAGE) == QF_TIME_STORAGE_NORMAL) {
         CurrentStatement->StorageWidth = (UINT16) sizeof (EFI_HII_TIME);
 
-        InitializeRequestElement (FormSet, CurrentStatement);
+        InitializeRequestElement (FormSet, CurrentStatement, CurrentForm);
       } else {
         //
         // Don't assign storage for RTC type of date/time
@@ -1740,7 +1809,7 @@ ParseOpCodes (
         CurrentStatement->BufferValue = AllocateZeroPool (CurrentStatement->StorageWidth);
         CurrentStatement->ValueType = CurrentOption->Value.Type;
 
-        InitializeRequestElement (FormSet, CurrentStatement);
+        InitializeRequestElement (FormSet, CurrentStatement, CurrentForm);
       }
       break;
 

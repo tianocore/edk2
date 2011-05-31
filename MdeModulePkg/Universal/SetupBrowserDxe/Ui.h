@@ -1,7 +1,7 @@
 /** @file
 Private structure, MACRO and function definitions for User Interface related functionalities.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -76,6 +76,8 @@ typedef enum {
 #define UI_ACTION_REFRESH_FORMSET    2
 #define UI_ACTION_EXIT               3
 
+typedef struct _UI_MENU_LIST UI_MENU_LIST;
+
 typedef struct {
   EFI_HII_HANDLE  Handle;
 
@@ -111,6 +113,8 @@ typedef struct {
   // Whether the Form is editable
   //
   BOOLEAN                 FormEditable;
+
+  UI_MENU_LIST            *CurrentMenu;
 } UI_MENU_SELECTION;
 
 #define UI_MENU_OPTION_SIGNATURE  SIGNATURE_32 ('u', 'i', 'm', 'm')
@@ -151,8 +155,6 @@ typedef struct {
 } UI_MENU_OPTION;
 
 #define MENU_OPTION_FROM_LINK(a)  CR (a, UI_MENU_OPTION, Link, UI_MENU_OPTION_SIGNATURE)
-
-typedef struct _UI_MENU_LIST UI_MENU_LIST;
 
 struct _UI_MENU_LIST {
   UINTN           Signature;
@@ -449,6 +451,7 @@ GetNumericInput (
 /**
   Update status bar on the bottom of menu.
 
+  @param  Selection              Current selection info.
   @param  MessageType            The type of message to be shown.
   @param  Flags                  The flags in Question header.
   @param  State                  Set or clear.
@@ -456,6 +459,7 @@ GetNumericInput (
 **/
 VOID
 UpdateStatusBar (
+  IN  UI_MENU_SELECTION           *Selection,
   IN  UINTN                       MessageType,
   IN  UINT8                       Flags,
   IN  BOOLEAN                     State

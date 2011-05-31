@@ -482,7 +482,7 @@ ProcessOptions (
           SetArrayData (ValueArray, ValueType, Index2, 0);
 
           Status = SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
-          UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
+          UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
 
           FreePool (*OptionString);
           *OptionString = NULL;
@@ -550,7 +550,7 @@ ProcessOptions (
               !Option->SuppressExpression->Result.Value.b) {
             CopyMem (QuestionValue, &Option->Value, sizeof (EFI_HII_VALUE));
             SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
-            UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
+            UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
             break;
           }
 
@@ -586,7 +586,7 @@ ProcessOptions (
             Suppress = FALSE;
             CopyMem (QuestionValue, &OneOfOption->Value, sizeof (EFI_HII_VALUE));
             SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
-            UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
+            UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
             gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND);
             break;
           }
@@ -638,7 +638,7 @@ ProcessOptions (
       // Save Question value
       //
       Status = SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
-      UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
+      UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
     }
 
     if (QuestionValue->Value.b) {
@@ -751,7 +751,7 @@ ProcessOptions (
           CopyMem (Question->BufferValue, StringPtr, Maximum * sizeof (CHAR16));
           SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
 
-          UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
+          UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
         }
       }
 

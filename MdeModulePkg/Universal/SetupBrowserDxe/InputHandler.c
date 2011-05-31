@@ -637,7 +637,7 @@ EnterCarriageReturn:
           //
           // NV flag is unnecessary for RTC type of Date/Time
           //
-          UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
+          UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
         }
       }
 
@@ -653,7 +653,7 @@ EnterCarriageReturn:
         // Remove a character
         //
         EditValue = PreviousNumber[Count - 1];
-        UpdateStatusBar (INPUT_ERROR, Question->QuestionFlags, FALSE);
+        UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, FALSE);
         Count--;
         Column--;
         PrintAt (Column, Row, L" ");
@@ -670,12 +670,12 @@ EnterCarriageReturn:
           } else if ((Key.UnicodeChar >= L'a') && (Key.UnicodeChar <= L'f')) {
             Digital = (UINT8) (Key.UnicodeChar - L'a' + 0x0A);
           } else {
-            UpdateStatusBar (INPUT_ERROR, Question->QuestionFlags, TRUE);
+            UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, TRUE);
             break;
           }
         } else {
           if (Key.UnicodeChar > L'9' || Key.UnicodeChar < L'0') {
-            UpdateStatusBar (INPUT_ERROR, Question->QuestionFlags, TRUE);
+            UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, TRUE);
             break;
           }
         }
@@ -704,12 +704,12 @@ EnterCarriageReturn:
         }
 
         if (EditValue > Maximum) {
-          UpdateStatusBar (INPUT_ERROR, Question->QuestionFlags, TRUE);
+          UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, TRUE);
           ASSERT (Count < sizeof (PreviousNumber) / sizeof (PreviousNumber[0]));
           EditValue = PreviousNumber[Count];
           break;
         } else {
-          UpdateStatusBar (INPUT_ERROR, Question->QuestionFlags, FALSE);
+          UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, FALSE);
         }
 
         Count++;
@@ -1183,7 +1183,7 @@ TheKey:
         GetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
       } else {
         SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
-        UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
+        UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
       }
 
       return Status;

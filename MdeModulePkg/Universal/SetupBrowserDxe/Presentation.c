@@ -848,6 +848,327 @@ FormUpdateNotify (
 }
 
 /**
+  check whether the formset need to update the NV.
+
+  @param  FormSet                FormSet data structure.
+
+  @retval TRUE                   Need to update the NV.
+  @retval FALSE                  No need to update the NV.
+**/
+BOOLEAN 
+IsNvUpdateRequired (
+  IN FORM_BROWSER_FORMSET  *FormSet
+  )
+{
+  LIST_ENTRY              *Link;
+  FORM_BROWSER_FORM       *Form;
+
+  Link = GetFirstNode (&FormSet->FormListHead);
+  while (!IsNull (&FormSet->FormListHead, Link)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+
+    if (Form->NvUpdateRequired ) {
+      return TRUE;
+    }
+
+    Link = GetNextNode (&FormSet->FormListHead, Link);
+  }
+
+  return FALSE;
+}
+
+/**
+  check whether the formset need to update the NV.
+
+  @param  FormSet                FormSet data structure.
+  @param  SetValue               Whether set new value or clear old value.
+
+**/
+VOID
+UpdateNvInfoInForm (
+  IN FORM_BROWSER_FORMSET  *FormSet,
+  IN BOOLEAN               SetValue
+  )
+{
+  LIST_ENTRY              *Link;
+  FORM_BROWSER_FORM       *Form;
+  
+  Link = GetFirstNode (&FormSet->FormListHead);
+  while (!IsNull (&FormSet->FormListHead, Link)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+
+    Form->NvUpdateRequired = SetValue;
+
+    Link = GetNextNode (&FormSet->FormListHead, Link);
+  }
+}
+/**
+  Find menu which will show next time.
+
+  @param Selection       On input, Selection tell setup browser the information
+                         about the Selection, form and formset to be displayed.
+                         On output, Selection return the screen item that is selected
+                         by user.
+  @param Repaint         Whether need to repaint the menu.
+  @param NewLine         Whether need to show at new line.
+  
+  @retval TRUE           Need return.
+  @retval FALSE          No need to return.
+**/
+BOOLEAN
+FindNextMenu (
+  IN OUT UI_MENU_SELECTION    *Selection,
+  IN     BOOLEAN              *Repaint, 
+  IN     BOOLEAN              *NewLine  
+  )
+{
+  UI_MENU_LIST            *CurrentMenu;
+  CHAR16                  YesResponse;
+  CHAR16                  NoResponse;
+  EFI_INPUT_KEY           Key;
+  EFI_STATUS              Status;
+  
+  CurrentMenu = Selection->CurrentMenu;
+
+  if (CurrentMenu != NULL && CurrentMenu->Parent != NULL) {
+    //
+    // we have a parent, so go to the parent menu
+    //
+    if (CompareGuid (&CurrentMenu->FormSetGuid, &CurrentMenu->Parent->FormSetGuid)) {
+      //
+      // The parent menu and current menu are in the same formset
+      //
+      Selection->Action = UI_ACTION_REFRESH_FORM;
+    } else {
+      Selection->Action = UI_ACTION_REFRESH_FORMSET;
+    }
+    Selection->Statement = NULL;
+
+    Selection->FormId = CurrentMenu->Parent->FormId;
+    Selection->QuestionId = CurrentMenu->Parent->QuestionId;
+
+    //
+    // Clear highlight record for this menu
+    //
+    CurrentMenu->QuestionId = 0;
+    return FALSE;
+  }
+
+  if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) == FORMSET_CLASS_FRONT_PAGE) {
+    //
+    // We never exit FrontPage, so skip the ESC
+    //
+    Selection->Action = UI_ACTION_NONE;
+    return FALSE;
+  }
+
+  //
+  // We are going to leave current FormSet, so check uncommited data in this FormSet
+  //
+  if (IsNvUpdateRequired(Selection->FormSet)) {
+    Status      = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+
+    YesResponse = gYesResponse[0];
+    NoResponse  = gNoResponse[0];
+
+    //
+    // If NV flag is up, prompt user
+    //
+    do {
+      CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gSaveChanges, gAreYouSure, gEmptyString);
+    } while
+    (
+      (Key.ScanCode != SCAN_ESC) &&
+      ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (NoResponse | UPPER_LOWER_CASE_OFFSET)) &&
+      ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (YesResponse | UPPER_LOWER_CASE_OFFSET))
+    );
+
+    if (Key.ScanCode == SCAN_ESC) {
+      //
+      // User hits the ESC key
+      //
+      if (Repaint != NULL) {
+        *Repaint = TRUE;
+      }
+
+      if (NewLine != NULL) {
+        *NewLine = TRUE;
+      }
+
+      Selection->Action = UI_ACTION_NONE;
+      return FALSE;
+    }
+
+    //
+    // If the user hits the YesResponse key
+    //
+    if ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) == (YesResponse | UPPER_LOWER_CASE_OFFSET)) {
+      Status = SubmitForm (Selection->FormSet, Selection->Form, FALSE);
+    }
+  }
+
+  Selection->Statement = NULL;
+  CurrentMenu->QuestionId = 0;  
+
+  Selection->Action = UI_ACTION_EXIT;
+  return TRUE;
+}
+
+/**
+  Call the call back function for the question and process the return action.
+
+  @param Selection             On input, Selection tell setup browser the information
+                               about the Selection, form and formset to be displayed.
+                               On output, Selection return the screen item that is selected
+                               by user.
+  @param Question              The Question which need to call.
+  @param Action                The action request.
+  @param SkipSaveOrDiscard     Whether skip save or discard action.
+
+  @retval EFI_SUCCESS          The call back function excutes successfully.
+  @return Other value if the call back function failed to excute.  
+**/
+EFI_STATUS 
+ProcessCallBackFunction (
+  IN OUT UI_MENU_SELECTION               *Selection,
+  IN     FORM_BROWSER_STATEMENT          *Question,
+  IN     EFI_BROWSER_ACTION              Action,
+  IN     BOOLEAN                         SkipSaveOrDiscard
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_BROWSER_ACTION_REQUEST      ActionRequest;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
+  EFI_HII_VALUE                   *HiiValue;
+  EFI_IFR_TYPE_VALUE              *TypeValue;
+  FORM_BROWSER_STATEMENT          *Statement;
+  BOOLEAN                         SubmitFormIsRequired;
+  BOOLEAN                         SingleForm;
+  BOOLEAN                         DiscardFormIsRequired;
+  BOOLEAN                         NeedExit;
+  LIST_ENTRY                      *Link;
+
+  ConfigAccess = Selection->FormSet->ConfigAccess;
+  SubmitFormIsRequired  = FALSE;
+  SingleForm            = FALSE;
+  DiscardFormIsRequired = FALSE;
+  NeedExit              = FALSE;
+  Status                = EFI_SUCCESS;
+  ActionRequest         = EFI_BROWSER_ACTION_REQUEST_NONE;
+
+  if (ConfigAccess == NULL) {
+    return EFI_SUCCESS;
+  }
+
+  Link = GetFirstNode (&Selection->Form->StatementListHead);
+  while (!IsNull (&Selection->Form->StatementListHead, Link)) {
+    Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
+    Link = GetNextNode (&Selection->Form->StatementListHead, Link);
+
+    //
+    // if Question != NULL, only process the question. Else, process all question in this form.
+    //
+    if ((Question != NULL) && (Statement != Question)) {
+      continue;
+    }
+    
+    if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != EFI_IFR_FLAG_CALLBACK) {
+      continue;
+    }
+
+    //
+    // Check whether Statement is disabled.
+    //
+    if (Statement->DisableExpression != NULL) {
+      Status = EvaluateExpression (Selection->FormSet, Selection->Form, Statement->DisableExpression);
+      if (!EFI_ERROR (Status) && 
+          (Statement->DisableExpression->Result.Type == EFI_IFR_TYPE_BOOLEAN) && 
+          (Statement->DisableExpression->Result.Value.b)) {
+        continue;
+      }
+    }
+
+    HiiValue = &Statement->HiiValue;
+    TypeValue = &HiiValue->Value;
+    if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
+      //
+      // For OrderedList, passing in the value buffer to Callback()
+      //
+      TypeValue = (EFI_IFR_TYPE_VALUE *) Statement->BufferValue;
+    }
+      
+    ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+    Status = ConfigAccess->Callback (
+                             ConfigAccess,
+                             Action,
+                             Statement->QuestionId,
+                             HiiValue->Type,
+                             TypeValue,
+                             &ActionRequest
+                             );
+    if (!EFI_ERROR (Status)) {
+      switch (ActionRequest) {
+      case EFI_BROWSER_ACTION_REQUEST_RESET:
+        gResetRequired = TRUE;
+        break;
+
+      case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
+        SubmitFormIsRequired = TRUE;
+        break;
+
+      case EFI_BROWSER_ACTION_REQUEST_EXIT:
+        Selection->Action = UI_ACTION_EXIT;
+        break;
+
+      case EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT:
+        SubmitFormIsRequired  = TRUE;
+        SingleForm            = TRUE;
+        NeedExit              = TRUE;
+        break;
+
+      case EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT:
+        DiscardFormIsRequired = TRUE;
+        SingleForm            = TRUE;      
+        NeedExit              = TRUE;
+        break;
+
+      case EFI_BROWSER_ACTION_REQUEST_FORM_APPLY:
+        SubmitFormIsRequired  = TRUE;
+        SingleForm            = TRUE;
+        break;
+
+      case EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD:
+        DiscardFormIsRequired = TRUE;
+        SingleForm            = TRUE;
+        break;
+
+      default:
+        break;
+      }
+    } else if (Status == EFI_UNSUPPORTED) {
+      //
+      // If return EFI_UNSUPPORTED, also consider Hii driver suceess deal with it.
+      //
+      Status = EFI_SUCCESS;
+    }
+  }
+
+  if (SubmitFormIsRequired && !SkipSaveOrDiscard) {
+    SubmitForm (Selection->FormSet, Selection->Form, SingleForm);
+  }
+
+  if (DiscardFormIsRequired && !SkipSaveOrDiscard) {
+    DiscardForm (Selection->FormSet, Selection->Form, SingleForm);
+  }
+
+  if (NeedExit) {
+    FindNextMenu (Selection, NULL, NULL);
+  }
+
+  return Status;
+}
+
+/**
   The worker function that send the displays to the screen. On output,
   the selection made by user is returned.
 
@@ -867,15 +1188,11 @@ SetupBrowser (
 {
   EFI_STATUS                      Status;
   LIST_ENTRY                      *Link;
-  EFI_BROWSER_ACTION_REQUEST      ActionRequest;
   EFI_HANDLE                      NotifyHandle;
-  EFI_HII_VALUE                   *HiiValue;
-  EFI_IFR_TYPE_VALUE              *TypeValue;
   FORM_BROWSER_STATEMENT          *Statement;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
   FORM_BROWSER_FORMSET            *FormSet;
   EFI_INPUT_KEY                   Key;
-  BOOLEAN                         SubmitFormIsRequired;
 
   gMenuRefreshHead = NULL;
   gResetRequired = FALSE;
@@ -974,69 +1291,11 @@ SetupBrowser (
       CopyGuid (&mCurrentFormSetGuid, &Selection->FormSetGuid);
       mCurrentFormId      = Selection->FormId;
 
-      //
-      // Go through each statement in this form
-      //
-      SubmitFormIsRequired = FALSE;
-      Link = GetFirstNode (&Selection->Form->StatementListHead);
-      while (!IsNull (&Selection->Form->StatementListHead, Link)) {
-        Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
-        Link = GetNextNode (&Selection->Form->StatementListHead, Link);
-        
-        if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != EFI_IFR_FLAG_CALLBACK) {
-          continue;
-        }
-
-        //
-        // Check whether Statement is disabled.
-        //
-        if (Statement->DisableExpression != NULL) {
-          Status = EvaluateExpression (Selection->FormSet, Selection->Form, Statement->DisableExpression);
-          if (!EFI_ERROR (Status) && 
-              (Statement->DisableExpression->Result.Type == EFI_IFR_TYPE_BOOLEAN) && 
-              (Statement->DisableExpression->Result.Value.b)) {
-            continue;
-          }
-        }
-
-        ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-        Status = ConfigAccess->Callback (
-                                 ConfigAccess,
-                                 EFI_BROWSER_ACTION_FORM_OPEN,
-                                 Statement->QuestionId,
-                                 EFI_IFR_TYPE_UNDEFINED,
-                                 NULL,
-                                 &ActionRequest
-                                 );
-
-        if (!EFI_ERROR (Status)) {
-          switch (ActionRequest) {
-          case EFI_BROWSER_ACTION_REQUEST_RESET:
-            gResetRequired = TRUE;
-            break;
-
-          case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
-            SubmitFormIsRequired = TRUE;
-            break;
-
-          case EFI_BROWSER_ACTION_REQUEST_EXIT:
-            Selection->Action = UI_ACTION_EXIT;
-            gNvUpdateRequired = FALSE;
-            break;
-
-          default:
-            break;
-          }
-        } else if (Status == EFI_UNSUPPORTED) {
-          //
-          // If return EFI_UNSUPPORTED, also consider Hii driver suceess deal with it.
-          //
-          Status = EFI_SUCCESS;
-        }
+      Status = ProcessCallBackFunction (Selection, NULL, EFI_BROWSER_ACTION_FORM_OPEN, FALSE);
+      if (EFI_ERROR (Status)) {
+        goto Done;
       }
-      if (SubmitFormIsRequired) {
-        SubmitForm (Selection->FormSet, Selection->Form);
-      }
+
       //
       // EXIT requests to close form.
       //
@@ -1107,45 +1366,8 @@ SetupBrowser (
           ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK) && 
           (Statement->Operand != EFI_IFR_PASSWORD_OP)) {
 
-        ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-
-        HiiValue = &Statement->HiiValue;
-        TypeValue = &HiiValue->Value;
-        if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
-          //
-          // For OrderedList, passing in the value buffer to Callback()
-          //
-          TypeValue = (EFI_IFR_TYPE_VALUE *) Statement->BufferValue;
-        }
-
-        Status = ConfigAccess->Callback (
-                                 ConfigAccess,
-                                 EFI_BROWSER_ACTION_CHANGING,
-                                 Statement->QuestionId,
-                                 HiiValue->Type,
-                                 TypeValue,
-                                 &ActionRequest
-                                 );
-
-        if (!EFI_ERROR (Status)) {
-          switch (ActionRequest) {
-          case EFI_BROWSER_ACTION_REQUEST_RESET:
-            gResetRequired = TRUE;
-            break;
-
-          case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
-            SubmitForm (Selection->FormSet, Selection->Form);
-            break;
-
-          case EFI_BROWSER_ACTION_REQUEST_EXIT:
-            Selection->Action = UI_ACTION_EXIT;
-            gNvUpdateRequired = FALSE;
-            break;
-
-          default:
-            break;
-          }
-        } else if (Status != EFI_UNSUPPORTED) {
+        Status = ProcessCallBackFunction(Selection, Statement, EFI_BROWSER_ACTION_CHANGING, FALSE);         
+        if ((EFI_ERROR (Status)) && (Status != EFI_UNSUPPORTED)) {
           //
           // Callback return error status other than EFI_UNSUPPORTED
           //
@@ -1156,11 +1378,6 @@ SetupBrowser (
             Selection->FormId = Selection->Form->FormId;
             Selection->QuestionId = 0;
           }
-        } else {
-          //
-          // If return EFI_UNSUPPORTED, also consider Hii driver suceess deal with it.
-          //
-          Status = EFI_SUCCESS;
         }
       }
 
@@ -1185,56 +1402,10 @@ SetupBrowser (
          (Selection->Handle != mCurrentHiiHandle) ||
          (!CompareGuid (&Selection->FormSetGuid, &mCurrentFormSetGuid)) ||
          (Selection->FormId != mCurrentFormId))) {
-      //
-      // Go through each statement in this form
-      //
-      SubmitFormIsRequired = FALSE;
-      Link = GetFirstNode (&Selection->Form->StatementListHead);
-      while (!IsNull (&Selection->Form->StatementListHead, Link)) {
-        Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
-        Link = GetNextNode (&Selection->Form->StatementListHead, Link);
-        
-        if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != EFI_IFR_FLAG_CALLBACK) {
-          continue;
-        }
 
-        ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-        Status = ConfigAccess->Callback (
-                                 ConfigAccess,
-                                 EFI_BROWSER_ACTION_FORM_CLOSE,
-                                 Statement->QuestionId,
-                                 EFI_IFR_TYPE_UNDEFINED,
-                                 NULL,
-                                 &ActionRequest
-                                 );
-
-        if (!EFI_ERROR (Status)) {
-          switch (ActionRequest) {
-          case EFI_BROWSER_ACTION_REQUEST_RESET:
-            gResetRequired = TRUE;
-            break;
-
-          case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
-            SubmitFormIsRequired = TRUE;
-            break;
-
-          case EFI_BROWSER_ACTION_REQUEST_EXIT:
-            Selection->Action = UI_ACTION_EXIT;
-            gNvUpdateRequired = FALSE;
-            break;
-
-          default:
-            break;
-          }
-        } else if (Status == EFI_UNSUPPORTED) {
-          //
-          // If return EFI_UNSUPPORTED, also consider Hii driver suceess deal with it.
-          //
-          Status = EFI_SUCCESS;
-        }
-      }
-      if (SubmitFormIsRequired) {
-        SubmitForm (Selection->FormSet, Selection->Form);
+      Status = ProcessCallBackFunction (Selection, NULL, EFI_BROWSER_ACTION_FORM_CLOSE, FALSE);
+      if (EFI_ERROR (Status)) {
+        goto Done;
       }
     }
   } while (Selection->Action == UI_ACTION_REFRESH_FORM);

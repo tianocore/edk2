@@ -2,7 +2,7 @@
 This is an example of how a driver might export data to the HII protocol to be
 later utilized by the Setup Protocol
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -587,7 +587,7 @@ AppendAltCfgString (
     StringPtr += StrLen (L"&VALUE=");
 
     //
-    // Get Width
+    // Get Value
     //
     Status = GetValueOfNumber (StringPtr, &TmpBuffer, &Length);
     if (EFI_ERROR (Status)) {
@@ -1499,6 +1499,34 @@ DriverCallback (
       // User press "Save now", request Browser to save the uncommitted data.
       //
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      break;
+
+    case 0x1241:
+      //
+      // User press "Submit current form and Exit now", request Browser to submit current form and exit
+      //
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
+      break;
+
+    case 0x1242:
+      //
+      // User press "Discard current form now", request Browser to discard the uncommitted data.
+      //
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD;
+      break;
+
+    case 0x1243:
+      //
+      // User press "Submit current form now", request Browser to save the uncommitted data.
+      //
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
+      break;
+
+    case 0x1244:
+      //
+      // User press "Discard current form and Exit now", request Browser to discard the uncommitted data and exit.
+      //
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT;
       break;
 
     case 0x2000:
