@@ -458,7 +458,6 @@ SecLoadFromCore (
     (SWITCH_STACK_ENTRY_POINT) (UINTN) PeiCoreEntryPoint,
     SecCoreData,
     (VOID *)gPpiList,
-    NULL,
     TopOfStack
     );
   //

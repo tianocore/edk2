@@ -43,7 +43,8 @@ fi
 TARGET_TOOLS=MYTOOLS
 UNIXPKG_TOOLS=GCC44
 NETWORK_SUPPORT=
-COMPILE_BINS=
+BUILD_NEW_SHELL=
+BUILD_FAT=
 case `uname` in
   CYGWIN*) echo Cygwin not fully supported yet. ;;
   Darwin*)
@@ -56,8 +57,9 @@ case `uname` in
         TARGET_TOOLS=XCODE32
         UNIXPKG_TOOLS=XCLANG
       fi
-      NETWORK_SUPPORT="-D NETWORK_SUPPORT"
-      COMPILE_BINS="-D COMPILE_BINS"
+#      NETWORK_SUPPORT="-D NETWORK_SUPPORT"
+#      BUILD_NEW_SHELL="-D BUILD_NEW_SHELL"
+#      BUILD_FAT="-D BUILD_FAT"
       ;;
   Linux*) TARGET_TOOLS=ELFGCC ;;
 
@@ -112,11 +114,6 @@ do
     exit $?
   fi
 
-  if [[ $arg == shell ]]; then
-    build -p $WORKSPACE/ShellPkg/ShellPkg.dsc -a X64 -t $UNIXPKG_TOOLS -n 3 $2 $3 $4 $5 $6 $7 $8
-    cp Build/Shell/DEBUG_$UNIXPKG_TOOLS/X64/Shell.efi ShellBinPkg/UefiShell/X64/Shell.efi
-    exit $?
-  fi
 done
 
 
@@ -126,7 +123,7 @@ done
 echo $PATH
 echo `which build`
 build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a X64 -t $TARGET_TOOLS -D SEC_ONLY -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
-build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a X64 -t $UNIXPKG_TOOLS $NETWORK_SUPPORT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a X64 -t $UNIXPKG_TOOLS $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
 cp $WORKSPACE/Build/EmuUnixX64/DEBUG_"$TARGET_TOOLS"/X64/SecMain $WORKSPACE/Build/EmuUnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
 exit $?
 

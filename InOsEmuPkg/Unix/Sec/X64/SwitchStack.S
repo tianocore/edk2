@@ -16,7 +16,7 @@
 #------------------------------------------------------------------------------
 # Routine Description:
 #
-#   Routine for switching stacks with 3 parameters EFI ABI
+#   Routine for switching stacks with 2 parameters EFI ABI
 #   Convert UNIX to EFI ABI
 #
 # Arguments:
@@ -24,8 +24,7 @@
 #   (rdi) EntryPoint    - Entry point with new stack.
 #   (rsi) Context1      - Parameter1 for entry point. (rcx)
 #   (rdx) Context2      - Parameter2 for entry point. (rdx) 
-#   (rcx) Context3      - Parameter3 for entry point. (r8)
-#   (r8)  NewStack      - The pointer to new stack.
+#   (rcx) NewStack      - The pointer to new stack.
 #
 # Returns:
 #
@@ -37,11 +36,11 @@ ASM_PFX(PeiSwitchStacks):
     pushq   $0            // tells gdb to stop unwinding frame
     movq    %rsp, %rbp
 
-    movq    %r8,  %rsp
+    movq    %rcx, %rsp    // update stack pointer
     
-    movq    %rdi, %rax
-    movq    %rsi, %rcx
-    movq    %rcx, %r8    
+    movq    %rdi, %rax    // entry point to %rax
+    movq    %rsi, %rcx    // Adjust Context1
+                          // Context2 already in the rigth spot
     
     #
     # Reserve space for register parameters (rcx, rdx, r8 & r9) on the stack,

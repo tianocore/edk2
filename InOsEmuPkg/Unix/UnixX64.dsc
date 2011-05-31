@@ -356,9 +356,9 @@
   InOsEmuPkg/EmuBusDriverDxe/EmuBusDriverDxe.inf
   InOsEmuPkg/EmuGopDxe/EmuGopDxe.inf
   InOsEmuPkg/EmuSimpleFileSystemDxe/EmuSimpleFileSystemDxe.inf
+  InOsEmuPkg/EmuBlockIoDxe/EmuBlockIoDxe.inf
 
 !if $(0)
-  UnixPkg/UnixBlockIoDxe/UnixBlockIo.inf
   UnixPkg/UnixSerialIoDxe/UnixSerialIo.inf
   UnixPkg/UnixConsoleDxe/UnixConsole.inf
   UnixPkg/UnixSimpleFileSystemDxe/UnixSimpleFileSystem.inf
