@@ -1,7 +1,7 @@
 /** @file
   The mian interface of IPsec Protocol.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -70,6 +70,13 @@ IpSecProcess (
   UINT8                  OldLastHead;
   BOOLEAN                IsOutbound;
 
+  if (OptionsBuffer == NULL || 
+      OptionsLength == NULL || 
+      FragmentTable == NULL || 
+      FragmentCount == NULL
+      ) {
+    return EFI_INVALID_PARAMETER;
+  }
   Private         = IPSEC_PRIVATE_DATA_FROM_IPSEC (This);
   IpPayload       = (*FragmentTable)[0].FragmentBuffer;
   IsOutbound      = (BOOLEAN) ((TrafficDirection == EfiIPsecOutBound) ? TRUE : FALSE);

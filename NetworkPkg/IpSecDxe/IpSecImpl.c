@@ -1,7 +1,7 @@
 /** @file
   The implementation of IPsec.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1188,8 +1188,8 @@ IpSecTunnelInboundPacket (
   @param[in]      IpVersion          The version of IP.
   @param[in]      SadData            The related SAD data.
   @param[in, out] LastHead           The Last Header in IP header.  
-  @param[in]      OptionsBuffer      Pointer to the options buffer. It is optional.
-  @param[in]      OptionsLength      Length of the options buffer. It is optional.
+  @param[in]      OptionsBuffer      Pointer to the options buffer.
+  @param[in]      OptionsLength      Length of the options buffer.
   @param[in, out] FragmentTable      Pointer to a list of fragments to be protected by
                                      IPsec on input, and with IPsec protected
                                      on return.
@@ -1360,8 +1360,8 @@ IpSecTunnelOutboundPacket (
                                      to be trimed on input, and without ESP header
                                      on return.
   @param[out]     LastHead           The Last Header in IP header on return.
-  @param[in, out] OptionsBuffer      Pointer to the options buffer. It is optional.
-  @param[in, out] OptionsLength      Length of the options buffer. It is optional.
+  @param[in, out] OptionsBuffer      Pointer to the options buffer.
+  @param[in, out] OptionsLength      Length of the options buffer.
   @param[in, out] FragmentTable      Pointer to a list of fragments in the form of IPsec
                                      protected on input, and without IPsec protected
                                      on return.
@@ -1382,8 +1382,8 @@ IpSecEspInboundPacket (
   IN     UINT8                       IpVersion,
   IN OUT VOID                        *IpHead,
      OUT UINT8                       *LastHead,
-  IN OUT VOID                        **OptionsBuffer, OPTIONAL
-  IN OUT UINT32                      *OptionsLength,  OPTIONAL
+  IN OUT VOID                        **OptionsBuffer,
+  IN OUT UINT32                      *OptionsLength,
   IN OUT EFI_IPSEC_FRAGMENT_DATA     **FragmentTable,
   IN OUT UINT32                      *FragmentCount,
      OUT EFI_IPSEC_SPD_SELECTOR      **SpdSelector,
@@ -1647,8 +1647,8 @@ ON_EXIT:
                                      to be processed on input, and inserted ESP header
                                      on return.
   @param[in, out] LastHead           The Last Header in IP header.
-  @param[in, out] OptionsBuffer      Pointer to the options buffer. It is optional.
-  @param[in, out] OptionsLength      Length of the options buffer. It is optional.
+  @param[in, out] OptionsBuffer      Pointer to the options buffer.
+  @param[in, out] OptionsLength      Length of the options buffer.
   @param[in, out] FragmentTable      Pointer to a list of fragments to be protected by
                                      IPsec on input, and with IPsec protected
                                      on return.
@@ -1665,8 +1665,8 @@ IpSecEspOutboundPacket (
   IN UINT8                           IpVersion,
   IN OUT VOID                        *IpHead,
   IN OUT UINT8                       *LastHead,
-  IN OUT VOID                        **OptionsBuffer, OPTIONAL
-  IN OUT UINT32                      *OptionsLength,  OPTIONAL
+  IN OUT VOID                        **OptionsBuffer,
+  IN OUT UINT32                      *OptionsLength,
   IN OUT EFI_IPSEC_FRAGMENT_DATA     **FragmentTable,
   IN OUT UINT32                      *FragmentCount,
   IN     IPSEC_SAD_ENTRY             *SadEntry,
@@ -2046,8 +2046,8 @@ ON_EXIT:
                                      to be trimed on input, and without ESP/AH header
                                      on return.
   @param[in, out] LastHead           The Last Header in IP header on return.
-  @param[in, out] OptionsBuffer      Pointer to the options buffer. It is optional.
-  @param[in, out] OptionsLength      Length of the options buffer. It is optional.
+  @param[in, out] OptionsBuffer      Pointer to the options buffer.
+  @param[in, out] OptionsLength      Length of the options buffer.
   @param[in, out] FragmentTable      Pointer to a list of fragments in form of IPsec
                                      protected on input, and without IPsec protected
                                      on return.
@@ -2064,8 +2064,8 @@ IpSecProtectInboundPacket (
   IN     UINT8                       IpVersion,
   IN OUT VOID                        *IpHead,
   IN OUT UINT8                       *LastHead,
-  IN OUT VOID                        **OptionsBuffer, OPTIONAL
-  IN OUT UINT32                      *OptionsLength,  OPTIONAL
+  IN OUT VOID                        **OptionsBuffer,
+  IN OUT UINT32                      *OptionsLength,
   IN OUT EFI_IPSEC_FRAGMENT_DATA     **FragmentTable,
   IN OUT UINT32                      *FragmentCount,
      OUT EFI_IPSEC_SPD_SELECTOR      **SpdEntry,
@@ -2105,8 +2105,8 @@ IpSecProtectInboundPacket (
                                      to be processed on input, and inserted ESP/AH header
                                      on return.
   @param[in, out] LastHead           The Last Header in IP header.
-  @param[in, out] OptionsBuffer      Pointer to the options buffer. It is optional.
-  @param[in, out] OptionsLength      Length of the options buffer. It is optional.
+  @param[in, out] OptionsBuffer      Pointer to the options buffer.
+  @param[in, out] OptionsLength      Length of the options buffer.
   @param[in, out] FragmentTable      Pointer to a list of fragments to be protected by
                                      IPsec on input, and with IPsec protected
                                      on return.
@@ -2123,8 +2123,8 @@ IpSecProtectOutboundPacket (
   IN     UINT8                       IpVersion,
   IN OUT VOID                        *IpHead,
   IN OUT UINT8                       *LastHead,
-  IN OUT VOID                        **OptionsBuffer, OPTIONAL
-  IN OUT UINT32                      *OptionsLength,  OPTIONAL
+  IN OUT VOID                        **OptionsBuffer,
+  IN OUT UINT32                      *OptionsLength,
   IN OUT EFI_IPSEC_FRAGMENT_DATA     **FragmentTable,
   IN OUT UINT32                      *FragmentCount,
   IN     IPSEC_SAD_ENTRY             *SadEntry,
