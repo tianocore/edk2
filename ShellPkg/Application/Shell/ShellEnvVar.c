@@ -148,9 +148,13 @@ GetEnvironmentVariableList(
     return (EFI_INVALID_PARAMETER);
   }
 
-  Status = gRT->QueryVariableInfo(EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS, &MaxStorSize, &RemStorSize, &MaxVarSize);
-  if (EFI_ERROR(Status)) {
-    return (Status);
+  if (gRT->Hdr.Revision >= EFI_2_00_SYSTEM_TABLE_REVISION) {
+    Status = gRT->QueryVariableInfo(EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS, &MaxStorSize, &RemStorSize, &MaxVarSize);
+    if (EFI_ERROR(Status)) {
+      return (Status);
+    }
+  } else {
+    MaxVarSize = 16384;
   }
 
   NameSize = (UINTN)MaxVarSize;

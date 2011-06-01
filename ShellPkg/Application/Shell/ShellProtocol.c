@@ -3301,15 +3301,16 @@ CleanUpShellProtocol (
     NULL,
     EFI_OPEN_PROTOCOL_GET_PROTOCOL);
 
-  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle1);
-  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle2);
-  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle3);
-  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle4);
-  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle1);
-  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle2);
-  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle3);
-  Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle4);
-
+  if (!EFI_ERROR (Status)) {
+    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle1);
+    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle2);
+    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle3);
+    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle4);
+    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle1);
+    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle2);
+    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle3);
+    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle4);
+  }
   return (Status);
 }
 
