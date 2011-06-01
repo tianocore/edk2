@@ -4,7 +4,7 @@
   running in the EFI boot services environment, to perform data transactions over 
   a USB bus. In addition, it provides an abstraction for the root hub of the USB bus.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -47,6 +47,7 @@ typedef struct {
 #define USB_PORT_STAT_POWER         0x0100
 #define USB_PORT_STAT_LOW_SPEED     0x0200
 #define USB_PORT_STAT_HIGH_SPEED    0x0400
+#define USB_PORT_STAT_SUPER_SPEED   0x0800
 #define USB_PORT_STAT_OWNER         0x2000
 
 ///
@@ -80,6 +81,7 @@ typedef enum {
 #define EFI_USB_SPEED_FULL      0x0000  ///< 12 Mb/s, USB 1.1 OHCI and UHCI HC.
 #define EFI_USB_SPEED_LOW       0x0001  ///< 1 Mb/s, USB 1.1 OHCI and UHCI HC.
 #define EFI_USB_SPEED_HIGH      0x0002  ///< 480 Mb/s, USB 2.0 EHCI HC.
+#define EFI_USB_SPEED_SUPER     0x0003  ///< 4.8 Gb/s, USB 3.0 XHCI HC.
 
 typedef struct {
   UINT8      TranslatorHubAddress; ///< device address
