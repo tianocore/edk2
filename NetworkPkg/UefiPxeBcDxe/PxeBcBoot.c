@@ -1,7 +1,7 @@
 /** @file
   Boot functions implementation for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1074,6 +1074,9 @@ PxeBcLoadBootFile (
     // Discover the boot information about the bootfile if hasn't.
     //
     Status = PxeBcDiscoverBootFile (Private, &RequiredSize);
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
 
     if (PXEBC_IS_SIZE_OVERFLOWED (RequiredSize)) {
       //
