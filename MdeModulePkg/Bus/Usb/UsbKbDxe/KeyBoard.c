@@ -1562,7 +1562,7 @@ UsbKeyCodeToEfiInputKey (
   //
   // Make sure modifier of Key Descriptor is in the valid range according to UEFI spec.
   //
-  if (KeyDescriptor->Modifier > (sizeof (ModifierValueToEfiScanCodeConvertionTable) / sizeof (UINT8))) {
+  if (KeyDescriptor->Modifier >= (sizeof (ModifierValueToEfiScanCodeConvertionTable) / sizeof (UINT8))) {
     return EFI_DEVICE_ERROR;
   }
 
