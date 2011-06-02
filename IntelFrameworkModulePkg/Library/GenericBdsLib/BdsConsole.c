@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which contain all the code to connect console device
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -196,6 +196,7 @@ BdsLibUpdateConsoleVariable (
   IN  EFI_DEVICE_PATH_PROTOCOL  *ExclusiveDevicePath
   )
 {
+  EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *VarConsole;
   UINTN                     DevicePathSize;
   EFI_DEVICE_PATH_PROTOCOL  *NewDevicePath;
@@ -272,13 +273,14 @@ BdsLibUpdateConsoleVariable (
   //
   // Finally, Update the variable of the default console by NewDevicePath
   //
-  gRT->SetVariable (
-        ConVarName,
-        &gEfiGlobalVariableGuid,
-        Attributes,
-        GetDevicePathSize (NewDevicePath),
-        NewDevicePath
-        );
+  Status = gRT->SetVariable (
+                  ConVarName,
+                  &gEfiGlobalVariableGuid,
+                  Attributes,
+                  GetDevicePathSize (NewDevicePath),
+                  NewDevicePath
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   if (VarConsole == NewDevicePath) {
     if (VarConsole != NULL) {
