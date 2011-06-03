@@ -107,6 +107,9 @@
   GdbSerialLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/GdbSerialLib/GdbSerialLib.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
   
+  # ARM PL011 UART Driver
+  PL011UartLib|ArmPlatformPkg/Drivers/PL011Uart/PL011Uart.inf
+
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
 
 [LibraryClasses.common.SEC]

@@ -99,6 +99,8 @@
   PL341DmcLib|ArmPkg/Drivers/PL34xDmc/PL341Dmc.inf
   # ARM PL301 Axi Driver
   PL301AxiLib|ArmPkg/Drivers/PL301Axi/PL301Axi.inf
+  # ARM PL011 UART Driver
+  PL011UartLib|ArmPlatformPkg/Drivers/PL011Uart/PL011Uart.inf
 
 #
 # Assume everything is fixed at build
@@ -385,6 +387,12 @@
   gArmTokenSpaceGuid.PcdPL180SysMciRegAddress|0x10000048
   gArmTokenSpaceGuid.PcdPL180MciBaseAddress|0x10005000
 
+  #
+  # ARM PL011 - Serial Terminal
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x10009000
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|38400
+  
   #
   # ARM PL390 General Interrupt Controller
   #

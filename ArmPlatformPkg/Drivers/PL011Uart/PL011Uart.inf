@@ -15,24 +15,21 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PL011SerialPortLib
-  FILE_GUID                      = 8ecefc8f-a2c4-4091-b80f-20f7aeb0567f 
+  BASE_NAME                      = PL011Uart
+  FILE_GUID                      = 4ec8b120-8307-11e0-bc91-0002a5d5c51b 
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = SerialPortLib
+  LIBRARY_CLASS                  = PL011UartLib
 
 [Sources.common]
-  PL011SerialPortLib.c
+  PL011Uart.c
 
 [LibraryClasses]
-  PL011UartLib
-  PcdLib
+  IoLib
 
 [Packages]
   MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
+#  MdeModulePkg/MdeModulePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
