@@ -57,40 +57,6 @@ FV = FVMAIN_SEC
 gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize
 FV = FVMAIN_COMPACT
 
-0x00150000|0x00010000
-gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
-#NV_VARIABLE_STORE
-DATA = {
-  ## This is the EFI_FIRMWARE_VOLUME_HEADER
-  # ZeroVector []
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  # FileSystemGuid: gEfiSystemNvDataFvGuid         =
-  #  { 0xFFF12B8D, 0x7696, 0x4C8B, { 0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50 }}
-  0x8D, 0x2B, 0xF1, 0xFF, 0x96, 0x76, 0x8B, 0x4C,
-  0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50,
-  # FvLength: 0x20000
-  0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
-  #Signature "_FVH"       #Attributes
-  0x5f, 0x46, 0x56, 0x48, 0xff, 0xfe, 0x04, 0x00,
-  #HeaderLength #CheckSum #ExtHeaderOffset #Reserved #Revision
-  0x48, 0x00, 0x36, 0x09, 0x00, 0x00, 0x00, 0x02,
-  #Blockmap[0]: 2 Blocks * 0x10000 Bytes / Block
-  0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00,
-  #Blockmap[1]: End
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  ## This is the VARIABLE_STORE_HEADER
-  #Signature: gEfiVariableGuid =
-  #  { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d }}
-  0x16, 0x36, 0xcf, 0xdd, 0x75, 0x32, 0x64, 0x41,
-  0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d,
-  #Size: 0xc000 (gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize) - 0x48 (size of EFI_FIRMWARE_VOLUME_HEADER) = 0xBFB8
-  # This can speed up the Variable Dispatch a bit.
-  0xB8, 0xBF, 0x00, 0x00,
-  #FORMATTED: 0x5A #HEALTHY: 0xFE #Reserved: UINT16 #Reserved1: UINT32
-  0x5A, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-}
-
 ################################################################################
 #
 # FV Section
@@ -153,7 +119,8 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
-  INF MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+  INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
   INF EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
   INF EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
@@ -163,6 +130,8 @@ READ_LOCK_STATUS   = TRUE
   
   INF ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
   INF ArmPlatformPkg/Drivers/SP804TimerDxe/SP804TimerDxe.inf
+  
+  INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
 
   #
   # Semi-hosting filesystem
