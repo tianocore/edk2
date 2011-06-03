@@ -12,7 +12,6 @@
 **/
 
 #include <Library/UefiLib.h>
-#include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -24,37 +23,7 @@
 //
 // Global variable declarations
 //
-
-#define NOR_FLASH_LAST_DEVICE                     4
-
-NOR_FLASH_DESCRIPTION mNorFlashDescription[NOR_FLASH_LAST_DEVICE] = {
-  { // BootMon
-    ARM_VE_SMB_NOR0_BASE,
-    SIZE_256KB * 255,
-    SIZE_256KB,
-    {0xE7223039, 0x5836, 0x41E1, 0xB5, 0x42, 0xD7, 0xEC, 0x73, 0x6C, 0x5E, 0x59}
-  },
-  { // BootMon non-volatile storage
-    ARM_VE_SMB_NOR0_BASE + SIZE_256KB * 255,
-    SIZE_64KB * 4,
-    SIZE_64KB,
-    {0x02118005, 0x9DA7, 0x443A, 0x92, 0xD5, 0x78, 0x1F, 0x02, 0x2A, 0xED, 0xBB}
-  },
-  { // UEFI
-    ARM_VE_SMB_NOR1_BASE,
-    SIZE_256KB * 255,
-    SIZE_256KB,
-    {0x1F15DA3C, 0x37FF, 0x4070, 0xB4, 0x71, 0xBB, 0x4A, 0xF1, 0x2A, 0x72, 0x4A}
-  },
-  { // UEFI Variable Services non-volatile storage
-    ARM_VE_SMB_NOR1_BASE + SIZE_256KB * 255,
-    SIZE_64KB * 3, //FIXME: Set 3 blocks because I did not succeed to copy 4 blocks into the ARM Versastile Express NOR Falsh in the last NOR Flash. It should be 4 blocks
-    SIZE_64KB,
-    {0xCC2CBF29, 0x1498, 0x4CDD, 0x81, 0x71, 0xF8, 0xB6, 0xB4, 0x1D, 0x09, 0x09}
-  }
-};
-
-NOR_FLASH_INSTANCE *mNorFlashInstances[ NOR_FLASH_LAST_DEVICE ];
+NOR_FLASH_INSTANCE **mNorFlashInstances;
 
 NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
   NOR_FLASH_SIGNATURE, // Signature
@@ -65,6 +34,7 @@ NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
 
   0, // BaseAddress ... NEED TO BE FILLED
   0, // Size ... NEED TO BE FILLED
+  0, // StartLba
 
   {
     EFI_BLOCK_IO_PROTOCOL_REVISION2, // Revision
@@ -120,15 +90,17 @@ NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
     } // DevicePath
 };
 
-EFI_STATUS NorFlashCreateInstance(
-    IN UINTN NorFlashBase,
-    IN UINTN NorFlashSize,
-    IN UINT32 MediaId,
-    IN UINT32  BlockSize,
-    IN BOOLEAN SupportFvb,
-    IN CONST GUID  *NorFlashGuid,
-    OUT NOR_FLASH_INSTANCE** NorFlashInstance
-  ) {
+EFI_STATUS
+NorFlashCreateInstance (
+  IN UINTN                  NorFlashBase,
+  IN UINTN                  NorFlashSize,
+  IN UINT32                 MediaId,
+  IN UINT32                 BlockSize,
+  IN BOOLEAN                SupportFvb,
+  IN CONST GUID             *NorFlashGuid,
+  OUT NOR_FLASH_INSTANCE**  NorFlashInstance
+  )
+{
   EFI_STATUS Status;
   NOR_FLASH_INSTANCE* Instance;
 
@@ -156,7 +128,7 @@ EFI_STATUS NorFlashCreateInstance(
     Status = gBS->InstallMultipleProtocolInterfaces (
                   &Instance->Handle,
                   &gEfiDevicePathProtocolGuid, &Instance->DevicePath,
-                  //&gEfiBlockIoProtocolGuid,  &Instance->BlockIoProtocol,
+                  &gEfiBlockIoProtocolGuid,  &Instance->BlockIoProtocol,
                   &gEfiFirmwareVolumeBlockProtocolGuid, &Instance->FvbProtocol,
                   NULL
                   );
@@ -186,13 +158,13 @@ EFI_STATUS NorFlashCreateInstance(
 EFI_STATUS
 NorFlashReadCfiData (
   IN UINTN   BaseAddress,
-  IN UINTN   CFI_Offset,
+  IN UINTN   CfiOffset,
   IN UINT32  NumberOfBytes,
   OUT UINT32 *Data
-)
+  )
 {
   UINT32          CurrentByte;
-  volatile UINTN  *ReadAddress;
+  UINTN           ReadAddress;
   UINT32          ReadData;
   UINT32          Byte1;
   UINT32          Byte2;
@@ -200,15 +172,14 @@ NorFlashReadCfiData (
   EFI_STATUS      Status = EFI_SUCCESS;
 
 
-  if( NumberOfBytes > 4 ) {
+  if (NumberOfBytes > 4) {
     // Using 32 bit variable so can only read 4 bytes
     return EFI_INVALID_PARAMETER;
   }
 
-  // First combine the base address with the offset address
-  // to create an absolute read address.
+  // First combine the base address with the offset address to create an absolute read address.
   // However, because we are in little endian, read from the last address down to the first
-  ReadAddress = CREATE_NOR_ADDRESS( BaseAddress, CFI_Offset ) + NumberOfBytes - 1;
+  ReadAddress = CREATE_NOR_ADDRESS (BaseAddress, CfiOffset) + (NumberOfBytes - 1) * sizeof(UINT32);
 
   // Although each read returns 32 bits, because of the NOR Flash structure,
   // each 16 bits (16 MSB and 16 LSB) come from two different chips.
@@ -218,30 +189,28 @@ NorFlashReadCfiData (
   //
   // Also note: As we are in little endian notation and we are reading
   // bytes from incremental addresses, we should assemble them in little endian order.
-  for( CurrentByte=0; CurrentByte<NumberOfBytes; CurrentByte++  ) {
-
+  for (CurrentByte=0; CurrentByte<NumberOfBytes; CurrentByte++) {
     // Read the bytes from the two chips
-    ReadData = *ReadAddress;
+    ReadData = MmioRead32(ReadAddress);
 
     // Check the data validity:
     // The 'Dual Data' function means that
     // each chip should return identical data.
     // If that is not the case then we have a problem.
-    Byte1 = GET_LOW_BYTE ( ReadData );
-    Byte2 = GET_HIGH_BYTE( ReadData );
+    Byte1 = GET_LOW_BYTE (ReadData);
+    Byte2 = GET_HIGH_BYTE(ReadData);
 
-    if( Byte1 != Byte2 ) {
+    if(Byte1 != Byte2) {
       // The two bytes should have been identical
       return EFI_DEVICE_ERROR;
     } else {
-
       // Each successive iteration of the 'for' loop reads a lower address.
       // As we read lower addresses and as we use little endian,
       // we read lower significance bytes. So combine them in the correct order.
       CombinedData = (CombinedData << 8) | Byte1;
 
       // Decrement down to the next address
-      ReadAddress--;
+      ReadAddress -= sizeof(UINT32);
     }
   }
 
@@ -251,7 +220,7 @@ NorFlashReadCfiData (
 }
 
 EFI_STATUS
-NorFlashReadStatusRegister(
+NorFlashReadStatusRegister (
   IN UINTN SR_Address
   )
 {
@@ -265,12 +234,12 @@ NorFlashReadStatusRegister(
 
   do {
     // Prepare to read the status register
-    SEND_NOR_COMMAND( SR_Address, 0, P30_CMD_READ_STATUS_REGISTER );
+    SEND_NOR_COMMAND (SR_Address, 0, P30_CMD_READ_STATUS_REGISTER);
     // Snapshot the status register
     StatusRegister = *pStatusRegister;
   }
   // The chip is busy while the WRITE bit is not asserted
-  while ( (StatusRegister & P30_SR_BIT_WRITE) != P30_SR_BIT_WRITE );
+  while ((StatusRegister & P30_SR_BIT_WRITE) != P30_SR_BIT_WRITE);
 
 
   // Perform a full status check:
@@ -294,42 +263,38 @@ NorFlashReadStatusRegister(
     }
 
     // If an error is detected we must clear the Status Register
-    SEND_NOR_COMMAND( SR_Address, 0, P30_CMD_CLEAR_STATUS_REGISTER );
+    SEND_NOR_COMMAND(SR_Address, 0, P30_CMD_CLEAR_STATUS_REGISTER);
     Status = EFI_DEVICE_ERROR;
   }
 
-  SEND_NOR_COMMAND( SR_Address, 0, P30_CMD_READ_ARRAY );
+  SEND_NOR_COMMAND(SR_Address, 0, P30_CMD_READ_ARRAY);
 
   return Status;
 }
 
 
 BOOLEAN
-NorFlashBlockIsLocked(
+NorFlashBlockIsLocked (
   IN UINTN BlockAddress
   )
 {
-  volatile UINT32       *pReadData;
   UINT32                LockStatus;
   BOOLEAN               BlockIsLocked = TRUE;
 
-  // Prepare the read address
-  pReadData = (UINT32 *) CREATE_NOR_ADDRESS( BlockAddress, 2 );
-
   // Send command for reading device id
-  SEND_NOR_COMMAND( BlockAddress, 2, P30_CMD_READ_DEVICE_ID );
+  SEND_NOR_COMMAND (BlockAddress, 2, P30_CMD_READ_DEVICE_ID);
 
   // Read block lock status
-  LockStatus = *pReadData;
+  LockStatus = MmioRead32 (CREATE_NOR_ADDRESS( BlockAddress, 2 ));
 
   // Decode block lock status
   LockStatus = FOLD_32BIT_INTO_16BIT(LockStatus);
 
-  if( (LockStatus & 0x2) != 0 ) {
+  if((LockStatus & 0x2) != 0) {
     DEBUG((EFI_D_ERROR, "UnlockSingleBlock: WARNING: Block LOCKED DOWN\n"));
   }
 
-  if( (LockStatus & 0x1) == 0 ) {
+  if((LockStatus & 0x1) == 0) {
     // This means the block is unlocked
     DEBUG((DEBUG_BLKIO, "UnlockSingleBlock: Block 0x%08x unlocked\n", BlockAddress ));
     BlockIsLocked = FALSE;
@@ -340,7 +305,7 @@ NorFlashBlockIsLocked(
 
 
 EFI_STATUS
-NorFlashUnlockSingleBlock(
+NorFlashUnlockSingleBlock (
   IN UINTN  BlockAddress
   )
 {
@@ -349,17 +314,14 @@ NorFlashUnlockSingleBlock(
   // Raise the Task Priority Level to TPL_NOTIFY to serialise all its operations
   // and to protect shared data structures.
 
-  //while( NorFlashBlockIsLocked( BlockAddress ) )
-  {
-    // Request a lock setup
-    SEND_NOR_COMMAND( BlockAddress, 0, P30_CMD_LOCK_BLOCK_SETUP );
+  // Request a lock setup
+  SEND_NOR_COMMAND(BlockAddress, 0, P30_CMD_LOCK_BLOCK_SETUP);
 
-    // Request an unlock
-    SEND_NOR_COMMAND( BlockAddress, 0, P30_CMD_UNLOCK_BLOCK );
-  }
+  // Request an unlock
+  SEND_NOR_COMMAND(BlockAddress, 0, P30_CMD_UNLOCK_BLOCK);
 
   // Put device back into Read Array mode
-  SEND_NOR_COMMAND( BlockAddress, 0, P30_CMD_READ_ARRAY );
+  SEND_NOR_COMMAND(BlockAddress, 0, P30_CMD_READ_ARRAY);
 
   DEBUG((DEBUG_BLKIO, "UnlockSingleBlock: BlockAddress=0x%08x, Exit Status = \"%r\".\n", BlockAddress, Status));
 
@@ -368,14 +330,14 @@ NorFlashUnlockSingleBlock(
 
 
 EFI_STATUS
-NorFlashUnlockSingleBlockIfNecessary(
+NorFlashUnlockSingleBlockIfNecessary (
   IN UINTN BlockAddress
   )
 {
   EFI_STATUS Status = EFI_SUCCESS;
 
-  if ( NorFlashBlockIsLocked( BlockAddress ) == TRUE ) {
-    Status = NorFlashUnlockSingleBlock( BlockAddress );
+  if ( NorFlashBlockIsLocked(BlockAddress) == TRUE ) {
+    Status = NorFlashUnlockSingleBlock(BlockAddress);
   }
 
   return Status;
@@ -386,15 +348,15 @@ NorFlashUnlockSingleBlockIfNecessary(
  * The following function presumes that the block has already been unlocked.
  **/
 EFI_STATUS
-NorFlashEraseSingleBlock(
+NorFlashEraseSingleBlock (
   IN UINTN BlockAddress
   )
 {
   EFI_STATUS            Status = EFI_SUCCESS;
 
   // Request a block erase and then confirm it
-  SEND_NOR_COMMAND( BlockAddress, 0, P30_CMD_BLOCK_ERASE_SETUP );
-  SEND_NOR_COMMAND( BlockAddress, 0, P30_CMD_BLOCK_ERASE_CONFIRM );
+  SEND_NOR_COMMAND (BlockAddress, 0, P30_CMD_BLOCK_ERASE_SETUP);
+  SEND_NOR_COMMAND (BlockAddress, 0, P30_CMD_BLOCK_ERASE_CONFIRM);
   // Wait until the status register gives us the all clear
   Status = NorFlashReadStatusRegister( BlockAddress );
 
@@ -408,16 +370,16 @@ NorFlashEraseSingleBlock(
  * The following function presumes that the block has already been unlocked.
  **/
 EFI_STATUS
-NorFlashUnlockAndEraseSingleBlock(
+NorFlashUnlockAndEraseSingleBlock (
   IN  UINTN   BlockAddress
   )
 {
   EFI_STATUS   Status;
 
   // Unlock the block if we have to
-  Status = NorFlashUnlockSingleBlockIfNecessary( BlockAddress );
+  Status = NorFlashUnlockSingleBlockIfNecessary (BlockAddress);
   if (!EFI_ERROR(Status)) {
-    Status = NorFlashEraseSingleBlock( BlockAddress );
+    Status = NorFlashEraseSingleBlock(BlockAddress);
   }
 
   return Status;
@@ -426,8 +388,8 @@ NorFlashUnlockAndEraseSingleBlock(
 
 EFI_STATUS
 NorFlashWriteSingleWord (
-    IN  UINTN   WordAddress,
-    IN  UINT32  WriteData
+  IN  UINTN   WordAddress,
+  IN  UINT32  WriteData
   )
 {
   EFI_STATUS            Status;
@@ -465,9 +427,9 @@ NorFlashWriteSingleWord (
  */
 EFI_STATUS
 NorFlashWriteBuffer (
-    IN  UINTN   TargetAddress,
-    IN  UINTN   BufferSizeInBytes,
-    IN  UINT32  *Buffer
+  IN  UINTN   TargetAddress,
+  IN  UINTN   BufferSizeInBytes,
+  IN  UINT32  *Buffer
   )
 {
   EFI_STATUS            Status;
@@ -546,10 +508,10 @@ NorFlashWriteBuffer (
 
 EFI_STATUS
 NorFlashWriteSingleBlock (
-    IN  UINTN     DeviceBaseAddress,
-    IN  EFI_LBA   Lba,
-    IN  UINT32    *DataBuffer,
-    IN  UINT32    BlockSizeInWords
+  IN  UINTN     DeviceBaseAddress,
+  IN  EFI_LBA   Lba,
+  IN  UINT32    *DataBuffer,
+  IN  UINT32    BlockSizeInWords
   )
 {
   EFI_STATUS    Status = EFI_SUCCESS;
@@ -575,7 +537,7 @@ NorFlashWriteSingleBlock (
   WordAddress = BlockAddress;
 
   // Check that the address starts at a 32-word boundary, i.e. last 7 bits must be zero
-  if ( (WordAddress & BOUNDARY_OF_32_WORDS) == 0x00 ) {
+  if ((WordAddress & BOUNDARY_OF_32_WORDS) == 0x00) {
 
     // First, break the entire block into buffer-sized chunks.
     BuffersInBlock = (UINTN)BlockSizeInWords / P30_MAX_BUFFER_SIZE_IN_BYTES;
@@ -635,7 +597,6 @@ NorFlashWriteBlocks (
   UINT32          BlockSizeInWords;
   UINT32          NumBlocks;
   UINT32          BlockCount;
-  volatile UINT32 *VersatileExpress_SYS_FLASH;
 
   // The buffer must be valid
   if (Buffer == NULL) {
@@ -666,15 +627,6 @@ NorFlashWriteBlocks (
   if ( ( Lba + NumBlocks ) > ( Instance->Media.LastBlock + 1 ) ) {
     DEBUG((EFI_D_ERROR, "NorFlashWriteBlocks: ERROR - Write will exceed last block.\n"));
     return EFI_INVALID_PARAMETER;
-  }
-
-  // Everything seems ok so far, so now we need to disable the platform-specific
-  // flash write protection for Versatile Express
-  VersatileExpress_SYS_FLASH = (UINT32 *)VE_REGISTER_SYS_FLASH_ADDR;
-  if( (*VersatileExpress_SYS_FLASH & 0x1) == 0 ) {
-    // Writing to NOR FLASH is disabled, so enable it
-    *VersatileExpress_SYS_FLASH = 0x1;
-    DEBUG((DEBUG_BLKIO, "NorFlashWriteBlocks: informational - Had to enable HSYS_FLASH flag.\n" ));
   }
 
   BlockSizeInWords = Instance->Media.BlockSize / 4;
@@ -740,13 +692,13 @@ NorFlashReadBlocks (
   }
 
   // Get the address to start reading from
-  StartAddress = GET_NOR_BLOCK_ADDRESS( Instance->BaseAddress,
+  StartAddress = GET_NOR_BLOCK_ADDRESS (Instance->BaseAddress,
                                         Lba,
                                         Instance->Media.BlockSize
-                                      );
+                                        );
 
   // Put the device into Read Array mode
-  SEND_NOR_COMMAND( Instance->BaseAddress, 0, P30_CMD_READ_ARRAY );
+  SEND_NOR_COMMAND (Instance->BaseAddress, 0, P30_CMD_READ_ARRAY);
 
   // Readout the data
   CopyMem(Buffer, (UINTN *)StartAddress, BufferSizeInBytes);
@@ -760,11 +712,8 @@ NorFlashReset (
   IN  NOR_FLASH_INSTANCE *Instance
   )
 {
-  DEBUG((DEBUG_BLKIO, "NorFlashReset(BaseAddress=0x%08x)\n", Instance->BaseAddress));
-
   // As there is no specific RESET to perform, ensure that the devices is in the default Read Array mode
-  SEND_NOR_COMMAND( Instance->BaseAddress, 0, P30_CMD_READ_ARRAY );
-
+  SEND_NOR_COMMAND( Instance->BaseAddress, 0, P30_CMD_READ_ARRAY);
   return EFI_SUCCESS;
 }
 
@@ -777,18 +726,39 @@ NorFlashInitialise (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS    Status = EFI_SUCCESS;
-  UINT32        Index;
-  UINTN NvStorageVariableBase = (UINTN) PcdGet32 (PcdFlashNvStorageVariableBase);
+  EFI_STATUS              Status;
+  UINT32                  Index;
+  NOR_FLASH_DESCRIPTION*  NorFlashDevices;
+  UINT32                  NorFlashDeviceCount;
+  BOOLEAN                 ContainVariableStorage;
 
-  for (Index = 0; Index < NOR_FLASH_LAST_DEVICE; Index++) {
-    Status = NorFlashCreateInstance(
-      mNorFlashDescription[Index].BaseAddress,
-      mNorFlashDescription[Index].Size,
+  Status = NorFlashPlatformInitialization ();
+  if (EFI_ERROR(Status)) {
+    DEBUG((EFI_D_ERROR,"NorFlashInitialise: Fail to initialize Nor Flash devices\n"));
+    return Status;
+  }
+
+  Status = NorFlashPlatformGetDevices (&NorFlashDevices,&NorFlashDeviceCount);
+  if (EFI_ERROR(Status)) {
+    DEBUG((EFI_D_ERROR,"NorFlashInitialise: Fail to get Nor Flash devices\n"));
+    return Status;
+  }
+
+  mNorFlashInstances = AllocatePool(sizeof(NOR_FLASH_INSTANCE*) * NorFlashDeviceCount);
+
+  for (Index = 0; Index < NorFlashDeviceCount; Index++) {
+    // Check if this NOR Flash device contain the variable storage region
+    ContainVariableStorage =
+        (NorFlashDevices[Index].BaseAddress <= PcdGet32 (PcdFlashNvStorageVariableBase)) &&
+        (PcdGet32 (PcdFlashNvStorageVariableBase) + PcdGet32 (PcdFlashNvStorageVariableSize) <= NorFlashDevices[Index].BaseAddress + NorFlashDevices[Index].Size);
+
+    Status = NorFlashCreateInstance (
+      NorFlashDevices[Index].BaseAddress,
+      NorFlashDevices[Index].Size,
       Index,
-      mNorFlashDescription[Index].BlockSize,
-      (mNorFlashDescription[Index].BaseAddress == NvStorageVariableBase),
-      &mNorFlashDescription[Index].Guid,
+      NorFlashDevices[Index].BlockSize,
+      ContainVariableStorage,
+      &NorFlashDevices[Index].Guid,
       &mNorFlashInstances[Index]
     );
     if (EFI_ERROR(Status)) {

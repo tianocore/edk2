@@ -101,6 +101,8 @@
   PL301AxiLib|ArmPkg/Drivers/PL301Axi/PL301Axi.inf
   # ARM PL011 UART Driver
   PL011UartLib|ArmPlatformPkg/Drivers/PL011Uart/PL011Uart.inf
+  
+  NorFlashPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/NorFlashArmVExpressLib/NorFlashArmVExpressLib.inf
 
 #
 # Assume everything is fixed at build
@@ -489,7 +491,7 @@
   EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
 
   ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
-  ArmPlatformPkg/ArmVExpressPkg/NorFlashDxe/NorFlashDxe.inf
+  ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
   ArmPlatformPkg/Drivers/SP804TimerDxe/SP804TimerDxe.inf
 
   #

@@ -16,7 +16,6 @@
 #include <Library/PcdLib.h>
 #include <Library/BaseLib.h>
 #include <Library/UefiLib.h>
-#include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -62,12 +61,29 @@ InitializeFvAndVariableStoreHeaders (
   HeadersLength = sizeof(EFI_FIRMWARE_VOLUME_HEADER) + sizeof(EFI_FV_BLOCK_MAP_ENTRY) + sizeof(VARIABLE_STORE_HEADER);
   Headers = AllocateZeroPool(HeadersLength);
 
+  // FirmwareVolumeHeader->FvLength is declared to have the Variable area AND the FTW working area AND the FTW Spare contiguous.
+  ASSERT(PcdGet32(PcdFlashNvStorageVariableBase) + PcdGet32(PcdFlashNvStorageVariableSize) == PcdGet32(PcdFlashNvStorageFtwWorkingBase));
+  ASSERT(PcdGet32(PcdFlashNvStorageFtwWorkingBase) + PcdGet32(PcdFlashNvStorageFtwWorkingSize) == PcdGet32(PcdFlashNvStorageFtwSpareBase));
+
+  // Check if the size of the area is at least one block size
+  ASSERT((PcdGet32(PcdFlashNvStorageVariableSize) > 0) && (PcdGet32(PcdFlashNvStorageVariableSize) / Instance->Media.BlockSize > 0));
+  ASSERT((PcdGet32(PcdFlashNvStorageFtwWorkingSize) > 0) && (PcdGet32(PcdFlashNvStorageFtwWorkingSize) / Instance->Media.BlockSize > 0));
+  ASSERT((PcdGet32(PcdFlashNvStorageFtwSpareSize) > 0) && (PcdGet32(PcdFlashNvStorageFtwSpareSize) / Instance->Media.BlockSize > 0));
+
+  // Ensure the Variable area Base Addresses are aligned on a block size boundaries
+  ASSERT(PcdGet32(PcdFlashNvStorageVariableBase) % Instance->Media.BlockSize == 0);
+  ASSERT(PcdGet32(PcdFlashNvStorageFtwWorkingBase) % Instance->Media.BlockSize == 0);
+  ASSERT(PcdGet32(PcdFlashNvStorageFtwSpareBase) % Instance->Media.BlockSize == 0);
+
   //
   // EFI_FIRMWARE_VOLUME_HEADER
   //
   FirmwareVolumeHeader = (EFI_FIRMWARE_VOLUME_HEADER*)Headers;
   CopyGuid (&FirmwareVolumeHeader->FileSystemGuid, &gEfiSystemNvDataFvGuid);
-  FirmwareVolumeHeader->FvLength = Instance->Media.BlockSize * (Instance->Media.LastBlock + 1);
+  FirmwareVolumeHeader->FvLength =
+      PcdGet32(PcdFlashNvStorageVariableSize) +
+      PcdGet32(PcdFlashNvStorageFtwWorkingSize) +
+      PcdGet32(PcdFlashNvStorageFtwSpareSize);
   FirmwareVolumeHeader->Signature = EFI_FVH_SIGNATURE;
   FirmwareVolumeHeader->Attributes = (EFI_FVB_ATTRIBUTES_2) (
                                           EFI_FVB2_READ_ENABLED_CAP   | // Reads may be enabled
@@ -96,9 +112,9 @@ InitializeFvAndVariableStoreHeaders (
   VariableStoreHeader->State             = VARIABLE_STORE_HEALTHY;
 
   // Install the combined super-header in the NorFlash
-  Status = FvbWrite(&Instance->FvbProtocol, 0, 0, &HeadersLength, Headers );
+  Status = FvbWrite (&Instance->FvbProtocol, 0, 0, &HeadersLength, Headers);
 
-  FreePool(Headers);
+  FreePool (Headers);
   return Status;
 }
 
@@ -120,18 +136,23 @@ ValidateFvHeader (
   EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
   VARIABLE_STORE_HEADER       *VariableStoreHeader;
   UINTN                       VariableStoreLength;
+  UINTN						  FvLength;
 
   FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER*)Instance->BaseAddress;
+
+  FvLength = PcdGet32(PcdFlashNvStorageVariableSize) + PcdGet32(PcdFlashNvStorageFtwWorkingSize) +
+      PcdGet32(PcdFlashNvStorageFtwSpareSize);
 
   //
   // Verify the header revision, header signature, length
   // Length of FvBlock cannot be 2**64-1
   // HeaderLength cannot be an odd number
   //
-  if (     ( FwVolHeader->Revision      != EFI_FVH_REVISION     )
-        || ( FwVolHeader->Signature     != EFI_FVH_SIGNATURE    )
-        || ( FwVolHeader->FvLength      != Instance->Media.BlockSize * (Instance->Media.LastBlock + 1) )
-      ) {
+  if (   (FwVolHeader->Revision  != EFI_FVH_REVISION)
+      || (FwVolHeader->Signature != EFI_FVH_SIGNATURE)
+      || (FwVolHeader->FvLength  != FvLength)
+      )
+  {
     DEBUG ((EFI_D_ERROR, "ValidateFvHeader: No Firmware Volume header present\n"));
     return EFI_NOT_FOUND;
   }
@@ -278,7 +299,7 @@ FvbGetPhysicalAddress(
 
   ASSERT(Address != NULL);
 
-  *Address = Instance->BaseAddress;
+  *Address = PcdGet32 (PcdFlashNvStorageVariableBase);
   return EFI_SUCCESS;
 }
 
@@ -310,7 +331,7 @@ FvbGetPhysicalAddress(
  **/
 EFI_STATUS
 EFIAPI
-FvbGetBlockSize(
+FvbGetBlockSize (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
   IN        EFI_LBA                              Lba,
   OUT       UINTN                                *BlockSize,
@@ -399,7 +420,7 @@ FvbRead (
 
   Instance = INSTANCE_FROM_FVB_THIS(This);
 
-  DEBUG ((DEBUG_BLKIO, "FvbRead(Parameters: Lba=%ld, Offset=0x%x, *NumBytes=0x%x, Buffer @ 0x%08x)\n", Lba, Offset, *NumBytes, Buffer));
+  DEBUG ((DEBUG_BLKIO, "FvbRead(Parameters: Lba=%ld, Offset=0x%x, *NumBytes=0x%x, Buffer @ 0x%08x)\n", Instance->StartLba + Lba, Offset, *NumBytes, Buffer));
 
   if (!Instance->Initialized) {
     Instance->Initialize(Instance);
@@ -415,9 +436,9 @@ FvbRead (
 
   // The read must not span block boundaries.
   // We need to check each variable individually because adding two large values together overflows.
-  if ( ( Offset               >= BlockSize ) ||
-       ( *NumBytes            >  BlockSize ) ||
-       ( (Offset + *NumBytes) >  BlockSize )    ) {
+  if ((Offset               >= BlockSize) ||
+      (*NumBytes            >  BlockSize) ||
+      ((Offset + *NumBytes) >  BlockSize)) {
     DEBUG ((EFI_D_ERROR, "FvbRead: ERROR - EFI_BAD_BUFFER_SIZE: (Offset=0x%x + NumBytes=0x%x) > BlockSize=0x%x\n", Offset, *NumBytes, BlockSize ));
     return EFI_BAD_BUFFER_SIZE;
   }
@@ -433,13 +454,13 @@ FvbRead (
   BlockBuffer = AllocateRuntimePool(BlockSize);
 
   // Check if the memory allocation was successful
-  if( BlockBuffer == NULL ) {
+  if (BlockBuffer == NULL) {
     DEBUG ((EFI_D_ERROR, "FvbRead: ERROR - Could not allocate BlockBuffer @ 0x%08x.\n", BlockBuffer));
     return EFI_DEVICE_ERROR;
   }
 
   // Read NOR Flash data into shadow buffer
-  TempStatus = NorFlashReadBlocks(Instance, Lba, BlockSize, BlockBuffer);
+  TempStatus = NorFlashReadBlocks (Instance, Instance->StartLba + Lba, BlockSize, BlockBuffer);
   if (EFI_ERROR (TempStatus)) {
     // Return one of the pre-approved error statuses
     Status = EFI_DEVICE_ERROR;
@@ -453,8 +474,6 @@ FvbRead (
 
 FREE_MEMORY:
   FreePool(BlockBuffer);
-
-  DEBUG ((DEBUG_BLKIO, "FvbRead - end\n"));
   return Status;
 }
 
@@ -534,7 +553,7 @@ FvbWrite (
     Instance->Initialize(Instance);
   }
 
-  DEBUG ((DEBUG_BLKIO, "FvbWrite(Parameters: Lba=%ld, Offset=0x%x, *NumBytes=0x%x, Buffer @ 0x%08x)\n", Lba, Offset, *NumBytes, Buffer));
+  DEBUG ((DEBUG_BLKIO, "FvbWrite(Parameters: Lba=%ld, Offset=0x%x, *NumBytes=0x%x, Buffer @ 0x%08x)\n", Instance->StartLba + Lba, Offset, *NumBytes, Buffer));
 
   Status = EFI_SUCCESS;
   TempStatus = Status;
@@ -576,7 +595,7 @@ FvbWrite (
   }
 
   // Read NOR Flash data into shadow buffer
-  TempStatus = NorFlashReadBlocks(Instance, Lba, BlockSize, BlockBuffer);
+  TempStatus = NorFlashReadBlocks(Instance, Instance->StartLba + Lba, BlockSize, BlockBuffer);
   if (EFI_ERROR (TempStatus)) {
     // Return one of the pre-approved error statuses
     Status = EFI_DEVICE_ERROR;
@@ -587,7 +606,7 @@ FvbWrite (
   CopyMem((BlockBuffer + Offset), Buffer, *NumBytes);
 
   // Write the modified buffer back to the NorFlash
-  Status = NorFlashWriteBlocks(Instance, Lba, BlockSize, BlockBuffer);
+  Status = NorFlashWriteBlocks(Instance, Instance->StartLba + Lba, BlockSize, BlockBuffer);
   if (EFI_ERROR (TempStatus)) {
     // Return one of the pre-approved error statuses
     Status = EFI_DEVICE_ERROR;
@@ -650,7 +669,7 @@ FvbEraseBlocks (
   )
 {
   EFI_STATUS  Status;
-  VA_LIST     args;
+  VA_LIST     Args;
   UINTN       BlockAddress; // Physical address of Lba to erase
   EFI_LBA     StartingLba; // Lba from which we start erasing
   UINTN       NumOfLba; // Number of Lba blocks to erase
@@ -671,12 +690,10 @@ FvbEraseBlocks (
 
   // Before erasing, check the entire list of parameters to ensure all specified blocks are valid
 
-  VA_START (args, This);
-
+  VA_START (Args, This);
   do {
-
     // Get the Lba from which we start erasing
-    StartingLba = VA_ARG (args, EFI_LBA);
+    StartingLba = VA_ARG (Args, EFI_LBA);
 
     // Have we reached the end of the list?
     if (StartingLba == EFI_LBA_LIST_TERMINATOR) {
@@ -685,30 +702,27 @@ FvbEraseBlocks (
     }
 
     // How many Lba blocks are we requested to erase?
-    NumOfLba = VA_ARG (args, UINT32);
+    NumOfLba = VA_ARG (Args, UINT32);
 
     // All blocks must be within range
-    DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks: Check if: ( StartingLba=%ld + NumOfLba=%d - 1 ) > LastBlock=%ld.\n", StartingLba, NumOfLba, Instance->Media.LastBlock));
-    if ((NumOfLba == 0) || ((StartingLba + NumOfLba - 1) > Instance->Media.LastBlock)) {
-      VA_END (args);
-      DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks: Check if: ( StartingLba=%ld + NumOfLba=%d - 1 ) > LastBlock=%ld.\n", StartingLba, NumOfLba, Instance->Media.LastBlock));
+    DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks: Check if: ( StartingLba=%ld + NumOfLba=%d - 1 ) > LastBlock=%ld.\n", Instance->StartLba + StartingLba, NumOfLba, Instance->Media.LastBlock));
+    if ((NumOfLba == 0) || ((Instance->StartLba + StartingLba + NumOfLba - 1) > Instance->Media.LastBlock)) {
+      VA_END (Args);
       DEBUG ((EFI_D_ERROR, "FvbEraseBlocks: ERROR - Lba range goes past the last Lba.\n"));
       Status = EFI_INVALID_PARAMETER;
       goto EXIT;
     }
-
   } while (TRUE);
+  VA_END (Args);
 
-  VA_END (args);
 
+  //
   // To get here, all must be ok, so start erasing
-
-  VA_START (args, This);
-
+  //
+  VA_START (Args, This);
   do {
-
     // Get the Lba from which we start erasing
-    StartingLba = VA_ARG (args, EFI_LBA);
+    StartingLba = VA_ARG (Args, EFI_LBA);
 
     // Have we reached the end of the list?
     if (StartingLba == EFI_LBA_LIST_TERMINATOR) {
@@ -717,7 +731,7 @@ FvbEraseBlocks (
     }
 
     // How many Lba blocks are we requested to erase?
-    NumOfLba = VA_ARG (args, UINT32);
+    NumOfLba = VA_ARG (Args, UINT32);
 
     // Go through each one and erase it
     while (NumOfLba > 0) {
@@ -725,15 +739,15 @@ FvbEraseBlocks (
       // Get the physical address of Lba to erase
       BlockAddress = GET_NOR_BLOCK_ADDRESS (
           Instance->BaseAddress,
-          StartingLba,
+          Instance->StartLba + StartingLba,
           Instance->Media.BlockSize
       );
 
       // Erase it
-      DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks: Erasing Lba=%ld @ 0x%08x.\n", StartingLba, BlockAddress));
+      DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks: Erasing Lba=%ld @ 0x%08x.\n", Instance->StartLba + StartingLba, BlockAddress));
       Status = NorFlashUnlockAndEraseSingleBlock (BlockAddress);
       if (EFI_ERROR(Status)) {
-        VA_END (args);
+        VA_END (Args);
         Status = EFI_DEVICE_ERROR;
         goto EXIT;
       }
@@ -742,10 +756,8 @@ FvbEraseBlocks (
       StartingLba++;
       NumOfLba--;
     }
-
   } while (TRUE);
-
-  VA_END (args);
+  VA_END (Args);
 
 EXIT:
   return Status;
@@ -755,17 +767,22 @@ EFI_STATUS
 EFIAPI
 NorFlashFvbInitialize (
   IN NOR_FLASH_INSTANCE* Instance
-  ) {
-  EFI_STATUS Status;
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      FvbNumLba;
 
   DEBUG((DEBUG_BLKIO,"NorFlashFvbInitialize\n"));
 
-  Status = NorFlashBlkIoInitialize(Instance);
+  Status = NorFlashBlkIoInitialize (Instance);
   if (EFI_ERROR(Status)) {
     DEBUG((EFI_D_ERROR,"NorFlashFvbInitialize: ERROR - Failed to initialize FVB\n"));
     return Status;
   }
   Instance->Initialized = TRUE;
+
+  // Set the index of the first LBA for the FVB
+  Instance->StartLba = (PcdGet32 (PcdFlashNvStorageVariableBase) - Instance->BaseAddress) / Instance->Media.BlockSize;
 
   // Determine if there is a valid header at the beginning of the NorFlash
   Status = ValidateFvHeader (Instance);
@@ -774,17 +791,18 @@ NorFlashFvbInitialize (
     DEBUG((EFI_D_ERROR,"NorFlashFvbInitialize: ERROR - The FVB Header is not valid. Installing a correct one for this volume.\n"));
 
     // Erase all the NorFlash that is reserved for variable storage
-    Status = FvbEraseBlocks ( &Instance->FvbProtocol, (EFI_LBA)0, (UINT32)(Instance->Media.LastBlock + 1), EFI_LBA_LIST_TERMINATOR );
+    FvbNumLba = (PcdGet32(PcdFlashNvStorageVariableSize) + PcdGet32(PcdFlashNvStorageFtwWorkingSize) + PcdGet32(PcdFlashNvStorageFtwSpareSize)) / Instance->Media.BlockSize;
+
+    Status = FvbEraseBlocks (&Instance->FvbProtocol, (EFI_LBA)0, FvbNumLba, EFI_LBA_LIST_TERMINATOR);
     if (EFI_ERROR(Status)) {
       return Status;
     }
 
     // Install all appropriate headers
-    InitializeFvAndVariableStoreHeaders ( Instance );
+    Status = InitializeFvAndVariableStoreHeaders (Instance);
     if (EFI_ERROR(Status)) {
       return Status;
     }
   }
-
   return Status;
 }

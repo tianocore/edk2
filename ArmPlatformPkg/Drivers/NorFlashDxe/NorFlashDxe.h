@@ -1,6 +1,6 @@
 /** @file  NorFlashDxe.h
 
-  Copyright (c) 2010, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,18 +21,16 @@
 #include <Protocol/BlockIo.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 
+#include <Library/DebugLib.h>
+#include <Library/IoLib.h>
+#include <Library/NorFlashPlatformLib.h>
+#include <Library/UefiLib.h>
+
 #include <ArmPlatform.h>
 
 #define HIGH_16_BITS                              0xFFFF0000
 #define LOW_16_BITS                               0x0000FFFF
 #define LOW_8_BITS                                0x000000FF
-
-// Hardware addresses
-
-#define VE_SYSTEM_REGISTERS_OFFSET                0x00000000
-#define SYSTEM_REGISTER_SYS_FLASH                 0x0000004C
-
-#define VE_REGISTER_SYS_FLASH_ADDR                ( ARM_VE_BOARD_PERIPH_BASE + VE_SYSTEM_REGISTERS_OFFSET + SYSTEM_REGISTER_SYS_FLASH )
 
 // Device access macros
 // These are necessary because we use 2 x 16bit parts to make up 32bit data
@@ -44,20 +42,20 @@
 
 // Each command must be sent simultaneously to both chips,
 // i.e. at the lower 16 bits AND at the higher 16 bits
-#define CREATE_NOR_ADDRESS(BaseAddr,OffsetAddr)   ( (volatile UINTN *)((BaseAddr) + ((OffsetAddr) << 2)) )
+#define CREATE_NOR_ADDRESS(BaseAddr,OffsetAddr)   ((BaseAddr) + ((OffsetAddr) << 2))
 #define CREATE_DUAL_CMD(Cmd)                      ( ( Cmd << 16) | ( Cmd & LOW_16_BITS) )
-#define SEND_NOR_COMMAND(BaseAddr,OffsetAddr,Cmd) ( *CREATE_NOR_ADDRESS(BaseAddr,OffsetAddr) = CREATE_DUAL_CMD(Cmd) )
-#define GET_NOR_BLOCK_ADDRESS(BaseAddr,Lba,LbaSize)( BaseAddr + (UINTN)(Lba * LbaSize) )
+#define SEND_NOR_COMMAND(BaseAddr,OffsetAddr,Cmd) MmioWrite32 (CREATE_NOR_ADDRESS(BaseAddr,OffsetAddr), CREATE_DUAL_CMD(Cmd))
+#define GET_NOR_BLOCK_ADDRESS(BaseAddr,Lba,LbaSize)( BaseAddr + (UINTN)((Lba) * LbaSize) )
 
 // Status Register Bits
-#define P30_SR_BIT_WRITE                          0x00800080     /* Bit 7 */
-#define P30_SR_BIT_ERASE_SUSPEND                  0x00400040     /* Bit 6 */
-#define P30_SR_BIT_ERASE                          0x00200020     /* Bit 5 */
-#define P30_SR_BIT_PROGRAM                        0x00100010     /* Bit 4 */
-#define P30_SR_BIT_VPP                            0x00080008     /* Bit 3 */
-#define P30_SR_BIT_PROGRAM_SUSPEND                0x00040004     /* Bit 2 */
-#define P30_SR_BIT_BLOCK_LOCKED                   0x00020002     /* Bit 1 */
-#define P30_SR_BIT_BEFP                           0x00010001     /* Bit 0 */
+#define P30_SR_BIT_WRITE                          (BIT7 << 16 | BIT7)
+#define P30_SR_BIT_ERASE_SUSPEND                  (BIT6 << 16 | BIT6)
+#define P30_SR_BIT_ERASE                          (BIT5 << 16 | BIT5)
+#define P30_SR_BIT_PROGRAM                        (BIT4 << 16 | BIT4)
+#define P30_SR_BIT_VPP                            (BIT3 << 16 | BIT3)
+#define P30_SR_BIT_PROGRAM_SUSPEND                (BIT2 << 16 | BIT2)
+#define P30_SR_BIT_BLOCK_LOCKED                   (BIT1 << 16 | BIT1)
+#define P30_SR_BIT_BEFP                           (BIT0 << 16 | BIT0)
 
 // Device Commands for Intel StrataFlash(R) Embedded Memory (P30) Family
 
@@ -121,13 +119,6 @@ typedef struct _NOR_FLASH_INSTANCE                NOR_FLASH_INSTANCE;
 typedef EFI_STATUS (*NOR_FLASH_INITIALIZE)        (NOR_FLASH_INSTANCE* Instance);
 
 typedef struct {
-    UINTN                             BaseAddress;
-    UINTN                             Size;
-    UINTN                             BlockSize;
-    EFI_GUID                          Guid;
-} NOR_FLASH_DESCRIPTION;
-
-typedef struct {
   VENDOR_DEVICE_PATH                  Vendor;
   EFI_DEVICE_PATH_PROTOCOL            End;
 } NOR_FLASH_DEVICE_PATH;
@@ -141,6 +132,7 @@ struct _NOR_FLASH_INSTANCE {
 
   UINTN                               BaseAddress;
   UINTN                               Size;
+  EFI_LBA                             StartLba;
 
   EFI_BLOCK_IO_PROTOCOL               BlockIoProtocol;
   EFI_BLOCK_IO_MEDIA                  Media;
@@ -150,6 +142,24 @@ struct _NOR_FLASH_INSTANCE {
 
   NOR_FLASH_DEVICE_PATH	              DevicePath;
 };
+
+EFI_STATUS
+EFIAPI
+NorFlashGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+NorFlashGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  );
 
 EFI_STATUS
 EFIAPI

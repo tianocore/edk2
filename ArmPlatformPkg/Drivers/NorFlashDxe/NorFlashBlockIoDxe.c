@@ -1,6 +1,6 @@
 /** @file  NorFlashBlockIoDxe.c
 
-  Copyright (c) 2010, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,7 +11,6 @@
 
 **/
 
-#include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
@@ -21,7 +20,8 @@ EFI_STATUS
 EFIAPI
 NorFlashBlkIoInitialize (
   IN NOR_FLASH_INSTANCE* Instance
-  ) {
+  )
+{
   UINT32                Reply;
   EFI_STATUS            Status = EFI_SUCCESS;
 
@@ -33,29 +33,23 @@ NorFlashBlkIoInitialize (
 
   // Read a specific CFI query that returns back "QRY"
   // This ensures that there is really a device present there
-  SEND_NOR_COMMAND( Instance->BaseAddress, 0, P30_CMD_READ_CFI_QUERY );
+  SEND_NOR_COMMAND (Instance->BaseAddress, 0, P30_CMD_READ_CFI_QUERY);
 
   // Read CFI 'QRY' data
-  Status = NorFlashReadCfiData( Instance->BaseAddress,
-                                 P30_CFI_ADDR_QUERY_UNIQUE_QRY,
-                                 3,
-                                 &Reply
-                               );
+  Status = NorFlashReadCfiData (Instance->BaseAddress, P30_CFI_ADDR_QUERY_UNIQUE_QRY, 3, &Reply);
   if (EFI_ERROR(Status)) {
-    goto EXIT;
+    return Status;
   }
 
-  if ( Reply != CFI_QRY ) {
+  if (Reply != CFI_QRY) {
     DEBUG((EFI_D_ERROR, "NorFlashBlkIoInitialize: CFI QRY=0x%x (expected 0x595251)\n", Reply));
-    Status = EFI_DEVICE_ERROR;
-    goto EXIT;
+    return EFI_DEVICE_ERROR;
   }
 
-EXIT:
   // Reset the device
-  Status = NorFlashBlockIoReset( &Instance->BlockIoProtocol, FALSE );
+  Status = NorFlashBlockIoReset (&Instance->BlockIoProtocol, FALSE);
   if (EFI_ERROR(Status)) {
-    goto EXIT;
+    return Status;
   }
 
   Instance->Initialized = TRUE;
@@ -73,17 +67,13 @@ NorFlashBlockIoReset (
   IN BOOLEAN                ExtendedVerification
   )
 {
-  EFI_STATUS     Status;
   NOR_FLASH_INSTANCE *Instance;
 
   Instance = INSTANCE_FROM_BLKIO_THIS(This);
 
   DEBUG ((DEBUG_BLKIO, "NorFlashBlockIoReset(MediaId=0x%x)\n", This->Media->MediaId));
 
-  Status = NorFlashReset(Instance);
-
-  return Status;
-
+  return NorFlashReset(Instance);
 }
 
 //
@@ -99,13 +89,22 @@ NorFlashBlockIoReadBlocks (
   OUT VOID                    *Buffer
   )
 {
-  NOR_FLASH_INSTANCE *Instance;
+  NOR_FLASH_INSTANCE  *Instance;
+  EFI_STATUS          Status;
 
   Instance = INSTANCE_FROM_BLKIO_THIS(This);
 
   DEBUG ((DEBUG_BLKIO, "NorFlashBlockIoReadBlocks(MediaId=0x%x, Lba=%ld, BufferSize=0x%x bytes (%d kB), BufferPtr @ 0x%08x)\n", MediaId, Lba, BufferSizeInBytes, Buffer));
 
-  return NorFlashReadBlocks(Instance,Lba,BufferSizeInBytes,Buffer);
+  if( !This->Media->MediaPresent ) {
+    Status = EFI_NO_MEDIA;
+  } else if( This->Media->MediaId != MediaId ) {
+    Status = EFI_MEDIA_CHANGED;
+  } else {
+    Status = NorFlashReadBlocks(Instance,Lba,BufferSizeInBytes,Buffer);
+  }
+
+  return Status;
 }
 
 //
@@ -121,13 +120,24 @@ NorFlashBlockIoWriteBlocks (
   IN  VOID                    *Buffer
   )
 {
-  NOR_FLASH_INSTANCE *Instance;
+  NOR_FLASH_INSTANCE  *Instance;
+  EFI_STATUS          Status;
 
   Instance = INSTANCE_FROM_BLKIO_THIS(This);
 
   DEBUG ((DEBUG_BLKIO, "NorFlashBlockIoWriteBlocks(MediaId=0x%x, Lba=%ld, BufferSize=0x%x bytes (%d kB), BufferPtr @ 0x%08x)\n", MediaId, Lba, BufferSizeInBytes, Buffer));
 
-  return NorFlashWriteBlocks(Instance,Lba,BufferSizeInBytes,Buffer);
+  if( !This->Media->MediaPresent ) {
+    Status = EFI_NO_MEDIA;
+  } else if( This->Media->MediaId != MediaId ) {
+    Status = EFI_MEDIA_CHANGED;
+  } else if( This->Media->ReadOnly ) {
+    Status = EFI_WRITE_PROTECTED;
+  } else {
+    Status = NorFlashWriteBlocks(Instance,Lba,BufferSizeInBytes,Buffer);
+  }
+
+  return Status;
 }
 
 //
