@@ -30,7 +30,7 @@
   IoLib
   ArmLib
   ArmTrustZoneLib
-  PL354SmcSecLib
+  PL354SmcLib
   PL341DmcLib
   PL301AxiLib
   L2X0CacheLib

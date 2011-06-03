@@ -93,6 +93,8 @@
   
   # ARM PL310 L2 Cache Driver
   L2X0CacheLib|ArmPkg/Drivers/PL310L2Cache/PL310L2CacheSec.inf
+  # ARM PL354 SMC Driver
+  PL354SmcLib|ArmPkg/Drivers/PL35xSmc/PL354SmcSec.inf
   # ARM PL341 DMC Driver
   PL341DmcLib|ArmPkg/Drivers/PL34xDmc/PL341Dmc.inf
   # ARM PL301 Axi Driver
@@ -133,8 +135,6 @@
   # Uncomment to turn on GDB stub in SEC. 
   #DebugAgentLib|EmbeddedPkg/Library/GdbDebugAgent/GdbDebugAgent.inf
   
-  # ARM PL354 SMC Driver
-  PL354SmcSecLib|ArmPkg/Drivers/PL35xSmc/PL354SmcSec.inf
   # ARM PL390 General Interrupt Driver in Secure and Non-secure
   PL390GicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicSec.inf
   PL390GicNonSecLib|ArmPkg/Drivers/PL390Gic/PL390GicNonSec.inf

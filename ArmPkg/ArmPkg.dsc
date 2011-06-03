@@ -71,8 +71,8 @@
   ArmTrustZoneLib|ArmPkg/Library/ArmTrustZoneLib/ArmTrustZoneLib.inf
   ArmMPCoreMailBoxLib|ArmPkg/Library/ArmMPCoreMailBoxLib/ArmMPCoreMailBoxLib.inf
   
-  PL354SmcSecLib|ArmPkg/Drivers/PL35xSmc/PL354SmcSec.inf
-  #PL341DmcLib|ArmPkg/Drivers/PL34xDmc/PL341Dmc.inf
+  PL354SmcLib|ArmPkg/Drivers/PL35xSmc/PL354SmcSec.inf
+  PL341DmcLib|ArmPkg/Drivers/PL34xDmc/PL341Dmc.inf
   PL301AxiLib|ArmPkg/Drivers/PL301Axi/PL301Axi.inf
   PL310L2CacheSecLib|ArmPkg/Drivers/PL310L2Cache/PL310L2CacheSec.inf
   
@@ -128,7 +128,7 @@
   ArmPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
   ArmPkg/Drivers/PL301Axi/PL301Axi.inf
   ArmPkg/Drivers/PL310L2Cache/PL310L2CacheSec.inf
-  #ArmPkg/Drivers/PL34xDmc/PL341Dmc.inf
+  ArmPkg/Drivers/PL34xDmc/PL341Dmc.inf
   ArmPkg/Drivers/PL35xSmc/PL354SmcSec.inf
   ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
   ArmPkg/Drivers/PL390Gic/PL390GicNonSec.inf
