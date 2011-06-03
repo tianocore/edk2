@@ -355,6 +355,7 @@
   #
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x10041000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x10040000
+  gArmTokenSpaceGuid.PcdGicNumInterrupts|96
 
   #
   # ARM OS Loader
@@ -437,7 +438,7 @@
   EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
 
   ArmPlatformPkg/ArmRealViewEbPkg/FvbDxe/FvbDxe.inf
-  ArmPlatformPkg/ArmRealViewEbPkg/InterruptDxe/InterruptDxe.inf
+  ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
   ArmPlatformPkg/Drivers/SP804TimerDxe/SP804TimerDxe.inf
 
   #
