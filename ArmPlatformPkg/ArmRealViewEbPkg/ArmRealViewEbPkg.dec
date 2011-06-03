@@ -35,6 +35,3 @@
   gArmRealViewEbPkgTokenSpaceGuid    =  { 0x44577A0D, 0x361A, 0x45B2, { 0xb3, 0x3d, 0xbb, 0x9e, 0xe6, 0x0d, 0x5a, 0x4f} } 
 
 [PcdsFeatureFlag.common]
-
-[PcdsFixedAtBuild.common]
-  gArmRealViewEbPkgTokenSpaceGuid.PcdPeiServicePtrAddr|0|UINT32|0x00000003
