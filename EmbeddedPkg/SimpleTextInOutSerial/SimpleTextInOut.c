@@ -214,7 +214,7 @@ SIMPLE_TEXT_OUT_DEVICE_PATH mDevicePath = {
     EFI_CALLER_ID_GUID
   },
   {
-    { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, sizeof (UART_DEVICE_PATH), 0},
+    { MESSAGING_DEVICE_PATH, MSG_UART_DP, sizeof (UART_DEVICE_PATH), 0},
     0,        // Reserved
     FixedPcdGet64 (PcdUartDefaultBaudRate),   // BaudRate
     FixedPcdGet8 (PcdUartDefaultDataBits),    // DataBits
