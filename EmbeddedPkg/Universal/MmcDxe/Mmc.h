@@ -41,6 +41,8 @@
 #define MMC_CSD_GET_DEVICESIZE(csd)         (((Response[2] >> 30) & 0x3) | ((Response[1] & 0x3FF) << 2))
 #define MMC_CSD_GET_DEVICESIZEMULT(csd)     ((Response[2] >> 15) & 0x7)
 
+#define MMC_R0_READY_FOR_DATA               (1 << 8)
+
 #define MMC_R0_CURRENTSTATE(Response)       ((Response[0] >> 9) & 0xF)
 
 #define MMC_R0_STATE_IDLE       0

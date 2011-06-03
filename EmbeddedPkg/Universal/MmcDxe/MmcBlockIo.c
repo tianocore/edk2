@@ -476,12 +476,17 @@ EFI_STATUS MmcIoBlocks (
 		CmdArg = MmcHostInstance->CardInfo.RCA << 16;
 		Response[0] = 0;
 		Timeout = 20;
-    	while((Response[0] & (1 << 8)) && Timeout-- ){
+    	while(!(Response[0] & MMC_R0_READY_FOR_DATA) && (MMC_R0_CURRENTSTATE(Response) != MMC_R0_STATE_TRAN) && Timeout--) {
     		Status = MmcHost->SendCommand(MMC_CMD13, CmdArg);
     		if (!EFI_ERROR(Status)){
     			MmcHost->ReceiveResponse(MMC_RESPONSE_TYPE_R1,Response);
     		}
     	}
+
+    	if (0 == Timeout) {
+      		DEBUG((EFI_D_ERROR, "The Card is busy\n"));
+      		return EFI_NOT_READY;
+    }
 
         // Set Block Length
         Status = MmcHost->SendCommand(MMC_CMD16, This->Media->BlockSize);
@@ -554,14 +559,19 @@ EFI_STATUS MmcIoBlocks (
 
         // Command 12 - Stop transmission (ends read)
         Status = MmcHost->SendCommand(MMC_CMD12, 0);
-        MmcHost->ReceiveResponse(MMC_RESPONSE_TYPE_R1b,Response);
+    	if (!EFI_ERROR(Status)) {
+        	MmcHost->ReceiveResponse(MMC_RESPONSE_TYPE_R1b,Response);
+    	}
 
         // Command 13 - Read status and wait for programming to complete (return to tran)
         Timeout = MMCI0_TIMEOUT;
         CmdArg = MmcHostInstance->CardInfo.RCA << 16;
-        while ((MMC_R0_CURRENTSTATE(Response) != MMC_R0_STATE_TRAN) && Timeout) {
-            MmcHost->SendCommand(MMC_CMD13, CmdArg);
-            MmcHost->ReceiveResponse(MMC_RESPONSE_TYPE_R1,Response);
+    	Response[0] = 0;
+    	while(!(Response[0] & MMC_R0_READY_FOR_DATA) && (MMC_R0_CURRENTSTATE(Response) != MMC_R0_STATE_TRAN) && Timeout--) {
+      		Status = MmcHost->SendCommand(MMC_CMD13, CmdArg);
+      		if (!EFI_ERROR(Status)) {
+            	MmcHost->ReceiveResponse(MMC_RESPONSE_TYPE_R1,Response);
+      		}
             NanoSecondDelay(100);
             Timeout--;
         }
