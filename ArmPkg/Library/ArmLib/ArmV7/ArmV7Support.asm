@@ -50,6 +50,8 @@
     EXPORT  ArmReadCbar
     EXPORT  ArmInvalidateInstructionAndDataTlb
     EXPORT  ArmReadMpidr
+    EXPORT  ArmReadTpidrurw
+    EXPORT  ArmWriteTpidrurw
 
     AREA    ArmCacheLib, CODE, READONLY
     PRESERVE8
@@ -341,6 +343,14 @@ ArmInvalidateInstructionAndDataTlb
 
 ArmReadMpidr
   mrc     p15, 0, r0, c0, c0, 5    ; read MPIDR
+  bx      lr
+
+ArmReadTpidrurw
+  mrc     p15, 0, r0, c13, c0, 2    ; read TPIDRURW
+  bx      lr
+
+ArmWriteTpidrurw
+  mcr     p15, 0, r0, c13, c0, 2    ; write TPIDRURW
   bx      lr
 
   END

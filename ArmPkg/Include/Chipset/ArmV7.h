@@ -388,4 +388,17 @@ VOID
 );
 
 
+UINTN
+EFIAPI
+ArmReadTpidrurw(
+VOID
+);
+
+
+VOID
+EFIAPI
+ArmWriteTpidrurw(
+UINTN Value
+);
+
 #endif // __ARM_V7_H__

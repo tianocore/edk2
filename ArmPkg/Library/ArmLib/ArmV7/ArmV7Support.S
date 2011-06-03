@@ -52,6 +52,8 @@ GCC_ASM_EXPORT (ArmReadAuxCr)
 GCC_ASM_EXPORT (ArmReadCbar)
 GCC_ASM_EXPORT (ArmInvalidateInstructionAndDataTlb)
 GCC_ASM_EXPORT (ArmReadMpidr)
+GCC_ASM_EXPORT (ArmReadTpidrurw)
+GCC_ASM_EXPORT (ArmWriteTpidrurw)
 
 .set DC_ON, (0x1<<2)
 .set IC_ON, (0x1<<12)
@@ -343,6 +345,14 @@ ASM_PFX(ArmInvalidateInstructionAndDataTlb):
 
 ASM_PFX(ArmReadMpidr):
   mrc     p15, 0, r0, c0, c0, 5       @ read MPIDR
+  bx      lr
+  
+ASM_PFX(ArmReadTpidrurw):
+  mrc     p15, 0, r0, c13, c0, 2    @ read TPIDRURW
+  bx      lr
+
+ASM_PFX(ArmWriteTpidrurw):
+  mcr     p15, 0, r0, c13, c0, 2    @ write TPIDRURW
   bx      lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
