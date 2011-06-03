@@ -16,10 +16,18 @@
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 
-VOID ArmClearMPCoreMailbox() {
+VOID
+ArmClearMPCoreMailbox (
+  VOID
+  )
+{
   MmioWrite32(PcdGet32(PcdMPCoreMailboxClearAddress),PcdGet32(PcdMPCoreMailboxClearValue));
 }
 
-UINTN ArmGetMPCoreMailbox() {
-    return MmioRead32(PcdGet32(PcdMPCoreMailboxGetAddress));
+UINTN
+ArmGetMPCoreMailbox (
+  VOID
+  )
+{
+  return MmioRead32(PcdGet32(PcdMPCoreMailboxGetAddress));
 }

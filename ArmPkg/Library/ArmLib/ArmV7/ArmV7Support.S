@@ -295,21 +295,21 @@ ASM_PFX(ArmWriteCPACR):
   bx      lr
 
 ASM_PFX(ArmEnableVFP):
-  // Enable VFP registers
+  # Enable VFP registers
   mrc     p15, 0, r0, c1, c0, 2
-  orr     r0, r0, #0x00f00000   // Enable VPF access (V* instructions)
+  orr     r0, r0, #0x00f00000   @ Enable VPF access (V* instructions)
   mcr     p15, 0, r0, c1, c0, 2
-  mov     r0, #0x40000000       // Set EN bit in FPEXC
-  mcr     p10,#0x7,r0,c8,c0,#0  // msr     FPEXC,r0 in ARM assembly
+  mov     r0, #0x40000000       @ Set EN bit in FPEXC
+  mcr     p10,#0x7,r0,c8,c0,#0  @ msr     FPEXC,r0 in ARM assembly
   bx      lr
 
 ASM_PFX(ArmCallWFI):
   wfi
   bx      lr
 
-//Note: Return 0 in Uniprocessor implementation
+#Note: Return 0 in Uniprocessor implementation
 ASM_PFX(ArmReadCbar):
-  mrc     p15, 4, r0, c15, c0, 0  //Read Configuration Base Address Register
+  mrc     p15, 4, r0, c15, c0, 0  @ Read Configuration Base Address Register
   bx      lr
 
 ASM_PFX(ArmInvalidateInstructionAndDataTlb):

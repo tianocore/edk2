@@ -15,6 +15,11 @@
 #include <Library/L2X0CacheLib.h>
 
 // Initialize L2X0 Cache Controller
-VOID L2x0CacheInit(UINTN L2x0Base, BOOLEAN CacheEnabled) {
+VOID
+L2x0CacheInit (
+  IN  UINTN   L2x0Base,
+  IN  BOOLEAN CacheEnabled
+  )
+{
     //No implementation
 }

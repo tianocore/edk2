@@ -50,8 +50,8 @@ ArmInvalidScu (
 
     scu_base = ArmGetScuBaseAddress();
 
-    /* Invalidate all: write -1 to SCU Invalidate All register */
+    // Invalidate all: write -1 to SCU Invalidate All register
     MmioWrite32(scu_base + SCU_INVALL_OFFSET, 0xffffffff);
-    /* Enable SCU */
+    // Enable SCU
     MmioWrite32(scu_base + SCU_CONTROL_OFFSET, 0x1);
 }
