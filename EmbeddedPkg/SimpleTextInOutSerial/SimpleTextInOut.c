@@ -517,13 +517,71 @@ OutputString (
   IN CHAR16                           *String
   )
 {
-  UINTN Size          = StrLen(String) + 1;
-  CHAR8 *OutputString = AllocatePool(Size);
+  UINTN                       Size;
+  CHAR8*                      OutputString;
+  EFI_STATUS                  Status;
+  EFI_SIMPLE_TEXT_OUTPUT_MODE *Mode;
+  UINTN                       MaxColumn;
+  UINTN                       MaxRow;
   
+  Size = StrLen(String) + 1;
+  OutputString = AllocatePool(Size);
+
   //If there is any non-ascii characters in String buffer then replace it with '?'
   //Eventually, UnicodeStrToAsciiStr API should be fixed.
   SafeUnicodeStrToAsciiStr(String, OutputString);  
   SerialPortWrite ((UINT8 *)OutputString, Size - 1);
+
+  //
+  // Parse each character of the string to output
+  // to update the cursor position information
+  //
+  Mode = This->Mode;
+
+  Status = This->QueryMode (
+                   This,
+                   Mode->Mode,
+                   &MaxColumn,
+                   &MaxRow
+                   );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  for (; *String != CHAR_NULL; String++) {
+
+    switch (*String) {
+    case CHAR_BACKSPACE:
+      if (Mode->CursorColumn > 0) {
+        Mode->CursorColumn--;
+      }
+      break;
+
+    case CHAR_LINEFEED:
+      if (Mode->CursorRow < (INT32) (MaxRow - 1)) {
+        Mode->CursorRow++;
+      }
+      break;
+
+    case CHAR_CARRIAGE_RETURN:
+      Mode->CursorColumn = 0;
+      break;
+
+    default:
+      if (Mode->CursorColumn >= (INT32) (MaxColumn - 1)) {
+        // Move the cursor as if we print CHAR_CARRIAGE_RETURN & CHAR_LINE_FEED
+        // CHAR_LINEFEED
+        if (Mode->CursorRow < (INT32) (MaxRow - 1)) {
+          Mode->CursorRow++;
+        }
+        // CHAR_CARIAGE_RETURN
+        Mode->CursorColumn = 0;
+      } else {
+        Mode->CursorColumn++;
+      }
+      break;
+    }
+  }
 
   FreePool(OutputString);
 
