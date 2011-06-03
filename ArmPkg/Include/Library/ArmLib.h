@@ -346,7 +346,19 @@ EFIAPI
 ArmDisableBranchPrediction (
   VOID
   );
-  
+
+VOID
+EFIAPI
+ArmSetLowVectors (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmSetHighVectors (
+  VOID
+  );
+
 VOID
 EFIAPI
 ArmDataMemoryBarrier (

@@ -31,6 +31,8 @@
     EXPORT  ArmEnableSWPInstruction
     EXPORT  ArmEnableBranchPrediction
     EXPORT  ArmDisableBranchPrediction
+    EXPORT  ArmSetLowVectors
+    EXPORT  ArmSetHighVectors
     EXPORT  ArmV7AllDataCachesOperation
     EXPORT  ArmDataMemoryBarrier
     EXPORT  ArmDataSyncronizationBarrier
@@ -196,6 +198,19 @@ ArmDisableBranchPrediction
   isb
   bx      LR
 
+ArmSetLowVectors
+  mrc     p15, 0, r0, c1, c0, 0 ; Read SCTLR into R0 (Read control register configuration data)
+  bic     r0, r0, #0x00002000   ; clear V bit
+  mcr     p15, 0, r0, c1, c0, 0 ; Write R0 into SCTLR (Write control register configuration data)
+  isb
+  bx      LR
+
+ArmSetHighVectors
+  mrc     p15, 0, r0, c1, c0, 0 ; Read SCTLR into R0 (Read control register configuration data)
+  orr     r0, r0, #0x00002000   ; clear V bit
+  mcr     p15, 0, r0, c1, c0, 0 ; Write R0 into SCTLR (Write control register configuration data)
+  isb
+  bx      LR
 
 ArmV7AllDataCachesOperation
   stmfd SP!,{r4-r12, LR}
@@ -281,7 +296,13 @@ ArmWriteVMBar
   bx      lr
 
 ArmWriteVBar
+  // Set the Address of the Vector Table in the VBAR register
   mcr     p15, 0, r0, c12, c0, 0 
+  // Ensure the SCTLR.V bit is clear
+  mrc     p15, 0, r0, c1, c0, 0 ; Read SCTLR into R0 (Read control register configuration data)
+  bic     r0, r0, #0x00002000   ; clear V bit
+  mcr     p15, 0, r0, c1, c0, 0 ; Write R0 into SCTLR (Write control register configuration data)
+  isb
   bx      lr
 
 ArmReadVBar

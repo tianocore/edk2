@@ -149,6 +149,14 @@ InitializeExceptions (
     //
     Length = (UINTN)ExceptionHandlersEnd - (UINTN)ExceptionHandlersStart;
 
+    // Check if the exception vector is in the low address
+    if (PcdGet32 (PcdCpuVectorBaseAddress) == 0x0) {
+      // Set SCTLR.V to 0 to enable VBAR to be used
+      ArmSetLowVectors ();
+    } else {
+      ArmSetHighVectors ();
+    }
+
     //
     // Reserve space for the exception handlers
     //

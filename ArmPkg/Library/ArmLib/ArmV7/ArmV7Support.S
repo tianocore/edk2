@@ -34,6 +34,8 @@ GCC_ASM_EXPORT (ArmDisableInstructionCache)
 GCC_ASM_EXPORT (ArmEnableSWPInstruction)
 GCC_ASM_EXPORT (ArmEnableBranchPrediction)
 GCC_ASM_EXPORT (ArmDisableBranchPrediction)
+GCC_ASM_EXPORT (ArmSetLowVectors)
+GCC_ASM_EXPORT (ArmSetHighVectors)
 GCC_ASM_EXPORT (ArmV7AllDataCachesOperation)
 GCC_ASM_EXPORT (ArmDataMemoryBarrier)
 GCC_ASM_EXPORT (ArmDataSyncronizationBarrier)
@@ -199,6 +201,19 @@ ASM_PFX(ArmDisableBranchPrediction):
   isb
   bx      LR
 
+ASM_PFX(ArmSetLowVectors):
+  mrc     p15, 0, r0, c1, c0, 0 @ Read SCTLR into R0 (Read control register configuration data)
+  bic     r0, r0, #0x00002000   @ clear V bit
+  mcr     p15, 0, r0, c1, c0, 0 @ Write R0 into SCTLR (Write control register configuration data)
+  isb
+  bx      LR
+
+ASM_PFX(ArmSetHighVectors):
+  mrc     p15, 0, r0, c1, c0, 0 @ Read SCTLR into R0 (Read control register configuration data)
+  orr     r0, r0, #0x00002000   @ clear V bit
+  mcr     p15, 0, r0, c1, c0, 0 @ Write R0 into SCTLR (Write control register configuration data)
+  isb
+  bx      LR
 
 ASM_PFX(ArmV7AllDataCachesOperation):
   stmfd SP!,{r4-r12, LR}
@@ -287,7 +302,13 @@ ASM_PFX(ArmWriteVMBar):
   bx      lr
 
 ASM_PFX(ArmWriteVBar):
+  # Set the Address of the Vector Table in the VBAR register
   mcr     p15, 0, r0, c12, c0, 0 
+  # Ensure the SCTLR.V bit is clear
+  mrc     p15, 0, r0, c1, c0, 0 @ Read SCTLR into R0 (Read control register configuration data)
+  bic     r0, r0, #0x00002000   @ clear V bit
+  mcr     p15, 0, r0, c1, c0, 0 @ Write R0 into SCTLR (Write control register configuration data)
+  isb
   bx      lr
 
 ASM_PFX(ArmWriteCPACR):
