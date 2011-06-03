@@ -143,7 +143,7 @@ PeCoffLoaderUnloadImageExtraAction (
 {
   CHAR8 Buffer[256];
   
-  AsciiSPrint (Buffer, sizeof(Buffer), "unload symbols_only %a", ImageContext->PdbPointer);
+  AsciiSPrint (Buffer, sizeof(Buffer), "unload symbols_only %a\n", ImageContext->PdbPointer);
   DeCygwinPathIfNeeded (Buffer);
  
   WriteStringToFile (Buffer, AsciiStrSize (Buffer));
