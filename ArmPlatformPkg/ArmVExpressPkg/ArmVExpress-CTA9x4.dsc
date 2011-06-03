@@ -230,12 +230,14 @@
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 [BuildOptions]
-  RVCT:*_*_ARM_ARCHCC_FLAGS  == --cpu Cortex-A9 --thumb -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
-  RVCT:*_*_ARM_ARCHASM_FLAGS == --cpu Cortex-A9 -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
-  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
+  RVCT:*_*_ARM_ARCHCC_FLAGS  == --cpu Cortex-A9 --thumb
+  RVCT:*_*_ARM_ARCHASM_FLAGS == --cpu Cortex-A9
+  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
+  RVCT:*_*_ARM_PLATFORM_FLAGS = -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
 
-  ARMGCC:*_*_ARM_ARCHCC_FLAGS  == -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
-  ARMGCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
+  ARMGCC:*_*_ARM_ARCHCC_FLAGS  == 
+  ARMGCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
+  ARMGCC:*_*_ARM_PLATFORM_FLAGS = -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
   
 
 ################################################################################

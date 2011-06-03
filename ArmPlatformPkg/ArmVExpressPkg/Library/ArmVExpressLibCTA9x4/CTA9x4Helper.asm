@@ -61,7 +61,7 @@ ArmPlatformInitializeBootMemory
   mov   r5, lr
   // Initialize PL354 SMC
   LoadConstantToReg (ARM_VE_SMC_CTRL_BASE, r1)
-  LoadConstantToReg (ARM_VE_SMB_PERIPH_VRAM, r2)
+  LoadConstantToReg (VRAM_MOTHERBOARD_BASE, r2)
   blx   InitializeSMC
   bx	r5
   
