@@ -232,7 +232,7 @@ EmuBlockIoReset (
   EMU_BLOCK_IO_PRIVATE    *Private;
   EFI_TPL                 OldTpl;
 
-  Private = EMU_BLOCK_IO2_PRIVATE_DATA_FROM_THIS (This);
+  Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
@@ -264,8 +264,7 @@ EmuBlockIoReset (
 **/
 EFI_STATUS
 EFIAPI
-EmuBlockIoReadBlocks
-(
+EmuBlockIoReadBlocks (
   IN EFI_BLOCK_IO_PROTOCOL          *This,
   IN UINT32                         MediaId,
   IN EFI_LBA                        Lba,
@@ -278,7 +277,7 @@ EmuBlockIoReadBlocks
   EFI_TPL                 OldTpl;
   EFI_BLOCK_IO2_TOKEN     Token;
 
-  Private = EMU_BLOCK_IO2_PRIVATE_DATA_FROM_THIS (This);
+  Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
@@ -325,7 +324,7 @@ EmuBlockIoWriteBlocks (
   EFI_TPL                 OldTpl;
   EFI_BLOCK_IO2_TOKEN     Token;
 
-  Private = EMU_BLOCK_IO2_PRIVATE_DATA_FROM_THIS (This);
+  Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
@@ -357,7 +356,7 @@ EmuBlockIoFlushBlocks (
   EFI_TPL                 OldTpl;
   EFI_BLOCK_IO2_TOKEN     Token;
 
-  Private = EMU_BLOCK_IO2_PRIVATE_DATA_FROM_THIS (This);
+  Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
@@ -442,7 +441,7 @@ EmuBlockIoDriverBindingSupported (
   // Make sure GUID is for a File System handle.
   //
   Status = EFI_UNSUPPORTED;
-  if (CompareGuid (EmuIoThunk->Protocol, &gEmuVirtualDisksGuid)) {
+  if (CompareGuid (EmuIoThunk->Protocol, &gEmuBlockIoProtocolGuid)) {
     Status = EFI_SUCCESS;
   }
 
@@ -524,7 +523,7 @@ EmuBlockIoDriverBindingStart (
   //
   // Set DiskType
   //
-  if (!CompareGuid (EmuIoThunk->Protocol, &gEmuVirtualDisksGuid)) {
+  if (!CompareGuid (EmuIoThunk->Protocol, &gEmuBlockIoProtocolGuid)) {
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
@@ -542,6 +541,7 @@ EmuBlockIoDriverBindingStart (
   Private->Signature = EMU_BLOCK_IO_PRIVATE_SIGNATURE;
   Private->IoThunk   = EmuIoThunk;
   Private->Io        = EmuIoThunk->Interface;
+  Private->EfiHandle = Handle;
   
   Private->BlockIo.Revision    = EFI_BLOCK_IO_PROTOCOL_REVISION2;
   Private->BlockIo.Media       = &Private->Media;

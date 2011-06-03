@@ -58,8 +58,8 @@ case `uname` in
         UNIXPKG_TOOLS=XCLANG
       fi
 #      NETWORK_SUPPORT="-D NETWORK_SUPPORT"
-#      BUILD_NEW_SHELL="-D BUILD_NEW_SHELL"
-#      BUILD_FAT="-D BUILD_FAT"
+      BUILD_NEW_SHELL="-D BUILD_NEW_SHELL"
+      BUILD_FAT="-D BUILD_FAT"
       ;;
   Linux*) TARGET_TOOLS=ELFGCC ;;
 

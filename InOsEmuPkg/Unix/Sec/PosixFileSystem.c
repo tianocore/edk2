@@ -1533,7 +1533,7 @@ PosixFileSystmeThunkClose (
   }
 
   if (This->Private != NULL) {
-    if (Private->VolumeLabel == NULL) {
+    if (Private->VolumeLabel != NULL) {
       free (Private->VolumeLabel);
     }   
     free (This->Private);

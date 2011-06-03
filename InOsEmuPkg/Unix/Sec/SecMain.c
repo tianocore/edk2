@@ -116,7 +116,10 @@ main (
   //
   AddThunkProtocol (&gX11ThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuGop), TRUE); 
   AddThunkProtocol (&gPosixFileSystemThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuFileSystem), TRUE); 
+  AddThunkProtocol (&gBlockIoThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuVirtualDisk), TRUE); 
   
+
+
   //
   // Emulator other Thunks
   //

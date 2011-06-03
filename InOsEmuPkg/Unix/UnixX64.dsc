@@ -220,8 +220,7 @@
   
   gInOsEmuPkgTokenSpaceGuid.PcdEmuApCount|L"1"
 
-  gInOsEmuPkgTokenSpaceGuid.PcdEmuPhysicalDisk|L"E:RW;245760;512"
-  gInOsEmuPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"FW;40960;512"
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"disk.dmg:FW"
   gInOsEmuPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFileSystem|L".!../../../../EdkShellBinPkg/Bin"
   gInOsEmuPkgTokenSpaceGuid.PcdEmuSerialPort|L"/dev/ttyS0"
@@ -358,20 +357,13 @@
   InOsEmuPkg/EmuSimpleFileSystemDxe/EmuSimpleFileSystemDxe.inf
   InOsEmuPkg/EmuBlockIoDxe/EmuBlockIoDxe.inf
 
-!if $(0)
-  UnixPkg/UnixSerialIoDxe/UnixSerialIo.inf
-  UnixPkg/UnixConsoleDxe/UnixConsole.inf
-  UnixPkg/UnixSimpleFileSystemDxe/UnixSimpleFileSystem.inf
-!endif
-
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
   #
   # Network stack drivers
   #
-##!if $(NETWORK_SUPPORT) & $(0)
-!if $(0)
-  UnixPkg/UnixSnpDxe/UnixSnpDxe.inf
+!if $(NETWORK_SUPPORT) 
+  InOsEmuPkg/EmuSnpDxe/EmuSnpDxe.inf
 !endif
   MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
   MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf

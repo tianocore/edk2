@@ -23,7 +23,7 @@
 #include <Protocol/BlockIo2.h>
 
 #define EMU_BLOCK_IO_PROTOCOL_GUID \
- { 0x3EC5F7E0, 0x1124, 0xDF45, { 0x9F, 0x96, 0x7D, 0xD6, 0x63, 0xC0, 0xAF, 0xE7 } }
+{ 0x6888A4AE, 0xAFCE, 0xE84B, { 0x91, 0x02, 0xF7, 0xB9, 0xDA, 0xE6, 0xA0, 0x30 } }
 
 typedef struct _EMU_BLOCK_IO_PROTOCOL   EMU_BLOCK_IO_PROTOCOL;
 
@@ -90,7 +90,7 @@ EFI_STATUS
   IN     EFI_LBA                LBA,
   IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
   IN     UINTN                  BufferSize,
-     OUT VOID                  *Buffer
+     OUT VOID                   *Buffer
   );
 
 /**
@@ -127,7 +127,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EMU_BLOCK_WRITE) (
-  IN     EMU_BLOCK_IO_PROTOCOL   *This,
+  IN     EMU_BLOCK_IO_PROTOCOL  *This,
   IN     UINT32                 MediaId,
   IN     EFI_LBA                LBA,
   IN OUT EFI_BLOCK_IO2_TOKEN    *Token,

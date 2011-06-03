@@ -46,6 +46,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/EmuIoThunk.h>
 #include <Protocol/EmuGraphicsWindow.h>
 #include <Protocol/EmuThread.h>
+#include <Protocol/EmuBlockIo.h>
 
 #include <Guid/FileInfo.h>
 #include <Guid/FileSystemInfo.h>
@@ -318,6 +319,6 @@ extern EMU_THUNK_PROTOCOL    gEmuThunkProtocol;
 extern EMU_IO_THUNK_PROTOCOL gX11ThunkIo;
 extern EMU_IO_THUNK_PROTOCOL gPosixFileSystemThunkIo;
 extern EMU_IO_THUNK_PROTOCOL gPthreadThunkIo;
-
+extern EMU_IO_THUNK_PROTOCOL gBlockIoThunkIo;
 
 #endif

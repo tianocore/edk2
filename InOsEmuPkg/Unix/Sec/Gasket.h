@@ -405,8 +405,58 @@ GasketPosixFileSystmeThunkClose (
   IN  EMU_IO_THUNK_PROTOCOL   *This
   );
 
+EFI_STATUS
+EFIAPI
+GasketEmuBlockIoReset (
+  IN EMU_BLOCK_IO_PROTOCOL    *This,
+  IN BOOLEAN                  ExtendedVerification
+  );
 
+EFI_STATUS
+GasketEmuBlockIoReadBlocks (
+  IN     EMU_BLOCK_IO_PROTOCOL  *This,
+  IN     UINT32                 MediaId,
+  IN     EFI_LBA                LBA,
+  IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
+  IN     UINTN                  BufferSize,
+     OUT VOID                   *Buffer
+  );
 
+EFI_STATUS
+EFIAPI
+GasketEmuBlockIoWriteBlocks (
+  IN     EMU_BLOCK_IO_PROTOCOL  *This,
+  IN     UINT32                 MediaId,
+  IN     EFI_LBA                LBA,
+  IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
+  IN     UINTN                  BufferSize,
+  IN     VOID                   *Buffer
+  );
+  
+EFI_STATUS
+GasketEmuBlockIoFlushBlocks (
+  IN     EMU_BLOCK_IO_PROTOCOL    *This,
+  IN OUT EFI_BLOCK_IO2_TOKEN      *Token
+  );
+  
+EFI_STATUS
+GasketEmuBlockIoCreateMapping (
+  IN     EMU_BLOCK_IO_PROTOCOL    *This,
+  IN     EFI_BLOCK_IO_MEDIA       *Media
+  );
+
+EFI_STATUS
+EFIAPI
+GasketBlockIoThunkOpen (
+  IN  EMU_IO_THUNK_PROTOCOL   *This
+  );
+
+EFI_STATUS
+EFIAPI
+GasketBlockIoThunkClose (
+  IN  EMU_IO_THUNK_PROTOCOL   *This
+  );
+  
 #endif
 
 

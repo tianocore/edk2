@@ -66,4 +66,4 @@
   gEfiBlockIoProtocolGuid                     # PROTOCOL BY_START
   gEfiBlockIo2ProtocolGuid                    # PROTOCOL BY_START
   gEmuIoThunkProtocolGuid                     # PROTOCOL TO_START
-
+  gEmuBlockIoProtocolGuid                     # PROTOCOL BY_START

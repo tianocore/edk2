@@ -9,598 +9,111 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  UnixBlockIo.c
-
-Abstract:
-
-  Produce block IO abstractions for real devices on your PC using Posix APIs.
-  The configuration of what devices to mount or emulate comes from UNIX 
-  environment variables. The variables must be visible to the Microsoft* 
-  Developer Studio for them to work.
-
-  <F>ixed       - Fixed disk like a hard drive.
-  <R>emovable   - Removable media like a floppy or CD-ROM.
-  Read <O>nly   - Write protected device.
-  Read <W>rite  - Read write device.
-  <block count> - Decimal number of blocks a device supports.
-  <block size>  - Decimal number of bytes per block.
-
-  UNIX envirnonment variable contents. '<' and '>' are not part of the variable, 
-  they are just used to make this help more readable. There should be no 
-  spaces between the ';'. Extra spaces will break the variable. A '!' is 
-  used to seperate multiple devices in a variable.
-
-  EFI_EMU_VIRTUAL_DISKS = 
-    <F | R><O | W>;<block count>;<block size>[!...]
-
-  EFI_EMU_PHYSICAL_DISKS =
-    <drive letter>:<F | R><O | W>;<block count>;<block size>[!...]
-
-  Virtual Disks: These devices use a file to emulate a hard disk or removable
-                 media device. 
-                 
-    Thus a 20 MB emulated hard drive would look like:
-    EFI_EMU_VIRTUAL_DISKS=FW;40960;512
-
-    A 1.44MB emulated floppy with a block size of 1024 would look like:
-    EFI_EMU_VIRTUAL_DISKS=RW;1440;1024
-
-  Physical Disks: These devices use UNIX to open a real device in your system
-
-    Thus a 120 MB floppy would look like:
-    EFI_EMU_PHYSICAL_DISKS=B:RW;245760;512
-
-    Thus a standard CD-ROM floppy would look like:
-    EFI_EMU_PHYSICAL_DISKS=Z:RO;307200;2048
-
-
-  * Other names and brands may be claimed as the property of others.
-
 **/
 
-#include <fcntl.h>
-#include <unistd.h>
-#include "UnixBlockIo.h"
+//#include <fcntl.h>
+//#include <unistd.h>
+#include "SecMain.h"
 
-//
-// Block IO protocol member functions
-//
-EFI_STATUS
-EFIAPI
-UnixBlockIoReadBlocks (
-  IN EFI_BLOCK_IO_PROTOCOL  *This,
-  IN UINT32                 MediaId,
-  IN EFI_LBA                Lba,
-  IN UINTN                  BufferSize,
-  OUT VOID                  *Buffer
-  );
+#define EMU_BLOCK_IO_PRIVATE_SIGNATURE SIGNATURE_32 ('E', 'M', 'b', 'k')
+typedef struct {
+  UINTN                       Signature;
 
-EFI_STATUS
-EFIAPI
-UnixBlockIoWriteBlocks (
-  IN EFI_BLOCK_IO_PROTOCOL  *This,
-  IN UINT32                 MediaId,
-  IN EFI_LBA                Lba,
-  IN UINTN                  BufferSize,
-  IN VOID                   *Buffer
-  );
+  EMU_IO_THUNK_PROTOCOL       *Thunk;
 
-EFI_STATUS
-EFIAPI
-UnixBlockIoFlushBlocks (
-  IN EFI_BLOCK_IO_PROTOCOL  *This
-  );
+  char                        *Filename;
+  UINTN                       ReadMode;
+  UINTN                       Mode;
 
-EFI_STATUS
-EFIAPI
-UnixBlockIoResetBlock (
-  IN EFI_BLOCK_IO_PROTOCOL  *This,
-  IN BOOLEAN                ExtendedVerification
-  );
+  int                         fd;
 
-//
-// Private Worker functions
-//
-EFI_STATUS
-UnixBlockIoCreateMapping (
-  IN EMU_IO_THUNK_PROTOCOL             *EmuIoThunk,
-  IN EFI_HANDLE                         EfiDeviceHandle,
-  IN CHAR16                             *Filename,
-  IN BOOLEAN                            ReadOnly,
-  IN BOOLEAN                            RemovableMedia,
-  IN UINTN                              NumberOfBlocks,
-  IN UINTN                              BlockSize
-  );
-
-EFI_STATUS
-UnixBlockIoReadWriteCommon (
-  IN  EMU_BLOCK_IO_PRIVATE *Private,
-  IN UINT32                   MediaId,
-  IN EFI_LBA                  Lba,
-  IN UINTN                    BufferSize,
-  IN VOID                     *Buffer,
-  IN CHAR8                    *CallerName
-  );
-
-EFI_STATUS
-UnixBlockIoError (
-  IN EMU_BLOCK_IO_PRIVATE      *Private
-  );
-
-EFI_STATUS
-UnixBlockIoOpenDevice (
-  EMU_BLOCK_IO_PRIVATE         *Private
-  );
-
-CHAR16                                    *
-GetNextElementPastTerminator (
-  IN  CHAR16  *EnvironmentVariable,
-  IN  CHAR16  Terminator
-  );
-
-
-
-EFI_DRIVER_BINDING_PROTOCOL gUnixBlockIoDriverBinding = {
-  UnixBlockIoDriverBindingSupported,
-  UnixBlockIoDriverBindingStart,
-  UnixBlockIoDriverBindingStop,
-  0xa,
-  NULL,
-  NULL
-};
-
-/**
-  The user Entry Point for module UnixBlockIo. The user code starts with this function.
-
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
-  @param[in] SystemTable    A pointer to the EFI System Table.
-  
-  @retval EFI_SUCCESS       The entry point is executed successfully.
-  @retval other             Some error occurs when executing this entry point.
-
-**/
-EFI_STATUS
-EFIAPI
-InitializeUnixBlockIo(
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
-  )
-{
-  EFI_STATUS              Status;
-
-  Status = EfiLibInstallAllDriverProtocols2 (
-             ImageHandle,
-             SystemTable,
-             &gUnixBlockIoDriverBinding,
-             ImageHandle,
-             &gUnixBlockIoComponentName,
-             &gUnixBlockIoComponentName2,
-             NULL,
-             &gUnixBlockIoDriverDiagnostics,
-             &gUnixBlockIoDriverDiagnostics2
-             );
-  ASSERT_EFI_ERROR (Status);
-
-
-  return Status;
-}
-
-EFI_STATUS
-EFIAPI
-UnixBlockIoDriverBindingSupported (
-  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN  EFI_HANDLE                   Handle,
-  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-{
-  EFI_STATUS              Status;
-  EMU_IO_THUNK_PROTOCOL  *EmuIoThunk;
-
-  //
-  // Open the IO Abstraction(s) needed to perform the supported test
-  //
-  Status = gBS->OpenProtocol (
-                  Handle,
-                  &gEmuIoThunkProtocolGuid,
-                  (VOID **)&EmuIoThunk,
-                  This->DriverBindingHandle,
-                  Handle,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Make sure the UnixThunkProtocol is valid
-  //
-  Status = EFI_UNSUPPORTED;
-  if (EmuIoThunk->UnixThunk->Signature == EFI_EMU_THUNK_PROTOCOL_SIGNATURE) {
-
-    //
-    // Check the GUID to see if this is a handle type the driver supports
-    //
-    if (CompareGuid (EmuIoThunk->TypeGuid, &gEfiUnixVirtualDisksGuid) ) {
-      Status = EFI_SUCCESS;
-    }
-  }
-
-  //
-  // Close the I/O Abstraction(s) used to perform the supported test
-  //
-  gBS->CloseProtocol (
-        Handle,
-        &gEmuIoThunkProtocolGuid,
-        This->DriverBindingHandle,
-        Handle
-        );
-  return Status;
-}
-
-EFI_STATUS
-EFIAPI
-UnixBlockIoDriverBindingStart (
-  IN  EFI_DRIVER_BINDING_PROTOCOL   *This,
-  IN  EFI_HANDLE                    Handle,
-  IN  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath
-  )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-{
-  EFI_STATUS                  Status;
-  EMU_IO_THUNK_PROTOCOL       *EmuIoThunk;
-  CHAR16                      Buffer[FILENAME_BUFFER_SIZE];
-  CHAR16                      *Str;
   BOOLEAN                     RemovableMedia;
   BOOLEAN                     WriteProtected;
-  UINTN                       NumberOfBlocks;
+
   UINTN                       BlockSize;
-  INTN                        i;
+  UINT64                      NumberOfBlocks;
+  UINT64                      LastBlock;
 
-  //
-  // Grab the protocols we need
-  //
-  
-  Status = gBS->OpenProtocol (
-                  Handle,
-                  &gEmuIoThunkProtocolGuid,
-                  (void *)&EmuIoThunk,
-                  This->DriverBindingHandle,
-                  Handle,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  //
-  // Set DiskType
-  //
-  if (!CompareGuid (EmuIoThunk->TypeGuid, &gEfiUnixVirtualDisksGuid)) {
-    Status = EFI_UNSUPPORTED;
-    goto Done;
-  }
+  EMU_BLOCK_IO_PROTOCOL       EmuBlockIo;
+  EFI_BLOCK_IO_MEDIA          *Media;
 
-  Status  = EFI_NOT_FOUND;
-  //  Extract filename.
-  Str     = EmuIoThunk->EnvString;
-  i = 0;
-  while (*Str && *Str != ':')
-    Buffer[i++] = *Str++;
-  Buffer[i] = 0;
-  if (*Str != ':') {
-    goto Done;
-  }
+} EMU_BLOCK_IO_PRIVATE;
 
-  Str++;
+#define EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS(a) \
+         CR(a, EMU_BLOCK_IO_PRIVATE, EmuBlockIo, EMU_BLOCK_IO_PRIVATE_SIGNATURE)
 
-  RemovableMedia = FALSE;
-  WriteProtected = TRUE;
-  NumberOfBlocks = 0;
-  BlockSize = 512;
-  do {
-    if (*Str == 'R' || *Str == 'F') {
-      RemovableMedia = (BOOLEAN) (*Str == 'R');
-      Str++;
-    }
-    if (*Str == 'O' || *Str == 'W') {
-      WriteProtected  = (BOOLEAN) (*Str == 'O');
-      Str++;
-    }
-    if (*Str == 0)
-      break;
-    if (*Str != ';')
-      goto Done;
-    Str++;
 
-    NumberOfBlocks  = Atoi (Str);
-    Str       = GetNextElementPastTerminator (Str, ';');
-    if (NumberOfBlocks == 0)
-      break;
-
-    BlockSize = Atoi (Str);
-    if (BlockSize != 0)
-      Str       = GetNextElementPastTerminator (Str, ';');
-  } while (0);
-
-  //
-  // If we get here the variable is valid so do the work.
-  //
-  Status = UnixBlockIoCreateMapping (
-              EmuIoThunk,
-              Handle,
-              Buffer,
-              WriteProtected,
-              RemovableMedia,
-              NumberOfBlocks,
-              BlockSize
-              );
-
-Done:
-  if (EFI_ERROR (Status)) {
-    gBS->CloseProtocol (
-          Handle,
-          &gEmuIoThunkProtocolGuid,
-          This->DriverBindingHandle,
-          Handle
-          );
-  }
-
-  return Status;
-}
 
 EFI_STATUS
-EFIAPI
-UnixBlockIoDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN  EFI_HANDLE                   Handle,
-  IN  UINTN                        NumberOfChildren,
-  IN  EFI_HANDLE                   *ChildHandleBuffer
-  )
-{
-  EFI_BLOCK_IO_PROTOCOL   *BlockIo;
-  EFI_STATUS              Status;
-  EMU_BLOCK_IO_PRIVATE *Private;
+EmuBlockIoReset (
+  IN EMU_BLOCK_IO_PROTOCOL    *This,
+  IN BOOLEAN                  ExtendedVerification
+  );
 
-  //
-  // Get our context back
-  //
-  Status = gBS->OpenProtocol (
-                  Handle,
-                  &gEfiBlockIoProtocolGuid,
-                  (void *)&BlockIo,
-                  This->DriverBindingHandle,
-                  Handle,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
-  if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
-  }
 
-  Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (BlockIo);
-
-  //
-  // BugBug: If we need to kick people off, we need to make Uninstall Close the handles.
-  //         We could pass in our image handle or FLAG our open to be closed via
-  //         Unistall (== to saying any CloseProtocol will close our open)
-  //
-  Status = gBS->UninstallMultipleProtocolInterfaces (
-                  Private->EfiHandle,
-                  &gEfiBlockIoProtocolGuid,
-                  &Private->BlockIo,
-                  NULL
-                  );
-  if (!EFI_ERROR (Status)) {
-
-    Status = gBS->CloseProtocol (
-                    Handle,
-                    &gEmuIoThunkProtocolGuid,
-                    This->DriverBindingHandle,
-                    Handle
-                    );
-
-    //
-    // Shut down our device
-    //
-    Private->UnixThunk->Close (Private->fd);
-
-    //
-    // Free our instance data
-    //
-    FreeUnicodeStringTable (Private->ControllerNameTable);
-
-    gBS->FreePool (Private);
-  }
-
-  return Status;
-}
-
-CHAR16 *
-GetNextElementPastTerminator (
-  IN  CHAR16  *EnvironmentVariable,
-  IN  CHAR16  Terminator
-  )
 /*++
 
-Routine Description:
-
-  Worker function to parse environment variables.
-
-Arguments:
-  EnvironmentVariable - Envirnment variable to parse.
-
-  Terminator          - Terminator to parse for.
-
-Returns: 
-
-  Pointer to next eliment past the first occurence of Terminator or the '\0'
-  at the end of the string.
+This function extends the capability of SetFilePointer to accept 64 bit parameters
 
 **/
-{
-  CHAR16  *Ptr;
-
-  for (Ptr = EnvironmentVariable; *Ptr != '\0'; Ptr++) {
-    if (*Ptr == Terminator) {
-      Ptr++;
-      break;
-    }
-  }
-
-  return Ptr;
-}
-
 EFI_STATUS
-UnixBlockIoCreateMapping (
-  IN EMU_IO_THUNK_PROTOCOL             *EmuIoThunk,
-  IN EFI_HANDLE                         EfiDeviceHandle,
-  IN CHAR16                             *Filename,
-  IN BOOLEAN                            ReadOnly,
-  IN BOOLEAN                            RemovableMedia,
-  IN UINTN                              NumberOfBlocks,
-  IN UINTN                              BlockSize
+SetFilePointer64 (
+  IN  EMU_BLOCK_IO_PRIVATE        *Private,
+  IN  INT64                      DistanceToMove,
+  OUT UINT64                     *NewFilePointer,
+  IN  INT32                      MoveMethod
   )
 {
-  EFI_STATUS              Status;
-  EFI_BLOCK_IO_PROTOCOL   *BlockIo;
-  EMU_BLOCK_IO_PRIVATE *Private;
-  UINTN                   Index;
+  EFI_STATUS    Status;
+  off_t         res;
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EMU_BLOCK_IO_PRIVATE),
-                  (void *)&Private
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  EfiInitializeLock (&Private->Lock, TPL_NOTIFY);
-
-  Private->UnixThunk = EmuIoThunk->UnixThunk;
-
-  Private->Signature  = EMU_BLOCK_IO_PRIVATE_SIGNATURE;
-  Private->LastBlock  = NumberOfBlocks - 1;
-  Private->BlockSize  = BlockSize;
-
-  for (Index = 0; Filename[Index] != 0; Index++) {
-    Private->Filename[Index] = Filename[Index];
+  Status = EFI_SUCCESS;
+  res = lseek (Private->fd, DistanceToMove, MoveMethod);
+  if (res == -1) {
+    Status = EFI_INVALID_PARAMETER;
   }
 
-  Private->Filename[Index]      = 0;
-
-  Private->Mode                 = (ReadOnly ? O_RDONLY : O_RDWR);
-
-  Private->NumberOfBlocks       = NumberOfBlocks;
-  Private->fd                   = -1;
-
-  Private->ControllerNameTable  = NULL;
-
-  AddUnicodeString (
-    "eng",
-    gUnixBlockIoComponentName.SupportedLanguages,
-    &Private->ControllerNameTable,
-    Filename
-    );
-
-  BlockIo = &Private->BlockIo;
-  BlockIo->Revision = EFI_BLOCK_IO_PROTOCOL_REVISION;
-  BlockIo->Media = &Private->Media;
-  BlockIo->Media->BlockSize = Private->BlockSize;
-  BlockIo->Media->LastBlock = Private->NumberOfBlocks - 1;
-  BlockIo->Media->MediaId = 0;;
-
-  BlockIo->Reset = UnixBlockIoResetBlock;
-  BlockIo->ReadBlocks = UnixBlockIoReadBlocks;
-  BlockIo->WriteBlocks = UnixBlockIoWriteBlocks;
-  BlockIo->FlushBlocks = UnixBlockIoFlushBlocks;
-
-  BlockIo->Media->ReadOnly = ReadOnly;
-  BlockIo->Media->RemovableMedia = RemovableMedia;
-  BlockIo->Media->LogicalPartition = FALSE;
-  BlockIo->Media->MediaPresent = TRUE;
-  BlockIo->Media->WriteCaching = FALSE;
-
-  BlockIo->Media->IoAlign = 1;
-
-  Private->EfiHandle  = EfiDeviceHandle;
-  Status              = UnixBlockIoOpenDevice (Private);
-  if (!EFI_ERROR (Status)) {
-
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &Private->EfiHandle,
-                    &gEfiBlockIoProtocolGuid,
-                    &Private->BlockIo,
-                    NULL
-                    );
-    if (EFI_ERROR (Status)) {
-      FreeUnicodeStringTable (Private->ControllerNameTable);
-      gBS->FreePool (Private);
-    }
-
-    DEBUG ((EFI_D_ERROR, "BlockDevice added: %s\n", Filename));
+  if (NewFilePointer != NULL) {
+    *NewFilePointer = res;
   }
 
   return Status;
 }
 
+
 EFI_STATUS
-UnixBlockIoOpenDevice (
-  EMU_BLOCK_IO_PRIVATE                 *Private
+EmuBlockIoOpenDevice (
+  IN EMU_BLOCK_IO_PRIVATE   *Private
   )
 {
   EFI_STATUS            Status;
   UINT64                FileSize;
   UINT64                EndOfFile;
-  EFI_BLOCK_IO_PROTOCOL *BlockIo;
 
-  BlockIo = &Private->BlockIo;
-  EfiAcquireLock (&Private->Lock);
 
   //
   // If the device is already opened, close it
   //
   if (Private->fd >= 0) {
-    BlockIo->Reset (BlockIo, FALSE);
+    EmuBlockIoReset (&Private->EmuBlockIo, FALSE);
   }
 
   //
   // Open the device
   //
-  Private->fd = Private->UnixThunk->Open (Private->Filename, Private->Mode, 0644);
+  Private->fd = open (Private->Filename, Private->Mode, 0644);
   if (Private->fd < 0) {
-    DEBUG ((EFI_D_INFO, "PlOpenBlock: Could not open %a\n", Private->Filename));
-    BlockIo->Media->MediaPresent  = FALSE;
-    Status                        = EFI_NO_MEDIA;
+    DEBUG ((EFI_D_INFO, "EmuOpenBlock: Could not open %a\n", Private->Filename));
+    Private->Media->MediaPresent  = FALSE;
+    Status                          = EFI_NO_MEDIA;
     goto Done;
   }
 
-  if (!BlockIo->Media->MediaPresent) {
+  if (!Private->Media->MediaPresent) {
     //
     // BugBug: try to emulate if a CD appears - notify drivers to check it out
     //
-    BlockIo->Media->MediaPresent = TRUE;
-    EfiReleaseLock (&Private->Lock);
-    EfiAcquireLock (&Private->Lock);
+    Private->Media->MediaPresent = TRUE;
   }
 
   //
@@ -609,7 +122,7 @@ UnixBlockIoOpenDevice (
   Status = SetFilePointer64 (Private, 0, &FileSize, SEEK_END);
   if (EFI_ERROR (Status)) {
     FileSize = MultU64x32 (Private->NumberOfBlocks, Private->BlockSize);
-    DEBUG ((EFI_D_ERROR, "PlOpenBlock: Could not get filesize of %a\n", Private->Filename));
+    DEBUG ((EFI_D_ERROR, "EmuOpenBlock: Could not get filesize of %a\n", Private->Filename));
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
@@ -617,7 +130,7 @@ UnixBlockIoOpenDevice (
   if (Private->NumberOfBlocks == 0) {
     Private->NumberOfBlocks = DivU64x32 (FileSize, Private->BlockSize);
     Private->LastBlock = Private->NumberOfBlocks - 1;
-    Private->Media.LastBlock = Private->LastBlock;
+    Private->Media->LastBlock = Private->LastBlock;
   }
 
   EndOfFile = MultU64x32 (Private->NumberOfBlocks, Private->BlockSize);
@@ -626,67 +139,97 @@ UnixBlockIoOpenDevice (
     //
     // file is not the proper size, change it
     //
-    DEBUG ((EFI_D_INIT, "PlOpenBlock: Initializing block device: %a\n", Private->Filename));
+    DEBUG ((EFI_D_INIT, "EmuOpenBlock: Initializing block device: %a\n", Private->Filename));
 
     //
     // first set it to 0
     //
-    Private->UnixThunk->FTruncate (Private->fd, 0);
+    ftruncate (Private->fd, 0);
 
     //
     // then set it to the needed file size (OS will zero fill it)
     //
-    Private->UnixThunk->FTruncate (Private->fd, EndOfFile);
+    ftruncate (Private->fd, EndOfFile);
   }
 
-  DEBUG ((EFI_D_INIT, "%HPlOpenBlock: opened %a%N\n", Private->Filename));
+  DEBUG ((EFI_D_INIT, "%HEmuOpenBlock: opened %a%N\n", Private->Filename));
   Status = EFI_SUCCESS;
 
 Done:
   if (EFI_ERROR (Status)) {
     if (Private->fd >= 0) {
-      BlockIo->Reset (BlockIo, FALSE);
+      EmuBlockIoReset (&Private->EmuBlockIo, FALSE);
     }
   }
 
-  EfiReleaseLock (&Private->Lock);
   return Status;
 }
 
+
 EFI_STATUS
-UnixBlockIoError (
+EmuBlockIoCreateMapping (
+  IN     EMU_BLOCK_IO_PROTOCOL    *This,
+  IN     EFI_BLOCK_IO_MEDIA       *Media
+  )
+{
+  EFI_STATUS              Status;
+  EMU_BLOCK_IO_PRIVATE    *Private;
+
+  Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
+
+  Private->Media = Media;
+  
+  Media->MediaId          = 0;
+  Media->RemovableMedia   = Private->RemovableMedia;
+  Media->MediaPresent     = TRUE;
+  Media->LogicalPartition = FALSE;
+  Media->ReadOnly         = Private->WriteProtected;
+  Media->WriteCaching     = FALSE;
+  Media->BlockSize        = Private->BlockSize;
+  Media->IoAlign          = 1;
+  Media->LastBlock        = 0; // Filled in by OpenDevice
+  
+  // EFI_BLOCK_IO_PROTOCOL_REVISION2
+  Media->LowestAlignedLba              = 0;
+  Media->LogicalBlocksPerPhysicalBlock = 0; 
+  
+  // EFI_BLOCK_IO_PROTOCOL_REVISION3
+  Media->OptimalTransferLengthGranularity = 0;
+
+  Status = EmuBlockIoOpenDevice (Private);
+
+  return Status;
+}
+
+
+EFI_STATUS
+EmuBlockIoError (
   IN EMU_BLOCK_IO_PRIVATE      *Private
   )
 {
-  return EFI_DEVICE_ERROR;
-
-#if 0
-  EFI_BLOCK_IO_PROTOCOL *BlockIo;
   EFI_STATUS            Status;
   BOOLEAN               ReinstallBlockIoFlag;
 
 
-  BlockIo = &Private->BlockIo;
+  switch (errno) {
 
-  switch (Private->UnixThunk->GetLastError ()) {
-
-  case ERROR_NOT_READY:
+  case EAGAIN:
     Status                        = EFI_NO_MEDIA;
-    BlockIo->Media->ReadOnly      = FALSE;
-    BlockIo->Media->MediaPresent  = FALSE;
+    Private->Media->ReadOnly      = FALSE;
+    Private->Media->MediaPresent  = FALSE;
     ReinstallBlockIoFlag          = FALSE;
     break;
 
-  case ERROR_WRONG_DISK:
-    BlockIo->Media->ReadOnly      = FALSE;
-    BlockIo->Media->MediaPresent  = TRUE;
-    BlockIo->Media->MediaId += 1;
+  case EACCES:
+    Private->Media->ReadOnly      = FALSE;
+    Private->Media->MediaPresent  = TRUE;
+    Private->Media->MediaId += 1;
     ReinstallBlockIoFlag  = TRUE;
     Status                = EFI_MEDIA_CHANGED;
     break;
 
-  case ERROR_WRITE_PROTECT:
-    BlockIo->Media->ReadOnly  = TRUE;
+  case EROFS:
+    Private->Media->ReadOnly  = TRUE;
     ReinstallBlockIoFlag      = FALSE;
     Status                    = EFI_WRITE_PROTECTED;
     break;
@@ -696,9 +239,9 @@ UnixBlockIoError (
     Status                = EFI_DEVICE_ERROR;
     break;
   }
-
+/*
   if (ReinstallBlockIoFlag) {
-    BlockIo->Reset (BlockIo, FALSE);
+    Private->EmuBlockIo->Reset (&Private->EmuBlockIo, FALSE);
 
     gBS->ReinstallProtocolInterface (
           Private->EfiHandle,
@@ -707,14 +250,13 @@ UnixBlockIoError (
           BlockIo
           );
   }
-
+*/
   return Status;
-#endif
 }
 
 EFI_STATUS
-UnixBlockIoReadWriteCommon (
-  IN  EMU_BLOCK_IO_PRIVATE     *Private,
+EmuBlockIoReadWriteCommon (
+  IN  EMU_BLOCK_IO_PRIVATE        *Private,
   IN UINT32                       MediaId,
   IN EFI_LBA                      Lba,
   IN UINTN                        BufferSize,
@@ -729,22 +271,22 @@ UnixBlockIoReadWriteCommon (
   UINT64      DistanceMoved;
 
   if (Private->fd < 0) {
-    Status = UnixBlockIoOpenDevice (Private);
+    Status = EmuBlockIoOpenDevice (Private);
     if (EFI_ERROR (Status)) {
       return Status;
     }
   }
 
-  if (!Private->Media.MediaPresent) {
+  if (!Private->Media->MediaPresent) {
     DEBUG ((EFI_D_INIT, "%s: No Media\n", CallerName));
     return EFI_NO_MEDIA;
   }
 
-  if (Private->Media.MediaId != MediaId) {
+  if (Private->Media->MediaId != MediaId) {
     return EFI_MEDIA_CHANGED;
   }
 
-  if ((UINTN) Buffer % Private->Media.IoAlign != 0) {
+  if ((UINTN) Buffer % Private->Media->IoAlign != 0) {
     return EFI_INVALID_PARAMETER;
   }
   
@@ -775,172 +317,238 @@ UnixBlockIoReadWriteCommon (
 
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_INIT, "WriteBlocks: SetFilePointer failed\n"));
-    return UnixBlockIoError (Private);
+    return EmuBlockIoError (Private);
   }
 
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-EFIAPI
-UnixBlockIoReadBlocks (
-  IN EFI_BLOCK_IO_PROTOCOL  *This,
-  IN UINT32                 MediaId,
-  IN EFI_LBA                Lba,
-  IN UINTN                  BufferSize,
-  OUT VOID                  *Buffer
-  )
-/*++
 
-  Routine Description:
-    Read BufferSize bytes from Lba into Buffer.
+/**
+  Read BufferSize bytes from Lba into Buffer.
+  
+  This function reads the requested number of blocks from the device. All the
+  blocks are read, or an error is returned.
+  If EFI_DEVICE_ERROR, EFI_NO_MEDIA,_or EFI_MEDIA_CHANGED is returned and
+  non-blocking I/O is being used, the Event associated with this request will
+  not be signaled.
 
-  Arguments:
-    This       - Protocol instance pointer.
-    MediaId    - Id of the media, changes every time the media is replaced.
-    Lba        - The starting Logical Block Address to read from
-    BufferSize - Size of Buffer, must be a multiple of device block size.
-    Buffer     - Buffer containing read data
+  @param[in]       This       Indicates a pointer to the calling context.
+  @param[in]       MediaId    Id of the media, changes every time the media is 
+                              replaced.
+  @param[in]       Lba        The starting Logical Block Address to read from.
+  @param[in, out]  Token	    A pointer to the token associated with the transaction.
+  @param[in]       BufferSize Size of Buffer, must be a multiple of device block size.  
+  @param[out]      Buffer     A pointer to the destination buffer for the data. The 
+                              caller is responsible for either having implicit or 
+                              explicit ownership of the buffer.
 
-  Returns:
-    EFI_SUCCESS           - The data was read correctly from the device.
-    EFI_DEVICE_ERROR      - The device reported an error while performing the read.
-    EFI_NO_MEDIA          - There is no media in the device.
-    EFI_MEDIA_CHANGED     - The MediaId does not matched the current device.
-    EFI_BAD_BUFFER_SIZE   - The Buffer was not a multiple of the block size of the 
-                            device.
-    EFI_INVALID_PARAMETER - The read request contains device addresses that are not 
-                            valid for the device.
-
+  @retval EFI_SUCCESS           The read request was queued if Token->Event is
+                                not NULL.The data was read correctly from the
+                                device if the Token->Event is NULL.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing
+                                the read.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHANGED     The MediaId is not for the current media.
+  @retval EFI_BAD_BUFFER_SIZE   The BufferSize parameter is not a multiple of the
+                                intrinsic block size of the device.
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+                                or the buffer is not on proper alignment.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack
+                                of resources.
 **/
+EFI_STATUS
+EmuBlockIoReadBlocks (
+  IN     EMU_BLOCK_IO_PROTOCOL  *This,
+  IN     UINT32                 MediaId,
+  IN     EFI_LBA                LBA,
+  IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
+  IN     UINTN                  BufferSize,
+     OUT VOID                   *Buffer
+  )
 {
-  EMU_BLOCK_IO_PRIVATE *Private;
-  ssize_t                 len;
   EFI_STATUS              Status;
-  EFI_TPL                 OldTpl;
-
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  EMU_BLOCK_IO_PRIVATE    *Private;
+  ssize_t                 len;
 
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
-  Status  = UnixBlockIoReadWriteCommon (Private, MediaId, Lba, BufferSize, Buffer, "UnixReadBlocks");
+  Status  = EmuBlockIoReadWriteCommon (Private, MediaId, LBA, BufferSize, Buffer, "UnixReadBlocks");
   if (EFI_ERROR (Status)) {
     goto Done;
   }
 
-  len = Private->UnixThunk->Read (Private->fd, Buffer, BufferSize);
+  len = read (Private->fd, Buffer, BufferSize);
   if (len != BufferSize) {
     DEBUG ((EFI_D_INIT, "ReadBlocks: ReadFile failed.\n"));
-    Status = UnixBlockIoError (Private);
+    Status = EmuBlockIoError (Private);
     goto Done;
   }
 
   //
-  // If we wrote then media is present.
+  // If we read then media is present.
   //
-  This->Media->MediaPresent = TRUE;
+  Private->Media->MediaPresent = TRUE;
   Status = EFI_SUCCESS;
 
 Done:
-  gBS->RestoreTPL (OldTpl);
+  if (Token != NULL) {
+    if (Token->Event != NULL) {
+      // Caller is responcible for signaling EFI Event
+      Token->TransactionStatus = Status;
+      return EFI_SUCCESS;
+    }
+  }
   return Status;
 }
 
-EFI_STATUS
-EFIAPI
-UnixBlockIoWriteBlocks (
-  IN EFI_BLOCK_IO_PROTOCOL  *This,
-  IN UINT32                 MediaId,
-  IN EFI_LBA                Lba,
-  IN UINTN                  BufferSize,
-  IN VOID                   *Buffer
-  )
-/*++
 
-  Routine Description:
-    Write BufferSize bytes from Lba into Buffer.
+/**
+  Write BufferSize bytes from Lba into Buffer.
 
-  Arguments:
-    This       - Protocol instance pointer.
-    MediaId    - Id of the media, changes every time the media is replaced.
-    Lba        - The starting Logical Block Address to read from
-    BufferSize - Size of Buffer, must be a multiple of device block size.
-    Buffer     - Buffer containing read data
+  This function writes the requested number of blocks to the device. All blocks
+  are written, or an error is returned.If EFI_DEVICE_ERROR, EFI_NO_MEDIA,
+  EFI_WRITE_PROTECTED or EFI_MEDIA_CHANGED is returned and non-blocking I/O is
+  being used, the Event associated with this request will not be signaled.
 
-  Returns:
-    EFI_SUCCESS           - The data was written correctly to the device.
-    EFI_WRITE_PROTECTED   - The device can not be written to.
-    EFI_DEVICE_ERROR      - The device reported an error while performing the write.
-    EFI_NO_MEDIA          - There is no media in the device.
-    EFI_MEDIA_CHNAGED     - The MediaId does not matched the current device.
-    EFI_BAD_BUFFER_SIZE   - The Buffer was not a multiple of the block size of the 
-                            device.
-    EFI_INVALID_PARAMETER - The write request contains a LBA that is not 
-                            valid for the device.
+  @param[in]       This       Indicates a pointer to the calling context.
+  @param[in]       MediaId    The media ID that the write request is for.
+  @param[in]       Lba        The starting logical block address to be written. The
+                              caller is responsible for writing to only legitimate
+                              locations.
+  @param[in, out]  Token      A pointer to the token associated with the transaction.
+  @param[in]       BufferSize Size of Buffer, must be a multiple of device block size.
+  @param[in]       Buffer     A pointer to the source buffer for the data.
+
+  @retval EFI_SUCCESS           The write request was queued if Event is not NULL.
+                                The data was written correctly to the device if
+                                the Event is NULL.
+  @retval EFI_WRITE_PROTECTED   The device can not be written to.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
+  @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+                                or the buffer is not on proper alignment.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack
+                                of resources.
 
 **/
+EFI_STATUS
+EmuBlockIoWriteBlocks (
+  IN     EMU_BLOCK_IO_PROTOCOL  *This,
+  IN     UINT32                 MediaId,
+  IN     EFI_LBA                LBA,
+  IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
+  IN     UINTN                  BufferSize,
+  IN     VOID                   *Buffer
+  )
 {
-  EMU_BLOCK_IO_PRIVATE *Private;
+  EMU_BLOCK_IO_PRIVATE    *Private;
   ssize_t                 len;
   EFI_STATUS              Status;
-  EFI_TPL                 OldTpl;
 
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
-  Status  = UnixBlockIoReadWriteCommon (Private, MediaId, Lba, BufferSize, Buffer, "UnixWriteBlocks");
+  Status  = EmuBlockIoReadWriteCommon (Private, MediaId, LBA, BufferSize, Buffer, "UnixWriteBlocks");
   if (EFI_ERROR (Status)) {
     goto Done;
   }
 
-  len = Private->UnixThunk->Write (Private->fd, Buffer, BufferSize);
+  len = write (Private->fd, Buffer, BufferSize);
   if (len != BufferSize) {
     DEBUG ((EFI_D_INIT, "ReadBlocks: WriteFile failed.\n"));
-    Status = UnixBlockIoError (Private);
+    Status = EmuBlockIoError (Private);
     goto Done;
   }
 
   //
   // If the write succeeded, we are not write protected and media is present.
   //
-  This->Media->MediaPresent = TRUE;
-  This->Media->ReadOnly     = FALSE;
+  Private->Media->MediaPresent = TRUE;
+  Private->Media->ReadOnly     = FALSE;
   Status = EFI_SUCCESS;
 
 Done:
-  gBS->RestoreTPL (OldTpl);
+  if (Token != NULL) {
+    if (Token->Event != NULL) {
+      // Caller is responcible for signaling EFI Event
+      Token->TransactionStatus = Status;
+      return EFI_SUCCESS;
+    }
+  }
+
   return Status;
 }
 
-EFI_STATUS
-EFIAPI
-UnixBlockIoFlushBlocks (
-  IN EFI_BLOCK_IO_PROTOCOL  *This
-  )
-/*++
 
-  Routine Description:
-    Flush the Block Device.
+/**
+  Flush the Block Device.
+ 
+  If EFI_DEVICE_ERROR, EFI_NO_MEDIA,_EFI_WRITE_PROTECTED or EFI_MEDIA_CHANGED
+  is returned and non-blocking I/O is being used, the Event associated with
+  this request will not be signaled.  
 
-  Arguments:
-    This             - Protocol instance pointer.
+  @param[in]      This     Indicates a pointer to the calling context.
+  @param[in,out]  Token    A pointer to the token associated with the transaction
 
-  Returns:
-    EFI_SUCCESS      - All outstanding data was written to the device
-    EFI_DEVICE_ERROR - The device reported an error while writting back the data
-    EFI_NO_MEDIA     - There is no media in the device.
+  @retval EFI_SUCCESS          The flush request was queued if Event is not NULL.
+                               All outstanding data was written correctly to the
+                               device if the Event is NULL.
+  @retval EFI_DEVICE_ERROR     The device reported an error while writting back
+                               the data.
+  @retval EFI_WRITE_PROTECTED  The device cannot be written to.
+  @retval EFI_NO_MEDIA         There is no media in the device.
+  @retval EFI_MEDIA_CHANGED    The MediaId is not for the current media.
+  @retval EFI_OUT_OF_RESOURCES The request could not be completed due to a lack
+                               of resources.
 
 **/
+EFI_STATUS
+EmuBlockIoFlushBlocks (
+  IN     EMU_BLOCK_IO_PROTOCOL    *This,
+  IN OUT EFI_BLOCK_IO2_TOKEN      *Token
+  )
 {
+  EMU_BLOCK_IO_PRIVATE *Private;
+
+  Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
+
+  if (Private->fd >= 0) {
+    close (Private->fd);
+    Private->fd = open (Private->Filename, Private->Mode, 0644);
+  }
+  
+  if (Token != NULL) {
+    if (Token->Event != NULL) {
+      // Caller is responcible for signaling EFI Event
+      Token->TransactionStatus = EFI_SUCCESS;
+      return EFI_SUCCESS;
+    }
+  }
+  
   return EFI_SUCCESS;
 }
 
+
+/**
+  Reset the block device hardware.
+
+  @param[in]  This                 Indicates a pointer to the calling context.
+  @param[in]  ExtendedVerification Indicates that the driver may perform a more
+                                   exhausive verfication operation of the device
+                                   during reset.
+
+  @retval EFI_SUCCESS          The device was reset.
+  @retval EFI_DEVICE_ERROR     The device is not functioning properly and could
+                               not be reset.
+
+**/
 EFI_STATUS
-EFIAPI
-UnixBlockIoResetBlock (
-  IN EFI_BLOCK_IO_PROTOCOL  *This,
-  IN BOOLEAN                ExtendedVerification
+EmuBlockIoReset (
+  IN EMU_BLOCK_IO_PROTOCOL    *This,
+  IN BOOLEAN                  ExtendedVerification
   )
 /*++
 
@@ -959,95 +567,138 @@ UnixBlockIoResetBlock (
 **/
 {
   EMU_BLOCK_IO_PRIVATE *Private;
-  EFI_TPL               OldTpl;
 
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   if (Private->fd >= 0) {
-    Private->UnixThunk->Close (Private->fd);
+    close (Private->fd);
     Private->fd = -1;
   }
-
-  gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
 }
 
-UINTN
-Atoi (
-  CHAR16  *String
+
+char *
+StdDupUnicodeToAscii (
+  IN  CHAR16 *Str
   )
-/*++
-
-Routine Description:
-
-  Convert a unicode string to a UINTN
-
-Arguments:
-
-  String - Unicode string.
-
-Returns: 
-
-  UINTN of the number represented by String.  
-
-**/
 {
-  UINTN   Number;
-  CHAR16  *Str;
-
-  //
-  // skip preceeding white space
-  //
-  Str = String;
-  while ((*Str) && (*Str == ' ')) {
-    Str++;
+  UINTN   Size;
+  char    *Ascii;
+  char    *Ptr;
+  
+  Size = StrLen (Str) + 1;
+  Ascii = malloc (Size);
+  if (Ascii == NULL) {
+    return NULL;
   }
-  //
-  // Convert ot a Number
-  //
-  Number = 0;
-  while (*Str != '\0') {
-    if ((*Str >= '0') && (*Str <= '9')) {
-      Number = (Number * 10) +*Str - '0';
-    } else {
-      break;
-    }
-
-    Str++;
+  
+  for (Ptr = Ascii; *Str != '\0'; Ptr++, Str++) {
+    *Ptr = *Str;
   }
-
-  return Number;
+  *Ptr = 0;
+  
+  return Ascii;
 }
 
 
-/*++
+EMU_BLOCK_IO_PROTOCOL gEmuBlockIoProtocol = {
+  GasketEmuBlockIoReset,
+  GasketEmuBlockIoReadBlocks,
+  GasketEmuBlockIoWriteBlocks,
+  GasketEmuBlockIoFlushBlocks,
+  GasketEmuBlockIoCreateMapping
+};
 
-This function extends the capability of SetFilePointer to accept 64 bit parameters
-
-**/
 EFI_STATUS
-SetFilePointer64 (
-  IN  EMU_BLOCK_IO_PRIVATE    *Private,
-  IN  INT64                      DistanceToMove,
-  OUT UINT64                     *NewFilePointer,
-  IN  INT32                      MoveMethod
+EmuBlockIoThunkOpen (
+  IN  EMU_IO_THUNK_PROTOCOL   *This
   )
 {
-  EFI_STATUS    Status;
-  off_t         res;
-
-  Status = EFI_SUCCESS;
-  res = Private->UnixThunk->Lseek(Private->fd, DistanceToMove, MoveMethod);
-  if (res == -1) {
-    Status = EFI_INVALID_PARAMETER;
+  EMU_BLOCK_IO_PRIVATE  *Private;
+  char                  *Str;
+  
+  if (This->Private != NULL) {
+    return EFI_ALREADY_STARTED;
+  }
+  
+  if (!CompareGuid (This->Protocol, &gEmuBlockIoProtocolGuid)) {
+    return EFI_UNSUPPORTED;
+  }
+  
+  Private = malloc (sizeof (EMU_BLOCK_IO_PRIVATE));
+  if (Private == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
-  if (NewFilePointer != NULL) {
-    *NewFilePointer = res;
+  
+  Private->Signature = EMU_BLOCK_IO_PRIVATE_SIGNATURE;
+  Private->Thunk     = This;
+  CopyMem (&Private->EmuBlockIo, &gEmuBlockIoProtocol, sizeof (gEmuBlockIoProtocol));
+  Private->fd = -1;
+ 
+  Private->Filename = StdDupUnicodeToAscii (This->ConfigString);
+  if (Private->Filename == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
-
-  return Status;
+ 
+  Str = strstr (Private->Filename, ":");
+  if (Str == NULL) {
+    Private->RemovableMedia = FALSE;
+    Private->WriteProtected = FALSE;
+  } else {
+    for (*Str++ = '\0'; *Str != 0; Str++) {
+      if (*Str == 'R' || *Str == 'F') {
+        Private->RemovableMedia = (BOOLEAN) (*Str == 'R');
+      }
+      if (*Str == 'O' || *Str == 'W') {
+        Private->WriteProtected  = (BOOLEAN) (*Str == 'O');
+      }
+    }
+  }
+  
+  Private->BlockSize = 512;
+ 
+  This->Interface = &Private->EmuBlockIo;
+  This->Private   = Private;
+  return EFI_SUCCESS;
 }
+
+
+EFI_STATUS
+EmuBlockIoThunkClose (
+  IN  EMU_IO_THUNK_PROTOCOL   *This
+  )
+{
+  EMU_BLOCK_IO_PRIVATE  *Private;
+
+  if (!CompareGuid (This->Protocol, &gEmuBlockIoProtocolGuid)) {
+    return EFI_UNSUPPORTED;
+  }
+  
+  Private = This->Private;
+  
+  if (This->Private != NULL) {
+    if (Private->Filename != NULL) {
+      free (Private->Filename);
+    }   
+    free (This->Private);
+  }
+  
+  return EFI_SUCCESS;
+}
+
+
+
+EMU_IO_THUNK_PROTOCOL gBlockIoThunkIo = {
+  &gEmuBlockIoProtocolGuid,
+  NULL,
+  NULL,
+  0,
+  GasketBlockIoThunkOpen,
+  GasketBlockIoThunkClose,
+  NULL
+};
+
+

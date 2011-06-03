@@ -1022,9 +1022,143 @@ ASM_PFX(GasketPosixFileSystmeThunkClose):
   popq    %rbp
   ret
 
+ASM_GLOBAL ASM_PFX(GasketEmuBlockIoReset)
+ASM_PFX(GasketEmuBlockIoReset):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq   %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+  pushq   %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+  movq    %rdx, %rsi     
+
+  call    ASM_PFX(EmuBlockIoReset)
+
+  popq    %rdi          // restore state
+  popq    %rsi
+  popq    %rbp
+  ret
 
 
+ASM_GLOBAL ASM_PFX(GasketEmuBlockIoReadBlocks)
+ASM_PFX(GasketEmuBlockIoReadBlocks):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
 
+  pushq   %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+  pushq   %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+  movq    %rdx, %rsi     
+  movq    %r8,  %rdx
+  movq    %r9,  %rcx
+  movq    0x30(%rbp), %r8   
+  movq    0x38(%rbp), %r9   
+
+  call    ASM_PFX(EmuBlockIoReadBlocks)
+
+  popq    %rdi          // restore state
+  popq    %rsi
+  popq    %rbp
+  ret
+
+
+ASM_GLOBAL ASM_PFX(GasketEmuBlockIoWriteBlocks)
+ASM_PFX(GasketEmuBlockIoWriteBlocks):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq   %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+  pushq   %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+  movq    %rdx, %rsi     
+  movq    %r8,  %rdx
+  movq    %r9,  %rcx
+  movq    0x30(%rbp), %r8   
+  movq    0x38(%rbp), %r9   
+
+  call    ASM_PFX(EmuBlockIoWriteBlocks)
+
+  popq    %rdi          // restore state
+  popq    %rsi
+  popq    %rbp
+  ret
+
+
+ASM_GLOBAL ASM_PFX(GasketEmuBlockIoFlushBlocks)
+ASM_PFX(GasketEmuBlockIoFlushBlocks):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq   %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+  pushq   %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+  movq    %rdx, %rsi    
+
+  call    ASM_PFX(EmuBlockIoFlushBlocks)
+
+  popq    %rdi          // restore state
+  popq    %rsi
+  popq    %rbp
+  ret
+
+
+ASM_GLOBAL ASM_PFX(GasketEmuBlockIoCreateMapping)
+ASM_PFX(GasketEmuBlockIoCreateMapping):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq   %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+  pushq   %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+  movq    %rdx, %rsi     
+
+  call    ASM_PFX(EmuBlockIoCreateMapping)
+
+  popq    %rdi          // restore state
+  popq    %rsi
+  popq    %rbp
+  ret
+
+
+ASM_GLOBAL ASM_PFX(GasketBlockIoThunkOpen)
+ASM_PFX(GasketBlockIoThunkOpen):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq   %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+  pushq   %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+
+  call    ASM_PFX(EmuBlockIoThunkOpen)
+
+  popq    %rdi          // restore state
+  popq    %rsi
+  popq    %rbp
+  ret
+
+
+ASM_GLOBAL ASM_PFX(GasketBlockIoThunkClose)
+ASM_PFX(GasketBlockIoThunkClose):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq   %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+  pushq   %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+
+  call    ASM_PFX(EmuBlockIoThunkClose)
+
+  popq    %rdi          // restore state
+  popq    %rsi
+  popq    %rbp
+  ret
 
 
 
