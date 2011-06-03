@@ -66,7 +66,7 @@
 
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000080000000|UINT64|0x00000002
   gArmTokenSpaceGuid.PcdArmCacheOperationThreshold|1024|UINT32|0x00000003
-  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0xfff00000|UINT32|0x00000004
+  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0xffff0000|UINT32|0x00000004
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x00000000|UINT32|0x00000005
   
   #
