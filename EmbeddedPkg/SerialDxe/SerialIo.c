@@ -188,10 +188,12 @@ SerialRead (
   OUT VOID                   *Buffer
   )
 {
-  UINTN Count;
+  UINTN Count = 0;
   
-  Count = SerialPortRead (Buffer, *BufferSize);
-  *BufferSize = Count;
+  if (SerialPortPoll()) {
+    Count = SerialPortRead (Buffer, *BufferSize);
+    *BufferSize = Count;
+  }
   return (Count == 0) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
 }
 
