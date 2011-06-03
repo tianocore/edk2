@@ -30,38 +30,32 @@ TimerConstructor (
   VOID
   )
 {
-    // Check if Timer 2 is already initialized
-    if (MmioRead32(SP804_TIMER2_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
-        return RETURN_SUCCESS;
-    } else {
-        // configure SP810 to use 1MHz clock and disable
-        MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER2_EN, SP810_SYS_CTRL_TIMER2_TIMCLK);
-
-        // configure timer 2 for one shot operation, 32 bits, no prescaler, and interrupt disabled
-        MmioOr32 (SP804_TIMER2_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ONESHOT | SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
-
-        // preload the timer count register
-        MmioWrite32 (SP804_TIMER2_BASE + SP804_TIMER_LOAD_REG, 1);
-
-        // enable the timer
-        MmioOr32 (SP804_TIMER2_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
-    }
-
-    // Check if Timer 3 is already initialized
-    if (MmioRead32(SP804_TIMER3_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
-        return RETURN_SUCCESS;
-    } else {
-        // configure SP810 to use 1MHz clock and disable
-        MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER3_EN, SP810_SYS_CTRL_TIMER3_TIMCLK);
-
-        // configure timer 3 for free running operation, 32 bits, no prescaler, interrupt disabled
-        MmioOr32 (SP804_TIMER3_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
-
-        // enable the timer
-        MmioOr32 (SP804_TIMER3_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
-    }
-
+  // Check if Timer 2 is already initialized
+  if (MmioRead32(SP804_TIMER2_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
     return RETURN_SUCCESS;
+  } else {
+    // Configure timer 2 for one shot operation, 32 bits, no prescaler, and interrupt disabled
+    MmioOr32 (SP804_TIMER2_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ONESHOT | SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
+
+    // Preload the timer count register
+    MmioWrite32 (SP804_TIMER2_BASE + SP804_TIMER_LOAD_REG, 1);
+
+    // Enable the timer
+    MmioOr32 (SP804_TIMER2_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
+  }
+
+  // Check if Timer 3 is already initialized
+  if (MmioRead32(SP804_TIMER3_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
+    return RETURN_SUCCESS;
+  } else {
+    // Configure timer 3 for free running operation, 32 bits, no prescaler, interrupt disabled
+    MmioOr32 (SP804_TIMER3_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
+
+    // Enable the timer
+    MmioOr32 (SP804_TIMER3_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
+  }
+
+  return RETURN_SUCCESS;
 }
 
 /**
@@ -141,11 +135,10 @@ GetPerformanceCounter (
 { 
   // Free running 64-bit/32-bit counter is needed here.
   // Don't think we need this to boot, just to do performance profile
-  // ASSERT (FALSE);
-  UINT32 val = MmioRead32 (SP804_TIMER3_BASE + SP804_TIMER_CURRENT_REG);
-  ASSERT(val > 0);
-
-  return (UINT64)val;
+  UINT64 Value;
+  Value = MmioRead32 (SP804_TIMER3_BASE + SP804_TIMER_CURRENT_REG);
+  ASSERT(Value > 0);
+  return Value;
 }
 
 

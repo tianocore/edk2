@@ -211,9 +211,9 @@ TimerDriverSetTimerPeriod (
   MmioAnd32 (SP804_TIMER0_BASE + SP804_TIMER_CONTROL_REG, ~SP804_TIMER_CTRL_ENABLE);
 
   if (TimerPeriod == 0) {
-    // leave timer disabled from above, and...
+    // Leave timer disabled from above, and...
 
-    // disable timer 0/1 interrupt for a TimerPeriod of 0
+    // Disable timer 0/1 interrupt for a TimerPeriod of 0
     Status = gInterrupt->DisableInterruptSource (gInterrupt, gVector);    
   } else {  
     // Convert TimerPeriod into 1MHz clock counts (us units = 100ns units / 10)
@@ -364,16 +364,13 @@ TimerInitialize (
   Status = gBS->LocateProtocol (&gHardwareInterruptProtocolGuid, NULL, (VOID **)&gInterrupt);
   ASSERT_EFI_ERROR (Status);
 
-  // Configure 1MHz clock
-  MmioOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, SP810_SYS_CTRL_TIMER1_TIMCLK);
-
-  // configure timer 1 for free running operation, 32 bits, no prescaler, interrupt disabled
+  // Configure timer 1 for free running operation, 32 bits, no prescaler, interrupt disabled
   MmioWrite32 (SP804_TIMER1_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
 
-  // enable the free running timer
+  // Enable the free running timer
   MmioOr32 (SP804_TIMER1_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
 
-  // record free running tick value (should be close to 0xffffffff)
+  // Record free running tick value (should be close to 0xffffffff)
   mLastTickCount = MmioRead32 (SP804_TIMER1_BASE + SP804_TIMER_CURRENT_REG);
 
   // Disable the timer
@@ -384,9 +381,6 @@ TimerInitialize (
   gVector = TIMER01_INTERRUPT_NUM;
   Status = gInterrupt->RegisterInterruptSource (gInterrupt, gVector, TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
-
-  // configure periodic timer (TIMER0) for 1MHz operation
-  MmioOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, SP810_SYS_CTRL_TIMER0_TIMCLK);
 
   // configure timer 0 for periodic operation, 32 bits, no prescaler, and interrupt enabled
   MmioWrite32 (SP804_TIMER0_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_PERIODIC | SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1 | SP804_TIMER_CTRL_INT_ENABLE);

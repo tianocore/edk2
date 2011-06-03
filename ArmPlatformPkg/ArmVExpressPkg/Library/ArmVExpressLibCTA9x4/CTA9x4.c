@@ -17,10 +17,12 @@
 #include <Library/ArmPlatformLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
+#include <Library/SerialPortLib.h>
+
 #include <Drivers/PL341Dmc.h>
 #include <Drivers/PL301Axi.h>
 #include <Drivers/PL310L2Cache.h>
-#include <Library/SerialPortLib.h>
+#include <Drivers/SP804Timer.h>
 
 #define SerialPrint(txt)  SerialPortWrite (txt, AsciiStrLen(txt)+1);
 
@@ -212,7 +214,14 @@ ArmPlatformNormalInitialize (
   VOID
   )
 {
-  // Nothing to do here
+  // Configure periodic timer (TIMER0) for 1MHz operation
+  MmioOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, SP810_SYS_CTRL_TIMER0_TIMCLK);
+  // Configure 1MHz clock
+  MmioOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, SP810_SYS_CTRL_TIMER1_TIMCLK);
+  // configure SP810 to use 1MHz clock and disable
+  MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER2_EN, SP810_SYS_CTRL_TIMER2_TIMCLK);
+  // Configure SP810 to use 1MHz clock and disable
+  MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER3_EN, SP810_SYS_CTRL_TIMER3_TIMCLK);
 }
 
 /**
