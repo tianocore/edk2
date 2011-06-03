@@ -51,6 +51,7 @@
 #  Arm/lshrdi3.c    | GCC
   Arm/ashrdi3.S    | GCC
   Arm/ashldi3.S    | GCC
+  Arm/div.S        | GCC
   Arm/divdi3.S     | GCC
   Arm/divsi3.S     | GCC
   Arm/lshrdi3.S    | GCC
@@ -63,7 +64,8 @@
 #  Arm/muldi3.c     | GCC  
   Arm/modsi3.S     | GCC
   Arm/moddi3.S     | GCC
-  Arm/muldi3.S     | GCC  
+  Arm/muldi3.S     | GCC
+  Arm/mullu.S      | GCC  
 
 #  Arm/udivsi3.c    | GCC
 #  Arm/umodsi3.c    | GCC
