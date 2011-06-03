@@ -61,3 +61,8 @@
 
   # Size of the region reserved for fixed address allocations (Reserved 128MB by default)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryFixRegionSize|0x08000000|UINT32|0x00000014
+  #
+  # ARM Primecells
+  #
+  gArmPlatformTokenSpaceGuid.PcdSP804FrequencyInMHz|1|UINT32|0x0000001D
+

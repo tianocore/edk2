@@ -74,11 +74,16 @@ MicroSecondDelay (
   IN  UINTN MicroSeconds
   )
 {
-  // load the timer count register
-  MmioWrite32 (SP804_TIMER2_BASE + SP804_TIMER_LOAD_REG, MicroSeconds);
+  UINTN Index;
 
-  while (MmioRead32 (SP804_TIMER2_BASE + SP804_TIMER_CURRENT_REG) > 0) {
-    ;
+  // Reload the counter for each 1Mhz to avoid an overflow in the load value
+  for (Index = 0; Index < (UINTN)PcdGet32(PcdSP804FrequencyInMHz); Index++) {
+    // load the timer count register
+    MmioWrite32 (SP804_TIMER2_BASE + SP804_TIMER_LOAD_REG, MicroSeconds);
+
+    while (MmioRead32 (SP804_TIMER2_BASE + SP804_TIMER_CURRENT_REG) > 0) {
+      ;
+    }
   }
 
   return MicroSeconds;
@@ -100,17 +105,21 @@ NanoSecondDelay (
   IN  UINTN NanoSeconds
   )
 {
-  UINT32 MicroSeconds;
+  UINTN   Index;
+  UINT32  MicroSeconds;
 
   // Round up to 1us Tick Number
   MicroSeconds =   (UINT32)NanoSeconds / 1000;
   MicroSeconds += ((UINT32)NanoSeconds % 1000) == 0 ? 0 : 1;
 
-  // load the timer count register
-  MmioWrite32 (SP804_TIMER2_BASE + SP804_TIMER_LOAD_REG, MicroSeconds);
+  // Reload the counter for each 1Mhz to avoid an overflow in the load value
+  for (Index = 0; Index < (UINTN)PcdGet32(PcdSP804FrequencyInMHz); Index++) {
+    // load the timer count register
+    MmioWrite32 (SP804_TIMER2_BASE + SP804_TIMER_LOAD_REG, MicroSeconds);
 
-  while (MmioRead32 (SP804_TIMER2_BASE + SP804_TIMER_CURRENT_REG) > 0) {
-    ;
+    while (MmioRead32 (SP804_TIMER2_BASE + SP804_TIMER_CURRENT_REG) > 0) {
+      ;
+    }
   }
  
   return NanoSeconds;
@@ -182,5 +191,5 @@ GetPerformanceCounterProperties (
     *EndValue = 0xFFFFFFFF;
   }
   
-  return 1000000;
+  return PcdGet64 (PcdEmbeddedPerformanceCounterFrequencyInHz);
 }

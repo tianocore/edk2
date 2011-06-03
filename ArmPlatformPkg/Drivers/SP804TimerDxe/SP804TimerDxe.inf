@@ -48,6 +48,7 @@
   gHardwareInterruptProtocolGuid
 
 [Pcd.common]
+  gArmPlatformTokenSpaceGuid.PcdSP804FrequencyInMHz
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod
 
 [Depex]

@@ -218,6 +218,7 @@ TimerDriverSetTimerPeriod (
   } else {  
     // Convert TimerPeriod into 1MHz clock counts (us units = 100ns units / 10)
     TimerTicks = DivU64x32 (TimerPeriod, 10);
+    TimerTicks = MultU64x32 (TimerTicks, PcdGet32(PcdSP804FrequencyInMHz));
 
     // if it's larger than 32-bits, pin to highest value
     if (TimerTicks > 0xffffffff) {
