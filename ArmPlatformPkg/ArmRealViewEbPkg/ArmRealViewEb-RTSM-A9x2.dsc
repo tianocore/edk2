@@ -354,6 +354,7 @@
   # Size of the region used by UEFI in permanent memory (Reserved 64MB)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
   
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|1000000
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000        # expressed in 100ns units, 100,000 x 100 ns = 10,000,000 ns = 10 ms
   
   #
@@ -365,6 +366,11 @@
   # ARM EB PCDS
   #
   gArmRealViewEbPkgTokenSpaceGuid.PcdGdbUartBase|0x1000a000
+  
+  #
+  # ARM PL011 - Serial Terminal
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x10009000
   
   #
   # ARM PL390 General Interrupt Controller
