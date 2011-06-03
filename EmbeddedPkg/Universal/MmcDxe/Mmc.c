@@ -52,7 +52,7 @@ InitializeMmcHostPool (
   VOID
   )
 {
-    InitializeListHead (&mMmcHostPool);
+  InitializeListHead (&mMmcHostPool);
 }
 
 /**
@@ -63,7 +63,7 @@ InsertMmcHost (
   IN MMC_HOST_INSTANCE      *MmcHostInstance
   )
 {
-    InsertTailList (&mMmcHostPool, &(MmcHostInstance->Link));
+  InsertTailList (&mMmcHostPool, &(MmcHostInstance->Link));
 }
 
 /*
@@ -74,101 +74,101 @@ RemoveMmcHost (
   IN MMC_HOST_INSTANCE      *MmcHostInstance
   )
 {
-    RemoveEntryList (&(MmcHostInstance->Link));
+  RemoveEntryList (&(MmcHostInstance->Link));
 }
 
-MMC_HOST_INSTANCE* CreateMmcHostInstance(
+MMC_HOST_INSTANCE* CreateMmcHostInstance (
   IN EFI_MMC_HOST_PROTOCOL* MmcHost
   )
 {
-    EFI_STATUS          Status;
-    MMC_HOST_INSTANCE*  MmcHostInstance;
-    EFI_DEVICE_PATH_PROTOCOL    *NewDevicePathNode;
-    EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  EFI_STATUS          Status;
+  MMC_HOST_INSTANCE*  MmcHostInstance;
+  EFI_DEVICE_PATH_PROTOCOL    *NewDevicePathNode;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
 
-    MmcHostInstance = AllocateZeroPool (sizeof (MMC_HOST_INSTANCE));
-    if (MmcHostInstance == NULL) {
-        return NULL;
-    }
+  MmcHostInstance = AllocateZeroPool (sizeof (MMC_HOST_INSTANCE));
+  if (MmcHostInstance == NULL) {
+    return NULL;
+  }
 
-    MmcHostInstance->Signature = MMC_HOST_INSTANCE_SIGNATURE;
+  MmcHostInstance->Signature = MMC_HOST_INSTANCE_SIGNATURE;
 
-    MmcHostInstance->State = MmcHwInitializationState;
-    
-    MmcHostInstance->BlockIo.Media = AllocateCopyPool (sizeof(EFI_BLOCK_IO_MEDIA), &mMmcMediaTemplate);
-    if (MmcHostInstance->BlockIo.Media == NULL) {
-        goto FREE_INSTANCE;
-    }
+  MmcHostInstance->State = MmcHwInitializationState;
 
-    MmcHostInstance->BlockIo.Revision = EFI_BLOCK_IO_INTERFACE_REVISION;
-    MmcHostInstance->BlockIo.Reset = MmcReset;
-    MmcHostInstance->BlockIo.ReadBlocks = MmcReadBlocks;
-    MmcHostInstance->BlockIo.WriteBlocks = MmcWriteBlocks;
-    MmcHostInstance->BlockIo.FlushBlocks = MmcFlushBlocks;
+  MmcHostInstance->BlockIo.Media = AllocateCopyPool (sizeof(EFI_BLOCK_IO_MEDIA), &mMmcMediaTemplate);
+  if (MmcHostInstance->BlockIo.Media == NULL) {
+    goto FREE_INSTANCE;
+  }
 
-    MmcHostInstance->MmcHost = MmcHost;
+  MmcHostInstance->BlockIo.Revision = EFI_BLOCK_IO_INTERFACE_REVISION;
+  MmcHostInstance->BlockIo.Reset = MmcReset;
+  MmcHostInstance->BlockIo.ReadBlocks = MmcReadBlocks;
+  MmcHostInstance->BlockIo.WriteBlocks = MmcWriteBlocks;
+  MmcHostInstance->BlockIo.FlushBlocks = MmcFlushBlocks;
 
-    // Create DevicePath for the new MMC Host
-    Status = MmcHost->BuildDevicePath(&NewDevicePathNode);
-    if (EFI_ERROR (Status)) {
-        goto FREE_MEDIA;
-    }
+  MmcHostInstance->MmcHost = MmcHost;
 
-    DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocatePool (END_DEVICE_PATH_LENGTH);
-    if (DevicePath == NULL) {
-        goto FREE_MEDIA;
-    }
-    
-    SetDevicePathEndNode (DevicePath);
-    MmcHostInstance->DevicePath = AppendDevicePathNode (DevicePath, NewDevicePathNode);
+  // Create DevicePath for the new MMC Host
+  Status = MmcHost->BuildDevicePath(&NewDevicePathNode);
+  if (EFI_ERROR (Status)) {
+    goto FREE_MEDIA;
+  }
 
-    // Publish BlockIO protocol interface
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                  &MmcHostInstance->MmcHandle,
-                  &gEfiBlockIoProtocolGuid,&(MmcHostInstance->BlockIo),
-                  &gEfiDevicePathProtocolGuid,MmcHostInstance->DevicePath,
-                  NULL
-                  );
-    if (EFI_ERROR(Status)) {
-        goto FREE_DEVICE_PATH;
-    }
+  DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocatePool (END_DEVICE_PATH_LENGTH);
+  if (DevicePath == NULL) {
+    goto FREE_MEDIA;
+  }
 
-    return MmcHostInstance;
+  SetDevicePathEndNode (DevicePath);
+  MmcHostInstance->DevicePath = AppendDevicePathNode (DevicePath, NewDevicePathNode);
+
+  // Publish BlockIO protocol interface
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                &MmcHostInstance->MmcHandle,
+                &gEfiBlockIoProtocolGuid,&(MmcHostInstance->BlockIo),
+                &gEfiDevicePathProtocolGuid,MmcHostInstance->DevicePath,
+                NULL
+                );
+  if (EFI_ERROR(Status)) {
+    goto FREE_DEVICE_PATH;
+  }
+
+  return MmcHostInstance;
 
 FREE_DEVICE_PATH:
-    FreePool(DevicePath);
+  FreePool(DevicePath);
 
 FREE_MEDIA:
-    FreePool(MmcHostInstance->BlockIo.Media);
+  FreePool(MmcHostInstance->BlockIo.Media);
 
 FREE_INSTANCE:
-    FreePool(MmcHostInstance);
+  FreePool(MmcHostInstance);
 
-    return NULL;
+  return NULL;
 }
 
-EFI_STATUS DestroyMmcHostInstance(
+EFI_STATUS DestroyMmcHostInstance (
   IN MMC_HOST_INSTANCE* MmcHostInstance
   )
 {
-    EFI_STATUS Status;
+  EFI_STATUS Status;
 
-    // Uninstall Protocol Interfaces
-    Status = gBS->UninstallMultipleProtocolInterfaces(
+  // Uninstall Protocol Interfaces
+  Status = gBS->UninstallMultipleProtocolInterfaces (
         MmcHostInstance->MmcHandle,
-            &gEfiBlockIoProtocolGuid,&(MmcHostInstance->BlockIo),
+        &gEfiBlockIoProtocolGuid,&(MmcHostInstance->BlockIo),
         &gEfiDevicePathProtocolGuid,MmcHostInstance->DevicePath,
-            NULL
-            );
-    ASSERT_EFI_ERROR (Status);
-    
-    // Free Memory allocated for the instance
-    if (MmcHostInstance->BlockIo.Media) {
-        FreePool(MmcHostInstance->BlockIo.Media);
-    }
-    FreePool (MmcHostInstance);
+        NULL
+        );
+  ASSERT_EFI_ERROR (Status);
 
-    return Status;
+  // Free Memory allocated for the instance
+  if (MmcHostInstance->BlockIo.Media) {
+    FreePool(MmcHostInstance->BlockIo.Media);
+  }
+  FreePool (MmcHostInstance);
+
+  return Status;
 }
 
 /**
@@ -182,62 +182,62 @@ MmcDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
 {
-    EFI_STATUS                      Status;
-    //EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
-    EFI_MMC_HOST_PROTOCOL           *MmcHost;
-    EFI_DEV_PATH_PTR                Node;
+  EFI_STATUS                      Status;
+  //EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
+  EFI_MMC_HOST_PROTOCOL           *MmcHost;
+  EFI_DEV_PATH_PTR                Node;
 
+  //
+  // Check RemainingDevicePath validation
+  //
+  if (RemainingDevicePath != NULL) {
     //
-    // Check RemainingDevicePath validation
+    // Check if RemainingDevicePath is the End of Device Path Node,
+    // if yes, go on checking other conditions
     //
-    if (RemainingDevicePath != NULL) {
-        //
-        // Check if RemainingDevicePath is the End of Device Path Node, 
-        // if yes, go on checking other conditions
-        //
-        if (!IsDevicePathEnd (RemainingDevicePath)) {
-            //
-            // If RemainingDevicePath isn't the End of Device Path Node,
-            // check its validation
-            //
-            Node.DevPath = RemainingDevicePath;
-            if (Node.DevPath->Type != HARDWARE_DEVICE_PATH ||
-              Node.DevPath->SubType != HW_VENDOR_DP      ||
-              DevicePathNodeLength(Node.DevPath) != sizeof(VENDOR_DEVICE_PATH)) {
-                return EFI_UNSUPPORTED;
-            }
-        }
+    if (!IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // If RemainingDevicePath isn't the End of Device Path Node,
+      // check its validation
+      //
+      Node.DevPath = RemainingDevicePath;
+      if (Node.DevPath->Type != HARDWARE_DEVICE_PATH ||
+        Node.DevPath->SubType != HW_VENDOR_DP      ||
+        DevicePathNodeLength(Node.DevPath) != sizeof(VENDOR_DEVICE_PATH)) {
+          return EFI_UNSUPPORTED;
+      }
     }
+  }
 
-    //
-    // Check if Mmc Host protocol is installed by platform
-    //
-    Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiMmcHostProtocolGuid,
-                  (VOID **) &MmcHost,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-    if (Status == EFI_ALREADY_STARTED) {
-        return EFI_SUCCESS;
-    }
-    if (EFI_ERROR (Status)) {
-        return Status;
-    }
-
-    //
-    // Close the Mmc Host used to perform the supported test
-    //
-    gBS->CloseProtocol (
-        Controller,
-        &gEfiMmcHostProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
-
+  //
+  // Check if Mmc Host protocol is installed by platform
+  //
+  Status = gBS->OpenProtocol (
+                Controller,
+                &gEfiMmcHostProtocolGuid,
+                (VOID **) &MmcHost,
+                This->DriverBindingHandle,
+                Controller,
+                EFI_OPEN_PROTOCOL_BY_DRIVER
+                );
+  if (Status == EFI_ALREADY_STARTED) {
     return EFI_SUCCESS;
+  }
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Close the Mmc Host used to perform the supported test
+  //
+  gBS->CloseProtocol (
+      Controller,
+      &gEfiMmcHostProtocolGuid,
+      This->DriverBindingHandle,
+      Controller
+      );
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -251,48 +251,48 @@ MmcDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-    EFI_STATUS              Status;
-    MMC_HOST_INSTANCE       *MmcHostInstance;
-    EFI_MMC_HOST_PROTOCOL   *MmcHost;
+  EFI_STATUS              Status;
+  MMC_HOST_INSTANCE       *MmcHostInstance;
+  EFI_MMC_HOST_PROTOCOL   *MmcHost;
 
+  //
+  // Check RemainingDevicePath validation
+  //
+  if (RemainingDevicePath != NULL) {
     //
-    // Check RemainingDevicePath validation
+    // Check if RemainingDevicePath is the End of Device Path Node,
+    // if yes, return EFI_SUCCESS
     //
-    if (RemainingDevicePath != NULL) {
-        //
-        // Check if RemainingDevicePath is the End of Device Path Node, 
-        // if yes, return EFI_SUCCESS
-        //
-        if (IsDevicePathEnd (RemainingDevicePath)) {
-            return EFI_SUCCESS;
-        }
+    if (IsDevicePathEnd (RemainingDevicePath)) {
+      return EFI_SUCCESS;
     }
+  }
 
-    //
-    // Get the Mmc Host protocol
-    //
-    Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiMmcHostProtocolGuid,
-                  (VOID **) &MmcHost,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-    if (EFI_ERROR (Status)) {
-        if (Status == EFI_ALREADY_STARTED) {
-            return EFI_SUCCESS;
-        }
-        return Status;
+  //
+  // Get the Mmc Host protocol
+  //
+  Status = gBS->OpenProtocol (
+                Controller,
+                &gEfiMmcHostProtocolGuid,
+                (VOID **) &MmcHost,
+                This->DriverBindingHandle,
+                Controller,
+                EFI_OPEN_PROTOCOL_BY_DRIVER
+                );
+  if (EFI_ERROR (Status)) {
+    if (Status == EFI_ALREADY_STARTED) {
+      return EFI_SUCCESS;
     }
+    return Status;
+  }
 
-    MmcHostInstance = CreateMmcHostInstance(MmcHost);
-    if (MmcHostInstance != NULL) {
-        // Add the handle to the pool
-        InsertMmcHost (MmcHostInstance);
-    }
+  MmcHostInstance = CreateMmcHostInstance(MmcHost);
+  if (MmcHostInstance != NULL) {
+    // Add the handle to the pool
+    InsertMmcHost (MmcHostInstance);
+  }
 
-    return EFI_SUCCESS;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -307,33 +307,33 @@ MmcDriverBindingStop (
   IN  EFI_HANDLE                    *ChildHandleBuffer
   )
 {
-    EFI_STATUS          Status = EFI_SUCCESS;
-    LIST_ENTRY          *CurrentLink;
-    MMC_HOST_INSTANCE   *MmcHostInstance;
+  EFI_STATUS          Status = EFI_SUCCESS;
+  LIST_ENTRY          *CurrentLink;
+  MMC_HOST_INSTANCE   *MmcHostInstance;
 
-    MMC_TRACE("MmcDriverBindingStop()");
+  MMC_TRACE("MmcDriverBindingStop()");
 
-    // For each MMC instance
-    CurrentLink = mMmcHostPool.ForwardLink;
-    while (CurrentLink != NULL && CurrentLink != &mMmcHostPool && (Status == EFI_SUCCESS)) {
-        MmcHostInstance = MMC_HOST_INSTANCE_FROM_LINK(CurrentLink);
-        ASSERT(MmcHostInstance != NULL);
+  // For each MMC instance
+  CurrentLink = mMmcHostPool.ForwardLink;
+  while (CurrentLink != NULL && CurrentLink != &mMmcHostPool && (Status == EFI_SUCCESS)) {
+    MmcHostInstance = MMC_HOST_INSTANCE_FROM_LINK(CurrentLink);
+    ASSERT(MmcHostInstance != NULL);
 
-        // Close gEfiMmcHostProtocolGuid
-        Status = gBS->CloseProtocol (
-                    Controller,
-                    &gEfiMmcHostProtocolGuid,(VOID **) &MmcHostInstance->MmcHost,
-                    This->DriverBindingHandle
-                    );
+    // Close gEfiMmcHostProtocolGuid
+    Status = gBS->CloseProtocol (
+                Controller,
+                &gEfiMmcHostProtocolGuid,(VOID **) &MmcHostInstance->MmcHost,
+                This->DriverBindingHandle
+                );
 
-        // Remove MMC Host Instance from the pool
-        RemoveMmcHost (MmcHostInstance);
+    // Remove MMC Host Instance from the pool
+    RemoveMmcHost (MmcHostInstance);
 
-        // Destroy MmcHostInstance
-        DestroyMmcHostInstance (MmcHostInstance);
-    }
+    // Destroy MmcHostInstance
+    DestroyMmcHostInstance (MmcHostInstance);
+  }
 
-    return Status;
+  return Status;
 }
 
 EFI_DRIVER_BINDING_PROTOCOL gMmcDriverBinding = {
@@ -355,33 +355,33 @@ MmcDxeInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-    EFI_STATUS  Status;
+  EFI_STATUS  Status;
 
-    //
-    // Initializes MMC Host pool
-    //
-    InitializeMmcHostPool ();
+  //
+  // Initializes MMC Host pool
+  //
+  InitializeMmcHostPool ();
 
-    //
-    // Install driver model protocol(s).
-    //
-    Status = EfiLibInstallDriverBindingComponentName2 (
-             ImageHandle,
-             SystemTable,
-             &gMmcDriverBinding,
-             ImageHandle,
-             &gMmcComponentName,
-             &gMmcComponentName2
-             );
-    ASSERT_EFI_ERROR (Status);
+  //
+  // Install driver model protocol(s).
+  //
+  Status = EfiLibInstallDriverBindingComponentName2 (
+           ImageHandle,
+           SystemTable,
+           &gMmcDriverBinding,
+           ImageHandle,
+           &gMmcComponentName,
+           &gMmcComponentName2
+           );
+  ASSERT_EFI_ERROR (Status);
 
-    // Install driver diagnostics
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                  &ImageHandle, 
-                  &gEfiDriverDiagnostics2ProtocolGuid,&gMmcDriverDiagnostics2,
-                  NULL
-                  );
-    ASSERT_EFI_ERROR (Status);
+  // Install driver diagnostics
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                &ImageHandle,
+                &gEfiDriverDiagnostics2ProtocolGuid,&gMmcDriverDiagnostics2,
+                NULL
+                );
+  ASSERT_EFI_ERROR (Status);
 
-    return Status;
+  return Status;
 }
