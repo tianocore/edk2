@@ -154,6 +154,7 @@ GetEnvironmentVariableList(
       return (Status);
     }
   } else {
+    Status = EFI_SUCCESS;
     MaxVarSize = 16384;
   }
 
