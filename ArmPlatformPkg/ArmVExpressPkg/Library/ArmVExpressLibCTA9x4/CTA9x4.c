@@ -19,7 +19,7 @@
 #include <Library/PcdLib.h>
 #include <Drivers/PL341Dmc.h>
 #include <Drivers/PL301Axi.h>
-#include <Library/L2X0CacheLib.h>
+#include <Drivers/PL310L2Cache.h>
 #include <Library/SerialPortLib.h>
 
 #define SerialPrint(txt)  SerialPortWrite (txt, AsciiStrLen(txt)+1);
@@ -186,7 +186,11 @@ ArmPlatformSecInitialize (
   VOID
   ) {
   // The L2x0 controller must be intialize in Secure World
-  L2x0CacheInit(PcdGet32(PcdL2x0ControllerBase), FALSE);
+  L2x0CacheInit(PcdGet32(PcdL2x0ControllerBase),
+      PL310_TAG_LATENCIES(L2x0_LATENCY_8_CYCLES,L2x0_LATENCY_8_CYCLES,L2x0_LATENCY_8_CYCLES),
+      PL310_DATA_LATENCIES(L2x0_LATENCY_8_CYCLES,L2x0_LATENCY_8_CYCLES,L2x0_LATENCY_8_CYCLES),
+      0,~0, // Use default setting for the Auxiliary Control Register
+      FALSE);
 }
 
 /**

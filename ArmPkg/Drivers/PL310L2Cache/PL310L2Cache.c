@@ -15,7 +15,7 @@
 #include <Library/IoLib.h>
 #include <Library/DebugLib.h>
 #include <Library/ArmLib.h>
-#include <Library/L2X0CacheLib.h>
+#include <Drivers/PL310L2Cache.h>
 #include <Library/PcdLib.h>
 
 #define L2x0WriteReg(reg,val)               MmioWrite32(PcdGet32(PcdL2x0ControllerBase) + reg, val)
@@ -25,6 +25,10 @@
 VOID
 L2x0CacheInit (
   IN  UINTN   L2x0Base,
+  IN  UINT32  L2x0TagLatencies,
+  IN  UINT32  L2x0DataLatencies,
+  IN  UINT32  L2x0AuxValue,
+  IN  UINT32  L2x0AuxMask,
   IN  BOOLEAN CacheEnabled
   )
 {
@@ -66,9 +70,9 @@ L2x0CacheInit (
   Aux |= L2x0_AUXCTRL_AW_AWCACHE;
   // Use default Size
   Data = L2x0ReadReg(L2X0_AUXCTRL);
-  Aux |= Data & (0x7 << 17);
+  Aux |= Data & L2X0_AUXCTRL_WAYSIZE_MASK;
   // Use default associativity
-  Aux |= Data & (0x1 << 16);
+  Aux |= Data & L2X0_AUXCTRL_ASSOCIATIVITY;
   // Enabled I & D Prefetch
   Aux |= L2x0_AUXCTRL_IPREFETCH | L2x0_AUXCTRL_DPREFETCH;
 
@@ -88,29 +92,16 @@ L2x0CacheInit (
     L2x0WriteReg(L2X0_PWRCTRL, PwrCtl);
   }
 
-    if (Revision >= 4) {
-        // Tag RAM Latency register
-        // - Use default latency
-    
-        // Data RAM Latency Control register
-        // - Use default latency
-    } else if (Revision >= 2) {
-        L2x0WriteReg(L230_TAG_LATENCY,
-            (L2_TAG_ACCESS_LATENCY << 8)
-            | (L2_TAG_ACCESS_LATENCY << 4)
-            | L2_TAG_SETUP_LATENCY
-        );
-        
-        L2x0WriteReg(L230_DATA_LATENCY,
-            (L2_DATA_ACCESS_LATENCY << 8)
-            | (L2_DATA_ACCESS_LATENCY << 4)
-            | L2_DATA_SETUP_LATENCY
-        );
-    } else {
-        Aux |= (L2_TAG_ACCESS_LATENCY << 6)
-               | (L2_DATA_ACCESS_LATENCY << 3)
-               | L2_DATA_ACCESS_LATENCY;
-    }
+  if (Revision >= 2) {
+    L2x0WriteReg(L230_TAG_LATENCY, L2x0TagLatencies);
+    L2x0WriteReg(L230_DATA_LATENCY, L2x0DataLatencies);
+  } else {
+    // PL310 old style latency is not supported yet
+    ASSERT(0);
+  }
+
+  // Set the platform specific values
+  Aux = (Aux & L2x0AuxMask) | L2x0AuxValue;
 
   // Write Auxiliary value
   L2x0WriteReg(L2X0_AUXCTRL, Aux);

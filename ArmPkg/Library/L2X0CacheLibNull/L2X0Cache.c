@@ -12,12 +12,17 @@
 *
 **/
 
-#include <Library/L2X0CacheLib.h>
+#include <Uefi.h>
+#include <Drivers/PL310L2Cache.h>
 
 // Initialize L2X0 Cache Controller
 VOID
 L2x0CacheInit (
   IN  UINTN   L2x0Base,
+  IN  UINT32  L2x0TagLatencies,
+  IN  UINT32  L2x0DataLatencies,
+  IN  UINT32  L2x0AuxValue,
+  IN  UINT32  L2x0AuxMask,
   IN  BOOLEAN CacheEnabled
   )
 {
