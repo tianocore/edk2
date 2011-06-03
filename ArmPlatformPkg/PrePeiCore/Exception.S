@@ -100,4 +100,3 @@ _DefaultFiq:
   mov  r0, #7
   blx  ASM_PFX(PeiCommonExceptionEntry)
 
-  END
