@@ -73,6 +73,7 @@
 [FeaturePcd.common]
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport
   gArmTokenSpaceGuid.PcdRelocateVectorTable
+  gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
   gArmTokenSpaceGuid.PcdEfiUncachedMemoryToStronglyOrdered
 
 [depex]

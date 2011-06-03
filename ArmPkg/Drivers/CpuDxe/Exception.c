@@ -162,8 +162,10 @@ InitializeExceptions (
         ASSERT_EFI_ERROR (Status);
       }
     
+    if (FeaturePcdGet(PcdDebuggerExceptionSupport) == TRUE) {
       // Save existing vector table, in case debugger is already hooked in
       CopyMem ((VOID *)gDebuggerExceptionHandlers, (VOID *)VectorBase, sizeof (gDebuggerExceptionHandlers));
+    }
     
       // Copy our assembly code into the page that contains the exception vectors. 
       CopyMem ((VOID *)VectorBase, (VOID *)ExceptionHandlersStart, Length);
@@ -178,7 +180,8 @@ InitializeExceptions (
       // Initialize the C entry points for interrupts
       //
       for (Index = 0; Index <= MAX_ARM_EXCEPTION; Index++) {
-        if ((gDebuggerExceptionHandlers[Index] == 0) || (gDebuggerExceptionHandlers[Index] == (VOID *)(UINTN)0xEAFFFFFE)) {
+      if (!FeaturePcdGet(PcdDebuggerExceptionSupport) ||
+          (gDebuggerExceptionHandlers[Index] == 0) || (gDebuggerExceptionHandlers[Index] == (VOID *)(UINTN)0xEAFFFFFE)) {
           // Exception handler contains branch to vector location (jmp $) so no handler
           // NOTE: This code assumes vectors are ARM and not Thumb code
           Status = RegisterInterruptHandler (Index, NULL);

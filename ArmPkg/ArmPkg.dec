@@ -52,6 +52,9 @@
   # point the Exception Vector Table to its location in CpuDxe.
   # By default we copy the Vector Table at  PcdGet32(PcdCpuVectorBaseAddress)
   gArmTokenSpaceGuid.PcdRelocateVectorTable|TRUE|BOOLEAN|0x00000022
+  # Set this PCD to TRUE if the Exception Vector is changed to add debugger support before
+  # it has been configured by the CPU DXE
+  gArmTokenSpaceGuid.PcdDebuggerExceptionSupport|FALSE|BOOLEAN|0x00000032
   
   gArmTokenSpaceGuid.PcdEfiUncachedMemoryToStronglyOrdered|FALSE|BOOLEAN|0x00000025
   gArmTokenSpaceGuid.PcdSkipPeiCore|FALSE|BOOLEAN|0x00000026
