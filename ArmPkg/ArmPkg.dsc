@@ -134,6 +134,5 @@
   ArmPkg/Drivers/PL390Gic/PL390GicNonSec.inf
   ArmPkg/Drivers/PL390Gic/PL390GicSec.inf
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
-  ArmPkg/Universal/MmcDxe/MmcDxe.inf
 
 

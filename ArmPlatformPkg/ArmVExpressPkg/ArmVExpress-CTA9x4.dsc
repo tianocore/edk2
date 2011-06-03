@@ -492,7 +492,7 @@
   #
   # Multimedia Card Interface
   #
-  ArmPkg/Universal/MmcDxe/MmcDxe.inf
+  EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   ArmPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
   
   #

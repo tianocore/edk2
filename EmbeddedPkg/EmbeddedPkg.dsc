@@ -259,6 +259,7 @@
   EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
+  EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   
   
 

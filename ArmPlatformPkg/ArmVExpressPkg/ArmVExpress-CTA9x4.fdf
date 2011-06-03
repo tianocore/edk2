@@ -178,7 +178,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # Multimedia Card Interface
   #
-  INF ArmPkg/Universal/MmcDxe/MmcDxe.inf
+  INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   INF ArmPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
   
   #
