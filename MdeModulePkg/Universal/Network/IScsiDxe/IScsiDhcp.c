@@ -235,7 +235,7 @@ IScsiDhcpSelectOffer (
     break;
   }
 
-  if ((Index == OptionCount)) {
+  if (Index == OptionCount) {
     Status = EFI_NOT_READY;
   }
 
@@ -361,6 +361,7 @@ IScsiDoDhcp (
   EFI_DHCP4_PACKET_OPTION *ParaList;
   EFI_DHCP4_CONFIG_DATA   Dhcp4ConfigData;
   BOOLEAN                 MediaPresent;
+  UINT8                   *Data;
 
   Dhcp4Handle = NULL;
   Dhcp4       = NULL;
@@ -410,10 +411,11 @@ IScsiDoDhcp (
   //
   ParaList->OpCode  = DHCP4_TAG_PARA_LIST;
   ParaList->Length  = (UINT8) (ConfigData->NvData.TargetInfoFromDhcp ? 4 : 3);
-  ParaList->Data[0] = DHCP4_TAG_NETMASK;
-  ParaList->Data[1] = DHCP4_TAG_ROUTER;
-  ParaList->Data[2] = DHCP4_TAG_DNS;
-  ParaList->Data[3] = DHCP4_TAG_ROOT_PATH;
+  Data = &ParaList->Data[0];
+  Data[0] = DHCP4_TAG_NETMASK;
+  Data[1] = DHCP4_TAG_ROUTER;
+  Data[2] = DHCP4_TAG_DNS;
+  Data[3] = DHCP4_TAG_ROOT_PATH;
 
   ZeroMem (&Dhcp4ConfigData, sizeof (EFI_DHCP4_CONFIG_DATA));
   Dhcp4ConfigData.OptionCount = 1;

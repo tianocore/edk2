@@ -1865,7 +1865,7 @@ ConSplitterTextInDeleteDevice (
   //
   for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++) {
     if (Private->TextInList[Index] == TextIn) {
-      for (Index = Index; Index < Private->CurrentNumberOfConsoles - 1; Index++) {
+      for (; Index < Private->CurrentNumberOfConsoles - 1; Index++) {
         Private->TextInList[Index] = Private->TextInList[Index + 1];
       }
 
@@ -1945,7 +1945,7 @@ ConSplitterTextInExDeleteDevice (
   //
   for (Index = 0; Index < Private->CurrentNumberOfExConsoles; Index++) {
     if (Private->TextInExList[Index] == TextInEx) {
-      for (Index = Index; Index < Private->CurrentNumberOfExConsoles - 1; Index++) {
+      for (; Index < Private->CurrentNumberOfExConsoles - 1; Index++) {
         Private->TextInExList[Index] = Private->TextInExList[Index + 1];
       }
 
@@ -2022,7 +2022,7 @@ ConSplitterSimplePointerDeleteDevice (
   //
   for (Index = 0; Index < Private->CurrentNumberOfPointers; Index++) {
     if (Private->PointerList[Index] == SimplePointer) {
-      for (Index = Index; Index < Private->CurrentNumberOfPointers - 1; Index++) {
+      for (; Index < Private->CurrentNumberOfPointers - 1; Index++) {
         Private->PointerList[Index] = Private->PointerList[Index + 1];
       }
 
@@ -2099,7 +2099,7 @@ ConSplitterAbsolutePointerDeleteDevice (
   //
   for (Index = 0; Index < Private->CurrentNumberOfAbsolutePointers; Index++) {
     if (Private->AbsolutePointerList[Index] == AbsolutePointer) {
-      for (Index = Index; Index < Private->CurrentNumberOfAbsolutePointers - 1; Index++) {
+      for (; Index < Private->CurrentNumberOfAbsolutePointers - 1; Index++) {
         Private->AbsolutePointerList[Index] = Private->AbsolutePointerList[Index + 1];
       }
 

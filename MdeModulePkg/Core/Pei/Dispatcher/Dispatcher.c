@@ -779,7 +779,7 @@ PeiDispatcher (
                          );
             }
 
-            if ((Status == EFI_SUCCESS)) {
+            if (Status == EFI_SUCCESS) {
               //
               // The PEIM has its dependencies satisfied, and its entry point
               // has been found, so invoke it.

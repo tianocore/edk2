@@ -359,7 +359,7 @@ UsbParseConfigDesc (
   while (Len >= sizeof (EFI_USB_INTERFACE_DESCRIPTOR)) {
     Setting = UsbParseInterfaceDesc (DescBuf, Len, &Consumed);
 
-    if ((Setting == NULL)) {
+    if (Setting == NULL) {
       DEBUG (( EFI_D_ERROR, "UsbParseConfigDesc: failed to parse interface setting\n"));
       goto ON_ERROR;
 

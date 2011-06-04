@@ -183,7 +183,7 @@ IScsiExtScsiPassThruBuildDevicePath (
   EFI_DEV_PATH                  *Node;
   UINTN                         DevPathNodeLen;
 
-  if ((DevicePath == NULL)) {
+  if (DevicePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
