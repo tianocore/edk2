@@ -32,8 +32,6 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
   &mVariablePpi
 };
 
-EFI_GUID mEfiVariableIndexTableGuid = EFI_VARIABLE_INDEX_TABLE_GUID;
-
 
 /**
   Check if it runs in Recovery mode.
@@ -393,7 +391,7 @@ FindVariable (
   MaxIndex = 0;
   StopRecord = FALSE;
 
-  GuidHob = GetFirstGuidHob (&mEfiVariableIndexTableGuid);
+  GuidHob = GetFirstGuidHob (&gEfiVariableIndexTableGuid);
   if (GuidHob == NULL) {
     //
     // If it's the first time to access variable region in flash, create a guid hob to record
@@ -401,7 +399,7 @@ FindVariable (
     // Note that as the resource of PEI phase is limited, only store the number of 
     // VARIABLE_INDEX_TABLE_VOLUME of VAR_ADDED type variables to reduce access time.
     //
-    IndexTable = BuildGuidHob (&mEfiVariableIndexTableGuid, sizeof (VARIABLE_INDEX_TABLE));
+    IndexTable = BuildGuidHob (&gEfiVariableIndexTableGuid, sizeof (VARIABLE_INDEX_TABLE));
     IndexTable->Length      = 0;
     IndexTable->StartPtr    = NULL;
     IndexTable->EndPtr      = NULL;
