@@ -85,7 +85,6 @@
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFirmwareFdSize
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFirmwareBlockSize
   gInOsEmuPkgTokenSpaceGuid.PcdEmuApCount
-  gInOsEmuPkgTokenSpaceGuid.PcdEmuPhysicalDisk
   gInOsEmuPkgTokenSpaceGuid.PcdEmuVirtualDisk
   gInOsEmuPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFileSystem
