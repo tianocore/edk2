@@ -554,7 +554,7 @@ EmuBlockIoDriverBindingStart (
   Private->BlockIo2.Reset         = EmuBlockIo2Reset;
   Private->BlockIo2.ReadBlocksEx  = EmuBlockIo2ReadBlocksEx;
   Private->BlockIo2.WriteBlocksEx = EmuBlockIo2WriteBlocksEx;
-  Private->BlockIo2.FlushBlocksEx = (EFI_BLOCK_FLUSH_EX)EmuBlockIoFlushBlocks;
+  Private->BlockIo2.FlushBlocksEx = EmuBlockIo2Flush;
 
   Private->ControllerNameTable = NULL;
 

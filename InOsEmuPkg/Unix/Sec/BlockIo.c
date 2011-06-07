@@ -30,9 +30,7 @@ typedef struct {
   BOOLEAN                     RemovableMedia;
   BOOLEAN                     WriteProtected;
 
-  UINTN                       BlockSize;
   UINT64                      NumberOfBlocks;
-  UINT64                      LastBlock;
 
   EMU_BLOCK_IO_PROTOCOL       EmuBlockIo;
   EFI_BLOCK_IO_MEDIA          *Media;
@@ -66,12 +64,13 @@ SetFilePointer64 (
 {
   EFI_STATUS    Status;
   off_t         res;
+  off_t         offset = DistanceToMove;
 
   Status = EFI_SUCCESS;
-  res = lseek (Private->fd, DistanceToMove, MoveMethod);
+  res = lseek (Private->fd, offset, (int)MoveMethod);
   if (res == -1) {
     Status = EFI_INVALID_PARAMETER;
-  }
+  } 
 
   if (NewFilePointer != NULL) {
     *NewFilePointer = res;
@@ -88,7 +87,7 @@ EmuBlockIoOpenDevice (
 {
   EFI_STATUS            Status;
   UINT64                FileSize;
-  UINT64                EndOfFile;
+  struct statfs         buf;
 
 
   //
@@ -103,9 +102,9 @@ EmuBlockIoOpenDevice (
   //
   Private->fd = open (Private->Filename, Private->Mode, 0644);
   if (Private->fd < 0) {
-    DEBUG ((EFI_D_INFO, "EmuOpenBlock: Could not open %a\n", Private->Filename));
+    printf ("EmuOpenBlock: Could not open %s: %s\n", Private->Filename, strerror(errno));
     Private->Media->MediaPresent  = FALSE;
-    Status                          = EFI_NO_MEDIA;
+    Status                        = EFI_NO_MEDIA;
     goto Done;
   }
 
@@ -121,36 +120,54 @@ EmuBlockIoOpenDevice (
   //
   Status = SetFilePointer64 (Private, 0, &FileSize, SEEK_END);
   if (EFI_ERROR (Status)) {
-    FileSize = MultU64x32 (Private->NumberOfBlocks, Private->BlockSize);
-    DEBUG ((EFI_D_ERROR, "EmuOpenBlock: Could not get filesize of %a\n", Private->Filename));
+    printf ("EmuOpenBlock: Could not get filesize of %s\n", Private->Filename);
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
-
-  if (Private->NumberOfBlocks == 0) {
-    Private->NumberOfBlocks = DivU64x32 (FileSize, Private->BlockSize);
-    Private->LastBlock = Private->NumberOfBlocks - 1;
-    Private->Media->LastBlock = Private->LastBlock;
-  }
-
-  EndOfFile = MultU64x32 (Private->NumberOfBlocks, Private->BlockSize);
-
-  if (FileSize != EndOfFile) {
+  
+  if (FileSize == 0) {
+    // lseek fails on a real device. ioctl calls are OS specific
+#if __APPLE__
+    {
+      UINT32 BlockSize;
+     
+      if (ioctl (Private->fd, DKIOCGETBLOCKSIZE, &BlockSize) == 0) {
+        Private->Media->BlockSize = BlockSize;
+      }
+      if (ioctl (Private->fd, DKIOCGETBLOCKCOUNT, &Private->NumberOfBlocks) == 0) {
+        if ((Private->NumberOfBlocks == 0) && (BlockSize == 0x800)) {
+          // A DVD is ~ 4.37 GB so make up a number
+          Private->Media->LastBlock = (0x100000000ULL/0x800) - 1;
+        } else {
+          Private->Media->LastBlock = Private->NumberOfBlocks - 1;
+        }
+      }
+      ioctl (Private->fd, DKIOCGETMAXBLOCKCOUNTWRITE, &Private->Media->OptimalTransferLengthGranularity);  
+    }
+#else 
+    {
+      size_t BlockSize;
+      UINT64 DiskSize;
+      
+      if (ioctl (Private->fd, BLKSSZGET, &BlockSize) == 0) {
+        Private->Media->BlockSize = BlockSize;
+      }
+      if (ioctl (Private->fd, BLKGETSIZE64, &DiskSize) == 0) {
+        Private->NumberOfBlocks = DivU64x32 (DiskSize, (UINT32)BlockSize);
+        Private->Media->LastBlock = Private->NumberOfBlocks - 1;
+      }
+    }
+#endif
+    
+  } else if (fstatfs (Private->fd, &buf) == 0) {
     //
-    // file is not the proper size, change it
+    // Works for files, not devices
     //
-    DEBUG ((EFI_D_INIT, "EmuOpenBlock: Initializing block device: %a\n", Private->Filename));
-
-    //
-    // first set it to 0
-    //
-    ftruncate (Private->fd, 0);
-
-    //
-    // then set it to the needed file size (OS will zero fill it)
-    //
-    ftruncate (Private->fd, EndOfFile);
-  }
+    Private->Media->BlockSize = buf.f_bsize;
+    Private->Media->OptimalTransferLengthGranularity = buf.f_iosize/buf.f_bsize;
+    Private->NumberOfBlocks = DivU64x32 (FileSize, Private->Media->BlockSize);
+    Private->Media->LastBlock = Private->NumberOfBlocks - 1;
+  } 
 
   DEBUG ((EFI_D_INIT, "%HEmuOpenBlock: opened %a%N\n", Private->Filename));
   Status = EFI_SUCCESS;
@@ -185,19 +202,20 @@ EmuBlockIoCreateMapping (
   Media->LogicalPartition = FALSE;
   Media->ReadOnly         = Private->WriteProtected;
   Media->WriteCaching     = FALSE;
-  Media->BlockSize        = Private->BlockSize;
   Media->IoAlign          = 1;
   Media->LastBlock        = 0; // Filled in by OpenDevice
   
   // EFI_BLOCK_IO_PROTOCOL_REVISION2
   Media->LowestAlignedLba              = 0;
   Media->LogicalBlocksPerPhysicalBlock = 0; 
-  
+    
+
   // EFI_BLOCK_IO_PROTOCOL_REVISION3
   Media->OptimalTransferLengthGranularity = 0;
-
+    
   Status = EmuBlockIoOpenDevice (Private);
 
+  
   return Status;
 }
 
@@ -293,7 +311,7 @@ EmuBlockIoReadWriteCommon (
   //
   // Verify buffer size
   //
-  BlockSize = Private->BlockSize;
+  BlockSize = Private->Media->BlockSize;
   if (BufferSize == 0) {
     DEBUG ((EFI_D_INIT, "%s: Zero length read\n", CallerName));
     return EFI_SUCCESS;
@@ -305,7 +323,7 @@ EmuBlockIoReadWriteCommon (
   }
 
   LastBlock = Lba + (BufferSize / BlockSize) - 1;
-  if (LastBlock > Private->LastBlock) {
+  if (LastBlock > Private->Media->LastBlock) {
     DEBUG ((EFI_D_INIT, "ReadBlocks: Attempted to read off end of device\n"));
     return EFI_INVALID_PARAMETER;
   }
@@ -512,13 +530,14 @@ EmuBlockIoFlushBlocks (
   )
 {
   EMU_BLOCK_IO_PRIVATE *Private;
+  int                  Res;
 
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   if (Private->fd >= 0) {
-    close (Private->fd);
-    Private->fd = open (Private->Filename, Private->Mode, 0644);
+    Res = fcntl (Private->fd, F_FULLFSYNC);
   }
+  
   
   if (Token != NULL) {
     if (Token->Event != NULL) {
@@ -658,8 +677,6 @@ EmuBlockIoThunkOpen (
     }
   }
   
-  Private->BlockSize = 512;
- 
   This->Interface = &Private->EmuBlockIo;
   This->Private   = Private;
   return EFI_SUCCESS;

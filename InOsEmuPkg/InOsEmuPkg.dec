@@ -71,9 +71,16 @@
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
   gInOsEmuPkgTokenSpaceGuid.PcdEmuMemorySize|L"64!64"|VOID*|0x0000100c
   
-
-  gInOsEmuPkgTokenSpaceGuid.PcdEmuPhysicalDisk|L"E:RW;245760;512"|VOID*|0x00001000
+  #
+  # filename[:][R|F][O|W]
+  # filename can be a device node, like /dev/disk1
+  # R - Removable Media F - Fixed Media
+  # O - Write protected W - Writable
+  #   Default is Fixed Media, Writable
+  # Size comes from file or device. 
+  # On Mac OS X you can use Disk Utility to create .dmg files and mount then like disks
   gInOsEmuPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"FW;40960;512"|VOID*|0x00001001
+  
   gInOsEmuPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"|VOID*|0x00001018
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFileSystem|L".!../../../../../EdkShellBinPkg/bin/ia32/Apps"|VOID*|0x00001004
   gInOsEmuPkgTokenSpaceGuid.PcdEmuSerialPort|L"/dev/ttyS0"|VOID*|0x00001002

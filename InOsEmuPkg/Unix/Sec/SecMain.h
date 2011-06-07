@@ -78,6 +78,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <string.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
+#include <sys/statvfs.h>
 
 #include <sys/socket.h>
 #include <netdb.h>
@@ -90,6 +91,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <net/bpf.h>
 #include <sys/param.h>
 #include <sys/mount.h>
+#include <sys/disk.h>
 #define _XOPEN_SOURCE
 #ifndef _Bool
   #define _Bool char // for clang debug
@@ -97,6 +99,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #else
 #include <termio.h>
 #include <sys/vfs.h>
+#include <linux/fs.h>
 #endif 
 
 #include <utime.h>
