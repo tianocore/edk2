@@ -237,7 +237,6 @@ VfrParserStart (
 #token EndGuidOp("endguidop")                   "endguidop"
 #token DataType("datatype")                     "datatype"
 #token Data("data")                             "data"
-#token Modal("modal")                           "modal"
 
 //
 // Define the class and subclass tokens
@@ -1252,8 +1251,7 @@ vfrFormDefinition :
     vfrStatementBanner                       |
     // Just for framework vfr compatibility
     vfrStatementInvalid                      |
-    vfrStatementExtension                    |
-    vfrStatementModal
+    vfrStatementExtension
   )*
   E:EndForm                                         <<
                                                       if (mCompatibleMode) {
@@ -1312,8 +1310,7 @@ vfrFormMapDefinition :
     vfrStatementConditional                  |
     vfrStatementLabel                        |
     vfrStatementBanner                       |
-    vfrStatementExtension                    |
-    vfrStatementModal
+    vfrStatementExtension
   )*
   E:EndForm                                         << CRT_END_OP (E); >>
   ";"
@@ -2493,11 +2490,6 @@ vfrLockedTag :
   L:Locked                                             << LObj.SetLineNo(L->getLine()); >>
   ;
 
-vfrModalTag :
-  << CIfrModal MObj; >>
-  L:Modal                                             << MObj.SetLineNo(L->getLine()); >>
-  ;
-
 vfrStatementStatTag :
   vfrImageTag  |
   vfrLockedTag
@@ -2509,11 +2501,6 @@ vfrStatementStatTagList :
 
 vfrStatementImage :
   vfrImageTag
-  ";"
-  ;
-
-vfrStatementModal :
-  vfrModalTag
   ";"
   ;
 
