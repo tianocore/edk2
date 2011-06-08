@@ -770,6 +770,7 @@ typedef union {
 #define EFI_IFR_GUID_OP                0x5F
 #define EFI_IFR_SECURITY_OP            0x60
 #define EFI_IFR_MODAL_TAG_OP           0x61
+#define EFI_IFR_REFRESH_ID_OP          0x62
 
 //
 // Definitions of IFR Standard Headers
@@ -1146,6 +1147,11 @@ typedef struct _EFI_IFR_GUID {
   EFI_GUID                 Guid;
   //Optional Data Follows
 } EFI_IFR_GUID;
+
+typedef struct _EFI_IFR_REFRESH_ID {
+  EFI_IFR_OP_HEADER Header;
+  EFI_GUID          RefreshEventGroupId;
+} EFI_IFR_REFRESH_ID;
 
 typedef struct _EFI_IFR_DUP {
   EFI_IFR_OP_HEADER        Header;
