@@ -40,8 +40,5 @@
 [Protocols]
   gEfiShellParametersProtocolGuid                         # ALWAYS_CONSUMED
   gEfiShellInterfaceGuid                                  # SOMETIMES_CONSUMED
-
-[Guids]
-
-[Pcd.common]
+  
 
