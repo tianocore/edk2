@@ -1305,6 +1305,7 @@ static struct {
   { sizeof (EFI_IFR_CATENATE), 0 },            // EFI_IFR_CATENATE_OP
   { sizeof (EFI_IFR_GUID), 0 },                // EFI_IFR_GUID_OP
   { sizeof (EFI_IFR_SECURITY), 0 },            // EFI_IFR_SECURITY_OP - 0x60
+  { sizeof (EFI_IFR_MODAL), 0},                // EFI_IFR_MODAL_OP - 0x61
 };
 
 #ifdef CIFROBJ_DEUBG
@@ -1327,7 +1328,7 @@ static struct {
   "EFI_IFR_STRING_REF1","EFI_IFR_STRING_REF2",          "EFI_IFR_CONDITIONAL",   "EFI_IFR_QUESTION_REF3",   "EFI_IFR_ZERO",          "EFI_IFR_ONE",
   "EFI_IFR_ONES",       "EFI_IFR_UNDEFINED",            "EFI_IFR_LENGTH",        "EFI_IFR_DUP",             "EFI_IFR_THIS",          "EFI_IFR_SPAN",
   "EFI_IFR_VALUE",      "EFI_IFR_DEFAULT",              "EFI_IFR_DEFAULTSTORE",  "EFI_IFR_FORM_MAP",        "EFI_IFR_CATENATE",      "EFI_IFR_GUID",
-  "EFI_IFR_SECURITY",
+  "EFI_IFR_SECURITY",   "EFI_IFR_MODAL",
 };
 
 VOID

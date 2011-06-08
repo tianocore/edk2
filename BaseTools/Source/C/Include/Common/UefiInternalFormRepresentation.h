@@ -681,6 +681,7 @@ typedef union {
 #define EFI_IFR_CATENATE_OP            0x5E
 #define EFI_IFR_GUID_OP                0x5F
 #define EFI_IFR_SECURITY_OP            0x60
+#define EFI_IFR_MODAL_TAG_OP           0x61
 
 
 typedef struct _EFI_IFR_OP_HEADER {
@@ -770,6 +771,10 @@ typedef struct _EFI_IFR_IMAGE {
   EFI_IFR_OP_HEADER        Header;
   EFI_IMAGE_ID             Id;
 } EFI_IFR_IMAGE;
+
+typedef struct _EFI_IFR_MODAL {
+  EFI_IFR_OP_HEADER        Header;
+} EFI_IFR_MODAL;
 
 typedef struct _EFI_IFR_LOCKED {
   EFI_IFR_OP_HEADER        Header;
