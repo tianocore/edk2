@@ -426,6 +426,8 @@ typedef struct {
 
   EFI_IMAGE_ID      ImageId;
 
+  BOOLEAN           ModalForm;            // Whether this is a modal form.
+
   BOOLEAN           NvUpdateRequired;     // Whether this form has NV update request.
 
   LIST_ENTRY        ExpressionListHead;   // List of Expressions (FORM_EXPRESSION)
@@ -717,10 +719,13 @@ DestroyFormSet (
 /**
   This function displays the page frame.
 
+  @param  Selection              Selection contains the information about 
+                                 the Selection, form and formset to be displayed.
+                                 Selection action may be updated in retrieve callback.
 **/
 VOID
 DisplayPageFrame (
-  VOID
+  IN UI_MENU_SELECTION    *Selection
   );
 
 /**

@@ -1502,6 +1502,7 @@ DriverCallback (
       break;
 
     case 0x1241:
+    case 0x1246:
       //
       // User press "Submit current form and Exit now", request Browser to submit current form and exit
       //
@@ -1523,6 +1524,7 @@ DriverCallback (
       break;
 
     case 0x1244:
+    case 0x1245:
       //
       // User press "Discard current form and Exit now", request Browser to discard the uncommitted data and exit.
       //

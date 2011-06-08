@@ -2069,6 +2069,14 @@ ParseOpCodes (
       break;
 
     //
+    // Modal tag
+    //
+    case EFI_IFR_MODAL_TAG_OP:
+      ASSERT (CurrentForm != NULL);
+      CurrentForm->ModalForm = TRUE;
+      break;
+
+    //
     // Vendor specific
     //
     case EFI_IFR_GUID_OP:

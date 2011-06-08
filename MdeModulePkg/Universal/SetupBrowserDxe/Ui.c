@@ -1648,6 +1648,7 @@ UiDisplayMenu (
   UI_MENU_LIST                    *CurrentMenu;
   UI_MENU_LIST                    *MenuList;
   FORM_BROWSER_FORM               *RefForm;
+  UINTN                           ModalSkipColumn;
 
   CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
 
@@ -1670,6 +1671,7 @@ UiDisplayMenu (
   PreviousMenuOption  = NULL;
   SavedMenuOption     = NULL;
   RefForm             = NULL;
+  ModalSkipColumn     = (LocalScreen.RightColumn - LocalScreen.LeftColumn) / 6;
 
   ZeroMem (&Key, sizeof (EFI_INPUT_KEY));
 
@@ -1681,7 +1683,12 @@ UiDisplayMenu (
     Row     = LocalScreen.TopRow + NONE_FRONT_PAGE_HEADER_HEIGHT + SCROLL_ARROW_HEIGHT;
   }
 
-  Col = LocalScreen.LeftColumn + LEFT_SKIPPED_COLUMNS;
+  if (Selection->Form->ModalForm) {
+    Col = LocalScreen.LeftColumn + LEFT_SKIPPED_COLUMNS + ModalSkipColumn;
+  } else {
+    Col = LocalScreen.LeftColumn + LEFT_SKIPPED_COLUMNS;
+  }
+
   BottomRow = LocalScreen.BottomRow - STATUS_BAR_HEIGHT - FOOTER_HEIGHT - SCROLL_ARROW_HEIGHT - 1;
 
   Selection->TopRow = TopRow;
@@ -1757,14 +1764,23 @@ UiDisplayMenu (
         Temp            = (UINTN) SkipValue;
         Temp2           = (UINTN) SkipValue;
 
-        ClearLines (
-          LocalScreen.LeftColumn,
-          LocalScreen.RightColumn,
-          TopRow - SCROLL_ARROW_HEIGHT,
-          BottomRow + SCROLL_ARROW_HEIGHT,
-          PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND
-          );
-
+        if (Selection->Form->ModalForm) {
+          ClearLines (
+            LocalScreen.LeftColumn + ModalSkipColumn,
+            LocalScreen.LeftColumn + ModalSkipColumn + gPromptBlockWidth + gOptionBlockWidth,
+            TopRow - SCROLL_ARROW_HEIGHT,
+            BottomRow + SCROLL_ARROW_HEIGHT,
+            PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND
+            );   
+        } else {
+          ClearLines (
+            LocalScreen.LeftColumn,
+            LocalScreen.RightColumn,
+            TopRow - SCROLL_ARROW_HEIGHT,
+            BottomRow + SCROLL_ARROW_HEIGHT,
+            PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND
+            );
+        }
         UiFreeRefreshList ();
         MinRefreshInterval = 0;
 
@@ -1772,7 +1788,11 @@ UiDisplayMenu (
           MenuOption          = MENU_OPTION_FROM_LINK (Link);
           MenuOption->Row     = Row;
           MenuOption->Col     = Col;
-          MenuOption->OptCol  = gPromptBlockWidth + 1 + LocalScreen.LeftColumn;
+          if (Selection->Form->ModalForm) {
+            MenuOption->OptCol  = gPromptBlockWidth + 1 + LocalScreen.LeftColumn + ModalSkipColumn;
+          } else {
+            MenuOption->OptCol  = gPromptBlockWidth + 1 + LocalScreen.LeftColumn;
+          }
 
           Statement = MenuOption->ThisTag;
           if (Statement->InSubtitle) {
@@ -2293,6 +2313,9 @@ UiDisplayMenu (
 
     case CfUpdateHelpString:
       ControlFlag = CfPrepareToReadKey;
+      if (Selection->Form->ModalForm) {
+        break;
+      }
 
       if (Repaint || NewLine) {
         //
@@ -2447,6 +2470,12 @@ UiDisplayMenu (
           //
         } else {
           for (Index = 0; Index < sizeof (gScanCodeToOperation) / sizeof (gScanCodeToOperation[0]); Index++) {
+            if (Selection->Form->ModalForm && 
+              (Key.ScanCode == SCAN_F9 || Key.ScanCode == SCAN_F10 || Key.ScanCode == SCAN_ESC)) {
+              ControlFlag = CfReadKey;
+              break;
+            }
+
             if (Key.ScanCode == gScanCodeToOperation[Index].ScanCode) {
               if (Key.ScanCode == SCAN_F9) {
                 //
@@ -2503,6 +2532,9 @@ UiDisplayMenu (
       switch (Statement->Operand) {
       case EFI_IFR_REF_OP:
         if (Statement->RefDevicePath != 0) {
+          if (Selection->Form->ModalForm) {
+            break;
+          }
           //
           // Goto another Hii Package list
           //
@@ -2558,6 +2590,9 @@ UiDisplayMenu (
           Selection->FormId = Statement->RefFormId;
           Selection->QuestionId = Statement->RefQuestionId;
         } else if (!CompareGuid (&Statement->RefFormSetId, &gZeroGuid)) {
+          if (Selection->Form->ModalForm) {
+            break;
+          }
           //
           // Goto another Formset, check for uncommitted data
           //

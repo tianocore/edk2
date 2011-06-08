@@ -2835,6 +2835,7 @@ InitializeCurrentSetting (
   FORMSET_STORAGE         *StorageSrc;
   FORMSET_STORAGE         *OldStorage;
   FORM_BROWSER_FORM       *Form;
+  FORM_BROWSER_FORM       *Form2;
   EFI_STATUS              Status;
 
   //
@@ -2894,6 +2895,29 @@ InitializeCurrentSetting (
     }
 
     Link = GetNextNode (&FormSet->StorageListHead, Link);
+  }
+
+  //
+  // If has old formset, get the old nv update status.
+  //
+  if (gOldFormSet != NULL) {
+      Link = GetFirstNode (&FormSet->FormListHead);
+      while (!IsNull (&FormSet->FormListHead, Link)) {
+        Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+
+        Link2 = GetFirstNode (&gOldFormSet->FormListHead);
+        while (!IsNull (&gOldFormSet->FormListHead, Link2)) {
+          Form2 = FORM_BROWSER_FORM_FROM_LINK (Link2);
+
+          if (Form->FormId == Form2->FormId) {
+            Form->NvUpdateRequired = Form2->NvUpdateRequired;
+            break;
+          }
+
+          Link2 = GetNextNode (&gOldFormSet->FormListHead, Link2);
+        }
+          Link = GetNextNode (&FormSet->FormListHead, Link);
+      }
   }
 
   return EFI_SUCCESS;

@@ -182,10 +182,13 @@ GetStringWidth (
 /**
   This function displays the page frame.
 
+  @param  Selection              Selection contains the information about 
+                                 the Selection, form and formset to be displayed.
+                                 Selection action may be updated in retrieve callback.
 **/
 VOID
 DisplayPageFrame (
-  VOID
+  IN UI_MENU_SELECTION    *Selection
   )
 {
   UINTN                  Index;
@@ -202,6 +205,10 @@ DisplayPageFrame (
   ZeroMem (&LocalScreen, sizeof (EFI_SCREEN_DESCRIPTOR));
   gST->ConOut->QueryMode (gST->ConOut, gST->ConOut->Mode->Mode, &LocalScreen.RightColumn, &LocalScreen.BottomRow);
   ClearLines (0, LocalScreen.RightColumn, 0, LocalScreen.BottomRow, KEYHELP_BACKGROUND);
+
+  if (Selection->Form->ModalForm) {
+    return;
+  }
 
   CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
 
@@ -484,7 +491,11 @@ DisplayForm (
   StringPtr = GetToken (Selection->Form->FormTitle, Handle);
 
   if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) != FORMSET_CLASS_FRONT_PAGE) {
-    gST->ConOut->SetAttribute (gST->ConOut, TITLE_TEXT | TITLE_BACKGROUND);
+    if (Selection->Form->ModalForm) {
+      gST->ConOut->SetAttribute (gST->ConOut, TITLE_TEXT | EFI_BACKGROUND_BLACK);
+    } else {
+      gST->ConOut->SetAttribute (gST->ConOut, TITLE_TEXT | TITLE_BACKGROUND);
+    }
     PrintStringAt (
       (LocalScreen.RightColumn + LocalScreen.LeftColumn - GetStringWidth (StringPtr) / 2) / 2,
       LocalScreen.TopRow + 1,
@@ -673,6 +684,12 @@ UpdateKeyHelp (
   EFI_SCREEN_DESCRIPTOR  LocalScreen;
   FORM_BROWSER_STATEMENT *Statement;
 
+  gST->ConOut->SetAttribute (gST->ConOut, KEYHELP_TEXT | KEYHELP_BACKGROUND);
+
+  if (Selection->Form->ModalForm) {
+    return;
+  }
+
   CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
 
   SecCol            = LocalScreen.LeftColumn + (LocalScreen.RightColumn - LocalScreen.LeftColumn) / 3;
@@ -683,8 +700,6 @@ UpdateKeyHelp (
   RightColumnOfHelp = LocalScreen.RightColumn - 2;
   TopRowOfHelp      = LocalScreen.BottomRow - 4;
   BottomRowOfHelp   = LocalScreen.BottomRow - 3;
-
-  gST->ConOut->SetAttribute (gST->ConOut, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
   Statement = MenuOption->ThisTag;
   switch (Statement->Operand) {
@@ -1338,7 +1353,7 @@ SetupBrowser (
     //
     // Displays the Header and Footer borders
     //
-    DisplayPageFrame ();
+    DisplayPageFrame (Selection);
 
     //
     // Display form
