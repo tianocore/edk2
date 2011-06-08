@@ -193,8 +193,12 @@ SerialRead (
   if (SerialPortPoll()) {
     Count = SerialPortRead (Buffer, *BufferSize);
     *BufferSize = Count;
+    return (Count == 0) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
   }
-  return (Count == 0) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
+  
+  // No data to return
+  *BufferSize = 0;
+  return EFI_SUCCESS;
 }
 
 
