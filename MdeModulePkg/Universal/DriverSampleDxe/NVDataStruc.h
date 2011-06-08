@@ -41,6 +41,11 @@ Revision History:
 #define EFI_USER_INFO_ACCESS_SETUP_ADMIN_GUID \
   { 0x85b75607, 0xf7ce, 0x471e, { 0xb7, 0xe4, 0x2a, 0xea, 0x5f, 0x72, 0x32, 0xee } }
 
+#define EFI_IFR_REFRESH_ID_OP_GUID \
+  { \
+    0xF5E655D9, 0x02A6, 0x46f2, {0x9E, 0x76, 0xB8, 0xBE, 0x8E, 0x60, 0xAB, 0x22} \
+  }
+
 #define CONFIGURATION_VARSTORE_ID    0x1234
 
 #pragma pack(1)
@@ -77,6 +82,7 @@ typedef struct {
   UINT8   GetDefaultValueFromCallBack;
   UINT8   GetDefaultValueFromAccess;
   EFI_HII_TIME  Time;
+  UINT8   RefreshGuidCount;
 } DRIVER_SAMPLE_CONFIGURATION;
 
 //
@@ -93,6 +99,7 @@ typedef struct {
 //
 #define LABEL_UPDATE1               0x1234
 #define LABEL_UPDATE2               0x2234
+#define LABEL_UPDATE3               0x3234
 #define LABEL_END                   0x2223
 
 #pragma pack()

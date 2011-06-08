@@ -20,10 +20,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 EFI_GUID   mFormSetGuid = FORMSET_GUID;
 EFI_GUID   mInventoryGuid = INVENTORY_GUID;
+EFI_GUID   MyEventGroupGuid = EFI_IFR_REFRESH_ID_OP_GUID;
 
 CHAR16     VariableName[] = L"MyIfrNVData";
 EFI_HANDLE                      DriverHandle[2] = {NULL, NULL};
 DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData = NULL;
+EFI_EVENT                       mEvent;
 
 HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath0 = {
   {
@@ -74,6 +76,158 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath1 = {
     }
   }
 };
+
+/**
+  Add empty function for event process function.
+
+  @param Event    The Event need to be process
+  @param Context  The context of the event.
+
+**/
+VOID
+EFIAPI
+DriverSampleInternalEmptyFunction (
+  IN  EFI_EVENT Event,
+  IN  VOID      *Context
+  )
+{
+}
+
+/**
+  Notification function for keystrokes.
+
+  @param[in] KeyData    The key that was pressed.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
+EFI_STATUS
+EFIAPI
+NotificationFunction(
+  IN EFI_KEY_DATA *KeyData
+  )
+{
+  gBS->SignalEvent (mEvent);
+  
+  return EFI_SUCCESS;
+}
+
+/**
+  Function to start monitoring for CTRL-C using SimpleTextInputEx. 
+
+  @retval EFI_SUCCESS           The feature is enabled.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough mnemory available.
+**/
+EFI_STATUS
+EFIAPI
+InternalStartMonitor(
+  VOID
+  )
+{
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *SimpleEx;
+  EFI_KEY_DATA                      KeyData;
+  EFI_STATUS                        Status;
+  EFI_HANDLE                        *Handles;
+  UINTN                             HandleCount;
+  UINTN                             HandleIndex;
+  EFI_HANDLE                        NotifyHandle;
+
+  Status = gBS->LocateHandleBuffer (
+              ByProtocol,
+              &gEfiSimpleTextInputExProtocolGuid,
+              NULL,
+              &HandleCount,
+              &Handles
+              );
+  for (HandleIndex = 0; HandleIndex < HandleCount; HandleIndex++) {
+    Status = gBS->HandleProtocol (Handles[HandleIndex], &gEfiSimpleTextInputExProtocolGuid, (VOID **) &SimpleEx);
+    ASSERT_EFI_ERROR (Status);
+
+    KeyData.KeyState.KeyToggleState = 0;
+    KeyData.Key.ScanCode            = 0;
+    KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED;
+    KeyData.Key.UnicodeChar         = L'c';
+
+    Status = SimpleEx->RegisterKeyNotify(
+      SimpleEx,
+      &KeyData,
+      NotificationFunction,
+      &NotifyHandle);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+    
+    KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED;
+    Status = SimpleEx->RegisterKeyNotify(
+      SimpleEx,
+      &KeyData,
+      NotificationFunction,
+      &NotifyHandle);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Function to stop monitoring for CTRL-C using SimpleTextInputEx.  
+
+  @retval EFI_SUCCESS           The feature is enabled.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough mnemory available.
+**/
+EFI_STATUS
+EFIAPI
+InternalStopMonitor(
+  VOID
+  )
+{
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *SimpleEx;
+  EFI_STATUS                        Status;
+  EFI_HANDLE                        *Handles;
+  EFI_KEY_DATA                      KeyData;  
+  UINTN                             HandleCount;
+  UINTN                             HandleIndex;
+  EFI_HANDLE                        NotifyHandle;
+
+  Status = gBS->LocateHandleBuffer (
+                ByProtocol,
+                &gEfiSimpleTextInputExProtocolGuid,
+                NULL,
+                &HandleCount,
+                &Handles
+                );
+  for (HandleIndex = 0; HandleIndex < HandleCount; HandleIndex++) {
+    Status = gBS->HandleProtocol (Handles[HandleIndex], &gEfiSimpleTextInputExProtocolGuid, (VOID **) &SimpleEx);
+    ASSERT_EFI_ERROR (Status);
+
+    KeyData.KeyState.KeyToggleState = 0;
+    KeyData.Key.ScanCode            = 0;
+    KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED;
+    KeyData.Key.UnicodeChar         = L'c';
+
+    Status = SimpleEx->RegisterKeyNotify(
+      SimpleEx,
+      &KeyData,
+      NotificationFunction,
+      &NotifyHandle);
+    if (!EFI_ERROR (Status)) {
+      Status = SimpleEx->UnregisterKeyNotify (SimpleEx, NotifyHandle);
+    }
+
+    KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED;
+    Status = SimpleEx->RegisterKeyNotify(
+      SimpleEx,
+      &KeyData,
+      NotificationFunction,
+      &NotifyHandle);
+    if (!EFI_ERROR (Status)) {
+      Status = SimpleEx->UnregisterKeyNotify (SimpleEx, NotifyHandle);
+    }
+  }
+  return EFI_SUCCESS;
+}
+
 
 /**
   Encode the password using a simple algorithm.
@@ -1124,6 +1278,7 @@ DriverCallback (
   EFI_INPUT_KEY                   Key;
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
   UINTN                           MyVarSize;
+  EFI_FORM_ID                     FormId;
   
   if (((Value == NULL) && (Action != EFI_BROWSER_ACTION_FORM_OPEN) && (Action != EFI_BROWSER_ACTION_FORM_CLOSE))||
     (ActionRequest == NULL)) {
@@ -1131,6 +1286,7 @@ DriverCallback (
   }
 
 
+  FormId = 0;
   Status = EFI_SUCCESS;
   PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
 
@@ -1177,6 +1333,11 @@ DriverCallback (
 
         HiiFreeOpCodeHandle (StartOpCodeHandle);
       }
+
+      if (QuestionId == 0x1247) {
+        Status = InternalStartMonitor ();
+        ASSERT_EFI_ERROR (Status);
+      }
     }
     break;
 
@@ -1198,6 +1359,11 @@ DriverCallback (
             NULL
             );
         } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
+      }
+
+      if (QuestionId == 0x1247) {
+        Status = InternalStopMonitor ();
+        ASSERT_EFI_ERROR (Status);
       }
     }
     break;
@@ -1424,6 +1590,7 @@ DriverCallback (
       break;
 
     case 0x5678:
+    case 0x1247:
       //
       // We will reach here once the Question is refreshed
       //
@@ -1439,7 +1606,15 @@ DriverCallback (
       //
       StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
       StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-      StartLabel->Number       = LABEL_UPDATE2;
+      if (QuestionId == 0x5678) {
+        StartLabel->Number       = LABEL_UPDATE2;
+        FormId                   = 0x03;
+        PrivateData->Configuration.DynamicRefresh++;
+      } else if (QuestionId == 0x1247 ) {
+        StartLabel->Number       = LABEL_UPDATE3;
+        FormId                   = 0x05;
+        PrivateData->Configuration.RefreshGuidCount++;
+      }
 
       HiiCreateActionOpCode (
         StartOpCodeHandle,                // Container for dynamic created opcodes
@@ -1453,7 +1628,7 @@ DriverCallback (
       HiiUpdateForm (
         PrivateData->HiiHandle[0],  // HII handle
         &mFormSetGuid,              // Formset GUID
-        0x3,                        // Form ID
+        FormId,                        // Form ID
         StartOpCodeHandle,          // Label for where to insert opcodes
         NULL                        // Insert data
         );
@@ -1463,7 +1638,6 @@ DriverCallback (
       //
       // Refresh the Question value
       //
-      PrivateData->Configuration.DynamicRefresh++;
       Status = gRT->SetVariable(
                       VariableName,
                       &mFormSetGuid,
@@ -1472,19 +1646,21 @@ DriverCallback (
                       &PrivateData->Configuration
                       );
 
-      //
-      // Change an EFI Variable storage (MyEfiVar) asynchronous, this will cause
-      // the first statement in Form 3 be suppressed
-      //
-      MyVarSize = 1;
-      MyVar = 111;
-      Status = gRT->SetVariable(
-                      L"MyVar",
-                      &mFormSetGuid,
-                      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                      MyVarSize,
-                      &MyVar
-                      );
+      if (QuestionId == 0x5678) {
+        //
+        // Change an EFI Variable storage (MyEfiVar) asynchronous, this will cause
+        // the first statement in Form 3 be suppressed
+        //
+        MyVarSize = 1;
+        MyVar = 111;
+        Status = gRT->SetVariable(
+                        L"MyVar",
+                        &mFormSetGuid,
+                        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                        MyVarSize,
+                        &MyVar
+                        );
+      }
       break;
 
     case 0x1237:
@@ -1805,7 +1981,15 @@ DriverSampleInit (
 
   FreePool (ConfigRequestHdr);
 
-
+  Status = gBS->CreateEventEx (
+        EVT_NOTIFY_SIGNAL, 
+        TPL_NOTIFY,
+        DriverSampleInternalEmptyFunction,
+        NULL,
+        &MyEventGroupGuid,
+        &mEvent
+        );
+  ASSERT_EFI_ERROR (Status);
   //
   // In default, this driver is built into Flash device image,
   // the following code doesn't run.
@@ -1892,6 +2076,8 @@ DriverSampleUnload (
   }
   FreePool (PrivateData);
   PrivateData = NULL;
+
+  gBS->CloseEvent (mEvent);
 
   return EFI_SUCCESS;
 }

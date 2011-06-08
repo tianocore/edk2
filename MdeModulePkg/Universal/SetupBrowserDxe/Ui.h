@@ -178,6 +178,7 @@ struct _MENU_REFRESH_ENTRY {
   UINTN                       CurrentColumn;
   UINTN                       CurrentRow;
   UINTN                       CurrentAttribute;
+  EFI_EVENT                   Event;
 };
 
 typedef struct {

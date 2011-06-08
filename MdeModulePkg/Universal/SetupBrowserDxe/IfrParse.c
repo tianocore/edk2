@@ -2069,6 +2069,14 @@ ParseOpCodes (
       break;
 
     //
+    // Refresh guid.
+    //
+    case EFI_IFR_REFRESH_ID_OP:
+      ASSERT (CurrentStatement != NULL);
+      CopyMem (&CurrentStatement->RefreshGuid, &((EFI_IFR_REFRESH_ID *) OpCodeData)->RefreshEventGroupId, sizeof (EFI_GUID));
+      break;
+
+    //
     // Modal tag
     //
     case EFI_IFR_MODAL_TAG_OP:

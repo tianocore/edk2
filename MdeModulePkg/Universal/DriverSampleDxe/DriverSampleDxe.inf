@@ -65,6 +65,7 @@
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
   gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
   gEfiHiiDatabaseProtocolGuid                   ## CONSUMES
+  gEfiSimpleTextInputExProtocolGuid             ## CONSUMES
 
 
 [Depex]

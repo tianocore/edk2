@@ -16,7 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 LIST_ENTRY          gMenuOption;
 LIST_ENTRY          gMenuList = INITIALIZE_LIST_HEAD_VARIABLE (gMenuList);
-MENU_REFRESH_ENTRY  *gMenuRefreshHead;
+MENU_REFRESH_ENTRY  *gMenuRefreshHead;                // Menu list used for refresh timer opcode.
+MENU_REFRESH_ENTRY  *gMenuEventGuidRefreshHead;       // Menu list used for refresh event guid opcode.
 
 //
 // Search table for UiDisplayMenu()
@@ -320,9 +321,114 @@ UiFreeRefreshList (
     gMenuRefreshHead = OldMenuRefreshEntry;
   }
 
-  gMenuRefreshHead = NULL;
+  while (gMenuEventGuidRefreshHead != NULL) {
+    OldMenuRefreshEntry = gMenuEventGuidRefreshHead->Next;
+    if (gMenuEventGuidRefreshHead != NULL) {
+      gBS->CloseEvent(gMenuEventGuidRefreshHead->Event);
+    }
+    FreePool (gMenuEventGuidRefreshHead);
+    gMenuEventGuidRefreshHead = OldMenuRefreshEntry;
+  }
 }
 
+
+
+/**
+  Refresh question.
+
+  @param     MenuRefreshEntry    Menu refresh structure which has info about the refresh question.
+**/
+EFI_STATUS 
+RefreshQuestion (
+  IN   MENU_REFRESH_ENTRY    *MenuRefreshEntry
+  )
+{
+  CHAR16                          *OptionString;
+  UINTN                           Index;
+  EFI_STATUS                      Status;
+  UI_MENU_SELECTION               *Selection;
+  FORM_BROWSER_STATEMENT          *Question;
+
+  Selection = MenuRefreshEntry->Selection;
+  Question = MenuRefreshEntry->MenuOption->ThisTag;
+
+  Status = GetQuestionValue (Selection->FormSet, Selection->Form, Question, FALSE);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  OptionString = NULL;
+  ProcessOptions (Selection, MenuRefreshEntry->MenuOption, FALSE, &OptionString);
+
+  if (OptionString != NULL) {
+    //
+    // If leading spaces on OptionString - remove the spaces
+    //
+    for (Index = 0; OptionString[Index] == L' '; Index++)
+      ;
+
+    //
+    // If old Text is longer than new string, need to clean the old string before paint the newer.
+    // This option is no need for time/date opcode, because time/data opcode has fixed string length.
+    //
+    if ((MenuRefreshEntry->MenuOption->ThisTag->Operand != EFI_IFR_DATE_OP) &&
+      (MenuRefreshEntry->MenuOption->ThisTag->Operand != EFI_IFR_TIME_OP)) {
+      ClearLines (
+        MenuRefreshEntry->CurrentColumn, 
+        MenuRefreshEntry->CurrentColumn + gOptionBlockWidth - 1,
+        MenuRefreshEntry->CurrentRow,
+        MenuRefreshEntry->CurrentRow,
+        PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND
+        );
+    }
+
+    gST->ConOut->SetAttribute (gST->ConOut, MenuRefreshEntry->CurrentAttribute);
+    PrintStringAt (MenuRefreshEntry->CurrentColumn, MenuRefreshEntry->CurrentRow, &OptionString[Index]);
+    FreePool (OptionString);
+  }
+
+  //
+  // Question value may be changed, need invoke its Callback()
+  //
+  Status = ProcessCallBackFunction (Selection, Question, EFI_BROWSER_ACTION_CHANGING, FALSE);
+
+  return Status;
+}
+
+/**
+  Refresh the question which has refresh guid event attribute.
+  
+  @param Event    The event which has this function related.     
+  @param Context  The input context info related to this event or the status code return to the caller.
+**/
+VOID
+RefreshQuestionNotify(
+  IN      EFI_EVENT Event,
+  IN      VOID      *Context
+  )
+{
+  MENU_REFRESH_ENTRY              *MenuRefreshEntry;
+  UI_MENU_SELECTION               *Selection;
+
+  //
+  // Reset FormPackage update flag
+  //
+  mHiiPackageListUpdated = FALSE;
+
+  MenuRefreshEntry = (MENU_REFRESH_ENTRY *)Context;
+  ASSERT (MenuRefreshEntry != NULL);
+  Selection = MenuRefreshEntry->Selection;
+
+  RefreshQuestion (MenuRefreshEntry);
+  
+  if (mHiiPackageListUpdated) {
+    //
+    // Package list is updated, force to reparse IFR binary of target Formset
+    //
+    mHiiPackageListUpdated = FALSE;
+    Selection->Action = UI_ACTION_REFRESH_FORMSET;
+  } 
+}
 
 
 /**
@@ -334,65 +440,23 @@ RefreshForm (
   VOID
   )
 {
-  CHAR16                          *OptionString;
   MENU_REFRESH_ENTRY              *MenuRefreshEntry;
-  UINTN                           Index;
   EFI_STATUS                      Status;
   UI_MENU_SELECTION               *Selection;
-  FORM_BROWSER_STATEMENT          *Question;
 
   if (gMenuRefreshHead != NULL) {
-
+    //
+    // call from refresh interval process.
+    //
     MenuRefreshEntry = gMenuRefreshHead;
-
+    Selection = MenuRefreshEntry->Selection;
     //
     // Reset FormPackage update flag
     //
     mHiiPackageListUpdated = FALSE;
 
     do {
-      Selection = MenuRefreshEntry->Selection;
-      Question = MenuRefreshEntry->MenuOption->ThisTag;
-
-      Status = GetQuestionValue (Selection->FormSet, Selection->Form, Question, FALSE);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-
-      OptionString = NULL;
-      ProcessOptions (Selection, MenuRefreshEntry->MenuOption, FALSE, &OptionString);
-
-      if (OptionString != NULL) {
-        //
-        // If leading spaces on OptionString - remove the spaces
-        //
-        for (Index = 0; OptionString[Index] == L' '; Index++)
-          ;
-
-        //
-        // If old Text is longer than new string, need to clean the old string before paint the newer.
-        // This option is no need for time/date opcode, because time/data opcode has fixed string length.
-        //
-        if ((MenuRefreshEntry->MenuOption->ThisTag->Operand != EFI_IFR_DATE_OP) &&
-          (MenuRefreshEntry->MenuOption->ThisTag->Operand != EFI_IFR_TIME_OP)) {
-          ClearLines (
-            MenuRefreshEntry->CurrentColumn, 
-            MenuRefreshEntry->CurrentColumn + gOptionBlockWidth - 1,
-            MenuRefreshEntry->CurrentRow,
-            MenuRefreshEntry->CurrentRow,
-            PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND
-            );
-        }
-
-        gST->ConOut->SetAttribute (gST->ConOut, MenuRefreshEntry->CurrentAttribute);
-        PrintStringAt (MenuRefreshEntry->CurrentColumn, MenuRefreshEntry->CurrentRow, &OptionString[Index]);
-        FreePool (OptionString);
-      }
-
-      //
-      // Question value may be changed, need invoke its Callback()
-      //
-      Status = ProcessCallBackFunction(Selection, Question, EFI_BROWSER_ACTION_CHANGING, FALSE);
+      Status = RefreshQuestion (MenuRefreshEntry);
       if (EFI_ERROR (Status)) {
         return Status;
       }
@@ -1636,6 +1700,7 @@ UiDisplayMenu (
   UI_CONTROL_FLAG                 ControlFlag;
   EFI_SCREEN_DESCRIPTOR           LocalScreen;
   MENU_REFRESH_ENTRY              *MenuRefreshEntry;
+  MENU_REFRESH_ENTRY              *MenuUpdateEntry;  
   UI_SCREEN_OPERATION             ScreenOperation;
   UINT8                           MinRefreshInterval;
   UINTN                           BufferSize;
@@ -1870,6 +1935,34 @@ UiDisplayMenu (
               }
 
               OptionString[Count] = CHAR_NULL;
+            }
+
+            //
+            // If Question has refresh guid, register the op-code.
+            //
+            if (!CompareGuid (&Statement->RefreshGuid, &gZeroGuid)) {
+              if (gMenuEventGuidRefreshHead == NULL) {
+                MenuUpdateEntry = AllocateZeroPool (sizeof (MENU_REFRESH_ENTRY));
+                gMenuEventGuidRefreshHead = MenuUpdateEntry;
+              } else {
+                MenuUpdateEntry = gMenuEventGuidRefreshHead;
+                while (MenuUpdateEntry->Next != NULL) {
+                  MenuUpdateEntry = MenuUpdateEntry->Next; 
+                }
+                MenuUpdateEntry->Next = AllocateZeroPool (sizeof (MENU_REFRESH_ENTRY));
+              }
+              ASSERT (MenuUpdateEntry != NULL);
+              Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL, TPL_NOTIFY, RefreshQuestionNotify, MenuUpdateEntry, &Statement->RefreshGuid, &MenuUpdateEntry->Event);
+              ASSERT (!EFI_ERROR (Status));
+              MenuUpdateEntry->MenuOption        = MenuOption;
+              MenuUpdateEntry->Selection         = Selection;
+              MenuUpdateEntry->CurrentColumn     = MenuOption->OptCol;
+              MenuUpdateEntry->CurrentRow        = MenuOption->Row;
+              if (MenuOption->GrayOut) {
+                MenuUpdateEntry->CurrentAttribute = FIELD_TEXT_GRAYED | FIELD_BACKGROUND;
+              } else {
+                MenuUpdateEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
+              }
             }
 
             //
