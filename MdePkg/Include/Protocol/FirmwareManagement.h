@@ -8,7 +8,7 @@
   CheckImage(), GetPackageInfo(), and SetPackageInfo() shall return 
   EFI_UNSUPPORTED if not supported by the driver.
   
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -51,7 +51,7 @@ typedef struct {
   /// 
   UINT64                           ImageId;
   /// 
-  /// A pointer to a null-terminated Unicode string representing the firmware image name.  
+  /// A pointer to a null-terminated string representing the firmware image name.  
   /// 
   CHAR16                           *ImageIdName;
   /// 
@@ -60,7 +60,7 @@ typedef struct {
   /// 
   UINT32                           Version;
   /// 
-  /// A pointer to a null-terminated Unicode string representing the firmware image version name.
+  /// A pointer to a null-terminated string representing the firmware image version name.
   /// 
   CHAR16                           *VersionName;
   /// 
@@ -239,7 +239,7 @@ EFI_STATUS
                                      0xFFFFFFFF. A value of 0xFFFFFFFE indicates that package version comparison
                                      is to be performed using PackageVersionName. A value of 0xFFFFFFFD indicates
                                      that package version update is in progress.
-  @param[out]     PackageVersionName A pointer to a pointer to a null-terminated Unicode string representing the
+  @param[out]     PackageVersionName A pointer to a pointer to a null-terminated string representing the
                                      package version name. The buffer is allocated by this function with 
                                      AllocatePool(), and it is the caller's responsibility to free it with a call
                                      to FreePool().
@@ -330,7 +330,7 @@ EFI_STATUS
   @param[in]  VendorCode         This enables vendor to implement vendor-specific firmware image update policy.  
                                  Null indicates the caller did not specify the policy or use the default policy.
   @param[in]  Progress           A function used by the driver to report the progress of the firmware update.
-  @param[out] AbortReason        A pointer to a pointer to a null-terminated Unicode string providing more
+  @param[out] AbortReason        A pointer to a pointer to a null-terminated string providing more
                                  details for the aborted operation. The buffer is allocated by this function 
                                  with AllocatePool(), and it is the caller's responsibility to free it with a
                                  call to FreePool().
@@ -396,7 +396,7 @@ EFI_STATUS
                                        0xFFFFFFFF. A value of 0xFFFFFFFE indicates that package version
                                        comparison is to be performed using PackageVersionName. A value of
                                        0xFFFFFFFD indicates that package version update is in progress.
-  @param[out] PackageVersionName       A pointer to a pointer to a null-terminated Unicode string representing
+  @param[out] PackageVersionName       A pointer to a pointer to a null-terminated string representing
                                        the package version name. The buffer is allocated by this function with
                                        AllocatePool(), and it is the caller's responsibility to free it with a
                                        call to FreePool().

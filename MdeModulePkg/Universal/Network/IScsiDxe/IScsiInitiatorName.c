@@ -1,7 +1,7 @@
 /** @file
   Implementation for EFI iSCSI Initiator Name Protocol.
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -25,7 +25,8 @@ EFI_ISCSI_INITIATOR_NAME_PROTOCOL gIScsiInitiatorName = {
   @param[in]       This       Pointer to the EFI_ISCSI_INITIATOR_NAME_PROTOCOL instance.
   @param[in, out]  BufferSize Size of the buffer in bytes pointed to by Buffer / Actual size of the
                               variable data buffer.
-  @param[out]      Buffer     Pointer to the buffer for data to be read.
+  @param[out]      Buffer     Pointer to the buffer for data to be read. The data is a null-terminated UTF-8 encoded string.
+                              The maximum length is 223 characters, including the null-terminator.
 
   @retval EFI_SUCCESS           Data was successfully retrieved into the provided buffer and the
                                 BufferSize was sufficient to handle the iSCSI initiator name.
@@ -64,7 +65,8 @@ IScsiGetInitiatorName (
 
   @param[in]       This       Pointer to the EFI_ISCSI_INITIATOR_NAME_PROTOCOL instance.
   @param[in, out]  BufferSize Size of the buffer in bytes pointed to by Buffer.
-  @param[in]       Buffer     Pointer to the buffer for data to be written.
+  @param[in]       Buffer     Pointer to the buffer for data to be written. The data is a null-terminated UTF-8 encoded string.
+                              The maximum length is 223 characters, including the null-terminator.
 
   @retval EFI_SUCCESS           Data was successfully stored by the protocol.
   @retval EFI_UNSUPPORTED       Platform policies do not allow for data to be written.

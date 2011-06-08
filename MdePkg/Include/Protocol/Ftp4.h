@@ -7,7 +7,7 @@
   The definitions in this file are defined in UEFI Specification 2.3, which have
   not been verified by one implementation yet.
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -180,7 +180,7 @@ struct _EFI_FTP4_COMMAND_TOKEN {
   /// 
   EFI_EVENT                             Event; 
   /// 
-  /// Pointer to an ASCIIZ path name string. 
+  /// Pointer to a null-terminated ASCII name string. 
   /// 
   UINT8                                 *Pathname;
   /// 

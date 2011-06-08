@@ -1763,7 +1763,8 @@ HiiSetString (
 
   @param  This                   A pointer to the EFI_HII_STRING_PROTOCOL instance.
   @param  PackageList            The package list to examine.
-  @param  Languages              Points to the buffer to hold the returned string.
+  @param  Languages              Points to the buffer to hold the returned
+                                 null-terminated ASCII string.
   @param  LanguagesSize          On entry, points to the size of the buffer pointed
                                  to by  Languages, in bytes. On  return, points to
                                  the length of Languages, in bytes.
@@ -1851,25 +1852,28 @@ HiiGetLanguages (
 
   @param  This                   A pointer to the EFI_HII_STRING_PROTOCOL instance.
   @param  PackageList            The package list to examine.
-  @param  FirstLanguage          Points to the primary language.
-  @param  SecondaryLanguages     Points to the buffer to hold the returned list of
+  @param  PrimaryLanguage        Points to the null-terminated ASCII string that specifies
+                                 the primary language. Languages are specified in the
+                                 format specified in Appendix M of the UEFI 2.0 specification.
+  @param  SecondaryLanguages     Points to the buffer to hold the returned null-terminated
+                                 ASCII string that describes the list of
                                  secondary languages for the specified
-                                 FirstLanguage. If there are no secondary
-                                 languages, the function  returns successfully, but
+                                 PrimaryLanguage. If there are no secondary
+                                 languages, the function returns successfully, but
                                  this is set to NULL.
   @param  SecondaryLanguagesSize On entry, points to the size of the buffer pointed
-                                 to  by SecondaryLanguages, in bytes. On return,
+                                 to by SecondaryLanguages, in bytes. On return,
                                  points to the length of SecondaryLanguages in bytes.
 
   @retval EFI_SUCCESS            Secondary languages were correctly returned.
-  @retval EFI_INVALID_PARAMETER  FirstLanguage or SecondaryLanguages or
+  @retval EFI_INVALID_PARAMETER  PrimaryLanguage or SecondaryLanguages or
                                  SecondaryLanguagesSize was NULL.
   @retval EFI_BUFFER_TOO_SMALL   The buffer specified by SecondaryLanguagesSize is
                                  too small to hold the returned information.
-                                 SecondLanguageSize is updated to hold the size of
+                                 SecondaryLanguageSize is updated to hold the size of
                                  the buffer required.
-  @retval EFI_INVALID_LANGUAGE           The language specified by FirstLanguage is not
-                                  present in the specified package list.
+  @retval EFI_INVALID_LANGUAGE   The language specified by PrimaryLanguage is not
+                                 present in the specified package list.
   @retval EFI_NOT_FOUND          The specified PackageList is not in the Database.                                
 
 **/
@@ -1878,7 +1882,7 @@ EFIAPI
 HiiGetSecondaryLanguages (
   IN CONST EFI_HII_STRING_PROTOCOL   *This,
   IN EFI_HII_HANDLE                  PackageList,
-  IN CONST CHAR8                     *FirstLanguage,
+  IN CONST CHAR8                     *PrimaryLanguage,
   IN OUT CHAR8                       *SecondaryLanguages,
   IN OUT UINTN                       *SecondaryLanguagesSize
   )
@@ -1892,7 +1896,7 @@ HiiGetSecondaryLanguages (
   CHAR8                               *Languages;
   UINTN                               ResultSize;
 
-  if (This == NULL || PackageList == NULL || FirstLanguage == NULL) {
+  if (This == NULL || PackageList == NULL || PrimaryLanguage == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   if (SecondaryLanguages == NULL || SecondaryLanguagesSize == NULL) {
@@ -1923,7 +1927,7 @@ HiiGetSecondaryLanguages (
          Link1 = Link1->ForwardLink
         ) {
     StringPackage = CR (Link1, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
-    if (HiiCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) FirstLanguage)) {
+    if (HiiCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) PrimaryLanguage)) {
       Languages = StringPackage->StringPkgHdr->Language;
       //
       // Language is a series of ';' terminated strings, first one is primary

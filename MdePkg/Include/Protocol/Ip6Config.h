@@ -2,7 +2,7 @@
   This file provides a definition of the EFI IPv6 Configuration
   Protocol.
 
-Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -100,7 +100,7 @@ typedef enum {
 ///
 typedef struct {
   ///
-  /// The name of the interface. It is a NULL-terminated Unicode string.
+  /// The name of the interface. It is a NULL-terminated string.
   ///
   CHAR16                Name[32];
   /// 

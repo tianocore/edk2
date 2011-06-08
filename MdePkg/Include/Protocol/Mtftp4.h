@@ -1,7 +1,7 @@
 /** @file
   EFI Multicast Trivial File Tranfer Protocol Definition
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -313,8 +313,8 @@ EFI_STATUS
   @param  OverrideData Data that is used to override the existing parameters. If NULL,
                        the default parameters that were set in the
                        EFI_MTFTP4_PROTOCOL.Configure() function are used.
-  @param  Filename     The pointer to ASCIIZ file name string.
-  @param  ModeStr      The pointer to ASCIIZ mode string. If NULL, "octet" will be used.
+  @param  Filename     The pointer to null-terminated ASCII file name string.
+  @param  ModeStr      The pointer to null-terminated ASCII mode string. If NULL, "octet" will be used.
   @param  OptionCount  Number of option/value string pairs in OptionList.
   @param  OptionList   The pointer to array of option/value string pairs. Ignored if
                        OptionCount is zero.
@@ -542,11 +542,11 @@ struct _EFI_MTFTP4_TOKEN {
   ///
   EFI_MTFTP4_OVERRIDE_DATA    *OverrideData;
   ///
-  /// The pointer to the ASCIIZ file name string.
+  /// The pointer to the null-terminated ASCII file name string.
   ///
   UINT8                       *Filename;
   ///
-  /// The pointer to the ASCIIZ mode string. If NULL, "octet" is used.
+  /// The pointer to the null-terminated ASCII mode string. If NULL, "octet" is used.
   ///
   UINT8                       *ModeStr;
   ///

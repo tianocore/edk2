@@ -3,7 +3,7 @@
   This protocol is used to allow code running in the boot services environment 
   to perform lexical comparison functions on Unicode strings for given languages.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -125,7 +125,7 @@ VOID
   @param  This    A pointer to the EFI_UNICODE_COLLATION_PROTOCOL instance.
   @param  FatSize The size of the string Fat in bytes.
   @param  Fat     A pointer to a Null-terminated string that contains an 8.3 file
-                  name using an OEM character set.
+                  name using an 8-bit OEM character set.
   @param  String  A pointer to a Null-terminated string. The string must
                   be allocated in advance to hold FatSize characters.
 

@@ -1,7 +1,7 @@
 /** @file
   The file provides services to manipulate string data.
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -150,9 +150,10 @@ EFI_STATUS
 
   @param  This                   A pointer to the EFI_HII_STRING_PROTOCOL instance.
   @param  PackageList            The package list to examine.
-  @param  Languages              Points to the buffer to hold the returned string.
+  @param  Languages              Points to the buffer to hold the returned
+                                 null-terminated ASCII string.
   @param  LanguagesSize          On entry, points to the size of the buffer pointed
-                                 to by  Languages, in bytes. On  return, points to
+                                 to by Languages, in bytes. On return, points to
                                  the length of Languages, in bytes.
 
   @retval EFI_SUCCESS            The languages were returned successfully.
@@ -181,24 +182,27 @@ EFI_STATUS
 
   @param  This                   A pointer to the EFI_HII_STRING_PROTOCOL instance.
   @param  PackageList            The package list to examine.
-  @param  FirstLanguage          Points to the primary language.
-  @param  SecondaryLanguages     Points to the buffer to hold the returned list of
+  @param  PrimaryLanguage        Points to the null-terminated ASCII string that specifies
+                                 the primary language. Languages are specified in the
+                                 format specified in Appendix M of the UEFI 2.0 specification.
+  @param  SecondaryLanguages     Points to the buffer to hold the returned null-terminated
+                                 ASCII string that describes the list of
                                  secondary languages for the specified
-                                 FirstLanguage. If there are no secondary
-                                 languages, the function  returns successfully, but
+                                 PrimaryLanguage. If there are no secondary
+                                 languages, the function returns successfully, but
                                  this is set to NULL.
   @param  SecondaryLanguagesSize On entry, points to the size of the buffer pointed
-                                 to  by SecondaryLanguages, in bytes. On return,
+                                 to by SecondaryLanguages, in bytes. On return,
                                  points to the length of SecondaryLanguages in bytes.
 
   @retval EFI_SUCCESS            Secondary languages were correctly returned.
-  @retval EFI_INVALID_PARAMETER  FirstLanguage or SecondaryLanguages or
+  @retval EFI_INVALID_PARAMETER  PrimaryLanguage or SecondaryLanguages or
                                  SecondaryLanguagesSize was NULL.
   @retval EFI_BUFFER_TOO_SMALL   The buffer specified by SecondaryLanguagesSize is
                                  too small to hold the returned information.
-                                 SecondLanguageSize is updated to hold the size of
+                                 SecondaryLanguageSize is updated to hold the size of
                                  the buffer required.
-  @retval EFI_INVALID_LANGUAGE   The language specified by FirstLanguage is not
+  @retval EFI_INVALID_LANGUAGE   The language specified by PrimaryLanguage is not
                                  present in the specified package list.
   @retval EFI_NOT_FOUND          The specified PackageList is not in the Database.                                
 
@@ -208,9 +212,9 @@ EFI_STATUS
 (EFIAPI *EFI_HII_GET_2ND_LANGUAGES)(
   IN CONST  EFI_HII_STRING_PROTOCOL   *This,
   IN        EFI_HII_HANDLE            PackageList,
-  IN CONST  CHAR8                     *FirstLanguage,
-  IN OUT    CHAR8                     *SecondLanguages,
-  IN OUT    UINTN                     *SecondLanguagesSize
+  IN CONST  CHAR8                     *PrimaryLanguage,
+  IN OUT    CHAR8                     *SecondaryLanguages,
+  IN OUT    UINTN                     *SecondaryLanguagesSize
 );
 
 
@@ -229,5 +233,4 @@ struct _EFI_HII_STRING_PROTOCOL {
 extern EFI_GUID gEfiHiiStringProtocolGuid;
 
 #endif
-
 

@@ -2,7 +2,7 @@
 Framework to UEFI 2.1 HII Thunk. The driver consume UEFI HII protocols
 to produce a Framework HII protocol.
 
-Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -386,7 +386,7 @@ Done:
   If not enough resource to complete the operation, then ASSERT.
 
   @param  HiiHandle              The HII package list handle.
-  @param  FirstLanguage          Pointer to language name buffer.
+  @param  PrimaryLanguage        Pointer to language name buffer.
   
   @return The supported languages.
 
@@ -395,7 +395,7 @@ CHAR8 *
 EFIAPI
 HiiGetSupportedSecondaryLanguages (
   IN EFI_HII_HANDLE           HiiHandle,
-  IN CONST CHAR8              *FirstLanguage
+  IN CONST CHAR8              *PrimaryLanguage
   )
 {
   EFI_STATUS  Status;
@@ -414,7 +414,7 @@ HiiGetSupportedSecondaryLanguages (
     return NULL;
   }
 
-  Status = mHiiStringProtocol->GetSecondaryLanguages (mHiiStringProtocol, HiiHandle, FirstLanguage, LanguageString, &BufferSize);
+  Status = mHiiStringProtocol->GetSecondaryLanguages (mHiiStringProtocol, HiiHandle, PrimaryLanguage, LanguageString, &BufferSize);
   ASSERT (Status != EFI_NOT_FOUND);
   
   if (Status == EFI_BUFFER_TOO_SMALL) {
@@ -424,7 +424,7 @@ HiiGetSupportedSecondaryLanguages (
       return NULL;
     }
 
-    Status = mHiiStringProtocol->GetSecondaryLanguages (mHiiStringProtocol, HiiHandle, FirstLanguage, LanguageString, &BufferSize);
+    Status = mHiiStringProtocol->GetSecondaryLanguages (mHiiStringProtocol, HiiHandle, PrimaryLanguage, LanguageString, &BufferSize);
   }
 
   if (EFI_ERROR (Status)) {
@@ -543,4 +543,3 @@ Done:
   return Status;
 }
 
- 

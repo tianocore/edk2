@@ -1,7 +1,7 @@
 /** @file
   Mtftp6 internal data structure and definition declaration.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved. <BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -200,8 +200,8 @@ EfiMtftp6Configure (
   @param[in]  OverrideData       Data that is used to override the existing parameters. If NULL, the
                                  default parameters that were set in the EFI_MTFTP6_PROTOCOL.Configure()
                                  function are used.
-  @param[in]  Filename           Pointer to ASCIIZ file name string.
-  @param[in]  ModeStr            Pointer to ASCIIZ mode string. If NULL, octet will be used
+  @param[in]  Filename           Pointer to null-terminated ASCII file name string.
+  @param[in]  ModeStr            Pointer to null-terminated ASCII mode string. If NULL, octet will be used
   @param[in]  OptionCount        Number of option/value string pairs in OptionList.
   @param[in]  OptionList         Pointer to array of option/value string pairs. Ignored if
                                  OptionCount is zero.

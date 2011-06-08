@@ -965,7 +965,7 @@ typedef struct {
   ///
   UINT16                          StatusFlag;
   ///
-  /// ASCIIZ string that describes the boot device to a user. 
+  /// Null-terminated ASCII string that describes the boot device to a user.
   ///
   CHAR8                           String[1];
 } BBS_BBS_DEVICE_PATH;

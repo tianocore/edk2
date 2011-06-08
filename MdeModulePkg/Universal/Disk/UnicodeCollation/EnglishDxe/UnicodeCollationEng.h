@@ -1,7 +1,7 @@
 /** @file
   Head file for Unicode Collation Protocol (English)
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -50,12 +50,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Prototypes
 //
 /**
-  Performs a case-insensitive comparison of two Null-terminated Unicode 
-  strings.
+  Performs a case-insensitive comparison of two Null-terminated strings.
 
   @param  This Protocol instance pointer.
-  @param  Str1 A pointer to a Null-terminated Unicode string.
-  @param  Str2 A pointer to a Null-terminated Unicode string.
+  @param  Str1 A pointer to a Null-terminated string.
+  @param  Str2 A pointer to a Null-terminated string.
 
   @retval 0   Str1 is equivalent to Str2
   @retval > 0 Str1 is lexically greater than Str2
@@ -71,12 +70,12 @@ EngStriColl (
   );
 
 /**
-  Performs a case-insensitive comparison of a Null-terminated Unicode 
-  pattern string and a Null-terminated Unicode string.
+  Performs a case-insensitive comparison of a Null-terminated
+  pattern string and a Null-terminated string.
 
   @param  This    Protocol instance pointer.
-  @param  String  A pointer to a Null-terminated Unicode string.
-  @param  Pattern A pointer to a Null-terminated Unicode pattern string.
+  @param  String  A pointer to a Null-terminated string.
+  @param  Pattern A pointer to a Null-terminated pattern string.
 
   @retval TRUE    Pattern was found in String.
   @retval FALSE   Pattern was not found in String.
@@ -91,11 +90,11 @@ EngMetaiMatch (
   );
 
 /**
-  Converts all the Unicode characters in a Null-terminated Unicode string to 
-  lower case Unicode characters.
+  Converts all the characters in a Null-terminated string to 
+  lower case characters.
 
   @param  This   Protocol instance pointer.
-  @param  Str    A pointer to a Null-terminated Unicode string.
+  @param  Str    A pointer to a Null-terminated string.
 
 **/
 VOID
@@ -106,11 +105,11 @@ EngStrLwr (
   );
 
 /**
-  Converts all the Unicode characters in a Null-terminated Unicode string to upper
-  case Unicode characters.
+  Converts all the characters in a Null-terminated string to upper
+  case characters.
 
   @param  This   Protocol instance pointer.
-  @param  Str    A pointer to a Null-terminated Unicode string.
+  @param  Str    A pointer to a Null-terminated string.
 
 **/
 VOID
@@ -121,15 +120,14 @@ EngStrUpr (
   );
 
 /**
-  Converts an 8.3 FAT file name in an OEM character set to a Null-terminated 
-  Unicode string.
+  Converts an 8.3 FAT file name in an OEM character set to a Null-terminated string.
 
   @param  This    Protocol instance pointer.
   @param  FatSize The size of the string Fat in bytes.
   @param  Fat     A pointer to a Null-terminated string that contains an 8.3 file
-                  name using an OEM character set.
-  @param  String  A pointer to a Null-terminated Unicode string. The string must
-                  be preallocated to hold FatSize Unicode characters.
+                  name using an 8-bit OEM character set.
+  @param  String  A pointer to a Null-terminated string. The string must
+                  be preallocated to hold FatSize characters.
 
 **/
 VOID
@@ -142,12 +140,12 @@ EngFatToStr (
   );
 
 /**
-  Converts a Null-terminated Unicode string to legal characters in a FAT 
+  Converts a Null-terminated string to legal characters in a FAT 
   filename using an OEM character set. 
 
   @param  This    Protocol instance pointer.
-  @param  String  A pointer to a Null-terminated Unicode string. The string must
-                  be preallocated to hold FatSize Unicode characters.
+  @param  String  A pointer to a Null-terminated string. The string must
+                  be preallocated to hold FatSize characters.
   @param  FatSize The size of the string Fat in bytes.
   @param  Fat     A pointer to a Null-terminated string that contains an 8.3 file
                   name using an OEM character set.

@@ -1,7 +1,7 @@
 /** @file
   Interface routine for Mtftp4.
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -936,8 +936,8 @@ EfiMtftp4ReadDirectory (
                                  parameters. If NULL, the default parameters that 
                                  were set in the EFI_MTFTP4_PROTOCOL.Configure() 
                                  function are used
-  @param  Filename               Pointer to ASCIIZ file name string
-  @param  ModeStr                Pointer to ASCIIZ mode string. If NULL, "octet" 
+  @param  Filename               Pointer to null-terminated ASCII file name string
+  @param  ModeStr                Pointer to null-terminated ASCII mode string. If NULL, "octet" 
                                  will be used
   @param  OptionCount            Number of option/value string pairs in OptionList
   @param  OptionList             Pointer to array of option/value string pairs. 

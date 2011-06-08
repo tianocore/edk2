@@ -3,7 +3,7 @@
   the EFI UDPv6 Protocol and provides basic services for client-side unicast and/or
   multicast TFTP operations.
 
-  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -265,7 +265,7 @@ typedef struct {
   ///
   UINT8                   SupportedOptionCount;
   ///
-  /// An array of option strings that are recognized and supported by
+  /// An array of null-terminated ASCII option strings that are recognized and supported by
   /// this EFI MTFTPv6 Protocol driver implementation. The buffer is
   /// read only to the caller and the caller should NOT free the buffer.
   ///
@@ -304,8 +304,8 @@ typedef struct {
 /// EFI_MTFTP6_OPTION
 ///
 typedef struct {
-  UINT8                  *OptionStr; ///< Pointer to the ASCIIZ MTFTPv6 option string.
-  UINT8                  *ValueStr;  ///< Pointer to the ASCIIZ MTFTPv6 value string.
+  UINT8                  *OptionStr; ///< Pointer to the null-terminated ASCII MTFTPv6 option string.
+  UINT8                  *ValueStr;  ///< Pointer to the null-terminated ASCII MTFTPv6 value string.
 } EFI_MTFTP6_OPTION;
 
 /**
@@ -409,11 +409,11 @@ struct _EFI_MTFTP6_TOKEN {
   ///
   EFI_MTFTP6_OVERRIDE_DATA    *OverrideData;
   ///
-  /// Pointer to the ASCIIZ file name string.
+  /// Pointer to the null-terminated ASCII file name string.
   ///
   UINT8                       *Filename;
   ///
-  /// Pointer to the ASCIIZ mode string. If NULL, octet is used.
+  /// Pointer to the null-terminated ASCII mode string. If NULL, octet is used.
   ///
   UINT8                       *ModeStr;
   ///
@@ -534,8 +534,8 @@ EFI_STATUS
   @param[in]  OverrideData       Data that is used to override the existing parameters. If NULL, the
                                  default parameters that were set in the EFI_MTFTP6_PROTOCOL.Configure()
                                  function are used.
-  @param[in]  Filename           Pointer to ASCIIZ file name string.
-  @param[in]  ModeStr            Pointer to ASCIIZ mode string. If NULL, octet will be used
+  @param[in]  Filename           Pointer to null-terminated ASCII file name string.
+  @param[in]  ModeStr            Pointer to null-terminated ASCII mode string. If NULL, octet will be used
   @param[in]  OptionCount        Number of option/value string pairs in OptionList.
   @param[in]  OptionList         Pointer to array of option/value string pairs. Ignored if
                                  OptionCount is zero.

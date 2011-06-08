@@ -2,7 +2,7 @@
   EFI_ISCSI_INITIATOR_NAME_PROTOCOL as defined in UEFI 2.0.
   It provides the ability to get and set the iSCSI Initiator Name.                                                  
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -29,7 +29,8 @@ typedef struct _EFI_ISCSI_INITIATOR_NAME_PROTOCOL EFI_ISCSI_INITIATOR_NAME_PROTO
   @param  This       Pointer to the EFI_ISCSI_INITIATOR_NAME_PROTOCOL instance.
   @param  BufferSize Size of the buffer in bytes pointed to by Buffer / Actual size of the
                      variable data buffer.
-  @param  Buffer     Pointer to the buffer for data to be read.
+  @param  Buffer     Pointer to the buffer for data to be read. The data is a null-terminated UTF-8 encoded string.
+                     The maximum length is 223 characters, including the null-terminator.
 
   @retval EFI_SUCCESS           Data was successfully retrieved into the provided buffer and the
                                 BufferSize was sufficient to handle the iSCSI initiator name
@@ -53,7 +54,8 @@ EFI_STATUS
 
   @param  This       Pointer to the EFI_ISCSI_INITIATOR_NAME_PROTOCOL instance.
   @param  BufferSize Size of the buffer in bytes pointed to by Buffer.
-  @param  Buffer     Pointer to the buffer for data to be written.
+  @param  Buffer     Pointer to the buffer for data to be written. The data is a null-terminated UTF-8 encoded string.
+                     The maximum length is 223 characters, including the null-terminator.
 
   @retval EFI_SUCCESS           Data was successfully stored by the protocol.
   @retval EFI_UNSUPPORTED       Platform policies do not allow for data to be written.
@@ -82,10 +84,4 @@ struct _EFI_ISCSI_INITIATOR_NAME_PROTOCOL {
 extern EFI_GUID gEfiIScsiInitiatorNameProtocolGuid;
 
 #endif
-
-
-
-
-
-
 

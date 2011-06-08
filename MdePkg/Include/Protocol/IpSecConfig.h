@@ -3,7 +3,7 @@
   The EFI_IPSEC_CONFIG_PROTOCOL provides the mechanism to set and retrieve security and 
   policy related information for the EFI IPsec protocol driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -331,7 +331,7 @@ typedef struct _EFI_IPSEC_SA_ID {
 ///
 typedef struct _EFI_IPSEC_SPD_DATA {
   /// 
-  /// A null-terminated name string which is used as a symbolic 
+  /// A null-terminated ASCII name string which is used as a symbolic 
   /// identifier for an IPsec Local or Remote address.
   /// 
   UINT8                           Name[MAX_PEERID_LEN];
@@ -522,7 +522,7 @@ typedef struct _EFI_IPSEC_PAD_ID {
     ///
     EFI_IP_ADDRESS_INFO   IpAddress;
     ///
-    /// Pointer to a null terminated string (8-bit ASCII character) 
+    /// Pointer to a null terminated ASCII string
     /// representing the symbolic names. A PeerId can be a DNS 
     /// name, Distinguished Name, RFC 822 email address or Key ID 
     /// (specified in section 4.4.3.1 of RFC 4301)
