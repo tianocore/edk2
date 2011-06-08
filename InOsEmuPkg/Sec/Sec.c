@@ -82,7 +82,7 @@ _ModuleEntryPoint (
   UINTN                     SecReseveredMemorySize;
   UINTN                     Index;
   
-  gPpiList = PpiList;
+  EMU_MAGIC_PAGE()->PpiList = PpiList;
   ProcessLibraryConstructorList ();
   
   DEBUG ((EFI_D_ERROR, "SEC Has Started\n"));

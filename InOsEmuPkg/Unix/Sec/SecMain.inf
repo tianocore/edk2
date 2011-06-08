@@ -101,7 +101,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwSpareBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
-
+  gInOsEmuPkgTokenSpaceGuid.PcdPeiServicesTablePage
 
 
 [BuildOptions]

@@ -57,7 +57,7 @@ EMU_SYSTEM_MEMORY  *gSystemMemory;
 UINTN                        mImageContextModHandleArraySize = 0;
 IMAGE_CONTEXT_TO_MOD_HANDLE  *mImageContextModHandleArray = NULL;
 
-
+EFI_PEI_PPI_DESCRIPTOR  *gPpiList;
 
 /*++
 
@@ -126,7 +126,6 @@ main (
   AddThunkProtocol (&gPthreadThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuApCount), FALSE); 
 
   // EmuSecLibConstructor ();
-  
   
   gPpiList = GetThunkPpiList (); 
 
@@ -371,7 +370,7 @@ MapFile (
   FileSize = lseek (fd, 0, SEEK_END);
 
 
-  res = MapMemory (fd, FileSize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE);
+  res = MapMemory (fd, FileSize, PROT_READ | PROT_EXEC, MAP_PRIVATE);
 
   close (fd);
 
@@ -394,9 +393,10 @@ MapFd0 (
   )
 {
   int     fd;
-  VOID    *res, *res2;
+  void    *res, *res2, *res3;
   UINTN   FileSize;
   UINTN   FvSize;
+  void    *EmuMagicPage;
 
   fd = open (FileName, O_RDWR);
   if (fd < 0) {
@@ -410,15 +410,31 @@ MapFd0 (
   res = mmap (
           (void *)(UINTN)FixedPcdGet64 (PcdEmuFlashFvRecoveryBase), 
           FvSize, 
-          PROT_READ | PROT_WRITE | PROT_EXEC, 
+          PROT_READ | PROT_EXEC, 
           MAP_PRIVATE, 
           fd, 
           0
           );
   if (res == MAP_FAILED) {
-    perror ("MapFile() Failed res =");
+    perror ("MapFd0() Failed res =");
     close (fd);
     return EFI_DEVICE_ERROR;
+  } else if (res != (void *)(UINTN)FixedPcdGet64 (PcdEmuFlashFvRecoveryBase)) {
+    // We could not load at the build address, so we need to allow writes
+    munmap (res, FvSize);
+    res = mmap (
+            (void *)(UINTN)FixedPcdGet64 (PcdEmuFlashFvRecoveryBase), 
+            FvSize, 
+            PROT_READ | PROT_WRITE | PROT_EXEC, 
+            MAP_PRIVATE, 
+            fd, 
+            0
+            );
+    if (res == MAP_FAILED) {
+      perror ("MapFd0() Failed res =");
+      close (fd);
+      return EFI_DEVICE_ERROR;
+    }
   }
   
   // Map the rest of the FD as read/write
@@ -432,10 +448,32 @@ MapFd0 (
           );
   close (fd);
   if (res2 == MAP_FAILED) {
-    perror ("MapFile() Failed res2 =");
+    perror ("MapFd0() Failed res2 =");
     return EFI_DEVICE_ERROR;
   }
 
+  //
+  // If enabled use the magic page to communicate between modules 
+  // This replaces the PI PeiServicesTable pointer mechanism that
+  // deos not work in the emulator. It also allows the removal of
+  // writable globals from SEC, PEI_CORE (libraries), PEIMs
+  //
+  EmuMagicPage = (void *)(UINTN)FixedPcdGet64 (PcdPeiServicesTablePage);
+  if (EmuMagicPage != NULL) {
+    res3 =  mmap (
+              (void *)EmuMagicPage, 
+              4096, 
+              PROT_READ | PROT_WRITE, 
+              MAP_PRIVATE | MAP_ANONYMOUS,
+              0, 
+              0
+              );
+    if (res3 != EmuMagicPage) {
+      printf ("MapFd0(): Could not allocate PeiServicesTablePage @ %lx\n", (long unsigned int)EmuMagicPage);
+      return EFI_DEVICE_ERROR;
+    }
+  }
+  
   *Length = (UINT64) FileSize;
   *BaseAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) res;
 
@@ -631,6 +669,7 @@ SecPeCoffGetEntryPoint (
     return Status;
   }
 
+  if (ImageContext.ImageAddress != (UINTN)Pe32Data) {
   //
   // Relocate image to match the address where it resides
   //
@@ -643,6 +682,17 @@ SecPeCoffGetEntryPoint (
   Status = PeCoffLoaderRelocateImage (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+  } else {
+    //
+    // Or just return image entry point
+    //
+    ImageContext.PdbPointer = PeCoffLoaderGetPdbPointer (Pe32Data);
+    Status = PeCoffLoaderGetEntryPoint (Pe32Data, EntryPoint);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    ImageContext.EntryPoint = (UINTN)*EntryPoint;
   }
 
   // On Unix a dlopen is done that will change the entry point

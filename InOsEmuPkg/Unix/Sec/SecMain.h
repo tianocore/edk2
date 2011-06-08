@@ -29,9 +29,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Library/ThunkPpiList.h>
 #include <Library/ThunkProtocolList.h>
-#include <Library/PpiListLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/EmuMagicPageLib.h>
 
 #include <Ppi/EmuThunk.h>
 #include <Ppi/StatusCode.h>

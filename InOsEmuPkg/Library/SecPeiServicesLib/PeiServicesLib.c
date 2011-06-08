@@ -14,11 +14,10 @@
 
 
 #include <PiPei.h>
-
+#include <Library/EmuMagicPageLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/PpiListLib.h>
 
 
 
@@ -116,8 +115,7 @@ PeiServicesLocatePpi (
     return EFI_NOT_FOUND;
   }
   
-  
-  for (PpiList = (EFI_PEI_PPI_DESCRIPTOR *)gPpiList; ; PpiList++) {
+  for (PpiList = EMU_MAGIC_PAGE()->PpiList; ; PpiList++) {
     if (CompareGuid (PpiList->Guid, Guid)) {
       if (PpiDescriptor != NULL) {
         *PpiDescriptor = PpiList;

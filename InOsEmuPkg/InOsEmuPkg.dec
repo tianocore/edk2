@@ -64,7 +64,11 @@
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFirmwareFdSize|0x0|UINT32|0x00001012
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFirmwareBlockSize|0|UINT32|0x00001013
  
+  ## Number of Application Processors (APs) in the system 0 means Uniprocessor mode
   gInOsEmuPkgTokenSpaceGuid.PcdEmuApCount|L"0"|VOID*|0x00001019
+
+  ## Magic page to implement PEI Services Table Pointer Lib
+  gInOsEmuPkgTokenSpaceGuid.PcdPeiServicesTablePage|0x1000000000|UINT64|0x0000101b
 
 [PcdsFixedAtBuild, PcdsPatchableInModule] 
   gInOsEmuPkgTokenSpaceGuid.PcdEmuBootMode|1|UINT32|0x00001006

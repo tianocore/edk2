@@ -42,3 +42,5 @@
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid
   
+[Pcd]
+  gInOsEmuPkgTokenSpaceGuid.PcdPeiServicesTablePage

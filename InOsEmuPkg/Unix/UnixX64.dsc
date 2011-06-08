@@ -109,7 +109,8 @@
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 
-#####  DevicePathTextLib|InOsEmuPkg/Library/DevicePathTextLib/DevicePathTextLib.inf
+####  DevicePathTextLib|InOsEmuPkg/Library/DevicePathTextLib/DevicePathTextLib.inf
+  PeiServicesTablePointerLib|InOsEmuPkg/Library/PeiServicesTablePointerLibMagicPage/PeiServicesTablePointerLibMagicPage.inf
 
 [LibraryClasses.common.SEC]
   PeiServicesLib|InOsEmuPkg/Library/SecPeiServicesLib/SecPeiServicesLib.inf
@@ -145,11 +146,9 @@
 
 [LibraryClasses.common.PEI_CORE]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  PeiServicesTablePointerLib|InOsEmuPkg/Library/PeiCoreServicesTablePointerLib/PeiCoreServicesTablePointerLib.inf
 
 [LibraryClasses.common.PEIM]
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  PeiServicesTablePointerLib|InOsEmuPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf

@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/PeCoffExtraActionLib.h>
+#include <Library/EmuMagicPageLib.h>
 
 //
 // Cache of UnixThunk protocol 
@@ -56,7 +57,7 @@ EmuPeCoffGetThunkStucture (
               );
   ASSERT_EFI_ERROR (Status);
 
-  mThunk  = (EMU_THUNK_PROTOCOL *) ThunkPpi->Thunk ();
+  EMU_MAGIC_PAGE()->Thunk = (EMU_THUNK_PROTOCOL *) ThunkPpi->Thunk ();
 
   return EFI_SUCCESS;
 }
@@ -76,10 +77,10 @@ PeCoffLoaderRelocateImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-  if (mThunk == NULL) {
+  if (EMU_MAGIC_PAGE()->Thunk == NULL) {
     EmuPeCoffGetThunkStucture ();
   }
-    mThunk->PeCoffRelocateImageExtraAction (ImageContext);
+    EMU_MAGIC_PAGE()->Thunk->PeCoffRelocateImageExtraAction (ImageContext);
   }
 
 
@@ -99,8 +100,8 @@ PeCoffLoaderUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-  if (mThunk == NULL) {
+  if (EMU_MAGIC_PAGE()->Thunk == NULL) {
     EmuPeCoffGetThunkStucture ();
   }
-  mThunk->PeCoffUnloadImageExtraAction (ImageContext);
+  EMU_MAGIC_PAGE()->Thunk->PeCoffUnloadImageExtraAction (ImageContext);
 }

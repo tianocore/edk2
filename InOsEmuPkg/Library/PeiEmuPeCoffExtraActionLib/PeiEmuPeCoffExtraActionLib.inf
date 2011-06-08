@@ -44,3 +44,6 @@
 
 [Ppis]
   gEmuThunkPpiGuid                          # PPI ALWAYS_CONSUMED
+
+[Pcd]
+  gInOsEmuPkgTokenSpaceGuid.PcdPeiServicesTablePage
