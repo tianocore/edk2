@@ -701,6 +701,7 @@ EmuBlockIoThunkClose (
       free (Private->Filename);
     }   
     free (This->Private);
+    This->Private = NULL;
   }
   
   return EFI_SUCCESS;

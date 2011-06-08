@@ -372,7 +372,7 @@ EmuGopDestructor (
   
   Status = EFI_SUCCESS;
   if (!Private->HardwareNeedsStarting) {
-    Status = Private->EmuIoThunk->Open (Private->EmuIoThunk);
+    Status = Private->EmuIoThunk->Close (Private->EmuIoThunk);
     Private->EmuGraphicsWindow = NULL;
   }
 

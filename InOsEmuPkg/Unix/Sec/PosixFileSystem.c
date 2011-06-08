@@ -1537,6 +1537,7 @@ PosixFileSystmeThunkClose (
       free (Private->VolumeLabel);
     }   
     free (This->Private);
+    This->Private = NULL;
   }
   
   return EFI_SUCCESS;
