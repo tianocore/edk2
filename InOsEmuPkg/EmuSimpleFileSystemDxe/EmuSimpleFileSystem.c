@@ -718,7 +718,7 @@ EmuSimpleFileSystemDriverBindingStart (
     goto Done;
   }
 
-  Private = AllocatePool (sizeof (EMU_SIMPLE_FILE_SYSTEM_PRIVATE));
+  Private = AllocateZeroPool (sizeof (EMU_SIMPLE_FILE_SYSTEM_PRIVATE));
   if (Private == NULL) {
     goto Done;
   }

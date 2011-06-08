@@ -17,7 +17,7 @@
 #define __EMU_THUNK_PROTOCOL_H__
 
 #define EMU_THUNK_PROTOCOL_GUID  \
-  { 0xA37D7CCD, 0x8E91, 0xFB48, { 0xA0, 0xBD, 0x64, 0xC1, 0x83, 0xA3, 0xB4, 0x3F } }
+ { 0x5CF32E0B, 0x8EDF, 0x2E44, { 0x9C, 0xDA, 0x93, 0x20, 0x5E, 0x99, 0xEC, 0x1C } }
 
 // neded for things like EFI_TIME_CAPABILITIES
 #include <Uefi.h>
@@ -45,11 +45,39 @@ typedef struct _EMU_THUNK_PROTOCOL  EMU_THUNK_PROTOCOL;
 
 
 typedef 
-EFI_STATUS
+UINTN
 (EFIAPI *EMU_WRITE_STD_ERROR) (
   IN UINT8     *Buffer,
   IN UINTN     NumberOfBytes
+  );  
+  
+typedef 
+EFI_STATUS
+(EFIAPI *EMU_CONFIG_STD_IN) (
+  VOID
   );
+  
+typedef 
+UINTN
+(EFIAPI *EMU_WRITE_STD_OUT) (
+  IN UINT8     *Buffer,
+  IN UINTN     NumberOfBytes
+  );
+  
+typedef 
+UINTN
+(EFIAPI *EMU_READ_STD_IN) (
+  OUT UINT8     *Buffer,
+  IN  UINTN     NumberOfBytes
+  );
+
+typedef 
+BOOLEAN
+(EFIAPI *EMU_POLL_STD_IN) (
+  VOID
+  );
+
+
 
 typedef 
 EFI_STATUS
@@ -166,6 +194,10 @@ EFI_STATUS
 struct _EMU_THUNK_PROTOCOL {
   // Used for early debug printing
   EMU_WRITE_STD_ERROR               WriteStdErr;
+  EMU_CONFIG_STD_IN                 ConfigStdIn;
+  EMU_WRITE_STD_OUT                 WriteStdOut;
+  EMU_READ_STD_IN                   ReadStdIn;
+  EMU_POLL_STD_IN                   PollStdIn;
   
   ///
   /// PE/COFF loader hooks to get symbols loaded

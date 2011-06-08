@@ -16,15 +16,15 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxeEmuSerialPortLib
-  FILE_GUID                      = DF08A29A-F60B-E649-AA79-A1490E863A5D
+  BASE_NAME                      = DxeEmuStdErrSerialPortLib
+  FILE_GUID                      = 4EED5138-C512-9E4F-AB13-149B87D40453
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SerialPortLib| DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER SMM_CORE UEFI_APPLICATION UEFI_DRIVE
 
 
 [Sources]
-  DxeEmuSerialPortLib.c
+  DxeEmuStdErrSerialPortLib.c
 
 
 [Packages]

@@ -39,7 +39,7 @@ SerialPortInitialize (
   VOID
   )
 {
-  return gEmuThunk->ConfigStdIn ();
+  return RETURN_SUCCESS;
 }
 
 /**
@@ -66,7 +66,7 @@ SerialPortWrite (
   IN UINTN     NumberOfBytes
   )
 {
-  return gEmuThunk->WriteStdOut (Buffer, NumberOfBytes);
+  return gEmuThunk->WriteStdErr (Buffer, NumberOfBytes);
 }
 
 
@@ -93,7 +93,7 @@ SerialPortRead (
   IN  UINTN     NumberOfBytes
   )
 {
-  return gEmuThunk->ReadStdIn (Buffer, NumberOfBytes);
+  return 0;
 }
 
 /**
@@ -113,7 +113,7 @@ SerialPortPoll (
   VOID
   )
 {
-  return gEmuThunk->PollStdIn ();
+  return FALSE;
 }
 
 

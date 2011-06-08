@@ -503,7 +503,7 @@ EmuBlockIoDriverBindingStart (
 {
   EFI_STATUS                  Status;
   EMU_IO_THUNK_PROTOCOL       *EmuIoThunk;
-  EMU_BLOCK_IO_PRIVATE        *Private;
+  EMU_BLOCK_IO_PRIVATE        *Private = NULL;
 
   //
   // Grab the protocols we need

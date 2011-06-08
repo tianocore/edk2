@@ -49,9 +49,72 @@ SecWriteStdErr (
 {
   ssize_t Return;
   
-  Return = write (1, (const void *)Buffer, (size_t)NumberOfBytes);
+  Return = write (STDERR_FILENO, (const void *)Buffer, (size_t)NumberOfBytes);
   
   return (Return == -1) ? 0 : Return;
+}
+
+
+EFI_STATUS
+SecConfigStdIn (
+  VOID
+  )
+{
+  struct termios tty;
+  
+  //
+  // Need to turn off line buffering, ECHO, and make it unbuffered.
+  //
+  tcgetattr (STDIN_FILENO, &tty);
+  tty.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr (STDIN_FILENO, TCSANOW, &tty);
+  
+//  setvbuf (STDIN_FILENO, NULL, _IONBF, 0);
+  
+  // now ioctl FIONREAD will do what we need
+  return EFI_SUCCESS;
+}
+
+UINTN
+SecWriteStdOut (
+  IN UINT8     *Buffer,
+  IN UINTN     NumberOfBytes
+  )
+{
+  ssize_t Return;
+  
+  Return = write (STDOUT_FILENO, (const void *)Buffer, (size_t)NumberOfBytes);
+  
+  return (Return == -1) ? 0 : Return;
+}
+
+UINTN
+SecReadStdIn (
+  IN UINT8     *Buffer,
+  IN UINTN     NumberOfBytes
+  )
+{
+  ssize_t Return;
+  
+  Return = read (STDIN_FILENO, Buffer, (size_t)NumberOfBytes);
+  
+  return (Return == -1) ? 0 : Return;
+}
+
+BOOLEAN
+SecPollStdIn (
+  VOID
+  )
+{
+  int Result;
+  int Bytes;
+  
+  Result = ioctl (STDIN_FILENO, FIONREAD, &Bytes);
+  if (Result == -1) {
+    return FALSE;
+  }
+  
+  return (BOOLEAN)(Bytes > 0);
 }
 
 
@@ -287,6 +350,10 @@ SecGetNextProtocol (
 
 EMU_THUNK_PROTOCOL gEmuThunkProtocol = {
   GasketSecWriteStdErr,
+  GasketSecConfigStdIn,
+  GasketSecWriteStdOut,
+  GasketSecReadStdIn,
+  GasketSecPollStdIn,
   GasketSecPeCoffGetEntryPoint,
   GasketSecPeCoffRelocateImageExtraAction,
   GasketSecPeCoffUnloadImageExtraAction,

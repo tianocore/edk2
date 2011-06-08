@@ -60,6 +60,73 @@ ASM_PFX(GasketSecWriteStdErr):
   ret
 
 
+ASM_GLOBAL ASM_PFX(GasketSecConfigStdIn)
+ASM_PFX(GasketSecConfigStdIn):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq    %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+  pushq    %rdi
+
+  call  ASM_PFX(SecConfigStdIn)
+  
+  popq  %rdi            // restore state
+  popq  %rsi
+  popq  %rbp
+  ret
+
+ASM_GLOBAL ASM_PFX(GasketSecWriteStdOut)
+ASM_PFX(GasketSecWriteStdOut):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq    %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+  pushq    %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+  movq    %rdx, %rsi     
+
+  call  ASM_PFX(SecWriteStdOut)
+  
+  popq  %rdi            // restore state
+  popq  %rsi
+  popq  %rbp
+  ret
+
+ASM_GLOBAL ASM_PFX(GasketSecReadStdIn)
+ASM_PFX(GasketSecReadStdIn):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq    %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+  pushq    %rdi
+
+  movq    %rcx, %rdi    // Swizzle args 
+  movq    %rdx, %rsi     
+
+  call  ASM_PFX(SecReadStdIn)
+  
+  popq  %rdi            // restore state
+  popq  %rsi
+  popq  %rbp
+  ret
+
+ASM_GLOBAL ASM_PFX(GasketSecPollStdIn)
+ASM_PFX(GasketSecPollStdIn):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq    %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+  pushq    %rdi
+
+  call  ASM_PFX(SecPollStdIn)
+  
+  popq  %rdi            // restore state
+  popq  %rsi
+  popq  %rbp
+  ret
+
+
 ASM_GLOBAL ASM_PFX(GasketSecSetTimer)
 ASM_PFX(GasketSecSetTimer):
   pushq   %rbp            // stack frame is for the debugger

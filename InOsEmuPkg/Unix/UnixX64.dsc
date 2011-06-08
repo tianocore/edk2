@@ -109,6 +109,7 @@
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 
+#####  DevicePathTextLib|InOsEmuPkg/Library/DevicePathTextLib/DevicePathTextLib.inf
 
 [LibraryClasses.common.SEC]
   PeiServicesLib|InOsEmuPkg/Library/SecPeiServicesLib/SecPeiServicesLib.inf
@@ -229,6 +230,9 @@
   gInOsEmuPkgTokenSpaceGuid.PcdEmuCpuModel|L"Intel(R) Processor Model"
   gInOsEmuPkgTokenSpaceGuid.PcdEmuCpuSpeed|L"3000"
 
+  #  0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
+  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|1
+
 ################################################################################
 #
 # Pcd Dynamic Section - list of all EDK II PCD Entries defined by this Platform
@@ -316,7 +320,7 @@
   MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
   MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf {
    <LibraryClasses>
-      SerialPortLib|InOsEmuPkg/Library/DxeEmuSerialPortLib/DxeEmuSerialPortLib.inf    
+      SerialPortLib|InOsEmuPkg/Library/DxeEmuStdErrSerialPortLib/DxeEmuStdErrSerialPortLib.inf    
   }
 
   InOsEmuPkg/MetronomeDxe/Metronome.inf
@@ -341,6 +345,12 @@
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+  EmbeddedPkg/SerialDxe/SerialDxe.inf {
+   <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      SerialPortLib|InOsEmuPkg/Library/DxeEmuSerialPortLib/DxeEmuSerialPortLib.inf    
+  }
+  
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf

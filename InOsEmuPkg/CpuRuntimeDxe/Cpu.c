@@ -323,7 +323,7 @@ InitializeCpu (
   //
   // Convert frequency in Hz to a clock period in femtoseconds.
   //
-  mTimerPeriod = DivU64x64Remainder (1000000000000000, Frequency, NULL);
+  mTimerPeriod = DivU64x64Remainder (1000000000000000ULL, Frequency, NULL);
 
   CpuUpdateSmbios ();
   

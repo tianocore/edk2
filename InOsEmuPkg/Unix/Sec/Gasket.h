@@ -21,10 +21,39 @@
 //
 
 UINTN
+EFIAPI
 GasketSecWriteStdErr (
   IN UINT8     *Buffer,
   IN UINTN     NumberOfBytes
   );
+
+EFI_STATUS
+EFIAPI
+GasketSecConfigStdIn (
+  VOID
+  );
+
+UINTN
+EFIAPI
+GasketSecWriteStdOut (
+  IN UINT8     *Buffer,
+  IN UINTN     NumberOfBytes
+  );
+  
+UINTN
+EFIAPI
+GasketSecReadStdIn (
+  IN UINT8     *Buffer,
+  IN UINTN     NumberOfBytes
+  );
+
+BOOLEAN
+EFIAPI
+GasketSecPollStdIn (
+  VOID
+  );
+
+
 
 RETURN_STATUS
 EFIAPI

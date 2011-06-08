@@ -354,18 +354,19 @@ MapFile (
   VOID    *res;
   UINTN   FileSize;
 
-  fd = open (FileName, O_RDONLY);
+  fd = open (FileName, O_RDWR);
   if (fd < 0) {
     return EFI_NOT_FOUND;
   }
   FileSize = lseek (fd, 0, SEEK_END);
 
 
-  res = MapMemory (fd, FileSize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE);
+  res = MapMemory (fd, FileSize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED);
 
   close (fd);
 
-  if (res == MAP_FAILED) {
+  if (res == NULL) {
+    perror ("MapFile() Failed");
     return EFI_DEVICE_ERROR;
   }
   
