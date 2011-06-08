@@ -310,6 +310,13 @@ MapFile (
   OUT UINT64                    *Length
   );
 
+EFI_STATUS
+MapFd0 (
+  IN  CHAR8                     *FileName,
+  IN OUT  EFI_PHYSICAL_ADDRESS  *BaseAddress,
+  OUT UINT64                    *Length
+  );
+
  
 
 VOID SecSleep (UINT64 Milliseconds);

@@ -91,6 +91,18 @@
   gInOsEmuPkgTokenSpaceGuid.PcdEmuSerialPort
   gInOsEmuPkgTokenSpaceGuid.PcdEmuNetworkInterface
 
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashFvRecoveryBase
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashFvRecoverySize
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageVariableBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogBase
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogSize
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwWorkingBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwSpareBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+
+
 
 [BuildOptions]
    GCC:*_*_IA32_DLINK_FLAGS == -o $(BIN_DIR)/SecMain -m elf_i386 -dynamic-linker /lib/ld-linux.so.2 /usr/lib/crt1.o /usr/lib/crti.o -L/usr/X11R6/lib -lXext -lX11 /usr/lib/crtn.o

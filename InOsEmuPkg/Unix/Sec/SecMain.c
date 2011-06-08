@@ -212,14 +212,24 @@ main (
     }
     FileName[Index1]  = '\0';
 
-    //
-    // Open the FD and remmeber where it got mapped into our processes address space
-    //
-    Status = MapFile (
-              FileName,
-              &gFdInfo[Index].Address,
-              &gFdInfo[Index].Size
-              );
+    if (Index == 0) {
+      // Map FV Recovery Read Only and other areas Read/Write
+      Status = MapFd0 (
+                FileName,
+                &gFdInfo[0].Address,
+                &gFdInfo[0].Size
+                );
+    } else {
+      //
+      // Open the FD and remmeber where it got mapped into our processes address space
+      // Maps Read Only
+      //
+      Status = MapFile (
+                FileName,
+                &gFdInfo[Index].Address,
+                &gFdInfo[Index].Size
+                );
+    }
     if (EFI_ERROR (Status)) {
       printf ("ERROR : Can not open Firmware Device File %s (%x).  Exiting.\n", FileName, (unsigned int)Status);
       exit (1);
@@ -350,7 +360,7 @@ MapFile (
   OUT UINT64                    *Length
   )
 {
-  int fd;
+  int     fd;
   VOID    *res;
   UINTN   FileSize;
 
@@ -361,7 +371,7 @@ MapFile (
   FileSize = lseek (fd, 0, SEEK_END);
 
 
-  res = MapMemory (fd, FileSize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED);
+  res = MapMemory (fd, FileSize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE);
 
   close (fd);
 
@@ -369,13 +379,68 @@ MapFile (
     perror ("MapFile() Failed");
     return EFI_DEVICE_ERROR;
   }
-  
+      
   *Length = (UINT64) FileSize;
   *BaseAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) res;
 
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+MapFd0 (
+  IN  CHAR8                     *FileName,
+  IN OUT  EFI_PHYSICAL_ADDRESS  *BaseAddress,
+  OUT UINT64                    *Length
+  )
+{
+  int     fd;
+  VOID    *res, *res2;
+  UINTN   FileSize;
+  UINTN   FvSize;
+
+  fd = open (FileName, O_RDWR);
+  if (fd < 0) {
+    return EFI_NOT_FOUND;
+  }
+  FileSize = lseek (fd, 0, SEEK_END);
+ 
+  FvSize = FixedPcdGet64 (PcdEmuFlashFvRecoverySize);
+
+  // Assume start of FD is Recovery FV, and make it write protected
+  res = mmap (
+          (void *)(UINTN)FixedPcdGet64 (PcdEmuFlashFvRecoveryBase), 
+          FvSize, 
+          PROT_READ | PROT_WRITE | PROT_EXEC, 
+          MAP_PRIVATE, 
+          fd, 
+          0
+          );
+  if (res == MAP_FAILED) {
+    perror ("MapFile() Failed res =");
+    close (fd);
+    return EFI_DEVICE_ERROR;
+  }
+  
+  // Map the rest of the FD as read/write
+  res2 = mmap (
+          (void *)(FixedPcdGet64 (PcdEmuFlashFvRecoveryBase) + FvSize), 
+          FileSize - FvSize, 
+          PROT_READ | PROT_WRITE | PROT_EXEC, 
+          MAP_SHARED,
+          fd, 
+          FvSize
+          );
+  close (fd);
+  if (res2 == MAP_FAILED) {
+    perror ("MapFile() Failed res2 =");
+    return EFI_DEVICE_ERROR;
+  }
+
+  *Length = (UINT64) FileSize;
+  *BaseAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) res;
+
+  return EFI_SUCCESS;  
+}
 
 
 /*++
