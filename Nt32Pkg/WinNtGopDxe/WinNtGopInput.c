@@ -246,12 +246,14 @@ Returns:
 
 VOID
 WinNtGopSimpleTextInTimerHandler (
-  IN EFI_EVENT          Event,
-  IN GOP_PRIVATE_DATA   *Private
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  EFI_KEY_DATA          KeyData;
+  GOP_PRIVATE_DATA  *Private;
+  EFI_KEY_DATA      KeyData;
 
+  Private = (GOP_PRIVATE_DATA *)Context;
   while (GopPrivateDeleteQ (Private, &Private->QueueForNotify, &KeyData) == EFI_SUCCESS) {
     GopPrivateInvokeRegisteredFunction (Private, &KeyData);
   }
@@ -330,9 +332,9 @@ GopPrivateAddKey (
       (KeyData.Key.UnicodeChar >= 1) && (KeyData.Key.UnicodeChar <= 26)
      ) {
     if ((Private->LeftShift || Private->RightShift) == Private->CapsLock) {
-      KeyData.Key.UnicodeChar = KeyData.Key.UnicodeChar + L'a' - 1;
+      KeyData.Key.UnicodeChar = (CHAR16)(KeyData.Key.UnicodeChar + L'a' - 1);
     } else {
-      KeyData.Key.UnicodeChar = KeyData.Key.UnicodeChar + L'A' - 1;
+      KeyData.Key.UnicodeChar = (CHAR16)(KeyData.Key.UnicodeChar + L'A' - 1);
     }
   }
 
@@ -352,9 +354,9 @@ GopPrivateAddKey (
   //
   if (Private->LeftCtrl || Private->RightCtrl) {
     if ((KeyData.Key.UnicodeChar >= L'a') && (KeyData.Key.UnicodeChar <= L'z')) {
-      KeyData.Key.UnicodeChar = KeyData.Key.UnicodeChar - L'a' + 1;
+      KeyData.Key.UnicodeChar = (CHAR16)(KeyData.Key.UnicodeChar - L'a' + 1);
     } else if ((KeyData.Key.UnicodeChar >= L'A') && (KeyData.Key.UnicodeChar <= L'Z')) {
-      KeyData.Key.UnicodeChar = KeyData.Key.UnicodeChar - L'A' + 1;
+      KeyData.Key.UnicodeChar = (CHAR16)(KeyData.Key.UnicodeChar - L'A' + 1);
     }
   }
   GopPrivateAddQ (Private, &Private->QueueForRead, &KeyData);

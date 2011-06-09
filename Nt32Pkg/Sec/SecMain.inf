@@ -3,7 +3,7 @@
 #
 # Main executable file of NT32 Emulator that loads PEI core after initialization finished.
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -63,13 +63,13 @@
   
 [BuildOptions]
   MSFT:*_*_IA32_DLINK_FLAGS == /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib
-  MSFT:*_*_IA32_CC_FLAGS == /nologo /W4 /WX /Gy /c /D UNICODE /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
-  MSFT:*_*_IA32_PP_FLAGS == /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
+  MSFT:*_*_IA32_CC_FLAGS == /nologo /W4 /WX /Gy /c /D UNICODE /Od /FIAutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
+  MSFT:*_*_IA32_PP_FLAGS == /nologo /E /TC /FIAutoGen.h
   MSFT:*_*_IA32_ASM_FLAGS == /nologo /W3 /WX /c /coff /Cx /Zd /W0 /Zi
   MSFT:*_*_IA32_ASMLINK_FLAGS       == /link /nologo /tiny
 
   INTEL:*_*_IA32_DLINK_FLAGS == /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"C:\Program Files\Intel\Compiler\C++\9.1\IA32\Lib" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib
-  INTEL:*_*_IA32_CC_FLAGS == /nologo /W4 /WX /Gy /c /D UNICODE /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
-  INTEL:*_*_IA32_PP_FLAGS == /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
+  INTEL:*_*_IA32_CC_FLAGS == /nologo /W4 /WX /Gy /c /D UNICODE /Od /FIAutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
+  INTEL:*_*_IA32_PP_FLAGS == /nologo /E /TC /FIAutoGen.h
   INTEL:*_*_IA32_ASM_FLAGS == /nologo /W3 /WX /c /coff /Cx /Zd /W0 /Zi
   INTEL:*_*_IA32_ASMLINK_FLAGS       == /link /nologo /tiny

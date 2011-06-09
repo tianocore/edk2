@@ -327,7 +327,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
   
-  gWinNt->QueryPerformanceCounter (TimerValue);
+  gWinNt->QueryPerformanceCounter ((LARGE_INTEGER *)TimerValue);
   
   if (TimerPeriod != NULL) {
     *TimerPeriod = mTimerPeriod;
@@ -532,7 +532,7 @@ Returns:
   //
   // Retrieve the frequency of the performance counter in Hz.
   //  
-  gWinNt->QueryPerformanceFrequency (&Frequency);
+  gWinNt->QueryPerformanceFrequency ((LARGE_INTEGER *)&Frequency);
   
   //
   // Convert frequency in Hz to a clock period in femtoseconds.
