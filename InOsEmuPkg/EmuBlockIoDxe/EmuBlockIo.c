@@ -420,7 +420,7 @@ EmuBlockIoDriverBindingSupported (
   )
 {
   EFI_STATUS              Status;
-  EMU_IO_THUNK_PROTOCOL  *EmuIoThunk;
+  EMU_IO_THUNK_PROTOCOL   *EmuIoThunk;
 
   //
   // Open the IO Abstraction(s) needed to perform the supported test
@@ -520,9 +520,7 @@ EmuBlockIoDriverBindingStart (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  //
-  // Set DiskType
-  //
+  
   if (!CompareGuid (EmuIoThunk->Protocol, &gEmuBlockIoProtocolGuid)) {
     Status = EFI_UNSUPPORTED;
     goto Done;

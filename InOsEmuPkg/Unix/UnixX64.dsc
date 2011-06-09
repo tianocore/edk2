@@ -132,8 +132,6 @@
   PpiListLib|InOsEmuPkg/Library/SecPpiListLib/SecPpiListLib.inf
   PeiServicesLib|InOsEmuPkg/Library/SecPeiServicesLib/SecPeiServicesLib.inf
 
-#  PeCoffExtraActionLib|InOsEmuPkg/Library/PeiEmuPeCoffExtraActionLib/PeiEmuPeCoffExtraActionLib.inf
-
 
 [LibraryClasses.common.PEIM, LibraryClasses.common.PEI_CORE]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
@@ -365,15 +363,13 @@
   InOsEmuPkg/EmuGopDxe/EmuGopDxe.inf
   InOsEmuPkg/EmuSimpleFileSystemDxe/EmuSimpleFileSystemDxe.inf
   InOsEmuPkg/EmuBlockIoDxe/EmuBlockIoDxe.inf
+  InOsEmuPkg/EmuSnpDxe/EmuSnpDxe.inf
 
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
   #
   # Network stack drivers
   #
-!if $(NETWORK_SUPPORT) 
-  InOsEmuPkg/EmuSnpDxe/EmuSnpDxe.inf
-!endif
   MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
   MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
   MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
