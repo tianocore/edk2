@@ -1,7 +1,7 @@
 /** @file
   The driver binding for UEFI PXEBC protocol.
 
-Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -341,7 +341,7 @@ PxeBcDriverBindingStart (
     goto ON_ERROR;
   }
   ZeroMem (&Private->Udp4CfgData, sizeof (EFI_UDP4_CONFIG_DATA));
-  Private->Udp4CfgData.AcceptBroadcast    = TRUE;
+  Private->Udp4CfgData.AcceptBroadcast    = FALSE;
   Private->Udp4CfgData.AcceptPromiscuous  = FALSE;
   Private->Udp4CfgData.AcceptAnyPort      = TRUE;
   Private->Udp4CfgData.AllowDuplicatePort = TRUE;
