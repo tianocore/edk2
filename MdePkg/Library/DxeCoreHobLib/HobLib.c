@@ -1,7 +1,7 @@
 /** @file
   HOB Library implementation for DxeCore driver.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -286,7 +286,8 @@ BuildResourceDescriptorHob (
   @param  Guid          The GUID to tag the customized HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @return The start address of GUID HOB data.
+  @retval  NULL         The GUID HOB could not be allocated.
+  @retval  others       The start address of GUID HOB data.
 
 **/
 VOID *
@@ -323,7 +324,8 @@ BuildGuidHob (
   @param  Data          The data to be copied into the data field of the GUID HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @return The start address of GUID HOB data.
+  @retval  NULL         The GUID HOB could not be allocated.
+  @retval  others       The start address of GUID HOB data.
 
 **/
 VOID *
