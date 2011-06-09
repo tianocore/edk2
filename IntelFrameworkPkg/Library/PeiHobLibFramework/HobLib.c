@@ -5,7 +5,7 @@
  This library instance uses EFI_HOB_TYPE_CV defined in Intel framework HOB specification v0.9
  to implement HobLib BuildCvHob() API. 
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -230,7 +230,8 @@ GetBootModeHob (
   @param  Type          Type of the new HOB.
   @param  Length        Length of the new HOB to allocate.
 
-  @return The address of new HOB.
+  @retval  NULL         The HOB could not be allocated.
+  @retval  others       The address of new HOB.
 
 **/
 VOID *
@@ -244,10 +245,13 @@ InternalPeiCreateHob (
   VOID              *Hob;
 
   Status = PeiServicesCreateHob (Type, Length, &Hob);
+  if (EFI_ERROR (Status)) {
+    Hob = NULL;
+  }
   //
   // Assume the process of HOB building is always successful.
   //
-  ASSERT_EFI_ERROR (Status);
+  ASSERT (Hob != NULL);
   return Hob;
 }
 
@@ -282,6 +286,9 @@ BuildModuleHob (
           ((ModuleLength & (EFI_PAGE_SIZE - 1)) == 0));
 
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE));
+  if (Hob == NULL) {
+    return;
+  }
 
   CopyGuid (&(Hob->MemoryAllocationHeader.Name), &gEfiHobMemoryAllocModuleGuid);
   Hob->MemoryAllocationHeader.MemoryBaseAddress = MemoryAllocationModule;
@@ -324,6 +331,9 @@ BuildResourceDescriptorHob (
   EFI_HOB_RESOURCE_DESCRIPTOR  *Hob;
 
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, (UINT16) sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
+  if (Hob == NULL) {
+    return;
+  }
 
   Hob->ResourceType      = ResourceType;
   Hob->ResourceAttribute = ResourceAttribute;
@@ -348,7 +358,8 @@ BuildResourceDescriptorHob (
   @param  Guid          The GUID to tag the customized HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @return The start address of GUID HOB data.
+  @retval  NULL         The GUID HOB could not be allocated.
+  @retval  others       The start address of GUID HOB data.
 
 **/
 VOID *
@@ -361,11 +372,19 @@ BuildGuidHob (
   EFI_HOB_GUID_TYPE *Hob;
 
   //
+  // Make sure Guid is valid
+  //
+  ASSERT (Guid != NULL);
+  
+  //
   // Make sure that data length is not too long.
   //
   ASSERT (DataLength <= (0xffff - sizeof (EFI_HOB_GUID_TYPE)));
 
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_GUID_EXTENSION, (UINT16) (sizeof (EFI_HOB_GUID_TYPE) + DataLength));
+  if (Hob == NULL) {
+    return Hob;
+  }
   CopyGuid (&Hob->Name, Guid);
   return Hob + 1;
 }
@@ -390,7 +409,8 @@ BuildGuidHob (
   @param  Data          The data to be copied into the data field of the GUID HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @return The start address of GUID HOB data.
+  @retval  NULL         The GUID HOB could not be allocated.
+  @retval  others       The start address of GUID HOB data.
 
 **/
 VOID *
@@ -406,6 +426,9 @@ BuildGuidDataHob (
   ASSERT (Data != NULL || DataLength == 0);
 
   HobData = BuildGuidHob (Guid, DataLength);
+  if (HobData == NULL) {
+    return HobData;
+  }
 
   return CopyMem (HobData, Data, DataLength);
 }
@@ -433,6 +456,9 @@ BuildFvHob (
   EFI_HOB_FIRMWARE_VOLUME  *Hob;
 
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_FV, (UINT16) sizeof (EFI_HOB_FIRMWARE_VOLUME));
+  if (Hob == NULL) {
+    return;
+  }
 
   Hob->BaseAddress = BaseAddress;
   Hob->Length      = Length;
@@ -465,6 +491,9 @@ BuildFv2Hob (
   EFI_HOB_FIRMWARE_VOLUME2  *Hob;
 
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_FV2, (UINT16) sizeof (EFI_HOB_FIRMWARE_VOLUME2));
+  if (Hob == NULL) {
+    return;
+  }
 
   Hob->BaseAddress = BaseAddress;
   Hob->Length      = Length;
@@ -496,6 +525,9 @@ BuildCvHob (
   EFI_HOB_CAPSULE_VOLUME     *Hob;
 
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_CV, (UINT16) sizeof (EFI_HOB_CAPSULE_VOLUME));
+  if (Hob == NULL) {
+    return;
+  }
 
   Hob->BaseAddress = BaseAddress;
   Hob->Length      = Length;
@@ -524,6 +556,9 @@ BuildCpuHob (
   EFI_HOB_CPU  *Hob;
 
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_CPU, (UINT16) sizeof (EFI_HOB_CPU));
+  if (Hob == NULL) {
+    return;
+  }
 
   Hob->SizeOfMemorySpace = SizeOfMemorySpace;
   Hob->SizeOfIoSpace     = SizeOfIoSpace;
@@ -560,6 +595,9 @@ BuildStackHob (
           ((Length & (EFI_PAGE_SIZE - 1)) == 0));
 
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION_STACK));
+  if (Hob == NULL) {
+    return;
+  }
 
   CopyGuid (&(Hob->AllocDescriptor.Name), &gEfiHobMemoryAllocStackGuid);
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
@@ -600,6 +638,9 @@ BuildBspStoreHob (
           ((Length & (EFI_PAGE_SIZE - 1)) == 0));
 
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION_BSP_STORE));
+  if (Hob == NULL) {
+    return;
+  }
 
   CopyGuid (&(Hob->AllocDescriptor.Name), &gEfiHobMemoryAllocBspStoreGuid);
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
@@ -640,6 +681,9 @@ BuildMemoryAllocationHob (
           ((Length & (EFI_PAGE_SIZE - 1)) == 0));
   
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, (UINT16) sizeof (EFI_HOB_MEMORY_ALLOCATION));
+  if (Hob == NULL) {
+    return;
+  }
   
   ZeroMem (&(Hob->AllocDescriptor.Name), sizeof (EFI_GUID));
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
