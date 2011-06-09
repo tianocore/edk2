@@ -1464,8 +1464,10 @@ CoreGetMemoryMap (
       }
     }
     MemoryMap->Attribute = Entry->Attribute;
-    if (mMemoryTypeStatistics[MemoryMap->Type].Runtime) {
-      MemoryMap->Attribute |= EFI_MEMORY_RUNTIME;
+    if (MemoryMap->Type < EfiMaxMemoryType) {
+      if (mMemoryTypeStatistics[MemoryMap->Type].Runtime) {
+        MemoryMap->Attribute |= EFI_MEMORY_RUNTIME;
+      }
     }
 
     //
