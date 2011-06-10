@@ -1086,6 +1086,13 @@ CoreLoadImageCommon (
                                   OriginalFilePath
                                   );
     if (EFI_ERROR (SecurityStatus) && SecurityStatus != EFI_SECURITY_VIOLATION) {
+      if (SecurityStatus == EFI_ACCESS_DENIED) {
+        //
+        // Image was not loaded because the platform policy prohibits the image from being loaded.
+        // It's the only place we could meet EFI_ACCESS_DENIED.
+        //
+        *ImageHandle = NULL;
+      }
       Status = SecurityStatus;
       Image = NULL;
       goto Done;
@@ -1237,7 +1244,6 @@ Done:
   if (EFI_ERROR (Status)) {
     if (Image != NULL) {
       CoreUnloadAndCloseImage (Image, (BOOLEAN)(DstBuffer == 0));
-      *ImageHandle = NULL;
     }
   } else if (EFI_ERROR (SecurityStatus)) {
     Status = SecurityStatus;
