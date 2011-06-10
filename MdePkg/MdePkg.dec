@@ -211,6 +211,9 @@
   ##  @libraryclass  Provides library services to make PAL Calls.
   PalLib|Include/Library/PalLib.h
 
+  ##  @libraryclass  Provides library services to make Extended SAL Calls.
+  ExtendedSalLib|Include/Library/ExtendedSalLib.h
+  
 [Guids]
   #
   # GUID defined in UEFI2.1/UEFI2.0/EFI1.1
