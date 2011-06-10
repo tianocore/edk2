@@ -1158,51 +1158,64 @@ ParseIfrData (
       InsertBlockData (&VarStorageData->BlockEntry, &BlockData);
       
       //
-      // Add default value by CheckBox Flags 
+      // Add default value for standard ID by CheckBox Flag
       //
+      VarDefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
+      //
+      // Prepare new DefaultValue
+      //
+      DefaultData = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
+      if (DefaultData == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
+      DefaultData->OpCode      = IfrOpHdr->OpCode;
+      DefaultData->DefaultId   = VarDefaultId;
       if ((IfrCheckBox->Flags & EFI_IFR_CHECKBOX_DEFAULT) == EFI_IFR_CHECKBOX_DEFAULT) {
         //
-        // Set standard ID to Manufacture ID
+        // When flag is set, defautl value is TRUE.
         //
-        VarDefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
+        DefaultData->Value    = 1;
+      } else {
         //
-        // Prepare new DefaultValue
+        // When flag is not set, defautl value is FASLE.
         //
-        DefaultData = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
-        if (DefaultData == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto Done;
-        }
-        DefaultData->OpCode      = IfrOpHdr->OpCode;
-        DefaultData->DefaultId   = VarDefaultId;
-        DefaultData->Value       = 1;
-        //
-        // Add DefaultValue into current BlockData
-        //
-        InsertDefaultValue (BlockData, DefaultData);
+        DefaultData->Value    = 0;
       }
+      //
+      // Add DefaultValue into current BlockData
+      //
+      InsertDefaultValue (BlockData, DefaultData);
 
+      //
+      // Add default value for Manufacture ID by CheckBox Flag
+      //
+      VarDefaultId = EFI_HII_DEFAULT_CLASS_MANUFACTURING;
+      //
+      // Prepare new DefaultValue
+      //
+      DefaultData = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
+      if (DefaultData == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
+      DefaultData->OpCode      = IfrOpHdr->OpCode;
+      DefaultData->DefaultId   = VarDefaultId;
       if ((IfrCheckBox->Flags & EFI_IFR_CHECKBOX_DEFAULT_MFG) == EFI_IFR_CHECKBOX_DEFAULT_MFG) {
         //
-        // Set standard ID to Manufacture ID
+        // When flag is set, defautl value is TRUE.
         //
-        VarDefaultId = EFI_HII_DEFAULT_CLASS_MANUFACTURING;
+        DefaultData->Value    = 1;
+      } else {
         //
-        // Prepare new DefaultValue
+        // When flag is not set, defautl value is FASLE.
         //
-        DefaultData = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
-        if (DefaultData == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto Done;
-        }
-        DefaultData->OpCode      = IfrOpHdr->OpCode;
-        DefaultData->DefaultId   = VarDefaultId;
-        DefaultData->Value       = 1;
-        //
-        // Add DefaultValue into current BlockData
-        //
-        InsertDefaultValue (BlockData, DefaultData);
+        DefaultData->Value    = 0;
       }
+      //
+      // Add DefaultValue into current BlockData
+      //
+      InsertDefaultValue (BlockData, DefaultData);
       break;
 
     case EFI_IFR_STRING_OP:
