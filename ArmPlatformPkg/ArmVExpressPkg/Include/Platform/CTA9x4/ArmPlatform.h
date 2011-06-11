@@ -106,6 +106,10 @@
 //#define PL111_CLCD_BASE                       PL111_CLCD_MOTHERBOARD_BASE
 #define PL111_CLCD_BASE                         PL111_CLCD_CORE_TILE_BASE
 
+// Specify which Watchdog to use
+#define SP805_WDOG_BASE                         SP805_WDOG_MOTHERBOARD_BASE
+//#define SP805_WDOG_BASE                       SP805_WDOG_CORE_TILE_BASE
+
 /***********************************************************************************
    Peripherals' misc settings
 ************************************************************************************/
@@ -129,6 +133,9 @@
 // PL031 RTC - Other settings
 #define PL031_PPM_ACCURACY                      300000000
 
+// SP805 Watchdog - Other settings
+#define SP805_CLOCK_FREQUENCY                   32000
+#define SP805_MAX_TICKS                         0xFFFFFFFF
 
 // PL111 Lcd
 #define PL111_CLCD_CORE_TILE_VIDEO_MODE_OSC_ID  1

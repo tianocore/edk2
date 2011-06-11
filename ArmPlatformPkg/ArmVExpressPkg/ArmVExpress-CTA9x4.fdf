@@ -162,6 +162,7 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/Drivers/SP804TimerDxe/SP804TimerDxe.inf
   INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
   INF ArmPlatformPkg/Drivers/LcdGraphicsOutputDxe/PL111LcdGraphicsOutputDxe.inf
+  INF ArmPlatformPkg/Drivers/SP805WatchdogDxe/SP805WatchdogDxe.inf
 
   #
   # Semi-hosting filesystem
