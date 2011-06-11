@@ -46,8 +46,6 @@
   # Using a FeaturePcd make a '(BOOLEAN) casting for its value which is not understood by the preprocessor.
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|0|UINT32|0x00000002
   
-  gArmPlatformTokenSpaceGuid.PcdPeiServicePtrAddr|0|UINT32|0x00000003
-  
   # Stack for CPU Cores in Secure Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0|UINT32|0x00000004
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecStackSize|0|UINT32|0x00000005
@@ -65,6 +63,15 @@
 
   # Size of the region reserved for fixed address allocations (Reserved 128MB by default)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryFixRegionSize|0x08000000|UINT32|0x00000014
+
+  # Size to reserve in the primary core stack for PEI Global Variables
+  #  = sizeof(UINTN) /* PcdPeiServicePtr or HobListPtr */
+  gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize|0x4|UINT32|0x00000016
+  # PeiServicePtr and HobListPtr shares the same location in the PEI Global Variable list
+  # PeiServicePtr is only valid with PEI Core and HobListPtr only when the PEI Core is skipped. 
+  gArmPlatformTokenSpaceGuid.PcdPeiServicePtrGlobalOffset|0x4|UINT32|0x00000017
+  gArmPlatformTokenSpaceGuid.PcdHobListPtrGlobalOffset|0x4|UINT32|0x00000018
+
   #
   # ARM Primecells
   #

@@ -1,22 +1,21 @@
 //
 //  Copyright (c) 2011, ARM Limited. All rights reserved.
 //  
-# This program and the accompanying materials                          
-#  are licensed and made available under the terms and conditions of the BSD License         
-#  which accompanies this distribution.  The full text of the license may be found at        
-#  http:#opensource.org/licenses/bsd-license.php                                            
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-#
-#
+//  This program and the accompanying materials                          
+//  are licensed and made available under the terms and conditions of the BSD License         
+//  which accompanies this distribution.  The full text of the license may be found at        
+//  http://opensource.org/licenses/bsd-license.php                                            
+//
+//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+//
+//
 
 #include <AsmMacroIoLib.h>
 #include <Base.h>
 #include <Library/PcdLib.h>
 #include <AutoGen.h>
 
-#start of the code section
 .text
 .align 3
 
@@ -45,9 +44,17 @@ _SetupStack:
   add     r3,r3,r2,LSR #1   @ r3 = stack_offset + (stack_size/2)   <-- the top half is for the heap
   mov     sp, r3
 
-  # lr points to area in reset vector block containing PEI core address. lr needs to
-  # be saved from the beginning as the _ModuleEntryPoint could call helper functions
-  # that will overwrite 'lr'
+  # Only allocate memory in top of the primary core stack
+  cmp   r0, #0
+  bne   _PrepareArguments
+
+_AllocateGlobalPeiVariables:
+  # Reserve top of the stack for Global PEI Variables (eg: PeiServicesTablePointer)
+  LoadConstantToReg (FixedPcdGet32(PcdPeiGlobalVariableSize), r1)
+  sub   sp, sp, r1
+
+_PrepareArguments:
+  # The PEI Core Entry Point has been computed by GenFV and stored in the second entry of the Reset Vector
   LoadConstantToReg (FixedPcdGet32(PcdNormalFdBaseAddress), r2)
   add   r2, r2, #4
   ldr   r1, [r2]

@@ -348,7 +348,6 @@
   # Stack for CPU Cores in Non Secure Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase|0x48000000  # Top of SEC Stack for Normal World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize|0x20000     # Size of SEC Stack for Normal World
-  gArmPlatformTokenSpaceGuid.PcdPeiServicePtrAddr|0x48020004        # Pei Services Ptr just above stack
 
   # Non Sec UEFI Firmware: These two PCDs must match PcdFlashFvMainBase/PcdFlashFvMainSize
   gArmTokenSpaceGuid.PcdNormalFdBaseAddress|0x40050000       # Must be equal to gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase

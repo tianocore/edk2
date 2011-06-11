@@ -383,7 +383,6 @@
   # Stacks for MPCores in Normal World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase|0x48000000	# Top of SEC Stack for Normal World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize|0x00020000	# Stack for each of the 4 CPU cores
-  gArmPlatformTokenSpaceGuid.PcdPeiServicePtrAddr|0x48020004        # pei services ptr just above stack. Overlapped with the stack of CoreId 1
 
 
   # System Memory (1GB) 

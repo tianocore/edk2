@@ -33,15 +33,25 @@ _ModuleEntryPoint
 
 _SetupStack
   // Setup Stack for the 4 CPU cores
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresNonSecStackBase) ,r1)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresNonSecStackSize) ,r2)
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresNonSecStackBase), r1)
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresNonSecStackSize), r2)
   
-  mov     r3,r0         // r3 = core_id
-  mul     r3,r3,r2      // r3 = core_id * stack_size = offset from the stack base
-  add     r3,r3,r1      // r3 = stack_base + offset
-  add     r3,r3,r2,LSR #1   // r3 = stack_offset + (stack_size/2)   <-- the top half is for the heap
-  mov     sp, r3
+  mov   r3, r0              // r3 = core_id
+  mul   r3, r3, r2          // r3 = core_id * stack_size = offset from the stack base
+  add   r3, r3, r1          // r3 = stack_base + offset
+  add   r3, r3, r2, LSR #1  // r3 = stack_offset + (stack_size/2) <-- the top half is for the heap
+  mov   sp, r3
 
+  // Only allocate memory in top of the primary core stack
+  cmp   r0, #0
+  bne   _PrepareArguments
+
+_AllocateGlobalPeiVariables
+  // Reserve top of the stack for Global PEI Variables (eg: PeiServicesTablePointer)
+  LoadConstantToReg (FixedPcdGet32(PcdPeiGlobalVariableSize), r1)
+  sub   sp, sp, r1
+
+_PrepareArguments
   // The PEI Core Entry Point has been computed by GenFV and stored in the second entry of the Reset Vector
   LoadConstantToReg (FixedPcdGet32(PcdNormalFdBaseAddress), r2)
   add   r2, r2, #4

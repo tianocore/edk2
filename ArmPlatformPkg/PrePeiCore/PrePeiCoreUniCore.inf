@@ -57,5 +57,7 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize
   
+  gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
+  
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
