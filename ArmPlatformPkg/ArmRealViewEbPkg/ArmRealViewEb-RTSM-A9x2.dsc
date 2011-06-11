@@ -386,8 +386,8 @@
   #
   # ARM PL390 General Interrupt Controller
   #
-  gArmTokenSpaceGuid.PcdGicDistributorBase|0x10041000
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x10040000
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0x1F001000
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x1F000100
   gArmTokenSpaceGuid.PcdGicNumInterrupts|96
 
   #
