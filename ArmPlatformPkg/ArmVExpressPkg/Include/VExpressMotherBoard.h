@@ -73,4 +73,27 @@
 #define ARM_VE_DAUGHTERBOARD_1_SITE               1
 #define ARM_VE_DAUGHTERBOARD_2_SITE               2
 
+#define VIRTUAL_SYS_CFG(site,func)                (((site) << 24) | (func))
+
+//
+// System Configuration Control Functions
+//
+#define SYS_CFG_OSC                               1
+#define SYS_CFG_VOLT                              2
+#define SYS_CFG_AMP                               3
+#define SYS_CFG_TEMP                              4
+#define SYS_CFG_RESET                             5
+#define SYS_CFG_SCC                               6
+#define SYS_CFG_MUXFPGA                           7
+#define SYS_CFG_SHUTDOWN                          8
+#define SYS_CFG_REBOOT                            9
+#define SYS_CFG_DVIMODE                           11
+#define SYS_CFG_POWER                             12
+// Oscillator for Site 1
+#define SYS_CFG_OSC_SITE1                         VIRTUAL_SYS_CFG(ARM_VE_DAUGHTERBOARD_1_SITE,SYS_CFG_OSC)
+// Oscillator for Site 2
+#define SYS_CFG_OSC_SITE2                         VIRTUAL_SYS_CFG(ARM_VE_DAUGHTERBOARD_2_SITE,SYS_CFG_OSC)
+// Can not access the battery backed-up hardware clock on the Versatile Express motherboard
+#define SYS_CFG_RTC                               VIRTUAL_SYS_CFG(ARM_VE_UNSUPPORTED,1)
+
 #endif /* VEXPRESSMOTHERBOARD_H_ */

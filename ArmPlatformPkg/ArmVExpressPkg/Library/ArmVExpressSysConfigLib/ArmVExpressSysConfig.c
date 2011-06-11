@@ -1,0 +1,255 @@
+/** @file  SysCfgArmVExpress.c
+
+  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#include <PiDxe.h>
+#include <Library/IoLib.h>
+#include <Library/DebugLib.h>
+
+#include <Library/ArmPlatformSysConfigLib.h>
+#include <ArmPlatform.h>
+
+//
+// SYS_CFGCTRL Bits
+//
+#define SYS_CFGCTRL_START                 BIT31
+#define SYS_CFGCTRL_READ                  (0 << 30)
+#define SYS_CFGCTRL_WRITE                 (1 << 30)
+#define SYS_CFGCTRL_FUNCTION(fun)         (((fun ) &  0x3F) << 20)
+#define SYS_CFGCTRL_SITE(site)            (((site) &   0x3) << 16)
+#define SYS_CFGCTRL_POSITION(pos)         (((pos ) &   0xF) << 12)
+#define SYS_CFGCTRL_DEVICE(dev)            ((dev ) & 0xFFF)
+
+//
+// SYS_CFGSTAT Bits
+//
+#define SYS_CFGSTAT_ERROR                 BIT1
+#define SYS_CFGSTAT_COMPLETE              BIT0
+
+/****************************************************************************
+ *
+ *  This file makes it easier to access the System Configuration Registers
+ *  in the ARM Versatile Express motherboard.
+ *
+ ****************************************************************************/
+
+EFI_STATUS
+ArmPlatformSysConfigInitialize (
+  VOID
+  )
+{
+  return EFI_SUCCESS;
+}
+
+/***************************************
+ * GENERAL FUNCTION: AccessSysCfgRegister
+ * Interacts with
+ *    SYS_CFGSTAT
+ *    SYS_CFGDATA
+ *    SYS_CFGCTRL
+ * for setting and for reading out values
+ ***************************************/
+
+EFI_STATUS
+AccessSysCfgRegister (
+  IN     UINT32   ReadWrite,
+  IN     UINT32   Function,
+  IN     UINT32   Site,
+  IN     UINT32   Position,
+  IN     UINT32   Device,
+  IN OUT UINT32*  Data
+  )
+{
+  UINT32          SysCfgCtrl;
+
+  // Clear the COMPLETE bit
+  MmioAnd32(ARM_VE_SYS_CFGSTAT_REG, ~SYS_CFGSTAT_COMPLETE);
+
+  // If writing, then set the data value
+  if(ReadWrite == SYS_CFGCTRL_WRITE) {
+    MmioWrite32(ARM_VE_SYS_CFGDATA_REG, *Data);
+  }
+
+  // Set the control value
+  SysCfgCtrl = SYS_CFGCTRL_START | ReadWrite | SYS_CFGCTRL_FUNCTION(Function) | SYS_CFGCTRL_SITE(Site) |
+      SYS_CFGCTRL_POSITION(Position) | SYS_CFGCTRL_DEVICE(Device);
+  MmioWrite32(ARM_VE_SYS_CFGCTRL_REG, SysCfgCtrl);
+
+  // Wait until the COMPLETE bit is set
+  while ((MmioRead32(ARM_VE_SYS_CFGSTAT_REG) & SYS_CFGSTAT_COMPLETE) == 0);
+
+  // Check for errors
+  if(MmioRead32(ARM_VE_SYS_CFGSTAT_REG) & SYS_CFGSTAT_ERROR) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  // If reading then get the data value
+  if(ReadWrite == SYS_CFGCTRL_READ) {
+    *Data = MmioRead32(ARM_VE_SYS_CFGDATA_REG);
+  }
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+ArmPlatformSysConfigGet (
+  IN  SYS_CONFIG_FUNCTION   Function,
+  OUT UINT32*               Value
+  )
+{
+  UINT32          Site;
+  UINT32          Position;
+  UINT32          Device;
+
+  Position = 0;
+  Device = 0;
+
+  // Intercept some functions
+  switch(Function) {
+
+  case SYS_CFG_OSC_SITE1:
+    Function = SYS_CFG_OSC;
+    Site = ARM_VE_DAUGHTERBOARD_1_SITE;
+    break;
+
+  case SYS_CFG_OSC_SITE2:
+    Function = SYS_CFG_OSC;
+    Site = ARM_VE_DAUGHTERBOARD_2_SITE;
+    break;
+
+  case SYS_CFG_MUXFPGA:
+    Site = *Value;
+    break;
+
+  case SYS_CFG_OSC:
+  case SYS_CFG_VOLT:
+  case SYS_CFG_AMP:
+  case SYS_CFG_TEMP:
+  case SYS_CFG_RESET:
+  case SYS_CFG_SCC:
+  case SYS_CFG_DVIMODE:
+  case SYS_CFG_POWER:
+    Site = ARM_VE_MOTHERBOARD_SITE;
+    break;
+
+  case SYS_CFG_SHUTDOWN:
+  case SYS_CFG_REBOOT:
+  case SYS_CFG_RTC:
+  default:
+    return EFI_UNSUPPORTED;
+  }
+
+  return AccessSysCfgRegister (SYS_CFGCTRL_READ, Function, Site, Position, Device, Value);
+}
+
+EFI_STATUS
+ArmPlatformSysConfigSet (
+  IN  SYS_CONFIG_FUNCTION   Function,
+  IN  UINT32                Value
+  )
+{
+  UINT32          Site;
+  UINT32          Position;
+  UINT32          Device;
+
+  Position = 0;
+  Device = 0;
+
+  // Intercept some functions
+  switch(Function) {
+
+  case SYS_CFG_OSC_SITE1:
+    Function = SYS_CFG_OSC;
+    Site = ARM_VE_DAUGHTERBOARD_1_SITE;
+    break;
+
+  case SYS_CFG_OSC_SITE2:
+    Function = SYS_CFG_OSC;
+    Site = ARM_VE_DAUGHTERBOARD_2_SITE;
+    break;
+
+  case SYS_CFG_MUXFPGA:
+    Site = Value;
+    break;
+
+  case SYS_CFG_RESET:
+  case SYS_CFG_SCC:
+  case SYS_CFG_SHUTDOWN:
+  case SYS_CFG_REBOOT:
+  case SYS_CFG_DVIMODE:
+  case SYS_CFG_POWER:
+    Site = ARM_VE_MOTHERBOARD_SITE;
+    break;
+
+  case SYS_CFG_OSC:
+  case SYS_CFG_VOLT:
+  case SYS_CFG_AMP:
+  case SYS_CFG_TEMP:
+  case SYS_CFG_RTC:
+  default:
+    return(EFI_UNSUPPORTED);
+  }
+
+  return AccessSysCfgRegister (SYS_CFGCTRL_WRITE, Function, Site, Position, Device, &Value);
+}
+
+EFI_STATUS
+ArmPlatformSysConfigSetDevice (
+  IN  SYS_CONFIG_FUNCTION   Function,
+  IN  UINT32                Device,
+  IN  UINT32                Value
+  )
+{
+  UINT32          Site;
+  UINT32          Position;
+
+  Position = 0;
+
+  // Intercept some functions
+  switch(Function) {
+
+  case SYS_CFG_OSC_SITE1:
+    Function = SYS_CFG_OSC;
+    Site = ARM_VE_DAUGHTERBOARD_1_SITE;
+    break;
+
+  case SYS_CFG_OSC_SITE2:
+    Function = SYS_CFG_OSC;
+    Site = ARM_VE_DAUGHTERBOARD_2_SITE;
+    break;
+
+  case SYS_CFG_MUXFPGA:
+    Site = Value;
+    break;
+
+  case SYS_CFG_RTC:
+    return(EFI_UNSUPPORTED);
+    //break;
+
+  case SYS_CFG_OSC:
+  case SYS_CFG_VOLT:
+  case SYS_CFG_AMP:
+  case SYS_CFG_TEMP:
+  case SYS_CFG_RESET:
+  case SYS_CFG_SCC:
+  case SYS_CFG_SHUTDOWN:
+  case SYS_CFG_REBOOT:
+  case SYS_CFG_DVIMODE:
+  case SYS_CFG_POWER:
+    Site = ARM_VE_MOTHERBOARD_SITE;
+    break;
+  default:
+    return EFI_UNSUPPORTED;
+  }
+
+  return AccessSysCfgRegister (SYS_CFGCTRL_WRITE, Function, Site, Position, Device, &Value);
+}
