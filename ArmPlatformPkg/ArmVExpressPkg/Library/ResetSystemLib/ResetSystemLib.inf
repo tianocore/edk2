@@ -27,8 +27,9 @@
 [Packages]
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
-  ArmPlatformPkg/ArmVExpressPkg/ArmVExpressPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
   DebugLib
   BaseLib
+  ArmPlatformSysConfigLib

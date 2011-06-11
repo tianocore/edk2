@@ -19,9 +19,9 @@
 #include <PiDxe.h>
 
 #include <Library/BaseLib.h>
-#include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 #include <Library/EfiResetSystemLib.h>
+#include <Library/ArmPlatformSysConfigLib.h>
 
 #include <ArmPlatform.h>
 
@@ -45,23 +45,20 @@ LibResetSystem (
   IN CHAR16           *ResetData OPTIONAL
   )
 {
-  if (ResetData != NULL) {
-    DEBUG ((EFI_D_ERROR, "%s", ResetData));
-  }
-
   switch (ResetType) {
   case EfiResetWarm:
     // Map a warm reset into a cold reset
   case EfiResetCold:
   case EfiResetShutdown:
-  default:
-    CpuDeadLoop ();
-    break;
+    // Send the REBOOT function to the platform microcontroller
+    ArmPlatformSysConfigSet (SYS_CFG_REBOOT, 0);
+
+    // We should never be here
+    while(1);
   }
 
-  // If the reset didn't work, return an error.
-  ASSERT (FALSE);
-  return EFI_DEVICE_ERROR;
+  ASSERT(FALSE);
+  return EFI_UNSUPPORTED;
 }
 
 /**
