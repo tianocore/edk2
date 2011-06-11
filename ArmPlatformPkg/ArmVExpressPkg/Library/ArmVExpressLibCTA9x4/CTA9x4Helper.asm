@@ -15,13 +15,17 @@
 #include <Base.h>
 #include <Library/PcdLib.h>
 #include <ArmPlatform.h>
+#include <Drivers/PL354Smc.h>
 #include <AutoGen.h>
 
   INCLUDE AsmMacroIoLib.inc
   
   EXPORT  ArmPlatformIsMemoryInitialized
   EXPORT  ArmPlatformInitializeBootMemory
-  IMPORT  InitializeSMC
+  IMPORT  SMCInitializeNOR
+  IMPORT  SMCInitializeSRAM
+  IMPORT  SMCInitializePeripherals
+  IMPORT  SMCInitializeVRAM
   
   PRESERVE8
   AREA    CTA9x4Helper, CODE, READONLY
@@ -59,10 +63,32 @@ ArmPlatformIsMemoryInitialized
 **/
 ArmPlatformInitializeBootMemory
   mov   r5, lr
+
+  //
   // Initialize PL354 SMC
+  //
   LoadConstantToReg (ARM_VE_SMC_CTRL_BASE, r1)
+
+  // NOR Flash 0
+  mov   r2, PL354_SMC_DIRECT_CMD_ADDR_CS(0,0)
+  blx   SMCInitializeNOR
+
+  // NOR Flash 1
+  mov   r2, PL354_SMC_DIRECT_CMD_ADDR_CS(1,0)
+  blx   SMCInitializeNOR
+
+  // Setup SRAM
+  blx   SMCInitializeSRAM
+
+  // Memory Mapped Peripherals
+  blx   SMCInitializePeripherals
+
+  // Initialize VRAM
+  //TODO: Check if we really must inititialize Video SRAM in UEFI. Does Linux can do it ? Does the Video driver can do it ?
+  //      It will be faster (only initialize if required) and easier (remove assembly code because of a stack available) to move this initialization.
   LoadConstantToReg (VRAM_MOTHERBOARD_BASE, r2)
-  blx   InitializeSMC
+  blx   SMCInitializeVRAM
+
   bx	r5
-  
+
   END

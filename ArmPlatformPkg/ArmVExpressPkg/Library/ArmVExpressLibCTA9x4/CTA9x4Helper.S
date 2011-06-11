@@ -1,36 +1,32 @@
-#------------------------------------------------------------------------------ 
-#
-# ARM VE Entry point. Reset vector in FV header will brach to
-# _ModuleEntryPoint. 
-#
-# We use crazy macros, like LoadConstantToReg, since Xcode assembler 
-# does not support = assembly syntax for ldr.
-#
-#  Copyright (c) 2011, ARM Limited. All rights reserved.
-#  
-#  This program and the accompanying materials                          
-#  are licensed and made available under the terms and conditions of the BSD License         
-#  which accompanies this distribution.  The full text of the license may be found at        
-#  http://opensource.org/licenses/bsd-license.php                                            
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-#
-#------------------------------------------------------------------------------
+//
+//  Copyright (c) 2011, ARM Limited. All rights reserved.
+//
+//  This program and the accompanying materials
+//  are licensed and made available under the terms and conditions of the BSD License
+//  which accompanies this distribution.  The full text of the license may be found at
+//  http://opensource.org/licenses/bsd-license.php
+//
+//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
+//
 
 #include <AsmMacroIoLib.h>
 #include <Base.h>
 #include <Library/PcdLib.h>
 #include <Library/ArmPlatformLib.h>
+#include <Drivers/PL354Smc.h>
 #include <AutoGen.h>
 
-#Start of Code section
 .text
 .align 3
 
 GCC_ASM_EXPORT(ArmPlatformIsMemoryInitialized)
 GCC_ASM_EXPORT(ArmPlatformInitializeBootMemory)
-.extern ASM_PFX(InitializeSMC)
+.extern ASM_PFX(SMCInitializeNOR)
+.extern ASM_PFX(SMCInitializeSRAM)
+.extern ASM_PFX(SMCInitializePeripherals)
+.extern ASM_PFX(SMCInitializeVRAM)
 
 /**
   Called at the early stage of the Boot phase to know if the memory has already been initialized
@@ -65,10 +61,32 @@ ASM_PFX(ArmPlatformIsMemoryInitialized):
 **/
 ASM_PFX(ArmPlatformInitializeBootMemory):
   mov   r5, lr
+
+  //
   // Initialize PL354 SMC
+  //
   LoadConstantToReg (ARM_VE_SMC_CTRL_BASE, r1)
+
+  // NOR Flash 0
+  LoadConstantToReg (PL354_SMC_DIRECT_CMD_ADDR_CS(0,0), r2)
+  blx   ASM_PFX(SMCInitializeNOR)
+
+  // NOR Flash 1
+  LoadConstantToReg (PL354_SMC_DIRECT_CMD_ADDR_CS(1,0), r2)
+  blx   ASM_PFX(SMCInitializeNOR)
+
+  // Setup SRAM
+  blx   ASM_PFX(SMCInitializeSRAM)
+
+  // Memory Mapped Peripherals
+  blx   ASM_PFX(SMCInitializePeripherals)
+
+  // Initialize VRAM
+  //TODO: Check if we really must inititialize Video SRAM in UEFI. Does Linux can do it ? Does the Video driver can do it ?
+  //      It will be faster (only initialize if required) and easier (remove assembly code because of a stack available) to move this initialization.
   LoadConstantToReg (VRAM_MOTHERBOARD_BASE, r2)
-  blx   ASM_PFX(InitializeSMC)
+  blx   ASM_PFX(SMCInitializeVRAM)
+
   bx	r5
 
 .end

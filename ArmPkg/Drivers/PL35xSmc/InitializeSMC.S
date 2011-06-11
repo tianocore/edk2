@@ -14,7 +14,7 @@
 #include <AsmMacroIoLib.h>
 #include <Library/PcdLib.h>
 #include <AutoGen.h>
-#include <AsmMacroIoLib.h>
+#include <Drivers/PL354Smc.h>
 
 #Start of the code section
 .text
@@ -22,13 +22,12 @@
 #Maintain 8 byte alignment
 .align 3
 
-#Export Initialize SMC symbol
-GCC_ASM_EXPORT(InitializeSMC)
 
-# Static memory configuation definitions for SMC
-.set        SmcDirectCmd,              0x10
-.set        SmcSetCycles,              0x14
-.set        SmcSetOpMode,              0x18
+GCC_ASM_EXPORT(SMCInitializeNOR)
+GCC_ASM_EXPORT(SMCInitializeSRAM)
+GCC_ASM_EXPORT(SMCInitializePeripherals)
+GCC_ASM_EXPORT(SMCInitializeVRAM)
+
 
 # CS0  CS0-Interf0     NOR1 flash on the motherboard
 # CS1  CS1-Interf0     Reserved for the motherboard
@@ -39,125 +38,134 @@ GCC_ASM_EXPORT(InitializeSMC)
 # CS6  CS2-Interf1     memory-mapped peripherals
 # CS7  CS3-Interf1     system memory-mapped peripherals on the motherboard.
 
-# IN r1 SmcBase
-# IN r2 VideoSRamBase
-# NOTE: This code is been called before any stack has been setup. It means some registers
-#       could be overwritten (case of 'r0')
-
-
-ASM_PFX(InitializeSMC):
+// IN r1 SmcBase
+// IN r2 ChipSelect
+// NOTE: This code is been called before any stack has been setup. It means some registers
+//       could be overwritten (case of 'r0')
+ASM_PFX(SMCInitializeNOR):
 #
 # Setup NOR1 (CS0-Interface0)
 #
 
-  #Write to set_cycle register(holding register for NOR 1 cycle register or NAND cycle register)
+  # Write to set_cycle register(holding register for NOR 1 cycle register or NAND cycle register)
      #Read cycle timeout = 0xA (0:3)
      #Write cycle timeout = 0x3(7:4)
      #OE Assertion Delay = 0x9(11:8)
      #WE Assertion delay = 0x3(15:12)
      #Page cycle timeout = 0x2(19:16)  
   LoadConstantToReg (0x0002393A,r0)       @ldr     r0, = 0x0002393A
-  str     r0, [r1, #SmcSetCycles]
+  str     r0, [r1, #PL354_SMC_SET_CYCLES_OFFSET]
   
-  #Write to set_opmode register(holding register for NOR 1 opomode register or NAND opmode register)
+  # Write to set_opmode register(holding register for NOR 1 opomode register or NAND opmode register)
      # 0x00000002 = MemoryWidth: 32bit
      # 0x00000028 = ReadMemoryBurstLength:continuous
      # 0x00000280 = WriteMemoryBurstLength:continuous
      # 0x00000800 = Set Address Valid
   LoadConstantToReg (0x00000AAA,r0)       @ldr     r0, = 0x00000AAA
-  str     r0, [r1, #SmcSetOpMode]    
+  str     r0, [r1, #PL354_SMC_SET_OPMODE_OFFSET]
 
- #Write to direct_cmd register so that the NOR 1 registers(set-cycles and opmode) are updated with holding registers
+ # Write to direct_cmd register so that the NOR 1 registers(set-cycles and opmode) are updated with holding registers
      # 0x00000000 = ChipSelect0-Interface 0
      # 0x00400000 = CmdTypes: UpdateRegs
   LoadConstantToReg (0x00400000,r0)       @ldr     r0, = 0x00400000
-  str     r0, [r1, #SmcDirectCmd]                              
+  str     r0, [r1, #PL354_SMC_DIRECT_CMD_OFFSET]
   
-  
+  bx lr
+
+ASM_PFX(SMCInitializeSRAM):
 #
 # Setup SRAM (CS2-Interface0)
 #
   LoadConstantToReg (0x00027158,r0)       @ldr     r0, = 0x00027158
-  str     r0, [r1, #SmcSetCycles]
+  str     r0, [r1, #PL354_SMC_SET_CYCLES_OFFSET]
 
   # 0x00000002 = MemoryWidth: 32bit
   # 0x00000800 = Set Address Valid
   LoadConstantToReg (0x00000802,r0)       @ldr     r0, = 0x00000802
-  str     r0, [r1, #SmcSetOpMode]
+  str     r0, [r1, #PL354_SMC_SET_OPMODE_OFFSET]
   
   # 0x01000000 = ChipSelect2-Interface 0
   # 0x00400000 = CmdTypes: UpdateRegs
   LoadConstantToReg (0x01400000,r0)       @ldr     r0, = 0x01400000
-  str     r0, [r1, #SmcDirectCmd]
+  str     r0, [r1, #PL354_SMC_DIRECT_CMD_OFFSET]
 
+  bx    lr
+
+ASM_PFX(SMCInitializePeripherals):
 #
 # USB/Eth/VRAM (CS3-Interface0)
 #
   LoadConstantToReg (0x000CD2AA,r0)      @ldr     r0, = 0x000CD2AA
-  str     r0, [r1, #SmcSetCycles]
+  str     r0, [r1, #PL354_SMC_SET_CYCLES_OFFSET]
  
   # 0x00000002 = MemoryWidth: 32bit
   # 0x00000004 = Memory reads are synchronous
   # 0x00000040 = Memory writes are synchronous
   LoadConstantToReg (0x00000046,r0)      @ldr     r0, = 0x00000046
-  str     r0, [r1, #SmcSetOpMode]  
+  str     r0, [r1, #PL354_SMC_SET_OPMODE_OFFSET]
         
   # 0x01800000 = ChipSelect3-Interface 0
   # 0x00400000 = CmdTypes: UpdateRegs
   LoadConstantToReg (0x01C00000,r0)      @ldr     r0, = 0x01C00000
-  str     r0, [r1, #SmcDirectCmd]  
+  str     r0, [r1, #PL354_SMC_DIRECT_CMD_OFFSET]
 
 #
 # Setup NOR3 (CS0-Interface1)
 #
   LoadConstantToReg (0x0002393A,r0)      @ldr     r0, = 0x0002393A
-  str     r0, [r1, #SmcSetCycles]
+  str     r0, [r1, #PL354_SMC_SET_CYCLES_OFFSET]
  
   # 0x00000002 = MemoryWidth: 32bit
   # 0x00000028 = ReadMemoryBurstLength:continuous
   # 0x00000280 = WriteMemoryBurstLength:continuous
   # 0x00000800 = Set Address Valid
   LoadConstantToReg (0x00000AAA,r0)      @ldr     r0, = 0x00000AAA
-  str     r0, [r1, #SmcSetOpMode]  
+  str     r0, [r1, #PL354_SMC_SET_OPMODE_OFFSET]
         
   # 0x02000000 = ChipSelect0-Interface 1
   # 0x00400000 = CmdTypes: UpdateRegs
   LoadConstantToReg (0x02400000,r0)      @ldr     r0, = 0x02400000
-  str     r0, [r1, #SmcDirectCmd]  
+  str     r0, [r1, #PL354_SMC_DIRECT_CMD_OFFSET]
  
 #
 # Setup Peripherals (CS3-Interface1)
 #
   LoadConstantToReg (0x00025156,r0)      @ldr     r0, = 0x00025156
-  str     r0, [r1, #SmcSetCycles]
+  str     r0, [r1, #PL354_SMC_SET_CYCLES_OFFSET]
  
   # 0x00000002 = MemoryWidth: 32bit
   # 0x00000004 = Memory reads are synchronous
   # 0x00000040 = Memory writes are synchronous
   LoadConstantToReg (0x00000046,r0)      @ldr     r0, = 0x00000046
-  str     r0, [r1, #SmcSetOpMode]  
+  str     r0, [r1, #PL354_SMC_SET_OPMODE_OFFSET]
         
   # 0x03800000 = ChipSelect3-Interface 1
   # 0x00400000 = CmdTypes: UpdateRegs
   LoadConstantToReg (0x03C00000,r0)      @ldr     r0, = 0x03C00000
-  str     r0, [r1, #SmcDirectCmd] 
+  str     r0, [r1, #PL354_SMC_DIRECT_CMD_OFFSET]
+  bx    lr
 
+// IN r1 SmcBase
+// IN r2 VideoSRamBase
+// NOTE: This code is been called before any stack has been setup. It means some registers
+//       could be overwritten (case of 'r0')
+ASM_PFX(SMCInitializeVRAM):
 #
 # Setup VRAM (CS1-Interface0)
 #
   LoadConstantToReg (0x00049249,r0)      @ldr     r0, =  0x00049249
-  str     r0, [r1, #SmcSetCycles]
+  str     r0, [r1, #PL354_SMC_SET_CYCLES_OFFSET]
  
   # 0x00000002 = MemoryWidth: 32bit
   # 0x00000004 = Memory reads are synchronous
   # 0x00000040 = Memory writes are synchronous
   LoadConstantToReg (0x00000046,r0)      @ldr     r0, = 0x00000046
-  str     r0, [r1, #SmcSetOpMode]  
+  str     r0, [r1, #PL354_SMC_SET_OPMODE_OFFSET]
         
   # 0x00800000 = ChipSelect1-Interface 0
   # 0x00400000 = CmdTypes: UpdateRegs
   LoadConstantToReg (0x00C00000,r0)      @ldr     r0, = 0x00C00000
-  str     r0, [r1, #SmcDirectCmd]  
+  str     r0, [r1, #PL354_SMC_DIRECT_CMD_OFFSET]
   
 #
 # Page mode setup for VRAM
