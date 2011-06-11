@@ -35,8 +35,8 @@ ASM_PFX(_ModuleEntryPoint):
 
 _SetupStack:
   # Setup Stack for the 4 CPU cores
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresNonSecStackBase) ,r1)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresNonSecStackSize) ,r2)
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresNonSecStackBase), r1)
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresNonSecStackSize), r2)
   
   mov     r3,r0         @ r3 = core_id
   mul     r3,r3,r2      @ r3 = core_id * stack_size = offset from the stack base
@@ -55,7 +55,7 @@ _AllocateGlobalPeiVariables:
 
 _PrepareArguments:
   # The PEI Core Entry Point has been computed by GenFV and stored in the second entry of the Reset Vector
-  LoadConstantToReg (FixedPcdGet32(PcdNormalFdBaseAddress), r2)
+  LoadConstantToReg (FixedPcdGet32(PcdNormalFvBaseAddress), r2)
   add   r2, r2, #4
   ldr   r1, [r2]
 

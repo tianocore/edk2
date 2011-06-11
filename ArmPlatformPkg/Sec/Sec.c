@@ -121,18 +121,18 @@ CEntryPoint (
     // If we are in standalone, we need the initialization to copy the UEFI firmware into DRAM
     if (FeaturePcdGet(PcdSkipPeiCore) || !FeaturePcdGet(PcdStandalone)) {
       // Initialize system memory (DRAM)
-      ArmPlatformInitializeSystemMemory();
+      ArmPlatformInitializeSystemMemory ();
     }
 
     // Some platform can change their physical memory mapping
-    ArmPlatformBootRemapping();
+    ArmPlatformBootRemapping ();
   }
 
   // Test if Trustzone is supported on this platform
   if (ArmPlatformTrustzoneSupported()) {
     if (FixedPcdGet32(PcdMPCoreSupport)) {
       // Setup SMP in Non Secure world
-      ArmSetupSmpNonSecure(CoreId);
+      ArmSetupSmpNonSecure (CoreId);
     }
 
     // Enter Monitor Mode
@@ -206,7 +206,7 @@ CEntryPoint (
   // If ArmVe has not been built as Standalone then we need to patch the DRAM to add an infinite loop at the start address
   if (FeaturePcdGet(PcdStandalone) == FALSE) {
     if (CoreId == ARM_PRIMARY_CORE) {
-      UINTN*   StartAddress = (UINTN*)PcdGet32(PcdNormalFdBaseAddress);
+      UINTN*   StartAddress = (UINTN*)PcdGet32(PcdNormalFvBaseAddress);
 
       // Patch the DRAM to make an infinite loop at the start address
       *StartAddress = 0xEAFFFFFE; // opcode for while(1)
@@ -215,7 +215,7 @@ CEntryPoint (
       SerialPortWrite ((UINT8 *) Buffer, CharCount);
 
       // To enter into Non Secure state, we need to make a return from exception
-      return_from_exception(PcdGet32(PcdNormalFdBaseAddress));
+      return_from_exception(PcdGet32(PcdNormalFvBaseAddress));
     } else {
       // When the primary core is stopped by the hardware debugger to copy the firmware
       // into DRAM. The secondary cores are still running. As soon as the first bytes of
@@ -229,7 +229,7 @@ CEntryPoint (
     }
   } else {
     // To enter into Non Secure state, we need to make a return from exception
-    return_from_exception(PcdGet32(PcdNormalFdBaseAddress));
+    return_from_exception(PcdGet32(PcdNormalFvBaseAddress));
   }
   //-------------------- Non Secure Mode ---------------------
 
@@ -247,7 +247,7 @@ NonSecureWaitForFirmware (
   VOID (*secondary_start)(VOID);
 
   // The secondary cores will execute the firmware once wake from WFI.
-  secondary_start = (VOID (*)())PcdGet32(PcdNormalFdBaseAddress);
+  secondary_start = (VOID (*)())PcdGet32(PcdNormalFvBaseAddress);
 
   ArmCallWFI();
 

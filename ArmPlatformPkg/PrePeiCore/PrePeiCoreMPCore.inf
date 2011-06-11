@@ -53,8 +53,8 @@
   gArmPlatformTokenSpaceGuid.PcdStandalone
   
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdNormalFdBaseAddress
-  gArmTokenSpaceGuid.PcdNormalFdSize
+  gArmTokenSpaceGuid.PcdNormalFvBaseAddress
+  gArmTokenSpaceGuid.PcdNormalFvSize
 
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize

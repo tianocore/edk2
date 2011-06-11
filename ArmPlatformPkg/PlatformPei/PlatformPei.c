@@ -78,7 +78,7 @@ Returns:
 
   BuildCpuHob (PcdGet8 (PcdPrePiCpuMemorySize), PcdGet8 (PcdPrePiCpuIoSize));
   
-  BuildFvHob (FixedPcdGet32(PcdFlashFvMainBase), FixedPcdGet32(PcdFlashFvMainSize));
+  BuildFvHob (PcdGet32(PcdNormalFvBaseAddress), PcdGet32(PcdNormalFvSize));
   
   BootMode  = ArmPlatformGetBootMode ();
   Status    = (**PeiServices).SetBootMode (PeiServices, (UINT8) BootMode);

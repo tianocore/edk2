@@ -27,8 +27,8 @@
 
 
 [FD.ArmRealViewEb_EFI]
-BaseAddress   = 0x40000000  # The base address of the FLASH Device.
-Size          = 0x00200000  # The size in bytes of the FLASH Device
+BaseAddress   = 0x40000000|gArmTokenSpaceGuid.PcdNormalFdBaseAddress
+Size          = 0x00200000|gArmTokenSpaceGuid.PcdNormalFdSize
 ErasePolarity = 1
 BlockSize     = 0x00010000
 NumBlocks     = 0x20
@@ -50,11 +50,11 @@ NumBlocks     = 0x20
 ################################################################################
 
 0x00000000|0x00050000
-gEmbeddedTokenSpaceGuid.PcdFlashFvSecBase|gEmbeddedTokenSpaceGuid.PcdFlashFvSecSize
+gArmTokenSpaceGuid.PcdSecureFvBaseAddress|gArmTokenSpaceGuid.PcdSecureFvBaseSize
 FV = FVMAIN_SEC
 
 0x00050000|0x00100000
-gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize
+gArmTokenSpaceGuid.PcdNormalFvBaseAddress|gArmTokenSpaceGuid.PcdNormalFvSize
 FV = FVMAIN_COMPACT
 
 ################################################################################

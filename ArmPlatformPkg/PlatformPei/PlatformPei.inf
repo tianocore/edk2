@@ -47,10 +47,12 @@
   gEfiPeiBootInRecoveryModePpiGuid              # PPI SOMETIMES_PRODUCED
 
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdNormalFdBaseAddress  # The base address of the FLASH Device.
-  gArmTokenSpaceGuid.PcdNormalFdSize         # The size in bytes of the FLASH Device
-  gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase
-  gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize
+  gArmTokenSpaceGuid.PcdNormalFdBaseAddress
+  gArmTokenSpaceGuid.PcdNormalFdSize
+  
+  gArmTokenSpaceGuid.PcdNormalFvBaseAddress
+  gArmTokenSpaceGuid.PcdNormalFvSize
+  
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
   

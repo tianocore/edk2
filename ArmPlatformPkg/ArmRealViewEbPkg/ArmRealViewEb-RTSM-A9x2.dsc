@@ -344,10 +344,6 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase|0x48000000	# Top of SEC Stack for Normal World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize|0x20000	# Stack for each of the 4 CPU cores
 
-  # Non Sec UEFI Firmware: These two PCDs must match PcdFlashFvMainBase/PcdFlashFvMainSize
-  gArmTokenSpaceGuid.PcdNormalFdBaseAddress|0x40050000       # Must be equal to gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase
-  gArmTokenSpaceGuid.PcdNormalFdSize|0x00100000              # Must be equal to gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize
-  
   # System Memory (256MB) 
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x70000000
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x10000000

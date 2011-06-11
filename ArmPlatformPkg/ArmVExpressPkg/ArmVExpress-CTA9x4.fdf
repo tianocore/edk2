@@ -27,10 +27,10 @@
 
 [FD.Sec_ArmVExpress_EFI]
 BaseAddress   = 0x44000000|gArmTokenSpaceGuid.PcdSecureFdBaseAddress  #The base address of the Secure FLASH Device.
-Size          = 0x00200000|gArmTokenSpaceGuid.PcdSecureFdSize         #The size in bytes of the Secure FLASH Device
+Size          = 0x00080000|gArmTokenSpaceGuid.PcdSecureFdSize         #The size in bytes of the Secure FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x00001000
-NumBlocks     = 0x200
+NumBlocks     = 0x80
 
 ################################################################################
 #
@@ -48,8 +48,8 @@ NumBlocks     = 0x200
 #
 ################################################################################
 
-0x00000000|0x00200000
-gEmbeddedTokenSpaceGuid.PcdFlashFvSecBase|gEmbeddedTokenSpaceGuid.PcdFlashFvSecSize
+0x00000000|0x00080000
+gArmTokenSpaceGuid.PcdSecureFvBaseAddress|gArmTokenSpaceGuid.PcdSecureFvBaseSize
 FV = FVMAIN_SEC
 
 
@@ -83,7 +83,7 @@ NumBlocks     = 0x200
 ################################################################################
 
 0x00000000|0x00200000
-gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize
+gArmTokenSpaceGuid.PcdNormalFvBaseAddress|gArmTokenSpaceGuid.PcdNormalFvBaseSize
 FV = FVMAIN_COMPACT
 
 
@@ -147,11 +147,10 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-  INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-  INF EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
+  INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   INF EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf

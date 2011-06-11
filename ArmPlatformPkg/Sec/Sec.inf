@@ -52,7 +52,7 @@
   gArmTokenSpaceGuid.PcdVFPEnabled
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport
   
-  gArmTokenSpaceGuid.PcdNormalFdBaseAddress
+  gArmTokenSpaceGuid.PcdNormalFvBaseAddress
   
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecStackSize
