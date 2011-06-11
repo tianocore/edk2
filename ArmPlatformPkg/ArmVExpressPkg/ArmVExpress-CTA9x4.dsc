@@ -285,7 +285,7 @@
 !endif
 
 [PcdsFixedAtBuild.common]
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmVExpress %a"
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmVExpress"
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000

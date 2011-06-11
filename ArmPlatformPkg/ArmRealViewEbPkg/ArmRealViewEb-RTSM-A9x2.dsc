@@ -264,7 +264,7 @@
 !endif
 
 [PcdsFixedAtBuild.common]
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmRealViewEb %a"
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmRealViewEb-A9x2"
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000

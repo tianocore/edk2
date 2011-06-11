@@ -508,7 +508,7 @@ EblPrompt (
   )
 {
   EblSetTextColor (EFI_YELLOW);
-  AsciiPrint ((CHAR8 *)PcdGetPtr (PcdEmbeddedPrompt), EfiGetCwd ());
+  AsciiPrint ("%a %a",(CHAR8 *)PcdGetPtr (PcdEmbeddedPrompt), EfiGetCwd ());
   EblSetTextColor (0);
   AsciiPrint ("%a", ">");
 }
