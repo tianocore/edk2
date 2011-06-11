@@ -178,10 +178,15 @@ ArmPlatformBootRemapping (
   VOID
   )
 {
-    UINT32 val32  = MmioRead32(ARM_VE_SYS_CFGRW1_REG); //Scc - CFGRW1
-    // we remap the DRAM to 0x0
-    MmioWrite32(ARM_VE_SYS_CFGRW1_REG, (val32 & 0x0FFFFFFF) | ARM_VE_CFGRW1_REMAP_DRAM);
-}
+  UINT32 Value;
+
+  if (FeaturePcdGet(PcdNorFlashRemapping)) {
+    SerialPrint ("Secure ROM at 0x0\n\r");
+  } else {
+    Value = MmioRead32(ARM_VE_SYS_CFGRW1_REG); //Scc - CFGRW1
+    // Remap the DRAM to 0x0
+    MmioWrite32(ARM_VE_SYS_CFGRW1_REG, (Value & 0x0FFFFFFF) | ARM_VE_CFGRW1_REMAP_DRAM);
+  }
 
 /**
   Initialize controllers that must setup at the early stage

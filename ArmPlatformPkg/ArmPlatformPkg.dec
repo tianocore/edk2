@@ -40,23 +40,25 @@
 
 [PcdsFeatureFlag.common]
   gArmPlatformTokenSpaceGuid.PcdStandalone|FALSE|BOOLEAN|0x00000001
+  # Set this PCD to TRUE to map NORFlash at 0x0. FALSE means the DRAM is mapped at 0x0.
+  gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping|FALSE|BOOLEAN|0x00000012
 
 [PcdsFixedAtBuild.common]
-  # This PCD should be a FeaturePcd. But we used this PCD as an '#if' in an ASM file.
+  # These PCDs should be FeaturePcds. But we used these PCDs as an '#if' in an ASM file.
   # Using a FeaturePcd make a '(BOOLEAN) casting for its value which is not understood by the preprocessor.
-  gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|0|UINT32|0x00000002
+  gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|0|UINT32|0x00000003
   
   # Stack for CPU Cores in Secure Mode
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0|UINT32|0x00000004
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecStackSize|0|UINT32|0x00000005
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0|UINT32|0x00000005
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecStackSize|0|UINT32|0x00000006
 
   # Stack for CPU Cores in Secure Monitor Mode
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT32|0x00000006
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0|UINT32|0x00000007
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT32|0x00000007
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0|UINT32|0x00000008
 
   # Stack for CPU Cores in Non Secure Mode
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase|0|UINT32|0x00000008
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize|0|UINT32|0x00000009
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase|0|UINT32|0x00000009
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize|0|UINT32|0x0000000A
     
   # Size of the region used by UEFI in permanent memory (Reserved 128MB by default)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x08000000|UINT32|0x00000015

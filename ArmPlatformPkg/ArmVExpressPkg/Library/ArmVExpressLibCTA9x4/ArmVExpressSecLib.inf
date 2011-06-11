@@ -45,6 +45,7 @@
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
   gArmPlatformTokenSpaceGuid.PcdStandalone
+  gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdNormalFdBaseAddress
