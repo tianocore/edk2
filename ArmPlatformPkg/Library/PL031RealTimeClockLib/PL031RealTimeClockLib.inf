@@ -29,7 +29,10 @@
 [Packages]
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
   IoLib
+  UefiLib
   DebugLib
+  ArmPlatformSysConfigLib

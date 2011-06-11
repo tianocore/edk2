@@ -92,6 +92,9 @@
 #define SP804_TIMER2_BASE                     (ARM_EB_BOARD_PERIPH_BASE + 0x12000)
 #define SP804_TIMER3_BASE                     (ARM_EB_BOARD_PERIPH_BASE + 0x12020)
 
+// PL301 RTC
+#define PL031_RTC_BASE                        (ARM_EB_BOARD_PERIPH_BASE + 0x17000)
+
 // Dynamic Memory Controller Base
 #define ARM_EB_DMC_BASE                     0x10018000
 
@@ -117,6 +120,10 @@
 
 // L2x0 Cache Controller Base Address
 //#define ARM_EB_L2x0_CTLR_BASE                   0x1E00A000*/
+
+
+// PL031 RTC - Other settings
+#define PL031_PPM_ACCURACY                      300000000
 
 
 /*******************************************

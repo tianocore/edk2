@@ -126,6 +126,9 @@
 #define ARM_VE_DECPROT_BIT_NMC_TZASC_LOCK       (1 << 4)
 #define ARM_VE_DECPROT_BIT_SMC_TZASC_LOCK       (1 << 5)
 
+// PL031 RTC - Other settings
+#define PL031_PPM_ACCURACY                      300000000
+
 
 // PL111 Lcd
 #define PL111_CLCD_CORE_TILE_VIDEO_MODE_OSC_ID  1
