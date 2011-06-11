@@ -126,7 +126,7 @@ EnableInterruptSource (
   RegShift = Source % 32;
 
   // write set-enable register
-  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDISER+(4*RegOffset), 1 << RegShift);
+  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDISER + (4*RegOffset), 1 << RegShift);
   
   return EFI_SUCCESS;
 }
@@ -156,12 +156,12 @@ DisableInterruptSource (
     return EFI_UNSUPPORTED;
   }
   
-  // calculate enable register offset and bit position
+  // Calculate enable register offset and bit position
   RegOffset = Source / 32;
   RegShift = Source % 32;
 
-  // write set-enable register
-  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDICER+(4*RegOffset), 1 << RegShift);
+  // Write set-enable register
+  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDICER + (4*RegOffset), 1 << RegShift);
   
   return EFI_SUCCESS;
 }
@@ -197,7 +197,7 @@ GetInterruptSourceState (
   RegOffset = Source / 32;
   RegShift = Source % 32;
     
-  if ((MmioRead32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDISER+(4*RegOffset)) & (1<<RegShift)) == 0) {
+  if ((MmioRead32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDISER + (4*RegOffset)) & (1<<RegShift)) == 0) {
     *InterruptState = FALSE;
   } else {
     *InterruptState = TRUE;
@@ -389,27 +389,27 @@ InterruptDxeInitialize (
     RegOffset = i / 4;
     RegShift = (i % 4) * 8;
     MmioAndThenOr32 (
-      PcdGet32(PcdGicDistributorBase) + GIC_ICDIPR+(4*RegOffset), 
+      PcdGet32(PcdGicDistributorBase) + GIC_ICDIPR + (4*RegOffset),
       ~(0xff << RegShift), 
       GIC_DEFAULT_PRIORITY << RegShift
       );
   }
 
-  // configure interrupts for cpu 0
+  // Configure interrupts for cpu 0
   for (i = 0; i < GIC_NUM_REG_PER_INT_BYTES; i++) {
     MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDIPTR + (i*4), 0x01010101);
   }
 
-  // set binary point reg to 0x7 (no preemption)
+  // Set binary point reg to 0x7 (no preemption)
   MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + GIC_ICCBPR, 0x7);
 
-  // set priority mask reg to 0xff to allow all priorities through
+  // Set priority mask reg to 0xff to allow all priorities through
   MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + GIC_ICCPMR, 0xff);
   
-  // enable gic cpu interface
+  // Enable gic cpu interface
   MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + GIC_ICCICR, 0x1);
 
-  // enable gic distributor
+  // Enable gic distributor
   MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDDCR, 0x1);
   
   ZeroMem (&gRegisteredInterruptHandlers, sizeof (gRegisteredInterruptHandlers));

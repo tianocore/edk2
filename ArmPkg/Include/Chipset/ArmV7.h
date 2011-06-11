@@ -339,7 +339,7 @@ ArmGetScuBaseAddress (
 
 UINT32
 EFIAPI
-ArmIsScuEnable(
+ArmIsScuEnable (
   VOID
   );
 
@@ -370,35 +370,35 @@ ArmSetupSmpNonSecure (
 
 UINTN 
 EFIAPI
-ArmReadCbar(
-VOID
-);
+ArmReadCbar (
+  VOID
+  );
 
 VOID
 EFIAPI
-ArmInvalidateInstructionAndDataTlb(
-VOID
-);
+ArmInvalidateInstructionAndDataTlb (
+  VOID
+  );
 
 
 UINTN
 EFIAPI
-ArmReadMpidr(
-VOID
-);
+ArmReadMpidr (
+  VOID
+  );
 
 
 UINTN
 EFIAPI
-ArmReadTpidrurw(
-VOID
-);
+ArmReadTpidrurw (
+  VOID
+  );
 
 
 VOID
 EFIAPI
-ArmWriteTpidrurw(
-UINTN Value
-);
+ArmWriteTpidrurw (
+  UINTN Value
+  );
 
 #endif // __ARM_V7_H__
