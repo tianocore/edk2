@@ -1,0 +1,398 @@
+/** @file
+*
+*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  
+*  This program and the accompanying materials                          
+*  are licensed and made available under the terms and conditions of the BSD License         
+*  which accompanies this distribution.  The full text of the license may be found at        
+*  http://opensource.org/licenses/bsd-license.php                                            
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*
+**/
+
+#include "BdsInternal.h"
+
+#include <Library/PcdLib.h>
+#include <Library/PerformanceLib.h>
+
+#include <Protocol/Bds.h>
+
+#define EFI_SET_TIMER_TO_SECOND   10000000
+
+EFI_HANDLE mImageHandle;
+
+STATIC
+EFI_STATUS
+GetConsoleDevicePathFromVariable (
+  IN  CHAR16*             ConsoleVarName,
+  IN  CHAR16*             DefaultConsolePaths,
+  OUT EFI_DEVICE_PATH**   DevicePaths
+  )
+{
+  EFI_STATUS                Status;
+  UINTN                     Size;
+  EFI_DEVICE_PATH_PROTOCOL* DevicePathInstances;
+  EFI_DEVICE_PATH_PROTOCOL* DevicePathInstance;
+  CHAR16*                   DevicePathStr;
+  CHAR16*                   NextDevicePathStr;
+  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL  *EfiDevicePathFromTextProtocol;
+
+  Status = GetEnvironmentVariable (ConsoleVarName, NULL, NULL, (VOID**)&DevicePathInstances);
+  if (EFI_ERROR(Status)) {
+    Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);
+    ASSERT_EFI_ERROR(Status);
+
+    DevicePathInstances = NULL;
+
+    // Extract the Device Path instances from the multi-device path string
+    while ((DefaultConsolePaths != NULL) && (DefaultConsolePaths[0] != L'\0')) {
+      NextDevicePathStr = StrStr (DefaultConsolePaths, L";");
+      if (NextDevicePathStr == NULL) {
+        DevicePathStr = DefaultConsolePaths;
+        DefaultConsolePaths = NULL;
+      } else {
+        DevicePathStr = (CHAR16*)AllocateCopyPool ((NextDevicePathStr - DefaultConsolePaths + 1) * sizeof(CHAR16), DefaultConsolePaths);
+        *(DevicePathStr + (NextDevicePathStr - DefaultConsolePaths)) = L'\0';
+        DefaultConsolePaths = NextDevicePathStr;
+        if (DefaultConsolePaths[0] == L';') {
+          DefaultConsolePaths++;
+        }
+      }
+
+      DevicePathInstance = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath (DevicePathStr);
+      ASSERT(DevicePathInstance != NULL);
+      DevicePathInstances = AppendDevicePathInstance (DevicePathInstances, DevicePathInstance);
+
+      if (NextDevicePathStr != NULL) {
+        FreePool (DevicePathStr);
+      }
+      FreePool (DevicePathInstance);
+    }
+
+    // Set the environment variable with this device path multi-instances
+    Size = GetDevicePathSize (DevicePathInstances);
+    if (Size > 0) {
+      Status = gRT->SetVariable (
+          ConsoleVarName,
+          &gEfiGlobalVariableGuid,
+          EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+          Size,
+          DevicePathInstances
+          );
+    } else {
+      Status = EFI_INVALID_PARAMETER;
+    }
+  }
+
+  if (!EFI_ERROR(Status)) {
+    *DevicePaths = DevicePathInstances;
+  }
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+InitializeConsolePipe (
+  IN EFI_DEVICE_PATH    *ConsoleDevicePaths,
+  IN EFI_GUID           *Protocol,
+  OUT EFI_HANDLE        *Handle,
+  OUT VOID*             *Interface
+  )
+{
+  EFI_STATUS                Status;
+  UINTN                     Size;
+  UINTN                     NoHandles;
+  EFI_HANDLE                *Buffer;
+  EFI_DEVICE_PATH_PROTOCOL* DevicePath;
+
+  // Connect all the Device Path Consoles
+  do {
+    DevicePath = GetNextDevicePathInstance (&ConsoleDevicePaths, &Size);
+
+    Status = BdsConnectDevicePath (DevicePath, Handle, NULL);
+    DEBUG_CODE_BEGIN();
+      if (EFI_ERROR(Status)) {
+        // We convert back to the text representation of the device Path
+        EFI_DEVICE_PATH_TO_TEXT_PROTOCOL* DevicePathToTextProtocol;
+        CHAR16* DevicePathTxt;
+
+        ASSERT_EFI_ERROR(gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol));
+        DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText (DevicePath, TRUE, TRUE);
+
+        DEBUG((EFI_D_ERROR,"Fail to start the console with the Device Path '%s'. (Error '%r')\n", DevicePathTxt, Status));
+
+        FreePool (DevicePathTxt);
+      }
+    DEBUG_CODE_END();
+
+    // If the console splitter driver is not supported by the platform then use the first Device Path
+    // instance for the console interface.
+    if (!EFI_ERROR(Status) && (*Interface == NULL)) {
+      Status = gBS->HandleProtocol (*Handle, Protocol, Interface);
+    }
+  } while (ConsoleDevicePaths != NULL);
+
+  // No Device Path has been defined for this console interface. We take the first protocol implementation
+  if (*Interface == NULL) {
+    Status = gBS->LocateHandleBuffer (ByProtocol, Protocol, NULL, &NoHandles, &Buffer);
+    if (EFI_ERROR (Status)) {
+      BdsConnectAllDrivers();
+      Status = gBS->LocateHandleBuffer (ByProtocol, Protocol, NULL, &NoHandles, &Buffer);
+    }
+
+    if (!EFI_ERROR(Status)) {
+      *Handle = Buffer[0];
+      Status = gBS->HandleProtocol (*Handle, Protocol, Interface);
+      ASSERT_EFI_ERROR(Status);
+    }
+    FreePool (Buffer);
+  } else {
+    Status = EFI_SUCCESS;
+  }
+
+  return Status;
+}
+
+EFI_STATUS
+InitializeConsole (
+  VOID
+  )
+{
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH*          ConOutDevicePaths;
+  EFI_DEVICE_PATH*          ConInDevicePaths;
+  EFI_DEVICE_PATH*          ConErrDevicePaths;
+
+  // By getting the Console Device Paths from the environment variables before initializing the console pipe, we
+  // create the 3 environment variables (ConIn, ConOut, ConErr) that allows to initialize all the console interface
+  // of newly installed console drivers
+  Status = GetConsoleDevicePathFromVariable (L"ConOut", (CHAR16*)PcdGetPtr(PcdDefaultConOutPaths),&ConOutDevicePaths);
+  ASSERT_EFI_ERROR (Status);
+  Status = GetConsoleDevicePathFromVariable (L"ConIn", (CHAR16*)PcdGetPtr(PcdDefaultConInPaths),&ConInDevicePaths);
+  ASSERT_EFI_ERROR (Status);
+  Status = GetConsoleDevicePathFromVariable (L"ConErr", (CHAR16*)PcdGetPtr(PcdDefaultConOutPaths),&ConErrDevicePaths);
+  ASSERT_EFI_ERROR (Status);
+
+  // Initialize the Consoles
+  Status = InitializeConsolePipe (ConOutDevicePaths, &gEfiSimpleTextOutProtocolGuid, &gST->ConsoleOutHandle, (VOID **)&gST->ConOut);
+  ASSERT_EFI_ERROR (Status);
+  Status = InitializeConsolePipe (ConInDevicePaths, &gEfiSimpleTextInProtocolGuid, &gST->ConsoleInHandle, (VOID **)&gST->ConIn);
+  ASSERT_EFI_ERROR (Status);
+  Status = InitializeConsolePipe (ConErrDevicePaths, &gEfiSimpleTextOutProtocolGuid, &gST->StandardErrorHandle, (VOID **)&gST->StdErr);
+  if (EFI_ERROR(Status)) {
+    // In case of error, we reuse the console output for the error output
+    gST->StandardErrorHandle = gST->ConsoleOutHandle;
+    gST->StdErr = gST->ConOut;
+  }
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+DefineDefaultBootEntries (
+  VOID
+  )
+{
+  BDS_LOAD_OPTION     *BdsLoadOption;
+  UINTN               Size;
+  EFI_STATUS          Status;
+  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL  *EfiDevicePathFromTextProtocol;
+  EFI_DEVICE_PATH*    BootDevicePath;
+
+  //
+  // If Boot Order does not exist then create a default entry
+  //
+  Size = 0;
+  Status = gRT->GetVariable (L"BootOrder", &gEfiGlobalVariableGuid, NULL, &Size, NULL);
+  if (Status == EFI_NOT_FOUND) {
+    Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);
+    ASSERT_EFI_ERROR(Status);
+    BootDevicePath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath ((CHAR16*)PcdGetPtr(PcdDefaultBootDevicePath));
+
+    DEBUG_CODE_BEGIN();
+      // We convert back to the text representation of the device Path to see if the initial text is correct
+      EFI_DEVICE_PATH_TO_TEXT_PROTOCOL* DevicePathToTextProtocol;
+      CHAR16* DevicePathTxt;
+
+      Status = gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
+      ASSERT_EFI_ERROR(Status);
+      DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText (BootDevicePath, TRUE, TRUE);
+
+      ASSERT (StrCmp ((CHAR16*)PcdGetPtr(PcdDefaultBootDevicePath), DevicePathTxt) == 0);
+
+      FreePool (DevicePathTxt);
+    DEBUG_CODE_END();
+
+    // Create the entry is the Default values are correct
+    if (BootDevicePath != NULL) {
+      BootOptionCreate (LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_BOOT,
+        (CHAR16*)PcdGetPtr(PcdDefaultBootDescription),
+        BootDevicePath,
+        (BDS_LOADER_TYPE)PcdGet32 (PcdDefaultBootType),
+        (CHAR8*)PcdGetPtr(PcdDefaultBootArgument),
+        &BdsLoadOption
+        );
+      FreePool (BdsLoadOption);
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+StartDefaultBootOnTimeout (
+  VOID
+  )
+{
+  UINTN               Size;
+  UINT16              Timeout;
+  UINT16              *TimeoutPtr;
+  EFI_EVENT           WaitList[2];
+  UINTN               WaitIndex;
+  UINT16              *BootOrder;
+  UINTN               BootOrderSize;
+  UINTN               Index;
+  CHAR16              BootVariableName[9];
+  EFI_STATUS           Status;
+
+  Size = sizeof(UINT16);
+  Timeout = (UINT16)PcdGet16 (PcdPlatformBootTimeOut);
+  TimeoutPtr = &Timeout;
+  GetEnvironmentVariable (L"Timeout", &Timeout, &Size, (VOID**)&TimeoutPtr);
+
+  if (Timeout != 0xFFFF) {
+    if (Timeout > 0) {
+      // Create the waiting events (keystroke and 1sec timer)
+      gBS->CreateEvent (EVT_TIMER, 0, NULL, NULL, &WaitList[0]);
+      gBS->SetTimer (WaitList[0], TimerPeriodic, EFI_SET_TIMER_TO_SECOND);
+      WaitList[1] = gST->ConIn->WaitForKey;
+
+      // Start the timer
+      WaitIndex = 0;
+      Print(L"The default boot selection will start in ");
+      while ((Timeout > 0) && (WaitIndex == 0)) {
+        Print(L"%3d seconds",Timeout);
+        gBS->WaitForEvent (2, WaitList, &WaitIndex);
+        if (WaitIndex == 0) {
+          Print(L"\b\b\b\b\b\b\b\b\b\b\b");
+          Timeout--;
+        }
+      }
+      gBS->CloseEvent (WaitList[0]);
+      Print(L"\n\r");
+    }
+
+    // In case of Timeout we start the default boot selection
+    if (Timeout == 0) {
+      // Get the Boot Option Order from the environment variable (a default value should have been created)
+      GetEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
+
+      for (Index = 0; Index < BootOrderSize / sizeof (UINT16); Index++) {
+        UnicodeSPrint (BootVariableName, 9 * sizeof(CHAR16), L"Boot%04X", BootOrder[Index]);
+        Status = BdsStartBootOption (BootVariableName);
+        if(!EFI_ERROR(Status)){
+        	// Boot option returned successfully, hence don't need to start next boot option
+        	break;
+        }
+        // In case of success, we should not return from this call.
+      }
+    }
+  }
+  return EFI_SUCCESS;
+}
+
+/**
+  This function uses policy data from the platform to determine what operating 
+  system or system utility should be loaded and invoked.  This function call 
+  also optionally make the use of user input to determine the operating system 
+  or system utility to be loaded and invoked.  When the DXE Core has dispatched 
+  all the drivers on the dispatch queue, this function is called.  This 
+  function will attempt to connect the boot devices required to load and invoke 
+  the selected operating system or system utility.  During this process, 
+  additional firmware volumes may be discovered that may contain addition DXE 
+  drivers that can be dispatched by the DXE Core.   If a boot device cannot be 
+  fully connected, this function calls the DXE Service Dispatch() to allow the 
+  DXE drivers from any newly discovered firmware volumes to be dispatched.  
+  Then the boot device connection can be attempted again.  If the same boot 
+  device connection operation fails twice in a row, then that boot device has 
+  failed, and should be skipped.  This function should never return.
+
+  @param  This             The EFI_BDS_ARCH_PROTOCOL instance.
+
+  @return None.
+
+**/
+VOID
+EFIAPI
+BdsEntry (
+  IN EFI_BDS_ARCH_PROTOCOL  *This
+  )
+{
+  UINTN               Size;
+  EFI_STATUS          Status;
+
+  PERF_END   (NULL, "DXE", NULL, 0);
+
+  //
+  // Declare the Firmware Vendor
+  //
+  Size = 0x100;
+  gST->FirmwareVendor = AllocateRuntimePool (Size);
+  ASSERT (gST->FirmwareVendor != NULL);
+  UnicodeSPrint (gST->FirmwareVendor, Size, L"%a EFI %a %a", PcdGetPtr(PcdFirmwareVendor), __DATE__, __TIME__);
+
+  // If BootNext environment variable is defined then we just load it !
+  Status = BdsStartBootOption (L"BootNext");
+  if (Status != EFI_NOT_FOUND) {
+    // BootNext has not been succeeded launched
+    if (EFI_ERROR(Status)) {
+      Print(L"Fail to start BootNext.\n");
+    }
+
+    // Delete the BootNext environment variable
+    gRT->SetVariable (L"BootNext", &gEfiGlobalVariableGuid,
+        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+        0, NULL);
+  }
+
+  // If Boot Order does not exist then create a default entry
+  DefineDefaultBootEntries ();
+
+  // Now we need to setup the EFI System Table with information about the console devices.
+  InitializeConsole ();
+
+  // Timer before initiating the default boot selection
+  StartDefaultBootOnTimeout ();
+
+  // Start the Boot Menu
+  Status = BootMenuMain ();
+  ASSERT_EFI_ERROR (Status);
+
+}
+
+EFI_BDS_ARCH_PROTOCOL  gBdsProtocol = {
+  BdsEntry,
+};
+
+EFI_STATUS
+EFIAPI
+BdsInitialize (
+  IN EFI_HANDLE                            ImageHandle,
+  IN EFI_SYSTEM_TABLE                      *SystemTable
+  )
+{
+  EFI_STATUS  Status;
+
+  mImageHandle = ImageHandle;
+
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &ImageHandle,
+                  &gEfiBdsArchProtocolGuid, &gBdsProtocol,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
+}

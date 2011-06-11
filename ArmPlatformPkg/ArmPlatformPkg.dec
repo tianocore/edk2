@@ -71,3 +71,24 @@
   gArmPlatformTokenSpaceGuid.PcdSP804FrequencyInMHz|1|UINT32|0x0000001D
   gArmPlatformTokenSpaceGuid.PcdSP804Timer0InterruptNum|0|UINT32|0x0000001E
 
+  #
+  # BDS - Boot Manager
+  #
+  gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Platform"|VOID*|0x00000019
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L""|VOID*|0x0000000C
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L""|VOID*|0x0000000D
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|""|VOID*|0x000000F
+  # PcdDefaultBootType define the type of the binary pointed by PcdDefaultBootDevicePath: 
+  #  - 0 = an EFI application
+  #  - 1 = a Linux kernel with ATAG support
+  #  - 2 = a Linux kernel with FDT support
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|0|UINT32|0x00000010
+  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L""|VOID*|0x00000011
+  
+  ## Timeout value for displaying progressing bar in before boot OS.
+  #  According to UEFI 2.0 spec, the default TimeOut should be 0xffff.
+  gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x0000001A
+  
+  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L""|VOID*|0x0000001B
+  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L""|VOID*|0x0000001C
+  

@@ -285,6 +285,8 @@
 !endif
 
 [PcdsFixedAtBuild.common]
+  gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"
+  
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmVExpress"
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0
@@ -411,9 +413,10 @@
   #
   # Versatile Express machine type (ARM VERSATILE EXPRESS = 2272) required for ARM Linux: 
   gArmTokenSpaceGuid.PcdArmMachineType|2272
-  gArmTokenSpaceGuid.PcdLinuxKernelDP|L"VenHw(02118005-9DA7-443a-92D5-781F022AEDBB)/MemoryMapped(0,0x46000000,0x46400000)"
-  gArmTokenSpaceGuid.PcdLinuxAtag|"rdinit=/bin/ash debug earlyprintk console=ttyAMA0,38400 mem=1G"
-  gArmTokenSpaceGuid.PcdFdtDP|L""
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"NorFlash"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)/MemoryMapped(0x0,0x46000000,0x46400000)"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"rdinit=/bin/ash debug earlyprintk console=ttyAMA0,38400 mem=1G"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|1
 
   #
   # ARM L2x0 PCDs
