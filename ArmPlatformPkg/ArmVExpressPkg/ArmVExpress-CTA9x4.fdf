@@ -155,8 +155,15 @@ READ_LOCK_STATUS   = TRUE
   INF EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
-   
-  INF EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
+
+  #
+  # Multiple Console IO support
+  #
+  INF MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+  INF MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  INF MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+  INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+  INF EmbeddedPkg/SerialDxe/SerialDxe.inf
 
   INF ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
   INF ArmPlatformPkg/Drivers/SP804TimerDxe/SP804TimerDxe.inf

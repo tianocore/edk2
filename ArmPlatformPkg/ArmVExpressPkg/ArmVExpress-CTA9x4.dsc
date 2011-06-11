@@ -59,6 +59,9 @@
   EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   
+  HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
+  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
+  
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window 
   # in the debugger will show load and unload commands for symbols. You can cut and paste this
@@ -284,6 +287,11 @@
   gArmTokenSpaceGuid.PcdSkipPeiCore|TRUE
 !endif
 
+  
+  ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
+  #  It could be set FALSE to save size.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
+
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"
   
@@ -418,6 +426,11 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"rdinit=/bin/ash debug earlyprintk console=ttyAMA0,38400 mem=1G"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|1
 
+  # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
+  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi();VenHw(407B4008-BF5B-11DF-9547-CF16E0D72085)"
+  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi()"
+  gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|10
+
   #
   # ARM L2x0 PCDs
   #
@@ -486,8 +499,12 @@
   EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
-  
-  EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
+
+  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+  EmbeddedPkg/SerialDxe/SerialDxe.inf
 
   ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
   ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
