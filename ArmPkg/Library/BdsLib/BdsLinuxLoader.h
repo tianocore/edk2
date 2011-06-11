@@ -15,8 +15,7 @@
 #ifndef __BDSLINUXLOADER_H
 #define __BDSLINUXLOADER_H
 
-#define ATAG_MAX_SIZE       0x4000
-//PcdKernelParamsMaxMemorySize
+#define ATAG_MAX_SIZE       0x3000
 
 /* ATAG : list of possible tags */
 #define ATAG_NONE            0x00000000
@@ -31,64 +30,24 @@
 #define ATAG_CMDLINE         0x54410009
 #define ATAG_ARM_MP_CORE     0x5441000A
 
-// Some system addresses
-// These should probably come from the platform header file or from pcd values
-#define DRAM_BASE            0x10000000
-#define ZIMAGE_LOAD_ADDRESS  (DRAM_BASE + 0x8000)
-#define INITRD_LOAD_ADDRESS  (DRAM_BASE + 0x800000)
-
-#define SIZE_1B              0x00000001
-#define SIZE_2B              0x00000002
-#define SIZE_4B              0x00000004
-#define SIZE_8B              0x00000008
-#define SIZE_16B             0x00000010
-#define SIZE_32B             0x00000020
-#define SIZE_64B             0x00000040
-#define SIZE_128B            0x00000080
-#define SIZE_256B            0x00000100
-#define SIZE_512B            0x00000200
-#define SIZE_1KB             0x00000400
-#define SIZE_2KB             0x00000800
-#define SIZE_4KB             0x00001000
-#define SIZE_8KB             0x00002000
-#define SIZE_16KB            0x00004000
-#define SIZE_32KB            0x00008000
-#define SIZE_64KB            0x00010000
-#define SIZE_128KB           0x00020000
-#define SIZE_256KB           0x00040000
-#define SIZE_512KB           0x00080000
-#define SIZE_1MB             0x00100000
-#define SIZE_2MB             0x00200000
-#define SIZE_4MB             0x00400000
-#define SIZE_8MB             0x00800000
-#define SIZE_16MB            0x01000000
-#define SIZE_32MB            0x02000000
-#define SIZE_64MB            0x04000000
-#define SIZE_100MB           0x06400000
-#define SIZE_128MB           0x08000000
-#define SIZE_256MB           0x10000000
-#define SIZE_512MB           0x20000000
-#define SIZE_1GB             0x40000000
-#define SIZE_2GB             0x80000000
-
 /* structures for each atag */
-struct atag_header {
+typedef struct {
   UINT32  size; /* length of tag in words including this header */
   UINT32  type;  /* tag type */
-};
+} LINUX_ATAG_HEADER;
 
-struct atag_core {
+typedef struct {
   UINT32  flags;
   UINT32  pagesize;
   UINT32  rootdev;
-};
+} LINUX_ATAG_CORE;
 
-struct atag_mem {
+typedef struct {
   UINT32  size;
   UINTN  start;
-};
+} LINUX_ATAG_MEM;
 
-struct atag_videotext {
+typedef struct {
   UINT8   x;
   UINT8   y;
   UINT16  video_page;
@@ -98,29 +57,29 @@ struct atag_videotext {
   UINT8   video_lines;
   UINT8   video_isvga;
   UINT16  video_points;
-};
+} LINUX_ATAG_VIDEOTEXT;
 
-struct atag_ramdisk {
+typedef struct {
   UINT32  flags;
   UINT32  size;
   UINTN  start;
-};
+} LINUX_ATAG_RAMDISK;
 
-struct atag_initrd2 {
+typedef struct {
   UINT32  start;
   UINT32  size;
-};
+} LINUX_ATAG_INITRD2;
 
-struct atag_serialnr {
+typedef struct {
   UINT32  low;
   UINT32  high;
-};
+} LINUX_ATAG_SERIALNR;
 
-struct atag_revision {
+typedef struct {
   UINT32  rev;
-};
+} LINUX_ATAG_REVISION;
 
-struct atag_videolfb {
+typedef struct {
   UINT16  lfb_width;
   UINT16  lfb_height;
   UINT16  lfb_depth;
@@ -135,31 +94,30 @@ struct atag_videolfb {
   UINT8   blue_pos;
   UINT8   rsvd_size;
   UINT8   rsvd_pos;
-};
+} LINUX_ATAG_VIDEOLFB;
 
-struct atag_cmdline {
+typedef struct {
   CHAR8   cmdline[1];
-};
+} LINUX_ATAG_CMDLINE;
 
-struct atag {
-  struct atag_header header;
+typedef struct {
+  LINUX_ATAG_HEADER header;
   union {
-    struct atag_core         core_tag;
-    struct atag_mem          mem_tag;
-    struct atag_videotext    videotext_tag;
-    struct atag_ramdisk      ramdisk_tag;
-    struct atag_initrd2      initrd2_tag;
-    struct atag_serialnr     serialnr_tag;
-    struct atag_revision     revision_tag;
-    struct atag_videolfb     videolfb_tag;
-    struct atag_cmdline      cmdline_tag;
+    LINUX_ATAG_CORE         core_tag;
+    LINUX_ATAG_MEM          mem_tag;
+    LINUX_ATAG_VIDEOTEXT    videotext_tag;
+    LINUX_ATAG_RAMDISK      ramdisk_tag;
+    LINUX_ATAG_INITRD2      initrd2_tag;
+    LINUX_ATAG_SERIALNR     serialnr_tag;
+    LINUX_ATAG_REVISION     revision_tag;
+    LINUX_ATAG_VIDEOLFB     videolfb_tag;
+    LINUX_ATAG_CMDLINE      cmdline_tag;
   } body;
-};
+} LINUX_ATAG;
 
-#define next_tag_address(t)     ((struct atag *)((UINT32)(t) + (((t)->header.size) << 2) ))
-#define tag_size(type)  ((UINT32)((sizeof(struct atag_header) + sizeof(struct type)) >> 2))
+typedef VOID (*LINUX_KERNEL)(UINT32 Zero, UINT32 Arch, UINTN ParametersBase);
 
-STATIC struct atag *Params; /* used to point at the current tag */
+#define next_tag_address(t)     ((LINUX_ATAG*)((UINT32)(t) + (((t)->header.size) << 2) ))
+#define tag_size(type)          ((UINT32)((sizeof(LINUX_ATAG_HEADER) + sizeof(type)) >> 2))
 
 #endif
-

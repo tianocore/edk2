@@ -12,8 +12,21 @@
 *
 **/
 
-#ifndef _BDS_UNIX_LIB_H_
-#define _BDS_UNIX_LIB_H_
+#ifndef __BDS_ENTRY_H__
+#define __BDS_ENTRY_H__
+
+/**
+  Connect all DXE drivers
+
+  @retval EFI_SUCCESS           All drivers have been connected
+  @retval EFI_NOT_FOUND         No handles match the search.
+  @retval EFI_OUT_OF_RESOURCES  There is not resource pool memory to store the matching results.
+
+**/
+EFI_STATUS
+BdsConnectAllDrivers (
+  VOID
+  );
 
 /**
   Start a Linux kernel from a Device Path
@@ -30,8 +43,24 @@
 EFI_STATUS
 BdsBootLinux (
   IN  EFI_DEVICE_PATH_PROTOCOL* LinuxKernelDevicePath,
-  IN  CONST CHAR8*              Arguments,
+  IN  CONST CHAR8*  Arguments,
   IN  EFI_DEVICE_PATH_PROTOCOL* FdtDevicePath
+  );
+
+/**
+  Start an EFI Application from any Firmware Volume
+
+  @param  EfiApp                EFI Application Name
+
+  @retval EFI_SUCCESS           All drivers have been connected
+  @retval EFI_NOT_FOUND         The Linux kernel Device Path has not been found
+  @retval EFI_OUT_OF_RESOURCES  There is not enough resource memory to store the matching results.
+
+**/
+EFI_STATUS
+BdsLoadApplication (
+  IN EFI_HANDLE                  ParentImageHandle,
+  IN CHAR16*                     EfiApp
   );
 
 #endif

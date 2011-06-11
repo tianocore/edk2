@@ -16,9 +16,22 @@
 
 #include <Library/DxeServicesTableLib.h>
 #include <Library/HobLib.h>
+#include <Library/TimerLib.h>
+#include <Library/PrintLib.h>
+#include <Library/SerialPortLib.h>
+
+STATIC CHAR8 *mTokenList[] = {
+  /*"SEC",*/
+  "PEI",
+  "DXE",
+  "BDS",
+  NULL
+};
 
 EFI_STATUS
-ShutdownUefiBootServices( VOID )
+ShutdownUefiBootServices (
+  VOID
+  )
 {
   EFI_STATUS              Status;
   UINTN                   MemoryMapSize;
@@ -68,39 +81,50 @@ ShutdownUefiBootServices( VOID )
   return Status;
 }
 
+/**
+  Connect all DXE drivers
+
+  @retval EFI_SUCCESS           All drivers have been connected
+  @retval EFI_NOT_FOUND         No handles match the search.
+  @retval EFI_OUT_OF_RESOURCES  There is not resource pool memory to store the matching results.
+
+**/
 EFI_STATUS
-BdsConnectAllDrivers( VOID ) {
-    UINTN                     HandleCount, Index;
-    EFI_HANDLE                *HandleBuffer;
-    EFI_STATUS                Status;
+BdsConnectAllDrivers (
+  VOID
+  )
+{
+  UINTN                     HandleCount, Index;
+  EFI_HANDLE                *HandleBuffer;
+  EFI_STATUS                Status;
 
-    do {
-        // Locate all the driver handles
-        Status = gBS->LocateHandleBuffer (
-                    AllHandles,
-                    NULL,
-                    NULL,
-                    &HandleCount,
-                    &HandleBuffer
-                    );
-        if (EFI_ERROR (Status)) {
-            break;
-        }
+  do {
+    // Locate all the driver handles
+    Status = gBS->LocateHandleBuffer (
+                AllHandles,
+                NULL,
+                NULL,
+                &HandleCount,
+                &HandleBuffer
+                );
+    if (EFI_ERROR (Status)) {
+      break;
+    }
 
-        // Connect every handles
-        for (Index = 0; Index < HandleCount; Index++) {
-            gBS->ConnectController(HandleBuffer[Index], NULL, NULL, TRUE);
-        }
+    // Connect every handles
+    for (Index = 0; Index < HandleCount; Index++) {
+      gBS->ConnectController (HandleBuffer[Index], NULL, NULL, TRUE);
+    }
 
-        if (HandleBuffer != NULL) {
-            FreePool (HandleBuffer);
-        }
-        
-        // Check if new handles have been created after the start of the previous handles
-        Status = gDS->Dispatch ();
-    } while (!EFI_ERROR(Status));
+    if (HandleBuffer != NULL) {
+      FreePool (HandleBuffer);
+    }
 
-    return EFI_SUCCESS;
+    // Check if new handles have been created after the start of the previous handles
+    Status = gDS->Dispatch ();
+  } while (!EFI_ERROR(Status));
+
+  return EFI_SUCCESS;
 }
 
 STATIC
@@ -220,4 +244,42 @@ GetSystemMemoryResources (
   }
 
   return EFI_SUCCESS;
+}
+
+VOID
+PrintPerformance (
+  VOID
+  )
+{
+  UINTN       Key;
+  CONST VOID  *Handle;
+  CONST CHAR8 *Token, *Module;
+  UINT64      Start, Stop, TimeStamp;
+  UINT64      Delta, TicksPerSecond, Milliseconds;
+  UINTN       Index;
+  CHAR8       Buffer[100];
+  UINTN       CharCount;
+
+  TicksPerSecond = GetPerformanceCounterProperties (NULL, NULL);
+
+  TimeStamp = 0;
+  Key       = 0;
+  do {
+    Key = GetPerformanceMeasurement (Key, (CONST VOID **)&Handle, &Token, &Module, &Start, &Stop);
+    if (Key != 0) {
+      for (Index = 0; mTokenList[Index] != NULL; Index++) {
+        if (AsciiStriCmp (mTokenList[Index], Token) == 0) {
+          Delta = Start - Stop;
+          TimeStamp += Delta;
+          Milliseconds = DivU64x64Remainder (MultU64x32 (Delta, 1000), TicksPerSecond, NULL);
+          CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"%6a %6ld ms\n", Token, Milliseconds);
+          SerialPortWrite ((UINT8 *) Buffer, CharCount);
+          break;
+        }
+      }
+    }
+  } while (Key != 0);
+
+  CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Total Time = %ld ms\n\n", DivU64x64Remainder (MultU64x32 (TimeStamp, 1000), TicksPerSecond, NULL));
+  SerialPortWrite ((UINT8 *) Buffer, CharCount);
 }

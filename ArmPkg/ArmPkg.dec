@@ -125,7 +125,8 @@
   # BdsLib
   #
   gArmTokenSpaceGuid.PcdArmMachineType|0|UINT32|0x0000001E
-  gArmTokenSpaceGuid.PcdLinuxKernelDP|L""|VOID*|0x0000001F
-  gArmTokenSpaceGuid.PcdLinuxAtag|""|VOID*|0x00000020
-  gArmTokenSpaceGuid.PcdFdtDP|L""|VOID*|0x00000021
+  # The compressed Linux kernel is expected to be under 128MB from the beginning of the System Memory
+  gArmTokenSpaceGuid.PcdArmLinuxKernelMaxOffset|0x08000000|UINT32|0x0000001F
+  # The Linux ATAGs are expected to be under 0x4000 (16KB) from the beginning of the System Memory
+  gArmTokenSpaceGuid.PcdArmLinuxAtagMaxOffset|0x4000|UINT32|0x00000020
 
