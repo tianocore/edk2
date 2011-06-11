@@ -54,6 +54,8 @@
 // DRAM
 #define ARM_VE_DRAM_BASE                        0x60000000
 #define ARM_VE_DRAM_SZ                          0x40000000
+// Inside the DRAM we allocate a section for the VRAM (Video RAM)
+#define LCD_VRAM_CORE_TILE_BASE                 0x64000000
 
 // External AXI between daughterboards (Logic Tile)
 #define ARM_VE_EXT_AXI_BASE                     0xE0000000
@@ -97,6 +99,14 @@
 //#define ARM_VE_L2x0_CTLR_BASE                 0x1E00A000
 
 /***********************************************************************************
+   Select between Motherboard and Core Tile peripherals
+************************************************************************************/
+
+// Specify which PL111 to use
+//#define PL111_CLCD_BASE                       PL111_CLCD_MOTHERBOARD_BASE
+#define PL111_CLCD_BASE                         PL111_CLCD_CORE_TILE_BASE
+
+/***********************************************************************************
    Peripherals' misc settings
 ************************************************************************************/
 
@@ -116,6 +126,9 @@
 #define ARM_VE_DECPROT_BIT_NMC_TZASC_LOCK       (1 << 4)
 #define ARM_VE_DECPROT_BIT_SMC_TZASC_LOCK       (1 << 5)
 
+
+// PL111 Lcd
+#define PL111_CLCD_CORE_TILE_VIDEO_MODE_OSC_ID  1
 
 /***********************************************************************************
 // Interrupt Map

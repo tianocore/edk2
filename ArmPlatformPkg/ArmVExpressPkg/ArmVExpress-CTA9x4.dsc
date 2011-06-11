@@ -104,6 +104,7 @@
   
   ArmPlatformSysConfigLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressSysConfigLib/ArmVExpressSysConfigLib.inf
   NorFlashPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/NorFlashArmVExpressLib/NorFlashArmVExpressLib.inf
+  LcdPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/PL111LcdArmVExpressLib/PL111LcdArmVExpressLib.inf
 
 #
 # Assume everything is fixed at build
@@ -414,15 +415,6 @@
   gArmTokenSpaceGuid.PcdFdtDP|L""
 
   #
-  # ARM PL111 Colour LCD Controller
-  #
-  gArmVExpressTokenSpaceGuid.PcdPL111RegistersBaseMotherboard|0x1001F000
-  gArmVExpressTokenSpaceGuid.PcdPL111RegistersBaseDaughterboard|0x10020000
-  gArmVExpressTokenSpaceGuid.PcdPL111VRamBaseMotherboard|0x4C000000
-  gArmVExpressTokenSpaceGuid.PcdPL111VRamBaseDaughterboard|0x64000000
-  gArmVExpressTokenSpaceGuid.PcdPL111VRamSize|0x800000
-  
-  #
   # ARM L2x0 PCDs
   #
   gArmTokenSpaceGuid.PcdL2x0ControllerBase|0x1E00A000
@@ -496,6 +488,7 @@
   ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
   ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
   ArmPlatformPkg/Drivers/SP804TimerDxe/SP804TimerDxe.inf
+  ArmPlatformPkg/Drivers/LcdGraphicsOutputDxe/PL111LcdGraphicsOutputDxe.inf
 
   #
   # Semi-hosting filesystem

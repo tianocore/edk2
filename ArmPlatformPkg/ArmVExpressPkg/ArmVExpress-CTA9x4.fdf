@@ -161,6 +161,7 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
   INF ArmPlatformPkg/Drivers/SP804TimerDxe/SP804TimerDxe.inf
   INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
+  INF ArmPlatformPkg/Drivers/LcdGraphicsOutputDxe/PL111LcdGraphicsOutputDxe.inf
 
   #
   # Semi-hosting filesystem
