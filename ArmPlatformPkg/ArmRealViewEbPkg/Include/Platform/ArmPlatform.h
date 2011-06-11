@@ -26,7 +26,7 @@
 
 // Motherboard Peripheral and On-chip peripheral
 #define ARM_EB_SMB_MB_ON_CHIP_PERIPH_BASE     0x10000000
-#define ARM_EB_SMB_MB_ON_CHIP_PERIPH_SZ       0x00100000
+#define ARM_EB_SMB_MB_ON_CHIP_PERIPH_SZ       0x10000000
 #define ARM_EB_BOARD_PERIPH_BASE              0x10000000
 //#define ARM_EB_CHIP_PERIPH_BASE             0x10020000
 
@@ -73,9 +73,6 @@
 #define ARM_EB_SYS_CLCD_REG                   (ARM_EB_BOARD_PERIPH_BASE + 0x00050)
 #define ARM_EB_SYS_PROCID0_REG                (ARM_EB_BOARD_PERIPH_BASE + 0x00084)
 #define ARM_EB_SYS_PROCID1_REG                (ARM_EB_BOARD_PERIPH_BASE + 0x00088)
-#define ARM_EB_SYS_CFGDATA_REG                (ARM_EB_BOARD_PERIPH_BASE + 0x000A0)
-#define ARM_EB_SYS_CFGCTRL_REG                (ARM_EB_BOARD_PERIPH_BASE + 0x000A4)
-#define ARM_EB_SYS_CFGSTAT_REG                (ARM_EB_BOARD_PERIPH_BASE + 0x000A8)
 
 // SP810 Controller
 #define SP810_CTRL_BASE                       (ARM_EB_BOARD_PERIPH_BASE + 0x01000)
@@ -96,10 +93,11 @@
 #define PL031_RTC_BASE                        (ARM_EB_BOARD_PERIPH_BASE + 0x17000)
 
 // Dynamic Memory Controller Base
-#define ARM_EB_DMC_BASE                     0x10018000
+#define ARM_EB_DMC_BASE                       0x10018000
 
 // Static Memory Controller Base
-#define ARM_EB_SMC_CTRL_BASE                    0x10080000
+#define ARM_EB_SMC_CTRL_BASE                  0x10080000
+
 #define PL111_CLCD_BASE                       0x10020000
 //Note: Moving the framebuffer into the 0x70000000-0x80000000 region does not seem to work
 #define PL111_CLCD_VRAM_BASE                  0x00100000
@@ -137,5 +135,16 @@
 // This region is the memory declared to PEI as permanent memory for PEI
 // and DXE. EFI stacks and heaps will be declared in this region.
 #define ARM_EB_EFI_MEMORY_REGION_SZ             0x1000000
+
+/*******************************************
+// System Configuration Control
+*******************************************/
+
+// Sites where the peripheral is fitted
+#define ARM_EB_UNSUPPORTED                        ~0
+
+#define VIRTUAL_SYS_CFG(site,func)                     (((site) << 24) | (func))
+
+#define SYS_CFG_RTC                               VIRTUAL_SYS_CFG(ARM_EB_UNSUPPORTED,1)
 
 #endif 
