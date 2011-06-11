@@ -27,15 +27,18 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
-  IoLib
   ArmLib
   ArmTrustZoneLib
-  PL354SmcLib
-  PL341DmcLib
-  PL301AxiLib
+  ArmPlatformSysConfigLib
+  IoLib
   L2X0CacheLib
+  PL301AxiLib
+  PL341DmcLib
+  PL354SmcLib
+  SerialPortLib
 
 [Sources.common]
+  CTA9x4Sec.c
   CTA9x4.c
   CTA9x4Helper.asm   | RVCT
   CTA9x4Helper.S     | GCC

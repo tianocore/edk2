@@ -31,9 +31,11 @@
   ArmLib
   ArmTrustZoneLib
   MemoryAllocationLib
+  PL354SmcLib
   PL341DmcLib
   PL301AxiLib
   L2X0CacheLib
+  SerialPortLib
 
 [Sources.common]
   CTA9x4.c
