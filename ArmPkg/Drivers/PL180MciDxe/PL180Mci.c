@@ -481,7 +481,7 @@ MciNotifyState (
   return EFI_SUCCESS;
 }
 
-EFI_GUID mPL180MciDevicePathGuid = { 0x621b6fa5, 0x4dc1, 0x476f, 0xb9, 0xd8, 0x52, 0xc5, 0x57, 0xd8, 0x10, 0x70 };
+EFI_GUID mPL180MciDevicePathGuid = EFI_CALLER_ID_GUID;
 
 EFI_STATUS
 MciBuildDevicePath (
