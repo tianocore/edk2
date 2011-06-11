@@ -29,11 +29,13 @@
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/TimerLib.h>
+#include <Library/BdsLib.h>
 
 #include <Guid/DebugImageInfoTable.h>
 
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>
+#include <Protocol/DevicePathToText.h>
 
 EFI_STATUS
 EblDumpMmu (
@@ -183,7 +185,7 @@ ImageHandleToPdbFileName (
 }
 
 
-CHAR8 *mTokenList[] = {
+STATIC CHAR8 *mTokenList[] = {
   /*"SEC",*/
   "PEI",
   "DXE",
@@ -269,76 +271,112 @@ EblDumpGcd (
   IN CHAR8  **Argv
   )
 {
-    EFI_STATUS                        Status;
-    UINTN                           NumberOfDescriptors;
-    UINTN i;
-    EFI_GCD_MEMORY_SPACE_DESCRIPTOR *MemorySpaceMap;
-    EFI_GCD_IO_SPACE_DESCRIPTOR *IoSpaceMap;
+  EFI_STATUS                        Status;
+  UINTN                           NumberOfDescriptors;
+  UINTN i;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR *MemorySpaceMap;
+  EFI_GCD_IO_SPACE_DESCRIPTOR *IoSpaceMap;
 
-    Status = gDS->GetMemorySpaceMap(&NumberOfDescriptors,&MemorySpaceMap);
-    if (EFI_ERROR (Status)) {
-        return Status;
-    }
-    AsciiPrint ("    Address Range       Image     Device   Attributes\n");
-    AsciiPrint ("__________________________________________________________\n");
-    for (i=0; i < NumberOfDescriptors; i++) {
-        //AsciiPrint ("%016lx - %016lx",MemorySpaceMap[i].BaseAddress,MemorySpaceMap[i].BaseAddress+MemorySpaceMap[i].Length);
-        AsciiPrint ("MEM %08lx - %08lx",(UINT64)MemorySpaceMap[i].BaseAddress,MemorySpaceMap[i].BaseAddress+MemorySpaceMap[i].Length-1);
-        AsciiPrint (" %08x %08x",MemorySpaceMap[i].ImageHandle,MemorySpaceMap[i].DeviceHandle);
+  Status = gDS->GetMemorySpaceMap(&NumberOfDescriptors,&MemorySpaceMap);
+  if (EFI_ERROR (Status)) {
+      return Status;
+  }
+  AsciiPrint ("    Address Range       Image     Device   Attributes\n");
+  AsciiPrint ("__________________________________________________________\n");
+  for (i=0; i < NumberOfDescriptors; i++) {
+    AsciiPrint ("MEM %016lx - %016lx",(UINT64)MemorySpaceMap[i].BaseAddress,MemorySpaceMap[i].BaseAddress+MemorySpaceMap[i].Length-1);
+    AsciiPrint (" %08x %08x",MemorySpaceMap[i].ImageHandle,MemorySpaceMap[i].DeviceHandle);
 
-        if (MemorySpaceMap[i].Attributes & EFI_MEMORY_RUNTIME)
-            AsciiPrint (" RUNTIME");
-        if (MemorySpaceMap[i].Attributes & EFI_MEMORY_PORT_IO)
-            AsciiPrint (" PORT_IO");
+    if (MemorySpaceMap[i].Attributes & EFI_MEMORY_RUNTIME)
+        AsciiPrint (" RUNTIME");
+    if (MemorySpaceMap[i].Attributes & EFI_MEMORY_PORT_IO)
+        AsciiPrint (" PORT_IO");
 
-        if (MemorySpaceMap[i].Attributes & EFI_MEMORY_UC)
-            AsciiPrint (" MEM_UC");
-        if (MemorySpaceMap[i].Attributes & EFI_MEMORY_WC)
-            AsciiPrint (" MEM_WC");
-        if (MemorySpaceMap[i].Attributes & EFI_MEMORY_WT)
-            AsciiPrint (" MEM_WT");
-        if (MemorySpaceMap[i].Attributes & EFI_MEMORY_WB)
-            AsciiPrint (" MEM_WB");
-        if (MemorySpaceMap[i].Attributes & EFI_MEMORY_UCE)
-            AsciiPrint (" MEM_UCE");
-        if (MemorySpaceMap[i].Attributes & EFI_MEMORY_WP)
-            AsciiPrint (" MEM_WP");
-        if (MemorySpaceMap[i].Attributes & EFI_MEMORY_RP)
-            AsciiPrint (" MEM_RP");
-        if (MemorySpaceMap[i].Attributes & EFI_MEMORY_XP)
-            AsciiPrint (" MEM_XP");
+    if (MemorySpaceMap[i].Attributes & EFI_MEMORY_UC)
+        AsciiPrint (" MEM_UC");
+    if (MemorySpaceMap[i].Attributes & EFI_MEMORY_WC)
+        AsciiPrint (" MEM_WC");
+    if (MemorySpaceMap[i].Attributes & EFI_MEMORY_WT)
+        AsciiPrint (" MEM_WT");
+    if (MemorySpaceMap[i].Attributes & EFI_MEMORY_WB)
+        AsciiPrint (" MEM_WB");
+    if (MemorySpaceMap[i].Attributes & EFI_MEMORY_UCE)
+        AsciiPrint (" MEM_UCE");
+    if (MemorySpaceMap[i].Attributes & EFI_MEMORY_WP)
+        AsciiPrint (" MEM_WP");
+    if (MemorySpaceMap[i].Attributes & EFI_MEMORY_RP)
+        AsciiPrint (" MEM_RP");
+    if (MemorySpaceMap[i].Attributes & EFI_MEMORY_XP)
+        AsciiPrint (" MEM_XP");
 
-        if (MemorySpaceMap[i].GcdMemoryType & EfiGcdMemoryTypeNonExistent)
-            AsciiPrint (" TYPE_NONEXISTENT");
-        if (MemorySpaceMap[i].GcdMemoryType & EfiGcdMemoryTypeReserved)
-            AsciiPrint (" TYPE_RESERVED");
-        if (MemorySpaceMap[i].GcdMemoryType & EfiGcdMemoryTypeSystemMemory)
-            AsciiPrint (" TYPE_SYSMEM");
-        if (MemorySpaceMap[i].GcdMemoryType & EfiGcdMemoryTypeMemoryMappedIo)
-            AsciiPrint (" TYPE_MEMMAP");
+    if (MemorySpaceMap[i].GcdMemoryType & EfiGcdMemoryTypeNonExistent)
+        AsciiPrint (" TYPE_NONEXISTENT");
+    if (MemorySpaceMap[i].GcdMemoryType & EfiGcdMemoryTypeReserved)
+        AsciiPrint (" TYPE_RESERVED");
+    if (MemorySpaceMap[i].GcdMemoryType & EfiGcdMemoryTypeSystemMemory)
+        AsciiPrint (" TYPE_SYSMEM");
+    if (MemorySpaceMap[i].GcdMemoryType & EfiGcdMemoryTypeMemoryMappedIo)
+        AsciiPrint (" TYPE_MEMMAP");
 
-        AsciiPrint ("\n");
-    }
+    AsciiPrint ("\n");
+  }
 
-    Status = gDS->GetIoSpaceMap(&NumberOfDescriptors,&IoSpaceMap);
-    if (EFI_ERROR (Status)) {
-        return Status;
-    }
-    for (i=0; i < NumberOfDescriptors; i++) {
-        AsciiPrint ("IO  %08lx - %08lx",IoSpaceMap[i].BaseAddress,IoSpaceMap[i].BaseAddress+IoSpaceMap[i].Length);
-        AsciiPrint ("\t%08x %08x",IoSpaceMap[i].ImageHandle,IoSpaceMap[i].DeviceHandle);
+  Status = gDS->GetIoSpaceMap(&NumberOfDescriptors,&IoSpaceMap);
+  if (EFI_ERROR (Status)) {
+      return Status;
+  }
+  for (i=0; i < NumberOfDescriptors; i++) {
+    AsciiPrint ("IO  %08lx - %08lx",IoSpaceMap[i].BaseAddress,IoSpaceMap[i].BaseAddress+IoSpaceMap[i].Length);
+    AsciiPrint ("\t%08x %08x",IoSpaceMap[i].ImageHandle,IoSpaceMap[i].DeviceHandle);
 
-        if (IoSpaceMap[i].GcdIoType & EfiGcdMemoryTypeNonExistent)
-            AsciiPrint (" TYPE_NONEXISTENT");
-        if (IoSpaceMap[i].GcdIoType & EfiGcdMemoryTypeReserved)
-            AsciiPrint (" TYPE_RESERVED");
-        if (IoSpaceMap[i].GcdIoType & EfiGcdIoTypeIo)
-            AsciiPrint (" TYPE_IO");
+    if (IoSpaceMap[i].GcdIoType & EfiGcdMemoryTypeNonExistent)
+        AsciiPrint (" TYPE_NONEXISTENT");
+    if (IoSpaceMap[i].GcdIoType & EfiGcdMemoryTypeReserved)
+        AsciiPrint (" TYPE_RESERVED");
+    if (IoSpaceMap[i].GcdIoType & EfiGcdIoTypeIo)
+        AsciiPrint (" TYPE_IO");
 
-        AsciiPrint ("\n");
-    }
+    AsciiPrint ("\n");
+  }
 
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EblDevicePaths (
+  IN UINTN  Argc,
+  IN CHAR8  **Argv
+  )
+{
+  EFI_STATUS Status;
+  UINTN                              HandleCount;
+  EFI_HANDLE                         *HandleBuffer;
+  UINTN                              Index;
+  CHAR16*                            String;
+  EFI_DEVICE_PATH_PROTOCOL*          DevicePathProtocol;
+  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL*  DevicePathToTextProtocol;
+
+  BdsConnectAllDrivers();
+
+  Status = gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
+  if (EFI_ERROR (Status)) {
+    AsciiPrint ("Did not find the DevicePathToTextProtocol.\n");
     return EFI_SUCCESS;
+  }
+
+  Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiDevicePathProtocolGuid, NULL, &HandleCount, &HandleBuffer);
+  if (EFI_ERROR (Status)) {
+    AsciiPrint ("No device path found\n");
+    return EFI_SUCCESS;
+  }
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID **)&DevicePathProtocol);
+    String = DevicePathToTextProtocol->ConvertDevicePathToText(DevicePathProtocol,TRUE,TRUE);
+    Print (L"[0x%X] %s\n",(UINT32)HandleBuffer[Index], String);
+  }
+
+  return EFI_SUCCESS;
 }
 
 GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mLibCmdTemplate[] =
@@ -372,6 +410,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mLibCmdTemplate[] =
     " dump MMU Table",
     NULL,
     EblDumpMmu
+  },
+  {
+    "devicepaths",
+    " list all the Device Paths",
+    NULL,
+    EblDevicePaths
   }
 };
 
