@@ -353,6 +353,7 @@
   
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|1000000
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000        # expressed in 100ns units, 100,000 x 100 ns = 10,000,000 ns = 10 ms
+  gArmPlatformTokenSpaceGuid.PcdSP804Timer0InterruptNum|36
   
   #
   # ARM Pcds

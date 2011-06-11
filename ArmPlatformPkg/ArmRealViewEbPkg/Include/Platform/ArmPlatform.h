@@ -120,15 +120,6 @@
 
 
 /*******************************************
-// Interrupt Map
-*******************************************/
-
-// Timer Interrupts
-#define TIMER01_INTERRUPT_NUM                34
-#define TIMER23_INTERRUPT_NUM                35
-
-
-/*******************************************
 // EFI Memory Map in Permanent Memory (DRAM)
 *******************************************/
 

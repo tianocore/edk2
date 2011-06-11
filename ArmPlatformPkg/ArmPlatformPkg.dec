@@ -69,4 +69,5 @@
   # ARM Primecells
   #
   gArmPlatformTokenSpaceGuid.PcdSP804FrequencyInMHz|1|UINT32|0x0000001D
+  gArmPlatformTokenSpaceGuid.PcdSP804Timer0InterruptNum|0|UINT32|0x0000001E
 

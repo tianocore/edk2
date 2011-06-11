@@ -379,7 +379,7 @@ TimerInitialize (
   ASSERT_EFI_ERROR (Status);
 
   // Install interrupt handler
-  gVector = TIMER01_INTERRUPT_NUM;
+  gVector = PcdGet32(PcdSP804Timer0InterruptNum);
   Status = gInterrupt->RegisterInterruptSource (gInterrupt, gVector, TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
 
