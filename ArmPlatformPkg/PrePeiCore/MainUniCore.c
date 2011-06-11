@@ -12,42 +12,47 @@
 *
 **/
 
-#include <PiPei.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Chipset/ArmV7.h>
+
+#include "PrePeiCore.h"
 
 extern EFI_PEI_PPI_DESCRIPTOR *gSecPpiTable;
 
 VOID
 EFIAPI
-secondary_main(IN UINTN CoreId)
+SecondaryMain (
+  IN UINTN CoreId
+  )
 {
-	ASSERT(FALSE);
+  ASSERT(FALSE);
 }
 
-VOID primary_main (
+VOID
+EFIAPI
+PrimaryMain (
   IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
   )
 {
-	EFI_SEC_PEI_HAND_OFF        SecCoreData;
+  EFI_SEC_PEI_HAND_OFF        SecCoreData;
 
 
-	//
-	// Bind this information into the SEC hand-off state
-	// Note: this must be in sync with the stuff in the asm file
-	// Note also:  HOBs (pei temp ram) MUST be above stack
-	//
-	SecCoreData.DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
-    SecCoreData.BootFirmwareVolumeBase = (VOID *)(UINTN)PcdGet32 (PcdNormalFvBaseAddress);
-    SecCoreData.BootFirmwareVolumeSize = PcdGet32 (PcdNormalFvSize);
-	SecCoreData.TemporaryRamBase       = (VOID *)(UINTN)PcdGet32 (PcdCPUCoresNonSecStackBase); // We consider we run on the primary core (and so we use the first stack)
-	SecCoreData.TemporaryRamSize       = (UINTN)(UINTN)PcdGet32 (PcdCPUCoresNonSecStackSize);
-	SecCoreData.PeiTemporaryRamBase    = (VOID *)((UINTN)(SecCoreData.TemporaryRamBase) + (SecCoreData.TemporaryRamSize / 2));
-	SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize / 2;
-	SecCoreData.StackBase              = SecCoreData.TemporaryRamBase;
-	SecCoreData.StackSize              = SecCoreData.TemporaryRamSize - SecCoreData.PeiTemporaryRamSize;
+  //
+  // Bind this information into the SEC hand-off state
+  // Note: this must be in sync with the stuff in the asm file
+  // Note also:  HOBs (pei temp ram) MUST be above stack
+  //
+  SecCoreData.DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
+  SecCoreData.BootFirmwareVolumeBase = (VOID *)(UINTN)PcdGet32 (PcdNormalFvBaseAddress);
+  SecCoreData.BootFirmwareVolumeSize = PcdGet32 (PcdNormalFvSize);
+  SecCoreData.TemporaryRamBase       = (VOID *)(UINTN)PcdGet32 (PcdCPUCoresNonSecStackBase); // We consider we run on the primary core (and so we use the first stack)
+  SecCoreData.TemporaryRamSize       = (UINTN)(UINTN)PcdGet32 (PcdCPUCoresNonSecStackSize);
+  SecCoreData.PeiTemporaryRamBase    = (VOID *)((UINTN)(SecCoreData.TemporaryRamBase) + (SecCoreData.TemporaryRamSize / 2));
+  SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize / 2;
+  SecCoreData.StackBase              = SecCoreData.TemporaryRamBase;
+  SecCoreData.StackSize              = SecCoreData.TemporaryRamSize - SecCoreData.PeiTemporaryRamSize;
 
-	// jump to pei core entry point
-	(PeiCoreEntryPoint)(&SecCoreData, (VOID *)&gSecPpiTable);
+  // jump to pei core entry point
+  (PeiCoreEntryPoint)(&SecCoreData, (VOID *)&gSecPpiTable);
 }

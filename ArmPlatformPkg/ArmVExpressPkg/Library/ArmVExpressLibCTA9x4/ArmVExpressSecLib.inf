@@ -48,7 +48,4 @@
   gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
 
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdNormalFdBaseAddress
-  gArmTokenSpaceGuid.PcdNormalFdSize
-
   gArmTokenSpaceGuid.PcdL2x0ControllerBase

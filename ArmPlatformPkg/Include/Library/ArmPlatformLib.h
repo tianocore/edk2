@@ -159,21 +159,6 @@ ArmPlatformTrustzoneInit (
   );
 
 /**
-  Return the information about the memory region in permanent memory used by PEI
-
-  One of the PEI Module must install the permament memory used by PEI. This function returns the
-  information about this region for your platform to this PEIM module.
-
-  @param[out]   PeiMemoryBase       Base of the memory region used by PEI core and modules
-  @param[out]   PeiMemorySize       Size of the memory region used by PEI core and modules
-
-**/
-VOID ArmPlatformGetPeiMemory (
-    OUT UINTN*                                   PeiMemoryBase,
-    OUT UINTN*                                   PeiMemorySize
-    );
-
-/**
   Return the Virtual Memory Map of your platform
 
   This Virtual Memory Map is used by MemoryInitPei Module to initialize the MMU on your platform.

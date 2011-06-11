@@ -16,6 +16,7 @@
 // The package level header files this module uses
 //
 #include <PiPei.h>
+
 //
 // The protocols, PPI and GUID defintions for this module
 //
@@ -35,28 +36,24 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/ArmPlatformLib.h>
 
-//
-// Module globals
-//
-
 VOID
 InitMmu (
   VOID
   )
 {
-    ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable;
-    VOID                          *TranslationTableBase;
-    UINTN                         TranslationTableSize;
+  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable;
+  VOID                          *TranslationTableBase;
+  UINTN                         TranslationTableSize;
 
-    // Get Virtual Memory Map from the Platform Library
-    ArmPlatformGetVirtualMemoryMap(&MemoryTable);
+  // Get Virtual Memory Map from the Platform Library
+  ArmPlatformGetVirtualMemoryMap(&MemoryTable);
 
-    //Note: Because we called PeiServicesInstallPeiMemory() before to call InitMmu() the MMU Page Table resides in
-    //      DRAM (even at the top of DRAM as it is the first permanent memory allocation)
-    ArmConfigureMmu (MemoryTable, &TranslationTableBase, &TranslationTableSize);
+  //Note: Because we called PeiServicesInstallPeiMemory() before to call InitMmu() the MMU Page Table resides in
+  //      DRAM (even at the top of DRAM as it is the first permanent memory allocation)
+  ArmConfigureMmu (MemoryTable, &TranslationTableBase, &TranslationTableSize);
 }
 
-// May want to put this into a library so you only need the PCD setings if you are using the feature?
+// May want to put this into a library so you only need the PCD settings if you are using the feature?
 VOID
 BuildMemoryTypeInformationHob (
   VOID
@@ -87,10 +84,8 @@ BuildMemoryTypeInformationHob (
   Info[9].Type          = EfiMaxMemoryType;
   Info[9].NumberOfPages = 0;
 
-
   BuildGuidDataHob (&gEfiMemoryTypeInformationGuid, &Info, sizeof (Info));
 }
-
 /*++
 
 Routine Description:
@@ -234,7 +229,7 @@ InitializeMemory (
   InitMmu ();
 
   if (FeaturePcdGet (PcdPrePiProduceMemoryTypeInformationHob)) {
-    // Optional feature that helps prevent EFI memory map fragmentation. 
+    // Optional feature that helps prevent EFI memory map fragmentation.
     BuildMemoryTypeInformationHob ();
   }
 

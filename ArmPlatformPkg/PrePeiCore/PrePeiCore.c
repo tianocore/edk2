@@ -13,29 +13,17 @@
 *
 **/
 
-#include <PiPei.h>
-#include <Ppi/TemporaryRamSupport.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/PrintLib.h>
 #include <Library/ArmLib.h>
+#include <Library/SerialPortLib.h>
 #include <Chipset/ArmV7.h>
 
-EFI_STATUS
-EFIAPI
-SecTemporaryRamSupport (
-  IN CONST EFI_PEI_SERVICES   **PeiServices,
-  IN EFI_PHYSICAL_ADDRESS     TemporaryMemoryBase,
-  IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
-  IN UINTN                    CopySize
-  );
-
-VOID
-SecSwitchStack (
-  INTN    StackDelta
-  );
+#include "PrePeiCore.h"
 
 EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   mSecTemporaryRamSupportPpi = {SecTemporaryRamSupport};
 
@@ -46,10 +34,6 @@ EFI_PEI_PPI_DESCRIPTOR      gSecPpiTable[] = {
     &mSecTemporaryRamSupportPpi
   }
 };
-
-// Vector Table for Pei Phase
-VOID  PeiVectorTable (VOID);
-
 
 VOID
 CEntryPoint (
@@ -64,8 +48,8 @@ CEntryPoint (
   ArmInvalidateInstructionCache();
 
   // Enable Instruction & Data caches
-  ArmEnableDataCache();
-  ArmEnableInstructionCache();
+  ArmEnableDataCache ();
+  ArmEnableInstructionCache ();
 
   //
   // Note: Doesn't have to Enable CPU interface in non-secure world,
@@ -81,9 +65,9 @@ CEntryPoint (
   //If not primary Jump to Secondary Main
   if(0 == CoreId) {
     //Goto primary Main.
-    primary_main(PeiCoreEntryPoint);
+    PrimaryMain (PeiCoreEntryPoint);
   } else {
-    secondary_main(CoreId);
+    SecondaryMain (CoreId);
   }
 
   // PEI Core should always load and never return
@@ -101,7 +85,7 @@ SecTemporaryRamSupport (
 {
   //
   // Migrate the whole temporary memory to permenent memory.
-  // 
+  //
   CopyMem (
     (VOID*)(UINTN)PermanentMemoryBase, 
     (VOID*)(UINTN)TemporaryMemoryBase, 
