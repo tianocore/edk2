@@ -114,6 +114,7 @@
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   
   NorFlashPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/NorFlashArmRealViewEbLib/NorFlashArmRealViewEbLib.inf
+  LcdPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/PL111LcdArmRealViewEbLib/PL111LcdArmRealViewEbLib.inf
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
@@ -448,6 +449,7 @@
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
   
   EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
+  ArmPlatformPkg/Drivers/LcdGraphicsOutputDxe/PL111LcdGraphicsOutputDxe.inf
 
   ArmPlatformPkg/ArmRealViewEbPkg/FvbDxe/FvbDxe.inf
   ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
