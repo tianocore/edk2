@@ -15,8 +15,6 @@
 #ifndef _SHELL_BASE_
 #define _SHELL_BASE_
 
-#define ABS(a) ((a<0)?(-(a)):(a))
-
 typedef VOID *SHELL_FILE_HANDLE;
 
 #define SHELL_FREE_NON_NULL(Pointer)  \
