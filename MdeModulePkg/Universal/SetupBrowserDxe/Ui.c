@@ -402,6 +402,7 @@ RefreshQuestion (
   @param Context  The input context info related to this event or the status code return to the caller.
 **/
 VOID
+EFIAPI
 RefreshQuestionNotify(
   IN      EFI_EVENT Event,
   IN      VOID      *Context
