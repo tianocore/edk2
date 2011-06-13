@@ -6,7 +6,7 @@
   environment. There are a set of base libraries in the Mde Package that can
   be used to implement base modules.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -676,9 +676,21 @@ typedef UINTN  *BASE_LIST;
   @return  Minimum of two operands.
 
 **/
-
 #define MIN(a, b)                       \
   (((a) < (b)) ? (a) : (b))
+
+/**
+  Return the absolute value of a signed operand.
+
+  This macro returns the absolute value of the signed operand specified by a.
+
+  @param   a        The signed operand.
+
+  @return  The absolute value of the signed operand.
+
+**/
+#define ABS(a)                          \
+  (((a) < 0) ? (-(a)) : (a))
 
 //
 // Status codes common to all execution phases
