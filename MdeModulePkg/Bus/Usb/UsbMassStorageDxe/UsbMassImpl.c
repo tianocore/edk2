@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "UsbMassImpl.h"
+#include "UsbMass.h"
 
 #define USB_MASS_TRANSPORT_COUNT    3
 //
@@ -554,6 +554,8 @@ UsbMassInitMultiLun (
       goto ON_ERROR;
     }
 
+    InitializeDiskInfo (UsbMass);
+
     //
     // Create a new handle for each LUN, and install Block I/O Protocol and Device Path Protocol.
     //
@@ -563,6 +565,8 @@ UsbMassInitMultiLun (
                     UsbMass->DevicePath,
                     &gEfiBlockIoProtocolGuid,
                     &UsbMass->BlockIo,
+                    &gEfiDiskInfoProtocolGuid,
+                    &UsbMass->DiskInfo,
                     NULL
                     );
     
@@ -591,6 +595,8 @@ UsbMassInitMultiLun (
              UsbMass->DevicePath,
              &gEfiBlockIoProtocolGuid,
              &UsbMass->BlockIo,
+             &gEfiDiskInfoProtocolGuid,
+             &UsbMass->DiskInfo,
              NULL
              );
       goto ON_ERROR;
@@ -702,11 +708,15 @@ UsbMassInitNonLun (
     goto ON_ERROR;
   }
     
-  Status = gBS->InstallProtocolInterface (
+  InitializeDiskInfo (UsbMass);
+
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &Controller,
                   &gEfiBlockIoProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &UsbMass->BlockIo
+                  &UsbMass->BlockIo,
+                  &gEfiDiskInfoProtocolGuid,
+                  &UsbMass->DiskInfo,
+                  NULL
                   );
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
@@ -1007,10 +1017,13 @@ USBMassDriverBindingStop (
     // Uninstall Block I/O protocol from the device handle,
     // then call the transport protocol to stop itself.
     //
-    Status = gBS->UninstallProtocolInterface (
+    Status = gBS->UninstallMultipleProtocolInterfaces (
                     Controller,
                     &gEfiBlockIoProtocolGuid,
-                    &UsbMass->BlockIo
+                    &UsbMass->BlockIo,
+                    &gEfiDiskInfoProtocolGuid,
+                    &UsbMass->DiskInfo,
+                    NULL
                     );
     if (EFI_ERROR (Status)) {
       return Status;
@@ -1068,6 +1081,8 @@ USBMassDriverBindingStop (
                     UsbMass->DevicePath,
                     &gEfiBlockIoProtocolGuid,
                     &UsbMass->BlockIo,
+                    &gEfiDiskInfoProtocolGuid,
+                    &UsbMass->DiskInfo,
                     NULL
                     );
     

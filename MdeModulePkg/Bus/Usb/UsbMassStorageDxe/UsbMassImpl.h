@@ -2,7 +2,7 @@
   Definitions of functions for Driver Binding Protocol and Block I/O Protocol,
   and other internal definitions.
 
-Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,15 +16,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _EFI_USBMASS_IMPL_H_
 #define _EFI_USBMASS_IMPL_H_
 
-#include "UsbMass.h"
-#include "UsbMassBot.h"
-#include "UsbMassCbi.h"
-#include "UsbMassBoot.h"
-
 #define  USB_MASS_SIGNATURE    SIGNATURE_32 ('U', 's', 'b', 'M')
 
 #define USB_MASS_DEVICE_FROM_BLOCK_IO(a) \
         CR (a, USB_MASS_DEVICE, BlockIo, USB_MASS_SIGNATURE)
+
+#define USB_MASS_DEVICE_FROM_DISK_INFO(a) \
+        CR (a, USB_MASS_DEVICE, DiskInfo, USB_MASS_SIGNATURE)
+
 
 extern EFI_COMPONENT_NAME_PROTOCOL   gUsbMassStorageComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gUsbMassStorageComponentName2;

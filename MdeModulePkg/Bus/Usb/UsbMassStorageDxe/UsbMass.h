@@ -2,7 +2,7 @@
   Definition of USB Mass Storage Class and its value, USB Mass Transport Protocol, 
   and other common definitions.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/BlockIo.h>
 #include <Protocol/UsbIo.h>
 #include <Protocol/DevicePath.h>
-
+#include <Protocol/DiskInfo.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -31,6 +31,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
+
+typedef struct _USB_MASS_TRANSPORT USB_MASS_TRANSPORT;
+typedef struct _USB_MASS_DEVICE    USB_MASS_DEVICE;
+
+#include "UsbMassBot.h"
+#include "UsbMassCbi.h"
+#include "UsbMassBoot.h"
+#include "UsbMassDiskInfo.h"
+#include "UsbMassImpl.h"
 
 #define USB_IS_IN_ENDPOINT(EndPointAddr)      (((EndPointAddr) & BIT7) == BIT7)
 #define USB_IS_OUT_ENDPOINT(EndPointAddr)     (((EndPointAddr) & BIT7) == 0)
@@ -177,16 +186,16 @@ EFI_STATUS
 /// structure so that the CBI protocol can be easily removed when
 /// it is no longer necessary.
 ///
-typedef struct {
+struct _USB_MASS_TRANSPORT {
   UINT8                   Protocol;
   USB_MASS_INIT_TRANSPORT Init;        ///< Initialize the mass storage transport protocol
   USB_MASS_EXEC_COMMAND   ExecCommand; ///< Transport command to the device then get result
   USB_MASS_RESET          Reset;       ///< Reset the device
   USB_MASS_GET_MAX_LUN    GetMaxLun;   ///< Get max lun, only for bot
   USB_MASS_CLEAN_UP       CleanUp;     ///< Clean up the resources.
-} USB_MASS_TRANSPORT;
+};
 
-typedef struct {
+struct _USB_MASS_DEVICE {
   UINT32                    Signature;
   EFI_HANDLE                Controller;
   EFI_USB_IO_PROTOCOL       *UsbIo;
@@ -197,7 +206,9 @@ typedef struct {
   UINT8                     Lun;          ///< Logical Unit Number
   UINT8                     Pdt;          ///< Peripheral Device Type
   USB_MASS_TRANSPORT        *Transport;   ///< USB mass storage transport protocol
-  VOID                      *Context;     
-} USB_MASS_DEVICE;
+  VOID                      *Context;
+  EFI_DISK_INFO_PROTOCOL    DiskInfo;
+  USB_BOOT_INQUIRY_DATA     InquiryData;
+};
 
 #endif

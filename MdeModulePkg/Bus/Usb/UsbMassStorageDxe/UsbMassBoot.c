@@ -2,7 +2,7 @@
   Implementation of the command set of USB Mass Storage Specification
   for Bootability, Revision 1.0.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "UsbMassImpl.h"
+#include "UsbMass.h"
 
 /**
   Execute REQUEST SENSE Command to retrieve sense data from device.
@@ -314,25 +314,24 @@ UsbBootInquiry (
   )
 {
   USB_BOOT_INQUIRY_CMD        InquiryCmd;
-  USB_BOOT_INQUIRY_DATA       InquiryData;
   EFI_BLOCK_IO_MEDIA          *Media;
   EFI_STATUS                  Status;
 
   Media = &(UsbMass->BlockIoMedia);
 
   ZeroMem (&InquiryCmd, sizeof (USB_BOOT_INQUIRY_CMD));
-  ZeroMem (&InquiryData, sizeof (USB_BOOT_INQUIRY_DATA));
+  ZeroMem (&UsbMass->InquiryData, sizeof (USB_BOOT_INQUIRY_DATA));
 
   InquiryCmd.OpCode   = USB_BOOT_INQUIRY_OPCODE;
   InquiryCmd.Lun      = (UINT8) (USB_BOOT_LUN (UsbMass->Lun));
-  InquiryCmd.AllocLen = (UINT8) sizeof (InquiryData);
+  InquiryCmd.AllocLen = (UINT8) sizeof (USB_BOOT_INQUIRY_DATA);
 
   Status = UsbBootExecCmdWithRetry (
              UsbMass,
              &InquiryCmd,
              (UINT8) sizeof (USB_BOOT_INQUIRY_CMD),
              EfiUsbDataIn,
-             &InquiryData,
+             &UsbMass->InquiryData,
              sizeof (USB_BOOT_INQUIRY_DATA),
              USB_BOOT_GENERAL_CMD_TIMEOUT
              );
@@ -344,8 +343,8 @@ UsbBootInquiry (
   // Get information from PDT (Peripheral Device Type) field and Removable Medium Bit
   // from the inquiry data.
   //
-  UsbMass->Pdt          = (UINT8) (USB_BOOT_PDT (InquiryData.Pdt));
-  Media->RemovableMedia = (BOOLEAN) (USB_BOOT_REMOVABLE (InquiryData.Removable));
+  UsbMass->Pdt          = (UINT8) (USB_BOOT_PDT (UsbMass->InquiryData.Pdt));
+  Media->RemovableMedia = (BOOLEAN) (USB_BOOT_REMOVABLE (UsbMass->InquiryData.Removable));
   //
   // Set block size to the default value of 512 Bytes, in case no media is present at first time.
   //

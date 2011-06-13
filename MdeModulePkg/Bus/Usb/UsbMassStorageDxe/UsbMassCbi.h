@@ -2,7 +2,7 @@
   Defination for the USB mass storage Control/Bulk/Interrupt (CBI) transport,
   according to USB Mass Storage Class Control/Bulk/Interrupt (CBI) Transport, Revision 1.1.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,8 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #ifndef _EFI_USBMASS_CBI_H_
 #define _EFI_USBMASS_CBI_H_
-
-#include "UsbMass.h"
 
 extern USB_MASS_TRANSPORT mUsbCbi0Transport;
 extern USB_MASS_TRANSPORT mUsbCbi1Transport;
