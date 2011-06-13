@@ -1023,7 +1023,9 @@ FindNextMenu (
   }
 
   Selection->Statement = NULL;
-  CurrentMenu->QuestionId = 0;  
+  if (CurrentMenu != NULL) {
+    CurrentMenu->QuestionId = 0;
+  }
 
   Selection->Action = UI_ACTION_EXIT;
   return TRUE;

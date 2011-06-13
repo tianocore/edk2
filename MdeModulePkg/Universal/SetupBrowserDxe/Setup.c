@@ -2133,6 +2133,7 @@ GetDefaultValueFromAltCfg (
   ConfigRequest = NULL;
   Result        = NULL;
   ConfigResp    = NULL;
+  Value         = NULL;
   Storage       = Question->Storage;
 
   if ((Storage == NULL) || (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE)) {
@@ -2213,12 +2214,18 @@ GetDefaultValueFromAltCfg (
   //
   // Skip <ConfigRequest>
   //
-  Value = StrStr (ConfigResp, L"&VALUE");
   if (IsBufferStorage) {
+    Value = StrStr (ConfigResp, L"&VALUE");
+    ASSERT (Value != NULL);
     //
     // Skip "&VALUE"
     //
     Value = Value + 6;
+  } else {
+    Value = StrStr (ConfigResp, Question->VariableName);
+    ASSERT (Value != NULL);
+
+    Value = Value + StrLen (Question->VariableName);
   }
   if (*Value != '=') {
     Status = EFI_NOT_FOUND;

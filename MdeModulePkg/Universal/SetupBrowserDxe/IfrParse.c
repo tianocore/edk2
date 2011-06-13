@@ -457,6 +457,7 @@ InitializeRequestElement (
 
   if (!Find) {
     ConfigInfo = AllocateZeroPool(sizeof (FORM_BROWSER_CONFIG_REQUEST));
+    ASSERT (ConfigInfo != NULL);
     ConfigInfo->Signature     = FORM_BROWSER_CONFIG_REQUEST_SIGNATURE;
     ConfigInfo->ConfigRequest = AllocateCopyPool (StrSize (Storage->ConfigHdr), Storage->ConfigHdr);
     ConfigInfo->SpareStrLen   = 0;
