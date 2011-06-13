@@ -56,6 +56,7 @@ FindHiiHandleViaDevPath(
   Status = HiiDb->ListPackageLists(HiiDb, EFI_HII_PACKAGE_DEVICE_PATH, NULL, &HandleBufferSize, HandleBuffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HandleBuffer = AllocateZeroPool(HandleBufferSize);
+    ASSERT (HandleBuffer != NULL);
     Status = HiiDb->ListPackageLists(HiiDb, EFI_HII_PACKAGE_DEVICE_PATH, NULL, &HandleBufferSize, HandleBuffer);
   }
   if (EFI_ERROR(Status)) {
@@ -69,6 +70,7 @@ FindHiiHandleViaDevPath(
     Status = HiiDb->ExportPackageLists(HiiDb, HandleBuffer[LoopVariable], &MainBufferSize, MainBuffer);
     if (Status == EFI_BUFFER_TOO_SMALL) {
       MainBuffer = AllocateZeroPool(MainBufferSize);
+      ASSERT (MainBuffer != NULL);
       Status = HiiDb->ExportPackageLists(HiiDb, HandleBuffer[LoopVariable], &MainBufferSize, MainBuffer);
     }
     //
