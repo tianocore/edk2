@@ -1,7 +1,7 @@
 /** @file
   Private data structures for the Console Splitter driver
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -203,7 +203,6 @@ typedef struct {
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *GraphicsOutputModeBuffer;
   UINTN                                 CurrentNumberOfGraphicsOutput;
   UINTN                                 CurrentNumberOfUgaDraw;
-  BOOLEAN                               HardwareNeedsStarting;
 
   UINTN                                 CurrentNumberOfConsoles;
   TEXT_OUT_AND_GOP_DATA                 *TextOutList;
@@ -1766,7 +1765,6 @@ ConSplitterGrowBuffer (
   @retval EFI_SUCCESS           Mode information returned.
   @retval EFI_BUFFER_TOO_SMALL  The Info buffer was too small.
   @retval EFI_DEVICE_ERROR      A hardware error occurred trying to retrieve the video mode.
-  @retval EFI_NOT_STARTED       Video display is not initialized. Call SetMode ()
   @retval EFI_INVALID_PARAMETER One of the input args was NULL.
   @retval EFI_OUT_OF_RESOURCES  No resource available.
 

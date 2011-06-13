@@ -1,7 +1,7 @@
 /** @file
   Support for Graphics output spliter.
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,7 +30,6 @@ CHAR16 mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
   @retval EFI_SUCCESS           Mode information returned.
   @retval EFI_BUFFER_TOO_SMALL  The Info buffer was too small.
   @retval EFI_DEVICE_ERROR      A hardware error occurred trying to retrieve the video mode.
-  @retval EFI_NOT_STARTED       Video display is not initialized. Call SetMode ()
   @retval EFI_INVALID_PARAMETER One of the input args was NULL.
   @retval EFI_OUT_OF_RESOURCES  No resource available.
 
@@ -54,10 +53,6 @@ ConSplitterGraphicsOutputQueryMode (
   // retrieve private data
   //
   Private = GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
-
-  if (Private->HardwareNeedsStarting) {
-    return EFI_NOT_STARTED;
-  }
 
   *Info = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
   if (*Info == NULL) {
@@ -163,8 +158,6 @@ ConSplitterGraphicsOutputSetMode (
   //  GraphicsOutputMode->SizeOfInfo, GraphicsOutputMode->FrameBufferBase, GraphicsOutputMode->FrameBufferSize
   // These items will be initialized/updated when a new GOP device is added into ConsoleSplitter.
   //
-
-  Private->HardwareNeedsStarting = FALSE;
 
   return ReturnStatus;
 }
