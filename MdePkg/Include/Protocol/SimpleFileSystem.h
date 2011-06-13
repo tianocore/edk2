@@ -7,7 +7,7 @@
 
   UEFI 2.0 can boot from any valid EFI image contained in a SimpleFileSystem.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -45,16 +45,21 @@ typedef EFI_FILE_PROTOCOL                 EFI_FILE;
 /**
   Open the root directory on a volume.
 
-  @param  This Protocol instance pointer.
-  @param  Root Returns an Open file handle for the root directory
+  @param  This A pointer to the volume to open the root directory.
+  @param  Root A pointer to the location to return the opened file handle for the
+               root directory.
 
   @retval EFI_SUCCESS          The device was opened.
-  @retval EFI_UNSUPPORTED      This volume does not support the file system.
-  @retval EFI_NO_MEDIA         The device has no media.
+  @retval EFI_UNSUPPORTED      This volume does not support the requested file system type.
+  @retval EFI_NO_MEDIA         The device has no medium.
   @retval EFI_DEVICE_ERROR     The device reported an error.
   @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
   @retval EFI_ACCESS_DENIED    The service denied access to the file.
   @retval EFI_OUT_OF_RESOURCES The volume was not opened due to lack of resources.
+  @retval EFI_MEDIA_CHANGED    The device has a different medium in it or the medium is no
+                               longer supported. Any existing file handles for this volume are
+                               no longer valid. To access the files on the new medium, the
+                               volume must be reopened with OpenVolume().
 
 **/
 typedef
@@ -84,20 +89,30 @@ struct _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL {
 /**
   Opens a new file relative to the source file's location.
 
-  @param  This       The protocol instance pointer.
-  @param  NewHandle  Returns File Handle for FileName.
-  @param  FileName   Null terminated string. "\", ".", and ".." are supported.
-  @param  OpenMode   Open mode for file.
-  @param  Attributes Only used for EFI_FILE_MODE_CREATE.
+  @param  This       A pointer to the EFI_FILE_PROTOCOL instance that is the file
+                     handle to the source location. This would typically be an open
+                     handle to a directory.
+  @param  NewHandle  A pointer to the location to return the opened handle for the new
+                     file.
+  @param  FileName   The Null-terminated string of the name of the file to be opened.
+                     The file name may contain the following path modifiers: "\", ".",
+                     and "..".
+  @param  OpenMode   The mode to open the file. The only valid combinations that the
+                     file may be opened with are: Read, Read/Write, or Create/Read/Write.
+  @param  Attributes Only valid for EFI_FILE_MODE_CREATE, in which case these are the 
+                     attribute bits for the newly created file.
 
-  @retval EFI_SUCCESS          The device was opened.
+  @retval EFI_SUCCESS          The file was opened.
   @retval EFI_NOT_FOUND        The specified file could not be found on the device.
-  @retval EFI_NO_MEDIA         The device has no media.
-  @retval EFI_MEDIA_CHANGED    The media has changed.
+  @retval EFI_NO_MEDIA         The device has no medium.
+  @retval EFI_MEDIA_CHANGED    The device has a different medium in it or the medium is no
+                               longer supported.
   @retval EFI_DEVICE_ERROR     The device reported an error.
   @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED  An attempt was made to create a file, or open a file for write
+                               when the media is write-protected.
   @retval EFI_ACCESS_DENIED    The service denied access to the file.
-  @retval EFI_OUT_OF_RESOURCES The volume was not opened due to lack of resources.
+  @retval EFI_OUT_OF_RESOURCES Not enough resources were available to open the file.
   @retval EFI_VOLUME_FULL      The volume is full.
 
 **/
@@ -130,11 +145,12 @@ EFI_STATUS
 #define EFI_FILE_VALID_ATTR 0x0000000000000037ULL
 
 /**
-  Close the file handle
+  Closes a specified file handle.
 
-  @param  This          Protocol instance pointer.
+  @param  This          A pointer to the EFI_FILE_PROTOCOL instance that is the file 
+                        handle to close.
 
-  @retval EFI_SUCCESS   The device was opened.
+  @retval EFI_SUCCESS   The file was closed.
 
 **/
 typedef
@@ -146,10 +162,11 @@ EFI_STATUS
 /**
   Close and delete the file handle.
 
-  @param  This                     Protocol instance pointer.
-                                   
-  @retval EFI_SUCCESS              The device was opened.
-  @retval EFI_WARN_DELETE_FAILURE  The handle was closed but the file was not deleted.
+  @param  This                     A pointer to the EFI_FILE_PROTOCOL instance that is the
+                                   handle to the file to delete.
+
+  @retval EFI_SUCCESS              The file was closed and deleted, and the handle was closed.
+  @retval EFI_WARN_DELETE_FAILURE  The handle was closed, but the file was not deleted.
 
 **/
 typedef
@@ -159,17 +176,23 @@ EFI_STATUS
   );
 
 /**
-  Read data from the file.
+  Reads data from a file.
 
-  @param  This       Protocol instance pointer.
-  @param  BufferSize On input size of buffer, on output amount of data in buffer.
-  @param  Buffer     The buffer in which data is read.
+  @param  This       A pointer to the EFI_FILE_PROTOCOL instance that is the file
+                     handle to read data from.
+  @param  BufferSize On input, the size of the Buffer. On output, the amount of data
+                     returned in Buffer. In both cases, the size is measured in bytes.
+  @param  Buffer     The buffer into which the data is read.
 
   @retval EFI_SUCCESS          Data was read.
-  @retval EFI_NO_MEDIA         The device has no media.
+  @retval EFI_NO_MEDIA         The device has no medium.
   @retval EFI_DEVICE_ERROR     The device reported an error.
+  @retval EFI_DEVICE_ERROR     An attempt was made to read from a deleted file.
+  @retval EFI_DEVICE_ERROR     On entry, the current file position is beyond the end of the file.
   @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
-  @retval EFI_BUFFER_TO_SMALL  BufferSize is too small. BufferSize contains required size.
+  @retval EFI_BUFFER_TO_SMALL  The BufferSize is too small to read the current directory
+                               entry. BufferSize has been updated with the size
+                               needed to complete the request.
 
 **/
 typedef
@@ -181,20 +204,22 @@ EFI_STATUS
   );
 
 /**
-  Write data to a file.
+  Writes data to a file.
 
-  @param  This       Protocol instance pointer.
-  @param  BufferSize On input size of buffer, on output amount of data in buffer.
-  @param  Buffer     The buffer in which data to write.
+  @param  This       A pointer to the EFI_FILE_PROTOCOL instance that is the file
+                     handle to write data to.
+  @param  BufferSize On input, the size of the Buffer. On output, the amount of data
+                     actually written. In both cases, the size is measured in bytes.
+  @param  Buffer     The buffer of data to write.
 
   @retval EFI_SUCCESS          Data was written.
-  @retval EFI_UNSUPPORT        Writes to Open directory are not supported.
-  @retval EFI_NO_MEDIA         The device has no media.
+  @retval EFI_UNSUPPORTED      Writes to open directory files are not supported.
+  @retval EFI_NO_MEDIA         The device has no medium.
   @retval EFI_DEVICE_ERROR     The device reported an error.
   @retval EFI_DEVICE_ERROR     An attempt was made to write to a deleted file.
   @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED  The device is write protected.
-  @retval EFI_ACCESS_DENIED    The file was open for read only.
+  @retval EFI_WRITE_PROTECTED  The file or medium is write-protected.
+  @retval EFI_ACCESS_DENIED    The file was opened read only.
   @retval EFI_VOLUME_FULL      The volume is full.
 
 **/
@@ -207,13 +232,16 @@ EFI_STATUS
   );
 
 /**
-  Set a files current position
+  Sets a file's current position.
 
-  @param  This            Protocol instance pointer.
-  @param  Position        Byte position from the start of the file.
-                          
-  @retval EFI_SUCCESS     Data was written.
-  @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open.
+  @param  This            A pointer to the EFI_FILE_PROTOCOL instance that is the
+                          file handle to set the requested position on.
+  @param  Position        The byte position from the start of the file to set.
+
+  @retval EFI_SUCCESS      The position was set.
+  @retval EFI_UNSUPPORTED  The seek request for nonzero is not valid on open
+                           directories.
+  @retval EFI_DEVICE_ERROR An attempt was made to set the position of a deleted file.
 
 **/
 typedef
@@ -224,13 +252,15 @@ EFI_STATUS
   );
 
 /**
-  Get a file's current position
+  Returns a file's current position.
 
-  @param  This            Protocol instance pointer.
-  @param  Position        Byte position from the start of the file.
-                          
-  @retval EFI_SUCCESS     Data was written.
-  @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open..
+  @param  This            A pointer to the EFI_FILE_PROTOCOL instance that is the file
+                          handle to get the current position on.
+  @param  Position        The address to return the file's current position value.
+
+  @retval EFI_SUCCESS      The position was returned.
+  @retval EFI_UNSUPPORTED  The request is not valid on open directories.
+  @retval EFI_DEVICE_ERROR An attempt was made to get the position from a deleted file.
 
 **/
 typedef
@@ -241,22 +271,24 @@ EFI_STATUS
   );
 
 /**
-  Get information about a file.
+  Returns information about a file.
 
-  @param  This            Protocol instance pointer.
-  @param  InformationType Type of information to return in Buffer.
-  @param  BufferSize      On input size of buffer, on output amount of data in buffer.
-  @param  Buffer          The buffer to return data.
+  @param  This            A pointer to the EFI_FILE_PROTOCOL instance that is the file
+                          handle the requested information is for.
+  @param  InformationType The type identifier for the information being requested.
+  @param  BufferSize      On input, the size of Buffer. On output, the amount of data
+                          returned in Buffer. In both cases, the size is measured in bytes.
+  @param  Buffer          A pointer to the data buffer to return. The buffer's type is
+                          indicated by InformationType.
 
-  @retval EFI_SUCCESS          Data was returned.
-  @retval EFI_UNSUPPORT        InformationType is not supported.
-  @retval EFI_NO_MEDIA         The device has no media.
+  @retval EFI_SUCCESS          The information was returned.
+  @retval EFI_UNSUPPORTED      The InformationType is not known.
+  @retval EFI_NO_MEDIA         The device has no medium.
   @retval EFI_DEVICE_ERROR     The device reported an error.
   @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED  The device is write protected.
-  @retval EFI_ACCESS_DENIED    The file was open for read only.
-  @retval EFI_BUFFER_TOO_SMALL Buffer was too small; required size returned in BufferSize.
-
+  @retval EFI_BUFFER_TOO_SMALL The BufferSize is too small to read the current directory entry.
+                               BufferSize has been updated with the size needed to complete
+                               the request.
 **/
 typedef
 EFI_STATUS
@@ -268,20 +300,37 @@ EFI_STATUS
   );
 
 /**
-  Set information about a file
+  Sets information about a file.
 
-  @param  File            Protocol instance pointer.
-  @param  InformationType Type of information in Buffer.
-  @param  BufferSize      Size of buffer.
-  @param  Buffer          The data to write.
+  @param  File            A pointer to the EFI_FILE_PROTOCOL instance that is the file
+                          handle the information is for.
+  @param  InformationType The type identifier for the information being set.
+  @param  BufferSize      The size, in bytes, of Buffer.
+  @param  Buffer          A pointer to the data buffer to write. The buffer¡¯s type is
+                          indicated by InformationType.
 
-  @retval EFI_SUCCESS          Data was returned.
-  @retval EFI_UNSUPPORT        InformationType is not supported.
-  @retval EFI_NO_MEDIA         The device has no media.
+  @retval EFI_SUCCESS          The information was set.
+  @retval EFI_UNSUPPORTED      The InformationType is not known.
+  @retval EFI_NO_MEDIA         The device has no medium.
   @retval EFI_DEVICE_ERROR     The device reported an error.
   @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED  The device is write protected.
-  @retval EFI_ACCESS_DENIED    The file was open for read only.
+  @retval EFI_WRITE_PROTECTED  InformationType is EFI_FILE_INFO_ID and the media is
+                               read-only.
+  @retval EFI_WRITE_PROTECTED  InformationType is EFI_FILE_PROTOCOL_SYSTEM_INFO_ID
+                               and the media is read only.
+  @retval EFI_WRITE_PROTECTED  InformationType is EFI_FILE_SYSTEM_VOLUME_LABEL_ID
+                               and the media is read-only.
+  @retval EFI_ACCESS_DENIED    An attempt is made to change the name of a file to a
+                               file that is already present.
+  @retval EFI_ACCESS_DENIED    An attempt is being made to change the EFI_FILE_DIRECTORY
+                               Attribute.
+  @retval EFI_ACCESS_DENIED    An attempt is being made to change the size of a directory.
+  @retval EFI_ACCESS_DENIED    InformationType is EFI_FILE_INFO_ID and the file was opened
+                               read-only and an attempt is being made to modify a field
+                               other than Attribute.
+  @retval EFI_VOLUME_FULL      The volume is full.
+  @retval EFI_BAD_BUFFER_SIZE  BufferSize is smaller than the size of the type indicated
+                               by InformationType.
 
 **/
 typedef
@@ -294,17 +343,17 @@ EFI_STATUS
   );
 
 /**
-  Flush data back for the file handle.
+  Flushes all modified data associated with a file to a device.
 
-  @param  This Protocol instance pointer.
+  @param  This A pointer to the EFI_FILE_PROTOCOL instance that is the file 
+               handle to flush.
 
-  @retval EFI_SUCCESS          Data was written.
-  @retval EFI_UNSUPPORT        Writes to Open directory are not supported.
-  @retval EFI_NO_MEDIA         The device has no media.
+  @retval EFI_SUCCESS          The data was flushed.
+  @retval EFI_NO_MEDIA         The device has no medium.
   @retval EFI_DEVICE_ERROR     The device reported an error.
   @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED  The device is write protected.
-  @retval EFI_ACCESS_DENIED    The file was open for read only.
+  @retval EFI_WRITE_PROTECTED  The file or medium is write-protected.
+  @retval EFI_ACCESS_DENIED    The file was opened read-only.
   @retval EFI_VOLUME_FULL      The volume is full.
 
 **/
