@@ -1,7 +1,7 @@
 /** @file
   Processor or Compiler specific defines and types for IA-32 architecture.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -245,13 +245,17 @@ typedef INT32   INTN;
   /// Microsoft* compiler specific method for EFIAPI calling convention.
   /// 
   #define EFIAPI __cdecl  
+#elif defined(__GNUC__)
+  ///
+  /// GCC specific method for EFIAPI calling convention.
+  /// 
+  #define EFIAPI __attribute__((cdecl))  
 #else
-  #if defined(__GNUC__)
-    ///
-    /// GCC specific method for EFIAPI calling convention.
-    /// 
-    #define EFIAPI __attribute__((cdecl))  
-  #endif  
+  ///
+  /// The default for a non Microsoft* or GCC compiler is to assume the EFI ABI
+  /// is the standard. 
+  ///
+  #define EFIAPI
 #endif
 
 #if defined(__GNUC__)
