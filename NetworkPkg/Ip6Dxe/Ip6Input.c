@@ -1,7 +1,7 @@
 /** @file
   IP6 internal functions to process the incoming packets.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -613,6 +613,7 @@ Ip6IpSecProcessPacket (
   Ip6NtohHead (*Head);
 
   if (EFI_ERROR (Status)) {
+    FreePool (OriginalFragmentTable);
     goto ON_EXIT;
   }
 
@@ -620,7 +621,13 @@ Ip6IpSecProcessPacket (
     //
     // For ByPass Packet
     //
+    FreePool (FragmentTable);
     goto ON_EXIT;
+  } else {
+    //
+    // Free the FragmentTable which allocated before calling the IPsec.
+    //
+    FreePool (OriginalFragmentTable);
   }
 
   if (Direction == EfiIPsecOutBound && TxWrap != NULL) {
@@ -634,6 +641,7 @@ Ip6IpSecProcessPacket (
                                    TxWrap
                                    );
     if (TxWrap->Packet == NULL) {
+      TxWrap->Packet = *Netbuf;
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
     }
@@ -652,6 +660,8 @@ Ip6IpSecProcessPacket (
     IpSecWrap = AllocateZeroPool (sizeof (IP6_IPSEC_WRAP));
 
     if (IpSecWrap == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      gBS->SignalEvent (RecycleEvent);
       goto ON_EXIT;
     }
 
@@ -667,6 +677,9 @@ Ip6IpSecProcessPacket (
                                       );
 
     if (Packet == NULL) {
+      Packet = IpSecWrap->Packet;
+      gBS->SignalEvent (RecycleEvent);
+      FreePool (IpSecWrap);
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
     }
@@ -679,7 +692,8 @@ Ip6IpSecProcessPacket (
                                         NET_BUF_HEAD
                                         );
       if (PacketHead == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
+        *Netbuf = Packet;
+        Status  = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
 

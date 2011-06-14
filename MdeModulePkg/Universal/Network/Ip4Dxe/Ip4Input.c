@@ -1,7 +1,7 @@
 /** @file
   IP4 input process.
   
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -583,11 +583,21 @@ Ip4IpSecProcessPacket (
   Ip4NtohHead (*Head);
   
   if (EFI_ERROR (Status)) {
+    FreePool (OriginalFragmentTable);
     goto ON_EXIT;
   }
 
   if (OriginalFragmentTable == FragmentTable && OriginalFragmentCount == FragmentCount) {
+    //
+    // For ByPass Packet
+    //
+    FreePool (FragmentTable);
     goto ON_EXIT;
+  } else {
+    //
+    // Free the FragmentTable which allocated before calling the IPsec.
+    //
+    FreePool (OriginalFragmentTable);
   }
 
   if (Direction == EfiIPsecOutBound && TxWrap != NULL) {
@@ -602,6 +612,11 @@ Ip4IpSecProcessPacket (
                                    TxWrap
                                    );
     if (TxWrap->Packet == NULL) {
+      //
+      // Recover the TxWrap->Packet, if meet a error, and the caller will free
+      // the TxWrap.
+      //
+      TxWrap->Packet = *Netbuf;
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
     }
@@ -617,6 +632,8 @@ Ip4IpSecProcessPacket (
     IpSecWrap = AllocateZeroPool (sizeof (IP4_IPSEC_WRAP));
   
     if (IpSecWrap == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      gBS->SignalEvent (RecycleEvent);
       goto ON_EXIT;
     }
     
@@ -632,6 +649,9 @@ Ip4IpSecProcessPacket (
                                       );
   
     if (Packet == NULL) {
+      Packet = IpSecWrap->Packet;
+      gBS->SignalEvent (RecycleEvent);
+      FreePool (IpSecWrap);
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
     }
@@ -848,11 +868,11 @@ Ip4AccpetFrame (
   // and no need consider any other ahead ext headers.
   //
   Status = Ip4IpSecProcessPacket (
-             IpSb, 
-             &Head, 
-             &Packet, 
+             IpSb,
+             &Head,
+             &Packet,
              &Option,
-             &OptionLen, 
+             &OptionLen,
              EfiIPsecInBound,
              NULL
              );
@@ -872,11 +892,11 @@ Ip4AccpetFrame (
   //
     Head = (IP4_HEAD *) NetbufGetByte (Packet, 0, NULL);
     Status = Ip4PreProcessPacket (
-               IpSb, 
-               &Packet, 
-               Head, 
+               IpSb,
+               &Packet,
+               Head,
                Option,
-               OptionLen,  
+               OptionLen,
                Flag
                );
     if (EFI_ERROR (Status)) {

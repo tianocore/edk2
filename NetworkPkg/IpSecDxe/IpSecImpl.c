@@ -1596,7 +1596,7 @@ IpSecEspInboundPacket (
   //
   if (!SadData->Mode == EfiIPsecTunnel) {
     if (IpVersion == IP_VERSION_4) {
-      ((IP4_HEAD *) IpHead)->TotalLen = HTONS ((UINT16) (((IP4_HEAD *) IpHead)->HeadLen + PlainPayloadSize));
+      ((IP4_HEAD *) IpHead)->TotalLen = HTONS ((UINT16) ((((IP4_HEAD *) IpHead)->HeadLen << 2) + PlainPayloadSize));
     } else {
       IpSecHeadSize                              = IpSecGetPlainExtHeadSize (IpHead, LastHead);
       ((EFI_IP6_HEADER *) IpHead)->PayloadLength = HTONS ((UINT16)(IpSecHeadSize + PlainPayloadSize));
