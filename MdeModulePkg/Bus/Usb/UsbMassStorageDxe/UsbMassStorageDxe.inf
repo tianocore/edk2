@@ -56,8 +56,8 @@
   UsbMassCbi.h
   UsbMass.h
   UsbMassCbi.c
-  UsbMassDiskinfo.h
-  UsbMassDiskinfo.c
+  UsbMassDiskInfo.h
+  UsbMassDiskInfo.c
 
 [Packages]
   MdePkg/MdePkg.dec
