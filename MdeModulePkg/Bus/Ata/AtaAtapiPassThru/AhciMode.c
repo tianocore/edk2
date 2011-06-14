@@ -1273,12 +1273,12 @@ AhciStartCommand (
   if ((PortTfd & (EFI_AHCI_PORT_TFD_BSY | EFI_AHCI_PORT_TFD_DRQ)) != 0) {
     if ((Capability & BIT24) != 0) {
       Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CMD;
-      AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_CMD_COL);
+      AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_CMD_CLO);
 
       AhciWaitMemSet (
         PciIo,
         Offset,
-        EFI_AHCI_PORT_CMD_COL,
+        EFI_AHCI_PORT_CMD_CLO,
         0,
         Timeout
         );
@@ -1816,7 +1816,6 @@ AhciPacketCommandExecute (
   EFI_ATA_COMMAND_BLOCK        AtaCommandBlock;
   EFI_ATA_STATUS_BLOCK         AtaStatusBlock;
   BOOLEAN                      Read;
-  UINT8                        Retry;
 
   if (Packet == NULL || Packet->Cdb == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1860,35 +1859,21 @@ AhciPacketCommandExecute (
                NULL
                );
   } else {
-    //
-    // READ_CAPACITY cmd may execute failure. Retry 5 times
-    //
-    if (((UINT8 *)Packet->Cdb)[0] == ATA_CMD_READ_CAPACITY) {
-      Retry = 5;
-    } else {
-      Retry = 1;
-    }
-    do {
-      Status = AhciPioTransfer (
-                 PciIo,
-                 AhciRegisters,
-                 Port,
-                 PortMultiplier,
-                 Packet->Cdb,
-                 Packet->CdbLength,
-                 Read,
-                 &AtaCommandBlock,
-                 &AtaStatusBlock,
-                 Buffer,
-                 Length,
-                 Packet->Timeout, 
-                 NULL
-                 );
-      if (!EFI_ERROR (Status)) {
-        break;
-      }
-      Retry--;
-    } while (Retry != 0);
+    Status = AhciPioTransfer (
+               PciIo,
+               AhciRegisters,
+               Port,
+               PortMultiplier,
+               Packet->Cdb,
+               Packet->CdbLength,
+               Read,
+               &AtaCommandBlock,
+               &AtaStatusBlock,
+               Buffer,
+               Length,
+               Packet->Timeout, 
+               NULL
+               );
   }
   return Status;
 }
@@ -2165,7 +2150,8 @@ AhciModeInitialization (
   EFI_ATA_DEVICE_TYPE              DeviceType;
   EFI_ATA_COLLECTIVE_MODE          *SupportedModes;
   EFI_ATA_TRANSFER_MODE            TransferMode;
-  
+  UINT32                           PhyDetectDelay;
+
   if (Instance == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -2173,7 +2159,7 @@ AhciModeInitialization (
   PciIo   = Instance->PciIo;
   IdeInit = Instance->IdeControllerInit;
 
-  Status = AhciReset (PciIo, ATA_ATAPI_TIMEOUT); 
+  Status = AhciReset (PciIo, EFI_AHCI_BUS_RESET_TIMEOUT); 
 
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
@@ -2193,14 +2179,14 @@ AhciModeInitialization (
   // Get the number of command slots per port supported by this HBA.
   //
   MaxCommandSlotNumber = (UINT8) (((Capability & 0x1F00) >> 8) + 1);
-  Support64Bit         = (BOOLEAN) (((Capability & BIT31) != 0) ? TRUE : FALSE);
+  MaxPortNumber        = (UINT8) ((Capability & 0x1F) + 1);
+  Support64Bit         = (BOOLEAN) (((Capability & EFI_AHCI_CAP_S64A) != 0) ? TRUE : FALSE);
 
   //
   // Get the bit map of those ports exposed by this HBA.
   // It indicates which ports that the HBA supports are available for software to use. 
   //
   PortImplementBitMap  = AhciReadReg(PciIo, EFI_AHCI_PI_OFFSET);
-  MaxPortNumber        = (UINT8) ((Capability & 0x1F) + 1);
   
   AhciRegisters = &Instance->AhciRegisters;
   Status = AhciCreateTransferDescriptor (PciIo, AhciRegisters);
@@ -2210,191 +2196,227 @@ AhciModeInitialization (
   }
 
   for (Port = 0; Port < MaxPortNumber; Port ++) {  
-    Data64.Uint64 = (UINTN) (AhciRegisters->AhciRFisPciAddr) + sizeof (EFI_AHCI_RECEIVED_FIS) * Port;
-  
-    Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_FB;
-    AhciWriteReg (PciIo, Offset, Data64.Uint32.Lower32);
-    Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_FBU;
-    AhciWriteReg (PciIo, Offset, Data64.Uint32.Upper32);
-  
-    //
-    // Single task envrionment, we only use one command table for all port
-    //
-    Data64.Uint64 = (UINTN) (AhciRegisters->AhciCmdListPciAddr);
-  
-    Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CLB;
-    AhciWriteReg (PciIo, Offset, Data64.Uint32.Lower32);
-    Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CLBU;
-    AhciWriteReg (PciIo, Offset, Data64.Uint32.Upper32);
-  
     if ((PortImplementBitMap & (BIT0 << Port)) != 0) {
+      IdeInit->NotifyPhase (IdeInit, EfiIdeBeforeChannelEnumeration, Port);
+
+      //
+      // Initialize FIS Base Address Register and Command List Base Address Register for use.
+      //
+      Data64.Uint64 = (UINTN) (AhciRegisters->AhciRFisPciAddr) + sizeof (EFI_AHCI_RECEIVED_FIS) * Port;
+      Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_FB;
+      AhciWriteReg (PciIo, Offset, Data64.Uint32.Lower32);
+      Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_FBU;
+      AhciWriteReg (PciIo, Offset, Data64.Uint32.Upper32);
+
+      Data64.Uint64 = (UINTN) (AhciRegisters->AhciCmdListPciAddr);
+      Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CLB;
+      AhciWriteReg (PciIo, Offset, Data64.Uint32.Lower32);
+      Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CLBU;
+      AhciWriteReg (PciIo, Offset, Data64.Uint32.Upper32);
+
       Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CMD;
-  
-      if ((Capability & EFI_AHCI_PORT_CMD_ASP) != 0) {
-        AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_CMD_SUD);
-      }
       Data = AhciReadReg (PciIo, Offset);
       if ((Data & EFI_AHCI_PORT_CMD_CPD) != 0) {
         AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_CMD_POD);
       }
-  
-      AhciAndReg (PciIo, Offset, (UINT32)~(EFI_AHCI_PORT_CMD_FRE|EFI_AHCI_PORT_CMD_COL|EFI_AHCI_PORT_CMD_ST));
-    }
-  
-    Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SCTL;
-    AhciAndReg (PciIo, Offset, (UINT32)~(EFI_AHCI_PORT_SCTL_IPM_MASK));
- 
-    AhciAndReg (PciIo, Offset,(UINT32) ~(EFI_AHCI_PORT_SCTL_IPM_PSD));
-    AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_SCTL_IPM_PSD);
-  
-    AhciAndReg (PciIo, Offset, (UINT32)~(EFI_AHCI_PORT_SCTL_IPM_SSD));
-    AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_SCTL_IPM_SSD);
-  
-    Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_IE;
-    AhciAndReg (PciIo, Offset, 0);
-  
-    Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SERR;
-    AhciWriteReg (PciIo, Offset, AhciReadReg (PciIo, Offset));
-  }
 
-  //
-  // Stall for 100 milliseconds.
-  //
-  MicroSecondDelay(100000);
-  
-  IdeInit->NotifyPhase (IdeInit, EfiIdeBeforeChannelEnumeration, Port);
-  
-  for (Port = 0; Port < MaxPortNumber; Port ++) {  
-    if ((PortImplementBitMap & (BIT0 << Port)) != 0) {
-    
-      Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SSTS;
-      Data = AhciReadReg (PciIo, Offset) & EFI_AHCI_PORT_SSTS_DET_MASK;
+      if ((Capability & EFI_AHCI_CAP_SSS) != 0) {
+        AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_CMD_SUD);
+      }
 
-      if (Data == 0) {
+      //
+      // Disable aggressive power management.
+      //
+      Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SCTL;
+      AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_SCTL_IPM_INIT);
+      //
+      // Disable the reporting of the corresponding interrupt to system software.
+      //
+      Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_IE;
+      AhciAndReg (PciIo, Offset, 0);
+
+      //
+      // Now inform the IDE Controller Init Module.
+      //
+      IdeInit->NotifyPhase (IdeInit, EfiIdeBusBeforeDevicePresenceDetection, Port);
+
+      //
+      // Enable FIS Receive DMA engine for the first D2H FIS.
+      //
+      Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CMD;
+      AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_CMD_FRE);
+      Status = AhciWaitMemSet (
+                 PciIo, 
+                 Offset,
+                 EFI_AHCI_PORT_CMD_FR,
+                 EFI_AHCI_PORT_CMD_FR,
+                 EFI_AHCI_PORT_CMD_FR_CLEAR_TIMEOUT
+                 );
+      if (EFI_ERROR (Status)) {
         continue;
       }
+
       //
-      // Found device in the port
+      // Wait no longer than 10 ms to wait the Phy to detect the presence of a device.
+      // It's the requirment from SATA1.0a spec section 5.2.
       //
-      if (Data == EFI_AHCI_PORT_SSTS_DET_PCE) {
-        Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SIG;
+      PhyDetectDelay = EFI_AHCI_BUS_PHY_DETECT_TIMEOUT;
+      Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SSTS;
+      do {
+        Data = AhciReadReg (PciIo, Offset) & EFI_AHCI_PORT_SSTS_DET_MASK;
+        if ((Data == EFI_AHCI_PORT_SSTS_DET_PCE) || (Data == EFI_AHCI_PORT_SSTS_DET)) {
+          break;
+        }
 
-        Status = AhciWaitMemSet (
-                   PciIo, 
-                   Offset,
-                   0x0000FFFF,
-                   0x00000101,
-                   ATA_ATAPI_TIMEOUT
-                   );
+        MicroSecondDelay (1000);
+        PhyDetectDelay--;
+      } while (PhyDetectDelay > 0);
+
+      if (PhyDetectDelay == 0) {
+        //
+        // No device detected at this port.
+        //
+        continue;
+      }
+
+      //
+      // According to SATA1.0a spec section 5.2, we need to wait for PxTFD.BSY and PxTFD.DRQ
+      // and PxTFD.ERR to be zero. The maximum wait time is 16s which is defined at ATA spec.
+      //
+      PhyDetectDelay = 16 * 1000;
+      do {
+        Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SERR;
+        if (AhciReadReg(PciIo, Offset) != 0) {
+          AhciWriteReg (PciIo, Offset, AhciReadReg(PciIo, Offset));
+        }
+        Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
+
+        Data = AhciReadReg (PciIo, Offset) & EFI_AHCI_PORT_TFD_MASK;
+        if (Data == 0) {
+          break;
+        }
+
+        MicroSecondDelay (1000);
+        PhyDetectDelay--;
+      } while (PhyDetectDelay > 0);
+      
+      if (PhyDetectDelay == 0) {
+        continue;
+      }
+
+      //
+      // When the first D2H register FIS is received, the content of PxSIG register is updated.
+      //
+      Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SIG;
+      Status = AhciWaitMemSet (
+                 PciIo, 
+                 Offset,
+                 0x0000FFFF,
+                 0x00000101,
+                 EFI_TIMER_PERIOD_SECONDS(16)
+                 );
+      if (EFI_ERROR (Status)) {
+        continue;
+      }
+
+      Data = AhciReadReg (PciIo, Offset);
+      if ((Data & EFI_AHCI_ATAPI_SIG_MASK) == EFI_AHCI_ATAPI_DEVICE_SIG) {
+        Status = AhciIdentifyPacket (PciIo, AhciRegisters, Port, 0, &Buffer);
+
         if (EFI_ERROR (Status)) {
           continue;
         }
 
-        //
-        // Now inform the IDE Controller Init Module.
-        //
-        IdeInit->NotifyPhase (IdeInit, EfiIdeBusBeforeDevicePresenceDetection, Port);
-
-        Data = AhciReadReg (PciIo, Offset);
-
-        if ((Data & EFI_AHCI_ATAPI_SIG_MASK) == EFI_AHCI_ATAPI_DEVICE_SIG) {
-          Status = AhciIdentifyPacket (PciIo, AhciRegisters, Port, 0, &Buffer);
-
-          if (EFI_ERROR (Status)) {
-            continue;
-          }
-
-          DeviceType = EfiIdeCdrom;
-        } else if ((Data & EFI_AHCI_ATAPI_SIG_MASK) == EFI_AHCI_ATA_DEVICE_SIG) {
-          Status = AhciIdentify (PciIo, AhciRegisters, Port, 0, &Buffer);
-
-          if (EFI_ERROR (Status)) {
-            REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_EC_NOT_DETECTED));
-            continue;
-          }
-
-          DeviceType = EfiIdeHarddisk;
-        } else {
-          continue;
-        }
-
-        DEBUG ((EFI_D_INFO, "port [%d] port mulitplier [%d] has a [%a]\n", 
-            Port, 0, DeviceType == EfiIdeCdrom ? "cdrom" : "harddisk"));
-
-        //
-        // If the device is a hard disk, then try to enable S.M.A.R.T feature
-        //
-        if (DeviceType == EfiIdeHarddisk) {
-          AhciAtaSmartSupport (
-            PciIo,
-            AhciRegisters,
-            Port,
-            0,
-            &Buffer,
-            NULL
-            );
-        }
-
-        //
-        // Submit identify data to IDE controller init driver
-        //
-        IdeInit->SubmitData (IdeInit, Port, 0, &Buffer);
-
-        //
-        // Now start to config ide device parameter and transfer mode.
-        //
-        Status = IdeInit->CalculateMode (
-                            IdeInit,
-                            Port,
-                            0,
-                            &SupportedModes
-                            );
-        if (EFI_ERROR (Status)) {
-          DEBUG ((EFI_D_ERROR, "Calculate Mode Fail, Status = %r\n", Status));
-          continue;
-        }
-
-        //
-        // Set best supported PIO mode on this IDE device
-        //
-        if (SupportedModes->PioMode.Mode <= EfiAtaPioMode2) {
-          TransferMode.ModeCategory = EFI_ATA_MODE_DEFAULT_PIO;
-        } else {
-          TransferMode.ModeCategory = EFI_ATA_MODE_FLOW_PIO;
-        }
-
-        TransferMode.ModeNumber = (UINT8) (SupportedModes->PioMode.Mode);
-    
-        //
-        // Set supported DMA mode on this IDE device. Note that UDMA & MDMA cann't
-        // be set together. Only one DMA mode can be set to a device. If setting
-        // DMA mode operation fails, we can continue moving on because we only use
-        // PIO mode at boot time. DMA modes are used by certain kind of OS booting
-        //
-        if (SupportedModes->UdmaMode.Valid) {
-          TransferMode.ModeCategory = EFI_ATA_MODE_UDMA;
-          TransferMode.ModeNumber = (UINT8) (SupportedModes->UdmaMode.Mode);
-        } else if (SupportedModes->MultiWordDmaMode.Valid) {
-          TransferMode.ModeCategory = EFI_ATA_MODE_MDMA;
-          TransferMode.ModeNumber = (UINT8) SupportedModes->MultiWordDmaMode.Mode;  
-        }
-
-        Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, 0, 0x03, (UINT32)(*(UINT8 *)&TransferMode));
+        DeviceType = EfiIdeCdrom;
+      } else if ((Data & EFI_AHCI_ATAPI_SIG_MASK) == EFI_AHCI_ATA_DEVICE_SIG) {
+        Status = AhciIdentify (PciIo, AhciRegisters, Port, 0, &Buffer);
 
         if (EFI_ERROR (Status)) {
-          DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
+          REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_EC_NOT_DETECTED));
           continue;
         }
-        //
-        // Found a ATA or ATAPI device, add it into the device list.
-        //
-        CreateNewDeviceInfo (Instance, Port, 0, DeviceType, &Buffer);
-        if (DeviceType == EfiIdeHarddisk) {
-          REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_PC_ENABLE));
-        }
+
+        DeviceType = EfiIdeHarddisk;
+      } else {
+        continue;
+      }
+      DEBUG ((EFI_D_INFO, "port [%d] port mulitplier [%d] has a [%a]\n", 
+              Port, 0, DeviceType == EfiIdeCdrom ? "cdrom" : "harddisk"));
+
+      //
+      // If the device is a hard disk, then try to enable S.M.A.R.T feature
+      //
+      if (DeviceType == EfiIdeHarddisk) {
+        AhciAtaSmartSupport (
+          PciIo,
+          AhciRegisters,
+          Port,
+          0,
+          &Buffer,
+          NULL
+          );
+      }
+
+      //
+      // Submit identify data to IDE controller init driver
+      //
+      IdeInit->SubmitData (IdeInit, Port, 0, &Buffer);
+
+      //
+      // Now start to config ide device parameter and transfer mode.
+      //
+      Status = IdeInit->CalculateMode (
+                          IdeInit,
+                          Port,
+                          0,
+                          &SupportedModes
+                          );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_ERROR, "Calculate Mode Fail, Status = %r\n", Status));
+        continue;
+      }
+
+      //
+      // Set best supported PIO mode on this IDE device
+      //
+      if (SupportedModes->PioMode.Mode <= EfiAtaPioMode2) {
+        TransferMode.ModeCategory = EFI_ATA_MODE_DEFAULT_PIO;
+      } else {
+        TransferMode.ModeCategory = EFI_ATA_MODE_FLOW_PIO;
+      }
+
+      TransferMode.ModeNumber = (UINT8) (SupportedModes->PioMode.Mode);
+
+      //
+      // Set supported DMA mode on this IDE device. Note that UDMA & MDMA cann't
+      // be set together. Only one DMA mode can be set to a device. If setting
+      // DMA mode operation fails, we can continue moving on because we only use
+      // PIO mode at boot time. DMA modes are used by certain kind of OS booting
+      //
+      if (SupportedModes->UdmaMode.Valid) {
+        TransferMode.ModeCategory = EFI_ATA_MODE_UDMA;
+        TransferMode.ModeNumber = (UINT8) (SupportedModes->UdmaMode.Mode);
+      } else if (SupportedModes->MultiWordDmaMode.Valid) {
+        TransferMode.ModeCategory = EFI_ATA_MODE_MDMA;
+        TransferMode.ModeNumber = (UINT8) SupportedModes->MultiWordDmaMode.Mode;  
+      }
+
+      Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, 0, 0x03, (UINT32)(*(UINT8 *)&TransferMode));
+      if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
+        continue;
+      }
+
+      //
+      // Found a ATA or ATAPI device, add it into the device list.
+      //
+      CreateNewDeviceInfo (Instance, Port, 0, DeviceType, &Buffer);
+      if (DeviceType == EfiIdeHarddisk) {
+        REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_PC_ENABLE));
       }
     }
   }
+
   return EFI_SUCCESS;
 }
 

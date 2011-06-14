@@ -166,6 +166,9 @@ ScsiDiskDriverBindingStart (
   UINT8                 Index;
   UINT8                 MaxRetry;
   BOOLEAN               NeedRetry;
+  BOOLEAN               MustReadCapacity;
+
+  MustReadCapacity = TRUE;
 
   ScsiDiskDevice = (SCSI_DISK_DEV *) AllocateZeroPool (sizeof (SCSI_DISK_DEV));
   if (ScsiDiskDevice == NULL) {
@@ -199,10 +202,12 @@ ScsiDiskDriverBindingStart (
   switch (ScsiDiskDevice->DeviceType) {
   case EFI_SCSI_TYPE_DISK:
     ScsiDiskDevice->BlkIo.Media->BlockSize = 0x200;
+    MustReadCapacity = TRUE;
     break;
 
   case EFI_SCSI_TYPE_CDROM:
     ScsiDiskDevice->BlkIo.Media->BlockSize = 0x800;
+    MustReadCapacity = FALSE;
     break;
   }
   //
@@ -249,7 +254,7 @@ ScsiDiskDriverBindingStart (
   // The second parameter "TRUE" means must
   // retrieve media capacity
   //
-  Status = ScsiDiskDetectMedia (ScsiDiskDevice, TRUE, &Temp);
+  Status = ScsiDiskDetectMedia (ScsiDiskDevice, MustReadCapacity, &Temp);
   if (!EFI_ERROR (Status)) {
     //
     // Determine if Block IO should be produced on this controller handle
@@ -710,6 +715,7 @@ ScsiDiskDetectMedia (
   CopyMem (&OldMedia, ScsiDiskDevice->BlkIo.Media, sizeof (OldMedia));
   *MediaChange        = FALSE;
   MaxRetry            = 3;
+  Action              = ACTION_NO_ACTION;
 
   for (Index = 0; Index < MaxRetry; Index++) {
     Status = ScsiDiskTestUnitReady (
@@ -719,7 +725,19 @@ ScsiDiskDetectMedia (
               &NumberOfSenseKeys
               );
     if (!EFI_ERROR (Status)) {
-      break;
+      Status = DetectMediaParsingSenseKeys (
+                 ScsiDiskDevice,
+                 SenseData,
+                 NumberOfSenseKeys,
+                 &Action
+                 );
+      if (EFI_ERROR (Status)) {
+        return Status;
+      } else if (Action == ACTION_RETRY_COMMAND_LATER) {
+        continue;
+      } else {
+        break;
+      }
     }
 
     if (!NeedRetry) {
@@ -731,22 +749,11 @@ ScsiDiskDetectMedia (
     return EFI_DEVICE_ERROR;
   }
 
-  Status = DetectMediaParsingSenseKeys (
-            ScsiDiskDevice,
-            SenseData,
-            NumberOfSenseKeys,
-            &Action
-            );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
   //
   // ACTION_NO_ACTION: need not read capacity
   // other action code: need read capacity
   //
-  if (Action == ACTION_NO_ACTION) {
-    NeedReadCapacity = FALSE;
-  } else {
+  if (Action == ACTION_READ_CAPACITY) {
     NeedReadCapacity = TRUE;
   }
 
@@ -1202,6 +1209,11 @@ DetectMediaParsingSenseKeys (
 
   if (ScsiDiskIsMediaChange (SenseData, NumberOfSenseKeys)) {
     ScsiDiskDevice->BlkIo.Media->MediaId++;
+    return EFI_SUCCESS;
+  }
+
+  if (ScsiDiskIsResetBefore (SenseData, NumberOfSenseKeys)) {
+    *Action = ACTION_RETRY_COMMAND_LATER;
     return EFI_SUCCESS;
   }
 

@@ -17,6 +17,8 @@
 #define EFI_AHCI_BAR_INDEX                     0x05
 
 #define EFI_AHCI_CAPABILITY_OFFSET             0x0000
+#define   EFI_AHCI_CAP_SSS                     BIT27
+#define   EFI_AHCI_CAP_S64A                    BIT31
 #define EFI_AHCI_GHC_OFFSET                    0x0004
 #define   EFI_AHCI_GHC_RESET                   BIT0
 #define   EFI_AHCI_GHC_IE                      BIT1
@@ -33,6 +35,19 @@ typedef union {
   DATA_32   Uint32;
   UINT64    Uint64;
 } DATA_64;
+
+//
+// Refer SATA1.0a spec section 5.2, the Phy detection time should be less than 10ms.
+//
+#define  EFI_AHCI_BUS_PHY_DETECT_TIMEOUT       10
+//
+// Refer SATA1.0a spec, the FIS enable time should be less than 500ms.
+//
+#define  EFI_AHCI_PORT_CMD_FR_CLEAR_TIMEOUT    EFI_TIMER_PERIOD_MILLISECONDS(500)
+//
+// Refer SATA1.0a spec, the bus reset time should be less than 1s.
+//
+#define  EFI_AHCI_BUS_RESET_TIMEOUT            EFI_TIMER_PERIOD_SECONDS(1)
 
 #define  EFI_AHCI_ATAPI_DEVICE_SIG             0xEB140000
 #define  EFI_AHCI_ATA_DEVICE_SIG               0x00000000
@@ -103,7 +118,7 @@ typedef union {
 #define   EFI_AHCI_PORT_CMD_ST                 BIT0
 #define   EFI_AHCI_PORT_CMD_SUD                BIT1
 #define   EFI_AHCI_PORT_CMD_POD                BIT2
-#define   EFI_AHCI_PORT_CMD_COL                BIT3
+#define   EFI_AHCI_PORT_CMD_CLO                BIT3
 #define   EFI_AHCI_PORT_CMD_CR                 BIT15
 #define   EFI_AHCI_PORT_CMD_FRE                BIT4
 #define   EFI_AHCI_PORT_CMD_FR                 BIT14

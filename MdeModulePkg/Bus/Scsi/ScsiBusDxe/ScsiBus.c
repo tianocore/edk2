@@ -1026,10 +1026,63 @@ ScsiScanCreateDevice (
   EFI_STATUS                Status;
   SCSI_IO_DEV               *ScsiIoDevice;
   EFI_DEVICE_PATH_PROTOCOL  *ScsiDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath;
+  EFI_HANDLE                 DeviceHandle;
+
+  DevicePath          = NULL;
+  RemainingDevicePath = NULL;
+  ScsiDevicePath      = NULL;
+  ScsiIoDevice        = NULL;
+
+  //
+  // Build Device Path
+  //
+  if (ScsiBusDev->ExtScsiSupport){
+    Status = ScsiBusDev->ExtScsiInterface->BuildDevicePath (
+                                             ScsiBusDev->ExtScsiInterface,
+                                             &TargetId->ScsiId.ExtScsi[0],
+                                             Lun,
+                                             &ScsiDevicePath
+                                             );
+  } else {
+    Status = ScsiIoDevice->ScsiPassThru->BuildDevicePath (
+                                           ScsiBusDev->ScsiInterface,
+                                           TargetId->ScsiId.Scsi,
+                                           Lun,
+                                           &ScsiDevicePath
+                                           );
+  }
+
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
+  DevicePath = AppendDevicePathNode (
+                 ScsiBusDev->DevicePath,
+                 ScsiDevicePath
+                 );
+
+  if (DevicePath == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
+  }
+
+  DeviceHandle = NULL;
+  RemainingDevicePath = DevicePath;
+  Status = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &RemainingDevicePath, &DeviceHandle);
+  if (!EFI_ERROR (Status) && (DeviceHandle != NULL) && IsDevicePathEnd(RemainingDevicePath)) {
+    //
+    // The device has been started, directly return to fast boot.
+    //
+    Status = EFI_ALREADY_STARTED;
+    goto ErrorExit;
+  }
 
   ScsiIoDevice = AllocateZeroPool (sizeof (SCSI_IO_DEV));
   if (ScsiIoDevice == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
   }
 
   ScsiIoDevice->Signature                 = SCSI_IO_DEV_SIGNATURE;
@@ -1053,52 +1106,12 @@ ScsiScanCreateDevice (
   ScsiIoDevice->ScsiIo.ResetDevice        = ScsiResetDevice;
   ScsiIoDevice->ScsiIo.ExecuteScsiCommand = ScsiExecuteSCSICommand;
 
-
   if (!DiscoverScsiDevice (ScsiIoDevice)) {
-    FreePool (ScsiIoDevice);
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
   }
 
-  //
-  // Set Device Path
-  //
-  ScsiDevicePath = NULL;
-  if (ScsiIoDevice->ExtScsiSupport){
-    Status = ScsiIoDevice->ExtScsiPassThru->BuildDevicePath (
-                                          ScsiIoDevice->ExtScsiPassThru,
-                                          &ScsiIoDevice->Pun.ScsiId.ExtScsi[0],
-                                          ScsiIoDevice->Lun,
-                                          &ScsiDevicePath
-                                          );
-  } else {
-    Status = ScsiIoDevice->ScsiPassThru->BuildDevicePath (
-                                          ScsiIoDevice->ScsiPassThru,
-                                          ScsiIoDevice->Pun.ScsiId.Scsi,
-                                          ScsiIoDevice->Lun,
-                                          &ScsiDevicePath
-                                          );
-  }
-
-  if (EFI_ERROR(Status)) {
-    FreePool (ScsiIoDevice);
-    return Status;
-  }
-
-  ScsiIoDevice->DevicePath = AppendDevicePathNode (
-                              ScsiBusDev->DevicePath,
-                              ScsiDevicePath
-                              );
-  //
-  // The memory space for ScsiDevicePath is allocated in
-  // ScsiPassThru->BuildDevicePath() function; It is no longer used
-  // after EfiAppendDevicePathNode,so free the memory it occupies.
-  //
-  FreePool (ScsiDevicePath);
-
-  if (ScsiIoDevice->DevicePath == NULL) {
-    FreePool (ScsiIoDevice);
-    return EFI_OUT_OF_RESOURCES;
-  }
+  ScsiIoDevice->DevicePath = DevicePath;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ScsiIoDevice->Handle,
@@ -1109,31 +1122,48 @@ ScsiScanCreateDevice (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-    FreePool (ScsiIoDevice->DevicePath);
-    FreePool (ScsiIoDevice);
-    return EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
   } else {
     if (ScsiBusDev->ExtScsiSupport) {
       gBS->OpenProtocol (
-            Controller,
-            &gEfiExtScsiPassThruProtocolGuid,
-            (VOID **) &(ScsiBusDev->ExtScsiInterface),
-            This->DriverBindingHandle,
-            ScsiIoDevice->Handle,
-            EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
-            );
+             Controller,
+             &gEfiExtScsiPassThruProtocolGuid,
+             (VOID **) &(ScsiBusDev->ExtScsiInterface),
+             This->DriverBindingHandle,
+             ScsiIoDevice->Handle,
+             EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+             );
      } else {
       gBS->OpenProtocol (
-            Controller,
-            &gEfiScsiPassThruProtocolGuid,
-            (VOID **) &(ScsiBusDev->ScsiInterface),
-            This->DriverBindingHandle,
-            ScsiIoDevice->Handle,
-            EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
-            );
+             Controller,
+             &gEfiScsiPassThruProtocolGuid,
+             (VOID **) &(ScsiBusDev->ScsiInterface),
+             This->DriverBindingHandle,
+             ScsiIoDevice->Handle,
+             EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+             );
      }
   }
   return EFI_SUCCESS;
+
+ErrorExit:
+  
+  //
+  // The memory space for ScsiDevicePath is allocated in
+  // ScsiPassThru->BuildDevicePath() function; It is no longer used
+  // after AppendDevicePathNode,so free the memory it occupies.
+  //
+  FreePool (ScsiDevicePath);
+
+  if (DevicePath != NULL) {
+    FreePool (DevicePath);
+  }
+
+  if (ScsiIoDevice != NULL) {
+    FreePool (ScsiIoDevice);
+  }
+
+  return Status;
 }
 
 
@@ -1158,6 +1188,8 @@ DiscoverScsiDevice (
   UINT8                 TargetStatus;
   EFI_SCSI_SENSE_DATA   SenseData;
   EFI_SCSI_INQUIRY_DATA InquiryData;
+  UINT8                 MaxRetry;
+  UINT8                 Index;
 
   HostAdapterStatus = 0;
   TargetStatus      = 0;
@@ -1166,21 +1198,34 @@ DiscoverScsiDevice (
   //
   InquiryDataLength = sizeof (EFI_SCSI_INQUIRY_DATA);
   SenseDataLength   = (UINT8) sizeof (EFI_SCSI_SENSE_DATA);
+  ZeroMem (&InquiryData, InquiryDataLength);
 
-  Status = ScsiInquiryCommand (
-            &ScsiIoDevice->ScsiIo,
-            EFI_TIMER_PERIOD_SECONDS (1),
-            (VOID *) &SenseData,
-            &SenseDataLength,
-            &HostAdapterStatus,
-            &TargetStatus,
-            (VOID *) &InquiryData,
-            &InquiryDataLength,
-            FALSE
-            );
-  if (EFI_ERROR (Status) && Status != EFI_BAD_BUFFER_SIZE) {
+  MaxRetry = 2;
+  for (Index = 0; Index < MaxRetry; Index++) {
+    Status = ScsiInquiryCommand (
+              &ScsiIoDevice->ScsiIo,
+              EFI_TIMER_PERIOD_SECONDS (1),
+              (VOID *) &SenseData,
+              &SenseDataLength,
+              &HostAdapterStatus,
+              &TargetStatus,
+              (VOID *) &InquiryData,
+              &InquiryDataLength,
+              FALSE
+              );
+    if (!EFI_ERROR (Status)) {
+      break;
+    } else if ((Status == EFI_BAD_BUFFER_SIZE) || 
+               (Status == EFI_INVALID_PARAMETER) ||
+               (Status == EFI_UNSUPPORTED)) {
+      return FALSE;
+    }
+  }
+
+  if (Index == MaxRetry) {
     return FALSE;
   }
+  
   //
   // Retrieved inquiry data successfully
   //
