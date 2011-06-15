@@ -386,7 +386,7 @@ BdsLoadOptionFileSystemUpdateDevicePath (
 
   Print(L"File path of the EFI Application or the kernel: ");
   UnicodeStrToAsciiStr (EndingDevicePath->PathName,AsciiBootFilePath);
-  Status = EditHIInputAscii(AsciiBootFilePath,BOOT_DEVICE_FILEPATH_MAX);
+  Status = EditHIInputAscii (AsciiBootFilePath,BOOT_DEVICE_FILEPATH_MAX);
   if (EFI_ERROR(Status)) {
     return Status;
   }
@@ -567,9 +567,40 @@ BdsLoadOptionMemMapUpdateDevicePath (
   OUT UINT32 *Attributes
   )
 {
-  ASSERT(0);
-  //TODO: Implement me
-  return EFI_SUCCESS;
+  EFI_STATUS          Status;
+  CHAR8               AsciiStartingAddress[BOOT_DEVICE_ADDRESS_MAX];
+  CHAR8               AsciiEndingAddress[BOOT_DEVICE_ADDRESS_MAX];
+  MEMMAP_DEVICE_PATH* EndingDevicePath;
+  EFI_DEVICE_PATH*    DevicePath;
+
+  DevicePath = DuplicateDevicePath (BootOption->FilePathList);
+  EndingDevicePath = (MEMMAP_DEVICE_PATH*)GetLastDevicePathNode (DevicePath);
+
+  Print(L"Starting Address of the binary: ");
+  AsciiSPrint (AsciiStartingAddress,BOOT_DEVICE_ADDRESS_MAX,"0x%X",(UINTN)EndingDevicePath->StartingAddress);
+  Status = EditHIInputAscii (AsciiStartingAddress,BOOT_DEVICE_ADDRESS_MAX);
+  if (EFI_ERROR(Status)) {
+    return EFI_ABORTED;
+  }
+
+  Print(L"Ending Address of the binary: ");
+  AsciiSPrint (AsciiEndingAddress,BOOT_DEVICE_ADDRESS_MAX,"0x%X",(UINTN)EndingDevicePath->EndingAddress);
+  Status = EditHIInputAscii (AsciiEndingAddress,BOOT_DEVICE_ADDRESS_MAX);
+  if (EFI_ERROR(Status)) {
+    return EFI_ABORTED;
+  }
+
+  EndingDevicePath->StartingAddress = AsciiStrHexToUint64 (AsciiStartingAddress);
+  EndingDevicePath->EndingAddress = AsciiStrHexToUint64 (AsciiEndingAddress);
+
+  Status = BootDeviceGetType (NULL, BootType, Attributes);
+  if (EFI_ERROR(Status)) {
+    FreePool(DevicePath);
+  } else {
+    *NewDevicePath = DevicePath;
+  }
+
+  return Status;
 }
 
 BOOLEAN

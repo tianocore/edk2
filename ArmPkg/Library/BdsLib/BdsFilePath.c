@@ -298,6 +298,18 @@ TryRemovableDevice (
   return Status;
 }
 
+/**
+  Connect a Device Path and return the handle of the driver that support this DevicePath
+
+  @param  DevicePath            Device Path of the File to connect
+  @param  Handle                Handle of the driver that support this DevicePath
+  @param  RemainingDevicePath   Remaining DevicePath nodes that do not match the driver DevicePath
+
+  @retval EFI_SUCCESS           A driver that matches the Device Path has been found
+  @retval EFI_NOT_FOUND         No handles match the search.
+  @retval EFI_INVALID_PARAMETER DevicePath or Handle is NULL
+
+**/
 EFI_STATUS
 BdsConnectDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
@@ -335,7 +347,7 @@ BdsConnectDevicePath (
     // Now, we have got the whole Device Path connected, call again ConnectController to ensure all the supported Driver
     // Binding Protocol are connected (such as DiskIo and SimpleFileSystem)
     Remaining = DevicePath;
-    Status = gBS->LocateDevicePath(&gEfiDevicePathProtocolGuid,&Remaining,Handle);
+    Status = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid,&Remaining,Handle);
     if (!EFI_ERROR (Status)) {
       Status = gBS->ConnectController (*Handle, NULL, Remaining, FALSE);
       if (EFI_ERROR (Status)) {
@@ -420,6 +432,9 @@ BdsFileSystemLoadImage (
 
   File = NULL;
   Status = Fs->Open(Fs, &File, FilePathDevicePath->PathName, EFI_FILE_MODE_READ, 0);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
 
   Size = 0;
   File->GetInfo(File, &gEfiFileInfoGuid, &Size, NULL);
@@ -811,6 +826,17 @@ BdsLoadImage (
   return EFI_UNSUPPORTED;
 }
 
+/**
+  Start an EFI Application from a Device Path
+
+  @param  ParentImageHandle     Handle of the calling image
+  @param  DevicePath            Location of the EFI Application
+
+  @retval EFI_SUCCESS           All drivers have been connected
+  @retval EFI_NOT_FOUND         The Linux kernel Device Path has not been found
+  @retval EFI_OUT_OF_RESOURCES  There is not enough resource memory to store the matching results.
+
+**/
 EFI_STATUS
 BdsStartEfiApplication (
   IN EFI_HANDLE                  ParentImageHandle,

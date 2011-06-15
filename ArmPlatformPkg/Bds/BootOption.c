@@ -258,8 +258,13 @@ BootOptionSetFields (
   CopyMem (&((BDS_LOADER_OPTIONAL_DATA*)EfiLoadOptionPtr)->Arguments, BootArguments, AsciiStrSize(BootArguments));
   BootOption->OptionalData = (BDS_LOADER_OPTIONAL_DATA *)EfiLoadOptionPtr;
 
+  // If this function is called at the creation of the Boot Device entry (not at the update) the
+  // BootOption->LoadOptionSize must be zero then we get a new BootIndex for this entry
+  if (BootOption->LoadOptionSize == 0) {
+    BootOption->LoadOptionIndex = BootOptionAllocateBootIndex();
+  }
+
   // Fill the EFI Load option fields
-  BootOption->LoadOptionIndex = BootOptionAllocateBootIndex();
   BootOption->LoadOption = EfiLoadOption;
   BootOption->LoadOptionSize = EfiLoadOptionSize;
 
@@ -341,20 +346,20 @@ BootOptionUpdate (
   )
 {
   EFI_STATUS      Status;
-  BDS_LOAD_OPTION *BootOption;
   CHAR16          BootVariableName[9];
 
   // Update the BDS Load Option structure
   BootOptionSetFields (BdsLoadOption, Attributes, BootDescription, DevicePath, BootType, BootArguments);
 
   // Update the related environment variables
-  UnicodeSPrint (BootVariableName, 9 * sizeof(CHAR16), L"Boot%04X", BootOption->LoadOptionIndex);
+  UnicodeSPrint (BootVariableName, 9 * sizeof(CHAR16), L"Boot%04X", BdsLoadOption->LoadOptionIndex);
+
   Status = gRT->SetVariable (
       BootVariableName,
       &gEfiGlobalVariableGuid,
       EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-      BootOption->LoadOptionSize,
-      BootOption->LoadOption
+      BdsLoadOption->LoadOptionSize,
+      BdsLoadOption->LoadOption
       );
 
   return Status;
