@@ -886,6 +886,9 @@ UpdateStdInStdOutStdErr(
       ||(StdErrFileName != NULL && !ErrUnicode && ErrAppend && (!EFI_ERROR(ShellFileExists(StdErrFileName)) && !EFI_ERROR(IsUnicodeFile(StdErrFileName))))
       ){
       Status = EFI_INVALID_PARAMETER;
+      ShellParameters->StdIn  = *OldStdIn;
+      ShellParameters->StdOut = *OldStdOut;
+      ShellParameters->StdErr = *OldStdErr;
     } else if (!EFI_ERROR(Status)){
       //
       // Open the Std<Whatever> and we should not have conflicts here...
