@@ -16,41 +16,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _SEC_MAIN_H__
 #define _SEC_MAIN_H__
 
-#include <PiPei.h>
-#include <Uefi.h>
-
-#include <Library/PeCoffLib.h>
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/PrintLib.h>
-#include <Library/PcdLib.h>
-#include <Library/DebugLib.h>
-#include <Library/ReportStatusCodeLib.h>
-
-#include <Library/ThunkPpiList.h>
-#include <Library/ThunkProtocolList.h>
-#include <Library/PeiServicesLib.h>
-#include <Library/PeCoffGetEntryPointLib.h>
-#include <Library/EmuMagicPageLib.h>
-
-#include <Ppi/EmuThunk.h>
-#include <Ppi/StatusCode.h>
-
-#include <Protocol/SimplePointer.h>
-#include <Protocol/SimpleTextIn.h>
-#include <Protocol/SimpleTextInEx.h>
-#include <Protocol/UgaDraw.h>
-#include <Protocol/SimpleFileSystem.h>
-
-#include <Protocol/EmuThunk.h>
-#include <Protocol/EmuIoThunk.h>
-#include <Protocol/EmuGraphicsWindow.h>
-#include <Protocol/EmuThread.h>
-#include <Protocol/EmuBlockIo.h>
-
-#include <Guid/FileInfo.h>
-#include <Guid/FileSystemInfo.h>
-#include <Guid/FileSystemVolumeLabelInfo.h>
+//
+// Name mangle to prevent build errors. I.e conflicts between EFI and OS
+//
+#define NTOHL   _UNIX_EFI_NAME_MANGLE_NTOHL_
+#define HTONL   _UNIX_EFI_NAME_MANGLE_HTONL_
+#define NTOHS   _UNIX_EFI_NAME_MANGLE_NTOHS_
+#define HTONS   _UNIX_EFI_NAME_MANGLE_HTOHS_
+#define B0      _UNIX_EFI_NAME_MANGLE_B0_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -103,6 +76,51 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #endif 
 
 #include <utime.h>
+
+#undef NTOHL
+#undef HTONL
+#undef NTOHS
+#undef HTONS
+#undef B0
+
+
+#include <PiPei.h>
+#include <Uefi.h>
+
+#include <Library/PeCoffLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/PrintLib.h>
+#include <Library/PcdLib.h>
+#include <Library/DebugLib.h>
+#include <Library/ReportStatusCodeLib.h>
+
+#include <Library/ThunkPpiList.h>
+#include <Library/ThunkProtocolList.h>
+#include <Library/PeiServicesLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/EmuMagicPageLib.h>
+
+#include <Ppi/EmuThunk.h>
+#include <Ppi/StatusCode.h>
+
+#include <Protocol/SimplePointer.h>
+#include <Protocol/SimpleTextIn.h>
+#include <Protocol/SimpleTextInEx.h>
+#include <Protocol/UgaDraw.h>
+#include <Protocol/SimpleFileSystem.h>
+
+#include <Protocol/EmuThunk.h>
+#include <Protocol/EmuIoThunk.h>
+#include <Protocol/EmuGraphicsWindow.h>
+#include <Protocol/EmuThread.h>
+#include <Protocol/EmuBlockIo.h>
+#include <Protocol/EmuSnp.h>
+
+#include <Guid/FileInfo.h>
+#include <Guid/FileSystemInfo.h>
+#include <Guid/FileSystemVolumeLabelInfo.h>
+
 
 #include "Gasket.h"
 
@@ -330,5 +348,6 @@ extern EMU_IO_THUNK_PROTOCOL gX11ThunkIo;
 extern EMU_IO_THUNK_PROTOCOL gPosixFileSystemThunkIo;
 extern EMU_IO_THUNK_PROTOCOL gPthreadThunkIo;
 extern EMU_IO_THUNK_PROTOCOL gBlockIoThunkIo;
+extern EMU_IO_THUNK_PROTOCOL gSnpThunkIo;
 
 #endif

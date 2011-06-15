@@ -108,8 +108,6 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-
-####  DevicePathTextLib|InOsEmuPkg/Library/DevicePathTextLib/DevicePathTextLib.inf
   PeiServicesTablePointerLib|InOsEmuPkg/Library/PeiServicesTablePointerLibMagicPage/PeiServicesTablePointerLibMagicPage.inf
 
 [LibraryClasses.common.SEC]
@@ -350,7 +348,12 @@
   
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
-  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf 
+ # {
+ #   <LibraryClasses>  
+ #     NULL|InOsEmuPkg/Library/DevicePathTextLib/DevicePathTextLib.inf
+ # }
+  
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf

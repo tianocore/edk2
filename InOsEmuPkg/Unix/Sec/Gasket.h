@@ -485,7 +485,139 @@ EFIAPI
 GasketBlockIoThunkClose (
   IN  EMU_IO_THUNK_PROTOCOL   *This
   );
-  
+
+EFI_STATUS
+EFIAPI
+GasketSnpThunkOpen (
+  IN  EMU_IO_THUNK_PROTOCOL   *This
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpThunkClose (
+  IN  EMU_IO_THUNK_PROTOCOL   *This
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpCreateMapping (
+  IN     EMU_SNP_PROTOCOL         *This,
+  IN     EFI_SIMPLE_NETWORK_MODE  *Media
+  );
+ 
+EFI_STATUS
+EFIAPI
+GasketSnpStart (
+  IN EMU_SNP_PROTOCOL  *This
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpStop (
+  IN EMU_SNP_PROTOCOL  *This
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpInitialize (
+  IN EMU_SNP_PROTOCOL                    *This,
+  IN UINTN                               ExtraRxBufferSize  OPTIONAL,
+  IN UINTN                               ExtraTxBufferSize  OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpReset (
+  IN EMU_SNP_PROTOCOL   *This,
+  IN BOOLEAN            ExtendedVerification
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpShutdown (
+  IN EMU_SNP_PROTOCOL  *This
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpReceiveFilters (
+  IN EMU_SNP_PROTOCOL                             *This,
+  IN UINT32                                       Enable,
+  IN UINT32                                       Disable,
+  IN BOOLEAN                                      ResetMCastFilter,
+  IN UINTN                                        MCastFilterCnt     OPTIONAL,
+  IN EFI_MAC_ADDRESS                              *MCastFilter OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpStationAddress (
+  IN EMU_SNP_PROTOCOL            *This,
+  IN BOOLEAN                     Reset,
+  IN EFI_MAC_ADDRESS             *New OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpStatistics (
+  IN EMU_SNP_PROTOCOL                     *This,
+  IN BOOLEAN                              Reset,
+  IN OUT UINTN                            *StatisticsSize   OPTIONAL,
+  OUT EFI_NETWORK_STATISTICS              *StatisticsTable  OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpMCastIpToMac (
+  IN EMU_SNP_PROTOCOL                     *This,
+  IN BOOLEAN                              IPv6,
+  IN EFI_IP_ADDRESS                       *IP,
+  OUT EFI_MAC_ADDRESS                     *MAC
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpNvData (
+  IN EMU_SNP_PROTOCOL                     *This,
+  IN BOOLEAN                              ReadWrite,
+  IN UINTN                                Offset,
+  IN UINTN                                BufferSize,
+  IN OUT VOID                             *Buffer
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpGetStatus (
+  IN EMU_SNP_PROTOCOL                     *This,
+  OUT UINT32                              *InterruptStatus OPTIONAL,
+  OUT VOID                                **TxBuf OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpTransmit (
+  IN EMU_SNP_PROTOCOL                     *This,
+  IN UINTN                                HeaderSize,
+  IN UINTN                                BufferSize,
+  IN VOID                                 *Buffer,
+  IN EFI_MAC_ADDRESS                      *SrcAddr  OPTIONAL,
+  IN EFI_MAC_ADDRESS                      *DestAddr OPTIONAL,
+  IN UINT16                               *Protocol OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+GasketSnpReceive (
+  IN EMU_SNP_PROTOCOL                     *This,
+  OUT UINTN                               *HeaderSize OPTIONAL,
+  IN OUT UINTN                            *BufferSize,
+  OUT VOID                                *Buffer,
+  OUT EFI_MAC_ADDRESS                     *SrcAddr    OPTIONAL,
+  OUT EFI_MAC_ADDRESS                     *DestAddr   OPTIONAL,
+  OUT UINT16                              *Protocol   OPTIONAL
+  );
+
+ 
 #endif
 
 

@@ -1,30 +1,42 @@
-/** @file
-  The EMU_SNP_PROTOCOL provides services to initialize a network interface, 
-  transmit packets, receive packets, and close a network interface.
+/**@file
+ Linux Packet Filter implementation of the EMU_SNP_PROTOCOL that allows the 
+ emulator to get on real networks.
 
+ Currently only the Berkeley Packet Filter is fully implemented and this file
+ is just a template that needs to get filled in. 
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-Portitions copyright (c) 2011, Apple Inc. All rights reserved. 
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
+Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Portitions copyright (c) 2011, Apple Inc. All rights reserved.
+
+This program and the accompanying materials                          
+are licensed and made available under the terms and conditions of the BSD License         
+which accompanies this distribution.  The full text of the license may be found at        
+http://opensource.org/licenses/bsd-license.php                                            
+                                                                                          
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.   
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
-#ifndef __EMU_SNP_H__
-#define __EMU_SNP_H__
 
-#include <Protocol/SimpleNetwork.h>
+#include "SecMain.h"
 
-#define EMU_SNP_PROTOCOL_GUID \
- { 0xFD5FBE54, 0x8C35, 0xB345, { 0x8A, 0x0F, 0x7A, 0xC8, 0xA5, 0xFD, 0x05, 0x21 } }
+#ifndef __APPLE__
 
-typedef struct _EMU_SNP_PROTOCOL  EMU_SNP_PROTOCOL;
+#define EMU_SNP_PRIVATE_SIGNATURE SIGNATURE_32('E', 'M', 's', 'n')
+typedef struct {
+  UINTN                       Signature;
 
+  EMU_IO_THUNK_PROTOCOL       *Thunk;
+
+
+  EMU_SNP_PROTOCOL            EmuSnp;
+  EFI_SIMPLE_NETWORK_MODE     *Mode;
+
+} EMU_SNP_PRIVATE;
+
+#define EMU_SNP_PRIVATE_DATA_FROM_THIS(a) \
+         CR(a, EMU_SNP_PRIVATE, EmuSnp, EMU_SNP_PRIVATE_SIGNATURE)
 
 /**
   Register storage for SNP Mode.
@@ -36,13 +48,20 @@ typedef struct _EMU_SNP_PROTOCOL  EMU_SNP_PROTOCOL;
   @retval EFI_INVALID_PARAMETER One or more of the parameters has an unsupported value.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_CREATE_MAPPING)(
-  IN EMU_SNP_PROTOCOL         *This,
-  IN EFI_SIMPLE_NETWORK_MODE  *Mode
-  );
+EmuSnpCreateMapping (
+  IN     EMU_SNP_PROTOCOL         *This,
+  IN     EFI_SIMPLE_NETWORK_MODE  *Mode
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
 
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
+
+  Private->Mode = Mode;
+    
+  return EFI_SUCCESS;
+}
 
 /**
   Changes the state of a network interface from "stopped" to "started".
@@ -56,11 +75,17 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_START)(
+EmuSnpStart (
   IN EMU_SNP_PROTOCOL  *This
-  );
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
+
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Changes the state of a network interface from "started" to "stopped".
@@ -74,11 +99,17 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_STOP)(
+EmuSnpStop (
   IN EMU_SNP_PROTOCOL  *This
-  );
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
+
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Resets a network adapter and allocates the transmit and receive buffers 
@@ -106,13 +137,19 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_INITIALIZE)(
+EmuSnpInitialize (
   IN EMU_SNP_PROTOCOL                    *This,
   IN UINTN                               ExtraRxBufferSize  OPTIONAL,
   IN UINTN                               ExtraTxBufferSize  OPTIONAL
-  );
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
+
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Resets a network adapter and re-initializes it with the parameters that were 
@@ -130,12 +167,18 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_RESET)(
+EmuSnpReset (
   IN EMU_SNP_PROTOCOL   *This,
   IN BOOLEAN            ExtendedVerification
-  );
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
+
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Resets a network adapter and leaves it in a state that is safe for 
@@ -150,11 +193,17 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_SHUTDOWN)(
+EmuSnpShutdown (
   IN EMU_SNP_PROTOCOL  *This
-  );
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
+
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Manages the multicast receive filters of a network interface.
@@ -180,16 +229,22 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_RECEIVE_FILTERS)(
+EmuSnpReceiveFilters (
   IN EMU_SNP_PROTOCOL                             *This,
   IN UINT32                                       Enable,
   IN UINT32                                       Disable,
   IN BOOLEAN                                      ResetMCastFilter,
   IN UINTN                                        MCastFilterCnt     OPTIONAL,
   IN EFI_MAC_ADDRESS                              *MCastFilter OPTIONAL
-  );
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
+
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Modifies or resets the current station address, if supported.
@@ -206,13 +261,19 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_STATION_ADDRESS)(
+EmuSnpStationAddress (
   IN EMU_SNP_PROTOCOL            *This,
   IN BOOLEAN                     Reset,
   IN EFI_MAC_ADDRESS             *New OPTIONAL
-  );
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
+
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Resets or collects the statistics on a network interface.
@@ -235,14 +296,20 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_STATISTICS)(
+EmuSnpStatistics (
   IN EMU_SNP_PROTOCOL                     *This,
   IN BOOLEAN                              Reset,
   IN OUT UINTN                            *StatisticsSize   OPTIONAL,
   OUT EFI_NETWORK_STATISTICS              *StatisticsTable  OPTIONAL
-  );
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
+
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Converts a multicast IP address to a multicast HW MAC address.
@@ -265,14 +332,20 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_MCAST_IP_TO_MAC)(
+EmuSnpMCastIpToMac (
   IN EMU_SNP_PROTOCOL                     *This,
   IN BOOLEAN                              IPv6,
   IN EFI_IP_ADDRESS                       *IP,
   OUT EFI_MAC_ADDRESS                     *MAC
-  );
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
+
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Performs read and write operations on the NVRAM device attached to a 
@@ -294,15 +367,21 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_NVDATA)(
+EmuSnpNvData (
   IN EMU_SNP_PROTOCOL                     *This,
   IN BOOLEAN                              ReadWrite,
   IN UINTN                                Offset,
   IN UINTN                                BufferSize,
   IN OUT VOID                             *Buffer
-  );
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
+
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Reads the current interrupt status and recycled transmit buffer status from 
@@ -329,13 +408,19 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_GET_STATUS)(
+EmuSnpGetStatus (
   IN EMU_SNP_PROTOCOL                     *This,
   OUT UINT32                              *InterruptStatus OPTIONAL,
   OUT VOID                                **TxBuf OPTIONAL
-  );
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
+
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Places a packet in the transmit queue of a network interface.
@@ -370,9 +455,8 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_TRANSMIT)(
+EmuSnpTransmit (
   IN EMU_SNP_PROTOCOL                     *This,
   IN UINTN                                HeaderSize,
   IN UINTN                                BufferSize,
@@ -380,7 +464,14 @@ EFI_STATUS
   IN EFI_MAC_ADDRESS                      *SrcAddr  OPTIONAL,
   IN EFI_MAC_ADDRESS                      *DestAddr OPTIONAL,
   IN UINT16                               *Protocol OPTIONAL
-  );
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
+
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Receives a packet from a network interface.
@@ -414,9 +505,8 @@ EFI_STATUS
   @retval  EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
-typedef
 EFI_STATUS
-(EFIAPI *EMU_SNP_RECEIVE)(
+EmuSnpReceive (
   IN EMU_SNP_PROTOCOL                     *This,
   OUT UINTN                               *HeaderSize OPTIONAL,
   IN OUT UINTN                            *BufferSize,
@@ -424,36 +514,91 @@ EFI_STATUS
   OUT EFI_MAC_ADDRESS                     *SrcAddr    OPTIONAL,
   OUT EFI_MAC_ADDRESS                     *DestAddr   OPTIONAL,
   OUT UINT16                              *Protocol   OPTIONAL
-  );
+  )
+{
+  EMU_SNP_PRIVATE    *Private;
 
-#define EMU_SNP_PROTOCOL_REVISION  0x00010000
+  Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
-//
-// Revision defined in EFI1.1
-// 
-#define EMU_SNP_INTERFACE_REVISION   EMU_SNP_PROTOCOL_REVISION
+  return EFI_UNSUPPORTED;
+}
 
-///
-/// The EMU_SNP_PROTOCOL protocol abstracts OS network sercices 
-/// from the EFI driver that produces EFI Simple Network Protocol.
-///
-struct _EMU_SNP_PROTOCOL {
-  EMU_SNP_CREATE_MAPPING   CreateMapping;
-  EMU_SNP_START            Start;
-  EMU_SNP_STOP             Stop;
-  EMU_SNP_INITIALIZE       Initialize;
-  EMU_SNP_RESET            Reset;
-  EMU_SNP_SHUTDOWN         Shutdown;
-  EMU_SNP_RECEIVE_FILTERS  ReceiveFilters;
-  EMU_SNP_STATION_ADDRESS  StationAddress;
-  EMU_SNP_STATISTICS       Statistics;
-  EMU_SNP_MCAST_IP_TO_MAC  MCastIpToMac;
-  EMU_SNP_NVDATA           NvData;
-  EMU_SNP_GET_STATUS       GetStatus;
-  EMU_SNP_TRANSMIT         Transmit;
-  EMU_SNP_RECEIVE          Receive;
+
+EMU_SNP_PROTOCOL gEmuSnpProtocol = {
+  GasketSnpCreateMapping,
+  GasketSnpStart,
+  GasketSnpStop,
+  GasketSnpInitialize,
+  GasketSnpReset,
+  GasketSnpShutdown,
+  GasketSnpReceiveFilters,
+  GasketSnpStationAddress,
+  GasketSnpStatistics,
+  GasketSnpMCastIpToMac,
+  GasketSnpNvData,
+  GasketSnpGetStatus,
+  GasketSnpTransmit,
+  GasketSnpReceive
 };
 
-extern EFI_GUID gEmuSnpProtocolGuid;
+EFI_STATUS
+EmuSnpThunkOpen (
+  IN  EMU_IO_THUNK_PROTOCOL   *This
+  )
+{
+  EMU_SNP_PRIVATE  *Private;
+  
+  if (This->Private != NULL) {
+    return EFI_ALREADY_STARTED;
+  }
+  
+  if (!CompareGuid (This->Protocol, &gEmuSnpProtocolGuid)) {
+    return EFI_UNSUPPORTED;
+  }
+  
+  Private = malloc (sizeof (EMU_SNP_PRIVATE));
+  if (Private == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  
+  Private->Signature = EMU_SNP_PRIVATE_SIGNATURE;
+  Private->Thunk     = This;
+  CopyMem (&Private->EmuSnp, &gEmuSnpProtocol, sizeof (gEmuSnpProtocol));
+  
+  This->Interface = &Private->EmuSnp;
+  This->Private   = Private;
+  return EFI_SUCCESS;
+}
+
+
+EFI_STATUS
+EmuSnpThunkClose (
+  IN  EMU_IO_THUNK_PROTOCOL   *This
+  )
+{
+  EMU_SNP_PRIVATE  *Private;
+
+  if (!CompareGuid (This->Protocol, &gEmuSnpProtocolGuid)) {
+    return EFI_UNSUPPORTED;
+  }
+  
+  Private = This->Private;
+  free (Private);
+  
+  return EFI_SUCCESS;
+}
+
+
+
+EMU_IO_THUNK_PROTOCOL gSnpThunkIo = {
+  &gEmuSnpProtocolGuid,
+  NULL,
+  NULL,
+  0,
+  GasketSnpThunkOpen,
+  GasketSnpThunkClose,
+  NULL
+};
 
 #endif
