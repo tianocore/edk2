@@ -2,7 +2,7 @@
   Provides string functions, linked list functions, math functions, synchronization
   functions, and CPU architecture-specific functions.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1470,8 +1470,8 @@ IsListEmpty (
   @param  List  A pointer to the head node of a doubly linked list.
   @param  Node  A pointer to a node in the doubly linked list.
 
-  @retval TRUE  Node is one of the nodes in the doubly linked list.
-  @retval FALSE Node is not one of the nodes in the doubly linked list.
+  @retval TRUE  Node is the head of the doubly-linked list pointed by List.
+  @retval FALSE Node is not the head of the doubly-linked list pointed by List.
 
 **/
 BOOLEAN
