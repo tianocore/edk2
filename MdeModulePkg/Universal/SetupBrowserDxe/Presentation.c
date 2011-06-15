@@ -1325,7 +1325,7 @@ SetupBrowser (
       if (mHiiPackageListUpdated) {
         Selection->Action = UI_ACTION_REFRESH_FORMSET;
         mHiiPackageListUpdated = FALSE;
-        goto Done;
+        break;
       }
     }
 
@@ -1349,7 +1349,7 @@ SetupBrowser (
     if (mHiiPackageListUpdated) {
       Selection->Action = UI_ACTION_REFRESH_FORMSET;
       mHiiPackageListUpdated = FALSE;
-      goto Done;
+      break;
     }
 
     //
