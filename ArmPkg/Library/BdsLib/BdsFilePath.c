@@ -264,8 +264,11 @@ TryRemovableDevice (
   EFI_DEVICE_PATH* RemovableDevicePath;
   BOOLEAN         RemovableFound;
 
-  RemovableFound = FALSE;
-  TmpDevicePath = DevicePath;
+  RemovableDevice     = NULL;
+  RemovableDevicePath = NULL;
+  RemovableFound      = FALSE;
+  TmpDevicePath       = DevicePath;
+
   while (!IsDevicePathEnd (TmpDevicePath) && !RemovableFound) {
     for (Index = 0; Index < sizeof(RemovableDeviceSupport) / sizeof(BDS_REMOVABLE_DEVICE_SUPPORT); Index++) {
       RemovableDevice = &RemovableDeviceSupport[Index];

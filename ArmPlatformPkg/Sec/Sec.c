@@ -27,7 +27,7 @@
 
 #define ARM_PRIMARY_CORE  0
 
-#define SerialPrint(txt)  SerialPortWrite (txt, AsciiStrLen(txt)+1);
+#define SerialPrint(txt)  SerialPortWrite ((UINT8*)txt, AsciiStrLen(txt)+1);
 
 extern VOID *monitor_vector_table;
 

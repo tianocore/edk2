@@ -77,7 +77,9 @@ PeCoffLoaderRelocateImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-    CHAR8 Temp[512];
+#if !defined(MDEPKG_NDEBUG) 
+  CHAR8 Temp[512];
+#endif
 
 #ifdef __CC_ARM
   // Print out the command for the RVD debugger to load symbols for this image
@@ -108,7 +110,9 @@ PeCoffLoaderUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
+#if !defined(MDEPKG_NDEBUG)
   CHAR8 Temp[512];
+#endif
   
 #ifdef __CC_ARM
   {  

@@ -38,7 +38,8 @@ BootMenuAddBootOption (
   EFI_DEVICE_PATH*  DevicePath;
   EFI_DEVICE_PATH_PROTOCOL *DevicePathNode;
 
-  Attributes = 0;
+  Attributes                = 0;
+  SupportedBootDevice = NULL;
 
   //
   // List the Boot Devices supported
@@ -402,6 +403,7 @@ BootMenuMain (
   UINTN   Index;
   UINTN   BootMainEntryCount;
 
+  BootOption              = NULL;
   BootMainEntryCount = sizeof(BootMainEntries) / sizeof(struct BOOT_MAIN_ENTRY);
 
   // Get Boot#### list

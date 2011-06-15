@@ -122,7 +122,7 @@ InitializeMemory (
   // Ensure PcdSystemMemorySize has been set
   ASSERT (FixedPcdGet32 (PcdSystemMemorySize) != 0);
 
-  SystemMemoryTop = FixedPcdGet32 (PcdSystemMemoryBase) + FixedPcdGet32 (PcdSystemMemorySize);
+  SystemMemoryTop = (UINTN)FixedPcdGet32 (PcdSystemMemoryBase) + (UINTN)FixedPcdGet32 (PcdSystemMemorySize);
 
   //
   // Initialize the System Memory (DRAM)

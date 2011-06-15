@@ -89,8 +89,10 @@ PrintCSD (
   )
 {
   UINTN Value;
+#if !defined(MDEPKG_NDEBUG)
   CONST CHAR8* str_unit[] = { "100kbit/s","1Mbit/s","10Mbit/s","100MBit/s","Unkbown","Unkbown","Unkbown","Unkbown" };
   CONST CHAR8* str_value[] = { "1.0","1.2","1.3","1.5","2.0","2.5","3.0","3.5","4.0","4.5","5.0","Unknown","Unknown","Unknown","Unknown" };
+#endif
 
   if (((Csd[2] >> 30) & 0x3) == 0) {
     DEBUG((EFI_D_ERROR, "- PrintCSD Version 1.01-1.10/Version 2.00/Standard Capacity\n"));

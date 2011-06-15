@@ -14,82 +14,7 @@
 
 #include "BdsInternal.h"
 
-//#include <Library/PeCoffLib.h>
-#include <Library/DxeServicesLib.h>
-
-//TODO: RemoveMe
-#include <Protocol/DevicePathToText.h>
-
-/**
-  Retrieves the magic value from the PE/COFF header.
-
-  @param  Hdr             The buffer in which to return the PE32, PE32+, or TE header.
-
-  @return EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC - Image is PE32
-  @return EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC - Image is PE32+
-
-**/
-UINT16
-PeCoffLoaderGetPeHeaderMagicValue (
-  IN  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr
-  )
-{
-  //
-  // NOTE: Some versions of Linux ELILO for Itanium have an incorrect magic value
-  //       in the PE/COFF Header.  If the MachineType is Itanium(IA64) and the
-  //       Magic value in the OptionalHeader is  EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC
-  //       then override the returned value to EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
-  //
-  if (Hdr.Pe32->FileHeader.Machine == IMAGE_FILE_MACHINE_IA64 && Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-    return EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
-  }
-  //
-  // Return the magic value from the PC/COFF Optional Header
-  //
-  return Hdr.Pe32->OptionalHeader.Magic;
-}
-
-STATIC
-BOOLEAN
-IsLoadableImage (
-  VOID*   Image
-  )
-{
-  UINT16                       Magic;
-  EFI_IMAGE_DOS_HEADER        *DosHeader;
-  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Header;
-
-  if (Image == NULL) {
-    return FALSE;
-  }
-
-  DosHeader = (EFI_IMAGE_DOS_HEADER*)Image;
-  if (DosHeader->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
-    Header.Pe32 = (EFI_IMAGE_NT_HEADERS32*)((UINT8*)Image + DosHeader->e_lfanew);
-  } else {
-    Header.Pe32 = (EFI_IMAGE_NT_HEADERS32*)(Image);
-  }
-
-  if (Header.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
-    // It is a TE Image
-    return TRUE;
-  } else if (Header.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE)  {
-    Magic = PeCoffLoaderGetPeHeaderMagicValue (Header);
-    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-      // It is a PE32 Image
-      return TRUE;
-    } else if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
-      // It is a PE32+ Image
-      return TRUE;
-    } else {
-      DEBUG ((EFI_D_ERROR,"BdsLoadBinaryFromPath(): Fail unrecognized PE Image\n"));
-    }
-  } else {
-    DEBUG ((EFI_D_ERROR,"BdsLoadBinaryFromPath(): Fail unrecognize image\n"));
-  }
-
-  return FALSE;
-}
+//#include <Library/DxeServicesLib.h>
 
 STATIC
 EFI_STATUS
@@ -186,7 +111,6 @@ BdsLoadApplication (
   EFI_STATUS                      Status;
   UINTN                           NoHandles, HandleIndex;
   EFI_HANDLE                      *Handles;
-  EFI_DEVICE_PATH                 *FvDevicePath;
   EFI_DEVICE_PATH                 *EfiAppDevicePath;
 
   // Need to connect every drivers to ensure no dependencies are missing for the application
@@ -205,6 +129,7 @@ BdsLoadApplication (
 
   // Search in all Firmware Volume for the EFI Application
   for (HandleIndex = 0; HandleIndex < NoHandles; HandleIndex++) {
+    EfiAppDevicePath = NULL;
     Status = BdsLoadFileFromFirmwareVolume (Handles[HandleIndex], EfiApp, EFI_FV_FILETYPE_APPLICATION, &EfiAppDevicePath);
     if (!EFI_ERROR (Status)) {
       // Start the application

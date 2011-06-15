@@ -23,7 +23,7 @@
 #include <Drivers/PL301Axi.h>
 #include <Drivers/SP804Timer.h>
 
-#define SerialPrint(txt)  SerialPortWrite (txt, AsciiStrLen(txt)+1);
+#define SerialPrint(txt)  SerialPortWrite ((UINT8*)(txt), AsciiStrLen(txt)+1);
 
 // DDR2 timings
 PL341_DMC_CONFIG DDRTimings = {

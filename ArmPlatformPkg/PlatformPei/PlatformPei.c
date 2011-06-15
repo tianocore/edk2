@@ -24,6 +24,7 @@
 //
 // The Library classes this module consumes
 //
+#include <Library/ArmPlatformLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PcdLib.h>

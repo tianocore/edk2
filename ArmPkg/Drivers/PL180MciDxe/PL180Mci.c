@@ -60,6 +60,11 @@ MciIsReadOnly (
   return (MmioRead32(FixedPcdGet32(PcdPL180SysMciRegAddress)) & 2);
 }
 
+#if 0
+//Note: This function has been commented out because it is not used yet.
+//      This function could be used to remove the hardcoded BlockLen used
+//      in MciPrepareDataPath
+
 // Convert block size to 2^n
 STATIC
 UINT32
@@ -79,6 +84,7 @@ GetPow2BlockLen (
 
   return Pow2BlockLen;
 }
+#endif
 
 VOID
 MciPrepareDataPath (
