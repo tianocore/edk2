@@ -20,8 +20,10 @@
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/EmuThread.h>
 
-#include <Library/DevicePathTextLib.h>
+#include <Library/BaseLib.h>
+#include <Library/DevicePathToTextLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DevicePathLib.h>
 
 
 /**
@@ -76,3 +78,106 @@ DevPathToTextVendorLib (
   return EFI_NOT_FOUND;
 }
 
+/**
+  Converts a text device path node to Hardware Vendor device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Hardware Vendor device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextEmuThunk (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16              *Str;
+  VENDOR_DEVICE_PATH  *Vendor;
+
+  Str    = GetNextParamStr (&TextDeviceNode);
+  Vendor = (VENDOR_DEVICE_PATH *) CreateDeviceNode (
+                                     HARDWARE_DEVICE_PATH,
+                                     HW_VENDOR_DP,
+                                     (UINT16) sizeof (VENDOR_DEVICE_PATH)
+                                     );
+  CopyGuid (&Vendor->Guid, &gEmuThunkProtocolGuid);
+  return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
+}
+
+/**
+  Converts a text device path node to Hardware Vendor device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Hardware Vendor device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextEmuThread (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16              *Str;
+  VENDOR_DEVICE_PATH  *Vendor;
+
+  Str    = GetNextParamStr (&TextDeviceNode);
+  Vendor = (VENDOR_DEVICE_PATH *) CreateDeviceNode (
+                                     HARDWARE_DEVICE_PATH,
+                                     HW_VENDOR_DP,
+                                     (UINT16) sizeof (VENDOR_DEVICE_PATH)
+                                     );
+  CopyGuid (&Vendor->Guid, &gEmuThreadThunkProtocolGuid);
+  return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
+}
+
+/**
+  Converts a text device path node to Hardware Vendor device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Hardware Vendor device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextEmuFs (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16                       *Str;
+  EMU_VENDOR_DEVICE_PATH_NODE  *Vendor;
+
+  Str = GetNextParamStr (&TextDeviceNode);
+  Vendor    = (EMU_VENDOR_DEVICE_PATH_NODE *) CreateDeviceNode (
+                                                   HARDWARE_DEVICE_PATH,
+                                                   HW_VENDOR_DP,
+                                                   (UINT16) sizeof (EMU_VENDOR_DEVICE_PATH_NODE)
+                                                   );
+  CopyGuid (&Vendor->VendorDevicePath.Guid, &gEfiSimpleFileSystemProtocolGuid);
+  Vendor->Instance = (UINT32) StrDecimalToUintn (Str);
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
+}
+
+/**
+  Register the Filter function
+  
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS   The constructor executed correctly.
+
+**/
+EFI_STATUS
+EFIAPI
+DevicePathToTextLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+
+{
+  DevPathToTextSetVendorDevicePathFilter (DevPathToTextVendorLib);
+  DevicePathFromTextAddFilter (L"EmuThunk", DevPathFromTextEmuThunk);
+  DevicePathFromTextAddFilter (L"EmuThread", DevPathFromTextEmuThread);
+  DevicePathFromTextAddFilter (L"EmuFs", DevPathFromTextEmuFs);
+  return EFI_SUCCESS;
+}
