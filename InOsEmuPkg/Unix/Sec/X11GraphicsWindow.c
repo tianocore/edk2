@@ -28,7 +28,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define KEYSYM_LOWER  0
 #define KEYSYM_UPPER  1
 
-/* XQueryPointer  */
 
 struct uga_drv_shift_mask {
   unsigned char shift;
@@ -40,24 +39,25 @@ struct uga_drv_shift_mask {
 typedef struct {
   EMU_GRAPHICS_WINDOW_PROTOCOL GraphicsIo;
 
-  Display *display;
-  int screen;      /* values for window_size in main */
-  Window win;
-  GC gc;
-  Visual *visual;
+  Display     *display;
+  int         screen;      // values for window_size in main 
+  Window      win;
+  GC          gc;
+  Visual      *visual;
 
-  int depth;
-  unsigned int width;
-  unsigned int height;
-  unsigned int line_bytes;
-  unsigned int pixel_shift;
+  int           depth;
+  unsigned int  width;
+  unsigned int  height;
+  unsigned int  line_bytes;
+  unsigned int  pixel_shift;
   unsigned char *image_data;
 
   struct uga_drv_shift_mask r, g, b;
 
-  int use_shm;
+  int             use_shm;
   XShmSegmentInfo xshm_info;
-  XImage *image;
+  XImage          *image;
+  char            *Title;
 
   unsigned int key_rd;
   unsigned int key_wr;
@@ -77,61 +77,68 @@ typedef struct {
 } GRAPHICS_IO_PRIVATE;
 
 void
-HandleEvents(GRAPHICS_IO_PRIVATE *drv);
+HandleEvents(
+  IN GRAPHICS_IO_PRIVATE *Drv
+  );
 
 void
-fill_shift_mask (struct uga_drv_shift_mask *sm, unsigned long mask)
+fill_shift_mask (
+  IN  struct uga_drv_shift_mask *sm, 
+  IN  unsigned long             mask
+  )
 {
   sm->shift = 0;
   sm->size = 0;
-  while ((mask & 1) == 0)
-    {
-      mask >>= 1;
-      sm->shift++;
-    }
-  while (mask & 1)
-    {
-      sm->size++;
-      mask >>= 1;
-    }
+  while ((mask & 1) == 0) {
+    mask >>= 1;
+    sm->shift++;
+  }
+  while (mask & 1) {
+    sm->size++;
+    mask >>= 1;
+  }
   sm->csize = 8 - sm->size;
 }
 
 int
 TryCreateShmImage (
-  IN  GRAPHICS_IO_PRIVATE *drv
+  IN  GRAPHICS_IO_PRIVATE *Drv
   )
 {
-  drv->image = XShmCreateImage (drv->display, drv->visual,
-                 drv->depth, ZPixmap, NULL, &drv->xshm_info,
-                 drv->width, drv->height);
-  if (drv->image == NULL)
+  Drv->image = XShmCreateImage (
+                 Drv->display, Drv->visual,
+                 Drv->depth, ZPixmap, NULL, &Drv->xshm_info,
+                 Drv->width, Drv->height
+                 );
+  if (Drv->image == NULL) {
     return 0;
+  }
 
-  switch (drv->image->bitmap_unit) {
+  switch (Drv->image->bitmap_unit) {
   case 32:
-    drv->pixel_shift = 2;
+    Drv->pixel_shift = 2;
     break;
   case 16:
-    drv->pixel_shift = 1;
+    Drv->pixel_shift = 1;
     break;
   case 8:
-    drv->pixel_shift = 0;
+    Drv->pixel_shift = 0;
     break;
   }
 
-  drv->xshm_info.shmid = shmget
-                          (IPC_PRIVATE, drv->image->bytes_per_line * drv->image->height,
-                          IPC_CREAT | 0777);
-  if (drv->xshm_info.shmid < 0) {
-    XDestroyImage(drv->image);
+  Drv->xshm_info.shmid = shmget (
+                          IPC_PRIVATE, Drv->image->bytes_per_line * Drv->image->height,
+                          IPC_CREAT | 0777
+                          );
+  if (Drv->xshm_info.shmid < 0) {
+    XDestroyImage(Drv->image);
     return 0;
   }
       
-  drv->image_data = shmat (drv->xshm_info.shmid, NULL, 0);
-  if(!drv->image_data) {
-    shmctl (drv->xshm_info.shmid, IPC_RMID, NULL);
-    XDestroyImage(drv->image);
+  Drv->image_data = shmat (Drv->xshm_info.shmid, NULL, 0);
+  if(!Drv->image_data) {
+    shmctl (Drv->xshm_info.shmid, IPC_RMID, NULL);
+    XDestroyImage(Drv->image);
     return 0;
   }
   
@@ -140,16 +147,15 @@ TryCreateShmImage (
   // This closes shared memory in real time on OS X. Only closes after folks quit using
   // it on Linux. 
   //
-  /* Can this fail ?  */
-  shmctl (drv->xshm_info.shmid, IPC_RMID, NULL);
+  shmctl (Drv->xshm_info.shmid, IPC_RMID, NULL);
 #endif
 
-  drv->xshm_info.shmaddr = (char*)drv->image_data;
-  drv->image->data = (char*)drv->image_data;
+  Drv->xshm_info.shmaddr = (char*)Drv->image_data;
+  Drv->image->data = (char*)Drv->image_data;
 
-  if (!XShmAttach (drv->display, &drv->xshm_info)) {
-    shmdt (drv->image_data);
-    XDestroyImage(drv->image);
+  if (!XShmAttach (Drv->display, &Drv->xshm_info)) {
+    shmdt (Drv->image_data);
+    XDestroyImage(Drv->image);
     return 0;
   }
   return 1;
@@ -157,75 +163,85 @@ TryCreateShmImage (
 
 
 EFI_STATUS
-X11Size(
+X11Size (
   IN  EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsIo, 
   IN  UINT32                        Width, 
   IN  UINT32                        Height
   )
 {
-  GRAPHICS_IO_PRIVATE *drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
-  XSizeHints size_hints;
+  GRAPHICS_IO_PRIVATE *Drv;
+  XSizeHints          size_hints;
 
-  /* Destroy current buffer if created.  */
-  if (drv->image != NULL)
-    {
-      /* Before destroy buffer, need to make sure the buffer available for access. */
-      XDestroyImage(drv->image);
+  // Destroy current buffer if created. 
+  Drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
+  if (Drv->image != NULL) {
+    // Before destroy buffer, need to make sure the buffer available for access. 
+    XDestroyImage (Drv->image);
 
-      if (drv->use_shm)
-        shmdt (drv->image_data);
-
-      drv->image_data = NULL;
-      drv->image = NULL;
+    if (Drv->use_shm) {
+      shmdt (Drv->image_data);
     }
 
-  drv->width = Width;
-  drv->height = Height;
-  XResizeWindow (drv->display, drv->win, Width, Height);
+    Drv->image_data = NULL;
+    Drv->image = NULL;
+  }
 
-  /* Allocate image.  */
-  if (XShmQueryExtension(drv->display) && TryCreateShmImage(drv)) {
-    drv->use_shm = 1;
+  Drv->width = Width;
+  Drv->height = Height;
+  XResizeWindow (Drv->display, Drv->win, Width, Height);
+
+  // Allocate image. 
+  if (XShmQueryExtension(Drv->display) && TryCreateShmImage(Drv)) {
+    Drv->use_shm = 1;
   } else {
-    drv->use_shm = 0;
-    if (drv->depth > 16)
-      drv->pixel_shift = 2;
-    else if (drv->depth > 8)
-      drv->pixel_shift = 1;
-    else
-      drv->pixel_shift = 0;
-      
-      drv->image_data = malloc((drv->width * drv->height) << drv->pixel_shift);
-      drv->image = XCreateImage (drv->display, drv->visual, drv->depth,
-                                  ZPixmap, 0, (char *)drv->image_data,
-                                  drv->width, drv->height,
-                                  8 << drv->pixel_shift, 0);
+    Drv->use_shm = 0;
+    if (Drv->depth > 16) {
+      Drv->pixel_shift = 2;
+    } else if (Drv->depth > 8) {
+      Drv->pixel_shift = 1;
+    } else {
+      Drv->pixel_shift = 0;
     }
-  drv->line_bytes = drv->image->bytes_per_line;
-  fill_shift_mask (&drv->r, drv->image->red_mask);
-  fill_shift_mask (&drv->g, drv->image->green_mask);
-  fill_shift_mask (&drv->b, drv->image->blue_mask);
+      
+    Drv->image_data = malloc ((Drv->width * Drv->height) << Drv->pixel_shift);
+    Drv->image = XCreateImage (
+                    Drv->display, Drv->visual, Drv->depth,
+                    ZPixmap, 0, (char *)Drv->image_data,
+                    Drv->width, Drv->height,
+                    8 << Drv->pixel_shift, 0
+                    );
+  }
+  
+  Drv->line_bytes = Drv->image->bytes_per_line;
 
-  /* Set WM hints.  */
+  fill_shift_mask (&Drv->r, Drv->image->red_mask);
+  fill_shift_mask (&Drv->g, Drv->image->green_mask);
+  fill_shift_mask (&Drv->b, Drv->image->blue_mask);
+
+  // Set WM hints.  
   size_hints.flags = PSize | PMinSize | PMaxSize;
   size_hints.min_width = size_hints.max_width = size_hints.base_width = Width;
   size_hints.min_height = size_hints.max_height = size_hints.base_height = Height;
-  XSetWMNormalHints (drv->display, drv->win, &size_hints);
+  XSetWMNormalHints (Drv->display, Drv->win, &size_hints);
 
-  XMapWindow (drv->display, drv->win);
-  HandleEvents(drv);
+  XMapWindow (Drv->display, Drv->win);
+  HandleEvents (Drv);
   return EFI_SUCCESS;
 }
 
 void
-handleKeyEvent(GRAPHICS_IO_PRIVATE *drv, XEvent *ev, BOOLEAN Make)
+handleKeyEvent (
+  IN  GRAPHICS_IO_PRIVATE *Drv, 
+  IN  XEvent              *ev, 
+  IN  BOOLEAN             Make
+  )
 {
   KeySym        *KeySym;
   EFI_KEY_DATA  KeyData;
   int           KeySymArraySize;
  
   if (Make) {
-    if (drv->key_count == NBR_KEYS) {
+    if (Drv->key_count == NBR_KEYS) {
       return;
     }
   }
@@ -238,7 +254,7 @@ handleKeyEvent(GRAPHICS_IO_PRIVATE *drv, XEvent *ev, BOOLEAN Make)
   // [2] and [3] are based on option and command modifiers. The problem we have is command V
   // could be mapped to a crazy Unicode character so the old scheme of returning a string. 
   //
-  KeySym = XGetKeyboardMapping (drv->display, ev->xkey.keycode, 1, &KeySymArraySize);
+  KeySym = XGetKeyboardMapping (Drv->display, ev->xkey.keycode, 1, &KeySymArraySize);
    
   KeyData.Key.ScanCode = 0;
   KeyData.Key.UnicodeChar = 0;
@@ -248,10 +264,10 @@ handleKeyEvent(GRAPHICS_IO_PRIVATE *drv, XEvent *ev, BOOLEAN Make)
   // Skipping EFI_SCROLL_LOCK_ACTIVE & EFI_NUM_LOCK_ACTIVE since they are not on Macs  
   //
   if ((ev->xkey.state & LockMask) == 0) {
-    drv->KeyState.KeyToggleState &= ~EFI_CAPS_LOCK_ACTIVE;
+    Drv->KeyState.KeyToggleState &= ~EFI_CAPS_LOCK_ACTIVE;
   } else {
     if (Make) {
-      drv->KeyState.KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
+      Drv->KeyState.KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
     }
   }
   
@@ -260,54 +276,54 @@ handleKeyEvent(GRAPHICS_IO_PRIVATE *drv, XEvent *ev, BOOLEAN Make)
   switch (*KeySym) {
   case XK_Control_R:
     if (Make) {
-      drv->KeyState.KeyShiftState |=  EFI_RIGHT_CONTROL_PRESSED;
+      Drv->KeyState.KeyShiftState |=  EFI_RIGHT_CONTROL_PRESSED;
     } else {
-      drv->KeyState.KeyShiftState &= ~EFI_RIGHT_CONTROL_PRESSED;
+      Drv->KeyState.KeyShiftState &= ~EFI_RIGHT_CONTROL_PRESSED;
     }
    break;
   case XK_Control_L:
     if (Make) {    
-      drv->KeyState.KeyShiftState |=  EFI_LEFT_CONTROL_PRESSED;
+      Drv->KeyState.KeyShiftState |=  EFI_LEFT_CONTROL_PRESSED;
     } else {
-      drv->KeyState.KeyShiftState &= ~EFI_LEFT_CONTROL_PRESSED;
+      Drv->KeyState.KeyShiftState &= ~EFI_LEFT_CONTROL_PRESSED;
     }
     break;
 
   case XK_Shift_R:
     if (Make) {
-      drv->KeyState.KeyShiftState |=  EFI_RIGHT_SHIFT_PRESSED;
+      Drv->KeyState.KeyShiftState |=  EFI_RIGHT_SHIFT_PRESSED;
     } else {
-      drv->KeyState.KeyShiftState &= ~EFI_RIGHT_SHIFT_PRESSED;
+      Drv->KeyState.KeyShiftState &= ~EFI_RIGHT_SHIFT_PRESSED;
     }
     break;
   case XK_Shift_L:
     if (Make) {
-      drv->KeyState.KeyShiftState |=  EFI_LEFT_SHIFT_PRESSED;
+      Drv->KeyState.KeyShiftState |=  EFI_LEFT_SHIFT_PRESSED;
     } else {
-      drv->KeyState.KeyShiftState &= ~EFI_LEFT_SHIFT_PRESSED;
+      Drv->KeyState.KeyShiftState &= ~EFI_LEFT_SHIFT_PRESSED;
     }
     break;
   
   case XK_Mode_switch:
     if (Make) {
-      drv->KeyState.KeyShiftState |=  EFI_LEFT_ALT_PRESSED;
+      Drv->KeyState.KeyShiftState |=  EFI_LEFT_ALT_PRESSED;
     } else {
-      drv->KeyState.KeyShiftState &= ~EFI_LEFT_ALT_PRESSED;
+      Drv->KeyState.KeyShiftState &= ~EFI_LEFT_ALT_PRESSED;
     }
     break;
 
   case XK_Meta_R:
     if (Make) {
-      drv->KeyState.KeyShiftState |=  EFI_RIGHT_LOGO_PRESSED;
+      Drv->KeyState.KeyShiftState |=  EFI_RIGHT_LOGO_PRESSED;
     } else {
-      drv->KeyState.KeyShiftState &= ~EFI_RIGHT_LOGO_PRESSED;
+      Drv->KeyState.KeyShiftState &= ~EFI_RIGHT_LOGO_PRESSED;
     }
     break;
   case XK_Meta_L:
     if (Make) {
-      drv->KeyState.KeyShiftState |=  EFI_LEFT_LOGO_PRESSED;
+      Drv->KeyState.KeyShiftState |=  EFI_LEFT_LOGO_PRESSED;
     } else {
-      drv->KeyState.KeyShiftState &= ~EFI_LEFT_LOGO_PRESSED;
+      Drv->KeyState.KeyShiftState &= ~EFI_LEFT_LOGO_PRESSED;
     }
     break;
   
@@ -431,12 +447,12 @@ handleKeyEvent(GRAPHICS_IO_PRIVATE *drv, XEvent *ev, BOOLEAN Make)
   }
 
   // The global state is our state
-  KeyData.KeyState.KeyShiftState = drv->KeyState.KeyShiftState;
-  KeyData.KeyState.KeyToggleState = drv->KeyState.KeyToggleState;
+  KeyData.KeyState.KeyShiftState = Drv->KeyState.KeyShiftState;
+  KeyData.KeyState.KeyToggleState = Drv->KeyState.KeyToggleState;
 
   if (*KeySym < XK_BackSpace) {
-    if (((drv->KeyState.KeyShiftState & (EFI_LEFT_SHIFT_PRESSED | EFI_RIGHT_SHIFT_PRESSED)) != 0) ||
-        ((drv->KeyState.KeyToggleState & EFI_CAPS_LOCK_ACTIVE) != 0) ) {
+    if (((Drv->KeyState.KeyShiftState & (EFI_LEFT_SHIFT_PRESSED | EFI_RIGHT_SHIFT_PRESSED)) != 0) ||
+        ((Drv->KeyState.KeyToggleState & EFI_CAPS_LOCK_ACTIVE) != 0) ) {
       
       KeyData.Key.UnicodeChar = (CHAR16)KeySym[KEYSYM_UPPER];
 
@@ -451,180 +467,215 @@ handleKeyEvent(GRAPHICS_IO_PRIVATE *drv, XEvent *ev, BOOLEAN Make)
   }
   
   if (Make) {
-    memcpy (&drv->keys[drv->key_wr], &KeyData, sizeof (EFI_KEY_DATA));
-    drv->key_wr = (drv->key_wr + 1) % NBR_KEYS;
-    drv->key_count++; 
-    if (drv->MakeRegisterdKeyCallback != NULL) {
-      ReverseGasketUint64Uint64 (drv->MakeRegisterdKeyCallback ,drv->RegisterdKeyCallbackContext, &KeyData);
+    memcpy (&Drv->keys[Drv->key_wr], &KeyData, sizeof (EFI_KEY_DATA));
+    Drv->key_wr = (Drv->key_wr + 1) % NBR_KEYS;
+    Drv->key_count++; 
+    if (Drv->MakeRegisterdKeyCallback != NULL) {
+      ReverseGasketUint64Uint64 (Drv->MakeRegisterdKeyCallback ,Drv->RegisterdKeyCallbackContext, &KeyData);
     }
   } else {
-    if (drv->BreakRegisterdKeyCallback != NULL) {
-      ReverseGasketUint64Uint64 (drv->BreakRegisterdKeyCallback ,drv->RegisterdKeyCallbackContext, &KeyData);
+    if (Drv->BreakRegisterdKeyCallback != NULL) {
+      ReverseGasketUint64Uint64 (Drv->BreakRegisterdKeyCallback ,Drv->RegisterdKeyCallbackContext, &KeyData);
     }
   }
 }
 
 
 void
-handleMouseMoved(GRAPHICS_IO_PRIVATE *drv, XEvent *ev)
+handleMouseMoved(
+  IN  GRAPHICS_IO_PRIVATE   *Drv, 
+  IN  XEvent                *ev
+  )
 {
-  if ( ev->xmotion.x != drv->previous_x )
-  {
-    drv->pointer_state.RelativeMovementX += ( ev->xmotion.x - drv->previous_x );
-  drv->previous_x = ev->xmotion.x;
-  drv->pointer_state_changed = 1;
+  if (ev->xmotion.x != Drv->previous_x) {
+    Drv->pointer_state.RelativeMovementX += ( ev->xmotion.x - Drv->previous_x );
+    Drv->previous_x = ev->xmotion.x;
+    Drv->pointer_state_changed = 1;
   }
 
-  if ( ev->xmotion.y != drv->previous_y )
-  {
-    drv->pointer_state.RelativeMovementY += ( ev->xmotion.y - drv->previous_y );
-    drv->previous_y = ev->xmotion.y;
-  drv->pointer_state_changed = 1;
+  if (ev->xmotion.y != Drv->previous_y) {
+    Drv->pointer_state.RelativeMovementY += ( ev->xmotion.y - Drv->previous_y );
+    Drv->previous_y = ev->xmotion.y;
+    Drv->pointer_state_changed = 1;
   }
 
-  drv->pointer_state.RelativeMovementZ = 0;
+  Drv->pointer_state.RelativeMovementZ = 0;
 }
 
 void
-handleMouseDown(GRAPHICS_IO_PRIVATE *drv, XEvent *ev, BOOLEAN Pressed)
+handleMouseDown (
+  IN  GRAPHICS_IO_PRIVATE *Drv, 
+  IN  XEvent              *ev, 
+  IN  BOOLEAN             Pressed
+  )
 {
-  if ( ev->xbutton.button == Button1 )
-  {
-    drv->pointer_state_changed = ( drv->pointer_state.LeftButton != Pressed );
-  drv->pointer_state.LeftButton = Pressed;
+  if (ev->xbutton.button == Button1) {
+    Drv->pointer_state_changed = (Drv->pointer_state.LeftButton != Pressed);
+    Drv->pointer_state.LeftButton = Pressed;
   }
-  if ( ev->xbutton.button == Button2 )
-  {
-    drv->pointer_state_changed = ( drv->pointer_state.RightButton != Pressed );
-  drv->pointer_state.RightButton = Pressed;
+  if ( ev->xbutton.button == Button2 ) {
+    Drv->pointer_state_changed = (Drv->pointer_state.RightButton != Pressed);
+    Drv->pointer_state.RightButton = Pressed;
   }
 }
 
 void
-Redraw(GRAPHICS_IO_PRIVATE *drv, UINTN X, UINTN Y, UINTN Width, UINTN Height)
+Redraw (
+  IN  GRAPHICS_IO_PRIVATE *Drv, 
+  IN  UINTN               X, 
+  IN  UINTN               Y, 
+  IN  UINTN               Width, 
+  IN  UINTN               Height
+  )
 {
-  if (drv->use_shm)
-    XShmPutImage (drv->display, drv->win, drv->gc, drv->image,
-                   X, Y, X, Y, Width, Height, False);
-  else
-    XPutImage (drv->display, drv->win, drv->gc, drv->image,
-                X, Y, X, Y, Width, Height);
-  XFlush(drv->display);
+  if (Drv->use_shm) {
+    XShmPutImage (
+      Drv->display, Drv->win, Drv->gc, Drv->image, X, Y, X, Y, Width, Height, False
+      );
+  } else {
+    XPutImage (
+      Drv->display, Drv->win, Drv->gc, Drv->image, X, Y, X, Y, Width, Height
+      );
+  }
+  XFlush(Drv->display);
 }
 
 void
-HandleEvent(GRAPHICS_IO_PRIVATE *drv, XEvent *ev)
+HandleEvent(GRAPHICS_IO_PRIVATE *Drv, XEvent *ev)
 {
-  switch (ev->type)
-    {
-    case Expose:
-      Redraw(drv, ev->xexpose.x, ev->xexpose.y,
-        ev->xexpose.width, ev->xexpose.height);
-      break;
-    case GraphicsExpose:
-      Redraw(drv, ev->xgraphicsexpose.x, ev->xgraphicsexpose.y,
-        ev->xgraphicsexpose.width, ev->xgraphicsexpose.height);
-      break;
-    case KeyPress:
-      handleKeyEvent(drv, ev, TRUE);
-      break;
-    case KeyRelease:
-      handleKeyEvent(drv, ev, FALSE);
-      break;
-    case MappingNotify:
-      XRefreshKeyboardMapping(&ev->xmapping);
-      break;
-    case MotionNotify:
-      handleMouseMoved(drv, ev);
-      break;
-    case ButtonPress:
-      handleMouseDown(drv, ev, TRUE);
+  switch (ev->type) {
+  case Expose:
+    Redraw (Drv, ev->xexpose.x, ev->xexpose.y,
+      ev->xexpose.width, ev->xexpose.height);
     break;
-    case ButtonRelease:
-      handleMouseDown(drv, ev, FALSE);
+  case GraphicsExpose:
+    Redraw (Drv, ev->xgraphicsexpose.x, ev->xgraphicsexpose.y,
+      ev->xgraphicsexpose.width, ev->xgraphicsexpose.height);
     break;
+  case KeyPress:
+    handleKeyEvent (Drv, ev, TRUE);
+    break;
+  case KeyRelease:
+    handleKeyEvent (Drv, ev, FALSE);
+    break;
+  case MappingNotify:
+    XRefreshKeyboardMapping (&ev->xmapping);
+    break;
+  case MotionNotify:
+    handleMouseMoved (Drv, ev);
+    break;
+  case ButtonPress:
+    handleMouseDown (Drv, ev, TRUE);
+  break;
+  case ButtonRelease:
+    handleMouseDown (Drv, ev, FALSE);
+  break;
 #if 0
-    case DestroyNotify:
-      XCloseDisplay (drv->display);
-      exit (1);
-      break;
+  case DestroyNotify:
+    XCloseDisplay (Drv->display);
+    exit (1);
+    break;
 #endif
-    case NoExpose:
-    default:
-      break;
-    }
+  case NoExpose:
+  default:
+    break;
+  }
 }
 
 void
-HandleEvents(GRAPHICS_IO_PRIVATE *drv)
+HandleEvents (
+  IN  GRAPHICS_IO_PRIVATE *Drv
+  )
 {
-  while (XPending(drv->display) != 0)
-    {
-      XEvent ev;
+  XEvent ev;
 
-      XNextEvent (drv->display, &ev);
-      HandleEvent(drv, &ev);
-    }
+  while (XPending (Drv->display) != 0) {
+    XNextEvent (Drv->display, &ev);
+    HandleEvent (Drv, &ev);
+  }
 }
 
 unsigned long
-X11PixelToColor (GRAPHICS_IO_PRIVATE *drv, EFI_UGA_PIXEL pixel)
+X11PixelToColor (
+  IN  GRAPHICS_IO_PRIVATE *Drv, 
+  IN  EFI_UGA_PIXEL       pixel
+  )
 {
-  return ((pixel.Red >> drv->r.csize) << drv->r.shift)
-    | ((pixel.Green >> drv->g.csize) << drv->g.shift)
-    | ((pixel.Blue >> drv->b.csize) << drv->b.shift);
+  return ((pixel.Red   >> Drv->r.csize) << Drv->r.shift)
+       | ((pixel.Green >> Drv->g.csize) << Drv->g.shift)
+       | ((pixel.Blue  >> Drv->b.csize) << Drv->b.shift);
 }
 
 EFI_UGA_PIXEL
-X11ColorToPixel (GRAPHICS_IO_PRIVATE *drv, unsigned long val)
+X11ColorToPixel (
+  IN  GRAPHICS_IO_PRIVATE *Drv, 
+  IN  unsigned long       val
+  )
 {
-  EFI_UGA_PIXEL res;
+  EFI_UGA_PIXEL Pixel;
 
-  memset (&res, 0, sizeof (EFI_UGA_PIXEL));
-  /* FIXME: should round instead of truncate.  */
-  res.Red = (val >> drv->r.shift) << drv->r.csize;
-  res.Green = (val >> drv->g.shift) << drv->g.csize;
-  res.Blue = (val >> drv->b.shift) << drv->b.csize;
+  memset (&Pixel, 0, sizeof (EFI_UGA_PIXEL));
+  
+  // Truncation not an issue since X11 and EFI are both using 8 bits per color
+  Pixel.Red =   (val >> Drv->r.shift) << Drv->r.csize;
+  Pixel.Green = (val >> Drv->g.shift) << Drv->g.csize;
+  Pixel.Blue =  (val >> Drv->b.shift) << Drv->b.csize;
 
-  return res;
+  return Pixel;
 }
 
-STATIC EFI_STATUS
-CheckKeyInternal( GRAPHICS_IO_PRIVATE *drv, BOOLEAN delay )
+EFI_STATUS
+CheckKeyInternal (
+  IN  GRAPHICS_IO_PRIVATE *Drv, 
+  IN  BOOLEAN             delay 
+  )
 {
-  HandleEvents(drv);
-  if (drv->key_count != 0)
+  HandleEvents (Drv);
+  
+  if (Drv->key_count != 0) {
     return EFI_SUCCESS;
-  if ( delay )
-    /* EFI is polling.  Be CPU-friendly.  */
-    SecSleep (20);
-    return EFI_NOT_READY;
   }
+  
+  if (delay) {
+    // EFI is polling.  Be CPU-friendly. 
+    SecSleep (20);
+  }
+  return EFI_NOT_READY;
+}
 
 EFI_STATUS
-X11CheckKey(EMU_GRAPHICS_WINDOW_PROTOCOL *GraphicsIo)
+X11CheckKey (
+  IN  EMU_GRAPHICS_WINDOW_PROTOCOL *GraphicsIo
+  )
 {
-  GRAPHICS_IO_PRIVATE  *drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
-  return CheckKeyInternal(drv, TRUE);
+  GRAPHICS_IO_PRIVATE  *Drv;
+  
+  Drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
+  
+  return CheckKeyInternal (Drv, TRUE);
 }
 
 EFI_STATUS
 EFIAPI
 X11GetKey (
   IN  EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsIo, 
-  IN  EFI_KEY_DATA                   *KeyData
+  IN  EFI_KEY_DATA                  *KeyData
   )
 {
-  GRAPHICS_IO_PRIVATE *drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
-  EFI_STATUS status;
+  EFI_STATUS          EfiStatus;
+  GRAPHICS_IO_PRIVATE *Drv;
+  
+  Drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
 
-  status = CheckKeyInternal(drv, FALSE);
-  if (status != EFI_SUCCESS)
-    return status;
-
-  CopyMem (KeyData, &drv->keys[drv->key_rd], sizeof (EFI_KEY_DATA));
-  drv->key_rd = (drv->key_rd + 1) % NBR_KEYS;
-  drv->key_count--;
+  EfiStatus = CheckKeyInternal (Drv, FALSE);
+  if (EFI_ERROR (EfiStatus)) {
+    return EfiStatus;
+  }
+  
+  CopyMem (KeyData, &Drv->keys[Drv->key_rd], sizeof (EFI_KEY_DATA));
+  Drv->key_rd = (Drv->key_rd + 1) % NBR_KEYS;
+  Drv->key_count--;
+  
   return EFI_SUCCESS;
 }
 
@@ -633,14 +684,15 @@ EFI_STATUS
 EFIAPI
 X11KeySetState (
   IN EMU_GRAPHICS_WINDOW_PROTOCOL   *GraphicsIo, 
-  IN EFI_KEY_TOGGLE_STATE       *KeyToggleState
+  IN EFI_KEY_TOGGLE_STATE           *KeyToggleState
   )
 {
-  GRAPHICS_IO_PRIVATE  *drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
-//  XKeyEvent       event;
+  GRAPHICS_IO_PRIVATE  *Drv;
+  
+  Drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;  
   
   if (*KeyToggleState & EFI_CAPS_LOCK_ACTIVE) {
-    if ((drv->KeyState.KeyToggleState & EFI_CAPS_LOCK_ACTIVE) == 0) {
+    if ((Drv->KeyState.KeyToggleState & EFI_CAPS_LOCK_ACTIVE) == 0) {
       //
       // We could create an XKeyEvent and send a XK_Caps_Lock to
       // the UGA/GOP Window
@@ -648,7 +700,7 @@ X11KeySetState (
     }
   }
     
-  drv->KeyState.KeyToggleState = *KeyToggleState;
+  Drv->KeyState.KeyToggleState = *KeyToggleState;
   return EFI_SUCCESS;
 }
 
@@ -656,17 +708,19 @@ X11KeySetState (
 EFI_STATUS
 EFIAPI
 X11RegisterKeyNotify (
-  IN EMU_GRAPHICS_WINDOW_PROTOCOL                       *GraphicsIo, 
+  IN EMU_GRAPHICS_WINDOW_PROTOCOL                        *GraphicsIo, 
   IN EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK    MakeCallBack,
   IN EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK    BreakCallBack,
   IN VOID                                                *Context
   )
 {
-  GRAPHICS_IO_PRIVATE  *drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
+  GRAPHICS_IO_PRIVATE  *Drv;
 
-  drv->MakeRegisterdKeyCallback         = MakeCallBack;
-  drv->BreakRegisterdKeyCallback        = BreakCallBack;
-  drv->RegisterdKeyCallbackContext = Context;
+  Drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;  
+
+  Drv->MakeRegisterdKeyCallback    = MakeCallBack;
+  Drv->BreakRegisterdKeyCallback   = BreakCallBack;
+  Drv->RegisterdKeyCallbackContext = Context;
 
   return EFI_SUCCESS;
 }
@@ -680,7 +734,7 @@ X11Blt (
   IN  EMU_GRAPHICS_WINDOWS__BLT_ARGS          *Args
   )
 {
-  GRAPHICS_IO_PRIVATE *Private = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
+  GRAPHICS_IO_PRIVATE *Private;
   UINTN             DstY;
   UINTN             SrcY;
   UINTN             DstX;
@@ -691,6 +745,10 @@ X11Blt (
   UINT8             *Src;
   UINTN             Nbr;
   unsigned long     Color;
+  XEvent            ev;
+
+  Private = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
+
 
   //
   //  Check bounds
@@ -730,8 +788,7 @@ X11Blt (
     Args->Delta -= Args->Width * sizeof (EFI_UGA_PIXEL);
     for (SrcY = Args->SourceY; SrcY < (Args->Height + Args->SourceY); SrcY++) {
       for (SrcX = Args->SourceX; SrcX < (Args->Width + Args->SourceX); SrcX++) {
-        *Blt++ = X11ColorToPixel(Private,
-                                  XGetPixel(Private->image, SrcX, SrcY));
+        *Blt++ = X11ColorToPixel (Private, XGetPixel (Private->image, SrcX, SrcY));
       }
       Blt = (EFI_UGA_PIXEL *) ((UINT8 *) Blt + Args->Delta);
     }
@@ -749,9 +806,9 @@ X11Blt (
     break;
   case EfiUgaVideoToVideo:
     Dst = Private->image_data + (Args->DestinationX << Private->pixel_shift)
-      + Args->DestinationY * Private->line_bytes;
+          + Args->DestinationY * Private->line_bytes;
     Src = Private->image_data + (Args->SourceX << Private->pixel_shift)
-      + Args->SourceY * Private->line_bytes;
+          + Args->SourceY * Private->line_bytes;
     Nbr = Args->Width << Private->pixel_shift;
     if (Args->DestinationY < Args->SourceY) {
       for (Index = 0; Index < Args->Height; Index++) {
@@ -759,8 +816,7 @@ X11Blt (
         Dst += Private->line_bytes;
         Src += Private->line_bytes;
       }
-    }
-    else {
+    } else {
       Dst += (Args->Height - 1) * Private->line_bytes;
       Src += (Args->Height - 1) * Private->line_bytes;
       for (Index = 0; Index < Args->Height; Index++) {
@@ -783,7 +839,7 @@ X11Blt (
     }
     break;
   default:
-      return EFI_INVALID_PARAMETER;
+    return EFI_INVALID_PARAMETER;
   }
 
   //
@@ -791,26 +847,31 @@ X11Blt (
   //
   switch (BltOperation) {
   case EfiUgaVideoToVideo:
-    XCopyArea(Private->display, Private->win, Private->win, Private->gc,
-               Args->SourceX, Args->SourceY, Args->Width, Args->Height, Args->DestinationX, Args->DestinationY);
+    XCopyArea(
+      Private->display, Private->win, Private->win, Private->gc,
+      Args->SourceX, Args->SourceY, Args->Width, Args->Height, 
+      Args->DestinationX, Args->DestinationY
+      );
+      
     while (1) {
-      XEvent ev;
-
       XNextEvent (Private->display, &ev);
-      HandleEvent(Private, &ev);
-      if (ev.type == NoExpose || ev.type == GraphicsExpose)
+      HandleEvent (Private, &ev);
+      if (ev.type == NoExpose || ev.type == GraphicsExpose) {
         break;
+      }
     }
     break;
   case EfiUgaVideoFill:
-    Color = X11PixelToColor(Private, *BltBuffer);
-    XSetForeground(Private->display, Private->gc, Color);
-    XFillRectangle(Private->display, Private->win, Private->gc,
-                    Args->DestinationX, Args->DestinationY, Args->Width, Args->Height);
-    XFlush(Private->display);
+    Color = X11PixelToColor (Private, *BltBuffer);
+    XSetForeground (Private->display, Private->gc, Color);
+    XFillRectangle (
+      Private->display, Private->win, Private->gc,
+      Args->DestinationX, Args->DestinationY, Args->Width, Args->Height
+      );
+    XFlush (Private->display);
     break;
   case EfiUgaBltBufferToVideo:
-    Redraw(Private, Args->DestinationX, Args->DestinationY, Args->Width, Args->Height);
+    Redraw (Private, Args->DestinationX, Args->DestinationY, Args->Width, Args->Height);
     break;
   default:
     break;
@@ -818,41 +879,56 @@ X11Blt (
   return EFI_SUCCESS;
 }
 
-STATIC EFI_STATUS
-CheckPointerInternal( GRAPHICS_IO_PRIVATE *drv, BOOLEAN delay )
+EFI_STATUS
+CheckPointerInternal (
+  IN  GRAPHICS_IO_PRIVATE *Drv, 
+  IN  BOOLEAN             delay
+  )
 {
-  HandleEvents(drv);
-  if (drv->pointer_state_changed != 0)
+  HandleEvents (Drv);
+  if (Drv->pointer_state_changed != 0) {
     return EFI_SUCCESS;
-  if ( delay )
-    /* EFI is polling.  Be CPU-friendly.  */
+  }
+  
+  if ( delay ) {
+    // EFI is polling.  Be CPU-friendly.  
     SecSleep (20);
+  }
+  
   return EFI_NOT_READY;
 }
 
 EFI_STATUS
-X11CheckPointer(EMU_GRAPHICS_WINDOW_PROTOCOL *GraphicsIo)
+X11CheckPointer (
+  IN  EMU_GRAPHICS_WINDOW_PROTOCOL *GraphicsIo
+  )
 {
-  GRAPHICS_IO_PRIVATE  *drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
-  return( CheckPointerInternal( drv, TRUE ) );
+  GRAPHICS_IO_PRIVATE  *Drv;
+
+  Drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
+
+  return CheckPointerInternal (Drv, TRUE);
 }
 
 EFI_STATUS
 X11GetPointerState (EMU_GRAPHICS_WINDOW_PROTOCOL *GraphicsIo, EFI_SIMPLE_POINTER_STATE *state)
 {
-  GRAPHICS_IO_PRIVATE *drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
-  EFI_STATUS status;
+  EFI_STATUS          EfiStatus;
+  GRAPHICS_IO_PRIVATE *Drv;
 
-  status = CheckPointerInternal( drv, FALSE );
-  if (status != EFI_SUCCESS)
-    return status;
+  Drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
+
+  EfiStatus = CheckPointerInternal (Drv, FALSE);
+  if (EfiStatus != EFI_SUCCESS) {
+    return EfiStatus;
+  }
   
-  memcpy( state, &drv->pointer_state, sizeof( EFI_SIMPLE_POINTER_STATE ) );
+  memcpy (state, &Drv->pointer_state, sizeof (EFI_SIMPLE_POINTER_STATE));
 
-  drv->pointer_state.RelativeMovementX = 0;
-  drv->pointer_state.RelativeMovementY = 0;
-  drv->pointer_state.RelativeMovementZ = 0;
-  drv->pointer_state_changed = 0;
+  Drv->pointer_state.RelativeMovementX = 0;
+  Drv->pointer_state.RelativeMovementY = 0;
+  Drv->pointer_state.RelativeMovementZ = 0;
+  Drv->pointer_state_changed = 0;
   return EFI_SUCCESS;
 }
 
@@ -863,72 +939,66 @@ X11GraphicsWindowOpen (
   IN  EMU_IO_THUNK_PROTOCOL   *This
   )
 {
-  GRAPHICS_IO_PRIVATE *drv;
-  unsigned int border_width = 0;
-  char *display_name = NULL;
-  int title_len;
+  GRAPHICS_IO_PRIVATE *Drv;
+  unsigned int        border_width = 0;
+  char                *display_name = NULL;
 
-  drv = (GRAPHICS_IO_PRIVATE *)calloc (1, sizeof (GRAPHICS_IO_PRIVATE));
-  if (drv == NULL)
+  Drv = (GRAPHICS_IO_PRIVATE *)calloc (1, sizeof (GRAPHICS_IO_PRIVATE));
+  if (Drv == NULL) {
     return EFI_OUT_OF_RESOURCES;
+  }
 
-  drv->GraphicsIo.Size                = GasketX11Size;
-  drv->GraphicsIo.CheckKey            = GasketX11CheckKey;
-  drv->GraphicsIo.GetKey              = GasketX11GetKey;
-  drv->GraphicsIo.KeySetState         = GasketX11KeySetState;
-  drv->GraphicsIo.RegisterKeyNotify   = GasketX11RegisterKeyNotify;
-  drv->GraphicsIo.Blt                 = GasketX11Blt;
-  drv->GraphicsIo.CheckPointer        = GasketX11CheckPointer;
-  drv->GraphicsIo.GetPointerState     = GasketX11GetPointerState;
+  Drv->GraphicsIo.Size                = GasketX11Size;
+  Drv->GraphicsIo.CheckKey            = GasketX11CheckKey;
+  Drv->GraphicsIo.GetKey              = GasketX11GetKey;
+  Drv->GraphicsIo.KeySetState         = GasketX11KeySetState;
+  Drv->GraphicsIo.RegisterKeyNotify   = GasketX11RegisterKeyNotify;
+  Drv->GraphicsIo.Blt                 = GasketX11Blt;
+  Drv->GraphicsIo.CheckPointer        = GasketX11CheckPointer;
+  Drv->GraphicsIo.GetPointerState     = GasketX11GetPointerState;
   
 
-  drv->key_count = 0;
-  drv->key_rd = 0;
-  drv->key_wr = 0;
-  drv->KeyState.KeyShiftState      = EFI_SHIFT_STATE_VALID;
-  drv->KeyState.KeyToggleState     = EFI_TOGGLE_STATE_VALID;
-  drv->MakeRegisterdKeyCallback    = NULL;
-  drv->BreakRegisterdKeyCallback   = NULL;
-  drv->RegisterdKeyCallbackContext = NULL;
+  Drv->key_count = 0;
+  Drv->key_rd = 0;
+  Drv->key_wr = 0;
+  Drv->KeyState.KeyShiftState      = EFI_SHIFT_STATE_VALID;
+  Drv->KeyState.KeyToggleState     = EFI_TOGGLE_STATE_VALID;
+  Drv->MakeRegisterdKeyCallback    = NULL;
+  Drv->BreakRegisterdKeyCallback   = NULL;
+  Drv->RegisterdKeyCallbackContext = NULL;
   
   
-  drv->display = XOpenDisplay (display_name);
-  if (drv->display == NULL) {
+  Drv->display = XOpenDisplay (display_name);
+  if (Drv->display == NULL) {
     fprintf (stderr, "uga: cannot connect to X server %s\n", XDisplayName (display_name));
-    free (drv);
+    free (Drv);
     return EFI_DEVICE_ERROR;
   }
-  drv->screen = DefaultScreen (drv->display);
-  drv->visual = DefaultVisual (drv->display, drv->screen);
-  drv->win = XCreateSimpleWindow
-               (drv->display, RootWindow (drv->display, drv->screen),
+  Drv->screen = DefaultScreen (Drv->display);
+  Drv->visual = DefaultVisual (Drv->display, Drv->screen);
+  Drv->win = XCreateSimpleWindow (
+                Drv->display, RootWindow (Drv->display, Drv->screen),
                 0, 0, 4, 4, border_width,
-                WhitePixel (drv->display, drv->screen),
-                BlackPixel (drv->display, drv->screen));
+                WhitePixel (Drv->display, Drv->screen),
+                BlackPixel (Drv->display, Drv->screen)
+                );
 
-  drv->depth = DefaultDepth (drv->display, drv->screen);
-  XDefineCursor (drv->display, drv->win, XCreateFontCursor (drv->display, XC_pirate)); 
+  Drv->depth = DefaultDepth (Drv->display, Drv->screen);
+  XDefineCursor (Drv->display, Drv->win, XCreateFontCursor (Drv->display, XC_pirate)); 
 
-  /* Compute title len and convert to Ascii.  */
-  for (title_len = 0; This->ConfigString[title_len] != 0; title_len++)
-    ;
-  {
-    char title[title_len + 1];
-    int i;
-    for (i = 0; i < title_len; i++)
-      title[i] = This->ConfigString[i];
-    title[i] = 0;
-    
-    XStoreName (drv->display, drv->win, title);
-  }
+  Drv->Title = malloc (StrSize (This->ConfigString));  
+  UnicodeStrToAsciiStr (This->ConfigString, Drv->Title);
+  XStoreName (Drv->display, Drv->win, Drv->Title);
 
-//  XAutoRepeatOff (drv->display);
-  XSelectInput (drv->display, drv->win,
-                 ExposureMask | KeyPressMask | KeyReleaseMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask );
-  drv->gc = DefaultGC (drv->display, drv->screen);
+//  XAutoRepeatOff (Drv->display);
+  XSelectInput (
+    Drv->display, Drv->win,
+    ExposureMask | KeyPressMask | KeyReleaseMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask 
+    );
+  Drv->gc = DefaultGC (Drv->display, Drv->screen);
 
-  This->Private   = (VOID *)drv;
-  This->Interface = (VOID *)drv;
+  This->Private   = (VOID *)Drv;
+  This->Interface = (VOID *)Drv;
   return EFI_SUCCESS;
 }
 
@@ -938,29 +1008,33 @@ X11GraphicsWindowClose (
   IN  EMU_IO_THUNK_PROTOCOL   *This
   )
 {
-  GRAPHICS_IO_PRIVATE *drv = (GRAPHICS_IO_PRIVATE *)This->Private;
+  GRAPHICS_IO_PRIVATE *Drv;
 
-  if (drv == NULL)
+  Drv = (GRAPHICS_IO_PRIVATE *)This->Private;
+
+  if (Drv == NULL) {
     return EFI_SUCCESS;
-  if (drv->image != NULL)
-    {
-      XDestroyImage(drv->image);
+  }
+  
+  if (Drv->image != NULL) {
+    XDestroyImage(Drv->image);
 
-      if (drv->use_shm)
-        shmdt (drv->image_data);
-
-      drv->image_data = NULL;
-      drv->image = NULL;
+    if (Drv->use_shm) {
+      shmdt (Drv->image_data);
     }
-  XDestroyWindow(drv->display, drv->win);
-  XCloseDisplay(drv->display);
+
+    Drv->image_data = NULL;
+    Drv->image = NULL;
+  }
+  XDestroyWindow (Drv->display, Drv->win);
+  XCloseDisplay (Drv->display);
   
 #ifdef __APPLE__
   // Free up the shared memory
-  shmctl (drv->xshm_info.shmid, IPC_RMID, NULL);
+  shmctl (Drv->xshm_info.shmid, IPC_RMID, NULL);
 #endif
   
-  free(drv);
+  free (Drv);
   return EFI_SUCCESS;
 }
 

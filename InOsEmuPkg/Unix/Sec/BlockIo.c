@@ -255,20 +255,9 @@ EmuBlockIoError (
     Status                = EFI_DEVICE_ERROR;
     break;
   }
-/*
-  if (ReinstallBlockIoFlag) {
-    Private->EmuBlockIo->Reset (&Private->EmuBlockIo, FALSE);
-
-    gBS->ReinstallProtocolInterface (
-          Private->EfiHandle,
-          &gEfiBlockIoProtocolGuid,
-          BlockIo,
-          BlockIo
-          );
-  }
-*/
   return Status;
 }
+
 
 EFI_STATUS
 EmuBlockIoReadWriteCommon (
@@ -567,21 +556,6 @@ EmuBlockIoReset (
   IN EMU_BLOCK_IO_PROTOCOL    *This,
   IN BOOLEAN                  ExtendedVerification
   )
-/*++
-
-  Routine Description:
-    Reset the Block Device.
-
-  Arguments:
-    This                 - Protocol instance pointer.
-    ExtendedVerification - Driver may perform diagnostics on reset.
-
-  Returns:
-    EFI_SUCCESS           - The device was reset.
-    EFI_DEVICE_ERROR      - The device is not functioning properly and could 
-                            not be reset.
-
-**/
 {
   EMU_BLOCK_IO_PRIVATE *Private;
 

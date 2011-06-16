@@ -298,10 +298,11 @@ main (
 
 EFI_PHYSICAL_ADDRESS *
 MapMemory (
-  INTN fd,
-  UINT64 length,
-  INTN   prot,
-  INTN   flags)
+  IN INTN   fd,
+  IN UINT64 length,
+  IN INTN   prot,
+  IN INTN   flags
+  )
 {
   STATIC UINTN base  = 0x40000000;
   CONST UINTN  align = (1 << 24);
@@ -786,7 +787,6 @@ CountSeperatorsInString (
 
 
 EFI_STATUS
-EFIAPI
 SecImageRead (
   IN     VOID    *FileHandle,
   IN     UINTN   FileOffset,
