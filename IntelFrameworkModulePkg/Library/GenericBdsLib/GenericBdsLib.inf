@@ -119,4 +119,5 @@
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
 [Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
