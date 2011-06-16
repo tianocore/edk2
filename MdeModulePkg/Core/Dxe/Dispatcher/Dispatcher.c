@@ -26,7 +26,7 @@
   Depex - Dependency Expresion.
   SOR   - Schedule On Request - Don't schedule if this bit is set.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -402,7 +402,7 @@ CoreTrust (
 **/
 VOID
 EFIAPI
-EmptyFuntion (
+CoreEmptyCallbackFunction (
   IN EFI_EVENT                Event,
   IN VOID                     *Context
   )
@@ -450,7 +450,7 @@ CoreDispatcher (
   Status = CoreCreateEventEx (
              EVT_NOTIFY_SIGNAL,
              TPL_NOTIFY,
-             EmptyFuntion,
+             CoreEmptyCallbackFunction,
              NULL,
              &gEfiEventDxeDispatchGuid,
              &DxeDispatchEvent

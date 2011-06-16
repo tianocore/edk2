@@ -63,6 +63,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/EventLegacyBios.h>
 #include <Guid/EventGroup.h>
 #include <Guid/LoadModuleAtFixedAddress.h>
+#include <Guid/IdleLoopEvent.h>
 
 #include <Library/DxeCoreEntryPoint.h>
 #include <Library/DebugLib.h>
@@ -2457,6 +2458,22 @@ CoreAcquireLockOrFail (
 VOID
 CoreReleaseLock (
   IN EFI_LOCK  *Lock
+  );
+
+
+/**
+  An empty function to pass error checking of CreateEventEx ().
+
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               Pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+CoreEmptyCallbackFunction (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
   );
 
 #endif

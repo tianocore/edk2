@@ -1,7 +1,7 @@
 /** @file
   UEFI Event support functions implemented in this file.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -87,6 +87,11 @@ UINT32 mEventTable[] = {
   EVT_TIMER | EVT_NOTIFY_WAIT,
 };
 
+///
+/// gIdleLoopEvent - Event which is signalled when the core is idle
+///
+EFI_EVENT       gIdleLoopEvent = NULL;
+
 
 /**
   Enter critical section by acquiring the lock on gEventQueueLock.
@@ -133,6 +138,15 @@ CoreInitializeEventServices (
   }
 
   CoreInitializeTimer ();
+
+  CoreCreateEventEx (
+    EVT_NOTIFY_SIGNAL,
+    TPL_NOTIFY,
+    CoreEmptyCallbackFunction,
+    NULL,
+    &gIdleLoopEventGuid,
+    &gIdleLoopEvent
+    );
 
   return EFI_SUCCESS;
 }
@@ -630,9 +644,9 @@ CoreWaitForEvent (
     }
 
     //
-    // This was the location of the Idle loop callback in EFI 1.x reference
-    // code. We don't have that concept in this base at this point.
+    // Signal the Idle event
     //
+    CoreSignalEvent (gIdleLoopEvent);
   }
 }
 
@@ -702,3 +716,4 @@ CoreCloseEvent (
 
   return Status;
 }
+

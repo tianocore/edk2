@@ -107,7 +107,7 @@
   gEfiMemoryTypeInformationGuid                 ## CONSUMES ## GUID
   gEfiEventDxeDispatchGuid                      ## CONSUMES ## GUID
   gLoadFixedAddressConfigurationTableGuid       ## SOMETIMES_CONSUMES
-  
+  gIdleLoopEventGuid                            ## CONSUMES ## GUID
 
 [Protocols]
   gEfiStatusCodeRuntimeProtocolGuid             ## SOMETIMES_CONSUMES
