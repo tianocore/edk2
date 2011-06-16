@@ -273,13 +273,17 @@ BdsLibUpdateConsoleVariable (
   //
   // Finally, Update the variable of the default console by NewDevicePath
   //
+  DevicePathSize = GetDevicePathSize (NewDevicePath);
   Status = gRT->SetVariable (
                   ConVarName,
                   &gEfiGlobalVariableGuid,
                   Attributes,
-                  GetDevicePathSize (NewDevicePath),
+                  DevicePathSize,
                   NewDevicePath
                   );
+  if ((DevicePathSize == 0) && (Status == EFI_NOT_FOUND)) {
+    Status = EFI_SUCCESS;
+  }
   ASSERT_EFI_ERROR (Status);
 
   if (VarConsole == NewDevicePath) {
@@ -295,7 +299,7 @@ BdsLibUpdateConsoleVariable (
     }
   }
 
-  return EFI_SUCCESS;
+  return Status;
 
 }
 
