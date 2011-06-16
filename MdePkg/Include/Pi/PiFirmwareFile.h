@@ -173,7 +173,7 @@ typedef struct {
   /// If FFS_ATTRIB_LARGE_FILE is set in Attributes, then ExtendedSize exists and Size must be set to zero.
   /// If FFS_ATTRIB_LARGE_FILE is not set then EFI_FFS_FILE_HEADER is used.
   ///
-  EFI_FFS_FILE_STATE        ExtendedSize;
+  UINT32                    ExtendedSize;
 } EFI_FFS_FILE_HEADER2;
 
 typedef UINT8 EFI_SECTION_TYPE;
