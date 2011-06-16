@@ -1,0 +1,27 @@
+From 0c01d81d610c6566fdde5e41bbce2265ee952c83 Mon Sep 17 00:00:00 2001
+From: Olivier Martin <olivier.martin@arm.com>
+Date: Wed, 15 Jun 2011 19:54:50 +0100
+Subject: [PATCH 4/6] BaseTools: Add -mword-relocations to ARMGCC to generate supported relocation symbols
+
+---
+ BaseTools/Conf/tools_def.template |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/BaseTools/Conf/tools_def.template b/BaseTools/Conf/tools_def.template
+index 7629701..39d67fb 100755
+--- a/BaseTools/Conf/tools_def.template
++++ b/BaseTools/Conf/tools_def.template
+@@ -3605,8 +3605,8 @@ RELEASE_ARMGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) -mlittle-endian
+ *_ARMGCC_ARM_SLINK_FLAGS =  -rc
+ *_ARMGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS)  --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+ 
+-  DEBUG_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mlittle-endian -g -O0 -mabi=aapcs -mapcs -fno-short-enums -save-temps -combine -fsigned-char -fshort-wchar -fno-strict-aliasing -ffunction-sections -fdata-sections -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h
+-RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mlittle-endian    -Os -mabi=aapcs -mapcs -fno-short-enums -save-temps -combine -fsigned-char -fshort-wchar -fno-strict-aliasing -ffunction-sections -fdata-sections -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h
++  DEBUG_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mword-relocations -mlittle-endian -g -O0 -mabi=aapcs -mapcs -fno-short-enums -save-temps -combine -fsigned-char -fshort-wchar -fno-strict-aliasing -ffunction-sections -fdata-sections -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h
++RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mword-relocations -mlittle-endian    -Os -mabi=aapcs -mapcs -fno-short-enums -save-temps -combine -fsigned-char -fshort-wchar -fno-strict-aliasing -ffunction-sections -fdata-sections -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h
+ 
+ #################
+ # ASM 16 linker defintions
+-- 
+1.6.3.3
+
