@@ -3,7 +3,7 @@
   This protocol is used on any device handle to obtain authentication information 
   associated with the physical or logical device.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -145,7 +145,9 @@ typedef struct {
 
   @param[in]  This                  The pointer to the EFI_AUTHENTICATION_INFO_PROTOCOL.
   @param[in]  ControllerHandle      The handle to the Controller.
-  @param[out] Buffer                The pointer to the authentication information.
+  @param[out] Buffer                The pointer to the authentication information. This function is
+                                    responsible for allocating the buffer and it is the caller's
+                                    responsibility to free buffer when the caller is finished with buffer.
 
   @retval EFI_SUCCESS           Successfully retrieved authentication information 
                                 for the given ControllerHandle.
@@ -157,10 +159,10 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_AUTHENTICATION_PROTOCOL_INFO_GET)(
+(EFIAPI *EFI_AUTHENTICATION_INFO_PROTOCOL_GET)(
   IN  EFI_AUTHENTICATION_INFO_PROTOCOL *This,
-  IN  EFI_HANDLE                       *ControllerHandle,
-  OUT VOID                             *Buffer
+  IN  EFI_HANDLE                       ControllerHandle,
+  OUT VOID                             **Buffer
   );
 
 /**
@@ -181,9 +183,9 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_AUTHENTICATION_PROTOCOL_INFO_SET)(
+(EFIAPI *EFI_AUTHENTICATION_INFO_PROTOCOL_SET)(
   IN EFI_AUTHENTICATION_INFO_PROTOCOL  *This,
-  IN EFI_HANDLE                        *ControllerHandle,
+  IN EFI_HANDLE                        ControllerHandle,
   IN VOID                              *Buffer
   );  
 
@@ -192,8 +194,8 @@ EFI_STATUS
 /// information associated with the physical or logical device.
 ///
 struct _EFI_AUTHENTICATION_INFO_PROTOCOL {
-  EFI_AUTHENTICATION_PROTOCOL_INFO_GET Get;
-  EFI_AUTHENTICATION_PROTOCOL_INFO_SET Set;
+  EFI_AUTHENTICATION_INFO_PROTOCOL_GET Get;
+  EFI_AUTHENTICATION_INFO_PROTOCOL_SET Set;
 };
 
 extern EFI_GUID gEfiAuthenticationInfoProtocolGuid;

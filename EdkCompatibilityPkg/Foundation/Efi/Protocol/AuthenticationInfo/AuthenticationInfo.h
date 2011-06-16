@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,8 +38,8 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_AUTHENTICATION_INFO_PROTOCOL_GET) (
   IN  EFI_AUTHENTICATION_INFO_PROTOCOL    *This,
-  IN  EFI_HANDLE                          *ControllerHandle,
-  OUT VOID                                *Buffer
+  IN  EFI_HANDLE                          ControllerHandle,
+  OUT VOID                                **Buffer
   );
 /*++
 
@@ -69,7 +69,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_AUTHENTICATION_INFO_PROTOCOL_SET) (
   IN  EFI_AUTHENTICATION_INFO_PROTOCOL    *This,
-  IN  EFI_HANDLE                          *ControllerHandle,
+  IN  EFI_HANDLE                          ControllerHandle,
   IN  VOID                                *Buffer
   );
 /*++
