@@ -1155,6 +1155,25 @@ InitInterruptDescriptorTable (
 
 
 /**
+  Callback function for idle events.
+ 
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               The pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+IdleLoopEventCallback (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  CpuSleep ();
+}
+
+
+/**
   Initialize the state information for the CPU Architectural Protocol.
 
   @param ImageHandle     Image handle this driver.
@@ -1173,6 +1192,7 @@ InitializeCpu (
   )
 {
   EFI_STATUS  Status;
+  EFI_EVENT   IdleLoopEvent;
 
   //
   // Make sure interrupts are disabled
@@ -1203,6 +1223,19 @@ InitializeCpu (
   // Refresh GCD memory space map according to MTRR value.
   //
   RefreshGcdMemoryAttributes ();
+
+  //
+  // Setup a callback for idle events
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  IdleLoopEventCallback,
+                  NULL,
+                  &gIdleLoopEventGuid,
+                  &IdleLoopEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
