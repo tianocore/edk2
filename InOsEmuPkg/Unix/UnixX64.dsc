@@ -1,6 +1,6 @@
 ## @file
 #
-# EFI/Framework Emulation Platform with UEFI HII interface supported.
+# UEFI/PI Emulation Platform with UEFI HII interface supported.
 #
 # The Emulation Platform can be used to debug individual modules, prior to creating
 #       a real platform. This also provides an example for how an DSC is created.
@@ -216,6 +216,7 @@
   
   gInOsEmuPkgTokenSpaceGuid.PcdEmuApCount|L"1"
 
+  # For a CD-ROM/DVD use L"diag.dmg:RO:2048"
   gInOsEmuPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"disk.dmg:FW"
   gInOsEmuPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFileSystem|L".!../../../../EdkShellBinPkg/Bin"
@@ -266,7 +267,7 @@
 [Components]
 !if $(SEC_ONLY)
   ##
-  #  SEC Phase modules
+  #  Emulator, OS POSIX application
   ##
   InOsEmuPkg/Unix/Sec/SecMain.inf
 !else
@@ -349,10 +350,10 @@
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf 
- # {
- #   <LibraryClasses>  
- #     NULL|InOsEmuPkg/Library/DevicePathTextLib/DevicePathTextLib.inf
- # }
+  #{
+  #  <LibraryClasses>  
+  #    NULL|InOsEmuPkg/Library/DevicePathTextLib/DevicePathTextLib.inf
+  #}
   
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
@@ -413,6 +414,9 @@
       ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
       SortLib|ShellPkg/Library/UefiSortLib/UefiSortLib.inf
       PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
+#      SafeBlockIoLib|ShellPkg/Library/SafeBlockIoLib/SafeBlockIoLib.inf
+#      SafeOpenProtocolLib|ShellPkg/Library/SafeOpenProtocolLib/SafeOpenProtocolLib.inf
+
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE

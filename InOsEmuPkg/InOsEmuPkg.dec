@@ -48,10 +48,6 @@
   gEmuVirtualDisksGuid       = { 0xf2ba331a, 0x8985, 0x11db, { 0xa4, 0x06, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35 } }
   gEmuPhysicalDisksGuid      = { 0xf2bdcc96, 0x8985, 0x11db, { 0x87, 0x19, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35 } }
 
-#  gEmuFileSystemGuid         = {0xf2c16b9e, 0x8985, 0x11db, {0x92, 0xc8, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
-#  gEmuSerialPortGuid         = {0x6d3a727d, 0x66c8, 0x4d19, {0x87, 0xe6, 0x02, 0x15, 0x86, 0x14, 0x90, 0xf3}}
-#  gEmuNetworkGuid            = {0x081603B4, 0x0F1D, 0x4022, {0xB6, 0xFD, 0x4C, 0xE3, 0x5E, 0x09, 0xA1, 0xA6}}
-
 [PcdsFixedAtBuild]
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageVariableBase|0x0|UINT64|0x00001014
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwSpareBase|0x0|UINT64|0x00001015
@@ -82,14 +78,17 @@
   gInOsEmuPkgTokenSpaceGuid.PcdEmuMemorySize|L"64!64"|VOID*|0x0000100c
   
   #
-  # filename[:][R|F][O|W]
+  # filename[:[R|F][O|W]][:BlockSize]
   # filename can be a device node, like /dev/disk1
   # R - Removable Media F - Fixed Media
   # O - Write protected W - Writable
   #   Default is Fixed Media, Writable
-  # Size comes from file or device. 
+  # For a file the default BlockSize is 512, and can be overridden via BlockSize,
+  #  for example 2048 for an ISO CD image. The block size for a device comes from
+  #  the device and is not configurable. 
+  # Device Size comes from file or device. 
   # On Mac OS X you can use Disk Utility to create .dmg files and mount then like disks
-  gInOsEmuPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"FW;40960;512"|VOID*|0x00001001
+  gInOsEmuPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"disk.dmg:FW"|VOID*|0x00001001
   
   gInOsEmuPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"|VOID*|0x00001018
   gInOsEmuPkgTokenSpaceGuid.PcdEmuFileSystem|L".!../../../../../EdkShellBinPkg/bin/ia32/Apps"|VOID*|0x00001004

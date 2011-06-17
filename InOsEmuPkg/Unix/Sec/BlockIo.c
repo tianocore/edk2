@@ -29,6 +29,7 @@ typedef struct {
   BOOLEAN                     WriteProtected;
 
   UINT64                      NumberOfBlocks;
+  UINT32                      BlockSize;
 
   EMU_BLOCK_IO_PROTOCOL       EmuBlockIo;
   EFI_BLOCK_IO_MEDIA          *Media;
@@ -157,14 +158,14 @@ EmuBlockIoOpenDevice (
     }
 #endif
     
-  } else if (fstatfs (Private->fd, &buf) == 0) {
-    //
-    // Works for files, not devices
-    //
-    Private->Media->BlockSize = buf.f_bsize;
-    Private->Media->OptimalTransferLengthGranularity = buf.f_iosize/buf.f_bsize;
+  } else {
+    Private->Media->BlockSize = Private->BlockSize;
     Private->NumberOfBlocks = DivU64x32 (FileSize, Private->Media->BlockSize);
     Private->Media->LastBlock = Private->NumberOfBlocks - 1;
+    
+    if (fstatfs (Private->fd, &buf) == 0) {
+      Private->Media->OptimalTransferLengthGranularity = buf.f_iosize/buf.f_bsize;
+    }
   } 
 
   DEBUG ((EFI_D_INIT, "%HEmuOpenBlock: opened %a%N\n", Private->Filename));
@@ -627,7 +628,8 @@ EmuBlockIoThunkOpen (
   Private->Signature = EMU_BLOCK_IO_PRIVATE_SIGNATURE;
   Private->Thunk     = This;
   CopyMem (&Private->EmuBlockIo, &gEmuBlockIoProtocol, sizeof (gEmuBlockIoProtocol));
-  Private->fd = -1;
+  Private->fd        = -1;
+  Private->BlockSize = 512;
  
   Private->Filename = StdDupUnicodeToAscii (This->ConfigString);
   if (Private->Filename == NULL) {
@@ -645,6 +647,10 @@ EmuBlockIoThunkOpen (
       }
       if (*Str == 'O' || *Str == 'W') {
         Private->WriteProtected  = (BOOLEAN) (*Str == 'O');
+      }
+      if (*Str == ':') {
+        Private->BlockSize = strtol (++Str, NULL, 0);
+        break;
       }
     }
   }
