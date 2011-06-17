@@ -87,7 +87,7 @@
   #  for example 2048 for an ISO CD image. The block size for a device comes from
   #  the device and is not configurable. 
   # Device Size comes from file or device. 
-  # On Mac OS X you can use Disk Utility to create .dmg files and mount then like disks
+  # On Mac OS X you can use Disk Utility to create .dmg files and mount them like disks
   gInOsEmuPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"disk.dmg:FW"|VOID*|0x00001001
   
   gInOsEmuPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"|VOID*|0x00001018
