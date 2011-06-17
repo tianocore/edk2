@@ -103,3 +103,9 @@
   ## Error level for hardware recorder. If value 0, platform does not support feature of hardware error record.
   #  This PCD should be set as HII type PCD by platform integrator mapped to variable L"HwErrRecSupport"
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|0|UINT16|0x40000002
+
+
+[PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx, PcdsPatchableInModule]
+  ## I/O Base address of floppy device controller.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFdcBaseAddress|0x3f0|UINT16|0x30000000
+

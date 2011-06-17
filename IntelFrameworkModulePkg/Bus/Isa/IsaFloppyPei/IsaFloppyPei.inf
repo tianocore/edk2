@@ -1,0 +1,68 @@
+## @file
+# ISA Floppy PEIM to support recovery boot via floppy disk.
+#
+# This module detects Floppy devices. If found, it will install BlockIo PPI.
+#  This module is only dispatched in Recovery Boot mode.
+#
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions
+# of the BSD License which accompanies this distribution.  The
+# full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IsaFloppyPei
+  FILE_GUID                      = 7F6E0A24-DBFD-43df-9755-0292D7D3DD48
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = FdcPeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
+#
+
+[Sources]
+  FloppyPeim.c
+  FloppyPeim.h
+  Fdc.h
+
+[Packages]
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  IoLib
+  TimerLib
+  ReportStatusCodeLib
+  BaseMemoryLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+
+[Ppis]
+  gEfiPeiVirtualBlockIoPpiGuid    # PPI ALWAYS_PRODUCED
+
+[Pcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFdcBaseAddress
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
+
