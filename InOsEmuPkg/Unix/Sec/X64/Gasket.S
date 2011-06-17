@@ -227,6 +227,22 @@ ASM_PFX(GasketSecSleep):
   ret
   
   
+ASM_GLOBAL ASM_PFX(GasketSecCpuSleep)
+ASM_PFX(GasketSecCpuSleep):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq    %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+  pushq    %rdi
+
+  call  ASM_PFX(SecCpuSleep)
+  
+  popq  %rdi            // restore state
+  popq  %rsi
+  popq  %rbp
+  ret
+  
+  
 ASM_GLOBAL ASM_PFX(GasketSecExit)
 ASM_PFX(GasketSecExit):
   pushq   %rbp                 // stack frame is for the debugger

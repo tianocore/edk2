@@ -66,6 +66,9 @@
   gEmuThreadThunkProtocolGuid
   gEfiMpServiceProtocolGuid
 
+[Guids]
+  gIdleLoopEventGuid                            ## CONSUMES ## GUID
+
 [Pcd]
   gInOsEmuPkgTokenSpaceGuid.PcdEmuMpServicesPollingInterval
 

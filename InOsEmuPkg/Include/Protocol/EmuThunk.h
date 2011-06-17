@@ -130,6 +130,12 @@ VOID
 
 typedef
 VOID
+(EFIAPI *EMU_CPU_SLEEP) (
+  VOID
+  );
+
+typedef
+VOID
 (EFIAPI *EMU_EXIT) (
   IN  UINTN    Status
   );
@@ -215,6 +221,7 @@ struct _EMU_THUNK_PROTOCOL {
   EMU_QUERY_PERFORMANCE_COUNTER     QueryPerformanceCounter;
 
   EMU_SLEEP                         Sleep;
+  EMU_CPU_SLEEP                     CpuSleep;
   EMU_EXIT                          Exit;
   EMU_GET_TIME                      GetTime;                
   EMU_SET_TIME                      SetTime;

@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/CpuIo2.h>
 
 #include <Guid/DataHubRecords.h>
+#include <Guid/IdleLoopEvent.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>

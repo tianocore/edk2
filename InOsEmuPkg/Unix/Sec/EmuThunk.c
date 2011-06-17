@@ -286,6 +286,22 @@ SecSleep (
   } 
 }
 
+
+VOID
+SecCpuSleep (
+  VOID
+  )
+{
+  struct timespec rq, rm;
+
+  // nanosleep gets interrupted by the timer tic
+  rq.tv_sec  = 1;
+  rq.tv_nsec = 0;
+  
+  nanosleep (&rq, &rm);
+}
+
+
 VOID
 SecExit (
   UINTN   Status
@@ -362,6 +378,7 @@ EMU_THUNK_PROTOCOL gEmuThunkProtocol = {
   GasketQueryPerformanceFrequency,
   GasketQueryPerformanceCounter,
   GasketSecSleep,
+  GasketSecCpuSleep,
   GasketSecExit,
   GasketSecGetTime,                
   GasketSecSetTime,

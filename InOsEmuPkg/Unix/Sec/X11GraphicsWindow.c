@@ -624,24 +624,6 @@ X11ColorToPixel (
   return Pixel;
 }
 
-EFI_STATUS
-CheckKeyInternal (
-  IN  GRAPHICS_IO_PRIVATE *Drv, 
-  IN  BOOLEAN             delay 
-  )
-{
-  HandleEvents (Drv);
-  
-  if (Drv->key_count != 0) {
-    return EFI_SUCCESS;
-  }
-  
-  if (delay) {
-    // EFI is polling.  Be CPU-friendly. 
-    SecSleep (20);
-  }
-  return EFI_NOT_READY;
-}
 
 EFI_STATUS
 X11CheckKey (
@@ -652,7 +634,13 @@ X11CheckKey (
   
   Drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
   
-  return CheckKeyInternal (Drv, TRUE);
+  HandleEvents (Drv);
+  
+  if (Drv->key_count != 0) {
+    return EFI_SUCCESS;
+  }
+  
+  return EFI_NOT_READY;
 }
 
 EFI_STATUS
@@ -667,7 +655,7 @@ X11GetKey (
   
   Drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
 
-  EfiStatus = CheckKeyInternal (Drv, FALSE);
+  EfiStatus = X11CheckKey (GraphicsIo);
   if (EFI_ERROR (EfiStatus)) {
     return EfiStatus;
   }
@@ -879,24 +867,6 @@ X11Blt (
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-CheckPointerInternal (
-  IN  GRAPHICS_IO_PRIVATE *Drv, 
-  IN  BOOLEAN             delay
-  )
-{
-  HandleEvents (Drv);
-  if (Drv->pointer_state_changed != 0) {
-    return EFI_SUCCESS;
-  }
-  
-  if ( delay ) {
-    // EFI is polling.  Be CPU-friendly.  
-    SecSleep (20);
-  }
-  
-  return EFI_NOT_READY;
-}
 
 EFI_STATUS
 X11CheckPointer (
@@ -907,23 +877,32 @@ X11CheckPointer (
 
   Drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
 
-  return CheckPointerInternal (Drv, TRUE);
+  HandleEvents (Drv);
+  if (Drv->pointer_state_changed != 0) {
+    return EFI_SUCCESS;
+  }
+  
+  return EFI_NOT_READY;
 }
 
+
 EFI_STATUS
-X11GetPointerState (EMU_GRAPHICS_WINDOW_PROTOCOL *GraphicsIo, EFI_SIMPLE_POINTER_STATE *state)
+X11GetPointerState (
+  IN  EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsIo, 
+  IN  EFI_SIMPLE_POINTER_STATE      *State
+  )
 {
   EFI_STATUS          EfiStatus;
   GRAPHICS_IO_PRIVATE *Drv;
 
   Drv = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
 
-  EfiStatus = CheckPointerInternal (Drv, FALSE);
+  EfiStatus = X11CheckPointer (GraphicsIo);
   if (EfiStatus != EFI_SUCCESS) {
     return EfiStatus;
   }
   
-  memcpy (state, &Drv->pointer_state, sizeof (EFI_SIMPLE_POINTER_STATE));
+  memcpy (State, &Drv->pointer_state, sizeof (EFI_SIMPLE_POINTER_STATE));
 
   Drv->pointer_state.RelativeMovementX = 0;
   Drv->pointer_state.RelativeMovementY = 0;

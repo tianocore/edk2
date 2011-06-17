@@ -305,6 +305,27 @@ CpuUpdateSmbios (
   FreePool (SmbiosRecord);
 }
 
+
+
+/**
+  Callback function for idle events.
+ 
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               The pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+IdleLoopEventCallback (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  gEmuThunk->CpuSleep ();
+}
+
+
 EFI_STATUS
 EFIAPI
 InitializeCpu (
@@ -314,6 +335,7 @@ InitializeCpu (
 {
   EFI_STATUS    Status;
   UINT64        Frequency;
+  EFI_EVENT     IdleLoopEvent;
 
   //
   // Retrieve the frequency of the performance counter in Hz.
@@ -328,6 +350,17 @@ InitializeCpu (
   CpuUpdateSmbios ();
   
   CpuMpServicesInit ();
+  
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  IdleLoopEventCallback,
+                  NULL,
+                  &gIdleLoopEventGuid,
+                  &IdleLoopEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mCpuTemplate.Handle,
