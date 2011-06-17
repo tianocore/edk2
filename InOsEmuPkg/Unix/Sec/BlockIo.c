@@ -164,7 +164,11 @@ EmuBlockIoOpenDevice (
     Private->Media->LastBlock = Private->NumberOfBlocks - 1;
     
     if (fstatfs (Private->fd, &buf) == 0) {
+#if __APPLE__
       Private->Media->OptimalTransferLengthGranularity = buf.f_iosize/buf.f_bsize;
+#else
+      Private->Media->OptimalTransferLengthGranularity = buf.f_bsize/buf.f_bsize;
+#endif
     }
   } 
 
@@ -518,12 +522,14 @@ EmuBlockIoFlushBlocks (
   )
 {
   EMU_BLOCK_IO_PRIVATE *Private;
-  int                  Res;
 
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   if (Private->fd >= 0) {
-    Res = fcntl (Private->fd, F_FULLFSYNC);
+    fsync (Private->fd);
+#if __APPLE__
+    fcntl (Private->fd, F_FULLFSYNC);
+#endif
   }
   
   
