@@ -27,7 +27,12 @@
   PLATFORM_GUID                  = 05FD064D-1073-E844-936C-A0E16317107D
   PLATFORM_VERSION               = 0.3
   DSC_ SPECIFICATION             = 0x00010005
+!if $(BUILD_32)
+  OUTPUT_DIRECTORY               = Build/EmuUnixIa32
+!else
   OUTPUT_DIRECTORY               = Build/EmuUnixX64
+!endif
+
   SUPPORTED_ARCHITECTURES        = X64|IA32
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT

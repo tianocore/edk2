@@ -65,7 +65,7 @@
   gInOsEmuPkgTokenSpaceGuid.PcdEmuApCount|L"0"|VOID*|0x00001019
 
   ## Magic page to implement PEI Services Table Pointer Lib
-  gInOsEmuPkgTokenSpaceGuid.PcdPeiServicesTablePage|0x1000000000|UINT64|0x0000101b
+  gInOsEmuPkgTokenSpaceGuid.PcdPeiServicesTablePage|0x1003000000|UINT64|0x0000101b
 
   ## Size of the packet filter
   gInOsEmuPkgTokenSpaceGuid.PcdNetworkPacketFilterSize|524288|UINT32|0x0000101c

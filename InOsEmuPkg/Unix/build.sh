@@ -57,7 +57,6 @@ case `uname` in
         TARGET_TOOLS=XCODE32
         UNIXPKG_TOOLS=XCLANG
       fi
-#      NETWORK_SUPPORT="-D NETWORK_SUPPORT"
       BUILD_NEW_SHELL="-D BUILD_NEW_SHELL"
       BUILD_FAT="-D BUILD_FAT"
       ;;
@@ -65,7 +64,7 @@ case `uname` in
 
 esac
 
-BUILD_ROOT_ARCH=$WORKSPACE/Build/EmuUnixX64/DEBUG_"$UNIXPKG_TOOLS"/IA32
+BUILD_ROOT_ARCH=$WORKSPACE/Build/EmuUnixIa32/DEBUG_"$UNIXPKG_TOOLS"/IA32
 
 if  [[ ! -f `which build` || ! -f `which GenFv` ]];
 then
@@ -92,7 +91,7 @@ do
         # This .gdbinit script sets a breakpoint that loads symbols for the PE/COFFEE
         # images that get loaded in SecMain
         #
-        cp $WORKSPACE/InOsEmuPkg/Unix/.gdbinit $WORKSPACE/Build/EmuUnixX64/DEBUG_"$UNIXPKG_TOOLS"/IA32
+        cp $WORKSPACE/InOsEmuPkg/Unix/.gdbinit $WORKSPACE/Build/EmuUnixIa32/DEBUG_"$UNIXPKG_TOOLS"/IA32
         ;;
     esac
 
@@ -122,8 +121,8 @@ done
 #
 echo $PATH
 echo `which build`
-build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a IA32 -t $TARGET_TOOLS -D SEC_ONLY -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
-build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a IA32 -t $UNIXPKG_TOOLS $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
-cp $WORKSPACE/Build/EmuUnixX64/DEBUG_"$TARGET_TOOLS"/IA32/SecMain $WORKSPACE/Build/EmuUnixX64/DEBUG_"$UNIXPKG_TOOLS"/IA32
+build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a IA32 -t $TARGET_TOOLS -D SEC_ONLY -D BUILD_32 -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
+build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a IA32 -t  $UNIXPKG_TOOLS -D BUILD_32 $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+cp $WORKSPACE/Build/EmuUnixIa32/DEBUG_"$TARGET_TOOLS"/IA32/SecMain $WORKSPACE/Build/EmuUnixIa32/DEBUG_"$UNIXPKG_TOOLS"/IA32
 exit $?
 

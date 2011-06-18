@@ -670,19 +670,19 @@ SecPeCoffGetEntryPoint (
   }
 
   if (ImageContext.ImageAddress != (UINTN)Pe32Data) {
-  //
-  // Relocate image to match the address where it resides
-  //
-  ImageContext.ImageAddress = (UINTN)Pe32Data;
-  Status = PeCoffLoaderLoadImage (&ImageContext);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+    //
+    // Relocate image to match the address where it resides
+    //
+    ImageContext.ImageAddress = (UINTN)Pe32Data;
+    Status = PeCoffLoaderLoadImage (&ImageContext);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
-  Status = PeCoffLoaderRelocateImage (&ImageContext);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+    Status = PeCoffLoaderRelocateImage (&ImageContext);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   } else {
     //
     // Or just return image entry point
