@@ -28,6 +28,9 @@
 [Sources.X64]
   X64/SwitchRam.S
 
+[Sources.IA32]
+  Ia32/SwitchRam.S
+
 [Packages]
   MdePkg/MdePkg.dec
   InOsEmuPkg/InOsEmuPkg.dec

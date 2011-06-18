@@ -28,7 +28,7 @@
   PLATFORM_VERSION               = 0.3
   DSC_ SPECIFICATION             = 0x00010005
   OUTPUT_DIRECTORY               = Build/EmuUnixX64
-  SUPPORTED_ARCHITECTURES        = X64
+  SUPPORTED_ARCHITECTURES        = X64|IA32
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = InOsEmuPkg/Unix/UnixX64.fdf
@@ -264,6 +264,17 @@
 #       generated for it, but the binary will not be put into any firmware volume.
 #
 ###################################################################################################
+
+[Components.X64]
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
+    <LibraryClasses>
+      # turn off CR3 write so that DXE IPL will not crash emulator
+      BaseLib|UnixPkg/Library/UnixBaseLib/UnixBaseLib.inf
+  }
+
+[Components.IA32]
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf 
+
 [Components]
 !if $(SEC_ONLY)
   ##
@@ -294,11 +305,6 @@
   InOsEmuPkg/FirmwareVolumePei/FirmwareVolumePei.inf
   InOsEmuPkg/FlashMapPei/FlashMapPei.inf
   InOsEmuPkg/ThunkPpiToProtocolPei/ThunkPpiToProtocolPei.inf
-  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
-    <LibraryClasses>
-      # turn off CR3 write so that DXE IPL will not crash emulator
-      BaseLib|UnixPkg/Library/UnixBaseLib/UnixBaseLib.inf
-  }
 
   ##
   #  DXE Phase modules

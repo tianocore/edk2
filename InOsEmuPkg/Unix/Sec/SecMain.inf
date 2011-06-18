@@ -20,7 +20,6 @@
   BASE_NAME                      = SecMain
   FILE_GUID                      = 8863C0AD-7724-C84B-88E5-A33B116D1485
   MODULE_TYPE                    = USER_DEFINED
-#  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
 
 #
@@ -42,6 +41,10 @@
 [Sources.X64]
   X64/Gasket.S        # convert between Emu x86_64 ABI and EFI X64 ABI
   X64/SwitchStack.S
+
+[Sources.IA32]
+  Ia32/Gasket.S       # enforce 16-byte stack alignment for Mac OS X
+  Ia32/SwitchStack.c
 
 
 [Packages]

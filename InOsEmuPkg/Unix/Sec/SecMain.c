@@ -439,7 +439,7 @@ MapFd0 (
   
   // Map the rest of the FD as read/write
   res2 = mmap (
-          (void *)(FixedPcdGet64 (PcdEmuFlashFvRecoveryBase) + FvSize), 
+          (void *)(UINTN)(FixedPcdGet64 (PcdEmuFlashFvRecoveryBase) + FvSize), 
           FileSize - FvSize, 
           PROT_READ | PROT_WRITE | PROT_EXEC, 
           MAP_SHARED,
