@@ -29,6 +29,7 @@
   X64/SwitchRam.S
 
 [Sources.IA32]
+  Ia32/TempRam.c
   Ia32/SwitchRam.S
 
 [Packages]
