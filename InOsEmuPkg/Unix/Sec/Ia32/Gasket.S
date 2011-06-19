@@ -1022,15 +1022,17 @@ ASM_GLOBAL ASM_PFX(GasketEmuBlockIoReadBlocks)
 ASM_PFX(GasketEmuBlockIoReadBlocks):
 	pushl	%ebp
 	movl	%esp, %ebp
-  subl  $40, %esp      // sub extra 16 from the stack for alignment
+  subl  $56, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
+	movl	32(%ebp), %eax
+	movl	%eax, 24(%esp)
 	movl	28(%ebp), %eax
 	movl	%eax, 20(%esp)
 	movl	24(%ebp), %eax
 	movl	%eax, 16(%esp)
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
 	movl	16(%ebp), %eax
+	movl	20(%ebp), %edx
+	movl	%edx, 12(%esp)
 	movl	%eax, 8(%esp)
 	movl	12(%ebp), %eax
 	movl	%eax, 4(%esp)
@@ -1047,15 +1049,17 @@ ASM_GLOBAL ASM_PFX(GasketEmuBlockIoWriteBlocks)
 ASM_PFX(GasketEmuBlockIoWriteBlocks):
 	pushl	%ebp
 	movl	%esp, %ebp
-  subl  $40, %esp      // sub extra 16 from the stack for alignment
+  subl  $56, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
+	movl	32(%ebp), %eax
+	movl	%eax, 24(%esp)
 	movl	28(%ebp), %eax
 	movl	%eax, 20(%esp)
 	movl	24(%ebp), %eax
 	movl	%eax, 16(%esp)
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
 	movl	16(%ebp), %eax
+	movl	20(%ebp), %edx
+	movl	%edx, 12(%esp)
 	movl	%eax, 8(%esp)
 	movl	12(%ebp), %eax
 	movl	%eax, 4(%esp)

@@ -94,11 +94,13 @@ GasketSecDisableInterrupt (
   );
   
 UINT64  
+EFIAPI
 GasketQueryPerformanceFrequency (
   VOID
   );
 
 UINT64
+EFIAPI
 GasketQueryPerformanceCounter (
   VOID
   );
@@ -176,7 +178,7 @@ GasketSecUnixUnixFwhAddress (
 
 typedef
 void
-(*CALL_BACK) (
+(EFIAPI *CALL_BACK) (
   UINT64 Delta
   );
 
@@ -448,6 +450,7 @@ GasketEmuBlockIoReset (
   );
 
 EFI_STATUS
+EFIAPI
 GasketEmuBlockIoReadBlocks (
   IN     EMU_BLOCK_IO_PROTOCOL  *This,
   IN     UINT32                 MediaId,
@@ -469,12 +472,14 @@ GasketEmuBlockIoWriteBlocks (
   );
   
 EFI_STATUS
+EFIAPI
 GasketEmuBlockIoFlushBlocks (
   IN     EMU_BLOCK_IO_PROTOCOL    *This,
   IN OUT EFI_BLOCK_IO2_TOKEN      *Token
   );
   
 EFI_STATUS
+EFIAPI
 GasketEmuBlockIoCreateMapping (
   IN     EMU_BLOCK_IO_PROTOCOL    *This,
   IN     EFI_BLOCK_IO_MEDIA       *Media
