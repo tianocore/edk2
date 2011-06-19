@@ -39,8 +39,7 @@ ASM_PFX(GasketSecWriteStdErr):
 
   call  ASM_PFX(SecWriteStdErr)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -57,8 +56,7 @@ ASM_PFX(GasketSecConfigStdIn):
 
   call  ASM_PFX(SecConfigStdIn)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 ASM_GLOBAL ASM_PFX(GasketSecWriteStdOut) 
@@ -74,8 +72,7 @@ ASM_PFX(GasketSecWriteStdOut):
 
   call  ASM_PFX(SecWriteStdOut)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 ASM_GLOBAL ASM_PFX(GasketSecReadStdIn)  
@@ -91,8 +88,7 @@ ASM_PFX(GasketSecReadStdIn):
 
   call  ASM_PFX(SecReadStdIn)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 ASM_GLOBAL ASM_PFX(GasketSecPollStdIn)  
@@ -108,8 +104,7 @@ ASM_PFX(GasketSecPollStdIn):
 
   call  ASM_PFX(SecPollStdIn)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -126,8 +121,7 @@ ASM_PFX(GasketSecSetTimer):
 
   call  ASM_PFX(SecSetTimer)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -140,8 +134,7 @@ ASM_PFX(GasketSecEnableInterrupt):
 
   call    ASM_PFX(SecEnableInterrupt)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -154,8 +147,7 @@ ASM_PFX(GasketSecDisableInterrupt):
 
   call    ASM_PFX(SecDisableInterrupt)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 ASM_GLOBAL ASM_PFX(GasketQueryPerformanceFrequency) 
@@ -167,8 +159,7 @@ ASM_PFX(GasketQueryPerformanceFrequency):
 
   call    ASM_PFX(QueryPerformanceFrequency)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -181,8 +172,7 @@ ASM_PFX(GasketQueryPerformanceCounter):
 
   call    ASM_PFX(QueryPerformanceCounter)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -197,8 +187,7 @@ ASM_PFX(GasketSecSleep):
 
   call  ASM_PFX(SecSleep)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
   
    
@@ -211,8 +200,7 @@ ASM_PFX(GasketSecCpuSleep):
 
   call  ASM_PFX(SecCpuSleep)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
   
   
@@ -243,8 +231,7 @@ ASM_PFX(GasketSecGetTime):
 
   call  ASM_PFX(SecGetTime)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 ASM_GLOBAL ASM_PFX(GasketSecSetTime) 
@@ -260,8 +247,7 @@ ASM_PFX(GasketSecSetTime):
 
   call  ASM_PFX(SecSetTime)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -282,8 +268,7 @@ ASM_PFX(GasketSecGetNextProtocol):
 
   call    ASM_PFX(SecGetNextProtocol)
   
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 // PPIs produced by SEC
@@ -301,8 +286,7 @@ ASM_PFX(GasketSecPeCoffGetEntryPoint):
 
   call    ASM_PFX(SecPeCoffGetEntryPoint)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
  
 ASM_GLOBAL ASM_PFX(GasketSecPeCoffRelocateImageExtraAction) 
@@ -316,8 +300,7 @@ ASM_PFX(GasketSecPeCoffRelocateImageExtraAction):
 
   call    ASM_PFX(SecPeCoffRelocateImageExtraAction)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
  
 ASM_GLOBAL ASM_PFX(GasketSecPeCoffUnloadImageExtraAction) 
@@ -331,8 +314,7 @@ ASM_PFX(GasketSecPeCoffUnloadImageExtraAction):
 
   call    ASM_PFX(SecPeCoffUnloadImageExtraAction)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
  
 
@@ -345,8 +327,7 @@ ASM_PFX(GasketSecEmuThunkAddress):
 
   call    ASM_PFX(SecEmuThunkAddress)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 //
@@ -370,8 +351,7 @@ ASM_PFX(GasketX11Size):
 
   call    ASM_PFX(X11Size)
   
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -386,8 +366,7 @@ ASM_PFX(GasketX11CheckKey):
 
   call    ASM_PFX(X11CheckKey)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 ASM_GLOBAL ASM_PFX(GasketX11GetKey) 
@@ -403,8 +382,7 @@ ASM_PFX(GasketX11GetKey):
 
   call    ASM_PFX(X11GetKey)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -421,8 +399,7 @@ ASM_PFX(GasketX11KeySetState):
 
   call    ASM_PFX(X11KeySetState)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
   
@@ -443,8 +420,7 @@ ASM_PFX(GasketX11RegisterKeyNotify):
 
   call    ASM_PFX(X11RegisterKeyNotify)
   
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
   
@@ -465,8 +441,7 @@ ASM_PFX(GasketX11Blt):
 
   call    ASM_PFX(X11Blt)
   
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -481,8 +456,7 @@ ASM_PFX(GasketX11CheckPointer):
 
   call    ASM_PFX(X11CheckPointer)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -499,8 +473,7 @@ ASM_PFX(GasketX11GetPointerState):
 
   call    ASM_PFX(X11GetPointerState)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -515,8 +488,7 @@ ASM_PFX(GasketX11GraphicsWindowOpen):
 
   call    ASM_PFX(X11GraphicsWindowOpen)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
  
@@ -533,8 +505,7 @@ ASM_PFX(GasketX11GraphicsWindowClose):
 
   call    ASM_PFX(X11GraphicsWindowClose)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -551,8 +522,7 @@ ASM_PFX(GasketPthreadMutexLock):
 
   call    ASM_PFX(PthreadMutexLock)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -567,8 +537,7 @@ ASM_PFX(GasketPthreadMutexUnLock):
 
   call    ASM_PFX(PthreadMutexUnLock)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 ASM_GLOBAL ASM_PFX(GasketPthreadMutexTryLock) 
@@ -582,8 +551,7 @@ ASM_PFX(GasketPthreadMutexTryLock):
 
   call    ASM_PFX(PthreadMutexTryLock)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 ASM_GLOBAL ASM_PFX(GasketPthreadMutexInit) 
@@ -595,8 +563,7 @@ ASM_PFX(GasketPthreadMutexInit):
 
   call    ASM_PFX(PthreadMutexInit)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -612,8 +579,7 @@ ASM_PFX(GasketPthreadMutexDestroy):
 
   call    ASM_PFX(PthreadMutexDestroy)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -634,8 +600,7 @@ ASM_PFX(GasketPthreadCreate):
 
   call    ASM_PFX(PthreadCreate)
   
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
                           
@@ -650,8 +615,7 @@ ASM_PFX(GasketPthreadExit):
 
   call    ASM_PFX(PthreadExit)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -665,8 +629,7 @@ ASM_PFX(GasketPthreadSelf):
 
   call    ASM_PFX(PthreadSelf)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -681,8 +644,7 @@ ASM_PFX(GasketPthreadOpen):
 
   call    ASM_PFX(PthreadOpen)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -697,8 +659,7 @@ ASM_PFX(GasketPthreadClose):
 
   call    ASM_PFX(PthreadClose)
   
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -714,15 +675,19 @@ ASM_PFX(GasketPthreadClose):
 //   );
 ASM_GLOBAL ASM_PFX(ReverseGasketUint64)
 ASM_PFX(ReverseGasketUint64):
-  pushl %ebp
-  movl  %esp, %ebp        // stack frame is for the debugger
-  subl  $8, %esp
-  movl  12(%ebp), %eax
-  movl  %eax, (%esp)
-  calll *8(%ebp)
-  addl  $8, %esp
-  popl  %ebp
-  ret
+	pushl	%ebp
+	movl	%esp, %ebp
+	subl	$8, %esp
+	movl	16(%ebp), %eax
+	movl	%eax, 4(%esp)
+	movl	12(%ebp), %eax
+	movl	%eax, (%esp)
+	calll	*8(%ebp)
+	addl	$8, %esp
+	popl	%ebp
+	ret
+
+
 
 //
 // UNIX ABI to EFI ABI call
@@ -735,17 +700,21 @@ ASM_PFX(ReverseGasketUint64):
 //   );
 ASM_GLOBAL ASM_PFX(ReverseGasketUint64Uint64)
 ASM_PFX(ReverseGasketUint64Uint64):
-  pushl %ebp
-  movl  %esp, %ebp      // stack frame is for the debugger
-  subl  $8, %esp
-  movl  16(%ebp), %eax
-  movl  %eax, 4(%esp)
-  movl  12(%ebp), %eax
-  movl  %eax, (%esp)
-  calll *8(%ebp)
-  addl  $8, %esp
-  popl  %ebp
-  ret
+	pushl	%ebp
+	movl	%esp, %ebp
+	subl	$24, %esp
+	movl	24(%ebp), %eax
+	movl	%eax, 12(%esp)
+	movl	20(%ebp), %eax
+	movl	%eax, 8(%esp)
+	movl	16(%ebp), %eax
+	movl	%eax, 4(%esp)
+	movl	12(%ebp), %eax
+	movl	%eax, (%esp)
+	calll	*8(%ebp)
+	addl	$24, %esp
+	popl	%ebp
+	ret
   
 
 ASM_GLOBAL ASM_PFX(GasketSecUnixPeiAutoScan)  
@@ -763,8 +732,7 @@ ASM_PFX(GasketSecUnixPeiAutoScan):
 
   call    ASM_PFX(SecUnixPeiAutoScan)
   
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -785,8 +753,7 @@ ASM_PFX(GasketSecUnixFdAddress):
 
   call    ASM_PFX(SecUnixFdAddress)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -809,8 +776,7 @@ ASM_PFX(GasketPosixOpenVolume):
 
   call    ASM_PFX(PosixOpenVolume)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -833,8 +799,7 @@ ASM_PFX(GasketPosixFileOpen):
  
   call    ASM_PFX(PosixFileOpen)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -849,8 +814,7 @@ ASM_PFX(GasketPosixFileCLose):
 
   call    ASM_PFX(PosixFileCLose)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
    
@@ -865,8 +829,7 @@ ASM_PFX(GasketPosixFileDelete):
 
   call    ASM_PFX(PosixFileDelete)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -885,8 +848,7 @@ ASM_PFX(GasketPosixFileRead):
 
   call    ASM_PFX(PosixFileRead)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
   
@@ -905,8 +867,7 @@ ASM_PFX(GasketPosixFileWrite):
 
   call    ASM_PFX(PosixFileWrite)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -923,8 +884,7 @@ ASM_PFX(GasketPosixFileSetPossition):
 
   call    ASM_PFX(PosixFileSetPossition)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -941,8 +901,7 @@ ASM_PFX(GasketPosixFileGetPossition):
 
   call    ASM_PFX(PosixFileGetPossition)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -963,8 +922,7 @@ ASM_PFX(GasketPosixFileGetInfo):
 
   call    ASM_PFX(PosixFileGetInfo)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -985,8 +943,7 @@ ASM_PFX(GasketPosixFileSetInfo):
 
   call    ASM_PFX(PosixFileSetInfo)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1001,8 +958,7 @@ ASM_PFX(GasketPosixFileFlush):
 
   call    ASM_PFX(PosixFileFlush)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1017,8 +973,7 @@ ASM_PFX(GasketPosixFileSystmeThunkOpen):
 
   call    ASM_PFX(PosixFileSystmeThunkOpen)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1033,8 +988,7 @@ ASM_PFX(GasketPosixFileSystmeThunkClose):
 
   call    ASM_PFX(PosixFileSystmeThunkClose)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 ASM_GLOBAL ASM_PFX(GasketEmuBlockIoReset) 
@@ -1050,8 +1004,7 @@ ASM_PFX(GasketEmuBlockIoReset):
 
   call    ASM_PFX(EmuBlockIoReset)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1076,8 +1029,7 @@ ASM_PFX(GasketEmuBlockIoReadBlocks):
 
   call    ASM_PFX(EmuBlockIoReadBlocks)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1102,8 +1054,7 @@ ASM_PFX(GasketEmuBlockIoWriteBlocks):
 
   call    ASM_PFX(EmuBlockIoWriteBlocks)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1120,8 +1071,7 @@ ASM_PFX(GasketEmuBlockIoFlushBlocks):  pushl %ebp
 
   call    ASM_PFX(EmuBlockIoFlushBlocks)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1138,8 +1088,7 @@ ASM_PFX(GasketEmuBlockIoCreateMapping):
 
   call    ASM_PFX(EmuBlockIoCreateMapping)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1154,8 +1103,7 @@ ASM_PFX(GasketBlockIoThunkOpen):
 
   call    ASM_PFX(EmuBlockIoThunkOpen)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1170,8 +1118,7 @@ ASM_PFX(GasketBlockIoThunkClose):
 
   call    ASM_PFX(EmuBlockIoThunkClose)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1189,8 +1136,7 @@ ASM_PFX(GasketSnpCreateMapping):
 
   call    ASM_PFX(EmuSnpCreateMapping)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1205,8 +1151,7 @@ ASM_PFX(GasketSnpStart):
 
   call    ASM_PFX(EmuSnpStart)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1221,8 +1166,7 @@ ASM_PFX(GasketSnpStop):
 
   call    ASM_PFX(EmuSnpStop)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1241,8 +1185,7 @@ ASM_PFX(GasketSnpInitialize):
 
   call    ASM_PFX(EmuSnpInitialize)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1259,8 +1202,7 @@ ASM_PFX(GasketSnpReset):
 
   call    ASM_PFX(EmuSnpReset)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1275,8 +1217,7 @@ ASM_PFX(GasketSnpShutdown):
 
   call    ASM_PFX(EmuSnpShutdown)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1301,8 +1242,7 @@ ASM_PFX(GasketSnpReceiveFilters):
 
   call    ASM_PFX(EmuSnpReceiveFilters)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1319,8 +1259,7 @@ ASM_PFX(GasketSnpStationAddress):
 	movl	8(%ebp), %eax
 	movl	%eax, (%esp)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1342,8 +1281,7 @@ ASM_PFX(GasketSnpStatistics):
 
   call    ASM_PFX(EmuSnpStatistics)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1364,8 +1302,7 @@ ASM_PFX(GasketSnpMCastIpToMac):
 
   call    ASM_PFX(EmuSnpMCastIpToMac)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1388,8 +1325,7 @@ ASM_PFX(GasketSnpNvData):
 
   call    ASM_PFX(EmuSnpNvData)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1408,8 +1344,7 @@ ASM_PFX(GasketSnpGetStatus):
 
   call    ASM_PFX(EmuSnpGetStatus)
 
-  addl  $40, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1437,8 +1372,7 @@ ASM_PFX(GasketSnpTransmit):
 
   call    ASM_PFX(EmuSnpTransmit)
 
-  addl  $56, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1466,8 +1400,7 @@ ASM_PFX(GasketSnpReceive):
 
   call    ASM_PFX(EmuSnpReceive)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1482,8 +1415,7 @@ ASM_PFX(GasketSnpThunkOpen):
 
   call    ASM_PFX(EmuSnpThunkOpen)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
@@ -1498,8 +1430,7 @@ ASM_PFX(GasketSnpThunkClose):
 
   call    ASM_PFX(EmuSnpThunkClose)
 
-  addl  $24, %esp
-  popl  %ebp
+  leave
   ret
 
 
