@@ -108,8 +108,8 @@ VOID
 EFIAPI
 GasketSecSleep (
   IN  UINT64 Milliseconds
-
   );
+  
 VOID
 EFIAPI
 GasketSecCpuSleep (

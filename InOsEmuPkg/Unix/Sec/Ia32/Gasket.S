@@ -112,12 +112,14 @@ ASM_GLOBAL ASM_PFX(GasketSecSetTimer)
 ASM_PFX(GasketSecSetTimer):
   pushl %ebp
   movl  %esp, %ebp
-  subl  $24, %esp      // sub extra 16 from the stack for alignment
+  subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-  movl  12(%ebp), %eax
-  movl  %eax, 4(%esp)
-  movl  8(%ebp), %eax
-  movl  %eax, (%esp)
+  movl	16(%ebp), %eax
+	movl	%eax, 8(%esp)
+	movl	8(%ebp), %eax
+	movl	12(%ebp), %edx
+	movl	%edx, 4(%esp)
+	movl	%eax, (%esp)
 
   call  ASM_PFX(SecSetTimer)
   
@@ -182,8 +184,10 @@ ASM_PFX(GasketSecSleep):
   movl  %esp, %ebp
   subl  $24, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-  movl  8(%ebp), %eax
-  movl  %eax, (%esp)
+	movl	8(%ebp), %eax
+	movl	12(%ebp), %ecx
+	movl	%ecx, 4(%esp)
+	movl	%eax, (%esp)
 
   call  ASM_PFX(SecSleep)
   
@@ -784,11 +788,15 @@ ASM_GLOBAL ASM_PFX(GasketPosixFileOpen)
 ASM_PFX(GasketPosixFileOpen):
 	pushl	%ebp
 	movl	%esp, %ebp
-  subl  $40, %esp      // sub extra 16 from the stack for alignment
+  subl  $56, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	24(%ebp), %eax
-	movl	%eax, 16(%esp)
+	movl	28(%ebp), %eax
+	movl	32(%ebp), %ecx
+	movl	%ecx, 24(%esp)
+	movl	%eax, 20(%esp)
 	movl	20(%ebp), %eax
+	movl	24(%ebp), %ecx
+	movl	%ecx, 16(%esp)
 	movl	%eax, 12(%esp)
 	movl	16(%ebp), %eax
 	movl	%eax, 8(%esp)
@@ -875,12 +883,14 @@ ASM_GLOBAL ASM_PFX(GasketPosixFileSetPossition)
 ASM_PFX(GasketPosixFileSetPossition):
   pushl %ebp
   movl  %esp, %ebp
-  subl  $24, %esp      // sub extra 16 from the stack for alignment
+  subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-  movl  12(%ebp), %eax
-  movl  %eax, 4(%esp)
-  movl  8(%ebp), %eax
-  movl  %eax, (%esp)
+	movl	12(%ebp), %eax
+	movl	16(%ebp), %ecx
+	movl	%ecx, 8(%esp)
+	movl	%eax, 4(%esp)
+	movl	8(%ebp), %eax
+	movl	%eax, (%esp)
 
   call    ASM_PFX(PosixFileSetPossition)
 
