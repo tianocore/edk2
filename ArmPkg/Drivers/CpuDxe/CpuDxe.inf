@@ -3,6 +3,8 @@
 #  DXE CPU driver
 #  
 #  Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
+#  Copyright (c) 2011, ARM Limited. All rights reserved.
+#
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -45,6 +47,7 @@
   ArmPkg/ArmPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
@@ -65,6 +68,7 @@
 
 [Guids]
   gEfiDebugImageInfoTableGuid
+  gIdleLoopEventGuid
 
 [Pcd.common]
   gArmTokenSpaceGuid.PcdVFPEnabled

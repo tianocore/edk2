@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011, ARM Limited. All rights reserved.
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -13,6 +14,8 @@
 **/
 
 #include "CpuDxe.h"
+
+#include <Guid/IdleLoopEvent.h>
 
 BOOLEAN mInterruptState   = FALSE;
 
@@ -194,6 +197,23 @@ CpuGetTimerValue (
   return EFI_UNSUPPORTED;
 }
 
+/**
+  Callback function for idle events.
+ 
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               The pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+IdleLoopEventCallback (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  CpuSleep ();
+}
 
 //
 // Globals used to initialize the protocol
@@ -219,9 +239,9 @@ CpuDxeInitialize (
   )
 {
   EFI_STATUS  Status;
+  EFI_EVENT    IdleLoopEvent;
 
   InitializeExceptions (&mCpu);  
-  
   
   Status = gBS->InstallMultipleProtocolInterfaces (
                 &mCpuHandle, 
@@ -237,6 +257,18 @@ CpuDxeInitialize (
   //
   SyncCacheConfig (&mCpu);
   
+  //
+  // Setup a callback for idle events
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  IdleLoopEventCallback,
+                  NULL,
+                  &gIdleLoopEventGuid,
+                  &IdleLoopEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
   return Status;
 }
-
