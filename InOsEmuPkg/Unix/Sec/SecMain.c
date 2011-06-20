@@ -136,7 +136,7 @@ main (
   // symbols when we load every PE/COFF image.
   //
   Index = strlen (*Argv);
-  gGdbWorkingFileName = malloc (Index + strlen(".gdb") + 1);
+  gGdbWorkingFileName = AllocatePool (Index + strlen(".gdb") + 1);
   strcpy (gGdbWorkingFileName, *Argv);
   strcat (gGdbWorkingFileName, ".gdb");
 #endif
@@ -146,7 +146,7 @@ main (
   // Allocate space for gSystemMemory Array
   //
   gSystemMemoryCount  = CountSeperatorsInString (MemorySizeStr, '!') + 1;
-  gSystemMemory       = calloc (gSystemMemoryCount, sizeof (EMU_SYSTEM_MEMORY));
+  gSystemMemory       = AllocateZeroPool (gSystemMemoryCount * sizeof (EMU_SYSTEM_MEMORY));
   if (gSystemMemory == NULL) {
     printf ("ERROR : Can not allocate memory for system.  Exiting.\n");
     exit (1);
@@ -155,7 +155,7 @@ main (
   // Allocate space for gSystemMemory Array
   //
   gFdInfoCount  = CountSeperatorsInString (FirmwareVolumesStr, '!') + 1;
-  gFdInfo       = calloc (gFdInfoCount, sizeof (EMU_FD_INFO));
+  gFdInfo       = AllocateZeroPool (gFdInfoCount * sizeof (EMU_FD_INFO));
   if (gFdInfo == NULL) {
     printf ("ERROR : Can not allocate memory for fd info.  Exiting.\n");
     exit (1);
@@ -192,7 +192,7 @@ main (
   //
   // Open All the firmware volumes and remember the info in the gFdInfo global
   //
-  FileName = (CHAR8 *)malloc (StrLen (FirmwareVolumesStr) + 1);
+  FileName = (CHAR8 *) AllocatePool (StrLen (FirmwareVolumesStr) + 1);
   if (FileName == NULL) {
     printf ("ERROR : Can not allocate memory for firmware volume string\n");
     exit (1);
@@ -870,7 +870,11 @@ AddHandle (
   PreviousSize = mImageContextModHandleArraySize * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE);
   mImageContextModHandleArraySize += MAX_IMAGE_CONTEXT_TO_MOD_HANDLE_ARRAY_SIZE;
 
-  mImageContextModHandleArray = realloc (mImageContextModHandleArray, mImageContextModHandleArraySize * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE));
+  mImageContextModHandleArray = ReallocatePool (
+                                  (mImageContextModHandleArraySize - 1) * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE),
+                                  mImageContextModHandleArraySize * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE),
+                                  mImageContextModHandleArray
+                                  );
   if (mImageContextModHandleArray == NULL) {
     ASSERT (FALSE);
     return EFI_OUT_OF_RESOURCES;

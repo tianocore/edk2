@@ -35,8 +35,9 @@
   Pthreads.c
   PosixFileSystem.c
   BlockIo.c
-  LinuxPacketFilter.c 
-  BerkeleyPacketFilter.c 
+  LinuxPacketFilter.c
+  BerkeleyPacketFilter.c
+  MemoryAllocationLib.c
   
 [Sources.X64]
   X64/Gasket.S        # convert between Emu x86_64 ABI and EFI X64 ABI

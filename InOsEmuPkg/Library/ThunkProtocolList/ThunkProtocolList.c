@@ -2,6 +2,7 @@
   Emulator Thunk to abstract OS services from pure EFI code
 
   Copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -17,10 +18,9 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #include <Protocol/EmuIoThunk.h>
-
-#include <stdlib.h>
 
 
 #define EMU_IO_THUNK_PROTOCOL_DATA_SIGNATURE SIGNATURE_32('E','m','u','T')
@@ -53,7 +53,7 @@ AddThunkProtocol (
   }
   
   Instance = 0;
-  StartString = malloc (StrSize (ConfigString));
+  StartString = AllocatePool (StrSize (ConfigString));
   StrCpy (StartString, ConfigString);
   while (*StartString != '\0') {
 
@@ -74,7 +74,7 @@ AddThunkProtocol (
       SubString++;
     }
 
-    Private = malloc (sizeof (EMU_IO_THUNK_PROTOCOL_DATA));
+    Private = AllocatePool (sizeof (EMU_IO_THUNK_PROTOCOL_DATA));
     if (Private == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }

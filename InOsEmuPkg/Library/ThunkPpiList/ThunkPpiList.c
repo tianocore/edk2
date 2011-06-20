@@ -2,6 +2,7 @@
   Emulator Thunk to abstract OS services from pure EFI code
 
   Copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -15,8 +16,7 @@
 
 #include <PiPei.h>
 #include <Library/BaseLib.h>
-
-#include <stdlib.h>
+#include <Library/MemoryAllocationLib.h>
 
 
 UINTN                   gThunkPpiListSize = 0;
@@ -51,8 +51,12 @@ AddThunkPpi (
   )
 {
   UINTN Index;
-  
-  gThunkPpiList = realloc (gThunkPpiList, gThunkPpiListSize + sizeof (EFI_PEI_PPI_DESCRIPTOR));
+
+  gThunkPpiList = ReallocatePool (
+                    gThunkPpiListSize,
+                    gThunkPpiListSize + sizeof (EFI_PEI_PPI_DESCRIPTOR),
+                    gThunkPpiList
+                    );
   if (gThunkPpiList == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
