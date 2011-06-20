@@ -644,7 +644,6 @@ X11CheckKey (
 }
 
 EFI_STATUS
-EFIAPI
 X11GetKey (
   IN  EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsIo, 
   IN  EFI_KEY_DATA                  *KeyData
@@ -669,7 +668,6 @@ X11GetKey (
 
 
 EFI_STATUS
-EFIAPI
 X11KeySetState (
   IN EMU_GRAPHICS_WINDOW_PROTOCOL   *GraphicsIo, 
   IN EFI_KEY_TOGGLE_STATE           *KeyToggleState
@@ -694,7 +692,6 @@ X11KeySetState (
 
 
 EFI_STATUS
-EFIAPI
 X11RegisterKeyNotify (
   IN EMU_GRAPHICS_WINDOW_PROTOCOL                        *GraphicsIo, 
   IN EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK    MakeCallBack,

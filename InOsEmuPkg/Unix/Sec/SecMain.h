@@ -213,7 +213,6 @@ SecUnixPeCoffLoaderFreeLibrary (
   );
 
 EFI_STATUS
-EFIAPI
 SecUnixFdAddress (
   IN     UINTN                 Index,
   IN OUT EFI_PHYSICAL_ADDRESS  *FdBase,
@@ -300,7 +299,6 @@ SecPeCoffLoaderUnloadImageExtraAction (
 
 
 VOID
-EFIAPI
 PeiSwitchStacks (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
   IN      VOID                      *Context1,  OPTIONAL

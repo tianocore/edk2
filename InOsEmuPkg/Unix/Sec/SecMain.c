@@ -595,7 +595,6 @@ Returns:
 
 **/
 EFI_STATUS
-EFIAPI
 SecUnixPeiAutoScan (
   IN  UINTN                 Index,
   OUT EFI_PHYSICAL_ADDRESS  *MemoryBase,
@@ -640,7 +639,6 @@ Returns:
 
 **/
 VOID *
-EFIAPI
 SecEmuThunkAddress (
   VOID
   )
@@ -722,7 +720,6 @@ Returns:
 
 **/
 EFI_STATUS
-EFIAPI
 SecUnixFdAddress (
   IN     UINTN                 Index,
   IN OUT EFI_PHYSICAL_ADDRESS  *FdBase,
@@ -787,6 +784,7 @@ CountSeperatorsInString (
 
 
 EFI_STATUS
+EFIAPI
 SecImageRead (
   IN     VOID    *FileHandle,
   IN     UINTN   FileOffset,
