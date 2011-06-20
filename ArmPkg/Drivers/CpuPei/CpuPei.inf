@@ -46,6 +46,8 @@
 [Ppis]
 
 [FixedPcd]
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
 
 [FeaturePcd]  
   gEmbeddedTokenSpaceGuid.PcdCacheEnable  

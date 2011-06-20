@@ -163,6 +163,9 @@ Returns:
   // Enable program flow prediction, if supported.
   ArmEnableBranchPrediction ();
 
+  // publish the CPU memory and io spaces sizes
+  BuildCpuHob (PcdGet8 (PcdPrePiCpuMemorySize), PcdGet8 (PcdPrePiCpuIoSize));
+
   ConfigureMmu();
 
   return EFI_SUCCESS;
