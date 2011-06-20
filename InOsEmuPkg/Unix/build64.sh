@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -40,7 +40,6 @@ fi
 #
 # Pick a default tool type for a given OS
 #
-TARGET_TOOLS=MYTOOLS
 UNIXPKG_TOOLS=GCC44
 NETWORK_SUPPORT=
 BUILD_NEW_SHELL=
@@ -61,9 +60,12 @@ case `uname` in
       BUILD_NEW_SHELL="-D BUILD_NEW_SHELL"
       BUILD_FAT="-D BUILD_FAT"
       ;;
-  Linux*) TARGET_TOOLS=ELFGCC ;;
-
 esac
+
+if [ -z "$TARGET_TOOLS" ]
+then
+  TARGET_TOOLS=$UNIXPKG_TOOLS
+fi
 
 BUILD_ROOT_ARCH=$WORKSPACE/Build/EmuUnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
 
@@ -120,10 +122,12 @@ done
 #
 # Build the edk2 UnixPkg
 #
-echo $PATH
-echo `which build`
-build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a X64 -t $TARGET_TOOLS -D SEC_ONLY -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
-build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a X64 -t $UNIXPKG_TOOLS $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
-cp $WORKSPACE/Build/EmuUnixX64/DEBUG_"$TARGET_TOOLS"/X64/SecMain $WORKSPACE/Build/EmuUnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
+if [[ $TARGET_TOOLS == $UNIXPKG_TOOLS ]]; then
+  build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a X64 -t $UNIXPKG_TOOLS -D UNIX_SEC_BUILD $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+else
+  build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a X64 -t $TARGET_TOOLS  -D UNIX_SEC_BUILD -D SKIP_MAIN_BUILD -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
+  build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a X64 -t $UNIXPKG_TOOLS $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+  cp $WORKSPACE/Build/EmuUnixX64/DEBUG_"$TARGET_TOOLS"/X64/SecMain $WORKSPACE/Build/EmuUnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
+fi
 exit $?
 

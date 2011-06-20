@@ -285,12 +285,14 @@
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf 
 
 [Components]
-!if $(SEC_ONLY)
+!ifdef $(UNIX_SEC_BUILD)
   ##
   #  Emulator, OS POSIX application
   ##
   InOsEmuPkg/Unix/Sec/SecMain.inf
-!else
+!endif
+
+!ifndef $(SKIP_MAIN_BUILD)
   #
   # Generic SEC
   #
@@ -441,4 +443,5 @@
   }
 !endif
 
-!endif  
+!endif
+
