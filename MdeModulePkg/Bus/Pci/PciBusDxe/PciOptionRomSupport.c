@@ -1,7 +1,7 @@
 /** @file
   PCI Rom supporting funtions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -689,20 +689,6 @@ ProcessOpRomImage (
     Status      = EFI_SUCCESS;
     ImageHandle = NULL;
 
-    if (!EFI_ERROR (Status)) {
-      Status = gBS->LoadImage (
-                      FALSE,
-                      gPciBusDriverBinding.DriverBindingHandle,
-                      PciOptionRomImageDevicePath,
-                      Buffer,
-                      BufferSize,
-                      &ImageHandle
-                      );
-    }
-
-    //
-    // load image and start image
-    //
      if (!EFI_ERROR (Status)) {
       Status = gBS->LoadImage (
                       FALSE,
