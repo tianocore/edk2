@@ -374,8 +374,6 @@ CpuMpServicesStartupAllAps (
 {
   EFI_STATUS            Status;
   PROCESSOR_DATA_BLOCK  *ProcessorData;
-  UINTN                 *FailledList;
-  UINTN                 FailedListIndex;
   UINTN                 ListIndex;
   UINTN                 Number;
   UINTN                 NextNumber;
