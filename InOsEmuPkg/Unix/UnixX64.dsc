@@ -274,12 +274,14 @@
 #
 ###################################################################################################
 
+!ifndef $(SKIP_MAIN_BUILD)
 [Components.X64]
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
     <LibraryClasses>
       # turn off CR3 write so that DXE IPL will not crash emulator
       BaseLib|UnixPkg/Library/UnixBaseLib/UnixBaseLib.inf
   }
+!endif
 
 [Components.IA32]
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf 

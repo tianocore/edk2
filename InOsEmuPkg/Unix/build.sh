@@ -121,7 +121,7 @@ done
 #
 echo $PATH
 echo `which build`
-build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a IA32 -t $TARGET_TOOLS -D SEC_ONLY -D BUILD_32 -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
+build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a IA32 -t $TARGET_TOOLS -D SEC_ONLY -D BUILD_32 -D SKIP_MAIN_BUILD -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
 build -p $WORKSPACE/InOsEmuPkg/Unix/UnixX64.dsc      -a IA32 -t  $UNIXPKG_TOOLS -D BUILD_32 $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
 cp $WORKSPACE/Build/EmuUnixIa32/DEBUG_"$TARGET_TOOLS"/IA32/SecMain $WORKSPACE/Build/EmuUnixIa32/DEBUG_"$UNIXPKG_TOOLS"/IA32
 exit $?
