@@ -76,5 +76,5 @@
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
   gArmTokenSpaceGuid.PcdEfiUncachedMemoryToStronglyOrdered
 
-[depex]
-  gHardwareInterruptProtocolGuid
+[Depex]
+  TRUE

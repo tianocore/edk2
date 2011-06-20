@@ -54,8 +54,6 @@ extern EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptProtocol;
 //
 // Notifications
 //
-VOID      *CpuProtocolNotificationToken = NULL;
-EFI_EVENT CpuProtocolNotificationEvent  = (EFI_EVENT)NULL;
 EFI_EVENT EfiExitBootServicesEvent      = (EFI_EVENT)NULL;
 
 HARDWARE_INTERRUPT_HANDLER  gRegisteredInterruptHandlers[FixedPcdGet32(PcdGicNumInterrupts)];
@@ -303,19 +301,19 @@ ExitBootServicesEvent (
   IN VOID       *Context
   )
 {
-  UINTN    i;
+  UINTN    Index;
   
-  for (i = 0; i < PcdGet32(PcdGicNumInterrupts); i++) {
-    DisableInterruptSource (&gHardwareInterruptProtocol, i);
+  for (Index = 0; Index < PcdGet32(PcdGicNumInterrupts); Index++) {
+    DisableInterruptSource (&gHardwareInterruptProtocol, Index);
   }
 
   // Acknowledge all pending interrupts
-  for (i = 0; i < PcdGet32(PcdGicNumInterrupts); i++) {
-    DisableInterruptSource (&gHardwareInterruptProtocol, i);
+  for (Index = 0; Index < PcdGet32(PcdGicNumInterrupts); Index++) {
+    DisableInterruptSource (&gHardwareInterruptProtocol, Index);
   }
 
-  for (i = 0; i < PcdGet32(PcdGicNumInterrupts); i++) {
-    EndOfInterrupt (&gHardwareInterruptProtocol, i);
+  for (Index = 0; Index < PcdGet32(PcdGicNumInterrupts); Index++) {
+    EndOfInterrupt (&gHardwareInterruptProtocol, Index);
   }
 
   // Disable Gic Interface
@@ -324,37 +322,6 @@ ExitBootServicesEvent (
 
   // Disable Gic Distributor
   MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDDCR, 0x0);
-}
-
-//
-// Notification routines
-//
-VOID
-CpuProtocolInstalledNotification (
-  IN EFI_EVENT   Event,
-  IN VOID        *Context
-  )
-{
-  EFI_STATUS              Status;
-  EFI_CPU_ARCH_PROTOCOL   *Cpu;
-  
-  //
-  // Get the cpu protocol that this driver requires.
-  //
-  Status = gBS->LocateProtocol(&gEfiCpuArchProtocolGuid, NULL, (VOID **)&Cpu);
-  ASSERT_EFI_ERROR(Status);
-
-  //
-  // Unregister the default exception handler.
-  //
-  Status = Cpu->RegisterInterruptHandler(Cpu, EXCEPT_ARM_IRQ, NULL);
-  ASSERT_EFI_ERROR(Status);
-
-  //
-  // Register to receive interrupts
-  //
-  Status = Cpu->RegisterInterruptHandler(Cpu, EXCEPT_ARM_IRQ, IrqInterruptHandler);
-  ASSERT_EFI_ERROR(Status);
 }
 
 /**
@@ -374,20 +341,21 @@ InterruptDxeInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS  Status;
-  UINTN      i;
-  UINT32      RegOffset;
-  UINTN       RegShift;
+  EFI_STATUS              Status;
+  UINTN                   Index;
+  UINT32                  RegOffset;
+  UINTN                   RegShift;
+  EFI_CPU_ARCH_PROTOCOL   *Cpu;
   
   // Make sure the Interrupt Controller Protocol is not already installed in the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
-  for (i = 0; i < PcdGet32(PcdGicNumInterrupts); i++) {
-    DisableInterruptSource (&gHardwareInterruptProtocol, i);
+  for (Index = 0; Index < PcdGet32(PcdGicNumInterrupts); Index++) {
+    DisableInterruptSource (&gHardwareInterruptProtocol, Index);
     
     // Set Priority 
-    RegOffset = i / 4;
-    RegShift = (i % 4) * 8;
+    RegOffset = Index / 4;
+    RegShift = (Index % 4) * 8;
     MmioAndThenOr32 (
       PcdGet32(PcdGicDistributorBase) + GIC_ICDIPR + (4*RegOffset),
       ~(0xff << RegShift), 
@@ -396,8 +364,8 @@ InterruptDxeInitialize (
   }
 
   // Configure interrupts for cpu 0
-  for (i = 0; i < GIC_NUM_REG_PER_INT_BYTES; i++) {
-    MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDIPTR + (i*4), 0x01010101);
+  for (Index = 0; Index < GIC_NUM_REG_PER_INT_BYTES; Index++) {
+    MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDIPTR + (Index*4), 0x01010101);
   }
 
   // Set binary point reg to 0x7 (no preemption)
@@ -421,12 +389,23 @@ InterruptDxeInitialize (
                   );
   ASSERT_EFI_ERROR (Status);
   
-  // Set up to be notified when the Cpu protocol is installed.
-  Status = gBS->CreateEvent (EVT_NOTIFY_SIGNAL, TPL_CALLBACK, CpuProtocolInstalledNotification, NULL, &CpuProtocolNotificationEvent);    
-  ASSERT_EFI_ERROR (Status);
+  //
+  // Get the CPU protocol that this driver requires.
+  //
+  Status = gBS->LocateProtocol(&gEfiCpuArchProtocolGuid, NULL, (VOID **)&Cpu);
+  ASSERT_EFI_ERROR(Status);
 
-  Status = gBS->RegisterProtocolNotify (&gEfiCpuArchProtocolGuid, CpuProtocolNotificationEvent, (VOID *)&CpuProtocolNotificationToken);
-  ASSERT_EFI_ERROR (Status);
+  //
+  // Unregister the default exception handler.
+  //
+  Status = Cpu->RegisterInterruptHandler(Cpu, EXCEPT_ARM_IRQ, NULL);
+  ASSERT_EFI_ERROR(Status);
+
+  //
+  // Register to receive interrupts
+  //
+  Status = Cpu->RegisterInterruptHandler(Cpu, EXCEPT_ARM_IRQ, IrqInterruptHandler);
+  ASSERT_EFI_ERROR(Status);
 
   // Register for an ExitBootServicesEvent
   Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_NOTIFY, ExitBootServicesEvent, NULL, &EfiExitBootServicesEvent);

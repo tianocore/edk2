@@ -92,7 +92,6 @@ CommonCExceptionHandler (
   IN OUT EFI_SYSTEM_CONTEXT           SystemContext
   )
 {
-
   if (ExceptionType <= MAX_ARM_EXCEPTION) {
     if (gExceptionHandlers[ExceptionType]) {
       gExceptionHandlers[ExceptionType] (ExceptionType, SystemContext);
