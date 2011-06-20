@@ -1046,12 +1046,12 @@ ScsiScanCreateDevice (
                                              &ScsiDevicePath
                                              );
   } else {
-    Status = ScsiIoDevice->ScsiPassThru->BuildDevicePath (
-                                           ScsiBusDev->ScsiInterface,
-                                           TargetId->ScsiId.Scsi,
-                                           Lun,
-                                           &ScsiDevicePath
-                                           );
+    Status = ScsiBusDev->ScsiInterface->BuildDevicePath (
+                                          ScsiBusDev->ScsiInterface,
+                                          TargetId->ScsiId.Scsi,
+                                          Lun,
+                                          &ScsiDevicePath
+                                          );
   }
 
   if (EFI_ERROR(Status)) {
