@@ -1221,7 +1221,7 @@ CpuDriverApIdolLoop (
     
     // Poll 5 times a seconds, 200ms
     // Don't want to burn too many system resources doing nothing.
-    gEmuThunk->Sleep (200);
+    gEmuThunk->Sleep (200 * 1000);
   }
   
   return 0;

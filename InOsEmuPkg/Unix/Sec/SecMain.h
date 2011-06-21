@@ -336,7 +336,7 @@ MapFd0 (
 
  
 
-VOID SecSleep (UINT64 Milliseconds);
+VOID SecSleep (UINT64 Nanoseconds);
 VOID SecEnableInterrupt (VOID);
 VOID SecDisableInterrupt (VOID);
 BOOLEAN SecInterruptEanbled (VOID);

@@ -250,15 +250,15 @@ QueryPerformanceCounter (
 
 VOID
 SecSleep (
-  IN  UINT64 Milliseconds
+  IN  UINT64 Nanoseconds
   )
 {
   struct timespec rq, rm;
   struct timeval  start, end;
   unsigned long  MicroSec;
   
-  rq.tv_sec = Milliseconds / 1000;
-  rq.tv_nsec = (Milliseconds % 1000) * 1000000;
+  rq.tv_sec  = Nanoseconds / 1000000000;
+  rq.tv_nsec = Nanoseconds % 1000000000;
 
   //
   // nanosleep gets interrupted by our timer tic. 

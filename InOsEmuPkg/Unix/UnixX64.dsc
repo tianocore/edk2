@@ -124,6 +124,7 @@
   SerialPortLib|InOsEmuPkg/Library/PeiEmuSerialPortLib/PeiEmuSerialPortLib.inf
   PpiListLib|InOsEmuPkg/Library/SecPpiListLib/SecPpiListLib.inf
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+  TimerLib|InOsEmuPkg/Library/PeiTimerLib/PeiTimerLib.inf
 
 [LibraryClasses.common.USER_DEFINED, LibraryClasses.common.BASE]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
@@ -147,6 +148,7 @@
   ExtractGuidedSectionLib|MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
   SerialPortLib|InOsEmuPkg/Library/PeiEmuSerialPortLib/PeiEmuSerialPortLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
+  TimerLib|InOsEmuPkg/Library/PeiTimerLib/PeiTimerLib.inf
 
 [LibraryClasses.common.PEI_CORE]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -161,6 +163,8 @@
   PeCoffExtraActionLib|InOsEmuPkg/Library/DxeEmuPeCoffExtraActionLib/DxeEmuPeCoffExtraActionLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  TimerLib|InOsEmuPkg/Library/DxeCoreTimerLib/DxeCoreTimerLib.inf
+  EmuThunkLib|InOsEmuPkg/Library/DxeEmuLib/DxeEmuLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -170,6 +174,7 @@
   EmuThunkLib|InOsEmuPkg/Library/DxeEmuLib/DxeEmuLib.inf
   PeCoffExtraActionLib|InOsEmuPkg/Library/DxeEmuPeCoffExtraActionLib/DxeEmuPeCoffExtraActionLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
+  TimerLib|InOsEmuPkg/Library/DxeTimerLib/DxeTimerLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -340,7 +345,7 @@
       SerialPortLib|InOsEmuPkg/Library/DxeEmuStdErrSerialPortLib/DxeEmuStdErrSerialPortLib.inf    
   }
 
-  InOsEmuPkg/MetronomeDxe/Metronome.inf
+  MdeModulePkg/Universal/Metronome/Metronome.inf
   InOsEmuPkg/RealTimeClockRuntimeDxe/RealTimeClock.inf
   InOsEmuPkg/ResetRuntimeDxe/Reset.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf

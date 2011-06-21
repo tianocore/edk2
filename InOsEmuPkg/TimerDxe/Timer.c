@@ -326,6 +326,14 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   //
+  // Start the timer thread at the default timer period
+  //
+  Status = mTimer.SetTimerPeriod (&mTimer, DEFAULT_TIMER_TICK_DURATION);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
   // Install the Timer Architectural Protocol onto a new handle
   //
   Handle = NULL;
@@ -339,13 +347,6 @@ Returns:
     return Status;
   }
 
-  //
-  // Start the timer thread at the default timer period
-  //
-  Status = mTimer.SetTimerPeriod (&mTimer, DEFAULT_TIMER_TICK_DURATION);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   return EFI_SUCCESS;
 }

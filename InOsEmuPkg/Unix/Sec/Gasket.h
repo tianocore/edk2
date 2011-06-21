@@ -109,7 +109,7 @@ GasketQueryPerformanceCounter (
 VOID
 EFIAPI
 GasketSecSleep (
-  IN  UINT64 Milliseconds
+  IN  UINT64 Nanoseconds
   );
   
 VOID
