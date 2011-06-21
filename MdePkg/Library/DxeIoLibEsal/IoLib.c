@@ -38,6 +38,8 @@ IoReadWorker (
   SAL_RETURN_REGS  ReturnReg;
   UINT64           Data;
 
+  Data = 0;
+
   ReturnReg = EsalCall (
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_LO,
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_HI,
@@ -118,6 +120,8 @@ MmioReadWorker (
 {
   SAL_RETURN_REGS  ReturnReg;
   UINT64           Data;
+
+  Data = 0;
 
   ReturnReg = EsalCall (
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_LO,

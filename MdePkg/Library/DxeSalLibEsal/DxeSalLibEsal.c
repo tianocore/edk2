@@ -59,6 +59,14 @@ SalCall (
   )
 {
   SAL_RETURN_REGS Regs;
+  
+  //
+  // Initial all members in this structure.
+  //
+  Regs.r9     = 0;
+  Regs.r10    = 0;
+  Regs.r11    = 0;
+  Regs.Status = EFI_SAL_INVALID_ARGUMENT;
 
   switch (Index) {
   case EFI_SAL_SET_VECTORS:
@@ -272,7 +280,6 @@ SalCall (
     break;
 
   default:
-    Regs.Status = EFI_SAL_INVALID_ARGUMENT;
     return Regs;
     break;
   }
