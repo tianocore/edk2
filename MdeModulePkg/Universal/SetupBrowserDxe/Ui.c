@@ -1910,6 +1910,70 @@ UiDisplayMenu (
           Temp  = 0;
           Row   = OriginalRow;
 
+          //
+          // If Question has refresh guid, register the op-code.
+          //
+          if (!CompareGuid (&Statement->RefreshGuid, &gZeroGuid)) {
+            if (gMenuEventGuidRefreshHead == NULL) {
+              MenuUpdateEntry = AllocateZeroPool (sizeof (MENU_REFRESH_ENTRY));
+              gMenuEventGuidRefreshHead = MenuUpdateEntry;
+            } else {
+              MenuUpdateEntry = gMenuEventGuidRefreshHead;
+              while (MenuUpdateEntry->Next != NULL) {
+                MenuUpdateEntry = MenuUpdateEntry->Next; 
+              }
+              MenuUpdateEntry->Next = AllocateZeroPool (sizeof (MENU_REFRESH_ENTRY));
+              MenuUpdateEntry = MenuUpdateEntry->Next; 
+            }
+            ASSERT (MenuUpdateEntry != NULL);
+            Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL, TPL_NOTIFY, RefreshQuestionNotify, MenuUpdateEntry, &Statement->RefreshGuid, &MenuUpdateEntry->Event);
+            ASSERT (!EFI_ERROR (Status));
+            MenuUpdateEntry->MenuOption        = MenuOption;
+            MenuUpdateEntry->Selection         = Selection;
+            MenuUpdateEntry->CurrentColumn     = MenuOption->OptCol;
+            MenuUpdateEntry->CurrentRow        = MenuOption->Row;
+            if (MenuOption->GrayOut) {
+              MenuUpdateEntry->CurrentAttribute = FIELD_TEXT_GRAYED | FIELD_BACKGROUND;
+            } else {
+              MenuUpdateEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
+            }
+          }
+          
+          //
+          // If Question request refresh, register the op-code
+          //
+          if (Statement->RefreshInterval != 0) {
+            //
+            // Menu will be refreshed at minimal interval of all Questions
+            // which have refresh request
+            //
+            if (MinRefreshInterval == 0 || Statement->RefreshInterval < MinRefreshInterval) {
+              MinRefreshInterval = Statement->RefreshInterval;
+            }
+            
+            if (gMenuRefreshHead == NULL) {
+              MenuRefreshEntry = AllocateZeroPool (sizeof (MENU_REFRESH_ENTRY));
+              gMenuRefreshHead = MenuRefreshEntry;
+            } else {
+              MenuRefreshEntry = gMenuRefreshHead;
+              while (MenuRefreshEntry->Next != NULL) {
+                MenuRefreshEntry = MenuRefreshEntry->Next; 
+              }
+              MenuRefreshEntry->Next = AllocateZeroPool (sizeof (MENU_REFRESH_ENTRY));
+              MenuRefreshEntry = MenuRefreshEntry->Next;
+            }
+            ASSERT (MenuRefreshEntry != NULL);            
+            MenuRefreshEntry->MenuOption        = MenuOption;
+            MenuRefreshEntry->Selection         = Selection;
+            MenuRefreshEntry->CurrentColumn     = MenuOption->OptCol;
+            MenuRefreshEntry->CurrentRow        = MenuOption->Row;
+            if (MenuOption->GrayOut) {
+              MenuRefreshEntry->CurrentAttribute = FIELD_TEXT_GRAYED | FIELD_BACKGROUND;
+            } else {               
+              MenuRefreshEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
+            }
+          }
+
           Status = ProcessOptions (Selection, MenuOption, FALSE, &OptionString);
           if (EFI_ERROR (Status)) {
             //
@@ -1936,83 +2000,6 @@ UiDisplayMenu (
               }
 
               OptionString[Count] = CHAR_NULL;
-            }
-
-            //
-            // If Question has refresh guid, register the op-code.
-            //
-            if (!CompareGuid (&Statement->RefreshGuid, &gZeroGuid)) {
-              if (gMenuEventGuidRefreshHead == NULL) {
-                MenuUpdateEntry = AllocateZeroPool (sizeof (MENU_REFRESH_ENTRY));
-                gMenuEventGuidRefreshHead = MenuUpdateEntry;
-              } else {
-                MenuUpdateEntry = gMenuEventGuidRefreshHead;
-                while (MenuUpdateEntry->Next != NULL) {
-                  MenuUpdateEntry = MenuUpdateEntry->Next; 
-                }
-                MenuUpdateEntry->Next = AllocateZeroPool (sizeof (MENU_REFRESH_ENTRY));
-              }
-              ASSERT (MenuUpdateEntry != NULL);
-              Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL, TPL_NOTIFY, RefreshQuestionNotify, MenuUpdateEntry, &Statement->RefreshGuid, &MenuUpdateEntry->Event);
-              ASSERT (!EFI_ERROR (Status));
-              MenuUpdateEntry->MenuOption        = MenuOption;
-              MenuUpdateEntry->Selection         = Selection;
-              MenuUpdateEntry->CurrentColumn     = MenuOption->OptCol;
-              MenuUpdateEntry->CurrentRow        = MenuOption->Row;
-              if (MenuOption->GrayOut) {
-                MenuUpdateEntry->CurrentAttribute = FIELD_TEXT_GRAYED | FIELD_BACKGROUND;
-              } else {
-                MenuUpdateEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
-              }
-            }
-
-            //
-            // If Question request refresh, register the op-code
-            //
-            if (Statement->RefreshInterval != 0) {
-              //
-              // Menu will be refreshed at minimal interval of all Questions
-              // which have refresh request
-              //
-              if (MinRefreshInterval == 0 || Statement->RefreshInterval < MinRefreshInterval) {
-                MinRefreshInterval = Statement->RefreshInterval;
-              }
-
-              if (gMenuRefreshHead == NULL) {
-                MenuRefreshEntry = AllocateZeroPool (sizeof (MENU_REFRESH_ENTRY));
-                ASSERT (MenuRefreshEntry != NULL);
-                MenuRefreshEntry->MenuOption        = MenuOption;
-                MenuRefreshEntry->Selection         = Selection;
-                MenuRefreshEntry->CurrentColumn     = MenuOption->OptCol;
-                MenuRefreshEntry->CurrentRow        = MenuOption->Row;
-                if (MenuOption->GrayOut) {
-                  MenuRefreshEntry->CurrentAttribute = FIELD_TEXT_GRAYED | FIELD_BACKGROUND;
-                } else {               
-                  MenuRefreshEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
-                }
-                gMenuRefreshHead                    = MenuRefreshEntry;
-              } else {
-                //
-                // Advance to the last entry
-                //
-                for (MenuRefreshEntry = gMenuRefreshHead;
-                     MenuRefreshEntry->Next != NULL;
-                     MenuRefreshEntry = MenuRefreshEntry->Next
-                    )
-                  ;
-                MenuRefreshEntry->Next = AllocateZeroPool (sizeof (MENU_REFRESH_ENTRY));
-                ASSERT (MenuRefreshEntry->Next != NULL);
-                MenuRefreshEntry                    = MenuRefreshEntry->Next;
-                MenuRefreshEntry->MenuOption        = MenuOption;
-                MenuRefreshEntry->Selection         = Selection;
-                MenuRefreshEntry->CurrentColumn     = MenuOption->OptCol;
-                MenuRefreshEntry->CurrentRow        = MenuOption->Row;
-                if (MenuOption->GrayOut) {
-                  MenuRefreshEntry->CurrentAttribute = FIELD_TEXT_GRAYED | FIELD_BACKGROUND;
-                } else {               
-                  MenuRefreshEntry->CurrentAttribute = PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND;
-                }
-              }
             }
 
             Width       = (UINT16) gOptionBlockWidth;
