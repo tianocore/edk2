@@ -483,6 +483,15 @@ formset
       prompt = STRING_TOKEN(STR_GOTO_FORM4), //FourthSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
       help   = STRING_TOKEN(STR_GOTO_HELP);
 
+    guidop 
+      guid = FORMSET_GUID,
+      datatype = MY_DATA2,
+        data.Field8  = 0x21, 
+        data.Field16 = 0x2121,
+        data.OrderedList[0] = 0x21,        
+    endguidop;
+
+
   endform;
 
   suppressif ideqval MyIfrNVData.BootOrderLarge == 0;
