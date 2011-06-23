@@ -61,6 +61,11 @@ case `uname` in
       ;;
 esac
 
+if [ -d /lib32 ]
+then
+  export LIB_ARCH_SFX=32
+fi
+
 if [ -z "$TARGET_TOOLS" ]
 then
   TARGET_TOOLS=$UNIXPKG_TOOLS
