@@ -1,0 +1,37 @@
+## @file
+# GDB startup script
+#
+# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+#
+# Gdb will set $_exitcode when the program exits.  Pre-init it to an unlikely
+# return value.
+#
+set $_exitcode = 42
+
+#
+# Gdb will call hook-stop on each break.  Check to see if $_exitcode was
+# changed from the value we pre-initialized it to.  If so, the program
+# had exited, so gdb should now quit.
+#
+define hook-stop
+  if $_exitcode != 42
+    quit
+  end
+end
+
+#
+# Start the program running
+#
+run
+

@@ -95,7 +95,7 @@ do
         ;;
     esac
 
-    /usr/bin/gdb $BUILD_ROOT_ARCH/SecMain -q -cd=$BUILD_ROOT_ARCH
+    /usr/bin/gdb $BUILD_ROOT_ARCH/SecMain -q -cd=$BUILD_ROOT_ARCH -x $WORKSPACE/InOsEmuPkg/Unix/GdbRun
     exit
   fi
 
