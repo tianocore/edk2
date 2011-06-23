@@ -310,7 +310,7 @@ ProcessSingleControllerHealth (
   IN  EFI_DRIVER_HEALTH_HII_MESSAGE      **MessageList,    OPTIONAL
   IN  EFI_HII_HANDLE                     FormHiiHandle,
   IN OUT BOOLEAN                         *RebootRequired
-);
+  );
 
 /**
   Repair notification function, simply print the repair progress.
