@@ -64,6 +64,10 @@ FindHiiHandleViaDevPath(
     return (Status);
   }
 
+  if (HandleBuffer == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
   for (LoopVariable = 0 ; LoopVariable < (HandleBufferSize/sizeof(HandleBuffer[0])) && *HiiHandle == NULL ; LoopVariable++) {
     MainBufferSize    = 0;
     MainBuffer        = NULL;
