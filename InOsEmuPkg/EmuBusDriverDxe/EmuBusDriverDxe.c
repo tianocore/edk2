@@ -148,6 +148,7 @@ EmuBusDriverBindingStart (
   EMU_VENDOR_DEVICE_PATH_NODE     *Node;
   BOOLEAN                         CreateDevice;
 
+  InstallStatus = EFI_UNSUPPORTED;
   Status = EFI_UNSUPPORTED;
 
   //

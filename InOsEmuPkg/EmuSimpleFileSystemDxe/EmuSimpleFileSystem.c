@@ -489,6 +489,8 @@ EmuSimpleFileSystemOpenVolume (
   EMU_EFI_FILE_PRIVATE              *PrivateFile;
   EFI_TPL                           OldTpl;
 
+  Status = EFI_UNSUPPORTED;
+
   if (This == NULL || Root == NULL) {
     return EFI_INVALID_PARAMETER;
   }

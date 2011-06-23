@@ -667,10 +667,11 @@ EmuSnpDriverBindingStart (
   MAC_ADDR_DEVICE_PATH        Node;
   EFI_DEVICE_PATH_PROTOCOL    *ParentDevicePath;
 
+  Private = NULL;
+
   //
   // Grab the protocols we need
   //
-  
   Status = gBS->OpenProtocol(
                   ControllerHandle,
                   &gEfiDevicePathProtocolGuid,

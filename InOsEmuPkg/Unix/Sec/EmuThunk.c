@@ -257,8 +257,8 @@ SecSleep (
   struct timeval  start, end;
   unsigned long  MicroSec;
   
-  rq.tv_sec  = Nanoseconds / 1000000000;
-  rq.tv_nsec = Nanoseconds % 1000000000;
+  rq.tv_sec  = DivU64x32 (Nanoseconds, 1000000000);
+  rq.tv_nsec = ModU64x32 (Nanoseconds, 1000000000);
 
   //
   // nanosleep gets interrupted by our timer tic. 

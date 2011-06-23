@@ -254,19 +254,13 @@ INF  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
 !if $(BUILD_FAT)
 INF FatPkg/EnhancedFatDxe/Fat.inf
 !else
-# Used checked in Visual Studio binaries
-FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
-    SECTION PE32 = FatBinPkg/EnhancedFatDxe/X64/Fat.efi
-  }
+INF  RuleOverride = BINARY FatBinPkg/EnhancedFatDxe/Fat.inf
 !endif
 
 !if $(BUILD_NEW_SHELL)
 INF  ShellPkg/Application/Shell/Shell.inf
 !else
-# Used checked in Visual Studio binaries
-FILE APPLICATION = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile) {
-    SECTION PE32 = EdkShellBinPkg/FullShell/X64/Shell_Full.efi
-  }
+INF  RuleOverride = BINARY EdkShellBinPkg/FullShell/FullShell.inf
 !endif
 
 FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
