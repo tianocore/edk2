@@ -306,7 +306,7 @@ EFI_STATUS
                           handle the information is for.
   @param  InformationType The type identifier for the information being set.
   @param  BufferSize      The size, in bytes, of Buffer.
-  @param  Buffer          A pointer to the data buffer to write. The buffer¡¯s type is
+  @param  Buffer          A pointer to the data buffer to write. The buffer's type is
                           indicated by InformationType.
 
   @retval EFI_SUCCESS          The information was set.
