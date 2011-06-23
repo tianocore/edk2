@@ -739,7 +739,7 @@ PxeBcCreateIp4Children (
   Udp4CfgData                     = &Private->Udp4CfgData;
   Ip4CfgData                      = &Private->Ip4CfgData;
 
-  Udp4CfgData->AcceptBroadcast    = TRUE;
+  Udp4CfgData->AcceptBroadcast    = FALSE;
   Udp4CfgData->AcceptAnyPort      = TRUE;
   Udp4CfgData->AllowDuplicatePort = TRUE;
   Udp4CfgData->TypeOfService      = Mode->ToS;
