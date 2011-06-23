@@ -1,7 +1,7 @@
 /** @file
   Interface routines for PxeBc.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -727,6 +727,8 @@ ON_EXIT:
     }
   }
 
+  Status = Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
+
   //
   // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP 
   // receive filter list emptied and the filter set to EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP.
@@ -1040,6 +1042,8 @@ EfiPxeBcDiscover (
 
 ON_EXIT:
 
+  Status = Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
+  
   //
   // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP 
   // receive filter list emptied and the filter set to EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP.
@@ -1274,6 +1278,7 @@ EfiPxeBcMtftp (
     Mode->IcmpErrorReceived = TRUE;
   }
 
+  Status = Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
   //
   // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP 
   // receive filter list emptied and the filter set to EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP.
@@ -1866,7 +1871,11 @@ EfiPxeBcSetIpFilter (
   PXEBC_PRIVATE_DATA        *Private;
   EFI_PXE_BASE_CODE_MODE    *Mode;
   UINTN                     Index;
+  EFI_UDP4_CONFIG_DATA      *Udp4Cfg;
   BOOLEAN                   PromiscuousNeed;
+  BOOLEAN                   AcceptPromiscuous;
+  BOOLEAN                   AcceptBroadcast;
+  BOOLEAN                   MultiCastUpdate;
 
   if (This == NULL) {
     DEBUG ((EFI_D_ERROR, "This == NULL.\n"));
@@ -1891,6 +1900,11 @@ EfiPxeBcSetIpFilter (
     return EFI_NOT_STARTED;
   }
 
+  if (Mode->UsingIpv6) {
+    DEBUG ((EFI_D_ERROR, "This driver is PXE for IPv4 Only.\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
   PromiscuousNeed = FALSE;
 
   for (Index = 0; Index < NewFilter->IpCnt; ++Index) {
@@ -1912,54 +1926,71 @@ EfiPxeBcSetIpFilter (
     }
   }
 
-  //
-  // Clear the UDP instance configuration, all joined groups will be left
-  // during the operation.
-  //
-  Private->Udp4Read->Configure (Private->Udp4Read, NULL);
-  Private->Udp4CfgData.AcceptPromiscuous  = FALSE;
-  Private->Udp4CfgData.AcceptBroadcast    = FALSE;
+  AcceptPromiscuous = FALSE;
+  AcceptBroadcast   = FALSE;
+  MultiCastUpdate   = FALSE;
 
   if (PromiscuousNeed ||
       ((NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_PROMISCUOUS) != 0) ||
       ((NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_PROMISCUOUS_MULTICAST) != 0)
      ) {
     //
-    // Configure the udp4 filter to receive all packages
+    // Configure the udp4 filter to receive all packages.
     //
-    Private->Udp4CfgData.AcceptPromiscuous  = TRUE;
-
+    AcceptPromiscuous  = TRUE;
+  } else if ((NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_BROADCAST) != 0) {
     //
-    // Configure the UDP instance with the new configuration.
+    // Configure the udp4 filter to receive all broadcast packages.
     //
-    Status = Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    AcceptBroadcast   = TRUE;
+  }
 
-  } else {
-
-    if ((NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_BROADCAST) != 0) {
-      //
-      // Configure the udp4 filter to receive all broadcast packages
-      //
-      Private->Udp4CfgData.AcceptBroadcast    = TRUE;
-    }
-
-    //
-    // Configure the UDP instance with the new configuration.
-    //
-    Status = Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
+  //
+  // In multicast condition when Promiscuous FALSE and IpCnt no-zero.
+  // Here check if there is any update of the multicast ip address. If yes,
+  // we need leave the old multicast group (by Config UDP instance to NULL),
+  // and join the new multicast group.
+  //
+  if (!AcceptPromiscuous) {
     if ((NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP) != 0) {
+      if (Mode->IpFilter.IpCnt != NewFilter->IpCnt) {
+        MultiCastUpdate = TRUE;
+      } else if (CompareMem (Mode->IpFilter.IpList, NewFilter->IpList, NewFilter->IpCnt * sizeof (EFI_IP_ADDRESS)) != 0 ) {
+        MultiCastUpdate = TRUE;
+      }
+    }
+  }
+  
+  //
+  // Check whether we need reconfigure the UDP instance.
+  //
+  Udp4Cfg = &Private->Udp4CfgData;
+  if ((AcceptPromiscuous != Udp4Cfg->AcceptPromiscuous) ||
+  	  (AcceptBroadcast != Udp4Cfg->AcceptBroadcast)     || MultiCastUpdate) {
+    //
+    // Clear the UDP instance configuration, all joined groups will be left
+    // during the operation.
+    //
+    Private->Udp4Read->Configure (Private->Udp4Read, NULL);
 
+    //
+    // Configure the UDP instance with the new configuration.
+    //
+    Udp4Cfg->AcceptPromiscuous = AcceptPromiscuous;
+    Udp4Cfg->AcceptBroadcast   = AcceptBroadcast;
+    Status = Private->Udp4Read->Configure (Private->Udp4Read, Udp4Cfg);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // In not Promiscuous mode, need to join the new multicast group.
+    //
+    if (!AcceptPromiscuous) {
       for (Index = 0; Index < NewFilter->IpCnt; ++Index) {
         if (IP4_IS_MULTICAST (EFI_NTOHL (NewFilter->IpList[Index].v4))) {
           //
-          // Join the mutilcast group
+          // Join the mutilcast group.
           //
           Status = Private->Udp4Read->Groups (Private->Udp4Read, TRUE, &NewFilter->IpList[Index].v4);
           if (EFI_ERROR (Status)) {
