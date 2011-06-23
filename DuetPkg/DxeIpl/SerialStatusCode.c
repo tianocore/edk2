@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -18,15 +18,8 @@ Revision History:
 
 **/
 
+#include <Library/SerialPortLib.h>
 #include "SerialStatusCode.h"
-
-
-UINT16  gComBase = 0x3f8;
-UINTN   gBps = 115200;
-UINT8   gData = 8;
-UINT8   gStop = 1;
-UINT8   gParity = 0;
-UINT8   gBreakSet = 0;
 
 //
 // All of the lookup tables are only needed in debug.
@@ -602,68 +595,6 @@ Returns:
 }
 
 
-
-VOID
-DebugSerialWrite (
-  IN UINT8  Character
-  )
-/*++
-
-Routine Description:
-
- DebugSerialWrite - Outputs a character to the Serial port
-
-  Repeatedly polls the TXRDY bit of the Line Status Register
-  until the Transmitter Holding Register is empty.  The character
-  is then written to the Serial port.
-
-Arguments:
-
-  Character   - Character to write
-
-Returns:
-
-  None
-
---*/
-{
-  UINT8   Data;
-
-  //
-  // Wait for the serail port to be ready.
-  //
-  do {
-    Data = IoRead8 (gComBase + LSR_OFFSET);
-  } while ((Data & LSR_TXRDY) == 0);
-    
-  IoWrite8 (gComBase, Character);
-}
-
-VOID
-DebugSerialPrint (
-  IN CHAR8    *OutputString
-  )
-/*++
-
-Routine Description:
-
-  Prints a string to the Serial port
-
-Arguments:
-
-  OutputString - Ascii string to print to serial port.
-
-Returns:
-
-  None
-
---*/
-{
-  for ( ; *OutputString != 0; OutputString++) {
-    DebugSerialWrite (*OutputString);
-  }
-}
-
 EFI_STATUS
 EFIAPI 
 SerialReportStatusCode (
@@ -697,7 +628,7 @@ Returns:
   CHAR8                   *Format;
   BASE_LIST               Marker;
   UINT32                  ErrorLevel;
-  UINTN                   CharCount;
+  UINTN                   CharCount = 0;
 
   Buffer[0] = '\0';
 
@@ -706,7 +637,7 @@ Returns:
     //
     // Processes PEI_ASSERT ()
     //
-    AsciiSPrint (
+    CharCount = AsciiSPrint (
       Buffer,
       sizeof (Buffer),
       "\nPEI_ASSERT!: %a (%d): %a\n",
@@ -720,7 +651,7 @@ Returns:
     //
     // Process PEI_DEBUG () macro to Serial
     //
-    AsciiBSPrint (Buffer, sizeof (Buffer), Format, Marker);
+    CharCount = AsciiBSPrint (Buffer, sizeof (Buffer), Format, Marker);
 
   } else if ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) { 
     //
@@ -744,7 +675,7 @@ Returns:
     //
     // Callout to platform Lib function to do print.
     //
-    DebugSerialPrint (Buffer);
+    SerialPortWrite (Buffer, CharCount);
   }
 
   //
@@ -786,7 +717,7 @@ Returns:
         //
         // Concatenate the instance
         //
-        AsciiSPrint (
+        CharCount = AsciiSPrint (
           Buffer,
           sizeof (Buffer),
           "%a:%a:%a:%d\n",
@@ -796,7 +727,7 @@ Returns:
           Instance
           );
 
-        DebugSerialPrint (Buffer);
+        SerialPortWrite (Buffer, CharCount);
       }
     }
 
@@ -812,15 +743,11 @@ InstallSerialStatusCode (
 
 Routine Description:
 
-  Initialize Serial Port
-
-    The Baud Rate Divisor registers are programmed and the LCR 
-    is used to configure the communications format. Hard coded
-    UART config comes from globals in DebugSerialPlatform lib.
+  Initialize Serial Port and Status Code Handler
 
 Arguments: 
 
-  None
+  ReportStatusCode - A pointer to the handler
 
 Returns: 
 
@@ -828,41 +755,6 @@ Returns:
 
 --*/
 {
-  UINTN           Divisor;
-  UINT8           OutputData;
-  UINT8           Data;
-
-  //
-  // Some init is done by the platform status code initialization.
-  //
-  
-  //
-  // Map 5..8 to 0..3
-  //
-  Data = (UINT8) (gData - (UINT8)5);
-
-  //
-  // Calculate divisor for baud generator
-  //
-  Divisor = 115200 / gBps; 
-  
-  //
-  // Set communications format
-  //
-  OutputData = (UINT8)((DLAB << 7) | ((gBreakSet << 6) | ((gParity << 3) | ((gStop << 2) | Data))));
-  IoWrite8 (gComBase + LCR_OFFSET, OutputData);
-
-  //
-  // Configure baud rate
-  //
-  IoWrite8 (gComBase + BAUD_HIGH_OFFSET, (UINT8)(Divisor >> 8));
-  IoWrite8 (gComBase + BAUD_LOW_OFFSET, (UINT8)(Divisor & 0xff));
-
-  //
-  // Switch back to bank 0
-  //
-  OutputData = (UINT8)((~DLAB<<7)|((gBreakSet<<6)|((gParity<<3)|((gStop<<2)| Data))));
-  IoWrite8 (gComBase + LCR_OFFSET, OutputData);
-
+  SerialPortInitialize();
   *ReportStatusCode = SerialReportStatusCode;
 }

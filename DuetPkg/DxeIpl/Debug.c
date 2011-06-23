@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -19,6 +19,7 @@ Revision History:
 **/
 
 #include "DxeIpl.h"
+#include <Library/SerialPortLib.h>
 #include "SerialStatusCode.h"
 #include "Debug.h"
 
@@ -51,57 +52,31 @@ ClearScreen (
 }
 
 VOID
-PrintValue (
-  UINT32 Value
-  )
-{
-  UINT32 Index;
-  CHAR8  Char;
-  CHAR8  String[9];
-
-  for (Index = 0; Index < 8; Index++) {
-    Char = (UINT8)(((Value >> ((7 - Index) * 4)) & 0x0f) + '0');
-    if (Char > '9') {
-      Char = (UINT8) (Char - '0' - 10 + 'A');
-    }
-    String[Index] = Char;
-  }
-
-  String[sizeof (String) - 1] = '\0';
-
-  PrintString (String);
-}
-
-VOID
-PrintValue64 (
-  UINT64 Value
-  )
-{
-  PrintValue ((UINT32) RShiftU64 (Value, 32));
-  PrintValue ((UINT32) Value);
-}
-
-
-
-VOID
 PrintString (
-  CHAR8 *String
+  IN CONST CHAR8  *FormatString,
+  ...
   )
 {
-  UINT32 Index;
+  UINTN           Index;
+  CHAR8           PrintBuffer[1000];
+  VA_LIST         Marker;
 
-  for (Index = 0; String[Index] != 0; Index++) {
-    if (String[Index] == '\n') {
-      mCursor = (UINT8 *)(UINTN)(0xb8000 + (((((UINTN)mCursor - 0xb8000) + 160) / 160) * 160));
+  VA_START (Marker, FormatString);
+  AsciiVSPrint (PrintBuffer, sizeof (PrintBuffer), FormatString, Marker);
+  VA_END (Marker);
+
+  for (Index = 0; PrintBuffer[Index] != 0; Index++) {
+    if (PrintBuffer[Index] == '\n') {
+      mCursor = (UINT8 *) (UINTN) (0xb8000 + (((((UINTN)mCursor - 0xb8000) + 160) / 160) * 160));
     } else {
-      *mCursor = String[Index];
+      *mCursor = (UINT8) PrintBuffer[Index];
       mCursor += 2;
     }
   }
-  
+
   //
   // All information also output to serial port.
   //
-  DebugSerialPrint ((CHAR8*)String);
+  SerialPortWrite (PrintBuffer, Index);
 }
 

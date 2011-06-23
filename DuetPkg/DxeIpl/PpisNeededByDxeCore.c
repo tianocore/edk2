@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -48,26 +48,7 @@ Returns:
 
 --*/
 {
-  //EFI_PEI_PE_COFF_LOADER_PROTOCOL           *PeCoffLoader;
-  //EFI_DECOMPRESS_PROTOCOL                   *EfiDecompress;
-  //EFI_TIANO_DECOMPRESS_PROTOCOL             *TianoDecompress;
   EFI_REPORT_STATUS_CODE                    ReportStatusCode;
-
-  //InstallEfiPeiFlushInstructionCache (&FlushInstructionCache);
-  //Hob->FlushInstructionCache.Interface = FlushInstructionCache;
-
-  // R9 do not need this protocol.
-  // InstallEfiPeiTransferControl (&TransferControl);
-  // Hob->TransferControl.Interface = TransferControl;
-
-  //InstallEfiPeiPeCoffLoader (NULL, &PeCoffLoader, NULL);
-  //Hob->PeCoffLoader.Interface = PeCoffLoader;
-
-  //InstallEfiDecompress (&EfiDecompress);
-  //Hob->EfiDecompress.Interface = EfiDecompress;
-
-  //InstallTianoDecompress (&TianoDecompress);
-  //Hob->TianoDecompress.Interface = TianoDecompress;
 
   InstallSerialStatusCode (&ReportStatusCode);
   Hob->SerialStatusCode.Interface = (EFI_PHYSICAL_ADDRESS) (UINTN) ReportStatusCode;

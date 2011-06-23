@@ -26,19 +26,10 @@ PrintHeader (
   CHAR8 Char
   );
 
-VOID 
-PrintValue (
-  UINT32 Value
-  );
-
 VOID
-PrintValue64 (
-  UINT64 Value
-  );
-
-VOID 
 PrintString (
-  CHAR8 *String
+  IN CONST CHAR8  *FormatString,
+  ...
   );
 
 VOID 

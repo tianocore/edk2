@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -137,55 +137,42 @@ Returns:
   VOID                  *MemoryTopOnDescriptor;
   VOID                  *MemoryDescriptor;
   VOID                  *NvStorageBase;
-  CHAR8                 PrintBuffer[256];
   EFILDRHANDOFF         HandoffCopy;
 
   CopyMem ((VOID*) &HandoffCopy, (VOID*) Handoff, sizeof (EFILDRHANDOFF));
   Handoff = &HandoffCopy;
 
   ClearScreen();
-  PrintString("Enter DxeIpl ...\n");
-  
-/*
-  ClearScreen();
-  PrintString("handoff:\n");
-  PrintString("Handoff.BfvBase = ");   
-  PrintValue64((UINT64)(UINTN)Handoff->BfvBase);
-  PrintString(", ");   
-  PrintString("BfvLength = ");   
-  PrintValue64(Handoff->BfvSize);
-  PrintString("\n");   
-  PrintString("Handoff.DxeIplImageBase = ");   
-  PrintValue64((UINT64)(UINTN)Handoff->DxeIplImageBase);
-  PrintString(", ");   
-  PrintString("DxeIplImageSize = ");   
-  PrintValue64(Handoff->DxeIplImageSize);
-  PrintString("\n");   
-  PrintString("Handoff.DxeCoreImageBase = ");   
-  PrintValue64((UINT64)(UINTN)Handoff->DxeCoreImageBase);
-  PrintString(", ");   
-  PrintString("DxeCoreImageSize = ");   
-  PrintValue64(Handoff->DxeCoreImageSize);
-  PrintString("\n");   
-*/
+
+  PrintString (
+    "Enter DxeIpl ...\n"
+    "Handoff:\n"
+    "Handoff.BfvBase = %p, BfvLength = %x\n"
+    "Handoff.DxeIplImageBase = %p, DxeIplImageSize = %x\n"
+    "Handoff.DxeCoreImageBase = %p, DxeCoreImageSize = %x\n",
+    Handoff->BfvBase, Handoff->BfvSize,
+    Handoff->DxeIplImageBase, Handoff->DxeIplImageSize,
+    Handoff->DxeCoreImageBase, Handoff->DxeCoreImageSize
+    );
+
   //
   // Hob Generation Guild line:
   //   * Don't report FV as physical memory
   //   * MemoryAllocation Hob should only cover physical memory
   //   * Use ResourceDescriptor Hob to report physical memory or Firmware Device and they shouldn't be overlapped
-  PrintString("Prepare Cpu HOB information ...\n");
+  PrintString ("Prepare Cpu HOB information ...\n");
   PrepareHobCpu ();
 
   //
   // 1. BFV
   //
-  PrintString("Prepare BFV HOB information ...\n");
+  PrintString ("Prepare BFV HOB information ...\n");
   PrepareHobBfv (Handoff->BfvBase, Handoff->BfvSize);
 
   //
   // 2. Updates Memory information, and get the top free address under 4GB
   //
-  PrintString("Prepare Memory HOB information ...\n");
+  PrintString ("Prepare Memory HOB information ...\n");
   MemoryTopOnDescriptor = PrepareHobMemory (Handoff->MemDescCount, Handoff->MemDesc);
   
   //
@@ -193,17 +180,13 @@ Returns:
   //
   
   //   3.1 NV data
-  PrintString("Prepare NV Storage information ...\n");
+  PrintString ("Prepare NV Storage information ...\n");
   NvStorageBase = PrepareHobNvStorage (MemoryTopOnDescriptor);
-  AsciiSPrint (PrintBuffer, 256, "NV Storage Base=0x%x\n", (UINTN)NvStorageBase);
-  PrintString (PrintBuffer);
-  
+  PrintString ("NV Storage Base = %p\n", NvStorageBase);
   //   3.2 Stack
   StackTop = NvStorageBase;
   StackBottom = PrepareHobStack (StackTop);
-  AsciiSPrint (PrintBuffer, 256, "Stack Top=0x%x, Stack Bottom=0x%x\n", 
-              (UINTN)StackTop, (UINTN)StackBottom);
-  PrintString (PrintBuffer);
+  PrintString ("Stack Top=0x%x, Stack Bottom=0x%x\n", StackTop, StackBottom);
   //   3.3 Page Table
   PageTableBase = PreparePageTable (StackBottom, gHob->Cpu.SizeOfMemorySpace);
   //   3.4 MemDesc (will be used in PlatformBds)
@@ -214,7 +197,7 @@ Returns:
   //
   // 4. Register the memory occupied by DxeCore and DxeIpl together as DxeCore
   //
-  PrintString("Prepare DxeCore memory Hob ...\n");
+  PrintString ("Prepare DxeCore memory Hob ...\n");
   PrepareHobDxeCore (
     Handoff->DxeCoreEntryPoint,
     (EFI_PHYSICAL_ADDRESS)(UINTN)Handoff->DxeCoreImageBase,
@@ -227,125 +210,57 @@ Returns:
 
   CompleteHobGeneration ();
 
-  AsciiSPrint (PrintBuffer, 256, "HobStart=0x%x\n", (UINTN)gHob);
-  PrintString (PrintBuffer);
-
-  AsciiSPrint (PrintBuffer, 256, "Memory Top=0x%x, Bottom=0x%x\n", 
-              (UINTN)gHob->Phit.EfiMemoryTop, (UINTN)gHob->Phit.EfiMemoryBottom);
-  PrintString (PrintBuffer);
-
-  AsciiSPrint (PrintBuffer, 256, "Free Memory Top=0x%x, Bottom=0x%x\n", 
-              (UINTN)gHob->Phit.EfiFreeMemoryTop, (UINTN)gHob->Phit.EfiFreeMemoryBottom);
-  PrintString (PrintBuffer);
-
-  AsciiSPrint (PrintBuffer, 256, "Nv Base=0x%x, Length=0x%x\n", 
-              (UINTN)gHob->NvStorageFvb.FvbInfo.Entries[0].Base, 
-              (UINTN)gHob->NvFtwFvb.FvbInfo.Entries[0].Length);
-  PrintString (PrintBuffer);
-/*
   //
   // Print Hob Info
   //
   ClearScreen();
-  PrintString("Hob Info\n");
-  PrintString("Phit.EfiMemoryTop = ");   
-  PrintValue64(gHob->Phit.EfiMemoryTop);
-  PrintString(" Phit.EfiMemoryBottom = ");   
-  PrintValue64(gHob->Phit.EfiMemoryBottom);
-  PrintString("\n");   
-  PrintString("Phit.EfiFreeMemoryTop = ");   
-  PrintValue64(gHob->Phit.EfiFreeMemoryTop);
-  PrintString(" Phit.EfiFreeMemoryBottom = ");   
-  PrintValue64(gHob->Phit.EfiFreeMemoryBottom);
-  PrintString("\n");   
-  PrintString("Bfv = ");   
-  PrintValue64(gHob->Bfv.BaseAddress);
-  PrintString(" BfvLength = ");   
-  PrintValue64(gHob->Bfv.Length);
-  PrintString("\n");
-  PrintString("NvStorageFvb = ");
-  PrintValue64(gHob->NvStorageFvb.FvbInfo.Entries[0].Base);
-  PrintString(" Length = ");
-  PrintValue64(gHob->NvStorageFvb.FvbInfo.Entries[0].Length);
-  PrintString("\n");
-  PrintString("NvFtwFvb = ");
-  PrintValue64(gHob->NvFtwFvb.FvbInfo.Entries[0].Base);
-  PrintString(" Length = ");
-  PrintValue64(gHob->NvFtwFvb.FvbInfo.Entries[0].Length);
-  PrintString("\n");
-  PrintString("BfvResource = ");
-  PrintValue64(gHob->BfvResource.PhysicalStart);
-  PrintString(" Length = ");
-  PrintValue64(gHob->BfvResource.ResourceLength);
-  PrintString("\n");
-  PrintString("NvStorageFvResource = ");
-  PrintValue64(gHob->NvStorageFvResource.PhysicalStart);
-  PrintString(" Length = ");
-  PrintValue64(gHob->NvStorageFvResource.ResourceLength);
-  PrintString("\n");
-  PrintString("NvStorage = ");
-  PrintValue64(gHob->NvStorage.FvbInfo.Entries[0].Base);
-  PrintString(" Length = ");
-  PrintValue64(gHob->NvStorage.FvbInfo.Entries[0].Length);
-  PrintString("\n");
-  PrintString("NvFtwFvResource = ");
-  PrintValue64(gHob->NvFtwFvResource.PhysicalStart);
-  PrintString(" Length = ");
-  PrintValue64(gHob->NvFtwFvResource.ResourceLength);
-  PrintString("\n");
-  PrintString("NvFtwWorking = ");
-  PrintValue64(gHob->NvFtwWorking.FvbInfo.Entries[0].Base);
-  PrintString(" Length = ");
-  PrintValue64(gHob->NvFtwWorking.FvbInfo.Entries[0].Length);
-  PrintString("\n");
-  PrintString("NvFtwSpare = ");
-  PrintValue64(gHob->NvFtwSpare.FvbInfo.Entries[0].Base);
-  PrintString(" Length = ");
-  PrintValue64(gHob->NvFtwSpare.FvbInfo.Entries[0].Length);
-  PrintString("\n");
-  PrintString("Stack = ");   
-  PrintValue64(gHob->Stack.AllocDescriptor.MemoryBaseAddress);
-  PrintString(" StackLength = ");   
-  PrintValue64(gHob->Stack.AllocDescriptor.MemoryLength);
-  PrintString("\n");   
-  PrintString("PageTable = ");   
-  PrintValue64((UINTN)PageTableBase);
-  PrintString("\n");     
-  PrintString("MemoryFreeUnder1MB = ");   
-  PrintValue64(gHob->MemoryFreeUnder1MB.PhysicalStart);
-  PrintString(" MemoryFreeUnder1MBLength = ");   
-  PrintValue64(gHob->MemoryFreeUnder1MB.ResourceLength);
-  PrintString("\n");   
-  PrintString("MemoryAbove1MB = ");   
-  PrintValue64(gHob->MemoryAbove1MB.PhysicalStart);
-  PrintString(" MemoryAbove1MBLength = ");   
-  PrintValue64(gHob->MemoryAbove1MB.ResourceLength);
-  PrintString("\n");   
-  PrintString("MemoryAbove4GB = ");   
-  PrintValue64(gHob->MemoryAbove4GB.PhysicalStart);
-  PrintString(" MemoryAbove4GBLength = ");   
-  PrintValue64(gHob->MemoryAbove4GB.ResourceLength);
-  PrintString("\n");   
-  PrintString("DxeCore = ");   
-  PrintValue64(gHob->DxeCore.MemoryAllocationHeader.MemoryBaseAddress);
-  PrintString(" DxeCoreLength = ");   
-  PrintValue64(gHob->DxeCore.MemoryAllocationHeader.MemoryLength);
-  PrintString("\n");   
-  PrintString("MemoryAllocation = ");   
-  PrintValue64(gHob->MemoryAllocation.AllocDescriptor.MemoryBaseAddress);
-  PrintString(" MemoryLength = ");   
-  PrintValue64(gHob->MemoryAllocation.AllocDescriptor.MemoryLength);
-  PrintString("\n");   
-  EFI_DEADLOOP();
-*/
+  PrintString (
+    "HobStart = %p\n"
+    "Memory Top = %lx, Bottom = %lx\n"
+    "Free Memory Top = %lx, Bottom = %lx\n"
+    "NvStorageFvb = %p, Length = %x\n"
+    "BfvResource = %lx, Length = %lx\n"
+    "NvStorageFvResource = %lx, Length = %lx\n"
+    "NvStorage = %lx, Length = %lx\n"
+    "NvFtwFvResource = %lx, Length = %lx\n"
+    "NvFtwWorking = %lx, Length = %lx\n"
+    "NvFtwSpare = %lx, Length = %lx\n"
+    "Stack = %lx, StackLength = %lx\n"
+    "PageTable = %p\n"
+    "MemoryFreeUnder1MB = %lx, MemoryFreeUnder1MBLength = %lx\n"
+    "MemoryAbove1MB = %lx, MemoryAbove1MBLength = %lx\n"
+    "MemoryAbove4GB = %lx, MemoryAbove4GBLength = %lx\n"
+    "DxeCore = %lx, DxeCoreLength = %lx\n"
+    "MemoryAllocation = %lx, MemoryLength = %lx\n"
+    "$",
+    gHob,
+    gHob->Phit.EfiMemoryTop, gHob->Phit.EfiMemoryBottom,
+    gHob->Phit.EfiFreeMemoryTop, gHob->Phit.EfiFreeMemoryBottom,
+    gHob->NvStorageFvb.FvbInfo.Entries[0].Base, (UINTN) gHob->NvFtwFvb.FvbInfo.Entries[0].Length,
+    gHob->BfvResource.PhysicalStart, gHob->BfvResource.ResourceLength,
+    gHob->NvStorageFvResource.PhysicalStart, gHob->NvStorageFvResource.ResourceLength,
+    gHob->NvStorage.FvbInfo.Entries[0].Base, gHob->NvStorage.FvbInfo.Entries[0].Length,
+    gHob->NvFtwFvResource.PhysicalStart, gHob->NvFtwFvResource.ResourceLength,
+    gHob->NvFtwWorking.FvbInfo.Entries[0].Base, gHob->NvFtwWorking.FvbInfo.Entries[0].Length,
+    gHob->NvFtwSpare.FvbInfo.Entries[0].Base, gHob->NvFtwSpare.FvbInfo.Entries[0].Length,
+    gHob->Stack.AllocDescriptor.MemoryBaseAddress, gHob->Stack.AllocDescriptor.MemoryLength,
+    PageTableBase,
+    gHob->MemoryFreeUnder1MB.PhysicalStart, gHob->MemoryFreeUnder1MB.ResourceLength,
+    gHob->MemoryAbove1MB.PhysicalStart, gHob->MemoryAbove1MB.ResourceLength,
+    gHob->MemoryAbove4GB.PhysicalStart, gHob->MemoryAbove4GB.ResourceLength,
+    gHob->DxeCore.MemoryAllocationHeader.MemoryBaseAddress, gHob->DxeCore.MemoryAllocationHeader.MemoryLength,
+    gHob->MemoryAllocation.AllocDescriptor.MemoryBaseAddress, gHob->MemoryAllocation.AllocDescriptor.MemoryLength
+    );
 
   ClearScreen();
-  PrintString("\n\n\n\n\n\n\n\n\n\n");
-  PrintString("                         WELCOME TO EFI WORLD!\n");
+  PrintString (
+    "\n\n\n\n\n\n\n\n\n\n"
+    "                         WELCOME TO EFI WORLD!\n"
+    );
   
   EnterDxeMain (StackTop, Handoff->DxeCoreEntryPoint, gHob, PageTableBase);
+  PrintString ("Fail to enter DXE main!\n");
  
-  PrintString("Fail to enter DXE main!\n");
   //
   // Should never get here
   //
