@@ -251,8 +251,7 @@ UnixSimpleFileSystemFileInfo (
 
   if (FileName != NULL) {
     RealFileName = FileName;
-  }
-  else if (PrivateFile->IsRootDirectory) {
+  } else if (PrivateFile->IsRootDirectory) {
     RealFileName = "";
   } else {
     RealFileName  = PrivateFile->FileName;
