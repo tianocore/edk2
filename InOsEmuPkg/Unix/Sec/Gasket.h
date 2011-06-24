@@ -53,6 +53,16 @@ GasketSecPollStdIn (
   VOID
   );
 
+VOID *
+EFIAPI
+GasketSecMalloc (
+  IN  UINTN Size
+  );
+  
+VOID
+GasketSecFree (
+  IN  VOID *Ptr
+  );
 
 
 RETURN_STATUS

@@ -126,6 +126,34 @@ ASM_PFX(GasketSecPollStdIn):
   popq  %rbp
   ret
 
+ASM_GLOBAL ASM_PFX(GasketSecMalloc)
+ASM_PFX(GasketSecMalloc):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq    %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+
+  call  ASM_PFX(SecMalloc)
+  
+  popq  %rdi            // restore state
+  popq  %rsi
+  popq  %rbp
+  ret
+
+ASM_GLOBAL ASM_PFX(GasketSecFree)
+ASM_PFX(GasketSecFree):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq    %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+
+  call  ASM_PFX(SecFree)
+  
+  popq  %rdi            // restore state
+  popq  %rsi
+  popq  %rbp
+  ret
+
 
 ASM_GLOBAL ASM_PFX(GasketSecSetTimer)
 ASM_PFX(GasketSecSetTimer):

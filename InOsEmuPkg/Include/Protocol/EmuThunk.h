@@ -78,6 +78,18 @@ BOOLEAN
   );
 
 
+typedef
+VOID *
+(EFIAPI *EMU_OS_MALLOC) (
+  IN  UINTN Size
+  );
+  
+typedef 
+VOID
+(EFIAPI *EMU_OS_FREE) (
+  IN  VOID *Ptr
+  );
+
 
 typedef 
 EFI_STATUS
@@ -204,6 +216,13 @@ struct _EMU_THUNK_PROTOCOL {
   EMU_WRITE_STD_OUT                 WriteStdOut;
   EMU_READ_STD_IN                   ReadStdIn;
   EMU_POLL_STD_IN                   PollStdIn;
+  
+  //
+  // Map OS malloc/free so we can use OS based guard malloc
+  //
+  EMU_OS_MALLOC                     Malloc;
+  EMU_OS_FREE                       Free;
+  
   
   ///
   /// PE/COFF loader hooks to get symbols loaded

@@ -118,6 +118,23 @@ SecPollStdIn (
 }
 
 
+VOID *
+SecMalloc (
+  IN  UINTN Size
+  )
+{
+  return malloc ((size_t)Size);
+}
+
+VOID
+SecFree (
+  IN  VOID *Ptr
+  )
+{
+  free (Ptr);
+  return;
+}
+
 
 void
 settimer_handler (int sig)
@@ -370,6 +387,8 @@ EMU_THUNK_PROTOCOL gEmuThunkProtocol = {
   GasketSecWriteStdOut,
   GasketSecReadStdIn,
   GasketSecPollStdIn,
+  GasketSecMalloc,
+  GasketSecFree,
   GasketSecPeCoffGetEntryPoint,
   GasketSecPeCoffRelocateImageExtraAction,
   GasketSecPeCoffUnloadImageExtraAction,
