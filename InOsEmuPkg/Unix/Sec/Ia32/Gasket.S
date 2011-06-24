@@ -121,6 +121,20 @@ ASM_PFX(GasketSecMalloc):
   leave
   ret
 
+ASM_GLOBAL ASM_PFX(GasketSecValloc) 
+ASM_PFX(GasketSecValloc):
+  pushl %ebp
+  movl  %esp, %ebp
+  subl  $24, %esp      // sub extra 16 from the stack for alignment
+  and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
+
+  call    ASM_PFX(SecValloc)
+  
+  leave
+  ret
+
 ASM_GLOBAL ASM_PFX(GasketSecFree) 
 ASM_PFX(GasketSecFree):
   pushl %ebp

@@ -334,7 +334,11 @@ MapFd0 (
   OUT UINT64                    *Length
   );
 
- 
+BOOLEAN
+EfiSystemMemoryRange (
+  IN  VOID *MemoryAddress
+  );
+
 
 VOID SecSleep (UINT64 Nanoseconds);
 VOID SecEnableInterrupt (VOID);

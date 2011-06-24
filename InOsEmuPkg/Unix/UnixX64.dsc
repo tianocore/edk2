@@ -286,10 +286,10 @@
       # turn off CR3 write so that DXE IPL will not crash emulator
       BaseLib|UnixPkg/Library/UnixBaseLib/UnixBaseLib.inf
   }
-!endif
 
 [Components.IA32]
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf 
+!endif
 
 [Components]
 !ifdef $(UNIX_SEC_BUILD)
@@ -440,8 +440,9 @@
       ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
       SortLib|ShellPkg/Library/UefiSortLib/UefiSortLib.inf
       PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
-#      SafeBlockIoLib|ShellPkg/Library/SafeBlockIoLib/SafeBlockIoLib.inf
-#      SafeOpenProtocolLib|ShellPkg/Library/SafeOpenProtocolLib/SafeOpenProtocolLib.inf
+      MemoryAllocationLib|InOsEmuPkg/Library/GuardUefiMemoryAllocationLib/GuardUefiMemoryAllocationLib.inf
+      SafeBlockIoLib|ShellPkg/Library/SafeBlockIoLib/SafeBlockIoLib.inf
+      SafeOpenProtocolLib|ShellPkg/Library/SafeOpenProtocolLib/SafeOpenProtocolLib.inf
 
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF

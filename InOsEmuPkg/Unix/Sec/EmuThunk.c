@@ -126,13 +126,27 @@ SecMalloc (
   return malloc ((size_t)Size);
 }
 
-VOID
+VOID *
+SecValloc (
+  IN  UINTN Size
+  )
+{
+  return valloc ((size_t)Size);
+}
+
+BOOLEAN
 SecFree (
   IN  VOID *Ptr
   )
 {
+  if (EfiSystemMemoryRange (Ptr)) {
+    // If an address range is in the EFI memory map it was alloced via EFI.
+    // So don't free those ranges and let the caller know.
+    return FALSE;
+  }
+  
   free (Ptr);
-  return;
+  return TRUE;
 }
 
 
@@ -388,6 +402,7 @@ EMU_THUNK_PROTOCOL gEmuThunkProtocol = {
   GasketSecReadStdIn,
   GasketSecPollStdIn,
   GasketSecMalloc,
+  GasketSecValloc,
   GasketSecFree,
   GasketSecPeCoffGetEntryPoint,
   GasketSecPeCoffRelocateImageExtraAction,

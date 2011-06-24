@@ -627,6 +627,45 @@ SecUnixPeiAutoScan (
 /*++
 
 Routine Description:
+ Check to see if an address range is in the EFI GCD memory map.
+ 
+ This is all of GCD for system memory passed to DXE Core. FV 
+ mapping and other device mapped into system memory are not
+ inlcuded in the check. 
+
+Arguments:
+  Index      - Which memory region to use
+  MemoryBase - Return Base address of memory region
+  MemorySize - Return size in bytes of the memory region
+
+Returns:
+  TRUE -  Address is in the EFI GCD memory map
+  FALSE - Address is NOT in memory map
+
+**/
+BOOLEAN
+EfiSystemMemoryRange (
+  IN  VOID *MemoryAddress
+  )
+{
+  UINTN                 Index;
+  EFI_PHYSICAL_ADDRESS  MemoryBase;
+  
+  MemoryBase = (EFI_PHYSICAL_ADDRESS)(UINTN)MemoryAddress;
+  for (Index = 0; Index < gSystemMemoryCount; Index++) {
+    if ((MemoryBase >= gSystemMemory[Index].Memory) &&
+        (MemoryBase < (gSystemMemory[Index].Memory + gSystemMemory[Index].Size)) ) {
+      return TRUE;
+    }
+  }
+  
+  return FALSE;
+}
+
+
+/*++
+
+Routine Description:
   Since the SEC is the only Unix program in stack it must export
   an interface to do POSIX calls.  gUnix is initailized in UnixThunk.c.
 

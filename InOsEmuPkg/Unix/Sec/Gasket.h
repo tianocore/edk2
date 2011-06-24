@@ -58,8 +58,15 @@ EFIAPI
 GasketSecMalloc (
   IN  UINTN Size
   );
+
+VOID *
+EFIAPI
+GasketSecValloc (
+  IN  UINTN Size
+  );
   
-VOID
+BOOLEAN
+EFIAPI
 GasketSecFree (
   IN  VOID *Ptr
   );
