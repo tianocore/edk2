@@ -150,8 +150,16 @@ FreePages (
   IN UINTN  Pages
   )
 {
+  EFI_STATUS    Status;
+
   ASSERT (Pages != 0);
-  FreePool (Buffer);
+  if (!gEmuThunk->Free (Buffer)) {
+    // The Free thunk will not free memory allocated in emulated EFI memory.
+    // The assmuption is this was allocated directly by EFI. We need this as some 
+    // times protocols or EFI BootServices can return dynamically allocated buffers.
+    Status = gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
+    ASSERT_EFI_ERROR (Status);
+  }
 }
 
 /**
@@ -178,6 +186,7 @@ InternalAllocateAlignedPages (
   IN UINTN            Alignment
   )
 {
+  EFI_STATUS            Status;
   VOID                  *Memory;
   UINTN                 AlignedMemory;
   UINTN                 AlignmentMask;
@@ -213,7 +222,7 @@ InternalAllocateAlignedPages (
       //
       // Free first unaligned page(s).
       //
-      FreePool (Memory);
+      FreePages (Memory, UnalignedPages);
     }
     Memory         = (VOID *) (AlignedMemory + EFI_PAGES_TO_SIZE (Pages));
     UnalignedPages = RealPages - Pages - UnalignedPages;
@@ -221,7 +230,7 @@ InternalAllocateAlignedPages (
       //
       // Free last unaligned page(s).
       //
-      FreePool (Memory);
+      FreePages (Memory, UnalignedPages);
     }
   } else {
     //
@@ -341,9 +350,7 @@ FreeAlignedPages (
   IN UINTN  Pages
   )
 {
-  ASSERT (Pages != 0);
-
-  FreePool (Buffer);
+  FreePages (Buffer, Pages);
 }
 
 /**
@@ -799,13 +806,14 @@ FreePool (
   IN VOID   *Buffer
   )
 {
-  EFI_STATUS  Status;
-  
+  EFI_STATUS    Status;
+
   if (!gEmuThunk->Free (Buffer)) {
     // The Free thunk will not free memory allocated in emulated EFI memory.
     // The assmuption is this was allocated directly by EFI. We need this as some 
     // times protocols or EFI BootServices can return dynamically allocated buffers.
-    gBS->FreePool (Buffer);
+    Status = gBS->FreePool (Buffer);
+    ASSERT_EFI_ERROR (Status);
   }
 }
 
