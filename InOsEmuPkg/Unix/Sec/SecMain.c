@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #ifdef __APPLE__
 #define MAP_ANONYMOUS MAP_ANON
-char *gGdbWorkingFileName = NULL;
 #endif
 
 
@@ -30,7 +29,8 @@ EMU_THUNK_PPI mSecEmuThunkPpi = {
   GasketSecEmuThunkAddress
 };
 
-
+char *gGdbWorkingFileName = NULL;
+UINTN mScriptSymbolChangesCount = 0;
 
 
 //
@@ -95,6 +95,7 @@ main (
   CHAR16                *MemorySizeStr;
   CHAR16                *FirmwareVolumesStr;
   UINTN                 *StackPointer;
+  FILE                  *GdbTempFile;
 
   setbuf (stdout, 0);
   setbuf (stderr, 0);
@@ -128,19 +129,22 @@ main (
   
   gPpiList = GetThunkPpiList (); 
 
-
-#ifdef __APPLE__
   //
-  // We can't use dlopen on OS X, so we need a scheme to get symboles into gdb
-  // We need to create a temp file that contains gdb commands so we can load
-  // symbols when we load every PE/COFF image.
+  // If dlopen doesn't work, then we build a gdb script to allow the
+  // symbols to be loaded.
   //
   Index = strlen (*Argv);
   gGdbWorkingFileName = AllocatePool (Index + strlen(".gdb") + 1);
   strcpy (gGdbWorkingFileName, *Argv);
   strcat (gGdbWorkingFileName, ".gdb");
-#endif
 
+  //
+  // Empty out the gdb symbols script file.
+  //
+  GdbTempFile = fopen (gGdbWorkingFileName, "w");
+  if (GdbTempFile != NULL) {
+    fclose (GdbTempFile);
+  }
 
   //
   // Allocate space for gSystemMemory Array
@@ -1050,89 +1054,25 @@ PrintLoadAddress (
 }
 
 
-VOID
-EFIAPI
-SecPeCoffRelocateImageExtraAction (
+/**
+  Loads the image using dlopen so symbols will be automatically
+  loaded by gdb.
+
+  @param  ImageContext  The PE/COFF image context
+
+  @retval TRUE - The image was successfully loaded
+  @retval FALSE - The image was successfully loaded
+
+**/
+BOOLEAN
+DlLoadImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
 
 #ifdef __APPLE__
-  BOOLEAN EnabledOnEntry;
 
-   //
-   // Make sure writting of the file is an atomic operation
-   //
-   if (SecInterruptEanbled ()) {
-     SecDisableInterrupt ();
-     EnabledOnEntry = TRUE;
-   } else {
-     EnabledOnEntry = FALSE;
-   }
-
-  PrintLoadAddress (ImageContext);
-
-  //
-  // In mach-o (OS X executable) dlopen() can only load files in the MH_DYLIB of MH_BUNDLE format.
-  // To convert to PE/COFF we need to construct a mach-o with the MH_PRELOAD format. We create
-  // .dSYM files for the PE/COFF images that can be used by gdb for source level debugging.
-  //
-  FILE  *GdbTempFile;
-
-  //
-  // In the Mach-O to PE/COFF conversion the size of the PE/COFF headers is not accounted for.
-  // Thus we need to skip over the PE/COFF header when giving load addresses for our symbol table.
-  //
-  if (ImageContext->PdbPointer != NULL && !IsPdbFile (ImageContext->PdbPointer)) {
-    //
-    // Now we have a database of the images that are currently loaded
-    //
-
-    //
-    // 'symbol-file' will clear out currnet symbol mappings in gdb.
-    // you can do a 'add-symbol-file filename address' for every image we loaded to get source
-    // level debug in gdb. Note Sec, being a true application will work differently.
-    //
-    // We add the PE/COFF header size into the image as the mach-O does not have a header in
-    // loaded into system memory.
-    //
-    // This gives us a data base of gdb commands and after something is unloaded that entry will be
-    // removed. We don't yet have the scheme of how to comunicate with gdb, but we have the
-    // data base of info ready to roll.
-    //
-    // We could use qXfer:libraries:read, but OS X GDB does not currently support it.
-    //  <library-list>
-    //    <library name="/lib/libc.so.6">   // ImageContext->PdbPointer
-    //      <segment address="0x10000000"/> // ImageContext->ImageAddress + ImageContext->SizeOfHeaders
-    //    </library>
-    //  </library-list>
-    //
-
-    //
-    // Write the file we need for the gdb script
-    //
-    GdbTempFile = fopen (gGdbWorkingFileName, "w");
-    if (GdbTempFile != NULL) {
-      fprintf (GdbTempFile, "add-symbol-file %s 0x%08lx\n", ImageContext->PdbPointer, (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders));
-      fclose (GdbTempFile);
-
-      //
-      // Target for gdb breakpoint in a script that uses gGdbWorkingFileName to set a breakpoint.
-      // Hey what can you say scripting in gdb is not that great....
-      //
-      SecGdbScriptBreak ();
-    } else {
-      ASSERT (FALSE);
-    }
-
-    AddHandle (ImageContext, ImageContext->PdbPointer);
-
-    if (EnabledOnEntry) {
-      SecEnableInterrupt ();
-    }
-
-    
-  }
+  return FALSE;
 
 #else
 
@@ -1140,11 +1080,11 @@ SecPeCoffRelocateImageExtraAction (
   void        *Entry = NULL;
 
   if (ImageContext->PdbPointer == NULL) {
-    return;
+    return FALSE;
   }
 
   if (!IsPdbFile (ImageContext->PdbPointer)) {
-    return;
+    return FALSE;
   }
 
   fprintf (
@@ -1166,13 +1106,131 @@ SecPeCoffRelocateImageExtraAction (
   if (Entry != NULL) {
     ImageContext->EntryPoint = (UINTN)Entry;
     printf ("Change %s Entrypoint to :0x%08lx\n", ImageContext->PdbPointer, (unsigned long)Entry);
+    return TRUE;
+  } else {
+    return FALSE;
   }
 
-  SecUnixLoaderBreak ();
-
 #endif
+}
 
-  return;
+
+/**
+  Adds the image to a gdb script so it's symbols can be loaded.
+  The AddFirmwareSymbolFile helper macro is used.
+
+  @param  ImageContext  The PE/COFF image context
+
+**/
+VOID
+GdbScriptAddImage (
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  )
+{
+  BOOLEAN InterruptsWereEnabled;
+
+   //
+   // Disable interrupts to make sure writing of the .gdb file
+   // is an atomic operation.
+   //
+   if (SecInterruptEanbled ()) {
+     SecDisableInterrupt ();
+     InterruptsWereEnabled = TRUE;
+   } else {
+     InterruptsWereEnabled = FALSE;
+   }
+
+  PrintLoadAddress (ImageContext);
+
+  if (ImageContext->PdbPointer != NULL && !IsPdbFile (ImageContext->PdbPointer)) {
+    FILE  *GdbTempFile;
+    GdbTempFile = fopen (gGdbWorkingFileName, "a");
+    if (GdbTempFile != NULL) {
+      long unsigned int SymbolsAddr = (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders);
+      mScriptSymbolChangesCount++;
+      fprintf (
+        GdbTempFile,
+        "AddFirmwareSymbolFile 0x%x %s 0x%08lx\n",
+        mScriptSymbolChangesCount,
+        ImageContext->PdbPointer,
+        SymbolsAddr
+        );
+      fclose (GdbTempFile);
+    } else {
+      ASSERT (FALSE);
+    }
+
+    AddHandle (ImageContext, ImageContext->PdbPointer);
+
+    if (InterruptsWereEnabled) {
+      SecEnableInterrupt ();
+    }
+
+  }
+}
+
+
+VOID
+EFIAPI
+SecPeCoffRelocateImageExtraAction (
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  )
+{
+  if (!DlLoadImage (ImageContext)) {
+    GdbScriptAddImage (ImageContext);
+  }
+}
+
+
+/**
+  Adds the image to a gdb script so it's symbols can be unloaded.
+  The RemoveFirmwareSymbolFile helper macro is used.
+
+  @param  ImageContext  The PE/COFF image context
+
+**/
+VOID
+GdbScriptRemoveImage (
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  )
+{
+  FILE  *GdbTempFile;
+  BOOLEAN InterruptsWereEnabled;
+
+  //
+  // Need to skip .PDB files created from VC++
+  //
+  if (IsPdbFile (ImageContext->PdbPointer)) {
+    return;
+  }
+
+  if (SecInterruptEanbled ()) {
+    SecDisableInterrupt ();
+    InterruptsWereEnabled = TRUE;
+  } else {
+    InterruptsWereEnabled = FALSE;
+  }
+
+  //
+  // Write the file we need for the gdb script
+  //
+  GdbTempFile = fopen (gGdbWorkingFileName, "a");
+  if (GdbTempFile != NULL) {
+    mScriptSymbolChangesCount++;
+    fprintf (
+      GdbTempFile,
+      "RemoveFirmwareSymbolFile 0x%x %s\n",
+      mScriptSymbolChangesCount,
+      ImageContext->PdbPointer
+      );
+    fclose (GdbTempFile);
+  } else {
+    ASSERT (FALSE);
+  }
+  
+  if (InterruptsWereEnabled) {
+    SecEnableInterrupt ();
+  }
 }
 
 
@@ -1184,57 +1242,19 @@ SecPeCoffUnloadImageExtraAction (
 {
   VOID *Handle;
 
+  //
+  // Check to see if the image symbols were loaded with gdb script, or dlopen
+  //
   Handle = RemoveHandle (ImageContext);
 
-#ifdef __APPLE__
-  FILE  *GdbTempFile;
-  BOOLEAN EnabledOnEntry;
-
-  if (Handle != NULL) {
-    //
-    // Need to skip .PDB files created from VC++
-    //
-    if (!IsPdbFile (ImageContext->PdbPointer)) {
-       if (SecInterruptEanbled ()) {
-         SecDisableInterrupt ();
-         EnabledOnEntry = TRUE;
-       } else {
-         EnabledOnEntry = FALSE;
-       }
-       
-      //
-      // Write the file we need for the gdb script
-      //
-      GdbTempFile = fopen (gGdbWorkingFileName, "w");
-      if (GdbTempFile != NULL) {
-        fprintf (GdbTempFile, "remove-symbol-file %s\n", ImageContext->PdbPointer);
-        fclose (GdbTempFile);
-
-        //
-        // Target for gdb breakpoint in a script that uses gGdbWorkingFileName to set a breakpoint.
-        // Hey what can you say scripting in gdb is not that great....
-        //
-        SecGdbScriptBreak ();
-      } else {
-        ASSERT (FALSE);
-      }
-      
-      if (EnabledOnEntry) {
-        SecEnableInterrupt ();
-      }
-    }
-  }
-
-#else
-  //
-  // Don't want to confuse gdb with symbols for something that got unloaded
-  //
-  if (Handle != NULL) {
+  if (Handle == NULL) {
+#ifndef __APPLE__
     dlclose (Handle);
+#endif
+    return;
   }
 
-#endif
-  return;
+  GdbScriptRemoveImage (ImageContext);
 }
 
 

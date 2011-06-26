@@ -27,6 +27,43 @@ set $_exitcode = 42
 define hook-stop
   if $_exitcode != 42
     quit
+  else
+    source SecMain.gdb
+  end
+end
+
+#
+# We keep track of the number of symbol files we have loaded via gdb
+# scripts in the $SymbolFilesAdded variable
+#
+set $SymbolFileChangesCount = 0
+
+#
+# This macro adds a symbols file for gdb
+#
+# @param  $arg0 - Symbol file changes number
+# @param  $arg1 - Symbol file name
+# @param  $arg2 - Image address
+#
+define AddFirmwareSymbolFile
+  if $SymbolFileChangesCount < $arg0
+    add-symbol-file $arg1 $arg2
+    set $SymbolFileChangesCount = $arg0
+  end
+end
+
+#
+# This macro removes a symbols file for gdb
+#
+# @param  $arg0 - Symbol file changes number
+# @param  $arg1 - Symbol file name
+#
+define RemoveFirmwareSymbolFile
+  if $SymbolFileChangesCount < $arg0
+    #
+    # Currently there is not a method to remove a single symbol file
+    #
+    set $SymbolFileChangesCount = $arg0
   end
 end
 
