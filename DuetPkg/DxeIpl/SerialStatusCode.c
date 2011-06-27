@@ -675,7 +675,7 @@ Returns:
     //
     // Callout to platform Lib function to do print.
     //
-    SerialPortWrite (Buffer, CharCount);
+    SerialPortWrite ((UINT8 *) Buffer, CharCount);
   }
 
   //
@@ -727,7 +727,7 @@ Returns:
           Instance
           );
 
-        SerialPortWrite (Buffer, CharCount);
+        SerialPortWrite ((UINT8 *) Buffer, CharCount);
       }
     }
 
