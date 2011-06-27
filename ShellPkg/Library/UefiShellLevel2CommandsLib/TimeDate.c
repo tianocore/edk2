@@ -102,7 +102,10 @@ CheckAndSetDate (
   }
 
   Status = gRT->GetTime(&TheTime, NULL);
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR(Status)) {
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"gRT->GetTime", Status);
+    return (SHELL_DEVICE_ERROR);
+  }
 
   DateStringCopy = NULL;
   DateStringCopy = StrnCatGrow(&DateStringCopy, NULL, DateString, 0);
