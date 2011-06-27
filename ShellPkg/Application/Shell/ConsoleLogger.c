@@ -258,10 +258,12 @@ UpdateDisplayFromHistory(
   CHAR16          *StringSegment;
   CHAR16          *StringSegmentEnd;
   CHAR16          StringSegmentEndChar;
+  INT32           OrigAttribute;
 
   ASSERT(ConsoleInfo != NULL);
   TempCharHolder = CHAR_NULL;
   RetVal = EFI_SUCCESS;
+  OrigAttribute = ConsoleInfo->OldConOut->Mode->Attribute;
 
   //
   // Disable cursor visibility and move it to the top left corner
@@ -369,6 +371,11 @@ UpdateDisplayFromHistory(
     if (EFI_ERROR (Status)) {
       RetVal = Status;
     }
+  } else {
+    ConsoleInfo->OldConOut->SetAttribute (
+                                ConsoleInfo->OldConOut,
+                                OrigAttribute
+                               );
   }
 
   return (RetVal);
