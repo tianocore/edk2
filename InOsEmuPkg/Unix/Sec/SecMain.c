@@ -59,6 +59,26 @@ IMAGE_CONTEXT_TO_MOD_HANDLE  *mImageContextModHandleArray = NULL;
 
 EFI_PEI_PPI_DESCRIPTOR  *gPpiList;
 
+
+int gInXcode = 0;
+
+
+/*++
+  Breakpoint target for Xcode project. Set in the Xcode XML
+  
+  Xcode breakpoint will 'source SecMain.gdb'
+  gGdbWorkingFileName is set to SecMain.gdb
+
+**/
+VOID
+SecGdbConfigBreak (
+  VOID
+  )
+{
+}
+
+
+
 /*++
 
 Routine Description:
@@ -96,14 +116,37 @@ main (
   CHAR16                *FirmwareVolumesStr;
   UINTN                 *StackPointer;
   FILE                  *GdbTempFile;
+  
+  //
+  // Xcode does not support sourcing gdb scripts directly, so the Xcode XML 
+  // has a break point script to source the GdbRun script.
+  //
+  SecGdbConfigBreak ();
+  
+  //
+  // If dlopen doesn't work, then we build a gdb script to allow the
+  // symbols to be loaded.
+  //
+  Index = strlen (*Argv);
+  gGdbWorkingFileName = AllocatePool (Index + strlen(".gdb") + 1);
+  strcpy (gGdbWorkingFileName, *Argv);
+  strcat (gGdbWorkingFileName, ".gdb");
 
+  //
+  // Empty out the gdb symbols script file.
+  //
+  GdbTempFile = fopen (gGdbWorkingFileName, "w");
+  if (GdbTempFile != NULL) {
+    fclose (GdbTempFile);
+  }
+
+  printf ("\nEDK II UNIX Host Emulation Environment from edk2.sourceforge.net\n");
+  
   setbuf (stdout, 0);
   setbuf (stderr, 0);
 
   MemorySizeStr      = (CHAR16 *) PcdGetPtr (PcdEmuMemorySize);
   FirmwareVolumesStr = (CHAR16 *) PcdGetPtr (PcdEmuFirmwareVolume);
-
-  printf ("\nEDK II UNIX Emulation Environment from edk2.sourceforge.net\n");
 
   //
   // PPIs pased into PEI_CORE
@@ -128,23 +171,6 @@ main (
   // EmuSecLibConstructor ();
   
   gPpiList = GetThunkPpiList (); 
-
-  //
-  // If dlopen doesn't work, then we build a gdb script to allow the
-  // symbols to be loaded.
-  //
-  Index = strlen (*Argv);
-  gGdbWorkingFileName = AllocatePool (Index + strlen(".gdb") + 1);
-  strcpy (gGdbWorkingFileName, *Argv);
-  strcat (gGdbWorkingFileName, ".gdb");
-
-  //
-  // Empty out the gdb symbols script file.
-  //
-  GdbTempFile = fopen (gGdbWorkingFileName, "w");
-  if (GdbTempFile != NULL) {
-    fclose (GdbTempFile);
-  }
 
   //
   // Allocate space for gSystemMemory Array
@@ -974,34 +1000,6 @@ RemoveHandle (
 
 
 
-//
-// Target for gdb breakpoint in a script that uses gGdbWorkingFileName to source a
-// add-symbol-file command. Hey what can you say scripting in gdb is not that great....
-//
-// Put .gdbinit in the CWD where you do gdb SecMain.dll for source level debug
-//
-// cat .gdbinit
-// b SecGdbScriptBreak
-// command
-// silent
-// source SecMain.gdb
-// c
-// end
-//
-VOID
-SecGdbScriptBreak (
-  VOID
-  )
-{
-}
-
-VOID
-SecUnixLoaderBreak (
-  VOID
-  )
-{
-}
-
 BOOLEAN
 IsPdbFile (
   IN  CHAR8   *PdbFileName
@@ -1096,9 +1094,9 @@ DlLoadImage (
      );
 
   Handle = dlopen (ImageContext->PdbPointer, RTLD_NOW);
-
-  if (Handle) {
+  if (Handle != NULL) {
     Entry = dlsym (Handle, "_ModuleEntryPoint");
+    AddHandle (ImageContext, Handle);
   } else {
     printf("%s\n", dlerror());
   }
@@ -1127,18 +1125,6 @@ GdbScriptAddImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
-  BOOLEAN InterruptsWereEnabled;
-
-   //
-   // Disable interrupts to make sure writing of the .gdb file
-   // is an atomic operation.
-   //
-   if (SecInterruptEanbled ()) {
-     SecDisableInterrupt ();
-     InterruptsWereEnabled = TRUE;
-   } else {
-     InterruptsWereEnabled = FALSE;
-   }
 
   PrintLoadAddress (ImageContext);
 
@@ -1159,13 +1145,6 @@ GdbScriptAddImage (
     } else {
       ASSERT (FALSE);
     }
-
-    AddHandle (ImageContext, ImageContext->PdbPointer);
-
-    if (InterruptsWereEnabled) {
-      SecEnableInterrupt ();
-    }
-
   }
 }
 
@@ -1195,20 +1174,12 @@ GdbScriptRemoveImage (
   )
 {
   FILE  *GdbTempFile;
-  BOOLEAN InterruptsWereEnabled;
 
   //
   // Need to skip .PDB files created from VC++
   //
   if (IsPdbFile (ImageContext->PdbPointer)) {
     return;
-  }
-
-  if (SecInterruptEanbled ()) {
-    SecDisableInterrupt ();
-    InterruptsWereEnabled = TRUE;
-  } else {
-    InterruptsWereEnabled = FALSE;
   }
 
   //
@@ -1227,10 +1198,6 @@ GdbScriptRemoveImage (
   } else {
     ASSERT (FALSE);
   }
-  
-  if (InterruptsWereEnabled) {
-    SecEnableInterrupt ();
-  }
 }
 
 
@@ -1246,7 +1213,6 @@ SecPeCoffUnloadImageExtraAction (
   // Check to see if the image symbols were loaded with gdb script, or dlopen
   //
   Handle = RemoveHandle (ImageContext);
-
   if (Handle != NULL) {
 #ifndef __APPLE__
     dlclose (Handle);

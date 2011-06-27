@@ -5,7 +5,7 @@
 		activeExecutable = BA11A1010FB10BCE00D06FEC /* SecMain.dll */;
 		activeTarget = D28A88AD04BDD90700651E21 /* xcode_project */;
 		breakpoints = (
-			BA11A11A0FB10E0700D06FEC /* SecGdbScriptBreak */,
+			BA11A11A0FB10E0700D06FEC /* SecGdbConfigBreak */,
 		);
 		codeSenseManager = BA11A0FE0FB10B4800D06FEC /* Code sense */;
 		executables = (
@@ -161,7 +161,7 @@
 		path = ../../../../Build/EmuUnixIa32/DEBUG_XCLANG/IA32/SecMain;
 		sourceTree = SOURCE_ROOT;
 	};
-	BA11A11A0FB10E0700D06FEC /* SecGdbScriptBreak */ = {
+	BA11A11A0FB10E0700D06FEC /* SecGdbConfigBreak */ = {
 		isa = PBXSymbolicBreakpoint;
 		actions = (
 			BA11A11E0FB10E2200D06FEC /* XCBreakpointCommandAction */,
@@ -176,11 +176,11 @@
 		modificationTime = 263261853.260195;
 		originalNumberOfMultipleMatches = 1;
 		state = 1;
-		symbolName = SecGdbScriptBreak;
+		symbolName = SecGdbConfigBreak;
 	};
 	BA11A11E0FB10E2200D06FEC /* XCBreakpointCommandAction */ = {
 		isa = XCBreakpointCommandAction;
-		command = "source SecMain.gdb";
+		command = "set gInXcode=1\nsource ../../../../InOsEmuPkg/Unix/GdbRun";
 		fallbackIsa = XCBreakpointAction;
 		logCommand = 0;
 		useDebuggerSideImplementation = 1;
