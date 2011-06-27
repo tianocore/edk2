@@ -30,7 +30,7 @@ EMU_THUNK_PPI mSecEmuThunkPpi = {
 };
 
 char *gGdbWorkingFileName = NULL;
-UINTN mScriptSymbolChangesCount = 0;
+unsigned int mScriptSymbolChangesCount = 0;
 
 
 //
@@ -1247,7 +1247,7 @@ SecPeCoffUnloadImageExtraAction (
   //
   Handle = RemoveHandle (ImageContext);
 
-  if (Handle == NULL) {
+  if (Handle != NULL) {
 #ifndef __APPLE__
     dlclose (Handle);
 #endif
