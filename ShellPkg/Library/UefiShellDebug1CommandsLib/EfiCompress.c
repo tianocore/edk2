@@ -113,6 +113,7 @@ ShellCommandRunEfiCompress (
           ASSERT_EFI_ERROR(Status);
           InBuffer = AllocateZeroPool((UINTN)InSize);
           ASSERT(InBuffer != NULL);
+          InSize2 = (UINTN)InSize;
           Status = gEfiShellProtocol->ReadFile(InShellFileHandle, &InSize2, InBuffer);
           InSize = InSize2;
           ASSERT_EFI_ERROR(Status);
