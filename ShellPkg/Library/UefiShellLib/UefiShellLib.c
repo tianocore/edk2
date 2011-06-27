@@ -483,12 +483,10 @@ ShellOpenFileByDevicePath(
   EFI_FILE_PROTOCOL               *Handle1;
   EFI_FILE_PROTOCOL               *Handle2;
 
-  //
-  // ASERT for FileHandle, FilePath, and DeviceHandle being NULL
-  //
-  ASSERT(FilePath != NULL);
-  ASSERT(FileHandle != NULL);
-  ASSERT(DeviceHandle != NULL);
+  if (FilePath == NULL || FileHandle == NULL || DeviceHandle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
+
   //
   // which shell interface should we use
   //
@@ -601,7 +599,7 @@ ShellOpenFileByDevicePath(
   otherwise, the Filehandle is NULL. The Attributes is valid only for
   EFI_FILE_MODE_CREATE.
 
-  if FileNAme is NULL then ASSERT()
+  if FileName is NULL then ASSERT()
 
   @param  FileName 		  pointer to file name
   @param  FileHandle		pointer to the file handle.
@@ -1047,8 +1045,11 @@ ShellGetExecutionBreakFlag(
   //
   // using EFI Shell; call the function to check
   //
-  ASSERT(mEfiShellEnvironment2 != NULL);
-  return (mEfiShellEnvironment2->GetExecutionBreak());
+  if (mEfiShellEnvironment2 != NULL) {
+    return (mEfiShellEnvironment2->GetExecutionBreak());
+  }
+
+  return (FALSE);
 }
 /**
   return the value of an environment variable
@@ -1075,14 +1076,13 @@ ShellGetEnvironmentVariable (
   }
 
   //
-  // ASSERT that we must have EFI shell
+  // Check for EFI shell
   //
-  ASSERT(mEfiShellEnvironment2 != NULL);
+  if (mEfiShellEnvironment2 != NULL) {
+    return (mEfiShellEnvironment2->GetEnv((CHAR16*)EnvKey));
+  }
 
-  //
-  // using EFI Shell
-  //
-  return (mEfiShellEnvironment2->GetEnv((CHAR16*)EnvKey));
+  return NULL;
 }
 /**
   set the value of an environment variable
@@ -1177,17 +1177,21 @@ ShellExecute (
                                       EnvironmentVariables,
                                       Status));
   }
+
   //
-  // ASSERT that we must have EFI shell
+  // Check for EFI shell
   //
-  ASSERT(mEfiShellEnvironment2 != NULL);
-  //
-  // Call EFI Shell version (not using EnvironmentVariables or Status parameters)
-  // Due to oddity in the EFI shell we want to dereference the ParentHandle here
-  //
-  return (mEfiShellEnvironment2->Execute(*ParentHandle,
-                                        CommandLine,
-                                        Output));
+  if (mEfiShellEnvironment2 != NULL) {
+    //
+    // Call EFI Shell version (not using EnvironmentVariables or Status parameters)
+    // Due to oddity in the EFI shell we want to dereference the ParentHandle here
+    //
+    return (mEfiShellEnvironment2->Execute(*ParentHandle,
+                                          CommandLine,
+                                          Output));
+  }
+
+  return (EFI_UNSUPPORTED);
 }
 /**
   Retreives the current directory path
@@ -1213,6 +1217,7 @@ ShellGetCurrentDir (
   if (mEfiShellProtocol != NULL) {
     return (mEfiShellProtocol->GetCurDir(DeviceName));
   }
+
   //
   // Check for EFI shell
   //
@@ -1251,14 +1256,15 @@ ShellSetPageBreakMode (
       return;
     } else {
       //
-      // ASSERT that must have EFI Shell
+      // Check for EFI shell
       //
-      ASSERT(mEfiShellEnvironment2 != NULL);
-      //
-      // Enable with EFI Shell
-      //
-      mEfiShellEnvironment2->EnablePageBreak (DEFAULT_INIT_ROW, DEFAULT_AUTO_LF);
-      return;
+      if (mEfiShellEnvironment2 != NULL) {
+        //
+        // Enable with EFI Shell
+        //
+        mEfiShellEnvironment2->EnablePageBreak (DEFAULT_INIT_ROW, DEFAULT_AUTO_LF);
+        return;
+      }
     }
   } else {
     //
@@ -1272,14 +1278,15 @@ ShellSetPageBreakMode (
       return;
     } else {
       //
-      // ASSERT that must have EFI Shell
+      // Check for EFI shell
       //
-      ASSERT(mEfiShellEnvironment2 != NULL);
-      //
-      // Disable with EFI Shell
-      //
-      mEfiShellEnvironment2->DisablePageBreak ();
-      return;
+      if (mEfiShellEnvironment2 != NULL) {
+        //
+        // Disable with EFI Shell
+        //
+        mEfiShellEnvironment2->DisablePageBreak ();
+        return;
+      }
     }
   }
 }
@@ -1463,49 +1470,50 @@ ShellOpenFileMetaArg (
   }
 
   //
-  // ASSERT that we must have EFI shell
+  // Check for EFI shell
   //
-  ASSERT(mEfiShellEnvironment2 != NULL);
+  if (mEfiShellEnvironment2 != NULL) {
+    //
+    // make sure the list head is initialized
+    //
+    InitializeListHead(&mOldStyleFileList);
 
-  //
-  // make sure the list head is initialized
-  //
-  InitializeListHead(&mOldStyleFileList);
+    //
+    // Get the EFI Shell list of files
+    //
+    Status = mEfiShellEnvironment2->FileMetaArg(Arg, &mOldStyleFileList);
+    if (EFI_ERROR(Status)) {
+      *ListHead = NULL;
+      return (Status);
+    }
 
-  //
-  // Get the EFI Shell list of files
-  //
-  Status = mEfiShellEnvironment2->FileMetaArg(Arg, &mOldStyleFileList);
-  if (EFI_ERROR(Status)) {
-    *ListHead = NULL;
+    if (*ListHead == NULL) {
+      *ListHead = (EFI_SHELL_FILE_INFO    *)AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
+      if (*ListHead == NULL) {
+        return (EFI_OUT_OF_RESOURCES);
+      }
+      InitializeListHead(&((*ListHead)->Link));
+    }
+
+    //
+    // Convert that to equivalent of UEFI Shell 2.0 structure
+    //
+    InternalShellConvertFileListType(&mOldStyleFileList, &(*ListHead)->Link);
+
+    //
+    // Free the EFI Shell version that was converted.
+    //
+    mEfiShellEnvironment2->FreeFileList(&mOldStyleFileList);
+
+    if ((*ListHead)->Link.ForwardLink == (*ListHead)->Link.BackLink && (*ListHead)->Link.BackLink == &((*ListHead)->Link)) {
+      FreePool(*ListHead);
+      *ListHead = NULL;
+      Status = EFI_NOT_FOUND;
+    }
     return (Status);
   }
 
-  if (*ListHead == NULL) {
-    *ListHead = (EFI_SHELL_FILE_INFO    *)AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
-    if (*ListHead == NULL) {
-      return (EFI_OUT_OF_RESOURCES);
-    }
-    InitializeListHead(&((*ListHead)->Link));
-  }
-
-  //
-  // Convert that to equivalent of UEFI Shell 2.0 structure
-  //
-  InternalShellConvertFileListType(&mOldStyleFileList, &(*ListHead)->Link);
-
-  //
-  // Free the EFI Shell version that was converted.
-  //
-  mEfiShellEnvironment2->FreeFileList(&mOldStyleFileList);
-
-  if ((*ListHead)->Link.ForwardLink == (*ListHead)->Link.BackLink && (*ListHead)->Link.BackLink == &((*ListHead)->Link)) {
-    FreePool(*ListHead);
-    *ListHead = NULL;
-    Status = EFI_NOT_FOUND;
-  }
-
-  return (Status);
+  return (EFI_UNSUPPORTED);
 }
 /**
   Free the linked list returned from ShellOpenFileMetaArg.
@@ -1534,7 +1542,7 @@ ShellCloseFileMetaArg (
   //
   if (mEfiShellProtocol != NULL) {
     return (mEfiShellProtocol->FreeFileList(ListHead));
-  } else {
+  } else if (mEfiShellEnvironment2 != NULL) {
     //
     // Since this is EFI Shell version we need to free our internally made copy
     // of the list
@@ -1551,6 +1559,8 @@ ShellCloseFileMetaArg (
     }
     return EFI_SUCCESS;
   }
+
+  return (EFI_UNSUPPORTED);
 }
 
 /**
