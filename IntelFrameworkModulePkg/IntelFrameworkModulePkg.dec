@@ -56,6 +56,9 @@
   ## Include/Guid/AcpiVariable.h
   gEfiAcpiVariableCompatiblityGuid   = { 0xc020489e, 0x6db2, 0x4ef2, { 0x9a, 0xa5, 0xca, 0x6,  0xfc, 0x11, 0xd3, 0x6a }}
 
+  ## Include/Guid/LegacyBios.h
+  gEfiLegacyBiosGuid                 = { 0x2E3044AC, 0x879F, 0x490F, { 0x97, 0x60, 0xBB, 0xDF, 0xAF, 0x69, 0x5F, 0x50 }}
+
 [Protocols]
   ## Vga Mini port binding for a VGA controller
   #  Include/Protocol/VgaMiniPort.h
@@ -87,6 +90,10 @@
   ## This PCD specifies whether Serial device use half hand shake.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE|BOOLEAN|0x00010043
 
+  ## Indicates if CSM support is needed for ACPI S3 Save.
+  #  If TRUE, CSM support is enclosed for ACPI S3 Save.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformCsmSupport|TRUE|BOOLEAN|0x00010044
+
 [PcdsFixedAtBuild]
   ## FFS filename to find the default BMP Logo file.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile |{ 0x99, 0x8b, 0xB2, 0x7B, 0xBB, 0x61, 0xD5, 0x11, 0x9A, 0x5D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }|VOID*|0x40000003
@@ -113,8 +120,25 @@
   #  This PCD should be set as HII type PCD by platform integrator mapped to variable L"HwErrRecSupport"
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|0|UINT16|0x40000002
 
-
 [PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx, PcdsPatchableInModule]
   ## I/O Base address of floppy device controller.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFdcBaseAddress|0x3f0|UINT16|0x30000000
+
+  ## If TRUE, BiosVideo will switch to 80x25 Text VGA Mode when exiting boot service.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoSetTextVgaModeEnable|FALSE|BOOLEAN|0x30000001
+
+  ## If TRUE, BiosVideo will check for VESA BIOS Extension service support.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoCheckVbeEnable|TRUE|BOOLEAN|0x30000002
+
+  ## If TRUE, BiosVideo will check for VGA service support.
+  #  NOTE: If both PcdBiosVideoCheckVbeEnable and PcdBiosVideoCheckVgaEnable are set to FALSE,
+  #  that means Graphics Output protocol will not be installed, the VGA miniport protocol will be installed instead.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoCheckVgaEnable|TRUE|BOOLEAN|0x30000003
+
+  ## If TRUE, memory space for legacy region will be set as cacheable.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLegacyBiosCacheLegacyRegion|TRUE|BOOLEAN|0x00000004
+
+  ## The PCD is used to specify memory size with bytes to reserve EBDA for OPROM.
+  ## The value should be a multiple of 4KB.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEbdaReservedMemorySize|0x8000|UINT32|0x30000005
 

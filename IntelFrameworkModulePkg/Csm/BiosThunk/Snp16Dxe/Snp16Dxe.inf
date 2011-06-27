@@ -1,0 +1,67 @@
+## @file
+# Thunk wrapper UEFI driver to produce EFI SNP protocol based on legacy 16 NIC ROM.
+#
+# Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions
+# of the BSD License which accompanies this distribution.  The
+# full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  BASE_NAME                            = BiosSnp16
+  FILE_GUID                            = D0CAA91E-2DE4-4b0d-B3DC-09C67E854E34
+  MODULE_TYPE                          = UEFI_DRIVER
+  INF_VERSION                          = 0x00010005
+  VERSION_STRING                       = 1.0
+  
+  ENTRY_POINT                          = BiosSnp16DriverEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gBiosSnp16DriverBinding
+#  COMPONENT_NAME                =  gBiosSnp16ComponentName
+#
+
+[Sources]
+  BiosSnp16.h
+  BiosSnp16.c
+  Misc.c
+  Pxe.h
+  PxeUndi.c
+  ComponentName.c
+
+
+[Libraryclasses]
+  UefiDriverEntryPoint
+  DebugLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+  UefiLib
+  BaseLib
+  DevicePathLib
+  MemoryAllocationLib
+
+[Guids]
+  gEfiEventExitBootServicesGuid
+
+[Protocols]
+  gEfiNetworkInterfaceIdentifierProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiSimpleNetworkProtocolGuid
+  gEfiPciIoProtocolGuid
+  gEfiLegacyBiosProtocolGuid
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+

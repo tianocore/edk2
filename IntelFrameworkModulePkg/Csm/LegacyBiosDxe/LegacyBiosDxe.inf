@@ -1,0 +1,143 @@
+## @file
+# Legacy Bios Module to support CSM.
+#
+# This driver installs Legacy Bios Protocol to support CSM module work in EFI system.
+#
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions
+# of the BSD License which accompanies this distribution.  The
+# full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LegacyBiosDxe
+  FILE_GUID                      = F122A15C-C10B-4d54-8F48-60F4F06DD1AD
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = LegacyBiosInstall
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+
+[Sources]
+  LegacyCmos.c
+  LegacyIde.c
+  LegacyBios.c
+  LegacyBda.c
+  LegacyBiosInterface.h
+  LegacyPci.c
+
+[Sources.Ia32]
+  IA32/InterruptTable.S
+  IA32/InterruptTable.asm
+  Thunk.c
+  LegacyBootSupport.c
+  LegacyBbs.c
+  LegacySio.c
+
+[Sources.X64]
+  X64/InterruptTable.asm
+  X64/InterruptTable.S
+  Thunk.c
+  LegacyBootSupport.c
+  LegacyBbs.c
+  LegacySio.c
+
+[Sources.IPF]
+  Ipf/IpfThunk.s
+  Ipf/Thunk.c
+  Ipf/IpfThunk.i
+  Ipf/IpfBootSupport.c
+  Ipf/IpfThunk.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+
+[LibraryClasses]
+  DevicePathLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  UefiLib
+  DebugLib
+  DxeServicesTableLib
+  PcdLib
+  ReportStatusCodeLib
+  PeCoffLib
+  CacheMaintenanceLib
+  DebugAgentLib
+
+[LibraryClasses.IA32]
+  IoLib
+  HobLib
+  UefiRuntimeServicesTableLib
+  BaseLib
+
+[LibraryClasses.X64]
+  IoLib
+  HobLib
+  UefiRuntimeServicesTableLib
+  BaseLib
+
+[LibraryClasses.IPF]
+  IoLib
+  UefiRuntimeServicesTableLib
+
+
+[Guids]
+  gEfiDiskInfoIdeInterfaceGuid                  # ALWAYS_CONSUMED
+  gEfiLegacyBiosGuid                            # ALWAYS_PRODUCED
+
+[Guids.IA32]
+  gEfiSmbiosTableGuid                           # ALWAYS_CONSUMED
+  gEfiAcpi20TableGuid                           # ALWAYS_CONSUMED
+  gEfiAcpi10TableGuid                           # ALWAYS_CONSUMED
+
+[Guids.X64]
+  gEfiSmbiosTableGuid                           # ALWAYS_CONSUMED
+  gEfiAcpi20TableGuid                           # ALWAYS_CONSUMED
+  gEfiAcpi10TableGuid                           # ALWAYS_CONSUMED
+
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiIsaIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiBlockIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+  gEfiDiskInfoProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
+  gEfiSimpleTextInProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
+  gEfiLegacy8259ProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiLegacyBiosPlatformProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiLegacyInterruptProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiLegacyRegion2ProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+  gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED
+  gEfiTimerArchProtocolGuid                     # PROTOCOL ALWAYS_PRODUCED
+
+[Pcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLegacyBiosCacheLegacyRegion
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEbdaReservedMemorySize
+
+[Depex]
+  gEfiLegacyRegion2ProtocolGuid AND gEfiLegacyInterruptProtocolGuid AND gEfiLegacyBiosPlatformProtocolGuid AND gEfiLegacy8259ProtocolGuid AND gEfiGenericMemTestProtocolGuid AND gEfiCpuArchProtocolGuid
+

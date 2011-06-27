@@ -1,0 +1,68 @@
+## @file
+# Component description file for BiosKeyboard module.
+#
+# Ps2 Keyboard driver by using Legacy Bios protocol service and IsaIo protocol service.
+# This dirver uses legacy INT16 to get the key stroke status.
+#
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions
+# of the BSD License which accompanies this distribution.  The
+# full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = KeyboardDxe
+  FILE_GUID                      = 5479662B-6AE4-49e8-A6BD-6DE4B625811F
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeBiosKeyboard
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gBiosKeyboardDriverBinding
+#  COMPONENT_NAME                =  gBiosKeyboardComponentName
+#
+
+[Sources]
+  ComponentName.c
+  ComponentName.h
+  BiosKeyboard.c
+  BiosKeyboard.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+
+[LibraryClasses]
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  ReportStatusCodeLib
+  BaseMemoryLib
+  UefiLib
+  DebugLib
+  BaseLib
+
+[Protocols]
+  gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START
+  gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
+  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
+  gEfiLegacyBiosProtocolGuid                    # PROTOCOL TO_START
+  gEfiPs2PolicyProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+

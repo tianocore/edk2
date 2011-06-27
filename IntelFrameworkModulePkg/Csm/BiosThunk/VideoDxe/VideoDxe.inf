@@ -1,0 +1,80 @@
+## @file
+# Video driver based on legacy bios.
+#
+# This driver by using Legacy Bios protocol service to support csm Video
+# and produce Graphics Output Protocol.
+#
+# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions
+# of the BSD License which accompanies this distribution.  The
+# full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BiosVideoDxe
+  FILE_GUID                      = 0B04B2ED-861C-42cd-A22F-C3AAFACCB896
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = BiosVideoEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gBiosVideoDriverBinding
+#  COMPONENT_NAME                =  gBiosVideoComponentName
+#
+
+[Sources]
+  BiosVideo.c
+  BiosVideo.h
+  ComponentName.c
+  VesaBiosExtensions.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+
+[LibraryClasses]
+  MemoryAllocationLib
+  DevicePathLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  ReportStatusCodeLib
+  DebugLib
+  PcdLib
+
+
+[Guids]
+  gEfiLegacyBiosGuid                            # ALWAYS_PRODUCED
+  gEfiEventExitBootServicesGuid
+
+[Protocols]
+  gEfiVgaMiniPortProtocolGuid                   # PROTOCOL BY_START
+  gEfiEdidDiscoveredProtocolGuid                # PROTOCOL BY_START
+  gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
+  gEfiEdidActiveProtocolGuid                    # PROTOCOL BY_START
+  gEfiLegacyBiosProtocolGuid                    # PROTOCOL TO_START
+  gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiEdidOverrideProtocolGuid                  # PROTOCOL TO_START
+
+[Pcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoSetTextVgaModeEnable
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoCheckVbeEnable
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoCheckVgaEnable
