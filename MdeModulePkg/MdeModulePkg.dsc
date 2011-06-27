@@ -185,6 +185,10 @@
   MdeModulePkg/Bus/Pci/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupportDxe.inf
   MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
   MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+  MdeModulePkg/Bus/Pci/UhciPei/UhciPei.inf
+  MdeModulePkg/Bus/Pci/EhciPei/EhciPei.inf
+  MdeModulePkg/Bus/Usb/UsbBusPei/UsbBusPei.inf
+  MdeModulePkg/Bus/Usb/UsbBotPei/UsbBotPei.inf
   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
   MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf

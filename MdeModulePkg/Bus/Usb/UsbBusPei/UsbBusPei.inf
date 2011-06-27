@@ -1,0 +1,66 @@
+## @file
+# Component description file for UsbPeim module.
+#
+# Usb Bus Peim driver to support recovery from usb device.
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions
+# of the BSD License which accompanies this distribution.  The
+# full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UsbBusPei
+  FILE_GUID                      = 8401A045-6F70-4505-8471-7015B40355E3
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = PeimInitializeUsb
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  PeiUsbLib.c
+  HubPeim.c
+  UsbIoPeim.c
+  UsbPeim.c
+  UsbPeim.h
+  PeiUsbLib.h
+  HubPeim.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  TimerLib
+  BaseMemoryLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  PcdLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue
+  
+[Ppis]
+  gPeiUsbIoPpiGuid                              # PPI ALWAYS_PRODUCED
+  gPeiUsbHostControllerPpiGuid                  # PPI ALWAYS_CONSUMED
+  gPeiUsb2HostControllerPpiGuid                 # PPI ALWAYS_CONSUMED
+
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid AND gPeiUsb2HostControllerPpiGuid OR gPeiUsbHostControllerPpiGuid
+
