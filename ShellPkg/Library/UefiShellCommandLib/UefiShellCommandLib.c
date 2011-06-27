@@ -34,8 +34,6 @@ STATIC UINTN                              mBlkMaxCount = 0;
 STATIC BUFFER_LIST                        mFileHandleList;
 
 // global variables required by library class.
-EFI_SHELL_PROTOCOL                *gEfiShellProtocol            = NULL;
-EFI_SHELL_PARAMETERS_PROTOCOL     *gEfiShellParametersProtocol  = NULL;
 EFI_UNICODE_COLLATION_PROTOCOL    *gUnicodeCollation            = NULL;
 EFI_DEVICE_PATH_TO_TEXT_PROTOCOL  *gDevPathToText               = NULL;
 SHELL_MAP_LIST                    gShellMapList;
@@ -59,24 +57,6 @@ CommandInit(
   )
 {
   EFI_STATUS Status;
-  if (gEfiShellParametersProtocol == NULL) {
-    Status = gBS->OpenProtocol(gImageHandle,
-                               &gEfiShellParametersProtocolGuid,
-                               (VOID **)&gEfiShellParametersProtocol,
-                               gImageHandle,
-                               NULL,
-                               EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                              );
-    if (EFI_ERROR(Status)) {
-      return (EFI_DEVICE_ERROR);
-    }
-  }
-  if (gEfiShellProtocol == NULL) {
-    Status = gBS->LocateProtocol(&gEfiShellProtocolGuid, NULL, (VOID**)&gEfiShellProtocol);
-    if (EFI_ERROR(Status)) {
-      return (EFI_DEVICE_ERROR);
-    }
-  }
   if (gUnicodeCollation == NULL) {
     Status = gBS->LocateProtocol(&gEfiUnicodeCollation2ProtocolGuid, NULL, (VOID**)&gUnicodeCollation);
     if (EFI_ERROR(Status)) {
@@ -207,8 +187,6 @@ ShellCommandLibDestructor (
     FreePool(mProfileList);
   }
 
-  gEfiShellProtocol            = NULL;
-  gEfiShellParametersProtocol  = NULL;
   gUnicodeCollation            = NULL;
   gDevPathToText               = NULL;
   gShellCurDir                 = NULL;

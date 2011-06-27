@@ -287,7 +287,7 @@ BcfgAddDebug1(
         //
         // get the device path
         //
-        DevicePath = mEfiShellProtocol->GetDevicePathFromFilePath(Arg->FullName);
+        DevicePath = gEfiShellProtocol->GetDevicePathFromFilePath(Arg->FullName);
         if (DevicePath == NULL) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_FILE_DP), gShellDebug1HiiHandle, Arg->FullName);
           ShellStatus = SHELL_UNSUPPORTED;

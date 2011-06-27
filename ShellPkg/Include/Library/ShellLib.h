@@ -27,8 +27,8 @@
 // (20 * (6+5+2))+1) unicode characters from EFI FAT spec (doubled for bytes)
 #define MAX_FILE_NAME_LEN 512
 
-extern EFI_SHELL_PARAMETERS_PROTOCOL *mEfiShellParametersProtocol;
-extern EFI_SHELL_PROTOCOL            *mEfiShellProtocol;
+extern EFI_SHELL_PARAMETERS_PROTOCOL *gEfiShellParametersProtocol;
+extern EFI_SHELL_PROTOCOL            *gEfiShellProtocol;
 
 /**
   This function will retrieve the information about the file for the handle

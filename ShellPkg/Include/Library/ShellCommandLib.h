@@ -32,8 +32,6 @@
 //
 // The extern global protocol poionters.
 //
-extern        EFI_SHELL_PROTOCOL                *gEfiShellProtocol;
-extern        EFI_SHELL_PARAMETERS_PROTOCOL     *gEfiShellParametersProtocol;
 extern        EFI_UNICODE_COLLATION_PROTOCOL    *gUnicodeCollation;
 extern        EFI_DEVICE_PATH_TO_TEXT_PROTOCOL  *gDevPathToText;
 extern        CONST CHAR16*                     SupportLevel[];

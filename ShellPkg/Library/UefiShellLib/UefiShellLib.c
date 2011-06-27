@@ -30,8 +30,8 @@ SHELL_PARAM_ITEM SfoParamList[] = {
   };
 EFI_SHELL_ENVIRONMENT2        *mEfiShellEnvironment2;
 EFI_SHELL_INTERFACE           *mEfiShellInterface;
-EFI_SHELL_PROTOCOL            *mEfiShellProtocol;
-EFI_SHELL_PARAMETERS_PROTOCOL *mEfiShellParametersProtocol;
+EFI_SHELL_PROTOCOL            *gEfiShellProtocol;
+EFI_SHELL_PARAMETERS_PROTOCOL *gEfiShellParametersProtocol;
 EFI_HANDLE                    mEfiShellEnvironment2Handle;
 FILE_HANDLE_FUNCTION_MAP      FileFunctionMap;
 
@@ -182,7 +182,7 @@ ShellLibConstructorWorker (
   Status = gBS->OpenProtocol(
     ImageHandle,
     &gEfiShellProtocolGuid,
-    (VOID **)&mEfiShellProtocol,
+    (VOID **)&gEfiShellProtocol,
     ImageHandle,
     NULL,
     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -194,25 +194,25 @@ ShellLibConstructorWorker (
     Status = gBS->LocateProtocol(
       &gEfiShellProtocolGuid,
       NULL,
-      (VOID **)&mEfiShellProtocol
+      (VOID **)&gEfiShellProtocol
      );
     if (EFI_ERROR(Status)) {
-      mEfiShellProtocol = NULL;
+      gEfiShellProtocol = NULL;
     }
   }
   Status = gBS->OpenProtocol(
     ImageHandle,
     &gEfiShellParametersProtocolGuid,
-    (VOID **)&mEfiShellParametersProtocol,
+    (VOID **)&gEfiShellParametersProtocol,
     ImageHandle,
     NULL,
     EFI_OPEN_PROTOCOL_GET_PROTOCOL
    );
   if (EFI_ERROR(Status)) {
-    mEfiShellParametersProtocol = NULL;
+    gEfiShellParametersProtocol = NULL;
   }
 
-  if (mEfiShellParametersProtocol == NULL || mEfiShellProtocol == NULL) {
+  if (gEfiShellParametersProtocol == NULL || gEfiShellProtocol == NULL) {
     //
     // Moved to seperate function due to complexity
     //
@@ -238,18 +238,18 @@ ShellLibConstructorWorker (
   // only success getting 2 of either the old or new, but no 1/2 and 1/2
   //
   if ((mEfiShellEnvironment2 != NULL && mEfiShellInterface          != NULL) ||
-      (mEfiShellProtocol     != NULL && mEfiShellParametersProtocol != NULL)   ) {
-    if (mEfiShellProtocol != NULL) {
-      FileFunctionMap.GetFileInfo     = mEfiShellProtocol->GetFileInfo;
-      FileFunctionMap.SetFileInfo     = mEfiShellProtocol->SetFileInfo;
-      FileFunctionMap.ReadFile        = mEfiShellProtocol->ReadFile;
-      FileFunctionMap.WriteFile       = mEfiShellProtocol->WriteFile;
-      FileFunctionMap.CloseFile       = mEfiShellProtocol->CloseFile;
-      FileFunctionMap.DeleteFile      = mEfiShellProtocol->DeleteFile;
-      FileFunctionMap.GetFilePosition = mEfiShellProtocol->GetFilePosition;
-      FileFunctionMap.SetFilePosition = mEfiShellProtocol->SetFilePosition;
-      FileFunctionMap.FlushFile       = mEfiShellProtocol->FlushFile;
-      FileFunctionMap.GetFileSize     = mEfiShellProtocol->GetFileSize;
+      (gEfiShellProtocol     != NULL && gEfiShellParametersProtocol != NULL)   ) {
+    if (gEfiShellProtocol != NULL) {
+      FileFunctionMap.GetFileInfo     = gEfiShellProtocol->GetFileInfo;
+      FileFunctionMap.SetFileInfo     = gEfiShellProtocol->SetFileInfo;
+      FileFunctionMap.ReadFile        = gEfiShellProtocol->ReadFile;
+      FileFunctionMap.WriteFile       = gEfiShellProtocol->WriteFile;
+      FileFunctionMap.CloseFile       = gEfiShellProtocol->CloseFile;
+      FileFunctionMap.DeleteFile      = gEfiShellProtocol->DeleteFile;
+      FileFunctionMap.GetFilePosition = gEfiShellProtocol->GetFilePosition;
+      FileFunctionMap.SetFilePosition = gEfiShellProtocol->SetFilePosition;
+      FileFunctionMap.FlushFile       = gEfiShellProtocol->FlushFile;
+      FileFunctionMap.GetFileSize     = gEfiShellProtocol->GetFileSize;
     } else {
       FileFunctionMap.GetFileInfo     = (EFI_SHELL_GET_FILE_INFO)FileHandleGetInfo;
       FileFunctionMap.SetFileInfo     = (EFI_SHELL_SET_FILE_INFO)FileHandleSetInfo;
@@ -285,8 +285,8 @@ ShellLibConstructor (
   )
 {
   mEfiShellEnvironment2       = NULL;
-  mEfiShellProtocol           = NULL;
-  mEfiShellParametersProtocol = NULL;
+  gEfiShellProtocol           = NULL;
+  gEfiShellParametersProtocol = NULL;
   mEfiShellInterface          = NULL;
   mEfiShellEnvironment2Handle = NULL;
 
@@ -330,19 +330,19 @@ ShellLibDestructor (
                        NULL);
     mEfiShellInterface = NULL;
   }
-  if (mEfiShellProtocol != NULL) {
+  if (gEfiShellProtocol != NULL) {
     gBS->CloseProtocol(ImageHandle,
                        &gEfiShellProtocolGuid,
                        ImageHandle,
                        NULL);
-    mEfiShellProtocol = NULL;
+    gEfiShellProtocol = NULL;
   }
-  if (mEfiShellParametersProtocol != NULL) {
+  if (gEfiShellParametersProtocol != NULL) {
     gBS->CloseProtocol(ImageHandle,
                        &gEfiShellParametersProtocolGuid,
                        ImageHandle,
                        NULL);
-    mEfiShellParametersProtocol = NULL;
+    gEfiShellParametersProtocol = NULL;
   }
   mEfiShellEnvironment2Handle = NULL;
 
@@ -490,11 +490,11 @@ ShellOpenFileByDevicePath(
   //
   // which shell interface should we use
   //
-  if (mEfiShellProtocol != NULL) {
+  if (gEfiShellProtocol != NULL) {
     //
     // use UEFI Shell 2.0 method.
     //
-    FileName = mEfiShellProtocol->GetFilePathFromDevicePath(*FilePath);
+    FileName = gEfiShellProtocol->GetFilePathFromDevicePath(*FilePath);
     if (FileName == NULL) {
       return (EFI_INVALID_PARAMETER);
     }
@@ -646,14 +646,14 @@ ShellOpenFileByName(
     return (EFI_INVALID_PARAMETER);
   }
 
-  if (mEfiShellProtocol != NULL) {
+  if (gEfiShellProtocol != NULL) {
     if ((OpenMode & EFI_FILE_MODE_CREATE) == EFI_FILE_MODE_CREATE && (Attributes & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY) {
       return ShellCreateDirectory(FileName, FileHandle);
     }
     //
     // Use UEFI Shell 2.0 method
     //
-    Status = mEfiShellProtocol->OpenFileByName(FileName,
+    Status = gEfiShellProtocol->OpenFileByName(FileName,
                                                FileHandle,
                                                OpenMode);
     if (StrCmp(FileName, L"NUL") != 0 && !EFI_ERROR(Status) && ((OpenMode & EFI_FILE_MODE_CREATE) != 0)){
@@ -716,11 +716,11 @@ ShellCreateDirectory(
   OUT SHELL_FILE_HANDLE                  *FileHandle
   )
 {
-  if (mEfiShellProtocol != NULL) {
+  if (gEfiShellProtocol != NULL) {
     //
     // Use UEFI Shell 2.0 method
     //
-    return (mEfiShellProtocol->CreateFile(DirectoryName,
+    return (gEfiShellProtocol->CreateFile(DirectoryName,
                           EFI_FILE_DIRECTORY,
                           FileHandle
                          ));
@@ -1031,12 +1031,12 @@ ShellGetExecutionBreakFlag(
   //
   // Check for UEFI Shell 2.0 protocols
   //
-  if (mEfiShellProtocol != NULL) {
+  if (gEfiShellProtocol != NULL) {
 
     //
     // We are using UEFI Shell 2.0; see if the event has been triggered
     //
-    if (gBS->CheckEvent(mEfiShellProtocol->ExecutionBreak) != EFI_SUCCESS) {
+    if (gBS->CheckEvent(gEfiShellProtocol->ExecutionBreak) != EFI_SUCCESS) {
       return (FALSE);
     }
     return (TRUE);
@@ -1071,8 +1071,8 @@ ShellGetEnvironmentVariable (
   //
   // Check for UEFI Shell 2.0 protocols
   //
-  if (mEfiShellProtocol != NULL) {
-    return (mEfiShellProtocol->GetEnv(EnvKey));
+  if (gEfiShellProtocol != NULL) {
+    return (gEfiShellProtocol->GetEnv(EnvKey));
   }
 
   //
@@ -1115,8 +1115,8 @@ ShellSetEnvironmentVariable (
   //
   // Check for UEFI Shell 2.0 protocols
   //
-  if (mEfiShellProtocol != NULL) {
-    return (mEfiShellProtocol->SetEnv(EnvKey, EnvVal, Volatile));
+  if (gEfiShellProtocol != NULL) {
+    return (gEfiShellProtocol->SetEnv(EnvKey, EnvVal, Volatile));
   }
 
   //
@@ -1168,11 +1168,11 @@ ShellExecute (
   //
   // Check for UEFI Shell 2.0 protocols
   //
-  if (mEfiShellProtocol != NULL) {
+  if (gEfiShellProtocol != NULL) {
     //
     // Call UEFI Shell 2.0 version (not using Output parameter)
     //
-    return (mEfiShellProtocol->Execute(ParentHandle,
+    return (gEfiShellProtocol->Execute(ParentHandle,
                                       CommandLine,
                                       EnvironmentVariables,
                                       Status));
@@ -1214,8 +1214,8 @@ ShellGetCurrentDir (
   //
   // Check for UEFI Shell 2.0 protocols
   //
-  if (mEfiShellProtocol != NULL) {
-    return (mEfiShellProtocol->GetCurDir(DeviceName));
+  if (gEfiShellProtocol != NULL) {
+    return (gEfiShellProtocol->GetCurDir(DeviceName));
   }
 
   //
@@ -1248,11 +1248,11 @@ ShellSetPageBreakMode (
     //
     // check for UEFI Shell 2.0
     //
-    if (mEfiShellProtocol != NULL) {
+    if (gEfiShellProtocol != NULL) {
       //
       // Enable with UEFI 2.0 Shell
       //
-      mEfiShellProtocol->EnablePageBreak();
+      gEfiShellProtocol->EnablePageBreak();
       return;
     } else {
       //
@@ -1270,11 +1270,11 @@ ShellSetPageBreakMode (
     //
     // check for UEFI Shell 2.0
     //
-    if (mEfiShellProtocol != NULL) {
+    if (gEfiShellProtocol != NULL) {
       //
       // Disable with UEFI 2.0 Shell
       //
-      mEfiShellProtocol->DisablePageBreak();
+      gEfiShellProtocol->DisablePageBreak();
       return;
     } else {
       //
@@ -1445,7 +1445,7 @@ ShellOpenFileMetaArg (
   //
   // Check for UEFI Shell 2.0 protocols
   //
-  if (mEfiShellProtocol != NULL) {
+  if (gEfiShellProtocol != NULL) {
     if (*ListHead == NULL) {
       *ListHead = (EFI_SHELL_FILE_INFO*)AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
       if (*ListHead == NULL) {
@@ -1453,13 +1453,13 @@ ShellOpenFileMetaArg (
       }
       InitializeListHead(&((*ListHead)->Link));
     }
-    Status = mEfiShellProtocol->OpenFileList(Arg,
+    Status = gEfiShellProtocol->OpenFileList(Arg,
                                            OpenMode,
                                            ListHead);
     if (EFI_ERROR(Status)) {
-      mEfiShellProtocol->RemoveDupInFileList(ListHead);
+      gEfiShellProtocol->RemoveDupInFileList(ListHead);
     } else {
-      Status = mEfiShellProtocol->RemoveDupInFileList(ListHead);
+      Status = gEfiShellProtocol->RemoveDupInFileList(ListHead);
     }
     if (*ListHead != NULL && IsListEmpty(&(*ListHead)->Link)) {
       FreePool(*ListHead);
@@ -1540,8 +1540,8 @@ ShellCloseFileMetaArg (
   //
   // Check for UEFI Shell 2.0 protocols
   //
-  if (mEfiShellProtocol != NULL) {
-    return (mEfiShellProtocol->FreeFileList(ListHead));
+  if (gEfiShellProtocol != NULL) {
+    return (gEfiShellProtocol->FreeFileList(ListHead));
   } else if (mEfiShellEnvironment2 != NULL) {
     //
     // Since this is EFI Shell version we need to free our internally made copy
@@ -2099,13 +2099,13 @@ ShellCommandLineParseEx (
   //
   // Check for UEFI Shell 2.0 protocols
   //
-  if (mEfiShellParametersProtocol != NULL) {
+  if (gEfiShellParametersProtocol != NULL) {
     return (InternalCommandLineParse(CheckList,
                                      CheckPackage,
                                      ProblemParam,
                                      AutoPageBreak,
-                                     (CONST CHAR16**) mEfiShellParametersProtocol->Argv,
-                                     mEfiShellParametersProtocol->Argc,
+                                     (CONST CHAR16**) gEfiShellParametersProtocol->Argv,
+                                     gEfiShellParametersProtocol->Argc,
                                      AlwaysAllowNumbers));
   }
 
@@ -2557,8 +2557,8 @@ InternalPrintTo (
   if (Size == 0) {
     return (EFI_SUCCESS);
   }
-  if (mEfiShellParametersProtocol != NULL) {
-    return (mEfiShellProtocol->WriteFile(mEfiShellParametersProtocol->StdOut, &Size, (VOID*)String));
+  if (gEfiShellParametersProtocol != NULL) {
+    return (gEfiShellProtocol->WriteFile(gEfiShellParametersProtocol->StdOut, &Size, (VOID*)String));
   }
   if (mEfiShellInterface          != NULL) {
     //
@@ -2859,13 +2859,13 @@ ShellIsDirectory(
     //
     // try good logic first.
     //
-    if (mEfiShellProtocol != NULL) {
+    if (gEfiShellProtocol != NULL) {
       TempLocation  = StrnCatGrow(&TempLocation, NULL, DirName, 0);
       TempLocation2 = StrStr(TempLocation, L":");
       if (TempLocation2 != NULL && StrLen(StrStr(TempLocation, L":")) == 2) {
         *(TempLocation2+1) = CHAR_NULL;
       }
-      if (mEfiShellProtocol->GetDevicePathFromMap(TempLocation) != NULL) {
+      if (gEfiShellProtocol->GetDevicePathFromMap(TempLocation) != NULL) {
         FreePool(TempLocation);
         return (EFI_SUCCESS);
       }

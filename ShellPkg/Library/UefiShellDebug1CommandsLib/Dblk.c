@@ -179,16 +179,16 @@ ShellCommandRunDblk (
         //
         // do the work if we have a valid block identifier
         //
-        if (mEfiShellProtocol->GetDevicePathFromMap(BlockName) == NULL) {
+        if (gEfiShellProtocol->GetDevicePathFromMap(BlockName) == NULL) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, BlockName);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
-          DevPath = (EFI_DEVICE_PATH_PROTOCOL*)mEfiShellProtocol->GetDevicePathFromMap(BlockName);
+          DevPath = (EFI_DEVICE_PATH_PROTOCOL*)gEfiShellProtocol->GetDevicePathFromMap(BlockName);
           if (gBS->LocateDevicePath(&gEfiBlockIoProtocolGuid, &DevPath, NULL) == EFI_NOT_FOUND) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_MAP_PROTOCOL), gShellDebug1HiiHandle, BlockName, L"BlockIo");
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
-            ShellStatus = DisplayTheBlocks(mEfiShellProtocol->GetDevicePathFromMap(BlockName), Lba, (UINT8)BlockCount);
+            ShellStatus = DisplayTheBlocks(gEfiShellProtocol->GetDevicePathFromMap(BlockName), Lba, (UINT8)BlockCount);
           }
         }
       }
