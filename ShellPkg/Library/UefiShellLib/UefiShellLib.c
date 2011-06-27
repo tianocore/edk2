@@ -1214,10 +1214,13 @@ ShellGetCurrentDir (
     return (mEfiShellProtocol->GetCurDir(DeviceName));
   }
   //
-  // ASSERT that we must have EFI shell
+  // Check for EFI shell
   //
-  ASSERT(mEfiShellEnvironment2 != NULL);
-  return (mEfiShellEnvironment2->CurDir(DeviceName));
+  if (mEfiShellEnvironment2 != NULL) {
+    return (mEfiShellEnvironment2->CurDir(DeviceName));
+  }
+
+  return (NULL);
 }
 /**
   sets (enabled or disabled) the page break mode
