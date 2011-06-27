@@ -187,6 +187,7 @@
   MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
   MdeModulePkg/Bus/Pci/UhciPei/UhciPei.inf
   MdeModulePkg/Bus/Pci/EhciPei/EhciPei.inf
+  MdeModulePkg/Bus/Pci/IdeBusPei/IdeBusPei.inf
   MdeModulePkg/Bus/Usb/UsbBusPei/UsbBusPei.inf
   MdeModulePkg/Bus/Usb/UsbBotPei/UsbBotPei.inf
   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf

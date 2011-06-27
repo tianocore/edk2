@@ -1,0 +1,66 @@
+## @file
+# PEIM to produce gEfiPeiVirtualBlockIoPpiGuid PPI for ATA controllers in the platform.
+# This PPI canl be consumed by PEIM which produce gEfiPeiDeviceRecoveryModulePpiGuid
+# for Atapi CD ROM device.
+#
+# This module discovers CDROM devices in Legacy and native mode and installs block IO ppis for them.
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions
+# of the BSD License which accompanies this distribution.  The
+# full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IdeBusPei
+  FILE_GUID                      = B7A5041A-78BA-49e3-B73B-54C757811FB6
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = AtapiPeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  AtapiPeim.h
+  AtapiPeim.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  IoLib
+  BaseMemoryLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  TimerLib
+  PeiServicesTablePointerLib
+  MemoryAllocationLib
+
+[Ppis]
+  gPeiAtaControllerPpiGuid                      # PPI ALWAYS_CONSUMED
+  gEfiPeiVirtualBlockIoPpiGuid                  # PPI ALWAYS_PRODUCED
+  
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSataSpinUpDelayInSecForRecoveryPath
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid AND gPeiAtaControllerPpiGuid
+
+
+
