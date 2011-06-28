@@ -1,24 +1,28 @@
 /** @file
   Global data for the program environment.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials are licensed and made available under
-  the terms and conditions of the BSD License that accompanies this distribution.
-  The full text of the license may be found at
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 #include  <Uefi.h>
-#include  <Library/ShellLib.h>
 
+#include  <stdio.h>
+#include  <stdlib.h>
+#include  <sys/types.h>
 #include  <limits.h>
 #include  <signal.h>
-#include  <stdlib.h>
-#include  <stdio.h>
 #include  <time.h>
-#include  "Efi/Console.h"
+
+#include  <kfile.h>
+#include  <Device/Device.h>
+
+#include  "Device/Console.h"
 
 /* ##################  Type Declarations  ################################# */
 
@@ -52,28 +56,25 @@ typedef void            __xithandler_t(void);
 ** three explicit spaces, two explicit colons, a newline,
 ** and a trailing ASCII nul).
 */
-#define ASCTIME_BUFLEN  (3 * 2 + 5 * INT_STRLEN_MAXIMUM(int) + 3 + 2 + 1 + 1)
+#define ASCTIME_BUFLEN  ((2 * 3) + (5 * INT_STRLEN_MAXIMUM(int)) + 3 + 2 + 1 + 1)
 
-struct  __filedes {
-  EFI_FILE_HANDLE   FileHandle;
-  UINT32            State;        // In use if non-zero
-  int               Oflags;       // From the open call
-  int               Omode;        // From the open call
-  int               RefCount;     // Reference count of opens
-  int               SocProc;      // Placeholder: socket owner process or process group.
-  UINT16            MyFD;         // Which FD this is.
-};
+struct __filedes;   /* Forward Reference */
+struct stat;        /* Forward Reference so I don't have to include <stat.h> */
 
 struct  __MainData {
   // File descriptors
   struct __filedes  fdarray[OPEN_MAX];
   // Low-level File abstractions for the stdin, stdout, stderr streams
-  ConInstance       StdIo[3];
+  ConInstance      *StdIo[3];
 
   // Signal Handlers
   __sighandler_t    *sigarray[SIG_LAST];      // Pointers to signal handlers
 
-  void (*cleanup)(void);   // Cleanup Function Pointer
+  char              *NArgV[ARGC_MAX];         // Narrow character argv array
+  char              *NCmdLine;                // Narrow character version of command line arguments.
+
+  void (*cleanup)(void);        // Stdio Cleanup Function Pointer
+  void (*FinalCleanup)(void);   // Function to free this structure and cleanup before exit.
 
   __xithandler_t   *atexit_handler[ATEXIT_MAX];  // Array of handlers for atexit.
   clock_t           AppStartTime;                // Set in Main.c and used for time.h
@@ -81,6 +82,7 @@ struct  __MainData {
   int               num_atexit;                  ///< Number of registered atexit handlers.
 
   CHAR16            UString[UNICODE_STRING_MAX];
+  CHAR16            UString2[UNICODE_STRING_MAX];
   struct tm         BDTime;                       // Broken-down time structure for localtime.
   EFI_TIME          TimeBuffer;                   // Used by <time.h>mk
   char              ASgetenv[ASCII_STRING_MAX];   // Only modified by getenv
