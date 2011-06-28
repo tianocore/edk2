@@ -189,7 +189,14 @@ EmuGopSimpleTextInReadKeyStroke (
   OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
 
   Status  = Private->EmuGraphicsWindow->GetKey (Private->EmuGraphicsWindow, &KeyData);
-  CopyMem (Key, &KeyData.Key, sizeof (EFI_INPUT_KEY));
+  if (!EFI_ERROR (Status)) {
+    if ((KeyData.Key.ScanCode == 0) && (KeyData.Key.UnicodeChar == 0)) {
+      // Modifier key was pressed
+      Status = EFI_NOT_READY;
+    } else {
+      CopyMem (Key, &KeyData.Key, sizeof (EFI_INPUT_KEY));
+    }
+  }
 
   //
   // Leave critical section and return
