@@ -1014,19 +1014,17 @@ InitializeFormSet (
   );
 
 /**
-  Reset Questions in a Form to their default value.
+  Reset Questions in a Formset to their default value.
 
   @param  FormSet                FormSet data structure.
-  @param  Form                   The Form which to be reset.
   @param  DefaultId              The Class of the default.
 
   @retval EFI_SUCCESS            The function completed successfully.
 
 **/
 EFI_STATUS
-ExtractFormDefault (
+ExtractFormSetDefault (
   IN FORM_BROWSER_FORMSET             *FormSet,
-  IN  FORM_BROWSER_FORM               *Form,
   IN UINT16                           DefaultId
   );
 

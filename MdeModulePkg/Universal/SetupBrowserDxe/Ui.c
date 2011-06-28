@@ -3234,14 +3234,10 @@ UiDisplayMenu (
 
     case CfUiDefault:
       ControlFlag = CfCheckSelection;
-      if (!Selection->FormEditable) {
-        //
-        // This Form is not editable, ignore the F9 (reset to default)
-        //
-        break;
-      }
-
-      Status = ExtractFormDefault (Selection->FormSet, Selection->Form, DefaultId);
+      //
+      // Reset to default values for the whole formset
+      //
+      Status = ExtractFormSetDefault (Selection->FormSet, DefaultId);
 
       if (!EFI_ERROR (Status)) {
         Selection->Action = UI_ACTION_REFRESH_FORM;

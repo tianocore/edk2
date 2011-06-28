@@ -2538,56 +2538,65 @@ GetQuestionDefault (
 
 
 /**
-  Reset Questions in a Form to their default value.
+  Reset Questions in a Formset to their default value.
 
   @param  FormSet                FormSet data structure.
-  @param  Form                   The Form which to be reset.
   @param  DefaultId              The Class of the default.
 
   @retval EFI_SUCCESS            The function completed successfully.
 
 **/
 EFI_STATUS
-ExtractFormDefault (
+ExtractFormSetDefault (
   IN FORM_BROWSER_FORMSET             *FormSet,
-  IN FORM_BROWSER_FORM                *Form,
   IN UINT16                           DefaultId
   )
 {
   EFI_STATUS              Status;
-  LIST_ENTRY              *Link;
+  LIST_ENTRY              *FormLink;
+  LIST_ENTRY              *StatementLink;
   FORM_BROWSER_STATEMENT  *Question;
+  FORM_BROWSER_FORM       *Form;
 
-  Link = GetFirstNode (&Form->StatementListHead);
-  while (!IsNull (&Form->StatementListHead, Link)) {
-    Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
-    Link = GetNextNode (&Form->StatementListHead, Link);
+  FormLink = GetFirstNode (&FormSet->FormListHead);
+  while (!IsNull (&FormSet->FormListHead, FormLink)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (FormLink); 
+    
+    //
+    // Extract Form default
+    //
+    StatementLink = GetFirstNode (&Form->StatementListHead);
+    while (!IsNull (&Form->StatementListHead, StatementLink)) {
+      Question = FORM_BROWSER_STATEMENT_FROM_LINK (StatementLink);
+      StatementLink = GetNextNode (&Form->StatementListHead, StatementLink);
 
-    //
-    // If Question is disabled, don't reset it to default
-    //
-    if (Question->DisableExpression != NULL) {
-      Status = EvaluateExpression (FormSet, Form, Question->DisableExpression);
-      if (!EFI_ERROR (Status) && Question->DisableExpression->Result.Value.b) {
+      //
+      // If Question is disabled, don't reset it to default
+      //
+      if (Question->DisableExpression != NULL) {
+        Status = EvaluateExpression (FormSet, Form, Question->DisableExpression);
+        if (!EFI_ERROR (Status) && Question->DisableExpression->Result.Value.b) {
+          continue;
+        }
+      }
+
+      //
+      // Reset Question to its default value
+      //
+      Status = GetQuestionDefault (FormSet, Form, Question, DefaultId);
+      if (EFI_ERROR (Status)) {
         continue;
       }
-    }
 
-    //
-    // Reset Question to its default value
-    //
-    Status = GetQuestionDefault (FormSet, Form, Question, DefaultId);
-    if (EFI_ERROR (Status)) {
-      continue;
+      //
+      // Synchronize Buffer storage's Edit buffer
+      //
+      if ((Question->Storage != NULL) &&
+          (Question->Storage->Type != EFI_HII_VARSTORE_EFI_VARIABLE)) {
+        SetQuestionValue (FormSet, Form, Question, TRUE);
+      }
     }
-
-    //
-    // Synchronize Buffer storage's Edit buffer
-    //
-    if ((Question->Storage != NULL) &&
-        (Question->Storage->Type != EFI_HII_VARSTORE_EFI_VARIABLE)) {
-      SetQuestionValue (FormSet, Form, Question, TRUE);
-    }
+    FormLink = GetNextNode (&FormSet->FormListHead, FormLink);
   }
 
   return EFI_SUCCESS;
@@ -2848,13 +2857,9 @@ InitializeCurrentSetting (
   //
   // Extract default from IFR binary
   //
-  Link = GetFirstNode (&FormSet->FormListHead);
-  while (!IsNull (&FormSet->FormListHead, Link)) {
-    Form = FORM_BROWSER_FORM_FROM_LINK (Link);
-
-    Status = ExtractFormDefault (FormSet, Form, EFI_HII_DEFAULT_CLASS_STANDARD);
-
-    Link = GetNextNode (&FormSet->FormListHead, Link);
+  Status = ExtractFormSetDefault (FormSet, EFI_HII_DEFAULT_CLASS_STANDARD);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   //
