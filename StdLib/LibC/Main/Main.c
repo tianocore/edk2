@@ -4,7 +4,7 @@
   All of the global data in the gMD structure is initialized to 0, NULL, or
   SIG_DFL; as appropriate.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -24,10 +24,12 @@
 
 #include  <errno.h>
 #include  <stdio.h>
+#include  <stdlib.h>
 #include  <string.h>
 #include  <MainData.h>
+#include  <sys/EfiSysCall.h>
 
-extern int main( int, wchar_t**);
+extern int main( int, char**);
 extern int __sse2_available;
 
 struct  __MainData  *gMD;
@@ -38,6 +40,75 @@ void __main()
   ;
 }
 
+static
+void
+FinalCleanup( void )
+{
+  int i;
+
+  /* Close any open files */
+  for(i = OPEN_MAX - 1; i >= 0; --i) {
+    (void)close(i);   // Close properly handles closing a closed file.
+  }
+
+  /* Free the global MainData structure */
+  if(gMD != NULL) {
+    if(gMD->NCmdLine != NULL) {
+      FreePool( gMD->NCmdLine );
+    }
+    FreePool( gMD );
+  }
+}
+
+/* Create mbcs versions of the Argv strings. */
+static
+char **
+ArgvConvert(UINTN Argc, CHAR16 **Argv)
+{
+  size_t  AVsz;       /* Size of a single nArgv string */
+  UINTN   count;
+  char  **nArgv;
+  char   *string;
+  INTN    nArgvSize;  /* Cumulative size of narrow Argv[i] */
+
+  nArgvSize = Argc;
+  /* Determine space needed for narrow Argv strings. */
+  for(count = 0; count < Argc; ++count) {
+    AVsz = wcstombs(NULL, Argv[count], ARG_MAX);
+    if(AVsz < 0) {
+      Print(L"ABORTING: Argv[%d] contains an unconvertable character.\n", count);
+      exit(EXIT_FAILURE);
+      /* Not Reached */
+    }
+    nArgvSize += AVsz;
+  }
+
+  /* Reserve space for the converted strings. */
+  gMD->NCmdLine = (char *)AllocateZeroPool(nArgvSize+1);
+  if(gMD->NCmdLine == NULL) {
+    Print(L"ABORTING: Insufficient memory.\n");
+    exit(EXIT_FAILURE);
+    /* Not Reached */
+  }
+
+  /* Convert Argument Strings. */
+  nArgv   = gMD->NArgV;
+  string  = gMD->NCmdLine;
+  for(count = 0; count < Argc; ++count) {
+    nArgv[count] = string;
+    AVsz = wcstombs(string, Argv[count], nArgvSize);
+    string[AVsz] = 0;   /* NULL terminate the argument */
+    string += AVsz + 1;
+    nArgvSize -= AVsz + 1;
+    if(nArgvSize < 0) {
+      Print(L"ABORTING: Internal Argv[%d] conversion error.\n", count);
+      exit(EXIT_FAILURE);
+      /* Not Reached */
+    }
+  }
+  return gMD->NArgV;
+}
+
 INTN
 EFIAPI
 ShellAppMain (
@@ -45,10 +116,10 @@ ShellAppMain (
   IN CHAR16 **Argv
   )
 {
+  struct __filedes   *mfd;
+  char              **nArgv;
   INTN   ExitVal;
   INTN   i;
-  struct __filedes *mfd;
-  FILE  *fp;
 
   ExitVal = (INTN)RETURN_SUCCESS;
   gMD = AllocateZeroPool(sizeof(struct __MainData));
@@ -61,10 +132,11 @@ ShellAppMain (
     _fltused              = 1;
     errno                 = 0;
     EFIerrno              = 0;
+    gMD->FinalCleanup     = &FinalCleanup;
 
 #ifdef NT32dvm
-    gMD->ClocksPerSecond  = 0;  // For NT32 only
-    gMD->AppStartTime     = 0;  // For NT32 only
+    gMD->ClocksPerSecond  = 1;  // For NT32 only
+    gMD->AppStartTime     = 1;  // For NT32 only
 #else
     gMD->ClocksPerSecond = (clock_t)GetPerformanceCounterProperties( NULL, NULL);
     gMD->AppStartTime = (clock_t)GetPerformanceCounter();
@@ -76,27 +148,28 @@ ShellAppMain (
       mfd[i].MyFD = (UINT16)i;
     }
 
-    // Open stdin, stdout, stderr
-    fp = freopen("stdin:", "r", stdin);
-    if(fp != NULL) {
-      fp = freopen("stdout:", "w", stdout);
-      if(fp != NULL) {
-        fp = freopen("stderr:", "w", stderr);
+    i = open("stdin:", O_RDONLY, 0444);
+    if(i == 0) {
+      i = open("stdout:", O_WRONLY, 0222);
+      if(i == 1) {
+        i = open("stderr:", O_WRONLY, 0222);
       }
     }
-    if(fp == NULL) {
+    if(i != 2) {
       Print(L"ERROR Initializing Standard IO: %a.\n    %r\n",
             strerror(errno), EFIerrno);
     }
 
-    ExitVal = (INTN)main( (int)Argc, (wchar_t **)Argv);
-
-    if (gMD->cleanup != NULL) {
-      gMD->cleanup();
+    /* Create mbcs versions of the Argv strings. */
+    nArgv = ArgvConvert(Argc, Argv);
+    if(nArgv == NULL) {
+      ExitVal = (INTN)RETURN_INVALID_PARAMETER;
     }
+    else {
+      ExitVal = (INTN)main( (int)Argc, nArgv);
   }
-  if(gMD != NULL) {
-    FreePool( gMD );
   }
+  exit((int)ExitVal);
+  /* Not Reached */
   return ExitVal;
 }

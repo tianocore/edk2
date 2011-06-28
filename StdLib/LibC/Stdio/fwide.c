@@ -1,6 +1,13 @@
-/* $NetBSD: fwide.c,v 1.3 2005/06/12 05:21:27 lukem Exp $ */
+/*
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available
+    under the terms and conditions of the BSD License that accompanies this
+    distribution.  The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
 
-/*-
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c)2001 Citrus Project,
  * All rights reserved.
  *
@@ -26,14 +33,14 @@
  * SUCH DAMAGE.
  *
  * $Citrus$
- */
+
+    NetBSD: fwide.c,v 1.3 2005/06/12 05:21:27 lukem Exp
+*/
 #include  <LibConfig.h>
 #include <sys/EfiCdefs.h>
-#if defined(LIBC_SCCS) && !defined(lint)
-__RCSID("$NetBSD: fwide.c,v 1.3 2005/06/12 05:21:27 lukem Exp $");
-#endif /* LIBC_SCCS and not lint */
 
 #include <assert.h>
+#include  <errno.h>
 #include <stdio.h>
 #include <wchar.h>
 #include "reentrant.h"
@@ -45,6 +52,10 @@ fwide(FILE *fp, int mode)
   struct wchar_io_data *wcio;
 
   _DIAGASSERT(fp != NULL);
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (0);
+  }
 
   /*
    * this implementation use only -1, 0, 1

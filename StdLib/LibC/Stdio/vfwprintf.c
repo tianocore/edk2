@@ -164,6 +164,10 @@ __sbprintf(FILE *fp, const CHAR_T *fmt, va_list ap)
 
   _DIAGASSERT(fp != NULL);
   _DIAGASSERT(fmt != NULL);
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (EOF);
+  }
 
   _FILEEXT_SETUP(&fake, &fakeext);
 
@@ -229,6 +233,10 @@ __sprint(FILE *fp, struct __suio *uio)
 
   _DIAGASSERT(fp != NULL);
   _DIAGASSERT(uio != NULL);
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (EOF);
+  }
 
   if (uio->uio_resid == 0) {
     uio->uio_iovcnt = 0;
@@ -544,6 +552,10 @@ WDECL(vf,printf)(FILE * __restrict fp, const CHAR_T * __restrict fmt0, va_list a
 {
   int ret;
 
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (EOF);
+  }
   FLOCKFILE(fp);
   ret = WDECL(__vf,printf_unlocked)(fp, fmt0, ap);
   FUNLOCKFILE(fp);
@@ -801,6 +813,10 @@ WDECL(__vf,printf_unlocked)(FILE *fp, const CHAR_T *fmt0, va_list ap)
 
   _DIAGASSERT(fp != NULL);
   _DIAGASSERT(fmt0 != NULL);
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (EOF);
+  }
 
   _SET_ORIENTATION(fp, -1);
 

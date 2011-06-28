@@ -88,7 +88,8 @@
 
 #undef __KERNEL_RCSID
 
-#define __RCSID(_s) __IDSTRING(rcsid,_s)
+//#define __RCSID(_s) __IDSTRING(rcsid,_s)
+#define __RCSID(_s)
 #define __SCCSID(_s)
 #define __SCCSID2(_s)
 #if 0 /* XXX userland __COPYRIGHTs have \ns in them */

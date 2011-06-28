@@ -1,7 +1,7 @@
 /** @file
   Value transformations between stdio and the UEFI environment.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -18,7 +18,7 @@
 
 #include  <errno.h>
 #include  <fcntl.h>
-#include  "SysEfi.h"
+#include  <Efi/SysEfi.h>
 
 /** Translate the Open flags into a Uefi Open Modes value.
 
@@ -44,6 +44,10 @@ Oflags2EFI( int oflags )
 
   // Build the Open Modes
   flags = (UINT64)((oflags & O_ACCMODE) + 1);   // Handle the Read/Write flags
+  if(flags & EFI_FILE_MODE_WRITE) {  // Asking for write only?
+    // EFI says the only two RW modes are read-only and read+write.
+    flags = EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE;
+  }
   if(oflags & (O_CREAT | O_TRUNC)) {            // Now add the Create flag.
     // Also added if O_TRUNC set since we will need to create a new file.
     // We just set the flags here since the only valid EFI mode with create

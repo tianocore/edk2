@@ -6,11 +6,11 @@
     - exit(int status)
     - _Exit(int status)
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
+  http://opensource.org/licenses/bsd-license.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -92,29 +92,26 @@ atexit(void (*handler)(void))
 void
 exit(int status)
 {
-  int i = gMD->num_atexit;
+  void (*CleanUp)(void);   // Pointer to Cleanup Function
+  int   i;
+
+  if(gMD != NULL) {
+    CleanUp = gMD->cleanup; // Preserve the pointer to the Cleanup Function
 
   // Call all registered atexit functions in reverse order
+    i = gMD->num_atexit;
   if( i > 0) {
     do {
       (gMD->atexit_handler[--i])();
     } while( i > 0);
   }
 
-  if (gMD->cleanup != NULL) {
-    gMD->cleanup();
+    if (CleanUp != NULL) {
+      CleanUp();
+    }
   }
   _Exit(status);
 }
-
-typedef
-EFI_STATUS
-(EFIAPI *ExitFuncPtr)(
-  IN  EFI_HANDLE                   ImageHandle,
-  IN  EFI_STATUS                   ExitStatus,
-  IN  UINTN                        ExitDataSize,
-  IN  CHAR16                       *ExitData     OPTIONAL
-) __noreturn;
 
 /** The _Exit function causes normal program termination to occur and control
     to be returned to the host environment.
@@ -133,16 +130,16 @@ void
 _Exit(int status)
 {
   RETURN_STATUS ExitVal = (RETURN_STATUS)status;
-  ExitFuncPtr   ExitFunc;
 
   if( ExitVal == EXIT_FAILURE) {
     ExitVal = RETURN_ABORTED;
   }
 
-  ExitFunc = (ExitFuncPtr)gBS->Exit;
+  if(gMD->FinalCleanup != NULL) {
+    gMD->FinalCleanup();  // gMD does not exist when this returns.
+  }
 
-  //gBS->Exit(gImageHandle, ExitVal, 0, NULL);   /* abort() */
-  ExitFunc(gImageHandle, ExitVal, 0, NULL);   /* abort() */
+  gBS->Exit(gImageHandle, ExitVal, 0, NULL);   /* abort() */
 }
 
 /** If string is a null pointer, the system function determines whether the
@@ -206,3 +203,98 @@ char   *getenv(const char *name)
 
   return retval;
 }
+
+
+/**
+  Add or update a variable in the environment list
+
+  @param name     Address of a zero terminated name string
+  @param value    Address of a zero terminated value string
+  @param rewrite  TRUE allows overwriting existing values
+
+  @retval Returns 0 upon success
+  @retval Returns -1 upon failure, sets errno with more information
+
+  Errors
+
+  EINVAL - name is NULL or points to a zero length string
+  EALREADY - name already set and rewrite set to FALSE
+  ENODEV - Unable to set non-volatile version of environment variable
+  ENOMEM - Unable to set volatile version of environment variable
+  ENOTSUP - Variable storage not supported
+
+**/
+int
+setenv (
+  register const char * name,
+  register const char * value,
+  int rewrite
+  )
+{
+  CONST CHAR16 * HostName;
+  int retval;
+  EFI_STATUS Status;
+  CHAR16 * UName;
+  CHAR16 * UValue;
+
+  //
+  //  Assume failure
+  //
+  retval = -1;
+
+  //
+  //  Validate the inputs
+  //
+  errno = EINVAL;
+  if (( NULL != name ) && ( 0 != *name )) {
+    //
+    //  Get the storage locations for the unicode strings
+    //
+    UName = &gMD->UString[0];
+    UValue = &gMD->UString2[0];
+
+    //
+    //  Convert the strings
+    //
+    AsciiStrToUnicodeStr ( name, UName );
+    AsciiStrToUnicodeStr ( value, UValue );
+
+    //
+    //  Determine if the string is already present
+    //
+    errno = EALREADY;
+    HostName = ShellGetEnvironmentVariable ( UName );
+    if ( rewrite || ( NULL == HostName )) {
+      //
+      //  Support systems that don't have non-volatile memory
+      //
+      errno = ENOMEM;
+      Status = ShellSetEnvironmentVariable ( UName, UValue, TRUE );
+      if ( EFI_ERROR ( Status )) {
+        if ( EFI_UNSUPPORTED == Status ) {
+          errno = ENOTSUP;
+        }
+      }
+      else {
+        //
+        //  Permanently set the environment variable
+        //
+        errno = ENODEV;
+        Status = ShellSetEnvironmentVariable ( UName, UValue, FALSE );
+        if ( !EFI_ERROR ( Status )) {
+          //
+          //  Success
+          //
+          errno = 0;
+          retval = 0;
+        }
+      }
+    }
+  }
+
+  //
+  //  Return the operation status
+  //
+  return retval;
+}
+

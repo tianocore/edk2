@@ -5,19 +5,17 @@
     two wide characters the same way as two integers of the underlying integer
     type designated by wchar_t.
 
-    Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
-    http://opensource.org/licenses/bsd-license.php.
+    http://opensource.org/licenses/bsd-license.
 
     THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 #include  <Uefi.h>
-#include  <Library/BaseLib.h>
-#include  <Library/BaseMemoryLib.h>
-#include  <Library/MemoryAllocationLib.h>
+#include  <Library/DebugLib.h>
 
 #include  <LibConfig.h>
 
@@ -36,11 +34,17 @@ __wchar_construct(
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  EFI_STATUS  Status;
+
   if( __wchar_bitmap == NULL) {
     __wchar_bitmap_size = (WCHAR_MAX + 8) / 8U;
-    __wchar_bitmap = AllocatePool(__wchar_bitmap_size);
-    if( __wchar_bitmap == NULL) {
-      EFIerrno = RETURN_OUT_OF_RESOURCES;
+
+    Status  = SystemTable->BootServices->AllocatePool(
+                EfiBootServicesData, __wchar_bitmap_size, (VOID **)&__wchar_bitmap);
+    ASSERT(__wchar_bitmap != NULL);
+    if (EFI_ERROR (Status)) {
+      __wchar_bitmap = NULL;
+      EFIerrno = Status;
       errno = ENOMEM;
       return EFIerrno;
     }
@@ -56,9 +60,12 @@ __wchar_deconstruct(
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  EFI_STATUS    Status  = RETURN_SUCCESS;
+
   if( __wchar_bitmap != NULL) {
-    FreePool( __wchar_bitmap);
+    Status = SystemTable->BootServices->FreePool( __wchar_bitmap);
+    ASSERT_EFI_ERROR (Status);
     __wchar_bitmap = NULL;
   }
-  return RETURN_SUCCESS;
+  return Status;
 }

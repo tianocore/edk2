@@ -243,8 +243,8 @@ typedef int64_t   dtime_t;  /* on-disk time_t */
   #undef  _EFI_CLOCK_T
 #endif
 
-#if   defined(_BSD_SIZE_T_) && defined(_EFI_SIZE_T_)
-  typedef _BSD_SIZE_T_      size_t;
+#ifdef  _EFI_SIZE_T_
+  typedef _EFI_SIZE_T_      size_t;
   #define _SIZE_T
   #undef  _BSD_SIZE_T_
   #undef  _EFI_SIZE_T_

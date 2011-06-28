@@ -70,6 +70,9 @@
   vprintf.c           #
   vsprintf.c          #
 
+  snprintf.c
+  vsnprintf.c
+
   # Wide character functions
   fgetwc.c            #
   fgetws.c            #

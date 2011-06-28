@@ -50,13 +50,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     corresponding to the specified condition.
     Many existing programs expect these to be macros.
 **/
-#define SIGINT    1   ///< receipt of an interactive attention signal
-#define SIGILL    2   ///< detection of an invalid function image, such as an invalid instruction
-#define SIGABRT   3   ///< abnormal termination, such as is initiated by the abort function
-#define SIGFPE    4   ///< an erroneous arithmetic operation, such as zero divide or an operation resulting in overflow
-#define SIGSEGV   5   ///< an invalid access to storage
-#define SIGTERM   6   ///< a termination request sent to the program
-#define SIG_LAST  7   ///< One more than the largest signal number
+#define SIGINT     __SigInt     ///< receipt of an interactive attention signal
+#define SIGILL     __SigIll     ///< detection of an invalid function image, such as an invalid instruction
+#define SIGABRT    __SigAbrt    ///< abnormal termination, such as is initiated by the abort function
+#define SIGFPE     __SigFpe     ///< an erroneous arithmetic operation, such as zero divide or an operation resulting in overflow
+#define SIGSEGV    __SigSegv    ///< an invalid access to storage
+#define SIGTERM    __SigTerm    ///< a termination request sent to the program
+#define SIGBREAK   __SigBreak   ///< added for Python
+#define SIG_LAST   __Sig_Last   ///< One more than the largest signal number
 
 __BEGIN_DECLS
 

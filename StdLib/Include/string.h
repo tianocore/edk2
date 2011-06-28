@@ -15,7 +15,7 @@
   interpreted as if it had the type unsigned char (and therefore every possible
   object representation is valid and has a different value).
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -323,6 +323,16 @@ char   *strdup    (const char *);
 int     strerror_r(int, char *, size_t);
 int     strcasecmp(const char *s1, const char *s2);
 void   *memccpy   (void *, const void *, int, size_t);
+int     strncasecmp(const char *s1, const char *s2, size_t n);
+
+// bcopy is same as memcpy but it is a void function, being used in socket lib
+#define bcopy(a,b,c) ( memcpy((void *)a, (void *)b, (size_t)c))
+
+// bcmp is same as memcmp, returns 0 for successful compare, non-zero otherwise
+#define bcmp(a,b,c) ( memcmp((void *)a, (void *)b, (size_t)c))
+
+//strsep is the same as strtok, the only difference is for strsep the 1st parameter is a char**
+#define strsep(a,b) (strtok(*a,b))
 
 __END_DECLS
 

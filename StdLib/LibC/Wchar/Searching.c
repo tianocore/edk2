@@ -5,7 +5,7 @@
   two wide characters the same way as two integers of the underlying integer
   type designated by wchar_t.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -86,12 +86,14 @@ size_t wcscspn(const wchar_t *s1, const wchar_t *s2)
   const wchar_t *str;
   UINT8 bit;
   int index;
+  size_t s1len;
 
   if(*s1 == 0)   return 0;
+  s1len = wcslen(s1);
 
   BuildBitmap( __wchar_bitmap, s2, __wchar_bitmap_size);
 
-  for(str = s1; ; str++) {
+  for(str = s1; str < &s1[s1len] ; str++) {
     index = WHICH8(*str);
     bit = WHICH_BIT(*str);
     if ((__wchar_bitmap[index] & bit) != 0)

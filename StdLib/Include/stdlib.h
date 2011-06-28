@@ -2,7 +2,7 @@
   The header <stdlib.h> declares five types and several functions of general
   utility, and defines several macros.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -133,10 +133,14 @@ void    exit(int status) __noreturn;
     buffered data are not flushed, open streams are not closed, and temporary
     files are not removed by abort.
 
+    While this function does not return, it can NOT be marked as "__noreturn"
+    without causing a warning to be emitted because the compilers can not
+    determine that the function truly does not return.
+
     The status returned to the host environment is determined in the same way
     as for the exit function.
 **/
-void    _Exit(int status) __noreturn;
+void    _Exit(int status);
 
 /** The getenv function searches an environment list, provided by the host
     environment, for a string that matches the string pointed to by name.  The
@@ -150,6 +154,24 @@ void    _Exit(int status) __noreturn;
               found, a null pointer is returned.
 **/
 char   *getenv(const char *name);
+
+/**
+  Add or update a variable in the environment list
+
+  @param name     Address of a zero terminated name string
+  @param value    Address of a zero terminated value string
+  @param rewrite  TRUE allows overwriting existing values
+
+  @retval Returns 0 upon success
+  @retval Returns -1 upon failure, sets errno with more information
+
+**/
+int
+setenv (
+  register const char * name,
+  register const char * value,
+  int rewrite
+  );
 
 /** If string is a null pointer, the system function determines whether the
     host environment has a command processor. If string is not a null pointer,
@@ -499,37 +521,125 @@ void qsort( void *base, size_t nmemb, size_t size,
 
 /* ################  Multibyte/wide character conversion functions  ####### */
 
-/**
+/** Determine the number of bytes comprising a multibyte character.
 
-  @return
+  If s is not a null pointer, the mblen function determines the number of bytes
+  contained in the multibyte character pointed to by s. Except that the
+  conversion state of the mbtowc function is not affected, it is equivalent to
+    mbtowc((wchar_t *)0, s, n);
+
+  The implementation shall behave as if no library function calls the mblen
+  function.
+
+  @return   If s is a null pointer, the mblen function returns a nonzero or
+            zero value, if multibyte character encodings, respectively, do
+            or do not have state-dependent encodings. If s is not a null
+            pointer, the mblen function either returns 0 (if s points to the
+            null character), or returns the number of bytes that are contained
+            in the multibyte character (if the next n or fewer bytes form a
+            valid multibyte character), or returns -1 (if they do not form a
+            valid multibyte character).
 **/
 int     mblen(const char *, size_t);
 
-/**
+/** Convert a multibyte character into a wide character.
 
-  @return
+    If s is not a null pointer, the mbtowc function inspects at most n bytes
+    beginning with the byte pointed to by s to determine the number of bytes
+    needed to complete the next multibyte character (including any shift
+    sequences). If the function determines that the next multibyte character
+    is complete and valid, it determines the value of the corresponding wide
+    character and then, if pwc is not a null pointer, stores that value in
+    the object pointed to by pwc. If the corresponding wide character is the
+    null wide character, the function is left in the initial conversion state.
+
+    The implementation shall behave as if no library function calls the
+    mbtowc function.
+
+    @return   If s is a null pointer, the mbtowc function returns a nonzero or
+              zero value, if multibyte character encodings, respectively, do
+              or do not have state-dependent encodings. If s is not a null
+              pointer, the mbtowc function either returns 0 (if s points to
+              the null character), or returns the number of bytes that are
+              contained in the converted multibyte character (if the next n or
+              fewer bytes form a valid multibyte character), or returns -1
+              (if they do not form a valid multibyte character).
+
+              In no case will the value returned be greater than n or the value
+              of the MB_CUR_MAX macro.
 **/
 int     mbtowc(wchar_t * __restrict, const char * __restrict, size_t);
 
 /**
+The wctomb function determines the number of bytes needed to represent the multibyte
+character corresponding to the wide character given by wc (including any shift
+sequences), and stores the multibyte character representation in the array whose first
+element is pointed to by s (if s is not a null pointer). At most MB_CUR_MAX characters
+are stored. If wc is a null wide character, a null byte is stored, preceded by any shift
+sequence needed to restore the initial shift state, and the function is left in the initial
+conversion state.
+
+The implementation shall behave as if no library function calls the wctomb function.
 
   @return
+If s is a null pointer, the wctomb function returns a nonzero or zero value, if multibyte
+character encodings, respectively, do or do not have state-dependent encodings. If s is
+not a null pointer, the wctomb function returns -1 if the value of wc does not correspond
+to a valid multibyte character, or returns the number of bytes that are contained in the
+multibyte character corresponding to the value of wc.
+
+In no case will the value returned be greater than the value of the MB_CUR_MAX macro.
+
 **/
 int     wctomb(char *, wchar_t);
 
 /* ################  Multibyte/wide string conversion functions  ########## */
 
-/**
+/** Convert a multibyte character string into a wide-character string.
 
-  @return
+    The mbstowcs function converts a sequence of multibyte characters that
+    begins in the initial shift state from the array pointed to by src into
+    a sequence of corresponding wide characters and stores not more than limit
+    wide characters into the array pointed to by dest.  No multibyte
+    characters that follow a null character (which is converted into a null
+    wide character) will be examined or converted. Each multibyte character
+    is converted as if by a call to the mbtowc function, except that the
+    conversion state of the mbtowc function is not affected.
+
+    No more than limit elements will be modified in the array pointed to by dest.
+    If copying takes place between objects that overlap,
+    the behavior is undefined.
+
+  @return   If an invalid multibyte character is encountered, the mbstowcs
+            function returns (size_t)(-1). Otherwise, the mbstowcs function
+            returns the number of array elements modified, not including a
+            terminating null wide character, if any.
+
 **/
-size_t  mbstowcs(wchar_t * __restrict , const char * __restrict, size_t);
+size_t  mbstowcs(wchar_t * __restrict dest, const char * __restrict src, size_t limit);
 
-/**
+/** Convert a wide-character string into a multibyte character string.
 
-  @return
+    The wcstombs function converts a sequence of wide characters from the
+    array pointed to by src into a sequence of corresponding multibyte
+    characters that begins in the initial shift state, and stores these
+    multibyte characters into the array pointed to by dest, stopping if a
+    multibyte character would exceed the limit of limit total bytes or if a
+    null character is stored. Each wide character is converted as if by
+    a call to the wctomb function, except that the conversion state of
+    the wctomb function is not affected.
+
+    No more than limit bytes will be modified in the array pointed to by dest.
+    If copying takes place between objects that overlap,
+    the behavior is undefined.
+
+  @return   If a wide character is encountered that does not correspond to a
+            valid multibyte character, the wcstombs function returns
+            (size_t)(-1). Otherwise, the wcstombs function returns the number
+            of bytes modified, not including a terminating null character,
+            if any.
 **/
-size_t  wcstombs(char * __restrict, const wchar_t * __restrict, size_t);
+size_t  wcstombs(char * __restrict dest, const wchar_t * __restrict src, size_t limit);
 
 __END_DECLS
 

@@ -506,11 +506,23 @@ size_t wcsftime(wchar_t * __restrict s, size_t maxsize, const wchar_t * __restri
 **/
 wint_t btowc(int c);
 
-/**
+/** The wctob function determines whether c corresponds to a member of the extended
+    character set whose multibyte character representation is a single byte when in the initial
+    shift state.
+
+    @Returns    The wctob function returns EOF if c does not correspond to a multibyte
+                character with length one in the initial shift state. Otherwise, it
+                returns the single-byte representation of that character as an
+                unsigned char converted to an int.
 **/
 int wctob(wint_t c);
 
-/**
+/** If ps is not a null pointer, the mbsinit function determines whether the
+    pointed-to mbstate_t object describes an initial conversion state.
+
+    @Returns    The mbsinit function returns nonzero if ps is a null pointer
+                or if the pointed-to object describes an initial conversion
+                state; otherwise, it returns zero.
 **/
 int mbsinit(const mbstate_t *ps);
 
@@ -532,7 +544,33 @@ size_t wcrtomb(char * __restrict s, wchar_t wc, mbstate_t * __restrict ps);
 **/
 size_t mbsrtowcs(wchar_t * __restrict dst, const char ** __restrict src, size_t len, mbstate_t * __restrict ps);
 
-/**
+/** The wcsrtombs function converts a sequence of wide characters from the array
+    indirectly pointed to by src into a sequence of corresponding multibyte
+    characters that begins in the conversion state described by the object
+    pointed to by ps. If dst is not a null pointer, the converted characters
+    are then stored into the array pointed to by dst.  Conversion continues
+    up to and including a terminating null wide character, which is also
+    stored. Conversion stops earlier in two cases: when a wide character is
+    reached that does not correspond to a valid multibyte character, or
+    (if dst is not a null pointer) when the next multibyte character would
+    exceed the limit of len total bytes to be stored into the array pointed
+    to by dst. Each conversion takes place as if by a call to the wcrtomb
+    function.)
+
+    If dst is not a null pointer, the pointer object pointed to by src is
+    assigned either a null pointer (if conversion stopped due to reaching
+    a terminating null wide character) or the address just past the last wide
+    character converted (if any). If conversion stopped due to reaching a
+    terminating null wide character, the resulting state described is the
+    initial conversion state.
+
+    @Returns    If conversion stops because a wide character is reached that
+                does not correspond to a valid multibyte character, an
+                encoding error occurs: the wcsrtombs function stores the
+                value of the macro EILSEQ in errno and returns (size_t)(-1);
+                the conversion state is unspecified. Otherwise, it returns
+                the number of bytes in the resulting multibyte character
+                sequence, not including the terminating null character (if any).
 **/
 size_t wcsrtombs(char * __restrict dst, const wchar_t ** __restrict src, size_t len, mbstate_t * __restrict ps);
 

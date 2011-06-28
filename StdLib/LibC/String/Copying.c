@@ -1,7 +1,7 @@
 /** @file
     Copying Functions for <string.h>.
 
-    Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -10,8 +10,6 @@
     THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
-//#include  <sys/EfiCdefs.h>
-
 #include  <Uefi.h>
 #include  <Library/BaseLib.h>
 #include  <Library/BaseMemoryLib.h>
@@ -21,6 +19,11 @@
 #include  <stdlib.h>
 #include  <string.h>
 
+/** Do not define memcpy for IPF+GCC builds.
+    For IPF, using a GCC compiler, the memcpy function is converted to
+    CopyMem by objcpy during build.
+**/
+#if  !(defined(MDE_CPU_IPF) && defined(__GNUC__))
 /** The memcpy function copies n characters from the object pointed to by s2
     into the object pointed to by s1.
 
@@ -33,6 +36,7 @@ memcpy(void * __restrict s1, const void * __restrict s2, size_t n)
 {
   return CopyMem( s1, s2, n);
 }
+#endif  /* !(defined(MDE_CPU_IPF) && defined(__GCC)) */
 
 /** The memmove function copies n characters from the object pointed to by s2
     into the object pointed to by s1. Copying takes place as if the n

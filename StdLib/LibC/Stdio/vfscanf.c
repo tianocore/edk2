@@ -1,11 +1,11 @@
 /** @file
     Implementation of scanf internals for <stdio.h>.
 
-    Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available
     under the terms and conditions of the BSD License that accompanies this
     distribution.  The full text of the license may be found at
-    http://opensource.org/licenses/bsd-license.php.
+    http://opensource.org/licenses/bsd-license.
 
     THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -44,14 +44,12 @@
     FreeBSD: src/lib/libc/stdio/vfscanf.c,v 1.41 2007/01/09 00:28:07 imp Exp
     vfscanf.c 8.1 (Berkeley) 6/4/93
 **/
-//#include <Uefi.h>               // REMOVE, For DEBUG only
-//#include <Library/UefiLib.h>    // REMOVE, For DEBUG only
-
 #include  <LibConfig.h>
 
 #include "namespace.h"
 #include <assert.h>
 #include <ctype.h>
+#include  <errno.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -142,6 +140,10 @@ __svfscanf(FILE *fp, char const *fmt0, va_list ap)
 {
   int ret;
 
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (EOF);
+  }
   FLOCKFILE(fp);
   ret = __svfscanf_unlocked(fp, fmt0, ap);
   FUNLOCKFILE(fp);
@@ -178,6 +180,10 @@ __svfscanf_unlocked(FILE *fp, const char *fmt0, va_list ap)
 
   _DIAGASSERT(fp != NULL);
   _DIAGASSERT(fmt0 != NULL);
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (EOF);
+  }
 
   _SET_ORIENTATION(fp, -1);
 
@@ -837,12 +843,12 @@ literal:
         goto match_failure;
       if ((flags & SUPPRESS) == 0) {
         if (flags & LONGDBL) {
-/*dvm*/   long double **mp = (long double **)ap;
+          long double **mp = (long double **)ap;
           long double res = strtold(buf, &p);
 
-/*dvm*/   *(*mp) = res;
-/*dvm*/   ap += sizeof(long double *);
-/*dvm*/   //*va_arg(ap, long double *) = res;
+          *(*mp) = res;
+          ap += sizeof(long double *);
+/*???*/   //*va_arg(ap, long double *) = res;
         } else if (flags & LONG) {
           double res = strtod(buf, &p);
           *va_arg(ap, double *) = res;
@@ -988,6 +994,11 @@ parsefloat(FILE *fp, char *buf, char *end)
   unsigned char c;
   char decpt = *localeconv()->decimal_point;
   _Bool gotmantdig = 0, ishex = 0;
+
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (EOF);
+  }
 
   /*
    * We set commit = p whenever the string we have read so far

@@ -1,6 +1,15 @@
-/*  $NetBSD: wctype.h,v 1.6 2005/02/03 04:39:32 perry Exp $ */
+/** @file
+    Wide character classification functions and macros.
 
-/*-
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available under
+    the terms and conditions of the BSD License that accompanies this distribution.
+    The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
+
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c)1999 Citrus Project,
  * All rights reserved.
  *
@@ -26,17 +35,19 @@
  * SUCH DAMAGE.
  *
  *  citrus Id: wctype.h,v 1.4 2000/12/21 01:50:21 itojun Exp
- */
 
+    NetBSD: wctype.h,v 1.6 2005/02/03 04:39:32 perry Exp
+**/
 #ifndef _WCTYPE_H_
 #define _WCTYPE_H_
 
 #include  <sys/EfiCdefs.h>
 #include  <machine/ansi.h>
 
-#ifdef  _BSD_WINT_T_
-typedef _BSD_WINT_T_    wint_t;
-#undef  _BSD_WINT_T_
+#ifdef _EFI_WINT_T
+  typedef _EFI_WINT_T  wint_t;
+  #undef _BSD_WINT_T_
+  #undef _EFI_WINT_T
 #endif
 
 #ifdef  _BSD_WCTRANS_T_

@@ -1,6 +1,13 @@
-/*  $NetBSD: wbuf.c,v 1.13 2003/08/07 16:43:35 agc Exp $  */
+/*
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available
+    under the terms and conditions of the BSD License that accompanies this
+    distribution.  The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
 
-/*-
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1990, 1993
  *  The Regents of the University of California.  All rights reserved.
  *
@@ -30,16 +37,12 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- */
+
+    NetBSD: wbuf.c,v 1.13 2003/08/07 16:43:35 agc Exp
+    wbuf.c  8.1 (Berkeley) 6/4/93
+*/
 #include  <LibConfig.h>
 #include <sys/EfiCdefs.h>
-#if defined(LIBC_SCCS) && !defined(lint)
-#if 0
-static char sccsid[] = "@(#)wbuf.c  8.1 (Berkeley) 6/4/93";
-#else
-__RCSID("$NetBSD: wbuf.c,v 1.13 2003/08/07 16:43:35 agc Exp $");
-#endif
-#endif /* LIBC_SCCS and not lint */
 
 #include <assert.h>
 #include <errno.h>
@@ -58,6 +61,10 @@ __swbuf(int c, FILE *fp)
   int n;
 
   //_DIAGASSERT(fp != NULL);
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (EOF);
+  }
 
   _SET_ORIENTATION(fp, -1);
 

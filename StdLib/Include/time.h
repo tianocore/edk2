@@ -33,11 +33,11 @@
     if Daylight Saving Time is not in effect, and negative if the information
     is not available.
 
-    Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
-    http://opensource.org/licenses/bsd-license.php.
+    http://opensource.org/licenses/bsd-license.
 
     THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -68,6 +68,39 @@
   typedef _EFI_TIME_T  time_t;
   #undef _EFI_TIME_T
 #endif
+
+/** Value added to tm_year to get the full year value.  TM_YEAR_BASE + 110 --> 2010
+**/
+#define TM_YEAR_BASE  1900
+
+/** Values for the tm_wday member of struct tm.
+  @{
+**/
+#define TM_SUNDAY     0
+#define TM_MONDAY     1
+#define TM_TUESDAY    2
+#define TM_WEDNESDAY  3
+#define TM_THURSDAY   4
+#define TM_FRIDAY     5
+#define TM_SATURDAY   6
+/** @}  **/
+
+/** Values for the tm_mon member of struct tm.
+  @{
+**/
+#define TM_JANUARY     0
+#define TM_FEBRUARY    1
+#define TM_MARCH       2
+#define TM_APRIL       3
+#define TM_MAY         4
+#define TM_JUNE        5
+#define TM_JULY        6
+#define TM_AUGUST      7
+#define TM_SEPTEMBER   8
+#define TM_OCTOBER     9
+#define TM_NOVEMBER   10
+#define TM_DECEMBER   11
+/** @}  **/
 
 /** A structure holding the components of a calendar time, called the
     broken-down time.  The first nine (9) members are as mandated by the
@@ -115,7 +148,7 @@ double EFIAPI difftime(time_t time1, time_t time0);
     same encoding as that of the values returned by the time function. The
     original values of the tm_wday and tm_yday components of the structure are
     ignored, and the original values of the other components are not
-    restricted to the ranges indicated above.270) On successful completion,
+    restricted to the ranges indicated above. On successful completion,
     the values of the tm_wday and tm_yday components of the structure are set
     appropriately, and the other components are set to represent the specified
     calendar time, but with their values forced to the ranges indicated above;
@@ -128,25 +161,50 @@ double EFIAPI difftime(time_t time1, time_t time0);
 **/
 time_t EFIAPI mktime(struct tm *timeptr);
 
-/**
+/** The time function determines the current calendar time.
+
+    The encoding of the value is unspecified.
+
+    @return   The time function returns the implementation’s best approximation
+              of the current calendar time. The value (time_t)(-1) is returned
+              if the calendar time is not available. If timer is not a null
+              pointer, the return value is also assigned to the object it
+              points to.
 **/
 time_t EFIAPI time(time_t *timer);
 
 /* #################  Time Conversion Functions  ########################## */
 
-/**
+/** The asctime function converts the broken-down time in the structure pointed
+    to by timeptr into a string in the form
+          Sun Sep 16 01:03:52 1973\n\0
+
+    @return   The asctime function returns a pointer to the string.
 **/
 char * EFIAPI asctime(const struct tm *timeptr);
 
-/**
+/** The ctime function converts the calendar time pointed to by timer to local
+    time in the form of a string. It is equivalent to asctime(localtime(timer))
+
+    @return   The ctime function returns the pointer returned by the asctime
+              function with that broken-down time as argument.
 **/
 char * EFIAPI ctime(const time_t *timer);
 
-/**
+/** The gmtime function converts the calendar time pointed to by timer into a
+    brokendown time, expressed as UTC.
+
+    @return   The gmtime function returns a pointer to the broken-down time,
+              or a null pointer if the specified time cannot be converted to UTC.
 **/
 struct tm  * EFIAPI gmtime(const time_t *timer);
 
-/**
+/** The localtime function converts the calendar time pointed to by timer into
+    a broken-down time, expressed as local time.
+
+    @return   The localtime function returns a pointer to the broken-down time,
+              or a null pointer if the specified time cannot be converted to
+              local time.
 **/
 struct tm  * EFIAPI localtime(const time_t *timer);
 
@@ -303,6 +361,9 @@ struct tm  * EFIAPI localtime(const time_t *timer);
 size_t EFIAPI strftime( char * __restrict s, size_t maxsize,
                       const char * __restrict format,
                       const struct tm * __restrict timeptr);
+
+char *strptime(const char *, const char * format, struct tm*);
+
 
 /* #################  Implementation Functions  ########################### */
 

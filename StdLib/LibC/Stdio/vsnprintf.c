@@ -54,11 +54,7 @@ __weak_alias(vsnprintf,_vsnprintf)
 #endif
 
 int
-vsnprintf(str, n, fmt, ap)
-  char *str;
-  size_t n;
-  const char *fmt;
-  _BSD_VA_LIST_ ap;
+vsnprintf(char *str, size_t n, const char *fmt, _BSD_VA_LIST_ ap)
 {
   int ret;
   FILE f;
@@ -81,7 +77,7 @@ vsnprintf(str, n, fmt, ap)
     f._bf._size = f._w = 0;
   } else {
     f._bf._base = f._p = (unsigned char *)str;
-    f._bf._size = f._w = n - 1;
+    f._bf._size = f._w = (int)(n - 1);
   }
   ret = __vfprintf_unlocked(&f, fmt, ap);
   *f._p = 0;

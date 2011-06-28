@@ -1,6 +1,13 @@
-/* $NetBSD: fgetws.c,v 1.2 2006/07/03 17:06:36 tnozaki Exp $ */
+/*
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available
+    under the terms and conditions of the BSD License that accompanies this
+    distribution.  The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
 
-/*-
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 2002 Tim J. Robbins.
  * All rights reserved.
  *
@@ -27,13 +34,11 @@
  *
  * Original version ID:
  * FreeBSD: src/lib/libc/stdio/fgetws.c,v 1.4 2002/09/20 13:25:40 tjr Exp
- *
- */
+
+    $NetBSD: fgetws.c,v 1.2 2006/07/03 17:06:36 tnozaki Exp $
+*/
 #include  <LibConfig.h>
 #include <sys/EfiCdefs.h>
-#if defined(LIB_SCCS) && !defined(lint)
-__RCSID("$NetBSD: fgetws.c,v 1.2 2006/07/03 17:06:36 tnozaki Exp $");
-#endif
 
 #include <assert.h>
 #include <errno.h>
@@ -54,6 +59,10 @@ fgetws(
 
   _DIAGASSERT(fp != NULL);
   _DIAGASSERT(ws != NULL);
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (NULL);
+  }
 
   FLOCKFILE(fp);
   _SET_ORIENTATION(fp, 1);

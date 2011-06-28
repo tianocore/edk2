@@ -57,8 +57,7 @@
 /*
  * File status flags: these are used by open(2), fcntl(2).
  * They are also used (indirectly) in the kernel file structure f_flags,
- * which is a superset of the open/fcntl flags.  Open flags and f_flags
- * are inter-convertible using OFLAGS(fflags) and FFLAGS(oflags).
+ * which is a superset of the open/fcntl flags.
  * Open/fcntl flags begin with O_; kernel-internal flags begin with F.
  */
 /* open-only flags */
@@ -70,10 +69,6 @@
 /*
  * Kernel encoding of open mode; separate read and write bits that are
  * independently testable: 1 greater than the above.
- *
- * XXX
- * FREAD and FWRITE are excluded from the #ifdef _KERNEL so that TIOCFLUSH,
- * which was documented to use FREAD/FWRITE, continues to work.
  */
 #define FREAD       0x00000001
 #define FWRITE      0x00000002

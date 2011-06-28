@@ -1,6 +1,13 @@
-/*  $NetBSD: fvwrite.c,v 1.16.2.1 2007/05/07 19:49:09 pavel Exp $ */
+/*
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available
+    under the terms and conditions of the BSD License that accompanies this
+    distribution.  The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
 
-/*-
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1990, 1993
  *  The Regents of the University of California.  All rights reserved.
  *
@@ -30,16 +37,12 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- */
+
+    NetBSD: fvwrite.c,v 1.16.2.1 2007/05/07 19:49:09 pavel Exp
+    fvwrite.c 8.1 (Berkeley) 6/4/93
+*/
 #include  <LibConfig.h>
 #include <sys/EfiCdefs.h>
-#if defined(LIBC_SCCS) && !defined(lint)
-#if 0
-static char sccsid[] = "@(#)fvwrite.c 8.1 (Berkeley) 6/4/93";
-#else
-__RCSID("$NetBSD: fvwrite.c,v 1.16.2.1 2007/05/07 19:49:09 pavel Exp $");
-#endif
-#endif /* LIBC_SCCS and not lint */
 
 #include <assert.h>
 #include <errno.h>
@@ -68,6 +71,10 @@ __sfvwrite(FILE *fp, struct __suio *uio)
 
   _DIAGASSERT(fp != NULL);
   _DIAGASSERT(uio != NULL);
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (EOF);
+  }
 
   if ((len = uio->uio_resid) == 0)
     return (0);

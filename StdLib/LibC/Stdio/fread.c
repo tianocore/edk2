@@ -1,11 +1,11 @@
 /** @file
     Implementation of fread as declared in <stdio.h>.
 
-    Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available
     under the terms and conditions of the BSD License that accompanies this
     distribution.  The full text of the license may be found at
-    http://opensource.org/licenses/bsd-license.php.
+    http://opensource.org/licenses/bsd-license.
 
     THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -61,6 +61,10 @@ fread(void *buf, size_t size, size_t count, FILE *fp)
   size_t total;
 
   _DIAGASSERT(fp != NULL);
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (0);
+  }
   /*
    * The ANSI standard requires a return value of 0 for a count
    * or a size of 0.  Whilst ANSI imposes no such requirements on

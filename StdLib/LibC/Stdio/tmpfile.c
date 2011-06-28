@@ -68,8 +68,12 @@ tmpfile()
   //(void)sigprocmask(SIG_BLOCK, &set, &oset);
 
   fd = mkstemp(buf);
-  if (fd != -1)
-    (void)unlink(buf);
+  if (fd != -1) {
+    /*  Changed from unlink(buf) because of differences between the behavior
+        of Unix and UEFI file systems.
+    */
+    (void)DeleteOnClose(fd);
+  }
 
   //(void)sigprocmask(SIG_SETMASK, &oset, NULL);
 

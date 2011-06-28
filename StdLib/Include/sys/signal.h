@@ -14,6 +14,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include  <sys/EfiCdefs.h>
 #include  <machine/signal.h>
 
+enum {
+  __SigInt    = 1,
+  __SigIll,
+  __SigAbrt,
+  __SigFpe,
+  __SigSegv,
+  __SigTerm,
+  __SigBreak,
+  __Sig_Last
+};
+
 /** The type of a signal handler function. **/
 typedef void __sighandler_t(int);
 

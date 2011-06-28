@@ -2,11 +2,11 @@
     Small standard I/O/seek/close functions.
     These maintain the `known seek offset' for seek optimisation.
 
-    Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available
     under the terms and conditions of the BSD License that accompanies this
     distribution.  The full text of the license may be found at
-    http://opensource.org/licenses/bsd-license.php.
+    http://opensource.org/licenses/bsd-license.
 
     THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -65,6 +65,10 @@ __sread(void *cookie, char *buf, int n)
 
   _DIAGASSERT(fp != NULL);
   _DIAGASSERT(buf != NULL);
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (EOF);
+  }
 
   ret = (int)read(fp->_file, buf, (size_t)n);
   /* if the read succeeded, update the current offset */
@@ -82,6 +86,10 @@ __swrite(void *cookie, char const *buf, int n)
 
   _DIAGASSERT(cookie != NULL);
   _DIAGASSERT(buf != NULL);
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (EOF);
+  }
 
   if (fp->_flags & __SAPP)
     (void) lseek(fp->_file, (off_t)0, SEEK_END);
@@ -96,6 +104,10 @@ __sseek(void *cookie, fpos_t offset, int whence)
   off_t ret;
 
   _DIAGASSERT(fp != NULL);
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (EOF);
+  }
 
   ret = lseek(fp->_file, (off_t)offset, whence);
   if (ret == -1L)
@@ -112,6 +124,10 @@ __sclose(void *cookie)
 {
 
   _DIAGASSERT(cookie != NULL);
+  if(cookie == NULL) {
+    errno = EINVAL;
+    return (EOF);
+  }
 
   return (close(((FILE *)cookie)->_file));
 }

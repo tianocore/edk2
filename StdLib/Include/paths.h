@@ -58,12 +58,9 @@
 //#define _PATH_AUDIOCTL0 "/dev/audioctl0"
 //#define _PATH_BPF "/dev/bpf"
 //#define _PATH_CLOCKCTL  "/dev/clockctl"
-#define _PATH_CONSOLE "console:"
-#define _PATH_CONSTTY "constty:"
 //#define _PATH_CSMAPPER  "/usr/share/i18n/csmapper"
 //#define _PATH_DEFTAPE "/dev/nrst0"
 //#define _PATH_DEVDB "/var/run/dev.db"
-#define _PATH_DEVNULL "null:"
 //#define _PATH_DRUM  "/dev/drum"
 //#define _PATH_ESDB  "/usr/share/i18n/esdb"
 //#define _PATH_FTPUSERS  "/etc/ftpusers"
@@ -72,7 +69,6 @@
 //#define _PATH_KMEM  "/dev/kmem"
 //#define _PATH_KSYMS "/dev/ksyms"
 //#define _PATH_KVMDB "/var/db/kvm.db"
-#define _PATH_LOCALE  "/Efi/Locale"
 //#define _PATH_MAILDIR "/var/mail"
 //#define _PATH_MAN "/usr/share/man"
 //#define _PATH_MEM "/dev/mem"
@@ -86,33 +82,51 @@
 //#define _PATH_SOUND "/dev/sound"
 //#define _PATH_SOUND0  "/dev/sound0"
 //#define _PATH_SYSMON  "/dev/sysmon"
-#define _PATH_TTY "tty:"
 //#define _PATH_UNIX  "/netbsd"
 //#define _PATH_URANDOM "/dev/urandom"
 //#define _PATH_VI  "/usr/bin/vi"
+
+// DOS style device paths
+#define _PATH_TTYDEV "tty:"
+#define _PATH_NULLDEV "null:"
+#define _PATH_CONSOLE "console:"
+#define _PATH_CONSTTY "constty:"
 #define _PATH_STDIN   "stdin:"
 #define _PATH_STDOUT  "stdout:"
 #define _PATH_STDERR  "stderr:"
+#define _PATH_SOCKET  "socket:"
+
+// *nix style device paths
+#define _PATH_DEVTTY      "/dev/tty"
+#define _PATH_DEVNULL     "/dev/null"
+#define _PATH_DEVCONSOLE  "/dev/console"
+#define _PATH_DEVCONSTTY  "/dev/constty"
+#define _PATH_DEVSTDIN    "/dev/stdin"
+#define _PATH_DEVSTDOUT   "/dev/stdout"
+#define _PATH_DEVSTDERR   "/dev/stderr"
+#define _PATH_DEVSOCKET   "/dev/socket"
+
+// Special files and locations
+#define _PATH_HOSTS       "/Efi/etc/hosts"
+#define _PATH_SERVICES    "/Efi/etc/services"
+#define _PATH_HOSTNAME    "/Efi/etc/hostname"
+#define _PATH_LOCALE      "/Efi/etc/Locale"
+#define _PATH_FSTAB       "/Efi/etc/fstab"
 
 /*
  * Provide trailing slash, since mostly used for building pathnames.
  * see the __CONCAT() macro from <sys/EfiCdefs.h> for cpp examples.
  */
-//#define _PATH_DEV "/dev/"
+#define _PATH_DEV "/dev/"
+#define _PATH_TMP "/Efi/Temp/"
 //#define _PATH_DEV_PTS "/dev/pts/"
 //#define _PATH_EMUL_AOUT "/emul/aout/"
-#define _PATH_TMP "/Efi/Temp/"
 //#define _PATH_VARDB "/var/db/"
 //#define _PATH_VARRUN  "/var/run/"
 //#define _PATH_VARTMP  "/var/tmp/"
 
-//#ifdef RESCUEDIR
 //#define _PATH_BSHELL  RESCUEDIR "/sh"
 //#define _PATH_CSHELL  RESCUEDIR "/csh"
-//#else
-//#define _PATH_BSHELL  "/bin/sh"
-//#define _PATH_CSHELL  "/bin/csh"
-//#endif
 
 #endif /* !_PATHS_H_ */
 

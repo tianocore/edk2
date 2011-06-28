@@ -4,7 +4,7 @@
   The information is based upon the EFI_FILE_INFO structure
   in MdePkg/Include/Guid/FileInfo.h.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -49,6 +49,7 @@
 
 #include  <sys/featuretest.h>
 #include  <time.h>
+#include  <sys/time.h>
 
 #define MAXNAMLEN 511
 
@@ -66,10 +67,10 @@ struct dirent {
   UINT64    PhysicalSize;       // The amount of physical space the file consumes
                                   // on the file system volume.
   UINT64    Attribute;          // The time the file was created.
-  timespec  CreateTime;         // The time when the file was last accessed.
-  timespec  LastAccessTime;     // The time when the file’s contents were last modified.
-  timespec  ModificationTime;   // The attribute bits for the file. See below.
-  CHAR16    FileName[];         // The Null-terminated name of the file.
+  struct timespec  CreateTime;         // The time when the file was last accessed.
+  struct timespec  LastAccessTime;     // The time when the file’s contents were last modified.
+  struct timespec  ModificationTime;   // The attribute bits for the file. See below.
+  CHAR16    FileName[1];         // The Null-terminated name of the file.
 };
 
 /*

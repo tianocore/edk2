@@ -86,8 +86,9 @@ typedef __socklen_t socklen_t;
 
 #include <machine/ansi.h>
 
-#ifdef  _BSD_SIZE_T_
-typedef _BSD_SIZE_T_  size_t;
+#ifdef  _EFI_SIZE_T_
+typedef _EFI_SIZE_T_  size_t;
+#undef  _EFI_SIZE_T_
 #undef  _BSD_SIZE_T_
 #endif
 

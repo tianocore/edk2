@@ -1,6 +1,6 @@
 /** @file
 
-    Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made
     available under  the terms and conditions of the BSD License that
     accompanies this distribution. The full text of the license may be found at
@@ -54,6 +54,7 @@
 struct stat {
   off_t           st_size;          /* file size, in bytes */
   off_t           st_physsize;      /* physical space the file consumes */
+  off_t           st_curpos;        /* current position within the file, or XY coord. for Console */
   dtime_t         st_birthtime;     /* time of creation */
   dtime_t         st_atime;         /* time of last access */
   dtime_t         st_mtime;         /* time of last data modification */
@@ -113,7 +114,8 @@ struct stat {
     Traditionally, the remainder of the flags are specified in Octal
     but they are expressed in Hex here for modern clarity.
 */
-#define _S_IFMT       0x0001F000   /* type-of-file mask */
+#define _S_IFMT       0x000FF000   /* type-of-file mask */
+#define _S_IFIFO      0x00001000   /* named pipe (fifo) */
 #define _S_IFCHR      0x00002000   /* character special */
 #define _S_IFDIR      0x00004000   /* directory */
 #define _S_IFBLK      0x00006000   /* block special */
@@ -121,9 +123,10 @@ struct stat {
 #define _S_IFSOCK     0x0000C000   /* socket */
 #define _S_ITTY       0x00010000   /* File connects to a TTY device */
 #define _S_IWTTY      0x00020000   /* TTY receives Wide characters */
+#define _S_ICONSOLE   0x00030000    /* UEFI Console Device */
 
 /*  UEFI specific (FAT file system) File attributes.
-    Specifiec in Hexadecimal instead of Octal.
+    Specified in Hexadecimal instead of Octal.
     These bits correspond to the xx portion of _S_IFMT
 */
 #define S_IREADONLY   0x00100000    // Read Only File
@@ -133,9 +136,10 @@ struct stat {
 #define S_IARCHIVE    0x02000000    // Archive Bit
 #define S_IROFS       0x08000000   /* Read Only File System */
 
+#define S_EFIONLY     0xF0000000  /* Flags only used by the EFI system calls. */
+
 #define S_EFISHIFT    20            // LS bit of the UEFI attributes
 
-//#define _S_IFIFO      0010000   /* named pipe (fifo) */
 //#define _S_IFLNK      0120000   /* symbolic link */
 //#define _S_IFWHT      0160000   /* whiteout */
 //#define _S_ARCH1      0200000   /* Archive state 1, ls -l shows 'a' */
@@ -146,12 +150,12 @@ struct stat {
 #define S_IFMT   _S_IFMT
 #define S_IFBLK  _S_IFBLK
 #define S_IFREG  _S_IFREG
-//#define S_IFIFO  _S_IFIFO
-//#define S_IFCHR  _S_IFCHR
-//#define S_IFDIR  _S_IFDIR
+#define S_IFIFO  _S_IFIFO
+#define S_IFCHR  _S_IFCHR
+#define S_IFDIR  _S_IFDIR
 //#define S_IFLNK  _S_IFLNK
 //#define S_ISVTX  _S_ISVTX
-//#define S_IFSOCK _S_IFSOCK
+#define S_IFSOCK _S_IFSOCK
 //#define S_IFWHT  _S_IFWHT
 
 //#define S_ARCH1 _S_ARCH1
@@ -163,7 +167,7 @@ struct stat {
 #define S_ISBLK(m)  ((m & _S_IFMT) == _S_IFBLK) /* block special */
 #define S_ISSOCK(m) ((m & _S_IFMT) == _S_IFSOCK)  /* socket */
 
-//#define S_ISFIFO(m) ((m & _S_IFMT) == _S_IFIFO) /* fifo */
+#define S_ISFIFO(m) ((m & _S_IFMT) == _S_IFIFO) /* fifo */
 //#define S_ISLNK(m)  ((m & _S_IFMT) == _S_IFLNK) /* symbolic link */
 //#define S_ISWHT(m)  ((m & _S_IFMT) == _S_IFWHT) /* whiteout */
 

@@ -1,11 +1,11 @@
 /** @file
     Time Zone processing, declarations and macros.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
+  http://opensource.org/licenses/bsd-license.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -130,29 +130,6 @@ struct tzhead {
 #define SECSPERHOUR (SECSPERMIN * MINSPERHOUR)
 #define SECSPERDAY  ((LONG32)(SECSPERHOUR * HOURSPERDAY))
 #define MONSPERYEAR 12
-
-#define TM_SUNDAY 0
-#define TM_MONDAY 1
-#define TM_TUESDAY  2
-#define TM_WEDNESDAY  3
-#define TM_THURSDAY 4
-#define TM_FRIDAY 5
-#define TM_SATURDAY 6
-
-#define TM_JANUARY  0
-#define TM_FEBRUARY 1
-#define TM_MARCH  2
-#define TM_APRIL  3
-#define TM_MAY    4
-#define TM_JUNE   5
-#define TM_JULY   6
-#define TM_AUGUST 7
-#define TM_SEPTEMBER  8
-#define TM_OCTOBER  9
-#define TM_NOVEMBER 10
-#define TM_DECEMBER 11
-
-#define TM_YEAR_BASE  1900
 
 #define EPOCH_YEAR  1970
 #define EPOCH_WDAY  TM_THURSDAY   // Use this for 32-bit time_t

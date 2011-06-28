@@ -1,6 +1,13 @@
-/*  $NetBSD: fparseln.c,v 1.5 2004/06/20 22:20:15 jmc Exp $ */
-
 /*
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available
+    under the terms and conditions of the BSD License that accompanies this
+    distribution.  The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
+
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1997 Christos Zoulas.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,12 +34,11 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+
+    NetBSD: fparseln.c,v 1.5 2004/06/20 22:20:15 jmc Exp
+*/
 #include  <LibConfig.h>
 #include <sys/EfiCdefs.h>
-#if defined(LIBC_SCCS) && !defined(lint)
-__RCSID("$NetBSD: fparseln.c,v 1.5 2004/06/20 22:20:15 jmc Exp $");
-#endif /* LIBC_SCCS and not lint */
 
 #include "namespace.h"
 
@@ -107,6 +113,10 @@ fparseln(FILE *fp, size_t *size, size_t *lineno, const char str[3], int flags)
   char  esc, con, nl, com;
 
   _DIAGASSERT(fp != NULL);
+  if(fp == NULL) {
+    errno = EINVAL;
+    return (NULL);
+  }
 
   len = 0;
   buf = NULL;

@@ -13,6 +13,7 @@
 **/
 #include  <Uefi.h>
 #include  <Library/UefiLib.h>
+#include  <Library/UefiBootServicesTableLib.h>
 #include  <Library/BaseLib.h>
 #include  <Library/MemoryAllocationLib.h>
 #include  <Library/ShellLib.h>
@@ -23,39 +24,21 @@
 #include  <sys/ansi.h>
 #include  <errno.h>
 #include  <stdarg.h>
+#include  <stdlib.h>
 #include  <string.h>
 #include  <wchar.h>
+#include  <sys/poll.h>
 #include  <sys/fcntl.h>
 #include  <sys/stat.h>
 #include  <sys/syslimits.h>
-#include  "SysEfi.h"
+#include  <Efi/SysEfi.h>
+#include  <kfile.h>
+#include  <Device/Device.h>
 #include  <MainData.h>
 #include  <extern.h>      // Library/include/extern.h: Private to implementation
-#include  <Efi/Console.h>
-
-/* Macros only used in this file. */
-// Parameters for the ValidateFD function.
-#define VALID_OPEN         1
-#define VALID_CLOSED       0
-#define VALID_DONT_CARE   -1
-
+#include  <sys/EfiSysCall.h>
 
 /* EFI versions of BSD system calls used in stdio */
-
-/* Normalize path so that forward slashes are replaced with backslashes.
-    Backslashes are required for UEFI.
-*/
-static void
-NormalizePath( const CHAR16 *path)
-{
-  CHAR16  *temp;
-
-  for( temp = (CHAR16 *)path; *temp; ++temp) {
-    if(*temp == L'/') {
-      *temp = L'\\';
-    }
-  }
-}
 
 /*  Validate that fd refers to a valid file descriptor.
     IsOpen is interpreted as follows:
@@ -66,15 +49,18 @@ NormalizePath( const CHAR16 *path)
     @retval TRUE  fd is VALID
     @retval FALSE fd is INVALID
 */
-static BOOLEAN
+BOOLEAN
 ValidateFD( int fd, int IsOpen)
 {
+  struct __filedes    *filp;
   BOOLEAN   retval = FALSE;
 
   if((fd >= 0) && (fd < OPEN_MAX)) {
+    filp = &gMD->fdarray[fd];
     retval = TRUE;
     if(IsOpen >= 0) {
-      retval = (BOOLEAN)(gMD->fdarray[fd].State != 0);   // TRUE if OPEN
+      retval = (BOOLEAN)((filp->f_iflags != 0)  &&    // TRUE if OPEN
+                         FILE_IS_USABLE(filp));         // and Usable (not Larval or Closing)
       if(IsOpen == VALID_CLOSED) {
         retval = (BOOLEAN)!retval;                      // We want TRUE if CLOSED
       }
@@ -91,7 +77,7 @@ ValidateFD( int fd, int IsOpen)
   @return   Returns -1 if there are no free FDs.  Otherwise returns the
             found fd.
 */
-static int
+int
 FindFreeFD( int MinFd )
 {
   struct __filedes    *Mfd;
@@ -102,13 +88,29 @@ FindFreeFD( int MinFd )
 
   // Get an available fd
   for(i=MinFd; i < OPEN_MAX; ++i) {
-    if(Mfd[i].State == 0) {
-      Mfd[i].State = S_ISYSTEM; // Temporarily mark this fd as reserved
+    if(Mfd[i].f_iflags == 0) {
+      Mfd[i].f_iflags = FIF_LARVAL; // Temporarily mark this fd as reserved
       fd = i;
       break;
     }
   }
   return fd;
+}
+
+/* Mark that an open file is to be deleted when closed. */
+int
+DeleteOnClose(int fd)
+{
+  int   retval = 0;
+
+  if(ValidateFD( fd, VALID_OPEN)) {
+    gMD->fdarray[fd].f_iflags |= FIF_DELCLOSE;
+  }
+  else {
+    errno = EBADF;
+    retval = -1;
+  }
+  return retval;
 }
 
 /** The isatty() function tests whether fildes, an open file descriptor,
@@ -119,15 +121,14 @@ FindFreeFD( int MinFd )
                   EBADF if fildes is not a valid open FD.
 **/
 int
-isatty  (int fildes)
+isatty  (int fd)
 {
   int   retval = 0;
-  EFI_FILE_HANDLE   FileHandle;
+  struct __filedes *Fp;
 
-  if(ValidateFD( fildes, VALID_OPEN)) {
-    FileHandle = gMD->fdarray[fildes].FileHandle;
-    retval =  (FileHandle >= &gMD->StdIo[0].Abstraction) &&
-              (FileHandle <= &gMD->StdIo[2].Abstraction);
+  if(ValidateFD( fd, VALID_OPEN)) {
+    Fp = &gMD->fdarray[fd];
+    retval =  Fp->f_iflags & _S_ITTY;
   }
   else {
     errno = EBADF;
@@ -138,16 +139,19 @@ isatty  (int fildes)
 static BOOLEAN
 IsDupFd( int fd)
 {
-  EFI_FILE_HANDLE       FileHandle;
+  void * DevData;
+  const struct fileops   *FileOps;
   int                   i;
   BOOLEAN               Ret = FALSE;
 
   if(ValidateFD( fd, VALID_OPEN )) {
-    FileHandle = gMD->fdarray[fd].FileHandle;
+    FileOps = gMD->fdarray[fd].f_ops;
+    DevData = gMD->fdarray[fd].devdata;
     for(i=0; i < OPEN_MAX; ++i) {
       if(i == fd)   continue;
-      if(gMD->fdarray[i].State != 0) {   // TRUE if fd is OPEN
-        if(gMD->fdarray[i].FileHandle == FileHandle) {
+      if(ValidateFD( i, VALID_OPEN )) {   // TRUE if fd is valid and OPEN
+        if((gMD->fdarray[i].f_ops == FileOps)
+          &&(gMD->fdarray[i].devdata == DevData )) {
           Ret = TRUE;
           break;
         }
@@ -160,36 +164,37 @@ IsDupFd( int fd)
 static int
 _closeX  (int fd, int NewState)
 {
-  struct __filedes     *Mfd;
-  RETURN_STATUS         Status;
+  struct __filedes     *Fp;
   int                   retval = 0;
-
-  Status = EFIerrno = RETURN_SUCCESS;  // In case of error before the EFI call.
 
   // Verify my pointers and get my FD.
   if(ValidateFD( fd, VALID_OPEN )) {
-    Mfd = &gMD->fdarray[fd];
-    // Check if there are duplicates using this FileHandle
+    Fp = &gMD->fdarray[fd];
+    // Check if there are other users of this FileHandle
+    if(Fp->RefCount == 1) { // There should be no other users
     if(! IsDupFd(fd)) {
       // Only do the close if no one else is using the FileHandle
-      if(isatty(fd)) {
-        Status = Mfd->FileHandle->Close( Mfd->FileHandle);
+        if(Fp->f_iflags & FIF_DELCLOSE) {
+          /* Handle files marked "Delete on Close". */
+          if(Fp->f_ops->fo_delete != NULL) {
+            retval = Fp->f_ops->fo_delete(Fp);
+          }
       }
       else {
-        Status = ShellCloseFile( (SHELL_FILE_HANDLE *)&Mfd->FileHandle);
+          retval = Fp->f_ops->fo_close( Fp);
       }
     }
-    Mfd->State = NewState;   // Close this FD or reserve it
-    if(Status != RETURN_SUCCESS) {
-      errno = EFI2errno(Status);
-      EFIerrno = Status;
-      retval = -1;
+      Fp->f_iflags = NewState;    // Close this FD or reserve it
+      Fp->RefCount = 0;           // No one using this FD
+    }
+    else {
+      --Fp->RefCount;   /* One less user of this FD */
     }
   }
   else {
     // Bad FD
-    errno = EBADF;
     retval = -1;
+    errno = EBADF;
   }
   return retval;
 }
@@ -210,41 +215,28 @@ close  (int fd)
   return _closeX(fd, 0);
 }
 
-/* Wide character version of unlink */
-int
-Uunlink (const wchar_t *Path)
-{
-  EFI_FILE_HANDLE       FileHandle;
-  RETURN_STATUS         Status;
-
-  EFIerrno = RETURN_SUCCESS;
-
-  NormalizePath( Path);
-  // We can only delete open files.
-  Status = ShellOpenFileByName( Path, (SHELL_FILE_HANDLE *)&FileHandle, 3, 0);
-  if(Status != RETURN_SUCCESS) {
-    errno = EFI2errno(Status);
-    EFIerrno = Status;
-    return -1;
-  }
-  Status = ShellDeleteFile( (SHELL_FILE_HANDLE *)&FileHandle);
-  if(Status != RETURN_SUCCESS) {
-    errno = EFI2errno(Status);
-    EFIerrno = Status;
-    return -1;
-  }
-  return 0;
-}
-
 /**
 **/
 int
 unlink (const char *path)
 {
-  // Convert path from MBCS to WCS
-  (void)AsciiStrToUnicodeStr( path, gMD->UString);
+  struct __filedes     *Fp;
+  int                   fd;
+  int                   retval = -1;
 
-  return Uunlink(gMD->UString);
+  EFIerrno = RETURN_SUCCESS;
+
+  fd = open(path, O_WRONLY, 0);
+  if(fd >= 0) {
+    Fp = &gMD->fdarray[fd];
+
+    if(Fp->f_ops->fo_delete != NULL) {
+      retval = Fp->f_ops->fo_delete(Fp);
+  }
+    Fp->f_iflags = 0;    // Close this FD
+    Fp->RefCount = 0;    // No one using this FD
+  }
+  return retval;
 }
 
 /** The fcntl() function shall perform the operations described below on open
@@ -366,23 +358,23 @@ fcntl     (int fildes, int cmd, ...)
         break;
       //case F_SETFL:
       case F_SETFD:
-        retval = MyFd->State;
+        retval = MyFd->f_iflags;
         break;
-      case F_SETOWN:
-        retval = MyFd->SocProc;
-        MyFd->SocProc = va_arg(p3, int);
-        break;
+      //case F_SETOWN:
+      //  retval = MyFd->SocProc;
+      //  MyFd->SocProc = va_arg(p3, int);
+      //  break;
       case F_GETFD:
         //retval = MyFd->Oflags;
-        retval = MyFd->State;
+        retval = MyFd->f_iflags;
         break;
       case F_GETFL:
-        //retval = MyFd->State;
+        //retval = MyFd->f_iflags;
         retval = MyFd->Oflags;
         break;
-      case F_GETOWN:
-        retval = MyFd->SocProc;
-        break;
+      //case F_GETOWN:
+      //  retval = MyFd->SocProc;
+      //  break;
       default:
         errno  = EINVAL;
         break;
@@ -441,9 +433,10 @@ dup2    (int fildes, int fildes2)
     retval = fildes2;
     if( fildes != fildes2) {
       if(ValidateFD( fildes2, VALID_DONT_CARE)) {
-        gMD->fdarray[fildes2].State = S_ISYSTEM;  // Mark the file closed, but reserved
+        gMD->fdarray[fildes2].f_iflags = FIF_LARVAL;  // Mark the file closed, but reserved
         (void)memcpy(&gMD->fdarray[fildes2],      // Duplicate fildes into fildes2
                      &gMD->fdarray[fildes], sizeof(struct __filedes));
+        gMD->fdarray[fildes2].MyFD = (UINT16)fildes2;
       }
       else {
         errno = EBADF;
@@ -486,53 +479,21 @@ dup2    (int fildes, int fildes2)
               indicate the error.
 **/
 __off_t
-lseek (int fildes, __off_t offset, int how)
+lseek (int fd, __off_t offset, int how)
 {
   __off_t             CurPos = -1;
-  RETURN_STATUS       Status = RETURN_SUCCESS;
-  EFI_FILE_HANDLE     FileHandle;
+//  RETURN_STATUS       Status = RETURN_SUCCESS;
+  struct __filedes   *filp;
 
   EFIerrno = RETURN_SUCCESS;    // In case of error without an EFI call
 
   if( how == SEEK_SET || how == SEEK_CUR  || how == SEEK_END) {
-    if(ValidateFD( fildes, VALID_OPEN)) {
+    if(ValidateFD( fd, VALID_OPEN)) {
+      filp = &gMD->fdarray[fd];
       // Both of our parameters have been verified as valid
-      FileHandle = gMD->fdarray[fildes].FileHandle;
-      CurPos = 0;
-      if(isatty(fildes)) {
-        Status = FileHandle->SetPosition( FileHandle, offset);
-        CurPos = offset;
-      }
-      else {
-        if(how != SEEK_SET) {
-          // We are doing a relative seek
-          if(how == SEEK_END) {
-            // seeking relative to EOF, so position there first.
-            Status = ShellSetFilePosition( (SHELL_FILE_HANDLE)FileHandle, 0xFFFFFFFFFFFFFFFFULL);
-          }
-          if(Status == RETURN_SUCCESS) {
-            // Now, determine our current position.
-            Status = ShellGetFilePosition( (SHELL_FILE_HANDLE)FileHandle, (UINT64 *)&CurPos);
-          }
-        }
-        if(Status == RETURN_SUCCESS) {
-          /* CurPos now indicates the point we are seeking from, so seek... */
-          Status = ShellSetFilePosition( (SHELL_FILE_HANDLE)FileHandle, (UINT64)(CurPos + offset));
-          if(Status == RETURN_SUCCESS) {
-            // Now, determine our final position.
-            Status = ShellGetFilePosition( (SHELL_FILE_HANDLE)FileHandle, (UINT64 *)&CurPos);
-          }
-        }
-        if(Status != RETURN_SUCCESS) {
-          EFIerrno = Status;
-          CurPos = -1;
-          if(Status == EFI_UNSUPPORTED) {
-            errno = EISDIR;
-          }
-          else {
-            errno = EFI2errno(Status);
-          }
-        }
+      CurPos = filp->f_ops->fo_lseek( filp, offset, how);
+      if(CurPos >= 0) {
+        filp->f_offset = CurPos;
       }
     }
     else {
@@ -551,37 +512,35 @@ lseek (int fildes, __off_t offset, int how)
     The directory is closed after it is created.
 
     @retval   0   The directory was created successfully.
-    @retval  -1   An error occurred and an error code is stored in errno.
+    @retval  -1   An error occurred and error codes are stored in errno and EFIerrno.
 **/
 int
 mkdir (const char *path, __mode_t perms)
 {
-  EFI_FILE_HANDLE   FileHandle;
+  wchar_t            *NewPath;
+  DeviceNode         *Node;
+  char               *GenI;
   RETURN_STATUS     Status;
-  EFI_FILE_INFO     *FileInfo;
+  int                 Instance  = 0;
+  int                 retval = 0;
 
-  // Convert name from MBCS to WCS
-  (void)AsciiStrToUnicodeStr( path, gMD->UString);
-  NormalizePath( gMD->UString);
-
-//Print(L"%a( \"%s\", 0x%8X)\n", __func__, gMD->UString, perms);
-  Status = ShellCreateDirectory( gMD->UString, (SHELL_FILE_HANDLE *)&FileHandle);
+  Status = ParsePath(path, &NewPath, &Node, &Instance);
   if(Status == RETURN_SUCCESS) {
-    FileInfo = ShellGetFileInfo( FileHandle);
-    if(FileInfo != NULL) {
-      FileInfo->Attribute = Omode2EFI(perms);
-      Status = ShellSetFileInfo( FileHandle, FileInfo);
-      FreePool(FileInfo);
-      if(Status == RETURN_SUCCESS) {
-        (void)ShellCloseFile((SHELL_FILE_HANDLE *)&FileHandle);
-        return 0;
+    GenI = Node->InstanceList;
+    if(GenI == NULL) {
+      errno   = EPERM;
+      retval  = -1;
       }
+    else {
+      GenI += (Instance * Node->InstanceSize);
+      retval = ((GenericInstance *)GenI)->Abstraction.fo_mkdir( path, perms);
+      }
+    free(NewPath);
     }
+  else {
+    retval = -1;
   }
-  errno = EFI2errno(Status);
-  EFIerrno = Status;
-
-  return -1;
+  return retval;
 }
 
 /** Open a file.
@@ -608,112 +567,215 @@ mkdir (const char *path, __mode_t perms)
     O_EXCL        -- if O_CREAT is also set, open will fail if the file already exists.
 **/
 int
-open   (const char *name, int oflags, int mode)
+open   (const char *path, int oflags, int mode)
 {
-  EFI_FILE_HANDLE       FileHandle;
-  struct __filedes     *Mfd;
+  wchar_t              *NewPath;
+  DeviceNode           *Node;
+  char                 *GenI = NULL;
+  struct __filedes     *filp;
+  int                   Instance  = 0;
   RETURN_STATUS         Status;
   UINT64                OpenMode;
-  UINT64                Attributes;
   int                   fd = -1;
-  UINT32                NewState;
+  int                   doresult;
 
-  EFIerrno = RETURN_SUCCESS;
-  Mfd = gMD->fdarray;
-
-  // Convert name from MBCS to WCS
-  (void)AsciiStrToUnicodeStr( name, gMD->UString);
-  NormalizePath( gMD->UString);
-
-  // Convert oflags to Attributes
-  OpenMode = Oflags2EFI(oflags);
-  if(OpenMode == 0) {
-    errno = EINVAL;
-    return -1;
+  Status = ParsePath(path, &NewPath, &Node, &Instance);
+  if(Status == RETURN_SUCCESS) {
+    if((Node != NULL)                       &&
+       ((GenI = Node->InstanceList) == NULL)) {
+      errno   = EPERM;
   }
-
-  //Attributes = Omode2EFI(mode);
-  Attributes = 0;
-
+    else {
   // Could add a test to see if the file name begins with a period.
   // If it does, then add the HIDDEN flag to Attributes.
 
   // Get an available fd
-  fd = FindFreeFD( 0 );
+      fd = FindFreeFD( VALID_CLOSED );
 
   if( fd < 0 ) {
     // All available FDs are in use
     errno = EMFILE;
     return -1;
   }
+      filp = &gMD->fdarray[fd];
+      // Save the flags and mode in the File Descriptor
+      filp->Oflags = oflags;
+      filp->Omode = mode;
 
-  Status = ConOpen( NULL, &FileHandle, gMD->UString, OpenMode, Attributes);
-  if(Status == RETURN_NO_MAPPING) {
-    // Not a console device, how about a regular file device?
-
-    /* Do we care if the file already exists?
-       If O_TRUNC, then delete the file.  It will be created anew subsequently.
-       If O_EXCL, then error if the file exists and O_CREAT is set.
-
-    !!!!!!!!! Change this to use ShellSetFileInfo() to actually truncate the file
-    !!!!!!!!! instead of deleting and re-creating it.
-    */
-    if((oflags & O_TRUNC) || ((oflags & (O_EXCL | O_CREAT)) == (O_EXCL | O_CREAT))) {
-      Status = ShellIsFile( gMD->UString );
-      if(Status == RETURN_SUCCESS) {
-        // The file exists
-        if(oflags & O_TRUNC) {
-          // We do a truncate by deleting the existing file and creating a new one.
-          if(Uunlink(gMD->UString) != 0) {
-            Mfd[fd].State = 0;    // Release our reservation on this FD
-            return -1;  // errno and EFIerrno are already set.
-          }
-        }
-        else if(oflags & (O_EXCL | O_CREAT)) {
-          errno = EEXIST;
-          EFIerrno = Status;
-          Mfd[fd].State = 0;    // Release our reservation on this FD
-          return -1;
-        }
+      GenI += (Instance * Node->InstanceSize);
+      doresult = Node->OpenFunc(filp, GenI, NewPath, NULL);
+      if(doresult < 0) {
+        filp->f_iflags = 0;   // Release this FD
+        fd = -1;              // Indicate an error
       }
-    }
-    // Call the EFI Shell's Open function
-    Status = ShellOpenFileByName( gMD->UString, (SHELL_FILE_HANDLE *)&FileHandle, OpenMode, Attributes);
-    if(RETURN_ERROR(Status)) {
-      Mfd[fd].State = 0;    // Release our reservation on this FD
-      // Set errno based upon Status
-      errno = EFI2errno(Status);
-      EFIerrno = Status;
-      return -1;
-    }
-    // Successfully got a regular File
-    NewState = S_IFREG;
-  }
-  else if(Status != RETURN_SUCCESS) {
-    // Set errno based upon Status
-    errno = EFI2errno(Status);
-    EFIerrno = Status;
-    return -1;
-  }
-  else {
-    // Succesfully got a Console stream
-    NewState = S_IFREG | _S_ITTY | _S_IFCHR;
-  }
+      else {
+        // Re-use OpenMode in order to build our final f_iflags value
+        OpenMode  = ( mode & S_ACC_READ )  ? S_ACC_READ : 0;
+        OpenMode |= ( mode & S_ACC_WRITE ) ? S_ACC_WRITE : 0;
 
-  // Update the info in the fd
-  Mfd[fd].FileHandle = FileHandle;
-  Mfd[fd].Oflags = oflags;
-  Mfd[fd].Omode = mode;
-
-  // Re-use OpenMode in order to build our final State value
-  OpenMode  = ( mode & S_ACC_READ )  ? S_ACC_READ : 0;
-  OpenMode |= ( mode & S_ACC_WRITE ) ? S_ACC_WRITE : 0;
-
-  Mfd[fd].State = NewState | (UINT32)OpenMode;
-
+        filp->f_iflags |= (UINT32)OpenMode;
+        ++filp->RefCount;
+        FILE_SET_MATURE(filp);
+      }
+          }
+    free(NewPath);
+        }
   // return the fd of our now open file
   return fd;
 }
+
+
+/**
+  Poll a list of file descriptors.
+
+  The ::poll routine waits for up to timeout milliseconds for an event
+  to occur on one or more of the file descriptors listed.  The event
+  types of interested are specified for each file descriptor in the events
+  field.  The actual event detected is returned in the revents field of
+  the array.  The
+  <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/poll.html">POSIX</a>
+  documentation is available online.
+
+  @param [in] pfd       Address of an array of pollfd structures.
+
+  @param [in] nfds      Number of elements in the array of pollfd structures.
+
+  @param [in] timeout   Length of time in milliseconds to wait for the event
+
+  @returns    The number of file descriptors with detected events.  Zero
+              indicates that the call timed out and -1 indicates an error.
+
+ **/
+int
+poll (
+  struct pollfd * pfd,
+  nfds_t nfds,
+  int timeout
+  )
+{
+  struct __filedes * pDescriptor;
+  struct pollfd * pEnd;
+  struct pollfd * pPollFD;
+  int SelectedFDs;
+  EFI_STATUS Status;
+  EFI_EVENT Timer;
+  UINT64 TimerTicks;
+
+  //
+  //  Create the timer for the timeout
+  //
+  Timer = NULL;
+  Status = EFI_SUCCESS;
+  if ( INFTIM != timeout ) {
+    Status = gBS->CreateEvent ( EVT_TIMER,
+                                TPL_NOTIFY,
+                                NULL,
+                                NULL,
+                                &Timer );
+    if ( !EFI_ERROR ( Status )) {
+      //
+      //  Start the timeout timer
+      //
+      TimerTicks = timeout;
+      TimerTicks *= 1000 * 10;
+      Status = gBS->SetTimer ( Timer,
+                               TimerRelative,
+                               TimerTicks );
+    }
+    else {
+      SelectedFDs = -1;
+      errno = ENOMEM;
+    }
+  }
+  if ( !EFI_ERROR ( Status )) {
+    //
+    //  Poll until an event is detected or the timer fires
+    //
+    SelectedFDs = 0;
+    errno = 0;
+    do {
+      //
+      //  Poll the list of file descriptors
+      //
+      pPollFD = pfd;
+      pEnd = &pPollFD [ nfds ];
+      while ( pEnd > pPollFD ) {
+        //
+        //  Validate the file descriptor
+        //
+        if ( !ValidateFD ( pPollFD->fd, VALID_OPEN )) {
+          errno = EINVAL;
+          return -1;
+        }
+
+        //
+        //  Poll the device or file
+        //
+        pDescriptor = &gMD->fdarray [ pPollFD->fd ];
+        pPollFD->revents = pDescriptor->f_ops->fo_poll ( pDescriptor,
+                                                         pPollFD->events );
+
+        //
+        //  Determine if this file descriptor detected an event
+        //
+        if ( 0 != pPollFD->revents ) {
+          //
+          //  Select this descriptor
+          //
+          SelectedFDs += 1;
+        }
+
+        //
+        //  Set the next file descriptor
+        //
+        pPollFD += 1;
+      }
+
+      //
+      //  Check for timeout
+      //
+      if ( NULL != Timer ) {
+        Status = gBS->CheckEvent ( Timer );
+        if ( EFI_SUCCESS == Status ) {
+          //
+          //  Timeout
+          //
+          break;
+        }
+        else if ( EFI_NOT_READY == Status ) {
+          Status = EFI_SUCCESS;
+    }
+    }
+    } while (( 0 == SelectedFDs )
+        && ( EFI_SUCCESS == Status ));
+    //
+    //  Stop the timer
+    //
+    if ( NULL != Timer ) {
+      gBS->SetTimer ( Timer,
+                      TimerCancel,
+                      0 );
+  }
+  }
+  else {
+    SelectedFDs = -1;
+    errno = EAGAIN;
+  }
+
+  //
+  //  Release the timer
+  //
+  if ( NULL != Timer ) {
+    gBS->CloseEvent ( Timer );
+  }
+
+  //
+  //  Return the number of selected file system descriptors
+  //
+  return SelectedFDs;
+}
+
+
 
 /** The rename() function changes the name of a file.
     The old argument points to the pathname of the file to be renamed. The new
@@ -745,168 +807,54 @@ open   (const char *name, int oflags, int mode)
               shall be changed or created.
 **/
 int
-rename    (const char *old, const char *new)
+EFIAPI
+rename(
+  const char *from,
+  const char *to
+  )
 {
- // UINT64            InfoSize;
- // RETURN_STATUS     Status;
- // EFI_FILE_INFO     *NewFileInfo = NULL;
- // EFI_FILE_INFO     *OldFileInfo;
- // char              *Newfn;
- // int                OldFd;
+  wchar_t            *FromPath;
+  DeviceNode         *FromNode;
+  char               *GenI;
+  int                 Instance    = 0;
+  RETURN_STATUS       Status;
+  int                 retval      = -1;
 
- //// Open old file
- // OldFd = open(old, O_RDONLY, 0);
- // if(OldFd >= 0) {
- //   NewFileInfo = malloc(sizeof(EFI_FILE_INFO) + PATH_MAX);
- //   if(NewFileInfo != NULL) {
- //     OldFileInfo = ShellGetFileInfo( FileHandle);
- //     if(OldFileInfo != NULL) {
- //       // Copy the Old file info into our new buffer, and free the old.
- //       memcpy(OldFileInfo, NewFileInfo, sizeof(EFI_FILE_INFO));
- //       FreePool(OldFileInfo);
- //       // Strip off all but the file name portion of new
- //       NewFn = strrchr(new, '/');
- //       if(NewFn == NULL) {
- //         NewFn = strrchr(new '\\');
- //         if(NewFn == NULL) {
- //           NewFn = new;
- //         }
- //       }
- //       // Convert new name from MBCS to WCS
- //       (void)AsciiStrToUnicodeStr( NewFn, gMD->UString);
- //       // Copy the new file name into our new file info buffer
- //       wcsncpy(NewFileInfo->FileName, gMD->UString, wcslen(gMD->UString)+1);
- //       // Apply the new file name
- //       Status = ShellSetFileInfo(FileHandle);
- //       if(Status == EFI_SUCCESS) {
- //         // File has been successfully renamed.  We are DONE!
- //         return 0;
- //       }
- //       errno = EFI2errno( Status );
- //       EFIerrno = Status;
- //     }
- //     else {
- //       errno = EIO;
- //     }
- //   }
- //   else {
- //     errno = ENOMEM;
- //   }
- // }
-  return -1;
+  Status = ParsePath(from, &FromPath, &FromNode, &Instance);
+  if(Status == RETURN_SUCCESS) {
+    GenI = FromNode->InstanceList;
+    if(GenI == NULL) {
+      errno   = EPERM;
+      retval  = -1;
+      }
+      else {
+      GenI += (Instance * FromNode->InstanceSize);
+      retval = ((GenericInstance *)GenI)->Abstraction.fo_rename( from, to);
+              }
+    free(FromPath);
+            }
+  return retval;
 }
 
 /**
 **/
 int
-rmdir     (const char *path)
+EFIAPI
+rmdir(
+  const char *path
+  )
 {
-  EFI_FILE_HANDLE   FileHandle;
-  RETURN_STATUS     Status;
-  EFI_FILE_INFO     *FileInfo = NULL;
-  int               Count = 0;
-  BOOLEAN           NoFile = FALSE;
+  struct __filedes   *filp;
+  int                 fd;
+  int                 retval = -1;
 
-  errno = 0;    // Make it easier to see if we have an error later
+  fd = open(path, O_RDWR, 0);
+  if(fd >= 0) {
+    filp = &gMD->fdarray[fd];
 
-  // Convert name from MBCS to WCS
-  (void)AsciiStrToUnicodeStr( path, gMD->UString);
-  NormalizePath( gMD->UString);
-
-//Print(L"%a( \"%s\")\n", __func__, gMD->UString);
-  Status = ShellOpenFileByName( gMD->UString, (SHELL_FILE_HANDLE *)&FileHandle,
-                               (EFI_FILE_MODE_READ || EFI_FILE_MODE_WRITE), 0);
-  if(Status == RETURN_SUCCESS) {
-    FileInfo = ShellGetFileInfo( (SHELL_FILE_HANDLE)FileHandle);
-    if(FileInfo != NULL) {
-      if((FileInfo->Attribute & EFI_FILE_DIRECTORY) == 0) {
-        errno = ENOTDIR;
+    retval = filp->f_ops->fo_rmdir(filp);
       }
-      else {
-        // See if the directory has any entries other than ".." and ".".
-        FreePool(FileInfo);  // Free up the buffer from ShellGetFileInfo()
-        Status = ShellFindFirstFile( (SHELL_FILE_HANDLE)FileHandle, &FileInfo);
-        if(Status == RETURN_SUCCESS) {
-          ++Count;
-          while(Count < 3) {
-            Status = ShellFindNextFile( (SHELL_FILE_HANDLE)FileHandle, FileInfo, &NoFile);
-            if(Status == RETURN_SUCCESS) {
-              if(NoFile) {
-                break;
-              }
-              ++Count;
-            }
-            else {
-              Count = 99;
-            }
-          }
-          FreePool(FileInfo);   // Free buffer from ShellFindFirstFile()
-          if(Count < 3) {
-            // Directory is empty
-            Status = ShellDeleteFile( (SHELL_FILE_HANDLE *)&FileHandle);
-            if(Status == RETURN_SUCCESS) {
-              EFIerrno = RETURN_SUCCESS;
-              return 0;
-              /* ######## SUCCESSFUL RETURN ######## */
-            }
-          }
-          else {
-            if(Count == 99) {
-              errno = EIO;
-            }
-            else {
-              errno = ENOTEMPTY;
-            }
-          }
-        }
-      }
-    }
-    else {
-      errno = EIO;
-    }
-  }
-  EFIerrno = Status;
-  if(errno == 0) {
-    errno = EFI2errno( Status );
-  }
-  return -1;
-}
-
-/* Internal File Info. worker function for stat and fstat. */
-static
-EFI_STATUS
-_EFI_FileInfo( EFI_FILE_INFO *FileInfo, struct stat *statbuf)
-{
-  UINT64            Attributes;
-  RETURN_STATUS     Status;
-  mode_t            newmode;
-
-  if(FileInfo != NULL) {
-    // Got the info, now populate statbuf with it
-    statbuf->st_blksize   = S_BLKSIZE;
-    statbuf->st_size      = FileInfo->Size;
-    statbuf->st_physsize  = FileInfo->PhysicalSize;
-    statbuf->st_birthtime = Efi2Time( &FileInfo->CreateTime);
-    statbuf->st_atime     = Efi2Time( &FileInfo->LastAccessTime);
-    statbuf->st_mtime     = Efi2Time( &FileInfo->ModificationTime);
-    Attributes = FileInfo->Attribute;
-    newmode               = (mode_t)(Attributes << S_EFISHIFT) | S_ACC_READ;
-    if((Attributes & EFI_FILE_DIRECTORY) == 0) {
-      newmode |= _S_IFREG;
-      if((Attributes & EFI_FILE_READ_ONLY) == 0) {
-        statbuf->st_mode |= S_ACC_WRITE;
-      }
-    }
-    else {
-      newmode |= _S_IFDIR;
-    }
-    statbuf->st_mode      = newmode;
-    Status = RETURN_SUCCESS;
-  }
-  else {
-    Status = RETURN_DEVICE_ERROR;
-  }
-  return Status;
+  return retval;
 }
 
 /** The fstat() function obtains information about an open file associated
@@ -935,7 +883,7 @@ _EFI_FileInfo( EFI_FILE_INFO *FileInfo, struct stat *statbuf)
       - st_gid      Set to zero.
       - st_nlink    Set to one.
 
-    @param[in]    fildes    File descriptor as returned from open().
+    @param[in]    fd        File descriptor as returned from open().
     @param[out]   statbuf   Buffer in which the file status is put.
 
     @retval    0  Successful Completion.
@@ -943,37 +891,19 @@ _EFI_FileInfo( EFI_FILE_INFO *FileInfo, struct stat *statbuf)
                   identify the error.
 **/
 int
-fstat (int fildes, struct stat *statbuf)
+fstat (int fd, struct stat *statbuf)
 {
-  EFI_FILE_HANDLE   FileHandle;
-  RETURN_STATUS     Status = RETURN_SUCCESS;
-  EFI_FILE_INFO     *FileInfo = NULL;
-  UINTN             FinfoSize = sizeof(EFI_FILE_INFO);
+  int                 retval = -1;
+  struct __filedes   *filp;
 
-  if(ValidateFD( fildes, VALID_OPEN)) {
-    FileHandle = gMD->fdarray[fildes].FileHandle;
-    if(isatty(fildes)) {
-      FileInfo = AllocateZeroPool(FinfoSize);
-      if(FileInfo != NULL) {
-        Status = FileHandle->GetInfo( FileHandle, 0, &FinfoSize, FileInfo);
+  if(ValidateFD( fd, VALID_OPEN)) {
+    filp = &gMD->fdarray[fd];
+    retval = filp->f_ops->fo_stat(filp, statbuf, NULL);
       }
       else {
-        Status = RETURN_OUT_OF_RESOURCES;
+    errno   =  EBADF;
       }
-    }
-    else {
-      FileInfo = ShellGetFileInfo( FileHandle);
-    }
-    Status = _EFI_FileInfo( FileInfo, statbuf);
-  }
-  errno     = EFI2errno(Status);
-  EFIerrno  = Status;
-
-  if(FileInfo != NULL) {
-    FreePool(FileInfo);     // Release the buffer allocated by the GetInfo function
-  }
-
-  return errno? -1 : 0;
+  return retval;
 }
 
 /** Obtains information about the file pointed to by path.
@@ -988,26 +918,17 @@ fstat (int fildes, struct stat *statbuf)
 int
 stat   (const char *path, void *statbuf)
 {
-  EFI_FILE_HANDLE   FileHandle;
-  RETURN_STATUS     Status;
-  EFI_FILE_INFO     *FileInfo;
+  int                 fd;
+  int                 retval  = -1;
+  struct __filedes   *filp;
 
-  errno = 0;    // Make it easier to see if we have an error later
-
-  // Convert name from MBCS to WCS
-  (void)AsciiStrToUnicodeStr( path, gMD->UString);
-  NormalizePath( gMD->UString);
-
-  Status = ShellOpenFileByName( gMD->UString, (SHELL_FILE_HANDLE *)&FileHandle, EFI_FILE_MODE_READ, 0ULL);
-  if(Status == RETURN_SUCCESS) {
-    FileInfo = ShellGetFileInfo( FileHandle);
-    Status = _EFI_FileInfo( FileInfo, (struct stat *)statbuf);
-    (void)ShellCloseFile( (SHELL_FILE_HANDLE *)&FileHandle);
+  fd = open(path, O_RDONLY, 0);
+  if(fd >= 0) {
+    filp = &gMD->fdarray[fd];
+    retval = filp->f_ops->fo_stat( filp, statbuf, NULL);
+    close(fd);
   }
-  errno     = EFI2errno(Status);
-  EFIerrno  = Status;
-
-  return errno? -1 : 0;
+  return retval;
 }
 
 /**  Same as stat since EFI doesn't have symbolic links.  **/
@@ -1015,6 +936,33 @@ int
 lstat (const char *path, struct stat *statbuf)
 {
   return stat(path, statbuf);
+}
+
+/** Control a device.
+**/
+int
+ioctl(
+  int             fd,
+  unsigned long   request,
+  ...
+  )
+{
+  int                 retval = -1;
+  struct __filedes   *filp;
+  va_list             argp;
+
+  va_start(argp, request);
+
+  if(ValidateFD( fd, VALID_OPEN)) {
+    filp = &gMD->fdarray[fd];
+    retval = filp->f_ops->fo_ioctl(filp, request, argp);
+  }
+  else {
+    errno   =  EBADF;
+  }
+  va_end(argp);
+
+  return retval;
 }
 
 /** Read from a file.
@@ -1083,57 +1031,20 @@ lstat (const char *path, struct stat *statbuf)
 ssize_t
 read   (int fildes, void *buf, size_t nbyte)
 {
+  struct __filedes *filp;
   ssize_t           BufSize;
-  EFI_FILE_HANDLE   FileHandle;
-  RETURN_STATUS     Status;
 
   BufSize = (ssize_t)nbyte;
   if(ValidateFD( fildes, VALID_OPEN)) {
-    FileHandle = gMD->fdarray[fildes].FileHandle;
-    if(isatty(fildes)) {
-      Status = FileHandle->Read( FileHandle, (UINTN *)&BufSize, buf);
-    }
-    else {
-      Status = ShellReadFile( FileHandle, (UINTN *)&BufSize, buf);
-    }
-    if(Status != RETURN_SUCCESS) {
-      EFIerrno = Status;
-      errno = EFI2errno(Status);
-      if(Status == RETURN_BUFFER_TOO_SMALL) {
-        BufSize = -BufSize;
-      }
-      else {
-      BufSize = -1;
-      }
-    }
+    filp = &gMD->fdarray[fildes];
+
+    BufSize = filp->f_ops->fo_read(filp, &filp->f_offset, nbyte, buf);
   }
   else {
     errno = EBADF;
+    BufSize = -EBADF;
   }
   return BufSize;
-}
-
-ssize_t
-WideTtyCvt( CHAR16 *dest, const char *buf, size_t n)
-{
-  UINTN   i;
-  wint_t  wc;
-
-  for(i = 0; i < n; ++i) {
-    wc = btowc(*buf++);
-    if( wc == 0) {
-      break;
-    };
-    if(wc < 0) {
-      wc = BLOCKELEMENT_LIGHT_SHADE;
-    }
-    if(wc == L'\n') {
-      *dest++ = L'\r';
-    }
-    *dest++ = (CHAR16)wc;
-  }
-  *dest = 0;
-  return (ssize_t)i;
 }
 
 /** Write data to a file.
@@ -1159,40 +1070,62 @@ WideTtyCvt( CHAR16 *dest, const char *buf, size_t n)
   QUESTION:  Should writes to stdout or stderr always succeed?
 **/
 ssize_t
-write  (int fildes, const void *buf, size_t n)
+write  (int fd, const void *buf, size_t nbyte)
 {
+  struct __filedes *filp;
   ssize_t           BufSize;
-  EFI_FILE_HANDLE   FileHandle;
-  RETURN_STATUS     Status = RETURN_SUCCESS;
-  ssize_t           UniBufSz;
+//  EFI_FILE_HANDLE   FileHandle;
+//  RETURN_STATUS     Status = RETURN_SUCCESS;
 
-  BufSize = (ssize_t)n;
+  BufSize = (ssize_t)nbyte;
 
-  if(ValidateFD( fildes, VALID_OPEN)) {
-    FileHandle = gMD->fdarray[fildes].FileHandle;
-    if(isatty(fildes)) {
-      // Convert string from MBCS to WCS and translate \n to \r\n.
-      UniBufSz = WideTtyCvt(gMD->UString, (const char *)buf, n);
-      if(UniBufSz > 0) {
-        BufSize = (ssize_t)(UniBufSz * sizeof(CHAR16));
-        Status = FileHandle->Write( FileHandle, (UINTN *)&BufSize, (void *)gMD->UString);
-        BufSize = (ssize_t)n;   // Always pretend all was output
-      }
+  if(ValidateFD( fd, VALID_OPEN)) {
+    filp = &gMD->fdarray[fd];
+
+    BufSize = filp->f_ops->fo_write(filp, &filp->f_offset, nbyte, buf);
     }
     else {
-      Status = ShellWriteFile( FileHandle, (UINTN *)&BufSize, (void *)buf);
-    }
-    if(Status != RETURN_SUCCESS) {
-      EFIerrno = Status;
-      errno = EFI2errno(Status);
-      if(Status == EFI_UNSUPPORTED) {
-        errno = EISDIR;
-      }
-      BufSize = -1;
-    }
-  }
-  else {
     errno = EBADF;
-  }
+    BufSize = -EBADF;
+      }
   return BufSize;
+}
+
+/** Gets the current working directory.
+
+  The getcwd() function shall place an absolute pathname of the current 
+  working directory in the array pointed to by buf, and return buf. The 
+  pathname copied to the array shall contain no components that are 
+  symbolic links. The size argument is the size in bytes of the character 
+  array pointed to by the buf argument. 
+  
+  @param[in,out] buf    The buffer to fill.
+  @param[in]     size   The number of bytes in buffer.
+
+  @retval NULL          The function failed.
+  @retval NULL          Buf was NULL.
+  @retval NULL          Size was 0.
+  @return buf           The function completed successfully. See errno for info.
+**/
+char     
+*getcwd (char *buf, size_t size) 
+{
+  CONST CHAR16 *Cwd;
+
+  if (size == 0 || buf == NULL) {
+    errno = EINVAL;
+    return NULL;
+    }
+
+  Cwd = ShellGetCurrentDir(NULL);
+  if (Cwd == NULL) {
+    errno = EACCES;
+    return NULL;
+  }
+  if (size < ((StrLen (Cwd) + 1) * sizeof (CHAR8))) {
+    errno = ERANGE;
+    return (NULL);
+  }
+  
+  return (UnicodeStrToAsciiStr(Cwd, buf));
 }
