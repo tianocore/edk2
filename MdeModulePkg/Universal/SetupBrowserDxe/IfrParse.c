@@ -1143,6 +1143,10 @@ ParseOpCodes (
           ExpressionOpCode->ValueWidth = (UINT8) sizeof (EFI_IFR_TIME);
           break;
 
+        case EFI_IFR_TYPE_REF:
+          ExpressionOpCode->ValueWidth = (UINT8) sizeof (EFI_IFR_REF);
+          break;
+
         case EFI_IFR_TYPE_OTHER:
         case EFI_IFR_TYPE_UNDEFINED:
         case EFI_IFR_TYPE_ACTION:
@@ -1548,19 +1552,25 @@ ParseOpCodes (
     case EFI_IFR_REF_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
       ASSERT (CurrentStatement != NULL);
-      CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_UNDEFINED;
-      CopyMem (&CurrentStatement->RefFormId, &((EFI_IFR_REF *) OpCodeData)->FormId, sizeof (EFI_FORM_ID));
-      if (OpCodeLength >= sizeof (EFI_IFR_REF2)) {
-        CopyMem (&CurrentStatement->RefQuestionId, &((EFI_IFR_REF2 *) OpCodeData)->QuestionId, sizeof (EFI_QUESTION_ID));
+      Value = &CurrentStatement->HiiValue;
+      Value->Type = EFI_IFR_TYPE_REF;
+      if (OpCodeLength >= sizeof (EFI_IFR_REF)) {
+        CopyMem (&Value->Value.ref.FormId, &((EFI_IFR_REF *) OpCodeData)->FormId, sizeof (EFI_FORM_ID));
 
-        if (OpCodeLength >= sizeof (EFI_IFR_REF3)) {
-          CopyMem (&CurrentStatement->RefFormSetId, &((EFI_IFR_REF3 *) OpCodeData)->FormSetId, sizeof (EFI_GUID));
+        if (OpCodeLength >= sizeof (EFI_IFR_REF2)) {
+          CopyMem (&Value->Value.ref.QuestionId, &((EFI_IFR_REF2 *) OpCodeData)->QuestionId, sizeof (EFI_QUESTION_ID));
 
-          if (OpCodeLength >= sizeof (EFI_IFR_REF4)) {
-            CopyMem (&CurrentStatement->RefDevicePath, &((EFI_IFR_REF4 *) OpCodeData)->DevicePath, sizeof (EFI_STRING_ID));
+          if (OpCodeLength >= sizeof (EFI_IFR_REF3)) {
+            CopyMem (&Value->Value.ref.FormSetGuid, &((EFI_IFR_REF3 *) OpCodeData)->FormSetId, sizeof (EFI_GUID));
+
+            if (OpCodeLength >= sizeof (EFI_IFR_REF4)) {
+              CopyMem (&Value->Value.ref.DevicePath, &((EFI_IFR_REF4 *) OpCodeData)->DevicePath, sizeof (EFI_STRING_ID));
+            }
           }
         }
       }
+      CurrentStatement->StorageWidth = (UINT16) sizeof (EFI_HII_REF);        
+      InitializeRequestElement (FormSet, CurrentStatement, CurrentForm);
       break;
 
     case EFI_IFR_ONE_OF_OP:

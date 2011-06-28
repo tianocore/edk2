@@ -372,10 +372,6 @@ typedef struct {
   UINT64                Step;
 
   EFI_DEFAULT_ID        DefaultId;        // for EFI_IFR_RESET_BUTTON
-  EFI_FORM_ID           RefFormId;        // for EFI_IFR_REF
-  EFI_QUESTION_ID       RefQuestionId;    // for EFI_IFR_REF2
-  EFI_GUID              RefFormSetId;     // for EFI_IFR_REF3
-  EFI_STRING_ID         RefDevicePath;    // for EFI_IFR_REF4
   EFI_GUID              RefreshGuid;      // for EFI_IFR_REFRESH_ID
 
   //

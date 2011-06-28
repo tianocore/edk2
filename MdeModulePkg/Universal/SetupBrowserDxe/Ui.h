@@ -332,6 +332,26 @@ FreeBrowserStrings (
   );
 
 /**
+  Process the goto op code, update the info in the selection structure.
+
+  @param Statement    The statement belong to goto op code.
+  @param Selection    The selection info.
+  @param Repaint      Whether need to repaint the menu.
+  @param NewLine      Whether need to create new line.
+
+  @retval EFI_SUCCESS    The menu process successfully.
+  @return Other value if the process failed.
+**/
+EFI_STATUS
+ProcessGotoOpCode (
+  IN OUT   FORM_BROWSER_STATEMENT      *Statement,
+  IN OUT   UI_MENU_SELECTION           *Selection,
+  OUT      BOOLEAN                     *Repaint,
+  OUT      BOOLEAN                     *NewLine
+  );
+
+
+/**
   The worker function that send the displays to the screen. On output,
   the selection made by user is returned.
 

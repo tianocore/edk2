@@ -1650,6 +1650,175 @@ DevicePathToHiiHandle (
 }
 
 /**
+  Process the goto op code, update the info in the selection structure.
+
+  @param Statement    The statement belong to goto op code.
+  @param Selection    The selection info.
+  @param Repaint      Whether need to repaint the menu.
+  @param NewLine      Whether need to create new line.
+
+  @retval EFI_SUCCESS    The menu process successfully.
+  @return Other value if the process failed.
+**/
+EFI_STATUS
+ProcessGotoOpCode (
+  IN OUT   FORM_BROWSER_STATEMENT      *Statement,
+  IN OUT   UI_MENU_SELECTION           *Selection,
+  OUT      BOOLEAN                     *Repaint,
+  OUT      BOOLEAN                     *NewLine
+  )
+{
+  CHAR16                          *StringPtr;
+  UINTN                           BufferSize;
+  EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
+  CHAR16                          TemStr[2];
+  UINT8                           *DevicePathBuffer;
+  UINTN                           Index;
+  UINT8                           DigitUint8;
+  FORM_BROWSER_FORM               *RefForm;
+  EFI_INPUT_KEY                   Key;
+  EFI_STATUS                      Status;
+  UI_MENU_LIST                    *MenuList;
+  
+  Status = EFI_SUCCESS;
+
+  if (Statement->HiiValue.Value.ref.DevicePath != 0) {
+    if (Selection->Form->ModalForm) {
+      return Status;
+    }
+    //
+    // Goto another Hii Package list
+    //
+    Selection->Action = UI_ACTION_REFRESH_FORMSET;
+
+    StringPtr = GetToken (Statement->HiiValue.Value.ref.DevicePath, Selection->FormSet->HiiHandle);
+    if (StringPtr == NULL) {
+      //
+      // No device path string not found, exit
+      //
+      Selection->Action = UI_ACTION_EXIT;
+      Selection->Statement = NULL;
+      return Status;
+    }
+    BufferSize = StrLen (StringPtr) / 2;
+    DevicePath = AllocatePool (BufferSize);
+    ASSERT (DevicePath != NULL);
+
+    //
+    // Convert from Device Path String to DevicePath Buffer in the reverse order.
+    //
+    DevicePathBuffer = (UINT8 *) DevicePath;
+    for (Index = 0; StringPtr[Index] != L'\0'; Index ++) {
+      TemStr[0] = StringPtr[Index];
+      DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+      if (DigitUint8 == 0 && TemStr[0] != L'0') {
+        //
+        // Invalid Hex Char as the tail.
+        //
+        break;
+      }
+      if ((Index & 1) == 0) {
+        DevicePathBuffer [Index/2] = DigitUint8;
+      } else {
+        DevicePathBuffer [Index/2] = (UINT8) ((DevicePathBuffer [Index/2] << 4) + DigitUint8);
+      }
+    }
+
+    Selection->Handle = DevicePathToHiiHandle (DevicePath);
+    if (Selection->Handle == NULL) {
+      //
+      // If target Hii Handle not found, exit
+      //
+      Selection->Action = UI_ACTION_EXIT;
+      Selection->Statement = NULL;
+      return Status;
+    }
+
+    FreePool (StringPtr);
+    FreePool (DevicePath);
+
+    CopyMem (&Selection->FormSetGuid,&Statement->HiiValue.Value.ref.FormSetGuid, sizeof (EFI_GUID));
+    Selection->FormId = Statement->HiiValue.Value.ref.FormId;
+    Selection->QuestionId = Statement->HiiValue.Value.ref.QuestionId;
+  } else if (!CompareGuid (&Statement->HiiValue.Value.ref.FormSetGuid, &gZeroGuid)) {
+    if (Selection->Form->ModalForm) {
+      return Status;
+    }  
+    //
+    // Goto another Formset, check for uncommitted data
+    //
+    Selection->Action = UI_ACTION_REFRESH_FORMSET;
+
+    CopyMem (&Selection->FormSetGuid, &Statement->HiiValue.Value.ref.FormSetGuid, sizeof (EFI_GUID));
+    Selection->FormId = Statement->HiiValue.Value.ref.FormId;
+    Selection->QuestionId = Statement->HiiValue.Value.ref.QuestionId;
+  } else if (Statement->HiiValue.Value.ref.FormId != 0) {
+    //
+    // Check whether target From is suppressed.
+    //
+    RefForm = IdToForm (Selection->FormSet, Statement->HiiValue.Value.ref.FormId);
+
+    if ((RefForm != NULL) && (RefForm->SuppressExpression != NULL)) {
+      Status = EvaluateExpression (Selection->FormSet, RefForm, RefForm->SuppressExpression);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      if (RefForm->SuppressExpression->Result.Value.b) {
+        //
+        // Form is suppressed. 
+        //
+        do {
+          CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gFormSuppress, gPressEnter, gEmptyString);
+        } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+        if (Repaint != NULL) {
+          *Repaint = TRUE;
+        }
+        return Status;
+      }
+    }
+
+    //
+    // Goto another form inside this formset,
+    //
+    Selection->Action = UI_ACTION_REFRESH_FORM;
+
+    //
+    // Link current form so that we can always go back when someone hits the ESC
+    //
+    MenuList = UiFindMenuList (&Selection->FormSetGuid, Statement->HiiValue.Value.ref.FormId);
+    if (MenuList == NULL && Selection->CurrentMenu != NULL) {
+      MenuList = UiAddMenuList (Selection->CurrentMenu, &Selection->FormSetGuid, Statement->HiiValue.Value.ref.FormId);
+    }
+
+    Selection->FormId = Statement->HiiValue.Value.ref.FormId;
+    Selection->QuestionId = Statement->HiiValue.Value.ref.QuestionId;
+  } else if (Statement->HiiValue.Value.ref.QuestionId != 0) {
+    //
+    // Goto another Question
+    //
+    Selection->QuestionId = Statement->HiiValue.Value.ref.QuestionId;
+
+    if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) {
+      Selection->Action = UI_ACTION_REFRESH_FORM;
+    } else {
+      if (Repaint != NULL) {
+        *Repaint = TRUE;
+      }
+      if (NewLine != NULL) {
+        *NewLine = TRUE;
+      }
+    }
+  } else {
+    if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) {
+      Selection->Action = UI_ACTION_REFRESH_FORM;
+    }
+  }
+
+  return Status;
+}
+
+/**
   Display menu and wait for user to select one menu option, then return it.
   If AutoBoot is enabled, then if user doesn't select any option,
   after period of time, it will automatically return the first menu option.
@@ -1704,16 +1873,9 @@ UiDisplayMenu (
   MENU_REFRESH_ENTRY              *MenuUpdateEntry;  
   UI_SCREEN_OPERATION             ScreenOperation;
   UINT8                           MinRefreshInterval;
-  UINTN                           BufferSize;
   UINT16                          DefaultId;
-  EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
   FORM_BROWSER_STATEMENT          *Statement;
-  CHAR16                          TemStr[2];
-  UINT8                           *DevicePathBuffer;
-  UINT8                           DigitUint8;
   UI_MENU_LIST                    *CurrentMenu;
-  UI_MENU_LIST                    *MenuList;
-  FORM_BROWSER_FORM               *RefForm;
   UINTN                           ModalSkipColumn;
 
   CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
@@ -1736,7 +1898,6 @@ UiDisplayMenu (
   NextMenuOption      = NULL;
   PreviousMenuOption  = NULL;
   SavedMenuOption     = NULL;
-  RefForm             = NULL;
   ModalSkipColumn     = (LocalScreen.RightColumn - LocalScreen.LeftColumn) / 6;
 
   ZeroMem (&Key, sizeof (EFI_INPUT_KEY));
@@ -2613,130 +2774,7 @@ UiDisplayMenu (
 
       switch (Statement->Operand) {
       case EFI_IFR_REF_OP:
-        if (Statement->RefDevicePath != 0) {
-          if (Selection->Form->ModalForm) {
-            break;
-          }
-          //
-          // Goto another Hii Package list
-          //
-          Selection->Action = UI_ACTION_REFRESH_FORMSET;
-
-          StringPtr = GetToken (Statement->RefDevicePath, Selection->FormSet->HiiHandle);
-          if (StringPtr == NULL) {
-            //
-            // No device path string not found, exit
-            //
-            Selection->Action = UI_ACTION_EXIT;
-            Selection->Statement = NULL;
-            break;
-          }
-          BufferSize = StrLen (StringPtr) / 2;
-          DevicePath = AllocatePool (BufferSize);
-          ASSERT (DevicePath != NULL);
-
-          //
-          // Convert from Device Path String to DevicePath Buffer in the reverse order.
-          //
-          DevicePathBuffer = (UINT8 *) DevicePath;
-          for (Index = 0; StringPtr[Index] != L'\0'; Index ++) {
-            TemStr[0] = StringPtr[Index];
-            DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
-            if (DigitUint8 == 0 && TemStr[0] != L'0') {
-              //
-              // Invalid Hex Char as the tail.
-              //
-              break;
-            }
-            if ((Index & 1) == 0) {
-              DevicePathBuffer [Index/2] = DigitUint8;
-            } else {
-              DevicePathBuffer [Index/2] = (UINT8) ((DevicePathBuffer [Index/2] << 4) + DigitUint8);
-            }
-          }
-
-          Selection->Handle = DevicePathToHiiHandle (DevicePath);
-          if (Selection->Handle == NULL) {
-            //
-            // If target Hii Handle not found, exit
-            //
-            Selection->Action = UI_ACTION_EXIT;
-            Selection->Statement = NULL;
-            break;
-          }
-
-          FreePool (StringPtr);
-          FreePool (DevicePath);
-
-          CopyMem (&Selection->FormSetGuid, &Statement->RefFormSetId, sizeof (EFI_GUID));
-          Selection->FormId = Statement->RefFormId;
-          Selection->QuestionId = Statement->RefQuestionId;
-        } else if (!CompareGuid (&Statement->RefFormSetId, &gZeroGuid)) {
-          if (Selection->Form->ModalForm) {
-            break;
-          }
-          //
-          // Goto another Formset, check for uncommitted data
-          //
-          Selection->Action = UI_ACTION_REFRESH_FORMSET;
-
-          CopyMem (&Selection->FormSetGuid, &Statement->RefFormSetId, sizeof (EFI_GUID));
-          Selection->FormId = Statement->RefFormId;
-          Selection->QuestionId = Statement->RefQuestionId;
-        } else if (Statement->RefFormId != 0) {
-          //
-          // Check whether target From is suppressed.
-          //
-          RefForm = IdToForm (Selection->FormSet, Statement->RefFormId);
-
-          if ((RefForm != NULL) && (RefForm->SuppressExpression != NULL)) {
-            Status = EvaluateExpression (Selection->FormSet, RefForm, RefForm->SuppressExpression);
-            if (EFI_ERROR (Status)) {
-              return Status;
-            }
-
-            if (RefForm->SuppressExpression->Result.Value.b) {
-              //
-              // Form is suppressed. 
-              //
-              do {
-                CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gFormSuppress, gPressEnter, gEmptyString);
-              } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
-
-              Repaint = TRUE;
-              break;
-            }
-          }
-
-          //
-          // Goto another form inside this formset,
-          //
-          Selection->Action = UI_ACTION_REFRESH_FORM;
-
-          //
-          // Link current form so that we can always go back when someone hits the ESC
-          //
-          MenuList = UiFindMenuList (&Selection->FormSetGuid, Statement->RefFormId);
-          if (MenuList == NULL) {
-            MenuList = UiAddMenuList (CurrentMenu, &Selection->FormSetGuid, Statement->RefFormId);
-          }
-
-          Selection->FormId = Statement->RefFormId;
-          Selection->QuestionId = Statement->RefQuestionId;
-        } else if (Statement->RefQuestionId != 0) {
-          //
-          // Goto another Question
-          //
-          Selection->QuestionId = Statement->RefQuestionId;
-
-          if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) {
-            Selection->Action = UI_ACTION_REFRESH_FORM;
-          } else {
-            Repaint = TRUE;
-            NewLine = TRUE;
-            break;
-          }
-        }
+        ProcessGotoOpCode(Statement, Selection, &Repaint, &NewLine);
         break;
 
       case EFI_IFR_ACTION_OP:

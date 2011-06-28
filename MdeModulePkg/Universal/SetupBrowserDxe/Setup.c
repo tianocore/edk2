@@ -2644,6 +2644,16 @@ LoadFormConfig (
     }
 
     //
+    // According the spec, ref opcode try to get value from call back with "retrieve" type.
+    //
+    if ((Question->Operand == EFI_IFR_REF_OP) && (FormSet->ConfigAccess != NULL)) {
+      Status = ProcessCallBackFunction(Selection, Question, EFI_BROWSER_ACTION_RETRIEVE, TRUE);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+    }
+
+    //
     // Check whether EfiVarstore with CallBack can be got.
     //
     if ((FormSet->ConfigAccess != NULL) &&

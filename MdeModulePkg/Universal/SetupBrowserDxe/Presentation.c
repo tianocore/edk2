@@ -1162,6 +1162,14 @@ ProcessCallBackFunction (
       default:
         break;
       }
+
+      //
+      // According the spec, return value from call back of "changing" and 
+      // "retrieve" should update to the question's temp buffer.
+      //
+      if (Action == EFI_BROWSER_ACTION_CHANGING || Action == EFI_BROWSER_ACTION_RETRIEVE) {
+        SetQuestionValue(Selection->FormSet,Selection->Form, Question,TRUE);
+      }
     } else if (Status == EFI_UNSUPPORTED) {
       //
       // If return EFI_UNSUPPORTED, also consider Hii driver suceess deal with it.
@@ -1384,11 +1392,18 @@ SetupBrowser (
           (Statement->Operand != EFI_IFR_PASSWORD_OP)) {
 
         Status = ProcessCallBackFunction(Selection, Statement, EFI_BROWSER_ACTION_CHANGING, FALSE);         
-        if ((EFI_ERROR (Status)) && (Status != EFI_UNSUPPORTED)) {
+        if (Statement->Operand == EFI_IFR_REF_OP && Selection->Action != UI_ACTION_EXIT) {
           //
-          // Callback return error status other than EFI_UNSUPPORTED
+          // Process dynamic update ref opcode.
           //
-          if (Statement->Operand == EFI_IFR_REF_OP) {
+          if (!EFI_ERROR (Status)) {
+            Status = ProcessGotoOpCode(Statement, Selection, NULL, NULL);
+          }
+          
+          //
+          // Callback return error status or status return from process goto opcode.
+          //
+          if (EFI_ERROR (Status)) {
             //
             // Cross reference will not be taken
             //
