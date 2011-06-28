@@ -441,8 +441,8 @@
       SortLib|ShellPkg/Library/UefiSortLib/UefiSortLib.inf
       PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
       MemoryAllocationLib|EmulatorPkg/Library/GuardUefiMemoryAllocationLib/GuardUefiMemoryAllocationLib.inf
-      SafeBlockIoLib|ShellPkg/Library/SafeBlockIoLib/SafeBlockIoLib.inf
-      SafeOpenProtocolLib|ShellPkg/Library/SafeOpenProtocolLib/SafeOpenProtocolLib.inf
+#      SafeBlockIoLib|ShellPkg/Library/SafeBlockIoLib/SafeBlockIoLib.inf
+#      SafeOpenProtocolLib|ShellPkg/Library/SafeOpenProtocolLib/SafeOpenProtocolLib.inf
 
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
