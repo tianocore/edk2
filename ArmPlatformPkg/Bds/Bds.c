@@ -198,11 +198,11 @@ DefineDefaultBootEntries (
   VOID
   )
 {
-  BDS_LOAD_OPTION     *BdsLoadOption;
-  UINTN               Size;
-  EFI_STATUS          Status;
-  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL  *EfiDevicePathFromTextProtocol;
-  EFI_DEVICE_PATH*    BootDevicePath;
+  BDS_LOAD_OPTION*                    BdsLoadOption;
+  UINTN                               Size;
+  EFI_STATUS                          Status;
+  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL* EfiDevicePathFromTextProtocol;
+  EFI_DEVICE_PATH*                    BootDevicePath;
 
   //
   // If Boot Order does not exist then create a default entry
@@ -210,8 +210,16 @@ DefineDefaultBootEntries (
   Size = 0;
   Status = gRT->GetVariable (L"BootOrder", &gEfiGlobalVariableGuid, NULL, &Size, NULL);
   if (Status == EFI_NOT_FOUND) {
+    if ((PcdGetPtr(PcdDefaultBootDevicePath) == NULL) || (StrLen ((CHAR16*)PcdGetPtr(PcdDefaultBootDevicePath)) == 0)) {
+      return EFI_UNSUPPORTED;
+    }
+
     Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);
-    ASSERT_EFI_ERROR(Status);
+    if (EFI_ERROR(Status)) {
+      // You must provide an implementation of DevicePathFromTextProtocol in your firmware (eg: DevicePathDxe)
+      DEBUG((EFI_D_ERROR,"Error: Bds requires DevicePathFromTextProtocol\n"));
+      return Status;
+    }
     BootDevicePath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath ((CHAR16*)PcdGetPtr(PcdDefaultBootDevicePath));
 
     DEBUG_CODE_BEGIN();
@@ -238,6 +246,8 @@ DefineDefaultBootEntries (
         &BdsLoadOption
         );
       FreePool (BdsLoadOption);
+    } else {
+      Status = EFI_UNSUPPORTED;
     }
   }
 
@@ -341,10 +351,12 @@ BdsEntry (
   //
   // Declare the Firmware Vendor
   //
-  Size = 0x100;
-  gST->FirmwareVendor = AllocateRuntimePool (Size);
-  ASSERT (gST->FirmwareVendor != NULL);
-  UnicodeSPrint (gST->FirmwareVendor, Size, L"%a EFI %a %a", PcdGetPtr(PcdFirmwareVendor), __DATE__, __TIME__);
+  if (PcdGetPtr(PcdFirmwareVendor)) {
+    Size = 0x100;
+    gST->FirmwareVendor = AllocateRuntimePool (Size);
+    ASSERT (gST->FirmwareVendor != NULL);
+    UnicodeSPrint (gST->FirmwareVendor, Size, L"%a EFI %a %a", PcdGetPtr(PcdFirmwareVendor), __DATE__, __TIME__);
+  }
 
   // If BootNext environment variable is defined then we just load it !
   Status = BdsStartBootOption (L"BootNext");
