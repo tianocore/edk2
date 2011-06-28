@@ -1,7 +1,7 @@
 /** @file
   Unicode and ASCII string primatives.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -994,6 +994,9 @@ InternalAsciiIsHexaDecimalDigitCharacter (
   This function converts the content of the Unicode string Source
   to the ASCII string Destination by copying the lower 8 bits of
   each Unicode character. It returns Destination.
+
+  The caller is responsible to make sure Destination points to a buffer with size
+  equal or greater than ((StrLen (Source) + 1) * sizeof (CHAR8)) in bytes.
 
   If any Unicode characters in Source contain non-zero value in
   the upper 8 bits, then ASSERT().
