@@ -1,0 +1,239 @@
+## @file
+# PythonCore.inf
+#
+# Uses include files from Python-2.7.1/Include
+#
+#  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = Python
+  FILE_GUID                      = 42f58b27-5dc3-4fa7-844d-5a7dbff06432
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 0.1
+  ENTRY_POINT                    = ShellCEntryLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+
+[Packages]
+  StdLib/StdLib.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiLib
+  LibC
+  LibString
+  LibStdio
+  LibGdtoa
+  LibWchar
+  LibMath
+  DevShell
+
+[Sources]
+  Python-2.7.1/Modules/python.c
+  Python-2.7.1/Modules/getbuildinfo.c
+
+#Parser
+  Python-2.7.1/Parser/acceler.c
+  Python-2.7.1/Parser/bitset.c
+  Python-2.7.1/Parser/firstsets.c
+  Python-2.7.1/Parser/grammar.c
+  Python-2.7.1/Parser/grammar1.c
+  Python-2.7.1/Parser/listnode.c
+  Python-2.7.1/Parser/metagrammar.c
+  Python-2.7.1/Parser/myreadline.c
+  Python-2.7.1/Parser/node.c
+  Python-2.7.1/Parser/parser.c
+  Python-2.7.1/Parser/parsetok.c
+  Python-2.7.1/Parser/tokenizer.c
+
+#Python
+  Python-2.7.1/Python/_warnings.c
+  Python-2.7.1/Python/asdl.c
+  Python-2.7.1/Python/ast.c
+  Python-2.7.1/Python/bltinmodule.c
+  Python-2.7.1/Python/ceval.c
+  Python-2.7.1/Python/codecs.c
+  Python-2.7.1/Python/compile.c
+  Python-2.7.1/Python/dtoa.c
+  Python-2.7.1/Python/dynload_stub.c            # Change from dynload_win.c
+  Python-2.7.1/Python/errors.c
+  Python-2.7.1/Python/formatter_string.c
+  Python-2.7.1/Python/formatter_unicode.c
+  Python-2.7.1/Python/frozen.c
+  Python-2.7.1/Python/future.c
+  Python-2.7.1/Python/getargs.c
+  Python-2.7.1/Python/getcompiler.c
+  Python-2.7.1/Python/getcopyright.c
+  Python-2.7.1/Python/getopt.c
+  Python-2.7.1/Python/getplatform.c
+  Python-2.7.1/Python/getversion.c
+  Python-2.7.1/Python/graminit.c
+  Python-2.7.1/Python/import.c
+  Python-2.7.1/Python/importdl.c
+  Python-2.7.1/Python/marshal.c
+  Python-2.7.1/Python/modsupport.c
+  Python-2.7.1/Python/mysnprintf.c
+  Python-2.7.1/Python/mystrtoul.c
+  Python-2.7.1/Python/peephole.c
+  Python-2.7.1/Python/pyarena.c
+  Python-2.7.1/Python/pyctype.c
+  Python-2.7.1/Python/pyfpe.c
+  Python-2.7.1/Python/pymath.c
+  Python-2.7.1/Python/pystate.c
+  Python-2.7.1/Python/pystrcmp.c
+  Python-2.7.1/Python/pystrtod.c
+  Python-2.7.1/Python/Python-ast.c
+  Python-2.7.1/Python/pythonrun.c
+  Python-2.7.1/Python/structmember.c
+  Python-2.7.1/Python/symtable.c
+  Python-2.7.1/Python/sysmodule.c
+  Python-2.7.1/Python/traceback.c
+#  Python-2.7.1/Python/thread.c
+
+#Modules -- See Efi/config.c
+  Python-2.7.1/Modules/_bisectmodule.c
+  Python-2.7.1/Modules/_codecsmodule.c
+  Python-2.7.1/Modules/_collectionsmodule.c
+  Python-2.7.1/Modules/_csv.c
+  Python-2.7.1/Modules/_functoolsmodule.c
+  Python-2.7.1/Modules/_heapqmodule.c
+#  Python-2.7.1/Modules/_hotshot.c
+  Python-2.7.1/Modules/_json.c
+#  Python-2.7.1/Modules/_localemodule.c
+#  Python-2.7.1/Modules/_lsprof.c
+  Python-2.7.1/Modules/_math.c
+  Python-2.7.1/Modules/_randommodule.c
+  Python-2.7.1/Modules/_sre.c
+  Python-2.7.1/Modules/_struct.c
+#  Python-2.7.1/Modules/_weakref.c
+  Python-2.7.1/Modules/arraymodule.c
+#  Python-2.7.1/Modules/audioop.c
+  Python-2.7.1/Modules/binascii.c
+  Python-2.7.1/Modules/cPickle.c
+  Python-2.7.1/Modules/cStringIO.c
+#  Python-2.7.1/Modules/cmathmodule.c
+#  Python-2.7.1/Modules/datetimemodule.c
+  Python-2.7.1/Modules/errnomodule.c
+  Python-2.7.1/Modules/future_builtins.c
+  Python-2.7.1/Modules/gcmodule.c
+  Python-2.7.1/Modules/imageop.c
+  Python-2.7.1/Modules/itertoolsmodule.c
+  Python-2.7.1/Modules/mathmodule.c
+  Python-2.7.1/Modules/md5.c
+  Python-2.7.1/Modules/md5module.c
+#  Python-2.7.1/Modules/mmapmodule.c
+  Python-2.7.1/Modules/operator.c
+  Python-2.7.1/Modules/parsermodule.c
+#  Python-2.7.1/Modules/posixmodule.c
+  Python-2.7.1/Modules/signalmodule.c
+  Python-2.7.1/Modules/shamodule.c
+  Python-2.7.1/Modules/sha256module.c
+  Python-2.7.1/Modules/sha512module.c
+  Python-2.7.1/Modules/stropmodule.c
+  Python-2.7.1/Modules/symtablemodule.c
+#  Python-2.7.1/Modules/threadmodule.c
+  Python-2.7.1/Modules/timemodule.c
+  Python-2.7.1/Modules/xxsubtype.c
+#  Python-2.7.1/Modules/zipimport.c
+#  Python-2.7.1/Modules/zlibmodule.c
+
+#Modules/cjkcodecs
+  Python-2.7.1/Modules/cjkcodecs/multibytecodec.c
+  Python-2.7.1/Modules/cjkcodecs/_codecs_cn.c
+  Python-2.7.1/Modules/cjkcodecs/_codecs_hk.c
+  Python-2.7.1/Modules/cjkcodecs/_codecs_iso2022.c
+  Python-2.7.1/Modules/cjkcodecs/_codecs_jp.c
+  Python-2.7.1/Modules/cjkcodecs/_codecs_kr.c
+  Python-2.7.1/Modules/cjkcodecs/_codecs_tw.c
+
+  Python-2.7.1/Modules/main.c
+#  Python-2.7.1/Modules/rotatingtree.c
+
+#Modules/_io
+  Python-2.7.1/Modules/_io/_iomodule.c
+  Python-2.7.1/Modules/_io/bufferedio.c
+  Python-2.7.1/Modules/_io/bytesio.c
+  Python-2.7.1/Modules/_io/fileio.c
+  Python-2.7.1/Modules/_io/iobase.c
+  Python-2.7.1/Modules/_io/stringio.c
+  Python-2.7.1/Modules/_io/textio.c
+
+#Modules/zlib
+#  Python-2.7.1/Modules/zlib/adler32.c
+#  Python-2.7.1/Modules/zlib/compress.c
+#  Python-2.7.1/Modules/zlib/crc32.c
+#  Python-2.7.1/Modules/zlib/deflate.c
+#  Python-2.7.1/Modules/zlib/gzio.c
+#  Python-2.7.1/Modules/zlib/infback.c
+#  Python-2.7.1/Modules/zlib/inffast.c
+#  Python-2.7.1/Modules/zlib/inflate.c
+#  Python-2.7.1/Modules/zlib/inftrees.c
+#  Python-2.7.1/Modules/zlib/trees.c
+#  Python-2.7.1/Modules/zlib/uncompr.c
+#  Python-2.7.1/Modules/zlib/zutil.c
+
+#Objects
+  Python-2.7.1/Objects/abstract.c
+  Python-2.7.1/Objects/boolobject.c
+  Python-2.7.1/Objects/bufferobject.c
+  Python-2.7.1/Objects/bytearrayobject.c
+  Python-2.7.1/Objects/bytes_methods.c
+  Python-2.7.1/Objects/capsule.c
+  Python-2.7.1/Objects/cellobject.c
+  Python-2.7.1/Objects/classobject.c
+  Python-2.7.1/Objects/cobject.c
+  Python-2.7.1/Objects/codeobject.c
+  Python-2.7.1/Objects/complexobject.c
+  Python-2.7.1/Objects/descrobject.c
+  Python-2.7.1/Objects/dictobject.c
+  Python-2.7.1/Objects/enumobject.c
+  Python-2.7.1/Objects/exceptions.c
+  Python-2.7.1/Objects/fileobject.c
+  Python-2.7.1/Objects/floatobject.c
+  Python-2.7.1/Objects/frameobject.c
+  Python-2.7.1/Objects/funcobject.c
+  Python-2.7.1/Objects/genobject.c
+  Python-2.7.1/Objects/intobject.c
+  Python-2.7.1/Objects/iterobject.c
+  Python-2.7.1/Objects/listobject.c
+  Python-2.7.1/Objects/longobject.c
+  Python-2.7.1/Objects/memoryobject.c
+  Python-2.7.1/Objects/methodobject.c
+  Python-2.7.1/Objects/moduleobject.c
+  Python-2.7.1/Objects/object.c
+  Python-2.7.1/Objects/obmalloc.c
+  Python-2.7.1/Objects/rangeobject.c
+  Python-2.7.1/Objects/setobject.c
+  Python-2.7.1/Objects/sliceobject.c
+  Python-2.7.1/Objects/stringobject.c
+  Python-2.7.1/Objects/structseq.c
+  Python-2.7.1/Objects/tupleobject.c
+  Python-2.7.1/Objects/typeobject.c
+  Python-2.7.1/Objects/unicodectype.c
+  Python-2.7.1/Objects/unicodeobject.c
+  Python-2.7.1/Objects/weakrefobject.c
+
+#EFI -- EFI specific code
+  Efi/config.c
+  Efi/getpathp.c
+#  Efi/_subprocess.c
+#  Efi/_winreg.c
+#  Efi/dl_nt.c
+#  Efi/import_nt.c
+#  Efi/msvcrtmodule.c
+
+[BuildOptions]
+   MSFT:*_*_*_CC_FLAGS            = /Oi- /wd4018 /wd4054 /wd4055 /wd4101 /wd4131 /wd4152 /wd4204 /wd4210 /wd4244 /wd4267 /wd4305 /wd4310 /wd4389 /wd4701 /wd4702 /wd4706 /I%WORKSPACE%\AppPkg\Applications\Python\Ia32 /I%WORKSPACE%\AppPkg\Applications\Python\Python-2.7.1\Include
+    GCC:*_*_IPF_SYMRENAME_FLAGS   = --redefine-syms=$WORKSPACE/StdLib/GccSymRename.txt

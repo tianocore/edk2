@@ -141,6 +141,7 @@
   AppPkg/Applications/Hello/Hello.inf        # No LibC includes or functions.
   AppPkg/Applications/Main/Main.inf          # Simple invocation. No other LibC functions.
   AppPkg/Applications/Enquire/Enquire.inf
+  AppPkg/Applications/Python/PythonCore.inf
 
 ################################################################
 #
