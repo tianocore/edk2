@@ -35,8 +35,8 @@
 [LibraryClasses]
   LibC
   LibStdio
-#  UefiLib
-#  ShellCEntryLib
+  DevShell
+
 
 [BuildOptions]
   MSFT:*_*_IA32_CC_FLAGS  = /Oi-

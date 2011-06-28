@@ -85,6 +85,12 @@
   LibSignal|StdLib/LibC/Signal/Signal.inf
   LibNetUtil|StdLib/LibC/NetUtil/NetUtil.inf
 
+  # Libraries for device abstractions within the Standard C Library
+  # Applications should not directly access any functions defined in these libraries.
+  DevUtility|StdLib/LibC/Uefi/Devices/daUtility.inf
+  DevConsole|StdLib/LibC/Uefi/Devices/daConsole.inf
+  DevShell|StdLib/LibC/Uefi/Devices/daShell.inf
+
 [LibraryClasses.IA32]
   TimerLib|PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
   ## Comment out the above line and un-comment the line below for running under Nt32 emulation.
