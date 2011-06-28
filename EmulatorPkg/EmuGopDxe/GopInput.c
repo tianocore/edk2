@@ -27,36 +27,36 @@ Routine Description:
 
 Arguments:
 
-  RegsiteredData    - A pointer to a buffer that is filled in with the keystroke 
+  RegsiteredData    - A pointer to a buffer that is filled in with the keystroke
                       state data for the key that was registered.
-  InputData         - A pointer to a buffer that is filled in with the keystroke 
+  InputData         - A pointer to a buffer that is filled in with the keystroke
                       state data for the key that was pressed.
 
 Returns:
   TRUE              - Key be pressed matches a registered key.
-  FLASE             - Match failed. 
-  
+  FLASE             - Match failed.
+
 **/
 {
   ASSERT (RegsiteredData != NULL && InputData != NULL);
-  
+
   if ((RegsiteredData->Key.ScanCode    != InputData->Key.ScanCode) ||
       (RegsiteredData->Key.UnicodeChar != InputData->Key.UnicodeChar)) {
-    return FALSE;  
-  }      
-  
+    return FALSE;
+  }
+
   //
   // Assume KeyShiftState/KeyToggleState = 0 in Registered key data means these state could be ignored.
   //
   if (RegsiteredData->KeyState.KeyShiftState != 0 &&
       RegsiteredData->KeyState.KeyShiftState != InputData->KeyState.KeyShiftState) {
-    return FALSE;    
-  }   
+    return FALSE;
+  }
   if (RegsiteredData->KeyState.KeyToggleState != 0 &&
       RegsiteredData->KeyState.KeyToggleState != InputData->KeyState.KeyToggleState) {
-    return FALSE;    
-  }     
-  
+    return FALSE;
+  }
+
   return TRUE;
 
 }
@@ -68,26 +68,26 @@ GopPrivateMakeCallbackFunction (
   IN VOID           *Context,
   IN EFI_KEY_DATA   *KeyData
   )
-{ 
+{
   LIST_ENTRY                        *Link;
   EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY  *CurrentNotify;
   GOP_PRIVATE_DATA                  *Private = (GOP_PRIVATE_DATA *)Context;
-  
+
   KeyMapMake (KeyData);
 
   for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
     CurrentNotify = CR (
-                      Link, 
-                      EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY, 
-                      NotifyEntry, 
+                      Link,
+                      EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY,
+                      NotifyEntry,
                       EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE
                       );
-    if (GopPrivateIsKeyRegistered (&CurrentNotify->KeyData, KeyData)) { 
-      // We could be called at a high TPL so signal an event to call the registered function 
+    if (GopPrivateIsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
+      // We could be called at a high TPL so signal an event to call the registered function
       // at a lower TPL.
       gBS->SignalEvent (CurrentNotify->Event);
     }
-  }    
+  }
 }
 
 
@@ -97,7 +97,7 @@ GopPrivateBreakCallbackFunction (
   IN VOID           *Context,
   IN EFI_KEY_DATA   *KeyData
   )
-{ 
+{
   KeyMapBreak (KeyData);
 }
 
@@ -202,7 +202,7 @@ EmuGopSimpleTextInReadKeyStroke (
 
 
 /**
-  SimpleTextIn and SimpleTextInEx Notify Wait Event 
+  SimpleTextIn and SimpleTextInEx Notify Wait Event
 
   @param  Event                 Event whose notification function is being invoked.
   @param  Context               Pointer to GOP_PRIVATE_DATA.
@@ -268,7 +268,7 @@ EmuGopSimpleTextInWaitForKey (
 
 
   @retval EFI_SUCCESS       The device was reset.
-  
+
   @retval EFI_DEVICE_ERROR  The device is not functioning
                             correctly and could not be reset.
 
@@ -296,7 +296,7 @@ EmuGopSimpleTextInExResetEx (
   GOP_PRIVATE_DATA *Private;
 
   Private = GOP_PRIVATE_DATA_FROM_TEXT_IN_EX_THIS (This);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -333,17 +333,17 @@ EmuGopSimpleTextInExResetEx (
   state information, and in those cases the high order bit in the
   respective Toggle and Shift state fields should not be active.
 
-  
+
   @param This     A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
 
   @param KeyData  A pointer to a buffer that is filled in with
                   the keystroke state data for the key that was
                   pressed.
 
-  
+
   @retval EFI_SUCCESS     The keystroke information was
                           returned.
-  
+
   @retval EFI_NOT_READY   There was no keystroke data available.
                           EFI_DEVICE_ERROR The keystroke
                           information was not returned due to
@@ -360,20 +360,20 @@ EmuGopSimpleTextInExReadKeyStrokeEx (
 /*++
 
   Routine Description:
-    Reads the next keystroke from the input device. The WaitForKey Event can 
+    Reads the next keystroke from the input device. The WaitForKey Event can
     be used to test for existance of a keystroke via WaitForEvent () call.
 
   Arguments:
     This       - Protocol instance pointer.
-    KeyData    - A pointer to a buffer that is filled in with the keystroke 
+    KeyData    - A pointer to a buffer that is filled in with the keystroke
                  state data for the key that was pressed.
 
   Returns:
     EFI_SUCCESS           - The keystroke information was returned.
     EFI_NOT_READY         - There was no keystroke data availiable.
-    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
+    EFI_DEVICE_ERROR      - The keystroke information was not returned due to
                             hardware errors.
-    EFI_INVALID_PARAMETER - KeyData is NULL.                        
+    EFI_INVALID_PARAMETER - KeyData is NULL.
 
 **/
 {
@@ -411,13 +411,13 @@ EmuGopSimpleTextInExReadKeyStrokeEx (
 /**
   The SetState() function allows the input device hardware to
   have state settings adjusted.
-  
+
   @param This           A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
-  
+
   @param KeyToggleState Pointer to the EFI_KEY_TOGGLE_STATE to
                         set the state for the input device.
-  
-  
+
+
   @retval EFI_SUCCESS       The device state was set appropriately.
 
   @retval EFI_DEVICE_ERROR  The device is not functioning
@@ -460,7 +460,7 @@ EmuGopSimpleTextInExSetState (
 
 
 /**
-  SimpleTextIn and SimpleTextInEx Notify Wait Event 
+  SimpleTextIn and SimpleTextInEx Notify Wait Event
 
   @param  Event                 Event whose notification function is being invoked.
   @param  Context               Pointer to GOP_PRIVATE_DATA.
@@ -474,7 +474,7 @@ EmuGopRegisterKeyCallback (
   )
 {
   EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY *ExNotify = (EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY *)Context;
-  
+
   ExNotify->KeyNotificationFn (&ExNotify->KeyData);
 }
 
@@ -483,21 +483,21 @@ EmuGopRegisterKeyCallback (
 /**
   The RegisterKeystrokeNotify() function registers a function
   which will be called when a specified keystroke will occur.
-  
+
   @param This                     A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
-  
+
   @param KeyData                  A pointer to a buffer that is filled in with
                                   the keystroke information for the key that was
                                   pressed.
-  
+
   @param KeyNotificationFunction  Points to the function to be
                                   called when the key sequence
                                   is typed specified by KeyData.
-  
-  
+
+
   @param NotifyHandle             Points to the unique handle assigned to
                                   the registered notification.
-  
+
   @retval EFI_SUCCESS           The device state was set
                                 appropriately.
 
@@ -531,33 +531,33 @@ EmuGopSimpleTextInExRegisterKeyNotify (
   //
   for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
     CurrentNotify = CR (
-                      Link, 
-                      EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY, 
-                      NotifyEntry, 
+                      Link,
+                      EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY,
+                      NotifyEntry,
                       EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE
                       );
-    if (GopPrivateIsKeyRegistered (&CurrentNotify->KeyData, KeyData)) { 
+    if (GopPrivateIsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
       if (CurrentNotify->KeyNotificationFn == KeyNotificationFunction) {
         *NotifyHandle = CurrentNotify->NotifyHandle;
         return EFI_SUCCESS;
       }
     }
-  }    
-  
+  }
+
   //
   // Allocate resource to save the notification function
-  //  
+  //
   NewNotify = (EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY *) AllocateZeroPool (sizeof (EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY));
   if (NewNotify == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewNotify->Signature         = EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE;     
+  NewNotify->Signature         = EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
   NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (KeyData));
   InsertTailList (&Private->NotifyList, &NewNotify->NotifyEntry);
-  
+
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
@@ -568,24 +568,24 @@ EmuGopSimpleTextInExRegisterKeyNotify (
   ASSERT_EFI_ERROR (Status);
 
 
-  *NotifyHandle = NewNotify->NotifyHandle;  
-  
+  *NotifyHandle = NewNotify->NotifyHandle;
+
   return EFI_SUCCESS;
-  
+
 }
 
 
 /**
   The UnregisterKeystrokeNotify() function removes the
   notification which was previously registered.
-  
+
   @param This               A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
-  
+
   @param NotificationHandle The handle of the notification
                             function being unregistered.
-  
+
   @retval EFI_SUCCESS The device state was set appropriately.
-  
+
   @retval EFI_INVALID_PARAMETER The NotificationHandle is
                                 invalid.
 
@@ -602,14 +602,14 @@ EmuGopSimpleTextInExUnregisterKeyNotify (
     Remove a registered notification function from a particular keystroke.
 
   Arguments:
-    This                    - Protocol instance pointer.    
+    This                    - Protocol instance pointer.
     NotificationHandle      - The handle of the notification function being unregistered.
 
   Returns:
     EFI_SUCCESS             - The notification function was unregistered successfully.
     EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
-                              
-**/   
+
+**/
 {
   GOP_PRIVATE_DATA                   *Private;
   LIST_ENTRY                         *Link;
@@ -617,30 +617,30 @@ EmuGopSimpleTextInExUnregisterKeyNotify (
 
   if (NotificationHandle == NULL) {
     return EFI_INVALID_PARAMETER;
-  } 
+  }
 
   if (((EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY *) NotificationHandle)->Signature != EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE) {
     return EFI_INVALID_PARAMETER;
-  } 
+  }
 
   Private = GOP_PRIVATE_DATA_FROM_TEXT_IN_EX_THIS (This);
 
   for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
     CurrentNotify = CR (
-                      Link, 
-                      EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY, 
-                      NotifyEntry, 
+                      Link,
+                      EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY,
+                      NotifyEntry,
                       EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE
-                      );       
+                      );
     if (CurrentNotify->NotifyHandle == NotificationHandle) {
       //
       // Remove the notification function from NotifyList and free resources
       //
-      RemoveEntryList (&CurrentNotify->NotifyEntry);    
-      
+      RemoveEntryList (&CurrentNotify->NotifyEntry);
+
       gBS->CloseEvent (CurrentNotify->Event);
 
-      gBS->FreePool (CurrentNotify);            
+      gBS->FreePool (CurrentNotify);
       return EFI_SUCCESS;
     }
   }
@@ -657,7 +657,7 @@ EmuGopSimpleTextInExUnregisterKeyNotify (
   Initialize SimplelTextIn and SimpleTextInEx protocols in the Private
   context structure.
 
-  @param  Private               Context structure to fill in. 
+  @param  Private               Context structure to fill in.
 
   @return EFI_SUCCESS           Initialization was a success
 
@@ -683,12 +683,12 @@ EmuGopInitializeSimpleTextInForWindow (
                   &Private->SimpleTextIn.WaitForKey
                   );
   ASSERT_EFI_ERROR (Status);
-  
-  
+
+
   //
   // Initialize Simple Text In Ex
   //
-  
+
   Private->SimpleTextInEx.Reset               = EmuGopSimpleTextInExResetEx;
   Private->SimpleTextInEx.ReadKeyStrokeEx     = EmuGopSimpleTextInExReadKeyStrokeEx;
   Private->SimpleTextInEx.SetState            = EmuGopSimpleTextInExSetState;
@@ -696,7 +696,7 @@ EmuGopInitializeSimpleTextInForWindow (
   Private->SimpleTextInEx.UnregisterKeyNotify = EmuGopSimpleTextInExUnregisterKeyNotify;
 
   Private->SimpleTextInEx.Reset (&Private->SimpleTextInEx, FALSE);
-  
+
   InitializeListHead (&Private->NotifyList);
 
   Status = gBS->CreateEvent (
@@ -723,17 +723,17 @@ EmuGopInitializeSimpleTextInForWindow (
 //
 
 
-/**                                                                 
+/**
   Resets the pointer device hardware.
-    
+
   @param  This                  A pointer to the EFI_SIMPLE_POINTER_PROTOCOL
-                                instance.                                   
+                                instance.
   @param  ExtendedVerification  Indicates that the driver may perform a more exhaustive
-                                verification operation of the device during reset.                                       
-                                
+                                verification operation of the device during reset.
+
   @retval EFI_SUCCESS           The device was reset.
-  @retval EFI_DEVICE_ERROR      The device is not functioning correctly and could not be reset.  
-                                   
+  @retval EFI_DEVICE_ERROR      The device is not functioning correctly and could not be reset.
+
 **/
 EFI_STATUS
 EFIAPI
@@ -770,19 +770,19 @@ EmuGopSimplePointerReset (
 }
 
 
-/**                                                                 
+/**
   Retrieves the current state of a pointer device.
-    
+
   @param  This                  A pointer to the EFI_SIMPLE_POINTER_PROTOCOL
-                                instance.                                   
+                                instance.
   @param  State                 A pointer to the state information on the pointer device.
-                                
+
   @retval EFI_SUCCESS           The state of the pointer device was returned in State.
   @retval EFI_NOT_READY         The state of the pointer device has not changed since the last call to
-                                GetState().                                                           
+                                GetState().
   @retval EFI_DEVICE_ERROR      A device error occurred while attempting to retrieve the pointer device's
-                                current state.                                                           
-                                   
+                                current state.
+
 **/
 EFI_STATUS
 EFIAPI
@@ -816,7 +816,7 @@ EmuGopSimplePointerGetState (
 
 
 /**
-  SimplePointer Notify Wait Event 
+  SimplePointer Notify Wait Event
 
   @param  Event                 Event whose notification function is being invoked.
   @param  Context               Pointer to GOP_PRIVATE_DATA.
@@ -858,11 +858,11 @@ EmuGopSimplePointerWaitForInput (
 
 
 /**
-  SimplePointer constructor 
+  SimplePointer constructor
 
-  @param  Private Context structure to fill in.      
+  @param  Private Context structure to fill in.
 
-  @retval EFI_SUCCESS Constructor had success        
+  @retval EFI_SUCCESS Constructor had success
 
 **/
 EFI_STATUS

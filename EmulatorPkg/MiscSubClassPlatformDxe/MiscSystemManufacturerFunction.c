@@ -1,19 +1,19 @@
 /*++
 
 Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   MiscSystemManufacturerFunction.c
-  
-Abstract: 
+
+Abstract:
 
   This driver parses the mMiscSubclassDataTable structure and reports
   any generated data to the DataHub.
@@ -26,7 +26,7 @@ Abstract:
   This function makes boot time changes to the contents of the
   MiscSystemManufacturer (Type 1).
 
-  @param  RecordData                 Pointer to copy of RecordData from the Data Table.  
+  @param  RecordData                 Pointer to copy of RecordData from the Data Table.
 
   @retval EFI_SUCCESS                All parameters were valid.
   @retval EFI_UNSUPPORTED            Unexpected RecordType value.
@@ -96,8 +96,8 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscSystemManufacturer)
   SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE1);
   //
   // Make handle chosen by smbios protocol.add automatically.
-  // 
-  SmbiosRecord->Hdr.Handle = 0;  
+  //
+  SmbiosRecord->Hdr.Handle = 0;
   //
   // Manu will be the 1st optional string following the formatted structure.
   //
@@ -105,11 +105,11 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscSystemManufacturer)
   //
   // ProductName will be the 2nd optional string following the formatted structure.
   //
-  SmbiosRecord->ProductName = 2;  
+  SmbiosRecord->ProductName = 2;
   //
-  // Version will be the 3rd optional string following the formatted structure.  
+  // Version will be the 3rd optional string following the formatted structure.
   //
-  SmbiosRecord->Version = 3;  
+  SmbiosRecord->Version = 3;
   //
   // Version will be the 4th optional string following the formatted structure.
   //
@@ -128,9 +128,9 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscSystemManufacturer)
   //
   SmbiosHandle = 0;
   Status = Smbios-> Add(
-                      Smbios, 
+                      Smbios,
                       NULL,
-                      &SmbiosHandle, 
+                      &SmbiosHandle,
                       (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
                       );
   FreePool(SmbiosRecord);

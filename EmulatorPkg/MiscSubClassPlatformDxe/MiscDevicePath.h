@@ -1,13 +1,13 @@
 /*++
- 
+
 Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
-  Misc class required EFI Device Path definitions (Ports, slots & 
+  Misc class required EFI Device Path definitions (Ports, slots &
   onboard devices)
 
 **/
@@ -33,7 +33,7 @@ Abstract:
 #define USB1_1_STR  "ACPI(PNP0A03,0)/PCI(1D,0)."
 #define USB1_2_STR  "ACPI(PNP0A03,0)/PCI(1D,1)."
 #define USB1_3_STR  "ACPI(PNP0A03,0)/PCI(1D,2)."
-#define USB2_1_STR  "ACPI(PNP0A03,0)/PCI(1D,7)." 
+#define USB2_1_STR  "ACPI(PNP0A03,0)/PCI(1D,7)."
 */
 
 //

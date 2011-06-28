@@ -1,20 +1,20 @@
 /**@file
- Linux Packet Filter implementation of the EMU_SNP_PROTOCOL that allows the 
+ Linux Packet Filter implementation of the EMU_SNP_PROTOCOL that allows the
  emulator to get on real networks.
 
  Currently only the Berkeley Packet Filter is fully implemented and this file
- is just a template that needs to get filled in. 
+ is just a template that needs to get filled in.
 
 Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
 Portitions copyright (c) 2011, Apple Inc. All rights reserved.
 
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -59,7 +59,7 @@ EmuSnpCreateMapping (
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
   Private->Mode = Mode;
-    
+
   return EFI_SUCCESS;
 }
 
@@ -112,8 +112,8 @@ EmuSnpStop (
 }
 
 /**
-  Resets a network adapter and allocates the transmit and receive buffers 
-  required by the network interface; optionally, also requests allocation 
+  Resets a network adapter and allocates the transmit and receive buffers
+  required by the network interface; optionally, also requests allocation
   of additional transmit and receive buffers.
 
   @param  This              The protocol instance pointer.
@@ -152,8 +152,8 @@ EmuSnpInitialize (
 }
 
 /**
-  Resets a network adapter and re-initializes it with the parameters that were 
-  provided in the previous call to Initialize().  
+  Resets a network adapter and re-initializes it with the parameters that were
+  provided in the previous call to Initialize().
 
   @param  This                 The protocol instance pointer.
   @param  ExtendedVerification Indicates that the driver may perform a more
@@ -181,7 +181,7 @@ EmuSnpReset (
 }
 
 /**
-  Resets a network adapter and leaves it in a state that is safe for 
+  Resets a network adapter and leaves it in a state that is safe for
   another driver to initialize.
 
   @param  This Protocol instance pointer.
@@ -348,7 +348,7 @@ EmuSnpMCastIpToMac (
 }
 
 /**
-  Performs read and write operations on the NVRAM device attached to a 
+  Performs read and write operations on the NVRAM device attached to a
   network interface.
 
   @param  This       The protocol instance pointer.
@@ -384,7 +384,7 @@ EmuSnpNvData (
 }
 
 /**
-  Reads the current interrupt status and recycled transmit buffer status from 
+  Reads the current interrupt status and recycled transmit buffer status from
   a network interface.
 
   @param  This            The protocol instance pointer.
@@ -448,7 +448,7 @@ EmuSnpGetStatus (
 
   @retval EFI_SUCCESS           The packet was placed on the transmit queue.
   @retval EFI_NOT_STARTED       The network interface has not been started.
-  @retval EFI_NOT_READY         The network interface is too busy to accept this transmit request.                      
+  @retval EFI_NOT_READY         The network interface is too busy to accept this transmit request.
   @retval EFI_BUFFER_TOO_SMALL  The BufferSize parameter is too small.
   @retval EFI_INVALID_PARAMETER One or more of the parameters has an unsupported value.
   @retval EFI_DEVICE_ERROR      The command could not be sent to the network interface.
@@ -547,25 +547,25 @@ EmuSnpThunkOpen (
   )
 {
   EMU_SNP_PRIVATE  *Private;
-  
+
   if (This->Private != NULL) {
     return EFI_ALREADY_STARTED;
   }
-  
+
   if (!CompareGuid (This->Protocol, &gEmuSnpProtocolGuid)) {
     return EFI_UNSUPPORTED;
   }
-  
+
   Private = malloc (sizeof (EMU_SNP_PRIVATE));
   if (Private == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  
+
   Private->Signature = EMU_SNP_PRIVATE_SIGNATURE;
   Private->Thunk     = This;
   CopyMem (&Private->EmuSnp, &gEmuSnpProtocol, sizeof (gEmuSnpProtocol));
-  
+
   This->Interface = &Private->EmuSnp;
   This->Private   = Private;
   return EFI_SUCCESS;
@@ -582,10 +582,10 @@ EmuSnpThunkClose (
   if (!CompareGuid (This->Protocol, &gEmuSnpProtocolGuid)) {
     return EFI_UNSUPPORTED;
   }
-  
+
   Private = This->Private;
   free (Private);
-  
+
   return EFI_SUCCESS;
 }
 

@@ -20,7 +20,7 @@
   This function makes boot time changes to the contents of the
   MiscSystemOptionString (Type 12).
 
-  @param  RecordData                 Pointer to copy of RecordData from the Data Table.  
+  @param  RecordData                 Pointer to copy of RecordData from the Data Table.
 
   @retval EFI_SUCCESS                All parameters were valid.
   @retval EFI_UNSUPPORTED            Unexpected RecordType value.
@@ -50,7 +50,7 @@ MISC_SMBIOS_TABLE_FUNCTION(SystemOptionString)
   if (OptStrLen > SMBIOS_STRING_MAX_LENGTH) {
     return EFI_UNSUPPORTED;
   }
- 
+
   //
   // Two zeros following the last string.
   //
@@ -62,7 +62,7 @@ MISC_SMBIOS_TABLE_FUNCTION(SystemOptionString)
   //
   // Make handle chosen by smbios protocol.add automatically.
   //
-  SmbiosRecord->Hdr.Handle = 0;  
+  SmbiosRecord->Hdr.Handle = 0;
 
   SmbiosRecord->StringCount = 1;
   OptionalStrStart = (CHAR8*) (SmbiosRecord + 1);
@@ -72,9 +72,9 @@ MISC_SMBIOS_TABLE_FUNCTION(SystemOptionString)
   //
   SmbiosHandle = 0;
   Status = Smbios-> Add(
-                      Smbios, 
+                      Smbios,
                       NULL,
-                      &SmbiosHandle, 
+                      &SmbiosHandle,
                       (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
                       );
 

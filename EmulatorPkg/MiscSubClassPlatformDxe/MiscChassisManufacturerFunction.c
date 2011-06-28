@@ -19,7 +19,7 @@
   This function makes boot time changes to the contents of the
   MiscChassisManufacturer (Type 3).
 
-  @param  RecordData                 Pointer to copy of RecordData from the Data Table.  
+  @param  RecordData                 Pointer to copy of RecordData from the Data Table.
 
   @retval EFI_SUCCESS                All parameters were valid.
   @retval EFI_UNSUPPORTED            Unexpected RecordType value.
@@ -91,24 +91,24 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscChassisManufacturer)
   //
   // Make handle chosen by smbios protocol.add automatically.
   //
-  SmbiosRecord->Hdr.Handle = 0;  
+  SmbiosRecord->Hdr.Handle = 0;
   //
   // Manu will be the 1st optional string following the formatted structure.
-  // 
-  SmbiosRecord->Manufacturer = 1;  
+  //
+  SmbiosRecord->Manufacturer = 1;
   SmbiosRecord->Type = (UINT8)ForType3InputData->ChassisType.ChassisType;
   //
   // Version will be the 2nd optional string following the formatted structure.
   //
-  SmbiosRecord->Version = 2;  
+  SmbiosRecord->Version = 2;
   //
   // SerialNumber will be the 3rd optional string following the formatted structure.
   //
-  SmbiosRecord->SerialNumber = 3;  
+  SmbiosRecord->SerialNumber = 3;
   //
   // AssertTag will be the 4th optional string following the formatted structure.
   //
-  SmbiosRecord->AssetTag = 4;  
+  SmbiosRecord->AssetTag = 4;
   SmbiosRecord->BootupState = (UINT8)ForType3InputData->ChassisBootupState;
   SmbiosRecord->PowerSupplyState = (UINT8)ForType3InputData->ChassisPowerSupplyState;
   SmbiosRecord->ThermalState = (UINT8)ForType3InputData->ChassisThermalState;
@@ -126,9 +126,9 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscChassisManufacturer)
   //
   SmbiosHandle = 0;
   Status = Smbios-> Add(
-                      Smbios, 
+                      Smbios,
                       NULL,
-                      &SmbiosHandle, 
+                      &SmbiosHandle,
                       (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
                       );
 

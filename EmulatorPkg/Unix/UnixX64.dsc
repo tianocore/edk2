@@ -105,7 +105,7 @@
   #
   PlatformBdsLib|EmulatorPkg/Library/EmuBdsLib/EmuBdsLib.inf
   KeyMapLib|EmulatorPkg/Library/KeyMapLibNull/KeyMapLibNull.inf
-  
+
   #
   # Misc
   #
@@ -178,7 +178,7 @@
 
 [LibraryClasses.common.UEFI_DRIVER]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
- 
+
 [LibraryClasses.common.UEFI_APPLICATION]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 
@@ -204,7 +204,7 @@
   gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareFdSize|0x002a0000
   gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareBlockSize|0x10000
   gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareVolume|L"../FV/FV_RECOVERY.fd"
-  
+
   gEmulatorPkgTokenSpaceGuid.PcdEmuMemorySizeForSecMain|L"64!64"
 
 !if $(BUILD_NEW_SHELL)
@@ -227,7 +227,7 @@
 #define BOOT_ON_FLASH_UPDATE                          0x12
 #define BOOT_IN_RECOVERY_MODE                         0x20
   gEmulatorPkgTokenSpaceGuid.PcdEmuBootMode|0
-  
+
   gEmulatorPkgTokenSpaceGuid.PcdEmuApCount|L"1"
 
   # For a CD-ROM/DVD use L"diag.dmg:RO:2048"
@@ -288,7 +288,7 @@
   }
 
 [Components.IA32]
-  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf 
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 !endif
 
 [Components]
@@ -314,8 +314,8 @@
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
   MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
-  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf 
-  
+  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
+
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
   EmulatorPkg/BootModePei/BootModePei.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
@@ -342,7 +342,7 @@
   MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf {
    <LibraryClasses>
       DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-      SerialPortLib|EmulatorPkg/Library/DxeEmuStdErrSerialPortLib/DxeEmuStdErrSerialPortLib.inf    
+      SerialPortLib|EmulatorPkg/Library/DxeEmuStdErrSerialPortLib/DxeEmuStdErrSerialPortLib.inf
   }
 
   MdeModulePkg/Universal/Metronome/Metronome.inf
@@ -370,17 +370,17 @@
   EmbeddedPkg/SerialDxe/SerialDxe.inf {
    <LibraryClasses>
       DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-      SerialPortLib|EmulatorPkg/Library/DxeEmuSerialPortLib/DxeEmuSerialPortLib.inf    
+      SerialPortLib|EmulatorPkg/Library/DxeEmuSerialPortLib/DxeEmuSerialPortLib.inf
   }
-  
+
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
-  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf 
+  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   #{
-  #  <LibraryClasses>  
+  #  <LibraryClasses>
   #    NULL|EmulatorPkg/Library/DevicePathTextLib/DevicePathTextLib.inf
   #}
-  
+
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf

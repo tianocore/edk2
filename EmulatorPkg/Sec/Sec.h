@@ -1,7 +1,7 @@
 /*++ @file
   Stub SEC that is called from the OS appliation that is the root of the emulator.
-  
-  The OS application will call the SEC with the PEI Entry Point API.  
+
+  The OS application will call the SEC with the PEI Entry Point API.
 
 Copyright (c) 2011, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials

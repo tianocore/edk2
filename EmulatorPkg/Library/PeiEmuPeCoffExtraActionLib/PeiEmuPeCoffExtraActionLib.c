@@ -26,7 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/EmuMagicPageLib.h>
 
 //
-// Cache of UnixThunk protocol 
+// Cache of UnixThunk protocol
 //
 EMU_THUNK_PROTOCOL   *mThunk = NULL;
 
@@ -45,7 +45,7 @@ EmuPeCoffGetThunkStucture (
   EMU_THUNK_PPI     *ThunkPpi;
   EFI_STATUS        Status;
 
-  
+
   //
   // Locate Unix ThunkPpi for retrieving standard output handle
   //
@@ -87,9 +87,9 @@ PeCoffLoaderRelocateImageExtraAction (
 /**
   Performs additional actions just before a PE/COFF image is unloaded.  Any resources
   that were allocated by PeCoffLoaderRelocateImageExtraAction() must be freed.
-  
+
   If ImageContext is NULL, then ASSERT().
-  
+
   @param  ImageContext  Pointer to the image context structure that describes the
                         PE/COFF image that is being unloaded.
 

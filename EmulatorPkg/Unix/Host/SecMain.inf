@@ -38,7 +38,7 @@
   LinuxPacketFilter.c
   BerkeleyPacketFilter.c
   MemoryAllocationLib.c
-  
+
 [Sources.X64]
   X64/Gasket.S        # convert between Emu x86_64 ABI and EFI X64 ABI
   X64/SwitchStack.S

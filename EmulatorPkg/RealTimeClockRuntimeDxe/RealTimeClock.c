@@ -3,13 +3,13 @@
 
 Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2010 - 2011, Apple Inc. All rights reserved.
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 #include <PiDxe.h>
@@ -55,14 +55,14 @@ EmuGetTime (
 /*++
 
 Routine Description:
-  Service routine for RealTimeClockInstance->GetTime 
+  Service routine for RealTimeClockInstance->GetTime
 
 Arguments:
 
   Time          - A pointer to storage that will receive a snapshot of the current time.
 
   Capabilities  - A pointer to storage that will receive the capabilities of the real time clock
-                  in the platform. This includes the real time clock's resolution and accuracy.  
+                  in the platform. This includes the real time clock's resolution and accuracy.
                   All reported device capabilities are rounded up.  This is an OPTIONAL argument.
 
 Returns:
@@ -95,7 +95,7 @@ EmuSetTime (
 /*++
 
 Routine Description:
-  Service routine for RealTimeClockInstance->SetTime 
+  Service routine for RealTimeClockInstance->SetTime
 
 Arguments:
 
@@ -105,7 +105,7 @@ Arguments:
 Returns:
 
   EFI_SUCEESS           - The operation completed successfully.
-                  
+
   EFI_INVALID_PARAMETER - One of the fields in Time is out of range.
 
   EFI_DEVICE_ERROR      - The operation could not be complete due to a device error.
@@ -152,7 +152,7 @@ Arguments:
 Returns:
 
   EFI_SUCEESS           - The operation completed successfully.
-                  
+
   EFI_DEVICE_ERROR      - The operation could not be complete due to a device error.
 
   EFI_UNSUPPORTED       - The operation is not supported on this platform.
@@ -184,7 +184,7 @@ Arguments:
 Returns:
 
   EFI_SUCEESS           - The operation completed successfully.
-                  
+
   EFI_DEVICE_ERROR      - The operation could not be complete due to a device error.
 
   EFI_INVALID_PARAMETER - A field in Time is out of range.
@@ -205,7 +205,7 @@ InitializeRealTimeClock (
 /*++
 
 Routine Description:
-  Install Real Time Clock Protocol 
+  Install Real Time Clock Protocol
 
 Arguments:
   ImageHandle - Image Handle
@@ -244,8 +244,8 @@ RtcTimeFieldsValid (
 Routine Description:
 
   Arguments:
- 
-  Returns: 
+
+  Returns:
 **/
 {
   if (Time->Year < 1998 ||

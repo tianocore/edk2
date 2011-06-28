@@ -2,7 +2,7 @@
 #   A DXE driver to produce EMU_THUNK_PROTOCOL
 #
 # Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-# Portions copyright (c) 2011, Apple Inc. All rights reserved. 
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

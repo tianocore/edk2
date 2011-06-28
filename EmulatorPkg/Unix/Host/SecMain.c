@@ -65,7 +65,7 @@ int gInXcode = 0;
 
 /*++
   Breakpoint target for Xcode project. Set in the Xcode XML
-  
+
   Xcode breakpoint will 'source SecMain.gdb'
   gGdbWorkingFileName is set to SecMain.gdb
 
@@ -116,13 +116,13 @@ main (
   CHAR16                *FirmwareVolumesStr;
   UINTN                 *StackPointer;
   FILE                  *GdbTempFile;
-  
+
   //
-  // Xcode does not support sourcing gdb scripts directly, so the Xcode XML 
+  // Xcode does not support sourcing gdb scripts directly, so the Xcode XML
   // has a break point script to source the GdbRun script.
   //
   SecGdbConfigBreak ();
-  
+
   //
   // If dlopen doesn't work, then we build a gdb script to allow the
   // symbols to be loaded.
@@ -141,7 +141,7 @@ main (
   }
 
   printf ("\nEDK II UNIX Host Emulation Environment from edk2.sourceforge.net\n");
-  
+
   setbuf (stdout, 0);
   setbuf (stderr, 0);
 
@@ -154,23 +154,23 @@ main (
   AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEmuThunkPpiGuid, &mSecEmuThunkPpi);
 
   SecInitThunkProtocol ();
-  
+
   //
   // Emulator Bus Driver Thunks
   //
-  AddThunkProtocol (&gX11ThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuGop), TRUE); 
-  AddThunkProtocol (&gPosixFileSystemThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuFileSystem), TRUE); 
-  AddThunkProtocol (&gBlockIoThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuVirtualDisk), TRUE); 
-  AddThunkProtocol (&gSnpThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuNetworkInterface), TRUE); 
+  AddThunkProtocol (&gX11ThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuGop), TRUE);
+  AddThunkProtocol (&gPosixFileSystemThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuFileSystem), TRUE);
+  AddThunkProtocol (&gBlockIoThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuVirtualDisk), TRUE);
+  AddThunkProtocol (&gSnpThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuNetworkInterface), TRUE);
 
   //
   // Emulator other Thunks
   //
-  AddThunkProtocol (&gPthreadThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuApCount), FALSE); 
+  AddThunkProtocol (&gPthreadThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuApCount), FALSE);
 
   // EmuSecLibConstructor ();
-  
-  gPpiList = GetThunkPpiList (); 
+
+  gPpiList = GetThunkPpiList ();
 
   //
   // Allocate space for gSystemMemory Array
@@ -272,8 +272,8 @@ main (
       //
       FileHandle = NULL;
       Status = PeiServicesFfsFindNextFile (
-                  EFI_FV_FILETYPE_SECURITY_CORE, 
-                  (EFI_PEI_FV_HANDLE)(UINTN)gFdInfo[Index].Address, 
+                  EFI_FV_FILETYPE_SECURITY_CORE,
+                  (EFI_PEI_FV_HANDLE)(UINTN)gFdInfo[Index].Address,
                   &FileHandle
                   );
       if (!EFI_ERROR (Status)) {
@@ -408,7 +408,7 @@ MapFile (
     perror ("MapFile() Failed");
     return EFI_DEVICE_ERROR;
   }
-      
+
   *Length = (UINT64) FileSize;
   *BaseAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) res;
 
@@ -433,16 +433,16 @@ MapFd0 (
     return EFI_NOT_FOUND;
   }
   FileSize = lseek (fd, 0, SEEK_END);
- 
+
   FvSize = FixedPcdGet64 (PcdEmuFlashFvRecoverySize);
 
   // Assume start of FD is Recovery FV, and make it write protected
   res = mmap (
-          (void *)(UINTN)FixedPcdGet64 (PcdEmuFlashFvRecoveryBase), 
-          FvSize, 
-          PROT_READ | PROT_EXEC, 
-          MAP_PRIVATE, 
-          fd, 
+          (void *)(UINTN)FixedPcdGet64 (PcdEmuFlashFvRecoveryBase),
+          FvSize,
+          PROT_READ | PROT_EXEC,
+          MAP_PRIVATE,
+          fd,
           0
           );
   if (res == MAP_FAILED) {
@@ -453,11 +453,11 @@ MapFd0 (
     // We could not load at the build address, so we need to allow writes
     munmap (res, FvSize);
     res = mmap (
-            (void *)(UINTN)FixedPcdGet64 (PcdEmuFlashFvRecoveryBase), 
-            FvSize, 
-            PROT_READ | PROT_WRITE | PROT_EXEC, 
-            MAP_PRIVATE, 
-            fd, 
+            (void *)(UINTN)FixedPcdGet64 (PcdEmuFlashFvRecoveryBase),
+            FvSize,
+            PROT_READ | PROT_WRITE | PROT_EXEC,
+            MAP_PRIVATE,
+            fd,
             0
             );
     if (res == MAP_FAILED) {
@@ -466,14 +466,14 @@ MapFd0 (
       return EFI_DEVICE_ERROR;
     }
   }
-  
+
   // Map the rest of the FD as read/write
   res2 = mmap (
-          (void *)(UINTN)(FixedPcdGet64 (PcdEmuFlashFvRecoveryBase) + FvSize), 
-          FileSize - FvSize, 
-          PROT_READ | PROT_WRITE | PROT_EXEC, 
+          (void *)(UINTN)(FixedPcdGet64 (PcdEmuFlashFvRecoveryBase) + FvSize),
+          FileSize - FvSize,
+          PROT_READ | PROT_WRITE | PROT_EXEC,
           MAP_SHARED,
-          fd, 
+          fd,
           FvSize
           );
   close (fd);
@@ -483,7 +483,7 @@ MapFd0 (
   }
 
   //
-  // If enabled use the magic page to communicate between modules 
+  // If enabled use the magic page to communicate between modules
   // This replaces the PI PeiServicesTable pointer mechanism that
   // deos not work in the emulator. It also allows the removal of
   // writable globals from SEC, PEI_CORE (libraries), PEIMs
@@ -491,11 +491,11 @@ MapFd0 (
   EmuMagicPage = (void *)(UINTN)FixedPcdGet64 (PcdPeiServicesTablePage);
   if (EmuMagicPage != NULL) {
     res3 =  mmap (
-              (void *)EmuMagicPage, 
-              4096, 
-              PROT_READ | PROT_WRITE, 
+              (void *)EmuMagicPage,
+              4096,
+              PROT_READ | PROT_WRITE,
               MAP_PRIVATE | MAP_ANONYMOUS,
-              0, 
+              0,
               0
               );
     if (res3 != EmuMagicPage) {
@@ -503,11 +503,11 @@ MapFd0 (
       return EFI_DEVICE_ERROR;
     }
   }
-  
+
   *Length = (UINT64) FileSize;
   *BaseAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) res;
 
-  return EFI_SUCCESS;  
+  return EFI_SUCCESS;
 }
 
 
@@ -658,10 +658,10 @@ SecUnixPeiAutoScan (
 
 Routine Description:
  Check to see if an address range is in the EFI GCD memory map.
- 
- This is all of GCD for system memory passed to DXE Core. FV 
+
+ This is all of GCD for system memory passed to DXE Core. FV
  mapping and other device mapped into system memory are not
- inlcuded in the check. 
+ inlcuded in the check.
 
 Arguments:
   Index      - Which memory region to use
@@ -680,7 +680,7 @@ EfiSystemMemoryRange (
 {
   UINTN                 Index;
   EFI_PHYSICAL_ADDRESS  MemoryBase;
-  
+
   MemoryBase = (EFI_PHYSICAL_ADDRESS)(UINTN)MemoryAddress;
   for (Index = 0; Index < gSystemMemoryCount; Index++) {
     if ((MemoryBase >= gSystemMemory[Index].Memory) &&
@@ -688,7 +688,7 @@ EfiSystemMemoryRange (
       return TRUE;
     }
   }
-  
+
   return FALSE;
 }
 
@@ -765,7 +765,7 @@ SecPeCoffGetEntryPoint (
   // On Unix a dlopen is done that will change the entry point
   SecPeCoffRelocateImageExtraAction (&ImageContext);
   *EntryPoint = (VOID *)(UINTN)ImageContext.EntryPoint;
-  
+
   return Status;
 }
 

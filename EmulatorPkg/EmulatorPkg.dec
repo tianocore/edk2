@@ -3,9 +3,9 @@
 # This is the Emu Emulation Environment Platform
 #
 # Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
-# Portions copyright (c) 2011, Apple Inc. All rights reserved. 
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
 #
-#    This program and the accompanying materials are licensed and made available 
+#    This program and the accompanying materials are licensed and made available
 #    under the terms and conditions of the BSD License which accompanies this distribution.
 #    The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
 #    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
@@ -60,7 +60,7 @@
   gEmulatorPkgTokenSpaceGuid.PcdEmuFlashFvRecoverySize|0x0|UINT32|0x00001011
   gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareFdSize|0x0|UINT32|0x00001012
   gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareBlockSize|0|UINT32|0x00001013
- 
+
   ## Number of Application Processors (APs) in the system 0 means Uniprocessor mode
   gEmulatorPkgTokenSpaceGuid.PcdEmuApCount|L"0"|VOID*|0x00001019
 
@@ -70,13 +70,13 @@
   ## Size of the packet filter
   gEmulatorPkgTokenSpaceGuid.PcdNetworkPacketFilterSize|524288|UINT32|0x0000101c
 
-  
 
-[PcdsFixedAtBuild, PcdsPatchableInModule] 
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
   gEmulatorPkgTokenSpaceGuid.PcdEmuBootMode|1|UINT32|0x00001006
   gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
   gEmulatorPkgTokenSpaceGuid.PcdEmuMemorySize|L"64!64"|VOID*|0x0000100c
-  
+
   #
   # filename[:[R|F][O|W]][:BlockSize]
   # filename can be a device node, like /dev/disk1
@@ -85,11 +85,11 @@
   #   Default is Fixed Media, Writable
   # For a file the default BlockSize is 512, and can be overridden via BlockSize,
   #  for example 2048 for an ISO CD image. The block size for a device comes from
-  #  the device and is not configurable. 
-  # Device Size comes from file or device. 
+  #  the device and is not configurable.
+  # Device Size comes from file or device.
   # On Mac OS X you can use Disk Utility to create .dmg files and mount them like disks
   gEmulatorPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"disk.dmg:FW"|VOID*|0x00001001
-  
+
   gEmulatorPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"|VOID*|0x00001018
   gEmulatorPkgTokenSpaceGuid.PcdEmuFileSystem|L".!../../../../../EdkShellBinPkg/bin/ia32/Apps"|VOID*|0x00001004
   gEmulatorPkgTokenSpaceGuid.PcdEmuSerialPort|L"/dev/ttyS0"|VOID*|0x00001002

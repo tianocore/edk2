@@ -1,13 +1,13 @@
 /*++ @file
 
 Copyright (c) 2011, Apple Inc. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -21,7 +21,7 @@ extern EMU_THUNK_PROTOCOL   *gEmuThunk;
 
 
 /**
-  Serach the EMU IO Thunk database for a matching EMU IO Thunk 
+  Serach the EMU IO Thunk database for a matching EMU IO Thunk
   Protocol instance.
 
   @param  Protocol   Protocol to search for.

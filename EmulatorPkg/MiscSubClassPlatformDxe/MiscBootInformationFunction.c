@@ -20,7 +20,7 @@
   This function makes boot time changes to the contents of the
   MiscBootInformation (Type 32).
 
-  @param  RecordData                 Pointer to copy of RecordData from the Data Table.  
+  @param  RecordData                 Pointer to copy of RecordData from the Data Table.
 
   @retval EFI_SUCCESS                All parameters were valid.
   @retval EFI_UNSUPPORTED            Unexpected RecordType value.
@@ -34,7 +34,7 @@ MISC_SMBIOS_TABLE_FUNCTION(BootInformationStatus)
   EFI_SMBIOS_HANDLE                  SmbiosHandle;
   SMBIOS_TABLE_TYPE32                *SmbiosRecord;
   EFI_MISC_BOOT_INFORMATION_STATUS*  ForType32InputData;
- 
+
   ForType32InputData = (EFI_MISC_BOOT_INFORMATION_STATUS *)RecordData;
 
   //
@@ -55,7 +55,7 @@ MISC_SMBIOS_TABLE_FUNCTION(BootInformationStatus)
   //
   // Make handle chosen by smbios protocol.add automatically.
   //
-  SmbiosRecord->Hdr.Handle = 0;  
+  SmbiosRecord->Hdr.Handle = 0;
   SmbiosRecord->BootStatus = (UINT8)ForType32InputData->BootInformationStatus;
 
   //
@@ -63,9 +63,9 @@ MISC_SMBIOS_TABLE_FUNCTION(BootInformationStatus)
   //
   SmbiosHandle = 0;
   Status = Smbios-> Add(
-                      Smbios, 
+                      Smbios,
                       NULL,
-                      &SmbiosHandle, 
+                      &SmbiosHandle,
                       (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
                       );
   FreePool(SmbiosRecord);

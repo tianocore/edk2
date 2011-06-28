@@ -46,6 +46,6 @@
   EmuThunkLib
   UefiLib
   UefiBootServicesTableLib
-  
+
 [Protocols]
   gEfiTimerArchProtocolGuid

@@ -88,7 +88,7 @@ EmuGopQuerytMode (
 
 
 /**
-  Set the video device into the specified mode and clears the visible portions of 
+  Set the video device into the specified mode and clears the visible portions of
   the output display to black.
 
   @param  This              The EFI_GRAPHICS_OUTPUT_PROTOCOL instance.
@@ -137,8 +137,8 @@ EmuGopSetMode (
 
     Private->HardwareNeedsStarting = FALSE;
   }
-  
-  
+
+
   Status = Private->EmuGraphicsWindow->Size(
                             Private->EmuGraphicsWindow,
                             ModeData->HorizontalResolution,
@@ -168,7 +168,7 @@ EmuGopSetMode (
 
 /**
   Blt a rectangle of pixels on the graphics screen. Blt stands for BLock Transfer.
-  
+
   @param  This         Protocol instance pointer.
   @param  BltBuffer    Buffer containing data to blit into video buffer. This
                        buffer has a size of Width*Height*sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
@@ -302,12 +302,12 @@ EmuGopStartWindow (
   Status = Private->EmuIoThunk->Open (Private->EmuIoThunk);
   if (!EFI_ERROR (Status)) {
     Private->EmuGraphicsWindow = Private->EmuIoThunk->Interface;
-    
+
     // Register callback to support RegisterKeyNotify()
     Status  = Private->EmuGraphicsWindow->RegisterKeyNotify (
-                                            Private->EmuGraphicsWindow, 
-                                            GopPrivateMakeCallbackFunction, 
-                                            GopPrivateBreakCallbackFunction, 
+                                            Private->EmuGraphicsWindow,
+                                            GopPrivateMakeCallbackFunction,
+                                            GopPrivateBreakCallbackFunction,
                                             Private
                                             );
     ASSERT_EFI_ERROR (Status);
@@ -369,7 +369,7 @@ EmuGopDestructor (
   )
 {
   EFI_STATUS  Status;
-  
+
   Status = EFI_SUCCESS;
   if (!Private->HardwareNeedsStarting) {
     Status = Private->EmuIoThunk->Close (Private->EmuIoThunk);

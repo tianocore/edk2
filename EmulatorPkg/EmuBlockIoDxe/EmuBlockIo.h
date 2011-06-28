@@ -1,13 +1,13 @@
 /*++
 
 Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -16,8 +16,8 @@ Module Name:
 Abstract:
 
   Produce block IO abstractions for real devices on your PC using Posix APIs.
-  The configuration of what devices to mount or emulate comes from UNIX 
-  environment variables. The variables must be visible to the Microsoft* 
+  The configuration of what devices to mount or emulate comes from UNIX
+  environment variables. The variables must be visible to the Microsoft*
   Developer Studio for them to work.
 
   * Other names and brands may be claimed as the property of others.

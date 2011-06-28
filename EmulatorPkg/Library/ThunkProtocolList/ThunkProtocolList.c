@@ -3,7 +3,7 @@
 
   Copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -38,7 +38,7 @@ LIST_ENTRY  mThunkList = INITIALIZE_LIST_HEAD_VARIABLE (mThunkList);
 EFI_STATUS
 EFIAPI
 AddThunkProtocol (
-  IN  EMU_IO_THUNK_PROTOCOL   *ThunkIo,  
+  IN  EMU_IO_THUNK_PROTOCOL   *ThunkIo,
   IN  CHAR16                  *ConfigString,
   IN  BOOLEAN                 EmuBusDriver
   )
@@ -47,11 +47,11 @@ AddThunkProtocol (
   CHAR16                      *SubString;
   UINTN                       Instance;
   EMU_IO_THUNK_PROTOCOL_DATA  *Private;
-  
+
   if (ThunkIo == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   Instance = 0;
   StartString = AllocatePool (StrSize (ConfigString));
   StrCpy (StartString, ConfigString);
@@ -81,10 +81,10 @@ AddThunkProtocol (
     Private->Signature          = EMU_IO_THUNK_PROTOCOL_DATA_SIGNATURE;
     Private->EmuBusDriver       = EmuBusDriver;
 
-    CopyMem (&Private->Data, ThunkIo, sizeof (EMU_IO_THUNK_PROTOCOL));    
+    CopyMem (&Private->Data, ThunkIo, sizeof (EMU_IO_THUNK_PROTOCOL));
     Private->Data.Instance      = Instance++;
     Private->Data.ConfigString  = StartString;
-    
+
     InsertTailList (&mThunkList, &Private->Link);
 
     //
@@ -104,14 +104,14 @@ GetNextThunkProtocol (
   OUT EMU_IO_THUNK_PROTOCOL   **Instance  OPTIONAL
   )
 {
-  LIST_ENTRY                   *Link; 
-  EMU_IO_THUNK_PROTOCOL_DATA   *Private; 
-  
+  LIST_ENTRY                   *Link;
+  EMU_IO_THUNK_PROTOCOL_DATA   *Private;
+
   if (mThunkList.ForwardLink == &mThunkList) {
     // Skip parsing an empty list
     return EFI_NOT_FOUND;
   }
-  
+
   for (Link = mThunkList.ForwardLink; Link != &mThunkList; Link = Link->ForwardLink) {
     Private = CR (Link, EMU_IO_THUNK_PROTOCOL_DATA, Link, EMU_IO_THUNK_PROTOCOL_DATA_SIGNATURE);
     if (EmuBusDriver & !Private->EmuBusDriver) {
@@ -131,8 +131,8 @@ GetNextThunkProtocol (
       return EFI_SUCCESS;
     }
   }
-   
-   
+
+
   return EFI_NOT_FOUND;
 }
 

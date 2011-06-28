@@ -1,17 +1,17 @@
 /** @file
-  The EMU_SNP_PROTOCOL provides services to initialize a network interface, 
+  The EMU_SNP_PROTOCOL provides services to initialize a network interface,
   transmit packets, receive packets, and close a network interface.
 
 
 Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-Portitions copyright (c) 2011, Apple Inc. All rights reserved. 
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Portitions copyright (c) 2011, Apple Inc. All rights reserved.
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.   
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -81,8 +81,8 @@ EFI_STATUS
   );
 
 /**
-  Resets a network adapter and allocates the transmit and receive buffers 
-  required by the network interface; optionally, also requests allocation 
+  Resets a network adapter and allocates the transmit and receive buffers
+  required by the network interface; optionally, also requests allocation
   of additional transmit and receive buffers.
 
   @param  This              The protocol instance pointer.
@@ -115,8 +115,8 @@ EFI_STATUS
   );
 
 /**
-  Resets a network adapter and re-initializes it with the parameters that were 
-  provided in the previous call to Initialize().  
+  Resets a network adapter and re-initializes it with the parameters that were
+  provided in the previous call to Initialize().
 
   @param  This                 The protocol instance pointer.
   @param  ExtendedVerification Indicates that the driver may perform a more
@@ -138,7 +138,7 @@ EFI_STATUS
   );
 
 /**
-  Resets a network adapter and leaves it in a state that is safe for 
+  Resets a network adapter and leaves it in a state that is safe for
   another driver to initialize.
 
   @param  This Protocol instance pointer.
@@ -275,7 +275,7 @@ EFI_STATUS
   );
 
 /**
-  Performs read and write operations on the NVRAM device attached to a 
+  Performs read and write operations on the NVRAM device attached to a
   network interface.
 
   @param  This       The protocol instance pointer.
@@ -305,7 +305,7 @@ EFI_STATUS
   );
 
 /**
-  Reads the current interrupt status and recycled transmit buffer status from 
+  Reads the current interrupt status and recycled transmit buffer status from
   a network interface.
 
   @param  This            The protocol instance pointer.
@@ -363,7 +363,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The packet was placed on the transmit queue.
   @retval EFI_NOT_STARTED       The network interface has not been started.
-  @retval EFI_NOT_READY         The network interface is too busy to accept this transmit request.                      
+  @retval EFI_NOT_READY         The network interface is too busy to accept this transmit request.
   @retval EFI_BUFFER_TOO_SMALL  The BufferSize parameter is too small.
   @retval EFI_INVALID_PARAMETER One or more of the parameters has an unsupported value.
   @retval EFI_DEVICE_ERROR      The command could not be sent to the network interface.
@@ -430,11 +430,11 @@ EFI_STATUS
 
 //
 // Revision defined in EFI1.1
-// 
+//
 #define EMU_SNP_INTERFACE_REVISION   EMU_SNP_PROTOCOL_REVISION
 
 ///
-/// The EMU_SNP_PROTOCOL protocol abstracts OS network sercices 
+/// The EMU_SNP_PROTOCOL protocol abstracts OS network sercices
 /// from the EFI driver that produces EFI Simple Network Protocol.
 ///
 struct _EMU_SNP_PROTOCOL {

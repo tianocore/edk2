@@ -19,7 +19,7 @@
   FILE_GUID                      = E3E4A441-8465-0F41-8AF4-F67EBE984099
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PeiServicesLib|SEC PEIM PEI_CORE 
+  LIBRARY_CLASS                  = PeiServicesLib|SEC PEIM PEI_CORE
   PI_SPECIFICATION_VERSION       = 0x0001000A
 
 #

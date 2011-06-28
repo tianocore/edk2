@@ -68,11 +68,11 @@ PeCoffLoaderGetEntryPoint (
 }
 
 /**
-  Returns the machine type of PE/COFF image. 
+  Returns the machine type of PE/COFF image.
   This is copied from MDE BasePeCoffGetEntryPointLib, the code should be sync with it.
   The reason is Emu package needs to load the image to memory to support source
   level debug.
-   
+
 
   @param  Pe32Data   Pointer to a PE/COFF header
 
@@ -84,7 +84,7 @@ EFIAPI
 PeCoffLoaderGetMachineType (
   IN  VOID  *Pe32Data
   )
-{  
+{
   EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
   EFI_IMAGE_DOS_HEADER                 *DosHdr;
 
@@ -270,7 +270,7 @@ PeCoffGetSizeOfHeaders (
   UINTN                                 SizeOfHeaders;
 
   ASSERT (Pe32Data   != NULL);
- 
+
   DosHdr = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
   if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
     //

@@ -18,7 +18,7 @@
   This function makes boot time changes to the contents of the
   MiscSystemSlotDesignator structure (Type 9).
 
-  @param  RecordData                 Pointer to copy of RecordData from the Data Table.  
+  @param  RecordData                 Pointer to copy of RecordData from the Data Table.
 
   @retval EFI_SUCCESS                All parameters were valid.
   @retval EFI_UNSUPPORTED            Unexpected RecordType value.
@@ -47,7 +47,7 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscSystemSlotDesignation)
 
   TokenToGet = 0;
   switch (ForType9InputData->SlotDesignation) {
-    case STR_MISC_SYSTEM_SLOT_DESIGNATION: 
+    case STR_MISC_SYSTEM_SLOT_DESIGNATION:
       TokenToGet = STRING_TOKEN (STR_MISC_SYSTEM_SLOT_DESIGNATION);
       break;
     default:
@@ -59,7 +59,7 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscSystemSlotDesignation)
   if (SlotDesignationStrLen > SMBIOS_STRING_MAX_LENGTH) {
     return EFI_UNSUPPORTED;
   }
-  
+
   //
   // Two zeros following the last string.
   //
@@ -68,28 +68,28 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscSystemSlotDesignation)
 
   SmbiosRecord->Hdr.Type = EFI_SMBIOS_TYPE_SYSTEM_SLOTS;
   SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE9);
-  SmbiosRecord->Hdr.Handle = 0; 
+  SmbiosRecord->Hdr.Handle = 0;
   SmbiosRecord->SlotDesignation = 1;
   SmbiosRecord->SlotType = ForType9InputData->SlotType;
   SmbiosRecord->SlotDataBusWidth = ForType9InputData->SlotDataBusWidth;
   SmbiosRecord->CurrentUsage = ForType9InputData->SlotUsage;
   SmbiosRecord->SlotLength = ForType9InputData->SlotLength;
   SmbiosRecord->SlotID = ForType9InputData->SlotId;
-  
+
   //
   // Slot Characteristics
   //
   CopyMem ((UINT8 *) &SmbiosRecord->SlotCharacteristics1,(UINT8 *) &ForType9InputData->SlotCharacteristics,2);
   OptionalStrStart = (CHAR8 *)(SmbiosRecord + 1);
   UnicodeStrToAsciiStr(SlotDesignation, OptionalStrStart);
-  //  
+  //
   // Now we have got the full smbios record, call smbios protocol to add this record.
   //
   SmbiosHandle = 0;
   Status = Smbios-> Add(
-                      Smbios, 
+                      Smbios,
                       NULL,
-                      &SmbiosHandle, 
+                      &SmbiosHandle,
                       (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
                       );
   FreePool(SmbiosRecord);

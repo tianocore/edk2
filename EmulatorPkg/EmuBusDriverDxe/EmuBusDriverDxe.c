@@ -50,7 +50,7 @@ EmuBusDriverBindingSupported (
   //
   if (RemainingDevicePath != NULL) {
     //
-    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // Check if RemainingDevicePath is the End of Device Path Node,
     // if yes, go on checking other conditions
     //
     if (!IsDevicePathEnd (RemainingDevicePath)) {
@@ -65,7 +65,7 @@ EmuBusDriverBindingSupported (
       }
     }
   }
-  
+
   //
   // Open the IO Abstraction(s) needed to perform the supported test
   //
@@ -226,8 +226,8 @@ EmuBusDriverBindingStart (
     if (RemainingDevicePath != NULL) {
       CreateDevice  = FALSE;
       //
-      // Check if RemainingDevicePath is the End of Device Path Node, 
-      // if yes, don't create any child device 
+      // Check if RemainingDevicePath is the End of Device Path Node,
+      // if yes, don't create any child device
       //
       if (!IsDevicePathEnd (RemainingDevicePath)) {
         //
@@ -259,7 +259,7 @@ EmuBusDriverBindingStart (
       EmuDevice->ControllerHandle   = ControllerHandle;
       EmuDevice->ParentDevicePath   = ParentDevicePath;
       CopyMem (&EmuDevice->EmuIoThunk, EmuIoThunk, sizeof (EMU_IO_THUNK_PROTOCOL));
-      
+
       EmuDevice->ControllerNameTable = NULL;
 
       StrnCpy (ComponentName, EmuIoThunk->ConfigString, sizeof (ComponentName)/sizeof (CHAR16));
@@ -455,7 +455,7 @@ Arguments:
 
 Returns:
 
-  EFI_DEVICE_PATH_PROTOCOL 
+  EFI_DEVICE_PATH_PROTOCOL
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
@@ -493,9 +493,9 @@ EmuBusCreateDevicePath (
 /**
   The user Entry Point for module EmuBusDriver. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 

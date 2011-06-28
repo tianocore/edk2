@@ -1,7 +1,7 @@
 /** @file
   Provides services to perform additional actions to relocate and unload
   PE/Coff image for Emu environment specific purpose such as souce level debug.
-  This version only works for DXE phase  
+  This version only works for DXE phase
 
 Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
@@ -27,7 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PeCoffExtraActionLib.h>
 
 //
-// Cache of UnixThunk protocol 
+// Cache of UnixThunk protocol
 //
 EMU_THUNK_PROTOCOL   *mThunk = NULL;
 
@@ -84,9 +84,9 @@ PeCoffLoaderRelocateImageExtraAction (
 /**
   Performs additional actions just before a PE/COFF image is unloaded.  Any resources
   that were allocated by PeCoffLoaderRelocateImageExtraAction() must be freed.
-  
+
   If ImageContext is NULL, then ASSERT().
-  
+
   @param  ImageContext  Pointer to the image context structure that describes the
                         PE/COFF image that is being unloaded.
 

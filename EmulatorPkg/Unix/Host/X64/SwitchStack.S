@@ -23,7 +23,7 @@
 #
 #   (rdi) EntryPoint    - Entry point with new stack.
 #   (rsi) Context1      - Parameter1 for entry point. (rcx)
-#   (rdx) Context2      - Parameter2 for entry point. (rdx) 
+#   (rdx) Context2      - Parameter2 for entry point. (rdx)
 #   (rcx) NewStack      - The pointer to new stack.
 #
 # Returns:
@@ -37,11 +37,11 @@ ASM_PFX(PeiSwitchStacks):
     movq    %rsp, %rbp
 
     movq    %rcx, %rsp    // update stack pointer
-    
+
     movq    %rdi, %rax    // entry point to %rax
     movq    %rsi, %rcx    // Adjust Context1
                           // Context2 already in the rigth spot
-    
+
     #
     # Reserve space for register parameters (rcx, rdx, r8 & r9) on the stack,
     # in case the callee wishes to spill them.
@@ -49,5 +49,5 @@ ASM_PFX(PeiSwitchStacks):
     subq    $32, %rsp  // 32-byte shadow space plus alignment pad
     call    *%rax
 
-  
+
 

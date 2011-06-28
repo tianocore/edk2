@@ -36,7 +36,7 @@
   CpuDriver.h
   Strings.uni
   MpService.c
-  
+
 
 [Packages]
   MdePkg/MdePkg.dec

@@ -25,9 +25,9 @@
 
   @retval EFI_SUCCESS               All parameters were valid and *Value & *Exponent have been set.
   @retval EFI_INVALID_PARAMETER     Invalid parameter was found.
-  
+
 **/
-EFI_STATUS  
+EFI_STATUS
 GetValueExponentBase2(
   IN OUT UINTN        *Value,
   OUT    UINTN        *Exponent
@@ -36,7 +36,7 @@ GetValueExponentBase2(
   if ((Value == NULL) || (Exponent == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   while ((*Value % 2) == 0) {
     *Value=*Value/2;
     (*Exponent)++;
@@ -51,15 +51,15 @@ GetValueExponentBase2(
 
   @param  Base2Data              Pointer to Base2_Data
 
-  @retval EFI_SUCCESS            Transform successfully.       
-  @retval EFI_INVALID_PARAMETER  Invalid parameter was found.    
+  @retval EFI_SUCCESS            Transform successfully.
+  @retval EFI_INVALID_PARAMETER  Invalid parameter was found.
 
 **/
 UINT16
 Base2ToByteWith64KUnit (
   IN      EFI_EXP_BASE2_DATA  *Base2Data
   )
-{  
+{
   UINT16              Value;
   UINT16              Exponent;
 
@@ -109,11 +109,11 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscBiosVendor)
   }
 
   Version = (CHAR16 *) PcdGetPtr (PcdFirmwareVersionString);
-  if (StrLen (Version) > 0) {     
+  if (StrLen (Version) > 0) {
     TokenToUpdate = STRING_TOKEN (STR_MISC_BIOS_VERSION);
     HiiSetString (mHiiHandle, TokenToUpdate, Version, NULL);
   }
-  
+
   ReleaseDate = (CHAR16 *) PcdGetPtr (PcdFirmwareReleaseDateString);
   if (StrLen(ReleaseDate) > 0) {
     TokenToUpdate = STRING_TOKEN (STR_MISC_BIOS_RELEASE_DATE);
@@ -140,7 +140,7 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscBiosVendor)
   if (DateStrLen > SMBIOS_STRING_MAX_LENGTH) {
     return EFI_UNSUPPORTED;
   }
-  
+
   //
   // Two zeros following the last string.
   //
@@ -156,7 +156,7 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscBiosVendor)
   //
   // Vendor will be the 1st optional string following the formatted structure.
   //
-  SmbiosRecord->Vendor = 1;  
+  SmbiosRecord->Vendor = 1;
   //
   // Version will be the 2nd optional string following the formatted structure.
   //
@@ -191,9 +191,9 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscBiosVendor)
   //
   SmbiosHandle = 0;
   Status = Smbios-> Add(
-                      Smbios, 
+                      Smbios,
                       NULL,
-                      &SmbiosHandle, 
+                      &SmbiosHandle,
                       (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
                       );
 

@@ -127,26 +127,26 @@ PosixOpenVolume (
   if (PrivateFile == NULL) {
     goto Done;
   }
-  
+
   PrivateFile->FileName = malloc (AsciiStrSize (Private->FilePath));
   if (PrivateFile->FileName == NULL) {
     goto Done;
   }
   AsciiStrCpy (PrivateFile->FileName, Private->FilePath);
-  
+
   PrivateFile->Signature            = EMU_EFI_FILE_PRIVATE_SIGNATURE;
   PrivateFile->Thunk                = Private->Thunk;
   PrivateFile->SimpleFileSystem     = This;
   PrivateFile->IsRootDirectory      = TRUE;
   PrivateFile->IsDirectoryPath      = TRUE;
   PrivateFile->IsOpenedByRead       = TRUE;
-  
+
   CopyMem (&PrivateFile->EfiFile, &gPosixFileProtocol, sizeof (EFI_FILE_PROTOCOL));
 
   PrivateFile->fd                   = -1;
   PrivateFile->Dir                  = NULL;
   PrivateFile->Dirent               = NULL;
-  
+
   *Root = &PrivateFile->EfiFile;
 
   PrivateFile->Dir = opendir (PrivateFile->FileName);
@@ -165,10 +165,10 @@ Done:
 
       free (PrivateFile);
     }
-    
+
     *Root = NULL;
   }
-  
+
   return Status;
 }
 
@@ -179,13 +179,13 @@ ErrnoToEfiStatus ()
   switch (errno) {
   case EACCES:
     return EFI_ACCESS_DENIED;
-    
+
   case EDQUOT:
   case ENOSPC:
     return EFI_VOLUME_FULL;
-     
+
   default:
-    return EFI_DEVICE_ERROR;      
+    return EFI_DEVICE_ERROR;
   }
 }
 
@@ -225,7 +225,7 @@ PosixSystemTimeToEfiTime (
   Time->Minute = tm->tm_min;
   Time->Second = tm->tm_sec;
   Time->Nanosecond = 0;
-  
+
   Time->TimeZone = timezone;
   Time->Daylight = (daylight ? EFI_TIME_ADJUST_DAYLIGHT : 0) | (tm->tm_isdst > 0 ? EFI_TIME_IN_DAYLIGHT : 0);
 }
@@ -382,7 +382,7 @@ PosixFileOpen (
   EFI_FILE_INFO                     *Info;
   struct stat                       finfo;
   int                               res;
-  
+
 
   PrivateFile     = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
   PrivateRoot     = EMU_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (PrivateFile->SimpleFileSystem);
@@ -393,7 +393,7 @@ PosixFileOpen (
   // BUGBUG: assume an open of root
   // if current location, return current data
   //
-  if ((StrCmp (FileName, L"\\") == 0) || 
+  if ((StrCmp (FileName, L"\\") == 0) ||
       (StrCmp (FileName, L".") == 0 && PrivateFile->IsRootDirectory)) {
 OpenRoot:
     Status          = PosixOpenVolume (PrivateFile->SimpleFileSystem, &Root);
@@ -443,7 +443,7 @@ OpenRoot:
     Src++;
   }
   *Dst = 0;
-      
+
 
   //
   // Get rid of . and .., except leading . or ..
@@ -509,7 +509,7 @@ OpenRoot:
   while (RealFileName > NewPrivateFile->FileName && *RealFileName != '/') {
     RealFileName--;
   }
-  
+
   TempChar            = *(RealFileName - 1);
   *(RealFileName - 1) = 0;
   *(RealFileName - 1) = TempChar;
@@ -601,7 +601,7 @@ OpenRoot:
       Status = EFI_DEVICE_ERROR;
       goto Done;
     }
-    
+
     Info = malloc (InfoSize);
     if (Info == NULL) {
       goto Done;
@@ -614,7 +614,7 @@ OpenRoot:
 
     Info->Attribute = Attributes;
     PosixFileSetInfo (&NewPrivateFile->EfiFile, &gEfiFileInfoGuid, InfoSize, Info);
-    
+
     free (Info);
   }
 
@@ -682,7 +682,7 @@ PosixFileCLose (
   Close and delete the file handle.
 
   @param  This                     Protocol instance pointer.
-                                   
+
   @retval EFI_SUCCESS              The device was opened.
   @retval EFI_WARN_DELETE_FAILURE  The handle was closed but the file was not deleted.
 
@@ -694,7 +694,7 @@ PosixFileDelete (
 {
   EFI_STATUS              Status;
   EMU_EFI_FILE_PRIVATE   *PrivateFile;
-  
+
   PrivateFile = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
   Status      = EFI_WARN_DELETE_FAILURE;
 
@@ -806,9 +806,9 @@ PosixFileRead (
   FullFileName = malloc (AsciiStrLen(PrivateFile->FileName) + 1 + NameSize);
   if (FullFileName == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    goto Done;  
+    goto Done;
   }
-         
+
   AsciiStrCpy (FullFileName, PrivateFile->FileName);
   AsciiStrCat (FullFileName, "/");
   AsciiStrCat (FullFileName, PrivateFile->Dirent->d_name);
@@ -875,7 +875,7 @@ PosixFileWrite (
   if (Res == (UINTN)-1) {
     return ErrnoToEfiStatus ();
   }
-  
+
   *BufferSize = Res;
   return EFI_SUCCESS;
 }
@@ -887,7 +887,7 @@ PosixFileWrite (
 
   @param  This            Protocol instance pointer.
   @param  Position        Byte position from the start of the file.
-                          
+
   @retval EFI_SUCCESS     Data was written.
   @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open.
 
@@ -933,7 +933,7 @@ PosixFileSetPossition (
 
   @param  This            Protocol instance pointer.
   @param  Position        Byte position from the start of the file.
-                          
+
   @retval EFI_SUCCESS     Data was written.
   @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open..
 
@@ -946,7 +946,7 @@ PosixFileGetPossition (
 {
   EFI_STATUS            Status;
   EMU_EFI_FILE_PRIVATE  *PrivateFile;
-  
+
   PrivateFile   = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   if (PrivateFile->IsDirectoryPath) {
@@ -1024,7 +1024,7 @@ PosixFileGetInfo (
 
     StrCpy ((CHAR16 *) FileSystemInfoBuffer->VolumeLabel, PrivateRoot->VolumeLabel);
     *BufferSize = SIZE_OF_EFI_FILE_SYSTEM_INFO + StrSize (PrivateRoot->VolumeLabel);
-    
+
   } else if (CompareGuid (InformationType, &gEfiFileSystemVolumeLabelInfoIdGuid)) {
     if (*BufferSize < StrSize (PrivateRoot->VolumeLabel)) {
       *BufferSize = StrSize (PrivateRoot->VolumeLabel);
@@ -1087,7 +1087,7 @@ PosixFileSetInfo (
   CHAR16                            *UnicodeFilePtr;
   int                               UnixStatus;
   struct utimbuf                    Utime;
-  
+
 
   PrivateFile = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
   PrivateRoot = EMU_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (PrivateFile->SimpleFileSystem);
@@ -1213,7 +1213,7 @@ PosixFileSetInfo (
     AsciiFilePtr = NewFileName + AsciiStrLen(NewFileName);
     if ((AsciiFilePtr[-1] != '/') && (NewFileInfo->FileName[0] != '/')) {
       // make sure there is a / between Root FilePath and NewFileInfo Filename
-      AsciiFilePtr[0] = '/';      
+      AsciiFilePtr[0] = '/';
       AsciiFilePtr[1] = '\0';
       AsciiFilePtr++;
     }
@@ -1434,7 +1434,7 @@ PosixFileFlush (
 {
   EMU_EFI_FILE_PRIVATE     *PrivateFile;
 
-  
+
   PrivateFile = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   if (PrivateFile->IsDirectoryPath) {
@@ -1465,15 +1465,15 @@ PosixFileSystmeThunkOpen (
 {
   EMU_SIMPLE_FILE_SYSTEM_PRIVATE  *Private;
   UINTN                           i;
-  
+
   if (This->Private != NULL) {
     return EFI_ALREADY_STARTED;
   }
-  
+
   if (!CompareGuid (This->Protocol, &gEfiSimpleFileSystemProtocolGuid)) {
     return EFI_UNSUPPORTED;
   }
-  
+
   Private = malloc (sizeof (EMU_SIMPLE_FILE_SYSTEM_PRIVATE));
   if (Private == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -1482,9 +1482,9 @@ PosixFileSystmeThunkOpen (
   Private->FilePath = malloc (StrLen (This->ConfigString) + 1);
   if (Private->FilePath == NULL) {
     free (Private);
-    return EFI_OUT_OF_RESOURCES;    
+    return EFI_OUT_OF_RESOURCES;
   }
-  
+
   // Convert Unicode to Ascii
   for (i = 0; This->ConfigString[i] != 0; i++) {
     Private->FilePath[i] = This->ConfigString[i];
@@ -1499,12 +1499,12 @@ PosixFileSystmeThunkOpen (
     return EFI_OUT_OF_RESOURCES;
   }
   StrCpy (Private->VolumeLabel, L"EFI_EMULATED");
-  
+
   Private->Signature = EMU_SIMPLE_FILE_SYSTEM_PRIVATE_SIGNATURE;
   Private->Thunk     = This;
   CopyMem (&Private->SimpleFileSystem, &gPosixFileSystemProtocol, sizeof (Private->SimpleFileSystem));
   Private->FileHandlesOpen = FALSE;
- 
+
   This->Interface = &Private->SimpleFileSystem;
   This->Private   = Private;
   return EFI_SUCCESS;
@@ -1521,9 +1521,9 @@ PosixFileSystmeThunkClose (
   if (!CompareGuid (This->Protocol, &gEfiSimpleFileSystemProtocolGuid)) {
     return EFI_UNSUPPORTED;
   }
-  
+
   Private = This->Private;
-  
+
   if (Private->FileHandlesOpen) {
     //
     // Close only supported if all the EFI_FILE_HANDLEs have been closed.
@@ -1534,11 +1534,11 @@ PosixFileSystmeThunkClose (
   if (This->Private != NULL) {
     if (Private->VolumeLabel != NULL) {
       free (Private->VolumeLabel);
-    }   
+    }
     free (This->Private);
     This->Private = NULL;
   }
-  
+
   return EFI_SUCCESS;
 }
 

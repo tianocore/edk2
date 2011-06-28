@@ -76,18 +76,18 @@ AllocateZeroPool (
   Reallocates a buffer of type EfiBootServicesData.
 
   Allocates and zeros the number bytes specified by NewSize from memory of type
-  EfiBootServicesData.  If OldBuffer is not NULL, then the smaller of OldSize and 
-  NewSize bytes are copied from OldBuffer to the newly allocated buffer, and 
-  OldBuffer is freed.  A pointer to the newly allocated buffer is returned.  
-  If NewSize is 0, then a valid buffer of 0 size is  returned.  If there is not 
+  EfiBootServicesData.  If OldBuffer is not NULL, then the smaller of OldSize and
+  NewSize bytes are copied from OldBuffer to the newly allocated buffer, and
+  OldBuffer is freed.  A pointer to the newly allocated buffer is returned.
+  If NewSize is 0, then a valid buffer of 0 size is  returned.  If there is not
   enough memory remaining to satisfy the request, then NULL is returned.
-  
+
   If the allocation of the new buffer is successful and the smaller of NewSize and OldSize
   is greater than (MAX_ADDRESS - OldBuffer + 1), then ASSERT().
 
   @param  OldSize        The size, in bytes, of OldBuffer.
   @param  NewSize        The size, in bytes, of the buffer to reallocate.
-  @param  OldBuffer      The buffer to copy to the allocated buffer.  This is an optional 
+  @param  OldBuffer      The buffer to copy to the allocated buffer.  This is an optional
                          parameter that may be NULL.
 
   @return A pointer to the allocated buffer or NULL if allocation fails.
@@ -127,7 +127,7 @@ ReallocatePool (
   Frees the buffer specified by Buffer.  Buffer must have been allocated on a previous call to the
   pool allocation services of the Memory Allocation Library.  If it is not possible to free pool
   resources, then this function will perform no actions.
-  
+
   If Buffer was not allocated with a pool allocation function in the Memory Allocation Library,
   then ASSERT().
 

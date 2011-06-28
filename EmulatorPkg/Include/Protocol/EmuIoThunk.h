@@ -2,7 +2,7 @@
   Emulator Thunk to abstract OS services from pure EFI code
 
   Copyright (c) 2010 - 2011, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -13,7 +13,7 @@
 
 **/
 
-#ifndef __EMU_IO_THUNK__ 
+#ifndef __EMU_IO_THUNK__
 #define __EMU_IO_THUNK__
 
 
@@ -24,13 +24,13 @@
 typedef struct _EMU_IO_THUNK_PROTOCOL  EMU_IO_THUNK_PROTOCOL;
 
 
-typedef 
+typedef
 EFI_STATUS
 (EFIAPI *EMU_IO_THUNK_PROTOCOL_CLOSE_OPEN) (
   IN  EMU_IO_THUNK_PROTOCOL   *This
   );
 
-typedef 
+typedef
 EFI_STATUS
 (EFIAPI *EMU_IO_THUNK_PROTOCOL_CLOSE_CLOSE) (
   IN  EMU_IO_THUNK_PROTOCOL   *This
@@ -43,7 +43,7 @@ struct _EMU_IO_THUNK_PROTOCOL {
   UINT16                              Instance;
   EMU_IO_THUNK_PROTOCOL_CLOSE_OPEN    Open;
   EMU_IO_THUNK_PROTOCOL_CLOSE_CLOSE   Close;
-  VOID                                *Private;    /// Used by implementation 
+  VOID                                *Private;    /// Used by implementation
 };
 
 extern EFI_GUID gEmuIoThunkProtocolGuid;

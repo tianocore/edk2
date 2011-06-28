@@ -34,8 +34,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EMU_GRAPHICS_WINDOWS_SIZE)(
-  EMU_GRAPHICS_WINDOW_PROTOCOL  *Uga, 
-  UINT32                        Width, 
+  EMU_GRAPHICS_WINDOW_PROTOCOL  *Uga,
+  UINT32                        Width,
   UINT32                        Height
   );
 
@@ -48,19 +48,19 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EMU_GRAPHICS_WINDOWS_GET_KEY)(
-  EMU_GRAPHICS_WINDOW_PROTOCOL  *Uga, 
+  EMU_GRAPHICS_WINDOW_PROTOCOL  *Uga,
   EFI_KEY_DATA                  *key
   );
 
 typedef
 EFI_STATUS
 (EFIAPI *EMU_GRAPHICS_WINDOWS_KEY_SET_STATE) (
-  IN EMU_GRAPHICS_WINDOW_PROTOCOL   *GraphicsWindows, 
+  IN EMU_GRAPHICS_WINDOW_PROTOCOL   *GraphicsWindows,
   IN EFI_KEY_TOGGLE_STATE           *KeyToggleState
   );
 
 
-typedef 
+typedef
 VOID
 (EFIAPI *EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK) (
   IN VOID           *Context,
@@ -70,7 +70,7 @@ VOID
 typedef
 EFI_STATUS
 (EFIAPI *EMU_GRAPHICS_WINDOWS_REGISTER_KEY_NOTIFY) (
-  IN EMU_GRAPHICS_WINDOW_PROTOCOL                       *GraphicsWindows, 
+  IN EMU_GRAPHICS_WINDOW_PROTOCOL                       *GraphicsWindows,
   IN EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK   MakeCallBack,
   IN EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK   BreakCallBack,
   IN VOID                                               *Context
@@ -98,8 +98,8 @@ EFI_STATUS
 
 typedef
 BOOLEAN
-(EFIAPI *EMU_GRAPHICS_WINDOWS_IS_KEY_PRESSED) ( 
-  IN  EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsWindows, 
+(EFIAPI *EMU_GRAPHICS_WINDOWS_IS_KEY_PRESSED) (
+  IN  EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsWindows,
   IN  EFI_KEY_DATA                  *KeyData
   );
 

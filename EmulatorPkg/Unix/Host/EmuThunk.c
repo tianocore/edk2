@@ -1,5 +1,5 @@
 /*++ @file
-  Since the SEC is the only program in our emulation we 
+  Since the SEC is the only program in our emulation we
   must use a UEFI/PI mechanism to export APIs to other modules.
   This is the role of the EFI_EMU_THUNK_PROTOCOL.
 
@@ -11,13 +11,13 @@
 
 Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -48,9 +48,9 @@ SecWriteStdErr (
   )
 {
   ssize_t Return;
-  
+
   Return = write (STDERR_FILENO, (const void *)Buffer, (size_t)NumberOfBytes);
-  
+
   return (Return == -1) ? 0 : Return;
 }
 
@@ -61,16 +61,16 @@ SecConfigStdIn (
   )
 {
   struct termios tty;
-  
+
   //
   // Need to turn off line buffering, ECHO, and make it unbuffered.
   //
   tcgetattr (STDIN_FILENO, &tty);
   tty.c_lflag &= ~(ICANON | ECHO);
   tcsetattr (STDIN_FILENO, TCSANOW, &tty);
-  
+
 //  setvbuf (STDIN_FILENO, NULL, _IONBF, 0);
-  
+
   // now ioctl FIONREAD will do what we need
   return EFI_SUCCESS;
 }
@@ -82,9 +82,9 @@ SecWriteStdOut (
   )
 {
   ssize_t Return;
-  
+
   Return = write (STDOUT_FILENO, (const void *)Buffer, (size_t)NumberOfBytes);
-  
+
   return (Return == -1) ? 0 : Return;
 }
 
@@ -95,9 +95,9 @@ SecReadStdIn (
   )
 {
   ssize_t Return;
-  
+
   Return = read (STDIN_FILENO, Buffer, (size_t)NumberOfBytes);
-  
+
   return (Return == -1) ? 0 : Return;
 }
 
@@ -108,12 +108,12 @@ SecPollStdIn (
 {
   int Result;
   int Bytes;
-  
+
   Result = ioctl (STDIN_FILENO, FIONREAD, &Bytes);
   if (Result == -1) {
     return FALSE;
   }
-  
+
   return (BOOLEAN)(Bytes > 0);
 }
 
@@ -144,7 +144,7 @@ SecFree (
     // So don't free those ranges and let the caller know.
     return FALSE;
   }
-  
+
   free (Ptr);
   return TRUE;
 }
@@ -158,10 +158,10 @@ settimer_handler (int sig)
 
   gettimeofday (&timeval, NULL);
   delta = ((UINT64)timeval.tv_sec * 1000) + (timeval.tv_usec / 1000)
-    - ((UINT64)settimer_timeval.tv_sec * 1000) 
+    - ((UINT64)settimer_timeval.tv_sec * 1000)
     - (settimer_timeval.tv_usec / 1000);
   settimer_timeval = timeval;
-  
+
   if (settimer_callback) {
     ReverseGasketUint64 (settimer_callback, delta);
   }
@@ -196,7 +196,7 @@ SecSetTimer (
   timerval.it_value.tv_usec = remainder * 1000;
   timerval.it_value.tv_sec = DivU64x32(PeriodMs, 1000);
   timerval.it_interval = timerval.it_value;
-  
+
   if (setitimer (ITIMER_REAL, &timerval, NULL) != 0) {
     printf ("SetTimer: setitimer error %s\n", strerror (errno));
   }
@@ -212,7 +212,7 @@ SecEnableInterrupt (
   sigset_t  sigset;
 
   gEmulatorInterruptEnabled = TRUE;
-  // Since SetTimer() uses SIGALRM we emulate turning on and off interrupts 
+  // Since SetTimer() uses SIGALRM we emulate turning on and off interrupts
   // by enabling/disabling SIGALRM.
   sigemptyset (&sigset);
   sigaddset (&sigset, SIGALRM);
@@ -227,7 +227,7 @@ SecDisableInterrupt (
 {
   sigset_t  sigset;
 
-  // Since SetTimer() uses SIGALRM we emulate turning on and off interrupts 
+  // Since SetTimer() uses SIGALRM we emulate turning on and off interrupts
   // by enabling/disabling SIGALRM.
   sigemptyset (&sigset);
   sigaddset (&sigset, SIGALRM);
@@ -262,11 +262,11 @@ QueryPerformanceCounter (
   Nanoseconds     elapsedNano;
 
   Start = mach_absolute_time ();
-  
+
   // Convert to nanoseconds.
 
-  // Have to do some pointer fun because AbsoluteToNanoseconds 
-  // works in terms of UnsignedWide, which is a structure rather 
+  // Have to do some pointer fun because AbsoluteToNanoseconds
+  // works in terms of UnsignedWide, which is a structure rather
     // than a proper 64-bit integer.
   elapsedNano = AbsoluteToNanoseconds (*(AbsoluteTime *) &Start);
 
@@ -276,7 +276,7 @@ QueryPerformanceCounter (
   return 0;
 #endif
 }
-  
+
 
 
 VOID
@@ -287,12 +287,12 @@ SecSleep (
   struct timespec rq, rm;
   struct timeval  start, end;
   unsigned long  MicroSec;
-  
+
   rq.tv_sec  = DivU64x32 (Nanoseconds, 1000000000);
   rq.tv_nsec = ModU64x32 (Nanoseconds, 1000000000);
 
   //
-  // nanosleep gets interrupted by our timer tic. 
+  // nanosleep gets interrupted by our timer tic.
   // we need to track wall clock time or we will stall for way too long
   //
   gettimeofday (&start, NULL);
@@ -314,7 +314,7 @@ SecSleep (
       break;
     }
     rq = rm;
-  } 
+  }
 }
 
 
@@ -328,7 +328,7 @@ SecCpuSleep (
   // nanosleep gets interrupted by the timer tic
   rq.tv_sec  = 1;
   rq.tv_nsec = 0;
-  
+
   nanosleep (&rq, &rm);
 }
 
@@ -364,7 +364,7 @@ SecGetTime (
   Time->TimeZone = timezone;
   Time->Daylight = (daylight ? EFI_TIME_ADJUST_DAYLIGHT : 0)
     | (tm->tm_isdst > 0 ? EFI_TIME_IN_DAYLIGHT : 0);
-    
+
   if (Capabilities != NULL) {
     Capabilities->Resolution  = 1;
     Capabilities->Accuracy    = 50000000;
@@ -414,9 +414,9 @@ EMU_THUNK_PROTOCOL gEmuThunkProtocol = {
   GasketSecSleep,
   GasketSecCpuSleep,
   GasketSecExit,
-  GasketSecGetTime,                
+  GasketSecGetTime,
   GasketSecSetTime,
-  GasketSecSetTimer,  
+  GasketSecSetTimer,
   GasketSecGetNextProtocol
 };
 

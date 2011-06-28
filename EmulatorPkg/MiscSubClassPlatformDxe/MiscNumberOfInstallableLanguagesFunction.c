@@ -39,7 +39,7 @@ CurrentLanguageMatch (
   CHAR8     *MatchLang;
   CHAR8     *EndMatchLang;
   UINTN     CompareLength;
-  
+
   Languages = HiiGetSupportedLanguages (HiiHandle);
   if (Languages == NULL) {
     return;
@@ -61,10 +61,10 @@ CurrentLanguageMatch (
     CompareLength = AsciiStrLen (BestLanguage);
     for (MatchLang = Languages, (*Offset) = 0; MatchLang != '\0'; (*Offset)++) {
       //
-      // Seek to the end of current match language. 
+      // Seek to the end of current match language.
       //
       for (EndMatchLang = MatchLang; *EndMatchLang != '\0' && *EndMatchLang != ';'; EndMatchLang++);
-  
+
       if ((EndMatchLang == MatchLang + CompareLength) && AsciiStrnCmp(MatchLang, BestLanguage, CompareLength) == 0) {
         //
         // Find the current best Language in the supported languages
@@ -144,7 +144,7 @@ GetSupportedLanguageNumber (
   CHAR8   *Languages;
   CHAR8   *LanguageString;
   UINT16  LangNumber;
-  
+
   Languages = HiiGetSupportedLanguages (HiiHandle);
   if (Languages == NULL) {
     return 0;
@@ -186,7 +186,7 @@ MISC_SMBIOS_TABLE_FUNCTION(NumberOfInstallableLanguages)
   EFI_SMBIOS_HANDLE                         SmbiosHandle;
   SMBIOS_TABLE_TYPE13                       *SmbiosRecord;
   EFI_MISC_NUMBER_OF_INSTALLABLE_LANGUAGES  *ForType13InputData;
- 
+
   ForType13InputData = (EFI_MISC_NUMBER_OF_INSTALLABLE_LANGUAGES *)RecordData;
 
   //
@@ -195,7 +195,7 @@ MISC_SMBIOS_TABLE_FUNCTION(NumberOfInstallableLanguages)
   if (RecordData == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   ForType13InputData->NumberOfInstallableLanguages = GetSupportedLanguageNumber (mHiiHandle);
 
   //
@@ -216,7 +216,7 @@ MISC_SMBIOS_TABLE_FUNCTION(NumberOfInstallableLanguages)
   //
   // Make handle chosen by smbios protocol.add automatically.
   //
-  SmbiosRecord->Hdr.Handle = 0;  
+  SmbiosRecord->Hdr.Handle = 0;
 
   SmbiosRecord->InstallableLanguages = (UINT8)ForType13InputData->NumberOfInstallableLanguages;
   SmbiosRecord->Flags = (UINT8)ForType13InputData->LanguageFlags.AbbreviatedLanguageFormat;
@@ -228,9 +228,9 @@ MISC_SMBIOS_TABLE_FUNCTION(NumberOfInstallableLanguages)
   //
   SmbiosHandle = 0;
   Status = Smbios-> Add(
-                      Smbios, 
+                      Smbios,
                       NULL,
-                      &SmbiosHandle, 
+                      &SmbiosHandle,
                       (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
                       );
   FreePool(SmbiosRecord);

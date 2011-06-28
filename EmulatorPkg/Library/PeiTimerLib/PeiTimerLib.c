@@ -60,7 +60,7 @@ NanoSecondDelay (
   EMU_THUNK_PROTOCOL      *Thunk;
 
   //
-  // Locate EmuThunkPpi for 
+  // Locate EmuThunkPpi for
   //
   Status = PeiServicesLocatePpi (
               &gEmuThunkPpiGuid,
@@ -68,7 +68,7 @@ NanoSecondDelay (
               NULL,
               (VOID **) &ThunkPpi
              );
-  if (!EFI_ERROR (Status)) {   
+  if (!EFI_ERROR (Status)) {
     Thunk  = (EMU_THUNK_PROTOCOL *)ThunkPpi->Thunk ();
     Thunk->Sleep (NanoSeconds * 100);
     return NanoSeconds;
@@ -99,7 +99,7 @@ GetPerformanceCounter (
   EMU_THUNK_PROTOCOL      *Thunk;
 
   //
-  // Locate EmuThunkPpi for 
+  // Locate EmuThunkPpi for
   //
   Status = PeiServicesLocatePpi (
               &gEmuThunkPpiGuid,
@@ -107,7 +107,7 @@ GetPerformanceCounter (
               NULL,
               (VOID **) &ThunkPpi
              );
-  if (!EFI_ERROR (Status)) {   
+  if (!EFI_ERROR (Status)) {
     Thunk  = (EMU_THUNK_PROTOCOL *)ThunkPpi->Thunk ();
     return  Thunk->QueryPerformanceCounter ();
   }
@@ -150,7 +150,7 @@ GetPerformanceCounterProperties (
   EMU_THUNK_PROTOCOL      *Thunk;
 
   //
-  // Locate EmuThunkPpi for 
+  // Locate EmuThunkPpi for
   //
   Status = PeiServicesLocatePpi (
               &gEmuThunkPpiGuid,
@@ -165,7 +165,7 @@ GetPerformanceCounterProperties (
     if (EndValue != NULL) {
       *EndValue = (UINT64)-1LL;
     }
-    
+
     Thunk  = (EMU_THUNK_PROTOCOL *)ThunkPpi->Thunk ();
     return  Thunk->QueryPerformanceFrequency ();
   }

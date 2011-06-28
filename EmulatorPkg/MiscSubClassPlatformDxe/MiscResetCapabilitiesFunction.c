@@ -18,7 +18,7 @@
   This function makes boot time changes to the contents of the
   MiscOemString (Type 11).
 
-  @param  RecordData                 Pointer to copy of RecordData from the Data Table.  
+  @param  RecordData                 Pointer to copy of RecordData from the Data Table.
 
   @retval EFI_SUCCESS                All parameters were valid.
   @retval EFI_UNSUPPORTED            Unexpected RecordType value.
@@ -31,7 +31,7 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscResetCapabilities)
   EFI_SMBIOS_HANDLE        SmbiosHandle;
   SMBIOS_TABLE_TYPE23      *SmbiosRecord;
   EFI_MISC_RESET_CAPABILITIES   *ForType23InputData;
-  
+
   ForType23InputData = (EFI_MISC_RESET_CAPABILITIES *)RecordData;
 
   //
@@ -52,11 +52,11 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscResetCapabilities)
   SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE23);
   //
   // Make handle chosen by smbios protocol.add automatically.
-  // 
-  SmbiosRecord->Hdr.Handle    = 0;  
+  //
+  SmbiosRecord->Hdr.Handle    = 0;
   SmbiosRecord->Capabilities  = *(UINT8*)&(ForType23InputData->ResetCapabilities);
   SmbiosRecord->ResetCount    = (UINT16)ForType23InputData->ResetCount;
-  SmbiosRecord->ResetLimit    = (UINT16)ForType23InputData->ResetLimit;  
+  SmbiosRecord->ResetLimit    = (UINT16)ForType23InputData->ResetLimit;
   SmbiosRecord->TimerInterval = (UINT16)ForType23InputData->ResetTimerInterval;
   SmbiosRecord->Timeout       = (UINT16)ForType23InputData->ResetTimeout;
 
@@ -65,9 +65,9 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscResetCapabilities)
   //
   SmbiosHandle = 0;
   Status = Smbios-> Add(
-                      Smbios, 
+                      Smbios,
                       NULL,
-                      &SmbiosHandle, 
+                      &SmbiosHandle,
                       (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
                       );
   FreePool(SmbiosRecord);

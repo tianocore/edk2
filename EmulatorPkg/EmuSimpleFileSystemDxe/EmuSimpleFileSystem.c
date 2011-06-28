@@ -1,7 +1,7 @@
 /*++ @file
   Produce Simple File System abstractions for directories on your PC using Posix APIs.
-  The configuration of what devices to mount or emulate comes from UNIX 
-  environment variables. The variables must be visible to the Microsoft* 
+  The configuration of what devices to mount or emulate comes from UNIX
+  environment variables. The variables must be visible to the Microsoft*
   Developer Studio for them to work.
 
 Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
@@ -120,7 +120,7 @@ EmuSimpleFileSystemClose (
   }
 
   gBS->RestoreTPL (OldTpl);
-  
+
   return Status;
 }
 
@@ -129,7 +129,7 @@ EmuSimpleFileSystemClose (
   Close and delete the file handle.
 
   @param  This                     Protocol instance pointer.
-                                   
+
   @retval EFI_SUCCESS              The file was closed and deleted.
   @retval EFI_WARN_DELETE_FAILURE  The handle was closed but the file was not deleted.
 
@@ -149,7 +149,7 @@ EmuSimpleFileSystemDelete (
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  
+
   PrivateFile = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   Status = PrivateFile->Io->Delete (PrivateFile->Io);
@@ -192,14 +192,14 @@ EmuSimpleFileSystemRead (
   if (This == NULL || BufferSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if ((*BufferSize != 0) && (Buffer == NULL)) {
     // Buffer can be NULL  if *BufferSize is zero
     return EFI_INVALID_PARAMETER;
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  
+
   PrivateFile = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   Status = PrivateFile->Io->Read (PrivateFile->Io, BufferSize, Buffer);
@@ -259,7 +259,7 @@ EmuSimpleFileSystemWrite (
 
   @param  This            Protocol instance pointer.
   @param  Position        Byte position from the start of the file.
-                          
+
   @retval EFI_SUCCESS     Position was updated.
   @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open.
 
@@ -280,7 +280,7 @@ EmuSimpleFileSystemGetPosition (
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  
+
   PrivateFile   = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   Status = PrivateFile->Io->GetPosition (PrivateFile->Io, Position);
@@ -296,7 +296,7 @@ EmuSimpleFileSystemGetPosition (
 
   @param  This            Protocol instance pointer.
   @param  Position        Byte position from the start of the file.
-                          
+
   @retval EFI_SUCCESS     Position was updated.
   @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open..
 
@@ -317,7 +317,7 @@ EmuSimpleFileSystemSetPosition (
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  
+
   PrivateFile = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   Status = PrivateFile->Io->SetPosition (PrivateFile->Io, Position);
@@ -363,7 +363,7 @@ EmuSimpleFileSystemGetInfo (
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-    
+
   PrivateFile = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   Status = PrivateFile->Io->GetInfo (PrivateFile->Io, InformationType, BufferSize, Buffer);
@@ -411,12 +411,12 @@ EmuSimpleFileSystemSetInfo (
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  
+
   PrivateFile               = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   Status = PrivateFile->Io->SetInfo (PrivateFile->Io, InformationType, BufferSize, Buffer);
 
-  gBS->RestoreTPL (OldTpl);  
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -451,7 +451,7 @@ EmuSimpleFileSystemFlush (
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  
+
   PrivateFile = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   Status = PrivateFile->Io->Flush (PrivateFile->Io);
@@ -503,7 +503,7 @@ EmuSimpleFileSystemOpenVolume (
   if (PrivateFile == NULL) {
     goto Done;
   }
-  
+
   PrivateFile->Signature            = EMU_EFI_FILE_PRIVATE_SIGNATURE;
   PrivateFile->IoThunk              = Private->IoThunk;
   PrivateFile->SimpleFileSystem     = This;
@@ -525,7 +525,7 @@ EmuSimpleFileSystemOpenVolume (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
-  
+
   AddUnicodeString2 (
     "eng",
     gEmuSimpleFileSystemComponentName.SupportedLanguages,
@@ -548,7 +548,7 @@ Done:
     if (PrivateFile) {
       gBS->FreePool (PrivateFile);
     }
-    
+
     *Root = NULL;
   }
 
@@ -558,33 +558,33 @@ Done:
 }
 
 /**
-  Tests to see if this driver supports a given controller. If a child device is provided, 
+  Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
 
-  This function checks to see if the driver specified by This supports the device specified by 
-  ControllerHandle. Drivers will typically use the device path attached to 
-  ControllerHandle and/or the services from the bus I/O abstraction attached to 
-  ControllerHandle to determine if the driver supports ControllerHandle. This function 
-  may be called many times during platform initialization. In order to reduce boot times, the tests 
-  performed by this function must be very small, and take as little time as possible to execute. This 
-  function must not change the state of any hardware devices, and this function must be aware that the 
-  device specified by ControllerHandle may already be managed by the same driver or a 
-  different driver. This function must match its calls to AllocatePages() with FreePages(), 
-  AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().  
-  Because ControllerHandle may have been previously started by the same driver, if a protocol is 
-  already in the opened state, then it must not be closed with CloseProtocol(). This is required 
+  This function checks to see if the driver specified by This supports the device specified by
+  ControllerHandle. Drivers will typically use the device path attached to
+  ControllerHandle and/or the services from the bus I/O abstraction attached to
+  ControllerHandle to determine if the driver supports ControllerHandle. This function
+  may be called many times during platform initialization. In order to reduce boot times, the tests
+  performed by this function must be very small, and take as little time as possible to execute. This
+  function must not change the state of any hardware devices, and this function must be aware that the
+  device specified by ControllerHandle may already be managed by the same driver or a
+  different driver. This function must match its calls to AllocatePages() with FreePages(),
+  AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().
+  Because ControllerHandle may have been previously started by the same driver, if a protocol is
+  already in the opened state, then it must not be closed with CloseProtocol(). This is required
   to guarantee the state of ControllerHandle is not modified by this function.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to test. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to test. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
-                                   parameter is ignored by device drivers, and is optional for bus 
-                                   drivers. For bus drivers, if this parameter is not NULL, then 
-                                   the bus driver must determine if the bus controller specified 
-                                   by ControllerHandle and the child controller specified 
-                                   by RemainingDevicePath are both supported by this 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This
+                                   parameter is ignored by device drivers, and is optional for bus
+                                   drivers. For bus drivers, if this parameter is not NULL, then
+                                   the bus driver must determine if the bus controller specified
+                                   by ControllerHandle and the child controller specified
+                                   by RemainingDevicePath are both supported by this
                                    bus driver.
 
   @retval EFI_SUCCESS              The device specified by ControllerHandle and
@@ -652,28 +652,28 @@ EmuSimpleFileSystemDriverBindingSupported (
   Starts a device controller or a bus controller.
 
   The Start() function is designed to be invoked from the EFI boot service ConnectController().
-  As a result, much of the error checking on the parameters to Start() has been moved into this 
-  common boot service. It is legal to call Start() from other locations, 
+  As a result, much of the error checking on the parameters to Start() has been moved into this
+  common boot service. It is legal to call Start() from other locations,
   but the following calling restrictions must be followed, or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE.
   2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
      EFI_DEVICE_PATH_PROTOCOL.
   3. Prior to calling Start(), the Supported() function for the driver specified by This must
-     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.  
+     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
-                                   parameter is ignored by device drivers, and is optional for bus 
-                                   drivers. For a bus driver, if this parameter is NULL, then handles 
-                                   for all the children of Controller are created by this driver.  
-                                   If this parameter is not NULL and the first Device Path Node is 
-                                   not the End of Device Path Node, then only the handle for the 
-                                   child device specified by the first Device Path Node of 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This
+                                   parameter is ignored by device drivers, and is optional for bus
+                                   drivers. For a bus driver, if this parameter is NULL, then handles
+                                   for all the children of Controller are created by this driver.
+                                   If this parameter is not NULL and the first Device Path Node is
+                                   not the End of Device Path Node, then only the handle for the
+                                   child device specified by the first Device Path Node of
                                    RemainingDevicePath is created by this driver.
-                                   If the first Device Path Node of RemainingDevicePath is 
+                                   If the first Device Path Node of RemainingDevicePath is
                                    the End of Device Path Node, no child handle is created by this
                                    driver.
 
@@ -733,7 +733,7 @@ EmuSimpleFileSystemDriverBindingStart (
   Private->Signature = EMU_SIMPLE_FILE_SYSTEM_PRIVATE_SIGNATURE;
   Private->IoThunk   = EmuIoThunk;
   Private->Io        = EmuIoThunk->Interface;
-  
+
   Private->SimpleFileSystem.Revision    = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION;
   Private->SimpleFileSystem.OpenVolume  = EmuSimpleFileSystemOpenVolume;
 
@@ -746,7 +746,7 @@ EmuSimpleFileSystemDriverBindingStart (
     EmuIoThunk->ConfigString,
     TRUE
     );
-    
+
   AddUnicodeString2 (
     "en",
     gEmuSimpleFileSystemComponentName2.SupportedLanguages,
@@ -767,9 +767,9 @@ Done:
       if (Private->ControllerNameTable != NULL) {
         FreeUnicodeStringTable (Private->ControllerNameTable);
       }
-      
+
       gBS->FreePool (Private);
-    
+
     }
 
     gBS->CloseProtocol (
@@ -786,10 +786,10 @@ Done:
 
 /**
   Stops a device controller or a bus controller.
-  
-  The Stop() function is designed to be invoked from the EFI boot service DisconnectController(). 
-  As a result, much of the error checking on the parameters to Stop() has been moved 
-  into this common boot service. It is legal to call Stop() from other locations, 
+
+  The Stop() function is designed to be invoked from the EFI boot service DisconnectController().
+  As a result, much of the error checking on the parameters to Stop() has been moved
+  into this common boot service. It is legal to call Stop() from other locations,
   but the following calling restrictions must be followed, or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
      same driver's Start() function.
@@ -797,13 +797,13 @@ Done:
      EFI_HANDLE. In addition, all of these handles must have been created in this driver's
      Start() function, and the Start() function must have called OpenProtocol() on
      ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
-  
+
   @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
-                                support a bus specific I/O protocol for the driver 
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must
+                                support a bus specific I/O protocol for the driver
                                 to use to stop the device.
   @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
-  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL
                                 if NumberOfChildren is 0.
 
   @retval EFI_SUCCESS           The device was stopped.
@@ -885,9 +885,9 @@ EFI_DRIVER_BINDING_PROTOCOL gEmuSimpleFileSystemDriverBinding = {
 /**
   The user Entry Point for module EmuSimpleFileSystem. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 

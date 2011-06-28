@@ -56,7 +56,7 @@ typedef struct {
 
   EFI_SIMPLE_NETWORK_PROTOCOL Snp;
   EFI_SIMPLE_NETWORK_MODE     Mode;
-  
+
   EFI_UNICODE_STRING_TABLE    *ControllerNameTable;
 
 } EMU_SNP_PRIVATE_DATA;
@@ -124,7 +124,7 @@ EmuSnpDriverBindingStart (
   restrictions for this service. DisconnectController()
   must follow these calling restrictions. If any other agent wishes
   to call Stop() it must also follow these calling restrictions.
-  
+
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
@@ -156,7 +156,7 @@ EFIAPI
 EmuSnpStart(
   IN EFI_SIMPLE_NETWORK_PROTOCOL*    This
   );
-  
+
 /**
   Changes the state of a network interface from "started" to "stopped".
 
@@ -170,10 +170,10 @@ EFIAPI
 EmuSnpStop(
   IN EFI_SIMPLE_NETWORK_PROTOCOL*    This
   );
-  
+
 /**
-  Resets a network adapter and allocates the transmit and receive buffers 
-  required by the network interface; optionally, also requests allocation 
+  Resets a network adapter and allocates the transmit and receive buffers
+  required by the network interface; optionally, also requests allocation
   of additional transmit and receive buffers.
 
   @param  This              Protocol instance pointer.
@@ -198,10 +198,10 @@ EmuSnpInitialize(
   IN UINTN              ExtraRxBufferSize OPTIONAL,
   IN UINTN              ExtraTxBufferSize OPTIONAL
   );
-  
+
 /**
-  Resets a network adapter and re-initializes it with the parameters that were 
-  provided in the previous call to Initialize().  
+  Resets a network adapter and re-initializes it with the parameters that were
+  provided in the previous call to Initialize().
 
   @param  This                 Protocol instance pointer.
   @param  ExtendedVerification Indicates that the driver may perform a more
@@ -219,7 +219,7 @@ EmuSnpReset(
   );
 
 /**
-  Resets a network adapter and leaves it in a state that is safe for 
+  Resets a network adapter and leaves it in a state that is safe for
   another driver to initialize.
 
   @param  This Protocol instance pointer.
@@ -311,10 +311,10 @@ EmuSnpStatistics(
   IN OUT UINTN*            StatisticsSize OPTIONAL,
   OUT EFI_NETWORK_STATISTICS*      StatisticsTable OPTIONAL
   );
-  
+
 /**
   Converts a multicast IP address to a multicast HW MAC address.
-  
+
   @param  This  Protocol instance pointer.
   @param  Ipv6  Set to TRUE if the multicast IP address is IPv6 [RFC 2460]. Set
                 to FALSE if the multicast IP address is IPv4 [RFC 791].
@@ -341,7 +341,7 @@ EmuSnpMcastIptoMac(
   );
 
 /**
-  Performs read and write operations on the NVRAM device attached to a 
+  Performs read and write operations on the NVRAM device attached to a
   network interface.
 
   @param  This         Protocol instance pointer.
@@ -367,7 +367,7 @@ EmuSnpNvdata(
   );
 
 /**
-  Reads the current interrupt status and recycled transmit buffer status from 
+  Reads the current interrupt status and recycled transmit buffer status from
   a network interface.
 
   @param  This            Protocol instance pointer.

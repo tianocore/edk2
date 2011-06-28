@@ -3,7 +3,7 @@
 #
 # Parses the MiscSubclassDataTable and reports any generated data to the DataHub.
 #  All .uni file who tagged with "ToolCode="DUMMY"" in following file list is included by
-#  MiscSubclassDriver.uni file, the StrGather tool will expand MiscSubclassDriver.uni file 
+#  MiscSubclassDriver.uni file, the StrGather tool will expand MiscSubclassDriver.uni file
 #  and parse all .uni file.
 # Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 #
@@ -38,18 +38,18 @@
   MiscBiosVendor.uni
   MiscBiosVendorData.c
   MiscBiosVendorFunction.c
-  MiscBootInformationData.c  
+  MiscBootInformationData.c
   MiscBootInformationFunction.c
   MiscChassisManufacturer.uni
   MiscChassisManufacturerData.c
   MiscChassisManufacturerFunction.c
   MiscNumberOfInstallableLanguagesData.c
   MiscNumberOfInstallableLanguagesFunction.c
-  MiscOemString.uni  
-  MiscOemStringData.c  
-  MiscOemStringFunction.c  
+  MiscOemString.uni
+  MiscOemStringData.c
+  MiscOemStringFunction.c
   MiscPortInternalConnectorDesignator.uni
-  MiscPortInternalConnectorDesignatorData.c  
+  MiscPortInternalConnectorDesignatorData.c
   MiscPortInternalConnectorDesignatorFunction.c
   MiscResetCapabilitiesData.c
   MiscResetCapabilitiesFunction.c
@@ -95,7 +95,7 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareReleaseDateString
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang  
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
   gEmulatorPkgTokenSpaceGuid.PcdEmuMemorySize
 
 

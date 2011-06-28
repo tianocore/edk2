@@ -1,19 +1,19 @@
 /*++
- 
+
 Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   MiscPortInternalConnectorDesignatorFunction.c
-  
-Abstract: 
+
+Abstract:
 
   This driver parses the mMiscSubclassDataTable structure and reports
   any generated data to the DataHub.
@@ -69,7 +69,7 @@ Returns:
 {
   CHAR8                                        *OptionalStrStart;
   UINTN                                        InternalRefStrLen;
-  UINTN                                        ExternalRefStrLen;  
+  UINTN                                        ExternalRefStrLen;
   EFI_STRING                                   InternalRef;
   EFI_STRING                                   ExternalRef;
   STRING_REF                                   TokenForInternal;
@@ -78,7 +78,7 @@ Returns:
   SMBIOS_TABLE_TYPE8                           *SmbiosRecord;
   EFI_SMBIOS_HANDLE                            SmbiosHandle;
   EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR  *ForType8InputData;
-  
+
   ForType8InputData = (EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR *)RecordData;
   //
   // First check for invalid parameters.
@@ -89,8 +89,8 @@ Returns:
 
   TokenForInternal = 0;
   TokenForExternal = 0;
-  
-  switch (ForType8InputData->PortInternalConnectorDesignator) { 
+
+  switch (ForType8InputData->PortInternalConnectorDesignator) {
 
     case STR_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR:
       TokenForInternal = STRING_TOKEN (STR_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR);
@@ -147,13 +147,13 @@ Returns:
   //
   // Make handle chosen by smbios protocol.add automatically.
   //
-  SmbiosRecord->Hdr.Handle = 0;  
+  SmbiosRecord->Hdr.Handle = 0;
   SmbiosRecord->InternalReferenceDesignator = 1;
   SmbiosRecord->InternalConnectorType = (UINT8)ForType8InputData->PortInternalConnectorType;
   SmbiosRecord->ExternalReferenceDesignator = 2;
   SmbiosRecord->ExternalConnectorType = (UINT8)ForType8InputData->PortExternalConnectorType;
   SmbiosRecord->PortType = (UINT8)ForType8InputData->PortType;
-  
+
   OptionalStrStart = (CHAR8 *)(SmbiosRecord + 1);
   UnicodeStrToAsciiStr(InternalRef, OptionalStrStart);
   UnicodeStrToAsciiStr(ExternalRef, OptionalStrStart + InternalRefStrLen + 1);
@@ -163,9 +163,9 @@ Returns:
   //
   SmbiosHandle = 0;
   Status = Smbios-> Add(
-                      Smbios, 
+                      Smbios,
                       NULL,
-                      &SmbiosHandle, 
+                      &SmbiosHandle,
                       (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
                       );
   FreePool(SmbiosRecord);

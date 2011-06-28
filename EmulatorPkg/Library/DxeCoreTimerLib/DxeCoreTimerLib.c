@@ -121,7 +121,7 @@ GetPerformanceCounterProperties (
   if (EndValue != NULL) {
     *EndValue = (UINT64)-1LL;
   }
-  
+
   return gEmuThunk->QueryPerformanceFrequency ();
 }
 

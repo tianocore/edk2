@@ -3,13 +3,13 @@
 
 Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -37,11 +37,11 @@ PeimInitializeFlashMap (
 
 Routine Description:
   Build GUIDed HOBs for platform specific flash map
-  
+
 Arguments:
   FfsHeader   - A pointer to the EFI_FFS_FILE_HEADER structure.
   PeiServices - General purpose services available to every PEIM.
-    
+
 Returns:
   EFI_STATUS
 
@@ -74,7 +74,7 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   PcdSet64 (PcdFlashNvStorageVariableBase64, PcdGet64 (PcdEmuFlashNvStorageVariableBase) + FdFixUp);
   PcdSet64 (PcdFlashNvStorageFtwWorkingBase64, PcdGet64 (PcdEmuFlashNvStorageFtwWorkingBase) + FdFixUp);
   PcdSet64 (PcdFlashNvStorageFtwSpareBase64, PcdGet64 (PcdEmuFlashNvStorageFtwSpareBase) + FdFixUp);

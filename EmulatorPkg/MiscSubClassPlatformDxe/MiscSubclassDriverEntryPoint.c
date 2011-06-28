@@ -51,7 +51,7 @@ LogMemorySmbiosRecord (
 
   Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID**)&Smbios);
   ASSERT_EFI_ERROR (Status);
-  
+
   NumSlots        = 1;
 
   //
@@ -63,7 +63,7 @@ LogMemorySmbiosRecord (
     TotalMemorySize += StrDecimalToUint64 (MemString);
     while (*MemString != '\0') {
       if (*MemString == '!') {
-        MemString++;       
+        MemString++;
         break;
       }
       MemString++;
@@ -85,7 +85,7 @@ LogMemorySmbiosRecord (
   Type19Record->StartingAddress = 0;
   Type19Record->EndingAddress =  (UINT32)RShiftU64(TotalMemorySize, 10) - 1;
   Type19Record->MemoryArrayHandle = 0;
-  Type19Record->PartitionWidth = (UINT8)(NumSlots); 
+  Type19Record->PartitionWidth = (UINT8)(NumSlots);
 
   //
   // Generate Memory Array Mapped Address info (TYPE 19)
@@ -128,7 +128,7 @@ Returns:
 {
   UINTN                Index;
   EFI_STATUS           EfiStatus;
-  EFI_SMBIOS_PROTOCOL  *Smbios;  
+  EFI_SMBIOS_PROTOCOL  *Smbios;
 
   EfiStatus = gBS->LocateProtocol(&gEfiSmbiosProtocolGuid, NULL, (VOID**)&Smbios);
 

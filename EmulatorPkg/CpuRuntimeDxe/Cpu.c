@@ -1,6 +1,6 @@
 /*++ @file
   Emu driver to produce CPU Architectural Protocol.
-  
+
 Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
 This program and the accompanying materials
@@ -172,12 +172,12 @@ EmuGetTimerValue (
   if (TimerIndex != 0) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   *TimerValue = gEmuThunk->QueryPerformanceCounter ();
-  
+
   if (TimerPeriod != NULL) {
     *TimerPeriod = mTimerPeriod;
-  } 
+  }
 
   return EFI_SUCCESS;
 }
@@ -225,7 +225,7 @@ LogSmbiosData (
 {
   EFI_STATUS         Status;
   EFI_SMBIOS_HANDLE  SmbiosHandle;
-  
+
   SmbiosHandle = 0;
   Status = Smbios->Add (
                      Smbios,
@@ -255,7 +255,7 @@ CpuUpdateSmbios (
   // Locate Smbios protocol.
   //
   Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID **)&Smbios);
-  
+
   if (EFI_ERROR (Status)) {
     return;
   }
@@ -285,7 +285,7 @@ CpuUpdateSmbios (
   //
   // Make handle chosen by smbios protocol.add automatically.
   //
-  SmbiosRecord->Hdr.Handle = 0;  
+  SmbiosRecord->Hdr.Handle = 0;
   //
   // Processor version is the 1st string.
   //
@@ -309,7 +309,7 @@ CpuUpdateSmbios (
 
 /**
   Callback function for idle events.
- 
+
   @param  Event                 Event whose notification function is being invoked.
   @param  Context               The pointer to the notification function's context,
                                 which is implementation-dependent.
@@ -339,18 +339,18 @@ InitializeCpu (
 
   //
   // Retrieve the frequency of the performance counter in Hz.
-  //  
+  //
   Frequency = gEmuThunk->QueryPerformanceFrequency ();
-  
+
   //
   // Convert frequency in Hz to a clock period in femtoseconds.
   //
   mTimerPeriod = DivU64x64Remainder (1000000000000000ULL, Frequency, NULL);
 
   CpuUpdateSmbios ();
-  
+
   CpuMpServicesInit ();
-  
+
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,

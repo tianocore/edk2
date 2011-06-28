@@ -1,13 +1,13 @@
 /**@file
 
 Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -63,46 +63,46 @@ EFI_DRIVER_CONFIGURATION_PROTOCOL gEmuBlockIoDriverConfiguration = {
 /*++
 
   Routine Description:
-    Allows the user to set controller specific options for a controller that a 
+    Allows the user to set controller specific options for a controller that a
     driver is currently managing.
 
   Arguments:
     This             - A pointer to the EFI_DRIVER_CONFIGURATION_ PROTOCOL instance.
     ControllerHandle - The handle of the controller to set options on.
     ChildHandle      - The handle of the child controller to set options on.  This
-                       is an optional parameter that may be NULL.  It will be NULL 
-                       for device drivers, and for a bus drivers that wish to set 
-                       options for the bus controller.  It will not be NULL for a 
-                       bus driver that wishes to set options for one of its child 
+                       is an optional parameter that may be NULL.  It will be NULL
+                       for device drivers, and for a bus drivers that wish to set
+                       options for the bus controller.  It will not be NULL for a
+                       bus driver that wishes to set options for one of its child
                        controllers.
     Language         - A pointer to a three character ISO 639-2 language identifier.
-                       This is the language of the user interface that should be 
-                       presented to the user, and it must match one of the languages 
-                       specified in SupportedLanguages.  The number of languages 
+                       This is the language of the user interface that should be
+                       presented to the user, and it must match one of the languages
+                       specified in SupportedLanguages.  The number of languages
                        supported by a driver is up to the driver writer.
-    ActionRequired   - A pointer to the action that the calling agent is required 
-                       to perform when this function returns.  See "Related 
-                       Definitions" for a list of the actions that the calling 
-                       agent is required to perform prior to accessing 
+    ActionRequired   - A pointer to the action that the calling agent is required
+                       to perform when this function returns.  See "Related
+                       Definitions" for a list of the actions that the calling
+                       agent is required to perform prior to accessing
                        ControllerHandle again.
 
   Returns:
-    EFI_SUCCESS           - The driver specified by This successfully set the 
-                            configuration options for the controller specified 
+    EFI_SUCCESS           - The driver specified by This successfully set the
+                            configuration options for the controller specified
                             by ControllerHandle..
     EFI_INVALID_PARAMETER - ControllerHandle is not a valid EFI_HANDLE.
     EFI_INVALID_PARAMETER - ChildHandle is not NULL and it is not a valid EFI_HANDLE.
     EFI_INVALID_PARAMETER - ActionRequired is NULL.
-    EFI_UNSUPPORTED       - The driver specified by This does not support setting 
-                            configuration options for the controller specified by 
+    EFI_UNSUPPORTED       - The driver specified by This does not support setting
+                            configuration options for the controller specified by
                             ControllerHandle and ChildHandle.
-    EFI_UNSUPPORTED       - The driver specified by This does not support the 
+    EFI_UNSUPPORTED       - The driver specified by This does not support the
                             language specified by Language.
-    EFI_DEVICE_ERROR      - A device error occurred while attempt to set the 
-                            configuration options for the controller specified 
+    EFI_DEVICE_ERROR      - A device error occurred while attempt to set the
+                            configuration options for the controller specified
                             by ControllerHandle and ChildHandle.
-    EFI_OUT_RESOURCES     - There are not enough resources available to set the 
-                            configuration options for the controller specified 
+    EFI_OUT_RESOURCES     - There are not enough resources available to set the
+                            configuration options for the controller specified
                             by ControllerHandle and ChildHandle.
 
 --*/
@@ -183,29 +183,29 @@ EmuBlockIoDriverConfigurationSetOptions (
 
   Arguments:
     This             - A pointer to the EFI_DRIVER_CONFIGURATION_PROTOCOL instance.
-    ControllerHandle - The handle of the controller to test if it's current 
+    ControllerHandle - The handle of the controller to test if it's current
                        configuration options are valid.
     ChildHandle      - The handle of the child controller to test if it's current
-                       configuration options are valid.  This is an optional 
-                       parameter that may be NULL.  It will be NULL for device 
+                       configuration options are valid.  This is an optional
+                       parameter that may be NULL.  It will be NULL for device
                        drivers.  It will also be NULL for a bus drivers that wish
                        to test the configuration options for the bus controller.
-                       It will not be NULL for a bus driver that wishes to test 
+                       It will not be NULL for a bus driver that wishes to test
                        configuration options for one of its child controllers.
 
   Returns:
-    EFI_SUCCESS           - The controller specified by ControllerHandle and 
-                            ChildHandle that is being managed by the driver 
+    EFI_SUCCESS           - The controller specified by ControllerHandle and
+                            ChildHandle that is being managed by the driver
                             specified by This has a valid set of  configuration
                             options.
     EFI_INVALID_PARAMETER - ControllerHandle is not a valid EFI_HANDLE.
     EFI_INVALID_PARAMETER - ChildHandle is not NULL and it is not a valid EFI_HANDLE.
-    EFI_UNSUPPORTED       - The driver specified by This is not currently 
-                            managing the controller specified by ControllerHandle 
+    EFI_UNSUPPORTED       - The driver specified by This is not currently
+                            managing the controller specified by ControllerHandle
                             and ChildHandle.
-    EFI_DEVICE_ERROR      - The controller specified by ControllerHandle and 
-                            ChildHandle that is being managed by the driver 
-                            specified by This has an invalid set of configuration 
+    EFI_DEVICE_ERROR      - The controller specified by ControllerHandle and
+                            ChildHandle that is being managed by the driver
+                            specified by This has an invalid set of configuration
                             options.
 
 --*/

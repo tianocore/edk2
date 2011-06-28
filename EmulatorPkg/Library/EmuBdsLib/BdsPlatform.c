@@ -2,13 +2,13 @@
 
 Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -93,14 +93,14 @@ Routine Description:
 Arguments:
 
   PlatformConsole         - Predfined platform default console device array.
- 
+
 Returns:
 
-  EFI_SUCCESS             - Success connect at least one ConIn and ConOut 
-                            device, there must have one ConOut device is 
+  EFI_SUCCESS             - Success connect at least one ConIn and ConOut
+                            device, there must have one ConOut device is
                             active vga device.
-  
-  EFI_STATUS              - Return the status of 
+
+  EFI_STATUS              - Return the status of
                             BdsLibConnectAllDefaultConsoles ()
 
 **/
@@ -149,17 +149,17 @@ PlatformBdsConnectSequence (
 
 Routine Description:
 
-  Connect with predeined platform connect sequence, 
+  Connect with predeined platform connect sequence,
   the OEM/IBV can customize with their own connect sequence.
-  
+
 Arguments:
 
   None.
- 
+
 Returns:
 
   None.
-  
+
 **/
 {
   UINTN Index;
@@ -195,15 +195,15 @@ Routine Description:
 
   Load the predefined driver option, OEM/IBV can customize this
   to load their own drivers
-  
+
 Arguments:
 
   BdsDriverLists  - The header of the driver option link list.
- 
+
 Returns:
 
   None.
-  
+
 **/
 {
   UINTN Index;
@@ -235,19 +235,19 @@ Routine Description:
 
   Perform the platform diagnostic, such like test memory. OEM/IBV also
   can customize this fuction to support specific platform diagnostic.
-  
+
 Arguments:
 
   MemoryTestLevel  - The memory test intensive level
-  
+
   QuietBoot        - Indicate if need to enable the quiet boot
 
   BaseMemoryTest   - A pointer to BdsMemoryTest()
- 
+
 Returns:
 
   None.
-  
+
 **/
 {
   EFI_STATUS  Status;
@@ -291,11 +291,11 @@ Routine Description:
   The function will excute with as the platform policy, current policy
   is driven by boot mode. IBV/OEM can customize this code for their specific
   policy action.
-  
+
 Arguments:
 
   DriverOptionList - The header of the driver option link list
-  
+
   BootOptionList   - The header of the boot option link list
 
   ProcessCapsules  - A pointer to ProcessCapsules()
@@ -305,7 +305,7 @@ Arguments:
 Returns:
 
   None.
-  
+
 **/
 {
   EFI_STATUS     Status;
@@ -431,7 +431,7 @@ PlatformBdsBootSuccess (
 /*++
 
 Routine Description:
-  
+
   Hook point after a boot attempt succeeds. We don't expect a boot option to
   return, so the EFI 1.0 specification defines that you will default to an
   interactive mode and stop processing the BootOrder list in this case. This
@@ -442,7 +442,7 @@ Arguments:
   Option - Pointer to Boot Option that succeeded to boot.
 
 Returns:
-  
+
   None.
 
 **/
@@ -471,11 +471,11 @@ PlatformBdsBootFail (
 /*++
 
 Routine Description:
-  
+
   Hook point after a boot attempt fails.
 
 Arguments:
-  
+
   Option - Pointer to Boot Option that failed to boot.
 
   Status - Status returned from failed boot.
@@ -485,7 +485,7 @@ Arguments:
   ExitDataSize - Exit data size returned from failed boot.
 
 Returns:
-  
+
   None.
 
 **/
@@ -510,16 +510,16 @@ PlatformBdsNoConsoleAction (
 /*++
 
 Routine Description:
-  
+
   This function is remained for IBV/OEM to do some platform action,
   if there no console device can be connected.
 
 Arguments:
-  
+
   None.
-  
+
 Returns:
-  
+
   EFI_SUCCESS      - Direct return success now.
 
 **/

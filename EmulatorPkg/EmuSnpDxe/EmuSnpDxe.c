@@ -24,20 +24,20 @@ Abstract:
 
 
 EFI_SIMPLE_NETWORK_PROTOCOL gEmuSnpTemplate = {
-  EFI_SIMPLE_NETWORK_PROTOCOL_REVISION,  
-  EmuSnpStart,             
-  EmuSnpStop,              
-  EmuSnpInitialize,       
-  EmuSnpReset,              
-  EmuSnpShutdown,            
-  EmuSnpReceiveFilters,          
-  EmuSnpStationAddress,          
-  EmuSnpStatistics,            
-  EmuSnpMcastIptoMac,          
-  EmuSnpNvdata,              
-  EmuSnpGetStatus,            
-  EmuSnpTransmit,            
-  EmuSnpReceive,              
+  EFI_SIMPLE_NETWORK_PROTOCOL_REVISION,
+  EmuSnpStart,
+  EmuSnpStop,
+  EmuSnpInitialize,
+  EmuSnpReset,
+  EmuSnpShutdown,
+  EmuSnpReceiveFilters,
+  EmuSnpStationAddress,
+  EmuSnpStatistics,
+  EmuSnpMcastIptoMac,
+  EmuSnpNvdata,
+  EmuSnpGetStatus,
+  EmuSnpTransmit,
+  EmuSnpReceive,
   NULL,                     // WaitForPacket
   NULL                      // Mode
  };
@@ -94,8 +94,8 @@ EmuSnpStop (
 
 
 /**
-  Resets a network adapter and allocates the transmit and receive buffers 
-  required by the network interface; optionally, also requests allocation 
+  Resets a network adapter and allocates the transmit and receive buffers
+  required by the network interface; optionally, also requests allocation
   of additional transmit and receive buffers.
 
   @param  This              Protocol instance pointer.
@@ -131,8 +131,8 @@ EmuSnpInitialize (
 }
 
 /**
-  Resets a network adapter and re-initializes it with the parameters that were 
-  provided in the previous call to Initialize().  
+  Resets a network adapter and re-initializes it with the parameters that were
+  provided in the previous call to Initialize().
 
   @param  This                 Protocol instance pointer.
   @param  ExtendedVerification Indicates that the driver may perform a more
@@ -159,7 +159,7 @@ EmuSnpReset (
 }
 
 /**
-  Resets a network adapter and leaves it in a state that is safe for 
+  Resets a network adapter and leaves it in a state that is safe for
   another driver to initialize.
 
   @param  This Protocol instance pointer.
@@ -334,7 +334,7 @@ EmuSnpMcastIptoMac (
 
 
 /**
-  Performs read and write operations on the NVRAM device attached to a 
+  Performs read and write operations on the NVRAM device attached to a
   network interface.
 
   @param  This         Protocol instance pointer.
@@ -370,7 +370,7 @@ EmuSnpNvdata (
 
 
 /**
-  Reads the current interrupt status and recycled transmit buffer status from 
+  Reads the current interrupt status and recycled transmit buffer status from
   a network interface.
 
   @param  This            Protocol instance pointer.
@@ -568,8 +568,8 @@ EmuSnpDriverBindingSupported (
       }
     }
   }
-  
-  
+
+
   //
   // Open the IO Abstraction(s) needed to perform the supported test
   //
@@ -602,8 +602,8 @@ EmuSnpDriverBindingSupported (
         This->DriverBindingHandle,
         ControllerHandle
         );
-        
-        
+
+
   //
   // Open the EFI Device Path protocol needed to perform the supported test
   //
@@ -724,7 +724,7 @@ EmuSnpDriverBindingStart (
   Private->Snp.Mode     = &Private->Mode;
   Private->ControllerNameTable = NULL;
 
-  
+
   Status = Private->Io->CreateMapping (Private->Io, &Private->Mode);
   if (EFI_ERROR (Status)) {
     goto Done;
@@ -760,7 +760,7 @@ EmuSnpDriverBindingStart (
     EmuIoThunk->ConfigString,
     TRUE
     );
-    
+
   AddUnicodeString2 (
     "en",
     gEmuSnpDriverComponentName2.SupportedLanguages,
@@ -819,7 +819,7 @@ Done:
   restrictions for this service. DisconnectController()
   must follow these calling restrictions. If any other agent wishes
   to call Stop() it must also follow these calling restrictions.
-  
+
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
@@ -867,8 +867,8 @@ EmuSnpDriverBindingStop (
   }
 
   ASSERT (NumberOfChildren == 1);
-  
-  
+
+
   //
   // Get our context back.
   //

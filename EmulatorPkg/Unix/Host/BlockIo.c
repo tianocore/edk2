@@ -1,13 +1,13 @@
 /**@file
 
 Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -69,7 +69,7 @@ SetFilePointer64 (
   res = lseek (Private->fd, offset, (int)MoveMethod);
   if (res == -1) {
     Status = EFI_INVALID_PARAMETER;
-  } 
+  }
 
   if (NewFilePointer != NULL) {
     *NewFilePointer = res;
@@ -123,13 +123,13 @@ EmuBlockIoOpenDevice (
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
-  
+
   if (FileSize == 0) {
     // lseek fails on a real device. ioctl calls are OS specific
 #if __APPLE__
     {
       UINT32 BlockSize;
-     
+
       if (ioctl (Private->fd, DKIOCGETBLOCKSIZE, &BlockSize) == 0) {
         Private->Media->BlockSize = BlockSize;
       }
@@ -141,13 +141,13 @@ EmuBlockIoOpenDevice (
           Private->Media->LastBlock = Private->NumberOfBlocks - 1;
         }
       }
-      ioctl (Private->fd, DKIOCGETMAXBLOCKCOUNTWRITE, &Private->Media->OptimalTransferLengthGranularity);  
+      ioctl (Private->fd, DKIOCGETMAXBLOCKCOUNTWRITE, &Private->Media->OptimalTransferLengthGranularity);
     }
-#else 
+#else
     {
       size_t BlockSize;
       UINT64 DiskSize;
-      
+
       if (ioctl (Private->fd, BLKSSZGET, &BlockSize) == 0) {
         Private->Media->BlockSize = BlockSize;
       }
@@ -157,12 +157,12 @@ EmuBlockIoOpenDevice (
       }
     }
 #endif
-    
+
   } else {
     Private->Media->BlockSize = Private->BlockSize;
     Private->NumberOfBlocks = DivU64x32 (FileSize, Private->Media->BlockSize);
     Private->Media->LastBlock = Private->NumberOfBlocks - 1;
-    
+
     if (fstatfs (Private->fd, &buf) == 0) {
 #if __APPLE__
       Private->Media->OptimalTransferLengthGranularity = buf.f_iosize/buf.f_bsize;
@@ -170,7 +170,7 @@ EmuBlockIoOpenDevice (
       Private->Media->OptimalTransferLengthGranularity = buf.f_bsize/buf.f_bsize;
 #endif
     }
-  } 
+  }
 
   DEBUG ((EFI_D_INIT, "%HEmuOpenBlock: opened %a%N\n", Private->Filename));
   Status = EFI_SUCCESS;
@@ -198,7 +198,7 @@ EmuBlockIoCreateMapping (
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   Private->Media = Media;
-  
+
   Media->MediaId          = 0;
   Media->RemovableMedia   = Private->RemovableMedia;
   Media->MediaPresent     = TRUE;
@@ -207,18 +207,18 @@ EmuBlockIoCreateMapping (
   Media->WriteCaching     = FALSE;
   Media->IoAlign          = 1;
   Media->LastBlock        = 0; // Filled in by OpenDevice
-  
+
   // EFI_BLOCK_IO_PROTOCOL_REVISION2
   Media->LowestAlignedLba              = 0;
-  Media->LogicalBlocksPerPhysicalBlock = 0; 
-    
+  Media->LogicalBlocksPerPhysicalBlock = 0;
+
 
   // EFI_BLOCK_IO_PROTOCOL_REVISION3
   Media->OptimalTransferLengthGranularity = 0;
-    
+
   Status = EmuBlockIoOpenDevice (Private);
 
-  
+
   return Status;
 }
 
@@ -299,7 +299,7 @@ EmuBlockIoReadWriteCommon (
   if ((UINTN) Buffer % Private->Media->IoAlign != 0) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Verify buffer size
   //
@@ -336,7 +336,7 @@ EmuBlockIoReadWriteCommon (
 
 /**
   Read BufferSize bytes from Lba into Buffer.
-  
+
   This function reads the requested number of blocks from the device. All the
   blocks are read, or an error is returned.
   If EFI_DEVICE_ERROR, EFI_NO_MEDIA,_or EFI_MEDIA_CHANGED is returned and
@@ -344,13 +344,13 @@ EmuBlockIoReadWriteCommon (
   not be signaled.
 
   @param[in]       This       Indicates a pointer to the calling context.
-  @param[in]       MediaId    Id of the media, changes every time the media is 
+  @param[in]       MediaId    Id of the media, changes every time the media is
                               replaced.
   @param[in]       Lba        The starting Logical Block Address to read from.
   @param[in, out]  Token	    A pointer to the token associated with the transaction.
-  @param[in]       BufferSize Size of Buffer, must be a multiple of device block size.  
-  @param[out]      Buffer     A pointer to the destination buffer for the data. The 
-                              caller is responsible for either having implicit or 
+  @param[in]       BufferSize Size of Buffer, must be a multiple of device block size.
+  @param[out]      Buffer     A pointer to the destination buffer for the data. The
+                              caller is responsible for either having implicit or
                               explicit ownership of the buffer.
 
   @retval EFI_SUCCESS           The read request was queued if Token->Event is
@@ -362,7 +362,7 @@ EmuBlockIoReadWriteCommon (
   @retval EFI_MEDIA_CHANGED     The MediaId is not for the current media.
   @retval EFI_BAD_BUFFER_SIZE   The BufferSize parameter is not a multiple of the
                                 intrinsic block size of the device.
-  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack
                                 of resources.
@@ -438,7 +438,7 @@ Done:
   @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack
                                 of resources.
@@ -495,10 +495,10 @@ Done:
 
 /**
   Flush the Block Device.
- 
+
   If EFI_DEVICE_ERROR, EFI_NO_MEDIA,_EFI_WRITE_PROTECTED or EFI_MEDIA_CHANGED
   is returned and non-blocking I/O is being used, the Event associated with
-  this request will not be signaled.  
+  this request will not be signaled.
 
   @param[in]      This     Indicates a pointer to the calling context.
   @param[in,out]  Token    A pointer to the token associated with the transaction
@@ -531,8 +531,8 @@ EmuBlockIoFlushBlocks (
     fcntl (Private->fd, F_FULLFSYNC);
 #endif
   }
-  
-  
+
+
   if (Token != NULL) {
     if (Token->Event != NULL) {
       // Caller is responcible for signaling EFI Event
@@ -540,7 +540,7 @@ EmuBlockIoFlushBlocks (
       return EFI_SUCCESS;
     }
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -585,18 +585,18 @@ StdDupUnicodeToAscii (
   UINTN   Size;
   char    *Ascii;
   char    *Ptr;
-  
+
   Size = StrLen (Str) + 1;
   Ascii = malloc (Size);
   if (Ascii == NULL) {
     return NULL;
   }
-  
+
   for (Ptr = Ascii; *Str != '\0'; Ptr++, Str++) {
     *Ptr = *Str;
   }
   *Ptr = 0;
-  
+
   return Ascii;
 }
 
@@ -616,32 +616,32 @@ EmuBlockIoThunkOpen (
 {
   EMU_BLOCK_IO_PRIVATE  *Private;
   char                  *Str;
-  
+
   if (This->Private != NULL) {
     return EFI_ALREADY_STARTED;
   }
-  
+
   if (!CompareGuid (This->Protocol, &gEmuBlockIoProtocolGuid)) {
     return EFI_UNSUPPORTED;
   }
-  
+
   Private = malloc (sizeof (EMU_BLOCK_IO_PRIVATE));
   if (Private == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  
+
   Private->Signature = EMU_BLOCK_IO_PRIVATE_SIGNATURE;
   Private->Thunk     = This;
   CopyMem (&Private->EmuBlockIo, &gEmuBlockIoProtocol, sizeof (gEmuBlockIoProtocol));
   Private->fd        = -1;
   Private->BlockSize = 512;
- 
+
   Private->Filename = StdDupUnicodeToAscii (This->ConfigString);
   if (Private->Filename == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
- 
+
   Str = strstr (Private->Filename, ":");
   if (Str == NULL) {
     Private->RemovableMedia = FALSE;
@@ -660,7 +660,7 @@ EmuBlockIoThunkOpen (
       }
     }
   }
-  
+
   This->Interface = &Private->EmuBlockIo;
   This->Private   = Private;
   return EFI_SUCCESS;
@@ -677,17 +677,17 @@ EmuBlockIoThunkClose (
   if (!CompareGuid (This->Protocol, &gEmuBlockIoProtocolGuid)) {
     return EFI_UNSUPPORTED;
   }
-  
+
   Private = This->Private;
-  
+
   if (This->Private != NULL) {
     if (Private->Filename != NULL) {
       free (Private->Filename);
-    }   
+    }
     free (This->Private);
     This->Private = NULL;
   }
-  
+
   return EFI_SUCCESS;
 }
 

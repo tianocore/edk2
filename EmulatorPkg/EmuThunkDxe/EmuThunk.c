@@ -2,20 +2,20 @@
 
 Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 **/
 #include <PiDxe.h>
 
 #include <Protocol/DevicePath.h>
-#include <Protocol/EmuThunk.h> 
+#include <Protocol/EmuThunk.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
@@ -69,7 +69,7 @@ Arguments:
   (Standard EFI Image entry - EFI_IMAGE_ENTRY_POINT)
 
 Returns:
-  EFI_SUCEESS - UnixThunk protocol is added or error status from 
+  EFI_SUCEESS - UnixThunk protocol is added or error status from
                 gBS->InstallMultiProtocolInterfaces().
 
 **/

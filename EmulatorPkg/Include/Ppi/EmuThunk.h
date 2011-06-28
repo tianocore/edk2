@@ -2,7 +2,7 @@
   Emulator Thunk to abstract OS services from pure EFI code
 
   Copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -49,7 +49,7 @@ EFI_STATUS
 /*++
 
 Routine Description:
-  Return the FD Size and base address. Since the FD is loaded from a 
+  Return the FD Size and base address. Since the FD is loaded from a
   file into host memory only the SEC will know it's address.
 
 Arguments:

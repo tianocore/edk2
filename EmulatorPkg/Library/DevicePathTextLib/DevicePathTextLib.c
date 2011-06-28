@@ -74,7 +74,7 @@ DevPathToTextVendorLib (
     CatPrint (Str, L"EmuThread()");
     return EFI_SUCCESS;
   }
-  
+
   return EFI_NOT_FOUND;
 }
 
@@ -160,10 +160,10 @@ DevPathFromTextEmuFs (
 
 /**
   Register the Filter function
-  
+
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor executed correctly.
 
 **/

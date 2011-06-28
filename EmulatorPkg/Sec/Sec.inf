@@ -45,6 +45,6 @@
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid
-  
+
 [Pcd]
   gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage

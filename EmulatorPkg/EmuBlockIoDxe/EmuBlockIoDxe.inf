@@ -30,9 +30,9 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gUnixBlockIoDriverBinding                    
-#  COMPONENT_NAME                =  gUnixBlockIoComponentName                    
-#  DRIVER_DIAG                   =  gUnixBlockIoDriverDiagnostics                
+#  DRIVER_BINDING                =  gUnixBlockIoDriverBinding
+#  COMPONENT_NAME                =  gUnixBlockIoComponentName
+#  DRIVER_DIAG                   =  gUnixBlockIoDriverDiagnostics
 #
 
 [Sources]

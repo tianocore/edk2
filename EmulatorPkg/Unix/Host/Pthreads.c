@@ -34,17 +34,17 @@ UINTN
 EFIAPI
 PthreadMutexUnLock (
   IN VOID *Mutex
-  )                        
+  )
 {
   return (UINTN)pthread_mutex_unlock ((pthread_mutex_t *)Mutex);
 }
 
- 
+
 UINTN
 EFIAPI
 PthreadMutexTryLock (
   IN VOID *Mutex
-  )                      
+  )
 {
   return (UINTN)pthread_mutex_trylock ((pthread_mutex_t *)Mutex);
 }
@@ -57,13 +57,13 @@ PthreadMutexInit (
 {
   pthread_mutex_t *Mutex;
   int             err;
-  
+
   Mutex = malloc (sizeof (pthread_mutex_t));
   err = pthread_mutex_init (Mutex, NULL);
   if (err == 0) {
     return Mutex;
   }
-  
+
   return NULL;
 }
 
@@ -76,7 +76,7 @@ PthreadMutexDestroy (
   if (Mutex != NULL) {
     return pthread_mutex_destroy ((pthread_mutex_t *)Mutex);
   }
-  
+
   return -1;
 }
 
@@ -98,26 +98,26 @@ SecFakePthreadStart (
 {
   THREAD_THUNK_THREAD_ENTRY Start;
   sigset_t                  SigMask;
-  
+
   // Save global on the stack before we unlock
   Start   = mThreadMangle.Start;
   pthread_mutex_unlock (&mThreadMangle.Mutex);
-  
+
   // Mask all signals to the APs
-  sigfillset (&SigMask); 
+  sigfillset (&SigMask);
   pthread_sigmask (SIG_BLOCK, &SigMask, NULL);
-  
+
   //
   // We have to start the thread in SEC as we need to follow
-  // OS X calling conventions. We can then call back into 
+  // OS X calling conventions. We can then call back into
   // to the callers Start.
   //
-  // This is a great example of how all problems in computer 
+  // This is a great example of how all problems in computer
   // science can be solved by adding another level of indirection
   //
  return  (VOID *)ReverseGasketUint64 ((CALL_BACK)Start, (UINTN)Context);
 }
-  
+
 UINTN
 PthreadCreate (
   IN  VOID                      *Thread,
@@ -127,8 +127,8 @@ PthreadCreate (
   )
 {
   int         err;
-  BOOLEAN     EnabledOnEntry;    
-  
+  BOOLEAN     EnabledOnEntry;
+
   //
   // Threads inherit interrupt state so disable interrupts before we start thread
   //
@@ -138,21 +138,21 @@ PthreadCreate (
   } else {
     EnabledOnEntry = FALSE;
   }
-  
+
   // Aquire lock for global, SecFakePthreadStart runs in a different thread.
   pthread_mutex_lock (&mThreadMangle.Mutex);
   mThreadMangle.Start   = Start;
-  
+
   err = pthread_create (Thread, Attribute, SecFakePthreadStart, Context);
   if (err != 0) {
     // Thread failed to launch so release the lock;
     pthread_mutex_unlock (&mThreadMangle.Mutex);
   }
-  
+
   if (EnabledOnEntry) {
     // Restore interrupt state
     SecEnableInterrupt ();
-  }    
+  }
 
   return err;
 }
@@ -162,21 +162,21 @@ VOID
 PthreadExit (
   IN VOID *ValuePtr
   )
-{ 
+{
   pthread_exit (ValuePtr);
   return;
 }
 
-   
+
 UINTN
 PthreadSelf (
   VOID
   )
 {
   // POSIX currently allows pthread_t to be a structure or arithmetic type.
-  // Check out sys/types.h to make sure this will work if you are porting. 
+  // Check out sys/types.h to make sure this will work if you are porting.
   // On OS X (Darwin) pthread_t is a pointer to a structure so this code works.
-  return (UINTN)pthread_self (); 
+  return (UINTN)pthread_self ();
 }
 
 
@@ -201,14 +201,14 @@ PthreadOpen (
     // Only single instance is supported
     return EFI_NOT_FOUND;
   }
-  
+
   if (This->ConfigString[0] == L'0') {
     // If AP count is zero no need for threads
     return EFI_NOT_FOUND;
   }
-  
+
   This->Interface = &gPthreadThunk;
-  
+
   return EFI_SUCCESS;
 }
 

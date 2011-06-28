@@ -2,13 +2,13 @@
 
 Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -35,7 +35,7 @@ Routine Description:
 Arguments:
   FfsHeader   - Ffs Header availible to every PEIM
   PeiServices - General purpose services available to every PEIM.
-    
+
 Returns:
   None
 
@@ -90,8 +90,8 @@ Returns:
           EFI_RESOURCE_FIRMWARE_DEVICE,
           (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE),
           FdBase,
-          ( 
-            FvHeader->FvLength + 
+          (
+            FvHeader->FvLength +
             PcdGet32 (PcdFlashNvStorageVariableSize) +
             PcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
             PcdGet32 (PcdFlashNvStorageFtwSpareSize) +
@@ -103,7 +103,7 @@ Returns:
         // Hard code the address of the spare block and variable services.
         //  Assume it's a hard coded offset from FV0 in FD0.
         //
-        FdSize  = 
+        FdSize  =
           PcdGet32 (PcdFlashNvStorageVariableSize) +
           PcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
           PcdGet32 (PcdFlashNvStorageFtwSpareSize) +

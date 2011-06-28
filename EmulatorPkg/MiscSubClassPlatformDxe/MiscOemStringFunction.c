@@ -18,7 +18,7 @@
   This function makes boot time changes to the contents of the
   MiscOemString (Type 11).
 
-  @param  RecordData                 Pointer to copy of RecordData from the Data Table.  
+  @param  RecordData                 Pointer to copy of RecordData from the Data Table.
 
   @retval EFI_SUCCESS                All parameters were valid.
   @retval EFI_UNSUPPORTED            Unexpected RecordType value.
@@ -59,8 +59,8 @@ MISC_SMBIOS_TABLE_FUNCTION(OemString)
   SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE11);
   //
   // Make handle chosen by smbios protocol.add automatically.
-  // 
-  SmbiosRecord->Hdr.Handle = 0;  
+  //
+  SmbiosRecord->Hdr.Handle = 0;
   SmbiosRecord->StringCount = 1;
   OptionalStrStart = (CHAR8 *)(SmbiosRecord + 1);
   UnicodeStrToAsciiStr(OemStr, OptionalStrStart);
@@ -70,9 +70,9 @@ MISC_SMBIOS_TABLE_FUNCTION(OemString)
   //
   SmbiosHandle = 0;
   Status = Smbios-> Add(
-                      Smbios, 
+                      Smbios,
                       NULL,
-                      &SmbiosHandle, 
+                      &SmbiosHandle,
                       (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
                       );
   FreePool(SmbiosRecord);

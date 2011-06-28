@@ -1,7 +1,7 @@
 /*++ @file
 
 Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
-Portions copyright (c) 2011, Apple Inc. All rights reserved. 
+Portions copyright (c) 2011, Apple Inc. All rights reserved.
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -42,16 +42,16 @@ DxeEmuLibConstructor (
 
   GuidHob = GetFirstGuidHob (&gEmuThunkProtocolGuid);
   ASSERT (GuidHob != NULL);
-  
+
   gEmuThunk = (EMU_THUNK_PROTOCOL *)(*(UINTN *)(GET_GUID_HOB_DATA (GuidHob)));
   ASSERT (gEmuThunk != NULL);
-  
+
   return EFI_SUCCESS;
 }
 
 
 /**
-  Serach the EMU IO Thunk database for a matching EMU IO Thunk 
+  Serach the EMU IO Thunk database for a matching EMU IO Thunk
   Protocol instance.
 
   @param  Protocol   Protocol to search for.
@@ -70,19 +70,19 @@ GetIoThunkInstance (
 {
   EFI_STATUS              Status;
   EMU_IO_THUNK_PROTOCOL   *EmuIoThunk;
-  
+
   for (Status = EFI_SUCCESS, EmuIoThunk = NULL; !EFI_ERROR (Status); ) {
     Status = gEmuThunk->GetNextProtocol (FALSE, &EmuIoThunk);
     if (EFI_ERROR (Status)) {
       break;
     }
-  
+
     if (EmuIoThunk->Instance == Instance) {
       if (CompareGuid (EmuIoThunk->Protocol, Protocol)) {
         return EmuIoThunk;
       }
     }
   }
-  
+
   return NULL;
 }

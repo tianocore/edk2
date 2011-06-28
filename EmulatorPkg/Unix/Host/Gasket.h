@@ -39,7 +39,7 @@ GasketSecWriteStdOut (
   IN UINT8     *Buffer,
   IN UINTN     NumberOfBytes
   );
-  
+
 UINTN
 EFIAPI
 GasketSecReadStdIn (
@@ -64,7 +64,7 @@ EFIAPI
 GasketSecValloc (
   IN  UINTN Size
   );
-  
+
 BOOLEAN
 EFIAPI
 GasketSecFree (
@@ -109,8 +109,8 @@ EFIAPI
 GasketSecDisableInterrupt (
   VOID
   );
-  
-UINT64  
+
+UINT64
 EFIAPI
 GasketQueryPerformanceFrequency (
   VOID
@@ -128,7 +128,7 @@ EFIAPI
 GasketSecSleep (
   IN  UINT64 Nanoseconds
   );
-  
+
 VOID
 EFIAPI
 GasketSecCpuSleep (
@@ -162,9 +162,9 @@ GasketSecGetNextProtocol (
   );
 
 
-// PPIs produced by SEC  
+// PPIs produced by SEC
 
-  
+
 EFI_STATUS
 EFIAPI
 GasketSecUnixPeiAutoScan (
@@ -172,21 +172,21 @@ GasketSecUnixPeiAutoScan (
   OUT EFI_PHYSICAL_ADDRESS  *MemoryBase,
   OUT UINT64                *MemorySize
   );
-  
+
 VOID *
 EFIAPI
 GasketSecEmuThunkAddress (
   VOID
   );
 
- 
+
 EFI_STATUS
 EFIAPI
 GasketSecUnixUnixFwhAddress (
   IN OUT UINT64                *FwhSize,
   IN OUT EFI_PHYSICAL_ADDRESS  *FwhBase
   );
-  
+
 
 
 //
@@ -244,17 +244,17 @@ GasketX11KeySetState (
   EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsWindowsIo,
   EFI_KEY_TOGGLE_STATE          *KeyToggleState
   );
-  
+
 EFI_STATUS
-EFIAPI  
-GasketX11RegisterKeyNotify ( 
-  IN EMU_GRAPHICS_WINDOW_PROTOCOL                         *GraphicsWindowsIo, 
+EFIAPI
+GasketX11RegisterKeyNotify (
+  IN EMU_GRAPHICS_WINDOW_PROTOCOL                         *GraphicsWindowsIo,
   IN EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK     MakeCallBack,
   IN EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK     BreakCallBack,
   IN VOID                                                 *Context
   );
 
-  
+
 EFI_STATUS
 EFIAPI
 GasketX11Blt (
@@ -270,10 +270,10 @@ GasketX11CheckPointer (
   EMU_GRAPHICS_WINDOW_PROTOCOL *GraphicsWindowsIo
   );
 
-EFI_STATUS 
-EFIAPI 
+EFI_STATUS
+EFIAPI
 GasketX11GetPointerState (
-  EMU_GRAPHICS_WINDOW_PROTOCOL *GraphicsWindowsIo, 
+  EMU_GRAPHICS_WINDOW_PROTOCOL *GraphicsWindowsIo,
   EFI_SIMPLE_POINTER_STATE *state
   );
 
@@ -282,7 +282,7 @@ EFIAPI
 GasketX11GraphicsWindowOpen (
   IN  EMU_IO_THUNK_PROTOCOL   *This
   );
- 
+
 EFI_STATUS
 EFIAPI
 GasketX11GraphicsWindowClose (
@@ -295,7 +295,7 @@ UINTN
 EFIAPI
 GasketPthreadMutexLock (
   IN VOID *Mutex
-  );            
+  );
 
 
 
@@ -303,30 +303,30 @@ UINTN
 EFIAPI
 GasketPthreadMutexUnLock (
   IN VOID *Mutex
-  );                        
+  );
 
- 
+
 UINTN
 EFIAPI
 GasketPthreadMutexTryLock (
   IN VOID *Mutex
-  );                      
+  );
 
- 
+
 VOID *
 EFIAPI
 GasketPthreadMutexInit (
   IN VOID
-  );                     
+  );
 
- 
+
 UINTN
 EFIAPI
 GasketPthreadMutexDestroy (
   IN VOID *Mutex
-  );                            
+  );
 
- 
+
 UINTN
 EFIAPI
 GasketPthreadCreate (
@@ -335,19 +335,19 @@ GasketPthreadCreate (
   IN  THREAD_THUNK_THREAD_ENTRY Start,
   IN  VOID                      *Context
   );
- 
+
 VOID
 EFIAPI
 GasketPthreadExit (
   IN VOID *ValuePtr
-  );                            
+  );
 
-   
+
 UINTN
 EFIAPI
 GasketPthreadSelf (
   VOID
-  );                              
+  );
 
 EFI_STATUS
 EFIAPI
@@ -370,7 +370,7 @@ GasketPosixOpenVolume (
   IN EFI_SIMPLE_FILE_SYSTEM_PROTOCOL    *This,
   OUT EFI_FILE_PROTOCOL                 **Root
   );
-  
+
 EFI_STATUS
 EFIAPI
 GasketPosixFileOpen (
@@ -386,7 +386,7 @@ EFIAPI
 GasketPosixFileCLose (
   IN EFI_FILE_PROTOCOL  *This
   );
-  
+
 EFI_STATUS
 EFIAPI
 GasketPosixFileDelete (
@@ -400,7 +400,7 @@ GasketPosixFileRead (
   IN OUT UINTN                *BufferSize,
   OUT VOID                    *Buffer
   );
-  
+
 EFI_STATUS
 EFIAPI
 GasketPosixFileWrite (
@@ -487,14 +487,14 @@ GasketEmuBlockIoWriteBlocks (
   IN     UINTN                  BufferSize,
   IN     VOID                   *Buffer
   );
-  
+
 EFI_STATUS
 EFIAPI
 GasketEmuBlockIoFlushBlocks (
   IN     EMU_BLOCK_IO_PROTOCOL    *This,
   IN OUT EFI_BLOCK_IO2_TOKEN      *Token
   );
-  
+
 EFI_STATUS
 EFIAPI
 GasketEmuBlockIoCreateMapping (
@@ -532,7 +532,7 @@ GasketSnpCreateMapping (
   IN     EMU_SNP_PROTOCOL         *This,
   IN     EFI_SIMPLE_NETWORK_MODE  *Media
   );
- 
+
 EFI_STATUS
 EFIAPI
 GasketSnpStart (
@@ -645,7 +645,7 @@ GasketSnpReceive (
   OUT UINT16                              *Protocol   OPTIONAL
   );
 
- 
+
 #endif
 
 

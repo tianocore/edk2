@@ -18,7 +18,7 @@
   This function makes boot time changes to the contents of the
   MiscBaseBoardManufacturer (Type 2).
 
-  @param  RecordData                 Pointer to copy of RecordData from the Data Table.  
+  @param  RecordData                 Pointer to copy of RecordData from the Data Table.
 
   @retval EFI_SUCCESS                All parameters were valid.
   @retval EFI_UNSUPPORTED            Unexpected RecordType value.
@@ -109,37 +109,37 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscBaseBoardManufacturer)
   //
   // Make handle chosen by smbios protocol.add automatically.
   //
-  SmbiosRecord->Hdr.Handle = 0;  
+  SmbiosRecord->Hdr.Handle = 0;
   //
   // Manu will be the 1st optional string following the formatted structure.
-  // 
-  SmbiosRecord->Manufacturer = 1;  
+  //
+  SmbiosRecord->Manufacturer = 1;
   //
   // ProductName will be the 2st optional string following the formatted structure.
-  // 
-  SmbiosRecord->ProductName  = 2;  
+  //
+  SmbiosRecord->ProductName  = 2;
   //
   // Version will be the 3rd optional string following the formatted structure.
   //
-  SmbiosRecord->Version = 3;  
+  SmbiosRecord->Version = 3;
   //
   // SerialNumber will be the 4th optional string following the formatted structure.
   //
-  SmbiosRecord->SerialNumber = 4;  
+  SmbiosRecord->SerialNumber = 4;
   //
   // AssertTag will be the 5th optional string following the formatted structure.
   //
-  SmbiosRecord->AssetTag = 5;  
+  SmbiosRecord->AssetTag = 5;
 
   //
   // LocationInChassis will be the 6th optional string following the formatted structure.
   //
-  SmbiosRecord->LocationInChassis = 6;  
+  SmbiosRecord->LocationInChassis = 6;
   SmbiosRecord->FeatureFlag = (*(BASE_BOARD_FEATURE_FLAGS*)&(ForType2InputData->BaseBoardFeatureFlags));
   SmbiosRecord->ChassisHandle  = 0;
   SmbiosRecord->BoardType      = (UINT8)ForType2InputData->BaseBoardType;
   SmbiosRecord->NumberOfContainedObjectHandles = 0;
-  
+
   OptionalStrStart = (CHAR8 *)(SmbiosRecord + 1);
   //
   // Since we fill NumberOfContainedObjectHandles = 0 for simple, just after this filed to fill string
@@ -156,9 +156,9 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscBaseBoardManufacturer)
   //
   SmbiosHandle = 0;
   Status = Smbios-> Add(
-                      Smbios, 
+                      Smbios,
                       NULL,
-                      &SmbiosHandle, 
+                      &SmbiosHandle,
                       (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
                       );
 

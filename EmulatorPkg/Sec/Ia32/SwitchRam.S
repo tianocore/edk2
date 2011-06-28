@@ -20,7 +20,7 @@
 #------------------------------------------------------------------------------
 
  .text
- 
+
 
 //------------------------------------------------------------------------------
 // VOID
@@ -29,26 +29,26 @@
 //   UINT32   TemporaryMemoryBase,
 //   UINT32   PermenentMemoryBase
 //   )//
-//------------------------------------------------------------------------------    
+//------------------------------------------------------------------------------
 ASM_GLOBAL ASM_PFX(SecSwitchStack)
 ASM_PFX(SecSwitchStack):
 #
 # Save three register: eax, ebx, ecx
-#    
+#
     push  %eax
     push  %ebx
     push  %ecx
     push  %edx
-    
+
 #
 # !!CAUTION!! this function address's is pushed into stack after
 # migration of whole temporary memory, so need save it to permenent
 # memory at first!
-#    
-    
+#
+
     movl  20(%esp), %ebx            # Save the first parameter
     movl  24(%esp), %ecx            # Save the second parameter
-    
+
 #
 # Save this function's return address into permenent memory at first.
 # Then, Fixup the esp point to permenent memory
@@ -77,16 +77,16 @@ ASM_PFX(SecSwitchStack):
     subl   %ebx, %eax
     addl   %ecx, %eax
     movl   %eax, %ebp                  # From now, ebp is pointed to permenent memory
-    
+
 #
 # Fixup callee's ebp point for PeiDispatch
-#    
+#
     movl   (%ebp), %eax
     subl   %ebx, %eax
     addl   %ecx, %eax
     movl   %eax, (%ebp)                # From now, Temporary's PPI caller's stack is in permenent memory
-#endif    
-    
+#endif
+
     pop   %edx
     pop   %ecx
     pop   %ebx

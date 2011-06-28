@@ -73,7 +73,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <termio.h>
 #include <sys/vfs.h>
 #include <linux/fs.h>
-#endif 
+#endif
 
 #include <utime.h>
 
@@ -126,7 +126,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Gasket.h"
 
 
-#define STACK_SIZE                0x20000      
+#define STACK_SIZE                0x20000
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS  Address;
@@ -150,10 +150,10 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 SecUnixPeiLoadFile (
-  VOID                  *Pe32Data,  
-  EFI_PHYSICAL_ADDRESS  *ImageAddress,  
-  UINT64                *ImageSize,  
-  EFI_PHYSICAL_ADDRESS  *EntryPoint  
+  VOID                  *Pe32Data,
+  EFI_PHYSICAL_ADDRESS  *ImageAddress,
+  UINT64                *ImageSize,
+  EFI_PHYSICAL_ADDRESS  *EntryPoint
   );
 
 int
@@ -268,7 +268,7 @@ SecTemporaryRamSupport (
   IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
   IN UINTN                    CopySize
   );
-  
+
 EFI_STATUS
 EFIAPI
 GasketSecTemporaryRamSupport (
@@ -311,8 +311,8 @@ VOID
 SecInitThunkProtocol (
   VOID
   );
- 
-  
+
+
 EFI_PHYSICAL_ADDRESS *
 MapMemory (
   INTN fd,

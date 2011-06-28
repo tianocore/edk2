@@ -36,15 +36,15 @@ RegisterTimerArchProtocol (
   )
 {
   EFI_STATUS  Status;
-  
+
   Status = gBS->LocateProtocol (&gEfiTimerArchProtocolGuid, NULL, (VOID **)&gTimerAp);
-  if (!EFI_ERROR (Status)) {    
+  if (!EFI_ERROR (Status)) {
     Status = gTimerAp->GetTimerPeriod (gTimerAp, &gTimerPeriod);
     ASSERT_EFI_ERROR (Status);
 
     // Convert to Nanoseconds.
     gTimerPeriod = MultU64x32 (gTimerPeriod, 100);
-    
+
     if (gTimerEvent == NULL) {
       Status = gBS->CreateEvent (EVT_TIMER, 0, NULL, NULL, (VOID **)&gTimerEvent);
       ASSERT_EFI_ERROR (Status);
@@ -93,21 +93,21 @@ NanoSecondDelay (
   EFI_STATUS  Status;
   UINT64      HundredNanoseconds;
   UINTN       Index;
-  
-  if ((gTimerPeriod != 0) && 
-      ((UINT64)NanoSeconds > gTimerPeriod) && 
+
+  if ((gTimerPeriod != 0) &&
+      ((UINT64)NanoSeconds > gTimerPeriod) &&
       (EfiGetCurrentTpl () == TPL_APPLICATION)) {
     //
     // This stall is long, so use gBS->WaitForEvent () to yield CPU to DXE Core
     //
-    
+
     HundredNanoseconds = DivU64x32 (NanoSeconds, 100);
     Status = gBS->SetTimer (gTimerEvent, TimerRelative, HundredNanoseconds);
     ASSERT_EFI_ERROR (Status);
 
     Status = gBS->WaitForEvent (sizeof (gTimerEvent)/sizeof (EFI_EVENT), &gTimerEvent, &Index);
     ASSERT_EFI_ERROR (Status);
-  
+
   } else {
     gEmuThunk->Sleep (NanoSeconds);
   }
@@ -172,7 +172,7 @@ GetPerformanceCounterProperties (
   if (EndValue != NULL) {
     *EndValue = (UINT64)-1LL;
   }
-  
+
   return gEmuThunk->QueryPerformanceFrequency ();
 }
 

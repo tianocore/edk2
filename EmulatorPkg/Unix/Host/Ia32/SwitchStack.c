@@ -46,7 +46,7 @@ PeiSwitchStacks (
   )
 {
   BASE_LIBRARY_JUMP_BUFFER  JumpBuffer;
-  
+
   ASSERT (EntryPoint != NULL);
   ASSERT (NewStack != NULL);
 
@@ -62,12 +62,12 @@ PeiSwitchStacks (
   ((VOID**)JumpBuffer.Esp)[2] = Context2;
 
   LongJump (&JumpBuffer, (UINTN)-1);
-  
+
 
   //
   // PeiSwitchStacks () will never return
   //
-  ASSERT (FALSE);  
+  ASSERT (FALSE);
 }
 
 

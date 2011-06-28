@@ -1,20 +1,20 @@
 /*++ @file
   This is the code that publishes the CPU I/O Protocol.
   The intent herein is to have a single I/O service that can load
-  as early as possible, extend into runtime, and be layered upon by 
+  as early as possible, extend into runtime, and be layered upon by
   the implementations of architectural protocols and the PCI Root
   Bridge I/O Protocol.
 
 
 Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -74,12 +74,12 @@ Returns:
 
   Status
 
-  EFI_SUCCESS             - The data was read from or written to the EFI 
+  EFI_SUCCESS             - The data was read from or written to the EFI
                             System.
   EFI_INVALID_PARAMETER   - Width is invalid for this EFI System.
   EFI_INVALID_PARAMETER   - Buffer is NULL.
   EFI_UNSUPPORTED         - The Buffer is not aligned for the given Width.
-  EFI_UNSUPPORTED         - The address range specified by Address, Width, 
+  EFI_UNSUPPORTED         - The address range specified by Address, Width,
                             and Count is not valid for this EFI System.
 
 **/
@@ -132,7 +132,7 @@ Returns:
   EFI_INVALID_PARAMETER   - Width is invalid for this EFI System.
   EFI_INVALID_PARAMETER   - Buffer is NULL.
   EFI_UNSUPPORTED         - The Buffer is not aligned for the given Width.
-  EFI_UNSUPPORTED         - The address range specified by Address, Width, and 
+  EFI_UNSUPPORTED         - The address range specified by Address, Width, and
                             Count is not valid for this EFI System.
 
 **/
@@ -166,7 +166,7 @@ CpuIoServiceRead (
 /*++
 
 Routine Description:
-  
+
   This is the service that implements the I/O read
 
 Arguments:
@@ -184,7 +184,7 @@ Returns:
   EFI_INVALID_PARAMETER   - Width is invalid for this EFI System.
   EFI_INVALID_PARAMETER   - Buffer is NULL.
   EFI_UNSUPPORTED         - The Buffer is not aligned for the given Width.
-  EFI_UNSUPPORTED         - The address range specified by Address, Width, and 
+  EFI_UNSUPPORTED         - The address range specified by Address, Width, and
                             Count is not valid for this EFI System.
 **/
 {
@@ -225,7 +225,7 @@ CpuIoServiceWrite (
 
 Routine Description:
 
-  
+
   This is the service that implements the I/O Write
 
 Arguments:
@@ -245,7 +245,7 @@ Returns:
   EFI_INVALID_PARAMETER   - Width is invalid for this EFI System.
   EFI_INVALID_PARAMETER   - Buffer is NULL.
   EFI_UNSUPPORTED         - The Buffer is not aligned for the given Width.
-  EFI_UNSUPPORTED         - The address range specified by Address, Width, and 
+  EFI_UNSUPPORTED         - The address range specified by Address, Width, and
                             Count is not valid for this EFI System.
 
 **/

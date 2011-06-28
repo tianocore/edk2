@@ -1,21 +1,21 @@
 /** @file
   SimpleFileSystem protocol as defined in the UEFI 2.0 specification.
 
-  The SimpleFileSystem protocol is the programmatic access to the FAT (12,16,32) 
-  file system specified in UEFI 2.0. It can also be used to abstract a file  
+  The SimpleFileSystem protocol is the programmatic access to the FAT (12,16,32)
+  file system specified in UEFI 2.0. It can also be used to abstract a file
   system other than FAT.
 
   UEFI 2.0 can boot from any valid EFI image contained in a SimpleFileSystem.
 
 Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-Portions copyright (c) 2011, Apple Inc. All rights reserved. 
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Portions copyright (c) 2011, Apple Inc. All rights reserved.
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -41,8 +41,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EMU_GRAPHICS_WINDOWS_SIZE)(
-  EMU_GRAPHICS_WINDOW_PROTOCOL  *Uga, 
-  UINT32                        Width, 
+  EMU_GRAPHICS_WINDOW_PROTOCOL  *Uga,
+  UINT32                        Width,
   UINT32                        Height
   );
 
@@ -55,19 +55,19 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EMU_GRAPHICS_WINDOWS_GET_KEY)(
-  EMU_GRAPHICS_WINDOW_PROTOCOL  *Uga, 
+  EMU_GRAPHICS_WINDOW_PROTOCOL  *Uga,
   EFI_KEY_DATA                  *key
   );
 
 typedef
 EFI_STATUS
 (EFIAPI *EMU_GRAPHICS_WINDOWS_KEY_SET_STATE) (
-  IN EMU_GRAPHICS_WINDOW_PROTOCOL   *GraphicsWindows, 
+  IN EMU_GRAPHICS_WINDOW_PROTOCOL   *GraphicsWindows,
   IN EFI_KEY_TOGGLE_STATE           *KeyToggleState
   );
 
 
-typedef 
+typedef
 VOID
 (EFIAPI *EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK) (
   IN VOID           *Context,
@@ -77,7 +77,7 @@ VOID
 typedef
 EFI_STATUS
 (EFIAPI *EMU_GRAPHICS_WINDOWS_REGISTER_KEY_NOTIFY) (
-  IN EMU_GRAPHICS_WINDOW_PROTOCOL                       *GraphicsWindows, 
+  IN EMU_GRAPHICS_WINDOW_PROTOCOL                       *GraphicsWindows,
   IN EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK   CallBack,
   IN VOID                                               *Context
   );
@@ -104,8 +104,8 @@ EFI_STATUS
 
 typedef
 BOOLEAN
-(EFIAPI *EMU_GRAPHICS_WINDOWS_IS_KEY_PRESSED) ( 
-  IN  EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsWindows, 
+(EFIAPI *EMU_GRAPHICS_WINDOWS_IS_KEY_PRESSED) (
+  IN  EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsWindows,
   IN  EFI_KEY_DATA                  *KeyData
   );
 
