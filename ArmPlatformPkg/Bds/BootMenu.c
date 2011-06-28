@@ -436,7 +436,7 @@ BootMenuMain (
 
         Print(L"\t- %s\n",DevicePathTxt);
         if (BootOption->OptionalData != NULL) {
-          Print(L"\t- LoaderType: %d\n",BootOption->OptionalData->LoaderType);
+          Print(L"\t- LoaderType: %d\n", ReadUnaligned32 (&BootOption->OptionalData->LoaderType));
           if (BootOption->OptionalData->Arguments != NULL) {
             Print(L"\t- Arguments: %a\n",BootOption->OptionalData->Arguments);
           }

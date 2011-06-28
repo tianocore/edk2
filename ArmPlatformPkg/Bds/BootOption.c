@@ -21,20 +21,22 @@ BootOptionStart (
   IN BDS_LOAD_OPTION *BootOption
   )
 {
-  EFI_STATUS Status;
-  EFI_DEVICE_PATH* FdtDevicePath;
-  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL  *EfiDevicePathFromTextProtocol;
+  EFI_STATUS                            Status;
+  EFI_DEVICE_PATH*                      FdtDevicePath;
+  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL*   EfiDevicePathFromTextProtocol;
+  UINT32                                LoaderType;
 
   Status = EFI_UNSUPPORTED;
+  LoaderType = ReadUnaligned32 (&BootOption->OptionalData->LoaderType);
 
-  if (BootOption->OptionalData->LoaderType == BDS_LOADER_EFI_APPLICATION) {
+  if (LoaderType == BDS_LOADER_EFI_APPLICATION) {
     // Need to connect every drivers to ensure no dependencies are missing for the application
     BdsConnectAllDrivers();
 
     Status = BdsStartEfiApplication (mImageHandle, BootOption->FilePathList);
-  } else if (BootOption->OptionalData->LoaderType == BDS_LOADER_KERNEL_LINUX_ATAG) {
+  } else if (LoaderType == BDS_LOADER_KERNEL_LINUX_ATAG) {
     Status = BdsBootLinux (BootOption->FilePathList, BootOption->OptionalData->Arguments, NULL);
-  } else if (BootOption->OptionalData->LoaderType == BDS_LOADER_KERNEL_LINUX_FDT) {
+  } else if (LoaderType == BDS_LOADER_KERNEL_LINUX_FDT) {
     // Convert the FDT path into a Device Path
     Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);
     ASSERT_EFI_ERROR(Status);
@@ -178,12 +180,12 @@ BootOptionAllocateBootIndex (
 STATIC
 EFI_STATUS
 BootOptionSetFields (
-  IN BDS_LOAD_OPTION *BootOption,
-  IN UINT32 Attributes,
-  IN CHAR16* BootDescription,
-  IN EFI_DEVICE_PATH_PROTOCOL* DevicePath,
-  IN  BDS_LOADER_TYPE   BootType,
-  IN  CHAR8*            BootArguments
+  IN BDS_LOAD_OPTION*           BootOption,
+  IN UINT32                     Attributes,
+  IN CHAR16*                    BootDescription,
+  IN EFI_DEVICE_PATH_PROTOCOL*  DevicePath,
+  IN  BDS_LOADER_TYPE           BootType,
+  IN  CHAR8*                    BootArguments
   )
 {
   EFI_LOAD_OPTION EfiLoadOption;
@@ -273,17 +275,17 @@ BootOptionSetFields (
 
 EFI_STATUS
 BootOptionCreate (
-  IN  UINT32 Attributes,
-  IN  CHAR16* BootDescription,
+  IN  UINT32                    Attributes,
+  IN  CHAR16*                   BootDescription,
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
-  IN  BDS_LOADER_TYPE   BootType,
-  IN  CHAR8*            BootArguments,
-  OUT BDS_LOAD_OPTION **BdsLoadOption
+  IN  BDS_LOADER_TYPE           BootType,
+  IN  CHAR8*                    BootArguments,
+  OUT BDS_LOAD_OPTION           **BdsLoadOption
   )
 {
-  EFI_STATUS      Status;
-  BDS_LOAD_OPTION *BootOption;
-  CHAR16          BootVariableName[9];
+  EFI_STATUS        Status;
+  BDS_LOAD_OPTION   *BootOption;
+  CHAR16            BootVariableName[9];
   UINT16            *BootOrder;
   UINTN             BootOrderSize;
 
