@@ -259,8 +259,14 @@ PrintPerformance (
   UINTN       Index;
   CHAR8       Buffer[100];
   UINTN       CharCount;
+  BOOLEAN     CountUp;
 
-  TicksPerSecond = GetPerformanceCounterProperties (NULL, NULL);
+  TicksPerSecond = GetPerformanceCounterProperties (&Start, &Stop);
+  if (Start < Stop) {
+    CountUp = TRUE;
+  } else {
+    CountUp = FALSE;
+  }
 
   TimeStamp = 0;
   Key       = 0;
@@ -269,7 +275,7 @@ PrintPerformance (
     if (Key != 0) {
       for (Index = 0; mTokenList[Index] != NULL; Index++) {
         if (AsciiStriCmp (mTokenList[Index], Token) == 0) {
-          Delta = Start - Stop;
+          Delta = CountUp?(Stop - Start):(Start - Stop);
           TimeStamp += Delta;
           Milliseconds = DivU64x64Remainder (MultU64x32 (Delta, 1000), TicksPerSecond, NULL);
           CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"%6a %6ld ms\n", Token, Milliseconds);
