@@ -946,7 +946,7 @@ SetupResetReminder (
       //
       // If the user hits the YES Response key, reset
       //
-      if ((Key.UnicodeChar == CHAR_CARRIAGE_RETURN)) {
+      if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
         gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
       }
       gST->ConOut->ClearScreen (gST->ConOut);
