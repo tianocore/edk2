@@ -14,7 +14,7 @@
 ##
 
 [Defines]
-  DEC_VERSION                    = 0x00010005
+  DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = OvmfPkg
   PACKAGE_GUID                   = 2daf5f34-50e5-4b9d-b8e3-5562334d87e5
   PACKAGE_VERSION                = 0.1

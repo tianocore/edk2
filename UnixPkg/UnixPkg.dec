@@ -14,7 +14,7 @@
 ##
 
 [Defines]
-  DEC_VERSION                    = 0x00010005
+  DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = EdkUnixPkg
   PACKAGE_GUID                   = f2805c44-8985-11db-9e98-0040d02b1835
   PACKAGE_VERSION                = 0.1

@@ -2,7 +2,7 @@
 # OEM hook status code handler driver which produces general handler and hook it
 # onto the DXE status code router.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,7 @@
   BASE_NAME                      = WinNtOemHookStatusCodeHandlerDxe
   FILE_GUID                      = CA4233AD-847E-4E5D-AD3F-21CABFE5E23C
   MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
   ENTRY_POINT                    = WinNtOemHookStatusCodeHandlerDxeEntry
 
 #
