@@ -72,7 +72,7 @@ then
   TARGET_TOOLS=$UNIXPKG_TOOLS
 fi
 
-BUILD_ROOT_ARCH=$WORKSPACE/Build/EmuUnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
+BUILD_ROOT_ARCH=$WORKSPACE/Build/Emulator/DEBUG_"$UNIXPKG_TOOLS"/X64
 
 if  [[ ! -f `which build` || ! -f `which GenFv` ]];
 then
@@ -109,15 +109,15 @@ do
 
   if [[ $arg == cleanall ]]; then
     make -C $WORKSPACE/BaseTools clean
-    build -p $WORKSPACE/EmulatorPkg/Unix/UnixX64.dsc -a X64 -t $TARGET_TOOLS -D SEC_ONLY -n 3 clean
-    build -p $WORKSPACE/EmulatorPkg/Unix/UnixX64.dsc -a X64 -t $UNIXPKG_TOOLS -n 3 clean
+    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a X64 -t $TARGET_TOOLS -D SEC_ONLY -n 3 clean
+    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a X64 -t $UNIXPKG_TOOLS -n 3 clean
     build -p $WORKSPACE/ShellPkg/ShellPkg.dsc -a X64 -t $UNIXPKG_TOOLS -n 3 clean
     exit $?
   fi
 
   if [[ $arg == clean ]]; then
-    build -p $WORKSPACE/EmulatorPkg/Unix/UnixX64.dsc -a X64 -t $TARGET_TOOLS -D SEC_ONLY -n 3 clean
-    build -p $WORKSPACE/EmulatorPkg/Unix/UnixX64.dsc -a X64 -t $UNIXPKG_TOOLS -n 3 clean
+    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a X64 -t $TARGET_TOOLS -D SEC_ONLY -n 3 clean
+    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a X64 -t $UNIXPKG_TOOLS -n 3 clean
     exit $?
   fi
 
@@ -128,10 +128,10 @@ done
 # Build the edk2 UnixPkg
 #
 if [[ $TARGET_TOOLS == $UNIXPKG_TOOLS ]]; then
-  build -p $WORKSPACE/EmulatorPkg/Unix/UnixX64.dsc      -a X64 -t $UNIXPKG_TOOLS -D UNIX_SEC_BUILD $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc      -a X64 -t $UNIXPKG_TOOLS -D UNIX_SEC_BUILD $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
 else
-  build -p $WORKSPACE/EmulatorPkg/Unix/UnixX64.dsc      -a X64 -t $TARGET_TOOLS  -D UNIX_SEC_BUILD -D SKIP_MAIN_BUILD -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
-  build -p $WORKSPACE/EmulatorPkg/Unix/UnixX64.dsc      -a X64 -t $UNIXPKG_TOOLS $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc      -a X64 -t $TARGET_TOOLS  -D UNIX_SEC_BUILD -D SKIP_MAIN_BUILD -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
+  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc      -a X64 -t $UNIXPKG_TOOLS $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
   cp $WORKSPACE/Build/EmuUnixX64/DEBUG_"$TARGET_TOOLS"/X64/Host $WORKSPACE/Build/EmuUnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
 fi
 exit $?

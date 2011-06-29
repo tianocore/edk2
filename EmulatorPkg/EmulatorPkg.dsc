@@ -1,56 +1,41 @@
 ## @file
-#
 # UEFI/PI Emulation Platform with UEFI HII interface supported.
 #
 # The Emulation Platform can be used to debug individual modules, prior to creating
-#       a real platform. This also provides an example for how an DSC is created.
+# a real platform. This also provides an example for how an DSC is created.
+#
 # Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2010 - 2011, Apple Inc. All rights reserved.<BR>
 #
-#    This program and the accompanying materials
-#    are licensed and made available under the terms and conditions of the BSD License
-#    which accompanies this distribution. The full text of the license may be found at
-#    http://opensource.org/licenses/bsd-license.php
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
 #
-#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 ##
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 [Defines]
-  PLATFORM_NAME                  = EmuUnix
+  PLATFORM_NAME                  = EmulatorPkg
   PLATFORM_GUID                  = 05FD064D-1073-E844-936C-A0E16317107D
   PLATFORM_VERSION               = 0.3
   DSC_ SPECIFICATION             = 0x00010005
 !if $(BUILD_32)
-  OUTPUT_DIRECTORY               = Build/EmuUnixIa32
+  OUTPUT_DIRECTORY               = Build/Emulator32
 !else
-  OUTPUT_DIRECTORY               = Build/EmuUnixX64
+  OUTPUT_DIRECTORY               = Build/Emulator
 !endif
 
   SUPPORTED_ARCHITECTURES        = X64|IA32
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = EmulatorPkg/Unix/UnixX64.fdf
+  FLASH_DEFINITION               = EmulatorPkg/EmulatorPkg.fdf
 
-################################################################################
-#
-# SKU Identification section - list of all SKU IDs supported by this Platform.
-#
-################################################################################
 [SkuIds]
   0|DEFAULT
 
-################################################################################
-#
-# Library Class section - list of all Library Classes needed by this Platform.
-#
-################################################################################
 [LibraryClasses]
   #
   # Entry point
@@ -183,11 +168,6 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 
 
-################################################################################
-#
-# Pcd Section - list of all EDK II PCD Entries defined by this Platform.
-#
-################################################################################
 [PcdsFeatureFlag]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE
@@ -243,12 +223,6 @@
   #  0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|1
 
-################################################################################
-#
-# Pcd Dynamic Section - list of all EDK II PCD Entries defined by this Platform
-#
-################################################################################
-
 [PcdsDynamicDefault.common.DEFAULT]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
@@ -259,25 +233,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|L"Setup"|gEmuSystemConfigGuid|0x4|25
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10
 
-
-###################################################################################################
-#
-# Components Section - list of the modules and components that will be processed by compilation
-#                      tools and the EDK II tools to generate PE32/PE32+/Coff image files.
-#
-# Note: The EDK II DSC file is not used to specify how compiled binary images get placed
-#       into firmware volume images. This section is just a list of modules to compile from
-#       source into UEFI-compliant binaries.
-#       It is the FDF file that contains information on combining binary files into firmware
-#       volume images, whose concept is beyond UEFI and is described in PI specification.
-#       Binary modules do not need to be listed in this section, as they should be
-#       specified in the FDF file. For example: Shell binary (Shell_Full.efi), FAT binary (Fat.efi),
-#       Logo (Logo.bmp), and etc.
-#       There may also be modules listed in this section that are not required in the FDF file,
-#       When a module listed here is excluded from FDF file, then UEFI-compliant binary will be
-#       generated for it, but the binary will not be put into any firmware volume.
-#
-###################################################################################################
 
 !ifndef $(SKIP_MAIN_BUILD)
 [Components.X64]
