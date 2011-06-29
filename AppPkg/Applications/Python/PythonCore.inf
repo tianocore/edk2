@@ -17,7 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = Python
-  FILE_GUID                      = 42f58b27-5dc3-4fa7-844d-5a7dbff06432
+  FILE_GUID                      = ca5627c4-51ba-4dcb-ac62-c076ebd37ddb
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 0.1
   ENTRY_POINT                    = ShellCEntryLib
@@ -228,11 +228,6 @@
 #EFI -- EFI specific code
   Efi/config.c
   Efi/getpathp.c
-#  Efi/_subprocess.c
-#  Efi/_winreg.c
-#  Efi/dl_nt.c
-#  Efi/import_nt.c
-#  Efi/msvcrtmodule.c
 
 [BuildOptions]
    MSFT:*_*_*_CC_FLAGS            = /Oi- /wd4018 /wd4054 /wd4055 /wd4101 /wd4131 /wd4152 /wd4204 /wd4210 /wd4244 /wd4267 /wd4305 /wd4310 /wd4389 /wd4701 /wd4702 /wd4706 /I%WORKSPACE%\AppPkg\Applications\Python\Ia32 /I%WORKSPACE%\AppPkg\Applications\Python\Python-2.7.1\Include
