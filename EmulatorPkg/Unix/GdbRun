@@ -28,7 +28,7 @@ define hook-stop
   if $_exitcode != 42
     quit
   else
-    source SecMain.gdb
+    source Host.gdb
   end
 end
 

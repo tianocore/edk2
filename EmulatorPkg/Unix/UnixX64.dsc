@@ -205,7 +205,7 @@
   gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareBlockSize|0x10000
   gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareVolume|L"../FV/FV_RECOVERY.fd"
 
-  gEmulatorPkgTokenSpaceGuid.PcdEmuMemorySizeForSecMain|L"64!64"
+  gEmulatorPkgTokenSpaceGuid.PcdEmuMemorySize|L"64!64"
 
 !if $(BUILD_NEW_SHELL)
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1C, 0x4F, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
@@ -296,7 +296,7 @@
   ##
   #  Emulator, OS POSIX application
   ##
-  EmulatorPkg/Unix/Host/SecMain.inf
+  EmulatorPkg/Unix/Host/Host.inf
 !endif
 
 !ifndef $(SKIP_MAIN_BUILD)

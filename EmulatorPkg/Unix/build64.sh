@@ -97,13 +97,13 @@ do
         #
         # On Darwin we can't use dlopen, so we have to load the real PE/COFF images.
         # This .gdbinit script sets a breakpoint that loads symbols for the PE/COFFEE
-        # images that get loaded in SecMain
+        # images that get loaded in Host
         #
         cp $WORKSPACE/EmulatorPkg/Unix/.gdbinit $WORKSPACE/Build/EmuUnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
         ;;
     esac
 
-    /usr/bin/gdb $BUILD_ROOT_ARCH/SecMain -q -cd=$BUILD_ROOT_ARCH -x $WORKSPACE/EmulatorPkg/Unix/GdbRun
+    /usr/bin/gdb $BUILD_ROOT_ARCH/Host -q -cd=$BUILD_ROOT_ARCH -x $WORKSPACE/EmulatorPkg/Unix/GdbRun
     exit
   fi
 
@@ -132,7 +132,7 @@ if [[ $TARGET_TOOLS == $UNIXPKG_TOOLS ]]; then
 else
   build -p $WORKSPACE/EmulatorPkg/Unix/UnixX64.dsc      -a X64 -t $TARGET_TOOLS  -D UNIX_SEC_BUILD -D SKIP_MAIN_BUILD -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
   build -p $WORKSPACE/EmulatorPkg/Unix/UnixX64.dsc      -a X64 -t $UNIXPKG_TOOLS $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
-  cp $WORKSPACE/Build/EmuUnixX64/DEBUG_"$TARGET_TOOLS"/X64/SecMain $WORKSPACE/Build/EmuUnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
+  cp $WORKSPACE/Build/EmuUnixX64/DEBUG_"$TARGET_TOOLS"/X64/Host $WORKSPACE/Build/EmuUnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
 fi
 exit $?
 

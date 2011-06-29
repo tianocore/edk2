@@ -2,14 +2,14 @@
 {
 	08FB7793FE84155DC02AAC07 /* Project object */ = {
 		activeBuildConfigurationName = Debug;
-		activeExecutable = BA11A1010FB10BCE00D06FEC /* SecMain.dll */;
+		activeExecutable = BA11A1010FB10BCE00D06FEC /* Host.dll */;
 		activeTarget = D28A88AD04BDD90700651E21 /* xcode_project */;
 		breakpoints = (
 			BA11A11A0FB10E0700D06FEC /* SecGdbConfigBreak */,
 		);
 		codeSenseManager = BA11A0FE0FB10B4800D06FEC /* Code sense */;
 		executables = (
-			BA11A1010FB10BCE00D06FEC /* SecMain.dll */,
+			BA11A1010FB10BCE00D06FEC /* Host.dll */,
 		);
 		perUserDictionary = {
 			"PBXConfiguration.PBXBreakpointsDataSource.v1:1CA1AED706398EBD00589147" = {
@@ -92,7 +92,7 @@
 		isa = PBXCodeSenseManager;
 		indexTemplatePath = "";
 	};
-	BA11A1010FB10BCE00D06FEC /* SecMain.dll */ = {
+	BA11A1010FB10BCE00D06FEC /* Host.dll */ = {
 		isa = PBXExecutable;
 		activeArgIndices = (
 		);
@@ -144,9 +144,9 @@
 		);
 		executableSystemSymbolLevel = 0;
 		executableUserSymbolLevel = 0;
-		launchableReference = BA11A1020FB10BCE00D06FEC /* SecMain.dll */;
+		launchableReference = BA11A1020FB10BCE00D06FEC /* Host.dll */;
 		libgmallocEnabled = 0;
-		name = SecMain.dll;
+		name = Host.dll;
 		savedGlobals = {
 		};
 		showTypeColumn = 0;
@@ -154,11 +154,11 @@
 		);
 		startupPath = ../../../../Build/EmuUnixX64/DEBUG_XCLANG/X64;
 	};
-	BA11A1020FB10BCE00D06FEC /* SecMain.dll */ = {
+	BA11A1020FB10BCE00D06FEC /* Host.dll */ = {
 		isa = PBXFileReference;
 		lastKnownFileType = "compiled.mach-o.executable";
-		name = SecMain.dll;
-		path = ../../../../Build/EmuUnixX64/DEBUG_XCLANG/X64/SecMain;
+		name = Host.dll;
+		path = ../../../../Build/EmuUnixX64/DEBUG_XCLANG/X64/Host;
 		sourceTree = SOURCE_ROOT;
 	};
 	BA11A11A0FB10E0700D06FEC /* SecGdbConfigBreak */ = {
@@ -172,7 +172,7 @@
 		delayBeforeContinue = 0;
 		hitCount = 0;
 		ignoreCount = 0;
-		location = SecMain;
+		location = Host;
 		modificationTime = 263261853.260195;
 		originalNumberOfMultipleMatches = 1;
 		state = 1;

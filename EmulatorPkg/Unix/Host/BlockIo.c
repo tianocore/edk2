@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "SecMain.h"
+#include "Host.h"
 
 #define EMU_BLOCK_IO_PRIVATE_SIGNATURE SIGNATURE_32 ('E', 'M', 'b', 'k')
 typedef struct {

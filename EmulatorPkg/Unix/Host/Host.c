@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "SecMain.h"
+#include "Host.h"
 
 #ifdef __APPLE__
 #define MAP_ANONYMOUS MAP_ANON
@@ -66,8 +66,8 @@ int gInXcode = 0;
 /*++
   Breakpoint target for Xcode project. Set in the Xcode XML
 
-  Xcode breakpoint will 'source SecMain.gdb'
-  gGdbWorkingFileName is set to SecMain.gdb
+  Xcode breakpoint will 'source Host.gdb'
+  gGdbWorkingFileName is set to Host.gdb
 
 **/
 VOID
