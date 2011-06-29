@@ -152,13 +152,13 @@
 		showTypeColumn = 0;
 		sourceDirectories = (
 		);
-		startupPath = ../../../../Build/EmuUnixX64/DEBUG_XCLANG/X64;
+		startupPath = ../../../../Build/Emulator/DEBUG_XCLANG/X64;
 	};
 	BA11A1020FB10BCE00D06FEC /* Host.dll */ = {
 		isa = PBXFileReference;
 		lastKnownFileType = "compiled.mach-o.executable";
 		name = Host.dll;
-		path = ../../../../Build/EmuUnixX64/DEBUG_XCLANG/X64/Host;
+		path = ../../../../Build/Emulator/DEBUG_XCLANG/X64/Host;
 		sourceTree = SOURCE_ROOT;
 	};
 	BA11A11A0FB10E0700D06FEC /* SecGdbConfigBreak */ = {

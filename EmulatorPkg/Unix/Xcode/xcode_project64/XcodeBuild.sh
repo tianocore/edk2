@@ -19,6 +19,5 @@ set -e
 #
 # Source the workspace and set up the environment variables we need
 #
-cd ../..
-echo `pwd`
-./build64.sh $1 $2 $3 $4 $5 $6 $8
+cd ../../..
+./build.sh $1 $2 $3 $4 $5 $6 $8
