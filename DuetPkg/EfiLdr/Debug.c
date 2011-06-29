@@ -74,6 +74,6 @@ PrintString (
   //
   // All information also output to serial port.
   //
-  SerialPortWrite (PrintBuffer, Index);
+  SerialPortWrite ((UINT8 *) PrintBuffer, Index);
 }
 
