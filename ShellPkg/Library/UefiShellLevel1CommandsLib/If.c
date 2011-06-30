@@ -95,6 +95,10 @@ IsValidProfile (
   CONST CHAR16  *TempLocation;
 
   ProfilesString = ShellGetEnvironmentVariable(L"profiles");
+  //
+  // According to the Shell spec this is a required environment variable.
+  //
+  ASSERT(ProfileString != NULL);
   TempLocation = StrStr(ProfilesString, String);
   if ((TempLocation != NULL) && (*(TempLocation-1) == L';') && (*(TempLocation+StrLen(String)) == L';')) {
     return (TRUE);

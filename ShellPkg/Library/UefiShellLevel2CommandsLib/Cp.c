@@ -255,6 +255,11 @@ ValidateAndCopyFiles(
   ASSERT(DestDir  != NULL);
 
   //
+  // We already verified that this was present.
+  //
+  ASSERT(Cwd      != NULL);
+
+  //
   // If we are trying to copy multiple files... make sure we got a directory for the target...
   //
   if (EFI_ERROR(ShellIsDirectory(DestDir)) && FileList->Link.ForwardLink != FileList->Link.BackLink) {
