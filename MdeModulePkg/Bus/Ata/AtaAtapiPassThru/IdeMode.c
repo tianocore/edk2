@@ -1470,6 +1470,7 @@ AtaUdmaInOut (
   EFI_PHYSICAL_ADDRESS          PrdTableMapAddr;
   VOID                          *PrdTableMap;
   EFI_ATA_DMA_PRD               *PrdBaseAddr;
+  EFI_ATA_DMA_PRD               *TempPrdBaseAddr;
   UINTN                         PrdTableNum;
 
   UINT8                         RegisterValue;
@@ -1618,21 +1619,22 @@ AtaUdmaInOut (
     //
     // Fill the PRD table with appropriate bus master address of data buffer and data length.
     //
-    ByteRemaining = ByteCount;
+    ByteRemaining   = ByteCount;
+    TempPrdBaseAddr = PrdBaseAddr;
     while (ByteRemaining != 0) {
       if (ByteRemaining <= 0x10000) {
-        PrdBaseAddr->RegionBaseAddr = (UINT32) ((UINTN) BufferMapAddress);
-        PrdBaseAddr->ByteCount      = (UINT16) ByteRemaining;
-        PrdBaseAddr->EndOfTable     = 0x8000;
+        TempPrdBaseAddr->RegionBaseAddr = (UINT32) ((UINTN) BufferMapAddress);
+        TempPrdBaseAddr->ByteCount      = (UINT16) ByteRemaining;
+        TempPrdBaseAddr->EndOfTable     = 0x8000;
         break;
       }
 
-      PrdBaseAddr->RegionBaseAddr = (UINT32) ((UINTN) BufferMapAddress);
-      PrdBaseAddr->ByteCount      = (UINT16) 0x0;
+      TempPrdBaseAddr->RegionBaseAddr = (UINT32) ((UINTN) BufferMapAddress);
+      TempPrdBaseAddr->ByteCount      = (UINT16) 0x0;
 
       ByteRemaining    -= 0x10000;
       BufferMapAddress += 0x10000;
-      PrdBaseAddr++;
+      TempPrdBaseAddr++;
     }
 
     //
