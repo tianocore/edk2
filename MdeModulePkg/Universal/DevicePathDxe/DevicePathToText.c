@@ -1,7 +1,7 @@
 /** @file
   DevicePathToText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1156,7 +1156,7 @@ DevPathToTextIPv6 (
 
   CatPrint (
     Str,
-    L"%s,%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x)",
+    L",%s,%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x)",
     IPDevPath->StaticIpAddress ? L"Static" : L"DHCP",
     (UINTN) IPDevPath->LocalIpAddress.Addr[0],
     (UINTN) IPDevPath->LocalIpAddress.Addr[1],
