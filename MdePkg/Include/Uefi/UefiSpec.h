@@ -276,7 +276,7 @@ EFI_STATUS
                                 2) No drivers were connected to ControllerHandle, but
                                 RemainingDevicePath is not NULL, and it is an End Device
                                 Path Node.
-  @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
   @retval EFI_NOT_FOUND         1) There are no EFI_DRIVER_BINDING_PROTOCOL instances
                                 present in the system.
                                 2) No drivers were connected to ControllerHandle.
@@ -1167,7 +1167,7 @@ EFI_STATUS
   @retval EFI_ACCESS_DENIED     The protocol interface could not be reinstalled,
                                 because OldInterface is still being used by a
                                 driver that will not release it.
-  @retval EFI_INVALID_PARAMETER Handle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER Handle is NULL.
   @retval EFI_INVALID_PARAMETER Protocol is NULL.
 
 **/
@@ -1193,7 +1193,7 @@ EFI_STATUS
   @retval EFI_NOT_FOUND         The interface was not found.
   @retval EFI_ACCESS_DENIED     The interface was not removed because the interface
                                 is still being used by a driver.
-  @retval EFI_INVALID_PARAMETER Handle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER Handle is NULL.
   @retval EFI_INVALID_PARAMETER Protocol is NULL.
 
 **/
@@ -1233,7 +1233,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The interface information for the specified protocol was returned.
   @retval EFI_UNSUPPORTED       The device does not support the specified protocol.
-  @retval EFI_INVALID_PARAMETER Handle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER Handle is NULL.
   @retval EFI_INVALID_PARAMETER Protocol is NULL.
   @retval EFI_INVALID_PARAMETER Interface is NULL.
 

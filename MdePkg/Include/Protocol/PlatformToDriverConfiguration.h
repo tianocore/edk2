@@ -99,8 +99,7 @@ typedef struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL EFI_PLATFORM_TO_DR
 
   @retval EFI_NOT_FOUND         No more unread Instance exists.
 
-  @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid
-                                EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
 
   @retval EFI_INVALID_PARAMETER Instance is NULL.
 
@@ -235,7 +234,7 @@ typedef enum {
   
   @retval EFI_NOT_FOUND         Instance was not found.
   
-  @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
  
   @retval EFI_INVALID_PARAMETER Instance is zero.
   

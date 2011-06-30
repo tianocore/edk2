@@ -1,7 +1,7 @@
 /** @file
   EFI Driver Diagnostics Protocol
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -73,7 +73,7 @@ typedef enum {
 
   @retval EFI_SUCCESS           The controller specified by ControllerHandle and
                                 ChildHandle passed the diagnostic.
-  @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
   @retval EFI_INVALID_PARAMETER ChildHandle is not NULL, and it is not a valid EFI_HANDLE.
   @retval EFI_INVALID_PARAMETER Language is NULL.
   @retval EFI_INVALID_PARAMETER ErrorType is NULL.
