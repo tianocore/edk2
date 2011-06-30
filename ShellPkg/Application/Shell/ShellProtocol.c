@@ -529,7 +529,7 @@ EfiShellGetDevicePathFromFilePath(
     StrCpy(NewPath, Cwd);
     if (*Path == L'\\') {
       Path++;
-      while (ChopLastSlash(NewPath)) ;
+      while (PathRemoveLastItem(NewPath)) ;
     }
     StrCat(NewPath, Path);
     DevicePathForReturn = EfiShellGetDevicePathFromFilePath(NewPath);
@@ -2232,7 +2232,7 @@ EfiShellFindFiles(
   }
   StrCpy(PatternCopy, FilePattern);
 
-  PatternCopy = CleanPath(PatternCopy);
+  PatternCopy = PathCleanUpDirectories(PatternCopy);
 
   Count = StrStr(PatternCopy, L":") - PatternCopy;
   Count += 2;
@@ -2293,7 +2293,7 @@ EfiShellOpenFileList(
   CONST CHAR16        *CurDir;
   BOOLEAN             Found;
 
-  ShellCommandCleanPath(Path);
+  PathCleanUpDirectories(Path);
 
   Path2Size     = 0;
   Path2         = NULL;
@@ -2315,7 +2315,7 @@ EfiShellOpenFileList(
     StrnCatGrow(&Path2, &Path2Size, CurDir, 0);
     if (*Path == L'\\') {
       Path++;
-      while (ChopLastSlash(Path2)) ;
+      while (PathRemoveLastItem(Path2)) ;
     }
     ASSERT((Path2 == NULL && Path2Size == 0) || (Path2 != NULL));
     StrnCatGrow(&Path2, &Path2Size, Path, 0);
@@ -2324,7 +2324,7 @@ EfiShellOpenFileList(
     StrnCatGrow(&Path2, NULL, Path, 0);
   }
 
-  CleanPath (Path2);
+  PathCleanUpDirectories (Path2);
 
   //
   // do the search
@@ -2677,7 +2677,7 @@ EfiShellSetCurDir(
   DirectoryName = StrnCatGrow(&DirectoryName, NULL, Dir, 0);
   ASSERT(DirectoryName != NULL);
 
-  CleanPath(DirectoryName);
+  PathCleanUpDirectories(DirectoryName);
 
   if (FileSystem == NULL) {
     //

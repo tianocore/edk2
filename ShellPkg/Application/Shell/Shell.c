@@ -859,7 +859,7 @@ DoStartupScript(
       *TempSpot = CHAR_NULL;
     }
     FileStringPath = StrnCatGrow(&FileStringPath, &NewSize, ((FILEPATH_DEVICE_PATH*)FilePath)->PathName, 0);
-    ChopLastSlash(FileStringPath);
+    PathRemoveLastItem(FileStringPath);
     FileStringPath = StrnCatGrow(&FileStringPath, &NewSize, mStartupScript, 0);
     Status = ShellInfoObject.NewEfiShellProtocol->OpenFileByName(FileStringPath, &FileHandle, EFI_FILE_MODE_READ);
     FreePool(FileStringPath);

@@ -148,7 +148,7 @@ GetDestinationLocation(
       return (SHELL_OUT_OF_RESOURCES);
     }
     StrCpy(DestPath, Cwd);
-    while (ChopLastSlash(DestPath)) ;
+    while (PathRemoveLastItem(DestPath)) ;
     *DestPathPointer =  DestPath;
     return (SHELL_SUCCESS);
   }
@@ -268,7 +268,7 @@ ValidateAndMoveFiles(
   if (ShellStatus != SHELL_SUCCESS) {
     return (ShellStatus);
   }
-  DestPath = CleanPath(DestPath);
+  DestPath = PathCleanUpDirectories(DestPath);
 
   HiiOutput   = HiiGetString (gShellLevel2HiiHandle, STRING_TOKEN (STR_MV_OUTPUT), NULL);
   HiiResultOk = HiiGetString (gShellLevel2HiiHandle, STRING_TOKEN (STR_GEN_RES_OK), NULL);

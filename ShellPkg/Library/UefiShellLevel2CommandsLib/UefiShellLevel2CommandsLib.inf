@@ -64,6 +64,7 @@
   PcdLib
   HiiLib
   HandleParsingLib
+  PathLib
 
 [Protocols]
   gEfiUnicodeCollation2ProtocolGuid                       # ALWAYS_CONSUMED

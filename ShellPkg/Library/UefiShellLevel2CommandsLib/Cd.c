@@ -108,7 +108,7 @@ ShellCommandRunCd (
           ShellStatus = SHELL_NOT_FOUND;
         } else {
           Drive = GetFullyQualifiedPath(Directory);
-          ChopLastSlash(Drive);
+          PathRemoveLastItem(Drive);
         }
         if (ShellStatus == SHELL_SUCCESS && Drive != NULL) {
           //
@@ -130,7 +130,7 @@ ShellCommandRunCd (
           ShellStatus = SHELL_NOT_FOUND;
         } else {
           Drive = GetFullyQualifiedPath(Directory);
-          while (ChopLastSlash(Drive)) ;
+          while (PathRemoveLastItem(Drive)) ;
         }
         if (ShellStatus == SHELL_SUCCESS && Drive != NULL) {
           //
@@ -150,7 +150,7 @@ ShellCommandRunCd (
           ASSERT((Drive == NULL && DriveSize == 0) || (Drive != NULL));
           Drive = StrnCatGrow(&Drive, &DriveSize, ShellGetCurrentDir(NULL), 0);
           if (*Param1 == L'\\') {
-            while (ChopLastSlash(Drive)) ;
+            while (PathRemoveLastItem(Drive)) ;
             Drive = StrnCatGrow(&Drive, &DriveSize, Param1+1, 0);
           } else {
             Drive = StrnCatGrow(&Drive, &DriveSize, Param1, 0);

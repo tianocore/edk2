@@ -67,7 +67,7 @@ PrintLsOutput(
 
   CorrectedPath = StrnCatGrow(&CorrectedPath, NULL, Path, 0);
   ASSERT(CorrectedPath != NULL);
-  ShellCommandCleanPath(CorrectedPath);
+  PathCleanUpDirectories(CorrectedPath);
 
   Status = ShellOpenFileMetaArg((CHAR16*)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
   if (EFI_ERROR(Status)) {

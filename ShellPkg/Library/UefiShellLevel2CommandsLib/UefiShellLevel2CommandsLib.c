@@ -196,7 +196,7 @@ GetFullyQualifiedPath(
   }
   StrnCatGrow(&PathToReturn, &Size, Path, 0);
 
-  CleanPath(PathToReturn);
+  PathCleanUpDirectories(PathToReturn);
 
   while (PathToReturn[StrLen(PathToReturn)-1] == L'*') {
     PathToReturn[StrLen(PathToReturn)-1] = CHAR_NULL;

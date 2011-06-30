@@ -1123,30 +1123,6 @@ ShellCommandCreateInitialMappingsAndPaths(
 }
 
 /**
-  Function to make sure all directory delimeters are backslashes.
-
-  @param[in,out] Path     The path to modify.
-
-  @return Path.
-**/
-CHAR16*
-EFIAPI
-ShellCommandCleanPath (
-  IN OUT CHAR16 *Path
-  )
-{
-  CHAR16  *Path2;
-
-  for (Path2 = Path ; Path2 != NULL && *Path2 != CHAR_NULL ; Path2++) {
-    if (*Path2 == L'/') {
-      *Path2 = L'\\';
-    }
-  }
-
-  return (Path);
-}
-
-/**
   Converts a SHELL_FILE_HANDLE to an EFI_FILE_PROTOCOL*.
 
   @param[in] Handle     The SHELL_FILE_HANDLE to convert.
@@ -1487,87 +1463,5 @@ FreeBufferList (
     }
     FreePool(BufferListEntry);
   }
-}
-
-/**
-  Chops off last directory or file entry in a path leaving the trailing slash
-
-  @param[in,out] PathToReturn The path to modify.
-
-  @retval FALSE     No directory was found to chop off.
-  @retval TRUE      A directory was chopped off.
-**/
-BOOLEAN
-EFIAPI
-ChopLastSlash(
-  IN OUT CHAR16 *PathToReturn
-  )
-{
-  CHAR16        *Walker;
-  CHAR16        *LastSlash;
-  //
-  // get directory name from path... ('chop' off extra)
-  //
-  for ( Walker = PathToReturn, LastSlash = NULL
-      ; Walker != NULL && *Walker != CHAR_NULL
-      ; Walker++
-     ){
-    if (*Walker == L'\\' && *(Walker + 1) != CHAR_NULL) {
-      LastSlash = Walker+1;
-    }
-  }
-  if (LastSlash != NULL) {
-    *LastSlash = CHAR_NULL;
-    return (TRUE);
-  }
-  return (FALSE);
-}
-
-/**
-  Function to clean up paths.  Removes the following items:
-    single periods in the path (no need for the current directory tag)
-    double periods in the path and removes a single parent directory.
-
-  This will be done inline and the resultant string may be be 'too big'.
-
-  @param[in] PathToReturn  The pointer to the string containing the path.
-
-  @return PathToReturn is always returned.
-**/
-CHAR16*
-EFIAPI
-CleanPath(
-  IN CHAR16 *PathToReturn
-  )
-{
-  CHAR16  *TempString;
-  UINTN   TempSize;
-  if (PathToReturn==NULL) {
-    return(NULL);
-  }
-  //
-  // Fix up the directory name
-  //
-  while ((TempString = StrStr(PathToReturn, L"\\..\\")) != NULL) {
-    *TempString = CHAR_NULL;
-    TempString  += 4;
-    ChopLastSlash(PathToReturn);
-    TempSize = StrSize(TempString);
-    CopyMem(PathToReturn+StrLen(PathToReturn), TempString, TempSize);
-  }
-  if ((TempString = StrStr(PathToReturn, L"\\..")) != NULL && *(TempString + 3) == CHAR_NULL) {
-    *TempString = CHAR_NULL;
-    ChopLastSlash(PathToReturn);
-  }
-  while ((TempString = StrStr(PathToReturn, L"\\.\\")) != NULL) {
-    *TempString = CHAR_NULL;
-    TempString  += 2;
-    TempSize = StrSize(TempString);
-    CopyMem(PathToReturn+StrLen(PathToReturn), TempString, TempSize);
-  }
-  if ((TempString = StrStr(PathToReturn, L"\\.")) != NULL && *(TempString + 2) == CHAR_NULL) {
-    *TempString = CHAR_NULL;
-  }
-  return (PathToReturn);
 }
 

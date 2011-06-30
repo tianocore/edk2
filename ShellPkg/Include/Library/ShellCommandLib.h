@@ -573,20 +573,6 @@ ShellCommandCreateInitialMappingsAndPaths(
   );
 
 /**
-  Function to standardize the directory indicators to \ characters.
-
-  @param[in,out] Path   The pointer to the path string to fix.
-
-  @retval NULL          The operation failed.
-  @return               The Path pointer.
-**/
-CHAR16*
-EFIAPI
-ShellCommandCleanPath (
-  IN OUT CHAR16 *Path
-  );
-
-/**
   Converts a SHELL_FILE_HANDLE to an EFI_FILE_PROTOCOL*.
 
   @param[in] Handle     The SHELL_FILE_HANDLE to convert.
@@ -732,37 +718,6 @@ VOID
 EFIAPI
 FreeBufferList (
   IN BUFFER_LIST *List
-  );
-
-/**
-  Chops off last directory or file entry in a path by changing the last '\' to a CHAR_NULL
-
-  @param[in,out] PathToReturn   The pointer to the path to modify.
-
-  @retval FALSE     No directory was found to chop off.
-  @retval TRUE      A directory was chopped off.
-**/
-BOOLEAN
-EFIAPI
-ChopLastSlash(
-  IN OUT CHAR16 *PathToReturn
-  );
-
-/**
-  Function to clean up paths.  Removes the following items:
-    single periods in the path (no need for the current directory tag)
-    double periods in the path and removes a single parent directory.
-
-  This will be done inline and the resultant string may be be 'too big'.
-
-  @param[in] PathToReturn  The pointer to the string containing the path.
-
-  @return PathToReturn is always returned.
-**/
-CHAR16*
-EFIAPI
-CleanPath(
-  IN CHAR16 *PathToReturn
   );
 
 #endif //_SHELL_COMMAND_LIB_

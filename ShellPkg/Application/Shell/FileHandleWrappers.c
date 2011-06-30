@@ -522,7 +522,7 @@ FileInterfaceStdInRead(
         }
         StrCat(TabStr, L"*");
         FoundFileList = NULL;
-//        TabStr = CleanPath(TabStr);
+//        TabStr = PathCleanUpDirectories(TabStr);
         Status  = ShellInfoObject.NewEfiShellProtocol->FindFiles(TabStr, &FoundFileList);
         for ( TempStr = CurrentString
             ; *TempStr == L' '
