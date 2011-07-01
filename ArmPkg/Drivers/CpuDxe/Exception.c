@@ -129,6 +129,8 @@ InitializeExceptions (
   UINT32               *VectorBase;
 
   Status = EFI_SUCCESS;
+  ZeroMem (gExceptionHandlers,sizeof(*gExceptionHandlers));
+
   //
   // Disable interrupts
   //
