@@ -82,9 +82,6 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|131072|UINT32|0x00000040
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0|UINT32|0x0000000b
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|131072|UINT32|0x0000000c
-  gEmbeddedTokenSpaceGuid.PcdPrePiTempMemorySize|0|UINT32|0x000000d
-  gEmbeddedTokenSpaceGuid.PcdPrePiBfvBaseAddress|0|UINT32|0x000000e
-  gEmbeddedTokenSpaceGuid.PcdPrePiBfvSize|0|UINT32|0x0000000f
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32|UINT8|0x00000010
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
   
@@ -94,10 +91,6 @@
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|0x0|UINT32|0x00000043
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainOffset|0x0|UINT32|0x00000044
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize|0x0|UINT32|0x00000045
-
-  gEmbeddedTokenSpaceGuid.PcdFlashFvSecBase|0x0|UINT32|0x00000050
-  gEmbeddedTokenSpaceGuid.PcdFlashFvSecSize|0x0|UINT32|0x00000051
-
   
 # Used to help reduce fragmentation in the EFI memory map
 # EFI Pages (4K) are the units used

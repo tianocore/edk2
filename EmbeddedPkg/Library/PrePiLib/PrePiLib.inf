@@ -58,8 +58,6 @@
   HobLib
 
 [Guids]
-  gEfiHobMemoryAllocModuleGuid
-  gEfiHobMemoryAllocStackGuid
   gEfiStatusCodeSpecificDataGuid
   gEfiMemoryTypeInformationGuid
   gEfiStatusCodeDataTypeDebugGuid
@@ -70,10 +68,6 @@
   
 
 [FixedPcd.common]
-  gEmbeddedTokenSpaceGuid.PcdPrePiHobBase
-  gEmbeddedTokenSpaceGuid.PcdPrePiTempMemorySize
-  gEmbeddedTokenSpaceGuid.PcdPrePiBfvBaseAddress
-  gEmbeddedTokenSpaceGuid.PcdPrePiBfvSize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
 
