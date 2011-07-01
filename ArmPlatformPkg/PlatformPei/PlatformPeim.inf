@@ -24,11 +24,12 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM
 #
 
 [Sources]
-  PlatformPei.c
+  PlatformPeim.c
+  PlatformPeiLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -57,6 +58,6 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
   
-[depex]
+[Depex]
   TRUE
   

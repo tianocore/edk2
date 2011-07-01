@@ -12,10 +12,8 @@
 *
 **/
 
-//
-// The package level header files this module uses
-//
 #include <PiPei.h>
+
 //
 // The protocols, PPI and GUID defintions for this module
 //
@@ -24,12 +22,17 @@
 //
 // The Library classes this module consumes
 //
-#include <Library/ArmPlatformLib.h>
-#include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PcdLib.h>
-#include <Library/HobLib.h>
+#include <Library/DebugLib.h>
+#include <Library/ArmPlatformLib.h>
 
+EFI_STATUS
+EFIAPI
+InitializePlatformPeim (
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
+  );
 
 //
 // Module globals
@@ -46,12 +49,6 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiListRecoveryBootMode = {
   NULL
 };
 
-EFI_STATUS
-EFIAPI
-InitializePlatformPeim (
-  IN       EFI_PEI_FILE_HANDLE  FileHandle,
-  IN CONST EFI_PEI_SERVICES     **PeiServices
-  )
 /*++
 
 Routine Description:
@@ -68,18 +65,19 @@ Returns:
   Status -  EFI_SUCCESS if the boot mode could be set
 
 --*/
+EFI_STATUS
+EFIAPI
+InitializePlatformPeim (
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
+  )
 {
   EFI_STATUS                    Status;
   UINTN                         BootMode;
 
   DEBUG ((EFI_D_ERROR, "Platform PEIM Loaded\n"));
 
-  // Initialize the platform specific controllers
-  ArmPlatformNormalInitialize ();
-
-  BuildCpuHob (PcdGet8 (PcdPrePiCpuMemorySize), PcdGet8 (PcdPrePiCpuIoSize));
-  
-  BuildFvHob (PcdGet32(PcdNormalFvBaseAddress), PcdGet32(PcdNormalFvSize));
+  PlatformPeim ();
   
   BootMode  = ArmPlatformGetBootMode ();
   Status    = (**PeiServices).SetBootMode (PeiServices, (UINT8) BootMode);
