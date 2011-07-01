@@ -267,6 +267,13 @@ SetHobList (
   IN  VOID      *HobList
   );
 
+EFI_HOB_HANDOFF_INFO_TABLE*
+HobConstructor (
+  IN VOID   *EfiMemoryBegin,
+  IN UINTN  EfiMemoryLength,
+  IN VOID   *EfiFreeMemoryBottom,
+  IN VOID   *EfiFreeMemoryTop
+  );
 
 /**
   Retrieves the magic value from the PE/COFF header.
