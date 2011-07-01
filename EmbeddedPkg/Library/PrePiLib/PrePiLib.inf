@@ -33,7 +33,6 @@
 [Sources.common]
   FwVol.c
   Hob.c
-  Memory.c
   PrePiLib.c
   ReportStatusCode.c
 
