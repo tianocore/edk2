@@ -13,7 +13,11 @@
 
 **/
 
-#include <PrePi.h>
+#include <PiPei.h>
+
+#include <Library/BaseLib.h>
+#include <Library/PrePiLib.h>
+#include <Library/DebugLib.h>
 
 
 
@@ -30,7 +34,7 @@
   @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
-VOID * 
+VOID *
 EFIAPI
 AllocatePages (
   IN UINTN            Pages
@@ -61,7 +65,15 @@ AllocatePages (
 
     // This routine used to create a memory allocation HOB a la PEI, but that's not
     // necessary for us.
-    
+
+    //
+    // Create a memory allocation HOB.
+    //
+    BuildMemoryAllocationHob (
+        Hob.HandoffInformationTable->EfiFreeMemoryTop,
+        Pages * EFI_PAGE_SIZE,
+        EfiBootServicesData
+        );
     return (VOID *)(UINTN)Hob.HandoffInformationTable->EfiFreeMemoryTop;
   }
 }
@@ -112,7 +124,7 @@ AllocateAlignedPages (
   if (Alignment == 0) {
     AlignmentMask = Alignment;
   } else {
-    AlignmentMask = Alignment - 1;  
+    AlignmentMask = Alignment - 1;
   }
   return (VOID *) (UINTN) (((UINTN) Memory + AlignmentMask) & ~AlignmentMask);
 }
@@ -156,5 +168,25 @@ AllocatePool (
   }
 }
 
+/**
+  Frees a buffer that was previously allocated with one of the pool allocation functions in the
+  Memory Allocation Library.
 
+  Frees the buffer specified by Buffer.  Buffer must have been allocated on a previous call to the
+  pool allocation services of the Memory Allocation Library.  If it is not possible to free pool
+  resources, then this function will perform no actions.
 
+  If Buffer was not allocated with a pool allocation function in the Memory Allocation Library,
+  then ASSERT().
+
+  @param  Buffer                Pointer to the buffer to free.
+
+**/
+VOID
+EFIAPI
+FreePool (
+  IN VOID   *Buffer
+  )
+{
+  // Not implemented yet
+}
