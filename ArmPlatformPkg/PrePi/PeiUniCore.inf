@@ -1,0 +1,93 @@
+#/** @file
+#  
+#  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmPlatformPrePiUniCore
+  FILE_GUID                      = d959e387-7b91-452c-90e0-a1dbac90ddb8
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+[Sources.ARM]
+  PrePi.c
+  ModuleEntryPoint.S   | GCC
+  ModuleEntryPoint.asm | RVCT
+  Exception.asm | RVCT
+  Exception.S | GCC
+  MainUniCore.c
+  
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  DebugAgentLib
+  ArmLib
+  IoLib
+  TimerLib
+  SerialPortLib
+  ExtractGuidedSectionLib
+  LzmaDecompressLib
+  PeCoffGetEntryPointLib
+  DebugAgentLib
+  PrePiLib
+  ArmPlatformLib
+  MemoryAllocationLib
+  HobLib
+  PrePiHobListPointerLib
+  PlatformPeiLib
+  MemoryInitPeiLib
+
+[FeaturePcd]  
+  gEmbeddedTokenSpaceGuid.PcdCacheEnable
+  gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdStandalone
+  gArmTokenSpaceGuid.PcdVFPEnabled
+
+  gArmTokenSpaceGuid.PcdNormalFdBaseAddress
+  gArmTokenSpaceGuid.PcdNormalFdSize
+
+  gArmTokenSpaceGuid.PcdNormalFvBaseAddress
+  gArmTokenSpaceGuid.PcdNormalFvSize
+
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize
+
+  gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
+  gArmPlatformTokenSpaceGuid.PcdHobListPtrGlobalOffset
+
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryFixRegionSize
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
+  
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
+
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData
