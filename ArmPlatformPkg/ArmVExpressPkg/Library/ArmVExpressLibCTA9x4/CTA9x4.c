@@ -29,16 +29,14 @@
 
 // DDR2 timings
 PL341_DMC_CONFIG DDRTimings = {
-  .base   = ARM_VE_DMC_BASE,
-  .phy_ctrl_base  = 0x0,  //There is no DDR2 PHY controller on CTA9 test chip
   .MaxChip   = 1,
   .IsUserCfg = TRUE,
   .User0Cfg = 0x7C924924,
   .User2Cfg = (TC_UIOLHXC_VALUE << TC_UIOLHNC_SHIFT) | (TC_UIOLHXC_VALUE << TC_UIOLHPC_SHIFT) | (0x1 << TC_UIOHOCT_SHIFT) | (0x1 << TC_UIOHSTOP_SHIFT),
   .HasQos    = TRUE,
-  .refresh_prd  = 0x3D0,
-  .cas_latency  = 0x8,
-  .write_latency  = 0x3,
+  .RefreshPeriod  = 0x3D0,
+  .CasLatency  = 0x8,
+  .WriteLatency  = 0x3,
   .t_mrd    = 0x2,
   .t_ras    = 0xA,
   .t_rc   = 0xE,
@@ -153,6 +151,6 @@ ArmPlatformInitializeSystemMemory (
   VOID
   )
 {
-  PL341DmcInit(&DDRTimings);
+  PL341DmcInit(ARM_VE_DMC_BASE, &DDRTimings);
   PL301AxiInit(ARM_VE_FAXI_BASE);
 }

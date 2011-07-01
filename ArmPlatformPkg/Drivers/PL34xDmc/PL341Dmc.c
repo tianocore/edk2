@@ -12,8 +12,11 @@
 *
 **/
 
+#include <Uefi.h>
+
 #include <Library/IoLib.h>
 #include <Library/DebugLib.h>
+
 #include <Drivers/PL341Dmc.h>
 
 // Macros for writing to DDR2 controller.
@@ -27,14 +30,12 @@
 // Initialise PL341 Dynamic Memory Controller
 VOID
 PL341DmcInit (
-  IN  PL341_DMC_CONFIG *DmcConfig
+  IN  UINTN             DmcBase,
+  IN  PL341_DMC_CONFIG* DmcConfig
   )
 {
-  UINTN DmcBase;
   UINTN Index;
   UINT32 Chip;
-
-  DmcBase = DmcConfig->base;
 
   // Set config mode
   DmcWriteReg(DMC_COMMAND_REG, DMC_COMMAND_CONFIGURE);
@@ -67,9 +68,9 @@ PL341DmcInit (
   //
   // Initialise memory controlller
   //
-  DmcWriteReg(DMC_REFRESH_PRD_REG, DmcConfig->refresh_prd);
-  DmcWriteReg(DMC_CAS_LATENCY_REG, DmcConfig->cas_latency);
-  DmcWriteReg(DMC_WRITE_LATENCY_REG, DmcConfig->write_latency);
+  DmcWriteReg(DMC_REFRESH_PRD_REG, DmcConfig->RefreshPeriod);
+  DmcWriteReg(DMC_CAS_LATENCY_REG, DmcConfig->CasLatency);
+  DmcWriteReg(DMC_WRITE_LATENCY_REG, DmcConfig->WriteLatency);
   DmcWriteReg(DMC_T_MRD_REG, DmcConfig->t_mrd);
   DmcWriteReg(DMC_T_RAS_REG, DmcConfig->t_ras);
   DmcWriteReg(DMC_T_RC_REG, DmcConfig->t_rc);
@@ -96,6 +97,9 @@ PL341DmcInit (
   // Set PL341 Memory Config 2
   DmcWriteReg(DMC_MEMORY_CFG2_REG, DmcConfig->MemoryCfg2);
 
+  // Set PL341 Memory Config 3
+  DmcWriteReg(DMC_MEMORY_CFG3_REG, DmcConfig->MemoryCfg3);
+
   // Set PL341 Chip Select <n>
   DmcWriteReg(DMC_CHIP_0_CFG_REG, DmcConfig->ChipCfg0);
   DmcWriteReg(DMC_CHIP_1_CFG_REG, DmcConfig->ChipCfg1);
@@ -106,9 +110,6 @@ PL341DmcInit (
   for (Index = 0; Index < 10; Index++) {
     DmcReadReg(DMC_STATUS_REG);
   }
-
-  // Set PL341 Memory Config 3
-  DmcWriteReg(DMC_MEMORY_CFG3_REG, DmcConfig->MemoryCfg3);
 
   if (DmcConfig->IsUserCfg) {
     //
@@ -210,6 +211,11 @@ PL341DmcInit (
     // Set (EMR) extended mode register - OCD Exit
     DmcWriteReg(DMC_DIRECT_CMD_REG, DMC_DIRECT_CMD_CHIP_ADDR(Chip) | (0x00090000) |
         (1 << DDR_MODESET_SHFT) | (DDR_EMR_OCD_NS << DDR_EMR_OCD_SHIFT) | DmcConfig->ExtModeReg);
+
+    // Delay
+    for (Index = 0; Index < 10; Index++) {
+      DmcReadReg(DMC_STATUS_REG);
+    }
   }
 
   // Move DDR2 Controller to Ready state by issueing GO command

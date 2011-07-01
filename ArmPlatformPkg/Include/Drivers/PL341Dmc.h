@@ -17,16 +17,14 @@
 
 
 typedef struct  {
-    UINTN	base;           // base address for the controller
-    UINTN	phy_ctrl_base;	// DDR2 Phy control base
     UINTN	HasQos;        // has QoS registers
     UINTN	MaxChip;       // number of memory chips accessible
     BOOLEAN  IsUserCfg;
     UINT32  User0Cfg;
     UINT32  User2Cfg;
-    UINT32	refresh_prd;
-    UINT32	cas_latency;
-    UINT32	write_latency;
+    UINT32	RefreshPeriod;
+    UINT32	CasLatency;
+    UINT32	WriteLatency;
     UINT32	t_mrd;
     UINT32	t_ras;
     UINT32	t_rc;
@@ -245,16 +243,6 @@ typedef struct  {
 #define PHY_PTM_REFCLK_DIV_200_400MHz		0x0
 #define PHY_PTM_REFCLK_DIV_400_800MHz		0x1
 
-
-// PHY Reset in SCC
-
-#define SCC_PHY_RST_REG_OFF	        		0xA0
-#define SCC_REMAP_REG_OFF   	       		0x00
-#define SCC_PHY_RST0_MASK					1		// Active LOW PHY0 reset
-#define SCC_PHY_RST0_SHFT					0		// Active LOW PHY0 reset
-#define SCC_PHY_RST1_MASK					0x100	// Active LOW PHY1 reset
-#define SCC_PHY_RST1_SHFT					8		// Active LOW PHY1 reset
-
 #define TC_UIOLHNC_MASK                         0x000003C0
 #define TC_UIOLHNC_SHIFT                        0x6
 #define TC_UIOLHPC_MASK                         0x0000003F
@@ -331,8 +319,10 @@ typedef struct  {
 #define DDR2_MR_WR_CYCLES_6        (5 << 9)
 
 
-VOID PL341DmcInit (
-  IN PL341_DMC_CONFIG *config
+VOID
+PL341DmcInit (
+  IN  UINTN             DmcBase,
+  IN  PL341_DMC_CONFIG* DmcConfig
   );
 
 VOID PL341DmcPhyInit (
