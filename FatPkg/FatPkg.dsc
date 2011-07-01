@@ -26,6 +26,11 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
+[BuildOptions]
+  GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
+  INTEL:RELEASE_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
+  MSFT:RELEASE_*_*_CC_FLAGS            = /D MDEPKG_NDEBUG
+
 [LibraryClasses]
   #
   # Entry Point Libraries
@@ -45,6 +50,14 @@
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf  
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+
+[LibraryClasses.common.PEIM]
+  PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
+  PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+  PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
+  MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+  PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
 
 ###################################################################################################
 #
@@ -66,4 +79,5 @@
 ###################################################################################################
 
 [Components]
+  FatPkg/FatPei/FatPei.inf
   FatPkg/EnhancedFatDxe/Fat.inf
