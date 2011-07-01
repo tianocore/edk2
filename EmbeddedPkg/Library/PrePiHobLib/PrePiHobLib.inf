@@ -15,11 +15,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PrePiLib
+  BASE_NAME                      = PrePiHobLib
   FILE_GUID                      = 1F3A3278-82EB-4C0D-86F1-5BCDA5846CB2
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PrePiLib 
+  LIBRARY_CLASS                  = HobLib 
 
 
 #
@@ -31,8 +31,34 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
 
 
 [LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PrePiHobListPointerLib
   
+[Guids]
+  gEfiHobMemoryAllocModuleGuid
+  gEfiHobMemoryAllocStackGuid
+
+[FixedPcd.common]
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
+
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData
+
+[FeaturePcd]
+  gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
 

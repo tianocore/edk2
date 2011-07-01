@@ -32,7 +32,6 @@
 
 [Sources.common]
   FwVol.c
-  Hob.c
   PrePiLib.c
   ReportStatusCode.c
 
@@ -56,7 +55,7 @@
   ExtractGuidedSectionLib
   TimerLib
   PerformanceLib
-  
+  HobLib
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid
