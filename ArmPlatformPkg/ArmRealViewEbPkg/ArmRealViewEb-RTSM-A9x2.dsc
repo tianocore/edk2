@@ -28,7 +28,7 @@
   FLASH_DEFINITION               = ArmPlatformPkg/ArmRealViewEbPkg/ArmRealViewEb-RTSM-MPCore.fdf
 
 [LibraryClasses.common]
-!if $(BUILD_TARGETS) == RELEASE
+!if $(TARGET) == RELEASE
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
 !else
@@ -291,7 +291,11 @@
 # CLEAR_MEMORY_ENABLED       0x08
 # ASSERT_BREAKPOINT_ENABLED  0x10
 # ASSERT_DEADLOOP_ENABLED    0x20
+!if $(TARGET) == RELEASE
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x21
+!else
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2f
+!endif
 
 #  DEBUG_INIT      0x00000001  // Initialization
 #  DEBUG_WARN      0x00000002  // Warnings
