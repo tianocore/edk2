@@ -1,0 +1,52 @@
+#/** @file
+#  INF file for the MMC Host Protocol implementation for the ARM PrimeCell PL180.
+#
+#  Copyright (c) 2011, ARM Limited. All rights reserved.
+#  
+#  This program and the accompanying materials                          
+#  are licensed and made available under the terms and conditions of the BSD License         
+#  which accompanies this distribution.  The full text of the license may be found at        
+#  http://opensource.org/licenses/bsd-license.php                                            
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PL180MciDxe
+  FILE_GUID                      = 09831032-6fa3-4484-af4f-0a000a8d3a82
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = PL180MciDxeInitialize
+
+[Sources.common]
+  PL180Mci.c
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  ArmLib
+  IoLib
+  TimerLib
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiMmcHostProtocolGuid
+  
+[Pcd]
+  gArmPlatformTokenSpaceGuid.PcdPL180SysMciRegAddress
+  gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress
+  
+[Depex]
+  TRUE
