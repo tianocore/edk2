@@ -22,15 +22,10 @@ EFI_STATUS
 EFIAPI
 
 SecWinNtPeiLoadFile (
-
   IN  VOID                    *Pe32Data,
-
   IN  EFI_PHYSICAL_ADDRESS    *ImageAddress,
-
   IN  UINT64                  *ImageSize,
-
   IN  EFI_PHYSICAL_ADDRESS    *EntryPoint
-
   );
 
 
@@ -115,10 +110,6 @@ LoadDxeCoreFromFfsFile (
   VOID                    *TopOfStack;
   VOID                    *Hob;
   EFI_FV_FILE_INFO        FvFileInfo;
-  UINT64                  Tick;
-
-  Tick = 0;
-  PERF_START (NULL, "SEC", NULL, 1);
 
   Status = FfsFindSectionData (EFI_SECTION_PE32, FileHandle, &PeCoffImage);
   if (EFI_ERROR  (Status)) {
@@ -144,12 +135,6 @@ LoadDxeCoreFromFfsFile (
   if (StackSize == 0) {
     // User the current stack
   
-  
-    if (PerformanceMeasurementEnabled ()) {
-      Tick = GetPerformanceCounter ();
-    }
-    PERF_END (NULL, "SEC", NULL, Tick);
-
     ((DXE_CORE_ENTRY_POINT)(UINTN)EntryPoint) (Hob);
   } else {
     
@@ -170,12 +155,6 @@ LoadDxeCoreFromFfsFile (
     // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
     //    
     UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN) BaseOfStack, StackSize);
-    
-
-    if (PerformanceMeasurementEnabled ()) {
-      Tick = GetPerformanceCounter ();
-    }
-    PERF_END (NULL, "SEC", NULL, Tick);
 
     SwitchStack (
       (SWITCH_STACK_ENTRY_POINT)(UINTN)EntryPoint,
