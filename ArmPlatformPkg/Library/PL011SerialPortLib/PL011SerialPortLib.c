@@ -22,7 +22,6 @@
 
 #include <Drivers/PL011Uart.h>
 
-#include <ArmPlatform.h>
 
 /*
 

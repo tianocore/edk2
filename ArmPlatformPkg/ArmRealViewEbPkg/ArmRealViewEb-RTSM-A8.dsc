@@ -132,7 +132,7 @@
   #DebugAgentLib|EmbeddedPkg/Library/GdbDebugAgent/GdbDebugAgent.inf
   
   # L2 Cache Driver
-  L2X0CacheLib|ArmPkg/Library/L2X0CacheLibNull/L2X0CacheLibNull.inf
+  L2X0CacheLib|ArmPlatformPkg/Library/L2X0CacheLibNull/L2X0CacheLibNull.inf
   # ARM PL390 General Interrupt Driver in Secure and Non-secure
   PL390GicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicSec.inf
 
@@ -357,11 +357,7 @@
   
   # Size of the region used by UEFI in permanent memory (Reserved 64MB)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
-  
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|1000000
-  gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000        # expressed in 100ns units, 100,000 x 100 ns = 10,000,000 ns = 10 ms
-  gArmPlatformTokenSpaceGuid.PcdSP804Timer0InterruptNum|36
-  
+    
   #
   # ARM Pcds
   #
@@ -371,6 +367,24 @@
   # ARM EB PCDS
   #
   gArmRealViewEbPkgTokenSpaceGuid.PcdGdbUartBase|0x1000a000
+  
+  #
+  # ARM PrimeCells
+  #
+  
+  ## SP804 Timer
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|1000000
+  gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000        # expressed in 100ns units, 100,000 x 100 ns = 10,000,000 ns = 10 ms
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicInterruptNum|36
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicBase|0x10011000
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPerformanceBase|0x10012020
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerMetronomeBase|0x10012000
+  
+  ## PL031 RealTimeClock
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x10017000
+  
+  ## PL111 Lcd
+  gArmPlatformTokenSpaceGuid.PcdPL111LcdBase|0x10020000
   
   #
   # ARM PL011 - Serial Terminal

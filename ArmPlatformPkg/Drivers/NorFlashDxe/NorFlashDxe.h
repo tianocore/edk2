@@ -26,8 +26,6 @@
 #include <Library/NorFlashPlatformLib.h>
 #include <Library/UefiLib.h>
 
-#include <ArmPlatform.h>
-
 #define HIGH_16_BITS                              0xFFFF0000
 #define LOW_16_BITS                               0x0000FFFF
 #define LOW_8_BITS                                0x000000FF

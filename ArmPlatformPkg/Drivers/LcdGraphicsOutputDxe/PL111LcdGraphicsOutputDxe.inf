@@ -45,16 +45,12 @@
   BaseMemoryLib
   LcdPlatformLib
 
-[Guids]
-
 [Protocols]
   gEfiDevicePathProtocolGuid
   gEfiGraphicsOutputProtocolGuid
 
-[FixedPcd.common]
- 
-[Pcd.common]
-
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdPL111LcdBase
 
 [Depex]
   gEfiCpuArchProtocolGuid

@@ -28,7 +28,10 @@
 #include <Protocol/HardwareInterrupt.h>
 
 #include <Drivers/SP804Timer.h>
-#include <ArmPlatform.h>
+
+#define SP804_TIMER_PERIODIC_BASE     (UINTN)PcdGet32 (PcdSP804TimerPeriodicBase)
+#define SP804_TIMER_METRONOME_BASE    (UINTN)PcdGet32 (PcdSP804TimerMetronomeBase)
+#define SP804_TIMER_PERFORMANCE_BASE  (UINTN)PcdGet32 (PcdSP804TimerPerformanceBase)
 
 // The notification function to call on every timer interrupt.
 volatile EFI_TIMER_NOTIFY      mTimerNotifyFunction   = (EFI_TIMER_NOTIFY)NULL;
@@ -43,7 +46,6 @@ EFI_HARDWARE_INTERRUPT_PROTOCOL *gInterrupt = NULL;
 // Cached interrupt vector
 UINTN  gVector;
 
-UINT32 mLastTickCount;
 
 /**
 
@@ -75,9 +77,9 @@ TimerInterruptHandler (
   OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
   // If the interrupt is shared then we must check if this interrupt source is the one associated to this Timer
-  if (MmioRead32 (SP804_TIMER0_BASE + SP804_TIMER_MSK_INT_STS_REG) != 0) {
+  if (MmioRead32 (SP804_TIMER_PERIODIC_BASE + SP804_TIMER_MSK_INT_STS_REG) != 0) {
     // clear the periodic interrupt
-    MmioWrite32 (SP804_TIMER0_BASE + SP804_TIMER_INT_CLR_REG, 0);
+    MmioWrite32 (SP804_TIMER_PERIODIC_BASE + SP804_TIMER_INT_CLR_REG, 0);
 
     // signal end of interrupt early to help avoid losing subsequent ticks from long duration handlers
     gInterrupt->EndOfInterrupt (gInterrupt, Source);
@@ -139,7 +141,7 @@ TimerDriverRegisterHandler (
 }
 
 /**
-    Make sure all ArrmVe Timers are disabled
+    Make sure all Dual Timers are disabled
 **/
 VOID
 EFIAPI
@@ -148,25 +150,20 @@ ExitBootServicesEvent (
   IN VOID       *Context
   )
 {
-    // Disable timer 0 if enabled
-    if (MmioRead32(SP804_TIMER0_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
-        MmioAnd32 (SP804_TIMER0_BASE + SP804_TIMER_CONTROL_REG, 0);
-    }
+  // Disable 'Periodic Operation' timer if enabled
+  if (MmioRead32(SP804_TIMER_PERIODIC_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
+    MmioAnd32 (SP804_TIMER_PERIODIC_BASE + SP804_TIMER_CONTROL_REG, 0);
+  }
 
-    // Disable timer 1 if enabled
-    if (MmioRead32(SP804_TIMER1_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
-        MmioAnd32 (SP804_TIMER1_BASE + SP804_TIMER_CONTROL_REG, 0);
-    }
+  // Disable 'Metronome/Delay' timer if enabled
+  if (MmioRead32(SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
+    MmioAnd32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG, 0);
+  }
 
-    // Disable timer 2 if enabled
-    if (MmioRead32(SP804_TIMER2_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
-        MmioAnd32 (SP804_TIMER2_BASE + SP804_TIMER_CONTROL_REG, 0);
-    }
-
-    // Disable timer 3 if enabled
-    if (MmioRead32(SP804_TIMER3_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
-        MmioAnd32 (SP804_TIMER3_BASE + SP804_TIMER_CONTROL_REG, 0);
-    }
+  // Disable 'Performance' timer if enabled
+  if (MmioRead32(SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
+    MmioAnd32 (SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG, 0);
+  }
 }
 
 /**
@@ -208,7 +205,7 @@ TimerDriverSetTimerPeriod (
   UINT64      TimerTicks;
   
   // always disable the timer
-  MmioAnd32 (SP804_TIMER0_BASE + SP804_TIMER_CONTROL_REG, ~SP804_TIMER_CTRL_ENABLE);
+  MmioAnd32 (SP804_TIMER_PERIODIC_BASE + SP804_TIMER_CONTROL_REG, ~SP804_TIMER_CTRL_ENABLE);
 
   if (TimerPeriod == 0) {
     // Leave timer disabled from above, and...
@@ -218,7 +215,7 @@ TimerDriverSetTimerPeriod (
   } else {  
     // Convert TimerPeriod into 1MHz clock counts (us units = 100ns units / 10)
     TimerTicks = DivU64x32 (TimerPeriod, 10);
-    TimerTicks = MultU64x32 (TimerTicks, PcdGet32(PcdSP804FrequencyInMHz));
+    TimerTicks = MultU64x32 (TimerTicks, PcdGet32(PcdSP804TimerFrequencyInMHz));
 
     // if it's larger than 32-bits, pin to highest value
     if (TimerTicks > 0xffffffff) {
@@ -228,10 +225,10 @@ TimerDriverSetTimerPeriod (
     }
 
     // Program the SP804 timer with the new count value
-    MmioWrite32 (SP804_TIMER0_BASE + SP804_TIMER_LOAD_REG, TimerTicks);
+    MmioWrite32 (SP804_TIMER_PERIODIC_BASE + SP804_TIMER_LOAD_REG, TimerTicks);
 
     // enable the timer
-    MmioOr32 (SP804_TIMER0_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
+    MmioOr32 (SP804_TIMER_PERIODIC_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
 
     // enable timer 0/1 interrupts
     Status = gInterrupt->EnableInterruptSource (gInterrupt, gVector);    
@@ -365,26 +362,17 @@ TimerInitialize (
   Status = gBS->LocateProtocol (&gHardwareInterruptProtocolGuid, NULL, (VOID **)&gInterrupt);
   ASSERT_EFI_ERROR (Status);
 
-  // Configure timer 1 for free running operation, 32 bits, no prescaler, interrupt disabled
-  MmioWrite32 (SP804_TIMER1_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
-
-  // Enable the free running timer
-  MmioOr32 (SP804_TIMER1_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
-
-  // Record free running tick value (should be close to 0xffffffff)
-  mLastTickCount = MmioRead32 (SP804_TIMER1_BASE + SP804_TIMER_CURRENT_REG);
-
   // Disable the timer
   Status = TimerDriverSetTimerPeriod (&gTimer, 0);
   ASSERT_EFI_ERROR (Status);
 
   // Install interrupt handler
-  gVector = PcdGet32(PcdSP804Timer0InterruptNum);
+  gVector = PcdGet32(PcdSP804TimerPeriodicInterruptNum);
   Status = gInterrupt->RegisterInterruptSource (gInterrupt, gVector, TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
 
   // configure timer 0 for periodic operation, 32 bits, no prescaler, and interrupt enabled
-  MmioWrite32 (SP804_TIMER0_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_PERIODIC | SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1 | SP804_TIMER_CTRL_INT_ENABLE);
+  MmioWrite32 (SP804_TIMER_PERIODIC_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_PERIODIC | SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1 | SP804_TIMER_CTRL_INT_ENABLE);
 
   // Set up default timer
   Status = TimerDriverSetTimerPeriod (&gTimer, FixedPcdGet32(PcdTimerPeriod)); // TIMER_DEFAULT_PERIOD

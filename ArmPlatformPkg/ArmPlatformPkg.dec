@@ -77,8 +77,36 @@
   #
   # ARM Primecells
   #
-  gArmPlatformTokenSpaceGuid.PcdSP804FrequencyInMHz|1|UINT32|0x0000001D
-  gArmPlatformTokenSpaceGuid.PcdSP804Timer0InterruptNum|0|UINT32|0x0000001E
+
+  ## SP804 DualTimer
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerFrequencyInMHz|1|UINT32|0x0000001D
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicInterruptNum|0|UINT32|0x0000001E
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicBase|0|UINT32|0x0000002A
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPerformanceBase|0|UINT32|0x0000002B
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerMetronomeBase|0|UINT32|0x0000002C
+
+  ## SP805 Watchdog
+  gArmPlatformTokenSpaceGuid.PcdSP805WatchdogBase|0x0|UINT32|0x00000023
+  gArmPlatformTokenSpaceGuid.PcdSP805WatchdogClockFrequencyInHz|32000|UINT32|0x00000021
+
+  ## PL011 UART
+  gArmPlatformTokenSpaceGuid.PcdUartDefaultReceiveFifoDepth|0x00000000|UINT32|0x0000001F
+  gArmPlatformTokenSpaceGuid.PcdUartDefaultTimeout|0x00000000|UINT32|0x00000020
+
+  ## PL031 RealTimeClock
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0|UINT32|0x00000024
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcPpmAccuracy|300000000|UINT32|0x00000022
+
+  ## PL061 GPIO
+  gArmPlatformTokenSpaceGuid.PcdPL061GpioBase|0x0|UINT32|0x00000025
+  
+  ## PL111 Lcd
+  gArmPlatformTokenSpaceGuid.PcdPL111LcdBase|0x0|UINT32|0x00000026
+  gArmPlatformTokenSpaceGuid.PcdArmHdLcdBase|0x0|UINT32|0x00000027
+  
+  ## PL180 MCI
+  gArmPlatformTokenSpaceGuid.PcdPL180SysMciRegAddress|0x00000000|UINT32|0x00000028
+  gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress|0x00000000|UINT32|0x00000029
 
   #
   # BDS - Boot Manager

@@ -120,10 +120,6 @@
 //#define ARM_EB_L2x0_CTLR_BASE                   0x1E00A000*/
 
 
-// PL031 RTC - Other settings
-#define PL031_PPM_ACCURACY                      300000000
-
-
 /*******************************************
 // EFI Memory Map in Permanent Memory (DRAM)
 *******************************************/

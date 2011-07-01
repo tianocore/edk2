@@ -22,7 +22,6 @@
 
 #include <Guid/GlobalVariable.h>
 
-#include <ArmPlatform.h>
 #include "LcdGraphicsOutputDxe.h"
 
 extern BOOLEAN mDisplayInitialized;

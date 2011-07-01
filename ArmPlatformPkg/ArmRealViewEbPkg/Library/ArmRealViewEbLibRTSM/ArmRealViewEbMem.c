@@ -18,6 +18,8 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/IoLib.h>
 
+#include <ArmPlatform.h>
+
 #define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          6
 
 // DDR attributes

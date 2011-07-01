@@ -16,27 +16,24 @@
 #ifndef __SP805_WATCHDOG_H__
 #define __SP805_WATCHDOG_H__
 
-#include <Base.h>
-#include <ArmPlatform.h>
-
 // SP805 Watchdog Registers
-#define SP805_WDOG_LOAD_REG             (SP805_WDOG_BASE + 0x000)
-#define SP805_WDOG_CURRENT_REG          (SP805_WDOG_BASE + 0x004)
-#define SP805_WDOG_CONTROL_REG          (SP805_WDOG_BASE + 0x008)
-#define SP805_WDOG_INT_CLR_REG          (SP805_WDOG_BASE + 0x00C)
-#define SP805_WDOG_RAW_INT_STS_REG      (SP805_WDOG_BASE + 0x010)
-#define SP805_WDOG_MSK_INT_STS_REG      (SP805_WDOG_BASE + 0x014)
-#define SP805_WDOG_LOCK_REG             (SP805_WDOG_BASE + 0xC00)
+#define SP805_WDOG_LOAD_REG             ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0x000)
+#define SP805_WDOG_CURRENT_REG          ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0x004)
+#define SP805_WDOG_CONTROL_REG          ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0x008)
+#define SP805_WDOG_INT_CLR_REG          ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0x00C)
+#define SP805_WDOG_RAW_INT_STS_REG      ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0x010)
+#define SP805_WDOG_MSK_INT_STS_REG      ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0x014)
+#define SP805_WDOG_LOCK_REG             ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0xC00)
 
-#define SP805_WDOG_PERIPH_ID0           (SP805_WDOG_BASE + 0xFE0)
-#define SP805_WDOG_PERIPH_ID1           (SP805_WDOG_BASE + 0xFE4)
-#define SP805_WDOG_PERIPH_ID2           (SP805_WDOG_BASE + 0xFE8)
-#define SP805_WDOG_PERIPH_ID3           (SP805_WDOG_BASE + 0xFEC)
+#define SP805_WDOG_PERIPH_ID0           ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0xFE0)
+#define SP805_WDOG_PERIPH_ID1           ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0xFE4)
+#define SP805_WDOG_PERIPH_ID2           ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0xFE8)
+#define SP805_WDOG_PERIPH_ID3           ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0xFEC)
 
-#define SP805_WDOG_PCELL_ID0            (SP805_WDOG_BASE + 0xFF0)
-#define SP805_WDOG_PCELL_ID1            (SP805_WDOG_BASE + 0xFF4)
-#define SP805_WDOG_PCELL_ID2            (SP805_WDOG_BASE + 0xFF8)
-#define SP805_WDOG_PCELL_ID3            (SP805_WDOG_BASE + 0xFFC)
+#define SP805_WDOG_PCELL_ID0            ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0xFF0)
+#define SP805_WDOG_PCELL_ID1            ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0xFF4)
+#define SP805_WDOG_PCELL_ID2            ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0xFF8)
+#define SP805_WDOG_PCELL_ID3            ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0xFFC)
 
 // Timer control register bit definitions
 #define SP805_WDOG_CTRL_INTEN           BIT0

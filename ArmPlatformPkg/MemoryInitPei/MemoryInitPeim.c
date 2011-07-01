@@ -95,12 +95,8 @@ InitializeMemory (
   )
 {
   EFI_STATUS                            Status;
-  EFI_RESOURCE_ATTRIBUTE_TYPE           Attributes;
-  ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR*  EfiMemoryMap;
-  UINTN                                 Index;
   UINTN                                 SystemMemoryTop;
   UINTN                                 UefiMemoryBase;
-  UINTN                                 UefiMemorySize;
 
   DEBUG ((EFI_D_ERROR, "Memory Init PEIM Loaded\n"));
 

@@ -31,19 +31,20 @@
 
 [LibraryClasses]
   BaseLib
-  UefiRuntimeServicesTableLib
-  UefiLib
-  UefiBootServicesTableLib
   BaseMemoryLib
   DebugLib
-  UefiDriverEntryPoint
   IoLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  UefiRuntimeServicesTableLib
 
-[Guids]
+[Pcd]
+  gArmPlatformTokenSpaceGuid.PcdPL061GpioBase
 
 [Protocols]
   gEmbeddedGpioProtocolGuid  
 
-
 [Depex]
-TRUE
+  TRUE

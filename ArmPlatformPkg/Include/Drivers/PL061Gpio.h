@@ -16,31 +16,29 @@
 #ifndef __PL061_GPIO_H__
 #define __PL061_GPIO_H__
 
-#include <Base.h>
 #include <Protocol/EmbeddedGpio.h>
-#include <ArmPlatform.h>
 
 // SP805 Watchdog Registers
-#define PL061_GPIO_DATA_REG             (PL061_GPIO_BASE + 0x000)
-#define PL061_GPIO_DIR_REG              (PL061_GPIO_BASE + 0x400)
-#define PL061_GPIO_IS_REG               (PL061_GPIO_BASE + 0x404)
-#define PL061_GPIO_IBE_REG              (PL061_GPIO_BASE + 0x408)
-#define PL061_GPIO_IEV_REG              (PL061_GPIO_BASE + 0x40C)
-#define PL061_GPIO_IE_REG               (PL061_GPIO_BASE + 0x410)
-#define PL061_GPIO_RIS_REG              (PL061_GPIO_BASE + 0x414)
-#define PL061_GPIO_MIS_REG              (PL061_GPIO_BASE + 0x410)
-#define PL061_GPIO_IC_REG               (PL061_GPIO_BASE + 0x41C)
-#define PL061_GPIO_AFSEL_REG            (PL061_GPIO_BASE + 0x420)
+#define PL061_GPIO_DATA_REG             ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x000)
+#define PL061_GPIO_DIR_REG              ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x400)
+#define PL061_GPIO_IS_REG               ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x404)
+#define PL061_GPIO_IBE_REG              ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x408)
+#define PL061_GPIO_IEV_REG              ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x40C)
+#define PL061_GPIO_IE_REG               ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x410)
+#define PL061_GPIO_RIS_REG              ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x414)
+#define PL061_GPIO_MIS_REG              ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x410)
+#define PL061_GPIO_IC_REG               ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x41C)
+#define PL061_GPIO_AFSEL_REG            ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x420)
 
-#define PL061_GPIO_PERIPH_ID0           (PL061_GPIO_BASE + 0xFE0)
-#define PL061_GPIO_PERIPH_ID1           (PL061_GPIO_BASE + 0xFE4)
-#define PL061_GPIO_PERIPH_ID2           (PL061_GPIO_BASE + 0xFE8)
-#define PL061_GPIO_PERIPH_ID3           (PL061_GPIO_BASE + 0xFEC)
+#define PL061_GPIO_PERIPH_ID0           ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFE0)
+#define PL061_GPIO_PERIPH_ID1           ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFE4)
+#define PL061_GPIO_PERIPH_ID2           ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFE8)
+#define PL061_GPIO_PERIPH_ID3           ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFEC)
 
-#define PL061_GPIO_PCELL_ID0            (PL061_GPIO_BASE + 0xFF0)
-#define PL061_GPIO_PCELL_ID1            (PL061_GPIO_BASE + 0xFF4)
-#define PL061_GPIO_PCELL_ID2            (PL061_GPIO_BASE + 0xFF8)
-#define PL061_GPIO_PCELL_ID3            (PL061_GPIO_BASE + 0xFFC)
+#define PL061_GPIO_PCELL_ID0            ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFF0)
+#define PL061_GPIO_PCELL_ID1            ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFF4)
+#define PL061_GPIO_PCELL_ID2            ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFF8)
+#define PL061_GPIO_PCELL_ID3            ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFFC)
 
 
 // GPIO pins are numbered 0..7

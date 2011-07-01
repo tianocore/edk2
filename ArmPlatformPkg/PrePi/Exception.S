@@ -29,7 +29,6 @@ GCC_ASM_EXPORT(PrePiVectorTable)
 //Default Exception Handlers
 //============================================================
   
-  
 ASM_PFX(PrePiVectorTable):
   b _DefaultResetHandler
   b _DefaultUndefined

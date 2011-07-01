@@ -15,6 +15,9 @@
 #ifndef __PREPEICORE_H_
 #define __PREPEICORE_H_
 
+#include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
+
 #include <PiPei.h>
 #include <Ppi/TemporaryRamSupport.h>
 

@@ -195,7 +195,7 @@ LcdPlatformGetMaxMode (
   // This could be because the specific implementation of PL111 has certain limitations.
 
   // Set the maximum mode allowed
-  return (PcdGet32(PcdPL111MaxMode));
+  return (PcdGet32(PcdPL111LcdMaxMode));
 }
 
 EFI_STATUS
@@ -221,7 +221,7 @@ LcdPlatformSetMode (
     break;
   case ARM_VE_DAUGHTERBOARD_1_SITE:
     Function = SYS_CFG_OSC_SITE1;
-    OscillatorId = PL111_CLCD_CORE_TILE_VIDEO_MODE_OSC_ID;
+    OscillatorId = (UINT32)PcdGet32(PcdPL111LcdVideoModeOscId);
     break;
   default:
     return EFI_UNSUPPORTED;

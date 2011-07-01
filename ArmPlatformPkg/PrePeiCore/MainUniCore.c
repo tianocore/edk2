@@ -12,8 +12,6 @@
 *
 **/
 
-#include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
 #include <Chipset/ArmV7.h>
 
 #include "PrePeiCore.h"

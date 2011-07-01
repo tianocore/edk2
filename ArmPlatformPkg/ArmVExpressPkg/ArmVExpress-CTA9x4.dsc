@@ -95,13 +95,13 @@
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   
   # ARM PL310 L2 Cache Driver
-  L2X0CacheLib|ArmPkg/Drivers/PL310L2Cache/PL310L2CacheSec.inf
+  L2X0CacheLib|ArmPlatformPkg/Drivers/PL310L2Cache/PL310L2CacheSec.inf
   # ARM PL354 SMC Driver
-  PL354SmcLib|ArmPkg/Drivers/PL35xSmc/PL354SmcSec.inf
+  PL35xSmcLib|ArmPlatformPkg/Drivers/PL35xSmc/PL35xSmc.inf
   # ARM PL341 DMC Driver
-  PL341DmcLib|ArmPkg/Drivers/PL34xDmc/PL341Dmc.inf
+  PL341DmcLib|ArmPlatformPkg/Drivers/PL34xDmc/PL341Dmc.inf
   # ARM PL301 Axi Driver
-  PL301AxiLib|ArmPkg/Drivers/PL301Axi/PL301Axi.inf
+  PL301AxiLib|ArmPlatformPkg/Drivers/PL301Axi/PL301Axi.inf
   # ARM PL011 UART Driver
   PL011UartLib|ArmPlatformPkg/Drivers/PL011Uart/PL011Uart.inf
   
@@ -392,27 +392,45 @@
   # System Memory (1GB) 
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x60000000
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x40000000
-  
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|1000000
-  gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000        # expressed in 100ns units, 100,000 x 100 ns = 10,000,000 ns = 10 ms
-  gArmPlatformTokenSpaceGuid.PcdSP804Timer0InterruptNum|34
-  
+    
   #
   # ARM Pcds
   #
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
-    
+  
   #
   # ARM PrimeCell
   #
-  gArmTokenSpaceGuid.PcdPL180SysMciRegAddress|0x10000048
-  gArmTokenSpaceGuid.PcdPL180MciBaseAddress|0x10005000
 
-  #
-  # ARM PL011 - Serial Terminal
-  #
+  ## SP804 Timer
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|1000000
+  gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000        # expressed in 100ns units, 100,000 x 100 ns = 10,000,000 ns = 10 ms
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicInterruptNum|34
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicBase|0x10011000
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPerformanceBase|0x10012020
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerMetronomeBase|0x10012000
+
+  ## SP805 Watchdog - Motherboard Watchdog
+  gArmPlatformTokenSpaceGuid.PcdSP805WatchdogBase|0x1000F000
+  ## SP805 Watchdog - CoreTile Watchdog
+  #gArmPlatformTokenSpaceGuid.PcdSP805WatchdogBase|0x100E5000
+  
+  ## PL011 - Serial Terminal
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x10009000
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|38400
+
+  ## PL031 RealTimeClock
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x10017000
+
+  ## PL111 Lcd
+  # PL111 CoreTile or Tuscan Standalone controller
+  gArmPlatformTokenSpaceGuid.PcdPL111LcdBase|0x10020000
+  # PL111 Versatile Express Motherboard controller
+  #gArmPlatformTokenSpaceGuid.PcdPL111LcdBase|0x1001F000
+
+  ## PL180 MMC/SD card controller
+  gArmPlatformTokenSpaceGuid.PcdPL180SysMciRegAddress|0x10000048
+  gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress|0x10005000
   
   #
   # ARM PL390 General Interrupt Controller
@@ -532,7 +550,7 @@
   # Multimedia Card Interface
   #
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
-  ArmPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
+  ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
   
   #
   # FAT filesystem + GPT/MBR partitioning

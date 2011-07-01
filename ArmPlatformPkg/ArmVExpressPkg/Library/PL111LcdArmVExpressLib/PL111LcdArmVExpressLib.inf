@@ -33,15 +33,6 @@
   BaseLib
   ArmPlatformSysConfigLib
 
-[Guids]
-
-[Protocols]
-
-[FeaturePcd]
-
-[FixedPcd.common]
-  gArmVExpressTokenSpaceGuid.PcdPL111MaxMode
-  
-[Pcd.common]
-
-[Depex]
+[Pcd]
+  gArmVExpressTokenSpaceGuid.PcdPL111LcdMaxMode
+  gArmVExpressTokenSpaceGuid.PcdPL111LcdVideoModeOscId

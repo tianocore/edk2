@@ -35,4 +35,9 @@
   IoLib
   UefiLib
   DebugLib
+  PcdLib
   ArmPlatformSysConfigLib
+  
+[Pcd]
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcPpmAccuracy

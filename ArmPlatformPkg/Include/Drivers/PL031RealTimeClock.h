@@ -16,26 +16,23 @@
 #ifndef __PL031_REAL_TIME_CLOCK_H__
 #define __PL031_REAL_TIME_CLOCK_H__
 
-#include <Base.h>
-#include <ArmPlatform.h>
-
 // PL031 Registers
-#define PL031_RTC_DR_DATA_REGISTER                      (PL031_RTC_BASE + 0x000)
-#define PL031_RTC_MR_MATCH_REGISTER                     (PL031_RTC_BASE + 0x004)
-#define PL031_RTC_LR_LOAD_REGISTER                      (PL031_RTC_BASE + 0x008)
-#define PL031_RTC_CR_CONTROL_REGISTER                   (PL031_RTC_BASE + 0x00C)
-#define PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER      (PL031_RTC_BASE + 0x010)
-#define PL031_RTC_RIS_RAW_IRQ_STATUS_REGISTER           (PL031_RTC_BASE + 0x014)
-#define PL031_RTC_MIS_MASKED_IRQ_STATUS_REGISTER        (PL031_RTC_BASE + 0x018)
-#define PL031_RTC_ICR_IRQ_CLEAR_REGISTER                (PL031_RTC_BASE + 0x01C)
-#define PL031_RTC_PERIPH_ID0                            (PL031_RTC_BASE + 0xFE0)
-#define PL031_RTC_PERIPH_ID1                            (PL031_RTC_BASE + 0xFE4)
-#define PL031_RTC_PERIPH_ID2                            (PL031_RTC_BASE + 0xFE8)
-#define PL031_RTC_PERIPH_ID3                            (PL031_RTC_BASE + 0xFEC)
-#define PL031_RTC_PCELL_ID0                             (PL031_RTC_BASE + 0xFF0)
-#define PL031_RTC_PCELL_ID1                             (PL031_RTC_BASE + 0xFF4)
-#define PL031_RTC_PCELL_ID2                             (PL031_RTC_BASE + 0xFF8)
-#define PL031_RTC_PCELL_ID3                             (PL031_RTC_BASE + 0xFFC)
+#define PL031_RTC_DR_DATA_REGISTER                      ((UINT32)PcdGet32(PcdPL031RtcBase) + 0x000)
+#define PL031_RTC_MR_MATCH_REGISTER                     ((UINT32)PcdGet32(PcdPL031RtcBase) + 0x004)
+#define PL031_RTC_LR_LOAD_REGISTER                      ((UINT32)PcdGet32(PcdPL031RtcBase) + 0x008)
+#define PL031_RTC_CR_CONTROL_REGISTER                   ((UINT32)PcdGet32(PcdPL031RtcBase) + 0x00C)
+#define PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER      ((UINT32)PcdGet32(PcdPL031RtcBase) + 0x010)
+#define PL031_RTC_RIS_RAW_IRQ_STATUS_REGISTER           ((UINT32)PcdGet32(PcdPL031RtcBase) + 0x014)
+#define PL031_RTC_MIS_MASKED_IRQ_STATUS_REGISTER        ((UINT32)PcdGet32(PcdPL031RtcBase) + 0x018)
+#define PL031_RTC_ICR_IRQ_CLEAR_REGISTER                ((UINT32)PcdGet32(PcdPL031RtcBase) + 0x01C)
+#define PL031_RTC_PERIPH_ID0                            ((UINT32)PcdGet32(PcdPL031RtcBase) + 0xFE0)
+#define PL031_RTC_PERIPH_ID1                            ((UINT32)PcdGet32(PcdPL031RtcBase) + 0xFE4)
+#define PL031_RTC_PERIPH_ID2                            ((UINT32)PcdGet32(PcdPL031RtcBase) + 0xFE8)
+#define PL031_RTC_PERIPH_ID3                            ((UINT32)PcdGet32(PcdPL031RtcBase) + 0xFEC)
+#define PL031_RTC_PCELL_ID0                             ((UINT32)PcdGet32(PcdPL031RtcBase) + 0xFF0)
+#define PL031_RTC_PCELL_ID1                             ((UINT32)PcdGet32(PcdPL031RtcBase) + 0xFF4)
+#define PL031_RTC_PCELL_ID2                             ((UINT32)PcdGet32(PcdPL031RtcBase) + 0xFF8)
+#define PL031_RTC_PCELL_ID3                             ((UINT32)PcdGet32(PcdPL031RtcBase) + 0xFFC)
 
 // PL031 Values
 #define PL031_RTC_ENABLED                               0x00000001

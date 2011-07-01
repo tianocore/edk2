@@ -27,7 +27,6 @@
 #include <Guid/MemoryTypeInformation.h>
 
 #include <Library/ArmLib.h>
-#include <ArmPlatform.h>
 
 /**
   This structure is used by ArmVExpressGetEfiMemoryMap to describes a region of the EFI memory map
@@ -98,7 +97,7 @@ ArmPlatformSecInitialize (
 /**
   Initialize controllers that must setup in the normal world
 
-  This function is called by the ArmPlatformPkg/Pei or ArmPlatformPkg/Pei/PlatformPeim
+  This function is called by the ArmPlatformPkg/PrePi or ArmPlatformPkg/PlatformPei
   in the PEI phase.
 
 **/

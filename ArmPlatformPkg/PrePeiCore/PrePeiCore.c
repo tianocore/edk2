@@ -13,8 +13,6 @@
 *
 **/
 
-#include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>

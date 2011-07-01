@@ -23,6 +23,8 @@
 #include <Drivers/PL301Axi.h>
 #include <Drivers/SP804Timer.h>
 
+#include <ArmPlatform.h>
+
 #define SerialPrint(txt)  SerialPortWrite ((UINT8*)(txt), AsciiStrLen(txt)+1);
 
 // DDR2 timings
@@ -121,7 +123,7 @@ ArmPlatformBootRemapping (
 /**
   Initialize controllers that must setup in the normal world
 
-  This function is called by the ArmPlatformPkg/Pei or ArmPlatformPkg/Pei/PlatformPeim
+  This function is called by the ArmPlatformPkg/PrePi or ArmPlatformPkg/PlatformPei
   in the PEI phase.
 
 **/

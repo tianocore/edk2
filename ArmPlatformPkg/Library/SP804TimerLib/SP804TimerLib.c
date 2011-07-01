@@ -20,7 +20,9 @@
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 #include <Drivers/SP804Timer.h>
-#include <ArmPlatform.h>
+
+#define SP804_TIMER_METRONOME_BASE    (UINTN)PcdGet32 (PcdSP804TimerPerformanceBase)
+#define SP804_TIMER_PERFORMANCE_BASE  (UINTN)PcdGet32 (PcdSP804TimerMetronomeBase)
 
 // Setup SP810's Timer2 for managing delay functions. And Timer3 for Performance counter
 // Note: ArmVE's Timer0 and Timer1 are used by TimerDxe.
@@ -31,28 +33,28 @@ TimerConstructor (
   )
 {
   // Check if Timer 2 is already initialized
-  if (MmioRead32(SP804_TIMER2_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
+  if (MmioRead32(SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
     return RETURN_SUCCESS;
   } else {
     // Configure timer 2 for one shot operation, 32 bits, no prescaler, and interrupt disabled
-    MmioOr32 (SP804_TIMER2_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ONESHOT | SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
+    MmioOr32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ONESHOT | SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
 
     // Preload the timer count register
-    MmioWrite32 (SP804_TIMER2_BASE + SP804_TIMER_LOAD_REG, 1);
+    MmioWrite32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_LOAD_REG, 1);
 
     // Enable the timer
-    MmioOr32 (SP804_TIMER2_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
+    MmioOr32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
   }
 
   // Check if Timer 3 is already initialized
-  if (MmioRead32(SP804_TIMER3_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
+  if (MmioRead32(SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
     return RETURN_SUCCESS;
   } else {
     // Configure timer 3 for free running operation, 32 bits, no prescaler, interrupt disabled
-    MmioOr32 (SP804_TIMER3_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
+    MmioOr32 (SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
 
     // Enable the timer
-    MmioOr32 (SP804_TIMER3_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
+    MmioOr32 (SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
   }
 
   return RETURN_SUCCESS;
@@ -77,11 +79,11 @@ MicroSecondDelay (
   UINTN Index;
 
   // Reload the counter for each 1Mhz to avoid an overflow in the load value
-  for (Index = 0; Index < (UINTN)PcdGet32(PcdSP804FrequencyInMHz); Index++) {
+  for (Index = 0; Index < (UINTN)PcdGet32(PcdSP804TimerFrequencyInMHz); Index++) {
     // load the timer count register
-    MmioWrite32 (SP804_TIMER2_BASE + SP804_TIMER_LOAD_REG, MicroSeconds);
+    MmioWrite32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_LOAD_REG, MicroSeconds);
 
-    while (MmioRead32 (SP804_TIMER2_BASE + SP804_TIMER_CURRENT_REG) > 0) {
+    while (MmioRead32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CURRENT_REG) > 0) {
       ;
     }
   }
@@ -113,11 +115,11 @@ NanoSecondDelay (
   MicroSeconds += ((UINT32)NanoSeconds % 1000) == 0 ? 0 : 1;
 
   // Reload the counter for each 1Mhz to avoid an overflow in the load value
-  for (Index = 0; Index < (UINTN)PcdGet32(PcdSP804FrequencyInMHz); Index++) {
+  for (Index = 0; Index < (UINTN)PcdGet32(PcdSP804TimerFrequencyInMHz); Index++) {
     // load the timer count register
-    MmioWrite32 (SP804_TIMER2_BASE + SP804_TIMER_LOAD_REG, MicroSeconds);
+    MmioWrite32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_LOAD_REG, MicroSeconds);
 
-    while (MmioRead32 (SP804_TIMER2_BASE + SP804_TIMER_CURRENT_REG) > 0) {
+    while (MmioRead32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CURRENT_REG) > 0) {
       ;
     }
   }
@@ -145,7 +147,7 @@ GetPerformanceCounter (
   // Free running 64-bit/32-bit counter is needed here.
   // Don't think we need this to boot, just to do performance profile
   UINT64 Value;
-  Value = MmioRead32 (SP804_TIMER3_BASE + SP804_TIMER_CURRENT_REG);
+  Value = MmioRead32 (SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CURRENT_REG);
   ASSERT(Value > 0);
   return Value;
 }

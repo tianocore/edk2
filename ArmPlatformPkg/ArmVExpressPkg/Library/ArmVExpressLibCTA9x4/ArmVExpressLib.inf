@@ -50,4 +50,7 @@
 [FixedPcd]
   gArmPlatformTokenSpaceGuid.PcdStandalone
 
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+
   gArmTokenSpaceGuid.PcdL2x0ControllerBase

@@ -13,22 +13,19 @@
 **/
 
 
-#include <Base.h>
 #include <PiDxe.h>
 
 #include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/UefiLib.h>
+#include <Library/DebugLib.h>
 #include <Library/IoLib.h>
+#include <Library/PcdLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 
 #include <Protocol/EmbeddedGpio.h>
-#include <ArmPlatform.h>
 #include <Drivers/PL061Gpio.h>
-
-#define LOW_4_BITS                              0x0000000F
 
 BOOLEAN     mPL061Initialized = FALSE;
 
@@ -42,18 +39,18 @@ PL061Identify (
   )
 {
   // Check if this is a PrimeCell Peripheral
-  if(    ( MmioRead8( PL061_GPIO_PCELL_ID0 ) != 0x0D )
-      || ( MmioRead8( PL061_GPIO_PCELL_ID1 ) != 0xF0 )
-      || ( MmioRead8( PL061_GPIO_PCELL_ID2 ) != 0x05 )
-      || ( MmioRead8( PL061_GPIO_PCELL_ID3 ) != 0xB1 ) ) {
+  if (    (MmioRead8 (PL061_GPIO_PCELL_ID0) != 0x0D)
+      ||  (MmioRead8 (PL061_GPIO_PCELL_ID1) != 0xF0)
+      ||  (MmioRead8 (PL061_GPIO_PCELL_ID2) != 0x05)
+      ||  (MmioRead8 (PL061_GPIO_PCELL_ID3) != 0xB1)) {
     return EFI_NOT_FOUND;
   }
 
   // Check if this PrimeCell Peripheral is the PL061 GPIO
-  if(    ( MmioRead8( PL061_GPIO_PERIPH_ID0 ) != 0x61 )
-      || ( MmioRead8( PL061_GPIO_PERIPH_ID1 ) != 0x10 )
-      || ( ( MmioRead8( PL061_GPIO_PERIPH_ID2 ) & LOW_4_BITS ) != 0x04 )
-      || ( MmioRead8( PL061_GPIO_PERIPH_ID3 ) != 0x00 ) ) {
+  if (    (MmioRead8 (PL061_GPIO_PERIPH_ID0) != 0x61)
+      ||  (MmioRead8 (PL061_GPIO_PERIPH_ID1) != 0x10)
+      ||  ((MmioRead8 (PL061_GPIO_PERIPH_ID2) & 0xF) != 0x04)
+      ||  (MmioRead8 (PL061_GPIO_PERIPH_ID3) != 0x00)) {
     return EFI_NOT_FOUND;
   }
 
@@ -62,14 +59,14 @@ PL061Identify (
 
 EFI_STATUS
 PL061Initialize (
-VOID
+  VOID
   )
 {
   EFI_STATUS  Status;
 
   // Check if the PL061 GPIO module exists on board
   Status = PL061Identify();
-  if (EFI_ERROR( Status )) {
+  if (EFI_ERROR (Status)) {
     Status = EFI_DEVICE_ERROR;
     goto EXIT;
   }
@@ -77,7 +74,7 @@ VOID
   // Do other hardware initialisation things here as required
 
   // Disable Interrupts
-  //if( MmioRead8( PL061_GPIO_IE_REG ) != 0 ) {
+  //if (MmioRead8 (PL061_GPIO_IE_REG) != 0) {
   //   // Ensure interrupts are disabled
   //}
 
@@ -114,21 +111,21 @@ Get (
 {
   EFI_STATUS    Status = EFI_SUCCESS;
 
-  if(    ( Value == NULL )
-      || ( Gpio > LAST_GPIO_PIN ) )
+  if (    (Value == NULL)
+      ||  (Gpio > LAST_GPIO_PIN))
   {
     return EFI_INVALID_PARAMETER;
   }
 
   // Initialize the hardware if not already done
-  if( !mPL061Initialized ) {
+  if (!mPL061Initialized) {
     Status = PL061Initialize();
-    if( EFI_ERROR(Status) ) {
+    if (EFI_ERROR(Status)) {
       goto EXIT;
     }
   }
 
-  if( MmioRead8( PL061_GPIO_DATA_REG ) & GPIO_PIN_MASK_HIGH_8BIT(Gpio) ) {
+  if (MmioRead8 (PL061_GPIO_DATA_REG) & GPIO_PIN_MASK_HIGH_8BIT(Gpio)) {
     *Value = 1;
   } else {
     *Value = 0;
@@ -167,15 +164,15 @@ Set (
   EFI_STATUS    Status = EFI_SUCCESS;
 
   // Check for errors
-  if( Gpio > LAST_GPIO_PIN ) {
+  if (Gpio > LAST_GPIO_PIN) {
     Status = EFI_INVALID_PARAMETER;
     goto EXIT;
   }
 
   // Initialize the hardware if not already done
-  if( !mPL061Initialized ) {
+  if (!mPL061Initialized) {
     Status = PL061Initialize();
-    if( EFI_ERROR(Status) ) {
+    if (EFI_ERROR(Status)) {
       goto EXIT;
     }
   }
@@ -184,21 +181,21 @@ Set (
   {
     case GPIO_MODE_INPUT:
       // Set the corresponding direction bit to LOW for input
-      MmioAnd8( PL061_GPIO_DIR_REG, GPIO_PIN_MASK_LOW_8BIT(Gpio) );
+      MmioAnd8 (PL061_GPIO_DIR_REG, GPIO_PIN_MASK_LOW_8BIT(Gpio));
       break;
 
     case GPIO_MODE_OUTPUT_0:
       // Set the corresponding data bit to LOW for 0
-      MmioAnd8( PL061_GPIO_DATA_REG, GPIO_PIN_MASK_LOW_8BIT(Gpio) );
+      MmioAnd8 (PL061_GPIO_DATA_REG, GPIO_PIN_MASK_LOW_8BIT(Gpio));
       // Set the corresponding direction bit to HIGH for output
-      MmioOr8( PL061_GPIO_DIR_REG, GPIO_PIN_MASK_HIGH_8BIT(Gpio) );
+      MmioOr8 (PL061_GPIO_DIR_REG, GPIO_PIN_MASK_HIGH_8BIT(Gpio));
       break;
 
     case GPIO_MODE_OUTPUT_1:
       // Set the corresponding data bit to HIGH for 1
-      MmioOr8( PL061_GPIO_DATA_REG, GPIO_PIN_MASK_HIGH_8BIT(Gpio) );
+      MmioOr8 (PL061_GPIO_DATA_REG, GPIO_PIN_MASK_HIGH_8BIT(Gpio));
       // Set the corresponding direction bit to HIGH for output
-      MmioOr8( PL061_GPIO_DIR_REG, GPIO_PIN_MASK_HIGH_8BIT(Gpio) );
+      MmioOr8 (PL061_GPIO_DIR_REG, GPIO_PIN_MASK_HIGH_8BIT(Gpio));
       break;
 
     default:
@@ -239,23 +236,23 @@ GetMode (
   EFI_STATUS Status;
 
   // Check for errors
-  if(    ( Mode == NULL )
-      || ( Gpio > LAST_GPIO_PIN ) ) {
+  if (    (Mode == NULL)
+      ||  (Gpio > LAST_GPIO_PIN)) {
     return EFI_INVALID_PARAMETER;
   }
 
   // Initialize the hardware if not already done
-  if( !mPL061Initialized ) {
+  if (!mPL061Initialized) {
     Status = PL061Initialize();
-    if( EFI_ERROR(Status) ) {
+    if (EFI_ERROR(Status)) {
       return Status;
     }
   }
 
   // Check if it is input or output
-  if( MmioRead8( PL061_GPIO_DIR_REG ) & GPIO_PIN_MASK_HIGH_8BIT(Gpio) ) {
+  if (MmioRead8 (PL061_GPIO_DIR_REG) & GPIO_PIN_MASK_HIGH_8BIT(Gpio)) {
     // Pin set to output
-    if( MmioRead8( PL061_GPIO_DATA_REG ) & GPIO_PIN_MASK_HIGH_8BIT(Gpio) ) {
+    if (MmioRead8 (PL061_GPIO_DATA_REG) & GPIO_PIN_MASK_HIGH_8BIT(Gpio)) {
       *Mode = GPIO_MODE_OUTPUT_1;
     } else {
       *Mode = GPIO_MODE_OUTPUT_0;
@@ -338,7 +335,7 @@ PL061InstallProtocol (
                   &Handle,
                   &gEmbeddedGpioProtocolGuid, &gGpio,
                   NULL
-                  );
+                 );
   if (EFI_ERROR(Status)) {
     Status = EFI_OUT_OF_RESOURCES;
   }

@@ -16,15 +16,15 @@
 #include <PiDxe.h>
 
 #include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/IoLib.h>
+#include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiLib.h>
-#include <Library/IoLib.h>
 
 #include <Protocol/WatchdogTimer.h>
-#include <ArmPlatform.h>
 #include <Drivers/SP805Watchdog.h>
 
 /**
@@ -75,18 +75,18 @@ SP805Identify (
   )
 {
   // Check if this is a PrimeCell Peripheral
-  if(    ( MmioRead8( SP805_WDOG_PCELL_ID0 ) != 0x0D )
-      || ( MmioRead8( SP805_WDOG_PCELL_ID1 ) != 0xF0 )
-      || ( MmioRead8( SP805_WDOG_PCELL_ID2 ) != 0x05 )
-      || ( MmioRead8( SP805_WDOG_PCELL_ID3 ) != 0xB1 ) ) {
+  if (    (MmioRead8 (SP805_WDOG_PCELL_ID0) != 0x0D)
+      ||  (MmioRead8 (SP805_WDOG_PCELL_ID1) != 0xF0)
+      ||  (MmioRead8 (SP805_WDOG_PCELL_ID2) != 0x05)
+      ||  (MmioRead8 (SP805_WDOG_PCELL_ID3) != 0xB1)) {
     return EFI_NOT_FOUND;
   }
 
   // Check if this PrimeCell Peripheral is the SP805 Watchdog Timer
-  if(    ( MmioRead8( SP805_WDOG_PERIPH_ID0 ) != 0x05 )
-      || ( MmioRead8( SP805_WDOG_PERIPH_ID1 ) != 0x18 )
-      || (( MmioRead8( SP805_WDOG_PERIPH_ID2 ) & 0x0000000F) != 0x04 )
-      || ( MmioRead8( SP805_WDOG_PERIPH_ID3 ) != 0x00 ) ) {
+  if (    (MmioRead8 (SP805_WDOG_PERIPH_ID0) != 0x05)
+      ||  (MmioRead8 (SP805_WDOG_PERIPH_ID1) != 0x18)
+      || ((MmioRead8 (SP805_WDOG_PERIPH_ID2) & 0x0000000F) != 0x04)
+      ||  (MmioRead8 (SP805_WDOG_PERIPH_ID3) != 0x00)) {
     return EFI_NOT_FOUND;
   }
 

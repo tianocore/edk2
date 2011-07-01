@@ -70,12 +70,6 @@
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x00000000|UINT32|0x00000005
   
   #
-  # ARM PL180 MCI
-  #
-  gArmTokenSpaceGuid.PcdPL180SysMciRegAddress|0x00000000|UINT32|0x00000006
-  gArmTokenSpaceGuid.PcdPL180MciBaseAddress|0x00000000|UINT32|0x00000007
-
-  #
   # ARM PL390 General Interrupt Controller
   #
   gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT32|0x0000000C

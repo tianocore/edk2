@@ -52,10 +52,10 @@
 #define ARM_VE_SMB_PERIPH_SZ                    SIZE_64MB
 
 // DRAM
-#define ARM_VE_DRAM_BASE                        0x60000000
-#define ARM_VE_DRAM_SZ                          0x40000000
+#define ARM_VE_DRAM_BASE                        PcdGet32 (PcdSystemMemoryBase)
+#define ARM_VE_DRAM_SZ                          PcdGet32 (PcdSystemMemorySize)
 // Inside the DRAM we allocate a section for the VRAM (Video RAM)
-#define LCD_VRAM_CORE_TILE_BASE                 0x64000000
+#define LCD_VRAM_CORE_TILE_BASE                     0x64000000
 
 // External AXI between daughterboards (Logic Tile)
 #define ARM_VE_EXT_AXI_BASE                     0xE0000000
@@ -99,18 +99,6 @@
 //#define ARM_VE_L2x0_CTLR_BASE                 0x1E00A000
 
 /***********************************************************************************
-   Select between Motherboard and Core Tile peripherals
-************************************************************************************/
-
-// Specify which PL111 to use
-//#define PL111_CLCD_BASE                       PL111_CLCD_MOTHERBOARD_BASE
-#define PL111_CLCD_BASE                         PL111_CLCD_CORE_TILE_BASE
-
-// Specify which Watchdog to use
-#define SP805_WDOG_BASE                         SP805_WDOG_MOTHERBOARD_BASE
-//#define SP805_WDOG_BASE                       SP805_WDOG_CORE_TILE_BASE
-
-/***********************************************************************************
    Peripherals' misc settings
 ************************************************************************************/
 
@@ -129,16 +117,6 @@
 #define ARM_VE_DECPROT_BIT_DMC_TZASC_LOCK       (1 << 3)
 #define ARM_VE_DECPROT_BIT_NMC_TZASC_LOCK       (1 << 4)
 #define ARM_VE_DECPROT_BIT_SMC_TZASC_LOCK       (1 << 5)
-
-// PL031 RTC - Other settings
-#define PL031_PPM_ACCURACY                      300000000
-
-// SP805 Watchdog - Other settings
-#define SP805_CLOCK_FREQUENCY                   32000
-#define SP805_MAX_TICKS                         0xFFFFFFFF
-
-// PL111 Lcd
-#define PL111_CLCD_CORE_TILE_VIDEO_MODE_OSC_ID  1
 
 /***********************************************************************************
 // EFI Memory Map in Permanent Memory (DRAM)

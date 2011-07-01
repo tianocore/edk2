@@ -15,7 +15,6 @@
 
 **/
 
-#include <Base.h>
 #include <Uefi.h>
 #include <PiDxe.h>
 #include <Library/BaseLib.h>
@@ -24,13 +23,15 @@
 #include <Library/IoLib.h>
 #include <Library/RealTimeClockLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
 #include <Library/ArmPlatformSysConfigLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Protocol/RealTimeClock.h>
 #include <Guid/GlobalVariable.h>
-#include <ArmPlatform.h>
 #include <Drivers/PL031RealTimeClock.h>
+
+#include <ArmPlatform.h>
 
 CHAR16        mTimeZoneVariableName[] = L"PL031_TimeZone";
 CHAR16        mDaylightVariableName[] = L"PL031_Daylight";
@@ -44,19 +45,19 @@ IdentifyPL031 (
   EFI_STATUS    Status;
 
   // Check if this is a PrimeCell Peripheral
-  if(    ( MmioRead8( PL031_RTC_PCELL_ID0 ) != 0x0D )
-      || ( MmioRead8( PL031_RTC_PCELL_ID1 ) != 0xF0 )
-      || ( MmioRead8( PL031_RTC_PCELL_ID2 ) != 0x05 )
-      || ( MmioRead8( PL031_RTC_PCELL_ID3 ) != 0xB1 ) ) {
+  if (  (MmioRead8 (PL031_RTC_PCELL_ID0) != 0x0D)
+      || (MmioRead8 (PL031_RTC_PCELL_ID1) != 0xF0)
+      || (MmioRead8 (PL031_RTC_PCELL_ID2) != 0x05)
+      || (MmioRead8 (PL031_RTC_PCELL_ID3) != 0xB1)) {
     Status = EFI_NOT_FOUND;
     goto EXIT;
   }
 
   // Check if this PrimeCell Peripheral is the SP805 Watchdog Timer
-  if(    ( MmioRead8( PL031_RTC_PERIPH_ID0 ) != 0x31 )
-      || ( MmioRead8( PL031_RTC_PERIPH_ID1 ) != 0x10 )
-      || (( MmioRead8( PL031_RTC_PERIPH_ID2 ) & 0xF) != 0x04 )
-      || ( MmioRead8( PL031_RTC_PERIPH_ID3 ) != 0x00 ) ) {
+  if (  (MmioRead8 (PL031_RTC_PERIPH_ID0) != 0x31)
+      || (MmioRead8 (PL031_RTC_PERIPH_ID1) != 0x10)
+      || ((MmioRead8 (PL031_RTC_PERIPH_ID2) & 0xF) != 0x04)
+      || (MmioRead8 (PL031_RTC_PERIPH_ID3) != 0x00)) {
     Status = EFI_NOT_FOUND;
     goto EXIT;
   }
@@ -81,18 +82,18 @@ InitializePL031 (
   }
 
   // Ensure interrupts are masked. We do not want RTC interrupts in UEFI
-  if ( (MmioRead32( PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER ) & PL031_SET_IRQ_MASK) != PL031_SET_IRQ_MASK ) {
-    MmioOr32( PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER, PL031_SET_IRQ_MASK);
+  if ((MmioRead32 (PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER) & PL031_SET_IRQ_MASK) != PL031_SET_IRQ_MASK) {
+    MmioOr32 (PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER, PL031_SET_IRQ_MASK);
   }
 
   // Clear any existing interrupts
-  if ( (MmioRead32( PL031_RTC_RIS_RAW_IRQ_STATUS_REGISTER ) & PL031_IRQ_TRIGGERED) == PL031_IRQ_TRIGGERED ) {
-    MmioOr32( PL031_RTC_ICR_IRQ_CLEAR_REGISTER, PL031_CLEAR_IRQ);
+  if ((MmioRead32 (PL031_RTC_RIS_RAW_IRQ_STATUS_REGISTER) & PL031_IRQ_TRIGGERED) == PL031_IRQ_TRIGGERED) {
+    MmioOr32 (PL031_RTC_ICR_IRQ_CLEAR_REGISTER, PL031_CLEAR_IRQ);
   }
 
   // Start the clock counter
-  if ( (MmioRead32( PL031_RTC_CR_CONTROL_REGISTER ) & PL031_RTC_ENABLED) != PL031_RTC_ENABLED ) {
-    MmioOr32( PL031_RTC_CR_CONTROL_REGISTER, PL031_RTC_ENABLED);
+  if ((MmioRead32 (PL031_RTC_CR_CONTROL_REGISTER) & PL031_RTC_ENABLED) != PL031_RTC_ENABLED) {
+    MmioOr32 (PL031_RTC_CR_CONTROL_REGISTER, PL031_RTC_ENABLED);
   }
 
   mPL031Initialized = TRUE;
@@ -127,7 +128,7 @@ EpochToEfiTime (
   UINTN         ss;
   UINTN         J;
 
-  if( Time->Daylight == TRUE) {
+  if (Time->Daylight == TRUE) {
 
   }
 
@@ -183,7 +184,7 @@ EfiTimeToEpoch (
 
   JulianDate = Time->Day + ((153*m + 2)/5) + (365*y) + (y/4) - (y/100) + (y/400) - 32045;
 
-  ASSERT( JulianDate > EPOCH_JULIAN_DATE );
+  ASSERT(JulianDate > EPOCH_JULIAN_DATE);
   EpochDays = JulianDate - EPOCH_JULIAN_DATE;
 
   EpochSeconds = (EpochDays * SEC_PER_DAY) + ((UINTN)Time->Hour * SEC_PER_HOUR) + (Time->Minute * SEC_PER_MIN) + Time->Second;
@@ -221,7 +222,7 @@ DayValid (
   if (Time->Day < 1 ||
       Time->Day > DayOfMonth[Time->Month - 1] ||
       (Time->Month == 2 && (!IsLeapYear (Time) && Time->Day > 28))
-      ) {
+     ) {
     return FALSE;
   }
 
@@ -254,8 +255,8 @@ LibGetTime (
   UINTN       *Daylight = 0;
 
   // Initialize the hardware if not already done
-  if( !mPL031Initialized ) {
-    Status = InitializePL031();
+  if (!mPL031Initialized) {
+    Status = InitializePL031 ();
     if (EFI_ERROR (Status)) {
       goto EXIT;
     }
@@ -267,7 +268,7 @@ LibGetTime (
   Status = ArmPlatformSysConfigGet (SYS_CFG_RTC, &EpochSeconds);
   if (Status == EFI_UNSUPPORTED) {
     // Battery backed up hardware RTC does not exist, revert to PL031
-    EpochSeconds = MmioRead32( PL031_RTC_DR_DATA_REGISTER );
+    EpochSeconds = MmioRead32 (PL031_RTC_DR_DATA_REGISTER);
     Status = EFI_SUCCESS;
   } else if (EFI_ERROR (Status)) {
     // Battery backed up hardware RTC exists but could not be read due to error. Abort.
@@ -275,11 +276,11 @@ LibGetTime (
   } else {
     // Battery backed up hardware RTC exists and we read the time correctly from it.
     // Now sync the PL031 to the new time.
-    MmioWrite32( PL031_RTC_LR_LOAD_REGISTER, EpochSeconds);
+    MmioWrite32 (PL031_RTC_LR_LOAD_REGISTER, EpochSeconds);
   }
 
   // Ensure Time is a valid pointer
-  if( Time == NULL ) {
+  if (Time == NULL) {
     Status = EFI_INVALID_PARAMETER;
     goto EXIT;
   }
@@ -287,7 +288,7 @@ LibGetTime (
   // Get the current time zone information from non-volatile storage
   TimeZone = (INT16 *)GetVariable(mTimeZoneVariableName, &gEfiGlobalVariableGuid);
 
-  if( TimeZone == NULL ) {
+  if (TimeZone == NULL) {
     // The time zone variable does not exist in non-volatile storage, so create it.
     Time->TimeZone = EFI_UNSPECIFIED_TIMEZONE;
     // Store it
@@ -297,7 +298,7 @@ LibGetTime (
                                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
                                 sizeof(Time->TimeZone),
                                 &(Time->TimeZone)
-                              );
+                             );
     if (EFI_ERROR (Status)) {
       DEBUG((EFI_D_ERROR,"LibGetTime: ERROR: TimeZone\n"));
       goto EXIT;
@@ -308,13 +309,13 @@ LibGetTime (
     FreePool(TimeZone);
 
     // Check TimeZone bounds:   -1440 to 1440 or 2047
-    if( (( Time->TimeZone < -1440 ) || ( Time->TimeZone > 1440 ))
-        && ( Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE) ) {
+    if (((Time->TimeZone < -1440) || (Time->TimeZone > 1440))
+        && (Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE)) {
       Time->TimeZone = EFI_UNSPECIFIED_TIMEZONE;
     }
 
     // Adjust for the correct time zone
-    if( Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE ) {
+    if (Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE) {
       EpochSeconds += Time->TimeZone * SEC_PER_MIN;
     }
   }
@@ -322,7 +323,7 @@ LibGetTime (
   // Get the current daylight information from non-volatile storage
   Daylight = (UINTN *)GetVariable(mDaylightVariableName, &gEfiGlobalVariableGuid);
 
-  if( Daylight == NULL ) {
+  if (Daylight == NULL) {
     // The daylight variable does not exist in non-volatile storage, so create it.
     Time->Daylight = 0;
     // Store it
@@ -332,7 +333,7 @@ LibGetTime (
                                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
                                 sizeof(Time->Daylight),
                                 &(Time->Daylight)
-                              );
+                             );
     if (EFI_ERROR (Status)) {
       DEBUG((EFI_D_ERROR,"LibGetTime: ERROR: Daylight\n"));
       goto EXIT;
@@ -343,20 +344,23 @@ LibGetTime (
     FreePool(Daylight);
 
     // Adjust for the correct period
-    if( (Time->Daylight & EFI_TIME_IN_DAYLIGHT) == EFI_TIME_IN_DAYLIGHT ) {
+    if ((Time->Daylight & EFI_TIME_IN_DAYLIGHT) == EFI_TIME_IN_DAYLIGHT) {
       // Convert to adjusted time, i.e. spring forwards one hour
       EpochSeconds += SEC_PER_HOUR;
     }
   }
 
   // Convert from internal 32-bit time to UEFI time
-  EpochToEfiTime( EpochSeconds, Time );
+  EpochToEfiTime (EpochSeconds, Time);
 
   // Update the Capabilities info
-  if( Capabilities != NULL ) {
-    Capabilities->Resolution  = PL031_COUNTS_PER_SECOND;  /* PL031 runs at frequency 1Hz */
-    Capabilities->Accuracy    = PL031_PPM_ACCURACY;       /* Accuracy in ppm multiplied by 1,000,000, e.g. for 50ppm set 50,000,000 */
-    Capabilities->SetsToZero  = FALSE;                    /* FALSE: Setting the time does not clear the values below the resolution level */
+  if (Capabilities != NULL) {
+    // PL031 runs at frequency 1Hz
+    Capabilities->Resolution  = PL031_COUNTS_PER_SECOND;
+    // Accuracy in ppm multiplied by 1,000,000, e.g. for 50ppm set 50,000,000
+    Capabilities->Accuracy    = (UINT32)PcdGet32 (PcdPL031RtcPpmAccuracy);
+    // FALSE: Setting the time does not clear the values below the resolution level
+    Capabilities->SetsToZero  = FALSE;
   }
 
   EXIT:
@@ -391,41 +395,41 @@ LibSetTime (
   // to the range 1998 .. 2011
 
   // Check the input parameters' range.
-  if ( ( Time->Year   < 1998 ) ||
-       ( Time->Year   > 2099 ) ||
-       ( Time->Month  < 1    ) ||
-       ( Time->Month  > 12   ) ||
-       (!DayValid (Time)     ) ||
-       ( Time->Hour   > 23   ) ||
-       ( Time->Minute > 59   ) ||
-       ( Time->Second > 59   ) ||
-       ( Time->Nanosecond > 999999999 ) ||
-       ( !((Time->TimeZone == EFI_UNSPECIFIED_TIMEZONE) || ((Time->TimeZone >= -1440) && (Time->TimeZone <= 1440))) ) ||
-       ( Time->Daylight & (~(EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT)) )
-     ) {
+  if ((Time->Year   < 1998) ||
+       (Time->Year   > 2099) ||
+       (Time->Month  < 1   ) ||
+       (Time->Month  > 12  ) ||
+       (!DayValid (Time)    ) ||
+       (Time->Hour   > 23  ) ||
+       (Time->Minute > 59  ) ||
+       (Time->Second > 59  ) ||
+       (Time->Nanosecond > 999999999) ||
+       (!((Time->TimeZone == EFI_UNSPECIFIED_TIMEZONE) || ((Time->TimeZone >= -1440) && (Time->TimeZone <= 1440)))) ||
+       (Time->Daylight & (~(EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT)))
+    ) {
     Status = EFI_INVALID_PARAMETER;
     goto EXIT;
   }
 
   // Initialize the hardware if not already done
-  if( !mPL031Initialized ) {
-    Status = InitializePL031();
+  if (!mPL031Initialized) {
+    Status = InitializePL031 ();
     if (EFI_ERROR (Status)) {
       goto EXIT;
     }
   }
 
-  EpochSeconds = EfiTimeToEpoch( Time );
+  EpochSeconds = EfiTimeToEpoch (Time);
 
   // Adjust for the correct time zone, i.e. convert to UTC time zone
-  if( Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE ) {
+  if (Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE) {
     EpochSeconds -= Time->TimeZone * SEC_PER_MIN;
   }
 
   // TODO: Automatic Daylight activation
 
   // Adjust for the correct period
-  if( (Time->Daylight & EFI_TIME_IN_DAYLIGHT) == EFI_TIME_IN_DAYLIGHT ) {
+  if ((Time->Daylight & EFI_TIME_IN_DAYLIGHT) == EFI_TIME_IN_DAYLIGHT) {
     // Convert to un-adjusted time, i.e. fall back one hour
     EpochSeconds -= SEC_PER_HOUR;
   }
@@ -445,7 +449,7 @@ LibSetTime (
 
 
   // Set the PL031
-  MmioWrite32( PL031_RTC_LR_LOAD_REGISTER, EpochSeconds);
+  MmioWrite32 (PL031_RTC_LR_LOAD_REGISTER, EpochSeconds);
 
   // The accesses to Variable Services can be very slow, because we may be writing to Flash.
   // Do this after having set the RTC.
@@ -457,7 +461,7 @@ LibSetTime (
                               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
                               sizeof(Time->TimeZone),
                               &(Time->TimeZone)
-                            );
+                           );
   if (EFI_ERROR (Status)) {
     DEBUG((EFI_D_ERROR,"LibSetTime: ERROR: TimeZone\n"));
     goto EXIT;
@@ -470,7 +474,7 @@ LibSetTime (
                               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
                               sizeof(Time->Daylight),
                               &(Time->Daylight)
-                            );
+                           );
   if (EFI_ERROR (Status)) {
     DEBUG((EFI_D_ERROR,"LibSetTime: ERROR: Daylight\n"));
     goto EXIT;
@@ -564,7 +568,7 @@ LibRtcInitialize (
                   &Handle,
                   &gEfiRealTimeClockArchProtocolGuid,  NULL,
                   NULL
-                  );
+                 );
 
   return Status;
 }

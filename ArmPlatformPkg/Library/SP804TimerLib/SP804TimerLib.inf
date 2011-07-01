@@ -38,5 +38,7 @@
   BaseLib
 
 [Pcd]
-  gArmPlatformTokenSpaceGuid.PcdSP804FrequencyInMHz
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerFrequencyInMHz
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPerformanceBase
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerMetronomeBase
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz

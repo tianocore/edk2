@@ -14,8 +14,6 @@
 #ifndef _PL111LCD_H__
 #define _PL111LCD_H__
 
-#include <ArmPlatform.h>
-
 /**********************************************************************
  *
  *  This header file contains all the bits of the PL111 that are
@@ -24,30 +22,30 @@
  **********************************************************************/
 
 // Controller Register Offsets
-#define PL111_REG_LCD_TIMING_0            (PL111_CLCD_BASE + 0x000)
-#define PL111_REG_LCD_TIMING_1            (PL111_CLCD_BASE + 0x004)
-#define PL111_REG_LCD_TIMING_2            (PL111_CLCD_BASE + 0x008)
-#define PL111_REG_LCD_TIMING_3            (PL111_CLCD_BASE + 0x00C)
-#define PL111_REG_LCD_UP_BASE             (PL111_CLCD_BASE + 0x010)
-#define PL111_REG_LCD_LP_BASE             (PL111_CLCD_BASE + 0x014)
-#define PL111_REG_LCD_CONTROL             (PL111_CLCD_BASE + 0x018)
-#define PL111_REG_LCD_IMSC                (PL111_CLCD_BASE + 0x01C)
-#define PL111_REG_LCD_RIS                 (PL111_CLCD_BASE + 0x020)
-#define PL111_REG_LCD_MIS                 (PL111_CLCD_BASE + 0x024)
-#define PL111_REG_LCD_ICR                 (PL111_CLCD_BASE + 0x028)
-#define PL111_REG_LCD_UP_CURR             (PL111_CLCD_BASE + 0x02C)
-#define PL111_REG_LCD_LP_CURR             (PL111_CLCD_BASE + 0x030)
-#define PL111_REG_LCD_PALETTE             (PL111_CLCD_BASE + 0x200)
+#define PL111_REG_LCD_TIMING_0            ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x000)
+#define PL111_REG_LCD_TIMING_1            ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x004)
+#define PL111_REG_LCD_TIMING_2            ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x008)
+#define PL111_REG_LCD_TIMING_3            ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x00C)
+#define PL111_REG_LCD_UP_BASE             ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x010)
+#define PL111_REG_LCD_LP_BASE             ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x014)
+#define PL111_REG_LCD_CONTROL             ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x018)
+#define PL111_REG_LCD_IMSC                ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x01C)
+#define PL111_REG_LCD_RIS                 ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x020)
+#define PL111_REG_LCD_MIS                 ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x024)
+#define PL111_REG_LCD_ICR                 ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x028)
+#define PL111_REG_LCD_UP_CURR             ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x02C)
+#define PL111_REG_LCD_LP_CURR             ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x030)
+#define PL111_REG_LCD_PALETTE             ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0x200)
 
 // Identification Register Offsets
-#define PL111_REG_CLCD_PERIPH_ID_0        (PL111_CLCD_BASE + 0xFE0)
-#define PL111_REG_CLCD_PERIPH_ID_1        (PL111_CLCD_BASE + 0xFE4)
-#define PL111_REG_CLCD_PERIPH_ID_2        (PL111_CLCD_BASE + 0xFE8)
-#define PL111_REG_CLCD_PERIPH_ID_3        (PL111_CLCD_BASE + 0xFEC)
-#define PL111_REG_CLCD_P_CELL_ID_0        (PL111_CLCD_BASE + 0xFF0)
-#define PL111_REG_CLCD_P_CELL_ID_1        (PL111_CLCD_BASE + 0xFF4)
-#define PL111_REG_CLCD_P_CELL_ID_2        (PL111_CLCD_BASE + 0xFF8)
-#define PL111_REG_CLCD_P_CELL_ID_3        (PL111_CLCD_BASE + 0xFFC)
+#define PL111_REG_CLCD_PERIPH_ID_0        ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0xFE0)
+#define PL111_REG_CLCD_PERIPH_ID_1        ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0xFE4)
+#define PL111_REG_CLCD_PERIPH_ID_2        ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0xFE8)
+#define PL111_REG_CLCD_PERIPH_ID_3        ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0xFEC)
+#define PL111_REG_CLCD_P_CELL_ID_0        ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0xFF0)
+#define PL111_REG_CLCD_P_CELL_ID_1        ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0xFF4)
+#define PL111_REG_CLCD_P_CELL_ID_2        ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0xFF8)
+#define PL111_REG_CLCD_P_CELL_ID_3        ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0xFFC)
 
 /**********************************************************************/
 

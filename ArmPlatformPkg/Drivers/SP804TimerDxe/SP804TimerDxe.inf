@@ -48,8 +48,11 @@
   gHardwareInterruptProtocolGuid
 
 [Pcd.common]
-  gArmPlatformTokenSpaceGuid.PcdSP804FrequencyInMHz
-  gArmPlatformTokenSpaceGuid.PcdSP804Timer0InterruptNum
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerFrequencyInMHz
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicInterruptNum
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicBase
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPerformanceBase
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerMetronomeBase
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod
 
 [Depex]

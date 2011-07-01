@@ -21,6 +21,8 @@
 
 #include <Drivers/PL310L2Cache.h>
 
+#include <ArmPlatform.h>
+
 /**
   Initialize the Secure peripherals and memory regions
 

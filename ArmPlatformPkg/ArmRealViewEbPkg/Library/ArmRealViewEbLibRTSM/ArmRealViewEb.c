@@ -20,6 +20,8 @@
 #include <Drivers/PL341Dmc.h>
 #include <Drivers/SP804Timer.h>
 
+#include <ArmPlatform.h>
+
 /**
   Return if Trustzone is supported by your platform
 
@@ -102,7 +104,7 @@ ArmPlatformSecInitialize (
 /**
   Initialize controllers that must setup in the normal world
 
-  This function is called by the ArmPlatformPkg/Pei or ArmPlatformPkg/Pei/PlatformPeim
+  This function is called by the ArmPlatformPkg/PrePi or ArmPlatformPkg/PlatformPei
   in the PEI phase.
 
 **/

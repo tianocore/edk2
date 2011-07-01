@@ -32,19 +32,21 @@
 
 [LibraryClasses]
   BaseLib
-  UefiRuntimeServicesTableLib
-  UefiLib
-  UefiBootServicesTableLib
   BaseMemoryLib
   DebugLib
-  UefiDriverEntryPoint
   IoLib
+  PcdLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
 
-[Guids]
+[Pcd]
+  gArmPlatformTokenSpaceGuid.PcdSP805WatchdogBase
+  gArmPlatformTokenSpaceGuid.PcdSP805WatchdogClockFrequencyInHz
 
 [Protocols]
   gEfiWatchdogTimerArchProtocolGuid  
 
-
 [Depex]
-TRUE
+  TRUE
