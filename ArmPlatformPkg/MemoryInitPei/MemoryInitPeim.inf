@@ -23,12 +23,12 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM
 #
 
 [Sources]
-  MemoryInit.c
-
+  MemoryInitPeim.c
+  MemoryInitPeiLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -46,8 +46,6 @@
 
 [Guids]
   gEfiMemoryTypeInformationGuid
-
-[Ppis]
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
@@ -72,5 +70,5 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData
    
-[depex]
+[Depex]
   TRUE
