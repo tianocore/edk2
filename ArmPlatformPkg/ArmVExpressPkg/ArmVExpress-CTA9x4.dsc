@@ -272,10 +272,6 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
-!if $(EDK2_ARMVE_STANDALONE) == 1
-  gArmPlatformTokenSpaceGuid.PcdStandalone|TRUE
-!endif
-
 !if $(EDK2_SKIP_PEICORE) == 1
   gArmTokenSpaceGuid.PcdSkipPeiCore|TRUE
 !endif
@@ -365,6 +361,10 @@
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|1
   gArmTokenSpaceGuid.PcdVFPEnabled|1
   
+!if $(EDK2_ARMVE_STANDALONE) == 1
+  gArmPlatformTokenSpaceGuid.PcdStandalone|1
+!endif
+
   # Stacks for MPCores in Secure World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0x49E00000	    # Top of SEC Stack for Secure World
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecStackSize|0x2000		      # Stack for each of the 4 CPU cores

@@ -112,7 +112,7 @@ InitializeMemory (
   //
   // Initialize the System Memory (DRAM)
   //
-  if (FeaturePcdGet(PcdStandalone)) {
+  if (PcdGet32 (PcdStandalone)) {
     // In case of a standalone version, the DRAM is already initialized
     ArmPlatformInitializeSystemMemory();
   }
@@ -120,7 +120,7 @@ InitializeMemory (
   //
   // Declare the UEFI memory to PEI
   //
-  if (FeaturePcdGet(PcdStandalone)) {
+  if (PcdGet32 (PcdStandalone)) {
     // In case of standalone UEFI, we set the UEFI memory region at the top of the DRAM
     UefiMemoryBase = SystemMemoryTop - FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
   } else {

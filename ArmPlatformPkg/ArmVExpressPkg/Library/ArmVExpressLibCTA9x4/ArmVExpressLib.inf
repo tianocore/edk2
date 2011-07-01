@@ -45,8 +45,9 @@
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
-  gArmPlatformTokenSpaceGuid.PcdStandalone
   gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
 
 [FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdStandalone
+
   gArmTokenSpaceGuid.PcdL2x0ControllerBase

@@ -49,9 +49,10 @@
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
-  gArmPlatformTokenSpaceGuid.PcdStandalone
 
 [FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdStandalone
+
   gArmTokenSpaceGuid.PcdNormalFdBaseAddress
   gArmTokenSpaceGuid.PcdNormalFdSize
 

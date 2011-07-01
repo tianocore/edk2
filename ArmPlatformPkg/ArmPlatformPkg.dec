@@ -39,13 +39,13 @@
   gVariableRuntimeDxeFileGuid = { 0xcbd2e4d5, 0x7068, 0x4ff5, { 0xb4, 0x62, 0x98, 0x22, 0xb4, 0xad, 0x8d, 0x60 } }
 
 [PcdsFeatureFlag.common]
-  gArmPlatformTokenSpaceGuid.PcdStandalone|FALSE|BOOLEAN|0x00000001
   # Set this PCD to TRUE to map NORFlash at 0x0. FALSE means the DRAM is mapped at 0x0.
   gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping|FALSE|BOOLEAN|0x00000012
 
 [PcdsFixedAtBuild.common]
   # These PCDs should be FeaturePcds. But we used these PCDs as an '#if' in an ASM file.
   # Using a FeaturePcd make a '(BOOLEAN) casting for its value which is not understood by the preprocessor.
+  gArmPlatformTokenSpaceGuid.PcdStandalone|0|UINT32|0x00000001
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|0|UINT32|0x00000003
   
   # Stack for CPU Cores in Secure Mode

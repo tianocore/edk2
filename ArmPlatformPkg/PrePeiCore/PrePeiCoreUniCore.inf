@@ -46,10 +46,9 @@
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid
 
-[FeaturePcd]
-  gArmPlatformTokenSpaceGuid.PcdStandalone
-  
 [FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdStandalone
+
   gArmTokenSpaceGuid.PcdNormalFvBaseAddress
   gArmTokenSpaceGuid.PcdNormalFvSize
 

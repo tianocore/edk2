@@ -119,7 +119,7 @@ CEntryPoint (
 
     // If we skip the PEI Core we could want to initialize the DRAM in the SEC phase.
     // If we are in standalone, we need the initialization to copy the UEFI firmware into DRAM
-    if (FeaturePcdGet(PcdSkipPeiCore) || !FeaturePcdGet(PcdStandalone)) {
+    if (FeaturePcdGet(PcdSkipPeiCore) || !PcdGet32(PcdStandalone)) {
       // Initialize system memory (DRAM)
       ArmPlatformInitializeSystemMemory ();
     }
@@ -204,7 +204,7 @@ CEntryPoint (
   }
 
   // If ArmVe has not been built as Standalone then we need to patch the DRAM to add an infinite loop at the start address
-  if (FeaturePcdGet(PcdStandalone) == FALSE) {
+  if (!PcdGet32(PcdStandalone)) {
     if (CoreId == ARM_PRIMARY_CORE) {
       UINTN*   StartAddress = (UINTN*)PcdGet32(PcdNormalFvBaseAddress);
 

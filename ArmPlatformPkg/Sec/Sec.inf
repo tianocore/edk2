@@ -45,10 +45,10 @@
   SerialPortLib
   
 [FeaturePcd]
-  gArmPlatformTokenSpaceGuid.PcdStandalone
   gArmTokenSpaceGuid.PcdSkipPeiCore
   
 [FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdStandalone
   gArmTokenSpaceGuid.PcdVFPEnabled
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport
   

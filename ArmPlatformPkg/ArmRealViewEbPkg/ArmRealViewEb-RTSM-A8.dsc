@@ -248,8 +248,6 @@
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport|FALSE
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
-  
-  gArmPlatformTokenSpaceGuid.PcdStandalone|TRUE
 
 !if $(EDK2_SKIP_PEICORE) == 1
   gArmTokenSpaceGuid.PcdSkipPeiCore|TRUE
@@ -327,6 +325,8 @@
 # but not used).
 #
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x00000000
+  
+  gArmPlatformTokenSpaceGuid.PcdStandalone|1
   
   # Stack for CPU Cores in Secure Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0x4B000000     # Top of SEC Stack for Secure World
