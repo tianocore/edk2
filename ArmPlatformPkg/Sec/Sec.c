@@ -227,6 +227,18 @@ CEntryPoint (
       // Enter Secondary Cores into non Secure State. To enter into Non Secure state, we need to make a return from exception
       return_from_exception((UINTN)NonSecureWaitForFirmware);
     }
+  } else if (FeaturePcdGet(PcdSkipPeiCore)) {
+    if (CoreId == ARM_PRIMARY_CORE) {
+      // Signal the secondary cores they can jump to PEI phase
+      PL390GicSendSgiTo (PcdGet32(PcdGicDistributorBase), GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
+
+      // To enter into Non Secure state, we need to make a return from exception
+      return_from_exception(PcdGet32(PcdNormalFvBaseAddress));
+    } else {
+      // We wait for the primary core to finish to initialize the System Memory. When we skip PEI Core, we could set the stack in DRAM
+      // Without this synchronization the secondary cores will complete the SEC before the primary core has finished to intitialize the DRAM.
+      return_from_exception((UINTN)NonSecureWaitForFirmware);
+    }
   } else {
     // To enter into Non Secure state, we need to make a return from exception
     return_from_exception(PcdGet32(PcdNormalFvBaseAddress));
