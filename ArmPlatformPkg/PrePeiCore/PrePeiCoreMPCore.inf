@@ -37,13 +37,14 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
-  BaseLib
-  DebugLib
-  IoLib
   ArmLib
   ArmPlatformLib
   ArmMPCoreMailBoxLib
+  BaseLib
+  DebugLib
+  IoLib
   PL390GicNonSecLib
+  PrintLib
   SerialPortLib
 
 [Ppis]

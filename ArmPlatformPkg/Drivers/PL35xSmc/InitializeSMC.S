@@ -48,6 +48,6 @@ ASM_PFX(PL35xSmcInitialize):
   str   r0, [r1, #PL350_SMC_DIRECT_CMD_OFFSET]
 
   add   r2, #0xC
-  b     ASM_PFX(PL350SmcInitialize)
+  b     ASM_PFX(PL35xSmcInitialize)
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

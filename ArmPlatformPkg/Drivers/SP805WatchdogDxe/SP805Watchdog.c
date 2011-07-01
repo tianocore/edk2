@@ -282,10 +282,10 @@ SP805SetTimerPeriod (
     //
     // WatchdogTicks = (TimerPeriod * SP805_CLOCK_FREQUENCY) / 20 MHz ;
 
-    Ticks64bit = DivU64x32( MultU64x32( TimerPeriod, SP805_CLOCK_FREQUENCY ), 20000000 );
+    Ticks64bit = DivU64x32(MultU64x32(TimerPeriod, (UINTN)PcdGet32(PcdSP805WatchdogClockFrequencyInHz)), 20000000);
 
     // The registers in the SP805 are only 32 bits
-    if( Ticks64bit > SP805_MAX_TICKS ) {
+    if(Ticks64bit > (UINT64)0xFFFFFFFF) {
       // We could load the watchdog with the maximum supported value but
       // if a smaller value was requested, this could have the watchdog
       // triggering before it was intended.

@@ -36,12 +36,13 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
+  ArmLib
+  ArmPlatformLib
   BaseLib
   DebugLib
   IoLib
-  ArmLib
-  ArmPlatformLib
   PL390GicSecLib
+  PrintLib
   SerialPortLib
   
 [FeaturePcd]

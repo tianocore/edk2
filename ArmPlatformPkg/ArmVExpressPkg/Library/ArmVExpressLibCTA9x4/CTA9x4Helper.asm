@@ -20,7 +20,7 @@
 
   INCLUDE AsmMacroIoLib.inc
 
-  EXPORT  ArmPlatformInitializeBootMemory
+  EXPORT  ArmPlatformIsMemoryInitialized
 
   PRESERVE8
   AREA    CTA9x4Helper, CODE, READONLY

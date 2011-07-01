@@ -21,7 +21,7 @@
 .text
 .align 3
 
-GCC_ASM_EXPORT(ArmPlatformInitializeBootMemory)
+GCC_ASM_EXPORT(ArmPlatformIsMemoryInitialized)
 
 /**
   Called at the early stage of the Boot phase to know if the memory has already been initialized

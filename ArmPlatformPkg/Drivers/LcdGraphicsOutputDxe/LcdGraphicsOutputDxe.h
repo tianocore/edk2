@@ -16,10 +16,14 @@
 
 
 #include <Base.h>
+
+#include <Library/DebugLib.h>
+#include <Library/LcdPlatformLib.h>
+#include <Library/PcdLib.h>
 #include <Library/UefiLib.h>
+
 #include <Protocol/DevicePath.h>
 
-#include <Library/LcdPlatformLib.h>
 
 //
 // Device structures

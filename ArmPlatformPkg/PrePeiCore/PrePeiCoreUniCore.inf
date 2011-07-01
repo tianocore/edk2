@@ -37,11 +37,13 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
+  ArmLib
+  ArmPlatformLib
   BaseLib
   DebugLib
   IoLib
-  ArmLib
-  ArmPlatformLib
+  PrintLib
+  SerialPortLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid

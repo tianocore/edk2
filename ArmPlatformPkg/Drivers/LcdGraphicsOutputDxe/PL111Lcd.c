@@ -11,11 +11,8 @@
 
 **/
 
-#include <Library/DebugLib.h>
 #include <Library/IoLib.h>
-#include <Library/LcdPlatformLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/PcdLib.h>
 
 #include <Drivers/PL111Lcd.h>
 

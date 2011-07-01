@@ -33,6 +33,12 @@ InitializePlatformPeim (
   IN       EFI_PEI_FILE_HANDLE  FileHandle,
   IN CONST EFI_PEI_SERVICES     **PeiServices
   );
+  
+EFI_STATUS
+EFIAPI
+PlatformPeim (
+  VOID
+  );
 
 //
 // Module globals

@@ -37,6 +37,7 @@
   DevicePathLib
   HobLib
   PerformanceLib
+  SerialPortLib
 
 [Guids]
   gEfiFileInfoGuid
