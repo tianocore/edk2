@@ -604,6 +604,11 @@ EdkBootLoaderEntry (
   EblInitializeNetworkCmd();
   EblInitializeVariableCmds ();
   
+  if (gST->ConOut == NULL) {
+    DEBUG((EFI_D_ERROR,"Errot: No Console Output\n"));
+    return EFI_NOT_READY;
+  }
+
   // Disable the 5 minute EFI watchdog time so we don't get automatically reset
   gBS->SetWatchdogTimer (0, 0, 0, NULL);
 
