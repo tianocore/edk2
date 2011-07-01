@@ -4,7 +4,7 @@
 @REM #  and platform building, so just use a bat file to do post build commands.
 @REM #  Originally, following post building command is for EfiLoader module.
 @REM #
-@REM #  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+@REM #  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 @REM #
 @REM #  This program and the accompanying materials
 @REM #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,13 +19,14 @@
 @set BASETOOLS_DIR=%WORKSPACE_TOOLS_PATH%\Bin\Win32
 @set BOOTSECTOR_BIN_DIR=%WORKSPACE%\DuetPkg\BootSector\bin
 @set PROCESSOR=""
+@call %WORKSPACE%\DuetPkg\GetVariables.bat
 
-@if "%1"=="" goto NoArch
-@if "%1"=="IA32" set PROCESSOR=IA32
-@if "%1"=="X64" set PROCESSOR=X64
+@if NOT "%1"=="" @set TARGET_ARCH=%1
+@if "%TARGET_ARCH%"=="IA32" set PROCESSOR=IA32
+@if "%TARGET_ARCH%"=="X64" set PROCESSOR=X64
 @if %PROCESSOR%=="" goto WrongArch
 
-@set BUILD_DIR=%WORKSPACE%\Build\DuetPkg%PROCESSOR%\DEBUG_MYTOOLS
+@set BUILD_DIR=%WORKSPACE%\Build\DuetPkg%PROCESSOR%\%TARGET%_%TOOL_CHAIN_TAG%
 
 
 @echo Compressing DUETEFIMainFv.FV ...
@@ -58,10 +59,6 @@
 @%BASETOOLS_DIR%\GenPage.exe %BUILD_DIR%\FV\Efildr20Pure -o %BUILD_DIR%\FV\Efildr20
 @goto end
 
-
-:NoArch
-@echo Error! Please specific the architecture.
-@goto Help
 
 :WrongArch
 @echo Error! Wrong architecture.

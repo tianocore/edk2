@@ -1,6 +1,6 @@
 @REM ## @file
 @REM #
-@REM #  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+@REM #  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 @REM #
 @REM #  This program and the accompanying materials
 @REM #  are licensed and made available under the terms and conditions of the BSD License
@@ -12,24 +12,29 @@
 @REM #
 @REM ##
 
-@REM Set up environment at fisrt.
+@REM Set up environment at first.
 
 @set BASETOOLS_DIR=%WORKSPACE_TOOLS_PATH%\Bin\Win32
 @set BOOTSECTOR_BIN_DIR=%WORKSPACE%\DuetPkg\BootSector\bin
 @set DISK_LABEL=DUET
 @set PROCESSOR=""
+@set STEP=1
+@call %WORKSPACE%\DuetPkg\GetVariables.bat
 
 @echo on
 
 @if "%1"=="" goto Help
 @if "%2"=="" goto Help
 @if "%3"=="" goto Help
-@if "%4"=="" goto NoArch
+@if "%4"=="" goto Set_BootDisk
+@if "%4"=="step2" (@set STEP=2) else @set TARGET_ARCH=%4
+@if "%5"=="step2" @set STEP=2
+:Set_BootDisk
 @set EFI_BOOT_DISK=%2
-@if "%4"=="IA32" set PROCESSOR=IA32
-@if "%4"=="X64" set PROCESSOR=X64
+@if "%TARGET_ARCH%"=="IA32" set PROCESSOR=IA32
+@if "%TARGET_ARCH%"=="X64" set PROCESSOR=X64
 @if %PROCESSOR%=="" goto WrongArch
-@set BUILD_DIR=%WORKSPACE%\Build\DuetPkg%PROCESSOR%\DEBUG_MYTOOLS
+@set BUILD_DIR=%WORKSPACE%\Build\DuetPkg%PROCESSOR%\%TARGET%_%TOOL_CHAIN_TAG%
 
 @if "%1"=="floppy" goto CreateFloppy
 @if "%1"=="file" goto CreateFile
@@ -76,7 +81,7 @@ mkdir %EFI_BOOT_DISK%\efi\boot
 @if "%3"=="FAT12" goto WrongFATType
 
 :CreateUsb_FAT16
-@if "%5"=="step2" goto CreateUsb_FAT16_step2
+@if "%STEP%"=="2" goto CreateUsb_FAT16_step2
 @echo Format %EFI_BOOT_DISK% ...
 @echo.> FormatCommandInput.txt
 @format /FS:FAT /v:%DISK_LABEL% /q %EFI_BOOT_DISK% < FormatCommandInput.txt > NUL
@@ -98,7 +103,7 @@ mkdir %EFI_BOOT_DISK%\efi\boot
 @goto end
 
 :CreateUsb_FAT32
-@if "%5"=="step2" goto CreateUsb_FAT32_step2
+@if "%STEP%"=="2" goto CreateUsb_FAT32_step2
 @echo Format %EFI_BOOT_DISK% ...
 @echo.> FormatCommandInput.txt
 @format /FS:FAT32 /v:%DISK_LABEL% /q %EFI_BOOT_DISK% < FormatCommandInput.txt > NUL
@@ -134,10 +139,6 @@ copy %WORKSPACE%\EdkShellBinPkg\MinimumShell\X64\Shell.efi %EFI_BOOT_DISK%\efi\b
 :WrongFATType
 @echo Wrong FAT type %3 for %1
 @goto end
-
-:NoArch
-@echo Error! Please specific the architecture.
-@goto Help
 
 :WrongArch
 @echo Error! Wrong architecture.
