@@ -34,6 +34,8 @@
   ArmRealViewEb.c
   ArmRealViewEbHelper.asm   | RVCT
   ArmRealViewEbHelper.S     | GCC
+  ArmRealViewEbBoot.asm     | RVCT
+  ArmRealViewEbBoot.S       | GCC
 
 [Protocols]
 

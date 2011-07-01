@@ -1,32 +1,27 @@
 //
 //  Copyright (c) 2011, ARM Limited. All rights reserved.
-//  
-//  This program and the accompanying materials                          
-//  are licensed and made available under the terms and conditions of the BSD License         
-//  which accompanies this distribution.  The full text of the license may be found at        
-//  http://opensource.org/licenses/bsd-license.php                                            
 //
-//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+//  This program and the accompanying materials
+//  are licensed and made available under the terms and conditions of the BSD License
+//  which accompanies this distribution.  The full text of the license may be found at
+//  http://opensource.org/licenses/bsd-license.php
+//
+//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 //
 
 #include <AsmMacroIoLib.h>
 #include <Base.h>
 #include <Library/PcdLib.h>
+#include <Library/ArmPlatformLib.h>
 #include <ArmPlatform.h>
-#include <Drivers/PL354Smc.h>
 #include <AutoGen.h>
 
   INCLUDE AsmMacroIoLib.inc
-  
-  EXPORT  ArmPlatformIsMemoryInitialized
+
   EXPORT  ArmPlatformInitializeBootMemory
-  IMPORT  SMCInitializeNOR
-  IMPORT  SMCInitializeSRAM
-  IMPORT  SMCInitializePeripherals
-  IMPORT  SMCInitializeVRAM
-  
+
   PRESERVE8
   AREA    CTA9x4Helper, CODE, READONLY
 
@@ -51,44 +46,3 @@ ArmPlatformIsMemoryInitialized
   tst   r0, #0x40000000
   bx	lr
     
-/**
-  Initialize the memory where the initial stacks will reside
-
-  This memory can contain the initial stacks (Secure and Secure Monitor stacks).
-  In some platform, this region is already initialized and the implementation of this function can
-  do nothing. This memory can also represent the Secure RAM.
-  This function is called before the satck has been set up. Its implementation must ensure the stack
-  pointer is not used (probably required to use assembly language)
-
-**/
-ArmPlatformInitializeBootMemory
-  mov   r5, lr
-
-  //
-  // Initialize PL354 SMC
-  //
-  LoadConstantToReg (ARM_VE_SMC_CTRL_BASE, r1)
-
-  // NOR Flash 0
-  mov   r2, PL354_SMC_DIRECT_CMD_ADDR_CS(0,0)
-  blx   SMCInitializeNOR
-
-  // NOR Flash 1
-  mov   r2, PL354_SMC_DIRECT_CMD_ADDR_CS(1,0)
-  blx   SMCInitializeNOR
-
-  // Setup SRAM
-  blx   SMCInitializeSRAM
-
-  // Memory Mapped Peripherals
-  blx   SMCInitializePeripherals
-
-  // Initialize VRAM
-  //TODO: Check if we really must inititialize Video SRAM in UEFI. Does Linux can do it ? Does the Video driver can do it ?
-  //      It will be faster (only initialize if required) and easier (remove assembly code because of a stack available) to move this initialization.
-  LoadConstantToReg (VRAM_MOTHERBOARD_BASE, r2)
-  blx   SMCInitializeVRAM
-
-  bx	r5
-
-  END

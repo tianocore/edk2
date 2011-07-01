@@ -14,14 +14,13 @@
 #include <AsmMacroIoLib.h>
 #include <Base.h>
 #include <Library/PcdLib.h>
+#include <Library/ArmPlatformLib.h>
 #include <ArmPlatform.h>
 #include <AutoGen.h>
 
-#Start of Code section
 .text
 .align 3
 
-GCC_ASM_EXPORT(ArmPlatformIsMemoryInitialized)
 GCC_ASM_EXPORT(ArmPlatformInitializeBootMemory)
 
 /**
@@ -45,18 +44,4 @@ ASM_PFX(ArmPlatformIsMemoryInitialized):
   tst   r0, #0x200
   bx	lr
     
-/**
-  Initialize the memory where the initial stacks will reside
-
-  This memory can contain the initial stacks (Secure and Secure Monitor stacks).
-  In some platform, this region is already initialized and the implementation of this function can
-  do nothing. This memory can also represent the Secure RAM.
-  This function is called before the satck has been set up. Its implementation must ensure the stack
-  pointer is not used (probably required to use assembly language)
-
-**/
-ASM_PFX(ArmPlatformInitializeBootMemory):
-  // The SMC does not need to be initialized for RTSM
-  bx    lr
-
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

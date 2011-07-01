@@ -15,18 +15,13 @@
 #include <Base.h>
 #include <Library/PcdLib.h>
 #include <Library/ArmPlatformLib.h>
-#include <Drivers/PL354Smc.h>
+#include <ArmPlatform.h>
 #include <AutoGen.h>
 
 .text
 .align 3
 
 GCC_ASM_EXPORT(ArmPlatformIsMemoryInitialized)
-GCC_ASM_EXPORT(ArmPlatformInitializeBootMemory)
-.extern ASM_PFX(SMCInitializeNOR)
-.extern ASM_PFX(SMCInitializeSRAM)
-.extern ASM_PFX(SMCInitializePeripherals)
-.extern ASM_PFX(SMCInitializeVRAM)
 
 /**
   Called at the early stage of the Boot phase to know if the memory has already been initialized
@@ -49,44 +44,3 @@ ASM_PFX(ArmPlatformIsMemoryInitialized):
   tst   r0, #0x40000000
   bx	lr
 
-/**
-  Initialize the memory where the initial stacks will reside
-
-  This memory can contain the initial stacks (Secure and Secure Monitor stacks).
-  In some platform, this region is already initialized and the implementation of this function can
-  do nothing. This memory can also represent the Secure RAM.
-  This function is called before the satck has been set up. Its implementation must ensure the stack
-  pointer is not used (probably required to use assembly language)
-
-**/
-ASM_PFX(ArmPlatformInitializeBootMemory):
-  mov   r5, lr
-
-  //
-  // Initialize PL354 SMC
-  //
-  LoadConstantToReg (ARM_VE_SMC_CTRL_BASE, r1)
-
-  // NOR Flash 0
-  LoadConstantToReg (PL354_SMC_DIRECT_CMD_ADDR_CS(0,0), r2)
-  blx   ASM_PFX(SMCInitializeNOR)
-
-  // NOR Flash 1
-  LoadConstantToReg (PL354_SMC_DIRECT_CMD_ADDR_CS(1,0), r2)
-  blx   ASM_PFX(SMCInitializeNOR)
-
-  // Setup SRAM
-  blx   ASM_PFX(SMCInitializeSRAM)
-
-  // Memory Mapped Peripherals
-  blx   ASM_PFX(SMCInitializePeripherals)
-
-  // Initialize VRAM
-  //TODO: Check if we really must inititialize Video SRAM in UEFI. Does Linux can do it ? Does the Video driver can do it ?
-  //      It will be faster (only initialize if required) and easier (remove assembly code because of a stack available) to move this initialization.
-  LoadConstantToReg (VRAM_MOTHERBOARD_BASE, r2)
-  blx   ASM_PFX(SMCInitializeVRAM)
-
-  bx	r5
-
-.end

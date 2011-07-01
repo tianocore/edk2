@@ -34,7 +34,7 @@
   L2X0CacheLib
   PL301AxiLib
   PL341DmcLib
-  PL354SmcLib
+  PL35xSmcLib
   SerialPortLib
 
 [Sources.common]
@@ -42,6 +42,8 @@
   CTA9x4.c
   CTA9x4Helper.asm   | RVCT
   CTA9x4Helper.S     | GCC
+  CTA9x4Boot.asm     | RVCT
+  CTA9x4Boot.S       | GCC
 
 [Protocols]
 

@@ -31,7 +31,6 @@
   ArmLib
   ArmTrustZoneLib
   MemoryAllocationLib
-  PL354SmcLib
   PL341DmcLib
   PL301AxiLib
   L2X0CacheLib
@@ -40,6 +39,8 @@
 [Sources.common]
   CTA9x4.c
   CTA9x4Mem.c
+  CTA9x4Helper.asm   | RVCT
+  CTA9x4Helper.S     | GCC
 
 [Protocols]
 
