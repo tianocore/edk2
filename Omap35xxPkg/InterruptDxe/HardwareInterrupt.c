@@ -31,8 +31,6 @@
 //
 // Notifications
 //
-VOID      *CpuProtocolNotificationToken = NULL;
-EFI_EVENT CpuProtocolNotificationEvent  = (EFI_EVENT)NULL;
 EFI_EVENT EfiExitBootServicesEvent      = (EFI_EVENT)NULL;
 
 
@@ -298,37 +296,6 @@ EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptProtocol = {
   EndOfInterrupt
 };
 
-//
-// Notification routines
-//
-VOID
-CpuProtocolInstalledNotification (
-  IN EFI_EVENT   Event,
-  IN VOID        *Context
-  )
-{
-  EFI_STATUS              Status;
-  EFI_CPU_ARCH_PROTOCOL   *Cpu;
-  
-  //
-  // Get the cpu protocol that this driver requires.
-  //
-  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&Cpu);
-  ASSERT_EFI_ERROR(Status);
-
-  //
-  // Unregister the default exception handler.
-  //
-  Status = Cpu->RegisterInterruptHandler (Cpu, EXCEPT_ARM_IRQ, NULL);
-  ASSERT_EFI_ERROR(Status);
-
-  //
-  // Register to receive interrupts
-  //
-  Status = Cpu->RegisterInterruptHandler (Cpu, EXCEPT_ARM_IRQ, IrqInterruptHandler);
-  ASSERT_EFI_ERROR(Status);
-}
-
 /**
   Initialize the state information for the CPU Architectural Protocol
 
@@ -347,6 +314,7 @@ InterruptDxeInitialize (
   )
 {
   EFI_STATUS  Status;
+  EFI_CPU_ARCH_PROTOCOL   *Cpu;
 
   // Make sure the Interrupt Controller Protocol is not already installed in the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
@@ -362,11 +330,22 @@ InterruptDxeInitialize (
                                                   NULL);
   ASSERT_EFI_ERROR(Status);
   
-  // Set up to be notified when the Cpu protocol is installed.
-  Status = gBS->CreateEvent(EVT_NOTIFY_SIGNAL, TPL_CALLBACK, CpuProtocolInstalledNotification, NULL, &CpuProtocolNotificationEvent);    
+  //
+  // Get the CPU protocol that this driver requires.
+  //
+  Status = gBS->LocateProtocol(&gEfiCpuArchProtocolGuid, NULL, (VOID **)&Cpu);
   ASSERT_EFI_ERROR(Status);
 
-  Status = gBS->RegisterProtocolNotify(&gEfiCpuArchProtocolGuid, CpuProtocolNotificationEvent, (VOID *)&CpuProtocolNotificationToken);
+  //
+  // Unregister the default exception handler.
+  //
+  Status = Cpu->RegisterInterruptHandler(Cpu, EXCEPT_ARM_IRQ, NULL);
+  ASSERT_EFI_ERROR(Status);
+
+  //
+  // Register to receive interrupts
+  //
+  Status = Cpu->RegisterInterruptHandler(Cpu, EXCEPT_ARM_IRQ, IrqInterruptHandler);
   ASSERT_EFI_ERROR(Status);
 
   // Register for an ExitBootServicesEvent

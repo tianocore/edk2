@@ -53,5 +53,5 @@
 [FixedPcd.common]
   gEmbeddedTokenSpaceGuid.PcdInterruptBaseAddress
 
-[depex]
-  TRUE
+[Depex]
+  gEfiCpuArchProtocolGuid
