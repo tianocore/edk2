@@ -112,7 +112,7 @@
   # BDS - Boot Manager
   #
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Platform"|VOID*|0x00000019
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L""|VOID*|0x0000000C
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Default Boot Device"|VOID*|0x0000000C
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L""|VOID*|0x0000000D
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|""|VOID*|0x000000F
   # PcdDefaultBootType define the type of the binary pointed by PcdDefaultBootDevicePath: 

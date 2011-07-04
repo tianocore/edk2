@@ -128,8 +128,8 @@ MmuEntryGetAddress (
     } else if ((Entry.Value & 0x3) == 2) {    // Section Type
       return Entry.Value & TT_DESCRIPTOR_SECTION_BASE_ADDRESS_MASK;
     } else if ((Entry.Value & 0x3) == 1) {    // Level2 Table
-      MMU_ENTRY Entry = MmuEntryCreate(Level2,(UINT32*)(Entry.Value & 0xFFFFC000),0);
-      return MmuEntryGetAddress(Entry);
+      MMU_ENTRY Level2Entry = MmuEntryCreate (Level2,(UINT32*)(Entry.Value & 0xFFFFC000),0);
+      return MmuEntryGetAddress (Level2Entry);
     } else {                                  // Page Type
       return 0;
     }

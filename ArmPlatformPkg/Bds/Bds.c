@@ -351,7 +351,7 @@ BdsEntry (
   //
   // Declare the Firmware Vendor
   //
-  if (PcdGetPtr(PcdFirmwareVendor)) {
+  if (FixedPcdGetPtr(PcdFirmwareVendor) != NULL) {
     Size = 0x100;
     gST->FirmwareVendor = AllocateRuntimePool (Size);
     ASSERT (gST->FirmwareVendor != NULL);

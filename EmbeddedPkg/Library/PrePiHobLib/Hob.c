@@ -206,7 +206,7 @@ CreateHobList (
 
   BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY, Attributes, (UINTN)MemoryBegin, MemoryLength);
 
-  BuildStackHob ((UINTN)StackBase, ((UINT64)MemoryBegin + MemoryLength) - (UINTN)StackBase);
+  BuildStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN)StackBase, ((UINTN)MemoryBegin + MemoryLength) - (UINTN)StackBase);
 
   if (FeaturePcdGet (PcdPrePiProduceMemoryTypeInformationHob)) {
     // Optional feature that helps prevent EFI memory map fragmentation. 

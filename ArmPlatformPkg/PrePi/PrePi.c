@@ -135,6 +135,8 @@ CEntryPoint (
 {
   UINT64   StartTimeStamp;
 
+  StartTimeStamp = 0;
+
   if ((CoreId == 0) && PerformanceMeasurementEnabled ()) {
     // Initialize the Timer Library to setup the Timer HW controller
     TimerConstructor ();
