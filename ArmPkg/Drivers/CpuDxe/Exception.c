@@ -206,10 +206,13 @@ InitializeExceptions (
 
     //Note: On ARM processor with the Security Extension, the Vector Table can be located anywhere in the memory.
     //      The Vector Base Address Register defines the location
-    ArmWriteVBar(PcdGet32(PcdCpuVectorBaseAddress));
+    ArmWriteVBar (PcdGet32(PcdCpuVectorBaseAddress));
   } else {
+    // The Vector table must be 32-byte aligned
+    ASSERT(((UINT32)ExceptionHandlersStart & ((1 << 5)-1)) == 0);
+
     // We do not copy the Exception Table at PcdGet32(PcdCpuVectorBaseAddress). We just set Vector Base Address to point into CpuDxe code.
-    ArmWriteVBar((UINT32)ExceptionHandlersStart);
+    ArmWriteVBar ((UINT32)ExceptionHandlersStart);
   }
 
   if (FiqEnabled) {

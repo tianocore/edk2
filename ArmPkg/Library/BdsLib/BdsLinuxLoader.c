@@ -201,7 +201,7 @@ BdsBootLinux (
   EFI_STATUS            Status;
   UINT32                LinuxImageSize;
   UINT32                KernelParamsSize;
-  VOID*                 KernelParamsAddress = NULL;
+  EFI_PHYSICAL_ADDRESS  KernelParamsAddress;
   UINT32                MachineType;
   BOOLEAN               FdtSupported = FALSE;
   LINUX_KERNEL          LinuxKernel;
@@ -214,15 +214,19 @@ BdsBootLinux (
   LinuxImage = LINUX_KERNEL_MAX_OFFSET;
   Status = BdsLoadImage (LinuxKernelDevicePath, AllocateMaxAddress, &LinuxImage, &LinuxImageSize);
   if (EFI_ERROR(Status)) {
-    DEBUG ((EFI_D_ERROR, "ERROR: Do not find Linux kernel.\n"));
+    Print (L"ERROR: Did not find Linux kernel.\n");
     return Status;
   }
   LinuxKernel = (LINUX_KERNEL)(UINTN)LinuxImage;
 
-  // Load the FDT binary from a device path
-  KernelParamsAddress = (VOID*)LINUX_ATAG_MAX_OFFSET;
-  Status = BdsLoadImage (FdtDevicePath, AllocateMaxAddress, (EFI_PHYSICAL_ADDRESS*)&KernelParamsAddress, &KernelParamsSize);
-  if (!EFI_ERROR(Status)) {
+  if (FdtDevicePath) {
+    // Load the FDT binary from a device path
+    KernelParamsAddress = LINUX_ATAG_MAX_OFFSET;
+    Status = BdsLoadImage (FdtDevicePath, AllocateMaxAddress, &KernelParamsAddress, &KernelParamsSize);
+    if (EFI_ERROR(Status)) {
+      Print (L"ERROR: Did not find Device Tree blob.\n");
+      return Status;
+    }
     FdtSupported = TRUE;
   }
 
@@ -259,7 +263,7 @@ BdsBootLinux (
   // physical memory.
   if ((UINTN)KernelParamsAddress > LINUX_ATAG_MAX_OFFSET) {
     //Note: There is no requirement on the alignment
-    KernelParamsAddress = CopyMem (ALIGN32_BELOW(LINUX_ATAG_MAX_OFFSET - KernelParamsSize), KernelParamsAddress, KernelParamsSize);
+    KernelParamsAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)CopyMem (ALIGN32_BELOW(LINUX_ATAG_MAX_OFFSET - KernelParamsSize), (VOID*)(UINTN)KernelParamsAddress, KernelParamsSize);
   }
 
   if ((UINTN)LinuxImage > LINUX_KERNEL_MAX_OFFSET) {
