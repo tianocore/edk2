@@ -49,6 +49,8 @@
   OmapLib
   PeCoffGetEntryPointLib
   DebugAgentLib
+  MemoryAllocationLib
+  PrePiHobListPointerLib
 
 [FeaturePcd]  
   gEmbeddedTokenSpaceGuid.PcdCacheEnable

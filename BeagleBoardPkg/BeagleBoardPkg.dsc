@@ -31,7 +31,11 @@
 
 
 [LibraryClasses.common]
-!if $(BUILD_TARGETS) == RELEASE
+  BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
+  HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
+  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
+
+!if $(TARGET) == RELEASE
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
 !else
@@ -43,6 +47,7 @@
 
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
+  PrePiHobListPointerLib|EmbeddedPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
   
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
@@ -53,7 +58,7 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   
-  EblCmdLib|BeagleBoardPkg/Library/EblCmdLib/EblCmdLib.inf
+  EblCmdLib|ArmPlatformPkg/Library/EblCmdLib/EblCmdLib.inf
   
   EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
   
@@ -130,6 +135,7 @@
 #  PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   
   HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
+  MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
   PerformanceLib|MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
   
   # 1/123 faster than Stm or Vstm version
@@ -167,6 +173,7 @@
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   UefiDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
+  HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
@@ -232,6 +239,9 @@
 
   gEmbeddedTokenSpaceGuid.PcdCacheEnable|TRUE
   
+  # Use the Vector Table location in CpuDxe. We will not copy the Vector Table at PcdCpuVectorBaseAddress
+  gArmTokenSpaceGuid.PcdRelocateVectorTable|FALSE
+  
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport|FALSE
 
@@ -256,8 +266,11 @@
 # CLEAR_MEMORY_ENABLED       0x08
 # ASSERT_BREAKPOINT_ENABLED  0x10
 # ASSERT_DEADLOOP_ENABLED    0x20
-
+!if $(TARGET) == RELEASE
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x21
+!else
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2f
+!endif
 
 #  DEBUG_INIT      0x00000001  // Initialization
 #  DEBUG_WARN      0x00000002  // Warnings
@@ -284,9 +297,6 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedDefaultTextColor|0x07
   gEmbeddedTokenSpaceGuid.PcdEmbeddedMemVariableStoreSize|0x10000
   
-  gEmbeddedTokenSpaceGuid.PcdPrePiTempMemorySize|0
-  gEmbeddedTokenSpaceGuid.PcdPrePiBfvBaseAddress|0
-  gEmbeddedTokenSpaceGuid.PcdPrePiBfvSize|0
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|0
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize|0
 
@@ -333,6 +343,21 @@
   # ARM Pcds
   #
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
+
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from SD"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(B615F1F5-5088-43CD-809C-A16E52487D00)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/zImage"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|1
+  gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|10
+  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(B615F1F5-5088-43CD-809C-A16E52487D00)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/omap3-beagle.dtb"
+
+  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(6696936D-3637-467C-87CB-14EA8248948C)/Uart(115200,8,N,1)/VenPcAnsi()"
+  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(6696936D-3637-467C-87CB-14EA8248948C)/Uart(115200,8,N,1)/VenPcAnsi()"
+
+  #
+  # ARM OS Loader
+  #
+  # BeagleBoard machine type (OMAP3_BEAGLE = 1546) required for ARM Linux: 
+  gArmTokenSpaceGuid.PcdArmMachineType|1546 
 
 ################################################################################
 #
@@ -444,7 +469,9 @@
   #
   # Bds
   #
-  BeagleBoardPkg/Bds/Bds.inf  
+  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+  ArmPlatformPkg/Bds/Bds.inf 
 
   #
   # Example Application

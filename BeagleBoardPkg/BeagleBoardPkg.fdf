@@ -164,12 +164,13 @@ READ_LOCK_STATUS   = TRUE
   # UEFI application (Shell Embedded Boot Loader) 
   #  
   INF EmbeddedPkg/Ebl/Ebl.inf
-  
 
   #
   # Bds
   #
-  INF BeagleBoardPkg/Bds/Bds.inf
+  INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+  INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+  INF ArmPlatformPkg/Bds/Bds.inf
 
 
 
