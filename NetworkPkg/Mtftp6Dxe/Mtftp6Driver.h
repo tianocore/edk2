@@ -137,7 +137,7 @@ Mtftp6ServiceBindingCreateChild (
 
   @retval EFI_SUCCES            The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
-  @retval EFI_INVALID_PARAMETER Child handle is not a valid UEFI Handle.
+  @retval EFI_INVALID_PARAMETER Child handle is NULL.
   @retval Others                The child handle was not destroyed
 
 **/

@@ -1,7 +1,7 @@
 /** @file
   Driver Binding functions and Service Binding functions for the Network driver module.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -398,7 +398,7 @@ ON_ERROR:
                                  handle.
   @retval EFI_UNSUPPORTED        The child handle does not support the I/O services
                                  that are being removed.
-  @retval EFI_INVALID_PARAMETER  Child handle is not a valid EFI Handle.
+  @retval EFI_INVALID_PARAMETER  Child handle is NULL.
   @retval EFI_ACCESS_DENIED      The child handle could not be destroyed because
                                  its  I/O services are being used.
   @retval other                  The child handle was not destroyed.
