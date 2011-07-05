@@ -2877,6 +2877,7 @@ UiDisplayMenu (
       AdjustDateAndTimePosition (TRUE, &NewPos);
       if (NewPos->BackLink != &gMenuOption) {
         MenuOption = MENU_OPTION_FROM_LINK (NewPos);
+        ASSERT (MenuOption != NULL);
         NewLine    = TRUE;
         NewPos     = NewPos->BackLink;
 
@@ -2888,7 +2889,6 @@ UiDisplayMenu (
         }
         NextMenuOption = MENU_OPTION_FROM_LINK (NewPos);
        
-        ASSERT (MenuOption != NULL);
         if (Difference < 0) {
           //
           // We hit the begining MenuOption that can be focused

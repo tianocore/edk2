@@ -1168,7 +1168,7 @@ ProcessCallBackFunction (
       // "retrieve" should update to the question's temp buffer.
       //
       if (Action == EFI_BROWSER_ACTION_CHANGING || Action == EFI_BROWSER_ACTION_RETRIEVE) {
-        SetQuestionValue(Selection->FormSet,Selection->Form, Question,TRUE);
+        SetQuestionValue(Selection->FormSet, Selection->Form, Statement, TRUE);
       }
     } else if (Status == EFI_UNSUPPORTED) {
       //
