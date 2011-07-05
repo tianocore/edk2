@@ -299,7 +299,27 @@ GetNumericInput (
       break;
 
     case 1:
-      Maximum = 31;
+      switch (QuestionValue->Value.date.Month) {
+      case 2:
+        if ((QuestionValue->Value.date.Year % 4) == 0  && 
+            (QuestionValue->Value.date.Year % 100) != 0 && 
+            (QuestionValue->Value.date.Year % 400) == 0) {
+          Maximum = 29;
+        } else {
+          Maximum = 28;
+        }
+        break;
+      case 4:
+      case 6:
+      case 9:
+      case 11:
+        Maximum = 30;
+        break;
+      default:
+        Maximum = 31;
+        break;
+      } 
+
       EraseLen = 3;
       EditValue = QuestionValue->Value.date.Day;
       break;
@@ -492,15 +512,20 @@ TheKey2:
 
         if ((Step != 0) && !ManualInput) {
           if (Key.ScanCode == SCAN_LEFT) {
-            if (EditValue > Step) {
+            if (EditValue >= Minimum + Step) {
               EditValue = EditValue - Step;
-            } else {
+            } else if (EditValue > Minimum){
               EditValue = Minimum;
+            } else {
+              EditValue = Maximum;
             }
           } else if (Key.ScanCode == SCAN_RIGHT) {
-            EditValue = EditValue + Step;
-            if (EditValue > Maximum) {
+            if (EditValue + Step <= Maximum) {
+              EditValue = EditValue + Step;
+            } else if (EditValue < Maximum) {
               EditValue = Maximum;
+            } else {
+              EditValue = Minimum;
             }
           }
 
