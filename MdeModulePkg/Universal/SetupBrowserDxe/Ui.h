@@ -87,6 +87,7 @@ typedef struct {
   EFI_GUID        FormSetGuid;
   UINT16          FormId;
   UINT16          QuestionId;
+  UINTN           Sequence;  // used for time/date only.
 
   UINTN           TopRow;
   UINTN           BottomRow;
@@ -163,6 +164,7 @@ struct _UI_MENU_LIST {
   EFI_GUID        FormSetGuid;
   UINT16          FormId;
   UINT16          QuestionId;
+  UINTN           Sequence;    // used for time/date only.
 
   UI_MENU_LIST    *Parent;
   LIST_ENTRY      ChildListHead;
