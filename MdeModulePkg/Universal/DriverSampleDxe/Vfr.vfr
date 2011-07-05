@@ -566,7 +566,7 @@ formset
         flags  = INTERACTIVE,
         key    = 0x1242;
 
-      time    hour varid  = Time.Hours,         // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
+      time    hour varid  = Time.Hour,         // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
               prompt      = STRING_TOKEN(STR_TIME_PROMPT),
               help        = STRING_TOKEN(STR_TIME_HELP),
               minimum     = 0,
@@ -574,7 +574,7 @@ formset
               step        = 1,
               default     = 0,
 
-              minute varid  = Time.Minutes,       // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
+              minute varid  = Time.Minute,       // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
               prompt        = STRING_TOKEN(STR_TIME_PROMPT),
               help          = STRING_TOKEN(STR_TIME_HELP),
               minimum       = 0,
@@ -582,7 +582,7 @@ formset
               step          = 1,
               default       = 0,
 
-              second varid  = Time.Seconds,       // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
+              second varid  = Time.Second,       // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
               prompt        = STRING_TOKEN(STR_TIME_PROMPT),
               help          = STRING_TOKEN(STR_TIME_HELP),
               minimum       = 0,
