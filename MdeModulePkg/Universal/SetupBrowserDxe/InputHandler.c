@@ -302,8 +302,8 @@ GetNumericInput (
       switch (QuestionValue->Value.date.Month) {
       case 2:
         if ((QuestionValue->Value.date.Year % 4) == 0  && 
-            (QuestionValue->Value.date.Year % 100) != 0 && 
-            (QuestionValue->Value.date.Year % 400) == 0) {
+            ((QuestionValue->Value.date.Year % 100) != 0 || 
+            (QuestionValue->Value.date.Year % 400) == 0)) {
           Maximum = 29;
         } else {
           Maximum = 28;
