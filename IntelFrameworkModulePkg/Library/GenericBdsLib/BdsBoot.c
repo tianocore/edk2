@@ -1435,6 +1435,7 @@ BdsLibEnumerateAllBootOption (
 {
   EFI_STATUS                    Status;
   UINT16                        FloppyNumber;
+  UINT16                        HarddriveNumber;
   UINT16                        CdromNumber;
   UINT16                        UsbNumber;
   UINT16                        MiscNumber;
@@ -1467,13 +1468,14 @@ BdsLibEnumerateAllBootOption (
   EFI_IMAGE_OPTIONAL_HEADER_UNION       HdrData;
   EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr;
 
-  FloppyNumber  = 0;
-  CdromNumber   = 0;
-  UsbNumber     = 0;
-  MiscNumber    = 0;
-  ScsiNumber    = 0;
-  PlatLang      = NULL;
-  LastLang      = NULL;
+  FloppyNumber    = 0;
+  HarddriveNumber = 0;
+  CdromNumber     = 0;
+  UsbNumber       = 0;
+  MiscNumber      = 0;
+  ScsiNumber      = 0;
+  PlatLang        = NULL;
+  LastLang        = NULL;
   ZeroMem (Buffer, sizeof (Buffer));
 
   //
@@ -1562,18 +1564,27 @@ BdsLibEnumerateAllBootOption (
         break;
 
       //
-      // Assume a removable SATA device should be the DVD/CD device
+      // Assume a removable SATA device should be the DVD/CD device, a fixed SATA device should be the Hard Drive device.
       //
       case BDS_EFI_MESSAGE_ATAPI_BOOT:
       case BDS_EFI_MESSAGE_SATA_BOOT:
-        if (CdromNumber != 0) {
-          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_CD_DVD)), CdromNumber);
+        if (BlkIo->Media->RemovableMedia) {
+          if (CdromNumber != 0) {
+            UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_CD_DVD)), CdromNumber);
+          } else {
+            UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_CD_DVD)));
+          }
+          CdromNumber++;
         } else {
-          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_CD_DVD)));
+          if (HarddriveNumber != 0) {
+            UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_HARDDRIVE)), HarddriveNumber);
+          } else {
+            UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_HARDDRIVE)));
+          }
+          HarddriveNumber++;
         }
         DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Buffer: %S\n", Buffer));
         BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
-        CdromNumber++;
         break;
 
       case BDS_EFI_MESSAGE_USB_DEVICE_BOOT:
