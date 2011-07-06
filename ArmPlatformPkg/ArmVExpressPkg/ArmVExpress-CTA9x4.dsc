@@ -136,6 +136,7 @@
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLibSec.inf
   ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibCTA9x4/ArmVExpressSecLib.inf
+  DebugSecExtraActionLib|ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.inf
   
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   
@@ -284,10 +285,18 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
-!if $(EDK2_SKIP_PEICORE) == 1
-  gArmTokenSpaceGuid.PcdSkipPeiCore|TRUE
+!if $(EDK2_ARMVE_STANDALONE) == 1
+  gArmPlatformTokenSpaceGuid.PcdStandalone|TRUE
+!else
+  gArmPlatformTokenSpaceGuid.PcdStandalone|FALSE
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|TRUE
+  gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|TRUE
 !endif
 
+!if $(EDK2_SKIP_PEICORE) == 1
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|TRUE
+  gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|TRUE
+!endif
   
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
   #  It could be set FALSE to save size.
@@ -377,10 +386,6 @@
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|1
   gArmTokenSpaceGuid.PcdVFPEnabled|1
   
-!if $(EDK2_ARMVE_STANDALONE) == 1
-  gArmPlatformTokenSpaceGuid.PcdStandalone|1
-!endif
-
   # Stacks for MPCores in Secure World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0x49E00000	    # Top of SEC Stack for Secure World
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecStackSize|0x2000		      # Stack for each of the 4 CPU cores
@@ -493,7 +498,10 @@
       ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibCTA9x4/ArmVExpressLib.inf
   }
 !else
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf
+  ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf {
+    <LibraryClasses>
+      PL390GicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicNonSec.inf
+  }
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
     <LibraryClasses>

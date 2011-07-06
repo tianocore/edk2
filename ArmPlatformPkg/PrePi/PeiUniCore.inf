@@ -57,9 +57,9 @@
 [FeaturePcd]  
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
+  gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores
 
 [FixedPcd]
-  gArmPlatformTokenSpaceGuid.PcdStandalone
   gArmTokenSpaceGuid.PcdVFPEnabled
 
   gArmTokenSpaceGuid.PcdNormalFdBaseAddress

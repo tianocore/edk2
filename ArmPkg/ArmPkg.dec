@@ -57,7 +57,6 @@
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport|FALSE|BOOLEAN|0x00000032
   
   gArmTokenSpaceGuid.PcdEfiUncachedMemoryToStronglyOrdered|FALSE|BOOLEAN|0x00000025
-  gArmTokenSpaceGuid.PcdSkipPeiCore|FALSE|BOOLEAN|0x00000026
 
 [PcdsFixedAtBuild.common]
   # This PCD should be a FeaturePcd. But we used this PCD as an '#if' in an ASM file.

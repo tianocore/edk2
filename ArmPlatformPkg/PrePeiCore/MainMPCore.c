@@ -69,7 +69,7 @@ PrimaryMain (
   PL390GicEnableDistributor(PcdGet32(PcdGicDistributorBase));
 
   // If ArmVe has not been built as Standalone then we need to wake up the secondary cores
-  if (!PcdGet32(PcdStandalone)) {
+  if (FeaturePcdGet(PcdSendSgiToBringUpSecondaryCores)) {
     // Sending SGI to all the Secondary CPU interfaces
     PL390GicSendSgiTo (PcdGet32(PcdGicDistributorBase), GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
   }

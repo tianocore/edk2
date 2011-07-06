@@ -14,6 +14,7 @@
 **/
 
 #include <Library/DebugLib.h>
+#include <Library/DebugAgentLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
 #include <Library/BaseLib.h>
@@ -70,6 +71,7 @@ CEntryPoint (
 {
   CHAR8           Buffer[100];
   UINTN           CharCount;
+  UINTN           JumpAddress;
 
   // Primary CPU clears out the SCU tag RAMs, secondaries wait
   if (CoreId == ARM_PRIMARY_CORE) {
@@ -84,6 +86,10 @@ CEntryPoint (
     // Start talking
     CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"UEFI firmware built at %a on %a\n\r",__TIME__, __DATE__);
     SerialPortWrite ((UINT8 *) Buffer, CharCount);
+
+    // Initialize the Debug Agent for Source Level Debugging
+    InitializeDebugAgent (DEBUG_AGENT_INIT_PREMEM_SEC, NULL, NULL);
+    SaveAndSetDebugTimerInterrupt (TRUE);
 
     // Now we've got UART, make the check:
     // - The Vector table must be 32-byte aligned
@@ -119,7 +125,7 @@ CEntryPoint (
 
     // If we skip the PEI Core we could want to initialize the DRAM in the SEC phase.
     // If we are in standalone, we need the initialization to copy the UEFI firmware into DRAM
-    if (FeaturePcdGet(PcdSkipPeiCore) || !PcdGet32(PcdStandalone)) {
+    if (FeaturePcdGet(PcdSystemMemoryInitializeInSec)) {
       // Initialize system memory (DRAM)
       ArmPlatformInitializeSystemMemory ();
     }
@@ -155,7 +161,7 @@ CEntryPoint (
       //
 
       PL390GicEnableDistributor (PcdGet32(PcdGicDistributorBase));
-      PL390GicEnableInterruptInterface(PcdGet32(PcdGicInterruptInterfaceBase));
+      PL390GicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
 
       // Send SGI to all Secondary core to wake them up from WFI state.
       PL390GicSendSgiTo (PcdGet32(PcdGicDistributorBase), GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
@@ -170,11 +176,11 @@ CEntryPoint (
       ArmCallWFI();
 
       // Acknowledge the interrupt and send End of Interrupt signal.
-      PL390GicAcknowledgeSgiFrom(PcdGet32(PcdGicInterruptInterfaceBase), ARM_PRIMARY_CORE);
+      PL390GicAcknowledgeSgiFrom (PcdGet32(PcdGicInterruptInterfaceBase), ARM_PRIMARY_CORE);
     }
 
     // Transfer the interrupt to Non-secure World
-    PL390GicSetupNonSecure(PcdGet32(PcdGicDistributorBase),PcdGet32(PcdGicInterruptInterfaceBase));
+    PL390GicSetupNonSecure (PcdGet32(PcdGicDistributorBase),PcdGet32(PcdGicInterruptInterfaceBase));
 
     // Write to CP15 Non-secure Access Control Register :
     //   - Enable CP10 and CP11 accesses in NS World
@@ -195,79 +201,19 @@ CEntryPoint (
     if (CoreId == ARM_PRIMARY_CORE) {
       PL390GicEnableDistributor (PcdGet32(PcdGicDistributorBase));
     }
-    PL390GicEnableInterruptInterface(PcdGet32(PcdGicInterruptInterfaceBase));
+    PL390GicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
 
     // With Trustzone support the transition from Sec to Normal world is done by return_from_exception().
     // If we want to keep this function call we need to ensure the SVC's SPSR point to the same Program
     // Status Register as the the current one (CPSR).
-    copy_cpsr_into_spsr();
+    copy_cpsr_into_spsr ();
   }
 
-  // If ArmVe has not been built as Standalone then we need to patch the DRAM to add an infinite loop at the start address
-  if (!PcdGet32(PcdStandalone)) {
-    if (CoreId == ARM_PRIMARY_CORE) {
-      UINTN*   StartAddress = (UINTN*)PcdGet32(PcdNormalFvBaseAddress);
+  JumpAddress = PcdGet32 (PcdNormalFvBaseAddress);
+  ArmPlatformSecExtraAction (CoreId, &JumpAddress);
 
-      // Patch the DRAM to make an infinite loop at the start address
-      *StartAddress = 0xEAFFFFFE; // opcode for while(1)
-
-      CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Waiting for firmware at 0x%08X ...\n\r",StartAddress);
-      SerialPortWrite ((UINT8 *) Buffer, CharCount);
-
-      // To enter into Non Secure state, we need to make a return from exception
-      return_from_exception(PcdGet32(PcdNormalFvBaseAddress));
-    } else {
-      // When the primary core is stopped by the hardware debugger to copy the firmware
-      // into DRAM. The secondary cores are still running. As soon as the first bytes of
-      // the firmware are written into DRAM, the secondary cores will start to execute the
-      // code even if the firmware is not entirely written into the memory.
-      // That's why the secondary cores need to be parked in WFI and wake up once the
-      // firmware is ready.
-
-      // Enter Secondary Cores into non Secure State. To enter into Non Secure state, we need to make a return from exception
-      return_from_exception((UINTN)NonSecureWaitForFirmware);
-    }
-  } else if (FeaturePcdGet(PcdSkipPeiCore)) {
-    if (CoreId == ARM_PRIMARY_CORE) {
-      // Signal the secondary cores they can jump to PEI phase
-      PL390GicSendSgiTo (PcdGet32(PcdGicDistributorBase), GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
-
-      // To enter into Non Secure state, we need to make a return from exception
-      return_from_exception(PcdGet32(PcdNormalFvBaseAddress));
-    } else {
-      // We wait for the primary core to finish to initialize the System Memory. When we skip PEI Core, we could set the stack in DRAM
-      // Without this synchronization the secondary cores will complete the SEC before the primary core has finished to intitialize the DRAM.
-      return_from_exception((UINTN)NonSecureWaitForFirmware);
-    }
-  } else {
-    // To enter into Non Secure state, we need to make a return from exception
-    return_from_exception(PcdGet32(PcdNormalFvBaseAddress));
-  }
+  return_from_exception (JumpAddress);
   //-------------------- Non Secure Mode ---------------------
-
-  // PEI Core should always load and never return
-  ASSERT (FALSE);
-}
-
-// When the firmware is built as not Standalone, the secondary cores need to wait the firmware
-// entirely written into DRAM. It is the firmware from DRAM which will wake up the secondary cores.
-VOID
-NonSecureWaitForFirmware (
-  VOID
-  )
-{
-  VOID (*secondary_start)(VOID);
-
-  // The secondary cores will execute the firmware once wake from WFI.
-  secondary_start = (VOID (*)())PcdGet32(PcdNormalFvBaseAddress);
-
-  ArmCallWFI();
-
-  // Acknowledge the interrupt and send End of Interrupt signal.
-  PL390GicAcknowledgeSgiFrom(PcdGet32(PcdGicInterruptInterfaceBase),ARM_PRIMARY_CORE);
-
-  // Jump to secondary core entry point.
-  secondary_start();
 
   // PEI Core should always load and never return
   ASSERT (FALSE);

@@ -41,11 +41,15 @@
 [PcdsFeatureFlag.common]
   # Set this PCD to TRUE to map NORFlash at 0x0. FALSE means the DRAM is mapped at 0x0.
   gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping|FALSE|BOOLEAN|0x00000012
+  
+  gArmPlatformTokenSpaceGuid.PcdStandalone|TRUE|BOOLEAN|0x00000001
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|FALSE|BOOLEAN|0x00000002
+  gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|FALSE|BOOLEAN|0x00000004
+  
 
 [PcdsFixedAtBuild.common]
   # These PCDs should be FeaturePcds. But we used these PCDs as an '#if' in an ASM file.
   # Using a FeaturePcd make a '(BOOLEAN) casting for its value which is not understood by the preprocessor.
-  gArmPlatformTokenSpaceGuid.PcdStandalone|0|UINT32|0x00000001
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|0|UINT32|0x00000003
   
   # Stack for CPU Cores in Secure Mode

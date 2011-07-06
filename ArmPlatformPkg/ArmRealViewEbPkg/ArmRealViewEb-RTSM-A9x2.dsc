@@ -114,6 +114,8 @@
   
   # ARM PL011 UART Driver
   PL011UartLib|ArmPlatformPkg/Drivers/PL011Uart/PL011Uart.inf
+  # ARM PL390 General Interrupt Driver in Secure and Non-secure
+  PL390GicNonSecLib|ArmPkg/Drivers/PL390Gic/PL390GicNonSec.inf
 
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   
@@ -124,6 +126,8 @@
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLibSec.inf
   ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbSecLib.inf
+  DebugSecExtraActionLib|ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.inf
+  
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   
   # 1/123 faster than Stm or Vstm version
@@ -134,9 +138,8 @@
   
   # L2 Cache Driver
   L2X0CacheLib|ArmPlatformPkg/Library/L2X0CacheLibNull/L2X0CacheLibNull.inf
-  # ARM PL390 General Interrupt Driver in Secure and Non-secure
+  # ARM PL390 General Interrupt Driver in Secure
   PL390GicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicSec.inf
-  PL390GicNonSecLib|ArmPkg/Drivers/PL390Gic/PL390GicNonSec.inf
 
 !if $(EDK2_SKIP_PEICORE) == 1
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
@@ -263,7 +266,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
 !if $(EDK2_SKIP_PEICORE) == 1
-  gArmTokenSpaceGuid.PcdSkipPeiCore|TRUE
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|TRUE
+  gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|TRUE
 !endif
 
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
@@ -343,7 +347,6 @@
 #
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x00000000
   
-  gArmPlatformTokenSpaceGuid.PcdStandalone|1
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|1
   
   # Stacks for MPCores in Secure World
@@ -446,13 +449,16 @@
 # PEI Phase modules
 #
 !if $(EDK2_SKIP_PEICORE) == 1
-  ArmPlatformPkg/PrePi/PeiMPCore.inf{
+  ArmPlatformPkg/PrePi/PeiMPCore.inf {
     <LibraryClasses>
       ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLib.inf
       ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbLib.inf
   }
 !else
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf
+  ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf {
+    <LibraryClasses>
+      PL390GicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicNonSec.inf
+  }
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
     <LibraryClasses>

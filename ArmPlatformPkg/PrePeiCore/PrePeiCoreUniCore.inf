@@ -41,16 +41,17 @@
   ArmPlatformLib
   BaseLib
   DebugLib
+  DebugAgentLib
   IoLib
   PrintLib
-  SerialPortLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid
 
-[FixedPcd]
-  gArmPlatformTokenSpaceGuid.PcdStandalone
+[FeaturePcd]
+  gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores
 
+[FixedPcd]
   gArmTokenSpaceGuid.PcdNormalFvBaseAddress
   gArmTokenSpaceGuid.PcdNormalFvSize
 

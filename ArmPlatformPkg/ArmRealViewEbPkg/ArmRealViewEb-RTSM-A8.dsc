@@ -123,6 +123,8 @@
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
   ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbSecLib.inf
+  DebugSecExtraActionLib|ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.inf
+  
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   
   # 1/123 faster than Stm or Vstm version
@@ -261,7 +263,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
 !if $(EDK2_SKIP_PEICORE) == 1
-  gArmTokenSpaceGuid.PcdSkipPeiCore|TRUE
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|TRUE
+  gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|TRUE
 !endif
 
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
@@ -340,8 +343,6 @@
 # but not used).
 #
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x00000000
-  
-  gArmPlatformTokenSpaceGuid.PcdStandalone|1
   
   # Stack for CPU Cores in Secure Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0x4B000000     # Top of SEC Stack for Secure World
@@ -445,7 +446,10 @@
       ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbLib.inf
   }
 !else
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
+  ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf {
+    <LibraryClasses>
+      PL390GicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicNonSec.inf
+  }
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
     <LibraryClasses>

@@ -16,6 +16,7 @@
 #include <Library/IoLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugAgentLib.h>
 #include <Library/PrintLib.h>
 #include <Library/ArmLib.h>
 #include <Library/SerialPortLib.h>
@@ -62,7 +63,11 @@ CEntryPoint (
 
   //If not primary Jump to Secondary Main
   if(0 == CoreId) {
-    //Goto primary Main.
+    // Initialize the Debug Agent for Source Level Debugging
+    InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
+    SaveAndSetDebugTimerInterrupt (TRUE);
+
+    // Goto primary Main.
     PrimaryMain (PeiCoreEntryPoint);
   } else {
     SecondaryMain (CoreId);

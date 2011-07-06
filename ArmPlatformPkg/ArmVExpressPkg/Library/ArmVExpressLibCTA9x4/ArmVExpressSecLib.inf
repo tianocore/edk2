@@ -30,6 +30,7 @@
   ArmLib
   ArmTrustZoneLib
   ArmPlatformSysConfigLib
+  DebugSecExtraActionLib
   IoLib
   L2X0CacheLib
   PL301AxiLib
@@ -45,13 +46,9 @@
   CTA9x4Boot.asm     | RVCT
   CTA9x4Boot.S       | GCC
 
-[Protocols]
-
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
   gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
 
 [FixedPcd]
-  gArmPlatformTokenSpaceGuid.PcdStandalone
-
   gArmTokenSpaceGuid.PcdL2x0ControllerBase

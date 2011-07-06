@@ -95,6 +95,19 @@ ArmPlatformSecInitialize (
   );
 
 /**
+  Call before jumping to Normal World
+
+  This function allows the firmware platform to do extra actions before
+  jumping to the Normal World
+
+**/
+VOID
+ArmPlatformSecExtraAction (
+  IN  UINTN         CoreId,
+  OUT UINTN*        JumpAddress
+  );
+
+/**
   Initialize controllers that must setup in the normal world
 
   This function is called by the ArmPlatformPkg/PrePi or ArmPlatformPkg/PlatformPei

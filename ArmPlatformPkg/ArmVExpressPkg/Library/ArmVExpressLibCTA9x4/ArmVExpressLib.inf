@@ -42,15 +42,11 @@
   CTA9x4Helper.asm   | RVCT
   CTA9x4Helper.S     | GCC
 
-[Protocols]
-
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
   gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
 
 [FixedPcd]
-  gArmPlatformTokenSpaceGuid.PcdStandalone
-
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
 

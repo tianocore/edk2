@@ -40,16 +40,16 @@
   ArmPlatformLib
   BaseLib
   DebugLib
+  DebugAgentLib
   IoLib
   PL390GicSecLib
   PrintLib
   SerialPortLib
   
 [FeaturePcd]
-  gArmTokenSpaceGuid.PcdSkipPeiCore
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec
   
 [FixedPcd]
-  gArmPlatformTokenSpaceGuid.PcdStandalone
   gArmTokenSpaceGuid.PcdVFPEnabled
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport
   
