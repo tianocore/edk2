@@ -1266,4 +1266,61 @@ ShellFileExists(
   IN CONST CHAR16 *Name
   );
 
+/**
+  Function to read a single line from a SHELL_FILE_HANDLE. The \n is not included in the returned
+  buffer.  The returned buffer must be callee freed.
+
+  If the position upon start is 0, then the Ascii Boolean will be set.  This should be
+  maintained and not changed for all operations with the same file.
+
+  @param[in]      Handle        SHELL_FILE_HANDLE to read from.
+  @param[in,out]  Ascii         Boolean value for indicating whether the file is
+                                Ascii (TRUE) or UCS2 (FALSE).
+
+  @return                       The line of text from the file.
+
+  @sa ShellFileHandleReadLine
+**/
+CHAR16*
+EFIAPI
+ShellFileHandleReturnLine(
+  IN SHELL_FILE_HANDLE            Handle,
+  IN OUT BOOLEAN                *Ascii
+  );
+
+/**
+  Function to read a single line (up to but not including the \n) from a SHELL_FILE_HANDLE.
+
+  If the position upon start is 0, then the Ascii Boolean will be set.  This should be
+  maintained and not changed for all operations with the same file.
+
+  @param[in]      Handle        SHELL_FILE_HANDLE to read from.
+  @param[in,out]  Buffer        The pointer to buffer to read into.
+  @param[in,out]  Size          The pointer to number of bytes in Buffer.
+  @param[in]      Truncate      If the buffer is large enough, this has no effect.
+                                If the buffer is is too small and Truncate is TRUE,
+                                the line will be truncated.
+                                If the buffer is is too small and Truncate is FALSE,
+                                then no read will occur.
+
+  @param[in,out]  Ascii         Boolean value for indicating whether the file is
+                                Ascii (TRUE) or UCS2 (FALSE).
+
+  @retval EFI_SUCCESS           The operation was successful.  The line is stored in
+                                Buffer.
+  @retval EFI_INVALID_PARAMETER Handle was NULL.
+  @retval EFI_INVALID_PARAMETER Size was NULL.
+  @retval EFI_BUFFER_TOO_SMALL  Size was not large enough to store the line.
+                                Size was updated to the minimum space required.
+**/
+EFI_STATUS
+EFIAPI
+ShellFileHandleReadLine(
+  IN SHELL_FILE_HANDLE          Handle,
+  IN OUT CHAR16                 *Buffer,
+  IN OUT UINTN                  *Size,
+  IN BOOLEAN                    Truncate,
+  IN OUT BOOLEAN                *Ascii
+  );
+
 #endif // __SHELL_LIB__
