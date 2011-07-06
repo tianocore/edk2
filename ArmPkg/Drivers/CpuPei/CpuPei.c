@@ -47,7 +47,7 @@ Abstract:
 #define DDR_ATTRIBUTES_UNCACHED              ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED
 
 EFI_STATUS
-FindMainMemory(
+FindMainMemory (
   OUT UINT32    *PhysicalBase,
   OUT UINT32    *Length
   )
@@ -71,7 +71,9 @@ FindMainMemory(
 }
 
 VOID
-ConfigureMmu ( VOID )
+ConfigureMmu (
+  VOID
+  )
 {
   EFI_STATUS                 Status;
   UINTN                         Idx;

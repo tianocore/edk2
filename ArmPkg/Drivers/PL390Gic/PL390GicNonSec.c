@@ -12,6 +12,7 @@
 *
 **/
 
+#include <Uefi.h>
 #include <Library/IoLib.h>
 #include <Drivers/PL390Gic.h>
 
@@ -23,10 +24,10 @@ PL390GicEnableInterruptInterface (
   )
 {  
   /*
-   * Enable the CPU interface in Non-Secure world
-   * Note: The ICCICR register is banked when Security extensions are implemented   
-   */
-    MmioWrite32(GicInterruptInterfaceBase + GIC_ICCICR,0x00000001);
+  * Enable the CPU interface in Non-Secure world
+  * Note: The ICCICR register is banked when Security extensions are implemented
+  */
+  MmioWrite32 (GicInterruptInterfaceBase + GIC_ICCICR,0x00000001);
 }
 
 VOID
@@ -35,11 +36,11 @@ PL390GicEnableDistributor (
   IN  INTN          GicDistributorBase
   )
 {
-    /*
-     * Enable GIC distributor in Non-Secure world.
-     * Note: The ICDDCR register is banked when Security extensions are implemented
-     */
-    MmioWrite32(GicDistributorBase + GIC_ICDDCR, 0x00000001);
+  /*
+   * Enable GIC distributor in Non-Secure world.
+   * Note: The ICDDCR register is banked when Security extensions are implemented
+   */
+  MmioWrite32 (GicDistributorBase + GIC_ICDDCR, 0x00000001);
 }
 
 VOID
@@ -50,7 +51,7 @@ PL390GicSendSgiTo (
   IN  INTN          CPUTargetList
   )
 {
-  MmioWrite32(GicDistributorBase + GIC_ICDSGIR, ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16));
+  MmioWrite32 (GicDistributorBase + GIC_ICDSGIR, ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16));
 }
 
 UINT32
@@ -60,18 +61,18 @@ PL390GicAcknowledgeSgiFrom (
   IN  INTN          CoreId
   )
 {
-    INTN            InterruptId;
+  INTN            InterruptId;
 
-    InterruptId = MmioRead32(GicInterruptInterfaceBase + GIC_ICCIAR);
+  InterruptId = MmioRead32 (GicInterruptInterfaceBase + GIC_ICCIAR);
 
-    //Check if the Interrupt ID is valid, The read from Interrupt Ack register returns CPU ID and Interrupt ID
+  // Check if the Interrupt ID is valid, The read from Interrupt Ack register returns CPU ID and Interrupt ID
   if (((CoreId & 0x7) << 10) == (InterruptId & 0x1C00)) {
-      //Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
-    MmioWrite32(GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
-        return 1;
-    } else {
-        return 0;
-    }
+    // Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
+    MmioWrite32 (GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 UINT32
@@ -82,16 +83,16 @@ PL390GicAcknowledgeSgi2From (
   IN  INTN          SgiId
   )
 {
-    INTN            InterruptId;
+  INTN            InterruptId;
 
-    InterruptId = MmioRead32(GicInterruptInterfaceBase + GIC_ICCIAR);
+  InterruptId = MmioRead32(GicInterruptInterfaceBase + GIC_ICCIAR);
 
-    //Check if the Interrupt ID is valid, The read from Interrupt Ack register returns CPU ID and Interrupt ID
+  // Check if the Interrupt ID is valid, The read from Interrupt Ack register returns CPU ID and Interrupt ID
   if((((CoreId & 0x7) << 10) | (SgiId & 0x3FF)) == (InterruptId & 0x1FFF)) {
-      //Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
-    MmioWrite32(GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
-        return 1;
-    } else {
-        return 0;
-    }
+    // Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
+    MmioWrite32 (GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
+    return 1;
+  } else {
+    return 0;
+  }
 }

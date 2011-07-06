@@ -42,6 +42,7 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  IoLib
   MemoryAllocationLib
 
 [Protocols]

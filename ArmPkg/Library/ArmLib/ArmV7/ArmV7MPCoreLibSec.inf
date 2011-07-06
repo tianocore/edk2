@@ -36,6 +36,9 @@
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
 
+[LibraryClasses]
+  IoLib
+
 [Protocols]
   gEfiCpuArchProtocolGuid
 
