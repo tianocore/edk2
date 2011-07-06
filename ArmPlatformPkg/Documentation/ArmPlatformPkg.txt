@@ -1,41 +1,70 @@
-Porting UEFI to a ARM platform
-------------------------------
+Porting UEFI to a ARM platform :
+--------------------------------
 1. Create the new platform directory under ArmPlatformPkg
 
 2. Create its DSC and FDF files into this new directory. These files can be copied from ArmVExpress-CTA9x4.dsc and ArmVExpress-CTA9x4.fdf; and adapted following the requirement of your platform. 
 
 3. Set up the PCDs required by ArmPlatformPkg in your FDF or DSC files 
 
-PCD	Description
-gArmTokenSpaceGuid.PcdSecureFdBaseAddress : Base address of your Secure Firmware 
-gArmTokenSpaceGuid.PcdSecureFdSize        : Size in byte of your Secure Firmware gEmbeddedTokenSpaceGuid.
-gArmTokenSpaceGuid.PcdNormalFdBaseAddress : Base Address of your Non-Secure Firmware gEmbeddedTokenSpaceGuid.
-gArmTokenSpaceGuid.PcdNormalFdSize        : Size in bytes of your Non-Secure Firmware 
-gArmTokenSpaceGuid.PcdL2x0ControllerBase  : Base Address of your L2x0 controller 
-gArmTokenSpaceGuid.PcdGicDistributorBase  : Base address of the Distributor of your General Interrupt Controller gArmTokenSpaceGuid.
-PcdGicInterruptInterfaceBase              : Base address of the Interface of your General Interrupt Controller gArmVExpressTokenSpaceGuid.
-PcdCPUCoresSecStackBase                   : Top of Secure Stack for Secure World gArmVExpressTokenSpaceGuid.
-PcdCPUCoreSecStackSize                    : Size of the stack for each of the 4 CPU cores gArmVExpressTokenSpaceGuid.
-PcdCPUCoresSecMonStackBase                : Top of Stack for Monitor World gArmVExpressTokenSpaceGuid.
-PcdCPUCoreSecMonStackSize                 : Size of the stack for each of the 4 CPU cores gArmVExpressTokenSpaceGuid.
-PcdCPUCoresNonSecStackBase                : Top of SEC Stack for Normal World gArmVExpressTokenSpaceGuid.
-PcdCPUCoresNonSecStackSize                : Size of the stack for each of the 4 CPU Cores gArmVExpressTokenSpaceGuid.
-PcdPeiServicePtrAddr                      : Cached value of PeiServicesTable 
-
 4. Implement 'ArmPlatformLib' for your platform following the interface defined by ArmPlatformPkg\Include\Library\ArmPlatformLib.h.
 
-Functions to implement:
 
-VOID ArmPlatformIsMemoryInitialized(VOID);
-VOID ArmPlatformInitializeBootMemory(VOID);
-VOID ArmPlatformInitializeSystemMemory(VOID);
-VOID ArmPlatformBootRemapping(VOID);
-UINTN ArmPlatformTrustzoneSupported(VOID);
-VOID ArmPlatformTrustzoneInit(VOID);
-VOID ArmPlatformGetPeiMemory (
-    OUT UINTN*                                   PeiMemoryBase,
-    OUT UINTN*                                   PeiMemorySize);
-VOID ArmPlatformGetVirtualMemoryMap (
-    OUT ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemoryMap);
-VOID ArmPlatformGetEfiMemoryMap (
-    OUT ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR** EfiMemoryMap)
+PCDs	Description :
+-------------------
+
+# Firmware Device / Volume
+gArmTokenSpaceGuid.PcdSecureFdBaseAddress       : Base address of your Secure Firmware Device 
+gArmTokenSpaceGuid.PcdSecureFdSize              : Size in byte of your Secure Firmware Device.
+gArmTokenSpaceGuid.PcdNormalFdBaseAddress       : Base Address of your Non-Secure/Normal World Firmware Device.
+gArmTokenSpaceGuid.PcdNormalFdSize              : Size in bytes of your Non-Secure/Normal World Firmware Device 
+
+# Stacks
+gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase                   : Top of Secure Stack for Secure World
+gArmPlatformTokenSpaceGuid.PcdCPUCoreSecStackSize                    : Size of the stack for each of the 4 CPU cores
+gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase                : Top of Stack for Monitor World
+gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize                 : Size of the stack for each of the 4 CPU cores
+gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase                : Top of SEC Stack for Normal World
+gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize                : Size of the stack for each of the 4 CPU Cores
+
+# CPU / Architectural controllers
+gArmTokenSpaceGuid.PcdGicDistributorBase        : Base address of the Distributor of your General Interrupt Controller
+gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase : Base address of the Interface of your General Interrupt Controller
+gArmPlatformTokenSpaceGuid.PcdMPCoreSupport     : Set to 1 when MP Core platforms
+gArmPlatformTokenSpaceGuid.PcdMPCoreMaxCores    : Maximum number of CPU cores on the platform (used for instance to know how many stacks we need to configure)
+
+# Memory Regions
+gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize  : Size of the region reserve for PI & UEFI
+gArmTokenSpaceGuid.PcdSystemMemoryBase                    : Base Address of the System Memory (DRAM)
+gArmTokenSpaceGuid.PcdSystemMemorySize                    : Size of the System Memory (DRAM)
+
+# Features
+gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec : TRUE if System Memory initialized by the SEC phase
+gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores : TRUE if the PrePi or PrePeiCore modules have to send an SGI to resume the excution of the secondary cores 
+
+# Boot Manager
+gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription      : Description of the Default Boot Entry
+gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath       : DevicePath of the Default Boot Entry
+gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument         : Argument for the Default Boot Entry
+gArmPlatformTokenSpaceGuid.PcdDefaultBootType             : Define the binary type of the Default Boot Entry (0=EFI application, 1=Linux kernel with ATAG support, 2=Linux Kernel with FDT support)  
+gArmPlatformTokenSpaceGuid.PcdFdtDevicePath               : DevicePath of the Platform Device Tree
+gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut         : Timeout before booting on the Device Boot entry (by default the auto boot is skipped)
+gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths           : List of Device Path use for the Console Input
+gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths          : List of Device Path use for the Console Output
+
+
+FAQ :
+-----
+# When to use PrePi or PrePeiCore ?
+- PrePi: when the memory has already been initialized by the first stage boot loader
+    Boot sequence: PlatformFirmware/PrePi/Dxe/Bds
+    Example: Beagle Board
+
+- PrePeiCore: when the firmware is started from XIP memory and in Secure world. The PeiCore shadows the firmware itself in System Memory (DRAM)
+    Boot sequence: Sec/PrePiCore/PeiCore/Dxe/Bds
+    Example: ARM Versatile Express
+
+# What is the PcdStandalone
+gArmPlatformTokenSpaceGuid.PcdStandalone=FALSE is used on ARM Development Platforms during the development stage.
+To avoid to reflash the NOR Flash after each build, the SEC (in NOR Flash) intializes thd DRAM and wait until the Normal World firmware is copied into the DRAM.
+Copying the firmware in DRAM is much faster than reflashing the NOR Flash. It is also more convenient to debug the firmware form DRAM than NOR Flash (eg: use of software breakpoint)
+ 
