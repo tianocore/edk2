@@ -46,11 +46,11 @@ ASM_PFX(InitializeExternalVectorTablePtr):
 ASM_GLOBAL ASM_PFX(SetCodeSelector)
 ASM_PFX(SetCodeSelector):
     subq    $0x10, %rsp 
-    leaq    setCodeSelectorLongJump(%rip), %rax 
+    leaq    L_setCodeSelectorLongJump(%rip), %rax 
     movq    %rax, (%rsp) 
     movw    %cx, 4(%rsp)
     .byte   0xFF, 0x2C, 0x24     # jmp (%rsp) note:fword jmp
-setCodeSelectorLongJump:
+L_setCodeSelectorLongJump:
     addq    $0x10, %rsp
     ret
 
@@ -158,13 +158,13 @@ CommonInterruptEntry_al_0000:
     pushq   %rax                      # for ss
     movzwq  32(%rbp), %rax
     pushq   %rax                      # for cs
-    movq    %ds, %rax
+    movl    %ds, %eax
     pushq   %rax
-    movq    %es, %rax
+    movl    %es, erax
     pushq   %rax
-    movq    %fs, %rax
+    movl    %fs, %eax
     pushq   %rax
-    movq    %gs, %rax
+    movl    %gs, %eax
     pushq   %rax
 
     movq    %rcx, 8(%rbp)                # save vector number
@@ -307,9 +307,9 @@ nonNullValue:
     # mov   %rax, %fs ; not for fs
     # (X64 will not use fs and gs, so we do not restore it)
     popq    %rax
-    movq    %rax, %es
+    movl    %eax, %es
     popq    %rax
-    movq    %rax, %ds
+    movl    %eax, %ds
     popq    32(%rbp)  # for cs
     popq    56(%rbp)  # for ss
 
