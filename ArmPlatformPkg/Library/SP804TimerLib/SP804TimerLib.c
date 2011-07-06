@@ -185,12 +185,12 @@ GetPerformanceCounterProperties (
 {
   if (StartValue != NULL) {
     // Timer starts with the reload value
-    *StartValue = (UINT64)0ULL;
+    *StartValue = 0xFFFFFFFF;
   }
   
   if (EndValue != NULL) {
-    // Timer counts up to 0xFFFFFFFF
-    *EndValue = 0xFFFFFFFF;
+    // Timer counts down to 0x0
+    *EndValue = (UINT64)0ULL;
   }
   
   return PcdGet64 (PcdEmbeddedPerformanceCounterFrequencyInHz);
