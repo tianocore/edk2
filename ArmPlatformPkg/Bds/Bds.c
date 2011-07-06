@@ -269,6 +269,7 @@ StartDefaultBootOnTimeout (
   UINTN               Index;
   CHAR16              BootVariableName[9];
   EFI_STATUS           Status;
+  EFI_INPUT_KEY   Key;
 
   Size = sizeof(UINT16);
   Timeout = (UINT16)PcdGet16 (PcdPlatformBootTimeOut);
@@ -293,6 +294,10 @@ StartDefaultBootOnTimeout (
           Timeout--;
         }
       }
+      // Discard key in the buffer
+      do {
+      	Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+      } while(!EFI_ERROR(Status));
       gBS->CloseEvent (WaitList[0]);
       Print(L"\n\r");
     }
