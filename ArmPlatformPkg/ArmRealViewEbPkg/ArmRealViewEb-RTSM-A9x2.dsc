@@ -348,6 +348,7 @@
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x00000000
   
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|1
+  gArmPlatformTokenSpaceGuid.PcdMPCoreMaxCores|2
   
   # Stacks for MPCores in Secure World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0x4B000000     # Top of SEC Stack for Secure World

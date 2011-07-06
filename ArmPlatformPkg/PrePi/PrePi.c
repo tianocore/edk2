@@ -49,14 +49,16 @@ LzmaDecompressLibConstructor (
 VOID
 PrePiMain (
   IN  UINTN                     UefiMemoryBase,
-  IN  UINTN                     StackBase,
   IN  UINT64                    StartTimeStamp
   )
 {
-  EFI_HOB_HANDOFF_INFO_TABLE**   PrePiHobBase;
+  EFI_HOB_HANDOFF_INFO_TABLE**  PrePiHobBase;
   EFI_STATUS                    Status;
   CHAR8                         Buffer[100];
   UINTN                         CharCount;
+  UINTN                         UefiMemoryTop;
+  UINTN                         StacksSize;
+  UINTN                         StacksBase;
 
   // Enable program flow prediction, if supported.
   ArmEnableBranchPrediction ();
@@ -76,19 +78,24 @@ PrePiMain (
 
   PrePiHobBase = (EFI_HOB_HANDOFF_INFO_TABLE**)(PcdGet32 (PcdCPUCoresNonSecStackBase) + (PcdGet32 (PcdCPUCoresNonSecStackSize) / 2) - PcdGet32 (PcdHobListPtrGlobalOffset));
 
-  // We leave UINT32 at the top of UEFI memory for PcdPrePiHobBase
+  UefiMemoryTop = UefiMemoryBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
+  StacksSize = PcdGet32 (PcdCPUCoresNonSecStackSize) * PcdGet32 (PcdMPCoreMaxCores);
+  StacksBase = UefiMemoryTop - StacksSize;
+
+  // Declare the PI/UEFI memory region
   *PrePiHobBase = HobConstructor (
     (VOID*)UefiMemoryBase,
     FixedPcdGet32 (PcdSystemMemoryUefiRegionSize),
     (VOID*)UefiMemoryBase,
-    (VOID*)(UefiMemoryBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize) - sizeof(UINT32)));
+    (VOID*)StacksBase  // The top of the UEFI Memory is reserved for the stacks
+    );
 
   // Initialize MMU and Memory HOBs (Resource Descriptor HOBs)
   Status = MemoryPeim (UefiMemoryBase, FixedPcdGet32 (PcdSystemMemoryUefiRegionSize));
   ASSERT_EFI_ERROR (Status);
 
-  // Create the Stack HOB
-  BuildStackHob (StackBase, FixedPcdGet32(PcdCPUCoresNonSecStackSize));
+  // Create the Stacks HOB (reserve the memory for all stacks)
+  BuildStackHob (StacksBase, StacksSize);
 
   // Set the Boot Mode
   SetBootMode (ArmPlatformGetBootMode ());
@@ -99,8 +106,8 @@ PrePiMain (
 
   BuildMemoryTypeInformationHob ();
 
-  //InitializeDebugAgent (DEBUG_AGENT_INIT_PREMEM_SEC, NULL, NULL);
-  //SaveAndSetDebugTimerInterrupt (TRUE);
+  InitializeDebugAgent (DEBUG_AGENT_INIT_PREMEM_SEC, NULL, NULL);
+  SaveAndSetDebugTimerInterrupt (TRUE);
 
   // Now, the HOB List has been initialized, we can register performance information
   PERF_START (NULL, "PEI", NULL, StartTimeStamp);
@@ -129,41 +136,38 @@ PrePiMain (
 VOID
 CEntryPoint (
   IN  UINTN                     CoreId,
-  IN  UINTN                     UefiMemoryBase,
-  IN  UINTN                     StackBase
+  IN  UINTN                     UefiMemoryBase
   )
 {
   UINT64   StartTimeStamp;
 
-  StartTimeStamp = 0;
-
-  if ((CoreId == 0) && PerformanceMeasurementEnabled ()) {
+  if ((CoreId == ARM_PRIMARY_CORE) && PerformanceMeasurementEnabled ()) {
     // Initialize the Timer Library to setup the Timer HW controller
     TimerConstructor ();
     // We cannot call yet the PerformanceLib because the HOB List has not been initialized
     StartTimeStamp = GetPerformanceCounter ();
   }
 
-  //Clean Data cache
-  ArmCleanInvalidateDataCache();
+  // Clean Data cache
+  ArmCleanInvalidateDataCache ();
 
-  //Invalidate instruction cache
-  ArmInvalidateInstructionCache();
+  // Invalidate instruction cache
+  ArmInvalidateInstructionCache ();
 
   //TODO:Drain Write Buffer
 
   // Enable Instruction & Data caches
-  ArmEnableDataCache();
-  ArmEnableInstructionCache();
+  ArmEnableDataCache ();
+  ArmEnableInstructionCache ();
 
   // Write VBAR - The Vector table must be 32-byte aligned
-  ASSERT(((UINT32)PrePiVectorTable & ((1 << 5)-1)) == 0);
-  ArmWriteVBar((UINT32)PrePiVectorTable);
+  ASSERT (((UINT32)PrePiVectorTable & ((1 << 5)-1)) == 0);
+  ArmWriteVBar ((UINT32)PrePiVectorTable);
 
-  //If not primary Jump to Secondary Main
-  if(0 == CoreId) {
+  // If not primary Jump to Secondary Main
+  if (CoreId == ARM_PRIMARY_CORE) {
     // Goto primary Main.
-    PrimaryMain (UefiMemoryBase, StackBase, StartTimeStamp);
+    PrimaryMain (UefiMemoryBase, StartTimeStamp);
   } else {
     SecondaryMain (CoreId);
   }

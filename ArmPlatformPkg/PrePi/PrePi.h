@@ -27,6 +27,7 @@
 
 #include <Chipset/ArmV7.h>
 
+#define ARM_PRIMARY_CORE  0
 #define SerialPrint(txt)  SerialPortWrite (txt, AsciiStrLen(txt)+1);
 
 // Vector Table for PrePi Phase
@@ -44,15 +45,14 @@ TimerConstructor (
 VOID
 PrePiMain (
   IN  UINTN                     UefiMemoryBase,
-  IN  UINTN                     StackBase,
   IN  UINT64                    StartTimeStamp
   );
 
 EFI_STATUS
 EFIAPI
 MemoryPeim (
-  IN EFI_PHYSICAL_ADDRESS               UefiMemoryBase,
-  IN UINT64                             UefiMemorySize
+  IN EFI_PHYSICAL_ADDRESS       UefiMemoryBase,
+  IN UINT64                     UefiMemorySize
   );
 
 EFI_STATUS
@@ -64,7 +64,6 @@ PlatformPeim (
 VOID
 PrimaryMain (
   IN  UINTN                     UefiMemoryBase,
-  IN  UINTN                     StackBase,
   IN  UINT64                    StartTimeStamp
   );
 

@@ -21,20 +21,19 @@
 VOID
 PrimaryMain (
   IN  UINTN                     UefiMemoryBase,
-  IN  UINTN                     StackBase,
   IN  UINT64                    StartTimeStamp
   )
 {
   //Enable the GIC Distributor
   PL390GicEnableDistributor(PcdGet32(PcdGicDistributorBase));
 
-  // If ArmVe has not been built as Standalone then we need to wake up the secondary cores
-  if (!FixedPcdGet32(PcdStandalone)) {
+  // In some cases, the secondary cores are waiting for an SGI from the next stage boot loader toresume their initialization
+  if (!FixedPcdGet32(PcdSendSgiToBringUpSecondaryCores)) {
     // Sending SGI to all the Secondary CPU interfaces
     PL390GicSendSgiTo (PcdGet32(PcdGicDistributorBase), GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
   }
 
-  PrePiMain (UefiMemoryBase, StackBase, StartTimeStamp);
+  PrePiMain (UefiMemoryBase, StartTimeStamp);
 
   // We must never return
   ASSERT(FALSE);

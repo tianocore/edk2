@@ -17,11 +17,10 @@
 VOID
 PrimaryMain (
   IN  UINTN                     UefiMemoryBase,
-  IN  UINTN                     StackBase,
   IN  UINT64                    StartTimeStamp
   )
 {
-  PrePiMain (UefiMemoryBase, StackBase, StartTimeStamp);
+  PrePiMain (UefiMemoryBase, StartTimeStamp);
 
   // We must never return
   ASSERT(FALSE);

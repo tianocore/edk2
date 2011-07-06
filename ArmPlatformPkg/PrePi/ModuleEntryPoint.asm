@@ -31,28 +31,51 @@ _ModuleEntryPoint
   mrc   p15, 0, r0, c0, c0, 5
   and   r0, #0xf
 
-_UefiMemoryBase
-#if FixedPcdGet32(PcdStandalone)
+_SetSVCMode
+  // Enter SVC mode
+  mov     r1, #0x13|0x80|0x40
+  msr     CPSR_c, r1
+
+// Check if we can install the size at the top of the System Memory or if we need
+// to install the stacks at the bottom of the Firmware Device (case the FD is located
+// at the top of the DRAM)
+_SetupStackPosition
   // Compute Top of System Memory
   LoadConstantToReg (FixedPcdGet32(PcdSystemMemoryBase), r1)
   LoadConstantToReg (FixedPcdGet32(PcdSystemMemorySize), r2)
   add   r1, r1, r2      // r1 = SystemMemoryTop = PcdSystemMemoryBase + PcdSystemMemorySize
-#else
-  // If it is not a Standalone, we must compute the top of the UEFI memory with the base of the FD
-  LoadConstantToReg (FixedPcdGet32(PcdNormalFdBaseAddress), r1)
-#endif
 
-  // Compute Base of UEFI Memory
-  LoadConstantToReg (FixedPcdGet32(PcdSystemMemoryUefiRegionSize), r2)
-  sub   r1, r1, r2      // r1 = SystemMemoryTop - PcdSystemMemoryUefiRegionSize = UefiMemoryBase
+  // Calculate Top of the Firmware Device
+  LoadConstantToReg (FixedPcdGet32(PcdNormalFdBaseAddress), r2)
+  LoadConstantToReg (FixedPcdGet32(PcdNormalFdSize), r3)
+  add   r3, r3, r2      // r4 = FdTop = PcdNormalFdBaseAddress + PcdNormalFdSize
+
+  // UEFI Memory Size (stacks are allocated in this region)
+  LoadConstantToReg (FixedPcdGet32(PcdSystemMemoryUefiRegionSize), r4)
+
+  //
+  // Reserve the memory for the UEFI region (contain stacks on its top)
+  //
+
+  // Calculate how much space there is between the top of the Firmware and the Top of the System Memory
+  subs	r5, r1, r3		// r5 = SystemMemoryTop - FdTop
+  bmi	_SetupStack		// Jump if negative (FdTop > SystemMemoryTop)
+  cmp	r5, r4
+  bge	_SetupStack
+
+  // Case the top of stacks is the FdBaseAddress
+  mov	r1, r2
 
 _SetupStack
   // Compute Base of Normal stacks for CPU Cores
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresNonSecStackSize), r2)
-  mul   r3, r0, r2      // r3 = core_id * stack_size = offset from the stack base
-  sub   sp, r1, r3      // r3 = UefiMemoryBase - StackOffset = TopOfStack
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresNonSecStackSize), r5)
+  mul   r3, r0, r5      // r3 = core_id * stack_size = offset from the stack base
+  sub   sp, r1, r3      // r3 = (SystemMemoryTop|FdBaseAddress) - StackOffset = TopOfStack
 
-  // Only allocate memory in top of the primary core stack
+  // Calculate the Base of the UEFI Memory
+  sub	r1, r1, r4
+
+  // Only allocate memory for global variables at top of the primary core stack
   cmp   r0, #0
   bne   _PrepareArguments
 
@@ -66,17 +89,13 @@ _AllocateGlobalPrePiVariables
   sub   sp, sp, r4
 
 _PrepareArguments
-  // Pass the StackBase to the C Entrypoint (UefiMemoryBase - StackSize - StackOffset)
-  sub   r2, r1, r2
-  sub   r2, r3
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
-  ldr   r3, StartupAddr
+  ldr   r2, StartupAddr
 
-  // jump to PrePiCore C code
+  // Jump to PrePiCore C code
   //    r0 = core_id
   //    r1 = UefiMemoryBase
-  //    r2 = StackBase
-  blx   r3
+  blx   r2
 
   END

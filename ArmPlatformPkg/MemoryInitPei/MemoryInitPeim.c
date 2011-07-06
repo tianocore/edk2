@@ -95,7 +95,10 @@ InitializeMemory (
   )
 {
   EFI_STATUS                            Status;
+  UINTN                                 SystemMemoryBase;
   UINTN                                 SystemMemoryTop;
+  UINTN                                 FdBase;
+  UINTN                                 FdTop;
   UINTN                                 UefiMemoryBase;
 
   DEBUG ((EFI_D_ERROR, "Memory Init PEIM Loaded\n"));
@@ -103,27 +106,44 @@ InitializeMemory (
   // Ensure PcdSystemMemorySize has been set
   ASSERT (FixedPcdGet32 (PcdSystemMemorySize) != 0);
 
-  SystemMemoryTop = (UINTN)FixedPcdGet32 (PcdSystemMemoryBase) + (UINTN)FixedPcdGet32 (PcdSystemMemorySize);
+  SystemMemoryBase = (UINTN)FixedPcdGet32 (PcdSystemMemoryBase);
+  SystemMemoryTop = SystemMemoryBase + (UINTN)FixedPcdGet32 (PcdSystemMemorySize);
+  FdBase = (UINTN)PcdGet32 (PcdNormalFdBaseAddress);
+  FdTop = FdBase + (UINTN)PcdGet32 (PcdNormalFdSize);
 
   //
   // Initialize the System Memory (DRAM)
   //
-  if (PcdGet32 (PcdStandalone)) {
-    // In case of a standalone version, the DRAM is already initialized
-    ArmPlatformInitializeSystemMemory();
+  if (!FeaturePcdGet (PcdSystemMemoryInitializeInSec)) {
+    // In case the DRAM has not been initialized by the secure firmware
+    ArmPlatformInitializeSystemMemory ();
   }
 
   //
   // Declare the UEFI memory to PEI
   //
-  if (PcdGet32 (PcdStandalone)) {
-    // In case of standalone UEFI, we set the UEFI memory region at the top of the DRAM
-    UefiMemoryBase = SystemMemoryTop - FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
+
+  // In case the firmware has been shadowed in the System Memory
+  if ((FdBase >= SystemMemoryBase) && (FdTop <= SystemMemoryTop)) {
+    // Check if there is enough space between the top of the system memory and the top of the
+    // firmware to place the UEFI memory (for PEI & DXE phases)
+    if (SystemMemoryTop - FdTop >= FixedPcdGet32 (PcdSystemMemoryUefiRegionSize)) {
+      UefiMemoryBase = SystemMemoryTop - FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
+    } else {
+      // Check there is enough space for the UEFI memory
+      ASSERT (SystemMemoryBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize) <= FdBase);
+
+      UefiMemoryBase = FdBase - FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
+    }
   } else {
-    // In case of a non standalone UEFI, we set the UEFI memory below the Firmware Volume
-    UefiMemoryBase = FixedPcdGet32 (PcdNormalFdBaseAddress) - FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
+    // Check the Firmware does not overlapped with the system memory
+    ASSERT ((FdBase < SystemMemoryBase) || (FdBase >= SystemMemoryTop));
+    ASSERT ((FdTop <= SystemMemoryBase) || (FdTop > SystemMemoryTop));
+
+    UefiMemoryBase = SystemMemoryTop - FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
   }
-  Status = PeiServicesInstallPeiMemory (UefiMemoryBase,FixedPcdGet32 (PcdSystemMemoryUefiRegionSize));
+
+  Status = PeiServicesInstallPeiMemory (UefiMemoryBase, FixedPcdGet32 (PcdSystemMemoryUefiRegionSize));
   ASSERT_EFI_ERROR (Status);
 
   // Initialize MMU and Memory HOBs (Resource Descriptor HOBs)

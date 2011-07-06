@@ -81,9 +81,9 @@
 
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
-  gArmPlatformTokenSpaceGuid.PcdSystemMemoryFixRegionSize
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
   
+  gArmPlatformTokenSpaceGuid.PcdMPCoreMaxCores
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
 

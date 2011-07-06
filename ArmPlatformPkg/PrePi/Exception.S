@@ -48,54 +48,54 @@ _DefaultResetHandler:
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #0
-   blx   ASM_PFX(PrePiCommonExceptionEntry)
+  blx   ASM_PFX(PrePiCommonExceptionEntry)
 
 _DefaultUndefined:
   sub  r1, LR, #4
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #1
-   blx   ASM_PFX(PrePiCommonExceptionEntry)
+  blx   ASM_PFX(PrePiCommonExceptionEntry)
 
 _DefaultSWI:
   sub  r1, LR, #4
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #2
-   blx   ASM_PFX(PrePiCommonExceptionEntry)
+  blx   ASM_PFX(PrePiCommonExceptionEntry)
 
 _DefaultPrefetchAbort:
   sub  r1, LR, #4
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #3
-   blx   ASM_PFX(PrePiCommonExceptionEntry)
+  blx   ASM_PFX(PrePiCommonExceptionEntry)
 
 _DefaultDataAbort:
   sub  r1, LR, #8
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #4
-   blx   ASM_PFX(PrePiCommonExceptionEntry)
+  blx   ASM_PFX(PrePiCommonExceptionEntry)
 
 _DefaultReserved:
   mov  r1, lr
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #5
-   blx   ASM_PFX(PrePiCommonExceptionEntry)
+  blx   ASM_PFX(PrePiCommonExceptionEntry)
 
 _DefaultIrq:
   sub  r1, LR, #4
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #6
-   blx   ASM_PFX(PrePiCommonExceptionEntry)
+  blx   ASM_PFX(PrePiCommonExceptionEntry)
 
 _DefaultFiq:
   sub  r1, LR, #4
   # Switch to SVC for common stack
   cps  #0x13
   mov  r0, #7
-   blx   ASM_PFX(PrePiCommonExceptionEntry)
+  blx   ASM_PFX(PrePiCommonExceptionEntry)
 

@@ -51,6 +51,7 @@
   # These PCDs should be FeaturePcds. But we used these PCDs as an '#if' in an ASM file.
   # Using a FeaturePcd make a '(BOOLEAN) casting for its value which is not understood by the preprocessor.
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|0|UINT32|0x00000003
+  gArmPlatformTokenSpaceGuid.PcdMPCoreMaxCores|1|UINT32|0x0000002D
   
   # Stack for CPU Cores in Secure Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0|UINT32|0x00000005
@@ -66,9 +67,6 @@
     
   # Size of the region used by UEFI in permanent memory (Reserved 128MB by default)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x08000000|UINT32|0x00000015
-
-  # Size of the region reserved for fixed address allocations (Reserved 128MB by default)
-  gArmPlatformTokenSpaceGuid.PcdSystemMemoryFixRegionSize|0x08000000|UINT32|0x00000014
 
   # Size to reserve in the primary core stack for PEI Global Variables
   #  = sizeof(UINTN) /* PcdPeiServicePtr or HobListPtr */

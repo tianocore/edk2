@@ -384,6 +384,7 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData|0
   
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|1
+  gArmPlatformTokenSpaceGuid.PcdMPCoreMaxCores|4
   gArmTokenSpaceGuid.PcdVFPEnabled|1
   
   # Stacks for MPCores in Secure World
