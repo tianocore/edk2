@@ -1,7 +1,7 @@
 /** @file
   Platform Driver Override protocol as defined in the UEFI 2.1 specification.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -43,7 +43,7 @@ typedef struct _EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL  EFI_PLATFORM_DRIVER_OVERR
   @retval EFI_SUCCESS           The driver override for ControllerHandle was returned in
                                 DriverImageHandle.                                      
   @retval EFI_NOT_FOUND         A driver override for ControllerHandle was not found.
-  @retval EFI_INVALID_PARAMETER The handle specified by ControllerHandle is not a valid handle.
+  @retval EFI_INVALID_PARAMETER The handle specified by ControllerHandle is NULL.
   @retval EFI_INVALID_PARAMETER DriverImageHandle is not a handle that was returned on a
                                 previous call to GetDriver().                           
                                    
@@ -59,8 +59,7 @@ EFI_STATUS
 /**                                                                 
   Retrieves the device path of the platform override driver for a controller in the system.
     
-  @param  This                  A pointer to the EFI_PLATFORM_DRIVER_OVERRIDE_
-                                PROTOCOL instance.                            
+  @param  This                  A pointer to the EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL instance.
   @param  ControllerHandle      The device handle of the controller to check if a driver override
                                 exists.                                                          
   @param  DriverImagePath       On input, a pointer to the previous driver device path returned by
@@ -72,7 +71,7 @@ EFI_STATUS
                                 DriverImageHandle.                                      
   @retval EFI_UNSUPPORTED       The operation is not supported.                                
   @retval EFI_NOT_FOUND         A driver override for ControllerHandle was not found.
-  @retval EFI_INVALID_PARAMETER The handle specified by ControllerHandle is not a valid handle.
+  @retval EFI_INVALID_PARAMETER The handle specified by ControllerHandle is NULL.
   @retval EFI_INVALID_PARAMETER DriverImagePath is not a device path that was returned on a
                                 previous call to GetDriverPath().                          
                                    
@@ -106,7 +105,7 @@ EFI_STATUS
   @retval EFI_NOT_FOUND         DriverImagePath is not a device path that was returned on a prior
                                 call to GetDriverPath() for the controller specified by          
                                 ControllerHandle.                                                
-  @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid device handle.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
   @retval EFI_INVALID_PARAMETER DriverImagePath is not a valid device path.
   @retval EFI_INVALID_PARAMETER DriverImageHandle is not a valid image handle.
                                    

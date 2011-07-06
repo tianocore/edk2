@@ -306,7 +306,7 @@ EFI_STATUS
                                 2) On entry, no drivers are managing ControllerHandle.
                                 3) DriverImageHandle is not NULL, and on entry
                                    DriverImageHandle is not managing ControllerHandle.
-  @retval EFI_INVALID_PARAMETER 1) ControllerHandle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER 1) ControllerHandle is NULL.
                                 2) DriverImageHandle is not NULL, and it is not a valid EFI_HANDLE.
                                 3) ChildHandle is not NULL, and it is not a valid EFI_HANDLE.
                                 4) DriverImageHandle does not support the EFI_DRIVER_BINDING_PROTOCOL.
@@ -1304,8 +1304,8 @@ EFI_STATUS
                                 that required the protocol interface.
 
   @retval EFI_SUCCESS           The protocol instance was closed.
-  @retval EFI_INVALID_PARAMETER 1) Handle is not a valid EFI_HANDLE.
-                                2) AgentHandle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER 1) Handle is NULL.
+                                2) AgentHandle is NULL.
                                 3) ControllerHandle is not NULL and ControllerHandle is not a valid EFI_HANDLE.
                                 4) Protocol is NULL.
   @retval EFI_NOT_FOUND         1) Handle does not support the protocol specified by Protocol.
