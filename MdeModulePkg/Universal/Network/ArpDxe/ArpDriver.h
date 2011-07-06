@@ -1,7 +1,7 @@
 /** @file
   ARP driver header file.
   
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -192,7 +192,7 @@ ArpServiceBindingCreateChild (
   @retval EFI_SUCCES            The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is 
                                 being removed.
-  @retval EFI_INVALID_PARAMETER Child handle is not a valid UEFI Handle.
+  @retval EFI_INVALID_PARAMETER Child handle is NULL.
   @retval EFI_ACCESS_DENIED     The protocol could not be removed from the ChildHandle
                                 because its services are being used.
   @retval other                 The child handle was not destroyed
@@ -308,7 +308,7 @@ ArpComponentNameGetDriverName (
                                 driver specified by This was returned in
                                 DriverName.
 
-  @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
 
   @retval EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid
                                 EFI_HANDLE.

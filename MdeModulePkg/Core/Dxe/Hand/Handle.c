@@ -1,7 +1,7 @@
 /** @file
   UEFI handle & protocol handling.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -924,7 +924,7 @@ CoreGetProtocolInterface (
 
   @retval EFI_SUCCESS            The interface information for the specified protocol was returned.
   @retval EFI_UNSUPPORTED        The device does not support the specified protocol.
-  @retval EFI_INVALID_PARAMETER  Handle is not a valid EFI_HANDLE..
+  @retval EFI_INVALID_PARAMETER  Handle is NULL..
   @retval EFI_INVALID_PARAMETER  Protocol is NULL.
   @retval EFI_INVALID_PARAMETER  Interface is NULL.
 

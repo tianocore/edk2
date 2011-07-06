@@ -1429,10 +1429,9 @@ PlatOverMngrCallback (
                                  returned in DriverImageHandle.
   @retval EFI_NOT_FOUND          A driver override for ControllerHandle was not
                                  found.
-  @retval EFI_INVALID_PARAMETER  The handle specified by ControllerHandle is not a
-                                 valid handle. DriverImageHandle is not a handle
-                                 that was returned on a previous  call to
-                                 GetDriver().
+  @retval EFI_INVALID_PARAMETER  The handle specified by ControllerHandle is NULL.
+                                 DriverImageHandle is not a handle that was returned
+                                 on a previous  call to GetDriver().
 
 **/
 EFI_STATUS

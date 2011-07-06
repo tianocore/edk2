@@ -1121,8 +1121,7 @@ CoreConnectController (
   @retval EFI_SUCCESS                           DriverImageHandle is not NULL,
                                                 and on entry DriverImageHandle is
                                                 not managing ControllerHandle.
-  @retval EFI_INVALID_PARAMETER                 ControllerHandle is not a valid
-                                                EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER                 ControllerHandle is NULL.
   @retval EFI_INVALID_PARAMETER                 DriverImageHandle is not NULL,
                                                 and it is not a valid EFI_HANDLE.
   @retval EFI_INVALID_PARAMETER                 ChildHandle is not NULL, and it

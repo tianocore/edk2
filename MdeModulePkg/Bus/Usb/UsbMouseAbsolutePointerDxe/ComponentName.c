@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for USB Mouse Absolute Pointer Driver.
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -136,7 +136,7 @@ UsbMouseAbsolutePointerComponentNameGetDriverName (
                                 the language specified by Language for the
                                 driver specified by This was returned in
                                 DriverName.
-  @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
   @retval EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid
                                 EFI_HANDLE.
   @retval EFI_INVALID_PARAMETER Language is NULL.

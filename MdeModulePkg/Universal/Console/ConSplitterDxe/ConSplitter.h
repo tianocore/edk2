@@ -807,7 +807,7 @@ ConSplitterComponentNameGetDriverName (
                                 driver specified by This was returned in
                                 DriverName.
 
-  @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
 
   @retval EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid
                                 EFI_HANDLE.
@@ -886,7 +886,7 @@ ConSplitterConInComponentNameGetControllerName (
                                 driver specified by This was returned in
                                 DriverName.
 
-  @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
 
   @retval EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid
                                 EFI_HANDLE.
@@ -945,7 +945,7 @@ ConSplitterSimplePointerComponentNameGetControllerName (
   @retval EFI_SUCCESS            The Unicode string for the user readable name in
                                  the language specified by Language for the driver
                                  specified by This was returned in DriverName.
-  @retval EFI_INVALID_PARAMETER  ControllerHandle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER  ControllerHandle is NULL.
   @retval EFI_INVALID_PARAMETER  ChildHandle is not NULL and it is not a valid
                                  EFI_HANDLE.
   @retval EFI_INVALID_PARAMETER  Language is NULL.
@@ -1018,7 +1018,7 @@ ConSplitterAbsolutePointerComponentNameGetControllerName (
                                 driver specified by This was returned in
                                 DriverName.
 
-  @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
 
   @retval EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid
                                 EFI_HANDLE.
@@ -1097,7 +1097,7 @@ ConSplitterConOutComponentNameGetControllerName (
                                 driver specified by This was returned in
                                 DriverName.
 
-  @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
 
   @retval EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid
                                 EFI_HANDLE.
