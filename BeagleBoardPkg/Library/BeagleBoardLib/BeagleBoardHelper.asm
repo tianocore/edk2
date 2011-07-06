@@ -14,7 +14,7 @@
 #include <AsmMacroIoLib.h>
 #include <Base.h>
 #include <Library/PcdLib.h>
-#include <ArmPlatform.h>
+#include <BeagleBoard.h>
 #include <AutoGen.h>
 
   INCLUDE AsmMacroIoLib.inc
