@@ -1,7 +1,7 @@
 /** @file
   Misc BDS library function
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1096,8 +1096,10 @@ BdsLibGetImageHeader (
 }
 
 /**
-  This routine adjust the memory information for different memory type and 
-  save them into the variables for next boot.
+  This routine adjusts the memory information for different memory type and 
+  saves them into the variables for next boot. It conditionally resets the
+  system when the memory information changes. Platform can reserve memory 
+  large enough (125% of actual requirement) to avoid the reset in the first boot.
 **/
 VOID
 BdsSetMemoryTypeInformationVariable (
@@ -1131,7 +1133,7 @@ BdsSetMemoryTypeInformationVariable (
   }
 
   //
-  // Only get the the Memory Type Information variable in the boot mode 
+  // Only check the the Memory Type Information variable in the boot mode 
   // other than BOOT_WITH_DEFAULT_SETTINGS because the Memory Type
   // Information is not valid in this boot mode.
   //
@@ -1185,29 +1187,34 @@ BdsSetMemoryTypeInformationVariable (
 
   for (Index = 0; PreviousMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
 
-    Current = 0;
     for (Index1 = 0; CurrentMemoryTypeInformation[Index1].Type != EfiMaxMemoryType; Index1++) {
       if (PreviousMemoryTypeInformation[Index].Type == CurrentMemoryTypeInformation[Index1].Type) {
-        Current = CurrentMemoryTypeInformation[Index1].NumberOfPages;
         break;
       }
     }
-
     if (CurrentMemoryTypeInformation[Index1].Type == EfiMaxMemoryType) {
       continue;
     }
 
+    //
+    // Previous is the number of pages pre-allocated
+    // Current is the number of pages actually needed
+    //
     Previous = PreviousMemoryTypeInformation[Index].NumberOfPages;
+    Current  = CurrentMemoryTypeInformation[Index1].NumberOfPages;
+    Next     = Previous;
 
     //
     // Write next varible to 125% * current and Inconsistent Memory Reserved across bootings may lead to S4 fail
     //
-    if (!MemoryTypeInformationVariableExists && Current < Previous) {
-      Next = Current + (Current >> 2);
+    if (Current < Previous) {
+      if (BootMode == BOOT_WITH_DEFAULT_SETTINGS) {
+        Next = Current + (Current >> 2);
+      } else if (!MemoryTypeInformationVariableExists) {
+        Next = MAX (Current + (Current >> 2), Previous);
+      }
     } else if (Current > Previous) {
       Next = Current + (Current >> 2);
-    } else {
-      Next = Previous;
     }
     if (Next > 0 && Next < 4) {
       Next = 4;
