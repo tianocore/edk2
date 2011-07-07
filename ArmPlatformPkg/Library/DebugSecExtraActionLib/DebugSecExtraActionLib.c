@@ -18,7 +18,7 @@
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
 #include <Library/SerialPortLib.h>
-
+#include <Chipset/ArmV7.h>
 #include <Drivers/PL390Gic.h>
 
 #define ARM_PRIMARY_CORE    0

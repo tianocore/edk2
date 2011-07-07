@@ -76,11 +76,14 @@ PrePiMain (
   InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
   SaveAndSetDebugTimerInterrupt (TRUE);
 
-  PrePiHobBase = (EFI_HOB_HANDOFF_INFO_TABLE**)(PcdGet32 (PcdCPUCoresNonSecStackBase) + (PcdGet32 (PcdCPUCoresNonSecStackSize) / 2) - PcdGet32 (PcdHobListPtrGlobalOffset));
-
   UefiMemoryTop = UefiMemoryBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
   StacksSize = PcdGet32 (PcdCPUCoresNonSecStackSize) * PcdGet32 (PcdMPCoreMaxCores);
   StacksBase = UefiMemoryTop - StacksSize;
+
+  // Check the PcdCPUCoresNonSecStackBase match with the calculated StackBase
+  ASSERT (StacksBase == PcdGet32 (PcdCPUCoresNonSecStackBase));
+  
+  PrePiHobBase = (EFI_HOB_HANDOFF_INFO_TABLE**)(PcdGet32 (PcdCPUCoresNonSecStackBase) + (PcdGet32 (PcdCPUCoresNonSecStackSize) / 2) - PcdGet32 (PcdHobListPtrGlobalOffset));
 
   // Declare the PI/UEFI memory region
   *PrePiHobBase = HobConstructor (
@@ -140,12 +143,14 @@ CEntryPoint (
   )
 {
   UINT64   StartTimeStamp;
-
+ 
   if ((CoreId == ARM_PRIMARY_CORE) && PerformanceMeasurementEnabled ()) {
     // Initialize the Timer Library to setup the Timer HW controller
     TimerConstructor ();
     // We cannot call yet the PerformanceLib because the HOB List has not been initialized
     StartTimeStamp = GetPerformanceCounter ();
+  } else {
+    StartTimeStamp = 0;
   }
 
   // Clean Data cache
