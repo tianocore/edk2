@@ -160,7 +160,7 @@ CommonInterruptEntry_al_0000:
     pushq   %rax                      # for cs
     movl    %ds, %eax
     pushq   %rax
-    movl    %es, erax
+    movl    %es, %eax
     pushq   %rax
     movl    %fs, %eax
     pushq   %rax
