@@ -63,6 +63,11 @@ FAQ :
     Boot sequence: Sec/PrePiCore/PeiCore/Dxe/Bds
     Example: ARM Versatile Express
 
+See:
+- ArmPlatformPkg/Documentation/ARM-EDK2-Overview.png
+- ArmPlatformPkg/Documentation/ArmPlatformLib-Full-Boot.png
+- ArmPlatformPkg/Documentation/ArmPlatformLib-2nd-Stage.png
+
 # What is the PcdStandalone
 gArmPlatformTokenSpaceGuid.PcdStandalone=FALSE is used on ARM Development Platforms during the development stage.
 To avoid to reflash the NOR Flash after each build, the SEC (in NOR Flash) intializes thd DRAM and wait until the Normal World firmware is copied into the DRAM.
