@@ -79,7 +79,7 @@ PathCleanUpDirectories(
   }
 
   //
-  // Fix up the / vs \
+  // Fix up the '/' vs '\'
   //
   for (TempString = Path ; TempString != NULL && *TempString != CHAR_NULL ; TempString++) {
     if (*TempString == L'/') {
