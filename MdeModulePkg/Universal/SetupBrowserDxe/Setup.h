@@ -188,6 +188,7 @@ typedef struct {
 #define EFI_HII_VARSTORE_BUFFER              0
 #define EFI_HII_VARSTORE_NAME_VALUE          1
 #define EFI_HII_VARSTORE_EFI_VARIABLE        2
+#define EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER 3
 
 #define FORM_INCONSISTENT_VALIDATION         0
 #define FORM_NO_SUBMIT_VALIDATION            1

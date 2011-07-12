@@ -1716,6 +1716,7 @@ EvaluateExpression (
       if (OpCode->VarStorage != NULL) {
         switch (OpCode->VarStorage->Type) {
         case EFI_HII_VARSTORE_BUFFER:
+        case EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER:
           //
           // Get value from Edit Buffer
           //
@@ -1765,6 +1766,7 @@ EvaluateExpression (
             Value->Type = EFI_IFR_TYPE_UNDEFINED;
             Value->Value.u8 = 0;
           }
+          break;
         default:
           //
           // Not recognize storage.
@@ -2123,6 +2125,7 @@ EvaluateExpression (
       if (OpCode->VarStorage != NULL) {
         switch (OpCode->VarStorage->Type) {
         case EFI_HII_VARSTORE_BUFFER:
+        case EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER:
           CopyMem (OpCode->VarStorage->EditBuffer + OpCode->VarStoreInfo.VarOffset, &Value->Value, OpCode->ValueWidth);
           Data1.Value.b = TRUE;
           break;

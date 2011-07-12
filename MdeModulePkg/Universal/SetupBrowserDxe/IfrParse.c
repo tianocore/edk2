@@ -329,7 +329,8 @@ InitializeConfigHdr (
 {
   CHAR16      *Name;
 
-  if (Storage->Type == EFI_HII_VARSTORE_BUFFER) {
+  if (Storage->Type == EFI_HII_VARSTORE_BUFFER || 
+      Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
     Name = Storage->Name;
   } else {
     Name = NULL;
@@ -395,7 +396,8 @@ InitializeRequestElement (
   //
   // Prepare <RequestElement>
   //
-  if (Storage->Type == EFI_HII_VARSTORE_BUFFER) {
+  if (Storage->Type == EFI_HII_VARSTORE_BUFFER || 
+      Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
     StrLen = UnicodeSPrint (
                RequestElement,
                30 * sizeof (CHAR16),
@@ -1480,11 +1482,32 @@ ParseOpCodes (
       // Create a EFI variable Storage for this FormSet
       //
       Storage = CreateStorage (FormSet);
-      Storage->Type = EFI_HII_VARSTORE_EFI_VARIABLE;
 
       CopyMem (&Storage->VarStoreId, &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->VarStoreId, sizeof (EFI_VARSTORE_ID));
       CopyMem (&Storage->Guid,       &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Guid,       sizeof (EFI_GUID));
       CopyMem (&Storage->Attributes, &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Attributes, sizeof (UINT32));
+      CopyMem (&Storage->Size,       &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Size,       sizeof (UINT16));
+
+      if (OpCodeLength < sizeof (EFI_IFR_VARSTORE_EFI)) {
+        Storage->Type = EFI_HII_VARSTORE_EFI_VARIABLE;
+        break;
+      } 
+
+      Storage->Type = EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER;
+      Storage->Buffer = AllocateZeroPool (Storage->Size);
+      Storage->EditBuffer = AllocateZeroPool (Storage->Size);
+
+      AsciiString = (CHAR8 *) ((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Name;
+      Storage->Name = AllocateZeroPool (AsciiStrSize (AsciiString) * 2);
+      ASSERT (Storage->Name != NULL);
+      for (Index = 0; AsciiString[Index] != 0; Index++) {
+        Storage->Name[Index] = (CHAR16) AsciiString[Index];
+      }
+
+      //
+      // Initialize <ConfigHdr>
+      //
+      InitializeConfigHdr (FormSet, Storage);
       break;
 
     //

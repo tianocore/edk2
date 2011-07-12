@@ -431,7 +431,8 @@ BrowserCallback (
       Link = GetNextNode (&FormSet->StorageListHead, Link);
 
       if (CompareGuid (&Storage->Guid, (EFI_GUID *) VariableGuid)) {
-        if (Storage->Type == EFI_HII_VARSTORE_BUFFER) {
+        if (Storage->Type == EFI_HII_VARSTORE_BUFFER ||
+            Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
           //
           // Buffer storage require both GUID and Name
           //
@@ -727,14 +728,19 @@ NewStringCat (
 
 
 /**
-  Synchronize Storage's Edit copy to Shadow copy.
+  Synchronize or restore Storage's Edit copy and Shadow copy.
 
-  @param  Storage                The Storage to be synchronized.
+  @param  Storage          The Storage to be synchronized.
+  @param  SyncOrRestore    Sync the buffer to editbuffer or Restore  the 
+                           editbuffer to buffer
+                           if TRUE, copy the editbuffer to the buffer.
+                           if FALSE, copy the buffer to the editbuffer.
 
 **/
 VOID
 SynchronizeStorage (
-  IN FORMSET_STORAGE         *Storage
+  IN FORMSET_STORAGE         *Storage,
+  IN BOOLEAN                 SyncOrRestore
   )
 {
   LIST_ENTRY              *Link;
@@ -742,7 +748,12 @@ SynchronizeStorage (
 
   switch (Storage->Type) {
   case EFI_HII_VARSTORE_BUFFER:
-    CopyMem (Storage->Buffer, Storage->EditBuffer, Storage->Size);
+  case EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER:
+    if (SyncOrRestore) {
+      CopyMem (Storage->Buffer, Storage->EditBuffer, Storage->Size);
+    } else {
+      CopyMem (Storage->EditBuffer, Storage->Buffer, Storage->Size);
+    }
     break;
 
   case EFI_HII_VARSTORE_NAME_VALUE:
@@ -750,7 +761,11 @@ SynchronizeStorage (
     while (!IsNull (&Storage->NameValueListHead, Link)) {
       Node = NAME_VALUE_NODE_FROM_LINK (Link);
 
-      NewStringCpy (&Node->Value, Node->EditValue);
+      if (SyncOrRestore) {
+        NewStringCpy (&Node->Value, Node->EditValue);
+      } else {
+        NewStringCpy (&Node->EditValue, Node->Value);
+      }
 
       Link = GetNextNode (&Storage->NameValueListHead, Link);
     }
@@ -894,6 +909,7 @@ StorageToConfigResp (
 
   switch (Storage->Type) {
   case EFI_HII_VARSTORE_BUFFER:
+  case EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER:
     Status = mHiiConfigRouting->BlockToConfig (
                                   mHiiConfigRouting,
                                   ConfigRequest,
@@ -959,6 +975,7 @@ ConfigRespToStorage (
 
   switch (Storage->Type) {
   case EFI_HII_VARSTORE_BUFFER:
+  case EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER:
     BufferSize = Storage->Size;
     Status = mHiiConfigRouting->ConfigToBlock (
                                   mHiiConfigRouting,
@@ -1050,8 +1067,10 @@ GetQuestionValue (
   BOOLEAN             IsString;
   CHAR16              TemStr[5];
   UINT8               DigitUint8;
+  UINT8               *TemBuffer;
 
   Status = EFI_SUCCESS;
+  Value  = NULL;
 
   //
   // Statement don't have storage, skip them
@@ -1172,7 +1191,12 @@ GetQuestionValue (
     Dst = (UINT8 *) &Question->HiiValue.Value;
   }
 
-  IsBufferStorage = (BOOLEAN) ((Storage->Type == EFI_HII_VARSTORE_BUFFER) ? TRUE : FALSE);
+  if (Storage->Type == EFI_HII_VARSTORE_BUFFER || 
+      Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+    IsBufferStorage = TRUE;
+  } else {
+    IsBufferStorage = FALSE;
+  }
   IsString = (BOOLEAN) ((Question->HiiValue.Type == EFI_IFR_TYPE_STRING) ?  TRUE : FALSE);
   if (Cached) {
     if (IsBufferStorage) {
@@ -1230,115 +1254,141 @@ GetQuestionValue (
       FreePool (Value);
     }
   } else {
-    //
-    // Request current settings from Configuration Driver
-    //
-    if (FormSet->ConfigAccess == NULL) {
-      return EFI_NOT_FOUND;
-    }
-
-    //
-    // <ConfigRequest> ::= <ConfigHdr> + <BlockName> ||
-    //                   <ConfigHdr> + "&" + <VariableName>
-    //
-    if (IsBufferStorage) {
-      Length = StrLen (Storage->ConfigHdr);
-      Length += StrLen (Question->BlockName);
-    } else {
-      Length = StrLen (Storage->ConfigHdr);
-      Length += StrLen (Question->VariableName) + 1;
-    }
-    ConfigRequest = AllocateZeroPool ((Length + 1) * sizeof (CHAR16));
-    ASSERT (ConfigRequest != NULL);
-
-    StrCpy (ConfigRequest, Storage->ConfigHdr);
-    if (IsBufferStorage) {
-      StrCat (ConfigRequest, Question->BlockName);
-    } else {
-      StrCat (ConfigRequest, L"&");
-      StrCat (ConfigRequest, Question->VariableName);
-    }
-
-    Status = FormSet->ConfigAccess->ExtractConfig (
-                                      FormSet->ConfigAccess,
-                                      ConfigRequest,
-                                      &Progress,
-                                      &Result
-                                      );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    //
-    // Skip <ConfigRequest>
-    //
-    Value = Result + Length;
-    if (IsBufferStorage) {
+    if (Storage->Type == EFI_HII_VARSTORE_BUFFER) {
       //
-      // Skip "&VALUE"
+      // Request current settings from Configuration Driver
       //
-      Value = Value + 6;
-    }
-    if (*Value != '=') {
-      FreePool (Result);
-      return EFI_NOT_FOUND;
-    }
-    //
-    // Skip '=', point to value
-    //
-    Value = Value + 1;
-
-    //
-    // Suppress <AltResp> if any
-    //
-    StringPtr = Value;
-    while (*StringPtr != L'\0' && *StringPtr != L'&') {
-      StringPtr++;
-    }
-    *StringPtr = L'\0';
-
-    LengthStr = StrLen (Value);
-    Status    = EFI_SUCCESS;
-    if (!IsBufferStorage && IsString) {
-      //
-      // Convert Config String to Unicode String, e.g "0041004200430044" => "ABCD"
-      // Add string tail char L'\0' into Length
-      //
-      Length    = StorageWidth + sizeof (CHAR16);
-      if (Length < ((LengthStr / 4 + 1) * 2)) {
-        Status = EFI_BUFFER_TOO_SMALL;
-      } else {
-        StringPtr = (CHAR16 *) Dst;
-        ZeroMem (TemStr, sizeof (TemStr));
-        for (Index = 0; Index < LengthStr; Index += 4) {
-          StrnCpy (TemStr, Value + Index, 4);
-          StringPtr[Index/4] = (CHAR16) StrHexToUint64 (TemStr);
-        }
-        //
-        // Add tailing L'\0' character
-        //
-        StringPtr[Index/4] = L'\0';
+      if (FormSet->ConfigAccess == NULL) {
+        return EFI_NOT_FOUND;
       }
-    } else {
-      if (StorageWidth < ((LengthStr + 1) / 2)) {
-        Status = EFI_BUFFER_TOO_SMALL;
+
+      //
+      // <ConfigRequest> ::= <ConfigHdr> + <BlockName> ||
+      //                   <ConfigHdr> + "&" + <VariableName>
+      //
+      if (IsBufferStorage) {
+        Length = StrLen (Storage->ConfigHdr);
+        Length += StrLen (Question->BlockName);
       } else {
-        ZeroMem (TemStr, sizeof (TemStr));
-        for (Index = 0; Index < LengthStr; Index ++) {
-          TemStr[0] = Value[LengthStr - Index - 1];
-          DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
-          if ((Index & 1) == 0) {
-            Dst [Index/2] = DigitUint8;
-          } else {
-            Dst [Index/2] = (UINT8) ((DigitUint8 << 4) + Dst [Index/2]);
+        Length = StrLen (Storage->ConfigHdr);
+        Length += StrLen (Question->VariableName) + 1;
+      }
+      ConfigRequest = AllocateZeroPool ((Length + 1) * sizeof (CHAR16));
+      ASSERT (ConfigRequest != NULL);
+
+      StrCpy (ConfigRequest, Storage->ConfigHdr);
+      if (IsBufferStorage) {
+        StrCat (ConfigRequest, Question->BlockName);
+      } else {
+        StrCat (ConfigRequest, L"&");
+        StrCat (ConfigRequest, Question->VariableName);
+      }
+
+      Status = FormSet->ConfigAccess->ExtractConfig (
+                                        FormSet->ConfigAccess,
+                                        ConfigRequest,
+                                        &Progress,
+                                        &Result
+                                        );
+      FreePool (ConfigRequest);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      //
+      // Skip <ConfigRequest>
+      //
+      Value = Result + Length;
+      if (IsBufferStorage) {
+        //
+        // Skip "&VALUE"
+        //
+        Value = Value + 6;
+      }
+      if (*Value != '=') {
+        FreePool (Result);
+        return EFI_NOT_FOUND;
+      }
+      //
+      // Skip '=', point to value
+      //
+      Value = Value + 1;
+
+      //
+      // Suppress <AltResp> if any
+      //
+      StringPtr = Value;
+      while (*StringPtr != L'\0' && *StringPtr != L'&') {
+        StringPtr++;
+      }
+      *StringPtr = L'\0';
+
+      LengthStr = StrLen (Value);
+      Status    = EFI_SUCCESS;
+      if (!IsBufferStorage && IsString) {
+        //
+        // Convert Config String to Unicode String, e.g "0041004200430044" => "ABCD"
+        // Add string tail char L'\0' into Length
+        //
+        Length    = StorageWidth + sizeof (CHAR16);
+        if (Length < ((LengthStr / 4 + 1) * 2)) {
+          Status = EFI_BUFFER_TOO_SMALL;
+        } else {
+          StringPtr = (CHAR16 *) Dst;
+          ZeroMem (TemStr, sizeof (TemStr));
+          for (Index = 0; Index < LengthStr; Index += 4) {
+            StrnCpy (TemStr, Value + Index, 4);
+            StringPtr[Index/4] = (CHAR16) StrHexToUint64 (TemStr);
+          }
+          //
+          // Add tailing L'\0' character
+          //
+          StringPtr[Index/4] = L'\0';
+        }
+      } else {
+        if (StorageWidth < ((LengthStr + 1) / 2)) {
+          Status = EFI_BUFFER_TOO_SMALL;
+        } else {
+          ZeroMem (TemStr, sizeof (TemStr));
+          for (Index = 0; Index < LengthStr; Index ++) {
+            TemStr[0] = Value[LengthStr - Index - 1];
+            DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+            if ((Index & 1) == 0) {
+              Dst [Index/2] = DigitUint8;
+            } else {
+              Dst [Index/2] = (UINT8) ((DigitUint8 << 4) + Dst [Index/2]);
+            }
           }
         }
       }
-    }
-
-    if (EFI_ERROR (Status)) {
       FreePool (Result);
-      return Status;
+
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+    } else if (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+      TemBuffer = NULL;
+      TemBuffer = AllocateZeroPool (Storage->Size);
+      if (TemBuffer == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        return Status;
+      }
+      Length = Storage->Size;
+      Status = gRT->GetVariable (
+                       Storage->Name,
+                       &Storage->Guid,
+                       NULL,
+                       &Length,
+                       TemBuffer
+                       );
+      if (EFI_ERROR (Status)) {
+        FreePool (TemBuffer);
+        return Status;
+      }
+
+      CopyMem (Dst, TemBuffer + Question->VarStoreInfo.VarOffset, StorageWidth);
+
+      FreePool (TemBuffer);
     }
 
     //
@@ -1349,8 +1399,6 @@ GetQuestionValue (
     } else {
       SetValueByName (Storage, Question->VariableName, Value, TRUE);
     }
-
-    FreePool (Result);
   }
 
   return Status;
@@ -1507,7 +1555,12 @@ SetQuestionValue (
     Src = (UINT8 *) &Question->HiiValue.Value;
   }
 
-  IsBufferStorage = (BOOLEAN) ((Storage->Type == EFI_HII_VARSTORE_BUFFER) ? TRUE : FALSE);
+  if (Storage->Type == EFI_HII_VARSTORE_BUFFER || 
+      Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+    IsBufferStorage = TRUE;
+  } else {
+    IsBufferStorage = FALSE;
+  }
   IsString = (BOOLEAN) ((Question->HiiValue.Type == EFI_IFR_TYPE_STRING) ?  TRUE : FALSE);
   if (IsBufferStorage) {
     //
@@ -1550,84 +1603,115 @@ SetQuestionValue (
   }
 
   if (!Cached) {
-    //
-    // <ConfigResp> ::= <ConfigHdr> + <BlockName> + "&VALUE=" + "<HexCh>StorageWidth * 2" ||
-    //                <ConfigHdr> + "&" + <VariableName> + "=" + "<string>"
-    //
-    if (IsBufferStorage) {
-      Length = StrLen (Question->BlockName) + 7;
-    } else {
-      Length = StrLen (Question->VariableName) + 2;
-    }
-    if (!IsBufferStorage && IsString) {
-      Length += (StrLen ((CHAR16 *) Src) * 4);
-    } else {
-      Length += (StorageWidth * 2);
-    }
-    ConfigResp = AllocateZeroPool ((StrLen (Storage->ConfigHdr) + Length + 1) * sizeof (CHAR16));
-    ASSERT (ConfigResp != NULL);
-
-    StrCpy (ConfigResp, Storage->ConfigHdr);
-    if (IsBufferStorage) {
-      StrCat (ConfigResp, Question->BlockName);
-      StrCat (ConfigResp, L"&VALUE=");
-    } else {
-      StrCat (ConfigResp, L"&");
-      StrCat (ConfigResp, Question->VariableName);
-      StrCat (ConfigResp, L"=");
-    }
-
-    Value = ConfigResp + StrLen (ConfigResp);
-
-    if (!IsBufferStorage && IsString) {
+    if (Storage->Type == EFI_HII_VARSTORE_BUFFER) {
       //
-      // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
+      // <ConfigResp> ::= <ConfigHdr> + <BlockName> + "&VALUE=" + "<HexCh>StorageWidth * 2" ||
+      //                <ConfigHdr> + "&" + <VariableName> + "=" + "<string>"
       //
-      TemName = (CHAR16 *) Src;
-      TemString = Value;
-      for (; *TemName != L'\0'; TemName++) {
-        TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemName, 4);
+      if (IsBufferStorage) {
+        Length = StrLen (Question->BlockName) + 7;
+      } else {
+        Length = StrLen (Question->VariableName) + 2;
       }
-    } else {
-      //
-      // Convert Buffer to Hex String
-      //
-      TemBuffer = Src + StorageWidth - 1;
-      TemString = Value;
-      for (Index = 0; Index < StorageWidth; Index ++, TemBuffer --) {
-        TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+      if (!IsBufferStorage && IsString) {
+        Length += (StrLen ((CHAR16 *) Src) * 4);
+      } else {
+        Length += (StorageWidth * 2);
       }
-    }
+      ConfigResp = AllocateZeroPool ((StrLen (Storage->ConfigHdr) + Length + 1) * sizeof (CHAR16));
+      ASSERT (ConfigResp != NULL);
 
-    //
-    // Convert to lower char.
-    //
-    for (TemString = Value; *Value != L'\0'; Value++) {
-      if (*Value >= L'A' && *Value <= L'Z') {
-        *Value = (CHAR16) (*Value - L'A' + L'a');
+      StrCpy (ConfigResp, Storage->ConfigHdr);
+      if (IsBufferStorage) {
+        StrCat (ConfigResp, Question->BlockName);
+        StrCat (ConfigResp, L"&VALUE=");
+      } else {
+        StrCat (ConfigResp, L"&");
+        StrCat (ConfigResp, Question->VariableName);
+        StrCat (ConfigResp, L"=");
       }
-    }
 
-    //
-    // Submit Question Value to Configuration Driver
-    //
-    if (FormSet->ConfigAccess != NULL) {
-      Status = FormSet->ConfigAccess->RouteConfig (
-                                        FormSet->ConfigAccess,
-                                        ConfigResp,
-                                        &Progress
-                                        );
-      if (EFI_ERROR (Status)) {
-        FreePool (ConfigResp);
+      Value = ConfigResp + StrLen (ConfigResp);
+
+      if (!IsBufferStorage && IsString) {
+        //
+        // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
+        //
+        TemName = (CHAR16 *) Src;
+        TemString = Value;
+        for (; *TemName != L'\0'; TemName++) {
+          TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemName, 4);
+        }
+      } else {
+        //
+        // Convert Buffer to Hex String
+        //
+        TemBuffer = Src + StorageWidth - 1;
+        TemString = Value;
+        for (Index = 0; Index < StorageWidth; Index ++, TemBuffer --) {
+          TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+        }
+      }
+
+      //
+      // Convert to lower char.
+      //
+      for (TemString = Value; *Value != L'\0'; Value++) {
+        if (*Value >= L'A' && *Value <= L'Z') {
+          *Value = (CHAR16) (*Value - L'A' + L'a');
+        }
+      }
+
+      //
+      // Submit Question Value to Configuration Driver
+      //
+      if (FormSet->ConfigAccess != NULL) {
+        Status = FormSet->ConfigAccess->RouteConfig (
+                                          FormSet->ConfigAccess,
+                                          ConfigResp,
+                                          &Progress
+                                          );
+        if (EFI_ERROR (Status)) {
+          FreePool (ConfigResp);
+          return Status;
+        }
+      }
+      FreePool (ConfigResp);
+      
+    } else if (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+      TemBuffer = NULL;
+      TemBuffer = AllocateZeroPool(Storage->Size);
+      if (TemBuffer == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        return Status;
+      }
+      Length = Storage->Size;
+      Status = gRT->GetVariable (
+                       Storage->Name,
+                       &Storage->Guid,
+                       NULL,
+                       &Length,
+                       TemBuffer
+                       );
+
+      CopyMem (TemBuffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
+      
+      Status = gRT->SetVariable (
+                       Storage->Name,
+                       &Storage->Guid,
+                       Storage->Attributes,
+                       Storage->Size,
+                       TemBuffer
+                       );
+      FreePool (TemBuffer);
+      if (EFI_ERROR (Status)){
         return Status;
       }
     }
-    FreePool (ConfigResp);
-
     //
-    // Synchronize shadow Buffer
+    // Sync storage, from editbuffer to buffer.
     //
-    SynchronizeStorage (Storage);
+    CopyMem (Storage->Buffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
   }
 
   return Status;
@@ -1751,57 +1835,23 @@ NoSubmitCheck (
 }
 
 /**
-  Restore Storage's Edit copy to Shadow copy.
-
-  @param  Storage                The Storage to be synchronized.
-
-**/
-VOID
-RestoreStorage (
-  IN FORMSET_STORAGE         *Storage
-  )
-{
-  LIST_ENTRY              *Link;
-  NAME_VALUE_NODE         *Node;
-
-  switch (Storage->Type) {
-  case EFI_HII_VARSTORE_BUFFER:
-    CopyMem (Storage->EditBuffer, Storage->Buffer, Storage->Size);
-    break;
-
-  case EFI_HII_VARSTORE_NAME_VALUE:
-    Link = GetFirstNode (&Storage->NameValueListHead);
-    while (!IsNull (&Storage->NameValueListHead, Link)) {
-      Node = NAME_VALUE_NODE_FROM_LINK (Link);
-
-      if (Node->EditValue != NULL) {
-        FreePool (Node->EditValue);
-      }
-      Node->EditValue = AllocateCopyPool (StrSize (Node->Value), Node->Value);
-      ASSERT (Node->EditValue != NULL);
-      Link = GetNextNode (&Storage->NameValueListHead, Link);
-    }
-    break;
-
-  case EFI_HII_VARSTORE_EFI_VARIABLE:
-  default:
-    break;
-  }
-}
-
-/**
   Fill storage's edit copy with settings requested from Configuration Driver.
 
   @param  FormSet                FormSet data structure.
   @param  ConfigInfo             The config info related to this form.
+  @param  SyncOrRestore          Sync the buffer to editbuffer or Restore  the 
+                                 editbuffer to buffer
+                                 if TRUE, copy the editbuffer to the buffer.
+                                 if FALSE, copy the buffer to the editbuffer.
 
   @retval EFI_SUCCESS            The function completed successfully.
 
 **/
 EFI_STATUS
-FormRestoreStorage (
+SynchronizeStorageForForm (
   IN FORM_BROWSER_FORMSET        *FormSet,
-  IN FORM_BROWSER_CONFIG_REQUEST *ConfigInfo
+  IN FORM_BROWSER_CONFIG_REQUEST *ConfigInfo,
+  IN BOOLEAN                     SyncOrRestore
   )
 {
   EFI_STATUS              Status;
@@ -1810,10 +1860,12 @@ FormRestoreStorage (
   UINTN                   BufferSize;
   LIST_ENTRY              *Link;
   NAME_VALUE_NODE         *Node;
+  UINT8                   *Src;
+  UINT8                   *Dst;
 
   Status = EFI_SUCCESS;
   Result = NULL;
-  if (FormSet->ConfigAccess == NULL) {
+  if (FormSet->ConfigAccess == NULL && ConfigInfo->Storage->Type != EFI_HII_VARSTORE_NAME_VALUE) {
     return EFI_NOT_FOUND;
   }
 
@@ -1824,12 +1876,22 @@ FormRestoreStorage (
     return EFI_SUCCESS;
   }
 
-  if (ConfigInfo->Storage->Type == EFI_HII_VARSTORE_BUFFER) {
+  if (ConfigInfo->Storage->Type == EFI_HII_VARSTORE_BUFFER || 
+      (ConfigInfo->Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER)) {
     BufferSize = ConfigInfo->Storage->Size;
+
+    if (SyncOrRestore) {
+      Src = ConfigInfo->Storage->EditBuffer;
+      Dst = ConfigInfo->Storage->Buffer;
+    } else {
+      Src = ConfigInfo->Storage->Buffer;
+      Dst = ConfigInfo->Storage->EditBuffer;
+    }
+
     Status = mHiiConfigRouting->BlockToConfig(
                                   mHiiConfigRouting,
                                   ConfigInfo->ConfigRequest,
-                                  ConfigInfo->Storage->Buffer,
+                                  Src,
                                   BufferSize,
                                   &Result,
                                   &Progress
@@ -1841,16 +1903,12 @@ FormRestoreStorage (
     Status = mHiiConfigRouting->ConfigToBlock (
                                   mHiiConfigRouting,
                                   Result,
-                                  ConfigInfo->Storage->EditBuffer,
+                                  Dst,
                                   &BufferSize,
                                   &Progress
                                   );
     if (Result != NULL) {
       FreePool (Result);
-    }
-
-    if (EFI_ERROR (Status)) {
-      return Status;
     }
   } else if (ConfigInfo->Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
     Link = GetFirstNode (&ConfigInfo->Storage->NameValueListHead);
@@ -1858,11 +1916,11 @@ FormRestoreStorage (
       Node = NAME_VALUE_NODE_FROM_LINK (Link);
 
       if (StrStr (ConfigInfo->ConfigRequest, Node->Name) != NULL) {
-        if (Node->EditValue != NULL) {
-          FreePool (Node->EditValue);
+        if (SyncOrRestore) {
+          NewStringCpy (&Node->Value, Node->EditValue);
+        } else {
+          NewStringCpy (&Node->EditValue, Node->Value);
         }
-        Node->EditValue = AllocateCopyPool (StrSize (Node->Value), Node->Value);
-        ASSERT (Node->EditValue != NULL);
       }
 
       Link = GetNextNode (&ConfigInfo->Storage->NameValueListHead, Link);
@@ -1916,7 +1974,7 @@ DiscardForm (
         //
         // Prepare <ConfigResp>
         //
-        FormRestoreStorage(FormSet, ConfigInfo);
+        SynchronizeStorageForForm(FormSet, ConfigInfo, FALSE);
       }
 
       Form->NvUpdateRequired = FALSE;
@@ -1942,7 +2000,7 @@ DiscardForm (
           continue;
         }
 
-        RestoreStorage(Storage);
+        SynchronizeStorage(Storage, FALSE);
       }
 
       UpdateNvInfoInForm(FormSet, FALSE);   
@@ -1974,6 +2032,8 @@ SubmitForm (
   EFI_STRING              ConfigResp;
   EFI_STRING              Progress;
   FORMSET_STORAGE         *Storage;
+  UINTN                   BufferSize;
+  UINT8                   *TmpBuf;
   FORM_BROWSER_CONFIG_REQUEST  *ConfigInfo;
 
   //
@@ -1995,7 +2055,8 @@ SubmitForm (
       ConfigInfo = FORM_BROWSER_CONFIG_REQUEST_FROM_LINK (Link);
       Link = GetNextNode (&Form->ConfigRequestHead, Link);
 
-      if (ConfigInfo->Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) {
+      Storage = ConfigInfo->Storage;
+      if (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) {
         continue;
       }
 
@@ -2007,7 +2068,7 @@ SubmitForm (
       }
 
       //
-      // Prepare <ConfigResp>
+      // 1. Prepare <ConfigResp>
       //
       Status = StorageToConfigResp (ConfigInfo, &ConfigResp, TRUE);
       if (EFI_ERROR (Status)) {
@@ -2015,27 +2076,82 @@ SubmitForm (
       }
 
       //
-      // Send <ConfigResp> to Configuration Driver
+      // 2. Set value to hii driver or efi variable.
       //
-      if (FormSet->ConfigAccess != NULL) {
-        Status = FormSet->ConfigAccess->RouteConfig (
-                                          FormSet->ConfigAccess,
-                                          ConfigResp,
-                                          &Progress
-                                          );
+      if (Storage->Type == EFI_HII_VARSTORE_BUFFER || 
+          Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+        //
+        // Send <ConfigResp> to Configuration Driver
+        //
+        if (FormSet->ConfigAccess != NULL) {
+          Status = FormSet->ConfigAccess->RouteConfig (
+                                            FormSet->ConfigAccess,
+                                            ConfigResp,
+                                            &Progress
+                                            );
+          if (EFI_ERROR (Status)) {
+            FreePool (ConfigResp);
+            return Status;
+          }
+        }
+      } else if (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+        TmpBuf = NULL;
+        TmpBuf = AllocateZeroPool(Storage->Size);
+        if (TmpBuf == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          return Status;
+        }
+
+        BufferSize = Storage->Size;
+        Status = gRT->GetVariable (
+                         Storage->Name,
+                         &Storage->Guid,
+                         NULL,
+                         &BufferSize,
+                         TmpBuf
+                         );
+        if (EFI_ERROR (Status)) {
+          FreePool (TmpBuf);
+          FreePool (ConfigResp);
+          return Status;
+        }
+        ASSERT (BufferSize == Storage->Size);      
+        Status = mHiiConfigRouting->ConfigToBlock (
+                                      mHiiConfigRouting,
+                                      ConfigResp,
+                                      TmpBuf,
+                                      &BufferSize,
+                                      &Progress
+                                      );
+        if (EFI_ERROR (Status)) {
+          FreePool (TmpBuf);
+          FreePool (ConfigResp);
+          return Status;
+        }
+
+        Status = gRT->SetVariable (
+                         Storage->Name,
+                         &Storage->Guid,
+                         Storage->Attributes,
+                         Storage->Size,
+                         TmpBuf
+                         );
+        FreePool (TmpBuf);
         if (EFI_ERROR (Status)) {
           FreePool (ConfigResp);
           return Status;
         }
       }
       FreePool (ConfigResp);
-
       //
-      // Config success, update storage shadow Buffer
+      // 3. Config success, update storage shadow Buffer, only update the data belong to this form.
       //
-      SynchronizeStorage (ConfigInfo->Storage);
+      SynchronizeStorageForForm(FormSet, ConfigInfo, TRUE);
     }
 
+    //
+    // 4. Update the NV flag.
+    // 
     Form->NvUpdateRequired = FALSE;
   } else {
     //
@@ -2058,35 +2174,86 @@ SubmitForm (
       }
 
       //
-      // Prepare <ConfigResp>
+      // 1. Prepare <ConfigResp>
       //
       Status = StorageToConfigResp (Storage, &ConfigResp, FALSE);
       if (EFI_ERROR (Status)) {
         return Status;
       }
 
-      //
-      // Send <ConfigResp> to Configuration Driver
-      //
-      if (FormSet->ConfigAccess != NULL) {
-        Status = FormSet->ConfigAccess->RouteConfig (
-                                          FormSet->ConfigAccess,
-                                          ConfigResp,
-                                          &Progress
-                                          );
+      if (Storage->Type == EFI_HII_VARSTORE_BUFFER || 
+          Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+
+        //
+        // 2. Send <ConfigResp> to Configuration Driver
+        //
+        if (FormSet->ConfigAccess != NULL) {
+          Status = FormSet->ConfigAccess->RouteConfig (
+                                            FormSet->ConfigAccess,
+                                            ConfigResp,
+                                            &Progress
+                                            );
+          if (EFI_ERROR (Status)) {
+            FreePool (ConfigResp);
+            return Status;
+          }
+        }
+      } else if (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+        //
+        // 1&2. Set the edit data to the variable.
+        //
+        TmpBuf = NULL;
+        TmpBuf = AllocateZeroPool (Storage->Size);
+        if (TmpBuf == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          return Status;
+        }        
+        BufferSize = Storage->Size;
+        Status = gRT->GetVariable (
+                       Storage->Name,
+                       &Storage->Guid,
+                       NULL,
+                       &BufferSize,
+                       TmpBuf
+                       );
+        ASSERT (BufferSize == Storage->Size);      
+        Status = mHiiConfigRouting->ConfigToBlock (
+                                      mHiiConfigRouting,
+                                      ConfigResp,
+                                      TmpBuf,
+                                      &BufferSize,
+                                      &Progress
+                                      );
         if (EFI_ERROR (Status)) {
+          FreePool (TmpBuf);
           FreePool (ConfigResp);
           return Status;
         }
+
+        Status = gRT->SetVariable (
+                         Storage->Name,
+                         &Storage->Guid,
+                         Storage->Attributes,
+                         Storage->Size,
+                         TmpBuf
+                         );
+        if (EFI_ERROR (Status)) {
+          FreePool (TmpBuf);
+          FreePool (ConfigResp);
+          return Status;
+        }
+        FreePool (TmpBuf);
       }
       FreePool (ConfigResp);
-
       //
-      // Config success, update storage shadow Buffer
+      // 3. Config success, update storage shadow Buffer
       //
-      SynchronizeStorage (Storage);
+      SynchronizeStorage (Storage, TRUE);
     }
 
+    //
+    // 4. Update the NV flag.
+    // 
     UpdateNvInfoInForm(FormSet, FALSE);
   }
 
@@ -2136,7 +2303,9 @@ GetDefaultValueFromAltCfg (
   Value         = NULL;
   Storage       = Question->Storage;
 
-  if ((Storage == NULL) || (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE)) {
+  if ((Storage == NULL) || 
+      (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) || 
+      (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER)) {
     return Status;
   }
 
@@ -2754,6 +2923,17 @@ LoadStorage (
     return EFI_SUCCESS;
   }
 
+  if (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+    Status = gRT->GetVariable (
+                     Storage->Name,
+                     &Storage->Guid,
+                     NULL,
+                     (UINTN*)&Storage->Size,
+                     Storage->EditBuffer
+                     );
+    return Status;
+  }
+
   if (FormSet->ConfigAccess == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -2817,6 +2997,7 @@ CopyStorage (
 
   switch (Src->Type) {
   case EFI_HII_VARSTORE_BUFFER:
+  case EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER:
     CopyMem (Dst->EditBuffer, Src->EditBuffer, Src->Size);
     CopyMem (Dst->Buffer, Src->Buffer, Src->Size);
     break;
@@ -2907,7 +3088,7 @@ InitializeCurrentSetting (
       // settings(higher priority), sychronize it to shadow Buffer
       //
       if (!EFI_ERROR (Status)) {
-        SynchronizeStorage (Storage);
+        SynchronizeStorage (Storage, TRUE);
       }
     } else {
       //

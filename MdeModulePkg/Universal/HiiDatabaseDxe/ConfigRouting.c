@@ -781,6 +781,187 @@ BlockArrayCheck (
 }
 
 /**
+  Get form package data from data base.
+
+  @param  DataBaseRecord         The DataBaseRecord instance contains the found Hii handle and package.
+  @param  HiiFormPackage         The buffer saves the package data.
+  @param  PackageSize            The buffer size of the package data.
+
+**/
+EFI_STATUS
+GetFormPackageData (
+  IN     HII_DATABASE_RECORD        *DataBaseRecord,
+  IN OUT UINT8                      **HiiFormPackage,
+  OUT    UINTN                      *PackageSize
+  )
+{
+  EFI_STATUS                   Status;
+  UINTN                        Size;
+  UINTN                        ResultSize;
+
+  if (DataBaseRecord == NULL || HiiFormPackage == NULL || PackageSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Size       = 0;
+  ResultSize = 0;
+  //
+  // 0. Get Hii Form Package by HiiHandle
+  //
+  Status = ExportFormPackages (
+             &mPrivate, 
+             DataBaseRecord->Handle, 
+             DataBaseRecord->PackageList, 
+             0, 
+             Size, 
+             HiiFormPackage,
+             &ResultSize
+           );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+ 
+  (*HiiFormPackage) = AllocatePool (ResultSize);
+  if (*HiiFormPackage == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    return Status;
+  }
+
+  //
+  // Get HiiFormPackage by HiiHandle
+  //
+  Size   = ResultSize;
+  ResultSize    = 0;
+  Status = ExportFormPackages (
+             &mPrivate, 
+             DataBaseRecord->Handle, 
+             DataBaseRecord->PackageList, 
+             0,
+             Size, 
+             *HiiFormPackage,
+             &ResultSize
+           );
+  if (EFI_ERROR (Status)) {
+    FreePool (*HiiFormPackage);
+  }
+  
+  *PackageSize = Size;
+
+  return Status;
+}
+
+
+/**
+  This function parses Form Package to get the efi varstore info according to the request ConfigHdr.
+
+  @param  DataBaseRecord        The DataBaseRecord instance contains the found Hii handle and package.
+  @param  ConfigHdr             Request string ConfigHdr. If it is NULL,
+                                the first found varstore will be as ConfigHdr.
+  @param  IsEfiVarstore         Whether the request storage type is efi varstore type.
+  @param  EfiVarStore           The efi varstore info which will return.
+**/                                
+EFI_STATUS
+GetVarStoreType (
+  IN     HII_DATABASE_RECORD        *DataBaseRecord,
+  IN     EFI_STRING                 ConfigHdr,
+  OUT    BOOLEAN                    *IsEfiVarstore,
+  OUT    EFI_IFR_VARSTORE_EFI       **EfiVarStore
+  
+  )
+{
+  EFI_STATUS               Status;
+  UINTN                    IfrOffset;
+  EFI_IFR_OP_HEADER        *IfrOpHdr;
+  CHAR16                   *VarStoreName;
+  EFI_STRING               GuidStr;
+  EFI_STRING               NameStr;
+  EFI_STRING               TempStr;
+  UINTN                    LengthString;  
+  UINT8                    *HiiFormPackage;
+  UINTN                    PackageSize;
+  EFI_IFR_VARSTORE_EFI     *IfrEfiVarStore;
+  
+  HiiFormPackage = NULL;
+  LengthString     = 0;
+  Status           = EFI_SUCCESS;
+  GuidStr          = NULL;
+  NameStr          = NULL;
+  TempStr          = NULL;
+
+  Status = GetFormPackageData(DataBaseRecord, &HiiFormPackage, &PackageSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  IfrOffset   = sizeof (EFI_HII_PACKAGE_HEADER);
+  while (IfrOffset < PackageSize) {
+    IfrOpHdr  = (EFI_IFR_OP_HEADER *) (HiiFormPackage + IfrOffset);    
+    IfrOffset += IfrOpHdr->Length;
+
+    if (IfrOpHdr->OpCode == EFI_IFR_VARSTORE_EFI_OP ) {
+      IfrEfiVarStore = (EFI_IFR_VARSTORE_EFI *) IfrOpHdr;
+      //
+      // If the length is small than the structure, this is from old efi 
+      // varstore definition. Old efi varstore get config directly from 
+      // GetVariable function.
+      //
+      if (IfrOpHdr->Length < sizeof (EFI_IFR_VARSTORE_EFI)) {
+        continue;
+      }
+
+      VarStoreName = AllocateZeroPool (AsciiStrSize ((CHAR8 *)IfrEfiVarStore->Name) * sizeof (CHAR16));
+      if (VarStoreName == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
+      AsciiStrToUnicodeStr ((CHAR8 *) IfrEfiVarStore->Name, VarStoreName);
+
+      GenerateSubStr (L"GUID=", sizeof (EFI_GUID), (VOID *) &IfrEfiVarStore->Guid, 1, &GuidStr);
+      GenerateSubStr (L"NAME=", StrLen (VarStoreName) * sizeof (CHAR16), (VOID *) VarStoreName, 2, &NameStr);
+      LengthString = StrLen (GuidStr);
+      LengthString = LengthString + StrLen (NameStr) + 1;
+      TempStr = AllocateZeroPool (LengthString * sizeof (CHAR16));
+      if (TempStr == NULL) {
+        FreePool (GuidStr);
+        FreePool (NameStr);
+        FreePool (VarStoreName);
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
+      StrCpy (TempStr, GuidStr);
+      StrCat (TempStr, NameStr);
+      if (ConfigHdr == NULL || StrnCmp (ConfigHdr, TempStr, StrLen (TempStr)) == 0) {
+        *EfiVarStore = (EFI_IFR_VARSTORE_EFI *) AllocateZeroPool (IfrOpHdr->Length);
+        if (*EfiVarStore == NULL) {
+          FreePool (VarStoreName);
+          FreePool (GuidStr);
+          FreePool (NameStr);
+          FreePool (TempStr);
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Done;
+        }
+        *IsEfiVarstore = TRUE;
+        CopyMem (*EfiVarStore, IfrEfiVarStore, IfrOpHdr->Length);
+      } 
+        
+      //
+      // Free alllocated temp string.
+      //
+      FreePool (VarStoreName);
+      FreePool (GuidStr);
+      FreePool (NameStr);
+      FreePool (TempStr);
+    }
+  }
+Done:
+  if (HiiFormPackage != NULL) {
+    FreePool (HiiFormPackage);
+  }
+
+  return Status;
+}
+
+/**
   This function parses Form Package to get the block array and the default
   value array according to the request ConfigHdr.
 
@@ -811,6 +992,7 @@ ParseIfrData (
   EFI_STATUS               Status;
   UINTN                    IfrOffset;
   EFI_IFR_VARSTORE         *IfrVarStore;
+  EFI_IFR_VARSTORE_EFI     *IfrEfiVarStore;
   EFI_IFR_OP_HEADER        *IfrOpHdr;
   EFI_IFR_ONE_OF           *IfrOneOf;
   EFI_IFR_ONE_OF_OPTION    *IfrOneOfOption;
@@ -876,7 +1058,7 @@ ParseIfrData (
       LengthString = StrLen (GuidStr);
       LengthString = LengthString + StrLen (NameStr) + 1;
       TempStr = AllocateZeroPool (LengthString * sizeof (CHAR16));
-    if (TempStr == NULL) {
+      if (TempStr == NULL) {
         FreePool (GuidStr);
         FreePool (NameStr);
         FreePool (VarStoreName);
@@ -892,6 +1074,73 @@ ParseIfrData (
         CopyGuid (&VarStorageData->Guid, (EFI_GUID *) (VOID *) &IfrVarStore->Guid);
         VarStorageData->VarStoreId = IfrVarStore->VarStoreId;
         VarStorageData->Size       = IfrVarStore->Size;
+        VarStorageData->Name       = VarStoreName;
+      } else {
+        //
+        // No found, free the allocated memory 
+        //
+        FreePool (VarStoreName);
+      }
+      //
+      // Free alllocated temp string.
+      //
+      FreePool (GuidStr);
+      FreePool (NameStr);
+      FreePool (TempStr);
+      break;
+
+    case EFI_IFR_VARSTORE_EFI_OP:
+      //
+      // VarStore is found. Don't need to search any more.
+      //
+      if (VarStorageData->Size != 0) {
+        break;
+      }
+
+      //
+      // Get the requied varstore information
+      // Add varstore by Guid and Name in ConfigHdr
+      // Make sure Offset is in varstore size and varstoreid
+      //
+      IfrEfiVarStore = (EFI_IFR_VARSTORE_EFI *) IfrOpHdr;
+
+      //
+      // If the length is small than the structure, this is from old efi 
+      // varstore definition. Old efi varstore get config directly from 
+      // GetVariable function.
+      //      
+      if (IfrOpHdr->Length < sizeof (EFI_IFR_VARSTORE_EFI)) {
+        break;
+      }
+
+      VarStoreName = AllocateZeroPool (AsciiStrSize ((CHAR8 *)IfrEfiVarStore->Name) * sizeof (CHAR16));
+      if (VarStoreName == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
+      AsciiStrToUnicodeStr ((CHAR8 *) IfrEfiVarStore->Name, VarStoreName);
+
+      GenerateSubStr (L"GUID=", sizeof (EFI_GUID), (VOID *) &IfrEfiVarStore->Guid, 1, &GuidStr);
+      GenerateSubStr (L"NAME=", StrLen (VarStoreName) * sizeof (CHAR16), (VOID *) VarStoreName, 2, &NameStr);
+      LengthString = StrLen (GuidStr);
+      LengthString = LengthString + StrLen (NameStr) + 1;
+      TempStr = AllocateZeroPool (LengthString * sizeof (CHAR16));
+      if (TempStr == NULL) {
+        FreePool (GuidStr);
+        FreePool (NameStr);
+        FreePool (VarStoreName);
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
+      StrCpy (TempStr, GuidStr);
+      StrCat (TempStr, NameStr);
+      if (ConfigHdr == NULL || StrnCmp (ConfigHdr, TempStr, StrLen (TempStr)) == 0) {
+        //
+        // Find the matched VarStore
+        //
+        CopyGuid (&VarStorageData->Guid, (EFI_GUID *) (VOID *) &IfrEfiVarStore->Guid);
+        VarStorageData->VarStoreId = IfrEfiVarStore->VarStoreId;
+        VarStorageData->Size       = IfrEfiVarStore->Size;
         VarStorageData->Name       = VarStoreName;
       } else {
         //
@@ -1637,45 +1886,10 @@ GetFullStringFromHiiFormPackages (
   PackageSize       = 0;
   DataExist         = FALSE;
   Progress          = *Request;
- 
-  //
-  // 0. Get Hii Form Package by HiiHandle
-  //
-  Status = ExportFormPackages (
-             &mPrivate, 
-             DataBaseRecord->Handle, 
-             DataBaseRecord->PackageList, 
-             0, 
-             PackageSize, 
-             HiiFormPackage,
-             &ResultSize
-           );
+
+  Status = GetFormPackageData (DataBaseRecord, &HiiFormPackage, &PackageSize);
   if (EFI_ERROR (Status)) {
     return Status;
-  }
- 
-  HiiFormPackage = AllocatePool (ResultSize);
-  if (HiiFormPackage == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
-  }
-
-  //
-  // Get HiiFormPackage by HiiHandle
-  //
-  PackageSize   = ResultSize;
-  ResultSize    = 0;
-  Status = ExportFormPackages (
-             &mPrivate, 
-             DataBaseRecord->Handle, 
-             DataBaseRecord->PackageList, 
-             0,
-             PackageSize, 
-             HiiFormPackage,
-             &ResultSize
-           );
-  if (EFI_ERROR (Status)) {
-    goto Done;
   }
 
   //
@@ -2209,6 +2423,168 @@ Done:
 }
 
 /**
+  This function gets the full request resp string by 
+  parsing IFR data in HII form packages.
+
+  @param  This                   A pointer to the EFI_HII_CONFIG_ROUTING_PROTOCOL
+                                 instance.
+  @param  EfiVarStoreInfo        The efi varstore info which is save in the EFI 
+                                 varstore data structure.                       
+  @param  Request                Pointer to a null-terminated Unicode string in
+                                 <ConfigRequest> format.
+  @param  RequestResp            Pointer to a null-terminated Unicode string in
+                                 <ConfigResp> format.
+  @param  AccessProgress         On return, points to a character in the Request
+                                 string. Points to the string's null terminator if
+                                 request was successful. Points to the most recent
+                                 & before the first failing name / value pair (or
+                                 the beginning of the string if the failure is in
+                                 the first name / value pair) if the request was
+                                 not successful.
+
+  @retval EFI_SUCCESS            The Results string is set to the full request string.
+                                 And AltCfgResp contains all default value string.
+  @retval EFI_OUT_OF_RESOURCES   Not enough memory for the return string.
+  @retval EFI_INVALID_PARAMETER  Request points to NULL.
+
+**/
+EFI_STATUS
+GetConfigRespFromEfiVarStore (
+  IN  CONST EFI_HII_CONFIG_ROUTING_PROTOCOL  *This,
+  IN  EFI_IFR_VARSTORE_EFI                   *EfiVarStoreInfo,    
+  IN  EFI_STRING                             Request,
+  OUT EFI_STRING                             *RequestResp,
+  OUT EFI_STRING                             *AccessProgress
+  )
+{
+  EFI_STATUS Status;
+  EFI_STRING VarStoreName;
+  UINT8      *VarStore;
+  UINTN      BufferSize;
+
+  Status       = EFI_SUCCESS;
+  BufferSize   = 0;
+  VarStore     = NULL;
+  VarStoreName = NULL;
+  
+  VarStoreName = AllocateZeroPool (AsciiStrSize ((CHAR8 *)EfiVarStoreInfo->Name) * sizeof (CHAR16));
+  if (VarStoreName == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
+  }
+  AsciiStrToUnicodeStr ((CHAR8 *) EfiVarStoreInfo->Name, VarStoreName);
+   
+  
+  Status = gRT->GetVariable (VarStoreName, &EfiVarStoreInfo->Guid, NULL, &BufferSize, NULL);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    goto Done;
+  }
+
+  VarStore = AllocateZeroPool (BufferSize);
+  ASSERT (VarStore != NULL);
+  Status = gRT->GetVariable (VarStoreName, &EfiVarStoreInfo->Guid, NULL, &BufferSize, VarStore);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Status = HiiBlockToConfig(This, Request, VarStore, BufferSize, RequestResp, AccessProgress);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+Done:
+  if (VarStoreName != NULL) {
+    FreePool (VarStoreName);
+  }
+
+  if (VarStore != NULL) {
+    FreePool (VarStore);
+  }
+
+  return Status;
+}
+
+
+/**
+  This function route the full request resp string for efi varstore. 
+
+  @param  This                   A pointer to the EFI_HII_CONFIG_ROUTING_PROTOCOL
+                                 instance.
+  @param  EfiVarStoreInfo        The efi varstore info which is save in the EFI 
+                                 varstore data structure.      
+  @param  RequestResp            Pointer to a null-terminated Unicode string in
+                                 <ConfigResp> format.
+  @param  Result                 Pointer to a null-terminated Unicode string in
+                                 <ConfigResp> format.
+                                 
+  @retval EFI_SUCCESS            The Results string is set to the full request string.
+                                 And AltCfgResp contains all default value string.
+  @retval EFI_OUT_OF_RESOURCES   Not enough memory for the return string.
+  @retval EFI_INVALID_PARAMETER  Request points to NULL.
+
+**/
+EFI_STATUS
+RouteConfigRespForEfiVarStore (
+  IN  CONST EFI_HII_CONFIG_ROUTING_PROTOCOL  *This,
+  IN  EFI_IFR_VARSTORE_EFI                   *EfiVarStoreInfo,  
+  IN  EFI_STRING                             RequestResp,
+  OUT EFI_STRING                             *Result
+  )
+{
+  EFI_STATUS Status;
+  EFI_STRING VarStoreName;
+  CHAR8      *VarStore;
+  UINTN      BufferSize;
+  UINTN      BlockSize;
+
+  Status       = EFI_SUCCESS;
+  BufferSize   = 0;
+  VarStore     = NULL;
+  VarStoreName = NULL;
+
+  VarStoreName = AllocateZeroPool (AsciiStrSize ((CHAR8 *)EfiVarStoreInfo->Name) * sizeof (CHAR16));
+  if (VarStoreName == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
+  }
+  AsciiStrToUnicodeStr ((CHAR8 *) EfiVarStoreInfo->Name, VarStoreName);
+      
+  Status = gRT->GetVariable (VarStoreName, &EfiVarStoreInfo->Guid, NULL, &BufferSize, NULL);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    goto Done;
+  }
+
+  BlockSize = BufferSize;
+  VarStore = AllocateZeroPool (BufferSize);
+  ASSERT (VarStore != NULL);
+  Status = gRT->GetVariable (VarStoreName, &EfiVarStoreInfo->Guid, NULL, &BufferSize, VarStore);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Status = HiiConfigToBlock(This, RequestResp, VarStore, &BlockSize, Result);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Status = gRT->SetVariable (VarStoreName, &EfiVarStoreInfo->Guid, EfiVarStoreInfo->Attributes, BufferSize, VarStore);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+Done:
+  if (VarStoreName != NULL) {
+    FreePool (VarStoreName);
+  }
+
+  if (VarStore != NULL) {
+    FreePool (VarStore);
+  }
+
+  return Status;
+}
+
+/**
   This function allows a caller to extract the current configuration
   for one or more named elements from one or more drivers.
 
@@ -2275,6 +2651,8 @@ HiiConfigRoutingExtractConfig (
   EFI_STRING                          DefaultResults;
   BOOLEAN                             FirstElement;
   BOOLEAN                             IfrDataParsedFlag;
+  BOOLEAN                             IsEfiVarStore;
+  EFI_IFR_VARSTORE_EFI                *EfiVarStoreInfo; 
 
   if (This == NULL || Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2292,8 +2670,11 @@ HiiConfigRoutingExtractConfig (
   ConfigRequest  = NULL;
   Status         = EFI_SUCCESS;
   AccessResults  = NULL;
+  AccessProgress = NULL;
   DevicePath     = NULL;
   IfrDataParsedFlag = FALSE;
+  IsEfiVarStore     = FALSE;
+  EfiVarStoreInfo   = NULL;
 
   //
   // The first element of <MultiConfigRequest> should be
@@ -2418,21 +2799,37 @@ HiiConfigRoutingExtractConfig (
     }
 
     //
-    // Call corresponding ConfigAccess protocol to extract settings
+    // Check whether this ConfigRequest is search from Efi varstore type storage.
     //
-    Status = gBS->HandleProtocol (
-                    DriverHandle,
-                    &gEfiHiiConfigAccessProtocolGuid,
-                    (VOID **) &ConfigAccess
-                    );
-    ASSERT_EFI_ERROR (Status);
+    Status = GetVarStoreType(Database, ConfigRequest, &IsEfiVarStore, &EfiVarStoreInfo);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+    
+    if (IsEfiVarStore) {
+      //
+      // Call the GetVariable function to extract settings.
+      //
+      Status = GetConfigRespFromEfiVarStore(This, EfiVarStoreInfo, ConfigRequest, &AccessResults, &AccessProgress);
+      FreePool (EfiVarStoreInfo);    
+    } else {
+      //
+      // Call corresponding ConfigAccess protocol to extract settings
+      //
+      Status = gBS->HandleProtocol (
+                      DriverHandle,
+                      &gEfiHiiConfigAccessProtocolGuid,
+                      (VOID **) &ConfigAccess
+                      );
+      ASSERT_EFI_ERROR (Status);
 
-    Status = ConfigAccess->ExtractConfig (
-                             ConfigAccess,
-                             ConfigRequest,
-                             &AccessProgress,
-                             &AccessResults
-                             );
+      Status = ConfigAccess->ExtractConfig (
+                               ConfigAccess,
+                               ConfigRequest,
+                               &AccessProgress,
+                               &AccessResults
+                               );
+    }
     if (EFI_ERROR (Status)) {
       //
       // AccessProgress indicates the parsing progress on <ConfigRequest>.
@@ -2766,6 +3163,8 @@ HiiConfigRoutingRouteConfig (
   EFI_HANDLE                          DriverHandle;
   EFI_HII_CONFIG_ACCESS_PROTOCOL      *ConfigAccess;
   EFI_STRING                          AccessProgress;
+  EFI_IFR_VARSTORE_EFI                *EfiVarStoreInfo;
+  BOOLEAN                             IsEfiVarstore;
 
   if (This == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2779,6 +3178,10 @@ HiiConfigRoutingRouteConfig (
   Private   = CONFIG_ROUTING_DATABASE_PRIVATE_DATA_FROM_THIS (This);
   StringPtr = Configuration;
   *Progress = StringPtr;
+  Database       = NULL;
+  AccessProgress = NULL;
+  EfiVarStoreInfo= NULL;
+  IsEfiVarstore  = FALSE;
 
   //
   // The first element of <MultiConfigResp> should be
@@ -2869,21 +3272,36 @@ HiiConfigRoutingRouteConfig (
     FreePool (DevicePath);
 
     //
-    // Call corresponding ConfigAccess protocol to route settings
+    // Check whether this ConfigRequest is search from Efi varstore type storage.
     //
-    Status = gBS->HandleProtocol (
-                    DriverHandle,
-                    &gEfiHiiConfigAccessProtocolGuid,
-                    (VOID **)  &ConfigAccess
-                    );
-    ASSERT_EFI_ERROR (Status);
+    Status = GetVarStoreType(Database, ConfigResp, &IsEfiVarstore, &EfiVarStoreInfo);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
-    Status = ConfigAccess->RouteConfig (
-                             ConfigAccess,
-                             ConfigResp,
-                             &AccessProgress
-                             );
+    if (IsEfiVarstore) {
+      //
+      // Call the SetVariable function to route settings.
+      //    
+      Status = RouteConfigRespForEfiVarStore(This, EfiVarStoreInfo, ConfigResp, &AccessProgress);
+      FreePool (EfiVarStoreInfo);
+    } else {
+      //
+      // Call corresponding ConfigAccess protocol to route settings
+      //
+      Status = gBS->HandleProtocol (
+                      DriverHandle,
+                      &gEfiHiiConfigAccessProtocolGuid,
+                      (VOID **)  &ConfigAccess
+                      );
+      ASSERT_EFI_ERROR (Status);
 
+      Status = ConfigAccess->RouteConfig (
+                               ConfigAccess,
+                               ConfigResp,
+                               &AccessProgress
+                               );
+    }
     if (EFI_ERROR (Status)) {
       //
       // AccessProgress indicates the parsing progress on <ConfigResp>.
