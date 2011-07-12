@@ -1,6 +1,7 @@
 #------------------------------------------------------------------------------
 #
 # Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved. 
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -11,42 +12,37 @@
 #
 # Module Name:
 #
-#   SwitchStack.S
+#   InternalSwitchStack.S
 #
 # Abstract:
 #
+#   Implementation of a stack switch on IA-32.
+#
 #------------------------------------------------------------------------------
 
-
-#------------------------------------------------------------------------------
-# Routine Description:
-#
-#   Routine for switching stacks with 2 parameters
-#
-# Arguments:
-#
-#   (rcx) EntryPoint    - Entry point with new stack.
-#   (rdx) Context1      - Parameter1 for entry point.
-#   (r8)  Context2      - Parameter2 for entry point.
-#   (r9)  NewStack      - The pointer to new stack.
-#
-# Returns:
-#
-#   None
-#
-#------------------------------------------------------------------------------
 ASM_GLOBAL ASM_PFX(InternalSwitchStack)
+
+#------------------------------------------------------------------------------
+# VOID
+# EFIAPI
+# InternalSwitchStack (
+#   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
+#   IN      VOID                      *Context1,   OPTIONAL
+#   IN      VOID                      *Context2,   OPTIONAL
+#   IN      VOID                      *NewStack
+#   );
+#------------------------------------------------------------------------------
 ASM_PFX(InternalSwitchStack):
-	  pushq   %rbp            
-  	movq    %rsp, %rbp
-    
-    mov     %rcx, %rax  // Shift registers for new call
-    mov     %rdx, %rcx
-    mov     %r8, %rdx
-    #
-    # Reserve space for register parameters (rcx, rdx, r8 & r9) on the stack,
-    # in case the callee wishes to spill them.
-    #
-    lea     -0x20(%r9), %rsp
-    pushq   $0        // stop gdb stack unwind
-    jmp     *%rax     // call EntryPoint ()
+  pushl %ebp
+	movl	%esp, %ebp
+
+	movl	20(%ebp), %esp      # switch stack
+	subl	$8, %esp
+
+	movl	16(%ebp), %eax
+	movl	%eax, 4(%esp)
+	movl	12(%ebp), %eax
+	movl	%eax, (%esp)
+	pushl $0                  # keeps gdb from unwinding stack
+	jmp   *8(%ebp)            # call and never return 
+

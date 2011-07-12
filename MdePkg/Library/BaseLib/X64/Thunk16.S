@@ -49,12 +49,17 @@ ASM_GLOBAL ASM_PFX(InternalAsmThunk16)
 .set  IA32_REGS_SIZE, 56
 
     .data
-
-ASM_PFX(m16Size):         .word      ASM_PFX(InternalAsmThunk16) - ASM_PFX(m16Start)
-ASM_PFX(mThunk16Attr):    .word      _ThunkAttr - ASM_PFX(m16Start)
-ASM_PFX(m16Gdt):          .word      ASM_PFX(NullSeg) - ASM_PFX(m16Start)
-ASM_PFX(m16GdtrBase):     .word      _16GdtrBase - ASM_PFX(m16Start)
-ASM_PFX(mTransition):     .word      _EntryPoint - ASM_PFX(m16Start)
+    
+.set Lm16Size, ASM_PFX(InternalAsmThunk16) - ASM_PFX(m16Start)
+ASM_PFX(m16Size):         .word      Lm16Size
+.set  LmThunk16Attr, L_ThunkAttr - ASM_PFX(m16Start)
+ASM_PFX(mThunk16Attr):    .word      LmThunk16Attr
+.set Lm16Gdt, ASM_PFX(NullSeg) - ASM_PFX(m16Start)
+ASM_PFX(m16Gdt):          .word      Lm16Gdt
+.set Lm16GdtrBase, _16GdtrBase - ASM_PFX(m16Start)
+ASM_PFX(m16GdtrBase):     .word      Lm16GdtrBase
+.set LmTransition, _EntryPoint - ASM_PFX(m16Start)
+ASM_PFX(mTransition):     .word      LmTransition
 
     .text
 
@@ -91,7 +96,7 @@ L_Base:
     .byte 0x1e                          # push ds
     .byte 0x66,0x60                     # pushad
     .byte 0x66,0xba                     # mov edx, imm32
-_ThunkAttr:  .space  4
+L_ThunkAttr:  .space  4
     testb   $THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15, %dl
     jz      L_1
     movl    $0x15cd2401,%eax            # mov ax, 2401h & int 15h
@@ -120,7 +125,7 @@ L_2:
     .byte 0x66,0x2e,0x89,0x87           # mov cs:[bx + (L_64Eip - L_Base)], eax
     .word   L_64Eip - L_Base
     .byte 0x66,0xb8                     # mov eax, imm32
-SavedCr4:   .space  4
+L_SavedCr4:   .long  0
     movq    %rax, %cr4
     #
     # rdi in the instruction below is indeed bx in 16-bit code
@@ -133,15 +138,15 @@ SavedCr4:   .space  4
     orb     $1,%ah
     wrmsr
     .byte 0x66,0xb8                     # mov eax, imm32
-SavedCr0:    .space      4
+L_SavedCr0:    .long      
     movq    %rax, %cr0
     .byte 0x66,0xea                     # jmp far cs:L_64Bit
-L_64Eip:     .space      4
-SavedCs:     .space      2
+L_64Eip:     .long       0
+L_SavedCs:     .space      2
 L_64BitCode: 
     .byte   0x90
     .byte   0x67,0xbc                  # mov esp, imm32
-SavedSp:    .space 4                   # restore stack
+L_SavedSp:    .long                      # restore stack
     nop
     ret
 
@@ -258,19 +263,20 @@ ASM_PFX(InternalAsmThunk16):
     popq    %rcx
     rep
     movsl                               # copy RegSet
-    lea     (SavedCr4 - ASM_PFX(m16Start))(%rdx), %ecx
+    lea     (L_SavedCr4 - ASM_PFX(m16Start))(%rdx), %ecx
     movl    %edx,%eax                   # eax <- transition code address
     andl    $0xf,%edx
     shll    $12,%eax                    # segment address in high order 16 bits
-    lea     (ASM_PFX(BackFromUserCode) - ASM_PFX(m16Start))(%rdx), %ax
+    .set LBackFromUserCodeDelta, ASM_PFX(BackFromUserCode) - ASM_PFX(m16Start) 
+    lea     (LBackFromUserCodeDelta)(%rdx), %ax
     stosl                               # [edi] <- return address of user code
     sgdt    0x60(%rsp)                  # save GDT stack in argument space
     movzwq  0x60(%rsp), %r10            # r10 <- GDT limit 
-    lea     ((ASM_PFX(InternalAsmThunk16) - SavedCr4) + 0xf)(%rcx), %r11 
+    lea     ((ASM_PFX(InternalAsmThunk16) - L_SavedCr4) + 0xf)(%rcx), %r11 
     andq    $0xfffffffffffffff0, %r11   # r11 <- 16-byte aligned shadowed GDT table in real mode buffer      
     
-    movw    %r10w, (SavedGdt - SavedCr4)(%rcx)       # save the limit of shadowed GDT table
-    movq    %r11, (SavedGdt - SavedCr4 + 0x2)(%rcx)  # save the base address of shadowed GDT table
+    movw    %r10w, (SavedGdt - L_SavedCr4)(%rcx)       # save the limit of shadowed GDT table
+    movq    %r11, (SavedGdt - L_SavedCr4 + 0x2)(%rcx)  # save the base address of shadowed GDT table
     
     movq    0x62(%rsp) ,%rsi            # rsi <- the original GDT base address
     xchg   %r10, %rcx                   # save rcx to r10 and initialize rcx to be the limit of GDT table 
@@ -283,7 +289,8 @@ ASM_PFX(InternalAsmThunk16):
        
     sidt    0x50(%rsp)
     movq    %cr0, %rax
-    movl    %eax, (SavedCr0 - SavedCr4)(%rcx)
+    .set LSavedCrDelta, L_SavedCr0 - L_SavedCr4
+    movl    %eax, (LSavedCrDelta)(%rcx)
     andl    $0x7ffffffe,%eax            # clear PE, PG bits
     movq    %cr4, %rbp
     movl    %ebp, (%rcx)                # save CR4 in SavedCr4
@@ -291,17 +298,18 @@ ASM_PFX(InternalAsmThunk16):
     movl    %r8d, %esi                  # esi <- 16-bit stack segment
     .byte      0x6a, DATA32
     popq    %rdx
-    lgdt    (_16Gdtr - SavedCr4)(%rcx)
+    lgdt    (_16Gdtr - L_SavedCr4)(%rcx)
     movl    %edx,%ss
     pushfq
     lea     -8(%rdx), %edx
     lea     L_RetFromRealMode(%rip), %r8
     pushq   %r8
     movl    %cs, %r8d
-    movw    %r8w, (SavedCs - SavedCr4)(%rcx)
-    movl    %esp, (SavedSp - SavedCr4)(%rcx)
-    .byte   0xff, 0x69                  #  jmp (_EntryPoint - SavedCr4)(%rcx)
-    .byte   _EntryPoint - SavedCr4
+    movw    %r8w, (L_SavedCs - L_SavedCr4)(%rcx)
+    movl    %esp, (L_SavedSp - L_SavedCr4)(%rcx)
+    .byte   0xff, 0x69                  #  jmp (_EntryPoint - L_SavedCr4)(%rcx)
+    .set    Ltemp1, _EntryPoint - L_SavedCr4
+    .byte   Ltemp1
 L_RetFromRealMode: 
     popfq
     lgdt    0x60(%rsp)                  # restore protected mode GDTR

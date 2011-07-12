@@ -829,6 +829,7 @@ PeCoffLoaderLoadImage (
   EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY    *ResourceDirectoryEntry;
   EFI_IMAGE_RESOURCE_DIRECTORY_STRING   *ResourceDirectoryString;
   EFI_IMAGE_RESOURCE_DATA_ENTRY         *ResourceDataEntry;
+  CHAR16                                *String;
 
 
   ASSERT (ImageContext != NULL);
@@ -1209,11 +1210,12 @@ PeCoffLoaderLoadImage (
         for (Index = 0; Index < ResourceDirectory->NumberOfNamedEntries; Index++) {
           if (ResourceDirectoryEntry->u1.s.NameIsString) {
             ResourceDirectoryString = (EFI_IMAGE_RESOURCE_DIRECTORY_STRING *) (Base + ResourceDirectoryEntry->u1.s.NameOffset);
+            String = &ResourceDirectoryString->String[0];
 
             if (ResourceDirectoryString->Length == 3 &&
-                ResourceDirectoryString->String[0] == L'H' &&
-                ResourceDirectoryString->String[1] == L'I' &&
-                ResourceDirectoryString->String[2] == L'I') {
+                String[0] == L'H' &&
+                String[1] == L'I' &&
+                String[2] == L'I') {
               //
               // Resource Type "HII" found
               //

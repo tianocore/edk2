@@ -277,7 +277,9 @@
   Ia32/DisableCache.S | GCC
 
   Ia32/DivS64x64Remainder.c
-  Ia32/InternalSwitchStack.c
+  Ia32/InternalSwitchStack.c | MSFT
+  Ia32/InternalSwitchStack.c | INTEL
+  Ia32/InternalSwitchStack.S | GCC
   Ia32/Non-existing.c
   Unaligned.c
   X86WriteIdtr.c
