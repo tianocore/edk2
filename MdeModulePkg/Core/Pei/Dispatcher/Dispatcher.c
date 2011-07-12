@@ -815,7 +815,7 @@ PeiDispatcher (
 
               REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
                 EFI_PROGRESS_CODE,
-                (EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT_BEGIN),
+                (EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT_END),
                 (VOID *)(&ExtendedData),
                 sizeof (ExtendedData)
                 );
