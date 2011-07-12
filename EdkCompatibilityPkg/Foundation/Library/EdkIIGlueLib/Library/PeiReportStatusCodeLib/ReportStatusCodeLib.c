@@ -248,7 +248,12 @@ GlueReportStatusCodeExtractDebugInfo (
   // The first 12 * UINTN bytes of the string are really an 
   // argument stack to support varargs on the Format string.
   //
+#ifdef __APPLE__
+  // This is non portable C code you can't assume VA_LIST is pointer
+  return FALSE;
+#else
   *Marker = (VA_LIST) (DebugInfo + 1);
+#endif
   *Format = (CHAR8 *)(((UINT64 *)*Marker) + 12);
 
   return TRUE;

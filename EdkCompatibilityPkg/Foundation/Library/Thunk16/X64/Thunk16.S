@@ -20,7 +20,7 @@
 #*****************************************************************************
 #include <EfiBind.h>
 
-
+#ifndef __APPLE__
 
     .data
 
@@ -240,3 +240,5 @@ FarCallRet:
 _16Idtr:
    .word 0x3ff                          #FWORD   (1 SHL 10) - 1
    .byte 0x00
+
+#endif

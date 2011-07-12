@@ -13,18 +13,18 @@
 #------------------------------------------------------------------------------
 
 
-.equ                   VacantFlag,       0x0
-.equ                   NotVacantFlag,    0xff
+.set                   VacantFlag,       0x0
+.set                   NotVacantFlag,    0xff
 
-.equ                   LockLocation,              RendezvousFunnelProcEnd - RendezvousFunnelProcStart
-.equ                   StackStartAddressLocation, RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x08
-.equ                   StackSizeLocation,         RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x10
-.equ                   CProcedureLocation,        RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x18
-.equ                   GdtrLocation,              RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x20
-.equ                   IdtrLocation,              RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x2A
-.equ                   BufferStartLocation,       RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x34
-.equ                   Cr3OffsetLocation,         RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x38
-.equ                   ProcessorNumberLocation,   RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x38
+.set                   LockLocation,              RendezvousFunnelProcEnd - RendezvousFunnelProcStart
+.set                   StackStartAddressLocation, RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x08
+.set                   StackSizeLocation,         RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x10
+.set                   CProcedureLocation,        RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x18
+.set                   GdtrLocation,              RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x20
+.set                   IdtrLocation,              RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x2A
+.set                   BufferStartLocation,       RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x34
+.set                   Cr3OffsetLocation,         RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x38
+.set                   ProcessorNumberLocation,   RendezvousFunnelProcEnd - RendezvousFunnelProcStart + 0x38
 
 #-------------------------------------------------------------------------------------
 
@@ -186,7 +186,9 @@ RendezvousFunnelProcEnd:
 # comments here for definition of address map
 ASM_GLOBAL ASM_PFX(AsmGetAddressMap)
 ASM_PFX(AsmGetAddressMap):
-
+#ifdef __APPLE__
+        int          $3
+#else
         movq         $RendezvousFunnelProcStart, %rax
         movq         %rax, (%rcx)
         movq         $(ProtectedModeStart - RendezvousFunnelProcStart), 0x08(%rcx)
@@ -194,5 +196,5 @@ ASM_PFX(AsmGetAddressMap):
         movq         $(LongModeStart - RendezvousFunnelProcStart), 0x18(%rcx)
         movq         $(LONG_JUMP - RendezvousFunnelProcStart), 0x20(%rcx)
         movq         $(RendezvousFunnelProcEnd - RendezvousFunnelProcStart), 0x28(%rcx)
-
+#endif
         ret

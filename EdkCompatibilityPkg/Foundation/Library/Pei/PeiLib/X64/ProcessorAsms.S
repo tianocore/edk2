@@ -59,8 +59,8 @@ ASM_PFX(SwitchStacks):
 #SwitchStacks ENDP
 
 
-.equ                            EFI_SUCCESS, 0
-.equ                            EFI_WARN_RETURN_FROM_LONG_JUMP, 5
+.set                            EFI_SUCCESS, 0
+.set                            EFI_WARN_RETURN_FROM_LONG_JUMP, 5
 
 #
 #Routine Description:

@@ -45,9 +45,9 @@ ASM_PFX(AsmExecute32BitCode):
     #
     # save orignal GDTR and CS
     #
-    movq    %ds, %rax
+    movl    %ds, %eax
     push    %rax
-    movq    %cs, %rax
+    movl    %cs, %eax
     push    %rax
     subq    $0x10, %rsp
     sgdt    (%rsp)
@@ -209,8 +209,8 @@ ReturnToLongMode:
     # Reload original DS/ES/SS
     #
     pop     %rcx
-    movq    %rcx, %ds
-    movq    %rcx, %es
-    movq    %rcx, %ss
+    movl    %ecx, %ds
+    movl    %ecx, %es
+    movl    %ecx, %ss
     ret
 

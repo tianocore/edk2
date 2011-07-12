@@ -30,31 +30,33 @@
 .globl ASM_PFX(InternalAsmThunk16)
 
 # define the structure of IA32_REGS
-.equ  _EDI, 0       #size 4
-.equ  _ESI, 4       #size 4
-.equ  _EBP, 8       #size 4
-.equ  _ESP, 12      #size 4
-.equ  _EBX, 16      #size 4
-.equ  _EDX, 20      #size 4
-.equ  _ECX, 24      #size 4
-.equ  _EAX, 28      #size 4
-.equ  _DS,  32      #size 2
-.equ  _ES,  34      #size 2
-.equ  _FS,  36      #size 2
-.equ  _GS,  38      #size 2
-.equ  _EFLAGS, 40   #size 8
-.equ  _EIP, 48      #size 4
-.equ  _CS, 52       #size 2
-.equ  _SS, 54       #size 2
-.equ  IA32_REGS_SIZE, 56
+.set  _EDI, 0       #size 4
+.set  _ESI, 4       #size 4
+.set  _EBP, 8       #size 4
+.set  _ESP, 12      #size 4
+.set  _EBX, 16      #size 4
+.set  _EDX, 20      #size 4
+.set  _ECX, 24      #size 4
+.set  _EAX, 28      #size 4
+.set  _DS,  32      #size 2
+.set  _ES,  34      #size 2
+.set  _FS,  36      #size 2
+.set  _GS,  38      #size 2
+.set  _EFLAGS, 40   #size 8
+.set  _EIP, 48      #size 4
+.set  _CS, 52       #size 2
+.set  _SS, 54       #size 2
+.set  IA32_REGS_SIZE, 56
 
     .data
-
+    
+#ifndef __APPLE__
 ASM_PFX(m16Size):         .word      ASM_PFX(InternalAsmThunk16) - ASM_PFX(m16Start)
 ASM_PFX(mThunk16Attr):    .word      _ThunkAttr - ASM_PFX(m16Start)
 ASM_PFX(m16Gdt):          .word      ASM_PFX(NullSeg) - ASM_PFX(m16Start)
 ASM_PFX(m16GdtrBase):     .word      _16GdtrBase - ASM_PFX(m16Start)
 ASM_PFX(mTransition):     .word      _EntryPoint - ASM_PFX(m16Start)
+#endif
 
     .text
 
@@ -68,6 +70,9 @@ SavedGdt:    .space 10
 #------------------------------------------------------------------------------
 .globl ASM_PFX(BackFromUserCode)
 ASM_PFX(BackFromUserCode):
+#ifdef __APPLE__
+    int $3
+#else
     #
     # The order of saved registers on the stack matches the order they appears
     # in IA32_REGS structure. This facilitates wrapper function to extract them
@@ -143,14 +148,17 @@ L_64BitCode:
     .byte   0x67,0xbc                  # mov esp, imm32
 SavedSp:    .space 4                   # restore stack
     nop
+#endif
     ret
 
+#ifndef __APPLE__
 _EntryPoint: .long      ASM_PFX(ToUserCode) - ASM_PFX(m16Start)
              .word      CODE16
 _16Gdtr:     .word      GDT_SIZE - 1
 _16GdtrBase: .quad      ASM_PFX(NullSeg)
 _16Idtr:     .word      0x3ff
              .long      0
+#endif
 
 #------------------------------------------------------------------------------
 # _ToUserCode() takes control in real mode before passing control to user code.
@@ -158,6 +166,9 @@ _16Idtr:     .word      0x3ff
 #------------------------------------------------------------------------------
 .globl ASM_PFX(ToUserCode)
 ASM_PFX(ToUserCode):
+#ifdef __APPLE__
+    int $3
+#else
     movl    %edx,%ss                    # set new segment selectors
     movl    %edx,%ds
     movl    %edx,%es
@@ -191,11 +202,12 @@ L_RealMode:
     .byte 0x66, 0x9d                    # popfd
     leaw    4(%esp),%sp                 # skip high order 32 bits of EFlags
     .byte 0x66                          # make the following retf 32-bit
-    lret                                # transfer control to user code
+#endif
+     lret                                # transfer control to user code
 
-.equ  CODE16,  ASM_PFX(_16Code) - .
-.equ  DATA16,  ASM_PFX(_16Data) - .
-.equ  DATA32,  ASM_PFX(_32Data) - .
+.set  CODE16,  ASM_PFX(_16Code) - .
+.set  DATA16,  ASM_PFX(_16Data) - .
+.set  DATA32,  ASM_PFX(_32Data) - .
 
 ASM_PFX(NullSeg):   .quad      0
 ASM_PFX(_16Code):
@@ -220,7 +232,7 @@ ASM_PFX(_32Data):
             .byte 0xcf                  # 16-bit segment, 4GB limit
             .byte 0
 
-.equ  GDT_SIZE, . - ASM_PFX(NullSeg)
+.set  GDT_SIZE, . - ASM_PFX(NullSeg)
 
 #------------------------------------------------------------------------------
 # IA32_REGISTER_SET *
@@ -233,6 +245,9 @@ ASM_PFX(_32Data):
 
 .globl ASM_PFX(InternalAsmThunk16)
 ASM_PFX(InternalAsmThunk16):
+#ifdef __APPLE__
+    int $3
+#else
     pushq   %rbp
     pushq   %rbx
     pushq   %rsi
@@ -304,5 +319,5 @@ L_RetFromRealMode:
     popq    %rsi
     popq    %rbx
     popq    %rbp
-
+#endif
     ret

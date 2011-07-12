@@ -61,15 +61,6 @@ Abstract:
 
 
 STATIC
-CHAR_W *
-GetFlagsAndWidth (
-  IN  CHAR_W      *Format, 
-  OUT UINTN       *Flags, 
-  OUT UINTN       *Width,
-  IN OUT  VA_LIST *Marker
-  );
-
-STATIC
 UINTN
 GuidToString (
   IN  EFI_GUID  *Guid,
@@ -180,6 +171,7 @@ Returns:
   UINTN     BufferLeft;
   UINT64    Value;
   EFI_GUID  *TmpGUID;
+  BOOLEAN   Done;
 
   //
   // Process the format string. Stop if Buffer is over run.
@@ -204,8 +196,50 @@ Returns:
       
       //
       // Now it's time to parse what follows after %
-      //
-      Format = GetFlagsAndWidth (Format, &Flags, &Width, &Marker);
+      //    
+      Flags = 0;
+      Width = 0;
+      for (Done = FALSE; !Done; ) {
+        Format++;
+    
+        switch (*Format) {
+    
+        case '-': Flags |= LEFT_JUSTIFY; break;
+        case '+': Flags |= PREFIX_SIGN;  break;
+        case ' ': Flags |= PREFIX_BLANK; break;
+        case ',': Flags |= COMMA_TYPE;   break;
+        case 'L':
+        case 'l': Flags |= LONG_TYPE;    break;
+    
+        case '*':
+          Width = VA_ARG (Marker, UINTN);
+          break;
+    
+        case '0':
+          Flags |= PREFIX_ZERO;
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+          Count = 0;
+          do {
+            Count = (Count * 10) + *Format - '0';
+            Format++;
+          } while ((*Format >= '0')  &&  (*Format <= '9'));
+          Format--;
+          Width = Count;
+          break;
+    
+        default:
+          Done = TRUE;
+        }
+      }
+
       switch (*Format) {
       case 'p':
         //
@@ -345,89 +379,6 @@ Returns:
   Buffer[Index++] = '\0'; 
    
   return &Buffer[Index] - StartOfBuffer;
-}
-
-
-
-STATIC
-CHAR_W *
-GetFlagsAndWidth (
-  IN  CHAR_W      *Format, 
-  OUT UINTN       *Flags, 
-  OUT UINTN       *Width,
-  IN OUT  VA_LIST *Marker
-  )
-/*++
-
-Routine Description:
-
-  VSPrint worker function that parses flag and width information from the 
-  Format string and returns the next index into the Format string that needs
-  to be parsed. See file headed for details of Flag and Width.
-
-Arguments:
-
-  Format - Current location in the VSPrint format string.
-
-  Flags  - Returns flags
-
-  Width  - Returns width of element
-
-  Marker - Vararg list that may be paritally consumed and returned.
-
-Returns: 
-
-  Pointer indexed into the Format string for all the information parsed
-  by this routine.
-
---*/
-{
-  UINTN   Count;
-  BOOLEAN Done;
-
-  *Flags = 0;
-  *Width = 0;
-  for (Done = FALSE; !Done; ) {
-    Format++;
-
-    switch (*Format) {
-
-    case '-': *Flags |= LEFT_JUSTIFY; break;
-    case '+': *Flags |= PREFIX_SIGN;  break;
-    case ' ': *Flags |= PREFIX_BLANK; break;
-    case ',': *Flags |= COMMA_TYPE;   break;
-    case 'L':
-    case 'l': *Flags |= LONG_TYPE;    break;
-
-    case '*':
-      *Width = VA_ARG (*Marker, UINTN);
-      break;
-
-    case '0':
-      *Flags |= PREFIX_ZERO;
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-      Count = 0;
-      do {
-        Count = (Count * 10) + *Format - '0';
-        Format++;
-      } while ((*Format >= '0')  &&  (*Format <= '9'));
-      Format--;
-      *Width = Count;
-      break;
-
-    default:
-      Done = TRUE;
-    }
-  }
-  return Format;
 }
 
 STATIC

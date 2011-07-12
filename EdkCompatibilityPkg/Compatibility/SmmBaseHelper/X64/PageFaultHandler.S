@@ -40,7 +40,11 @@ ASM_PFX(PageFaultHandlerHook):
     popq     %rcx
     popq     %rax                         # restore all volatile registers
     jnz      L1
+#ifdef __APPLE__
+    int      $3
+#else
     jmpq     *ASM_PFX(mOriginalHandler)
+#endif
 L1:
     addq     $0x08, %rsp                  # skip error code for PF
     iretq
