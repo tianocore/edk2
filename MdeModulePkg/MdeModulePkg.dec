@@ -189,6 +189,9 @@
   ## Include/Ppi/UsbIo.h
   gPeiUsbIoPpiGuid               = { 0x7C29785C, 0x66B9, 0x49FC, { 0xB7, 0x97, 0x1C, 0xA5, 0x55, 0x0E, 0xF2, 0x83 }}
 
+  ## Include/Ppi/Capsule.h
+  gPeiCapsulePpiGuid             = { 0x3acf33ee, 0xd892, 0x40f4, { 0xa2, 0xfc, 0x38, 0x54, 0xd2, 0xe1, 0x32, 0x3d }}
+
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
