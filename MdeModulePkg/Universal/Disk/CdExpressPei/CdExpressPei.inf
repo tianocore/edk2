@@ -1,0 +1,69 @@
+## @file
+# Component description file for PeiCdExpress module.
+#
+# This module reads data from CDROM device by all installed block IO ppi and 
+# finds whether there is Recovery data in the device. If it finds recovery
+# data, it will install Device Recovery Module PPI.
+#
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions
+# of the BSD License which accompanies this distribution.  The
+# full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CdExpressPei
+  FILE_GUID                      = 31e147a6-d39a-4147-9da3-befd4d523243
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = CdExpressPeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  PeiCdExpress.c
+  PeiCdExpress.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  PeimEntryPoint
+  DebugLib
+  PeiServicesTablePointerLib
+  PeiServicesLib
+  MemoryAllocationLib
+  PcdLib
+
+[Guids]
+  gRecoveryOnDataCdGuid                         # ALWAYS_CONSUMED
+
+
+[Ppis]
+  gEfiPeiVirtualBlockIoPpiGuid                  # PPI_NOTIFY SOMETIMES_CONSUMED
+  gEfiPeiDeviceRecoveryModulePpiGuid            # PPI ALWAYS_PRODUCED
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport	         ## CONSUMES
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
+
+
+
