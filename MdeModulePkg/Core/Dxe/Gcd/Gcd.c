@@ -1930,9 +1930,9 @@ CoreInitializeMemoryServices (
   EFI_PHYSICAL_ADDRESS               MaxMemoryBaseAddress;
   UINT64                             MaxMemoryLength;
   UINT64                             MaxMemoryAttributes;
-  EFI_PHYSICAL_ADDRESS               MaxAddress;
+  EFI_PHYSICAL_ADDRESS               TestedMemoryBaseAddress;
+  UINT64                             TestedMemoryLength;
   EFI_PHYSICAL_ADDRESS               HighAddress;
-  EFI_HOB_RESOURCE_DESCRIPTOR        *MaxResourceHob;
   EFI_HOB_GUID_TYPE                  *GuidHob;
   UINT32                              ReservedCodePageNumber;
 
@@ -1952,7 +1952,6 @@ CoreInitializeMemoryServices (
   // Initialize Local Variables
   //
   PhitResourceHob       = NULL;
-  MaxResourceHob        = NULL;
   ResourceHob           = NULL;
   BaseAddress           = 0;
   Length                = 0;
@@ -1989,43 +1988,68 @@ CoreInitializeMemoryServices (
   }
 
   //
-  // Find the Resource Descriptor HOB that contains range FreeMemoryBaseAddress..FreeMemoryLength
+  // Find the Resource Descriptor HOB that contains PHIT range EfiFreeMemoryBottom..EfiFreeMemoryTop
   //
   Length = 0;
   Found  = FALSE;
   for (Hob.Raw = *HobStart; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
+    //
+    // Skip all HOBs except Resource Descriptor HOBs
+    //
+    if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      continue;
+    }
 
-    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    //
+    // Skip Resource Descriptor HOBs that do not describe tested system memory
+    //
+    ResourceHob = Hob.ResourceDescriptor;
+    if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) {
+      continue;
+    }
+    if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
+      continue;
+    }
 
-      ResourceHob = Hob.ResourceDescriptor;
+    //
+    // Skip Resource Descriptor HOBs that do not contain the PHIT range EfiFreeMemoryBottom..EfiFreeMemoryTop
+    //
+    if (PhitHob->EfiFreeMemoryBottom < ResourceHob->PhysicalStart) {
+      continue;
+    }
+    if (PhitHob->EfiFreeMemoryTop > (ResourceHob->PhysicalStart + ResourceHob->ResourceLength)) {
+      continue;
+    }
 
-      if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY                                       &&
-          (ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) == TESTED_MEMORY_ATTRIBUTES    ) {
+    //
+    // Cache the resource descriptor HOB for the memory region described by the PHIT HOB
+    //
+    PhitResourceHob = ResourceHob;
+    Found = TRUE;
 
-        if (PhitHob->EfiFreeMemoryBottom >= ResourceHob->PhysicalStart                         &&
-            PhitHob->EfiFreeMemoryTop    <= (ResourceHob->PhysicalStart + ResourceHob->ResourceLength)    ) {
-
-          //
-          // Cache the resource descriptor HOB for the memory region described by the PHIT HOB
-          //
-          PhitResourceHob = ResourceHob;
-          Found = TRUE;
-
-          Attributes  = PhitResourceHob->ResourceAttribute;
-          BaseAddress = PageAlignAddress (PhitHob->EfiMemoryTop);
-          Length      = PageAlignLength  (ResourceHob->PhysicalStart + ResourceHob->ResourceLength - BaseAddress);
-          if (Length < MINIMUM_INITIAL_MEMORY_SIZE) {
-            BaseAddress = PageAlignAddress (PhitHob->EfiFreeMemoryBottom);
-            Length      = PageAlignLength  (PhitHob->EfiFreeMemoryTop - BaseAddress);
-            if (Length < MINIMUM_INITIAL_MEMORY_SIZE) {
-              BaseAddress = PageAlignAddress (ResourceHob->PhysicalStart);
-              Length      = PageAlignLength  ((UINT64)((UINTN)*HobStart - BaseAddress));
-            }
-          }
-          break;
-        }
+    //
+    // Compute range between PHIT EfiFreeMemoryTop and the end of the Resource Descriptor HOB
+    //
+    Attributes  = PhitResourceHob->ResourceAttribute;
+    BaseAddress = PageAlignAddress (PhitHob->EfiMemoryTop);
+    Length      = PageAlignLength  (ResourceHob->PhysicalStart + ResourceHob->ResourceLength - BaseAddress);
+    if (Length < MINIMUM_INITIAL_MEMORY_SIZE) {
+      //
+      // If that range is not large enough to intialize the DXE Core, then 
+      // Compute range between PHIT EfiFreeMemoryBottom and PHIT EfiFreeMemoryTop
+      //
+      BaseAddress = PageAlignAddress (PhitHob->EfiFreeMemoryBottom);
+      Length      = PageAlignLength  (PhitHob->EfiFreeMemoryTop - BaseAddress);
+      if (Length < MINIMUM_INITIAL_MEMORY_SIZE) {
+        //
+        // If that range is not large enough to intialize the DXE Core, then 
+        // Compute range between the start of the Resource Descriptor HOB and the start of the HOB List
+        //
+        BaseAddress = PageAlignAddress (ResourceHob->PhysicalStart);
+        Length      = PageAlignLength  ((UINT64)((UINTN)*HobStart - BaseAddress));
       }
     }
+    break;
   }
 
   //
@@ -2038,51 +2062,66 @@ CoreInitializeMemoryServices (
   // region that is big enough to initialize the DXE core.  Always skip the PHIT Resource HOB.
   // The max address must be within the physically addressible range for the processor.
   //
-  MaxMemoryLength = 0;
-  MaxAddress      = MAX_ADDRESS;
-  do {
-    HighAddress = 0;
-    Found       = FALSE;
+  HighAddress = MAX_ADDRESS;
+  for (Hob.Raw = *HobStart; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
     //
-    // Search for a tested memory region that is below MaxAddress
+    // Skip the Resource Descriptor HOB that contains the PHIT
     //
-    for (Hob.Raw = *HobStart; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
-
-      //
-      // See if this is a resource descriptor HOB that does not contain the PHIT.
-      //
-      if (Hob.ResourceDescriptor != PhitResourceHob && GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-
-        ResourceHob = Hob.ResourceDescriptor;
-        //
-        // See if this resource descrior HOB describes tested system memory below MaxAddress
-        //
-        if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY &&
-           (ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) == TESTED_MEMORY_ATTRIBUTES &&
-            ResourceHob->PhysicalStart + ResourceHob->ResourceLength <= MaxAddress) {
-          //
-          // See if this is the highest tested system memory region below MaxAddress
-          //
-          if (ResourceHob->PhysicalStart > HighAddress) {
-
-            MaxResourceHob = ResourceHob;
-            HighAddress = MaxResourceHob->PhysicalStart;
-            Found = TRUE;
-          }
-        }
-      }
+    if (Hob.ResourceDescriptor == PhitResourceHob) {
+      continue;
     }
-    if (Found) {
-      //
-      // Compute the size of the tested memory region below MaxAddrees
-      //
-      MaxMemoryBaseAddress = PageAlignAddress (MaxResourceHob->PhysicalStart);
-      MaxMemoryLength      = PageAlignLength  (MaxResourceHob->PhysicalStart + MaxResourceHob->ResourceLength - MaxMemoryBaseAddress);
-      MaxMemoryAttributes  = MaxResourceHob->ResourceAttribute;
+    //
+    // Skip all HOBs except Resource Descriptor HOBs
+    //
+    if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      continue;
     }
-    MaxAddress = ResourceHob->PhysicalStart;
-  } while (Found && MaxMemoryLength < MINIMUM_INITIAL_MEMORY_SIZE);
 
+    //
+    // Skip Resource Descriptor HOBs that do not describe tested system memory below MAX_ADDRESS
+    //
+    ResourceHob = Hob.ResourceDescriptor;
+    if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) {
+      continue;
+    }
+    if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
+      continue;
+    }
+    if ((ResourceHob->PhysicalStart + ResourceHob->ResourceLength) > (EFI_PHYSICAL_ADDRESS)MAX_ADDRESS) {
+      continue;
+    }
+    
+    //
+    // Skip Resource Descriptor HOBs that are below a previously found Resource Descriptor HOB
+    //
+    if (HighAddress != (EFI_PHYSICAL_ADDRESS)MAX_ADDRESS && ResourceHob->PhysicalStart <= HighAddress) {
+      continue;
+    }
+
+    //
+    // Skip Resource Descriptor HOBs that are not large enough to initilize the DXE Core
+    //
+    TestedMemoryBaseAddress = PageAlignAddress (ResourceHob->PhysicalStart);
+    TestedMemoryLength      = PageAlignLength  (ResourceHob->PhysicalStart + ResourceHob->ResourceLength - TestedMemoryBaseAddress);
+    if (TestedMemoryLength < MINIMUM_INITIAL_MEMORY_SIZE) {
+      continue;
+    }
+    
+    //
+    // Save the Resource Descriptor HOB context that is large enough to initilize the DXE Core
+    //
+    MaxMemoryBaseAddress = TestedMemoryBaseAddress;
+    MaxMemoryLength      = TestedMemoryLength;
+    MaxMemoryAttributes  = ResourceHob->ResourceAttribute; 
+    HighAddress          = ResourceHob->PhysicalStart;
+  }
+
+  //
+  // If Length is not large enough to initialize the DXE Core or a Resource 
+  // Descriptor HOB was found above the PHIT HOB that is large enough to initialize 
+  // the DXE Core, then use the range described by the Resource Descriptor 
+  // HOB that was found above the PHIT HOB.
+  //
   if ((Length < MINIMUM_INITIAL_MEMORY_SIZE) ||
       (MaxMemoryBaseAddress > BaseAddress && MaxMemoryLength >= MINIMUM_INITIAL_MEMORY_SIZE)) {
     BaseAddress = MaxMemoryBaseAddress;
