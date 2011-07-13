@@ -2533,7 +2533,7 @@ RouteConfigRespForEfiVarStore (
 {
   EFI_STATUS Status;
   EFI_STRING VarStoreName;
-  CHAR8      *VarStore;
+  UINT8      *VarStore;
   UINTN      BufferSize;
   UINTN      BlockSize;
 
