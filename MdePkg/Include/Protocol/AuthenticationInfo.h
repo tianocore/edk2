@@ -66,9 +66,9 @@ typedef struct {
   UINT8            NasIpAddr[16];            ///< IPv4 or IPv6 address.
 
   ///
-  /// Network Access Server Secret Length in bytes (OPTIONAL)
+  /// Network Access Server Secret Length in bytes (OPTIONAL).
   ///
-  UINT16           NasSecretLength; 
+  UINT16           NasSecretLength;
 
   ///
   /// Network Access Server Secret (OPTIONAL).
@@ -76,11 +76,11 @@ typedef struct {
   UINT8            NasSecret[1];
 
   /// 
-  /// CHAP Initiator Secret length in bytes on offset NasSecret + NasSecretLength.
+  /// CHAP Initiator Secret Length in bytes on offset NasSecret + NasSecretLength.
   ///
   /// UINT16           ChapSecretLength;
   ///
-  /// CHAP Initiator Secret
+  /// CHAP Initiator Secret.
   ///
   /// UINT8            ChapSecret[];
   ///
@@ -88,9 +88,25 @@ typedef struct {
   ///
   /// UINT16           ChapNameLength;
   ///
-  /// CHAP Initiator Name
+  /// CHAP Initiator Name.
   ///
   /// UINT8            ChapName[];
+  ///
+  /// Reverse CHAP Name Length in bytes on offset ChapName + ChapNameLength.
+  ///
+  /// UINT16           ReverseChapNameLength;
+  ///
+  /// Reverse CHAP Name.
+  ///
+  /// UINT8            ReverseChapName[];
+  ///
+  /// Reverse CHAP Secret Length in bytes on offseet ReverseChapName + ReverseChapNameLength.
+  ///
+  /// UINT16           ReverseChapSecretLength;
+  ///
+  /// Reverse CHAP Secret.
+  ///
+  /// UINT8            ReverseChapSecret[];
   ///
 } CHAP_RADIUS_AUTH_NODE;
 
@@ -117,25 +133,41 @@ typedef struct {
   ///
   /// UINT16           UserNameLength;
   ///
-  /// User Name
+  /// User Name.
   ///
-  /// UINT8            *UserName;
+  /// UINT8            UserName[];
   ///
-  /// CHAP Initiator Secret length in bytes on offset UserName + UserNameLength
+  /// CHAP Initiator Secret Length in bytes on offset UserName + UserNameLength.
   ///
   /// UINT16           ChapSecretLength;
   ///
-  /// CHAP Initiator Secret
+  /// CHAP Initiator Secret.
   ///
-  /// UINT8            *ChapSecret;
+  /// UINT8            ChapSecret[];
   ///
-  /// CHAP Initiator Name Length in bytes on offset ChapSecret + ChapSecretLength
+  /// CHAP Initiator Name Length in bytes on offset ChapSecret + ChapSecretLength.
   ///
   /// UINT16           ChapNameLength;
   ///
-  /// CHAP Initiator Name
+  /// CHAP Initiator Name.
   ///
-  /// UINT8            *ChapName;
+  /// UINT8            ChapName[];
+  ///
+  /// Reverse CHAP Name Length in bytes on offset ChapName + ChapNameLength.
+  ///
+  /// UINT16           ReverseChapNameLength;
+  ///
+  /// Reverse CHAP Name.
+  ///
+  /// UINT8            ReverseChapName[];
+  ///
+  /// Reverse CHAP Secret Length in bytes on offset ReverseChapName + ReverseChapNameLength.
+  ///
+  /// UINT16           ReverseChapSecretLength;
+  ///
+  /// Reverse CHAP Secret.
+  ///
+  /// UINT8            ReverseChapSecret[];
   ///
 } CHAP_LOCAL_AUTH_NODE;
 #pragma pack()
