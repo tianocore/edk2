@@ -1,7 +1,7 @@
 /** @file
   Network library.
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Uefi.h>
 
+#include <IndustryStandard/SmBios.h>
+
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/SimpleNetwork.h>
@@ -23,6 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiConfigAccess.h>
 
 #include <Guid/NicIp4ConfigNvData.h>
+#include <Guid/SmBios.h>
 
 #include <Library/NetLib.h>
 #include <Library/BaseLib.h>
@@ -3155,3 +3158,86 @@ Exit:
   return Status;
 }
 
+
+
+/**
+  This function obtains the system guid from the smbios table.
+
+  @param[out]  SystemGuid     The pointer of the returned system guid.
+
+  @retval EFI_SUCCESS         Successfully obtained the system guid.
+  @retval EFI_NOT_FOUND       Did not find the SMBIOS table.
+
+**/
+EFI_STATUS
+EFIAPI
+NetLibGetSystemGuid (
+  OUT EFI_GUID              *SystemGuid
+  )
+{
+  EFI_STATUS                Status;
+  SMBIOS_TABLE_ENTRY_POINT  *SmbiosTable;
+  SMBIOS_STRUCTURE_POINTER  Smbios;
+  SMBIOS_STRUCTURE_POINTER  SmbiosEnd;
+  CHAR8                     *String;
+
+  SmbiosTable = NULL;
+  Status      = EfiGetSystemConfigurationTable (&gEfiSmbiosTableGuid, (VOID **) &SmbiosTable);
+
+  if (EFI_ERROR (Status) || SmbiosTable == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  Smbios.Hdr    = (SMBIOS_STRUCTURE *) (UINTN) SmbiosTable->TableAddress;
+  SmbiosEnd.Raw = (UINT8 *) (UINTN) (SmbiosTable->TableAddress + SmbiosTable->TableLength);
+
+  do {
+    if (Smbios.Hdr->Type == 1) {
+      if (Smbios.Hdr->Length < 0x19) {
+        //
+        // Older version did not support UUID.
+        //
+        return EFI_NOT_FOUND;
+      }
+      
+      //
+      // SMBIOS tables are byte packed so we need to do a byte copy to
+      // prevend alignment faults on Itanium-based platform.
+      //
+      CopyMem (SystemGuid, &Smbios.Type1->Uuid, sizeof (EFI_GUID));
+      return EFI_SUCCESS;
+    }
+
+    //
+    // Go to the next SMBIOS structure. Each SMBIOS structure may include 2 parts:
+    // 1. Formatted section; 2. Unformatted string section. So, 2 steps are needed
+    // to skip one SMBIOS structure.
+    //
+    
+    //
+    // Step 1: Skip over formatted section.
+    //
+    String = (CHAR8 *) (Smbios.Raw + Smbios.Hdr->Length);
+  
+    //
+    // Step 2: Skip over unformated string section.
+    //
+    do {
+      //
+      // Each string is terminated with a NULL(00h) BYTE and the sets of strings
+      // is terminated with an additional NULL(00h) BYTE.
+      //
+      for ( ; *String != 0; String++) {
+      }
+
+      if (*(UINT8*)++String == 0) {
+        //
+        // Pointer to the next SMBIOS structure.
+        //
+        Smbios.Raw = (UINT8 *)++String;
+        break;
+      }    
+    } while (TRUE);
+  } while (Smbios.Raw < SmbiosEnd.Raw);
+  return EFI_NOT_FOUND;
+}

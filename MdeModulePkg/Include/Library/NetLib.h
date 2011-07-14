@@ -2,7 +2,7 @@
   This library is only intended to be used by UEFI network stack modules.
   It provides basic functions for the UEFI network stack.
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -2020,4 +2020,20 @@ VOID
 NetIpSecNetbufFree (
   NET_BUF   *Nbuf
   );
+
+/**
+  This function obtains the system guid from the smbios table.
+
+  @param[out]  SystemGuid     The pointer of the returned system guid.
+
+  @retval EFI_SUCCESS         Successfully obtained the system guid.
+  @retval EFI_NOT_FOUND       Did not find the SMBIOS table.
+
+**/
+EFI_STATUS
+EFIAPI
+NetLibGetSystemGuid (
+  OUT EFI_GUID              *SystemGuid
+  );
+
 #endif

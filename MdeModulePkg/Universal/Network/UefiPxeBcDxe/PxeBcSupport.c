@@ -1,7 +1,7 @@
 /** @file
   Support routines for PxeBc.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,127 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include "PxeBcImpl.h"
-
-
-/**
-  This function returns SMBIOS string given the string number.
-
-  @param  Smbios              Pointer to SMBIOS structure
-  @param  StringNumber        String number to return. 0 is used to skip all
-                              strings and  point to the next SMBIOS structure.
-
-  @return Pointer to string, or pointer to next SMBIOS strcuture if StringNumber == 0
-
-**/
-CHAR8 *
-GetSmbiosString (
-  IN  SMBIOS_STRUCTURE_POINTER  *Smbios,
-  IN  UINT16                    StringNumber
-  )
-{
-  UINT16  Index;
-  CHAR8   *String;
-
-  //
-  // Skip over formatted section
-  //
-  String = (CHAR8 *) (Smbios->Raw + Smbios->Hdr->Length);
-
-  //
-  // Look through unformated section
-  //
-  for (Index = 1; Index <= StringNumber || StringNumber == 0; Index++) {
-    if (StringNumber == Index) {
-      return String;
-    }
-    //
-    // Skip string
-    //
-    for (; *String != 0; String++)
-      ;
-    String++;
-
-    if (*String == 0) {
-      //
-      // If double NULL then we are done.
-      //  Return pointer to next structure in Smbios.
-      //  if you pass in a 0 you will always get here
-      //
-      Smbios->Raw = (UINT8 *)++String;
-      return NULL;
-    }
-  }
-
-  return NULL;
-}
-
-
-/**
-  This function gets system guid and serial number from the smbios table.
-
-  @param  SystemGuid          The pointer of returned system guid.
-  @param  SystemSerialNumber  The pointer of returned system serial number.
-
-  @retval EFI_SUCCESS         Successfully get the system guid and system serial
-                              number.
-  @retval EFI_NOT_FOUND       Not find the SMBIOS table.
-
-**/
-EFI_STATUS
-GetSmbiosSystemGuidAndSerialNumber (
-  IN  EFI_GUID  *SystemGuid,
-  OUT CHAR8     **SystemSerialNumber
-  )
-{
-  EFI_STATUS                Status;
-  SMBIOS_TABLE_ENTRY_POINT  *SmbiosTable;
-  SMBIOS_STRUCTURE_POINTER  Smbios;
-  SMBIOS_STRUCTURE_POINTER  SmbiosEnd;
-  UINT16                    Index;
-
-  Status = EfiGetSystemConfigurationTable (&gEfiSmbiosTableGuid, (VOID **) &SmbiosTable);
-
-  if (EFI_ERROR (Status)) {
-    return EFI_NOT_FOUND;
-  }
-  ASSERT (SmbiosTable != NULL);
-
-  Smbios.Hdr    = (SMBIOS_STRUCTURE *) (UINTN) SmbiosTable->TableAddress;
-  SmbiosEnd.Raw = (UINT8 *) (UINTN) (SmbiosTable->TableAddress + SmbiosTable->TableLength);
-
-  for (Index = 0; Index < SmbiosTable->TableLength; Index++) {
-    if (Smbios.Hdr->Type == 1) {
-      if (Smbios.Hdr->Length < 0x19) {
-        //
-        // Older version did not support Guid and Serial number
-        //
-        continue;
-      }
-      //
-      // SMBIOS tables are byte packed so we need to do a byte copy to
-      // prevend alignment faults on Itanium-based platform.
-      //
-      CopyMem (SystemGuid, &Smbios.Type1->Uuid, sizeof (EFI_GUID));
-      *SystemSerialNumber = GetSmbiosString (&Smbios, Smbios.Type1->SerialNumber);
-
-      return EFI_SUCCESS;
-    }
-    //
-    // Make Smbios point to the next record
-    //
-    GetSmbiosString (&Smbios, 0);
-
-    if (Smbios.Raw >= SmbiosEnd.Raw) {
-      //
-      // SMBIOS 2.1 incorrectly stated the length of SmbiosTable as 0x1e.
-      // given this we must double check against the length of the structure.
-      //
-      return EFI_SUCCESS;
-    }
-  }
-
-  return EFI_SUCCESS;
-}
 
 
 /**

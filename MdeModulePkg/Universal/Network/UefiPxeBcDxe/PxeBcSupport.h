@@ -1,6 +1,6 @@
 /** @file
   Support routines for PxeBc.
-Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,23 +13,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #ifndef __EFI_PXEBC_SUPPORT_H__
 #define __EFI_PXEBC_SUPPORT_H__
-
-/**
-  This function gets system guid and serial number from the smbios table.
-
-  @param  SystemGuid          The pointer of returned system guid.
-  @param  SystemSerialNumber  The pointer of returned system serial number.
-
-  @retval EFI_SUCCESS         Successfully get the system guid and system serial
-                              number.
-  @retval EFI_NOT_FOUND       Not find the SMBIOS table.
-
-**/
-EFI_STATUS
-GetSmbiosSystemGuidAndSerialNumber (
-  IN  EFI_GUID  *SystemGuid,
-  OUT CHAR8     **SystemSerialNumber
-  );
 
 
 /**

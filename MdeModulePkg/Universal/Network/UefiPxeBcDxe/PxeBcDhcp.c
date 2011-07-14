@@ -1,7 +1,7 @@
 /** @file
   Support for PxeBc dhcp functions.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -788,7 +788,6 @@ PxeBcDhcpCallBack (
   UINT16                              Value;
   EFI_STATUS                          Status;
   BOOLEAN                             Received;
-  CHAR8                               *SystemSerialNumber;
   EFI_DHCP4_HEADER                    *DhcpHeader;
 
   if ((Dhcp4Event != Dhcp4RcvdOffer) &&
@@ -843,7 +842,7 @@ PxeBcDhcpCallBack (
       //
       DhcpHeader = &Packet->Dhcp4.Header;
 
-      if (EFI_ERROR (GetSmbiosSystemGuidAndSerialNumber ((EFI_GUID *) DhcpHeader->ClientHwAddr, &SystemSerialNumber))) {
+      if (EFI_ERROR (NetLibGetSystemGuid ((EFI_GUID *) DhcpHeader->ClientHwAddr))) {
         //
         // GUID not yet set - send all 0xff's to show programable (via SetVariable)
         // SetMem(DHCPV4_OPTIONS_BUFFER.DhcpPlatformId.Guid, sizeof(EFI_GUID), 0xff);
@@ -928,7 +927,6 @@ PxeBcBuildDhcpOptions (
   UINT32                    Index;
   PXEBC_DHCP4_OPTION_ENTRY  OptEnt;
   UINT16                    Value;
-  CHAR8                     *SystemSerialNumber;
 
   Index       = 0;
   OptList[0]  = (EFI_DHCP4_PACKET_OPTION *) Private->OptionBuffer;
@@ -1009,7 +1007,7 @@ PxeBcBuildDhcpOptions (
   Index++;
   OptList[Index]          = GET_NEXT_DHCP_OPTION (OptList[Index - 1]);
 
-  if (EFI_ERROR (GetSmbiosSystemGuidAndSerialNumber ((EFI_GUID *) OptEnt.Uuid->Guid, &SystemSerialNumber))) {
+  if (EFI_ERROR (NetLibGetSystemGuid ((EFI_GUID *) OptEnt.Uuid->Guid))) {
     //
     // GUID not yet set - send all 0xff's to show programable (via SetVariable)
     // SetMem(DHCPV4_OPTIONS_BUFFER.DhcpPlatformId.Guid, sizeof(EFI_GUID), 0xff);
@@ -1120,7 +1118,6 @@ PxeBcDiscvBootService (
   EFI_DHCP4_PACKET_OPTION             *PxeOpt;
   PXEBC_OPTION_BOOT_ITEM              *PxeBootItem;
   UINT8                               VendorOptLen;
-  CHAR8                               *SystemSerialNumber;
   EFI_DHCP4_HEADER                    *DhcpHeader;
   UINT32                              Xid;
 
@@ -1180,7 +1177,7 @@ PxeBcDiscvBootService (
 
   DhcpHeader = &Token.Packet->Dhcp4.Header;
   if (Mode->SendGUID) {
-    if (EFI_ERROR (GetSmbiosSystemGuidAndSerialNumber ((EFI_GUID *) DhcpHeader->ClientHwAddr, &SystemSerialNumber))) {
+    if (EFI_ERROR (NetLibGetSystemGuid ((EFI_GUID *) DhcpHeader->ClientHwAddr))) {
       //
       // GUID not yet set - send all 0's to show not programable
       //
