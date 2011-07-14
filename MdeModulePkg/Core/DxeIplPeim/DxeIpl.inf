@@ -45,7 +45,7 @@
 [Sources.X64]
   X64/VirtualMemory.h
   X64/VirtualMemory.c
-  X64/DxeLoadFunc.c
+  X64/DxeLoadFunc.c    
 
 [Sources.IPF]
   Ipf/DxeLoadFunc.c
@@ -89,6 +89,9 @@
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+
+[FeaturePcd.X64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress

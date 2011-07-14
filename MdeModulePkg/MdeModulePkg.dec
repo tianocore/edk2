@@ -364,6 +364,12 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE|BOOLEAN|0x0001003b
 
+  ##
+  # This feature flag specifies whether DxeIpl should rebuild page tables. This flag only
+  # makes sense in the case where the DxeIpl and the DxeCore are both X64.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables|TRUE|BOOLEAN|0x0001003c
+
 [PcdsFixedAtBuild]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicate maximum number of callback function
