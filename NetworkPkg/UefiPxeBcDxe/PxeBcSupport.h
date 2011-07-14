@@ -25,20 +25,6 @@
 #define ICMP_PARAMETER_PROBLEM     12
 
 
-/**
-  This function obtain the system guid and serial number from the smbios table.
-
-  @param[out]  SystemGuid     The pointer of returned system guid.
-
-  @retval EFI_SUCCESS         Successfully obtained the system guid.
-  @retval EFI_NOT_FOUND       Did not find the SMBIOS table.
-
-**/
-EFI_STATUS
-PxeBcGetSystemGuid (
-  OUT EFI_GUID              *SystemGuid
-  );
-
 
 /**
   Flush the previous configration using the new station Ip address.

@@ -1,7 +1,7 @@
 /** @file
   Functions implementation related with DHCPv4 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -316,7 +316,7 @@ PxeBcBuildDhcp4Options (
   Index++;
   OptList[Index]          = GET_NEXT_DHCP_OPTION (OptList[Index - 1]);
 
-  if (EFI_ERROR (PxeBcGetSystemGuid ((EFI_GUID *) OptEnt.Uuid->Guid))) {
+  if (EFI_ERROR (NetLibGetSystemGuid ((EFI_GUID *) OptEnt.Uuid->Guid))) {
     //
     // Zero the Guid to indicate NOT programable if failed to get system Guid.
     //
@@ -1193,7 +1193,7 @@ PxeBcDhcp4CallBack (
       //
       // Send the system Guid instead of the MAC address as the hardware address if required.
       //
-      if (EFI_ERROR (PxeBcGetSystemGuid ((EFI_GUID *) Packet->Dhcp4.Header.ClientHwAddr))) {
+      if (EFI_ERROR (NetLibGetSystemGuid ((EFI_GUID *) Packet->Dhcp4.Header.ClientHwAddr))) {
         //
         // Zero the Guid to indicate NOT programable if failed to get system Guid.
         //
@@ -1369,7 +1369,7 @@ PxeBcDhcp4Discover (
   }
 
   if (Mode->SendGUID) {
-    if (EFI_ERROR (PxeBcGetSystemGuid ((EFI_GUID *) Token.Packet->Dhcp4.Header.ClientHwAddr))) {
+    if (EFI_ERROR (NetLibGetSystemGuid ((EFI_GUID *) Token.Packet->Dhcp4.Header.ClientHwAddr))) {
       //
       // Zero the Guid to indicate NOT programable if failed to get system Guid.
       //

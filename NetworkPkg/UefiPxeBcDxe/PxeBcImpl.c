@@ -1800,7 +1800,7 @@ EfiPxeBcSetParameters (
   }
 
   if (NewSendGUID != NULL) {
-    if (*NewSendGUID && EFI_ERROR (PxeBcGetSystemGuid (&SystemGuid))) {
+    if (*NewSendGUID && EFI_ERROR (NetLibGetSystemGuid (&SystemGuid))) {
       return EFI_INVALID_PARAMETER;
     }
     Mode->SendGUID = *NewSendGUID;
