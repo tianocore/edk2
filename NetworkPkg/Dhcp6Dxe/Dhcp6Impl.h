@@ -1,7 +1,7 @@
 /** @file
   Dhcp6 internal data structure and definition declaration.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -184,7 +184,8 @@ typedef enum {
 typedef enum {
   Dhcp6DuidTypeLlt              = 1,
   Dhcp6DuidTypeEn               = 2,
-  Dhcp6DuidTypeLl               = 3
+  Dhcp6DuidTypeLl               = 3,
+  Dhcp6DuidTypeUuid             = 4
 } DHCP6_DUID_TYPE;
 
 //

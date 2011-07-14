@@ -166,7 +166,8 @@ Dhcp6CreateService (
     );
 
   //
-  // Generate client Duid in the format of Duid-llt.
+  // Generate client Duid: If SMBIOS system UUID is located, generate DUID in DUID-UUID format.
+  // Otherwise, in DUID-LLT format.
   //
   Dhcp6Srv->ClientId        = Dhcp6GenerateClientId (Dhcp6Srv->Snp->Mode);
 

@@ -34,6 +34,8 @@ Dhcp6GenerateClientId (
   EFI_DHCP6_DUID            *Duid;
   EFI_TIME                  Time;
   UINT32                    Stamp;
+  EFI_GUID                  Uuid;
+
 
   //
   // Attempt to get client Id from variable to keep it constant.
@@ -43,17 +45,6 @@ Dhcp6GenerateClientId (
   if (Duid != NULL) {
     return Duid;
   }
-
-  //
-  // Generate a time stamp of the seconds from 2000/1/1, assume 30day/month.
-  //
-  gRT->GetTime (&Time, NULL);
-  Stamp = (UINT32)
-    (
-      (((((Time.Year - 2000) * 360 + (Time.Month - 1)) * 30 + (Time.Day - 1)) * 24 + Time.Hour) * 60 + Time.Minute) *
-      60 +
-      Time.Second
-    );
 
   //
   //  The format of client identifier option:
@@ -68,42 +59,96 @@ Dhcp6GenerateClientId (
   //    .                                                               .
   //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
   //
-  //
-  //  The format of DUID-LLT:
-  //
-  //     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  //    |          Duid type (1)        |    hardware type (16 bits)    |
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  //    |                        time (32 bits)                         |
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  //    .                                                               .
-  //    .             link-layer address (variable length)              .
-  //    .                                                               .
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  //
 
   //
-  // sizeof (option-len + Duid-type + hardware-type + time) = 10 bytes
+  // If System UUID is found from SMBIOS Table, use DUID-UUID type.
   //
-  Duid = AllocateZeroPool (10 + Mode->HwAddressSize);
-  if (Duid == NULL) {
-    return NULL;
+  if (!EFI_ERROR (NetLibGetSystemGuid (&Uuid))) {
+    //
+    //
+    //  The format of DUID-UUID:
+    //   
+    //    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    //   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    //   |          DUID-Type (4)        |    UUID (128 bits)            |
+    //   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
+    //   |                                                               |
+    //   |                                                               |
+    //   |                                -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    //   |                                |
+    //   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+    //
+    // sizeof (option-len + Duid-type + UUID-size) = 20 bytes
+    //
+    Duid = AllocateZeroPool (2 + 2 + sizeof (EFI_GUID));
+    if (Duid == NULL) {
+      return NULL;
+    }
+
+    //
+    // sizeof (Duid-type + UUID-size) = 18 bytes
+    //
+    Duid->Length = (UINT16) (18);
+  
+    //
+    // Set the Duid-type and copy UUID.
+    //
+    WriteUnaligned16 ((UINT16 *) (Duid->Duid), HTONS (Dhcp6DuidTypeUuid));
+  
+    CopyMem (Duid->Duid + 2, &Uuid, sizeof(EFI_GUID));
+
+  } else {
+      
+    //
+    //
+    //  The format of DUID-LLT:
+    //
+    //     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    //    |          Duid type (1)        |    hardware type (16 bits)    |
+    //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    //    |                        time (32 bits)                         |
+    //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    //    .                                                               .
+    //    .             link-layer address (variable length)              .
+    //    .                                                               .
+    //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    //
+
+    //
+    // Generate a time stamp of the seconds from 2000/1/1, assume 30day/month.
+    //
+    gRT->GetTime (&Time, NULL);
+    Stamp = (UINT32)
+      (
+        (((((Time.Year - 2000) * 360 + (Time.Month - 1)) * 30 + (Time.Day - 1)) * 24 + Time.Hour) * 60 + Time.Minute) *
+        60 +
+        Time.Second
+      );
+
+    //
+    // sizeof (option-len + Duid-type + hardware-type + time) = 10 bytes
+    //
+    Duid = AllocateZeroPool (10 + Mode->HwAddressSize);
+    if (Duid == NULL) {
+      return NULL;
+    }
+  
+    //
+    // sizeof (Duid-type + hardware-type + time) = 8 bytes
+    //
+    Duid->Length = (UINT16) (Mode->HwAddressSize + 8);
+  
+    //
+    // Set the Duid-type, hardware-type, time and copy the hardware address.
+    //
+    WriteUnaligned16 ((UINT16 *) (Duid->Duid), HTONS (Dhcp6DuidTypeLlt));
+    WriteUnaligned16 ((UINT16 *) (Duid->Duid + 2), HTONS (NET_IFTYPE_ETHERNET));
+    WriteUnaligned32 ((UINT32 *) (Duid->Duid + 4), HTONL (Stamp));
+  
+    CopyMem (Duid->Duid + 8, &Mode->CurrentAddress, Mode->HwAddressSize);
   }
-
-  //
-  // sizeof (Duid-type + hardware-type + time) = 8 bytes
-  //
-  Duid->Length = (UINT16) (Mode->HwAddressSize + 8);
-
-  //
-  // Set the Duid-type, hardware-type, time and copy the hardware address.
-  //
-  WriteUnaligned16 ((UINT16 *) (Duid->Duid), HTONS (Dhcp6DuidTypeLlt));
-  WriteUnaligned16 ((UINT16 *) (Duid->Duid + 2), HTONS (NET_IFTYPE_ETHERNET));
-  WriteUnaligned32 ((UINT32 *) (Duid->Duid + 4), HTONL (Stamp));
-
-  CopyMem (Duid->Duid + 8, &Mode->CurrentAddress, Mode->HwAddressSize);
 
   Status = gRT->SetVariable (
                   L"ClientId",
