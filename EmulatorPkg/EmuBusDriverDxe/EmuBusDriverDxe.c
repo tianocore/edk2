@@ -404,7 +404,7 @@ EmuBusDriverBindingStop (
       Status = gBS->UninstallMultipleProtocolInterfaces (
                       EmuDevice->Handle,
                       &gEfiDevicePathProtocolGuid,  EmuDevice->DevicePath,
-                      &gEmuIoThunkProtocolGuid,     EmuDevice->EmuIoThunk,
+                      &gEmuIoThunkProtocolGuid,     &EmuDevice->EmuIoThunk,
                       NULL
                       );
 
