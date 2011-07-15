@@ -52,6 +52,7 @@ HandOffToDxeCore (
   TopOfStack = (VOID *) ((UINTN) BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT);
   TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
+  PageTables = 0;
   if (FeaturePcdGet (PcdDxeIplBuildPageTables)) {
     //
     // Create page table and save PageMapLevel4 to CR3
