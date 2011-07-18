@@ -14,6 +14,7 @@
 
 **/
 
+#include <Base.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -244,10 +245,8 @@ UncachedInternalAllocateAlignedPages (
     gAttributes = Descriptor.Attributes;
   }
   
-  Status = gDebugUncachedCpu->SetMemoryAttributes (gDebugUncachedCpu, Memory, EFI_PAGES_TO_SIZE (Pages), EFI_MEMORY_UC);
-  if (EFI_ERROR (Status)) {
-    return NULL;
-  }
+  Status = gDS->SetMemorySpaceAttributes (Memory, EFI_PAGES_TO_SIZE (Pages), EFI_MEMORY_UC);
+  ASSERT_EFI_ERROR (Status);
   
   return (VOID *)(UINTN)Memory;
 }
