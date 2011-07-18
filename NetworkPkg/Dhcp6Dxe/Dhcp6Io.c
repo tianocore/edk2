@@ -1,7 +1,7 @@
 /** @file
   Dhcp6 internal functions implementation.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -2797,6 +2797,7 @@ Dhcp6OnTimerTick (
   DHCP6_TX_CB               *TxCb;
   DHCP6_IA_CB               *IaCb;
   UINT32                    LossTime;
+  EFI_STATUS                Status;
 
   ASSERT (Context != NULL);
 
@@ -2827,7 +2828,10 @@ Dhcp6OnTimerTick (
           //
           // Select the advertisement received before.
           //
-          Dhcp6SelectAdvertiseMsg (Instance, Instance->AdSelect);
+          Status = Dhcp6SelectAdvertiseMsg (Instance, Instance->AdSelect);
+          if (EFI_ERROR (Status)) {
+            TxCb->RetryCnt++;
+          }
           return;
         }
       }
