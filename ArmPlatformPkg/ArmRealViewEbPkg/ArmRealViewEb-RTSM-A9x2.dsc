@@ -104,7 +104,7 @@
   EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
   
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
-  DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+  DebugAgentLib|ArmPkg/Library/DebugAgentSymbolsOnlyLib/DebugAgentSymbolsOnlyLib.inf
   DebugAgentTimerLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/DebugAgentTimerLib/DebugAgentTimerLib.inf
 
   SerialPortLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
