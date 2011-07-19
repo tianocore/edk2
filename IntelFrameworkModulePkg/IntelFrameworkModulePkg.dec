@@ -80,6 +80,9 @@
   #  Include/Protocol/OEMBadging.h
   gEfiOEMBadgingProtocolGuid     = { 0x170E13C0, 0xBF1B, 0x4218, { 0x87, 0x1D, 0x2A, 0xBD, 0xC6, 0xF8, 0x87, 0xBC }}
 
+  ## Include/Protocol/ExitPmAuth.h
+  gExitPmAuthProtocolGuid        = { 0xd088a413, 0xa70, 0x4217, { 0xba, 0x55, 0x9a, 0x3c, 0xb6, 0x5c, 0x41, 0xb3 }}
+
 [PcdsFeatureFlag]
   ## This PCD specifies whether StatusCode is reported via OEM device.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM|FALSE|BOOLEAN|0x00010024
