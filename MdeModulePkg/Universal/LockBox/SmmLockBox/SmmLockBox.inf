@@ -1,0 +1,59 @@
+## @file
+#  Component description file for LockBox SMM driver.
+#
+#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions
+#  of the BSD License which accompanies this distribution.  The
+#  full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmLockBox
+  FILE_GUID                      = 33FB3535-F15E-4c17-B303-5EB94595ECB6
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = SmmLockBoxEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 
+#
+
+[Sources]
+  SmmLockBox.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  SmmServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  LockBoxLib
+
+[Guids]
+  gEfiSmmLockBoxCommunicationGuid    ## PRODUCED
+
+[Protocols]
+  gEfiSmmReadyToLockProtocolGuid     ## CONSUMED
+  gEfiSmmAccess2ProtocolGuid         ## CONSUMED
+  gEfiLockBoxProtocolGuid            ## PRODUCED
+
+[Depex]
+  gEfiSmmSwDispatch2ProtocolGuid
+
