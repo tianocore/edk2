@@ -98,7 +98,7 @@ SerialPortWrite (
       SemihostWriteString ((CHAR8 *) PrintBuffer);
   }
 
-  return 0;
+  return NumberOfBytes;
 }
 
 
