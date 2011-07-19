@@ -894,6 +894,12 @@ typedef UINTN RETURN_STATUS;
 ///
 #define RETURN_INVALID_LANGUAGE      ENCODE_ERROR (32)
 
+///
+/// The security status of the data is unknown or compromised
+/// and the data must be updated or replaced to restore a valid
+/// security status.
+///
+#define RETURN_COMPROMISED_DATA      ENCODE_ERROR (33)
 
 ///
 /// The string contained one or more characters that
@@ -917,6 +923,12 @@ typedef UINTN RETURN_STATUS;
 /// truncated to the buffer size.
 ///
 #define RETURN_WARN_BUFFER_TOO_SMALL ENCODE_WARNING (4)
+
+///
+/// The data has not been updated within the timeframe set by
+/// local policy for this type of data.
+///
+#define RETURN_WARN_STALE_DATA       ENCODE_WARNING (5)
 
 /**
   Returns a 16-bit signature built from 2 ASCII characters.

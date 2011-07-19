@@ -1,7 +1,7 @@
 /** @file
   Defines data types and constants introduced in UEFI.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -148,11 +148,13 @@ typedef union {
 #define EFI_END_OF_MEDIA          RETURN_END_OF_MEDIA
 #define EFI_END_OF_FILE           RETURN_END_OF_FILE
 #define EFI_INVALID_LANGUAGE      RETURN_INVALID_LANGUAGE
+#define EFI_COMPROMISED_DATA      RETURN_COMPROMISED_DATA
 
 #define EFI_WARN_UNKNOWN_GLYPH    RETURN_WARN_UNKNOWN_GLYPH   
 #define EFI_WARN_DELETE_FAILURE   RETURN_WARN_DELETE_FAILURE  
 #define EFI_WARN_WRITE_FAILURE    RETURN_WARN_WRITE_FAILURE   
 #define EFI_WARN_BUFFER_TOO_SMALL RETURN_WARN_BUFFER_TOO_SMALL
+#define EFI_WARN_STALE_DATA       RETURN_WARN_STALE_DATA
 ///@}
 
 ///
