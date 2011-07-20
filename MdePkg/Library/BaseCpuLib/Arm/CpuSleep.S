@@ -1,6 +1,12 @@
 #------------------------------------------------------------------------------ 
 #
-# CpuSleep() for ARM
+# CpuSleep() for ARMv7
+#
+# ARMv6 versions was:
+#    MOV r0,#0
+#    MCR p15,0,r0,c7,c0,4   ;Wait for Interrupt instruction
+#
+# But this is a no-op on ARMv7
 #
 # Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
@@ -33,6 +39,5 @@ GCC_ASM_EXPORT(CpuSleep)
 #  );
 #
 ASM_PFX(CpuSleep):
-    mov r0,#0
-    mcr p15,0,r0,c7,c0,4   // Wait for Interrupt instruction
+    wfi
     bx  lr
