@@ -832,7 +832,7 @@ HBufferImageRefresh (
       //
       FStartRow = HBufferImage.LowVisibleRow;
       StartRow  = 2;
-      EndRow    = (HMainEditor.ScreenSize.Row - 4);
+      EndRow    = (HMainEditor.ScreenSize.Row - 1);
     }
     //
     // no line
@@ -1404,7 +1404,7 @@ HUnderCurrentScreen (
   IN  UINTN FileRow
   )
 {
-  if (FileRow > HBufferImage.LowVisibleRow + (HMainEditor.ScreenSize.Row - 5) - 1) {
+  if (FileRow > HBufferImage.LowVisibleRow + (HMainEditor.ScreenSize.Row - 2) - 1) {
     return TRUE;
   }
 
@@ -1712,8 +1712,8 @@ HBufferImagePageDown (
   //
   // has next page
   //
-  if (HBufferImage.NumLines >= FRow + (HMainEditor.ScreenSize.Row - 5)) {
-    Gap = (HMainEditor.ScreenSize.Row - 5);
+  if (HBufferImage.NumLines >= FRow + (HMainEditor.ScreenSize.Row - 2)) {
+    Gap = (HMainEditor.ScreenSize.Row - 2);
   } else {
     //
     // MOVE CURSOR TO LAST LINE
@@ -1764,8 +1764,8 @@ HBufferImagePageUp (
   //
   // has previous page
   //
-  if (FRow > (HMainEditor.ScreenSize.Row - 5)) {
-    Gap = (HMainEditor.ScreenSize.Row - 5);
+  if (FRow > (HMainEditor.ScreenSize.Row - 2)) {
+    Gap = (HMainEditor.ScreenSize.Row - 2);
   } else {
     //
     // the first line of file will displayed on the first line of screen
@@ -2392,12 +2392,12 @@ HBufferImageAdjustMousePosition (
   // check whether new mouse row position is beyond screen
   // if not, adjust it
   //
-  if (TempY >= 2 && TempY <= (HMainEditor.ScreenSize.Row - 4)) {
+  if (TempY >= 2 && TempY <= (HMainEditor.ScreenSize.Row - 1)) {
     HBufferImage.MousePosition.Row = TempY;
   } else if (TempY < 2) {
     HBufferImage.MousePosition.Row = 2;
-  } else if (TempY > (HMainEditor.ScreenSize.Row - 4)) {
-    HBufferImage.MousePosition.Row = (HMainEditor.ScreenSize.Row - 4);
+  } else if (TempY > (HMainEditor.ScreenSize.Row - 1)) {
+    HBufferImage.MousePosition.Row = (HMainEditor.ScreenSize.Row - 1);
   }
 
 }

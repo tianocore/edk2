@@ -15,6 +15,20 @@
 #ifndef _LIB_MENU_BAR_H_
 #define _LIB_MENU_BAR_H_
 
+#define SCAN_CONTROL_E  5
+#define SCAN_CONTROL_F  6
+#define SCAN_CONTROL_G  7
+#define SCAN_CONTROL_K  11
+#define SCAN_CONTROL_O  15
+#define SCAN_CONTROL_Q  17
+#define SCAN_CONTROL_R  18
+#define SCAN_CONTROL_S  19
+#define SCAN_CONTROL_T  20
+#define SCAN_CONTROL_U  21
+#define SCAN_CONTROL_W  23
+#define SCAN_CONTROL_Z  26
+
+
 typedef
 EFI_STATUS
 (*MENU_ITEM_FUNCTION) (
@@ -39,6 +53,19 @@ EFI_STATUS
 EFIAPI
 MenuBarInit (
   IN CONST EDITOR_MENU_ITEM  *Items
+  );
+
+/**
+  Initialize the control hot-key with the specified items.
+
+  @param[in] Items              The hot-key functions.
+
+  @retval EFI_SUCCESS           The initialization was correct.
+**/
+EFI_STATUS
+EFIAPI
+ControlHotKeyInit (
+  IN MENU_ITEM_FUNCTION  *Items
   );
 
 /**
@@ -77,6 +104,21 @@ MenuBarRefresh (
 EFI_STATUS
 EFIAPI
 MenuBarDispatchFunctionKey (
+  IN CONST EFI_INPUT_KEY   *Key
+  );
+
+/**
+  Function to dispatch the correct function based on a control-based key (ctrl+o...)
+
+  @param[in] Key                The pressed key.
+
+  @retval EFI_NOT_FOUND         The key was not a valid control-based key 
+                                (an error was sent to the status bar).
+  @return EFI_SUCCESS.
+**/
+EFI_STATUS
+EFIAPI
+MenuBarDispatchControlHotKey (
   IN CONST EFI_INPUT_KEY   *Key
   );
 

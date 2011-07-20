@@ -66,6 +66,71 @@ HEFI_EDITOR_GLOBAL_EDITOR       HMainEditorConst = {
 };
 
 /**
+  Help info that will be displayed.
+**/
+EFI_STRING_ID  HexMainMenuHelpInfo[] = {
+  STRING_TOKEN(STR_HEXEDIT_HELP_TITLE),
+  STRING_TOKEN(STR_HEXEDIT_HELP_BLANK),
+  STRING_TOKEN(STR_HEXEDIT_HELP_LIST_TITLE),
+  STRING_TOKEN(STR_HEXEDIT_HELP_DIV),
+  STRING_TOKEN(STR_HEXEDIT_HELP_GO_TO_OFFSET),
+  STRING_TOKEN(STR_HEXEDIT_HELP_SAVE_BUFFER),
+  STRING_TOKEN(STR_HEXEDIT_HELP_EXIT),
+  STRING_TOKEN(STR_HEXEDIT_HELP_SELECT_START),
+  STRING_TOKEN(STR_HEXEDIT_HELP_SELECT_END),
+  STRING_TOKEN(STR_HEXEDIT_HELP_CUT),
+  STRING_TOKEN(STR_HEXEDIT_HELP_PASTE),
+  STRING_TOKEN(STR_HEXEDIT_HELP_OPEN_FILE),
+  STRING_TOKEN(STR_HEXEDIT_HELP_OPEN_DISK),
+  STRING_TOKEN(STR_HEXEDIT_HELP_OPEN_MEMORY),
+  STRING_TOKEN(STR_HEXEDIT_HELP_BLANK),
+  STRING_TOKEN(STR_HEXEDIT_HELP_EXIT_HELP),
+  STRING_TOKEN(STR_HEXEDIT_HELP_BLANK),
+  STRING_TOKEN(STR_HEXEDIT_HELP_BLANK),
+  STRING_TOKEN(STR_HEXEDIT_HELP_BLANK),
+  STRING_TOKEN(STR_HEXEDIT_HELP_BLANK),
+  STRING_TOKEN(STR_HEXEDIT_HELP_BLANK),
+  STRING_TOKEN(STR_HEXEDIT_HELP_BLANK),
+  STRING_TOKEN(STR_HEXEDIT_HELP_DIV),
+  0
+};
+
+
+/**
+  show help menu.
+
+  @retval EFI_SUCCESS             The operation was successful.
+**/
+EFI_STATUS
+HMainCommandDisplayHelp (
+  VOID
+  )
+{
+  INTN     CurrentLine=0;
+  CHAR16 * InfoString;
+  EFI_INPUT_KEY  Key;
+  
+  // print helpInfo      
+  for (CurrentLine = 0; 0 != HexMainMenuHelpInfo[CurrentLine]; CurrentLine++) {
+    InfoString = HiiGetString(gShellDebug1HiiHandle, HexMainMenuHelpInfo[CurrentLine]
+, NULL);
+    ShellPrintEx (0,CurrentLine+1,L"%E%s%N",InfoString);        
+  }
+  
+  // scan for ctrl+w
+  do {
+    gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+  } while(SCAN_CONTROL_W != Key.UnicodeChar); 
+
+  // update screen with buffer's info
+  HBufferImageNeedRefresh = TRUE;
+  HBufferImageOnlyLineNeedRefresh = FALSE;
+  HBufferImageRefresh ();
+
+  return EFI_SUCCESS;
+}
+
+/**
   Move cursor to specified lines.
 
   @retval EFI_SUCCESS   The operation was successful.
@@ -1439,6 +1504,36 @@ HMainCommandOpenMemory (
 
 }
 
+MENU_ITEM_FUNCTION HexMainControlBasedMenuFunctions[] = {
+  NULL,
+  NULL,                      /* Ctrl - A */
+  NULL,                      /* Ctrl - B */
+  NULL,                      /* Ctrl - C */
+  NULL,                      /* Ctrl - D */
+  HMainCommandDisplayHelp,   /* Ctrl - E */
+  NULL,                      /* Ctrl - F */
+  NULL,                      /* Ctrl - G */
+  NULL,                      /* Ctrl - H */
+  NULL,                      /* Ctrl - I */
+  NULL,                      /* Ctrl - J */
+  NULL,                      /* Ctrl - K */
+  NULL,                      /* Ctrl - L */
+  NULL,                      /* Ctrl - M */
+  NULL,                      /* Ctrl - N */
+  NULL,                      /* Ctrl - O */
+  NULL,                      /* Ctrl - P */
+  NULL,                      /* Ctrl - Q */
+  NULL,                      /* Ctrl - R */
+  NULL,                      /* Ctrl - S */
+  NULL,                      /* Ctrl - T */
+  NULL,                      /* Ctrl - U */
+  NULL,                      /* Ctrl - V */
+  NULL,                      /* Ctrl - W */
+  NULL,                      /* Ctrl - X */
+  NULL,                      /* Ctrl - Y */
+  NULL,                      /* Ctrl - Z */
+};
+
 CONST EDITOR_MENU_ITEM HexEditorMenuItems[] = {
   {
     STRING_TOKEN(STR_HEXEDIT_LIBMENUBAR_GO_TO_OFFSET),
@@ -1598,6 +1693,11 @@ HMainEditorInit (
     return EFI_LOAD_ERROR;
   }
 
+  Status = ControlHotKeyInit (HexMainControlBasedMenuFunctions);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_MAINMENU), gShellDebug1HiiHandle);
+    return EFI_LOAD_ERROR;
+  }
   Status = MenuBarInit (HexEditorMenuItems);
   if (EFI_ERROR (Status)) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_MAINMENU), gShellDebug1HiiHandle);
@@ -1777,9 +1877,6 @@ HMainEditorRefresh (
   }
 
   if (HEditorFirst) {
-    MenuBarRefresh (    
-      HMainEditor.ScreenSize.Row,
-      HMainEditor.ScreenSize.Column);
     HBufferImageRefresh ();
   }
 
@@ -2138,8 +2235,9 @@ HMainEditorKeyInput (
       // clear previous status string
       //
       StatusBarSetRefresh();
-
-      if (Key.ScanCode == SCAN_NULL) {
+      if (EFI_SUCCESS == MenuBarDispatchControlHotKey(&Key)) {
+        Status = EFI_SUCCESS;
+      } else if (Key.ScanCode == SCAN_NULL) {
         Status = HBufferImageHandleInput (&Key);
       } else if (((Key.ScanCode >= SCAN_UP) && (Key.ScanCode <= SCAN_PAGE_DOWN))) {
         Status = HBufferImageHandleInput (&Key);

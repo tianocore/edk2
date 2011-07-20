@@ -15,6 +15,32 @@
 #include "TextEditor.h"
 #include "EditStatusBar.h"
 #include "EditInputBar.h"
+#include "EditMenuBar.h"
+
+//
+// the first time editor launch
+//
+BOOLEAN                       EditorFirst;
+
+//
+// it's time editor should exit
+//
+BOOLEAN                       EditorExit;
+
+BOOLEAN                       EditorMouseAction;
+
+extern EFI_EDITOR_FILE_BUFFER FileBuffer;
+
+extern BOOLEAN                FileBufferNeedRefresh;
+
+extern BOOLEAN                FileBufferOnlyLineNeedRefresh;
+
+extern BOOLEAN                FileBufferMouseNeedRefresh;
+
+extern EFI_EDITOR_FILE_BUFFER FileBufferBackupVar;
+
+EFI_EDITOR_GLOBAL_EDITOR      MainEditor;
+
 
 /**
   Load a file from disk to editor
@@ -58,6 +84,16 @@ MainCommandGotoLine (
 **/
 EFI_STATUS
 MainCommandSaveFile (
+  VOID
+  );
+
+/**
+  show help menu.
+
+  @retval EFI_SUCCESS             The operation was successful.
+**/
+EFI_STATUS
+MainCommandDisplayHelp (
   VOID
   );
 
@@ -121,6 +157,66 @@ MainCommandPasteLine (
   VOID
   );
 
+/**
+  Help info that will be displayed.
+**/
+EFI_STRING_ID  MainMenuHelpInfo[] = {
+  STRING_TOKEN(STR_EDIT_HELP_TITLE),
+  STRING_TOKEN(STR_EDIT_HELP_BLANK),
+  STRING_TOKEN(STR_EDIT_HELP_LIST_TITLE),
+  STRING_TOKEN(STR_EDIT_HELP_DIV),
+  STRING_TOKEN(STR_EDIT_HELP_GO_TO_LINE),
+  STRING_TOKEN(STR_EDIT_HELP_SAVE_FILE),
+  STRING_TOKEN(STR_EDIT_HELP_EXIT),
+  STRING_TOKEN(STR_EDIT_HELP_SEARCH),
+  STRING_TOKEN(STR_EDIT_HELP_SEARCH_REPLACE),
+  STRING_TOKEN(STR_EDIT_HELP_CUT_LINE),
+  STRING_TOKEN(STR_EDIT_HELP_PASTE_LINE),
+  STRING_TOKEN(STR_EDIT_HELP_OPEN_FILE),
+  STRING_TOKEN(STR_EDIT_HELP_FILE_TYPE),
+  STRING_TOKEN(STR_EDIT_HELP_BLANK),
+  STRING_TOKEN(STR_EDIT_HELP_EXIT_HELP),
+  STRING_TOKEN(STR_EDIT_HELP_BLANK),
+  STRING_TOKEN(STR_EDIT_HELP_BLANK),
+  STRING_TOKEN(STR_EDIT_HELP_BLANK),
+  STRING_TOKEN(STR_EDIT_HELP_BLANK),
+  STRING_TOKEN(STR_EDIT_HELP_BLANK),
+  STRING_TOKEN(STR_EDIT_HELP_BLANK),
+  STRING_TOKEN(STR_EDIT_HELP_BLANK),
+  STRING_TOKEN(STR_EDIT_HELP_DIV),
+0
+};
+
+MENU_ITEM_FUNCTION MainControlBasedMenuFunctions[] = {
+  NULL,
+  NULL,                      /* Ctrl - A */
+  NULL,                      /* Ctrl - B */
+  NULL,                      /* Ctrl - C */
+  NULL,                      /* Ctrl - D */
+  MainCommandDisplayHelp,    /* Ctrl - E */
+  MainCommandSearch,         /* Ctrl - F */
+  MainCommandGotoLine,       /* Ctrl - G */
+  NULL,                      /* Ctrl - H */
+  NULL,                      /* Ctrl - I */
+  NULL,                      /* Ctrl - J */
+  MainCommandCutLine,        /* Ctrl - K */
+  NULL,                      /* Ctrl - L */
+  NULL,                      /* Ctrl - M */
+  NULL,                      /* Ctrl - N */
+  MainCommandOpenFile,       /* Ctrl - O */
+  NULL,                      /* Ctrl - P */
+  MainCommandExit,           /* Ctrl - Q */
+  MainCommandSearchReplace,  /* Ctrl - R */
+  MainCommandSaveFile,       /* Ctrl - S */
+  MainCommandSwitchFileType, /* Ctrl - T */
+  MainCommandPasteLine,      /* Ctrl - U */
+  NULL,                      /* Ctrl - V */
+  NULL,                      /* Ctrl - W */
+  NULL,                      /* Ctrl - X */
+  NULL,                      /* Ctrl - Y */
+  NULL,                      /* Ctrl - Z */
+};
+
 EDITOR_MENU_ITEM  MainMenuItems[] = {
   {
     STRING_TOKEN(STR_EDIT_LIBMENUBAR_GO_TO_LINE),
@@ -167,6 +263,11 @@ EDITOR_MENU_ITEM  MainMenuItems[] = {
   {
     STRING_TOKEN(STR_EDIT_LIBMENUBAR_FILE_TYPE),
     STRING_TOKEN(STR_EDIT_LIBMENUBAR_F9),
+    MainCommandSwitchFileType
+  },
+  {
+    STRING_TOKEN(STR_EDIT_LIBMENUBAR_FILE_TYPE),
+    STRING_TOKEN(STR_EDIT_LIBMENUBAR_F11),
     MainCommandSwitchFileType
   },
 
@@ -1248,28 +1349,43 @@ MainCommandSaveFile (
   return Status;
 }
 
+/**
+  show help menu.
+
+  @retval EFI_SUCCESS             The operation was successful.
+**/
+EFI_STATUS
+MainCommandDisplayHelp (
+  VOID
+  )
+{
+  INTN     CurrentLine=0;
+  CHAR16 * InfoString;
+  EFI_INPUT_KEY  Key;
+  
+  // print helpInfo      
+  for (CurrentLine = 0; 0 != MainMenuHelpInfo[CurrentLine]; CurrentLine++) {
+    InfoString = HiiGetString(gShellDebug1HiiHandle, MainMenuHelpInfo[CurrentLine], NULL);
+    ShellPrintEx (0,CurrentLine+1,L"%E%s%N",InfoString);        
+  }
+  
+  // scan for ctrl+w
+  do {
+    gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+  } while(SCAN_CONTROL_W != Key.UnicodeChar); 
+
+  // update screen with file buffer's info
+  FileBufferRestorePosition ();
+  FileBufferNeedRefresh = TRUE;
+  FileBufferOnlyLineNeedRefresh = FALSE;
+  FileBufferRefresh ();  
+
+  return EFI_SUCCESS;
+}
+
 EFI_EDITOR_COLOR_ATTRIBUTES   OriginalColors;
 INTN                          OriginalMode;
 
-//
-// the first time editor launch
-//
-BOOLEAN                       EditorFirst;
-
-//
-// it's time editor should exit
-//
-BOOLEAN                       EditorExit;
-
-BOOLEAN                       EditorMouseAction;
-
-extern EFI_EDITOR_FILE_BUFFER FileBuffer;
-
-extern BOOLEAN                FileBufferMouseNeedRefresh;
-
-extern EFI_EDITOR_FILE_BUFFER FileBufferBackupVar;
-
-EFI_EDITOR_GLOBAL_EDITOR      MainEditor;
 
 //
 // basic initialization for MainEditor
@@ -1387,6 +1503,7 @@ MainEditorInit (
     return EFI_LOAD_ERROR;
   }
 
+  Status = ControlHotKeyInit (MainControlBasedMenuFunctions);
   Status = MenuBarInit (MainMenuItems);
   if (EFI_ERROR (Status)) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN(STR_EDIT_LIBEDITOR_MAINMENU), gShellDebug1HiiHandle);
@@ -1508,7 +1625,6 @@ MainEditorRefresh (
   }
 
   if (EditorFirst) {
-    MenuBarRefresh (MainEditor.ScreenSize.Row, MainEditor.ScreenSize.Column);
     FileBufferRestorePosition ();
   }
 
@@ -1730,15 +1846,17 @@ MainEditorKeyInput (
       //
       // dispatch to different components' key handling function
       //
-      if ((Key.ScanCode == SCAN_NULL) || ((Key.ScanCode >= SCAN_UP) && (Key.ScanCode <= SCAN_PAGE_DOWN))) {
+      if (EFI_NOT_FOUND != MenuBarDispatchControlHotKey(&Key)) {
+        Status = EFI_SUCCESS;
+      } else if ((Key.ScanCode == SCAN_NULL) || ((Key.ScanCode >= SCAN_UP) && (Key.ScanCode <= SCAN_PAGE_DOWN))) {
         Status = FileBufferHandleInput (&Key);
       } else if ((Key.ScanCode >= SCAN_F1) && (Key.ScanCode <= SCAN_F12)) {
         Status = MenuBarDispatchFunctionKey (&Key);
       } else {
         StatusBarSetStatusString (L"Unknown Command");
-        FileBufferMouseNeedRefresh = FALSE;
+        FileBufferMouseNeedRefresh = FALSE;  
       }
-
+      
       if (Status != EFI_SUCCESS && Status != EFI_OUT_OF_RESOURCES) {
         //
         // not already has some error status

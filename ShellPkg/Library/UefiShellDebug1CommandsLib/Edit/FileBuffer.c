@@ -53,7 +53,7 @@ EFI_EDITOR_FILE_BUFFER  FileBufferConst = {
 //
 // the whole edit area needs to be refreshed
 //
-STATIC BOOLEAN          FileBufferNeedRefresh;
+BOOLEAN          FileBufferNeedRefresh;	
 
 //
 // only the current line in edit area needs to be refresh
@@ -627,11 +627,11 @@ FileBufferRefresh (
 
       Link = Link->ForwardLink;
       Row++;
-    } while (Link != FileBuffer.ListHead && Row <= (MainEditor.ScreenSize.Row - 4));
+    } while (Link != FileBuffer.ListHead && Row <= (MainEditor.ScreenSize.Row - 1));
     //
     // while not file end and not screen full
     //
-    while (Row <= (MainEditor.ScreenSize.Row - 4)) {
+    while (Row <= (MainEditor.ScreenSize.Row - 1)) {
       EditorClearLine (Row, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row);
       Row++;
     }
@@ -2300,8 +2300,8 @@ FileBufferPageDown (
   //
   // has next page
   //
-  if (FileBuffer.NumLines >= FRow + (MainEditor.ScreenSize.Row - 5)) {
-    Gap = (MainEditor.ScreenSize.Row - 5);
+  if (FileBuffer.NumLines >= FRow + (MainEditor.ScreenSize.Row - 2)) {
+    Gap = (MainEditor.ScreenSize.Row - 2);
   } else {
     //
     // MOVE CURSOR TO LAST LINE
@@ -2352,8 +2352,8 @@ FileBufferPageUp (
   //
   // has previous page
   //
-  if (FRow > (MainEditor.ScreenSize.Row - 5)) {
-    Gap = (MainEditor.ScreenSize.Row - 5);
+  if (FRow > (MainEditor.ScreenSize.Row - 2)) {
+    Gap = (MainEditor.ScreenSize.Row - 2);
   } else {
     //
     // the first line of file will displayed on the first line of screen
@@ -2575,7 +2575,7 @@ UnderCurrentScreen (
   //
   // if is to the under of the screen
   //
-  if (FileRow > FileBuffer.LowVisibleRange.Row + (MainEditor.ScreenSize.Row - 5) - 1) {
+  if (FileRow > FileBuffer.LowVisibleRange.Row + (MainEditor.ScreenSize.Row - 2) - 1) {
     return TRUE;
   }
 
@@ -3207,12 +3207,12 @@ FileBufferAdjustMousePosition (
   // check whether new mouse row position is beyond screen
   // if not, adjust it
   //
-  if (CoordinateY >= 2 && CoordinateY <= (MainEditor.ScreenSize.Row - 4)) {
+  if (CoordinateY >= 2 && CoordinateY <= (MainEditor.ScreenSize.Row - 1)) {
     FileBuffer.MousePosition.Row = CoordinateY;
   } else if (CoordinateY < 2) {
     FileBuffer.MousePosition.Row = 2;
-  } else if (CoordinateY > (MainEditor.ScreenSize.Row - 4)) {
-    FileBuffer.MousePosition.Row = (MainEditor.ScreenSize.Row - 4);
+  } else if (CoordinateY > (MainEditor.ScreenSize.Row - 1)) {
+    FileBuffer.MousePosition.Row = (MainEditor.ScreenSize.Row - 1);
   }
 
 }

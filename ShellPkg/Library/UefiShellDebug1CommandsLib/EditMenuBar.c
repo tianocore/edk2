@@ -16,7 +16,8 @@
 #include "UefiShellDebug1CommandsLib.h"
 #include "EditStatusBar.h"
 
-EDITOR_MENU_ITEM  *MenuItems;
+EDITOR_MENU_ITEM   *MenuItems;
+MENU_ITEM_FUNCTION *ControlBasedMenuFunctions;
 UINTN                 NumItems;
 
 /**
@@ -32,7 +33,7 @@ MenuBarCleanup (
 }
 
 /**
-  Initializa the menu bar with the specified items.
+  Initialize the menu bar with the specified items.
 
   @param[in] Items              The items to display and their functions.
 
@@ -57,6 +58,22 @@ MenuBarInit (
   return EFI_SUCCESS;
 }
 
+/**
+  Initialize the control hot-key with the specified items.
+
+  @param[in] Items              The hot-key functions.
+
+  @retval EFI_SUCCESS           The initialization was correct.
+**/
+EFI_STATUS
+EFIAPI
+ControlHotKeyInit (
+  IN MENU_ITEM_FUNCTION  *Items
+  )
+{
+  ControlBasedMenuFunctions = Items;
+  return EFI_SUCCESS; 
+}
 /**
   Refresh function for the menu bar.
 
@@ -149,4 +166,31 @@ MenuBarDispatchFunctionKey (
 
   return (MenuItems[Index].Function ());
 }
+
+/**
+  Function to dispatch the correct function based on a control-based key (ctrl+o...)
+
+  @param[in] Key                The pressed key.
+
+  @retval EFI_NOT_FOUND         The key was not a valid control-based key 
+                                (an error was sent to the status bar).
+  @return EFI_SUCCESS.
+**/
+EFI_STATUS
+EFIAPI
+MenuBarDispatchControlHotKey (
+  IN CONST EFI_INPUT_KEY   *Key
+  )
+{
+  
+  if ((SCAN_CONTROL_Z < Key->UnicodeChar)
+    ||(NULL == ControlBasedMenuFunctions[Key->UnicodeChar]))
+  {
+      return EFI_NOT_FOUND;
+  }
+
+  ControlBasedMenuFunctions[Key->UnicodeChar]();
+  return EFI_SUCCESS;
+}
+
 

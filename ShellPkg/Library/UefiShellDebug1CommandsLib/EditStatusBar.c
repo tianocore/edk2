@@ -120,7 +120,7 @@ StatusBarRefresh (
   //
   // clear status bar
   //
-  EditorClearLine (LastRow - 3, LastCol, LastRow);
+  EditorClearLine (LastRow, LastCol, LastRow);
 
   //
   // print row, column fields
@@ -128,8 +128,8 @@ StatusBarRefresh (
   if (FileRow != (UINTN)(-1) && FileCol != (UINTN)(-1)) {
     ShellPrintEx (
       0,
-      (INT32)(LastRow) - 4,
-      L"  Row: %d  Col: %d       %s",
+      (INT32)(LastRow) - 1,
+      L" %d,%d       %s",
       FileRow,
       FileCol,
       StatusString
@@ -137,7 +137,7 @@ StatusBarRefresh (
   } else {
     ShellPrintEx (
       0,
-      (INT32)(LastRow) - 4,
+      (INT32)(LastRow) - 1,
       L"  %s",
       StatusString
       );
@@ -147,9 +147,9 @@ StatusBarRefresh (
   // print insert mode field
   //
   if (InsertMode) {
-    ShellPrintEx ((INT32)(LastCol) - 10, (INT32)(LastRow) - 4, L"|%s|", L"INS");
+    ShellPrintEx ((INT32)(LastCol) - 21, (INT32)(LastRow) - 1, L"|%s|   Help: Ctrl-E", L"INS");
   } else {
-    ShellPrintEx ((INT32)(LastCol) - 10, (INT32)(LastRow) - 4, L"|%s|", L"OVR");
+    ShellPrintEx ((INT32)(LastCol) - 21, (INT32)(LastRow) - 1, L"|%s|   Help: Ctrl-E", L"OVR");
   }
   //
   // restore the old screen attributes

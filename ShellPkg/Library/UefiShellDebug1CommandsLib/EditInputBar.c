@@ -87,18 +87,18 @@ InputBarPrintInput (
 
   gST->ConOut->EnableCursor (gST->ConOut, FALSE);
 
-  ShellPrintEx (((INT32)mPromptLen), ((INT32)LastRow) - 4, L"%s", Buffer);
+  ShellPrintEx (((INT32)mPromptLen), ((INT32)LastRow) - 1, L"%s", Buffer);
   Size = StrLen (Buffer);
 
   //
   // print " " after mPrompt
   //
   for (Index = Size; Index < Limit; Index++) {
-    ShellPrintEx ((INT32)(mPromptLen + Size), ((INT32)LastRow) - 4, L" ");
+    ShellPrintEx ((INT32)(mPromptLen + Size), ((INT32)LastRow) - 1, L" ");
   }
 
   gST->ConOut->EnableCursor (gST->ConOut, TRUE);
-  gST->ConOut->SetCursorPosition (gST->ConOut, Size + mPromptLen, LastRow - 4);
+  gST->ConOut->SetCursorPosition (gST->ConOut, Size + mPromptLen, LastRow - 1);
 }
 
 typedef struct {
@@ -159,9 +159,9 @@ InputBarRefresh (
   //
   // clear input bar
   //
-  EditorClearLine (LastRow - 3, LastColumn, LastRow);
+  EditorClearLine (LastRow , LastColumn, LastRow);
 
-  gST->ConOut->SetCursorPosition (gST->ConOut, 0, LastRow - 4);
+  gST->ConOut->SetCursorPosition (gST->ConOut, 0, LastRow - 1);
   ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN(STR_EDIT_LIBINPUTBAR_MAININPUTBAR), gShellDebug1HiiHandle, mPrompt);
 
   //
