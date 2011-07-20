@@ -356,6 +356,9 @@ TimerInitialize (
   Status = gInterrupt->RegisterInterruptSource (gInterrupt, gVector, TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
 
+  // Turn on the functional clock for Timer
+  MmioOr32 (CM_FCLKEN_PER, CM_FCLKEN_PER_EN_GPT3_ENABLE);
+
   // Set up default timer
   Status = TimerDriverSetTimerPeriod (&gTimer, FixedPcdGet32(PcdTimerPeriod));
   ASSERT_EFI_ERROR (Status);

@@ -46,7 +46,6 @@ ClockInit (
 
   // Turn on functional & interface clocks to various Peripherals.
   MmioOr32(CM_FCLKEN_PER, CM_FCLKEN_PER_EN_UART3_ENABLE
-                          | CM_FCLKEN_PER_EN_GPT3_ENABLE
                           | CM_FCLKEN_PER_EN_GPT4_ENABLE
                           | CM_FCLKEN_PER_EN_GPIO2_ENABLE
                           | CM_FCLKEN_PER_EN_GPIO3_ENABLE
