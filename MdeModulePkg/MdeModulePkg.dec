@@ -370,6 +370,18 @@
   #  If FALSE, TEXT statement will be set to GrayOut only when GrayOut condition is TRUE.
   gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserGrayOutTextStatement|FALSE|BOOLEAN|0x0001004f
   
+  ## If TRUE, recovery from IDE disk will be supported.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryOnIdeDisk|TRUE|BOOLEAN|0x00010060
+
+  ## If TRUE, recovery from FAT floppy disk will be supported.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryOnFatFloppyDisk|TRUE|BOOLEAN|0x00010061
+
+  ## If TRUE, recovery from data CD will be supported.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryOnDataCD|TRUE|BOOLEAN|0x00010062
+
+  ## If TRUE, recovery from FAT USB disk will be supported.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryOnFatUsbDisk|TRUE|BOOLEAN|0x00010063
+
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
   ##
   # This feature flag specifies whether DxeIpl switches to long mode to enter DXE phase.
