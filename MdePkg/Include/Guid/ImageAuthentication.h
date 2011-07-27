@@ -12,7 +12,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  GUIDs defined in UEFI 2.2 spec.
+  GUIDs defined in UEFI 2.3.1 spec.
 **/
 
 #ifndef __IMAGE_AUTHTICATION_H__
@@ -271,5 +271,8 @@ extern EFI_GUID gEfiCertRsa2048Sha256Guid;
 extern EFI_GUID gEfiCertSha1Guid;
 extern EFI_GUID gEfiCertRsa2048Sha1Guid;
 extern EFI_GUID gEfiCertX509Guid;
+extern EFI_GUID gEfiCertSha224Guid;
+extern EFI_GUID gEfiCertSha384Guid;
+extern EFI_GUID gEfiCertSha512Guid;
 
 #endif
