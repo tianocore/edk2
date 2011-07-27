@@ -1,7 +1,9 @@
 /** @file
   ACPI Timer implements one instance of Timer Library.
 
-  Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011, Andrei Warkentin <andreiw@motorola.com>
+
   This program and the accompanying materials are
   licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,9 +19,17 @@
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
 #include <Library/PciLib.h>
+#include <Library/DebugLib.h>
 
+//
+// PIIX4 Power Management Base Address
+//
+UINT32 mPmba = 0x401;
+
+#define PCI_BAR_IO             0x1
 #define ACPI_TIMER_FREQUENCY   3579545
 #define ACPI_TIMER_COUNT_SIZE  0x01000000
+#define ACPI_TIMER_OFFSET      0x8
 
 /**
   The constructor function enables ACPI IO space.
@@ -41,12 +51,21 @@ AcpiTimerLibConstructor (
   Device = 1;
   // Device = 7;
 
+  if (PciRead8 (PCI_LIB_ADDRESS (0,Device,3,0x80)) & 1) {
+    mPmba = PciRead32 (PCI_LIB_ADDRESS (0,Device,3,0x40));
+    ASSERT (mPmba & PCI_BAR_IO);
+    mPmba &= ~PCI_BAR_IO;
+  } else {
+    PciAndThenOr32 (PCI_LIB_ADDRESS (0,Device,3,0x40),
+                    (UINT32) ~0xfc0, mPmba);
+    PciOr8         (PCI_LIB_ADDRESS (0,Device,3,0x04), 0x01);
+  }
+
   //
   // ACPI Timer enable is in Bus 0, Device ?, Function 3
   //
-  PciOr8         (PCI_LIB_ADDRESS (0,Device,3,0x04), 0x01);
-  PciAndThenOr32 (PCI_LIB_ADDRESS (0,Device,3,0x40), (UINT32) ~0xfc0, 0x400);
-  PciOr8         (PCI_LIB_ADDRESS (0,Device,3,0x80), 0x01);  return RETURN_SUCCESS;
+  PciOr8         (PCI_LIB_ADDRESS (0,Device,3,0x80), 0x01);
+  return RETURN_SUCCESS;
 }
 
 /**
@@ -63,7 +82,7 @@ InternalAcpiGetTimerTick (
   VOID
   )
 {
-  return IoRead32 (0x408);
+  return IoRead32 (mPmba + ACPI_TIMER_OFFSET);
 }
 
 /**
