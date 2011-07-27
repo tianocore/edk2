@@ -4,7 +4,7 @@
 #  Device Path Library that layers on top of the UEFI 2.0 Device Path Protocol.
 #  This library is not available for EFI 1.10 modules.
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -50,5 +50,5 @@
   gEfiDevicePathProtocolGuid                    ## CONSUMES
   gEfiDevicePathUtilitiesProtocolGuid           ## CONSUMES
 
-[Depex]
+[Depex.common.DXE_DRIVER, Depex.common.DXE_RUNTIME_DRIVER, Depex.common.DXE_SAL_DRIVER, Depex.common.DXE_SMM_DRIVER]
   gEfiDevicePathUtilitiesProtocolGuid

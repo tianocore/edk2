@@ -7,7 +7,7 @@
 #  This library binds to the first PCI Root Bridge I/O Protocol in the platform. As a result,
 #  it should only be used on platforms that contain a single PCI root bridge.
 #
-# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -49,5 +49,5 @@
 [Protocols]
   gEfiSmmPciRootBridgeIoProtocolGuid               ## CONSUMES
   
-[Depex]
+[Depex.common.DXE_SMM_DRIVER]
   gEfiSmmPciRootBridgeIoProtocolGuid

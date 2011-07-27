@@ -40,5 +40,5 @@
 [Protocols]
   gEfiExtendedSalBootServiceProtocolGuid        # PROTOCOL ALWAYS_CONSUMED
 
-[Depex]
+[Depex.common.DXE_DRIVER]
   gEfiExtendedSalBootServiceProtocolGuid

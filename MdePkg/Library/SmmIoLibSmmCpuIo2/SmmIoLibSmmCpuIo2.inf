@@ -3,7 +3,7 @@
 #
 # I/O Library implementation that uses the CPU I/O Protocol for I/O
 #  and MMIO operations.
-# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -46,5 +46,5 @@
 [Protocols]
   gEfiSmmCpuIo2ProtocolGuid                         ## CONSUMES
 
-[Depex]
+[Depex.common.DXE_SMM_DRIVER]
   gEfiSmmCpuIo2ProtocolGuid
