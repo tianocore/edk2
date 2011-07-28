@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Uefi.h>
 
-#pragma pack(push, 1)
+#pragma pack(1)
 
 //
 // Below data structure is used for lockbox registration in SMST
@@ -48,7 +48,7 @@ typedef struct {
   LIST_ENTRY                     Link;
 } SMM_LOCK_BOX_DATA;
 
-#pragma pack(pop)
+#pragma pack()
 
 #endif
 
