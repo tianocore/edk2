@@ -67,5 +67,3 @@ _PrepareArguments:
   #    r0 = core_id
   #    r1 = pei_core_address
   blx   r2
-
-.end

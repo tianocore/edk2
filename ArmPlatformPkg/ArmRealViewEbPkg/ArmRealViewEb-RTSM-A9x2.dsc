@@ -240,7 +240,6 @@
 
   XCODE:*_*_ARM_ARCHCC_FLAGS     == -arch armv7 -march=armv7 -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
   XCODE:*_*_ARM_ARCHASM_FLAGS    == -arch armv7 -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
-  XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv7 -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
   XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
 
 

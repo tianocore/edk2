@@ -12,12 +12,12 @@
 #
 #------------------------------------------------------------------------------
 
-    .text
-    .align 2
-    GCC_ASM_EXPORT(__aeabi_uidiv)
-    GCC_ASM_EXPORT(__aeabi_uidivmod)
-    GCC_ASM_EXPORT(__aeabi_idiv)
-    GCC_ASM_EXPORT(__aeabi_idivmod)
+.text
+.align 2
+GCC_ASM_EXPORT(__aeabi_uidiv)
+GCC_ASM_EXPORT(__aeabi_uidivmod)
+GCC_ASM_EXPORT(__aeabi_idiv)
+GCC_ASM_EXPORT(__aeabi_idivmod)
 
 #    AREA  Math, CODE, READONLY
 
@@ -32,13 +32,13 @@
 
 ASM_PFX(__aeabi_uidiv):
 ASM_PFX(__aeabi_uidivmod):
-    RSBS    r12, r1, r0, LSR #4
-    MOV     r2, #0
-    BCC     ASM_PFX(__arm_div4)
-    RSBS    r12, r1, r0, LSR #8
-    BCC     ASM_PFX(__arm_div8)
-    MOV     r3, #0
-    B       ASM_PFX(__arm_div_large)
+  rsbs    r12, r1, r0, LSR #4
+  mov     r2, #0
+  bcc     ASM_PFX(__arm_div4)
+  rsbs    r12, r1, r0, LSR #8
+  bcc     ASM_PFX(__arm_div8)
+  mov     r3, #0
+  b       ASM_PFX(__arm_div_large)
 
 #
 #INT32
@@ -50,107 +50,104 @@ ASM_PFX(__aeabi_uidivmod):
 #
 ASM_PFX(__aeabi_idiv):
 ASM_PFX(__aeabi_idivmod):
-    ORRS    r12, r0, r1
-    BMI     ASM_PFX(__arm_div_negative)
-    RSBS    r12, r1, r0, LSR #1
-    MOV     r2, #0
-    BCC     ASM_PFX(__arm_div1)
-    RSBS    r12, r1, r0, LSR #4
-    BCC     ASM_PFX(__arm_div4)
-    RSBS    r12, r1, r0, LSR #8
-    BCC     ASM_PFX(__arm_div8)
-    MOV     r3, #0
-    B       ASM_PFX(__arm_div_large)
+  orrs    r12, r0, r1
+  bmi     ASM_PFX(__arm_div_negative)
+  rsbs    r12, r1, r0, LSR #1
+  mov     r2, #0
+  bcc     ASM_PFX(__arm_div1)
+  rsbs    r12, r1, r0, LSR #4
+  bcc     ASM_PFX(__arm_div4)
+  rsbs    r12, r1, r0, LSR #8
+  bcc     ASM_PFX(__arm_div8)
+  mov     r3, #0
+  b       ASM_PFX(__arm_div_large)
 ASM_PFX(__arm_div8):
-    RSBS    r12, r1, r0, LSR #7
-    SUBCS   r0, r0, r1, LSL #7
-    ADC     r2, r2, r2
-    RSBS    r12, r1, r0,LSR #6
-    SUBCS   r0, r0, r1, LSL #6
-    ADC     r2, r2, r2
-    RSBS    r12, r1, r0, LSR #5
-    SUBCS   r0, r0, r1, LSL #5
-    ADC     r2, r2, r2
-    RSBS    r12, r1, r0, LSR #4
-    SUBCS   r0, r0, r1, LSL #4
-    ADC     r2, r2, r2
+  rsbs    r12, r1, r0, LSR #7
+  subcs   r0, r0, r1, LSL #7
+  adc     r2, r2, r2
+  rsbs    r12, r1, r0,LSR #6
+  subcs   r0, r0, r1, LSL #6
+  adc     r2, r2, r2
+  rsbs    r12, r1, r0, LSR #5
+  subcs   r0, r0, r1, LSL #5
+  adc     r2, r2, r2
+  rsbs    r12, r1, r0, LSR #4
+  subcs   r0, r0, r1, LSL #4
+  adc     r2, r2, r2
 ASM_PFX(__arm_div4):
-    RSBS    r12, r1, r0, LSR #3
-    SUBCS   r0, r0, r1, LSL #3
-    ADC     r2, r2, r2
-    RSBS    r12, r1, r0, LSR #2
-    SUBCS   r0, r0, r1, LSL #2
-    ADCS    r2, r2, r2
-    RSBS    r12, r1, r0, LSR #1
-    SUBCS   r0, r0, r1, LSL #1
-    ADC     r2, r2, r2
+  rsbs    r12, r1, r0, LSR #3
+  subcs   r0, r0, r1, LSL #3
+  adc     r2, r2, r2
+  rsbs    r12, r1, r0, LSR #2
+  subcs   r0, r0, r1, LSL #2
+  adcs    r2, r2, r2
+  rsbs    r12, r1, r0, LSR #1
+  subcs   r0, r0, r1, LSL #1
+  adc     r2, r2, r2
 ASM_PFX(__arm_div1):
-    SUBS    r1, r0, r1
-    MOVCC   r1, r0
-    ADC     r0, r2, r2
-    BX      r14
+  subs    r1, r0, r1
+  movcc   r1, r0
+  adc     r0, r2, r2
+  bx      r14
 ASM_PFX(__arm_div_negative):
-    ANDS    r2, r1, #0x80000000
-    RSBMI   r1, r1, #0
-    EORS    r3, r2, r0, ASR #32
-    RSBCS   r0, r0, #0
-    RSBS    r12, r1, r0, LSR #4
-    BCC     label1
-    RSBS    r12, r1, r0, LSR #8
-    BCC     label2
+  ands    r2, r1, #0x80000000
+  rsbmi   r1, r1, #0
+  eors    r3, r2, r0, ASR #32
+  rsbcs   r0, r0, #0
+  rsbs    r12, r1, r0, LSR #4
+  bcc     label1
+  rsbs    r12, r1, r0, LSR #8
+  bcc     label2
 ASM_PFX(__arm_div_large):
-    LSL     r1, r1, #6
-    RSBS    r12, r1, r0, LSR #8
-    ORR     r2, r2, #0xfc000000
-    BCC     label2
-    LSL     r1, r1, #6
-    RSBS    r12, r1, r0, LSR #8
-    ORR     r2, r2, #0x3f00000
-    BCC     label2
-    LSL     r1, r1, #6
-    RSBS    r12, r1, r0, LSR #8
-    ORR     r2, r2, #0xfc000
-    ORRCS   r2, r2, #0x3f00
-    LSLCS   r1, r1, #6
-    RSBS    r12, r1, #0
-    BCS     ASM_PFX(__aeabi_idiv0)
+  lsl     r1, r1, #6
+  rsbs    r12, r1, r0, LSR #8
+  orr     r2, r2, #0xfc000000
+  bcc     label2
+  lsl     r1, r1, #6
+  rsbs    r12, r1, r0, LSR #8
+  orr     r2, r2, #0x3f00000
+  bcc     label2
+  lsl     r1, r1, #6
+  rsbs    r12, r1, r0, LSR #8
+  orr     r2, r2, #0xfc000
+  orrcs   r2, r2, #0x3f00
+  lslcs   r1, r1, #6
+  rsbs    r12, r1, #0
+  bcs     ASM_PFX(__aeabi_idiv0)
 label3:
-    LSRCS   r1, r1, #6
+  lsrcs   r1, r1, #6
 label2:
-    RSBS    r12, r1, r0, LSR #7
-    SUBCS   r0, r0, r1, LSL #7
-    ADC     r2, r2, r2
-    RSBS    r12, r1, r0, LSR #6
-    SUBCS   r0, r0, r1, LSL #6
-    ADC     r2, r2, r2
-    RSBS    r12, r1, r0, LSR #5
-    SUBCS   r0, r0, r1, LSL #5
-    ADC     r2, r2, r2
-    RSBS    r12, r1, r0, LSR #4
-    SUBCS   r0, r0, r1, LSL #4
-    ADC     r2, r2, r2
+  rsbs    r12, r1, r0, LSR #7
+  subcs   r0, r0, r1, LSL #7
+  adc     r2, r2, r2
+  rsbs    r12, r1, r0, LSR #6
+  subcs   r0, r0, r1, LSL #6
+  adc     r2, r2, r2
+  rsbs    r12, r1, r0, LSR #5
+  subcs   r0, r0, r1, LSL #5
+  adc     r2, r2, r2
+  rsbs    r12, r1, r0, LSR #4
+  subcs   r0, r0, r1, LSL #4
+  adc     r2, r2, r2
 label1:
-    RSBS    r12, r1, r0, LSR #3
-    SUBCS   r0, r0, r1, LSL #3
-    ADC     r2, r2, r2
-    RSBS    r12, r1, r0, LSR #2
-    SUBCS   r0, r0, r1, LSL #2
-    ADCS    r2, r2, r2
-    BCS     label3
-    RSBS    r12, r1, r0, LSR #1
-    SUBCS   r0, r0, r1, LSL #1
-    ADC     r2, r2, r2
-    SUBS    r1, r0, r1
-    MOVCC   r1, r0
-    ADC     r0, r2, r2
-    ASRS    r3, r3, #31
-    RSBMI   r0, r0, #0
-    RSBCS   r1, r1, #0
-    BX      r14
+  rsbs    r12, r1, r0, LSR #3
+  subcs   r0, r0, r1, LSL #3
+  adc     r2, r2, r2
+  rsbs    r12, r1, r0, LSR #2
+  subcs   r0, r0, r1, LSL #2
+  adcs    r2, r2, r2
+  bcs     label3
+  rsbs    r12, r1, r0, LSR #1
+  subcs   r0, r0, r1, LSL #1
+  adc     r2, r2, r2
+  subs    r1, r0, r1
+  movcc   r1, r0
+  adc     r0, r2, r2
+  asrs    r3, r3, #31
+  rsbmi   r0, r0, #0
+  rsbcs   r1, r1, #0
+  bx      r14
 
-    @ What to do about division by zero?  For now, just return.
+  @ What to do about division by zero?  For now, just return.
 ASM_PFX(__aeabi_idiv0):
-    BX      r14
-
-.end
-
+  bx      r14

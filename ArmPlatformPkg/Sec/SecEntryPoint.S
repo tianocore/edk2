@@ -87,10 +87,10 @@ _InitMem:
 _SetupStack:
   # Setup Stack for the 4 CPU cores
   #Read Stack Base address from PCD
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresSecStackBase) ,r1)
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresSecStackBase), r1)
 
   #read Stack size from PCD
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecStackSize) ,r2)
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecStackSize), r2)
 
   #calcuate Stack Pointer reg value using Stack size and CPU ID.
   mov     r3,r5         @ r3 = core_id
