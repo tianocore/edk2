@@ -214,6 +214,70 @@ ReadString (
 
 }
 
+/**
+  Adjust the value to the correct one. Rules follow the sample:
+  like:  Year change:  2012.02.29 -> 2013.02.29 -> 2013.02.01
+         Month change: 2013.03.29 -> 2013.02.29 -> 2013.02.28
+
+  @param  Question          Pointer to current question.
+  @param  Sequence          The sequence of the field in the question.
+**/
+VOID
+AdjustQuestionValue (
+  IN  FORM_BROWSER_STATEMENT  *Question,
+  IN  UINT8                   Sequence
+  )
+{
+  UINT8     Month;
+  UINT16    Year;
+  UINT8     Maximum;
+  UINT8     Minimum;
+
+  if (Question->Operand != EFI_IFR_DATE_OP) {
+    return;
+  }
+
+  Month   = Question->HiiValue.Value.date.Month;
+  Year    = Question->HiiValue.Value.date.Year;
+  Minimum = 1;
+
+  switch (Month) {
+  case 2:
+    if ((Year % 4) == 0 && ((Year % 100) != 0 || (Year % 400) == 0)) {
+      Maximum = 29;
+    } else {
+      Maximum = 28;
+    }
+    break;
+  case 4:
+  case 6:
+  case 9:
+  case 11:
+    Maximum = 30;
+    break;
+  default:
+    Maximum = 31;
+    break;
+  }
+
+  //
+  // Change the month area.
+  //
+  if (Sequence == 0) {
+    if (Question->HiiValue.Value.date.Day > Maximum) {
+      Question->HiiValue.Value.date.Day = Maximum;
+    }
+  }
+  
+  //
+  // Change the Year area.
+  //
+  if (Sequence == 2) {
+    if (Question->HiiValue.Value.date.Day > Maximum) {
+      Question->HiiValue.Value.date.Day = Minimum;
+    }
+  }
+}
 
 /**
   This routine reads a numeric value from the user input.
@@ -644,6 +708,16 @@ EnterCarriageReturn:
         // Numeric
         //
         QuestionValue->Value.u64 = EditValue;
+      }
+
+      //
+      // Adjust the value to the correct one.
+      // Sample like: 2012.02.29 -> 2013.02.29 -> 2013.02.01
+      //              2013.03.29 -> 2013.02.29 -> 2013.02.28
+      //
+      if (Question->Operand == EFI_IFR_DATE_OP && 
+        (MenuOption->Sequence == 0 || MenuOption->Sequence == 2)) {
+        AdjustQuestionValue (Question, (UINT8)MenuOption->Sequence);
       }
 
       //
