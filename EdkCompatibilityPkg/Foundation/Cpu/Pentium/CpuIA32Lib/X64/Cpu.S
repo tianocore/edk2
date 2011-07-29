@@ -26,6 +26,7 @@
 .globl ASM_PFX(EfiDisableCache)
 .globl ASM_PFX(EfiEnableCache)
 .globl ASM_PFX(EfiReadMsr)
+.globl ASM_PFX(EfiWriteMsr)
 .globl ASM_PFX(EfiGetEflags)
 .globl ASM_PFX(EfiDisableInterrupts)
 .globl ASM_PFX(EfiEnableInterrupts)
