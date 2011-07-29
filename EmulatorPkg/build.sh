@@ -195,15 +195,15 @@ fi
 
 case $CLEAN_TYPE in
   clean)
-    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -t $TARGET_TOOLS -D UNIX_SEC_BUILD -n 3 clean
-    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -t $UNIXPKG_TOOLS -n 3 clean
+    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS -D UNIX_SEC_BUILD -n 3 clean
+    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $UNIXPKG_TOOLS -n 3 clean
     exit $?
     ;;
   cleanall)
     make -C $WORKSPACE/BaseTools clean
-    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -t $TARGET_TOOLS -D UNIX_SEC_BUILD -n 3 clean
-    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -t $UNIXPKG_TOOLS -n 3 clean
-    build -p $WORKSPACE/ShellPkg/ShellPkg.dsc -a IA32 -t $UNIXPKG_TOOLS -n 3 clean
+    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS -D UNIX_SEC_BUILD -n 3 clean
+    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $UNIXPKG_TOOLS -n 3 clean
+    build -p $WORKSPACE/ShellPkg/ShellPkg.dsc -a IA32 -b $BUILDTARGET -t $UNIXPKG_TOOLS -n 3 clean
     exit $?
     ;;
 esac
@@ -213,10 +213,10 @@ esac
 # Build the edk2 EmulatorPkg
 #
 if [[ $TARGET_TOOLS == $UNIXPKG_TOOLS ]]; then
-  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -t $UNIXPKG_TOOLS -D BUILD_$ARCH_SIZE -D UNIX_SEC_BUILD $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $UNIXPKG_TOOLS -D BUILD_$ARCH_SIZE -D UNIX_SEC_BUILD $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
 else
-  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -t $TARGET_TOOLS  -D BUILD_$ARCH_SIZE -D UNIX_SEC_BUILD -D SKIP_MAIN_BUILD -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
-  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -t $UNIXPKG_TOOLS -D BUILD_$ARCH_SIZE $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS  -D BUILD_$ARCH_SIZE -D UNIX_SEC_BUILD -D SKIP_MAIN_BUILD -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
+  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $UNIXPKG_TOOLS -D BUILD_$ARCH_SIZE $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
   cp $BUILD_OUTPUT_DIR/DEBUG_"$TARGET_TOOLS"/$PROCESSOR/Host $BUILD_ROOT_ARCH
 fi
 exit $?
