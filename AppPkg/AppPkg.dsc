@@ -41,6 +41,7 @@
   #
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   ShellCEntryLib|ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
+  UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   #
   # Common Libraries
   #
@@ -64,45 +65,11 @@
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
+
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   FileHandleLib|ShellPkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   SortLib|ShellPkg/Library/UefiSortLib/UefiSortLib.inf
-
-  #
-  # C Standard Libraries
-  #
-  LibC|StdLib/LibC/LibC.inf
-  LibStdLib|StdLib/LibC/StdLib/StdLib.inf
-  LibString|StdLib/LibC/String/String.inf
-  LibWchar|StdLib/LibC/Wchar/Wchar.inf
-  LibCType|StdLib/LibC/Ctype/Ctype.inf
-  LibTime|StdLib/LibC/Time/Time.inf
-  LibStdio|StdLib/LibC/Stdio/Stdio.inf
-  LibGdtoa|StdLib/LibC/gdtoa/gdtoa.inf
-  LibLocale|StdLib/LibC/Locale/Locale.inf
-  LibUefi|StdLib/LibC/Uefi/Uefi.inf
-  LibMath|StdLib/LibC/Math/Math.inf
-  LibSignal|StdLib/LibC/Signal/Signal.inf
-  LibNetUtil|StdLib/LibC/NetUtil/NetUtil.inf
-
-  # Libraries for device abstractions within the Standard C Library
-  # Applications should not directly access any functions defined in these libraries.
-  DevUtility|StdLib/LibC/Uefi/Devices/daUtility.inf
-  DevConsole|StdLib/LibC/Uefi/Devices/daConsole.inf
-  DevShell|StdLib/LibC/Uefi/Devices/daShell.inf
-
-[LibraryClasses.IA32]
-  TimerLib|PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
-  # To run in an emulation environment, such as Nt32Pkg, comment out the TimerLib
-  # description above and un-comment the line below.
-#  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
-
-[LibraryClasses.X64]
-  TimerLib|PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
-
-[LibraryClasses.IPF]
-  PalLib|MdePkg/Library/UefiPalLib/UefiPalLib.inf
-  TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  PathLib|ShellPkg/Library/BasePathLib/BasePathLib.inf
 
 ###################################################################################################
 #
@@ -124,44 +91,41 @@
 ###################################################################################################
 
 [Components]
-# BaseLib and BaseMemoryLib need to be built with the /GL- switch when using the Microsoft
-# tool chain.  This is required so that the library functions can be resolved during
-# the second pass of the linker during Link-time-code-generation.
-###
-  MdePkg/Library/BaseLib/BaseLib.inf {
-    <BuildOptions>
-      MSFT:*_*_*_CC_FLAGS    = /X /Zc:wchar_t /GL-
-  }
-
-  MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf {
-    <BuildOptions>
-      MSFT:*_*_*_CC_FLAGS    = /X /Zc:wchar_t /GL-
-  }
 
 #### Sample Applications.
   AppPkg/Applications/Hello/Hello.inf        # No LibC includes or functions.
   AppPkg/Applications/Main/Main.inf          # Simple invocation. No other LibC functions.
   AppPkg/Applications/Enquire/Enquire.inf
 
-# After extracting the Python distribution, un-comment the following line to build Python.
+#### After extracting the Python distribution, un-comment the following line to build Python.
 #  AppPkg/Applications/Python/PythonCore.inf
 
-################################################################
+##########
+#    Socket Applications - LibC based
+##########
+  AppPkg/Applications/Sockets/DataSink/DataSink.inf
+  AppPkg/Applications/Sockets/DataSource/DataSource.inf
+#  SocketPkg/Application/FtpNew/FTP.inf
+  AppPkg/Applications/Sockets/GetHostByAddr/GetHostByAddr.inf
+  AppPkg/Applications/Sockets/GetHostByDns/GetHostByDns.inf
+  AppPkg/Applications/Sockets/GetHostByName/GetHostByName.inf
+  AppPkg/Applications/Sockets/GetNetByAddr/GetNetByAddr.inf
+  AppPkg/Applications/Sockets/GetNetByName/GetNetByName.inf
+  AppPkg/Applications/Sockets/GetServByName/GetServByName.inf
+  AppPkg/Applications/Sockets/GetServByPort/GetServByPort.inf
+  AppPkg/Applications/Sockets/RecvDgram/RecvDgram.inf
+#  SocketPkg/Application/route/route.inf
+  AppPkg/Applications/Sockets/SetHostName/SetHostName.inf
+  AppPkg/Applications/Sockets/SetSockOpt/SetSockOpt.inf
+  AppPkg/Applications/Sockets/TftpServer/TftpServer.inf
+  AppPkg/Applications/Sockets/WebServer/WebServer.inf {
+    <PcdsFixedAtBuild>
+      gStdLibTokenSpaceGuid.WebServer_HttpPort|80
+  }
+
+###################################################################################################
 #
-# See the additional comments below if you plan to run applications under the
-# Nt32 emulation environment.
+#       Include Boilerplate text required for building with the Standard Libraries.
 #
-
-[BuildOptions]
-  INTEL:*_*_*_CC_FLAGS      = /Qfreestanding
-   MSFT:*_*_*_CC_FLAGS      = /X /Zc:wchar_t
-    GCC:*_*_*_CC_FLAGS      = -ffreestanding -nostdinc -nostdlib
-
-# The Build Options, below, are only used when building the C library
-# to be run under an emulation environment, such as Nt32Pkg.  The clock()
-# system call is modified to return -1 indicating that it is unsupported.
-# Just uncomment the lines below and select the correct TimerLib instance, above.
-
-  # INTEL:*_*_IA32_CC_FLAGS     = /D NT32dvm
-  #  MSFT:*_*_IA32_CC_FLAGS     = /D NT32dvm
-  #   GCC:*_*_IA32_CC_FLAGS     = -DNT32dvm
+###################################################################################################
+!include StdLib/StdLib.inc

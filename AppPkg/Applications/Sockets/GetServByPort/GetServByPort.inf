@@ -1,0 +1,65 @@
+#/** @file
+#  GetServByPort Application
+#
+# This file contains an 'Intel Peripheral Driver' and is      
+# licensed for Intel CPUs and chipsets under the terms of your
+# license agreement with Intel or your vendor.  This file may 
+# be modified by the user, subject to additional terms of the 
+# license agreement                                           
+#
+#
+# Copyright (c)  20011 Intel Corporation. All rights reserved
+# This software and associated documentation (if any) is furnished
+# under a license and may only be used or copied in accordance
+# with the terms of the license. Except as permitted by such
+# license, no part of this software or documentation may be
+# reproduced, stored in a retrieval system, or transmitted in any
+# form or by any means without the express written consent of
+# Intel Corporation.
+#
+##
+
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = GetServByPort
+  FILE_GUID                      = 83381B06-2EEA-4cf3-9B5F-D75B9B5C93DE
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ShellCEntryLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  GetServByPort.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  StdLib/StdLib.dec
+
+
+[LibraryClasses]
+  BaseMemoryLib
+  BsdSocketLib
+  DebugLib
+  DevShell
+  EfiSocketLib
+  LibC
+  LibMath
+  LibNetUtil
+  ShellCEntryLib
+  UefiBootServicesTableLib
+  UefiLib
+#  UseSocketDxe
+
+[BuildOptions]
+  INTEL:*_*_*_CC_FLAGS = /Qdiag-disable:181,186
+   MSFT:*_*_*_CC_FLAGS = /Od
+    GCC:*_*_*_CC_FLAGS = -O0 -Wno-unused-variable
+
