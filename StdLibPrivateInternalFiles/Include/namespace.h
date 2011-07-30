@@ -39,6 +39,17 @@
 #include  <sys/EfiCdefs.h>
 
 #ifndef __lint__
+#define ftello        _ftello
+#define getcontext    _getcontext
+#define getenv_r      _getenv_r
+#define strtof        _strtof
+#define strtoimax     _strtoimax
+#define strtold       _strtold
+#define strtoll       _strtoll
+#define strtoull      _strtoull
+#define strtoumax     _strtoumax
+
+#if 0
 #define brk           _brk
 #define catclose      _catclose
 #define catgets       _catgets
@@ -51,22 +62,13 @@
 #endif /* _REENTRANT */
 #define fork          _fork
 #define fseeko        _fseeko
-#define ftello        _ftello
-#define getcontext    _getcontext
-#define getenv_r      _getenv_r
-//#define inet_aton     _inet_aton
-//#define inet_pton     _inet_pton
+#define inet_aton     _inet_aton
+#define inet_pton     _inet_pton
 #define pipe          _pipe
 #define sbrk          _sbrk
-//#define strerror_r    _strerror_r
+#define strerror_r    _strerror_r
 #define strlcat       _strlcat
 #define strlcpy       _strlcpy
-#define strtof        _strtof
-#define strtoimax     _strtoimax
-#define strtold       _strtold
-#define strtoll       _strtoll
-#define strtoull      _strtoull
-#define strtoumax     _strtoumax
 #define sys_errlist   _sys_errlist
 #define sys_nerr      _sys_nerr
 #define sys_siglist   _sys_siglist
@@ -79,7 +81,6 @@
 #define warn          _warn
 #define warnx         _warnx
 
-#if 0
 //#ifdef __weak_alias
 #define MD2Data       _MD2Data
 #define MD2End        _MD2End
@@ -244,7 +245,6 @@
 #define ftrylockfile  _ftrylockfile
 #define funlockfile   _funlockfile
 #define fnmatch       _fnmatch
-#define fparseln      _fparseln
 #define fpgetmask     _fpgetmask
 #define fpgetround    _fpgetround
 #define fpgetsticky   _fpgetsticky

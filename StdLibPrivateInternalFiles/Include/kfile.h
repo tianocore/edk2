@@ -79,14 +79,14 @@ struct _Device_Node;
     This structure must be a multiple of 8 bytes in length.
 */
 struct __filedes {
+  off_t                   f_offset;     /* current position in file */
   const struct fileops   *f_ops;
   void                   *devdata;      /* Device-specific data */
-  off_t                   f_offset;     /* current position in file */
-  UINT32                  f_flag;       /* see fcntl.h */
-  UINT32                  f_iflags;     // In use if non-zero
   int                     Oflags;       // From the open call
   int                     Omode;        // From the open call
   int                     RefCount;     // Reference count of opens
+  UINT32                  f_flag;       /* see fcntl.h */
+  UINT32                  f_iflags;     // In use if non-zero
   UINT16                  MyFD;         // Which FD this is.
   UINT16                  Reserved_1;   // Force this structure to be a multiple of 8-bytes in length
 };
@@ -130,7 +130,8 @@ typedef struct {
 
 /* Type of all Device-specific handler's open routines. */
 typedef
-  int     (EFIAPI *FO_OPEN)    (struct __filedes *FD, void *IP, wchar_t *Path, wchar_t *Flags);
+  int     (EFIAPI *FO_OPEN)    (struct _Device_Node *This, struct __filedes *FD,
+                                int Instance, wchar_t *Path, wchar_t *MPath);
 
 #define FILE_IS_USABLE(fp)  (((fp)->f_iflags &      \
           (FIF_WANTCLOSE|FIF_LARVAL)) == 0)
@@ -153,16 +154,16 @@ int   fdcreate    (CHAR16 *, UINT32, UINT32, BOOLEAN, VOID *, const struct fileo
       fnullop_*   Does nothing and returns success.
       fbadop_*    Does nothing and returns EPERM
 */
-int     fnullop_fcntl (struct __filedes *filp, UINT32 Cmd, void *p3, void *p4);
-short   fnullop_poll  (struct __filedes *filp, short Events);
-int     fnullop_flush (struct __filedes *filp);
+int     EFIAPI fnullop_fcntl (struct __filedes *filp, UINT32 Cmd, void *p3, void *p4);
+short   EFIAPI fnullop_poll  (struct __filedes *filp, short Events);
+int     EFIAPI fnullop_flush (struct __filedes *filp);
 
-int     fbadop_stat   (struct __filedes *filp, struct stat *StatBuf, void *Buf);
-int     fbadop_ioctl  (struct __filedes *filp, ULONGN Cmd, void *argp);
-int     fbadop_delete (struct __filedes *filp);
-int     fbadop_rmdir  (struct __filedes *filp);
-int     fbadop_mkdir  (const char *path, __mode_t perms);
-int     fbadop_rename (const char *from, const char *to);
+int     EFIAPI fbadop_stat   (struct __filedes *filp, struct stat *StatBuf, void *Buf);
+int     EFIAPI fbadop_ioctl  (struct __filedes *filp, ULONGN Cmd, void *argp);
+int     EFIAPI fbadop_delete (struct __filedes *filp);
+int     EFIAPI fbadop_rmdir  (struct __filedes *filp);
+int     EFIAPI fbadop_mkdir  (const char *path, __mode_t perms);
+int     EFIAPI fbadop_rename (const char *from, const char *to);
 
 __END_DECLS
 

@@ -51,10 +51,11 @@ __BEGIN_DECLS
 int
 EFIAPI
 da_ConOpen(
+  IN  DeviceNode         *DevNode,
   IN  struct __filedes   *filp,
-  IN  void               *DevInstance,
+  IN  int                 DevInstance,
   IN  CHAR16             *Path,
-  IN  CHAR16             *Flags
+  IN  CHAR16             *MPath
 );
 
 __END_DECLS

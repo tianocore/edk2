@@ -18,6 +18,7 @@
 #include  <limits.h>
 #include  <signal.h>
 #include  <time.h>
+#include  <setjmp.h>
 
 #include  <kfile.h>
 #include  <Device/Device.h>
@@ -74,7 +75,6 @@ struct  __MainData {
   char              *NCmdLine;                // Narrow character version of command line arguments.
 
   void (*cleanup)(void);        // Stdio Cleanup Function Pointer
-  void (*FinalCleanup)(void);   // Function to free this structure and cleanup before exit.
 
   __xithandler_t   *atexit_handler[ATEXIT_MAX];  // Array of handlers for atexit.
   clock_t           AppStartTime;                // Set in Main.c and used for time.h
@@ -87,6 +87,9 @@ struct  __MainData {
   EFI_TIME          TimeBuffer;                   // Used by <time.h>mk
   char              ASgetenv[ASCII_STRING_MAX];   // Only modified by getenv
   char              ASasctime[ASCTIME_BUFLEN];    // Only modified by asctime
+
+  jmp_buf           MainExit;                     ///< Save environment used for implementing _Exit()
+  int               ExitValue;                    ///< Value being returned by _Exit()
 
   BOOLEAN         aborting;                       // Ensures cleanup function only called once when aborting.
 };

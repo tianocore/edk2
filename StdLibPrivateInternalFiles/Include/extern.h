@@ -66,4 +66,6 @@ int vsnprintf_ss(char * __restrict, size_t, const char * __restrict,
 void    Efi2Tm( EFI_TIME *ET, struct tm *BT);
 time_t  Efi2Time( EFI_TIME *EfiBDtime);
 
+int     ffs(int x);
+
 __END_DECLS

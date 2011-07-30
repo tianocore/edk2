@@ -127,7 +127,7 @@ NormalizePath( const char *path);
 **/
 RETURN_STATUS
 EFIAPI
-ParsePath( const char *path, wchar_t **FullPath, DeviceNode **DevNode, int *Which);
+ParsePath( const char *path, wchar_t **FullPath, DeviceNode **DevNode, int *Which, wchar_t **MapPath);
 
 /** Process a wide character string representing a Mapping Path and extract the instance number.
 
@@ -191,6 +191,25 @@ PathAdjust(wchar_t *Path);
 wchar_t *
 EFIAPI
 PathAlias(wchar_t *Path, DeviceNode **Node);
+
+/**
+  Parses a normalized wide character path and returns a pointer to the entry
+  following the last \.  If a \ is not found in the path the return value will
+  be the same as the input value.  All error conditions return NULL.
+
+  The behavior when passing in a path that has not been normalized is undefined.
+
+  @param  Path - A pointer to a wide character string containing a path to a
+                 directory or a file.
+
+  @return Pointer to the file name or terminal directory.  NULL if an error is
+          detected.
+**/
+wchar_t *
+EFIAPI
+GetFileNameFromPath(
+  const wchar_t   *Path
+  );
 
 __END_DECLS
 
