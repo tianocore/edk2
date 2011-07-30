@@ -29,6 +29,7 @@
 #include  <wctype.h>
 #include  <wchar.h>
 #include  <sys/fcntl.h>
+#include  <sys/syslimits.h>
 #include  <kfile.h>
 #include  <Device/Device.h>
 #include  <MainData.h>
@@ -321,7 +322,7 @@ da_ShellIoctl(
   void               *argp       ///< May be a pointer or a value
   )
 {
-  return 0;
+  return -EPERM;
 }
 
 /** Open an abstract Shell File.
@@ -329,10 +330,11 @@ da_ShellIoctl(
 int
 EFIAPI
 da_ShellOpen(
+  DeviceNode         *DevNode,
   struct __filedes   *filp,
-  void               *DevInstance,
+  int                 DevInstance,    /* Not used by Shell */
   wchar_t            *Path,
-  wchar_t            *Flags
+  wchar_t            *MPath
   )
 {
   UINT64                OpenMode;
@@ -340,8 +342,10 @@ da_ShellOpen(
   SHELL_FILE_HANDLE     FileHandle;
   GenericInstance      *Gip;
   char                 *NPath;
+  wchar_t              *WPath;
   RETURN_STATUS         Status;
   int                   oflags;
+  int                   retval;
 
   EFIerrno = RETURN_SUCCESS;
 
@@ -356,6 +360,23 @@ da_ShellOpen(
     return -1;
   }
 
+  /* Re-create the full mapped path for the shell. */
+  if(MPath != NULL) {
+    WPath = AllocateZeroPool(PATH_MAX * sizeof(wchar_t) + 1);
+    if(WPath == NULL) {
+      errno = ENOMEM;
+      EFIerrno = RETURN_OUT_OF_RESOURCES;
+      return -1;
+    }
+    wcsncpy(WPath, MPath, NAME_MAX);                /* Get the Map Name */
+    wcsncat(WPath, Path, (PATH_MAX - NAME_MAX));    /* Append the path */
+  }
+  else {
+    WPath = Path;
+  }
+
+  retval = -1;    /* Initially assume failure.  */
+
   /* Do we care if the file already exists?
      If O_TRUNC, then delete the file.  It will be created anew subsequently.
      If O_EXCL, then error if the file exists and O_CREAT is set.
@@ -363,23 +384,24 @@ da_ShellOpen(
   !!!!!!!!! Change this to use ShellSetFileInfo() to actually truncate the file
   !!!!!!!!! instead of deleting and re-creating it.
   */
+  do {  /* Do fake exception handling */
   if((oflags & O_TRUNC) || ((oflags & (O_EXCL | O_CREAT)) == (O_EXCL | O_CREAT))) {
-    Status = ShellIsFile( Path );
+      Status = ShellIsFile( WPath );
     if(Status == RETURN_SUCCESS) {
       // The file exists
       if(oflags & O_TRUNC) {
-        NPath = AllocateZeroPool(1024);
+          NPath = AllocateZeroPool(PATH_MAX);
         if(NPath == NULL) {
           errno = ENOMEM;
           EFIerrno = RETURN_OUT_OF_RESOURCES;
-          return -1;
+            break;
         }
-        wcstombs(NPath, Path, 1024);
+          wcstombs(NPath, WPath, PATH_MAX);
         // We do a truncate by deleting the existing file and creating a new one.
         if(unlink(NPath) != 0) {
           filp->f_iflags = 0;    // Release our reservation on this FD
           FreePool(NPath);
-          return -1;  // errno and EFIerrno are already set.
+            break;
         }
         FreePool(NPath);
       }
@@ -387,32 +409,40 @@ da_ShellOpen(
         errno = EEXIST;
         EFIerrno = RETURN_ACCESS_DENIED;
         filp->f_iflags = 0;    // Release our reservation on this FD
-        return -1;
+          break;
       }
     }
   }
 
   // Call the EFI Shell's Open function
-  Status = ShellOpenFileByName( Path, &FileHandle, OpenMode, Attributes);
+    Status = ShellOpenFileByName( WPath, &FileHandle, OpenMode, Attributes);
   if(RETURN_ERROR(Status)) {
     filp->f_iflags = 0;    // Release our reservation on this FD
     // Set errno based upon Status
     errno = EFI2errno(Status);
     EFIerrno = Status;
-    return -1;
+      break;
   }
+    retval = 0;
   // Successfully got a regular File
   filp->f_iflags |= S_IFREG;
 
   // Update the info in the fd
   filp->devdata = (void *)FileHandle;
 
-  Gip = (GenericInstance *)DevInstance;
+    Gip = (GenericInstance *)DevNode->InstanceList;
   filp->f_offset = 0;
   filp->f_ops = &Gip->Abstraction;
-//  filp->devdata = FileHandle;
+  //  filp->devdata = FileHandle;
+  } while(FALSE);
 
-  return 0;
+  /* If we get this far, WPath is not NULL.
+     If MPath is not NULL, then WPath was allocated so we need to free it.
+  */
+  if(MPath != NULL) {
+    FreePool(WPath);
+  }
+  return retval;
 }
 
 #include  <sys/poll.h>
@@ -468,9 +498,10 @@ da_ShellRename(
   RETURN_STATUS       Status;
   EFI_FILE_INFO      *NewFileInfo;
   EFI_FILE_INFO      *OldFileInfo;
-  char               *NewFn;
+  wchar_t            *NewFn;
   int                 OldFd;
   SHELL_FILE_HANDLE   FileHandle;
+  wchar_t            *NormalizedPath;
 
   // Open old file
   OldFd = open(from, O_RDWR, 0);
@@ -482,22 +513,20 @@ da_ShellRename(
       OldFileInfo = ShellGetFileInfo( FileHandle);
       if(OldFileInfo != NULL) {
         // Copy the Old file info into our new buffer, and free the old.
-        memcpy(OldFileInfo, NewFileInfo, sizeof(EFI_FILE_INFO));
+        memcpy(NewFileInfo, OldFileInfo, sizeof(EFI_FILE_INFO));
         FreePool(OldFileInfo);
+        // Normalize path and convert to WCS.
+        NormalizedPath = NormalizePath(to);
+        if (NormalizedPath != NULL) {
         // Strip off all but the file name portion of new
-        NewFn = strrchr(to, '/');
-        if(NewFn == NULL) {
-          NewFn = strrchr(to, '\\');
-          if(NewFn == NULL) {
-            NewFn = (char *)to;
-          }
-        }
-        // Convert new name from MBCS to WCS
-        (void)AsciiStrToUnicodeStr( NewFn, gMD->UString);
+          NewFn = GetFileNameFromPath(NormalizedPath);
         // Copy the new file name into our new file info buffer
-        wcsncpy(NewFileInfo->FileName, gMD->UString, wcslen(gMD->UString)+1);
+          wcsncpy(NewFileInfo->FileName, NewFn, wcslen(NewFn) + 1);
+          // Update the size of the structure.
+          NewFileInfo->Size = sizeof(EFI_FILE_INFO) + StrSize(NewFn);
         // Apply the new file name
         Status = ShellSetFileInfo(FileHandle, NewFileInfo);
+          free(NormalizedPath);
         free(NewFileInfo);
         if(Status == EFI_SUCCESS) {
           // File has been successfully renamed.  We are DONE!
@@ -507,6 +536,12 @@ da_ShellRename(
         EFIerrno = Status;
       }
       else {
+          free(NewFileInfo);
+          errno = ENOMEM;
+        }
+      }
+      else {
+        free(NewFileInfo);
         errno = EIO;
       }
     }
@@ -619,7 +654,7 @@ __ctor_DevShell(
   Stream->Abstraction.fo_poll     = &da_ShellPoll;
   Stream->Abstraction.fo_flush    = &fnullop_flush;
   Stream->Abstraction.fo_stat     = &da_ShellStat;
-  Stream->Abstraction.fo_ioctl    = &fbadop_ioctl;
+  Stream->Abstraction.fo_ioctl    = &da_ShellIoctl;
   Stream->Abstraction.fo_delete   = &da_ShellDelete;
   Stream->Abstraction.fo_rmdir    = &da_ShellRmdir;
   Stream->Abstraction.fo_mkdir    = &da_ShellMkdir;

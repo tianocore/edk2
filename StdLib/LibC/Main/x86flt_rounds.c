@@ -16,7 +16,6 @@ extern int internal_FPU_rmode( void );
 static INT8  rmode[] = { 1, 3, 2, 0 };
 
 int
-EFIAPI
 __flt_rounds ( void )
 {
   return rmode[ internal_FPU_rmode() ];

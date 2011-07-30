@@ -17,16 +17,16 @@
     that the library can be easily tuned for different compilers.
     __inline    Defined to the appropriate keyword or not defined.
     __func__    Defined to __FUNC__, __FUNCTION__, or NULL as appropriate.
-    __restrict  Defined to nothing for VC++ or to restrict for C99 compliant compilers.
+    __restrict  Defined to nothing for VC++ or to restrict for GCC and C99 compliant compilers.
 
     This file and its contents are inspired by the <sys/cdefs.h> files in Berkeley
     Unix.  They have been re-implemented to be specific to the EFI environment.
 
-    Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
-    http://opensource.org/licenses/bsd-license.php.
+    http://opensource.org/licenses/bsd-license.
 
     THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -261,22 +261,7 @@
   #endif
 #endif /* !(__STDC_VERSION__ >= 199901L) */
 
-// <DVM 12/21/2010> Experiment to disable RENAME for GCC
-#if  0
-#ifdef __GNUC__
-  #define __RENAME(x) ___RENAME(x)
-#else
-  #ifdef __lint__
-    #define __RENAME(x) __symbolrename(x)
-  #else
-    /*DVM To see where this might be used... */
-    //#error "No function renaming possible"
-    #define __RENAME(x)
-  #endif /* __lint__ */
-#endif /* __GNUC__ */
-#else /* if 0 */
-  #define __RENAME(x)
-#endif  /* if 0 */
+#define __RENAME(x)
 
   /*
   * A barrier to stop the optimizer from moving code or assume live
@@ -361,7 +346,5 @@ typedef INT32    LONG32;
 typedef UINT32  ULONG32;
 typedef  INT64   LONG64;
 typedef UINT64  ULONG64;
-
-//extern int EFIAPI main();
 
 #endif  /* _EFI_CDEFS_H */

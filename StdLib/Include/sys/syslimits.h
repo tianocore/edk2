@@ -37,7 +37,7 @@
 #include <sys/featuretest.h>
 
 #define ARG_MAX    (2 * 1024) /* max bytes for an exec function */
-#define ARGC_MAX    (ARG_MAX / 2)   /* Maximum value for argc */
+#define ARGC_MAX       (64)   /* Maximum value for argc */
 
 #ifndef CHILD_MAX
   #define CHILD_MAX     128 /* max simultaneous processes */

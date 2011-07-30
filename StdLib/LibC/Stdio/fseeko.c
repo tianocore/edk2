@@ -238,6 +238,7 @@ fseeko(FILE *fp, off_t offset, int whence)
     fp->_r = (int)(n - o);
     if (HASUB(fp))
       FREEUB(fp);
+    WCIO_FREE(fp);    /* Should this really be unconditional??? */
     fp->_flags &= ~__SEOF;
     FUNLOCKFILE(fp);
     return (0);
@@ -261,6 +262,7 @@ fseeko(FILE *fp, off_t offset, int whence)
   fp->_p = fp->_bf._base;
   if (HASUB(fp))
     FREEUB(fp);
+  WCIO_FREE(fp);    /* Should this really be unconditional??? */
   fp->_flags &= ~__SEOF;
   n = (int)(target - curoff);
   if (n) {
@@ -290,9 +292,10 @@ dumb:
   /* success: clear EOF indicator and discard ungetc() data */
   if (HASUB(fp))
     FREEUB(fp);
+  WCIO_FREE(fp);    /* Should this really be unconditional??? */
   fp->_p = fp->_bf._base;
   fp->_r = 0;
-  /* fp->_w = 0; */ /* unnecessary (I think...) */
+  fp->_w = 0;
   fp->_flags &= ~__SEOF;
   FUNLOCKFILE(fp);
 //Print(L"%a: %d\n", __func__, __LINE__);

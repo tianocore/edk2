@@ -50,7 +50,7 @@
 #include <stdio.h>
 
 int
-vprintf(char const *fmt, _BSD_VA_LIST_ ap)
+vprintf(char const *fmt, va_list ap)
 {
   _DIAGASSERT(fmt != NULL);
 

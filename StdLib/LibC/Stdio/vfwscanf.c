@@ -198,7 +198,7 @@ literal:
         goto input_failure;
       if (wi != c) {
         ungetwc(wi, fp);
-        goto input_failure;
+        goto match_failure;
       }
       nread++;
       continue;
@@ -721,20 +721,19 @@ literal:
       if ((width = parsefloat(fp, buf, buf + width)) == 0)
         goto match_failure;
       if ((flags & SUPPRESS) == 0) {
-#ifdef notyet
+#ifdef REAL_LONG_DOUBLE_SUPPORT
         if (flags & LONGDBL) {
           long double res = wcstold(buf, &p);
           *va_arg(ap, long double *) = res;
         } else
 #endif
-        if (flags & LONG) {
+        if (flags & (LONG | LONGDBL)) {
           double res = wcstod(buf, &p);
           *va_arg(ap, double *) = res;
-#ifdef notyet
-        } else {
+        }
+        else {
           float res = wcstof(buf, &p);
           *va_arg(ap, float *) = res;
-#endif
         }
 #ifdef DEBUG
         if (p - buf != width)

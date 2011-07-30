@@ -19,7 +19,7 @@
 [Defines]
   INF_VERSION                   = 0x00010005
   BASE_NAME                     = DevShell
-  FILE_GUID                     = 42c078ef-14a8-4e30-9329-6f12d796e54a
+  FILE_GUID                     = 0a1d4fd8-4704-4501-85eb-93399492cbed
   MODULE_TYPE                   = UEFI_APPLICATION
   VERSION_STRING                = 1.0
   LIBRARY_CLASS                 = DevShell
@@ -49,15 +49,3 @@
   LibWchar
   LibUefi
   DevUtility
-
-################################################################
-#
-# The Build Options, below, are only used when building the C library.
-# DO NOT use them when building your application!
-# Nasty things could happen if you do.
-#
-# /Oi is required for Microsoft VC++ to allow "intrinsic" functions to be
-# defined in this library.
-#
-#[BuildOptions]
-#  MSFT:*_*_*_CC_FLAGS     = /Oi-

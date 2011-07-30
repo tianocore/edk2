@@ -108,13 +108,13 @@
 **/
 struct tm {
   int     tm_year;      // years since 1900
-  int     tm_mon;       // months since January — [0, 11]
-  int     tm_mday;      // day of the month — [1, 31]
-  int     tm_hour;      // hours since midnight — [0, 23]
-  int     tm_min;       // minutes after the hour — [0, 59]
-  int     tm_sec;       // seconds after the minute — [0, 60]
-  int     tm_wday;      // days since Sunday — [0, 6]
-  int     tm_yday;      // days since January 1 — [0, 365]
+  int     tm_mon;       // months since January  [0, 11]
+  int     tm_mday;      // day of the month  [1, 31]
+  int     tm_hour;      // hours since midnight  [0, 23]
+  int     tm_min;       // minutes after the hour  [0, 59]
+  int     tm_sec;       // seconds after the minute  [0, 60]
+  int     tm_wday;      // days since Sunday  [0, 6]
+  int     tm_yday;      // days since January 1  [0, 365]
   int     tm_isdst;     // Daylight Saving Time flag
   int     tm_zoneoff;   // EFI TimeZone offset, -1440 to 1440 or 2047
   int     tm_daylight;  // EFI Daylight flags
@@ -125,7 +125,7 @@ struct tm {
 
 /** The clock function determines the processor time used.
 
-    @return   The clock function returns the implementation’s best
+    @return   The clock function returns the implementation's best
               approximation to the processor time used by the program since the
               beginning of an implementation-defined era related only to the
               program invocation.  To determine the time in seconds, the value
@@ -137,11 +137,11 @@ struct tm {
               On IA32 or X64 platforms, the value returned is the number of
               CPU TimeStamp Counter ticks since the appliation started.
 **/
-clock_t EFIAPI clock(void);
+clock_t  clock(void);
 
 /**
 **/
-double EFIAPI difftime(time_t time1, time_t time0);
+double difftime(time_t time1, time_t time0);
 
 /** The mktime function converts the broken-down time, expressed as local time,
     in the structure pointed to by timeptr into a calendar time value with the
@@ -159,19 +159,19 @@ double EFIAPI difftime(time_t time1, time_t time0);
               as a value of type time_t. If the calendar time cannot be
               represented, the function returns the value (time_t)(-1).
 **/
-time_t EFIAPI mktime(struct tm *timeptr);
+time_t mktime(struct tm *timeptr);
 
 /** The time function determines the current calendar time.
 
     The encoding of the value is unspecified.
 
-    @return   The time function returns the implementation’s best approximation
+    @return   The time function returns the implementation's best approximation
               of the current calendar time. The value (time_t)(-1) is returned
               if the calendar time is not available. If timer is not a null
               pointer, the return value is also assigned to the object it
               points to.
 **/
-time_t EFIAPI time(time_t *timer);
+time_t time(time_t *timer);
 
 /* #################  Time Conversion Functions  ########################## */
 
@@ -181,7 +181,7 @@ time_t EFIAPI time(time_t *timer);
 
     @return   The asctime function returns a pointer to the string.
 **/
-char * EFIAPI asctime(const struct tm *timeptr);
+char * asctime(const struct tm *timeptr);
 
 /** The ctime function converts the calendar time pointed to by timer to local
     time in the form of a string. It is equivalent to asctime(localtime(timer))
@@ -189,7 +189,7 @@ char * EFIAPI asctime(const struct tm *timeptr);
     @return   The ctime function returns the pointer returned by the asctime
               function with that broken-down time as argument.
 **/
-char * EFIAPI ctime(const time_t *timer);
+char * ctime(const time_t *timer);
 
 /** The gmtime function converts the calendar time pointed to by timer into a
     brokendown time, expressed as UTC.
@@ -197,7 +197,13 @@ char * EFIAPI ctime(const time_t *timer);
     @return   The gmtime function returns a pointer to the broken-down time,
               or a null pointer if the specified time cannot be converted to UTC.
 **/
-struct tm  * EFIAPI gmtime(const time_t *timer);
+struct tm  * gmtime(const time_t *timer);
+
+/** The timegm function is the opposite of gmtime.
+
+    @return   The calendar time expressed as UTC.
+**/
+time_t timegm(struct tm*);
 
 /** The localtime function converts the calendar time pointed to by timer into
     a broken-down time, expressed as local time.
@@ -206,7 +212,7 @@ struct tm  * EFIAPI gmtime(const time_t *timer);
               or a null pointer if the specified time cannot be converted to
               local time.
 **/
-struct tm  * EFIAPI localtime(const time_t *timer);
+struct tm  * localtime(const time_t *timer);
 
 /** The strftime function places characters into the array pointed to by s as
     controlled by the string pointed to by format. The format shall be a
@@ -228,11 +234,11 @@ struct tm  * EFIAPI localtime(const time_t *timer);
     in the description. If any of the specified values is outside the normal
     range, the characters stored are unspecified.
 
-    %a is replaced by the locale’s abbreviated weekday name. [tm_wday]
-    %A is replaced by the locale’s full weekday name. [tm_wday]
-    %b is replaced by the locale’s abbreviated month name. [tm_mon]
-    %B is replaced by the locale’s full month name. [tm_mon]
-    %c is replaced by the locale’s appropriate date and time representation.
+    %a is replaced by the locale's abbreviated weekday name. [tm_wday]
+    %A is replaced by the locale's full weekday name. [tm_wday]
+    %b is replaced by the locale's abbreviated month name. [tm_mon]
+    %B is replaced by the locale's full month name. [tm_mon]
+    %c is replaced by the locale's appropriate date and time representation.
     %C is replaced by the year divided by 100 and truncated to an integer,
        as a decimal number (00-99). [tm_year]
     %d is replaced by the day of the month as a decimal number (01-31). [tm_mday]
@@ -252,9 +258,9 @@ struct tm  * EFIAPI localtime(const time_t *timer);
     %m is replaced by the month as a decimal number (01-12). [tm_mon]
     %M is replaced by the minute as a decimal number (00-59). [tm_min]
     %n is replaced by a new-line character.
-    %p is replaced by the locale’s equivalent of the AM/PM designations
+    %p is replaced by the locale's equivalent of the AM/PM designations
        associated with a 12-hour clock. [tm_hour]
-    %r is replaced by the locale’s 12-hour clock time. [tm_hour, tm_min, tm_sec]
+    %r is replaced by the locale's 12-hour clock time. [tm_hour, tm_min, tm_sec]
     %R is equivalent to "%H:%M". [tm_hour, tm_min]
     %S is replaced by the second as a decimal number (00-60). [tm_sec]
     %t is replaced by a horizontal-tab character.
@@ -270,8 +276,8 @@ struct tm  * EFIAPI localtime(const time_t *timer);
        [tm_wday]
     %W is replaced by the week number of the year (the first Monday as the
        first day of week 1) as a decimal number (00-53). [tm_year, tm_wday, tm_yday]
-    %x is replaced by the locale’s appropriate date representation.
-    %X is replaced by the locale’s appropriate time representation.
+    %x is replaced by the locale's appropriate date representation.
+    %X is replaced by the locale's appropriate time representation.
     %y is replaced by the last 2 digits of the year as a decimal
        number (00-99). [tm_year]
     %Y is replaced by the year as a decimal number (e.g., 1997). [tm_year]
@@ -285,38 +291,38 @@ struct tm  * EFIAPI localtime(const time_t *timer);
     Some conversion specifiers can be modified by the inclusion of an E or O
     modifier character to indicate an alternative format or specification.
     If the alternative format or specification does not exist for the current
-    locale, the modifier is ignored. %Ec is replaced by the locale’s
+    locale, the modifier is ignored. %Ec is replaced by the locale's
     alternative date and time representation.
 
-    %EC is replaced by the name of the base year (period) in the locale’s
+    %EC is replaced by the name of the base year (period) in the locale's
         alternative representation.
-    %Ex is replaced by the locale’s alternative date representation.
-    %EX is replaced by the locale’s alternative time representation.
-    %Ey is replaced by the offset from %EC (year only) in the locale’s
+    %Ex is replaced by the locale's alternative date representation.
+    %EX is replaced by the locale's alternative time representation.
+    %Ey is replaced by the offset from %EC (year only) in the locale's
         alternative representation.
-    %EY is replaced by the locale’s full alternative year representation.
-    %Od is replaced by the day of the month, using the locale’s alternative
+    %EY is replaced by the locale's full alternative year representation.
+    %Od is replaced by the day of the month, using the locale's alternative
         numeric symbols (filled as needed with leading zeros, or with leading
         spaces if there is no alternative symbol for zero).
-    %Oe is replaced by the day of the month, using the locale’s alternative
+    %Oe is replaced by the day of the month, using the locale's alternative
         numeric symbols (filled as needed with leading spaces).
-    %OH is replaced by the hour (24-hour clock), using the locale’s
+    %OH is replaced by the hour (24-hour clock), using the locale's
         alternative numeric symbols.
-    %OI is replaced by the hour (12-hour clock), using the locale’s
+    %OI is replaced by the hour (12-hour clock), using the locale's
         alternative numeric symbols.
-    %Om is replaced by the month, using the locale’s alternative numeric symbols.
-    %OM is replaced by the minutes, using the locale’s alternative numeric symbols.
-    %OS is replaced by the seconds, using the locale’s alternative numeric symbols.
-    %Ou is replaced by the ISO 8601 weekday as a number in the locale’s
+    %Om is replaced by the month, using the locale's alternative numeric symbols.
+    %OM is replaced by the minutes, using the locale's alternative numeric symbols.
+    %OS is replaced by the seconds, using the locale's alternative numeric symbols.
+    %Ou is replaced by the ISO 8601 weekday as a number in the locale's
         alternative representation, where Monday is 1.
-    %OU is replaced by the week number, using the locale’s alternative numeric symbols.
-    %OV is replaced by the ISO 8601 week number, using the locale’s alternative
+    %OU is replaced by the week number, using the locale's alternative numeric symbols.
+    %OV is replaced by the ISO 8601 week number, using the locale's alternative
         numeric symbols.
-    %Ow is replaced by the weekday as a number, using the locale’s alternative
+    %Ow is replaced by the weekday as a number, using the locale's alternative
         numeric symbols.
-    %OW is replaced by the week number of the year, using the locale’s
+    %OW is replaced by the week number of the year, using the locale's
         alternative numeric symbols.
-    %Oy is replaced by the last 2 digits of the year, using the locale’s
+    %Oy is replaced by the last 2 digits of the year, using the locale's
         alternative numeric symbols.
 
     %g, %G, and %V give values according to the ISO 8601 week-based year. In
@@ -358,7 +364,7 @@ struct tm  * EFIAPI localtime(const time_t *timer);
               character. Otherwise, zero is returned and the contents of the
               array are indeterminate.
 **/
-size_t EFIAPI strftime( char * __restrict s, size_t maxsize,
+size_t strftime( char * __restrict s, size_t maxsize,
                       const char * __restrict format,
                       const struct tm * __restrict timeptr);
 
@@ -367,6 +373,6 @@ char *strptime(const char *, const char * format, struct tm*);
 
 /* #################  Implementation Functions  ########################### */
 
-clock_t EFIAPI __getCPS(void);
+clock_t __getCPS(void);
 
 #endif  /* _TIME_H */

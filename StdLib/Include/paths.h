@@ -45,6 +45,19 @@
 //#define _PATH_DEFPATH "/usr/bin:/bin:/usr/pkg/bin:/usr/local/bin"
 //#endif
 
+/*
+ * Provide trailing slash, since mostly used for building pathnames.
+ * see the __CONCAT() macro from <sys/EfiCdefs.h> for cpp examples.
+ */
+#define _PATH_DEV "/dev/"
+#define _PATH_ETC "/Efi/etc/"
+#define _PATH_TMP "/Efi/Temp/"
+//#define _PATH_DEV_PTS "/dev/pts/"
+//#define _PATH_EMUL_AOUT "/emul/aout/"
+//#define _PATH_VARDB "/var/db/"
+//#define _PATH_VARRUN  "/var/run/"
+//#define _PATH_VARTMP  "/var/tmp/"
+
 ///*
 // * All standard utilities path.
 // * set by init(8) for system programs & scripts (e.g. /etc/rc)
@@ -97,33 +110,34 @@
 #define _PATH_SOCKET  "socket:"
 
 // *nix style device paths
-#define _PATH_DEVTTY      "/dev/tty"
-#define _PATH_DEVNULL     "/dev/null"
-#define _PATH_DEVCONSOLE  "/dev/console"
-#define _PATH_DEVCONSTTY  "/dev/constty"
-#define _PATH_DEVSTDIN    "/dev/stdin"
-#define _PATH_DEVSTDOUT   "/dev/stdout"
-#define _PATH_DEVSTDERR   "/dev/stderr"
-#define _PATH_DEVSOCKET   "/dev/socket"
+#define _PATH_DEVTTY      _PATH_DEV "tty"
+#define _PATH_DEVNULL     _PATH_DEV "null"
+#define _PATH_DEVCONSOLE  _PATH_DEV "console"
+#define _PATH_DEVCONSTTY  _PATH_DEV "constty"
+#define _PATH_DEVSTDIN    _PATH_DEV "stdin"
+#define _PATH_DEVSTDOUT   _PATH_DEV "stdout"
+#define _PATH_DEVSTDERR   _PATH_DEV "stderr"
+#define _PATH_DEVSOCKET   _PATH_DEV "socket"
 
 // Special files and locations
-#define _PATH_HOSTS       "/Efi/etc/hosts"
-#define _PATH_SERVICES    "/Efi/etc/services"
-#define _PATH_HOSTNAME    "/Efi/etc/hostname"
-#define _PATH_LOCALE      "/Efi/etc/Locale"
-#define _PATH_FSTAB       "/Efi/etc/fstab"
+#define _PATH_FSTAB       _PATH_ETC "fstab"
+////#define _PATH_HEQUIV      _PATH_ETC "hosts.equiv"
+#define _PATH_HOSTNAME    _PATH_ETC "hostname"
+#define _PATH_HOSTS       _PATH_ETC "hosts"
+#define _PATH_HOSTCONF    _PATH_ETC "host.conf"
+#define _PATH_LOCALE      _PATH_ETC "Locale"
+#define _PATH_NETCONF     _PATH_ETC "host.conf"
+#define _PATH_NETWORKS    _PATH_ETC "networks"
+#define _PATH_PROTOCOLS   _PATH_ETC "protocols"
 
 /*
- * Provide trailing slash, since mostly used for building pathnames.
- * see the __CONCAT() macro from <sys/EfiCdefs.h> for cpp examples.
+ * Resolver configuration file.
+ * Normally not present, but may contain the address of the
+ * inital name server(s) to query and the domain search list.
  */
-#define _PATH_DEV "/dev/"
-#define _PATH_TMP "/Efi/Temp/"
-//#define _PATH_DEV_PTS "/dev/pts/"
-//#define _PATH_EMUL_AOUT "/emul/aout/"
-//#define _PATH_VARDB "/var/db/"
-//#define _PATH_VARRUN  "/var/run/"
-//#define _PATH_VARTMP  "/var/tmp/"
+#define _PATH_RESCONF     _PATH_ETC "resolv.conf"
+#define _PATH_SERVICES    _PATH_ETC "services"
+////#define _PATH_SERVICES_DB "/Efi/var/db/services.db"
 
 //#define _PATH_BSHELL  RESCUEDIR "/sh"
 //#define _PATH_CSHELL  RESCUEDIR "/csh"

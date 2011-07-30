@@ -44,7 +44,6 @@
   Heimdal: gettimeofday.c 14773 2005-04-12 11:29:18Z lha $
   NetBSD: gettimeofday.c,v 1.2 2008/03/22 08:37:21 mlelstv Exp $
 **/
-
 #include <LibConfig.h>
 #include <sys/EfiCdefs.h>
 #include <sys/time.h>

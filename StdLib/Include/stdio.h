@@ -36,7 +36,7 @@
 #ifndef _STDIO_H_
 #define _STDIO_H_
 
-#include  <sys/EfiCdefs.h>
+#include  <stdarg.h>
 #include  <limits.h>
 #include  <sys/ansi.h>
 #include  <machine/ansi.h>
@@ -475,14 +475,14 @@ int       setvbuf (FILE * __restrict, char * __restrict, int, size_t);
 int       sscanf  (const char * __restrict, const char * __restrict, ...);
 FILE     *tmpfile (void);
 int       ungetc  (int, FILE *);
-int       vfprintf(FILE * __restrict, const char * __restrict, _BSD_VA_LIST_);
-int       vprintf (const char * __restrict, _BSD_VA_LIST_);
+int       vfprintf(FILE * __restrict, const char * __restrict, va_list);
+int       vprintf (const char * __restrict, va_list);
 
 #ifndef __AUDIT__
 char     *gets    (char *);
 int       sprintf (char * __restrict, const char * __restrict, ...);
 char     *tmpnam  (char *);
-int       vsprintf(char * __restrict, const char * __restrict, _BSD_VA_LIST_);
+int       vsprintf(char * __restrict, const char * __restrict, va_list);
 #endif
 
 #if defined(_POSIX_C_SOURCE) || defined(_XOPEN_SOURCE)
@@ -531,46 +531,33 @@ __END_DECLS
 /*
  * Functions defined in POSIX 1003.2 and XPG2 or later.
  */
-#if (_POSIX_C_SOURCE - 0) >= 2 || (_XOPEN_SOURCE - 0) >= 2 || \
-    defined(_NETBSD_SOURCE)
-  __BEGIN_DECLS
+__BEGIN_DECLS
   int     pclose  (FILE *);
   FILE   *popen   (const char *, const char *);
-  __END_DECLS
-#endif
+__END_DECLS
 
 /*
  * Functions defined in ISO XPG4.2, ISO C99, POSIX 1003.1-2001 or later.
  */
-#if ((__STDC_VERSION__ - 0) >= 199901L) || \
-    ((_POSIX_C_SOURCE - 0) >= 200112L) || \
-    (defined(_XOPEN_SOURCE) && defined(_XOPEN_SOURCE_EXTENDED)) || \
-    ((_XOPEN_SOURCE - 0) >= 500) || \
-    defined(_ISOC99_SOURCE) || defined(_NETBSD_SOURCE)
-  __BEGIN_DECLS
+__BEGIN_DECLS
   int     snprintf (char * __restrict, size_t, const char * __restrict, ...)
           __attribute__((__format__(__printf__, 3, 4)));
-  int     vsnprintf(char * __restrict, size_t, const char * __restrict, _BSD_VA_LIST_)
+  int     vsnprintf(char * __restrict, size_t, const char * __restrict, va_list)
           __attribute__((__format__(__printf__, 3, 0)));
-  __END_DECLS
-#endif
+__END_DECLS
 
 /*
  * Functions defined in XPG4.2.
  */
-#if defined(_XOPEN_SOURCE) || defined(_NETBSD_SOURCE)
-  __BEGIN_DECLS
+__BEGIN_DECLS
   int   getw(FILE *);
   int   putw(int, FILE *);
   char *mkdtemp(char *);
   int   mkstemp(char *);
   char *mktemp(char *);
 
-  #ifndef __AUDIT__
     char *tempnam(const char *, const char *);
-  #endif
-  __END_DECLS
-#endif
+__END_DECLS
 
 /*
  * X/Open CAE Specification Issue 5 Version 2
@@ -588,15 +575,13 @@ __END_DECLS
 /*
  * Routines that are purely local.
  */
-#if defined(_NETBSD_SOURCE)
+#define FPARSELN_UNESCESC 0x01
+#define FPARSELN_UNESCCONT  0x02
+#define FPARSELN_UNESCCOMM  0x04
+#define FPARSELN_UNESCREST  0x08
+#define FPARSELN_UNESCALL 0x0f
 
-  #define FPARSELN_UNESCESC 0x01
-  #define FPARSELN_UNESCCONT  0x02
-  #define FPARSELN_UNESCCOMM  0x04
-  #define FPARSELN_UNESCREST  0x08
-  #define FPARSELN_UNESCALL 0x0f
-
-  __BEGIN_DECLS
+__BEGIN_DECLS
   //int     asprintf(char ** __restrict, const char * __restrict, ...)
   //      __attribute__((__format__(__printf__, 2, 3)));
   char   *fgetln(FILE * __restrict, size_t * __restrict);
@@ -605,33 +590,32 @@ __END_DECLS
   void    setbuffer(FILE *, char *, int);
   int     setlinebuf(FILE *);
   int     vasprintf(char ** __restrict, const char * __restrict,
-        _BSD_VA_LIST_)
+        va_list)
         __attribute__((__format__(__printf__, 2, 0)));
-  int     vscanf(const char * __restrict, _BSD_VA_LIST_)
+  int     vscanf(const char * __restrict, va_list)
         __attribute__((__format__(__scanf__, 1, 0)));
   int     vfscanf(FILE * __restrict, const char * __restrict,
-        _BSD_VA_LIST_)
+        va_list)
         __attribute__((__format__(__scanf__, 2, 0)));
   int     vsscanf(const char * __restrict, const char * __restrict,
-        _BSD_VA_LIST_)
+        va_list)
         __attribute__((__format__(__scanf__, 2, 0)));
   const char *fmtcheck(const char *, const char *)
         __attribute__((__format_arg__(2)));
-  __END_DECLS
+__END_DECLS
 
   /*
    * Stdio function-access interface.
    */
-  __BEGIN_DECLS
+__BEGIN_DECLS
   FILE  *funopen(const void *,
       int (*)(void *, char *, int),
       int (*)(void *, const char *, int),
       fpos_t (*)(void *, fpos_t, int),
       int (*)(void *));
-  __END_DECLS
+__END_DECLS
   //#define fropen(cookie, fn) funopen(cookie, fn, 0, 0, 0)
   //#define fwopen(cookie, fn) funopen(cookie, 0, fn, 0, 0)
-#endif /* _NETBSD_SOURCE */
 
 /*
  * Functions internal to the implementation.
@@ -646,6 +630,7 @@ __END_DECLS
  * define function versions in the C library.
  */
 #define __sgetc(p) (--(p)->_r < 0 ? __srget(p) : (int)(*(p)->_p++))
+
 #if defined(__GNUC__) && defined(__STDC__)
   static __inline int __sputc(int _c, FILE *_p) {
     if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\n'))
@@ -673,33 +658,23 @@ __END_DECLS
 #define __sfileno(p)    ((p)->_file)
 
 #ifndef __lint__
-  #if !defined(_REENTRANT) && !defined(_PTHREADS)
     #define feof(p)     __sfeof(p)
     #define ferror(p)   __sferror(p)
     #define clearerr(p) __sclearerr(p)
 
     #define getc(fp)    __sgetc(fp)
     #define putc(x, fp) __sputc(x, fp)
-  #endif /* !_REENTRANT && !_PTHREADS */
 #endif /* __lint__ */
 
 #define getchar()   getc(stdin)
 #define putchar(x)  putc(x, stdout)
 
-#if defined(_POSIX_C_SOURCE) || defined(_XOPEN_SOURCE) || \
-    defined(_NETBSD_SOURCE)
-  #if !defined(_REENTRANT) && !defined(_PTHREADS)
-    #define fileno(p) __sfileno(p)
-  #endif /* !_REENTRANT && !_PTHREADS */
-#endif /* !_ANSI_SOURCE */
+#define fileno(p) __sfileno(p)
 
-#if (_POSIX_C_SOURCE - 0) >= 199506L || (_XOPEN_SOURCE - 0) >= 500 || \
-    defined(_REENTRANT) || defined(_NETBSD_SOURCE)
-  #define getc_unlocked(fp) __sgetc(fp)
-  #define putc_unlocked(x, fp)  __sputc(x, fp)
+#define getc_unlocked(fp) __sgetc(fp)
+#define putc_unlocked(x, fp)  __sputc(x, fp)
 
-  #define getchar_unlocked()  getc_unlocked(stdin)
-  #define putchar_unlocked(x) putc_unlocked(x, stdout)
-#endif /* _POSIX_C_SOURCE >= 199506 || _XOPEN_SOURCE >= 500 || _REENTRANT... */
+#define getchar_unlocked()  getc_unlocked(stdin)
+#define putchar_unlocked(x) putc_unlocked(x, stdout)
 
 #endif /* _STDIO_H_ */

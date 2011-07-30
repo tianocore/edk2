@@ -8,13 +8,14 @@
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
+  http://opensource.org/licenses/bsd-license.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 #include  <Uefi.h>
 #include  <Library/UefiLib.h>
+#include  <Library/DebugLib.h>
 
 #include  <Library/ShellCEntryLib.h>
 #include  <Library/MemoryAllocationLib.h>
@@ -40,23 +41,30 @@ void __main()
   ;
 }
 
-static
+/** Clean up data as required by the exit() function.
+
+**/
 void
-FinalCleanup( void )
+exitCleanup(INTN ExitVal)
 {
+  void (*CleanUp)(void);   // Pointer to Cleanup Function
   int i;
 
-  /* Close any open files */
-  for(i = OPEN_MAX - 1; i >= 0; --i) {
-    (void)close(i);   // Close properly handles closing a closed file.
+  if(gMD != NULL) {
+    gMD->ExitValue = (int)ExitVal;
+    CleanUp = gMD->cleanup; // Preserve the pointer to the Cleanup Function
+
+    // Call all registered atexit functions in reverse order
+    i = gMD->num_atexit;
+    if( i > 0) {
+      do {
+        (gMD->atexit_handler[--i])();
+      } while( i > 0);
   }
 
-  /* Free the global MainData structure */
-  if(gMD != NULL) {
-    if(gMD->NCmdLine != NULL) {
-      FreePool( gMD->NCmdLine );
+    if (CleanUp != NULL) {
+      CleanUp();
     }
-    FreePool( gMD );
   }
 }
 
@@ -70,6 +78,13 @@ ArgvConvert(UINTN Argc, CHAR16 **Argv)
   char  **nArgv;
   char   *string;
   INTN    nArgvSize;  /* Cumulative size of narrow Argv[i] */
+
+DEBUG_CODE_BEGIN();
+  Print(L"ArgvConvert called with %d arguments.\n", Argc);
+  for(count = 0; count < ((Argc > 5)? 5: Argc); ++count) {
+    Print(L"Argument[%d] = \"%s\".\n", count, Argv[count]);
+  }
+DEBUG_CODE_END();
 
   nArgvSize = Argc;
   /* Determine space needed for narrow Argv strings. */
@@ -98,6 +113,7 @@ ArgvConvert(UINTN Argc, CHAR16 **Argv)
     nArgv[count] = string;
     AVsz = wcstombs(string, Argv[count], nArgvSize);
     string[AVsz] = 0;   /* NULL terminate the argument */
+    DEBUG((DEBUG_INFO, "Cvt[%d] %d \"%s\" --> \"%a\"\n", (INT32)count, (INT32)AVsz, Argv[count], nArgv[count]));
     string += AVsz + 1;
     nArgvSize -= AVsz + 1;
     if(nArgvSize < 0) {
@@ -119,7 +135,7 @@ ShellAppMain (
   struct __filedes   *mfd;
   char              **nArgv;
   INTN   ExitVal;
-  INTN   i;
+  int                 i;
 
   ExitVal = (INTN)RETURN_SUCCESS;
   gMD = AllocateZeroPool(sizeof(struct __MainData));
@@ -132,7 +148,6 @@ ShellAppMain (
     _fltused              = 1;
     errno                 = 0;
     EFIerrno              = 0;
-    gMD->FinalCleanup     = &FinalCleanup;
 
 #ifdef NT32dvm
     gMD->ClocksPerSecond  = 1;  // For NT32 only
@@ -166,10 +181,33 @@ ShellAppMain (
       ExitVal = (INTN)RETURN_INVALID_PARAMETER;
     }
     else {
-      ExitVal = (INTN)main( (int)Argc, nArgv);
+      if( setjmp(gMD->MainExit) == 0) {
+        ExitVal = (INTN)main( (int)Argc, gMD->NArgV);
+        exitCleanup(ExitVal);
+      }
+      /* You reach here if:
+          * normal return from main()
+          * call to _Exit(), either directly or through exit().
+      */
+      ExitVal = (INTN)gMD->ExitValue;
+    }
+
+    if( ExitVal == EXIT_FAILURE) {
+      ExitVal = RETURN_ABORTED;
+    }
+
+    /* Close any open files */
+    for(i = OPEN_MAX - 1; i >= 0; --i) {
+      (void)close(i);   // Close properly handles closing a closed file.
+    }
+
+    /* Free the global MainData structure */
+    if(gMD != NULL) {
+      if(gMD->NCmdLine != NULL) {
+        FreePool( gMD->NCmdLine );
+      }
+      FreePool( gMD );
   }
   }
-  exit((int)ExitVal);
-  /* Not Reached */
   return ExitVal;
 }

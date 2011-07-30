@@ -72,9 +72,9 @@
 
 #define Locale  _CurrentTimeLocale
 
-static char * EFIAPI _add(const char *, char *, const char * const);
-static char * EFIAPI _conv(const int, const char * const, char * const, const char * const);
-static char * EFIAPI _fmt(const char *, const struct tm * const, char *, const char * const, int *);
+static char * _add(const char *, char *, const char * const);
+static char * _conv(const int, const char * const, char * const, const char * const);
+static char * _fmt(const char *, const struct tm * const, char *, const char * const, int *);
 
 #define NO_RUN_TIME_WARNINGS_ABOUT_YEAR_2000_PROBLEMS_THANK_YOU
 
@@ -89,7 +89,6 @@ static char * EFIAPI _fmt(const char *, const struct tm * const, char *, const c
 #define IN_ALL  3
 
 size_t
-EFIAPI
 strftime(
   char            * __restrict  s,
   size_t                        maxsize,
@@ -128,7 +127,6 @@ strftime(
 }
 
 static char *
-EFIAPI
 _fmt(
   const char      *       format,
   const struct tm * const t,
@@ -574,7 +572,6 @@ label:
 }
 
 static char *
-EFIAPI
 _conv(
   const int             n,
   const char  * const   format,
@@ -589,7 +586,6 @@ _conv(
 }
 
 static char *
-EFIAPI
 _add(
   const char  *       str,
   char        *       pt,

@@ -117,7 +117,7 @@ __weak_alias(vsnprintf_ss,_vsnprintf_ss)
 } while (/*CONSTCOND*/0)
 
 int
-vsnprintf_ss(char *sbuf, size_t slen, const char *fmt0, _BSD_VA_LIST_ ap)
+vsnprintf_ss(char *sbuf, size_t slen, const char *fmt0, va_list ap)
 {
   const char *fmt;  /* format string */
   int ch;     /* character from fmt */

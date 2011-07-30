@@ -137,7 +137,7 @@ wcrtomb(
   /* ps appears to be unused */
 
   if (s == NULL)
-    return 0;
+    return 1;     /* Spec. says this should be 1. */
 
   *s = (char) wchar;
   return 1;
@@ -150,7 +150,12 @@ wctomb(
   )
 {
 
-  /* s may be NULL */
+  /*
+    If s is NULL just return if MB Characters have state
+    dependent encodings.
+  */
+  if (s == NULL)
+    return 0;
 
   return (int)wcrtomb(s, wchar, NULL);
 }
@@ -176,8 +181,10 @@ mbsrtowcs(
   if (n != 0) {
     if (pwcs != NULL) {
       do {
-        if ((*pwcs++ = (wchar_t) *(*s)++) == 0)
+        if ((*pwcs++ = (wchar_t) *(*s)++) == 0) {
+          *s = NULL;
           break;
+        }
         count++;
       } while (--n != 0);
     } else {
@@ -232,8 +239,10 @@ wcsrtombs(
 
   if (n != 0) {
     do {
-      if ((*s++ = (char) *(*pwcs)++) == 0)
+      if ((*s++ = (char) *(*pwcs)++) == 0) {
+        *pwcs = NULL;
         break;
+      }
       count++;
     } while (--n != 0);
   }
@@ -266,7 +275,13 @@ btowc(int c)
 int
 wctob(wint_t c)
 {
-  if (c == WEOF || c & ~0xFF)
+  /*  wctob needs to be consistent with wcrtomb.
+      if wcrtomb says that a character is representable in 1 byte,
+      which this implementation always says, then wctob needs to
+      also represent the character as 1 byte.
+  */
+  if (c == WEOF) {
     return EOF;
-  return (int)c;
+  }
+  return (int)(c & 0xFF);
 }

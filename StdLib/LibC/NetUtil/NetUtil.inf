@@ -48,12 +48,3 @@
   LibStdLib
   LibStdio
   LibString
-
-################################################################
-#
-# The Build Options, below, are only used when building the Socket library.
-# DO NOT use them when building your application!
-# Nasty things could happen if you do.
-#
-#[BuildOptions]
-#  MSFT:*_*_IA32_CC_FLAGS = /GL-

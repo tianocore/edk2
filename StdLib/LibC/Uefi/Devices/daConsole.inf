@@ -16,7 +16,7 @@
 [Defines]
   INF_VERSION                   = 0x00010005
   BASE_NAME                     = DevConsole
-  FILE_GUID                     = 42c078ef-14a8-4e30-9329-6f12d796e54a
+  FILE_GUID                     = f6937495-1f44-4a8a-8a1b-5a669f9396f6
   MODULE_TYPE                   = UEFI_APPLICATION
   VERSION_STRING                = 1.0
   LIBRARY_CLASS                 = DevConsole
@@ -49,15 +49,3 @@
 [Protocols]
   gEfiSimpleTextInProtocolGuid
   gEfiSimpleTextOutProtocolGuid
-
-################################################################
-#
-# The Build Options, below, are only used when building the C library.
-# DO NOT use them when building your application!
-# Nasty things could happen if you do.
-#
-# /Oi is required for Microsoft VC++ to allow "intrinsic" functions to be
-# defined in this library.
-#
-#[BuildOptions]
-#  MSFT:*_*_*_CC_FLAGS     = /Oi-

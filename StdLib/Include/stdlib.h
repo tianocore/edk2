@@ -91,7 +91,7 @@ __BEGIN_DECLS
 
     @sa signal.h
 **/
-void    abort(void);
+void    abort(void) __noreturn;
 
 /** The atexit function registers the function pointed to by func, to be
     called without arguments at normal program termination.
@@ -122,6 +122,10 @@ int     atexit(void (*)(void));
     status is zero, or EXIT_SUCCESS, status is returned unchanged. If the value
     of status is EXIT_FAILURE, EAPPLICATION is returned.
     Otherwise, status is returned unchanged.
+
+    While this function does not return, it can NOT be marked as "__noreturn"
+    without causing a warning to be emitted because the compilers can not
+    determine that the function truly does not return.
 **/
 void    exit(int status) __noreturn;
 
@@ -140,7 +144,7 @@ void    exit(int status) __noreturn;
     The status returned to the host environment is determined in the same way
     as for the exit function.
 **/
-void    _Exit(int status);
+void    _Exit(int status) __noreturn;
 
 /** The getenv function searches an environment list, provided by the host
     environment, for a string that matches the string pointed to by name.  The
@@ -640,6 +644,42 @@ size_t  mbstowcs(wchar_t * __restrict dest, const char * __restrict src, size_t 
             if any.
 **/
 size_t  wcstombs(char * __restrict dest, const wchar_t * __restrict src, size_t limit);
+
+/**
+  The realpath() function shall derive, from the pathname pointed to by 
+  file_name, an absolute pathname that names the same file, whose resolution 
+  does not involve '.', '..', or symbolic links. The generated pathname shall
+  be stored as a null-terminated string, up to a maximum of {PATH_MAX} bytes,
+  in the buffer pointed to by resolved_name.
+
+  If resolved_name is a null pointer, the behavior of realpath() is 
+  implementation-defined.
+
+  @param[in] file_name            The filename to convert.
+  @param[in,out] resolved_name    The resultant name.
+
+  @retval NULL                    An error occured.
+  @return resolved_name.
+**/
+char * realpath(char *file_name, char *resolved_name);
+
+/**
+  The getprogname() function returns the name of the program.  If the name
+  has not been set yet, it will return NULL.
+
+  @retval         The name of the program.
+  @retval NULL    The name has not been set.
+**/
+const char * getprogname(void);
+
+/**
+  The setprogname() function sets the name of the program.
+
+  @param[in]        The name of the program.  This memory must be retained 
+                    by the caller until no calls to "getprogname" will be 
+                    called.
+**/
+void setprogname(const char *progname);
 
 __END_DECLS
 

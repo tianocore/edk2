@@ -1,0 +1,3 @@
+# symbolic names for networks, see networks(5) for more information
+link-local 169.254.0.0
+loopback   127.0.0.1

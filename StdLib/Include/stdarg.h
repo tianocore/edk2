@@ -41,10 +41,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /** The type va_list is a type suitable for holding information needed by the
     macros va_start, va_arg, and va_end.
-
-    This implementation aliases va_list to VA_LIST, declared in MdePkg/Base.h.
 **/
+#if defined(__GNUC__)
+typedef __builtin_va_list   va_list;
+#else
 #define va_list   VA_LIST
+#endif
 
 /** The va_start macro shall be invoked before any access to the unnamed arguments.
     The va_start macro initializes ap for subsequent use by va_arg and va_end.
@@ -63,11 +65,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                     is not compatible with the type that results after
                     application of the default argument promotions, the
                     behavior is undefined.
-
-    This implementation aliases va_start to VA_START, declared in MdePkg/Base.h.
 **/
-//#define va_start(ap, ParamN)    VA_START(ap, ParamN)
+#if defined(__GNUC__)
+#define va_start    __builtin_va_start
+#else
 #define va_start    VA_START
+#endif
 
 /** The va_arg macro expands to an expression that has the type and value of
     the next argument in the call.  The parameter ap shall be the same as the
@@ -90,11 +93,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                   va_start macro returns the value of the argument after that
                   specified by paramN.  Successive invocations return the values
                   of the remaining arguments in succession.
-
-    This implementation aliases va_arg to VA_ARG, declared in MdePkg/Base.h.
 **/
-//#define va_arg(ap, type)        VA_ARG(ap, type)
+#if defined(__GNUC__)
+#define va_arg        __builtin_va_arg
+#else
 #define va_arg        VA_ARG
+#endif
 
 /** The va_end macro facillitates a normal return from the function whose
     variable argument list was referred to by the expansion of va_start that
@@ -109,13 +113,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
     @param  ap    An object of type va_list, initialized by a prior
                   invocation of va_start, that will no longer be referenced.
-
-    This implementation aliases va_end to VA_END, declared in MdePkg/Base.h.
 **/
-//#define va_end(ap)              VA_END(ap)
+#if defined(__GNUC__)
+#define va_end              __builtin_va_end
+#else
 #define va_end              VA_END
+#endif
 
 /** For BSD compatibility. **/
+#if defined(__GNUC__)
+#define va_copy         __builtin_va_copy
+#else
 #define va_copy(s,d)      (s) = (d)
+#endif
 
 #endif  /* _STDARG_H */

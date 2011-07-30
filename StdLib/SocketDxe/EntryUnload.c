@@ -1,0 +1,296 @@
+/** @file
+  Implement the entry and unload for the socket driver.
+
+  Copyright (c) 2011, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#include "Socket.h"
+
+
+CONST EFI_GUID mEslRawServiceGuid = {
+    0xf9f5d280, 0x8a4b, 0x48e2, { 0x96, 0x28, 0xda, 0xfa, 0xa7, 0x70, 0x54, 0x5d }
+};
+
+CONST EFI_GUID mEslTcp4ServiceGuid = {
+    0x4dcaab0a, 0x1990, 0x4352, { 0x8d, 0x2f, 0x2d, 0x8f, 0x13, 0x55, 0x98, 0xa5 }
+};
+
+CONST EFI_GUID mEslUdp4ServiceGuid = {
+    0x43a110ce, 0x9ccd, 0x402b, { 0x8c, 0x29, 0x4a, 0x6d, 0x8a, 0xf7, 0x79, 0x90 }
+};
+
+
+/**
+  Socket driver unload routine.
+
+  @param [in] ImageHandle       Handle for the image.
+
+  @retval EFI_SUCCESS           Image may be unloaded
+
+**/
+EFI_STATUS
+EFIAPI
+DriverUnload (
+  IN EFI_HANDLE ImageHandle
+  )
+{
+  UINTN BufferSize;
+  UINTN Index;
+  UINTN Max;
+  EFI_HANDLE * pHandle;
+  EFI_STATUS Status;
+
+  //
+  //  Determine which devices are using this driver
+  //
+  BufferSize = 0;
+  pHandle = NULL;
+  Status = gBS->LocateHandle (
+                  ByProtocol,
+                  &gEfiCallerIdGuid,
+                  NULL,
+                  &BufferSize,
+                  NULL );
+  if ( EFI_BUFFER_TOO_SMALL == Status ) {
+    for ( ; ; ) {
+      //
+      //  One or more block IO devices are present
+      //
+      Status = gBS->AllocatePool (
+                      EfiRuntimeServicesData,
+                      BufferSize,
+                      (VOID **) &pHandle
+                      );
+      if ( EFI_ERROR ( Status )) {
+        DEBUG (( DEBUG_ERROR | DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
+                  "Insufficient memory, failed handle buffer allocation\r\n" ));
+        break;
+      }
+
+      //
+      //  Locate the block IO devices
+      //
+      Status = gBS->LocateHandle (
+                      ByProtocol,
+                      &gEfiCallerIdGuid,
+                      NULL,
+                      &BufferSize,
+                      pHandle );
+      if ( EFI_ERROR ( Status )) {
+        //
+        //  Error getting handles
+        //
+        DEBUG (( DEBUG_ERROR | DEBUG_INIT | DEBUG_INFO,
+                "Failure getting Telnet handles\r\n" ));
+        break;
+      }
+      
+      //
+      //  Remove any use of the driver
+      //
+      Max = BufferSize / sizeof ( pHandle[ 0 ]);
+      for ( Index = 0; Max > Index; Index++ ) {
+        Status = DriverStop ( &gDriverBinding,
+                              pHandle[ Index ],
+                              0,
+                              NULL );
+        if ( EFI_ERROR ( Status )) {
+          DEBUG (( DEBUG_WARN | DEBUG_INIT | DEBUG_INFO,
+                    "WARNING - Failed to shutdown the driver on handle %08x\r\n", pHandle[ Index ]));
+          break;
+        }
+      }
+      break;
+    }
+  }
+  else {
+    if ( EFI_NOT_FOUND == Status ) {
+      //
+      //  No devices were found
+      //
+      Status = EFI_SUCCESS;
+    }
+  }
+
+  //
+  //  Free the handle array
+  //
+  if ( NULL != pHandle ) {
+    gBS->FreePool ( pHandle );
+  }
+
+  //
+  //  Done with the socket layer
+  //
+  if ( !EFI_ERROR ( Status )) {
+    Status = EslServiceUninstall ( ImageHandle );
+    if ( !EFI_ERROR ( Status )) {
+      //
+      //  Remove the protocols installed by the EntryPoint routine.
+      //
+      Status = gBS->UninstallMultipleProtocolInterfaces (
+                  ImageHandle,
+                  &gEfiDriverBindingProtocolGuid,
+                  &gDriverBinding,
+                  &gEfiComponentNameProtocolGuid,
+                  &gComponentName,
+                  &gEfiComponentName2ProtocolGuid,
+                  &gComponentName2,
+                  NULL
+                  );
+      if ( !EFI_ERROR ( Status )) {
+        DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
+                "Removed:   gEfiComponentName2ProtocolGuid from 0x%08x\r\n",
+                ImageHandle ));
+        DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
+                  "Removed:   gEfiComponentNameProtocolGuid from 0x%08x\r\n",
+                  ImageHandle ));
+        DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
+                  "Removed:   gEfiDriverBindingProtocolGuid from 0x%08x\r\n",
+                  ImageHandle ));
+      }
+      else {
+        DEBUG (( DEBUG_ERROR | DEBUG_POOL | DEBUG_INIT,
+                    "ERROR - Failed to remove gEfiDriverBindingProtocolGuid from 0x%08x, Status: %r\r\n",
+                    ImageHandle,
+                    Status ));
+      }
+    }
+  }
+
+  //
+  //  Disconnect the network services
+  //
+  if ( !EFI_ERROR ( Status )) {
+    EslServiceUnload ( );
+  }
+
+  //
+  //  Return the unload status
+  //
+  return Status;
+}
+
+
+/**
+Socket driver entry point.
+
+@param [in] ImageHandle       Handle for the image.
+@param [in] pSystemTable      Address of the system table.
+
+@retval EFI_SUCCESS           Image successfully loaded.
+
+**/
+EFI_STATUS
+EFIAPI
+EntryPoint (
+  IN EFI_HANDLE ImageHandle,
+  IN EFI_SYSTEM_TABLE * pSystemTable
+  )
+{
+  EFI_LOADED_IMAGE_PROTOCOL * pLoadedImage;
+  EFI_STATUS    Status;
+
+  DBG_ENTER ( );
+
+  //
+  //  Display the image handle
+  //
+  DEBUG (( DEBUG_INFO,
+            "ImageHandle: 0x%08x\r\n",
+            ImageHandle ));
+
+  //
+  //  Enable unload support
+  //
+  Status = gBS->HandleProtocol (
+                  gImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID **)&pLoadedImage
+                  );
+  if (!EFI_ERROR (Status)) {
+    pLoadedImage->Unload = DriverUnload;
+
+    //
+    //  Add the driver to the list of drivers
+    //
+    Status = EfiLibInstallDriverBindingComponentName2 (
+               ImageHandle,
+               pSystemTable,
+               &gDriverBinding,
+               ImageHandle,
+               &gComponentName,
+               &gComponentName2
+               );
+    if ( !EFI_ERROR ( Status )) {
+      DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
+                "Installed: gEfiDriverBindingProtocolGuid on   0x%08x\r\n",
+                ImageHandle ));
+      DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
+                "Installed: gEfiComponentNameProtocolGuid on   0x%08x\r\n",
+                ImageHandle ));
+      DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
+                "Installed: gEfiComponentName2ProtocolGuid on   0x%08x\r\n",
+                ImageHandle ));
+
+      //
+      //  Initialize the service layer
+      //
+      EslServiceLoad ( ImageHandle );
+
+      //
+      //  Make the socket serivces available to other drivers
+      //  and applications
+      //
+      Status = EslServiceInstall ( &ImageHandle );
+      if ( EFI_ERROR ( Status )) {
+        //
+        //  Disconnect from the network
+        //
+        EslServiceUnload ( );
+
+        //
+        //  Remove the driver bindings
+        //
+        gBS->UninstallMultipleProtocolInterfaces (
+                ImageHandle,
+                &gEfiDriverBindingProtocolGuid,
+                &gDriverBinding,
+                &gEfiComponentNameProtocolGuid,
+                &gComponentName,
+                &gEfiComponentName2ProtocolGuid,
+                &gComponentName2,
+                NULL
+                );
+        DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
+                "Removed:   gEfiComponentName2ProtocolGuid from 0x%08x\r\n",
+                ImageHandle ));
+        DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
+                  "Removed:   gEfiComponentNameProtocolGuid from 0x%08x\r\n",
+                  ImageHandle ));
+        DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
+                  "Removed:   gEfiDriverBindingProtocolGuid from 0x%08x\r\n",
+                  ImageHandle ));
+      }
+    }
+    else  {
+      DEBUG (( DEBUG_ERROR | DEBUG_POOL | DEBUG_INIT,
+                "ERROR - EfiLibInstallDriverBindingComponentName2 failed, Status: %r\r\n",
+                Status ));
+    }
+  }
+  DBG_EXIT_STATUS ( Status );
+  return Status;
+}
+
+
+PFN_ESL_xSTRUCTOR mpfnEslConstructor = NULL;
+PFN_ESL_xSTRUCTOR mpfnEslDestructor = NULL;

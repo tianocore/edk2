@@ -29,6 +29,10 @@
 #include  <stdlib.h>
 #include  <MainData.h>
 
+/** Internal worker function used by exit().
+**/
+void  exitCleanup(INTN ExitVal);
+
 /* #################  Public Functions  ################################### */
 
 /** The abort function causes abnormal program termination to occur, unless
@@ -92,24 +96,7 @@ atexit(void (*handler)(void))
 void
 exit(int status)
 {
-  void (*CleanUp)(void);   // Pointer to Cleanup Function
-  int   i;
-
-  if(gMD != NULL) {
-    CleanUp = gMD->cleanup; // Preserve the pointer to the Cleanup Function
-
-  // Call all registered atexit functions in reverse order
-    i = gMD->num_atexit;
-  if( i > 0) {
-    do {
-      (gMD->atexit_handler[--i])();
-    } while( i > 0);
-  }
-
-    if (CleanUp != NULL) {
-      CleanUp();
-    }
-  }
+  exitCleanup((INTN) status);
   _Exit(status);
 }
 
@@ -129,17 +116,12 @@ exit(int status)
 void
 _Exit(int status)
 {
-  RETURN_STATUS ExitVal = (RETURN_STATUS)status;
+  gMD->ExitValue = status;          // Save our exit status.  Allows a status of 0.
+  longjmp(gMD->MainExit, 0x55);     // Get out of here.  longjmp can't return 0. Use 0x55 for a non-zero value.
 
-  if( ExitVal == EXIT_FAILURE) {
-    ExitVal = RETURN_ABORTED;
-  }
-
-  if(gMD->FinalCleanup != NULL) {
-    gMD->FinalCleanup();  // gMD does not exist when this returns.
-  }
-
-  gBS->Exit(gImageHandle, ExitVal, 0, NULL);   /* abort() */
+#ifdef __GNUC__
+  __builtin__Exit(status);         /* Keep GCC happy - never reached */
+#endif
 }
 
 /** If string is a null pointer, the system function determines whether the

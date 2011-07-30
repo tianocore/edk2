@@ -63,12 +63,3 @@
 [LibraryClasses]
   LibC
   LibCType
-
-################################################################
-#
-# The Build Options, below, are only used when building the C library.
-# DO NOT use them when building your application!
-# Nasty things could happen if you do.
-#
-[BuildOptions]
-  GCC:*_*_*_CC_FLAGS    = -fno-builtin

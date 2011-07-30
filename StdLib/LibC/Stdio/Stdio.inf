@@ -72,6 +72,7 @@
 
   snprintf.c
   vsnprintf.c
+  fparseln.c
 
   # Wide character functions
   fgetwc.c            #

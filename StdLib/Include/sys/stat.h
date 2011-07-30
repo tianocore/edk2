@@ -210,7 +210,7 @@ __BEGIN_DECLS
   extern int      fstat     (int, struct stat *);
   extern int      lstat     (const char *, struct stat *);
   extern int      stat      (const char *, void *);
-//  extern int      chmod     (const char *, mode_t);
+  extern int      chmod     (const char *, mode_t);
 #endif  // __STAT_SYSCALLS_DECLARED
 __END_DECLS
 

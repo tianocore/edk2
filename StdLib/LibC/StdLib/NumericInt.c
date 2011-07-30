@@ -8,7 +8,7 @@
     - atol: strtol(nptr, (char **)NULL, 10)
     - atoll: strtoll(nptr, (char **)NULL, 10)
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -120,7 +120,7 @@ atoll(const char *nptr)
 static int
 Digit2Val( int c)
 {
-  if(__isHexLetter(c)) {  /* If c is one of [A-Fa-f]... */
+  if(isalpha(c)) {  /* If c is one of [A-Za-z]... */
     c = toupper(c) - 7;   // Adjust so 'A' is ('9' + 1)
   }
   return c - '0';   // Value returned is between 0 and 35, inclusive.
@@ -183,13 +183,18 @@ Digit2Val( int c)
 long
 strtol(const char * __restrict nptr, char ** __restrict endptr, int base)
 {
+  const char *pEnd;
   long        Result = 0;
   long        Previous;
   int         temp;
   BOOLEAN     Negative = FALSE;
 
+  pEnd = nptr;
+
   if((base < 0) || (base == 1) || (base > 36)) {
+    if(endptr != NULL) {
     *endptr = NULL;
+    }
     return 0;
   }
   // Skip leading spaces.
@@ -204,9 +209,29 @@ strtol(const char * __restrict nptr, char ** __restrict endptr, int base)
     Negative = TRUE;
     ++nptr;
   }
-  if( (base == 16) && (*nptr == '0') && (toupper(nptr[1]) == 'X')) {
-    nptr += 2;
+
+  if(*nptr == '0') {  /* Might be Octal or Hex */
+    if(toupper(nptr[1]) == 'X') {   /* Looks like Hex */
+      if((base == 0) || (base == 16)) {
+        nptr += 2;  /* Skip the "0X"      */
+        base = 16;  /* In case base was 0 */
+      }
+    }
+    else {    /* Looks like Octal */
+      if((base == 0) || (base == 8)) {
+        ++nptr;     /* Skip the leading "0" */
+        base = 8;   /* In case base was 0   */
+      }
+    }
   }
+  if(base == 0) {   /* If still zero then must be decimal */
+    base = 10;
+  }
+  if(*nptr  == '0') {
+    for( ; *nptr == '0'; ++nptr);  /* Skip any remaining leading zeros */
+    pEnd = nptr;
+  }
+
   while( isalnum(*nptr) && ((temp = Digit2Val(*nptr)) < base)) {
     Previous = Result;
     Result = (Result * base) + (long int)temp;
@@ -221,15 +246,15 @@ strtol(const char * __restrict nptr, char ** __restrict endptr, int base)
       errno = ERANGE;
       break;
     }
-    ++nptr;
+    pEnd = ++nptr;
   }
   if(Negative) {
     Result = -Result;
   }
 
   // Save pointer to final sequence
-  if( endptr != NULL) {
-    *endptr = (char *)nptr;
+  if(endptr != NULL) {
+    *endptr = (char *)pEnd;
   }
   return Result;
 }
@@ -247,12 +272,17 @@ strtol(const char * __restrict nptr, char ** __restrict endptr, int base)
 unsigned long
 strtoul(const char * __restrict nptr, char ** __restrict endptr, int base)
 {
+  const char     *pEnd;
   unsigned long   Result = 0;
   unsigned long   Previous;
   int             temp;
 
+  pEnd = nptr;
+
   if((base < 0) || (base == 1) || (base > 36)) {
+    if(endptr != NULL) {
     *endptr = NULL;
+    }
     return 0;
   }
   // Skip leading spaces.
@@ -262,9 +292,29 @@ strtoul(const char * __restrict nptr, char ** __restrict endptr, int base)
   if(*nptr == '+') {
     ++nptr;
   }
-  if( (base == 16) && (*nptr == '0') && (toupper(nptr[1]) == 'X')) {
-    nptr += 2;
+
+  if(*nptr == '0') {  /* Might be Octal or Hex */
+    if(toupper(nptr[1]) == 'X') {   /* Looks like Hex */
+      if((base == 0) || (base == 16)) {
+        nptr += 2;  /* Skip the "0X"      */
+        base = 16;  /* In case base was 0 */
+      }
+    }
+    else {    /* Looks like Octal */
+      if((base == 0) || (base == 8)) {
+        ++nptr;     /* Skip the leading "0" */
+        base = 8;   /* In case base was 0   */
+      }
+    }
   }
+  if(base == 0) {   /* If still zero then must be decimal */
+    base = 10;
+  }
+  if(*nptr  == '0') {
+    for( ; *nptr == '0'; ++nptr);  /* Skip any remaining leading zeros */
+    pEnd = nptr;
+  }
+
   while( isalnum(*nptr) && ((temp = Digit2Val(*nptr)) < base)) {
     Previous = Result;
     Result = (Result * base) + (unsigned long)temp;
@@ -273,12 +323,12 @@ strtoul(const char * __restrict nptr, char ** __restrict endptr, int base)
       errno = ERANGE;
       break;
     }
-    ++nptr;
+    pEnd = ++nptr;
   }
 
   // Save pointer to final sequence
-  if( endptr != NULL) {
-    *endptr = (char *)nptr;
+  if(endptr != NULL) {
+    *endptr = (char *)pEnd;
   }
   return Result;
 }
@@ -297,13 +347,18 @@ strtoul(const char * __restrict nptr, char ** __restrict endptr, int base)
 long long
 strtoll(const char * __restrict nptr, char ** __restrict endptr, int base)
 {
+  const char *pEnd;
   long long   Result = 0;
   long long   Previous;
   int         temp;
   BOOLEAN     Negative = FALSE;
 
+  pEnd = nptr;
+
   if((base < 0) || (base == 1) || (base > 36)) {
+    if(endptr != NULL) {
     *endptr = NULL;
+    }
     return 0;
   }
   // Skip leading spaces.
@@ -318,9 +373,29 @@ strtoll(const char * __restrict nptr, char ** __restrict endptr, int base)
     Negative = TRUE;
     ++nptr;
   }
-  if( (base == 16) && (*nptr == '0') && (toupper(nptr[1]) == 'X')) {
-    nptr += 2;
+
+  if(*nptr == '0') {  /* Might be Octal or Hex */
+    if(toupper(nptr[1]) == 'X') {   /* Looks like Hex */
+      if((base == 0) || (base == 16)) {
+        nptr += 2;  /* Skip the "0X"      */
+        base = 16;  /* In case base was 0 */
+      }
+    }
+    else {    /* Looks like Octal */
+      if((base == 0) || (base == 8)) {
+        ++nptr;     /* Skip the leading "0" */
+        base = 8;   /* In case base was 0   */
+      }
+    }
   }
+  if(base == 0) {   /* If still zero then must be decimal */
+    base = 10;
+  }
+  if(*nptr  == '0') {
+    for( ; *nptr == '0'; ++nptr);  /* Skip any remaining leading zeros */
+    pEnd = nptr;
+  }
+
   while( isalnum(*nptr) && ((temp = Digit2Val(*nptr)) < base)) {
     Previous = Result;
     Result = (Result * base) + (long long int)temp;
@@ -335,15 +410,15 @@ strtoll(const char * __restrict nptr, char ** __restrict endptr, int base)
       errno = ERANGE;
       break;
     }
-    ++nptr;
+    pEnd = ++nptr;
   }
   if(Negative) {
     Result = -Result;
   }
 
   // Save pointer to final sequence
-  if( endptr != NULL) {
-    *endptr = (char *)nptr;
+  if(endptr != NULL) {
+    *endptr = (char *)pEnd;
   }
   return Result;
 }
@@ -361,12 +436,17 @@ strtoll(const char * __restrict nptr, char ** __restrict endptr, int base)
 unsigned long long
 strtoull(const char * __restrict nptr, char ** __restrict endptr, int base)
 {
+  const char           *pEnd;
   unsigned long long    Result = 0;
   unsigned long long    Previous;
   int                   temp;
 
+  pEnd = nptr;
+
   if((base < 0) || (base == 1) || (base > 36)) {
+    if(endptr != NULL) {
     *endptr = NULL;
+    }
     return 0;
   }
   // Skip leading spaces.
@@ -376,9 +456,29 @@ strtoull(const char * __restrict nptr, char ** __restrict endptr, int base)
   if(*nptr == '+') {
     ++nptr;
   }
-  if( (base == 16) && (*nptr == '0') && (toupper(nptr[1]) == 'X')) {
-    nptr += 2;
+
+  if(*nptr == '0') {  /* Might be Octal or Hex */
+    if(toupper(nptr[1]) == 'X') {   /* Looks like Hex */
+      if((base == 0) || (base == 16)) {
+        nptr += 2;  /* Skip the "0X"      */
+        base = 16;  /* In case base was 0 */
+      }
+    }
+    else {    /* Looks like Octal */
+      if((base == 0) || (base == 8)) {
+        ++nptr;     /* Skip the leading "0" */
+        base = 8;   /* In case base was 0   */
+      }
+    }
   }
+  if(base == 0) {   /* If still zero then must be decimal */
+    base = 10;
+  }
+  if(*nptr  == '0') {
+    for( ; *nptr == '0'; ++nptr);  /* Skip any remaining leading zeros */
+    pEnd = nptr;
+  }
+
   while( isalnum(*nptr) && ((temp = Digit2Val(*nptr)) < base)) {
     Previous = Result;
     Result = (Result * base) + (unsigned long long)temp;
@@ -387,12 +487,12 @@ strtoull(const char * __restrict nptr, char ** __restrict endptr, int base)
       errno = ERANGE;
       break;
     }
-    ++nptr;
+    pEnd = ++nptr;
   }
 
   // Save pointer to final sequence
-  if( endptr != NULL) {
-    *endptr = (char *)nptr;
+  if(endptr != NULL) {
+    *endptr = (char *)pEnd;
   }
   return Result;
 }

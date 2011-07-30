@@ -42,6 +42,8 @@
   NetBSD: _wcstoul.h,v 1.3 2005/11/29 03:11:59 christos Exp
  */
 
+#include <Library/BaseLib.h>
+
 /*
  * function template for wcstoul, wcstoull and wcstoumax.
  *
@@ -102,8 +104,8 @@ _FUNCNAME(
   /*
    * See strtoul for comments as to the logic used.
    */
-  cutoff = __wUINT_MAX / (__wUINT)base;
-  cutlim = (int)(__wUINT_MAX % (__wUINT)base);
+  cutoff = (__wUINT)DivU64x32 ((UINT64) __wUINT_MAX, (UINT32) base);
+  cutlim = (int) ModU64x32 ((UINT64) __wUINT_MAX, (UINT32) base);
   for (acc = 0, any = 0;; wc = (wint_t) *s++) {
     i = __wctoint((wchar_t)wc);
     if (i == -1) {

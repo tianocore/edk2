@@ -53,7 +53,7 @@
 #include "local.h"
 
 int
-vsprintf(char *str, const char *fmt, _BSD_VA_LIST_ ap)
+vsprintf(char *str, const char *fmt, va_list ap)
 {
   int ret;
   FILE f;

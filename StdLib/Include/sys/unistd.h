@@ -37,7 +37,7 @@
 #include <sys/featuretest.h>
 
 /* compile-time symbolic constants */
-#define _POSIX_JOB_CONTROL  /* implementation supports job control */
+//#define _POSIX_JOB_CONTROL  /* implementation supports job control */
 
 /*
  * According to POSIX 1003.1:
@@ -62,43 +62,42 @@
 
 /* execution-time symbolic constants */
         /* chown requires appropriate privileges */
-#define _POSIX_CHOWN_RESTRICTED 1
-        /* clock selection */
-#define _POSIX_CLOCK_SELECTION  -1
-        /* too-long path components generate errors */
-#define _POSIX_NO_TRUNC   1
-        /* may disable terminal special characters */
-#define _POSIX_VDISABLE   ((unsigned char)'\377')
-        /* file synchronization is available */
-#define _POSIX_FSYNC    1
-        /* synchronized I/O is available */
-#define _POSIX_SYNCHRONIZED_IO  1
-        /* memory mapped files */
-#define _POSIX_MAPPED_FILES 1
-        /* memory locking of whole address space */
-#define _POSIX_MEMLOCK    1
-        /* memory locking address ranges */
-#define _POSIX_MEMLOCK_RANGE  1
-        /* memory access protections */
-#define _POSIX_MEMORY_PROTECTION 1
-        /* monotonic clock */
-#define _POSIX_MONOTONIC_CLOCK  200112L
-        /* threads */
-#define _POSIX_THREADS    200112L
-        /* semaphores */
-#define _POSIX_SEMAPHORES 0
-        /* barriers */
-#define _POSIX_BARRIERS   200112L
+//#define _POSIX_CHOWN_RESTRICTED 1
+//        /* clock selection */
+//#define _POSIX_CLOCK_SELECTION  -1
+//        /* too-long path components generate errors */
+//#define _POSIX_NO_TRUNC   1
+//        /* may disable terminal special characters */
+//#define _POSIX_VDISABLE   ((unsigned char)'\377')
+//        /* file synchronization is available */
+//#define _POSIX_FSYNC    1
+//        /* synchronized I/O is available */
+//#define _POSIX_SYNCHRONIZED_IO  1
+//        /* memory mapped files */
+//#define _POSIX_MAPPED_FILES 1
+//        /* memory locking of whole address space */
+//#define _POSIX_MEMLOCK    1
+//        /* memory locking address ranges */
+//#define _POSIX_MEMLOCK_RANGE  1
+//        /* memory access protections */
+//#define _POSIX_MEMORY_PROTECTION 1
+//        /* monotonic clock */
+//#define _POSIX_MONOTONIC_CLOCK  200112L
+//        /* threads */
+//#define _POSIX_THREADS    200112L
+//        /* semaphores */
+//#define _POSIX_SEMAPHORES 0
+//        /* barriers */
+//#define _POSIX_BARRIERS   200112L
         /* timers */
 #define _POSIX_TIMERS   200112L
         /* spin locks */
-#define _POSIX_SPIN_LOCKS 200112L
-        /* read/write locks */
-#define _POSIX_READER_WRITER_LOCKS  200112L
-        /* XPG4.2 shared memory */
-#define _XOPEN_SHM    0
+//#define _POSIX_SPIN_LOCKS 200112L
+//        /* read/write locks */
+//#define _POSIX_READER_WRITER_LOCKS  200112L
+//        /* XPG4.2 shared memory */
+//#define _XOPEN_SHM    0
 
-#if defined(_NETBSD_SOURCE)
 /* whence values for lseek(2); renamed by POSIX 1003.1 */
 #define L_SET   SEEK_SET
 #define L_INCR    SEEK_CUR
@@ -115,7 +114,6 @@
 #define FDATASYNC 0x0010  /* sync data and minimal metadata */
 #define FFILESYNC 0x0020  /* sync data and metadata */
 #define FDISKSYNC 0x0040  /* flush disk caches after sync */
-#endif
 
 /* configurable pathname variables; use as argument to pathconf(3) */
 #define _PC_LINK_MAX     1

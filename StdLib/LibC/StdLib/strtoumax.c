@@ -48,6 +48,8 @@ __RCSID("$NetBSD: strtoumax.c,v 1.1 2006/04/22 15:33:33 thorpej Exp $");
 #include <inttypes.h>
 #include <stddef.h>
 
+#include <Library/BaseLib.h>
+
 #ifdef __weak_alias
 __weak_alias(strtoumax, _strtoumax)
 #endif
@@ -98,8 +100,8 @@ strtoumax(const char *nptr, char **endptr, int base)
   if (base == 0)
     base = c == '0' ? 8 : 10;
 
-  cutoff = UINTMAX_MAX / (uintmax_t)base;
-  cutlim = (int)(UINTMAX_MAX % (uintmax_t)base);
+  cutoff = DivU64x32 ((UINT64) UINTMAX_MAX, (UINT32) base);
+  cutlim = (int) ModU64x32 ((UINT64) UINTMAX_MAX, (UINT32) base);
   for (acc = 0, any = 0;; c = (unsigned char) *s++) {
     if (isdigit(c))
       c -= '0';

@@ -11,12 +11,7 @@
 #define _C_LABEL(x)   __CONCAT(_,x)
 #define _C_LABEL_STRING(x)  "_"x
 
-#if __STDC__
-#define ___RENAME(x)  __asm(___STRING(_C_LABEL(x)))
-#else
-#define ___RENAME(x)  ____RENAME(_/**/x)
-#define ____RENAME(x) __asm(___STRING(x))
-#endif
+#define ___RENAME(x)
 
 #define __indr_reference(sym,alias) /* nada, since we do weak refs */
 

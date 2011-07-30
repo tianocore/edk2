@@ -248,10 +248,16 @@ PathAlias(
 
 /** Parse a path producing the target device, device instance, and file path.
 
+    It is the caller's responsibility to free() FullPath and MapPath when they
+    are no longer needed.
+
     @param[in]    path
     @param[out]   FullPath
     @param[out]   DevNode
     @param[out]   Which
+    @param[out]   MapPath       OPTIONAL.  If not NULL, it points to the place to save a pointer
+                                to the extracted map name.  If the path didn't have a map name,
+                                then *MapPath is set to NULL.
 
     @retval   RETURN_SUCCESS              The path was parsed successfully.
     @retval   RETURN_NOT_FOUND            The path does not map to a valid device.
@@ -266,7 +272,8 @@ ParsePath(
   IN    const char   *path,
   OUT   wchar_t     **FullPath,
   OUT   DeviceNode  **DevNode,
-  OUT   int          *Which
+  OUT   int          *Which,
+  OUT   wchar_t     **MapPath
   )
 {
   int                 MapLen;
@@ -301,7 +308,7 @@ reclassify:
           // Get the Map Name, including the trailing ':'. */
           MPath = calloc(MapLen+2, sizeof(wchar_t));
           if(MPath != NULL) {
-            wmemcpy(MPath, WPath, MapLen+2);
+            wmemcpy(MPath, WPath, MapLen+1);
           }
           else {
             errno = ENOMEM;
@@ -346,6 +353,12 @@ reclassify:
   if(!RETURN_ERROR(Status)) {
     *FullPath = WPath;
     *Which    = Instance;
+    if(MapPath != NULL) {
+      *MapPath  = MPath;
+    }
+    else if(MPath != NULL) {
+      free(MPath);    /* Caller doesn't want it so let MPath go free */
+    }
 
     /*  At this point, WPath is an absolute path,
         MPath is either NULL or points to the Map Name,
@@ -358,6 +371,9 @@ reclassify:
       }
       if(Node != NULL) {
         Status = RETURN_SUCCESS;
+      }
+      else {
+        Status = RETURN_NOT_FOUND;
       }
     }
     else {
@@ -375,8 +391,41 @@ reclassify:
       *DevNode = Node;
     }
   }
-  if(MPath != NULL) {
-    free(MPath);    // We don't need this any more.
-  }
   return Status;
+}
+
+/**
+  Parses a normalized wide character path and returns a pointer to the entry
+  following the last \.  If a \ is not found in the path the return value will
+  be the same as the input value.  All error conditions return NULL.
+
+  The behavior when passing in a path that has not been normalized is undefined.
+
+  @param  Path - A pointer to a wide character string containing a path to a
+                 directory or a file.
+
+  @return Pointer to the file name or terminal directory.  NULL if an error is
+          detected.
+**/
+wchar_t *
+EFIAPI
+GetFileNameFromPath (
+  const wchar_t   *Path
+  )
+{
+  wchar_t   *Tail;
+
+  if (Path == NULL) {
+    return NULL;
+  }
+
+  Tail = wcsrchr(Path, L'\\');
+  if(Tail == NULL) {
+    Tail = (wchar_t *) Path;
+  } else {
+    // Move to the next character after the '\\' to get the file name.
+    Tail++;
+  }
+
+  return Tail;
 }

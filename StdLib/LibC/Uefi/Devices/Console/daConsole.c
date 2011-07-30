@@ -45,6 +45,12 @@ static const int stdioFlags[NUM_SPECIAL] = {
 static DeviceNode    *ConNode[NUM_SPECIAL];
 static ConInstance   *ConInstanceList;
 
+static wchar_t       *ConReadBuf;
+
+/* Flags settable by Ioctl */
+static BOOLEAN        TtyCooked;
+static BOOLEAN        TtyEcho;
+
 ssize_t
 WideTtyCvt( CHAR16 *dest, const char *buf, size_t n)
 {
@@ -127,74 +133,6 @@ da_ConSeek(
   }
 }
 
-static
-ssize_t
-EFIAPI
-da_ConRead(
-  IN OUT  struct __filedes   *filp,
-  IN OUT  off_t              *offset,         // Console ignores this
-  IN      size_t              BufferSize,
-     OUT  VOID               *Buffer
-)
-{
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL   *Proto;
-  ConInstance                      *Stream;
-  CHAR16                           *OutPtr;
-  EFI_INPUT_KEY                     Key;
-  UINTN                             NumChar;
-  UINTN                             Edex;
-  EFI_STATUS                        Status = RETURN_SUCCESS;
-  UINTN                             i;
-
-  Stream = BASE_CR(filp->f_ops, ConInstance, Abstraction);
-  // Quick check to see if Stream looks reasonable
-  if(Stream->Cookie != CON_COOKIE) {    // Cookie == 'IoAb'
-    EFIerrno = RETURN_INVALID_PARAMETER;
-    return -1;    // Looks like a bad This pointer
-  }
-  if(Stream->InstanceNum != STDIN_FILENO) {
-    // Read only valid for stdin
-    EFIerrno = RETURN_UNSUPPORTED;
-    return -1;
-  }
-  // It looks like things are OK for trying to read
-  // We will accumulate *BufferSize characters or until we encounter
-  // an "activation" character.  Currently any control character.
-  Proto = (EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)Stream->Dev;
-  OutPtr = Buffer;
-  NumChar = (BufferSize - 1) / sizeof(CHAR16);
-  i = 0;
-  do {
-    if((Stream->UnGetKey.UnicodeChar == CHAR_NULL) && (Stream->UnGetKey.ScanCode == SCAN_NULL)) {
-      Status = gBS->WaitForEvent( 1, &Proto->WaitForKey, &Edex);
-      if(Status != RETURN_SUCCESS) {
-        break;
-      }
-      Status = Proto->ReadKeyStroke(Proto, &Key);
-      if(Status != RETURN_SUCCESS) {
-        break;
-      }
-    }
-    else {
-      Key.ScanCode          = Stream->UnGetKey.ScanCode;
-      Key.UnicodeChar       = Stream->UnGetKey.UnicodeChar;
-      Stream->UnGetKey.ScanCode     = SCAN_NULL;
-      Stream->UnGetKey.UnicodeChar  = CHAR_NULL;
-    }
-    if(Key.ScanCode == SCAN_NULL) {
-      *OutPtr++ = Key.UnicodeChar;
-      ++i;
-    }
-    if(iswcntrl(Key.UnicodeChar)) {    // If a control character, or a scan code
-      break;
-    }
-  } while(i < NumChar);
-
-  *OutPtr = L'\0';    // Terminate the input buffer
-  EFIerrno = Status;
-  return (ssize_t)(i * sizeof(CHAR16));  // Will be 0 if we didn't get a key
-}
-
 /* Write a NULL terminated WCS to the EFI console.
 
   @param[in,out]  BufferSize  Number of bytes in Buffer.  Set to zero if
@@ -263,6 +201,109 @@ da_ConWrite(
   }
   EFIerrno = Status;
   return BufferSize;
+}
+
+/** Read characters from the console input device.
+
+    @param[in,out]  filp          Pointer to file descriptor for this file.
+    @param[in,out]  offset        Ignored.
+    @param[in]      BufferSize    Buffer size, in bytes.
+    @param[out]     Buffer        Buffer in which to place the read characters.
+
+    @return     Number of bytes actually placed into Buffer.
+
+    @todo       Handle encodings other than ASCII-7 and UEFI.
+**/
+static
+ssize_t
+EFIAPI
+da_ConRead(
+  IN OUT  struct __filedes   *filp,
+  IN OUT  off_t              *offset,         // Console ignores this
+  IN      size_t              BufferSize,
+     OUT  VOID               *Buffer
+)
+{
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL   *Proto;
+  ConInstance                      *Stream;
+  wchar_t                          *OutPtr;
+  EFI_INPUT_KEY                     Key;
+  UINTN                             NumChar;
+  UINTN                             Edex;
+  EFI_STATUS                        Status = RETURN_SUCCESS;
+  UINTN                             i;
+  char                              EchoBuff[MB_CUR_MAX + 1];
+  int                               NumEcho;
+
+  Stream = BASE_CR(filp->f_ops, ConInstance, Abstraction);
+  // Quick check to see if Stream looks reasonable
+  if(Stream->Cookie != CON_COOKIE) {    // Cookie == 'IoAb'
+    EFIerrno = RETURN_INVALID_PARAMETER;
+    return -1;    // Looks like a bad This pointer
+  }
+  if(Stream->InstanceNum != STDIN_FILENO) {
+    // Read only valid for stdin
+    EFIerrno = RETURN_UNSUPPORTED;
+    return -1;
+  }
+  // It looks like things are OK for trying to read
+  // We will accumulate *BufferSize characters or until we encounter
+  // an "activation" character.  Currently any control character.
+  Proto = (EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)Stream->Dev;
+  OutPtr = ConReadBuf;
+  NumChar = (BufferSize > MAX_INPUT)? MAX_INPUT : BufferSize;
+  i = 0;
+  do {
+    if((Stream->UnGetKey.UnicodeChar == CHAR_NULL) && (Stream->UnGetKey.ScanCode == SCAN_NULL)) {
+      Status = gBS->WaitForEvent( 1, &Proto->WaitForKey, &Edex);
+      if(Status != RETURN_SUCCESS) {
+        break;
+      }
+      Status = Proto->ReadKeyStroke(Proto, &Key);
+      if(Status != RETURN_SUCCESS) {
+        break;
+      }
+    }
+    else {
+      Key.ScanCode          = Stream->UnGetKey.ScanCode;
+      Key.UnicodeChar       = Stream->UnGetKey.UnicodeChar;
+      Stream->UnGetKey.ScanCode     = SCAN_NULL;
+      Stream->UnGetKey.UnicodeChar  = CHAR_NULL;
+    }
+    if(Key.ScanCode == SCAN_NULL) {
+      NumEcho = 0;
+      if(TtyCooked && (Key.UnicodeChar == CHAR_CARRIAGE_RETURN)) {
+        *OutPtr++ = CHAR_LINEFEED;
+        NumEcho = wctomb(EchoBuff, CHAR_LINEFEED);
+      }
+      else {
+        *OutPtr++ = Key.UnicodeChar;
+        NumEcho = wctomb(EchoBuff, Key.UnicodeChar);
+      }
+      ++i;
+      EchoBuff[NumEcho] = 0;  /* Terminate the Echo buffer */
+      if(TtyEcho) {
+        /* Echo the character just input */
+        da_ConWrite(&gMD->fdarray[STDOUT_FILENO], NULL, 2, EchoBuff);
+      }
+    }
+    if(iswcntrl(Key.UnicodeChar)) {    // If a control character, or a scan code
+      break;
+    }
+  } while(i < NumChar);
+
+  *OutPtr = L'\0';    // Terminate the input buffer
+
+  /*  Convert the input buffer and place in Buffer.
+      If the fully converted input buffer won't fit, write what will and
+      leave the rest in ConReadBuf with ConReadLeft indicating how many
+      unconverted characters remain in ConReadBuf.
+  */
+  NumEcho = (int)wcstombs(Buffer, ConReadBuf, BufferSize);   /* Re-use NumEcho to hold number of bytes in Buffer */
+  /* More work needs to be done before locales other than C can be supported. */
+
+  EFIerrno = Status;
+  return (ssize_t)NumEcho;  // Will be 0 if we didn't get a key
 }
 
 /** Console-specific helper function for the fstat() function.
@@ -347,27 +388,28 @@ da_ConIoctl(
 int
 EFIAPI
 da_ConOpen(
+  DeviceNode         *DevNode,
   struct __filedes   *filp,
-  void               *DevInstance,
+  int                 DevInstance,    // Not used for console devices
   wchar_t            *Path,           // Not used for console devices
-  wchar_t            *Flags           // Not used for console devices
+  wchar_t            *MPath           // Not used for console devices
   )
 {
   ConInstance                      *Stream;
 
   if((filp == NULL)           ||
-     (DevInstance  == NULL))
+     (DevNode  == NULL))
   {
     EFIerrno = RETURN_INVALID_PARAMETER;
     return -1;
   }
-  Stream = (ConInstance *)DevInstance;
+  Stream = (ConInstance *)DevNode->InstanceList;
   // Quick check to see if Stream looks reasonable
   if(Stream->Cookie != CON_COOKIE) {    // Cookie == 'IoAb'
     EFIerrno = RETURN_INVALID_PARAMETER;
     return -1;    // Looks like a bad This pointer
   }
-  gMD->StdIo[Stream->InstanceNum] = (ConInstance *)DevInstance;
+  gMD->StdIo[Stream->InstanceNum] = Stream;
   filp->f_iflags |= (S_IFREG | _S_IFCHR | _S_ICONSOLE);
   filp->f_offset = 0;
   filp->f_ops = &Stream->Abstraction;
@@ -448,7 +490,8 @@ __Cons_construct(
   int             i;
 
   ConInstanceList = (ConInstance *)AllocateZeroPool(NUM_SPECIAL * sizeof(ConInstance));
-  if(ConInstanceList == NULL) {
+  ConReadBuf      = (wchar_t *)AllocateZeroPool((MAX_INPUT + 1) * sizeof(wchar_t));
+  if((ConInstanceList == NULL) || (ConReadBuf == NULL))  {
     return RETURN_OUT_OF_RESOURCES;
   }
 
@@ -507,6 +550,10 @@ __Cons_construct(
     }
     Stream->Parent = ConNode[i];
   }
+  /* Initialize Ioctl flags until Ioctl is really implemented. */
+  TtyCooked = TRUE;
+  TtyEcho   = TRUE;
+
   return  Status;
 }
 
@@ -526,6 +573,9 @@ __Cons_deconstruct(
   }
   if(ConInstanceList != NULL) {
     FreePool(ConInstanceList);
+  }
+  if(ConReadBuf != NULL) {
+    FreePool(ConReadBuf);
   }
 
   return RETURN_SUCCESS;

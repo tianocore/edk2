@@ -43,6 +43,7 @@
   #
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   ShellCEntryLib|ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
+  UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   #
   # Common Libraries
   #
@@ -69,41 +70,7 @@
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   FileHandleLib|ShellPkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   SortLib|ShellPkg/Library/UefiSortLib/UefiSortLib.inf
-
-  #
-  # C Standard Libraries
-  #
-  LibC|StdLib/LibC/LibC.inf
-  LibStdLib|StdLib/LibC/StdLib/StdLib.inf
-  LibString|StdLib/LibC/String/String.inf
-  LibWchar|StdLib/LibC/Wchar/Wchar.inf
-  LibCType|StdLib/LibC/Ctype/Ctype.inf
-  LibTime|StdLib/LibC/Time/Time.inf
-  LibStdio|StdLib/LibC/Stdio/Stdio.inf
-  LibGdtoa|StdLib/LibC/gdtoa/gdtoa.inf
-  LibLocale|StdLib/LibC/Locale/Locale.inf
-  LibUefi|StdLib/LibC/Uefi/Uefi.inf
-  LibMath|StdLib/LibC/Math/Math.inf
-  LibSignal|StdLib/LibC/Signal/Signal.inf
-  LibNetUtil|StdLib/LibC/NetUtil/NetUtil.inf
-
-  # Libraries for device abstractions within the Standard C Library
-  # Applications should not directly access any functions defined in these libraries.
-  DevUtility|StdLib/LibC/Uefi/Devices/daUtility.inf
-  DevConsole|StdLib/LibC/Uefi/Devices/daConsole.inf
-  DevShell|StdLib/LibC/Uefi/Devices/daShell.inf
-
-[LibraryClasses.IA32]
-  TimerLib|PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
-  ## Comment out the above line and un-comment the line below for running under Nt32 emulation.
-#  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
-
-[LibraryClasses.X64]
-  TimerLib|PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
-
-[LibraryClasses.IPF]
-  PalLib|MdePkg/Library/UefiPalLib/UefiPalLib.inf
-  TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  PathLib|ShellPkg/Library/BasePathLib/BasePathLib.inf
 
 ###################################################################################################
 #
@@ -125,20 +92,6 @@
 ###################################################################################################
 
 [Components]
-# BaseLib and BaseMemoryLib need to be built with the /GL- switch when using the Microsoft
-# tool chain.  This is required so that the library functions can be resolved during
-# the second pass of the linker during Link-time-code-generation.
-###
-#  MdePkg/Library/BaseLib/BaseLib.inf {
-#    <BuildOptions>
-#      MSFT:*_*_*_CC_FLAGS    = /X /Zc:wchar_t /GL-
-#  }
-#
-#  MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf {
-#    <BuildOptions>
-#      MSFT:*_*_*_CC_FLAGS    = /X /Zc:wchar_t /GL-
-#  }
-
 # Standard C Libraries.
   StdLib/LibC/LibC.inf
   StdLib/LibC/StdLib/StdLib.inf
@@ -147,7 +100,6 @@
   StdLib/LibC/Ctype/Ctype.inf
   StdLib/LibC/Time/Time.inf
   StdLib/LibC/Stdio/Stdio.inf
-  StdLib/LibC/gdtoa/gdtoa.inf
   StdLib/LibC/Locale/Locale.inf
   StdLib/LibC/Uefi/Uefi.inf
   StdLib/LibC/Math/Math.inf
@@ -156,26 +108,25 @@
 
 # Device Abstractions within the Standard C Library
 # Applications should not directly access any functions defined in these libraries.
+  StdLib/LibC/gdtoa/gdtoa.inf
   StdLib/LibC/Uefi/Devices/daUtility.inf
   StdLib/LibC/Uefi/Devices/daConsole.inf
   StdLib/LibC/Uefi/Devices/daShell.inf
 
-################################################################
+# Additional libraries for POSIX functionality.
+  StdLib/PosixLib/Err/LibErr.inf
+  StdLib/PosixLib/Gen/LibGen.inf
+  StdLib/PosixLib/Glob/LibGlob.inf
+  StdLib/PosixLib/Stringlist/LibStringlist.inf
+
+#    Socket Applications - LibC based
+  StdLib/BsdSocketLib/BsdSocketLib.inf
+  StdLib/EfiSocketLib/EfiSocketLib.inf
+  StdLib/UseSocketDxe/UseSocketDxe.inf
+
+###################################################################################################
 #
-# See the additional comments below if you plan to run applications under the
-# Nt32 emulation environment.
+#       Include Boilerplate text required for building with the Standard Libraries.
 #
-
-[BuildOptions]
-  INTEL:*_*_*_CC_FLAGS          = /Qfreestanding
-   MSFT:*_*_*_CC_FLAGS          = /X /Zc:wchar_t
-    GCC:*_*_*_CC_FLAGS          = -ffreestanding -nostdinc -nostdlib
-
-# The Build Options, below, are only used when building the C library
-# to be run under the NT32 emulation.  They disable the clock() system call
-# which is currently incompatible with the NT32 environment.
-# Just uncomment the lines below and select the correct TimerLib instance, above.
-
-  # INTEL:*_*_IA32_CC_FLAGS     = /D NT32dvm
-  #  MSFT:*_*_IA32_CC_FLAGS     = /D NT32dvm
-  #   GCC:*_*_IA32_CC_FLAGS     = -DNT32dvm
+###################################################################################################
+!include StdLib/StdLib.inc

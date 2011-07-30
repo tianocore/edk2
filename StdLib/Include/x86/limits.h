@@ -46,15 +46,6 @@
 /** maximum value for an object of type unsigned int **/
 #define __UINT_MAX    0xffffffff // 2^32 - 1
 
-/** minimum value for an object of type long int **/
-#define __LONG_MIN    (-2147483647L - 1L) // -(2^31 - 1)
-
-/** maximum value for an object of type long int **/
-#define __LONG_MAX    +2147483647L // 2^31 - 1
-
-/** maximum value for an object of type unsigned long int **/
-#define __ULONG_MAX   0xffffffff // 2^32 - 1
-
 /** minimum value for an object of type long long int **/
 //#define __LLONG_MIN   -9223372036854775808LL // -(2^63 - 1)
 //#define __LLONG_MIN   ((-9223372036854775807LL)-1) // -(2^63 - 1)
@@ -71,7 +62,6 @@
 #define __SHORT_BIT     16
 #define __WCHAR_BIT     16
 #define __INT_BIT       32
-#define __LONG_BIT      32    /* Compiler dependent */
 #define __LONG_LONG_BIT 64
 
 #endif    /* _MACHINE_LIMITS_H */

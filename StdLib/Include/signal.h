@@ -14,7 +14,7 @@
   their semantics, and their default handling is implementation-defined; all
   signal numbers shall be positive.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -57,6 +57,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define SIGSEGV    __SigSegv    ///< an invalid access to storage
 #define SIGTERM    __SigTerm    ///< a termination request sent to the program
 #define SIGBREAK   __SigBreak   ///< added for Python
+#define SIGALRM    __SigAlrm    ///< Added for Posix timer functions
+#define SIGVTALRM  __SigVtAlrm  ///< Added for Posix timer functions
+#define SIGPROF    __SigProf    ///< Added for Posix timer functions
+#define SIGUSR1    __SigUsr1    ///< Added for Posix timer functions
+#define SIGUSR2    __SigUsr2    ///< Added for Posix timer functions
+#define SIGWINCH   __SigWinch   ///< Added for Posix timer functions
+#define SIGPIPE    __SigPipe    ///< Added for Posix timer functions
+#define SIGQUIT    __SigQuit    ///< Added for Posix timer functions
 #define SIG_LAST   __Sig_Last   ///< One more than the largest signal number
 
 __BEGIN_DECLS

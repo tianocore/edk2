@@ -761,7 +761,6 @@ tzparse(
 }
 
 void
-EFIAPI
 gmtload(struct state * const sp)
 {
   if (tzload(gmt, sp) != 0)
@@ -788,7 +787,6 @@ tzsetwall(void)
 }
 
 void
-EFIAPI
 tzset(void)
 {
   register const char * name;

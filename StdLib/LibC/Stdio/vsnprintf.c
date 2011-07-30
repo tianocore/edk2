@@ -54,7 +54,7 @@ __weak_alias(vsnprintf,_vsnprintf)
 #endif
 
 int
-vsnprintf(char *str, size_t n, const char *fmt, _BSD_VA_LIST_ ap)
+vsnprintf(char *str, size_t n, const char *fmt, va_list ap)
 {
   int ret;
   FILE f;

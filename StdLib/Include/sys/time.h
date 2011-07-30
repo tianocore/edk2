@@ -71,6 +71,7 @@ struct timespec {
   (ts)->tv_sec = (tv)->tv_sec;          \
   (ts)->tv_nsec = (tv)->tv_usec * 1000;       \
 } while (/*CONSTCOND*/0)
+
 #define TIMESPEC_TO_TIMEVAL(tv, ts) do {        \
   (tv)->tv_sec = (ts)->tv_sec;          \
   (tv)->tv_usec = (ts)->tv_nsec / 1000;       \
@@ -79,10 +80,12 @@ struct timespec {
 /* Operations on timevals. */
 #define timerclear(tvp)   (tvp)->tv_sec = (tvp)->tv_usec = 0
 #define timerisset(tvp)   ((tvp)->tv_sec || (tvp)->tv_usec)
+
 #define timercmp(tvp, uvp, cmp)           \
   (((tvp)->tv_sec == (uvp)->tv_sec) ?       \
       ((tvp)->tv_usec cmp (uvp)->tv_usec) :     \
       ((tvp)->tv_sec cmp (uvp)->tv_sec))
+
 #define timeradd(tvp, uvp, vvp)           \
   do {                \
     (vvp)->tv_sec = (tvp)->tv_sec + (uvp)->tv_sec;    \
@@ -92,6 +95,7 @@ struct timespec {
       (vvp)->tv_usec -= 1000000;      \
     }             \
   } while (/* CONSTCOND */ 0)
+
 #define timersub(tvp, uvp, vvp)           \
   do {                \
     (vvp)->tv_sec = (tvp)->tv_sec - (uvp)->tv_sec;    \
@@ -105,10 +109,12 @@ struct timespec {
 /* Operations on timespecs. */
 #define timespecclear(tsp)    (tsp)->tv_sec = (tsp)->tv_nsec = 0
 #define timespecisset(tsp)    ((tsp)->tv_sec || (tsp)->tv_nsec)
+
 #define timespeccmp(tsp, usp, cmp)          \
   (((tsp)->tv_sec == (usp)->tv_sec) ?       \
       ((tsp)->tv_nsec cmp (usp)->tv_nsec) :     \
       ((tsp)->tv_sec cmp (usp)->tv_sec))
+
 #define timespecadd(tsp, usp, vsp)          \
   do {                \
     (vsp)->tv_sec = (tsp)->tv_sec + (usp)->tv_sec;    \
@@ -118,6 +124,7 @@ struct timespec {
       (vsp)->tv_nsec -= 1000000000L;      \
     }             \
   } while (/* CONSTCOND */ 0)
+
 #define timespecsub(tsp, usp, vsp)          \
   do {                \
     (vsp)->tv_sec = (tsp)->tv_sec - (usp)->tv_sec;    \
@@ -182,5 +189,8 @@ __END_DECLS
 
 /* BSD compatibility functions */
 int gettimeofday (struct timeval *tp, void *ignore);
+/* POSIX compatibility functions */
+int getitimer (int which, struct itimerval *value);
+int setitimer (int which, const struct itimerval *value, struct itimerval *ovalue);
 
 #endif /* !_SYS_TIME_H_ */

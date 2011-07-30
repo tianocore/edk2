@@ -1,0 +1,62 @@
+#/** @file
+# Component description file for the socket layer driver.
+#
+# This module implements the socket layer.
+# Copyright (c) 2011, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SocketDxe
+  FILE_GUID                      = 2A43BA5F-AC29-4fdc-8A3B-0328D0256F8C
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = EntryPoint
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  Socket.h
+  ComponentName.c
+  DriverBinding.c
+  EntryUnload.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StdLib/StdLib.dec
+
+[LibraryClasses]
+  EfiSocketLib
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  UefiRuntimeLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiTcp4ProtocolGuid
+  gEfiTcp4ServiceBindingProtocolGuid
+  gEfiUdp4ProtocolGuid
+  gEfiUdp4ServiceBindingProtocolGuid
+  gEfiSocketProtocolGuid
+  gEfiSocketServiceBindingProtocolGuid
+
+[Depex]
+  gEfiBdsArchProtocolGuid AND
+  gEfiCpuArchProtocolGuid AND
+  gEfiTcp4ServiceBindingProtocolGuid AND
+  gEfiTimerArchProtocolGuid AND
+  gEfiUdp4ServiceBindingProtocolGuid

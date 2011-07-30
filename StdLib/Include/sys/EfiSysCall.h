@@ -75,7 +75,7 @@ int       isatty    (int);
   int     fstat     (int, struct stat *);
   int     lstat     (const char *, struct stat *);
   int     stat      (const char *, void *);
-//  int      chmod     (const char *, mode_t);
+  int     chmod     (const char *, mode_t);
 #endif  // __STAT_SYSCALLS_DECLARED
 
 // These are also declared in sys/types.h
@@ -110,10 +110,11 @@ int       FindFreeFD  (int MinFd);
 */
 BOOLEAN   ValidateFD (int fd, int IsOpen);
 
+char     *getcwd    (char *, size_t);
+int       chdir     (const char *);
+
 /* These system calls don't YET have EFI implementations. */
 int       access    (const char *path, int amode);
-int       chdir     (const char *);
-char     *getcwd    (char *, size_t);
 int       reboot    (int, char *);
 
 __END_DECLS

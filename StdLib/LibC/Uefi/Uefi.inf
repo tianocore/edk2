@@ -16,18 +16,24 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = LibUefi
-  FILE_GUID                      = 39356e02-26bf-4cfb-9564-378ce25e702f
+  FILE_GUID                      = 1dcff17c-aa53-4b78-b234-864027555035
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = LibUefi
+  LIBRARY_CONSTRUCTOR            = DestructMePlease
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF
 #
 
 [Sources]
+  select.c
   SysCalls.c
+  writev.c
   Xform.c
+  compat.c
+  GetPass.c
+  StubFunctions.c
 
 [Packages]
   StdLib/StdLib.dec

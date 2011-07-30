@@ -126,6 +126,10 @@ struct _ns_flagdata {  int mask, shift;  };
 extern struct _ns_flagdata _ns_flagdata[];
 
 /* Accessor macros - this is part of the public interface. */
+#define ns_msg_getflag(handle, flag) ( \
+      ((handle)._flags & _ns_flagdata[flag].mask) \
+       >> _ns_flagdata[flag].shift \
+      )
 
 #define ns_msg_id(handle) ((handle)._id + 0)
 #define ns_msg_base(handle) ((handle)._msg + 0)
@@ -216,6 +220,28 @@ typedef enum __ns_update_operation {
   ns_uop_add = 1,
   ns_uop_max = 2
 } ns_update_operation;
+
+/*
+ * This RR-like structure is particular to UPDATE.
+ */
+struct _ns_updrec {
+  struct _ns_updrec *r_prev; /* prev record */
+  struct _ns_updrec *r_next; /* next record */
+  u_int8_t  r_section;  /* ZONE/PREREQUISITE/UPDATE */
+  char *    r_dname;  /* owner of the RR */
+  u_int16_t r_class;  /* class number */
+  u_int16_t r_type;   /* type number */
+  u_int32_t r_ttl;    /* time to live */
+  u_char *  r_data;   /* rdata fields as text string */
+  u_int16_t r_size;   /* size of r_data field */
+  int   r_opcode; /* type of operation */
+  /* following fields for private use by the resolver/server routines */
+  struct _ns_updrec *r_grpnext;  /* next record when grouped */
+  struct databuf *r_dp;   /* databuf to process */
+  struct databuf *r_deldp;  /* databuf's deleted/overwritten */
+  u_int16_t r_zone;   /* zone number on server */
+};
+typedef struct _ns_updrec ns_updrec;
 
 /*%
  * This structure is used for TSIG authenticated messages
@@ -456,25 +482,24 @@ typedef enum __ns_cert_types {
 #define NS_PUT16(s, cp) do { \
   uint32_t t_s = (uint32_t)(s); \
   u_char *t_cp = (u_char *)(cp); \
-  *t_cp++ = t_s >> 8; \
-  *t_cp   = t_s; \
+  *t_cp++ = (u_char)( t_s >> 8 ); \
+  *t_cp   = (u_char)( t_s ); \
   (cp) += NS_INT16SZ; \
 } while (/*CONSTCOND*/0)
 
 #define NS_PUT32(l, cp) do { \
   uint32_t t_l = (uint32_t)(l); \
   u_char *t_cp = (u_char *)(cp); \
-  *t_cp++ = t_l >> 24; \
-  *t_cp++ = t_l >> 16; \
-  *t_cp++ = t_l >> 8; \
-  *t_cp   = t_l; \
+  *t_cp++ = (u_char)( t_l >> 24 ); \
+  *t_cp++ = (u_char)( t_l >> 16 ); \
+  *t_cp++ = (u_char)( t_l >> 8 ); \
+  *t_cp   = (u_char)( t_l ); \
   (cp) += NS_INT32SZ; \
 } while (/*CONSTCOND*/0)
 
 /*%
  * ANSI C identifier hiding for bind's lib/nameser.
  */
-#define ns_msg_getflag    __ns_msg_getflag
 #define ns_get16    __ns_get16
 #define ns_get32    __ns_get32
 #define ns_put16    __ns_put16
@@ -511,7 +536,6 @@ typedef enum __ns_cert_types {
 #define ns_samename   __ns_samename
 
 __BEGIN_DECLS
-int   ns_msg_getflag(ns_msg, int);
 uint16_t  ns_get16(const u_char *);
 uint32_t  ns_get32(const u_char *);
 void    ns_put16(uint16_t, u_char *);

@@ -31,33 +31,33 @@ DeviceNode   *daCurrentDevice = NULL;     ///< Device currently being accessed
       fnullop_*   Does nothing and returns success.
       fbadop_*    Does nothing and returns EPERM
 */
-int     fnullop_fcntl (struct __filedes *filp, UINT32 Cmd, void *p3, void *p4)
+int     EFIAPI fnullop_fcntl (struct __filedes *filp, UINT32 Cmd, void *p3, void *p4)
 { return 0; }
 
-short  fnullop_poll  (struct __filedes *filp, short Events)
+short  EFIAPI fnullop_poll  (struct __filedes *filp, short Events)
 {
   return ((POLLIN | POLLRDNORM | POLLOUT) & Events);
 }
 
-int     fnullop_flush (struct __filedes *filp)
+int     EFIAPI fnullop_flush (struct __filedes *filp)
 { return 0; }
 
-int     fbadop_stat   (struct __filedes *filp, struct stat *StatBuf, void *Buf)
+int     EFIAPI fbadop_stat   (struct __filedes *filp, struct stat *StatBuf, void *Buf)
 { return -EPERM;  }
 
-int     fbadop_ioctl  (struct __filedes *filp, ULONGN Cmd, void *argp)
+int     EFIAPI fbadop_ioctl  (struct __filedes *filp, ULONGN Cmd, void *argp)
 { return -EPERM;  }
 
-int     fbadop_delete (struct __filedes *filp)
+int     EFIAPI fbadop_delete (struct __filedes *filp)
 { return -EPERM;  }
 
-int     fbadop_mkdir  (const char *path, __mode_t perms)
+int     EFIAPI fbadop_mkdir  (const char *path, __mode_t perms)
 { return -EPERM;  }
 
-int     fbadop_rename   (const char *from, const char *to)
+int     EFIAPI fbadop_rename   (const char *from, const char *to)
 { return -EPERM;  }
 
-int     fbadop_rmdir    (struct __filedes *filp)
+int     EFIAPI fbadop_rmdir    (struct __filedes *filp)
 { return -EPERM;  }
 
 /** Add a new device to the device list.

@@ -38,6 +38,7 @@
 #include  <sys/fd_set.h>
 
 #include  <sys/sigtypes.h>
+#include  <sys/time.h>
 #include  <time.h>
 
 __BEGIN_DECLS

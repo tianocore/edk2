@@ -64,11 +64,11 @@ extern int      _fwalk(int (*)(FILE *));
 extern char    *_mktemp(char *);
 extern int      __swsetup(FILE *);
 extern int      __sflags(const char *, int *);
-extern int      __svfscanf(FILE * __restrict, const char * __restrict, _BSD_VA_LIST_)
+extern int      __svfscanf(FILE * __restrict, const char * __restrict, va_list)
                             __attribute__((__format__(__scanf__, 2, 0)));
-extern int      __svfscanf_unlocked(FILE * __restrict, const char * __restrict, _BSD_VA_LIST_)
+extern int      __svfscanf_unlocked(FILE * __restrict, const char * __restrict, va_list)
                             __attribute__((__format__(__scanf__, 2, 0)));
-extern int      __vfprintf_unlocked(FILE * __restrict, const char * __restrict, _BSD_VA_LIST_);
+extern int      __vfprintf_unlocked(FILE * __restrict, const char * __restrict, va_list);
 
 
 extern int      __sdidinit;
@@ -80,8 +80,8 @@ extern wint_t   __fputwc_unlock(wchar_t, FILE *);
 
 extern char    *__fgetstr(FILE * __restrict, size_t * __restrict, int);
 extern int      __slbexpand(FILE *, size_t);
-extern int      __vfwprintf_unlocked(FILE *, const wchar_t *, _BSD_VA_LIST_);
-extern int      __vfwscanf_unlocked(FILE * __restrict, const wchar_t * __restrict, _BSD_VA_LIST_);
+extern int      __vfwprintf_unlocked(FILE *, const wchar_t *, va_list);
+extern int      __vfwscanf_unlocked(FILE * __restrict, const wchar_t * __restrict, va_list);
 
 /*
  * Return true iff the given FILE cannot be written now.

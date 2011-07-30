@@ -32,6 +32,8 @@
   strptime.c
   TimeEfi.c
   gettimeofday.c
+  timegm.c
+  itimer.c
 
 [Packages]
   StdLib/StdLib.dec

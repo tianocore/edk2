@@ -34,6 +34,8 @@ extern  RETURN_STATUS   EFIerrno;
 
 // Define error number in terms of the ENUM in <sys/errno.h>
 
+#define ERESTART          -1                      /* restart syscall */
+
 #define EMINERRORVAL      __EMINERRORVAL          /* The lowest valid error value */
 
 #define EPERM             __EPERM                 /*  1   Operation not permitted */

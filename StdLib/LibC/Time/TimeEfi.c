@@ -21,7 +21,6 @@
 
 /* Convert an EFI_TIME structure into a C Standard tm structure. */
 void
-EFIAPI
 Efi2Tm( EFI_TIME *ET, struct tm *BT)
 {
   // Convert EFI time to broken-down time.
@@ -39,7 +38,6 @@ Efi2Tm( EFI_TIME *ET, struct tm *BT)
 
 /* Convert an EFI_TIME structure into a time_t value. */
 time_t
-EFIAPI
 Efi2Time( EFI_TIME *EfiBDtime)
 {
   Efi2Tm( EfiBDtime, &gMD->BDTime);

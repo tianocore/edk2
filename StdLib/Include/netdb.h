@@ -94,6 +94,7 @@
 #include <sys/cdefs.h>
 #include <sys/featuretest.h>
 #include <inttypes.h>
+#include <paths.h>
 /*
  * Data types
  */
@@ -107,27 +108,6 @@ typedef __socklen_t	socklen_t;
   #undef _EFI_SIZE_T_
   #undef _BSD_SIZE_T_
 #endif
-
-////#if defined(_NETBSD_SOURCE)
-////#ifndef _PATH_HEQUIV
-////#define	_PATH_HEQUIV	"/etc/hosts.equiv"
-////#endif
-#ifndef _PATH_HOSTS
-#define	_PATH_HOSTS	"/etc/hosts"
-#endif
-#ifndef _PATH_NETWORKS
-#define	_PATH_NETWORKS	"/etc/networks"
-#endif
-#ifndef _PATH_PROTOCOLS
-#define	_PATH_PROTOCOLS	"/etc/protocols"
-#endif
-#ifndef _PATH_SERVICES
-#define	_PATH_SERVICES	"/etc/services"
-#endif
-////#ifndef _PATH_SERVICES_DB
-////#define	_PATH_SERVICES_DB "/var/db/services.db"
-////#endif
-////#endif
 
 __BEGIN_DECLS
 extern int h_errno;
@@ -219,14 +199,11 @@ struct addrinfo {
 #define	NETDB_INTERNAL	-1	/*%< see errno */
 #define	NETDB_SUCCESS	0	/*%< no problem */
 #endif
-////#define	NO_ADDRESS	NO_DATA		/* no address, look for MX record */
+#define	NO_ADDRESS	NO_DATA		/* no address, look for MX record */
 #define	HOST_NOT_FOUND	1 /*%< Authoritative Answer Host not found */
 #define	TRY_AGAIN	2 /*%< Non-Authoritive Host not found, or SERVERFAIL */
 #define	NO_RECOVERY	3 /*%< Non recoverable errors, FORMERR, REFUSED, NOTIMP */
-////#define	NO_DATA		4 /*%< Valid name, no data record of requested type */
-////#if defined(_NETBSD_SOURCE)
-////#define	NO_ADDRESS	NO_DATA		/*%< no address, look for MX record */
-////#endif
+#define	NO_DATA		4 /*%< Valid name, no data record of requested type */
 
 /*
  * Error return codes from getaddrinfo()

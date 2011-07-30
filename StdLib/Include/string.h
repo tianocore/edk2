@@ -324,15 +324,31 @@ int     strerror_r(int, char *, size_t);
 int     strcasecmp(const char *s1, const char *s2);
 void   *memccpy   (void *, const void *, int, size_t);
 int     strncasecmp(const char *s1, const char *s2, size_t n);
+size_t  strlcpy(char *destination, const char *source, size_t size);
+size_t  strlcat(char *destination, const char *source, size_t size);
 
-// bcopy is same as memcpy but it is a void function, being used in socket lib
-#define bcopy(a,b,c) ( memcpy((void *)a, (void *)b, (size_t)c))
+// bcopy is is a void function with the src/dest arguments reversed, being used in socket lib
+#define bcopy(a,b,c) ( memcpy((void *)b, (const void *)a, (size_t)c))
 
 // bcmp is same as memcmp, returns 0 for successful compare, non-zero otherwise
 #define bcmp(a,b,c) ( memcmp((void *)a, (void *)b, (size_t)c))
 
-//strsep is the same as strtok, the only difference is for strsep the 1st parameter is a char**
-#define strsep(a,b) (strtok(*a,b))
+/*
+ * Get next token from string *stringp, where tokens are possibly-empty
+ * strings separated by characters from delim.
+ *
+ * Writes NULs into the string at *stringp to end tokens.
+ * delim need not remain constant from call to call.
+ * On return, *stringp points past the last NUL written (if there might
+ * be further tokens), or is NULL (if there are definitely no more tokens).
+ *
+ * If *stringp is NULL, strsep returns NULL.
+ */
+char *
+strsep(
+  register char **stringp,
+  register const char *delim
+  );
 
 __END_DECLS
 

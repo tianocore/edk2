@@ -104,7 +104,7 @@ freopen(const char *file, const char *mode, FILE *fp)
       (void) __sflush(fp);
     /* if close is NULL, closing is a no-op, hence pointless */
     isopen = fp->_close != NULL;
-    if ((wantfd = fp->_file) < 0 && isopen) {
+    if (((wantfd = fp->_file) >= 0) && isopen) {
       (void) (*fp->_close)(fp->_cookie);
       isopen = 0;
     }
@@ -127,7 +127,7 @@ freopen(const char *file, const char *mode, FILE *fp)
    * keep fp->_base: it may be the wrong size.  This loses the effect
    * of any setbuffer calls, but stdio has always done this before.
    */
-  if (isopen && f != wantfd)
+  if (isopen && (f != wantfd))
     (void) (*fp->_close)(fp->_cookie);
   if (fp->_flags & __SMBF)
     free((char *)fp->_bf._base);

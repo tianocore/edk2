@@ -524,7 +524,7 @@ mkdir (const char *path, __mode_t perms)
   int                 Instance  = 0;
   int                 retval = 0;
 
-  Status = ParsePath(path, &NewPath, &Node, &Instance);
+  Status = ParsePath(path, &NewPath, &Node, &Instance, NULL);
   if(Status == RETURN_SUCCESS) {
     GenI = Node->InstanceList;
     if(GenI == NULL) {
@@ -532,7 +532,7 @@ mkdir (const char *path, __mode_t perms)
       retval  = -1;
       }
     else {
-      GenI += (Instance * Node->InstanceSize);
+      //GenI += (Instance * Node->InstanceSize);
       retval = ((GenericInstance *)GenI)->Abstraction.fo_mkdir( path, perms);
       }
     free(NewPath);
@@ -567,11 +567,15 @@ mkdir (const char *path, __mode_t perms)
     O_EXCL        -- if O_CREAT is also set, open will fail if the file already exists.
 **/
 int
-open   (const char *path, int oflags, int mode)
+open(
+  const char *path,
+  int oflags,
+  int mode
+  )
 {
   wchar_t              *NewPath;
+  wchar_t              *MPath;
   DeviceNode           *Node;
-  char                 *GenI = NULL;
   struct __filedes     *filp;
   int                   Instance  = 0;
   RETURN_STATUS         Status;
@@ -579,10 +583,10 @@ open   (const char *path, int oflags, int mode)
   int                   fd = -1;
   int                   doresult;
 
-  Status = ParsePath(path, &NewPath, &Node, &Instance);
+  Status = ParsePath(path, &NewPath, &Node, &Instance, &MPath);
   if(Status == RETURN_SUCCESS) {
-    if((Node != NULL)                       &&
-       ((GenI = Node->InstanceList) == NULL)) {
+    if((Node == NULL)               ||
+       (Node->InstanceList == NULL)) {
       errno   = EPERM;
   }
     else {
@@ -595,15 +599,14 @@ open   (const char *path, int oflags, int mode)
   if( fd < 0 ) {
     // All available FDs are in use
     errno = EMFILE;
-    return -1;
   }
+      else {
       filp = &gMD->fdarray[fd];
       // Save the flags and mode in the File Descriptor
       filp->Oflags = oflags;
       filp->Omode = mode;
 
-      GenI += (Instance * Node->InstanceSize);
-      doresult = Node->OpenFunc(filp, GenI, NewPath, NULL);
+        doresult = Node->OpenFunc(Node, filp, Instance, NewPath, MPath);
       if(doresult < 0) {
         filp->f_iflags = 0;   // Release this FD
         fd = -1;              // Indicate an error
@@ -618,8 +621,14 @@ open   (const char *path, int oflags, int mode)
         FILE_SET_MATURE(filp);
       }
           }
+    }
+    if(NewPath != NULL) {
     free(NewPath);
         }
+  }
+  if(MPath != NULL) {
+    free(MPath);    // We don't need this any more.
+  }
   // return the fd of our now open file
   return fd;
 }
@@ -748,6 +757,7 @@ poll (
     }
     } while (( 0 == SelectedFDs )
         && ( EFI_SUCCESS == Status ));
+
     //
     //  Stop the timer
     //
@@ -774,7 +784,6 @@ poll (
   //
   return SelectedFDs;
 }
-
 
 
 /** The rename() function changes the name of a file.
@@ -807,7 +816,6 @@ poll (
               shall be changed or created.
 **/
 int
-EFIAPI
 rename(
   const char *from,
   const char *to
@@ -820,7 +828,7 @@ rename(
   RETURN_STATUS       Status;
   int                 retval      = -1;
 
-  Status = ParsePath(from, &FromPath, &FromNode, &Instance);
+  Status = ParsePath(from, &FromPath, &FromNode, &Instance, NULL);
   if(Status == RETURN_SUCCESS) {
     GenI = FromNode->InstanceList;
     if(GenI == NULL) {
@@ -828,7 +836,7 @@ rename(
       retval  = -1;
       }
       else {
-      GenI += (Instance * FromNode->InstanceSize);
+      //GenI += (Instance * FromNode->InstanceSize);
       retval = ((GenericInstance *)GenI)->Abstraction.fo_rename( from, to);
               }
     free(FromPath);
@@ -839,7 +847,6 @@ rename(
 /**
 **/
 int
-EFIAPI
 rmdir(
   const char *path
   )
@@ -1006,13 +1013,13 @@ ioctl(
     from a file associated with a terminal may return one typed line of data.
 
     If fildes does not refer to a directory, the function reads the requested
-    number of bytes from the file at the file’s current position and returns
+    number of bytes from the file at the file's current position and returns
     them in buf. If the read goes beyond the end of the file, the read
-    length is truncated to the end of the file. The file’s current position is
+    length is truncated to the end of the file. The file's current position is
     increased by the number of bytes returned.
 
     If fildes refers to a directory, the function reads the directory entry at
-    the file’s current position and returns the entry in buf. If buf
+    the file's current position and returns the entry in buf. If buf
     is not large enough to hold the current directory entry, then
     errno is set to EBUFSIZE, EFIerrno is set to EFI_BUFFER_TOO_SMALL, and the
     current file position is not updated. The size of the buffer needed to read
@@ -1129,3 +1136,56 @@ char
   
   return (UnicodeStrToAsciiStr(Cwd, buf));
 }
+
+/** Change the current working directory.
+
+  The chdir() function shall cause the directory named by the pathname
+  pointed to by the path argument to become the current working directory;
+  that is, the starting point for path searches for pathnames not beginning
+  with '/'.
+
+  @param[in] path   The new path to set.
+
+  @todo Add non-shell CWD changing.
+**/
+int
+chdir (const char *path)
+{
+  CONST CHAR16 *Cwd;
+  EFI_STATUS   Status;
+  CHAR16       *UnicodePath;
+
+  Cwd = ShellGetCurrentDir(NULL);
+  if (Cwd != NULL) {
+    /* We have shell support */
+    UnicodePath = AllocatePool(((AsciiStrLen (path) + 1) * sizeof (CHAR16)));
+    if (UnicodePath == NULL) {
+      errno = ENOMEM;
+      return -1;
+    }
+    AsciiStrToUnicodeStr(path, UnicodePath);
+    Status = gEfiShellProtocol->SetCurDir(NULL, UnicodePath);
+    FreePool(UnicodePath);
+    if (EFI_ERROR(Status)) {
+      errno = EACCES;
+      return -1;
+    } else {
+      return 0;
+    }
+  }
+
+  /* Add here for non-shell */
+  errno = EACCES;
+  return -1;
+}
+
+pid_t tcgetpgrp (int x)
+{
+  return ((pid_t)(UINTN)(gImageHandle));
+}
+
+pid_t getpgrp(void)
+{
+  return ((pid_t)(UINTN)(gImageHandle));
+}
+

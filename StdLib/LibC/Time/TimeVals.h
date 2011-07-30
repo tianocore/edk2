@@ -110,8 +110,8 @@ struct rule {
 #define MONTH_NTH_DAY_OF_WEEK 2 /* Mm.n.d - month, week, day of week */
 
 __BEGIN_DECLS
-extern void EFIAPI gmtload(struct state * const sp);
-extern void EFIAPI tzset(void);
+extern void gmtload(struct state * const sp);
+extern void tzset(void);
 __END_DECLS
 
 #endif  /* _TIMEVAL_H */

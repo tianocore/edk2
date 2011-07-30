@@ -33,6 +33,9 @@
   Searching.c
   ErrorList.c
   strncasecmp.c
+  strlcpy.c
+  strlcat.c
+  strsep.c
 
 [Packages]
   StdLib/StdLib.dec

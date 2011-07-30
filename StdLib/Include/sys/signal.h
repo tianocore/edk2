@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -22,6 +22,14 @@ enum {
   __SigSegv,
   __SigTerm,
   __SigBreak,
+  __SigAlrm,
+  __SigVtAlrm,
+  __SigProf,
+  __SigUsr1,
+  __SigUsr2,
+  __SigWinch,
+  __SigPipe,
+  __SigQuit,
   __Sig_Last
 };
 

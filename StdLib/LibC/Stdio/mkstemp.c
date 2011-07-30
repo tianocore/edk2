@@ -34,7 +34,7 @@
 #include "nbtool_config.h"
 #endif
 
-#if !HAVE_NBTOOL_CONFIG_H || !HAVE_MKSTEMP
+#if !defined(HAVE_NBTOOL_CONFIG_H) || !defined(HAVE_MKSTEMP)
 
 #include  <sys/EfiCdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
