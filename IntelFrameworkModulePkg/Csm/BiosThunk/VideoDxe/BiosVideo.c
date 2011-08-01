@@ -712,6 +712,19 @@ BiosVideoChildHandleInstall (
 
     if (EFI_ERROR (Status)) {
       //
+      // Free GOP mode structure if it is not freed before
+      // VgaMiniPort does not need this structure any more
+      //
+      if (BiosVideoPrivate->GraphicsOutput.Mode != NULL) {
+        if (BiosVideoPrivate->GraphicsOutput.Mode->Info != NULL) {
+          FreePool (BiosVideoPrivate->GraphicsOutput.Mode->Info);
+          BiosVideoPrivate->GraphicsOutput.Mode->Info = NULL;
+        }
+        FreePool (BiosVideoPrivate->GraphicsOutput.Mode);
+        BiosVideoPrivate->GraphicsOutput.Mode = NULL;
+      }
+
+      //
       // Neither VBE nor the standard 640x480 16 color VGA mode are supported, so do
       // not produce the Graphics Output protocol.  Instead, produce the VGA MiniPort Protocol.
       //
@@ -993,8 +1006,10 @@ BiosVideoDeviceReleaseResource (
   if (BiosVideoPrivate->GraphicsOutput.Mode != NULL) {
     if (BiosVideoPrivate->GraphicsOutput.Mode->Info != NULL) {
         FreePool (BiosVideoPrivate->GraphicsOutput.Mode->Info);
+        BiosVideoPrivate->GraphicsOutput.Mode->Info = NULL;
     }
     FreePool (BiosVideoPrivate->GraphicsOutput.Mode);
+    BiosVideoPrivate->GraphicsOutput.Mode = NULL;
   }
   //
   // Free EDID discovered protocol occupied resource
@@ -1633,14 +1648,6 @@ Done:
       FreePool (BiosVideoPrivate->ModeData);
       BiosVideoPrivate->ModeData  = NULL;
       BiosVideoPrivate->MaxMode   = 0;
-    }
-    if (BiosVideoPrivate->GraphicsOutput.Mode != NULL) {
-      if (BiosVideoPrivate->GraphicsOutput.Mode->Info != NULL) {
-        FreePool (BiosVideoPrivate->GraphicsOutput.Mode->Info);
-        BiosVideoPrivate->GraphicsOutput.Mode->Info = NULL;
-      }
-      FreePool (BiosVideoPrivate->GraphicsOutput.Mode);
-      BiosVideoPrivate->GraphicsOutput.Mode= NULL;
     }
     if (EdidOverrideDataBlock != NULL) {
       FreePool (EdidOverrideDataBlock);
