@@ -1,7 +1,7 @@
 /** @file
   This code supports the implementation of the Smbios protocol
   
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -107,5 +107,14 @@ typedef struct {
   EFI_SMBIOS_TABLE_HEADER  Header;
   UINT8                    Tailing[2];
 } EFI_SMBIOS_TABLE_END_STRUCTURE;
+
+/**
+  Create Smbios Table and installs the Smbios Table to the System Table.
+**/
+VOID
+EFIAPI
+SmbiosTableConstruction (
+  VOID
+  );
 
 #endif
