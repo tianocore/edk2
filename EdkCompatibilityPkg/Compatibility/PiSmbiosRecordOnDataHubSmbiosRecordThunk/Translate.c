@@ -2,7 +2,7 @@
   Translate the DataHub records via EFI_DATA_HUB_PROTOCOL to Smbios recorders 
   via EFI_SMBIOS_PROTOCOL.
   
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -127,7 +127,7 @@ SmbiosProcessDataRecord (
             StructureNode->SubInstance == DataHeader->SubInstance &&
             CompareGuid (&(StructureNode->ProducerName), &(RecordHeader->ProducerName))
               ) {
-          if (Conversion->SmbiosType >= 0X80) {
+          if (Conversion->SmbiosType >= 0x80) {
             if (StructureNode->SmbiosType == ((SMBIOS_STRUCTURE_HDR *) SrcData)->Type) {
               break;
             }
@@ -144,7 +144,7 @@ SmbiosProcessDataRecord (
             StructureNode->Instance == DataHeader->Instance &&
             CompareGuid (&(StructureNode->ProducerName), &(RecordHeader->ProducerName))
               ) {
-          if (Conversion->SmbiosType >= 0X80) {
+          if (Conversion->SmbiosType >= 0x80) {
             if (StructureNode->SmbiosType == ((SMBIOS_STRUCTURE_HDR *) SrcData)->Type) {
               break;
             }
@@ -196,7 +196,6 @@ SmbiosProcessDataRecord (
       // Allocate the structure instance
       //
       StructureNode->StructureSize = SmbiosGetTypeMinimalLength (Conversion->SmbiosType);
-      StructureNode->SmbiosType    = Conversion->SmbiosType;
       
       //
       // StructureSize include the TWO trailing zero byte.
@@ -209,7 +208,15 @@ SmbiosProcessDataRecord (
         goto Done;
       }
 
-      StructureNode->SmbiosType          = Conversion->SmbiosType;
+      //
+      // Assign correct SmbiosType when OEM type and Non-OEM type
+      //
+      if (Conversion->SmbiosType >= 0x80) {
+        StructureNode->SmbiosType = ((SMBIOS_STRUCTURE_HDR *) SrcData)->Type;
+      } else {
+        StructureNode->SmbiosType = Conversion->SmbiosType;
+      }
+      
       StructureNode->SmbiosHandle        = 0;
       Status = SmbiosProtocolCreateRecord (
                  NULL, 
@@ -361,6 +368,17 @@ SmbiosProcessDataRecord (
 
       goto Done;
     }
+    
+    //
+    // SmbiosEnlargeStructureBuffer is called to remove and add again
+    // this SMBIOS entry to reflash SMBIOS table in configuration table.
+    //
+    SmbiosEnlargeStructureBuffer (
+      StructureNode,
+      StructureNode->Structure->Length,
+      StructureNode->StructureSize,
+      StructureNode->StructureSize
+      );
   }
 Done:
   return ;
