@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiPei.h>
 #include <Guid/SmramMemoryReserve.h>
-#include <Guid/AcpiVariable.h>
+#include <Guid/AcpiS3Context.h>
 
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
