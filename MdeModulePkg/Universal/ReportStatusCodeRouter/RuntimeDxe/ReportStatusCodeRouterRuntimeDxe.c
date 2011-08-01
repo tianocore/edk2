@@ -252,9 +252,12 @@ ReportDispatcher (
     return EFI_DEVICE_ERROR;
   }
 
-  for (Link = GetFirstNode (&mCallbackListHead); !IsNull (&mCallbackListHead, Link); Link = GetNextNode (&mCallbackListHead, Link)) {
+  for (Link = GetFirstNode (&mCallbackListHead); !IsNull (&mCallbackListHead, Link);) {
     CallbackEntry = CR (Link, RSC_HANDLER_CALLBACK_ENTRY, Node, RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE);
-
+    //
+    // The handler may remove itself, so get the next handler in advance.
+    //
+    Link = GetNextNode (&mCallbackListHead, Link);
     if ((CallbackEntry->Tpl == TPL_HIGH_LEVEL) || EfiAtRuntime ()) {
       CallbackEntry->RscHandlerCallback (
                        Type,

@@ -2,7 +2,7 @@
   Report Status Code Router Driver which produces SMM Report Stataus Code Handler Protocol
   and SMM Status Code Protocol.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -165,9 +165,12 @@ ReportDispatcher (
     return EFI_DEVICE_ERROR;
   }
 
-  for (Link = GetFirstNode (&mCallbackListHead); !IsNull (&mCallbackListHead, Link); Link = GetNextNode (&mCallbackListHead, Link)) {
+  for (Link = GetFirstNode (&mCallbackListHead); !IsNull (&mCallbackListHead, Link);) {
     CallbackEntry = CR (Link, SMM_RSC_HANDLER_CALLBACK_ENTRY, Node, SMM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE);
-
+    //
+    // The handler may remove itself, so get the next handler in advance.
+    //
+    Link = GetNextNode (&mCallbackListHead, Link);
     CallbackEntry->RscHandlerCallback (
                      Type,
                      Value,

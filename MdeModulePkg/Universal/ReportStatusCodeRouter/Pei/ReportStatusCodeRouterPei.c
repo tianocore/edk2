@@ -1,7 +1,7 @@
 /** @file
   Report Status Code Router PEIM which produces Report Stataus Code Handler PPI and Status Code PPI.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -95,19 +95,26 @@ Register (
   EFI_PEI_RSC_HANDLER_CALLBACK  *CallbackEntry;
   UINTN                         *NumberOfEntries;
   UINTN                         Index;
+  UINTN                         FreeEntryIndex;
   UINTN                         *FreePacket;
 
   if (Callback == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Hob.Raw  = GetFirstGuidHob (&gStatusCodeCallbackGuid);
-  FreePacket = NULL;
+  Hob.Raw        = GetFirstGuidHob (&gStatusCodeCallbackGuid);
+  FreePacket     = NULL;
+  FreeEntryIndex = 0;
   while (Hob.Raw != NULL) {
     NumberOfEntries = GET_GUID_HOB_DATA (Hob);
     CallbackEntry   = (EFI_PEI_RSC_HANDLER_CALLBACK *) (NumberOfEntries + 1);
-    if (*NumberOfEntries < 64) {
+    if (FreePacket == NULL && *NumberOfEntries < 64) {
+      //
+      // If current total number of handlers does not exceed 64, put new handler
+      // at the last of packet
+      //
       FreePacket = NumberOfEntries;
+      FreeEntryIndex = *NumberOfEntries;
     }
     for (Index = 0; Index < *NumberOfEntries; Index++) {
       if (CallbackEntry[Index] == Callback) {
@@ -115,6 +122,14 @@ Register (
         // If the function was already registered. It can't be registered again.
         //
         return EFI_ALREADY_STARTED;
+      }
+      if (FreePacket == NULL && CallbackEntry[Index] == NULL) {
+        //
+        // If the total number of handlers in current packet is max value 64,
+        // search an entry with NULL pointer and fill new handler into this entry.
+        //  
+        FreePacket = NumberOfEntries;
+        FreeEntryIndex = Index;
       }
     }
     Hob.Raw = GET_NEXT_HOB (Hob);
@@ -126,8 +141,15 @@ Register (
   }
 
   CallbackEntry = (EFI_PEI_RSC_HANDLER_CALLBACK *) (FreePacket + 1);
-  CallbackEntry[*FreePacket] = Callback;
-  *FreePacket += 1;
+  CallbackEntry[FreeEntryIndex] = Callback;
+  
+  if (*FreePacket == FreeEntryIndex) {
+    //
+    // If new registered callback is added as a new entry in the packet,
+    // increase the total number of handlers in the packet.
+    //
+    *FreePacket += 1;
+  }
 
   return EFI_SUCCESS;
 }
@@ -166,8 +188,10 @@ Unregister (
     CallbackEntry   = (EFI_PEI_RSC_HANDLER_CALLBACK *) (NumberOfEntries + 1);
     for (Index = 0; Index < *NumberOfEntries; Index++) {
       if (CallbackEntry[Index] == Callback) {
-        CallbackEntry[Index] = CallbackEntry[*NumberOfEntries - 1];
-        *NumberOfEntries -= 1;
+        //
+        // Set removed entry as NULL.
+        //
+        CallbackEntry[Index] = NULL;
         return EFI_SUCCESS;
       }
     }
