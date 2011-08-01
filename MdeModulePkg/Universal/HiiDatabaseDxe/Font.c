@@ -1917,7 +1917,7 @@ HiiStringToImage (
       // When EFI_HII_OUT_FLAG_CLEAN_X is set, it will not draw a character
       // if its right-most on pixel cannot fit.
       //
-      if (Index > 0) {
+      if (Index > RowInfo[RowIndex].StartIndex) {
         //
         // Don't draw the last char on this row. And, don't draw the second last char (AdvanceX - Width - OffsetX).
         //
@@ -1929,10 +1929,11 @@ HiiStringToImage (
         RowInfo[RowIndex].BaselineOffset = BaseLineOffset;
       } else {
         //
-        // There is only one column and it can not be drawn so that return directly.
+        // There is no enough column to draw any character, so set current line width to zero.
+        // And go to draw Next line if LineBreak is set.
         //
-        Status = EFI_SUCCESS;
-        goto Exit;
+        RowInfo[RowIndex].LineWidth      = 0;
+        goto NextLine;
       }
     }
 
@@ -1941,7 +1942,9 @@ HiiStringToImage (
     // opportunity prior to a character whose right-most extent would exceed Width.
     // Search the right-most line-break opportunity here.
     //
-    if ((Flags & EFI_HII_OUT_FLAG_WRAP) == EFI_HII_OUT_FLAG_WRAP && StringPtr[NextIndex] != 0 && !LineBreak) {
+    if ((Flags & EFI_HII_OUT_FLAG_WRAP) == EFI_HII_OUT_FLAG_WRAP && 
+        (RowInfo[RowIndex].LineWidth + BltX > Image->Width || StringPtr[NextIndex] != 0) && 
+        !LineBreak) {
       if ((Flags & EFI_HII_IGNORE_LINE_BREAK) == 0) {
         LineWidth = RowInfo[RowIndex].LineWidth;
         for (Index1 = RowInfo[RowIndex].EndIndex; Index1 >= RowInfo[RowIndex].StartIndex; Index1--) {
@@ -1986,8 +1989,26 @@ HiiStringToImage (
       // behave as if EFI_HII_OUT_FLAG_CLEAN_X is set.
       //
       if (!LineBreak) {
-        Flags &= (~ (EFI_HII_OUT_FLAGS) EFI_HII_OUT_FLAG_WRAP);
-        Flags |= EFI_HII_OUT_FLAG_CLIP_CLEAN_X;
+        LineWidth = RowInfo[RowIndex].LineWidth;
+        Index1    = RowInfo[RowIndex].EndIndex;
+        if (LineWidth + BltX > Image->Width) {
+          if (Index1 > RowInfo[RowIndex].StartIndex) {
+            //
+            // Don't draw the last char on this row. And, don't draw the second last char (AdvanceX - Width - OffsetX).
+            //
+            LineWidth -= (UINTN) (Cell[Index1].Width + Cell[Index1].OffsetX);
+            LineWidth -= (UINTN) (Cell[Index1 - 1].AdvanceX - Cell[Index1 - 1].Width - Cell[Index1 - 1].OffsetX);
+            RowInfo[RowIndex].EndIndex       = Index1 - 1;
+            RowInfo[RowIndex].LineWidth      = LineWidth;
+          } else {
+            //
+            // There is no enough column to draw any character, so set current line width to zero.
+            // And go to draw Next line if LineBreak is set.
+            //
+            RowInfo[RowIndex].LineWidth = 0;
+            goto NextLine;
+          }
+        }
       }
     }
     
@@ -2117,6 +2138,7 @@ HiiStringToImage (
       }
     }
 
+NextLine:
     //
     // Recalculate the start point of X/Y axis to draw multi-lines with the order of top-to-down
     //
