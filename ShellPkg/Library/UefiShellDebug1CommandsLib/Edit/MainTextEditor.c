@@ -88,7 +88,7 @@ MainCommandSaveFile (
   );
 
 /**
-  show help menu.
+  Show help information for the editor.
 
   @retval EFI_SUCCESS             The operation was successful.
 **/
@@ -1350,7 +1350,7 @@ MainCommandSaveFile (
 }
 
 /**
-  show help menu.
+  Show help information for the editor.
 
   @retval EFI_SUCCESS             The operation was successful.
 **/
@@ -1359,22 +1359,28 @@ MainCommandDisplayHelp (
   VOID
   )
 {
-  INTN     CurrentLine=0;
-  CHAR16 * InfoString;
-  EFI_INPUT_KEY  Key;
+  INT32           CurrentLine;
+  CHAR16          *InfoString;
+  EFI_INPUT_KEY   Key;
   
+  //
   // print helpInfo      
+  //
   for (CurrentLine = 0; 0 != MainMenuHelpInfo[CurrentLine]; CurrentLine++) {
     InfoString = HiiGetString(gShellDebug1HiiHandle, MainMenuHelpInfo[CurrentLine], NULL);
-    ShellPrintEx (0,CurrentLine+1,L"%E%s%N",InfoString);        
+    ShellPrintEx (0, CurrentLine+1, L"%E%s%N", InfoString);        
   }
   
+  //
   // scan for ctrl+w
+  //
   do {
     gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
   } while(SCAN_CONTROL_W != Key.UnicodeChar); 
 
+  //
   // update screen with file buffer's info
+  //
   FileBufferRestorePosition ();
   FileBufferNeedRefresh = TRUE;
   FileBufferOnlyLineNeedRefresh = FALSE;
