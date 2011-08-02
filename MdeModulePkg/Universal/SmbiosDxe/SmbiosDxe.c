@@ -933,7 +933,7 @@ SmbiosCreateTable (
     EntryPointStructure->MaxStructureSize = (UINT16) sizeof (EndStructure);
   }
 
-  if (EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength) > PreAllocatedPages) {
+  if ((UINTN) EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength) > PreAllocatedPages) {
     //
     // If new SMBIOS talbe size exceeds the original pre-allocated page, 
     // it is time to re-allocate memory (below 4GB).
