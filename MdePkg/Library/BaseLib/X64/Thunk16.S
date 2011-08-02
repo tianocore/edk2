@@ -125,7 +125,7 @@ L_2:
     .byte 0x66,0x2e,0x89,0x87           # mov cs:[bx + (L_64Eip - L_Base)], eax
     .word   L_64Eip - L_Base
     .byte 0x66,0xb8                     # mov eax, imm32
-L_SavedCr4:   .long  0
+L_SavedCr4: .space      4
     movq    %rax, %cr4
     #
     # rdi in the instruction below is indeed bx in 16-bit code
@@ -138,15 +138,15 @@ L_SavedCr4:   .long  0
     orb     $1,%ah
     wrmsr
     .byte 0x66,0xb8                     # mov eax, imm32
-L_SavedCr0:    .long      
+L_SavedCr0: .space      4
     movq    %rax, %cr0
     .byte 0x66,0xea                     # jmp far cs:L_64Bit
-L_64Eip:     .long       0
-L_SavedCs:     .space      2
-L_64BitCode: 
+L_64Eip:    .space      4
+L_SavedCs:  .space      2
+L_64BitCode:
     .byte   0x90
     .byte   0x67,0xbc                  # mov esp, imm32
-L_SavedSp:    .long                      # restore stack
+L_SavedSp:  .space      4              # restore stack
     nop
     ret
 
