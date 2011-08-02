@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -140,6 +140,14 @@ ReportStatusCodeLibExitBootServices (
   IN VOID             *Context
   )
 {
+  //
+  // If mReportStatusCode is NULL, then see if a Status Code Protocol instance is present
+  // in the handle database.
+  //
+  if (mReportStatusCode == NULL) {
+    mReportStatusCode = InternalGetReportStatusCode ();
+  }
+
   mHaveExitedBootServices = TRUE;
 }
 
