@@ -1,7 +1,7 @@
 /** @file
   API implementation for instance of Report Status Code Library.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -29,6 +29,8 @@
 
 EFI_STATUS_CODE_PROTOCOL  *mReportStatusCodeLibStatusCodeProtocol = NULL;
 EFI_EVENT                 mReportStatusCodeLibVirtualAddressChangeEvent;
+EFI_EVENT                 mReportStatusCodeLibExitBootServicesEvent;
+BOOLEAN                   mHaveExitedBootServices = FALSE;
 
 /**
   Locate the report status code service.
@@ -47,7 +49,7 @@ InternalGetReportStatusCode (
     return;
   }
   
-  if (EfiAtRuntime ()) {
+  if (mHaveExitedBootServices) {
     return;
   }
   
@@ -80,6 +82,28 @@ ReportStatusCodeLibVirtualAddressChange (
     return;
   }
   EfiConvertPointer (0, (VOID **) &mReportStatusCodeLibStatusCodeProtocol);
+}
+
+/**
+  Notification function of EVT_SIGNAL_EXIT_BOOT_SERVICES.
+
+  @param  Event        Event whose notification function is being invoked.
+  @param  Context      Pointer to the notification function's context
+
+**/
+VOID
+EFIAPI
+ReportStatusCodeLibExitBootServices (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+{
+  //
+  // Locate the report status code service before enter runtime.
+  // 
+  InternalGetReportStatusCode ();
+  
+  mHaveExitedBootServices = TRUE;
 }
 
 /**
@@ -121,6 +145,19 @@ ReportStatusCodeLibConstructor (
                   );
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Register notify function for EVT_SIGNAL_EXIT_BOOT_SERVICES
+  // 
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  ReportStatusCodeLibExitBootServices,
+                  NULL,
+                  &gEfiEventExitBootServicesGuid,
+                  &mReportStatusCodeLibExitBootServicesEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
   return EFI_SUCCESS;
 }
 
@@ -147,6 +184,9 @@ ReportStatusCodeLibDestructor (
 
   ASSERT (gBS != NULL);
   Status = gBS->CloseEvent (mReportStatusCodeLibVirtualAddressChangeEvent);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->CloseEvent (mReportStatusCodeLibExitBootServicesEvent);
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
@@ -586,7 +626,7 @@ ReportStatusCodeEx (
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
-  if (EfiAtRuntime ()) {
+  if (mHaveExitedBootServices) {
     if (sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize > EFI_STATUS_CODE_DATA_MAX_SIZE) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -634,7 +674,7 @@ ReportStatusCodeEx (
   //
   // Free the allocated buffer
   //
-  if (!EfiAtRuntime()) {
+  if (!mHaveExitedBootServices) {
     gBS->FreePool (StatusCodeData);
   }
 
