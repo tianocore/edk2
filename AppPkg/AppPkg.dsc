@@ -123,9 +123,9 @@
       gStdLibTokenSpaceGuid.WebServer_HttpPort|80
   }
 
-###################################################################################################
+##############################################################################
 #
-#       Include Boilerplate text required for building with the Standard Libraries.
+#  Include Boilerplate text required for building with the Standard Libraries.
 #
-###################################################################################################
+##############################################################################
 !include StdLib/StdLib.inc

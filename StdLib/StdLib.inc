@@ -63,8 +63,7 @@
   TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
 !else
-  # Running in an Emulation Environment.
-  # Adds this to the end of the current [LibraryClasses.Common.UEFI_APPLICATION] section.
+  # Use this instance if Running in an Emulation Environment.
 [LibraryClasses.Common.UEFI_APPLICATION]
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
 !endif
