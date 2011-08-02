@@ -21,7 +21,6 @@
 struct passwd *
 getpwuid (uid_t uid)
 {
-  uid;
   errno = EPERM;
   return NULL;
 }
@@ -35,7 +34,6 @@ char *getlogin (void)
 struct passwd *
 getpwnam (const char *name)
 {
-  name;
   errno = EPERM;
   return NULL;
 }

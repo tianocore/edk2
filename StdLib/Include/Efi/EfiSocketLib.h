@@ -112,13 +112,13 @@ typedef struct _DT_SERVICE DT_SERVICE;  ///<  Forward delcaration
 
 typedef
 EFI_STATUS
-(* PFN_SB_INITIALIZE) (
+(EFIAPI * PFN_SB_INITIALIZE) (
     DT_SERVICE * pService
     );
 
 typedef
 VOID
-(* PFN_SB_SHUTDOWN) (
+(EFIAPI * PFN_SB_SHUTDOWN) (
     DT_SERVICE * pService
     );
 
