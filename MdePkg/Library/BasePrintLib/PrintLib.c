@@ -1,7 +1,7 @@
 /** @file
   Base Print Library instance implementation.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -693,4 +693,52 @@ AsciiValueToString (
   )
 {
   return BasePrintLibConvertValueToString (Buffer, Flags, Value, Width, 1);
+}
+
+/**
+  Returns the number of characters that would be produced by if the formatted 
+  output were produced not including the Null-terminator.
+
+  If FormatString is NULL, then ASSERT().
+  If FormatString is not aligned on a 16-bit boundary, then ASSERT().
+
+  @param[in]  FormatString    A Null-terminated Unicode format string.
+  @param[in]  Marker          VA_LIST marker for the variable argument list.
+
+  @return The number of characters that would be produced, not including the 
+          Null-terminator.
+**/
+UINTN
+EFIAPI
+SPrintLength (
+  IN  CONST CHAR16   *FormatString,
+  IN  VA_LIST       Marker
+  )
+{
+  ASSERT(FormatString != NULL);
+  ASSERT_UNICODE_BUFFER (FormatString);
+  return BasePrintLibSPrintMarker (NULL, 0, FORMAT_UNICODE | OUTPUT_UNICODE | COUNT_ONLY_NO_PRINT, (CHAR8 *)FormatString, Marker, NULL);
+}
+
+/**
+  Returns the number of characters that would be produced by if the formatted 
+  output were produced not including the Null-terminator.
+
+  If FormatString is NULL, then ASSERT().
+
+  @param[in]  FormatString    A Null-terminated ASCII format string.
+  @param[in]  Marker          VA_LIST marker for the variable argument list.
+
+  @return The number of characters that would be produced, not including the 
+          Null-terminator.
+**/
+UINTN
+EFIAPI
+SPrintLengthAsciiFormat (
+  IN  CONST CHAR8   *FormatString,
+  IN  VA_LIST       Marker
+  )
+{
+  ASSERT(FormatString != NULL);
+  return BasePrintLibSPrintMarker (NULL, 0, OUTPUT_UNICODE | COUNT_ONLY_NO_PRINT, (CHAR8 *)FormatString, Marker, NULL);
 }

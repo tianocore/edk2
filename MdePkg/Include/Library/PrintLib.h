@@ -2,7 +2,7 @@
   Provides services to print a formatted string to a buffer. All combinations of
   Unicode and ASCII strings are supported.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -804,6 +804,45 @@ AsciiValueToString (
   IN  UINTN      Flags,
   IN  INT64      Value,
   IN  UINTN      Width
+  );
+
+/**
+  Returns the number of characters that would be produced by if the formatted 
+  output were produced not including the Null-terminator.
+
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
+
+  @param[in]  FormatString    A Null-terminated Unicode format string.
+  @param[in]  Marker          VA_LIST marker for the variable argument list.
+
+  @return The number of characters that would be produced, not including the 
+          Null-terminator.
+**/
+UINTN
+EFIAPI
+SPrintLength (
+  IN  CONST CHAR16   *FormatString,
+  IN  VA_LIST       Marker
+  );
+
+/**
+  Returns the number of characters that would be produced by if the formatted 
+  output were produced not including the Null-terminator.
+
+  If Format is NULL, then ASSERT().
+
+  @param[in]  FormatString    A Null-terminated ASCII format string.
+  @param[in]  Marker          VA_LIST marker for the variable argument list.
+
+  @return The number of characters that would be produced, not including the 
+          Null-terminator.
+**/
+UINTN
+EFIAPI
+SPrintLengthAsciiFormat (
+  IN  CONST CHAR8   *FormatString,
+  IN  VA_LIST       Marker
   );
 
 #endif

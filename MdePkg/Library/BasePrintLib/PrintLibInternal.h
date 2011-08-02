@@ -1,7 +1,7 @@
 /** @file
   Base Print Library instance Internal Functions definition.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -24,15 +24,16 @@
 //
 // Print primitives
 //
-#define PREFIX_SIGN       0x02
-#define PREFIX_BLANK      0x04
-#define LONG_TYPE         0x10
-#define OUTPUT_UNICODE    0x40
-#define FORMAT_UNICODE    0x100
-#define PAD_TO_WIDTH      0x200
-#define ARGUMENT_UNICODE  0x400
-#define PRECISION         0x800
-#define ARGUMENT_REVERSED 0x1000
+#define PREFIX_SIGN           BIT1
+#define PREFIX_BLANK          BIT2
+#define LONG_TYPE             BIT4
+#define OUTPUT_UNICODE        BIT6
+#define FORMAT_UNICODE        BIT8
+#define PAD_TO_WIDTH          BIT9
+#define ARGUMENT_UNICODE      BIT10
+#define PRECISION             BIT11
+#define ARGUMENT_REVERSED     BIT12
+#define COUNT_ONLY_NO_PRINT   BIT13
 
 //
 // Record date and time information
@@ -59,16 +60,24 @@ typedef struct {
   VA_LIST is used this routine allows the nesting of Vararg routines. Thus 
   this is the main print working routine.
 
-  @param  Buffer          The character buffer to print the results of the parsing
-                          of Format into.
-  @param  BufferSize      The maximum number of characters to put into buffer.
-  @param  Flags           Initial flags value.
-                          Can only have FORMAT_UNICODE and OUTPUT_UNICODE set.
-  @param  Format          A Null-terminated format string.
-  @param  VaListMarker    VA_LIST style variable argument list consumed by processing Format.
-  @param  BaseListMarker  BASE_LIST style variable argument list consumed by processing Format.
+  If COUNT_ONLY_NO_PRINT is set in Flags, Buffer will not be modified at all.
+
+  @param[out] Buffer          The character buffer to print the results of the 
+                              parsing of Format into.
+  @param[in]  BufferSize      The maximum number of characters to put into 
+                              buffer.
+  @param[in]  Flags           Initial flags value.
+                              Can only have FORMAT_UNICODE, OUTPUT_UNICODE, 
+                              and COUNT_ONLY_NO_PRINT set.
+  @param[in]  Format          A Null-terminated format string.
+  @param[in]  VaListMarker    VA_LIST style variable argument list consumed by
+                              processing Format.
+  @param[in]  BaseListMarker  BASE_LIST style variable argument list consumed
+                              by processing Format.
 
   @return The number of characters printed not including the Null-terminator.
+          If COUNT_ONLY_NO_PRINT was set returns the same, but without any
+          modification to Buffer.
 
 **/
 UINTN

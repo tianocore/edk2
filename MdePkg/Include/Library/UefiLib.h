@@ -12,7 +12,7 @@
   of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
   defined, then debug and assert related macros wrapped by it are the NULL implementations.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -1332,6 +1332,66 @@ EfiLibInstallAllDriverProtocols2 (
   IN CONST EFI_DRIVER_CONFIGURATION2_PROTOCOL *DriverConfiguration2, OPTIONAL
   IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics,    OPTIONAL
   IN CONST EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   *DriverDiagnostics2    OPTIONAL
+  );
+
+/** 
+  Appends a formatted Unicode string to a Null-terminated Unicode string
+ 
+  This function appends a formatted Unicode string to the Null-terminated 
+  Unicode string specified by String.   String is optional and may be NULL.
+  Storage for the formatted Unicode string returned is allocated using 
+  AllocatePool().  The pointer to the appended string is returned.  The caller
+  is responsible for freeing the returned string.
+ 
+  If String is not NULL and not aligned on a 16-bit boundary, then ASSERT().
+  If FormatString is NULL, then ASSERT().
+  If FormatString is not aligned on a 16-bit boundary, then ASSERT().
+ 
+  @param[in] String         A Null-terminated Unicode string.
+  @param[in] FormatString   A Null-terminated Unicode format string.
+  @param[in]  Marker        VA_LIST marker for the variable argument list.
+
+  @retval NULL    There was not enough available memory.
+  @return         Null-terminated Unicode string is that is the formatted 
+                  string appended to String.
+**/
+CHAR16*
+EFIAPI
+CatVSPrint (
+  IN  CHAR16  *String, OPTIONAL
+  IN  CONST CHAR16  *FormatString,
+  IN  VA_LIST       Marker
+  );
+
+/** 
+  Appends a formatted Unicode string to a Null-terminated Unicode string
+ 
+  This function appends a formatted Unicode string to the Null-terminated 
+  Unicode string specified by String.   String is optional and may be NULL.
+  Storage for the formatted Unicode string returned is allocated using 
+  AllocatePool().  The pointer to the appended string is returned.  The caller
+  is responsible for freeing the returned string.
+ 
+  If String is not NULL and not aligned on a 16-bit boundary, then ASSERT().
+  If FormatString is NULL, then ASSERT().
+  If FormatString is not aligned on a 16-bit boundary, then ASSERT().
+ 
+  @param[in] String         A Null-terminated Unicode string.
+  @param[in] FormatString   A Null-terminated Unicode format string.
+  @param[in] ...            The variable argument list whose contents are 
+                            accessed based on the format string specified by 
+                            FormatString.
+
+  @retval NULL    There was not enough available memory.
+  @return         Null-terminated Unicode string is that is the formatted 
+                  string appended to String.
+**/
+CHAR16 *
+EFIAPI
+CatSPrint (
+  IN  CHAR16  *String, OPTIONAL
+  IN  CONST CHAR16  *FormatString,
+  ...
   );
 
 #endif
