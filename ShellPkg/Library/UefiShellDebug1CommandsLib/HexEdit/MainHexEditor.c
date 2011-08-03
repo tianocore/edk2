@@ -1509,27 +1509,27 @@ MENU_ITEM_FUNCTION HexMainControlBasedMenuFunctions[] = {
   NULL,                      /* Ctrl - A */
   NULL,                      /* Ctrl - B */
   NULL,                      /* Ctrl - C */
-  NULL,                      /* Ctrl - D */
+  HMainCommandSelectEnd,     /* Ctrl - D */
   HMainCommandDisplayHelp,   /* Ctrl - E */
   NULL,                      /* Ctrl - F */
-  NULL,                      /* Ctrl - G */
+  HMainCommandGoToOffset,    /* Ctrl - G */
   NULL,                      /* Ctrl - H */
-  NULL,                      /* Ctrl - I */
+  HMainCommandOpenDisk,      /* Ctrl - I */
   NULL,                      /* Ctrl - J */
   NULL,                      /* Ctrl - K */
   NULL,                      /* Ctrl - L */
-  NULL,                      /* Ctrl - M */
+  HMainCommandOpenMemory,    /* Ctrl - M */
   NULL,                      /* Ctrl - N */
-  NULL,                      /* Ctrl - O */
+  HMainCommandOpenFile,      /* Ctrl - O */
   NULL,                      /* Ctrl - P */
-  NULL,                      /* Ctrl - Q */
+  HMainCommandExit,          /* Ctrl - Q */
   NULL,                      /* Ctrl - R */
-  NULL,                      /* Ctrl - S */
-  NULL,                      /* Ctrl - T */
+  HMainCommandSaveBuffer,    /* Ctrl - S */
+  HMainCommandSelectStart,   /* Ctrl - T */
   NULL,                      /* Ctrl - U */
-  NULL,                      /* Ctrl - V */
+  HMainCommandPaste,         /* Ctrl - V */
   NULL,                      /* Ctrl - W */
-  NULL,                      /* Ctrl - X */
+  HMainCommandCut,           /* Ctrl - X */
   NULL,                      /* Ctrl - Y */
   NULL,                      /* Ctrl - Z */
 };
