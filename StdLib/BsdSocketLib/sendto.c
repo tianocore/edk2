@@ -82,7 +82,7 @@ sendto (
                                           to,
                                           tolen,
                                           &errno );
-      if ( EFI_ERROR ( Status )) {
+      if ( EFI_ERROR ( Status ) && ( EFI_NOT_READY != Status )) {
         LengthInBytes = -1;
         break;
       }

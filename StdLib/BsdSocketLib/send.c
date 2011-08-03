@@ -44,54 +44,8 @@ send (
   int flags
   )
 {
-  ssize_t LengthInBytes;
-  CONST UINT8 * pData;
-  struct __filedes * pDescriptor;
-  EFI_SOCKET_PROTOCOL * pSocketProtocol;
-  EFI_STATUS Status;
-
   //
-  //  Assume failure
+  //  Send the data
   //
-  LengthInBytes = -1;
-
-  //
-  //  Locate the context for this socket
-  //
-  pSocketProtocol = BslFdToSocketProtocol ( s,
-                                            &pDescriptor,
-                                            &errno );
-  if ( NULL != pSocketProtocol ) {
-    //
-    //  Send the data using the socket
-    //
-    pData = buffer;
-    do {
-      errno = 0;
-      Status = pSocketProtocol->pfnSend ( pSocketProtocol,
-                                          flags,
-                                          length,
-                                          pData,
-                                          (size_t *)&LengthInBytes,
-                                          NULL,
-                                          0,
-                                          &errno );
-      if ( EFI_ERROR ( Status )) {
-        LengthInBytes = -1;
-        break;
-      }
-
-      //
-      //  Account for the data sent
-      //
-      pData += LengthInBytes;
-      length -= LengthInBytes;
-      // TODO: Add non-blocking check
-    } while (( 0 != length ) && ( EFI_NOT_READY == Status ));
-  }
-
-  //
-  //  Return the number of data bytes sent, -1 for errors
-  //
-  return (INT32)LengthInBytes;
+  return sendto ( s, buffer, length, flags, NULL, 0 );
 }
