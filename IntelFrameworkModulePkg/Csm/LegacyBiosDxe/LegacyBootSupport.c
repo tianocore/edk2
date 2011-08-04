@@ -136,6 +136,72 @@ PrintHddInfo (
 }
 
 /**
+  Print the PCI Interrupt Line and Interrupt Pin registers.
+**/
+VOID
+PrintPciInterruptRegister (
+  VOID
+  )
+{
+  EFI_STATUS                  Status;
+  UINTN                       Index;
+  EFI_HANDLE                  *Handles;
+  UINTN                       HandleNum;
+  EFI_PCI_IO_PROTOCOL         *PciIo;
+  UINT8                       Interrupt[2];
+  UINTN                       Segment;
+  UINTN                       Bus;
+  UINTN                       Device;
+  UINTN                       Function;
+
+  gBS->LocateHandleBuffer (
+         ByProtocol,
+         &gEfiPciIoProtocolGuid,
+         NULL,
+         &HandleNum,
+         &Handles
+         );
+
+  Bus      = 0;
+  Device   = 0;
+  Function = 0;
+
+  DEBUG ((EFI_D_INFO, "\n"));
+  DEBUG ((EFI_D_INFO, " bb/dd/ff interrupt line interrupt pin\n"));
+  DEBUG ((EFI_D_INFO, "======================================\n"));
+  for (Index = 0; Index < HandleNum; Index++) {
+    Status = gBS->HandleProtocol (Handles[Index], &gEfiPciIoProtocolGuid, (VOID **) &PciIo);
+    if (!EFI_ERROR (Status)) {
+      Status = PciIo->Pci.Read (
+                            PciIo,
+                            EfiPciIoWidthUint8,
+                            PCI_INT_LINE_OFFSET,
+                            2,
+                            Interrupt
+                            );
+    }
+    if (!EFI_ERROR (Status)) {
+      Status = PciIo->GetLocation (
+                        PciIo,
+                        &Segment,
+                        &Bus,
+                        &Device,
+                        &Function
+                        );
+    }
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_INFO, " %02x/%02x/%02x 0x%02x           0x%02x\n",
+              Bus, Device, Function, Interrupt[0], Interrupt[1]));
+    }
+  }
+  DEBUG ((EFI_D_INFO, "\n"));
+
+  if (Handles != NULL) {
+    FreePool (Handles);
+  }
+}
+
+/**
   Identify drive data must be updated to actual parameters before boot.
 
   @param  IdentifyDriveData       ATA Identify Data
@@ -1031,9 +1097,11 @@ GenericLegacyBoot (
     &LocalBbsTable
     );
 
-  PrintBbsTable (LocalBbsTable);
-  PrintHddInfo (LocalHddInfo);
-
+  DEBUG_CODE (
+    PrintPciInterruptRegister ();
+    PrintBbsTable (LocalBbsTable);
+    PrintHddInfo (LocalHddInfo);
+    );
   //
   // If drive wasn't spun up then BuildIdeData may have found new drives.
   // Need to update BBS boot priority.
