@@ -334,7 +334,7 @@ BasePrintLibSPrintMarker (
   UINT32            GuidData1;
   UINT16            GuidData2;
   UINT16            GuidData3;
-  UINT32            LengthToReturn;
+  UINTN             LengthToReturn;
 
   //
   // If you change this code be sure to match the 2 versions of this function.
