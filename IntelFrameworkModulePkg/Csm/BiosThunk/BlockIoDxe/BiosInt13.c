@@ -864,8 +864,13 @@ Edd11BiosReadBlocks (
     AddressPacket->Zero               = 0;
     AddressPacket->NumberOfBlocks     = (UINT8) NumberOfBlocks;
     AddressPacket->Zero2              = 0;
-    AddressPacket->SegOffset          = EFI_SEGMENT (TransferBuffer) << 16;
-    AddressPacket->SegOffset |= EFI_OFFSET (TransferBuffer);
+    //
+    // TransferBuffer has been 4KB alignment. Normalize TransferBuffer to make offset as 0 in seg:offset
+    // format to transfer maximum 127 blocks of data.
+    // Otherwise when offset adding data size exceeds 0xFFFF, if OpROM does not normalize TransferBuffer,
+    // INT13 function 42H will return data boundary error 09H.
+    //
+    AddressPacket->SegOffset = (UINT32) ((TransferBuffer >> 4) << 16);
     AddressPacket->Lba  = (UINT64) Lba;
 
     Regs.H.AH           = 0x42;
@@ -1012,8 +1017,13 @@ Edd11BiosWriteBlocks (
     AddressPacket->Zero               = 0;
     AddressPacket->NumberOfBlocks     = (UINT8) NumberOfBlocks;
     AddressPacket->Zero2              = 0;
-    AddressPacket->SegOffset          = EFI_SEGMENT (TransferBuffer) << 16;
-    AddressPacket->SegOffset |= EFI_OFFSET (TransferBuffer);
+    //
+    // TransferBuffer has been 4KB alignment. Normalize TransferBuffer to make offset as 0 in seg:offset
+    // format to transfer maximum 127 blocks of data.
+    // Otherwise when offset adding data size exceeds 0xFFFF, if OpROM does not normalize TransferBuffer,
+    // INT13 function 42H will return data boundary error 09H.
+    //
+    AddressPacket->SegOffset = (UINT32) ((TransferBuffer >> 4) << 16);
     AddressPacket->Lba  = (UINT64) Lba;
 
     Regs.H.AH           = 0x43;
