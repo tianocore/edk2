@@ -1,7 +1,7 @@
 /** @file
   PCI emumeration support functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "PciBus.h"
+
+extern CHAR16  *mBarTypeStr[];
 
 /**
   This routine is used to check whether the pci device is present.
@@ -211,6 +213,15 @@ PciSearchDevice (
 
   PciIoDevice = NULL;
 
+  DEBUG ((
+    EFI_D_INFO,
+    "PciBus: Discovered %s @ [%02x|%02x|%02x]\n",
+    IS_PCI_BRIDGE (Pci) ?     L"PPB" :
+    IS_CARDBUS_BRIDGE (Pci) ? L"P2C" :
+                              L"PCI",
+    Bus, Device, Func
+    ));
+
   if (!IS_PCI_BRIDGE (Pci)) {
 
     if (IS_CARDBUS_BRIDGE (Pci)) {
@@ -305,6 +316,46 @@ PciSearchDevice (
 }
 
 /**
+  Dump the PCI BAR information.
+
+  @param PciIoDevice     PCI IO instance.
+**/
+VOID
+DumpPciBars (
+  IN PCI_IO_DEVICE                    *PciIoDevice
+  )
+{
+  UINTN                               Index;
+
+  for (Index = 0; Index < PCI_MAX_BAR; Index++) {
+    if (PciIoDevice->PciBar[Index].BarType == PciBarTypeUnknown) {
+      continue;
+    }
+
+    DEBUG ((
+      EFI_D_INFO,
+      "   BAR[%d]: Type = %s; Alignment = 0x%x;\tLength = 0x%x;\tOffset = 0x%02x\n",
+      Index, mBarTypeStr[MIN (PciIoDevice->PciBar[Index].BarType, PciBarTypeMaxType)],
+      PciIoDevice->PciBar[Index].Alignment, PciIoDevice->PciBar[Index].Length, PciIoDevice->PciBar[Index].Offset
+      ));
+  }
+
+  for (Index = 0; Index < PCI_MAX_BAR; Index++) {
+    if ((PciIoDevice->VfPciBar[Index].BarType == PciBarTypeUnknown) && (PciIoDevice->VfPciBar[Index].Length == 0)) {
+      continue;
+    }
+
+    DEBUG ((
+      EFI_D_INFO,
+      " VFBAR[%d]: Type = %s; Alignment = 0x%x;\tLength = 0x%x;\tOffset = 0x%02x\n",
+      Index, mBarTypeStr[MIN (PciIoDevice->VfPciBar[Index].BarType, PciBarTypeMaxType)],
+      PciIoDevice->VfPciBar[Index].Alignment, PciIoDevice->VfPciBar[Index].Length, PciIoDevice->VfPciBar[Index].Offset
+      ));
+  }
+  DEBUG ((EFI_D_INFO, "\n"));
+}
+
+/**
   Create PCI device instance for PCI device.
 
   @param Bridge   Parent bridge instance.
@@ -377,6 +428,8 @@ GatherDeviceInfo (
       Offset = PciIovParseVfBar (PciIoDevice, Offset, BarIndex);
     }
   }
+
+  DEBUG_CODE (DumpPciBars (PciIoDevice););
   return PciIoDevice;
 }
 
@@ -529,6 +582,8 @@ GatherPpbInfo (
 
   GetResourcePaddingPpb (PciIoDevice);
 
+  DEBUG_CODE (DumpPciBars (PciIoDevice););
+
   return PciIoDevice;
 }
 
@@ -597,6 +652,8 @@ GatherP2CInfo (
   PciIoDevice->Decodes = EFI_BRIDGE_MEM32_DECODE_SUPPORTED  |
                          EFI_BRIDGE_PMEM32_DECODE_SUPPORTED |
                          EFI_BRIDGE_IO32_DECODE_SUPPORTED;
+
+  DEBUG_CODE (DumpPciBars (PciIoDevice););
 
   return PciIoDevice;
 }
@@ -2035,22 +2092,15 @@ CreatePciIoDevice (
                               );
           DEBUG ((
             EFI_D_INFO,
-            "PCI B%x.D%x.F%x - ARI forwarding enabled\n",
-            (UINTN)Bridge->BusNumber,
-            (UINTN)Bridge->DeviceNumber,
-            (UINTN)Bridge->FunctionNumber
+            " ARI: forwarding enabled for PPB[%02x:%02x:%02x]\n",
+            Bridge->BusNumber,
+            Bridge->DeviceNumber,
+            Bridge->FunctionNumber
             ));
         }
       }
 
-      DEBUG ((
-        EFI_D_INFO,
-        "PCI ARI B%x.D%x.F%x - ARI Cap offset - 0x%x\n",
-        (UINTN)Bus,
-        (UINTN)Device,
-        (UINTN)Func,
-        (UINTN)PciIoDevice->AriCapabilityOffset
-        ));
+      DEBUG ((EFI_D_INFO, " ARI: CapOffset = 0x%x\n", PciIoDevice->AriCapabilityOffset));
     }
   }
 
@@ -2066,6 +2116,7 @@ CreatePciIoDevice (
                NULL
                );
     if (!EFI_ERROR (Status)) {
+      UINT32    SupportedPageSize;
       UINT16    VFStride;
       UINT16    FirstVFOffset;
       UINT16    Data16;
@@ -2102,18 +2153,9 @@ CreatePciIoDevice (
                    EfiPciIoWidthUint32,
                    PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_SUPPORTED_PAGE_SIZE,
                    1,
-                   &PciIoDevice->SystemPageSize
+                   &SupportedPageSize
                    );
-      DEBUG ((
-        EFI_D_INFO,
-        "PCI SR-IOV B%x.D%x.F%x - SupportedPageSize - 0x%x\n",
-        (UINTN)Bus,
-        (UINTN)Device,
-        (UINTN)Func,
-        PciIoDevice->SystemPageSize
-        ));
-
-      PciIoDevice->SystemPageSize = (PcdGet32 (PcdSrIovSystemPageSize) & PciIoDevice->SystemPageSize);
+      PciIoDevice->SystemPageSize = (PcdGet32 (PcdSrIovSystemPageSize) & SupportedPageSize);
       ASSERT (PciIoDevice->SystemPageSize != 0);
 
       PciIo->Pci.Write (
@@ -2123,14 +2165,6 @@ CreatePciIoDevice (
                    1,
                    &PciIoDevice->SystemPageSize
                    );
-      DEBUG ((
-        EFI_D_INFO,
-        "PCI SR-IOV B%x.D%x.F%x - SystemPageSize - 0x%x\n",
-        (UINTN)Bus,
-        (UINTN)Device,
-        (UINTN)Func,
-        PciIoDevice->SystemPageSize
-        ));
       //
       // Adjust SystemPageSize for Alignment usage later
       //
@@ -2150,15 +2184,6 @@ CreatePciIoDevice (
                    1,
                    &FirstVFOffset
                    );
-      DEBUG ((
-        EFI_D_INFO,
-        "PCI SR-IOV B%x.D%x.F%x - FirstVFOffset - 0x%x\n",
-        (UINTN)Bus,
-        (UINTN)Device,
-        (UINTN)Func,
-        (UINTN)FirstVFOffset
-        ));
-
       PciIo->Pci.Read (
                    PciIo,
                    EfiPciIoWidthUint16,
@@ -2166,15 +2191,6 @@ CreatePciIoDevice (
                    1,
                    &PciIoDevice->InitialVFs
                    );
-      DEBUG ((
-        EFI_D_INFO,
-        "PCI SR-IOV B%x.D%x.F%x - InitialVFs - 0x%x\n",
-        (UINTN)Bus,
-        (UINTN)Device,
-        (UINTN)Func,
-        (UINTN)PciIoDevice->InitialVFs
-        ));
-
       PciIo->Pci.Read (
                    PciIo,
                    EfiPciIoWidthUint16,
@@ -2182,15 +2198,6 @@ CreatePciIoDevice (
                    1,
                    &VFStride
                    );
-      DEBUG ((
-        EFI_D_INFO,
-        "PCI SR-IOV B%x.D%x.F%x - VFStride - 0x%x\n",
-        (UINTN)Bus,
-        (UINTN)Device,
-        (UINTN)Func,
-        (UINTN)VFStride
-        ));
-
       //
       // Calculate LastVF
       //
@@ -2201,22 +2208,16 @@ CreatePciIoDevice (
       // Calculate ReservedBusNum for this PF
       //
       PciIoDevice->ReservedBusNum = (UINT16)(EFI_PCI_BUS_OF_RID (LastVF) - Bus + 1);
-      DEBUG ((
-        EFI_D_INFO,
-        "PCI SR-IOV B%x.D%x.F%x - reserved bus number - 0x%x\n",
-        (UINTN)Bus,
-        (UINTN)Device,
-        (UINTN)Func,
-        (UINTN)PciIoDevice->ReservedBusNum
-        ));
 
       DEBUG ((
         EFI_D_INFO,
-        "PCI SR-IOV B%x.D%x.F%x - SRIOV Cap offset - 0x%x\n",
-        (UINTN)Bus,
-        (UINTN)Device,
-        (UINTN)Func,
-        (UINTN)PciIoDevice->SrIovCapabilityOffset
+        " SR-IOV: SupportedPageSize = 0x%x; SystemPageSize = 0x%x; FirstVFOffset = 0x%x;\n",
+        SupportedPageSize, PciIoDevice->SystemPageSize >> 12, FirstVFOffset
+        ));
+      DEBUG ((
+        EFI_D_INFO,
+        "         InitialVFs = 0x%x; ReservedBusNum = 0x%x; CapOffset = 0x%x\n",
+        PciIoDevice->InitialVFs, PciIoDevice->ReservedBusNum, PciIoDevice->SrIovCapabilityOffset
         ));
     }
   }
@@ -2229,14 +2230,7 @@ CreatePciIoDevice (
                NULL
                );
     if (!EFI_ERROR (Status)) {
-      DEBUG ((
-        EFI_D_INFO,
-        "PCI MR-IOV B%x.D%x.F%x - MRIOV Cap offset - 0x%x\n",
-        (UINTN)Bus,
-        (UINTN)Device,
-        (UINTN)Func,
-        (UINTN)PciIoDevice->MrIovCapabilityOffset
-        ));
+      DEBUG ((EFI_D_INFO, " MR-IOV: CapOffset = 0x%x\n", PciIoDevice->MrIovCapabilityOffset));
     }
   }
 

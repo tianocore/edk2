@@ -1,7 +1,7 @@
 /** @file
   Internal library implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PciBus.h"
 
+GLOBAL_REMOVE_IF_UNREFERENCED
+CHAR16 *mBarTypeStr[] = {
+  L"Unknow",
+  L"  Io16",
+  L"  Io32",
+  L" Mem32",
+  L"PMem32",
+  L" Mem64",
+  L"PMem64",
+  L"    Io",
+  L"   Mem",
+  L"Unknow"
+  };
 
 /**
   Retrieve the PCI Card device BAR information via PciIo interface.
@@ -154,6 +167,200 @@ RemoveRejectedPciDevices (
 }
 
 /**
+  Dump the resourc map of the bridge device.
+
+  @param[in] BridgeResource   Resource descriptor of the bridge device.
+**/
+VOID
+DumpBridgeResource (
+  IN PCI_RESOURCE_NODE     *BridgeResource
+  )
+{
+  LIST_ENTRY               *Link;
+  PCI_RESOURCE_NODE        *Resource;
+  PCI_BAR                  *Bar;
+
+  if ((BridgeResource != NULL) && (BridgeResource->Length != 0)) {
+    DEBUG ((
+      EFI_D_INFO, "Type = %s; Base = 0x%x;\tLength = 0x%x;\tAlignment = 0x%x\n",
+      mBarTypeStr[MIN (BridgeResource->ResType, PciBarTypeMaxType)],
+      BridgeResource->PciDev->PciBar[BridgeResource->Bar].BaseAddress,
+      BridgeResource->Length, BridgeResource->Alignment
+      ));
+    for ( Link = BridgeResource->ChildList.ForwardLink
+        ; Link != &BridgeResource->ChildList
+        ; Link = Link->ForwardLink
+        ) {
+      Resource = RESOURCE_NODE_FROM_LINK (Link);
+      if (Resource->ResourceUsage == PciResUsageTypical) {
+        Bar = Resource->Virtual ? Resource->PciDev->VfPciBar : Resource->PciDev->PciBar;
+        DEBUG ((
+          EFI_D_INFO, " Base = 0x%x;\tLength = 0x%x;\tAlignment = 0x%x;\tOwner = %s ",
+          Bar[Resource->Bar].BaseAddress, Resource->Length, Resource->Alignment,
+          IS_PCI_BRIDGE (&Resource->PciDev->Pci)     ? L"PPB" :
+          IS_CARDBUS_BRIDGE (&Resource->PciDev->Pci) ? L"P2C" :
+                                                       L"PCI"
+          ));
+
+        if ((!IS_PCI_BRIDGE (&Resource->PciDev->Pci) && !IS_CARDBUS_BRIDGE (&Resource->PciDev->Pci)) ||
+            (IS_PCI_BRIDGE (&Resource->PciDev->Pci) && (Resource->Bar < PPB_IO_RANGE)) ||
+            (IS_CARDBUS_BRIDGE (&Resource->PciDev->Pci) && (Resource->Bar < P2C_MEM_1))
+            ) {
+          //
+          // The resource requirement comes from the device itself.
+          //
+          DEBUG ((
+            EFI_D_INFO, " [%02x|%02x|%02x:%02x]\n",
+            Resource->PciDev->BusNumber, Resource->PciDev->DeviceNumber,
+            Resource->PciDev->FunctionNumber, Bar[Resource->Bar].Offset
+            ));
+        } else {
+          //
+          // The resource requirement comes from the subordinate devices.
+          //
+          DEBUG ((
+            EFI_D_INFO, " [%02x|%02x|%02x:**]\n",
+            Resource->PciDev->BusNumber, Resource->PciDev->DeviceNumber,
+            Resource->PciDev->FunctionNumber
+            ));
+        }
+      } else {
+        DEBUG ((EFI_D_INFO, " Padding:Length = 0x%x;\tAlignment = 0x%x\n", Resource->Length, Resource->Alignment));
+      }
+    }
+  }
+}
+
+/**
+  Find the corresponding resource node for the Device in child list of BridgeResource.
+  
+  @param[in] Device         Pointer to PCI_IO_DEVICE.
+  @param[in] BridgeResource Pointer to PCI_RESOURCE_NODE.
+  
+  @return !NULL  The corresponding resource node for the Device.
+  @return NULL   No corresponding resource node for the Device.
+**/
+PCI_RESOURCE_NODE *
+FindResourceNode (
+  IN PCI_IO_DEVICE     *Device,
+  IN PCI_RESOURCE_NODE *BridgeResource
+  )
+{
+  LIST_ENTRY               *Link;
+  PCI_RESOURCE_NODE        *Resource;
+
+  for ( Link = BridgeResource->ChildList.ForwardLink
+      ; Link != &BridgeResource->ChildList
+      ; Link = Link->ForwardLink
+      ) {
+    Resource = RESOURCE_NODE_FROM_LINK (Link);
+    if (Resource->PciDev == Device) {
+      return Resource;
+    }
+  }
+
+  return NULL;
+}
+
+/**
+  Dump the resource map of all the devices under Bridge.
+  
+  @param[in] Bridge     Bridge device instance.
+  @param[in] IoNode     IO resource descriptor for the bridge device.
+  @param[in] Mem32Node  Mem32 resource descriptor for the bridge device.
+  @param[in] PMem32Node PMem32 resource descriptor for the bridge device.
+  @param[in] Mem64Node  Mem64 resource descriptor for the bridge device.
+  @param[in] PMem64Node PMem64 resource descriptor for the bridge device.
+**/
+VOID
+DumpResourceMap (
+  IN PCI_IO_DEVICE     *Bridge,
+  IN PCI_RESOURCE_NODE *IoNode,
+  IN PCI_RESOURCE_NODE *Mem32Node,
+  IN PCI_RESOURCE_NODE *PMem32Node,
+  IN PCI_RESOURCE_NODE *Mem64Node,
+  IN PCI_RESOURCE_NODE *PMem64Node
+  )
+{
+  EFI_STATUS                       Status;
+  LIST_ENTRY                       *Link;
+  PCI_IO_DEVICE                    *Device;
+  PCI_RESOURCE_NODE                *ChildIoNode;
+  PCI_RESOURCE_NODE                *ChildMem32Node;
+  PCI_RESOURCE_NODE                *ChildPMem32Node;
+  PCI_RESOURCE_NODE                *ChildMem64Node;
+  PCI_RESOURCE_NODE                *ChildPMem64Node;
+  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *ToText;
+  CHAR16                           *Str;
+
+  DEBUG ((EFI_D_INFO, "PciBus: Resource Map for "));
+
+  Status = gBS->OpenProtocol (
+                  Bridge->Handle,
+                  &gEfiPciRootBridgeIoProtocolGuid,
+                  NULL,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      EFI_D_INFO, "Bridge [%02x|%02x|%02x]\n",
+      Bridge->BusNumber, Bridge->DeviceNumber, Bridge->FunctionNumber
+      ));
+  } else {
+    Status = gBS->LocateProtocol (
+                    &gEfiDevicePathToTextProtocolGuid,
+                    NULL,
+                    (VOID **) &ToText
+                    );
+    Str = NULL;
+    if (!EFI_ERROR (Status)) {
+      Str = ToText->ConvertDevicePathToText (
+                      DevicePathFromHandle (Bridge->Handle),
+                      FALSE,
+                      FALSE
+                      );
+    }
+    DEBUG ((EFI_D_INFO, "Root Bridge %s\n", Str != NULL ? Str : L""));
+    if (Str != NULL) {
+      FreePool (Str);
+    }
+  }
+
+  DumpBridgeResource (IoNode);
+  DumpBridgeResource (Mem32Node);
+  DumpBridgeResource (PMem32Node);
+  DumpBridgeResource (Mem64Node);
+  DumpBridgeResource (PMem64Node);
+  DEBUG ((EFI_D_INFO, "\n"));
+
+  for ( Link = Bridge->ChildList.ForwardLink
+      ; Link != &Bridge->ChildList
+      ; Link = Link->ForwardLink
+      ) {
+    Device = PCI_IO_DEVICE_FROM_LINK (Link);
+    if (IS_PCI_BRIDGE (&Device->Pci)) {
+
+      ChildIoNode     = (IoNode     == NULL ? NULL : FindResourceNode (Device, IoNode));
+      ChildMem32Node  = (Mem32Node  == NULL ? NULL : FindResourceNode (Device, Mem32Node));
+      ChildPMem32Node = (PMem32Node == NULL ? NULL : FindResourceNode (Device, PMem32Node));
+      ChildMem64Node  = (Mem64Node  == NULL ? NULL : FindResourceNode (Device, Mem64Node));
+      ChildPMem64Node = (PMem64Node == NULL ? NULL : FindResourceNode (Device, PMem64Node));
+
+      DumpResourceMap (
+        Device,
+        ChildIoNode,
+        ChildMem32Node,
+        ChildPMem32Node,
+        ChildMem64Node,
+        ChildPMem64Node
+        );
+    }
+  }
+}
+
+/**
   Submits the I/O and memory resource requirements for the specified PCI Host Bridge.
 
   @param PciResAlloc  Point to protocol instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
@@ -244,7 +451,7 @@ PciHostBridgeResourceAllocator (
                    RootBridgeDev,
                    0,
                    FeaturePcdGet (PcdPciBridgeIoAlignmentProbe) ? 0x1FF: 0xFFF,
-                   0,
+                   RB_IO_RANGE,
                    PciBarTypeIo16,
                    PciResUsageTypical
                    );
@@ -253,7 +460,7 @@ PciHostBridgeResourceAllocator (
                       RootBridgeDev,
                       0,
                       0xFFFFF,
-                      0,
+                      RB_MEM32_RANGE,
                       PciBarTypeMem32,
                       PciResUsageTypical
                       );
@@ -262,7 +469,7 @@ PciHostBridgeResourceAllocator (
                        RootBridgeDev,
                        0,
                        0xFFFFF,
-                       0,
+                       RB_PMEM32_RANGE,
                        PciBarTypePMem32,
                        PciResUsageTypical
                        );
@@ -271,7 +478,7 @@ PciHostBridgeResourceAllocator (
                       RootBridgeDev,
                       0,
                       0xFFFFF,
-                      0,
+                      RB_MEM64_RANGE,
                       PciBarTypeMem64,
                       PciResUsageTypical
                       );
@@ -280,7 +487,7 @@ PciHostBridgeResourceAllocator (
                        RootBridgeDev,
                        0,
                        0xFFFFF,
-                       0,
+                       RB_PMEM64_RANGE,
                        PciBarTypePMem64,
                        PciResUsageTypical
                        );
@@ -597,19 +804,11 @@ PciHostBridgeResourceAllocator (
     // Create the entire system resource map from the information collected by
     // enumerator. Several resource tree was created
     //
-    GetResourceMap (
-      RootBridgeDev,
-      &IoBridge,
-      &Mem32Bridge,
-      &PMem32Bridge,
-      &Mem64Bridge,
-      &PMem64Bridge,
-      &IoPool,
-      &Mem32Pool,
-      &PMem32Pool,
-      &Mem64Pool,
-      &PMem64Pool
-      );
+    IoBridge     = FindResourceNode (RootBridgeDev, &IoPool);
+    Mem32Bridge  = FindResourceNode (RootBridgeDev, &Mem32Pool);
+    PMem32Bridge = FindResourceNode (RootBridgeDev, &PMem32Pool);
+    Mem64Bridge  = FindResourceNode (RootBridgeDev, &Mem64Pool);
+    PMem64Bridge = FindResourceNode (RootBridgeDev, &PMem64Pool);
 
     //
     // Program IO resources
@@ -650,6 +849,26 @@ PciHostBridgeResourceAllocator (
       PMem64Base,
       PMem64Bridge
       );
+
+    IoBridge    ->PciDev->PciBar[IoBridge    ->Bar].BaseAddress = IoBase;
+    Mem32Bridge ->PciDev->PciBar[Mem32Bridge ->Bar].BaseAddress = Mem32Base;
+    PMem32Bridge->PciDev->PciBar[PMem32Bridge->Bar].BaseAddress = PMem32Base;
+    Mem64Bridge ->PciDev->PciBar[Mem64Bridge ->Bar].BaseAddress = Mem64Base;
+    PMem64Bridge->PciDev->PciBar[PMem64Bridge->Bar].BaseAddress = PMem64Base;
+
+    //
+    // Dump the resource map for current root bridge
+    //
+    DEBUG_CODE (
+      DumpResourceMap (
+        RootBridgeDev,
+        IoBridge,
+        Mem32Bridge,
+        PMem32Bridge,
+        Mem64Bridge,
+        PMem64Bridge
+        );
+    );
 
     FreePool (AcpiConfig);
   }
@@ -740,8 +959,6 @@ PciScanBus (
       if (EFI_ERROR (Status)) {
         continue;
       }
-
-      DEBUG((EFI_D_INFO, "Found DEV(%02d,%02d,%02d)\n", StartBusNumber, Device, Func ));
 
       //
       // Get the PCI device information
@@ -930,7 +1147,6 @@ PciScanBus (
             EfiPciBeforeChildBusEnumeration
             );
 
-          DEBUG((EFI_D_INFO, "Scan  PPB(%02d,%02d,%02d)\n", PciDevice->BusNumber, PciDevice->DeviceNumber,PciDevice->FunctionNumber));
           Status = PciScanBus (
                     PciDevice,
                     (UINT8) (SecondBus),

@@ -1,7 +1,7 @@
 /** @file
   Header files and data structures needed by PCI Bus module.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -32,6 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/IncompatiblePciDeviceSupport.h>
 #include <Protocol/PciOverride.h>
 #include <Protocol/PciEnumerationComplete.h>
+#include <Protocol/DevicePathToText.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -126,6 +127,12 @@ struct _PCI_BAR {
 
 #define PCI_CARD_PREFETCHABLE_MEMORY_0_ENABLE BIT8
 #define PCI_CARD_PREFETCHABLE_MEMORY_1_ENABLE BIT9
+
+#define RB_IO_RANGE                           1
+#define RB_MEM32_RANGE                        2
+#define RB_PMEM32_RANGE                       3
+#define RB_MEM64_RANGE                        4
+#define RB_PMEM64_RANGE                       5
 
 #define PPB_BAR_0                             0
 #define PPB_BAR_1                             1

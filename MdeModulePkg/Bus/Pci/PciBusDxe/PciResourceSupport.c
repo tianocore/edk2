@@ -1,7 +1,7 @@
 /** @file
   PCI resouces support functions implemntation for PCI Bus module.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -724,17 +724,6 @@ CreateVfResourceNode (
 {
   PCI_RESOURCE_NODE *Node;
 
-  DEBUG ((
-    EFI_D_INFO,
-    "PCI-IOV B%x.D%x.F%x - VfResource (Bar - 0x%x) (Type - 0x%x) (Length - 0x%x)\n",
-    (UINTN)PciDev->BusNumber,
-    (UINTN)PciDev->DeviceNumber,
-    (UINTN)PciDev->FunctionNumber,
-    (UINTN)Bar,
-    (UINTN)ResType,
-    (UINTN)Length
-    ));
-
   Node = CreateResourceNode (PciDev, Length, Alignment, Bar, ResType, ResUsage);
   if (Node == NULL) {
     return Node;
@@ -1403,17 +1392,6 @@ ProgramVfBar (
                 );
 
     Node->PciDev->VfPciBar[Node->Bar].BaseAddress = Address;
-
-    DEBUG ((
-      EFI_D_INFO,
-      "PCI-IOV B%x.D%x.F%x - VF Bar (Offset - 0x%x) 32Mem (Address - 0x%x)\n",
-      (UINTN)Node->PciDev->BusNumber,
-      (UINTN)Node->PciDev->DeviceNumber,
-      (UINTN)Node->PciDev->FunctionNumber,
-      (UINTN)(Node->PciDev->VfPciBar[Node->Bar]).Offset,
-      (UINTN)Address
-      ));
-
     break;
 
   case PciBarTypeMem64:
@@ -1440,17 +1418,6 @@ ProgramVfBar (
                 );
 
     Node->PciDev->VfPciBar[Node->Bar].BaseAddress = Address;
-
-    DEBUG ((
-      EFI_D_INFO,
-      "PCI-IOV B%x.D%x.F%x - VF Bar (Offset - 0x%x) 64Mem (Address - 0x%lx)\n",
-      (UINTN)Node->PciDev->BusNumber,
-      (UINTN)Node->PciDev->DeviceNumber,
-      (UINTN)Node->PciDev->FunctionNumber,
-      (UINTN)(Node->PciDev->VfPciBar[Node->Bar]).Offset,
-      (UINT64)Address
-      ));
-
     break;
 
   case PciBarTypeIo16:
@@ -1725,123 +1692,6 @@ InitializeResourcePool (
   ResourcePool->ResType   = ResourceType;
   ResourcePool->Signature = PCI_RESOURCE_SIGNATURE;
   InitializeListHead (&ResourcePool->ChildList);
-}
-
-
-/**
-  Get all resource information for given Pci device.
-
-  @param PciDev         Pci device instance.
-  @param IoBridge       Io resource node.
-  @param Mem32Bridge    32-bit memory node.
-  @param PMem32Bridge   32-bit Pmemory node.
-  @param Mem64Bridge    64-bit memory node.
-  @param PMem64Bridge   64-bit PMemory node.
-  @param IoPool         Link list header for Io resource.
-  @param Mem32Pool      Link list header for 32-bit memory.
-  @param PMem32Pool     Link list header for 32-bit Prefetchable memory.
-  @param Mem64Pool      Link list header for 64-bit memory.
-  @param PMem64Pool     Link list header for 64-bit Prefetchable memory.
-
-**/
-VOID
-GetResourceMap (
-  IN PCI_IO_DEVICE      *PciDev,
-  IN PCI_RESOURCE_NODE  **IoBridge,
-  IN PCI_RESOURCE_NODE  **Mem32Bridge,
-  IN PCI_RESOURCE_NODE  **PMem32Bridge,
-  IN PCI_RESOURCE_NODE  **Mem64Bridge,
-  IN PCI_RESOURCE_NODE  **PMem64Bridge,
-  IN PCI_RESOURCE_NODE  *IoPool,
-  IN PCI_RESOURCE_NODE  *Mem32Pool,
-  IN PCI_RESOURCE_NODE  *PMem32Pool,
-  IN PCI_RESOURCE_NODE  *Mem64Pool,
-  IN PCI_RESOURCE_NODE  *PMem64Pool
-  )
-{
-
-  PCI_RESOURCE_NODE *Temp;
-  LIST_ENTRY        *CurrentLink;
-
-  CurrentLink = IoPool->ChildList.ForwardLink;
-
-  //
-  // Get Io resource map
-  //
-  while (CurrentLink != &IoPool->ChildList) {
-
-    Temp = RESOURCE_NODE_FROM_LINK (CurrentLink);
-
-    if (Temp->PciDev == PciDev) {
-      *IoBridge = Temp;
-    }
-
-    CurrentLink = CurrentLink->ForwardLink;
-  }
-
-  //
-  // Get Mem32 resource map
-  //
-  CurrentLink = Mem32Pool->ChildList.ForwardLink;
-
-  while (CurrentLink != &Mem32Pool->ChildList) {
-
-    Temp = RESOURCE_NODE_FROM_LINK (CurrentLink);
-
-    if (Temp->PciDev == PciDev) {
-      *Mem32Bridge = Temp;
-    }
-
-    CurrentLink = CurrentLink->ForwardLink;
-  }
-
-  //
-  // Get Pmem32 resource map
-  //
-  CurrentLink = PMem32Pool->ChildList.ForwardLink;
-
-  while (CurrentLink != &PMem32Pool->ChildList) {
-
-    Temp = RESOURCE_NODE_FROM_LINK (CurrentLink);
-
-    if (Temp->PciDev == PciDev) {
-      *PMem32Bridge = Temp;
-    }
-
-    CurrentLink = CurrentLink->ForwardLink;
-  }
-
-  //
-  // Get Mem64 resource map
-  //
-  CurrentLink = Mem64Pool->ChildList.ForwardLink;
-
-  while (CurrentLink != &Mem64Pool->ChildList) {
-
-    Temp = RESOURCE_NODE_FROM_LINK (CurrentLink);
-
-    if (Temp->PciDev == PciDev) {
-      *Mem64Bridge = Temp;
-    }
-
-    CurrentLink = CurrentLink->ForwardLink;
-  }
-
-  //
-  // Get Pmem64 resource map
-  //
-  CurrentLink = PMem64Pool->ChildList.ForwardLink;
-
-  while (CurrentLink != &PMem64Pool->ChildList) {
-
-    Temp = RESOURCE_NODE_FROM_LINK (CurrentLink);
-
-    if (Temp->PciDev == PciDev) {
-      *PMem64Bridge = Temp;
-    }
-
-    CurrentLink = CurrentLink->ForwardLink;
-  }
 }
 
 /**

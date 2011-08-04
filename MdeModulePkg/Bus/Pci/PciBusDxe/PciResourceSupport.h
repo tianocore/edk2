@@ -1,7 +1,7 @@
 /** @file
   PCI resouces support functions declaration for PCI Bus module.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,9 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _EFI_PCI_RESOURCE_SUPPORT_H_
 
 typedef enum {
-  PciResUsageTypical            = 0,
-  PciResUsagePadding,
-  PciResUsageOptionRomProcessing
+  PciResUsageTypical,
+  PciResUsagePadding
 } PCI_RESOURCE_USAGE;
 
 #define PCI_RESOURCE_SIGNATURE  SIGNATURE_32 ('p', 'c', 'r', 'c')
@@ -380,37 +379,6 @@ VOID
 InitializeResourcePool (
   IN OUT PCI_RESOURCE_NODE   *ResourcePool,
   IN     PCI_BAR_TYPE        ResourceType
-  );
-
-/**
-  Get all resource information for given Pci device.
-
-  @param PciDev         Pci device instance.
-  @param IoBridge       Io resource node.
-  @param Mem32Bridge    32-bit memory node.
-  @param PMem32Bridge   32-bit Pmemory node.
-  @param Mem64Bridge    64-bit memory node.
-  @param PMem64Bridge   64-bit PMemory node.
-  @param IoPool         Link list header for Io resource.
-  @param Mem32Pool      Link list header for 32-bit memory.
-  @param PMem32Pool     Link list header for 32-bit Prefetchable memory.
-  @param Mem64Pool      Link list header for 64-bit memory.
-  @param PMem64Pool     Link list header for 64-bit Prefetchable memory.
-
-**/
-VOID
-GetResourceMap (
-  IN PCI_IO_DEVICE      *PciDev,
-  IN PCI_RESOURCE_NODE  **IoBridge,
-  IN PCI_RESOURCE_NODE  **Mem32Bridge,
-  IN PCI_RESOURCE_NODE  **PMem32Bridge,
-  IN PCI_RESOURCE_NODE  **Mem64Bridge,
-  IN PCI_RESOURCE_NODE  **PMem64Bridge,
-  IN PCI_RESOURCE_NODE  *IoPool,
-  IN PCI_RESOURCE_NODE  *Mem32Pool,
-  IN PCI_RESOURCE_NODE  *PMem32Pool,
-  IN PCI_RESOURCE_NODE  *Mem64Pool,
-  IN PCI_RESOURCE_NODE  *PMem64Pool
   );
 
 /**
