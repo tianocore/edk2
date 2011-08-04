@@ -1,6 +1,13 @@
-/*  $NetBSD: float_ieee754.h,v 1.8 2005/12/11 12:25:20 christos Exp $ */
+/** @file
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available under
+    the terms and conditions of the BSD License that accompanies this distribution.
+    The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
 
-/*
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1992, 1993
  *  The Regents of the University of California.  All rights reserved.
  *
@@ -29,12 +36,11 @@
  * SUCH DAMAGE.
  *
  *  @(#)float.h 8.1 (Berkeley) 6/10/93
- */
+    NetBSD: float_ieee754.h,v 1.8 2005/12/11 12:25:20 christos Exp
 
-/*
  * NOTICE: This is not a standalone file.  To use it, #include it in
  * your port's float.h header.
- */
+**/
 
 #ifndef _SYS_FLOAT_IEEE754_H_
 #define _SYS_FLOAT_IEEE754_H_

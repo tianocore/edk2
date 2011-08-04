@@ -1,11 +1,11 @@
 /** @file
     ANSI type definitions.
 
-    Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available
     under the terms and conditions of the BSD License that accompanies this
     distribution.  The full text of the license may be found at
-    http://opensource.org/licenses/bsd-license.php.
+    http://opensource.org/licenses/bsd-license.
 
     THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -47,17 +47,17 @@
 
 #include <machine/int_types.h>
 
-typedef INT8 *      __caddr_t;      /* core address */
-typedef __uint32_t  __gid_t;        /* group id */
-typedef __uint32_t  __in_addr_t;    /* IP(v4) address */
-typedef __uint16_t  __in_port_t;    /* "Internet" port number */
-typedef __uint32_t  __mode_t;       /* file permissions */
-typedef __int64_t   __off_t;        /* file offset */
-typedef __int32_t   __pid_t;        /* process id */
-typedef __uint8_t   __sa_family_t;  /* socket address family */
-typedef UINT32       __socklen_t;    /* socket-related datum length */
-typedef __uint32_t  __uid_t;        /* user id */
-typedef __uint64_t  __fsblkcnt_t;   /* fs block count (statvfs) */
-typedef __uint64_t  __fsfilcnt_t;   /* fs file count */
+typedef INT8 *      __caddr_t;      ///< core address
+typedef __uint32_t  __gid_t;        ///< group id
+typedef __uint32_t  __in_addr_t;    ///< IP(v4) address
+typedef __uint16_t  __in_port_t;    ///< "Internet" port number
+typedef __uint32_t  __mode_t;       ///< file permissions
+typedef __int64_t   __off_t;        ///< file offset
+typedef __int32_t   __pid_t;        ///< process id
+typedef __uint8_t   __sa_family_t;  ///< socket address family
+typedef UINT32      __socklen_t;    ///< socket-related datum length
+typedef __uint32_t  __uid_t;        ///< user id
+typedef __uint64_t  __fsblkcnt_t;   ///< fs block count (statvfs)
+typedef __uint64_t  __fsfilcnt_t;   ///< fs file count
 
 #endif  /* !_SYS_ANSI_H_ */

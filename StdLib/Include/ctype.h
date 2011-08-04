@@ -55,6 +55,17 @@ int isalnum(int c);
 **/
 int isalpha(int c);
 
+/** The isblank function tests that a character is a white-space character that results
+    in a number of space (' ') characters being sent to the output device.  In the C locale
+    this is either ' ' or '\t'.
+
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
+**/
+int isblank(int);
+
 /** The iscntrl function tests for any control character.
 
     @param[in]    c   The character to be tested.
@@ -150,18 +161,8 @@ int isupper(int c);
 **/
 int isxdigit(int c);
 
-/** The isblank function tests that a character is a white-space character that results
-    in a number of space (' ') characters being sent to the output device.  In the C locale
-    this is either ' ' or '\t'.
-
-    @param[in]    c   The character to be tested.
-
-    @return   Returns nonzero (true) if and only if the value of the parameter c
-              can be classified as specified in the description of the function.
-**/
-int isblank(int);
-
 /** The isascii function tests that a character is one of the 128 7-bit ASCII characters.
+    This function is not part of the C standard, but is commonly used.
 
     @param[in]    c   The character to be tested.
 
