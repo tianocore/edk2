@@ -1,5 +1,5 @@
 /** @file
-  Single-byte character classification and case conversion macros and
+  Single-byte character classification, case conversion macros, and
   function declarations.
 
   The header <ctype.h> declares several functions useful for testing and mapping
@@ -11,19 +11,18 @@
   default is the "C" locale.
 
   The term "printing character" refers to a member of a locale-specific
-  set of characters, each of which occupies one printing position on a display
+  set of characters, each of which occupies at least one printing position on an output
   device; the term control character refers to a member of a locale-specific
   set of characters that are not printing characters.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
+  http://opensource.org/licenses/bsd-license.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
 **/
 #ifndef _CTYPE_H
 #define _CTYPE_H
@@ -36,8 +35,10 @@ __BEGIN_DECLS
 /** The isalnum function tests for any character for which isalpha or isdigit
     is true.
 
-    @return   Returns nonzero (true) if and only if the value of the argument c
-              conforms to that in the description of the function.
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
 **/
 int isalnum(int c);
 
@@ -47,29 +48,37 @@ int isalnum(int c);
     isspace is true. In the "C" locale, isalpha returns true only for the
     characters for which isupper or islower is true.
 
-    @return   Returns nonzero (true) if and only if the value of the argument c
-              conforms to that in the description of the function.
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
 **/
 int isalpha(int c);
 
 /** The iscntrl function tests for any control character.
 
-    @return   Returns nonzero (true) if and only if the value of the argument c
-              conforms to that in the description of the function.
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
 **/
 int iscntrl(int c);
 
 /** The isdigit function tests for any decimal-digit character.
 
-    @return   Returns nonzero (true) if and only if the value of the argument c
-              conforms to that in the description of the function.
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
 **/
 int isdigit(int c);
 
 /** The isgraph function tests for any printing character except space (' ').
 
-    @return   Returns nonzero (true) if and only if the value of the argument c
-              conforms to that in the description of the function.
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
 **/
 int isgraph(int c);
 
@@ -78,15 +87,19 @@ int isgraph(int c);
     isdigit, ispunct, or isspace is true.  In the "C" locale, islower returns
     true only for the lowercase letters.
 
-    @return   Returns nonzero (true) if and only if the value of the argument c
-              conforms to that in the description of the function.
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
 **/
 int islower(int c);
 
 /** The isprint function tests for any printing character including space (' ').
 
-    @return   Returns nonzero (true) if and only if the value of the argument c
-              conforms to that in the description of the function.
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
 **/
 int isprint(int c);
 
@@ -95,8 +108,10 @@ int isprint(int c);
     isalnum is true. In the "C" locale, ispunct returns true for every printing
     character for which neither isspace nor isalnum is true.
 
-    @return   Returns nonzero (true) if and only if the value of the argument c
-              conforms to that in the description of the function.
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
 **/
 int ispunct(int c);
 
@@ -107,8 +122,10 @@ int ispunct(int c);
     horizontal tab ('\t'), and vertical tab ('\v'). In the "C" locale, isspace
     returns true only for the standard white-space characters.
 
-    @return   Returns nonzero (true) if and only if the value of the argument c
-              conforms to that in the description of the function.
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
 **/
 int isspace(int c);
 
@@ -117,28 +134,46 @@ int isspace(int c);
     isdigit, ispunct, or isspace is true. In the "C" locale, isupper returns
     true only for the uppercase letters.
 
-    @return   Returns nonzero (true) if and only if the value of the argument c
-              conforms to that in the description of the function.
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
 **/
 int isupper(int c);
 
 /** The isxdigit function tests for any hexadecimal-digit character.
 
-    @return   Returns nonzero (true) if and only if the value of the argument c
-              conforms to that in the description of the function.
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
 **/
 int isxdigit(int c);
 
-/** The isascii function tests that a character is one of the 128 ASCII characters.
+/** The isblank function tests that a character is a white-space character that results
+    in a number of space (' ') characters being sent to the output device.  In the C locale
+    this is either ' ' or '\t'.
 
-  @param[in]  c   The character to test.
-  @return     Returns nonzero (true) if c is a valid ASCII character.  Otherwize,
-              zero (false) is returned.
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
+**/
+int isblank(int);
+
+/** The isascii function tests that a character is one of the 128 7-bit ASCII characters.
+
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
 **/
 int isascii(int c);
 
 /** The tolower function converts an uppercase letter to a corresponding
     lowercase letter.
+
+    @param[in]    c   The character to be converted.
 
     @return   If the argument is a character for which isupper is true and
               there are one or more corresponding characters, as specified by
@@ -152,6 +187,8 @@ int tolower(int c);
 /** The toupper function converts a lowercase letter to a corresponding
     uppercase letter.
 
+    @param[in]    c   The character to be converted.
+
     @return   If the argument is a character for which islower is true and
               there are one or more corresponding characters, as specified by
               the current locale, for which isupper is true, the toupper
@@ -161,13 +198,13 @@ int tolower(int c);
 **/
 int toupper(int c);
 
-int isblank(int);
-
 __END_DECLS
 
-// Character Classification Macros
-// Undefine individually or define NO_CTYPE_MACROS, before including <ctype.h>,
-// in order to use the Function version of the character classification macros.
+/** Character Classification Macros.
+    Undefine individually or define NO_CTYPE_MACROS, before including <ctype.h>,
+    in order to use the Function version of the character classification macros.
+@{
+**/
 #ifndef NO_CTYPE_MACROS
   #define isalnum(c)    (__isCClass( (int)c, (_CD | _CU | _CL | _XA)))
   #define isalpha(c)    (__isCClass( (int)c, (_CU | _CL | _XA)))
@@ -183,5 +220,6 @@ __END_DECLS
   #define tolower(c)    (__toLower((int)c))
   #define toupper(c)    (__toUpper((int)c))
 #endif  /* NO_CTYPE_MACROS */
+///@}
 
 #endif  /* _CTYPE_H */

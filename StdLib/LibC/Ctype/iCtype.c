@@ -4,20 +4,19 @@
 
   These are the default, C locale, tables.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
+  http://opensource.org/licenses/bsd-license.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
 **/
 #include  <LibConfig.h>
 #include  <ctype.h>
 
-/// ASCII-8 Character Classification Table
+/// ASCII-7 Character Classification Table
 const UINT16  _C_CharClassTable[128] = {
   /* 00 NUL */    ( _CC ),
   /* 01 SOH */    ( _CC ),
@@ -149,7 +148,7 @@ const UINT16  _C_CharClassTable[128] = {
   /* 7F DEL */    ( _CC )
 };
 
-/// ASCII-8 Upper case to Lower case character conversion table
+/// ASCII-7 Upper case to Lower case character conversion table
 const UINT8  _C_ToLowerTable[128] = {
   /* 00 NUL */    0x00,           /* 01 SOH */    0x01,
   /* 02 STX */    0x02,           /* 03 ETX */    0x03,
@@ -217,7 +216,7 @@ const UINT8  _C_ToLowerTable[128] = {
   /* 7E '~' */    0x7E,           /* 7F DEL */    0x7F
 };
 
-/// ASCII-8 Lower case to Upper case character conversion table
+/// ASCII-7 Lower case to Upper case character conversion table
 const UINT8  _C_ToUpperTable[128] = {
   /* 00 NUL */    0x00,           /* 01 SOH */    0x01,
   /* 02 STX */    0x02,           /* 03 ETX */    0x03,
@@ -285,15 +284,21 @@ const UINT8  _C_ToUpperTable[128] = {
   /* 7E '~' */    0x7E,           /* 7F DEL */    0x7F
 };
 
-/// Default character classification table is 8-bit ASCII
+/// Default character classification table is 7-bit ASCII
 const UINT16  *_cClass = _C_CharClassTable;
 
-/// Default upper to lower conversion table is 8-bit ASCII
+/// Default upper to lower conversion table is 7-bit ASCII
 const UINT8  *_lConvT = _C_ToLowerTable;
 
-/// Default lower to upper conversion table is 8-bit ASCII
+/// Default lower to upper conversion table is 7-bit ASCII
 const UINT8  *_uConvT = _C_ToUpperTable;
 
+/** Sets the character classification and case conversion tables for the 'C' locale.
+
+    A set of locale-independent pointers are used to point to the classification and
+    conversion tables for the currently specified locale.  This function is used to
+    establish the tables for the 'C' locale.
+**/
 void
 __set_C_locale( void )
 {

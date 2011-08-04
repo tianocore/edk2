@@ -4,7 +4,8 @@
 
   The enum members expand to integral constant expressions
   with distinct nonzero values, suitable for use in #if preprocessing
-  directives.
+  directives.  These default values are specified as an enum in order to ease
+  the maintenance of the values.
 
   Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
@@ -14,7 +15,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
 **/
 #ifdef  _ERRNO_H          // May only be included from <errno.h>
 #ifndef _SYS_ERRNO_H

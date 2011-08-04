@@ -1,5 +1,6 @@
 /** @file
-  Provides a definition of the assert macro.
+  Provides a definition of the assert macro used to insert diagnostic messages
+  into code.
 
   This header file defines the assert macro and refers to the NDEBUG macro,
   which is NOT defined in this file.
@@ -9,51 +10,62 @@
 
   If the NDEBUG macro is defined at the point where assert.h
   is included, the assert macro is defined so as to not produce code.
-  Otherwise, the assertion is tested and if the assertion is true a
-  diagnostic message of the form
-  "ASSERT <FileName>(<LineNumber>): <Description>\n" is produced.
-  A true assertion will also result in the application being terminated.
+  Otherwise, the assertion is tested and if the assertion is FALSE
+  (e.g. evaluates to 0) a diagnostic message of the form<BR>
+  "Assertion failed: (EXPR), file FILE, function FUNC, line LINE.\n"<BR>
+  is produced.
+  A FALSE evaluation will also result in the application being aborted.
 
-  The behavior of the assert macro can be further modified by setting attributes
-  in the PcdDebugPropertyMask PCD entry when building the Application Toolkit.
-  If DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED bit of PcdDebugProperyMask is set
-  then CpuBreakpoint() is called. Otherwise, if the
-  DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugProperyMask is set then
-  CpuDeadLoop() is called.  If neither of these bits are set, then the
-  application will be terminated immediately after the message is printed to
-  the debug output device.
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under
-the terms and conditions of the BSD License that accompanies this distribution.
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 #include  <sys/EfiCdefs.h>
 
 #undef  assert        ///< Remove any existing definition for assert.
 
+/** Internal helper function for the assert macro.
+    The __assert function prints a diagnostic message then exits the
+    currently running application.
+
+    This function should NEVER be called directly.
+
+    Some pre-processors do not provide the __func__ identifier.  When that is
+    the case, __func__ will be NULL.  This function accounts for this and
+    will modify the diagnostic message appropriately.
+
+
+    @param[in]    file          The name of the file containing the assert.
+    @param[in]    func          The name of the function containing the assert.
+    @param[in]    line          The line number the assert is located on.
+    @param[in]    failedexpr    A literal representation of the assert's expression.
+
+    @return       The __assert function will never return.  It aborts the
+                  current application and returns to the environment that
+                  the application was launched from.
+**/
 extern void
-__assert(const char *func, const char *file, int line, const char *failedexpr);
+__assert(const char *file, const char *func, int line, const char *failedexpr);
 
 /** The assert macro puts diagnostic tests into programs; it expands to a
     void expression.
 
-    When it is executed, if expression (which shall have a scalar type) is
-    false (that is, compares equal to 0), the assert macro writes information
+    When it is executed, if expression (which must have a scalar type) is
+    FALSE (that is, compares equal to 0), the assert macro writes information
     about the particular call that failed (including the text of the argument,
     the name of the source file, the source line number, and the name of the
     enclosing function - the latter are respectively the values of the
     preprocessing macros __FILE__ and __LINE__ and of the identifier __func__)
     on the standard error stream. It then calls the abort function.
 
-  If NDEBUG is not defined, Expression is evaluated.  If Expression evaluates to FALSE, then
-  __assert is called passing in the source filename, source function, source line number,
-  and the Expression.
+  If NDEBUG is not defined, Expression is evaluated.  If Expression evaluates to FALSE,
+  then __assert is called passing in the source filename, source function, source
+  line number, and the Expression.
 
   @param  Expression  Boolean expression.
 
@@ -64,7 +76,7 @@ __assert(const char *func, const char *file, int line, const char *failedexpr);
 
 #else
 #define assert(Expression)   ((Expression) ? (void)0 :\
-                              __assert(__func__, __FILE__, __LINE__, #Expression) )
+                              __assert(__FILE__, __func__, __LINE__, #Expression) )
 #endif
 /// @}
 /* END of file assert.h */
