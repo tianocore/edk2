@@ -1,6 +1,15 @@
-/*  $NetBSD: syslimits.h,v 1.23 2005/12/11 12:25:21 christos Exp $  */
+/** @file
+  Platform specific values for <limits.h>.
 
-/*
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1988, 1993
  *  The Regents of the University of California.  All rights reserved.
  *
@@ -28,28 +37,30 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *  @(#)syslimits.h 8.1 (Berkeley) 6/2/93
- */
+ *  syslimits.h 8.1 (Berkeley) 6/2/93
+ *  NetBSD: syslimits.h,v 1.23 2005/12/11 12:25:21 christos Exp
+**/
 
 #ifndef _SYS_SYSLIMITS_H_
 #define _SYS_SYSLIMITS_H_
 
 #include <sys/featuretest.h>
 
-#define ARG_MAX    (2 * 1024) /* max bytes for an exec function */
-#define ARGC_MAX       (64)   /* Maximum value for argc */
+#define ARG_MAX     (2 * 1024)  ///< Maximum bytes for an exec function.
+#define ARGC_MAX          (64)  ///< Maximum value for argc.
+
+#define MAX_INPUT         255   ///< Maximum bytes in terminal input.
+#define NAME_MAX          255   ///< Maximum bytes in a file name.
+#ifndef OPEN_MAX
+  #define OPEN_MAX         20   ///< Maximum open files per process.
+#endif
+#define PATH_MAX         1024   ///< Maximum bytes in pathname.
+#define PIPE_BUF          512   ///< Maximum bytes for atomic pipe writes.
 
 #ifndef CHILD_MAX
-  #define CHILD_MAX     128 /* max simultaneous processes */
+  #define CHILD_MAX       128   ///< Maximum simultaneous processes.
 #endif
-#define MAX_INPUT     255 /* max bytes in terminal input */
-#define NAME_MAX      255 /* max bytes in a file name */
-#ifndef OPEN_MAX
-  #define OPEN_MAX       20 /* max open files per process */
-#endif
-#define PATH_MAX     1024 /* max bytes in pathname */
-#define PIPE_BUF      512 /* max bytes for atomic pipe writes */
 
-#define LOGIN_NAME_MAX       17 /* max login name length incl. NUL */
+#define LOGIN_NAME_MAX     17   ///< Maximum login name length including the NUL.
 
 #endif /* !_SYS_SYSLIMITS_H_ */

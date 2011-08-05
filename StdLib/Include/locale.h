@@ -1,6 +1,15 @@
-/*  $NetBSD: locale.h,v 1.14 2005/02/03 04:39:32 perry Exp $  */
+/** @file
+  Localization functions and macros.
 
-/*
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1991, 1993
  *  The Regents of the University of California.  All rights reserved.
  *
@@ -29,11 +38,15 @@
  * SUCH DAMAGE.
  *
  *  @(#)locale.h  8.1 (Berkeley) 6/2/93
- */
+ *  $NetBSD: locale.h,v 1.14 2005/02/03 04:39:32 perry Exp
+**/
 
 #ifndef _LOCALE_H_
 #define _LOCALE_H_
 
+/** This is a structure containing members pertaining to the formatting of numeric values.
+    There is no requirement for members of this structure to be in any particular order.
+**/
 struct lconv {
   char  *decimal_point;
   char  *thousands_sep;
@@ -61,27 +74,42 @@ struct lconv {
   char  int_n_sign_posn;
 };
 
-#define LC_ALL      0
-#define LC_COLLATE  1
-#define LC_CTYPE    2
-#define LC_MONETARY 3
-#define LC_NUMERIC  4
-#define LC_TIME     5
-#define LC_MESSAGES 6
+/** These macros expand to integer expressions suitable for use as the first
+    argument to the setlocale() function.
 
-#define _LC_LAST    7   /* marks end */
+    Only the first six macros are required by the C language specification.
+    Implementations are free to extend this list, as has been done with LC_MESSAGES,
+    with additional macro definitions, beginning with the characters LC_ and
+    an uppercase letter.
+@{
+**/
+#define LC_ALL      0   ///< The application's entire locale.
+#define LC_COLLATE  1   ///< Affects the behavior of the strcoll and strxfrm functions.
+#define LC_CTYPE    2   ///< Affects the behavior of the character handling, multibyte, and wide character functions.
+#define LC_MONETARY 3   ///< Affects monetary formatting information.
+#define LC_NUMERIC  4   ///< Affects the decimal-point character and non-monetary formatting information.
+#define LC_TIME     5   ///< Affects the behavior of the strftime and wcsftime functions.
+#define LC_MESSAGES 6
+#define _LC_LAST    7   ///< Number of defined macros. Marks end.
+/// @}
 
 #include  <sys/EfiCdefs.h>
 
+/** @fn   char *setlocale(int, const char *)
+**/
+
+/** @fn   struct lconv *localeconv(void)
+**/
+
 __BEGIN_DECLS
-struct lconv  *localeconv(void);
-  char    *__setlocale_mb_len_max_32(int, const char *);
 #ifdef __SETLOCALE_SOURCE__
   char    *setlocale(int, const char *);
   char    *__setlocale(int, const char *);
 #else /* !__SETLOCALE_SOURCE__ */
   char    *setlocale(int, const char *) __RENAME(__setlocale_mb_len_max_32);
 #endif /* !__SETLOCALE_SOURCE__ */
+struct lconv  *localeconv(void);
+  char    *__setlocale_mb_len_max_32(int, const char *);
 __END_DECLS
 
 #endif /* _LOCALE_H_ */

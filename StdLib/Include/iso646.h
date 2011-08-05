@@ -17,16 +17,16 @@
 #define _ISO646_H
 #include  <sys/EfiCdefs.h>
 
-#define and     &&
-#define and_eq  &=
-#define bitand  &
-#define bitor   |
-#define compl   ~
-#define not     !
-#define not_eq  !=
-#define or      ||
-#define or_eq   |=
-#define xor     ^
-#define xor_eq  ^=
+#define and     &&    ///< Logical AND of two boolean expressions
+#define and_eq  &=    ///< Bitwise AND with assignment to lval
+#define bitand  &     ///< Bitwise AND of two scalar expressions
+#define bitor   |     ///< Bitwise OR of two scalar expressions
+#define compl   ~     ///< Binary complement
+#define not     !     ///< Logical complement of a boolean expression
+#define not_eq  !=    ///< Not-equal comparison
+#define or      ||    ///< Logical OR of two boolean expressions
+#define or_eq   |=    ///< Bitwise OR with assignment to lval
+#define xor     ^     ///< Exclusive OR
+#define xor_eq  ^=    ///< Exclusive OR with assignment to lval
 
 #endif  /* _ISO646_H */

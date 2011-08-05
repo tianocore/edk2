@@ -1,6 +1,15 @@
-/*  $NetBSD: setlocale1.c,v 1.2 2003/03/11 17:23:07 tshiozak Exp $  */
+/** @file
+  Single-byte character version of the setlocale function.
 
-/*-
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c)1999 Citrus Project,
  * All rights reserved.
  *
@@ -24,12 +33,11 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- */
+
+ *  NetBSD: setlocale1.c,v 1.2 2003/03/11 17:23:07 tshiozak Exp
+**/
 #include  <LibConfig.h>
 #include  <sys/EfiCdefs.h>
-#if defined(LIBC_SCCS) && !defined(lint)
-__RCSID("$NetBSD: setlocale1.c,v 1.2 2003/03/11 17:23:07 tshiozak Exp $");
-#endif /* LIBC_SCCS and not lint */
 
 #include "namespace.h"
 #define __SETLOCALE_SOURCE__
