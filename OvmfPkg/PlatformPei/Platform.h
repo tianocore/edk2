@@ -1,7 +1,7 @@
 /** @file
   Platform PEI module include file.
 
-  Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -46,6 +46,12 @@ AddUntestedMemoryBaseSizeHob (
   );
 
 VOID
+AddReservedMemoryBaseSizeHob (
+  EFI_PHYSICAL_ADDRESS        MemoryBase,
+  UINT64                      MemorySize
+  );
+
+VOID
 AddUntestedMemoryRangeHob (
   EFI_PHYSICAL_ADDRESS        MemoryBase,
   EFI_PHYSICAL_ADDRESS        MemoryLimit
@@ -58,6 +64,11 @@ MemDetect (
 
 EFI_STATUS
 PeiFvInitialization (
+  VOID
+  );
+
+EFI_STATUS
+InitializeXen (
   VOID
   );
 

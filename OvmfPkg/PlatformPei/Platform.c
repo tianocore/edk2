@@ -1,7 +1,9 @@
 /**@file
   Platform PEI driver
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011, Andrei Warkentin <andreiw@motorola.com>
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -73,6 +75,22 @@ AddIoMemoryBaseSizeHob (
     );
 }
 
+VOID
+AddReservedMemoryBaseSizeHob (
+  EFI_PHYSICAL_ADDRESS        MemoryBase,
+  UINT64                      MemorySize
+  )
+{
+  BuildResourceDescriptorHob (
+    EFI_RESOURCE_MEMORY_RESERVED,
+      EFI_RESOURCE_ATTRIBUTE_PRESENT     |
+      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_TESTED,
+    MemoryBase,
+    MemorySize
+    );
+}
 
 VOID
 AddIoMemoryRangeHob (
@@ -164,19 +182,19 @@ MemMapInitialization (
   //
   BuildResourceDescriptorHob (
     EFI_RESOURCE_IO,
-      EFI_RESOURCE_ATTRIBUTE_PRESENT     |
-      EFI_RESOURCE_ATTRIBUTE_INITIALIZED,
-    0x1000,
-    0xF000
+    EFI_RESOURCE_ATTRIBUTE_PRESENT     |
+    EFI_RESOURCE_ATTRIBUTE_INITIALIZED,
+    0xC000,
+    0x4000
     );
 
   //
   // Add PCI MMIO space available to PCI resource allocations
   //
   if (TopOfMemory < BASE_2GB) {
-    AddIoMemoryBaseSizeHob (BASE_2GB, 0xFEC00000 - BASE_2GB);
+    AddIoMemoryBaseSizeHob (BASE_2GB, 0xFC000000 - BASE_2GB);
   } else {
-    AddIoMemoryBaseSizeHob (TopOfMemory, 0xFEC00000 - TopOfMemory);
+    AddIoMemoryBaseSizeHob (TopOfMemory, 0xFC000000 - TopOfMemory);
   }
 
   //
@@ -198,6 +216,7 @@ MemMapInitialization (
 
 VOID
 MiscInitialization (
+  BOOLEAN Xen
   )
 {
   //
@@ -210,10 +229,12 @@ MiscInitialization (
   //
   BuildCpuHob (36, 16);
 
-  //
-  // Set the PM I/O base address to 0x400
-  //
-  PciAndThenOr32 (PCI_LIB_ADDRESS (0, 1, 3, 0x40), (UINT32) ~0xfc0, 0x400);
+  if (!Xen) {
+    //
+    // Set the PM I/O base address to 0x400
+    //
+    PciAndThenOr32 (PCI_LIB_ADDRESS (0, 1, 3, 0x40), (UINT32) ~0xfc0, 0x400);
+  }
 }
 
 
@@ -294,7 +315,9 @@ InitializePlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
+  EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  TopOfMemory;
+  BOOLEAN               Xen;
 
   DEBUG ((EFI_D_ERROR, "Platform PEIM Loaded\n"));
 
@@ -302,13 +325,16 @@ InitializePlatform (
 
   TopOfMemory = MemDetect ();
 
+  Status = InitializeXen ();
+  Xen = EFI_ERROR (Status) ? FALSE : TRUE;
+
   ReserveEmuVariableNvStore ();
 
   PeiFvInitialization ();
 
   MemMapInitialization (TopOfMemory);
 
-  MiscInitialization ();
+  MiscInitialization (Xen);
 
   BootModeInitialization ();
 
