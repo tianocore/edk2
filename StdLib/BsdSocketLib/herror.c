@@ -1,32 +1,32 @@
 /*
  * Copyright (c) 1987, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Portions copyright (c) 1999, 2000
  * Intel Corporation.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 
+ *
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- * 
+ *
  *    This product includes software developed by the University of
  *    California, Berkeley, Intel Corporation, and its contributors.
- * 
+ *
  * 4. Neither the name of University, Intel Corporation, or their respective
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS, INTEL CORPORATION AND
  * CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
  * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -56,12 +56,10 @@
  * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
  * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
  * SOFTWARE.
- */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)herror.c	8.1 (Berkeley) 6/4/93";
-static char rcsid[] = "$Id: herror.c,v 1.1.1.1 2003/11/19 01:51:28 kyu3 Exp $";
-#endif /* LIBC_SCCS and not lint */
+  herror.c  8.1 (Berkeley) 6/4/93
+  herror.c,v 1.1.1.1 2003/11/19 01:51:28 kyu3 Exp
+ */
 
 #include <sys/types.h>
 #include <sys/uio.h>
@@ -71,15 +69,15 @@ static char rcsid[] = "$Id: herror.c,v 1.1.1.1 2003/11/19 01:51:28 kyu3 Exp $";
 #include <unistd.h>
 
 const char *h_errlist[] = {
-	"Resolver Error 0 (no error)",
-	"Unknown host",				/* 1 HOST_NOT_FOUND */
-	"Host name lookup failure",		/* 2 TRY_AGAIN */
-	"Unknown server error",			/* 3 NO_RECOVERY */
-	"No address associated with name",	/* 4 NO_ADDRESS */
+  "Resolver Error 0 (no error)",
+  "Unknown host",       /* 1 HOST_NOT_FOUND */
+  "Host name lookup failure",   /* 2 TRY_AGAIN */
+  "Unknown server error",     /* 3 NO_RECOVERY */
+  "No address associated with name",  /* 4 NO_ADDRESS */
 };
-int	h_nerr = { sizeof h_errlist / sizeof h_errlist[0] };
+int h_nerr = { sizeof h_errlist / sizeof h_errlist[0] };
 
-int	h_errno;
+int h_errno;
 
 const char *
 hstrerror(
@@ -88,47 +86,47 @@ hstrerror(
 
 /*
  * herror --
- *	print the error indicated by the h_errno value.
+ *  print the error indicated by the h_errno value.
  */
 void
 herror(
-	const char *s
-	)
+  const char *s
+  )
 {
-	struct iovec iov[4];
-	register struct iovec *v = iov;
-	int		i;
+  struct iovec iov[4];
+  register struct iovec *v = iov;
+  int   i;
 
-	if (s && *s) {
-		v->iov_base = (char *)s;
-		v->iov_len = strlen(s);
-		v++;
-		v->iov_base = ": ";
-		v->iov_len = 2;
-		v++;
-	}
-	v->iov_base = (char *)hstrerror(h_errno);
-	v->iov_len = strlen(v->iov_base);
-	v++;
-	v->iov_base = "\n";
-	v->iov_len = 1;
+  if (s && *s) {
+    v->iov_base = (char *)s;
+    v->iov_len = strlen(s);
+    v++;
+    v->iov_base = ": ";
+    v->iov_len = 2;
+    v++;
+  }
+  v->iov_base = (char *)hstrerror(h_errno);
+  v->iov_len = strlen(v->iov_base);
+  v++;
+  v->iov_base = "\n";
+  v->iov_len = 1;
 #ifdef _ORG_FREEBSD_
-	writev(STDERR_FILENO, iov, (v - iov) + 1);
+  writev(STDERR_FILENO, iov, (v - iov) + 1);
 #else
-	for (i = 0; i < (v - iov) + 1; i++)
-		fprintf( stderr, iov[i].iov_base);
+  for (i = 0; i < (v - iov) + 1; i++)
+    fprintf( stderr, iov[i].iov_base);
 #endif
 
 }
 
 const char *
 hstrerror(
-	int err
-	)
+  int err
+  )
 {
-	if (err < 0)
-		return ("Resolver internal error");
-	else if (err < h_nerr)
-		return (h_errlist[err]);
-	return ("Unknown resolver error");
+  if (err < 0)
+    return ("Resolver internal error");
+  else if (err < h_nerr)
+    return (h_errlist[err]);
+  return ("Unknown resolver error");
 }

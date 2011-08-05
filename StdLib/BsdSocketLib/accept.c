@@ -12,7 +12,7 @@
 
 **/
 
-#include <SocketInternals.h>
+#include "SocketInternals.h"
 
 
 /**
@@ -60,7 +60,7 @@ AcceptWork (
     //
     // TODO: Update bBlocking by anding with check for NON_BLOCKING
     //
-    
+
     //
     //  Attempt to accept a new network connection
     //

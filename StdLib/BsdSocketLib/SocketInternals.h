@@ -25,7 +25,7 @@
 #include <kfile.h>
 #include <MainData.h>
 
-#include <efi/SysEfi.h>
+#include <Efi/SysEfi.h>
 
 //
 //  End of private files
@@ -118,7 +118,7 @@ BslSocketPoll (
   Build a file descriptor for a socket.
 
   @param [in] pSocketProtocol   Socket protocol structure address
-  
+
   @param [in] pErrno            Address of the errno variable
 
   @returns The file descriptor for the socket or -1 if an error occurs.
