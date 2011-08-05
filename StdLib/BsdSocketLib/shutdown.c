@@ -26,8 +26,8 @@
   @param [in] s         Socket file descriptor returned from ::socket.
 
   @param [in] how       Which operations to shutdown
-  
-  @returns    ::shutdown returns the zero (0) if successful or -1 when an
+
+  @return     ::shutdown returns the zero (0) if successful or -1 when an
               error occurs.  In the latter case, errno contains more details.
 
  **/

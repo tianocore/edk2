@@ -1,9 +1,9 @@
 /*++
-  This file contains an 'Intel UEFI Application' and is        
-  licensed for Intel CPUs and chipsets under the terms of your  
-  license agreement with Intel or your vendor.  This file may   
-  be modified by the user, subject to additional terms of the   
-  license agreement                                             
+  This file contains an 'Intel UEFI Application' and is
+  licensed for Intel CPUs and chipsets under the terms of your
+  license agreement with Intel or your vendor.  This file may
+  be modified by the user, subject to additional terms of the
+  license agreement
 --*/
 /*++
 
@@ -155,7 +155,7 @@ CONST TABLE_SIGNATURE mTableId [] = {
 /**
   Locate the RSDT table
 
-  @returns Table address or NULL if not found
+  @return  Table address or NULL if not found
 
 **/
 CONST ACPI_RSDT *
@@ -202,7 +202,7 @@ LocateRsdt (
 
   @param [in] Signature     Table signature
 
-  @returns Table address or NULL if not found
+  @return  Table address or NULL if not found
 
 **/
 CONST VOID *
@@ -767,7 +767,7 @@ RowGenericAddress (
   @param [in] pSignature      Address of the table signature
   @param [out] ppTableName    Address to receive the table name address
 
-  @returns Zero terminated web page address or NULL if not found
+  @return  Zero terminated web page address or NULL if not found
 
 **/
 CONST CHAR16 *
@@ -835,7 +835,7 @@ AcpiDsdtPage (
   EFI_STATUS Status;
 
   DBG_ENTER ( );
-  
+
   //
   //  Send the DADT page
   //
@@ -950,7 +950,7 @@ AcpiDsdtPage (
                             pbDone );
     break;
   }
-    
+
   //
   //  Return the operation status
   //
@@ -980,7 +980,7 @@ AcpiFadtPage (
   EFI_STATUS Status;
 
   DBG_ENTER ( );
-  
+
   //
   //  Send the FADT page
   //
@@ -1205,7 +1205,7 @@ AcpiFadtPage (
     if ( EFI_ERROR ( Status )) {
       break;
     }
-    
+
     Status = RowHexValue ( SocketFD,
                            pPort,
                            "GPE0_BLK",
@@ -1502,7 +1502,7 @@ AcpiFadtPage (
                             pbDone );
     break;
   }
-    
+
   //
   //  Return the operation status
   //
@@ -1532,7 +1532,7 @@ AcpiRsdp10Page (
   EFI_STATUS Status;
 
   DBG_ENTER ( );
-  
+
   //
   //  Send the RSDP page
   //
@@ -1605,7 +1605,7 @@ AcpiRsdp10Page (
                             pbDone );
     break;
   }
-    
+
   //
   //  Return the operation status
   //
@@ -1635,7 +1635,7 @@ AcpiRsdp30Page (
   EFI_STATUS Status;
 
   DBG_ENTER ( );
-  
+
   //
   //  Send the RSDP page
   //
@@ -1739,7 +1739,7 @@ AcpiRsdp30Page (
                             pbDone );
     break;
   }
-    
+
   //
   //  Return the operation status
   //
@@ -1774,7 +1774,7 @@ AcpiRsdtPage (
   UINT32 TableName [ 2 ];
 
   DBG_ENTER ( );
-  
+
   //
   //  Send the RSDT page
   //
@@ -1907,7 +1907,7 @@ AcpiRsdtPage (
                             pbDone );
     break;
   }
-    
+
   //
   //  Return the operation status
   //

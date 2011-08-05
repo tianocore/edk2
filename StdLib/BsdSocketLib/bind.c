@@ -22,9 +22,9 @@
   <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/bind.html">POSIX</a>
   documentation for the bind routine is available online for reference.
 
-  @param [in] s         Socket file descriptor returned from ::socket.
+  @param[in] s         Socket file descriptor returned from ::socket.
 
-  @param [in] name      Address of a sockaddr structure that contains the
+  @param[in] name      Address of a sockaddr structure that contains the
                         connection point on the local machine.  An IPv4 address
                         of INADDR_ANY specifies that the connection is made to
                         all of the network stacks on the platform.  Specifying a
@@ -34,9 +34,9 @@
                         number from the dynamic range.  Specifying a specific
                         port number causes the network layer to use that port.
 
-  @param [in] namelen   Specifies the length in bytes of the sockaddr structure.
+  @param[in] namelen   Specifies the length in bytes of the sockaddr structure.
 
-  @returns    The bind routine returns zero (0) if successful and -1 upon failure.
+  @return     The bind routine returns zero (0) if successful and -1 upon failure.
 
  **/
 int

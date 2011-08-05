@@ -1,9 +1,9 @@
 /*++
-  This file contains an 'Intel UEFI Application' and is        
-  licensed for Intel CPUs and chipsets under the terms of your  
-  license agreement with Intel or your vendor.  This file may   
-  be modified by the user, subject to additional terms of the   
-  license agreement                                             
+  This file contains an 'Intel UEFI Application' and is
+  licensed for Intel CPUs and chipsets under the terms of your
+  license agreement with Intel or your vendor.  This file may
+  be modified by the user, subject to additional terms of the
+  license agreement
 --*/
 /*++
 
@@ -351,7 +351,7 @@ SocketPoll (
 
   @param [in] Character The character to convert
 
-  @returns  The lower case equivalent of the character
+  @return   The lower case equivalent of the character
 
 **/
 int
@@ -382,7 +382,7 @@ tolower (
   @param [in] pString1  Zero terminated string address
   @param [in] pString2  Zero terminated string address
 
-  @returns    Returns the first character difference between string 1
+  @return     Returns the first character difference between string 1
               and string 2.
 
 **/
@@ -501,7 +501,7 @@ TftpOptionGet (
   @param [in] pOack     Option acknowledgement address
   @param [in] Value     Value to translate into ASCII decimal
 
-  @returns              Option acknowledgement address
+  @return               Option acknowledgement address
 
 **/
 UINT8 *

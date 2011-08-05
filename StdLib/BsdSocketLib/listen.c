@@ -31,7 +31,7 @@
                         waiting for the application to call accept.  Connection attempts
                         received while the queue is full are refused.
 
-  @returns    The listen routine returns zero (0) if successful and -1 upon failure.
+  @return     The listen routine returns zero (0) if successful and -1 upon failure.
 
  **/
 int

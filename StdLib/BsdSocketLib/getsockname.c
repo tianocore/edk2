@@ -29,7 +29,7 @@
 
   @param [in] address_len Length of the local network address structure
 
-  @returns    ::getsockname returns zero (0) if successful or -1 when an error occurs.
+  @return     ::getsockname returns zero (0) if successful or -1 when an error occurs.
               In the case of an error, errno contains more details.
 
  **/

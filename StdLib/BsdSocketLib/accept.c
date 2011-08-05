@@ -27,7 +27,7 @@
                                 of the remote network address buffer.  Upon return,
                                 contains the length of the remote network address.
 
-  @returns    ::accept returns zero if successful and -1 when an error occurs.
+  @return     ::accept returns zero if successful and -1 when an error occurs.
               In the case of an error, errno contains more details.
 
  **/
@@ -108,7 +108,7 @@ AcceptWork (
                                 of the remote network address buffer.  Upon return,
                                 contains the length of the remote network address.
 
-  @returns    ::accept returns zero if successful and -1 when an error occurs.
+  @return     ::accept returns zero if successful and -1 when an error occurs.
               In the case of an error, errno contains more details.
 
  **/
@@ -139,7 +139,7 @@ accept (
                                 of the remote network address buffer.  Upon return,
                                 contains the length of the remote network address.
 
-  @returns    This routine returns zero if successful and -1 when an error occurs.
+  @return     This routine returns zero if successful and -1 when an error occurs.
               In the case of an error, errno contains more details.
 
  **/

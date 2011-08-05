@@ -26,7 +26,7 @@
   @param [in] s         Socket file descriptor returned from ::socket.
 
   @param [in] buffer    Address of a buffer to receive the data.
-  
+
   @param [in] length    Length of the buffer in bytes.
 
   @param [in] flags     Message control flags
@@ -35,7 +35,7 @@
 
   @param [in] address_len Length of the remote network address structure
 
-  @returns    ::recvfrom returns the number of valid bytes in the buffer,
+  @return     ::recvfrom returns the number of valid bytes in the buffer,
               zero if no data was received, and -1 when an error occurs.
               In the case of an error, errno contains more details.
 

@@ -26,12 +26,12 @@
   @param [in] s         Socket file descriptor returned from ::socket.
 
   @param [in] buffer    Address of a buffer containing the data to send.
-    
+
   @param [in] length    Length of the buffer in bytes.
 
   @param [in] flags     Message control flags
 
-  @returns    ::send returns the number of data bytes that were
+  @return     ::send returns the number of data bytes that were
               sent and -1 when an error occurs.  In the case of
               an error, errno contains more details.
 

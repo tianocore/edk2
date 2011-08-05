@@ -510,7 +510,7 @@ wint_t btowc(int c);
     character set whose multibyte character representation is a single byte when in the initial
     shift state.
 
-    @Returns    The wctob function returns EOF if c does not correspond to a multibyte
+    @return     The wctob function returns EOF if c does not correspond to a multibyte
                 character with length one in the initial shift state. Otherwise, it
                 returns the single-byte representation of that character as an
                 unsigned char converted to an int.
@@ -520,7 +520,7 @@ int wctob(wint_t c);
 /** If ps is not a null pointer, the mbsinit function determines whether the
     pointed-to mbstate_t object describes an initial conversion state.
 
-    @Returns    The mbsinit function returns nonzero if ps is a null pointer
+    @return     The mbsinit function returns nonzero if ps is a null pointer
                 or if the pointed-to object describes an initial conversion
                 state; otherwise, it returns zero.
 **/
@@ -564,7 +564,7 @@ size_t mbsrtowcs(wchar_t * __restrict dst, const char ** __restrict src, size_t 
     terminating null wide character, the resulting state described is the
     initial conversion state.
 
-    @Returns    If conversion stops because a wide character is reached that
+    @return     If conversion stops because a wide character is reached that
                 does not correspond to a valid multibyte character, an
                 encoding error occurs: the wcsrtombs function stores the
                 value of the macro EILSEQ in errno and returns (size_t)(-1);

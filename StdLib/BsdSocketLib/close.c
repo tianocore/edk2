@@ -18,9 +18,9 @@
 /**
   Worker routine to close the socket.
 
-  @param [in] pSocketProtocol   Socket protocol structure address
+  @param[in] pSocketProtocol   Socket protocol structure address
 
-  @param [in] pErrno            Address of the errno variable
+  @param[in] pErrno            Address of the errno variable
 
   @retval EFI_SUCCESS   Successfully closed the socket
 
@@ -83,9 +83,9 @@ BslSocketCloseWork (
 /**
   Close the socket
 
-  @param [in] pDescriptor Descriptor address for the file
+  @param[in] pDescriptor Descriptor address for the file
 
-  @returns  This routine returns 0 upon success and -1 upon failure.
+  @return   This routine returns 0 upon success and -1 upon failure.
             In the case of failure, errno contains more information.
 
 **/

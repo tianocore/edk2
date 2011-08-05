@@ -57,7 +57,7 @@
                             address for the file
   @param [in] pErrno        Address of the errno variable
 
-  @returns  A pointer to the socket protocol structure or NULL if
+  @return   A pointer to the socket protocol structure or NULL if
             an invalid file descriptor was passed in.
 
  **/
@@ -73,7 +73,7 @@ BslFdToSocketProtocol (
 
   @param [in] pDescriptor Descriptor address for the file
 
-  @returns  This routine returns 0 upon success and -1 upon failure.
+  @return   This routine returns 0 upon success and -1 upon failure.
             In the case of failure, errno contains more information.
 
 **/
@@ -105,7 +105,7 @@ BslSocketCloseWork (
 
   @param [in] Events      Mask of events to detect
 
-  @returns    Detected events for the socket
+  @return     Detected events for the socket
 
  **/
 short
@@ -121,7 +121,7 @@ BslSocketPoll (
 
   @param [in] pErrno            Address of the errno variable
 
-  @returns The file descriptor for the socket or -1 if an error occurs.
+  @return  The file descriptor for the socket or -1 if an error occurs.
 
  **/
 int
@@ -138,7 +138,7 @@ BslSocketProtocolToFd (
   @param [in] LengthInBytes Number of bytes to read
   @param [in] pBuffer       Address of the buffer to receive the data
 
-  @returns  The number of bytes read or -1 if an error occurs.
+  @return   The number of bytes read or -1 if an error occurs.
 
 **/
 ssize_t
@@ -157,7 +157,7 @@ BslSocketRead (
   @param [in] LengthInBytes Number of bytes to write
   @param [in] pBuffer       Address of the data
 
-  @returns  The number of bytes written or -1 if an error occurs.
+  @return   The number of bytes written or -1 if an error occurs.
 
 **/
 ssize_t
@@ -175,7 +175,7 @@ BslSocketWrite (
 
   @param [in] pErrno      Address of the errno variable
 
-  @returns  A pointer to the socket protocol structure or NULL if
+  @return   A pointer to the socket protocol structure or NULL if
             an invalid file descriptor was passed in.
 
  **/

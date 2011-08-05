@@ -22,7 +22,7 @@
 
   @param [in] Events      Mask of events to detect
 
-  @returns    Detected events for the socket
+  @return     Detected events for the socket
 
  **/
 short

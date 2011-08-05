@@ -47,7 +47,7 @@ const struct fileops SocketOperations = {
                             address for the file
   @param [in] pErrno        Address of the errno variable
 
-  @returns  A pointer to the socket protocol structure or NULL if
+  @return   A pointer to the socket protocol structure or NULL if
             an invalid file descriptor was passed in.
 
  **/
@@ -101,10 +101,10 @@ BslFdToSocketProtocol (
   Build a file descriptor for a socket.
 
   @param [in] pSocketProtocol   Socket protocol structure address
-  
+
   @param [in] pErrno            Address of the errno variable
 
-  @returns The file descriptor for the socket or -1 if an error occurs.
+  @return  The file descriptor for the socket or -1 if an error occurs.
 
  **/
 int
@@ -194,7 +194,7 @@ BslSocketProtocolToFd (
                           <li>IPPROTO_UDP</li> - This value must be combined with SOCK_DGRAM.</li>
                         </ul>
 
-  @returns This routine returns a file descriptor for the socket.
+  @return  This routine returns a file descriptor for the socket.
 
  **/
 INT32
@@ -250,7 +250,7 @@ socket (
 
   @param [in] pErrno      Address of the errno variable
 
-  @returns  A pointer to the socket protocol structure or NULL if
+  @return   A pointer to the socket protocol structure or NULL if
             an invalid file descriptor was passed in.
 
  **/

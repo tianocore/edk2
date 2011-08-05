@@ -1,9 +1,9 @@
 /*++
-  This file contains an 'Intel UEFI Application' and is        
-  licensed for Intel CPUs and chipsets under the terms of your  
-  license agreement with Intel or your vendor.  This file may   
-  be modified by the user, subject to additional terms of the   
-  license agreement                                             
+  This file contains an 'Intel UEFI Application' and is
+  licensed for Intel CPUs and chipsets under the terms of your
+  license agreement with Intel or your vendor.  This file may
+  be modified by the user, subject to additional terms of the
+  license agreement
 --*/
 /*++
 
@@ -31,7 +31,7 @@ Intel Corporation.
   @param [in] pData     The address of the buffer containing the character
   @param [out] ppData   The address to receive the next character address
 
-  @returns    The character value
+  @return     The character value
 
 **/
 INTN
@@ -157,7 +157,7 @@ HttpFlush (
 
   @param [in] Character The character to convert to lower case.
 
-  @returns  The lower case character
+  @return   The lower case character
 
 **/
 INTN
@@ -186,7 +186,7 @@ HttpLowerCase (
   @param [in] pData       A zero terminated UTF-8 string
   @param [in] bIgnoreCase TRUE if case is to be ignored
 
-  @returns    The difference between the last two characters tested.
+  @return     The difference between the last two characters tested.
               Returns -1 for error.
 
 **/
@@ -313,7 +313,7 @@ HttpPageHeader (
     Status = HttpSendAnsiString ( SocketFD, pPort, "  <body>\r\n" );
     break;
   }
-    
+
   //
   //  Return the operation status
   //
@@ -372,7 +372,7 @@ HttpPageNotFound (
     Status = HttpPageTrailer ( SocketFD, pPort, pbDone );
     break;
   }
-    
+
   //
   //  Return the operation status
   //
@@ -471,7 +471,7 @@ HttpPageTrailer (
     *pbDone = TRUE;
     break;
   }
-    
+
   //
   //  Return the operation status
   //
@@ -486,7 +486,7 @@ HttpPageTrailer (
   @param [in] pData     The request buffer address
   @param [in] pEnd      End of buffer address
 
-  @returns    The next character location
+  @return     The next character location
 
 **/
 UINT8 *
@@ -867,7 +867,7 @@ HttpSendCharacter (
 
 /**
   Send a buffer dump
-  
+
   @param [in] SocketFD      The socket's file descriptor to add to the list.
   @param [in] pPort         The WSDT_PORT structure address
   @param [in] ByteCount     The number of bytes to display
@@ -930,7 +930,7 @@ HttpSendDump (
       if ( EFI_ERROR ( Status )) {
         break;
       }
-      
+
       //
       //  Position the starting data correctly
       //

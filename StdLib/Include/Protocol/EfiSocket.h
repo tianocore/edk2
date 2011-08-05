@@ -198,11 +198,11 @@ EFI_STATUS
   @param [in] pSocketProtocol Address of the socket protocol structure.
 
   @param [in] pSockAddr       Network address of the remote system.
-    
+
   @param [in] SockAddrLength  Length in bytes of the network address.
-  
+
   @param [out] pErrno   Address to receive the errno value upon completion.
-  
+
   @retval EFI_SUCCESS   The connection was successfully established.
   @retval EFI_NOT_READY The connection is in progress, call this routine again.
   @retval Others        The connection attempt failed.
@@ -221,7 +221,7 @@ EFI_STATUS
   Get the local address.
 
   @param [in] pSocketProtocol Address of the socket protocol structure.
-  
+
   @param [out] pAddress       Network address to receive the local system address
 
   @param [in,out] pAddressLength  Length of the local network address structure
@@ -244,7 +244,7 @@ EFI_STATUS
   Get the peer address.
 
   @param [in] pSocketProtocol Address of the socket protocol structure.
-  
+
   @param [out] pAddress       Network address to receive the remote system address
 
   @param [in,out] pAddressLength  Length of the remote network address structure
@@ -387,13 +387,13 @@ EFI_STATUS
   documentation is available online.
 
   @param [in] pSocketProtocol Address of the socket protocol structure.
-  
+
   @param [in] Flags           Message control flags
-  
+
   @param [in] BufferLength    Length of the the buffer
-  
+
   @param [in] pBuffer         Address of a buffer to receive the data.
-  
+
   @param [in] pDataLength     Number of received data bytes in the buffer.
 
   @param [out] pAddress       Network address to receive the remote system address
@@ -425,13 +425,13 @@ EFI_STATUS
   remote network connection.
 
   @param [in] pSocketProtocol Address of the socket protocol structure.
-  
+
   @param [in] Flags           Message control flags
-  
+
   @param [in] BufferLength    Length of the the buffer
-  
+
   @param [in] pBuffer         Address of a buffer containing the data to send
-  
+
   @param [in] pDataLength     Address to receive the number of data bytes sent
 
   @param [in] pAddress        Network address of the remote system address
@@ -463,9 +463,9 @@ EFI_STATUS
   operations.
 
   @param [in] pSocketProtocol Address of the socket protocol structure.
-  
+
   @param [in] How             Which operations to stop
-  
+
   @param [out] pErrno         Address to receive the errno value upon completion.
 
   @retval EFI_SUCCESS - Socket operations successfully shutdown
@@ -577,7 +577,7 @@ typedef struct _EFI_SOCKET_PROTOCOL {
                                 of the remote network address buffer.  Upon return,
                                 contains the length of the remote network address.
 
-  @returns    This routine returns zero if successful and -1 when an error occurs.
+  @return     This routine returns zero if successful and -1 when an error occurs.
               In the case of an error, errno contains more details.
 
  **/

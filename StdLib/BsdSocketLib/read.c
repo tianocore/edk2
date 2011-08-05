@@ -23,7 +23,7 @@
   @param [in] LengthInBytes Number of bytes to read
   @param [in] pBuffer       Address of the buffer to receive the data
 
-  @returns  The number of bytes read or -1 if an error occurs.
+  @return   The number of bytes read or -1 if an error occurs.
 
 **/
 ssize_t

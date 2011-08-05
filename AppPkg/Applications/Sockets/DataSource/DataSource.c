@@ -131,7 +131,7 @@ ControlCCheck (
   @param [in] pDigit    The address of the next digit
   @param [out] pValue   The address to receive the value
 
-  @returns  Returns the address of the separator
+  @return   Returns the address of the separator
 
 **/
 CHAR8 *
@@ -775,7 +775,7 @@ Tcp4Locate (
     //
     if ( HandleCount <= Tcp4Index ) {
       Tcp4Index = 0;
-    
+
       //
       //  Wait for the next timer tick
       //
@@ -797,7 +797,7 @@ Tcp4Locate (
               htons ( RemoteHostAddress.sin_port ));
       bTcp4Connecting = FALSE;
     }
-    
+
     //
     //  Open the network controller's service protocol
     //
@@ -1110,7 +1110,7 @@ Tcp4Open (
     Status = pTcp4Protocol->Configure ( pTcp4Protocol,
                                         &Tcp4ConfigData );
     if ( EFI_ERROR ( Status )) {
-      DEBUG (( DEBUG_ERROR, 
+      DEBUG (( DEBUG_ERROR,
                 "ERROR - Failed to configure TCP port, Status: %r\r\n",
                 Status ));
       break;

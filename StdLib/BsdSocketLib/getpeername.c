@@ -29,7 +29,7 @@
 
   @param [in] address_len Length of the remote network address structure
 
-  @returns    ::getpeername returns zero (0) if successful or -1 when an error occurs.
+  @return     ::getpeername returns zero (0) if successful or -1 when an error occurs.
               In the case of an error, errno contains more details.
 
  **/

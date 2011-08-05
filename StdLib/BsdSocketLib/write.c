@@ -23,7 +23,7 @@
   @param [in] LengthInBytes Number of bytes to write
   @param [in] pBuffer       Address of the data
 
-  @returns  The number of bytes written or -1 if an error occurs.
+  @return   The number of bytes written or -1 if an error occurs.
 
 **/
 ssize_t

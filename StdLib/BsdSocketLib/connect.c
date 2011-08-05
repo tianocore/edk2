@@ -42,10 +42,10 @@
   @param [in] s         Socket file descriptor returned from ::socket.
 
   @param [in] address   Network address of the remote system
-  
+
   @param [in] address_len Length of the remote network address
 
-  @returns    ::connect returns zero if successful and -1 when an error occurs.
+  @return     ::connect returns zero if successful and -1 when an error occurs.
               In the case of an error, errno contains more details.
 
  **/
@@ -61,7 +61,7 @@ connect (
   struct __filedes * pDescriptor;
   EFI_SOCKET_PROTOCOL * pSocketProtocol;
   EFI_STATUS Status;
-  
+
   //
   //  Locate the context for this socket
   //
@@ -85,7 +85,7 @@ connect (
                                              &errno );
     } while ( bBlocking && ( EFI_NOT_READY == Status ));
   }
-  
+
   //
   //  Return the new socket file descriptor
   //

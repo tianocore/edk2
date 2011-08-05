@@ -651,7 +651,7 @@ open(
 
   @param [in] timeout   Length of time in milliseconds to wait for the event
 
-  @returns    The number of file descriptors with detected events.  Zero
+  @return     The number of file descriptors with detected events.  Zero
               indicates that the call timed out and -1 indicates an error.
 
  **/
@@ -1100,12 +1100,12 @@ write  (int fd, const void *buf, size_t nbyte)
 
 /** Gets the current working directory.
 
-  The getcwd() function shall place an absolute pathname of the current 
-  working directory in the array pointed to by buf, and return buf. The 
-  pathname copied to the array shall contain no components that are 
-  symbolic links. The size argument is the size in bytes of the character 
-  array pointed to by the buf argument. 
-  
+  The getcwd() function shall place an absolute pathname of the current
+  working directory in the array pointed to by buf, and return buf. The
+  pathname copied to the array shall contain no components that are
+  symbolic links. The size argument is the size in bytes of the character
+  array pointed to by the buf argument.
+
   @param[in,out] buf    The buffer to fill.
   @param[in]     size   The number of bytes in buffer.
 
@@ -1114,8 +1114,8 @@ write  (int fd, const void *buf, size_t nbyte)
   @retval NULL          Size was 0.
   @return buf           The function completed successfully. See errno for info.
 **/
-char     
-*getcwd (char *buf, size_t size) 
+char
+*getcwd (char *buf, size_t size)
 {
   CONST CHAR16 *Cwd;
 
@@ -1133,7 +1133,7 @@ char
     errno = ERANGE;
     return (NULL);
   }
-  
+
   return (UnicodeStrToAsciiStr(Cwd, buf));
 }
 
