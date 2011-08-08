@@ -393,10 +393,10 @@ CoreInsertGcdMapEntry (
   )
 {
   ASSERT (Length != 0);
-  ASSERT (TopEntry->Signature == 0);
-  ASSERT (BottomEntry->Signature == 0);
 
   if (BaseAddress > Entry->BaseAddress) {
+    ASSERT (BottomEntry->Signature == 0);
+
     CopyMem (BottomEntry, Entry, sizeof (EFI_GCD_MAP_ENTRY));
     Entry->BaseAddress      = BaseAddress;
     BottomEntry->EndAddress = BaseAddress - 1;
@@ -404,6 +404,8 @@ CoreInsertGcdMapEntry (
   }
 
   if ((BaseAddress + Length - 1) < Entry->EndAddress) {
+    ASSERT (TopEntry->Signature == 0);
+
     CopyMem (TopEntry, Entry, sizeof (EFI_GCD_MAP_ENTRY));
     TopEntry->BaseAddress = BaseAddress + Length;
     Entry->EndAddress     = BaseAddress + Length - 1;
