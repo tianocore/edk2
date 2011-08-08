@@ -1,5 +1,5 @@
 /** @file
-  Include flie for basic command line parser for EBL (Embedded Boot Loader)
+  Include file for basic command line parser for EBL (Embedded Boot Loader)
 
   Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>

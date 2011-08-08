@@ -65,7 +65,7 @@ WaitForTick (
 
 
 /**
-  Interface stucture for the Metronome Architectural Protocol.
+  Interface structure for the Metronome Architectural Protocol.
 
   @par Protocol Description:
   This protocol provides access to a known time source in the platform to the

@@ -103,14 +103,14 @@ GLOBAL_REMOVE_IF_UNREFERENCED char *mHobResourceType[] = {
 
 
 /**
-  Dump out the HOBs in the system. HOBs are defined in the PI specificaiton
+  Dump out the HOBs in the system. HOBs are defined in the PI specification
   and they are used to hand off information from PEI to DXE.
 
   Argv[0] - "hob"
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_SUCCESS
 

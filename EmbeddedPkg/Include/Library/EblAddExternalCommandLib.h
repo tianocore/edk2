@@ -1,5 +1,5 @@
 /** @file
-  Include flie for basic command line parser for EBL (Embedded Boot Loader)
+  Include file for basic command line parser for EBL (Embedded Boot Loader)
 
   Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
@@ -32,7 +32,7 @@ EblAddExternalCommands (
 
   Return a keypress or optionally timeout if a timeout value was passed in.
 
-  An optional callback funciton is called evey second when waiting for a
+  An optional callback function is called every second when waiting for a
 
   timeout.
 

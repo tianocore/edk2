@@ -17,7 +17,7 @@ is in the form of DevType:Path. Current DevType is required as there is no
 current mounted device concept of current working directory concept implement
 by this library.
 
-Device names are case insensative and only check the leading characters for 
+Device names are case insensitive and only check the leading characters for
 unique matches. Thus the following are all the same:
 LoadFile0:
 l0:
@@ -168,7 +168,7 @@ EblUpdateDeviceLists (
   }
 
   if (&mFsInfo[0] != NULL) {
-    // Need to Free the mFsInfo prior to reclaculating mFsCount so don't move this code
+    // Need to Free the mFsInfo prior to recalculating mFsCount so don't move this code
     for (Index = 0; Index < mFsCount; Index++) {
       if (mFsInfo[Index] != NULL) {
         FreePool (mFsInfo[Index]);
@@ -635,12 +635,12 @@ EblFvFileDevicePath (
 
 /**
 Open a device named by PathName. The PathName includes a device name and 
-path seperated by a :. See file header for more details on the PathName 
+path separated by a :. See file header for more details on the PathName
 syntax. There is no checking to prevent a file from being opened more than
 one type. 
 
 SectionType is only used to open an FV. Each file in an FV contains multiple
-secitons and only the SectionType section is opened. 
+sections and only the SectionType section is opened.
 
 For any file that is opened with EfiOpen() must be closed with EfiClose().
 
@@ -704,7 +704,7 @@ EfiOpen (
         return NULL;
       }
 
-      // We could add a current working diretory concept 
+      // We could add a current working directory concept
       CwdPlusPathName = AllocatePool (AsciiStrSize (gCwd) + AsciiStrSize (PathName));
       if (CwdPlusPathName == NULL) {
         return NULL;
@@ -731,7 +731,7 @@ EfiOpen (
 
       AsciiStrCat (CwdPlusPathName, PathName);
       if (AsciiStrStr (CwdPlusPathName, ":") == NULL) {
-        // Extra error check to make sure we don't recusre and blow stack
+        // Extra error check to make sure we don't recurse and blow stack
         return NULL;
       }
 
@@ -1175,7 +1175,7 @@ EfiTell (
 
 
 /**
-Seek to the Offset locaiton in the file. LoadFile and FV device types do
+Seek to the Offset location in the file. LoadFile and FV device types do
 not support EfiSeek(). It is not possible to grow the file size using 
 EfiSeek().
 
@@ -1190,7 +1190,7 @@ EfiSeekEnd    : Only supported if Offset is zero to seek to end of file.
 
 
 @return EFI_INVALID_PARAMETER  Stream is not an Open File
-@return EFI_UNSUPPORTED        LoadFile and FV doe not support Seek
+@return EFI_UNSUPPORTED        LoadFile and FV do not support Seek
 @return EFI_NOT_FOUND          Seek past the end of the file.
 @return EFI_SUCCESS            Steam closed
 
@@ -1300,7 +1300,7 @@ CacheTftpFile (
 }
 
 /**
-Read BufferSize bytes from the current locaiton in the file. For load file,
+Read BufferSize bytes from the current location in the file. For load file,
 FV, and TFTP case you must read the entire file. 
 
 @param  Stream      Open File Handle
@@ -1431,7 +1431,7 @@ EfiRead (
 Read the entire file into a buffer. This routine allocates the buffer and
 returns it to the user full of the read data. 
 
-This is very useful for load flie where it's hard to know how big the buffer
+This is very useful for load file where it's hard to know how big the buffer
 must be.
 
 @param  Stream      Open File Handle
@@ -1669,7 +1669,7 @@ ExpandPath (
 
 
 /**
-Set the Curent Working Directory (CWD). If a call is made to EfiOpen () and 
+Set the Current Working Directory (CWD). If a call is made to EfiOpen () and
 the path does not contain a device name, The CWD is prepended to the path.
 
 @param  Cwd     Current Working Directory to set
@@ -1751,11 +1751,11 @@ EfiSetCwd (
 
 
 /**
-Set the Curent Working Directory (CWD). If a call is made to EfiOpen () and 
+Set the Current Working Directory (CWD). If a call is made to EfiOpen () and
 the path does not contain a device name, The CWD is prepended to the path.
 The CWD buffer is only valid until a new call is made to EfiSetCwd(). After
 a call to EfiSetCwd() it is not legal to use the pointer returned by 
-this funciton.
+this function.
 
 @param  Cwd     Current Working Directory 
 

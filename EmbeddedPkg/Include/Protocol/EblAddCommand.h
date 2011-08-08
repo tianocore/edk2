@@ -62,7 +62,7 @@ VOID
 
   @param EntryArray     Pointer EBL_COMMAND_TABLE of the commands that are being added
 
-  @param ArrayCount     Nuber of commands in the EntryArray.
+  @param ArrayCount     Number of commands in the EntryArray.
 
 **/
 typedef
@@ -81,7 +81,7 @@ VOID
 
 /**
   Return a keypress or optionally timeout if a timeout value was passed in.
-  An optional callback funciton is called evey second when waiting for a
+  An optional callback function is called every second when waiting for a
   timeout.
 
   @param  Key           EFI Key information returned

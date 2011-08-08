@@ -31,7 +31,7 @@ EBL_ADD_COMMAND_PROTOCOL      *gEblExternalCommand = NULL;
 
 /**
   Return a keypress or optionally timeout if a timeout value was passed in.
-  An optional callback funciton is called evey second when waiting for a
+  An optional callback function is called every second when waiting for a
   timeout.
 
   @param  Key           EFI Key information returned

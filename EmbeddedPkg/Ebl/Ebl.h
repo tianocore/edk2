@@ -1,5 +1,5 @@
 /** @file
-  Include flie for basic command line parser for EBL (Embedded Boot Loader)
+  Include file for basic command line parser for EBL (Embedded Boot Loader)
 
   Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
@@ -58,14 +58,14 @@
 //
 // Prompt for the command line
 //
-#define CMD_SEPERATOR   ';'
-#define EBL_MAX_COMMAND_COUNT   0x100
-#define MAX_CMD_HISTORY         16
-#define MAX_CMD_LINE            256
-#define MAX_ARGS                32
+#define CMD_SEPARATOR             ';'
+#define EBL_MAX_COMMAND_COUNT     0x100
+#define MAX_CMD_HISTORY           16
+#define MAX_CMD_LINE              256
+#define MAX_ARGS                  32
 
-#define EBL_CR                  0x0a
-#define EBL_LF                  0x0d
+#define EBL_CR                    0x0a
+#define EBL_LF                    0x0d
 
 #define EFI_SET_TIMER_TO_SECOND   10000000
 
@@ -73,7 +73,7 @@
 
 EBL_COMMAND_TABLE *
 EblGetCommand (
-  IN CHAR8    *CommandName
+  IN CHAR8                        *CommandName
   );
 
 
@@ -88,8 +88,8 @@ EblPathToDevice (
 
 BOOLEAN
 EblAnyKeyToContinueQtoQuit (
-  IN  UINTN   *CurrentRow,
-  IN  BOOLEAN PrefixNewline
+  IN  UINTN                       *CurrentRow,
+  IN  BOOLEAN                     PrefixNewline
   );
 
 VOID
@@ -109,7 +109,7 @@ EblShutdownExternalCmdTable (
 
 VOID
 EblSetTextColor (
-  UINTN   Attribute
+  UINTN                           Attribute
   );
 
 
@@ -124,9 +124,9 @@ EblGetCharKey (
 INTN
 EFIAPI
 AsciiStrniCmp (
-  IN      CONST CHAR8               *FirstString,
-  IN      CONST CHAR8               *SecondString,
-  IN      UINTN                     Length
+  IN      CONST CHAR8             *FirstString,
+  IN      CONST CHAR8             *SecondString,
+  IN      UINTN                   Length
   );
 
 
@@ -172,36 +172,36 @@ EblInitializeVariableCmds (
 
 CHAR8 *
 ParseArguments (
-  IN  CHAR8  *CmdLine,
-  OUT UINTN  *Argc,
-  OUT CHAR8  **Argv
+  IN  CHAR8                       *CmdLine,
+  OUT UINTN                       *Argc,
+  OUT CHAR8                       **Argv
   );
 
 EFI_STATUS
 ProcessCmdLine (
-  IN CHAR8      *CmdLine,
-  IN UINTN      MaxCmdLineSize
+  IN CHAR8                        *CmdLine,
+  IN UINTN                        MaxCmdLineSize
   );
 
 EFI_STATUS
 OutputData (
-  IN UINT8  *Address,
-  IN UINTN  Length,
-  IN UINTN  Width,
-  IN UINTN  Offset
+  IN UINT8                        *Address,
+  IN UINTN                        Length,
+  IN UINTN                         Width,
+  IN UINTN                        Offset
   );
   
 UINTN
 WidthFromCommandName (
-  IN CHAR8  *Argv,
-  IN UINTN  Default
+  IN CHAR8                        *Argv,
+  IN UINTN                        Default
   );
 
 
-extern UINTN    gScreenColumns;
-extern UINTN    gScreenRows;
-extern BOOLEAN  gPageBreak;
-extern CHAR8    *gMemMapType[];
+extern UINTN                      gScreenColumns;
+extern UINTN                      gScreenRows;
+extern BOOLEAN                    gPageBreak;
+extern CHAR8                      *gMemMapType[];
 
 #endif
 

@@ -12,7 +12,7 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Commands useful for debugging hardware. IO commands seperated out as not all
+  Commands useful for debugging hardware. IO commands separated out as not all
   processor architectures support the IO command.
 
 **/
@@ -24,7 +24,7 @@
 /**
   Read from IO space
 
-  Argv[0] - "ioread"[.#] # is optiona width 1, 2, or 4. Default 1
+  Argv[0] - "ioread"[.#] # is optional width 1, 2, or 4. Default 1
   Argv[1] - Hex IO address
 
   ior.4 0x3f8  ;Do a 32-bit IO Read from 0x3f8
@@ -32,7 +32,7 @@
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_SUCCESS
 
@@ -73,7 +73,7 @@ EblIoReadCmd (
 /**
   Write to IO space
 
-  Argv[0] - "iowrite"[.#] # is optiona width 1, 2, or 4. Default 1
+  Argv[0] - "iowrite"[.#] # is optional width 1, 2, or 4. Default 1
   Argv[1] - Hex IO address
   Argv[2] - Hex data to write
 
@@ -82,7 +82,7 @@ EblIoReadCmd (
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_SUCCESS
 

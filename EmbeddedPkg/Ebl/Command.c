@@ -46,7 +46,7 @@ AsciiToUpper (
 
 
 /**
-  Case insensitve comparison of two Null-terminated Unicode strings with maximum
+  Case insensitive comparison of two Null-terminated Unicode strings with maximum
   lengths, and returns the difference between the first mismatched Unicode
   characters.
   This function compares the Null-terminated Unicode string FirstString to the
@@ -94,9 +94,9 @@ AsciiStrniCmp (
 /**
   Add a command to the mCmdTable. If there is no free space in the command 
   table ASSERT. The mCmdTable is maintained in alphabetical order and the 
-  new entry is inserted into its sorted possition.
+  new entry is inserted into its sorted position.
 
-  @param  Entry   Commnad Entry to add to the CmdTable
+  @param  Entry   Command Entry to add to the CmdTable
 
 **/
 VOID
@@ -139,7 +139,7 @@ EblAddCommand (
   array of commands.
 
   @param  EntryArray   Pointer to array of command entries
-  @param  ArrayCount   Number of commnad entries to add
+  @param  ArrayCount   Number of command entries to add
 
 **/
 VOID
@@ -168,8 +168,8 @@ EBL_ADD_COMMAND_PROTOCOL gEblAddCommand = {
 
 /**
   Return the best matching command for the passed in command name. The match 
-  does not have to be exact, it just needs to be unqiue. This enables commands
-  to be shortend to the smallest set of starting characters that is unique.
+  does not have to be exact, it just needs to be unique. This enables commands
+  to be shortened to the smallest set of starting characters that is unique.
 
   @param  CommandName   Name of command to search for
 
@@ -250,7 +250,7 @@ CountNewLines (
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_SUCCESS
 
@@ -300,14 +300,14 @@ EblHelpCmd (
 
 
 /**
-  Exit the EBL. If the commnad processor sees EFI_ABORTED return status it will
+  Exit the EBL. If the command processor sees EFI_ABORTED return status it will
   exit the EBL.
 
   Argv[0] - "exit"
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_ABORTED
 
@@ -388,7 +388,7 @@ EblExitCmd (
   This AsciiPrint has to match the AsciiPrint in 
   EblPauseCmd. 
 
-  @param  ElaspedTime   Current timout value remaining
+  @param  ElaspedTime   Current timeout value remaining
 
 **/
 VOID
@@ -411,10 +411,10 @@ EblPauseCallback (
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_SUCCESS  Timeout expired with no input
-  @return EFI_TIMEOUT  Stop procesing other commands on the same command line
+  @return EFI_TIMEOUT  Stop processing other commands on the same command line
 
 **/
 EFI_STATUS
@@ -433,8 +433,8 @@ EblPauseCmd (
   Status = EblGetCharKey (&Key, Delay, EblPauseCallback);
   AsciiPrint ("\n");
 
-  // If we timeout then the pause succeded thus return success
-  // If we get a key return timout to stop other commnad on this cmd line
+  // If we timeout then the pause succeeded thus return success
+  // If we get a key return timeout to stop other command on this cmd line
   return (Status == EFI_SUCCESS) ? EFI_TIMEOUT : EFI_SUCCESS;;
 }
 
@@ -446,7 +446,7 @@ EblPauseCmd (
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_SUCCESS
 
@@ -472,7 +472,7 @@ EblBreakPointCmd (
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_SUCCESS
 
@@ -512,7 +512,7 @@ EblResetCmd (
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_SUCCESS
 
@@ -693,7 +693,7 @@ OutputData (
   
   Example hexdump.4 returns a width of 4.
 
-  @param  Argv   Argv[0] is the comamnd name
+  @param  Argv   Argv[0] is the command name
 
   @return Width of command
 
@@ -735,7 +735,7 @@ WidthFromCommandName (
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_SUCCESS
 

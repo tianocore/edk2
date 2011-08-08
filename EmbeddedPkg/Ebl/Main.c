@@ -151,7 +151,7 @@ Exit:
 
 /**
   Parse the CmdLine and break it up into Argc (arg count) and Argv (array of
-  pointers to each argument). The Cmd buffer is altered and seperators are 
+  pointers to each argument). The Cmd buffer is altered and separators are
   converted to string terminators. This allows Argv to point into CmdLine.
   A CmdLine can support multiple commands. The next command in the command line
   is returned if it exists.
@@ -179,11 +179,11 @@ ParseArguments (
     return NULL;
   }
 
-  // Walk a single command line. A CMD_SEPERATOR allows mult commands on a single line
+  // Walk a single command line. A CMD_SEPARATOR allows multiple commands on a single line
   InQuote       = FALSE;
   LookingForArg = TRUE;
   for (Char = CmdLine, Arg = 0; *Char != '\0'; Char++) {
-    if (!InQuote && *Char == CMD_SEPERATOR) {
+    if (!InQuote && *Char == CMD_SEPARATOR) {
       break;
     }
 
@@ -194,7 +194,7 @@ ParseArguments (
     }
 
     if (LookingForArg) {
-      // Look for the beging of an Argv[] entry
+      // Look for the beginning of an Argv[] entry
       if (*Char == '"') {
         Argv[Arg++] = ++Char;
         LookingForArg = FALSE;
@@ -219,8 +219,8 @@ ParseArguments (
 
   *Argc = Arg;
 
-  if (*Char == CMD_SEPERATOR) {
-    // Replace the command delimeter with null and return pointer to next command line
+  if (*Char == CMD_SEPARATOR) {
+    // Replace the command delimiter with null and return pointer to next command line
     *Char = '\0';
     return ++Char;
   }
@@ -231,7 +231,7 @@ ParseArguments (
 
 /**
   Return a keypress or optionally timeout if a timeout value was passed in.
-  An optional callback funciton is called evey second when waiting for a
+  An optional callback function is called every second when waiting for a
   timeout.
 
   @param  Key           EFI Key information returned
@@ -370,10 +370,10 @@ EblSetTextColor (
 
 
 /**
-  Collect the keyboard input for a cmd line. Carage Return, New Line, or ESC
+  Collect the keyboard input for a cmd line. Carriage Return, New Line, or ESC
   terminates the command line. You can edit the command line via left arrow,
   delete and backspace and they all back up and erase the command line. 
-  No edit of commnad line is possible without deletion at this time!
+  No edit of command line is possible without deletion at this time!
   The up arrow and down arrow fill Cmd with information from the history 
   buffer.
 
@@ -516,7 +516,7 @@ EblPrompt (
 
 
 /**
-  Parse a command line and execute the commands. The ; seperator allows 
+  Parse a command line and execute the commands. The ; separator allows
   multiple commands for each command line. Stop processing if one of the
   commands returns an error.
 
@@ -538,7 +538,7 @@ ProcessCmdLine (
   UINTN               Argc;
   CHAR8               *Argv[MAX_ARGS];
 
-  // Parse the command line. The loop processes commands seperated by ;
+  // Parse the command line. The loop processes commands separated by ;
   for (Ptr = CmdLine, Status = EFI_SUCCESS; Ptr != NULL;) {
     Ptr = ParseArguments (Ptr, &Argc, Argv);
     if (Argc != 0) {
@@ -550,7 +550,7 @@ ProcessCmdLine (
           // exit command so lets exit
           break;
         } else if (Status == EFI_TIMEOUT) {
-          // pause command got imput so don't process any more cmd on this cmd line
+          // pause command got input so don't process any more cmd on this cmd line
           break;
         } else if (EFI_ERROR (Status)) {
           AsciiPrint ("%a returned %r error\n", Cmd->Name, Status);
@@ -568,14 +568,14 @@ ProcessCmdLine (
 
 /**
   Embedded Boot Loader (EBL) - A simple EFI command line application for embedded 
-  devices. PcdEmbeddedAutomaticBootCommand is a complied in commnad line that
-  gets executed automatically. The ; seperator allows multiple commands 
+  devices. PcdEmbeddedAutomaticBootCommand is a complied in command line that
+  gets executed automatically. The ; separator allows multiple commands
   for each command line.
 
   @param  ImageHandle   EFI ImageHandle for this application.
   @param  SystemTable   EFI system table
 
-  @return EFI status of the applicaiton
+  @return EFI status of the application
 
 **/
 EFI_STATUS
@@ -592,7 +592,7 @@ EdkBootLoaderEntry (
   UINTN       CommandLineVariableSize = 0;
   EFI_GUID    VendorGuid;
 
-  // Initialize tables of commnads
+  // Initialize tables of commands
   EblInitializeCmdTable ();
   EblInitializeDeviceCmd ();
   EblInitializemdHwDebugCmds ();
@@ -605,7 +605,7 @@ EdkBootLoaderEntry (
   EblInitializeVariableCmds ();
   
   if (gST->ConOut == NULL) {
-    DEBUG((EFI_D_ERROR,"Errot: No Console Output\n"));
+    DEBUG((EFI_D_ERROR,"Error: No Console Output\n"));
     return EFI_NOT_READY;
   }
 
@@ -627,7 +627,7 @@ EdkBootLoaderEntry (
 
   EblPrintStartupBanner ();
  
-  // Parse command line and handle commands seperated by ;
+  // Parse command line and handle commands separated by ;
   // The loop prints the prompt gets user input and saves history
   
   // Look for a variable with a default command line, otherwise use the Pcd

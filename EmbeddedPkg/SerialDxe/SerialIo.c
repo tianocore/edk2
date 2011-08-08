@@ -1,8 +1,8 @@
 /** @file
   Serial IO Abstraction for GDB stub. This allows an EFI consoles that shows up on the system 
-  running GDB. One consle for error information and another console for user input/output.
+  running GDB. One console for error information and another console for user input/output.
   
-  Basic packet format is $packet-data#checksum. So every comand has 4 bytes of overhead: $, 
+  Basic packet format is $packet-data#checksum. So every command has 4 bytes of overhead: $,
   #, 0, 0. The 0 and 0 are the ascii characters for the checksum. 
   
 
@@ -48,15 +48,15 @@ SerialReset (
 
 
 /**
-  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity, 
+  Sets the baud rate, receive FIFO depth, transmit/receive time out, parity,
   data buts, and stop bits on a serial device.
 
   @param  This             Protocol instance pointer.
   @param  BaudRate         The requested baud rate. A BaudRate value of 0 will use the the
                            device's default interface speed.
-  @param  ReveiveFifoDepth The requested depth of the FIFO on the receive side of the
+  @param  ReceiveFifoDepth The requested depth of the FIFO on the receive side of the
                            serial interface. A ReceiveFifoDepth value of 0 will use
-                           the device's dfault FIFO depth.
+                           the device's default FIFO depth.
   @param  Timeout          The requested time out for a single character in microseconds.
                            This timeout applies to both the transmit and receive side of the
                            interface. A Timeout value of 0 will use the device's default time
@@ -64,7 +64,7 @@ SerialReset (
   @param  Parity           The type of parity to use on this serial device. A Parity value of
                            DefaultParity will use the device's default parity value.
   @param  DataBits         The number of data bits to use on the serial device. A DataBits
-                           vaule of 0 will use the device's default data bit setting.
+                           value of 0 will use the device's default data bit setting.
   @param  StopBits         The number of stop bits to use on this serial device. A StopBits
                            value of DefaultStopBits will use the device's default number of
                            stop bits.
@@ -112,7 +112,7 @@ SerialSetControl (
 
 
 /**
-  Retrieves the status of thecontrol bits on a serial device
+  Retrieves the status of the control bits on a serial device
 
   @param  This              Protocol instance pointer.
   @param  Control           A pointer to return the current Control signals from the serial device.
@@ -205,13 +205,13 @@ SerialRead (
 EFI_HANDLE  gHandle = NULL;
 
 // 
-// Template used to initailize the GDB Serial IO protocols
+// Template used to initialize the GDB Serial IO protocols
 //
 EFI_SERIAL_IO_MODE gSerialIoMode = {
   0,                                          // ControlMask
   0,                                          // Timeout
   FixedPcdGet64 (PcdUartDefaultBaudRate),     // BaudRate
-  1,                                          // RceiveFifoDepth
+  1,                                          // ReceiveFifoDepth
   FixedPcdGet8 (PcdUartDefaultDataBits),      // DataBits
   FixedPcdGet8 (PcdUartDefaultParity),        // Parity
   FixedPcdGet8 (PcdUartDefaultStopBits)       // StopBits

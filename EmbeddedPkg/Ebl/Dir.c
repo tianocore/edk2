@@ -51,12 +51,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED   CHAR8 *gFvFileType[] = {
   dir fs1:\efi *.efi; perform a dir on fs1: device in the efi directory but 
                       only print out files that contain the string *.efi
   dir fv1:\         ; perform a dir on fv1: device in the efi directory 
-                    NOTE: fv devices do not contian subdirs 
+                    NOTE: fv devices do not contain subdirs
   dir fv1:\ * PEIM  ; will match all files of type PEIM
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_SUCCESS
 
@@ -301,7 +301,7 @@ Done:
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_SUCCESS
 

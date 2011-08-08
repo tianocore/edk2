@@ -17,7 +17,7 @@
 
 **/
 
-#define CMD_SEPERATOR     ';'
+#define CMD_SEPARATOR     ';'
 #define MAX_ARGS          32
 
 EFI_STATUS
@@ -35,7 +35,7 @@ EblMain (
 
 /**
   Parse the CmdLine and break it up into Argc (arg count) and Argv (array of
-  pointers to each argument). The Cmd buffer is altered and seperators are 
+  pointers to each argument). The Cmd buffer is altered and separators are
   converted to string terminators. This allows Argv to point into CmdLine.
   A CmdLine can support multiple commands. The next command in the command line
   is returned if it exists.
@@ -67,18 +67,18 @@ ParseArguments (
     return;
   }
 
-  // Walk a single command line. A CMD_SEPERATOR allows mult commands on a single line
+  // Walk a single command line. A CMD_SEPARATOR allows multiple commands on a single line
   InQuote       = FALSE;
   LookingForArg = TRUE;
-  for (Char = CmdLine, Arg = 0, Index = 0; *Char != '\0' && *Char != CMD_SEPERATOR; Char++, Index++) {
-    // Perform any text coversion here
+  for (Char = CmdLine, Arg = 0, Index = 0; *Char != '\0' && *Char != CMD_SEPARATOR; Char++, Index++) {
+    // Perform any text conversion here
     if (*Char == '\t') {
       // TAB to space
       *Char = ' ';
     }
 
     if (LookingForArg) {
-      // Look for the beging of an Argv[] entry
+      // Look for the beginning of an Argv[] entry
       if (*Char == '"') {
         Argv[Arg++] = ++Char;
         LookingForArg = FALSE;
@@ -103,8 +103,8 @@ ParseArguments (
 
   *Argc = Arg;
 
-  if (*Char == CMD_SEPERATOR) {
-    // Replace the command delimeter with null
+  if (*Char == CMD_SEPARATOR) {
+    // Replace the command delimiter with null
     *Char = '\0';
   }
 
@@ -116,14 +116,14 @@ ParseArguments (
 
 /**
   Embedded Boot Loader (EBL) - A simple EFI command line application for embedded 
-  devices. PcdEmbeddedAutomaticBootCommand is a complied in commnad line that
-  gets executed automatically. The ; seperator allows multiple commands 
+  devices. PcdEmbeddedAutomaticBootCommand is a complied in command line that
+  gets executed automatically. The ; separator allows multiple commands
   for each command line.
 
   @param  ImageHandle   EFI ImageHandle for this application.
   @param  SystemTable   EFI system table
 
-  @return EFI status of the applicaiton
+  @return EFI status of the application
 
 **/
 EFI_STATUS

@@ -72,7 +72,7 @@ MonotonicCounterDriverInitialize (
   gBS->GetNextMonotonicCount     = GetNextMonotonicCount;
   gRT->GetNextHighMonotonicCount = GetNextHighMonotonicCount;
 
-  // Install the Monotonic Counter Architctural Protocol onto a new handle
+  // Install the Monotonic Counter Architectural Protocol onto a new handle
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
                   &gEfiMonotonicCounterArchProtocolGuid,    NULL,
