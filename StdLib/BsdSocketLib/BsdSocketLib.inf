@@ -100,7 +100,6 @@
   StdLibPrivateInternalFiles/DoNotUse.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-#  SocketPkg/SocketPkg.dec
 
 [LibraryClasses]
   BaseLib
