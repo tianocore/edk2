@@ -2525,91 +2525,18 @@ EslSocketReceive (
     pSocket = SOCKET_FROM_PROTOCOL ( pSocketProtocol );
 
     //
-    //  Verify the socket state
+    //  Return the transmit error if necessary
     //
-    if ( !pSocket->bConfigured ) {
-      //
-      //  Synchronize with the socket layer
-      //
-      RAISE_TPL ( TplPrevious, TPL_SOCKETS );
-
-      //
-      //  Validate the local address
-      //
-      switch ( pSocket->Domain ) {
-      default:
-        DEBUG (( DEBUG_RX,
-                  "ERROR - Invalid socket address family: %d\r\n",
-                  pSocket->Domain ));
-        Status = EFI_INVALID_PARAMETER;
-        pSocket->errno = EADDRNOTAVAIL;
-        break;
-
-      case AF_INET:
-        //
-        //  Determine the connection point within the network stack
-        //
-        switch ( pSocket->Type ) {
-        default:
-          DEBUG (( DEBUG_RX,
-                    "ERROR - Invalid socket type: %d\r\n",
-                    pSocket->Type));
-          Status = EFI_INVALID_PARAMETER;
-          break;
-
-        case SOCK_STREAM:
-        case SOCK_SEQPACKET:
-          //
-          //  Verify the port state
-          //
-          Status = EslTcpSocketIsConfigured4 ( pSocket );
-          break;
-
-        case SOCK_DGRAM:
-          //
-          //  Verify the port state
-          //
-          Status = EslUdpSocketIsConfigured4 ( pSocket );
-          break;
-        }
-        break;
-      }
-
-      //
-      //  Release the socket layer synchronization
-      //
-      RESTORE_TPL ( TplPrevious );
-
-      //
-      //  Set errno if a failure occurs
-      //
-      if ( EFI_ERROR ( Status )) {
-        pSocket->errno = EADDRNOTAVAIL;
-      }
+    if ( EFI_SUCCESS != pSocket->TxError ) {
+      pSocket->errno = EIO;
+      Status = pSocket->TxError;
+      pSocket->TxError = EFI_SUCCESS;
     }
-    if ( !EFI_ERROR ( Status )) {
+    else {
       //
-      //  Validate the buffer length
+      //  Verify the socket state
       //
-      if (( NULL == pDataLength )
-        && ( 0 > pDataLength )
-        && ( NULL == pBuffer )) {
-        if ( NULL == pDataLength ) {
-          DEBUG (( DEBUG_RX,
-                    "ERROR - pDataLength is NULL!\r\n" ));
-        }
-        else if ( NULL == pBuffer ) {
-          DEBUG (( DEBUG_RX,
-                    "ERROR - pBuffer is NULL!\r\n" ));
-        }
-        else {
-          DEBUG (( DEBUG_RX,
-                    "ERROR - Data length < 0!\r\n" ));
-        }
-        Status = EFI_INVALID_PARAMETER;
-        pSocket->errno = EFAULT;
-      }
-      else{
+      if ( !pSocket->bConfigured ) {
         //
         //  Synchronize with the socket layer
         //
@@ -2637,28 +2564,21 @@ EslSocketReceive (
                       "ERROR - Invalid socket type: %d\r\n",
                       pSocket->Type));
             Status = EFI_INVALID_PARAMETER;
-            pSocket->errno = EADDRNOTAVAIL;
             break;
 
           case SOCK_STREAM:
           case SOCK_SEQPACKET:
-            Status = EslTcpReceive4 ( pSocket,
-                                      Flags,
-                                      BufferLength,
-                                      pBuffer,
-                                      pDataLength,
-                                      pAddress,
-                                      pAddressLength );
+            //
+            //  Verify the port state
+            //
+            Status = EslTcpSocketIsConfigured4 ( pSocket );
             break;
 
           case SOCK_DGRAM:
-            Status = EslUdpReceive4 ( pSocket,
-                                      Flags,
-                                      BufferLength,
-                                      pBuffer,
-                                      pDataLength,
-                                      pAddress,
-                                      pAddressLength);
+            //
+            //  Verify the port state
+            //
+            Status = EslUdpSocketIsConfigured4 ( pSocket );
             break;
           }
           break;
@@ -2668,6 +2588,96 @@ EslSocketReceive (
         //  Release the socket layer synchronization
         //
         RESTORE_TPL ( TplPrevious );
+
+        //
+        //  Set errno if a failure occurs
+        //
+        if ( EFI_ERROR ( Status )) {
+          pSocket->errno = EADDRNOTAVAIL;
+        }
+      }
+      if ( !EFI_ERROR ( Status )) {
+        //
+        //  Validate the buffer length
+        //
+        if (( NULL == pDataLength )
+          && ( 0 > pDataLength )
+          && ( NULL == pBuffer )) {
+          if ( NULL == pDataLength ) {
+            DEBUG (( DEBUG_RX,
+                      "ERROR - pDataLength is NULL!\r\n" ));
+          }
+          else if ( NULL == pBuffer ) {
+            DEBUG (( DEBUG_RX,
+                      "ERROR - pBuffer is NULL!\r\n" ));
+          }
+          else {
+            DEBUG (( DEBUG_RX,
+                      "ERROR - Data length < 0!\r\n" ));
+          }
+          Status = EFI_INVALID_PARAMETER;
+          pSocket->errno = EFAULT;
+        }
+        else{
+          //
+          //  Synchronize with the socket layer
+          //
+          RAISE_TPL ( TplPrevious, TPL_SOCKETS );
+
+          //
+          //  Validate the local address
+          //
+          switch ( pSocket->Domain ) {
+          default:
+            DEBUG (( DEBUG_RX,
+                      "ERROR - Invalid socket address family: %d\r\n",
+                      pSocket->Domain ));
+            Status = EFI_INVALID_PARAMETER;
+            pSocket->errno = EADDRNOTAVAIL;
+            break;
+
+          case AF_INET:
+            //
+            //  Determine the connection point within the network stack
+            //
+            switch ( pSocket->Type ) {
+            default:
+              DEBUG (( DEBUG_RX,
+                        "ERROR - Invalid socket type: %d\r\n",
+                        pSocket->Type));
+              Status = EFI_INVALID_PARAMETER;
+              pSocket->errno = EADDRNOTAVAIL;
+              break;
+
+            case SOCK_STREAM:
+            case SOCK_SEQPACKET:
+              Status = EslTcpReceive4 ( pSocket,
+                                        Flags,
+                                        BufferLength,
+                                        pBuffer,
+                                        pDataLength,
+                                        pAddress,
+                                        pAddressLength );
+              break;
+
+            case SOCK_DGRAM:
+              Status = EslUdpReceive4 ( pSocket,
+                                        Flags,
+                                        BufferLength,
+                                        pBuffer,
+                                        pDataLength,
+                                        pAddress,
+                                        pAddressLength);
+              break;
+            }
+            break;
+          }
+
+          //
+          //  Release the socket layer synchronization
+          //
+          RESTORE_TPL ( TplPrevious );
+        }
       }
     }
   }
@@ -2895,171 +2905,181 @@ EslSocketTransmit (
     pSocket = SOCKET_FROM_PROTOCOL ( pSocketProtocol );
 
     //
-    //  Verify the socket state
+    //  Return the transmit error if necessary
     //
-    if ( !pSocket->bConfigured ) {
+    if ( EFI_SUCCESS != pSocket->TxError ) {
+      pSocket->errno = EIO;
+      Status = pSocket->TxError;
+      pSocket->TxError = EFI_SUCCESS;
+    }
+    else {
       //
-      //  Synchronize with the socket layer
+      //  Verify the socket state
       //
-      RAISE_TPL ( TplPrevious, TPL_SOCKETS );
-    
-      //
-      //  Validate the local address
-      //
-      switch ( pSocket->Domain ) {
-      default:
-        DEBUG (( DEBUG_RX,
-                  "ERROR - Invalid socket address family: %d\r\n",
-                  pSocket->Domain ));
-        Status = EFI_INVALID_PARAMETER;
-        pSocket->errno = EADDRNOTAVAIL;
-        break;
-    
-      case AF_INET:
+      if ( !pSocket->bConfigured ) {
         //
-        //  Determine the connection point within the network stack
+        //  Synchronize with the socket layer
         //
-        switch ( pSocket->Type ) {
+        RAISE_TPL ( TplPrevious, TPL_SOCKETS );
+
+        //
+        //  Validate the local address
+        //
+        switch ( pSocket->Domain ) {
         default:
           DEBUG (( DEBUG_RX,
-                    "ERROR - Invalid socket type: %d\r\n",
-                    pSocket->Type));
+                    "ERROR - Invalid socket address family: %d\r\n",
+                    pSocket->Domain ));
           Status = EFI_INVALID_PARAMETER;
+          pSocket->errno = EADDRNOTAVAIL;
           break;
-    
-        case SOCK_STREAM:
-        case SOCK_SEQPACKET:
+
+        case AF_INET:
           //
-          //  Verify the port state
+          //  Determine the connection point within the network stack
           //
-          Status = EslTcpSocketIsConfigured4 ( pSocket );
-          break;
-    
-        case SOCK_DGRAM:
-          //
-          //  Verify the port state
-          //
-          Status = EslUdpSocketIsConfigured4 ( pSocket );
+          switch ( pSocket->Type ) {
+          default:
+            DEBUG (( DEBUG_RX,
+                      "ERROR - Invalid socket type: %d\r\n",
+                      pSocket->Type));
+            Status = EFI_INVALID_PARAMETER;
+            break;
+
+          case SOCK_STREAM:
+          case SOCK_SEQPACKET:
+            //
+            //  Verify the port state
+            //
+            Status = EslTcpSocketIsConfigured4 ( pSocket );
+            break;
+
+          case SOCK_DGRAM:
+            //
+            //  Verify the port state
+            //
+            Status = EslUdpSocketIsConfigured4 ( pSocket );
+            break;
+          }
           break;
         }
-        break;
-      }
-    
-      //
-      //  Release the socket layer synchronization
-      //
-      RESTORE_TPL ( TplPrevious );
-    
-      //
-      //  Set errno if a failure occurs
-      //
-      if ( EFI_ERROR ( Status )) {
-        pSocket->errno = EADDRNOTAVAIL;
-      }
-    }
-    if ( !EFI_ERROR ( Status )) {
-      //
-      //  Verify that transmit is still allowed
-      //
-      if ( !pSocket->bTxDisable ) {
+
         //
-        //  Validate the buffer length
+        //  Release the socket layer synchronization
         //
-        if (( NULL == pDataLength )
-          && ( 0 > pDataLength )
-          && ( NULL == pBuffer )) {
-          if ( NULL == pDataLength ) {
-            DEBUG (( DEBUG_RX,
-                      "ERROR - pDataLength is NULL!\r\n" ));
-          }
-          else if ( NULL == pBuffer ) {
-            DEBUG (( DEBUG_RX,
-                      "ERROR - pBuffer is NULL!\r\n" ));
-          }
-          else {
-            DEBUG (( DEBUG_RX,
-                      "ERROR - Data length < 0!\r\n" ));
-          }
-          Status = EFI_INVALID_PARAMETER;
-          pSocket->errno = EFAULT;
+        RESTORE_TPL ( TplPrevious );
+
+        //
+        //  Set errno if a failure occurs
+        //
+        if ( EFI_ERROR ( Status )) {
+          pSocket->errno = EADDRNOTAVAIL;
         }
-        else {
+      }
+      if ( !EFI_ERROR ( Status )) {
+        //
+        //  Verify that transmit is still allowed
+        //
+        if ( !pSocket->bTxDisable ) {
           //
-          //  Validate the remote network address
+          //  Validate the buffer length
           //
-          if (( NULL != pAddress )
-            && ( AddressLength < pAddress->sa_len )) {
-            DEBUG (( DEBUG_TX,
-                      "ERROR - Invalid sin_len field in address\r\n" ));
+          if (( NULL == pDataLength )
+            && ( 0 > pDataLength )
+            && ( NULL == pBuffer )) {
+            if ( NULL == pDataLength ) {
+              DEBUG (( DEBUG_RX,
+                        "ERROR - pDataLength is NULL!\r\n" ));
+            }
+            else if ( NULL == pBuffer ) {
+              DEBUG (( DEBUG_RX,
+                        "ERROR - pBuffer is NULL!\r\n" ));
+            }
+            else {
+              DEBUG (( DEBUG_RX,
+                        "ERROR - Data length < 0!\r\n" ));
+            }
             Status = EFI_INVALID_PARAMETER;
             pSocket->errno = EFAULT;
           }
           else {
             //
-            //  Synchronize with the socket layer
+            //  Validate the remote network address
             //
-            RAISE_TPL ( TplPrevious, TPL_SOCKETS );
-
-            //
-            //  Validate the local address
-            //
-            switch ( pSocket->Domain ) {
-            default:
-              DEBUG (( DEBUG_RX,
-                        "ERROR - Invalid socket address family: %d\r\n",
-                        pSocket->Domain ));
+            if (( NULL != pAddress )
+              && ( AddressLength < pAddress->sa_len )) {
+              DEBUG (( DEBUG_TX,
+                        "ERROR - Invalid sin_len field in address\r\n" ));
               Status = EFI_INVALID_PARAMETER;
-              pSocket->errno = EADDRNOTAVAIL;
-              break;
+              pSocket->errno = EFAULT;
+            }
+            else {
+              //
+              //  Synchronize with the socket layer
+              //
+              RAISE_TPL ( TplPrevious, TPL_SOCKETS );
 
-            case AF_INET:
               //
-              //  Determine the connection point within the network stack
+              //  Validate the local address
               //
-              switch ( pSocket->Type ) {
+              switch ( pSocket->Domain ) {
               default:
                 DEBUG (( DEBUG_RX,
-                          "ERROR - Invalid socket type: %d\r\n",
-                          pSocket->Type));
+                          "ERROR - Invalid socket address family: %d\r\n",
+                          pSocket->Domain ));
                 Status = EFI_INVALID_PARAMETER;
                 pSocket->errno = EADDRNOTAVAIL;
                 break;
 
-              case SOCK_STREAM:
-              case SOCK_SEQPACKET:
-                Status = EslTcpTxBuffer4 ( pSocket,
-                                           Flags,
-                                           BufferLength,
-                                           pBuffer,
-                                           pDataLength );
-                break;
+              case AF_INET:
+                //
+                //  Determine the connection point within the network stack
+                //
+                switch ( pSocket->Type ) {
+                default:
+                  DEBUG (( DEBUG_RX,
+                            "ERROR - Invalid socket type: %d\r\n",
+                            pSocket->Type));
+                  Status = EFI_INVALID_PARAMETER;
+                  pSocket->errno = EADDRNOTAVAIL;
+                  break;
 
-              case SOCK_DGRAM:
-                Status = EslUdpTxBuffer4 ( pSocket,
-                                           Flags,
-                                           BufferLength,
-                                           pBuffer,
-                                           pDataLength,
-                                           pAddress,
-                                           AddressLength );
+                case SOCK_STREAM:
+                case SOCK_SEQPACKET:
+                  Status = EslTcpTxBuffer4 ( pSocket,
+                                             Flags,
+                                             BufferLength,
+                                             pBuffer,
+                                             pDataLength );
+                  break;
+
+                case SOCK_DGRAM:
+                  Status = EslUdpTxBuffer4 ( pSocket,
+                                             Flags,
+                                             BufferLength,
+                                             pBuffer,
+                                             pDataLength,
+                                             pAddress,
+                                             AddressLength );
+                  break;
+                }
                 break;
               }
-              break;
-            }
 
-            //
-            //  Release the socket layer synchronization
-            //
-            RESTORE_TPL ( TplPrevious );
+              //
+              //  Release the socket layer synchronization
+              //
+              RESTORE_TPL ( TplPrevious );
+            }
           }
         }
-      }
-      else {
-        //
-        //  The transmitter was shutdown
-        //
-        pSocket->errno = EPIPE;
-        Status = EFI_NOT_STARTED;
+        else {
+          //
+          //  The transmitter was shutdown
+          //
+          pSocket->errno = EPIPE;
+          Status = EFI_NOT_STARTED;
+        }
       }
     }
   }

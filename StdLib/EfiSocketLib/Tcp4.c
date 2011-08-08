@@ -2448,13 +2448,21 @@ EslTcpReceive4 (
           && ( NULL == pSocket->pRxPacketListHead )
           && ( NULL == pSocket->pRxOobPacketListHead )) {
           Status = pSocket->RxError;
+          pSocket->RxError = EFI_SUCCESS;
           switch ( Status ) {
           default:
             pSocket->errno = EIO;
             break;
           
           case EFI_CONNECTION_FIN:
-            pSocket->errno = ESHUTDOWN;
+            //
+            //  Continue to return zero bytes received when the
+            //  peer has successfully closed the connection
+            //
+            pSocket->RxError = EFI_CONNECTION_FIN;
+            *pDataLength = 0;
+            pSocket->errno = 0;
+            Status = EFI_SUCCESS;
             break;
 
           case EFI_CONNECTION_REFUSED:
@@ -2481,7 +2489,6 @@ EslTcpReceive4 (
             pSocket->errno = ENOPROTOOPT;
             break;
           }
-          pSocket->RxError = EFI_SUCCESS;
         }
         else {
           Status = EFI_NOT_READY;
