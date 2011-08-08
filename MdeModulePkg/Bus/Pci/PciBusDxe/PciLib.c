@@ -810,6 +810,12 @@ PciHostBridgeResourceAllocator (
     Mem64Bridge  = FindResourceNode (RootBridgeDev, &Mem64Pool);
     PMem64Bridge = FindResourceNode (RootBridgeDev, &PMem64Pool);
 
+    ASSERT (IoBridge     != NULL);
+    ASSERT (Mem32Bridge  != NULL);
+    ASSERT (PMem32Bridge != NULL);
+    ASSERT (Mem64Bridge  != NULL);
+    ASSERT (PMem64Bridge != NULL);
+
     //
     // Program IO resources
     //
