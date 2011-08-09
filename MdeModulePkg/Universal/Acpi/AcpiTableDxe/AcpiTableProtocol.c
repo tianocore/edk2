@@ -457,16 +457,14 @@ ReallocateAcpiTableBuffer (
   //
   NewMaxTableNumber = mEfiAcpiMaxNumTables + EFI_ACPI_MAX_NUM_TABLES;
   //
-  // Create RSDP, RSDT, XSDT structures and allocate all buffers
+  // Create RSDT, XSDT structures and allocate buffers.
   //
-  TotalSize = sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER) +
-      sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER) +
-      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 1.0 RSDT
-      NewMaxTableNumber * sizeof (UINT32) +
-      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 RSDT
-      NewMaxTableNumber * sizeof (UINT32) +
-      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 XSDT
-      NewMaxTableNumber * sizeof (UINT64);
+  TotalSize = sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 1.0 RSDT
+              NewMaxTableNumber * sizeof (UINT32) +
+              sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 RSDT
+              NewMaxTableNumber * sizeof (UINT32) +
+              sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 XSDT
+              NewMaxTableNumber * sizeof (UINT64);
 
   //
   // Allocate memory in the lower 32 bit of address range for
@@ -492,25 +490,16 @@ ReallocateAcpiTableBuffer (
   Pointer = (UINT8 *) (UINTN) PageAddress;
   ZeroMem (Pointer, TotalSize);
   
-  AcpiTableInstance->Rsdp1 = (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER *) Pointer;
-  Pointer += sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER);
-  AcpiTableInstance->Rsdp3 = (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER *) Pointer;
-  Pointer += sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER);
-
   AcpiTableInstance->Rsdt1 = (EFI_ACPI_DESCRIPTION_HEADER *) Pointer;
   Pointer += (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + NewMaxTableNumber * sizeof (UINT32));
   AcpiTableInstance->Rsdt3 = (EFI_ACPI_DESCRIPTION_HEADER *) Pointer;
   Pointer += (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + NewMaxTableNumber * sizeof (UINT32));
-
   AcpiTableInstance->Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *) Pointer;
 
   //
-  // Initialize RSDP
+  // Update RSDP to point to the new Rsdt and Xsdt address.
   //
-  CopyMem (AcpiTableInstance->Rsdp1, TempPrivateData.Rsdp1, sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER)); 
   AcpiTableInstance->Rsdp1->RsdtAddress = (UINT32) (UINTN) AcpiTableInstance->Rsdt1;
-  
-  CopyMem (AcpiTableInstance->Rsdp3, TempPrivateData.Rsdp3, sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER)); 
   AcpiTableInstance->Rsdp3->RsdtAddress = (UINT32) (UINTN) AcpiTableInstance->Rsdt3;
   CurrentData = (UINT64) (UINTN) AcpiTableInstance->Xsdt;
   CopyMem (&AcpiTableInstance->Rsdp3->XsdtAddress, &CurrentData, sizeof (UINT64));
@@ -525,15 +514,13 @@ ReallocateAcpiTableBuffer (
   //
   // Calculate orignal ACPI table buffer size
   //
-  TotalSize = sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER) +
-      sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER) +
-      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 1.0 RSDT
-      mEfiAcpiMaxNumTables * sizeof (UINT32) +
-      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 RSDT
-      mEfiAcpiMaxNumTables * sizeof (UINT32) +
-      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 XSDT
-      mEfiAcpiMaxNumTables * sizeof (UINT64);
-  gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)TempPrivateData.Rsdp1, EFI_SIZE_TO_PAGES (TotalSize));
+  TotalSize = sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 1.0 RSDT
+              mEfiAcpiMaxNumTables * sizeof (UINT32) +
+              sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 RSDT
+              mEfiAcpiMaxNumTables * sizeof (UINT32) +
+              sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 XSDT
+              mEfiAcpiMaxNumTables * sizeof (UINT64);
+  gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)TempPrivateData.Rsdt1, EFI_SIZE_TO_PAGES (TotalSize));
   
   //
   // Update the Max ACPI table number
@@ -1718,6 +1705,7 @@ AcpiTableAcpiTableConstructor (
   EFI_STATUS            Status;
   UINT64                CurrentData;
   UINTN                 TotalSize;
+  UINTN                 RsdpTableSize;
   UINT8                 *Pointer;
   EFI_PHYSICAL_ADDRESS  PageAddress;
 
@@ -1737,17 +1725,39 @@ AcpiTableAcpiTableConstructor (
   }
 
   //
-  // Create RSDP, RSDT, XSDT structures
-  // Allocate all buffers
+  // Create RSDP table
   //
-  TotalSize = sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER) +
-      sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER) +
-      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 1.0 RSDT
-      mEfiAcpiMaxNumTables * sizeof (UINT32) +
-      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 RSDT
-      mEfiAcpiMaxNumTables * sizeof (UINT32) +
-      sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 XSDT
-      mEfiAcpiMaxNumTables * sizeof (UINT64);
+  RsdpTableSize = sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER) +
+                  sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER);
+
+  PageAddress = 0xFFFFFFFF;
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiACPIReclaimMemory,
+                  EFI_SIZE_TO_PAGES (RsdpTableSize),
+                  &PageAddress
+                  );
+
+  if (EFI_ERROR (Status)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Pointer = (UINT8 *) (UINTN) PageAddress;
+  ZeroMem (Pointer, RsdpTableSize);
+
+  AcpiTableInstance->Rsdp1 = (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER *) Pointer;
+  Pointer += sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER);
+  AcpiTableInstance->Rsdp3 = (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER *) Pointer;
+
+  //
+  // Create RSDT, XSDT structures
+  //
+  TotalSize = sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 1.0 RSDT
+              mEfiAcpiMaxNumTables * sizeof (UINT32) +
+              sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 RSDT
+              mEfiAcpiMaxNumTables * sizeof (UINT32) +
+              sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 XSDT
+              mEfiAcpiMaxNumTables * sizeof (UINT64);
 
   //
   // Allocate memory in the lower 32 bit of address range for
@@ -1767,22 +1777,17 @@ AcpiTableAcpiTableConstructor (
                   );
 
   if (EFI_ERROR (Status)) {
+    gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)AcpiTableInstance->Rsdp1, EFI_SIZE_TO_PAGES (RsdpTableSize));
     return EFI_OUT_OF_RESOURCES;
   }
 
   Pointer = (UINT8 *) (UINTN) PageAddress;
   ZeroMem (Pointer, TotalSize);
 
-  AcpiTableInstance->Rsdp1 = (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER *) Pointer;
-  Pointer += sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER);
-  AcpiTableInstance->Rsdp3 = (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER *) Pointer;
-  Pointer += sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER);
-
   AcpiTableInstance->Rsdt1 = (EFI_ACPI_DESCRIPTION_HEADER *) Pointer;
   Pointer += (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + EFI_ACPI_MAX_NUM_TABLES * sizeof (UINT32));
   AcpiTableInstance->Rsdt3 = (EFI_ACPI_DESCRIPTION_HEADER *) Pointer;
   Pointer += (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + EFI_ACPI_MAX_NUM_TABLES * sizeof (UINT32));
-
   AcpiTableInstance->Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *) Pointer;
 
   //
