@@ -132,7 +132,6 @@
   gEfiLegacyInterruptProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
   gEfiLegacyRegion2ProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
   gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED
-  gEfiTimerArchProtocolGuid                     # PROTOCOL ALWAYS_PRODUCED
 
 [Pcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLegacyBiosCacheLegacyRegion

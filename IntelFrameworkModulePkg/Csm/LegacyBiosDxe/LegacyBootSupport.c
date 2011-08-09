@@ -819,14 +819,11 @@ GenericLegacyBoot (
   VOID                              *AcpiTable;
   UINTN                             ShadowAddress;
   UINT32                            Granularity;
-  EFI_TIMER_ARCH_PROTOCOL           *Timer;
-  UINT64                            TimerPeriod;
 
   LocalHddInfo  = NULL;
   HddCount      = 0;
   BbsCount      = 0;
   LocalBbsTable = NULL;
-  TimerPeriod   = 0;
 
   Private       = LEGACY_BIOS_INSTANCE_FROM_THIS (This);
   DEBUG_CODE (
@@ -841,36 +838,6 @@ GenericLegacyBoot (
 
   EfiToLegacy16BootTable->MajorVersion = EFI_TO_LEGACY_MAJOR_VERSION;
   EfiToLegacy16BootTable->MinorVersion = EFI_TO_LEGACY_MINOR_VERSION;
-
-  //
-  // Before starting the Legacy boot check the system ticker.
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiTimerArchProtocolGuid, 
-                  NULL,
-                  (VOID **) &Timer
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = Timer->GetTimerPeriod (
-                    Timer,
-                    &TimerPeriod
-                    );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  if (TimerPeriod != DEFAULT_LAGACY_TIMER_TICK_DURATION) {
-    Status = Timer->SetTimerPeriod (
-                      Timer, 
-                      DEFAULT_LAGACY_TIMER_TICK_DURATION
-                      );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
   
   //
   // If booting to a legacy OS then force HDD drives to the appropriate

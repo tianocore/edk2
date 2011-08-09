@@ -40,7 +40,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DevicePath.h>
 #include <Protocol/Legacy8259.h>
 #include <Protocol/PciRootBridgeIo.h>
-#include <Protocol/Timer.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -61,9 +60,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugAgentLib.h>
 
 //
-// System Tickers
-//
-#define DEFAULT_LAGACY_TIMER_TICK_DURATION 549254
 // BUGBUG: This entry maybe changed to PCD in future and wait for
 //         redesign of BDS library
 //
