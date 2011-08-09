@@ -1619,6 +1619,7 @@ RunScriptFileHandle (
   SCRIPT_COMMAND_LIST *LastCommand;
   BOOLEAN             Ascii;
   BOOLEAN             PreScriptEchoState;
+  BOOLEAN             PreCommandEchoState;
   CONST CHAR16        *CurDir;
   UINTN               LineCount;
 
@@ -1806,7 +1807,22 @@ RunScriptFileHandle (
             }
             ShellPrintEx(-1, -1, L"%s\r\n", CommandLine2);
           }
-          Status = RunCommand(CommandLine3);
+          if (CommandLine3[0] == L'@') {
+            //
+            // We need to save the current echo state
+            // and disable echo for just this command.
+            //
+            PreCommandEchoState = ShellCommandGetEchoState();
+            ShellCommandSetEchoState(FALSE);
+            Status = RunCommand(CommandLine3+1);
+
+            //
+            // Now restore the pre-'@' echo state.
+            //
+            ShellCommandSetEchoState(PreCommandEchoState);
+          } else {
+            Status = RunCommand(CommandLine3);
+          }
         }
 
         if (ShellCommandGetScriptExit()) {
