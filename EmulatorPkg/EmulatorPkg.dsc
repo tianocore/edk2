@@ -173,6 +173,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables|FALSE
 
 [PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000040
@@ -234,18 +235,6 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10
 
 
-!ifndef $(SKIP_MAIN_BUILD)
-[Components.X64]
-  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
-    <LibraryClasses>
-      # turn off CR3 write so that DXE IPL will not crash emulator
-      BaseLib|UnixPkg/Library/UnixBaseLib/UnixBaseLib.inf
-  }
-
-[Components.IA32]
-  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-!endif
-
 [Components]
 !ifdef $(UNIX_SEC_BUILD)
   ##
@@ -278,6 +267,7 @@
   EmulatorPkg/FirmwareVolumePei/FirmwareVolumePei.inf
   EmulatorPkg/FlashMapPei/FlashMapPei.inf
   EmulatorPkg/ThunkPpiToProtocolPei/ThunkPpiToProtocolPei.inf
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
   ##
   #  DXE Phase modules
