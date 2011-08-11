@@ -24,7 +24,7 @@
 //
 // PIIX4 Power Management Base Address
 //
-UINT32 mPmba = 0x401;
+UINT32 mPmba = 0x400;
 
 #define PCI_BAR_IO             0x1
 #define ACPI_TIMER_FREQUENCY   3579545
