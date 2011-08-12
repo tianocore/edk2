@@ -405,6 +405,10 @@ EfiPxeBcDhcp (
     //
     Status = PxeBcDhcp6Sarr (Private, Private->Dhcp6);
 
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
     //
     // Configure Udp6Read instance
     //
@@ -420,6 +424,10 @@ EfiPxeBcDhcp (
     // Start D.O.R.A. process to get a IPv4 address and other boot information.
     //
     Status = PxeBcDhcp4Dora (Private, Private->Dhcp4);
+
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
     //
     // Configure Udp4Read instance
