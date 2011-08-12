@@ -212,6 +212,7 @@ struct _DHCP6_TX_CB {
   UINT32                        RetryLos;
   UINT32                        TickTime;
   UINT16                        *Elapsed;
+  BOOLEAN                       SolicitRetry;
 };
 
 //

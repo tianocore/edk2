@@ -321,6 +321,8 @@ EfiPxeBcStop (
   gBS->CloseEvent (Private->UdpTimeOutEvent);
   Private->CurSrcPort   = 0;
   Private->BootFileSize = 0;
+  Private->SolicitTimes = 0;
+  Private->ElapsedTime  = 0;
 
   //
   // Reset the mode data.

@@ -474,4 +474,15 @@ PxeBcUniHexToUint8 (
   IN  CHAR16               Char
   );
 
+/**
+  Calculate the elapsed time
+
+  @param[in]      Private      The pointer to PXE private data
+
+**/
+VOID
+CalcElapsedTime (
+  IN     PXEBC_PRIVATE_DATA     *Private
+  );
+
 #endif

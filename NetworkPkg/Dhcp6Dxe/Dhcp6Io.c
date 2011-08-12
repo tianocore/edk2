@@ -2817,7 +2817,7 @@ Dhcp6OnTimerTick (
       //
       // Handle the first rt in the transmission of solicit specially.
       //
-      if (TxCb->RetryCnt == 0 && TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgSolicit) {
+      if ((TxCb->RetryCnt == 0 || TxCb->SolicitRetry) && TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgSolicit) {
         if (Instance->AdSelect == NULL) {
           //
           // Set adpref as 0xff here to indicate select any advertisement
@@ -2893,6 +2893,10 @@ Dhcp6OnTimerTick (
       // Retransmit the last sent packet again.
       //
       Dhcp6TransmitPacket (Instance, TxCb->TxPacket, TxCb->Elapsed);
+      TxCb->SolicitRetry = FALSE;
+      if (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgSolicit) {
+        TxCb->SolicitRetry = TRUE;
+      }
     }
   }
 

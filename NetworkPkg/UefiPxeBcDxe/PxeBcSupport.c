@@ -1464,3 +1464,56 @@ PxeBcUniHexToUint8 (
 
   return EFI_INVALID_PARAMETER;
 }
+
+/**
+  Calculate the elapsed time
+
+  @param[in]      Private      The pointer to PXE private data
+
+**/
+VOID
+CalcElapsedTime (
+  IN     PXEBC_PRIVATE_DATA     *Private
+  )
+{
+  EFI_TIME          Time;
+  UINT64            CurrentStamp;
+  UINT64            ElapsedTimeValue;
+
+  //
+  // Generate a time stamp of the centiseconds from 1900/1/1, assume 30day/month.
+  //
+  ZeroMem (&Time, sizeof (EFI_TIME));
+  gRT->GetTime (&Time, NULL);
+  CurrentStamp = (UINT64)
+    (
+      ((((((Time.Year - 1900) * 360 +
+       (Time.Month - 1)) * 30 +
+       (Time.Day - 1)) * 24 + Time.Hour) * 60 +
+       Time.Minute) * 60 + Time.Second) * 100
+       + DivU64x32(Time.Nanosecond, 10000000)
+    );
+
+  //
+  // Sentinel value of 0 means that this is the first DHCP packet that we are
+  // sending and that we need to initialize the value.  First DHCP Solicit
+  // gets 0 elapsed-time.  Otherwise, calculate based on StartTime.
+  //
+  if (Private->ElapsedTime == 0) {
+    Private->ElapsedTime = CurrentStamp;
+  } else {
+    ElapsedTimeValue = CurrentStamp - Private->ElapsedTime;
+
+    //
+    // If elapsed time cannot fit in two bytes, set it to 0xffff.
+    //
+    if (ElapsedTimeValue > 0xffff) {
+      ElapsedTimeValue = 0xffff;
+    }
+    //
+    // Save the elapsed time
+    //
+    Private->ElapsedTime = ElapsedTimeValue;
+  }
+}
+

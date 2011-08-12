@@ -1,7 +1,7 @@
 /** @file
   The internal functions and routines to transmit the IP6 packet.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -689,13 +689,25 @@ Ip6Output (
     // For unicast packets, use a combination of the Destination Cache, the Prefix List
     // and the Default Router List to determine the IP address of the appropriate next hop.
     //
-    RouteCache = Ip6Route (IpSb, &Head->DestinationAddress, &Head->SourceAddress);
-    if (RouteCache == NULL) {
-      return EFI_NOT_FOUND;
-    }
 
-    IP6_COPY_ADDRESS (&NextHop, &RouteCache->NextHop);
-    Ip6FreeRouteCacheEntry (RouteCache);
+    NeighborCache = Ip6FindNeighborEntry (IpSb, &Head->DestinationAddress);
+    if (NeighborCache != NULL) {
+      //
+      // Hit Neighbor Cache.
+      //
+      IP6_COPY_ADDRESS (&NextHop, &Head->DestinationAddress);
+    } else {
+      //
+      // Not in Neighbor Cache, check Router cache
+      //
+      RouteCache = Ip6Route (IpSb, &Head->DestinationAddress, &Head->SourceAddress);
+      if (RouteCache == NULL) {
+        return EFI_NOT_FOUND;
+      }
+
+      IP6_COPY_ADDRESS (&NextHop, &RouteCache->NextHop);
+      Ip6FreeRouteCacheEntry (RouteCache);
+    }
   }
 
   //

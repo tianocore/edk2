@@ -2,7 +2,7 @@
   This EFI_PXE_BASE_CODE_PROTOCOL and EFI_LOAD_FILE_PROTOCOL.
   interfaces declaration.
 
-  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -43,6 +43,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/NetLib.h>
@@ -146,6 +147,8 @@ struct _PXEBC_PRIVATE_DATA {
   EFI_PXE_BASE_CODE_MODE                    Mode;
   EFI_PXE_BASE_CODE_FUNCTION                Function;
   UINT32                                    Ip6Policy;
+  UINT32                                    SolicitTimes;
+  UINT64                                    ElapsedTime;
 
   EFI_UDP4_CONFIG_DATA                      Udp4CfgData;
   EFI_UDP6_CONFIG_DATA                      Udp6CfgData;
