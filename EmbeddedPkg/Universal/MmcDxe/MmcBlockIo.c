@@ -369,6 +369,28 @@ MmcReset (
   IN BOOLEAN                  ExtendedVerification
   )
 {
+  MMC_HOST_INSTANCE       *MmcHostInstance;
+
+  MmcHostInstance = MMC_HOST_INSTANCE_FROM_BLOCK_IO_THIS(This);
+
+  if (MmcHostInstance->MmcHost == NULL) {
+    // Nothing to do
+    return EFI_SUCCESS;
+  }
+
+  // If a card is not present then clear all media settings
+  if (!MmcHostInstance->MmcHost->IsCardPresent()) {
+    MmcHostInstance->BlockIo.Media->MediaPresent = FALSE;
+    MmcHostInstance->BlockIo.Media->LastBlock    = 0;
+    MmcHostInstance->BlockIo.Media->BlockSize    = 512;  // Should be zero but there is a bug in DiskIo
+    MmcHostInstance->BlockIo.Media->ReadOnly     = FALSE;
+
+    // Indicate that the driver requires initialization
+    MmcHostInstance->State = MmcHwInitializationState;
+
+    return EFI_SUCCESS;
+  }
+
   // Implement me. Either send a CMD0 (could not work for some MMC host) or just turn off/turn
   //      on power and restart Identification mode
   return EFI_SUCCESS;
@@ -419,11 +441,7 @@ MmcIoBlocks (
   }
 
   // Check if a Card is Present
-  if (!MmcHost->IsCardPresent()) {
-    MmcHostInstance->BlockIo.Media->MediaPresent = FALSE;
-    MmcHostInstance->BlockIo.Media->LastBlock    = 0;
-    MmcHostInstance->BlockIo.Media->BlockSize    = 512;  // Should be zero but there is a bug in DiskIo
-    MmcHostInstance->BlockIo.Media->ReadOnly     = FALSE;
+  if (!MmcHostInstance->BlockIo.Media->MediaPresent) {
     return EFI_NO_MEDIA;
   }
 

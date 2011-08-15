@@ -146,6 +146,8 @@ typedef struct _MMC_HOST_INSTANCE {
   EFI_BLOCK_IO_PROTOCOL     BlockIo;
   CARD_INFO                 CardInfo;
   EFI_MMC_HOST_PROTOCOL     *MmcHost;
+  
+  BOOLEAN                   Initialized;
 } MMC_HOST_INSTANCE;
 
 #define MMC_HOST_INSTANCE_SIGNATURE                 SIGNATURE_32('m', 'm', 'c', 'h')
