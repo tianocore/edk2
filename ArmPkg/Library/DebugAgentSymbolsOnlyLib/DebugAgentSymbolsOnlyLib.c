@@ -225,8 +225,10 @@ GetImageContext (
       switch (* (UINT32 *) CodeViewEntryPointer) {
       case CODEVIEW_SIGNATURE_NB10:
         ImageContext->PdbPointer = (CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY);
+        break;
       case CODEVIEW_SIGNATURE_RSDS:
         ImageContext->PdbPointer = (CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY);
+        break;
       case CODEVIEW_SIGNATURE_MTOC:
         ImageContext->PdbPointer = (CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY);
         break;
