@@ -210,8 +210,7 @@ MciReceiveResponse (
       (Type == MMC_RESPONSE_TYPE_R3) || (Type == MMC_RESPONSE_TYPE_R6) ||
       (Type == MMC_RESPONSE_TYPE_R7))
   {
-    Buffer[0] = MmioRead32(MCI_RESPONSE0_REG);
-    Buffer[1] = MmioRead32(MCI_RESPONSE1_REG);
+    Buffer[0] = MmioRead32(MCI_RESPONSE3_REG);
   } else if (Type == MMC_RESPONSE_TYPE_R2) {
     Buffer[0] = MmioRead32(MCI_RESPONSE0_REG);
     Buffer[1] = MmioRead32(MCI_RESPONSE1_REG);

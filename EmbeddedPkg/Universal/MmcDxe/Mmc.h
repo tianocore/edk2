@@ -32,15 +32,15 @@
 
 #define MMC_OCR_POWERUP             0x80000000
 
-#define MMC_CSD_GET_CCC(Response)    (Response[1] >> 20)
-#define MMC_CSD_GET_TRANSPEED(Response)    (Response[0] & 0xFF)
-#define MMC_CSD_GET_READBLLEN(Response)    ((Response[1] >> 16) & 0xF)
-#define MMC_CSD_GET_WRITEBLLEN(Response)  ((Response[3] >> 22) & 0xF)
-#define MMC_CSD_GET_FILEFORMAT(Response)  ((Response[3] >> 10) & 0x3)
-#define MMC_CSD_GET_FILEFORMATGRP(Response)  ((Response[3] >> 15) & 0x1)
-#define MMC_CSD_GET_DEVICESIZE(csd)         (((Response[2] >> 30) & 0x3) | ((Response[1] & 0x3FF) << 2))
+#define MMC_CSD_GET_CCC(Response)    (Response[2] >> 20)
+#define MMC_CSD_GET_TRANSPEED(Response)    (Response[3] & 0xFF)
+#define MMC_CSD_GET_READBLLEN(Response)    ((Response[2] >> 16) & 0xF)
+#define MMC_CSD_GET_WRITEBLLEN(Response)  ((Response[0] >> 22) & 0xF)
+#define MMC_CSD_GET_FILEFORMAT(Response)  ((Response[0] >> 10) & 0x3)
+#define MMC_CSD_GET_FILEFORMATGRP(Response)  ((Response[0] >> 15) & 0x1)
+#define MMC_CSD_GET_DEVICESIZE(csd)         (((Response[1] >> 30) & 0x3) | ((Response[2] & 0x3FF) << 2))
 #define HC_MMC_CSD_GET_DEVICESIZE(Response)    ((Response[1] >> 16) | ((Response[2] & 0x40) << 16));
-#define MMC_CSD_GET_DEVICESIZEMULT(csd)     ((Response[2] >> 15) & 0x7)
+#define MMC_CSD_GET_DEVICESIZEMULT(csd)     ((Response[1] >> 15) & 0x7)
 
 #define MMC_R0_READY_FOR_DATA               (1 << 8)
 
