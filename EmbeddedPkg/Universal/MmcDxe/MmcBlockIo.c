@@ -424,7 +424,7 @@ MmcIoBlocks (
   UINT32                  Response[4];
   EFI_STATUS              Status;
   UINTN                   CardSize, NumBlocks, BlockSize, CmdArg;
-  UINTN                   Timeout;
+  INTN                    Timeout;
   UINTN                   Cmd;
   MMC_HOST_INSTANCE       *MmcHostInstance;
   EFI_MMC_HOST_PROTOCOL   *MmcHost;
@@ -436,7 +436,7 @@ MmcIoBlocks (
   MmcHost = MmcHostInstance->MmcHost;
   ASSERT(MmcHost);
 
-  if (MmcHost == 0) {
+  if ((MmcHost == 0)|| (Buffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -445,7 +445,7 @@ MmcIoBlocks (
     return EFI_NO_MEDIA;
   }
 
-  // If the driver has not been initialized yet then go into Iddentification Mode
+  // If the driver has not been initialized yet then go into Identification Mode
   if (MmcHostInstance->State == MmcHwInitializationState) {
     MmcIdentificationMode (MmcHostInstance);
 
@@ -508,14 +508,24 @@ MmcIoBlocks (
     }
   }
 
-  if (Lba > This->Media->LastBlock) {
-      ASSERT(0);
-      return EFI_INVALID_PARAMETER;
+  // All blocks must be within the device
+  if ((Lba + (BufferSize / This->Media->BlockSize)) > (This->Media->LastBlock + 1)){
+    ASSERT(0);
+    return EFI_INVALID_PARAMETER;
   }
 
-  if ((BufferSize % This->Media->BlockSize) != 0) {
-      ASSERT(0);
-      return EFI_BAD_BUFFER_SIZE;
+  // The buffer size must not be zero and it must be an exact multiple of the block size
+  if ((BufferSize == 0) || ((BufferSize % This->Media->BlockSize) != 0)) {
+    ASSERT(0);
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  if (This->Media->MediaId != MediaId) {
+    return EFI_MEDIA_CHANGED;
+  }
+
+  if((Transfer == MMC_IOBLOCKS_WRITE) && (This->Media->ReadOnly == TRUE)) {
+    return EFI_WRITE_PROTECTED;
   }
 
   BytesRemainingToBeTransfered = BufferSize;
