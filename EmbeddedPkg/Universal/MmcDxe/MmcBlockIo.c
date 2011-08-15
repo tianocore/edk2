@@ -333,18 +333,20 @@ MmcIdentificationMode (
     return Status;
   }
 
-  CmdArg = 0;
-  CmdRetryCnt = CMD_RETRY_COUNT;
-  //Keep sending CMD 3 until card enters to Standby mode and Card status is ready
-  while((MMC_R0_CURRENTSTATE(Response) != MMC_R0_STATE_STDBY) && CmdRetryCnt--) {
-    Status = MmcHost->SendCommand(MMC_CMD3, CmdArg);
-    if (EFI_ERROR(Status)) {
-        DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD3): Error\n"));
-        return Status;
-    }
-    MmcHost->ReceiveResponse(MMC_RESPONSE_TYPE_RCA,Response);
-    PrintRCA(Response[0]);
+  //
+  // Note, SD specifications say that "if the command execution causes a state change, it
+  // will be visible to the host in the response to the next command"
+  // The status returned for this CMD3 will be 2 - identification
+  //
+  CmdArg = 1;
+  Status = MmcHost->SendCommand(MMC_CMD3, CmdArg);
+  if (EFI_ERROR(Status)) {
+    DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD3): Error\n"));
+    return Status;
   }
+
+  MmcHost->ReceiveResponse(MMC_RESPONSE_TYPE_RCA,Response);
+  PrintRCA(Response[0]);
 
   // For MMC card, RCA is assigned by CMD3 while CMD3 dumps the RCA for SD card
   if (MmcHostInstance->CardInfo.CardType != MMC_CARD) {
