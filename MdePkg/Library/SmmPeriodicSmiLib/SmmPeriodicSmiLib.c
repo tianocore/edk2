@@ -27,10 +27,8 @@
 #include <Library/SmmPeriodicSmiLib.h>
 
 ///
-/// Define the number of periodic SMI handler entries that should be allocated in 
-/// the constructor for gPeriodicSmiLibraryHandlers and also use this value as the 
-/// number of entries to add to gPeriodicSmiLibraryHandlers when gPeriodicSmiLibraryHandlers
-/// is full.
+/// Define the number of periodic SMI handler entries that should be allocated to the list
+/// of free periodic SMI handlers when the list of free periodic SMI handlers is empty.
 ///
 #define PERIODIC_SMI_LIBRARY_ALLOCATE_SIZE  0x08
 
@@ -47,6 +45,10 @@ typedef struct {
   /// Signature value that must be set to PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_SIGNATURE
   ///
   UINT32                                   Signature;
+  ///
+  /// The link entry to be inserted to the list of periodic SMI handlers.
+  ///
+  LIST_ENTRY                               Link;
   ///
   /// The dispatch function to called to invoke an enabled periodic SMI handler.
   ///
@@ -155,6 +157,19 @@ typedef struct {
     PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_SIGNATURE                    \
     )
 
+/**
+ Macro that returns a pointer to a PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT 
+ structure based on a pointer to a Link field.
+
+**/
+#define PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_FROM_LINK(a)             \
+  CR (                                                                \
+    a,                                                                \
+    PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT,                             \
+    Link,                                                             \
+    PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_SIGNATURE                    \
+    )
+
 ///
 /// Pointer to the SMM Periodic Timer Disatch Protocol that was located in the constuctor.
 ///
@@ -170,21 +185,22 @@ EFI_SMM_PERIODIC_TIMER_DISPATCH2_PROTOCOL  *gSmmPeriodicTimerDispatch2          
 UINT64                                     *gSmiTickPeriodTable                  = NULL;
 
 ///
-/// The number entries in gPeriodicSmiLibraryHandlers
+/// Linked list of free periodic SMI handlers that this library can use.
 ///
-UINTN                                      gNumberOfPeriodicSmiLibraryHandlers   = 0;
+LIST_ENTRY                                 gFreePeriodicSmiLibraryHandlers       =
+                                           INITIALIZE_LIST_HEAD_VARIABLE (gFreePeriodicSmiLibraryHandlers);
 
 ///
-/// Table of periodic SMI handlers that this library is currently managing.  This
-/// table is allocated using AllocatePool()
+/// Linked list of periodic SMI handlers that this library is currently managing.
 ///
-PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT       *gPeriodicSmiLibraryHandlers          = NULL;
+LIST_ENTRY                                 gPeriodicSmiLibraryHandlers           =
+                                           INITIALIZE_LIST_HEAD_VARIABLE (gPeriodicSmiLibraryHandlers);
 
 ///
-/// The index of gPeriodicSmiLibraryHandlers that is currently being executed.  
-/// Is set to -1 if no periodic SMI handler is currently being executed.
+/// Pointer to the periodic SMI handler that is currently being executed.
+/// Is set to NULL if no periodic SMI handler is currently being executed.
 ///
-INTN                                       gActivePeriodicSmiLibraryHandlerIndex = -1;
+PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT       *gActivePeriodicSmiLibraryHandler     = NULL;
 
 /**
   Internal worker function that returns a pointer to the 
@@ -202,18 +218,7 @@ GetActivePeriodicSmiLibraryHandler (
   VOID
   )
 {
-  if (gActivePeriodicSmiLibraryHandlerIndex < 0) {
-    //
-    // Return NULL if index is negative, which means that there is no active 
-    // periodic SMI handler.
-    //
-    return NULL;
-  }
-  
-  //
-  // Return a pointer to the active periodic SMI handler context
-  //
-  return &gPeriodicSmiLibraryHandlers[gActivePeriodicSmiLibraryHandlerIndex];
+  return gActivePeriodicSmiLibraryHandler;
 }
 
 /**
@@ -240,24 +245,30 @@ GetActivePeriodicSmiLibraryHandler (
 **/
 PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT *
 LookupPeriodicSmiLibraryHandler (
-  IN EFI_HANDLE  DispatchHandle    OPTIONAL
+  IN EFI_HANDLE                         DispatchHandle    OPTIONAL
   )
 {
-  UINTN  Index;
+  LIST_ENTRY                            *Link;
+  PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT  *PeriodicSmiLibraryHandler;
 
   //
   // If DispatchHandle is NULL, then return the active periodic SMI handler
-  //  
+  //
   if (DispatchHandle == NULL) {
     return GetActivePeriodicSmiLibraryHandler ();
   }
 
   //
   // Search the periodic SMI handler entries for a a matching DispatchHandle
-  //  
-  for (Index = 0; Index < gNumberOfPeriodicSmiLibraryHandlers; Index++) {
-    if (gPeriodicSmiLibraryHandlers[Index].DispatchHandle == DispatchHandle) {
-      return &gPeriodicSmiLibraryHandlers[Index];
+  //
+  for ( Link = GetFirstNode (&gPeriodicSmiLibraryHandlers)
+      ; !IsNull (&gPeriodicSmiLibraryHandlers, Link)
+      ; Link = GetNextNode (&gPeriodicSmiLibraryHandlers, Link)
+      ) {
+    PeriodicSmiLibraryHandler = PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_FROM_LINK (Link);
+
+    if (PeriodicSmiLibraryHandler->DispatchHandle == DispatchHandle) {
+      return PeriodicSmiLibraryHandler;
     }
   }
   
@@ -285,15 +296,88 @@ SetActivePeriodicSmiLibraryHandler (
   IN CONST VOID  *Context  OPTIONAL
   )
 {
-  PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT  *PeriodicSmiLibraryHandler;
-
   if (Context == NULL) {
-    gActivePeriodicSmiLibraryHandlerIndex = -1;
-    return NULL;
+    gActivePeriodicSmiLibraryHandler = NULL;
+  } else {
+    gActivePeriodicSmiLibraryHandler = PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_FROM_REGISTER_CONTEXT (Context);
   }
-  PeriodicSmiLibraryHandler = PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_FROM_REGISTER_CONTEXT (Context);
-  gActivePeriodicSmiLibraryHandlerIndex = PeriodicSmiLibraryHandler - gPeriodicSmiLibraryHandlers;
-  return PeriodicSmiLibraryHandler;
+  return gActivePeriodicSmiLibraryHandler;
+}
+
+/**
+  Internal worker function that moves the specified periodic SMI handler from the
+  list of managed periodic SMI handlers to the list of free periodic SMI handlers.
+
+  @param[in] PeriodicSmiLibraryHandler  Pointer to the periodic SMI handler to be reclaimed.
+**/
+VOID
+ReclaimPeriodicSmiLibraryHandler (
+  PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT     *PeriodicSmiLibraryHandler
+  )
+{
+  LIST_ENTRY                               *Link;
+
+  ASSERT (PeriodicSmiLibraryHandler->DispatchHandle == NULL);
+  if (PeriodicSmiLibraryHandler->Stack != NULL) {
+    FreePages (
+      PeriodicSmiLibraryHandler->Stack,
+      EFI_SIZE_TO_PAGES (PeriodicSmiLibraryHandler->StackSize)
+      );
+    PeriodicSmiLibraryHandler->Stack = NULL;
+  }
+  RemoveEntryList (&PeriodicSmiLibraryHandler->Link);
+  //
+  // Insert to gFreePeriodicSmiLibraryHandlers in the reverse order of the address of PeriodicSmiLibraryHandler
+  //
+  for ( Link = GetFirstNode (&gFreePeriodicSmiLibraryHandlers)
+      ; !IsNull (&gFreePeriodicSmiLibraryHandlers, Link)
+      ; Link = GetNextNode (&gFreePeriodicSmiLibraryHandlers, Link)
+      ) {
+    if (Link < &PeriodicSmiLibraryHandler->Link) {
+      break;
+    }
+  }
+  InsertTailList (Link, &PeriodicSmiLibraryHandler->Link);
+}
+
+/**
+  Add the additional entries to the list of free periodic SMI handlers.
+  The function is assumed to be called only when the list of free periodic SMI
+  handlers is empty.
+
+  @retval TRUE  The additional entries were added.
+  @retval FALSE There was no available resource for the additional entries.
+**/
+BOOLEAN
+EnlargeFreePeriodicSmiLibraryHandlerList (
+  VOID
+  )
+{
+  UINTN                                 Index;
+  PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT  *PeriodicSmiLibraryHandlers;
+
+  //
+  // The function is assumed to be called only when the list of free periodic SMI library
+  // handlers is empty.
+  //
+  ASSERT (IsListEmpty (&gFreePeriodicSmiLibraryHandlers));
+
+  PeriodicSmiLibraryHandlers = AllocatePool (
+                                 PERIODIC_SMI_LIBRARY_ALLOCATE_SIZE * sizeof (PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT)
+                                 );
+  if (PeriodicSmiLibraryHandlers == NULL) {
+    return FALSE;
+  }
+  
+  //
+  // Add the entries to the list in the reverse order of the their memory address
+  //
+  for (Index = 0; Index < PERIODIC_SMI_LIBRARY_ALLOCATE_SIZE; Index++) {
+    PeriodicSmiLibraryHandlers[Index].Signature  = PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_SIGNATURE;
+    InsertHeadList (&gFreePeriodicSmiLibraryHandlers, &PeriodicSmiLibraryHandlers[Index].Link);
+  }
+
+  return TRUE;
 }
 
 /**
@@ -310,40 +394,24 @@ FindFreePeriodicSmiLibraryHandler (
   VOID
   )
 {
-  UINTN                                 Index;
   PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT  *PeriodicSmiLibraryHandler;
   
-  //
-  // Search for a free entry in gPeriodicSmiLibraryHandlers
-  // A free entry must have a NULL DispatchHandle and a NULL Stack.
-  //  
-  for (Index = 0; Index < gNumberOfPeriodicSmiLibraryHandlers; Index++) {
-    if (gPeriodicSmiLibraryHandlers[Index].DispatchHandle != NULL) {
-      continue;
-    }
-    if (gPeriodicSmiLibraryHandlers[Index].Stack != NULL) {
-      continue;
-    }
-    return &gPeriodicSmiLibraryHandlers[Index];
-  }
-
-  //
-  // If no free entries were found, then grow the table of periodic SMI handler entries
-  //
-  if (Index == gNumberOfPeriodicSmiLibraryHandlers) {
-    PeriodicSmiLibraryHandler = ReallocatePool (
-                                  gNumberOfPeriodicSmiLibraryHandlers * sizeof (PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT),
-                                  (gNumberOfPeriodicSmiLibraryHandlers + PERIODIC_SMI_LIBRARY_ALLOCATE_SIZE) * sizeof (PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT),
-                                  gPeriodicSmiLibraryHandlers
-                                  );
-    if (PeriodicSmiLibraryHandler == NULL) {
+  if (IsListEmpty (&gFreePeriodicSmiLibraryHandlers)) {
+    if (!EnlargeFreePeriodicSmiLibraryHandlerList ()) {
       return NULL;
     }
-    gPeriodicSmiLibraryHandlers = PeriodicSmiLibraryHandler;
-    gNumberOfPeriodicSmiLibraryHandlers += PERIODIC_SMI_LIBRARY_ALLOCATE_SIZE;
   }
 
-  return &gPeriodicSmiLibraryHandlers[Index];
+  //
+  // Get one from the list of free periodic SMI handlers.
+  //
+  PeriodicSmiLibraryHandler = PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_FROM_LINK (
+                                GetFirstNode (&gFreePeriodicSmiLibraryHandlers)
+                                );
+  RemoveEntryList (&PeriodicSmiLibraryHandler->Link);
+  InsertTailList (&gPeriodicSmiLibraryHandlers, &PeriodicSmiLibraryHandler->Link);
+
+  return PeriodicSmiLibraryHandler;
 }
 
 /**
@@ -807,27 +875,12 @@ PeriodicSmiDispatchFunction (
     //
     ReleaseSpinLock (&PeriodicSmiLibraryHandler->DispatchLock);
   }
-  
+
   //
-  // Retrieve the active periodic SMI handler in case the entries were reallocated
-  // when the active periodic SMI handler was dispatched.
+  // Reclaim the active periodic SMI handler if it was disabled during the current dispatch.
   //
-  PeriodicSmiLibraryHandler = GetActivePeriodicSmiLibraryHandler ();
-  if (PeriodicSmiLibraryHandler != NULL) {
-    //
-    // If the active periodic SMI handler was disabled during the current dispatch 
-    // and the periodic SMI handler was allocated a stack when it was enabled, then 
-    // free that stack here.
-    //
-    if (PeriodicSmiLibraryHandler->DispatchHandle == NULL) {
-      if (PeriodicSmiLibraryHandler->Stack != NULL) {
-        FreePages (
-          PeriodicSmiLibraryHandler->Stack, 
-          EFI_SIZE_TO_PAGES (PeriodicSmiLibraryHandler->StackSize)
-          );
-        PeriodicSmiLibraryHandler->Stack = NULL;  
-      }
-    }
+  if (PeriodicSmiLibraryHandler->DispatchHandle == NULL) {
+    ReclaimPeriodicSmiLibraryHandler (PeriodicSmiLibraryHandler);
   }
   
   //
@@ -923,8 +976,7 @@ PeriodicSmiEnable (
 
   //
   // Initialize a new periodic SMI handler entry
-  //  
-  PeriodicSmiLibraryHandler->Signature        = PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_SIGNATURE;
+  //
   PeriodicSmiLibraryHandler->YieldFlag        = FALSE;
   PeriodicSmiLibraryHandler->DispatchHandle   = NULL;
   PeriodicSmiLibraryHandler->DispatchFunction = DispatchFunction;
@@ -937,6 +989,8 @@ PeriodicSmiEnable (
       return EFI_OUT_OF_RESOURCES;
     }
     ZeroMem (PeriodicSmiLibraryHandler->Stack, PeriodicSmiLibraryHandler->StackSize);
+  } else {
+    PeriodicSmiLibraryHandler->Stack = NULL;
   }
   InitializeSpinLock (&PeriodicSmiLibraryHandler->DispatchLock);
   PeriodicSmiLibraryHandler->PerfomanceCounterRate = GetPerformanceCounterProperties (
@@ -951,18 +1005,9 @@ PeriodicSmiEnable (
                                          &PeriodicSmiLibraryHandler->RegisterContext,
                                          &PeriodicSmiLibraryHandler->DispatchHandle
                                          );
-  if (EFI_ERROR (Status) || PeriodicSmiLibraryHandler->DispatchHandle == NULL) {
-    //
-    // If the registration failed or the handle is invalid, free the stack if one was allocated
-    //
-    if (PeriodicSmiLibraryHandler->Stack != NULL) {
-      FreePages (
-        PeriodicSmiLibraryHandler->Stack, 
-        EFI_SIZE_TO_PAGES (PeriodicSmiLibraryHandler->StackSize)
-        );
-      PeriodicSmiLibraryHandler->Stack = NULL;  
-    }
+  if (EFI_ERROR (Status)) {
     PeriodicSmiLibraryHandler->DispatchHandle = NULL;
+    ReclaimPeriodicSmiLibraryHandler (PeriodicSmiLibraryHandler);
     return EFI_OUT_OF_RESOURCES;
   }
   
@@ -1021,25 +1066,15 @@ PeriodicSmiDisable (
   }
 
   //
-  // If active periodic SMI handler is not the periodic SMI handler being 
-  // disabled, and the periodic SMI handler being disabled was allocated a 
-  // stack when it was enabled, then free the stack.
-  //
-  if (PeriodicSmiLibraryHandler != GetActivePeriodicSmiLibraryHandler ()) {
-    if (PeriodicSmiLibraryHandler->Stack != NULL) {
-      FreePages (
-        PeriodicSmiLibraryHandler->Stack, 
-        EFI_SIZE_TO_PAGES (PeriodicSmiLibraryHandler->StackSize)
-        );
-      PeriodicSmiLibraryHandler->Stack = NULL;  
-    }
-  }
-  
-  //
-  // Mark the entry for the disabled periodic SMI handler as free
+  // Mark the entry for the disabled periodic SMI handler as free, and
+  // call ReclaimPeriodicSmiLibraryHandler to move it to the list of free
+  // periodic SMI handlers.
   //
   PeriodicSmiLibraryHandler->DispatchHandle = NULL;
-  
+  if (PeriodicSmiLibraryHandler != GetActivePeriodicSmiLibraryHandler ()) {
+    ReclaimPeriodicSmiLibraryHandler (PeriodicSmiLibraryHandler);
+  }
+
   return TRUE;
 }
 
@@ -1111,12 +1146,12 @@ SmmPeriodicSmiLibConstructor (
       gSmiTickPeriodTable[Count] = *SmiTickInterval;
     }
     Count++;
-  } while (SmiTickInterval != NULL);                                           
+  } while (SmiTickInterval != NULL);
 
   //
   // Allocate buffer for initial set of periodic SMI handlers
   //
-  FindFreePeriodicSmiLibraryHandler ();
+  EnlargeFreePeriodicSmiLibraryHandlerList ();
 
   return EFI_SUCCESS;
 }
@@ -1138,28 +1173,43 @@ SmmPeriodicSmiLibDestructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  UINTN  Index;
+  LIST_ENTRY                            *Link;
+  PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT  *PeriodicSmiLibraryHandler;
+  UINTN                                 Index;
 
   //
   // Free the table of supported periodic SMI tick rates
-  //  
+  //
   if (gSmiTickPeriodTable != NULL) {
     FreePool (gSmiTickPeriodTable);
   }
 
   //
   // Disable all periodic SMI handlers
-  //  
-  for (Index = 0; Index < gNumberOfPeriodicSmiLibraryHandlers; Index++) {
-    PeriodicSmiDisable (gPeriodicSmiLibraryHandlers[Index].DispatchHandle);
+  //
+  for (Link = GetFirstNode (&gPeriodicSmiLibraryHandlers); !IsNull (&gPeriodicSmiLibraryHandlers, Link);) {
+    PeriodicSmiLibraryHandler = PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_FROM_LINK (Link);
+    Link = GetNextNode (&gPeriodicSmiLibraryHandlers, Link);
+    PeriodicSmiDisable (PeriodicSmiLibraryHandler->DispatchHandle);
   }
-  
+
   //
   // Free all the periodic SMI handler entries
   //
-  if (gPeriodicSmiLibraryHandlers != NULL) {
-    FreePool (gPeriodicSmiLibraryHandlers);
+  Index = 0;
+  for (Link = GetFirstNode (&gFreePeriodicSmiLibraryHandlers); !IsNull (&gFreePeriodicSmiLibraryHandlers, Link);) {    
+    PeriodicSmiLibraryHandler = PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_FROM_LINK (Link);
+    Link = RemoveEntryList (Link);
+    Index++;
+    //
+    // Because the entries in the list are in the reverse order of the address of PeriodicSmiLibraryHandler and
+    // every PERIODIC_SMI_LIBRARY_ALLOCATE_SIZE entries are in the same pool returned by AllocatePool(),
+    // every PERIODIC_SMI_LIBRARY_ALLOCATE_SIZE'th entry is the header of allocated pool.
+    //
+    if ((Index % PERIODIC_SMI_LIBRARY_ALLOCATE_SIZE) == 0) {
+      FreePool (PeriodicSmiLibraryHandler);
+    }
   }
-  
+
   return EFI_SUCCESS;
 }
