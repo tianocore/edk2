@@ -464,9 +464,8 @@ MmcIoBlocks (
     PrintCSD(Response);
 
     if (MmcHostInstance->CardInfo.CardType == SD_CARD_2_HIGH) {
-      ASSERT(0);  //TODO: Implementation needed
-      CardSize = MMC_CSD_GET_DEVICESIZE(Response);
-      NumBlocks = ((CardSize + 1) * 1024);;
+      CardSize = HC_MMC_CSD_GET_DEVICESIZE(Response);
+      NumBlocks = ((CardSize + 1) * 1024);
       BlockSize = 1 << MMC_CSD_GET_READBLLEN(Response);
     } else {
       CardSize = MMC_CSD_GET_DEVICESIZE(Response);
