@@ -13,9 +13,10 @@
 
 **/
 
-#include <Base.h>
+#include <PiDxe.h>
 #include <Library/DebugLib.h>
 #include <Library/DmaLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UncachedMemoryAllocationLib.h>
@@ -37,9 +38,6 @@ typedef struct {
 
 EFI_CPU_ARCH_PROTOCOL      *gCpu;
 UINTN                      gCacheAlignment = 0;
-
-
-
 
 /**                                                                 
   Provides the DMA controller-specific addresses needed to access system memory.
@@ -71,15 +69,14 @@ DmaMap (
   OUT    VOID                           **Mapping
   )
 {
-  EFI_STATUS            Status;
-  MAP_INFO_INSTANCE     *Map;
-  VOID                  *Buffer;
+  EFI_STATUS                      Status;
+  MAP_INFO_INSTANCE               *Map;
+  VOID                            *Buffer;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR GcdDescriptor;
 
-  if ( HostAddress == NULL || NumberOfBytes == NULL || 
-       DeviceAddress == NULL || Mapping == NULL ) {
+  if (HostAddress == NULL || NumberOfBytes == NULL || DeviceAddress == NULL || Mapping == NULL ) {
     return EFI_INVALID_PARAMETER;
   }
-  
 
   if (Operation >= MapOperationMaximum) {
     return EFI_INVALID_PARAMETER;
@@ -97,20 +94,44 @@ DmaMap (
 
   if ((((UINTN)HostAddress & (gCacheAlignment - 1)) != 0) ||
       ((*NumberOfBytes % gCacheAlignment) != 0)) {
-    //
-    // If the buffer does not fill entire cache lines we must double buffer into 
-    // uncached memory. Device (PCI) address becomes uncached page.
-    //
-    Map->DoubleBuffer  = TRUE;
-    Status = DmaAllocateBuffer (EfiBootServicesData, EFI_SIZE_TO_PAGES (*NumberOfBytes), &Buffer);
-    if (EFI_ERROR (Status)) {
+
+    // Get the cacheability of the region
+    Status = gDS->GetMemorySpaceDescriptor (HostAddress, &GcdDescriptor);
+    if (EFI_ERROR(Status)) {
       return Status;
     }
-    
-    *DeviceAddress = (PHYSICAL_ADDRESS)(UINTN)Buffer;
-    
+
+    // If the mapped buffer is not an uncached buffer
+    if (GcdDescriptor.Attributes != EFI_MEMORY_UC) {
+      //
+      // If the buffer does not fill entire cache lines we must double buffer into
+      // uncached memory. Device (PCI) address becomes uncached page.
+      //
+      Map->DoubleBuffer  = TRUE;
+      Status = DmaAllocateBuffer (EfiBootServicesData, EFI_SIZE_TO_PAGES (*NumberOfBytes), &Buffer);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      if ((Operation == MapOperationBusMasterRead) || (Operation == MapOperationBusMasterCommonBuffer)) {
+        CopyMem (Buffer, HostAddress, *NumberOfBytes);
+      }
+
+      *DeviceAddress = (PHYSICAL_ADDRESS)(UINTN)Buffer;
+    } else {
+      Map->DoubleBuffer  = FALSE;
+    }
   } else {
     Map->DoubleBuffer  = FALSE;
+
+    // Flush the Data Cache (should not have any effect if the memory region is uncached)
+    gCpu->FlushDataCache (gCpu, *DeviceAddress, *NumberOfBytes, EfiCpuFlushTypeWriteBackInvalidate);
+
+    if ((Operation == MapOperationBusMasterRead) || (Operation == MapOperationBusMasterCommonBuffer)) {
+      // In case the buffer is used for instance to send command to a PCI controller, we must ensure the memory is uncached
+      Status = gDS->SetMemorySpaceAttributes (ALIGN_VALUE(*DeviceAddress - BASE_4KB - 1,BASE_4KB), ALIGN_VALUE(*NumberOfBytes,BASE_4KB), EFI_MEMORY_UC);
+      ASSERT_EFI_ERROR (Status);
+    }
   }
 
   Map->HostAddress   = (UINTN)HostAddress;
@@ -118,17 +139,6 @@ DmaMap (
   Map->NumberOfBytes = *NumberOfBytes;
   Map->Operation     = Operation;
 
-  if (Map->DoubleBuffer) {
-    if (Map->Operation == MapOperationBusMasterWrite) {
-      CopyMem ((VOID *)(UINTN)Map->DeviceAddress, (VOID *)(UINTN)Map->HostAddress, Map->NumberOfBytes);
-    }
-  } else {
-    // EfiCpuFlushTypeWriteBack, EfiCpuFlushTypeInvalidate
-    if (Map->Operation == MapOperationBusMasterWrite || Map->Operation == MapOperationBusMasterRead) {
-      gCpu->FlushDataCache (gCpu, (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress,  Map->NumberOfBytes, EfiCpuFlushTypeWriteBackInvalidate);
-    }
-  }
-  
   return EFI_SUCCESS;
 }
 
@@ -159,7 +169,7 @@ DmaUnmap (
   Map = (MAP_INFO_INSTANCE *)Mapping;
   
   if (Map->DoubleBuffer) {
-    if (Map->Operation == MapOperationBusMasterRead) {
+    if ((Map->Operation == MapOperationBusMasterWrite) || (Map->Operation == MapOperationBusMasterCommonBuffer)) {
       CopyMem ((VOID *)(UINTN)Map->HostAddress, (VOID *)(UINTN)Map->DeviceAddress, Map->NumberOfBytes);
     }
     
