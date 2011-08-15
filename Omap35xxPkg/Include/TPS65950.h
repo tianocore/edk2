@@ -50,4 +50,11 @@
 #define LEDAPWM               BIT4
 #define LEDBPWM               BIT5
 
+// USB PHY power
+#define VAUX2_DEDICATED       0x79
+#define VAUX2_DEV_GRP         0x76
+
+#define VAUX_DEV_GRP_P1       0x20
+#define VAUX_DEDICATED_18V    0x05
+
 #endif //__TPS65950_H__

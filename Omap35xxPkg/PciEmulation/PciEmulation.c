@@ -60,7 +60,7 @@ ConfigureUSBHost (
   EFI_STATUS Status;
   UINT8      Data = 0;
 
-   // Take USB host out of force-standby mode
+  // Take USB host out of force-standby mode
   MmioWrite32 (UHH_SYSCONFIG, UHH_SYSCONFIG_MIDLEMODE_NO_STANDBY
                             | UHH_SYSCONFIG_CLOCKACTIVITY_ON
                             | UHH_SYSCONFIG_SIDLEMODE_NO_STANDBY
@@ -77,22 +77,32 @@ ConfigureUSBHost (
                              | UHH_HOSTCONFIG_P1_ULPI_BYPASS_ULPI_MODE);
 
   // USB reset (GPIO 147 - Port 5 pin 19) output high
-  MmioAnd32(GPIO5_BASE + GPIO_OE, ~BIT19);
+  MmioAnd32 (GPIO5_BASE + GPIO_OE, ~BIT19);
   MmioWrite32 (GPIO5_BASE + GPIO_SETDATAOUT, BIT19);
 
-  // Get the Power IC protocol.
-  Status = gBS->LocateProtocol(&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
+  // Get the Power IC protocol
+  Status = gBS->LocateProtocol (&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
+  ASSERT_EFI_ERROR (Status);  
+
+  // Power the USB PHY
+  Data = VAUX_DEV_GRP_P1;
+  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VAUX2_DEV_GRP), 1, &Data);
   ASSERT_EFI_ERROR(Status);
 
-  //Enable power to the USB host.
-  Status = gTPS65950->Read(gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
-  ASSERT_EFI_ERROR(Status);
+  Data = VAUX_DEDICATED_18V;
+  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VAUX2_DEDICATED), 1, &Data);
+  ASSERT_EFI_ERROR (Status);  
 
-  //LEDAON & LEDAPWM control the power to the USB host so enable those bits.
-  Data |= (LEDAON | LEDAPWM);
+  // Enable power to the USB hub
+  Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
+  ASSERT_EFI_ERROR (Status);
 
-  Status = gTPS65950->Write(gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
-  ASSERT_EFI_ERROR(Status);
+  // LEDAON controls the power to the USB host, PWM is disabled
+  Data &= ~LEDAPWM;
+  Data |= LEDAON;
+
+  Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
+  ASSERT_EFI_ERROR (Status);
 }
 
 
