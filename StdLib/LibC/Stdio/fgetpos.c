@@ -56,7 +56,7 @@ fgetpos(FILE *fp, fpos_t *pos)
   _DIAGASSERT(fp != NULL);
   _DIAGASSERT(pos != NULL);
 
-  if(fp == NULL) {
+  if((fp == NULL) || (pos == NULL)) {
     errno = EINVAL;
     return (EOF);
   }

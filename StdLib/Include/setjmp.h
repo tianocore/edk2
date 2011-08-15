@@ -1,16 +1,15 @@
 /** @file
-  The header <setjmp.h> defines the macro setjmp, and declares one function
-  and one type, for bypassing the normal function call and return discipline.
+    This file defines the macro setjmp, and declares the function longjmp
+    and the type jmp_buf, for bypassing the normal function call and return discipline.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under
-the terms and conditions of the BSD License that accompanies this distribution.
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available under
+    the terms and conditions of the BSD License that accompanies this distribution.
+    The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 #ifndef _SETJMP_H
 #define _SETJMP_H
@@ -40,7 +39,8 @@ typedef BASE_LIBRARY_JUMP_BUFFER jmp_buf[1];
 
     @return   If the return is from a direct invocation, the setjmp macro
     returns the value zero. If the return is from a call to the longjmp
-    function, the setjmp macro returns a nonzero value.
+    function, the setjmp macro returns a nonzero value based upon the value
+    of the second argument to the longjmp function.
 **/
 #define setjmp(env)   (INTN)SetJump((env))
 
@@ -52,7 +52,10 @@ typedef BASE_LIBRARY_JUMP_BUFFER jmp_buf[1];
     macro was within the scope of an identifier with variably modified type and
     execution has left that scope in the interim, the behavior is undefined.
 
-    After longjmp is completed, program execution continues as if the
+    @param[in]    env     The jump buffer containing the environment to be returned to.
+    @param[in]    val     A non-zero value to be returned from setjmp.
+
+    @return     After longjmp is completed, program execution continues as if the
     corresponding invocation of the setjmp macro had just returned the value
     specified by val. The longjmp function cannot cause the setjmp macro to
     return the value 0; if val is 0, the setjmp macro returns the value 1.

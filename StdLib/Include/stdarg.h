@@ -1,54 +1,53 @@
 /** @file
-  The header <stdarg.h> declares a type and defines three macros, for advancing
-  through a list of arguments whose number and types are not known to the
-  called function when it is translated.
+    This header, <stdarg.h>, declares type va_list and defines macros: va_start, va_arg, va_end;
+    for advancing through a list of arguments whose number and types are not known to the
+    called function when it is translated.
 
-  A function may be called with a variable number of arguments of varying types.
-  Its parameter list contains one or more parameters.  The rightmost parameter
-  plays a special role in the access mechanism, and will be designated paramN
-  in this description.
+    A function may be called with a variable number of arguments of varying types.
+    The rightmost argument plays a special role in the access mechanism, and will
+    be designated paramN in this and subsequent descriptions.
 
-  The type va_list is a type suitable for holding information needed by the
-  macros va_start, va_arg, and va_end.  If access to the varying arguments
-  is desired, the called function shall declare an object (referred to as ap
-  in these descriptions) having type va_list.  The object ap may be passed as
-  an argument to another function; if that function invokes the va_arg macro
-  with parameter ap, the value of ap in the calling function is indeterminate
-  and shall be passed to the va_end macro prior to any further reference to ap.
+    The type va_list is a type suitable for holding information needed by the
+    macros va_start, va_arg, and va_end.  If access to the varying arguments
+    is desired, the called function shall declare an object (referred to as ap
+    in these descriptions) having type va_list.  The object ap may be passed as
+    an argument to another function; if the receiving function invokes the va_arg macro
+    with parameter ap, the value of ap in the calling function becomes indeterminate
+    and must be passed to the va_end macro prior to any further reference to ap.
 
-  The va_start and va_arg macros shall be implemented as macros, not as actual
-  functions.  It is unspecified, by the C library standards, whether va_end
-  is a macro or an identifier declared with external linkage.  If a macro
-  definition is suppressed in order to access an actual function, or a
-  program defines an external identifier with the name va_end, the behavior
-  is undefined.  The va_start and va_end macros shall be invoked in the
-  function accepting a varying number of arguments, if access to the varying
-  arguments is desired.
+    The va_start and va_arg macros must be implemented as macros, not as actual
+    functions.  The va_start and va_end macros must be invoked in the
+    function accepting a varying number of arguments, if access to the varying
+    arguments is desired.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under
-the terms and conditions of the BSD License that accompanies this distribution.
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available under
+    the terms and conditions of the BSD License that accompanies this distribution.
+    The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 #ifndef _STDARG_H
 #define _STDARG_H
 #include  <sys/EfiCdefs.h>
 
-/** The type va_list is a type suitable for holding information needed by the
+/** @{
+    The type va_list is a type suitable for holding information needed by the
     macros va_start, va_arg, and va_end.
+
+    Depending upon compiler or CPU architecture, different definitions are required.
 **/
 #if defined(__GNUC__)
 typedef __builtin_va_list   va_list;
 #else
 #define va_list   VA_LIST
 #endif
+/*@}*/
 
-/** The va_start macro shall be invoked before any access to the unnamed arguments.
+/** @{
+    The va_start macro must be invoked before any access to the unnamed arguments.
     The va_start macro initializes ap for subsequent use by va_arg and va_end.
 
     Synopsys: void va_start(va_list ap, paramN);
@@ -71,8 +70,10 @@ typedef __builtin_va_list   va_list;
 #else
 #define va_start    VA_START
 #endif
+/*@}*/
 
-/** The va_arg macro expands to an expression that has the type and value of
+/** @{
+    The va_arg macro expands to an expression that has the type and value of
     the next argument in the call.  The parameter ap shall be the same as the
     va_list ap initialized by va_start.  Each invocation of va_arg modifies ap
     so that the values of successive arguments are returned in turn.  The
@@ -99,8 +100,10 @@ typedef __builtin_va_list   va_list;
 #else
 #define va_arg        VA_ARG
 #endif
+/*@}*/
 
-/** The va_end macro facillitates a normal return from the function whose
+/** @{
+    The va_end macro facillitates a normal return from the function whose
     variable argument list was referred to by the expansion of va_start that
     initialized the va_list ap.
 
@@ -119,12 +122,16 @@ typedef __builtin_va_list   va_list;
 #else
 #define va_end              VA_END
 #endif
+/*@}*/
 
-/** For BSD compatibility. **/
+/** @{
+    For BSD compatibility.
+**/
 #if defined(__GNUC__)
 #define va_copy         __builtin_va_copy
 #else
 #define va_copy(s,d)      (s) = (d)
 #endif
+/*@}*/
 
 #endif  /* _STDARG_H */
