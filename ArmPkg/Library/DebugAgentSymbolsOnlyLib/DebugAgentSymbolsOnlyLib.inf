@@ -34,5 +34,5 @@
   PeCoffLib
 
 [Pcd]
-  gArmTokenSpaceGuid.PcdSecureFdBaseAddress
+  gArmTokenSpaceGuid.PcdSecureFvBaseAddress
   gArmTokenSpaceGuid.PcdNormalFvBaseAddress
