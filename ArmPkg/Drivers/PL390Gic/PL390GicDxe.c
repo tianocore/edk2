@@ -80,7 +80,7 @@ RegisterInterruptSource (
   if (Source > PcdGet32(PcdGicNumInterrupts)) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
-  } 
+  }
   
   if ((Handler == NULL) && (gRegisteredInterruptHandlers[Source] == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -91,7 +91,13 @@ RegisterInterruptSource (
   }
 
   gRegisteredInterruptHandlers[Source] = Handler;
-  return This->EnableInterruptSource(This, Source);
+
+  // If the interrupt handler is unregistered then disable the interrupt
+  if (NULL == Handler){
+  	return This->DisableInterruptSource (This, Source);
+  } else {
+  	return This->EnableInterruptSource (This, Source);
+  }
 }
 
 /**
