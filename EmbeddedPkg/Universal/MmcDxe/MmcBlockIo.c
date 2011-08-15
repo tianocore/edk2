@@ -498,6 +498,18 @@ MmcIoBlocks (
       DEBUG((EFI_D_ERROR, "MmcIdentificationMode() : Error MmcTransferState\n"));
       return Status;
     }
+
+    // Set Block Length
+    Status = MmcHost->SendCommand(MMC_CMD16, This->Media->BlockSize);
+    if (EFI_ERROR(Status)) {
+      DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD16): Error This->Media->BlockSize: %d and Error = %r\n",This->Media->BlockSize, Status));
+      return Status;
+    }
+
+    // Block Count (not used). Could return an error for SD card
+    if (MmcHostInstance->CardInfo.CardType == MMC_CARD) {
+      MmcHost->SendCommand(MMC_CMD23, BlockCount);
+    }
   } else {
     // Maybe test if the card has changed to update gMmcMedia information
     if (MmcHostInstance->State == MmcTransferState) {
@@ -547,16 +559,6 @@ MmcIoBlocks (
       DEBUG((EFI_D_ERROR, "The Card is busy\n"));
       return EFI_NOT_READY;
     }
-
-    // Set Block Length
-    Status = MmcHost->SendCommand(MMC_CMD16, This->Media->BlockSize);
-    if (EFI_ERROR(Status)) {
-      DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD16): Error This->Media->BlockSize:%d and Error = %r\n",This->Media->BlockSize, Status));
-      return Status;
-    }
-
-    // Block Count (not used). Could return an error for SD card
-    MmcHost->SendCommand(MMC_CMD23, BlockCount);
 
     //Set command argument based on the card access mode (Byte mode or Block mode)
     if (MmcHostInstance->CardInfo.OCRData.AccessMode & BIT1) {
