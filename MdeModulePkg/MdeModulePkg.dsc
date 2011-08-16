@@ -120,7 +120,8 @@
 [LibraryClasses.common.SMM_CORE]
   MemoryAllocationLib|MdeModulePkg/Library/PiSmmCoreMemoryAllocationLib/PiSmmCoreMemoryAllocationLib.inf
   SmmServicesTableLib|MdeModulePkg/Library/PiSmmCoreSmmServicesTableLib/PiSmmCoreSmmServicesTableLib.inf
-  
+  SmmCorePlatformHookLib|MdeModulePkg/Library/SmmCorePlatformHookLibNull/SmmCorePlatformHookLibNull.inf  
+
 [LibraryClasses.common.DXE_SMM_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
@@ -321,4 +322,5 @@
   MdeModulePkg/Library/SmmPerformanceLib/SmmPerformanceLib.inf
   MdeModulePkg/Library/DxeSmmPerformanceLib/DxeSmmPerformanceLib.inf
   MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxPeiLib.inf
+  MdeModulePkg/Library/SmmCorePlatformHookLibNull/SmmCorePlatformHookLibNull.inf
 

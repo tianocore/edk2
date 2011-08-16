@@ -1,7 +1,7 @@
 /** @file
   SMM Core Main Entry Point
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -246,10 +246,17 @@ SmmEntryPoint (
   EFI_STATUS                  Status;
   EFI_SMM_COMMUNICATE_HEADER  *CommunicateHeader;
 
+  PERF_START (NULL, "SMM", NULL, 0) ;
+
   //
   // Update SMST using the context
   //
   CopyMem (&gSmmCoreSmst.SmmStartupThisAp, SmmEntryContext, sizeof (EFI_SMM_ENTRY_CONTEXT));
+
+  //
+  // Call platform hook before Smm Dispatch
+  //
+  PlatformHookBeforeSmmDispatch ();
 
   //
   // If a legacy boot has occured, then make sure gSmmCorePrivate is not accessed
@@ -297,11 +304,18 @@ SmmEntryPoint (
     //
     SmiManage (NULL, NULL, NULL, NULL);
   }
+  
+  //
+  // Call platform hook after Smm Dispatch
+  //
+  PlatformHookAfterSmmDispatch ();
 
   //
   // Clear the InSmm flag as we are going to leave SMM
   //
   gSmmCorePrivate->InSmm = FALSE;
+
+  PERF_END (NULL, "SMM", NULL, 0) ;
 }
 
 /**
