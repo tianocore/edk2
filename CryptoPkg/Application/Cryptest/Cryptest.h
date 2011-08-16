@@ -1,7 +1,7 @@
 /** @file  
   Application for Cryptographic Primitives Validation.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -85,7 +85,19 @@ ValidateCryptRsa2 (
   );
 
 /**
-  Validate UEFI-OpenSSL PKCS#7 Verification Interfaces.
+  Validate UEFI-OpenSSL PKCS#7 Signing & Verification Interfaces.
+
+  @retval  EFI_SUCCESS  Validation succeeded.
+  @retval  EFI_ABORTED  Validation failed.
+
+**/
+EFI_STATUS
+ValidateCryptPkcs7 (
+  VOID
+  );
+
+/**
+  Validate UEFI-OpenSSL Authenticode Verification Interfaces.
 
   @retval  EFI_SUCCESS  Validation succeeded.
   @retval  EFI_ABORTED  Validation failed.

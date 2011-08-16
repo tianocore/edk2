@@ -1,7 +1,7 @@
 /** @file
   RSA Asymmetric Cipher Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -545,7 +545,7 @@ DigestInfoEncoding (
 
   If RsaContext is NULL, then ASSERT().
   If MessageHash is NULL, then ASSERT().
-  If HashSize is not equal to the size of MD5, SHA-1, SHA-256, SHA-224, SHA-512 or SHA-384 digest, then ASSERT().
+  If HashSize is not equal to the size of MD5, SHA-1 or SHA-256 digest, then ASSERT().
   If SigSize is large enough but Signature is NULL, then ASSERT().
 
   @param[in]       RsaContext   Pointer to RSA context for signature generation.
@@ -615,7 +615,7 @@ RsaPkcs1Sign (
   If RsaContext is NULL, then ASSERT().
   If MessageHash is NULL, then ASSERT().
   If Signature is NULL, then ASSERT().
-  If HashSize is not equal to the size of MD5, SHA-1, SHA-256, SHA-224, SHA-512 or SHA-384 digest, then ASSERT().
+  If HashSize is not equal to the size of MD5, SHA-1 or SHA-256 digest, then ASSERT().
 
   @param[in]  RsaContext   Pointer to RSA context for signature verification.
   @param[in]  MessageHash  Pointer to octet message hash to be checked.

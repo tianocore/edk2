@@ -1,7 +1,7 @@
 /** @file
   X.509 Certificate Handler Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,202 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "InternalCryptLib.h"
 #include <openssl/x509.h>
+
+
+/**
+  Construct a X509 object from DER-encoded certificate data.
+
+  If Cert is NULL, then ASSERT().
+  If SingleX509Cert is NULL, then ASSERT().
+
+  @param[in]  Cert            Pointer to the DER-encoded certificate data.
+  @param[in]  CertSize        The size of certificate data in bytes.
+  @param[out] SingleX509Cert  The generated X509 object.
+
+  @retval     TRUE            The X509 object generation succeeded.
+  @retval     FALSE           The operation failed.
+
+**/
+BOOLEAN
+EFIAPI
+X509ConstructCertificate (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  UINT8        **SingleX509Cert
+  )
+{
+  BIO      *CertBio;
+  X509     *X509Cert;
+  BOOLEAN  Status;
+
+  //
+  // ASSERT if Cert is NULL or SingleX509Cert is NULL.
+  //
+  ASSERT (Cert != NULL);
+  ASSERT (SingleX509Cert != NULL);
+
+  Status = FALSE;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  CertBio = BIO_new (BIO_s_mem ());
+  BIO_write (CertBio, Cert, (int) CertSize);
+  if (CertBio == NULL) {
+    goto _Exit;
+  }
+  X509Cert = d2i_X509_bio (CertBio, NULL);
+  if (X509Cert == NULL) {
+    goto _Exit;
+  }
+
+  *SingleX509Cert = (UINT8 *) X509Cert;
+  Status = TRUE;
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  BIO_free (CertBio);
+
+  return Status;
+}
+
+/**
+  Construct a X509 stack object from a list of DER-encoded certificate data.
+
+  If X509Stack is NULL, then ASSERT().
+
+  @param[in, out]  X509Stack  On input, pointer to an existing X509 stack object.
+                              On output, pointer to the X509 stack object with new
+                              inserted X509 certificate.
+  @param           ...        A list of DER-encoded single certificate data followed
+                              by certificate size. A NULL terminates the list. The
+                              pairs are the arguments to X509ConstructCertificate().
+                                 
+  @retval     TRUE            The X509 stack construction succeeded.
+  @retval     FALSE           The construction operation failed.
+
+**/
+BOOLEAN
+EFIAPI
+X509ConstructCertificateStack (
+  IN OUT  UINT8  **X509Stack,
+  ...  
+  )
+{
+  UINT8           *Cert;
+  UINTN           CertSize;
+  X509            *X509Cert;
+  STACK_OF(X509)  *CertStack;
+  BOOLEAN         Status;
+  VA_LIST         Args;
+  UINTN           Index;
+
+  //
+  // ASSERT if input X509Stack is NULL.
+  //
+  ASSERT (X509Stack != NULL);
+
+  Status = FALSE;
+
+  //
+  // Initialize X509 stack object.
+  //
+  CertStack = (STACK_OF(X509) *) (*X509Stack);
+  if (CertStack == NULL) {
+    CertStack = sk_X509_new_null ();
+    if (CertStack == NULL) {
+      return Status;
+    }
+  }
+
+  VA_START (Args, X509Stack);
+
+  for (Index = 0; ; Index++) {
+    //
+    // If Cert is NULL, then it is the end of the list.
+    //
+    Cert = VA_ARG (Args, UINT8 *);
+    if (Cert == NULL) {
+      break;
+    }
+
+    CertSize = VA_ARG (Args, UINTN);
+
+    //
+    // Construct X509 Object from the given DER-encoded certificate data.
+    //
+    Status = X509ConstructCertificate (
+               (CONST UINT8 *) Cert,
+               CertSize,
+               (UINT8 **) &X509Cert
+               );
+    if (!Status) {
+      X509_free (X509Cert);
+      break;
+    }
+
+    //
+    // Insert the new X509 object into X509 stack object.
+    //
+    sk_X509_push (CertStack, X509Cert);
+  }
+
+  VA_END (Args);
+
+  if (!Status) {
+    sk_X509_pop_free (CertStack, X509_free);
+  } else {
+    *X509Stack = (UINT8 *) CertStack;
+  }
+
+  return Status;
+}
+
+/**
+  Release the specified X509 object.
+
+  If X509Cert is NULL, then ASSERT().
+
+  @param[in]  X509Cert  Pointer to the X509 object to be released.
+
+**/
+VOID
+EFIAPI
+X509Free (
+  IN  VOID  *X509Cert
+  )
+{
+  ASSERT (X509Cert != NULL);
+
+  //
+  // Free OpenSSL X509 object.
+  //
+  X509_free ((X509 *) X509Cert);
+}
+
+/**
+  Release the specified X509 stack object.
+
+  If X509Stack is NULL, then ASSERT().
+
+  @param[in]  X509Stack  Pointer to the X509 stack object to be released.
+
+**/
+VOID
+EFIAPI
+X509StackFree (
+  IN  VOID  *X509Stack
+  )
+{
+  ASSERT (X509Stack != NULL);
+
+  //
+  // Free OpenSSL X509 stack object.
+  //
+  sk_X509_pop_free ((STACK_OF(X509) *) X509Stack, X509_free);
+}
 
 /**
   Retrieve the subject bytes from one X.509 certificate.
@@ -42,7 +238,6 @@ X509GetSubjectName (
   )
 {
   BOOLEAN    Status;
-  BIO        *CertBio;
   X509       *X509Cert;
   X509_NAME  *X509Name;
 
@@ -58,13 +253,8 @@ X509GetSubjectName (
   //
   // Read DER-encoded X509 Certificate and Construct X509 object.
   //
-  CertBio = BIO_new (BIO_s_mem ());
-  BIO_write (CertBio, Cert, (int)CertSize);
-  if (CertBio == NULL) {
-    goto _Exit;
-  }
-  X509Cert = d2i_X509_bio (CertBio, NULL);
-  if (Cert == NULL) {
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
     goto _Exit;
   }
 
@@ -86,7 +276,6 @@ _Exit:
   //
   // Release Resources.
   //
-  BIO_free (CertBio);
   X509_free (X509Cert);
 
   return Status;
@@ -118,7 +307,6 @@ RsaGetPublicKeyFromX509 (
 {
   BOOLEAN   Status;
   EVP_PKEY  *Pkey;
-  BIO       *CertBio;
   X509      *X509Cert;
 
   //
@@ -129,19 +317,13 @@ RsaGetPublicKeyFromX509 (
 
   Status   = FALSE;
   Pkey     = NULL;
-  CertBio  = NULL;
   X509Cert = NULL;
 
   //
   // Read DER-encoded X509 Certificate and Construct X509 object.
   //
-  CertBio = BIO_new (BIO_s_mem ());
-  BIO_write (CertBio, Cert, (int)CertSize);
-  if (CertBio == NULL) {
-    goto _Exit;
-  }
-  X509Cert = d2i_X509_bio (CertBio, NULL);
-  if (X509Cert == NULL) {
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
     goto _Exit;
   }
 
@@ -164,7 +346,6 @@ _Exit:
   //
   // Release Resources.
   //
-  BIO_free (CertBio);
   X509_free (X509Cert);
   EVP_PKEY_free (Pkey);
 
@@ -197,8 +378,6 @@ X509VerifyCert (
   )
 {
   BOOLEAN         Status;
-  BIO             *BioCert;
-  BIO             *BioCACert;
   X509            *X509Cert;
   X509            *X509CACert;
   X509_STORE      *CertStore;
@@ -211,8 +390,6 @@ X509VerifyCert (
   ASSERT (CACert != NULL);
 
   Status     = FALSE;
-  BioCert    = NULL;
-  BioCACert  = NULL;
   X509Cert   = NULL;
   X509CACert = NULL;
   CertStore  = NULL;
@@ -227,26 +404,16 @@ X509VerifyCert (
   //
   // Read DER-encoded certificate to be verified and Construct X509 object.
   //
-  BioCert = BIO_new (BIO_s_mem ());
-  BIO_write (BioCert, Cert, (int)CertSize);
-  if (BioCert == NULL) {
-    goto _Exit;
-  }
-  X509Cert = d2i_X509_bio (BioCert, NULL);
-  if (X509Cert == NULL) {
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
     goto _Exit;
   }
 
   //
   // Read DER-encoded root certificate and Construct X509 object.
   //
-  BioCACert = BIO_new (BIO_s_mem());
-  BIO_write (BioCACert, CACert, (int)CACertSize);
-  if (BioCert == NULL) {
-    goto _Exit;
-  }
-  X509CACert = d2i_X509_bio (BioCACert, NULL);
-  if (CACert == NULL) {
+  Status = X509ConstructCertificate (CACert, CACertSize, (UINT8 **) &X509CACert);
+  if ((X509CACert == NULL) || (!Status)) {
     goto _Exit;
   }
 
@@ -277,8 +444,6 @@ _Exit:
   //
   // Release Resources.
   //
-  BIO_free (BioCert);
-  BIO_free (BioCACert);
   X509_free (X509Cert);
   X509_free (X509CACert);
   X509_STORE_free (CertStore);

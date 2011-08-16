@@ -4,7 +4,7 @@
   primitives (Hash Serials, HMAC, RSA, Diffie-Hellman, etc) for UEFI security
   functionality enabling.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1346,7 +1346,7 @@ RsaCheckKey (
 
   If RsaContext is NULL, then ASSERT().
   If MessageHash is NULL, then ASSERT().
-  If HashSize is not equal to the size of MD5, SHA-1, SHA-256, SHA-224, SHA-512 or SHA-384 digest, then ASSERT().
+  If HashSize is not equal to the size of MD5, SHA-1 or SHA-256 digest, then ASSERT().
   If SigSize is large enough but Signature is NULL, then ASSERT().
 
   @param[in]      RsaContext   Pointer to RSA context for signature generation.
@@ -1354,7 +1354,7 @@ RsaCheckKey (
   @param[in]      HashSize     Size of the message hash in bytes.
   @param[out]     Signature    Pointer to buffer to receive RSA PKCS1-v1_5 signature.
   @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
-                              On output, the size of data returned in Signature buffer in bytes.
+                               On output, the size of data returned in Signature buffer in bytes.
 
   @retval  TRUE   Signature successfully generated in PKCS1-v1_5.
   @retval  FALSE  Signature generation failed.
@@ -1378,7 +1378,7 @@ RsaPkcs1Sign (
   If RsaContext is NULL, then ASSERT().
   If MessageHash is NULL, then ASSERT().
   If Signature is NULL, then ASSERT().
-  If HashSize is not equal to the size of MD5, SHA-1, SHA-256, SHA-224, SHA-512 or SHA-384 digest, then ASSERT().
+  If HashSize is not equal to the size of MD5, SHA-1, SHA-256 digest, then ASSERT().
 
   @param[in]  RsaContext   Pointer to RSA context for signature verification.
   @param[in]  MessageHash  Pointer to octet message hash to be checked.
@@ -1502,6 +1502,116 @@ X509VerifyCert (
   );
 
 /**
+  Construct a X509 object from DER-encoded certificate data.
+
+  If Cert is NULL, then ASSERT().
+  If SingleX509Cert is NULL, then ASSERT().
+
+  @param[in]  Cert            Pointer to the DER-encoded certificate data.
+  @param[in]  CertSize        The size of certificate data in bytes.
+  @param[out] SingleX509Cert  The generated X509 object.
+
+  @retval     TRUE            The X509 object generation succeeded.
+  @retval     FALSE           The operation failed.
+
+**/
+BOOLEAN
+EFIAPI
+X509ConstructCertificate (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  UINT8        **SingleX509Cert
+  );
+
+/**
+  Construct a X509 stack object from a list of DER-encoded certificate data.
+
+  If X509Stack is NULL, then ASSERT().
+
+  @param[in, out]  X509Stack  On input, pointer to an existing X509 stack object.
+                              On output, pointer to the X509 stack object with new
+                              inserted X509 certificate.
+  @param           ...        A list of DER-encoded single certificate data followed
+                              by certificate size. A NULL terminates the list. The
+                              pairs are the arguments to X509ConstructCertificate().
+                                 
+  @retval     TRUE            The X509 stack construction succeeded.
+  @retval     FALSE           The construction operation failed.
+
+**/
+BOOLEAN
+EFIAPI
+X509ConstructCertificateStack (
+  IN OUT  UINT8  **X509Stack,
+  ...  
+  );
+
+/**
+  Release the specified X509 object.
+
+  If X509Cert is NULL, then ASSERT().
+
+  @param[in]  X509Cert  Pointer to the X509 object to be released.
+
+**/
+VOID
+EFIAPI
+X509Free (
+  IN  VOID  *X509Cert
+  );
+
+/**
+  Release the specified X509 stack object.
+
+  If X509Stack is NULL, then ASSERT().
+
+  @param[in]  X509Stack  Pointer to the X509 stack object to be released.
+
+**/
+VOID
+EFIAPI
+X509StackFree (
+  IN  VOID  *X509Stack
+  );
+
+/**
+  Creates a PKCS#7 signedData as described in "PKCS #7: Cryptographic Message
+  Syntax Standard, version 1.5". This interface is only intended to be used for
+  application to perform PKCS#7 functionality validation.
+
+  @param[in]  PrivateKey       Pointer to the PEM-formatted private key data for
+                               data signing.
+  @param[in]  PrivateKeySize   Size of the PEM private key data in bytes.
+  @param[in]  KeyPassword      NULL-terminated passphrase used for encrypted PEM
+                               key data.
+  @param[in]  InData           Pointer to the content to be signed.
+  @param[in]  InDataSize       Size of InData in bytes.
+  @param[in]  SignCert         Pointer to signer's DER-encoded certificate to sign with.
+  @param[in]  OtherCerts       Pointer to an optional additional set of certificates to
+                               include in the PKCS#7 signedData (e.g. any intermediate
+                               CAs in the chain).
+  @param[out] SignedData       Pointer to output PKCS#7 signedData.
+  @param[out] SignedDataSize   Size of SignedData in bytes.
+
+  @retval     TRUE             PKCS#7 data signing succeeded.
+  @retval     FALSE            PKCS#7 data signing failed.
+
+**/
+BOOLEAN
+EFIAPI
+Pkcs7Sign (
+  IN   CONST UINT8  *PrivateKey,
+  IN   UINTN        PrivateKeySize,
+  IN   CONST UINT8  *KeyPassword,
+  IN   UINT8        *InData,
+  IN   UINTN        InDataSize,
+  IN   UINT8        *SignCert,
+  IN   UINT8        *OtherCerts      OPTIONAL,
+  OUT  UINT8        **SignedData,
+  OUT  UINTN        *SignedDataSize
+  );
+
+/**
   Verifies the validility of a PKCS#7 signed data as described in "PKCS #7: Cryptographic
   Message Syntax Standard".
 
@@ -1528,6 +1638,39 @@ Pkcs7Verify (
   IN  UINTN        CertSize,
   IN  CONST UINT8  *InData,
   IN  UINTN        DataSize
+  );
+
+/**
+  Verifies the validility of a PE/COFF Authenticode Signature as described in "Windows
+  Authenticode Portable Executable Signature Format".
+
+  If AuthData is NULL, then ASSERT().
+  If ImageHash is NULL, then ASSERT().
+
+  @param[in]  AuthData     Pointer to the Authenticode Signature retrieved from signed
+                           PE/COFF image to be verified.
+  @param[in]  DataSize     Size of the Authenticode Signature in bytes.
+  @param[in]  TrustedCert  Pointer to a trusted/root certificate encoded in DER, which
+                           is used for certificate chain verification.
+  @param[in]  CertSize     Size of the trusted certificate in bytes.
+  @param[in]  ImageHash    Pointer to the original image file hash value. The procudure
+                           for calculating the image hash value is described in Authenticode
+                           specification.
+  @param[in]  HashSize     Size of Image hash value in bytes.
+
+  @retval  TRUE   The specified Authenticode Signature is valid.
+  @retval  FALSE  Invalid Authenticode Signature.
+
+**/
+BOOLEAN
+EFIAPI
+AuthenticodeVerify (
+  IN  CONST UINT8  *AuthData,
+  IN  UINTN        DataSize,
+  IN  CONST UINT8  *TrustedCert,
+  IN  UINTN        CertSize,
+  IN  CONST UINT8  *ImageHash,
+  IN  UINTN        HashSize
   );
 
 //=====================================================================================

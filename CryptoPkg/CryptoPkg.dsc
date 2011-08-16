@@ -23,7 +23,7 @@
   PLATFORM_VERSION               = 0.91
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/CryptoPkg
-  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|EBC|ARM
+  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -67,6 +67,9 @@
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
+
+[LibraryClasses.common.DXE_SMM_DRIVER]
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
 
 [LibraryClasses.common.DXE_SAL_DRIVER]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLibRuntimeCryptProtocol/BaseCryptLibRuntimeCryptProtocol.inf

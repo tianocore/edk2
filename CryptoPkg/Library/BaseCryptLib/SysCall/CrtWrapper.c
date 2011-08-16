@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 int errno = 0;
 
 FILE  *stderr = NULL;
-FILE  *stdin = NULL;
+FILE  *stdin  = NULL;
 FILE  *stdout = NULL;
 
 typedef
@@ -244,7 +244,10 @@ void qsort (void *base, size_t num, size_t width, int (*compare)(const void *, c
   ASSERT (base    != NULL);
   ASSERT (compare != NULL);
 
-  Buffer = AllocatePool (width);
+  //
+  // Use CRT-style malloc to cover BS and RT memory allocation.
+  //
+  Buffer = malloc (width);
   ASSERT (Buffer != NULL);
 
   //
@@ -252,7 +255,7 @@ void qsort (void *base, size_t num, size_t width, int (*compare)(const void *, c
   //
   QuickSortWorker (base, (UINTN)num, (UINTN)width, (SORT_COMPARE)compare, Buffer);
 
-  FreePool (Buffer);
+  free (Buffer);
   return;
 }
 

@@ -41,8 +41,6 @@ typedef VOID  *FILE;
 #define va_end(Marker)                ((void)0)
 #endif
 
-
-
 //
 // #defines from EFI Application Toolkit required to buiild Open SSL
 //
@@ -241,7 +239,6 @@ extern FILE  *stdout;
 #define abort()                           ASSERT (FALSE)
 #define assert(expression)
 #define localtime(timer)                  NULL
-#define gmtime(timer)                     NULL
 #define gmtime_r(timer,result)            (result = NULL)
 
 #endif

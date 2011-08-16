@@ -1,7 +1,7 @@
 /** @file  
   Application for RSA Key Retrieving (from PEM and X509) & Signature Validation.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -187,6 +187,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8 MsgHash[] = {
   0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09
   };
 
+//
+// Payload for PKCS#7 Signing & Verification Validation.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *Payload = "Payload Data for PKCS#7 Signing";
+
 /**
   Validate UEFI-OpenSSL RSA Key Retrieving & Signature Interfaces.
 
@@ -301,5 +306,90 @@ ValidateCryptRsa2 (
   FreePool (Signature);
   FreePool (Subject);
 
+  return EFI_SUCCESS;
+}
+
+/**
+  Validate UEFI-OpenSSL PKCS#7 Signing & Verification Interfaces.
+
+  @retval  EFI_SUCCESS  Validation succeeded.
+  @retval  EFI_ABORTED  Validation failed.
+
+**/
+EFI_STATUS
+ValidateCryptPkcs7 (
+  VOID
+  )
+{
+  BOOLEAN  Status;
+  UINT8    *P7SignedData;
+  UINTN    P7SignedDataSize;
+  UINT8    *SignCert;
+
+  P7SignedData = NULL;
+  SignCert     = NULL;
+
+  Print (L"\nUEFI-OpenSSL PKCS#7 Signing & Verification Testing: ");
+
+  Print (L"\n- Create PKCS#7 signedData ...");
+
+  //
+  // Construct Signer Certificate from RAW data.
+  //
+  Status = X509ConstructCertificate (TestCert, sizeof (TestCert), (UINT8 **) &SignCert);
+  if (!Status || SignCert == NULL) {
+    Print (L"[Fail]");
+    goto _Exit;
+  } else {
+    Print (L"[Pass]");
+  }
+
+  //
+  // Create PKCS#7 signedData on Payload. 
+  // Note: Caller should release P7SignedData manually.
+  //
+  Status = Pkcs7Sign (
+             TestKeyPem,
+             sizeof (TestKeyPem),
+             (CONST UINT8 *) PemPass,
+             (UINT8 *) Payload,
+             AsciiStrLen (Payload),
+             SignCert,
+             NULL,
+             &P7SignedData,
+             &P7SignedDataSize
+             );
+  if (!Status || P7SignedDataSize == 0) {
+    Print (L"[Fail]");
+    goto _Exit;
+  } else {
+    Print (L"[Pass]");
+  }
+
+  Print (L"\n- Verify PKCS#7 signedData ...");
+
+  Status = Pkcs7Verify (
+             P7SignedData,
+             P7SignedDataSize,
+             TestCACert,
+             sizeof (TestCACert),
+             (UINT8 *) Payload,
+             AsciiStrLen (Payload)
+             );
+  if (!Status) {
+    Print (L"[Fail]");
+  } else {
+    Print (L"[Pass]");
+  }
+
+_Exit:
+  if (P7SignedData != NULL) {
+    FreePool (P7SignedData);
+  }
+  if (SignCert != NULL) {
+    X509Free (SignCert);
+  }
+
+  Print (L"\n");
   return EFI_SUCCESS;
 }

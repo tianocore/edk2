@@ -2,7 +2,7 @@
   C Run-Time Libraries (CRT) Time Management Routines Wrapper Implementation
   for OpenSSL-based Cryptographic Library (used in SMM).
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -74,6 +74,7 @@ typedef union {
 //
 
 #define IsLeap(y)   (((y) % 4) == 0 && (((y) % 100) != 0 || ((y) % 400) == 0))
+#define SECSPERMIN  (60)
 #define SECSPERHOUR (60 * 60)
 #define SECSPERDAY  (24 * SECSPERHOUR)
 
@@ -220,3 +221,66 @@ time_t time (time_t *timer)
 
   return *timer;
 }
+
+//
+// Convert a time value from type time_t to struct tm.
+//
+struct tm * gmtime (const time_t *timer)
+{
+  struct tm      *GmTime;
+  UINT16         DayNo;
+  UINT16         DayRemainder;
+  time_t         Year;
+  time_t         YearNo;
+  UINT16         TotalDays;
+  UINT16         MonthNo;
+
+  if (timer == NULL) {
+    return NULL;
+  }
+
+  GmTime = malloc (sizeof (struct tm));
+  if (GmTime == NULL) {
+    return NULL;
+  }
+
+  ZeroMem ((VOID *) GmTime, (UINTN) sizeof (struct tm));
+
+  DayNo        = (UINT16) (*timer / SECSPERDAY);
+  DayRemainder = (UINT16) (*timer % SECSPERDAY);
+
+  GmTime->tm_sec = (int) (DayRemainder % SECSPERMIN);
+  GmTime->tm_min = (int) ((DayRemainder % SECSPERHOUR) / SECSPERMIN);
+  GmTime->tm_hour = (int) (DayRemainder / SECSPERHOUR);
+  GmTime->tm_wday = (int) ((DayNo + 4) % 7);
+
+  for (Year = 1970, YearNo = 0; DayNo > 0; Year++) {  
+    TotalDays = (UINT16) (IsLeap (Year) ? 366 : 365);
+    if (DayNo >= TotalDays) {
+      DayNo = (UINT16) (DayNo - TotalDays);
+      YearNo++;
+    } else {
+      break;
+    }
+  }
+
+  GmTime->tm_year = (int) (YearNo + (1970 - 1900));
+  GmTime->tm_yday = (int) DayNo;
+
+  for (MonthNo = 12; MonthNo > 1; MonthNo--) {
+    if (DayNo > CumulativeDays[IsLeap(Year)][MonthNo]) {
+      DayNo = (UINT16) (DayNo - (UINT16) (CumulativeDays[IsLeap(Year)][MonthNo]));
+      break;
+    }
+  }
+
+  GmTime->tm_mon  = (int) MonthNo;
+  GmTime->tm_mday = (int) DayNo;
+
+  GmTime->tm_isdst  = 0;
+  GmTime->tm_gmtoff = 0;
+  GmTime->tm_zone   = NULL;
+
+  return GmTime;
+}
+
