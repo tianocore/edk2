@@ -339,7 +339,7 @@ PxeBcExtractBootFileUrl (
       if (*BootFileNamePtr == '%') {
         TmpChar = *(BootFileNamePtr+ 3);
         *(BootFileNamePtr+ 3) = '\0';
-        *BootFileName = (UINT8) AsciiStrHexToUintn (BootFileNamePtr + 1);
+        *BootFileName = (UINT8) AsciiStrHexToUintn ((CHAR8*)(BootFileNamePtr + 1));
         BootFileName++;
         *(BootFileNamePtr+ 3) = TmpChar;
         BootFileNamePtr += 3;
