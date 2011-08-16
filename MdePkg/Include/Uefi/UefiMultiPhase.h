@@ -1,7 +1,7 @@
 /** @file
   This includes some definitions introduced in UEFI that will be used in both PEI and DXE phases.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -120,16 +120,21 @@ typedef struct {
 ///
 /// Attributes of variable.
 /// 
-#define EFI_VARIABLE_NON_VOLATILE                 0x00000001
-#define EFI_VARIABLE_BOOTSERVICE_ACCESS           0x00000002
-#define EFI_VARIABLE_RUNTIME_ACCESS               0x00000004
-#define EFI_VARIABLE_HARDWARE_ERROR_RECORD        0x00000008
-
+#define EFI_VARIABLE_NON_VOLATILE                            0x00000001
+#define EFI_VARIABLE_BOOTSERVICE_ACCESS                      0x00000002
+#define EFI_VARIABLE_RUNTIME_ACCESS                          0x00000004
 ///
 /// This attribute is identified by the mnemonic 'HR' 
 /// elsewhere in this specification.
 /// 
-#define EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS   0x00000010
+#define EFI_VARIABLE_HARDWARE_ERROR_RECORD                   0x00000008
+///
+/// Attributes of Authenticated Variable
+///
+#define EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS              0x00000010
+#define EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS   0x00000020
+#define EFI_VARIABLE_APPEND_WRITE                            0x00000040
+
 
 ///   
 /// AuthInfo is a WIN_CERTIFICATE using the wCertificateType
@@ -165,5 +170,24 @@ typedef struct {
   WIN_CERTIFICATE_UEFI_GUID   AuthInfo;
 } EFI_VARIABLE_AUTHENTICATION;
 
-#endif
+///
+/// When the attribute EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS is 
+/// set, then the Data buffer shall begin with an instance of a complete (and serialized)
+/// EFI_VARIABLE_AUTHENTICATION_2 descriptor. The descriptor shall be followed by the new 
+/// variable value and DataSize shall reflect the combined size of the descriptor and the new 
+/// variable value. The authentication descriptor is not part of the variable data and is not 
+/// returned by subsequent calls to GetVariable().
+///
+typedef struct {
+  ///
+  /// For the TimeStamp value, components Pad1, Nanosecond, TimeZone, Daylight and 
+  /// Pad2 shall be set to 0. This means that the time shall always be expressed in GMT.
+  ///
+  EFI_TIME                    TimeStamp;
+  /// 
+  /// Only a CertType of  EFI_CERT_TYPE_PKCS7_GUID is accepted.
+  ///
+  WIN_CERTIFICATE_UEFI_GUID   AuthInfo;
+ } EFI_VARIABLE_AUTHENTICATION_2;
 
+#endif

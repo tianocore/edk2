@@ -35,7 +35,8 @@
 /// for the forbidden signature database.
 ///
 #define EFI_IMAGE_SECURITY_DATABASE1      L"dbx"
-
+#define SECURE_BOOT_MODE_ENABLE           1
+#define SECURE_BOOT_MODE_DISABLE          0
 #define SETUP_MODE                        1
 #define USER_MODE                         0
 ///
@@ -57,6 +58,12 @@
 /// firmware supports for images and other data.
 ///
 #define EFI_SIGNATURE_SUPPORT_NAME        L"SignatureSupport"
+
+///
+/// Globally "SecureBoot" variable to specify whether the platform firmware 
+/// is operating in Secure boot mode (1) or not (0). All other values are reserved.
+///
+#define EFI_SECURE_BOOT_MODE_NAME         L"SecureBoot"
 
 //***********************************************************************
 // Signature Database
@@ -200,6 +207,15 @@ typedef struct {
   { \
     0x93e0fae, 0xa6c4, 0x4f50, {0x9f, 0x1b, 0xd4, 0x1e, 0x2b, 0x89, 0xc1, 0x9a} \
   }
+
+///
+/// This identifies a signature containing a DER-encoded PKCS #7 version 1.5 [RFC2315]
+/// SignedData value.
+///
+#define EFI_CERT_TYPE_PKCS7_GUID \
+  { \
+    0x4aafd29d, 0x68df, 0x49ee, {0x8a, 0xa9, 0x34, 0x7d, 0x37, 0x56, 0x65, 0xa7} \
+  }
   
 //***********************************************************************
 // Image Execution Information Table Definition
@@ -274,5 +290,6 @@ extern EFI_GUID gEfiCertX509Guid;
 extern EFI_GUID gEfiCertSha224Guid;
 extern EFI_GUID gEfiCertSha384Guid;
 extern EFI_GUID gEfiCertSha512Guid;
+extern EFI_GUID gEfiCertPkcs7Guid;
 
 #endif
