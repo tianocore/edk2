@@ -33,6 +33,40 @@
     if Daylight Saving Time is not in effect, and negative if the information
     is not available.
 
+    The following macros are defined in this file:<BR>
+    @verbatim
+      NULL
+      CLOCKS_PER_SEC    The number of values per second returned by the clock function.
+    @endverbatim
+
+    The following types are defined in this file:<BR>
+    @verbatim
+      size_t      Unsigned integer type of the result of the sizeof operator.
+      clock_t     Arithmetic type capable of representing a time from the clock function.
+      time_t      Arithmetic type capable of representing a time.
+      struct tm   Holds the components of a calendar time; or broken-down time.
+    @endverbatim
+
+    The following functions are declared in this file:<BR>
+    @verbatim
+      ###############  Time Manipulation Functions
+      clock_t       clock     (void);
+      double        difftime  (time_t time1, time_t time0);
+      time_t        mktime    (struct tm *timeptr);
+      time_t        time      (time_t *timer);
+
+      #################  Time Conversion Functions
+      char        * asctime   (const struct tm *timeptr);
+      char        * ctime     (const time_t *timer);
+      struct tm   * gmtime    (const time_t *timer);
+      time_t        timegm    (struct tm*);
+      struct tm   * localtime (const time_t *timer);
+      size_t        strftime  (char * __restrict s, size_t maxsize,
+                               const char * __restrict format,
+                               const struct tm * __restrict timeptr);
+      char        * strptime  (const char *, const char * format, struct tm*);
+    @endverbatim
+
     Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
@@ -41,7 +75,6 @@
 
     THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
 **/
 #ifndef _TIME_H
 #define _TIME_H
@@ -55,26 +88,25 @@
   #undef _BSD_SIZE_T_
 #endif
 
-/** An arithmetic type capable of representing values returned by clock(); **/
 #ifdef _EFI_CLOCK_T
+  /** An arithmetic type capable of representing values returned by clock(); **/
   typedef _EFI_CLOCK_T  clock_t;
   #undef _EFI_CLOCK_T
 #endif
 
-/** An arithmetic type capable of representing values returned as calendar time
-    values, such as that returned by mktime();
-**/
 #ifdef _EFI_TIME_T
+  /** An arithmetic type capable of representing values returned as calendar time
+      values, such as that returned by mktime();
+  **/
   typedef _EFI_TIME_T  time_t;
   #undef _EFI_TIME_T
 #endif
 
-/** Value added to tm_year to get the full year value.  TM_YEAR_BASE + 110 --> 2010
-**/
+/** Value added to tm_year to get the full year value.  TM_YEAR_BASE + 110 --> 2010 **/
 #define TM_YEAR_BASE  1900
 
-/** Values for the tm_wday member of struct tm.
-  @{
+/** @{
+    Values for the tm_wday member of struct tm.
 **/
 #define TM_SUNDAY     0
 #define TM_MONDAY     1
@@ -83,10 +115,10 @@
 #define TM_THURSDAY   4
 #define TM_FRIDAY     5
 #define TM_SATURDAY   6
-/** @}  **/
+/*@}*/
 
-/** Values for the tm_mon member of struct tm.
-  @{
+/** @{
+    Values for the tm_mon member of struct tm.
 **/
 #define TM_JANUARY     0
 #define TM_FEBRUARY    1
@@ -100,7 +132,7 @@
 #define TM_OCTOBER     9
 #define TM_NOVEMBER   10
 #define TM_DECEMBER   11
-/** @}  **/
+/*@}*/
 
 /** A structure holding the components of a calendar time, called the
     broken-down time.  The first nine (9) members are as mandated by the
@@ -133,17 +165,21 @@ struct tm {
               the macro CLOCKS_PER_SEC.  If the processor time used is not
               available or its value cannot be represented, the function
               returns the value (clock_t)(-1).
-
-              On IA32 or X64 platforms, the value returned is the number of
-              CPU TimeStamp Counter ticks since the appliation started.
 **/
 clock_t  clock(void);
 
-/**
+/** Compute the difference between two calendar times: time1 - time0.
+
+    @param[in]  time1   An arithmetic calendar time.
+    @param[in]  time2   Another arithmetic calendar time.
+
+    @return   The difference between the two times expressed in seconds.
 **/
 double difftime(time_t time1, time_t time0);
 
-/** The mktime function converts the broken-down time, expressed as local time,
+/** Convert a broken-down time into an arithmetic calendar time.
+
+    The mktime function converts the broken-down time, expressed as local time,
     in the structure pointed to by timeptr into a calendar time value with the
     same encoding as that of the values returned by the time function. The
     original values of the tm_wday and tm_yday components of the structure are
@@ -155,6 +191,8 @@ double difftime(time_t time1, time_t time0);
     the final value of tm_mday is not set until tm_mon and tm_year
     are determined.
 
+    @param[in]  timeptr   Pointer to a broken-down time to be converted.
+
     @return   The mktime function returns the specified calendar time encoded
               as a value of type time_t. If the calendar time cannot be
               represented, the function returns the value (time_t)(-1).
@@ -163,7 +201,10 @@ time_t mktime(struct tm *timeptr);
 
 /** The time function determines the current calendar time.
 
-    The encoding of the value is unspecified.
+    The encoding of the value is unspecified and undocumented.
+
+    @param[out]   timer   An optional pointer to an object in which to
+                          store the calendar time.
 
     @return   The time function returns the implementation's best approximation
               of the current calendar time. The value (time_t)(-1) is returned
@@ -176,15 +217,22 @@ time_t time(time_t *timer);
 /* #################  Time Conversion Functions  ########################## */
 
 /** The asctime function converts the broken-down time in the structure pointed
-    to by timeptr into a string in the form
+    to by timeptr into a string in the form<BR>
+    @verbatim
           Sun Sep 16 01:03:52 1973\n\0
+    @endverbatim
+
+    @param[in]  timeptr   A pointer to a broken-down time to convert.
 
     @return   The asctime function returns a pointer to the string.
 **/
 char * asctime(const struct tm *timeptr);
 
-/** The ctime function converts the calendar time pointed to by timer to local
+/** The ctime function converts the calendar time pointed to by timer to a local
     time in the form of a string. It is equivalent to asctime(localtime(timer))
+
+    @param[in]  timer   Pointer to a calendar time value to convert into a
+                        string representation.
 
     @return   The ctime function returns the pointer returned by the asctime
               function with that broken-down time as argument.
@@ -192,7 +240,10 @@ char * asctime(const struct tm *timeptr);
 char * ctime(const time_t *timer);
 
 /** The gmtime function converts the calendar time pointed to by timer into a
-    brokendown time, expressed as UTC.
+    broken-down time, expressed as UTC.
+
+    @param[in]  timer   Pointer to a calendar time value to convert into a
+                        broken-down time.
 
     @return   The gmtime function returns a pointer to the broken-down time,
               or a null pointer if the specified time cannot be converted to UTC.
@@ -201,12 +252,17 @@ struct tm  * gmtime(const time_t *timer);
 
 /** The timegm function is the opposite of gmtime.
 
+    @param[in]  tm    Pointer to a broken-down time to convert into a
+                      calendar time.
+
     @return   The calendar time expressed as UTC.
 **/
 time_t timegm(struct tm*);
 
 /** The localtime function converts the calendar time pointed to by timer into
     a broken-down time, expressed as local time.
+
+    @param[in]  timer   Pointer to a calendar time value to be converted.
 
     @return   The localtime function returns a pointer to the broken-down time,
               or a null pointer if the specified time cannot be converted to

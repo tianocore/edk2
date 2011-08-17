@@ -715,8 +715,7 @@ int       setvbuf (FILE * __restrict fp, char * __restrict Buff, int BufMode, si
     @param[in]  stream    An open File specifier to which the output is sent.
     @param[in]  format    A multi-byte character sequence containing characters
                           to be copied unchanged, and conversion specifiers
-                          which convert their associated arguments.  Copied and
-                          converted characters are sent to the output stream.
+                          which convert their associated arguments.
     @param      ...       Variable number of parameters as required by format.
 
     @return     The fprintf function returns the number of characters
