@@ -44,8 +44,8 @@ GetXenSmbiosTables (
     return NULL;
   }
 
-  for (XenSmbiosPtr = (UINT8*) XEN_SMBIOS_PHYSICAL_ADDRESS;
-       XenSmbiosPtr < (UINT8*) XEN_SMBIOS_PHYSICAL_END;
+  for (XenSmbiosPtr = (UINT8*)(UINTN) XEN_SMBIOS_PHYSICAL_ADDRESS;
+       XenSmbiosPtr < (UINT8*)(UINTN) XEN_SMBIOS_PHYSICAL_END;
        XenSmbiosPtr += 0x10) {
 
     XenSmbiosEntryPointStructure = (SMBIOS_TABLE_ENTRY_POINT *) XenSmbiosPtr;
