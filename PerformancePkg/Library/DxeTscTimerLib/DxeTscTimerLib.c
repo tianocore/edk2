@@ -38,6 +38,7 @@
 #include <Library/PciLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiLib.h>
+#include <Library/DebugLib.h>
 
 #include <Guid/TscFrequency.h>
 
@@ -117,15 +118,19 @@ DxeTscTimerLibConstructor (
   }
   EndTSC = AsmReadTsc();    // TSC value 1ms later
 
-  mTscFrequency =   MultU64x32 (
-                      (EndTSC - StartTSC),    // Number of TSC counts in 1ms
-                      1000                    // Number of ms in a second
-                    );
-  //
-  // mTscFrequency is now equal to the number of TSC counts per second, install system configuration table for it.
-  //
-  gBS->InstallConfigurationTable (&gEfiTscFrequencyGuid, &mTscFrequency);
+  Status = gBS->AllocatePool (EfiBootServicesData, sizeof (UINT64), &TscFrequency);
+  ASSERT_EFI_ERROR (Status);
 
+  *TscFrequency = MultU64x32 (
+                    (EndTSC - StartTSC),      // Number of TSC counts in 1ms
+                    1000                      // Number of ms in a second
+                  );
+  //
+  // TscFrequency now points to the number of TSC counts per second, install system configuration table for it.
+  //
+  gBS->InstallConfigurationTable (&gEfiTscFrequencyGuid, TscFrequency);
+
+  mTscFrequency = *TscFrequency;
   return EFI_SUCCESS;
 }
 

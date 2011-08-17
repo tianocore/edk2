@@ -49,6 +49,7 @@
   IoLib
   BaseLib
   UefiLib
+  DebugLib
 
 [Guids]
   gEfiTscFrequencyGuid                          ## CONSUMES ## System Configuration Table
