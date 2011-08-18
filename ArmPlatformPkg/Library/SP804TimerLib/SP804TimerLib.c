@@ -21,8 +21,8 @@
 #include <Library/IoLib.h>
 #include <Drivers/SP804Timer.h>
 
-#define SP804_TIMER_METRONOME_BASE    (UINTN)PcdGet32 (PcdSP804TimerPerformanceBase)
-#define SP804_TIMER_PERFORMANCE_BASE  (UINTN)PcdGet32 (PcdSP804TimerMetronomeBase)
+#define SP804_TIMER_METRONOME_BASE    ((UINTN)PcdGet32 (PcdSP804TimerMetronomeBase))
+#define SP804_TIMER_PERFORMANCE_BASE  ((UINTN)PcdGet32 (PcdSP804TimerPerformanceBase))
 
 // Setup SP810's Timer2 for managing delay functions. And Timer3 for Performance counter
 // Note: ArmVE's Timer0 and Timer1 are used by TimerDxe.
@@ -32,11 +32,11 @@ TimerConstructor (
   VOID
   )
 {
-  // Check if Timer 2 is already initialized
+  // Check if the Metronome Timer is already initialized
   if (MmioRead32(SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
     return RETURN_SUCCESS;
   } else {
-    // Configure timer 2 for one shot operation, 32 bits, no prescaler, and interrupt disabled
+    // Configure the Metronome Timer for one shot operation, 32 bits, no prescaler, and interrupt disabled
     MmioOr32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ONESHOT | SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
 
     // Preload the timer count register
@@ -46,14 +46,14 @@ TimerConstructor (
     MmioOr32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
   }
 
-  // Check if Timer 3 is already initialized
+  // Check if the Performance Timer is already initialized
   if (MmioRead32(SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
     return RETURN_SUCCESS;
   } else {
-    // Configure timer 3 for free running operation, 32 bits, no prescaler, interrupt disabled
+    // Configure the Performance timer for free running operation, 32 bits, no prescaler, interrupt disabled
     MmioOr32 (SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
 
-    // Enable the timer
+    // Start the Performance Timer ticking
     MmioOr32 (SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
   }
 
