@@ -86,9 +86,9 @@ GCD_ATTRIBUTE_CONVERSION_ENTRY mAttributeConversionTable[] = {
   { EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE,       EFI_MEMORY_WC,          TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE, EFI_MEMORY_WT,          TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE,    EFI_MEMORY_WB,          TRUE  },
-  { EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED,          EFI_MEMORY_RP,          TRUE  },
-  { EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED,         EFI_MEMORY_WP,          TRUE  },
-  { EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED,     EFI_MEMORY_XP,          TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_READ_PROTECTABLE,        EFI_MEMORY_RP,          TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTABLE,       EFI_MEMORY_WP,          TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE,   EFI_MEMORY_XP,          TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_PRESENT,                 EFI_MEMORY_PRESENT,     FALSE },
   { EFI_RESOURCE_ATTRIBUTE_INITIALIZED,             EFI_MEMORY_INITIALIZED, FALSE },
   { EFI_RESOURCE_ATTRIBUTE_TESTED,                  EFI_MEMORY_TESTED,      FALSE },
@@ -211,7 +211,27 @@ CoreDumpGcdIoSpaceMap (
   );
 }
   
+/**
+  Validate resource descriptor HOB's attributes.
 
+  If Attributes includes some memory resource's settings, it should include 
+  the corresponding capabilites also.
+
+  @param  Attributes  Resource descriptor HOB attributes.
+
+**/
+VOID
+CoreValidateResourceDescriptorHobAttributes (
+  IN UINT64  Attributes
+  )
+{
+  ASSERT (((Attributes & EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED) == 0) ||
+          ((Attributes & EFI_RESOURCE_ATTRIBUTE_READ_PROTECTABLE) != 0));
+  ASSERT (((Attributes & EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED) == 0) ||
+          ((Attributes & EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTABLE) != 0));
+  ASSERT (((Attributes & EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED) == 0) ||
+          ((Attributes & EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE) != 0));
+}
 
 /**
   Acquire memory lock on mGcdMemorySpaceLock.
@@ -2278,6 +2298,11 @@ CoreInitializeGcdServices (
       }
 
       if (GcdMemoryType != EfiGcdMemoryTypeNonExistent) {
+        //
+        // Validate the Resource HOB Attributes
+        //
+        CoreValidateResourceDescriptorHobAttributes (ResourceHob->ResourceAttribute);
+
         //
         // Convert the Resource HOB Attributes to an EFI Memory Capabilities mask
         //
