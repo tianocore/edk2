@@ -1152,17 +1152,12 @@ SdReadWrite (
   if (Update) {
     DEBUG ((EFI_D_INFO, "SD Card ReinstallProtocolInterface ()\n"));
     gBS->ReinstallProtocolInterface (
-
           gImageHandle,
-
           &gEfiBlockIoProtocolGuid,
-
           &gBlockIo,
-
           &gBlockIo
-
           );
-
+    return EFI_MEDIA_CHANGED;
   }
 
   if (EFI_ERROR (Status)) {
