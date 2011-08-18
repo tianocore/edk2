@@ -1509,7 +1509,7 @@ __END_DECLS
 
 __BEGIN_DECLS
 int     fseeko(FILE *, off_t, int);
-//off_t   ftello(FILE *);
+off_t   ftello(FILE *);
 __END_DECLS
 
 /*
