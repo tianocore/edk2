@@ -19,6 +19,7 @@
 #include <Library/IoLib.h>
 #include <Library/PrintLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/PrePiHobListPointerLib.h>
 #include <Library/TimerLib.h>
 #include <Library/PerformanceLib.h>
 
@@ -52,7 +53,7 @@ PrePiMain (
   IN  UINT64                    StartTimeStamp
   )
 {
-  EFI_HOB_HANDOFF_INFO_TABLE**  PrePiHobBase;
+  EFI_HOB_HANDOFF_INFO_TABLE*   HobList;
   EFI_STATUS                    Status;
   CHAR8                         Buffer[100];
   UINTN                         CharCount;
@@ -83,15 +84,14 @@ PrePiMain (
   // Check the PcdCPUCoresNonSecStackBase match with the calculated StackBase
   ASSERT (StacksBase == PcdGet32 (PcdCPUCoresNonSecStackBase));
   
-  PrePiHobBase = (EFI_HOB_HANDOFF_INFO_TABLE**)(PcdGet32 (PcdCPUCoresNonSecStackBase) + (PcdGet32 (PcdCPUCoresNonSecStackSize) / 2) - PcdGet32 (PcdHobListPtrGlobalOffset));
-
   // Declare the PI/UEFI memory region
-  *PrePiHobBase = HobConstructor (
+  HobList = HobConstructor (
     (VOID*)UefiMemoryBase,
     FixedPcdGet32 (PcdSystemMemoryUefiRegionSize),
     (VOID*)UefiMemoryBase,
     (VOID*)StacksBase  // The top of the UEFI Memory is reserved for the stacks
     );
+  PrePeiSetHobList (HobList);
 
   // Initialize MMU and Memory HOBs (Resource Descriptor HOBs)
   Status = MemoryPeim (UefiMemoryBase, FixedPcdGet32 (PcdSystemMemoryUefiRegionSize));
