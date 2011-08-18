@@ -35,14 +35,21 @@ BootOptionStart (
 
     Status = BdsStartEfiApplication (mImageHandle, BootOption->FilePathList);
   } else if (LoaderType == BDS_LOADER_KERNEL_LINUX_ATAG) {
-    Status = BdsBootLinux (BootOption->FilePathList, BootOption->OptionalData->Arguments, NULL);
+    Status = BdsBootLinux (BootOption->FilePathList, 
+                               (EFI_DEVICE_PATH_PROTOCOL*)ReadUnaligned32((UINT32*)(&BootOption->OptionalData->Arguments.LinuxAtagArguments.InitrdPathList)),
+                               BootOption->OptionalData->Arguments.LinuxAtagArguments.CmdLine,
+                               NULL);
   } else if (LoaderType == BDS_LOADER_KERNEL_LINUX_FDT) {
     // Convert the FDT path into a Device Path
     Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);
     ASSERT_EFI_ERROR(Status);
     FdtDevicePath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath ((CHAR16*)PcdGetPtr(PcdFdtDevicePath));
 
-    Status = BdsBootLinux (BootOption->FilePathList, BootOption->OptionalData->Arguments, FdtDevicePath);
+    Status = BdsBootLinux (BootOption->FilePathList,
+                              NULL,
+                              NULL,
+                              FdtDevicePath);
+
     FreePool(FdtDevicePath);
   }
 
@@ -184,8 +191,8 @@ BootOptionSetFields (
   IN UINT32                     Attributes,
   IN CHAR16*                    BootDescription,
   IN EFI_DEVICE_PATH_PROTOCOL*  DevicePath,
-  IN  BDS_LOADER_TYPE           BootType,
-  IN  CHAR8*                    BootArguments
+  IN BDS_LOADER_TYPE            BootType,
+  IN BDS_LOADER_ARGUMENTS*      BootArguments
   )
 {
   EFI_LOAD_OPTION EfiLoadOption;
@@ -193,9 +200,12 @@ BootOptionSetFields (
   UINTN           BootDescriptionSize;
   UINTN           BootOptionalDataSize;
   UINT16          FilePathListLength;
+  UINT16          InitrdPathListLength;
   EFI_DEVICE_PATH_PROTOCOL* DevicePathNode;
+  EFI_DEVICE_PATH_PROTOCOL* InitrdPathNode;
   UINTN           NodeLength;
   UINT8*          EfiLoadOptionPtr;
+  UINT8           *InitrdPathListPtr;
 
   // If we are overwriting an existent Boot Option then we have to free previously allocated memory
   if (BootOption->LoadOption) {
@@ -203,8 +213,9 @@ BootOptionSetFields (
   }
 
   BootDescriptionSize = StrSize(BootDescription);
-  BootOptionalDataSize = sizeof(BDS_LOADER_OPTIONAL_DATA) +
-      (BootArguments == NULL ? 0 : AsciiStrSize(BootArguments));
+  BootOptionalDataSize = sizeof(BDS_LOADER_TYPE) + (BootType == BDS_LOADER_KERNEL_LINUX_ATAG ? 
+                         (sizeof(UINT16) + sizeof(EFI_DEVICE_PATH_PROTOCOL*) + BOOT_DEVICE_OPTION_MAX + 1)
+                         : 0);
 
   // Compute the size of the FilePath list
   FilePathListLength = 0;
@@ -215,6 +226,18 @@ BootOptionSetFields (
   }
   // Add the length of the DevicePath EndType
   FilePathListLength += DevicePathNodeLength (DevicePathNode);
+
+  InitrdPathListLength = 0;
+  if (BootType == BDS_LOADER_KERNEL_LINUX_ATAG && BootArguments->LinuxAtagArguments.InitrdPathList != NULL) {
+    // Compute the size of the InitrdPath list    
+    InitrdPathNode = BootArguments->LinuxAtagArguments.InitrdPathList;
+    while (!IsDevicePathEndType (InitrdPathNode)) {
+      InitrdPathListLength += DevicePathNodeLength (InitrdPathNode);
+      InitrdPathNode = NextDevicePathNode (InitrdPathNode);
+    }
+    // Add the length of the DevicePath EndType
+    InitrdPathListLength += DevicePathNodeLength (InitrdPathNode);
+  }
 
   // Allocate the memory for the EFI Load Option
   EfiLoadOptionSize = sizeof(UINT32) + sizeof(UINT16) + BootDescriptionSize + FilePathListLength + BootOptionalDataSize;
@@ -257,9 +280,34 @@ BootOptionSetFields (
   // Optional Data fields, Do unaligned writes
   WriteUnaligned32 ((UINT32 *)EfiLoadOptionPtr, BootType);
 
-  CopyMem (&((BDS_LOADER_OPTIONAL_DATA*)EfiLoadOptionPtr)->Arguments, BootArguments, AsciiStrSize(BootArguments));
   BootOption->OptionalData = (BDS_LOADER_OPTIONAL_DATA *)EfiLoadOptionPtr;
 
+  if (BootType == BDS_LOADER_KERNEL_LINUX_ATAG) {
+    CopyMem (&((BDS_LOADER_OPTIONAL_DATA*)EfiLoadOptionPtr)->Arguments.LinuxAtagArguments.CmdLine,
+             BootArguments->LinuxAtagArguments.CmdLine,
+             AsciiStrSize(BootArguments->LinuxAtagArguments.CmdLine));
+
+    WriteUnaligned32 ((UINT32 *)(&BootOption->OptionalData->Arguments.LinuxAtagArguments.InitrdPathListLength), InitrdPathListLength);
+
+    if ((EFI_DEVICE_PATH_PROTOCOL*)ReadUnaligned32((UINT32 *)&BootOption->OptionalData->Arguments.LinuxAtagArguments.InitrdPathList) != NULL
+        && BootArguments->LinuxAtagArguments.InitrdPathList != NULL) {
+      InitrdPathListPtr = AllocatePool(InitrdPathListLength);
+      WriteUnaligned32 ((UINT32 *)(&BootOption->OptionalData->Arguments.LinuxAtagArguments.InitrdPathList), (UINT32)InitrdPathListPtr);
+      InitrdPathNode = BootArguments->LinuxAtagArguments.InitrdPathList;
+
+      while (!IsDevicePathEndType (InitrdPathNode)) {
+        NodeLength = DevicePathNodeLength(InitrdPathNode);
+        CopyMem (InitrdPathListPtr, InitrdPathNode, NodeLength);
+        InitrdPathListPtr += NodeLength;
+        InitrdPathNode = NextDevicePathNode (InitrdPathNode);
+      }
+
+      // Set the End Device Path Type
+      SetDevicePathEndNode (InitrdPathListPtr);
+    } else {
+      WriteUnaligned32 ((UINT32 *)(&BootOption->OptionalData->Arguments.LinuxAtagArguments.InitrdPathList), (UINT32)NULL);
+    }
+  }
   // If this function is called at the creation of the Boot Device entry (not at the update) the
   // BootOption->LoadOptionSize must be zero then we get a new BootIndex for this entry
   if (BootOption->LoadOptionSize == 0) {
@@ -279,7 +327,7 @@ BootOptionCreate (
   IN  CHAR16*                   BootDescription,
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
   IN  BDS_LOADER_TYPE           BootType,
-  IN  CHAR8*                    BootArguments,
+  IN  BDS_LOADER_ARGUMENTS*     BootArguments,
   OUT BDS_LOAD_OPTION           **BdsLoadOption
   )
 {
@@ -344,7 +392,7 @@ BootOptionUpdate (
   IN  CHAR16* BootDescription,
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
   IN  BDS_LOADER_TYPE   BootType,
-  IN  CHAR8*            BootArguments
+  IN  BDS_LOADER_ARGUMENTS* BootArguments
   )
 {
   EFI_STATUS      Status;

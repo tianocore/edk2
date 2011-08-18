@@ -24,7 +24,6 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BdsLib.h>
-#include <Library/BdsUnixLib.h>
 #include <Library/PerformanceLib.h>
 
 #include <Guid/FileInfo.h>

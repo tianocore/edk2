@@ -30,6 +30,7 @@
 EFI_STATUS
 BdsBootLinux (
   IN  EFI_DEVICE_PATH_PROTOCOL* LinuxKernelDevicePath,
+  IN  EFI_DEVICE_PATH_PROTOCOL* InitrdDevicePath,
   IN  CONST CHAR8*              Arguments,
   IN  EFI_DEVICE_PATH_PROTOCOL* FdtDevicePath
   );

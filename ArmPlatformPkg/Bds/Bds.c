@@ -203,6 +203,8 @@ DefineDefaultBootEntries (
   EFI_STATUS                          Status;
   EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL* EfiDevicePathFromTextProtocol;
   EFI_DEVICE_PATH*                    BootDevicePath;
+  BDS_LOADER_ARGUMENTS                BootArguments;
+  BDS_LOADER_TYPE                     BootType;
 
   //
   // If Boot Order does not exist then create a default entry
@@ -238,11 +240,19 @@ DefineDefaultBootEntries (
 
     // Create the entry is the Default values are correct
     if (BootDevicePath != NULL) {
+      BootType = (BDS_LOADER_TYPE)PcdGet32 (PcdDefaultBootType);
+
+      if (BootType == BDS_LOADER_KERNEL_LINUX_ATAG) {
+        BootArguments.LinuxAtagArguments.CmdLine[0] = '\0';
+        AsciiStrnCpy (BootArguments.LinuxAtagArguments.CmdLine,(CHAR8*)PcdGetPtr(PcdDefaultBootArgument),BOOT_DEVICE_OPTION_MAX);
+        BootArguments.LinuxAtagArguments.InitrdPathList = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath ((CHAR16*)PcdGetPtr(PcdDefaultBootInitrdPath));
+      }
+
       BootOptionCreate (LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_BOOT,
         (CHAR16*)PcdGetPtr(PcdDefaultBootDescription),
         BootDevicePath,
-        (BDS_LOADER_TYPE)PcdGet32 (PcdDefaultBootType),
-        (CHAR8*)PcdGetPtr(PcdDefaultBootArgument),
+        BootType,
+        &BootArguments,
         &BdsLoadOption
         );
       FreePool (BdsLoadOption);

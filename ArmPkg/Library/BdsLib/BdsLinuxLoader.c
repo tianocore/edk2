@@ -110,6 +110,8 @@ STATIC
 EFI_STATUS
 PrepareAtagList (
   IN  CONST CHAR8*     CommandLineString,
+  IN  EFI_PHYSICAL_ADDRESS InitrdImage,
+  IN  UINTN            InitrdImageSize,
   OUT LINUX_ATAG       **AtagBase,
   OUT UINT32           *AtagSize
   )
@@ -146,6 +148,17 @@ PrepareAtagList (
 
   // CommandLine setting root device
   SetupCmdlineTag (CommandLineString);
+
+  if (InitrdImageSize > 0 && InitrdImage != 0) {
+    mLinuxKernelCurrentAtag->header.size = tag_size(LINUX_ATAG_INITRD2);
+    mLinuxKernelCurrentAtag->header.type = ATAG_INITRD2;
+
+    mLinuxKernelCurrentAtag->body.initrd2_tag.start = (UINT32)InitrdImage;
+    mLinuxKernelCurrentAtag->body.initrd2_tag.size = (UINT32)InitrdImageSize;
+
+    // Move pointer to next tag
+    mLinuxKernelCurrentAtag = next_tag_address(mLinuxKernelCurrentAtag);
+  }
 
   // end of tags
   SetupEndTag();
@@ -194,18 +207,21 @@ PreparePlatformHardware (
 EFI_STATUS
 BdsBootLinux (
   IN  EFI_DEVICE_PATH_PROTOCOL* LinuxKernelDevicePath,
+  IN  EFI_DEVICE_PATH_PROTOCOL* InitrdDevicePath,
   IN  CONST CHAR8*  Arguments,
   IN  EFI_DEVICE_PATH_PROTOCOL* FdtDevicePath
   )
 {
   EFI_STATUS            Status;
   UINT32                LinuxImageSize;
+  UINT32                InitrdImageSize;
   UINT32                KernelParamsSize;
   EFI_PHYSICAL_ADDRESS  KernelParamsAddress;
   UINT32                MachineType;
   BOOLEAN               FdtSupported = FALSE;
   LINUX_KERNEL          LinuxKernel;
-  EFI_PHYSICAL_ADDRESS  LinuxImage;;
+  EFI_PHYSICAL_ADDRESS  LinuxImage;
+  EFI_PHYSICAL_ADDRESS  InitrdImage;
 
 
   PERF_START (NULL, "BDS", NULL, 0);
@@ -218,6 +234,15 @@ BdsBootLinux (
     return Status;
   }
   LinuxKernel = (LINUX_KERNEL)(UINTN)LinuxImage;
+
+  if (InitrdDevicePath) {
+    InitrdImageSize = 0;
+    Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImage, &InitrdImageSize);
+    if (EFI_ERROR(Status)) {
+      Print (L"ERROR: Did not find initrd image.\n");
+      return Status;
+    }
+  }
 
   if (FdtDevicePath) {
     // Load the FDT binary from a device path
@@ -240,7 +265,7 @@ BdsBootLinux (
     MachineType = PcdGet32(PcdArmMachineType);
 
     // By setting address=0 we leave the memory allocation to the function
-    Status = PrepareAtagList (Arguments, (LINUX_ATAG**)&KernelParamsAddress, &KernelParamsSize);
+    Status = PrepareAtagList (Arguments, InitrdImage, InitrdImageSize, (LINUX_ATAG**)&KernelParamsAddress, &KernelParamsSize);
     if(EFI_ERROR(Status)) {
       Print(L"ERROR: Can not prepare ATAG list. Status=0x%X\n", Status);
       goto Exit;
