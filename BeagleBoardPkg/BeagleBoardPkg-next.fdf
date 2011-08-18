@@ -123,7 +123,8 @@ READ_LOCK_STATUS   = TRUE
   #
   # MMC/SD
   #
-  INF Omap35xxPkg/MMCHSDxe/MMCHS.inf
+  INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
+  INF Omap35xxPkg/MmcHostDxe/MmcHostDxe.inf
   
   #
   # I2C

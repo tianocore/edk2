@@ -58,7 +58,7 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   
-  EblCmdLib|BeagleBoardPkg/Library/EblCmdLib/EblCmdLib.inf
+  EblCmdLib|ArmPlatformPkg/Library/EblCmdLib/EblCmdLib.inf
   
   EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
   
@@ -83,7 +83,7 @@
   SerialPortLib|Omap35xxPkg/Library/SerialPortLib/SerialPortLib.inf
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
   
-  RealTimeClockLib|EmbeddedPkg/Library/TemplateRealTimeClockLib/TemplateRealTimeClockLib.inf
+  RealTimeClockLib|Omap35xxPkg/Library/RealTimeClockLib/RealTimeClockLib.inf
 
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   
@@ -462,10 +462,8 @@
   #
   # MMC/SD
   #
-  Omap35xxPkg/MMCHSDxe/MMCHS.inf {
-    <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x800fffff
-  }
+  EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
+  Omap35xxPkg/MmcHostDxe/MmcHostDxe.inf
   
   #
   # I2C

@@ -19,14 +19,14 @@
 #define EXTERNAL_DEVICE_REGISTER_TO_REGISTER(x)          ((x) & 0xFF)
 #define EXTERNAL_DEVICE_REGISTER(SlaveAddress, Register) (((SlaveAddress) & 0xFF) << 8 | ((Register) & 0xFF))
 
-//I2C Address group
+// I2C Address group
 #define I2C_ADDR_GRP_ID1      0x48
 #define I2C_ADDR_GRP_ID2      0x49
 #define I2C_ADDR_GRP_ID3      0x4A
 #define I2C_ADDR_GRP_ID4      0x4B
 #define I2C_ADDR_GRP_ID5      0x12
 
-//MMC definitions.
+// MMC definitions.
 #define VMMC1_DEV_GRP         0x82
 #define DEV_GRP_P1            BIT5
 
@@ -43,12 +43,22 @@
 #define GPIODATAIN1           0x98  //I2C_ADDR_GRP_ID2
 #define CARD_DETECT_BIT       BIT0
 
-//LEDEN register
+// LEDEN register
 #define LEDEN                 0xEE
 #define LEDAON                BIT0
 #define LEDBON                BIT1
 #define LEDAPWM               BIT4
 #define LEDBPWM               BIT5
+
+// RTC registers
+#define SECONDS_REG           0x1C
+#define MINUTES_REG           0x1D
+#define HOURS_REG             0x1E
+#define DAYS_REG              0x1F
+#define MONTHS_REG            0x20
+#define YEARS_REG             0x21
+#define WEEKS_REG             0x22
+#define RTC_CTRL_REG          0x29
 
 // USB PHY power
 #define VAUX2_DEDICATED       0x79
