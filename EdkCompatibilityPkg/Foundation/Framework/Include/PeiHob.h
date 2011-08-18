@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -133,6 +133,12 @@ typedef UINT32  EFI_RESOURCE_ATTRIBUTE_TYPE;
 #define EFI_RESOURCE_ATTRIBUTE_32_BIT_IO                0x00008000
 #define EFI_RESOURCE_ATTRIBUTE_64_BIT_IO                0x00010000
 #define EFI_RESOURCE_ATTRIBUTE_UNCACHED_EXPORTED        0x00020000
+//
+// The following values are defined in PI 1.2 errata B.
+//
+#define EFI_RESOURCE_ATTRIBUTE_READ_PROTECTABLE         0x00100000
+#define EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTABLE        0x00200000
+#define EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE    0x00400000
 
 typedef struct {
   EFI_HOB_GENERIC_HEADER      Header;
