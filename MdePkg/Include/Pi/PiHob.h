@@ -1,7 +1,7 @@
 /** @file
   HOB related definitions in PI.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -249,21 +249,21 @@ typedef UINT32 EFI_RESOURCE_ATTRIBUTE_TYPE;
 //
 // These types can be ORed together as needed.
 //
-// The first three enumerations describe settings
+// The following attributes are used to describe settings
 //
-#define EFI_RESOURCE_ATTRIBUTE_PRESENT              0x00000001
-#define EFI_RESOURCE_ATTRIBUTE_INITIALIZED          0x00000002
-#define EFI_RESOURCE_ATTRIBUTE_TESTED               0x00000004
+#define EFI_RESOURCE_ATTRIBUTE_PRESENT                  0x00000001
+#define EFI_RESOURCE_ATTRIBUTE_INITIALIZED              0x00000002
+#define EFI_RESOURCE_ATTRIBUTE_TESTED                   0x00000004
+#define EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED           0x00000080
+#define EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED          0x00000100
+#define EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED      0x00000200
 //
-// The rest of the settings describe capabilities
+// The rest of the attributes are used to describe capabilities
 //
 #define EFI_RESOURCE_ATTRIBUTE_SINGLE_BIT_ECC           0x00000008
 #define EFI_RESOURCE_ATTRIBUTE_MULTIPLE_BIT_ECC         0x00000010
 #define EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_1           0x00000020
 #define EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_2           0x00000040
-#define EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED           0x00000080
-#define EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED          0x00000100
-#define EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED      0x00000200
 #define EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE              0x00000400
 #define EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE        0x00000800
 #define EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE  0x00001000
@@ -272,6 +272,9 @@ typedef UINT32 EFI_RESOURCE_ATTRIBUTE_TYPE;
 #define EFI_RESOURCE_ATTRIBUTE_32_BIT_IO                0x00008000
 #define EFI_RESOURCE_ATTRIBUTE_64_BIT_IO                0x00010000
 #define EFI_RESOURCE_ATTRIBUTE_UNCACHED_EXPORTED        0x00020000
+#define EFI_RESOURCE_ATTRIBUTE_READ_PROTECTABLE         0x00100000
+#define EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTABLE        0x00200000
+#define EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE    0x00400000
 
 ///
 /// Describes the resource properties of all fixed, 
