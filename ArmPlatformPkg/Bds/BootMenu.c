@@ -317,6 +317,9 @@ FREE_DEVICE_PATH:
   FreePool (DevicePath);
 
 EXIT:
+  if (Status == EFI_ABORTED) {
+    Print(L"\n");
+  }
   return Status;
 }
 
@@ -352,6 +355,9 @@ BootMenuManager (
     Print(L"Choice: ");
     Status = GetHIInputInteger (&OptionSelected);
     if (EFI_ERROR(Status) || (OptionSelected == (BootManagerEntryCount+1))) {
+      if (EFI_ERROR(Status)) {
+        Print(L"\n");
+      }
       return EFI_SUCCESS;
     } else if ((OptionSelected > 0) && (OptionSelected <= BootManagerEntryCount))  {
       Status = BootManagerEntries[OptionSelected-1].Callback (BootOptionsList);
