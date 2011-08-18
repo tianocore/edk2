@@ -109,9 +109,6 @@ PrePiMain (
 
   BuildMemoryTypeInformationHob ();
 
-  InitializeDebugAgent (DEBUG_AGENT_INIT_PREMEM_SEC, NULL, NULL);
-  SaveAndSetDebugTimerInterrupt (TRUE);
-
   // Now, the HOB List has been initialized, we can register performance information
   PERF_START (NULL, "PEI", NULL, StartTimeStamp);
 
