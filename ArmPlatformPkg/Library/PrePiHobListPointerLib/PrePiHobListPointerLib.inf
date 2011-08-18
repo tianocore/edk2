@@ -34,4 +34,5 @@
   gArmPlatformTokenSpaceGuid.PcdHobListPtrGlobalOffset
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase
   gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize
+  gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
   
