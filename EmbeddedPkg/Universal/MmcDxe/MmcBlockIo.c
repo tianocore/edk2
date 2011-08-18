@@ -196,7 +196,6 @@ MmcIdentificationMode (
   UINTN                   CmdArg;
   BOOLEAN                 IsHCS;
   EFI_MMC_HOST_PROTOCOL   *MmcHost;
-  UINTN                   CmdRetryCnt;
 
   MmcHost = MmcHostInstance->MmcHost;
   CmdArg = 0;

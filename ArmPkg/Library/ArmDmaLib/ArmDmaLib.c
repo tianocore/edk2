@@ -96,7 +96,7 @@ DmaMap (
       ((*NumberOfBytes % gCacheAlignment) != 0)) {
 
     // Get the cacheability of the region
-    Status = gDS->GetMemorySpaceDescriptor (HostAddress, &GcdDescriptor);
+    Status = gDS->GetMemorySpaceDescriptor (*DeviceAddress, &GcdDescriptor);
     if (EFI_ERROR(Status)) {
       return Status;
     }
