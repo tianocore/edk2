@@ -1291,10 +1291,10 @@ size_t    fread   (void   * __restrict  Buffer,
               encountered.  If Size or Num is zero, fwrite returns zero and
               the state of the stream remains unchanged.
 **/
-size_t    fwrite  (void   * __restrict  Buffer,
-                   size_t               Size,
-                   size_t               Num,
-                   FILE   * __restrict  Stream
+size_t    fwrite  (const void   * __restrict  Buffer,
+                   size_t                     Size,
+                   size_t                     Num,
+                   FILE         * __restrict  Stream
                   );
 
 /* ################ File Positioning Functions.  */
