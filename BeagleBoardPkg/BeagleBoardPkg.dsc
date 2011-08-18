@@ -331,6 +331,8 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryBase|0x80000000
   gEmbeddedTokenSpaceGuid.PcdMemorySize|0x10000000
 
+  gArmTokenSpaceGuid.PcdSystemMemoryBase|0x80000000
+  gArmTokenSpaceGuid.PcdSystemMemorySize|0x10000000
 
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x80000000
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x80008000

@@ -223,6 +223,8 @@ BdsBootLinux (
   EFI_PHYSICAL_ADDRESS  LinuxImage;
   EFI_PHYSICAL_ADDRESS  InitrdImage;
 
+  // Ensure the System Memory PCDs have been initialized (PcdSystemMemoryBase and PcdSystemMemorySize)
+  ASSERT (PcdGet32(PcdSystemMemorySize) != 0);
 
   PERF_START (NULL, "BDS", NULL, 0);
 
