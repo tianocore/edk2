@@ -73,8 +73,8 @@
   gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize|0x4|UINT32|0x00000016
   # PeiServicePtr and HobListPtr shares the same location in the PEI Global Variable list
   # PeiServicePtr is only valid with PEI Core and HobListPtr only when the PEI Core is skipped. 
-  gArmPlatformTokenSpaceGuid.PcdPeiServicePtrGlobalOffset|0x4|UINT32|0x00000017
-  gArmPlatformTokenSpaceGuid.PcdHobListPtrGlobalOffset|0x4|UINT32|0x00000018
+  gArmPlatformTokenSpaceGuid.PcdPeiServicePtrGlobalOffset|0x0|UINT32|0x00000017
+  gArmPlatformTokenSpaceGuid.PcdHobListPtrGlobalOffset|0x0|UINT32|0x00000018
 
   #
   # ARM Primecells

@@ -39,7 +39,10 @@ SetPeiServicesTablePointer (
   UINTN *PeiPtrLoc;
   ASSERT (PeiServicesTablePointer != NULL);
 
-  PeiPtrLoc = (UINTN *)(UINTN)(PcdGet32 (PcdCPUCoresNonSecStackBase) + (PcdGet32 (PcdCPUCoresNonSecStackSize) / 2) - PcdGet32 (PcdPeiServicePtrGlobalOffset));
+  PeiPtrLoc = (UINTN *)(UINTN)(PcdGet32 (PcdCPUCoresNonSecStackBase) + 
+                               (PcdGet32 (PcdCPUCoresNonSecStackSize) / 2) - 
+                               PcdGet32 (PcdPeiGlobalVariableSize) +
+                               PcdGet32 (PcdPeiServicePtrGlobalOffset));
   *PeiPtrLoc = (UINTN)PeiServicesTablePointer;
 }
 
@@ -63,7 +66,10 @@ GetPeiServicesTablePointer (
 {
   UINTN *PeiPtrLoc;
 
-  PeiPtrLoc = (UINTN *)(UINTN)(PcdGet32 (PcdCPUCoresNonSecStackBase) + (PcdGet32 (PcdCPUCoresNonSecStackSize) / 2) - PcdGet32 (PcdPeiServicePtrGlobalOffset));
+  PeiPtrLoc = (UINTN *)(UINTN)(PcdGet32 (PcdCPUCoresNonSecStackBase) + 
+                               (PcdGet32 (PcdCPUCoresNonSecStackSize) / 2) - 
+                               PcdGet32 (PcdPeiGlobalVariableSize) +
+                               PcdGet32 (PcdPeiServicePtrGlobalOffset));
   return (CONST EFI_PEI_SERVICES **)*PeiPtrLoc;
 }
 
