@@ -424,7 +424,7 @@ BdsFileSystemLoadImage (
     return Status;
   }
 
-  //Try to Open the volume and get root directory
+  // Try to Open the volume and get root directory
   Status = FsProtocol->OpenVolume (FsProtocol, &Fs);
   if (EFI_ERROR(Status)) {
     return Status;
@@ -451,7 +451,11 @@ BdsFileSystemLoadImage (
   }
   FreePool(FileInfo);
 
-  Status = gBS->AllocatePages (Type, EfiBootServicesCode, EFI_SIZE_TO_PAGES(Size),Image);
+  Status = gBS->AllocatePages (Type, EfiBootServicesCode, EFI_SIZE_TO_PAGES(Size), Image);
+  // Try to allocate in any pages if failed to allocate memory at the defined location
+  if ((Status == EFI_OUT_OF_RESOURCES) && (Type != AllocateAnyPages)) {
+    Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesCode, EFI_SIZE_TO_PAGES(Size), Image);
+  }
   if (!EFI_ERROR(Status)) {
     Status = File->Read (File, &Size, (VOID*)(UINTN)(*Image));
   }
@@ -492,7 +496,11 @@ BdsMemoryMapLoadImage (
       return EFI_INVALID_PARAMETER;
   }
 
-  Status = gBS->AllocatePages (Type, EfiBootServicesCode, EFI_SIZE_TO_PAGES(Size),Image);
+  Status = gBS->AllocatePages (Type, EfiBootServicesCode, EFI_SIZE_TO_PAGES(Size), Image);
+  // Try to allocate in any pages if failed to allocate memory at the defined location
+  if ((Status == EFI_OUT_OF_RESOURCES) && (Type != AllocateAnyPages)) {
+    Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesCode, EFI_SIZE_TO_PAGES(Size), Image);
+  }
   if (!EFI_ERROR(Status)) {
     CopyMem ((VOID*)(UINTN)(*Image), (CONST VOID*)(UINTN)MemMapPathDevicePath->StartingAddress, Size);
 
@@ -571,6 +579,10 @@ BdsFirmwareVolumeLoadImage (
 #else
     // We must copy the buffer into a page allocations. Otherwise, the caller could call gBS->FreePages() on the pool allocation
     Status = gBS->AllocatePages (Type, EfiBootServicesCode, EFI_SIZE_TO_PAGES(*ImageSize), Image);
+    // Try to allocate in any pages if failed to allocate memory at the defined location
+    if ((Status == EFI_OUT_OF_RESOURCES) && (Type != AllocateAnyPages)) {
+      Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesCode, EFI_SIZE_TO_PAGES(Size), Image);
+    }
     if (!EFI_ERROR(Status)) {
       CopyMem ((VOID*)(UINTN)(*Image), ImageBuffer, *ImageSize);
       FreePool (ImageBuffer);
@@ -588,7 +600,11 @@ BdsFirmwareVolumeLoadImage (
                         &AuthenticationStatus
                         );
     if (!EFI_ERROR(Status)) {
-      Status = gBS->AllocatePages (Type, EfiBootServicesCode, EFI_SIZE_TO_PAGES(*ImageSize),Image);
+      Status = gBS->AllocatePages (Type, EfiBootServicesCode, EFI_SIZE_TO_PAGES(*ImageSize), Image);
+      // Try to allocate in any pages if failed to allocate memory at the defined location
+      if ((Status == EFI_OUT_OF_RESOURCES) && (Type != AllocateAnyPages)) {
+        Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesCode, EFI_SIZE_TO_PAGES(Size), Image);
+      }
       if (!EFI_ERROR(Status)) {
         Status = FwVol->ReadFile (
                                 FwVol,
