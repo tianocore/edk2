@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011, ARM Limited. All rights reserved.
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -36,13 +37,10 @@ TimerConstructor (
   if (MmioRead32(SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
     return RETURN_SUCCESS;
   } else {
-    // Configure the Metronome Timer for one shot operation, 32 bits, no prescaler, and interrupt disabled
-    MmioOr32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ONESHOT | SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
+    // Configure the Metronome Timer for free running operation, 32 bits, no prescaler, and interrupt disabled
+    MmioWrite32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
 
-    // Preload the timer count register
-    MmioWrite32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_LOAD_REG, 1);
-
-    // Enable the timer
+    // Start the Metronome Timer ticking
     MmioOr32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
   }
 
@@ -51,7 +49,7 @@ TimerConstructor (
     return RETURN_SUCCESS;
   } else {
     // Configure the Performance timer for free running operation, 32 bits, no prescaler, interrupt disabled
-    MmioOr32 (SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
+    MmioWrite32 (SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
 
     // Start the Performance Timer ticking
     MmioOr32 (SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_ENABLE);
@@ -64,6 +62,26 @@ TimerConstructor (
   Stalls the CPU for at least the given number of microseconds.
 
   Stalls the CPU for the number of microseconds specified by MicroSeconds.
+  The hardware timer is 32 bits.
+  The maximum possible delay is (0xFFFFFFFF / TimerFrequencyMHz), i.e. ([32bits] / FreqInMHz)
+  For example:
+  +----------------+------------+----------+----------+
+  | TimerFrequency |  MaxDelay  | MaxDelay | MaxDelay |
+  |     (MHz)      |    (us)    |   (s)    |  (min)   |
+  +----------------+------------+----------+----------+
+  |        1       | 0xFFFFFFFF |   4294   |   71.5   |
+  |        5       | 0x33333333 |    859   |   14.3   |
+  |       10       | 0x19999999 |    429   |    7.2   |
+  |       50       | 0x051EB851 |     86   |    1.4   |
+  +----------------+------------+----------+----------+
+  If it becomes necessary to support higher delays, then consider using the
+  real time clock.
+
+  During this delay, the cpu is not yielded to any other process, with one exception:
+  events that are triggered off a timer and which execute at a higher TPL than
+  this function. These events may call MicroSecondDelay (or NanoSecondDelay) to
+  fulfil their own needs.
+  Therefore, this function must be re-entrant, as it may be interrupted and re-started.
 
   @param  MicroSeconds  The minimum number of microseconds to delay.
 
@@ -76,16 +94,68 @@ MicroSecondDelay (
   IN  UINTN MicroSeconds
   )
 {
-  UINTN Index;
+  UINT64    DelayTicks64;         // Convert from microseconds to timer ticks, more bits to detect over-range conditions.
+  UINTN     DelayTicks;           // Convert from microseconds to timer ticks, native size for general calculations.
+  UINTN     StartTicks;           // Timer value snapshot at the start of the delay
+  UINTN     TargetTicks;          // Timer value to signal the end of the delay
+  UINTN     CurrentTicks;         // Current value of the 64-bit timer value at any given moment
 
-  // Reload the counter for each 1Mhz to avoid an overflow in the load value
-  for (Index = 0; Index < (UINTN)PcdGet32(PcdSP804TimerFrequencyInMHz); Index++) {
-    // load the timer count register
-    MmioWrite32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_LOAD_REG, MicroSeconds);
+  // If we snapshot the timer at the start of the delay function then we minimise unaccounted overheads.
+  StartTicks = MmioRead32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CURRENT_REG);
 
-    while (MmioRead32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CURRENT_REG) > 0) {
-      ;
-    }
+  // We are operating at the limit of 32bits. For the range checking work in 64 bits to avoid overflows.
+  DelayTicks64 = MultU64x32((UINT64)MicroSeconds, PcdGet32(PcdSP804TimerFrequencyInMHz));
+
+  // We are limited to 32 bits.
+  // If the specified delay is exactly equal to the max range of the timer,
+  // then the start will be equal to the stop plus one timer overflow (wrap-around).
+  // To avoid having to check for that, reduce the maximum acceptable range by 1 tick,
+  // i.e. reject delays equal or greater than the max range of the timer.
+  if (DelayTicks64 >= (UINT64)SP804_MAX_TICKS) {
+    DEBUG((EFI_D_ERROR,"MicroSecondDelay: ERROR: MicroSeconds=%d exceed SP804 count range. Max MicroSeconds=%d\n",
+      MicroSeconds,
+      ((UINTN)SP804_MAX_TICKS/PcdGet32(PcdSP804TimerFrequencyInMHz))));
+  }
+  ASSERT(DelayTicks64 < (UINT64)SP804_MAX_TICKS);
+
+  // From now on do calculations only in native bit size.
+  DelayTicks = (UINTN)DelayTicks64;
+
+  // Calculate the target value of the timer.
+
+  //Note: SP804 timer is counting down
+  if (StartTicks >= DelayTicks) {
+    // In this case we do not expect a wrap-around of the timer to occur.
+    // CurrentTicks must be less than StartTicks and higher than TargetTicks.
+    // If this is not the case, then the delay has been reached and may even have been exceeded if this
+    // function was suspended by a higher priority interrupt.
+
+    TargetTicks = StartTicks - DelayTicks;
+
+    do {
+      CurrentTicks = MmioRead32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CURRENT_REG);
+    } while ((CurrentTicks > TargetTicks) && (CurrentTicks <= StartTicks));
+
+  } else {
+    // In this case TargetTicks is larger than StartTicks.
+    // This means we expect a wrap-around of the timer to occur and we must wait for it.
+    // Before the wrap-around, CurrentTicks must be less than StartTicks and less than TargetTicks.
+    // After the wrap-around, CurrentTicks must be larger than StartTicks and larger than TargetTicks.
+    // If this is not the case, then the delay has been reached and may even have been exceeded if this
+    // function was suspended by a higher priority interrupt.
+
+    // The order of operations is essential to avoid arithmetic overflow problems
+    TargetTicks = ((UINTN)SP804_MAX_TICKS - DelayTicks) + StartTicks;
+
+    // First wait for the wrap-around to occur
+    do {
+      CurrentTicks = MmioRead32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CURRENT_REG);
+    } while (CurrentTicks <= StartTicks);
+
+    // Then wait for the target
+    do {
+      CurrentTicks = MmioRead32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CURRENT_REG);
+    } while (CurrentTicks > TargetTicks);
   }
 
   return MicroSeconds;
@@ -95,6 +165,9 @@ MicroSecondDelay (
   Stalls the CPU for at least the given number of nanoseconds.
 
   Stalls the CPU for the number of nanoseconds specified by NanoSeconds.
+
+  When the timer frequency is 1MHz, each tick corresponds to 1 microsecond.
+  Therefore, the nanosecond delay will be rounded up to the nearest 1 microsecond.
 
   @param  NanoSeconds The minimum number of nanoseconds to delay.
 
@@ -107,23 +180,14 @@ NanoSecondDelay (
   IN  UINTN NanoSeconds
   )
 {
-  UINTN   Index;
-  UINT32  MicroSeconds;
+  UINTN  MicroSeconds;
 
   // Round up to 1us Tick Number
-  MicroSeconds =   (UINT32)NanoSeconds / 1000;
-  MicroSeconds += ((UINT32)NanoSeconds % 1000) == 0 ? 0 : 1;
+  MicroSeconds = NanoSeconds / 1000;
+  MicroSeconds += ((NanoSeconds % 1000) == 0) ? 0 : 1;
 
-  // Reload the counter for each 1Mhz to avoid an overflow in the load value
-  for (Index = 0; Index < (UINTN)PcdGet32(PcdSP804TimerFrequencyInMHz); Index++) {
-    // load the timer count register
-    MmioWrite32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_LOAD_REG, MicroSeconds);
+  MicroSecondDelay (MicroSeconds);
 
-    while (MmioRead32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CURRENT_REG) > 0) {
-      ;
-    }
-  }
- 
   return NanoSeconds;
 }
 
@@ -148,7 +212,6 @@ GetPerformanceCounter (
   // Don't think we need this to boot, just to do performance profile
   UINT64 Value;
   Value = MmioRead32 (SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CURRENT_REG);
-  ASSERT(Value > 0);
   return Value;
 }
 
