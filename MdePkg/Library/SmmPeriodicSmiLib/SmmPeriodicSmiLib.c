@@ -315,8 +315,6 @@ ReclaimPeriodicSmiLibraryHandler (
   PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT     *PeriodicSmiLibraryHandler
   )
 {
-  LIST_ENTRY                               *Link;
-
   ASSERT (PeriodicSmiLibraryHandler->DispatchHandle == NULL);
   if (PeriodicSmiLibraryHandler->Stack != NULL) {
     FreePages (
@@ -326,18 +324,7 @@ ReclaimPeriodicSmiLibraryHandler (
     PeriodicSmiLibraryHandler->Stack = NULL;
   }
   RemoveEntryList (&PeriodicSmiLibraryHandler->Link);
-  //
-  // Insert to gFreePeriodicSmiLibraryHandlers in the reverse order of the address of PeriodicSmiLibraryHandler
-  //
-  for ( Link = GetFirstNode (&gFreePeriodicSmiLibraryHandlers)
-      ; !IsNull (&gFreePeriodicSmiLibraryHandlers, Link)
-      ; Link = GetNextNode (&gFreePeriodicSmiLibraryHandlers, Link)
-      ) {
-    if (Link < &PeriodicSmiLibraryHandler->Link) {
-      break;
-    }
-  }
-  InsertTailList (Link, &PeriodicSmiLibraryHandler->Link);
+  InsertHeadList (&gFreePeriodicSmiLibraryHandlers, &PeriodicSmiLibraryHandler->Link);
 }
 
 /**
@@ -354,30 +341,21 @@ EnlargeFreePeriodicSmiLibraryHandlerList (
   )
 {
   UINTN                                 Index;
-  PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT  *PeriodicSmiLibraryHandlers;
+  PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT  *PeriodicSmiLibraryHandler;
 
   //
-  // The function is assumed to be called only when the list of free periodic SMI library
-  // handlers is empty.
-  //
-  ASSERT (IsListEmpty (&gFreePeriodicSmiLibraryHandlers));
-
-  PeriodicSmiLibraryHandlers = AllocatePool (
-                                 PERIODIC_SMI_LIBRARY_ALLOCATE_SIZE * sizeof (PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT)
-                                 );
-  if (PeriodicSmiLibraryHandlers == NULL) {
-    return FALSE;
-  }
-  
-  //
-  // Add the entries to the list in the reverse order of the their memory address
+  // Add the entries to the list
   //
   for (Index = 0; Index < PERIODIC_SMI_LIBRARY_ALLOCATE_SIZE; Index++) {
-    PeriodicSmiLibraryHandlers[Index].Signature  = PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_SIGNATURE;
-    InsertHeadList (&gFreePeriodicSmiLibraryHandlers, &PeriodicSmiLibraryHandlers[Index].Link);
+    PeriodicSmiLibraryHandler = AllocatePool (sizeof (PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT));
+    if (PeriodicSmiLibraryHandler == NULL) {
+      break;
+    }
+    PeriodicSmiLibraryHandler->Signature = PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_SIGNATURE;
+    InsertHeadList (&gFreePeriodicSmiLibraryHandlers, &PeriodicSmiLibraryHandler->Link);
   }
 
-  return TRUE;
+  return (BOOLEAN) (Index > 0);
 }
 
 /**
@@ -1175,7 +1153,6 @@ SmmPeriodicSmiLibDestructor (
 {
   LIST_ENTRY                            *Link;
   PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT  *PeriodicSmiLibraryHandler;
-  UINTN                                 Index;
 
   //
   // Free the table of supported periodic SMI tick rates
@@ -1196,19 +1173,10 @@ SmmPeriodicSmiLibDestructor (
   //
   // Free all the periodic SMI handler entries
   //
-  Index = 0;
   for (Link = GetFirstNode (&gFreePeriodicSmiLibraryHandlers); !IsNull (&gFreePeriodicSmiLibraryHandlers, Link);) {    
     PeriodicSmiLibraryHandler = PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT_FROM_LINK (Link);
     Link = RemoveEntryList (Link);
-    Index++;
-    //
-    // Because the entries in the list are in the reverse order of the address of PeriodicSmiLibraryHandler and
-    // every PERIODIC_SMI_LIBRARY_ALLOCATE_SIZE entries are in the same pool returned by AllocatePool(),
-    // every PERIODIC_SMI_LIBRARY_ALLOCATE_SIZE'th entry is the header of allocated pool.
-    //
-    if ((Index % PERIODIC_SMI_LIBRARY_ALLOCATE_SIZE) == 0) {
-      FreePool (PeriodicSmiLibraryHandler);
-    }
+    FreePool (PeriodicSmiLibraryHandler);
   }
 
   return EFI_SUCCESS;
