@@ -128,4 +128,9 @@
 #  Include Boilerplate text required for building with the Standard Libraries.
 #
 ##############################################################################
+# Specify whether we are running in an emulation environment, or not.
+# Define EMULATE if we are.
+#
+#DEFINE  EMULATE = 1
+
 !include StdLib/StdLib.inc
