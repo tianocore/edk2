@@ -218,11 +218,14 @@ BdsBootLinux (
   UINT32                KernelParamsSize;
   EFI_PHYSICAL_ADDRESS  KernelParamsAddress;
   UINT32                MachineType;
-  BOOLEAN               FdtSupported = FALSE;
+  BOOLEAN               FdtSupported;
   LINUX_KERNEL          LinuxKernel;
   EFI_PHYSICAL_ADDRESS  LinuxImage;
   EFI_PHYSICAL_ADDRESS  InitrdImage;
 
+  InitrdImageSize = 0;
+  FdtSupported = FALSE;
+	
   // Ensure the System Memory PCDs have been initialized (PcdSystemMemoryBase and PcdSystemMemorySize)
   ASSERT (PcdGet32(PcdSystemMemorySize) != 0);
 
@@ -238,7 +241,6 @@ BdsBootLinux (
   LinuxKernel = (LINUX_KERNEL)(UINTN)LinuxImage;
 
   if (InitrdDevicePath) {
-    InitrdImageSize = 0;
     Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImage, &InitrdImageSize);
     if (EFI_ERROR(Status)) {
       Print (L"ERROR: Did not find initrd image.\n");
