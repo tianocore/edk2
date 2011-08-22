@@ -118,7 +118,7 @@ DxeTscTimerLibConstructor (
   }
   EndTSC = AsmReadTsc();    // TSC value 1ms later
 
-  Status = gBS->AllocatePool (EfiBootServicesData, sizeof (UINT64), &TscFrequency);
+  Status = gBS->AllocatePool (EfiBootServicesData, sizeof (UINT64), (VOID **) &TscFrequency);
   ASSERT_EFI_ERROR (Status);
 
   *TscFrequency = MultU64x32 (
