@@ -2674,32 +2674,40 @@ InternalShellPrintWorker(
     // update the attribute
     //
     if (ResumeLocation != NULL) {
-      switch (*(ResumeLocation+1)) {
-        case (L'N'):
-          gST->ConOut->SetAttribute(gST->ConOut, OriginalAttribute);
-          break;
-        case (L'E'):
-          gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_YELLOW, ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)));
-          break;
-        case (L'H'):
-          gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_WHITE, ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)));
-          break;
-        case (L'B'):
-          gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_BLUE, ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)));
-          break;
-        case (L'V'):
-          gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_GREEN, ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)));
-          break;
-        default:
-          //
-          // Print a simple '%' symbol
-          //
-          Status = InternalPrintTo(L"%");
-          if (EFI_ERROR(Status)) {
+      if (*(ResumeLocation-1) == L'^') {
+        //
+        // Print a simple '%' symbol
+        //
+        Status = InternalPrintTo(L"%");
+        ResumeLocation = ResumeLocation - 1;
+      } else {
+        switch (*(ResumeLocation+1)) {
+          case (L'N'):
+            gST->ConOut->SetAttribute(gST->ConOut, OriginalAttribute);
             break;
-          }
-          ResumeLocation = ResumeLocation - 1;
-          break;
+          case (L'E'):
+            gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_YELLOW, ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)));
+            break;
+          case (L'H'):
+            gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_WHITE, ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)));
+            break;
+          case (L'B'):
+            gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_BLUE, ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)));
+            break;
+          case (L'V'):
+            gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_GREEN, ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)));
+            break;
+          default:
+            //
+            // Print a simple '%' symbol
+            //
+            Status = InternalPrintTo(L"%");
+            if (EFI_ERROR(Status)) {
+              break;
+            }
+            ResumeLocation = ResumeLocation - 1;
+            break;
+        }
       }
     } else {
       //
