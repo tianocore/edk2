@@ -106,7 +106,7 @@ HMainCommandDisplayHelp (
   VOID
   )
 {
-  INTN     CurrentLine=0;
+  INT32    CurrentLine=0;
   CHAR16 * InfoString;
   EFI_INPUT_KEY  Key;
   
