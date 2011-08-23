@@ -196,7 +196,7 @@ typedef enum {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_USB2_HC_PROTOCOL_GET_STATE)(
-  IN CONST  EFI_USB2_HC_PROTOCOL    *This,
+  IN        EFI_USB2_HC_PROTOCOL    *This,
   OUT       EFI_USB_HC_STATE        *State
 );
 
@@ -511,8 +511,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_USB2_HC_PROTOCOL_GET_ROOTHUB_PORT_STATUS)(
-  IN CONST  EFI_USB2_HC_PROTOCOL    *This,
-  IN CONST  UINT8                   PortNumber,
+  IN        EFI_USB2_HC_PROTOCOL    *This,
+  IN        UINT8                   PortNumber,
   OUT       EFI_USB_PORT_STATUS     *PortStatus
   );
 
