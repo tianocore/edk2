@@ -23,6 +23,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #define USB_DESC_TYPE_HUB     0x29
+
+#define USB_DESC_TYPE_HUB_SUPER_SPEED  0x2a
+
 //
 // Hub class control transfer target
 //
@@ -40,6 +43,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define USB_HUB_REQ_RESET_TT        9
 #define USB_HUB_REQ_GET_TT_STATE    10
 #define USB_HUB_REQ_STOP_TT         11
+
+#define USB_HUB_REQ_SET_DEPTH       12
+
 //
 // USB hub class feature selector
 //
@@ -50,6 +56,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define USB_HUB_PORT_SUSPEND        2
 #define USB_HUB_PORT_OVER_CURRENT   3
 #define USB_HUB_PORT_RESET          4
+
+#define USB_HUB_PORT_LINK_STATE     5
+
 #define USB_HUB_PORT_POWER          8
 #define USB_HUB_PORT_LOW_SPEED      9
 #define USB_HUB_C_PORT_CONNECT      16
@@ -59,6 +68,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define USB_HUB_C_PORT_RESET        20
 #define USB_HUB_PORT_TEST           21
 #define USB_HUB_PORT_INDICATOR      22
+
+#define USB_HUB_C_PORT_LINK_STATE     25
+#define USB_HUB_PORT_REMOTE_WAKE_MASK 27
+#define USB_HUB_BH_PORT_RESET         28
+#define USB_HUB_C_BH_PORT_RESET       29
+
+//
+// Constant value for Port Status & Port Change Status of SuperSpeed port
+//
+#define USB_SS_PORT_STAT_C_BH_RESET         0x0020
+#define USB_SS_PORT_STAT_C_PORT_LINK_STATE  0x0040
 //
 // USB hub power control method. In gang power control
 //
@@ -94,6 +114,19 @@ typedef struct {
   UINT8           HubContrCurrent;
   UINT8           Filler[16];
 } EFI_USB_HUB_DESCRIPTOR;
+
+typedef struct {
+  UINT8           Length;
+  UINT8           DescType;
+  UINT8           NumPorts;
+  UINT16          HubCharacter;
+  UINT8           PwrOn2PwrGood;
+  UINT8           HubContrCurrent;
+  UINT8           HubHdrDecLat;
+  UINT8           HubDelay;
+  UINT8           DeviceRemovable;
+} EFI_USB_SUPER_SPEED_HUB_DESCRIPTOR;
+
 #pragma pack()
 
 

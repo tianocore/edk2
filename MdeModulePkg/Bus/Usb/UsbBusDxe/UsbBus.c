@@ -45,6 +45,7 @@ EFI_DRIVER_BINDING_PROTOCOL mUsbBusDriverBinding = {
   NULL
 };
 
+UINT16 mMaxUsbDeviceNum = USB_MAX_DEVICES;
 
 /**
   USB_IO function to execute a control transfer. This
@@ -111,7 +112,7 @@ UsbIoControlTransfer (
     // Clear TT buffer when CTRL/BULK split transaction failes
     // Clear the TRANSLATOR TT buffer, not parent's buffer
     //
-    ASSERT (Dev->Translator.TranslatorHubAddress < USB_MAX_DEVICES);
+    ASSERT (Dev->Translator.TranslatorHubAddress < mMaxUsbDeviceNum);
     if (Dev->Translator.TranslatorHubAddress != 0) {
       UsbHubCtrlClearTTBuffer (
         Dev->Bus->Devices[Dev->Translator.TranslatorHubAddress],
@@ -284,7 +285,7 @@ UsbIoBulkTransfer (
     // Clear TT buffer when CTRL/BULK split transaction failes.
     // Clear the TRANSLATOR TT buffer, not parent's buffer
     //
-    ASSERT (Dev->Translator.TranslatorHubAddress < USB_MAX_DEVICES);
+    ASSERT (Dev->Translator.TranslatorHubAddress < mMaxUsbDeviceNum);
     if (Dev->Translator.TranslatorHubAddress != 0) {
       UsbHubCtrlClearTTBuffer (
         Dev->Bus->Devices[Dev->Translator.TranslatorHubAddress],
@@ -966,6 +967,16 @@ UsbBusBuildProtocol (
     goto CLOSE_HC;
   }
 
+  if (!EFI_ERROR (Status)) {
+    if (UsbBus->Usb2Hc->MajorRevision == 0x3) {
+      //
+      // The EFI_USB2_HC_PROTOCOL is produced for XHCI support.
+      // Then its max supported devices are 256.
+      //
+      mMaxUsbDeviceNum = 256;
+    }
+  }
+
   UsbHcReset (UsbBus, EFI_USB_HC_RESET_GLOBAL);
   UsbHcSetState (UsbBus, EfiUsbHcStateOperational);
 
@@ -1011,6 +1022,7 @@ UsbBusBuildProtocol (
   RootHub->Bus            = UsbBus;
   RootHub->NumOfInterface = 1;
   RootHub->Interfaces[0]  = RootIf;
+  RootHub->Tier           = 0;
   RootIf->Signature       = USB_INTERFACE_SIGNATURE;
   RootIf->Device          = RootHub;
   RootIf->DevicePath      = UsbBus->DevicePath;
@@ -1434,7 +1446,7 @@ UsbBusControllerDriverStop (
 
   mUsbRootHubApi.Release (RootIf);
 
-  for (Index = 1; Index < USB_MAX_DEVICES; Index++) {
+  for (Index = 1; Index < mMaxUsbDeviceNum; Index++) {
     if (Bus->Devices[Index] != NULL) {
       UsbRemoveDevice (Bus->Devices[Index]);
     }

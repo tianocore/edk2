@@ -527,12 +527,14 @@ UsbGetMaxPacketSize0 (
   // Get the first 8 bytes of the device descriptor which contains
   // max packet size for endpoint 0, which is at least 8.
   //
-  UsbDev->MaxPacket0 = 8;
-
   for (Index = 0; Index < 3; Index++) {
     Status = UsbCtrlGetDesc (UsbDev, USB_DESC_TYPE_DEVICE, 0, 0, &DevDesc, 8);
 
     if (!EFI_ERROR (Status)) {
+      if ((DevDesc.BcdUSB == 0x0300) && (DevDesc.MaxPacketSize0 == 9)) {
+        UsbDev->MaxPacket0 = 1 << 9;
+        return EFI_SUCCESS;
+      }
       UsbDev->MaxPacket0 = DevDesc.MaxPacketSize0;
       return EFI_SUCCESS;
     }

@@ -2,7 +2,7 @@
 
     Usb bus enumeration support.
 
-Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "UsbBus.h"
-
 
 /**
   Return the endpoint descriptor in this interface.
@@ -234,6 +233,7 @@ UsbCreateDevice (
   Device->ParentAddr  = ParentIf->Device->Address;
   Device->ParentIf    = ParentIf;
   Device->ParentPort  = ParentPort;
+  Device->Tier        = ParentIf->Device->Tier + 1;
   return Device;
 }
 
@@ -540,7 +540,7 @@ UsbRemoveDevice (
   USB_BUS                 *Bus;
   USB_DEVICE              *Child;
   EFI_STATUS              Status;
-  UINT8                   Index;
+  UINTN                   Index;
 
   Bus = Device->Bus;
 
@@ -548,7 +548,7 @@ UsbRemoveDevice (
   // Remove all the devices on its downstream ports. Search from devices[1].
   // Devices[0] is the root hub.
   //
-  for (Index = 1; Index < USB_MAX_DEVICES; Index++) {
+  for (Index = 1; Index < mMaxUsbDeviceNum; Index++) {
     Child = Bus->Devices[Index];
 
     if ((Child == NULL) || (Child->ParentAddr != Device->Address)) {
@@ -567,7 +567,7 @@ UsbRemoveDevice (
 
   DEBUG (( EFI_D_INFO, "UsbRemoveDevice: device %d removed\n", Device->Address));
 
-  ASSERT (Device->Address < USB_MAX_DEVICES);
+  ASSERT (Device->Address < mMaxUsbDeviceNum);
   Bus->Devices[Device->Address] = NULL;
   UsbFreeDevice (Device);
 
@@ -599,7 +599,7 @@ UsbFindChild (
   //
   // Start checking from device 1, device 0 is the root hub
   //
-  for (Index = 1; Index < USB_MAX_DEVICES; Index++) {
+  for (Index = 1; Index < mMaxUsbDeviceNum; Index++) {
     Device = Bus->Devices[Index];
 
     if ((Device != NULL) && (Device->ParentAddr == HubIf->Device->Address) &&
@@ -635,11 +635,11 @@ UsbEnumerateNewDev (
   USB_DEVICE              *Child;
   USB_DEVICE              *Parent;
   EFI_USB_PORT_STATUS     PortState;
-  UINT8                   Address;
+  UINTN                   Address;
   UINT8                   Config;
   EFI_STATUS              Status;
 
-  Address = USB_MAX_DEVICES;
+  Address = mMaxUsbDeviceNum;
   Parent  = HubIf->Device;
   Bus     = Parent->Bus;
   HubApi  = HubIf->HubApi;
@@ -679,14 +679,21 @@ UsbEnumerateNewDev (
     goto ON_ERROR;
   }
 
-  if (USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_LOW_SPEED)) {
-    Child->Speed = EFI_USB_SPEED_LOW;
-
+  if (!USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_CONNECTION)) {
+    DEBUG ((EFI_D_ERROR, "UsbEnumerateNewDev: No device presented at port %d\n", Port));
+    goto ON_ERROR;
+  } else if (USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_SUPER_SPEED)){
+    Child->Speed      = EFI_USB_SPEED_SUPER;
+    Child->MaxPacket0 = 512;
   } else if (USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_HIGH_SPEED)) {
-    Child->Speed = EFI_USB_SPEED_HIGH;
-
+    Child->Speed      = EFI_USB_SPEED_HIGH;
+    Child->MaxPacket0 = 64;
+  } else if (USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_LOW_SPEED)) {
+    Child->Speed      = EFI_USB_SPEED_LOW;
+    Child->MaxPacket0 = 8;
   } else {
-    Child->Speed = EFI_USB_SPEED_FULL;
+    Child->Speed      = EFI_USB_SPEED_FULL;
+    Child->MaxPacket0 = 8;
   }
 
   DEBUG (( EFI_D_INFO, "UsbEnumerateNewDev: device is of %d speed\n", Child->Speed));
@@ -720,6 +727,37 @@ UsbEnumerateNewDev (
   //
 
   //
+  // Host assigns an address to the device. Device completes the
+  // status stage with default address, then switches to new address.
+  // ADDRESS state. Address zero is reserved for root hub.
+  //
+  for (Address = 1; Address < mMaxUsbDeviceNum; Address++) {
+    if (Bus->Devices[Address] == NULL) {
+      break;
+    }
+  }
+
+  if (Address == mMaxUsbDeviceNum) {
+    DEBUG ((EFI_D_ERROR, "UsbEnumerateNewDev: address pool is full for port %d\n", Port));
+
+    Status = EFI_ACCESS_DENIED;
+    goto ON_ERROR;
+  }
+
+  Status                = UsbSetAddress (Child, (UINT8)Address);
+  Child->Address        = (UINT8)Address;
+  Bus->Devices[Address] = Child;
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "UsbEnumerateNewDev: failed to set device address - %r\n", Status));
+    goto ON_ERROR;
+  }
+
+  gBS->Stall (USB_SET_DEVICE_ADDRESS_STALL);
+
+  DEBUG ((EFI_D_INFO, "UsbEnumerateNewDev: device is now ADDRESSED at %d\n", Address));
+
+  //
   // Host sends a Get_Descriptor request to learn the max packet
   // size of default pipe (only part of the device's descriptor).
   //
@@ -731,37 +769,6 @@ UsbEnumerateNewDev (
   }
 
   DEBUG (( EFI_D_INFO, "UsbEnumerateNewDev: max packet size for EP 0 is %d\n", Child->MaxPacket0));
-
-  //
-  // Host assigns an address to the device. Device completes the
-  // status stage with default address, then switches to new address.
-  // ADDRESS state. Address zero is reserved for root hub.
-  //
-  for (Address = 1; Address < USB_MAX_DEVICES; Address++) {
-    if (Bus->Devices[Address] == NULL) {
-      break;
-    }
-  }
-
-  if (Address == USB_MAX_DEVICES) {
-    DEBUG ((EFI_D_ERROR, "UsbEnumerateNewDev: address pool is full for port %d\n", Port));
-
-    Status = EFI_ACCESS_DENIED;
-    goto ON_ERROR;
-  }
-
-  Bus->Devices[Address] = Child;
-  Status                = UsbSetAddress (Child, Address);
-  Child->Address        = Address;
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbEnumerateNewDev: failed to set device address - %r\n", Status));
-    goto ON_ERROR;
-  }
-  
-  gBS->Stall (USB_SET_DEVICE_ADDRESS_STALL);
-
-  DEBUG ((EFI_D_INFO, "UsbEnumerateNewDev: device is now ADDRESSED at %d\n", Address));
 
   //
   // Host learns about the device's abilities by requesting device's
@@ -801,7 +808,7 @@ UsbEnumerateNewDev (
   return EFI_SUCCESS;
 
 ON_ERROR:
-  if (Address != USB_MAX_DEVICES) {
+  if (Address != mMaxUsbDeviceNum) {
     Bus->Devices[Address] = NULL;
   }
 
@@ -848,12 +855,16 @@ UsbEnumeratePort (
     return Status;
   }
 
-  if (PortState.PortChangeStatus == 0) {
+  //
+  // Only handle connection/enable/overcurrent/reset change.
+  // Usb super speed hub may report other changes, such as warm reset change. Ignore them.
+  //
+  if ((PortState.PortChangeStatus & (USB_PORT_STAT_C_CONNECTION | USB_PORT_STAT_C_ENABLE | USB_PORT_STAT_C_OVERCURRENT | USB_PORT_STAT_C_RESET)) == 0) {
     return EFI_SUCCESS;
   }
 
-  DEBUG (( EFI_D_INFO, "UsbEnumeratePort: port %d state - %x, change - %x on %p\n",
-              Port, PortState.PortStatus, PortState.PortChangeStatus, HubIf));
+  DEBUG (( EFI_D_INFO, "UsbEnumeratePort: port %d state - %02x, change - %02x on %p\n",
+              Port, PortState.PortChangeStatus, PortState.PortStatus, HubIf));
 
   //
   // This driver only process two kinds of events now: over current and

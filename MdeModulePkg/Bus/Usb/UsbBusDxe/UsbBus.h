@@ -167,7 +167,7 @@ struct _USB_DEVICE {
   //
   UINT8                     Speed;
   UINT8                     Address;
-  UINT8                     MaxPacket0;
+  UINT32                    MaxPacket0;
 
   //
   // The device's descriptors and its configuration
@@ -189,6 +189,7 @@ struct _USB_DEVICE {
   UINT8                     ParentAddr;
   USB_INTERFACE             *ParentIf;
   UINT8                     ParentPort;       // Start at 0
+  UINT8                     Tier;
 };
 
 //
@@ -249,7 +250,7 @@ struct _USB_BUS {
   // An array of device that is on the bus. Devices[0] is
   // for root hub. Device with address i is at Devices[i].
   //
-  USB_DEVICE                *Devices[USB_MAX_DEVICES];
+  USB_DEVICE                *Devices[256];
 
   //
   // USB Bus driver need to control the recursive connect policy of the bus, only those wanted
@@ -746,6 +747,7 @@ UsbBusControllerDriverStop (
   IN EFI_HANDLE                   *ChildHandleBuffer
   );
 
+extern UINT16                         mMaxUsbDeviceNum;
 extern EFI_USB_IO_PROTOCOL            mUsbIoProtocol;
 extern EFI_DRIVER_BINDING_PROTOCOL    mUsbBusDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL    mUsbBusComponentName;
