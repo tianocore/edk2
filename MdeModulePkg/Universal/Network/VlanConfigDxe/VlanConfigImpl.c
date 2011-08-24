@@ -236,21 +236,7 @@ VlanCallback (
 
   PrivateData = VLAN_CONFIG_PRIVATE_DATA_FROM_THIS (This);
 
-  if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
-    if (QuestionId == VLAN_ADD_QUESTION_ID) {
-      //
-      // Update current VLAN list into Form when Form is opened.
-      // This will be done only in FORM_OPEN CallBack of question with VLAN_ADD_QUESTION_ID.
-      //
-      VlanUpdateForm (PrivateData);
-    }
-    return EFI_SUCCESS;
-  }
-
-  if (Action == EFI_BROWSER_ACTION_FORM_CLOSE) {
-    //
-    // Do nothing for UEFI FORM_CLOSE action
-    //
+  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
     return EFI_SUCCESS;
   }
 
@@ -317,6 +303,13 @@ VlanCallback (
 
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
       ZeroMem (Configuration->VlanList, MAX_VLAN_NUMBER);
+      break;
+
+    case VLAN_UPDATE_QUESTION_ID:
+      //
+      // Update current VLAN list into Form.
+      //
+      VlanUpdateForm (PrivateData);
       break;
 
     default:
