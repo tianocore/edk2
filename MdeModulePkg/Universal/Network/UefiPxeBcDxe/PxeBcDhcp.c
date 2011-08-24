@@ -565,7 +565,9 @@ PxeBcCacheDhcpOffer (
   }
 
   OfferType = CachedOffer->OfferType;
-  ASSERT (OfferType < DHCP4_PACKET_TYPE_MAX);
+  if (OfferType >= DHCP4_PACKET_TYPE_MAX) {
+    return ;
+  }
 
   if (OfferType == DHCP4_PACKET_TYPE_BOOTP) {
 
