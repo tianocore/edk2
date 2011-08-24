@@ -1174,7 +1174,7 @@ InternalPrintLibSPrintMarker (
 
   ASSERT(Flags & COUNT_ONLY_NO_PRINT);
 
-  if (Flags & OUTPUT_UNICODE) {
+  if ((Flags & OUTPUT_UNICODE) != 0) {
     BytesPerOutputCharacter = 2;
   } else {
     BytesPerOutputCharacter = 1;
