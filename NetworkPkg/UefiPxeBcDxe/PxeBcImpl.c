@@ -388,6 +388,8 @@ EfiPxeBcDhcp (
   Mode->IcmpErrorReceived = FALSE;
   Private->Function       = EFI_PXE_BASE_CODE_FUNCTION_DHCP;
   Private->IsOfferSorted  = SortOffers;
+  Private->SolicitTimes   = 0;
+  Private->ElapsedTime    = 0;
 
   if (!Mode->Started) {
     return EFI_NOT_STARTED;

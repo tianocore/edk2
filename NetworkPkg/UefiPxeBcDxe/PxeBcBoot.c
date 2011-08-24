@@ -1164,6 +1164,8 @@ ON_EXIT:
     AsciiPrint ("\n  PXE-E22: Client received ICMP error from server.\n");
   } else if (Status == EFI_TFTP_ERROR) {
     AsciiPrint ("\n  PXE-E23: Client received TFTP error from server.\n");
+  } else if (Status == EFI_NOT_FOUND) {
+    AsciiPrint ("\n  PXE-E53: No boot filename received.\n");
   } else if (Status != EFI_BUFFER_TOO_SMALL) {
     AsciiPrint ("\n  PXE-E99: Unexpected network error.\n");
   }

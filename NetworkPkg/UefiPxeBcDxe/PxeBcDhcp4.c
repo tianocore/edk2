@@ -960,6 +960,7 @@ PxeBcSelectDhcp4Offer (
 
   @retval     EFI_SUCCESS         Handled the DHCPv4 offer packet successfully.
   @retval     EFI_NO_RESPONSE     No response to the following request packet.
+  @retval     EFI_NOT_FOUND       No boot filename received.
 
 **/
 EFI_STATUS
@@ -1070,7 +1071,9 @@ PxeBcHandleDhcp4Offer (
       //
       //  Othewise, the bootfile name must be included in DhcpOnly offer.
       //
-      ASSERT (Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL);
+      if (Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] == NULL) {
+        Status = EFI_NOT_FOUND;
+      }
     }
   }
 
