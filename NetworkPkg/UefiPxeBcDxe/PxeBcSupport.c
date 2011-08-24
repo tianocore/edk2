@@ -1466,7 +1466,7 @@ PxeBcUniHexToUint8 (
 }
 
 /**
-  Calculate the elapsed time
+  Calculate the elapsed time.
 
   @param[in]      Private      The pointer to PXE private data
 
