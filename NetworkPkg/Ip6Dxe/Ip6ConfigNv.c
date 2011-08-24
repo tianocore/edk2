@@ -1649,20 +1649,127 @@ Ip6FormCallback (
   Instance  = IP6_CONFIG_INSTANCE_FROM_FORM_CALLBACK (Private);
   Ip6NvData = &Instance->Ip6NvData;
 
-  if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
-    //
-    // Update main Form when main Form is opened.
-    // This will be done only in FORM_OPEN CallBack of question with KEY_INTERFACE_ID from main Form.
-    //
-    if (QuestionId != KEY_INTERFACE_ID) {
-      return EFI_SUCCESS;
+  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)){
+    return EFI_SUCCESS;
+  }
+
+  if (Action != EFI_BROWSER_ACTION_CHANGING) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if ((Value == NULL) || (ActionRequest == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Retrieve uncommitted data from Browser
+  //
+
+  BufferSize = sizeof (IP6_CONFIG_IFR_NVDATA);
+  IfrNvData = AllocateZeroPool (BufferSize);
+  if (IfrNvData == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = EFI_SUCCESS;
+
+  ZeroMem (&OldIfrNvData, BufferSize);
+
+  HiiGetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData);
+
+  CopyMem (&OldIfrNvData, IfrNvData, BufferSize);
+
+  switch (QuestionId) {
+  case KEY_INTERFACE_ID:
+    Status = Ip6ParseInterfaceIdFromString (IfrNvData->InterfaceId, &Ip6NvData->InterfaceId);
+    if (EFI_ERROR (Status)) {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &Key,
+        L"Invalid Interface ID!",
+        NULL
+        );
     }
 
+    break;
+
+  case KEY_MANUAL_ADDRESS:
+    Status = Ip6ParseAddressListFromString (
+               IfrNvData->ManualAddress,
+               &Ip6NvData->ManualAddress,
+               &Ip6NvData->ManualAddressCount
+               );
+    if (EFI_ERROR (Status)) {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &Key,
+        L"Invalid Host Addresses!",
+        NULL
+        );
+    }
+
+    break;
+
+  case KEY_GATEWAY_ADDRESS:
+    Status = Ip6ParseAddressListFromString (
+               IfrNvData->GatewayAddress,
+               &Ip6NvData->GatewayAddress,
+               &Ip6NvData->GatewayAddressCount
+               );
+    if (EFI_ERROR (Status)) {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &Key,
+        L"Invalid Gateway Addresses!",
+        NULL
+        );
+    }
+
+    break;
+
+  case KEY_DNS_ADDRESS:
+    Status = Ip6ParseAddressListFromString (
+               IfrNvData->DnsAddress,
+               &Ip6NvData->DnsAddress,
+               &Ip6NvData->DnsAddressCount
+               );
+    if (EFI_ERROR (Status)) {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &Key,
+        L"Invalid DNS Addresses!",
+        NULL
+        );
+    }
+
+    break;
+
+  case KEY_SAVE_CONFIG_CHANGES:
+    CopyMem (&OldIfrNvData, IfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+    break;
+
+  case KEY_IGNORE_CONFIG_CHANGES:
+    CopyMem (IfrNvData, &OldIfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+    break;
+
+  case KEY_SAVE_CHANGES:
+    Status = Ip6ConvertIfrNvDataToConfigNvData (IfrNvData, Instance);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    break;
+
+  case KEY_GET_CURRENT_SETTING:
     Ip6Config = &Instance->Ip6Config;
     HiiHandle = Instance->CallbackInfo.RegisteredHandle;
+    Data      = NULL;
 
     //
-    // Get the current interface info.
+    // Get current interface info.
     //
     Status = Ip6ConfigNvGetData (
                Ip6Config,
@@ -1671,11 +1778,11 @@ Ip6FormCallback (
                (VOID **) &Data
                );
     if (EFI_ERROR (Status)) {
-      goto Exit;
+      return Status;
     }
 
     //
-    // Generate the dynamic text opcode for host address and draw it.
+    // Generate dynamic text opcode for host address and draw it.
     //
     IfInfo = (EFI_IP6_CONFIG_INTERFACE_INFO *) Data;
     Status = Ip6ConvertAddressListToString (
@@ -1686,7 +1793,8 @@ Ip6FormCallback (
                IfInfo->AddressInfoCount
                );
     if (EFI_ERROR (Status)) {
-      goto Exit;
+      FreePool (Data);
+      return Status;
     }
 
     //
@@ -1700,13 +1808,16 @@ Ip6FormCallback (
                IfInfo->RouteCount
                );
     if (EFI_ERROR (Status)) {
-      goto Exit;
+      FreePool (Data);
+      return Status;
     }
 
     //
     // Get DNS server list.
     //
+    FreePool (Data);
     DataSize = 0;
+    Data = NULL;
     Status = Ip6ConfigNvGetData (
                Ip6Config,
                Ip6ConfigDataTypeDnsServer,
@@ -1714,7 +1825,10 @@ Ip6FormCallback (
                (VOID **) &Data
                );
     if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
-      goto Exit;
+      if (Data != NULL) {
+        FreePool (Data);
+      }
+      return Status;
     }
 
     if (DataSize > 0) {
@@ -1729,14 +1843,20 @@ Ip6FormCallback (
                  DataSize / sizeof (EFI_IPv6_ADDRESS)
                  );
       if (EFI_ERROR (Status)) {
-        goto Exit;
+        FreePool (Data);
+        return Status;
       }
     }
 
     //
     // Get gateway adderss list.
     //
+    if (Data != NULL) {
+      FreePool (Data);
+    }
+
     DataSize = 0;
+    Data = NULL;
     Status = Ip6ConfigNvGetData (
                Ip6Config,
                Ip6ConfigDataTypeGateway,
@@ -1744,7 +1864,10 @@ Ip6FormCallback (
                (VOID **) &Data
                );
     if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
-      goto Exit;
+      if (Data != NULL) {
+        FreePool (Data);
+      }
+      return Status;
     }
 
     if (DataSize > 0) {
@@ -1759,149 +1882,33 @@ Ip6FormCallback (
                  DataSize / sizeof (EFI_IPv6_ADDRESS)
                  );
       if (EFI_ERROR (Status)) {
-        goto Exit;
+        FreePool (Data);
+        return Status;
       }
     }
 
-Exit:
-    FreePool (Data);
-    return Status;
-  }
-
-  if (Action == EFI_BROWSER_ACTION_FORM_CLOSE) {
-    //
-    // Do nothing for UEFI FORM_CLOSE action
-    //
-    return EFI_SUCCESS;
-  }
-
-  if (Action == EFI_BROWSER_ACTION_CHANGING) {
-    if ((Value == NULL) || (ActionRequest == NULL)) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    //
-    // Retrieve uncommitted data from Browser
-    //
-
-    BufferSize = sizeof (IP6_CONFIG_IFR_NVDATA);
-    IfrNvData = AllocateZeroPool (BufferSize);
-    if (IfrNvData == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+    if (Data != NULL) {
+      FreePool (Data);
     }
 
     Status = EFI_SUCCESS;
 
-    ZeroMem (&OldIfrNvData, BufferSize);
+    break;
 
-    HiiGetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData);
-
-    CopyMem (&OldIfrNvData, IfrNvData, BufferSize);
-
-    switch (QuestionId) {
-    case KEY_INTERFACE_ID:
-      Status = Ip6ParseInterfaceIdFromString (IfrNvData->InterfaceId, &Ip6NvData->InterfaceId);
-      if (EFI_ERROR (Status)) {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Invalid Interface ID!",
-          NULL
-          );
-      }
-
-      break;
-
-    case KEY_MANUAL_ADDRESS:
-      Status = Ip6ParseAddressListFromString (
-                 IfrNvData->ManualAddress,
-                 &Ip6NvData->ManualAddress,
-                 &Ip6NvData->ManualAddressCount
-                 );
-      if (EFI_ERROR (Status)) {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Invalid Host Addresses!",
-          NULL
-          );
-      }
-
-      break;
-
-    case KEY_GATEWAY_ADDRESS:
-      Status = Ip6ParseAddressListFromString (
-                 IfrNvData->GatewayAddress,
-                 &Ip6NvData->GatewayAddress,
-                 &Ip6NvData->GatewayAddressCount
-                 );
-      if (EFI_ERROR (Status)) {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Invalid Gateway Addresses!",
-          NULL
-          );
-      }
-
-      break;
-
-    case KEY_DNS_ADDRESS:
-      Status = Ip6ParseAddressListFromString (
-                 IfrNvData->DnsAddress,
-                 &Ip6NvData->DnsAddress,
-                 &Ip6NvData->DnsAddressCount
-                 );
-      if (EFI_ERROR (Status)) {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Invalid DNS Addresses!",
-          NULL
-          );
-      }
-
-      break;
-
-    case KEY_SAVE_CONFIG_CHANGES:
-      CopyMem (&OldIfrNvData, IfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-      break;
-
-    case KEY_IGNORE_CONFIG_CHANGES:
-      CopyMem (IfrNvData, &OldIfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-      break;
-
-    case KEY_SAVE_CHANGES:
-      Status = Ip6ConvertIfrNvDataToConfigNvData (IfrNvData, Instance);
-      if (EFI_ERROR (Status)) {
-        break;
-      }
-
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-      break;
-
-    default:
-      break;
-    }
-
-    if (!EFI_ERROR (Status)) {
-      //
-      // Pass changed uncommitted data back to Form Browser.
-      //
-      BufferSize = sizeof (IP6_CONFIG_IFR_NVDATA);
-      HiiSetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData, NULL);
-    }
-
-    FreePool (IfrNvData);
-    return Status;
+  default:
+    break;
   }
 
-  //
-  // All other action return unsupported.
-  //
-  return EFI_UNSUPPORTED;
+  if (!EFI_ERROR (Status)) {
+    //
+    // Pass changed uncommitted data back to Form Browser.
+    //
+    BufferSize = sizeof (IP6_CONFIG_IFR_NVDATA);
+    HiiSetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData, NULL);
+  }
+
+  FreePool (IfrNvData);
+  return Status;
 }
 
 /**
