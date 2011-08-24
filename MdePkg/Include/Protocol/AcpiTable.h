@@ -2,7 +2,7 @@
   The file provides the protocol to install or remove an ACPI
   table from a platform. 
   
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -66,8 +66,8 @@ typedef struct _EFI_ACPI_TABLE_PROTOCOL EFI_ACPI_TABLE_PROTOCOL;
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ACPI_TABLE_INSTALL_ACPI_TABLE)(
-  IN   CONST EFI_ACPI_TABLE_PROTOCOL *This,
-  IN   CONST VOID                    *AcpiTableBuffer,
+  IN   EFI_ACPI_TABLE_PROTOCOL       *This,
+  IN   VOID                          *AcpiTableBuffer,
   IN   UINTN                         AcpiTableBufferSize,
   OUT  UINTN                         *TableKey
 );
@@ -100,8 +100,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ACPI_TABLE_UNINSTALL_ACPI_TABLE)(
-  IN CONST EFI_ACPI_TABLE_PROTOCOL *This,
-  IN UINTN                         TableKey
+  IN  EFI_ACPI_TABLE_PROTOCOL       *This,
+  IN  UINTN                         TableKey
 );
 
 ///

@@ -4,7 +4,7 @@
   and destroy child of the driver to communicate with other host using TCP protocol.
   The EFI TCPv4 Protocol provides services to send and receive data stream.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -244,12 +244,12 @@ typedef struct {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TCP4_GET_MODE_DATA)(
-  IN CONST  EFI_TCP4_PROTOCOL                  *This,
-  OUT       EFI_TCP4_CONNECTION_STATE          *Tcp4State      OPTIONAL,
-  OUT       EFI_TCP4_CONFIG_DATA               *Tcp4ConfigData OPTIONAL,
-  OUT       EFI_IP4_MODE_DATA                  *Ip4ModeData    OPTIONAL,
-  OUT       EFI_MANAGED_NETWORK_CONFIG_DATA    *MnpConfigData  OPTIONAL,
-  OUT       EFI_SIMPLE_NETWORK_MODE            *SnpModeData    OPTIONAL
+  IN   EFI_TCP4_PROTOCOL                  *This,
+  OUT  EFI_TCP4_CONNECTION_STATE          *Tcp4State      OPTIONAL,
+  OUT  EFI_TCP4_CONFIG_DATA               *Tcp4ConfigData OPTIONAL,
+  OUT  EFI_IP4_MODE_DATA                  *Ip4ModeData    OPTIONAL,
+  OUT  EFI_MANAGED_NETWORK_CONFIG_DATA    *MnpConfigData  OPTIONAL,
+  OUT  EFI_SIMPLE_NETWORK_MODE            *SnpModeData    OPTIONAL
   );
 
 /**
