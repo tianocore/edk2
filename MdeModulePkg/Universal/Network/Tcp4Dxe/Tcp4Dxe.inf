@@ -2,7 +2,7 @@
 # Component name for module Tcp4
 #
 # FIX ME!
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -74,7 +74,7 @@
 
 [Protocols]
   gEfiIp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
-  gEfiTcp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiTcp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_PRODUCED
   gEfiIp4ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiTcp4ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
+  gEfiTcp4ProtocolGuid                          # PROTOCOL SOMETIMES_PRODUCED
   

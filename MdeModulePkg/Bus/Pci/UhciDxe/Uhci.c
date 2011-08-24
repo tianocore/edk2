@@ -2,7 +2,7 @@
 
   The UHCI driver model and HC protocol routines.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -123,8 +123,8 @@ ON_INVAILD_PARAMETER:
 EFI_STATUS
 EFIAPI
 Uhci2GetState (
-  IN CONST EFI_USB2_HC_PROTOCOL   *This,
-  OUT      EFI_USB_HC_STATE       *State
+  IN   EFI_USB2_HC_PROTOCOL   *This,
+  OUT  EFI_USB_HC_STATE       *State
   )
 {
   USB_HC_DEV          *Uhc;
@@ -339,9 +339,9 @@ Uhci2GetCapability (
 EFI_STATUS
 EFIAPI
 Uhci2GetRootHubPortStatus (
-  IN  CONST EFI_USB2_HC_PROTOCOL   *This,
-  IN  CONST UINT8                  PortNumber,
-  OUT       EFI_USB_PORT_STATUS    *PortStatus
+  IN   EFI_USB2_HC_PROTOCOL   *This,
+  IN   UINT8                  PortNumber,
+  OUT  EFI_USB_PORT_STATUS    *PortStatus
   )
 {
   USB_HC_DEV          *Uhc;

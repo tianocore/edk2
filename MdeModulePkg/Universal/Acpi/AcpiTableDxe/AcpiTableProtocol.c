@@ -308,10 +308,10 @@ PublishTables (
 EFI_STATUS
 EFIAPI
 InstallAcpiTable (
-  IN CONST EFI_ACPI_TABLE_PROTOCOL                    *This,
-  IN CONST VOID                                       *AcpiTableBuffer,
-  IN       UINTN                                      AcpiTableBufferSize,
-  OUT      UINTN                                      *TableKey
+  IN   EFI_ACPI_TABLE_PROTOCOL                    *This,
+  IN   VOID                                       *AcpiTableBuffer,
+  IN   UINTN                                      AcpiTableBufferSize,
+  OUT  UINTN                                      *TableKey
   )
 {
   EFI_ACPI_TABLE_INSTANCE   *AcpiTableInstance;
@@ -393,8 +393,8 @@ InstallAcpiTable (
 EFI_STATUS
 EFIAPI
 UninstallAcpiTable (
-  IN CONST EFI_ACPI_TABLE_PROTOCOL                    *This,
-  IN UINTN                                            TableKey
+  IN  EFI_ACPI_TABLE_PROTOCOL                    *This,
+  IN  UINTN                                      TableKey
   )
 {
   EFI_ACPI_TABLE_INSTANCE   *AcpiTableInstance;

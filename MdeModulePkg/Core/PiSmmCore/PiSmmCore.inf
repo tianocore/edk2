@@ -62,12 +62,12 @@
   gEfiSmmReadyToLockProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
   gEfiSmmCpuIo2ProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
-  gEfiSecurityArchProtocolGuid                  # PROTOCOL SIMETIMES_CONSUMED
+  gEfiSecurityArchProtocolGuid                  # PROTOCOL SOMETIMES_CONSUMED
   gEfiLoadedImageProtocolGuid                   # PROTOCOL SOMETIMES_PRODUCED
   gEfiDevicePathProtocolGuid                    # PROTOCOL SOMETIMES_CONSUMED
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber    # SIMETIMES_CONSUMED 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber    # SOMETIMES_CONSUMED 
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable       # ALWAYS_CONSUMED
   
 [Guids]

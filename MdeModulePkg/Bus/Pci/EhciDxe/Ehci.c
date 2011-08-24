@@ -10,7 +10,7 @@
   This way avoids the control transfer on a shared port between EHCI and companion host
   controller when UHCI gets attached earlier than EHCI and a USB 2.0 device inserts.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -191,8 +191,8 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 EhcGetState (
-  IN  CONST EFI_USB2_HC_PROTOCOL  *This,
-  OUT       EFI_USB_HC_STATE      *State
+  IN   EFI_USB2_HC_PROTOCOL  *This,
+  OUT  EFI_USB_HC_STATE      *State
   )
 {
   EFI_TPL                 OldTpl;
@@ -310,9 +310,9 @@ EhcSetState (
 EFI_STATUS
 EFIAPI
 EhcGetRootHubPortStatus (
-  IN  CONST EFI_USB2_HC_PROTOCOL  *This,
-  IN  CONST UINT8                 PortNumber,
-  OUT       EFI_USB_PORT_STATUS   *PortStatus
+  IN   EFI_USB2_HC_PROTOCOL  *This,
+  IN   UINT8                 PortNumber,
+  OUT  EFI_USB_PORT_STATUS   *PortStatus
   )
 {
   USB2_HC_DEV             *Ehc;
