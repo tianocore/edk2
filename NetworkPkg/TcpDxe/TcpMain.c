@@ -1,7 +1,7 @@
 /** @file
   Implementation of EFI_TCP4_PROTOCOL and EFI_TCP6_PROTOCOL.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -75,12 +75,12 @@ TcpChkDataBuf (
 EFI_STATUS
 EFIAPI
 Tcp4GetModeData (
-  IN CONST  EFI_TCP4_PROTOCOL                  *This,
-  OUT       EFI_TCP4_CONNECTION_STATE          *Tcp4State      OPTIONAL,
-  OUT       EFI_TCP4_CONFIG_DATA               *Tcp4ConfigData OPTIONAL,
-  OUT       EFI_IP4_MODE_DATA                  *Ip4ModeData    OPTIONAL,
-  OUT       EFI_MANAGED_NETWORK_CONFIG_DATA    *MnpConfigData  OPTIONAL,
-  OUT       EFI_SIMPLE_NETWORK_MODE            *SnpModeData    OPTIONAL
+  IN   EFI_TCP4_PROTOCOL                  *This,
+  OUT  EFI_TCP4_CONNECTION_STATE          *Tcp4State      OPTIONAL,
+  OUT  EFI_TCP4_CONFIG_DATA               *Tcp4ConfigData OPTIONAL,
+  OUT  EFI_IP4_MODE_DATA                  *Ip4ModeData    OPTIONAL,
+  OUT  EFI_MANAGED_NETWORK_CONFIG_DATA    *MnpConfigData  OPTIONAL,
+  OUT  EFI_SIMPLE_NETWORK_MODE            *SnpModeData    OPTIONAL
   )
 {
   TCP4_MODE_DATA  TcpMode;

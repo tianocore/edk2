@@ -1,7 +1,7 @@
 ## @file TcpDxe.inf
 #  Component description file for Tcp module.
 #
-#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -74,10 +74,10 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiIp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
   gEfiIp4ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiTcp4ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
-  gEfiTcp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiTcp4ProtocolGuid                          # PROTOCOL SOMETIMES_PRODUCED
+  gEfiTcp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_PRODUCED
   gEfiIp6ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
   gEfiIp6ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiTcp6ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
-  gEfiTcp6ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiTcp6ProtocolGuid                          # PROTOCOL SOMETIMES_PRODUCED
+  gEfiTcp6ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_PRODUCED
 
