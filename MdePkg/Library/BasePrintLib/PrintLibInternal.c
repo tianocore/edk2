@@ -342,7 +342,7 @@ BasePrintLibSPrintMarker (
   // DxePrintLibPrint2Protocol (both PrintLib instances).
   //
 
-  if (Flags & COUNT_ONLY_NO_PRINT) {
+  if ((Flags & COUNT_ONLY_NO_PRINT) != 0) {
     if (BufferSize == 0) {
       Buffer = NULL;
     }
