@@ -143,6 +143,20 @@ SmmIplReadyToLockEventNotify (
 **/
 VOID
 EFIAPI
+SmmIplDxeDispatchEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  );
+
+/**
+  Event notification that is fired when a GUIDed Event Group is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
 SmmIplGuidedEventNotify (
   IN EFI_EVENT  Event,
   IN VOID       *Context
@@ -175,6 +189,7 @@ typedef struct {
   EFI_GUID          *Guid;
   EFI_EVENT_NOTIFY  NotifyFunction;
   VOID              *NotifyContext;
+  EFI_TPL           NotifyTpl;
   EFI_EVENT         Event;
 } SMM_IPL_EVENT_NOTIFICATION;
 
@@ -240,39 +255,39 @@ SMM_IPL_EVENT_NOTIFICATION  mSmmIplEvents[] = {
   // the associated event is immediately signalled, so the notification function will be executed and the 
   // SMM Configuration Protocol will be found if it is already in the handle database.
   //
-  { TRUE,  FALSE, &gEfiSmmConfigurationProtocolGuid,  SmmIplSmmConfigurationEventNotify, &gEfiSmmConfigurationProtocolGuid,  NULL },
+  { TRUE,  FALSE, &gEfiSmmConfigurationProtocolGuid,  SmmIplSmmConfigurationEventNotify, &gEfiSmmConfigurationProtocolGuid,  TPL_NOTIFY,   NULL },
   //
   // Declare protocl notification on DxeSmmReadyToLock protocols.  When this notification is etablished, 
   // the associated event is immediately signalled, so the notification function will be executed and the 
   // DXE SMM Ready To Lock Protocol will be found if it is already in the handle database.
   //
-  { TRUE,  TRUE,  &gEfiDxeSmmReadyToLockProtocolGuid, SmmIplReadyToLockEventNotify,      &gEfiDxeSmmReadyToLockProtocolGuid, NULL },
+  { TRUE,  TRUE,  &gEfiDxeSmmReadyToLockProtocolGuid, SmmIplReadyToLockEventNotify,      &gEfiDxeSmmReadyToLockProtocolGuid, TPL_CALLBACK, NULL },
   //
   // Declare event notification on the DXE Dispatch Event Group.  This event is signaled by the DXE Core
   // each time the DXE Core dispatcher has completed its work.  When this event is signalled, the SMM Core
   // if notified, so the SMM Core can dispatch SMM drivers.
   //
-  { FALSE, TRUE,  &gEfiEventDxeDispatchGuid,          SmmIplGuidedEventNotify,           &gEfiEventDxeDispatchGuid,          NULL },
+  { FALSE, TRUE,  &gEfiEventDxeDispatchGuid,          SmmIplDxeDispatchEventNotify,      &gEfiEventDxeDispatchGuid,          TPL_CALLBACK, NULL },
   //
   // Declare event notification on Ready To Boot Event Group.  This is an extra event notification that is
   // used to make sure SMRAM is locked before any boot options are processed.
   //
-  { FALSE, TRUE,  &gEfiEventReadyToBootGuid,          SmmIplReadyToLockEventNotify,      &gEfiEventReadyToBootGuid,          NULL },
+  { FALSE, TRUE,  &gEfiEventReadyToBootGuid,          SmmIplReadyToLockEventNotify,      &gEfiEventReadyToBootGuid,          TPL_CALLBACK, NULL },
   //
   // Declare event notification on Legacy Boot Event Group.  This is used to inform the SMM Core that the platform 
   // is performing a legacy boot operation, and that the UEFI environment is no longer available and the SMM Core 
   // must guarantee that it does not access any UEFI related structures outside of SMRAM.
   //
-  { FALSE, FALSE, &gEfiEventLegacyBootGuid,           SmmIplGuidedEventNotify,           &gEfiEventLegacyBootGuid,           NULL },
+  { FALSE, FALSE, &gEfiEventLegacyBootGuid,           SmmIplGuidedEventNotify,           &gEfiEventLegacyBootGuid,           TPL_CALLBACK, NULL },
   //
   // Declare event notification on SetVirtualAddressMap() Event Group.  This is used to convert gSmmCorePrivate 
   // and mSmmControl2 from physical addresses to virtual addresses.
   //
-  { FALSE, FALSE, &gEfiEventVirtualAddressChangeGuid, SmmIplSetVirtualAddressNotify,     NULL,                               NULL },
+  { FALSE, FALSE, &gEfiEventVirtualAddressChangeGuid, SmmIplSetVirtualAddressNotify,     NULL,                               TPL_CALLBACK, NULL },
   //
   // Terminate the table of event notifications
   //
-  { FALSE, FALSE, NULL,                               NULL,                              NULL,                               NULL }
+  { FALSE, FALSE, NULL,                               NULL,                              NULL,                               TPL_CALLBACK, NULL }
 };
 
 /**
@@ -493,7 +508,7 @@ SmmCommunicationCommunicate (
 }
 
 /**
-  Event notification that is fired when DxeDispatch Event Group is signaled.
+  Event notification that is fired when GUIDed Event Group is signaled.
 
   @param  Event                 The Event that is being processed, not used.
   @param  Context               Event Context, not used.
@@ -521,6 +536,86 @@ SmmIplGuidedEventNotify (
   //
   Size = sizeof (CommunicateHeader);
   SmmCommunicationCommunicate (&mSmmCommunication, &CommunicateHeader, &Size);
+}
+
+/**
+  Event notification that is fired when DxeDispatch Event Group is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+SmmIplDxeDispatchEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  EFI_SMM_COMMUNICATE_HEADER  CommunicateHeader;
+  UINTN                       Size;
+  EFI_STATUS                  Status;
+
+  //
+  // Keep calling the SMM Core Dispatcher until there is no request to restart it.
+  //
+  while (TRUE) {
+    //
+    // Use Guid to initialize EFI_SMM_COMMUNICATE_HEADER structure
+    // Clear the buffer passed into the Software SMI.  This buffer will return
+    // the status of the SMM Core Dispatcher.
+    //
+    CopyGuid (&CommunicateHeader.HeaderGuid, (EFI_GUID *)Context);
+    CommunicateHeader.MessageLength = 1;
+    CommunicateHeader.Data[0] = 0;
+
+    //
+    // Generate the Software SMI and return the result
+    //
+    Size = sizeof (CommunicateHeader);
+    SmmCommunicationCommunicate (&mSmmCommunication, &CommunicateHeader, &Size);
+    
+    //
+    // Return if there is no request to restart the SMM Core Dispatcher
+    //
+    if (CommunicateHeader.Data[0] != COMM_BUFFER_SMM_DISPATCH_RESTART) {
+      return;
+    }
+      
+    //
+    // Attempt to reset SMRAM cacheability to UC
+    // Assume CPU AP is available at this time
+    //
+    Status = gDS->SetMemorySpaceAttributes(
+                    mSmramCacheBase, 
+                    mSmramCacheSize,
+                    EFI_MEMORY_UC
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "SMM IPL failed to reset SMRAM window to EFI_MEMORY_UC\n"));
+    }  
+
+    //
+    // Close all SMRAM ranges to protect SMRAM
+    //
+    Status = mSmmAccess->Close (mSmmAccess);
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Print debug message that the SMRAM window is now closed.
+    //
+    DEBUG ((DEBUG_INFO, "SMM IPL closed SMRAM window\n"));
+
+    //
+    // Lock the SMRAM (Note: Locking SMRAM may not be supported on all platforms)
+    //
+    mSmmAccess->Lock (mSmmAccess);
+
+    //
+    // Print debug message that the SMRAM window is now locked
+    //
+    DEBUG ((DEBUG_INFO, "SMM IPL locked SMRAM window\n"));
+  }
 }
 
 /**
@@ -555,7 +650,7 @@ SmmIplSmmConfigurationEventNotify (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Set flag to indicate that the SM< Entry Point has been registered which 
+  // Set flag to indicate that the SMM Entry Point has been registered which 
   // means that SMIs are now fully operational.
   //
   gSmmCorePrivate->SmmEntryPointRegistered = TRUE;
@@ -564,30 +659,6 @@ SmmIplSmmConfigurationEventNotify (
   // Print debug message showing SMM Core entry point address.
   //
   DEBUG ((DEBUG_INFO, "SMM IPL registered SMM Entry Point address %p\n", (VOID *)(UINTN)gSmmCorePrivate->SmmEntryPoint));
-
-  //
-  // Attempt to reset SMRAM cacheability to UC
-  // Assume CPU AP is available at this time
-  //
-  Status = gDS->SetMemorySpaceAttributes(
-                  mSmramCacheBase, 
-                  mSmramCacheSize,
-                  EFI_MEMORY_UC
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "SMM IPL failed to reset SMRAM window to EFI_MEMORY_UC\n"));
-  }  
-
-  //
-  // Close all SMRAM ranges to protect SMRAM
-  //
-  Status = mSmmAccess->Close (mSmmAccess);
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Print debug message that the SMRAM window is now closed.
-  //
-  DEBUG ((DEBUG_INFO, "SMM IPL closed SMRAM window\n"));
 }
 
 /**
@@ -1190,7 +1261,7 @@ SmmIplEntry (
     if (mSmmIplEvents[Index].Protocol) {
       mSmmIplEvents[Index].Event = EfiCreateProtocolNotifyEvent (
                                      mSmmIplEvents[Index].Guid,
-                                    TPL_CALLBACK,
+                                     mSmmIplEvents[Index].NotifyTpl,
                                      mSmmIplEvents[Index].NotifyFunction,
                                      mSmmIplEvents[Index].NotifyContext,
                                     &Registration
@@ -1198,7 +1269,7 @@ SmmIplEntry (
     } else {
       Status = gBS->CreateEventEx (
                       EVT_NOTIFY_SIGNAL,
-                      TPL_CALLBACK,
+                      mSmmIplEvents[Index].NotifyTpl,
                       mSmmIplEvents[Index].NotifyFunction,
                       mSmmIplEvents[Index].NotifyContext,
                       mSmmIplEvents[Index].Guid,

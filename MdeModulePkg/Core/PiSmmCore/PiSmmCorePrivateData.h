@@ -2,7 +2,7 @@
   The internal header file that declared a data structure that is shared
   between the SMM IPL and the SMM Core.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -15,6 +15,22 @@
 
 #ifndef _PI_SMM_CORE_PRIVATE_DATA_H_
 #define _PI_SMM_CORE_PRIVATE_DATA_H_
+
+///
+/// Define values for the communications buffer used when gEfiEventDxeDispatchGuid is
+/// event signaled.  This event is signaled by the DXE Core each time the DXE Core 
+/// dispatcher has completed its work.  When this event is signaled, the SMM Core
+/// if notified, so the SMM Core can dispatch SMM drivers.  If COMM_BUFFER_SMM_DISPATCH_ERROR
+/// is returned in the communication buffer, then an error occurred dispatching SMM
+/// Drivers.  If COMM_BUFFER_SMM_DISPATCH_SUCCESS is returned, then the SMM Core 
+/// dispatched all the drivers it could.  If COMM_BUFFER_SMM_DISPATCH_RESTART is 
+/// returned, then the SMM Core just dispatched the SMM Driver that registered
+/// the SMM Entry Point enabling the use of SMM Mode.  In this case, the SMM Core
+/// should be notified again to dispatch more SMM Drivers using SMM Mode.
+///
+#define COMM_BUFFER_SMM_DISPATCH_ERROR    0x00
+#define COMM_BUFFER_SMM_DISPATCH_SUCCESS  0x01
+#define COMM_BUFFER_SMM_DISPATCH_RESTART  0x02
 
 ///
 /// Signature for the private structure shared between the SMM IPL and the SMM Core

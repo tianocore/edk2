@@ -743,13 +743,15 @@ SmmGetDepexSectionAndPreProccess (
   drivers to run. Drain the mScheduledQueue and load and start a PE
   image for each driver. Search the mDiscoveredList to see if any driver can
   be placed on the mScheduledQueue. If no drivers are placed on the
-  mScheduledQueue exit the function. On exit it is assumed the Bds()
-  will be called, and when the Bds() exits the Dispatcher will be called
-  again.
+  mScheduledQueue exit the function. 
 
+  @retval EFI_SUCCESS           All of the SMM Drivers that could be dispatched
+                                have been run and the SMM Entry Point has been
+                                registered.
+  @retval EFI_NOT_READY         The SMM Driver that registered the SMM Entry Point
+                                was just dispatched.
+  @retval EFI_NOT_FOUND         There are no SMM Drivers available to be dispatched.
   @retval EFI_ALREADY_STARTED   The SMM Dispatcher is already running
-  @retval EFI_NOT_FOUND         No SMM Drivers were dispatched
-  @retval EFI_SUCCESS           One or more SMM Drivers were dispatched
 
 **/
 EFI_STATUS
@@ -758,10 +760,10 @@ SmmDispatcher (
   )
 {
   EFI_STATUS            Status;
-  EFI_STATUS            ReturnStatus;
   LIST_ENTRY            *Link;
   EFI_SMM_DRIVER_ENTRY  *DriverEntry;
   BOOLEAN               ReadyToRun;
+  BOOLEAN               PreviousSmmEntryPointRegistered;
 
   if (!gRequestDispatch) {
     return EFI_NOT_FOUND;
@@ -776,7 +778,6 @@ SmmDispatcher (
 
   gDispatcherRunning = TRUE;
 
-  ReturnStatus = EFI_NOT_FOUND;
   do {
     //
     // Drain the Scheduled Queue
@@ -828,6 +829,11 @@ SmmDispatcher (
         );
 
       //
+      // Cache state of SmmEntryPointRegistered before calling entry point
+      //
+      PreviousSmmEntryPointRegistered = gSmmCorePrivate->SmmEntryPointRegistered;
+
+      //
       // For each SMM driver, pass NULL as ImageHandle
       //
       Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)DriverEntry->ImageEntryPoint)(DriverEntry->ImageHandle, gST);
@@ -842,7 +848,19 @@ SmmDispatcher (
         sizeof (DriverEntry->ImageHandle)
         );
 
-      ReturnStatus = EFI_SUCCESS;
+      if (!PreviousSmmEntryPointRegistered && gSmmCorePrivate->SmmEntryPointRegistered) {
+        //
+        // Return immediately if the SMM Entry Point was registered by the SMM 
+        // Driver that was just dispatched.  The SMM IPL will reinvoke the SMM
+        // Core Dispatcher.  This is required so SMM Mode may be enabled as soon 
+        // as all the dependent SMM Drivers for SMM Mode have been dispatched.  
+        // Once the SMM Entry Point has been registered, then SMM Mode will be 
+        // used.
+        //
+        gRequestDispatch = TRUE;
+        gDispatcherRunning = FALSE;
+        return EFI_NOT_READY;
+      }
     }
 
     //
@@ -886,7 +904,7 @@ SmmDispatcher (
 
   gDispatcherRunning = FALSE;
 
-  return ReturnStatus;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -1309,7 +1327,34 @@ SmmDriverDispatchHandler (
   // Execute the SMM Dispatcher on any newly discovered FVs and previously 
   // discovered SMM drivers that have been discovered but not dispatched.
   //
-  return SmmDispatcher ();
+  Status = SmmDispatcher ();
+
+  //
+  // Check to see if CommBuffer and CommBufferSize are valid
+  //
+  if (CommBuffer != NULL && CommBufferSize != NULL) {
+    if (*CommBufferSize > 0) {
+      if (Status == EFI_NOT_READY) {
+        //
+        // If a the SMM Core Entry Point was just registered, then set flag to 
+        // request the SMM Dispatcher to be restarted.
+        //
+        *(UINT8 *)CommBuffer = COMM_BUFFER_SMM_DISPATCH_RESTART;
+      } else if (!EFI_ERROR (Status)) {
+        //
+        // Set the flag to show that the SMM Dispatcher executed without errors
+        //
+        *(UINT8 *)CommBuffer = COMM_BUFFER_SMM_DISPATCH_SUCCESS;
+      } else {
+        //
+        // Set the flag to show that the SMM Dispatcher encountered an error
+        //
+        *(UINT8 *)CommBuffer = COMM_BUFFER_SMM_DISPATCH_ERROR;
+      }
+    }
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
