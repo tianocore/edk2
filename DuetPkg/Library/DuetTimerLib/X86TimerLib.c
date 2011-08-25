@@ -4,9 +4,9 @@
   ACPI power management timer is a 24-bit or 32-bit fixed rate free running count-up
   timer that runs off a 3.579545 MHz clock. 
   When startup, Duet will check the FADT to determine whether the PM timer is a 
-  32-bit or 25-bit timer.
+  32-bit or 24-bit timer.
 
-  Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -242,4 +242,40 @@ GetPerformanceCounterProperties (
   }
 
   return 3579545;
+}
+
+/**
+  Converts elapsed ticks of performance counter to time in nanoseconds.
+
+  This function converts the elapsed ticks of running performance counter to
+  time value in unit of nanoseconds.
+
+  @param  Ticks     The number of elapsed ticks of running performance counter.
+
+  @return The elapsed time in nanoseconds.
+
+**/
+UINT64
+EFIAPI
+GetTimeInNanoSecond (
+  IN      UINT64                     Ticks
+  )
+{
+  UINT64  NanoSeconds;
+  UINT32  Remainder;
+
+  //
+  //          Ticks
+  // Time = --------- x 1,000,000,000
+  //        Frequency
+  //
+  NanoSeconds = MultU64x32 (DivU64x32Remainder (Ticks, 3579545, &Remainder), 1000000000u);
+
+  //
+  // Frequency < 0x100000000, so Remainder < 0x100000000, then (Remainder * 1,000,000,000)
+  // will not overflow 64-bit.
+  //
+  NanoSeconds += DivU64x32 (MultU64x32 ((UINT64) Remainder, 1000000000u), 3579545);
+
+  return NanoSeconds;
 }

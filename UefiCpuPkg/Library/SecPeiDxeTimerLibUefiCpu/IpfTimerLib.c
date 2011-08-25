@@ -1,7 +1,7 @@
 /** @file
   Timer Library functions built upon ITC on IPF.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -169,4 +169,48 @@ GetPerformanceCounterProperties (
   }
 
   return BaseFrequence * (PalRet.r11 >> 32) / (UINT32)PalRet.r11;
+}
+
+/**
+  Converts elapsed ticks of performance counter to time in nanoseconds.
+
+  This function converts the elapsed ticks of running performance counter to
+  time value in unit of nanoseconds.
+
+  @param  Ticks     The number of elapsed ticks of running performance counter.
+
+  @return The elapsed time in nanoseconds.
+
+**/
+UINT64
+EFIAPI
+GetTimeInNanoSecond (
+  IN      UINT64                     Ticks
+  )
+{
+  UINT64  Frequency;
+  UINT64  NanoSeconds;
+  UINT64  Remainder;
+  INTN    Shift;
+
+  Frequency = GetPerformanceCounterProperties (NULL, NULL);
+
+  //
+  //          Ticks
+  // Time = --------- x 1,000,000,000
+  //        Frequency
+  //
+  NanoSeconds = MultU64x32 (DivU64x64Remainder (Ticks, Frequency, &Remainder), 1000000000u);
+
+  //
+  // Ensure (Remainder * 1,000,000,000) will not overflow 64-bit.
+  // Since 2^29 < 1,000,000,000 = 0x3B9ACA00 < 2^30, Remainder should < 2^(64-30) = 2^34,
+  // i.e. highest bit set in Remainder should <= 33.
+  //
+  Shift = MAX (0, HighBitSet64 (Remainder) - 33);
+  Remainder = RShiftU64 (Remainder, (UINTN) Shift);
+  Frequency = RShiftU64 (Frequency, (UINTN) Shift);
+  NanoSeconds += DivU64x64Remainder (MultU64x32 (Remainder, 1000000000u), Frequency, NULL);
+
+  return NanoSeconds;
 }
