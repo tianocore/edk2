@@ -818,7 +818,6 @@ UsbIoPortReset (
   USB_INTERFACE           *UsbIf;
   USB_INTERFACE           *HubIf;
   USB_DEVICE              *Dev;
-  UINT8                   Address;
   EFI_TPL                 OldTpl;
   EFI_STATUS              Status;
 
@@ -843,27 +842,26 @@ UsbIoPortReset (
   }
 
   //
-  // Reset the device to its current address. The device now has a
-  // address of ZERO, so need to set Dev->Address to zero first for
-  // host to communicate with the device
+  // Reset the device to its current address. The device now has an address
+  // of ZERO after port reset, so need to set Dev->Address to the device again for
+  // host to communicate with it.
   //
-  Address       = Dev->Address;
-  Dev->Address  = 0;
-  Status        = UsbSetAddress (Dev, Address);
+  Status  = UsbSetAddress (Dev, Dev->Address);
 
   gBS->Stall (USB_SET_DEVICE_ADDRESS_STALL);
   
   if (EFI_ERROR (Status)) {
+    //
+    // It may fail due to device disconnection or other reasons.
+    //
     DEBUG (( EFI_D_ERROR, "UsbIoPortReset: failed to set address for device %d - %r\n",
-                Address, Status));
+                Dev->Address, Status));
 
     goto ON_EXIT;
   }
 
-  Dev->Address  = Address;
+  DEBUG (( EFI_D_INFO, "UsbIoPortReset: device is now ADDRESSED at %d\n", Dev->Address));
 
-  DEBUG (( EFI_D_INFO, "UsbIoPortReset: device is now ADDRESSED at %d\n", Address));
-  
   //
   // Reset the current active configure, after this device
   // is in CONFIGURED state.
@@ -873,7 +871,7 @@ UsbIoPortReset (
 
     if (EFI_ERROR (Status)) {
       DEBUG (( EFI_D_ERROR, "UsbIoPortReset: failed to set configure for device %d - %r\n",
-                  Address, Status));
+                  Dev->Address, Status));
     }
   }
 
