@@ -66,8 +66,8 @@ XenConnect (
   AsmCpuid (XenLeaf + 1, &XenVersion, NULL, NULL, NULL);
   DEBUG ((EFI_D_ERROR, "Detected Xen version %d.%d\n",
           XenVersion >> 16, XenVersion & 0xFFFF));
-  mXenInfo.VersionMajor = XenVersion >> 16;
-  mXenInfo.VersionMinor = XenVersion & 0xFFFF;
+  mXenInfo.VersionMajor = (UINT16)(XenVersion >> 16);
+  mXenInfo.VersionMinor = (UINT16)(XenVersion & 0xFFFF);
 
   /* TBD: Locate hvm_info and reserve it away. */
   mXenInfo.HvmInfo = NULL;

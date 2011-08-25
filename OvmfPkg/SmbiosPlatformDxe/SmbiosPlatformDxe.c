@@ -41,7 +41,7 @@ IsEntryPointStructureValid (
   Checksum = 0;
 
   for (Index = 0; Index < Length; Index++) {
-    Checksum += BytePtr[Index];
+    Checksum = Checksum + (UINT8) BytePtr[Index];
   }
 
   if (Checksum != 0) {
