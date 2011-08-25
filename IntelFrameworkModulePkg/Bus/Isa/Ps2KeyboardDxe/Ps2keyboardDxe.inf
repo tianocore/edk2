@@ -4,7 +4,7 @@
 # The keyboard type implemented follows IBM compatible PS2 protocol, with Scan Codes Set 1.
 #
 # This dirver directly uses IsaIo protocol service to support KeyBoard work.
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -56,6 +56,7 @@
   BaseLib
   BaseMemoryLib
   TimerLib
+  PcdLib
   
 [Protocols]
   gEfiPs2PolicyProtocolGuid                     # PROTOCOL TO_START
@@ -63,6 +64,9 @@
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
   gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+
+[FeaturePcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification
 
 # [Event]
 #   ##

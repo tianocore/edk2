@@ -361,10 +361,10 @@ BiosKeyboardDriverBindingStart (
   //
   Status = BiosKeyboardPrivate->SimpleTextInputEx.Reset (
                                                     &BiosKeyboardPrivate->SimpleTextInputEx,
-                                                    FALSE
+                                                    FeaturePcdGet (PcdPs2KbdExtendedVerification)
                                                     );
-
   if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "[KBD]Reset Failed. Status - %r\n", Status));  
     StatusCode = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_NOT_DETECTED;
     goto Done;
   }
@@ -436,6 +436,7 @@ BiosKeyboardDriverBindingStart (
       }
     }
   }
+  DEBUG ((EFI_D_INFO, "[KBD]Extended keystrokes supported by CSM16 - %02x\n", (UINTN)BiosKeyboardPrivate->ExtendedKeyboard));
   //
   // Install protocol interfaces for the keyboard device.
   //
@@ -1679,6 +1680,12 @@ CheckKeyboardConnect (
              KBC_INPBUF_VIA60_KBEN
              );
   if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "[KBD]CheckKeyboardConnect - Keyboard enable failed!\n"));
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_CONTROLLER_ERROR,
+      BiosKeyboardPrivate->DevicePath
+      );
     return FALSE;
   }
 
@@ -1689,6 +1696,12 @@ CheckKeyboardConnect (
              );
 
   if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "[KBD]CheckKeyboardConnect - Timeout!\n"));
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_CONTROLLER_ERROR,
+      BiosKeyboardPrivate->DevicePath
+      );
     return FALSE;
   }
 
@@ -1763,6 +1776,13 @@ BiosKeyboardTimerHandler (
 
   KeyData.Key.ScanCode            = (UINT16) Regs.H.AH;
   KeyData.Key.UnicodeChar         = (UINT16) Regs.H.AL;
+  DEBUG ((
+    EFI_D_INFO,
+    "[KBD]INT16 returns EFI_INPUT_KEY.ScanCode - %x, EFI_INPUT_KEY.UnicodeChar - %x\n",
+    KeyData.Key.ScanCode,
+    KeyData.Key.UnicodeChar
+    ));
+  
   KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
   KeyData.KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
   //
@@ -1800,6 +1820,40 @@ BiosKeyboardTimerHandler (
   //
   KbFlag1 = *((UINT8 *) (UINTN) 0x417);  // read the STATUS FLAGS 1
   KbFlag2 = *((UINT8 *) (UINTN) 0x418); // read STATUS FLAGS 2
+
+  DEBUG_CODE (
+    {
+      if ((KbFlag1 & KB_CAPS_LOCK_BIT) == KB_CAPS_LOCK_BIT) {
+        DEBUG ((EFI_D_INFO, "[KBD]Caps Lock Key is pressed.\n"));
+      }
+      if ((KbFlag1 & KB_NUM_LOCK_BIT) == KB_NUM_LOCK_BIT) {
+        DEBUG ((EFI_D_INFO, "[KBD]Num Lock Key is pressed.\n"));
+      }
+      if ((KbFlag1 & KB_SCROLL_LOCK_BIT) == KB_SCROLL_LOCK_BIT) {
+        DEBUG ((EFI_D_INFO, "[KBD]Scroll Lock Key is pressed.\n"));
+      } 
+      if ((KbFlag1 & KB_ALT_PRESSED) == KB_ALT_PRESSED) {
+        if ((KbFlag2 & KB_LEFT_ALT_PRESSED) == KB_LEFT_ALT_PRESSED) {
+          DEBUG ((EFI_D_INFO, "[KBD]Left Alt Key is pressed.\n"));
+        } else {
+          DEBUG ((EFI_D_INFO, "[KBD]Right Alt Key is pressed.\n"));
+        }
+      }  
+      if ((KbFlag1 & KB_CTRL_PRESSED) == KB_CTRL_PRESSED) {
+        if ((KbFlag2 & KB_LEFT_CTRL_PRESSED) == KB_LEFT_CTRL_PRESSED) {
+          DEBUG ((EFI_D_INFO, "[KBD]Left Ctrl Key is pressed.\n"));
+        } else {
+          DEBUG ((EFI_D_INFO, "[KBD]Right Ctrl Key is pressed.\n"));
+        }
+      }  
+      if ((KbFlag1 & KB_LEFT_SHIFT_PRESSED) == KB_LEFT_SHIFT_PRESSED) {
+        DEBUG ((EFI_D_INFO, "[KBD]Left Shift Key is pressed.\n"));
+      }
+      if ((KbFlag1 & KB_RIGHT_SHIFT_PRESSED) == KB_RIGHT_SHIFT_PRESSED) {
+        DEBUG ((EFI_D_INFO, "[KBD]Right Shift Key is pressed.\n"));
+      }
+    }
+  );
 
   //
   // Record toggle state
@@ -1864,6 +1918,13 @@ BiosKeyboardTimerHandler (
     }
   }
 
+  DEBUG ((
+    EFI_D_INFO,
+    "[KBD]Convert to EFI Scan Code, EFI_INPUT_KEY.ScanCode - %x, EFI_INPUT_KEY.UnicodeChar - %x\n",
+    KeyData.Key.ScanCode,
+    KeyData.Key.UnicodeChar
+    ));
+
   //
   // Need not return associated shift state if a class of printable characters that
   // are normally adjusted by shift modifiers.
@@ -1872,6 +1933,7 @@ BiosKeyboardTimerHandler (
   if ((KeyData.Key.UnicodeChar >= L'A' && KeyData.Key.UnicodeChar <= L'Z') ||
       (KeyData.Key.UnicodeChar >= L'a' && KeyData.Key.UnicodeChar <= L'z')
      ) {
+    DEBUG ((EFI_D_INFO, "[KBD]Shift key with a~z are pressed, remove shift state in EFI_KEY_STATE.\n"));
     KeyData.KeyState.KeyShiftState &= ~(EFI_LEFT_SHIFT_PRESSED | EFI_RIGHT_SHIFT_PRESSED);
   }
 

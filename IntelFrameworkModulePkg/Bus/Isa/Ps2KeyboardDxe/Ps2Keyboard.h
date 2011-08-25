@@ -33,6 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/TimerLib.h>
+#include <Library/PcdLib.h>
 
 //
 // Global Variables

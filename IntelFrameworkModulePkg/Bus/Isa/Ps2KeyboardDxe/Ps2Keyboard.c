@@ -332,7 +332,7 @@ KbdControllerDriverStart (
   //
   // Reset the keyboard device
   //
-  Status = ConsoleIn->ConInEx.Reset (&ConsoleIn->ConInEx, TRUE);
+  Status = ConsoleIn->ConInEx.Reset (&ConsoleIn->ConInEx, FeaturePcdGet (PcdPs2KbdExtendedVerification));
   if (EFI_ERROR (Status)) {
     Status      = EFI_DEVICE_ERROR;
     StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_NOT_DETECTED;
