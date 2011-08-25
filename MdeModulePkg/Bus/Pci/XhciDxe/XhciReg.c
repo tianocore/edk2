@@ -362,7 +362,7 @@ XhcReadRuntimeReg64 (
 
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "XhcReadRuntimeReg64: Pci Io Read error - %r at %d\n", Status, Offset));
-    Data = 0xFFFFFFFFFFFFFFFF;
+    Data = 0xFFFFFFFFFFFFFFFFULL;
   }
 
   return Data;
@@ -700,7 +700,7 @@ XhcGetLegSupCapAddr (
     //
     // If not, then traverse all of the ext capability registers till finding out it.
     //
-    NextExtCapReg = (Data >> 8) & 0xFF;
+    NextExtCapReg = (UINT8)((Data >> 8) & 0xFF);
     ExtCapOffset += (NextExtCapReg << 2);
   } while (NextExtCapReg != 0);
 

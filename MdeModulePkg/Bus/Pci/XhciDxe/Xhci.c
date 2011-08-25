@@ -829,7 +829,7 @@ XhcControlTransfer (
   // endpoint is bidirectional. XhcCreateUrb expects this
   // combination of Ep addr and its direction.
   //
-  Endpoint = 0 | ((TransferDirection == EfiUsbDataIn) ? 0x80 : 0);
+  Endpoint = (UINT8) (0 | ((TransferDirection == EfiUsbDataIn) ? 0x80 : 0));
   Urb = XhcCreateUrb (
           Xhc,
           XhciDevAddr,

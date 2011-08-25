@@ -233,7 +233,7 @@ UsbCreateDevice (
   Device->ParentAddr  = ParentIf->Device->Address;
   Device->ParentIf    = ParentIf;
   Device->ParentPort  = ParentPort;
-  Device->Tier        = ParentIf->Device->Tier + 1;
+  Device->Tier        = (UINT8)(ParentIf->Device->Tier + 1);
   return Device;
 }
 

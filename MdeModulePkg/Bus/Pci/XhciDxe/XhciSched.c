@@ -325,7 +325,7 @@ XhcCreateUrb (
 
   Ep            = &Urb->Ep;
   Ep->DevAddr   = DevAddr;
-  Ep->EpAddr    = EpAddr & 0x0F;
+  Ep->EpAddr    = (UINT8)(EpAddr & 0x0F);
   Ep->Direction = ((EpAddr & 0x80) != 0) ? EfiUsbDataIn : EfiUsbDataOut;
   Ep->DevSpeed  = DevSpeed;
   Ep->MaxPacket = MaxPacket;
@@ -352,7 +352,6 @@ XhcCreateUrb (
 
 **/
 EFI_STATUS
-EFIAPI
 XhcCreateTransferTrb (
   IN USB_XHCI_DEV               *Xhc,
   IN URB                        *Urb
@@ -369,7 +368,7 @@ XhcCreateTransferTrb (
   UINTN                         TrbNum;
 
   SlotId    = XhcDevAddrToSlotId(Urb->Ep.DevAddr);
-  Dci       = XhcEndpointToDci (Urb->Ep.EpAddr, Urb->Ep.Direction);
+  Dci       = XhcEndpointToDci (Urb->Ep.EpAddr, (UINT8)(Urb->Ep.Direction));
   EPRing    = (TRANSFER_RING *)(UINTN) UsbDevContext[SlotId].EndpointTransferRing[Dci-1];
   Urb->Ring = EPRing;
   OutputDevContxt = (DEVICE_CONTEXT *)(UINTN) Xhc->DCBAA[SlotId];
@@ -610,7 +609,7 @@ XhcInitSched (
   //
   MaxScratchpadBufs      = ((Xhc->HcSParams2.Data.ScratchBufHi) << 5) | (Xhc->HcSParams2.Data.ScratchBufLo);
   Xhc->MaxScratchpadBufs = MaxScratchpadBufs;
-  ASSERT (MaxScratchpadBufs >= 0 && MaxScratchpadBufs <= 1023);
+  ASSERT (MaxScratchpadBufs <= 1023);
   if (MaxScratchpadBufs != 0) {
     ScratchBuf      = AllocateAlignedZeroPool(MaxScratchpadBufs * sizeof (UINT64), Xhc->PageSize);
     ASSERT (ScratchBuf != NULL);
@@ -633,8 +632,8 @@ XhcInitSched (
   // a 64-bit address pointing to where the Device Context Base Address Array is located.
   //
   Xhc->DCBAA     = (UINT64 *)(UINTN)Dcbaa;
-  XhcWriteOpReg64 (Xhc, XHC_DCBAAP_OFFSET, (UINT64)Xhc->DCBAA);
-  DEBUG ((EFI_D_INFO, "XhcInitSched:DCBAA=0x%x\n", (UINT64)Xhc->DCBAA));
+  XhcWriteOpReg64 (Xhc, XHC_DCBAAP_OFFSET, (UINT64)(UINTN)Xhc->DCBAA);
+  DEBUG ((EFI_D_INFO, "XhcInitSched:DCBAA=0x%x\n", (UINT64)(UINTN)Xhc->DCBAA));
 
   //
   // Define the Command Ring Dequeue Pointer by programming the Command Ring Control Register
@@ -705,7 +704,7 @@ XhcRecoverHaltedEndpoint (
 
   Status     = EFI_SUCCESS;
   SlotId     = XhcDevAddrToSlotId(Urb->Ep.DevAddr);
-  Dci        = XhcEndpointToDci(Urb->Ep.EpAddr, Urb->Ep.Direction);
+  Dci        = XhcEndpointToDci(Urb->Ep.EpAddr, (UINT8)(Urb->Ep.Direction));
 
   DEBUG ((EFI_D_INFO, "Recovery Halted Slot = %x,Dci = %x\n", SlotId, Dci));
 
@@ -760,7 +759,6 @@ XhcRecoverHaltedEndpoint (
 
 **/
 VOID
-EFIAPI
 CreateEventRing (
   IN  USB_XHCI_DEV          *Xhc,
   IN  UINT8                 EventInterrupter,
@@ -811,7 +809,7 @@ CreateEventRing (
   XhcWriteRuntimeReg64 (
     Xhc,
     XHC_ERDP_OFFSET + (32 * EventRing->EventInterrupter),
-    (UINT64)EventRing->EventRingDequeue
+    (UINT64)(UINTN)EventRing->EventRingDequeue
     );
   //
   // Program the Interrupter Event Ring Segment Table Base Address (ERSTBA) register(5.5.2.3.2)
@@ -819,7 +817,7 @@ CreateEventRing (
   XhcWriteRuntimeReg64 (
     Xhc,
     XHC_ERSTBA_OFFSET + (32 * EventRing->EventInterrupter),
-    (UINT64) ERSTBase
+    (UINT64)(UINTN)ERSTBase
     );
   //
   // Need set IMAN IE bit to enble the ring interrupt
@@ -836,7 +834,6 @@ CreateEventRing (
 
 **/
 VOID
-EFIAPI
 CreateTransferRing (
   IN  USB_XHCI_DEV          *Xhc,
   IN  UINTN                 TrbNum,
@@ -1037,7 +1034,7 @@ XhcCheckUrbResult (
   Urb->EvtRing->EventRingDequeue = Urb->EvtTrbStart;
   for (Index = 0; Index < Urb->EvtRing->TrbNumber; Index++) {
     XhcSyncEventRing (Xhc, Urb->EvtRing);
-    Status = XhcCheckNewEvent (Xhc, Urb->EvtRing, &(TRB *)EvtTrb);
+    Status = XhcCheckNewEvent (Xhc, Urb->EvtRing, ((TRB **)&EvtTrb));
     if (Status == EFI_NOT_READY) {
       Urb->Result |= EFI_USB_ERR_TIMEOUT;
       goto EXIT;
@@ -1151,7 +1148,7 @@ XhcExecTransfer (
     Dci    = 0;
   } else {
     SlotId = XhcDevAddrToSlotId(Urb->Ep.DevAddr);
-    Dci    = XhcEndpointToDci(Urb->Ep.EpAddr, Urb->Ep.Direction);
+    Dci    = XhcEndpointToDci(Urb->Ep.EpAddr, (UINT8)(Urb->Ep.Direction));
   }
 
   Status = EFI_SUCCESS;
@@ -1459,7 +1456,7 @@ XhcEndpointToDci (
   if (EpAddr == 0) {
     return 1;
   } else {
-    Index = 2 * EpAddr;
+    Index = (UINT8) (2 * EpAddr);
     if (Direction == EfiUsbDataIn) {
       Index += 1;
     }
@@ -1476,7 +1473,6 @@ XhcEndpointToDci (
 
 **/
 UINT8
-EFIAPI
 XhcDevAddrToSlotId (
   IN  UINT8       DevAddr
   )
@@ -1613,11 +1609,11 @@ XhcSyncEventRing (
                                 XHC_ERDP_OFFSET + (32 * EvtRing->EventInterrupter)
                                 );
 
-  if (((UINT64) XhcDequeue & (~0x0F)) != ((UINT64) EvtRing->EventRingDequeue & (~0x0F))) {
+  if (((UINT64)(UINTN)XhcDequeue & (~0x0F)) != ((UINT64)(UINTN)EvtRing->EventRingDequeue & (~0x0F))) {
     XhcWriteRuntimeReg64 (
       Xhc,
       XHC_ERDP_OFFSET + (32 * EvtRing->EventInterrupter),
-      (UINT64)EvtRing->EventRingDequeue | BIT3
+      (UINT64)(UINTN)EvtRing->EventRingDequeue | BIT3
       );
   }
 
@@ -1782,7 +1778,7 @@ RingIntTransferDoorBell (
   UINT8                Dci;
 
   SlotId = XhcDevAddrToSlotId(Urb->Ep.DevAddr);
-  Dci    = XhcEndpointToDci(Urb->Ep.EpAddr, Urb->Ep.Direction);
+  Dci    = XhcEndpointToDci(Urb->Ep.EpAddr, (UINT8)(Urb->Ep.Direction));
   XhcRingDoorBell (Xhc, SlotId, Dci);
   return EFI_SUCCESS;
 }
@@ -2141,7 +2137,7 @@ XhcSetConfigCmd (
         EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
       }
 
-      EpAddr    = EpDesc->EndpointAddress & 0x0F;
+      EpAddr    = (UINT8)(EpDesc->EndpointAddress & 0x0F);
       Direction = (UINT8)((EpDesc->EndpointAddress & 0x80) ? EfiUsbDataIn : EfiUsbDataOut);
 
       Dci = XhcEndpointToDci (EpAddr, Direction);
