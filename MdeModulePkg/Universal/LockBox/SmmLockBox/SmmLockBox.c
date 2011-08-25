@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -183,11 +183,19 @@ SmmLockBoxRestore (
   //
   // Restore data
   //
-  Status = RestoreLockBox (
-             &LockBoxParameterRestore->Guid,
-             (VOID *)(UINTN)LockBoxParameterRestore->Buffer,
-             (UINTN *)&LockBoxParameterRestore->Length
-             );
+  if ((LockBoxParameterRestore->Length == 0) && (LockBoxParameterRestore->Buffer == 0)) {
+    Status = RestoreLockBox (
+               &LockBoxParameterRestore->Guid,
+               NULL,
+               NULL
+               );
+  } else {
+    Status = RestoreLockBox (
+               &LockBoxParameterRestore->Guid,
+               (VOID *)(UINTN)LockBoxParameterRestore->Buffer,
+               (UINTN *)&LockBoxParameterRestore->Length
+               );
+  }
   LockBoxParameterRestore->Header.ReturnStatus = (UINT64)Status;
   return ;
 }
