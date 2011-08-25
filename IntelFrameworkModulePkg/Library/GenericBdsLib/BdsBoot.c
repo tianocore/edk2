@@ -1904,6 +1904,7 @@ BdsLibGetBootableHandle (
   )
 {
   EFI_STATUS                      Status;
+  EFI_TPL                         OldTpl;
   EFI_DEVICE_PATH_PROTOCOL        *UpdatedDevicePath;
   EFI_DEVICE_PATH_PROTOCOL        *DupDevicePath;
   EFI_HANDLE                      Handle;
@@ -1922,6 +1923,12 @@ BdsLibGetBootableHandle (
   EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr;
 
   UpdatedDevicePath = DevicePath;
+
+  //
+  // Enter to critical section to protect the acquired BlockIo instance 
+  // from getting released due to the USB mass storage hotplug event
+  //
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Check whether the device is connected
@@ -1950,6 +1957,8 @@ BdsLibGetBootableHandle (
     // Get BlockIo protocol and check removable attribute
     //
     Status = gBS->HandleProtocol (Handle, &gEfiBlockIoProtocolGuid, (VOID **)&BlockIo);
+    ASSERT_EFI_ERROR (Status);
+
     //
     // Issue a dummy read to the device to check for media change.
     // When the removable media is changed, any Block IO read/write will
@@ -2045,6 +2054,8 @@ BdsLibGetBootableHandle (
   if (SimpleFileSystemHandles != NULL) {
     FreePool(SimpleFileSystemHandles);
   }
+
+  gBS->RestoreTPL (OldTpl);
 
   return ReturnHandle;
 }
