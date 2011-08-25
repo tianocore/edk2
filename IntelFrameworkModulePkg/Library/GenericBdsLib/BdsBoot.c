@@ -450,6 +450,7 @@ BdsFindUsbDevice (
         // could be installed for this USB device.
         //
         BdsLibConnectDevicePath (FullDevicePath);
+        REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdProgressCodeOsLoaderLoad));
         Status = gBS->LoadImage (
                        TRUE,
                        gImageHandle,
@@ -483,6 +484,7 @@ BdsFindUsbDevice (
         //
         FullDevicePath = FileDevicePath (Handle, EFI_REMOVABLE_MEDIA_FILE_NAME);
         if (FullDevicePath != NULL) {
+          REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdProgressCodeOsLoaderLoad));
           Status = gBS->LoadImage (
                           TRUE,
                           gImageHandle,
@@ -753,6 +755,10 @@ BdsLibBootViaBootOption (
         
     DEBUG_CODE_END();
   
+    //
+    // Report status code for OS Loader LoadImage.
+    //
+    REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdProgressCodeOsLoaderLoad));
     Status = gBS->LoadImage (
                     TRUE,
                     gImageHandle,
@@ -781,6 +787,7 @@ BdsLibBootViaBootOption (
       //
       FilePath = FileDevicePath (Handle, EFI_REMOVABLE_MEDIA_FILE_NAME);
       if (FilePath != NULL) {
+        REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdProgressCodeOsLoaderLoad));
         Status = gBS->LoadImage (
                         TRUE,
                         gImageHandle,
@@ -831,6 +838,11 @@ BdsLibBootViaBootOption (
   PERF_CODE (
     WriteBootToOsPerformanceData ();
   );
+
+  //
+  // Report status code for OS Loader StartImage.
+  //
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdProgressCodeOsLoaderStart));
 
   Status = gBS->StartImage (ImageHandle, ExitDataSize, ExitData);
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Image Return Status = %r\n", Status));
