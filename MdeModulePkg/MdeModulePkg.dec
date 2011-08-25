@@ -486,6 +486,22 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdTftpBlockSize|0x0|UINT64|0x30001026
 
+  ## Progress Code for OS Loader LoadImage start.
+  #  PROGRESS_CODE_OS_LOADER_LOAD   = (EFI_SOFTWARE_DXE_BS_DRIVER | (EFI_OEM_SPECIFIC | 0x00000000)) = 0x03058000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad|0x03058000|UINT32|0x30001030
+
+  ## Progress Code for OS Loader StartImage start.
+  #  PROGRESS_CODE_OS_LOADER_START  = (EFI_SOFTWARE_DXE_BS_DRIVER | (EFI_OEM_SPECIFIC | 0x00000001)) = 0x03058001
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart|0x03058001|UINT32|0x30001031
+
+  ## Progress Code for S3 Suspend start.
+  #  PROGRESS_CODE_S3_SUSPEND_START = (EFI_SOFTWARE_SMM_DRIVER | (EFI_OEM_SPECIFIC | 0x00000000))    = 0x03078000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeS3SuspendStart|0x03078000|UINT32|0x30001032
+
+  ## Progress Code for S3 Suspend end.
+  #  PROGRESS_CODE_S3_SUSPEND_END   = (EFI_SOFTWARE_SMM_DRIVER | (EFI_OEM_SPECIFIC | 0x00000001))    = 0x03078001
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeS3SuspendEnd|0x03078001|UINT32|0x30001033
+
 [PcdsFixedAtBuild,PcdsPatchableInModule]
   ## Maximun number of performance log entries during PEI phase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|40|UINT8|0x0001002f
