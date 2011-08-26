@@ -2596,7 +2596,11 @@ GetQuestionDefault (
           if (StrValue == NULL) {
             return EFI_NOT_FOUND;
           }
-          Question->BufferValue = AllocateCopyPool (StrSize (StrValue), StrValue);
+          if (Question->StorageWidth > StrSize (StrValue)) {
+            CopyMem (Question->BufferValue, StrValue, StrSize (StrValue));
+          } else {
+            CopyMem (Question->BufferValue, StrValue, Question->StorageWidth);
+          }
         }
 
         return EFI_SUCCESS;
