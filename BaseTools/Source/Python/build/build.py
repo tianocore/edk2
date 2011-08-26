@@ -705,7 +705,7 @@ class Build():
     #   @param  SkuId               SKU id from command line
     #
     def __init__(self, Target, WorkspaceDir, Platform, Module, Arch, ToolChain,
-                 BuildTarget, FlashDefinition, FdList=[], FvList=[],
+                 BuildTarget, FlashDefinition, FdList=[], FvList=[], CapList=[],
                  MakefileType="nmake", SilentMode=False, ThreadNumber=2,
                  SkipAutoGen=False, Reparse=False, SkuId=None, 
                  ReportFile=None, ReportType=None, UniFlag=None):
@@ -720,6 +720,7 @@ class Build():
         self.Fdf            = FlashDefinition
         self.FdList         = FdList
         self.FvList         = FvList
+        self.CapList        = CapList
         self.MakefileType   = MakefileType
         self.SilentMode     = SilentMode
         self.ThreadNumber   = ThreadNumber
@@ -999,6 +1000,11 @@ class Build():
             try:
                 #os.rmdir(AutoGenObject.BuildDir)
                 RemoveDirectory(AutoGenObject.BuildDir, True)
+                #
+                # First should close DB.
+                #
+                self.Db.Close()     
+                RemoveDirectory(gBuildCacheDir, True)
             except WindowsError, X:
                 EdkLogger.error("build", FILE_DELETE_FAILURE, ExtraData=str(X))
         return True
@@ -1317,6 +1323,7 @@ class Build():
                         self.Fdf,
                         self.FdList,
                         self.FvList,
+                        self.CapList,
                         self.SkuId,
                         self.UniFlag
                         )
@@ -1385,6 +1392,7 @@ class Build():
                         self.Fdf,
                         self.FdList,
                         self.FvList,
+                        self.CapList,
                         self.SkuId,
                         self.UniFlag
                         )
@@ -1463,6 +1471,7 @@ class Build():
                         self.Fdf,
                         self.FdList,
                         self.FvList,
+                        self.CapList,
                         self.SkuId,
                         self.UniFlag
                         )
@@ -1715,7 +1724,8 @@ def MyOptionParser():
         help="The name of FD to be generated. The name must be from [FD] section in FDF file.")
     Parser.add_option("-i", "--fv-image", action="append", type="string", dest="FvImage", default=[],
         help="The name of FV to be generated. The name must be from [FV] section in FDF file.")
-
+    Parser.add_option("-C", "--capsule-image", action="append", type="string", dest="CapName", default=[],
+        help="The name of Capsule to be generated. The name must be from [Capsule] section in FDF file.")
     Parser.add_option("-u", "--skip-autogen", action="store_true", dest="SkipAutoGen", help="Skip AutoGen step.")
     Parser.add_option("-e", "--re-parse", action="store_true", dest="Reparse", help="Re-parse all meta-data files.")
 
@@ -1861,7 +1871,7 @@ def Main():
 
         MyBuild = Build(Target, Workspace, Option.PlatformFile, Option.ModuleFile,
                         Option.TargetArch, Option.ToolChain, Option.BuildTarget,
-                        Option.FdfFile, Option.RomImage, Option.FvImage,
+                        Option.FdfFile, Option.RomImage, Option.FvImage, Option.CapName,
                         None, Option.SilentMode, Option.ThreadNumber,
                         Option.SkipAutoGen, Option.Reparse, Option.SkuId, 
                         Option.ReportFile, Option.ReportType, Option.Flag)
@@ -1919,14 +1929,19 @@ def Main():
     else:
         Conclusion = "Failed"
     FinishTime = time.time()
-    BuildDuration = time.strftime("%M:%S", time.gmtime(int(round(FinishTime - StartTime))))
+    BuildDuration = time.gmtime(int(round(FinishTime - StartTime)))
+    BuildDurationStr = ""
+    if BuildDuration.tm_yday > 1:
+        BuildDurationStr = time.strftime("%H:%M:%S", BuildDuration) + ", %d day(s)"%(BuildDuration.tm_yday - 1)
+    else:
+        BuildDurationStr = time.strftime("%H:%M:%S", BuildDuration)
     if MyBuild != None:
-        MyBuild.BuildReport.GenerateReport(BuildDuration)
+        MyBuild.BuildReport.GenerateReport(BuildDurationStr)
         MyBuild.Db.Close()
     EdkLogger.SetLevel(EdkLogger.QUIET)
     EdkLogger.quiet("\n- %s -" % Conclusion)
     EdkLogger.quiet(time.strftime("Build end time: %H:%M:%S, %b.%d %Y", time.localtime()))
-    EdkLogger.quiet("Build total time: %s\n" % BuildDuration)
+    EdkLogger.quiet("Build total time: %s\n" % BuildDurationStr)
     return ReturnCode
 
 if __name__ == '__main__':

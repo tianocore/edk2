@@ -468,6 +468,7 @@ static struct {
   {"EFI_HII_DATE",  EFI_IFR_TYPE_DATE,        sizeof (EFI_HII_DATE), sizeof (UINT16)},
   {"EFI_STRING_ID", EFI_IFR_TYPE_STRING,      sizeof (EFI_STRING_ID),sizeof (EFI_STRING_ID)},
   {"EFI_HII_TIME",  EFI_IFR_TYPE_TIME,        sizeof (EFI_HII_TIME), sizeof (UINT8)},
+  {"EFI_HII_REF",   EFI_IFR_TYPE_REF,         sizeof (EFI_HII_REF),  sizeof (EFI_GUID)},
   {NULL,            EFI_IFR_TYPE_OTHER,       0,                     0}
 };
 
@@ -635,7 +636,7 @@ CVfrVarDataTypeDB::ExtractFieldNameAndArrary (
 
 EFI_VFR_RETURN_CODE
 CVfrVarDataTypeDB::GetTypeField (
-  IN  CHAR8          *FName,
+  IN  CONST CHAR8   *FName,
   IN  SVfrDataType  *Type,
   OUT SVfrDataField *&Field
   )
@@ -647,6 +648,20 @@ CVfrVarDataTypeDB::GetTypeField (
   }
 
   for (pField = Type->mMembers; pField != NULL; pField = pField->mNext) {
+    //
+    // For type EFI_IFR_TYPE_TIME, because field name is not correctly wrote,
+    // add code to adjust it.
+    //
+    if (Type->mType == EFI_IFR_TYPE_TIME) {
+      if (strcmp (FName, "Hour") == 0) {
+        FName = "Hours";
+      } else if (strcmp (FName, "Minute") == 0) {
+        FName = "Minuts";
+      } else if (strcmp (FName, "Second") == 0) {
+        FName = "Seconds";
+      }
+    }
+
     if (strcmp (pField->mFieldName, FName) == 0) {
       Field = pField;
       return VFR_RETURN_SUCCESS;
@@ -789,6 +804,37 @@ CVfrVarDataTypeDB::InternalTypesListInit (
         pSecondsField->mArrayNum = 0;
 
         New->mMembers            = pHoursField;
+      } else if (strcmp (gInternalTypesTable[Index].mTypeName, "EFI_HII_REF") == 0) {
+        SVfrDataField *pQuestionIdField   = new SVfrDataField;
+        SVfrDataField *pFormIdField       = new SVfrDataField;
+        SVfrDataField *pFormSetGuidField  = new SVfrDataField;
+        SVfrDataField *pDevicePathField   = new SVfrDataField;
+
+        strcpy (pQuestionIdField->mFieldName, "QuestionId");
+        GetDataType ((CHAR8 *)"UINT16", &pQuestionIdField->mFieldType);
+        pQuestionIdField->mOffset     = 0;
+        pQuestionIdField->mNext       = pFormIdField;
+        pQuestionIdField->mArrayNum   = 0;
+
+        strcpy (pFormIdField->mFieldName, "FormId");
+        GetDataType ((CHAR8 *)"UINT16", &pFormIdField->mFieldType);
+        pFormIdField->mOffset   = 2;
+        pFormIdField->mNext     = pFormSetGuidField;
+        pFormIdField->mArrayNum = 0;
+
+        strcpy (pFormSetGuidField->mFieldName, "FormSetGuid");
+        GetDataType ((CHAR8 *)"EFI_GUID", &pFormSetGuidField->mFieldType);
+        pFormSetGuidField->mOffset   = 4;
+        pFormSetGuidField->mNext     = pDevicePathField;
+        pFormSetGuidField->mArrayNum = 0;
+
+        strcpy (pDevicePathField->mFieldName, "DevicePath");
+        GetDataType ((CHAR8 *)"EFI_STRING_ID", &pDevicePathField->mFieldType);
+        pDevicePathField->mOffset   = 20;
+        pDevicePathField->mNext     = NULL;
+        pDevicePathField->mArrayNum = 0;
+
+        New->mMembers            = pQuestionIdField;
       } else {
         New->mMembers            = NULL;
       }
@@ -2770,6 +2816,100 @@ Err:
   }
 }
 
+VOID 
+CVfrQuestionDB::RegisterRefQuestion (
+  IN     CHAR8           *Name,
+  IN     CHAR8           *BaseVarId,
+  IN OUT EFI_QUESTION_ID &QuestionId
+  )
+{
+  SVfrQuestionNode     *pNode[4] = {NULL, };
+  UINT32               Len;
+  CHAR8                *VarIdStr[4] = {NULL, };
+  CHAR8                 Index;
+
+  if (BaseVarId == NULL) {
+    return;
+  }
+
+  Len = strlen (BaseVarId);
+
+  VarIdStr[0] = new CHAR8[Len + strlen (".QuestionId") + 1];
+  if (VarIdStr[0] != NULL) {
+    strcpy (VarIdStr[0], BaseVarId);
+    strcat (VarIdStr[0], ".QuestionId");
+  }
+  VarIdStr[1] = new CHAR8[Len + strlen (".FormId") + 1];
+  if (VarIdStr[1] != NULL) {
+    strcpy (VarIdStr[1], BaseVarId);
+    strcat (VarIdStr[1], ".FormId");
+  }
+  VarIdStr[2] = new CHAR8[Len + strlen (".FormSetGuid") + 1];
+  if (VarIdStr[2] != NULL) {
+    strcpy (VarIdStr[2], BaseVarId);
+    strcat (VarIdStr[2], ".FormSetGuid");
+  }
+  VarIdStr[3] = new CHAR8[Len + strlen (".DevicePath") + 1];
+  if (VarIdStr[3] != NULL) {
+    strcpy (VarIdStr[3], BaseVarId);
+    strcat (VarIdStr[3], ".DevicePath");
+  }
+
+  if ((pNode[0] = new SVfrQuestionNode (Name, VarIdStr[0])) == NULL) {
+    goto Err;
+  }
+  if ((pNode[1] = new SVfrQuestionNode (Name, VarIdStr[1])) == NULL) {
+    goto Err;
+  }
+  if ((pNode[2] = new SVfrQuestionNode (Name, VarIdStr[2])) == NULL) {
+    goto Err;
+  }
+  if ((pNode[3] = new SVfrQuestionNode (Name, VarIdStr[3])) == NULL) {
+    goto Err;
+  }
+
+  if (QuestionId == EFI_QUESTION_ID_INVALID) {
+    QuestionId = GetFreeQuestionId ();
+  } else {
+    if (ChekQuestionIdFree (QuestionId) == FALSE) {
+      goto Err;
+    }
+    MarkQuestionIdUsed (QuestionId);
+  }
+
+  pNode[0]->mQuestionId = QuestionId;
+  pNode[1]->mQuestionId = QuestionId;
+  pNode[2]->mQuestionId = QuestionId;
+  pNode[3]->mQuestionId = QuestionId;  
+  pNode[0]->mQtype      = QUESTION_REF;
+  pNode[1]->mQtype      = QUESTION_REF;
+  pNode[2]->mQtype      = QUESTION_REF;
+  pNode[3]->mQtype      = QUESTION_REF;  
+  pNode[0]->mNext       = pNode[1];
+  pNode[1]->mNext       = pNode[2];
+  pNode[2]->mNext       = pNode[3];
+  pNode[3]->mNext       = mQuestionList;  
+  mQuestionList         = pNode[0];
+
+  gCFormPkg.DoPendingAssign (VarIdStr[0], (VOID *)&QuestionId, sizeof(EFI_QUESTION_ID));
+  gCFormPkg.DoPendingAssign (VarIdStr[1], (VOID *)&QuestionId, sizeof(EFI_QUESTION_ID));
+  gCFormPkg.DoPendingAssign (VarIdStr[2], (VOID *)&QuestionId, sizeof(EFI_QUESTION_ID));
+  gCFormPkg.DoPendingAssign (VarIdStr[3], (VOID *)&QuestionId, sizeof(EFI_QUESTION_ID));
+
+  return;
+
+  Err:
+  for (Index = 0; Index < 4; Index++) {
+    if (pNode[Index] != NULL) {
+      delete pNode[Index];
+    }
+
+    if (VarIdStr[Index] != NULL) {
+      delete VarIdStr[Index];
+    }
+  }
+}
+
 EFI_VFR_RETURN_CODE
 CVfrQuestionDB::UpdateQuestionId (
   IN EFI_QUESTION_ID   QId,
@@ -2892,6 +3032,402 @@ CVfrQuestionDB::FindQuestion (
   }
 
   return VFR_RETURN_UNDEFINED;
+}
+
+CVfrStringDB::CVfrStringDB ()
+{
+  mStringFileName = NULL;
+}
+
+CVfrStringDB::~CVfrStringDB ()
+{
+  if (mStringFileName != NULL) {
+    delete mStringFileName;
+  }
+  mStringFileName = NULL;
+}
+
+
+VOID 
+CVfrStringDB::SetStringFileName(IN CHAR8 *StringFileName)
+{
+  UINT32 FileLen = 0;
+
+  if (StringFileName == NULL) {
+    return;
+  }
+
+  FileLen = strlen (StringFileName) + 1;
+  mStringFileName = new CHAR8[FileLen];
+  if (mStringFileName == NULL) {
+    return;
+  }
+
+  strcpy (mStringFileName, StringFileName);
+  mStringFileName[FileLen - 1] = '\0';
+}
+
+CHAR8 *
+CVfrStringDB::GetVarStoreNameFormStringId (
+  IN EFI_STRING_ID StringId
+  )
+{
+  FILE        *pInFile    = NULL;
+  UINT32      NameOffset;
+  UINT32      Length;
+  UINT8       *StringPtr;
+  CHAR8       *StringName;
+  CHAR16      *UnicodeString;
+  CHAR8       *VarStoreName = NULL;
+  CHAR8       *DestTmp;
+  UINT8       *Current;
+  EFI_STATUS  Status;
+  CHAR8       LineBuf[EFI_IFR_MAX_LENGTH];
+  UINT8       BlockType;
+  EFI_HII_STRING_PACKAGE_HDR *PkgHeader;
+  
+  if (mStringFileName == '\0' ) {
+    return NULL;
+  }
+
+  if ((pInFile = fopen (mStringFileName, "rb")) == NULL) {
+    return NULL;
+  }
+
+  //
+  // Get file length.
+  //
+  fseek (pInFile, 0, SEEK_END);
+  Length = ftell (pInFile);
+  fseek (pInFile, 0, SEEK_SET);
+
+  //
+  // Get file data.
+  //
+  StringPtr = new UINT8[Length];
+  if (StringPtr == NULL) {
+    fclose (pInFile);
+    return NULL;
+  }
+  fread ((char *)StringPtr, sizeof (UINT8), Length, pInFile);
+  fclose (pInFile);
+
+  PkgHeader = (EFI_HII_STRING_PACKAGE_HDR *) StringPtr;
+  //
+  // Check the String package.
+  //
+  if (PkgHeader->Header.Type != EFI_HII_PACKAGE_STRINGS) {
+    delete StringPtr;
+    return NULL;
+  }
+
+  //
+  // Search the language, only search the "en-US".
+  //
+  Current = StringPtr;
+  while (strcmp (PkgHeader->Language, "en-US") != 0) {
+    Current += PkgHeader->Header.Length;
+    PkgHeader = (EFI_HII_STRING_PACKAGE_HDR *) Current;
+    //
+    // If can't find "en-US" string package, just return the first string package.
+    //
+    if (Current - StringPtr >= Length) {
+      Current = StringPtr;
+      break;
+    }
+  }
+
+  Current += PkgHeader->HdrSize;
+  //
+  // Find the string block according the stringId.
+  //
+  Status = FindStringBlock(Current, StringId, &NameOffset, &BlockType);
+  if (Status != EFI_SUCCESS) {
+    delete StringPtr;
+    return NULL;
+  }
+
+  //
+  // Get varstore name according the string type.
+  //
+  switch (BlockType) {
+  case EFI_HII_SIBT_STRING_SCSU:
+  case EFI_HII_SIBT_STRING_SCSU_FONT:
+  case EFI_HII_SIBT_STRINGS_SCSU:
+  case EFI_HII_SIBT_STRINGS_SCSU_FONT:
+    StringName = (CHAR8*)(Current + NameOffset);
+    VarStoreName = new CHAR8[strlen(StringName) + 1];
+    strcpy (VarStoreName, StringName);
+    break;
+  case EFI_HII_SIBT_STRING_UCS2:
+  case EFI_HII_SIBT_STRING_UCS2_FONT:
+  case EFI_HII_SIBT_STRINGS_UCS2:
+  case EFI_HII_SIBT_STRINGS_UCS2_FONT:
+    UnicodeString = (CHAR16*)(Current + NameOffset);
+    Length = GetUnicodeStringTextSize ((UINT8*)UnicodeString) ;
+    DestTmp = new CHAR8[Length / 2 + 1];
+    VarStoreName = DestTmp;
+    while (*UnicodeString != '\0') {
+      *(DestTmp++) = (CHAR8) *(UnicodeString++);
+    }
+    *DestTmp = '\0';
+    break;
+  default:
+    break;
+  }
+
+  delete StringPtr;
+
+  return VarStoreName;
+}
+
+EFI_STATUS
+CVfrStringDB::FindStringBlock (
+  IN  UINT8                           *StringData,
+  IN  EFI_STRING_ID                   StringId,
+  OUT UINT32                          *StringTextOffset,
+  OUT UINT8                           *BlockType
+  )
+{
+  UINT8                                *BlockHdr;
+  EFI_STRING_ID                        CurrentStringId;
+  UINT32                               BlockSize;
+  UINT32                               Index;
+  UINT8                                *StringTextPtr;
+  UINT32                               Offset;
+  UINT16                               StringCount;
+  UINT16                               SkipCount;
+  UINT8                                Length8;
+  EFI_HII_SIBT_EXT2_BLOCK              Ext2;
+  UINT32                               Length32;
+  UINT32                               StringSize;
+
+  CurrentStringId = 1;
+
+  //
+  // Parse the string blocks to get the string text and font.
+  //
+  BlockHdr  = StringData;
+  BlockSize = 0;
+  Offset    = 0;
+  while (*BlockHdr != EFI_HII_SIBT_END) {
+    switch (*BlockHdr) {
+    case EFI_HII_SIBT_STRING_SCSU:
+      Offset = sizeof (EFI_HII_STRING_BLOCK);
+      StringTextPtr = BlockHdr + Offset;
+      BlockSize += Offset + strlen ((CHAR8 *) StringTextPtr) + 1;
+      CurrentStringId++;
+      break;
+
+    case EFI_HII_SIBT_STRING_SCSU_FONT:
+      Offset = sizeof (EFI_HII_SIBT_STRING_SCSU_FONT_BLOCK) - sizeof (UINT8);
+      StringTextPtr = BlockHdr + Offset;
+      BlockSize += Offset + strlen ((CHAR8 *) StringTextPtr) + 1;
+      CurrentStringId++;
+      break;
+
+    case EFI_HII_SIBT_STRINGS_SCSU:
+      memcpy (&StringCount, BlockHdr + sizeof (EFI_HII_STRING_BLOCK), sizeof (UINT16));
+      StringTextPtr = BlockHdr + sizeof (EFI_HII_SIBT_STRINGS_SCSU_BLOCK) - sizeof (UINT8);
+      BlockSize += StringTextPtr - BlockHdr;
+
+      for (Index = 0; Index < StringCount; Index++) {
+        BlockSize += strlen ((CHAR8 *) StringTextPtr) + 1;
+        if (CurrentStringId == StringId) {
+          *BlockType        = *BlockHdr;
+          *StringTextOffset = StringTextPtr - StringData;
+          return EFI_SUCCESS;
+        }
+        StringTextPtr = StringTextPtr + strlen ((CHAR8 *) StringTextPtr) + 1;
+        CurrentStringId++;
+      }
+      break;
+
+    case EFI_HII_SIBT_STRINGS_SCSU_FONT:
+      memcpy (
+        &StringCount,
+        BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8),
+        sizeof (UINT16)
+        );
+      StringTextPtr = BlockHdr + sizeof (EFI_HII_SIBT_STRINGS_SCSU_FONT_BLOCK) - sizeof (UINT8);
+      BlockSize += StringTextPtr - BlockHdr;
+
+      for (Index = 0; Index < StringCount; Index++) {
+        BlockSize += strlen ((CHAR8 *) StringTextPtr) + 1;
+        if (CurrentStringId == StringId) {
+          *BlockType        = *BlockHdr;
+          *StringTextOffset = StringTextPtr - StringData;
+          return EFI_SUCCESS;
+        }
+        StringTextPtr = StringTextPtr + strlen ((CHAR8 *) StringTextPtr) + 1;
+        CurrentStringId++;
+      }
+      break;
+
+    case EFI_HII_SIBT_STRING_UCS2:
+      Offset        = sizeof (EFI_HII_STRING_BLOCK);
+      StringTextPtr = BlockHdr + Offset;
+      //
+      // Use StringSize to store the size of the specified string, including the NULL
+      // terminator.
+      //
+      StringSize = GetUnicodeStringTextSize (StringTextPtr);
+      BlockSize += Offset + StringSize;
+      CurrentStringId++;
+      break;
+
+    case EFI_HII_SIBT_STRING_UCS2_FONT:
+      Offset = sizeof (EFI_HII_SIBT_STRING_UCS2_FONT_BLOCK)  - sizeof (CHAR16);
+      StringTextPtr = BlockHdr + Offset;
+      //
+      // Use StrSize to store the size of the specified string, including the NULL
+      // terminator.
+      //
+      StringSize = GetUnicodeStringTextSize (StringTextPtr);
+      BlockSize += Offset + StringSize;
+      CurrentStringId++;
+      break;
+
+    case EFI_HII_SIBT_STRINGS_UCS2:
+      Offset = sizeof (EFI_HII_SIBT_STRINGS_UCS2_BLOCK) - sizeof (CHAR16);
+      StringTextPtr = BlockHdr + Offset;
+      BlockSize += Offset;
+      memcpy (&StringCount, BlockHdr + sizeof (EFI_HII_STRING_BLOCK), sizeof (UINT16));
+      for (Index = 0; Index < StringCount; Index++) {
+        StringSize = GetUnicodeStringTextSize (StringTextPtr);
+        BlockSize += StringSize;
+        if (CurrentStringId == StringId) {
+          *BlockType        = *BlockHdr;
+          *StringTextOffset = StringTextPtr - StringData;
+          return EFI_SUCCESS;
+        }
+        StringTextPtr = StringTextPtr + StringSize;
+        CurrentStringId++;
+      }
+      break;
+
+    case EFI_HII_SIBT_STRINGS_UCS2_FONT:
+      Offset = sizeof (EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK) - sizeof (CHAR16);
+      StringTextPtr = BlockHdr + Offset;
+      BlockSize += Offset;
+      memcpy (
+        &StringCount,
+        BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8),
+        sizeof (UINT16)
+        );
+      for (Index = 0; Index < StringCount; Index++) {
+        StringSize = GetUnicodeStringTextSize (StringTextPtr);
+        BlockSize += StringSize;
+        if (CurrentStringId == StringId) {
+          *BlockType        = *BlockHdr;
+          *StringTextOffset = StringTextPtr - StringData;
+          return EFI_SUCCESS;
+        }
+        StringTextPtr = StringTextPtr + StringSize;
+        CurrentStringId++;
+      }
+      break;
+
+    case EFI_HII_SIBT_DUPLICATE:
+      if (CurrentStringId == StringId) {
+        //
+        // Incoming StringId is an id of a duplicate string block.
+        // Update the StringId to be the previous string block.
+        // Go back to the header of string block to search.
+        //
+        memcpy (
+          &StringId,
+          BlockHdr + sizeof (EFI_HII_STRING_BLOCK),
+          sizeof (EFI_STRING_ID)
+          );
+        CurrentStringId = 1;
+        BlockSize       = 0;
+      } else {
+        BlockSize       += sizeof (EFI_HII_SIBT_DUPLICATE_BLOCK);
+        CurrentStringId++;
+      }
+      break;
+
+    case EFI_HII_SIBT_SKIP1:
+      SkipCount = (UINT16) (*(BlockHdr + sizeof (EFI_HII_STRING_BLOCK)));
+      CurrentStringId = (UINT16) (CurrentStringId + SkipCount);
+      BlockSize       +=  sizeof (EFI_HII_SIBT_SKIP1_BLOCK);
+      break;
+
+    case EFI_HII_SIBT_SKIP2:
+      memcpy (&SkipCount, BlockHdr + sizeof (EFI_HII_STRING_BLOCK), sizeof (UINT16));
+      CurrentStringId = (UINT16) (CurrentStringId + SkipCount);
+      BlockSize       +=  sizeof (EFI_HII_SIBT_SKIP2_BLOCK);
+      break;
+
+    case EFI_HII_SIBT_EXT1:
+      memcpy (
+        &Length8,
+        BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8),
+        sizeof (UINT8)
+        );
+      BlockSize += Length8;
+      break;
+
+    case EFI_HII_SIBT_EXT2:
+      memcpy (&Ext2, BlockHdr, sizeof (EFI_HII_SIBT_EXT2_BLOCK));
+      BlockSize += Ext2.Length;
+      break;
+
+    case EFI_HII_SIBT_EXT4:
+      memcpy (
+        &Length32,
+        BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8),
+        sizeof (UINT32)
+        );
+
+      BlockSize += Length32;
+      break;
+
+    default:
+      break;
+    }
+
+    if (StringId > 0 && StringId != (EFI_STRING_ID)(-1)) {
+      *StringTextOffset = BlockHdr - StringData + Offset;
+      *BlockType        = *BlockHdr;
+
+      if (StringId == CurrentStringId - 1) {
+        //
+        // if only one skip item, return EFI_NOT_FOUND.
+        //
+        if(*BlockType == EFI_HII_SIBT_SKIP2 || *BlockType == EFI_HII_SIBT_SKIP1) {
+          return EFI_NOT_FOUND;
+        } else {
+          return EFI_SUCCESS;
+        }
+      }
+
+      if (StringId < CurrentStringId - 1) {
+        return EFI_NOT_FOUND;
+      }
+    }
+    BlockHdr  = StringData + BlockSize;
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+UINT32
+CVfrStringDB::GetUnicodeStringTextSize (
+  IN  UINT8            *StringSrc
+  )
+{
+  UINT32 StringSize;
+  CHAR16 *StringPtr;
+
+  StringSize = sizeof (CHAR16);
+  StringPtr  = (UINT16*)StringSrc;
+  while (*StringPtr++ != L'\0') {
+    StringSize += sizeof (CHAR16);
+  }
+
+  return StringSize;
 }
 
 BOOLEAN  VfrCompatibleMode = FALSE;

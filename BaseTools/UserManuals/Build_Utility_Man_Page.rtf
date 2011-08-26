@@ -1,122 +1,306 @@
-{\rtf1\ansi\ansicpg1252\deff0\deflang1033\deflangfe2052{\fonttbl{\f0\fswiss\fprq2\fcharset0 Verdana;}{\f1\froman\fprq2\fcharset0 Times New Roman;}}
-{\colortbl ;\red8\green96\blue168;\red0\green0\blue0;}
-{\stylesheet{ Normal;}{\s1 heading 1;}{\s2 heading 2;}}
-{\*\generator Msftedit 5.41.15.1515;}\viewkind4\uc1\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\cf1\b\f0\fs28 Name\par
-\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 Build.exe \endash  the master command that provides the developer with a single command for selecting various options of a build\par
-\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\cf1\b\fs28 Synopsis\par
-\pard\nowidctlpar\li360\sb200\cf2\fs18 Build.exe [options] [target]\par
-\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\cf1\fs28 Description\par
-\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 Build.exe is the master command line (CLI) tool that provides the developer with a single command for selecting various options of a build.  In general, it checks the environment variables, gets the user\rquote s configuration from either the CLI or target.txt, parses the dsc, dec, inf, target.txt, tools_def.txt, generates .C, .H files and the Makefiles for one or more modules and/or the active platform, calls a make (NMake or make) program to process these Makefiles, then optionally calls GenFds to generate an fd file.\par
-The build tool supports two kinds of path specifications on command line - an absolutely path or a relative (to the WORKSPACE environment variable) path \endash  in command line.\par
-\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\b\fs28 Options\par
-\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 There are no required options. \par
-\b -a, --arch <ARCH>\par
-\pard\nowidctlpar\li720\sb200\b0 ARCH is one of list: IA32, X64, IPF or EBC,  which overrides target.txt's TARGET_ARCH  definition. To specify more ARCH, please  repeat this option.\par
-\pard\nowidctlpar\li360\sb200\b -p, --platform PlatformName.dsc\par
-\pard\nowidctlpar\li720\sb200\b0 Build the platform specified by the DSC file  name argument, overrides target.txt's  ACTIVE_PLATFORM definition.\par
-\pard\nowidctlpar\li360\sb200\b -m, --module ModuleName.inf\par
-\pard\nowidctlpar\li720\sb200\b0 Build the module specified by the INF file name argument.\par
-\pard\nowidctlpar\li360\sb200\b -b, --buildtarget <TARGET>\par
-\pard\nowidctlpar\li720\sb200\b0 TARGET is one of list: DEBUG, RELEASE,  which overrides target.txt's TARGET definition. To specify more TARGET, please repeat this option.\par
-\pard\nowidctlpar\li360\sb200\b -t, --tagname Tagname\par
-\pard\nowidctlpar\li720\sb200\b0 Using the Tool Chain Tagname to build the platform, overrides target.txt's TOOL_CHAIN_TAG definition.\par
-\pard\nowidctlpar\li360\sb200\b -f --fdf Filename.fdf\par
-\pard\nowidctlpar\li720\sb200\b0 The name of the FDF file to use, which overrides the setting in the DSC file.\par
-\pard\nowidctlpar\li360\sb200\b -r --rom-image ROM_IMAGE_NAME\par
-\pard\nowidctlpar\li720\sb200\b0 The name of FD to be generated. The name must be from [FD] section in FDF file.\par
-\pard\nowidctlpar\li360\sb200\b -i --fv-image FV_IMAGE_NAME\par
-\pard\nowidctlpar\li720\sb200\b0 The name of FV to be generated. The name must be from [FV] section in FDF file.\par
-\pard\nowidctlpar\li360\sb200\b -n NUM\par
-\pard\nowidctlpar\li720\sb200\b0 Build the platform using multi-threaded compiler. The value overrides target.txt's MULTIPLE_THREAD and MAX_CONCURRENT_THREAD_NUMBER. Less than 2 will disable multi-thread builds.\par
-\pard\nowidctlpar\li360\sb200\b -x --sku-id SKU_ID\f1\par
-\pard\nowidctlpar\li720\sb200\b0\f0 Using this name of SKU ID to build the platform, overriding SKUID_IDENTIFIER in DSC file.\par
-\pard\nowidctlpar\li360\sb200\b -u --skip-autogen\f1\par
-\pard\nowidctlpar\li720\sb200\b0\f0 Skip AutoGen step. Note the build may fail if there\rquote s no AutoGen-ed files before.\par
-\pard\nowidctlpar\li360\sb200\b -e --re-parse\f1\par
-\pard\nowidctlpar\li720\sb200\b0\f0 Re-parse all meta-data files. Use this option if you encounter inconsistency issue.\f1\par
-\pard\nowidctlpar\li360\sb200\b\f0 -w --warning-as-error\f1\par
-\pard\nowidctlpar\li720\sb200\b0\f0 Treat warning in tools as error.\par
-\pard\nowidctlpar\li360\sb200\b -j --log LOGFILE\f1\par
-\pard\nowidctlpar\li720\sb200\b0\f0 Put screen output in specified file.\par
-\pard\nowidctlpar\li360\sb200\b -s \endash silent\par
-\pard\nowidctlpar\li720\sb200\b0 Tell \ldblquote make\rdblquote  tool to run \ldblquote silently\rdblquote . Internally, a \lquote -s\rquote  switch will be passed to \ldblquote make\rdblquote  tool. Don\rquote t use this option if your \ldblquote make\rdblquote  tool doesn\rquote t support \lquote -s\rquote . Instead, if your \ldblquote make\rdblquote  tool uses other option to do the same, you could add it to the XX_XX_XX_MAKE_FLAGS in tools_def.txt.\par
-\pard\nowidctlpar\li360\sb200\b -d, --debug [#]\par
-\pard\nowidctlpar\li720\sb200\b0 Enable debug messages at specified level. It is used by Tool itself.\par
-\pard\nowidctlpar\li360\sb200\b -q, --quiet\par
-\pard\nowidctlpar\li720\sb200\b0 Disable all messages except FATAL ERRORS.\par
-\pard\nowidctlpar\li360\sb200\b -v, --verbose\par
-\pard\nowidctlpar\li720\sb200\b0 Turn on verbose output with informational messages printed.\par
-\pard\nowidctlpar\li360\sb200\b -D, --define MACROS\par
-\pard\nowidctlpar\li720\sb200\b0 Macro: "Name [= Value]".\par
-\pard\nowidctlpar\li360\sb200\b -y, --report-file REPORTFILE\f1\par
-\pard\nowidctlpar\li720\sb200\b0\f0 Create/overwrite the report to the specified filename.\par
-\pard\nowidctlpar\li360\sb200\b -Y, --report-type REPORTTYPE\par
-\pard\nowidctlpar\li720\sb200\b0 Flags that control the type of build report to generate.  Must be one of: [PCD, LIBRARY, FLASH, DEPEX, BUILD_FLAGS, FIXED_ADDRESS, EXECUTION_ORDER].  To specify more than one flag, repeat this option on the command line and the default flag set is [PCD, LIBRARY, FLASH, DEPEX, BUILD_FLAGS, FIXED_ADDRESS]\f1\par
-\pard\nowidctlpar\li360\sb200\b\f0 -F FLAG, --flag=FLAG\f1\par
-\pard\nowidctlpar\li720\sb200\b0\f0 Specify the specific option to parse EDK UNI file. Must be one of: [-c, -s]. -c is for EDK framework UNI file, and -s is for EDK UEFI UNI file. This option can also be specified by setting *_*_*_BUILD_FLAGS in [BuildOptions] section of platform DSC. If they are both specified, this value will override the setting in [BuildOptions] section of platform DSC.\par
-\pard\nowidctlpar\li360\sb200\b --version\par
-\pard\nowidctlpar\li720\sb200\b0 Show program's copyright and version number then exit.\par
-\pard\nowidctlpar\li360\sb200\b -h, --help\par
-\pard\nowidctlpar\li720\sb200\b0 Print the copyright, version and usage of this program then exit.\par
-\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\b\fs28 Target\par
-\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 If no target is given, then default target is ALL.\par
-\b ALL\b0            Build everything for either the platform or module.\par
-\b GenC\b0          Auto-generate all C files for either the platform or module.\par
-\b GenMake\b0      Generate the Makefiles \endash  if auto-generated files are missing,\par
-\pard\nowidctlpar\li360                     then auto-generate all C files first for either the platform or module.\par
-\pard\nowidctlpar\li360\sb200\b Fds\b0             Create the FD Image files.\par
-\b Libraries\b0       Build all EDK Libraries and EDK II Library Instances which are specified.\par
-\b Modules\b0        Build all EDK components and EDK II modules which are specified.\par
-\b Clean\b0          Remove intermediate files generated by the NMAKE command (leaving\par
-\pard\nowidctlpar\li360                     the auto-generated C format, FD image files, PE32 output files, PCH \par
-                    files and LIB files).\par
-\pard\nowidctlpar\li360\sb200\b CleanAll\b0       Remove all intermmediate, auto-generated, FV and FD image files \endash  \par
-\pard\nowidctlpar\li360                    state of the tree should be exactly as if a fresh checkout or install has \par
-                   occurred.\par
-\pard\nowidctlpar\li360\sb200\b CleanLib\b0      Remove intermediate files generated by the NMAKE command AND LIB \par
-\pard\nowidctlpar\li360                    files (leaving the auto-generated, FV and FD image files, PE32 output \par
-                   files and PCH files)\par
-\pard\nowidctlpar\li360\sb200\b run\b0            Run platform (for emulator platform only)\par
-\pard\nowidctlpar\li360\f1\par
-\par
-\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\b\f0\fs28 Examples\par
-\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 Assume that $(WORKSPACE) is C:\\MyWorkspace\par
-\pard\nowidctlpar\li180\sb200 Build platform: Nt32Pkg.dsc\par
-\pard\nowidctlpar\li360\sb200 Specify the platform description file on the command line.\par
-\pard\nowidctlpar\li720\sb200\b C:\\MyWorkspace>build -p Nt32Pkg\\Nt32Pkg.dsc \endash a IA32\par
-\pard\nowidctlpar\li360\sb200\b0 Build the platform in the current working directory if it contains a platform description file.\par
-\pard\nowidctlpar\li720\sb200\b C:\\MyWorkspace\\Nt32Pkg>build \endash a IA32\par
-\pard\nowidctlpar\li360\sb200\b0 Build the active platform specified in the target.txt file.\par
-\pard\nowidctlpar\li720\sb200\b C:\\ MyWorkspace>build \endash a Ia32\par
-\pard\nowidctlpar\li360\sb200\b0\f1\par
-\pard\nowidctlpar\li180\sb200\f0 Build Module: HelloWorld.inf\par
-\pard\nowidctlpar\li360\sb200 Specify the platform and Module on the command line.\par
-\pard\nowidctlpar\li720\sb200\b C:\\MyWorkspace>build -p Nt32Pkg\\Nt32Pkg.dsc \endash a IA32 \\\par
-\pard\nowidctlpar\li720  \endash m MdeModulePkg/Application/HelloWorld/HelloWorld.inf\par
-\pard\nowidctlpar\li360\sb200\b0 Specify the Module on the command line and use the active platform specified in the target.txt file.\par
-\pard\nowidctlpar\li720\sb200\b C:\\MyWorkspace>build \endash a IA32 \\\par
-\pard\nowidctlpar\li720\endash m MdeModulePkg/Application/HelloWorld/HelloWorld.inf\par
-\pard\nowidctlpar\li360\sb200\b0 Build the module in the current working directory if it contains a module description file and specify the platform on the command line.\par
-\pard\nowidctlpar\li720\sb200\b C:\\ MyWorkspace\\MdeModulePkg\\Application\\HelloWorld>build \endash a Ia32 \\\par
-\pard\nowidctlpar\li720\endash p Nt32Pkg\\Nt32Pkg.dsc\par
-\pard\nowidctlpar\li360\sb200\b0 Build the module in the current working directory and use the active platform specified in the target.txt file.\par
-\pard\nowidctlpar\li720\sb200\b C:\\ MyWorkspace\\MdeModulePkg\\Application\\HelloWorld>build \endash a Ia32 \par
-\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\fs28 Bugs \par
-\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 No known bugs.\par
-Report bugs to edk2-buildtools-devel@lists.sourceforge.net\f1\par
-\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\b\f0\fs28 Files \par
-\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 target.txt, tools_def.txt, platform.dsc, flashmap.fdf, package.dec and module.inf.\par
-\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\b\fs28 See also\par
-\pard\nowidctlpar\li360\sb200\cf2\b0\fs18 GenFds.exe\par
-\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx360\tx1440\cf1\b\fs28 License\par
-\pard\nowidctlpar\li360\cf2\b0\fs18 Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.\par
-\par
-This program and the accompanying materials are licensed and made available under the terms and\par
-conditions of the BSD License which accompanies this distribution.  The full text of the license may be\par
-found at:\par
-http://opensource.org/licenses/bsd-license.php\par
-\par
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES\par
-OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.\par
-}
- 
+{\rtf1\adeflang1025\ansi\ansicpg1252\uc1\adeff0\deff0\stshfdbch13\stshfloch39\stshfhich39\stshfbi0\deflang1033\deflangfe2052{\fonttbl{\f0\froman\fcharset0\fprq2{\*\panose 02020603050405020304}Times New Roman{\*\falt Times};}{\f2\fmodern\fcharset0\fprq1{\*\panose 02070309020205020404}Courier New{\*\falt Courier New};}
+{\f13\fnil\fcharset134\fprq2{\*\panose 02010600030101010101}SimSun{\*\falt SimSun};}{\f36\fswiss\fcharset0\fprq2{\*\panose 020b0604030504040204}Tahoma{\*\falt Times New Roman};}{\f38\froman\fcharset0\fprq2{\*\panose 02040503050406030204}Cambria;}
+{\f39\fswiss\fcharset0\fprq2{\*\panose 020f0502020204030204}Calibri{\*\falt Century Gothic};}{\f41\fnil\fcharset134\fprq2{\*\panose 02010600030101010101}@SimSun;}{\f48\fswiss\fcharset0\fprq2{\*\panose 020b0604030504040204}Verdana{\*\falt Verdana};}
+{\f165\fmodern\fcharset0\fprq1{\*\panose 020b0609020204030204}Consolas;}{\f304\froman\fcharset238\fprq2 Times New Roman CE{\*\falt Times};}{\f305\froman\fcharset204\fprq2 Times New Roman Cyr{\*\falt Times};}
+{\f307\froman\fcharset161\fprq2 Times New Roman Greek{\*\falt Times};}{\f308\froman\fcharset162\fprq2 Times New Roman Tur{\*\falt Times};}{\f309\fbidi \froman\fcharset177\fprq2 Times New Roman (Hebrew){\*\falt Times};}
+{\f310\fbidi \froman\fcharset178\fprq2 Times New Roman (Arabic){\*\falt Times};}{\f311\froman\fcharset186\fprq2 Times New Roman Baltic{\*\falt Times};}{\f312\froman\fcharset163\fprq2 Times New Roman (Vietnamese){\*\falt Times};}
+{\f324\fmodern\fcharset238\fprq1 Courier New CE{\*\falt Courier New};}{\f325\fmodern\fcharset204\fprq1 Courier New Cyr{\*\falt Courier New};}{\f327\fmodern\fcharset161\fprq1 Courier New Greek{\*\falt Courier New};}
+{\f328\fmodern\fcharset162\fprq1 Courier New Tur{\*\falt Courier New};}{\f329\fbidi \fmodern\fcharset177\fprq1 Courier New (Hebrew){\*\falt Courier New};}{\f330\fbidi \fmodern\fcharset178\fprq1 Courier New (Arabic){\*\falt Courier New};}
+{\f331\fmodern\fcharset186\fprq1 Courier New Baltic{\*\falt Courier New};}{\f332\fmodern\fcharset163\fprq1 Courier New (Vietnamese){\*\falt Courier New};}{\f436\fnil\fcharset0\fprq2 SimSun Western{\*\falt SimSun};}
+{\f664\fswiss\fcharset238\fprq2 Tahoma CE{\*\falt Times New Roman};}{\f665\fswiss\fcharset204\fprq2 Tahoma Cyr{\*\falt Times New Roman};}{\f667\fswiss\fcharset161\fprq2 Tahoma Greek{\*\falt Times New Roman};}
+{\f668\fswiss\fcharset162\fprq2 Tahoma Tur{\*\falt Times New Roman};}{\f669\fbidi \fswiss\fcharset177\fprq2 Tahoma (Hebrew){\*\falt Times New Roman};}{\f670\fbidi \fswiss\fcharset178\fprq2 Tahoma (Arabic){\*\falt Times New Roman};}
+{\f671\fswiss\fcharset186\fprq2 Tahoma Baltic{\*\falt Times New Roman};}{\f672\fswiss\fcharset163\fprq2 Tahoma (Vietnamese){\*\falt Times New Roman};}{\f673\fswiss\fcharset222\fprq2 Tahoma (Thai){\*\falt Times New Roman};}
+{\f684\froman\fcharset238\fprq2 Cambria CE;}{\f685\froman\fcharset204\fprq2 Cambria Cyr;}{\f687\froman\fcharset161\fprq2 Cambria Greek;}{\f688\froman\fcharset162\fprq2 Cambria Tur;}{\f691\froman\fcharset186\fprq2 Cambria Baltic;}
+{\f692\froman\fcharset163\fprq2 Cambria (Vietnamese);}{\f694\fswiss\fcharset238\fprq2 Calibri CE{\*\falt Century Gothic};}{\f695\fswiss\fcharset204\fprq2 Calibri Cyr{\*\falt Century Gothic};}
+{\f697\fswiss\fcharset161\fprq2 Calibri Greek{\*\falt Century Gothic};}{\f698\fswiss\fcharset162\fprq2 Calibri Tur{\*\falt Century Gothic};}{\f701\fswiss\fcharset186\fprq2 Calibri Baltic{\*\falt Century Gothic};}
+{\f702\fswiss\fcharset163\fprq2 Calibri (Vietnamese){\*\falt Century Gothic};}{\f716\fnil\fcharset0\fprq2 @SimSun Western;}{\f784\fswiss\fcharset238\fprq2 Verdana CE{\*\falt Verdana};}{\f785\fswiss\fcharset204\fprq2 Verdana Cyr{\*\falt Verdana};}
+{\f787\fswiss\fcharset161\fprq2 Verdana Greek{\*\falt Verdana};}{\f788\fswiss\fcharset162\fprq2 Verdana Tur{\*\falt Verdana};}{\f791\fswiss\fcharset186\fprq2 Verdana Baltic{\*\falt Verdana};}
+{\f792\fswiss\fcharset163\fprq2 Verdana (Vietnamese){\*\falt Verdana};}{\f1954\fmodern\fcharset238\fprq1 Consolas CE;}{\f1955\fmodern\fcharset204\fprq1 Consolas Cyr;}{\f1957\fmodern\fcharset161\fprq1 Consolas Greek;}
+{\f1958\fmodern\fcharset162\fprq1 Consolas Tur;}{\f1961\fmodern\fcharset186\fprq1 Consolas Baltic;}{\f1962\fmodern\fcharset163\fprq1 Consolas (Vietnamese);}}{\colortbl;\red0\green0\blue0;\red0\green0\blue255;\red0\green255\blue255;\red0\green255\blue0;
+\red255\green0\blue255;\red255\green0\blue0;\red255\green255\blue0;\red255\green255\blue255;\red0\green0\blue128;\red0\green128\blue128;\red0\green128\blue0;\red128\green0\blue128;\red128\green0\blue0;\red128\green128\blue0;\red128\green128\blue128;
+\red192\green192\blue192;\red8\green96\blue168;}{\stylesheet{\ql \li0\ri0\nowidctlpar\wrapdefault\faauto\rin0\lin0\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\f48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 
+\snext0 Normal;}{\s1\ql \li0\ri0\nowidctlpar\wrapdefault\faauto\outlinelevel0\rin0\lin0\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\f48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 \sbasedon0 \snext0 \slink15 
+heading 1;}{\s2\ql \li0\ri0\nowidctlpar\wrapdefault\faauto\outlinelevel1\rin0\lin0\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\f48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 \sbasedon0 \snext0 \slink16 
+heading 2;}{\*\cs10 \additive \ssemihidden Default Paragraph Font;}{\*
+\ts11\tsrowd\trftsWidthB3\trpaddl108\trpaddr108\trpaddfl3\trpaddft3\trpaddfb3\trpaddfr3\tblind0\tblindtype3\tscellwidthfts0\tsvertalt\tsbrdrt\tsbrdrl\tsbrdrb\tsbrdrr\tsbrdrdgl\tsbrdrdgr\tsbrdrh\tsbrdrv 
+\ql \li0\ri0\widctlpar\wrapdefault\aspalpha\aspnum\faauto\adjustright\rin0\lin0\itap0 \rtlch\fcs1 \af0\afs20 \ltrch\fcs0 \fs20\lang1024\langfe1024\loch\f39\hich\af39\dbch\af13\cgrid\langnp1024\langfenp1024 \snext11 \ssemihidden Normal Table;}{\*\cs15 
+\additive \rtlch\fcs1 \ab\af0\afs32 \ltrch\fcs0 \b\fs32\kerning32\loch\f38\hich\af38\dbch\af13 \sbasedon10 \slink1 \slocked Heading 1 Char;}{\*\cs16 \additive \rtlch\fcs1 \ab\ai\af0\afs28 \ltrch\fcs0 \b\i\fs28\loch\f38\hich\af38\dbch\af13 
+\sbasedon10 \slink2 \slocked Heading 2 Char;}{\*\cs17 \additive \rtlch\fcs1 \af0\afs16 \ltrch\fcs0 \fs16 \sbasedon10 \ssemihidden \styrsid16534634 annotation reference;}{\s18\ql \li0\ri0\nowidctlpar\wrapdefault\faauto\rin0\lin0\itap0 \rtlch\fcs1 
+\af0\afs20\alang1025 \ltrch\fcs0 \fs20\lang1033\langfe1033\loch\f48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 \sbasedon0 \snext18 \slink19 \ssemihidden \styrsid16534634 annotation text;}{\*\cs19 \additive \rtlch\fcs1 \af0 \ltrch\fcs0 \f48 
+\sbasedon10 \slink18 \slocked \ssemihidden \styrsid16534634 Comment Text Char;}{\s20\ql \li0\ri0\nowidctlpar\wrapdefault\faauto\rin0\lin0\itap0 \rtlch\fcs1 \ab\af0\afs20\alang1025 \ltrch\fcs0 
+\b\fs20\lang1033\langfe1033\loch\f48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 \sbasedon18 \snext18 \slink21 \ssemihidden \styrsid16534634 annotation subject;}{\*\cs21 \additive \rtlch\fcs1 \ab\af0 \ltrch\fcs0 \b\f48 
+\sbasedon19 \slink20 \slocked \ssemihidden \styrsid16534634 Comment Subject Char;}{\s22\ql \li0\ri0\nowidctlpar\wrapdefault\faauto\rin0\lin0\itap0 \rtlch\fcs1 \af36\afs16\alang1025 \ltrch\fcs0 
+\fs16\lang1033\langfe1033\loch\f36\hich\af36\dbch\af13\cgrid\langnp1033\langfenp1033 \sbasedon0 \snext22 \slink23 \ssemihidden \styrsid16534634 Balloon Text;}{\*\cs23 \additive \rtlch\fcs1 \af36\afs16 \ltrch\fcs0 \f36\fs16 
+\sbasedon10 \slink22 \slocked \ssemihidden \styrsid16534634 Balloon Text Char;}{\s24\ql \li0\ri20\sb60\sa60\sl-200\slmult0\widctlpar\wrapdefault\aspalpha\aspnum\faauto\adjustright\rin20\lin0\itap0 \rtlch\fcs1 \af0\afs16\alang1025 \ltrch\fcs0 
+\fs16\cf1\lang1033\langfe1033\loch\f48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 \sbasedon0 \snext24 \styrsid14971029 CellBodyLeft;}{\*\cs25 \additive \b\f2\cf13 \styrsid14971029 CodeCharacter;}{\*\ts26\tsrowd\trbrdrt\brdrs\brdrw10 \trbrdrl
+\brdrs\brdrw10 \trbrdrb\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10 \trbrdrh\brdrs\brdrw10 \trbrdrv\brdrs\brdrw10 
+\trftsWidthB3\trpaddl108\trpaddr108\trpaddfl3\trpaddft3\trpaddfb3\trpaddfr3\tblind0\tblindtype3\tscellwidthfts0\tsvertalt\tsbrdrt\tsbrdrl\tsbrdrb\tsbrdrr\tsbrdrdgl\tsbrdrdgr\tsbrdrh\tsbrdrv 
+\ql \li0\ri0\widctlpar\wrapdefault\aspalpha\aspnum\faauto\adjustright\rin0\lin0\itap0 \rtlch\fcs1 \af0\afs22\alang1025 \ltrch\fcs0 \fs22\lang1033\langfe2052\loch\f39\hich\af39\dbch\af13\cgrid\langnp1033\langfenp2052 \sbasedon11 \snext26 \styrsid14971029 
+Table Grid;}}
+{\*\latentstyles\lsdstimax156\lsdlockeddef0{\lsdlockedexcept Normal;heading 1;heading 2;heading 3;heading 4;heading 5;heading 6;heading 7;heading 8;heading 9;toc 1;toc 2;toc 3;toc 4;toc 5;toc 6;toc 7;toc 8;toc 9;caption;Title;Default Paragraph Font;Subtitle;Strong;Emphasis;Table Grid;}}
+{\*\rsidtbl \rsid1063253\rsid1211840\rsid1381256\rsid1839752\rsid2442797\rsid2694053\rsid2974720\rsid4338091\rsid4590013\rsid4999604\rsid5116989\rsid5911148\rsid6164334\rsid6375506\rsid6492146\rsid6561745\rsid6579891\rsid6637302\rsid6827362\rsid7278947
+\rsid7820891\rsid8023663\rsid8600807\rsid8996461\rsid9010967\rsid10121491\rsid10897639\rsid11224689\rsid11427337\rsid12210198\rsid13245303\rsid13716787\rsid14971029\rsid15612145\rsid16533044\rsid16534634}{\*\generator Microsoft Word 11.0.0000;}{\info
+{\operator jsu1}{\creatim\yr2010\mo10\dy6\hr13\min22}{\revtim\yr2011\mo8\dy16\hr9\min48}{\version28}{\edmins157}{\nofpages5}{\nofwords1168}{\nofchars6662}{\nofcharsws7815}{\vern24615}{\*\password 00000000}}{\*\xmlnstbl {\xmlns1 http://schemas.microsoft.co
+m/office/word/2003/wordml}}\paperw12240\paperh15840\margl1440\margr1440\margt1440\margb1440\gutter0\ltrsect 
+\widowctrl\ftnbj\aenddoc\revisions\donotembedsysfont0\donotembedlingdata1\grfdocevents0\validatexml0\showplaceholdtext0\ignoremixedcontent0\saveinvalidxml0\showxmlerrors0\horzdoc\dghspace120\dgvspace120\dghorigin1701\dgvorigin1984\dghshow0\dgvshow3
+\jcompress\viewkind1\viewscale135\rsidroot1211840 \fet0{\*\wgrffmtfilter 2450}\ilfomacatclnup0\ltrpar \sectd \ltrsect\linex0\sectdefaultcl\sftnbj {\*\pnseclvl1\pnucrm\pnstart1\pnindent720\pnhang {\pntxta .}}{\*\pnseclvl2
+\pnucltr\pnstart1\pnindent720\pnhang {\pntxta .}}{\*\pnseclvl3\pndec\pnstart1\pnindent720\pnhang {\pntxta .}}{\*\pnseclvl4\pnlcltr\pnstart1\pnindent720\pnhang {\pntxta )}}{\*\pnseclvl5\pndec\pnstart1\pnindent720\pnhang {\pntxtb (}{\pntxta )}}{\*\pnseclvl6
+\pnlcltr\pnstart1\pnindent720\pnhang {\pntxtb (}{\pntxta )}}{\*\pnseclvl7\pnlcrm\pnstart1\pnindent720\pnhang {\pntxtb (}{\pntxta )}}{\*\pnseclvl8\pnlcltr\pnstart1\pnindent720\pnhang {\pntxtb (}{\pntxta )}}{\*\pnseclvl9\pnlcrm\pnstart1\pnindent720\pnhang 
+{\pntxtb (}{\pntxta )}}\pard\plain \ltrpar\s2\ql \li-1440\ri0\sb400\sa60\sl-340\slmult0\keep\keepn\nowidctlpar\tx360\wrapdefault\faauto\outlinelevel1\rin0\lin-1440\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 
+\fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af48\afs28 \ltrch\fcs0 \b\fs28\cf17\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Name
+\par }\pard\plain \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \af48\afs18 
+\ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Build.exe \hich\f48 \endash \loch\f48  }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid1063253 \hich\af48\dbch\af13\loch\f48 is }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 
+\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 the master command that provides }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid1063253 \hich\af48\dbch\af13\loch\f48 developers}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 
+\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48  with a single command for selecting various options of a build
+\par }\pard\plain \ltrpar\s2\ql \li-1440\ri0\sb400\sa60\sl-340\slmult0\keep\keepn\nowidctlpar\tx360\wrapdefault\faauto\outlinelevel1\rin0\lin-1440\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 
+\fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af48\afs28 \ltrch\fcs0 \b\fs28\cf17\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Synopsis
+\par }\pard\plain \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af48\afs18 
+\ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Build.exe }{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid2442797 \hich\af48\dbch\af13\loch\f48 
+[-v | -q | -d] [-a <Arch>] [-p <DscFile>] [-m <InfFile>] [-b <Target>] [-t <TagName>] [-f FdfFile] [-r <RomImageName>] [-i <FvImageName>] }{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid15612145 
+\hich\af48\dbch\af13\loch\f48 [-}{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid15612145 \hich\af48\dbch\af13\loch\f48 C}{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 
+\b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid15612145 \hich\af48\dbch\af13\loch\f48  <}{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid15612145 \hich\af48\dbch\af13\loch\f48 Cap}{\rtlch\fcs1 
+\ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid8023663 \hich\af48\dbch\af13\loch\f48 sule}{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid15612145 \hich\af48\dbch\af13\loch\f48 
+ImageName>] }{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid2442797 \hich\af48\dbch\af13\loch\f48 
+[-n ThreadNum] [-x <SkuId>] [-u] [-e] [-w] [-j <LogFile>] [-s] [-D <MACROS>] [-y <ReportFile>] [-Y <ReportType>] [-F <\hich\af48\dbch\af13\loch\f48 Flags>] }{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+[}{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid2442797 \hich\af48\dbch\af13\loch\f48 All | GenC | GenMake | Fds | Libraries | Modules | Clean | CleanAll | CleanLib | run}{\rtlch\fcs1 \ab\af48\afs18 
+\ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 ]}{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid11224689 
+\par }{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid13716787 \hich\af48\dbch\af13\loch\f48 Build.exe}{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid13716787 \hich\af48\dbch\af13\loch\f48  \hich\f48 
+\endash \loch\f48 h
+\par }{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid13716787 \hich\af48\dbch\af13\loch\f48 Build.exe}{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid13716787 \hich\af48\dbch\af13\loch\f48  --version}{
+\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid13716787\charrsid13716787 
+\par }\pard\plain \ltrpar\s2\ql \li-1440\ri0\sb400\sa60\sl-340\slmult0\keep\keepn\nowidctlpar\wrapdefault\faauto\outlinelevel1\rin0\lin-1440\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 
+\fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af48\afs28 \ltrch\fcs0 \b\fs28\cf17\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Description
+\par }\pard\plain \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \af48\afs18 
+\ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Build.exe is the master command line (CLI) tool that provides a single command for selecting various }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid9010967 
+\hich\af48\dbch\af13\loch\f48 build options}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 . \hich\af48\dbch\af13\loch\f48 In general, it checks the environment variables, gets the user\hich\f48 \rquote 
+\loch\f48 s configuration from either the CLI or target.txt, parses the dsc, dec, inf, target.txt, tools_def.txt, generates .C, .H files and the Makefiles for one or more modules and/or the active platf\hich\af48\dbch\af13\loch\f48 o
+\hich\af48\dbch\af13\loch\f48 rm, calls a make (NMake or make) program to process these Makefiles, then optionally calls GenFds to generate an fd file.
+\par \hich\af48\dbch\af13\loch\f48 The build tool supports two kinds of path specifications on command line - an absolutely path or a relative (to the WORKSPACE environm\hich\af48\dbch\af13\loch\f48 ent variable) path \hich\f48 \endash \loch\f48 
+ in command line.
+\par }\pard\plain \ltrpar\s2\ql \li-1440\ri0\sb400\sa60\sl-340\slmult0\keep\keepn\nowidctlpar\tx360\tx1440\wrapdefault\faauto\outlinelevel1\rin0\lin-1440\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 
+\fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af48\afs28 \ltrch\fcs0 \b\fs28\cf17\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Options
+\par }\pard\plain \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \af48\afs18 
+\ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 There are no required options. }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid11427337 \hich\af48\dbch\af13\loch\f48 
+If no options are specified, it uses options specified in target.txt.}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid11224689 
+\par }{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -a, --arch <ARCH>
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 ARCH is one of }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid2974720 
+\hich\af48\dbch\af13\loch\f48 a }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 list: IA32, X64, IPF or EBC, which overrides }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid2974720 
+\hich\af48\dbch\af13\loch\f48 the }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 target.txt's TARGET_ARCH  definition. To specify }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid1063253 
+\hich\af48\dbch\af13\loch\f48 another }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 ARCH, repeat this option.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -p, --platform PlatformName.dsc
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Build}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid6164334 
+\hich\af48\dbch\af13\loch\f48 s}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48  the platform specified by the DSC file}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid9010967 
+\hich\af48\dbch\af13\loch\f48 . }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid1063253 \hich\af48\dbch\af13\loch\f48 The}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 name argument, overrides }{
+\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid1063253 \hich\af48\dbch\af13\loch\f48 the }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 target.txt's  ACTIVE_PLATFORM definition.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -m, --module ModuleN\hich\af48\dbch\af13\loch\f48 ame.inf
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Build}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid6164334 
+\hich\af48\dbch\af13\loch\f48 s}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48  the module specified by the INF file name argument.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -b, --buildtarget <TARGET>
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 TARGET is one of}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 
+\fs18\cf1\insrsid1063253 \hich\af48\dbch\af13\loch\f48  a}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48  list: DEBUG, RELEASE, which overrides }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid1063253 
+\hich\af48\dbch\af13\loch\f48 the }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 target.txt's TARGET definition. To specify }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid1063253 
+\hich\af48\dbch\af13\loch\f48 another }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 TARGET, please repeat this option.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -t, --tagname T\hich\af48\dbch\af13\loch\f48 agname
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Us}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid1063253 
+\hich\af48\dbch\af13\loch\f48 e}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid6164334 \hich\af48\dbch\af13\loch\f48 s}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+ the Tool Chain Tagname to build the platform}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid1063253 \hich\af48\dbch\af13\loch\f48 .}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid9010967 \hich\af48\dbch\af13\loch\f48  }{\rtlch\fcs1 
+\af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid1063253 \hich\af48\dbch\af13\loch\f48  It }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 overrides target.txt's TOOL_CHAIN_TAG definition.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -f --fdf Filename.fdf
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 The name of the FDF file }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 
+\fs18\cf1\insrsid6164334 \hich\af48\dbch\af13\loch\f48 to use to}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48  override the setting in the DSC file.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -r --rom-image ROM_IMAGE_NAME
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 The name of FD to b\hich\af48\dbch\af13\loch\f48 
+e generated. The name must be from \hich\af48\dbch\af13\loch\f48 [FD] section in FDF file.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -i --fv-image FV_IMAGE_NAME
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 The name of FV to be generated. The name must be from 
+\hich\af48\dbch\af13\loch\f48 [FV] section in FDF file.}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid11224689 
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0\pararsid10121491 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid10121491 \hich\af48\dbch\af13\loch\f48 -}{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 
+\b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid10121491 \hich\af48\dbch\af13\loch\f48 C}{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid10121491 \hich\af48\dbch\af13\loch\f48  --}{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 
+\b\fs18\cf1\insrsid6637302\charrsid6637302 \hich\af48\dbch\af13\loch\f48 capsule-image}{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid10121491 \hich\af48\dbch\af13\loch\f48  CAPSULE}{\rtlch\fcs1 \ab\af48\afs18 
+\ltrch\fcs0 \b\fs18\cf1\insrsid10121491 \hich\af48\dbch\af13\loch\f48 _IMAGE_NAME
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0\pararsid6375506 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid10121491\charrsid6375506 \hich\af48\dbch\af13\loch\f48 
+The name of Capsule to be generated. The name must be from \hich\af48\dbch\af13\loch\f48 [Capsule] section in FDF file.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\pnrdate1190691435\pnrnot1\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -n NUM
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Build}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid6164334 
+\hich\af48\dbch\af13\loch\f48 s}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48  the platform using multi-threaded compiler. The value overrides }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid7820891 
+\hich\af48\dbch\af13\loch\f48 the }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 target.txt's MULTIPLE_THREAD and MAX_CONCURRENT_THREAD_NUMBER. }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid7820891 
+\hich\af48\dbch\af13\loch\f48 Using l}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 ess than 2 will disable multi-thread builds.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -x --sku-id SKU_ID}{\rtlch\fcs1 \ab\af0\afs18 \ltrch\fcs0 
+\b\f0\fs18\cf1\insrsid11224689 
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid7820891 \hich\af48\dbch\af13\loch\f48 Use}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\hich\af48\dbch\af13\loch\f48  SKU ID to build the platform}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid7820891 \hich\af48\dbch\af13\loch\f48  and override the}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\hich\af48\dbch\af13\loch\f48  SKUID_IDENTIFIER in DSC file.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -u --skip-autogen}{\rtlch\fcs1 \ab\af0\afs18 \ltrch\fcs0 
+\b\f0\fs18\cf1\insrsid11224689 
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid7820891 \hich\af48\dbch\af13\loch\f48 Use to s}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\hich\af48\dbch\af13\loch\f48 kip }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid7820891 \hich\af48\dbch\af13\loch\f48 the }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+AutoGen step. Note the build may fail if there\hich\f48 \rquote \loch\f48 s no AutoGen-ed files before.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -\hich\af48\dbch\af13\loch\f48 e --re-parse}{\rtlch\fcs1 \ab\af0\afs18 
+\ltrch\fcs0 \b\f0\fs18\cf1\insrsid11224689 
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid7820891 \hich\af48\dbch\af13\loch\f48 Use to r}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\hich\af48\dbch\af13\loch\f48 e-parse all meta-data files. Use this option if you encounter }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid7820891 \hich\af48\dbch\af13\loch\f48 an }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\hich\af48\dbch\af13\loch\f48 inconsistency issue.}{\rtlch\fcs1 \af0\afs18 \ltrch\fcs0 \f0\fs18\cf1\insrsid11224689 
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -w --warning-as-error}{\rtlch\fcs1 \ab\af0\afs18 \ltrch\fcs0 
+\b\f0\fs18\cf1\insrsid11224689 
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid7820891 \hich\af48\dbch\af13\loch\f48 Use to t}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\hich\af48\dbch\af13\loch\f48 reat warning in }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid7820891 \hich\af48\dbch\af13\loch\f48 the }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 tool as }{
+\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid7820891 \hich\af48\dbch\af13\loch\f48 an }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 error.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -j --log LOGFILE}{\rtlch\fcs1 \ab\af0\afs18 \ltrch\fcs0 
+\b\f0\fs18\cf1\insrsid11224689 
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid7820891 \hich\af48\dbch\af13\loch\f48 Use to p}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\hich\af48\dbch\af13\loch\f48 ut screen output in specified file.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -s \hich\f48 \endash \loch\f48 silent
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid2974720 \hich\af48\dbch\af13\loch\f48 Enable  }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\loch\af48\dbch\af13\hich\f48 \'93\hich\af48\dbch\af13\loch\f48 \hich\f48 make\'94\loch\f48 \hich\f48  tool to run \'93\loch\f48 \hich\f48 silently\'94\loch\f48 . Internally, a \hich\f48 \lquote \loch\f48 -s\hich\f48 \rquote \loch\f48 \hich\f48 
+ switch will be passed to \'93\loch\f48 \hich\f48 make\'94\loch\f48  tool. Don\hich\f48 \rquote \loch\f48 \hich\f48 t use this option if your \'93\loch\f48 \hich\f48 make\'94\loch\f48  tool doesn\hich\f48 \rquote \loch\f48 t support \hich\f48 \lquote 
+\loch\f48 -s\hich\f48 \rquote \loch\f48 \hich\f48 . Instead, if your \'93\loch\f48 \hich\f48 make\'94\loch\f48  tool uses other option}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid2974720 \hich\af48\dbch\af13\loch\f48 s}{\rtlch\fcs1 \af48\afs18 
+\ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48  you could add it to the XX_XX_XX_MAKE_FLAGS in tools_def.\hich\af48\dbch\af13\loch\f48 txt.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -d, --debug [#]
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Enable debug messages at specified level. It is used by Tool itself.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -q, --quiet
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Disable all messages except FATAL ERRORS.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -v, --verbose
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid2974720 \hich\af48\dbch\af13\loch\f48 Enable}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\hich\af48\dbch\af13\loch\f48  verbose output with informational messages printed.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -D, --define MACROS
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Macro: "Name [= Value]".
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -y, --report-file REPORTFILE}{\rtlch\fcs1 \ab\af0\afs18 \ltrch\fcs0 
+\b\f0\fs18\cf1\insrsid11224689 
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Create/overwrite the report to the specified filename.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -Y, --report-type REPORTTYPE
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+Flags that control the type of build report to generate.  Must be one of: [PCD, LIBRARY, FLASH, DEPEX, BUILD_FLAGS, FI\hich\af48\dbch\af13\loch\f48 
+XED_ADDRESS, EXECUTION_ORDER].  To specify more than one flag, repeat this option on the command line and the default flag set is [PCD, LIBRARY, FLASH, DEPEX, BUILD_FLAGS, FIXED_ADDRESS]}{\rtlch\fcs1 \af0\afs18 \ltrch\fcs0 \f0\fs18\cf1\insrsid11224689 
+
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -F FLAG, --flag=FLAG}{\rtlch\fcs1 \ab\af0\afs18 \ltrch\fcs0 
+\b\f0\fs18\cf1\insrsid11224689 
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Specify the specific option to parse EDK UNI fil\hich\af48\dbch\af13\loch\f48 
+e. Must be one of: [-c, -s]. -c is for EDK framework UNI file, and -s is for EDK UEFI UNI file. This option can also be specified by setting *_*_*_BUILD_FLAGS in [BuildOptions] section of platform DSC. If they are both specified, this value will override 
+\hich\af48\dbch\af13\loch\f48 t\hich\af48\dbch\af13\loch\f48 he setting in [BuildOptions] section of platform DSC.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 --version
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Show program copyright and version number then exit.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 -h, --help
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Print the copyright, version and usage of this program then exit.
+\par }\pard\plain \ltrpar\s2\ql \li-1440\ri0\sb400\sa60\sl-340\slmult0\keep\keepn\nowidctlpar\tx360\tx1440\wrapdefault\faauto\outlinelevel1\rin0\lin-1440\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 
+\fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af48\afs28 \ltrch\fcs0 \b\fs28\cf17\insrsid11224689 {\*\bkmkstart _Ref299349210}\hich\af48\dbch\af13\loch\f48 Target{\*\bkmkend _Ref299349210}
+\par }\pard\plain \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \af48\afs18 
+\ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 If no target is given, then d\hich\af48\dbch\af13\loch\f48 efault target is ALL.
+\par }{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 ALL}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+           Build everything for either the platform or module.
+\par }{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 GenC}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+         Auto-generate all C files for either the platform or module.
+\par }{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 GenMake}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48      Generate the Makefiles \hich\f48 \endash 
+\loch\f48  if auto-generated files are missing,
+\par }\pard \ltrpar\ql \li360\ri0\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48                     \hich\af48\dbch\af13\loch\f48 
+then auto-generate all C files first for either the platform or module.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Fds}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\hich\af48\dbch\af13\loch\f48             Create the FD Image files.
+\par }{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Libraries}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+      Build all EDK Libraries and EDK II Library Instances which are specified.
+\par }{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Modules}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48        Build all EDK components and EDK II mod
+\hich\af48\dbch\af13\loch\f48 ules which are specified.
+\par }{\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Clean}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+         Remove intermediate files generated by the NMAKE command (leaving
+\par }\pard \ltrpar\ql \li360\ri0\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+                    the auto-generated C format, FD image files, PE32 output files, PCH 
+\par \hich\af48\dbch\af13\loch\f48                     files and LIB files).
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 CleanAll}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\hich\af48\dbch\af13\loch\f48       Remove all }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid6164334 \hich\af48\dbch\af13\loch\f48 intermediate}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+, auto-generated, FV and FD image files \hich\f48 \endash \loch\f48  
+\par }\pard \ltrpar\ql \li360\ri0\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+                   state of the tree should be exactly as if a fresh checkout or install has 
+\par \hich\af48\dbch\af13\loch\f48                    occurred.
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 CleanLib}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\hich\af48\dbch\af13\loch\f48      Remove intermediate files generated by the NMAKE\hich\af48\dbch\af13\loch\f48  command AND LIB 
+\par }\pard \ltrpar\ql \li360\ri0\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+                   files (leaving the auto-generated, FV and FD image files, PE32 output 
+\par \hich\af48\dbch\af13\loch\f48                    files and PCH files)
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 run}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\hich\af48\dbch\af13\loch\f48            Run platform (for emulator platform only)
+\par }\pard\plain \ltrpar\s2\ql \li-1440\ri0\sb400\sa60\sl-340\slmult0\keep\keepn\nowidctlpar\tx1440\wrapdefault\faauto\outlinelevel1\rin0\lin-1440\itap0\pararsid14971029 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 
+\fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af48\afs28 \ltrch\fcs0 \b\fs28\cf17\lang1033\langfe2052\langfenp2052\insrsid14971029 {\*\bkmkstart OLE_LINK3}{\*\bkmkstart OLE_LINK4}
+{\*\bkmkstart OLE_LINK5}{\*\bkmkstart OLE_LINK6}\hich\af48\dbch\af13\loch\f48 Status codes ret\hich\af48\dbch\af13\loch\f48 urned}{\rtlch\fcs1 \ab\af48\afs28 \ltrch\fcs0 \b\fs28\cf17\lang1033\langfe2052\langfenp2052\insrsid14971029\charrsid4999604 
+\par \ltrrow}\trowd \irow0\irowband0\ltrrow\ts26\trleft-108\trbrdrt\brdrs\brdrw10 \trbrdrl\brdrs\brdrw10 \trbrdrb\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10 \trbrdrh\brdrs\brdrw10 \trbrdrv\brdrs\brdrw10 
+\trftsWidth3\trwWidth8820\trftsWidthB3\trftsWidthA3\trautofit1\trpaddl108\trpaddr108\trpaddfl3\trpaddft3\trpaddfb3\trpaddfr3\tblrsid5911148\tbllkhdrrows\tbllkhdrcols\tblind0\tblindtype3 \clvertalt\clbrdrt\brdrs\brdrw10 \clbrdrl\brdrs\brdrw10 \clbrdrb
+\brdrs\brdrw10 \clbrdrr\brdrs\brdrw10 \cltxlrtb\clftsWidth3\clwWidth2970\clshdrawnil \cellx2862\clvertalt\clbrdrt\brdrs\brdrw10 \clbrdrl\brdrs\brdrw10 \clbrdrb\brdrs\brdrw10 \clbrdrr\brdrs\brdrw10 \cltxlrtb\clftsWidth3\clwWidth5850\clshdrawnil \cellx8712
+\pard\plain \ltrpar\s24\ql \li0\ri20\sb60\sa60\sl-200\slmult0\widctlpar\intbl\wrapdefault\aspalpha\aspnum\faauto\adjustright\rin20\lin0\pararsid5911148\yts26 \rtlch\fcs1 \af0\afs16\alang1025 \ltrch\fcs0 
+\fs16\cf1\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af2\afs18 \ltrch\fcs0 \cs25\b\f2\fs18\cf13\lang1033\langfe2052\kerning2\langfenp2052\insrsid14971029 \hich\af2\dbch\af13\loch\f2 0}{\rtlch\fcs1 
+\ab\af2\afs18 \ltrch\fcs0 \cs25\b\f2\fs18\lang1033\langfe2052\kerning2\langfenp2052\insrsid14971029 \cell }{\rtlch\fcs1 \af0 \ltrch\fcs0 \insrsid14971029 \hich\af48\dbch\af13\loch\f48 The action was completed as requested.}{\rtlch\fcs1 \af0 \ltrch\fcs0 
+\kerning2\insrsid14971029 \cell }\pard\plain \ltrpar\ql \li0\ri0\widctlpar\intbl\wrapdefault\aspalpha\aspnum\faauto\adjustright\rin0\lin0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 
+\fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \af39\afs20 \ltrch\fcs0 \fs20\insrsid14971029 \trowd \irow0\irowband0\ltrrow\ts26\trleft-108\trbrdrt\brdrs\brdrw10 \trbrdrl\brdrs\brdrw10 \trbrdrb
+\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10 \trbrdrh\brdrs\brdrw10 \trbrdrv\brdrs\brdrw10 
+\trftsWidth3\trwWidth8820\trftsWidthB3\trftsWidthA3\trautofit1\trpaddl108\trpaddr108\trpaddfl3\trpaddft3\trpaddfb3\trpaddfr3\tblrsid5911148\tbllkhdrrows\tbllkhdrcols\tblind0\tblindtype3 \clvertalt\clbrdrt\brdrs\brdrw10 \clbrdrl\brdrs\brdrw10 \clbrdrb
+\brdrs\brdrw10 \clbrdrr\brdrs\brdrw10 \cltxlrtb\clftsWidth3\clwWidth2970\clshdrawnil \cellx2862\clvertalt\clbrdrt\brdrs\brdrw10 \clbrdrl\brdrs\brdrw10 \clbrdrb\brdrs\brdrw10 \clbrdrr\brdrs\brdrw10 \cltxlrtb\clftsWidth3\clwWidth5850\clshdrawnil \cellx8712
+\row \ltrrow}\pard\plain \ltrpar\s24\ql \li0\ri20\sb60\sa60\sl-200\slmult0\widctlpar\intbl\wrapdefault\aspalpha\aspnum\faauto\adjustright\rin20\lin0\pararsid5911148\yts26 \rtlch\fcs1 \af0\afs16\alang1025 \ltrch\fcs0 
+\fs16\cf1\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af2\afs18 \ltrch\fcs0 \cs25\b\f2\fs18\cf13\lang1033\langfe2052\kerning2\langfenp2052\insrsid4338091 \hich\af2\dbch\af13\loch\f2 Nonzero}{
+\rtlch\fcs1 \af165\afs19 \ltrch\fcs0 \cs25\f165\fs19\cf0\lang1033\langfe2052\langfenp2052\insrsid14971029\charrsid8600807 \cell }\pard \ltrpar\s24\ql \li0\ri20\sb60\sa60\sl-200\slmult0
+\widctlpar\intbl\wrapdefault\aspalpha\aspnum\faauto\adjustright\rin20\lin0\pararsid13245303\yts26 {\rtlch\fcs1 \af0 \ltrch\fcs0 \lang1033\langfe2052\kerning2\langfenp2052\insrsid14971029 \hich\af48\dbch\af13\loch\f48 The action failed.\cell 
+}\pard\plain \ltrpar\ql \li0\ri0\widctlpar\intbl\wrapdefault\aspalpha\aspnum\faauto\adjustright\rin0\lin0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 
+\af39\afs20 \ltrch\fcs0 \fs20\insrsid14971029 \trowd \irow1\irowband1\lastrow \ltrrow\ts26\trleft-108\trbrdrt\brdrs\brdrw10 \trbrdrl\brdrs\brdrw10 \trbrdrb\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10 \trbrdrh\brdrs\brdrw10 \trbrdrv\brdrs\brdrw10 
+\trftsWidth3\trwWidth8820\trftsWidthB3\trftsWidthA3\trautofit1\trpaddl108\trpaddr108\trpaddfl3\trpaddft3\trpaddfb3\trpaddfr3\tblrsid5911148\tbllkhdrrows\tbllkhdrcols\tblind0\tblindtype3 \clvertalt\clbrdrt\brdrs\brdrw10 \clbrdrl\brdrs\brdrw10 \clbrdrb
+\brdrs\brdrw10 \clbrdrr\brdrs\brdrw10 \cltxlrtb\clftsWidth3\clwWidth2970\clshdrawnil \cellx2862\clvertalt\clbrdrt\brdrs\brdrw10 \clbrdrl\brdrs\brdrw10 \clbrdrb\brdrs\brdrw10 \clbrdrr\brdrs\brdrw10 \cltxlrtb\clftsWidth3\clwWidth5850\clshdrawnil \cellx8712
+\row }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid16534634 {\*\bkmkend OLE_LINK3}{\*\bkmkend OLE_LINK4}{\*\bkmkend OLE_LINK5}
+{\*\bkmkend OLE_LINK6}
+\par }\pard \ltrpar\ql \li360\ri0\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af0\afs18 \ltrch\fcs0 \f0\fs18\cf1\insrsid11224689 
+\par }{\rtlch\fcs1 \af0\afs18 \ltrch\fcs0 \f0\fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid11224689 
+\par }\pard\plain \ltrpar\s2\ql \li-1440\ri0\sb400\sa60\sl-340\slmult0\keep\keepn\nowidctlpar\tx360\tx1440\wrapdefault\faauto\outlinelevel1\rin0\lin-1440\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 
+\fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af48\afs28 \ltrch\fcs0 \b\fs28\cf17\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Examples
+\par }\pard\plain \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \af48\afs18 
+\ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Assume that $(WORKSPACE) is C:\\MyWorkspace
+\par }\pard \ltrpar\ql \li180\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin180\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Build platform: Nt32Pkg.dsc
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Specify the platform description file on the command line.
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 C:\\\hich\af48\dbch\af13\loch\f48 MyWorkspace>build -p Nt32Pkg\\
+Nt32Pkg.dsc \hich\f48 \endash \loch\f48 a IA32
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+Build the platform in the current working directory if it contains a platform description file.
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 C:\\MyWorkspace\\Nt32Pkg>build \hich\f48 \endash \loch\f48 a IA32
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Build the active platform specified in the target.txt file.
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 C:\\ MyWorkspa\hich\af48\dbch\af13\loch\f48 ce>build \hich\f48 \endash 
+\loch\f48 a Ia32
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af0\afs18 \ltrch\fcs0 \f0\fs18\cf1\insrsid11224689 
+\par }\pard \ltrpar\ql \li180\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin180\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Build Module: HelloWorld.inf
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Specify the platform and Module on the command line.
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 C:\\MyWorkspace>build -p Nt32Pkg\\Nt32Pkg.dsc \hich\f48 \endash 
+\loch\f48 a IA32 \\
+\par }\pard \ltrpar\ql \li720\ri0\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48  \hich\f48 \endash \loch\f48 
+m MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Specify the Module on the command line and use \hich\af48\dbch\af13\loch\f48 
+the active platform specified in the target.txt file.
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 C:\\MyWorkspace>build \hich\f48 \endash \loch\f48 a IA32 \\
+\par }\pard \ltrpar\ql \li720\ri0\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \loch\af48\dbch\af13\hich\f48 \endash \loch\f48 m MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+Build the module in the current working directory if it contains a module description file and specify the platform o\hich\af48\dbch\af13\loch\f48 n the command line.
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 C:\\ MyWorkspace\\MdeModulePkg\\Application\\HelloWorld>build \hich\f48 
+\endash \loch\f48 a Ia32 \\
+\par }\pard \ltrpar\ql \li720\ri0\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \loch\af48\dbch\af13\hich\f48 \endash \loch\f48 p Nt32Pkg\\Nt32Pkg.dsc
+\par }\pard \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 
+Build the module in the current working directory and use the active platform specified in the target.txt file.
+\par }\pard \ltrpar\ql \li720\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin720\itap0 {\rtlch\fcs1 \ab\af48\afs18 \ltrch\fcs0 \b\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 C:\\ MyWorkspace\\MdeModulePkg\\\hich\af48\dbch\af13\loch\f48 Application
+\\HelloWorld>build \hich\f48 \endash \loch\f48 a Ia32 
+\par }\pard\plain \ltrpar\s2\ql \li-1440\ri0\sb400\sa60\sl-340\slmult0\keep\keepn\nowidctlpar\tx360\tx1440\wrapdefault\faauto\outlinelevel1\rin0\lin-1440\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 
+\fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af48\afs28 \ltrch\fcs0 \b\fs28\cf17\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Bugs 
+\par }\pard\plain \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \af48\afs18 
+\ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 No known }{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid9010967 \hich\af48\dbch\af13\loch\f48 issues.}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 
+\par \hich\af48\dbch\af13\loch\f48 Report bugs to edk2-buildtools-devel@lists.sourceforge.net}{\rtlch\fcs1 \af0\afs18 \ltrch\fcs0 \f0\fs18\cf1\insrsid11224689 
+\par }\pard\plain \ltrpar\s2\ql \li-1440\ri0\sb400\sa60\sl-340\slmult0\keep\keepn\nowidctlpar\tx360\tx1440\wrapdefault\faauto\outlinelevel1\rin0\lin-1440\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 
+\fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af48\afs28 \ltrch\fcs0 \b\fs28\cf17\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Files 
+\par }\pard\plain \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \af48\afs18 
+\ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 target.txt, tools_def.txt, platform.dsc, flashmap.fdf, package.dec and module.inf.
+\par }\pard\plain \ltrpar\s2\ql \li-1440\ri0\sb400\sa60\sl-340\slmult0\keep\keepn\nowidctlpar\tx360\tx1440\wrapdefault\faauto\outlinelevel1\rin0\lin-1440\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 
+\fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af48\afs28 \ltrch\fcs0 \b\fs28\cf17\insrsid11224689 \hich\af48\dbch\af13\loch\f48 See also
+\par }\pard\plain \ltrpar\ql \li360\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \af48\afs18 
+\ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 GenFds.exe
+\par }\pard\plain \ltrpar\s2\ql \li-1440\ri0\sb400\sa60\sl-340\slmult0\keep\keepn\nowidctlpar\tx360\tx1440\wrapdefault\faauto\outlinelevel1\rin0\lin-1440\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 
+\fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af48\afs28 \ltrch\fcs0 \b\fs28\cf17\insrsid11224689 \hich\af48\dbch\af13\loch\f48 License
+\par }\pard\plain \ltrpar\ql \li360\ri0\nowidctlpar\wrapdefault\faauto\rin0\lin360\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\af48\hich\af48\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 
+\fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 Copyright (c) 1999\hich\af48\dbch\af13\loch\f48  - 201}{\rtlch\fcs1 \af48\afs18 \ltrch\fcs0 \fs18\cf1\lang1033\langfe2052\langfenp2052\insrsid1381256 \hich\af48\dbch\af13\loch\f48 1}{\rtlch\fcs1 
+\af48\afs18 \ltrch\fcs0 \fs18\cf1\insrsid11224689 \hich\af48\dbch\af13\loch\f48 , Intel Corporation. All rights reserved.
+\par 
+\par \hich\af48\dbch\af13\loch\f48 This program and the accompanying materials are licensed and made available under the terms and
+\par \hich\af48\dbch\af13\loch\f48 conditions of the BSD License which accompanies this distribution.  The full text of the license may be
+\par \hich\af48\dbch\af13\loch\f48 found \hich\af48\dbch\af13\loch\f48 at:
+\par \hich\af48\dbch\af13\loch\f48 http://opensource.org/licenses/bsd-license.php
+\par 
+\par \hich\af48\dbch\af13\loch\f48 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
+\par \hich\af48\dbch\af13\loch\f48 OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+\par }}

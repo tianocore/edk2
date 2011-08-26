@@ -1926,6 +1926,8 @@ class FdfParser:
             pass
 
         self.__GetSetStatements(FvObj)
+        
+        self.__GetFvBaseAddress(FvObj)
 
         self.__GetFvAlignment(FvObj)
 
@@ -1979,6 +1981,34 @@ class FdfParser:
             raise Warning("Unknown alignment value '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
         Obj.FvAlignment = self.__Token
         return True
+    
+    ## __GetFvBaseAddress() method
+    #
+    #   Get BaseAddress for FV
+    #
+    #   @param  self        The object pointer
+    #   @param  Obj         for whom FvBaseAddress is got
+    #   @retval True        Successfully find a FvBaseAddress statement
+    #   @retval False       Not able to find a FvBaseAddress statement
+    #
+    def __GetFvBaseAddress(self, Obj):
+
+        if not self.__IsKeyword("FvBaseAddress"):
+            return False
+
+        if not self.__IsToken( "="):
+            raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+
+        if not self.__GetNextToken():
+            raise Warning("expected FV base address value", self.FileName, self.CurrentLineNumber)
+
+        IsValidBaseAddrValue = re.compile('^0[x|X][0-9a-fA-F]+')
+
+        if not IsValidBaseAddrValue.match(self.__Token.upper()):
+            raise Warning("Unknown alignment value '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
+        Obj.FvBaseAddress = self.__Token
+        return True    
+    
 
     ## __GetFvAttributes() method
     #

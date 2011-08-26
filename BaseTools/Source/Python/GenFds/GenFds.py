@@ -239,6 +239,13 @@ def main():
                 EdkLogger.error("GenFds", OPTION_VALUE_INVALID,
                                 "No such an FV in FDF file: %s" % Options.uiFvName)
 
+        if (Options.uiCapName) :
+            if Options.uiCapName.upper() in FdfParserObj.Profile.CapsuleDict.keys():
+                GenFds.OnlyGenerateThisCap = Options.uiCapName
+            else:
+                EdkLogger.error("GenFds", OPTION_VALUE_INVALID,
+                                "No such a Capsule in FDF file: %s" % Options.uiCapName)
+
         """Modify images from build output if the feature of loading driver at fixed address is on."""
         if GenFdsGlobalVariable.FixedLoadAddress:
             GenFds.PreprocessImage(BuildWorkSpace, GenFdsGlobalVariable.ActivePlatform)
@@ -302,7 +309,8 @@ def myOptionParser():
     Parser.add_option("-o", "--outputDir", type="string", dest="outputDir", help="Name of Build Output directory",
                       action="callback", callback=SingleCheckCallback)
     Parser.add_option("-r", "--rom_image", dest="uiFdName", help="Build the image using the [FD] section named by FdUiName.")
-    Parser.add_option("-i", "--FvImage", dest="uiFvName", help="Buld the FV image using the [FV] section named by UiFvName")
+    Parser.add_option("-i", "--FvImage", dest="uiFvName", help="Build the FV image using the [FV] section named by UiFvName")
+    Parser.add_option("-C", "--CapsuleImage", dest="uiCapName", help="Build the Capsule image using the [Capsule] section named by UiCapName")
     Parser.add_option("-b", "--buildtarget", type="choice", choices=['DEBUG','RELEASE'], dest="BuildTarget", help="Build TARGET is one of list: DEBUG, RELEASE.",
                       action="callback", callback=SingleCheckCallback)
     Parser.add_option("-t", "--tagname", type="string", dest="ToolChain", help="Using the tools: TOOL_CHAIN_TAG name to build the platform.",
@@ -325,6 +333,7 @@ class GenFds :
     ImageBinDict = {}
     OnlyGenerateThisFd = None
     OnlyGenerateThisFv = None
+    OnlyGenerateThisCap = None
 
     ## GenFd()
     #
@@ -337,11 +346,18 @@ class GenFds :
         GenFdsGlobalVariable.SetDir ('', FdfParser, WorkSpace, ArchList)
 
         GenFdsGlobalVariable.VerboseLogger(" Generate all Fd images and their required FV and Capsule images!")
+        if GenFds.OnlyGenerateThisCap != None and GenFds.OnlyGenerateThisCap.upper() in GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict.keys():
+            CapsuleObj = GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict.get(GenFds.OnlyGenerateThisCap.upper())
+            if CapsuleObj != None:
+                CapsuleObj.GenCapsule()
+                return
+
         if GenFds.OnlyGenerateThisFd != None and GenFds.OnlyGenerateThisFd.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
             FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict.get(GenFds.OnlyGenerateThisFd.upper())
             if FdObj != None:
                 FdObj.GenFd()
-        elif GenFds.OnlyGenerateThisFd == None:
+                return
+        elif GenFds.OnlyGenerateThisFd == None and GenFds.OnlyGenerateThisFv == None:
             for FdName in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
                 FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[FdName]
                 FdObj.GenFd()
@@ -361,7 +377,7 @@ class GenFds :
                 FvObj.AddToBuffer(Buffer)
                 Buffer.close()
         
-        if GenFds.OnlyGenerateThisFv == None and GenFds.OnlyGenerateThisFd == None:
+        if GenFds.OnlyGenerateThisFv == None and GenFds.OnlyGenerateThisFd == None and GenFds.OnlyGenerateThisCap == None:
             if GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict != {}:
                 GenFdsGlobalVariable.VerboseLogger("\n Generate other Capsule images!")
                 for CapsuleName in GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict.keys():

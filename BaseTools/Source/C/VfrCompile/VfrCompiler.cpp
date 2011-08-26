@@ -22,6 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 PACKAGE_DATA  gCBuffer;
 PACKAGE_DATA  gRBuffer;
+CVfrStringDB  gCVfrStringDB;
 
 VOID 
 CVfrCompiler::DebugError (
@@ -62,7 +63,9 @@ CVfrCompiler::OptionInitialization (
   )
 {
   INT32         Index;
-  
+  EFI_STATUS    Status;
+
+  Status = EFI_SUCCESS;
   SetUtilityName ((CHAR8*) PROGRAM_NAME);
 
   mOptions.VfrFileName[0]                = '\0';
@@ -78,6 +81,8 @@ CVfrCompiler::OptionInitialization (
   mOptions.SkipCPreprocessor             = TRUE;
   mOptions.CPreprocessorOptions          = NULL;
   mOptions.CompatibleMode                = FALSE;
+  mOptions.HasOverrideClassGuid          = FALSE;
+  memset (&mOptions.OverrideClassGuid, 0, sizeof (EFI_GUID));
   
   if (Argc == 1) {
     Usage ();
@@ -132,6 +137,22 @@ CVfrCompiler::OptionInitialization (
       AppendCPreprocessorOptions (Argv[Index]);
     } else if (stricmp(Argv[Index], "-c") == 0 || stricmp(Argv[Index], "--compatible-framework") == 0) {
       mOptions.CompatibleMode = TRUE;
+    } else if (stricmp(Argv[Index], "-s") == 0|| stricmp(Argv[Index], "--string-db") == 0) {
+      Index++;
+      if ((Index >= Argc) || (Argv[Index][0] == '-')) {
+        DebugError (NULL, 0, 1001, "Missing option", "-s missing input string file name");
+        goto Fail;
+      }
+      gCVfrStringDB.SetStringFileName(Argv[Index]);
+      DebugMsg (NULL, 0, 9, (CHAR8 *) "Input string file path", Argv[Index]);
+    } else if ((stricmp (Argv[Index], "-g") == 0) || (stricmp (Argv[Index], "--guid") == 0)) {
+      Index++;
+      Status = StringToGuid (Argv[Index], &mOptions.OverrideClassGuid);
+      if (EFI_ERROR (Status)) {
+        DebugError (NULL, 0, 1000, "Invalid format:", "%s", Argv[Index]);
+        goto Fail;
+      }
+      mOptions.HasOverrideClassGuid = TRUE;
     } else {
       DebugError (NULL, 0, 1000, "Unknown option", "unrecognized option %s", Argv[Index]);
       goto Fail;
@@ -399,6 +420,11 @@ CVfrCompiler::Usage (
     "                 do not preprocessing input file",
     "  -c, --compatible-framework",
     "                 compatible framework vfr file",
+    "  -s, --string-db",
+    "                 input uni string package file",
+    "  -g, --guid",
+    "                 override class guid input",
+    "                 format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
     NULL
     };
   for (Index = 0; Help[Index] != NULL; Index++) {
@@ -472,7 +498,7 @@ Fail:
   delete PreProcessCmd;
 }
 
-extern UINT8 VfrParserStart (IN FILE *, IN BOOLEAN);
+extern UINT8 VfrParserStart (IN FILE *, IN INPUT_INFO_TO_SYNTAX *);
 
 VOID
 CVfrCompiler::Compile (
@@ -481,6 +507,7 @@ CVfrCompiler::Compile (
 {
   FILE  *pInFile    = NULL;
   CHAR8 *InFileName = NULL;
+  INPUT_INFO_TO_SYNTAX InputInfo;
 
   if (!IS_RUN_STATUS(STATUS_PREPROCESSED)) {
     goto Fail;
@@ -495,7 +522,14 @@ CVfrCompiler::Compile (
     goto Fail;
   }
 
-  if (VfrParserStart (pInFile, mOptions.CompatibleMode) != 0) {
+  InputInfo.CompatibleMode = mOptions.CompatibleMode;
+  if (mOptions.HasOverrideClassGuid) {
+    InputInfo.OverrideClassGuid = &mOptions.OverrideClassGuid;
+  } else {
+    InputInfo.OverrideClassGuid = NULL;
+  }
+
+  if (VfrParserStart (pInFile, &InputInfo) != 0) {
     goto Fail;
   }
 

@@ -175,7 +175,7 @@ private:
   VOID RegisterNewType (IN SVfrDataType *);
 
   EFI_VFR_RETURN_CODE ExtractStructTypeName (IN CHAR8 *&, OUT CHAR8 *);
-  EFI_VFR_RETURN_CODE GetTypeField (IN CHAR8 *, IN SVfrDataType *, IN SVfrDataField *&);
+  EFI_VFR_RETURN_CODE GetTypeField (IN CONST CHAR8 *, IN SVfrDataType *, IN SVfrDataField *&);
   EFI_VFR_RETURN_CODE GetFieldOffset (IN SVfrDataField *, IN UINT32, OUT UINT32 &);
   UINT8               GetFieldWidth (IN SVfrDataField *);
   UINT32              GetFieldSize (IN SVfrDataField *, IN UINT32);
@@ -359,6 +359,7 @@ public:
   VOID                RegisterNewDateQuestion (IN CHAR8 *, IN CHAR8 *, IN OUT EFI_QUESTION_ID &);
   VOID                RegisterOldTimeQuestion (IN CHAR8 *, IN CHAR8 *, IN CHAR8 *, IN OUT EFI_QUESTION_ID &);
   VOID                RegisterNewTimeQuestion (IN CHAR8 *, IN CHAR8 *, IN OUT EFI_QUESTION_ID &);
+  VOID                RegisterRefQuestion (IN CHAR8 *, IN CHAR8 *, IN OUT EFI_QUESTION_ID &);  
   EFI_VFR_RETURN_CODE UpdateQuestionId (IN EFI_QUESTION_ID, IN EFI_QUESTION_ID);
   VOID                GetQuestionId (IN CHAR8 *, IN CHAR8 *, OUT EFI_QUESTION_ID &, OUT UINT32 &, OUT EFI_QUESION_TYPE *QType = NULL);
   EFI_VFR_RETURN_CODE FindQuestion (IN EFI_QUESTION_ID);
@@ -421,6 +422,35 @@ public:
 
   VOID RegisterRule (IN CHAR8 *);
   UINT8 GetRuleId (IN CHAR8 *);
+};
+
+class CVfrStringDB {
+private:
+  CHAR8   *mStringFileName;
+
+  EFI_STATUS FindStringBlock (
+    IN  UINT8            *StringData,
+    IN  EFI_STRING_ID    StringId,
+    OUT UINT32           *StringTextOffset,
+    OUT UINT8            *BlockType
+    );
+
+  UINT32 GetUnicodeStringTextSize (
+    IN  UINT8            *StringSrc
+    );
+
+public:
+  CVfrStringDB ();
+  ~CVfrStringDB ();
+
+  VOID SetStringFileName (
+    IN CHAR8 *StringFileName
+    );
+
+  CHAR8 * GetVarStoreNameFormStringId (
+    IN EFI_STRING_ID StringId
+    );
+
 };
 
 #endif

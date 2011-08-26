@@ -31,7 +31,9 @@ Abstract:
 #define _MAX_PATH 500
 #endif
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 //
 // Functions declarations
 //
@@ -227,4 +229,9 @@ Returns:
   TRUE if section found
 
 --*/
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

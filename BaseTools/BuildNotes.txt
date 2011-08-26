@@ -74,11 +74,11 @@ please make sure the environment variable PYTHONPATH is set to
 
         <buildtools_project>/BaseTools/Source/Python
 
-  There're four tools written in Python. The entrance file of each tool is listed
+  There're five tools written in Python. The entrance file of each tool is listed
 below.
 
       build               <buildtools_project>/BaseTools/Source/Python/build/build.py
       GenFds              <buildtools_project>/BaseTools/Source/Python/GenFds/GenFds.py
       Trim                <buildtools_project>/BaseTools/Source/Python/Trim/Trim.py
       MigrationMsa2Inf    <buildtools_project>/BaseTools/Source/Python/MigrationMsa2Inf/MigrationMsa2Inf.py
-
+      UPT                 <buildtools_project>/BaseTools/Source/Python/UPT/UPT.py

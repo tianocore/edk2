@@ -53,7 +53,19 @@ class FfsInfStatement(FfsInfStatementClassObject):
         self.InDsc = True
         self.OptRomDefs = {}
         self.PiSpecVersion = '0x00000000'
-        
+        self.InfModule = None
+        self.FinalBuildTargetList = []
+
+    ## GetFinalBuildTargetList() method
+    #
+    #    Get final build target list
+    def GetFinalBuildTargetList(self):
+        if not self.InfModule or not self.CurrentArch:
+            return []
+        if not self.FinalBuildTargetList:
+            self.FinalBuildTargetList = GenFdsGlobalVariable.GetModuleCodaTargetList(self.InfModule, self.CurrentArch)
+        return self.FinalBuildTargetList
+
     ## __InfParse() method
     #
     #   Parse inf file to get module information
@@ -128,6 +140,8 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
         if Inf._Defs != None and len(Inf._Defs) > 0:
             self.OptRomDefs.update(Inf._Defs)
+        
+        self.InfModule = Inf
             
         GenFdsGlobalVariable.VerboseLogger( "BaseName : %s" %self.BaseName)
         GenFdsGlobalVariable.VerboseLogger("ModuleGuid : %s" %self.ModuleGuid)

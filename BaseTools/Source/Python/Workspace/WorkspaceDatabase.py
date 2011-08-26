@@ -2261,6 +2261,7 @@ class WorkspaceDatabase(object):
     # @prarm RenewDb=False      Create new database file if it's already there
     #
     def __init__(self, DbPath, GlobalMacros={}, RenewDb=False):
+        self._DbClosedFlag = False
         self._GlobalMacros = GlobalMacros
 
         if DbPath == None or DbPath == '':
@@ -2414,9 +2415,11 @@ determine whether database file is out of date!\n")
     # Close the connection and cursor
     #
     def Close(self):
-        self.Conn.commit()
-        self.Cur.close()
-        self.Conn.close()
+        if not self._DbClosedFlag:
+            self.Conn.commit()
+            self.Cur.close()
+            self.Conn.close()
+            self._DbClosedFlag = True
 
     ## Get unique file ID for the gvien file
     def GetFileId(self, FilePath):

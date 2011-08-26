@@ -216,7 +216,7 @@ class Region(RegionClassObject):
                                     "Size of File (%s) is larger than Region Size 0x%X specified." \
                                     % (RegionData, Size))
                 GenFdsGlobalVariable.InfLogger('   Region File Name = %s'%RegionData)
-                BinFile = open (RegionData, 'r+b')
+                BinFile = open (RegionData, 'rb')
                 Buffer.write(BinFile.read())
                 BinFile.close()
                 Size = Size - FileLength

@@ -252,7 +252,15 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True):
         except:
             EdkLogger.error(None, FILE_OPEN_FAILURE, ExtraData=File)
 
-    CreateDirectory(os.path.dirname(File))
+    DirName = os.path.dirname(File)
+    if not CreateDirectory(DirName):
+        EdkLogger.error(None, FILE_CREATE_FAILURE, "Could not create directory %s" % DirName)
+    else:
+        if DirName == '':
+            DirName = os.getcwd()
+        if not os.access(DirName, os.W_OK):
+            EdkLogger.error(None, PERMISSION_FAILURE, "Do not have write permission on directory %s" % DirName)
+
     try:
         if GlobalData.gIsWindows:
             try:
@@ -267,8 +275,8 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True):
             Fd = open(File, "wb")
             Fd.write(Content)
             Fd.close()
-    except:
-        EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData=File)
+    except IOError, X:
+        EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData='IOError %s'%X)
 
     return True
 

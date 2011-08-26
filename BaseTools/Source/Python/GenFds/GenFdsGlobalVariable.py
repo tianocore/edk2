@@ -25,6 +25,12 @@ from Common.BuildToolError import *
 from Common import EdkLogger
 from Common.Misc import SaveFileOnChange
 
+from Common.TargetTxtClassObject import TargetTxtClassObject
+from Common.ToolDefClassObject import ToolDefClassObject
+from AutoGen.BuildEngine import BuildRule
+import Common.DataType as DataType
+from Common.Misc import PathClass
+
 ## Global variables
 #
 #
@@ -55,8 +61,191 @@ class GenFdsGlobalVariable:
     FdfFileTimeStamp = 0
     FixedLoadAddress = False
     PlatformName = ''
+    
+    BuildRuleFamily = "MSFT"
+    ToolChainFamily = "MSFT"
+    __BuildRuleDatabase = None
 
     SectionHeader = struct.Struct("3B 1B")
+    
+    ## LoadBuildRule
+    #
+    @staticmethod
+    def __LoadBuildRule():
+        if GenFdsGlobalVariable.__BuildRuleDatabase:
+            return GenFdsGlobalVariable.__BuildRuleDatabase
+        BuildConfigurationFile = os.path.normpath(os.path.join(GenFdsGlobalVariable.WorkSpaceDir, "Conf/target.txt"))
+        TargetTxt = TargetTxtClassObject()
+        if os.path.isfile(BuildConfigurationFile) == True:
+            TargetTxt.LoadTargetTxtFile(BuildConfigurationFile)
+            if DataType.TAB_TAT_DEFINES_BUILD_RULE_CONF in TargetTxt.TargetTxtDictionary:
+                BuildRuleFile = TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_BUILD_RULE_CONF]
+            if BuildRuleFile in [None, '']:
+                BuildRuleFile = 'Conf/build_rule.txt'
+            GenFdsGlobalVariable.__BuildRuleDatabase = BuildRule(BuildRuleFile)
+            ToolDefinitionFile = TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
+            if ToolDefinitionFile == '':
+                ToolDefinitionFile = "Conf/tools_def.txt"
+            if os.path.isfile(ToolDefinitionFile):
+                ToolDef = ToolDefClassObject()
+                ToolDef.LoadToolDefFile(ToolDefinitionFile)
+                ToolDefinition = ToolDef.ToolsDefTxtDatabase
+                if DataType.TAB_TOD_DEFINES_BUILDRULEFAMILY in ToolDefinition \
+                   and GenFdsGlobalVariable.ToolChainTag in ToolDefinition[DataType.TAB_TOD_DEFINES_BUILDRULEFAMILY] \
+                   and ToolDefinition[DataType.TAB_TOD_DEFINES_BUILDRULEFAMILY][GenFdsGlobalVariable.ToolChainTag]:
+                    GenFdsGlobalVariable.BuildRuleFamily = ToolDefinition[DataType.TAB_TOD_DEFINES_BUILDRULEFAMILY][GenFdsGlobalVariable.ToolChainTag]
+                    
+                if DataType.TAB_TOD_DEFINES_FAMILY in ToolDefinition \
+                   and GenFdsGlobalVariable.ToolChainTag in ToolDefinition[DataType.TAB_TOD_DEFINES_FAMILY] \
+                   and ToolDefinition[DataType.TAB_TOD_DEFINES_FAMILY][GenFdsGlobalVariable.ToolChainTag]:
+                    GenFdsGlobalVariable.ToolChainFamily = ToolDefinition[DataType.TAB_TOD_DEFINES_FAMILY][GenFdsGlobalVariable.ToolChainTag]
+        return GenFdsGlobalVariable.__BuildRuleDatabase
+
+    ## GetBuildRules
+    #    @param Inf: object of InfBuildData
+    #    @param Arch: current arch
+    #
+    @staticmethod
+    def GetBuildRules(Inf, Arch):
+        if not Arch:
+            Arch = 'COMMON'
+
+        if not Arch in GenFdsGlobalVariable.OutputDirDict:
+            return {}
+
+        BuildRuleDatabase = GenFdsGlobalVariable.__LoadBuildRule()
+        if not BuildRuleDatabase:
+            return {}
+
+        PathClassObj = PathClass(str(Inf.MetaFile).lstrip(GenFdsGlobalVariable.WorkSpaceDir),
+                                 GenFdsGlobalVariable.WorkSpaceDir)
+        Macro = {}
+        Macro["WORKSPACE"             ] = GenFdsGlobalVariable.WorkSpaceDir
+        Macro["MODULE_NAME"           ] = Inf.BaseName
+        Macro["MODULE_GUID"           ] = Inf.Guid
+        Macro["MODULE_VERSION"        ] = Inf.Version
+        Macro["MODULE_TYPE"           ] = Inf.ModuleType
+        Macro["MODULE_FILE"           ] = str(PathClassObj)
+        Macro["MODULE_FILE_BASE_NAME" ] = PathClassObj.BaseName
+        Macro["MODULE_RELATIVE_DIR"   ] = PathClassObj.SubDir
+        Macro["MODULE_DIR"            ] = PathClassObj.SubDir
+
+        Macro["BASE_NAME"             ] = Inf.BaseName
+
+        Macro["ARCH"                  ] = Arch
+        Macro["TOOLCHAIN"             ] = GenFdsGlobalVariable.ToolChainTag
+        Macro["TOOLCHAIN_TAG"         ] = GenFdsGlobalVariable.ToolChainTag
+        Macro["TARGET"                ] = GenFdsGlobalVariable.TargetName
+
+        Macro["BUILD_DIR"             ] = GenFdsGlobalVariable.OutputDirDict[Arch]
+        Macro["BIN_DIR"               ] = os.path.join(GenFdsGlobalVariable.OutputDirDict[Arch], Arch)
+        Macro["LIB_DIR"               ] = os.path.join(GenFdsGlobalVariable.OutputDirDict[Arch], Arch)
+        BuildDir = os.path.join(
+            GenFdsGlobalVariable.OutputDirDict[Arch],
+            Arch,
+            PathClassObj.SubDir,
+            PathClassObj.BaseName
+        )
+        Macro["MODULE_BUILD_DIR"      ] = BuildDir
+        Macro["OUTPUT_DIR"            ] = os.path.join(BuildDir, "OUTPUT")
+        Macro["DEBUG_DIR"             ] = os.path.join(BuildDir, "DEBUG")
+
+        BuildRules = {}
+        for Type in BuildRuleDatabase.FileTypeList:
+            #first try getting build rule by BuildRuleFamily
+            RuleObject = BuildRuleDatabase[Type, Inf.BuildType, Arch, GenFdsGlobalVariable.BuildRuleFamily]
+            if not RuleObject:
+                # build type is always module type, but ...
+                if Inf.ModuleType != Inf.BuildType:
+                    RuleObject = BuildRuleDatabase[Type, Inf.ModuleType, Arch, GenFdsGlobalVariable.BuildRuleFamily]
+            #second try getting build rule by ToolChainFamily
+            if not RuleObject:
+                RuleObject = BuildRuleDatabase[Type, Inf.BuildType, Arch, GenFdsGlobalVariable.ToolChainFamily]
+                if not RuleObject:
+                    # build type is always module type, but ...
+                    if Inf.ModuleType != Inf.BuildType:
+                        RuleObject = BuildRuleDatabase[Type, Inf.ModuleType, Arch, GenFdsGlobalVariable.ToolChainFamily]
+            if not RuleObject:
+                continue
+            RuleObject = RuleObject.Instantiate(Macro)
+            BuildRules[Type] = RuleObject
+            for Ext in RuleObject.SourceFileExtList:
+                BuildRules[Ext] = RuleObject
+        return BuildRules
+
+    ## GetModuleCodaTargetList
+    #
+    #    @param Inf: object of InfBuildData
+    #    @param Arch: current arch
+    #
+    @staticmethod
+    def GetModuleCodaTargetList(Inf, Arch):
+        BuildRules = GenFdsGlobalVariable.GetBuildRules(Inf, Arch)
+        if not BuildRules:
+            return []
+
+        TargetList = set()
+        FileList = []
+        for File in Inf.Sources:
+            if File.TagName in ("", "*", GenFdsGlobalVariable.ToolChainTag) and \
+                File.ToolChainFamily in ("", "*", GenFdsGlobalVariable.ToolChainFamily):
+                FileList.append((File, DataType.TAB_UNKNOWN_FILE))
+        
+        for File in Inf.Binaries:
+            if File.Target in ['COMMON', '*', GenFdsGlobalVariable.TargetName]:
+                FileList.append((File, File.Type))
+
+        for File, FileType in FileList:
+            LastTarget = None
+            RuleChain = []
+            SourceList = [File]
+            Index = 0
+            while Index < len(SourceList):
+                Source = SourceList[Index]
+                Index = Index + 1
+    
+                if File.IsBinary and File == Source and Inf.Binaries != None and File in Inf.Binaries:
+                    # Skip all files that are not binary libraries
+                    if not Inf.LibraryClass:
+                        continue            
+                    RuleObject = BuildRules[DataType.TAB_DEFAULT_BINARY_FILE]
+                elif FileType in BuildRules:
+                    RuleObject = BuildRules[FileType]
+                elif Source.Ext in BuildRules:
+                    RuleObject = BuildRules[Source.Ext]
+                else:
+                    # stop at no more rules
+                    if LastTarget:
+                        TargetList.add(str(LastTarget))
+                    break
+    
+                FileType = RuleObject.SourceFileType
+    
+                # stop at STATIC_LIBRARY for library
+                if Inf.LibraryClass and FileType == DataType.TAB_STATIC_LIBRARY:
+                    if LastTarget:
+                        TargetList.add(str(LastTarget))
+                    break
+    
+                Target = RuleObject.Apply(Source)
+                if not Target:
+                    if LastTarget:
+                        TargetList.add(str(LastTarget))
+                    break
+                elif not Target.Outputs:
+                    # Only do build for target with outputs
+                    TargetList.add(str(Target))
+    
+                # to avoid cyclic rule
+                if FileType in RuleChain:
+                    break
+    
+                RuleChain.append(FileType)
+                SourceList.extend(Target.Outputs)
+                LastTarget = Target
+                FileType = DataType.TAB_UNKNOWN_FILE
+
+        return list(TargetList)
 
     ## SetDir()
     #
@@ -459,17 +648,21 @@ class GenFdsGlobalVariable:
 
         PcdValue = ''
         for Platform in GenFdsGlobalVariable.WorkSpace.PlatformList:
-            PcdDict = Platform.Pcds
-            for Key in PcdDict:
-                PcdObj = PcdDict[Key]
-                if (PcdObj.TokenCName == TokenCName) and (PcdObj.TokenSpaceGuidCName == TokenSpace):
-                    if PcdObj.Type != 'FixedAtBuild':
-                        EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not FixedAtBuild type." % PcdPattern)
-                    if PcdObj.DatumType != 'VOID*':
-                        EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not VOID* datum type." % PcdPattern)
-                        
-                    PcdValue = PcdObj.DefaultValue
-                    return PcdValue
+            #
+            # Only process platform which match current build option.
+            #
+            if Platform.MetaFile == GenFdsGlobalVariable.ActivePlatform:            
+                PcdDict = Platform.Pcds
+                for Key in PcdDict:
+                    PcdObj = PcdDict[Key]
+                    if (PcdObj.TokenCName == TokenCName) and (PcdObj.TokenSpaceGuidCName == TokenSpace):
+                        if PcdObj.Type != 'FixedAtBuild':
+                            EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not FixedAtBuild type." % PcdPattern)
+                        if PcdObj.DatumType != 'VOID*':
+                            EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not VOID* datum type." % PcdPattern)
+                            
+                        PcdValue = PcdObj.DefaultValue
+                        return PcdValue
 
         for Package in GenFdsGlobalVariable.WorkSpace.PackageList:
             PcdDict = Package.Pcds

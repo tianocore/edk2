@@ -198,7 +198,7 @@
         -$(MD) $(OUTPUT_DIR)(+)${s_dir} > NUL 2>&1
         "$(VFRPP)" $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
         -$(MD) ${d_path} > NUL 2>&1
-        "$(VFR)" $(VFR_FLAGS) --output-directory ${d_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        "$(VFR)" $(VFR_FLAGS) --string-db $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk --output-directory ${d_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
 
 [Object-File]
     <InputFile>
@@ -242,7 +242,7 @@
         "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
     <Command.ARMGCC>
-        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -) $(DLINK2_FLAGS)
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -\) $(DLINK2_FLAGS)
 
     <Command.RVCT>
         "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) --via $(STATIC_LIBRARY_FILES_LIST) $(DLINK2_FLAGS)
@@ -272,7 +272,7 @@
         "$(DLINK)" $(DLINK_FLAGS) -\( $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) -\) $(DLINK2_FLAGS)
 
     <Command.ARMGCC>
-        "$(DLINK)" $(DLINK_FLAGS) -( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -) $(DLINK2_FLAGS)
+        "$(DLINK)" $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -\) $(DLINK2_FLAGS)
 
     <Command.RVCT>
         "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) --via $(STATIC_LIBRARY_FILES_LIST) $(DLINK2_FLAGS)
@@ -417,15 +417,17 @@
         $(OUTPUT_DIR)(+)${s_base}.com
 
     <Command.MSFT, Command.INTEL>
+        "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+        Trim --source-code --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
         cd $(OUTPUT_DIR)(+)${s_dir}
-        "$(ASM16)" /nologo /c /omf $(INC) /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj ${src}
+        "$(ASM16)" /nologo /c /omf $(INC) /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj ${d_path}(+)${s_base}.iii
         "$(ASMLINK)" $(ASMLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj,${dst},,,,
 
     <Command.GCC>
       "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
       Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
       "$(ASM)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASM_FLAGS) $(INC) ${d_path}(+)${s_base}.iii
-      "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -( $(DLINK_SPATH) $(LIBS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj -)
+      "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(LIBS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj -\)
      
     <Command.XCODE>
       "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
@@ -474,6 +476,7 @@
     <OutputFile>
         $(DEBUG_DIR)(+)AutoGen.c
         $(DEBUG_DIR)(+)$(MODULE_NAME)StrDefs.h
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk
 
     <Command>
 
@@ -513,7 +516,7 @@
         -$(MD) $(OUTPUT_DIR)(+)${s_dir} > NUL 2>&1
         "$(VFRPP)" $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
         -$(MD) $(OUTPUT_DIR)(+)${s_dir} > NUL 2>&1
-        "$(VFR)" $(VFR_FLAGS) --create-ifr-package --output-directory $(OUTPUT_DIR)(+)${s_dir} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        "$(VFR)" $(VFR_FLAGS) --create-ifr-package --string-db $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk --output-directory $(OUTPUT_DIR)(+)${s_dir} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
 
 [Hii-Binary-Package.UEFI_HII]
     <InputFile>

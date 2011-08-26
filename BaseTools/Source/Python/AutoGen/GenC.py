@@ -1951,6 +1951,9 @@ def CreateHeaderCode(Info, AutoGenC, AutoGenH):
         if Info.ModuleType in gModuleTypeHeaderFile \
            and gModuleTypeHeaderFile[Info.ModuleType][0] != gBasicHeaderFile:
             AutoGenH.Append("#include <%s>\n" % gModuleTypeHeaderFile[Info.ModuleType][0])
+        if 'PcdLib' in Info.Module.LibraryClasses:
+            AutoGenH.Append("#include <Library/PcdLib.h>\n")
+
         AutoGenH.Append('\nextern GUID  gEfiCallerIdGuid;\n\n')
 
         if Info.IsLibrary:

@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -63,7 +63,7 @@ UINT32 gPageTableOffsetInFile = EFI_PAGE_BASE_OFFSET_IN_LDR;
 //
 // Utility Name
 //
-#define UTILITY_NAME  "GenBootSector"
+#define UTILITY_NAME  "GenPage"
 
 //
 // Utility version information
@@ -92,7 +92,7 @@ Returns:
 --*/
 {
   printf ("%s v%d.%d -Utility to generate the EfiLoader image containing page table.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
-  printf ("Copyright (c) 2008 - 2010 Intel Corporation. All rights reserved.\n");
+  printf ("Copyright (c) 2008 - 2011 Intel Corporation. All rights reserved.\n");
 }
 
 VOID
@@ -103,14 +103,21 @@ Usage (
   Version();
   printf ("\nUsage: \n\
    GenPage\n\
-     -o, --output Filename containing page table\n\
-     [-b, --baseaddr baseaddress of page table]\n\
-     [-f, --offset offset in the file that page table will reside]\n\
-     [-v, --verbose]\n\
-     [--version]\n\
-     [-q, --quiet disable all messages except fatal errors]\n\
-     [-d, --debug[#]\n\
-     [-h, --help]\n\
+     -o, --output Filename\n\
+                        The file that contains both non-page table part and\n\
+                        page table\n\
+     [-b, --baseaddr baseaddress]\n\
+                        The page table location\n\
+     [-f, --offset offset]\n\
+                        The position that the page table will appear in the\n\
+                        output file\n\
+     [-v, --verbose]    Turn on verbose output with informational messages\n\
+                        printed\n\
+     [--version]        Print version and copyright of this program and exit\n\
+     [-q, --quiet]      Disable all messages except unrecoverable errors\n\
+     [-d, --debug[#]]   Enable debug messages, at level #\n\
+     [-h, --help]       Print copyright, version and usage of this program\n\
+                        and exit\n\
      EfiLoaderImageName\n");
 
 }

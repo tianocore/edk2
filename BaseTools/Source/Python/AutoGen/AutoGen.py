@@ -169,10 +169,17 @@ class WorkspaceAutoGen(AutoGen):
     #   @param  FlashDefinitionFile     File of flash definition
     #   @param  Fds                     FD list to be generated
     #   @param  Fvs                     FV list to be generated
+    #   @param  Caps                    Capsule list to be generated
     #   @param  SkuId                   SKU id from command line
     #
     def _Init(self, WorkspaceDir, ActivePlatform, Target, Toolchain, ArchList, MetaFileDb,
-              BuildConfig, ToolDefinition, FlashDefinitionFile='', Fds=[], Fvs=[], SkuId='', UniFlag=None):
+              BuildConfig, ToolDefinition, FlashDefinitionFile='', Fds=None, Fvs=None, Caps=None, SkuId='', UniFlag=None):
+        if Fds is None:
+            Fds = []
+        if Fvs is None:
+            Fvs = []
+        if Caps is None:
+            Caps = []
         self.MetaFile       = ActivePlatform.MetaFile
         self.WorkspaceDir   = WorkspaceDir
         self.Platform       = ActivePlatform
@@ -188,6 +195,7 @@ class WorkspaceAutoGen(AutoGen):
         self.FdfFile        = FlashDefinitionFile
         self.FdTargetList   = Fds
         self.FvTargetList   = Fvs
+        self.CapTargetList  = Caps
         self.AutoGenObjectList = []
 
         # there's many relative directory operations, so ...
@@ -228,12 +236,67 @@ class WorkspaceAutoGen(AutoGen):
         #
         self._CheckAllPcdsTokenValueConflict()
         
+        #
+        # Check PCD type and definition between DSC and DEC
+        #
+        self._CheckPcdDefineAndType()
+        
         self._BuildDir = None
         self._FvDir = None
         self._MakeFileDir = None
         self._BuildCommand = None
 
         return True
+
+    def _CheckPcdDefineAndType(self):
+        PcdTypeList = [
+            "FixedAtBuild", "PatchableInModule", "FeatureFlag",
+            "Dynamic", #"DynamicHii", "DynamicVpd",
+            "DynamicEx", # "DynamicExHii", "DynamicExVpd"
+        ]
+
+        # This dict store PCDs which are not used by any modules with specified arches
+        UnusedPcd = sdict()
+        for Pa in self.AutoGenObjectList:
+            # Key of DSC's Pcds dictionary is PcdCName, TokenSpaceGuid
+            for Pcd in Pa.Platform.Pcds:
+                PcdType = Pa.Platform.Pcds[Pcd].Type
+                
+                # If no PCD type, this PCD comes from FDF 
+                if not PcdType:
+                    continue
+                
+                # Try to remove Hii and Vpd suffix
+                if PcdType.startswith("DynamicEx"):
+                    PcdType = "DynamicEx"
+                elif PcdType.startswith("Dynamic"):
+                    PcdType = "Dynamic"
+    
+                for Package in Pa.PackageList:
+                    # Key of DEC's Pcds dictionary is PcdCName, TokenSpaceGuid, PcdType
+                    if (Pcd[0], Pcd[1], PcdType) in Package.Pcds:
+                        break
+                    for Type in PcdTypeList:
+                        if (Pcd[0], Pcd[1], Type) in Package.Pcds:
+                            EdkLogger.error(
+                                'build',
+                                FORMAT_INVALID,
+                                "Type [%s] of PCD [%s.%s] in DSC file doesn't match the type [%s] defined in DEC file." \
+                                % (Pa.Platform.Pcds[Pcd].Type, Pcd[1], Pcd[0], Type),
+                                ExtraData=None
+                            )
+                            return
+                else:
+                    UnusedPcd.setdefault(Pcd, []).append(Pa.Arch)
+
+        for Pcd in UnusedPcd:
+            EdkLogger.warn(
+                'build',
+                "The PCD was not specified by any INF module in the platform for the given architecture.\n"
+                "\tPCD: [%s.%s]\n\tPlatform: [%s]\n\tArch: %s"
+                % (Pcd[1], Pcd[0], os.path.basename(str(self.MetaFile)), str(UnusedPcd[Pcd])),
+                ExtraData=None
+            )
 
     def __repr__(self):
         return "%s [%s]" % (self.MetaFile, ", ".join(self.ArchList))
@@ -2125,9 +2188,8 @@ class ModuleAutoGen(AutoGen):
     #
     def _GetAutoGenFileList(self):
         UniStringAutoGenC = True
-        UniStringBinBuffer = None
+        UniStringBinBuffer = StringIO()
         if self.BuildType == 'UEFI_HII':
-            UniStringBinBuffer = StringIO()
             UniStringAutoGenC = False
         if self._AutoGenFileList == None:
             self._AutoGenFileList = {}

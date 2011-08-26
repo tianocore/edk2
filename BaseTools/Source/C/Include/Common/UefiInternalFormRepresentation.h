@@ -575,6 +575,13 @@ typedef struct {
   UINT8  Day;
 } EFI_HII_DATE;
 
+typedef struct {
+  EFI_QUESTION_ID QuestionId;
+  EFI_FORM_ID     FormId;
+  EFI_GUID        FormSetGuid;
+  EFI_STRING_ID   DevicePath;
+} EFI_HII_REF;
+
 typedef union {
   UINT8           u8;
   UINT16          u16;
@@ -584,6 +591,7 @@ typedef union {
   EFI_HII_TIME    time;
   EFI_HII_DATE    date;
   EFI_STRING_ID   string;
+  EFI_HII_REF     ref;
 } EFI_IFR_TYPE_VALUE;
 
 #define EFI_IFR_FORM_OP                0x01
@@ -681,6 +689,8 @@ typedef union {
 #define EFI_IFR_CATENATE_OP            0x5E
 #define EFI_IFR_GUID_OP                0x5F
 #define EFI_IFR_SECURITY_OP            0x60
+#define EFI_IFR_MODAL_TAG_OP           0x61
+#define EFI_IFR_REFRESH_ID_OP          0x62
 
 
 typedef struct _EFI_IFR_OP_HEADER {
@@ -739,6 +749,8 @@ typedef struct _EFI_IFR_VARSTORE_EFI {
   EFI_VARSTORE_ID          VarStoreId;
   EFI_GUID                 Guid;
   UINT32                   Attributes;
+  UINT16                   Size;
+  UINT8                    Name[1];
 } EFI_IFR_VARSTORE_EFI;
 
 typedef struct _EFI_IFR_VARSTORE_NAME_VALUE {
@@ -770,6 +782,10 @@ typedef struct _EFI_IFR_IMAGE {
   EFI_IFR_OP_HEADER        Header;
   EFI_IMAGE_ID             Id;
 } EFI_IFR_IMAGE;
+
+typedef struct _EFI_IFR_MODAL {
+  EFI_IFR_OP_HEADER        Header;
+} EFI_IFR_MODAL;
 
 typedef struct _EFI_IFR_LOCKED {
   EFI_IFR_OP_HEADER        Header;
@@ -843,6 +859,11 @@ typedef struct _EFI_IFR_REF4 {
   EFI_GUID                 FormSetId;
   EFI_STRING_ID            DevicePath;
 } EFI_IFR_REF4;
+
+typedef struct _EFI_IFR_REF5 {
+  EFI_IFR_OP_HEADER        Header;
+  EFI_IFR_QUESTION_HEADER  Question;
+} EFI_IFR_REF5;
 
 typedef struct _EFI_IFR_RESET_BUTTON {
   EFI_IFR_OP_HEADER        Header;
@@ -993,6 +1014,11 @@ typedef struct _EFI_IFR_REFRESH {
   UINT8                    RefreshInterval;
 } EFI_IFR_REFRESH;
 
+typedef struct _EFI_IFR_REFRESH_ID {
+  EFI_IFR_OP_HEADER Header;
+  EFI_GUID          RefreshEventGroupId;
+} EFI_IFR_REFRESH_ID;
+
 typedef struct _EFI_IFR_VARSTORE_DEVICE {
   EFI_IFR_OP_HEADER        Header;
   EFI_STRING_ID            DevicePath;
@@ -1018,6 +1044,7 @@ typedef struct _EFI_IFR_ONE_OF_OPTION {
 #define EFI_IFR_TYPE_UNDEFINED         0x09
 #define EFI_IFR_TYPE_ACTION            0x0A
 #define EFI_IFR_TYPE_BUFFER            0x0B
+#define EFI_IFR_TYPE_REF               0x0C
 
 #define EFI_IFR_OPTION_DEFAULT         0x10
 #define EFI_IFR_OPTION_DEFAULT_MFG     0x20

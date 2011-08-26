@@ -96,6 +96,11 @@ struct SBufferNode {
   struct SBufferNode *mNext;
 };
 
+typedef struct {
+  BOOLEAN  CompatibleMode;
+  EFI_GUID *OverrideClassGuid;
+} INPUT_INFO_TO_SYNTAX;
+
 class CFormPkg {
 private:
   UINT32              mBufferSize;
@@ -144,7 +149,8 @@ public:
     );
 };
 
-extern CFormPkg gCFormPkg;
+extern CFormPkg       gCFormPkg;
+extern CVfrStringDB   gCVfrStringDB;
 
 struct SIfrRecord {
   UINT32     mLineNo;
@@ -233,6 +239,15 @@ public:
       return FALSE;
     }
   }
+
+  inline bool ShrinkObjBin (IN UINT8 Size) {
+    if ((mDelayEmit == TRUE) && (mObjBinLen > Size)) {
+      mObjBinLen -= Size;
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
 };
 
 /*
@@ -254,7 +269,7 @@ public:
 
   VOID DecLength (UINT8 Size) {
     if (mHeader->Length >= Size) {
-      mHeader -= Size;
+      mHeader->Length -= Size;
     }
   }
 
@@ -755,10 +770,12 @@ private:
   EFI_IFR_VARSTORE_EFI *mVarStoreEfi;
 
 public:
-  CIfrVarStoreEfi () : CIfrObj (EFI_IFR_VARSTORE_EFI_OP, (CHAR8 **)&mVarStoreEfi), 
+  CIfrVarStoreEfi () : CIfrObj (EFI_IFR_VARSTORE_EFI_OP, (CHAR8 **)&mVarStoreEfi, sizeof (EFI_IFR_VARSTORE_EFI), TRUE),
                       CIfrOpHeader (EFI_IFR_VARSTORE_EFI_OP, &mVarStoreEfi->Header) {
     mVarStoreEfi->VarStoreId = EFI_VAROFFSET_INVALID;
+    mVarStoreEfi->Size       = 0;
     memset (&mVarStoreEfi->Guid, 0, sizeof (EFI_GUID));
+    mVarStoreEfi->Name[0]    = '\0';
   }
 
   VOID SetGuid (IN EFI_GUID *Guid) {
@@ -771,6 +788,36 @@ public:
 
   VOID SetAttributes (IN UINT32 Attributes) {
     mVarStoreEfi->Attributes = Attributes;
+  }
+  VOID SetSize (IN UINT16 Size) {
+    mVarStoreEfi->Size = Size;
+  }
+
+  VOID SetName (IN CHAR8 *Name) {
+    UINT8 Len;
+
+    if (Name != NULL) {
+      Len = (UINT8) strlen (Name);
+      if (Len != 0) {
+        if (ExpendObjBin (Len) == TRUE) {
+          IncLength (Len);
+          strcpy ((CHAR8 *)(mVarStoreEfi->Name), Name);
+        }
+      }
+    }
+  }
+
+  VOID SetBinaryLength (IN UINT16 Size) {
+    UINT16 Len;
+
+    Len = sizeof (EFI_IFR_VARSTORE_EFI);
+    if (Size > Len) {
+      ExpendObjBin(Size - Len);
+      IncLength(Size - Len);
+    } else {
+      ShrinkObjBin(Len - Size);
+      DecLength(Len - Size);
+    }
   }
 };
 
@@ -808,6 +855,17 @@ public:
     mImage->Id = ImageId;
   }
 };
+
+class CIfrModal : public CIfrObj, public CIfrOpHeader {
+private:
+  EFI_IFR_MODAL *mModal;
+
+public:
+  CIfrModal () : CIfrObj (EFI_IFR_MODAL_TAG_OP, (CHAR8 **)&mModal),
+                 CIfrOpHeader (EFI_IFR_MODAL_TAG_OP, &mModal->Header) {
+  }
+};
+
 
 class CIfrLocked : public CIfrObj, public CIfrOpHeader {
 private:
@@ -1043,8 +1101,8 @@ private:
   EFI_IFR_REF4 *mRef4;
 
 public:
-  CIfrRef4 () : CIfrObj (EFI_IFR_REF_OP, (CHAR8 **)&mRef4, sizeof(EFI_IFR_REF3)),
-               CIfrOpHeader (EFI_IFR_REF_OP, &mRef4->Header, sizeof (EFI_IFR_REF3)), 
+  CIfrRef4 () : CIfrObj (EFI_IFR_REF_OP, (CHAR8 **)&mRef4, sizeof(EFI_IFR_REF4)),
+               CIfrOpHeader (EFI_IFR_REF_OP, &mRef4->Header, sizeof(EFI_IFR_REF4)), 
                CIfrQuestionHeader (&mRef4->Question) {
     mRef4->FormId     = 0;
     mRef4->QuestionId = EFI_QUESTION_ID_INVALID;
@@ -1066,6 +1124,17 @@ public:
 
   VOID SetDevicePath (IN EFI_STRING_ID DevicePath) {
     mRef4->DevicePath = DevicePath;
+  }
+};
+
+class CIfrRef5 : public CIfrObj, public CIfrOpHeader, public CIfrQuestionHeader {
+private:
+  EFI_IFR_REF5 *mRef5;
+
+public:
+  CIfrRef5 () : CIfrObj (EFI_IFR_REF_OP, (CHAR8 **)&mRef5, sizeof (EFI_IFR_REF5)),
+              CIfrOpHeader (EFI_IFR_REF_OP, &mRef5->Header, sizeof (EFI_IFR_REF5)), 
+              CIfrQuestionHeader (&mRef5->Question) {
   }
 };
 
@@ -1478,6 +1547,21 @@ public:
 
   VOID SetRefreshInterval (IN UINT8 RefreshInterval) {
     mRefresh->RefreshInterval = RefreshInterval;
+  }
+};
+
+class CIfrRefreshId : public CIfrObj, public CIfrOpHeader {
+private:
+  EFI_IFR_REFRESH_ID *mRefreshId;
+
+public:
+  CIfrRefreshId () : CIfrObj (EFI_IFR_REFRESH_ID_OP, (CHAR8 **)&mRefreshId),
+      CIfrOpHeader (EFI_IFR_REFRESH_ID_OP, &mRefreshId->Header) {
+    memset (&mRefreshId->RefreshEventGroupId, 0, sizeof (EFI_GUID));
+  }
+
+  VOID SetRefreshEventGroutId (IN EFI_GUID *RefreshEventGroupId) {
+    memcpy (&mRefreshId->RefreshEventGroupId, RefreshEventGroupId, sizeof (EFI_GUID));
   }
 };
 
