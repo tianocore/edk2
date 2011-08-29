@@ -140,7 +140,12 @@
   MdePkg/Library/SmmPciLibPciRootBridgeIo/SmmPciLibPciRootBridgeIo.inf
   MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
   MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
-  MdePkg/Library/SmmPeriodicSmiLib/SmmPeriodicSmiLib.inf  
+  MdePkg/Library/SmmPeriodicSmiLib/SmmPeriodicSmiLib.inf
+  MdePkg/Library/BaseS3BootScriptLibNull/BaseS3BootScriptLibNull.inf
+  MdePkg/Library/BaseS3IoLib/BaseS3IoLib.inf
+  MdePkg/Library/BaseS3PciLib/BaseS3PciLib.inf
+  MdePkg/Library/BaseS3SmbusLib/BaseS3SmbusLib.inf
+  MdePkg/Library/BaseS3StallLib/BaseS3StallLib.inf
 
 [Components.IPF]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf

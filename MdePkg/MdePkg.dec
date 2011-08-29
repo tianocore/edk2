@@ -191,6 +191,32 @@
   ##
   SynchronizationLib|Include/Library/SynchronizationLib.h
 
+  ##  @libraryclass  Defines library APIs used by modules to save S3 Boot
+  #                  Script Opcodes.  These OpCode will be restored by S3
+  #                  related modules.
+  S3BootScriptLib|Include/Library/S3BootScriptLib.h
+  
+  ##  @libraryclass  I/O and MMIO Library Services that do I/O and also enable
+  #                  the I/O operatation to be replayed during an S3 resume.
+  #                  This library class maps directly on top of the IoLib class.
+  S3IoLib|Include/Library/S3IoLib.h
+
+  ##  @libraryclass  PCI configuration Library Services that do PCI configuration
+  #                  and also enable the PCI operations to be replayed during an
+  #                  S3 resume. This library class maps directly on top of the
+  #                  PciLib class.
+  S3PciLib|Include/Library/S3PciLib.h
+
+  ##  @libraryclass  Smbus Library Services that do SMBus transactions and also
+  #                  enable the operatation to be replayed during an S3 resume.
+  #                  This library class maps directly on top of the SmbusLib class.
+  S3SmbusLib|Include/Library/S3SmbusLib.h
+
+  ##  @libraryclass  Stall Services that do stall and also enable the Stall
+  #                  operatation to be replayed during an S3 resume. This
+  #                  library class maps directly on top of the Timer class.
+  S3StallLib|Include/Library/S3StallLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Abstracts both S/W SMI generation and detection.
   ##
