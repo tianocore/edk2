@@ -328,4 +328,6 @@
   MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxPeiLib.inf
   MdeModulePkg/Library/SmmCorePlatformHookLibNull/SmmCorePlatformHookLibNull.inf
   MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
+  MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
+  MdeModulePkg/Universal/Acpi/SmmS3SaveState/SmmS3SaveState.inf
 

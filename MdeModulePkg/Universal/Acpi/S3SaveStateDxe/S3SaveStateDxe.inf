@@ -1,0 +1,57 @@
+## @file
+# Component description file for ScriptSave module.
+#
+# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials are
+# licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = S3SaveStateDxe
+  FILE_GUID                      = BDCE85BB-FBAA-4f4e-9264-501A2C249581
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeS3SaveState
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  S3SaveState.c
+  InternalS3SaveState.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+  BaseLib
+  S3BootScriptLib
+
+[Protocols]
+  gEfiS3SaveStateProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
+
+
+[Depex]
+  TRUE        
+  
