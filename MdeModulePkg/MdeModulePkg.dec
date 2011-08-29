@@ -716,6 +716,12 @@
   ## Time in second to delay for SATA devices to spin-up for recovery.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSataSpinUpDelayInSecForRecoveryPath|15|UINT16|0x0001005B
 
+  ## The PCD is used to specify memory size with page number for a pre-allocated ACPI NVS memory to hold
+  #  runtime created S3 boot script entries. The default page number is 2. When changing the value of this
+  #  PCD, the platform developer should make sure the memory size is large enough to hold the S3 boot
+  #  script node created in runtime phase.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptRuntimeTableReservePageNumber|0x2|UINT16|0x0001005C
+
 [PcdsPatchableInModule]
   ## Specify  memory size with page number for PEI code when 
   #  the feature of Loading Module at Fixed Address is enabled
@@ -732,4 +738,11 @@
   ## Specify  memory size with page number for SMM code when 
   #  the feature of Loading Module at Fixed Address is enabled
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber|0|UINT32|0x0000002c
+
+[PcdsDynamic, PcdsDynamicEx]
+  ## This dynamic PCD hold an address to point to private data structure used in DxeS3BootScriptLib library
+  #  instance which records the S3 boot script table start address, length, etc. To introduce this PCD is
+  #  only for DxeS3BootScriptLib instance implementation purpose. The platform developer should make sure the
+  #  default value is set to Zero. And the PCD is assumed ONLY to be accessed in DxeS3BootScriptLib Library.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateDataPtr|0x0|UINT64|0x00030000
 
