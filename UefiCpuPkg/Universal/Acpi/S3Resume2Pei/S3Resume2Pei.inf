@@ -1,0 +1,79 @@
+## @file
+# S3 Resume Module:
+# This module works with StandAloneBootScriptExecutor to S3 resume to OS.
+# This module will excute the boot script saved during last boot and after that,
+# control is passed to OS waking up handler.
+#
+# Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials are
+# licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = S3Resume2Pei
+  FILE_GUID                      = 89E549B0-7CFE-449d-9BA3-10D8B2312D71
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeimS3ResumeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  S3Resume.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  PeiServicesTablePointerLib
+  PerformanceLib
+  HobLib
+  PeiServicesLib
+  PeimEntryPoint
+  TimerLib
+  BaseLib
+  DebugLib
+  PcdLib
+  IoLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugAgentLib
+  LocalApicLib
+  ReportStatusCodeLib
+  LockBoxLib
+  PrintLib
+
+[Guids]
+  gEfiBootScriptExecutorVariableGuid            # SOMETIMES_CONSUMED
+  gEfiBootScriptExecutorContextGuid             # SOMETIMES_CONSUMED
+  gPerformanceProtocolGuid                      # ALWAYS_CONSUMED L"PerfDataMemAddr"
+  gEfiAcpiVariableGuid                          # ALWAYS_CONSUMED  Hob: GUID_EXTENSION
+  gEfiAcpiS3ContextGuid                         # ALWAYS_CONSUMED
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid                # PPI ALWAYS_CONSUMED
+  gEfiPeiS3Resume2PpiGuid                        # PPI ALWAYS_PRODUCED
+  gPeiSmmAccessPpiGuid                           # PPI ALWAYS_CONSUMED
+  gPeiPostScriptTablePpiGuid                     # PPI ALWAYS_PRODUCED
+  gEfiEndOfPeiSignalPpiGuid                      # PPI ALWAYS_PRODUCED
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport
+
+[Depex]
+  gEfiPeiReadOnlyVariable2PpiGuid
