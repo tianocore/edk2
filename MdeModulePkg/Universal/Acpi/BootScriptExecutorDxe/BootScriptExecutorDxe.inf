@@ -1,0 +1,83 @@
+## @file
+# Boot Script Executor Module
+#
+# This is a standalone Boot Script Executor. Standalone means it does not
+# depends on any PEI or DXE service.
+#
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials are
+# licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BootScriptExecutorDxe
+  FILE_GUID                      = FA20568B-548B-4b2b-81EF-1BA08D4A3CEC
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = BootScriptExecutorEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  ScriptExecute.h
+  ScriptExecute.c
+
+[Sources.X64]
+  X64/SetIdtEntry.c  
+  X64/S3Asm.asm
+  X64/S3Asm.S
+  
+[Sources.Ia32]
+  IA32/SetIdtEntry.c   
+  IA32/S3Asm.asm
+  IA32/S3Asm.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  TimerLib
+  PcdLib
+  BaseMemoryLib
+  SmbusLib
+  UefiDriverEntryPoint
+  BaseLib
+  PciLib
+  IoLib
+  S3BootScriptLib
+  PeCoffLib
+  DxeServicesLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  CacheMaintenanceLib
+  PerformanceLib
+  UefiLib
+  DebugAgentLib
+  LockBoxLib
+
+[Guids]
+  gEfiBootScriptExecutorVariableGuid
+  gEfiBootScriptExecutorContextGuid
+  gPerformanceProtocolGuid
+  gEfiEventExitBootServicesGuid
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+
+[Depex]
+  gEfiLockBoxProtocolGuid
+
