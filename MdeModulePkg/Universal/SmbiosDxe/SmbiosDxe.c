@@ -103,6 +103,7 @@ SMBIOS_TABLE_ENTRY_POINT EntryPointStructureData = {
 };
 
 
+
 /**
 
   Get the full size of SMBIOS structure including optional strings that follow the formatted structure.
@@ -889,7 +890,11 @@ SmbiosCreateTable (
   //
   SmbiosProtocol = &mPrivateData.Smbios;
 
-  PreAllocatedPages = EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength);
+  if (EntryPointStructure->TableAddress == 0) {
+    PreAllocatedPages = 0;
+  } else {
+    PreAllocatedPages = EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength);
+  }
 
   //
   // Make some statistics about all the structures
@@ -957,9 +962,12 @@ SmbiosCreateTable (
                     &PhysicalAddress
                     );
     if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "SmbiosCreateTable() could not allocate SMBIOS table < 4GB\n"));
+      EntryPointStructure->TableAddress = 0;
       return EFI_OUT_OF_RESOURCES;
+    } else {
+      EntryPointStructure->TableAddress = (UINT32) PhysicalAddress;
     }
-    EntryPointStructure->TableAddress = (UINT32) PhysicalAddress;
   }
   
   //
@@ -1061,7 +1069,16 @@ SmbiosDriverEntryPoint (
                   &PhysicalAddress
                   );
   if (EFI_ERROR (Status)) {
-    return EFI_OUT_OF_RESOURCES;
+    DEBUG ((EFI_D_ERROR, "SmbiosDriverEntryPoint() could not allocate EntryPointStructure < 4GB\n"));
+    Status = gBS->AllocatePages (
+                    AllocateAnyPages,
+                    EfiReservedMemoryType,
+                    EFI_SIZE_TO_PAGES (sizeof (SMBIOS_TABLE_ENTRY_POINT)),
+                    &PhysicalAddress
+                    );
+   if (EFI_ERROR (Status)) {   
+      return EFI_OUT_OF_RESOURCES;
+    }
   }
 
   EntryPointStructure = (SMBIOS_TABLE_ENTRY_POINT *) (UINTN) PhysicalAddress;
@@ -1086,14 +1103,14 @@ SmbiosDriverEntryPoint (
                   &PhysicalAddress
                   );
   if (EFI_ERROR (Status)) {
-    FreePages ((VOID*) EntryPointStructure, EFI_SIZE_TO_PAGES (sizeof (SMBIOS_TABLE_ENTRY_POINT)));
-    EntryPointStructure = NULL;
-    return EFI_OUT_OF_RESOURCES;
+    DEBUG ((EFI_D_ERROR, "SmbiosDriverEntryPoint() could not allocate SMBIOS table < 4GB\n"));
+    EntryPointStructure->TableAddress = 0;
+    EntryPointStructure->TableLength  = 0;
+  } else {
+    EntryPointStructure->TableAddress = (UINT32) PhysicalAddress;
+    EntryPointStructure->TableLength  = EFI_PAGES_TO_SIZE (1);
   }
-
-  EntryPointStructure->TableAddress = (UINT32) PhysicalAddress;
-  EntryPointStructure->TableLength  = EFI_PAGES_TO_SIZE (1);
-
+  
   //
   // Make a new handle and install the protocol
   //
