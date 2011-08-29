@@ -1,0 +1,70 @@
+## @file
+# S3 boot script Library which could be used for multi phases. 
+#
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials are
+# licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeS3BootScriptLib
+  FILE_GUID                      = 57F9967B-26CD-4262-837A-55B8AA158254
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = S3BootScriptLib|SEC PEIM PEI_CORE DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+
+
+  CONSTRUCTOR                    = S3BootScriptLibInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  BootScriptSave.c
+  BootScriptExecute.c
+  InternalBootScriptLib.h
+  BootScriptInternalFormat.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  TimerLib
+  DebugLib
+  PcdLib
+  UefiLib
+  SmbusLib
+  PciLib
+  IoLib 
+  LockBoxLib
+  
+[Guids]
+  gEfiEventExitBootServicesGuid                  # ALWAYS_CONSUMED
+
+[Protocols]
+  gEfiSmmBase2ProtocolGuid                       # ALWAYS_CONSUMED
+  gEfiDxeSmmReadyToLockProtocolGuid              # ALWAYS_CONSUMED
+  gEfiSmmReadyToLockProtocolGuid                 # ALWAYS_CONSUMED
+  
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateDataPtr                   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptRuntimeTableReservePageNumber         ## CONSUMES
+
+[Depex]
+  gPcdProtocolGuid 
