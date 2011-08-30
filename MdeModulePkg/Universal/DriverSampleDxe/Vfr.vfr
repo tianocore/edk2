@@ -74,20 +74,12 @@ formset
     guid  = FORMSET_GUID;                   // GUID of this buffer storage
 
   //
-  // Define another Buffer Storage
-  //
-  varstore MY_DATA2,
-    name  = MyIfrNVData2,
-    guid  = FORMSET_GUID;
-
-  //
   // Define a EFI variable Storage (EFI_IFR_VARSTORE_EFI)
   //
-  efivarstore MyEfiVar,                           // Define referenced name in vfr
-    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attribures
-    name      = STRING_TOKEN(STR_VAR_NAME),       // EFI variable name
-    varsize   = 1,                                // Size of the EFI variable
-    guid      = FORMSET_GUID;                     // EFI variable GUID
+  efivarstore MY_EFI_VARSTORE_DATA,
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attribures  
+    name  = MyEfiVar,
+    guid  = FORMSET_GUID;
 
   //
   // Define a Name/Value Storage (EFI_IFR_VARSTORE_NAME_VALUE)
@@ -330,21 +322,22 @@ formset
             inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
               ideqval MyIfrNVData.HowOldAreYouInYearsManual == 99
               OR
-              ideqid  MyIfrNVData.HowOldAreYouInYearsManual == MyEfiVar
+              ideqid  MyIfrNVData.HowOldAreYouInYearsManual == MyEfiVar.Field8
               OR
               ideqvallist MyIfrNVData.HowOldAreYouInYearsManual == 1 3 5 7
             endif
 
     endnumeric;
 
-    numeric varid   = MyEfiVar,                           // Reference of EFI variable storage
+    numeric varid   = MyEfiVar.Field8,                    // Reference of EFI variable storage
             questionid  = 0x1111,
             prompt  = STRING_TOKEN(STR_TALL_HEX_PROMPT),
             help    = STRING_TOKEN(STR_NUMERIC_HELP1),
             flags   = DISPLAY_UINT_HEX | INTERACTIVE,     // Display in HEX format (if not specified, default is in decimal format)
             minimum = 0,
             maximum = 250,
-            default = 175,
+            default = 18, defaultstore = MyStandardDefault,     // This is standard default value
+            default = 19, defaultstore = MyManufactureDefault,  // This is manufacture default value
 
     endnumeric;
 
@@ -382,6 +375,13 @@ formset
               minsize  = 2,
               maxsize  = 0x14,
     endstring;
+
+    oneof varid   = MyEfiVar.Field16,
+      prompt      = STRING_TOKEN(STR_ONE_OF_PROMPT),
+      help        = STRING_TOKEN(STR_NUMERIC_NUM_HELP),
+      option text = STRING_TOKEN(STR_BOOT_ORDER1), value = 0x0, flags = 0;
+      option text = STRING_TOKEN(STR_BOOT_ORDER2), value = 0x1, flags = DEFAULT;
+    endoneof;
 
     label LABEL_1_VALUE;
     label LABEL_2_VALUE;
@@ -483,9 +483,17 @@ formset
       prompt = STRING_TOKEN(STR_GOTO_FORM4), //FourthSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
       help   = STRING_TOKEN(STR_GOTO_HELP);
 
+    goto 5,
+      prompt = STRING_TOKEN(STR_GOTO_FORM5), //FifthSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
+      help   = STRING_TOKEN(STR_GOTO_FORM5_HELP);
+      
+    goto 6,
+      prompt = STRING_TOKEN(STR_GOTO_FORM6), //SixthSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
+      help   = STRING_TOKEN(STR_GOTO_HELP);
+
     guidop 
       guid = FORMSET_GUID,
-      datatype = MY_DATA2,
+      datatype = MY_EFI_VARSTORE_DATA,
         data.Field8  = 0x21, 
         data.Field16 = 0x2121,
         data.OrderedList[0] = 0x21,        
@@ -621,12 +629,29 @@ formset
         prompt = STRING_TOKEN(STR_GOTO_FORM1), //MainSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
         help   = STRING_TOKEN(STR_GOTO_HELP);
 
+    goto 
+      varid   = MyIfrNVData.RefData,
+      prompt  = STRING_TOKEN(STR_GOTO_DYNAMIC3),
+      help    = STRING_TOKEN(STR_GOTO_DYNAMIC3_HELP),
+      flags   = INTERACTIVE,
+      key     = 0x1248;
+      //
+      // Set the defult value, format is QuestionId; FormId; FormsetGuid; Device Path String Token
+      //
+      default = 0;0;ZERO_GUID;STRING_TOKEN(STR_NULL_STRING),  
+
+    goto 
+      prompt  = STRING_TOKEN(STR_GOTO_DYNAMIC4),
+      help    = STRING_TOKEN(STR_GOTO_DYNAMIC4_HELP),
+      flags   = INTERACTIVE,
+      key     = 0x1249;
+      
     endform;
   endif;
 
   form formid = 3, title = STRING_TOKEN(STR_FORM3_TITLE);  // note formid is a variable (for readability) (UINT16) - also added Form to the line to signify the Op-Code
 
-    suppressif  ideqval MyEfiVar == 111;
+    suppressif  ideqval MyEfiVar.Field8 == 111;
       text
         help = STRING_TOKEN(STR_TEXT_HELP),
         text = STRING_TOKEN(STR_TEXT_TEXT_1);
@@ -709,6 +734,51 @@ formset
     goto 1,
       prompt = STRING_TOKEN(STR_GOTO_FORM1), //MainSetupPage
       help   = STRING_TOKEN(STR_GOTO_HELP);
+
+  endform;
+
+  form formid = 5,            // Modal form
+       title = STRING_TOKEN(STR_MODAL_FORM_TITLE);
+    //
+    //  This form is a modal form.
+    //
+    modal;
+    text
+      help   = STRING_TOKEN(STR_EXIT_TEXT),
+      text   = STRING_TOKEN(STR_EXIT_TEXT),
+        text   = STRING_TOKEN(STR_EXIT_TEXT),
+      flags  = INTERACTIVE,   // VfrCompiler will generate opcode EFI_IFR_ACTION for Text marked as INTERACTIVE
+      key    = 0x1245;
+
+    text
+      help   = STRING_TOKEN(STR_SAVE_TEXT),
+      text   = STRING_TOKEN(STR_SAVE_TEXT),
+        text   = STRING_TOKEN(STR_SAVE_TEXT),
+      flags  = INTERACTIVE,   // VfrCompiler will generate opcode EFI_IFR_ACTION for Text marked as INTERACTIVE
+      key    = 0x1246;
+  endform;
+
+  form formid = 6,            // Form to show the refresh guid group op-code
+       title = STRING_TOKEN(STR_FORM6_TITLE); 
+
+    text
+      help   = STRING_TOKEN(STR_TEXT_REFRESH_GUID),
+      text   = STRING_TOKEN(STR_TEXT_REFRESH_GUID);
+
+    numeric varid   = MyIfrNVData.RefreshGuidCount,
+            prompt  = STRING_TOKEN(STR_TEXT_REFRESH_GUID_COUNT),
+            help    = STRING_TOKEN(STR_NUMERIC_HELP0),
+            flags   = INTERACTIVE,
+            key     = 0x1247,
+            minimum = 0,
+            maximum = 0xff,
+            step    = 0,
+            default = 0,
+            refreshguid = EFI_IFR_REFRESH_ID_OP_GUID,
+    endnumeric;
+
+    label LABEL_UPDATE3;
+    label LABEL_END;
 
   endform;
 

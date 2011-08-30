@@ -23,6 +23,7 @@ EFI_GUID   mInventoryGuid = INVENTORY_GUID;
 EFI_GUID   MyEventGroupGuid = EFI_IFR_REFRESH_ID_OP_GUID;
 
 CHAR16     VariableName[] = L"MyIfrNVData";
+CHAR16     MyEfiVar[] = L"MyEfiVar";
 EFI_HANDLE                      DriverHandle[2] = {NULL, NULL};
 DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData = NULL;
 EFI_EVENT                       mEvent;
@@ -868,6 +869,13 @@ ExtractConfig (
       return EFI_NOT_FOUND;
     }
     //
+    // Check whether request for EFI Varstore. EFI varstore get data
+    // through hii database, not support in this path.
+    //
+    if (HiiIsConfigHdrMatch(Request, &mFormSetGuid, MyEfiVar)) {
+      return EFI_UNSUPPORTED;
+    }
+    //
     // Set Request to the unified request string.
     //
     ConfigRequest = Request;
@@ -1071,6 +1079,14 @@ RouteConfig (
   }
 
   //
+  // Check whether request for EFI Varstore. EFI varstore get data
+  // through hii database, not support in this path.
+  //
+  if (HiiIsConfigHdrMatch(Configuration, &mFormSetGuid, MyEfiVar)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
   // Get Buffer Storage data from EFI variable
   //
   BufferSize = sizeof (DRIVER_SAMPLE_CONFIGURATION);
@@ -1269,7 +1285,6 @@ DriverCallback (
 {
   DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData;
   EFI_STATUS                      Status;
-  UINT8                           MyVar;
   VOID                            *StartOpCodeHandle;
   VOID                            *OptionsOpCodeHandle;
   EFI_IFR_GUID_LABEL              *StartLabel;
@@ -1277,7 +1292,7 @@ DriverCallback (
   EFI_IFR_GUID_LABEL              *EndLabel;
   EFI_INPUT_KEY                   Key;
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
-  UINTN                           MyVarSize;
+  MY_EFI_VARSTORE_DATA            *EfiData;
   EFI_FORM_ID                     FormId;
   
   if (((Value == NULL) && (Action != EFI_BROWSER_ACTION_FORM_OPEN) && (Action != EFI_BROWSER_ACTION_FORM_CLOSE))||
@@ -1370,21 +1385,14 @@ DriverCallback (
     
   case EFI_BROWSER_ACTION_RETRIEVE:
     {
-      if (QuestionId == 0x1111) {
-        //
-        // EfiVarstore question takes sample action (print value as debug information) 
-        // after read/write question.
-        //
-        MyVarSize = 1;
-        Status = gRT->GetVariable(
-                        L"MyVar",
-                        &mFormSetGuid,
-                        NULL,
-                        &MyVarSize,
-                        &MyVar
-                        );
-        ASSERT_EFI_ERROR (Status);
-        DEBUG ((DEBUG_INFO, "EfiVarstore question: Tall value is %d with value width %d\n", MyVar, MyVarSize));
+      if (QuestionId == 0x1248) {
+        {
+          if (Type != EFI_IFR_TYPE_REF) {
+            return EFI_INVALID_PARAMETER;
+          }
+        
+          Value->ref.FormId = 0x3;
+        }
       }
     }
     break;
@@ -1420,6 +1428,15 @@ DriverCallback (
   case EFI_BROWSER_ACTION_CHANGING:
   {
     switch (QuestionId) {
+    case 0x1249:
+      {
+        if (Type != EFI_IFR_TYPE_REF) {
+          return EFI_INVALID_PARAMETER;
+        }
+
+        Value->ref.FormId = 0x1234;
+      }
+    break;
     case 0x1234:
       //
       // Initialize the container for dynamic opcodes
@@ -1612,7 +1629,7 @@ DriverCallback (
         PrivateData->Configuration.DynamicRefresh++;
       } else if (QuestionId == 0x1247 ) {
         StartLabel->Number       = LABEL_UPDATE3;
-        FormId                   = 0x05;
+        FormId                   = 0x06;
         PrivateData->Configuration.RefreshGuidCount++;
       }
 
@@ -1648,18 +1665,21 @@ DriverCallback (
 
       if (QuestionId == 0x5678) {
         //
-        // Change an EFI Variable storage (MyEfiVar) asynchronous, this will cause
-        // the first statement in Form 3 be suppressed
+        // Update uncommitted data of Browser
         //
-        MyVarSize = 1;
-        MyVar = 111;
-        Status = gRT->SetVariable(
-                        L"MyVar",
-                        &mFormSetGuid,
-                        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                        MyVarSize,
-                        &MyVar
-                        );
+        EfiData = AllocateZeroPool (sizeof (MY_EFI_VARSTORE_DATA));
+        ASSERT (EfiData != NULL);
+        if (HiiGetBrowserData (&mFormSetGuid, MyEfiVar, sizeof (MY_EFI_VARSTORE_DATA), (UINT8 *) EfiData)) {
+          EfiData->Field8 = 111;
+          HiiSetBrowserData (
+            &mFormSetGuid,
+            MyEfiVar,
+            sizeof (MY_EFI_VARSTORE_DATA),
+            (UINT8 *) EfiData,
+            NULL
+            );
+        }
+        FreePool (EfiData);
       }
       break;
 
@@ -1741,21 +1761,6 @@ DriverCallback (
 
       break;
 
-    case 0x1111:
-      //
-      // EfiVarstore question takes sample action (print value as debug information) 
-      // after read/write question.
-      //
-      MyVarSize = 1;
-      Status = gRT->GetVariable(
-                      L"MyVar",
-                      &mFormSetGuid,
-                      NULL,
-                      &MyVarSize,
-                      &MyVar
-                      );
-      ASSERT_EFI_ERROR (Status);
-      DEBUG ((DEBUG_INFO, "EfiVarstore question: Tall value is %d with value width %d\n", MyVar, MyVarSize));
     default:
       break;
     }
@@ -1798,6 +1803,7 @@ DriverSampleInit (
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
   BOOLEAN                         ActionFlag;
   EFI_STRING                      ConfigRequestHdr;
+  MY_EFI_VARSTORE_DATA            *VarStoreConfig;
 
   //
   // Initialize the local variables.
@@ -1978,7 +1984,44 @@ DriverSampleInit (
     ActionFlag = HiiValidateSettings (ConfigRequestHdr);
     ASSERT (ActionFlag);
   }
+  FreePool (ConfigRequestHdr);
 
+  //
+  // Initialize efi varstore configuration data
+  //
+  VarStoreConfig = &PrivateData->VarStoreConfig;
+  ZeroMem (VarStoreConfig, sizeof (MY_EFI_VARSTORE_DATA));
+
+  ConfigRequestHdr = HiiConstructConfigHdr (&mFormSetGuid, MyEfiVar, DriverHandle[0]);
+  ASSERT (ConfigRequestHdr != NULL);
+
+  BufferSize = sizeof (MY_EFI_VARSTORE_DATA);
+  Status = gRT->GetVariable (MyEfiVar, &mFormSetGuid, NULL, &BufferSize, VarStoreConfig);
+  if (EFI_ERROR (Status)) {
+    //
+    // Store zero data to EFI variable Storage.
+    //
+    Status = gRT->SetVariable(
+                    MyEfiVar,
+                    &mFormSetGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    sizeof (MY_EFI_VARSTORE_DATA),
+                    VarStoreConfig
+                    );
+    ASSERT (Status == EFI_SUCCESS);
+    //
+    // EFI variable for NV config doesn't exit, we should build this variable
+    // based on default values stored in IFR
+    //
+    ActionFlag = HiiSetToDefaults (ConfigRequestHdr, EFI_HII_DEFAULT_CLASS_STANDARD);
+    ASSERT (ActionFlag);
+  } else {
+    //
+    // EFI variable does exist and Validate Current Setting
+    //
+    ActionFlag = HiiValidateSettings (ConfigRequestHdr);
+    ASSERT (ActionFlag);
+  }
   FreePool (ConfigRequestHdr);
 
   Status = gBS->CreateEventEx (

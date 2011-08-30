@@ -81,6 +81,7 @@ typedef struct {
   EFI_HANDLE                       DriverHandle[2];
   EFI_HII_HANDLE                   HiiHandle[2];
   DRIVER_SAMPLE_CONFIGURATION      Configuration;
+  MY_EFI_VARSTORE_DATA             VarStoreConfig;
   UINT8                            PasswordState;
 
   //

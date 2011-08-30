@@ -46,6 +46,11 @@ Revision History:
     0xF5E655D9, 0x02A6, 0x46f2, {0x9E, 0x76, 0xB8, 0xBE, 0x8E, 0x60, 0xAB, 0x22} \
   }
 
+#define ZERO_GUID \
+  { \
+    0x0, 0x0, 0x0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} \
+  } 
+
 #define CONFIGURATION_VARSTORE_ID    0x1234
 
 #pragma pack(1)
@@ -72,6 +77,7 @@ typedef struct {
   UINT8   DynamicOneof;
   UINT8   DynamicOrderedList[5];
   UINT8   Reserved;
+  EFI_HII_REF RefData;
   UINT8   NameValueVar0;
   UINT16  NameValueVar1;
   UINT16  NameValueVar2[20];
@@ -92,7 +98,7 @@ typedef struct {
   UINT8         Field8;
   UINT16        Field16;
   UINT8         OrderedList[3];
-} MY_DATA2;
+} MY_EFI_VARSTORE_DATA;
 
 //
 // Labels definition
