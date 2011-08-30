@@ -4,7 +4,7 @@
   This driver is the counterpart of the SMM Base On SMM Base2 Thunk driver. It
   provides helping services in SMM to the SMM Base On SMM Base2 Thunk driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -144,17 +144,13 @@ ReadCpuSaveState (
     SaveState = &mFrameworkSmst->CpuSaveState[CpuIndex].Ia32SaveState;
   }
 
-  if (State->x86.SMMRevId < EFI_SMM_MIN_REV_ID_x64) {
-    SaveState->SMBASE = State->x86.SMBASE;
-    SaveState->SMMRevId = State->x86.SMMRevId;
-    SaveState->IORestart = State->x86.IORestart;
-    SaveState->AutoHALTRestart = State->x86.AutoHALTRestart;
-  } else {
-    SaveState->SMBASE = State->x64.SMBASE;
-    SaveState->SMMRevId = State->x64.SMMRevId;
-    SaveState->IORestart = State->x64.IORestart;
-    SaveState->AutoHALTRestart = State->x64.AutoHALTRestart;
-  }
+  //
+  // Note that SMBASE/SMMRevId/IORestart/AutoHALTRestart are in same location in IA32 and X64 CPU Save State Map.
+  //
+  SaveState->SMBASE = State->x86.SMBASE;
+  SaveState->SMMRevId = State->x86.SMMRevId;
+  SaveState->IORestart = State->x86.IORestart;
+  SaveState->AutoHALTRestart = State->x86.AutoHALTRestart;
 
   for (Index = 0; Index < sizeof (mCpuSaveStateConvTable) / sizeof (CPU_SAVE_STATE_CONVERSION); Index++) {
     ///
@@ -188,15 +184,26 @@ WriteCpuSaveState (
   IN EFI_SMM_CPU_SAVE_STATE  *ToWrite
   )
 {
-  EFI_STATUS Status;
-  UINTN      Index;
+  EFI_STATUS             Status;
+  UINTN                  Index;
+  EFI_SMM_CPU_STATE      *State;
   EFI_SMI_CPU_SAVE_STATE *SaveState;
+
+  State = (EFI_SMM_CPU_STATE *)gSmst->CpuSaveState[CpuIndex];
 
   if (ToWrite != NULL) {
     SaveState = &ToWrite->Ia32SaveState;
   } else {
     SaveState = &mFrameworkSmst->CpuSaveState[CpuIndex].Ia32SaveState;
   }
+
+  //
+  // SMMRevId is read-only.
+  // Note that SMBASE/IORestart/AutoHALTRestart are in same location in IA32 and X64 CPU Save State Map.
+  //
+  State->x86.SMBASE = SaveState->SMBASE;
+  State->x86.IORestart = SaveState->IORestart;
+  State->x86.AutoHALTRestart = SaveState->AutoHALTRestart;
   
   for (Index = 0; Index < sizeof (mCpuSaveStateConvTable) / sizeof (CPU_SAVE_STATE_CONVERSION); Index++) {
     Status = mSmmCpu->WriteSaveState (
