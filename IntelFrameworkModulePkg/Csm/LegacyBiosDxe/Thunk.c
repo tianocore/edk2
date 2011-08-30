@@ -1,7 +1,7 @@
 /** @file
   Call into 16-bit BIOS code, Use AsmThunk16 function of BaseLib.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -17,6 +17,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "LegacyBiosInterface.h"
 
 THUNK_CONTEXT      mThunkContext;
+
+/**
+  Sets the counter value for Timer #0 in a legacy 8254 timer.
+
+  @param  Count - The 16-bit counter value to program into Timer #0 of the legacy 8254 timer.
+
+**/
+VOID
+SetPitCount (
+  IN UINT16  Count
+  )
+{
+  IoWrite8 (TIMER_CONTROL_PORT, TIMER0_CONTROL_WORD);
+  IoWrite8 (TIMER0_COUNT_PORT, (UINT8) (Count & 0xFF));
+  IoWrite8 (TIMER0_COUNT_PORT, (UINT8) ((Count>>8) & 0xFF));
+}
 
 /**
   Thunk to 16-bit real mode and execute a software interrupt with a vector
@@ -104,6 +120,23 @@ LegacyBiosFarCall86 (
 }
 
 /**
+  Provide NULL interrupt handler which is used to check 
+  if there is more than one HW interrupt registers with the CPU AP.
+
+  @param  InterruptType - The type of interrupt that occured
+  @param  SystemContext - A pointer to the system context when the interrupt occured
+
+**/
+VOID
+EFIAPI
+LegacyBiosNullInterruptHandler (
+  IN EFI_EXCEPTION_TYPE   InterruptType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext
+  )
+{
+}
+
+/**
   Thunk to 16-bit real mode and call Segment:Offset. Regs will contain the
   16-bit register context on entry and exit. Arguments can be passed on
   the Stack argument
@@ -138,6 +171,7 @@ InternalLegacyBiosFarCall (
   EFI_TPL               OriginalTpl;
   IA32_REGISTER_SET     ThunkRegSet;
   BOOLEAN               InterruptState;
+  UINT64                TimerPeriod;
 
   Private = LEGACY_BIOS_INSTANCE_FROM_THIS (This);
 
@@ -165,7 +199,17 @@ InternalLegacyBiosFarCall (
   Stack16 = (UINT16 *)((UINT8 *) mThunkContext.RealModeBuffer + mThunkContext.RealModeBufferSize - sizeof (UINT16));
 
   //
-  // Save and disable interrutp of debug timer
+  // Save current rate of DXE Timer
+  //
+  Private->Timer->GetTimerPeriod (Private->Timer, &TimerPeriod);
+
+  //
+  // Disable DXE Timer while executing in real mode
+  //
+  Private->Timer->SetTimerPeriod (Private->Timer, 0);
+ 
+  //
+  // Save and disable interrupt of debug timer
   //
   InterruptState = SaveAndSetDebugTimerInterrupt (FALSE);
 
@@ -174,6 +218,40 @@ InternalLegacyBiosFarCall (
   //
   OriginalTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
+  //
+  // Check to see if there is more than one HW interrupt registers with the CPU AP.
+  // If there is, then ASSERT() since that is not compatible with the CSM because 
+  // interupts other than the Timer interrupt that was disabled above can not be 
+  // handled properly from real mode.
+  //
+  DEBUG_CODE (
+    UINTN  Vector;
+    UINTN  Count;
+    
+    for (Vector = 0x20, Count = 0; Vector < 0x100; Vector++) {
+      Status = Private->Cpu->RegisterInterruptHandler (Private->Cpu, Vector, LegacyBiosNullInterruptHandler);
+      if (Status == EFI_ALREADY_STARTED) {
+        Count++;
+      }
+      if (Status == EFI_SUCCESS) {
+        Private->Cpu->RegisterInterruptHandler (Private->Cpu, Vector, NULL);
+      }
+    }
+    if (Count >= 2) {
+      DEBUG ((EFI_D_ERROR, "ERROR: More than one HW interrupt active with CSM enabled\n"));
+    }
+    ASSERT (Count < 2);
+  );
+
+  //
+  // If the Timer AP has enabled the 8254 timer IRQ and the current 8254 timer 
+  // period is less than the CSM required rate of 54.9254, then force the 8254 
+  // PIT counter to 0, which is the CSM required rate of 54.9254 ms
+  //
+  if (Private->TimerUses8254 && TimerPeriod < 549254) {
+    SetPitCount (0);
+  }
+  
   if (Stack != NULL && StackSize != 0) {
     //
     // Copy Stack to low memory stack
@@ -235,7 +313,12 @@ InternalLegacyBiosFarCall (
   gBS->RestoreTPL (OriginalTpl);
 
   //
-  // Restore interrutp of debug timer
+  // Enable and restore rate of DXE Timer
+  //
+  Private->Timer->SetTimerPeriod (Private->Timer, TimerPeriod);
+  
+  //
+  // Restore interrupt of debug timer
   //
   SaveAndSetDebugTimerInterrupt (InterruptState);
 
@@ -270,7 +353,9 @@ LegacyBiosInitializeThunk (
   IN  LEGACY_BIOS_INSTANCE    *Private
   )
 {
+  EFI_STATUS              Status;
   EFI_PHYSICAL_ADDRESS    MemoryAddress;
+  UINT8                   TimerVector;
 
   MemoryAddress   = (EFI_PHYSICAL_ADDRESS) (UINTN) Private->IntThunk;
 
@@ -280,5 +365,48 @@ LegacyBiosInitializeThunk (
 
   AsmPrepareThunk16 (&mThunkContext);
 
+  //
+  // Get the interrupt vector number corresponding to IRQ0 from the 8259 driver
+  //
+  TimerVector = 0;
+  Status = Private->Legacy8259->GetVector (Private->Legacy8259, Efi8259Irq0, &TimerVector);
+  ASSERT_EFI_ERROR (Status);
+  
+  //
+  // Check to see if the Timer AP has hooked the IRQ0 from the 8254 PIT
+  //  
+  Status = Private->Cpu->RegisterInterruptHandler (
+                           Private->Cpu, 
+                           TimerVector, 
+                           LegacyBiosNullInterruptHandler
+                           );
+  if (Status == EFI_SUCCESS) {
+    //
+    // If the Timer AP has not enabled the 8254 timer IRQ, then force the 8254 PIT 
+    // counter to 0, which is the CSM required rate of 54.9254 ms
+    //
+    Private->Cpu->RegisterInterruptHandler (
+                    Private->Cpu, 
+                    TimerVector, 
+                    NULL
+                    );
+    SetPitCount (0);
+    
+    //
+    // Save status that the Timer AP is not using the 8254 PIT
+    //
+    Private->TimerUses8254 = FALSE;
+  } else if (Status == EFI_ALREADY_STARTED) {
+    //
+    // Save status that the Timer AP is using the 8254 PIT
+    //
+    Private->TimerUses8254 = TRUE;
+  } else {
+    //
+    // Unexpected status from CPU AP RegisterInterruptHandler()
+    //
+    ASSERT (FALSE);
+  }
+  
   return EFI_SUCCESS;
 }

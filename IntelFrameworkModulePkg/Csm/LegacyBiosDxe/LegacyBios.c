@@ -736,6 +736,9 @@ LegacyBiosInstall (
   Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **) &Private->Cpu);
   ASSERT_EFI_ERROR (Status);
 
+  Status = gBS->LocateProtocol (&gEfiTimerArchProtocolGuid, NULL, (VOID **) &Private->Timer);
+  ASSERT_EFI_ERROR (Status);
+
   Status = gBS->LocateProtocol (&gEfiLegacyRegion2ProtocolGuid, NULL, (VOID **) &Private->LegacyRegion);
   ASSERT_EFI_ERROR (Status);
 
