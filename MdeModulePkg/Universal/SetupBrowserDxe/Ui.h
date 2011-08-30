@@ -426,7 +426,7 @@ CreateMultiStringPopUp (
 
   @param  MenuOption        Pointer to the current input menu.
   @param  Prompt            The prompt string shown on popup window.
-  @param  StringPtr         Destination for use input string.
+  @param  StringPtr         Old user input and destination for use input string.
 
   @retval EFI_SUCCESS       If string input is read successfully
   @retval EFI_DEVICE_ERROR  If operation fails
@@ -434,9 +434,9 @@ CreateMultiStringPopUp (
 **/
 EFI_STATUS
 ReadString (
-  IN  UI_MENU_OPTION              *MenuOption,
-  IN  CHAR16                      *Prompt,
-  OUT CHAR16                      *StringPtr
+  IN     UI_MENU_OPTION              *MenuOption,
+  IN     CHAR16                      *Prompt,
+  IN OUT CHAR16                      *StringPtr
   );
 
 /**

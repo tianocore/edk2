@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param  MenuOption        Pointer to the current input menu.
   @param  Prompt            The prompt string shown on popup window.
-  @param  StringPtr         Destination for use input string.
+  @param  StringPtr         Old user input and destination for use input string.
 
   @retval EFI_SUCCESS       If string input is read successfully
   @retval EFI_DEVICE_ERROR  If operation fails
@@ -28,9 +28,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 EFI_STATUS
 ReadString (
-  IN  UI_MENU_OPTION              *MenuOption,
-  IN  CHAR16                      *Prompt,
-  OUT CHAR16                      *StringPtr
+  IN     UI_MENU_OPTION              *MenuOption,
+  IN     CHAR16                      *Prompt,
+  IN OUT CHAR16                      *StringPtr
   )
 {
   EFI_STATUS              Status;
@@ -42,11 +42,13 @@ ReadString (
   CHAR16                  *TempString;
   CHAR16                  *BufferedString;
   UINTN                   Index;
+  UINTN                   Index2;
   UINTN                   Count;
   UINTN                   Start;
   UINTN                   Top;
   UINTN                   DimensionsWidth;
   UINTN                   DimensionsHeight;
+  UINTN                   CurrentCursor;
   BOOLEAN                 CursorVisible;
   UINTN                   Minimum;
   UINTN                   Maximum;
@@ -98,6 +100,40 @@ ReadString (
   CursorVisible = gST->ConOut->Mode->CursorVisible;
   gST->ConOut->EnableCursor (gST->ConOut, TRUE);
 
+  CurrentCursor = GetStringWidth (StringPtr) / 2 - 1;
+  if (CurrentCursor != 0) {
+    //
+    // Show the string which has beed saved before.
+    //
+    SetUnicodeMem (BufferedString, ScreenSize - 1, L' ');
+    PrintStringAt (Start + 1, Top + 3, BufferedString);
+
+    if ((GetStringWidth (StringPtr) / 2) > (DimensionsWidth - 2)) {
+      Index = (GetStringWidth (StringPtr) / 2) - DimensionsWidth + 2;
+    } else {
+      Index = 0;
+    }
+
+    if (IsPassword) {
+      gST->ConOut->SetCursorPosition (gST->ConOut, Start + 1, Top + 3);
+    }
+
+    for (Count = 0; Index + 1 < GetStringWidth (StringPtr) / 2; Index++, Count++) {
+      BufferedString[Count] = StringPtr[Index];
+
+      if (IsPassword) {
+        PrintChar (L'*');
+      }
+    }
+
+    if (!IsPassword) {
+      PrintStringAt (Start + 1, Top + 3, BufferedString);
+    }
+    
+    gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
+    gST->ConOut->SetCursorPosition (gST->ConOut, Start + GetStringWidth (StringPtr) / 2, Top + 3);
+  }
+  
   do {
     Status = WaitForKeyStroke (&Key);
     ASSERT_EFI_ERROR (Status);
@@ -107,9 +143,15 @@ ReadString (
     case CHAR_NULL:
       switch (Key.ScanCode) {
       case SCAN_LEFT:
+        if (CurrentCursor > 0) {
+          CurrentCursor--;
+        }
         break;
 
       case SCAN_RIGHT:
+        if (CurrentCursor < (GetStringWidth (StringPtr) / 2 - 1)) {
+          CurrentCursor++;
+        }
         break;
 
       case SCAN_ESC:
@@ -152,15 +194,22 @@ ReadString (
       break;
 
     case CHAR_BACKSPACE:
-      if (StringPtr[0] != CHAR_NULL) {
-        for (Index = 0; StringPtr[Index] != CHAR_NULL; Index++) {
+      if (StringPtr[0] != CHAR_NULL && CurrentCursor != 0) {
+        for (Index = 0; Index < CurrentCursor - 1; Index++) {
           TempString[Index] = StringPtr[Index];
+        }
+        Count = GetStringWidth (StringPtr) / 2 - 1;
+        if (Count >= CurrentCursor) {
+          for (Index = CurrentCursor - 1, Index2 = CurrentCursor; Index2 < Count; Index++, Index2++) {
+            TempString[Index] = StringPtr[Index2];
+          }
+          TempString[Index] = CHAR_NULL;
         }
         //
         // Effectively truncate string by 1 character
         //
-        TempString[Index - 1] = CHAR_NULL;
         StrCpy (StringPtr, TempString);
+        CurrentCursor --;
       }
 
     default:
@@ -169,12 +218,23 @@ ReadString (
       //
       if ((StringPtr[0] == CHAR_NULL) && (Key.UnicodeChar != CHAR_BACKSPACE)) {
         StrnCpy (StringPtr, &Key.UnicodeChar, 1);
-        StrnCpy (TempString, &Key.UnicodeChar, 1);
+        CurrentCursor++;
       } else if ((GetStringWidth (StringPtr) < ((Maximum + 1) * sizeof (CHAR16))) && (Key.UnicodeChar != CHAR_BACKSPACE)) {
         KeyPad[0] = Key.UnicodeChar;
         KeyPad[1] = CHAR_NULL;
-        StrCat (StringPtr, KeyPad);
-        StrCat (TempString, KeyPad);
+        Count = GetStringWidth (StringPtr) / 2 - 1;
+        if (CurrentCursor < Count) {
+          for (Index = 0; Index < CurrentCursor; Index++) {
+            TempString[Index] = StringPtr[Index];
+          }
+		  TempString[Index] = CHAR_NULL;
+          StrCat (TempString, KeyPad);
+          StrCat (TempString, StringPtr + CurrentCursor);
+          StrCpy (StringPtr, TempString);
+        } else {
+          StrCat (StringPtr, KeyPad);
+        }
+        CurrentCursor++;
       }
 
       //
@@ -209,7 +269,7 @@ ReadString (
     }
 
     gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
-    gST->ConOut->SetCursorPosition (gST->ConOut, Start + GetStringWidth (StringPtr) / 2, Top + 3);
+    gST->ConOut->SetCursorPosition (gST->ConOut, Start + CurrentCursor + 1, Top + 3);
   } while (TRUE);
 
 }

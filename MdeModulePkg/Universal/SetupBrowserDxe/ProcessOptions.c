@@ -740,6 +740,7 @@ ProcessOptions (
     if (Selected) {
       StringPtr = AllocateZeroPool ((Maximum + 1) * sizeof (CHAR16));
       ASSERT (StringPtr);
+      CopyMem(StringPtr, Question->BufferValue, Maximum * sizeof (CHAR16));
 
       Status = ReadString (MenuOption, gPromptForData, StringPtr);
       if (!EFI_ERROR (Status)) {
