@@ -32,6 +32,7 @@
 
 [Sources.common]
   ArmRealViewEb.c
+  ArmRealViewEbSec.c
   ArmRealViewEbHelper.asm   | RVCT
   ArmRealViewEbHelper.S     | GCC
   ArmRealViewEbBoot.asm     | RVCT
@@ -39,3 +40,6 @@
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdNormalFvBaseAddress

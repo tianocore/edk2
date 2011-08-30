@@ -280,9 +280,9 @@ InitializeDebugAgent (
   // modules
   if (InitFlag == DEBUG_AGENT_INIT_PREMEM_SEC) {
     //
-    // Get the PrePi or PrePeiCore module (defined as SEC type module)
+    // Get the Sec or PrePeiCore module (defined as SEC type module)
     //
-    Status = GetFfsFile ((EFI_FIRMWARE_VOLUME_HEADER*)PcdGet32(PcdSecureFdBaseAddress), EFI_FV_FILETYPE_SECURITY_CORE, &FfsHeader);
+    Status = GetFfsFile ((EFI_FIRMWARE_VOLUME_HEADER*)PcdGet32(PcdSecureFvBaseAddress), EFI_FV_FILETYPE_SECURITY_CORE, &FfsHeader);
     if (!EFI_ERROR(Status)) {
       Status = GetImageContext (FfsHeader,&ImageContext);
       if (!EFI_ERROR(Status)) {

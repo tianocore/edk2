@@ -43,21 +43,6 @@ ArmPlatformTrustzoneSupported (
 }
 
 /**
-  Initialize the Secure peripherals and memory regions
-
-  If Trustzone is supported by your platform then this function makes the required initialization
-  of the secure peripherals and memory regions.
-
-**/
-VOID
-ArmPlatformTrustzoneInit (
-  VOID
-  )
-{
-  ASSERT(FALSE);
-}
-
-/**
   Remap the memory at 0x0
 
   Some platform requires or gives the ability to remap the memory at the address 0x0.
@@ -85,20 +70,6 @@ ArmPlatformGetBootMode (
   )
 {
   return BOOT_WITH_FULL_CONFIGURATION;
-}
-
-/**
-  Initialize controllers that must setup at the early stage
-
-  Some peripherals must be initialized in Secure World.
-  For example, some L2x0 requires to be initialized in Secure World
-
-**/
-VOID
-ArmPlatformSecInitialize (
-  VOID
-  ) {
-  // Do nothing yet
 }
 
 /**
