@@ -288,4 +288,15 @@ MmcFlushBlocks (
   IN EFI_BLOCK_IO_PROTOCOL  *This
   );
 
+EFI_STATUS InitializeMmcDevice(
+  IN  MMC_HOST_INSTANCE   *MmcHost
+  );
+
+VOID
+EFIAPI
+CheckCardsCallback (
+  IN  EFI_EVENT   Event,
+  IN  VOID        *Context
+  );
+
 #endif

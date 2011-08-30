@@ -172,7 +172,6 @@ MmcGetCardStatus(
     Status = MmcHost->SendCommand(MMC_CMD13, CmdArg);
     if (EFI_ERROR(Status)) {
       DEBUG((EFI_D_ERROR, "MmcGetCardStatus(MMC_CMD13): Error and Status = %r\n", Status));
-      ASSERT(0);
       return Status;
     }
 
@@ -305,7 +304,6 @@ MmcIdentificationMode (
 
   if (Timeout == 0) {
     DEBUG((EFI_D_ERROR, "MmcIdentificationMode(): No Card\n"));
-    ASSERT(0);
     return EFI_NO_MEDIA;
   } else {
     PrintOCR(Response[0]);
@@ -320,7 +318,6 @@ MmcIdentificationMode (
   Status = MmcHost->SendCommand(MMC_CMD2, 0);
   if (EFI_ERROR(Status)) {
     DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD2): Error\n"));
-    ASSERT(0);
     return Status;
   }
   MmcHost->ReceiveResponse(MMC_RESPONSE_TYPE_CID,Response);
@@ -358,6 +355,81 @@ MmcIdentificationMode (
   if (EFI_ERROR(Status)) {
     DEBUG((EFI_D_ERROR, "MmcIdentificationMode() : Error MmcStandByState\n"));
     return Status;
+  }
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS InitializeMmcDevice(
+  IN  MMC_HOST_INSTANCE   *MmcHostInstance
+  )
+{
+  UINT32                  Response[4];
+  EFI_STATUS              Status;
+  UINTN                   CardSize, NumBlocks, BlockSize, CmdArg;
+  EFI_MMC_HOST_PROTOCOL   *MmcHost;
+  UINTN                   BlockCount = 1;
+  
+  MmcHost = MmcHostInstance->MmcHost;
+
+  MmcIdentificationMode (MmcHostInstance);
+
+  //Send a command to get Card specific data
+  CmdArg = MmcHostInstance->CardInfo.RCA << 16;
+  Status = MmcHost->SendCommand(MMC_CMD9, CmdArg);
+  if (EFI_ERROR(Status)) {
+    DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD9): Error, Status=%r\n", Status));
+    return Status;
+  }
+  //Read Response
+  MmcHost->ReceiveResponse(MMC_RESPONSE_TYPE_CSD,Response);
+  PrintCSD(Response);
+
+  if (MmcHostInstance->CardInfo.CardType == SD_CARD_2_HIGH) {
+    CardSize = HC_MMC_CSD_GET_DEVICESIZE(Response);
+    NumBlocks = ((CardSize + 1) * 1024);
+    BlockSize = 1 << MMC_CSD_GET_READBLLEN(Response);
+  } else {
+    CardSize = MMC_CSD_GET_DEVICESIZE(Response);
+    NumBlocks = (CardSize + 1) * (1 << (MMC_CSD_GET_DEVICESIZEMULT(Response) + 2));
+    BlockSize = 1 << MMC_CSD_GET_READBLLEN(Response);
+  }
+
+  //For >=2G card, BlockSize may be 1K, but the transfer size is 512 bytes.
+  if (BlockSize > 512) {
+    NumBlocks = MultU64x32(NumBlocks, BlockSize/512);
+    BlockSize = 512;
+  }
+
+  MmcHostInstance->BlockIo.Media->LastBlock    = (NumBlocks - 1);
+  MmcHostInstance->BlockIo.Media->BlockSize    = BlockSize;
+  MmcHostInstance->BlockIo.Media->ReadOnly     = MmcHost->IsReadOnly();
+  MmcHostInstance->BlockIo.Media->MediaPresent = TRUE;
+  MmcHostInstance->BlockIo.Media->MediaId++;
+
+  CmdArg = MmcHostInstance->CardInfo.RCA << 16;
+  Status = MmcHost->SendCommand(MMC_CMD7, CmdArg);
+  if (EFI_ERROR(Status)) {
+    DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD7): Error and Status = %r\n", Status));
+    return Status;
+  }
+
+  Status = MmcNotifyState (MmcHostInstance, MmcTransferState);
+  if (EFI_ERROR(Status)) {
+    DEBUG((EFI_D_ERROR, "MmcIdentificationMode() : Error MmcTransferState\n"));
+    return Status;
+  }
+
+  // Set Block Length
+  Status = MmcHost->SendCommand(MMC_CMD16, MmcHostInstance->BlockIo.Media->BlockSize);
+  if (EFI_ERROR(Status)) {
+    DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD16): Error MmcHostInstance->BlockIo.Media->BlockSize: %d and Error = %r\n",MmcHostInstance->BlockIo.Media->BlockSize, Status));
+    return Status;
+  }
+
+  // Block Count (not used). Could return an error for SD card
+  if (MmcHostInstance->CardInfo.CardType == MMC_CARD) {
+    MmcHost->SendCommand(MMC_CMD23, BlockCount);
   }
 
   return EFI_SUCCESS;
@@ -424,7 +496,7 @@ MmcIoBlocks (
 {
   UINT32                  Response[4];
   EFI_STATUS              Status;
-  UINTN                   CardSize, NumBlocks, BlockSize, CmdArg;
+  UINTN                   CmdArg;
   INTN                    Timeout;
   UINTN                   Cmd;
   MMC_HOST_INSTANCE       *MmcHostInstance;
@@ -446,89 +518,13 @@ MmcIoBlocks (
     return EFI_NO_MEDIA;
   }
 
-  // If the driver has not been initialized yet then go into Identification Mode
-  if (MmcHostInstance->State == MmcHwInitializationState) {
-    MmcIdentificationMode (MmcHostInstance);
-
-    //Send a command to get Card specific data
-    CmdArg = MmcHostInstance->CardInfo.RCA << 16;
-    Status = MmcHost->SendCommand(MMC_CMD9, CmdArg);
-    if (EFI_ERROR(Status)) {
-      DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD9): Error, Status=%r\n", Status));
-      ASSERT(0);
-      return Status;
-    }
-    //Read Response
-    MmcHost->ReceiveResponse(MMC_RESPONSE_TYPE_CSD,Response);
-    PrintCSD(Response);
-
-    if (MmcHostInstance->CardInfo.CardType == SD_CARD_2_HIGH) {
-      CardSize = HC_MMC_CSD_GET_DEVICESIZE(Response);
-      NumBlocks = ((CardSize + 1) * 1024);
-      BlockSize = 1 << MMC_CSD_GET_READBLLEN(Response);
-    } else {
-      CardSize = MMC_CSD_GET_DEVICESIZE(Response);
-      NumBlocks = (CardSize + 1) * (1 << (MMC_CSD_GET_DEVICESIZEMULT(Response) + 2));
-      BlockSize = 1 << MMC_CSD_GET_READBLLEN(Response);
-    }
-
-    //For >=2G card, BlockSize may be 1K, but the transfer size is 512 bytes.
-    if (BlockSize > 512) {
-      NumBlocks = MultU64x32(NumBlocks, BlockSize/512);
-      BlockSize = 512;
-    }
-
-    MmcHostInstance->BlockIo.Media->LastBlock    = (NumBlocks - 1);
-    MmcHostInstance->BlockIo.Media->BlockSize    = BlockSize;
-    MmcHostInstance->BlockIo.Media->ReadOnly     = MmcHost->IsReadOnly();
-    MmcHostInstance->BlockIo.Media->MediaPresent = TRUE;
-    MmcHostInstance->BlockIo.Media->MediaId++;
-
-    CmdArg = MmcHostInstance->CardInfo.RCA << 16;
-    Status = MmcHost->SendCommand(MMC_CMD7, CmdArg);
-    if (EFI_ERROR(Status)) {
-      DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD7): Error and Status = %r\n", Status));
-      ASSERT(0);
-      return Status;
-    }
-
-    Status = MmcNotifyState (MmcHostInstance, MmcTransferState);
-    if (EFI_ERROR(Status)) {
-      DEBUG((EFI_D_ERROR, "MmcIdentificationMode() : Error MmcTransferState\n"));
-      return Status;
-    }
-
-    // Set Block Length
-    Status = MmcHost->SendCommand(MMC_CMD16, This->Media->BlockSize);
-    if (EFI_ERROR(Status)) {
-      DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD16): Error This->Media->BlockSize: %d and Error = %r\n",This->Media->BlockSize, Status));
-      return Status;
-    }
-
-    // Block Count (not used). Could return an error for SD card
-    if (MmcHostInstance->CardInfo.CardType == MMC_CARD) {
-      MmcHost->SendCommand(MMC_CMD23, BlockCount);
-    }
-  } else {
-    // Maybe test if the card has changed to update gMmcMedia information
-    if (MmcHostInstance->State == MmcTransferState) {
-      //DEBUG((EFI_D_ERROR, "MmcIdentificationMode() : MmcTransferState\n"));
-    } else if (MmcHostInstance->State == MmcStandByState) {
-      DEBUG((EFI_D_ERROR, "MmcIdentificationMode() : MmcStandByState\n"));
-    } else {
-      ASSERT(0);
-    }
-  }
-
   // All blocks must be within the device
   if ((Lba + (BufferSize / This->Media->BlockSize)) > (This->Media->LastBlock + 1)){
-    ASSERT(0);
     return EFI_INVALID_PARAMETER;
   }
 
   // The buffer size must not be zero and it must be an exact multiple of the block size
   if ((BufferSize == 0) || ((BufferSize % This->Media->BlockSize) != 0)) {
-    ASSERT(0);
     return EFI_BAD_BUFFER_SIZE;
   }
 
