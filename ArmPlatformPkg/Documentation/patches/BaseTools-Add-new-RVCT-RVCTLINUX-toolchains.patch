@@ -13,15 +13,6 @@ diff --git a/BaseTools/Conf/tools_def.template b/BaseTools/Conf/tools_def.templa
 index 0645d6f..f9db7db 100755
 --- a/BaseTools/Conf/tools_def.template
 +++ b/BaseTools/Conf/tools_def.template
-@@ -164,8 +164,6 @@ DEFINE IPHONE_TOOLS            = /Developer/Platforms/iPhoneOS.platform/Develope
- DEFINE RVCT31_TOOLS_PATH       = c:/Program Files/ARM/RVCT/Programs/3.1/569/win_32-pentium
- DEFINE RVCT31CYGWIN_TOOLS_PATH = /cygdrive/c/Program Files/ARM/RVCT/Programs/3.1/569/win_32-pentium
- 
--DEFINE SOURCERY_TOOLS        = c:/Program Files/CodeSourcery/Sourcery G++ Lite/bin
--DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G++ Lite/bin
- 
- ####################################################################################
- #
 @@ -3020,6 +3018,45 @@ RELEASE_ICC11x86_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL
  *_ICC11x86_EBC_SLINK_FLAGS                = /lib /NOLOGO /MACHINE:EBC
  *_ICC11x86_EBC_DLINK_FLAGS                = "C:\Program Files (x86)\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP
@@ -182,41 +173,6 @@ index 0645d6f..f9db7db 100755
  # ARM GCC (www.codesourcery.com)
  #
  ####################################################################################
-@@ -3484,7 +3610,7 @@ RELEASE_RVCT31CYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM
- *_ARMGCC_*_*_FAMILY          = GCC
- *_ARMGCC_*_*_BUILDRULEFAMILY = ARMGCC
- 
--*_ARMGCC_*_MAKE_PATH         = DEF(SOURCERY_TOOLS)/cs-make
-+*_ARMGCC_*_MAKE_PATH         = make
- *_ARMGCC_*_MAKE_FLAGS        = --no-print-directory
- 
- ##################
-@@ -3501,16 +3627,16 @@ RELEASE_RVCT31CYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM
- # ARM definitions
- ##################
- 
--*_ARMGCC_ARM_ASLCC_PATH      = DEF(SOURCERY_TOOLS)/arm-none-eabi-gcc
--*_ARMGCC_ARM_ASLDLINK_PATH   = DEF(SOURCERY_TOOLS)/arm-none-eabi-ld
--*_ARMGCC_ARM_ASLPP_PATH      = DEF(SOURCERY_TOOLS)/arm-none-eabi-gcc
-+*_ARMGCC_ARM_ASLCC_PATH      = ENV(ARMGCC_TOOLS_PATH)arm-none-eabi-gcc
-+*_ARMGCC_ARM_ASLDLINK_PATH   = ENV(ARMGCC_TOOLS_PATH)arm-none-eabi-ld
-+*_ARMGCC_ARM_ASLPP_PATH      = ENV(ARMGCC_TOOLS_PATH)arm-none-eabi-gcc
- 
--*_ARMGCC_ARM_CC_PATH         = DEF(SOURCERY_TOOLS)/arm-none-eabi-gcc
--*_ARMGCC_ARM_SLINK_PATH      = DEF(SOURCERY_TOOLS)/arm-none-eabi-ar
--*_ARMGCC_ARM_DLINK_PATH      = DEF(SOURCERY_TOOLS)/arm-none-eabi-ld
--*_ARMGCC_ARM_ASM_PATH        = DEF(SOURCERY_TOOLS)/arm-none-eabi-as
--*_ARMGCC_ARM_PP_PATH         = DEF(SOURCERY_TOOLS)/arm-none-eabi-gcc
--*_ARMGCC_ARM_VFRPP_PATH      = DEF(SOURCERY_TOOLS)/arm-none-eabi-gcc
-+*_ARMGCC_ARM_CC_PATH         = ENV(ARMGCC_TOOLS_PATH)arm-none-eabi-gcc
-+*_ARMGCC_ARM_SLINK_PATH      = ENV(ARMGCC_TOOLS_PATH)arm-none-eabi-ar
-+*_ARMGCC_ARM_DLINK_PATH      = ENV(ARMGCC_TOOLS_PATH)arm-none-eabi-ld
-+*_ARMGCC_ARM_ASM_PATH        = ENV(ARMGCC_TOOLS_PATH)arm-none-eabi-as
-+*_ARMGCC_ARM_PP_PATH         = ENV(ARMGCC_TOOLS_PATH)arm-none-eabi-gcc
-+*_ARMGCC_ARM_VFRPP_PATH      = ENV(ARMGCC_TOOLS_PATH)arm-none-eabi-gcc
- 
- #
- # Use default values, or override in DSC file
 -- 
 1.6.3.3
 
