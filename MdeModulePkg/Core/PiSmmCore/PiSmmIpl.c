@@ -605,16 +605,6 @@ SmmIplDxeDispatchEventNotify (
     // Print debug message that the SMRAM window is now closed.
     //
     DEBUG ((DEBUG_INFO, "SMM IPL closed SMRAM window\n"));
-
-    //
-    // Lock the SMRAM (Note: Locking SMRAM may not be supported on all platforms)
-    //
-    mSmmAccess->Lock (mSmmAccess);
-
-    //
-    // Print debug message that the SMRAM window is now locked
-    //
-    DEBUG ((DEBUG_INFO, "SMM IPL locked SMRAM window\n"));
   }
 }
 
@@ -708,7 +698,7 @@ SmmIplReadyToLockEventNotify (
   // Lock the SMRAM (Note: Locking SMRAM may not be supported on all platforms)
   //
   mSmmAccess->Lock (mSmmAccess);
-
+  
   //
   // Close protocol and event notification events that do not apply after the 
   // DXE SMM Ready To Lock Protocol has been installed or the Ready To Boot 
