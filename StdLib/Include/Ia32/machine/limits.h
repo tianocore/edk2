@@ -26,8 +26,8 @@
 #define __LONG_MIN    (-2147483647L - 1L)   // -(2^31 - 1)
 
 /** Maximum value for an object of type long int. **/
-#define __LONG_MAX    +2147483647L          // 2^31 - 1
+#define __LONG_MAX     2147483647L          // 2^31 - 1
 
 /** Maximum value for an object of type unsigned long int. **/
-#define __ULONG_MAX   0xffffffff            // 2^32 - 1
+#define __ULONG_MAX   0xffffffffUL          // 2^32 - 1
 

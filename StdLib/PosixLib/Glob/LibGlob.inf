@@ -23,7 +23,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
 #
 
 [Sources.common]
@@ -40,8 +40,7 @@
   MemoryAllocationLib
   ShellLib
   BaseLib
+  LibC
   LibStdio
   LibStdLib
   LibString
-
-[Pcd]

@@ -23,6 +23,15 @@
  * gl_matchc:
  *  Number of matches in the current invocation of glob.
  *
+    Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available under
+    the terms and conditions of the BSD License that accompanies this distribution.
+    The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
+
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1989, 1993
  *  The Regents of the University of California.  All rights reserved.
  *
@@ -56,8 +65,10 @@
     glob.c  8.3 (Berkeley) 10/13/93
     NetBSD: glob.c,v 1.23.4.1 2010/07/19 18:14:08 riz Exp
  */
-#pragma warning ( disable : 4244 )
-#pragma warning ( disable : 4018 )
+#if defined(_MSC_VER)
+  #pragma warning ( disable : 4244 )
+  #pragma warning ( disable : 4018 )
+#endif
 
 #include  <LibConfig.h>
 

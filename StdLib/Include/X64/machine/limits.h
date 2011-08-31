@@ -5,13 +5,13 @@
 #if defined(__GNUC__)
 #define __LONG_BIT      64
 /** minimum value for an object of type long int **/
-#define __LONG_MIN    (-9223372036854775807L - 1L) // -(2^63 - 1)
+#define __LONG_MIN    (-9223372036854775807LL - 1LL) // -(2^63 - 1)
 
 /** maximum value for an object of type long int **/
-#define __LONG_MAX    +9223372036854775807L // 2^63 - 1
+#define __LONG_MAX    +9223372036854775807LL // 2^63 - 1
 
 /** maximum value for an object of type unsigned long int **/
-#define __ULONG_MAX   0xFFFFFFFFFFFFFFFFUL // 2^64 - 1
+#define __ULONG_MAX   0xFFFFFFFFFFFFFFFFULL // 2^64 - 1
 #else
 #define __LONG_BIT      32
 /** minimum value for an object of type long int **/

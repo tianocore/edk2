@@ -143,4 +143,4 @@
 # Nasty things could happen if you do.
 #
 [BuildOptions]
-  GCC:*_*_*_CC_FLAGS    = -fno-builtin -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
+  GCC:*_*_*_CC_FLAGS    = -fno-builtin -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-format
