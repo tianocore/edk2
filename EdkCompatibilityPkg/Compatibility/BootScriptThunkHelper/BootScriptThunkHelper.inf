@@ -1,0 +1,52 @@
+## @file
+#  Component description file for Boot Script Thunk Helper SMM driver.
+#
+#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions
+#  of the BSD License which accompanies this distribution.  The
+#  full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BootScriptThunkHelper
+  FILE_GUID                      = E633E57C-BBB1-4c6a-9F45-22C49378ADD0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = BootScriptThunkHelperMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 
+#
+
+[Sources]
+  BootScriptThunkHelper.c
+ 
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EdkCompatibilityPkg/EdkCompatibilityPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  PcdLib
+  LockBoxLib
+
+[Pcd]
+  gEfiEdkCompatibilityPkgTokenSpaceGuid.BootScriptThunkDataPtr
+
+[Depex]
+  gEfiS3SaveStateProtocolGuid AND gEfiBootScriptSaveProtocolGuid AND gEfiLockBoxProtocolGuid
