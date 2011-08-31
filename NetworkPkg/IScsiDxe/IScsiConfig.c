@@ -421,15 +421,16 @@ IScsiConvertAttemptConfigDataToIfrNvData (
   AsciiStrToUnicodeStr (Attempt->AttemptName, IfrNvData->AttemptName);
 }
 
-
 /**
   Convert the IFR data to iSCSI configuration data.
 
-  @param[in]       IfrNvData              The IFR nv data.
+  @param[in]       IfrNvData              Point to ISCSI_CONFIG_IFR_NVDATA.
   @param[in, out]  Attempt                The iSCSI attempt config data.
 
   @retval EFI_INVALID_PARAMETER  Any input or configured parameter is invalid.
   @retval EFI_NOT_FOUND          Cannot find the corresponding variable.
+  @retval EFI_OUT_OF_RESOURCES   The operation is failed due to lack of resources.
+  @retval EFI_ABORTED            The operation is aborted.
   @retval EFI_SUCCESS            The operation is completed successfully.
 
 **/
@@ -451,6 +452,11 @@ IScsiConvertIfrNvDataToAttemptConfigData (
   CHAR16                      IpMode[64];
   ISCSI_NIC_INFO              *NicInfo;
   EFI_INPUT_KEY               Key;
+  UINT8                       *AttemptConfigOrder;
+  UINTN                       AttemptConfigOrderSize;
+  UINT8                       *AttemptOrderTmp;
+  UINTN                       TotalNumber;
+  EFI_STATUS                  Status;
 
   if (IfrNvData == NULL || Attempt == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -615,6 +621,61 @@ IScsiConvertIfrNvDataToAttemptConfigData (
   }
 
   //
+  // Update the iSCSI Mode data and record it in attempt help info.
+  //
+  Attempt->SessionConfigData.Enabled = IfrNvData->Enabled;
+  if (IfrNvData->Enabled == ISCSI_DISABLED) {
+    UnicodeSPrint (IScsiMode, 64, L"Disabled");
+  } else if (IfrNvData->Enabled == ISCSI_ENABLED) {
+    UnicodeSPrint (IScsiMode, 64, L"Enabled");
+  } else if (IfrNvData->Enabled == ISCSI_ENABLED_FOR_MPIO) {
+    UnicodeSPrint (IScsiMode, 64, L"Enabled for MPIO");
+  }
+
+  if (IfrNvData->IpMode == IP_MODE_IP4) {
+    UnicodeSPrint (IpMode, 64, L"IP4");
+  } else if (IfrNvData->IpMode == IP_MODE_IP6) {
+    UnicodeSPrint (IpMode, 64, L"IP6");
+  } else if (IfrNvData->IpMode == IP_MODE_AUTOCONFIG) {
+    UnicodeSPrint (IpMode, 64, L"Autoconfigure");
+  }
+
+  NicInfo = IScsiGetNicInfoByIndex (Attempt->NicIndex);
+  if (NicInfo == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  MacString = (CHAR16 *) AllocateZeroPool (ISCSI_MAX_MAC_STRING_LEN * sizeof (CHAR16));
+  if (MacString == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  AsciiStrToUnicodeStr (Attempt->MacString, MacString);
+
+  UnicodeSPrint (
+    mPrivate->PortString,
+    (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
+    L"MAC: %s, PFA: Bus %d | Dev %d | Func %d, iSCSI mode: %s, IP version: %s",
+    MacString,
+    NicInfo->BusNumber,
+    NicInfo->DeviceNumber,
+    NicInfo->FunctionNumber,
+    IScsiMode,
+    IpMode
+    );
+
+  Attempt->AttemptTitleHelpToken = HiiSetString (
+                                     mCallbackInfo->RegisteredHandle,
+                                     Attempt->AttemptTitleHelpToken,
+                                     mPrivate->PortString,
+                                     NULL
+                                     );
+  if (Attempt->AttemptTitleHelpToken == 0) {
+    FreePool (MacString);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
   // Check whether this attempt is an existing one.
   //
   ExistAttempt = IScsiConfigGetAttemptByConfigIndex (Attempt->AttemptConfigIndex);
@@ -683,7 +744,70 @@ IScsiConvertIfrNvDataToAttemptConfigData (
       }
     }
 
-  } else if (ExistAttempt == NULL && IfrNvData->Enabled != ISCSI_DISABLED) {
+  } else if (ExistAttempt == NULL) {
+    //
+    // When a new attempt is created, pointer of the attempt is saved to
+    // mPrivate->NewAttempt, and also saved to mCallbackInfo->Current in
+    // IScsiConfigProcessDefault. If input Attempt does not match any existing
+    // attempt, it should be a new created attempt. Save it to system now.
+    //    
+    ASSERT (Attempt == mPrivate->NewAttempt);
+
+    //
+    // Save current order number for this attempt.
+    //
+    AttemptConfigOrder = IScsiGetVariableAndSize (
+                           L"AttemptOrder",
+                           &mVendorGuid,
+                           &AttemptConfigOrderSize
+                           );
+
+    TotalNumber = AttemptConfigOrderSize / sizeof (UINT8);
+    TotalNumber++;
+
+    //
+    // Append the new created attempt order to the end.
+    //
+    AttemptOrderTmp = AllocateZeroPool (TotalNumber * sizeof (UINT8));
+    if (AttemptOrderTmp == NULL) {
+      if (AttemptConfigOrder != NULL) {
+        FreePool (AttemptConfigOrder);
+      }
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    if (AttemptConfigOrder != NULL) {
+      CopyMem (AttemptOrderTmp, AttemptConfigOrder, AttemptConfigOrderSize);
+      FreePool (AttemptConfigOrder);
+    }
+
+    AttemptOrderTmp[TotalNumber - 1] = Attempt->AttemptConfigIndex;
+    AttemptConfigOrder               = AttemptOrderTmp;
+    AttemptConfigOrderSize           = TotalNumber * sizeof (UINT8);
+
+    Status = gRT->SetVariable (
+                    L"AttemptOrder",
+                    &mVendorGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    AttemptConfigOrderSize,
+                    AttemptConfigOrder
+                    );
+    FreePool (AttemptConfigOrder);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Insert new created attempt to array.
+    //
+    InsertTailList (&mPrivate->AttemptConfigs, &Attempt->Link);
+    mPrivate->AttemptCount++;
+    //
+    // Reset mPrivate->NewAttempt to NULL, which indicates none attempt is created
+    // but not saved now.
+    //
+    mPrivate->NewAttempt = NULL;
+
     if (IfrNvData->Enabled == ISCSI_ENABLED_FOR_MPIO) {
       //
       // This new Attempt is enabled for MPIO; enable the multipath mode.
@@ -693,61 +817,8 @@ IScsiConvertIfrNvDataToAttemptConfigData (
     } else if (IfrNvData->Enabled == ISCSI_ENABLED) {
       mPrivate->SinglePathCount++;
     }
-  }
 
-  //
-  // Update the iSCSI Mode data and record it in attempt help info.
-  //
-  Attempt->SessionConfigData.Enabled = IfrNvData->Enabled;
-  if (IfrNvData->Enabled == ISCSI_DISABLED) {
-    UnicodeSPrint (IScsiMode, 64, L"Disabled");
-  } else if (IfrNvData->Enabled == ISCSI_ENABLED) {
-    UnicodeSPrint (IScsiMode, 64, L"Enabled");
-  } else if (IfrNvData->Enabled == ISCSI_ENABLED_FOR_MPIO) {
-    UnicodeSPrint (IScsiMode, 64, L"Enabled for MPIO");
-  }
-
-  if (IfrNvData->IpMode == IP_MODE_IP4) {
-    UnicodeSPrint (IpMode, 64, L"IP4");
-  } else if (IfrNvData->IpMode == IP_MODE_IP6) {
-    UnicodeSPrint (IpMode, 64, L"IP6");
-  } else if (IfrNvData->IpMode == IP_MODE_AUTOCONFIG) {
-    UnicodeSPrint (IpMode, 64, L"Autoconfigure");
-  }
-
-  NicInfo = IScsiGetNicInfoByIndex (Attempt->NicIndex);
-  if (NicInfo == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
-  MacString = (CHAR16 *) AllocateZeroPool (ISCSI_MAX_MAC_STRING_LEN * sizeof (CHAR16));
-  if (MacString == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  AsciiStrToUnicodeStr (Attempt->MacString, MacString);
-
-  UnicodeSPrint (
-    mPrivate->PortString,
-    (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
-    L"MAC: %s, PFA: Bus %d | Dev %d | Func %d, iSCSI mode: %s, IP version: %s",
-    MacString,
-    NicInfo->BusNumber,
-    NicInfo->DeviceNumber,
-    NicInfo->FunctionNumber,
-    IScsiMode,
-    IpMode
-    );
-
-  Attempt->AttemptTitleHelpToken = HiiSetString (
-                                     mCallbackInfo->RegisteredHandle,
-                                     Attempt->AttemptTitleHelpToken,
-                                     mPrivate->PortString,
-                                     NULL
-                                     );
-  if (Attempt->AttemptTitleHelpToken == 0) {
-    FreePool (MacString);
-    return EFI_OUT_OF_RESOURCES;
+    IScsiConfigUpdateAttempt ();
   }
 
   //
@@ -919,7 +990,7 @@ IScsiConfigAddAttempt (
       MacString
       );
 
-    UnicodeSPrint (mPrivate->PortString, (UINTN) ISCSI_NAME_IFR_MAX_SIZE, L"Port %s", MacString);
+    UnicodeSPrint (mPrivate->PortString, (UINTN) ISCSI_NAME_IFR_MAX_SIZE, L"MAC %s", MacString);
     PortTitleToken = HiiSetString (
                        mCallbackInfo->RegisteredHandle,
                        0,
@@ -1081,7 +1152,8 @@ IScsiConfigDeleteAttempts (
 
   AttemptNewOrder = AllocateZeroPool (AttemptConfigOrderSize);
   if (AttemptNewOrder == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Error;
   }
 
   Total    = AttemptConfigOrderSize / sizeof (UINT8);
@@ -1193,8 +1265,13 @@ IScsiConfigDeleteAttempts (
                   );
 
 Error:
-  FreePool (AttemptConfigOrder);
-  FreePool (AttemptNewOrder);
+  if (AttemptConfigOrder != NULL) {
+    FreePool (AttemptConfigOrder);
+  }
+
+  if (AttemptNewOrder != NULL) {
+    FreePool (AttemptNewOrder);
+  }
   
   return Status;
 }
@@ -1530,10 +1607,19 @@ IScsiConfigProcessDefault (
   UINT8                       *AttemptConfigOrder;
   UINTN                       AttemptConfigOrderSize;
   UINTN                       TotalNumber;
-  UINT8                       *AttemptOrderTmp;
   UINTN                       Index;
-  EFI_STATUS                  Status;
 
+  //
+  // Free any attempt that is previously created but not saved to system.
+  //
+  if (mPrivate->NewAttempt != NULL) {
+    FreePool (mPrivate->NewAttempt);
+    mPrivate->NewAttempt = NULL;
+  }
+
+  //
+  // Is User creating a new attempt?
+  //
   NewAttempt = FALSE;
 
   if ((KeyValue >= KEY_MAC_ENTRY_BASE) &&
@@ -1567,7 +1653,7 @@ IScsiConfigProcessDefault (
     }
     
     //
-    // Create the new attempt and save to NVR.
+    // Create new attempt.
     //
 
     AttemptConfigData = AllocateZeroPool (sizeof (ISCSI_ATTEMPT_CONFIG_NVDATA));
@@ -1613,45 +1699,13 @@ IScsiConfigProcessDefault (
     TotalNumber++;
 
     //
-    // Append the new created attempt order to the end.
-    //
-    AttemptOrderTmp = AllocateZeroPool (TotalNumber * sizeof (UINT8));
-    if (AttemptOrderTmp == NULL) {
-      FreePool (AttemptConfigData);
-      if (AttemptConfigOrder != NULL) {
-        FreePool (AttemptConfigOrder);
-      }
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    if (AttemptConfigOrder != NULL) {
-      CopyMem (AttemptOrderTmp, AttemptConfigOrder, AttemptConfigOrderSize);
-      FreePool (AttemptConfigOrder);      
-    }
-
-    AttemptOrderTmp[TotalNumber - 1] = CurrentAttemptConfigIndex;    
-    AttemptConfigOrder               = AttemptOrderTmp;
-    AttemptConfigOrderSize           = TotalNumber * sizeof (UINT8);
-
-    Status = gRT->SetVariable (
-                    L"AttemptOrder",
-                    &mVendorGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                    AttemptConfigOrderSize,
-                    AttemptConfigOrder
-                    );
-    FreePool (AttemptConfigOrder);
-    if (EFI_ERROR (Status)) {
-      FreePool (AttemptConfigData);
-      return Status;
-    }
-
-    //
     // Record the mapping between attempt order and attempt's configdata.
     //
     AttemptConfigData->AttemptConfigIndex  = CurrentAttemptConfigIndex;
-    InsertTailList (&mPrivate->AttemptConfigs, &AttemptConfigData->Link);
-    mPrivate->AttemptCount++;
+
+    if (AttemptConfigOrder != NULL) {
+      FreePool (AttemptConfigOrder);
+    }
 
     //
     // Record the MAC info in Config Data.
@@ -1708,6 +1762,13 @@ IScsiConfigProcessDefault (
       );
     UnicodeStrToAsciiStr (mPrivate->PortString, AttemptConfigData->AttemptName);
 
+    //
+    // Save the created Attempt temporarily. If user does not save the attempt
+    // by press 'KEY_SAVE_ATTEMPT_CONFIG' later, iSCSI driver would know that
+    // and free resources.
+    //
+    mPrivate->NewAttempt = (VOID *) AttemptConfigData;
+
   } else {
     //
     // Determine which Attempt user has selected to configure.
@@ -1734,9 +1795,10 @@ IScsiConfigProcessDefault (
   
   IScsiConvertAttemptConfigDataToIfrNvData (AttemptConfigData, IfrNvData);
 
+  //
+  // Update current attempt to be a new created attempt or an existing attempt.
+  //
   mCallbackInfo->Current = AttemptConfigData;
-
-  IScsiConfigUpdateAttempt ();
 
   return EFI_SUCCESS;
 }
@@ -2495,6 +2557,13 @@ IScsiConfigFormUnload (
   }
 
   ASSERT (mPrivate->NicCount == 0);
+
+  //
+  // Free attempt is created but not saved to system.
+  //
+  if (mPrivate->NewAttempt != NULL) {
+    FreePool (mPrivate->NewAttempt);
+  }
 
   FreePool (mPrivate);
   mPrivate = NULL;

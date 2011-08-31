@@ -297,7 +297,7 @@ IScsiMacAddrToStr (
   for (Index = 0; Index < Len; Index++) {
     Str[3 * Index]      = (CHAR16) IScsiHexString[(Mac->Addr[Index] >> 4) & 0x0F];
     Str[3 * Index + 1]  = (CHAR16) IScsiHexString[Mac->Addr[Index] & 0x0F];
-    Str[3 * Index + 2]  = L'-';
+    Str[3 * Index + 2]  = L':';
   }
 
   String = &Str[3 * Index - 1] ;
@@ -638,6 +638,14 @@ IScsiRemoveNic (
 
       FreePool (AttemptConfigData);
     }
+  }
+
+  //
+  // Free attempt is created but not saved to system.
+  //
+  if (mPrivate->NewAttempt != NULL) {
+    FreePool (mPrivate->NewAttempt);
+    mPrivate->NewAttempt = NULL;
   }
 
   return EFI_SUCCESS;

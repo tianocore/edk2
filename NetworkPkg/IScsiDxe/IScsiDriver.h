@@ -55,6 +55,7 @@ typedef struct {
   LIST_ENTRY      AttemptConfigs;       // User configured Attempt list.
   CHAR8           InitiatorName[ISCSI_NAME_MAX_SIZE];
   UINTN           InitiatorNameLength;
+  VOID            *NewAttempt;          // Attempt is created but not saved.
 } ISCSI_PRIVATE_DATA;
 
 extern ISCSI_PRIVATE_DATA                 *mPrivate;

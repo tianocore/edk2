@@ -346,75 +346,11 @@ formset
 
     endif;
 
-    suppressif NOT ideqval ISCSI_CONFIG_IFR_NVDATA.AuthenticationType == ISCSI_AUTH_TYPE_KRB;
-
-    checkbox varid = ISCSI_CONFIG_IFR_NVDATA.MutualRequired,
-            prompt = STRING_TOKEN(STR_ISCSI_MUTUAL_REQUIRED),
-            help   = STRING_TOKEN(STR_ISCSI_MUTUAL_REQUIRED_HELP),
-            flags  = 0,
-    endcheckbox;
-    
-    string  varid   = ISCSI_CONFIG_IFR_NVDATA.KerberosUserName,
-            prompt  = STRING_TOKEN(STR_ISCSI_KERBEROS_USER_NAME),
-            help    = STRING_TOKEN(STR_ISCSI_KERBEROS_USER_NAME),
-            flags   = INTERACTIVE,
-            key     = KEY_KERBEROS_USER_NAME,
-            minsize = 0,
-            maxsize = KERBEROS_NAME_MAX_LEN,
-    endstring;
-
-    string  varid    = ISCSI_CONFIG_IFR_NVDATA.KerberosUserSecret,
-            prompt   = STRING_TOKEN(STR_ISCSI_KERBEROS_USER_SECRET),
-            help     = STRING_TOKEN(STR_ISCSI_KERBEROS_USER_SECRET),
-            flags    = INTERACTIVE,
-            key      = KEY_KERBEROS_USER_SECRET,
-            minsize  = KERBEROS_SECRET_MIN_LEN,
-            maxsize  = KERBEROS_SECRET_MAX_LEN,
-    endstring;
-    
-    string  varid   = ISCSI_CONFIG_IFR_NVDATA.KerberosKDCName,
-            prompt  = STRING_TOKEN(STR_ISCSI_KERBEROS_KDC_NAME),
-            help    = STRING_TOKEN(STR_ISCSI_KERBEROS_KDC_NAME),
-            flags   = INTERACTIVE,
-            key     = KEY_KERBEROS_KDC_NAME,
-            minsize = 0,
-            maxsize = KERBEROS_NAME_MAX_LEN,
-    endstring;
-
-    string  varid    = ISCSI_CONFIG_IFR_NVDATA.KerberosKDCRealm,
-            prompt   = STRING_TOKEN(STR_ISCSI_KERBEROS_KDC_REALM),
-            help     = STRING_TOKEN(STR_ISCSI_KERBEROS_KDC_REALM),
-            flags    = INTERACTIVE,
-            key      = KEY_KERBEROS_KDC_REALM,
-            minsize  = 0,
-            maxsize  = KERBEROS_NAME_MAX_LEN,
-    endstring;
-
-    string  varid   = ISCSI_CONFIG_IFR_NVDATA.KerberosKDCIp,
-            prompt  = STRING_TOKEN(STR_ISCSI_KERBEROS_KDC_IP),
-            help    = STRING_TOKEN(STR_ISCSI_KERBEROS_KDC_IP),
-            flags   = INTERACTIVE,
-            key     = KEY_KERBEROS_KDC_IP_ADDR,
-            minsize = IP_MIN_SIZE,
-            maxsize = IP_MAX_SIZE,
-    endstring;
-
-    numeric varid   = ISCSI_CONFIG_IFR_NVDATA.KerberosKDCPort,
-            prompt  = STRING_TOKEN(STR_ISCSI_KERBEROS_KDC_PORT),
-            help    = STRING_TOKEN(STR_ISCSI_KERBEROS_KDC_PORT),
-            flags   = 0,
-            minimum = KERBEROS_KDC_PORT_MIN_NUM,
-            maximum = KERBEROS_KDC_PORT_MAX_NUM,
-            step    = 0,
-    endnumeric;
-    
-    endif;
-
     subtitle text = STRING_TOKEN(STR_NULL);
 
     goto FORMID_ATTEMPT_FORM,
     prompt = STRING_TOKEN (STR_SAVE_CHANGES),
-    help   = STRING_TOKEN (STR_SAVE_CHANGES),
+    help   = STRING_TOKEN (STR_SAVE_CHANGES_HELP),
     flags  = INTERACTIVE,
     key    = KEY_SAVE_ATTEMPT_CONFIG;
 
