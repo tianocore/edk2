@@ -1024,6 +1024,7 @@ EfiPxeBcDiscover (
     } else {
       Status = EFI_DEVICE_ERROR;
     }
+    return Status;
   } else {
     PxeBcParseCachedDhcpPacket (&Private->PxeReply);
   }
@@ -1276,6 +1277,10 @@ EfiPxeBcMtftp (
 
   if (Status == EFI_ICMP_ERROR) {
     Mode->IcmpErrorReceived = TRUE;
+  }
+
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   Status = Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
