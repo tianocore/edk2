@@ -669,7 +669,9 @@ EfiPxeBcDiscover (
                );
   }
 
-  if (!EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status)) {
+    return Status;    
+  } else {
     //
     // Parse the cached PXE reply packet, and store it into mode data if valid.
     //
@@ -935,6 +937,10 @@ EfiPxeBcMtftp (
 
   if (Status == EFI_ICMP_ERROR) {
     Mode->IcmpErrorReceived = TRUE;
+  }
+
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   if (Mode->UsingIpv6) {
