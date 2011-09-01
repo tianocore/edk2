@@ -804,45 +804,46 @@ AddTableToList (
           &Buffer64,
           sizeof (UINT64)
           );
+
+        //
+        // RSDP OEM information is updated to match the FADT OEM information
+        //
+        CopyMem (
+          &AcpiSupportInstance->Rsdp3->OemId,
+          &AcpiSupportInstance->Fadt3->Header.OemId,
+          6
+          );
+
+        //
+        // RSDT OEM information is updated to match FADT OEM information.
+        //
+        CopyMem (
+          &AcpiSupportInstance->Rsdt3->OemId,
+          &AcpiSupportInstance->Fadt3->Header.OemId,
+          6
+          );
+        CopyMem (
+          &AcpiSupportInstance->Rsdt3->OemTableId,
+          &AcpiSupportInstance->Fadt3->Header.OemTableId,
+          sizeof (UINT64)
+          );
+        AcpiSupportInstance->Rsdt3->OemRevision = AcpiSupportInstance->Fadt3->Header.OemRevision;
+
+        //
+        // XSDT OEM information is updated to match FADT OEM information.
+        //
+        CopyMem (
+          &AcpiSupportInstance->Xsdt->OemId,
+          &AcpiSupportInstance->Fadt3->Header.OemId,
+          6
+          );
+        CopyMem (
+          &AcpiSupportInstance->Xsdt->OemTableId,
+          &AcpiSupportInstance->Fadt3->Header.OemTableId,
+          sizeof (UINT64)
+          );
+        AcpiSupportInstance->Xsdt->OemRevision = AcpiSupportInstance->Fadt3->Header.OemRevision;
       }
-      //
-      // RSDP OEM information is updated to match the FADT OEM information
-      //
-      CopyMem (
-        &AcpiSupportInstance->Rsdp3->OemId,
-        &AcpiSupportInstance->Fadt3->Header.OemId,
-        6
-        );
-
-      //
-      // RSDT OEM information is updated to match FADT OEM information.
-      //
-      CopyMem (
-        &AcpiSupportInstance->Rsdt3->OemId,
-        &AcpiSupportInstance->Fadt3->Header.OemId,
-        6
-        );
-      CopyMem (
-        &AcpiSupportInstance->Rsdt3->OemTableId,
-        &AcpiSupportInstance->Fadt3->Header.OemTableId,
-        sizeof (UINT64)
-        );
-      AcpiSupportInstance->Rsdt3->OemRevision = AcpiSupportInstance->Fadt3->Header.OemRevision;
-
-      //
-      // XSDT OEM information is updated to match FADT OEM information.
-      //
-      CopyMem (
-        &AcpiSupportInstance->Xsdt->OemId,
-        &AcpiSupportInstance->Fadt3->Header.OemId,
-        6
-        );
-      CopyMem (
-        &AcpiSupportInstance->Xsdt->OemTableId,
-        &AcpiSupportInstance->Fadt3->Header.OemTableId,
-        sizeof (UINT64)
-        );
-      AcpiSupportInstance->Xsdt->OemRevision = AcpiSupportInstance->Fadt3->Header.OemRevision;
     }    
     //
     // Checksum the table
@@ -1336,40 +1337,42 @@ DeleteTable (
   // Init locals
   //
   RemoveFromRsdt        = TRUE;
-  CurrentTableSignature = ((EFI_ACPI_COMMON_HEADER *) Table->Table)->Signature;
 
-  //
-  // Basic tasks to accomplish delete are:
-  //   Determine removal requirements (in RSDT/XSDT or not)
-  //   Remove entry from RSDT/XSDT
-  //   Remove any table references to the table
-  //   If no one is using the table
-  //      Free the table (removing pointers from private data and tables)
-  //      Remove from list
-  //      Free list structure
-  //
-  //
-  // Determine if this table is in the RSDT or XSDT
-  //
-  if ((CurrentTableSignature == EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) ||
-      (CurrentTableSignature == EFI_ACPI_2_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE) ||
-      (CurrentTableSignature == EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE)
-      ) {
-    RemoveFromRsdt = FALSE;
-  }
-  //
-  // We don't remove the FADT in the standard way because some
-  // OS expect the FADT to be early in the table list.
-  // So we always put it as the first element in the list.
-  //
-  if (CurrentTableSignature == EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
-    RemoveFromRsdt = FALSE;
-  }
-
-  //
-  // Remove the table from RSDT and XSDT
-  //
   if (Table->Table != NULL) {
+    CurrentTableSignature = ((EFI_ACPI_COMMON_HEADER *) Table->Table)->Signature;
+
+    //
+    // Basic tasks to accomplish delete are:
+    //   Determine removal requirements (in RSDT/XSDT or not)
+    //   Remove entry from RSDT/XSDT
+    //   Remove any table references to the table
+    //   If no one is using the table
+    //      Free the table (removing pointers from private data and tables)
+    //      Remove from list
+    //      Free list structure
+    //
+    //
+    // Determine if this table is in the RSDT or XSDT
+    //
+    if ((CurrentTableSignature == EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) ||
+        (CurrentTableSignature == EFI_ACPI_2_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE) ||
+        (CurrentTableSignature == EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE)
+        ) {
+      RemoveFromRsdt = FALSE;
+    }
+    //
+    // We don't remove the FADT in the standard way because some
+    // OS expect the FADT to be early in the table list.
+    // So we always put it as the first element in the list.
+    //
+    if (CurrentTableSignature == EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
+      RemoveFromRsdt = FALSE;
+    }
+
+    //
+    // Remove the table from RSDT and XSDT
+    //
+
     //
     // This is a basic table, remove it from any lists and the Rsdt and/or Xsdt
     //
