@@ -301,7 +301,7 @@ IdentifyAtaDevice (
     return EFI_UNSUPPORTED;
   }
 
-  DEBUG ((EFI_D_INFO, "AtaBus - Identify Device (%x %x)\n", (UINTN)AtaDevice->Port, (UINTN)AtaDevice->PortMultiplierPort));
+  DEBUG ((EFI_D_INFO, "AtaBus - Identify Device: Port %x PortMultiplierPort %x\n", AtaDevice->Port, AtaDevice->PortMultiplierPort));
 
   //
   // Check whether the WORD 88 (supported UltraDMA by drive) is valid
@@ -570,8 +570,8 @@ AtaNonBlockingCallBack (
     Task->Token->TransactionStatus = EFI_DEVICE_ERROR;
   }
   DEBUG ((
-    DEBUG_INFO, 
-    "NON-BLOCKING EVENT FINISHED!- STATUS = %r\n", 
+    EFI_D_BLKIO,
+    "NON-BLOCKING EVENT FINISHED!- STATUS = %r\n",
     Task->Token->TransactionStatus
     ));
 
@@ -579,7 +579,7 @@ AtaNonBlockingCallBack (
   // Reduce the SubEventCount, till it comes to zero.
   //
   (*Task->UnsignalledEventCount) --;
-  DEBUG ((DEBUG_INFO, "UnsignalledEventCount = %d\n", *Task->UnsignalledEventCount));
+  DEBUG ((EFI_D_BLKIO, "UnsignalledEventCount = %d\n", *Task->UnsignalledEventCount));
 
   //
   // Remove the SubTask from the Task list.
@@ -592,7 +592,7 @@ AtaNonBlockingCallBack (
     //
     if (!(*Task->IsError)) {
       gBS->SignalEvent (Task->Token->Event);
-      DEBUG ((DEBUG_INFO, "Signal Up Level Event UnsignalledEventCount = %x!\n", *Task->UnsignalledEventCount));
+      DEBUG ((EFI_D_BLKIO, "Signal the upper layer event!\n"));
     }
     
     FreePool (Task->UnsignalledEventCount);
@@ -600,8 +600,8 @@ AtaNonBlockingCallBack (
   }
 
   DEBUG ((
-    DEBUG_INFO, 
-    "PACKET INFO: Write=%s, Lenght=%x, LowCylinder=%x, HighCylinder=%x,SectionNumber=%x",
+    EFI_D_BLKIO,
+    "PACKET INFO: Write=%s, Length=%x, LowCylinder=%x, HighCylinder=%x, SectionNumber=%x\n",
     Task->Packet.OutDataBuffer != NULL ? L"YES" : L"NO",
     Task->Packet.OutDataBuffer != NULL ? Task->Packet.OutTransferLength : Task->Packet.InTransferLength,
     Task->Packet.Acb->AtaCylinderLow,
@@ -737,28 +737,12 @@ AccessAtaDevice(
         goto EXIT;
       }
 
-      DEBUG ((EFI_D_INFO, "NON-BLOCKING SET EVENT START: WRITE = %d\n", IsWrite));
       Status = TransferAtaDevice (AtaDevice, &Task->Packet, Buffer, StartLba, (UINT32) TransferBlockNumber, IsWrite, SubEvent);
-      DEBUG ((
-        EFI_D_INFO,
-        "NON-BLOCKING SET EVENT END:StartLba=%x, TransferBlockNumbers=%x, Status=%r\n",
-        StartLba,
-        TransferBlockNumber,
-        Status
-        ));
     } else {
       //
       // Blocking Mode.
       //
-      DEBUG ((EFI_D_INFO, "BLOCKING BLOCK I/O START: WRITE = %d\n", IsWrite));
       Status = TransferAtaDevice (AtaDevice, NULL, Buffer, StartLba, (UINT32) TransferBlockNumber, IsWrite, NULL);
-      DEBUG ((
-        EFI_D_INFO,
-        "BLOCKING BLOCK I/O FINISHE - StartLba = %x; TransferBlockNumbers = %x, status = %r\n", 
-        StartLba,
-        TransferBlockNumber,
-        Status
-        ));
     }
 
     if (EFI_ERROR (Status)) {

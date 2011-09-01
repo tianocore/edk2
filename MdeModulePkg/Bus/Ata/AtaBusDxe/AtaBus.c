@@ -364,7 +364,7 @@ Done:
 
   if (EFI_ERROR (Status) && (AtaDevice != NULL)) {
     ReleaseAtaResources (AtaDevice);  
-    DEBUG ((DEBUG_ERROR | DEBUG_INIT, "Failed to initialize Port %x PortMultiplierPort %x, status = %r\n", Port, PortMultiplierPort, Status));
+    DEBUG ((EFI_D_ERROR | EFI_D_INIT, "Failed to initialize Port %x PortMultiplierPort %x, status = %r\n", Port, PortMultiplierPort, Status));
   }
   return Status;
 }

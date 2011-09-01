@@ -1364,7 +1364,6 @@ AtaUdmStatusWait (
 
     if ((RegisterValue & BMIS_INTERRUPT) != 0) {
       Status = EFI_SUCCESS;
-      DEBUG ((DEBUG_INFO, "Task->RetryTimes = %x\n", Timeout));      
       break;
     }
     //
@@ -1409,7 +1408,6 @@ AtaUdmStatusCheck (
   }
 
   if ((RegisterValue & BMIS_INTERRUPT) != 0) {
-    DEBUG ((DEBUG_INFO, "Task->RetryTimes = %x\n", Task->RetryTimes));
     return EFI_SUCCESS;
   }
 
