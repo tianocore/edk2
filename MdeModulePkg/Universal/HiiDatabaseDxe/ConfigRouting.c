@@ -3393,6 +3393,7 @@ HiiBlockToConfig (
   UINTN                               Index;
   UINT8                               *TemBuffer;
   CHAR16                              *TemString;
+  CHAR16                              TemChar;
 
   if (This == NULL || Progress == NULL || Config == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -3442,8 +3443,12 @@ HiiBlockToConfig (
     StringPtr++;
   }
   if (*StringPtr == 0) {
-    *Progress = StringPtr - 1;
-    Status = EFI_INVALID_PARAMETER;
+    *Progress = StringPtr;
+    Status = EFI_SUCCESS;
+
+    AppendToMultiString(Config, ConfigRequest);
+    HiiToLower (*Config);
+
     goto Exit;
   }
   //
@@ -3454,8 +3459,10 @@ HiiBlockToConfig (
   //
   // Copy <ConfigHdr> and an additional '&' to <ConfigResp>
   //
-  Length = StringPtr - ConfigRequest;
-  CopyMem (*Config, ConfigRequest, Length * sizeof (CHAR16));
+  TemChar = *StringPtr;
+  *StringPtr = '\0';
+  AppendToMultiString(Config, ConfigRequest);
+  *StringPtr = TemChar;
 
   //
   // Parse each <RequestElement> if exists
