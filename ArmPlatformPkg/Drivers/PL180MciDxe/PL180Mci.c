@@ -46,7 +46,7 @@ MciInitialize (
 
 BOOLEAN
 MciIsCardPresent (
-  VOID
+  IN EFI_MMC_HOST_PROTOCOL     *This
   )
 {
   return (MmioRead32(FixedPcdGet32(PcdPL180SysMciRegAddress)) & 1);
@@ -54,7 +54,7 @@ MciIsCardPresent (
 
 BOOLEAN
 MciIsReadOnly (
-  VOID
+  IN EFI_MMC_HOST_PROTOCOL     *This
   )
 {
   return (MmioRead32(FixedPcdGet32(PcdPL180SysMciRegAddress)) & 2);
@@ -92,22 +92,23 @@ MciPrepareDataPath (
   )
 {
   // Set Data Length & Data Timer
-  MmioWrite32(MCI_DATA_TIMER_REG,0xFFFFFFF);
-  MmioWrite32(MCI_DATA_LENGTH_REG,MMCI0_BLOCKLEN);
+  MmioWrite32 (MCI_DATA_TIMER_REG,0xFFFFFFF);
+  MmioWrite32 (MCI_DATA_LENGTH_REG,MMCI0_BLOCKLEN);
 
 #ifndef USE_STREAM
   //Note: we are using a hardcoded BlockLen (=512). If we decide to use a variable size, we could
   // compute the pow2 of BlockLen with the above function GetPow2BlockLen()
-  MmioWrite32(MCI_DATA_CTL_REG, MCI_DATACTL_ENABLE |  MCI_DATACTL_DMA_ENABLE | TransferDirection | (MMCI0_POW2_BLOCKLEN << 4));
+  MmioWrite32 (MCI_DATA_CTL_REG, MCI_DATACTL_ENABLE |  MCI_DATACTL_DMA_ENABLE | TransferDirection | (MMCI0_POW2_BLOCKLEN << 4));
 #else
-  MmioWrite32(MCI_DATA_CTL_REG, MCI_DATACTL_ENABLE | MCI_DATACTL_DMA_ENABLE | TransferDirection | MCI_DATACTL_STREAM_TRANS);
+  MmioWrite32 (MCI_DATA_CTL_REG, MCI_DATACTL_ENABLE | MCI_DATACTL_DMA_ENABLE | TransferDirection | MCI_DATACTL_STREAM_TRANS);
 #endif
 }
 
 EFI_STATUS
 MciSendCommand (
-  IN MMC_CMD MmcCmd,
-  IN UINT32 Argument
+  IN EFI_MMC_HOST_PROTOCOL     *This,
+  IN MMC_CMD                    MmcCmd,
+  IN UINT32                     Argument
   )
 {
   UINT32 Status;
@@ -190,7 +191,7 @@ MciSendCommand (
   }
 
 Exit:
-	//Disable Command Path
+	// Disable Command Path
 	CmdCtrlReg = MmioRead32(MCI_COMMAND_REG);
 	MmioWrite32(MCI_COMMAND_REG, (CmdCtrlReg & ~MCI_CPSM_ENABLED));
 	return RetVal;
@@ -198,8 +199,9 @@ Exit:
 
 EFI_STATUS
 MciReceiveResponse (
-  IN MMC_RESPONSE_TYPE Type,
-  IN UINT32* Buffer
+  IN EFI_MMC_HOST_PROTOCOL     *This,
+  IN MMC_RESPONSE_TYPE          Type,
+  IN UINT32*                    Buffer
   )
 {
   if (Buffer == NULL) {
@@ -223,9 +225,10 @@ MciReceiveResponse (
 
 EFI_STATUS
 MciReadBlockData (
-  IN EFI_LBA Lba,
-  IN UINTN Length,
-  IN UINT32* Buffer
+  IN EFI_MMC_HOST_PROTOCOL     *This,
+  IN EFI_LBA                    Lba,
+  IN UINTN                      Length,
+  IN UINT32*                    Buffer
   )
 {
   UINTN Loop;
@@ -298,9 +301,10 @@ MciReadBlockData (
 
 EFI_STATUS
 MciWriteBlockData (
-  IN EFI_LBA Lba,
-  IN UINTN Length,
-  IN UINT32* Buffer
+  IN EFI_MMC_HOST_PROTOCOL     *This,
+  IN EFI_LBA                   Lba,
+  IN UINTN                     Length,
+  IN UINT32*                   Buffer
   )
 {
   UINTN Loop;
@@ -396,7 +400,8 @@ Exit:
 
 EFI_STATUS
 MciNotifyState (
-  IN MMC_STATE State
+  IN  EFI_MMC_HOST_PROTOCOL     *This,
+  IN MMC_STATE                  State
   )
 {
   UINT32      Data32;
@@ -490,7 +495,8 @@ EFI_GUID mPL180MciDevicePathGuid = EFI_CALLER_ID_GUID;
 
 EFI_STATUS
 MciBuildDevicePath (
-  IN EFI_DEVICE_PATH_PROTOCOL **DevicePath
+  IN EFI_MMC_HOST_PROTOCOL      *This,
+  IN EFI_DEVICE_PATH_PROTOCOL   **DevicePath
   )
 {
   EFI_DEVICE_PATH_PROTOCOL    *NewDevicePathNode;
@@ -503,6 +509,7 @@ MciBuildDevicePath (
 }
 
 EFI_MMC_HOST_PROTOCOL gMciHost = {
+  MMC_HOST_PROTOCOL_REVISION,
   MciIsCardPresent,
   MciIsReadOnly,
   MciBuildDevicePath,

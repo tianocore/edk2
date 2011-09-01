@@ -78,35 +78,74 @@ typedef enum _MMC_STATE {
     MmcDisconnectState,
 } MMC_STATE;
 
-typedef BOOLEAN (*MMC_ISCARDPRESENT)();
+///
+/// Forward declaration for EFI_MMC_HOST_PROTOCOL
+///
+typedef struct _EFI_MMC_HOST_PROTOCOL  EFI_MMC_HOST_PROTOCOL;
 
-typedef BOOLEAN (*MMC_ISREADONLY)();
+typedef BOOLEAN (EFIAPI *MMC_ISCARDPRESENT) (
+  IN  EFI_MMC_HOST_PROTOCOL   *This
+  );
 
-typedef EFI_STATUS (*MMC_BUILDDEVICEPATH)(EFI_DEVICE_PATH_PROTOCOL **DevicePath);
+typedef BOOLEAN (EFIAPI *MMC_ISREADONLY) (
+  IN  EFI_MMC_HOST_PROTOCOL   *This
+  );
 
-typedef EFI_STATUS (*MMC_NOTIFYSTATE)(MMC_STATE State);
+typedef EFI_STATUS (EFIAPI *MMC_BUILDDEVICEPATH) (
+  IN  EFI_MMC_HOST_PROTOCOL     *This,
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePath
+  );
 
-typedef EFI_STATUS (*MMC_SENDCOMMAND)(MMC_CMD Cmd, UINT32 Argument);
+typedef EFI_STATUS (EFIAPI *MMC_NOTIFYSTATE) (
+  IN  EFI_MMC_HOST_PROTOCOL     *This,
+  IN  MMC_STATE                 State
+  );
 
-typedef EFI_STATUS (*MMC_RECEIVERESPONSE)(MMC_RESPONSE_TYPE Type, UINT32* Buffer);
+typedef EFI_STATUS (EFIAPI *MMC_SENDCOMMAND) (
+  IN  EFI_MMC_HOST_PROTOCOL     *This,
+  IN  MMC_CMD                   Cmd,
+  IN  UINT32                    Argument
+  );
 
-typedef EFI_STATUS (*MMC_READBLOCKDATA)(EFI_LBA Lba, UINTN Length, UINT32* Buffer);
+typedef EFI_STATUS (EFIAPI *MMC_RECEIVERESPONSE) (
+  IN  EFI_MMC_HOST_PROTOCOL     *This,
+  IN  MMC_RESPONSE_TYPE         Type,
+  IN  UINT32                    *Buffer
+  );
 
-typedef EFI_STATUS (*MMC_WRITEBLOCKDATA)(EFI_LBA Lba, UINTN Length, UINT32* Buffer);
+typedef EFI_STATUS (EFIAPI *MMC_READBLOCKDATA) (
+  IN  EFI_MMC_HOST_PROTOCOL     *This,
+  IN  EFI_LBA                   Lba,
+  IN  UINTN                     Length,
+  OUT UINT32                    *Buffer
+  );
+
+typedef EFI_STATUS (EFIAPI *MMC_WRITEBLOCKDATA) (
+  IN  EFI_MMC_HOST_PROTOCOL     *This,
+  IN  EFI_LBA                   Lba,
+  IN  UINTN                     Length,
+  IN  UINT32                    *Buffer
+  );
+
 
 typedef struct _EFI_MMC_HOST_PROTOCOL {
-    MMC_ISCARDPRESENT       IsCardPresent;
-    MMC_ISREADONLY          IsReadOnly;
-    MMC_BUILDDEVICEPATH     BuildDevicePath;
 
-    MMC_NOTIFYSTATE         NotifyState;
+  UINT32                  Revision;
+  MMC_ISCARDPRESENT       IsCardPresent;
+  MMC_ISREADONLY          IsReadOnly;
+  MMC_BUILDDEVICEPATH     BuildDevicePath;
 
-    MMC_SENDCOMMAND         SendCommand;
-    MMC_RECEIVERESPONSE     ReceiveResponse;
+  MMC_NOTIFYSTATE         NotifyState;
 
-    MMC_READBLOCKDATA       ReadBlockData;
-    MMC_WRITEBLOCKDATA      WriteBlockData;
+  MMC_SENDCOMMAND         SendCommand;
+  MMC_RECEIVERESPONSE     ReceiveResponse;
+
+  MMC_READBLOCKDATA       ReadBlockData;
+  MMC_WRITEBLOCKDATA      WriteBlockData;
+
 } EFI_MMC_HOST_PROTOCOL;
+
+#define MMC_HOST_PROTOCOL_REVISION    0x00010001    // 1.1
 
 extern EFI_GUID gEfiMmcHostProtocolGuid;
 

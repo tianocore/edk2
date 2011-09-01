@@ -288,7 +288,7 @@ MmcFlushBlocks (
   IN EFI_BLOCK_IO_PROTOCOL  *This
   );
 
-EFI_STATUS InitializeMmcDevice(
+EFI_STATUS InitializeMmcDevice (
   IN  MMC_HOST_INSTANCE   *MmcHost
   );
 

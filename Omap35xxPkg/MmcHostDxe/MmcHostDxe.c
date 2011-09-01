@@ -280,7 +280,7 @@ InitializeMMCHS (
 
 BOOLEAN
 MMCIsCardPresent (
-  VOID
+  IN EFI_MMC_HOST_PROTOCOL     *This
   )
 {
   EFI_STATUS  Status;
@@ -299,7 +299,7 @@ MMCIsCardPresent (
 
 BOOLEAN
 MMCIsReadOnly (
-  VOID
+  IN EFI_MMC_HOST_PROTOCOL     *This
   )
 {
   /* Note:
@@ -318,7 +318,8 @@ EFI_GUID mPL180MciDevicePathGuid = EFI_CALLER_ID_GUID;
 
 EFI_STATUS
 MMCBuildDevicePath (
-  IN EFI_DEVICE_PATH_PROTOCOL **DevicePath
+  IN EFI_MMC_HOST_PROTOCOL     *This,
+  IN EFI_DEVICE_PATH_PROTOCOL  **DevicePath
   )
 {
   EFI_DEVICE_PATH_PROTOCOL    *NewDevicePathNode;
@@ -331,8 +332,9 @@ MMCBuildDevicePath (
 
 EFI_STATUS
 MMCSendCommand (
-  IN MMC_CMD MmcCmd,
-  IN UINT32 Argument
+  IN EFI_MMC_HOST_PROTOCOL     *This,
+  IN MMC_CMD                   MmcCmd,
+  IN UINT32                    Argument
   )
 {
   UINTN MmcStatus;
@@ -403,7 +405,8 @@ MMCSendCommand (
 
 EFI_STATUS
 MMCNotifyState (
-  IN MMC_STATE State
+  IN EFI_MMC_HOST_PROTOCOL    *This,
+  IN MMC_STATE                State
   )
 {
   EFI_STATUS              Status;
@@ -526,8 +529,9 @@ MMCNotifyState (
 
 EFI_STATUS
 MMCReceiveResponse (
-  IN MMC_RESPONSE_TYPE Type,
-  IN UINT32* Buffer
+  IN EFI_MMC_HOST_PROTOCOL     *This,
+  IN MMC_RESPONSE_TYPE         Type,
+  IN UINT32*                   Buffer
   )
 {
   if (Buffer == NULL) {
@@ -554,9 +558,10 @@ MMCReceiveResponse (
 
 EFI_STATUS
 MMCReadBlockData (
-  IN EFI_LBA Lba,
-  IN UINTN Length,
-  IN UINT32* Buffer
+  IN EFI_MMC_HOST_PROTOCOL      *This,
+  IN EFI_LBA                    Lba,
+  IN UINTN                      Length,
+  IN UINT32*                    Buffer
   )
 {
   UINTN MmcStatus;
@@ -595,9 +600,10 @@ MMCReadBlockData (
 
 EFI_STATUS
 MMCWriteBlockData (
-  IN EFI_LBA Lba,
-  IN UINTN Length,
-  IN UINT32* Buffer
+  IN EFI_MMC_HOST_PROTOCOL    *This,
+  IN EFI_LBA                  Lba,
+  IN UINTN                    Length,
+  IN UINT32*                  Buffer
   )
 {
   UINTN MmcStatus;
@@ -635,6 +641,7 @@ MMCWriteBlockData (
 }
 
 EFI_MMC_HOST_PROTOCOL gMMCHost = {
+  MMC_HOST_PROTOCOL_REVISION,
   MMCIsCardPresent,
   MMCIsReadOnly,
   MMCBuildDevicePath,
