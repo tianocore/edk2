@@ -16,9 +16,9 @@
 #include "MmcHostDxe.h"
 
 EMBEDDED_EXTERNAL_DEVICE   *gTPS65950;
-UINT8                      MaxDataTransferRate = 0;
-UINT32                     Rca = 0;
-BOOLEAN                    BitModeSet = FALSE;
+UINT8                      mMaxDataTransferRate = 0;
+UINT32                     mRca = 0;
+BOOLEAN                    mBitModeSet = FALSE;
 
 
 typedef struct {
@@ -116,16 +116,17 @@ CalculateCardCLKD (
   UINTN *ClockFrequencySelect
   )
 {
-  DEBUG((EFI_D_ERROR, "CalculateCardCLKD()\n"));
   UINTN    TransferRateValue = 0;
   UINTN    TimeValue = 0 ;
   UINTN    Frequency = 0;
 
+  DEBUG ((DEBUG_BLKIO, "CalculateCardCLKD()\n"));
+
   // For SD Cards  we would need to send CMD6 to set
   // speeds abouve 25MHz. High Speed mode 50 MHz and up
 
-  //Calculate Transfer rate unit (Bits 2:0 of TRAN_SPEED)
-  switch (MaxDataTransferRate & 0x7) { // 2
+  // Calculate Transfer rate unit (Bits 2:0 of TRAN_SPEED)
+  switch (mMaxDataTransferRate & 0x7) { // 2
     case 0:
       TransferRateValue = 100 * 1000;
       break;
@@ -143,12 +144,13 @@ CalculateCardCLKD (
       break;
 
     default:
-      DEBUG((EFI_D_ERROR, "Invalid parameter.\n"));
+      DEBUG ((DEBUG_BLKIO, "Invalid parameter.\n"));
       ASSERT(FALSE);
+      return;
   }
 
   //Calculate Time value (Bits 6:3 of TRAN_SPEED)
-  switch ((MaxDataTransferRate >> 3) & 0xF) { // 6
+  switch ((mMaxDataTransferRate >> 3) & 0xF) { // 6
     case 1:
       TimeValue = 10;
       break;
@@ -210,16 +212,17 @@ CalculateCardCLKD (
       break;
 
     default:
-      DEBUG((EFI_D_ERROR, "Invalid parameter.\n"));
+      DEBUG ((DEBUG_BLKIO, "Invalid parameter.\n"));
       ASSERT(FALSE);
+      return;
   }
 
   Frequency = TransferRateValue * TimeValue/10;
 
-  //Calculate Clock divider value to program in MMCHS_SYSCTL[CLKD] field.
+  // Calculate Clock divider value to program in MMCHS_SYSCTL[CLKD] field.
   *ClockFrequencySelect = ((MMC_REFERENCE_CLK/Frequency) + 1);
 
-  DEBUG ((EFI_D_INFO, "MaxDataTransferRate: 0x%x, Frequency: %d KHz, ClockFrequencySelect: %x\n", MaxDataTransferRate, Frequency/1000, *ClockFrequencySelect));
+  DEBUG ((DEBUG_BLKIO, "mMaxDataTransferRate: 0x%x, Frequency: %d KHz, ClockFrequencySelect: %x\n", mMaxDataTransferRate, Frequency/1000, *ClockFrequencySelect));
 }
 
 VOID
@@ -227,17 +230,18 @@ UpdateMMCHSClkFrequency (
   UINTN NewCLKD
   )
 {
-  DEBUG((EFI_D_ERROR, "UpdateMMCHSClkFrequency()\n"));
-  //Set Clock enable to 0x0 to not provide the clock to the card
+  DEBUG ((DEBUG_BLKIO, "UpdateMMCHSClkFrequency()\n"));
+
+  // Set Clock enable to 0x0 to not provide the clock to the card
   MmioAnd32 (MMCHS_SYSCTL, ~CEN);
 
-  //Set new clock frequency.
+  // Set new clock frequency.
   MmioAndThenOr32 (MMCHS_SYSCTL, ~CLKD_MASK, NewCLKD << 6); 
 
-  //Poll till Internal Clock Stable
+  // Poll till Internal Clock Stable
   while ((MmioRead32 (MMCHS_SYSCTL) & ICS_MASK) != ICS);
 
-  //Set Clock enable to 0x1 to provide the clock to the card
+  // Set Clock enable to 0x1 to provide the clock to the card
   MmioOr32 (MMCHS_SYSCTL, CEN);
 }
 
@@ -246,21 +250,22 @@ InitializeMMCHS (
   VOID
   )
 {
-  DEBUG((EFI_D_ERROR, "InitializeMMCHS()\n"));
-  UINT8      Data = 0;
+  UINT8      Data;
   EFI_STATUS Status;
 
-  //Select Device group to belong to P1 device group in Power IC.
+  DEBUG ((DEBUG_BLKIO, "InitializeMMCHS()\n"));
+
+  // Select Device group to belong to P1 device group in Power IC.
   Data = DEV_GRP_P1;
   Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VMMC1_DEV_GRP), 1, &Data);
   ASSERT_EFI_ERROR(Status);
 
-  //Configure voltage regulator for MMC1 in Power IC to output 3.0 voltage.
+  // Configure voltage regulator for MMC1 in Power IC to output 3.0 voltage.
   Data = VSEL_3_00V;
   Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VMMC1_DEDICATED_REG), 1, &Data);
   ASSERT_EFI_ERROR(Status);
   
-  //After ramping up voltage, set VDDS stable bit to indicate that voltage level is stable.
+  // After ramping up voltage, set VDDS stable bit to indicate that voltage level is stable.
   MmioOr32 (CONTROL_PBIAS_LITE, (PBIASLITEVMODE0 | PBIASLITEPWRDNZ0 | PBIASSPEEDCTRL0 | PBIASLITEVMODE1 | PBIASLITEWRDNZ1));
 
   // Enable WP GPIO
@@ -270,7 +275,6 @@ InitializeMMCHS (
   Data = CARD_DETECT_ENABLE;
   gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID2, TPS65950_GPIO_CTRL), 1, &Data);
 
-
   return Status;
 }
 
@@ -279,7 +283,6 @@ MMCIsCardPresent (
   VOID
   )
 {
-  //DEBUG((EFI_D_ERROR, "MMCIsCardPresent()\n"));
   EFI_STATUS  Status;
   UINT8       Data;
 
@@ -332,47 +335,48 @@ MMCSendCommand (
   IN UINT32 Argument
   )
 {
+  UINTN MmcStatus;
+  UINTN RetryCount = 0;
+
   if (IgnoreCommand(MmcCmd))
     return EFI_SUCCESS;
 
   MmcCmd = TranslateCommand(MmcCmd);
 
-  //DEBUG((EFI_D_ERROR, "MMCSendCommand(%d)\n", MmcCmd));
-  UINTN MmcStatus;
-  UINTN RetryCount = 0;
+  //DEBUG ((EFI_D_ERROR, "MMCSendCommand(%d)\n", MmcCmd));
 
-  //Check if command line is in use or not. Poll till command line is available.
+  // Check if command line is in use or not. Poll till command line is available.
   while ((MmioRead32 (MMCHS_PSTATE) & DATI_MASK) == DATI_NOT_ALLOWED);
 
-  //Provide the block size.
+  // Provide the block size.
   MmioWrite32 (MMCHS_BLK, BLEN_512BYTES);
 
-  //Setting Data timeout counter value to max value.
+  // Setting Data timeout counter value to max value.
   MmioAndThenOr32 (MMCHS_SYSCTL, ~DTO_MASK, DTO_VAL);
 
-  //Clear Status register.
+  // Clear Status register.
   MmioWrite32 (MMCHS_STAT, 0xFFFFFFFF);
 
-  //Set command argument register
+  // Set command argument register
   MmioWrite32 (MMCHS_ARG, Argument);
 
   //TODO: fix this
   //Enable interrupt enable events to occur
   //MmioWrite32 (MMCHS_IE, CmdInterruptEnableVal);
 
-  //Send a command
+  // Send a command
   MmioWrite32 (MMCHS_CMD, MmcCmd);
 
-  //Check for the command status.
+  // Check for the command status.
   while (RetryCount < MAX_RETRY_COUNT) {
     do {
       MmcStatus = MmioRead32 (MMCHS_STAT);
     } while (MmcStatus == 0);
 
-    //Read status of command response
+    // Read status of command response
     if ((MmcStatus & ERRI) != 0) {
 
-      //Perform soft-reset for mmci_cmd line.
+      // Perform soft-reset for mmci_cmd line.
       MmioOr32 (MMCHS_SYSCTL, SRC);
       while ((MmioRead32 (MMCHS_SYSCTL) & SRC));
 
@@ -380,7 +384,7 @@ MMCSendCommand (
       return EFI_DEVICE_ERROR;
     }
 
-    //Check if command is completed.
+    // Check if command is completed.
     if ((MmcStatus & CC) == CC) {
       MmioWrite32 (MMCHS_STAT, CC);
       break;
@@ -390,7 +394,7 @@ MMCSendCommand (
   }
 
   if (RetryCount == MAX_RETRY_COUNT) {
-    DEBUG((EFI_D_ERROR, "MMCSendCommand: Timeout\n"));
+    DEBUG ((DEBUG_BLKIO, "MMCSendCommand: Timeout\n"));
     return EFI_TIMEOUT;
   }
 
@@ -403,27 +407,28 @@ MMCNotifyState (
   )
 {
   EFI_STATUS              Status;
-  UINTN freqSel;
+  UINTN                   FreqSel;
+
   switch(State) {
     case MmcInvalidState:
       ASSERT(0);
       break;
     case MmcHwInitializationState:
-      BitModeSet = FALSE;
+      mBitModeSet = FALSE;
 
-      DEBUG((EFI_D_ERROR, "MMCHwInitializationState()\n"));
+      DEBUG ((DEBUG_BLKIO, "MMCHwInitializationState()\n"));
       Status = InitializeMMCHS ();
       if (EFI_ERROR(Status)) {
-        DEBUG ((EFI_D_ERROR, "Initialize MMC host controller fails. Status: %x\n", Status));
+        DEBUG ((DEBUG_BLKIO, "Initialize MMC host controller fails. Status: %x\n", Status));
         return Status;
       }
 
-      //Software reset of the MMCHS host controller.
+      // Software reset of the MMCHS host controller.
       MmioWrite32 (MMCHS_SYSCONFIG, SOFTRESET);
       gBS->Stall(1000);
       while ((MmioRead32 (MMCHS_SYSSTATUS) & RESETDONE_MASK) != RESETDONE);
 
-      //Soft reset for all.
+      // Soft reset for all.
       MmioWrite32 (MMCHS_SYSCTL, SRA);
       gBS->Stall(1000);
       while ((MmioRead32 (MMCHS_SYSCTL) & SRA) != 0x0);
@@ -431,52 +436,52 @@ MMCNotifyState (
       //Voltage capabilities initialization. Activate VS18 and VS30.
       MmioOr32 (MMCHS_CAPA, (VS30 | VS18));
 
-      //Wakeup configuration
+      // Wakeup configuration
       MmioOr32 (MMCHS_SYSCONFIG, ENAWAKEUP);
       MmioOr32 (MMCHS_HCTL, IWE);
 
-      //MMCHS Controller default initialization
+      // MMCHS Controller default initialization
       MmioOr32 (MMCHS_CON, (OD | DW8_1_4_BIT | CEATA_OFF));
 
       MmioWrite32 (MMCHS_HCTL, (SDVS_3_0_V | DTW_1_BIT | SDBP_OFF));
 
-      //Enable internal clock
+      // Enable internal clock
       MmioOr32 (MMCHS_SYSCTL, ICE);
 
-      //Set the clock frequency to 80KHz.
+      // Set the clock frequency to 80KHz.
       UpdateMMCHSClkFrequency (CLKD_80KHZ);
 
-      //Enable SD bus power.
+      // Enable SD bus power.
       MmioOr32 (MMCHS_HCTL, (SDBP_ON));
 
-      //Poll till SD bus power bit is set.
+      // Poll till SD bus power bit is set.
       while ((MmioRead32 (MMCHS_HCTL) & SDBP_MASK) != SDBP_ON);
 
-      //Enable interrupts.
+      // Enable interrupts.
       MmioWrite32 (MMCHS_IE, (BADA_EN | CERR_EN | DEB_EN | DCRC_EN | DTO_EN | CIE_EN |
         CEB_EN | CCRC_EN | CTO_EN | BRR_EN | BWR_EN | TC_EN | CC_EN));
 
-      //Controller INIT procedure start.
+      // Controller INIT procedure start.
       MmioOr32 (MMCHS_CON, INIT);
       MmioWrite32 (MMCHS_CMD, 0x00000000);
       while (!(MmioRead32 (MMCHS_STAT) & CC));
 
-      //Wait for 1 ms
-      gBS->Stall(1000);
+      // Wait for 1 ms
+      gBS->Stall (1000);
 
-      //Set CC bit to 0x1 to clear the flag
+      // Set CC bit to 0x1 to clear the flag
       MmioOr32 (MMCHS_STAT, CC);
 
-      //Retry INIT procedure.
+      // Retry INIT procedure.
       MmioWrite32 (MMCHS_CMD, 0x00000000);
       while (!(MmioRead32 (MMCHS_STAT) & CC));
 
-      //End initialization sequence
+      // End initialization sequence
       MmioAnd32 (MMCHS_CON, ~INIT);
 
       MmioOr32 (MMCHS_HCTL, (SDVS_3_0_V | DTW_1_BIT | SDBP_ON));
 
-      //Change clock frequency to 400KHz to fit protocol
+      // Change clock frequency to 400KHz to fit protocol
       UpdateMMCHSClkFrequency(CLKD_400KHZ);
 
       MmioOr32 (MMCHS_CON, OD);
@@ -488,20 +493,20 @@ MMCNotifyState (
     case MmcIdentificationState:
       break;
     case MmcStandByState:
-      CalculateCardCLKD(&freqSel);
-      UpdateMMCHSClkFrequency(freqSel);
+      CalculateCardCLKD (&FreqSel);
+      UpdateMMCHSClkFrequency (FreqSel);
       break;
     case MmcTransferState:
-      if (!BitModeSet) {
-        Status = MMCSendCommand (CMD55, Rca << 16);
+      if (!mBitModeSet) {
+        Status = MMCSendCommand (This, CMD55, mRca << 16);
         if (!EFI_ERROR (Status)) {
-          // set device into 4-bit data bus mode
-          Status = MMCSendCommand (ACMD6, 0x2);
+          // Set device into 4-bit data bus mode
+          Status = MMCSendCommand (This, ACMD6, 0x2);
           if (!EFI_ERROR (Status)) {
-          // Set host controler into 4-bit mode
+            // Set host controler into 4-bit mode
             MmioOr32 (MMCHS_HCTL, DTW_4_BIT);
-            DEBUG ((EFI_D_INFO, "SD Memory Card set to 4-bit mode\n"));
-            BitModeSet = TRUE;
+            DEBUG ((DEBUG_BLKIO, "SD Memory Card set to 4-bit mode\n"));
+            mBitModeSet = TRUE;
           }
         }
       }
@@ -525,9 +530,7 @@ MMCReceiveResponse (
   IN UINT32* Buffer
   )
 {
-  //DEBUG((EFI_D_ERROR, "MMCReceiveResponse()\n"));
   if (Buffer == NULL) {
-    DEBUG((EFI_D_ERROR, "Buffer was NULL\n"));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -541,9 +544,9 @@ MMCReceiveResponse (
   }
 
   if (Type == MMC_RESPONSE_TYPE_CSD) {
-    MaxDataTransferRate = Buffer[3] & 0xFF;
+    mMaxDataTransferRate = Buffer[3] & 0xFF;
   } else if (Type == MMC_RESPONSE_TYPE_RCA) {
-    Rca = Buffer[0] >> 16;
+    mRca = Buffer[0] >> 16;
   }
 
   return EFI_SUCCESS;
@@ -556,24 +559,23 @@ MMCReadBlockData (
   IN UINT32* Buffer
   )
 {
-  //DEBUG((EFI_D_ERROR, "MMCReadBlockData(LBA: 0x%x, ", Lba));
-  //DEBUG((EFI_D_ERROR, "Length: 0x%x, ", Length));
-  //DEBUG((EFI_D_ERROR, "Buffer: 0x%x)\n", Buffer));
   UINTN MmcStatus;
   UINTN Count;
   UINTN RetryCount = 0;
 
-  //Check controller status to make sure there is no error.
+  DEBUG ((DEBUG_BLKIO, "MMCReadBlockData(LBA: 0x%x, Length: 0x%x, Buffer: 0x%x)\n", Lba, Length, Buffer));
+
+  // Check controller status to make sure there is no error.
   while (RetryCount < MAX_RETRY_COUNT) {
     do {
-      //Read Status.
+      // Read Status.
       MmcStatus = MmioRead32 (MMCHS_STAT);
     } while(MmcStatus == 0);
 
-    //Check if Buffer read ready (BRR) bit is set?
+    // Check if Buffer read ready (BRR) bit is set?
     if (MmcStatus & BRR) {
 
-      //Clear BRR bit
+      // Clear BRR bit
       MmioOr32 (MMCHS_STAT, BRR);
 
       for (Count = 0; Count < Length / 4; Count++) {
@@ -602,20 +604,20 @@ MMCWriteBlockData (
   UINTN Count;
   UINTN RetryCount = 0;
 
-  //Check controller status to make sure there is no error.
+  // Check controller status to make sure there is no error.
   while (RetryCount < MAX_RETRY_COUNT) {
     do {
-      //Read Status.
+      // Read Status.
       MmcStatus = MmioRead32 (MMCHS_STAT);
     } while(MmcStatus == 0);
 
-    //Check if Buffer write ready (BWR) bit is set?
+    // Check if Buffer write ready (BWR) bit is set?
     if (MmcStatus & BWR) {
 
-      //Clear BWR bit
+      // Clear BWR bit
       MmioOr32 (MMCHS_STAT, BWR);
 
-      //Write block worth of data.
+      // Write block worth of data.
       for (Count = 0; Count < Length / 4; Count++) {
         MmioWrite32 (MMCHS_DATA, *Buffer++);
       }
@@ -649,9 +651,10 @@ MMCInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  DEBUG((EFI_D_ERROR, "MMCInitialize()\n"));
   EFI_STATUS    Status;
   EFI_HANDLE    Handle = NULL;
+
+  DEBUG ((DEBUG_BLKIO, "MMCInitialize()\n"));
 
   Status = gBS->LocateProtocol (&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
   ASSERT_EFI_ERROR(Status);
