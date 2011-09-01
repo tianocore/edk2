@@ -1,11 +1,11 @@
 /** @file
     Machine dependent type definitions.
 
-    Portions Copyright (c) 2010, Intel Corporation.  All rights reserved.<BR>
-    This program and the accompanying materials are licensed and made available
-    under the terms and conditions of the BSD License that accompanies this
-    distribution.  The full text of the license may be found at
-    http://opensource.org/licenses/bsd-license.php.
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available under
+    the terms and conditions of the BSD License that accompanies this distribution.
+    The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
 
     THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -45,10 +45,6 @@
 
 #include  <sys/EfiCdefs.h>
 #include  <machine/int_types.h>
-
-/* Handle the long and unsigned long data types which EFI doesn't directly support. */
-//typedef long int             LONGN;     // 32-bit
-//typedef long unsigned int    ULONGN;    // 32-bit
 
 typedef PHYSICAL_ADDRESS  paddr_t;
 typedef UINT64            psize_t;

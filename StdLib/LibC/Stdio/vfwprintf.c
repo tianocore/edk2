@@ -1003,7 +1003,12 @@ reswitch: switch (ch) {
 
         mbs = initial;
         mbseqlen = wcrtomb(buf,
-            (wchar_t)GETARG(wint_t), &mbs);
+            /* The compiler "knows" that wint_t may be smaller than an int so
+               it warns about it when used as the type argument to va_arg().
+               Since any type of parameter smaller than an int is promoted to an int on a
+               function call, we must call GETARG with type int instead of wint_t.
+            */
+            (wchar_t)GETARG(int), &mbs);
         if (mbseqlen == (size_t)-1) {
           fp->_flags |= __SERR;
           goto error;
@@ -1015,7 +1020,7 @@ reswitch: switch (ch) {
       }
 #else
       if (flags & LONGINT)
-        *buf = (wchar_t)GETARG(wint_t);
+        *buf = (wchar_t)GETARG(int);
       else
         *buf = (wchar_t)btowc(GETARG(int));
       size = 1;
@@ -1915,7 +1920,7 @@ done:
       (*argtable) [n].pvoidarg = va_arg (ap, void *);
       break;
         case T_WINT:
-      (*argtable) [n].wintarg = va_arg (ap, wint_t);
+      (*argtable) [n].wintarg = va_arg (ap, int);
       break;
         case TP_WCHAR:
       (*argtable) [n].pwchararg = va_arg (ap, wchar_t *);

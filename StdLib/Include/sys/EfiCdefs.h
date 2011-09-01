@@ -102,6 +102,7 @@
   //#define _EFI_WINT_MIN     (0)
   //#define _EFI_WINT_MAX     (0xFFFF)
   #define _EFI_PTRDIFF_T_   __PTRDIFF_TYPE__  /* ptr1 - ptr2 --- Must be same size as size_t */
+
 #else
 #define _EFI_SIZE_T_      UINTN       /* sizeof() */
 #define _EFI_WCHAR_T      UINT16
@@ -338,13 +339,29 @@ extern int _fltused;    // VC++ requires this if you use floating point.  KEEP f
 #define _DIAGASSERT(e)
 
 // Types used to replace long so that it will have constant length regardless of compiler.
-typedef  INT32   EFI_LONG_T;  // Equivalent to long in VS200?
-typedef UINT32  EFI_ULONG_T;  // Equivalent to unsigned long in VS200?
-typedef INTN     LONGN;
-typedef UINTN   ULONGN;
-typedef INT32    LONG32;
+typedef  INT32   LONG32;
 typedef UINT32  ULONG32;
 typedef  INT64   LONG64;
 typedef UINT64  ULONG64;
+
+typedef   INT32   EFI_LONG_T;
+typedef  UINT32   EFI_ULONG_T;
+
+/* These types reflect the compiler's size for long */
+#if defined(__GNUC__)
+  #if __GNUC_PREREQ__(4,4)
+    /* GCC 4.4 or later */
+    typedef   INT64   LONGN;
+    typedef  UINT64   ULONGN;
+  #else
+    /* minGW gcc variant */
+    typedef   INT32   LONGN;
+    typedef  UINT32   ULONGN;
+  #endif  /* __GNUC_PREREQ__(4,4) */
+#else   /* NOT GCC */
+  /* Microsoft or Intel compilers */
+  typedef   INT32   LONGN;
+  typedef  UINT32   ULONGN;
+#endif  /* defined(__GNUC__) */
 
 #endif  /* _EFI_CDEFS_H */
