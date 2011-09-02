@@ -107,7 +107,7 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
   SecDispatchTableLib|UnixPkg/Library/SecDispatchTableLib/SecDispatchTableLib.inf
-  LockBoxLib|TianoModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
+  LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
 
 [LibraryClasses.common.USER_DEFINED]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
