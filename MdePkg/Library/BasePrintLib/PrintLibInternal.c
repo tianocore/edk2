@@ -843,7 +843,7 @@ BasePrintLibSPrintMarker (
     //
     if ((Flags & (PAD_TO_WIDTH | LEFT_JUSTIFY)) == (PAD_TO_WIDTH)) {
       LengthToReturn += ((Width - Precision) * BytesPerOutputCharacter);
-      if ((Flags & COUNT_ONLY_NO_PRINT) == 0) {
+      if ((Flags & COUNT_ONLY_NO_PRINT) == 0 && Buffer != NULL) {
         Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, Width - Precision, ' ', BytesPerOutputCharacter);
       }
     }
@@ -851,22 +851,22 @@ BasePrintLibSPrintMarker (
     if (ZeroPad) {
       if (Prefix != 0) {
         LengthToReturn += (1 * BytesPerOutputCharacter);
-        if ((Flags & COUNT_ONLY_NO_PRINT) == 0) {
+        if ((Flags & COUNT_ONLY_NO_PRINT) == 0 && Buffer != NULL) {
           Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, Prefix, BytesPerOutputCharacter);
         }
       }
       LengthToReturn += ((Precision - Count) * BytesPerOutputCharacter);
-      if ((Flags & COUNT_ONLY_NO_PRINT) == 0) {
+      if ((Flags & COUNT_ONLY_NO_PRINT) == 0 && Buffer != NULL) {
         Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, Precision - Count, '0', BytesPerOutputCharacter);
       }
     } else {
       LengthToReturn += ((Precision - Count) * BytesPerOutputCharacter);
-      if ((Flags & COUNT_ONLY_NO_PRINT) == 0) {
+      if ((Flags & COUNT_ONLY_NO_PRINT) == 0 && Buffer != NULL) {
         Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, Precision - Count, ' ', BytesPerOutputCharacter);
       }
       if (Prefix != 0) {
         LengthToReturn += (1 * BytesPerOutputCharacter);
-        if ((Flags & COUNT_ONLY_NO_PRINT) == 0) {
+        if ((Flags & COUNT_ONLY_NO_PRINT) == 0 && Buffer != NULL) {
           Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, Prefix, BytesPerOutputCharacter);
         }
       }
@@ -887,7 +887,7 @@ BasePrintLibSPrintMarker (
       ArgumentCharacter = ((*ArgumentString & 0xff) | (*(ArgumentString + 1) << 8)) & ArgumentMask;
 
       LengthToReturn += (1 * BytesPerOutputCharacter);
-      if ((Flags & COUNT_ONLY_NO_PRINT) == 0) {
+      if ((Flags & COUNT_ONLY_NO_PRINT) == 0 && Buffer != NULL) {
         Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, ArgumentCharacter, BytesPerOutputCharacter);
       }
       ArgumentString    += BytesPerArgumentCharacter;
@@ -899,7 +899,7 @@ BasePrintLibSPrintMarker (
           Index++;
           if (Index < Count) {
             LengthToReturn += (1 * BytesPerOutputCharacter);
-            if ((Flags & COUNT_ONLY_NO_PRINT) == 0) {
+            if ((Flags & COUNT_ONLY_NO_PRINT) == 0 && Buffer != NULL) {
               Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, ',', BytesPerOutputCharacter);
             }
           }
@@ -912,7 +912,7 @@ BasePrintLibSPrintMarker (
     //
     if ((Flags & (PAD_TO_WIDTH | LEFT_JUSTIFY)) == (PAD_TO_WIDTH | LEFT_JUSTIFY)) {
       LengthToReturn += ((Width - Precision) * BytesPerOutputCharacter);
-      if ((Flags & COUNT_ONLY_NO_PRINT) == 0) {
+      if ((Flags & COUNT_ONLY_NO_PRINT) == 0 && Buffer != NULL) {
         Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, Width - Precision, ' ', BytesPerOutputCharacter);
       }
     }
@@ -932,6 +932,7 @@ BasePrintLibSPrintMarker (
     return (LengthToReturn / BytesPerOutputCharacter);
   }
 
+  ASSERT (Buffer != NULL);
   //
   // Null terminate the Unicode or ASCII string
   //
