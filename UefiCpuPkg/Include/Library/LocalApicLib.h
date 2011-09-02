@@ -4,7 +4,7 @@
   Local APIC library assumes local APIC is enabled. It does not
   handles cases where local APIC is disabled.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -319,5 +319,54 @@ SendApicEoi (
   VOID
   );
 
+/**
+  Get the 32-bit address that a device should use to send a Message Signaled 
+  Interrupt (MSI) to the Local APIC of the currently executing processor.
+
+  @return 32-bit address used to send an MSI to the Local APIC.
+**/
+UINT32
+EFIAPI    
+GetApicMsiAddress (
+  VOID
+  );
+    
+/**
+  Get the 64-bit data value that a device should use to send a Message Signaled 
+  Interrupt (MSI) to the Local APIC of the currently executing processor.
+
+  If Vector is not in range 0x10..0xFE, then ASSERT().
+  If DeliveryMode is not supported, then ASSERT().
+  
+  @param  Vector          The 8-bit interrupt vector associated with the MSI.  
+                          Must be in the range 0x10..0xFE
+  @param  DeliveryMode    A 3-bit value that specifies how the recept of the MSI 
+                          is handled.  The only supported values are:
+                            0: LOCAL_APIC_DELIVERY_MODE_FIXED
+                            1: LOCAL_APIC_DELIVERY_MODE_LOWEST_PRIORITY
+                            2: LOCAL_APIC_DELIVERY_MODE_SMI
+                            4: LOCAL_APIC_DELIVERY_MODE_NMI
+                            5: LOCAL_APIC_DELIVERY_MODE_INIT
+                            7: LOCAL_APIC_DELIVERY_MODE_EXTINT
+                          
+  @param  LevelTriggered  TRUE specifies a level triggered interrupt.  
+                          FALSE specifies an edge triggered interrupt.
+  @param  AssertionLevel  Ignored if LevelTriggered is FALSE.
+                          TRUE specifies a level triggered interrupt that active 
+                          when the interrupt line is asserted.
+                          FALSE specifies a level triggered interrupt that active 
+                          when the interrupt line is deasserted.
+
+  @return 64-bit data value used to send an MSI to the Local APIC.
+**/
+UINT64
+EFIAPI    
+GetApicMsiValue (
+  IN UINT8    Vector,
+  IN UINTN    DeliveryMode,
+  IN BOOLEAN  LevelTriggered,
+  IN BOOLEAN  AssertionLevel
+  );
+  
 #endif
 

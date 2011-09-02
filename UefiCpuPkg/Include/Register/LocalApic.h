@@ -1,7 +1,7 @@
 /** @file
   IA32 Local APIC Definitions.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -178,6 +178,37 @@ typedef union {
   } Bits;
   UINT32    Uint32;
 } LOCAL_APIC_LVT_LINT;
+
+//
+// MSI Address Register
+//
+typedef union {
+  struct {
+    UINT32  Reserved0:2;         ///< Reserved
+    UINT32  DestinationMode:1;   ///< Specifies the Destination Mode.
+    UINT32  RedirectionHint:1;   ///< Specifies the Redirection Hint.
+    UINT32  Reserved1:8;         ///< Reserved.
+    UINT32  DestinationId:8;     ///< Specifies the Destination ID.
+    UINT32  BaseAddress:12;      ///< Must be 0FEEH
+  } Bits;
+  UINT32    Uint32;
+} LOCAL_APIC_MSI_ADDRESS;
+
+//
+// MSI Address Register
+//
+typedef union {
+  struct {
+    UINT32  Vector:8;            ///< Interrupt vector in range 010h..0FEH
+    UINT32  DeliveryMode:3;      ///< Specifies the type of interrupt to be sent.
+    UINT32  Reserved0:3;         ///< Reserved.
+    UINT32  Level:1;             ///< 0:Deassert, 1:Assert.  Ignored for Edge triggered interrupts.
+    UINT32  TriggerMode:1;       ///< 0:Edge,     1:Level.
+    UINT32  Reserved1:16;        ///< Reserved.
+    UINT32  Reserved2:32;        ///< Reserved.
+  } Bits;
+  UINT64    Uint64;
+} LOCAL_APIC_MSI_DATA;
 
 #endif
 

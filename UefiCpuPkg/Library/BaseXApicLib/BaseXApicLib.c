@@ -3,7 +3,7 @@
 
   This local APIC library instance supports xAPIC mode only.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -675,3 +675,80 @@ SendApicEoi (
   WriteLocalApicReg (XAPIC_EOI_OFFSET, 0);
 }
 
+/**
+  Get the 32-bit address that a device should use to send a Message Signaled 
+  Interrupt (MSI) to the Local APIC of the currently executing processor.
+
+  @return 32-bit address used to send an MSI to the Local APIC.
+**/
+UINT32
+EFIAPI    
+GetApicMsiAddress (
+  VOID
+  )
+{
+  LOCAL_APIC_MSI_ADDRESS  MsiAddress;
+
+  //
+  // Return address for an MSI interrupt to be delivered only to the APIC ID 
+  // of the currently executing processor.
+  //
+  MsiAddress.Uint32             = 0;
+  MsiAddress.Bits.BaseAddress   = 0xFEE;
+  MsiAddress.Bits.DestinationId = GetApicId ();
+  return MsiAddress.Uint32;
+}
+    
+/**
+  Get the 64-bit data value that a device should use to send a Message Signaled 
+  Interrupt (MSI) to the Local APIC of the currently executing processor.
+
+  If Vector is not in range 0x10..0xFE, then ASSERT().
+  If DeliveryMode is not supported, then ASSERT().
+  
+  @param  Vector          The 8-bit interrupt vector associated with the MSI.  
+                          Must be in the range 0x10..0xFE
+  @param  DeliveryMode    A 3-bit value that specifies how the recept of the MSI 
+                          is handled.  The only supported values are:
+                            0: LOCAL_APIC_DELIVERY_MODE_FIXED
+                            1: LOCAL_APIC_DELIVERY_MODE_LOWEST_PRIORITY
+                            2: LOCAL_APIC_DELIVERY_MODE_SMI
+                            4: LOCAL_APIC_DELIVERY_MODE_NMI
+                            5: LOCAL_APIC_DELIVERY_MODE_INIT
+                            7: LOCAL_APIC_DELIVERY_MODE_EXTINT
+                          
+  @param  LevelTriggered  TRUE specifies a level triggered interrupt.  
+                          FALSE specifies an edge triggered interrupt.
+  @param  AssertionLevel  Ignored if LevelTriggered is FALSE.
+                          TRUE specifies a level triggered interrupt that active 
+                          when the interrupt line is asserted.
+                          FALSE specifies a level triggered interrupt that active 
+                          when the interrupt line is deasserted.
+
+  @return 64-bit data value used to send an MSI to the Local APIC.
+**/
+UINT64
+EFIAPI    
+GetApicMsiValue (
+  IN UINT8    Vector,
+  IN UINTN    DeliveryMode,
+  IN BOOLEAN  LevelTriggered,
+  IN BOOLEAN  AssertionLevel
+  )
+{
+  LOCAL_APIC_MSI_DATA  MsiData;
+
+  ASSERT (Vector >= 0x10 && Vector <= 0xFE);
+  ASSERT (DeliveryMode < 8 && DeliveryMode != 6 && DeliveryMode != 3);
+  
+  MsiData.Uint64            = 0;
+  MsiData.Bits.Vector       = Vector;
+  MsiData.Bits.DeliveryMode = (UINT32)DeliveryMode;
+  if (LevelTriggered) {
+    MsiData.Bits.TriggerMode = 1;
+    if (AssertionLevel) {
+      MsiData.Bits.Level = 1;
+    }
+  }
+  return MsiData.Uint64;
+}
