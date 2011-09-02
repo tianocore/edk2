@@ -4933,6 +4933,28 @@ typedef union {
 } IA32_CR4;
 
 ///
+/// Byte packed structure for a segment descriptor in a GDT/LDT.
+///
+typedef union {
+  struct {
+    UINT32  LimitLow:16;
+    UINT32  BaseLow:16;
+    UINT32  BaseMid:8;
+    UINT32  Type:4;
+    UINT32  S:1;
+    UINT32  DPL:2;
+    UINT32  P:1;
+    UINT32  LimitHigh:4;
+    UINT32  AVL:1;
+    UINT32  L:1;
+    UINT32  DB:1;
+    UINT32  G:1;
+    UINT32  BaseHigh:8;
+  } Bits;
+  UINT64  Uint64;
+} IA32_SEGMENT_DESCRIPTOR;
+
+///
 /// Byte packed structure for an IDTR, GDTR, LDTR descriptor.
 ///
 #pragma pack (1)
