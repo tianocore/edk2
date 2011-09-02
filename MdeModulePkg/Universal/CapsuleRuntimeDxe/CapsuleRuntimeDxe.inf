@@ -33,6 +33,12 @@
 [Sources]
   CapsuleService.c
 
+[Sources.Ia32, Sources.IPF, Sources.EBC, Sources.ARM]
+  SaveLongModeContext.c
+
+[Sources.X64]
+  X64/SaveLongModeContext.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -47,19 +53,38 @@
   UefiRuntimeLib
   BaseLib
   PrintLib
+  
+[LibraryClasses.X64]
+  LockBoxLib
+  UefiLib
+  BaseMemoryLib
+  HobLib  
 
 [Guids]
   gEfiCapsuleVendorGuid                         ## SOMETIMES_PRODUCED (Process across reset capsule image) ## Variable:L"CapsuleUpdateData" for capsule updated data
 
+[Guids.X64]
+  gEfiAcpiVariableGuid                          # ALWAYS_CONSUMED
+  gEfiAcpiS3ContextGuid                         # ALWAYS_CONSUMED
+
 [Protocols]
   gEfiCapsuleArchProtocolGuid                   ## PRODUCED
+
+[Protocols.X64]
+  gEfiDxeSmmReadyToLockProtocolGuid             # ALWAYS_CONSUMED
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset
 
+[FeaturePcd.X64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule || gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset  ## Populate Image requires reset support.
+
+[Pcd.X64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsulePeiLongModeStackSize
 
 [Depex]
   gEfiVariableWriteArchProtocolGuid             ## Depends on variable write functionality to produce capsule data variable

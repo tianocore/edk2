@@ -476,6 +476,9 @@
   ## FFS filename to find the ACPI tables
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiTableStorageFile|{ 0x25, 0x4e, 0x37, 0x7e, 0x01, 0x8e, 0xee, 0x4f, 0x87, 0xf2, 0x39, 0xc, 0x23, 0xc6, 0x6, 0xcd }|VOID*|0x30000016
 
+  ## FFS filename to find the capsule coalesce image.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleCoalesceFile|{ 0xA6, 0xE4, 0xFD, 0xF7, 0x4C, 0x29, 0x3c, 0x49, 0xB5, 0x0F, 0x97, 0x34, 0x55, 0x3B, 0xB7, 0x57 }|VOID*|0x30000017
+
   ## Single root I/O virtualization virtual function memory BAR alignment
   #  BITN set indicates 2 of n+12 power
   #  BIT0 set indicates 4KB alignment
@@ -728,6 +731,11 @@
   #  PCD, the platform developer should make sure the memory size is large enough to hold the S3 boot
   #  script node created in runtime phase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptRuntimeTableReservePageNumber|0x2|UINT16|0x0001005C
+
+  ## The PCD is used to specify the stack size when capsule IA32 PEI transfers to long mode in PEI phase.
+  #  The default size 32K. When changing the value of this PCD, the platform developer should
+  #  make sure the memory size is large enough to meet capsule PEI requiremnt in capsule update path.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsulePeiLongModeStackSize|0x8000|UINT32|0x0001005C
 
 [PcdsPatchableInModule]
   ## Specify  memory size with page number for PEI code when 

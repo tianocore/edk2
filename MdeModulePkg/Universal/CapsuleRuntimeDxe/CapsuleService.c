@@ -4,7 +4,7 @@
   It installs the Capsule Architectural Protocol defined in PI1.0a to signify 
   the capsule runtime services are ready.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -39,6 +39,15 @@ EFI_HANDLE  mNewHandle = NULL;
 // The times of calling UpdateCapsule ()
 //
 UINTN       mTimes      = 0;
+
+/**
+  Create the variable to save the base address of page table and stack
+  for transferring into long mode in IA32 PEI.
+**/
+VOID
+SaveLongModeContext (
+  VOID
+  );
 
 /**
   Passes capsules to the firmware with both virtual and physical mapping. Depending on the intended
@@ -333,6 +342,15 @@ CapsuleServiceInitialize (
 {
   EFI_STATUS  Status;
   
+  //
+  // When PEI phase is IA32, DXE phase is X64, it is possible that capsule data are 
+  // put above 4GB, so capsule PEI will transfer to long mode to get capsule data.
+  // The page table and stack is used to transfer processor mode from IA32 to long mode.
+  // Create the base address of page table and stack, and save them into variable.
+  // This is not needed when capsule with reset type is not supported.
+  //
+  SaveLongModeContext ();
+    
   //
   // Install capsule runtime services into UEFI runtime service tables.
   //

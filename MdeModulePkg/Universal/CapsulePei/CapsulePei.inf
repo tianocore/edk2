@@ -3,7 +3,7 @@
 #
 # Capsule update module supports EFI and UEFI.
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -34,6 +34,7 @@
 [Sources]
   UefiCapsule.c
   Capsule.h
+  Common/CapsuleCoalesce.c  
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -48,6 +49,10 @@
   DebugLib
   PeiServicesTablePointerLib
   PrintLib
+  PeCoffLib
+  PeCoffGetEntryPointLib
+  PcdLib
+  ReportStatusCodeLib
 
 [Guids]
   gEfiCapsuleVendorGuid                         # ALWAYS_CONSUMED
@@ -56,7 +61,11 @@
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid               # PPI ALWAYS_CONSUMED
   gPeiCapsulePpiGuid                            # PPI ALWAYS_CONSUMED
+  gEfiPeiLoadFilePpiGuid                        # PPI ALWAYS_CONSUMED
 
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleCoalesceFile
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
 [Depex]
   gEfiPeiReadOnlyVariable2PpiGuid
