@@ -43,13 +43,17 @@
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
   ResetSystemLib|PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  IoApicLib|PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
+  LocalApicLib|UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
 
 [Components]
   PcAtChipsetPkg/8254TimerDxe/8254Timer.inf
+  PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
   PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
   PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
   PcAtChipsetPkg/KbcResetDxe/Reset.inf
   PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
   PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
   PcAtChipsetPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf

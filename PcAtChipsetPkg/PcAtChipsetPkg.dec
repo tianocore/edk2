@@ -22,9 +22,22 @@
   PACKAGE_GUID                   = B728689A-52D3-4b8c-AE89-2CE5514CC6DC
   PACKAGE_VERSION                = 0.1
 
+[Includes]
+  Include
+
+[LibraryClasses]
+  ##  @libraryclass  Provides functions to manage I/O APIC Redirection Table Entries.
+  #
+  IoApicLib|Include/Library/IoApicLib.h
+  
 [Guids]
   gPcAtChipsetPkgTokenSpaceGuid = { 0x326ae723, 0xae32, 0x4589, { 0x98, 0xb8, 0xca, 0xc2, 0x3c, 0xdc, 0xc1, 0xb1 } }
 
+[PcdsFeatureFlag]
+  ## If TRUE, then the HPET Timer will be configured to use MSI interrupts if the HPET timer supports them.
+  #  If FALSE, then the HPET Timer will be configued to use I/O APIC interrupts.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetMsiEnable|TRUE|BOOLEAN|0x00001000
+  
 [PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx, PcdsPatchableInModule]
   ## Pcd8259LegacyModeMask defines the default mask value for platform. This value is determined
   #  1) If platform only support pure UEFI, value should be set to 0xFFFF or 0xFFFE;
@@ -63,3 +76,17 @@
 
   ## This PCD specifies whether we need enable IsaAcpiFloppyB device.
   gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiFloppyBEnable|TRUE|BOOLEAN|0x00000008
+
+  ## This PCD specifies the base address of the HPET timer.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetBaseAddress|0xFED00000|UINT32|0x00000009
+
+  ## This PCD specifies the Local APIC Interrupt Vector for the HPET Timer.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetLocalApicVector|0x40|UINT8|0x0000000A
+
+  ## This PCD specifies the defaut period of the HPET Timer in 100 ns units.
+  #  The default value of 100000 100 ns units is the same as 10 ms.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetDefaultTimerPeriod|100000|UINT64|0x0000000B
+  
+  ## This PCD specifies the base address of the HPET timer.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIoApicBaseAddress|0xFEC00000|UINT32|0x0000000C
+  

@@ -1,0 +1,60 @@
+## @file
+# 
+# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials                          
+# are licensed and made available under the terms and conditions of the BSD License         
+# which accompanies this distribution.  The full text of the license may be found at        
+# http://opensource.org/licenses/bsd-license.php                                            
+#                                                                                           
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HpetTimerDxe
+  FILE_GUID                      = 6CE6B0DE-781C-4f6c-B42D-98346C614BEC
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TimerDriverInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#
+
+[Sources]
+  HpetTimer.c
+  
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+  
+[LibraryClasses]
+  PcdLib
+  IoLib
+  DebugLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  BaseLib
+  LocalApicLib
+  IoApicLib
+
+[Protocols]
+  gEfiTimerArchProtocolGuid                     # PROTOCOL ALWAYS_PRODUCED
+  gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+
+[FeaturePcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetMsiEnable
+  
+[Pcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetBaseAddress
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetLocalApicVector
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetDefaultTimerPeriod
+
+[Depex]
+  gEfiCpuArchProtocolGuid
