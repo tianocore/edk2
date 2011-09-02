@@ -1,0 +1,70 @@
+## @file
+#  Component file for module TcgDxe.
+#  This module will produce TCG protocol and measure boot environment.
+#
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TcgDxe
+  FILE_GUID                      = A5683620-7998-4bb2-A377-1C1E31E1E215
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DriverEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+
+[Sources]
+  TcgDxe.c
+  TisDxe.c
+  TpmComm.c
+  TpmComm.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  UefiBootServicesTableLib
+  HobLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  TpmCommLib
+  PrintLib
+  UefiLib
+
+[Guids]
+  gEfiSmbiosTableGuid                           # ALWAYS_CONSUMED
+  gEfiGlobalVariableGuid                        # ALWAYS_CONSUMED
+  gTcgEventEntryHobGuid
+  gEfiEventReadyToBootGuid
+  gEfiEventExitBootServicesGuid
+
+[Protocols]
+  gEfiTcgProtocolGuid                           ## PRODUCES
+  gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass
+
+[Depex]
+  TRUE
+

@@ -1,0 +1,44 @@
+/** @file
+  User identify manager formset.
+
+Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials 
+are licensed and made available under the terms and conditions of the BSD License 
+which accompanies this distribution.  The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#include "UserIdentifyManagerData.h"
+
+formset 
+  guid      = USER_IDENTIFY_MANAGER_GUID,
+  title     = STRING_TOKEN(STR_TITLE),  
+  help      = STRING_TOKEN(STR_NULL_STRING), 
+  classguid = USER_IDENTIFY_MANAGER_GUID,
+  
+  form formid = FORMID_USER_FORM,
+    title = STRING_TOKEN(STR_USER_SELECT);      
+
+    suppressif TRUE;
+      text
+        help   = STRING_TOKEN(STR_NULL_STRING),
+        text   = STRING_TOKEN(STR_NULL_STRING),
+          text   = STRING_TOKEN(STR_NULL_STRING),
+        flags  = INTERACTIVE,
+        key    = FORM_OPEN_QUESTION_ID;
+    endif;
+
+    label LABEL_USER_NAME;
+    label LABEL_END;  
+  endform;
+  
+  form formid = FORMID_PROVIDER_FORM,
+    title = STRING_TOKEN(STR_PROVIDER_SELECT);
+    label LABEL_PROVIDER_NAME;
+    label LABEL_END;
+  endform;  
+endformset;

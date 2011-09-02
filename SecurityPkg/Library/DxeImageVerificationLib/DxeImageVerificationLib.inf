@@ -1,0 +1,73 @@
+## @file
+#  The library instance provides security service of image verification.
+#  Image verification Library module supports UEFI2.3.1
+#
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeImageVerificationLib   
+  FILE_GUID                      = 0CA970E1-43FA-4402-BC0A-81AF336BFFD6
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  CONSTRUCTOR                    = DxeImageVerificationLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  DxeImageVerificationLib.c
+  DxeImageVerificationLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  BaseCryptLib
+  SecurityManagementLib
+
+[Protocols]
+  gEfiFirmwareVolume2ProtocolGuid
+  gEfiBlockIoProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+  gEfiVariableWriteArchProtocolGuid
+  
+[Guids]
+  gEfiCertTypeRsa2048Sha256Guid
+  gEfiImageSecurityDatabaseGuid
+  gEfiCertSha1Guid
+  gEfiCertSha256Guid
+  gEfiCertX509Guid
+  gEfiCertRsa2048Guid
+  
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy
+  gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy
+  gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy
+
+  
+
+
