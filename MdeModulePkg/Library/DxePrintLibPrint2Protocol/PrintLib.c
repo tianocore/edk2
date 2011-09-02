@@ -24,7 +24,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PrintLib.h>
 
 #include <Library/BaseLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 
 EFI_PRINT2_PROTOCOL  *mPrint2Protocol = NULL;
@@ -50,11 +49,11 @@ PrintLibConstructor (
 {
   EFI_STATUS                   Status;
 
-  Status = gBS->LocateProtocol (
-                  &gEfiPrint2ProtocolGuid,
-                  NULL,
-                  (VOID**) &mPrint2Protocol
-                  );
+  Status = SystemTable->BootServices->LocateProtocol (
+                                        &gEfiPrint2ProtocolGuid,
+                                        NULL,
+                                        (VOID**) &mPrint2Protocol
+                                        );
   ASSERT_EFI_ERROR (Status);
   ASSERT (mPrint2Protocol != NULL);
 
