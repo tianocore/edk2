@@ -1,7 +1,7 @@
 /** @file
   BDS routines to handle capsules.
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -65,6 +65,7 @@ BdsProcessCapsules (
   // We don't do anything else if the boot mode is not flash-update
   //
   if (BootMode != BOOT_ON_FLASH_UPDATE) {
+    DEBUG ((EFI_D_ERROR, "Boot mode is not correct for capsule update.\n"));
     return EFI_INVALID_PARAMETER;
   }
   
@@ -82,6 +83,10 @@ BdsProcessCapsules (
     //
     // We didn't find a hob, so had no errors.
     //
+    DEBUG ((EFI_D_ERROR, "We can not find capsule data in capsule update boot mode.\n"));
+    DEBUG ((EFI_D_ERROR, "Please check the followings are correct if unexpected capsule update error happens.\n"));
+    DEBUG ((EFI_D_ERROR, "1. CapsuleX64 is built as X64 module when PEI is IA32 and DXE is X64\n"));
+    DEBUG ((EFI_D_ERROR, "2. Capsule data should persist in memory across a system reset.\n"));
     PlatformBdsLockNonUpdatableFlash ();
     return EFI_SUCCESS;
   }
