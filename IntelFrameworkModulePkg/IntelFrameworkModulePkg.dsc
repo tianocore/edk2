@@ -136,6 +136,7 @@
   IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   IntelFrameworkModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
   IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
+  IntelFrameworkModulePkg/Library/DxeCapsuleLib/DxeCapsuleLib.inf
 
   IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
