@@ -440,7 +440,7 @@ TimerDriverSetTimerPeriod (
     // If TimerPeriod is 0, then mask HPET Timer interrupts
     //
     
-    if (mTimerConfiguration.Bits.MsiInterruptCapablity != 0) {
+    if (mTimerConfiguration.Bits.MsiInterruptCapablity != 0 && FeaturePcdGet (PcdHpetMsiEnable)) {
       //
       // Disable HPET MSI interrupt generation
       //
@@ -498,7 +498,7 @@ TimerDriverSetTimerPeriod (
     //
     // Enable HPET Timer interrupt generation
     //
-    if (mTimerConfiguration.Bits.MsiInterruptCapablity != 0) {
+    if (mTimerConfiguration.Bits.MsiInterruptCapablity != 0 && FeaturePcdGet (PcdHpetMsiEnable)) {
       //
       // Enable HPET MSI Interrupt
       //
@@ -789,7 +789,6 @@ TimerDriverInitialize (
     //   Set InterruptRoute field based in mTimerIrq
     //
     mTimerConfiguration.Uint64 = HpetRead (HPET_TIMER_CONFIGURATION_OFFSET + mTimerIndex * HPET_TIMER_STRIDE);
-    mTimerConfiguration.Bits.MsiInterruptCapablity   = 0;
     mTimerConfiguration.Bits.LevelTriggeredInterrupt = 1;
     mTimerConfiguration.Bits.InterruptRoute          = mTimerIrq;
   }
@@ -829,7 +828,7 @@ TimerDriverInitialize (
   // Show state of enabled HPET timer
   //
   DEBUG_CODE (
-    if (mTimerConfiguration.Bits.MsiInterruptCapablity != 0) {
+    if (mTimerConfiguration.Bits.MsiInterruptCapablity != 0 && FeaturePcdGet (PcdHpetMsiEnable)) {
       DEBUG ((DEBUG_INFO, "HPET Interrupt Mode MSI\n"));
     } else {
       DEBUG ((DEBUG_INFO, "HPET Interrupt Mode I/O APIC\n"));
