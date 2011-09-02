@@ -1179,10 +1179,10 @@ ParseHandleDatabaseForChildControllers(
 
   If DestinationBuffer is NULL, then ASSERT().
 
-  @param[in,out]  DestinationBuffer The pointer to the pointer to the buffer to append onto.
-  @param[in,out]  DestinationSize   The pointer to the size of DestinationBuffer.
-  @param[in]      SourceBuffer      The pointer to the buffer to append onto DestinationBuffer.
-  @param[in]      SourceSize        The number of bytes of SourceBuffer to append.
+  @param[in, out]  DestinationBuffer The pointer to the pointer to the buffer to append onto.
+  @param[in, out]  DestinationSize   The pointer to the size of DestinationBuffer.
+  @param[in]       SourceBuffer      The pointer to the buffer to append onto DestinationBuffer.
+  @param[in]       SourceSize        The number of bytes of SourceBuffer to append.
 
   @retval NULL                      A memory allocation failed.
   @retval NULL                      A parameter was invalid.

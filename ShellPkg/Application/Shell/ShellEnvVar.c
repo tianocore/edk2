@@ -123,8 +123,8 @@ FreeEnvironmentVariableList(
 /**
   Creates a list of all Shell-Guid-based environment variables.
 
-  @param[in,out] ListHead       The pointer to pointer to LIST ENTRY object for
-                                storing this list.
+  @param[in, out] ListHead       The pointer to pointer to LIST ENTRY object for
+                                 storing this list.
 
   @retval EFI_SUCCESS           the list was created sucessfully.
 **/

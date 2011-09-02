@@ -566,8 +566,8 @@ IsScriptOnlyCommand(
   loaded image protocol installed on it.  The FilePath will point to the device path
   for the file that was loaded.
 
-  @param[in,out] DevPath       On a sucessful return the device path to the loaded image.
-  @param[in,out] FilePath      On a sucessful return the device path to the file.
+  @param[in, out] DevPath       On a sucessful return the device path to the loaded image.
+  @param[in, out] FilePath      On a sucessful return the device path to the file.
 
   @retval EFI_SUCCESS           The 2 device paths were sucessfully returned.
   @retval other                 A error from gBS->HandleProtocol.
@@ -1016,10 +1016,10 @@ AddLineToCommandHistory(
   Checks if a string is an alias for another command.  If yes, then it replaces the alias name
   with the correct command name.
 
-  @param[in,out] CommandString    Upon entry the potential alias.  Upon return the
-                                  command name if it was an alias.  If it was not
-                                  an alias it will be unchanged.  This function may
-                                  change the buffer to fit the command name.
+  @param[in, out] CommandString    Upon entry the potential alias.  Upon return the
+                                   command name if it was an alias.  If it was not
+                                   an alias it will be unchanged.  This function may
+                                   change the buffer to fit the command name.
 
   @retval EFI_SUCCESS             The name was changed.
   @retval EFI_SUCCESS             The name was not an alias.

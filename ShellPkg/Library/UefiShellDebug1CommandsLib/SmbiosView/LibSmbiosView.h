@@ -72,10 +72,10 @@ LibSmbiosGetEPS (
     Handle is changed to the next handle or 0xFFFF when the end is
     reached or the handle is not found.
 
-    @param[in,out] Handle     0xFFFF: get the first structure
-                              Others: get a structure according to this value.
-    @param[in,out] Buffer     The pointer to the caller's memory buffer.
-    @param[out] Length        Length of return buffer in bytes.
+    @param[in, out] Handle     0xFFFF: get the first structure
+                               Others: get a structure according to this value.
+    @param[in, out] Buffer     The pointer to the caller's memory buffer.
+    @param[out] Length         Length of return buffer in bytes.
 
     @retval DMI_SUCCESS   Buffer contains the required structure data
                           Handle is updated with next structure handle or

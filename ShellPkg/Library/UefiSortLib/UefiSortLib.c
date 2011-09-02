@@ -43,13 +43,13 @@ STATIC EFI_UNICODE_COLLATION_PROTOCOL   *mUnicodeCollation = NULL;
   if Count is < 2 then perform no action.
   if Size is < 1 then perform no action.
 
-  @param[in,out] BufferToSort   on call a Buffer of (possibly sorted) elements
-                                on return a buffer of sorted elements
-  @param[in] Count              the number of elements in the buffer to sort
-  @param[in] ElementSize        Size of an element in bytes
-  @param[in] CompareFunction    The function to call to perform the comparison
-                                of any 2 elements
-  @param[in] Buffer             Buffer of size ElementSize for use in swapping
+  @param[in, out] BufferToSort   on call a Buffer of (possibly sorted) elements
+                                 on return a buffer of sorted elements
+  @param[in] Count               the number of elements in the buffer to sort
+  @param[in] ElementSize         Size of an element in bytes
+  @param[in] CompareFunction     The function to call to perform the comparison
+                                 of any 2 elements
+  @param[in] Buffer              Buffer of size ElementSize for use in swapping
 **/
 VOID
 EFIAPI
@@ -149,12 +149,12 @@ QuickSortWorker (
   if Count is < 2 then perform no action.
   if Size is < 1 then perform no action.
 
-  @param[in,out] BufferToSort   on call a Buffer of (possibly sorted) elements
-                                on return a buffer of sorted elements
-  @param[in] Count              the number of elements in the buffer to sort
-  @param[in] ElementSize        Size of an element in bytes
-  @param[in] CompareFunction    The function to call to perform the comparison
-                                of any 2 elements
+  @param[in, out] BufferToSort   on call a Buffer of (possibly sorted) elements
+                                 on return a buffer of sorted elements
+  @param[in] Count               the number of elements in the buffer to sort
+  @param[in] ElementSize         Size of an element in bytes
+  @param[in] CompareFunction     The function to call to perform the comparison
+                                 of any 2 elements
 **/
 VOID
 EFIAPI

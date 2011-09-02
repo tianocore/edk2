@@ -95,10 +95,10 @@ FileInterfaceNopSetPosition(
 /**
   File style interface for console (GetInfo).
   
-  @param[in] This             Ignored.
-  @param[in] InformationType  Ignored.
-  @param[in,out] BufferSize   Ignored.
-  @param[out] Buffer          Ignored.
+  @param[in] This              Ignored.
+  @param[in] InformationType   Ignored.
+  @param[in, out] BufferSize   Ignored.
+  @param[out] Buffer           Ignored.
   
   @retval EFI_UNSUPPORTED
 **/
@@ -141,9 +141,9 @@ FileInterfaceNopSetInfo(
 
   Writes data to the screen.
   
-  @param[in] This             The pointer to the EFI_FILE_PROTOCOL object.
-  @param[in,out] BufferSize   Size in bytes of Buffer.
-  @param[in] Buffer           The pointer to the buffer to write.
+  @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
+  @param[in, out] BufferSize   Size in bytes of Buffer.
+  @param[in] Buffer            The pointer to the buffer to write.
   
   @retval EFI_UNSUPPORTED No output console is supported.
   @return A return value from gST->ConOut->OutputString.
@@ -166,9 +166,9 @@ FileInterfaceStdOutWrite(
 /**
   File style interface for StdIn (Write).
   
-  @param[in] This           Ignored.
-  @param[in,out] BufferSize Ignored.
-  @param[in] Buffer         Ignored.
+  @param[in] This            Ignored.
+  @param[in, out] BufferSize Ignored.
+  @param[in] Buffer          Ignored.
   
   @retval EFI_UNSUPPORTED
 **/
@@ -188,9 +188,9 @@ FileInterfaceStdInWrite(
 
   Writes error to the error output.
   
-  @param[in] This             The pointer to the EFI_FILE_PROTOCOL object.
-  @param[in,out] BufferSize   Size in bytes of Buffer.
-  @param[in] Buffer           The pointer to the buffer to write.
+  @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
+  @param[in, out] BufferSize   Size in bytes of Buffer.
+  @param[in] Buffer            The pointer to the buffer to write.
   
   @return A return value from gST->StdErr->OutputString.
 **/
@@ -208,9 +208,9 @@ FileInterfaceStdErrWrite(
 /**
   File style interface for console StdOut (Read).
   
-  @param[in] This             Ignored.
-  @param[in,out] BufferSize   Ignored.
-  @param[out] Buffer          Ignored.
+  @param[in] This              Ignored.
+  @param[in, out] BufferSize   Ignored.
+  @param[out] Buffer           Ignored.
   
   @retval EFI_UNSUPPORTED
 **/
@@ -228,9 +228,9 @@ FileInterfaceStdOutRead(
 /**
   File style interface for console StdErr (Read).
   
-  @param[in] This             Ignored.
-  @param[in,out] BufferSize   Ignored.
-  @param[out] Buffer          Ignored.
+  @param[in] This              Ignored.
+  @param[in, out] BufferSize   Ignored.
+  @param[out] Buffer           Ignored.
   
   @retval EFI_UNSUPPORTED Always.
 **/
@@ -248,9 +248,9 @@ FileInterfaceStdErrRead(
 /**
   File style interface for NUL file (Read).
   
-  @param[in] This             Ignored.
-  @param[in,out] BufferSize   Poiner to 0 upon return.
-  @param[out] Buffer          Ignored.
+  @param[in] This              Ignored.
+  @param[in, out] BufferSize   Poiner to 0 upon return.
+  @param[out] Buffer           Ignored.
   
   @retval EFI_SUCCESS Always.
 **/
@@ -269,9 +269,9 @@ FileInterfaceNulRead(
 /**
   File style interface for NUL file (Write).
   
-  @param[in] This             Ignored.
-  @param[in,out] BufferSize   Ignored.
-  @param[in] Buffer           Ignored.
+  @param[in] This              Ignored.
+  @param[in, out] BufferSize   Ignored.
+  @param[in] Buffer            Ignored.
   
   @retval EFI_SUCCESS
 **/
@@ -974,9 +974,9 @@ FileInterfaceEnvDelete(
 /**
   File style interface for Environment Variable (Read).
   
-  @param[in] This             The pointer to the EFI_FILE_PROTOCOL object.
-  @param[in,out] BufferSize   Size in bytes of Buffer.
-  @param[out] Buffer          The pointer to the buffer to fill.
+  @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
+  @param[in, out] BufferSize   Size in bytes of Buffer.
+  @param[out] Buffer           The pointer to the buffer to fill.
   
   @retval EFI_SUCCESS   The data was read.
 **/
@@ -997,9 +997,9 @@ FileInterfaceEnvRead(
 /**
   File style interface for Volatile Environment Variable (Write).
   
-  @param[in] This             The pointer to the EFI_FILE_PROTOCOL object.
-  @param[in,out] BufferSize   Size in bytes of Buffer.
-  @param[in] Buffer           The pointer to the buffer to write.
+  @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
+  @param[in, out] BufferSize   Size in bytes of Buffer.
+  @param[in] Buffer            The pointer to the buffer to write.
   
   @retval EFI_SUCCESS   The data was read.
 **/
@@ -1044,9 +1044,9 @@ FileInterfaceEnvVolWrite(
 /**
   File style interface for Non Volatile Environment Variable (Write).
   
-  @param[in] This             The pointer to the EFI_FILE_PROTOCOL object.
-  @param[in,out] BufferSize   Size in bytes of Buffer.
-  @param[in] Buffer           The pointer to the buffer to write.
+  @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
+  @param[in, out] BufferSize   Size in bytes of Buffer.
+  @param[in] Buffer            The pointer to the buffer to write.
   
   @retval EFI_SUCCESS   The data was read.
 **/
@@ -1144,8 +1144,8 @@ CreateFileInterfaceEnv(
   Move the cursor position one character backward.
 
   @param[in] LineLength       Length of a line. Get it by calling QueryMode
-  @param[in,out] Column      Current column of the cursor position
-  @param[in,out] Row         Current row of the cursor position
+  @param[in, out] Column      Current column of the cursor position
+  @param[in, out] Row         Current row of the cursor position
 **/
 VOID
 EFIAPI
@@ -1174,8 +1174,8 @@ MoveCursorBackward (
 
   @param[in] LineLength       Length of a line.
   @param[in] TotalRow         Total row of a screen
-  @param[in,out] Column      Current column of the cursor position
-  @param[in,out] Row         Current row of the cursor position
+  @param[in, out] Column      Current column of the cursor position
+  @param[in, out] Row         Current row of the cursor position
 **/
 VOID
 EFIAPI
@@ -1323,9 +1323,9 @@ FileInterfaceMemGetPosition(
 /**
   File style interface for Mem (Write).
   
-  @param[in] This             The pointer to the EFI_FILE_PROTOCOL object.
-  @param[in,out] BufferSize   Size in bytes of Buffer.
-  @param[in] Buffer           The pointer to the buffer to write.
+  @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
+  @param[in, out] BufferSize   Size in bytes of Buffer.
+  @param[in] Buffer            The pointer to the buffer to write.
   
   @retval EFI_SUCCESS   The data was written.
 **/
@@ -1369,9 +1369,9 @@ FileInterfaceMemWrite(
 /**
   File style interface for Mem (Read).
   
-  @param[in] This             The pointer to the EFI_FILE_PROTOCOL object.
-  @param[in,out] BufferSize   Size in bytes of Buffer.
-  @param[in] Buffer           The pointer to the buffer to fill.
+  @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
+  @param[in, out] BufferSize   Size in bytes of Buffer.
+  @param[in] Buffer            The pointer to the buffer to fill.
   
   @retval EFI_SUCCESS   The data was read.
 **/
@@ -1718,9 +1718,9 @@ FileInterfaceFileClose(
   If the file was opened with ASCII mode the data will be processed through 
   AsciiSPrint before writing.
   
-  @param[in] This             The pointer to the EFI_FILE_PROTOCOL object.
-  @param[in,out] BufferSize   Size in bytes of Buffer.
-  @param[in] Buffer           The pointer to the buffer to write.
+  @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
+  @param[in, out] BufferSize   Size in bytes of Buffer.
+  @param[in] Buffer            The pointer to the buffer to write.
   
   @retval EFI_SUCCESS   The data was written.
 **/

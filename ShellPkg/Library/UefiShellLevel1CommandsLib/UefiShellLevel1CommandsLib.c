@@ -112,17 +112,17 @@ ShellLevel1CommandsLibDestructor (
 
   If label is used it will be used instead of the count.
 
-  @param[in] Function         The function to use to enumerate through the 
-                              list.  Normally GetNextNode or GetPreviousNode.
-  @param[in] DecrementerTag   The tag to decrement the count at.
-  @param[in] IncrementerTag   The tag to increment the count at.
-  @param[in] Label            A label to look for.
-  @param[in,out] ScriptFile   The pointer to the current script file structure.
-  @param[in] MovePast         TRUE makes function return 1 past the found 
-                              location.
-  @param[in] FindOnly         TRUE to not change the ScriptFile.
-  @param[in] CommandNode      The pointer to the Node to test.
-  @param[in,out] TargetCount  The pointer to the current count.
+  @param[in] Function          The function to use to enumerate through the 
+                               list.  Normally GetNextNode or GetPreviousNode.
+  @param[in] DecrementerTag    The tag to decrement the count at.
+  @param[in] IncrementerTag    The tag to increment the count at.
+  @param[in] Label             A label to look for.
+  @param[in, out] ScriptFile   The pointer to the current script file structure.
+  @param[in] MovePast          TRUE makes function return 1 past the found 
+                               location.
+  @param[in] FindOnly          TRUE to not change the ScriptFile.
+  @param[in] CommandNode       The pointer to the Node to test.
+  @param[in, out] TargetCount  The pointer to the current count.
 **/
 BOOLEAN
 EFIAPI
@@ -229,17 +229,17 @@ TestNodeForMove (
 
   If label is used it will be used instead of the count.
 
-  @param[in] Function         The function to use to enumerate through the 
-                              list.  Normally GetNextNode or GetPreviousNode.
-  @param[in] DecrementerTag   The tag to decrement the count at.
-  @param[in] IncrementerTag   The tag to increment the count at.
-  @param[in] Label            A label to look for.
-  @param[in,out] ScriptFile   The pointer to the current script file structure.
-  @param[in] MovePast         TRUE makes function return 1 past the found 
-                              location.
-  @param[in] FindOnly         TRUE to not change the ScriptFile.
-  @param[in] WrapAroundScript TRUE to wrap end-to-begining or vise versa in 
-                              searching.
+  @param[in] Function          The function to use to enumerate through the 
+                               list.  Normally GetNextNode or GetPreviousNode.
+  @param[in] DecrementerTag    The tag to decrement the count at.
+  @param[in] IncrementerTag    The tag to increment the count at.
+  @param[in] Label             A label to look for.
+  @param[in, out] ScriptFile   The pointer to the current script file structure.
+  @param[in] MovePast          TRUE makes function return 1 past the found 
+                               location.
+  @param[in] FindOnly          TRUE to not change the ScriptFile.
+  @param[in] WrapAroundScript  TRUE to wrap end-to-begining or vise versa in 
+                               searching.
 **/
 BOOLEAN
 EFIAPI

@@ -698,8 +698,8 @@ FileHandleSetSize (
   if Destination's current length (including NULL terminator) is already more then
   CurrentSize, then ASSERT()
 
-  @param[in,out] Destination   The String to append onto
-  @param[in,out] CurrentSize   on call the number of bytes in Destination.  On
+  @param[in, out] Destination   The String to append onto
+  @param[in, out] CurrentSize   on call the number of bytes in Destination.  On
                                 return possibly the new size (still in bytes).  if NULL
                                 then allocate whatever is needed.
   @param[in]      Source        The String to append from
@@ -879,8 +879,8 @@ FileHandleGetFileName (
   If the position upon start is 0, then the Ascii Boolean will be set.  This should be
   maintained and not changed for all operations with the same file.
 
-  @param[in]      Handle        FileHandle to read from.
-  @param[in,out]  Ascii         Boolean value for indicating whether the file is Ascii (TRUE) or UCS2 (FALSE);
+  @param[in]       Handle        FileHandle to read from.
+  @param[in, out]  Ascii         Boolean value for indicating whether the file is Ascii (TRUE) or UCS2 (FALSE);
 
   @return                       The line of text from the file.
 
@@ -919,13 +919,13 @@ FileHandleReturnLine(
   If the position upon start is 0, then the Ascii Boolean will be set.  This should be
   maintained and not changed for all operations with the same file.
 
-  @param[in]      Handle        FileHandle to read from
-  @param[in,out]  Buffer        pointer to buffer to read into
-  @param[in,out]  Size          pointer to number of bytes in buffer
-  @param[in]      Truncate      if TRUE then allows for truncation of the line to fit.
-                                if FALSE will reset the position to the begining of the
-                                line if the buffer is not large enough.
-  @param[in,out]  Ascii         Boolean value for indicating whether the file is Ascii (TRUE) or UCS2 (FALSE);
+  @param[in]       Handle        FileHandle to read from
+  @param[in, out]  Buffer        pointer to buffer to read into
+  @param[in, out]  Size          pointer to number of bytes in buffer
+  @param[in]       Truncate      if TRUE then allows for truncation of the line to fit.
+                                 if FALSE will reset the position to the begining of the
+                                 line if the buffer is not large enough.
+  @param[in, out]  Ascii         Boolean value for indicating whether the file is Ascii (TRUE) or UCS2 (FALSE);
 
   @retval EFI_SUCCESS           the operation was sucessful.  the line is stored in
                                 Buffer.

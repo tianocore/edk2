@@ -80,7 +80,7 @@ ConsoleLoggerInstall(
   Return the system to the state it was before InstallConsoleLogger
   was installed.
 
-  @param[in,out] ConsoleInfo   The object from the install function.
+  @param[in, out] ConsoleInfo   The object from the install function.
 
   @retval EFI_SUCCESS     The operation was successful
   @return other           The operation failed.  This was from UninstallProtocolInterface.

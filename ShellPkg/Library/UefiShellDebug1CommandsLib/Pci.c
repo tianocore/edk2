@@ -1268,7 +1268,7 @@ PCI_CLASS_ENTRY PCIPIFClass_0e00[] = {
                      bits 23:16 - Base Class Code
                      bits 15:8  - Sub-Class Code
                      bits  7:0  - Programming Interface
-  @param[in,out] ClassStrings   Pointer of PCI_CLASS_STRINGS structure, which contains
+  @param[in, out] ClassStrings   Pointer of PCI_CLASS_STRINGS structure, which contains
                  printable class strings corresponding to ClassCode. The
                  caller must not modify the strings that are pointed by
                  the fields in ClassStrings.
@@ -1474,11 +1474,11 @@ PciGetProtocolAndResource (
   It also moves the pointer backward a node, to get prepared to be called
   again.
 
-  @param[in,out] Descriptors Points to current position of a serial of address space
-                             descriptors.
-  @param[out] MinBus         The lower range of bus number.
-  @param[out] ManBus         The upper range of bus number.
-  @param[out] IsEnd          Meet end of the serial of descriptors.
+  @param[in, out] Descriptors Points to current position of a serial of address space
+                              descriptors.
+  @param[out] MinBus          The lower range of bus number.
+  @param[out] MaxBus          The upper range of bus number.
+  @param[out] IsEnd           Meet end of the serial of descriptors.
 
   @retval EFI_SUCCESS     The command completed successfully.
 **/
@@ -1543,11 +1543,11 @@ PciExplainBridgeData (
 /**
   Explain the Base Address Register(Bar) in PCI configuration space.
 
-  @param[in] Bar             Points to the Base Address Register intended to interpret.
-  @param[in] Command         Points to the register Command.
-  @param[in] Address         Address used to access configuration space of this PCI device.
-  @param[in] IoDev           Handle used to access configuration space of PCI device.
-  @param[in,out] Index       The Index.
+  @param[in] Bar              Points to the Base Address Register intended to interpret.
+  @param[in] Command          Points to the register Command.
+  @param[in] Address          Address used to access configuration space of this PCI device.
+  @param[in] IoDev            Handle used to access configuration space of PCI device.
+  @param[in, out] Index       The Index.
 
   @retval EFI_SUCCESS     The command completed successfully.
 **/
@@ -2564,11 +2564,11 @@ PciGetProtocolAndResource (
   It also moves the pointer backward a node, to get prepared to be called
   again.
 
-  @param[in,out] Descriptors Points to current position of a serial of address space
-                             descriptors.
-  @param[out] MinBus         The lower range of bus number.
-  @param[out] ManBus         The upper range of bus number.
-  @param[out] IsEnd          Meet end of the serial of descriptors.
+  @param[in, out] Descriptors Points to current position of a serial of address space
+                              descriptors.
+  @param[out] MinBus          The lower range of bus number.
+  @param[out] MaxBus          The upper range of bus number.
+  @param[out] IsEnd           Meet end of the serial of descriptors.
 
   @retval EFI_SUCCESS     The command completed successfully.
 **/
@@ -3148,11 +3148,11 @@ PciExplainBridgeData (
 /**
   Explain the Base Address Register(Bar) in PCI configuration space.
 
-  @param[in] Bar             Points to the Base Address Register intended to interpret.
-  @param[in] Command         Points to the register Command.
-  @param[in] Address         Address used to access configuration space of this PCI device.
-  @param[in] IoDev           Handle used to access configuration space of PCI device.
-  @param[in,out] Index       The Index.
+  @param[in] Bar              Points to the Base Address Register intended to interpret.
+  @param[in] Command          Points to the register Command.
+  @param[in] Address          Address used to access configuration space of this PCI device.
+  @param[in] IoDev            Handle used to access configuration space of PCI device.
+  @param[in, out] Index       The Index.
 
   @retval EFI_SUCCESS     The command completed successfully.
 **/

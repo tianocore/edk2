@@ -1945,8 +1945,8 @@ EfiShellFindFilesInDir(
 /**
   Updates a file name to be preceeded by the mapped drive name
 
-  @param[in] BasePath     the Mapped drive name to prepend
-  @param[in,out] Path     pointer to pointer to the file name to update.
+  @param[in] BasePath      the Mapped drive name to prepend
+  @param[in, out] Path     pointer to pointer to the file name to update.
 
   @retval EFI_SUCCESS
   @retval EFI_OUT_OF_RESOURCES
@@ -2001,12 +2001,12 @@ UpdateFileName(
   Upon a EFI_SUCCESS return fromt he function any the caller is responsible to call
   FreeFileList with FileList.
 
-  @param[in] FilePattern        The FilePattern to check against.
-  @param[in] UnicodeCollation   The pointer to EFI_UNICODE_COLLATION_PROTOCOL structure
-  @param[in] FileHandle         The FileHandle to start with
-  @param[in,out] FileList       pointer to pointer to list of found files.
-  @param[in] ParentNode         The node for the parent. Same file as identified by HANDLE.
-  @param[in] MapName            The file system name this file is on.
+  @param[in] FilePattern         The FilePattern to check against.
+  @param[in] UnicodeCollation    The pointer to EFI_UNICODE_COLLATION_PROTOCOL structure
+  @param[in] FileHandle          The FileHandle to start with
+  @param[in, out] FileList       pointer to pointer to list of found files.
+  @param[in] ParentNode          The node for the parent. Same file as identified by HANDLE.
+  @param[in] MapName             The file system name this file is on.
 
   @retval EFI_SUCCESS           all files were found and the FileList contains a list.
   @retval EFI_NOT_FOUND         no files were found
@@ -3124,7 +3124,7 @@ EFI_SHELL_PROTOCOL         mShellProtocol = {
 
   This must be removed via calling CleanUpShellProtocol().
 
-  @param[in,out] NewShell   The pointer to the pointer to the structure
+  @param[in, out] NewShell   The pointer to the pointer to the structure
   to install.
 
   @retval EFI_SUCCESS     The operation was successful.
@@ -3253,7 +3253,7 @@ CreatePopulateInstallShellProtocol (
   Free all memory and restore the system to the state it was in before calling
   CreatePopulateInstallShellProtocol.
 
-  @param[in,out] NewShell   The pointer to the new shell protocol structure.
+  @param[in, out] NewShell   The pointer to the new shell protocol structure.
 
   @retval EFI_SUCCESS       The operation was successful.
 **/

@@ -145,8 +145,8 @@ IsVolatileEnv (
 /**
   Creates a list of all Shell-Guid-based environment variables.
 
-  @param[in,out] List           The pointer to pointer to LIST_ENTRY object for
-                                storing this list.
+  @param[in, out] List           The pointer to pointer to LIST_ENTRY object for
+                                 storing this list.
 
   @retval EFI_SUCCESS           the list was created sucessfully.
 **/

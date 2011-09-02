@@ -68,7 +68,7 @@ typedef struct {
 
   This must be removed via calling CleanUpShellProtocol().
 
-  @param[in,out] NewShell   The pointer to the pointer to the structure 
+  @param[in, out] NewShell   The pointer to the pointer to the structure 
   to install.
 
   @retval EFI_SUCCESS     The operation was successful.
@@ -86,7 +86,7 @@ CreatePopulateInstallShellProtocol (
   Free all memory and restore the system to the state it was in before calling
   CreatePopulateInstallShellProtocol.
 
-  @param[in,out] NewShell   The pointer to the new shell protocol structure.
+  @param[in, out] NewShell   The pointer to the new shell protocol structure.
 
   @retval EFI_SUCCESS       The operation was successful.
 **/

@@ -61,7 +61,7 @@ EFI_STATUS
   This is used when programatically adding shell commands.  Upon successful return
   the memory allocated is up to the caller to free.
 
-  @param[in,out] Str              Pointer to pointer to string to display for help.
+  @param[in, out] Str              Pointer to pointer to string to display for help.
 
   @retval EFI_SUCCESS             The help string is in the parameter Str.
 
@@ -270,9 +270,9 @@ CHAR16*
   The memory allocated by the callee for this list is freed by making a call to
   SHELLENV_FREE_FILE_LIST.
 
-  @param[in] Arg                The pointer Path to files to open.
-  @param[in,out] ListHead       The pointer to the allocated and initialized list head
-                                upon which to append all opened file structures.
+  @param[in] Arg                 The pointer Path to files to open.
+  @param[in, out] ListHead       The pointer to the allocated and initialized list head
+                                 upon which to append all opened file structures.
 
   @retval EFI_SUCCESS           One or more files was opened and a struct of each file's
                                 information was appended to ListHead.
@@ -289,7 +289,7 @@ EFI_STATUS
 /**
   This frees all of the nodes under the ListHead, but not ListHead itself.
 
-  @param[in,out] ListHead       Pointer to list to free all nodes of.
+  @param[in, out] ListHead       Pointer to list to free all nodes of.
 
   @retval EFI_SUCCESS           This function always returns EFI_SUCCESS.
 **/
@@ -473,12 +473,12 @@ BOOLEAN
   This is an internal shell function to handle shell cascading.  It restores the
   original set of console protocols.
 
-  @param[in] ConInHandle        The handle of ConIn.
-  @param[in,out] ConIn          The pointer to the location to return the pointer to
-                                the original console input.
-  @param[in] ConOutHandle       The handle of ConOut
-  @param[in,out] ConOut         The pointer to the location to return the pointer to
-                                the original console output.
+  @param[in] ConInHandle         The handle of ConIn.
+  @param[in, out] ConIn          The pointer to the location to return the pointer to
+                                 the original console input.
+  @param[in] ConOutHandle        The handle of ConOut
+  @param[in, out] ConOut         The pointer to the location to return the pointer to
+                                 the original console output.
 **/
 typedef
 VOID
@@ -512,8 +512,8 @@ VOID
 
   This must be called after INIT_HANDLE_ENUMERATOR and before CLOSE_HANDLE_ENUMERATOR.
 
-  @param[in,out] Handle         The pointer to pointer to Handle.  It is set
-                                on a sucessful return.
+  @param[in, out] Handle         The pointer to pointer to Handle.  It is set
+                                 on a sucessful return.
 
   @retval EFI_SUCCESS           The next handle in the handle database is *Handle.
   @retval EFI_NOT_FOUND         There is not another handle.
@@ -656,7 +656,7 @@ VOID
   This cannot be called after CLOSE_PROTOCOL_INFO_ENUMERATOR, but it must be
   called after INIT_PROTOCOL_INFO_ENUMERATOR.
 
-  @param[in,out] ProtocolInfo   The pointer to pointer to protocol information structure.
+  @param[in, out] ProtocolInfo   The pointer to pointer to protocol information structure.
 
   @retval EFI_SUCCESS           The next protocol's information was sucessfully returned.
   @retval NULL                  There are no more protocols.
@@ -744,15 +744,15 @@ typedef struct {
 
   Upon successful return, the memory for *BestDeviceName is up to the caller to free.
 
-  @param[in] DeviceHandle           The device handle whose name is desired.
-  @param[in] UseComponentName       Whether to use the ComponentName protocol at all.
-  @param[in] UseDevicePath          Whether to use the DevicePath protocol at all.
-  @param[in] Language               The pointer to the language string to use.
-  @param[in,out] BestDeviceName     The pointer to pointer to string allocated with the name.
-  @param[out] ConfigurationStatus   The pointer to status for opening a Configuration protocol.
-  @param[out] DiagnosticsStatus     The pointer to status for opening a Diagnostics protocol.
-  @param[in] Display                Whether to Print this out to default Print location.
-  @param[in] Indent                 How many characters to indent the printing.
+  @param[in] DeviceHandle            The device handle whose name is desired.
+  @param[in] UseComponentName        Whether to use the ComponentName protocol at all.
+  @param[in] UseDevicePath           Whether to use the DevicePath protocol at all.
+  @param[in] Language                The pointer to the language string to use.
+  @param[in, out] BestDeviceName     The pointer to pointer to string allocated with the name.
+  @param[out] ConfigurationStatus    The pointer to status for opening a Configuration protocol.
+  @param[out] DiagnosticsStatus      The pointer to status for opening a Diagnostics protocol.
+  @param[in] Display                 Whether to Print this out to default Print location.
+  @param[in] Indent                  How many characters to indent the printing.
 
   @retval EFI_SUCCESS           This function always returns EFI_SUCCESS.
 **/
@@ -849,9 +849,9 @@ EFI_STATUS
   The memory allocated by the callee for this list is freed by making a call to
   SHELLENV_FREE_FILE_LIST.
 
-  @param[in] Arg                The pointer to the path of the files to be opened.
-  @param[in,out] ListHead       The pointer to allocated and initialized list head
-                                upon which to append all the opened file structures.
+  @param[in] Arg                 The pointer to the path of the files to be opened.
+  @param[in, out] ListHead       The pointer to allocated and initialized list head
+                                 upon which to append all the opened file structures.
 
   @retval EFI_SUCCESS           One or more files was opened and a struct of each file's
                                 information was appended to ListHead.

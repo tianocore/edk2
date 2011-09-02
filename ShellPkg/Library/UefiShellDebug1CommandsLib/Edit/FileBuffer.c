@@ -1685,8 +1685,8 @@ FileBufferScrollLeft (
 /**
   Delete a char in line
 
-  @param[in,out] Line   The line to delete in.
-  @param[in] Pos        Position to delete the char at ( start from 0 ).
+  @param[in, out] Line   The line to delete in.
+  @param[in] Pos         Position to delete the char at ( start from 0 ).
 **/
 VOID
 EFIAPI
@@ -1710,8 +1710,8 @@ LineDeleteAt (
 /**
   Concatenate Src into Dest.
 
-  @param[in,out] Dest   Destination string
-  @param[in] Src        Src String.
+  @param[in, out] Dest   Destination string
+  @param[in] Src         Src String.
 **/
 VOID
 EFIAPI
@@ -2981,7 +2981,7 @@ FileBufferSearch (
   //
   // found
   //
-  if (Found == TRUE) {
+  if (Found) {
     Column  = (Position - 1) + FileBuffer.FilePosition.Column + Offset;
     Row     = FileBuffer.FilePosition.Row;
   } else {
@@ -3000,7 +3000,7 @@ FileBufferSearch (
         Found   = TRUE;
       } 
       
-      if (Found == TRUE) {
+      if (Found) {
         //
         // found
         //

@@ -38,8 +38,8 @@ Test(CONST VOID*b1, CONST VOID*b2)
   The ShellCEntryLib library instance wrappers the actual UEFI application
   entry point and calls this ShellAppMain function.
 
-  @param  ImageHandle  The image handle of the UEFI Application.
-  @param  SystemTable  A pointer to the EFI System Table.
+  @param  Argc             Argument count
+  @param  Argv             The parsed arguments
 
   @retval  0               The application exited normally.
   @retval  Other           An error occurred.

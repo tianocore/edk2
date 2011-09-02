@@ -120,9 +120,9 @@ typedef struct {
 /**
   Update the value of a given alias on the list.  If the alias is not there then add it.
 
-  @param[in] Alias              The alias to test for.
-  @param[in] CommandString      The updated command string.
-  @param[in,out] List           The list to search.
+  @param[in] Alias               The alias to test for.
+  @param[in] CommandString       The updated command string.
+  @param[in, out] List           The list to search.
 
   @retval EFI_SUCCESS           The operation was completed successfully.
   @retval EFI_OUT_OF_RESOURCES  There was not enough free memory.
@@ -216,8 +216,8 @@ InternalIsAliasOnList(
 /**
   Remove an alias from the given list.
 
-  @param[in] Alias              The alias to remove.
-  @param[in,out] List           The list to search.
+  @param[in] Alias               The alias to remove.
+  @param[in, out] List           The list to search.
 **/
 BOOLEAN
 EFIAPI

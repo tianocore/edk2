@@ -531,9 +531,9 @@ EFI_STATUS
   If there are multiple map names they will be semi-colon seperated in the
   NULL-terminated string.
 
-  @param[in,out] DevicePath     On entry, points to a device path pointer. On
-                                exit, updates the pointer to point to the
-                                portion of the device path after the mapping.
+  @param[in, out] DevicePath     On entry, points to a device path pointer. On
+                                 exit, updates the pointer to point to the
+                                 portion of the device path after the mapping.
 
   @retval NULL                  No mapping was found.
   @retval !=NULL                Pointer to NULL-terminated mapping. The buffer
@@ -640,10 +640,10 @@ EFI_STATUS
   according to the rules specified in UEFI Shell 2.0 spec section 3.7.1. Each
   matching file has an EFI_SHELL_FILE_INFO structure created in a linked list.
 
-  @param[in] Path               A pointer to the path string.
-  @param[in] OpenMode           Specifies the mode used to open each file, EFI_FILE_MODE_READ or
-                                EFI_FILE_MODE_WRITE.
-  @param[in,out] FileList       Points to the start of a list of files opened.
+  @param[in] Path                A pointer to the path string.
+  @param[in] OpenMode            Specifies the mode used to open each file, EFI_FILE_MODE_READ or
+                                 EFI_FILE_MODE_WRITE.
+  @param[in, out] FileList       Points to the start of a list of files opened.
 
   @retval EFI_SUCCESS           Create the file list successfully.
   @return                       Can't create the file list.
@@ -710,9 +710,9 @@ EFI_STATUS
   current position is increased by the number of bytes returned.
   If FileHandle is a directory, then an error is returned.
 
-  @param[in] FileHandle         The opened file handle for read.
-  @param[in] ReadSize           On input, the size of Buffer, in bytes. On output, the amount of data read.
-  @param[in,out] Buffer         The buffer in which data is read.
+  @param[in] FileHandle          The opened file handle for read.
+  @param[in] ReadSize            On input, the size of Buffer, in bytes. On output, the amount of data read.
+  @param[in, out] Buffer         The buffer in which data is read.
 
   @retval EFI_SUCCESS           Data was read.
   @retval EFI_NO_MEDIA          The device has no media.
@@ -929,9 +929,9 @@ EFI_STATUS
 
   Direct writes to opened directories are not supported.
 
-  @param[in] FileHandle             The opened file handle for writing.
-  @param[in,out] BufferSize         On input, size of Buffer.
-  @param[in] Buffer                 The buffer in which data to write.
+  @param[in] FileHandle              The opened file handle for writing.
+  @param[in, out] BufferSize         On input, size of Buffer.
+  @param[in] Buffer                  The buffer in which data to write.
 
   @retval EFI_SUCCESS               Data was written.
   @retval EFI_UNSUPPORTED           Writes to open directory are not supported.

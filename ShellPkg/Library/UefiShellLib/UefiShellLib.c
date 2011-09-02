@@ -1313,8 +1313,8 @@ typedef struct {
   EFI_SHELL_FILE_INFO based list.  it is up to the caller to free the memory via
   the ShellCloseFileMetaArg function.
 
-  @param[in] FileList          the EFI shell list type
-  @param[in,out] ListHead      the list to add to
+  @param[in] FileList           the EFI shell list type
+  @param[in, out] ListHead      the list to add to
 
   @retval the resultant head of the double linked new format list;
 **/
@@ -2453,14 +2453,14 @@ ShellCommandLineCheckDuplicate (
 
   If the string would grow bigger than NewSize it will halt and return error.
 
-  @param[in] SourceString             The string with source buffer.
-  @param[in,out] NewString            The string with resultant buffer.
-  @param[in] NewSize                  The size in bytes of NewString.
-  @param[in] FindTarget               The string to look for.
-  @param[in] ReplaceWith              The string to replace FindTarget with.
-  @param[in] SkipPreCarrot            If TRUE will skip a FindTarget that has a '^'
-                                      immediately before it.
-  @param[in] ParameterReplacing       If TRUE will add "" around items with spaces.
+  @param[in] SourceString              The string with source buffer.
+  @param[in, out] NewString            The string with resultant buffer.
+  @param[in] NewSize                   The size in bytes of NewString.
+  @param[in] FindTarget                The string to look for.
+  @param[in] ReplaceWith               The string to replace FindTarget with.
+  @param[in] SkipPreCarrot             If TRUE will skip a FindTarget that has a '^'
+                                       immediately before it.
+  @param[in] ParameterReplacing        If TRUE will add "" around items with spaces.
 
   @retval EFI_INVALID_PARAMETER       SourceString was NULL.
   @retval EFI_INVALID_PARAMETER       NewString was NULL.
@@ -3020,8 +3020,8 @@ ShellStrToUintn(
   if Destination's current length (including NULL terminator) is already more then
   CurrentSize, then ASSERT()
 
-  @param[in,out] Destination   The String to append onto
-  @param[in,out] CurrentSize   on call the number of bytes in Destination.  On
+  @param[in, out] Destination   The String to append onto
+  @param[in, out] CurrentSize   on call the number of bytes in Destination.  On
                                 return possibly the new size (still in bytes).  if NULL
                                 then allocate whatever is needed.
   @param[in]      Source        The String to append from
@@ -3824,9 +3824,9 @@ ShellIsHexOrDecimalNumber (
   If the position upon start is 0, then the Ascii Boolean will be set.  This should be
   maintained and not changed for all operations with the same file.
 
-  @param[in]      Handle        SHELL_FILE_HANDLE to read from.
-  @param[in,out]  Ascii         Boolean value for indicating whether the file is
-                                Ascii (TRUE) or UCS2 (FALSE).
+  @param[in]       Handle        SHELL_FILE_HANDLE to read from.
+  @param[in, out]  Ascii         Boolean value for indicating whether the file is
+                                 Ascii (TRUE) or UCS2 (FALSE).
 
   @return                       The line of text from the file.
 
@@ -3865,17 +3865,17 @@ ShellFileHandleReturnLine(
   If the position upon start is 0, then the Ascii Boolean will be set.  This should be
   maintained and not changed for all operations with the same file.
 
-  @param[in]      Handle        SHELL_FILE_HANDLE to read from.
-  @param[in,out]  Buffer        The pointer to buffer to read into.
-  @param[in,out]  Size          The pointer to number of bytes in Buffer.
-  @param[in]      Truncate      If the buffer is large enough, this has no effect.
-                                If the buffer is is too small and Truncate is TRUE,
-                                the line will be truncated.
-                                If the buffer is is too small and Truncate is FALSE,
-                                then no read will occur.
+  @param[in]       Handle        SHELL_FILE_HANDLE to read from.
+  @param[in, out]  Buffer        The pointer to buffer to read into.
+  @param[in, out]  Size          The pointer to number of bytes in Buffer.
+  @param[in]       Truncate      If the buffer is large enough, this has no effect.
+                                 If the buffer is is too small and Truncate is TRUE,
+                                 the line will be truncated.
+                                 If the buffer is is too small and Truncate is FALSE,
+                                 then no read will occur.
 
-  @param[in,out]  Ascii         Boolean value for indicating whether the file is
-                                Ascii (TRUE) or UCS2 (FALSE).
+  @param[in, out]  Ascii         Boolean value for indicating whether the file is
+                                 Ascii (TRUE) or UCS2 (FALSE).
 
   @retval EFI_SUCCESS           The operation was successful.  The line is stored in
                                 Buffer.

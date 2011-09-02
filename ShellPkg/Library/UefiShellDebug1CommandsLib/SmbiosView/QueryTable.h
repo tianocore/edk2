@@ -52,11 +52,11 @@ typedef struct TABLE_ITEM {
     Then all the Key Value between Low and High gets the same string
     L"Unused".
 
-  @param[in] Table    The begin address of table.
-  @param[in] Number   The number of table items.
-  @param[in] Key      The query Key.
-  @param[in,out] Info Input as empty buffer; output as data buffer.
-  @param[in] InfoLen  The max number of characters for Info.
+  @param[in] Table     The begin address of table.
+  @param[in] Number    The number of table items.
+  @param[in] Key       The query Key.
+  @param[in, out] Info Input as empty buffer; output as data buffer.
+  @param[in] InfoLen   The max number of characters for Info.
 
   @return the found Key and Info is valid.
   @retval QUERY_TABLE_UNFOUND and Info should be NULL.

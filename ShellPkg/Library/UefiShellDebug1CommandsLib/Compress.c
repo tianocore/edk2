@@ -1324,10 +1324,10 @@ Encode (
 /**
   The compression routine.
 
-  @param[in]      SrcBuffer     The buffer containing the source data.
-  @param[in]      SrcSize       The number of bytes in SrcBuffer.
-  @param[in]      DstBuffer     The buffer to put the compressed image in.
-  @param[in,out]  DstSize       On input the size (in bytes) of DstBuffer, on
+  @param[in]       SrcBuffer     The buffer containing the source data.
+  @param[in]       SrcSize       The number of bytes in SrcBuffer.
+  @param[in]       DstBuffer     The buffer to put the compressed image in.
+  @param[in, out]  DstSize       On input the size (in bytes) of DstBuffer, on
                                 return the number of bytes placed in DstBuffer.
 
   @retval EFI_SUCCESS           The compression was sucessful.

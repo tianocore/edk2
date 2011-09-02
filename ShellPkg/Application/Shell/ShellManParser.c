@@ -423,12 +423,12 @@ ManBufferFindTitleSection(
 
   Upon a sucessful return the caller is responsible to free the memory in *BriefDesc
 
-  @param[in] Handle             FileHandle to read from
-  @param[in] Command            name of command's section to find
-  @param[out] BriefDesc         pointer to pointer to string where description goes.
-  @param[out] BriefSize         pointer to size of allocated BriefDesc
-  @param[in,out] Ascii          TRUE if the file is ASCII, FALSE otherwise, will be
-                                set if the file handle is at the 0 position.
+  @param[in] Handle              FileHandle to read from
+  @param[in] Command             name of command's section to find
+  @param[out] BriefDesc          pointer to pointer to string where description goes.
+  @param[out] BriefSize          pointer to size of allocated BriefDesc
+  @param[in, out] Ascii          TRUE if the file is ASCII, FALSE otherwise, will be
+                                 set if the file handle is at the 0 position.
 
   @retval EFI_OUT_OF_RESOURCES  a memory allocation failed.
   @retval EFI_SUCCESS           the section was found and its description sotred in

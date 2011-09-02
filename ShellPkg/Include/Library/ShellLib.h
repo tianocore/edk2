@@ -82,12 +82,12 @@ ShellSetFileInfo (
   This function opens a file with the open mode according to the file path. The
   Attributes is valid only for EFI_FILE_MODE_CREATE.
 
-  @param[in,out]  FilePath      On input, the device path to the file.  On output,
-                                the remaining device path.
-  @param[out]  DeviceHandle     Pointer to the system device handle.
-  @param[out]  FileHandle       Pointer to the file handle.
-  @param[in]  OpenMode          The mode to open the file with.
-  @param[in]  Attributes        The file's file attributes.
+  @param[in, out]  FilePath      On input, the device path to the file.  On output,
+                                 the remaining device path.
+  @param[out]   DeviceHandle     Pointer to the system device handle.
+  @param[out]   FileHandle       Pointer to the file handle.
+  @param[in]    OpenMode         The mode to open the file with.
+  @param[in]    Attributes       The file's file attributes.
 
   @retval EFI_SUCCESS	        The information was set.
   @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
@@ -204,10 +204,10 @@ ShellCreateDirectory(
   are no more directory entries, the read returns a zero-length buffer.
   EFI_FILE_INFO is the structure returned as the directory entry.
 
-  @param[in] FileHandle         The opened file handle.
-  @param[in,out] ReadSize       On input the size of buffer in bytes.  On return
-                                the number of bytes written.
-  @param[out] Buffer            The buffer to put read data into.
+  @param[in] FileHandle          The opened file handle.
+  @param[in, out] ReadSize       On input the size of buffer in bytes.  On return
+                                 the number of bytes written.
+  @param[out] Buffer             The buffer to put read data into.
 
   @retval EFI_SUCCESS           Data was read.
   @retval EFI_NO_MEDIA	        The device has no media.
@@ -235,12 +235,12 @@ ShellReadFile(
   The file is automatically grown to hold the data if required. Direct writes to
   opened directories are not supported.
 
-  @param[in] FileHandle         The opened file for writing.
+  @param[in] FileHandle          The opened file for writing.
 
-  @param[in,out] BufferSize     On input the number of bytes in Buffer.  On output
-                                the number of bytes written.
+  @param[in, out] BufferSize     On input the number of bytes in Buffer.  On output
+                                 the number of bytes written.
 
-  @param[in] Buffer             The buffer containing data to write is stored.
+  @param[in] Buffer              The buffer containing data to write is stored.
 
   @retval EFI_SUCCESS           Data was written.
   @retval EFI_UNSUPPORTED       Writes to an open directory are not supported.
@@ -402,9 +402,9 @@ ShellFindFirstFile (
   call of this function has no file to get. *NoFile will be set to TRUE, and the
   data in Buffer is meaningless.
 
-  @param[in] DirHandle          The file handle of the directory.
-  @param[in,out] Buffer         The pointer to buffer for file's information.
-  @param[in,out] NoFile         The pointer to boolean when last file is found.
+  @param[in] DirHandle           The file handle of the directory.
+  @param[in, out] Buffer         The pointer to buffer for file's information.
+  @param[in, out] NoFile         The pointer to boolean when last file is found.
 
   @retval EFI_SUCCESS           Found the next file.
   @retval EFI_NO_MEDIA          The device has no media.
@@ -583,9 +583,9 @@ ShellSetPageBreakMode (
   If you are NOT appending to an existing list *ListHead must be NULL.  If
   *ListHead is NULL then it must be callee freed.
 
-  @param[in] Arg                The pointer to path string.
-  @param[in] OpenMode           Mode to open files with.
-  @param[in,out] ListHead       Head of linked list of results.
+  @param[in] Arg                 The pointer to path string.
+  @param[in] OpenMode            Mode to open files with.
+  @param[in, out] ListHead       Head of linked list of results.
 
   @retval EFI_SUCCESS           The operation was sucessful and the list head
                                 contains the list of opened files.
@@ -604,7 +604,7 @@ ShellOpenFileMetaArg (
 /**
   Free the linked list returned from ShellOpenFileMetaArg.
 
-  @param[in,out] ListHead       The pointer to free.
+  @param[in, out] ListHead       The pointer to free.
 
   @retval EFI_SUCCESS           The operation was sucessful.
   @retval EFI_INVALID_PARAMETER A parameter was invalid.
@@ -1024,13 +1024,13 @@ ShellStrToUintn(
   If Destination's current length (including NULL terminator) is already more than
   CurrentSize, then ASSERT().
 
-  @param[in,out] Destination    The String to append onto.
-  @param[in,out] CurrentSize    On call, the number of bytes in Destination.  On
-                                return, possibly the new size (still in bytes).  If NULL,
-                                then allocate whatever is needed.
-  @param[in]     Source         The String to append from.
-  @param[in]     Count          The maximum number of characters to append.  If 0, then
-                                all are appended.
+  @param[in, out] Destination    The String to append onto.
+  @param[in, out] CurrentSize    On call, the number of bytes in Destination.  On
+                                 return, possibly the new size (still in bytes).  If NULL,
+                                 then allocate whatever is needed.
+  @param[in]      Source         The String to append from.
+  @param[in]      Count          The maximum number of characters to append.  If 0, then
+                                 all are appended.
 
   @return                       The Destination after appending the Source.
 **/
@@ -1051,14 +1051,14 @@ StrnCatGrow (
 
   If the string would grow bigger than NewSize it will halt and return error.
 
-  @param[in] SourceString             The string with source buffer.
-  @param[in,out] NewString            The string with resultant buffer.
-  @param[in] NewSize                  The size in bytes of NewString.
-  @param[in] FindTarget               The string to look for.
-  @param[in] ReplaceWith              The string to replace FindTarget with.
-  @param[in] SkipPreCarrot            If TRUE will skip a FindTarget that has a '^'
-                                      immediately before it.
-  @param[in] ParameterReplacing       If TRUE will add "" around items with spaces.
+  @param[in] SourceString              The string with source buffer.
+  @param[in, out] NewString            The string with resultant buffer.
+  @param[in] NewSize                   The size in bytes of NewString.
+  @param[in] FindTarget                The string to look for.
+  @param[in] ReplaceWith               The string to replace FindTarget with.
+  @param[in] SkipPreCarrot             If TRUE will skip a FindTarget that has a '^'
+                                       immediately before it.
+  @param[in] ParameterReplacing        If TRUE will add "" around items with spaces.
 
   @retval EFI_INVALID_PARAMETER       SourceString was NULL.
   @retval EFI_INVALID_PARAMETER       NewString was NULL.
@@ -1189,9 +1189,9 @@ ShellPromptForResponse (
 
   @param[in] Type What type of question is asked.  This is used to filter the input
                   to prevent invalid answers to question.
-  @param[in] HiiFormatStringId  The format string Id for getting from Hii.
-  @param[in] HiiFormatHandle    The format string Handle for getting from Hii.
-  @param[in,out] Response       The pointer to Response, which will be populated upon return.
+  @param[in] HiiFormatStringId   The format string Id for getting from Hii.
+  @param[in] HiiFormatHandle     The format string Handle for getting from Hii.
+  @param[in, out] Response       The pointer to Response, which will be populated upon return.
 
   @retval EFI_SUCCESS The operation was sucessful.
   @return other       The operation failed.
@@ -1273,11 +1273,11 @@ ShellFileExists(
   If the position upon start is 0, then the Ascii Boolean will be set.  This should be
   maintained and not changed for all operations with the same file.
 
-  @param[in]      Handle        SHELL_FILE_HANDLE to read from.
-  @param[in,out]  Ascii         Boolean value for indicating whether the file is
-                                Ascii (TRUE) or UCS2 (FALSE).
+  @param[in]       Handle        SHELL_FILE_HANDLE to read from.
+  @param[in, out]  Ascii         Boolean value for indicating whether the file is
+                                 Ascii (TRUE) or UCS2 (FALSE).
 
-  @return                       The line of text from the file.
+  @return                        The line of text from the file.
 
   @sa ShellFileHandleReadLine
 **/
@@ -1294,17 +1294,17 @@ ShellFileHandleReturnLine(
   If the position upon start is 0, then the Ascii Boolean will be set.  This should be
   maintained and not changed for all operations with the same file.
 
-  @param[in]      Handle        SHELL_FILE_HANDLE to read from.
-  @param[in,out]  Buffer        The pointer to buffer to read into.
-  @param[in,out]  Size          The pointer to number of bytes in Buffer.
-  @param[in]      Truncate      If the buffer is large enough, this has no effect.
-                                If the buffer is is too small and Truncate is TRUE,
-                                the line will be truncated.
-                                If the buffer is is too small and Truncate is FALSE,
-                                then no read will occur.
+  @param[in]       Handle        SHELL_FILE_HANDLE to read from.
+  @param[in, out]  Buffer        The pointer to buffer to read into.
+  @param[in, out]  Size          The pointer to number of bytes in Buffer.
+  @param[in]       Truncate      If the buffer is large enough, this has no effect.
+                                 If the buffer is is too small and Truncate is TRUE,
+                                 the line will be truncated.
+                                 If the buffer is is too small and Truncate is FALSE,
+                                 then no read will occur.
 
-  @param[in,out]  Ascii         Boolean value for indicating whether the file is
-                                Ascii (TRUE) or UCS2 (FALSE).
+  @param[in, out]  Ascii         Boolean value for indicating whether the file is
+                                 Ascii (TRUE) or UCS2 (FALSE).
 
   @retval EFI_SUCCESS           The operation was successful.  The line is stored in
                                 Buffer.

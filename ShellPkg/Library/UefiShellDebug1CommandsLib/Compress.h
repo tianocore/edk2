@@ -18,11 +18,11 @@
 /**
   The compression routine.
 
-  @param[in]      SrcBuffer     The buffer containing the source data.
-  @param[in]      SrcSize       Number of bytes in SrcBuffer.
-  @param[in]      DstBuffer     The buffer to put the compressed image in.
-  @param[in,out]  DstSize       On input the size (in bytes) of DstBuffer, on
-                                return the number of bytes placed in DstBuffer.
+  @param[in]       SrcBuffer     The buffer containing the source data.
+  @param[in]       SrcSize       Number of bytes in SrcBuffer.
+  @param[in]       DstBuffer     The buffer to put the compressed image in.
+  @param[in, out]  DstSize       On input the size (in bytes) of DstBuffer, on
+                                 return the number of bytes placed in DstBuffer.
 
   @retval EFI_SUCCESS           The compression was sucessful.
   @retval EFI_BUFFER_TOO_SMALL  The buffer was too small.  DstSize is required.

@@ -131,8 +131,8 @@ MTD_NAME  mMTDName[] = {
 /**
   Function to append a 64 bit number / 25 onto the string.
 
-  @param[in,out] Str          The string so append onto.
-  @param[in]     Num          The number to divide and append.
+  @param[in, out] Str          The string so append onto.
+  @param[in]      Num          The number to divide and append.
 
   @retval EFI_INVALID_PARAMETER   A parameter was NULL.
   @retval EFI_SUCCESS             The appending was successful.
@@ -163,8 +163,8 @@ AppendCSDNum2 (
 /**
   Function to append a 64 bit number onto the mapping info.
 
-  @param[in,out] MappingItem  The mapping info object to append onto.
-  @param[in]     Num          The info to append.
+  @param[in, out] MappingItem  The mapping info object to append onto.
+  @param[in]      Num          The info to append.
 
   @retval EFI_INVALID_PARAMETER   A parameter was NULL.
   @retval EFI_SUCCESS             The appending was successful.
@@ -194,8 +194,8 @@ AppendCSDNum (
 /**
   Function to append string into the mapping info.
 
-  @param[in,out] MappingItem  The mapping info object to append onto.
-  @param[in]     Str          The info to append.
+  @param[in, out] MappingItem  The mapping info object to append onto.
+  @param[in]      Str          The info to append.
 
   @retval EFI_INVALID_PARAMETER   A parameter was NULL.
   @retval EFI_SUCCESS             The appending was successful.
@@ -281,8 +281,8 @@ AppendCSDStr (
 /**
   Function to append a Guid to the mapping item.
 
-  @param[in,out] MappingItem  The item to append onto.
-  @param[in]     Guid         The guid to append.
+  @param[in, out] MappingItem  The item to append onto.
+  @param[in]      Guid         The guid to append.
 
   @retval EFI_SUCCESS           The appending operation was successful.
   @retval EFI_INVALID_PARAMETER A parameter was NULL.

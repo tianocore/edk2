@@ -106,10 +106,11 @@ HMainCommandDisplayHelp (
   VOID
   )
 {
-  INT32    CurrentLine=0;
+  INT32    CurrentLine;
   CHAR16 * InfoString;
   EFI_INPUT_KEY  Key;
-  
+
+  CurrentLine = 0;
   // print helpInfo      
   for (CurrentLine = 0; 0 != HexMainMenuHelpInfo[CurrentLine]; CurrentLine++) {
     InfoString = HiiGetString(gShellDebug1HiiHandle, HexMainMenuHelpInfo[CurrentLine]

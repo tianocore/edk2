@@ -82,9 +82,9 @@
   Copy Length of Src buffer to Dest buffer,
   add a NULL termination to Dest buffer.
 
-  @param[in,out] Dest  Destination buffer head.
-  @param[in] Src       Source buffer head.
-  @param[in] Length    Length of buffer to be copied.
+  @param[in, out] Dest  Destination buffer head.
+  @param[in] Src        Source buffer head.
+  @param[in] Length     Length of buffer to be copied.
 **/
 VOID
 MemToString (

@@ -49,8 +49,9 @@ typedef struct {
 
 /**
   This function will populate the device path protocol parameter based on TheHandle.
-  
-  @param[in,out] DevPath       On a sucessful return the device path to the handle.
+
+  @param[in]      TheHandle     Driver handle.
+  @param[in, out] FilePath      On a sucessful return the device path to the handle.
 
   @retval EFI_SUCCESS           The device path was sucessfully returned.
   @retval other                 A error from gBS->HandleProtocol.

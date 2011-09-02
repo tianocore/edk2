@@ -249,10 +249,10 @@ GetChildHandle (
 /**
   Append OFFSET/WIDTH/VALUE items at the beginning of string.
 
-  @param[in,out]  String      The pointer to the string to append onto.
-  @param[in]      Offset      Offset value.
-  @param[in]      Width       Width value.
-  @param[in]      Block       Point to data buffer.
+  @param[in, out]  String      The pointer to the string to append onto.
+  @param[in]       Offset      Offset value.
+  @param[in]       Width       Width value.
+  @param[in]       Block       Point to data buffer.
 
   @return The count of unicode character that were appended.
 **/

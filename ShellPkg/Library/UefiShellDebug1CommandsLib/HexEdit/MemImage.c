@@ -41,11 +41,11 @@ HEFI_EDITOR_MEM_IMAGE             HMemImageConst = {
 /**
   Empty function.  always returns the same.
 
-  @param[in] This       Ignored.
-  @param[in] Width      Ignored.
-  @param[in] Address    Ignored.
-  @param[in] Count      Ignored.
-  @param[in,out] Buffer Ignored.
+  @param[in] This        Ignored.
+  @param[in] Width       Ignored.
+  @param[in] Address     Ignored.
+  @param[in] Count       Ignored.
+  @param[in, out] Buffer Ignored.
 
   @retval EFI_UNSUPPORTED.
 **/
@@ -65,11 +65,11 @@ DummyMemRead (
 /**
   Empty function.  always returns the same.
 
-  @param[in] This       Ignored.
-  @param[in] Width      Ignored.
-  @param[in] Address    Ignored.
-  @param[in] Count      Ignored.
-  @param[in,out] Buffer Ignored.
+  @param[in] This        Ignored.
+  @param[in] Width       Ignored.
+  @param[in] Address     Ignored.
+  @param[in] Count       Ignored.
+  @param[in, out] Buffer Ignored.
 
   @retval EFI_UNSUPPORTED.
 **/

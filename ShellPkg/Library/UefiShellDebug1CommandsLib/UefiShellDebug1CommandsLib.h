@@ -82,8 +82,8 @@ DumpHex (
   Function returns a system configuration table that is stored in the
   EFI System Table based on the provided GUID.
 
-  @param[in]  TableGuid    A pointer to the table's GUID type.
-  @param[in,out] Table     On exit, a pointer to a system configuration table.
+  @param[in]   TableGuid    A pointer to the table's GUID type.
+  @param[in, out] Table     On exit, a pointer to a system configuration table.
 
   @retval EFI_SUCCESS      A configuration table matching TableGuid was found.
   @retval EFI_NOT_FOUND    A configuration table matching TableGuid was not found.
@@ -98,8 +98,8 @@ GetSystemConfigurationTable (
 /**
   Convert a string representation of a GUID to the GUID value.
 
-  @param[in] StringGuid   The pointer to the string containing a GUID printed.
-  @param[in,out] Guid     The pointer to the buffer to get the GUID value.
+  @param[in]  StringGuid   The pointer to the string containing a GUID printed.
+  @param[in, out] Guid     The pointer to the buffer to get the GUID value.
 **/
 EFI_STATUS
 EFIAPI

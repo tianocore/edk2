@@ -43,12 +43,12 @@ INTN
   If Count is < 2 , then perform no action.
   If Size is < 1 , then perform no action.
 
-  @param[in,out] BufferToSort   On call, a Buffer of (possibly sorted) elements;
-                                on return, a buffer of sorted elements.
-  @param[in] Count              The number of elements in the buffer to sort.
-  @param[in] ElementSize        The size of an element in bytes.
-  @param[in] CompareFunction    The function to call to perform the comparison
-                                of any two elements.
+  @param[in, out] BufferToSort   On call, a Buffer of (possibly sorted) elements;
+                                 on return, a buffer of sorted elements.
+  @param[in]  Count              The number of elements in the buffer to sort.
+  @param[in]  ElementSize        The size of an element in bytes.
+  @param[in]  CompareFunction    The function to call to perform the comparison
+                                 of any two elements.
 **/
 VOID
 EFIAPI

@@ -137,8 +137,8 @@ SetBuiltInAlias(
   loaded image protocol installed on it.  the FilePath will point to the device path
   for the file that was loaded.
 
-  @param[in,out] DevPath       on a sucessful return the device path to the loaded image
-  @param[in,out] FilePath      on a sucessful return the device path to the file
+  @param[in, out] DevPath       on a sucessful return the device path to the loaded image
+  @param[in, out] FilePath      on a sucessful return the device path to the file
 
   @retval EFI_SUCCESS           the 2 device paths were sucessfully returned.
   @return other                 a error from gBS->HandleProtocol

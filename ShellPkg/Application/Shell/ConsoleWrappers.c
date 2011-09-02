@@ -81,8 +81,8 @@ FileBasedSimpleTextInReset(
 /**
   ReadKeyStroke function for the fake simple text input.
 
-  @param[in] This     A pointer to the SimpleTextIn structure.
-  @param[in,out] Key  A pointer to the Key structure to fill.
+  @param[in] This      A pointer to the SimpleTextIn structure.
+  @param[in, out] Key  A pointer to the Key structure to fill.
 
   @retval   EFI_SUCCESS The read was successful.
 **/

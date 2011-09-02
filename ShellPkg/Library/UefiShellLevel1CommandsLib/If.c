@@ -40,8 +40,8 @@ typedef enum {
 /**
   Extract the next fragment, if there is one.
 
-  @param[in,out] Statement    The current remaining statement.
-  @param[in] Fragment         The current fragment.
+  @param[in, out] Statement    The current remaining statement.
+  @param[in] Fragment          The current fragment.
 
   @retval FALSE   There is not another fragment.
   @retval TRUE    There is another fragment.
@@ -338,15 +338,15 @@ TestOperation (
 /**
   Process an if statement and determine if its is valid or not.
 
-  @param[in,out] PassingState     Opon entry, the current state.  Upon exit, 
-                                  the new state.
-  @param[in] StartParameterNumber The number of the first parameter of
-                                  this statement.
-  @param[in] EndParameterNumber   The number of the final parameter of
-                                  this statement.
-  @param[in] OperatorToUse        The type of termination operator.
-  @param[in] CaseInsensitive      TRUE for case insensitive, FALSE otherwise.
-  @param[in] ForceStringCompare   TRUE for all string based, FALSE otherwise.
+  @param[in, out] PassingState     Opon entry, the current state.  Upon exit, 
+                                   the new state.
+  @param[in] StartParameterNumber  The number of the first parameter of
+                                   this statement.
+  @param[in] EndParameterNumber    The number of the final parameter of
+                                   this statement.
+  @param[in] OperatorToUse         The type of termination operator.
+  @param[in] CaseInsensitive       TRUE for case insensitive, FALSE otherwise.
+  @param[in] ForceStringCompare    TRUE for all string based, FALSE otherwise.
 
   @retval EFI_INVALID_PARAMETER   A parameter was invalid.
   @retval EFI_SUCCESS             The operation was successful.                                  

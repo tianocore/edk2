@@ -226,8 +226,8 @@ CharToUpper (
   Function returns a system configuration table that is stored in the
   EFI System Table based on the provided GUID.
 
-  @param[in]  TableGuid    A pointer to the table's GUID type.
-  @param[in,out] Table     On exit, a pointer to a system configuration table.
+  @param[in]  TableGuid     A pointer to the table's GUID type.
+  @param[in, out] Table     On exit, a pointer to a system configuration table.
 
   @retval EFI_SUCCESS      A configuration table matching TableGuid was found.
   @retval EFI_NOT_FOUND    A configuration table matching TableGuid was not found.
@@ -281,8 +281,8 @@ HexCharToUintn (
 /**
   Convert a string representation of a guid to a Guid value.
 
-  @param[in] StringGuid   The pointer to the string of a guid.
-  @param[in,out] Guid     The pointer to the GUID structure to populate.
+  @param[in] StringGuid    The pointer to the string of a guid.
+  @param[in, out] Guid     The pointer to the GUID structure to populate.
 
   @retval EFI_INVALID_PARAMETER   A parameter was invalid.
   @retval EFI_SUCCESS             The conversion was successful.

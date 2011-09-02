@@ -116,9 +116,9 @@ IsValidMove(
 
   if the result is sucessful the caller must free *DestPathPointer.
 
-  @param[in] DestDir              The original path to the destination.
-  @param[in,out] DestPathPointer  A pointer to the callee allocated final path.
-  @param[in] Cwd                  A pointer to the current working directory.
+  @param[in] DestDir               The original path to the destination.
+  @param[in, out] DestPathPointer  A pointer to the callee allocated final path.
+  @param[in] Cwd                   A pointer to the current working directory.
 
   @retval EFI_INVALID_PARAMETR  The DestDir could not be resolved to a location.
   @retval EFI_INVALID_PARAMETR  The DestDir could be resolved to more than 1 location.

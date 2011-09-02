@@ -82,10 +82,10 @@ FileHandleSetInfo (
   are no more directory entries, the read returns a zero-length buffer.
   EFI_FILE_INFO is the structure returned as the directory entry.
 
-  @param[in] FileHandle         The opened file handle.
-  @param[in,out] BufferSize     On input, the size of buffer in bytes.  On return,
-                                the number of bytes written.
-  @param[out] Buffer            The buffer to put read data into.
+  @param[in] FileHandle          The opened file handle.
+  @param[in, out] BufferSize     On input, the size of buffer in bytes.  On return,
+                                 the number of bytes written.
+  @param[out] Buffer             The buffer to put read data into.
 
   @retval EFI_SUCCESS	        Data was read.
   @retval EFI_NO_MEDIA	        The device has no media.
@@ -113,10 +113,10 @@ FileHandleRead(
   The file is automatically grown to hold the data if required. Direct writes to
   opened directories are not supported.
 
-  @param[in] FileHandle         The opened file for writing.
-  @param[in,out] BufferSize     On input, the number of bytes in Buffer.  On output,
-                                the number of bytes written.
-  @param[in] Buffer             The buffer containing data to write is stored.
+  @param[in] FileHandle          The opened file for writing.
+  @param[in, out] BufferSize     On input, the number of bytes in Buffer.  On output,
+                                 the number of bytes written.
+  @param[in] Buffer              The buffer containing data to write is stored.
 
   @retval EFI_SUCCESS	        Data was written.
   @retval EFI_UNSUPPORTED       Writes to an open directory are not supported.
@@ -379,17 +379,17 @@ FileHandleGetFileName (
   If the position upon start is 0, then the Ascii Boolean will be set.  This should be
   maintained and not changed for all operations with the same file.
 
-  @param[in]      Handle        FileHandle to read from.
-  @param[in,out]  Buffer        The pointer to buffer to read into.
-  @param[in,out]  Size          The pointer to number of bytes in Buffer.
-  @param[in]      Truncate      If the buffer is large enough, this has no effect.
-                                If the buffer is is too small and Truncate is TRUE,
-                                the line will be truncated.
-                                If the buffer is is too small and Truncate is FALSE,
-                                then no read will occur.
+  @param[in]       Handle        FileHandle to read from.
+  @param[in, out]  Buffer        The pointer to buffer to read into.
+  @param[in, out]  Size          The pointer to number of bytes in Buffer.
+  @param[in]       Truncate      If the buffer is large enough, this has no effect.
+                                 If the buffer is is too small and Truncate is TRUE,
+                                 the line will be truncated.
+                                 If the buffer is is too small and Truncate is FALSE,
+                                 then no read will occur.
 
-  @param[in,out]  Ascii         Boolean value for indicating whether the file is
-                                Ascii (TRUE) or UCS2 (FALSE).
+  @param[in, out]  Ascii         Boolean value for indicating whether the file is
+                                 Ascii (TRUE) or UCS2 (FALSE).
 
   @retval EFI_SUCCESS           The operation was successful.  The line is stored in
                                 Buffer.
@@ -416,9 +416,9 @@ FileHandleReadLine(
   If the position upon start is 0, then the Ascii Boolean will be set.  This should be
   maintained and not changed for all operations with the same file.
 
-  @param[in]      Handle        FileHandle to read from.
-  @param[in,out]  Ascii         Boolean value for indicating whether the file is
-                                Ascii (TRUE) or UCS2 (FALSE).
+  @param[in]       Handle        FileHandle to read from.
+  @param[in, out]  Ascii         Boolean value for indicating whether the file is
+                                 Ascii (TRUE) or UCS2 (FALSE).
 
   @return                       The line of text from the file.
 

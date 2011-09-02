@@ -19,8 +19,8 @@
   Move the cursor position one character backward.
 
   @param[in] LineLength       Length of a line. Get it by calling QueryMode
-  @param[in,out] Column      Current column of the cursor position
-  @param[in,out] Row         Current row of the cursor position
+  @param[in, out] Column      Current column of the cursor position
+  @param[in, out] Row         Current row of the cursor position
 **/
 VOID
 EFIAPI
@@ -35,8 +35,8 @@ MoveCursorBackward (
 
   @param[in] LineLength       Length of a line.
   @param[in] TotalRow         Total row of a screen
-  @param[in,out] Column      Current column of the cursor position
-  @param[in,out] Row         Current row of the cursor position
+  @param[in, out] Column      Current column of the cursor position
+  @param[in, out] Row         Current row of the cursor position
 **/
 VOID
 EFIAPI
