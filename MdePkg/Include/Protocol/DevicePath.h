@@ -347,6 +347,26 @@ typedef struct {
 } FIBRECHANNEL_DEVICE_PATH;
 
 ///
+/// Fibre Channel Ex SubType.
+///
+#define MSG_FIBRECHANNELEX_DP     0x15
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  ///
+  /// Reserved for the future.
+  ///
+  UINT32                          Reserved;
+  ///
+  /// 8 byte array containing Fibre Channel End Device Port Name.
+  ///
+  UINT8                           WWN[8];
+  ///
+  /// 8 byte array containing Fibre Channel Logical Unit Number.
+  ///
+  UINT8                           Lun[8];
+} FIBRECHANNELEX_DEVICE_PATH;
+
+///
 /// 1394 Device Path SubType
 ///
 #define MSG_1394_DP               0x04
@@ -541,6 +561,14 @@ typedef struct {
   /// 0x01 - The Source IP Address is statically bound.
   ///
   BOOLEAN                         StaticIpAddress;
+  ///
+  /// The gateway IP address
+  ///
+  EFI_IPv4_ADDRESS                GatewayIpAddress;
+  ///
+  /// The subnet mask
+  ///
+  EFI_IPv4_ADDRESS                SubnetMask;
 } IPv4_DEVICE_PATH;
 
 ///
@@ -1002,6 +1030,7 @@ typedef union {
   SCSI_DEVICE_PATH                           Scsi;
   ISCSI_DEVICE_PATH                          Iscsi;
   FIBRECHANNEL_DEVICE_PATH                   FibreChannel;
+  FIBRECHANNELEX_DEVICE_PATH                 FibreChannelEx;
 
   F1394_DEVICE_PATH                          F1394;
   USB_DEVICE_PATH                            Usb;
@@ -1049,6 +1078,7 @@ typedef union {
   SCSI_DEVICE_PATH                           *Scsi;
   ISCSI_DEVICE_PATH                          *Iscsi;
   FIBRECHANNEL_DEVICE_PATH                   *FibreChannel;
+  FIBRECHANNELEX_DEVICE_PATH                 *FibreChannelEx;
 
   F1394_DEVICE_PATH                          *F1394;
   USB_DEVICE_PATH                            *Usb;
