@@ -99,6 +99,7 @@
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
   PeiServicesTablePointerLib|EmulatorPkg/Library/PeiServicesTablePointerLibMagicPage/PeiServicesTablePointerLibMagicPage.inf
   DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
 
 
 [LibraryClasses.common.SEC]
