@@ -101,6 +101,7 @@
   PlatformHookLib|MdeModulePkg/Library/BasePlatformHookLibNull/BasePlatformHookLibNull.inf
   SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
   MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
+  LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
   
   #
   # To save size, use NULL library for DebugLib and ReportStatusCodeLib.
