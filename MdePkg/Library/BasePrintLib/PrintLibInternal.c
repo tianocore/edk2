@@ -356,7 +356,7 @@ BasePrintLibSPrintMarker (
     ASSERT (Buffer != NULL);
   }
 
-  if (Flags & OUTPUT_UNICODE) {
+  if ((Flags & OUTPUT_UNICODE) != 0) {
     BytesPerOutputCharacter = 2;
   } else {
     BytesPerOutputCharacter = 1;
