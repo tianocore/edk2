@@ -12,11 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _CAPSULE_THUNK_32_TO_64_
-#define _CAPSULE_THUNK_32_TO_64_
-
-#include <Uefi.h>
-#include "PiPei.h"
+#ifndef _CAPSULE_COMMON_HEADER_
+#define _CAPSULE_COMMON_HEADER_
 
 //
 // This capsule PEIM puts its private data at the start of the
@@ -31,6 +28,7 @@ typedef struct {
 
 #define CAPSULE_TEST_SIGNATURE SIGNATURE_32('T', 'E', 'S', 'T')
 
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 typedef struct {
   EFI_PHYSICAL_ADDRESS  EntryPoint;
   EFI_PHYSICAL_ADDRESS  StackBufferBase;
@@ -47,6 +45,7 @@ typedef struct {
   UINT64                ReturnStatus;
   IA32_DESCRIPTOR       Gdtr;
 } SWITCH_64_TO_32_CONTEXT;
+#endif
 
 /**
   The function to coalesce a fragmented capsule in memory.

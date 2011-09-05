@@ -38,6 +38,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/PeImage.h>
 #include "Common/CommonHeader.h"
 
+#ifdef MDE_CPU_IA32 
+
 #pragma pack(1)
 
 //
@@ -97,5 +99,7 @@ EFI_STATUS
   IN OUT VOID                        **MemoryBase,
   IN OUT UINTN                       *MemorySize
   );
+
+#endif
 
 #endif

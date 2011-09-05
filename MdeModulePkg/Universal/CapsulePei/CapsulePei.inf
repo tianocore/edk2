@@ -49,22 +49,26 @@
   DebugLib
   PeiServicesTablePointerLib
   PrintLib
-  PeCoffLib
+  ReportStatusCodeLib
+
+[LibraryClasses.IA32]
   PeCoffGetEntryPointLib
   PcdLib
-  ReportStatusCodeLib
 
 [Guids]
   gEfiCapsuleVendorGuid                         # ALWAYS_CONSUMED
 
-
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid               # PPI ALWAYS_CONSUMED
   gPeiCapsulePpiGuid                            # PPI ALWAYS_CONSUMED
+  
+[Ppis.IA32]  
   gEfiPeiLoadFilePpiGuid                        # PPI ALWAYS_CONSUMED
 
-[Pcd]
+[Pcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleCoalesceFile
+
+[FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
 [Depex]

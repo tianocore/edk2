@@ -16,6 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Capsule.h"
 
+#ifdef MDE_CPU_IA32
 //
 // Global Descriptor Table (GDT)
 //
@@ -418,6 +419,67 @@ ModeSwitch (
 }
 
 /**
+  Locates the coalesce image entry point, and detects its machine type.
+
+  @param CoalesceImageEntryPoint   Pointer to coalesce image entry point for output.
+  @param CoalesceImageMachineType  Pointer to machine type of coalesce image.
+
+  @retval EFI_SUCCESS     Coalesce image successfully located.
+  @retval Others          Failed to locate the coalesce image.
+
+**/
+EFI_STATUS
+FindCapsuleCoalesceImage (
+  OUT EFI_PHYSICAL_ADDRESS    *CoalesceImageEntryPoint,
+  OUT UINT16                  *CoalesceImageMachineType
+  )
+{
+  EFI_STATUS                           Status;
+  UINTN                                Instance;
+  EFI_PEI_LOAD_FILE_PPI                *LoadFile;
+  EFI_PEI_FV_HANDLE                    VolumeHandle;
+  EFI_PEI_FILE_HANDLE                  FileHandle;
+  EFI_PHYSICAL_ADDRESS                 CoalesceImageAddress;
+  UINT64                               CoalesceImageSize;
+  UINT32                               AuthenticationState;
+
+  Instance = 0;
+
+  while (TRUE) {
+    Status = PeiServicesFfsFindNextVolume (Instance++, &VolumeHandle);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    Status = PeiServicesFfsFindFileByName (PcdGetPtr(PcdCapsuleCoalesceFile), VolumeHandle, &FileHandle);
+    if (!EFI_ERROR (Status)) {
+      Status = PeiServicesLocatePpi (&gEfiPeiLoadFilePpiGuid, 0, NULL, (VOID **) &LoadFile);
+      ASSERT_EFI_ERROR (Status);
+
+      Status = LoadFile->LoadFile (
+                           LoadFile,
+                           FileHandle,
+                           &CoalesceImageAddress,
+                           &CoalesceImageSize,
+                           CoalesceImageEntryPoint,
+                           &AuthenticationState
+                           );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_ERROR, "Unable to find PE32 section in CapsuleRelocate image ffs %r!\n", Status));
+        return Status;
+      }
+      *CoalesceImageMachineType = PeCoffLoaderGetMachineType ((VOID *) (UINTN) CoalesceImageAddress);
+      break;
+    } else {
+      continue;
+    }
+  }
+
+  return Status;
+}
+
+#endif
+
+/**
   Checks for the presence of capsule descriptors.
   Get capsule descriptors from variable CapsuleUpdateData, CapsuleUpdateData1, CapsuleUpdateData2...
   and save to DescriptorBuffer.
@@ -524,65 +586,6 @@ GetCapsuleDescriptors (
   }
   
   return EFI_SUCCESS;
-}
-
-/**
-  Locates the coalesce image entry point, and detects its machine type.
-
-  @param CoalesceImageEntryPoint   Pointer to coalesce image entry point for output.
-  @param CoalesceImageMachineType  Pointer to machine type of coalesce image.
-
-  @retval EFI_SUCCESS     Coalesce image successfully located.
-  @retval Others          Failed to locate the coalesce image.
-
-**/
-EFI_STATUS
-FindCapsuleCoalesceImage (
-  OUT EFI_PHYSICAL_ADDRESS    *CoalesceImageEntryPoint,
-  OUT UINT16                  *CoalesceImageMachineType
-  )
-{
-  EFI_STATUS                           Status;
-  UINTN                                Instance;
-  EFI_PEI_LOAD_FILE_PPI                *LoadFile;
-  EFI_PEI_FV_HANDLE                    VolumeHandle;
-  EFI_PEI_FILE_HANDLE                  FileHandle;
-  EFI_PHYSICAL_ADDRESS                 CoalesceImageAddress;
-  UINT64                               CoalesceImageSize;
-  UINT32                               AuthenticationState;
-
-  Instance = 0;
-
-  while (TRUE) {
-    Status = PeiServicesFfsFindNextVolume (Instance++, &VolumeHandle);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-    Status = PeiServicesFfsFindFileByName (PcdGetPtr(PcdCapsuleCoalesceFile), VolumeHandle, &FileHandle);
-    if (!EFI_ERROR (Status)) {
-      Status = PeiServicesLocatePpi (&gEfiPeiLoadFilePpiGuid, 0, NULL, (VOID **) &LoadFile);
-      ASSERT_EFI_ERROR (Status);
-
-      Status = LoadFile->LoadFile (
-                           LoadFile,
-                           FileHandle,
-                           &CoalesceImageAddress,
-                           &CoalesceImageSize,
-                           CoalesceImageEntryPoint,
-                           &AuthenticationState
-                           );
-      if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Unable to find PE32 section in CapsuleRelocate image ffs %r!\n", Status));
-        return Status;
-      }
-      *CoalesceImageMachineType = PeCoffLoaderGetMachineType ((VOID *) (UINTN) CoalesceImageAddress);
-      break;
-    } else {
-      continue;
-    }
-  }
-
-  return Status;
 }
 
 /**
