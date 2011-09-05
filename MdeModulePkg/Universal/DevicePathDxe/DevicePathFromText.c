@@ -971,6 +971,22 @@ DevPathFromTextPciRoot (
 }
 
 /**
+  Converts a text device path node to PCIE root device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created PCIE root device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextPcieRoot (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  return ConvertFromTextAcpi (TextDeviceNode, 0x0a08);
+}
+
+/**
   Converts a text device path node to Floppy device path structure.
 
   @param TextDeviceNode  The input Text device path node.
@@ -1280,6 +1296,41 @@ DevPathFromTextFibre (
   Strtoi64 (LunStr, &Fibre->Lun);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Fibre;
+}
+
+/**
+  Converts a text device path node to FibreEx device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created FibreEx device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextFibreEx (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16                      *WWNStr;
+  CHAR16                      *LunStr;
+  FIBRECHANNELEX_DEVICE_PATH  *FibreEx;
+
+  WWNStr  = GetNextParamStr (&TextDeviceNode);
+  LunStr  = GetNextParamStr (&TextDeviceNode);
+  FibreEx = (FIBRECHANNELEX_DEVICE_PATH *) CreateDeviceNode (
+                                             MESSAGING_DEVICE_PATH,
+                                             MSG_FIBRECHANNELEX_DP,
+                                             (UINT16) sizeof (FIBRECHANNELEX_DEVICE_PATH)
+                                             );
+
+  FibreEx->Reserved = 0;
+  Strtoi64 (WWNStr, (UINT64 *) (&FibreEx->WWN));
+  Strtoi64 (LunStr, (UINT64 *) (&FibreEx->Lun));
+
+  *(UINT64 *) (&FibreEx->WWN) = SwapBytes64 (*(UINT64 *) (&FibreEx->WWN));
+  *(UINT64 *) (&FibreEx->Lun) = SwapBytes64 (*(UINT64 *) (&FibreEx->Lun));
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) FibreEx;
 }
 
 /**
@@ -1736,12 +1787,16 @@ DevPathFromTextIPv4 (
   CHAR16            *ProtocolStr;
   CHAR16            *TypeStr;
   CHAR16            *LocalIPStr;
+  CHAR16            *GatewayIPStr;
+  CHAR16            *SubnetMaskStr;
   IPv4_DEVICE_PATH  *IPv4;
 
   RemoteIPStr           = GetNextParamStr (&TextDeviceNode);
   ProtocolStr           = GetNextParamStr (&TextDeviceNode);
   TypeStr               = GetNextParamStr (&TextDeviceNode);
   LocalIPStr            = GetNextParamStr (&TextDeviceNode);
+  GatewayIPStr          = GetNextParamStr (&TextDeviceNode);
+  SubnetMaskStr         = GetNextParamStr (&TextDeviceNode);
   IPv4                  = (IPv4_DEVICE_PATH *) CreateDeviceNode (
                                                  MESSAGING_DEVICE_PATH,
                                                  MSG_IPv4_DP,
@@ -1757,6 +1812,13 @@ DevPathFromTextIPv4 (
   }
 
   StrToIPv4Addr (&LocalIPStr, &IPv4->LocalIpAddress);
+  if (!IS_NULL (*GatewayIPStr) && !IS_NULL (*SubnetMaskStr)) {
+    StrToIPv4Addr (&GatewayIPStr,  &IPv4->GatewayIpAddress);
+    StrToIPv4Addr (&SubnetMaskStr, &IPv4->SubnetMask);
+  } else {
+    ZeroMem (&IPv4->GatewayIpAddress, sizeof (IPv4->GatewayIpAddress));
+    ZeroMem (&IPv4->SubnetMask,    sizeof (IPv4->SubnetMask));
+  }
 
   IPv4->LocalPort       = 0;
   IPv4->RemotePort      = 0;
@@ -2810,6 +2872,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE DevPathFromTextTable[]
   {L"Ctrl", DevPathFromTextCtrl},
   {L"Acpi", DevPathFromTextAcpi},
   {L"PciRoot", DevPathFromTextPciRoot},
+  {L"PcieRoot", DevPathFromTextPcieRoot},
   {L"Floppy", DevPathFromTextFloppy},
   {L"Keyboard", DevPathFromTextKeyboard},
   {L"Serial", DevPathFromTextSerial},
@@ -2820,6 +2883,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE DevPathFromTextTable[]
   {L"Ata", DevPathFromTextAta},
   {L"Scsi", DevPathFromTextScsi},
   {L"Fibre", DevPathFromTextFibre},
+  {L"FibreEx", DevPathFromTextFibreEx},
   {L"I1394", DevPathFromText1394},
   {L"USB", DevPathFromTextUsb},
   {L"I2O", DevPathFromTextI2O},
