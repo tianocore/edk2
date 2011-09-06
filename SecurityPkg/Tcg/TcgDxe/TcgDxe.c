@@ -1006,7 +1006,7 @@ OnReadyToBoot (
 /**
   Install TCG ACPI Table when ACPI Table Protocol is available.
 
-  A system¡¯s firmware uses an ACPI table to identify the system's TCG capabilities 
+  A system's firmware uses an ACPI table to identify the system's TCG capabilities 
   to the Post-Boot environment. The information in this ACPI table is not guaranteed 
   to be valid until the Host Platform transitions from pre-boot state to post-boot state.  
 

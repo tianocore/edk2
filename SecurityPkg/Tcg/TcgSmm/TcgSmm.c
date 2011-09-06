@@ -374,7 +374,7 @@ PublishAcpiTable (
   ASSERT_EFI_ERROR (Status);
 
   ASSERT (Table->OemTableId == SIGNATURE_64 ('T', 'c', 'g', 'T', 'a', 'b', 'l', 'e'));
-  mTcgNvs = AssignOpRegion (Table, SIGNATURE_32 ('T', 'N', 'V', 'S'), sizeof (TCG_NVS));
+  mTcgNvs = AssignOpRegion (Table, SIGNATURE_32 ('T', 'N', 'V', 'S'), (UINT16) sizeof (TCG_NVS));
   ASSERT (mTcgNvs != NULL);
 
   //
