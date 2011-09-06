@@ -844,17 +844,18 @@ AddTableToList (
           );
         AcpiSupportInstance->Xsdt->OemRevision = AcpiSupportInstance->Fadt3->Header.OemRevision;
       }
-    }    
-    //
-    // Checksum the table
-    //
-    if (Checksum) {
-      AcpiPlatformChecksum (
-        CurrentTableList->Table,
-        CurrentTableList->Table->Length,
-        OFFSET_OF (EFI_ACPI_DESCRIPTION_HEADER,
-        Checksum)
-        );
+
+      //
+      // Checksum the table
+      //
+      if (Checksum) {
+        AcpiPlatformChecksum (
+          CurrentTableList->Table,
+          CurrentTableList->Table->Length,
+          OFFSET_OF (EFI_ACPI_DESCRIPTION_HEADER,
+          Checksum)
+          );
+      }
     }
     break;
 
