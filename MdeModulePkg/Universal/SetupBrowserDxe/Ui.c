@@ -2834,7 +2834,11 @@ UiDisplayMenu (
 
         Difference = MoveToNextStatement (TRUE, &NewPos);
         PreviousMenuOption = MENU_OPTION_FROM_LINK (NewPos);
-        DistanceValue += PreviousMenuOption->Skip;
+        if (Difference > 0) {
+          DistanceValue = Difference + PreviousMenuOption->Skip;
+        } else {
+          DistanceValue += PreviousMenuOption->Skip;
+        }
 
         if ((INTN) MenuOption->Row - (INTN) DistanceValue  < (INTN) TopRow) {
           if (Difference > 0) {
