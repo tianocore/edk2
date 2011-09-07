@@ -25,7 +25,7 @@
   PLATFORM_NAME                  = Unix
   PLATFORM_GUID                  = 7b3c1fb4-8986-11db-b5b2-0040d02b1835
   PLATFORM_VERSION               = 0.3
-  DSC_ SPECIFICATION             = 0x00010005
+  DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/Unix
   SUPPORTED_ARCHITECTURES        = IA32
   BUILD_TARGETS                  = DEBUG|RELEASE
