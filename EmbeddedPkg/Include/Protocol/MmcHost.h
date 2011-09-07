@@ -128,7 +128,7 @@ typedef EFI_STATUS (EFIAPI *MMC_WRITEBLOCKDATA) (
   );
 
 
-typedef struct _EFI_MMC_HOST_PROTOCOL {
+struct _EFI_MMC_HOST_PROTOCOL {
 
   UINT32                  Revision;
   MMC_ISCARDPRESENT       IsCardPresent;
@@ -143,7 +143,7 @@ typedef struct _EFI_MMC_HOST_PROTOCOL {
   MMC_READBLOCKDATA       ReadBlockData;
   MMC_WRITEBLOCKDATA      WriteBlockData;
 
-} EFI_MMC_HOST_PROTOCOL;
+};
 
 #define MMC_HOST_PROTOCOL_REVISION    0x00010001    // 1.1
 
