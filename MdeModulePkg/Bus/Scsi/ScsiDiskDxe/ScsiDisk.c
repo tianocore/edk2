@@ -697,27 +697,50 @@ ScsiDiskDetectMedia (
   )
 {
   EFI_STATUS          Status;
-  EFI_STATUS          ReadCapacityStatus;
   EFI_SCSI_SENSE_DATA *SenseData;
   UINTN               NumberOfSenseKeys;
   BOOLEAN             NeedRetry;
   BOOLEAN             NeedReadCapacity;
-  UINT8               Index;
+  UINT8               Retry;
   UINT8               MaxRetry;
   EFI_BLOCK_IO_MEDIA  OldMedia;
   UINTN               Action;
+  EFI_EVENT           TimeoutEvt;
 
   Status              = EFI_SUCCESS;
-  ReadCapacityStatus  = EFI_SUCCESS;
   SenseData           = NULL;
   NumberOfSenseKeys   = 0;
-  NeedReadCapacity    = FALSE;
-  CopyMem (&OldMedia, ScsiDiskDevice->BlkIo.Media, sizeof (OldMedia));
-  *MediaChange        = FALSE;
+  Retry               = 0;
   MaxRetry            = 3;
   Action              = ACTION_NO_ACTION;
+  NeedReadCapacity    = FALSE;
+  *MediaChange        = FALSE;
+  TimeoutEvt          = NULL;
 
-  for (Index = 0; Index < MaxRetry; Index++) {
+  CopyMem (&OldMedia, ScsiDiskDevice->BlkIo.Media, sizeof (OldMedia));
+
+  Status = gBS->CreateEvent (
+                  EVT_TIMER,
+                  TPL_CALLBACK,
+                  NULL,
+                  NULL,
+                  &TimeoutEvt
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = gBS->SetTimer (TimeoutEvt, TimerRelative, EFI_TIMER_PERIOD_SECONDS(120));
+  if (EFI_ERROR (Status)) {
+    goto EXIT;
+  }
+
+  //
+  // Sending Test_Unit cmd to poll device status.
+  // If the sense data shows the drive is not ready or reset before, we need poll the device status again.
+  // We limit the upper boundary to 120 seconds.
+  //
+  while (EFI_ERROR (gBS->CheckEvent (TimeoutEvt))) {
     Status = ScsiDiskTestUnitReady (
               ScsiDiskDevice,
               &NeedRetry,
@@ -732,21 +755,22 @@ ScsiDiskDetectMedia (
                  &Action
                  );
       if (EFI_ERROR (Status)) {
-        return Status;
+        goto EXIT;
       } else if (Action == ACTION_RETRY_COMMAND_LATER) {
         continue;
       } else {
         break;
       }
-    }
-
-    if (!NeedRetry) {
-      return Status;
+    } else {
+      Retry++;
+      if (!NeedRetry || (Retry >= MaxRetry)) {
+        goto EXIT;
+      }
     }
   }
 
-  if ((Index == MaxRetry) && EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
+  if (EFI_ERROR (Status)) {
+    goto EXIT;
   }
 
   //
@@ -765,63 +789,45 @@ ScsiDiskDetectMedia (
     //
     // retrieve media information
     //
-    MaxRetry = 3;
-    for (Index = 0; Index < MaxRetry; Index++) {
-
-      ReadCapacityStatus = ScsiDiskReadCapacity (
-                            ScsiDiskDevice,
-                            &NeedRetry,
-                            &SenseData,
-                            &NumberOfSenseKeys
-                            );
-      if (EFI_ERROR (ReadCapacityStatus) && !NeedRetry) {
-        return EFI_DEVICE_ERROR;
-      }
-      //
-      // analyze sense key to action
-      //
-      Status = DetectMediaParsingSenseKeys (
-                ScsiDiskDevice,
-                SenseData,
-                NumberOfSenseKeys,
-                &Action
-                );
-      //
-      // if Status is error, it may indicate crisis error,
-      // so return without retry.
-      //
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-
-      switch (Action) {
-      case ACTION_NO_ACTION:
+    for (Retry = 0; Retry < MaxRetry; Retry++) {
+      Status = ScsiDiskReadCapacity (
+                 ScsiDiskDevice,
+                 &NeedRetry,
+                 &SenseData,
+                 &NumberOfSenseKeys
+                 );
+      if (!EFI_ERROR (Status)) {
         //
-        // no retry
+        // analyze sense key to action
         //
-        Index = MaxRetry;
-        break;
-
-      case ACTION_RETRY_COMMAND_LATER:
-        //
-        // retry the ReadCapacity later and continuously, until the condition
-        // no longer emerges.
-        // stall time is 100000us, or say 0.1 second.
-        //
-        gBS->Stall (100000);
-        Index = 0;
-        break;
-
-      default:
-        //
-        // other cases, just retry the command
-        //
-        break;
+        Status = DetectMediaParsingSenseKeys (
+                   ScsiDiskDevice,
+                   SenseData,
+                   NumberOfSenseKeys,
+                   &Action
+                   );
+        if (EFI_ERROR (Status)) {
+          //
+          // if Status is error, it may indicate crisis error,
+          // so return without retry.
+          //
+          goto EXIT;
+        } else if (Action == ACTION_RETRY_COMMAND_LATER) {
+          Retry = 0;
+          continue;
+        } else {
+          break;
+        }
+      } else {   
+        Retry++;
+        if (!NeedRetry || (Retry >= MaxRetry)) {
+          goto EXIT;
+        }
       }
     }
 
-    if ((Index == MaxRetry) && EFI_ERROR (ReadCapacityStatus)) {
-      return EFI_DEVICE_ERROR;
+    if (EFI_ERROR (Status)) {
+      goto EXIT;
     }
   }
 
@@ -863,7 +869,11 @@ ScsiDiskDetectMedia (
     *MediaChange = TRUE;
   }
 
-  return EFI_SUCCESS;
+EXIT:
+  if (TimeoutEvt != NULL) {
+    gBS->CloseEvent (TimeoutEvt);
+  }
+  return Status;
 }
 
 
@@ -1188,7 +1198,9 @@ DetectMediaParsingSenseKeys (
   *Action = ACTION_READ_CAPACITY;
 
   if (NumberOfSenseKeys == 0) {
-    *Action = ACTION_NO_ACTION;
+    if (ScsiDiskDevice->BlkIo.Media->MediaPresent == TRUE) {
+      *Action = ACTION_NO_ACTION;
+    }
     return EFI_SUCCESS;
   }
 
@@ -1196,7 +1208,9 @@ DetectMediaParsingSenseKeys (
     //
     // No Sense Key returned from last submitted command
     //
-    *Action = ACTION_NO_ACTION;
+    if (ScsiDiskDevice->BlkIo.Media->MediaPresent == TRUE) {
+      *Action = ACTION_NO_ACTION;
+    }
     return EFI_SUCCESS;
   }
 
@@ -1220,10 +1234,12 @@ DetectMediaParsingSenseKeys (
   if (ScsiDiskIsMediaError (SenseData, NumberOfSenseKeys)) {
     ScsiDiskDevice->BlkIo.Media->MediaPresent = FALSE;
     ScsiDiskDevice->BlkIo.Media->LastBlock    = 0;
+    *Action = ACTION_NO_ACTION;
     return EFI_DEVICE_ERROR;
   }
 
   if (ScsiDiskIsHardwareError (SenseData, NumberOfSenseKeys)) {
+    *Action = ACTION_NO_ACTION;
     return EFI_DEVICE_ERROR;
   }
 
@@ -1232,7 +1248,7 @@ DetectMediaParsingSenseKeys (
       *Action = ACTION_RETRY_COMMAND_LATER;
       return EFI_SUCCESS;
     }
-
+    *Action = ACTION_NO_ACTION;
     return EFI_DEVICE_ERROR;
   }
 
