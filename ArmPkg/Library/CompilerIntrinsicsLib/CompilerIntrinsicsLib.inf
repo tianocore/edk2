@@ -1,8 +1,8 @@
-
 #/** @file
 #  Base Library implementation.
 #
 #  Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
+#  Copyright (c) 2011, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -32,6 +32,8 @@
   Arm/llsr.asm         | RVCT
   Arm/memcpy.asm       | RVCT
   Arm/memcpy4.asm      | RVCT
+  Arm/memset.asm       | RVCT
+  Arm/memmove.asm      | RVCT
   Arm/uread.asm        | RVCT
   Arm/uwrite.asm       | RVCT
   Arm/lasr.asm         | RVCT
