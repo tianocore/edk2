@@ -33,6 +33,32 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
 
 
 /**
+  Check if it runs in Recovery mode.
+  
+  @param  PeiServices  General purpose services available to every PEIM.
+
+  @retval TRUE         It's in Recovery mode.
+  @retval FALSE        It's not in Recovery mode.
+
+**/
+BOOLEAN
+IsInRecoveryMode (
+  IN CONST EFI_PEI_SERVICES          **PeiServices
+  )
+{
+  EFI_STATUS              Status;
+  EFI_BOOT_MODE           BootMode;
+
+  Status = (*PeiServices)->GetBootMode (PeiServices, &BootMode);
+  ASSERT_EFI_ERROR (Status);
+  
+  if (BootMode == BOOT_IN_RECOVERY_MODE) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
   Provide the functionality of the variable services.
   
   @param  FileHandle   Handle of the file being invoked. 
@@ -50,23 +76,7 @@ PeimInitializeVariableServices (
   IN CONST EFI_PEI_SERVICES          **PeiServices
   )
 {
-  EFI_BOOT_MODE BootMode;
-  EFI_STATUS    Status;
-
-  //
-  // Check if this is recovery boot path. If no, publish the variable access capability
-  // to other modules. If yes, the content of variable area is not reliable. Therefore,
-  // in this case we should not provide variable service to other pei modules. 
-  // 
-  Status = (*PeiServices)->GetBootMode (PeiServices, &BootMode);
-  ASSERT_EFI_ERROR (Status);
-  
-  if (BootMode == BOOT_IN_RECOVERY_MODE) {
-    return EFI_UNSUPPORTED;
-  }
-
   return PeiServicesInstallPpi (&mPpiListVariable);
-
 }
 
 /**
@@ -548,6 +558,16 @@ PeiGetVariable (
   if (VariableName == NULL || VariableGuid == NULL || DataSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  //
+  // Check if this is recovery boot path.
+  // If yes, the content of variable area is not reliable. Therefore we directly
+  // return EFI_NOT_FOUND. 
+  // 
+  if (IsInRecoveryMode(PeiServices)) {
+    return EFI_NOT_FOUND;
+  }
+
   //
   // Find existing variable
   //
@@ -624,6 +644,15 @@ PeiGetNextVariableName (
   PeiServices = GetPeiServicesTablePointer ();
   if (VariableName == NULL || VariableGuid == NULL || VariableNameSize == NULL) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check if this is recovery boot path.
+  // If yes, the content of variable area is not reliable. Therefore we directly
+  // return EFI_NOT_FOUND. 
+  //   
+  if (IsInRecoveryMode(PeiServices)) {
+    return EFI_NOT_FOUND;
   }
 
   Status = FindVariable (PeiServices, VariableName, VariableGuid, &Variable);
