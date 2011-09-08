@@ -68,7 +68,7 @@ struct dirent {
                                   // on the file system volume.
   UINT64    Attribute;          // The time the file was created.
   struct timespec  CreateTime;         // The time when the file was last accessed.
-  struct timespec  LastAccessTime;     // The time when the file’s contents were last modified.
+  struct timespec  LastAccessTime;     // The time when the file's contents were last modified.
   struct timespec  ModificationTime;   // The attribute bits for the file. See below.
   CHAR16    FileName[1];         // The Null-terminated name of the file.
 };

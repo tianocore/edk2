@@ -257,14 +257,14 @@ struct  tm;
 
     Each conversion specification is introduced by the wide character %. After
     the %, the following appear in sequence:
-      — Zero or more flags (in any order) that modify the meaning of the
+      * Zero or more flags (in any order) that modify the meaning of the
         conversion specification.
-      — An optional minimum field width. If the converted value has fewer wide
+      * An optional minimum field width. If the converted value has fewer wide
         characters than the field width, it is padded with spaces (by default)
         on the left (or right, if the left adjustment flag, described later,
         has been given) to the field width. The field width takes the form of
         an asterisk * (described later) or a nonnegative decimal integer.
-      — An optional precision that gives the minimum number of digits to appear
+      * An optional precision that gives the minimum number of digits to appear
         for the d, i, o, u, x, and X conversions, the number of digits to
         appear after the decimal-point wide character for e, E, f, and F
         conversions, the maximum number of significant digits for the g and G
@@ -274,8 +274,8 @@ struct  tm;
         decimal integer; if only the period is specified, the precision is
         taken as zero. If a precision appears with any other conversion
         specifier, the behavior is undefined.
-      — An optional length modifier that specifies the size of the argument.
-      — A conversion specifier wide character that specifies the type of
+      * An optional length modifier that specifies the size of the argument.
+      * A conversion specifier wide character that specifies the type of
         conversion to be applied.
 
     As noted above, a field width, or precision, or both, may be indicated by
@@ -296,7 +296,7 @@ struct  tm;
           if a signed conversion results in no wide characters, a space is
           prefixed to the result. If the space and + flags both appear, the
           space flag is ignored.
-    #     The result is converted to an ‘‘alternative form’’. For o conversion,
+    #     The result is converted to an "alternative form". For o conversion,
           it increases the precision, if and only if necessary, to force the
           first digit of the result to be a zero (if the value and precision
           are both 0, a single 0 is printed). For x (or X) conversion, a
@@ -384,7 +384,7 @@ struct  tm;
             The F conversion specifier produces INF or NAN instead
             of inf or nan, respectively.
     e,E     A double argument representing a floating-point number is converted
-            in the style [-]d.ddd e±dd, where there is one digit (which is
+            in the style [-]d.ddd e +/- dd, where there is one digit (which is
             nonzero if the argument is nonzero) before the decimal-point wide
             character and the number of digits after it is equal to the
             precision; if the precision is missing, it is taken as 6; if the
