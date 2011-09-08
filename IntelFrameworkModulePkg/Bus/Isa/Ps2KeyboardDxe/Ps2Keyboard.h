@@ -183,7 +183,7 @@ InstallPs2KeyboardDriver (
 #define SCANCODE_SYS_REQ_MAKE           0x37
 #define SCANCODE_MAX_MAKE               0x60
 
-#define SCANCODE_PAUSE_MAKE             0x1D45
+#define SCANCODE_PAUSE_MAKE             0x9DC5 // The last two bytes of scancode for PAUSE key
 
 #define KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA     BIT0        ///< 0 - Output register has no data; 1 - Output register has data
 #define KEYBOARD_STATUS_REGISTER_HAS_INPUT_DATA      BIT1        ///< 0 - Input register has no data;  1 - Input register has data

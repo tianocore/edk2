@@ -551,7 +551,7 @@ ConvertKeyboardScanCodeToEfiKey[] = {
     0x0000
   },  
   {
-    0x1D45,  //Pause key
+    SCANCODE_PAUSE_MAKE,  //Pause key
     SCAN_PAUSE,
     0x0000,
     0x0000
@@ -1166,9 +1166,9 @@ KeyGetchar (
   LIST_ENTRY                     *Link;
   KEYBOARD_CONSOLE_IN_EX_NOTIFY  *CurrentNotify;
   //
-  // 4 bytes most
+  // 6 bytes most
   //
-  UINT8                          ScancodeArr[4];
+  UINT8                          ScancodeArr[6];
   UINT32                         ScancodeArrPos;
   
   //
@@ -1201,16 +1201,11 @@ KeyGetchar (
     //
     if (ScancodeArr[ScancodeArrPos] == SCANCODE_EXTENDED1) {
       Extended1       = TRUE;
-      Status          = GetScancodeBufHead (&ConsoleIn->ScancodeQueue, 2, ScancodeArr);
-      ScancodeArrPos  = 1;
-
-      if (EFI_ERROR (Status)) {
-        return ;
-      }
-
-      Status          = GetScancodeBufHead (&ConsoleIn->ScancodeQueue, 3, ScancodeArr);
-      ScancodeArrPos  = 2;
-
+      //
+      // Try to read the whole bytes of scancode for PAUSE key
+      //
+      Status          = GetScancodeBufHead (&ConsoleIn->ScancodeQueue, 6, ScancodeArr);
+      ScancodeArrPos  = 5;
       if (EFI_ERROR (Status)) {
         return ;
       }
