@@ -464,25 +464,25 @@ ShellCommandRunMm (
       GetPciEAddressFromInputAddress (Address, &PciEAddress);
     }
 
-//    //
-//    // Set value
-//    //
-//    if (ValueStr != NULL) {
-//      if (AccessType == EFIMemoryMappedIo) {
-//        IoDev->Mem.Write (IoDev, Width, Address, 1, &Value);
-//      } else if (AccessType == EfiIo) {
-//        IoDev->Io.Write (IoDev, Width, Address, 1, &Value);
-//      } else if (AccessType == EfiPciConfig) {
-//        IoDev->Pci.Write (IoDev, Width, Address, 1, &Value);
-//      } else if (AccessType == EfiPciEConfig) {
-//        IoDev->Pci.Write (IoDev, Width, PciEAddress, 1, &Buffer);
-//      } else {
-//        WriteMem (Width, Address, 1, &Value);
-//      }
-//
-//      ASSERT(ShellStatus == SHELL_SUCCESS);
-//      goto Done;
-//    }
+    //
+    // Set value
+    //
+    if (ShellCommandLineGetRawValue(Package, 2) != NULL) {
+      if (AccessType == EFIMemoryMappedIo) {
+        IoDev->Mem.Write (IoDev, Width, Address, 1, &Value);
+      } else if (AccessType == EfiIo) {
+        IoDev->Io.Write (IoDev, Width, Address, 1, &Value);
+      } else if (AccessType == EfiPciConfig) {
+        IoDev->Pci.Write (IoDev, Width, Address, 1, &Value);
+      } else if (AccessType == EfiPciEConfig) {
+        IoDev->Pci.Write (IoDev, Width, PciEAddress, 1, &Value);
+      } else {
+        WriteMem (Width, Address, 1, &Value);
+      }
+
+      ASSERT(ShellStatus == SHELL_SUCCESS);
+      goto Done;
+    }
 
 
     //
