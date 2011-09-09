@@ -239,6 +239,7 @@ PxeBcExtractBootFileUrl (
   CHAR8                      TmpChar;
   CHAR8                      *ServerAddressOption;
   CHAR8                      *ServerAddress;
+  CHAR8                      *ModeStr;
   EFI_STATUS                 Status;
 
   //
@@ -322,6 +323,17 @@ PxeBcExtractBootFileUrl (
   ++BootFileNamePtr;
   BootFileNameLen = (UINT16)(Length - (UINT16) ((UINTN)BootFileNamePtr - (UINTN)TmpStr) + 1);
   if (BootFileNameLen != 0 || FileName != NULL) {
+    //
+    // Remove trailing mode=octet if present and ignore.  All other modes are
+    // invalid for netboot6, so reject them.
+    //
+    ModeStr = AsciiStrStr (BootFileNamePtr, ";mode=octet");
+    if (ModeStr != NULL && *(ModeStr + AsciiStrLen (";mode=octet")) == '\0') {
+      *ModeStr = '\0';
+    } else if (AsciiStrStr (BootFileNamePtr, ";mode=") != NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     //
     // Extract boot file name from URL.
     //

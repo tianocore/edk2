@@ -1228,6 +1228,12 @@ EfiPxeBcUdpRead (
   BOOLEAN                     IsDone;
   BOOLEAN                     IsMatched;
   UINTN                       CopiedLen;
+  UINTN                       HeaderLen;
+  UINTN                       HeaderCopiedLen;
+  UINTN                       BufferCopiedLen;
+  UINT32                      FragmentLength;
+  UINTN                       FragmentIndex;
+  UINT8                       *FragmentBuffer;
 
   if (This == NULL || DestIp == NULL || DestPort == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1342,26 +1348,53 @@ EfiPxeBcUdpRead (
     //
     // Copy the rececived packet to user if matched by filter.
     //
-    CopiedLen = 0;
     if (Mode->UsingIpv6) {
       Udp6Rx = Udp6Token.Packet.RxData;
       ASSERT (Udp6Rx != NULL);
-      //
-      // Copy the header part of received data.
-      //
+
+      HeaderLen = 0;
       if (HeaderSize != NULL) {
-        CopiedLen   = MIN (*HeaderSize, Udp6Rx->DataLength);
-        *HeaderSize = CopiedLen;
-        CopyMem (HeaderPtr, Udp6Rx->FragmentTable[0].FragmentBuffer, *HeaderSize);
+        HeaderLen = MIN (*HeaderSize, Udp6Rx->DataLength);
       }
-      //
-      // Copy the other part of received data.
-      //
-      if (Udp6Rx->DataLength - CopiedLen > *BufferSize) {
+
+      if (Udp6Rx->DataLength - HeaderLen > *BufferSize) {
         Status = EFI_BUFFER_TOO_SMALL;
       } else {
-        *BufferSize = Udp6Rx->DataLength - CopiedLen;
-        CopyMem (BufferPtr, (UINT8 *) Udp6Rx->FragmentTable[0].FragmentBuffer + CopiedLen, *BufferSize);
+        *HeaderSize = HeaderLen;
+        *BufferSize = Udp6Rx->DataLength - HeaderLen;
+
+        HeaderCopiedLen = 0;
+        BufferCopiedLen = 0;
+        for (FragmentIndex = 0; FragmentIndex < Udp6Rx->FragmentCount; FragmentIndex++) {
+          FragmentLength = Udp6Rx->FragmentTable[FragmentIndex].FragmentLength;
+          FragmentBuffer = Udp6Rx->FragmentTable[FragmentIndex].FragmentBuffer;
+          if (HeaderCopiedLen + FragmentLength < HeaderLen) {
+            //
+            // Copy the header part of received data.
+            //
+            CopyMem ((UINT8 *) HeaderPtr + HeaderCopiedLen, FragmentBuffer, FragmentLength);
+            HeaderCopiedLen += FragmentLength;
+          } else if (HeaderCopiedLen < HeaderLen) {
+            //
+            // Copy the header part of received data.
+            //
+            CopiedLen = HeaderLen - HeaderCopiedLen;
+            CopyMem ((UINT8 *) HeaderPtr + HeaderCopiedLen, FragmentBuffer, CopiedLen);
+            HeaderCopiedLen += CopiedLen;
+
+            //
+            // Copy the other part of received data.
+            //
+            CopyMem ((UINT8 *) BufferPtr + BufferCopiedLen, FragmentBuffer + CopiedLen, FragmentLength - CopiedLen);
+            BufferCopiedLen += (FragmentLength - CopiedLen);
+          } else {
+            //
+            // Copy the other part of received data.
+            //
+            CopyMem ((UINT8 *) BufferPtr + BufferCopiedLen, FragmentBuffer, FragmentLength);
+            BufferCopiedLen += FragmentLength;
+          }
+        }
       }
       //
       // Recycle the receiving buffer after copy to user.
@@ -1370,22 +1403,50 @@ EfiPxeBcUdpRead (
     } else {
       Udp4Rx = Udp4Token.Packet.RxData;
       ASSERT (Udp4Rx != NULL);
-      //
-      // Copy the header part of received data.
-      //
+
+      HeaderLen = 0;
       if (HeaderSize != NULL) {
-        CopiedLen   = MIN (*HeaderSize, Udp4Rx->DataLength);
-        *HeaderSize = CopiedLen;
-        CopyMem (HeaderPtr, Udp4Rx->FragmentTable[0].FragmentBuffer, *HeaderSize);
+        HeaderLen = MIN (*HeaderSize, Udp4Rx->DataLength);
       }
-      //
-      // Copy the other part of received data.
-      //
-      if (Udp4Rx->DataLength - CopiedLen > *BufferSize) {
+
+      if (Udp4Rx->DataLength - HeaderLen > *BufferSize) {
         Status = EFI_BUFFER_TOO_SMALL;
       } else {
-        *BufferSize = Udp4Rx->DataLength - CopiedLen;
-        CopyMem (BufferPtr, (UINT8 *) Udp4Rx->FragmentTable[0].FragmentBuffer + CopiedLen, *BufferSize);
+        *HeaderSize = HeaderLen;
+        *BufferSize = Udp4Rx->DataLength - HeaderLen;
+
+        HeaderCopiedLen = 0;
+        BufferCopiedLen = 0;
+        for (FragmentIndex = 0; FragmentIndex < Udp4Rx->FragmentCount; FragmentIndex++) {
+          FragmentLength = Udp4Rx->FragmentTable[FragmentIndex].FragmentLength;
+          FragmentBuffer = Udp4Rx->FragmentTable[FragmentIndex].FragmentBuffer;
+          if (HeaderCopiedLen + FragmentLength < HeaderLen) {
+            //
+            // Copy the header part of received data.
+            //
+            CopyMem ((UINT8 *) HeaderPtr + HeaderCopiedLen, FragmentBuffer, FragmentLength);
+            HeaderCopiedLen += FragmentLength;
+          } else if (HeaderCopiedLen < HeaderLen) {
+            //
+            // Copy the header part of received data.
+            //
+            CopiedLen = HeaderLen - HeaderCopiedLen;
+            CopyMem ((UINT8 *) HeaderPtr + HeaderCopiedLen, FragmentBuffer, CopiedLen);
+            HeaderCopiedLen += CopiedLen;
+
+            //
+            // Copy the other part of received data.
+            //
+            CopyMem ((UINT8 *) BufferPtr + BufferCopiedLen, FragmentBuffer + CopiedLen, FragmentLength - CopiedLen);
+            BufferCopiedLen += (FragmentLength - CopiedLen);
+          } else {
+            //
+            // Copy the other part of received data.
+            //
+            CopyMem ((UINT8 *) BufferPtr + BufferCopiedLen, FragmentBuffer, FragmentLength);
+            BufferCopiedLen += FragmentLength;
+          }
+        }
       }
       //
       // Recycle the receiving buffer after copy to user.
