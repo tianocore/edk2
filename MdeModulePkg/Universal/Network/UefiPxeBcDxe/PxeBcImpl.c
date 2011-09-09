@@ -1631,7 +1631,13 @@ EfiPxeBcUdpRead (
   EFI_STATUS                Status;
   BOOLEAN                   IsDone;
   BOOLEAN                   Matched;
-  UINTN                     CopyLen;
+  UINTN                     CopiedLen;
+  UINTN                     HeaderLen;
+  UINTN                     HeaderCopiedLen;
+  UINTN                     BufferCopiedLen;
+  UINT32                    FragmentLength;
+  UINTN                     FragmentIndex;
+  UINT8                     *FragmentBuffer;
 
   if (This == NULL || DestIp == NULL || DestPort == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1788,26 +1794,51 @@ TRY_AGAIN:
     }
 
     if (Matched) {
+      ASSERT (RxData != NULL);
 
-      CopyLen = 0;
-
+      HeaderLen = 0;
       if (HeaderSize != NULL) {
-        CopyLen = MIN (*HeaderSize, RxData->DataLength);
-        CopyMem (HeaderPtr, RxData->FragmentTable[0].FragmentBuffer, CopyLen);
-        *HeaderSize = CopyLen;
+        HeaderLen = MIN (*HeaderSize, RxData->DataLength);
       }
 
-      if (RxData->DataLength - CopyLen > *BufferSize) {
-
+      if (RxData->DataLength - HeaderLen > *BufferSize) {
         Status = EFI_BUFFER_TOO_SMALL;
       } else {
+        *HeaderSize = HeaderLen;
+        *BufferSize = RxData->DataLength - HeaderLen;
 
-        *BufferSize = RxData->DataLength - CopyLen;
-        CopyMem (
-          BufferPtr,
-          (UINT8 *) RxData->FragmentTable[0].FragmentBuffer + CopyLen,
-          *BufferSize
-          );
+        HeaderCopiedLen = 0;
+        BufferCopiedLen = 0;
+        for (FragmentIndex = 0; FragmentIndex < RxData->FragmentCount; FragmentIndex++) {
+          FragmentLength = RxData->FragmentTable[FragmentIndex].FragmentLength;
+          FragmentBuffer = RxData->FragmentTable[FragmentIndex].FragmentBuffer;
+          if (HeaderCopiedLen + FragmentLength < HeaderLen) {
+            //
+            // Copy the header part of received data.
+            //
+            CopyMem ((UINT8 *) HeaderPtr + HeaderCopiedLen, FragmentBuffer, FragmentLength);
+            HeaderCopiedLen += FragmentLength;
+          } else if (HeaderCopiedLen < HeaderLen) {
+            //
+            // Copy the header part of received data.
+            //
+            CopiedLen = HeaderLen - HeaderCopiedLen;
+            CopyMem ((UINT8 *) HeaderPtr + HeaderCopiedLen, FragmentBuffer, CopiedLen);
+            HeaderCopiedLen += CopiedLen;
+
+            //
+            // Copy the other part of received data.
+            //
+            CopyMem ((UINT8 *) BufferPtr + BufferCopiedLen, FragmentBuffer + CopiedLen, FragmentLength - CopiedLen);
+            BufferCopiedLen += (FragmentLength - CopiedLen);
+          } else {
+            //
+            // Copy the other part of received data.
+            //
+            CopyMem ((UINT8 *) BufferPtr + BufferCopiedLen, FragmentBuffer, FragmentLength);
+            BufferCopiedLen += FragmentLength;
+          }
+        }
       }
     } else {
 
