@@ -53,9 +53,9 @@ SelectBootDevice (
       CHAR16*                           DevicePathTxt;
       EFI_DEVICE_PATH_TO_TEXT_PROTOCOL* DevicePathToTextProtocol;
 
-      Status = gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
+      Status = gBS->LocateProtocol (&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
       ASSERT_EFI_ERROR(Status);
-      DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText((*SupportedBootDevice)->DevicePathProtocol,TRUE,TRUE);
+      DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText ((*SupportedBootDevice)->DevicePathProtocol,TRUE,TRUE);
 
       Print(L"\t- %s\n",DevicePathTxt);
 
@@ -82,7 +82,7 @@ SelectBootDevice (
       Status = EFI_ABORTED;
       goto EXIT;
     } else if ((SupportedDeviceSelected == 0) || (SupportedDeviceSelected > SupportedDeviceCount)) {
-      Print(L"Invalid input (max %d)\n",SupportedDeviceSelected);
+      Print(L"Invalid input (max %d)\n",SupportedDeviceCount);
       SupportedDeviceSelected = 0;
     }
   }
@@ -285,7 +285,7 @@ BootMenuSelectBootOption (
   // Get the structure of the Boot device to delete
   Index = 1;
   for (Entry = GetFirstNode (BootOptionsList);
-       !IsNull (BootOptionsList,Entry);
+       !IsNull (BootOptionsList, Entry);
        Entry = GetNextNode (BootOptionsList,Entry)
        )
   {
@@ -351,9 +351,9 @@ BootMenuUpdateBootOption (
   BootOption = BootOptionEntry->BdsLoadOption;
 
   // Get the device support for this Boot Option
-  Status = BootDeviceGetDeviceSupport (BootOption,&DeviceSupport);
+  Status = BootDeviceGetDeviceSupport (BootOption, &DeviceSupport);
   if (EFI_ERROR(Status)) {
-    Print(L"Impossible to retrieve the supported device for the update\n");
+    Print(L"Not possible to retrieve the supported device for the update\n");
     return EFI_UNSUPPORTED;
   }
 
@@ -463,7 +463,7 @@ BootMenuManager (
       }
       return EFI_SUCCESS;
     } else if ((OptionSelected > 0) && (OptionSelected <= BootManagerEntryCount))  {
-      Status = BootManagerEntries[OptionSelected-1].Callback (BootOptionsList);
+      BootManagerEntries[OptionSelected-1].Callback (BootOptionsList);
     }
   }
 
@@ -529,7 +529,7 @@ BootMenuMain (
     {
       BootOption = LOAD_OPTION_FROM_LINK(Entry);
 
-      Print(L"[%d] %s\n",OptionCount,BootOption->Description);
+      Print(L"[%d] %s\n", OptionCount, BootOption->Description);
 
       DEBUG_CODE_BEGIN();
         CHAR16*                           DevicePathTxt;
@@ -538,13 +538,13 @@ BootMenuMain (
         UINTN                             CmdLineSize;
         ARM_BDS_LOADER_TYPE           LoaderType;
 
-        Status = gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
+        Status = gBS->LocateProtocol (&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
         if (EFI_ERROR(Status)) {
           // You must provide an implementation of DevicePathToTextProtocol in your firmware (eg: DevicePathDxe)
           DEBUG((EFI_D_ERROR,"Error: Bds requires DevicePathToTextProtocol\n"));
           return Status;
         }
-        DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText(BootOption->FilePathList,TRUE,TRUE);
+        DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText (BootOption->FilePathList, TRUE, TRUE);
 
         Print(L"\t- %s\n",DevicePathTxt);
 
