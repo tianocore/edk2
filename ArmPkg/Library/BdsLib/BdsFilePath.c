@@ -471,7 +471,8 @@ BdsMemoryMapSupport (
   IN EFI_DEVICE_PATH *RemainingDevicePath
   )
 {
-  return IS_DEVICE_PATH_NODE(RemainingDevicePath,HARDWARE_DEVICE_PATH,HW_MEMMAP_DP);
+  return IS_DEVICE_PATH_NODE(DevicePath,HARDWARE_DEVICE_PATH,HW_MEMMAP_DP) ||
+         IS_DEVICE_PATH_NODE(RemainingDevicePath,HARDWARE_DEVICE_PATH,HW_MEMMAP_DP);
 }
 
 EFI_STATUS
@@ -488,9 +489,12 @@ BdsMemoryMapLoadImage (
   MEMMAP_DEVICE_PATH*   MemMapPathDevicePath;
   UINTN                 Size;
 
-  ASSERT (IS_DEVICE_PATH_NODE(RemainingDevicePath,HARDWARE_DEVICE_PATH,HW_MEMMAP_DP));
-
-  MemMapPathDevicePath = (MEMMAP_DEVICE_PATH*)RemainingDevicePath;
+  if (IS_DEVICE_PATH_NODE(RemainingDevicePath,HARDWARE_DEVICE_PATH,HW_MEMMAP_DP)) {
+    MemMapPathDevicePath = (MEMMAP_DEVICE_PATH*)RemainingDevicePath;
+  } else {
+    ASSERT (IS_DEVICE_PATH_NODE(DevicePath,HARDWARE_DEVICE_PATH,HW_MEMMAP_DP));
+    MemMapPathDevicePath = (MEMMAP_DEVICE_PATH*)DevicePath;
+  }
 
   Size = MemMapPathDevicePath->EndingAddress - MemMapPathDevicePath->StartingAddress;
   if (Size == 0) {
