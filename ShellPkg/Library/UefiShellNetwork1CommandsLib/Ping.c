@@ -17,6 +17,7 @@
 
 #define PING_IP4_COPY_ADDRESS(Dest, Src) (CopyMem ((Dest), (Src), sizeof (EFI_IPv4_ADDRESS)))
 
+UINT64          CurrentTick = 0;
 
 //
 // Function templates to match the IPv4 and IPv6 commands that we use.
@@ -217,13 +218,17 @@ STATIC CONST CHAR16      *mSrcString;
 STATIC UINT64            mFrequency = 0;
 EFI_CPU_ARCH_PROTOCOL    *gCpu = NULL;
 
+/**
+  Read the current time.
+
+  @retval the current tick value.
+**/
 UINT64
 EFIAPI
 ReadTime (
   VOID
   )
 {
-  static UINT64          CurrentTick = 0;
   UINT64                 TimerPeriod;
   EFI_STATUS             Status;
 

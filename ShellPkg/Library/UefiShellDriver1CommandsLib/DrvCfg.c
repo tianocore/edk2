@@ -457,6 +457,16 @@ ConfigFromFile(
   return (SHELL_SUCCESS);
 }
 
+/**
+  Present a requested action to the user.
+
+  @param[in] DriverImageHandle  The handle for the driver to configure.
+  @param[in] ControllerHandle   The handle of the device being managed by the Driver specified.
+  @param[in] ChildHandle        The handle of a child device of the specified device.
+  @param[in] ActionRequired     The required HII action.
+
+  @retval SHELL_INVALID_PARAMETER   A parameter has a invalid value.
+**/
 EFI_STATUS
 EFIAPI
 ShellCmdDriverConfigurationProcessActionRequired (
@@ -510,6 +520,22 @@ ShellCmdDriverConfigurationProcessActionRequired (
   return EFI_SUCCESS;
 }
 
+/**
+  Do the configuration in an environment without HII.
+
+  @param[in] Language           The language code.
+  @param[in] ForceDefaults      TRUE to force defaults, FALSE otherwise.
+  @param[in] DefaultType        If ForceDefaults is TRUE, specifies the default type.
+  @param[in] AllChildren        TRUE to configure all children, FALSE otherwise.
+  @param[in] ValidateOptions    TRUE to validate existing options, FALSE otherwise.
+  @param[in] SetOptions         TRUE to set options, FALSE otherwise.
+  @param[in] DriverImageHandle  The handle for the driver to configure.
+  @param[in] DeviceHandle       The handle of the device being managed by the Driver specified.
+  @param[in] ChildHandle        The handle of a child device of the specified device.
+
+  @retval SHELL_NOT_FOUND           A specified handle could not be found.
+  @retval SHELL_INVALID_PARAMETER   A parameter has a invalid value.
+**/
 SHELL_STATUS
 EFIAPI
 PreHiiDrvCfg (
