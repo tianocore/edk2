@@ -105,7 +105,9 @@ BdsLoadFileFromFirmwareVolume (
 EFI_STATUS
 BdsLoadApplication (
   IN EFI_HANDLE                  ParentImageHandle,
-  IN CHAR16*                     EfiApp
+  IN CHAR16*                     EfiApp,
+  IN UINTN                       LoadOptionsSize,
+  IN VOID*                       LoadOptions
   )
 {
   EFI_STATUS                      Status;
@@ -133,7 +135,7 @@ BdsLoadApplication (
     Status = BdsLoadFileFromFirmwareVolume (Handles[HandleIndex], EfiApp, EFI_FV_FILETYPE_APPLICATION, &EfiAppDevicePath);
     if (!EFI_ERROR (Status)) {
       // Start the application
-      Status = BdsStartEfiApplication (ParentImageHandle, EfiAppDevicePath);
+      Status = BdsStartEfiApplication (ParentImageHandle, EfiAppDevicePath, LoadOptionsSize, LoadOptions);
       return Status;
     }
   }

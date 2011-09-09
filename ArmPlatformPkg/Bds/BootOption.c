@@ -85,7 +85,7 @@ BootOptionStart (
                                 FdtDevicePath);
     }
   } else {
-    Status = BdsStartEfiApplication (mImageHandle, BootOption->FilePathList);
+    Status = BdsStartEfiApplication (mImageHandle, BootOption->FilePathList, BootOption->OptionalDataSize, BootOption->OptionalData);
   }
 
   return Status;

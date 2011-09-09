@@ -478,7 +478,7 @@ BootEBL (
   EFI_STATUS Status;
 
   // Start EFI Shell
-  Status = BdsLoadApplication(mImageHandle, L"Ebl");
+  Status = BdsLoadApplication (mImageHandle, L"Ebl", 0, NULL);
   if (Status == EFI_NOT_FOUND) {
     Print (L"Error: EFI Application not found.\n");
   } else if (EFI_ERROR(Status)) {

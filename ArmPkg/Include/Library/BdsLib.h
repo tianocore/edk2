@@ -100,7 +100,9 @@ BdsBootLinux (
 EFI_STATUS
 BdsStartEfiApplication (
   IN EFI_HANDLE                  ParentImageHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL    *DevicePath
+  IN EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
+  IN UINTN                       LoadOptionsSize,
+  IN VOID*                       LoadOptions
   );
 
 /**
@@ -116,7 +118,9 @@ BdsStartEfiApplication (
 EFI_STATUS
 BdsLoadApplication (
   IN EFI_HANDLE                  ParentImageHandle,
-  IN CHAR16*                     EfiApp
+  IN CHAR16*                     EfiApp,
+  IN UINTN                       LoadOptionsSize,
+  IN VOID*                       LoadOptions
   );
 
 #endif

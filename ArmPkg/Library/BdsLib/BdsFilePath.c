@@ -16,6 +16,7 @@
 
 #include <Protocol/UsbIo.h>
 #include <Protocol/DiskIo.h>
+#include <Protocol/LoadedImage.h>
 
 #define IS_DEVICE_PATH_NODE(node,type,subtype) (((node)->Type == (type)) && ((node)->SubType == (subtype)))
 
@@ -856,16 +857,19 @@ BdsLoadImage (
 EFI_STATUS
 BdsStartEfiApplication (
   IN EFI_HANDLE                  ParentImageHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL    *DevicePath
+  IN EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
+  IN UINTN                       LoadOptionsSize,
+  IN VOID*                       LoadOptions
   )
 {
   EFI_STATUS                   Status;
   EFI_HANDLE                   ImageHandle;
   EFI_PHYSICAL_ADDRESS         BinaryBuffer;
   UINTN                        BinarySize;
+  EFI_LOADED_IMAGE_PROTOCOL*   LoadedImage;
 
   // Find the nearest supported file loader
-  Status = BdsLoadImage (DevicePath, AllocateAnyPages,&BinaryBuffer,&BinarySize);
+  Status = BdsLoadImage (DevicePath, AllocateAnyPages, &BinaryBuffer, &BinarySize);
   if (EFI_ERROR(Status)) {
     return Status;
   }
@@ -874,6 +878,17 @@ BdsStartEfiApplication (
   Status = gBS->LoadImage (TRUE, ParentImageHandle, DevicePath, (VOID*)(UINTN)BinaryBuffer, BinarySize, &ImageHandle);
   if (EFI_ERROR(Status)) {
     return Status;
+  }
+
+  // Passed LoadOptions to the EFI Application
+  if (LoadOptionsSize != 0) {
+    Status = gBS->HandleProtocol (ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **) &LoadedImage);
+    if (EFI_ERROR(Status)) {
+      return Status;
+    }
+
+    LoadedImage->LoadOptionsSize  = LoadOptionsSize;
+    LoadedImage->LoadOptions      = LoadOptions;
   }
 
   // Before calling the image, enable the Watchdog Timer for  the 5 Minute period
