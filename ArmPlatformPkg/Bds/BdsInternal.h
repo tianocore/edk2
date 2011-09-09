@@ -38,26 +38,38 @@
 #define BOOT_DEVICE_OPTION_MAX        300
 #define BOOT_DEVICE_ADDRESS_MAX       20
 
+#define ARM_BDS_OPTIONAL_DATA_SIGNATURE   SIGNATURE_32('a', 'b', 'o', 'd')
+
+#define IS_ARM_BDS_BOOTENTRY(ptr)  (ReadUnaligned32 ((CONST UINT32*)&((ARM_BDS_LOADER_OPTIONAL_DATA*)((ptr)->OptionalData))->Header.Signature) == ARM_BDS_OPTIONAL_DATA_SIGNATURE)
+
 typedef enum {
     BDS_LOADER_EFI_APPLICATION = 0,
     BDS_LOADER_KERNEL_LINUX_ATAG,
     BDS_LOADER_KERNEL_LINUX_FDT,
-} BDS_LOADER_TYPE;
-
-typedef struct{
-  UINT16                     InitrdPathListLength;
-  EFI_DEVICE_PATH_PROTOCOL   *InitrdPathList;
-  CHAR8                      CmdLine[BOOT_DEVICE_OPTION_MAX + 1];
-} BDS_LINUX_ATAG_ARGUMENTS;
-
-typedef union {
-  BDS_LINUX_ATAG_ARGUMENTS     LinuxAtagArguments;
-} BDS_LOADER_ARGUMENTS;
+} ARM_BDS_LOADER_TYPE;
 
 typedef struct {
-  BDS_LOADER_TYPE            LoaderType;
-  BDS_LOADER_ARGUMENTS       Arguments;
-} BDS_LOADER_OPTIONAL_DATA;
+  UINT16                     CmdLineSize;
+  UINT16                     InitrdSize;
+  
+  // These following fields have variable length and are packed:
+  //CHAR8                      *CmdLine;
+  //EFI_DEVICE_PATH_PROTOCOL   *InitrdPathList;
+} ARM_BDS_LINUX_ARGUMENTS;
+
+typedef union {
+  ARM_BDS_LINUX_ARGUMENTS    LinuxArguments;
+} ARM_BDS_LOADER_ARGUMENTS;
+
+typedef struct {
+  UINT32                     Signature;
+  ARM_BDS_LOADER_TYPE        LoaderType;
+} ARM_BDS_LOADER_OPTIONAL_DATA_HEADER;
+
+typedef struct {
+  ARM_BDS_LOADER_OPTIONAL_DATA_HEADER Header;
+  ARM_BDS_LOADER_ARGUMENTS            Arguments;
+} ARM_BDS_LOADER_OPTIONAL_DATA;
 
 typedef enum {
   BDS_DEVICE_FILESYSTEM = 0,
@@ -97,8 +109,8 @@ typedef struct _BDS_LOAD_OPTION_SUPPORT {
   BDS_SUPPORTED_DEVICE_TYPE   Type;
   EFI_STATUS    (*ListDevices)(IN OUT LIST_ENTRY* BdsLoadOptionList);
   BOOLEAN       (*IsSupported)(IN BDS_LOAD_OPTION* BdsLoadOption);
-  EFI_STATUS    (*CreateDevicePathNode)(IN BDS_SUPPORTED_DEVICE* BdsLoadOption, OUT EFI_DEVICE_PATH_PROTOCOL **DevicePathNode, OUT BDS_LOADER_TYPE *BootType, OUT UINT32 *Attributes);
-  EFI_STATUS    (*UpdateDevicePathNode)(IN EFI_DEVICE_PATH *OldDevicePath, OUT EFI_DEVICE_PATH_PROTOCOL** NewDevicePath, OUT BDS_LOADER_TYPE *BootType, OUT UINT32 *Attributes);
+  EFI_STATUS    (*CreateDevicePathNode)(IN BDS_SUPPORTED_DEVICE* BdsLoadOption, OUT EFI_DEVICE_PATH_PROTOCOL **DevicePathNode, OUT ARM_BDS_LOADER_TYPE *BootType, OUT UINT32 *Attributes);
+  EFI_STATUS    (*UpdateDevicePathNode)(IN EFI_DEVICE_PATH *OldDevicePath, OUT EFI_DEVICE_PATH_PROTOCOL** NewDevicePath, OUT ARM_BDS_LOADER_TYPE *BootType, OUT UINT32 *Attributes);
 } BDS_LOAD_OPTION_SUPPORT;
 
 #define LOAD_OPTION_FROM_LINK(a)   BASE_CR(a, BDS_LOAD_OPTION, Link)
@@ -182,6 +194,16 @@ BdsStartBootOption (
   IN CHAR16* BootOption
   );
 
+UINTN
+GetUnalignedDevicePathSize (
+  IN EFI_DEVICE_PATH* DevicePath
+  );
+
+EFI_DEVICE_PATH*
+GetAlignedDevicePath (
+  IN EFI_DEVICE_PATH* DevicePath
+  );
+
 EFI_STATUS
 GenerateDeviceDescriptionName (
   IN  EFI_HANDLE  Handle,
@@ -207,22 +229,22 @@ BootOptionStart (
 
 EFI_STATUS
 BootOptionCreate (
-  IN  UINT32 Attributes,
-  IN  CHAR16* BootDescription,
+  IN  UINT32                    Attributes,
+  IN  CHAR16*                   BootDescription,
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
-  IN  BDS_LOADER_TYPE   BootType,
-  IN  BDS_LOADER_ARGUMENTS *BootArguments,
-  OUT BDS_LOAD_OPTION **BdsLoadOption
+  IN  ARM_BDS_LOADER_TYPE       BootType,
+  IN  ARM_BDS_LOADER_ARGUMENTS* BootArguments,
+  OUT BDS_LOAD_OPTION**         BdsLoadOption
   );
 
 EFI_STATUS
 BootOptionUpdate (
-  IN  BDS_LOAD_OPTION *BdsLoadOption,
-  IN  UINT32 Attributes,
-  IN  CHAR16* BootDescription,
+  IN  BDS_LOAD_OPTION*          BdsLoadOption,
+  IN  UINT32                    Attributes,
+  IN  CHAR16*                   BootDescription,
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
-  IN  BDS_LOADER_TYPE   BootType,
-  IN  BDS_LOADER_ARGUMENTS *BootArguments
+  IN  ARM_BDS_LOADER_TYPE       BootType,
+  IN  ARM_BDS_LOADER_ARGUMENTS* BootArguments
   );
 
 EFI_STATUS

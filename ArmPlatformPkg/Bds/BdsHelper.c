@@ -343,3 +343,34 @@ BdsStartBootOption (
   }
   return Status;
 }
+
+UINTN
+GetUnalignedDevicePathSize (
+  IN EFI_DEVICE_PATH* DevicePath
+  )
+{
+  UINTN Size;
+  EFI_DEVICE_PATH* AlignedDevicePath;
+
+  if ((UINTN)DevicePath & 0x1) {
+    AlignedDevicePath = DuplicateDevicePath (DevicePath);
+    Size = GetDevicePathSize (AlignedDevicePath);
+    FreePool (AlignedDevicePath);
+  } else {
+    Size = GetDevicePathSize (DevicePath);
+  }
+  return Size;
+}
+
+EFI_DEVICE_PATH*
+GetAlignedDevicePath (
+  IN EFI_DEVICE_PATH* DevicePath
+  )
+{
+  if ((UINTN)DevicePath & 0x1) {
+    return DuplicateDevicePath (DevicePath);
+  } else {
+    return DevicePath;
+  }
+}
+
