@@ -22,7 +22,6 @@ BootOptionStart (
   )
 {
   EFI_STATUS                            Status;
-  EFI_DEVICE_PATH*                      FdtDevicePath;
   EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL*   EfiDevicePathFromTextProtocol;
   UINT32                                LoaderType;
   ARM_BDS_LOADER_OPTIONAL_DATA*         OptionalData;
@@ -34,6 +33,7 @@ BootOptionStart (
   UINTN                                 InitrdSize;
   EFI_DEVICE_PATH*                      Initrd;
 
+  if (IS_ARM_BDS_BOOTENTRY (BootOption)) {
     Status = EFI_UNSUPPORTED;
     OptionalData = BootOption->OptionalData;
     LoaderType = ReadUnaligned32 ((CONST UINT32*)&OptionalData->Header.LoaderType);
@@ -83,6 +83,10 @@ BootOptionStart (
                                 Initrd, // Initrd
                                 (CHAR8*)(LinuxArguments + 1),
                                 FdtDevicePath);
+    }
+  } else {
+    Status = BdsStartEfiApplication (mImageHandle, BootOption->FilePathList);
+  }
 
   return Status;
 }
@@ -159,11 +163,12 @@ BootOptionList (
   IN OUT LIST_ENTRY *BootOptionList
   )
 {
-  EFI_STATUS        Status;
-  UINTN             Index;
-  UINT16            *BootOrder;
-  UINTN             BootOrderSize;
-  BDS_LOAD_OPTION   *BdsLoadOption;
+  EFI_STATUS                    Status;
+  UINTN                         Index;
+  UINT16*                       BootOrder;
+  UINTN                         BootOrderSize;
+  BDS_LOAD_OPTION*              BdsLoadOption;
+  BDS_LOAD_OPTION_ENTRY*        BdsLoadOptionEntry;
 
   InitializeListHead (BootOptionList);
 
@@ -176,7 +181,9 @@ BootOptionList (
   for (Index = 0; Index < BootOrderSize / sizeof (UINT16); Index++) {
     Status = BootOptionFromLoadOptionVariable (BootOrder[Index],&BdsLoadOption);
     if (!EFI_ERROR(Status)) {
-      InsertTailList (BootOptionList,&BdsLoadOption->Link);
+      BdsLoadOptionEntry = (BDS_LOAD_OPTION_ENTRY*)AllocatePool(sizeof(BDS_LOAD_OPTION_ENTRY));
+      BdsLoadOptionEntry->BdsLoadOption = BdsLoadOption;
+      InsertTailList (BootOptionList,&BdsLoadOptionEntry->Link);
     }
   }
 
@@ -327,21 +334,24 @@ BootOptionCreate (
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
   IN  ARM_BDS_LOADER_TYPE       BootType,
   IN  ARM_BDS_LOADER_ARGUMENTS* BootArguments,
-  OUT BDS_LOAD_OPTION           **BdsLoadOption
+  OUT BDS_LOAD_OPTION**         BdsLoadOption
   )
 {
-  EFI_STATUS        Status;
-  BDS_LOAD_OPTION   *BootOption;
-  CHAR16            BootVariableName[9];
-  UINT16            *BootOrder;
-  UINTN             BootOrderSize;
+  EFI_STATUS                    Status;
+  BDS_LOAD_OPTION_ENTRY*        BootOptionEntry;
+  BDS_LOAD_OPTION*              BootOption;
+  CHAR16                        BootVariableName[9];
+  UINT16*                       BootOrder;
+  UINTN                         BootOrderSize;
 
   //
   // Allocate and fill the memory for the BDS Load Option structure
   //
-  BootOption = (BDS_LOAD_OPTION*)AllocateZeroPool(sizeof(BDS_LOAD_OPTION));
+  BootOptionEntry = (BDS_LOAD_OPTION_ENTRY*)AllocatePool (sizeof (BDS_LOAD_OPTION_ENTRY));
+  InitializeListHead (&BootOptionEntry->Link);
+  BootOptionEntry->BdsLoadOption = (BDS_LOAD_OPTION*)AllocateZeroPool (sizeof(BDS_LOAD_OPTION));
 
-  InitializeListHead (&BootOption->Link);
+  BootOption = BootOptionEntry->BdsLoadOption;
   BootOptionSetFields (BootOption, Attributes, BootDescription, DevicePath, BootType, BootArguments);
 
   //
@@ -419,17 +429,11 @@ BootOptionDelete (
   IN  BDS_LOAD_OPTION *BootOption
   )
 {
-  UINTN Index;
-  UINTN BootOrderSize;
-  UINT16* BootOrder;
-  UINTN BootOrderCount;
-  EFI_STATUS  Status;
-
-  // If the Boot Optiono was attached to a list remove it
-  if (!IsListEmpty (&BootOption->Link)) {
-    // Remove the entry from the list
-    RemoveEntryList (&BootOption->Link);
-  }
+  UINTN         Index;
+  UINTN         BootOrderSize;
+  UINT16*       BootOrder;
+  UINTN         BootOrderCount;
+  EFI_STATUS    Status;
 
   // Remove the entry from the BootOrder environment variable
   Status = GetEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);

@@ -71,6 +71,11 @@ typedef struct {
   ARM_BDS_LOADER_ARGUMENTS            Arguments;
 } ARM_BDS_LOADER_OPTIONAL_DATA;
 
+typedef struct {
+  LIST_ENTRY                  Link;
+  BDS_LOAD_OPTION*            BdsLoadOption;
+} BDS_LOAD_OPTION_ENTRY;
+
 typedef enum {
   BDS_DEVICE_FILESYSTEM = 0,
   BDS_DEVICE_MEMMAP,
@@ -88,23 +93,6 @@ typedef struct {
 
 #define SUPPORTED_BOOT_DEVICE_FROM_LINK(a)   BASE_CR(a, BDS_SUPPORTED_DEVICE, Link)
 
-typedef UINT8* EFI_LOAD_OPTION;
-
-/* This is defined by the UEFI specs, don't change it */
-typedef struct {
-  LIST_ENTRY                  Link;
-
-  UINT16                      LoadOptionIndex;
-  EFI_LOAD_OPTION             LoadOption;
-  UINTN                       LoadOptionSize;
-
-  UINT32                      Attributes;
-  UINT16                      FilePathListLength;
-  CHAR16                      *Description;
-  EFI_DEVICE_PATH_PROTOCOL    *FilePathList;
-  BDS_LOADER_OPTIONAL_DATA    *OptionalData;
-} BDS_LOAD_OPTION;
-
 typedef struct _BDS_LOAD_OPTION_SUPPORT {
   BDS_SUPPORTED_DEVICE_TYPE   Type;
   EFI_STATUS    (*ListDevices)(IN OUT LIST_ENTRY* BdsLoadOptionList);
@@ -113,7 +101,8 @@ typedef struct _BDS_LOAD_OPTION_SUPPORT {
   EFI_STATUS    (*UpdateDevicePathNode)(IN EFI_DEVICE_PATH *OldDevicePath, OUT EFI_DEVICE_PATH_PROTOCOL** NewDevicePath, OUT ARM_BDS_LOADER_TYPE *BootType, OUT UINT32 *Attributes);
 } BDS_LOAD_OPTION_SUPPORT;
 
-#define LOAD_OPTION_FROM_LINK(a)   BASE_CR(a, BDS_LOAD_OPTION, Link)
+#define LOAD_OPTION_ENTRY_FROM_LINK(a)  BASE_CR(a, BDS_LOAD_OPTION_ENTRY, Link)
+#define LOAD_OPTION_FROM_LINK(a)        ((BDS_LOAD_OPTION_ENTRY*)BASE_CR(a, BDS_LOAD_OPTION_ENTRY, Link))->BdsLoadOption
 
 EFI_STATUS
 GetEnvironmentVariable (

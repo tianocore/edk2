@@ -15,6 +15,25 @@
 #ifndef __BDS_ENTRY_H__
 #define __BDS_ENTRY_H__
 
+typedef UINT8* EFI_LOAD_OPTION;
+
+/**
+  This is defined by the UEFI specs, don't change it
+**/
+typedef struct {
+  UINT16                      LoadOptionIndex;
+  EFI_LOAD_OPTION             LoadOption;
+  UINTN                       LoadOptionSize;
+
+  UINT32                      Attributes;
+  UINT16                      FilePathListLength;
+  CHAR16                      *Description;
+  EFI_DEVICE_PATH_PROTOCOL    *FilePathList;
+
+  VOID*                       OptionalData;
+  UINTN                       OptionalDataSize;
+} BDS_LOAD_OPTION;
+
 /**
   Connect a Device Path and return the handle of the driver that support this DevicePath
 

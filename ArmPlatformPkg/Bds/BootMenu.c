@@ -120,7 +120,7 @@ BootMenuAddBootOption (
   CHAR8                     CmdLine[BOOT_DEVICE_OPTION_MAX];
   UINT32                    Attributes;
   ARM_BDS_LOADER_TYPE       BootType;
-  BDS_LOAD_OPTION          *BdsLoadOption;
+  BDS_LOAD_OPTION_ENTRY     *BdsLoadOptionEntry;
   EFI_DEVICE_PATH           *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode;
   EFI_DEVICE_PATH_PROTOCOL  *InitrdPathNode;
@@ -192,9 +192,10 @@ BootMenuAddBootOption (
   }
 
   // Create new entry
-  Status = BootOptionCreate (Attributes, BootDescription, DevicePath, BootType, &BootArguments, &BdsLoadOption);
+  BdsLoadOptionEntry = (BDS_LOAD_OPTION_ENTRY*)AllocatePool (sizeof(BDS_LOAD_OPTION_ENTRY));
+  Status = BootOptionCreate (Attributes, BootDescription, DevicePath, BootType, BootArguments, &BdsLoadOptionEntry->BdsLoadOption);
   if (!EFI_ERROR(Status)) {
-    InsertTailList (BootOptionsList,&BdsLoadOption->Link);
+    InsertTailList (BootOptionsList, &BdsLoadOptionEntry->Link);
   }
 
 FREE_DEVICE_PATH:
@@ -212,36 +213,43 @@ EXIT:
 STATIC
 EFI_STATUS
 BootMenuSelectBootOption (
-  IN  LIST_ENTRY *BootOptionsList,
-  IN  CONST CHAR16* InputStatement,
-  OUT BDS_LOAD_OPTION **BdsLoadOption
+  IN  LIST_ENTRY*               BootOptionsList,
+  IN  CONST CHAR16*             InputStatement,
+  IN  BOOLEAN                   OnlyArmBdsBootEntry,
+  OUT BDS_LOAD_OPTION_ENTRY**   BdsLoadOptionEntry
   )
 {
-  EFI_STATUS    Status;
-  LIST_ENTRY*   Entry;
-  BDS_LOAD_OPTION *BootOption;
-  UINTN         BootOptionSelected;
-  UINTN         BootOptionCount;
-  UINTN         Index;
+  EFI_STATUS                    Status;
+  LIST_ENTRY*                   Entry;
+  BDS_LOAD_OPTION*              BdsLoadOption;
+  UINTN                         BootOptionSelected;
+  UINTN                         BootOptionCount;
+  UINTN                         Index;
 
   // Display the list of supported boot devices
   BootOptionCount = 1;
   for (Entry = GetFirstNode (BootOptionsList);
        !IsNull (BootOptionsList,Entry);
-       Entry = GetNextNode (BootOptionsList,Entry)
+       Entry = GetNextNode (BootOptionsList, Entry)
        )
   {
-    BootOption = LOAD_OPTION_FROM_LINK(Entry);
-    Print(L"[%d] %s\n",BootOptionCount,BootOption->Description);
+    BdsLoadOption = LOAD_OPTION_FROM_LINK(Entry);
+
+    if (OnlyArmBdsBootEntry && !IS_ARM_BDS_BOOTENTRY (BdsLoadOption)) {
+      continue;
+    }
+
+    Print (L"[%d] %s\n", BootOptionCount, BdsLoadOption->Description);
 
     DEBUG_CODE_BEGIN();
       CHAR16*                           DevicePathTxt;
       EFI_DEVICE_PATH_TO_TEXT_PROTOCOL* DevicePathToTextProtocol;
       ARM_BDS_LOADER_TYPE               LoaderType;
+      ARM_BDS_LOADER_OPTIONAL_DATA*     OptionalData;
 
       Status = gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
       ASSERT_EFI_ERROR(Status);
-      DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText(BootOption->FilePathList,TRUE,TRUE);
+      DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText(BdsLoadOption->FilePathList,TRUE,TRUE);
 
       Print(L"\t- %s\n",DevicePathTxt);
       OptionalData = BdsLoadOption->OptionalData;
@@ -254,6 +262,11 @@ BootMenuSelectBootOption (
     DEBUG_CODE_END();
 
     BootOptionCount++;
+  }
+
+  if (BootOptionCount == 0) {
+    Print (L"No supported Boot Entry.\n");
+    return EFI_NOT_FOUND;
   }
 
   // Get the index of the boot device to delete
@@ -277,7 +290,7 @@ BootMenuSelectBootOption (
        )
   {
     if (Index == BootOptionSelected) {
-      *BdsLoadOption = LOAD_OPTION_FROM_LINK(Entry);
+      *BdsLoadOptionEntry = LOAD_OPTION_ENTRY_FROM_LINK(Entry);
       break;
     }
     Index++;
@@ -291,16 +304,22 @@ BootMenuRemoveBootOption (
   IN LIST_ENTRY *BootOptionsList
   )
 {
-  EFI_STATUS    Status;
-  BDS_LOAD_OPTION *BootOption;
+  EFI_STATUS                    Status;
+  BDS_LOAD_OPTION_ENTRY*        BootOptionEntry;
 
-  Status = BootMenuSelectBootOption (BootOptionsList,L"Delete entry: ",&BootOption);
+  Status = BootMenuSelectBootOption (BootOptionsList, L"Delete entry: ", FALSE, &BootOptionEntry);
   if (EFI_ERROR(Status)) {
     return Status;
   }
 
+  // If the Boot Option was attached to a list remove it
+  if (!IsListEmpty (&BootOptionEntry->Link)) {
+    // Remove the entry from the list
+    RemoveEntryList (&BootOptionEntry->Link);
+  }
+
   // Delete the BDS Load option structures
-  BootOptionDelete (BootOption);
+  BootOptionDelete (BootOptionEntry->BdsLoadOption);
 
   return EFI_SUCCESS;
 }
@@ -311,6 +330,7 @@ BootMenuUpdateBootOption (
   )
 {
   EFI_STATUS                    Status;
+  BDS_LOAD_OPTION_ENTRY         *BootOptionEntry;
   BDS_LOAD_OPTION               *BootOption;
   BDS_LOAD_OPTION_SUPPORT*      DeviceSupport;
   ARM_BDS_LOADER_ARGUMENTS*     BootArguments;
@@ -324,10 +344,11 @@ BootMenuUpdateBootOption (
   UINTN                         InitrdSize;
   UINTN                         CmdLineSize;
 
-  Status = BootMenuSelectBootOption (BootOptionsList,L"Update entry: ",&BootOption);
+  Status = BootMenuSelectBootOption (BootOptionsList, L"Update entry: ", TRUE, &BootOptionEntry);
   if (EFI_ERROR(Status)) {
     return Status;
   }
+  BootOption = BootOptionEntry->BdsLoadOption;
 
   // Get the device support for this Boot Option
   Status = BootDeviceGetDeviceSupport (BootOption,&DeviceSupport);
@@ -494,10 +515,10 @@ BootMenuMain (
   BootOption              = NULL;
   BootMainEntryCount = sizeof(BootMainEntries) / sizeof(struct BOOT_MAIN_ENTRY);
 
-  // Get Boot#### list
-  BootOptionList (&BootOptionsList);
-
   while (TRUE) {
+    // Get Boot#### list
+    BootOptionList (&BootOptionsList);
+
     OptionCount = 1;
 
     // Display the Boot options
