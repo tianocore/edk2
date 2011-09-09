@@ -116,8 +116,7 @@ BootMenuAddBootOption (
   EFI_STATUS               Status;
   BDS_SUPPORTED_DEVICE*    SupportedBootDevice;
   BDS_LOADER_ARGUMENTS     BootArguments;
-  CHAR8                    AsciiBootDescription[BOOT_DEVICE_DESCRIPTION_MAX];
-  CHAR16                   *BootDescription;
+  CHAR16                    BootDescription[BOOT_DEVICE_DESCRIPTION_MAX];
   UINT32                   Attributes;
   BDS_LOADER_TYPE          BootType;
   BDS_LOAD_OPTION          *BdsLoadOption;
@@ -171,23 +170,17 @@ BootMenuAddBootOption (
   }
 
   Print(L"Description for this new Entry: ");
-  Status = GetHIInputAscii (AsciiBootDescription,BOOT_DEVICE_DESCRIPTION_MAX);
+  Status = GetHIInputStr (BootDescription, BOOT_DEVICE_DESCRIPTION_MAX);
   if (EFI_ERROR(Status)) {
     Status = EFI_ABORTED;
     goto FREE_DEVICE_PATH;
   }
-
-  // Convert Ascii into Unicode
-  BootDescription = (CHAR16*)AllocatePool(AsciiStrSize(AsciiBootDescription) * sizeof(CHAR16));
-  AsciiStrToUnicodeStr (AsciiBootDescription, BootDescription);
 
   // Create new entry
   Status = BootOptionCreate (Attributes, BootDescription, DevicePath, BootType, &BootArguments, &BdsLoadOption);
   if (!EFI_ERROR(Status)) {
     InsertTailList (BootOptionsList,&BdsLoadOption->Link);
   }
-
-  FreePool (BootDescription);
 
 FREE_DEVICE_PATH:
   FreePool (DevicePath);
@@ -303,8 +296,7 @@ BootMenuUpdateBootOption (
   BDS_LOAD_OPTION           *BootOption;
   BDS_LOAD_OPTION_SUPPORT   *DeviceSupport;
   BDS_LOADER_ARGUMENTS      BootArguments;
-  CHAR8                     AsciiBootDescription[BOOT_DEVICE_DESCRIPTION_MAX];
-  CHAR16                    *BootDescription;
+  CHAR16                        BootDescription[BOOT_DEVICE_DESCRIPTION_MAX];
   EFI_DEVICE_PATH*          DevicePath;
   BDS_LOADER_TYPE           BootType;
 
@@ -365,21 +357,14 @@ BootMenuUpdateBootOption (
   }
 
   Print(L"Description for this new Entry: ");
-  UnicodeStrToAsciiStr (BootOption->Description, AsciiBootDescription);
-  Status = EditHIInputAscii (AsciiBootDescription, BOOT_DEVICE_DESCRIPTION_MAX);
+  Status = EditHIInputStr (BootDescription, BOOT_DEVICE_DESCRIPTION_MAX);
   if (EFI_ERROR(Status)) {
     Status = EFI_ABORTED;
     goto FREE_DEVICE_PATH;
   }
 
-  // Convert Ascii into Unicode
-  BootDescription = (CHAR16*)AllocatePool(AsciiStrSize(AsciiBootDescription) * sizeof(CHAR16));
-  AsciiStrToUnicodeStr (AsciiBootDescription, BootDescription);
-
   // Update the entry
   Status = BootOptionUpdate (BootOption, BootOption->Attributes, BootDescription, DevicePath, BootType, &BootArguments);
-
-  FreePool (BootDescription);
 
 FREE_DEVICE_PATH:
   FreePool (DevicePath);

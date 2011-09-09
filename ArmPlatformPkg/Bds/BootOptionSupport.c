@@ -335,24 +335,19 @@ BdsLoadOptionFileSystemCreateDevicePath (
 {
   EFI_STATUS  Status;
   FILEPATH_DEVICE_PATH* FilePathDevicePath;
-  CHAR8       AsciiBootFilePath[BOOT_DEVICE_FILEPATH_MAX];
-  CHAR16      *BootFilePath;
+  CHAR16      BootFilePath[BOOT_DEVICE_FILEPATH_MAX];
   UINTN       BootFilePathSize;
 
-  Status = GetHIInputAscii (AsciiBootFilePath,BOOT_DEVICE_FILEPATH_MAX);
+  Status = GetHIInputStr (BootFilePath, BOOT_DEVICE_FILEPATH_MAX);
   if (EFI_ERROR(Status)) {
     return EFI_ABORTED;
   }
 
-  if (AsciiStrSize(AsciiBootFilePath) == 1) {
+  BootFilePathSize = StrSize (BootFilePath);
+  if (BootFilePathSize == 2) {
     *DevicePathNode = NULL;
     return EFI_NOT_FOUND;
   }
-
-  // Convert Ascii into Unicode
-  BootFilePath = (CHAR16*)AllocatePool(AsciiStrSize(AsciiBootFilePath) * sizeof(CHAR16));
-  AsciiStrToUnicodeStr (AsciiBootFilePath, BootFilePath);
-  BootFilePathSize = StrSize(BootFilePath);
 
   // Create the FilePath Device Path node
   FilePathDevicePath = (FILEPATH_DEVICE_PATH*)AllocatePool(SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize);
@@ -360,7 +355,6 @@ BdsLoadOptionFileSystemCreateDevicePath (
   FilePathDevicePath->Header.SubType = MEDIA_FILEPATH_DP;
   SetDevicePathNodeLength (FilePathDevicePath, SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize);
   CopyMem (FilePathDevicePath->PathName, BootFilePath, BootFilePathSize);
-  FreePool (BootFilePath);
 
   if (BootType != NULL || Attributes != NULL) {
     Status = BootDeviceGetType (FilePathDevicePath->PathName, BootType, Attributes);
@@ -384,8 +378,7 @@ BdsLoadOptionFileSystemUpdateDevicePath (
   )
 {
   EFI_STATUS  Status;
-  CHAR8       AsciiBootFilePath[BOOT_DEVICE_FILEPATH_MAX];
-  CHAR16      *BootFilePath;
+  CHAR16      BootFilePath[BOOT_DEVICE_FILEPATH_MAX];
   UINTN       BootFilePathSize;
   FILEPATH_DEVICE_PATH* EndingDevicePath;
   FILEPATH_DEVICE_PATH* FilePathDevicePath;
@@ -395,21 +388,17 @@ BdsLoadOptionFileSystemUpdateDevicePath (
 
   EndingDevicePath = (FILEPATH_DEVICE_PATH*)GetLastDevicePathNode (DevicePath);
  
-  UnicodeStrToAsciiStr (EndingDevicePath->PathName,AsciiBootFilePath);
-  Status = EditHIInputAscii (AsciiBootFilePath,BOOT_DEVICE_FILEPATH_MAX);
+  StrnCpy (BootFilePath, EndingDevicePath->PathName, BOOT_DEVICE_FILEPATH_MAX);
+  Status = EditHIInputStr (BootFilePath, BOOT_DEVICE_FILEPATH_MAX);
   if (EFI_ERROR(Status)) {
     return Status;
   }
 
-  if (AsciiStrSize(AsciiBootFilePath) == 1) {
+  BootFilePathSize = StrSize(BootFilePath);
+  if (BootFilePathSize == 2) {
     *NewDevicePath = NULL;
     return EFI_NOT_FOUND;
   }
-
-  // Convert Ascii into Unicode
-  BootFilePath = (CHAR16*)AllocatePool(AsciiStrSize(AsciiBootFilePath) * sizeof(CHAR16));
-  AsciiStrToUnicodeStr (AsciiBootFilePath, BootFilePath);
-  BootFilePathSize = StrSize(BootFilePath);
 
   // Create the FilePath Device Path node
   FilePathDevicePath = (FILEPATH_DEVICE_PATH*)AllocatePool(SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize);
@@ -417,7 +406,6 @@ BdsLoadOptionFileSystemUpdateDevicePath (
   FilePathDevicePath->Header.SubType = MEDIA_FILEPATH_DP;
   SetDevicePathNodeLength (FilePathDevicePath, SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize);
   CopyMem (FilePathDevicePath->PathName, BootFilePath, BootFilePathSize);
-  FreePool (BootFilePath);
 
   // Generate the new Device Path by replacing the last node by the updated node
   SetDevicePathEndNode (EndingDevicePath);
@@ -545,17 +533,17 @@ BdsLoadOptionMemMapCreateDevicePath (
 {
   EFI_STATUS  Status;
   MEMMAP_DEVICE_PATH* MemMapDevicePath;
-  CHAR8       AsciiStartingAddress[BOOT_DEVICE_ADDRESS_MAX];
-  CHAR8       AsciiEndingAddress[BOOT_DEVICE_ADDRESS_MAX];
+  CHAR16       StrStartingAddress[BOOT_DEVICE_ADDRESS_MAX];
+  CHAR16       StrEndingAddress[BOOT_DEVICE_ADDRESS_MAX];
 
   Print(L"Starting Address of the binary: ");
-  Status = GetHIInputAscii (AsciiStartingAddress,BOOT_DEVICE_ADDRESS_MAX);
+  Status = GetHIInputStr (StrStartingAddress,BOOT_DEVICE_ADDRESS_MAX);
   if (EFI_ERROR(Status)) {
     return EFI_ABORTED;
   }
 
   Print(L"Ending Address of the binary: ");
-  Status = GetHIInputAscii (AsciiEndingAddress,BOOT_DEVICE_ADDRESS_MAX);
+  Status = GetHIInputStr (StrEndingAddress,BOOT_DEVICE_ADDRESS_MAX);
   if (EFI_ERROR(Status)) {
     return EFI_ABORTED;
   }
@@ -565,8 +553,8 @@ BdsLoadOptionMemMapCreateDevicePath (
   MemMapDevicePath->Header.Type = HARDWARE_DEVICE_PATH;
   MemMapDevicePath->Header.SubType = HW_MEMMAP_DP;
   MemMapDevicePath->MemoryType = EfiBootServicesData;
-  MemMapDevicePath->StartingAddress = AsciiStrHexToUint64 (AsciiStartingAddress);
-  MemMapDevicePath->EndingAddress = AsciiStrHexToUint64 (AsciiEndingAddress);
+  MemMapDevicePath->StartingAddress = StrHexToUint64 (StrStartingAddress);
+  MemMapDevicePath->EndingAddress = StrHexToUint64 (StrEndingAddress);
 
   Status = BootDeviceGetType (NULL, BootType, Attributes);
   if (EFI_ERROR(Status)) {
@@ -587,8 +575,8 @@ BdsLoadOptionMemMapUpdateDevicePath (
   )
 {
   EFI_STATUS          Status;
-  CHAR8               AsciiStartingAddress[BOOT_DEVICE_ADDRESS_MAX];
-  CHAR8               AsciiEndingAddress[BOOT_DEVICE_ADDRESS_MAX];
+  CHAR16              StrStartingAddress[BOOT_DEVICE_ADDRESS_MAX];
+  CHAR16              StrEndingAddress[BOOT_DEVICE_ADDRESS_MAX];
   MEMMAP_DEVICE_PATH* EndingDevicePath;
   EFI_DEVICE_PATH*    DevicePath;
 
@@ -596,21 +584,21 @@ BdsLoadOptionMemMapUpdateDevicePath (
   EndingDevicePath = (MEMMAP_DEVICE_PATH*)GetLastDevicePathNode (DevicePath);
 
   Print(L"Starting Address of the binary: ");
-  AsciiSPrint (AsciiStartingAddress,BOOT_DEVICE_ADDRESS_MAX,"0x%X",(UINTN)EndingDevicePath->StartingAddress);
-  Status = EditHIInputAscii (AsciiStartingAddress,BOOT_DEVICE_ADDRESS_MAX);
+  UnicodeSPrint (StrStartingAddress, BOOT_DEVICE_ADDRESS_MAX, L"0x%X", (UINTN)EndingDevicePath->StartingAddress);
+  Status = EditHIInputStr (StrStartingAddress, BOOT_DEVICE_ADDRESS_MAX);
   if (EFI_ERROR(Status)) {
     return EFI_ABORTED;
   }
 
   Print(L"Ending Address of the binary: ");
-  AsciiSPrint (AsciiEndingAddress,BOOT_DEVICE_ADDRESS_MAX,"0x%X",(UINTN)EndingDevicePath->EndingAddress);
-  Status = EditHIInputAscii (AsciiEndingAddress,BOOT_DEVICE_ADDRESS_MAX);
+  UnicodeSPrint (StrEndingAddress, BOOT_DEVICE_ADDRESS_MAX, L"0x%X", (UINTN)EndingDevicePath->EndingAddress);
+  Status = EditHIInputStr (StrEndingAddress, BOOT_DEVICE_ADDRESS_MAX);
   if (EFI_ERROR(Status)) {
     return EFI_ABORTED;
   }
 
-  EndingDevicePath->StartingAddress = AsciiStrHexToUint64 (AsciiStartingAddress);
-  EndingDevicePath->EndingAddress = AsciiStrHexToUint64 (AsciiEndingAddress);
+  EndingDevicePath->StartingAddress = StrHexToUint64 (StrStartingAddress);
+  EndingDevicePath->EndingAddress = StrHexToUint64 (StrEndingAddress);
 
   Status = BootDeviceGetType (NULL, BootType, Attributes);
   if (EFI_ERROR(Status)) {
@@ -797,8 +785,7 @@ BdsLoadOptionTftpCreateDevicePath (
   EFI_IP_ADDRESS  RemoteIp;
   IPv4_DEVICE_PATH*   IPv4DevicePathNode;
   FILEPATH_DEVICE_PATH* FilePathDevicePath;
-  CHAR8       AsciiBootFilePath[BOOT_DEVICE_FILEPATH_MAX];
-  CHAR16*     BootFilePath;
+  CHAR16      BootFilePath[BOOT_DEVICE_FILEPATH_MAX];
   UINTN       BootFilePathSize;
 
   Print(L"Get the IP address from DHCP: ");
@@ -821,16 +808,16 @@ BdsLoadOptionTftpCreateDevicePath (
     return EFI_ABORTED;
   }
 
-  Print(L"File path of the EFI Application or the kernel: ");
-  Status = GetHIInputAscii (AsciiBootFilePath,BOOT_DEVICE_FILEPATH_MAX);
+  Print(L"File path of the EFI Application or the kernel : ");
+  Status = GetHIInputStr (BootFilePath, BOOT_DEVICE_FILEPATH_MAX);
   if (EFI_ERROR(Status)) {
     return EFI_ABORTED;
   }
 
-  // Convert Ascii into Unicode
-  BootFilePath = (CHAR16*)AllocatePool(AsciiStrSize(AsciiBootFilePath) * sizeof(CHAR16));
-  AsciiStrToUnicodeStr (AsciiBootFilePath, BootFilePath);
   BootFilePathSize = StrSize(BootFilePath);
+  if (BootFilePathSize == 2) {
+    return EFI_NOT_FOUND;
+  }
 
   // Allocate the memory for the IPv4 + File Path Device Path Nodes
   IPv4DevicePathNode = (IPv4_DEVICE_PATH*)AllocatePool(sizeof(IPv4_DEVICE_PATH) + SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize);
@@ -852,7 +839,6 @@ BdsLoadOptionTftpCreateDevicePath (
   FilePathDevicePath->Header.SubType = MEDIA_FILEPATH_DP;
   SetDevicePathNodeLength (FilePathDevicePath, SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize);
   CopyMem (FilePathDevicePath->PathName, BootFilePath, BootFilePathSize);
-  FreePool (BootFilePath);
 
   Status = BootDeviceGetType (NULL, BootType, Attributes);
   if (EFI_ERROR(Status)) {

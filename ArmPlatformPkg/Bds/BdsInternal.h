@@ -129,6 +129,18 @@ BootDeviceGetDeviceSupport (
   );
 
 EFI_STATUS
+GetHIInputStr (
+  IN OUT CHAR16  *CmdLine,
+  IN     UINTN   MaxCmdLine
+  );
+
+EFI_STATUS
+EditHIInputStr (
+  IN OUT CHAR16  *CmdLine,
+  IN     UINTN   MaxCmdLine
+  );
+
+EFI_STATUS
 GetHIInputAscii (
   IN OUT CHAR8   *CmdLine,
   IN     UINTN   MaxCmdLine
