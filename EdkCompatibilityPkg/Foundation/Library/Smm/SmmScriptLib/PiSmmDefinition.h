@@ -5,7 +5,7 @@
   runtime s3 boot Script. This header file is to definied PI SMM related definition to locate 
   SmmSaveState Protocol  
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -21,7 +21,7 @@
 #ifndef _PI_SMM_DEFINITION_H_
 #define _PI_SMM_DEFINITION_H_
 
-typedef struct _EFI_SMM_CPU_IO_PROTOCOL  EFI_SMM_CPU_IO_PROTOCOL;
+typedef struct _EFI_SMM_CPU_IO2_PROTOCOL  EFI_SMM_CPU_IO2_PROTOCOL;
 
 ///
 /// Width of the SMM CPU I/O operations
@@ -39,7 +39,7 @@ typedef enum {
   The I/O operations are carried out exactly as requested.  The caller is responsible for any alignment 
   and I/O width issues that the bus, device, platform, or type of I/O might require.
 
-  @param[in]      This           The EFI_SMM_CPU_IO_PROTOCOL instance.
+  @param[in]      This           The EFI_SMM_CPU_IO2_PROTOCOL instance.
   @param[in]      Width          Signifies the width of the I/O operations.
   @param[in]      Address        The base address of the I/O operations.
                                  The caller is responsible for aligning the Address if required. 
@@ -55,7 +55,7 @@ typedef enum {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SMM_CPU_IO2)(
-  IN CONST EFI_SMM_CPU_IO_PROTOCOL  *This,
+  IN CONST EFI_SMM_CPU_IO2_PROTOCOL  *This,
   IN EFI_SMM_IO_WIDTH               Width,
   IN UINT64                         Address,
   IN UINTN                          Count,
@@ -74,9 +74,9 @@ typedef struct {
 } EFI_SMM_IO_ACCESS2;
 
 ///
-/// SMM CPU I/O Protocol provides CPU I/O and memory access within SMM.
+/// SMM CPU I/O 2 Protocol provides CPU I/O and memory access within SMM.
 ///
-struct _EFI_SMM_CPU_IO_PROTOCOL {
+struct _EFI_SMM_CPU_IO2_PROTOCOL {
   EFI_SMM_IO_ACCESS2 Mem;  ///< Allows reads and writes to memory-mapped I/O space.
   EFI_SMM_IO_ACCESS2 Io;   ///< Allows reads and writes to I/O space.
 };
@@ -333,7 +333,7 @@ struct _EFI_SMM_SYSTEM_TABLE2 {
   ///
   /// I/O Service
   ///
-  EFI_SMM_CPU_IO_PROTOCOL              SmmIo;
+  EFI_SMM_CPU_IO2_PROTOCOL             SmmIo;
 
   ///
   /// Runtime memory services
