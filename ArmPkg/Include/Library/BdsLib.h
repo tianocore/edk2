@@ -66,6 +66,36 @@ BdsConnectAllDrivers (
   VOID
   );
 
+EFI_STATUS
+GetEnvironmentVariable (
+  IN     CONST CHAR16*   VariableName,
+  IN     VOID*           DefaultValue,
+  IN OUT UINTN*          Size,
+  OUT    VOID**          Value
+  );
+
+EFI_STATUS
+BootOptionFromLoadOptionIndex (
+  IN  UINT16            LoadOptionIndex,
+  OUT BDS_LOAD_OPTION** BdsLoadOption
+  );
+
+EFI_STATUS
+BootOptionFromLoadOptionVariable (
+  IN  CHAR16*           BootVariableName,
+  OUT BDS_LOAD_OPTION** BdsLoadOption
+  );
+
+EFI_STATUS
+BootOptionToLoadOptionVariable (
+  IN BDS_LOAD_OPTION*   BdsLoadOption
+  );
+
+UINT16
+BootOptionAllocateBootIndex (
+  VOID
+  );
+
 /**
   Start a Linux kernel from a Device Path
 
@@ -121,6 +151,14 @@ BdsLoadApplication (
   IN CHAR16*                     EfiApp,
   IN UINTN                       LoadOptionsSize,
   IN VOID*                       LoadOptions
+  );
+
+EFI_STATUS
+BdsLoadImage (
+  IN     EFI_DEVICE_PATH       *DevicePath,
+  IN     EFI_ALLOCATE_TYPE     Type,
+  IN OUT EFI_PHYSICAL_ADDRESS* Image,
+  OUT    UINTN                 *FileSize
   );
 
 #endif

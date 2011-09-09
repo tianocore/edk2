@@ -289,3 +289,56 @@ PrintPerformance (
   CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Total Time = %ld ms\n\n", DivU64x64Remainder (MultU64x32 (TimeStamp, 1000), TicksPerSecond, NULL));
   SerialPortWrite ((UINT8 *) Buffer, CharCount);
 }
+
+EFI_STATUS
+GetEnvironmentVariable (
+  IN     CONST CHAR16*   VariableName,
+  IN     VOID*           DefaultValue,
+  IN OUT UINTN*          Size,
+  OUT    VOID**          Value
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       VariableSize;
+
+  // Try to get the variable size.
+  *Value = NULL;
+  VariableSize = 0;
+  Status = gRT->GetVariable ((CHAR16 *) VariableName, &gEfiGlobalVariableGuid, NULL, &VariableSize, *Value);
+  if (Status == EFI_NOT_FOUND) {
+    if ((DefaultValue != NULL) && (Size != NULL) && (*Size != 0)) {
+      // If the environment variable does not exist yet then set it with the default value
+      Status = gRT->SetVariable (
+                    (CHAR16*)VariableName,
+                    &gEfiGlobalVariableGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                    *Size,
+                    DefaultValue
+                    );
+      *Value = DefaultValue;
+    } else {
+      return EFI_NOT_FOUND;
+    }
+  } else if (Status == EFI_BUFFER_TOO_SMALL) {
+    // Get the environment variable value
+    *Value = AllocatePool (VariableSize);
+    if (*Value == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Status = gRT->GetVariable ((CHAR16 *)VariableName, &gEfiGlobalVariableGuid, NULL, &VariableSize, *Value);
+    if (EFI_ERROR (Status)) {
+      FreePool(*Value);
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (Size) {
+      *Size = VariableSize;
+    }
+  } else {
+    *Value = DefaultValue;
+    return Status;
+  }
+
+  return EFI_SUCCESS;
+}

@@ -24,6 +24,7 @@
   BdsLinuxLoader.c
   BdsAppLoader.c
   BdsHelper.c
+  BdsLoadOption.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -52,6 +53,7 @@
   gEfiPxeBaseCodeProtocolGuid
   gEfiDiskIoProtocolGuid
   gEfiUsbIoProtocolGuid
+  gEfiLoadedImageProtocolGuid
     
 [FeaturePcd]  
 

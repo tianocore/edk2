@@ -92,73 +92,6 @@ BootOptionStart (
 }
 
 EFI_STATUS
-BootOptionParseLoadOption (
-  IN  EFI_LOAD_OPTION EfiLoadOption,
-  IN  UINTN           EfiLoadOptionSize,
-  OUT BDS_LOAD_OPTION **BdsLoadOption
-  )
-{
-  BDS_LOAD_OPTION *LoadOption;
-  UINTN           FilePathListLength;
-  UINTN           DescriptionLength;
-
-  if (EfiLoadOption == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (EfiLoadOptionSize < sizeof(UINT32) + sizeof(UINT16) + sizeof(CHAR16) + sizeof(EFI_DEVICE_PATH_PROTOCOL)) {
-    return EFI_BAD_BUFFER_SIZE;
-  }
-
-  LoadOption = (BDS_LOAD_OPTION*)AllocatePool(sizeof(BDS_LOAD_OPTION));
-  if (LoadOption == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  LoadOption->LoadOption = EfiLoadOption;
-  LoadOption->LoadOptionSize = EfiLoadOptionSize;
-
-  LoadOption->Attributes    = *(UINT32*)EfiLoadOption;
-  FilePathListLength        = *(UINT16*)(EfiLoadOption + sizeof(UINT32));
-  LoadOption->Description   = (CHAR16*)(EfiLoadOption + sizeof(UINT32) + sizeof(UINT16));
-  DescriptionLength         = StrSize (LoadOption->Description);
-  LoadOption->FilePathList  = (EFI_DEVICE_PATH_PROTOCOL*)(EfiLoadOption + sizeof(UINT32) + sizeof(UINT16) + DescriptionLength);
-
-  if ((UINTN)((UINT8*)LoadOption->FilePathList + FilePathListLength - EfiLoadOption) == EfiLoadOptionSize) {
-    LoadOption->OptionalData = NULL;
-  } else {
-    LoadOption->OptionalData = (BDS_LOADER_OPTIONAL_DATA *)((UINT8*)LoadOption->FilePathList + FilePathListLength);
-  }
-
-  *BdsLoadOption = LoadOption;
-  return EFI_SUCCESS;
-}
-
-EFI_STATUS
-BootOptionFromLoadOptionVariable (
-  IN  UINT16            LoadOptionIndex,
-  OUT BDS_LOAD_OPTION **BdsLoadOption
-  )
-{
-  EFI_STATUS  Status;
-  CHAR16      BootVariableName[9];
-  EFI_LOAD_OPTION     EfiLoadOption;
-  UINTN               EfiLoadOptionSize;
-
-  UnicodeSPrint (BootVariableName, 9 * sizeof(CHAR16), L"Boot%04X", LoadOptionIndex);
-
-  Status = GetEnvironmentVariable (BootVariableName, NULL, &EfiLoadOptionSize, (VOID**)&EfiLoadOption);
-  if (!EFI_ERROR(Status)) {
-    Status = BootOptionParseLoadOption (EfiLoadOption,EfiLoadOptionSize,BdsLoadOption);
-    if (!EFI_ERROR(Status)) {
-      (*BdsLoadOption)->LoadOptionIndex = LoadOptionIndex;
-    }
-  }
-
-  return Status;
-}
-
-EFI_STATUS
 BootOptionList (
   IN OUT LIST_ENTRY *BootOptionList
   )
@@ -179,7 +112,7 @@ BootOptionList (
   }
 
   for (Index = 0; Index < BootOrderSize / sizeof (UINT16); Index++) {
-    Status = BootOptionFromLoadOptionVariable (BootOrder[Index],&BdsLoadOption);
+    Status = BootOptionFromLoadOptionIndex (BootOrder[Index], &BdsLoadOption);
     if (!EFI_ERROR(Status)) {
       BdsLoadOptionEntry = (BDS_LOAD_OPTION_ENTRY*)AllocatePool(sizeof(BDS_LOAD_OPTION_ENTRY));
       BdsLoadOptionEntry->BdsLoadOption = BdsLoadOption;
@@ -188,38 +121,6 @@ BootOptionList (
   }
 
   return EFI_SUCCESS;
-}
-
-UINT16
-BootOptionAllocateBootIndex (
-  VOID
-  )
-{
-  EFI_STATUS        Status;
-  UINTN             Index;
-  UINT32            BootIndex;
-  UINT16            *BootOrder;
-  UINTN             BootOrderSize;
-  BOOLEAN           Found;
-
-  // Get the Boot Option Order from the environment variable
-  Status = GetEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
-  if (!EFI_ERROR(Status)) {
-    for (BootIndex = 0; BootIndex <= 0xFFFF; BootIndex++) {
-      Found = FALSE;
-      for (Index = 0; Index < BootOrderSize / sizeof (UINT16); Index++) {
-        if (BootOrder[Index] == BootIndex) {
-          Found = TRUE;
-          break;
-        }
-      }
-      if (!Found) {
-        return BootIndex;
-      }
-    }
-  }
-  // Return the first index
-  return 0;
 }
 
 STATIC
