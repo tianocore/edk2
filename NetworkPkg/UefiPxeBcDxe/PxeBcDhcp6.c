@@ -232,8 +232,8 @@ PxeBcExtractBootFileUrl (
   )
 {
   UINT16                     PrefixLen;
-  UINT8                      *BootFileNamePtr;
-  UINT8                      *BootFileName;
+  CHAR8                      *BootFileNamePtr;
+  CHAR8                      *BootFileName;
   UINT16                     BootFileNameLen;
   CHAR8                      *TmpStr;
   CHAR8                      TmpChar;
@@ -314,7 +314,7 @@ PxeBcExtractBootFileUrl (
   //
   // Get the part of BOOTFILE_NAME string.
   //
-  BootFileNamePtr = (UINT8*)((UINTN)ServerAddress + 1);
+  BootFileNamePtr = (CHAR8*)((UINTN)ServerAddress + 1);
   if (*BootFileNamePtr != PXEBC_TFTP_URL_SEPARATOR) {
     FreePool (TmpStr);
     return EFI_INVALID_PARAMETER;
@@ -337,12 +337,12 @@ PxeBcExtractBootFileUrl (
     //
     // Extract boot file name from URL.
     //
-    BootFileName = (UINT8 *) AllocateZeroPool (BootFileNameLen);
+    BootFileName = (CHAR8 *) AllocateZeroPool (BootFileNameLen);
     if (BootFileName == NULL) {
       FreePool (TmpStr);
       return EFI_OUT_OF_RESOURCES;
     }
-    *FileName = BootFileName;
+    *FileName = (UINT8*) BootFileName;
 
     //
     // Decode percent-encoding in boot file name.
