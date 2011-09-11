@@ -96,7 +96,7 @@ usleep( useconds_t Microseconds )
 unsigned int
 sleep( unsigned int Seconds )
 {
-  return (usleep( useconds_t(Seconds * 1000000) ));
+  return (usleep( (useconds_t)(Seconds * 1000000) ));
 }
 
 static int
