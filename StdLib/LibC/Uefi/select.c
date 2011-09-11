@@ -74,19 +74,14 @@
 
 #define MAX_SLEEP_DELAY 0xfffffffe
 
-//
-//  Name:
-//      usleep
-//
-//  Description:
-//      Implement usleep(3) function.
-//
-//  Arguments:
-//      Microseconds to sleep.
-//
-//  Returns:
-//      0
-//
+/** Sleep for the specified number of Microseconds.
+
+    Implements the usleep(3) function.
+
+    @param[in]    Microseconds    Number of microseconds to sleep.
+
+    @retval   0   Always returns zero.
+**/
 int
 usleep( useconds_t Microseconds )
 {
@@ -96,6 +91,12 @@ usleep( useconds_t Microseconds )
   }
   gBS->Stall((UINTN)Microseconds );
   return (0);
+}
+
+unsigned int
+sleep( unsigned int Seconds )
+{
+  return (usleep( useconds_t(Seconds * 1000000) ));
 }
 
 static int

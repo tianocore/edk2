@@ -37,6 +37,8 @@ extern   int    optind;
 pid_t           getpgrp(void);
 pid_t           tcgetpgrp(int);
 char           *getpass(const char *);
+int             usleep(useconds_t);
+unsigned int    sleep(unsigned int);
 
 // Networking
 long            gethostid(void);
@@ -84,7 +86,6 @@ int             setgid(gid_t);
 int             setpgid(pid_t, pid_t);
 pid_t           setsid(void);
 int             setuid(uid_t);
-unsigned int    sleep(unsigned int);
 long            sysconf(int);
 
 int             tcsetpgrp(int, pid_t);
@@ -127,7 +128,6 @@ void            swab(const void *, void *, size_t);
 int             symlink(const char *, const char *);
 void            sync(void);
 useconds_t      ualarm(useconds_t, useconds_t);
-int             usleep(useconds_t);
 pid_t           vfork(void) __RENAME(__vfork14);
 
 /*
