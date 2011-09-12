@@ -18,6 +18,16 @@
 #include <Library/ShellCEntryLib.h>
 #include <Library/SortLib.h>
 
+/**
+  Test comparator.
+
+  @param[in] b1   The first INTN
+  @param[in] b2   The other INTN
+
+  @retval 0       They are the same.
+  @retval -1      b1 is less than b2
+  @retval 1       b1 is greater then b2
+**/
 INTN
 EFIAPI
 Test(CONST VOID*b1, CONST VOID*b2)
