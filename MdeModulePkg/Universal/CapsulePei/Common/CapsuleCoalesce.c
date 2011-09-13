@@ -541,6 +541,8 @@ GetCapsuleInfo (
   UINTN Count;
   UINTN Size;
 
+  ASSERT (Desc != NULL);
+
   Count = 0;
   Size  = 0;
 

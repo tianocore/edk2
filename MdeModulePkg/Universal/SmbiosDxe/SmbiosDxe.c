@@ -973,6 +973,7 @@ SmbiosCreateTable (
   //
   // Assemble the tables
   //
+  ASSERT (EntryPointStructure->TableAddress != 0);
   BufferPointer = (UINT8 *) (UINTN) EntryPointStructure->TableAddress;
   CurrentSmbiosEntry = NULL;
   do {
