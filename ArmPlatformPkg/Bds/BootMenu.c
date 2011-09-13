@@ -372,14 +372,16 @@ BootMenuUpdateBootOption (
     LinuxArguments = &OptionalData->Arguments.LinuxArguments;
 
     CmdLineSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->CmdLineSize);
-    InitrdSize = GetUnalignedDevicePathSize ((EFI_DEVICE_PATH*)((LinuxArguments + 1) + CmdLineSize));
 
-    Print(L"File path of the initrd: ");
-    Status = DeviceSupport->UpdateDevicePathNode (
-      (EFI_DEVICE_PATH_PROTOCOL *)((UINTN)(LinuxArguments + 1) + CmdLineSize), &InitrdPathList, NULL, NULL);
-    if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) {// EFI_NOT_FOUND is returned on empty input string, but we can boot without an initrd
-      Status = EFI_ABORTED;
-      goto EXIT;
+    InitrdSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->InitrdSize);
+    if (InitrdSize > 0) {
+      Print(L"File path of the initrd: ");
+      Status = DeviceSupport->UpdateDevicePathNode ((EFI_DEVICE_PATH*)((LinuxArguments + 1) + CmdLineSize), &InitrdPathList, NULL, NULL);
+      if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) {// EFI_NOT_FOUND is returned on empty input string, but we can boot without an initrd
+        Status = EFI_ABORTED;
+        goto EXIT;
+      }
+      InitrdSize = GetDevicePathSize (InitrdPathList);
     }
 
     Print(L"Arguments to pass to the binary: "); 
@@ -395,7 +397,6 @@ BootMenuUpdateBootOption (
     }
 
     CmdLineSize = AsciiStrSize (CmdLine);
-    InitrdSize = GetDevicePathSize (InitrdPathList);
 
     BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)AllocatePool(sizeof(ARM_BDS_LOADER_ARGUMENTS) + CmdLineSize + InitrdSize);
     BootArguments->LinuxArguments.CmdLineSize = CmdLineSize;
@@ -407,6 +408,7 @@ BootMenuUpdateBootOption (
   }
 
   Print(L"Description for this new Entry: ");
+  StrnCpy (BootDescription, BootOption->Description, BOOT_DEVICE_DESCRIPTION_MAX);
   Status = EditHIInputStr (BootDescription, BOOT_DEVICE_DESCRIPTION_MAX);
   if (EFI_ERROR(Status)) {
     Status = EFI_ABORTED;
@@ -536,7 +538,7 @@ BootMenuMain (
         EFI_DEVICE_PATH_TO_TEXT_PROTOCOL* DevicePathToTextProtocol;
         ARM_BDS_LOADER_OPTIONAL_DATA*     OptionalData;
         UINTN                             CmdLineSize;
-        ARM_BDS_LOADER_TYPE           LoaderType;
+        ARM_BDS_LOADER_TYPE               LoaderType;
 
         Status = gBS->LocateProtocol (&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
         if (EFI_ERROR(Status)) {
