@@ -50,25 +50,15 @@ SCAN_CODE_TO_SCREEN_OPERATION     gScanCodeToOperation[] = {
   {
     SCAN_RIGHT,
     UiRight,
-  },
-  {
-    SCAN_F9,
-    UiDefault,
-  },
-  {
-    SCAN_F10,
-    UiSave
   }
 };
+
+UINTN mScanCodeNumber = sizeof (gScanCodeToOperation) / sizeof (gScanCodeToOperation[0]);
 
 SCREEN_OPERATION_T0_CONTROL_FLAG  gScreenOperationToControlFlag[] = {
   {
     UiNoOperation,
     CfUiNoOperation,
-  },
-  {
-    UiDefault,
-    CfUiDefault,
   },
   {
     UiSelect,
@@ -95,16 +85,16 @@ SCREEN_OPERATION_T0_CONTROL_FLAG  gScreenOperationToControlFlag[] = {
     CfUiReset,
   },
   {
-    UiSave,
-    CfUiSave,
-  },
-  {
     UiPageUp,
     CfUiPageUp,
   },
   {
     UiPageDown,
     CfUiPageDown
+  }, 
+  {
+    UiHotKey,
+    CfUiHotKey
   }
 };
 
@@ -1057,7 +1047,10 @@ UpdateStatusBar (
   UINTN           Index;
   CHAR16          *NvUpdateMessage;
   CHAR16          *InputErrorMessage;
-
+  LIST_ENTRY              *Link;
+  FORM_BROWSER_FORMSET    *LocalFormSet;
+  FORM_BROWSER_STATEMENT  *Question;
+  
   NvUpdateMessage   = GetToken (STRING_TOKEN (NV_UPDATE_MESSAGE), gHiiHandle);
   InputErrorMessage = GetToken (STRING_TOKEN (INPUT_ERROR_MESSAGE), gHiiHandle);
 
@@ -1082,32 +1075,38 @@ UpdateStatusBar (
     break;
 
   case NV_UPDATE_REQUIRED:
-    if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) != FORMSET_CLASS_FRONT_PAGE) {
-      if (State) {
+    //
+    // Global setting support. Show configuration change on every form.
+    //
+    if (State) {
+      gResetRequired    = (BOOLEAN) (gResetRequired | ((Flags & EFI_IFR_FLAG_RESET_REQUIRED) == EFI_IFR_FLAG_RESET_REQUIRED));
+
+      if (Selection != NULL && Selection->Statement != NULL) {
+        Question = Selection->Statement;
+        if (Question->Storage != NULL || Question->Operand == EFI_IFR_DATE_OP || Question->Operand == EFI_IFR_TIME_OP) {
+          //
+          // Update only for Question value that need to be saved into Storage.
+          //
+          Selection->Form->NvUpdateRequired = TRUE;
+        }
+      }
+      
+      if (Selection == NULL || IsNvUpdateRequired (Selection->FormSet)) {
         gST->ConOut->SetAttribute (gST->ConOut, INFO_TEXT);
         PrintStringAt (
           gScreenDimensions.LeftColumn + gPromptBlockWidth + gOptionBlockWidth,
           gScreenDimensions.BottomRow - 1,
           NvUpdateMessage
           );
-        gResetRequired    = (BOOLEAN) (gResetRequired | ((Flags & EFI_IFR_FLAG_RESET_REQUIRED) == EFI_IFR_FLAG_RESET_REQUIRED));
-
-        if (Selection != NULL) {
-          Selection->Form->NvUpdateRequired = TRUE;
-        }
-      } else {
-        gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextHighlightColor));
-        for (Index = 0; Index < (GetStringWidth (NvUpdateMessage) - 2) / 2; Index++) {
-          PrintAt (
-            (gScreenDimensions.LeftColumn + gPromptBlockWidth + gOptionBlockWidth + Index),
-            gScreenDimensions.BottomRow - 1,
-            L"  "
-            );
-        }
-
-        if (Selection != NULL) {
-          Selection->Form->NvUpdateRequired = FALSE;
-        }
+      }
+    } else {
+      gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextHighlightColor));
+      for (Index = 0; Index < (GetStringWidth (NvUpdateMessage) - 2) / 2; Index++) {
+        PrintAt (
+          (gScreenDimensions.LeftColumn + gPromptBlockWidth + gOptionBlockWidth + Index),
+          gScreenDimensions.BottomRow - 1,
+          L"  "
+          );
       }
     }
     break;
@@ -1117,9 +1116,28 @@ UpdateStatusBar (
       UpdateStatusBar (Selection, INPUT_ERROR, Flags, TRUE);
     }
 
-    if (IsNvUpdateRequired(Selection->FormSet)) {
-      UpdateStatusBar (NULL, NV_UPDATE_REQUIRED, Flags, TRUE);
+    switch (gBrowserSettingScope) {
+    case SystemLevel:
+      //
+      // Check the maintain list to see whether there is any change.
+      //
+      Link = GetFirstNode (&gBrowserFormSetList);
+      while (!IsNull (&gBrowserFormSetList, Link)) {
+        LocalFormSet = FORM_BROWSER_FORMSET_FROM_LINK (Link);
+        if (IsNvUpdateRequired(LocalFormSet)) {
+          UpdateStatusBar (NULL, NV_UPDATE_REQUIRED, Flags, TRUE);
+          break;
+        }
+        Link = GetNextNode (&gBrowserFormSetList, Link);
+      }
+      break;
+    case FormSetLevel:
+    case FormLevel:
+      UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Flags, TRUE);
+    default:
+      break;
     }
+
     break;
 
   default:
@@ -1877,6 +1895,7 @@ UiDisplayMenu (
   FORM_BROWSER_STATEMENT          *Statement;
   UI_MENU_LIST                    *CurrentMenu;
   UINTN                           ModalSkipColumn;
+  BROWSER_HOT_KEY                 *HotKey;
 
   CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
 
@@ -1898,6 +1917,7 @@ UiDisplayMenu (
   NextMenuOption      = NULL;
   PreviousMenuOption  = NULL;
   SavedMenuOption     = NULL;
+  HotKey              = NULL;
   ModalSkipColumn     = (LocalScreen.RightColumn - LocalScreen.LeftColumn) / 6;
 
   ZeroMem (&Key, sizeof (EFI_INPUT_KEY));
@@ -1916,7 +1936,7 @@ UiDisplayMenu (
     Col = LocalScreen.LeftColumn + LEFT_SKIPPED_COLUMNS;
   }
 
-  BottomRow = LocalScreen.BottomRow - STATUS_BAR_HEIGHT - FOOTER_HEIGHT - SCROLL_ARROW_HEIGHT - 1;
+  BottomRow = LocalScreen.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight - SCROLL_ARROW_HEIGHT - 1;
 
   Selection->TopRow = TopRow;
   Selection->BottomRow = BottomRow;
@@ -2620,8 +2640,9 @@ UiDisplayMenu (
         //
         // IFR is updated in Callback of refresh opcode, re-parse it
         //
+        ControlFlag = CfCheckSelection;
         Selection->Statement = NULL;
-        return EFI_SUCCESS;
+        break;
       }
 
       Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
@@ -2709,30 +2730,28 @@ UiDisplayMenu (
         break;
 
       case CHAR_NULL:
-        if (((Key.ScanCode == SCAN_F9) && ((gFunctionKeySetting & FUNCTION_NINE) != FUNCTION_NINE)) ||
-            ((Key.ScanCode == SCAN_F10) && ((gFunctionKeySetting & FUNCTION_TEN) != FUNCTION_TEN))
-            ) {
+        for (Index = 0; Index < mScanCodeNumber; Index++) {
+          if (Key.ScanCode == gScanCodeToOperation[Index].ScanCode) {
+            ScreenOperation = gScanCodeToOperation[Index].ScreenOperation;
+            break;
+          }
+        }
+        
+        if (Selection->Form->ModalForm && (Key.ScanCode == SCAN_ESC || Index == mScanCodeNumber)) {
           //
-          // If the function key has been disabled, just ignore the key.
+          // ModalForm has no ESC key and Hot Key.
           //
-        } else {
-          for (Index = 0; Index < sizeof (gScanCodeToOperation) / sizeof (gScanCodeToOperation[0]); Index++) {
-            if (Selection->Form->ModalForm && 
-              (Key.ScanCode == SCAN_F9 || Key.ScanCode == SCAN_F10 || Key.ScanCode == SCAN_ESC)) {
-              ControlFlag = CfReadKey;
-              break;
-            }
-
-            if (Key.ScanCode == gScanCodeToOperation[Index].ScanCode) {
-              if (Key.ScanCode == SCAN_F9) {
-                //
-                // Reset to standard default
-                //
-                DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
-              }
-              ScreenOperation = gScanCodeToOperation[Index].ScreenOperation;
-              break;
-            }
+          ControlFlag = CfReadKey;
+        } else if (Index == mScanCodeNumber) {
+          //
+          // Check whether Key matches the registered hot key.
+          //
+          HotKey = NULL;
+          if ((gBrowserSettingScope == SystemLevel) || (gFunctionKeySetting != NONE_FUNCTION_KEY_SETTING)) {
+            HotKey = GetHotKeyFromRegisterList (&Key);
+          }
+          if (HotKey != NULL) {
+            ScreenOperation = UiHotKey;
           }
         }
         break;
@@ -2832,9 +2851,7 @@ UiDisplayMenu (
       // We come here when someone press ESC
       //
       ControlFlag = CfCheckSelection;
-      if (FindNextMenu (Selection, &Repaint, &NewLine)) {
-        return EFI_SUCCESS;
-      } 
+      FindNextMenu (Selection, &Repaint, &NewLine);
       break;
 
     case CfUiLeft:
@@ -3252,43 +3269,120 @@ UiDisplayMenu (
       AdjustDateAndTimePosition (TRUE, &NewPos);
       break;
 
-    case CfUiSave:
+    case CfUiHotKey:
       ControlFlag = CfCheckSelection;
+      
+      Status = EFI_SUCCESS;
+      //
+      // Discard changes. After it, no NV flag is showed.
+      //
+      if ((HotKey->Action & BROWSER_ACTION_DISCARD) == BROWSER_ACTION_DISCARD) {
+        Status = DiscardForm (Selection->FormSet, Selection->Form, gBrowserSettingScope);
+        if (!EFI_ERROR (Status)) {
+          Selection->Action = UI_ACTION_REFRESH_FORM;
+          Selection->Statement = NULL;
+          gResetRequired = FALSE;
+        } else {
+          do {
+            CreateDialog (4, TRUE, 0, NULL, &Key, HotKey->HelpString, gDiscardFailed, gPressEnter, gEmptyString);
+          } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+          //
+          // Still show current page.
+          //
+          Selection->Action = UI_ACTION_NONE;
+          Repaint = TRUE;
+          NewLine = TRUE;
+          break;
+        }
+      }
 
       //
-      // Submit the form
+      // Reterieve default setting. After it. NV flag will be showed.
       //
-      Status = SubmitForm (Selection->FormSet, Selection->Form, FALSE);
+      if ((HotKey->Action & BROWSER_ACTION_DEFAULT) == BROWSER_ACTION_DEFAULT) {
+        Status = ExtractDefault (Selection->FormSet, Selection->Form, HotKey->DefaultId, gBrowserSettingScope);
+        if (!EFI_ERROR (Status)) {
+          Selection->Action = UI_ACTION_REFRESH_FORM;
+          Selection->Statement = NULL;
+          gResetRequired = TRUE;
+        } else {
+          do {
+            CreateDialog (4, TRUE, 0, NULL, &Key, HotKey->HelpString, gDefaultFailed, gPressEnter, gEmptyString);
+          } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+          //
+          // Still show current page.
+          //
+          Selection->Action = UI_ACTION_NONE;
+          Repaint = TRUE;
+          NewLine = TRUE;
+          break;
+        }
+      }
 
-      if (!EFI_ERROR (Status)) {
-        ASSERT(MenuOption != NULL);
-        UpdateStatusBar (Selection, INPUT_ERROR, MenuOption->ThisTag->QuestionFlags, FALSE);
-        UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, MenuOption->ThisTag->QuestionFlags, FALSE);
-      } else {
-        do {
-          CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gSaveFailed, gPressEnter, gEmptyString);
-        } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
-
-        Repaint = TRUE;
-        NewLine = TRUE;
+      //
+      // Save changes. After it, no NV flag is showed.
+      //
+      if ((HotKey->Action & BROWSER_ACTION_SUBMIT) == BROWSER_ACTION_SUBMIT) {
+        Status = SubmitForm (Selection->FormSet, Selection->Form, gBrowserSettingScope);
+        if (!EFI_ERROR (Status)) {
+          ASSERT(MenuOption != NULL);
+          UpdateStatusBar (Selection, INPUT_ERROR, MenuOption->ThisTag->QuestionFlags, FALSE);
+          UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, MenuOption->ThisTag->QuestionFlags, FALSE);
+        } else {
+          do {
+            CreateDialog (4, TRUE, 0, NULL, &Key, HotKey->HelpString, gSaveFailed, gPressEnter, gEmptyString);
+          } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+          //
+          // Still show current page.
+          //
+          Selection->Action = UI_ACTION_NONE;
+          Repaint = TRUE;
+          NewLine = TRUE;
+          break;
+        }
+      }
+      
+      //
+      // Set Reset required Flag
+      //
+      if ((HotKey->Action & BROWSER_ACTION_RESET) == BROWSER_ACTION_RESET) {
+        gResetRequired = TRUE;
+      }
+      
+      //
+      // Exit Action
+      //
+      if ((HotKey->Action & BROWSER_ACTION_EXIT) == BROWSER_ACTION_EXIT) {
+        //
+        // Form Exit without saving, Similar to ESC Key.
+        // FormSet Exit without saving, Exit SendForm.
+        // System Exit without saving, CallExitHandler and Exit SendForm.
+        //
+        DiscardForm (Selection->FormSet, Selection->Form, gBrowserSettingScope);
+        if (gBrowserSettingScope == FormLevel) {
+          ControlFlag = CfUiReset;
+        } else if (gBrowserSettingScope == FormSetLevel) {
+          Selection->Action = UI_ACTION_EXIT;
+        } else if (gBrowserSettingScope == SystemLevel) {
+          if (ExitHandlerFunction != NULL) {
+            ExitHandlerFunction ();
+          }
+          Selection->Action = UI_ACTION_EXIT;
+        }
+        Selection->Statement = NULL;
       }
       break;
 
     case CfUiDefault:
       ControlFlag = CfCheckSelection;
       //
-      // Reset to default values for the whole formset
+      // Reset to default value for all forms in the whole system.
       //
-      Status = ExtractFormSetDefault (Selection->FormSet, DefaultId);
+      Status = ExtractDefault (Selection->FormSet, NULL, DefaultId, FormSetLevel);
 
       if (!EFI_ERROR (Status)) {
         Selection->Action = UI_ACTION_REFRESH_FORM;
         Selection->Statement = NULL;
-
-        //
-        // Show NV update flag on status bar
-        //
-        UpdateNvInfoInForm(Selection->FormSet, TRUE);
         gResetRequired = TRUE;
       }
       break;

@@ -22,6 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/FormBrowser2.h>
+#include <Protocol/FormBrowserEx.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/UnicodeCollation.h>
 #include <Protocol/HiiConfigAccess.h>
@@ -74,10 +75,7 @@ extern UINT8  SetupBrowserStrings[];
 // Definition for function key setting
 //
 #define NONE_FUNCTION_KEY_SETTING     0
-#define DEFAULT_FUNCTION_KEY_SETTING  (FUNCTION_NINE | FUNCTION_TEN)
-
-#define FUNCTION_NINE                 (1 << 2)
-#define FUNCTION_TEN                  (1 << 3)
+#define ENABLE_FUNCTION_KEY_SETTING   1
 
 typedef struct {
   EFI_GUID  FormSetGuid;
@@ -164,7 +162,9 @@ typedef struct {
   //
   // Produced protocol
   //
-  EFI_FORM_BROWSER2_PROTOCOL         FormBrowser2;
+  EFI_FORM_BROWSER2_PROTOCOL          FormBrowser2;
+  
+  EFI_FORM_BROWSER_EXTENSION_PROTOCOL FormBrowserEx;
 
 } SETUP_DRIVER_PRIVATE_DATA;
 
@@ -448,8 +448,12 @@ typedef struct {
 
 #define FORMSET_DEFAULTSTORE_FROM_LINK(a)  CR (a, FORMSET_DEFAULTSTORE, Link, FORMSET_DEFAULTSTORE_SIGNATURE)
 
+#define FORM_BROWSER_FORMSET_SIGNATURE  SIGNATURE_32 ('F', 'B', 'F', 'S')
+
 typedef struct {
-  EFI_HII_HANDLE                  HiiHandle;
+  UINTN                           Signature;
+  LIST_ENTRY                      Link;
+  EFI_HII_HANDLE                  HiiHandle;      // unique id for formset.
   EFI_HANDLE                      DriverHandle;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
   EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
@@ -475,6 +479,8 @@ typedef struct {
   LIST_ENTRY                      ExpressionListHead;   // List of Expressions (FORM_EXPRESSION)
 } FORM_BROWSER_FORMSET;
 
+#define FORM_BROWSER_FORMSET_FROM_LINK(a)  CR (a, FORM_BROWSER_FORMSET, Link, FORM_BROWSER_FORMSET_SIGNATURE)
+
 #define BROWSER_CONTEXT_SIGNATURE  SIGNATURE_32 ('B', 'C', 'T', 'X')
 
 typedef struct {
@@ -490,13 +496,10 @@ typedef struct {
   BOOLEAN               ResetRequired;
   UINT16                Direction;
   EFI_SCREEN_DESCRIPTOR ScreenDimensions;
-  CHAR16                *FunctionNineString;
-  CHAR16                *FunctionTenString;
   CHAR16                *EnterString;
   CHAR16                *EnterCommitString;
   CHAR16                *EnterEscapeString;
   CHAR16                *EscapeString;
-  CHAR16                *SaveFailed;
   CHAR16                *MoveHighlight;
   CHAR16                *MakeSelection;
   CHAR16                *DecNumericInput;
@@ -534,6 +537,20 @@ typedef struct {
 
 #define BROWSER_CONTEXT_FROM_LINK(a)  CR (a, BROWSER_CONTEXT, Link, BROWSER_CONTEXT_SIGNATURE)
 
+#define BROWSER_HOT_KEY_SIGNATURE  SIGNATURE_32 ('B', 'H', 'K', 'S')
+
+typedef struct {
+  UINTN                 Signature;
+  LIST_ENTRY            Link;
+  
+  EFI_INPUT_KEY         *KeyData;
+  IN UINT32             Action;
+  IN UINT16             DefaultId;
+  IN EFI_STRING         HelpString;
+} BROWSER_HOT_KEY;
+
+#define BROWSER_HOT_KEY_FROM_LINK(a)  CR (a, BROWSER_HOT_KEY, Link, BROWSER_HOT_KEY_SIGNATURE)
+
 extern EFI_HII_DATABASE_PROTOCOL         *mHiiDatabase;
 extern EFI_HII_STRING_PROTOCOL           *mHiiString;
 extern EFI_HII_CONFIG_ROUTING_PROTOCOL   *mHiiConfigRouting;
@@ -548,12 +565,17 @@ extern UINT16                gDirection;
 extern EFI_SCREEN_DESCRIPTOR gScreenDimensions;
 
 extern FORM_BROWSER_FORMSET  *gOldFormSet;
+extern LIST_ENTRY            gBrowserFormSetList;
+extern LIST_ENTRY            gBrowserHotKeyList;
+extern BROWSER_SETTING_SCOPE gBrowserSettingScope;
+extern EXIT_HANDLER          ExitHandlerFunction;
+extern UINTN                 gFooterHeight;
 
 //
 // Browser Global Strings
 //
-extern CHAR16            *gFunctionNineString;
-extern CHAR16            *gFunctionTenString;
+extern CHAR16            *gDiscardFailed;
+extern CHAR16            *gDefaultFailed;
 extern CHAR16            *gEnterString;
 extern CHAR16            *gEnterCommitString;
 extern CHAR16            *gEnterEscapeString;
@@ -924,38 +946,41 @@ ValidateQuestion (
   IN  UINTN                           Type
   );
 
+
 /**
-  Discard data for form level or formset level.
+  Discard data based on the input setting scope (Form, FormSet or System).
 
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
-  @param  SingleForm             whether submit single form or formset.
+  @param  SettingScope           Setting Scope for Discard action.
 
   @retval EFI_SUCCESS            The function completed successfully.
+  @retval EFI_UNSUPPORTED        Unsupport SettingScope.
 
 **/
 EFI_STATUS
 DiscardForm (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form,
-  IN BOOLEAN                          SingleForm
+  IN BROWSER_SETTING_SCOPE            SettingScope
   );
 
 /**
-  Submit data for form level or formset level.
+  Submit data based on the input Setting level (Form, FormSet or System).
 
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
-  @param  SingleForm             whether submit single form or formset.
+  @param  SettingScope           Setting Scope for Submit action.
 
   @retval EFI_SUCCESS            The function completed successfully.
+  @retval EFI_UNSUPPORTED        Unsupport SettingScope.
 
 **/
 EFI_STATUS
 SubmitForm (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form,
-  IN BOOLEAN                          SingleForm
+  IN BROWSER_SETTING_SCOPE            SettingScope
   );
 
 /**
@@ -1011,18 +1036,23 @@ InitializeFormSet (
   );
 
 /**
-  Reset Questions in a Formset to their default value.
+  Reset Questions to their default value in a Form, Formset or System.
 
   @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
   @param  DefaultId              The Class of the default.
+  @param  SettingScope           Setting Scope for Default action.
 
   @retval EFI_SUCCESS            The function completed successfully.
+  @retval EFI_UNSUPPORTED        Unsupport SettingScope.
 
 **/
 EFI_STATUS
-ExtractFormSetDefault (
+ExtractDefault (
   IN FORM_BROWSER_FORMSET             *FormSet,
-  IN UINT16                           DefaultId
+  IN FORM_BROWSER_FORM                *Form,
+  IN UINT16                           DefaultId,
+  IN BROWSER_SETTING_SCOPE            SettingScope
   );
 
 /**
@@ -1300,4 +1330,121 @@ ProcessCallBackFunction (
   IN     EFI_BROWSER_ACTION              Action,
   IN     BOOLEAN                         SkipSaveOrDiscard
   );
+
+/**
+  Find the matched FormSet context in the backup maintain list based on HiiHandle.
+  
+  @param Handle  The Hii Handle.
+  
+  @return the found FormSet context. If no found, NULL will return.
+
+**/
+FORM_BROWSER_FORMSET * 
+GetFormSetFromHiiHandle (
+  EFI_HII_HANDLE Handle
+  );
+
+/**
+  Check whether the input HII handle is the FormSet that is being used.
+  
+  @param Handle  The Hii Handle.
+  
+  @retval TRUE   HII handle is being used.
+  @retval FALSE  HII handle is not being used.
+
+**/
+BOOLEAN
+IsHiiHandleInBrowserContext (
+  EFI_HII_HANDLE Handle
+  );
+
+/**
+  Configure what scope the hot key will impact.
+  All hot keys have the same scope. The mixed hot keys with the different level are not supported.
+  If no scope is set, the default scope will be FormSet level.
+  After all registered hot keys are removed, previous Scope can reset to another level.
+  
+  @param[in] Scope               Scope level to be set. 
+  
+  @retval EFI_SUCCESS            Scope is set correctly.
+  @retval EFI_INVALID_PARAMETER  Scope is not the valid value specified in BROWSER_SETTING_SCOPE. 
+  @retval EFI_UNSPPORTED         Scope level is different from current one that the registered hot keys have.
+
+**/
+EFI_STATUS
+EFIAPI
+SetScope (
+  IN BROWSER_SETTING_SCOPE Scope
+  );
+
+/**
+  Register the hot key with its browser action, or unregistered the hot key.
+  Only support hot key that is not printable character (control key, function key, etc.).
+  If the action value is zero, the hot key will be unregistered if it has been registered.
+  If the same hot key has been registered, the new action and help string will override the previous ones.
+  
+  @param[in] KeyData     A pointer to a buffer that describes the keystroke
+                         information for the hot key. Its type is EFI_INPUT_KEY to 
+                         be supported by all ConsoleIn devices.
+  @param[in] Action      Action value that describes what action will be trigged when the hot key is pressed. 
+  @param[in] DefaultId   Specifies the type of defaults to retrieve, which is only for DEFAULT action.
+  @param[in] HelpString  Help string that describes the hot key information.
+                         Its value may be NULL for the unregistered hot key.
+  
+  @retval EFI_SUCCESS            Hot key is registered or unregistered.
+  @retval EFI_INVALID_PARAMETER  KeyData is NULL.
+  @retval EFI_NOT_FOUND          KeyData is not found to be unregistered.
+  @retval EFI_UNSUPPORTED        Key represents a printable character. It is conflicted with Browser.
+**/
+EFI_STATUS
+EFIAPI
+RegisterHotKey (
+  IN EFI_INPUT_KEY *KeyData,
+  IN UINT32        Action,
+  IN UINT16        DefaultId,
+  IN EFI_STRING    HelpString OPTIONAL
+  );
+
+/**
+  Register Exit handler function. 
+  When more than one handler function is registered, the latter one will override the previous one. 
+  When NULL handler is specified, the previous Exit handler will be unregistered. 
+  
+  @param[in] Handler      Pointer to handler function. 
+
+**/
+VOID
+EFIAPI
+RegiserExitHandler (
+  IN EXIT_HANDLER Handler
+  );
+
+/**
+  Create reminder to let user to choose save or discard the changed browser data.
+  Caller can use it to actively check the changed browser data.
+
+  @retval BROWSER_NO_CHANGES       No browser data is changed.
+  @retval BROWSER_SAVE_CHANGES     The changed browser data is saved.
+  @retval BROWSER_DISCARD_CHANGES  The changed browser data is discard.
+
+**/
+UINT32
+EFIAPI
+SaveReminder (
+  VOID
+  );
+
+/**
+  Find the registered HotKey based on KeyData.
+  
+  @param[in] KeyData     A pointer to a buffer that describes the keystroke
+                         information for the hot key.
+
+  @return The registered HotKey context. If no found, NULL will return.
+**/
+BROWSER_HOT_KEY *
+GetHotKeyFromRegisterList (
+  IN EFI_INPUT_KEY *KeyData
+  );
+
 #endif

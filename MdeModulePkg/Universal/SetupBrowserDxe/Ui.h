@@ -33,17 +33,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef enum {
   UiNoOperation,
-  UiDefault,
   UiSelect,
   UiUp,
   UiDown,
   UiLeft,
   UiRight,
   UiReset,
-  UiSave,
   UiPrevious,
   UiPageUp,
   UiPageDown,
+  UiHotKey,
   UiMaxOperation
 } UI_SCREEN_OPERATION;
 
@@ -64,10 +63,10 @@ typedef enum {
   CfUiPageUp,
   CfUiPageDown,
   CfUiDown,
-  CfUiSave,
   CfUiDefault,
   CfUiNoOperation,
   CfExit,
+  CfUiHotKey,
   CfMaxControlFlag
 } UI_CONTROL_FLAG;
 

@@ -1060,7 +1060,7 @@ GetSelectionInputPopUp (
   Start  = (DimensionsWidth - PopUpWidth - POPUP_FRAME_WIDTH) / 2 + gScreenDimensions.LeftColumn;
   End    = Start + PopUpWidth + POPUP_FRAME_WIDTH;
   Top    = gScreenDimensions.TopRow + NONE_FRONT_PAGE_HEADER_HEIGHT;
-  Bottom = gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - FOOTER_HEIGHT - 1;
+  Bottom = gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight - 1;
 
   MenuLinesInView = Bottom - Top - 1;
   if (MenuLinesInView >= PopUpMenuLines) {

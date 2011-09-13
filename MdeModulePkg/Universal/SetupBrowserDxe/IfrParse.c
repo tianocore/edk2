@@ -992,6 +992,7 @@ ParseOpCodes (
   InitializeListHead (&FormSet->StorageListHead);
   InitializeListHead (&FormSet->DefaultStoreListHead);
   InitializeListHead (&FormSet->FormListHead);
+  InitializeListHead (&FormSet->ExpressionListHead);
   ResetCurrentExpressionStack ();
   ResetMapExpressionListStack ();
 
@@ -1332,8 +1333,6 @@ ParseOpCodes (
         FormSet->NumberOfClassGuid = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
         CopyMem (FormSet->ClassGuid, OpCodeData + sizeof (EFI_IFR_FORM_SET), FormSet->NumberOfClassGuid * sizeof (EFI_GUID));
       }
-
-      InitializeListHead (&FormSet->ExpressionListHead);
       break;
 
     case EFI_IFR_FORM_OP:

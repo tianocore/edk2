@@ -300,7 +300,7 @@ DisplayPageFrame (
   ClearLines (
     LocalScreen.LeftColumn,
     LocalScreen.RightColumn,
-    LocalScreen.BottomRow - STATUS_BAR_HEIGHT - FOOTER_HEIGHT,
+    LocalScreen.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight,
     LocalScreen.BottomRow - STATUS_BAR_HEIGHT - 1,
     KEYHELP_TEXT | KEYHELP_BACKGROUND
     );
@@ -348,14 +348,14 @@ DisplayPageFrame (
       // +------------------------------------------------------------------------------+
       //
       Character = BOXDRAW_DOWN_RIGHT;
-      PrintCharAt (LocalScreen.LeftColumn, LocalScreen.BottomRow - STATUS_BAR_HEIGHT - FOOTER_HEIGHT, Character);
+      PrintCharAt (LocalScreen.LeftColumn, LocalScreen.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight, Character);
 
       PrintString (Buffer);
 
       Character = BOXDRAW_DOWN_LEFT;
       PrintChar (Character);
       Character = BOXDRAW_VERTICAL;
-      for (Row = LocalScreen.BottomRow - STATUS_BAR_HEIGHT - FOOTER_HEIGHT + 1;
+      for (Row = LocalScreen.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight + 1;
            Row <= LocalScreen.BottomRow - STATUS_BAR_HEIGHT - 2;
            Row++
           ) {
@@ -583,13 +583,10 @@ InitializeBrowserStrings (
   VOID
   )
 {
-  gFunctionNineString   = GetToken (STRING_TOKEN (FUNCTION_NINE_STRING), gHiiHandle);
-  gFunctionTenString    = GetToken (STRING_TOKEN (FUNCTION_TEN_STRING), gHiiHandle);
   gEnterString          = GetToken (STRING_TOKEN (ENTER_STRING), gHiiHandle);
   gEnterCommitString    = GetToken (STRING_TOKEN (ENTER_COMMIT_STRING), gHiiHandle);
   gEnterEscapeString    = GetToken (STRING_TOKEN (ENTER_ESCAPE_STRING), gHiiHandle);
   gEscapeString         = GetToken (STRING_TOKEN (ESCAPE_STRING), gHiiHandle);
-  gSaveFailed           = GetToken (STRING_TOKEN (SAVE_FAILED), gHiiHandle);
   gMoveHighlight        = GetToken (STRING_TOKEN (MOVE_HIGHLIGHT), gHiiHandle);
   gMakeSelection        = GetToken (STRING_TOKEN (MAKE_SELECTION), gHiiHandle);
   gDecNumericInput      = GetToken (STRING_TOKEN (DEC_NUMERIC_INPUT), gHiiHandle);
@@ -626,8 +623,6 @@ FreeBrowserStrings (
   VOID
   )
 {
-  FreePool (gFunctionNineString);
-  FreePool (gFunctionTenString);
   FreePool (gEnterString);
   FreePool (gEnterCommitString);
   FreePool (gEnterEscapeString);
@@ -658,6 +653,64 @@ FreeBrowserStrings (
   return ;
 }
 
+/**
+  Show all registered HotKey help strings on bottom Rows.
+
+**/
+VOID
+PrintHotKeyHelpString (
+  VOID
+  )
+{
+  UINTN                  CurrentCol;
+  UINTN                  CurrentRow;
+  UINTN                  BottomRowOfHotKeyHelp;
+  UINTN                  ColumnWidth;
+  UINTN                  Index;
+  EFI_SCREEN_DESCRIPTOR  LocalScreen;
+  LIST_ENTRY             *Link;
+  BROWSER_HOT_KEY        *HotKey;
+
+  CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
+  ColumnWidth            = (LocalScreen.RightColumn - LocalScreen.LeftColumn) / 3;
+  BottomRowOfHotKeyHelp  = LocalScreen.BottomRow - STATUS_BAR_HEIGHT - 3;
+
+  //
+  // Calculate total number of Register HotKeys. 
+  //
+  Index = 0;
+  Link  = GetFirstNode (&gBrowserHotKeyList);
+  while (!IsNull (&gBrowserHotKeyList, Link)) {
+    HotKey = BROWSER_HOT_KEY_FROM_LINK (Link);
+    //
+    // Help string can't exceed ColumnWidth. One Row will show three Help information. 
+    //
+    if (StrLen (HotKey->HelpString) > ColumnWidth) {
+      HotKey->HelpString[ColumnWidth] = L'\0';
+    }
+    //
+    // Calculate help information Column and Row.
+    //
+    if ((Index % 3) != 2) {
+      CurrentCol = LocalScreen.LeftColumn + (2 - Index % 3) * ColumnWidth;
+    } else {
+      CurrentCol = LocalScreen.LeftColumn + 2;
+    }
+    CurrentRow = BottomRowOfHotKeyHelp - Index / 3;
+    //
+    // Print HotKey help string on bottom Row.
+    //
+    PrintStringAt (CurrentCol, CurrentRow, HotKey->HelpString);
+
+    //
+    // Get Next Hot Key.
+    //
+    Link = GetNextNode (&gBrowserHotKeyList, Link);
+    Index ++;
+  }
+  
+  return;
+}
 
 /**
   Update key's help imformation.
@@ -693,13 +746,13 @@ UpdateKeyHelp (
   CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
 
   SecCol            = LocalScreen.LeftColumn + (LocalScreen.RightColumn - LocalScreen.LeftColumn) / 3;
-  ThdCol            = LocalScreen.LeftColumn + (LocalScreen.RightColumn - LocalScreen.LeftColumn) * 2 / 3;
+  ThdCol            = LocalScreen.LeftColumn + (LocalScreen.RightColumn - LocalScreen.LeftColumn) / 3 * 2;
 
   StartColumnOfHelp = LocalScreen.LeftColumn + 2;
   LeftColumnOfHelp  = LocalScreen.LeftColumn + 1;
   RightColumnOfHelp = LocalScreen.RightColumn - 2;
-  TopRowOfHelp      = LocalScreen.BottomRow - 4;
-  BottomRowOfHelp   = LocalScreen.BottomRow - 3;
+  TopRowOfHelp      = LocalScreen.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight + 1;
+  BottomRowOfHelp   = LocalScreen.BottomRow - STATUS_BAR_HEIGHT - 2;
 
   Statement = MenuOption->ThisTag;
   switch (Statement->Operand) {
@@ -711,11 +764,15 @@ UpdateKeyHelp (
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
     if (!Selected) {
+      //
+      // On system setting, HotKey will show on every form.
+      //
+      if (gBrowserSettingScope == SystemLevel ||
+          (Selection->FormEditable && gFunctionKeySetting != NONE_FUNCTION_KEY_SETTING)) {
+        PrintHotKeyHelpString ();
+      }
+
       if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
-        if (Selection->FormEditable) {
-          PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
-          PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
-        }
         PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
       }
 
@@ -770,11 +827,14 @@ UpdateKeyHelp (
   case EFI_IFR_CHECKBOX_OP:
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
+    //
+    // On system setting, HotKey will show on every form.
+    //
+    if (gBrowserSettingScope == SystemLevel ||
+        (Selection->FormEditable && gFunctionKeySetting != NONE_FUNCTION_KEY_SETTING)) {
+      PrintHotKeyHelpString ();
+    }
     if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
-      if (Selection->FormEditable) {
-        PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
-        PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
-      }
       PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
     }
 
@@ -792,11 +852,14 @@ UpdateKeyHelp (
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
     if (!Selected) {
+      //
+      // On system setting, HotKey will show on every form.
+      //
+      if (gBrowserSettingScope == SystemLevel ||
+          (Selection->FormEditable && gFunctionKeySetting != NONE_FUNCTION_KEY_SETTING)) {
+        PrintHotKeyHelpString ();
+      }
       if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
-        if (Selection->FormEditable) {
-          PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
-          PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
-        }
         PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
       }
 
@@ -947,6 +1010,55 @@ FindNextMenu (
 
   if (CurrentMenu != NULL && CurrentMenu->Parent != NULL) {
     //
+    // Form Level Check whether the data is changed.
+    //
+    if (gBrowserSettingScope == FormLevel && Selection->Form->NvUpdateRequired) {
+      Status      = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+  
+      YesResponse = gYesResponse[0];
+      NoResponse  = gNoResponse[0];
+  
+      //
+      // If NV flag is up, prompt user
+      //
+      do {
+        CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gSaveChanges, gAreYouSure, gEmptyString);
+      } while
+      (
+        (Key.ScanCode != SCAN_ESC) &&
+        ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (NoResponse | UPPER_LOWER_CASE_OFFSET)) &&
+        ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (YesResponse | UPPER_LOWER_CASE_OFFSET))
+      );
+  
+      if (Key.ScanCode == SCAN_ESC) {
+        //
+        // User hits the ESC key, Ingore. 
+        //
+        if (Repaint != NULL) {
+          *Repaint = TRUE;
+        }
+        if (NewLine != NULL) {
+          *NewLine = TRUE;
+        }
+
+        Selection->Action = UI_ACTION_NONE;
+        return FALSE;
+      }
+  
+      if ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) == (YesResponse | UPPER_LOWER_CASE_OFFSET)) {
+        //
+        // If the user hits the YesResponse key
+        //
+        Status = SubmitForm (Selection->FormSet, Selection->Form, FormLevel);
+      } else {
+        //
+        // If the user hits the NoResponse key
+        //
+        Status = DiscardForm (Selection->FormSet, Selection->Form, FormLevel);
+      }
+    }
+
+    //
     // we have a parent, so go to the parent menu
     //
     if (CompareGuid (&CurrentMenu->FormSetGuid, &CurrentMenu->Parent->FormSetGuid)) {
@@ -980,7 +1092,7 @@ FindNextMenu (
   //
   // We are going to leave current FormSet, so check uncommited data in this FormSet
   //
-  if (IsNvUpdateRequired(Selection->FormSet)) {
+  if (gBrowserSettingScope != SystemLevel && IsNvUpdateRequired(Selection->FormSet)) {
     Status      = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
 
     YesResponse = gYesResponse[0];
@@ -1014,11 +1126,16 @@ FindNextMenu (
       return FALSE;
     }
 
-    //
-    // If the user hits the YesResponse key
-    //
     if ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) == (YesResponse | UPPER_LOWER_CASE_OFFSET)) {
-      Status = SubmitForm (Selection->FormSet, Selection->Form, FALSE);
+      //
+      // If the user hits the YesResponse key
+      //
+      Status = SubmitForm (Selection->FormSet, Selection->Form, FormSetLevel);
+    } else {
+      //
+      // If the user hits the NoResponse key
+      //
+      Status = DiscardForm (Selection->FormSet, Selection->Form, FormSetLevel);
     }
   }
 
@@ -1060,14 +1177,14 @@ ProcessCallBackFunction (
   EFI_IFR_TYPE_VALUE              *TypeValue;
   FORM_BROWSER_STATEMENT          *Statement;
   BOOLEAN                         SubmitFormIsRequired;
-  BOOLEAN                         SingleForm;
   BOOLEAN                         DiscardFormIsRequired;
   BOOLEAN                         NeedExit;
   LIST_ENTRY                      *Link;
+  BROWSER_SETTING_SCOPE           SettingLevel;
 
   ConfigAccess = Selection->FormSet->ConfigAccess;
   SubmitFormIsRequired  = FALSE;
-  SingleForm            = FALSE;
+  SettingLevel          = FormSetLevel;
   DiscardFormIsRequired = FALSE;
   NeedExit              = FALSE;
   Status                = EFI_SUCCESS;
@@ -1139,24 +1256,24 @@ ProcessCallBackFunction (
 
       case EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT:
         SubmitFormIsRequired  = TRUE;
-        SingleForm            = TRUE;
+        SettingLevel          = FormLevel;
         NeedExit              = TRUE;
         break;
 
       case EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT:
         DiscardFormIsRequired = TRUE;
-        SingleForm            = TRUE;      
+        SettingLevel          = FormLevel;      
         NeedExit              = TRUE;
         break;
 
       case EFI_BROWSER_ACTION_REQUEST_FORM_APPLY:
         SubmitFormIsRequired  = TRUE;
-        SingleForm            = TRUE;
+        SettingLevel          = FormLevel;
         break;
 
       case EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD:
         DiscardFormIsRequired = TRUE;
-        SingleForm            = TRUE;
+        SettingLevel          = FormLevel;
         break;
 
       default:
@@ -1179,11 +1296,11 @@ ProcessCallBackFunction (
   }
 
   if (SubmitFormIsRequired && !SkipSaveOrDiscard) {
-    SubmitForm (Selection->FormSet, Selection->Form, SingleForm);
+    SubmitForm (Selection->FormSet, Selection->Form, SettingLevel);
   }
 
   if (DiscardFormIsRequired && !SkipSaveOrDiscard) {
-    DiscardForm (Selection->FormSet, Selection->Form, SingleForm);
+    DiscardForm (Selection->FormSet, Selection->Form, SettingLevel);
   }
 
   if (NeedExit) {
@@ -1216,12 +1333,9 @@ SetupBrowser (
   EFI_HANDLE                      NotifyHandle;
   FORM_BROWSER_STATEMENT          *Statement;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
-  FORM_BROWSER_FORMSET            *FormSet;
   EFI_INPUT_KEY                   Key;
 
   gMenuRefreshHead = NULL;
-  gResetRequired = FALSE;
-  FormSet = Selection->FormSet;
   ConfigAccess = Selection->FormSet->ConfigAccess;
 
   //
@@ -1246,6 +1360,17 @@ SetupBrowser (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
+
+  //
+  // Update gOldFormSet on maintain back up FormSet list.
+  // And, make gOldFormSet point to current FormSet. 
+  //
+  if (gOldFormSet != NULL) {
+    RemoveEntryList (&gOldFormSet->Link);
+    DestroyFormSet (gOldFormSet);
+  }
+  gOldFormSet = Selection->FormSet;
+  InsertTailList (&gBrowserFormSetList, &gOldFormSet->Link);
 
   do {
     //
@@ -1441,14 +1566,6 @@ SetupBrowser (
       }
     }
   } while (Selection->Action == UI_ACTION_REFRESH_FORM);
-
-  //
-  // Record the old formset
-  //
-  if (gOldFormSet != NULL) {
-    DestroyFormSet (gOldFormSet);
-  }
-  gOldFormSet = FormSet;
 
 Done:
   //
