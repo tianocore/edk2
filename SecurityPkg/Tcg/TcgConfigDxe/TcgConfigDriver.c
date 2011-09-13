@@ -71,7 +71,7 @@ TcgConfigDriverEntryPoint (
   }
   
   PrivateData->TcgProtocol = TcgProtocol;
-  PrivateData->HideTpm     = PcdGetBool (PcdHideTpmSupport) && PcdGetBool (PcdHideTpm);
+  PrivateData->HideTpm     = (BOOLEAN) (PcdGetBool (PcdHideTpmSupport) && PcdGetBool (PcdHideTpm));
   
   //
   // Install TCG configuration form

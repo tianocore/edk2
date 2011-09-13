@@ -184,7 +184,7 @@ TcgExtractConfig (
 
   Configuration.MorState        = PcdGetBool (PcdMorEnable);
   Configuration.TpmOperation    = ENABLE;
-  Configuration.HideTpm         = PcdGetBool (PcdHideTpmSupport) && PcdGetBool (PcdHideTpm);
+  Configuration.HideTpm         = (BOOLEAN) (PcdGetBool (PcdHideTpmSupport) && PcdGetBool (PcdHideTpm));
   //
   // Read the original value of HideTpm from PrivateData which won't be changed by Setup in this boot.
   //
