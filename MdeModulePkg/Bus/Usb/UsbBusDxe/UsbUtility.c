@@ -997,7 +997,6 @@ MatchUsbWwid (
   EFI_USB_INTERFACE_DESCRIPTOR  *ActIfDesc;
   EFI_USB_DEVICE_DESCRIPTOR     *DevDesc;
   EFI_USB_STRING_DESCRIPTOR     *StrDesc;
-  UINT16                        *SnString;
   UINT16                        Index;
   CHAR16                        *CompareStr;
   UINTN                         CompareLen;
@@ -1013,7 +1012,6 @@ MatchUsbWwid (
   ASSERT (IfDesc->ActiveIndex < USB_MAX_INTERFACE_SETTING);
   ActIfDesc    = &(IfDesc->Settings[IfDesc->ActiveIndex]->Desc);
   DevDesc      = &(UsbIf->Device->DevDesc->Desc);
-  SnString     = (UINT16 *) ((UINT8 *)UsbWWIDDevicePathPtr + 10);
 
   //
   // In addition, Hub interface is always matched for this policy.
