@@ -1006,7 +1006,6 @@ ParseIfrData (
   CHAR16                   *VarStoreName;
   UINT16                   VarOffset;
   UINT16                   VarWidth;
-  EFI_STRING_ID            VarDefaultName;
   UINT16                   VarDefaultId;
   EFI_STRING               GuidStr;
   EFI_STRING               NameStr;
@@ -1021,7 +1020,6 @@ ParseIfrData (
   TempStr          = NULL;
   BlockData        = NULL;
   DefaultData      = NULL;
-  VarDefaultName   = 0;
   FirstOneOfOption = FALSE;
 
   //
@@ -1840,7 +1838,6 @@ GetFullStringFromHiiFormPackages (
   EFI_STATUS                   Status;
   UINT8                        *HiiFormPackage;
   UINTN                        PackageSize;
-  UINTN                        ResultSize;
   IFR_BLOCK_DATA               *RequestBlockArray;
   IFR_BLOCK_DATA               *BlockData;
   IFR_BLOCK_DATA               *NextBlockData;
@@ -1882,7 +1879,6 @@ GetFullStringFromHiiFormPackages (
   NameStr           = NULL;
   PathStr           = NULL;
   HiiFormPackage    = NULL;
-  ResultSize        = 0;
   PackageSize       = 0;
   DataExist         = FALSE;
   Progress          = *Request;
