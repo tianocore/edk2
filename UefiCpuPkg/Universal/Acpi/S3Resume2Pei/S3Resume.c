@@ -44,6 +44,7 @@
 #include <Library/LocalApicLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/PrintLib.h>
+#include <Library/HobLib.h>
 #include <Library/LockBoxLib.h>
 #include <IndustryStandard/Acpi.h>
 
@@ -112,6 +113,30 @@ typedef union {
   } Bits;
   UINT64    Uint64;
 } PAGE_TABLE_ENTRY;
+
+//
+// Page Table Entry 1GB
+//
+typedef union {
+  struct {
+    UINT64  Present:1;                // 0 = Not present in memory, 1 = Present in memory
+    UINT64  ReadWrite:1;              // 0 = Read-Only, 1= Read/Write
+    UINT64  UserSupervisor:1;         // 0 = Supervisor, 1=User
+    UINT64  WriteThrough:1;           // 0 = Write-Back caching, 1=Write-Through caching
+    UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
+    UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
+    UINT64  Dirty:1;                  // 0 = Not Dirty, 1 = written by processor on access to page
+    UINT64  MustBe1:1;                // Must be 1 
+    UINT64  Global:1;                 // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
+    UINT64  Available:3;              // Available for use by system software
+    UINT64  PAT:1;                    //
+    UINT64  MustBeZero:17;            // Must be zero;
+    UINT64  PageTableBaseAddress:22;  // Page Table Base Address
+    UINT64  AvabilableHigh:11;        // Available for use by system software
+    UINT64  Nx:1;                     // 0 = Execute Code, 1 = No Code Execution
+  } Bits;
+  UINT64    Uint64;
+} PAGE_TABLE_1G_ENTRY;
 
 #pragma pack()
 
@@ -462,17 +487,21 @@ RestoreS3PageTables (
 {
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     UINT32                                        RegEax;
+    UINT32                                        RegEdx;
     UINT8                                         PhysicalAddressBits;
     EFI_PHYSICAL_ADDRESS                          PageAddress;
     UINTN                                         IndexOfPml4Entries;
     UINTN                                         IndexOfPdpEntries;
     UINTN                                         IndexOfPageDirectoryEntries;
-    UINT64                                        NumberOfPml4EntriesNeeded;
-    UINT64                                        NumberOfPdpEntriesNeeded;
+    UINT32                                        NumberOfPml4EntriesNeeded;
+    UINT32                                        NumberOfPdpEntriesNeeded;
     PAGE_MAP_AND_DIRECTORY_POINTER                *PageMapLevel4Entry;
     PAGE_MAP_AND_DIRECTORY_POINTER                *PageMap;
     PAGE_MAP_AND_DIRECTORY_POINTER                *PageDirectoryPointerEntry;
     PAGE_TABLE_ENTRY                              *PageDirectoryEntry;
+    VOID                                          *Hob;
+    BOOLEAN                                       Page1GSupport;
+    PAGE_TABLE_1G_ENTRY                           *PageDirectory1GEntry;
 
     //
     // NOTE: We have to ASSUME the page table generation format, because we do not know whole page table information.
@@ -488,25 +517,47 @@ RestoreS3PageTables (
     PageMap = (PAGE_MAP_AND_DIRECTORY_POINTER *)S3NvsPageTableAddress;
     S3NvsPageTableAddress += SIZE_4KB;
     
+    Page1GSupport = FALSE;
+    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= 0x80000001) {
+      AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+      if ((RegEdx & BIT26) != 0) {
+        Page1GSupport = TRUE;
+      }
+    }
+    
     //
     // Get physical address bits supported.
     //
-    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-    if (RegEax >= 0x80000008) {
-      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-      PhysicalAddressBits = (UINT8) RegEax;
+    Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
+    if (Hob != NULL) {
+      PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
     } else {
-      PhysicalAddressBits = 36;
+      AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+      if (RegEax >= 0x80000008) {
+        AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+        PhysicalAddressBits = (UINT8) RegEax;
+      } else {
+        PhysicalAddressBits = 36;
+      }
     }
     
+    //
+    // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
+    //
+    ASSERT (PhysicalAddressBits <= 52);
+    if (PhysicalAddressBits > 48) {
+      PhysicalAddressBits = 48;
+    }
+
     //
     // Calculate the table entries needed.
     //
     if (PhysicalAddressBits <= 39) {
       NumberOfPml4EntriesNeeded = 1;
-      NumberOfPdpEntriesNeeded = LShiftU64 (1, (PhysicalAddressBits - 30));
+      NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 30));
     } else {
-      NumberOfPml4EntriesNeeded = LShiftU64 (1, (PhysicalAddressBits - 39));
+      NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 39));
       NumberOfPdpEntriesNeeded = 512;
     }
     
@@ -526,30 +577,45 @@ RestoreS3PageTables (
       PageMapLevel4Entry->Uint64 = (UINT64)(UINTN)PageDirectoryPointerEntry;
       PageMapLevel4Entry->Bits.ReadWrite = 1;
       PageMapLevel4Entry->Bits.Present = 1;
-    
-      for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
-        //
-        // Each Directory Pointer entries points to a page of Page Directory entires.
-        // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
-        //       
-        PageDirectoryEntry = (PAGE_TABLE_ENTRY *)S3NvsPageTableAddress;
+
+      if (Page1GSupport) {
+        PageDirectory1GEntry = (VOID *) S3NvsPageTableAddress;
         S3NvsPageTableAddress += SIZE_4KB;
     
-        //
-        // Fill in a Page Directory Pointer Entries
-        //
-        PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry;
-        PageDirectoryPointerEntry->Bits.ReadWrite = 1;
-        PageDirectoryPointerEntry->Bits.Present = 1;
-    
-        for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
+        for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
           //
           // Fill in the Page Directory entries
           //
-          PageDirectoryEntry->Uint64 = (UINT64)PageAddress;
-          PageDirectoryEntry->Bits.ReadWrite = 1;
-          PageDirectoryEntry->Bits.Present = 1;
-          PageDirectoryEntry->Bits.MustBe1 = 1;
+          PageDirectory1GEntry->Uint64 = (UINT64)PageAddress;
+          PageDirectory1GEntry->Bits.ReadWrite = 1;
+          PageDirectory1GEntry->Bits.Present = 1;
+          PageDirectory1GEntry->Bits.MustBe1 = 1;
+        }
+      } else {
+        for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
+          //
+          // Each Directory Pointer entries points to a page of Page Directory entires.
+          // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
+          //       
+          PageDirectoryEntry = (PAGE_TABLE_ENTRY *)S3NvsPageTableAddress;
+          S3NvsPageTableAddress += SIZE_4KB;
+    
+          //
+          // Fill in a Page Directory Pointer Entries
+          //
+          PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry;
+          PageDirectoryPointerEntry->Bits.ReadWrite = 1;
+          PageDirectoryPointerEntry->Bits.Present = 1;
+    
+          for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
+            //
+            // Fill in the Page Directory entries
+            //
+            PageDirectoryEntry->Uint64 = (UINT64)PageAddress;
+            PageDirectoryEntry->Bits.ReadWrite = 1;
+            PageDirectoryEntry->Bits.Present = 1;
+            PageDirectoryEntry->Bits.MustBe1 = 1;
+          }
         }
       }
     }

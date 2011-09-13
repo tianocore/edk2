@@ -53,20 +53,38 @@ CalculatePageTableSize (
   VOID
   )
 {
+  UINT32                                        RegEax;
+  UINT32                                        RegEdx;
   UINTN                                         TotalPagesNum;
   UINT8                                         PhysicalAddressBits;
   VOID                                          *Hob;
   UINT32                                        NumberOfPml4EntriesNeeded;
   UINT32                                        NumberOfPdpEntriesNeeded;
+  BOOLEAN                                       Page1GSupport;
+
+  Page1GSupport = FALSE;
+  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+  if (RegEax >= 0x80000001) {
+    AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+    if ((RegEdx & BIT26) != 0) {
+      Page1GSupport = TRUE;
+    }
+  }
 
   //
-  // Get physical address bits supported from CPU HOB.
+  // Get physical address bits supported.
   //
-  PhysicalAddressBits = 36;
-  
   Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
   if (Hob != NULL) {
     PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
+  } else {
+    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= 0x80000008) {
+      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+      PhysicalAddressBits = (UINT8) RegEax;
+    } else {
+      PhysicalAddressBits = 36;
+    }
   }
 
   //
@@ -82,13 +100,17 @@ CalculatePageTableSize (
   //
   if (PhysicalAddressBits <= 39 ) {
     NumberOfPml4EntriesNeeded = 1;
-    NumberOfPdpEntriesNeeded =  1 << (PhysicalAddressBits - 30);
+    NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 30));
   } else {
-    NumberOfPml4EntriesNeeded = 1 << (PhysicalAddressBits - 39);
+    NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 39));
     NumberOfPdpEntriesNeeded = 512;
   }
 
-  TotalPagesNum = (NumberOfPdpEntriesNeeded + 1) * NumberOfPml4EntriesNeeded + 1;
+  if (!Page1GSupport) {
+    TotalPagesNum = (NumberOfPdpEntriesNeeded + 1) * NumberOfPml4EntriesNeeded + 1;
+  } else {
+    TotalPagesNum = NumberOfPml4EntriesNeeded + 1;
+  }
 
   return EFI_PAGES_TO_SIZE (TotalPagesNum);
 }
@@ -118,15 +140,32 @@ CreateIdentityMappingPageTables (
   PAGE_TABLE_ENTRY                              *PageDirectoryEntry;
   UINTN                                         BigPageAddress;
   VOID                                          *Hob;
+  BOOLEAN                                       Page1GSupport;
+  PAGE_TABLE_1G_ENTRY                           *PageDirectory1GEntry;
+
+  Page1GSupport = FALSE;
+  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+  if (RegEax >= 0x80000001) {
+    AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+    if ((RegEdx & BIT26) != 0) {
+      Page1GSupport = TRUE;
+    }
+  }
 
   //
-  // Get physical address bits supported from CPU HOB.
+  // Get physical address bits supported.
   //
-  PhysicalAddressBits = 36;
-  
   Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
   if (Hob != NULL) {
     PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
+  } else {
+    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= 0x80000008) {
+      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+      PhysicalAddressBits = (UINT8) RegEax;
+    } else {
+      PhysicalAddressBits = 36;
+    }
   }
 
   //
@@ -142,9 +181,9 @@ CreateIdentityMappingPageTables (
   //
   if (PhysicalAddressBits <= 39 ) {
     NumberOfPml4EntriesNeeded = 1;
-    NumberOfPdpEntriesNeeded =  1 << (PhysicalAddressBits - 30);
+    NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 30));
   } else {
-    NumberOfPml4EntriesNeeded = 1 << (PhysicalAddressBits - 39);
+    NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 39));
     NumberOfPdpEntriesNeeded = 512;
   }
 
@@ -157,7 +196,7 @@ CreateIdentityMappingPageTables (
   // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
   //
   PageMap         = (VOID *) BigPageAddress;
-  BigPageAddress += EFI_PAGE_SIZE;
+  BigPageAddress += SIZE_4KB;
 
   PageMapLevel4Entry = PageMap;
   PageAddress        = 0;
@@ -167,7 +206,7 @@ CreateIdentityMappingPageTables (
     // So lets allocate space for them and fill them in in the IndexOfPdpEntries loop.
     //
     PageDirectoryPointerEntry = (VOID *) BigPageAddress;
-    BigPageAddress += EFI_PAGE_SIZE;
+    BigPageAddress += SIZE_4KB;
 
     //
     // Make a PML4 Entry
@@ -176,44 +215,63 @@ CreateIdentityMappingPageTables (
     PageMapLevel4Entry->Bits.ReadWrite = 1;
     PageMapLevel4Entry->Bits.Present = 1;
 
-    for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
-      //
-      // Each Directory Pointer entries points to a page of Page Directory entires.
-      // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
-      //       
-      PageDirectoryEntry = (VOID *) BigPageAddress;
-      BigPageAddress += EFI_PAGE_SIZE;
-
-      //
-      // Fill in a Page Directory Pointer Entries
-      //
-      PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry;
-      PageDirectoryPointerEntry->Bits.ReadWrite = 1;
-      PageDirectoryPointerEntry->Bits.Present = 1;
-
-      for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += 0x200000) {
+    if (Page1GSupport) {
+      PageDirectory1GEntry = (VOID *) BigPageAddress;
+      BigPageAddress += SIZE_4KB;
+    
+      for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
         //
         // Fill in the Page Directory entries
         //
-        PageDirectoryEntry->Uint64 = (UINT64)PageAddress;
-        PageDirectoryEntry->Bits.ReadWrite = 1;
-        PageDirectoryEntry->Bits.Present = 1;
-        PageDirectoryEntry->Bits.MustBe1 = 1;
+        PageDirectory1GEntry->Uint64 = (UINT64)PageAddress;
+        PageDirectory1GEntry->Bits.ReadWrite = 1;
+        PageDirectory1GEntry->Bits.Present = 1;
+        PageDirectory1GEntry->Bits.MustBe1 = 1;
+      }
+    } else {
+      for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
+        //
+        // Each Directory Pointer entries points to a page of Page Directory entires.
+        // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
+        //       
+        PageDirectoryEntry = (VOID *) BigPageAddress;
+        BigPageAddress += SIZE_4KB;
 
+        //
+        // Fill in a Page Directory Pointer Entries
+        //
+        PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry;
+        PageDirectoryPointerEntry->Bits.ReadWrite = 1;
+        PageDirectoryPointerEntry->Bits.Present = 1;
+
+        for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
+          //
+          // Fill in the Page Directory entries
+          //
+          PageDirectoryEntry->Uint64 = (UINT64)PageAddress;
+          PageDirectoryEntry->Bits.ReadWrite = 1;
+          PageDirectoryEntry->Bits.Present = 1;
+          PageDirectoryEntry->Bits.MustBe1 = 1;
+        }
+      }
+
+      for (; IndexOfPdpEntries < 512; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
+        ZeroMem (
+          PageDirectoryPointerEntry,
+          sizeof(PAGE_MAP_AND_DIRECTORY_POINTER)
+          );
       }
     }
   }
 
   //
   // For the PML4 entries we are not using fill in a null entry.
-  // For now we just copy the first entry.
   //
   for (; IndexOfPml4Entries < 512; IndexOfPml4Entries++, PageMapLevel4Entry++) {
-     CopyMem (
-       PageMapLevel4Entry,
-       PageMap,
-       sizeof (PAGE_MAP_AND_DIRECTORY_POINTER)
-       );
+    ZeroMem (
+      PageMapLevel4Entry,
+      sizeof (PAGE_MAP_AND_DIRECTORY_POINTER)
+      );
   }
 }
 

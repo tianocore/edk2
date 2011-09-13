@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/HobLib.h>
 #include <Library/LockBoxLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
@@ -201,46 +202,76 @@ S3CreateIdentityMappingPageTables (
 {  
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     UINT32                                        RegEax;
+    UINT32                                        RegEdx;
     UINT8                                         PhysicalAddressBits;
     EFI_PHYSICAL_ADDRESS                          PageAddress;
     UINTN                                         IndexOfPml4Entries;
     UINTN                                         IndexOfPdpEntries;
     UINTN                                         IndexOfPageDirectoryEntries;
-    UINTN                                         NumberOfPml4EntriesNeeded;
-    UINTN                                         NumberOfPdpEntriesNeeded;
+    UINT32                                        NumberOfPml4EntriesNeeded;
+    UINT32                                        NumberOfPdpEntriesNeeded;
     PAGE_MAP_AND_DIRECTORY_POINTER                *PageMapLevel4Entry;
     PAGE_MAP_AND_DIRECTORY_POINTER                *PageMap;
     PAGE_MAP_AND_DIRECTORY_POINTER                *PageDirectoryPointerEntry;
     PAGE_TABLE_ENTRY                              *PageDirectoryEntry;
     EFI_PHYSICAL_ADDRESS                          S3NvsPageTableAddress;
     UINTN                                         TotalPageTableSize;
+    VOID                                          *Hob;
+    BOOLEAN                                       Page1GSupport;
+    PAGE_TABLE_1G_ENTRY                           *PageDirectory1GEntry;
+
+    Page1GSupport = FALSE;
+    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= 0x80000001) {
+      AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+      if ((RegEdx & BIT26) != 0) {
+        Page1GSupport = TRUE;
+      }
+    }
 
     //
     // Get physical address bits supported.
     //
-    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-    if (RegEax >= 0x80000008) {
-      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-      PhysicalAddressBits = (UINT8) RegEax;
+    Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
+    if (Hob != NULL) {
+      PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
     } else {
-      PhysicalAddressBits = 36;
+      AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+      if (RegEax >= 0x80000008) {
+        AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+        PhysicalAddressBits = (UINT8) RegEax;
+      } else {
+        PhysicalAddressBits = 36;
+      }
     }
     
+    //
+    // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
+    //
+    ASSERT (PhysicalAddressBits <= 52);
+    if (PhysicalAddressBits > 48) {
+      PhysicalAddressBits = 48;
+    }
+
     //
     // Calculate the table entries needed.
     //
     if (PhysicalAddressBits <= 39 ) {
       NumberOfPml4EntriesNeeded = 1;
-      NumberOfPdpEntriesNeeded = (UINTN)LShiftU64 (1, (PhysicalAddressBits - 30));
+      NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 30));
     } else {
-      NumberOfPml4EntriesNeeded = (UINTN)LShiftU64 (1, (PhysicalAddressBits - 39));
+      NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 39));
       NumberOfPdpEntriesNeeded = 512;
     }
 
     //
     // We need calculate whole page size then allocate once, because S3 restore page table does not know each page in Nvs.
     //
-    TotalPageTableSize = (UINTN)(1 + NumberOfPml4EntriesNeeded + NumberOfPml4EntriesNeeded * NumberOfPdpEntriesNeeded);
+    if (!Page1GSupport) {
+      TotalPageTableSize = (UINTN)(1 + NumberOfPml4EntriesNeeded + NumberOfPml4EntriesNeeded * NumberOfPdpEntriesNeeded);
+    } else {
+      TotalPageTableSize = (UINTN)(1 + NumberOfPml4EntriesNeeded);
+    }
     DEBUG ((EFI_D_ERROR, "TotalPageTableSize - %x pages\n", TotalPageTableSize));
 
     //
@@ -267,29 +298,44 @@ S3CreateIdentityMappingPageTables (
       PageMapLevel4Entry->Bits.ReadWrite = 1;
       PageMapLevel4Entry->Bits.Present = 1;
     
-      for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
-        //
-        // Each Directory Pointer entries points to a page of Page Directory entires.
-        // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
-        //       
-        PageDirectoryEntry = (PAGE_TABLE_ENTRY *)(UINTN)S3NvsPageTableAddress;
+      if (Page1GSupport) {
+        PageDirectory1GEntry = (VOID *) S3NvsPageTableAddress;
         S3NvsPageTableAddress += SIZE_4KB;
     
-        //
-        // Fill in a Page Directory Pointer Entries
-        //
-        PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry;
-        PageDirectoryPointerEntry->Bits.ReadWrite = 1;
-        PageDirectoryPointerEntry->Bits.Present = 1;
-    
-        for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += 0x200000) {
+        for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
           //
           // Fill in the Page Directory entries
           //
-          PageDirectoryEntry->Uint64 = (UINT64)PageAddress;
-          PageDirectoryEntry->Bits.ReadWrite = 1;
-          PageDirectoryEntry->Bits.Present = 1;
-          PageDirectoryEntry->Bits.MustBe1 = 1;
+          PageDirectory1GEntry->Uint64 = (UINT64)PageAddress;
+          PageDirectory1GEntry->Bits.ReadWrite = 1;
+          PageDirectory1GEntry->Bits.Present = 1;
+          PageDirectory1GEntry->Bits.MustBe1 = 1;
+        }
+      } else {
+        for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
+          //
+          // Each Directory Pointer entries points to a page of Page Directory entires.
+          // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
+          //       
+          PageDirectoryEntry = (PAGE_TABLE_ENTRY *)(UINTN)S3NvsPageTableAddress;
+          S3NvsPageTableAddress += SIZE_4KB;
+      
+          //
+          // Fill in a Page Directory Pointer Entries
+          //
+          PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry;
+          PageDirectoryPointerEntry->Bits.ReadWrite = 1;
+          PageDirectoryPointerEntry->Bits.Present = 1;
+      
+          for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
+            //
+            // Fill in the Page Directory entries
+            //
+            PageDirectoryEntry->Uint64 = (UINT64)PageAddress;
+            PageDirectoryEntry->Bits.ReadWrite = 1;
+            PageDirectoryEntry->Bits.Present = 1;
+            PageDirectoryEntry->Bits.MustBe1 = 1;
+          }
         }
       }
     }
