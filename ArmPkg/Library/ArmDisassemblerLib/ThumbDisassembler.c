@@ -495,7 +495,7 @@ DisassembleThumbInstruction (
   UINT32  Offset;
   UINT16  Rd, Rn, Rm, Rt, Rt2;
   BOOLEAN H1, H2, imod;
-  BOOLEAN ItFlag;
+  //BOOLEAN ItFlag;
   UINT32  PC, Target, msbit, lsbit;
   CHAR8   *Cond;
   BOOLEAN S, J1, J2, P, U, W;
@@ -521,12 +521,12 @@ DisassembleThumbInstruction (
   *OpCodePtrPtr += 1;
   
   // Manage IT Block ItFlag TRUE means we are in an IT block
-  if (*ItBlock != 0) {
+  /*if (*ItBlock != 0) {
     ItFlag = TRUE;
     *ItBlock -= 1;
   } else {
     ItFlag = FALSE;
-  }
+  }*/
 
   for (Index = 0; Index < sizeof (gOpThumb)/sizeof (THUMB_INSTRUCTIONS); Index++) {
     if ((OpCode & gOpThumb[Index].Mask) == gOpThumb[Index].OpCode) {
