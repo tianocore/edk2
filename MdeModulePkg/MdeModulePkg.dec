@@ -89,6 +89,10 @@
   ##  @libraryclass  Provide platform specific hooks for SMM core.
   #
   SmmCorePlatformHookLib|Include/Library/SmmCorePlatformHookLib.h
+
+  ##  @libraryclass  Provide capability to maintain the data integrity cross S3 phase.
+  #
+  LockBoxLib|Include/Library/LockBoxLib.h
   
 [Guids]
   ## MdeModule package token space guid
