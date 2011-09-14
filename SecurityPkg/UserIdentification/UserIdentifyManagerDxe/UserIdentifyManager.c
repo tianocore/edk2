@@ -2319,7 +2319,7 @@ GetIdentifyType (
   Identify the User by the specfied provider.
 
   @param[in]  User                Handle of a user profile.
-  @param[in]  Provider            Points to the identifir of credential provider.
+  @param[in]  Provider            Points to the identifier of credential provider.
 
   @retval EFI_INVALID_PARAMETER   Provider is NULL.
   @retval EFI_NOT_FOUND           Fail to identify the specified user.
@@ -2340,7 +2340,6 @@ IdentifyByProviderId (
   EFI_GUID                      FormSetId;
   EFI_FORM_ID                   FormId;
   EFI_USER_CREDENTIAL_PROTOCOL  *UserCredential;
-  EFI_USER_INFO                 *IdInfo;
 
   if (Provider == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2398,24 +2397,7 @@ IdentifyByProviderId (
       if (EFI_ERROR (Status)) {
         return Status;
       }
-
-      if (User == NULL) {
-        return EFI_SUCCESS;
-      }
       
-      //
-      // Get user ID information.
-      //
-      IdInfo  = NULL;
-      Status  = FindUserInfoByType (User, &IdInfo, EFI_USER_INFO_IDENTIFIER_RECORD);
-      ASSERT (IdInfo != NULL);
-
-      if (CompareMem ((UINT8 *) (IdInfo + 1), UserId, sizeof (EFI_USER_INFO_IDENTIFIER)) != 0) {
-        //
-        // One user name is selected, but the other's credential is given. Here no user passed.
-        //
-        break;
-      }
       return EFI_SUCCESS;
     }
   }

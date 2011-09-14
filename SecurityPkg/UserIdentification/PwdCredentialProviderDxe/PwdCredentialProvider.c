@@ -1061,17 +1061,8 @@ CredentialUser (
     }
   }
 
-  //
-  // The User's password doesn't match the input password.
-  // Return the user ID whose password matches the input password.
-  //
-  CopyMem (
-    Identifier,
-    &mPwdTable->UserInfo[mPwdTable->ValidIndex - 1].UserId,
-    sizeof (EFI_USER_INFO_IDENTIFIER)
-    );
   FreePool (UserInfo);  
-  return EFI_SUCCESS;
+  return EFI_NOT_READY;
 }
 
 

@@ -1,7 +1,7 @@
 /** @file
   Usb Credential Provider driver implemenetation.
     
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -1037,25 +1037,10 @@ CredentialUser (
       } 
     }
   }
-  FreePool (UserInfo);
-  
-  //
-  // The read token mismatch with the User's Token.
-  // Only check token.
-  //
-  for (Index = 0; Index < mUsbTable->Count; Index++) {
-    UserToken = mUsbTable->UserInfo[Index].Token;
-    if (CompareMem (UserToken, ReadToken, HASHED_CREDENTIAL_LEN) == 0) {
-      //
-      // The read token matches with the one in UsbTable.
-      //
-      UserId = (UINT8 *) &mUsbTable->UserInfo[Index].UserId;
-      CopyMem (Identifier, UserId, sizeof (EFI_USER_INFO_IDENTIFIER));
-      return EFI_SUCCESS;
-    } 
-  }
-  
-  return EFI_NOT_FOUND;
+
+  FreePool (UserInfo); 
+    
+  return EFI_NOT_READY;
 }
 
 
