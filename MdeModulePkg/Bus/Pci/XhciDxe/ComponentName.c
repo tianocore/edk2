@@ -175,7 +175,7 @@ XhciComponentNameGetControllerName (
 {
   EFI_STATUS           Status;
   EFI_USB2_HC_PROTOCOL *Usb2Hc;
-  USB_XHCI_DEV         *XhciDev;
+  USB_XHCI_INSTANCE    *XhciDev;
 
   //
   // This is a device driver, so ChildHandle must be NULL.

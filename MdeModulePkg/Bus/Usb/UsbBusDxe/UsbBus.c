@@ -45,8 +45,6 @@ EFI_DRIVER_BINDING_PROTOCOL mUsbBusDriverBinding = {
   NULL
 };
 
-UINT16 mMaxUsbDeviceNum = USB_MAX_DEVICES;
-
 /**
   USB_IO function to execute a control transfer. This
   function will execute the USB transfer. If transfer
@@ -112,7 +110,7 @@ UsbIoControlTransfer (
     // Clear TT buffer when CTRL/BULK split transaction failes
     // Clear the TRANSLATOR TT buffer, not parent's buffer
     //
-    ASSERT (Dev->Translator.TranslatorHubAddress < mMaxUsbDeviceNum);
+    ASSERT (Dev->Translator.TranslatorHubAddress < Dev->Bus->MaxDevices);
     if (Dev->Translator.TranslatorHubAddress != 0) {
       UsbHubCtrlClearTTBuffer (
         Dev->Bus->Devices[Dev->Translator.TranslatorHubAddress],
@@ -285,7 +283,7 @@ UsbIoBulkTransfer (
     // Clear TT buffer when CTRL/BULK split transaction failes.
     // Clear the TRANSLATOR TT buffer, not parent's buffer
     //
-    ASSERT (Dev->Translator.TranslatorHubAddress < mMaxUsbDeviceNum);
+    ASSERT (Dev->Translator.TranslatorHubAddress < Dev->Bus->MaxDevices);
     if (Dev->Translator.TranslatorHubAddress != 0) {
       UsbHubCtrlClearTTBuffer (
         Dev->Bus->Devices[Dev->Translator.TranslatorHubAddress],
@@ -913,8 +911,9 @@ UsbBusBuildProtocol (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  UsbBus->Signature   = USB_BUS_SIGNATURE;
-  UsbBus->HostHandle  = Controller;
+  UsbBus->Signature  = USB_BUS_SIGNATURE;
+  UsbBus->HostHandle = Controller;
+  UsbBus->MaxDevices = USB_MAX_DEVICES;
 
   Status = gBS->OpenProtocol (
                   Controller,
@@ -966,12 +965,12 @@ UsbBusBuildProtocol (
   }
 
   if (!EFI_ERROR (Status)) {
+    //
+    // The EFI_USB2_HC_PROTOCOL is produced for XHCI support.
+    // Then its max supported devices are 256. Otherwise it's 128.
+    //
     if (UsbBus->Usb2Hc->MajorRevision == 0x3) {
-      //
-      // The EFI_USB2_HC_PROTOCOL is produced for XHCI support.
-      // Then its max supported devices are 256.
-      //
-      mMaxUsbDeviceNum = 256;
+      UsbBus->MaxDevices = 256;
     }
   }
 
@@ -1444,7 +1443,8 @@ UsbBusControllerDriverStop (
 
   mUsbRootHubApi.Release (RootIf);
 
-  for (Index = 1; Index < mMaxUsbDeviceNum; Index++) {
+  ASSERT (Bus->MaxDevices <= 256);
+  for (Index = 1; Index < Bus->MaxDevices; Index++) {
     if (Bus->Devices[Index] != NULL) {
       UsbRemoveDevice (Bus->Devices[Index]);
     }

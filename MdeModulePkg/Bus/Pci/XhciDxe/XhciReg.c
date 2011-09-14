@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Read 1-byte width XHCI capability register.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the 1-byte width capability register.
 
   @return The register content read.
@@ -27,7 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 UINT8
 XhcReadCapReg8 (
-  IN  USB_XHCI_DEV        *Xhc,
+  IN  USB_XHCI_INSTANCE   *Xhc,
   IN  UINT32              Offset
   )
 {
@@ -54,7 +54,7 @@ XhcReadCapReg8 (
 /**
   Read 4-bytes width XHCI capability register.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the 4-bytes width capability register.
 
   @return The register content read.
@@ -63,7 +63,7 @@ XhcReadCapReg8 (
 **/
 UINT32
 XhcReadCapReg (
-  IN  USB_XHCI_DEV        *Xhc,
+  IN  USB_XHCI_INSTANCE   *Xhc,
   IN  UINT32              Offset
   )
 {
@@ -90,7 +90,7 @@ XhcReadCapReg (
 /**
   Read 4-bytes width XHCI Operational register.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the 4-bytes width operational register.
 
   @return The register content read.
@@ -99,7 +99,7 @@ XhcReadCapReg (
 **/
 UINT32
 XhcReadOpReg (
-  IN  USB_XHCI_DEV        *Xhc,
+  IN  USB_XHCI_INSTANCE   *Xhc,
   IN  UINT32              Offset
   )
 {
@@ -128,14 +128,14 @@ XhcReadOpReg (
 /**
   Write the data to the 4-bytes width XHCI operational register.
 
-  @param  Xhc      The XHCI device.
+  @param  Xhc      The XHCI Instance.
   @param  Offset   The offset of the 4-bytes width operational register.
   @param  Data     The data to write.
 
 **/
 VOID
 XhcWriteOpReg (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Offset,
   IN UINT32               Data
   )
@@ -161,14 +161,14 @@ XhcWriteOpReg (
 /**
   Write the data to the 2-bytes width XHCI operational register.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the 2-bytes width operational register.
   @param  Data         The data to write.
 
 **/
 VOID
 XhcWriteOpReg16 (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Offset,
   IN UINT16               Data
   )
@@ -194,14 +194,14 @@ XhcWriteOpReg16 (
 /**
   Write the data to the 8-bytes width XHCI operational register.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the 8-bytes width operational register.
   @param  Data         The data to write.
 
 **/
 VOID
 XhcWriteOpReg64 (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Offset,
   IN UINT64               Data
   )
@@ -227,7 +227,7 @@ XhcWriteOpReg64 (
 /**
   Read XHCI door bell register.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the door bell register.
 
   @return The register content read
@@ -235,7 +235,7 @@ XhcWriteOpReg64 (
 **/
 UINT32
 XhcReadDoorBellReg (
-  IN  USB_XHCI_DEV        *Xhc,
+  IN  USB_XHCI_INSTANCE   *Xhc,
   IN  UINT32              Offset
   )
 {
@@ -264,14 +264,14 @@ XhcReadDoorBellReg (
 /**
   Write the data to the XHCI door bell register.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the door bell register.
   @param  Data         The data to write.
 
 **/
 VOID
 XhcWriteDoorBellReg (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Offset,
   IN UINT32               Data
   )
@@ -297,7 +297,7 @@ XhcWriteDoorBellReg (
 /**
   Read XHCI runtime register.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the runtime register.
 
   @return The register content read
@@ -305,7 +305,7 @@ XhcWriteDoorBellReg (
 **/
 UINT32
 XhcReadRuntimeReg (
-  IN  USB_XHCI_DEV        *Xhc,
+  IN  USB_XHCI_INSTANCE   *Xhc,
   IN  UINT32              Offset
   )
 {
@@ -334,7 +334,7 @@ XhcReadRuntimeReg (
 /**
   Read 8-bytes width XHCI runtime register.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the 8-bytes width runtime register.
 
   @return The register content read
@@ -342,7 +342,7 @@ XhcReadRuntimeReg (
 **/
 UINT64
 XhcReadRuntimeReg64 (
-  IN  USB_XHCI_DEV        *Xhc,
+  IN  USB_XHCI_INSTANCE   *Xhc,
   IN  UINT32              Offset
   )
 {
@@ -371,14 +371,14 @@ XhcReadRuntimeReg64 (
 /**
   Write the data to the XHCI runtime register.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the runtime register.
   @param  Data         The data to write.
 
 **/
 VOID
 XhcWriteRuntimeReg (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Offset,
   IN UINT32               Data
   )
@@ -404,14 +404,14 @@ XhcWriteRuntimeReg (
 /**
   Write the data to the 8-bytes width XHCI runtime register.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the 8-bytes width runtime register.
   @param  Data         The data to write.
 
 **/
 VOID
 XhcWriteRuntimeReg64 (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Offset,
   IN UINT64               Data
   )
@@ -437,7 +437,7 @@ XhcWriteRuntimeReg64 (
 /**
   Read XHCI extended capability register.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the extended capability register.
 
   @return The register content read
@@ -445,7 +445,7 @@ XhcWriteRuntimeReg64 (
 **/
 UINT32
 XhcReadExtCapReg (
-  IN  USB_XHCI_DEV        *Xhc,
+  IN  USB_XHCI_INSTANCE   *Xhc,
   IN  UINT32              Offset
   )
 {
@@ -474,14 +474,14 @@ XhcReadExtCapReg (
 /**
   Write the data to the XHCI extended capability register.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the extended capability register.
   @param  Data         The data to write.
 
 **/
 VOID
 XhcWriteExtCapReg (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Offset,
   IN UINT32               Data
   )
@@ -508,14 +508,14 @@ XhcWriteExtCapReg (
 /**
   Set one bit of the runtime register while keeping other bits.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the runtime register.
   @param  Bit          The bit mask of the register to set.
 
 **/
 VOID
 XhcSetRuntimeRegBit (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Offset,
   IN UINT32               Bit
   )
@@ -530,14 +530,14 @@ XhcSetRuntimeRegBit (
 /**
   Clear one bit of the runtime register while keeping other bits.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the runtime register.
   @param  Bit          The bit mask of the register to set.
 
 **/
 VOID
 XhcClearRuntimeRegBit (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Offset,
   IN UINT32               Bit
   )
@@ -552,14 +552,14 @@ XhcClearRuntimeRegBit (
 /**
   Set one bit of the operational register while keeping other bits.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the operational register.
   @param  Bit          The bit mask of the register to set.
 
 **/
 VOID
 XhcSetOpRegBit (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Offset,
   IN UINT32               Bit
   )
@@ -575,14 +575,14 @@ XhcSetOpRegBit (
 /**
   Clear one bit of the operational register while keeping other bits.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the operational register.
   @param  Bit          The bit mask of the register to clear.
 
 **/
 VOID
 XhcClearOpRegBit (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Offset,
   IN UINT32               Bit
   )
@@ -598,7 +598,7 @@ XhcClearOpRegBit (
   Wait the operation register's bit as specified by Bit
   to become set (or clear).
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Offset       The offset of the operation register.
   @param  Bit          The bit of the register to wait for.
   @param  WaitToSet    Wait the bit to set or clear.
@@ -610,7 +610,7 @@ XhcClearOpRegBit (
 **/
 EFI_STATUS
 XhcWaitOpRegBit (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Offset,
   IN UINT32               Bit,
   IN BOOLEAN              WaitToSet,
@@ -618,13 +618,16 @@ XhcWaitOpRegBit (
   )
 {
   UINT32                  Index;
+  UINTN                   Loop;
 
-  for (Index = 0; Index < Timeout / XHC_SYNC_POLL_INTERVAL + 1; Index++) {
+  Loop   = (Timeout * XHC_1_MILLISECOND / XHC_POLL_DELAY) + 1;
+
+  for (Index = 0; Index < Loop; Index++) {
     if (XHC_REG_BIT_IS_SET (Xhc, Offset, Bit) == WaitToSet) {
       return EFI_SUCCESS;
     }
 
-    gBS->Stall (XHC_SYNC_POLL_INTERVAL);
+    gBS->Stall (XHC_POLL_DELAY);
   }
 
   return EFI_TIMEOUT;
@@ -633,12 +636,12 @@ XhcWaitOpRegBit (
 /**
   Set Bios Ownership
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
 
 **/
 VOID
 XhcSetBiosOwnership (
-  IN USB_XHCI_DEV         *Xhc
+  IN USB_XHCI_INSTANCE    *Xhc
   )
 {
   UINT32                    Buffer;
@@ -653,12 +656,12 @@ XhcSetBiosOwnership (
 /**
   Clear Bios Ownership
 
-  @param  Xhc       The XHCI device.
+  @param  Xhc       The XHCI Instance.
 
 **/
 VOID
 XhcClearBiosOwnership (
-  IN USB_XHCI_DEV         *Xhc
+  IN USB_XHCI_INSTANCE    *Xhc
   )
 {
   UINT32                    Buffer;
@@ -673,14 +676,14 @@ XhcClearBiosOwnership (
 /**
   Calculate the XHCI legacy support capability register offset.
 
-  @param  Xhc     The XHCI device.
+  @param  Xhc     The XHCI Instance.
 
   @return The offset of XHCI legacy support capability register.
 
 **/
 UINT32
 XhcGetLegSupCapAddr (
-  IN USB_XHCI_DEV         *Xhc
+  IN USB_XHCI_INSTANCE    *Xhc
   )
 {
   UINT32 ExtCapOffset;
@@ -710,7 +713,7 @@ XhcGetLegSupCapAddr (
 /**
   Whether the XHCI host controller is halted.
 
-  @param  Xhc     The XHCI device.
+  @param  Xhc     The XHCI Instance.
 
   @retval TRUE    The controller is halted.
   @retval FALSE   It isn't halted.
@@ -718,7 +721,7 @@ XhcGetLegSupCapAddr (
 **/
 BOOLEAN
 XhcIsHalt (
-  IN USB_XHCI_DEV         *Xhc
+  IN USB_XHCI_INSTANCE    *Xhc
   )
 {
   return XHC_REG_BIT_IS_SET (Xhc, XHC_USBSTS_OFFSET, XHC_USBSTS_HALT);
@@ -728,7 +731,7 @@ XhcIsHalt (
 /**
   Whether system error occurred.
 
-  @param  Xhc      The XHCI device.
+  @param  Xhc      The XHCI Instance.
 
   @retval TRUE     System error happened.
   @retval FALSE    No system error.
@@ -736,7 +739,7 @@ XhcIsHalt (
 **/
 BOOLEAN
 XhcIsSysError (
-  IN USB_XHCI_DEV         *Xhc
+  IN USB_XHCI_INSTANCE    *Xhc
   )
 {
   return XHC_REG_BIT_IS_SET (Xhc, XHC_USBSTS_OFFSET, XHC_USBSTS_HSE);
@@ -745,7 +748,7 @@ XhcIsSysError (
 /**
   Reset the XHCI host controller.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Timeout      Time to wait before abort (in millisecond, ms).
 
   @retval EFI_SUCCESS  The XHCI host controller is reset.
@@ -754,7 +757,7 @@ XhcIsSysError (
 **/
 EFI_STATUS
 XhcResetHC (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Timeout
   )
 {
@@ -781,7 +784,7 @@ XhcResetHC (
 /**
   Halt the XHCI host controller.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Timeout      Time to wait before abort (in millisecond, ms).
 
   @return EFI_SUCCESS  The XHCI host controller is halt.
@@ -790,7 +793,7 @@ XhcResetHC (
 **/
 EFI_STATUS
 XhcHaltHC (
-  IN USB_XHCI_DEV        *Xhc,
+  IN USB_XHCI_INSTANCE   *Xhc,
   IN UINT32              Timeout
   )
 {
@@ -805,7 +808,7 @@ XhcHaltHC (
 /**
   Set the XHCI host controller to run.
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
   @param  Timeout      Time to wait before abort (in millisecond, ms).
 
   @return EFI_SUCCESS  The XHCI host controller is running.
@@ -814,7 +817,7 @@ XhcHaltHC (
 **/
 EFI_STATUS
 XhcRunHC (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Timeout
   )
 {

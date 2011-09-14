@@ -82,15 +82,29 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define TRB_COMPLETION_SHORT_PACKET           13
 
 //
-// USB device RouteChart record
+// The topology string used to present usb device location
 //
-typedef union _USB_DEV_TOPOLOGY {
-  UINT32 Dword;
-  struct {
-    UINT32 RouteString:20; ///< The tier concatenation of down stream port
-    UINT32 RootPortNum:8;  ///< The root port number of the chain
-    UINT32 TierNum:4;      ///< The Tier the device reside
-  } Field;
+typedef struct _USB_DEV_TOPOLOGY {
+  //
+  // The tier concatenation of down stream port.
+  //
+  UINT32 RouteString:20;
+  //
+  // The root port number of the chain.
+  //
+  UINT32 RootPortNum:8;
+  //
+  // The Tier the device reside.
+  //
+  UINT32 TierNum:4;
+} USB_DEV_TOPOLOGY;
+
+//
+// USB Device's RouteChart
+//
+typedef union _USB_DEV_ROUTE {
+  UINT32              Dword;
+  USB_DEV_TOPOLOGY    Route;
 } USB_DEV_ROUTE;
 
 //
@@ -106,23 +120,26 @@ typedef struct _USB_ENDPOINT {
 } USB_ENDPOINT;
 
 //
-// Command TRB
+// TRB Template
 //
-typedef struct _TRB {
-  UINT32                    Dword1;
-  UINT32                    Dword2;
-  UINT32                    Dword3;
+typedef struct _TRB_TEMPLATE {
+  UINT32                    Parameter1;
+
+  UINT32                    Parameter2;
+
+  UINT32                    Status;
+
   UINT32                    CycleBit:1;
   UINT32                    RsvdZ1:9;
   UINT32                    Type:6;
-  UINT32                    RsvdZ2:16;
-} TRB;
+  UINT32                    Control:16;
+} TRB_TEMPLATE;
 
 typedef struct _TRANSFER_RING {
   VOID                      *RingSeg0;
   UINTN                     TrbNumber;
-  TRB                       *RingEnqueue;
-  TRB                       *RingDequeue;
+  TRB_TEMPLATE              *RingEnqueue;
+  TRB_TEMPLATE              *RingDequeue;
   UINT32                    RingPCS;
 } TRANSFER_RING;
 
@@ -131,8 +148,8 @@ typedef struct _EVENT_RING {
   VOID                      *ERSTBase;
   VOID                      *EventRingSeg0;
   UINTN                     TrbNumber;
-  TRB                       *EventRingEnqueue;
-  TRB                       *EventRingDequeue;
+  TRB_TEMPLATE              *EventRingEnqueue;
+  TRB_TEMPLATE              *EventRingDequeue;
   UINT32                    EventRingCCS;
 } EVENT_RING;
 
@@ -164,39 +181,12 @@ typedef struct _URB {
   // Command/Tranfer Ring info
   //
   TRANSFER_RING                   *Ring;
-  TRB                             *TrbStart;
-  TRB                             *TrbEnd;
+  TRB_TEMPLATE                    *TrbStart;
+  TRB_TEMPLATE                    *TrbEnd;
   UINTN                           TrbNum;
   EVENT_RING                      *EvtRing;
-  TRB                             *EvtTrbStart;
+  TRB_TEMPLATE                    *EvtTrbStart;
 } URB;
-
-//
-// 5.5.2 Interrupter Register Set
-//
-typedef struct _INTERRUPTER_REGISTER_SET {
-  UINT32                    InterrupterManagement;
-  UINT32                    InterrupterModeration;
-  UINT32                    RingSegTableSize:16;
-  UINT32                    RsvdZ1:16;
-  UINT32                    RsvdZ2;
-  UINT32                    BasePtrLo;
-  UINT32                    BasePtrHi;
-  UINT32                    DequeLo;
-  UINT32                    DequeHi;
-} INTERRUPTER_REGISTER_SET;
-
-//
-// Host Controller Runtime Registers
-//
-typedef struct _HC_RUNTIME_REGS {
-  UINT32                    MicroframeIndex;
-  UINT32                    RsvdZ1;
-  UINT64                    RsvdZ2;
-  UINT64                    RsvdZ3;
-  UINT64                    RsvdZ4;
-  INTERRUPTER_REGISTER_SET  IR[1];
-} HC_RUNTIME_REGS;
 
 //
 // 6.5 Event Ring Segment Table
@@ -221,10 +211,13 @@ typedef struct _EVENT_RING_SEG_TABLE_ENTRY {
 //
 typedef struct _TRANSFER_TRB_NORMAL {
   UINT32                  TRBPtrLo;
+
   UINT32                  TRBPtrHi;
+
   UINT32                  Lenth:17;
   UINT32                  TDSize:5;
   UINT32                  IntTarget:10;
+
   UINT32                  CycleBit:1;
   UINT32                  ENT:1;
   UINT32                  ISP:1;
@@ -242,7 +235,7 @@ typedef struct _TRANSFER_TRB_NORMAL {
 // 6.4.1.2.1 Setup Stage TRB
 // A Setup Stage TRB is created by system software to initiate a USB Setup packet on a control endpoint.
 //
-typedef struct _TRANSFER_TRB_CONTROL_SETUP{
+typedef struct _TRANSFER_TRB_CONTROL_SETUP {
   UINT32                  bmRequestType:8;
   UINT32                  bRequest:8;
   UINT32                  wValue:16;
@@ -270,10 +263,13 @@ typedef struct _TRANSFER_TRB_CONTROL_SETUP{
 //
 typedef struct _TRANSFER_TRB_CONTROL_DATA {
   UINT32                  TRBPtrLo;
+
   UINT32                  TRBPtrHi;
+
   UINT32                  Lenth:17;
   UINT32                  TDSize:5;
   UINT32                  IntTarget:10;
+
   UINT32                  CycleBit:1;
   UINT32                  ENT:1;
   UINT32                  ISP:1;
@@ -294,8 +290,10 @@ typedef struct _TRANSFER_TRB_CONTROL_DATA {
 typedef struct _TRANSFER_TRB_CONTROL_STATUS {
   UINT32                  RsvdZ1;
   UINT32                  RsvdZ2;
+
   UINT32                  RsvdZ3:22;
   UINT32                  IntTarget:10;
+
   UINT32                  CycleBit:1;
   UINT32                  ENT:1;
   UINT32                  RsvdZ4:2;
@@ -314,15 +312,18 @@ typedef struct _TRANSFER_TRB_CONTROL_STATUS {
 //
 typedef struct _EVT_TRB_TRANSFER {
   UINT32                  TRBPtrLo;
+
   UINT32                  TRBPtrHi;
+
   UINT32                  Lenth:24;
-  UINT32                  Completcode:8;
+  UINT32                  Completecode:8;
+
   UINT32                  CycleBit:1;
   UINT32                  RsvdZ1:1;
   UINT32                  ED:1;
   UINT32                  RsvdZ2:7;
   UINT32                  Type:6;
-  UINT32                  EndpointID:5;
+  UINT32                  EndpointId:5;
   UINT32                  RsvdZ3:3;
   UINT32                  SlotId:8;
 } EVT_TRB_TRANSFER;
@@ -332,42 +333,39 @@ typedef struct _EVT_TRB_TRANSFER {
 // A Command Completion Event TRB shall be generated by the xHC when a command completes on the
 // Command Ring. Refer to section 4.11.4 for more information on the use of Command Completion Events.
 //
-typedef struct _EVT_TRB_COMMAND {
+typedef struct _EVT_TRB_COMMAND_COMPLETION {
   UINT32                  TRBPtrLo;
+
   UINT32                  TRBPtrHi;
+
   UINT32                  RsvdZ2:24;
-  UINT32                  Completcode:8;
+  UINT32                  Completecode:8;
+
   UINT32                  CycleBit:1;
   UINT32                  RsvdZ3:9;
   UINT32                  Type:6;
   UINT32                  VFID:8;
   UINT32                  SlotId:8;
-} EVT_TRB_COMMAND;
+} EVT_TRB_COMMAND_COMPLETION;
 
-//
-// 6.4.2.3 Port Status Change Event TRB
-//
-typedef struct _EVT_TRB_PORT {
-  UINT32                  RsvdZ1:24;
-  UINT32                  PortID:8;
-  UINT32                  RsvdZ2;
-  UINT32                  RsvdZ3:24;
-  UINT32                  Completcode:8;
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ4:9;
-  UINT32                  Type:6;
-  UINT32                  RsvdZ5:16;
-} EVT_TRB_PORT;
+typedef union _TRB {
+  TRB_TEMPLATE                TrbTemplate;
+  TRANSFER_TRB_NORMAL         TrbNormal;
+  TRANSFER_TRB_CONTROL_SETUP  TrbCtrSetup;
+  TRANSFER_TRB_CONTROL_DATA   TrbCtrData;
+  TRANSFER_TRB_CONTROL_STATUS TrbCtrStatus;
+} TRB;
 
 //
 // 6.4.3.1 No Op Command TRB
 // The No Op Command TRB provides a simple means for verifying the operation of the Command Ring
-//  mechanisms offered by the xHCI.
+// mechanisms offered by the xHCI.
 //
 typedef struct _CMD_TRB_NO_OP {
   UINT32                  RsvdZ0;
   UINT32                  RsvdZ1;
   UINT32                  RsvdZ2;
+
   UINT32                  CycleBit:1;
   UINT32                  RsvdZ3:9;
   UINT32                  Type:6;
@@ -379,44 +377,33 @@ typedef struct _CMD_TRB_NO_OP {
 // The Enable Slot Command TRB causes the xHC to select an available Device Slot and return the ID of the
 // selected slot to the host in a Command Completion Event.
 //
-typedef struct _CMD_TRB_EN_SLOT {
+typedef struct _CMD_TRB_ENABLE_SLOT {
   UINT32                  RsvdZ0;
   UINT32                  RsvdZ1;
   UINT32                  RsvdZ2;
+
   UINT32                  CycleBit:1;
   UINT32                  RsvdZ3:9;
   UINT32                  Type:6;
   UINT32                  RsvdZ4:16;
-} CMD_TRB_EN_SLOT;
+} CMD_TRB_ENABLE_SLOT;
 
 //
 // 6.4.3.3 Disable Slot Command TRB
 // The Disable Slot Command TRB releases any bandwidth assigned to the disabled slot and frees any
 // internal xHC resources assigned to the slot.
 //
-typedef struct _CMD_TRB_DIS_SLOT {
+typedef struct _CMD_TRB_DISABLE_SLOT {
   UINT32                  RsvdZ0;
   UINT32                  RsvdZ1;
   UINT32                  RsvdZ2;
+
   UINT32                  CycleBit:1;
   UINT32                  RsvdZ3:9;
   UINT32                  Type:6;
   UINT32                  RsvdZ4:8;
   UINT32                  SlotId:8;
-} CMD_TRB_DIS_SLOT;
-
-typedef struct _CMD_TRB_RESET_PORT {
-  UINT32                  RsvdZ0;
-  UINT32                  RsvdZ1;
-  UINT32                  RsvdZ2;
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ3:8;
-  UINT32                  Tsp:1;
-  UINT32                  Type:6;
-  UINT32                  Endpoint:5;
-  UINT32                  RsvdZ4:3;
-  UINT32                  SlotId:8;
-} CMD_TRB_RESET_PORT;
+} CMD_TRB_DISABLE_SLOT;
 
 //
 // 6.4.3.4 Address Device Command TRB
@@ -424,34 +411,40 @@ typedef struct _CMD_TRB_RESET_PORT {
 // Addressed state and causes the xHC to select an address for the USB device in the Default State and
 // issue a SET_ADDRESS request to the USB device.
 //
-typedef struct _CMD_TRB_ADDR_DEV {
+typedef struct _CMD_TRB_ADDRESS_DEVICE {
   UINT32                  PtrLo;
+
   UINT32                  PtrHi;
+
   UINT32                  RsvdZ1;
+
   UINT32                  CycleBit:1;
   UINT32                  RsvdZ2:8;
   UINT32                  BSR:1;
   UINT32                  Type:6;
   UINT32                  RsvdZ3:8;
   UINT32                  SlotId:8;
-} CMD_TRB_ADDR_DEV;
+} CMD_TRB_ADDRESS_DEVICE;
 
 //
 // 6.4.3.5 Configure Endpoint Command TRB
 // The Configure Endpoint Command TRB evaluates the bandwidth and resource requirements of the
 // endpoints selected by the command.
 //
-typedef struct _CMD_CFG_ED {
+typedef struct _CMD_TRB_CONFIG_ENDPOINT {
   UINT32                  PtrLo;
+
   UINT32                  PtrHi;
+
   UINT32                  RsvdZ1;
+
   UINT32                  CycleBit:1;
   UINT32                  RsvdZ2:8;
   UINT32                  DC:1;
   UINT32                  Type:6;
   UINT32                  RsvdZ3:8;
   UINT32                  SlotId:8;
-} CMD_CFG_ED;
+} CMD_TRB_CONFIG_ENDPOINT;
 
 //
 // 6.4.3.6 Evaluate Context Command TRB
@@ -459,25 +452,29 @@ typedef struct _CMD_CFG_ED {
 // Context data structures in the Device Context have been modified by system software and that the xHC
 // shall evaluate any changes
 //
-typedef struct _CMD_TRB_EVALU_CONTX {
+typedef struct _CMD_TRB_EVALUATE_CONTEXT {
   UINT32                  PtrLo;
+
   UINT32                  PtrHi;
+
   UINT32                  RsvdZ1;
+
   UINT32                  CycleBit:1;
   UINT32                  RsvdZ2:9;
   UINT32                  Type:6;
   UINT32                  RsvdZ3:8;
   UINT32                  SlotId:8;
-} CMD_TRB_EVALU_CONTX;
+} CMD_TRB_EVALUATE_CONTEXT;
 
 //
 // 6.4.3.7 Reset Endpoint Command TRB
 // The Reset Endpoint Command TRB is used by system software to reset a specified Transfer Ring
 //
-typedef struct _CMD_TRB_RESET_ED {
+typedef struct _CMD_TRB_RESET_ENDPOINT {
   UINT32                  RsvdZ0;
   UINT32                  RsvdZ1;
   UINT32                  RsvdZ2;
+
   UINT32                  CycleBit:1;
   UINT32                  RsvdZ3:8;
   UINT32                  TSP:1;
@@ -485,17 +482,18 @@ typedef struct _CMD_TRB_RESET_ED {
   UINT32                  EDID:5;
   UINT32                  RsvdZ4:3;
   UINT32                  SlotId:8;
-} CMD_TRB_RESET_ED;
+} CMD_TRB_RESET_ENDPOINT;
 
 //
 // 6.4.3.8 Stop Endpoint Command TRB
 // The Stop Endpoint Command TRB command allows software to stop the xHC execution of the TDs on a
 // Transfer Ring and temporarily take ownership of TDs that had previously been passed to the xHC.
 //
-typedef struct _CMD_TRB_STOP_ED {
+typedef struct _CMD_TRB_STOP_ENDPOINT {
   UINT32                  RsvdZ0;
   UINT32                  RsvdZ1;
   UINT32                  RsvdZ2;
+
   UINT32                  CycleBit:1;
   UINT32                  RsvdZ3:9;
   UINT32                  Type:6;
@@ -503,34 +501,41 @@ typedef struct _CMD_TRB_STOP_ED {
   UINT32                  RsvdZ4:2;
   UINT32                  SP:1;
   UINT32                  SlotId:8;
-} CMD_TRB_STOP_ED;
+} CMD_TRB_STOP_ENDPOINT;
 
 //
 // 6.4.3.9 Set TR Dequeue Pointer Command TRB
 // The Set TR Dequeue Pointer Command TRB is used by system software to modify the TR Dequeue
 // Pointer and DCS fields of an Endpoint or Stream Context.
 //
-typedef struct _CMD_SET_TR_DEQ {
+typedef struct _CMD_SET_TR_DEQ_POINTER {
   UINT32                  PtrLo;
+
   UINT32                  PtrHi;
+
   UINT32                  RsvdZ1:16;
   UINT32                  StreamID:16;
+
   UINT32                  CycleBit:1;
   UINT32                  RsvdZ2:9;
   UINT32                  Type:6;
   UINT32                  Endpoint:5;
   UINT32                  RsvdZ3:3;
   UINT32                  SlotId:8;
-} CMD_SET_TR_DEQ;
+} CMD_SET_TR_DEQ_POINTER;
 
 //
+// 6.4.4.1 Link TRB
 // A Link TRB provides support for non-contiguous TRB Rings.
 //
-typedef struct _LNK_TRB {
+typedef struct _LINK_TRB {
   UINT32                  PtrLo;
+
   UINT32                  PtrHi;
+
   UINT32                  RsvdZ1:22;
   UINT32                  InterTarget:10;
+
   UINT32                  CycleBit:1;
   UINT32                  TC:1;
   UINT32                  RsvdZ2:2;
@@ -539,26 +544,13 @@ typedef struct _LNK_TRB {
   UINT32                  RsvdZ3:4;
   UINT32                  Type:6;
   UINT32                  RsvdZ4:16;
-} LNK_TRB;
-
-//
-// A Link TRB provides support for non-contiguous TRB Rings.
-//
-typedef struct _NO_OP_TRB {
-  UINT32                  RsvdZ0;
-  UINT32                  RsvdZ1;
-  UINT32                  RsvdZ2;
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ3:9;
-  UINT32                  Type:6;
-  UINT32                  RsvdZ4:16;
-} CMD_NO_OP_TRB;
+} LINK_TRB;
 
 //
 // 6.2.2 Slot Context
 //
 typedef struct _SLOT_CONTEXT {
-  UINT32                  RouteStr:20;
+  UINT32                  RouteString:20;
   UINT32                  Speed:4;
   UINT32                  RsvdZ1:1;
   UINT32                  MTT:1;
@@ -651,29 +643,29 @@ typedef struct _INPUT_CONTEXT {
 /**
   Initialize the XHCI host controller for schedule.
 
-  @param  Xhc        The XHCI device to be initialized.
+  @param  Xhc        The XHCI Instance to be initialized.
 
 **/
 VOID
 XhcInitSched (
-  IN USB_XHCI_DEV         *Xhc
+  IN USB_XHCI_INSTANCE    *Xhc
   );
 
 /**
   Free the resouce allocated at initializing schedule.
 
-  @param  Xhc        The XHCI device.
+  @param  Xhc        The XHCI Instance.
 
 **/
 VOID
 XhcFreeSched (
-  IN USB_XHCI_DEV         *Xhc
+  IN USB_XHCI_INSTANCE    *Xhc
   );
 
 /**
   Ring the door bell to notify XHCI there is a transaction to be executed through URB.
 
-  @param  Xhc           The XHCI device.
+  @param  Xhc           The XHCI Instance.
   @param  Urb           The URB to be rung.
 
   @retval EFI_SUCCESS   Successfully ring the door bell.
@@ -681,17 +673,17 @@ XhcFreeSched (
 **/
 EFI_STATUS
 RingIntTransferDoorBell (
-  IN  USB_XHCI_DEV        *Xhc,
+  IN  USB_XHCI_INSTANCE   *Xhc,
   IN  URB                 *Urb
   );
 
 /**
   Execute the transfer by polling the URB. This is a synchronous operation.
 
-  @param  Xhc               The XHCI device.
+  @param  Xhc               The XHCI Instance.
   @param  CmdTransfer       The executed URB is for cmd transfer or not.
   @param  Urb               The URB to execute.
-  @param  TimeOut           The time to wait before abort, in millisecond.
+  @param  Timeout           The time to wait before abort, in millisecond.
 
   @return EFI_DEVICE_ERROR  The transfer failed due to transfer error.
   @return EFI_TIMEOUT       The transfer failed due to time out.
@@ -700,17 +692,17 @@ RingIntTransferDoorBell (
 **/
 EFI_STATUS
 XhcExecTransfer (
-  IN  USB_XHCI_DEV        *Xhc,
+  IN  USB_XHCI_INSTANCE   *Xhc,
   IN  BOOLEAN             CmdTransfer,
   IN  URB                 *Urb,
-  IN  UINTN               TimeOut
+  IN  UINTN               Timeout
   );
 
 /**
   Delete a single asynchronous interrupt transfer for
   the device and endpoint.
 
-  @param  Xhc                   The XHCI device.
+  @param  Xhc                   The XHCI Instance.
   @param  DevAddr               The address of the target device.
   @param  EpNum                 The endpoint of the target.
 
@@ -720,7 +712,7 @@ XhcExecTransfer (
 **/
 EFI_STATUS
 XhciDelAsyncIntTransfer (
-  IN  USB_XHCI_DEV        *Xhc,
+  IN  USB_XHCI_INSTANCE   *Xhc,
   IN  UINT8               DevAddr,
   IN  UINT8               EpNum
   );
@@ -728,39 +720,40 @@ XhciDelAsyncIntTransfer (
 /**
   Remove all the asynchronous interrupt transfers.
 
-  @param  Xhc                   The XHCI device.
+  @param  Xhc                   The XHCI Instance.
 
 **/
 VOID
 XhciDelAllAsyncIntTransfers (
-  IN USB_XHCI_DEV         *Xhc
+  IN USB_XHCI_INSTANCE    *Xhc
   );
 
 /**
   Set Bios Ownership
 
-  @param  Xhc          The XHCI device.
+  @param  Xhc          The XHCI Instance.
 
 **/
 VOID
 XhcSetBiosOwnership (
-  IN USB_XHCI_DEV         *Xhc
+  IN USB_XHCI_INSTANCE    *Xhc
   );
 
 /**
   Clear Bios Ownership
 
-  @param  Xhc       The XHCI device.
+  @param  Xhc       The XHCI Instance.
 
 **/
 VOID
 XhcClearBiosOwnership (
-  IN USB_XHCI_DEV         *Xhc
+  IN USB_XHCI_INSTANCE    *Xhc
   );
 
 /**
   Find out the slot id according to device address assigned by XHCI's Address_Device cmd.
 
+  @param  Xhc             The XHCI Instance.
   @param  DevAddr         The device address of the target device.
 
   @return The slot id used by the device.
@@ -768,13 +761,15 @@ XhcClearBiosOwnership (
 **/
 UINT8
 XhcDevAddrToSlotId (
-  IN  UINT8               DevAddr
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  UINT8              DevAddr
   );
 
 /**
   Find out the slot id according to the device's route string.
 
-  @param  RouteString      The route string described the device location.
+  @param  Xhc             The XHCI Instance.
+  @param  RouteString     The route string described the device location.
 
   @return The slot id used by the device.
 
@@ -782,7 +777,8 @@ XhcDevAddrToSlotId (
 UINT8
 EFIAPI
 XhcRouteStringToSlotId (
-  IN  USB_DEV_ROUTE     RouteString
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  USB_DEV_ROUTE      RouteString
   );
 
 /**
@@ -803,7 +799,7 @@ XhcEndpointToDci (
 /**
   Ring the door bell to notify XHCI there is a transaction to be executed.
 
-  @param  Xhc           The XHCI device.
+  @param  Xhc           The XHCI Instance.
   @param  SlotId        The slot id of the target device.
   @param  Dci           The device context index of the target slot or endpoint.
 
@@ -813,7 +809,7 @@ XhcEndpointToDci (
 EFI_STATUS
 EFIAPI
 XhcRingDoorBell (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT8                SlotId,
   IN UINT8                Dci
   );
@@ -822,7 +818,7 @@ XhcRingDoorBell (
   Interrupt transfer periodic check handler.
 
   @param  Event                 Interrupt event.
-  @param  Context               Pointer to USB_XHCI_DEV.
+  @param  Context               Pointer to USB_XHCI_INSTANCE.
 
 **/
 VOID
@@ -835,7 +831,7 @@ XhcMonitorAsyncRequests (
 /**
   Monitor the port status change. Enable/Disable device slot if there is a device attached/detached.
 
-  @param  Xhc                   The XHCI device.
+  @param  Xhc                   The XHCI Instance.
   @param  ParentRouteChart      The route string pointed to the parent device if it exists.
   @param  Port                  The port to be polled.
   @param  PortState             The port state.
@@ -847,7 +843,7 @@ XhcMonitorAsyncRequests (
 EFI_STATUS
 EFIAPI
 XhcPollPortStatusChange (
-  IN  USB_XHCI_DEV*         Xhc,
+  IN  USB_XHCI_INSTANCE     *Xhc,
   IN  USB_DEV_ROUTE         ParentRouteChart,
   IN  UINT8                 Port,
   IN  EFI_USB_PORT_STATUS   *PortState
@@ -856,7 +852,7 @@ XhcPollPortStatusChange (
 /**
   Evaluate the slot context for hub device through XHCI's Configure_Endpoint cmd.
 
-  @param  Xhc           The XHCI device.
+  @param  Xhc           The XHCI Instance.
   @param  SlotId        The slot id to be configured.
   @param  PortNum       The total number of downstream port supported by the hub.
   @param  TTT           The TT think time of the hub device.
@@ -867,7 +863,7 @@ XhcPollPortStatusChange (
 **/
 EFI_STATUS
 XhcConfigHubContext (
-  IN USB_XHCI_DEV             *Xhc,
+  IN USB_XHCI_INSTANCE        *Xhc,
   IN UINT8                    SlotId,
   IN UINT8                    PortNum,
   IN UINT8                    TTT,
@@ -877,7 +873,7 @@ XhcConfigHubContext (
 /**
   Configure all the device endpoints through XHCI's Configure_Endpoint cmd.
 
-  @param  Xhc           The XHCI device.
+  @param  Xhc           The XHCI Instance.
   @param  SlotId        The slot id to be configured.
   @param  DeviceSpeed   The device's speed.
   @param  ConfigDesc    The pointer to the usb device configuration descriptor.
@@ -888,7 +884,7 @@ XhcConfigHubContext (
 EFI_STATUS
 EFIAPI
 XhcSetConfigCmd (
-  IN USB_XHCI_DEV             *Xhc,
+  IN USB_XHCI_INSTANCE        *Xhc,
   IN UINT8                    SlotId,
   IN UINT8                    DeviceSpeed,
   IN USB_CONFIG_DESCRIPTOR    *ConfigDesc
@@ -897,7 +893,8 @@ XhcSetConfigCmd (
 /**
   Find out the actual device address according to the requested device address from UsbBus.
 
-  @param  BusDevAddr       The requested device address by UsbBus upper driver.
+  @param  Xhc             The XHCI Instance.
+  @param  BusDevAddr      The requested device address by UsbBus upper driver.
 
   @return The actual device address assigned to the device.
 
@@ -905,13 +902,14 @@ XhcSetConfigCmd (
 UINT8
 EFIAPI
 XhcBusDevAddrToSlotId (
-  IN  UINT8       BusDevAddr
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  UINT8              BusDevAddr
   );
 
 /**
   Assign and initialize the device slot for a new device.
 
-  @param  Xhc                 The XHCI device.
+  @param  Xhc                 The XHCI Instance.
   @param  ParentRouteChart    The route string pointed to the parent device.
   @param  ParentPort          The port at which the device is located.
   @param  RouteChart          The route string pointed to the device.
@@ -923,7 +921,7 @@ XhcBusDevAddrToSlotId (
 EFI_STATUS
 EFIAPI
 XhcInitializeDeviceSlot (
-  IN  USB_XHCI_DEV              *Xhc,
+  IN  USB_XHCI_INSTANCE         *Xhc,
   IN  USB_DEV_ROUTE             ParentRouteChart,
   IN  UINT16                    ParentPort,
   IN  USB_DEV_ROUTE             RouteChart,
@@ -933,7 +931,7 @@ XhcInitializeDeviceSlot (
 /**
   Evaluate the endpoint 0 context through XHCI's Evaluate_Context cmd.
 
-  @param  Xhc           The XHCI device.
+  @param  Xhc           The XHCI Instance.
   @param  SlotId        The slot id to be evaluated.
   @param  MaxPacketSize The max packet size supported by the device control transfer.
 
@@ -943,7 +941,7 @@ XhcInitializeDeviceSlot (
 EFI_STATUS
 EFIAPI
 XhcEvaluateContext (
-  IN USB_XHCI_DEV             *Xhc,
+  IN USB_XHCI_INSTANCE        *Xhc,
   IN UINT8                    SlotId,
   IN UINT32                   MaxPacketSize
   );
@@ -951,7 +949,7 @@ XhcEvaluateContext (
 /**
   Disable the specified device slot.
 
-  @param  Xhc           The XHCI device.
+  @param  Xhc           The XHCI Instance.
   @param  SlotId        The slot id to be disabled.
 
   @retval EFI_SUCCESS   Successfully disable the device slot.
@@ -960,14 +958,14 @@ XhcEvaluateContext (
 EFI_STATUS
 EFIAPI
 XhcDisableSlotCmd (
-  IN USB_XHCI_DEV             *Xhc,
+  IN USB_XHCI_INSTANCE        *Xhc,
   IN UINT8                    SlotId
   );
 
 /**
   Synchronize the specified transfer ring to update the enqueue and dequeue pointer.
 
-  @param  Xhc         The XHCI device.
+  @param  Xhc         The XHCI Instance.
   @param  TrsRing     The transfer ring to sync.
 
   @retval EFI_SUCCESS The transfer ring is synchronized successfully.
@@ -976,14 +974,14 @@ XhcDisableSlotCmd (
 EFI_STATUS
 EFIAPI
 XhcSyncTrsRing (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   TRANSFER_RING           *TrsRing
   );
 
 /**
   Synchronize the specified event ring to update the enqueue and dequeue pointer.
 
-  @param  Xhc         The XHCI device.
+  @param  Xhc         The XHCI Instance.
   @param  EvtRing     The event ring to sync.
 
   @retval EFI_SUCCESS The event ring is synchronized successfully.
@@ -992,14 +990,14 @@ XhcSyncTrsRing (
 EFI_STATUS
 EFIAPI
 XhcSyncEventRing (
-  IN USB_XHCI_DEV         *Xhc,
+  IN USB_XHCI_INSTANCE    *Xhc,
   EVENT_RING              *EvtRing
   );
 
 /**
   Check if there is a new generated event.
 
-  @param  Xhc           The XHCI device.
+  @param  Xhc           The XHCI Instance.
   @param  EvtRing       The event ring to check.
   @param  NewEvtTrb     The new event TRB found.
 
@@ -1010,22 +1008,22 @@ XhcSyncEventRing (
 EFI_STATUS
 EFIAPI
 XhcCheckNewEvent (
-  IN  USB_XHCI_DEV            *Xhc,
+  IN  USB_XHCI_INSTANCE       *Xhc,
   IN  EVENT_RING              *EvtRing,
-  OUT TRB                     **NewEvtTrb
+  OUT TRB_TEMPLATE            **NewEvtTrb
   );
 
 /**
   Create XHCI transfer ring.
 
-  @param  Xhc               The XHCI device.
+  @param  Xhc               The XHCI Instance.
   @param  TrbNum            The number of TRB in the ring.
   @param  TransferRing           The created transfer ring.
 
 **/
 VOID
 CreateTransferRing (
-  IN  USB_XHCI_DEV          *Xhc,
+  IN  USB_XHCI_INSTANCE     *Xhc,
   IN  UINTN                 TrbNum,
   OUT TRANSFER_RING         *TransferRing
   );
@@ -1033,14 +1031,14 @@ CreateTransferRing (
 /**
   Create XHCI event ring.
 
-  @param  Xhc                 The XHCI device.
+  @param  Xhc                 The XHCI Instance.
   @param  EventInterrupter    The interrupter of event.
   @param  EventRing           The created event ring.
 
 **/
 VOID
 CreateEventRing (
-  IN  USB_XHCI_DEV          *Xhc,
+  IN  USB_XHCI_INSTANCE     *Xhc,
   IN  UINT8                 EventInterrupter,
   OUT EVENT_RING            *EventRing
   );
@@ -1052,7 +1050,7 @@ CreateEventRing (
   reenabled. The next write to the Doorbell of the Endpoint will transition the Endpoint Context from the
   Stopped to the Running state.
 
-  @param  Xhc                   The XHCI device.
+  @param  Xhc                   The XHCI Instance.
   @param  Urb                   The urb which makes the endpoint halted.
 
   @retval EFI_SUCCESS           The recovery is successful.
@@ -1062,14 +1060,14 @@ CreateEventRing (
 EFI_STATUS
 EFIAPI
 XhcRecoverHaltedEndpoint (
-  IN  USB_XHCI_DEV        *Xhc,
+  IN  USB_XHCI_INSTANCE   *Xhc,
   IN  URB                 *Urb
   );
 
 /**
   Create a new URB for a new transaction.
 
-  @param  Xhc       The XHCI device
+  @param  Xhc       The XHCI Instance
   @param  DevAddr   The device address
   @param  EpAddr    Endpoint addrress
   @param  DevSpeed  The device speed
@@ -1086,7 +1084,7 @@ XhcRecoverHaltedEndpoint (
 **/
 URB*
 XhcCreateUrb (
-  IN USB_XHCI_DEV                       *Xhc,
+  IN USB_XHCI_INSTANCE                  *Xhc,
   IN UINT8                              DevAddr,
   IN UINT8                              EpAddr,
   IN UINT8                              DevSpeed,
@@ -1102,7 +1100,7 @@ XhcCreateUrb (
 /**
   Create a transfer TRB.
 
-  @param  Xhc     The XHCI device
+  @param  Xhc     The XHCI Instance
   @param  Urb     The urb used to construct the transfer TRB.
 
   @return Created TRB or NULL
@@ -1110,7 +1108,7 @@ XhcCreateUrb (
 **/
 EFI_STATUS
 XhcCreateTransferTrb (
-  IN USB_XHCI_DEV                 *Xhc,
+  IN USB_XHCI_INSTANCE            *Xhc,
   IN URB                          *Urb
   );
 

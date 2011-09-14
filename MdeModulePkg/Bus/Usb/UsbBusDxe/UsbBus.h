@@ -247,6 +247,12 @@ struct _USB_BUS {
   EFI_USB_HC_PROTOCOL       *UsbHc;
 
   //
+  // Recorded the max supported usb devices.
+  // XHCI can support up to 255 devices.
+  // EHCI/UHCI/OHCI supports up to 127 devices.
+  //
+  UINT32                    MaxDevices;
+  //
   // An array of device that is on the bus. Devices[0] is
   // for root hub. Device with address i is at Devices[i].
   //
@@ -747,7 +753,6 @@ UsbBusControllerDriverStop (
   IN EFI_HANDLE                   *ChildHandleBuffer
   );
 
-extern UINT16                         mMaxUsbDeviceNum;
 extern EFI_USB_IO_PROTOCOL            mUsbIoProtocol;
 extern EFI_DRIVER_BINDING_PROTOCOL    mUsbBusDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL    mUsbBusComponentName;

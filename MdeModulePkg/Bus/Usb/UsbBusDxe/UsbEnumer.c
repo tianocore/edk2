@@ -548,7 +548,7 @@ UsbRemoveDevice (
   // Remove all the devices on its downstream ports. Search from devices[1].
   // Devices[0] is the root hub.
   //
-  for (Index = 1; Index < mMaxUsbDeviceNum; Index++) {
+  for (Index = 1; Index < Bus->MaxDevices; Index++) {
     Child = Bus->Devices[Index];
 
     if ((Child == NULL) || (Child->ParentAddr != Device->Address)) {
@@ -567,7 +567,7 @@ UsbRemoveDevice (
 
   DEBUG (( EFI_D_INFO, "UsbRemoveDevice: device %d removed\n", Device->Address));
 
-  ASSERT (Device->Address < mMaxUsbDeviceNum);
+  ASSERT (Device->Address < Bus->MaxDevices);
   Bus->Devices[Device->Address] = NULL;
   UsbFreeDevice (Device);
 
@@ -599,7 +599,7 @@ UsbFindChild (
   //
   // Start checking from device 1, device 0 is the root hub
   //
-  for (Index = 1; Index < mMaxUsbDeviceNum; Index++) {
+  for (Index = 1; Index < Bus->MaxDevices; Index++) {
     Device = Bus->Devices[Index];
 
     if ((Device != NULL) && (Device->ParentAddr == HubIf->Device->Address) &&
@@ -639,11 +639,11 @@ UsbEnumerateNewDev (
   UINT8                   Config;
   EFI_STATUS              Status;
 
-  Address = mMaxUsbDeviceNum;
   Parent  = HubIf->Device;
   Bus     = Parent->Bus;
-  HubApi  = HubIf->HubApi;
-  
+  HubApi  = HubIf->HubApi;  
+  Address = Bus->MaxDevices;
+
   gBS->Stall (USB_WAIT_PORT_STABLE_STALL);
   
   //
@@ -731,13 +731,14 @@ UsbEnumerateNewDev (
   // status stage with default address, then switches to new address.
   // ADDRESS state. Address zero is reserved for root hub.
   //
-  for (Address = 1; Address < mMaxUsbDeviceNum; Address++) {
+  ASSERT (Bus->MaxDevices <= 256);
+  for (Address = 1; Address < Bus->MaxDevices; Address++) {
     if (Bus->Devices[Address] == NULL) {
       break;
     }
   }
 
-  if (Address == mMaxUsbDeviceNum) {
+  if (Address >= Bus->MaxDevices) {
     DEBUG ((EFI_D_ERROR, "UsbEnumerateNewDev: address pool is full for port %d\n", Port));
 
     Status = EFI_ACCESS_DENIED;
@@ -808,7 +809,7 @@ UsbEnumerateNewDev (
   return EFI_SUCCESS;
 
 ON_ERROR:
-  if (Address != mMaxUsbDeviceNum) {
+  if (Address != Bus->MaxDevices) {
     Bus->Devices[Address] = NULL;
   }
 
