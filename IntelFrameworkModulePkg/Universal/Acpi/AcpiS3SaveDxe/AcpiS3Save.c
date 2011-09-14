@@ -299,7 +299,7 @@ S3CreateIdentityMappingPageTables (
       PageMapLevel4Entry->Bits.Present = 1;
     
       if (Page1GSupport) {
-        PageDirectory1GEntry = (VOID *) S3NvsPageTableAddress;
+        PageDirectory1GEntry = (PAGE_TABLE_1G_ENTRY *)(UINTN)S3NvsPageTableAddress;
         S3NvsPageTableAddress += SIZE_4KB;
     
         for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {

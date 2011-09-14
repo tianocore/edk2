@@ -127,6 +127,8 @@ CreateIdentityMappingPageTables (
   IN  EFI_PHYSICAL_ADDRESS  PageTablesAddress
   )
 {  
+  UINT32                                        RegEax;
+  UINT32                                        RegEdx;
   UINT8                                         PhysicalAddressBits;
   EFI_PHYSICAL_ADDRESS                          PageAddress;
   UINTN                                         IndexOfPml4Entries;
