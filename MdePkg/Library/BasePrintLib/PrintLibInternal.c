@@ -928,7 +928,7 @@ BasePrintLibSPrintMarker (
     FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
   }
 
-  if (Flags & COUNT_ONLY_NO_PRINT) {
+  if ((Flags & COUNT_ONLY_NO_PRINT) != 0) {
     return (LengthToReturn / BytesPerOutputCharacter);
   }
 
