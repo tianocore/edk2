@@ -24,6 +24,20 @@
  #endif /* OPENSSL_NO_STDIO */
  
  #endif /* HEADER_BSS_FILE_C */
+--- crypto/pkcs7/pk7_smime.c	2009-03-15 21:36:02.000000000 +0800
++++ crypto/pkcs7/pk7_smime.c	2011-09-13 14:11:36.019454700 +0800
+@@ -88,7 +88,10 @@
+ 	if (!PKCS7_content_new(p7, NID_pkcs7_data))
+ 		goto err;
+ 
+-	if (!(si = PKCS7_add_signature(p7,signcert,pkey,EVP_sha1()))) {
++  /* 
++    NOTE: Update to SHA-256 digest algorithm for UEFI version.
++  */
++	if (!(si = PKCS7_add_signature(p7,signcert,pkey,EVP_sha256()))) {
+ 		PKCS7err(PKCS7_F_PKCS7_SIGN,PKCS7_R_PKCS7_ADD_SIGNATURE_ERROR);
+ 		goto err;
+ 	}
 --- crypto/rand/rand_egd.c	Thu Jan 15 17:14:12 1970
 +++ crypto/rand/rand_egd.c	Thu Jan 15 17:14:12 1970
 @@ -95,7 +95,7 @@
