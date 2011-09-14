@@ -789,73 +789,71 @@ AddTableToList (
       //
       // Update pointers in FADT.  If tables don't exist this will put NULL pointers there.
       //
-      if (AcpiSupportInstance->Fadt3 != NULL) {
-        AcpiSupportInstance->Fadt3->FirmwareCtrl  = (UINT32) (UINTN) AcpiSupportInstance->Facs3;
-        Buffer64 = (UINT64) (UINTN) AcpiSupportInstance->Facs3;
-        CopyMem (
-          &AcpiSupportInstance->Fadt3->XFirmwareCtrl,
-          &Buffer64,
-          sizeof (UINT64)
-          );
-        AcpiSupportInstance->Fadt3->Dsdt  = (UINT32) (UINTN) AcpiSupportInstance->Dsdt3;
-        Buffer64                          = (UINT64) (UINTN) AcpiSupportInstance->Dsdt3;
-        CopyMem (
-          &AcpiSupportInstance->Fadt3->XDsdt,
-          &Buffer64,
-          sizeof (UINT64)
-          );
-
-        //
-        // RSDP OEM information is updated to match the FADT OEM information
-        //
-        CopyMem (
-          &AcpiSupportInstance->Rsdp3->OemId,
-          &AcpiSupportInstance->Fadt3->Header.OemId,
-          6
-          );
-
-        //
-        // RSDT OEM information is updated to match FADT OEM information.
-        //
-        CopyMem (
-          &AcpiSupportInstance->Rsdt3->OemId,
-          &AcpiSupportInstance->Fadt3->Header.OemId,
-          6
-          );
-        CopyMem (
-          &AcpiSupportInstance->Rsdt3->OemTableId,
-          &AcpiSupportInstance->Fadt3->Header.OemTableId,
-          sizeof (UINT64)
-          );
-        AcpiSupportInstance->Rsdt3->OemRevision = AcpiSupportInstance->Fadt3->Header.OemRevision;
-
-        //
-        // XSDT OEM information is updated to match FADT OEM information.
-        //
-        CopyMem (
-          &AcpiSupportInstance->Xsdt->OemId,
-          &AcpiSupportInstance->Fadt3->Header.OemId,
-          6
-          );
-        CopyMem (
-          &AcpiSupportInstance->Xsdt->OemTableId,
-          &AcpiSupportInstance->Fadt3->Header.OemTableId,
-          sizeof (UINT64)
-          );
-        AcpiSupportInstance->Xsdt->OemRevision = AcpiSupportInstance->Fadt3->Header.OemRevision;
-      }
+      AcpiSupportInstance->Fadt3->FirmwareCtrl  = (UINT32) (UINTN) AcpiSupportInstance->Facs3;
+      Buffer64 = (UINT64) (UINTN) AcpiSupportInstance->Facs3;
+      CopyMem (
+        &AcpiSupportInstance->Fadt3->XFirmwareCtrl,
+        &Buffer64,
+        sizeof (UINT64)
+        );
+      AcpiSupportInstance->Fadt3->Dsdt  = (UINT32) (UINTN) AcpiSupportInstance->Dsdt3;
+      Buffer64                          = (UINT64) (UINTN) AcpiSupportInstance->Dsdt3;
+      CopyMem (
+        &AcpiSupportInstance->Fadt3->XDsdt,
+        &Buffer64,
+        sizeof (UINT64)
+        );
 
       //
-      // Checksum the table
+      // RSDP OEM information is updated to match the FADT OEM information
       //
-      if (Checksum) {
-        AcpiPlatformChecksum (
-          CurrentTableList->Table,
-          CurrentTableList->Table->Length,
-          OFFSET_OF (EFI_ACPI_DESCRIPTION_HEADER,
-          Checksum)
-          );
-      }
+      CopyMem (
+        &AcpiSupportInstance->Rsdp3->OemId,
+        &AcpiSupportInstance->Fadt3->Header.OemId,
+        6
+        );
+
+      //
+      // RSDT OEM information is updated to match FADT OEM information.
+      //
+      CopyMem (
+        &AcpiSupportInstance->Rsdt3->OemId,
+        &AcpiSupportInstance->Fadt3->Header.OemId,
+        6
+        );
+      CopyMem (
+        &AcpiSupportInstance->Rsdt3->OemTableId,
+        &AcpiSupportInstance->Fadt3->Header.OemTableId,
+        sizeof (UINT64)
+        );
+      AcpiSupportInstance->Rsdt3->OemRevision = AcpiSupportInstance->Fadt3->Header.OemRevision;
+
+      //
+      // XSDT OEM information is updated to match FADT OEM information.
+      //
+      CopyMem (
+        &AcpiSupportInstance->Xsdt->OemId,
+        &AcpiSupportInstance->Fadt3->Header.OemId,
+        6
+        );
+      CopyMem (
+        &AcpiSupportInstance->Xsdt->OemTableId,
+        &AcpiSupportInstance->Fadt3->Header.OemTableId,
+        sizeof (UINT64)
+        );
+      AcpiSupportInstance->Xsdt->OemRevision = AcpiSupportInstance->Fadt3->Header.OemRevision;
+    }
+
+    //
+    // Checksum the table
+    //
+    if (Checksum) {
+      AcpiPlatformChecksum (
+        CurrentTableList->Table,
+        CurrentTableList->Table->Length,
+        OFFSET_OF (EFI_ACPI_DESCRIPTION_HEADER,
+        Checksum)
+        );
     }
     break;
 
