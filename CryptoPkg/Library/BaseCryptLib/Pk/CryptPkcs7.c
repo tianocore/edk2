@@ -30,15 +30,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval     0        Verification failed.
 
 **/
-STATIC int X509VerifyCb (int Status, X509_STORE_CTX *Context)
+int
+X509VerifyCb (
+  IN int            Status,
+  IN X509_STORE_CTX *Context
+  )
 {
   X509_OBJECT  *Obj;
-  int          Error;
-  int          Index;
-  int          Count;
+  INTN         Error;
+  INTN         Index;
+  INTN         Count;
 
   Obj   = NULL;
-  Error = X509_STORE_CTX_get_error (Context);
+  Error = (INTN) X509_STORE_CTX_get_error (Context);
 
   //
   // X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT and X509_V_ERR_UNABLE_TO_GET_ISSUER_
@@ -70,9 +74,9 @@ STATIC int X509VerifyCb (int Status, X509_STORE_CTX *Context)
       // pass the certificate verification.
       //
       if (Error == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY) {
-        Count = sk_X509_num (Context->chain);
+        Count = (INTN) sk_X509_num (Context->chain);
         for (Index = 0; Index < Count; Index++) {
-          Obj->data.x509 = sk_X509_value (Context->chain, Index);
+          Obj->data.x509 = sk_X509_value (Context->chain, (int) Index);
           if (X509_OBJECT_retrieve_match (Context->ctx->objs, Obj)) {
             Status = 1;
             break;
@@ -203,7 +207,7 @@ Pkcs7Sign (
             Key,
             (STACK_OF(X509) *) OtherCerts,
             DataBio,
-            PKCS7_BINARY
+            PKCS7_BINARY | PKCS7_NOATTR | PKCS7_DETACHED
             );
   if (Pkcs7 == NULL) {
     goto _Exit;
