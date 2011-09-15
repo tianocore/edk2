@@ -588,7 +588,7 @@ EfiShellGetDevicePathFromFilePath(
   if (*(Path+StrLen(MapName)+1) == CHAR_NULL) {
     DevicePathForReturn = FileDevicePath(Handle, L"\\");
   } else {
-    DevicePathForReturn = FileDevicePath(Handle, Path+StrLen(MapName)+1);
+    DevicePathForReturn = FileDevicePath(Handle, Path+StrLen(MapName));
   }
 
   FreePool(MapName);
