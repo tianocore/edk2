@@ -894,6 +894,8 @@ PeiDispatcher (
                 StackOffsetPositive = FALSE;
                 StackOffset = (UINTN)(TopOfOldStack - TopOfNewStack);
               }
+              Private->StackOffsetPositive = StackOffsetPositive;
+              Private->StackOffset = StackOffset;
 
               DEBUG ((EFI_D_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64)Private->HeapOffset, (UINT64)(StackOffset)));
 

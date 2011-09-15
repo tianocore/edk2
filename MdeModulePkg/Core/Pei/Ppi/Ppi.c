@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core PPI services
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -40,44 +40,44 @@ InitializePpiServices (
 
   Migrate the Hob list from the temporary memory stack to PEI installed memory.
 
-  @param PrivateData         Pointer to PeiCore's private data structure.
-  @param OldCheckingBottom   Bottom of temporary memory range. All Ppi in this range
-                             will be fixup for PpiData and PpiDescriptor pointer.
-  @param OldCheckingTop      Top of temporary memory range. All Ppi in this range
-                             will be fixup for PpiData and PpiDescriptor.
-  @param Fixup               The address difference between
-                             the new Hob list and old Hob list.
-  @param FixupPositive       TRUE if new Hob list is above the old Hob list.  
-                             Otherwise FALSE.
+  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
+                         and location of temporary RAM, the stack location and the BFV location.
+  @param PrivateData     Pointer to PeiCore's private data structure.
 
 **/
 VOID
 ConvertPpiPointers (
-  IN PEI_CORE_INSTANCE       *PrivateData,
-  IN UINTN                   OldCheckingBottom,
-  IN UINTN                   OldCheckingTop,
-  IN UINTN                   Fixup,
-  IN BOOLEAN                 FixupPositive
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
+  IN PEI_CORE_INSTANCE           *PrivateData
   )
 {
   UINT8                 Index;
   PEI_PPI_LIST_POINTERS *PpiPointer;
+  UINTN                 OldHeapTop;
+  UINTN                 OldHeapBottom;
+  UINTN                 OldStackTop;
+  UINTN                 OldStackBottom;
+
+  OldHeapBottom = (UINTN)SecCoreData->PeiTemporaryRamBase;
+  OldHeapTop = (UINTN)SecCoreData->PeiTemporaryRamBase + SecCoreData->PeiTemporaryRamSize;
+  OldStackBottom = (UINTN)SecCoreData->StackBase;
+  OldStackTop = (UINTN)SecCoreData->StackBase + SecCoreData->StackSize;
 
   for (Index = 0; Index < FixedPcdGet32 (PcdPeiCoreMaxPpiSupported); Index++) {
     if (Index < PrivateData->PpiData.PpiListEnd ||
         Index > PrivateData->PpiData.NotifyListEnd) {
       PpiPointer = &PrivateData->PpiData.PpiListPtrs[Index];
 
-      if (((UINTN)PpiPointer->Raw < OldCheckingTop) &&
-          ((UINTN)PpiPointer->Raw >= OldCheckingBottom)) {
+      if (((UINTN)PpiPointer->Raw < OldHeapTop) &&
+          ((UINTN)PpiPointer->Raw >= OldHeapBottom)) {
         //
-        // Convert the pointer to the PEIM descriptor from the old HOB heap
+        // Convert the pointer to the PPI descriptor from the old HOB heap
         // to the relocated HOB heap.
         //
-        if (FixupPositive) {
-          PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw + Fixup);
+        if (PrivateData->HeapOffsetPositive) {
+          PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw + PrivateData->HeapOffset);
         } else {
-          PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw - Fixup);
+          PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw - PrivateData->HeapOffset);
         }
 
         //
@@ -85,16 +85,16 @@ ConvertPpiPointers (
         // to try to convert the pointers in the PEIM descriptor
         //
 
-        if (((UINTN)PpiPointer->Ppi->Guid < OldCheckingTop) &&
-            ((UINTN)PpiPointer->Ppi->Guid >= OldCheckingBottom)) {
+        if (((UINTN)PpiPointer->Ppi->Guid < OldHeapTop) &&
+            ((UINTN)PpiPointer->Ppi->Guid >= OldHeapBottom)) {
           //
           // Convert the pointer to the GUID in the PPI or NOTIFY descriptor
           // from the old HOB heap to the relocated HOB heap.
           //
-          if (FixupPositive) {
-            PpiPointer->Ppi->Guid = (VOID *) ((UINTN)PpiPointer->Ppi->Guid + Fixup);
+          if (PrivateData->HeapOffsetPositive) {
+            PpiPointer->Ppi->Guid = (VOID *) ((UINTN)PpiPointer->Ppi->Guid + PrivateData->HeapOffset);
           } else {
-            PpiPointer->Ppi->Guid = (VOID *) ((UINTN)PpiPointer->Ppi->Guid - Fixup);
+            PpiPointer->Ppi->Guid = (VOID *) ((UINTN)PpiPointer->Ppi->Guid - PrivateData->HeapOffset);
           }
         }
 
@@ -103,17 +103,27 @@ ConvertPpiPointers (
         // the notification function in the NOTIFY descriptor needs not be converted.
         //
         if (Index < PrivateData->PpiData.PpiListEnd &&
-            (UINTN)PpiPointer->Ppi->Ppi < OldCheckingTop &&
-            (UINTN)PpiPointer->Ppi->Ppi >= OldCheckingBottom) {
+            (UINTN)PpiPointer->Ppi->Ppi < OldHeapTop &&
+            (UINTN)PpiPointer->Ppi->Ppi >= OldHeapBottom) {
             //
             // Convert the pointer to the PPI interface structure in the PPI descriptor
             // from the old HOB heap to the relocated HOB heap.
             //
-            if (FixupPositive) {
-              PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi + Fixup);
+            if (PrivateData->HeapOffsetPositive) {
+              PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi + PrivateData->HeapOffset);
             } else {
-              PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi - Fixup);
+              PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi - PrivateData->HeapOffset);
             }
+        }
+      } else if (((UINTN)PpiPointer->Raw < OldStackTop) && ((UINTN)PpiPointer->Raw >= OldStackBottom)) {
+        //
+        // Convert the pointer to the PPI descriptor from the temporary stack
+        // to the permanent PEI stack.
+        //
+        if (PrivateData->StackOffsetPositive) {
+          PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw + PrivateData->StackOffset);
+        } else {
+          PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw - PrivateData->StackOffset);
         }
       }
     }

@@ -200,6 +200,8 @@ struct _PEI_CORE_INSTANCE {
   EFI_PHYSICAL_ADDRESS               FreePhysicalMemoryTop;
   UINTN                              HeapOffset;
   BOOLEAN                            HeapOffsetPositive;
+  UINTN                              StackOffset;
+  BOOLEAN                            StackOffsetPositive;
   PEICORE_FUNCTION_POINTER           ShadowedPeiCore;
   CACHE_SECTION_DATA                 CacheSection;
   //
@@ -377,24 +379,15 @@ InitializePpiServices (
 
   Migrate the Hob list from the temporary memory stack to PEI installed memory.
 
-  @param PrivateData         Pointer to PeiCore's private data structure.
-  @param OldCheckingBottom   Bottom of temporary memory range. All Ppi in this range
-                             will be fixup for PpiData and PpiDescriptor pointer.
-  @param OldCheckingTop      Top of temporary memory range. All Ppi in this range
-                             will be fixup for PpiData and PpiDescriptor.
-  @param Fixup               The address difference between
-                             the new Hob list and old Hob list.
-  @param FixupPositive       TRUE if new Hob list is above the old Hob list.  
-                             Otherwise FALSE.
+  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
+                         and location of temporary RAM, the stack location and the BFV location.
+  @param PrivateData     Pointer to PeiCore's private data structure.
 
 **/
 VOID
 ConvertPpiPointers (
-  IN PEI_CORE_INSTANCE       *PrivateData,
-  IN UINTN                   OldCheckingBottom,
-  IN UINTN                   OldCheckingTop,
-  IN UINTN                   Fixup,
-  IN BOOLEAN                 FixupPositive
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
+  IN PEI_CORE_INSTANCE           *PrivateData
   );
 
 /**

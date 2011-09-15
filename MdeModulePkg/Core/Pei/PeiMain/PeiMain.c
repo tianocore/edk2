@@ -1,7 +1,7 @@
 /** @file
   Pei Core Main Entry Point
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -204,9 +204,9 @@ PeiCore (
       HandoffInformationTable->EfiFreeMemoryBottom = HandoffInformationTable->EfiEndOfHobList + sizeof (EFI_HOB_GENERIC_HEADER);
 
       //
-      // We need convert the PPI desciptor's pointer
+      // We need convert the PPI descriptor's pointer
       //
-      ConvertPpiPointers (OldCoreData, (UINTN)SecCoreData->TemporaryRamBase, (UINTN)SecCoreData->TemporaryRamBase + SecCoreData->TemporaryRamSize, OldCoreData->HeapOffset, OldCoreData->HeapOffsetPositive);
+      ConvertPpiPointers (SecCoreData, OldCoreData);
 
       //
       // After the whole temporary memory is migrated, then we can allocate page in
