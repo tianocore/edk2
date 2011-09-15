@@ -340,11 +340,24 @@ ShellCommandSetEchoState (
   Indicate that the current shell or script should exit.
 
   @param[in] ScriptOnly   TRUE if exiting a script; FALSE otherwise.
+  @param[in] ErrorCode    The 64 bit error code to return.
 **/
 VOID
 EFIAPI
 ShellCommandRegisterExit (
-  IN BOOLEAN ScriptOnly
+  IN BOOLEAN      ScriptOnly,
+  IN CONST UINT64 ErrorCode
+  );
+
+/**
+  Retrieve the Exit code.
+
+  @return the value passed into RegisterExit.
+**/
+UINT64
+EFIAPI
+ShellCommandGetExitCode (
+  VOID
   );
 
 /**

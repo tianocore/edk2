@@ -26,6 +26,7 @@ STATIC SCRIPT_FILE_LIST                   mScriptList;
 STATIC ALIAS_LIST                         mAliasList;
 STATIC BOOLEAN                            mEchoState;
 STATIC BOOLEAN                            mExitRequested;
+STATIC UINT64                             mExitCode;
 STATIC BOOLEAN                            mExitScript;
 STATIC CHAR16                             *mProfileList;
 STATIC UINTN                              mProfileListSize;
@@ -697,12 +698,14 @@ ShellCommandSetEchoState(
 /**
   Indicate that the current shell or script should exit.
 
-  @param[in] ScriptOnly   TRUE if only exiting a script, FALSE othrwise.
+  @param[in] ScriptOnly   TRUE if exiting a script; FALSE otherwise.
+  @param[in] ErrorCode    The 64 bit error code to return.
 **/
 VOID
 EFIAPI
 ShellCommandRegisterExit (
-  IN BOOLEAN ScriptOnly
+  IN BOOLEAN      ScriptOnly,
+  IN CONST UINT64 ErrorCode
   )
 {
   mExitRequested = (BOOLEAN)(!mExitRequested);
@@ -711,6 +714,7 @@ ShellCommandRegisterExit (
   } else {
     mExitScript    = FALSE;
   }
+  mExitCode = ErrorCode;
 }
 
 /**
@@ -728,6 +732,21 @@ ShellCommandGetExit (
   return (mExitRequested);
 }
 
+/**
+  Retrieve the Exit code.
+
+  If ShellCommandGetExit returns FALSE than the return from this is undefined.
+
+  @return the value passed into RegisterExit.
+**/
+UINT64
+EFIAPI
+ShellCommandGetExitCode (
+  VOID
+  )
+{
+  return (mExitCode);
+}
 /**
   Retrieve the Exit script indicator.
 

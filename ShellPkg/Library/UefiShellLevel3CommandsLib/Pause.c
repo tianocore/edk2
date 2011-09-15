@@ -84,7 +84,7 @@ ShellCommandRunPause (
       }
 
       if (EFI_ERROR(Status) || Resp == NULL || *Resp == ShellPromptResponseQuit) {
-        ShellCommandRegisterExit(TRUE);
+        ShellCommandRegisterExit(TRUE, 0);
         ShellStatus = SHELL_ABORTED;
       }
 

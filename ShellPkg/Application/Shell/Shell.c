@@ -475,6 +475,9 @@ UefiMain (
     DEBUG_CODE(ShellInfoObject.ConsoleInfo = NULL;);
   }
 
+  if (ShellCommandGetExit()) {
+    return ((EFI_STATUS)ShellCommandGetExitCode());
+  }
   return (Status);
 }
 
@@ -1622,6 +1625,7 @@ RunScriptFileHandle (
   BOOLEAN             PreCommandEchoState;
   CONST CHAR16        *CurDir;
   UINTN               LineCount;
+  CHAR16              LeString[50];
 
   ASSERT(!ShellCommandGetScriptExit());
 
@@ -1826,7 +1830,11 @@ RunScriptFileHandle (
         }
 
         if (ShellCommandGetScriptExit()) {
-          ShellCommandRegisterExit(FALSE);
+          UnicodeSPrint(LeString, sizeof(LeString)*sizeof(LeString[0]), L"0x%Lx", ShellCommandGetExitCode());
+          DEBUG_CODE(InternalEfiShellSetEnv(L"DebugLasterror", LeString, TRUE););
+          InternalEfiShellSetEnv(L"Lasterror", LeString, TRUE);
+
+          ShellCommandRegisterExit(FALSE, 0);
           Status = EFI_SUCCESS;
           break;
         }

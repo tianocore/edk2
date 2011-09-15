@@ -77,16 +77,16 @@ ShellCommandRunExit (
         //
         // If we are in a batch file and /b then pass TRUE otherwise false...
         //
-        ShellCommandRegisterExit((BOOLEAN)(gEfiShellProtocol->BatchIsActive() && ShellCommandLineGetFlag(Package, L"/b")));
+        ShellCommandRegisterExit((BOOLEAN)(gEfiShellProtocol->BatchIsActive() && ShellCommandLineGetFlag(Package, L"/b")), RetVal);
 
-        ShellStatus = (SHELL_STATUS)(RetVal);
+        ShellStatus = SHELL_SUCCESS;
       }
     } else {
       // If we are in a batch file and /b then pass TRUE otherwise false...
       //
-      ShellCommandRegisterExit((BOOLEAN)(gEfiShellProtocol->BatchIsActive() && ShellCommandLineGetFlag(Package, L"/b")));
+      ShellCommandRegisterExit((BOOLEAN)(gEfiShellProtocol->BatchIsActive() && ShellCommandLineGetFlag(Package, L"/b")), 0);
 
-      ShellStatus = (SHELL_STATUS)0;
+      ShellStatus = SHELL_SUCCESS;
     }
 
     ShellCommandLineFreeVarList (Package);
