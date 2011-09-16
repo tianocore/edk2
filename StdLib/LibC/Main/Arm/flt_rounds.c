@@ -1,4 +1,4 @@
-/*	$NetBSD: flt_rounds.c,v 1.3 2006/02/25 00:58:35 wiz Exp $	*/
+/*  $NetBSD: flt_rounds.c,v 1.3 2006/02/25 00:58:35 wiz Exp $ */
 
 /*
  * Copyright (c) 1996 Mark Brinicombe
@@ -15,7 +15,7 @@
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
  *      This product includes software developed by Mark Brinicombe
- *	for the NetBSD Project.
+ *  for the NetBSD Project.
  * 4. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission
  *
@@ -31,29 +31,29 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
+#include <sys/EfiCdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
 __RCSID("$NetBSD: flt_rounds.c,v 1.3 2006/02/25 00:58:35 wiz Exp $");
 #endif /* LIBC_SCCS and not lint */
 
 #include <sys/types.h>
-#include <ieeefp.h>
+//#include <ieeefp.h>
 
 static const int map[] = {
-	1,	/* round to nearest */
-	2,	/* round to positive infinity */
-	3,	/* round to negative infinity */
-	0	/* round to zero */
+  1,  /* round to nearest */
+  2,  /* round to positive infinity */
+  3,  /* round to negative infinity */
+  0 /* round to zero */
 };
 
 /*
  * Return the current FP rounding mode
  *
  * Returns:
- *	0 - round to zero
- *	1 - round to nearest
- *	2 - round to postive infinity
- *	3 - round to negative infinity
+ *  0 - round to zero
+ *  1 - round to nearest
+ *  2 - round to postive infinity
+ *  3 - round to negative infinity
  *
  * ok all we need to do is get the current FP rounding mode
  * index our map table and return the appropriate value.
@@ -77,5 +77,6 @@ int __flt_rounds(void);
 int
 __flt_rounds()
 {
-	return(map[fpgetround()]);
+  //return(map[fpgetround()]);
+  return 1; //TODO: FixMe
 }

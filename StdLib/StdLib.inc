@@ -62,10 +62,19 @@
   PalLib|MdePkg/Library/UefiPalLib/UefiPalLib.inf
   TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
 
+[LibraryClasses.ARM.UEFI_APPLICATION]
+  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+
+
 !else
   # Use this instance if Running in an Emulation Environment.
 [LibraryClasses.Common.UEFI_APPLICATION]
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+
+[LibraryClasses.ARM.UEFI_APPLICATION]
+  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+
 !endif
 
 [Components]
@@ -99,9 +108,11 @@
 !ifndef $(EMULATE)
   # These Build Options are used when building the Standard Libraries to be run
   # on real hardware.
-  INTEL:*_*_*_CC_FLAGS      = /Qfreestanding
-   MSFT:*_*_*_CC_FLAGS      = /X /Zc:wchar_t
-    GCC:*_*_*_CC_FLAGS      = -nostdinc -nostdlib
+   INTEL:*_*_*_CC_FLAGS      = /Qfreestanding
+    MSFT:*_*_*_CC_FLAGS      = /X /Zc:wchar_t
+     GCC:*_*_*_CC_FLAGS      = -nostdinc -nostdlib
+    RVCT:*_*_*_CC_FLAGS      = --library_interface=none -J$(WORKSPACE)/StdLib/Include -J$(WORKSPACE)/StdLib/Include/Arm -DNT32dvm
+  ARMGCC:*_*_*_CC_FLAGS      = -nostdinc -nostdlib -Wno-unknown-pragmas -Wno-unused -Wno-format-zero-length -DNT32dvm
 
 !else
   # The Build Options, below, are only used when building the Standard Libraries
@@ -112,3 +123,5 @@
    MSFT:*_*_IA32_CC_FLAGS     = /Od /D NT32dvm
     GCC:*_*_IA32_CC_FLAGS     = -O0 -DNT32dvm
 !endif
+
+

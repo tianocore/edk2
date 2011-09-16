@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 #ifndef _MACHINE_SIGNAL_H
 #define _MACHINE_SIGNAL_H
-#include  <sys/common.h>
+#include  <sys/EfiCdefs.h>
 
 /** The type sig_atomic_t is the (possibly volatile-qualified) integer type of
     an object that can be accessed as an atomic entity, even in the presence

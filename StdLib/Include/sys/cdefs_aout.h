@@ -17,59 +17,63 @@
 
 #ifdef __GNUC__
 #if __STDC__
-    #ifndef   DONT_USE_STRONG_WEAK_ALIAS
-#define __strong_alias(alias,sym)               \
-    __asm(".global " _C_LABEL_STRING(#alias) "\n"     \
-      _C_LABEL_STRING(#alias) " = " _C_LABEL_STRING(#sym));
-#define __weak_alias(alias,sym)           \
-    __asm(".weak " _C_LABEL_STRING(#alias) "\n"     \
-      _C_LABEL_STRING(#alias) " = " _C_LABEL_STRING(#sym));
+  #ifndef   DONT_USE_STRONG_WEAK_ALIAS
+    #define __strong_alias(alias,sym)               \
+        __asm(".global " _C_LABEL_STRING(#alias) "\n"     \
+          _C_LABEL_STRING(#alias) " = " _C_LABEL_STRING(#sym));
+    #define __weak_alias(alias,sym)           \
+        __asm(".weak " _C_LABEL_STRING(#alias) "\n"     \
+          _C_LABEL_STRING(#alias) " = " _C_LABEL_STRING(#sym));
 
-/* Do not use __weak_extern, use __weak_reference instead */
-#define __weak_extern(sym)            \
-    __asm(".weak " _C_LABEL_STRING(#sym));
+    /* Do not use __weak_extern, use __weak_reference instead */
+    #define __weak_extern(sym)            \
+        __asm(".weak " _C_LABEL_STRING(#sym));
 
-#if __GNUC_PREREQ__(4, 0)
-#define __weak_reference(sym) __attribute__((__weakref__))
-#else
-#define __weak_reference(sym) ; __asm(".weak " _C_LABEL_STRING(#sym))
-#endif
-
-#define __warn_references(sym,msg)          \
-  __asm(".stabs \"" msg "\",30,0,0,0");       \
-  __asm(".stabs \"_" #sym "\",1,0,0,0");
+    #if __GNUC_PREREQ__(4, 0)
+      #define __weak_reference(sym) __attribute__((__weakref__))
     #else
-      #define __strong_alias(alias,sym)   /* NOTHING */
-      #define __weak_alias(alias,sym)     /* NOTHING */
-      #define __weak_extern(sym)          /* NOTHING */
-      #define __weak_reference(sym)       /* NOTHING */
+      #define __weak_reference(sym) ; __asm(".weak " _C_LABEL_STRING(#sym))
+    #endif
 
+    #define __warn_references(sym,msg)          \
+      __asm(".stabs \"" msg "\",30,0,0,0");       \
+      __asm(".stabs \"_" #sym "\",1,0,0,0");
+  #else
+    #define __strong_alias(alias,sym)   /* NOTHING */
+    #define __weak_alias(alias,sym)     /* NOTHING */
+    #define __weak_extern(sym)          /* NOTHING */
+    #define __weak_reference(sym)       /* NOTHING */
+
+    #if !defined(__CC_ARM)
       #define __warn_references(sym,msg)          \
               __asm(".stabs \"" msg "\",30,0,0,0");       \
               __asm(".stabs \"_" #sym "\",1,0,0,0");
+    #else
+      #define __warn_references(sym,msg)
     #endif
-#else /* __STDC__ */
-#define __weak_alias(alias,sym) ___weak_alias(_/**/alias,_/**/sym)
-#define ___weak_alias(alias,sym)          \
-    __asm(".weak alias\nalias = sym");
-/* Do not use __weak_extern, use __weak_reference instead */
-#define __weak_extern(sym) ___weak_extern(_/**/sym)
-#define ___weak_extern(sym)           \
-    __asm(".weak sym");
+  #endif
+#else   /* __STDC__ */
+  #define __weak_alias(alias,sym) ___weak_alias(_/**/alias,_/**/sym)
+  #define ___weak_alias(alias,sym)          \
+      __asm(".weak alias\nalias = sym");
+  /* Do not use __weak_extern, use __weak_reference instead */
+  #define __weak_extern(sym) ___weak_extern(_/**/sym)
+  #define ___weak_extern(sym)           \
+      __asm(".weak sym");
 
-#if __GNUC_PREREQ__(4, 0)
-#define __weak_reference(sym) __attribute__((__weakref__))
-#else
-#define ___weak_reference(sym)  ; __asm(".weak sym");
-#define __weak_reference(sym) ___weak_reference(_/**/sym)
-#endif
+  #if __GNUC_PREREQ__(4, 0)
+    #define __weak_reference(sym) __attribute__((__weakref__))
+  #else
+    #define ___weak_reference(sym)  ; __asm(".weak sym");
+    #define __weak_reference(sym) ___weak_reference(_/**/sym)
+  #endif
 
-#define __warn_references(sym,msg)          \
-  __asm(".stabs msg,30,0,0,0");         \
-  __asm(".stabs \"_/**/sym\",1,0,0,0");
+  #define __warn_references(sym,msg)          \
+    __asm(".stabs msg,30,0,0,0");         \
+    __asm(".stabs \"_/**/sym\",1,0,0,0");
 #endif /* __STDC__ */
 #else /* __GNUC__ */
-#define __warn_references(sym,msg)
+  #define __warn_references(sym,msg)
 #endif /* __GNUC__ */
 
 #if defined(__sh__)   /* XXX SH COFF */
