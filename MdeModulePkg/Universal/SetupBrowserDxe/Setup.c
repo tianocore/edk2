@@ -1447,12 +1447,18 @@ GetQuestionValue (
       //
       // Skip <ConfigRequest>
       //
-      Value = Result + Length;
       if (IsBufferStorage) {
+        Value = StrStr (Result, L"&VALUE");
+        if (Value == NULL) {
+          FreePool (Result);
+          return EFI_NOT_FOUND;
+        }
         //
         // Skip "&VALUE"
         //
         Value = Value + 6;
+      } else {
+        Value = Result + Length;
       }
       if (*Value != '=') {
         FreePool (Result);
