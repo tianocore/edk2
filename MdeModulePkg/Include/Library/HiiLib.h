@@ -1,7 +1,7 @@
 /** @file
   Public include file for the HII Library
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -48,7 +48,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                to packages terminated by a NULL.
 
   @retval NULL   An HII Handle has already been registered in the HII Database with
-                 the same PackageListGuid.
+                 the same PackageListGuid and DeviceHandle.
   @retval NULL   The HII Handle could not be created.
   @retval NULL   An empty list of packages was passed in.
   @retval NULL   All packages are empty.
