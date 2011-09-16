@@ -422,7 +422,6 @@ UserProfileManagerCallback (
           //
           case KEY_MODIFY_PROV:         
             mProviderChoice = Value->u8;
-            *ActionRequest  = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
             break;
 
           //
@@ -430,7 +429,6 @@ UserProfileManagerCallback (
           //
           case KEY_MODIFY_CONN:
             mConncetLogical = Value->u8;
-            *ActionRequest  = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
             break;
 
           //
@@ -445,7 +443,7 @@ UserProfileManagerCallback (
           //
           case KEY_IP_RETURN_UIF:
             SaveIdentityPolicy ();
-            *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+            *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
             break;
 
           default:
@@ -473,7 +471,6 @@ UserProfileManagerCallback (
           //
           case KEY_MODIFY_RIGHT:
             mAccessInfo.AccessRight = Value->u8;
-            *ActionRequest  = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
             break;
 
           //
@@ -481,7 +478,6 @@ UserProfileManagerCallback (
           //
           case KEY_MODIFY_SETUP:
             mAccessInfo.AccessSetup= Value->u8;
-            *ActionRequest  = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
             break;
 
           //
@@ -489,7 +485,6 @@ UserProfileManagerCallback (
           //
           case KEY_MODIFY_BOOT:
             mAccessInfo.AccessBootOrder = Value->u32;
-            *ActionRequest  = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
             break;
 
           //
@@ -551,7 +546,7 @@ UserProfileManagerCallback (
           //
           case KEY_AP_RETURN_UIF:
             SaveAccessPolicy ();
-            *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+            *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
             break;
 
           default:
