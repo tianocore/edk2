@@ -1,4 +1,4 @@
-/*	$NetBSD: stringlist.c,v 1.13 2008/04/28 20:22:59 martin Exp $
+/*  $NetBSD: stringlist.c,v 1.13 2008/04/28 20:22:59 martin Exp $
 
  * Copyright (c) 1994, 1999 The NetBSD Foundation, Inc.
  * All rights reserved.
@@ -27,8 +27,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
-#pragma warning ( disable : 4018 )
+#if defined(_MSC_VER)           /* Handle Microsoft VC++ compiler specifics. */
+  #pragma warning ( disable : 4018 )
+#endif
 
 #include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
@@ -49,7 +50,7 @@ __weak_alias(sl_init,_sl_init)
 __weak_alias(sl_delete,_sl_delete)
 #endif
 
-#define _SL_CHUNKSIZE	20
+#define _SL_CHUNKSIZE 20
 
 /*
  * sl_init(): Initialize a string list
@@ -57,20 +58,20 @@ __weak_alias(sl_delete,_sl_delete)
 StringList *
 sl_init(void)
 {
-	StringList *sl;
+  StringList *sl;
 
-	sl = malloc(sizeof(StringList));
-	if (sl == NULL)
-		return NULL;
+  sl = malloc(sizeof(StringList));
+  if (sl == NULL)
+    return NULL;
 
-	sl->sl_cur = 0;
-	sl->sl_max = _SL_CHUNKSIZE;
-	sl->sl_str = malloc(sl->sl_max * sizeof(char *));
-	if (sl->sl_str == NULL) {
-		free(sl);
-		sl = NULL;
-	}
-	return sl;
+  sl->sl_cur = 0;
+  sl->sl_max = _SL_CHUNKSIZE;
+  sl->sl_str = malloc(sl->sl_max * sizeof(char *));
+  if (sl->sl_str == NULL) {
+    free(sl);
+    sl = NULL;
+  }
+  return sl;
 }
 
 
@@ -81,20 +82,20 @@ int
 sl_add(StringList *sl, char *name)
 {
 
-	_DIAGASSERT(sl != NULL);
+  _DIAGASSERT(sl != NULL);
 
-	if (sl->sl_cur == sl->sl_max - 1) {
-		char	**new;
+  if (sl->sl_cur == sl->sl_max - 1) {
+    char  **new;
 
-		new = realloc(sl->sl_str,
-		    (sl->sl_max + _SL_CHUNKSIZE) * sizeof(char *));
-		if (new == NULL)
-			return -1;
-		sl->sl_max += _SL_CHUNKSIZE;
-		sl->sl_str = new;
-	}
-	sl->sl_str[sl->sl_cur++] = name;
-	return 0;
+    new = realloc(sl->sl_str,
+        (sl->sl_max + _SL_CHUNKSIZE) * sizeof(char *));
+    if (new == NULL)
+      return -1;
+    sl->sl_max += _SL_CHUNKSIZE;
+    sl->sl_str = new;
+  }
+  sl->sl_str[sl->sl_cur++] = name;
+  return 0;
 }
 
 
@@ -104,17 +105,17 @@ sl_add(StringList *sl, char *name)
 void
 sl_free(StringList *sl, int all)
 {
-	size_t i;
+  size_t i;
 
-	if (sl == NULL)
-		return;
-	if (sl->sl_str) {
-		if (all)
-			for (i = 0; i < sl->sl_cur; i++)
-				free(sl->sl_str[i]);
-		free(sl->sl_str);
-	}
-	free(sl);
+  if (sl == NULL)
+    return;
+  if (sl->sl_str) {
+    if (all)
+      for (i = 0; i < sl->sl_cur; i++)
+        free(sl->sl_str[i]);
+    free(sl->sl_str);
+  }
+  free(sl);
 }
 
 
@@ -124,31 +125,31 @@ sl_free(StringList *sl, int all)
 char *
 sl_find(StringList *sl, const char *name)
 {
-	size_t i;
+  size_t i;
 
-	_DIAGASSERT(sl != NULL);
+  _DIAGASSERT(sl != NULL);
 
-	for (i = 0; i < sl->sl_cur; i++)
-		if (strcmp(sl->sl_str[i], name) == 0)
-			return sl->sl_str[i];
+  for (i = 0; i < sl->sl_cur; i++)
+    if (strcmp(sl->sl_str[i], name) == 0)
+      return sl->sl_str[i];
 
-	return NULL;
+  return NULL;
 }
 
 int
 sl_delete(StringList *sl, const char *name, int all)
 {
-	size_t i, j;
+  size_t i, j;
 
-	for (i = 0; i < sl->sl_cur; i++)
-		if (strcmp(sl->sl_str[i], name) == 0) {
-			if (all)
-				free(sl->sl_str[i]);
-			for (j = i + 1; j < sl->sl_cur; j++)
-				sl->sl_str[j - 1] = sl->sl_str[j];
-			sl->sl_str[--sl->sl_cur] = NULL;
-			return 0;
-		}
-	return -1;
+  for (i = 0; i < sl->sl_cur; i++)
+    if (strcmp(sl->sl_str[i], name) == 0) {
+      if (all)
+        free(sl->sl_str[i]);
+      for (j = i + 1; j < sl->sl_cur; j++)
+        sl->sl_str[j - 1] = sl->sl_str[j];
+      sl->sl_str[--sl->sl_cur] = NULL;
+      return 0;
+    }
+  return -1;
 }
 

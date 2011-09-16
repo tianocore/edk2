@@ -48,6 +48,7 @@
 #include  <Protocol/SimpleFileSystem.h>
 
 #include  <wchar.h>
+#include  <stdarg.h>
 #include  <sys/fcntl.h>
 #include  <sys/unistd.h>
 
@@ -104,7 +105,7 @@ struct fileops {
 
   /* Call the fbadop_* version of these functions if not implemented by the device. */
   int     (EFIAPI *fo_stat)     (struct __filedes *filp, struct stat *StatBuf, void *Buf);
-  int     (EFIAPI *fo_ioctl)    (struct __filedes *filp, ULONGN Cmd, void *argp);
+  int     (EFIAPI *fo_ioctl)    (struct __filedes *filp, ULONGN Cmd, va_list argp);
   int     (EFIAPI *fo_delete)   (struct __filedes *filp);
   int     (EFIAPI *fo_rmdir)    (struct __filedes *filp);
   int     (EFIAPI *fo_mkdir)    (const char *path, __mode_t perms);
@@ -159,7 +160,7 @@ short   EFIAPI fnullop_poll  (struct __filedes *filp, short Events);
 int     EFIAPI fnullop_flush (struct __filedes *filp);
 
 int     EFIAPI fbadop_stat   (struct __filedes *filp, struct stat *StatBuf, void *Buf);
-int     EFIAPI fbadop_ioctl  (struct __filedes *filp, ULONGN Cmd, void *argp);
+int     EFIAPI fbadop_ioctl  (struct __filedes *filp, ULONGN Cmd, va_list argp);
 int     EFIAPI fbadop_delete (struct __filedes *filp);
 int     EFIAPI fbadop_rmdir  (struct __filedes *filp);
 int     EFIAPI fbadop_mkdir  (const char *path, __mode_t perms);

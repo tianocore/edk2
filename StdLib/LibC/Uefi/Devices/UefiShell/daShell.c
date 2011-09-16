@@ -26,6 +26,7 @@
 #include  <errno.h>
 #include  <string.h>
 #include  <stdlib.h>
+#include  <stdarg.h>
 #include  <wctype.h>
 #include  <wchar.h>
 #include  <sys/fcntl.h>
@@ -319,7 +320,7 @@ EFIAPI
 da_ShellIoctl(
   struct __filedes   *filp,
   ULONGN              cmd,
-  void               *argp       ///< May be a pointer or a value
+  va_list             argp
   )
 {
   return -EPERM;

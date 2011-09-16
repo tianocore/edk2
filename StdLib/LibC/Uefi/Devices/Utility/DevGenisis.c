@@ -17,6 +17,7 @@
 #include  <LibConfig.h>
 
 #include  <errno.h>
+#include  <stdarg.h>
 #include  <sys/poll.h>
 #include  <kfile.h>
 #include  <Device/Device.h>
@@ -45,7 +46,7 @@ int     EFIAPI fnullop_flush (struct __filedes *filp)
 int     EFIAPI fbadop_stat   (struct __filedes *filp, struct stat *StatBuf, void *Buf)
 { return -EPERM;  }
 
-int     EFIAPI fbadop_ioctl  (struct __filedes *filp, ULONGN Cmd, void *argp)
+int     EFIAPI fbadop_ioctl  (struct __filedes *filp, ULONGN Cmd, va_list argp)
 { return -EPERM;  }
 
 int     EFIAPI fbadop_delete (struct __filedes *filp)

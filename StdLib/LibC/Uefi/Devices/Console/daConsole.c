@@ -26,6 +26,7 @@
 #include  <errno.h>
 #include  <wctype.h>
 #include  <wchar.h>
+#include  <stdarg.h>
 #include  <sys/fcntl.h>
 #include  <kfile.h>
 #include  <Device/Device.h>
@@ -377,7 +378,7 @@ EFIAPI
 da_ConIoctl(
   struct __filedes   *filp,
   ULONGN              cmd,
-  void               *argp
+  va_list             argp
   )
 {
   return -EPERM;
