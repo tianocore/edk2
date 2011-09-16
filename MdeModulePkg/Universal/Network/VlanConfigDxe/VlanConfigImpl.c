@@ -273,7 +273,7 @@ VlanCallback (
       //
       // Clear UI data
       //
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
       Configuration->VlanId = 0;
       Configuration->Priority = 0;
       break;
@@ -301,7 +301,7 @@ VlanCallback (
         gBS->ConnectController (PrivateData->ControllerHandle, NULL, NULL, TRUE);
       }
 
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
       ZeroMem (Configuration->VlanList, MAX_VLAN_NUMBER);
       break;
 

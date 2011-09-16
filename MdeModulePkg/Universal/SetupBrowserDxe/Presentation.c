@@ -1244,10 +1244,12 @@ ProcessCallBackFunction (
       switch (ActionRequest) {
       case EFI_BROWSER_ACTION_REQUEST_RESET:
         gResetRequired = TRUE;
+        Selection->Action = UI_ACTION_EXIT;
         break;
 
       case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
         SubmitFormIsRequired = TRUE;
+        Selection->Action = UI_ACTION_EXIT;
         break;
 
       case EFI_BROWSER_ACTION_REQUEST_EXIT:

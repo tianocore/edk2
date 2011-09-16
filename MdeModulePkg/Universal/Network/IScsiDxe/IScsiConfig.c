@@ -889,7 +889,7 @@ IScsiFormCallback (
             BufferSize,
             &Private->Current->AuthConfigData
             );
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY
       break;
 
     default:
