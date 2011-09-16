@@ -84,6 +84,10 @@ typedef struct {
   UINT32                              StatusRegisterAddress;
   UINT32                              CommandRegisterAddress;
 
+  BOOLEAN                             LeftCtrl;
+  BOOLEAN                             RightCtrl;
+  BOOLEAN                             LeftAlt;
+  BOOLEAN                             RightAlt;
   BOOLEAN                             LeftShift;
   BOOLEAN                             RightShift;  
   BOOLEAN                             LeftLogo;
@@ -91,9 +95,6 @@ typedef struct {
   BOOLEAN                             Menu;
   BOOLEAN                             SysReq;
 
-  BOOLEAN                             Ctrl;
-  BOOLEAN                             Alt;
-  BOOLEAN                             Shift;
   BOOLEAN                             CapsLock;
   BOOLEAN                             NumLock;
   BOOLEAN                             ScrollLock;
@@ -160,7 +161,7 @@ InstallPs2KeyboardDriver (
 #define KEYBOARD_WAITFORVALUE_TIMEOUT   1000000 // 1s
 #define KEYBOARD_BAT_TIMEOUT            4000000 // 4s
 #define KEYBOARD_TIMER_INTERVAL         200000  // 0.02s
-#define SCANCODE_EXTENDED               0xE0
+#define SCANCODE_EXTENDED0              0xE0
 #define SCANCODE_EXTENDED1              0xE1
 #define SCANCODE_CTRL_MAKE              0x1D
 #define SCANCODE_CTRL_BREAK             0x9D
@@ -181,9 +182,12 @@ InstallPs2KeyboardDriver (
 #define SCANCODE_MENU_MAKE              0x5D //APPS key defined in Keyboard scan code 
 #define SCANCODE_MENU_BREAK             0xDD
 #define SCANCODE_SYS_REQ_MAKE           0x37
+#define SCANCODE_SYS_REQ_BREAK          0xB7
+#define SCANCODE_SYS_REQ_MAKE_WITH_ALT  0x54
+#define SCANCODE_SYS_REQ_BREAK_WITH_ALT 0xD4
+
 #define SCANCODE_MAX_MAKE               0x60
 
-#define SCANCODE_PAUSE_MAKE             0x9DC5 // The last two bytes of scancode for PAUSE key
 
 #define KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA     BIT0        ///< 0 - Output register has no data; 1 - Output register has data
 #define KEYBOARD_STATUS_REGISTER_HAS_INPUT_DATA      BIT1        ///< 0 - Input register has no data;  1 - Input register has data
