@@ -2153,7 +2153,7 @@ IScsiFormCallback (
           );      
       }
 
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
       break;
 
     case KEY_ADD_ATTEMPT:
@@ -2179,7 +2179,7 @@ IScsiFormCallback (
       }
 
       IScsiConfigUpdateAttempt ();
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
       break;
 
     case KEY_IGNORE_DELETE_ATTEMPT:
@@ -2188,7 +2188,7 @@ IScsiFormCallback (
         OldIfrNvData.DeleteAttemptList,
         sizeof (IfrNvData->DeleteAttemptList)
         );
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD;
       break;
 
     case KEY_ORDER_ATTEMPT_CONFIG:
@@ -2213,7 +2213,7 @@ IScsiFormCallback (
       }
 
       IScsiConfigUpdateAttempt ();
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
       break;
 
     case KEY_IGNORE_ORDER_CHANGES:
@@ -2222,7 +2222,7 @@ IScsiFormCallback (
         OldIfrNvData.DynamicOrderedList,
         sizeof (IfrNvData->DynamicOrderedList)
         );
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD;
       break;
 
     case KEY_ATTEMPT_NAME:
@@ -2241,7 +2241,7 @@ IScsiFormCallback (
 
       IScsiConfigUpdateAttempt ();
 
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
       break;
 
     case KEY_IP_MODE:
@@ -2419,7 +2419,7 @@ IScsiFormCallback (
         break;
       }
 
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
       break;
 
     default:

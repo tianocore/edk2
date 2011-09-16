@@ -1746,12 +1746,12 @@ Ip6FormCallback (
 
   case KEY_SAVE_CONFIG_CHANGES:
     CopyMem (&OldIfrNvData, IfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
     break;
 
   case KEY_IGNORE_CONFIG_CHANGES:
     CopyMem (IfrNvData, &OldIfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD;
     break;
 
   case KEY_SAVE_CHANGES:
