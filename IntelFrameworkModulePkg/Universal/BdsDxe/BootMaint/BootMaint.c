@@ -598,7 +598,7 @@ BootMaintCallback (
           // Tell browser not to ask for confirmation of changes,
           // since we have already applied or discarded.
           //
-          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
           break;
 
         default:
