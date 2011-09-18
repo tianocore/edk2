@@ -34,9 +34,6 @@ DEVICE_MANAGER_CALLBACK_DATA  gDeviceManagerPrivate = {
 
 #define  MAX_MAC_ADDRESS_NODE_LIST_LEN    10
 
-EFI_GUID mDeviceManagerGuid = DEVICE_MANAGER_FORMSET_GUID;
-EFI_GUID mDriverHealthGuid = DRIVER_HEALTH_FORMSET_GUID;
-
 //
 // Which Mac Address string is select
 // it will decide what menu need to show in the NETWORK_DEVICE_FORM_ID form.
@@ -72,10 +69,7 @@ HII_VENDOR_DEVICE_PATH  mDeviceManagerHiiVendorDevicePath = {
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    //
-    // {102579A0-3686-466e-ACD8-80C087044F4A}
-    //
-    { 0x102579a0, 0x3686, 0x466e, { 0xac, 0xd8, 0x80, 0xc0, 0x87, 0x4, 0x4f, 0x4a } }
+    DEVICE_MANAGER_FORMSET_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -97,10 +91,7 @@ HII_VENDOR_DEVICE_PATH  mDriverHealthHiiVendorDevicePath = {
           (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    //
-    // {D8F76651-1675-4986-BED4-3824B2F1F4C8}
-    //
-    { 0xd8f76651, 0x1675, 0x4986, { 0xbe, 0xd4, 0x38, 0x24, 0xb2, 0xf1, 0xf4, 0xc8 } }
+    DRIVER_HEALTH_FORMSET_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -775,7 +766,7 @@ CallDeviceManager (
     // Publish our HII data.
     //
     HiiHandle = HiiAddPackages (
-                  &mDeviceManagerGuid,
+                  &gDeviceManagerFormSetGuid,
                   gDeviceManagerPrivate.DriverHandle,
                   DeviceManagerVfrBin,
                   BdsDxeStrings,
@@ -980,7 +971,7 @@ CallDeviceManager (
 
   HiiUpdateForm (
     HiiHandle,
-    &mDeviceManagerGuid,
+    &gDeviceManagerFormSetGuid,
     mNextShowFormId,
     StartOpCodeHandle,
     EndOpCodeHandle
@@ -991,7 +982,7 @@ CallDeviceManager (
                            gFormBrowser2,
                            &HiiHandle,
                            1,
-                           &mDeviceManagerGuid,
+                           &gDeviceManagerFormSetGuid,
                            mNextShowFormId,
                            NULL,
                            &ActionRequest
@@ -1181,7 +1172,7 @@ CallDriverHealth (
     // Publish Driver Health HII data.
     //
     HiiHandle = HiiAddPackages (
-                  &mDeviceManagerGuid,
+                  &gDeviceManagerFormSetGuid,
                   gDeviceManagerPrivate.DriverHealthHandle,
                   DriverHealthVfrBin,
                   BdsDxeStrings,
@@ -1379,7 +1370,7 @@ CallDriverHealth (
 
   Status = HiiUpdateForm (
              HiiHandle,
-             &mDriverHealthGuid,
+             &gDriverHealthFormSetGuid,
              DRIVER_HEALTH_FORM_ID,
              StartOpCodeHandle,
              EndOpCodeHandle
@@ -1389,7 +1380,7 @@ CallDriverHealth (
 
   Status = HiiUpdateForm (
             HiiHandle,
-            &mDriverHealthGuid,
+            &gDriverHealthFormSetGuid,
             DRIVER_HEALTH_FORM_ID,
             StartOpCodeHandleRepair,
             EndOpCodeHandleRepair
@@ -1402,7 +1393,7 @@ CallDriverHealth (
                            gFormBrowser2,
                            &HiiHandle,
                            1,
-                           &mDriverHealthGuid,
+                           &gDriverHealthFormSetGuid,
                            DRIVER_HEALTH_FORM_ID,
                            NULL,
                            &ActionRequest

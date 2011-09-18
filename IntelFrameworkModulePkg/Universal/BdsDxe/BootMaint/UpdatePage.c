@@ -123,7 +123,7 @@ UpdatePageEnd (
 
   HiiUpdateForm (
     CallbackData->BmmHiiHandle,
-    &mBootMaintGuid,
+    &gBootMaintFormSetGuid,
     CallbackData->BmmCurrentPageId,
     mStartOpCodeHandle, // Label CallbackData->BmmCurrentPageId
     mEndOpCodeHandle    // LABEL_END
@@ -151,7 +151,7 @@ CleanUpPage (
   mStartLabel->Number = LabelId;
   HiiUpdateForm (
     CallbackData->BmmHiiHandle,
-    &mBootMaintGuid,
+    &gBootMaintFormSetGuid,
     LabelId,
     mStartOpCodeHandle, // Label LabelId
     mEndOpCodeHandle    // LABEL_END
@@ -1251,7 +1251,7 @@ UpdateSetLegacyDeviceOrderPage (
   IN BMM_CALLBACK_DATA                *CallbackData
   )
 {
-  BM_LEGACY_DEV_ORDER_CONTEXT *DevOrder;
+  LEGACY_DEV_ORDER_ENTRY      *DevOrder;
   BM_MENU_OPTION              *OptionMenu;
   BM_MENU_ENTRY               *NewMenuEntry;
   EFI_STRING_ID               StrRef;
@@ -1382,12 +1382,12 @@ UpdateSetLegacyDeviceOrderPage (
   //
   VarData = BdsLibGetVariableAndSize (
               VAR_LEGACY_DEV_ORDER,
-              &EfiLegacyDevOrderGuid,
+              &gEfiLegacyDevOrderVariableGuid,
               &VarSize
               );
 
   if (NULL != VarData) {
-    DevOrder    = (BM_LEGACY_DEV_ORDER_CONTEXT *) VarData;
+    DevOrder    = (LEGACY_DEV_ORDER_ENTRY *) VarData;
     while (VarData < VarData + VarSize) {
       if (DevOrder->BbsType == BbsType) {
         break;
@@ -1395,7 +1395,7 @@ UpdateSetLegacyDeviceOrderPage (
 
       VarData += sizeof (BBS_TYPE);
       VarData += *(UINT16 *) VarData;
-      DevOrder = (BM_LEGACY_DEV_ORDER_CONTEXT *) VarData;
+      DevOrder = (LEGACY_DEV_ORDER_ENTRY *) VarData;
     }
     //
     // Create oneof tag here for FD/HD/CD #1 #2

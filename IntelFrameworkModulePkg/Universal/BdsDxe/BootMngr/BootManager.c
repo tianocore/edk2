@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "BootManager.h"
 
 UINT16             mKeyInput;
-EFI_GUID           mBootManagerGuid = BOOT_MANAGER_FORMSET_GUID;
 LIST_ENTRY         mBootOptionsList;
 BDS_COMMON_OPTION  *gOption;
 CHAR16             *mDeviceTypeStr[] = {
@@ -40,10 +39,7 @@ HII_VENDOR_DEVICE_PATH  mBootManagerHiiVendorDevicePath = {
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    //
-    // {1DDDBE15-481D-4d2b-8277-B191EAF66525}
-    //
-    { 0x1dddbe15, 0x481d, 0x4d2b, { 0x82, 0x77, 0xb1, 0x91, 0xea, 0xf6, 0x65, 0x25 } }
+    BOOT_MANAGER_FORMSET_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -175,7 +171,7 @@ InitializeBootManager (
   // Publish our HII data
   //
   gBootManagerPrivate.HiiHandle = HiiAddPackages (
-                                    &mBootManagerGuid,
+                                    &gBootManagerFormSetGuid,
                                     gBootManagerPrivate.DriverHandle,
                                     BootManagerVfrBin,
                                     BdsDxeStrings,
@@ -338,7 +334,7 @@ CallBootManager (
 
   HiiUpdateForm (
     HiiHandle,
-    &mBootManagerGuid,
+    &gBootManagerFormSetGuid,
     BOOT_MANAGER_FORM_ID,
     StartOpCodeHandle,
     EndOpCodeHandle
@@ -352,7 +348,7 @@ CallBootManager (
                            gFormBrowser2,
                            &HiiHandle,
                            1,
-                           &mBootManagerGuid,
+                           &gBootManagerFormSetGuid,
                            0,
                            NULL,
                            &ActionRequest

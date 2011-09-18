@@ -5,7 +5,7 @@
   Availible on http://www.t13.org/#Project drafts
   Currently at ftp://fission.dt.wdc.com/pub/standards/x3t13/project/d1386r4.pdf
 
-Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2011, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -67,8 +67,6 @@ BIOS_LEGACY_DRIVE           *mLegacyDriverUnder1Mb;
 //  0xFE00 bytes is the max transfer size supported.
 //
 VOID                        *mEdd11Buffer;
-
-EFI_GUID                    mUnknownDevGuid = UNKNOWN_DEVICE_GUID;
 
 /**
   Driver entry point.
@@ -635,8 +633,8 @@ SetBiosInitBlockIoDevicePath (
   OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePath
   )
 {
-  EFI_STATUS                        Status;
-  UNKNOWN_DEVICE_VENDOR_DEVICE_PATH VendorNode;
+  EFI_STATUS                  Status;
+  BLOCKIO_VENDOR_DEVICE_PATH  VendorNode;
   
   Status = EFI_UNSUPPORTED;
   
@@ -658,7 +656,7 @@ SetBiosInitBlockIoDevicePath (
     VendorNode.DevicePath.Header.Type     = HARDWARE_DEVICE_PATH;
     VendorNode.DevicePath.Header.SubType  = HW_VENDOR_DP;
     SetDevicePathNodeLength (&VendorNode.DevicePath.Header, sizeof (VendorNode));
-    CopyMem (&VendorNode.DevicePath.Guid, &mUnknownDevGuid, sizeof (EFI_GUID));
+    CopyMem (&VendorNode.DevicePath.Guid, &gBlockIoVendorGuid, sizeof (EFI_GUID));
     VendorNode.LegacyDriveLetter  = Drive->Number;
     *DevicePath                   = AppendDevicePathNode (BaseDevicePath, &VendorNode.DevicePath.Header);
   }

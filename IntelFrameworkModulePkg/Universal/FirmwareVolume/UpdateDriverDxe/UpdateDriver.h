@@ -21,6 +21,7 @@
 
 #include <Protocol/LoadedImage.h>
 #include <Guid/Capsule.h>
+#include <Guid/CapsuleDataFile.h>
 #include <Protocol/FaultTolerantWrite.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 #include <Protocol/FirmwareVolume2.h>
@@ -37,12 +38,6 @@
 #include <Library/HiiLib.h>
 #include <Library/PrintLib.h>
 #include <Library/DevicePathLib.h>
-
-//
-// {283FA2EE-532C-484d-9383-9F93B36F0B7E}
-//
-#define EFI_UPDATE_DATA_FILE_GUID \
- { 0x283fa2ee, 0x532c, 0x484d, { 0x93, 0x83, 0x9f, 0x93, 0xb3, 0x6f, 0xb, 0x7e } }
 
 extern EFI_HII_HANDLE gHiiHandle;
 

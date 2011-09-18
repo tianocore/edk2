@@ -17,8 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Language.h"
 #include "Hotkey.h"
 
-EFI_GUID  mFrontPageGuid      = FRONT_PAGE_FORMSET_GUID;
-
 BOOLEAN   gConnectAllHappened = FALSE;
 UINTN     gCallbackKey;
 
@@ -46,10 +44,7 @@ HII_VENDOR_DEVICE_PATH  mFrontPageHiiVendorDevicePath = {
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    //
-    // {8E6D99EE-7531-48f8-8745-7F6144468FF2}
-    //
-    { 0x8e6d99ee, 0x7531, 0x48f8, { 0x87, 0x45, 0x7f, 0x61, 0x44, 0x46, 0x8f, 0xf2 } }
+    FRONT_PAGE_FORMSET_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -128,8 +123,8 @@ FakeRouteConfig (
   }
 
   *Progress = Configuration;
-  if (!HiiIsConfigHdrMatch (Configuration, &mBootMaintGuid, mBootMaintStorageName)
-      && !HiiIsConfigHdrMatch (Configuration, &mFileExplorerGuid, mFileExplorerStorageName)) {
+  if (!HiiIsConfigHdrMatch (Configuration, &gBootMaintFormSetGuid, mBootMaintStorageName)
+      && !HiiIsConfigHdrMatch (Configuration, &gFileExploreFormSetGuid, mFileExplorerStorageName)) {
     return EFI_NOT_FOUND;
   }
 
@@ -357,7 +352,7 @@ InitializeFrontPage (
     // Publish our HII data
     //
     gFrontPagePrivate.HiiHandle = HiiAddPackages (
-                                    &mFrontPageGuid,
+                                    &gFrontPageFormSetGuid,
                                     gFrontPagePrivate.DriverHandle,
                                     FrontPageVfrBin,
                                     BdsDxeStrings,
@@ -496,7 +491,7 @@ InitializeFrontPage (
 
   Status = HiiUpdateForm (
              HiiHandle,
-             &mFrontPageGuid,
+             &gFrontPageFormSetGuid,
              FRONT_PAGE_FORM_ID,
              StartOpCodeHandle, // LABEL_SELECT_LANGUAGE
              EndOpCodeHandle    // LABEL_END
@@ -536,7 +531,7 @@ CallFrontPage (
                             gFormBrowser2,
                             &gFrontPagePrivate.HiiHandle,
                             1,
-                            &mFrontPageGuid,
+                            &gFrontPageFormSetGuid,
                             0,
                             NULL,
                             &ActionRequest

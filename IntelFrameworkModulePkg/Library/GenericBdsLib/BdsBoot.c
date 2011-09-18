@@ -18,23 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 BOOLEAN mEnumBootDevice = FALSE;
 EFI_HII_HANDLE gBdsLibStringPackHandle = NULL;
 
-///
-/// This GUID is used for an EFI Variable that stores the front device pathes
-/// for a partial device path that starts with the HD node.
-///
-EFI_GUID  mHdBootVariablePrivateGuid = { 0xfab7e9e1, 0x39dd, 0x4f2b, { 0x84, 0x8, 0xe2, 0xe, 0x90, 0x6c, 0xb6, 0xde } };
-
-///
-/// This GUID is used for register UNI string.
-///
-EFI_GUID mBdsLibStringPackGuid = {  0x3b4d9b23, 0x95ac, 0x44f6, { 0x9f, 0xcd, 0xe, 0x95, 0x94, 0x58, 0x6c, 0x72 } };
-
-///
-/// This GUID is used for Set/Get platform language into/from variable at last time enumeration to ensure the enumeration will
-/// only execute once.
-///
-EFI_GUID mBdsLibLastLangGuid = { 0xe8c545b, 0xa2ee, 0x470d, { 0x8e, 0x26, 0xbd, 0xa1, 0xa1, 0x3c, 0xa, 0xa3 } };
-
 /**
   The constructor function register UNI strings into imageHandle.
   
@@ -56,7 +39,7 @@ GenericBdsLibConstructor (
 {
 
   gBdsLibStringPackHandle = HiiAddPackages (
-                              &mBdsLibStringPackGuid,
+                              &gBdsLibStringPackageGuid,
                               &ImageHandle,
                               GenericBdsLibStrings,
                               NULL
@@ -906,13 +889,13 @@ BdsExpandPartitionPartialDevicePathToFull (
 
   FullDevicePath = NULL;
   //
-  // Check if there is prestore 'HDDP' variable.
+  // Check if there is prestore HD_BOOT_DEVICE_PATH_VARIABLE_NAME variable.
   // If exist, search the front path which point to partition node in the variable instants.
-  // If fail to find or 'HDDP' not exist, reconnect all and search in all system
+  // If fail to find or HD_BOOT_DEVICE_PATH_VARIABLE_NAME not exist, reconnect all and search in all system
   //
   CachedDevicePath = BdsLibGetVariableAndSize (
-                      L"HDDP",
-                      &mHdBootVariablePrivateGuid,
+                      HD_BOOT_DEVICE_PATH_VARIABLE_NAME,
+                      &gHdBootDevicePathVariablGuid,
                       &CachedDevicePathSize
                       );
 
@@ -954,7 +937,7 @@ BdsExpandPartitionPartialDevicePathToFull (
       FullDevicePath = AppendDevicePath (Instance, DevicePath);
 
       //
-      // Adjust the 'HDDP' instances sequence if the matched one is not first one.
+      // Adjust the HD_BOOT_DEVICE_PATH_VARIABLE_NAME instances sequence if the matched one is not first one.
       //
       if (NeedAdjust) {
         //
@@ -974,8 +957,8 @@ BdsExpandPartitionPartialDevicePathToFull (
         // Save the matching Device Path so we don't need to do a connect all next time
         //
         Status = gRT->SetVariable (
-                        L"HDDP",
-                        &mHdBootVariablePrivateGuid,
+                        HD_BOOT_DEVICE_PATH_VARIABLE_NAME,
+                        &gHdBootDevicePathVariablGuid,
                         EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                         GetDevicePathSize (CachedDevicePath),
                         CachedDevicePath
@@ -989,7 +972,7 @@ BdsExpandPartitionPartialDevicePathToFull (
   }
 
   //
-  // If we get here we fail to find or 'HDDP' not exist, and now we need
+  // If we get here we fail to find or HD_BOOT_DEVICE_PATH_VARIABLE_NAME not exist, and now we need
   // to search all devices in the system for a matched partition
   //
   BdsLibConnectAllDriversToAllControllers ();
@@ -1019,11 +1002,11 @@ BdsExpandPartitionPartialDevicePathToFull (
       FullDevicePath = AppendDevicePath (BlockIoDevicePath, DevicePath);
 
       //
-      // Save the matched partition device path in 'HDDP' variable
+      // Save the matched partition device path in HD_BOOT_DEVICE_PATH_VARIABLE_NAME variable
       //
       if (CachedDevicePath != NULL) {
         //
-        // Save the matched partition device path as first instance of 'HDDP' variable
+        // Save the matched partition device path as first instance of HD_BOOT_DEVICE_PATH_VARIABLE_NAME variable
         //
         if (BdsLibMatchDevicePaths (CachedDevicePath, BlockIoDevicePath)) {
           TempNewDevicePath = CachedDevicePath;
@@ -1042,7 +1025,8 @@ BdsExpandPartitionPartialDevicePathToFull (
         }
         //
         // Here limit the device path instance number to 12, which is max number for a system support 3 IDE controller
-        // If the user try to boot many OS in different HDs or partitions, in theory, the 'HDDP' variable maybe become larger and larger.
+        // If the user try to boot many OS in different HDs or partitions, in theory, 
+        // the HD_BOOT_DEVICE_PATH_VARIABLE_NAME variable maybe become larger and larger.
         //
         InstanceNum = 0;
         ASSERT (CachedDevicePath != NULL);
@@ -1072,8 +1056,8 @@ BdsExpandPartitionPartialDevicePathToFull (
       // Save the matching Device Path so we don't need to do a connect all next time
       //
       Status = gRT->SetVariable (
-                      L"HDDP",
-                      &mHdBootVariablePrivateGuid,
+                      HD_BOOT_DEVICE_PATH_VARIABLE_NAME,
+                      &gHdBootDevicePathVariablGuid,
                       EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                       GetDevicePathSize (CachedDevicePath),
                       CachedDevicePath
@@ -1495,7 +1479,7 @@ BdsLibEnumerateAllBootOption (
   // device from the boot order variable
   //
   if (mEnumBootDevice) {
-    LastLang = GetVariable (L"LastEnumLang", &mBdsLibLastLangGuid);
+    LastLang = GetVariable (LAST_ENUM_LANGUAGE_VARIABLE_NAME, &gLastEnumLangGuid);
     PlatLang = GetEfiGlobalVariable (L"PlatformLang");
     ASSERT (PlatLang != NULL);
     if ((LastLang != NULL) && (AsciiStrCmp (LastLang, PlatLang) == 0)) {
@@ -1505,8 +1489,8 @@ BdsLibEnumerateAllBootOption (
       return Status;
     } else {
       Status = gRT->SetVariable (
-        L"LastEnumLang",
-        &mBdsLibLastLangGuid,
+        LAST_ENUM_LANGUAGE_VARIABLE_NAME,
+        &gLastEnumLangGuid,
         EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
         AsciiStrSize (PlatLang),
         PlatLang

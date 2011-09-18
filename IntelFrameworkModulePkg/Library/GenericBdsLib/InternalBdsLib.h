@@ -47,6 +47,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/GlobalVariable.h>
 #include <Guid/PcAnsi.h>
 #include <Guid/Performance.h>
+#include <Guid/BdsLibHii.h>
+#include <Guid/HdBootVariable.h>
+#include <Guid/LastEnumLang.h>
 
 #include <Library/PrintLib.h>
 #include <Library/DebugLib.h>

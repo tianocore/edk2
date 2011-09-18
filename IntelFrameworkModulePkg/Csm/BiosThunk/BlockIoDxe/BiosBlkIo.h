@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2011, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/LegacyBios.h>
 #include <Protocol/DevicePath.h>
 #include <Guid/LegacyBios.h>
+#include <Guid/BlockIoVendor.h>
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/DebugLib.h>
@@ -35,14 +36,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/Pci.h>
 
 #include "Edd.h"
-
-#define UNKNOWN_DEVICE_GUID \
-  { 0xcf31fac5, 0xc24e, 0x11d2,  {0x85, 0xf3, 0x0, 0xa0, 0xc9, 0x3e, 0xc9, 0x3b}  }
-
-typedef struct {
-  VENDOR_DEVICE_PATH              DevicePath;
-  UINT8                           LegacyDriveLetter;
-} UNKNOWN_DEVICE_VENDOR_DEVICE_PATH;
 
 //
 // Global Variables

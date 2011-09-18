@@ -18,7 +18,6 @@
 
 #include "UpdateDriver.h"
 
-EFI_GUID	UpdateDataGuid = EFI_UPDATE_DATA_FILE_GUID;
 EFI_HII_HANDLE  gHiiHandle;
 
 /**
@@ -767,7 +766,7 @@ InitializeUpdateDriver (
   FileBufferSize    = 0;
   Status            = FwVolProtocol->ReadFile (
                                        FwVolProtocol,
-                                       &UpdateDataGuid,
+                                       &gEfiUpdateDataFileGuid,
                                        (VOID **) &FileBuffer,
                                        &FileBufferSize,
                                        &FileType,

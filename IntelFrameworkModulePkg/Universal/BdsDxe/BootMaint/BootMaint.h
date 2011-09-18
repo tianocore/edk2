@@ -23,18 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Constants which are variable names used to access variables
 //
-#define VAR_LEGACY_DEV_ORDER L"LegacyDevOrder"
-
 #define VAR_CON_OUT_MODE L"ConOutMode"
-
-///
-/// Guid of a NV Variable which store the information about the
-/// FD/HD/CD/NET/BEV order
-///
-#define EFI_LEGACY_DEV_ORDER_VARIABLE_GUID \
-  { \
-  0xa56074db, 0x65fe, 0x45f7, {0xbd, 0x21, 0x2d, 0x2b, 0xdd, 0x8e, 0x96, 0x52} \
-  }
 
 //
 // String Contant
@@ -55,8 +44,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #define VAR_FLAG  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE
 
-extern EFI_GUID mBootMaintGuid;
-extern EFI_GUID mFileExplorerGuid;
 extern CHAR16   mFileExplorerStorageName[];
 extern CHAR16   mBootMaintStorageName[];
 //
@@ -85,8 +72,6 @@ extern UINT8    FEBin[];
 //
 // Enumeration type definition
 //
-typedef UINT8 BBS_TYPE;
-
 typedef enum _TYPE_OF_TERMINAL {
   TerminalTypePcAnsi                             = 0,
   TerminalTypeVt100,
@@ -263,15 +248,6 @@ typedef struct {
   UINT16    BbsIndex;
   UINT16    BbsType;
 } BOOT_OPTION_BBS_MAPPING;
-
-typedef struct {
-  BBS_TYPE  BbsType;
-  ///
-  /// Length = sizeof (UINT16) + SIZEOF (Data)
-  ///
-  UINT16    Length;
-  UINT16    Data[1];
-} BM_LEGACY_DEV_ORDER_CONTEXT;
 #pragma pack()
 
 typedef struct {
@@ -967,14 +943,14 @@ Var_UpdateDriverOrder (
   );
 
 /**
-  Update the legacy BBS boot option. L"LegacyDevOrder" and EfiLegacyDevOrderGuid EFI Variable
+  Update the legacy BBS boot option. VAR_LEGACY_DEV_ORDER and gEfiLegacyDevOrderVariableGuid EFI Variable
   is udpated with the new Legacy Boot order. The EFI Variable of "Boot####" and gEfiGlobalVariableGuid
   is also updated.
 
   @param CallbackData    The context data for BMM.
 
   @return EFI_SUCCESS    The function completed successfully.
-  @retval EFI_NOT_FOUND  If L"LegacyDevOrder" and EfiLegacyDevOrderGuid EFI Variable can not be found.
+  @retval EFI_NOT_FOUND  If VAR_LEGACY_DEV_ORDER and gEfiLegacyDevOrderVariableGuid EFI Variable can not be found.
 
 **/
 EFI_STATUS
@@ -1566,7 +1542,6 @@ extern STRING_DEPOSITORY          *DriverOptionStrDepository;
 extern STRING_DEPOSITORY          *DriverOptionHelpStrDepository;
 extern STRING_DEPOSITORY          *TerminalStrDepository;
 extern EFI_DEVICE_PATH_PROTOCOL   EndDevicePath[];
-extern EFI_GUID                   EfiLegacyDevOrderGuid;
 extern UINT16                     mFlowControlType[2];
 extern UINT32                     mFlowControlValue[2];
 //

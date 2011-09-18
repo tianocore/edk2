@@ -89,6 +89,9 @@
   gPerformanceProtocolGuid                      ## SOMETIMES_PRODUCES ## Variable:L"PerfDataMemAddr" (The ACPI address of performance data)
   gEfiUartDevicePathGuid                        ## CONSUMES ## GUID (Identify the device path for UARD device)
   gEfiSasDevicePathGuid                         ## CONSUMES ## GUID (Identify the device path for SAS device)
+  gLastEnumLangGuid                             ## SOMETIMES_PRODUCES ## Variable:L"LastEnumLang" (Platform language at last time enumeration.)
+  gHdBootDevicePathVariablGuid                  ## SOMETIMES_PRODUCES ## Variable:L"HDDP" (The device path of Boot file on Hard device.)
+  gBdsLibStringPackageGuid                      ## PRODUCES ## GUID (HII String PackageList Guid)
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL CONSUMES

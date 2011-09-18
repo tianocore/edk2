@@ -26,14 +26,6 @@ extern EFI_HII_HANDLE gStringPackHandle;
 
 extern UINT8  BdsDxeStrings[];
 
-//
-// String Definition Guid for BDS Platform
-//
-#define EFI_BDS_PLATFORM_GUID \
-  { \
-    0x7777E939, 0xD57E, 0x4DCB, 0xA0, 0x8E, 0x64, 0xD7, 0x98, 0x57, 0x1E, 0x0F \
-  }
-
 /**
   Get string by string id from HII Interface
 

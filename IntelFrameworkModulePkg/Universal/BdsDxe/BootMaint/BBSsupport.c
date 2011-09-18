@@ -1046,7 +1046,7 @@ BdsFillDevOrderBuf (
   @param BbsCount        The BBS Count.
 
   @retval EFI_SUCCES             The buffer is created and the EFI variable named 
-                                 VAR_LEGACY_DEV_ORDER and EfiLegacyDevOrderGuid is
+                                 VAR_LEGACY_DEV_ORDER and gEfiLegacyDevOrderVariableGuid is
                                  set correctly.
   @retval EFI_OUT_OF_RESOURCES   Memmory or storage is not enough.
   @retval EFI_DEVICE_ERROR       Fail to add the device order into EFI variable fail
@@ -1066,8 +1066,8 @@ BdsCreateDevOrder (
   UINTN                       BEVCount;
   UINTN                       TotalSize;
   UINTN                       HeaderSize;
-  BM_LEGACY_DEV_ORDER_CONTEXT *DevOrder;
-  BM_LEGACY_DEV_ORDER_CONTEXT *DevOrderPtr;
+  LEGACY_DEV_ORDER_ENTRY      *DevOrder;
+  LEGACY_DEV_ORDER_ENTRY      *DevOrderPtr;
   EFI_STATUS                  Status;
 
   FDCount     = 0;
@@ -1131,23 +1131,23 @@ BdsCreateDevOrder (
 
   DevOrderPtr->BbsType = BBS_FLOPPY;
   DevOrderPtr->Length  = (UINT16) (sizeof (DevOrderPtr->Length) + FDCount * sizeof (UINT16));
-  DevOrderPtr          = (BM_LEGACY_DEV_ORDER_CONTEXT *) BdsFillDevOrderBuf (BbsTable, BBS_FLOPPY, BbsCount, DevOrderPtr->Data);
+  DevOrderPtr          = (LEGACY_DEV_ORDER_ENTRY *) BdsFillDevOrderBuf (BbsTable, BBS_FLOPPY, BbsCount, DevOrderPtr->Data);
 
   DevOrderPtr->BbsType = BBS_HARDDISK;
   DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + HDCount * sizeof (UINT16));
-  DevOrderPtr          = (BM_LEGACY_DEV_ORDER_CONTEXT *) BdsFillDevOrderBuf (BbsTable, BBS_HARDDISK, BbsCount, DevOrderPtr->Data);
+  DevOrderPtr          = (LEGACY_DEV_ORDER_ENTRY *) BdsFillDevOrderBuf (BbsTable, BBS_HARDDISK, BbsCount, DevOrderPtr->Data);
   
   DevOrderPtr->BbsType = BBS_CDROM;
   DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + CDCount * sizeof (UINT16));
-  DevOrderPtr          = (BM_LEGACY_DEV_ORDER_CONTEXT *) BdsFillDevOrderBuf (BbsTable, BBS_CDROM, BbsCount, DevOrderPtr->Data);
+  DevOrderPtr          = (LEGACY_DEV_ORDER_ENTRY *) BdsFillDevOrderBuf (BbsTable, BBS_CDROM, BbsCount, DevOrderPtr->Data);
   
   DevOrderPtr->BbsType = BBS_EMBED_NETWORK;
   DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + NETCount * sizeof (UINT16));
-  DevOrderPtr          = (BM_LEGACY_DEV_ORDER_CONTEXT *) BdsFillDevOrderBuf (BbsTable, BBS_EMBED_NETWORK, BbsCount, DevOrderPtr->Data);
+  DevOrderPtr          = (LEGACY_DEV_ORDER_ENTRY *) BdsFillDevOrderBuf (BbsTable, BBS_EMBED_NETWORK, BbsCount, DevOrderPtr->Data);
 
   DevOrderPtr->BbsType = BBS_BEV_DEVICE;
   DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + BEVCount * sizeof (UINT16));
-  DevOrderPtr          = (BM_LEGACY_DEV_ORDER_CONTEXT *) BdsFillDevOrderBuf (BbsTable, BBS_BEV_DEVICE, BbsCount, DevOrderPtr->Data);
+  DevOrderPtr          = (LEGACY_DEV_ORDER_ENTRY *) BdsFillDevOrderBuf (BbsTable, BBS_BEV_DEVICE, BbsCount, DevOrderPtr->Data);
 
   ASSERT (TotalSize == (UINTN) ((UINT8 *) DevOrderPtr - (UINT8 *) DevOrder));
 
@@ -1156,7 +1156,7 @@ BdsCreateDevOrder (
   //
   Status = gRT->SetVariable (
                   VAR_LEGACY_DEV_ORDER,
-                  &EfiLegacyDevOrderGuid,
+                  &gEfiLegacyDevOrderVariableGuid,
                   VAR_FLAG,
                   TotalSize,
                   DevOrder
@@ -1182,10 +1182,10 @@ BdsUpdateLegacyDevOrder (
   VOID
   )
 {
-  BM_LEGACY_DEV_ORDER_CONTEXT *DevOrder;
-  BM_LEGACY_DEV_ORDER_CONTEXT *NewDevOrder;
-  BM_LEGACY_DEV_ORDER_CONTEXT *Ptr;
-  BM_LEGACY_DEV_ORDER_CONTEXT *NewPtr;
+  LEGACY_DEV_ORDER_ENTRY      *DevOrder;
+  LEGACY_DEV_ORDER_ENTRY      *NewDevOrder;
+  LEGACY_DEV_ORDER_ENTRY      *Ptr;
+  LEGACY_DEV_ORDER_ENTRY      *NewPtr;
   UINTN                       DevOrderSize;
   EFI_LEGACY_BIOS_PROTOCOL    *LegacyBios;
   EFI_STATUS                  Status;
@@ -1248,7 +1248,7 @@ BdsUpdateLegacyDevOrder (
 
   DevOrder = BdsLibGetVariableAndSize (
                VAR_LEGACY_DEV_ORDER,
-               &EfiLegacyDevOrderGuid,
+               &gEfiLegacyDevOrderVariableGuid,
                &DevOrderSize
                );
   if (NULL == DevOrder) {
@@ -1326,8 +1326,8 @@ BdsUpdateLegacyDevOrder (
   //
   // copy HD
   //
-  Ptr             = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&Ptr->Data[Ptr->Length / sizeof (UINT16) - 1]);
-  NewPtr          = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&NewPtr->Data[NewPtr->Length / sizeof (UINT16) -1]);
+  Ptr             = (LEGACY_DEV_ORDER_ENTRY *) (&Ptr->Data[Ptr->Length / sizeof (UINT16) - 1]);
+  NewPtr          = (LEGACY_DEV_ORDER_ENTRY *) (&NewPtr->Data[NewPtr->Length / sizeof (UINT16) -1]);
   NewPtr->BbsType = Ptr->BbsType;
   NewPtr->Length  = (UINT16) (sizeof (UINT16) + HDCount * sizeof (UINT16));
   for (Index = 0; Index < Ptr->Length / sizeof (UINT16) - 1; Index++) {
@@ -1347,8 +1347,8 @@ BdsUpdateLegacyDevOrder (
   //
   // copy CD
   //
-  Ptr    = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&Ptr->Data[Ptr->Length / sizeof (UINT16) - 1]);
-  NewPtr = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&NewPtr->Data[NewPtr->Length / sizeof (UINT16) -1]);
+  Ptr    = (LEGACY_DEV_ORDER_ENTRY *) (&Ptr->Data[Ptr->Length / sizeof (UINT16) - 1]);
+  NewPtr = (LEGACY_DEV_ORDER_ENTRY *) (&NewPtr->Data[NewPtr->Length / sizeof (UINT16) -1]);
   NewPtr->BbsType = Ptr->BbsType;
   NewPtr->Length  = (UINT16) (sizeof (UINT16) + CDCount * sizeof (UINT16));
   for (Index = 0; Index < Ptr->Length / sizeof (UINT16) - 1; Index++) {
@@ -1368,8 +1368,8 @@ BdsUpdateLegacyDevOrder (
   //
   // copy NET
   //
-  Ptr    = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&Ptr->Data[Ptr->Length / sizeof (UINT16) - 1]);
-  NewPtr = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&NewPtr->Data[NewPtr->Length / sizeof (UINT16) -1]);
+  Ptr    = (LEGACY_DEV_ORDER_ENTRY *) (&Ptr->Data[Ptr->Length / sizeof (UINT16) - 1]);
+  NewPtr = (LEGACY_DEV_ORDER_ENTRY *) (&NewPtr->Data[NewPtr->Length / sizeof (UINT16) -1]);
   NewPtr->BbsType = Ptr->BbsType;
   NewPtr->Length  = (UINT16) (sizeof (UINT16) + NETCount * sizeof (UINT16));
   for (Index = 0; Index < Ptr->Length / sizeof (UINT16) - 1; Index++) {
@@ -1389,8 +1389,8 @@ BdsUpdateLegacyDevOrder (
   //
   // copy BEV
   //
-  Ptr    = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&Ptr->Data[Ptr->Length / sizeof (UINT16) - 1]);
-  NewPtr = (BM_LEGACY_DEV_ORDER_CONTEXT *) (&NewPtr->Data[NewPtr->Length / sizeof (UINT16) -1]);
+  Ptr    = (LEGACY_DEV_ORDER_ENTRY *) (&Ptr->Data[Ptr->Length / sizeof (UINT16) - 1]);
+  NewPtr = (LEGACY_DEV_ORDER_ENTRY *) (&NewPtr->Data[NewPtr->Length / sizeof (UINT16) -1]);
   NewPtr->BbsType = Ptr->BbsType;
   NewPtr->Length  = (UINT16) (sizeof (UINT16) + BEVCount * sizeof (UINT16));
   for (Index = 0; Index < Ptr->Length / sizeof (UINT16) - 1; Index++) {
@@ -1477,7 +1477,7 @@ BdsUpdateLegacyDevOrder (
 
   Status = gRT->SetVariable (
                   VAR_LEGACY_DEV_ORDER,
-                  &EfiLegacyDevOrderGuid,
+                  &gEfiLegacyDevOrderVariableGuid,
                   VAR_FLAG,
                   TotalSize,
                   NewDevOrder
@@ -1508,14 +1508,14 @@ BdsSetBootPriority4SameTypeDev (
   IN OUT UINT16                                          *Priority
   )
 {
-  BM_LEGACY_DEV_ORDER_CONTEXT *DevOrder;
-  BM_LEGACY_DEV_ORDER_CONTEXT *DevOrderPtr;
+  LEGACY_DEV_ORDER_ENTRY      *DevOrder;
+  LEGACY_DEV_ORDER_ENTRY      *DevOrderPtr;
   UINTN                       DevOrderSize;
   UINTN                       Index;
 
   DevOrder = BdsLibGetVariableAndSize (
                VAR_LEGACY_DEV_ORDER,
-               &EfiLegacyDevOrderGuid,
+               &gEfiLegacyDevOrderVariableGuid,
                &DevOrderSize
                );
   if (NULL == DevOrder) {
@@ -1528,7 +1528,7 @@ BdsSetBootPriority4SameTypeDev (
       break;
     }
 
-    DevOrderPtr = (BM_LEGACY_DEV_ORDER_CONTEXT *) ((UINT8 *) DevOrderPtr + sizeof (BBS_TYPE) + DevOrderPtr->Length);
+    DevOrderPtr = (LEGACY_DEV_ORDER_ENTRY *) ((UINT8 *) DevOrderPtr + sizeof (BBS_TYPE) + DevOrderPtr->Length);
   }
 
   if ((UINT8 *) DevOrderPtr >= (UINT8 *) DevOrder + DevOrderSize) {

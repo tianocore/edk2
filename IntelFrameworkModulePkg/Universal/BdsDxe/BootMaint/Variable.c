@@ -1071,14 +1071,14 @@ Var_UpdateDriverOrder (
 }
 
 /**
-  Update the legacy BBS boot option. L"LegacyDevOrder" and EfiLegacyDevOrderGuid EFI Variable
+  Update the legacy BBS boot option. VAR_LEGACY_DEV_ORDER and gEfiLegacyDevOrderVariableGuid EFI Variable
   is udpated with the new Legacy Boot order. The EFI Variable of "Boot####" and gEfiGlobalVariableGuid
   is also updated.
 
   @param CallbackData    The context data for BMM.
 
   @return EFI_SUCCESS           The function completed successfully.
-  @retval EFI_NOT_FOUND         If L"LegacyDevOrder" and EfiLegacyDevOrderGuid EFI Variable can be found.
+  @retval EFI_NOT_FOUND         If VAR_LEGACY_DEV_ORDER and gEfiLegacyDevOrderVariableGuid EFI Variable can be found.
   @retval EFI_OUT_OF_RESOURCES  Fail to allocate memory resource
 **/
 EFI_STATUS
@@ -1097,7 +1097,7 @@ Var_UpdateBBSOption (
   UINT8                       *LegacyDev;
   UINT8                       *VarData;
   UINTN                       VarSize;
-  BM_LEGACY_DEV_ORDER_CONTEXT *DevOrder;
+  LEGACY_DEV_ORDER_ENTRY      *DevOrder;
   UINT8                       *OriginalPtr;
   UINT8                       *DisMap;
   UINTN                       Pos;
@@ -1155,7 +1155,7 @@ Var_UpdateBBSOption (
   //
   VarData = (UINT8 *) BdsLibGetVariableAndSize (
                         VAR_LEGACY_DEV_ORDER,
-                        &EfiLegacyDevOrderGuid,
+                        &gEfiLegacyDevOrderVariableGuid,
                         &VarSize
                         );
 
@@ -1164,7 +1164,7 @@ Var_UpdateBBSOption (
   }
 
   OriginalPtr = VarData;
-  DevOrder    = (BM_LEGACY_DEV_ORDER_CONTEXT *) VarData;
+  DevOrder    = (LEGACY_DEV_ORDER_ENTRY *) VarData;
 
   while (VarData < OriginalPtr + VarSize) {
     if (DevOrder->BbsType == CallbackData->BbsType) {
@@ -1172,7 +1172,7 @@ Var_UpdateBBSOption (
     }
 
     VarData += sizeof (BBS_TYPE) + DevOrder->Length;
-    DevOrder = (BM_LEGACY_DEV_ORDER_CONTEXT *) VarData;
+    DevOrder = (LEGACY_DEV_ORDER_ENTRY *) VarData;
   }
 
   if (VarData >= OriginalPtr + VarSize) {
@@ -1218,7 +1218,7 @@ Var_UpdateBBSOption (
 
   Status = gRT->SetVariable (
                   VAR_LEGACY_DEV_ORDER,
-                  &EfiLegacyDevOrderGuid,
+                  &gEfiLegacyDevOrderVariableGuid,
                   VAR_FLAG,
                   VarSize,
                   OriginalPtr

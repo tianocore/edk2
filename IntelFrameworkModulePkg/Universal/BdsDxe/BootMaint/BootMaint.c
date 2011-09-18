@@ -38,10 +38,7 @@ HII_VENDOR_DEVICE_PATH  mBmmHiiVendorDevicePath = {
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    //
-    // {165A028F-0BB2-4b5f-8747-77592E3F6499}
-    //
-    { 0x165a028f, 0xbb2, 0x4b5f, { 0x87, 0x47, 0x77, 0x59, 0x2e, 0x3f, 0x64, 0x99 } }
+    BOOT_MAINT_FORMSET_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -63,10 +60,7 @@ HII_VENDOR_DEVICE_PATH  mFeHiiVendorDevicePath = {
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    //
-    // {91DB4238-B0C8-472e-BBCF-F3A6541010F4}
-    //
-    { 0x91db4238, 0xb0c8, 0x472e, { 0xbb, 0xcf, 0xf3, 0xa6, 0x54, 0x10, 0x10, 0xf4 } }
+    FILE_EXPLORE_FORMSET_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -77,10 +71,6 @@ HII_VENDOR_DEVICE_PATH  mFeHiiVendorDevicePath = {
     }
   }
 };
-
-EFI_GUID EfiLegacyDevOrderGuid  = EFI_LEGACY_DEV_ORDER_VARIABLE_GUID;
-EFI_GUID mBootMaintGuid         = BOOT_MAINT_FORMSET_GUID;
-EFI_GUID mFileExplorerGuid      = FILE_EXPLORE_FORMSET_GUID;
 
 CHAR16  mBootMaintStorageName[]     = L"BmmData";
 CHAR16  mFileExplorerStorageName[]  = L"FeData";
@@ -194,7 +184,7 @@ BootMaintExtractConfig (
   }
 
   *Progress = Request;
-  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &mBootMaintGuid, mBootMaintStorageName)) {
+  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &gBootMaintFormSetGuid, mBootMaintStorageName)) {
     return EFI_NOT_FOUND;
   }
 
@@ -215,7 +205,7 @@ BootMaintExtractConfig (
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
-    ConfigRequestHdr = HiiConstructConfigHdr (&mBootMaintGuid, mBootMaintStorageName, Private->BmmDriverHandle);
+    ConfigRequestHdr = HiiConstructConfigHdr (&gBootMaintFormSetGuid, mBootMaintStorageName, Private->BmmDriverHandle);
     Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
     ASSERT (ConfigRequest != NULL);
@@ -319,7 +309,7 @@ BootMaintCallback (
     // Retrive uncommitted data from Form Browser
     //
     CurrentFakeNVMap = &Private->BmmFakeNvData;
-    HiiGetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap);
+    HiiGetBrowserData (&gBootMaintFormSetGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap);
 
     //
     // need to be subtituded.
@@ -630,7 +620,7 @@ BootMaintCallback (
     //
     // Pass changed uncommitted data back to Form Browser
     //
-    Status = HiiSetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap, NULL);
+    Status = HiiSetBrowserData (&gBootMaintFormSetGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap, NULL);
     return Status;
   }
 
@@ -985,7 +975,7 @@ InitializeBM (
   // Post our Boot Maint VFR binary to the HII database.
   //
   BmmCallbackInfo->BmmHiiHandle = HiiAddPackages (
-                                    &mBootMaintGuid,
+                                    &gBootMaintFormSetGuid,
                                     BmmCallbackInfo->BmmDriverHandle,
                                     BmBin,
                                     BdsDxeStrings,
@@ -997,7 +987,7 @@ InitializeBM (
   // Post our File Explorer VFR binary to the HII database.
   //
   BmmCallbackInfo->FeHiiHandle = HiiAddPackages (
-                                   &mFileExplorerGuid,
+                                   &gFileExploreFormSetGuid,
                                    BmmCallbackInfo->FeDriverHandle,
                                    FEBin,
                                    BdsDxeStrings,
@@ -1109,7 +1099,7 @@ InitializeBM (
     
     HiiUpdateForm (
       BmmCallbackInfo->BmmHiiHandle,
-      &mBootMaintGuid,
+      &gBootMaintFormSetGuid,
       FORM_BOOT_SETUP_ID,
       mStartOpCodeHandle, // Label FORM_BOOT_LEGACY_DEVICE_ID
       mEndOpCodeHandle    // LABEL_END
@@ -1399,7 +1389,7 @@ FormSetDispatcher (
                              gFormBrowser2,
                              &CallbackData->BmmHiiHandle,
                              1,
-                             &mBootMaintGuid,
+                             &gBootMaintFormSetGuid,
                              0,
                              NULL,
                              &ActionRequest
@@ -1421,7 +1411,7 @@ FormSetDispatcher (
                                gFormBrowser2,
                                &CallbackData->FeHiiHandle,
                                1,
-                               &mFileExplorerGuid,
+                               &gFileExploreFormSetGuid,
                                0,
                                NULL,
                                &ActionRequest

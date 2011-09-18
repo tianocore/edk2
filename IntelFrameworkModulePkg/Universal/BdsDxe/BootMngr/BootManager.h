@@ -1,7 +1,7 @@
 /** @file
   The platform boot manager reference implement
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,14 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Bds.h"
 #include "FrontPage.h"
-
-//
-// These are defined as the same with vfr file
-//
-#define BOOT_MANAGER_FORMSET_GUID \
-  { \
-  0x847bc3fe, 0xb974, 0x446d, {0x94, 0x49, 0x5a, 0xd5, 0x41, 0x2e, 0x99, 0x3b} \
-  }
 
 #define BOOT_MANAGER_FORM_ID     0x1000
 

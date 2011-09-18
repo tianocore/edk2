@@ -49,7 +49,7 @@
 
 [Guids]
   gEfiLegacyBiosGuid
-
+  gBlockIoVendorGuid
 
 [Packages]
   MdePkg/MdePkg.dec

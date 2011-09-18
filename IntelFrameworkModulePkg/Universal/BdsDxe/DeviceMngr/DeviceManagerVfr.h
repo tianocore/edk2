@@ -15,15 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _DEVICE_MANAGER_VFR_H_
 #define _DEVICE_MANAGER_VFR_H_
 
-#define DEVICE_MANAGER_FORMSET_GUID  \
-  { \
-  0x3ebfa8e6, 0x511d, 0x4b5b, {0xa9, 0x5f, 0xfb, 0x38, 0x26, 0xf, 0x1c, 0x27} \
-  }
-
-#define DRIVER_HEALTH_FORMSET_GUID  \
-  { \
-  0xf76e0a70, 0xb5ed, 0x4c38, {0xac, 0x9a, 0xe5, 0xf5, 0x4b, 0xf1, 0x6e, 0x34} \
-  }
+#include <Guid/BdsHii.h>
 
 #define LABEL_DEVICES_LIST                   0x1100
 #define LABEL_NETWORK_DEVICE_LIST_ID         0x1101

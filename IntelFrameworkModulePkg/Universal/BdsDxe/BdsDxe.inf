@@ -134,7 +134,14 @@
   gEfiHiiPlatformSetupFormsetGuid               ## CONSUMES ## GUID (Indicate the formset class guid to be displayed)
   gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
   gEfiHiiDriverHealthFormsetGuid                ## CONSUMES ## GUID (Indicate the Driver Health formset class guid to be displayed)
-  
+  gEfiLegacyDevOrderVariableGuid                ## SOMETIMES_PRODUCES ## Variable:L"LegacyDevOrder"
+  gFrontPageFormSetGuid                         ## PRODUCES           ## FrontPage HII Package
+  gBootMaintFormSetGuid                         ## SOMETIMES_PRODUCES ## BootMaint HII Package
+  gFileExploreFormSetGuid                       ## SOMETIMES_PRODUCES ## FileExplore HII Package
+  gBootManagerFormSetGuid                       ## SOMETIMES_PRODUCES ## BootManager HII Package
+  gDeviceManagerFormSetGuid                     ## SOMETIMES_PRODUCES ## DeviceManager HII Package
+  gDriverHealthFormSetGuid                      ## SOMETIMES_PRODUCES ## DriverHealth HII Package
+
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              ## PROTOCOL CONSUMES
   gEfiLoadFileProtocolGuid                      ## PROTOCOL CONSUMES
