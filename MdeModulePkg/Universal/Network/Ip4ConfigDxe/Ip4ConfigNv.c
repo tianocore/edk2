@@ -15,9 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ip4ConfigNv.h"
 #include "NicIp4Variable.h"
 
-EFI_GUID  mNicIp4ConfigNvDataGuid = EFI_NIC_IP4_CONFIG_NVDATA_GUID;
-
-
 /**
   Calculate the prefix length of the IPv4 subnet mask.
 
@@ -431,7 +428,7 @@ Ip4DeviceExtractConfig (
     }
   }
 
-  if ((Request == NULL) || HiiIsConfigHdrMatch (Request, &mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+  if ((Request == NULL) || HiiIsConfigHdrMatch (Request, &gNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
 
     IfrFormNvData = AllocateZeroPool (sizeof (IP4_CONFIG_IFR_NVDATA));
     if (IfrFormNvData == NULL) {
@@ -447,7 +444,7 @@ Ip4DeviceExtractConfig (
       // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
       // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
       //
-      ConfigRequestHdr = HiiConstructConfigHdr (&mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE, Ip4ConfigInstance->ChildHandle);
+      ConfigRequestHdr = HiiConstructConfigHdr (&gNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE, Ip4ConfigInstance->ChildHandle);
       Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
       ConfigRequest = AllocateZeroPool (Size);
       ASSERT (ConfigRequest != NULL);
@@ -498,7 +495,7 @@ Ip4DeviceExtractConfig (
     FreePool (FormResult);
   } else if (HiiIsConfigHdrMatch (Request, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
     *Results = DeviceResult;
-  } else if (HiiIsConfigHdrMatch (Request, &mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+  } else if (HiiIsConfigHdrMatch (Request, &gNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
     *Results = FormResult;
   } else {
     return EFI_NOT_FOUND;
@@ -582,7 +579,7 @@ Ip4DeviceRouteConfig (
   //
   // Check Routing data in <ConfigHdr>.
   //
-  if (HiiIsConfigHdrMatch (Configuration, &mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+  if (HiiIsConfigHdrMatch (Configuration, &gNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
     //
     // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
     //
@@ -703,7 +700,7 @@ Ip4FormCallback (
     //
     // Retrive uncommitted data from Browser
     //
-    if (!HiiGetBrowserData (&mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE, sizeof (IP4_CONFIG_IFR_NVDATA), (UINT8 *) IfrFormNvData)) {
+    if (!HiiGetBrowserData (&gNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE, sizeof (IP4_CONFIG_IFR_NVDATA), (UINT8 *) IfrFormNvData)) {
       FreePool (IfrFormNvData);
       return EFI_NOT_FOUND;
     }
@@ -841,7 +838,7 @@ Ip4ConfigDeviceInit (
   // Publish our HII data
   //
   Instance->RegisteredHandle = HiiAddPackages (
-                                 &mNicIp4ConfigNvDataGuid,
+                                 &gNicIp4ConfigNvDataGuid,
                                  Instance->ChildHandle,
                                  Ip4ConfigDxeStrings,
                                  Ip4ConfigDxeBin,

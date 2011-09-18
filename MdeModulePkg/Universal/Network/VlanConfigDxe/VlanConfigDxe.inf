@@ -52,6 +52,7 @@
 
 [Guids]
   gEfiIfrTianoGuid
+  gVlanConfigFormSetGuid
 
 [Protocols]
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES

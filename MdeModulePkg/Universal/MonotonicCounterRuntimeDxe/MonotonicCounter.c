@@ -2,7 +2,7 @@
   Produce the UEFI boot service GetNextMonotonicCount() and runtime service
   GetNextHighMonotonicCount().
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Uefi.h>
 
 #include <Protocol/MonotonicCounter.h>
+#include <Guid/MtcVendor.h>
 
 #include <Library/BaseLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -38,16 +39,6 @@ UINT64      mEfiMtc;
 // Event to update the monotonic Counter's high part when low part overflows.
 //
 EFI_EVENT   mEfiMtcEvent;
-
-//
-// Name of the variable for the high part of monotonic counter
-//
-CHAR16      *mEfiMtcName = (CHAR16 *) L"MTC";
-
-//
-// Vendor GUID of the variable for the high part of monotonic counter
-//
-EFI_GUID    mEfiMtcGuid = { 0xeb704011, 0x1402, 0x11d3, { 0x8e, 0x77, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } };
 
 /**
   Returns a monotonically increasing count for the platform.
@@ -171,8 +162,8 @@ MonotonicCounterDriverGetNextHighMonotonicCount (
   // Update the NV variable to match the new high part
   //
   return EfiSetVariable (
-           mEfiMtcName,
-           &mEfiMtcGuid,
+           MTC_VARIABLE_NAME,
+           &gMtcVendorGuid,
            EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
            sizeof (UINT32),
            HighCount
@@ -241,8 +232,8 @@ MonotonicCounterDriverInitialize (
   //
   BufferSize = sizeof (UINT32);
   Status = EfiGetVariable (
-             mEfiMtcName,
-             &mEfiMtcGuid,
+             MTC_VARIABLE_NAME,
+             &gMtcVendorGuid,
              NULL,
              &BufferSize,
              &HighCount

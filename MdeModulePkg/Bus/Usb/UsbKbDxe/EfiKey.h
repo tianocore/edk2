@@ -24,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DevicePath.h>
 
 #include <Guid/HiiKeyBoardLayout.h>
+#include <Guid/UsbKeyBoardLayout.h>
 
 #include <Library/DebugLib.h>
 #include <Library/ReportStatusCodeLib.h>

@@ -138,9 +138,6 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 #define USB_BIT(a)                  ((UINTN)(1 << (a)))
 #define USB_BIT_IS_SET(Data, Bit)   ((BOOLEAN)(((Data) & (Bit)) == (Bit)))
 
-#define EFI_USB_BUS_PROTOCOL_GUID \
-          {0x2B2F68CC, 0x0CD2, 0x44cf, {0x8E, 0x8B, 0xBB, 0xA2, 0x0B, 0x1B, 0x5B, 0x75}}
-
 #define USB_INTERFACE_FROM_USBIO(a) \
           CR(a, USB_INTERFACE, UsbIo, USB_INTERFACE_SIGNATURE)
 
@@ -149,6 +146,8 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 
 //
 // Used to locate USB_BUS
+// UsbBusProtocol is the private protocol.
+// gEfiCallerIdGuid will be used as its protocol guid.
 //
 typedef struct _EFI_USB_BUS_PROTOCOL {
   UINT64                    Reserved;

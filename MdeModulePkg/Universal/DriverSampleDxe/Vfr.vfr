@@ -51,7 +51,7 @@
 #define LABEL_UPDATE_BBS            0x2222
 
 formset
-  guid      = FORMSET_GUID,
+  guid      = DRIVER_SAMPLE_FORMSET_GUID,
   title     = STRING_TOKEN(STR_FORM_SET_TITLE),
   help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
   classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
@@ -71,7 +71,7 @@ formset
   varstore DRIVER_SAMPLE_CONFIGURATION,     // This is the data structure type
     varid = CONFIGURATION_VARSTORE_ID,      // Optional VarStore ID
     name  = MyIfrNVData,                    // Define referenced name in vfr
-    guid  = FORMSET_GUID;                   // GUID of this buffer storage
+    guid  = DRIVER_SAMPLE_FORMSET_GUID;     // GUID of this buffer storage
 
   //
   // Define a EFI variable Storage (EFI_IFR_VARSTORE_EFI)
@@ -79,7 +79,7 @@ formset
   efivarstore MY_EFI_VARSTORE_DATA,
     attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attribures  
     name  = MyEfiVar,
-    guid  = FORMSET_GUID;
+    guid  = DRIVER_SAMPLE_FORMSET_GUID;
 
   //
   // Define a Name/Value Storage (EFI_IFR_VARSTORE_NAME_VALUE)
@@ -88,7 +88,7 @@ formset
     name = STRING_TOKEN(STR_NAME_VALUE_VAR_NAME0), // Define Name list of this storage, refer it by MyNameValueVar[0]
     name = STRING_TOKEN(STR_NAME_VALUE_VAR_NAME1), // Define Name list of this storage, refer it by MyNameValueVar[1]
     name = STRING_TOKEN(STR_NAME_VALUE_VAR_NAME2), // Define Name list of this storage, refer it by MyNameValueVar[2]
-    guid = FORMSET_GUID;                           // GUID of this Name/Value storage
+    guid = DRIVER_SAMPLE_FORMSET_GUID;             // GUID of this Name/Value storage
 
   defaultstore MyStandardDefault,
     prompt      = STRING_TOKEN(STR_STANDARD_DEFAULT_PROMPT),
@@ -492,7 +492,7 @@ formset
       help   = STRING_TOKEN(STR_GOTO_HELP);
 
     guidop 
-      guid = FORMSET_GUID,
+      guid = DRIVER_SAMPLE_FORMSET_GUID,
       datatype = MY_EFI_VARSTORE_DATA,
         data.Field8  = 0x21, 
         data.Field16 = 0x2121,
@@ -680,7 +680,7 @@ formset
 
   formmap formid = 4,            
     maptitle = STRING_TOKEN(STR_SAMPL_MAP_METHOD);  
-    mapguid  = FORMSET_GUID;
+    mapguid  = DRIVER_SAMPLE_FORMSET_GUID;
     maptitle = STRING_TOKEN(STR_STANDARD_MAP_METHOD);  
     mapguid  = EFI_HII_STANDARD_FORM_GUID;
 

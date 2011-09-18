@@ -1,7 +1,7 @@
 /** @file
   Routines used to operate the Ip4 configure variable.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -15,10 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _NIC_IP4_NV_DATA_H_
 #define _NIC_IP4_NV_DATA_H_
 
-#define EFI_NIC_IP4_CONFIG_NVDATA_GUID \
-  { \
-    0x9d5b53f, 0xf4b0, 0x4f59, { 0xa0, 0xb1, 0x7b, 0x57, 0xd3, 0x5c, 0xe, 0x5 } \
-  }
+#include <Guid/Ip4ConfigHii.h>
 
 #define FORMID_MAIN_FORM    1
 #define FORMID_DEVICE_FORM  2

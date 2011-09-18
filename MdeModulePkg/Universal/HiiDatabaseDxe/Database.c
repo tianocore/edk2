@@ -15,12 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "HiiDatabase.h"
 
-//
-// Global variables
-//
-EFI_GUID mHiiDatabaseNotifyGuid = HII_DATABASE_NOTIFY_GUID;
-
-
 /**
   This function generates a HII_DATABASE_RECORD node and adds into hii database.
   This is a internal function.
@@ -3419,7 +3413,7 @@ HiiRegisterPackageNotify (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Notify->NotifyHandle,
-                  &mHiiDatabaseNotifyGuid,
+                  &gEfiCallerIdGuid,
                   NULL,
                   NULL
                   );
@@ -3477,7 +3471,7 @@ HiiUnregisterPackageNotify (
 
   Status = gBS->OpenProtocol (
                   NotificationHandle,
-                  &mHiiDatabaseNotifyGuid,
+                  &gEfiCallerIdGuid,
                   NULL,
                   NULL,
                   NULL,
@@ -3498,7 +3492,7 @@ HiiUnregisterPackageNotify (
       RemoveEntryList (&Notify->DatabaseNotifyEntry);
       Status = gBS->UninstallMultipleProtocolInterfaces (
                       Notify->NotifyHandle,
-                      &mHiiDatabaseNotifyGuid,
+                      &gEfiCallerIdGuid,
                       NULL,
                       NULL
                       );

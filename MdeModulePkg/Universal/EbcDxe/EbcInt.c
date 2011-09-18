@@ -3,7 +3,7 @@
   Provides auxiliary support routines for the VM. That is, routines
   that are not particularly related to VM execution of EBC instructions.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -191,6 +191,7 @@ InitEbcVmTestProtocol (
 
 **/
 EFI_STATUS
+EFIAPI
 EbcVmTestUnsupported (
   VOID
   );
@@ -336,7 +337,6 @@ EBC_ICACHE_FLUSH       mEbcICacheFlush;
 //
 EFI_PERIODIC_CALLBACK  mDebugPeriodicCallback = NULL;
 EFI_EXCEPTION_CALLBACK mDebugExceptionCallback[MAX_EBC_EXCEPTION + 1] = {NULL};
-EFI_GUID               mEfiEbcVmTestProtocolGuid = EFI_EBC_VM_TEST_PROTOCOL_GUID;
 
 VOID                   *mStackBuffer[MAX_STACK_NUM];
 EFI_HANDLE             mStackBufferIndex[MAX_STACK_NUM];
@@ -1328,7 +1328,7 @@ InitEbcVmTestProtocol (
   // Publish the protocol
   //
   Handle  = NULL;
-  Status  = gBS->InstallProtocolInterface (&Handle, &mEfiEbcVmTestProtocolGuid, EFI_NATIVE_INTERFACE, EbcVmTestProtocol);
+  Status  = gBS->InstallProtocolInterface (&Handle, &gEfiEbcVmTestProtocolGuid, EFI_NATIVE_INTERFACE, EbcVmTestProtocol);
   if (EFI_ERROR (Status)) {
     FreePool (EbcVmTestProtocol);
   }
@@ -1343,6 +1343,7 @@ InitEbcVmTestProtocol (
 
 **/
 EFI_STATUS
+EFIAPI
 EbcVmTestUnsupported (
   VOID
   )

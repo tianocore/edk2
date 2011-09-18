@@ -17,12 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __VLAN_CONFIG_NV_DATA_H__
 
 #include <Guid/HiiPlatformSetupFormset.h>
-
-
-#define VLAN_CONFIG_PRIVATE_GUID \
-  { \
-    0xd79df6b0, 0xef44, 0x43bd, {0x97, 0x97, 0x43, 0xe9, 0x3b, 0xcf, 0x5f, 0xa8 } \
-  }
+#include <Guid/VlanConfigHii.h>
 
 #define VLAN_CONFIGURATION_VARSTORE_ID  0x0001
 #define VLAN_CONFIGURATION_FORM_ID      0x0001

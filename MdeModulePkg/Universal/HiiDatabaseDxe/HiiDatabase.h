@@ -42,12 +42,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/PrintLib.h>
 
-
-#define HII_DATABASE_NOTIFY_GUID \
-  { \
-    0xc1c76, 0xd79e, 0x42fe, {0x86, 0xb, 0x8b, 0xe8, 0x7b, 0x3e, 0x7a, 0x78} \
-  }
-
 #define MAX_STRING_LENGTH                  1024
 #define MAX_FONT_NAME_LEN                  256
 #define NARROW_BASELINE                    15

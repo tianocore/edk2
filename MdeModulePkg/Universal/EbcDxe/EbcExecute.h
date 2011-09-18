@@ -3,7 +3,7 @@
   be of use to a disassembler for the most part. Also provides function
   prototypes for VM functions.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -314,54 +314,6 @@ VmWriteMem64 (
   IN UINT64       Data
   );
 
-//
-// Define a protocol for an EBC VM test interface.
-//
-#define EFI_EBC_VM_TEST_PROTOCOL_GUID \
-  { \
-    0xAAEACCFDL, 0xF27B, 0x4C17, { 0xB6, 0x10, 0x75, 0xCA, 0x1F, 0x2D, 0xFB, 0x52 } \
-  }
-
-//
-// Define for forward reference.
-//
-typedef struct _EFI_EBC_VM_TEST_PROTOCOL EFI_EBC_VM_TEST_PROTOCOL;
-
-typedef
-EFI_STATUS
-(*EBC_VM_TEST_EXECUTE) (
-  IN EFI_EBC_VM_TEST_PROTOCOL         * This,
-  IN VM_CONTEXT                       * VmPtr,
-  IN OUT UINTN                        *InstructionCount
-  );
-
-typedef
-EFI_STATUS
-(*EBC_VM_TEST_ASM) (
-  IN EFI_EBC_VM_TEST_PROTOCOL         * This,
-  IN CHAR16                           *AsmText,
-  IN OUT INT8                         *Buffer,
-  IN OUT UINTN                        *BufferLen
-  );
-
-typedef
-EFI_STATUS
-(*EBC_VM_TEST_DASM) (
-  IN EFI_EBC_VM_TEST_PROTOCOL         * This,
-  IN OUT CHAR16                       *AsmText,
-  IN OUT INT8                         *Buffer,
-  IN OUT UINTN                        *Len
-  );
-
-//
-// Prototype for the actual EBC test protocol interface
-//
-struct _EFI_EBC_VM_TEST_PROTOCOL {
-  EBC_VM_TEST_EXECUTE Execute;
-  EBC_VM_TEST_ASM     Assemble;
-  EBC_VM_TEST_DASM    Disassemble;
-};
-
 /**
   Given a pointer to a new VM context, execute one or more instructions. This
   function is only used for test purposes via the EBC VM test protocol.
@@ -377,6 +329,7 @@ struct _EFI_EBC_VM_TEST_PROTOCOL {
 
 **/
 EFI_STATUS
+EFIAPI
 EbcExecuteInstructions (
   IN EFI_EBC_VM_TEST_PROTOCOL *This,
   IN VM_CONTEXT               *VmPtr,

@@ -1,7 +1,7 @@
 /** @file
   The header file of IScsiDriver.c.
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -27,12 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ScsiPassThruExt.h>
 
-#define ISCSI_PRIVATE_GUID \
-  { 0xfa3cde4c, 0x87c2, 0x427d, {0xae, 0xde, 0x7d, 0xd0, 0x96, 0xc8, 0x8c, 0x58} }
-
 #define ISCSI_INITIATOR_NAME_VAR_NAME L"I_NAME"
-
-extern EFI_GUID                           gIScsiPrivateGuid;
 
 typedef struct _ISCSI_PRIVATE_PROTOCOL {
   UINT32  Reserved;

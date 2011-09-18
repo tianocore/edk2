@@ -15,11 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "UsbBus.h"
 
-//
-// USB_BUS_PROTOCOL is only used to locate USB_BUS
-//
-EFI_GUID  mUsbBusProtocolGuid = EFI_USB_BUS_PROTOCOL_GUID;
-
 EFI_USB_IO_PROTOCOL mUsbIoProtocol = {
   UsbIoControlTransfer,
   UsbIoBulkTransfer,
@@ -982,7 +977,7 @@ UsbBusBuildProtocol (
   //
   Status = gBS->InstallProtocolInterface (
                   &Controller,
-                  &mUsbBusProtocolGuid,
+                  &gEfiCallerIdGuid,
                   EFI_NATIVE_INTERFACE,
                   &UsbBus->BusId
                   );
@@ -1045,7 +1040,7 @@ FREE_ROOTHUB:
   }
 
 UNINSTALL_USBBUS:
-  gBS->UninstallProtocolInterface (Controller, &mUsbBusProtocolGuid, &UsbBus->BusId);
+  gBS->UninstallProtocolInterface (Controller, &gEfiCallerIdGuid, &UsbBus->BusId);
 
 CLOSE_HC:
   if (UsbBus->Usb2Hc != NULL) {
@@ -1277,7 +1272,7 @@ UsbBusControllerDriverStart (
   //
   Status = gBS->OpenProtocol (
                   Controller,
-                  &mUsbBusProtocolGuid,
+                  &gEfiCallerIdGuid,
                   (VOID **) &UsbBusId,
                   This->DriverBindingHandle,
                   Controller,
@@ -1298,7 +1293,7 @@ UsbBusControllerDriverStart (
     //
     Status = gBS->OpenProtocol (
                     Controller,
-                    &mUsbBusProtocolGuid,
+                    &gEfiCallerIdGuid,
                     (VOID **) &UsbBusId,
                     This->DriverBindingHandle,
                     Controller,
@@ -1417,7 +1412,7 @@ UsbBusControllerDriverStop (
   //
   Status = gBS->OpenProtocol (
                   Controller,
-                  &mUsbBusProtocolGuid,
+                  &gEfiCallerIdGuid,
                   (VOID **) &BusId,
                   This->DriverBindingHandle,
                   Controller,
@@ -1460,7 +1455,7 @@ UsbBusControllerDriverStop (
   //
   // Uninstall the bus identifier and close USB_HC/USB2_HC protocols
   //
-  gBS->UninstallProtocolInterface (Controller, &mUsbBusProtocolGuid, &Bus->BusId);
+  gBS->UninstallProtocolInterface (Controller, &gEfiCallerIdGuid, &Bus->BusId);
 
   if (Bus->Usb2Hc != NULL) {
     gBS->CloseProtocol (

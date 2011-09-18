@@ -1,7 +1,7 @@
 /** @file
   The entry point of IScsi driver.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,9 +22,6 @@ EFI_DRIVER_BINDING_PROTOCOL gIScsiDriverBinding = {
   NULL,
   NULL
 };
-
-EFI_GUID                    gIScsiPrivateGuid   = ISCSI_PRIVATE_GUID;
-
 
 /**
   Tests to see if this driver supports a given controller. If a child device is provided, 
@@ -63,7 +60,7 @@ IScsiDriverBindingSupported (
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &gIScsiPrivateGuid,
+                  &gEfiCallerIdGuid,
                   NULL,
                   This->DriverBindingHandle,
                   ControllerHandle,
@@ -179,7 +176,7 @@ IScsiDriverBindingStart (
   //
   Status = gBS->InstallProtocolInterface (
                   &ControllerHandle,
-                  &gIScsiPrivateGuid,
+                  &gEfiCallerIdGuid,
                   EFI_NATIVE_INTERFACE,
                   &Private->IScsiIdentifier
                   );
@@ -332,7 +329,7 @@ IScsiDriverBindingStop (
 
   Status = gBS->OpenProtocol (
                   IScsiController,
-                  &gIScsiPrivateGuid,
+                  &gEfiCallerIdGuid,
                   (VOID **)&IScsiIdentifier,
                   This->DriverBindingHandle,
                   ControllerHandle,
@@ -370,7 +367,7 @@ IScsiDriverBindingStop (
   //
   gBS->UninstallProtocolInterface (
         IScsiController,
-        &gIScsiPrivateGuid,
+        &gEfiCallerIdGuid,
         &Private->IScsiIdentifier
         );
 

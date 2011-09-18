@@ -2,7 +2,7 @@
   Main routines for the EBC interpreter.  Includes the initialization and
   main interpreter routines.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +21,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/DebugSupport.h>
 #include <Protocol/Ebc.h>
+#include <Protocol/EbcVmTest.h>
+#include <Protocol/EbcSimpleDebugger.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -28,36 +30,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
-
-typedef INT64   VM_REGISTER;
-typedef UINT8   *VMIP;      // instruction pointer for the VM
-typedef UINT32  EXCEPTION_FLAGS;
-
-typedef struct {
-  VM_REGISTER       Gpr[8];                 // General purpose registers.
-  UINT64            Flags;                  // Flags register:
-                                            //   0  Set to 1 if the result of the last compare was true
-                                            //   1  Set to 1 if stepping
-                                            //   2..63 Reserved.
-  VMIP              Ip;                     // Instruction pointer.
-  UINTN             LastException;          //
-  EXCEPTION_FLAGS   ExceptionFlags;         // to keep track of exceptions
-  UINT32            StopFlags;
-  UINT32            CompilerVersion;        // via break(6)
-  UINTN             HighStackBottom;        // bottom of the upper stack
-  UINTN             LowStackTop;            // top of the lower stack
-  UINT64            StackRetAddr;           // location of final return address on stack
-  UINTN             *StackMagicPtr;         // pointer to magic value on stack to detect corruption
-  EFI_HANDLE        ImageHandle;            // for this EBC driver
-  EFI_SYSTEM_TABLE  *SystemTable;           // for debugging only
-  UINTN             LastAddrConverted;      // for debug
-  UINTN             LastAddrConvertedValue; // for debug
-  VOID              *FramePtr;
-  VOID              *EntryPoint;            // entry point of EBC image
-  UINTN             ImageBase;
-  VOID              *StackPool;
-  VOID              *StackTop;
-} VM_CONTEXT;
 
 extern VM_CONTEXT                    *mVmPtr;
 
@@ -316,65 +288,6 @@ EFI_STATUS
 ReturnEBCStackByHandle(
   IN EFI_HANDLE Handle
   );
-
-
-//
-// Defines for a simple EBC debugger interface
-//
-typedef struct _EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL;
-
-#define EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL_GUID \
-  { \
-    0x2a72d11e, 0x7376, 0x40f6, { 0x9c, 0x68, 0x23, 0xfa, 0x2f, 0xe3, 0x63, 0xf1 } \
-  }
-
-typedef
-EFI_STATUS
-(*EBC_DEBUGGER_SIGNAL_EXCEPTION) (
-  IN EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL           *This,
-  IN VM_CONTEXT                                 *VmPtr,
-  IN EFI_EXCEPTION_TYPE                         ExceptionType
-  );
-
-typedef
-VOID
-(*EBC_DEBUGGER_DEBUG) (
-  IN EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL           *This,
-  IN VM_CONTEXT                                 *VmPtr
-  );
-
-typedef
-UINT32
-(*EBC_DEBUGGER_DASM) (
-  IN EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL           *This,
-  IN VM_CONTEXT                                 *VmPtr,
-  IN UINT16                                     *DasmString OPTIONAL,
-  IN UINT32                                     DasmStringSize
-  );
-
-//
-// This interface allows you to configure the EBC debug support
-// driver. For example, turn on or off saving and printing of
-// delta VM even if called. Or to even disable the entire interface,
-// in which case all functions become no-ops.
-//
-typedef
-EFI_STATUS
-(*EBC_DEBUGGER_CONFIGURE) (
-  IN EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL           *This,
-  IN UINT32                                     ConfigId,
-  IN UINTN                                      ConfigValue
-  );
-
-//
-// Prototype for the actual EBC debug support protocol interface
-//
-struct _EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL {
-  EBC_DEBUGGER_DEBUG            Debugger;
-  EBC_DEBUGGER_SIGNAL_EXCEPTION SignalException;
-  EBC_DEBUGGER_DASM             Dasm;
-  EBC_DEBUGGER_CONFIGURE        Configure;
-};
 
 typedef struct {
   EFI_EBC_PROTOCOL  *This;

@@ -75,11 +75,14 @@ typedef struct {
 //
 // SCSI Bus Controller device strcuture
 //
-#define EFI_SCSI_BUS_PROTOCOL_GUID \
-  { \
-    0x5261213D, 0x3A3D, 0x441E, {0xB3, 0xAF, 0x21, 0xD3, 0xF7, 0xA4, 0xCA, 0x17} \
-  }
 
+//
+// The ScsiBusProtocol is just used to locate ScsiBusDev
+// structure in the SCSIBusDriverBindingStop(). Then we can
+// Close all opened protocols and release this structure.
+// ScsiBusProtocol is the private protocol.
+// gEfiCallerIdGuid will be used as its protocol guid.
+//
 typedef struct _EFI_SCSI_BUS_PROTOCOL {
   UINT64  Reserved;
 } EFI_SCSI_BUS_PROTOCOL;

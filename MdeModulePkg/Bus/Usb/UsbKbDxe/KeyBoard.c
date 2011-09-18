@@ -14,9 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "KeyBoard.h"
 
-EFI_GUID  mUsbKeyboardLayoutPackageGuid = USB_KEYBOARD_LAYOUT_PACKAGE_GUID;
-EFI_GUID  mUsbKeyboardLayoutKeyGuid = USB_KEYBOARD_LAYOUT_KEY_GUID;
-
 USB_KEYBOARD_LAYOUT_PACK_BIN  mUsbKeyboardLayoutBin = {
   sizeof (USB_KEYBOARD_LAYOUT_PACK_BIN),   // Binary size
 
@@ -338,7 +335,7 @@ InstallDefaultKeyboardLayout (
   // Install Keyboard Layout package to HII database
   //
   HiiHandle = HiiAddPackages (
-                &mUsbKeyboardLayoutPackageGuid,
+                &gUsbKeyboardLayoutPackageGuid,
                 UsbKeyboardDevice->ControllerHandle,
                 &mUsbKeyboardLayoutBin,
                 NULL
@@ -350,7 +347,7 @@ InstallDefaultKeyboardLayout (
   //
   // Set current keyboard layout
   //
-  Status = HiiDatabase->SetKeyboardLayout (HiiDatabase, &mUsbKeyboardLayoutKeyGuid);
+  Status = HiiDatabase->SetKeyboardLayout (HiiDatabase, &gUsbKeyboardLayoutKeyGuid);
 
   return Status;
 }

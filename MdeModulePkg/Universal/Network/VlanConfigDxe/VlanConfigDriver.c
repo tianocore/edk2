@@ -15,8 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "VlanConfigImpl.h"
 
-EFI_GUID gVlanConfigPrivateGuid = VLAN_CONFIG_PRIVATE_GUID;
-
 EFI_DRIVER_BINDING_PROTOCOL gVlanConfigDriverBinding = {
   VlanConfigDriverBindingSupported,
   VlanConfigDriverBindingStart,
@@ -136,7 +134,7 @@ VlanConfigDriverBindingStart (
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &gVlanConfigPrivateGuid,
+                  &gEfiCallerIdGuid,
                   (VOID **) &PrivateData,
                   This->DriverBindingHandle,
                   ControllerHandle,
@@ -203,7 +201,7 @@ VlanConfigDriverBindingStart (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ControllerHandle,
-                  &gVlanConfigPrivateGuid,
+                  &gEfiCallerIdGuid,
                   PrivateData,
                   NULL
                   );
@@ -266,7 +264,7 @@ VlanConfigDriverBindingStop (
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &gVlanConfigPrivateGuid,
+                  &gEfiCallerIdGuid,
                   (VOID **) &PrivateData,
                   This->DriverBindingHandle,
                   ControllerHandle,
@@ -287,7 +285,7 @@ VlanConfigDriverBindingStop (
   //
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   ControllerHandle,
-                  &gVlanConfigPrivateGuid,
+                  &gEfiCallerIdGuid,
                   PrivateData,
                   NULL
                   );

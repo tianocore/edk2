@@ -58,6 +58,9 @@
 
 [Guids]
   gEfiIfrTianoGuid                              ## CONSUMES ## Guid
+  gDriverSampleFormSetGuid                      ## PRODUCES ## Guid
+  gDriverSampleInventoryGuid                    ## PRODUCES ## Guid
+  gEfiIfrRefreshIdOpGuid                        ## SOMETIMES_PRODUCES ## EventGuid
 
 [Protocols]
   gEfiHiiStringProtocolGuid                     ## CONSUMES

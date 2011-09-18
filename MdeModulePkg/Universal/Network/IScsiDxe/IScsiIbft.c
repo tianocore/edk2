@@ -1,7 +1,7 @@
 /** @file
   Implementation for iSCSI Boot Firmware Table publication.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -150,7 +150,7 @@ IScsiFillInitiatorSection (
   //
   // Get the identifier from the handle.
   //
-  Status = gBS->HandleProtocol (Handle, &gIScsiPrivateGuid, (VOID **) &IScsiIdentifier);
+  Status = gBS->HandleProtocol (Handle, &gEfiCallerIdGuid, (VOID **) &IScsiIdentifier);
   if (EFI_ERROR (Status)) {
     ASSERT (FALSE);
     return ;
@@ -288,7 +288,7 @@ IScsiFillNICAndTargetSections (
   SectionOffset = &Control->NIC0Offset;
 
   for (Index = 0; Index < HandleCount; Index++) {
-    Status = gBS->HandleProtocol (Handles[Index], &gIScsiPrivateGuid, (VOID **)&IScsiIdentifier);
+    Status = gBS->HandleProtocol (Handles[Index], &gEfiCallerIdGuid, (VOID **)&IScsiIdentifier);
     if (EFI_ERROR (Status)) {
       ASSERT (FALSE);
       return ;
@@ -484,7 +484,7 @@ IScsiPublishIbft (
   //
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
-                  &gIScsiPrivateGuid,
+                  &gEfiCallerIdGuid,
                   NULL,
                   &HandleCount,
                   &HandleBuffer

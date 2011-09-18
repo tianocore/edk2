@@ -16,7 +16,7 @@
 #include "VlanConfigNvData.h"
 
 formset
-  guid      = VLAN_CONFIG_PRIVATE_GUID,
+  guid      = VLAN_CONFIG_FORM_SET_GUID,
   title     = STRING_TOKEN(STR_VLAN_FORM_SET_TITLE),
   help      = STRING_TOKEN(STR_VLAN_FORM_SET_TITLE_HELP),
   classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
@@ -24,7 +24,7 @@ formset
   varstore VLAN_CONFIGURATION,
     varid = VLAN_CONFIGURATION_VARSTORE_ID,
     name  = VlanNvData,
-    guid  = VLAN_CONFIG_PRIVATE_GUID;
+    guid  = VLAN_CONFIG_FORM_SET_GUID;
 
   form formid = VLAN_HEAD_FORM_ID,
     title  = STRING_TOKEN(STR_VLAN_FORM_TITLE);

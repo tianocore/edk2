@@ -26,14 +26,6 @@ EFI_DRIVER_BINDING_PROTOCOL gSCSIBusDriverBinding = {
   NULL
 };
 
-
-//
-// The ScsiBusProtocol is just used to locate ScsiBusDev
-// structure in the SCSIBusDriverBindingStop(). Then we can
-// Close all opened protocols and release this structure.
-//
-EFI_GUID  mScsiBusProtocolGuid = EFI_SCSI_BUS_PROTOCOL_GUID;
-
 VOID  *mWorkingBuffer;
 
 /**
@@ -389,7 +381,7 @@ SCSIBusDriverBindingStart (
     // 
     Status = gBS->InstallProtocolInterface (
                     &Controller,
-                    &mScsiBusProtocolGuid,
+                    &gEfiCallerIdGuid,
                     EFI_NATIVE_INTERFACE,
                     &ScsiBusDev->BusIdentify
                     );
@@ -403,7 +395,7 @@ SCSIBusDriverBindingStart (
     //
     Status = gBS->OpenProtocol (
                     Controller,
-                    &mScsiBusProtocolGuid,
+                    &gEfiCallerIdGuid,
                     (VOID **) &BusIdentify,
                     This->DriverBindingHandle,
                     Controller,
@@ -560,7 +552,7 @@ SCSIBusDriverBindingStop (
     //
     Status = gBS->OpenProtocol (
                     Controller,
-                    &mScsiBusProtocolGuid,
+                    &gEfiCallerIdGuid,
                     (VOID **) &Scsidentifier,
                     This->DriverBindingHandle,
                     Controller,
@@ -578,7 +570,7 @@ SCSIBusDriverBindingStop (
     //
     gBS->UninstallProtocolInterface (
            Controller,
-           &mScsiBusProtocolGuid,
+           &gEfiCallerIdGuid,
            &ScsiBusDev->BusIdentify
            );
 

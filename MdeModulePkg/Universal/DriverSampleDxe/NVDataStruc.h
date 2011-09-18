@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -27,29 +27,8 @@ Revision History:
 
 #include <Guid/HiiPlatformSetupFormset.h>
 #include <Guid/HiiFormMapMethodGuid.h>
-
-#define FORMSET_GUID \
-  { \
-    0xA04A27f4, 0xDF00, 0x4D42, {0xB5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3D} \
-  }
-
-#define INVENTORY_GUID \
-  { \
-    0xb3f56470, 0x6141, 0x4621, {0x8f, 0x19, 0x70, 0x4e, 0x57, 0x7a, 0xa9, 0xe8} \
-  }
-
-#define EFI_USER_INFO_ACCESS_SETUP_ADMIN_GUID \
-  { 0x85b75607, 0xf7ce, 0x471e, { 0xb7, 0xe4, 0x2a, 0xea, 0x5f, 0x72, 0x32, 0xee } }
-
-#define EFI_IFR_REFRESH_ID_OP_GUID \
-  { \
-    0xF5E655D9, 0x02A6, 0x46f2, {0x9E, 0x76, 0xB8, 0xBE, 0x8E, 0x60, 0xAB, 0x22} \
-  }
-
-#define ZERO_GUID \
-  { \
-    0x0, 0x0, 0x0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} \
-  } 
+#include <Guid/DriverSampleHii.h>
+#include <Guid/ZeroGuid.h>
 
 #define CONFIGURATION_VARSTORE_ID    0x1234
 

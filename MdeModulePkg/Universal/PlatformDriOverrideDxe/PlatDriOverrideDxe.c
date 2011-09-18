@@ -61,7 +61,6 @@ extern UINT8  PlatDriOverrideDxeStrings[];
 //
 // module global data
 //
-EFI_GUID                     mPlatformOverridesManagerGuid = PLAT_OVER_MNGR_GUID;
 CHAR16                       mVariableName[] = L"Data";
 LIST_ENTRY                   mMappingDataBase = INITIALIZE_LIST_HEAD_VARIABLE (mMappingDataBase);
 BOOLEAN                      mEnvironmentVariableRead = FALSE;
@@ -92,7 +91,7 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    EFI_CALLER_ID_GUID
+    PLAT_OVER_MNGR_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -400,7 +399,7 @@ UpdateDeviceSelectPage (
   //
   HiiUpdateForm (
     Private->RegisteredHandle,
-    &mPlatformOverridesManagerGuid,
+    &gPlatformOverridesManagerGuid,
     FORM_ID_DEVICE,
     StartOpCodeHandle, // Label FORM_ID_DEVICE
     EndOpCodeHandle    // LABEL_END
@@ -531,7 +530,7 @@ UpdateDeviceSelectPage (
   //
   HiiUpdateForm (
     Private->RegisteredHandle,
-    &mPlatformOverridesManagerGuid,
+    &gPlatformOverridesManagerGuid,
     FORM_ID_DEVICE,
     StartOpCodeHandle, // Label FORM_ID_DEVICE
     EndOpCodeHandle    // LABEL_END
@@ -693,7 +692,7 @@ UpdateBindingDriverSelectPage (
   //
   HiiUpdateForm (
     Private->RegisteredHandle,
-    &mPlatformOverridesManagerGuid,
+    &gPlatformOverridesManagerGuid,
     FORM_ID_DRIVER,
     StartOpCodeHandle,
     EndOpCodeHandle
@@ -860,7 +859,7 @@ UpdateBindingDriverSelectPage (
   //
   HiiUpdateForm (
     Private->RegisteredHandle,
-    &mPlatformOverridesManagerGuid,
+    &gPlatformOverridesManagerGuid,
     FORM_ID_DRIVER,
     StartOpCodeHandle, // Label FORM_ID_DRIVER
     EndOpCodeHandle    // LABEL_END
@@ -937,7 +936,7 @@ UpdatePrioritySelectPage (
   //
   HiiUpdateForm (
     Private->RegisteredHandle,
-    &mPlatformOverridesManagerGuid,
+    &gPlatformOverridesManagerGuid,
     FORM_ID_ORDER,
     StartOpCodeHandle,
     EndOpCodeHandle
@@ -1060,7 +1059,7 @@ UpdatePrioritySelectPage (
   //
   HiiUpdateForm (
     Private->RegisteredHandle,
-    &mPlatformOverridesManagerGuid,
+    &gPlatformOverridesManagerGuid,
     FORM_ID_ORDER,
     StartOpCodeHandle, // Label FORM_ID_ORDER
     EndOpCodeHandle    // LABEL_END
@@ -1172,7 +1171,7 @@ PlatOverMngrExtractConfig (
   }
 
   *Progress = Request;
-  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &mPlatformOverridesManagerGuid, mVariableName)) {
+  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &gPlatformOverridesManagerGuid, mVariableName)) {
     return EFI_NOT_FOUND;
   }
 
@@ -1190,7 +1189,7 @@ PlatOverMngrExtractConfig (
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
-    ConfigRequestHdr = HiiConstructConfigHdr (&mPlatformOverridesManagerGuid, mVariableName, Private->DriverHandle);
+    ConfigRequestHdr = HiiConstructConfigHdr (&gPlatformOverridesManagerGuid, mVariableName, Private->DriverHandle);
     Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
     ASSERT (ConfigRequest != NULL);
@@ -1263,14 +1262,14 @@ PlatOverMngrRouteConfig (
   }
   *Progress = Configuration;
 
-  if (!HiiIsConfigHdrMatch (Configuration, &mPlatformOverridesManagerGuid, mVariableName)) {
+  if (!HiiIsConfigHdrMatch (Configuration, &gPlatformOverridesManagerGuid, mVariableName)) {
     return EFI_NOT_FOUND;
   }
   
   *Progress = Configuration + StrLen (Configuration);
   Private    = EFI_CALLBACK_INFO_FROM_THIS (This);
   FakeNvData = &Private->FakeNvData;
-  if (!HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
+  if (!HiiGetBrowserData (&gPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
     //
     // FakeNvData can't be got from SetupBrowser, which doesn't need to be set.
     //
@@ -1338,7 +1337,7 @@ PlatOverMngrCallback (
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
     Private = EFI_CALLBACK_INFO_FROM_THIS (This);
     FakeNvData = &Private->FakeNvData;
-    if (!HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
+    if (!HiiGetBrowserData (&gPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
       return EFI_NOT_FOUND;
     }
 
@@ -1401,7 +1400,7 @@ PlatOverMngrCallback (
     //
     // Pass changed uncommitted data back to Form Browser
     //
-    HiiSetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData, NULL);
+    HiiSetBrowserData (&gPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData, NULL);
 
     return EFI_SUCCESS;
   } 
@@ -1624,7 +1623,7 @@ PlatDriOverrideDxeInit (
   // Publish our HII data
   //
   mCallbackInfo->RegisteredHandle = HiiAddPackages (
-                                     &mPlatformOverridesManagerGuid,
+                                     &gPlatformOverridesManagerGuid,
                                      mCallbackInfo->DriverHandle,
                                      VfrBin,
                                      PlatDriOverrideDxeStrings,

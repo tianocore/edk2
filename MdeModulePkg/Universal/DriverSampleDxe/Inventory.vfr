@@ -2,7 +2,7 @@
 //
 //    Sample Inventory Data
 //
-//  Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+//  Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
@@ -13,10 +13,10 @@
 //
 //**/
 
-#define INVENTORY_GUID    { 0xb3f56470, 0x6141, 0x4621, 0x8f, 0x19, 0x70, 0x4e, 0x57, 0x7a, 0xa9, 0xe8 }
+#include "NVDataStruc.h"
 
 formset
-  guid     = INVENTORY_GUID,
+  guid     = DRIVER_SAMPLE_INVENTORY_GUID,
   title    = STRING_TOKEN(STR_INV_FORM_SET_TITLE),
   help     = STRING_TOKEN(STR_INV_FORM_SET_HELP),
   class    = 0x04,

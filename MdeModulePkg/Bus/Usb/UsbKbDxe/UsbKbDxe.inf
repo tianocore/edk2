@@ -74,6 +74,8 @@
   # which will be triggered by EFI_HII_DATABASE_PROTOCOL.SetKeyboardLayout().
   #
   gEfiHiiKeyBoardLayoutGuid                     ## SOMETIME_CONSUMES  ## Event
+  gUsbKeyboardLayoutPackageGuid
+  gUsbKeyboardLayoutKeyGuid
 
 [Protocols]
   gEfiUsbIoProtocolGuid                         ## TO_START

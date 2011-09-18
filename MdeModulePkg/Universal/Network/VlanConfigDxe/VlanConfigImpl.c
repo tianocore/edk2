@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "VlanConfigImpl.h"
 
-EFI_GUID                        mVlanFormSetGuid = VLAN_CONFIG_PRIVATE_GUID;
 CHAR16                          mVlanStorageName[] = L"VlanNvData";
 EFI_HII_CONFIG_ROUTING_PROTOCOL *mHiiConfigRouting = NULL;
 
@@ -37,7 +36,7 @@ VENDOR_DEVICE_PATH              mHiiVendorDevicePathNode = {
       (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
     }
   },
-  VLAN_CONFIG_PRIVATE_GUID
+  VLAN_CONFIG_FORM_SET_GUID
 };
 
 /**
@@ -89,7 +88,7 @@ VlanExtractConfig (
   }
 
   *Progress = Request;
-  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &mVlanFormSetGuid, mVlanStorageName)) {
+  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &gVlanConfigFormSetGuid, mVlanStorageName)) {
     return EFI_NOT_FOUND;
   }
 
@@ -119,7 +118,7 @@ VlanExtractConfig (
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
-    ConfigRequestHdr = HiiConstructConfigHdr (&mVlanFormSetGuid, mVlanStorageName, PrivateData->DriverHandle);
+    ConfigRequestHdr = HiiConstructConfigHdr (&gVlanConfigFormSetGuid, mVlanStorageName, PrivateData->DriverHandle);
     Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
     ASSERT (ConfigRequest != NULL);
@@ -187,7 +186,7 @@ VlanRouteConfig (
   }
 
   *Progress = Configuration;
-  if (!HiiIsConfigHdrMatch (Configuration, &mVlanFormSetGuid, mVlanStorageName)) {
+  if (!HiiIsConfigHdrMatch (Configuration, &gVlanConfigFormSetGuid, mVlanStorageName)) {
     return EFI_NOT_FOUND;
   }
 
@@ -246,7 +245,7 @@ VlanCallback (
     //
     Configuration = AllocateZeroPool (sizeof (VLAN_CONFIGURATION));
     ASSERT (Configuration != NULL);
-    HiiGetBrowserData (&mVlanFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration);
+    HiiGetBrowserData (&gVlanConfigFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration);
 
     VlanConfig = PrivateData->VlanConfig;
 
@@ -316,7 +315,7 @@ VlanCallback (
       break;
     }
 
-    HiiSetBrowserData (&mVlanFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration, NULL);
+    HiiSetBrowserData (&gVlanConfigFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration, NULL);
     FreePool (Configuration);
     return EFI_SUCCESS;
   }
@@ -444,7 +443,7 @@ VlanUpdateForm (
 
   HiiUpdateForm (
     PrivateData->HiiHandle,     // HII handle
-    &mVlanFormSetGuid,          // Formset GUID
+    &gVlanConfigFormSetGuid,    // Formset GUID
     VLAN_CONFIGURATION_FORM_ID, // Form ID
     StartOpCodeHandle,          // Label for where to insert opcodes
     EndOpCodeHandle             // Replace data
@@ -515,7 +514,7 @@ InstallVlanConfigForm (
   // Publish the HII package list
   //
   HiiHandle = HiiAddPackages (
-                &mVlanFormSetGuid,
+                &gVlanConfigFormSetGuid,
                 DriverHandle,
                 VlanConfigDxeStrings,
                 VlanConfigBin,

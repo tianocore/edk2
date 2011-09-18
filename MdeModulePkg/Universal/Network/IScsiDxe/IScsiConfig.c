@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "IScsiImpl.h"
 
-EFI_GUID        mVendorGuid              = ISCSI_CONFIG_GUID;
 CHAR16          mVendorStorageName[]     = L"ISCSI_CONFIG_IFR_NVDATA";
 BOOLEAN         mIScsiDeviceListUpdated  = FALSE;
 UINTN           mNumberOfIScsiDevices    = 0;
@@ -35,10 +34,7 @@ HII_VENDOR_DEVICE_PATH  mIScsiHiiVendorDevicePath = {
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    //
-    // {49D7B73E-143D-4716-977B-C45F1CB038CC}
-    //
-    { 0x49d7b73e, 0x143d, 0x4716, { 0x97, 0x7b, 0xc4, 0x5f, 0x1c, 0xb0, 0x38, 0xcc } }
+    IP4_ISCSI_CONFIG_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -224,7 +220,7 @@ IScsiUpdateDeviceList (
   DataSize = 0;
   Status = gRT->GetVariable (
                   L"iSCSIDeviceList",
-                  &mVendorGuid,
+                  &gIp4IScsiConfigGuid,
                   NULL,
                   &DataSize,
                   NULL
@@ -234,7 +230,7 @@ IScsiUpdateDeviceList (
 
     gRT->GetVariable (
           L"iSCSIDeviceList",
-          &mVendorGuid,
+          &gIp4IScsiConfigGuid,
           NULL,
           &DataSize,
           DeviceList
@@ -282,7 +278,7 @@ IScsiUpdateDeviceList (
       CurMacInfo = &DeviceList->MacInfo[Index];
       IScsiMacAddrToStr (&CurMacInfo->Mac, CurMacInfo->Len, CurMacInfo->VlanId, MacString);
       gRT->SetVariable (MacString, &gEfiIScsiInitiatorNameProtocolGuid, 0, 0, NULL);
-      gRT->SetVariable (MacString, &mIScsiCHAPAuthInfoGuid, 0, 0, NULL);
+      gRT->SetVariable (MacString, &gIScsiCHAPAuthInfoGuid, 0, 0, NULL);
     }
 
     FreePool (DeviceList);
@@ -308,7 +304,7 @@ IScsiUpdateDeviceList (
 
   gRT->SetVariable (
         L"iSCSIDeviceList",
-        &mVendorGuid,
+        &gIp4IScsiConfigGuid,
         ISCSI_CONFIG_VAR_ATTR,
         DeviceListSize,
         DeviceList
@@ -488,7 +484,7 @@ IScsiFormExtractConfig (
   }
 
   *Progress = Request;
-  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &mVendorGuid, mVendorStorageName)) {
+  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &gIp4IScsiConfigGuid, mVendorStorageName)) {
     return EFI_NOT_FOUND;
   }
 
@@ -532,7 +528,7 @@ IScsiFormExtractConfig (
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
-    ConfigRequestHdr = HiiConstructConfigHdr (&mVendorGuid, mVendorStorageName, Private->DriverHandle);
+    ConfigRequestHdr = HiiConstructConfigHdr (&gIp4IScsiConfigGuid, mVendorStorageName, Private->DriverHandle);
     Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
     ASSERT (ConfigRequest != NULL);
@@ -618,7 +614,7 @@ IScsiFormRouteConfig (
   // Check routing data in <ConfigHdr>.
   // Note: if only one Storage is used, then this checking could be skipped.
   //
-  if (!HiiIsConfigHdrMatch (Configuration, &mVendorGuid, mVendorStorageName)) {
+  if (!HiiIsConfigHdrMatch (Configuration, &gIp4IScsiConfigGuid, mVendorStorageName)) {
     *Progress = Configuration;
     return EFI_NOT_FOUND;
   }
@@ -687,7 +683,7 @@ IScsiFormCallback (
     //
     IfrNvData = AllocateZeroPool (sizeof (ISCSI_CONFIG_IFR_NVDATA));
     ASSERT (IfrNvData != NULL);
-    if (!HiiGetBrowserData (&mVendorGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData)) {
+    if (!HiiGetBrowserData (&gIp4IScsiConfigGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData)) {
       FreePool (IfrNvData);
       return EFI_NOT_FOUND;
     }
@@ -884,7 +880,7 @@ IScsiFormCallback (
       BufferSize = sizeof (Private->Current->AuthConfigData);
       gRT->SetVariable (
             Private->Current->MacString,
-            &mIScsiCHAPAuthInfoGuid,
+            &gIScsiCHAPAuthInfoGuid,
             ISCSI_CONFIG_VAR_ATTR,
             BufferSize,
             &Private->Current->AuthConfigData
@@ -916,7 +912,7 @@ IScsiFormCallback (
       //
       // Pass changed uncommitted data back to Form Browser
       //
-      HiiSetBrowserData (&mVendorGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData, NULL);
+      HiiSetBrowserData (&gIp4IScsiConfigGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData, NULL);
     }
     
     FreePool (IfrNvData);
@@ -1027,7 +1023,7 @@ IScsiConfigUpdateForm (
       BufferSize = sizeof (ConfigFormEntry->AuthConfigData);
       Status = gRT->GetVariable (
                       ConfigFormEntry->MacString,
-                      &mIScsiCHAPAuthInfoGuid,
+                      &gIScsiCHAPAuthInfoGuid,
                       NULL,
                       &BufferSize,
                       &ConfigFormEntry->AuthConfigData
@@ -1102,7 +1098,7 @@ IScsiConfigUpdateForm (
 
   HiiUpdateForm (
     mCallbackInfo->RegisteredHandle,
-    &mVendorGuid,
+    &gIp4IScsiConfigGuid,
     FORMID_MAIN_FORM,
     StartOpCodeHandle, // Label DEVICE_ENTRY_LABEL
     EndOpCodeHandle    // LABEL_END
@@ -1173,7 +1169,7 @@ IScsiConfigFormInit (
   // Publish our HII data
   //
   CallbackInfo->RegisteredHandle = HiiAddPackages (
-                                     &mVendorGuid,
+                                     &gIp4IScsiConfigGuid,
                                      CallbackInfo->DriverHandle,
                                      IScsiDxeStrings,
                                      IScsiConfigDxeBin,

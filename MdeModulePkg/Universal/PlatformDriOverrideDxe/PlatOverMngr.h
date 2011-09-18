@@ -3,7 +3,7 @@
   The defintions are required both by Source code and Vfr file.
   The PLAT_OVER_MNGR_DATA structure, form guid and Ifr question ID are defined. 
 
-Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,10 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _PLAT_OVER_MNGR_H_
 #define _PLAT_OVER_MNGR_H_
 
-#define PLAT_OVER_MNGR_GUID \
-  { \
-    0x8614567d, 0x35be, 0x4415, {0x8d, 0x88, 0xbd, 0x7d, 0xc, 0x9c, 0x70, 0xc0} \
-  }
+#include <Guid/PlatDriOverrideHii.h>
 
 //
 // The max number of the supported driver list.
