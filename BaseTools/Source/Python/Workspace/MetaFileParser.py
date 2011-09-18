@@ -338,10 +338,10 @@ class InfParser(MetaFileParser):
                 NextLine = CleanString(self._Content[Index + 1])
             if Line == '':
                 continue
-            if Line.find(DataType.TAB_COMMENT_R8_START) > -1:
+            if Line.find(DataType.TAB_COMMENT_EDK_START) > -1:
                 IsFindBlockComment = True
                 continue
-            if Line.find(DataType.TAB_COMMENT_R8_END) > -1:
+            if Line.find(DataType.TAB_COMMENT_EDK_END) > -1:
                 IsFindBlockComment = False
                 continue
             if IsFindBlockComment:
@@ -479,7 +479,7 @@ class InfParser(MetaFileParser):
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex+1)
         self._Macros[TokenList[0]] = ReplaceMacro(TokenList[1], self._Macros, False)
         
-    ## [nmake] section parser (R8.x style only)
+    ## [nmake] section parser (EDK.x style only)
     def _NmakeParser(self):
         TokenList = GetSplitValueList(self._CurrentLine, TAB_EQUAL_SPLIT, 1)
         self._ValueList[0:len(TokenList)] = TokenList
@@ -519,11 +519,11 @@ class InfParser(MetaFileParser):
         MODEL_UNKNOWN                   :   MetaFileParser._Skip,
         MODEL_META_DATA_HEADER          :   _DefineParser,
         MODEL_META_DATA_BUILD_OPTION    :   MetaFileParser._BuildOptionParser,
-        MODEL_EFI_INCLUDE               :   _IncludeParser,                 # for R8.x modules
-        MODEL_EFI_LIBRARY_INSTANCE      :   MetaFileParser._CommonParser,   # for R8.x modules
+        MODEL_EFI_INCLUDE               :   _IncludeParser,                 # for EDK.x modules
+        MODEL_EFI_LIBRARY_INSTANCE      :   MetaFileParser._CommonParser,   # for EDK.x modules
         MODEL_EFI_LIBRARY_CLASS         :   MetaFileParser._PathParser,
         MODEL_META_DATA_PACKAGE         :   MetaFileParser._PathParser,
-        MODEL_META_DATA_NMAKE           :   _NmakeParser,                   # for R8.x modules
+        MODEL_META_DATA_NMAKE           :   _NmakeParser,                   # for EDK.x modules
         MODEL_PCD_FIXED_AT_BUILD        :   _PcdParser,
         MODEL_PCD_PATCHABLE_IN_MODULE   :   _PcdParser,
         MODEL_PCD_FEATURE_FLAG          :   _PcdParser,
@@ -894,10 +894,20 @@ class DscParser(MetaFileParser):
             return self._OP_[Op](Value)
         # three operands
         elif TokenNumber == 3:
-            TokenValue = self._EvaluateToken(TokenList[0], Expression)
+            TokenValue = TokenList[0] 
+            if TokenValue[0] in ["'", '"'] and TokenValue[-1] in ["'", '"']:
+                TokenValue = TokenValue[1:-1]             
+            if TokenValue.startswith("$(") and TokenValue.endswith(")"):
+                TokenValue = self._EvaluateToken(TokenValue, Expression)
+            if TokenValue[0] in ["'", '"'] and TokenValue[-1] in ["'", '"']:
+                TokenValue = TokenValue[1:-1]                
             if TokenValue == None:
                 return False
             Value = TokenList[2]
+            if Value[0] in ["'", '"'] and Value[-1] in ["'", '"']:
+                Value = Value[1:-1]            
+            if Value.startswith("$(") and Value.endswith(")"):
+                Value = self._EvaluateToken(Value, Expression)          
             if Value[0] in ["'", '"'] and Value[-1] in ["'", '"']:
                 Value = Value[1:-1]
             Op = TokenList[1]

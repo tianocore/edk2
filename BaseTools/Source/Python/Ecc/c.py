@@ -2539,7 +2539,12 @@ if __name__ == '__main__':
 #    EdkLogger.Initialize()
 #    EdkLogger.SetLevel(EdkLogger.QUIET)
 #    CollectSourceCodeDataIntoDB(sys.argv[1])
-    MsgList = CheckFuncHeaderDoxygenComments('C:\\Combo\\R9\\LakeportX64Dev\\FlashDevicePkg\\Library\\SpiFlashChipM25P64\\SpiFlashChipM25P64.c')
+    try:
+        test_file = sys.argv[1]
+    except IndexError, v:
+        print "Usage: %s filename" % sys.argv[0]
+        sys.exit(1)
+    MsgList = CheckFuncHeaderDoxygenComments(test_file)
     for Msg in MsgList:
         print Msg
     print 'Done!'

@@ -27,12 +27,13 @@ import encodings.ascii
 from optparse import OptionParser
 from Common import EdkLogger
 from Common.BuildToolError import *
+from Common.BuildVersion import gBUILD_VERSION
 
 import StringTable as st
 import GenVpd
 
 PROJECT_NAME       = st.LBL_BPDG_LONG_UNI
-VERSION            = st.LBL_BPDG_VERSION
+VERSION            = (st.LBL_BPDG_VERSION + " " + gBUILD_VERSION)
 
 ## Tool entrance method
 #

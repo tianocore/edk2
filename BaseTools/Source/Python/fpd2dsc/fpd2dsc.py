@@ -18,9 +18,10 @@ import os, re, sys, xml.dom.minidom  #XmlRoutines, EdkIIWorkspace
 from LoadFpd import LoadFpd
 from StoreDsc import StoreDsc
 from optparse import OptionParser
+from Common.BuildVersion import gBUILD_VERSION
 
 # Version and Copyright
-__version_number__ = "1.0"
+__version_number__ = ("1.0" + " " + gBUILD_VERSION)
 __version__ = "%prog Version " + __version_number__
 __copyright__ = "Copyright (c) 2007 - 2010, Intel Corporation  All rights reserved."
 

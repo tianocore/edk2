@@ -43,7 +43,7 @@ class CapsuleFfs (CapsuleData):
     #
     #   @param  self        The object pointer
     #
-    def __init_(self) :
+    def __init__(self) :
         self.Ffs = None
         self.FvName = None
 
@@ -87,3 +87,51 @@ class CapsuleFv (CapsuleData):
         else:
             FvFile = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FvName)
             return FvFile
+
+## FD class for capsule data
+#
+#
+class CapsuleFd (CapsuleData):
+    ## The constructor
+    #
+    #   @param  self        The object pointer
+    #
+    def __init__(self) :
+        self.Ffs = None
+        self.FdName = None
+        self.CapsuleName = None
+
+    ## generate FD capsule data
+    #
+    #   @param  self        The object pointer
+    #   @retval string      Generated file name
+    #
+    def GenCapsuleSubItem(self):
+        if self.FdName.find('.fd') == -1:
+            if self.FdName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
+                FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict.get(self.FdName.upper())
+                FdFile = FdObj.GenFd()
+                return FdFile
+        else:
+            FdFile = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FdName)
+            return FdFile
+        
+## AnyFile class for capsule data
+#
+#
+class CapsuleAnyFile (CapsuleData):
+    ## The constructor
+    #
+    #   @param  self        The object pointer
+    #
+    def __init__(self) :
+        self.Ffs = None
+        self.FileName = None
+
+    ## generate AnyFile capsule data
+    #
+    #   @param  self        The object pointer
+    #   @retval string      Generated file name
+    #
+    def GenCapsuleSubItem(self):
+        return self.FileName

@@ -43,6 +43,7 @@ import RmPkg
 from Library.Misc import CheckEnvVariable
 from Library import GlobalData
 from Core.IpiDb import IpiDatabase
+from Common.BuildVersion import gBUILD_VERSION
 
 ##
 # Version and Copyright
@@ -90,7 +91,7 @@ def SetLogLevel(Opt):
 def Main():
     Logger.Initialize()
 
-    Parser = OptionParser(version=MSG_VERSION, description=MSG_DESCRIPTION,
+    Parser = OptionParser(version=(MSG_VERSION + ' ' + gBUILD_VERSION), description=MSG_DESCRIPTION,
                           prog="UPT.exe", usage=MSG_USAGE)
 
     Parser.add_option("-d", "--debug", action="store", type="int", dest="debug_level", help=ST.HLP_PRINT_DEBUG_INFO)

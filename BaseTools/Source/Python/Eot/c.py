@@ -31,16 +31,6 @@ IncludePathListDict = {}
 ComplexTypeDict = {}
 SUDict = {}
 
-## GetIgnoredDirListPattern() method
-#
-#  Get the pattern of ignored direction list
-#
-#  @return p:    the pattern of ignored direction list
-#
-def GetIgnoredDirListPattern():
-    p = re.compile(r'.*[\\/](?:BUILD|INTELRESTRICTEDTOOLS|INTELRESTRICTEDPKG|PCCTS)[\\/].*')
-    return p
-
 ## GetFuncDeclPattern() method
 #
 #  Get the pattern of function declaration

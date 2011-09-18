@@ -135,8 +135,8 @@ class Dec(DecObject):
         for Line in open(Filename, 'r'):
             LineNo = LineNo + 1
             # Remove comment block
-            if Line.find(TAB_COMMENT_R8_START) > -1:
-                ReservedLine = GetSplitValueList(Line, TAB_COMMENT_R8_START, 1)[0]
+            if Line.find(TAB_COMMENT_EDK_START) > -1:
+                ReservedLine = GetSplitValueList(Line, TAB_COMMENT_EDK_START, 1)[0]
                 if ReservedLine.strip().startswith(TAB_COMMENT_SPLIT):
                     Comment = Comment + Line.strip() + '\n'
                     ReservedLine = ''
@@ -145,9 +145,9 @@ class Dec(DecObject):
                 IsFindBlockComment = True
                 if not ReservedLine:
                     continue
-            if Line.find(TAB_COMMENT_R8_END) > -1:
-                Comment = Comment + Line[:Line.find(TAB_COMMENT_R8_END) + len(TAB_COMMENT_R8_END)] + '\n'
-                Line = ReservedLine + GetSplitValueList(Line, TAB_COMMENT_R8_END, 1)[1]
+            if Line.find(TAB_COMMENT_EDK_END) > -1:
+                Comment = Comment + Line[:Line.find(TAB_COMMENT_EDK_END) + len(TAB_COMMENT_EDK_END)] + '\n'
+                Line = ReservedLine + GetSplitValueList(Line, TAB_COMMENT_EDK_END, 1)[1]
                 ReservedLine = ''
                 IsFindBlockComment = False
             if IsFindBlockComment:
@@ -312,7 +312,7 @@ class Dec(DecObject):
         self.GenPackageHeader(ContainerFile)
         
         # Generate Includes
-        # Only for R8
+        # Only for Edk
         self.GenIncludes(ContainerFile)
 
         # Generate Guids

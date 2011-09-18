@@ -104,7 +104,7 @@ class InfHeader(ModuleHeaderClass):
         TAB_INF_DEFINES_VERSION_STRING              : "VersionString",
         TAB_INF_DEFINES_VERSION                     : "Version",
         TAB_INF_DEFINES_PCD_IS_DRIVER               : "PcdIsDriver",
-        TAB_INF_DEFINES_TIANO_R8_FLASHMAP_H         : "TianoR8FlashMap_h",
+        TAB_INF_DEFINES_TIANO_EDK_FLASHMAP_H         : "TianoEdkFlashMap_h",
         TAB_INF_DEFINES_SHADOW                      : "Shadow",
 #       TAB_INF_DEFINES_LIBRARY_CLASS               : "LibraryClass",
 #        TAB_INF_DEFINES_ENTRY_POINT                 : "ExternImages",
@@ -352,11 +352,11 @@ class Inf(InfObject):
             #
             # Remove comment block
             #
-            if Line.find(TAB_COMMENT_R8_START) > -1:
-                ReservedLine = GetSplitValueList(Line, TAB_COMMENT_R8_START, 1)[0]
+            if Line.find(TAB_COMMENT_EDK_START) > -1:
+                ReservedLine = GetSplitValueList(Line, TAB_COMMENT_EDK_START, 1)[0]
                 IsFindBlockComment = True
-            if Line.find(TAB_COMMENT_R8_END) > -1:
-                Line = ReservedLine + GetSplitValueList(Line, TAB_COMMENT_R8_END, 1)[1]
+            if Line.find(TAB_COMMENT_EDK_END) > -1:
+                Line = ReservedLine + GetSplitValueList(Line, TAB_COMMENT_EDK_END, 1)[1]
                 ReservedLine = ''
                 IsFindBlockComment = False
             if IsFindBlockComment:
@@ -465,7 +465,7 @@ class Inf(InfObject):
             print 'FvExt =', M.Header[Arch].FvExt
             print 'SourceFv =', M.Header[Arch].SourceFv
             print 'PcdIsDriver =', M.Header[Arch].PcdIsDriver
-            print 'TianoR8FlashMap_h =', M.Header[Arch].TianoR8FlashMap_h
+            print 'TianoEdkFlashMap_h =', M.Header[Arch].TianoEdkFlashMap_h
             print 'Shadow =', M.Header[Arch].Shadow
             print 'LibraryClass =', M.Header[Arch].LibraryClass
             for Item in M.Header[Arch].LibraryClass:
@@ -613,7 +613,7 @@ class Inf(InfObject):
             # Get version of INF
             #
             if ModuleHeader.InfVersion != "":
-                # R9 inf
+                # EdkII inf
                 VersionNumber = ModuleHeader.VersionNumber
                 VersionString = ModuleHeader.VersionString
                 if len(VersionNumber) > 0 and len(VersionString) == 0:
@@ -624,12 +624,12 @@ class Inf(InfObject):
                         EdkLogger.warn(2001, 'INF file %s defines both VERSION_NUMBER and VERSION_STRING, using VERSION_STRING' % self.Identification.FileFullPath)
                     ModuleHeader.Version = VersionString
             else:
-                # R8 inf
+                # Edk inf
                 ModuleHeader.InfVersion = "0x00010000"
                 if ModuleHeader.ComponentType in gComponentType2ModuleType:
                     ModuleHeader.ModuleType = gComponentType2ModuleType[ModuleHeader.ComponentType]
                 elif ModuleHeader.ComponentType != '':
-                    EdkLogger.error("Parser", PARSER_ERROR, "Unsupported R8 component type [%s]" % ModuleHeader.ComponentType, ExtraData=File, RaiseError = EdkLogger.IsRaiseError)
+                    EdkLogger.error("Parser", PARSER_ERROR, "Unsupported Edk component type [%s]" % ModuleHeader.ComponentType, ExtraData=File, RaiseError = EdkLogger.IsRaiseError)
 
             self.Module.Header[Arch] = ModuleHeader
 
@@ -841,7 +841,7 @@ class Inf(InfObject):
             Nmake.SupArchList = Nmakes[Key]
             self.Module.Nmake.append(Nmake)
 
-            # convert R8 format to R9 format
+            # convert Edk format to EdkII format
             if Nmake.Name == "IMAGE_ENTRY_POINT":
                 Image = ModuleExternImageClass()
                 Image.ModuleEntryPoint = Nmake.Value

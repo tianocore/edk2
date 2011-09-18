@@ -357,8 +357,8 @@ class WorkspaceAutoGen(AutoGen):
     # @return  None
     #
     def _CheckAllPcdsTokenValueConflict(self):
-        if len(self.BuildDatabase.WorkspaceDb.PackageList) >= 1:
-            for Package in self.BuildDatabase.WorkspaceDb.PackageList:
+        for Pa in self.AutoGenObjectList:
+            for Package in Pa.PackageList:
                 PcdList = Package.Pcds.values()
                 PcdList.sort(lambda x, y: cmp(x.TokenValue, y.TokenValue)) 
                 Count = 0
@@ -1152,7 +1152,7 @@ class PlatformAutoGen(AutoGen):
             if LibraryClass.startswith("NULL"):
                 Module.LibraryClasses[LibraryClass] = PlatformModule.LibraryClasses[LibraryClass]
 
-        # R9 module
+        # EdkII module
         LibraryConsumerList = [Module]
         Constructor         = []
         ConsumedByList      = sdict()
@@ -1401,7 +1401,7 @@ class PlatformAutoGen(AutoGen):
 
     ## Resolve library names to library modules
     #
-    # (for R8.x modules)
+    # (for Edk.x modules)
     #
     #   @param  Module  The module from which the library names will be resolved
     #
@@ -1412,7 +1412,7 @@ class PlatformAutoGen(AutoGen):
         EdkLogger.verbose("Library instances of module [%s] [%s]:" % (str(Module), self.Arch))
         LibraryConsumerList = [Module]
 
-        # "CompilerStub" is a must for R8 modules
+        # "CompilerStub" is a must for Edk modules
         if Module.Libraries:
             Module.Libraries.append("CompilerStub")
         LibraryList = []
@@ -1794,6 +1794,10 @@ class ModuleAutoGen(AutoGen):
     def _GetBaseName(self):
         return self.Module.BaseName
 
+    ## Return the module DxsFile if exist
+    def _GetDxsFile(self):
+        return self.Module.DxsFile
+
     ## Return the module SourceOverridePath
     def _GetSourceOverridePath(self):
         return self.Module.SourceOverridePath
@@ -1810,7 +1814,7 @@ class ModuleAutoGen(AutoGen):
     def _GetModuleType(self):
         return self.Module.ModuleType
 
-    ## Return the component type (for R8.x style of module)
+    ## Return the component type (for Edk.x style of module)
     def _GetComponentType(self):
         return self.Module.ComponentType
 
@@ -1913,7 +1917,7 @@ class ModuleAutoGen(AutoGen):
     def _GetDepexTokenList(self):
         if self._DepexList == None:
             self._DepexList = {}
-            if self.IsLibrary or TAB_DEPENDENCY_EXPRESSION_FILE in self.FileTypes:
+            if self.DxsFile or self.IsLibrary or TAB_DEPENDENCY_EXPRESSION_FILE in self.FileTypes:
                 return self._DepexList
 
             self._DepexList[self.ModuleType] = []
@@ -1949,7 +1953,7 @@ class ModuleAutoGen(AutoGen):
     def _GetDepexExpressionTokenList(self):
         if self._DepexExpressionList == None:
             self._DepexExpressionList = {}
-            if self.IsLibrary or TAB_DEPENDENCY_EXPRESSION_FILE in self.FileTypes:
+            if self.DxsFile or self.IsLibrary or TAB_DEPENDENCY_EXPRESSION_FILE in self.FileTypes:
                 return self._DepexExpressionList
 
             self._DepexExpressionList[self.ModuleType] = ''
@@ -2153,7 +2157,7 @@ class ModuleAutoGen(AutoGen):
             self._BuildTargets = {}
             self._FileTypes = {}
 
-        #TRICK: call _GetSourceFileList to apply build rule for binary files
+        #TRICK: call _GetSourceFileList to apply build rule for source files
         if self.SourceFileList:
             pass
 
@@ -2306,11 +2310,11 @@ class ModuleAutoGen(AutoGen):
                 for Inc in self.Module.Includes:
                     if Inc not in self._IncludePathList:
                         self._IncludePathList.append(Inc)
-                    # for r8 modules
+                    # for Edk modules
                     Inc = path.join(Inc, self.Arch.capitalize())
                     if os.path.exists(Inc) and Inc not in self._IncludePathList:
                         self._IncludePathList.append(Inc)
-                # r8 module needs to put DEBUG_DIR at the end of search path and not to use SOURCE_DIR all the time
+                # Edk module needs to put DEBUG_DIR at the end of search path and not to use SOURCE_DIR all the time
                 self._IncludePathList.append(self.DebugDir)
             else:
                 self._IncludePathList.append(self.MetaFile.Dir)
@@ -2470,7 +2474,7 @@ class ModuleAutoGen(AutoGen):
 
         for File in self.AutoGenFileList:
             if GenC.Generate(File.Path, self.AutoGenFileList[File], File.IsBinary):
-                #Ignore R8 AutoGen.c
+                #Ignore Edk AutoGen.c
                 if self.AutoGenVersion < 0x00010005 and File.Name == 'AutoGen.c':
                         continue
 
@@ -2572,6 +2576,7 @@ class ModuleAutoGen(AutoGen):
     ProtocolList            = property(_GetProtocolList)
     PpiList                 = property(_GetPpiList)
     DepexList               = property(_GetDepexTokenList)
+    DxsFile                 = property(_GetDxsFile)
     DepexExpressionList     = property(_GetDepexExpressionTokenList)
     BuildOption             = property(_GetModuleBuildOption)
     BuildCommand            = property(_GetBuildCommand)

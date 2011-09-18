@@ -31,7 +31,7 @@ gIncludePattern = re.compile(r"^[ \t]*#?[ \t]*include(?:[ \t]*(?:\\(?:\r\n|\r|\n
 ## Regular expression for matching macro used in header file inclusion
 gMacroPattern = re.compile("([_A-Z][_A-Z0-9]*)[ \t]*\((.+)\)", re.UNICODE)
 
-## pattern for include style in R8.x code
+## pattern for include style in Edk.x code
 gProtocolDefinition = "Protocol/%(HeaderKey)s/%(HeaderKey)s.h"
 gGuidDefinition = "Guid/%(HeaderKey)s/%(HeaderKey)s.h"
 gArchProtocolDefinition = "ArchProtocol/%(HeaderKey)s/%(HeaderKey)s.h"
@@ -462,13 +462,13 @@ cleanlib:
             ArchEntryPoint = ModuleEntryPoint
 
         if self._AutoGenObject.Arch == "EBC":
-            # EBC compiler always use "EfiStart" as entry point. Only applies to R9 modules
+            # EBC compiler always use "EfiStart" as entry point. Only applies to EdkII modules
             ImageEntryPoint = "EfiStart"
         elif self._AutoGenObject.AutoGenVersion < 0x00010005:
-            # R8 modules use entry point specified in INF file
+            # Edk modules use entry point specified in INF file
             ImageEntryPoint = ModuleEntryPoint
         else:
-            # R9 modules always use "_ModuleEntryPoint" as entry point
+            # EdkII modules always use "_ModuleEntryPoint" as entry point
             ImageEntryPoint = "_ModuleEntryPoint"
 
         # tools definitions
@@ -535,7 +535,7 @@ cleanlib:
                 False
                 )
 
-        # R8 modules need <BaseName>StrDefs.h for string ID
+        # Edk modules need <BaseName>StrDefs.h for string ID
         #if self._AutoGenObject.AutoGenVersion < 0x00010005 and len(self._AutoGenObject.UnicodeFileList) > 0:
         #    BcTargetList = ['strdefs']
         #else:

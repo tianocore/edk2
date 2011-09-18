@@ -3647,7 +3647,14 @@ class FdfParser(object):
             return CycleRefExists
         
 if __name__ == "__main__":
-    parser = FdfParser("..\LakeportX64Pkg.fdf")
+    import sys
+    try:
+        test_file = sys.argv[1]
+    except IndexError, v:
+        print "Usage: %s filename" % sys.argv[0]
+        sys.exit(1)
+
+    parser = FdfParser(test_file)
     try:
         parser.ParseFile()
         parser.CycleReferenceCheck()

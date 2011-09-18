@@ -403,7 +403,7 @@ CVfrCompiler::Usage (
   UINT32 Index;
   CONST  CHAR8 *Help[] = {
     " ", 
-    "VfrCompile version " VFR_COMPILER_VERSION VFR_COMPILER_UPDATE_TIME,
+    "VfrCompile version " VFR_COMPILER_VERSION __BUILD_VERSION VFR_COMPILER_UPDATE_TIME,
     "Copyright (c) 2004-2011 Intel Corporation. All rights reserved.",
     " ",
     "Usage: VfrCompile [options] VfrFile",
@@ -728,7 +728,7 @@ CVfrCompiler::GenRecordListFile (
       goto Err1;
     }
 
-    fprintf (pOutFile, "//\n//  VFR compiler version " VFR_COMPILER_VERSION "\n//\n");
+    fprintf (pOutFile, "//\n//  VFR compiler version " VFR_COMPILER_VERSION __BUILD_VERSION "\n//\n");
     LineNo = 0;
     while (!feof (pInFile)) {
       if (fgets (LineBuf, MAX_VFR_LINE_LEN, pInFile) != NULL) {

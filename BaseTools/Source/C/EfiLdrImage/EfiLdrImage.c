@@ -83,7 +83,7 @@ Returns:
 
 --*/
 {
-  printf ("%s v%d.%d -Utility to break a file into two pieces at the request offset.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("%s v%d.%d %s -Utility to break a file into two pieces at the request offset.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
   printf ("Copyright (c) 1999-2010 Intel Corporation. All rights reserved.\n");
 }
 

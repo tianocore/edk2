@@ -929,13 +929,13 @@ class WorkspaceBuild(object):
         ModuleDatabase = self.Build[Arch].ModuleDatabase
         ModuleType = Module.ModuleType
 
-        # check R8 module
+        # check Edk module
         if Module.AutoGenVersion < 0x00010005:
             EdkLogger.verbose("")
             EdkLogger.verbose("Library instances of module [%s] [%s]:" % (str(Module), Arch))
             LibraryConsumerList = [Module]
 
-            # "CompilerStub" is a must for R8 modules
+            # "CompilerStub" is a must for Edk modules
             Module.Libraries.append("CompilerStub")
             while len(LibraryConsumerList) > 0:
                 M = LibraryConsumerList.pop()
@@ -952,7 +952,7 @@ class WorkspaceBuild(object):
                         EdkLogger.verbose("\t" + LibraryName + " : " + LibraryFile)
             return
 
-        # R9 module
+        # EdkII module
         LibraryConsumerList = [Module]
         Constructor         = []
         ConsumedByList      = sdict()

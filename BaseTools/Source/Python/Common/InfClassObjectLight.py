@@ -89,7 +89,7 @@ class InfHeader(ModuleHeaderClass):
         TAB_INF_DEFINES_VERSION_STRING              : "VersionString",
         TAB_INF_DEFINES_VERSION                     : "Version",
         TAB_INF_DEFINES_PCD_IS_DRIVER               : "PcdIsDriver",
-        TAB_INF_DEFINES_TIANO_R8_FLASHMAP_H         : "TianoR8FlashMap_h",
+        TAB_INF_DEFINES_TIANO_EDK_FLASHMAP_H         : "TianoEdkFlashMap_h",
         TAB_INF_DEFINES_SHADOW                      : "Shadow",
     }
 
@@ -411,8 +411,8 @@ class Inf(InfObject):
         for Line in open(Filename, 'r'):
             LineNo = LineNo + 1
             # Remove comment block
-            if Line.find(TAB_COMMENT_R8_START) > -1:
-                ReservedLine = GetSplitValueList(Line, TAB_COMMENT_R8_START, 1)[0]
+            if Line.find(TAB_COMMENT_EDK_START) > -1:
+                ReservedLine = GetSplitValueList(Line, TAB_COMMENT_EDK_START, 1)[0]
                 if ReservedLine.strip().startswith(TAB_COMMENT_SPLIT):
                     Comment = Comment + Line.strip() + '\n'
                     ReservedLine = ''
@@ -421,9 +421,9 @@ class Inf(InfObject):
                 IsFindBlockComment = True
                 if not ReservedLine:
                     continue
-            if Line.find(TAB_COMMENT_R8_END) > -1:
-                Comment = Comment + Line[:Line.find(TAB_COMMENT_R8_END) + len(TAB_COMMENT_R8_END)] + '\n'
-                Line = ReservedLine + GetSplitValueList(Line, TAB_COMMENT_R8_END, 1)[1]
+            if Line.find(TAB_COMMENT_EDK_END) > -1:
+                Comment = Comment + Line[:Line.find(TAB_COMMENT_EDK_END) + len(TAB_COMMENT_EDK_END)] + '\n'
+                Line = ReservedLine + GetSplitValueList(Line, TAB_COMMENT_EDK_END, 1)[1]
                 ReservedLine = ''
                 IsFindBlockComment = False
             if IsFindBlockComment:

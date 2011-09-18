@@ -49,11 +49,11 @@ def PreProcess(Filename, MergeMultipleLines = True, LineNo = -1):
     for Line in open(Filename, 'r'):
         Line = Line.strip()
         # Remove comment block
-        if Line.find(TAB_COMMENT_R8_START) > -1:
-            ReservedLine = GetSplitValueList(Line, TAB_COMMENT_R8_START, 1)[0]
+        if Line.find(TAB_COMMENT_EDK_START) > -1:
+            ReservedLine = GetSplitValueList(Line, TAB_COMMENT_EDK_START, 1)[0]
             IsFindBlockComment = True
-        if Line.find(TAB_COMMENT_R8_END) > -1:
-            Line = ReservedLine + GetSplitValueList(Line, TAB_COMMENT_R8_END, 1)[1]
+        if Line.find(TAB_COMMENT_EDK_END) > -1:
+            Line = ReservedLine + GetSplitValueList(Line, TAB_COMMENT_EDK_END, 1)[1]
             ReservedLine = ''
             IsFindBlockComment = False
         if IsFindBlockComment:

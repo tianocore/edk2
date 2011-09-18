@@ -18,8 +18,9 @@ from optparse import OptionParser
 from AutoGenExterns import *
 from Common.XmlRoutines import  *             # XmlParseFile, XmlElement, XmlAttribute, XmlList, XmlElementData, XmlNode
 from Common.EdkIIWorkspace import *
+from Common.BuildVersion import gBUILD_VERSION
 
-versionNumber = "0.9"
+versionNumber = ("0.9" + " " + gBUILD_VERSION)
 __version__ = "%prog Version " + versionNumber
 __copyright__ = "Copyright (c) 2007 - 2010, Intel Corporation  All rights reserved."
 

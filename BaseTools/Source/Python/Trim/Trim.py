@@ -22,11 +22,11 @@ from optparse import OptionParser
 from optparse import make_option
 from Common.BuildToolError import *
 from Common.Misc import *
-
+from Common.BuildVersion import gBUILD_VERSION
 import Common.EdkLogger as EdkLogger
 
 # Version and Copyright
-__version_number__ = "0.10"
+__version_number__ = ("0.10" + " " + gBUILD_VERSION)
 __version__ = "%prog Version " + __version_number__
 __copyright__ = "Copyright (c) 2007-2010, Intel Corporation. All rights reserved."
 
@@ -390,7 +390,7 @@ def TrimAslFile(Source, Target, IncludePathFile):
 # @param  Source    File or directory to be trimmed
 # @param  Target    File or directory to store the trimmed content
 #
-def TrimR8Sources(Source, Target):
+def TrimEdkSources(Source, Target):
     if os.path.isdir(Source):
         for CurrentDir, Dirs, Files in os.walk(Source):
             if '.svn' in Dirs:
@@ -402,17 +402,17 @@ def TrimR8Sources(Source, Target):
                 Dummy, Ext = os.path.splitext(FileName)
                 if Ext.upper() not in ['.C', '.H']: continue
                 if Target == None or Target == '':
-                    TrimR8SourceCode(
+                    TrimEdkSourceCode(
                         os.path.join(CurrentDir, FileName),
                         os.path.join(CurrentDir, FileName)
                         )
                 else:
-                    TrimR8SourceCode(
+                    TrimEdkSourceCode(
                         os.path.join(CurrentDir, FileName),
                         os.path.join(Target, CurrentDir[len(Source)+1:], FileName)
                         )
     else:
-        TrimR8SourceCode(Source, Target)
+        TrimEdkSourceCode(Source, Target)
 
 ## Trim one EDK source code file
 #
@@ -445,7 +445,7 @@ def TrimR8Sources(Source, Target):
 # @param  Source    File to be trimmed
 # @param  Target    File to store the trimmed content
 #
-def TrimR8SourceCode(Source, Target):
+def TrimEdkSourceCode(Source, Target):
     EdkLogger.verbose("\t%s -> %s" % (Source, Target))
     CreateDirectory(os.path.dirname(Target))
 
@@ -491,8 +491,8 @@ def Options():
                           help="The input file is preprocessed VFR file"),
         make_option("-a", "--asl-file", dest="FileType", const="Asl", action="store_const",
                           help="The input file is ASL file"),
-        make_option("-8", "--r8-source-code", dest="FileType", const="R8SourceCode", action="store_const",
-                          help="The input file is source code for R8 to be trimmed for ECP"),
+        make_option("-8", "--Edk-source-code", dest="FileType", const="EdkSourceCode", action="store_const",
+                          help="The input file is source code for Edk to be trimmed for ECP"),
 
         make_option("-c", "--convert-hex", dest="ConvertHex", action="store_true",
                           help="Convert standard hex format (0xabcd) to MASM format (abcdh)"),
@@ -560,8 +560,8 @@ def Main():
             if CommandOptions.OutputFile == None:
                 CommandOptions.OutputFile = os.path.splitext(InputFile)[0] + '.iii'
             TrimAslFile(InputFile, CommandOptions.OutputFile, CommandOptions.IncludePathFile)
-        elif CommandOptions.FileType == "R8SourceCode":
-            TrimR8Sources(InputFile, CommandOptions.OutputFile)
+        elif CommandOptions.FileType == "EdkSourceCode":
+            TrimEdkSources(InputFile, CommandOptions.OutputFile)
         else :
             if CommandOptions.OutputFile == None:
                 CommandOptions.OutputFile = os.path.splitext(InputFile)[0] + '.iii'

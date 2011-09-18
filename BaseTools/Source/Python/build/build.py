@@ -34,6 +34,7 @@ from Common import Misc as Utils
 from Common.TargetTxtClassObject import *
 from Common.ToolDefClassObject import *
 from Common.DataType import *
+from Common.BuildVersion import gBUILD_VERSION
 from AutoGen.AutoGen import *
 from Common.BuildToolError import *
 from Workspace.WorkspaceDatabase import *
@@ -46,7 +47,7 @@ import Common.EdkLogger
 import Common.GlobalData as GlobalData
 
 # Version and Copyright
-VersionNumber = "0.5"
+VersionNumber = "0.5" + ' ' + gBUILD_VERSION
 __version__ = "%prog Version " + VersionNumber
 __copyright__ = "Copyright (c) 2007 - 2010, Intel Corporation  All rights reserved."
 
@@ -100,7 +101,7 @@ def CheckEnvVariable():
     os.environ["WORKSPACE"] = WorkspaceDir
 
     #
-    # Check EFI_SOURCE (R8 build convention). EDK_SOURCE will always point to ECP
+    # Check EFI_SOURCE (Edk build convention). EDK_SOURCE will always point to ECP
     #
     if "ECP_SOURCE" not in os.environ:
         os.environ["ECP_SOURCE"] = os.path.join(WorkspaceDir, GlobalData.gEdkCompatibilityPkg)
@@ -122,13 +123,13 @@ def CheckEnvVariable():
     os.environ["EDK_TOOLS_PATH"] = os.path.normcase(os.environ["EDK_TOOLS_PATH"])
     
     if not os.path.exists(EcpSourceDir):
-        EdkLogger.verbose("ECP_SOURCE = %s doesn't exist. R8 modules could not be built." % EcpSourceDir)
+        EdkLogger.verbose("ECP_SOURCE = %s doesn't exist. Edk modules could not be built." % EcpSourceDir)
     elif ' ' in EcpSourceDir:
         EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in ECP_SOURCE path",
                         ExtraData=EcpSourceDir)
     if not os.path.exists(EdkSourceDir):
         if EdkSourceDir == EcpSourceDir:
-            EdkLogger.verbose("EDK_SOURCE = %s doesn't exist. R8 modules could not be built." % EdkSourceDir)
+            EdkLogger.verbose("EDK_SOURCE = %s doesn't exist. Edk modules could not be built." % EdkSourceDir)
         else:
             EdkLogger.error("build", PARAMETER_INVALID, "EDK_SOURCE does not exist",
                             ExtraData=EdkSourceDir)
@@ -137,7 +138,7 @@ def CheckEnvVariable():
                         ExtraData=EdkSourceDir)
     if not os.path.exists(EfiSourceDir):
         if EfiSourceDir == EcpSourceDir:
-            EdkLogger.verbose("EFI_SOURCE = %s doesn't exist. R8 modules could not be built." % EfiSourceDir)
+            EdkLogger.verbose("EFI_SOURCE = %s doesn't exist. Edk modules could not be built." % EfiSourceDir)
         else:
             EdkLogger.error("build", PARAMETER_INVALID, "EFI_SOURCE does not exist",
                             ExtraData=EfiSourceDir)
@@ -746,13 +747,15 @@ class Build():
         self.LoadConfiguration()
         
         #
-        # @attention Treat $(TARGET) in meta data files as special macro when it has only one build target.
-        # This is not a complete support for $(TARGET) macro as it can only support one build target in ONE
-        # invocation of build command. However, it should cover the frequent usage model that $(TARGET) macro
-        # is used in DSC files to specify different libraries & PCD setting for debug/release build.
+        # @attention Treat $(TARGET)/$(TOOL_CHAIN_TAG) in meta data files as special macro when it has only one build target/toolchain.
+        # This is not a complete support for $(TARGET)/$(TOOL_CHAIN_TAG) macro as it can only support one build target/toolchain in ONE
+        # invocation of build command. However, it should cover the frequent usage model that $(TARGET)/$(TOOL_CHAIN_TAG) macro
+        # is used in DSC/FDF files to specify different libraries & PCD setting for debug/release build.
         #
         if len(self.BuildTargetList) == 1:
             self.Db._GlobalMacros.setdefault("TARGET", self.BuildTargetList[0])
+        if len(self.ToolChainList) == 1:   
+            self.Db._GlobalMacros.setdefault("TOOL_CHAIN_TAG", self.ToolChainList[0])
         
         self.InitBuild()
 
@@ -1708,8 +1711,8 @@ def MyOptionParser():
         help="Build the platform specified by the DSC file name argument, overriding target.txt's ACTIVE_PLATFORM definition.")
     Parser.add_option("-m", "--module", action="callback", type="string", dest="ModuleFile", callback=SingleCheckCallback,
         help="Build the module specified by the INF file name argument.")
-    Parser.add_option("-b", "--buildtarget", action="append", type="choice", choices=['DEBUG','RELEASE'], dest="BuildTarget",
-        help="BuildTarget is one of list: DEBUG, RELEASE, which overrides target.txt's TARGET definition. To specify more TARGET, please repeat this option.")
+    Parser.add_option("-b", "--buildtarget", action="append", type="choice", choices=['DEBUG','RELEASE','NOOPT'], dest="BuildTarget",
+        help="BuildTarget is one of list: DEBUG, RELEASE, NOOPT, which overrides target.txt's TARGET definition. To specify more TARGET, please repeat this option.")
     Parser.add_option("-t", "--tagname", action="append", type="string", dest="ToolChain",
         help="Using the Tool Chain Tagname to build the platform, overriding target.txt's TOOL_CHAIN_TAG definition.")
     Parser.add_option("-x", "--sku-id", action="callback", type="string", dest="SkuId", callback=SingleCheckCallback,

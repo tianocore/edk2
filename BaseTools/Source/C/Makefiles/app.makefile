@@ -22,4 +22,6 @@ all: $(MAKEROOT)/bin $(APPLICATION)
 $(APPLICATION): $(OBJECTS) 
 	$(LINKER) -o $(APPLICATION) $(LFLAGS) $(OBJECTS) -L$(MAKEROOT)/libs $(LIBS)
 
+$(OBJECTS): ../Include/Common/BuildVersion.h
+
 include $(MAKEROOT)/Makefiles/footer.makefile

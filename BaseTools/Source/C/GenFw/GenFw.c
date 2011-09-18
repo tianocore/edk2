@@ -147,7 +147,7 @@ Returns:
 
 --*/
 {
-  fprintf (stdout, "%s Version %d.%d\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  fprintf (stdout, "%s Version %d.%d %s \n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
 
 STATIC
@@ -658,7 +658,10 @@ PeCoffConvertImageToXip (
         SectionHeader->SizeOfRawData
         );
     }
-    SectionHeader->SizeOfRawData = SectionHeader->Misc.VirtualSize;
+    //
+    // Make the size of raw data in section header alignment.
+    //
+    SectionHeader->SizeOfRawData = (SectionHeader->Misc.VirtualSize + PeHdr->Pe32.OptionalHeader.FileAlignment - 1) & (~(PeHdr->Pe32.OptionalHeader.FileAlignment - 1));
     SectionHeader->PointerToRawData = SectionHeader->VirtualAddress;
   }
 

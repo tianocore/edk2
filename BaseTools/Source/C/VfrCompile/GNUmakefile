@@ -30,7 +30,21 @@ LINKER = $(CXX)
 
 EXTRA_CLEAN_OBJECTS = EfiVfrParser.cpp EfiVfrParser.h VfrParser.dlg VfrTokens.h VfrLexer.cpp VfrLexer.h VfrSyntax.cpp tokens.h
 
-include $(MAKEROOT)/Makefiles/app.makefile
+MAKEROOT ?= ../..
+
+include $(MAKEROOT)/Makefiles/header.makefile
+
+APPLICATION = $(MAKEROOT)/bin/$(APPNAME)
+
+.PHONY:all
+all: $(MAKEROOT)/bin $(APPLICATION) 
+
+$(APPLICATION): $(OBJECTS) 
+	$(LINKER) -o $(APPLICATION) $(LFLAGS) $(OBJECTS) -L$(MAKEROOT)/libs $(LIBS)
+
+VfrCompiler.o: ../Include/Common/BuildVersion.h
+
+include $(MAKEROOT)/Makefiles/footer.makefile
 
 VfrSyntax.cpp EfiVfrParser.cpp EfiVfrParser.h VfrParser.dlg VfrTokens.h: Pccts/antlr/antlr VfrSyntax.g
 	Pccts/antlr/antlr -CC -e3 -ck 3 -k 2 -fl VfrParser.dlg -ft VfrTokens.h -o . VfrSyntax.g

@@ -275,7 +275,7 @@ Version (
   VOID
   )
 {
-  printf ("%s v%d.%d -Utility to retrieve and update the boot sector or MBR.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("%s v%d.%d %s-Utility to retrieve and update the boot sector or MBR.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
   printf ("Copyright (c) 2007-2010 Intel Corporation. All rights reserved.\n");
 }
 

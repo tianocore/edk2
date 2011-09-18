@@ -286,7 +286,7 @@ class SourceFiles:
                     self.dots = 0
                     local_file = os.path.join(self.config.src_dir, fdata['filename'])
                     url = fdata['url']
-	            print 'Downloading %s:' % fname, url
+                    print 'Downloading %s:' % fname, url
                     if retries > 0:
                         print '(retry)',
                     sys.stdout.flush()

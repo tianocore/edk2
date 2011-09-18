@@ -40,7 +40,6 @@ Abstract:
 //
 #define UTILITY_MAJOR_VERSION 0
 #define UTILITY_MINOR_VERSION 1
-#define GENFV_UPDATE_TIME           " updated on 2010/2/1"
 
 EFI_GUID  mEfiFirmwareFileSystem2Guid = EFI_FIRMWARE_FILE_SYSTEM2_GUID;
 
@@ -65,7 +64,7 @@ Returns:
 
 --*/
 {
-  fprintf (stdout, "%s Version %d.%d %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, GENFV_UPDATE_TIME);
+  fprintf (stdout, "%s Version %d.%d %s \n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
 
 STATIC

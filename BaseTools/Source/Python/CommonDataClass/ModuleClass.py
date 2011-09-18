@@ -32,7 +32,7 @@ from CommonClass import *
 #                                [ ClonedRecordClass, ... ]
 # @var PcdIsDriver:              To store value for PcdIsDriver, selection scope is in below list
 #                                PEI_PCD_DRIVER | DXE_PCD_DRIVER
-# @var TianoR8FlashMap_h:        To store value for TianoR8FlashMap_h
+# @var TianoEdkFlashMap_h:       To store value for TianoEdkFlashMap_h
 # @var InfVersion:               To store value for InfVersion
 # @var UefiSpecificationVersion: To store value for UefiSpecificationVersion
 # @var EdkReleaseVersion:        To store value for EdkReleaseVersion
@@ -63,7 +63,7 @@ class ModuleHeaderClass(IdentificationClass, CommonHeaderClass, DefineClass):
         self.OutputFileBasename = ''
         self.ClonedFrom = []
         self.PcdIsDriver = ''
-        self.TianoR8FlashMap_h = False
+        self.TianoEdkFlashMap_h = False
         self.InfVersion = ''
         self.PiSpecificationVersion = ''
         self.UefiSpecificationVersion = ''

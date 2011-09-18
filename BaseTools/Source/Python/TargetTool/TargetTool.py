@@ -18,6 +18,7 @@ from optparse import OptionParser
 import Common.EdkLogger as EdkLogger
 import Common.BuildToolError as BuildToolError
 from Common.DataType import *
+from Common.BuildVersion import gBUILD_VERSION
 
 # To Do 1.set clean, 2. add item, if the line is disabled.
 
@@ -170,7 +171,7 @@ def GetConfigureKeyValue(self, Key):
                             "Build rule file %s does not exist!" % self.Opt.BUILD_RULE_FILE, RaiseError=False)
     return Line
 
-VersionNumber = "0.01"
+VersionNumber = ("0.01" + " " + gBUILD_VERSION)
 __version__ = "%prog Version " + VersionNumber
 __copyright__ = "Copyright (c) 2007 - 2010, Intel Corporation  All rights reserved."
 __usage__ = "%prog [options] {args} \

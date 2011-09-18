@@ -1387,19 +1387,21 @@ vfrFormDefinition :
                                                         CIfrLabel LObj3;
                                                         LObj3.SetLineNo(E->getLine());
                                                         LObj3.SetNumber (0xffff);  //add end label for UEFI, label number hardcode 0xffff
-                                                        //
-                                                        // Declare undefined Question
-                                                        //
-                                                        if (gCFormPkg.HavePendingUnassigned()) {
-                                                          gCFormPkg.DeclarePendingQuestion (
-                                                                      gCVfrVarDataTypeDB,
-                                                                      mCVfrDataStorage,
-                                                                      mCVfrQuestionDB,
-                                                                      &mFormsetGuid,
-                                                                      E->getLine()
-                                                                    );
-                                                        }
                                                       }
+
+                                                      //
+                                                      // Declare undefined Question so that they can be used in expression.
+                                                      //
+                                                      if (gCFormPkg.HavePendingUnassigned()) {
+                                                        gCFormPkg.DeclarePendingQuestion (
+                                                                    gCVfrVarDataTypeDB,
+                                                                    mCVfrDataStorage,
+                                                                    mCVfrQuestionDB,
+                                                                    &mFormsetGuid,
+                                                                    E->getLine()
+                                                                  );
+                                                      }
+
                                                       //
                                                       // mCVfrQuestionDB.PrintAllQuestion();
                                                       //
@@ -2110,6 +2112,7 @@ vfrStatementNumeric :
   <<
      CIfrNumeric NObj;
      UINT32 DataTypeSize;
+     BOOLEAN IsSupported;
   >>
   L:Numeric                                            << NObj.SetLineNo(L->getLine()); >>
   vfrQuestionHeader[NObj] ","                          << // check data type
@@ -2125,7 +2128,23 @@ vfrStatementNumeric :
   }
   vfrSetMinMaxStep[NObj]
   vfrStatementQuestionOptionList
-  E:EndNumeric                                         << CRT_END_OP (E); >>
+  E:EndNumeric                                         << 
+                                                          IsSupported = FALSE;
+                                                          switch (_GET_CURRQEST_DATATYPE()) {
+                                                            case EFI_IFR_TYPE_NUM_SIZE_8:
+                                                            case EFI_IFR_TYPE_NUM_SIZE_16:
+                                                            case EFI_IFR_TYPE_NUM_SIZE_32:
+                                                            case EFI_IFR_TYPE_NUM_SIZE_64:
+                                                              IsSupported = TRUE;
+                                                              break;
+                                                            default:
+                                                              break;
+                                                          }
+                                                          if (!IsSupported) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, L->getLine(), "Numeric question only support UINT8, UINT16, UINT32 and UINT64 data type.");
+                                                          }
+                                                          CRT_END_OP (E); 
+                                                       >>
   ";"
   ;
 
@@ -2170,6 +2189,7 @@ vfrStatementOneOf :
   <<
      CIfrOneOf OObj;
      UINT32    DataTypeSize;
+     BOOLEAN   IsSupported;
   >>
   L:OneOf                                              << OObj.SetLineNo(L->getLine()); >>
   vfrQuestionHeader[OObj] ","                          << //check data type
@@ -2184,7 +2204,23 @@ vfrStatementOneOf :
     vfrSetMinMaxStep[OObj]
   }
   vfrStatementQuestionOptionList
-  E:EndOneOf                                           << CRT_END_OP (E); >>
+  E:EndOneOf                                           << 
+                                                          IsSupported = FALSE;
+                                                          switch (_GET_CURRQEST_DATATYPE()) {
+                                                            case EFI_IFR_TYPE_NUM_SIZE_8:
+                                                            case EFI_IFR_TYPE_NUM_SIZE_16:
+                                                            case EFI_IFR_TYPE_NUM_SIZE_32:
+                                                            case EFI_IFR_TYPE_NUM_SIZE_64:
+                                                              IsSupported = TRUE;
+                                                              break;
+                                                            default:
+                                                              break;
+                                                          }
+                                                          if (!IsSupported) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, L->getLine(), "OneOf question only support UINT8, UINT16, UINT32 and UINT64 data type.");
+                                                          }
+                                                          CRT_END_OP (E); 
+                                                       >>
   ";"
   ;
 

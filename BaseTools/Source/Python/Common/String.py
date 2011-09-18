@@ -20,7 +20,7 @@ import os.path
 import string
 import EdkLogger as EdkLogger
 
-from GlobalData import *
+import GlobalData
 from BuildToolError import *
 
 gHexVerPatt = re.compile('0x[a-f0-9]{4}[a-f0-9]{4}$',re.IGNORECASE)
@@ -213,7 +213,7 @@ def ReplaceMacros(StringList, MacroDefinitions={}, SelfReplacement = False):
 def ReplaceMacro(String, MacroDefinitions={}, SelfReplacement = False):
     LastString = String
     while MacroDefinitions:
-        MacroUsed = gMacroPattern.findall(String)
+        MacroUsed = GlobalData.gMacroPattern.findall(String)
         # no macro found in String, stop replacing
         if len(MacroUsed) == 0:
             break
@@ -277,21 +277,40 @@ def CleanString(Line, CommentCharacter = DataType.TAB_COMMENT_SPLIT, AllowCppSty
     #
     Line = Line.strip();
     #
-    # Replace R8's comment character
+    # Replace Edk's comment character
     #
     if AllowCppStyleComment:
-        Line = Line.replace(DataType.TAB_COMMENT_R8_SPLIT, CommentCharacter)
+        Line = Line.replace(DataType.TAB_COMMENT_EDK_SPLIT, CommentCharacter)
     #
     # remove comments, but we should escape comment character in string
     #
     InString = False
+    CommentInString = False
     for Index in range(0, len(Line)):
         if Line[Index] == '"':
             InString = not InString
-        elif Line[Index] == CommentCharacter and not InString:
+        elif Line[Index] == CommentCharacter and InString :
+            CommentInString = True
+        elif Line[Index] == CommentCharacter and not InString :
             Line = Line[0: Index]
             break
-    
+        
+    if CommentInString:
+        Line = Line.replace('"', '')
+        ChIndex = Line.find('#')
+        while ChIndex >= 0:
+            if GlobalData.gIsWindows:
+                if ChIndex == 0 or Line[ChIndex-1] != '^':
+                    Line = Line[0:ChIndex] + '^' + Line[ChIndex:]
+                    ChIndex = Line.find('#', ChIndex + 2)
+                else:
+                    ChIndex = Line.find('#', ChIndex + 1)
+            else:
+                if ChIndex == 0 or Line[ChIndex-1] != '\\':
+                    Line = Line[0:ChIndex] + '\\' + Line[ChIndex:]
+                    ChIndex = Line.find('#', ChIndex + 2)
+                else:
+                    ChIndex = Line.find('#', ChIndex + 1)
     #
     # remove whitespace again
     #
@@ -315,10 +334,10 @@ def CleanString2(Line, CommentCharacter = DataType.TAB_COMMENT_SPLIT, AllowCppSt
     #
     Line = Line.strip();
     #
-    # Replace R8's comment character
+    # Replace Edk's comment character
     #
     if AllowCppStyleComment:
-        Line = Line.replace(DataType.TAB_COMMENT_R8_SPLIT, CommentCharacter)
+        Line = Line.replace(DataType.TAB_COMMENT_EDK_SPLIT, CommentCharacter)
     #
     # separate comments and statements
     #
@@ -689,11 +708,11 @@ def RemoveBlockComment(Lines):
         #
         # Remove comment block
         #
-        if Line.find(DataType.TAB_COMMENT_R8_START) > -1:
-            ReservedLine = GetSplitValueList(Line, DataType.TAB_COMMENT_R8_START, 1)[0]
+        if Line.find(DataType.TAB_COMMENT_EDK_START) > -1:
+            ReservedLine = GetSplitValueList(Line, DataType.TAB_COMMENT_EDK_START, 1)[0]
             IsFindBlockComment = True
-        if Line.find(DataType.TAB_COMMENT_R8_END) > -1:
-            Line = ReservedLine + GetSplitValueList(Line, DataType.TAB_COMMENT_R8_END, 1)[1]
+        if Line.find(DataType.TAB_COMMENT_EDK_END) > -1:
+            Line = ReservedLine + GetSplitValueList(Line, DataType.TAB_COMMENT_EDK_END, 1)[1]
             ReservedLine = ''
             IsFindBlockComment = False
         if IsFindBlockComment:

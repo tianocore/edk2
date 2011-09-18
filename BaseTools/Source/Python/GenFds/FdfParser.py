@@ -2298,10 +2298,15 @@ class FdfParser:
         if not self.__IsKeyword( "FILE"):
             return False
 
-        FfsFileObj = FfsFileStatement.FileStatement()
-
         if not self.__GetNextWord():
             raise Warning("expected FFS type", self.FileName, self.CurrentLineNumber)
+
+        if ForCapsule and self.__Token == 'DATA':
+            self.__UndoToken()
+            self.__UndoToken()
+            return False
+        
+        FfsFileObj = FfsFileStatement.FileStatement()
         FfsFileObj.FvFileType = self.__Token
 
         if not self.__IsToken( "="):
@@ -2917,7 +2922,9 @@ class FdfParser:
             IsInf = self.__GetInfStatement(Obj, True)
             IsFile = self.__GetFileStatement(Obj, True)
             IsFv = self.__GetFvStatement(Obj)
-            if not IsInf and not IsFile and not IsFv:
+            IsFd = self.__GetFdStatement(Obj)
+            IsAnyFile = self.__GetAnyFileStatement(Obj)
+            if not (IsInf or IsFile or IsFv or IsFd or IsAnyFile):
                 break
 
     ## __GetFvStatement() method
@@ -2943,6 +2950,65 @@ class FdfParser:
         CapsuleFv = CapsuleData.CapsuleFv()
         CapsuleFv.FvName = self.__Token
         CapsuleObj.CapsuleDataList.append(CapsuleFv)
+        return True
+
+    ## __GetFdStatement() method
+    #
+    #   Get FD for capsule
+    #
+    #   @param  self        The object pointer
+    #   @param  CapsuleObj  for whom FD is got
+    #   @retval True        Successfully find a FD statement
+    #   @retval False       Not able to find a FD statement
+    #
+    def __GetFdStatement(self, CapsuleObj):
+
+        if not self.__IsKeyword("FD"):
+            return False
+
+        if not self.__IsToken("="):
+            raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+
+        if not self.__GetNextToken():
+            raise Warning("expected FD name", self.FileName, self.CurrentLineNumber)
+
+        CapsuleFd = CapsuleData.CapsuleFd()
+        CapsuleFd.FdName = self.__Token
+        CapsuleObj.CapsuleDataList.append(CapsuleFd)
+        return True
+
+    ## __GetAnyFileStatement() method
+    #
+    #   Get AnyFile for capsule
+    #
+    #   @param  self        The object pointer
+    #   @param  CapsuleObj  for whom AnyFile is got
+    #   @retval True        Successfully find a Anyfile statement
+    #   @retval False       Not able to find a AnyFile statement
+    #
+    def __GetAnyFileStatement(self, CapsuleObj):
+
+        if not self.__IsKeyword("FILE"):
+            return False
+
+        if not self.__IsKeyword("DATA"):
+            self.__UndoToken()
+            return False
+
+        if not self.__IsToken("="):
+            raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+
+        if not self.__GetNextToken():
+            raise Warning("expected File name", self.FileName, self.CurrentLineNumber)
+        
+        AnyFileName = self.__Token
+        AnyFileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(AnyFileName)
+        if not os.path.exists(AnyFileName):
+            raise Warning("File %s not exists"%AnyFileName, self.FileName, self.CurrentLineNumber)
+
+        CapsuleAnyFile = CapsuleData.CapsuleAnyFile()
+        CapsuleAnyFile.FileName = AnyFileName
+        CapsuleObj.CapsuleDataList.append(CapsuleAnyFile)
         return True
 
     ## __GetRule() method
@@ -3930,16 +3996,18 @@ class FdfParser:
     def __GetReferencedFdCapTuple(self, CapObj, RefFdList = [], RefFvList = []):
 
         for CapsuleDataObj in CapObj.CapsuleDataList :
-            if CapsuleDataObj.FvName != None and CapsuleDataObj.FvName.upper() not in RefFvList:
+            if hasattr(CapsuleDataObj, 'FvName') and CapsuleDataObj.FvName != None and CapsuleDataObj.FvName.upper() not in RefFvList:
                 RefFvList.append (CapsuleDataObj.FvName.upper())
+            elif hasattr(CapsuleDataObj, 'FdName') and CapsuleDataObj.FdName != None and CapsuleDataObj.FdName.upper() not in RefFdList:
+                RefFdList.append (CapsuleDataObj.FdName.upper())            
             elif CapsuleDataObj.Ffs != None:
-              if isinstance(CapsuleDataObj.Ffs, FfsFileStatement.FileStatement):
-                  if CapsuleDataObj.Ffs.FvName != None and CapsuleDataObj.Ffs.FvName.upper() not in RefFvList:
-                      RefFvList.append(CapsuleDataObj.Ffs.FvName.upper())
-                  elif CapsuleDataObj.Ffs.FdName != None and CapsuleDataObj.Ffs.FdName.upper() not in RefFdList:
-                      RefFdList.append(CapsuleDataObj.Ffs.FdName.upper())
-                  else:
-                      self.__GetReferencedFdFvTupleFromSection(CapsuleDataObj.Ffs, RefFdList, RefFvList)
+                if isinstance(CapsuleDataObj.Ffs, FfsFileStatement.FileStatement):
+                    if CapsuleDataObj.Ffs.FvName != None and CapsuleDataObj.Ffs.FvName.upper() not in RefFvList:
+                        RefFvList.append(CapsuleDataObj.Ffs.FvName.upper())
+                    elif CapsuleDataObj.Ffs.FdName != None and CapsuleDataObj.Ffs.FdName.upper() not in RefFdList:
+                        RefFdList.append(CapsuleDataObj.Ffs.FdName.upper())
+                    else:
+                        self.__GetReferencedFdFvTupleFromSection(CapsuleDataObj.Ffs, RefFdList, RefFvList)
 
     ## __GetFvInFd() method
     #
@@ -4139,12 +4207,19 @@ class FdfParser:
         return False
 
 if __name__ == "__main__":
-    parser = FdfParser("..\LakeportX64Pkg.fdf")
+    import sys
+    try:
+        test_file = sys.argv[1]
+    except IndexError, v:
+        print "Usage: %s filename" % sys.argv[0]
+        sys.exit(1)
+
+    parser = FdfParser(test_file)
     try:
         parser.ParseFile()
         parser.CycleReferenceCheck()
     except Warning, X:
-            print str(X)
+        print str(X)
     else:
         print "Success!"
 

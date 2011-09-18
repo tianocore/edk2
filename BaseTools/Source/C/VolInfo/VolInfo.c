@@ -30,6 +30,7 @@ Abstract:
 #include <Common/UefiCapsule.h>
 #include <Common/PiFirmwareFile.h>
 #include <Common/PiFirmwareVolume.h>
+
 #include <Guid/PiFirmwareFileSystem.h>
 #include <IndustryStandard/PeImage.h>
 #include <Protocol/GuidedSectionExtraction.h>
@@ -172,10 +173,11 @@ Returns:
   //
   // Print utility header
   //
-  printf ("%s Tiano Firmware Volume FFS image info.  Version %d.%d, %s\n",
+  printf ("%s Tiano Firmware Volume FFS image info.  Version %d.%d %s, %s\n",
     UTILITY_NAME,
     UTILITY_MAJOR_VERSION,
     UTILITY_MINOR_VERSION,
+    __BUILD_VERSION,
     __DATE__
     );
 

@@ -25,9 +25,10 @@ import array
 from Common.BuildToolError import *
 import Common.EdkLogger as EdkLogger
 from Common.Misc import PeImageClass
+from Common.BuildVersion import gBUILD_VERSION
 
 # Version and Copyright
-__version_number__ = "0.10"
+__version_number__ = ("0.10" + " " + gBUILD_VERSION)
 __version__ = "%prog Version " + __version_number__
 __copyright__ = "Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved."
 

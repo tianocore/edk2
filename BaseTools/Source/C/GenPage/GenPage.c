@@ -91,7 +91,7 @@ Returns:
 
 --*/
 {
-  printf ("%s v%d.%d -Utility to generate the EfiLoader image containing page table.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  printf ("%s v%d.%d %s -Utility to generate the EfiLoader image containing page table.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
   printf ("Copyright (c) 2008 - 2011 Intel Corporation. All rights reserved.\n");
 }
 

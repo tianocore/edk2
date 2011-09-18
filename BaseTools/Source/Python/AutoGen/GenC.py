@@ -67,21 +67,21 @@ typedef UINT8 SKU_ID;
 
 #define PCD_TYPE_SHIFT        28
 
-#define PCD_TYPE_DATA         (0x0 << PCD_TYPE_SHIFT)
-#define PCD_TYPE_HII          (0x8 << PCD_TYPE_SHIFT)
-#define PCD_TYPE_VPD          (0x4 << PCD_TYPE_SHIFT)
-#define PCD_TYPE_SKU_ENABLED  (0x2 << PCD_TYPE_SHIFT)
-#define PCD_TYPE_STRING       (0x1 << PCD_TYPE_SHIFT)
+#define PCD_TYPE_DATA         (0x0U << PCD_TYPE_SHIFT)
+#define PCD_TYPE_HII          (0x8U << PCD_TYPE_SHIFT)
+#define PCD_TYPE_VPD          (0x4U << PCD_TYPE_SHIFT)
+#define PCD_TYPE_SKU_ENABLED  (0x2U << PCD_TYPE_SHIFT)
+#define PCD_TYPE_STRING       (0x1U << PCD_TYPE_SHIFT)
 
 #define PCD_TYPE_ALL_SET      (PCD_TYPE_DATA | PCD_TYPE_HII | PCD_TYPE_VPD | PCD_TYPE_SKU_ENABLED | PCD_TYPE_STRING)
 
 #define PCD_DATUM_TYPE_SHIFT  24
 
-#define PCD_DATUM_TYPE_POINTER  (0x0 << PCD_DATUM_TYPE_SHIFT)
-#define PCD_DATUM_TYPE_UINT8    (0x1 << PCD_DATUM_TYPE_SHIFT)
-#define PCD_DATUM_TYPE_UINT16   (0x2 << PCD_DATUM_TYPE_SHIFT)
-#define PCD_DATUM_TYPE_UINT32   (0x4 << PCD_DATUM_TYPE_SHIFT)
-#define PCD_DATUM_TYPE_UINT64   (0x8 << PCD_DATUM_TYPE_SHIFT)
+#define PCD_DATUM_TYPE_POINTER  (0x0U << PCD_DATUM_TYPE_SHIFT)
+#define PCD_DATUM_TYPE_UINT8    (0x1U << PCD_DATUM_TYPE_SHIFT)
+#define PCD_DATUM_TYPE_UINT16   (0x2U << PCD_DATUM_TYPE_SHIFT)
+#define PCD_DATUM_TYPE_UINT32   (0x4U << PCD_DATUM_TYPE_SHIFT)
+#define PCD_DATUM_TYPE_UINT64   (0x8U << PCD_DATUM_TYPE_SHIFT)
 
 #define PCD_DATUM_TYPE_ALL_SET  (PCD_DATUM_TYPE_POINTER | \\
                                  PCD_DATUM_TYPE_UINT8   | \\
@@ -1951,7 +1951,11 @@ def CreateHeaderCode(Info, AutoGenC, AutoGenH):
         if Info.ModuleType in gModuleTypeHeaderFile \
            and gModuleTypeHeaderFile[Info.ModuleType][0] != gBasicHeaderFile:
             AutoGenH.Append("#include <%s>\n" % gModuleTypeHeaderFile[Info.ModuleType][0])
-        if 'PcdLib' in Info.Module.LibraryClasses:
+        #
+        # if either PcdLib in [LibraryClasses] sections or there exist Pcd section, add PcdLib.h 
+        # As if modules only uses FixedPcd, then PcdLib is not needed in [LibraryClasses] section.
+        #
+        if 'PcdLib' in Info.Module.LibraryClasses or Info.Module.Pcds:
             AutoGenH.Append("#include <Library/PcdLib.h>\n")
 
         AutoGenH.Append('\nextern GUID  gEfiCallerIdGuid;\n\n')
@@ -2018,7 +2022,7 @@ def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer):
 
     CreateFooterCode(Info, AutoGenC, AutoGenH)
 
-    # no generation of AutoGen.c for R8 modules without unicode file
+    # no generation of AutoGen.c for Edk modules without unicode file
     if Info.AutoGenVersion < 0x00010005 and len(Info.UnicodeFileList) == 0:
         AutoGenC.String = ''
 

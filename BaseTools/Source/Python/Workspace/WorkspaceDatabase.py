@@ -300,7 +300,7 @@ class DscBuildData(PlatformBuildClassObject):
             if self._Header == None:
                 self._GetHeaderInfo()
             if self._BuildTargets == None:
-                self._BuildTargets = ['DEBUG', 'RELEASE']
+                self._BuildTargets = ['DEBUG', 'RELEASE', 'NOOPT']
         return self._BuildTargets
 
     ## Retrieve SKUID_IDENTIFIER
@@ -564,7 +564,7 @@ class DscBuildData(PlatformBuildClassObject):
                         continue
                     self._LibraryClasses[LibraryClass, ModuleType] = LibraryInstance
 
-            # for R8 style library instances, which are listed in different section
+            # for EDK style library instances, which are listed in different section
             RecordList = self._RawData[MODEL_EFI_LIBRARY_INSTANCE, self._Arch]
             for Record in RecordList:
                 File = PathClass(NormPath(Record[0], Macros), GlobalData.gWorkspace, Arch=self._Arch)
@@ -1198,6 +1198,7 @@ class InfBuildData(ModuleBuildClassObject):
         TAB_INF_DEFINES_COMPONENT_TYPE              : "_ComponentType",
         TAB_INF_DEFINES_MAKEFILE_NAME               : "_MakefileName",
         #TAB_INF_DEFINES_CUSTOM_MAKEFILE             : "_CustomMakefile",
+        TAB_INF_DEFINES_DPX_SOURCE                  :"_DxsFile",
         TAB_INF_DEFINES_VERSION_NUMBER              : "_Version",
         TAB_INF_DEFINES_VERSION_STRING              : "_Version",
         TAB_INF_DEFINES_VERSION                     : "_Version",
@@ -1278,6 +1279,7 @@ class InfBuildData(ModuleBuildClassObject):
         self._Header_               = None
         self._AutoGenVersion        = None
         self._BaseName              = None
+        self._DxsFile               = None
         self._ModuleType            = None
         self._ComponentType         = None
         self._BuildType             = None
@@ -1419,7 +1421,7 @@ class InfBuildData(ModuleBuildClassObject):
                 self._Defs[Name] = Record[1]
 
         #
-        # Retrieve information in sections specific to R8.x modules
+        # Retrieve information in sections specific to EDK.x modules
         #
         if self._AutoGenVersion >= 0x00010005:   # _AutoGenVersion may be None, which is less than anything
             if not self._ModuleType:
@@ -1446,6 +1448,17 @@ class InfBuildData(ModuleBuildClassObject):
                 self._BuildType = 'UEFI_HII'
             else:
                 self._BuildType = self._ModuleType.upper()
+            
+            if self._DxsFile:
+                File = PathClass(NormPath(self._DxsFile), self._ModuleDir, Arch=self._Arch)
+                # check the file validation
+                ErrorCode, ErrorInfo = File.Validate(".dxs", CaseSensitive=False)
+                if ErrorCode != 0:
+                    EdkLogger.error('build', ErrorCode, ExtraData=ErrorInfo,
+                                    File=self.MetaFile, Line=LineNo)
+                if self.Sources == None:
+                    self._Sources = []
+                self._Sources.append(File)
         else:
             self._BuildType = self._ComponentType.upper()
             if not self._ComponentType:
@@ -1492,7 +1505,7 @@ class InfBuildData(ModuleBuildClassObject):
                         else:
                             Tool = ToolList[0]
                         ToolChain = "*_*_*_%s_FLAGS" % Tool
-                        ToolChainFamily = 'MSFT'    # R8.x only support MSFT tool chain
+                        ToolChainFamily = 'MSFT'    # EDK.x only support MSFT tool chain
                         #ignore not replaced macros in value
                         ValueList = GetSplitValueList(' ' + Value, '/D')
                         Dummy = ValueList[0]
@@ -1526,6 +1539,15 @@ class InfBuildData(ModuleBuildClassObject):
             if self._BaseName == None:
                 EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No BASE_NAME name", File=self.MetaFile)
         return self._BaseName
+
+    ## Retrieve DxsFile
+    def _GetDxsFile(self):
+        if self._DxsFile == None:
+            if self._Header_ == None:
+                self._GetHeaderInfo()
+            if self._DxsFile == None:
+                self._DxsFile = ''
+        return self._DxsFile
 
     ## Retrieve MODULE_TYPE
     def _GetModuleType(self):
@@ -1709,7 +1731,7 @@ class InfBuildData(ModuleBuildClassObject):
                 ToolCode = Record[3]
                 FeatureFlag = Record[4]
                 if self._AutoGenVersion < 0x00010005:
-                    # old module source files (R8)
+                    # old module source files (EDK)
                     File = PathClass(NormPath(Record[0], Macros), self._ModuleDir, self._SourceOverridePath,
                                      '', False, self._Arch, ToolChainFamily, '', TagName, ToolCode)
                     # check the file validation
@@ -1746,13 +1768,13 @@ class InfBuildData(ModuleBuildClassObject):
                 self._LibraryClasses[Lib] = Instance
         return self._LibraryClasses
 
-    ## Retrieve library names (for R8.x style of modules)
+    ## Retrieve library names (for EDK.x style of modules)
     def _GetLibraryNames(self):
         if self._Libraries == None:
             self._Libraries = []
             RecordList = self._RawData[MODEL_EFI_LIBRARY_INSTANCE, self._Arch, self._Platform]
             for Record in RecordList:
-                # in case of name with '.lib' extension, which is unusual in R8.x inf
+                # in case of name with '.lib' extension, which is unusual in EDK.x inf
                 Record = ReplaceMacros(Record, GlobalData.gEdkGlobal, False)
                 LibraryName = os.path.splitext(Record[0])[0]
                 if LibraryName not in self._Libraries:
@@ -1807,14 +1829,14 @@ class InfBuildData(ModuleBuildClassObject):
                 self._Guids[CName] = Value
         return self._Guids
 
-    ## Retrieve include paths necessary for this module (for R8.x style of modules)
+    ## Retrieve include paths necessary for this module (for EDK.x style of modules)
     def _GetIncludes(self):
         if self._Includes == None:
             self._Includes = []
             if self._SourceOverridePath:
                 self._Includes.append(self._SourceOverridePath)
             RecordList = self._RawData[MODEL_EFI_INCLUDE, self._Arch, self._Platform]
-            # [includes] section must be used only in old (R8.x) inf file
+            # [includes] section must be used only in old (EDK.x) inf file
             if self.AutoGenVersion >= 0x00010005 and len(RecordList) > 0:
                 EdkLogger.error('build', FORMAT_NOT_SUPPORTED, "No [include] section allowed",
                                 File=self.MetaFile, Line=RecordList[0][-1]-1)
@@ -2130,7 +2152,8 @@ class InfBuildData(ModuleBuildClassObject):
     ConstructorList         = property(_GetConstructor)
     DestructorList          = property(_GetDestructor)
     Defines                 = property(_GetDefines)
-
+    DxsFile                 = property(_GetDxsFile)
+    
     Binaries                = property(_GetBinaryFiles)
     Sources                 = property(_GetSourceFiles)
     LibraryClasses          = property(_GetLibraryClassUses)

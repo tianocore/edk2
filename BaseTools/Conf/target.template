@@ -25,7 +25,7 @@
 #                                               files.
 ACTIVE_PLATFORM       = Nt32Pkg/Nt32Pkg.dsc
 
-#  TARGET                List       Optional    Zero or more of the following: DEBUG, RELEASE,
+#  TARGET                List       Optional    Zero or more of the following: DEBUG, RELEASE, NOOPT
 #                                               UserDefined; separated by a space character.
 #                                               If the line is missing or no value is specified, all
 #                                               valid targets specified in the platform description file 

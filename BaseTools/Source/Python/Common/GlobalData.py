@@ -34,4 +34,3 @@ gBuildingModule = ''
 
 ## Regular expression for matching macro used in DSC/DEC/INF file inclusion
 gMacroPattern = re.compile("\$\(([_A-Z][_A-Z0-9]*)\)", re.UNICODE)
-

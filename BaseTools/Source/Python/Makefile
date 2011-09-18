@@ -49,6 +49,7 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\XmlParser.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\XmlRoutines.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\__init__.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Common\BuildVersion.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\BuildClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\MetaDataTable.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\MetaFileParser.py \
@@ -79,7 +80,7 @@ $(BIN_DIR)\GenFds.exe: $(BASE_TOOLS_PATH)\Source\Python\GenFds\GenFds.py $(COMMO
 $(BIN_DIR)\Trim.exe: $(BASE_TOOLS_PATH)\Source\Python\Trim\Trim.py $(COMMON_PYTHON)
   @pushd . & @cd Trim & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Trim.py & @popd
 
-$(BIN_DIR)\MigrationMsa2Inf.exe: $(BASE_TOOLS_PATH)\Source\Python\MigrationMsa2Inf\MigrationMsa2Inf.py
+$(BIN_DIR)\MigrationMsa2Inf.exe: $(BASE_TOOLS_PATH)\Source\Python\MigrationMsa2Inf\MigrationMsa2Inf.py $(COMMON_PYTHON)
   @pushd . & @cd MigrationMsa2Inf & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) MigrationMsa2Inf.py & @popd 
 
 $(BIN_DIR)\Fpd2Dsc.exe: $(BASE_TOOLS_PATH)\Source\Python\Fpd2Dsc\Fpd2Dsc.py $(COMMON_PYTHON)
@@ -103,7 +104,7 @@ $(BIN_DIR)\PatchPcdValue.exe: $(BASE_TOOLS_PATH)\Source\Python\PatchPcdValue\Pat
 $(BIN_DIR)\BPDG.exe: $(BASE_TOOLS_PATH)\Source\Python\BPDG\BPDG.py $(COMMON_PYTHON)
   @pushd . & @cd BPDG & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) BPDG.py & @popd
 
-$(BIN_DIR)\UPT.exe: $(BASE_TOOLS_PATH)\Source\Python\UPT\UPT.py $(BASE_TOOLS_PATH)\Source\Python\UPT\UPT.py
+$(BIN_DIR)\UPT.exe: $(BASE_TOOLS_PATH)\Source\Python\UPT\UPT.py $(BASE_TOOLS_PATH)\Source\Python\UPT\UPT.py $(COMMON_PYTHON)
   @pushd . & @cd UPT & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) UPT.py & @popd
 
 clean:

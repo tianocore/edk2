@@ -27,6 +27,7 @@ from Common.DecClassObject import Dec
 from Common.DscClassObject import Dsc
 from Common.FdfClassObject import Fdf
 from Common.String import NormPath
+from Common.BuildVersion import gBUILD_VERSION
 from Common import BuildToolError
 import c
 import re, string
@@ -41,7 +42,7 @@ from Exception import *
 class Ecc(object):
     def __init__(self):
         # Version and Copyright
-        self.VersionNumber = "0.01"
+        self.VersionNumber = ("0.01" + " " + gBUILD_VERSION)
         self.Version = "%prog Version " + self.VersionNumber
         self.Copyright = "Copyright (c) 2009 - 2010, Intel Corporation  All rights reserved."
 

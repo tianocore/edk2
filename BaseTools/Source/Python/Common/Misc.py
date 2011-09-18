@@ -468,7 +468,7 @@ def ValidFile2(AllFiles, File, Ext=None, Workspace='', EfiSource='', EdkSource='
         if FileExt.lower() != Ext.lower():
             return False, File
 
-    # Replace the R8 macros
+    # Replace the Edk macros
     if OverrideDir != '' and OverrideDir != None:
         if OverrideDir.find('$(EFI_SOURCE)') > -1:
             OverrideDir = OverrideDir.replace('$(EFI_SOURCE)', EfiSource)
@@ -480,7 +480,7 @@ def ValidFile2(AllFiles, File, Ext=None, Workspace='', EfiSource='', EdkSource='
         Dir = os.getcwd()
         Dir = Dir[len(Workspace)+1:]
 
-    # First check if File has R8 definition itself
+    # First check if File has Edk definition itself
     if File.find('$(EFI_SOURCE)') > -1 or File.find('$(EDK_SOURCE)') > -1:
         NewFile = File.replace('$(EFI_SOURCE)', EfiSource)
         NewFile = NewFile.replace('$(EDK_SOURCE)', EdkSource)
@@ -506,7 +506,7 @@ def ValidFile2(AllFiles, File, Ext=None, Workspace='', EfiSource='', EdkSource='
 #
 #
 def ValidFile3(AllFiles, File, Workspace='', EfiSource='', EdkSource='', Dir='.', OverrideDir=''):
-    # Replace the R8 macros
+    # Replace the Edk macros
     if OverrideDir != '' and OverrideDir != None:
         if OverrideDir.find('$(EFI_SOURCE)') > -1:
             OverrideDir = OverrideDir.replace('$(EFI_SOURCE)', EfiSource)
@@ -524,7 +524,7 @@ def ValidFile3(AllFiles, File, Workspace='', EfiSource='', EdkSource='', Dir='.'
     NewRelaPath = RelaPath
 
     while(True):
-        # First check if File has R8 definition itself
+        # First check if File has Edk definition itself
         if File.find('$(EFI_SOURCE)') > -1 or File.find('$(EDK_SOURCE)') > -1:
             File = File.replace('$(EFI_SOURCE)', EfiSource)
             File = File.replace('$(EDK_SOURCE)', EdkSource)

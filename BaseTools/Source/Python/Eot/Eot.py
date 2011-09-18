@@ -28,6 +28,7 @@ from FvImage import *
 from array import array
 from Report import Report
 from Common.Misc import ParseConsoleLog
+from Common.BuildVersion import gBUILD_VERSION
 from Parser import ConvertGuid
 
 ## Class Eot
@@ -45,7 +46,7 @@ class Eot(object):
                  IncludeDirList=None, DecFileList=None, GuidList=None, LogFile=None,
                  FvFileList="", MapFileList="", Report='Report.html', Dispatch=None):
         # Version and Copyright
-        self.VersionNumber = "0.02"
+        self.VersionNumber = ("0.02" + " " + gBUILD_VERSION)
         self.Version = "%prog Version " + self.VersionNumber
         self.Copyright = "Copyright (c) 2008 - 2010, Intel Corporation  All rights reserved."
         self.Report = Report

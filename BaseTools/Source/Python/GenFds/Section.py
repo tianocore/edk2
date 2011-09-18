@@ -140,9 +140,9 @@ class Section (SectionClassObject):
                     GenFdsGlobalVariable.InfLogger ("\nCurrent ARCH \'%s\' of File %s is not in the Support Arch Scope of %s specified by INF %s in FDF" %(FfsInf.CurrentArch, File.File, File.Arch, FfsInf.InfFileName))
 
         if Suffix != None:
-            for File in FfsInf.GetFinalBuildTargetList():
-                if os.path.splitext(File)[1] in (Suffix):
-                    FileList.append(File)
+            SuffixMap = FfsInf.GetFinalTargetSuffixMap()
+            if Suffix in SuffixMap:
+                FileList.extend(SuffixMap[Suffix])
 
         #Process the file lists is alphabetical for a same section type
         if len (FileList) > 1:

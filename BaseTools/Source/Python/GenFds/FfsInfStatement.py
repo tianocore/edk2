@@ -36,6 +36,7 @@ from Common.BuildToolError import *
 from GuidSection import GuidSection
 from FvImageSection import FvImageSection
 from Common.Misc import PeImageClass
+from AutoGen.GenDepex import DependencyExpression
 
 ## generate FFS from INF
 #
@@ -54,17 +55,75 @@ class FfsInfStatement(FfsInfStatementClassObject):
         self.OptRomDefs = {}
         self.PiSpecVersion = '0x00000000'
         self.InfModule = None
-        self.FinalBuildTargetList = []
+        self.FinalTargetSuffixMap = {}
 
-    ## GetFinalBuildTargetList() method
+    ## GetFinalTargetSuffixMap() method
     #
     #    Get final build target list
-    def GetFinalBuildTargetList(self):
+    def GetFinalTargetSuffixMap(self):
         if not self.InfModule or not self.CurrentArch:
             return []
-        if not self.FinalBuildTargetList:
-            self.FinalBuildTargetList = GenFdsGlobalVariable.GetModuleCodaTargetList(self.InfModule, self.CurrentArch)
-        return self.FinalBuildTargetList
+        if not self.FinalTargetSuffixMap:
+            FinalBuildTargetList = GenFdsGlobalVariable.GetModuleCodaTargetList(self.InfModule, self.CurrentArch)
+            for File in FinalBuildTargetList:
+                self.FinalTargetSuffixMap.setdefault(os.path.splitext(File)[1], []).append(File)
+
+            # Check if current INF module has DEPEX
+            if '.depex' not in self.FinalTargetSuffixMap and self.InfModule.ModuleType != "USER_DEFINED" \
+                and not self.InfModule.DxsFile and not self.InfModule.LibraryClass:
+                ModuleType = self.InfModule.ModuleType
+                PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, self.CurrentArch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
+
+                if ModuleType != DataType.SUP_MODULE_USER_DEFINED:
+                    for LibraryClass in PlatformDataBase.LibraryClasses.GetKeys():
+                        if LibraryClass.startswith("NULL") and PlatformDataBase.LibraryClasses[LibraryClass, ModuleType]:
+                            self.InfModule.LibraryClasses[LibraryClass] = PlatformDataBase.LibraryClasses[LibraryClass, ModuleType]
+
+                StrModule = str(self.InfModule)
+                PlatformModule = None
+                if StrModule in PlatformDataBase.Modules:
+                    PlatformModule = PlatformDataBase.Modules[StrModule]
+                    for LibraryClass in PlatformModule.LibraryClasses:
+                        if LibraryClass.startswith("NULL"):
+                            self.InfModule.LibraryClasses[LibraryClass] = PlatformModule.LibraryClasses[LibraryClass]
+
+                DependencyList = [self.InfModule]
+                LibraryInstance = {}
+                DepexList = []
+                while len(DependencyList) > 0:
+                    Module = DependencyList.pop(0)
+                    if not Module:
+                        continue
+                    for Dep in Module.Depex[self.CurrentArch, ModuleType]:
+                        if DepexList != []:
+                            DepexList.append('AND')
+                        DepexList.append('(')
+                        DepexList.extend(Dep)
+                        if DepexList[-1] == 'END':  # no need of a END at this time
+                            DepexList.pop()
+                        DepexList.append(')')
+                    if 'BEFORE' in DepexList or 'AFTER' in DepexList:
+                        break
+                    for LibName in Module.LibraryClasses:
+                        if LibName in LibraryInstance:
+                            continue
+                        if PlatformModule and LibName in PlatformModule.LibraryClasses:
+                            LibraryPath = PlatformModule.LibraryClasses[LibName]
+                        else:
+                            LibraryPath = PlatformDataBase.LibraryClasses[LibName, ModuleType]
+                        if not LibraryPath:
+                            LibraryPath = Module.LibraryClasses[LibName]
+                        if not LibraryPath:
+                            continue
+                        LibraryModule = GenFdsGlobalVariable.WorkSpace.BuildObject[LibraryPath, self.CurrentArch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
+                        LibraryInstance[LibName] = LibraryModule
+                        DependencyList.append(LibraryModule)
+                if DepexList:
+                    Dpx = DependencyExpression(DepexList, ModuleType, True)
+                    if len(Dpx.PostfixNotation) != 0:
+                        # It means this module has DEPEX
+                        self.FinalTargetSuffixMap['.depex'] = [os.path.join(self.EfiOutputPath, self.BaseName) + '.depex']
+        return self.FinalTargetSuffixMap
 
     ## __InfParse() method
     #

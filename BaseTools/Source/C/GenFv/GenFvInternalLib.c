@@ -1085,7 +1085,11 @@ Returns:
       // Rebase the PE or TE image in FileBuffer of FFS file for XIP 
       // Rebase for the debug genfvmap tool
       //
-      FfsRebase (FvInfo, FvInfo->FvFiles[Index], (EFI_FFS_FILE_HEADER *) FileBuffer, (UINTN) *VtfFileImage - (UINTN) FvImage->FileImage, FvMapFile);
+      Status = FfsRebase (FvInfo, FvInfo->FvFiles[Index], (EFI_FFS_FILE_HEADER *) FileBuffer, (UINTN) *VtfFileImage - (UINTN) FvImage->FileImage, FvMapFile);
+      if (EFI_ERROR (Status)) {
+        Error (NULL, 0, 3000, "Invalid", "Could not rebase %s.", FvInfo->FvFiles[Index]);
+        return Status;
+      }	  
       //
       // copy VTF File
       //
@@ -1124,7 +1128,11 @@ Returns:
     // Rebase the PE or TE image in FileBuffer of FFS file for XIP. 
     // Rebase Bs and Rt drivers for the debug genfvmap tool.
     //
-    FfsRebase (FvInfo, FvInfo->FvFiles[Index], (EFI_FFS_FILE_HEADER *) FileBuffer, (UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage, FvMapFile);
+    Status = FfsRebase (FvInfo, FvInfo->FvFiles[Index], (EFI_FFS_FILE_HEADER *) FileBuffer, (UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage, FvMapFile);
+	if (EFI_ERROR (Status)) {
+	  Error (NULL, 0, 3000, "Invalid", "Could not rebase %s.", FvInfo->FvFiles[Index]);
+	  return Status;
+	}	  	
     //
     // Copy the file
     //
@@ -3020,7 +3028,7 @@ Returns:
       return EFI_OUT_OF_RESOURCES;
     }
     memset ((VOID *) MemoryImagePointer, 0, (UINTN) ImageContext.ImageSize + ImageContext.SectionAlignment);
-    ImageContext.ImageAddress = ((UINTN) MemoryImagePointer + ImageContext.SectionAlignment - 1) & (~((INT64)ImageContext.SectionAlignment - 1));
+    ImageContext.ImageAddress = ((UINTN) MemoryImagePointer + ImageContext.SectionAlignment - 1) & (~((UINTN) ImageContext.SectionAlignment - 1));
     
     Status =  PeCoffLoaderLoadImage (&ImageContext);
     if (EFI_ERROR (Status)) {
@@ -3247,7 +3255,7 @@ Returns:
       return EFI_OUT_OF_RESOURCES;
     }
     memset ((VOID *) MemoryImagePointer, 0, (UINTN) ImageContext.ImageSize + ImageContext.SectionAlignment);
-    ImageContext.ImageAddress = ((UINTN) MemoryImagePointer + ImageContext.SectionAlignment - 1) & (~(ImageContext.SectionAlignment - 1));
+    ImageContext.ImageAddress = ((UINTN) MemoryImagePointer + ImageContext.SectionAlignment - 1) & (~((UINTN) ImageContext.SectionAlignment - 1));
 
     Status =  PeCoffLoaderLoadImage (&ImageContext);
     if (EFI_ERROR (Status)) {

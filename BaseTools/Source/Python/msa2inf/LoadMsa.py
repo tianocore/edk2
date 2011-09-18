@@ -68,9 +68,9 @@ def LoadModuleHeader(XmlMsa, MsaFileName):
     XmlTag = "ModuleSurfaceArea/Externs/PcdDriverTypes"
     ModuleHeader.PcdIsDriver = XmlElement(XmlMsa, XmlTag)
     
-    XmlTag = "ModuleSurfaceArea/Externs/TianoR8FlashMap_h"
+    XmlTag = "ModuleSurfaceArea/Externs/TianoEdkFlashMap_h"
     if XmlElement(XmlMsa, XmlTag).lower() == "true":
-        ModuleHeader.TianoR8FlashMap_h = True
+        ModuleHeader.TianoEdkFlashMap_h = True
 
     XmlTag = "ModuleSurfaceArea/Externs/Specification"
     for Specification in XmlElementList(XmlMsa, XmlTag):

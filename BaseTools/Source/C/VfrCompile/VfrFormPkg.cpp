@@ -561,22 +561,24 @@ CFormPkg::DeclarePendingQuestion (
   CHAR8          *VarStr;
   UINT32         ArrayIdx;
   CHAR8          FName[MAX_NAME_LEN];
+  CHAR8          *SName;
+  CHAR8          *NewStr;
   EFI_VFR_RETURN_CODE  ReturnCode;
   EFI_VFR_VARSTORE_TYPE VarStoreType  = EFI_VFR_VARSTORE_INVALID;
 
+  //
+  // Declare all questions as Numeric in DisableIf True
+  //
+  // DisableIf
+  CIfrDisableIf DIObj;
+  DIObj.SetLineNo (LineNo);
+  
+  //TrueOpcode
+  CIfrTrue TObj (LineNo);
+
+  // Declare Numeric qeustion for each undefined question.
   for (pNode = PendingAssignList; pNode != NULL; pNode = pNode->mNext) {
     if (pNode->mFlag == PENDING) {
-      //
-      //  declare this question as Numeric in SuppressIf True
-      //
-      // SuppressIf
-      CIfrSuppressIf SIObj;
-      SIObj.SetLineNo (LineNo);
-      
-      //TrueOpcode
-      CIfrTrue TObj (LineNo);
-      
-      //Numeric qeustion
       CIfrNumeric CNObj;
       EFI_VARSTORE_INFO Info; 
   	  EFI_QUESTION_ID   QId   = EFI_QUESTION_ID_INVALID;
@@ -639,7 +641,16 @@ CFormPkg::DeclarePendingQuestion (
           ReturnCode = lCVfrDataStorage.GetEfiVarStoreInfo (&Info);
         } else if (VarStoreType == EFI_VFR_VARSTORE_BUFFER) {
           VarStr = pNode->mKey;
-          ReturnCode = lCVfrVarDataTypeDB.GetDataFieldInfo (VarStr, Info.mInfo.mVarOffset, Info.mVarType, Info.mVarTotalSize);
+          //convert VarStr with store name to VarStr with structure name
+          ReturnCode = lCVfrDataStorage.GetBufferVarStoreDataTypeName (FName, &SName);
+          if (ReturnCode == VFR_RETURN_SUCCESS) {
+            NewStr = new CHAR8[strlen (VarStr) + strlen (SName) + 1];
+            NewStr[0] = '\0';
+            strcpy (NewStr, SName);
+            strcat (NewStr, VarStr + strlen (FName));
+            ReturnCode = lCVfrVarDataTypeDB.GetDataFieldInfo (NewStr, Info.mInfo.mVarOffset, Info.mVarType, Info.mVarTotalSize);
+            delete NewStr;
+          }
         } else {
           ReturnCode = VFR_RETURN_UNSUPPORTED;
         }
@@ -657,7 +668,7 @@ CFormPkg::DeclarePendingQuestion (
       // For undefined Efi VarStore type question
       // Append the extended guided opcode to contain VarName
       //
-      if (VarStoreType == EFI_VFR_VARSTORE_EFI) {
+      if (VarStoreType == EFI_VFR_VARSTORE_EFI || VfrCompatibleMode) {
         CIfrVarEqName CVNObj (QId, Info.mInfo.mVarName);
         CVNObj.SetLineNo (LineNo);
       }
@@ -667,13 +678,15 @@ CFormPkg::DeclarePendingQuestion (
       //
       CIfrEnd CEObj; 
       CEObj.SetLineNo (LineNo);
-      //
-      // End for SuppressIf
-      //
-      CIfrEnd SEObj;
-      SEObj.SetLineNo (LineNo);
     }
   }
+
+  //
+  // End for DisableIf
+  //
+  CIfrEnd SEObj;
+  SEObj.SetLineNo (LineNo);
+
   return VFR_RETURN_SUCCESS;
 }
 

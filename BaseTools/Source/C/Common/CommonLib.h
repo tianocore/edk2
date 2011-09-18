@@ -23,6 +23,7 @@ Abstract:
 #define _EFI_COMMON_LIB_H
 
 #include <Common/UefiBaseTypes.h>
+#include <Common/BuildVersion.h>
 #define PRINTED_GUID_BUFFER_SIZE  37  // including null-termination
 //
 // Function declarations

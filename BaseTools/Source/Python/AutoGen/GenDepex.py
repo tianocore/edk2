@@ -23,7 +23,7 @@ from Common.BuildToolError import *
 from Common.Misc import SaveFileOnChange
 from Common.Misc import GuidStructureStringToGuidString
 from Common import EdkLogger as EdkLogger
-
+from Common.BuildVersion import gBUILD_VERSION
 
 ## Regular expression for matching "DEPENDENCY_START ... DEPENDENCY_END"
 gStartClosePattern = re.compile(".*DEPENDENCY_START(.+)DEPENDENCY_END.*", re.S)
@@ -354,7 +354,7 @@ class DependencyExpression:
         Buffer.close()
         return FileChangeFlag
 
-versionNumber = "0.04"
+versionNumber = ("0.04" + " " + gBUILD_VERSION)
 __version__ = "%prog Version " + versionNumber
 __copyright__ = "Copyright (c) 2007-2010, Intel Corporation  All rights reserved."
 __usage__ = "%prog [options] [dependency_expression_file]"

@@ -27,6 +27,7 @@
 #include "Sdk/C/7zVersion.h"
 #include "Sdk/C/LzmaDec.h"
 #include "Sdk/C/LzmaEnc.h"
+#include "CommonLib.h"
 
 const char *kCantReadMessage = "Can not read input file";
 const char *kCantWriteMessage = "Can not write output file";
@@ -82,7 +83,7 @@ int PrintUserError(char *buffer)
 
 void PrintVersion(char *buffer)
 {
-  sprintf (buffer, "%s Version %d.%d", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
+  sprintf (buffer, "%s Version %d.%d %s ", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
 
 #define IN_BUF_SIZE (1 << 16)
