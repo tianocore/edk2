@@ -30,6 +30,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
   UefiRuntimeServicesTableLib
@@ -44,6 +45,7 @@
 [Guids]
   gEfiIfrTianoGuid                              ## CONSUMES ## Guid
   gEfiEventUserProfileChangedGuid               ## CONSUMES ## Guid 
+  gUserIdentifyManagerGuid                      ## PRODUCES ## Guid
 
 [Protocols]
   gEfiFormBrowser2ProtocolGuid                  ## CONSUMES

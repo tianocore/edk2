@@ -55,6 +55,7 @@
 [Guids]
   gEfiPhysicalPresenceGuid
   gEfiIfrTianoGuid
+  gTcgConfigFormSetGuid
 
 [Protocols]
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES

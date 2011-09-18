@@ -14,8 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "TcgConfigImpl.h"
 
-EFI_GUID gTcgConfigPrivateGuid = TCG_CONFIG_PRIVATE_GUID;
-
 /**
   The entry point for Tcg configuration driver.
 
@@ -52,7 +50,7 @@ TcgConfigDriverEntryPoint (
   
   Status = gBS->OpenProtocol (
                   ImageHandle,
-                  &gTcgConfigPrivateGuid,
+                  &gEfiCallerIdGuid,
                   NULL,
                   ImageHandle,
                   ImageHandle,
@@ -86,7 +84,7 @@ TcgConfigDriverEntryPoint (
   //    
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ImageHandle,
-                  &gTcgConfigPrivateGuid,
+                  &gEfiCallerIdGuid,
                   PrivateData,
                   NULL
                   );
@@ -125,7 +123,7 @@ TcgConfigDriverUnload (
 
   Status = gBS->HandleProtocol (
                   ImageHandle,
-                  &gTcgConfigPrivateGuid,
+                  &gEfiCallerIdGuid,
                   (VOID **) &PrivateData
                   );  
   if (EFI_ERROR (Status)) {
@@ -136,7 +134,7 @@ TcgConfigDriverUnload (
 
   gBS->UninstallMultipleProtocolInterfaces (
          &ImageHandle,
-         &gTcgConfigPrivateGuid,
+         &gEfiCallerIdGuid,
          PrivateData,
          NULL
          );

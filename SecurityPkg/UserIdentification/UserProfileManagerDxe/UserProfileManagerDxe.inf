@@ -32,6 +32,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
   UefiRuntimeServicesTableLib
@@ -48,6 +49,7 @@
   gEfiUserInfoAccessSetupAdminGuid              ## CONSUMES ## Guid
   gEfiUserInfoAccessSetupNormalGuid             ## CONSUMES ## Guid
   gEfiUserInfoAccessSetupRestrictedGuid         ## CONSUMES ## Guid
+  gUserProfileManagerGuid                       ## PRODUCES ## Guid
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED

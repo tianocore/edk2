@@ -18,34 +18,6 @@ CREDENTIAL_TABLE            *mUsbTable       = NULL;
 USB_PROVIDER_CALLBACK_INFO  *mCallbackInfo   = NULL;
 USB_CREDENTIAL_INFO         *mUsbInfoHandle  = NULL;
 
-//
-// Used for save password credential and form browser
-// And used as provider identifier
-//
-EFI_GUID     mUsbCredentialGuid = USB_CREDENTIAL_PROVIDER_GUID;
-
-HII_VENDOR_DEVICE_PATH      mHiiVendorDevicePath = {
-  {
-    {
-      HARDWARE_DEVICE_PATH,
-      HW_VENDOR_DP,
-      {
-        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
-      }
-    },
-    { 0x9463f883, 0x48f6, 0x4a7a, { 0x97, 0x2d, 0x9f, 0x8f, 0x38, 0xf2, 0xdd, 0x91 } }
-  },
-  {
-    END_DEVICE_PATH_TYPE,
-    END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    {
-      (UINT8) (END_DEVICE_PATH_LENGTH),
-      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
-    }
-  }
-};
-
 EFI_USER_CREDENTIAL_PROTOCOL  gUsbCredentialProviderDriver = {
   USB_CREDENTIAL_PROVIDER_GUID,
   EFI_USER_CREDENTIAL_CLASS_SECURE_CARD,
@@ -180,7 +152,7 @@ ModifyTable (
   //
   Status = gRT->SetVariable (
                   L"UsbCredential",
-                  &mUsbCredentialGuid,
+                  &gUsbCredentialProviderGuid,
                   EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
                   mUsbTable->Count * sizeof (USB_INFO),
                   &mUsbTable->UserInfo
@@ -212,7 +184,7 @@ InitCredentialTable (
   Var     = NULL;
   Status  = gRT->GetVariable (
                    L"UsbCredential", 
-                   &mUsbCredentialGuid, 
+                   &gUsbCredentialProviderGuid, 
                    NULL, 
                    &VarSize,
                    Var
@@ -224,7 +196,7 @@ InitCredentialTable (
     }
     Status = gRT->GetVariable (
                     L"UsbCredential", 
-                    &mUsbCredentialGuid, 
+                    &gUsbCredentialProviderGuid, 
                     NULL, 
                     &VarSize,
                     Var
@@ -647,7 +619,7 @@ InitFormBrowser (
   // Publish HII data.
   //
   CallbackInfo->HiiHandle = HiiAddPackages (
-                              &mUsbCredentialGuid,
+                              &gUsbCredentialProviderGuid,
                               CallbackInfo->DriverHandle,
                               UsbCredentialProviderStrings,
                               NULL
@@ -1249,8 +1221,8 @@ CredentialGetNextInfo (
     Info->InfoType    = EFI_USER_INFO_CREDENTIAL_PROVIDER_RECORD;
     Info->InfoSize    = (UINT32) InfoLen;
     Info->InfoAttribs = EFI_USER_INFO_PROTECTED;
-    CopyGuid (&Info->Credential, &mUsbCredentialGuid);
-    CopyGuid ((EFI_GUID *)(Info + 1), &mUsbCredentialGuid);
+    CopyGuid (&Info->Credential, &gUsbCredentialProviderGuid);
+    CopyGuid ((EFI_GUID *)(Info + 1), &gUsbCredentialProviderGuid);
     
     mUsbInfoHandle->Info[0] = Info;
     mUsbInfoHandle->Count++;
@@ -1267,7 +1239,7 @@ CredentialGetNextInfo (
     Info->InfoType    = EFI_USER_INFO_CREDENTIAL_PROVIDER_NAME_RECORD;
     Info->InfoSize    = (UINT32) InfoLen;
     Info->InfoAttribs = EFI_USER_INFO_PROTECTED;
-    CopyGuid (&Info->Credential, &mUsbCredentialGuid);
+    CopyGuid (&Info->Credential, &gUsbCredentialProviderGuid);
     CopyMem ((UINT8*)(Info + 1), ProvNameStr, ProvStrLen);
     FreePool (ProvNameStr);
     
@@ -1284,7 +1256,7 @@ CredentialGetNextInfo (
     Info->InfoType    = EFI_USER_INFO_CREDENTIAL_TYPE_RECORD;
     Info->InfoSize    = (UINT32) InfoLen;
     Info->InfoAttribs = EFI_USER_INFO_PROTECTED;
-    CopyGuid (&Info->Credential, &mUsbCredentialGuid);
+    CopyGuid (&Info->Credential, &gUsbCredentialProviderGuid);
     CopyGuid ((EFI_GUID *)(Info + 1), &gEfiUserCredentialClassSecureCardGuid);
     
     mUsbInfoHandle->Info[2] = Info;
@@ -1302,7 +1274,7 @@ CredentialGetNextInfo (
     Info->InfoType    = EFI_USER_INFO_CREDENTIAL_PROVIDER_NAME_RECORD;
     Info->InfoSize    = (UINT32) InfoLen;
     Info->InfoAttribs = EFI_USER_INFO_PROTECTED;
-    CopyGuid (&Info->Credential, &mUsbCredentialGuid);
+    CopyGuid (&Info->Credential, &gUsbCredentialProviderGuid);
     CopyMem ((UINT8*)(Info + 1), ProvNameStr, ProvStrLen);
     FreePool (ProvNameStr);
     

@@ -51,4 +51,4 @@
   
 [Guids]
   gEfiAuthenticatedVariableGuid        ## CONSUMES ## Configuration Table Guid
-  
+  gEfiVariableGuid                     ## CONSUMES ## Configuration Table Guid

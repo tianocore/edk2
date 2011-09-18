@@ -1,7 +1,7 @@
 /** @file
   Usb Credential Provider driver header file.
     
-Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -18,9 +18,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Uefi.h>
 
 #include <Guid/GlobalVariable.h>
-#include <Guid/MdeModuleHii.h>
 #include <Guid/FileInfo.h>
 #include <Guid/SecurityPkgTokenSpace.h>
+#include <Guid/UsbCredentialProviderHii.h>
 
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/BlockIo.h>
@@ -40,15 +40,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 
 extern UINT8      UsbCredentialProviderStrings[];
-extern UINT8      UsbCredentialProviderVfrBin[];
 
 #define USB_TABLE_INC          16
 #define HASHED_CREDENTIAL_LEN  20
-
-#define USB_CREDENTIAL_PROVIDER_GUID \
-  { \
-    0xd0849ed1, 0xa88c, 0x4ba6, { 0xb1, 0xd6, 0xab, 0x50, 0xe2, 0x80, 0xb7, 0xa9 }\
-  }
 
 //
 // Save the enroll user credential Information.
@@ -74,14 +68,6 @@ typedef struct {
   UINTN                         Count;
   EFI_USER_INFO                 *Info[1];
 } USB_CREDENTIAL_INFO;
-
-///
-/// HII specific Vendor Device Path definition.
-///
-typedef struct {
-  VENDOR_DEVICE_PATH        VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  End;
-} HII_VENDOR_DEVICE_PATH;
 
 #define USB_PROVIDER_SIGNATURE  SIGNATURE_32 ('U', 'S', 'B', 'P')
 

@@ -17,7 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "UserProfileManager.h"
 
-EFI_GUID                  mUserProfileManagerGuid = USER_PROFILE_MANAGER_GUID;
 EFI_USER_MANAGER_PROTOCOL *mUserManager           = NULL;
 CREDENTIAL_PROVIDER_INFO  *mProviderInfo          = NULL;
 UINT8                     mProviderChoice;
@@ -35,7 +34,7 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    {0xad2e3474, 0x93e6, 0x488b, {0x93, 0x19, 0x64, 0x88, 0xfc, 0x68, 0x1f, 0x16}}
+    USER_PROFILE_MANAGER_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -293,7 +292,7 @@ UserProfileManagerCallback (
   
       HiiUpdateForm (
         mCallbackInfo->HiiHandle,               // HII handle
-        &mUserProfileManagerGuid,               // Formset GUID
+        &gUserProfileManagerGuid,               // Formset GUID
         FORMID_USER_MANAGE,                     // Form ID
         StartOpCodeHandle,                      // Label for where to insert opcodes
         EndOpCodeHandle                         // Replace data
@@ -786,7 +785,7 @@ UserProfileManagerInit (
   // Publish HII data.
   //
   CallbackInfo->HiiHandle = HiiAddPackages (
-                              &mUserProfileManagerGuid,
+                              &gUserProfileManagerGuid,
                               CallbackInfo->DriverHandle,
                               UserProfileManagerStrings,
                               UserProfileManagerVfrBin,

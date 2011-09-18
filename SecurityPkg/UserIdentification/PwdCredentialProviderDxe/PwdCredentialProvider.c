@@ -18,12 +18,6 @@ CREDENTIAL_TABLE            *mPwdTable      = NULL;
 PWD_PROVIDER_CALLBACK_INFO  *mCallbackInfo  = NULL;
 PASSWORD_CREDENTIAL_INFO    *mPwdInfoHandle = NULL;
 
-//
-// Used for save password credential and form browser.
-// Also used as provider identifier.
-//
-EFI_GUID  mPwdCredentialGuid = PWD_CREDENTIAL_PROVIDER_GUID;
-
 HII_VENDOR_DEVICE_PATH      mHiiVendorDevicePath = {
   {
     {
@@ -34,7 +28,7 @@ HII_VENDOR_DEVICE_PATH      mHiiVendorDevicePath = {
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    { 0xeba7fc2b, 0xa465, 0x4d96, { 0x85, 0xa9, 0xd2, 0xf6, 0x64, 0xdf, 0x9b, 0x45 } }   
+    PWD_CREDENTIAL_PROVIDER_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -180,7 +174,7 @@ ModifyTable (
   //
   Status = gRT->SetVariable (
                   L"PwdCredential",
-                  &mPwdCredentialGuid,
+                  &gPwdCredentialProviderGuid,
                   EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
                   mPwdTable->Count * sizeof (PASSWORD_INFO),
                   &mPwdTable->UserInfo
@@ -212,7 +206,7 @@ InitCredentialTable (
   Var     = NULL;
   Status  = gRT->GetVariable (
                    L"PwdCredential", 
-                   &mPwdCredentialGuid, 
+                   &gPwdCredentialProviderGuid, 
                    NULL, 
                    &VarSize,
                    Var
@@ -224,7 +218,7 @@ InitCredentialTable (
     }
     Status = gRT->GetVariable (
                     L"PwdCredential", 
-                    &mPwdCredentialGuid, 
+                    &gPwdCredentialProviderGuid, 
                     NULL, 
                     &VarSize,
                     Var
@@ -693,7 +687,7 @@ InitFormBrowser (
   // Publish HII data.
   //
   CallbackInfo->HiiHandle = HiiAddPackages (
-                              &mPwdCredentialGuid,
+                              &gPwdCredentialProviderGuid,
                               CallbackInfo->DriverHandle,
                               PwdCredentialProviderStrings,
                               PwdCredentialProviderVfrBin,
@@ -888,7 +882,7 @@ CredentialForm (
 
   *Hii       = mCallbackInfo->HiiHandle;
   *FormId    = FORMID_GET_PASSWORD_FORM;
-  CopyGuid (FormSetId, &mPwdCredentialGuid);
+  CopyGuid (FormSetId, &gPwdCredentialProviderGuid);
   
   return EFI_SUCCESS;
 }
@@ -1269,8 +1263,8 @@ CredentialGetNextInfo (
     Info->InfoType    = EFI_USER_INFO_CREDENTIAL_PROVIDER_RECORD;
     Info->InfoSize    = (UINT32) InfoLen;
     Info->InfoAttribs = EFI_USER_INFO_PROTECTED;
-    CopyGuid (&Info->Credential, &mPwdCredentialGuid);
-    CopyGuid ((EFI_GUID *)(Info + 1), &mPwdCredentialGuid);
+    CopyGuid (&Info->Credential, &gPwdCredentialProviderGuid);
+    CopyGuid ((EFI_GUID *)(Info + 1), &gPwdCredentialProviderGuid);
     
     mPwdInfoHandle->Info[0] = Info;
     mPwdInfoHandle->Count++;
@@ -1287,7 +1281,7 @@ CredentialGetNextInfo (
     Info->InfoType    = EFI_USER_INFO_CREDENTIAL_PROVIDER_NAME_RECORD;
     Info->InfoSize    = (UINT32) InfoLen;
     Info->InfoAttribs = EFI_USER_INFO_PROTECTED;
-    CopyGuid (&Info->Credential, &mPwdCredentialGuid);
+    CopyGuid (&Info->Credential, &gPwdCredentialProviderGuid);
     CopyMem ((UINT8*)(Info + 1), ProvNameStr, ProvStrLen);
     FreePool (ProvNameStr);
 
@@ -1304,7 +1298,7 @@ CredentialGetNextInfo (
     Info->InfoType    = EFI_USER_INFO_CREDENTIAL_TYPE_RECORD;
     Info->InfoSize    = (UINT32) InfoLen;
     Info->InfoAttribs = EFI_USER_INFO_PROTECTED;
-    CopyGuid (&Info->Credential, &mPwdCredentialGuid);
+    CopyGuid (&Info->Credential, &gPwdCredentialProviderGuid);
     CopyGuid ((EFI_GUID *)(Info + 1), &gEfiUserCredentialClassPasswordGuid);
     
     mPwdInfoHandle->Info[2] = Info;
@@ -1322,7 +1316,7 @@ CredentialGetNextInfo (
     Info->InfoType    = EFI_USER_INFO_CREDENTIAL_PROVIDER_NAME_RECORD;
     Info->InfoSize    = (UINT32) InfoLen;
     Info->InfoAttribs = EFI_USER_INFO_PROTECTED;
-    CopyGuid (&Info->Credential, &mPwdCredentialGuid);
+    CopyGuid (&Info->Credential, &gPwdCredentialProviderGuid);
     CopyMem ((UINT8*)(Info + 1), ProvNameStr, ProvStrLen);
     FreePool (ProvNameStr);
     

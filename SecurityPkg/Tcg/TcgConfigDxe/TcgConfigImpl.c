@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "TcgConfigImpl.h"
 
-EFI_GUID                        mTcgFormSetGuid = TCG_CONFIG_PRIVATE_GUID;
 CHAR16                          mTcgStorageName[] = L"TCG_CONFIGURATION";
 
 TCG_CONFIG_PRIVATE_DATA         mTcgConfigPrivateDateTemplate = {
@@ -36,7 +35,7 @@ HII_VENDOR_DEVICE_PATH          mTcgHiiVendorDevicePath = {
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    TCG_CONFIG_PRIVATE_GUID
+    TCG_CONFIG_FORM_SET_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -166,7 +165,7 @@ TcgExtractConfig (
   }
 
   *Progress = Request;
-  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &mTcgFormSetGuid, mTcgStorageName)) {
+  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &gTcgConfigFormSetGuid, mTcgStorageName)) {
     return EFI_NOT_FOUND;
   }
 
@@ -220,7 +219,7 @@ TcgExtractConfig (
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
-    ConfigRequestHdr = HiiConstructConfigHdr (&mTcgFormSetGuid, mTcgStorageName, PrivateData->DriverHandle);
+    ConfigRequestHdr = HiiConstructConfigHdr (&gTcgConfigFormSetGuid, mTcgStorageName, PrivateData->DriverHandle);
     Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
     ASSERT (ConfigRequest != NULL);
@@ -290,7 +289,7 @@ TcgRouteConfig (
   }
 
   *Progress = Configuration;
-  if (!HiiIsConfigHdrMatch (Configuration, &mTcgFormSetGuid, mTcgStorageName)) {
+  if (!HiiIsConfigHdrMatch (Configuration, &gTcgConfigFormSetGuid, mTcgStorageName)) {
     return EFI_NOT_FOUND;
   }
 
@@ -460,7 +459,7 @@ InstallTcgConfigForm (
   // Publish the HII package list
   //
   HiiHandle = HiiAddPackages (
-                &mTcgFormSetGuid,
+                &gTcgConfigFormSetGuid,
                 DriverHandle,
                 TcgConfigDxeStrings,
                 TcgConfigBin,

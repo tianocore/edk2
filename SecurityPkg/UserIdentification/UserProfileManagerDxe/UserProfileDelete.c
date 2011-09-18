@@ -1,7 +1,7 @@
 /** @file
   The functions to delete a user profile.
     
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -303,7 +303,7 @@ SelectUserToDelete (
 
   HiiUpdateForm (
     mCallbackInfo->HiiHandle, // HII handle
-    &mUserProfileManagerGuid, // Formset GUID
+    &gUserProfileManagerGuid, // Formset GUID
     FORMID_DEL_USER,          // Form ID
     StartOpCodeHandle,        // Label for where to insert opcodes
     EndOpCodeHandle           // Replace data

@@ -1,7 +1,7 @@
 /** @file
   The form data for user profile manager driver.
     
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -15,10 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __USER_PROFILE_MANAGER_DATA_H__
 #define __USER_PROFILE_MANAGER_DATA_H__
 
-#define USER_PROFILE_MANAGER_GUID \
-  { \
-    0xc35f272c, 0x97c2, 0x465a, { 0xa2, 0x16, 0x69, 0x6b, 0x66, 0x8a, 0x8c, 0xfe } \
-  }
+#include <Guid/UserProfileManagerHii.h>
 
 //
 // Form ID

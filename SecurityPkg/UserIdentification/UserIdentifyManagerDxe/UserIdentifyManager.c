@@ -15,11 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "UserIdentifyManager.h"
 
 //
-// Guid used in user profile saving and in form browser.
-//
-EFI_GUID                    mUserManagerGuid  = USER_IDENTIFY_MANAGER_GUID;
-
-//
 // Default user name.
 //
 CHAR16                      mUserName[]       = L"Administrator";
@@ -54,10 +49,7 @@ HII_VENDOR_DEVICE_PATH      mHiiVendorDevicePath = {
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    //
-    // {ACA7C06F-743C-454f-9C6D-692138482498}
-    //
-    { 0xaca7c06f, 0x743c, 0x454f, { 0x9c, 0x6d, 0x69, 0x21, 0x38, 0x48, 0x24, 0x98 } }
+    USER_IDENTIFY_MANAGER_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -1152,7 +1144,7 @@ SaveNvUserProfile (
   //
   Status = gRT->SetVariable (
                   User->UserVarName,
-                  &mUserManagerGuid,
+                  &gUserIdentifyManagerGuid,
                   EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
                   Delete ? 0 : User->UserProfileSize,
                   User->ProfileInfo
@@ -2812,7 +2804,7 @@ IdentifyOrTypeUser (
 
   HiiUpdateForm (
     mCallbackInfo->HiiHandle, // HII handle
-    &mUserManagerGuid,        // Formset GUID
+    &gUserIdentifyManagerGuid,// Formset GUID
     FORMID_PROVIDER_FORM,     // Form ID
     StartOpCodeHandle,        // Label for where to insert opcodes
     EndOpCodeHandle           // Replace data
@@ -2916,7 +2908,7 @@ UserIdentifyManagerCallback (
   
       HiiUpdateForm (
         mCallbackInfo->HiiHandle, // HII handle
-        &mUserManagerGuid,        // Formset GUID
+        &gUserIdentifyManagerGuid,// Formset GUID
         FORMID_USER_FORM,         // Form ID
         StartOpCodeHandle,        // Label for where to insert opcodes
         EndOpCodeHandle           // Replace data
@@ -3058,7 +3050,7 @@ InitUserProfileDb (
     // Get variable value.
     //
     VarSize = CurVarSize;
-    Status  = gRT->GetVariable (VarName, &mUserManagerGuid, &VarAttr, &VarSize, VarData);
+    Status  = gRT->GetVariable (VarName, &gUserIdentifyManagerGuid, &VarAttr, &VarSize, VarData);
     if (Status == EFI_BUFFER_TOO_SMALL) {
       FreePool (VarData);
       VarData = AllocatePool (VarSize);
@@ -3068,7 +3060,7 @@ InitUserProfileDb (
       }
 
       CurVarSize  = VarSize;
-      Status      = gRT->GetVariable (VarName, &mUserManagerGuid, &VarAttr, &VarSize, VarData);
+      Status      = gRT->GetVariable (VarName, &gUserIdentifyManagerGuid, &VarAttr, &VarSize, VarData);
     }
 
     if (EFI_ERROR (Status)) {
@@ -3082,7 +3074,7 @@ InitUserProfileDb (
     // Check variable attributes.
     //
     if (VarAttr != (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS)) {
-      Status = gRT->SetVariable (VarName, &mUserManagerGuid, VarAttr, 0, NULL);
+      Status = gRT->SetVariable (VarName, &gUserIdentifyManagerGuid, VarAttr, 0, NULL);
       continue;
     }
     
@@ -3095,7 +3087,7 @@ InitUserProfileDb (
         //
         // Delete invalid user profile
         //
-        gRT->SetVariable (VarName, &mUserManagerGuid, VarAttr, 0, NULL);
+        gRT->SetVariable (VarName, &gUserIdentifyManagerGuid, VarAttr, 0, NULL);
       } else if (Status == EFI_OUT_OF_RESOURCES) {
         break;
       }
@@ -3104,7 +3096,7 @@ InitUserProfileDb (
       // Delete and save the profile again if some invalid profiles are deleted.
       //
       if (mUserProfileDb->UserProfileNum < Index) {
-        gRT->SetVariable (VarName, &mUserManagerGuid, VarAttr, 0, NULL);
+        gRT->SetVariable (VarName, &gUserIdentifyManagerGuid, VarAttr, 0, NULL);
         SaveNvUserProfile (mUserProfileDb->UserProfile[mUserProfileDb->UserProfileNum - 1], FALSE);
       }
     }
@@ -3349,7 +3341,7 @@ InitFormBrowser (
   // Publish HII data.
   //
   CallbackInfo->HiiHandle = HiiAddPackages (
-                              &mUserManagerGuid,
+                              &gUserIdentifyManagerGuid,
                               CallbackInfo->DriverHandle,
                               UserIdentifyManagerStrings,
                               UserIdentifyManagerVfrBin,
@@ -3590,7 +3582,7 @@ IdentifyUser (
                                  mCallbackInfo->FormBrowser2,
                                  &mCallbackInfo->HiiHandle,
                                  1,
-                                 &mUserManagerGuid,
+                                 &gUserIdentifyManagerGuid,
                                  0,
                                  NULL,
                                  NULL

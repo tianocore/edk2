@@ -29,10 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmCommunication.h>
 #include <Protocol/SmmVariable.h>
 
-#define EFI_VARIABLE_GUID \
-  { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d } }
-
-EFI_GUID                        mEfiVariableGuid   = EFI_VARIABLE_GUID;
+extern EFI_GUID gEfiVariableGuid;
 EFI_SMM_COMMUNICATION_PROTOCOL  *mSmmCommunication = NULL;
 
 /**
@@ -208,7 +205,7 @@ UefiMain (
   VARIABLE_INFO_ENTRY   *VariableInfo;
   VARIABLE_INFO_ENTRY   *Entry;
 
-  Status = EfiGetSystemConfigurationTable (&mEfiVariableGuid, (VOID **)&Entry);
+  Status = EfiGetSystemConfigurationTable (&gEfiVariableGuid, (VOID **)&Entry);
   if (EFI_ERROR (Status) || (Entry == NULL)) {
     Status = EfiGetSystemConfigurationTable (&gEfiAuthenticatedVariableGuid, (VOID **)&Entry);
   }

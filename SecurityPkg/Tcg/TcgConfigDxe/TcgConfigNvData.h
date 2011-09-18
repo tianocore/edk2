@@ -17,11 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/HiiPlatformSetupFormset.h>
 #include <Guid/PhysicalPresenceData.h>
-
-#define TCG_CONFIG_PRIVATE_GUID \
-  { \
-    0xb0f901e4, 0xc424, 0x45de, {0x90, 0x81, 0x95, 0xe2, 0xb, 0xde, 0x6f, 0xb5 } \
-  }
+#include <Guid/TcgConfigHii.h>
 
 #define TCG_CONFIGURATION_VARSTORE_ID  0x0001
 #define TCG_CONFIGURATION_FORM_ID      0x0001

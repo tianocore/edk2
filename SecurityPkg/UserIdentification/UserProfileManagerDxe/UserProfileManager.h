@@ -1,7 +1,7 @@
 /** @file
   The header file for user profile manager driver.
     
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -111,11 +111,6 @@ extern UINT8                               UserProfileManagerVfrBin[];
 // This is the generated String package data for .UNI file.
 //
 extern UINT8                               UserProfileManagerStrings[];
-
-//
-// Guid used in the form browse.
-//
-extern EFI_GUID                            mUserProfileManagerGuid;
 
 //
 // The user manager protocol, used in several function.
