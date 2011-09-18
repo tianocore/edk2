@@ -20,7 +20,7 @@
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/MdeModule
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC|ARM
-  BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
+  BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
 [LibraryClasses]
