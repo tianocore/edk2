@@ -1,7 +1,7 @@
 /** @file
   The header file of Ip6ConfigNv.c.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -21,11 +21,6 @@
 
 extern UINT8  Ip6ConfigBin[];
 extern UINT8  Ip6DxeStrings[];
-
-#define IP6_HII_VENDOR_DEVICE_PATH_GUID \
-  { \
-    0x13288098, 0xb11f, 0x45b9, { 0xbc, 0x4f, 0x91, 0xb5, 0x4b, 0xa3, 0x39, 0xb9 } \
-  }
 
 #define IP6_ETHERNET              L"Ethernet"
 #define IP6_EXPERIMENTAL_ETHERNET L"Experimental Ethernet"

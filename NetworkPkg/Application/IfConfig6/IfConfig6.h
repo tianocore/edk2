@@ -1,7 +1,7 @@
 /** @file
   The interface function declaration of shell application IfConfig6.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -15,11 +15,6 @@
 
 #ifndef _IFCONFIG6_H_
 #define _IFCONFIG6_H_
-
-#define EFI_IFCONFIG6_GUID \
-  { \
-    0xbab7296b, 0x222c, 0x4408, {0x9e, 0x6c, 0xc2, 0x5c, 0x18, 0x7e, 0xff, 0x33} \
-  }
 
 enum {
   IfConfig6OpList     = 1,

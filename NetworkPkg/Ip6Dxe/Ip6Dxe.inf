@@ -67,7 +67,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-
+  NetworkPkg/NetworkPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -98,3 +98,4 @@
 
 [Guids]
   gEfiIfrTianoGuid                              ## CONSUMES ## GUID
+  gIp6ConfigNvDataGuid                          ## PRODUCES ## GUID

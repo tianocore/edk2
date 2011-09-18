@@ -1,7 +1,7 @@
 /** @file
   The implementation for Ping6 application.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -58,7 +58,6 @@ SHELL_PARAM_ITEM    Ping6ParamList[] = {
 EFI_HII_HANDLE    mHiiHandle;
 CONST CHAR16      *mIp6DstString;
 CONST CHAR16      *mIp6SrcString;
-EFI_GUID          mEfiPing6Guid = EFI_PING6_GUID;
 UINT64            mFrequency = 0;
 /**
   Get and caculate the frequency in tick/ms.

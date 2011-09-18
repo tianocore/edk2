@@ -15,8 +15,6 @@
 
 #include "Ip6Impl.h"
 
-EFI_GUID  mIp6HiiVendorDevicePathGuid = IP6_HII_VENDOR_DEVICE_PATH_GUID;
-EFI_GUID  mIp6ConfigNvDataGuid        = IP6_CONFIG_NVDATA_GUID;
 CHAR16    mIp6ConfigStorageName[]     = L"IP6_CONFIG_IFR_NVDATA";
 
 /**
@@ -556,7 +554,7 @@ Ip6ConvertAddressListToString (
 
   Status = HiiUpdateForm (
              HiiHandle,                       // HII handle
-             &mIp6ConfigNvDataGuid,           // Formset GUID
+             &gIp6ConfigNvDataGuid,           // Formset GUID
              FORMID_MAIN_FORM,                // Form ID
              StartOpCodeHandle,               // Label for where to insert opcodes
              EndOpCodeHandle                  // Replace data
@@ -1447,7 +1445,7 @@ Ip6FormExtractConfig (
 
   *Progress = Request;
   if ((Request != NULL) &&
-      !HiiIsConfigHdrMatch (Request, &mIp6ConfigNvDataGuid, mIp6ConfigStorageName)) {
+      !HiiIsConfigHdrMatch (Request, &gIp6ConfigNvDataGuid, mIp6ConfigStorageName)) {
     return EFI_NOT_FOUND;
   }
 
@@ -1478,7 +1476,7 @@ Ip6FormExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator.
     //
     ConfigRequestHdr = HiiConstructConfigHdr (
-                         &mIp6ConfigNvDataGuid,
+                         &gIp6ConfigNvDataGuid,
                          mIp6ConfigStorageName,
                          Private->ChildHandle
                          );
@@ -1578,7 +1576,7 @@ Ip6FormRouteConfig (
   // Check routing data in <ConfigHdr>.
   // Note: if only one Storage is used, then this checking could be skipped.
   //
-  if (!HiiIsConfigHdrMatch (Configuration, &mIp6ConfigNvDataGuid, mIp6ConfigStorageName)) {
+  if (!HiiIsConfigHdrMatch (Configuration, &gIp6ConfigNvDataGuid, mIp6ConfigStorageName)) {
     *Progress = Configuration;
     return EFI_NOT_FOUND;
   }
@@ -1962,7 +1960,7 @@ Ip6ConfigFormInit (
   VendorDeviceNode.Header.Type    = HARDWARE_DEVICE_PATH;
   VendorDeviceNode.Header.SubType = HW_VENDOR_DP;
 
-  CopyGuid (&VendorDeviceNode.Guid, &mIp6HiiVendorDevicePathGuid);
+  CopyGuid (&VendorDeviceNode.Guid, &gEfiCallerIdGuid);
 
   SetDevicePathNodeLength (&VendorDeviceNode.Header, sizeof (VENDOR_DEVICE_PATH));
   CallbackInfo->HiiVendorDevicePath = AppendDevicePathNode (
@@ -2012,7 +2010,7 @@ Ip6ConfigFormInit (
   // Publish our HII data
   //
   CallbackInfo->RegisteredHandle = HiiAddPackages (
-                                     &mIp6ConfigNvDataGuid,
+                                     &gIp6ConfigNvDataGuid,
                                      CallbackInfo->ChildHandle,
                                      Ip6DxeStrings,
                                      Ip6ConfigBin,

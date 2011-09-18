@@ -921,7 +921,7 @@ IScsiGetConfigData (
   //
   AttemptConfigOrder = IScsiGetVariableAndSize (
                          L"AttemptOrder",
-                         &mVendorGuid,
+                         &gIScsiConfigGuid,
                          &AttemptConfigOrderSize
                          );
   if (AttemptConfigOrder == NULL || AttemptConfigOrderSize == 0) {

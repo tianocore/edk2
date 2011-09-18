@@ -1,7 +1,7 @@
 /** @file
   The interface function declaration of shell application Ping6 (Ping for v6 series).
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -15,11 +15,6 @@
 
 #ifndef _PING6_H_
 #define _PING6_H_
-
-#define EFI_PING6_GUID \
-  { \
-    0x3f0b2478, 0x3619, 0x46c5, {0x81, 0x50, 0xa5, 0xab, 0xdd, 0xb6, 0x6b, 0xd9} \
-  }
 
 #define PING6_DEFAULT_TIMEOUT      5000
 #define PING6_MAX_SEND_NUMBER      10000

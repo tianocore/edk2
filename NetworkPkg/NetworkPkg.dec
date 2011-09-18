@@ -20,10 +20,19 @@
   PACKAGE_GUID                   = 947988BE-8D5C-471a-893D-AD181C46BEBB
   PACKAGE_VERSION                = 0.92
 
+[Includes]
+  Include
+
 [Guids]
   ## Network package token space guid.
   # Include/Guid/NetworkPkgTokenSpace.h
   gEfiNetworkPkgTokenSpaceGuid  = { 0x40e064b2, 0x0ae0, 0x48b1, { 0xa0, 0x7d, 0xf8, 0xcf, 0x1e, 0x1a, 0x23, 0x10}}
+
+  # Include/Guid/Ip6ConfigHii.h
+  gIp6ConfigNvDataGuid          = { 0x2eea107, 0x98db, 0x400e, { 0x98, 0x30, 0x46, 0xa, 0x15, 0x42, 0xd7, 0x99}}
+
+  # Include/Guid/IscsiConfigHii.h
+  gIScsiConfigGuid              = { 0x4b47d616, 0xa8d6, 0x4552, { 0x9d, 0x44, 0xcc, 0xad, 0x2e, 0xf, 0x4c, 0xf9}}
 
 [PcdsFeatureFlag]
   ## If true, the IKEv2 Certificate Authentication feature is enabled.

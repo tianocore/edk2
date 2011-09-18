@@ -25,14 +25,6 @@ EFI_DRIVER_BINDING_PROTOCOL gPxeBcDriverBinding = {
   NULL
 };
 
-//
-// PXE_PRIVATE_GUID is only used to keep the relationship between 
-// NIC handle and virtual child handles.
-//
-EFI_GUID mPxeBcPrivateGuid = PXEBC_PRIVATE_GUID;
-
-
-
 /**
   Get the Nic handle using any child handle in the IPv4 stack.
 
@@ -237,7 +229,7 @@ PxeBcDestroyIp4Children (
     //
     gBS->CloseProtocol (
            Private->Controller,
-           &mPxeBcPrivateGuid,
+           &gEfiCallerIdGuid,
            This->DriverBindingHandle,
            Private->Ip4Nic->Controller
            );
@@ -397,7 +389,7 @@ PxeBcDestroyIp6Children (
     //
     gBS->CloseProtocol (
            Private->Controller,
-           &mPxeBcPrivateGuid,
+           &gEfiCallerIdGuid,
            This->DriverBindingHandle,
            Private->Ip6Nic->Controller
            );
@@ -722,7 +714,7 @@ PxeBcCreateIp4Children (
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &mPxeBcPrivateGuid,
+                  &gEfiCallerIdGuid,
                   (VOID **) &Id,
                   This->DriverBindingHandle,
                   Private->Ip4Nic->Controller,
@@ -1030,7 +1022,7 @@ PxeBcCreateIp6Children (
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &mPxeBcPrivateGuid,
+                  &gEfiCallerIdGuid,
                   (VOID **) &Id,
                   This->DriverBindingHandle,
                   Private->Ip6Nic->Controller,
@@ -1214,7 +1206,7 @@ PxeBcDriverBindingStart (
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &mPxeBcPrivateGuid,
+                  &gEfiCallerIdGuid,
                   (VOID **) &Id,
                   This->DriverBindingHandle,
                   ControllerHandle,
@@ -1282,10 +1274,13 @@ PxeBcDriverBindingStart (
 
     //
     // Install PxeBaseCodePrivate protocol onto the real NIC handler.
+    // PxeBaseCodePrivate protocol is only used to keep the relationship between 
+    // NIC handle and virtual child handles.
+    // gEfiCallerIdGuid will be used as its protocol guid.
     //
     Status = gBS->InstallProtocolInterface (
                     &ControllerHandle,
-                    &mPxeBcPrivateGuid,
+                    &gEfiCallerIdGuid,
                     EFI_NATIVE_INTERFACE,
                     &Private->Id
                     );
@@ -1322,7 +1317,7 @@ PxeBcDriverBindingStart (
 ON_ERROR:
   gBS->UninstallProtocolInterface (
          ControllerHandle,
-         &mPxeBcPrivateGuid,
+         &gEfiCallerIdGuid,
          &Private->Id
          );
   PxeBcDestroyIp4Children (This, Private);
@@ -1403,7 +1398,7 @@ PxeBcDriverBindingStop (
     //
     Status = gBS->OpenProtocol (
                     NicHandle,
-                    &mPxeBcPrivateGuid,
+                    &gEfiCallerIdGuid,
                     (VOID **) &Id,
                     This->DriverBindingHandle,
                     ControllerHandle,
@@ -1459,7 +1454,7 @@ PxeBcDriverBindingStop (
   if (Private->Ip4Nic == NULL && Private->Ip6Nic == NULL) {
     gBS->UninstallProtocolInterface (
            NicHandle,
-           &mPxeBcPrivateGuid,
+           &gEfiCallerIdGuid,
            &Private->Id
            );
     FreePool (Private);

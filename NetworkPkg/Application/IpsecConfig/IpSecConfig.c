@@ -1,7 +1,7 @@
 /** @file
   The main process for IpSecConfig application.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -232,7 +232,6 @@ STR2INT mMapAuthMethod[] = {
 EFI_IPSEC2_PROTOCOL          *mIpSec;
 EFI_IPSEC_CONFIG_PROTOCOL    *mIpSecConfig;
 EFI_HII_HANDLE               mHiiHandle;
-EFI_GUID                     mEfiIpSecConfigGuid = EFI_IPSEC_CONFIG_GUID;
 CHAR16                       mAppName[]          = L"IpSecConfig";
 
 //

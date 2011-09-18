@@ -658,7 +658,7 @@ IScsiStart (
 
     AttemptConfigOrder = IScsiGetVariableAndSize (
                            L"AttemptOrder",
-                           &mVendorGuid,
+                           &gIScsiConfigGuid,
                            &AttemptConfigOrderSize
                            );
     ASSERT (AttemptConfigOrder != NULL);

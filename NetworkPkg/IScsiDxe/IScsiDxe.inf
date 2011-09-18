@@ -62,6 +62,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   CryptoPkg/CryptoPkg.dec
+  NetworkPkg/NetworkPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -104,3 +105,4 @@
   gEfiAcpiTableGuid                             ## CONSUMES ## GUID
   gEfiAcpi10TableGuid                           ## CONSUMES ## GUID
   gEfiAcpi20TableGuid                           ## CONSUMES ## GUID
+  gIScsiConfigGuid                              ## PRODUCES ## GUID

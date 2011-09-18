@@ -1,7 +1,7 @@
 /** @file
   The internal structure and function declaration in IpSecConfig application.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -25,11 +25,6 @@
 #include <Library/NetLib.h>
 
 #include <Protocol/IpSecConfig.h>
-
-#define EFI_IPSEC_CONFIG_GUID \
-  { \
-    0x9db0c3ac, 0xd9d2, 0x4f96, {0x9e, 0xd7, 0x6d, 0xa6, 0x12, 0xa4, 0xf3, 0x27} \
-  }
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 

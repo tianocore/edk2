@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "IScsiImpl.h"
 
-EFI_GUID        mVendorGuid              = ISCSI_CONFIG_GUID;
 CHAR16          mVendorStorageName[]     = L"ISCSI_CONFIG_IFR_NVDATA";
 BOOLEAN         mIScsiDeviceListUpdated  = FALSE;
 UINTN           mNumberOfIScsiDevices    = 0;
@@ -30,10 +29,7 @@ HII_VENDOR_DEVICE_PATH  mIScsiHiiVendorDevicePath = {
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    //
-    // {49D7B73E-143D-4716-977B-C45F1CB038CC}
-    //
-    { 0x49d7b73e, 0x143d, 0x4716, { 0x97, 0x7b, 0xc4, 0x5f, 0x1c, 0xb0, 0x38, 0xcc } }
+    ISCSI_CONFIG_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -758,7 +754,7 @@ IScsiConvertIfrNvDataToAttemptConfigData (
     //
     AttemptConfigOrder = IScsiGetVariableAndSize (
                            L"AttemptOrder",
-                           &mVendorGuid,
+                           &gIScsiConfigGuid,
                            &AttemptConfigOrderSize
                            );
 
@@ -787,7 +783,7 @@ IScsiConvertIfrNvDataToAttemptConfigData (
 
     Status = gRT->SetVariable (
                     L"AttemptOrder",
-                    &mVendorGuid,
+                    &gIScsiConfigGuid,
                     EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                     AttemptConfigOrderSize,
                     AttemptConfigOrder
@@ -1028,7 +1024,7 @@ IScsiConfigAddAttempt (
 
   Status = HiiUpdateForm (
              mCallbackInfo->RegisteredHandle, // HII handle
-             &mVendorGuid,                    // Formset GUID
+             &gIScsiConfigGuid,               // Formset GUID
              FORMID_MAC_FORM,                 // Form ID
              StartOpCodeHandle,               // Label for where to insert opcodes
              EndOpCodeHandle                  // Replace data
@@ -1098,7 +1094,7 @@ IScsiConfigUpdateAttempt (
 
   HiiUpdateForm (
     mCallbackInfo->RegisteredHandle, // HII handle
-    &mVendorGuid,                    // Formset GUID
+    &gIScsiConfigGuid,               // Formset GUID
     FORMID_MAIN_FORM,                // Form ID
     StartOpCodeHandle,               // Label for where to insert opcodes
     EndOpCodeHandle                  // Replace data
@@ -1143,7 +1139,7 @@ IScsiConfigDeleteAttempts (
 
   AttemptConfigOrder = IScsiGetVariableAndSize (
                          L"AttemptOrder",
-                         &mVendorGuid,
+                         &gIScsiConfigGuid,
                          &AttemptConfigOrderSize
                          );
   if ((AttemptConfigOrder == NULL) || (AttemptConfigOrderSize == 0)) {
@@ -1258,7 +1254,7 @@ IScsiConfigDeleteAttempts (
   //
   Status = gRT->SetVariable (
                   L"AttemptOrder",
-                  &mVendorGuid,
+                  &gIScsiConfigGuid,
                   Attribute,
                   NewTotal * sizeof (UINT8),
                   AttemptNewOrder
@@ -1317,7 +1313,7 @@ IScsiConfigDisplayDeleteAttempts (
 
   AttemptConfigOrder = IScsiGetVariableAndSize (
                          L"AttemptOrder",
-                         &mVendorGuid,
+                         &gIScsiConfigGuid,
                          &AttemptConfigOrderSize
                          );
   if (AttemptConfigOrder != NULL) {
@@ -1354,7 +1350,7 @@ IScsiConfigDisplayDeleteAttempts (
 
   Status = HiiUpdateForm (
              mCallbackInfo->RegisteredHandle, // HII handle
-             &mVendorGuid,                    // Formset GUID
+             &gIScsiConfigGuid,               // Formset GUID
              FORMID_DELETE_FORM,              // Form ID
              StartOpCodeHandle,               // Label for where to insert opcodes
              EndOpCodeHandle                  // Replace data
@@ -1454,7 +1450,7 @@ IScsiConfigDisplayOrderAttempts (
 Exit:
   Status = HiiUpdateForm (
              mCallbackInfo->RegisteredHandle, // HII handle
-             &mVendorGuid,                    // Formset GUID
+             &gIScsiConfigGuid,               // Formset GUID
              FORMID_ORDER_FORM,               // Form ID
              StartOpCodeHandle,               // Label for where to insert opcodes
              EndOpCodeHandle                  // Replace data
@@ -1498,7 +1494,7 @@ IScsiConfigOrderAttempts (
 
   AttemptConfigOrder = IScsiGetVariableAndSize (
                          L"AttemptOrder",
-                         &mVendorGuid,
+                         &gIScsiConfigGuid,
                          &AttemptConfigOrderSize
                          );
   if (AttemptConfigOrder == NULL) {
@@ -1560,7 +1556,7 @@ IScsiConfigOrderAttempts (
 
   Status = gRT->SetVariable (
                   L"AttemptOrder",
-                  &mVendorGuid,
+                  &gIScsiConfigGuid,
                   EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   AttemptConfigOrderSize,
                   AttemptConfigOrderTmp
@@ -1674,7 +1670,7 @@ IScsiConfigProcessDefault (
     //
     AttemptConfigOrder = IScsiGetVariableAndSize (
                            L"AttemptOrder",
-                           &mVendorGuid,
+                           &gIScsiConfigGuid,
                            &AttemptConfigOrderSize
                            );
 
@@ -1899,7 +1895,7 @@ IScsiFormExtractConfig (
   }
 
   *Progress = Request;
-  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &mVendorGuid, mVendorStorageName)) {
+  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &gIScsiConfigGuid, mVendorStorageName)) {
     return EFI_NOT_FOUND;
   }
 
@@ -1943,7 +1939,7 @@ IScsiFormExtractConfig (
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
-    ConfigRequestHdr = HiiConstructConfigHdr (&mVendorGuid, mVendorStorageName, Private->DriverHandle);
+    ConfigRequestHdr = HiiConstructConfigHdr (&gIScsiConfigGuid, mVendorStorageName, Private->DriverHandle);
     Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
     ASSERT (ConfigRequest != NULL);
@@ -2039,7 +2035,7 @@ IScsiFormRouteConfig (
   // Check routing data in <ConfigHdr>.
   // Note: if only one Storage is used, then this checking could be skipped.
   //
-  if (!HiiIsConfigHdrMatch (Configuration, &mVendorGuid, mVendorStorageName)) {
+  if (!HiiIsConfigHdrMatch (Configuration, &gIScsiConfigGuid, mVendorStorageName)) {
     *Progress = Configuration;
     return EFI_NOT_FOUND;
   }
@@ -2494,7 +2490,7 @@ IScsiConfigFormInit (
   // Publish our HII data.
   //
   CallbackInfo->RegisteredHandle = HiiAddPackages (
-                                     &mVendorGuid,
+                                     &gIScsiConfigGuid,
                                      CallbackInfo->DriverHandle,
                                      IScsiDxeStrings,
                                      IScsiConfigVfrBin,

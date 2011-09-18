@@ -23,7 +23,6 @@ typedef struct _ISCSI_FORM_CALLBACK_INFO ISCSI_FORM_CALLBACK_INFO;
 extern UINT8                       IScsiConfigVfrBin[];
 extern UINT8                       IScsiDxeStrings[];
 extern ISCSI_FORM_CALLBACK_INFO    *mCallbackInfo;
-extern EFI_GUID                    mVendorGuid;
 
 
 #define VAR_OFFSET(Field)    \

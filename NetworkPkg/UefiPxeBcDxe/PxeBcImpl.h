@@ -77,12 +77,6 @@ typedef struct _PXEBC_VIRTUAL_NIC   PXEBC_VIRTUAL_NIC;
 #define PXEBC_PRIVATE_DATA_FROM_ID(a)         CR (a, PXEBC_PRIVATE_DATA, Id, PXEBC_PRIVATE_DATA_SIGNATURE)
 #define PXEBC_VIRTUAL_NIC_FROM_LOADFILE(a)    CR (a, PXEBC_VIRTUAL_NIC, LoadFile, PXEBC_VIRTUAL_NIC_SIGNATURE)
 
-#define PXEBC_PRIVATE_GUID  \
-  { \
-    0xa4dfac32, 0xfbb4, 0x4907,{0xb3, 0x13, 0x4, 0xe, 0xe2, 0x42, 0x33, 0x20 }  \
-  }
-
-
 typedef union {
   PXEBC_DHCP4_PACKET_CACHE            Dhcp4;
   PXEBC_DHCP6_PACKET_CACHE            Dhcp6;

@@ -29,7 +29,6 @@
 
 EFI_HII_HANDLE      mHiiHandle;
 
-EFI_GUID            mEfiIfConfig6Guid     = EFI_IFCONFIG6_GUID;
 SHELL_PARAM_ITEM    mIfConfig6CheckList[] = {
   {
     L"-b",
