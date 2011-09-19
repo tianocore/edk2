@@ -579,8 +579,7 @@ RestoreS3PageTables (
       PageMapLevel4Entry->Bits.Present = 1;
 
       if (Page1GSupport) {
-        PageDirectory1GEntry = (VOID *) S3NvsPageTableAddress;
-        S3NvsPageTableAddress += SIZE_4KB;
+        PageDirectory1GEntry = (VOID *) PageDirectoryPointerEntry;
     
         for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
           //
