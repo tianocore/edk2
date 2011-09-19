@@ -45,6 +45,7 @@ from Common.BuildToolError import *
 from Common import EdkLogger
 from Common.Misc import PathClass
 from Common.String import NormPath
+from Common import GlobalData
 
 import re
 import os
@@ -2416,10 +2417,20 @@ class FdfParser:
         else:
             FfsFileObj.FileName = self.__Token
             if FfsFileObj.FileName.replace('$(WORKSPACE)', '').find('$') == -1:
-                #do case sensitive check for file path
-                ErrorCode, ErrorInfo = PathClass(NormPath(FfsFileObj.FileName), GenFdsGlobalVariable.WorkSpaceDir).Validate()
-                if ErrorCode != 0:
-                    EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
+                #
+                # For file in OUTPUT_DIRECTORY will not check whether it exist or not at AutoGen phase.
+                #
+                if not GlobalData.gAutoGenPhase:
+                    #do case sensitive check for file path
+                    ErrorCode, ErrorInfo = PathClass(NormPath(FfsFileObj.FileName), GenFdsGlobalVariable.WorkSpaceDir).Validate()
+                    if ErrorCode != 0:
+                        EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
+                else:
+                    if not InputMacroDict["OUTPUT_DIRECTORY"] in FfsFileObj.FileName:
+                        #do case sensitive check for file path
+                        ErrorCode, ErrorInfo = PathClass(NormPath(FfsFileObj.FileName), GenFdsGlobalVariable.WorkSpaceDir).Validate()
+                        if ErrorCode != 0:
+                            EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)                    
 
         if not self.__IsToken( "}"):
             raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)

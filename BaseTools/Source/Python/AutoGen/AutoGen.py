@@ -207,8 +207,13 @@ class WorkspaceAutoGen(AutoGen):
             # Make global macros available when parsing FDF file
             #
             InputMacroDict.update(self.BuildDatabase.WorkspaceDb._GlobalMacros)
+            #
+            # Mark now build in AutoGen Phase
+            #
+            GlobalData.gAutoGenPhase = True            
             Fdf = FdfParser(self.FdfFile.Path)
             Fdf.ParseFile()
+            GlobalData.gAutoGenPhase = False  
             PcdSet = Fdf.Profile.PcdDict
             ModuleList = Fdf.Profile.InfList
             self.FdfProfile = Fdf.Profile

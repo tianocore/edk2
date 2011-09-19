@@ -912,6 +912,10 @@ class Build():
                 EdkLogger.info("No flash definition file found. FV [%s] will be ignored." % " ".join(self.FvList))
                 self.FvList = []
         else:
+            #
+            # Mark now build in AutoGen Phase
+            #
+            GlobalData.gAutoGenPhase = True
             FdfParserObj = FdfParser(str(self.Fdf))
             for key in self.Db._GlobalMacros:
                 InputMacroDict[key] = self.Db._GlobalMacros[key]
@@ -920,6 +924,7 @@ class Build():
                 if fvname.upper() not in FdfParserObj.Profile.FvDict.keys():
                     EdkLogger.error("build", OPTION_VALUE_INVALID,
                                     "No such an FV in FDF file: %s" % fvname)
+            GlobalData.gAutoGenPhase = False
 
         #
         # Merge Arch
