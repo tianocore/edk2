@@ -1,20 +1,21 @@
-From 644bffcd6072feb1fa54b0f2e07cc2b40d79c489 Mon Sep 17 00:00:00 2001
+From 2f21435d2e226c25ef7dc7b0b5e254a1e516cd9f Mon Sep 17 00:00:00 2001
 From: Olivier Martin <olivier.martin@arm.com>
-Date: Tue, 30 Aug 2011 17:09:44 +0100
-Subject: Pending patches
+Date: Tue, 20 Sep 2011 16:56:44 +0100
+Subject: [PATCH] PendingPatch
 
 ---
  BaseTools/Conf/tools_def.template           |  136 ++++++++++++++++++++++++++-
  BaseTools/Source/C/GenFv/GenFv.c            |    2 +-
  BaseTools/Source/C/GenFv/GenFvInternalLib.c |   39 ++++----
- BaseTools/Source/Python/AutoGen/GenC.py     |   10 +-
- 4 files changed, 158 insertions(+), 29 deletions(-)
+ 3 files changed, 153 insertions(+), 24 deletions(-)
+ mode change 100644 => 100755 BaseTools/Source/C/GenFv/GenFv.c
+ mode change 100644 => 100755 BaseTools/Source/C/GenFv/GenFvInternalLib.c
 
 diff --git a/BaseTools/Conf/tools_def.template b/BaseTools/Conf/tools_def.template
-index f63fa7d..21d45af 100644
+index fe7900e..4c79fcb 100644
 --- a/BaseTools/Conf/tools_def.template
 +++ b/BaseTools/Conf/tools_def.template
-@@ -3030,6 +3030,45 @@ RELEASE_ICC11x86_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL
+@@ -3533,6 +3533,45 @@ NOOPT_ICC11x86_IPF_DLINK_FLAGS                = /NOLOGO /NODEFAULTLIB /LTCG /DLL
  *_ICC11x86_EBC_SLINK_FLAGS                = /lib /NOLOGO /MACHINE:EBC
  *_ICC11x86_EBC_DLINK_FLAGS                = "C:\Program Files (x86)\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP
  
@@ -60,7 +61,7 @@ index f63fa7d..21d45af 100644
  
  ####################################################################################
  #
-@@ -3462,7 +3501,7 @@ RELEASE_XCLANG_X64_CC_FLAGS   = -ccc-host-triple x86_64-pc-win32-macho -c    -Os
+@@ -3986,7 +4025,7 @@ RELEASE_XCLANG_X64_CC_FLAGS   = -ccc-host-triple x86_64-pc-win32-macho -c    -Os
  
  ####################################################################################
  #
@@ -69,7 +70,7 @@ index f63fa7d..21d45af 100644
  #
  ####################################################################################
  #   RVCT31         - Tools from ARM
-@@ -3502,7 +3541,7 @@ RELEASE_RVCT31_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90    -Ospac
+@@ -4026,7 +4065,7 @@ RELEASE_RVCT31_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90    -Ospac
  
  ####################################################################################
  #
@@ -78,7 +79,7 @@ index f63fa7d..21d45af 100644
  #
  ####################################################################################
  #   ARMCYGWIN         - Tools from ARM in a Cygwin environment
-@@ -3551,6 +3590,95 @@ RELEASE_RVCT31CYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM
+@@ -4075,6 +4114,95 @@ RELEASE_RVCT31CYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM
  
  ####################################################################################
  #
@@ -174,7 +175,7 @@ index f63fa7d..21d45af 100644
  # ARM GCC (www.codesourcery.com)
  #
  ####################################################################################
-@@ -3604,8 +3732,8 @@ RELEASE_ARMGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) -mlittle-endian
+@@ -4128,8 +4256,8 @@ RELEASE_ARMGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) -mlittle-endian
  *_ARMGCC_ARM_SLINK_FLAGS =  -rc
  *_ARMGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS)  --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
  
@@ -186,10 +187,12 @@ index f63fa7d..21d45af 100644
  #################
  # ASM 16 linker defintions
 diff --git a/BaseTools/Source/C/GenFv/GenFv.c b/BaseTools/Source/C/GenFv/GenFv.c
-index 2cb8771..4662461 100644
+old mode 100644
+new mode 100755
+index 8f452c7..a095220
 --- a/BaseTools/Source/C/GenFv/GenFv.c
 +++ b/BaseTools/Source/C/GenFv/GenFv.c
-@@ -598,7 +598,7 @@ Returns:
+@@ -597,7 +597,7 @@ Returns:
                );
    } else {
      VerboseMsg ("Create Fv image and its map file");
@@ -199,7 +202,9 @@ index 2cb8771..4662461 100644
      }
      //
 diff --git a/BaseTools/Source/C/GenFv/GenFvInternalLib.c b/BaseTools/Source/C/GenFv/GenFvInternalLib.c
-index 189dc43..496b96c 100644
+old mode 100644
+new mode 100755
+index d86909b..5aa1a08
 --- a/BaseTools/Source/C/GenFv/GenFvInternalLib.c
 +++ b/BaseTools/Source/C/GenFv/GenFvInternalLib.c
 @@ -209,6 +209,7 @@ Returns:
@@ -273,7 +278,7 @@ index 189dc43..496b96c 100644
    // Verify that we have enough space for the file header
    //
    if (((UINTN) FvImage->CurrentFilePointer + PadFileSize) > (UINTN) FvEnd) {
-@@ -1110,7 +1111,7 @@ Returns:
+@@ -1114,7 +1115,7 @@ Returns:
    //
    // Add pad file if necessary
    //
@@ -282,7 +287,7 @@ index 189dc43..496b96c 100644
    if (EFI_ERROR (Status)) {
      Error (NULL, 0, 4002, "Resource", "FV space is full, could not add pad file for data alignment property.");
      free (FileBuffer);
-@@ -2295,7 +2296,7 @@ Returns:
+@@ -2303,7 +2304,7 @@ Returns:
      //
      // Add FV Extended Header contents to the FV as a PAD file
      //
@@ -291,7 +296,7 @@ index 189dc43..496b96c 100644
  
      //
      // Fv Extension header change update Fv Header Check sum
-@@ -2820,7 +2821,7 @@ Returns:
+@@ -2828,7 +2829,7 @@ Returns:
    //
    // Don't need to relocate image when BaseAddress is not set.
    //
@@ -300,27 +305,6 @@ index 189dc43..496b96c 100644
      return EFI_SUCCESS;
    }
    XipBase = FvInfo->BaseAddress + XipOffset;
-diff --git a/BaseTools/Source/Python/AutoGen/GenC.py b/BaseTools/Source/Python/AutoGen/GenC.py
-index 4430c94..28dc5eb 100644
---- a/BaseTools/Source/Python/AutoGen/GenC.py
-+++ b/BaseTools/Source/Python/AutoGen/GenC.py
-@@ -67,11 +67,11 @@ typedef UINT8 SKU_ID;
- 
- #define PCD_TYPE_SHIFT        28
- 
--#define PCD_TYPE_DATA         (0x0 << PCD_TYPE_SHIFT)
--#define PCD_TYPE_HII          (0x8 << PCD_TYPE_SHIFT)
--#define PCD_TYPE_VPD          (0x4 << PCD_TYPE_SHIFT)
--#define PCD_TYPE_SKU_ENABLED  (0x2 << PCD_TYPE_SHIFT)
--#define PCD_TYPE_STRING       (0x1 << PCD_TYPE_SHIFT)
-+#define PCD_TYPE_DATA         (0x0u << PCD_TYPE_SHIFT)
-+#define PCD_TYPE_HII          (0x8u << PCD_TYPE_SHIFT)
-+#define PCD_TYPE_VPD          (0x4u << PCD_TYPE_SHIFT)
-+#define PCD_TYPE_SKU_ENABLED  (0x2u << PCD_TYPE_SHIFT)
-+#define PCD_TYPE_STRING       (0x1u << PCD_TYPE_SHIFT)
- 
- #define PCD_TYPE_ALL_SET      (PCD_TYPE_DATA | PCD_TYPE_HII | PCD_TYPE_VPD | PCD_TYPE_SKU_ENABLED | PCD_TYPE_STRING)
- 
 -- 
 1.7.5.1
 
