@@ -13,6 +13,7 @@
 **/
 
 #include <Uefi.h>
+#include <ShellBase.h>
 
 #include <Protocol/UnicodeCollation.h>
 #include <Protocol/DevicePath.h>
@@ -251,13 +252,19 @@ DevicePathCompare (
     FALSE,
     FALSE);
 
-  RetVal = mUnicodeCollation->StriColl(
-    mUnicodeCollation,
-    TextPath1,
-    TextPath2);
+  if (TextPath1 == NULL) {
+    RetVal = -1;
+  } else if (TextPath2 == NULL) {
+    RetVal = 1;
+  } else {
+    RetVal = mUnicodeCollation->StriColl(
+      mUnicodeCollation,
+      TextPath1,
+      TextPath2);
+  }
 
-  FreePool(TextPath1);
-  FreePool(TextPath2);
+  SHELL_FREE_NON_NULL(TextPath1);
+  SHELL_FREE_NON_NULL(TextPath2);
 
   return (RetVal);
 }
