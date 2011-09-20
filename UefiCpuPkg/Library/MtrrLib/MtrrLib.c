@@ -477,10 +477,12 @@ CombineMemoryAttribute (
   UINT64  MtrrEnd;
   UINT64  EndAddress;
   UINT32  FirmwareVariableMtrrCount;
+  BOOLEAN CoveredByExistingMtrr;
 
   FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCount ();
 
   *OverwriteExistingMtrr = FALSE;
+  CoveredByExistingMtrr = FALSE;
   EndAddress = *Base +*Length - 1;
 
   for (Index = 0; Index < FirmwareVariableMtrrCount; Index++) {
@@ -501,11 +503,12 @@ CombineMemoryAttribute (
     //
     if (Attributes == VariableMtrr[Index].Type) {
       //
-      // if the Mtrr range contain the request range, return RETURN_SUCCESS
+      // if the Mtrr range contain the request range, set a flag, then continue to 
+      // invalidate any MTRR of the same request range with higher priority cache type.
       //
       if (VariableMtrr[Index].BaseAddress <= *Base && MtrrEnd >= EndAddress) {
-        *Length = 0;
-        return RETURN_SUCCESS;
+        CoveredByExistingMtrr = TRUE;
+        continue;
       }
       //
       // invalid this MTRR, and program the combine range
@@ -550,6 +553,10 @@ CombineMemoryAttribute (
     // Other type memory overlap is invalid
     //
     return RETURN_ACCESS_DENIED;
+  }
+
+  if (CoveredByExistingMtrr) {
+    *Length = 0;
   }
 
   return RETURN_SUCCESS;
@@ -1007,8 +1014,9 @@ MtrrSetMemoryAttribute (
 
     if (Length == 0) {
       //
-      // Combined successfully
+      // Combined successfully, invalidate the now-unused MTRRs
       //
+      InvalidateMtrr(VariableMtrr);
       Status = RETURN_SUCCESS;
       goto Done;
     }
