@@ -359,7 +359,19 @@ ValidateAndCopyFiles(
       //
       // we have multiple files or a directory in the DestDir
       //
-      if (StrStr(DestDir, L":") == NULL) {
+      
+      //
+      // Check for leading slash
+      //
+      if (DestDir[0] == L'\\') {
+         //
+         // Copy to the root of CWD
+         //
+        StrCpy(DestPath, Cwd);
+        while (PathRemoveLastItem(DestPath));
+        StrCat(DestPath, DestDir+1);
+        StrCat(DestPath, Node->FileName);
+      } else if (StrStr(DestDir, L":") == NULL) {
         StrCpy(DestPath, Cwd);
         if (DestPath[StrLen(DestPath)-1] != L'\\' && DestDir[0] != L'\\') {
           StrCat(DestPath, L"\\");

@@ -112,7 +112,7 @@ PathCleanUpDirectories(
     CopyMem(Path+StrLen(Path), TempString, TempSize);
   }
   if ((TempString = StrStr(Path, L"\\.")) != NULL && *(TempString + 2) == CHAR_NULL) {
-    *TempString = CHAR_NULL;
+    *(TempString + 1) = CHAR_NULL;
   }
 
 

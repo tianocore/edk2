@@ -37,6 +37,7 @@ ShellCommandRunCd (
   SHELL_STATUS      ShellStatus;
   SHELL_FILE_HANDLE Handle;
   CONST CHAR16      *Param1;
+  CHAR16            *Param1Copy;
 
   ProblemParam = NULL;
   ShellStatus = SHELL_SUCCESS;
@@ -94,11 +95,13 @@ ShellCommandRunCd (
         ShellStatus = SHELL_NOT_FOUND;
       }
     } else {
-      if (StrCmp(Param1, L".") == 0) {
+      Param1Copy = CatSPrint(NULL, L"%s", Param1, NULL);
+      Param1Copy = PathCleanUpDirectories(Param1Copy);
+      if (StrCmp(Param1Copy, L".") == 0) {
         //
         // nothing to do... change to current directory
         //
-      } else if (StrCmp(Param1, L"..") == 0) {
+      } else if (StrCmp(Param1Copy, L"..") == 0) {
         //
         // Change up one directory...
         //
@@ -120,7 +123,7 @@ ShellCommandRunCd (
             ShellStatus = SHELL_NOT_FOUND;
           }
         }
-      } else if (StrCmp(Param1, L"\\") == 0) {
+      } else if (StrCmp(Param1Copy, L"\\") == 0) {
         //
         // Move to root of current drive
         //
@@ -142,18 +145,18 @@ ShellCommandRunCd (
             ShellStatus = SHELL_NOT_FOUND;
           }
         }
-      } else if (StrStr(Param1, L":") == NULL) {
+      } else if (StrStr(Param1Copy, L":") == NULL) {
         if (ShellGetCurrentDir(NULL) == NULL) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle);
           ShellStatus = SHELL_NOT_FOUND;
         } else {
           ASSERT((Drive == NULL && DriveSize == 0) || (Drive != NULL));
           Drive = StrnCatGrow(&Drive, &DriveSize, ShellGetCurrentDir(NULL), 0);
-          if (*Param1 == L'\\') {
+          if (*Param1Copy == L'\\') {
             while (PathRemoveLastItem(Drive)) ;
-            Drive = StrnCatGrow(&Drive, &DriveSize, Param1+1, 0);
+            Drive = StrnCatGrow(&Drive, &DriveSize, Param1Copy+1, 0);
           } else {
-            Drive = StrnCatGrow(&Drive, &DriveSize, Param1, 0);
+            Drive = StrnCatGrow(&Drive, &DriveSize, Param1Copy, 0);
           }
           //
           // Verify that this is a valid directory
@@ -185,12 +188,12 @@ ShellCommandRunCd (
         //
         // change directory on other drive letter
         //
-        Drive = AllocateZeroPool(StrSize(Param1));
+        Drive = AllocateZeroPool(StrSize(Param1Copy));
         if (Drive == NULL) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellLevel2HiiHandle);
           ShellStatus = SHELL_OUT_OF_RESOURCES;
         } else {
-          Drive = StrCpy(Drive, Param1);
+          Drive = StrCpy(Drive, Param1Copy);
           Path = StrStr(Drive, L":");
           ASSERT(Path != NULL);
           if (*(Path+1) == CHAR_NULL) {
@@ -210,11 +213,12 @@ ShellCommandRunCd (
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
             Status = SHELL_NOT_FOUND;
           } else if (EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, Param1);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, Param1Copy);
             Status = SHELL_NOT_FOUND;
           }
         }
       }
+      FreePool(Param1Copy);
     }
   }
 
