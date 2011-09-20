@@ -39,6 +39,8 @@
 
 [Guids]
   gEfiVariableGuid
+  gDxeCoreFileNameGuid
+  gLdrMemoryDescriptorGuid
 
 [Sources]
   DxeIpl.h

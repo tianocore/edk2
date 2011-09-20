@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -22,9 +22,6 @@ Revision History:
 #include "PpisNeededByDxeCore.h"
 #include "FlashLayout.h"
 #include "Debug.h"
-
-#define EFI_DXE_FILE_GUID \
-  { 0xb1644c1a, 0xc16a, 0x4c5b, {0x88, 0xde, 0xea, 0xfb, 0xa9, 0x7e, 0x74, 0xd8 }}
 
 #define EFI_CPUID_EXTENDED_FUNCTION  0x80000000
 #define CPUID_EXTENDED_ADD_SIZE      0x80000008
@@ -188,7 +185,7 @@ HOB_TEMPLATE  gHobTemplate = {
         0, 0, 0, 0                                  // UINT8                 Reserved[4]; 
       },
     },
-    EFI_DXE_FILE_GUID,
+    DXE_CORE_FILE_NAME_GUID,
     0x0                                             //  EFI_PHYSICAL_ADDRESS of EntryPoint;
   },
   { // MemoryDxeCore
@@ -362,7 +359,7 @@ HOB_TEMPLATE  gHobTemplate = {
         sizeof (MEMORY_DESC_HOB),          // Hob size
         0                                  // reserved
       },
-      EFI_LDR_MEMORY_DESCRIPTOR_GUID
+      LDR_MEMORY_DESCRIPTOR_GUID
     },
     0,
     NULL

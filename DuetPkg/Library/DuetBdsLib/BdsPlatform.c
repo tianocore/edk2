@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -83,21 +83,6 @@ Returns:
   return ;
 }
 
-#define EFI_LDR_MEMORY_DESCRIPTOR_GUID \
-  { 0x7701d7e5, 0x7d1d, 0x4432, {0xa4, 0x68, 0x67, 0x3d, 0xab, 0x8a, 0xde, 0x60 }}
-
-EFI_GUID gEfiLdrMemoryDescriptorGuid = EFI_LDR_MEMORY_DESCRIPTOR_GUID;
-
-#pragma pack(1)
-
-typedef struct {
-  EFI_HOB_GUID_TYPE             Hob;
-  UINTN                         MemDescCount;
-  EFI_MEMORY_DESCRIPTOR         *MemDesc;
-} MEMORY_DESC_HOB;
-
-#pragma pack()
-
 #if 0
 VOID
 PrintMemoryMap (
@@ -154,7 +139,7 @@ UpdateMemoryMap (
   EFI_PHYSICAL_ADDRESS            Memory;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
   
-  GuidHob.Raw = GetFirstGuidHob (&gEfiLdrMemoryDescriptorGuid);
+  GuidHob.Raw = GetFirstGuidHob (&gLdrMemoryDescriptorGuid);
   if (GuidHob.Raw == NULL) {
     DEBUG ((EFI_D_ERROR, "Fail to get gEfiLdrMemoryDescriptorGuid from GUID HOB LIST!\n"));
     return;

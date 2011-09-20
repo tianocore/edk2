@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -51,6 +51,7 @@ Abstract:
 #include <Guid/HobList.h>
 #include <Guid/PciExpressBaseAddress.h>
 #include <Guid/GlobalVariable.h>
+#include <Guid/LdrMemoryDescriptor.h>
 
 extern BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
 extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformConnectSequence[];
