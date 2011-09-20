@@ -17,8 +17,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _EBC_SIMPLE_DEBUGGER_PROTOCOL_H_
 #define _EBC_SIMPLE_DEBUGGER_PROTOCOL_H_
 
-#include <Protocol\DebugSupport.h>
-#include <Protocol\EbcVmTest.h>
+#include <Protocol/DebugSupport.h>
+#include <Protocol/EbcVmTest.h>
 
 #define EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL_GUID \
   { \
