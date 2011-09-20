@@ -105,15 +105,15 @@ ConvertPpiPointers (
         if (Index < PrivateData->PpiData.PpiListEnd &&
             (UINTN)PpiPointer->Ppi->Ppi < OldHeapTop &&
             (UINTN)PpiPointer->Ppi->Ppi >= OldHeapBottom) {
-            //
-            // Convert the pointer to the PPI interface structure in the PPI descriptor
-            // from the old HOB heap to the relocated HOB heap.
-            //
-            if (PrivateData->HeapOffsetPositive) {
-              PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi + PrivateData->HeapOffset);
-            } else {
-              PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi - PrivateData->HeapOffset);
-            }
+          //
+          // Convert the pointer to the PPI interface structure in the PPI descriptor
+          // from the old HOB heap to the relocated HOB heap.
+          //
+          if (PrivateData->HeapOffsetPositive) {
+            PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi + PrivateData->HeapOffset);
+          } else {
+            PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi - PrivateData->HeapOffset);
+          }
         }
       } else if (((UINTN)PpiPointer->Raw < OldStackTop) && ((UINTN)PpiPointer->Raw >= OldStackBottom)) {
         //
@@ -124,6 +124,41 @@ ConvertPpiPointers (
           PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw + PrivateData->StackOffset);
         } else {
           PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw - PrivateData->StackOffset);
+        }
+
+        //
+        // Try to convert the pointers in the PEIM descriptor
+        //
+
+        if (((UINTN)PpiPointer->Ppi->Guid < OldStackTop) &&
+            ((UINTN)PpiPointer->Ppi->Guid >= OldStackBottom)) {
+          //
+          // Convert the pointer to the GUID in the PPI or NOTIFY descriptor
+          // from the the temporary stack to the permanent PEI stack.
+          //
+          if (PrivateData->StackOffsetPositive) {
+            PpiPointer->Ppi->Guid = (VOID *) ((UINTN)PpiPointer->Ppi->Guid + PrivateData->StackOffset);
+          } else {
+            PpiPointer->Ppi->Guid = (VOID *) ((UINTN)PpiPointer->Ppi->Guid - PrivateData->StackOffset);
+          }
+        }
+
+        //
+        // Assume that no code is located in the temporary memory, so the pointer to
+        // the notification function in the NOTIFY descriptor needs not be converted.
+        //
+        if (Index < PrivateData->PpiData.PpiListEnd &&
+            (UINTN)PpiPointer->Ppi->Ppi < OldStackTop &&
+            (UINTN)PpiPointer->Ppi->Ppi >= OldStackBottom) {
+          //
+          // Convert the pointer to the PPI interface structure in the PPI descriptor
+          // from the the temporary stack to the permanent PEI stack.
+          //
+          if (PrivateData->StackOffsetPositive) {
+            PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi + PrivateData->StackOffset);
+          } else {
+            PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi - PrivateData->StackOffset);
+          }
         }
       }
     }
