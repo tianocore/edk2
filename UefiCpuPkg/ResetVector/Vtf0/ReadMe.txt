@@ -30,7 +30,7 @@ EBP/RBP - Pointer to the start of the Boot Firmware Volume
 
 Dependencies:
 * Python 2.5~2.7
-* Nasm with x86-64 support
+* Nasm 2.03 or newer
 
 To rebuild the VTF0 binaries:
 1. Change to VTF0 source dir: UefiCpuPkg/ResetVector/Vtf0
