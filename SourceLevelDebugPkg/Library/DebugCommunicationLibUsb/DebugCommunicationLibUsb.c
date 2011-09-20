@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on usb debug port.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -285,6 +285,7 @@ UsbDebugPortIn (
   }
 
   *Length = (UINT8)(MmioRead32((UINTN)&DebugPortRegister->ControlStatus) & 0xF);
+  ASSERT (*Length <= 8);
   for (Index = 0; Index < *Length; Index++) {
     Buffer[Index] = DebugPortRegister->DataBuffer[Index];
   }
@@ -402,6 +403,7 @@ UsbDebugPortControlTransfer (
 {
   RETURN_STATUS          Status;
   UINT8                  Temp;
+  UINT8                  ReturnStatus[8];
 
   //
   // Setup Phase
@@ -414,7 +416,7 @@ UsbDebugPortControlTransfer (
   //
   // Data Phase
   //
-  if (SetupPacket->Length != 0) {
+  if (DataLength != 0) {
     if ((SetupPacket->RequestType & BIT7) != 0) {
       //
       // Get Data From Device
@@ -446,7 +448,7 @@ UsbDebugPortControlTransfer (
     //
     // For WRITE operation, Data Toggle in Status Phase Should be 1.
     //
-    Status = UsbDebugPortIn(DebugPortRegister, NULL, &Temp, INPUT_PID, Addr, Ep, 1);
+    Status = UsbDebugPortIn(DebugPortRegister, ReturnStatus, &Temp, INPUT_PID, Addr, Ep, 1);
   }
 
   return Status;
@@ -641,11 +643,11 @@ InitializeUsbDebugHardware (
     //
     return Status;
   }
-
+  ASSERT (Length == sizeof(USB_DEBUG_PORT_DESCRIPTOR));
   //
   // set usb debug device address as 0x7F.
   //
-  Status = UsbDebugPortControlTransfer (UsbDebugPortRegister, &mSetDebugAddress, 0x0, 0x0, (UINT8*)&UsbDebugPortDescriptor, &Length);
+  Status = UsbDebugPortControlTransfer (UsbDebugPortRegister, &mSetDebugAddress, 0x0, 0x0, NULL, NULL);
   if (RETURN_ERROR(Status)) {
     //
     // The device can not work well.
