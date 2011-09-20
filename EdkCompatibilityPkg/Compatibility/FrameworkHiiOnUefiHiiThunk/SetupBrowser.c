@@ -2,7 +2,7 @@
 Framework to UEFI 2.1 Setup Browser Thunk. The file consume EFI_FORM_BROWSER2_PROTOCOL
 to produce a EFI_FORM_BROWSER_PROTOCOL.
 
-Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "HiiDatabase.h"
 #include "SetupBrowser.h"
 
-EFI_GUID gFrameworkBdsFrontPageFormsetGuid = FRAMEWORK_BDS_FRONTPAGE_FORMSET_GUID;
 EFI_HII_HANDLE gStringPackHandle = NULL;
 BOOLEAN mFrontPageDisplayed = FALSE;
 //
