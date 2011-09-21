@@ -221,11 +221,13 @@ S3CreateIdentityMappingPageTables (
     PAGE_TABLE_1G_ENTRY                           *PageDirectory1GEntry;
 
     Page1GSupport = FALSE;
-    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-    if (RegEax >= 0x80000001) {
-      AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
-      if ((RegEdx & BIT26) != 0) {
-        Page1GSupport = TRUE;
+    if (PcdGetBool(PcdUse1GPageTable)) {
+      AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+      if (RegEax >= 0x80000001) {
+        AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+        if ((RegEdx & BIT26) != 0) {
+          Page1GSupport = TRUE;
+        }
       }
     }
 

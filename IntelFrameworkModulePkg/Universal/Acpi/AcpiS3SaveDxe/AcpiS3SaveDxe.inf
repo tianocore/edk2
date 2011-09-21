@@ -73,6 +73,7 @@
 [Pcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3AcpiReservedMemorySize    ## CONSUMES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
 
 [Depex]
   #

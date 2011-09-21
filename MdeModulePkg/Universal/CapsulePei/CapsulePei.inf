@@ -68,6 +68,9 @@
 [Pcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleCoalesceFile
 
+[Pcd.IA32]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
+
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
