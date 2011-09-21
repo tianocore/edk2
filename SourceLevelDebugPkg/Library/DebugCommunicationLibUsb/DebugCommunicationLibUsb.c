@@ -285,7 +285,10 @@ UsbDebugPortIn (
   }
 
   *Length = (UINT8)(MmioRead32((UINTN)&DebugPortRegister->ControlStatus) & 0xF);
-  ASSERT (*Length <= 8);
+  if (*Length > 8) {
+    return RETURN_DEVICE_ERROR;
+  }
+
   for (Index = 0; Index < *Length; Index++) {
     Buffer[Index] = DebugPortRegister->DataBuffer[Index];
   }
@@ -643,7 +646,11 @@ InitializeUsbDebugHardware (
     //
     return Status;
   }
-  ASSERT (Length == sizeof(USB_DEBUG_PORT_DESCRIPTOR));
+
+  if (Length != sizeof(USB_DEBUG_PORT_DESCRIPTOR)) {
+    return RETURN_DEVICE_ERROR;
+  }
+
   //
   // set usb debug device address as 0x7F.
   //
