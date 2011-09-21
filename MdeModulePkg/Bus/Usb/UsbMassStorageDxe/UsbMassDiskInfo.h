@@ -12,6 +12,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+#ifndef _EFI_USBMASS_DISKINFO_H_
+#define _EFI_USBMASS_DISKINFO_H_
+
 /**
   Initialize the installation of DiskInfo protocol.
 
@@ -123,3 +126,4 @@ UsbDiskInfoWhichIde (
   OUT UINT32                   *IdeDevice
   );
 
+#endif

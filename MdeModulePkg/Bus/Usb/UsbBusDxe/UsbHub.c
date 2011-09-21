@@ -205,7 +205,6 @@ UsbHubCtrlClearTTBuffer (
 
   @param  HubDev                The hub device.
   @param  Buf                   The buffer to hold the descriptor.
-  @param  Len                   The length to retrieve.
 
   @retval EFI_SUCCESS           The hub descriptor is retrieved.
   @retval Others                Failed to retrieve the hub descriptor.
