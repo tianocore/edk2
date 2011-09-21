@@ -207,7 +207,9 @@ HashPeImage (
   EFI_IMAGE_SECTION_HEADER  *SectionHeader;
   UINTN                     Index;
   UINTN                     Pos;
-
+  UINTN                     SumOfSectionBytes;
+  EFI_IMAGE_SECTION_HEADER  *SectionCache;  
+  
   HashCtx       = NULL;
   SectionHeader = NULL;
   Status        = FALSE;
@@ -234,7 +236,9 @@ HashPeImage (
   CtxSize   = mHash[HashAlg].GetContextSize();
   
   HashCtx = AllocatePool (CtxSize);
-  ASSERT (HashCtx != NULL);
+  if (HashCtx == NULL) {
+    return FALSE;
+  }
 
   // 1.  Load the image header into memory.
 
@@ -259,11 +263,17 @@ HashPeImage (
     // Use PE32 offset.
     //
     HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32->OptionalHeader.CheckSum) - HashBase);
-  } else {
+  } else if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
     //
     // Use PE32+ offset.
     //
     HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32Plus->OptionalHeader.CheckSum) - HashBase);
+  } else {
+    //
+    // Invalid header magic number.
+    //
+    Status = FALSE;
+    goto Done;
   }
 
   Status  = mHash[HashAlg].HashUpdate(HashCtx, HashBase, HashSize);
@@ -330,20 +340,7 @@ HashPeImage (
     SumOfBytesHashed = mNtHeader.Pe32Plus->OptionalHeader.SizeOfHeaders;
   }
 
-  //
-  // 11. Build a temporary table of pointers to all the IMAGE_SECTION_HEADER
-  //     structures in the image. The 'NumberOfSections' field of the image
-  //     header indicates how big the table should be. Do not include any
-  //     IMAGE_SECTION_HEADERs in the table whose 'SizeOfRawData' field is zero.
-  //
-  SectionHeader = (EFI_IMAGE_SECTION_HEADER *) AllocateZeroPool (sizeof (EFI_IMAGE_SECTION_HEADER) * mNtHeader.Pe32->FileHeader.NumberOfSections);
-  ASSERT (SectionHeader != NULL);
-  //
-  // 12.  Using the 'PointerToRawData' in the referenced section headers as
-  //      a key, arrange the elements in the table in ascending order. In other
-  //      words, sort the section headers according to the disk-file offset of
-  //      the section.
-  //
+
   Section = (EFI_IMAGE_SECTION_HEADER *) (
                mImageBase +
                mPeCoffHeaderOffset +
@@ -351,6 +348,38 @@ HashPeImage (
                sizeof (EFI_IMAGE_FILE_HEADER) +
                mNtHeader.Pe32->FileHeader.SizeOfOptionalHeader
                );
+
+  SectionCache = Section;
+  for (Index = 0, SumOfSectionBytes = 0; Index < mNtHeader.Pe32->FileHeader.NumberOfSections; Index++, SectionCache++) {
+    SumOfSectionBytes += SectionCache->SizeOfRawData;
+  }
+  
+  //
+  // Sanity check for file corruption. Sections raw data size should be smaller
+  // than Image Size.
+  //
+  if (SumOfSectionBytes >= mImageSize) {
+    Status = FALSE;
+    goto Done;
+  }
+
+  //
+  // 11. Build a temporary table of pointers to all the IMAGE_SECTION_HEADER
+  //     structures in the image. The 'NumberOfSections' field of the image
+  //     header indicates how big the table should be. Do not include any
+  //     IMAGE_SECTION_HEADERs in the table whose 'SizeOfRawData' field is zero.
+  //
+  SectionHeader = (EFI_IMAGE_SECTION_HEADER *) AllocateZeroPool (sizeof (EFI_IMAGE_SECTION_HEADER) * mNtHeader.Pe32->FileHeader.NumberOfSections);
+  if (SectionHeader == NULL) {
+    Status = FALSE;
+    goto Done;
+  }
+  //
+  // 12.  Using the 'PointerToRawData' in the referenced section headers as
+  //      a key, arrange the elements in the table in ascending order. In other
+  //      words, sort the section headers according to the disk-file offset of
+  //      the section.
+  //
   for (Index = 0; Index < mNtHeader.Pe32->FileHeader.NumberOfSections; Index++) {
     Pos = Index;
     while ((Pos > 0) && (Section->PointerToRawData < SectionHeader[Pos - 1].PointerToRawData)) {
@@ -532,7 +561,6 @@ AddImageExeInfo (
   IN       UINTN                            SignatureSize
   )
 {
-  EFI_STATUS                      Status;
   EFI_IMAGE_EXECUTION_INFO_TABLE  *ImageExeInfoTable;
   EFI_IMAGE_EXECUTION_INFO_TABLE  *NewImageExeInfoTable;
   EFI_IMAGE_EXECUTION_INFO        *ImageExeInfoEntry;
@@ -541,12 +569,15 @@ AddImageExeInfo (
   UINTN                           NameStringLen;
   UINTN                           DevicePathSize;
 
-  ASSERT (DevicePath != NULL);
   ImageExeInfoTable     = NULL;
   NewImageExeInfoTable  = NULL;
   ImageExeInfoEntry     = NULL;
   NameStringLen         = 0;
 
+  if (DevicePath == NULL) {
+    return ;
+  }
+  
   if (Name != NULL) {
     NameStringLen = StrSize (Name);
   }
@@ -570,7 +601,9 @@ AddImageExeInfo (
   DevicePathSize            = GetDevicePathSize (DevicePath);
   NewImageExeInfoEntrySize  = sizeof (EFI_IMAGE_EXECUTION_INFO) + NameStringLen + DevicePathSize + SignatureSize;
   NewImageExeInfoTable      = (EFI_IMAGE_EXECUTION_INFO_TABLE *) AllocateRuntimePool (ImageExeInfoTableSize + NewImageExeInfoEntrySize);
-  ASSERT (NewImageExeInfoTable != NULL);
+  if (NewImageExeInfoTable == NULL) {
+    return ;
+  }
 
   if (ImageExeInfoTable != NULL) {
     CopyMem (NewImageExeInfoTable, ImageExeInfoTable, ImageExeInfoTableSize);
@@ -603,8 +636,8 @@ AddImageExeInfo (
   //
   // Update/replace the image execution table.
   //
-  Status = gBS->InstallConfigurationTable (&gEfiImageSecurityDatabaseGuid, (VOID *) NewImageExeInfoTable);
-  ASSERT_EFI_ERROR (Status);
+  gBS->InstallConfigurationTable (&gEfiImageSecurityDatabaseGuid, (VOID *) NewImageExeInfoTable);
+  
   //
   // Free Old table data!
   //
@@ -707,7 +740,9 @@ IsSignatureFoundInDatabase (
   }
 
   Data = (UINT8 *) AllocateZeroPool (DataSize);
-  ASSERT (Data != NULL);
+  if (Data == NULL) {
+    return FALSE;
+  }
 
   Status = gRT->GetVariable (VariableName, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, Data);
   if (EFI_ERROR (Status)) {
@@ -755,7 +790,7 @@ Done:
 
   @retval EFI_SUCCESS                 Image pass verification.
   @retval EFI_SECURITY_VIOLATION      Image fail verification.
-  @retval other error value
+  @retval EFI_OUT_OF_RESOURCE         Fail to allocate memory.
 
 **/
 EFI_STATUS 
@@ -769,13 +804,15 @@ VerifyCertPkcsSignedData (
   EFI_SIGNATURE_LIST        *CertList;
   EFI_SIGNATURE_DATA        *Cert;
   UINTN                     DataSize;
-  UINT8                     *Data;
+  UINT8                     *KekData;
+  UINT8                     *DbData;
   UINT8                     *RootCert;
   UINTN                     RootCertSize;
   UINTN                     Index;
   UINTN                     CertCount;
 
-  Data                   = NULL;
+  KekData                = NULL;
+  DbData                 = NULL;
   CertList               = NULL;
   Cert                   = NULL;
   RootCert               = NULL;
@@ -789,10 +826,12 @@ VerifyCertPkcsSignedData (
   DataSize = 0;
   Status   = gRT->GetVariable (EFI_KEY_EXCHANGE_KEY_NAME, &gEfiGlobalVariableGuid, NULL, &DataSize, NULL);
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    Data = (UINT8 *)AllocateZeroPool (DataSize);
-    ASSERT (Data != NULL);
+    KekData = (UINT8 *)AllocateZeroPool (DataSize);
+    if (KekData == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
 
-    Status = gRT->GetVariable (EFI_KEY_EXCHANGE_KEY_NAME, &gEfiGlobalVariableGuid, NULL, &DataSize, (VOID *)Data);
+    Status = gRT->GetVariable (EFI_KEY_EXCHANGE_KEY_NAME, &gEfiGlobalVariableGuid, NULL, &DataSize, (VOID *)KekData);
     if (EFI_ERROR (Status)) {
       goto Done;
     }
@@ -800,7 +839,7 @@ VerifyCertPkcsSignedData (
     //
     // Find Cert Enrolled in KEK database to verify the signature in pkcs7 signed data.
     // 
-    CertList = (EFI_SIGNATURE_LIST *) Data;
+    CertList = (EFI_SIGNATURE_LIST *) KekData;
     while ((DataSize > 0) && (DataSize >= CertList->SignatureListSize)) {
       if (CompareGuid (&CertList->SignatureType, &gEfiCertX509Guid)) {
         Cert          = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
@@ -843,10 +882,12 @@ VerifyCertPkcsSignedData (
   DataSize = 0;
   Status   = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, NULL);
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    Data = (UINT8 *)AllocateZeroPool (DataSize);
-    ASSERT (Data != NULL);
+    DbData = (UINT8 *)AllocateZeroPool (DataSize);
+    if (DbData == NULL) {
+      goto Done;
+    }
 
-    Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, (VOID *)Data);
+    Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, (VOID *)DbData);
     if (EFI_ERROR (Status)) {
       goto Done;
     }
@@ -854,7 +895,7 @@ VerifyCertPkcsSignedData (
     //
     // Find Cert Enrolled in DB database to verify the signature in pkcs7 signed data.
     // 
-    CertList = (EFI_SIGNATURE_LIST *) Data;
+    CertList = (EFI_SIGNATURE_LIST *) DbData;
     while ((DataSize > 0) && (DataSize >= CertList->SignatureListSize)) {
       if (CompareGuid (&CertList->SignatureType, &gEfiCertX509Guid)) {
         Cert          = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
@@ -890,8 +931,12 @@ VerifyCertPkcsSignedData (
   }
 
 Done:
-  if (Data != NULL) {
-    FreePool (Data);
+  if (KekData != NULL) {
+    FreePool (KekData);
+  }
+
+  if (DbData != NULL) {
+    FreePool (DbData);
   }
 
   if (VerifyStatus) {
@@ -992,7 +1037,11 @@ VerifyCertUefiGuid (
   // Verify the data payload.
   //
   Rsa = RsaNew ();
-  ASSERT (Rsa != NULL);
+  if (Rsa == NULL) {
+    Status = FALSE;
+    goto Done;
+  }
+  
   // 
   // Set RSA Key Components.
   // NOTE: Only N and E are needed to be set as RSA public key for signature verification.
@@ -1048,7 +1097,8 @@ Done:
 
   @retval EFI_SUCCESS            The file specified by File did authenticate, and the
                                  platform policy dictates that the DXE Core may use File.
-  @retval EFI_INVALID_PARAMETER  File is NULL.
+  @retval EFI_INVALID_PARAMETER  Input argument is incorrect.
+  @retval EFI_OUT_RESOURCE       Fail to allocate memory.
   @retval EFI_SECURITY_VIOLATION The file specified by File did not authenticate, and
                                  the platform policy dictates that File should be placed
                                  in the untrusted state. A file may be promoted from
@@ -1143,7 +1193,10 @@ DxeImageVerificationHandler (
   //
   // Read the Dos header.
   //
-  ASSERT (FileBuffer != NULL);
+  if (FileBuffer == NULL) {
+    FreePool (SetupMode);
+    return EFI_INVALID_PARAMETER;
+  }
   mImageBase  = (UINT8 *) FileBuffer;
   mImageSize  = FileSize;
   DosHdr      = (EFI_IMAGE_DOS_HEADER *) (mImageBase);
@@ -1173,11 +1226,25 @@ DxeImageVerificationHandler (
     // Use PE32 offset.
     //
     mSecDataDir = (EFI_IMAGE_DATA_DIRECTORY *)&mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY];
-  } else {
+  } else if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
     //
     // Use PE32+ offset.
     //
     mSecDataDir = (EFI_IMAGE_DATA_DIRECTORY *)&mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY];
+  } else {
+    //
+    // Invalid header magic number.
+    //
+    Status       = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if (mSecDataDir->VirtualAddress >= mImageSize) {
+    //
+    // Sanity check to see if this file is corrupted.
+    //
+    Status       = EFI_INVALID_PARAMETER;
+    goto Done;
   }
 
   if (mSecDataDir->Size == 0) {
@@ -1233,7 +1300,10 @@ DxeImageVerificationHandler (
   //
   SignatureListSize = sizeof (EFI_SIGNATURE_LIST) + sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize;
   SignatureList     = (EFI_SIGNATURE_LIST *) AllocateZeroPool (SignatureListSize);
-  ASSERT (SignatureList != NULL);
+  if (SignatureList == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
+  }
   SignatureList->SignatureHeaderSize  = 0;
   SignatureList->SignatureListSize    = (UINT32) SignatureListSize;
   SignatureList->SignatureSize        = (UINT32) mImageDigestSize;
