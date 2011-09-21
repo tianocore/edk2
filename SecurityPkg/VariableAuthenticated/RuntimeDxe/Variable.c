@@ -199,7 +199,9 @@ UpdateVariableStore (
   // Check if the Data is Volatile.
   //
   if (!Volatile) {
-    ASSERT (Fvb != NULL);
+    if (Fvb == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
     Status = Fvb->GetPhysicalAddress(Fvb, &FvVolHdr);
     ASSERT_EFI_ERROR (Status);
 
@@ -1048,7 +1050,9 @@ VariableGetBestLanguage (
   CONST CHAR8  *Supported;
   CHAR8        *Buffer;
 
-  ASSERT (SupportedLanguages != NULL);
+  if (SupportedLanguages == NULL) {
+    return NULL;
+  }
 
   VA_START (Args, Iso639Language);
   while ((Language = VA_ARG (Args, CHAR8 *)) != NULL) {

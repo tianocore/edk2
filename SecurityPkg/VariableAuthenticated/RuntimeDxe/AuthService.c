@@ -1046,19 +1046,37 @@ VerifyTimeBasedPayload (
     //
     return EFI_SECURITY_VIOLATION;
   }
-
+ 
   //
   // Find out Pkcs7 SignedData which follows the EFI_VARIABLE_AUTHENTICATION_2 descriptor.
   // AuthInfo.Hdr.dwLength is the length of the entire certificate, including the length of the header.
   //
-  SigData = (UINT8*) ((UINTN)Data + (UINTN)(((EFI_VARIABLE_AUTHENTICATION_2 *) 0)->AuthInfo.CertData));
-  SigDataSize = CertData->AuthInfo.Hdr.dwLength - (UINT32)(UINTN)(((WIN_CERTIFICATE_UEFI_GUID *) 0)->CertData);
+  SigData = (UINT8*) ((UINTN)Data + OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo) + OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData));
+
+  //
+  // Sanity check to avoid corrupted certificate input.
+  //
+  if (CertData->AuthInfo.Hdr.dwLength < (UINT32)(OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData))) {
+    return EFI_SECURITY_VIOLATION;
+  }
+
+
+
+  SigDataSize = CertData->AuthInfo.Hdr.dwLength - (UINT32)(OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData));
   
   //
   // Find out the new data payload which follows Pkcs7 SignedData directly.
   //
   PayLoadPtr = (UINT8*) ((UINTN) SigData + (UINTN) SigDataSize);
-  PayLoadSize = DataSize - (UINTN)(((EFI_VARIABLE_AUTHENTICATION_2 *) 0)->AuthInfo.CertData) - (UINTN) SigDataSize;
+
+  //
+  // Sanity check to avoid corrupted certificate input.
+  //
+  if (DataSize < (OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo) + OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData)+ (UINTN) SigDataSize)) {
+    return EFI_SECURITY_VIOLATION;
+  }
+  
+  PayLoadSize = DataSize - OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo) - OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData) - (UINTN) SigDataSize;
 
 
   //

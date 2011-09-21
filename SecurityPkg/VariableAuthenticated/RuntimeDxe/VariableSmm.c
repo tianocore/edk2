@@ -241,17 +241,18 @@ GetFvbCountAndBuffer (
 /**
   Get the variable statistics information from the information buffer pointed by gVariableInfo.
 
-  @param[in, out]  InfoEntry   A pointer to the buffer of variable information entry.
-                               On input, point to the variable information returned last time. if 
-                               InfoEntry->VendorGuid is zero, return the first information.
-                               On output, point to the next variable information.
-  @param[in, out]  InfoSize    On input, the size of the variable information buffer.
-                               On output, the returned variable information size.
+  @param[in, out]  InfoEntry    A pointer to the buffer of variable information entry.
+                                On input, point to the variable information returned last time. if 
+                                InfoEntry->VendorGuid is zero, return the first information.
+                                On output, point to the next variable information.
+  @param[in, out]  InfoSize     On input, the size of the variable information buffer.
+                                On output, the returned variable information size.
 
-  @retval EFI_SUCCESS          The variable information is found and returned successfully.
-  @retval EFI_UNSUPPORTED      No variable inoformation exists in variable driver. The 
-                               PcdVariableCollectStatistics should be set TRUE to support it.
-  @retval EFI_BUFFER_TOO_SMALL The buffer is too small to hold the next variable information.
+  @retval EFI_SUCCESS           The variable information is found and returned successfully.
+  @retval EFI_UNSUPPORTED       No variable inoformation exists in variable driver. The 
+                                PcdVariableCollectStatistics should be set TRUE to support it.
+  @retval EFI_BUFFER_TOO_SMALL  The buffer is too small to hold the next variable information.
+  @retval EFI_INVALID_PARAMETER Input parameter is invalid.
 
 **/
 EFI_STATUS
@@ -265,7 +266,10 @@ SmmVariableGetStatistics (
   UINTN                                                StatisticsInfoSize;
   CHAR16                                               *InfoName;
  
-  ASSERT (InfoEntry != NULL);
+  if (InfoEntry == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
   VariableInfo = gVariableInfo; 
   if (VariableInfo == NULL) {
     return EFI_UNSUPPORTED;
@@ -348,6 +352,8 @@ SmmVariableGetStatistics (
   @retval EFI_WARN_INTERRUPT_SOURCE_PENDING   The interrupt is still pending and other handlers should still 
                                               be called.
   @retval EFI_INTERRUPT_PENDING               The interrupt could not be quiesced.
+  @retval EFI_INVALID_PARAMETER               Input parameter is invalid.
+
 **/
 EFI_STATUS
 EFIAPI
@@ -366,7 +372,9 @@ SmmVariableHandler (
   VARIABLE_INFO_ENTRY                              *VariableInfo;
   UINTN                                            InfoSize;
 
-  ASSERT (CommBuffer != NULL);
+  if (CommBuffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   SmmVariableFunctionHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *)CommBuffer;
   switch (SmmVariableFunctionHeader->Function) {
