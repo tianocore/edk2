@@ -43,6 +43,9 @@
 #define EFI_VARIABLE_RUNTIME_ACCESS     0x00000004
 #define EFI_VARIABLE_READ_ONLY          0x00000008
 
+#define EFI_USER_INFO_ACCESS_SETUP_ADMIN_GUID \
+  { 0x85b75607, 0xf7ce, 0x471e, { 0xb7, 0xe4, 0x2a, 0xea, 0x5f, 0x72, 0x32, 0xee } }
+
 //
 // Labels definition
 //

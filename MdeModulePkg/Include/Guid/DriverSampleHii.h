@@ -25,9 +25,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     0xb3f56470, 0x6141, 0x4621, {0x8f, 0x19, 0x70, 0x4e, 0x57, 0x7a, 0xa9, 0xe8} \
   }
 
-#define EFI_USER_INFO_ACCESS_SETUP_ADMIN_GUID \
-  { 0x85b75607, 0xf7ce, 0x471e, { 0xb7, 0xe4, 0x2a, 0xea, 0x5f, 0x72, 0x32, 0xee } }
-
 #define EFI_IFR_REFRESH_ID_OP_GUID \
   { \
     0xF5E655D9, 0x02A6, 0x46f2, {0x9E, 0x76, 0xB8, 0xBE, 0x8E, 0x60, 0xAB, 0x22} \
@@ -35,7 +32,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 extern EFI_GUID gDriverSampleFormSetGuid;
 extern EFI_GUID gDriverSampleInventoryGuid;
-extern EFI_GUID gEfiUserInfoAccessSetupAdminGuid;
 extern EFI_GUID gEfiIfrRefreshIdOpGuid;
 
 #endif
