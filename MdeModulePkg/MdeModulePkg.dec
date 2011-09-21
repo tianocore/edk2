@@ -780,6 +780,9 @@
   #  make sure the memory size is large enough to meet capsule PEI requiremnt in capsule update path.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsulePeiLongModeStackSize|0x8000|UINT32|0x0001005D
 
+  ## This PCD specifies whether 1G page table is enabled.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|FALSE|BOOLEAN|0x0001005E
+
 [PcdsPatchableInModule]
   ## Specify  memory size with page number for PEI code when 
   #  the feature of Loading Module at Fixed Address is enabled
@@ -803,8 +806,4 @@
   #  only for DxeS3BootScriptLib instance implementation purpose. The platform developer should make sure the
   #  default value is set to Zero. And the PCD is assumed ONLY to be accessed in DxeS3BootScriptLib Library.
   gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateDataPtr|0x0|UINT64|0x00030000
-
-[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx, PcdsDynamicHii]
-  ## This PCD specifies whether 1G page table is enabled.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|FALSE|BOOLEAN|0x30000047
 
