@@ -18,6 +18,8 @@
 #include <Uefi.h>
 #include <ShellBase.h>
 
+#include <Guid/ShellLibHiiGuid.h>
+
 #include <Protocol/EfiShell.h>
 #include <Protocol/EfiShellParameters.h>
 #include <Protocol/DevicePath.h>

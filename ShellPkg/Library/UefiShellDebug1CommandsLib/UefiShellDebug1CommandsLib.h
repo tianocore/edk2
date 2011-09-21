@@ -22,6 +22,7 @@
 #include <Guid/ConsoleInDevice.h>
 #include <Guid/ConsoleOutDevice.h>
 #include <Guid/FileSystemInfo.h>
+#include <Guid/ShellLibHiiGuid.h>
 
 #include <Protocol/EfiShell.h>
 #include <Protocol/EfiShellParameters.h>
@@ -60,7 +61,6 @@
 
 
 extern        EFI_HANDLE                        gShellDebug1HiiHandle;
-extern CONST  EFI_GUID                          gShellDebug1HiiGuid;
 
 /**
   Function printing hex output to the console.

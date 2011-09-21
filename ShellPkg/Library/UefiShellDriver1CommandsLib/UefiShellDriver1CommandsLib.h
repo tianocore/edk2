@@ -21,6 +21,7 @@
 #include <Guid/GlobalVariable.h>
 #include <Guid/ConsoleInDevice.h>
 #include <Guid/ConsoleOutDevice.h>
+#include <Guid/ShellLibHiiGuid.h>
 
 #include <Protocol/EfiShell.h>
 #include <Protocol/EfiShellParameters.h>
@@ -57,7 +58,6 @@
 
 
 extern        EFI_HANDLE                        gShellDriver1HiiHandle;
-extern CONST  EFI_GUID                          gShellDriver1HiiGuid;
 extern        BOOLEAN                           gInReconnect;
 
 /**

@@ -16,10 +16,6 @@
 
 STATIC CONST CHAR16 mFileName[] = L"ShellCommands";
 EFI_HANDLE gShellInstall1HiiHandle = NULL;
-CONST EFI_GUID gShellInstall1HiiGuid = \
-  { \
-    0x7d574d54, 0xd364, 0x4d4a, { 0x95, 0xe3, 0x49, 0x45, 0xdb, 0x7a, 0xd3, 0xee } \
-  };
 
 /**
   Function to get the filename with help context if HII will not be used.

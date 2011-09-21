@@ -82,3 +82,4 @@
 [Guids]
   gEfiFileSystemInfoGuid
   gEfiFileInfoGuid
+  gShellLevel2HiiGuid

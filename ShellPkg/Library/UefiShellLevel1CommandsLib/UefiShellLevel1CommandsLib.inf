@@ -54,3 +54,6 @@
 
 [Pcd.common]
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel # ALWAYS_CONSUMED
+
+[Guids]
+  gShellLevel1HiiGuid

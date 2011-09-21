@@ -15,10 +15,6 @@
 
 CONST CHAR16 gShellLevel3FileName[] = L"ShellCommands";
 EFI_HANDLE gShellLevel3HiiHandle = NULL;
-STATIC CONST EFI_GUID gShellLevel3HiiGuid = \
-  { \
-    0x4344558d, 0x4ef9, 0x4725, { 0xb1, 0xe4, 0x33, 0x76, 0xe8, 0xd6, 0x97, 0x4f } \
-  };
 
 /**
   return the filename to get help from is not using HII.

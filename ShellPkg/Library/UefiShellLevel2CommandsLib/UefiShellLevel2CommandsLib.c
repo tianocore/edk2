@@ -36,10 +36,6 @@
 
 CONST CHAR16 mFileName[] = L"ShellCommands";
 EFI_HANDLE gShellLevel2HiiHandle = NULL;
-CONST EFI_GUID gShellLevel2HiiGuid = \
-  { \
-    0xf95a7ccc, 0x4c55, 0x4426, { 0xa7, 0xb4, 0xdc, 0x89, 0x61, 0x95, 0xb, 0xae } \
-  };
 
 /**
   Get the filename to get help text from if not using HII.

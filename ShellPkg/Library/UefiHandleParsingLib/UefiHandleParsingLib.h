@@ -24,6 +24,7 @@
 #include <Guid/GlobalVariable.h>
 #include <Guid/Gpt.h>
 #include <Guid/FileSystemInfo.h>
+#include <Guid/ShellLibHiiGuid.h>
 
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/LoadedImage.h>

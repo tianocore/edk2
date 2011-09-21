@@ -15,10 +15,6 @@
 
 CONST CHAR16 gShellNetwork1FileName[] = L"ShellCommands";
 EFI_HANDLE gShellNetwork1HiiHandle = NULL;
-STATIC CONST EFI_GUID gShellNetwork1HiiGuid = \
-  { \
-    0xf3d301bb, 0xf4a5, 0x45a8, { 0xb0, 0xb7, 0xfa, 0x99, 0x9c, 0x62, 0x37, 0xae } \
-  };
 
 /**
   return the file name of the help text file if not using HII.

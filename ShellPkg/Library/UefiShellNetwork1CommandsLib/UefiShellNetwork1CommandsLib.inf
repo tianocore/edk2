@@ -62,3 +62,6 @@
   gEfiIp6ProtocolGuid                           # SOMETIMES_CONSUMED
   gEfiIp6ServiceBindingProtocolGuid             # SOMETIMES_CONSUMED
   gEfiIp6ConfigProtocolGuid                     # SOMETIMES_CONSUMED
+  
+[Guids]
+  gShellNetwork1HiiGuid

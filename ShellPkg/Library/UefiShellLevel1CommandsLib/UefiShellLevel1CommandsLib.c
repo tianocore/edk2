@@ -16,11 +16,6 @@
 
 STATIC CONST CHAR16 mFileName[] = L"ShellCommands";
 EFI_HANDLE gShellLevel1HiiHandle = NULL;
-CONST EFI_GUID gShellLevel1HiiGuid = \
-  { \
-    0xdec5daa4, 0x6781, 0x4820, { 0x9c, 0x63, 0xa7, 0xb0, 0xe4, 0xf1, 0xdb, 0x31 }
-  };
-
 
 /**
   Return the help text filename.  Only used if no HII information found.

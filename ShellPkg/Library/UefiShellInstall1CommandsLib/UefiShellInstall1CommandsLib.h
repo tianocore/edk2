@@ -18,6 +18,8 @@
 #include <Uefi.h>
 #include <ShellBase.h>
 
+#include <Guid/ShellLibHiiGuid.h>
+
 #include <Protocol/EfiShell.h>
 #include <Protocol/EfiShellParameters.h>
 #include <Protocol/DevicePath.h>
@@ -40,7 +42,6 @@
 #include <Library/FileHandleLib.h>
 
 extern        EFI_HANDLE                        gShellInstall1HiiHandle;
-extern CONST  EFI_GUID                          gShellInstall1HiiGuid;
 
 /**
   Function for 'bcfg' command.

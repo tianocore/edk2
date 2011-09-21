@@ -14,11 +14,6 @@
 
 #include "UefiHandleParsingLib.h"
 
-
-STATIC CONST EFI_GUID mHandleParsingHiiGuid = \
-  { \
-  0xb8969637, 0x81de, 0x43af, { 0xbc, 0x9a, 0x24, 0xd9, 0x89, 0x13, 0xf2, 0xf6 } \
-  };
 EFI_HANDLE mHandleParsingHiiHandle;
 HANDLE_INDEX_LIST mHandleList = {{{NULL,NULL},0,0},0};
 
@@ -37,7 +32,7 @@ HandleParsingLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  mHandleParsingHiiHandle = HiiAddPackages (&mHandleParsingHiiGuid, gImageHandle, UefiHandleParsingLibStrings, NULL);
+  mHandleParsingHiiHandle = HiiAddPackages (&gHandleParsingHiiGuid, gImageHandle, UefiHandleParsingLibStrings, NULL);
   if (mHandleParsingHiiHandle == NULL) {
     return (EFI_DEVICE_ERROR);
   }

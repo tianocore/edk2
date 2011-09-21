@@ -26,6 +26,8 @@
 #include <Uefi.h>
 #include <ShellBase.h>
 
+#include <Guid/ShellLibHiiGuid.h>
+
 #include <Protocol/EfiShell.h>
 #include <Protocol/EfiShellParameters.h>
 #include <Protocol/DevicePath.h>
@@ -50,7 +52,6 @@
 
 extern CONST  CHAR16                            mFileName[];
 extern        EFI_HANDLE                        gShellLevel2HiiHandle;
-extern CONST  EFI_GUID                          gShellLevel2HiiGuid;
 
 /**
   Function for 'attrib' command.

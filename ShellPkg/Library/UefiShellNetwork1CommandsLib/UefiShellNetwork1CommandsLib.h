@@ -19,6 +19,8 @@
 #include <Uefi.h>
 #include <ShellBase.h>
 
+#include <Guid/ShellLibHiiGuid.h>
+
 #include <Protocol/Cpu.h>
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/Ip6.h>

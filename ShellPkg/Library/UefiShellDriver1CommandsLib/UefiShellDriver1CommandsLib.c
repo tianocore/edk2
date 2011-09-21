@@ -18,11 +18,6 @@ STATIC CONST CHAR16 mFileName[] = L"Driver1Commands";
 EFI_HANDLE gShellDriver1HiiHandle = NULL;
 BOOLEAN    gInReconnect = FALSE;
 
-CONST EFI_GUID gShellDriver1HiiGuid = \
-  { \
-  0xaf0b742, 0x63ec, 0x45bd, {0x8d, 0xb6, 0x71, 0xad, 0x7f, 0x2f, 0xe8, 0xe8} \
-  };
-
 /**
   Function to return the name of the file containing help if HII will not be used.
 

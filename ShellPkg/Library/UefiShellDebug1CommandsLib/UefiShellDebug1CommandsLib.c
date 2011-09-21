@@ -16,10 +16,6 @@
 
 STATIC CONST CHAR16 mFileName[] = L"Debug1Commands";
 EFI_HANDLE gShellDebug1HiiHandle = NULL;
-CONST EFI_GUID gShellDebug1HiiGuid = \
-  { \
-    0x25f200aa, 0xd3cb, 0x470a, { 0xbf, 0x51, 0xe7, 0xd1, 0x62, 0xd2, 0x2e, 0x6f } \
-  };
 
 /**
   Gets the debug file name.  This will be used if HII is not working.
