@@ -31,7 +31,6 @@
 
 
 [LibraryClasses.common]
-  BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
 
@@ -121,6 +120,9 @@
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
+
+  BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
+  FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
@@ -251,7 +253,11 @@
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport|FALSE
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
-  
+
+  ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
+  #  It could be set FALSE to save size.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
+
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"Beagle Board"
   
@@ -411,7 +417,12 @@
   MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
   EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
   
-  EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf 
+  EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
+  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf  
+  EmbeddedPkg/SerialDxe/SerialDxe.inf
+  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf 
 #
 # This version uses semi-hosting console  
 #  EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf {
@@ -473,7 +484,8 @@
   Omap35xxPkg/Gpio/Gpio.inf
   Omap35xxPkg/InterruptDxe/InterruptDxe.inf
   Omap35xxPkg/TimerDxe/TimerDxe.inf 
-  
+  Omap35xxPkg/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
+
   #
   # Power IC
   #
