@@ -1875,6 +1875,7 @@ ConvertDeviceNodeToText (
   //
   DumpNode (&Str, (VOID *) DeviceNode, DisplayOnly, AllowShortcuts);
 
+  ASSERT (Str.Str != NULL);
   return Str.Str;
 }
 
@@ -1959,5 +1960,9 @@ ConvertDevicePathToText (
     DevPathNode = NextDevicePathNode (DevPathNode);
   }
 
-  return Str.Str;
+  if (Str.Str == NULL) {
+    return AllocateZeroPool (sizeof (CHAR16));
+  } else {
+    return Str.Str;
+  }
 }
