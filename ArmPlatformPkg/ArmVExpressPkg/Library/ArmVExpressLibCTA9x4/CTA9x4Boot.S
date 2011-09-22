@@ -21,6 +21,7 @@
 .text
 .align 3
 
+GCC_ASM_EXPORT(ArmPlatformSecBootAction)
 GCC_ASM_EXPORT(ArmPlatformInitializeBootMemory)
 GCC_ASM_IMPORT(PL35xSmcInitialize)
 
@@ -58,6 +59,18 @@ VersatileExpressSmcConfiguration:
     .word     0x00049249
     .word     PL350_SMC_SET_OPMODE_MEM_WIDTH_32 | PL350_SMC_SET_OPMODE_SET_RD_SYNC | PL350_SMC_SET_OPMODE_SET_WR_SYNC
 VersatileExpressSmcConfigurationEnd:
+
+/**
+  Call at the beginning of the platform boot up
+
+  This function allows the firmware platform to do extra actions at the early
+  stage of the platform power up.
+
+  Note: This function must be implemented in assembler as there is no stack set up yet
+
+**/
+ASM_PFX(ArmPlatformSecBootAction):
+  bx    lr
 
 /**
   Initialize the memory where the initial stacks will reside

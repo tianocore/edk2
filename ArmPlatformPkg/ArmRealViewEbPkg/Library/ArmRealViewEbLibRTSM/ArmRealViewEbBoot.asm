@@ -19,10 +19,23 @@
 
   INCLUDE AsmMacroIoLib.inc
 
+  EXPORT  ArmPlatformSecBootAction
   EXPORT  ArmPlatformInitializeBootMemory
 
   PRESERVE8
   AREA    CTA9x4BootMode, CODE, READONLY
+
+/**
+  Call at the beginning of the platform boot up
+
+  This function allows the firmware platform to do extra actions at the early
+  stage of the platform power up.
+
+  Note: This function must be implemented in assembler as there is no stack set up yet
+
+**/
+ArmPlatformSecBootAction
+  bx  lr
 
 /**
   Initialize the memory where the initial stacks will reside

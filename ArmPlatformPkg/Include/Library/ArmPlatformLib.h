@@ -83,6 +83,20 @@ ArmPlatformGetBootMode (
   );
 
 /**
+  Call at the beginning of the platform boot up
+
+  This function allows the firmware platform to do extra actions at the early
+  stage of the platform power up.
+
+  Note: This function must be implemented in assembler as there is no stack set up yet
+
+**/
+VOID
+ArmPlatformSecBootAction (
+  VOID
+  );
+
+/**
   Initialize controllers that must setup at the early stage
 
   Some peripherals must be initialized in Secure World.

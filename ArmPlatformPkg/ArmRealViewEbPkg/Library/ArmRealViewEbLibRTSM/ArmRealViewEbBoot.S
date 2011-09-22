@@ -20,7 +20,20 @@
 .text
 .align 3
 
+GCC_ASM_EXPORT(ArmPlatformSecBootAction)
 GCC_ASM_EXPORT(ArmPlatformInitializeBootMemory)
+
+/**
+  Call at the beginning of the platform boot up
+
+  This function allows the firmware platform to do extra actions at the early
+  stage of the platform power up.
+
+  Note: This function must be implemented in assembler as there is no stack set up yet
+
+**/
+ASM_PFX(ArmPlatformSecBootAction):
+  bx  lr
 
 /**
   Initialize the memory where the initial stacks will reside

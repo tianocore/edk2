@@ -20,6 +20,7 @@
   INCLUDE AsmMacroIoLib.inc
   
   IMPORT  CEntryPoint
+  IMPORT  ArmPlatformSecBootAction
   IMPORT  ArmPlatformIsMemoryInitialized
   IMPORT  ArmPlatformInitializeBootMemory
   IMPORT  ArmDisableInterrupts
@@ -39,15 +40,18 @@
 StartupAddr        DCD      CEntryPoint
 
 _ModuleEntryPoint
-  //Set VBAR to the start of the exception vectors in Secure Mode
-  ldr   r0, =SecVectorTable
-  blx   ArmWriteVBar
-
   // First ensure all interrupts are disabled
   blx   ArmDisableInterrupts
 
   // Ensure that the MMU and caches are off
   blx   ArmDisableCachesAndMmu
+
+  // Jump to Platform Specific Boot Action function
+  blx   ArmPlatformSecBootAction
+
+  // Set VBAR to the start of the exception vectors in Secure Mode
+  ldr   r0, =SecVectorTable
+  blx   ArmWriteVBar
 
 _IdentifyCpu 
   // Identify CPU ID

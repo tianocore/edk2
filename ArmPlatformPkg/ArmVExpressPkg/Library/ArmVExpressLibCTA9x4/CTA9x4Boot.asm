@@ -20,6 +20,7 @@
 
   INCLUDE AsmMacroIoLib.inc
 
+  EXPORT  ArmPlatformSecBootAction
   EXPORT  ArmPlatformInitializeBootMemory
   IMPORT  PL35xSmcInitialize
 
@@ -60,6 +61,18 @@ VersatileExpressSmcConfiguration
     DCD     0x00049249
     DCD     PL350_SMC_SET_OPMODE_MEM_WIDTH_32 :OR: PL350_SMC_SET_OPMODE_SET_RD_SYNC :OR: PL350_SMC_SET_OPMODE_SET_WR_SYNC
 VersatileExpressSmcConfigurationEnd
+
+/**
+  Call at the beginning of the platform boot up
+
+  This function allows the firmware platform to do extra actions at the early
+  stage of the platform power up.
+
+  Note: This function must be implemented in assembler as there is no stack set up yet
+
+**/
+ArmPlatformSecBootAction
+  bx  lr
 
 /**
   Initialize the memory where the initial stacks will reside

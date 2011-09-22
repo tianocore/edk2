@@ -30,6 +30,7 @@ GCC_ASM_EXPORT(_ModuleEntryPoint)
 
 #global functions referenced by this module
 GCC_ASM_IMPORT(CEntryPoint)
+GCC_ASM_IMPORT(ArmPlatformSecBootAction)
 GCC_ASM_IMPORT(ArmPlatformIsMemoryInitialized)
 GCC_ASM_IMPORT(ArmPlatformInitializeBootMemory)
 GCC_ASM_IMPORT(ArmDisableInterrupts)
@@ -46,15 +47,18 @@ StartupAddr:        .word   ASM_PFX(CEntryPoint)
 SecVectorTableAddr: .word		ASM_PFX(SecVectorTable)
 
 ASM_PFX(_ModuleEntryPoint):
- #Set VBAR to the start of the exception vectors in Secure Mode
-  ldr   r0, SecVectorTableAddr
-  bl   ASM_PFX(ArmWriteVBar)
-
   # First ensure all interrupts are disabled
   bl   ASM_PFX(ArmDisableInterrupts)
 
   # Ensure that the MMU and caches are off
   bl  ASM_PFX(ArmDisableCachesAndMmu)
+
+  # Jump to Platform Specific Boot Action function
+  blx   ASM_PFX(ArmPlatformSecBootAction)
+
+  # Set VBAR to the start of the exception vectors in Secure Mode
+  ldr   r0, =SecVectorTable
+  bl    ASM_PFX(ArmWriteVBar)
 
 _IdentifyCpu: 
   # Identify CPU ID
