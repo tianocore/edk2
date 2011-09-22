@@ -45,7 +45,6 @@
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLib.inf
   ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibCTA9x4/ArmVExpressLib.inf
   ArmTrustZoneLib|ArmPkg/Library/ArmTrustZoneLib/ArmTrustZoneLib.inf
-  ArmMPCoreMailBoxLib|ArmPkg/Library/ArmMPCoreMailBoxLib/ArmMPCoreMailBoxLib.inf
   
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
@@ -462,15 +461,6 @@
   # ARM L2x0 PCDs
   #
   gArmTokenSpaceGuid.PcdL2x0ControllerBase|0x1E00A000
-
-  #
-  # ARM VE MP Core Mailbox
-  #
-  gArmTokenSpaceGuid.PcdMPCoreMailboxSetAddress|0x10000030
-  gArmTokenSpaceGuid.PcdMPCoreMailboxGetAddress|0x10000030
-  gArmTokenSpaceGuid.PcdMPCoreMailboxClearAddress|0x10000034
-  gArmTokenSpaceGuid.PcdMPCoreMailboxClearValue|0xFFFFFFFF
-
 
 ################################################################################
 #

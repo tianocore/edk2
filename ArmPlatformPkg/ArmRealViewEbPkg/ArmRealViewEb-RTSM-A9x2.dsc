@@ -40,7 +40,6 @@
 
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLib.inf
   ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbLib.inf
-  ArmMPCoreMailBoxLib|ArmPkg/Library/ArmMPCoreMailBoxLib/ArmMPCoreMailBoxLib.inf
   
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
@@ -417,15 +416,6 @@
   #
   gArmTokenSpaceGuid.PcdL2x0ControllerBase|0x1F002000
  
-  #
-  # ARM VE MP Core Mailbox
-  #
-  gArmTokenSpaceGuid.PcdMPCoreMailboxSetAddress|0x10000030
-  gArmTokenSpaceGuid.PcdMPCoreMailboxGetAddress|0x10000030
-  gArmTokenSpaceGuid.PcdMPCoreMailboxClearAddress|0x10000034
-  gArmTokenSpaceGuid.PcdMPCoreMailboxClearValue|0xFFFFFFFF
-
-
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform

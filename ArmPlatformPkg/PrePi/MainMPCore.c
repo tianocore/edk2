@@ -15,7 +15,6 @@
 #include "PrePi.h"
 
 #include <Library/ArmGicLib.h>
-#include <Library/ArmMPCoreMailBoxLib.h>
 #include <Chipset/ArmV7.h>
 
 VOID

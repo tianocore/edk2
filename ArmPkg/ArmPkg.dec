@@ -112,16 +112,6 @@
   gArmTokenSpaceGuid.PcdArmPrimaryCore|0|UINT32|0x00000037
 
   #
-  # ARM MPCore MailBox PCDs
-  #
-  # Address to Set/Get to Mailbox in Multicore system
-  gArmTokenSpaceGuid.PcdMPCoreMailboxSetAddress|0|UINT32|0x00000017
-  gArmTokenSpaceGuid.PcdMPCoreMailboxGetAddress|0|UINT32|0x00000018
-  # Address/Value to clear Mailbox in Multicore system
-  gArmTokenSpaceGuid.PcdMPCoreMailboxClearAddress|0|UINT32|0x00000019
-  gArmTokenSpaceGuid.PcdMPCoreMailboxClearValue|0|UINT32|0x0000001A
-
-  #
   # ARM L2x0 PCDs
   #
   gArmTokenSpaceGuid.PcdL2x0ControllerBase|0|UINT32|0x0000001B

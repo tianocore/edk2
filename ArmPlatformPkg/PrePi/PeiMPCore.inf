@@ -39,7 +39,6 @@
   DebugLib
   DebugAgentLib
   ArmLib
-  ArmMPCoreMailBoxLib
   ArmGicLib
   IoLib
   TimerLib

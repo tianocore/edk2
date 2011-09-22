@@ -39,7 +39,6 @@
 [LibraryClasses]
   ArmLib
   ArmPlatformLib
-  ArmMPCoreMailBoxLib
   BaseLib
   DebugLib
   DebugAgentLib

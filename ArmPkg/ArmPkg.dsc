@@ -69,7 +69,6 @@
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
   ArmTrustZoneLib|ArmPkg/Library/ArmTrustZoneLib/ArmTrustZoneLib.inf
-  ArmMPCoreMailBoxLib|ArmPkg/Library/ArmMPCoreMailBoxLib/ArmMPCoreMailBoxLib.inf
   
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   
@@ -101,7 +100,6 @@
   ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLibPrePi.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLibSec.inf
   ArmPkg/Library/ArmLib/Null/NullArmLib.inf
-  ArmPkg/Library/ArmMPCoreMailBoxLib/ArmMPCoreMailBoxLib.inf
   ArmPkg/Library/ArmTrustZoneLib/ArmTrustZoneLib.inf
   ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
   ArmPkg/Library/BaseMemoryLibVstm/BaseMemoryLibVstm.inf
