@@ -234,11 +234,15 @@ LcdPlatformSetMode (
     return Status;
   }
 
-  // Set the DVI into the new mode
-  Status = ArmPlatformSysConfigSet (SYS_CFG_DVIMODE, mResolutions[ModeNumber].Mode);
-  if (EFI_ERROR(Status)) {
-    ASSERT_EFI_ERROR (Status);
-    return Status;
+  // On the ARM Versatile Express Model (RTSM) the value of the SysId is equal to 0x225F500.
+  // Note: The DVI Mode is not modelled on RTSM
+  if (MmioRead32 (ARM_VE_SYS_ID_REG) != 0x225F500) {
+    // Set the DVI into the new mode
+    Status = ArmPlatformSysConfigSet (SYS_CFG_DVIMODE, mResolutions[ModeNumber].Mode);
+    if (EFI_ERROR(Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
   }
 
   // Set the multiplexer
