@@ -54,10 +54,9 @@ BootOptionStart (
         Initrd = NULL;
       }
 
-      Status = BdsBootLinux (BootOption->FilePathList,
+      Status = BdsBootLinuxAtag (BootOption->FilePathList,
                                  Initrd, // Initrd
-                                 (CHAR8*)(LinuxArguments + 1), // CmdLine
-                                 NULL);
+                                 (CHAR8*)(LinuxArguments + 1)); // CmdLine
     } else if (LoaderType == BDS_LOADER_KERNEL_LINUX_FDT) {
       LinuxArguments = &(OptionalData->Arguments.LinuxArguments);
       CmdLineSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->CmdLineSize);
@@ -79,7 +78,7 @@ BootOptionStart (
       Status = GetEnvironmentVariable ((CHAR16 *)L"FDT", DefaultFdtDevicePath, &FdtDevicePathSize, (VOID **)&FdtDevicePath);
       ASSERT_EFI_ERROR(Status);
 
-      Status = BdsBootLinux (BootOption->FilePathList,
+      Status = BdsBootLinuxFdt (BootOption->FilePathList,
                                 Initrd, // Initrd
                                 (CHAR8*)(LinuxArguments + 1),
                                 FdtDevicePath);

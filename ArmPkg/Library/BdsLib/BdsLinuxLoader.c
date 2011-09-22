@@ -13,16 +13,8 @@
 **/
 
 #include "BdsInternal.h"
-#include "BdsLinuxLoader.h"
-
-#include <Library/PcdLib.h>
-#include <Library/ArmLib.h>
-#include <Library/HobLib.h>
 
 #define ALIGN32_BELOW(addr)   ALIGN_POINTER(addr - 32,32)
-
-#define LINUX_ATAG_MAX_OFFSET     (PcdGet32(PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxAtagMaxOffset))
-#define LINUX_KERNEL_MAX_OFFSET   (PcdGet32(PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxKernelMaxOffset))
 
 // Point to the current ATAG
 STATIC LINUX_ATAG *mLinuxKernelCurrentAtag;
@@ -178,7 +170,7 @@ PreparePlatformHardware (
 {
   //Note: Interrupts will be disabled by the GIC driver when ExitBootServices() will be called.
 
-  // clean, invalidate, disable data cache
+  // Clean, invalidate, disable data cache
   ArmCleanInvalidateDataCache();
   ArmDisableDataCache();
 
@@ -186,97 +178,24 @@ PreparePlatformHardware (
   ArmInvalidateInstructionCache ();
   ArmDisableInstructionCache ();
 
-  // turn off MMU
+  // Turn off MMU
   ArmDisableMmu();
 
   return EFI_SUCCESS;
 }
 
-/**
-  Start a Linux kernel from a Device Path
-
-  @param  LinuxKernel           Device Path to the Linux Kernel
-  @param  Parameters            Linux kernel agruments
-  @param  Fdt                   Device Path to the Flat Device Tree
-
-  @retval EFI_SUCCESS           All drivers have been connected
-  @retval EFI_NOT_FOUND         The Linux kernel Device Path has not been found
-  @retval EFI_OUT_OF_RESOURCES  There is not enough resource memory to store the matching results.
-
-**/
+STATIC
 EFI_STATUS
-BdsBootLinux (
-  IN  EFI_DEVICE_PATH_PROTOCOL* LinuxKernelDevicePath,
-  IN  EFI_DEVICE_PATH_PROTOCOL* InitrdDevicePath,
-  IN  CONST CHAR8*  Arguments,
-  IN  EFI_DEVICE_PATH_PROTOCOL* FdtDevicePath
+StartLinux (
+  IN  EFI_PHYSICAL_ADDRESS  LinuxImage,
+  IN  UINTN                 LinuxImageSize,
+  IN  EFI_PHYSICAL_ADDRESS  KernelParamsAddress,
+  IN  UINTN                 KernelParamsSize,
+  IN  UINT32                MachineType
   )
 {
   EFI_STATUS            Status;
-  UINT32                LinuxImageSize;
-  UINT32                InitrdImageSize;
-  UINT32                KernelParamsSize;
-  EFI_PHYSICAL_ADDRESS  KernelParamsAddress;
-  UINT32                MachineType;
-  BOOLEAN               FdtSupported;
   LINUX_KERNEL          LinuxKernel;
-  EFI_PHYSICAL_ADDRESS  LinuxImage;
-  EFI_PHYSICAL_ADDRESS  InitrdImage;
-
-  InitrdImageSize = 0;
-  FdtSupported = FALSE;
-	
-  // Ensure the System Memory PCDs have been initialized (PcdSystemMemoryBase and PcdSystemMemorySize)
-  ASSERT (PcdGet32(PcdSystemMemorySize) != 0);
-
-  PERF_START (NULL, "BDS", NULL, 0);
-
-  // Load the Linux kernel from a device path
-  LinuxImage = LINUX_KERNEL_MAX_OFFSET;
-  Status = BdsLoadImage (LinuxKernelDevicePath, AllocateMaxAddress, &LinuxImage, &LinuxImageSize);
-  if (EFI_ERROR(Status)) {
-    Print (L"ERROR: Did not find Linux kernel.\n");
-    return Status;
-  }
-  LinuxKernel = (LINUX_KERNEL)(UINTN)LinuxImage;
-
-  if (InitrdDevicePath) {
-    Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImage, &InitrdImageSize);
-    if (EFI_ERROR(Status)) {
-      Print (L"ERROR: Did not find initrd image.\n");
-      return Status;
-    }
-  }
-
-  if (FdtDevicePath) {
-    // Load the FDT binary from a device path
-    KernelParamsAddress = LINUX_ATAG_MAX_OFFSET;
-    Status = BdsLoadImage (FdtDevicePath, AllocateMaxAddress, &KernelParamsAddress, &KernelParamsSize);
-    if (EFI_ERROR(Status)) {
-      Print (L"ERROR: Did not find Device Tree blob.\n");
-      return Status;
-    }
-    FdtSupported = TRUE;
-  }
-
-  //
-  // Setup the Linux Kernel Parameters
-  //
-  if (!FdtSupported) {
-    // Non-FDT requires a specific machine type.
-    // This OS Boot loader supports just one machine type,
-    // but that could change in the future.
-    MachineType = PcdGet32(PcdArmMachineType);
-
-    // By setting address=0 we leave the memory allocation to the function
-    Status = PrepareAtagList (Arguments, InitrdImage, InitrdImageSize, (LINUX_ATAG**)&KernelParamsAddress, &KernelParamsSize);
-    if(EFI_ERROR(Status)) {
-      Print(L"ERROR: Can not prepare ATAG list. Status=0x%X\n", Status);
-      goto Exit;
-    }
-  } else {
-    MachineType = 0xFFFFFFFF;
-  }
 
   // Shut down UEFI boot services. ExitBootServices() will notify every driver that created an event on
   // ExitBootServices event. Example the Interrupt DXE driver will disable the interrupts on this event.
@@ -298,6 +217,8 @@ BdsBootLinux (
   if ((UINTN)LinuxImage > LINUX_KERNEL_MAX_OFFSET) {
     //Note: There is no requirement on the alignment
     LinuxKernel = (LINUX_KERNEL)CopyMem (ALIGN32_BELOW(LINUX_KERNEL_MAX_OFFSET - LinuxImageSize), (VOID*)(UINTN)LinuxImage, LinuxImageSize);
+  } else {
+    LinuxKernel = (LINUX_KERNEL)(UINTN)LinuxImage;
   }
 
   //TODO: Check there is no overlapping between kernel and Atag
@@ -322,7 +243,7 @@ BdsBootLinux (
   DEBUG((EFI_D_ERROR, "\nStarting the kernel:\n\n"));
 
   // jump to kernel with register set
-  LinuxKernel ((UINTN)0, (UINTN)MachineType, (UINTN)KernelParamsAddress);
+  LinuxKernel ((UINTN)0, MachineType, (UINTN)KernelParamsAddress);
 
   // Kernel should never exit
   // After Life services are not provided
@@ -335,3 +256,122 @@ Exit:
   // Free Runtimee Memory (kernel and FDT)
   return Status;
 }
+
+/**
+  Start a Linux kernel from a Device Path
+
+  @param  LinuxKernel           Device Path to the Linux Kernel
+  @param  Parameters            Linux kernel agruments
+  @param  Fdt                   Device Path to the Flat Device Tree
+
+  @retval EFI_SUCCESS           All drivers have been connected
+  @retval EFI_NOT_FOUND         The Linux kernel Device Path has not been found
+  @retval EFI_OUT_OF_RESOURCES  There is not enough resource memory to store the matching results.
+
+**/
+EFI_STATUS
+BdsBootLinuxAtag (
+  IN  EFI_DEVICE_PATH_PROTOCOL* LinuxKernelDevicePath,
+  IN  EFI_DEVICE_PATH_PROTOCOL* InitrdDevicePath,
+  IN  CONST CHAR8*              Arguments
+  )
+{
+  EFI_STATUS            Status;
+  UINT32                LinuxImageSize;
+  UINT32                InitrdImageSize = 0;
+  UINT32                KernelParamsSize;
+  EFI_PHYSICAL_ADDRESS  KernelParamsAddress;
+  EFI_PHYSICAL_ADDRESS  LinuxImage;
+  EFI_PHYSICAL_ADDRESS  InitrdImage;
+
+  PERF_START (NULL, "BDS", NULL, 0);
+
+  // Load the Linux kernel from a device path
+  LinuxImage = LINUX_KERNEL_MAX_OFFSET;
+  Status = BdsLoadImage (LinuxKernelDevicePath, AllocateMaxAddress, &LinuxImage, &LinuxImageSize);
+  if (EFI_ERROR(Status)) {
+    Print (L"ERROR: Did not find Linux kernel.\n");
+    return Status;
+  }
+
+  if (InitrdDevicePath) {
+    Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImage, &InitrdImageSize);
+    if (EFI_ERROR(Status)) {
+      Print (L"ERROR: Did not find initrd image.\n");
+      return Status;
+    }
+  }
+
+  //
+  // Setup the Linux Kernel Parameters
+  //
+ 
+  // By setting address=0 we leave the memory allocation to the function
+  Status = PrepareAtagList (Arguments, InitrdImage, InitrdImageSize, (LINUX_ATAG**)&KernelParamsAddress, &KernelParamsSize);
+  if (EFI_ERROR(Status)) {
+    Print(L"ERROR: Can not prepare ATAG list. Status=0x%X\n", Status);
+    return Status;
+  }
+
+  return StartLinux (LinuxImage, LinuxImageSize, KernelParamsAddress, KernelParamsSize, PcdGet32(PcdArmMachineType));
+}
+
+/**
+  Start a Linux kernel from a Device Path
+
+  @param  LinuxKernel           Device Path to the Linux Kernel
+  @param  Parameters            Linux kernel agruments
+  @param  Fdt                   Device Path to the Flat Device Tree
+
+  @retval EFI_SUCCESS           All drivers have been connected
+  @retval EFI_NOT_FOUND         The Linux kernel Device Path has not been found
+  @retval EFI_OUT_OF_RESOURCES  There is not enough resource memory to store the matching results.
+
+**/
+EFI_STATUS
+BdsBootLinuxFdt (
+  IN  EFI_DEVICE_PATH_PROTOCOL* LinuxKernelDevicePath,
+  IN  EFI_DEVICE_PATH_PROTOCOL* InitrdDevicePath,
+  IN  CONST CHAR8*              Arguments,
+  IN  EFI_DEVICE_PATH_PROTOCOL* FdtDevicePath
+  )
+{
+  EFI_STATUS            Status;
+  UINT32                LinuxImageSize;
+  UINT32                InitrdImageSize = 0;
+  UINT32                KernelParamsSize;
+  EFI_PHYSICAL_ADDRESS  KernelParamsAddress;
+  UINT32                FdtMachineType;
+  EFI_PHYSICAL_ADDRESS  LinuxImage;
+  EFI_PHYSICAL_ADDRESS  InitrdImage;
+
+  FdtMachineType = 0xFFFFFFFF;
+
+  PERF_START (NULL, "BDS", NULL, 0);
+
+  // Load the Linux kernel from a device path
+  LinuxImage = LINUX_KERNEL_MAX_OFFSET;
+  Status = BdsLoadImage (LinuxKernelDevicePath, AllocateMaxAddress, &LinuxImage, &LinuxImageSize);
+  if (EFI_ERROR(Status)) {
+    Print (L"ERROR: Did not find Linux kernel.\n");
+    return Status;
+  }
+
+  if (InitrdDevicePath) {
+    Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImage, &InitrdImageSize);
+    if (EFI_ERROR(Status)) {
+      Print (L"ERROR: Did not find initrd image.\n");
+      return Status;
+    }
+  }
+
+  // Load the FDT binary from a device path
+  KernelParamsAddress = LINUX_ATAG_MAX_OFFSET;
+  Status = BdsLoadImage (FdtDevicePath, AllocateMaxAddress, &KernelParamsAddress, &KernelParamsSize);
+  if (EFI_ERROR(Status)) {
+    Print (L"ERROR: Did not find Device Tree blob.\n");
+    return Status;
+  }
+  return StartLinux (LinuxImage, LinuxImageSize, KernelParamsAddress, KernelParamsSize, FdtMachineType);
+}
+

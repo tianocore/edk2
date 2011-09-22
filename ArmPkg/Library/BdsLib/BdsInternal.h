@@ -16,14 +16,17 @@
 #define __BDS_INTERNAL_H__
 
 #include <PiDxe.h>
+#include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/HobLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BdsLib.h>
+#include <Library/PcdLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -38,6 +41,7 @@
 #include <Protocol/LoadFile.h>
 #include <Protocol/PxeBaseCode.h>
 
+#include "BdsLinuxLoader.h"
 
 typedef BOOLEAN (*BDS_FILE_LOADER_SUPPORT) (
   IN EFI_DEVICE_PATH            *DevicePath,

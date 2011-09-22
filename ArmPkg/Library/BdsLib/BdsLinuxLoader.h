@@ -15,6 +15,9 @@
 #ifndef __BDSLINUXLOADER_H
 #define __BDSLINUXLOADER_H
 
+#define LINUX_ATAG_MAX_OFFSET     (PcdGet32(PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxAtagMaxOffset))
+#define LINUX_KERNEL_MAX_OFFSET   (PcdGet32(PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxKernelMaxOffset))
+
 #define ATAG_MAX_SIZE       0x3000
 
 /* ATAG : list of possible tags */

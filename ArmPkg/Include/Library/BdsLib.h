@@ -101,6 +101,24 @@ BootOptionAllocateBootIndex (
 
   @param  LinuxKernel           Device Path to the Linux Kernel
   @param  Parameters            Linux kernel arguments
+
+  @retval EFI_SUCCESS           All drivers have been connected
+  @retval EFI_NOT_FOUND         The Linux kernel Device Path has not been found
+  @retval EFI_OUT_OF_RESOURCES  There is not enough resource memory to store the matching results.
+
+**/
+EFI_STATUS
+BdsBootLinuxAtag (
+  IN  EFI_DEVICE_PATH_PROTOCOL* LinuxKernelDevicePath,
+  IN  EFI_DEVICE_PATH_PROTOCOL* InitrdDevicePath,
+  IN  CONST CHAR8*              Arguments
+  );
+
+/**
+  Start a Linux kernel from a Device Path
+
+  @param  LinuxKernel           Device Path to the Linux Kernel
+  @param  Parameters            Linux kernel arguments
   @param  Fdt                   Device Path to the Flat Device Tree
 
   @retval EFI_SUCCESS           All drivers have been connected
@@ -109,7 +127,7 @@ BootOptionAllocateBootIndex (
 
 **/
 EFI_STATUS
-BdsBootLinux (
+BdsBootLinuxFdt (
   IN  EFI_DEVICE_PATH_PROTOCOL* LinuxKernelDevicePath,
   IN  EFI_DEVICE_PATH_PROTOCOL* InitrdDevicePath,
   IN  CONST CHAR8*              Arguments,
