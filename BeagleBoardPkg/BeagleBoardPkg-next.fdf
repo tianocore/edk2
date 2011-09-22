@@ -48,14 +48,7 @@ NumBlocks     = 0x80000
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
-!if $(EDK2_SECOND_STAGE_BOOTOLADER) == 1
 0x00000000|0x00080000
-!else
-# 512 bytes of configuration header & 8 bytes of image header
-0x00000000|0x00000208
-
-0x00000208|0x0007FDF8
-!endif
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvBaseSize
 FV = FVMAIN_COMPACT
 
@@ -180,7 +173,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   INF ArmPlatformPkg/Bds/Bds.inf
-
 
 
 [FV.FVMAIN_COMPACT]

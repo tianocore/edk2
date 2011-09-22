@@ -316,7 +316,6 @@ ConstructImage (
   FILE         *InputFile;
   FILE         *OutputFile;
   unsigned int InputImageFileSize;
-  unsigned int NewImageFileSize;
   struct       stat FileStat;
   char         Ch;
   unsigned int i;
@@ -327,31 +326,25 @@ ConstructImage (
     exit(0);
   } 
 
-  //Get the size of the input image.
+  // Get the size of the input image.
   fstat(fileno(InputFile), &FileStat);
   InputImageFileSize = FileStat.st_size;
   
-  //Calculate new file size
-  NewImageFileSize = InputImageFileSize - 520;
-
   OutputFile = fopen(gOutputImageFile, "wb");
   if (OutputFile == NULL) {
     fprintf(stderr, "Can't open output file %s.\n", gOutputImageFile);
     exit(0);
   }
 
-  //Write Configuration header 
+  // Write Configuration header 
   fwrite(gConfigurationHeader, 1, sizeof(gConfigurationHeader), OutputFile);
 
-  //Write image header (Input image size, execution address)
-  fwrite(&NewImageFileSize, 1, 4, OutputFile);
+  // Write image header (Input image size, execution address)
+  fwrite(&InputImageFileSize, 1, 4, OutputFile);
   fwrite(&gImageExecutionAddress, 1, 4, OutputFile);
 
-  //Skip first 0x207 bytes
-  fseek(InputFile, 520, SEEK_SET);
-
-  //Copy input image to the output file.
-  for (i = 0; i < NewImageFileSize; i++) {
+  // Copy input image to the output file.
+  for (i = 0; i < InputImageFileSize; i++) {
     fread(&Ch, 1, 1, InputFile);
     fwrite(&Ch, 1, 1, OutputFile);
   }
