@@ -1,5 +1,5 @@
 /** @file
-*  Main file supporting the SEC Phase for Versatile Express
+*  Main file supporting the SEC Phase on ARM Platforms
 *
 *  Copyright (c) 2011, ARM Limited. All rights reserved.
 *  
@@ -13,54 +13,20 @@
 *
 **/
 
-#include <Library/DebugLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
-#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/ArmLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/ArmPlatformLib.h>
-
-#include <Chipset/ArmV7.h>
 #include <Library/ArmGicLib.h>
+
+#include "SecInternal.h"
 
 #define SerialPrint(txt)  SerialPortWrite ((UINT8*)txt, AsciiStrLen(txt)+1);
 
 extern VOID *monitor_vector_table;
-
-VOID
-ArmSetupGicNonSecure (
-  IN  INTN          GicDistributorBase,
-  IN  INTN          GicInterruptInterfaceBase
-);
-
-// Vector Table for Sec Phase
-VOID
-SecVectorTable (
-  VOID
-  );
-
-VOID
-NonSecureWaitForFirmware (
-  VOID
-  );
-
-VOID
-enter_monitor_mode(
-  IN VOID* Stack
-  );
-
-VOID
-return_from_exception (
-  IN UINTN NonSecureBase
-  );
-
-VOID
-copy_cpsr_into_spsr (
-  VOID
-  );
 
 VOID
 CEntryPoint (
@@ -74,7 +40,7 @@ CEntryPoint (
   // Primary CPU clears out the SCU tag RAMs, secondaries wait
   if (IS_PRIMARY_CORE(MpId)) {
     if (FixedPcdGet32(PcdMPCoreSupport)) {
-      ArmInvalidScu();
+      ArmInvalidScu ();
     }
 
     // SEC phase needs to run library constructors by hand. This assumes we are linked against the SerialLib
@@ -97,20 +63,20 @@ CEntryPoint (
   // Invalidate the data cache. Doesn't have to do the Data cache clean.
   ArmInvalidateDataCache();
 
-  //Invalidate Instruction Cache
+  // Invalidate Instruction Cache
   ArmInvalidateInstructionCache();
 
-  //Invalidate I & D TLBs
+  // Invalidate I & D TLBs
   ArmInvalidateInstructionAndDataTlb();
 
   // Enable Full Access to CoProcessors
   ArmWriteCPACR (CPACR_CP_FULL_ACCESS);
 
   // Enable SWP instructions
-  ArmEnableSWPInstruction();
+  ArmEnableSWPInstruction ();
 
   // Enable program flow prediction, if supported.
-  ArmEnableBranchPrediction();
+  ArmEnableBranchPrediction ();
 
   if (FixedPcdGet32(PcdVFPEnabled)) {
     ArmEnableVFP();
@@ -133,7 +99,11 @@ CEntryPoint (
   }
 
   // Test if Trustzone is supported on this platform
-  if (ArmPlatformTrustzoneSupported()) {
+  if (ArmPlatformTrustzoneSupported ()) {
+    // Ensure the Monitor Stack Base & Size have been set
+    ASSERT(PcdGet32(PcdCPUCoresSecMonStackBase) != 0);
+    ASSERT(PcdGet32(PcdCPUCoreSecMonStackSize) != 0);
+
     if (FixedPcdGet32(PcdMPCoreSupport)) {
       // Setup SMP in Non Secure world
       ArmSetupSmpNonSecure (GET_CORE_ID(MpId));
@@ -148,7 +118,7 @@ CEntryPoint (
     //-------------------- Monitor Mode ---------------------
     // Setup the Trustzone Chipsets
     if (IS_PRIMARY_CORE(MpId)) {
-      ArmPlatformTrustzoneInit();
+      ArmPlatformTrustzoneInit ();
 
       // Wake up the secondary cores by sending a interrupt to everyone else
       // NOTE 1: The Software Generated Interrupts are always enabled on Cortex-A9
@@ -185,11 +155,11 @@ CEntryPoint (
     //   - Enable Access to Preload Engine in NS World
     //   - Enable lockable TLB entries allocation in NS world
     //   - Enable R/W access to SMP bit of Auxiliary Control Register in NS world
-    ArmWriteNsacr(NSACR_NS_SMP | NSACR_TL | NSACR_PLE | NSACR_CP(10) | NSACR_CP(11));
+    ArmWriteNsacr (NSACR_NS_SMP | NSACR_TL | NSACR_PLE | NSACR_CP(10) | NSACR_CP(11));
 
     // CP15 Secure Configuration Register with Non Secure bit (SCR_NS), CPSR.A modified in any
     // security state (SCR_AW), CPSR.F modified in any security state (SCR_FW)
-    ArmWriteScr(SCR_NS | SCR_FW | SCR_AW);
+    ArmWriteScr (SCR_NS | SCR_FW | SCR_AW);
   } else {
     if (IS_PRIMARY_CORE(MpId)) {
       SerialPrint ("Trust Zone Configuration is disabled\n\r");
