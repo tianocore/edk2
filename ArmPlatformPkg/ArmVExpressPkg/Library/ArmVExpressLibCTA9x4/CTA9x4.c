@@ -23,9 +23,54 @@
 #include <Drivers/PL301Axi.h>
 #include <Drivers/SP804Timer.h>
 
+#include <Ppi/ArmMpCoreInfo.h>
+
 #include <ArmPlatform.h>
 
 #define SerialPrint(txt)  SerialPortWrite ((UINT8*)(txt), AsciiStrLen(txt)+1);
+
+ARM_CORE_INFO mVersatileExpressMpCoreInfoCTA9x4[] = {
+  {
+    // Cluster 0, Core 0
+    0x0, 0x0,
+
+    // MP Core MailBox Set/Get/Clear Addresses and Clear Value
+    (EFI_PHYSICAL_ADDRESS)ARM_VE_SYS_FLAGS_REG,
+    (EFI_PHYSICAL_ADDRESS)ARM_VE_SYS_FLAGS_SET_REG,
+    (EFI_PHYSICAL_ADDRESS)ARM_VE_SYS_FLAGS_CLR_REG,
+    (UINT64)0xFFFFFFFF
+  },
+  {
+    // Cluster 0, Core 1
+    0x0, 0x1,
+
+    // MP Core MailBox Set/Get/Clear Addresses and Clear Value
+    (EFI_PHYSICAL_ADDRESS)ARM_VE_SYS_FLAGS_REG,
+    (EFI_PHYSICAL_ADDRESS)ARM_VE_SYS_FLAGS_SET_REG,
+    (EFI_PHYSICAL_ADDRESS)ARM_VE_SYS_FLAGS_CLR_REG,
+    (UINT64)0xFFFFFFFF
+  },
+  {
+    // Cluster 0, Core 2
+    0x0, 0x2,
+
+    // MP Core MailBox Set/Get/Clear Addresses and Clear Value
+    (EFI_PHYSICAL_ADDRESS)ARM_VE_SYS_FLAGS_REG,
+    (EFI_PHYSICAL_ADDRESS)ARM_VE_SYS_FLAGS_SET_REG,
+    (EFI_PHYSICAL_ADDRESS)ARM_VE_SYS_FLAGS_CLR_REG,
+    (UINT64)0xFFFFFFFF
+  },
+  {
+    // Cluster 0, Core 3
+    0x0, 0x3,
+
+    // MP Core MailBox Set/Get/Clear Addresses and Clear Value
+    (EFI_PHYSICAL_ADDRESS)ARM_VE_SYS_FLAGS_REG,
+    (EFI_PHYSICAL_ADDRESS)ARM_VE_SYS_FLAGS_SET_REG,
+    (EFI_PHYSICAL_ADDRESS)ARM_VE_SYS_FLAGS_CLR_REG,
+    (UINT64)0xFFFFFFFF
+  }
+};
 
 // DDR2 timings
 PL341_DMC_CONFIG DDRTimings = {
@@ -154,13 +199,38 @@ ArmPlatformInitializeSystemMemory (
   PL341DmcInit(ARM_VE_DMC_BASE, &DDRTimings);
   PL301AxiInit(ARM_VE_FAXI_BASE);
 }
+
+EFI_STATUS
+PrePeiCoreGetMpCoreInfo (
+  OUT UINTN                   *CoreCount,
+  OUT ARM_CORE_INFO           **ArmCoreTable
+  )
+{
+  *CoreCount    = sizeof(mVersatileExpressMpCoreInfoCTA9x4) / sizeof(ARM_CORE_INFO);
+  *ArmCoreTable = mVersatileExpressMpCoreInfoCTA9x4;
+
+  return EFI_SUCCESS;
+}
+
+// Needs to be declared in the file. Otherwise gArmMpCoreInfoPpiGuid is undefined in the contect of PrePeiCore
+EFI_GUID mArmMpCoreInfoPpiGuid = ARM_MP_CORE_INFO_PPI_GUID;
+ARM_MP_CORE_INFO_PPI mMpCoreInfoPpi = { PrePeiCoreGetMpCoreInfo };
+
+EFI_PEI_PPI_DESCRIPTOR      gPlatformPpiTable[] = {
+  {
+    EFI_PEI_PPI_DESCRIPTOR_PPI,
+    &mArmMpCoreInfoPpiGuid,
+    &mMpCoreInfoPpi
+  }
+};
+
 VOID
 ArmPlatformGetPlatformPpiList (
   OUT UINTN                   *PpiListSize,
   OUT EFI_PEI_PPI_DESCRIPTOR  **PpiList
   )
 {
-  *PpiListSize = 0;
-  *PpiList = NULL;
+  *PpiListSize = sizeof(gPlatformPpiTable);
+  *PpiList = gPlatformPpiTable;
 }
 

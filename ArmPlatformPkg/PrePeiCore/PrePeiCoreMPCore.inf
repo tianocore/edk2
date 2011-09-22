@@ -51,6 +51,7 @@
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid
   gArmGlobalVariablePpiGuid
+  gArmMpCoreInfoPpiGuid
 
 [FeaturePcd]
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores

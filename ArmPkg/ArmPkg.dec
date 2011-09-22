@@ -2,6 +2,7 @@
 # ARM processor package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2011, ARM Limited. All rights reserved.
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -40,6 +41,14 @@
   
 [Guids.common]
   gArmTokenSpaceGuid       = { 0xBB11ECFE, 0x820F, 0x4968, { 0xBB, 0xA6, 0xF7, 0x6A, 0xFE, 0x30, 0x25, 0x96 } }
+
+  ## ARM MPCore table
+  # Include/Guid/ArmMpCoreInfo.h
+  gArmMpCoreInfoGuid = { 0xa4ee0728, 0xe5d7, 0x4ac5,  {0xb2, 0x1e, 0x65, 0x8e, 0xd8, 0x57, 0xe8, 0x34} }
+
+[Ppis]
+  ## Include/Ppi/ArmMpCoreInfo.h
+  gArmMpCoreInfoPpiGuid = { 0x6847cc74, 0xe9ec, 0x4f8f, {0xa2, 0x9d, 0xab, 0x44, 0xe7, 0x54, 0xa8, 0xfc} }
 
 [Protocols.common]
   gVirtualUncachedPagesProtocolGuid = { 0xAD651C7D, 0x3C22, 0x4DBF, { 0x92, 0xe8, 0x38, 0xa7, 0xcd, 0xae, 0x87, 0xb2 } }

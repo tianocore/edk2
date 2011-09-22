@@ -44,6 +44,10 @@
   ArmLib
 
 [Ppis]
+  gArmMpCoreInfoPpiGuid
+  
+[Guids]
+  gArmMpCoreInfoGuid
 
 [FixedPcd]
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize

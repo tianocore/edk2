@@ -62,8 +62,11 @@
 // VRAM offset for the PL111 Colour LCD Controller on the motherboard
 #define VRAM_MOTHERBOARD_BASE                     (ARM_VE_SMB_PERIPH_BASE   + 0x00000)
 
-#define SYS_PROC_ID_UNSUPPORTED                   0xFF
-#define SYS_PROC_ID_CORTEX_A9                     0x0C
+#define ARM_VE_SYS_PROC_ID_MASK                   (0xFF << 24)
+#define ARM_VE_SYS_PROC_ID_UNSUPPORTED            (0xFF << 24)
+#define ARM_VE_SYS_PROC_ID_CORTEX_A9              (0x0C << 24)
+#define ARM_VE_SYS_PROC_ID_CORTEX_A5              (0x12 << 24)
+#define ARM_VE_SYS_PROC_ID_CORTEX_A15             (0x14 << 24)
 
 //
 // Sites where the peripheral is fitted

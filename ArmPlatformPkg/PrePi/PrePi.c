@@ -131,6 +131,9 @@ PrePiMain (
   // Declare the Global Variable HOB
   BuildGlobalVariableHob (GlobalVariableBase, FixedPcdGet32 (PcdPeiGlobalVariableSize));
 
+  //TODO: Call CpuPei as a library
+  BuildCpuHob (PcdGet8 (PcdPrePiCpuMemorySize), PcdGet8 (PcdPrePiCpuIoSize));
+
   // Set the Boot Mode
   SetBootMode (ArmPlatformGetBootMode ());
 

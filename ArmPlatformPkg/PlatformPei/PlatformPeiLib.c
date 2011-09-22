@@ -27,8 +27,6 @@ PlatformPeim (
   // Initialize the platform specific controllers
   ArmPlatformNormalInitialize ();
 
-  BuildCpuHob (PcdGet8 (PcdPrePiCpuMemorySize), PcdGet8 (PcdPrePiCpuIoSize));
-
   BuildFvHob (PcdGet32(PcdFvBaseAddress), PcdGet32(PcdFvSize));
 
   return EFI_SUCCESS;

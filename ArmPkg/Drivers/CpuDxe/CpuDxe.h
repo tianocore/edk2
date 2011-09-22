@@ -124,6 +124,20 @@ ConvertSectionToPages (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress
   );
 
+/**
+ * Publish ARM Processor Data table in UEFI SYSTEM Table.
+ * @param  HobStart               Pointer to the beginning of the HOB List from PEI.
+ *
+ * Description : This function iterates through HOB list and finds ARM processor Table Entry HOB.
+ *               If  the ARM processor Table Entry HOB is found, the HOB data is copied to run-time memory
+ *               and a pointer is assigned to it in ARM processor table. Then the ARM processor table is
+ *               installed in EFI configuration table.
+**/
+VOID
+EFIAPI
+PublishArmProcessorTable(
+  VOID
+  );
 
 extern VIRTUAL_UNCACHED_PAGES_PROTOCOL  gVirtualUncachedPages;
 

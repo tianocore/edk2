@@ -452,6 +452,7 @@
   }
   ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
+  ArmPkg/Drivers/CpuPei/CpuPei.inf
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
   Nt32Pkg/BootModePei/BootModePei.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
