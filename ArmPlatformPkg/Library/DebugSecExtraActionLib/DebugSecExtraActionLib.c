@@ -14,14 +14,14 @@
 
 #include <PiPei.h>
 
+#include <Library/ArmLib.h>
 #include <Library/ArmGicLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
 #include <Library/SerialPortLib.h>
-#include <Chipset/ArmV7.h>
 
-#define ARM_PRIMARY_CORE    0
+#include <Chipset/ArmV7.h>
 
 // When the firmware is built as not Standalone, the secondary cores need to wait the firmware
 // entirely written into DRAM. It is the firmware from DRAM which will wake up the secondary cores.
@@ -38,7 +38,7 @@ NonSecureWaitForFirmware (
   ArmCallWFI();
 
   // Acknowledge the interrupt and send End of Interrupt signal.
-  ArmGicAcknowledgeSgiFrom (PcdGet32(PcdGicInterruptInterfaceBase), ARM_PRIMARY_CORE);
+  ArmGicAcknowledgeSgiFrom (PcdGet32(PcdGicInterruptInterfaceBase), PRIMARY_CORE_ID);
 
   // Jump to secondary core entry point.
   secondary_start ();
@@ -56,7 +56,7 @@ NonSecureWaitForFirmware (
 **/
 VOID
 ArmPlatformSecExtraAction (
-  IN  UINTN         CoreId,
+  IN  UINTN         MpId,
   OUT UINTN*        JumpAddress
   )
 {
@@ -64,7 +64,7 @@ ArmPlatformSecExtraAction (
   UINTN           CharCount;
 
   if (FeaturePcdGet (PcdStandalone) == FALSE) {
-    if (CoreId == ARM_PRIMARY_CORE) {
+    if (IS_PRIMARY_CORE(MpId)) {
       UINTN*   StartAddress = (UINTN*)PcdGet32(PcdNormalFvBaseAddress);
 
       // Patch the DRAM to make an infinite loop at the start address
@@ -85,7 +85,7 @@ ArmPlatformSecExtraAction (
       *JumpAddress = (UINTN)NonSecureWaitForFirmware;
     }
   } else if (FeaturePcdGet (PcdSystemMemoryInitializeInSec)) {
-    if (CoreId == ARM_PRIMARY_CORE) {
+    if (IS_PRIMARY_CORE(MpId)) {
       // Signal the secondary cores they can jump to PEI phase
       ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
 

@@ -21,7 +21,7 @@ extern EFI_PEI_PPI_DESCRIPTOR *gSecPpiTable;
 VOID
 EFIAPI
 SecondaryMain (
-  IN UINTN CoreId
+  IN UINTN MpId
   )
 {
   ASSERT(FALSE);

@@ -32,7 +32,7 @@ extern EFI_PEI_PPI_DESCRIPTOR *gSecPpiTable;
 VOID
 EFIAPI
 SecondaryMain (
-  IN UINTN CoreId
+  IN UINTN MpId
   )
 {
   // Function pointer to Secondary Core entry point
@@ -45,7 +45,7 @@ SecondaryMain (
   while (secondary_entry_addr = ArmGetMPCoreMailbox(), secondary_entry_addr == 0) {
     ArmCallWFI();
     // Acknowledge the interrupt and send End of Interrupt signal.
-    ArmGicAcknowledgeSgiFrom(PcdGet32(PcdGicInterruptInterfaceBase),0/*CoreId*/);
+    ArmGicAcknowledgeSgiFrom (PcdGet32(PcdGicInterruptInterfaceBase), PRIMARY_CORE_ID);
   }
 
   secondary_start = (VOID (*)())secondary_entry_addr;

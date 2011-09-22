@@ -27,7 +27,6 @@
 
 #include <Chipset/ArmV7.h>
 
-#define ARM_PRIMARY_CORE  0
 #define SerialPrint(txt)  SerialPortWrite (txt, AsciiStrLen(txt)+1);
 
 // Vector Table for PrePi Phase
@@ -69,7 +68,7 @@ PrimaryMain (
 
 VOID
 SecondaryMain (
-  IN  UINTN                     CoreId
+  IN  UINTN                     MpId
   );
 
 // Either implemented by PrePiLib or by MemoryInitPei

@@ -53,6 +53,9 @@
   gArmTokenSpaceGuid.PcdVFPEnabled
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport
   
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
+  
   gArmTokenSpaceGuid.PcdNormalFvBaseAddress
   
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase

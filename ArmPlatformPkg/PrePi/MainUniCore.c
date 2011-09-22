@@ -28,7 +28,7 @@ PrimaryMain (
 
 VOID
 SecondaryMain (
-  IN  UINTN                     CoreId
+  IN  UINTN                     MpId
   )
 {
   // We must never get into this function on UniCore system

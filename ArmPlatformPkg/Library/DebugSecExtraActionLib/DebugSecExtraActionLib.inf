@@ -47,5 +47,8 @@
 [FixedPcd]
   gArmTokenSpaceGuid.PcdNormalFvBaseAddress
   
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
+
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase

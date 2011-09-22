@@ -136,13 +136,13 @@ PrePiMain (
 
 VOID
 CEntryPoint (
-  IN  UINTN                     CoreId,
+  IN  UINTN                     MpId,
   IN  UINTN                     UefiMemoryBase
   )
 {
   UINT64   StartTimeStamp;
  
-  if ((CoreId == ARM_PRIMARY_CORE) && PerformanceMeasurementEnabled ()) {
+  if (IS_PRIMARY_CORE(MpId) && PerformanceMeasurementEnabled ()) {
     // Initialize the Timer Library to setup the Timer HW controller
     TimerConstructor ();
     // We cannot call yet the PerformanceLib because the HOB List has not been initialized
@@ -168,11 +168,11 @@ CEntryPoint (
   ArmWriteVBar ((UINT32)PrePiVectorTable);
 
   // If not primary Jump to Secondary Main
-  if (CoreId == ARM_PRIMARY_CORE) {
+  if (IS_PRIMARY_CORE(MpId)) {
     // Goto primary Main.
     PrimaryMain (UefiMemoryBase, StartTimeStamp);
   } else {
-    SecondaryMain (CoreId);
+    SecondaryMain (MpId);
   }
 
   // DXE Core should always load and never return

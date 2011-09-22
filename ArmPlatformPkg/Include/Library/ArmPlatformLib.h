@@ -103,7 +103,7 @@ ArmPlatformSecInitialize (
 **/
 VOID
 ArmPlatformSecExtraAction (
-  IN  UINTN         CoreId,
+  IN  UINTN         MpId,
   OUT UINTN*        JumpAddress
   );
 

@@ -26,8 +26,6 @@
 #include <Chipset/ArmV7.h>
 #include <Library/ArmGicLib.h>
 
-#define ARM_PRIMARY_CORE  0
-
 #define SerialPrint(txt)  SerialPortWrite ((UINT8*)txt, AsciiStrLen(txt)+1);
 
 extern VOID *monitor_vector_table;
@@ -66,7 +64,7 @@ copy_cpsr_into_spsr (
 
 VOID
 CEntryPoint (
-  IN  UINTN                     CoreId
+  IN  UINTN                     MpId
   )
 {
   CHAR8           Buffer[100];
@@ -74,7 +72,7 @@ CEntryPoint (
   UINTN           JumpAddress;
 
   // Primary CPU clears out the SCU tag RAMs, secondaries wait
-  if (CoreId == ARM_PRIMARY_CORE) {
+  if (IS_PRIMARY_CORE(MpId)) {
     if (FixedPcdGet32(PcdMPCoreSupport)) {
       ArmInvalidScu();
     }
@@ -118,7 +116,7 @@ CEntryPoint (
     ArmEnableVFP();
   }
 
-  if (CoreId == ARM_PRIMARY_CORE) {
+  if (IS_PRIMARY_CORE(MpId)) {
     // Initialize peripherals that must be done at the early stage
     // Example: Some L2x0 controllers must be initialized in Secure World
     ArmPlatformSecInitialize ();
@@ -138,18 +136,18 @@ CEntryPoint (
   if (ArmPlatformTrustzoneSupported()) {
     if (FixedPcdGet32(PcdMPCoreSupport)) {
       // Setup SMP in Non Secure world
-      ArmSetupSmpNonSecure (CoreId);
+      ArmSetupSmpNonSecure (GET_CORE_ID(MpId));
     }
 
     // Enter Monitor Mode
-    enter_monitor_mode((VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * CoreId)));
+    enter_monitor_mode ((VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * GET_CORE_POS(MpId))));
 
     //Write the monitor mode vector table address
     ArmWriteVMBar((UINT32) &monitor_vector_table);
 
     //-------------------- Monitor Mode ---------------------
     // Setup the Trustzone Chipsets
-    if (CoreId == ARM_PRIMARY_CORE) {
+    if (IS_PRIMARY_CORE(MpId)) {
       ArmPlatformTrustzoneInit();
 
       // Wake up the secondary cores by sending a interrupt to everyone else
@@ -193,12 +191,12 @@ CEntryPoint (
     // security state (SCR_AW), CPSR.F modified in any security state (SCR_FW)
     ArmWriteScr(SCR_NS | SCR_FW | SCR_AW);
   } else {
-    if (CoreId == ARM_PRIMARY_CORE) {
+    if (IS_PRIMARY_CORE(MpId)) {
       SerialPrint ("Trust Zone Configuration is disabled\n\r");
     }
 
     // Trustzone is not enabled, just enable the Distributor and CPU interface
-    if (CoreId == ARM_PRIMARY_CORE) {
+    if (IS_PRIMARY_CORE(MpId)) {
       ArmGicEnableDistributor (PcdGet32(PcdGicDistributorBase));
     }
     ArmGicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
@@ -210,7 +208,7 @@ CEntryPoint (
   }
 
   JumpAddress = PcdGet32 (PcdNormalFvBaseAddress);
-  ArmPlatformSecExtraAction (CoreId, &JumpAddress);
+  ArmPlatformSecExtraAction (MpId, &JumpAddress);
 
   return_from_exception (JumpAddress);
   //-------------------- Non Secure Mode ---------------------

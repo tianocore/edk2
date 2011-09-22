@@ -52,10 +52,13 @@ _ModuleEntryPoint
 _IdentifyCpu 
   // Identify CPU ID
   bl    ArmReadMpidr
-  and   r5, r0, #0xf
+  // Get ID of this CPU in Multicore system
+  LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCoreMask), r1)
+  and   r5, r0, r1
   
-  //get ID of this CPU in Multicore system
-  cmp   r5, #0
+  // Is it the Primary Core ?
+  LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCore), r1)
+  cmp   r5, r1
   // Only the primary core initialize the memory (SMC)
   beq   _InitMem
   
@@ -97,7 +100,7 @@ _SetupStack
   ldr   r3, StartupAddr
   
   // Jump to SEC C code
-  //    r0 = core_id
+  //    r0 = mp_id
   mov   r0, r5
   blx   r3
   

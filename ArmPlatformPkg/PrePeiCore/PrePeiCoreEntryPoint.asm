@@ -19,6 +19,7 @@
   INCLUDE AsmMacroIoLib.inc
   
   IMPORT  CEntryPoint
+  IMPORT  ArmReadMpidr
   EXPORT  _ModuleEntryPoint
   
   PRESERVE8
@@ -28,8 +29,10 @@ StartupAddr        DCD      CEntryPoint
 
 _ModuleEntryPoint
   // Identify CPU ID
-  mrc   p15, 0, r0, c0, c0, 5
-  and   r0, #0xf
+  bl    ArmReadMpidr
+  // Get ID of this CPU in Multicore system
+  LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCoreMask), r1)
+  and   r0, r0, r1
 
 _SetupStack
   // Setup Stack for the 4 CPU cores
@@ -62,7 +65,7 @@ _PrepareArguments
   ldr   r2, StartupAddr
 
   // jump to PrePeiCore C code
-  //    r0 = core_id
+  //    r0 = mp_id
   //    r1 = pei_core_address
   blx   r2
 

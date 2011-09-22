@@ -57,7 +57,7 @@ PrimaryMain (
 VOID
 EFIAPI
 SecondaryMain (
-  IN UINTN CoreId
+  IN UINTN MpId
   );
 
 #endif

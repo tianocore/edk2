@@ -36,7 +36,7 @@ EFI_PEI_PPI_DESCRIPTOR      gSecPpiTable[] = {
 
 VOID
 CEntryPoint (
-  IN  UINTN                     CoreId,
+  IN  UINTN                     MpId,
   IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
   )
 {
@@ -62,7 +62,7 @@ CEntryPoint (
   //Note: The MMU will be enabled by MemoryPeim. Only the primary core will have the MMU on.
 
   //If not primary Jump to Secondary Main
-  if(0 == CoreId) {
+  if (IS_PRIMARY_CORE(MpId)) {
     // Initialize the Debug Agent for Source Level Debugging
     InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
     SaveAndSetDebugTimerInterrupt (TRUE);
@@ -70,7 +70,7 @@ CEntryPoint (
     // Goto primary Main.
     PrimaryMain (PeiCoreEntryPoint);
   } else {
-    SecondaryMain (CoreId);
+    SecondaryMain (MpId);
   }
 
   // PEI Core should always load and never return

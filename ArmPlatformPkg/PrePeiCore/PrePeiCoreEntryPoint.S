@@ -19,19 +19,18 @@
 .text
 .align 3
 
-#global symbols referenced by this module
 GCC_ASM_IMPORT(CEntryPoint)
+GCC_ASM_IMPORT(ArmReadMpidr)
+GCC_ASM_EXPORT(_ModuleEntryPoint)
 
 StartupAddr: .word    CEntryPoint
 
-#make _ModuleEntryPoint as global
-GCC_ASM_EXPORT(_ModuleEntryPoint)
-
-
 ASM_PFX(_ModuleEntryPoint):
   # Identify CPU ID
-  mrc   p15, 0, r0, c0, c0, 5
-  and   r0, #0xf
+  bl    ASM_PFX(ArmReadMpidr)
+  // Get ID of this CPU in Multicore system
+  LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCoreMask), r1)
+  and   r0, r0, r1
 
 _SetupStack:
   # Setup Stack for the 4 CPU cores

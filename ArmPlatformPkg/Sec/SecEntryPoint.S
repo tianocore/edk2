@@ -35,6 +35,7 @@ GCC_ASM_IMPORT(ArmPlatformInitializeBootMemory)
 GCC_ASM_IMPORT(ArmDisableInterrupts)
 GCC_ASM_IMPORT(ArmDisableCachesAndMmu)
 GCC_ASM_IMPORT(ArmWriteVBar)
+GCC_ASM_IMPORT(ArmReadMpidr)
 GCC_ASM_IMPORT(SecVectorTable)
 
 #if (FixedPcdGet32(PcdMPCoreSupport))
@@ -58,10 +59,13 @@ ASM_PFX(_ModuleEntryPoint):
 _IdentifyCpu: 
   # Identify CPU ID
   bl    ASM_PFX(ArmReadMpidr)
-  and   r5, r0, #0xf
+  // Get ID of this CPU in Multicore system
+  LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCoreMask), r1)
+  and   r5, r0, r1
   
   #get ID of this CPU in Multicore system
-  cmp   r5, #0
+  LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCore), r1)
+  cmp   r5, r1
   # Only the primary core initialize the memory (SMC)
   beq   _InitMem
   
