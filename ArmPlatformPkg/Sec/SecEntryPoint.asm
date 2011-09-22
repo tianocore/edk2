@@ -21,7 +21,6 @@
   
   IMPORT  CEntryPoint
   IMPORT  ArmPlatformSecBootAction
-  IMPORT  ArmPlatformIsMemoryInitialized
   IMPORT  ArmPlatformInitializeBootMemory
   IMPORT  ArmDisableInterrupts
   IMPORT  ArmDisableCachesAndMmu
@@ -76,10 +75,7 @@ _WaitForEnabledScu
 #endif
   
 _InitMem
-  bl    ArmPlatformIsMemoryInitialized
-  bne   _SetupStack
-  
-  // Initialize Init Memory
+  // Initialize Init Boot Memory
   bl    ArmPlatformInitializeBootMemory
 
   // Only Primary CPU could run this line (the secondary cores have jumped from _IdentifyCpu to _SetupStack)

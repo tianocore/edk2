@@ -41,8 +41,6 @@
 [Sources.common]
   CTA9x4Sec.c
   CTA9x4.c
-  CTA9x4Helper.asm   | RVCT
-  CTA9x4Helper.S     | GCC
   CTA9x4Boot.asm     | RVCT
   CTA9x4Boot.S       | GCC
 

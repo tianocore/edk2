@@ -31,7 +31,6 @@ GCC_ASM_EXPORT(_ModuleEntryPoint)
 #global functions referenced by this module
 GCC_ASM_IMPORT(CEntryPoint)
 GCC_ASM_IMPORT(ArmPlatformSecBootAction)
-GCC_ASM_IMPORT(ArmPlatformIsMemoryInitialized)
 GCC_ASM_IMPORT(ArmPlatformInitializeBootMemory)
 GCC_ASM_IMPORT(ArmDisableInterrupts)
 GCC_ASM_IMPORT(ArmDisableCachesAndMmu)
@@ -83,10 +82,7 @@ _WaitForEnabledScu:
 #endif
   
 _InitMem:
-  bl    ASM_PFX(ArmPlatformIsMemoryInitialized)
-  bne   _SetupStack
-  
-  # Initialize Init Memory
+  // Initialize Init Boot Memory
   bl    ASM_PFX(ArmPlatformInitializeBootMemory)
 
   # Only Primary CPU could run this line (the secondary cores have jumped from _IdentifyCpu to _SetupStack)

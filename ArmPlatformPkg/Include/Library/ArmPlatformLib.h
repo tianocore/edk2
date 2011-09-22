@@ -42,19 +42,6 @@ typedef struct {
 } ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR;
 
 /**
-  Called at the early stage of the Boot phase to know if the memory has already been initialized
-
-  Running the code from the reset vector does not mean we start from cold boot. In some case, we
-  can go through this code with the memory already initialized.
-  Because this function is called at the early stage, the implementation must not use the stack.
-  Its implementation must probably done in assembly to ensure this requirement.
-
-  @return   Return the condition value into the 'Z' flag
-
-**/
-VOID ArmPlatformIsMemoryInitialized(VOID);
-
-/**
   Initialize the memory where the initial stacks will reside
 
   This memory can contain the initial stacks (Secure and Secure Monitor stacks).
