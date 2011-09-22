@@ -255,7 +255,7 @@ DefineDefaultBootEntries (
         BootArguments->LinuxArguments.InitrdSize = InitrdSize;
 
         CopyMem ((VOID*)(BootArguments + 1), (CHAR8*)PcdGetPtr(PcdDefaultBootArgument), CmdLineSize);
-        CopyMem ((VOID*)(BootArguments + 1) + CmdLineSize, (CHAR8*)PcdGetPtr(PcdDefaultBootArgument), InitrdSize);
+        CopyMem ((VOID*)((UINTN)(BootArguments + 1) + CmdLineSize), InitrdPath, InitrdSize);
       } else {
         BootArguments = NULL;
       }
