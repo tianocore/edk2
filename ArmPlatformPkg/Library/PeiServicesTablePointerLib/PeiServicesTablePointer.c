@@ -16,6 +16,7 @@
 **/
 
 #include <PiPei.h>
+#include <Library/ArmPlatformGlobalVariableLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
@@ -33,17 +34,12 @@
 VOID
 EFIAPI
 SetPeiServicesTablePointer (
-  IN CONST EFI_PEI_SERVICES ** PeiServicesTablePointer
+  IN CONST EFI_PEI_SERVICES **PeiServicesTablePointer
   )
 {
-  UINTN *PeiPtrLoc;
   ASSERT (PeiServicesTablePointer != NULL);
 
-  PeiPtrLoc = (UINTN *)(UINTN)(PcdGet32 (PcdCPUCoresNonSecStackBase) + 
-                               (PcdGet32 (PcdCPUCoresNonSecStackSize) / 2) - 
-                               PcdGet32 (PcdPeiGlobalVariableSize) +
-                               PcdGet32 (PcdPeiServicePtrGlobalOffset));
-  *PeiPtrLoc = (UINTN)PeiServicesTablePointer;
+  ArmPlatformSetGlobalVariable (PcdGet32 (PcdPeiServicePtrGlobalOffset), sizeof(EFI_PEI_SERVICES **), &PeiServicesTablePointer);
 }
 
 /**
@@ -58,19 +54,17 @@ SetPeiServicesTablePointer (
   @return  The pointer to PeiServices.
 
 **/
-CONST EFI_PEI_SERVICES **
+CONST EFI_PEI_SERVICES**
 EFIAPI
 GetPeiServicesTablePointer (
   VOID
   )
 {
-  UINTN *PeiPtrLoc;
+  EFI_PEI_SERVICES **PeiServicesTablePointer;
 
-  PeiPtrLoc = (UINTN *)(UINTN)(PcdGet32 (PcdCPUCoresNonSecStackBase) + 
-                               (PcdGet32 (PcdCPUCoresNonSecStackSize) / 2) - 
-                               PcdGet32 (PcdPeiGlobalVariableSize) +
-                               PcdGet32 (PcdPeiServicePtrGlobalOffset));
-  return (CONST EFI_PEI_SERVICES **)*PeiPtrLoc;
+  ArmPlatformGetGlobalVariable (PcdGet32 (PcdPeiServicePtrGlobalOffset), sizeof(EFI_PEI_SERVICES **), &PeiServicesTablePointer);
+
+  return (CONST EFI_PEI_SERVICES**)PeiServicesTablePointer;
 }
 
 

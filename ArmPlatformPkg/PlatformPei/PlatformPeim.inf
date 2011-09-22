@@ -47,6 +47,10 @@
 [Ppis]
   gEfiPeiMasterBootModePpiGuid                  # PPI ALWAYS_PRODUCED
   gEfiPeiBootInRecoveryModePpiGuid              # PPI SOMETIMES_PRODUCED
+  gArmGlobalVariablePpiGuid
+
+[Guids]
+  gArmGlobalVariableGuid
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFdBaseAddress
@@ -57,6 +61,8 @@
   
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
+  
+  gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
   
 [Depex]
   TRUE

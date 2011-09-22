@@ -37,6 +37,13 @@
   #
   gVariableRuntimeDxeFileGuid = { 0xcbd2e4d5, 0x7068, 0x4ff5, { 0xb4, 0x62, 0x98, 0x22, 0xb4, 0xad, 0x8d, 0x60 } }
 
+  ## Include/Guid/ArmGlobalVariableHob.h
+  gArmGlobalVariableGuid      = { 0xc3253c90, 0xa24f, 0x4599, { 0xa6, 0x64, 0x1f, 0x88, 0x13, 0x77, 0x8f, 0xc9} }
+
+[Ppis]
+  ## Include/Ppi/ArmGlobalVariable.h
+  gArmGlobalVariablePpiGuid = { 0xab1c1816, 0xd542, 0x4e6f, {0x9b, 0x1e, 0x8e, 0xcd, 0x92, 0x53, 0xe2, 0xe7} }
+
 [PcdsFeatureFlag.common]
   # Set this PCD to TRUE to map NORFlash at 0x0. FALSE means the DRAM is mapped at 0x0.
   gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping|FALSE|BOOLEAN|0x00000012
@@ -75,6 +82,9 @@
   # PeiServicePtr is only valid with PEI Core and HobListPtr only when the PEI Core is skipped. 
   gArmPlatformTokenSpaceGuid.PcdPeiServicePtrGlobalOffset|0x0|UINT32|0x00000017
   gArmPlatformTokenSpaceGuid.PcdHobListPtrGlobalOffset|0x0|UINT32|0x00000018
+
+  # Size to reserve in the primary core stack for SEC Global Variables
+  gArmPlatformTokenSpaceGuid.PcdSecGlobalVariableSize|0x0|UINT32|0x00000031
 
   #
   # ARM Primecells

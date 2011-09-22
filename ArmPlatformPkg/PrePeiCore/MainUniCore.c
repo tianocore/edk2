@@ -16,8 +16,6 @@
 
 #include "PrePeiCore.h"
 
-extern EFI_PEI_PPI_DESCRIPTOR *gSecPpiTable;
-
 VOID
 EFIAPI
 SecondaryMain (

@@ -15,7 +15,11 @@
 #ifndef __PREPEICORE_H_
 #define __PREPEICORE_H_
 
+#include <Library/ArmLib.h>
+#include <Library/ArmPlatformLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 
 #include <PiPei.h>
@@ -29,6 +33,11 @@ SecTemporaryRamSupport (
   IN EFI_PHYSICAL_ADDRESS     TemporaryMemoryBase,
   IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
   IN UINTN                    CopySize
+  );
+
+EFI_STATUS
+PrePeiCoreGetGlobalVariableMemory (
+  OUT EFI_PHYSICAL_ADDRESS    *GlobalVariableBase
   );
 
 VOID

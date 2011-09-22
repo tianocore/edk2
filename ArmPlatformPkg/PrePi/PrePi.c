@@ -26,9 +26,16 @@
 
 #include <Ppi/GuidedSectionExtraction.h>
 #include <Guid/LzmaDecompress.h>
+#include <Guid/ArmGlobalVariableHob.h>
 
 #include "PrePi.h"
 #include "LzmaDecompress.h"
+
+#define IS_XIP() ((FixedPcdGet32 (PcdFdBaseAddress) > (FixedPcdGet32 (PcdSystemMemoryBase) + FixedPcdGet32 (PcdSystemMemorySize))) || \
+                  ((FixedPcdGet32 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) < FixedPcdGet32 (PcdSystemMemoryBase)))
+
+// Not used when PrePi in run in XIP mode
+UINTN mGlobalVariableBase = 0;
 
 VOID
 PrePiCommonExceptionEntry (
@@ -49,6 +56,23 @@ LzmaDecompressLibConstructor (
   );
 
 VOID
+EFIAPI
+BuildGlobalVariableHob (
+  IN EFI_PHYSICAL_ADDRESS         GlobalVariableBase,
+  IN UINT32                       GlobalVariableSize
+  )
+{
+  ARM_HOB_GLOBAL_VARIABLE  *Hob;
+
+  Hob = CreateHob (EFI_HOB_TYPE_GUID_EXTENSION, sizeof (ARM_HOB_GLOBAL_VARIABLE));
+  ASSERT(Hob != NULL);
+
+  CopyGuid (&(Hob->Header.Name), &gArmGlobalVariableGuid);
+  Hob->GlobalVariableBase = GlobalVariableBase;
+  Hob->GlobalVariableSize = GlobalVariableSize;
+}
+
+VOID
 PrePiMain (
   IN  UINTN                     UefiMemoryBase,
   IN  UINTN                     StacksBase,
@@ -61,6 +85,11 @@ PrePiMain (
   CHAR8                         Buffer[100];
   UINTN                         CharCount;
   UINTN                         StacksSize;
+
+  // If ensure the FD is either part of the System Memory or totally outside of the System Memory (XIP)
+  ASSERT (IS_XIP() || 
+          ((FixedPcdGet32 (PcdFdBaseAddress) >= FixedPcdGet32 (PcdSystemMemoryBase)) &&
+           ((FixedPcdGet32 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) <= (FixedPcdGet32 (PcdSystemMemoryBase) + FixedPcdGet32 (PcdSystemMemorySize)))));
 
   // Enable program flow prediction, if supported.
   ArmEnableBranchPrediction ();
@@ -77,6 +106,10 @@ PrePiMain (
   // Initialize the Debug Agent for Source Level Debugging
   InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
   SaveAndSetDebugTimerInterrupt (TRUE);
+
+  if (!IS_XIP()) {
+    mGlobalVariableBase = GlobalVariableBase;
+  }
   
   // Declare the PI/UEFI memory region
   HobList = HobConstructor (
@@ -94,6 +127,9 @@ PrePiMain (
   // Create the Stacks HOB (reserve the memory for all stacks)
   StacksSize = PcdGet32 (PcdCPUCorePrimaryStackSize) + (FixedPcdGet32(PcdClusterCount) * 4 * FixedPcdGet32(PcdCPUCoreSecondaryStackSize));
   BuildStackHob (StacksBase, StacksSize);
+
+  // Declare the Global Variable HOB
+  BuildGlobalVariableHob (GlobalVariableBase, FixedPcdGet32 (PcdPeiGlobalVariableSize));
 
   // Set the Boot Mode
   SetBootMode (ArmPlatformGetBootMode ());

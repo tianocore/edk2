@@ -29,10 +29,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
+  ArmPlatformGlobalVariableLib
   
 [FixedPcd.common]
   gArmPlatformTokenSpaceGuid.PcdHobListPtrGlobalOffset
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize
-  gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
-  

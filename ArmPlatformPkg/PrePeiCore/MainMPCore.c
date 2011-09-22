@@ -18,8 +18,6 @@
 
 #include "PrePeiCore.h"
 
-extern EFI_PEI_PPI_DESCRIPTOR *gSecPpiTable;
-
 /*
  * This is the main function for secondary cores. They loop around until a non Null value is written to
  * SYS_FLAGS register.The SYS_FLAGS register is platform specific.

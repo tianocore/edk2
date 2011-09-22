@@ -21,7 +21,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiServicesTablePointerLib
   FILE_GUID                      = 1c747f6b-0a58-49ae-8ea3-0327a4fa10e3
-  MODULE_TYPE                    = PEIM
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PeiServicesTablePointerLib|PEIM PEI_CORE SEC
 
@@ -37,11 +37,8 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
-  DebugLib
+  ArmPlatformGlobalVariableLib
   
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdPeiServicePtrGlobalOffset
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize
-  gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
-  
+

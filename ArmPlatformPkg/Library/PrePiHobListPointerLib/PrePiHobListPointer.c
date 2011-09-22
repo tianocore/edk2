@@ -13,6 +13,7 @@
 **/
 
 #include <PiPei.h>
+#include <Library/ArmPlatformGlobalVariableLib.h>
 #include <Library/PrePiHobListPointerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
@@ -31,10 +32,11 @@ PrePeiGetHobList (
   VOID
   )
 {
-  return (VOID *)*(UINTN*)(PcdGet32 (PcdCPUCoresNonSecStackBase) +
-                           PcdGet32 (PcdCPUCoresNonSecStackSize) -
-                           PcdGet32 (PcdPeiGlobalVariableSize) +
-                           PcdGet32 (PcdHobListPtrGlobalOffset));
+  VOID* HobList;
+
+  ArmPlatformGetGlobalVariable (PcdGet32 (PcdHobListPtrGlobalOffset), sizeof(VOID*), &HobList);
+
+  return HobList;
 }
 
 
@@ -51,14 +53,7 @@ PrePeiSetHobList (
   IN  VOID      *HobList
   )
 {
-  UINTN* HobListPtr;
-
-  HobListPtr = (UINTN*)(PcdGet32 (PcdCPUCoresNonSecStackBase) +
-                        PcdGet32 (PcdCPUCoresNonSecStackSize) -
-                        PcdGet32 (PcdPeiGlobalVariableSize) +
-                        PcdGet32 (PcdHobListPtrGlobalOffset));
-
-  *HobListPtr = (UINTN)HobList;
+  ArmPlatformSetGlobalVariable (PcdGet32 (PcdHobListPtrGlobalOffset), sizeof(VOID*), &HobList);
 
   return EFI_SUCCESS;
 }

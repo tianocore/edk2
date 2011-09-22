@@ -124,3 +124,6 @@
   ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
+
+  ArmPkg/Application/LinuxLoader/LinuxAtagLoader.inf
+  ArmPkg/Application/LinuxLoader/LinuxFdtLoader.inf

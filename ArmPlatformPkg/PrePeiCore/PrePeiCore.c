@@ -13,24 +13,30 @@
 *
 **/
 
-#include <Library/IoLib.h>
 #include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/PrintLib.h>
 #include <Library/ArmLib.h>
 #include <Library/SerialPortLib.h>
+
+#include <Ppi/ArmGlobalVariable.h>
 #include <Chipset/ArmV7.h>
 
 #include "PrePeiCore.h"
 
 EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   mSecTemporaryRamSupportPpi = {SecTemporaryRamSupport};
+ARM_GLOBAL_VARIABLE_PPI             mGlobalVariablePpi = { PrePeiCoreGetGlobalVariableMemory };
 
-EFI_PEI_PPI_DESCRIPTOR      gSecPpiTable[] = {
+EFI_PEI_PPI_DESCRIPTOR      gCommonPpiTable[] = {
   {
-    EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+    EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiTemporaryRamSupportPpiGuid,
     &mSecTemporaryRamSupportPpi
+  },
+  {
+    EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+    &gArmGlobalVariablePpiGuid,
+    &mGlobalVariablePpi
   }
 };
 
@@ -96,6 +102,17 @@ SecTemporaryRamSupport (
     );
 
   SecSwitchStack((UINTN)(PermanentMemoryBase - TemporaryMemoryBase));
+
+EFI_STATUS
+PrePeiCoreGetGlobalVariableMemory (
+  OUT EFI_PHYSICAL_ADDRESS    *GlobalVariableBase
+  )
+{
+  ASSERT (GlobalVariableBase != NULL);
+
+  *GlobalVariableBase = (UINTN)PcdGet32 (PcdCPUCoresStackBase) +
+                        (UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize) -
+                        (UINTN)PcdGet32 (PcdPeiGlobalVariableSize);
 
   return EFI_SUCCESS;
 }
