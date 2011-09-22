@@ -732,19 +732,64 @@ EblFileCopyCmd (
   VOID          *Buffer      = NULL;
   UINTN         Size;
   UINTN         Offset;
-  UINTN         Chunk = FILE_COPY_CHUNK;
+  UINTN         Chunk        = FILE_COPY_CHUNK;
+  UINTN         FileNameLen;
+  CHAR8*        DestFileName;
+  CHAR8*        SrcFileName;
+  CHAR8*        SrcPtr;
 
   if (Argc < 3) {
     return EFI_INVALID_PARAMETER;
   }
   
+  DestFileName = Argv[2];
+  FileNameLen = AsciiStrLen (DestFileName);
+
+  // Check if the destination file name looks like a directory
+  if ((DestFileName[FileNameLen-1] == '\\') || (DestFileName[FileNameLen-1] == ':')) {
+    // Set the pointer after the source drive (eg: after fs1:)
+    SrcPtr = AsciiStrStr (Argv[1], ":");
+    if (SrcPtr == NULL) {
+      SrcPtr = Argv[1];
+    } else {
+      SrcPtr++;
+      if (*SrcPtr == '\\') {
+        SrcPtr++;
+      }
+    }
+
+    if (*SrcPtr == '\0') {
+      AsciiPrint("Source file incorrect.\n");
+    }
+
+    // Skip the Source Directories
+    while (1) {
+      SrcFileName = SrcPtr;
+      SrcPtr = AsciiStrStr (SrcPtr,"\\");
+      if (SrcPtr != NULL) {
+        SrcPtr++;
+      } else {
+        break;
+      }
+    }
+
+    if (*SrcFileName == '\0') {
+      AsciiPrint("Source file incorrect (Error 2).\n");
+    }
+
+    // Construct the destination filepath
+    DestFileName = (CHAR8*)AllocatePool (FileNameLen + AsciiStrLen (SrcFileName) + 1);
+    AsciiStrCpy (DestFileName, Argv[2]);
+    AsciiStrCat (DestFileName, SrcFileName);
+  }
+
   Source = EfiOpen(Argv[1], EFI_FILE_MODE_READ, 0);
   if (Source == NULL) {
     AsciiPrint("Source file open error.\n");
     return EFI_NOT_FOUND;
   }
   
-  Destination = EfiOpen(Argv[2], EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE, 0);
+  Destination = EfiOpen(DestFileName, EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE, 0);
   if (Destination == NULL) {
     AsciiPrint("Destination file open error.\n");
     return EFI_NOT_FOUND;
@@ -802,6 +847,11 @@ Exit:
     Status = EfiClose(Destination);
     if (EFI_ERROR(Status)) {
       AsciiPrint("Destination close error %r\n", Status);
+    }
+
+    // Case when we have concated the filename to the destination directory
+    if (DestFileName != Argv[2]) {
+      FreePool (DestFileName);
     }
   }
   
@@ -972,7 +1022,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mCmdDeviceTemplate[] =
   },
   {
     "cp",
-    " file1 file2; copy file",
+    " file1 file2; copy file only.",
     NULL,
     EblFileCopyCmd
   },
