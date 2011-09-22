@@ -68,8 +68,8 @@
   gArmTokenSpaceGuid.PcdNormalFvBaseAddress
   gArmTokenSpaceGuid.PcdNormalFvSize
 
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize
+  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize
 
   gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
   gArmPlatformTokenSpaceGuid.PcdHobListPtrGlobalOffset

@@ -49,19 +49,21 @@
   # These PCDs should be FeaturePcds. But we used these PCDs as an '#if' in an ASM file.
   # Using a FeaturePcd make a '(BOOLEAN) casting for its value which is not understood by the preprocessor.
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|0|UINT32|0x00000003
-  gArmPlatformTokenSpaceGuid.PcdMPCoreMaxCores|1|UINT32|0x0000002D
-  
+  gArmPlatformTokenSpaceGuid.PcdClusterCount|1|UINT32|0x00000038
+    
   # Stack for CPU Cores in Secure Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0|UINT32|0x00000005
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecStackSize|0|UINT32|0x00000006
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecPrimaryStackSize|0x10000|UINT32|0x00000036
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecSecondaryStackSize|0x1000|UINT32|0x00000006
 
   # Stack for CPU Cores in Secure Monitor Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT32|0x00000007
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0|UINT32|0x00000008
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x1000|UINT32|0x00000008
 
   # Stack for CPU Cores in Non Secure Mode
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase|0|UINT32|0x00000009
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize|0|UINT32|0x0000000A
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0|UINT32|0x00000009
+  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x10000|UINT32|0x00000037
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize|0x1000|UINT32|0x0000000A
     
   # Size of the region used by UEFI in permanent memory (Reserved 128MB by default)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x08000000|UINT32|0x00000015

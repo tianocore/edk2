@@ -59,7 +59,8 @@
   gArmTokenSpaceGuid.PcdNormalFvBaseAddress
   
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecStackSize
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecPrimaryStackSize
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecSecondaryStackSize
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize
   

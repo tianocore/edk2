@@ -82,8 +82,8 @@ PrimaryMain (
   SecCoreData.DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
   SecCoreData.BootFirmwareVolumeBase = (VOID *)(UINTN)PcdGet32 (PcdNormalFvBaseAddress);
   SecCoreData.BootFirmwareVolumeSize = PcdGet32 (PcdNormalFvSize);
-  SecCoreData.TemporaryRamBase       = (VOID *)(UINTN)PcdGet32 (PcdCPUCoresNonSecStackBase); // We consider we run on the primary core (and so we use the first stack)
-  SecCoreData.TemporaryRamSize       = (UINTN)(UINTN)PcdGet32 (PcdCPUCoresNonSecStackSize);
+  SecCoreData.TemporaryRamBase       = (VOID *)(UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize); // We consider we run on the primary core (and so we use the first stack)
+  SecCoreData.TemporaryRamSize       = (UINTN)(UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize);
   SecCoreData.PeiTemporaryRamBase    = (VOID *)((UINTN)(SecCoreData.TemporaryRamBase) + (SecCoreData.TemporaryRamSize / 2));
   SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize / 2;
   SecCoreData.StackBase              = SecCoreData.TemporaryRamBase;

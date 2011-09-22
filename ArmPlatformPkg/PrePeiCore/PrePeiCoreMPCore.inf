@@ -61,8 +61,9 @@
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
   gArmTokenSpaceGuid.PcdArmPrimaryCore
 
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase
+  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize
   
   gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
   

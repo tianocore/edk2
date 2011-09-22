@@ -77,5 +77,21 @@
   LoadConstantToRegMacro $Data, $Reg 
   ldr  $Reg, =($Data) 
   MEND 
+  
+  MACRO
+  GetCorePositionInStack $Pos, $MpId, $Tmp
+  lsr   $Pos, $MpId, #6
+  and   $Tmp, $MpId, #3
+  add   $Pos, $Pos, $Tmp
+  MEND
+  
+  ; The reserved place must be 8-bytes aligned for pushing 64-bit variable on the stack
+  MACRO
+  SetPrimaryStack $StackTop, $GlobalSize, $Tmp
+  and     $Tmp, $GlobalSize, #7
+  rsbne   $Tmp, $Tmp, #8
+  add     $GlobalSize, $GlobalSize, $Tmp
+  sub     sp, $StackTop, $GlobalSize
+  MEND
 
   END

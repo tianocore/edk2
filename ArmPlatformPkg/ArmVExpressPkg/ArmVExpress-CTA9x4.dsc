@@ -385,20 +385,14 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData|0
   
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|1
-  gArmPlatformTokenSpaceGuid.PcdMPCoreMaxCores|4
   gArmTokenSpaceGuid.PcdVFPEnabled|1
   
   # Stacks for MPCores in Secure World
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0x49E00000	    # Top of SEC Stack for Secure World
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecStackSize|0x2000		      # Stack for each of the 4 CPU cores
-
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0x49E00000
   # Stacks for MPCores in Monitor Mode
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0x49D00000	# Top of SEC Stack for Monitor World
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x2000		    # Stack for each of the 4 CPU cores
-
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0x49D00000
   # Stacks for MPCores in Normal World
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase|0x48000000	# Top of SEC Stack for Normal World
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize|0x00020000	# Stack for each of the 4 CPU cores
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x48000000
 
   # System Memory (1GB) 
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x60000000

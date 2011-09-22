@@ -79,7 +79,6 @@ PrePiMain (
   SaveAndSetDebugTimerInterrupt (TRUE);
 
   UefiMemoryTop = UefiMemoryBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
-  StacksSize = PcdGet32 (PcdCPUCoresNonSecStackSize) * PcdGet32 (PcdMPCoreMaxCores);
   StacksBase = UefiMemoryTop - StacksSize;
 
   // Check the PcdCPUCoresNonSecStackBase match with the calculated StackBase
@@ -99,6 +98,7 @@ PrePiMain (
   ASSERT_EFI_ERROR (Status);
 
   // Create the Stacks HOB (reserve the memory for all stacks)
+  StacksSize = PcdGet32 (PcdCPUCorePrimaryStackSize) + (FixedPcdGet32(PcdClusterCount) * 4 * FixedPcdGet32(PcdCPUCoreSecondaryStackSize));
   BuildStackHob (StacksBase, StacksSize);
 
   // Set the Boot Mode

@@ -346,19 +346,13 @@
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x00000000
   
   gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|1
-  gArmPlatformTokenSpaceGuid.PcdMPCoreMaxCores|2
   
   # Stacks for MPCores in Secure World
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0x4B000000     # Top of SEC Stack for Secure World
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecStackSize|0x2000		      # Stack for each of the 4 CPU cores
-
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0x4B000000
   # Stacks for MPCores in Monitor Mode
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0x4A000000  # Top of SEC Stack for Monitor World
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x2000		    # Stack for each of the 4 CPU cores
-
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0x4A000000
   # Stacks for MPCores in Normal World
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase|0x48000000	# Top of SEC Stack for Normal World
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize|0x20000	# Stack for each of the 4 CPU cores
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x48000000
 
   # System Memory (256MB) 
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x70000000

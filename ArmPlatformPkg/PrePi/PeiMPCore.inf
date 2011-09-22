@@ -70,8 +70,9 @@
   gArmTokenSpaceGuid.PcdNormalFvBaseAddress
   gArmTokenSpaceGuid.PcdNormalFvSize
 
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase
+  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize
 
   gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
   gArmPlatformTokenSpaceGuid.PcdHobListPtrGlobalOffset
@@ -83,7 +84,10 @@
   gArmTokenSpaceGuid.PcdSystemMemorySize
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
   
-  gArmPlatformTokenSpaceGuid.PcdMPCoreMaxCores
+  gArmPlatformTokenSpaceGuid.PcdClusterCount
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
+
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
 

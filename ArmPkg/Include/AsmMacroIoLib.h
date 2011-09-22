@@ -168,6 +168,17 @@
 #define LoadConstantToReg(Data, Reg) \
   ldr  Reg, =Data
   
+#define GetCorePositionInStack(Pos, MpId, Tmp) \
+  lsr   Pos, MpId, #6 ;                        \
+  and   Tmp, MpId, #3 ;                        \
+  add   Pos, Pos, Tmp
+
+#define SetPrimaryStack(StackTop, GlobalSize, Tmp)  \
+  and     Tmp, GlobalSize, #7         ;             \
+  rsbne   Tmp, Tmp, #8                ;             \
+  add     GlobalSize, GlobalSize, Tmp ;             \
+  sub     sp, StackTop, GlobalSize
+
 #else
 
 //
@@ -229,8 +240,10 @@
 // conditional load testing eq flag
 #define LoadConstantToRegIfEq(Data, Reg)  LoadConstantToRegIfEqMacro Data, Reg
 
+#define GetCorePositionInStack(Pos, MpId, Tmp)  GetCorePositionInStack Pos, MpId, Tmp
+
+#define SetPrimaryStack(StackTop,GlobalSize,Tmp) SetPrimaryStack StackTop, GlobalSize, Tmp
 
 #endif
-
 
 #endif

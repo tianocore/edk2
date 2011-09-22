@@ -19,18 +19,19 @@ gArmTokenSpaceGuid.PcdNormalFdBaseAddress       : Base Address of your Non-Secur
 gArmTokenSpaceGuid.PcdNormalFdSize              : Size in bytes of your Non-Secure/Normal World Firmware Device 
 
 # Stacks
-gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase                   : Top of Secure Stack for Secure World
-gArmPlatformTokenSpaceGuid.PcdCPUCoreSecStackSize                    : Size of the stack for each of the 4 CPU cores
-gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase                : Top of Stack for Monitor World
-gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize                 : Size of the stack for each of the 4 CPU cores
-gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase                : Top of SEC Stack for Normal World
-gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize                : Size of the stack for each of the 4 CPU Cores
+gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase             : Base of Secure Stack for Secure World
+gArmPlatformTokenSpaceGuid.PcdCPUCoreSecPrimaryStackSize       : Size of the stack for the Primary Core in Secure World
+gArmPlatformTokenSpaceGuid.PcdCPUCoreSecSecondaryStackSize     : Size of the stack for the Secondary Cores in Secure World
+gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase          : Base of Stack for Monitor World
+gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize           : Size of the stack for each cores
+gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase                : Base of SEC Stack for Normal World
+gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize          : Size of the stack for the Primary Core
+gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize        : Size of the stack for the Secondary Core
 
 # CPU / Architectural controllers
 gArmTokenSpaceGuid.PcdGicDistributorBase        : Base address of the Distributor of your General Interrupt Controller
 gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase : Base address of the Interface of your General Interrupt Controller
 gArmPlatformTokenSpaceGuid.PcdMPCoreSupport     : Set to 1 when MP Core platforms
-gArmPlatformTokenSpaceGuid.PcdMPCoreMaxCores    : Maximum number of CPU cores on the platform (used for instance to know how many stacks we need to configure)
 
 # Memory Regions
 gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize  : Size of the region reserve for PI & UEFI
