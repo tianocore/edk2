@@ -436,6 +436,49 @@ EXIT:
   return Status;
 }
 
+EFI_STATUS
+UpdateFdtPath (
+  IN LIST_ENTRY *BootOptionsList
+  )
+{
+  EFI_STATUS Status;
+
+  BDS_SUPPORTED_DEVICE *SupportedBootDevice;
+  EFI_DEVICE_PATH_PROTOCOL *FdtDevicePathNode;
+  EFI_DEVICE_PATH_PROTOCOL *FdtDevicePath;
+
+  Status = SelectBootDevice (&SupportedBootDevice);
+  if (EFI_ERROR(Status)) {
+    Status = EFI_ABORTED;
+    goto EXIT;
+  }
+
+  // Create the specific device path node
+  Print(L"File path of the FDT blob: ");
+  Status = SupportedBootDevice->Support->CreateDevicePathNode (SupportedBootDevice, &FdtDevicePathNode, NULL, NULL);
+  if (EFI_ERROR(Status)) {
+    Status = EFI_ABORTED;
+    goto EXIT;
+  }
+
+  if (FdtDevicePathNode != NULL) {
+    // Append the Device Path node to the select device path
+    FdtDevicePath = AppendDevicePathNode (SupportedBootDevice->DevicePathProtocol, FdtDevicePathNode);
+    Status = gRT->SetVariable ((CHAR16*)L"FDT", &gEfiGlobalVariableGuid, (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS ), 4, &FdtDevicePath);
+    ASSERT_EFI_ERROR(Status);
+  } else {
+    gRT->SetVariable ((CHAR16*)L"FDT", &gEfiGlobalVariableGuid, (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS ), 0, NULL);
+    ASSERT_EFI_ERROR(Status);
+  }
+
+EXIT:
+  if (Status == EFI_ABORTED) {
+    Print(L"\n");
+  }
+  FreePool(SupportedBootDevice);
+  return Status;
+}
+
 struct BOOT_MANAGER_ENTRY {
   CONST CHAR16* Description;
   EFI_STATUS (*Callback) (IN LIST_ENTRY *BootOptionsList);
@@ -443,6 +486,7 @@ struct BOOT_MANAGER_ENTRY {
     { L"Add Boot Device Entry", BootMenuAddBootOption },
     { L"Update Boot Device Entry", BootMenuUpdateBootOption },
     { L"Remove Boot Device Entry", BootMenuRemoveBootOption },
+    { L"Update FDT path", UpdateFdtPath },
 };
 
 EFI_STATUS
