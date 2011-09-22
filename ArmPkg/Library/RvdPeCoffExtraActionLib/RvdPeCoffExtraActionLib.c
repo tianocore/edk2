@@ -89,7 +89,7 @@ DeCygwinPathIfNeeded (
   Ptr[9]  = Ptr[10];
   Ptr[10] = ':';
   
-  // switch path seperators
+  // switch path separators
   for (Index = 11; Index < Len; Index++) {
     if (Ptr[Index] == '/') {
       Ptr[Index] = '\\' ;

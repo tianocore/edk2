@@ -17,6 +17,8 @@
 
 **/
 
+#include "Ebl.h"
+
 #define CMD_SEPARATOR     ';'
 #define MAX_ARGS          32
 

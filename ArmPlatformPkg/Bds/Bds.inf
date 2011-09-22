@@ -45,6 +45,7 @@
   UefiDriverEntryPoint
   DebugLib
   PrintLib
+  BaseLib
   
 [Guids]
   gEfiFileSystemInfoGuid

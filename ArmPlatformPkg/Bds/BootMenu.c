@@ -315,7 +315,7 @@ BootMenuRemoveBootOption (
   EFI_STATUS                    Status;
   BDS_LOAD_OPTION_ENTRY*        BootOptionEntry;
 
-  Status = BootMenuSelectBootOption (BootOptionsList, L"Delete entry: ", FALSE, &BootOptionEntry);
+  Status = BootMenuSelectBootOption (BootOptionsList, DELETE_BOOT_ENTRY, FALSE, &BootOptionEntry);
   if (EFI_ERROR(Status)) {
     return Status;
   }
@@ -352,7 +352,7 @@ BootMenuUpdateBootOption (
   UINTN                         InitrdSize;
   UINTN                         CmdLineSize;
 
-  Status = BootMenuSelectBootOption (BootOptionsList, L"Update entry: ", TRUE, &BootOptionEntry);
+  Status = BootMenuSelectBootOption (BootOptionsList, UPDATE_BOOT_ENTRY, TRUE, &BootOptionEntry);
   if (EFI_ERROR(Status)) {
     return Status;
   }
@@ -476,8 +476,7 @@ BootMenuManager (
       BootManagerEntries[OptionSelected-1].Callback (BootOptionsList);
     }
   }
-
-  return EFI_SUCCESS;
+  // Should never go here
 }
 
 EFI_STATUS
@@ -619,6 +618,5 @@ BootMenuMain (
       Status = BootOptionStart (BootOption);
     }
   }
-
-  return Status;
+  // Should never go here
 }

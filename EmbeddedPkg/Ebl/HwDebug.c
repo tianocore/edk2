@@ -24,7 +24,7 @@
 /**
   Dump memory
 
-  Argv[0] - "md"[.#] # is optiona width 1, 2, 4, or 8. Default 1
+  Argv[0] - "md"[.#] # is optional width 1, 2, 4, or 8. Default 1
   Argv[1] - Hex Address to dump
   Argv[2] - Number of hex bytes to dump (0x20 is default)
 
@@ -34,7 +34,7 @@
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_SUCCESS
 

@@ -172,9 +172,6 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|0
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|0
-  gEmbeddedTokenSpaceGuid.PcdPrePiTempMemorySize|0
-  gEmbeddedTokenSpaceGuid.PcdPrePiBfvBaseAddress|0
-  gEmbeddedTokenSpaceGuid.PcdPrePiBfvSize|0
 
 #
 # Optinal feature to help prevent EFI memory map fragments

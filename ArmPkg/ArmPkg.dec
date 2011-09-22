@@ -35,7 +35,7 @@
   ArmLib|Include/Library/ArmLib.h
   SemihostLib|Include/Library/Semihosting.h
   UncachedMemoryAllocationLib|Include/Library/UncachedMemoryAllocationLib.h
-  DefaultExceptioHandlerLib|Include/Library/DefaultExceptioHandlerLib.h
+  DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
   ArmDisassemblerLib|Include/Library/ArmDisassemblerLib.h
   
 [Guids.common]

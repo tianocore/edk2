@@ -15,6 +15,7 @@
 #include <PiPei.h>
 
 #include <Library/DebugAgentLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/PrePiLib.h>
 #include <Library/IoLib.h>
 #include <Library/PrintLib.h>

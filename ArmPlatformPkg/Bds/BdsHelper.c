@@ -239,7 +239,7 @@ GenerateDeviceDescriptionName (
     //TODO: Fixme. we must find the best langague
     Status = ComponentName2Protocol->GetDriverName (ComponentName2Protocol,"en",&DriverName);
     if (!EFI_ERROR(Status)) {
-      StrnCpy (Description,DriverName,BOOT_DEVICE_DESCRIPTION_MAX);
+      StrnCpy (Description, DriverName, BOOT_DEVICE_DESCRIPTION_MAX);
     }
   }
 
@@ -254,7 +254,7 @@ GenerateDeviceDescriptionName (
     DevicePathNode = GetLastDevicePathNode (DevicePathProtocol);
     Status = gBS->LocateProtocol (&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
     ASSERT_EFI_ERROR(Status);
-    DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText(DevicePathNode,TRUE,TRUE);
+    DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText (DevicePathNode, TRUE, TRUE);
     StrnCpy (Description, DevicePathTxt, BOOT_DEVICE_DESCRIPTION_MAX);
     FreePool (DevicePathTxt);
   }

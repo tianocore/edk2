@@ -43,9 +43,6 @@
   IoLib
   ArmLib
 
-[Guids]
-  
-
 [Protocols]
   gHardwareInterruptProtocolGuid
   gEfiCpuArchProtocolGuid

@@ -132,9 +132,8 @@ GdbStubEntry (
   Status = DebugSupport->GetMaximumProcessorIndex (DebugSupport, &gMaxProcessorIndex);
   ASSERT_EFI_ERROR (Status);
   
-  // Make this an EFI_D_INFO after we get everything debugged.
-  DEBUG ((EFI_D_ERROR, "Debug Support Protocol ISA %x\n", DebugSupport->Isa));
-  DEBUG ((EFI_D_ERROR, "Debug Support Protocol Processor Index %d\n", gMaxProcessorIndex));
+  DEBUG ((EFI_D_INFO, "Debug Support Protocol ISA %x\n", DebugSupport->Isa));
+  DEBUG ((EFI_D_INFO, "Debug Support Protocol Processor Index %d\n", gMaxProcessorIndex));
   
   // Call processor-specific init routine
   InitializeProcessor();

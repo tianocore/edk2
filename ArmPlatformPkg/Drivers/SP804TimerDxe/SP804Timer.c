@@ -29,16 +29,16 @@
 
 #include <Drivers/SP804Timer.h>
 
-#define SP804_TIMER_PERIODIC_BASE     (UINTN)PcdGet32 (PcdSP804TimerPeriodicBase)
-#define SP804_TIMER_METRONOME_BASE    (UINTN)PcdGet32 (PcdSP804TimerMetronomeBase)
-#define SP804_TIMER_PERFORMANCE_BASE  (UINTN)PcdGet32 (PcdSP804TimerPerformanceBase)
+#define SP804_TIMER_PERIODIC_BASE     ((UINTN)PcdGet32 (PcdSP804TimerPeriodicBase))
+#define SP804_TIMER_METRONOME_BASE    ((UINTN)PcdGet32 (PcdSP804TimerMetronomeBase))
+#define SP804_TIMER_PERFORMANCE_BASE  ((UINTN)PcdGet32 (PcdSP804TimerPerformanceBase))
 
 // The notification function to call on every timer interrupt.
-volatile EFI_TIMER_NOTIFY      mTimerNotifyFunction   = (EFI_TIMER_NOTIFY)NULL;
-EFI_EVENT                       EfiExitBootServicesEvent        = (EFI_EVENT)NULL;
+EFI_TIMER_NOTIFY      mTimerNotifyFunction     = (EFI_TIMER_NOTIFY)NULL;
+EFI_EVENT             EfiExitBootServicesEvent = (EFI_EVENT)NULL;
 
 // The current period of the timer interrupt
-volatile UINT64 mTimerPeriod = 0;
+UINT64 mTimerPeriod = 0;
 
 // Cached copy of the Hardware Interrupt protocol instance
 EFI_HARDWARE_INTERRUPT_PROTOCOL *gInterrupt = NULL;
@@ -78,10 +78,10 @@ TimerInterruptHandler (
 
   // If the interrupt is shared then we must check if this interrupt source is the one associated to this Timer
   if (MmioRead32 (SP804_TIMER_PERIODIC_BASE + SP804_TIMER_MSK_INT_STS_REG) != 0) {
-    // clear the periodic interrupt
+    // Clear the periodic interrupt
     MmioWrite32 (SP804_TIMER_PERIODIC_BASE + SP804_TIMER_INT_CLR_REG, 0);
 
-    // signal end of interrupt early to help avoid losing subsequent ticks from long duration handlers
+    // Signal end of interrupt early to help avoid losing subsequent ticks from long duration handlers
     gInterrupt->EndOfInterrupt (gInterrupt, Source);
 
     if (mTimerNotifyFunction) {
@@ -213,15 +213,13 @@ TimerDriverSetTimerPeriod (
     // Disable timer 0/1 interrupt for a TimerPeriod of 0
     Status = gInterrupt->DisableInterruptSource (gInterrupt, gVector);    
   } else {  
-    // Convert TimerPeriod into 1MHz clock counts (us units = 100ns units / 10)
+    // Convert TimerPeriod into 1MHz clock counts (us units = 100ns units * 10)
     TimerTicks = DivU64x32 (TimerPeriod, 10);
     TimerTicks = MultU64x32 (TimerTicks, PcdGet32(PcdSP804TimerFrequencyInMHz));
 
     // if it's larger than 32-bits, pin to highest value
     if (TimerTicks > 0xffffffff) {
-
       TimerTicks = 0xffffffff;
-
     }
 
     // Program the SP804 timer with the new count value

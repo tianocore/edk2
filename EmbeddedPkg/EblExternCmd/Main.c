@@ -23,6 +23,7 @@
 
 **/
 
+#include "Ebl.h"
 
 /**
   Entry point with Argc, Argv. Put your code here.

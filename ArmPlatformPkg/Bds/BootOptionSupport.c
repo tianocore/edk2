@@ -209,7 +209,7 @@ BootDeviceGetDeviceSupport (
 
   // Find which supported device is the most appropriate
   for (Index = 0; Index < BDS_DEVICE_MAX; Index++) {
-    if (BdsLoadOptionSupportList[Index].IsSupported(BootOption)) {
+    if (BdsLoadOptionSupportList[Index].IsSupported (BootOption)) {
       *DeviceSupport = &BdsLoadOptionSupportList[Index];
       return EFI_SUCCESS;
     }

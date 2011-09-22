@@ -52,14 +52,12 @@
 [LibraryClasses]
   BaseMemoryLib
   CacheMaintenanceLib
-  UefiDriverEntryPoint
-  ArmLib
+  CpuLib
+  DebugLib
+  DefaultExceptionHandlerLib
   DxeServicesTableLib
   PeCoffGetEntryPointLib
   UefiLib
-  CpuLib
-  DefaultExceptioHandlerLib
-  DebugLib
 
 [Protocols]
   gEfiCpuArchProtocolGuid

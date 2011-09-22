@@ -26,12 +26,22 @@
 /**
     FIXME: Need documentation
 **/
-EFI_STATUS TZPCSetDecProtBits(UINTN tzpc_base, UINTN tzpc_id, UINTN bits);
+EFI_STATUS
+TZPCSetDecProtBits (
+  IN  UINTN TzpcBase,
+  IN  UINTN TzpcId,
+  IN  UINTN Bits
+  );
 
 /**
     FIXME: Need documentation
 **/
-EFI_STATUS TZPCClearDecProtBits(UINTN tzpc_base, UINTN tzpc_id, UINTN bits);
+EFI_STATUS
+TZPCClearDecProtBits (
+  IN  UINTN TzpcBase,
+  IN  UINTN TzpcId,
+  IN  UINTN Bits
+  );
 
 // Setup TZ Address Space Controller
 #define TZASC_REGION_ENABLED        1
@@ -64,6 +74,15 @@ EFI_STATUS TZPCClearDecProtBits(UINTN tzpc_base, UINTN tzpc_id, UINTN bits);
 /**
     FIXME: Need documentation
 **/
-EFI_STATUS TZASCSetRegion(UINTN tzasc_base, UINTN region_id, UINTN enabled, UINTN low_address, UINTN high_address, UINTN size, UINTN security);
+EFI_STATUS
+TZASCSetRegion (
+  IN  INTN  TzascBase,
+  IN  UINTN RegionId,
+  IN  UINTN Enabled,
+  IN  UINTN LowAddress,
+  IN  UINTN HighAddress,
+  IN  UINTN Size,
+  IN  UINTN Security
+  );
 
 #endif

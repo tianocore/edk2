@@ -142,6 +142,8 @@ LcdPlatformGetVram (
   EFI_STATUS              Status;
   EFI_CPU_ARCH_PROTOCOL  *Cpu;
 
+  Status = EFI_SUCCESS;
+
   // Is it on the motherboard or on the daughterboard?
   switch(PL111_CLCD_SITE) {
 

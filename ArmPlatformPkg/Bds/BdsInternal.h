@@ -42,6 +42,9 @@
 
 #define IS_ARM_BDS_BOOTENTRY(ptr)  (ReadUnaligned32 ((CONST UINT32*)&((ARM_BDS_LOADER_OPTIONAL_DATA*)((ptr)->OptionalData))->Header.Signature) == ARM_BDS_OPTIONAL_DATA_SIGNATURE)
 
+#define UPDATE_BOOT_ENTRY L"Update entry: "
+#define DELETE_BOOT_ENTRY L"Delete entry: "
+
 typedef enum {
     BDS_LOADER_EFI_APPLICATION = 0,
     BDS_LOADER_KERNEL_LINUX_ATAG,

@@ -678,7 +678,6 @@ GdbFWrite (
 
     case 'F':
       return;
-      break;
     }
   }
 }

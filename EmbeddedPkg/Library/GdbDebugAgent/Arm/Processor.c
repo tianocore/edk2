@@ -210,7 +210,7 @@ BasicReadRegister (
 }
 
 
-/** ‘p n’ 
+/**
  Reads the n-th register's value into an output buffer and sends it as a packet 
  @param   SystemContext   Register content at time of the exception
  @param   InBuffer      Pointer to the input buffer received from gdb server
@@ -240,7 +240,7 @@ ReadNthRegister (
 }
 
 
-/** ‘g’ 
+/**
  Reads the general registers into an output buffer  and sends it as a packet 
  @param   SystemContext     Register content at time of the exception
  **/
@@ -390,7 +390,7 @@ WriteGeneralRegisters (
 
 
 
-/** ‘c [addr ]’ 
+/**
  Continue. addr is Address to resume. If addr is omitted, resume at current 
  Address.
  

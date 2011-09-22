@@ -543,49 +543,49 @@ UpdatePageEntries (
       return EFI_UNSUPPORTED;
   }
 
-  // obtain page table base
+  // Obtain page table base
   FirstLevelTable = (ARM_FIRST_LEVEL_DESCRIPTOR *)ArmGetTTBR0BaseAddress ();
 
-  // calculate number of 4KB page table entries to change
+  // Calculate number of 4KB page table entries to change
   NumPageEntries = Length / TT_DESCRIPTOR_PAGE_SIZE;
   
-  // iterate for the number of 4KB pages to change
+  // Iterate for the number of 4KB pages to change
   Offset = 0;
-  for(p=0; p<NumPageEntries; p++) {
-    // calculate index into first level translation table for page table value
+  for(p = 0; p < NumPageEntries; p++) {
+    // Calculate index into first level translation table for page table value
     
     FirstLevelIdx = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(BaseAddress + Offset) >> TT_DESCRIPTOR_SECTION_BASE_SHIFT;
     ASSERT (FirstLevelIdx < TRANSLATION_TABLE_SECTION_COUNT);
 
-    // read the descriptor from the first level page table
+    // Read the descriptor from the first level page table
     Descriptor = FirstLevelTable[FirstLevelIdx];
 
-    // does this descriptor need to be converted from section entry to 4K pages?
+    // Does this descriptor need to be converted from section entry to 4K pages?
     if (!TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE(Descriptor)) {
       Status = ConvertSectionToPages (FirstLevelIdx << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
       if (EFI_ERROR(Status)) {
-        // exit for loop
+        // Exit for loop
         break; 
       } 
       
-      // re-read descriptor
+      // Re-read descriptor
       Descriptor = FirstLevelTable[FirstLevelIdx];
     }
 
-    // obtain page table base address
+    // Obtain page table base address
     PageTable = (ARM_PAGE_TABLE_ENTRY *)TT_DESCRIPTOR_PAGE_BASE_ADDRESS(Descriptor);
 
-    // calculate index into the page table
+    // Calculate index into the page table
     PageTableIndex = ((BaseAddress + Offset) & TT_DESCRIPTOR_PAGE_INDEX_MASK) >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
     ASSERT (PageTableIndex < TRANSLATION_TABLE_PAGE_COUNT);
 
-    // get the entry
+    // Get the entry
     CurrentPageTableEntry = PageTable[PageTableIndex];
 
-    // mask off appropriate fields
+    // Mask off appropriate fields
     PageTableEntry = CurrentPageTableEntry & ~EntryMask;
 
-    // mask in new attributes and/or permissions
+    // Mask in new attributes and/or permissions
     PageTableEntry |= EntryValue;
 
     if (VirtualMask != 0) {
@@ -609,7 +609,7 @@ UpdatePageEntries (
     Status = EFI_SUCCESS;
     Offset += TT_DESCRIPTOR_PAGE_SIZE;
     
-  } // end first level translation table loop
+  } // End first level translation table loop
 
   return Status;
 }
@@ -815,23 +815,24 @@ SetMemoryAttributes (
   EFI_STATUS    Status;
   
   if(((BaseAddress & 0xFFFFF) == 0) && ((Length & 0xFFFFF) == 0)) {
-    // is the base and length a multiple of 1 MB?
+    // Is the base and length a multiple of 1 MB?
     DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): MMU section 0x%x length 0x%x to %lx\n", (UINTN)BaseAddress, (UINTN)Length, Attributes));
     Status = UpdateSectionEntries (BaseAddress, Length, Attributes, VirtualMask);
   } else {
-    // base and/or length is not a multiple of 1 MB
+    // Base and/or length is not a multiple of 1 MB
     DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): MMU page 0x%x length 0x%x to %lx\n", (UINTN)BaseAddress, (UINTN)Length, Attributes));
     Status = UpdatePageEntries (BaseAddress, Length, Attributes, VirtualMask);
   }
 
-  // flush d-cache so descriptors make it back to uncached memory for subsequent table walks
+  // Flush d-cache so descriptors make it back to uncached memory for subsequent table walks
   // flush and invalidate pages
+  //TODO: Do we really need to invalidate the caches everytime we change the memory attributes ?
   ArmCleanInvalidateDataCache ();
-  
+
   ArmInvalidateInstructionCache ();
 
-  // invalidate all TLB entries so changes are synced
-  ArmInvalidateTlb (); 
+  // Invalidate all TLB entries so changes are synced
+  ArmInvalidateTlb ();
 
   return Status;
 }

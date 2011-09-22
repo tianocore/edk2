@@ -1,5 +1,4 @@
 #/** @file
-# Arm Versatile Express package.
 #
 #  Copyright (c) 2011, ARM Limited. All rights reserved.
 #  
@@ -32,7 +31,7 @@
   Include                        # Root include for the package
 
 [Guids.common]
-  gArmPlatformTokenSpaceGuid    =  { 0x9c0aaed4, 0x74c5, 0x4043, { 0xb4, 0x17, 0xa3, 0x22, 0x38, 0x14, 0xce, 0x76 } }
+  gArmPlatformTokenSpaceGuid   = { 0x9c0aaed4, 0x74c5, 0x4043, { 0xb4, 0x17, 0xa3, 0x22, 0x38, 0x14, 0xce, 0x76 } }
   #
   # Following Guid must match FILE_GUID in MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   #
@@ -45,7 +44,6 @@
   gArmPlatformTokenSpaceGuid.PcdStandalone|TRUE|BOOLEAN|0x00000001
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|FALSE|BOOLEAN|0x00000002
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|FALSE|BOOLEAN|0x00000004
-  
 
 [PcdsFixedAtBuild.common]
   # These PCDs should be FeaturePcds. But we used these PCDs as an '#if' in an ASM file.

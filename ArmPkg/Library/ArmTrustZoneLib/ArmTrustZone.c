@@ -29,51 +29,77 @@
 /**
     FIXME: Need documentation
 **/
-EFI_STATUS TZPCSetDecProtBits(UINTN TzpcBase, UINTN TzpcId, UINTN Bits) {
-    if (TzpcId > TZPC_DECPROT_MAX) {
-        return EFI_INVALID_PARAMETER;
-    }
+EFI_STATUS
+TZPCSetDecProtBits (
+  IN  UINTN TzpcBase,
+  IN  UINTN TzpcId,
+  IN  UINTN Bits
+  )
+{
+  if (TzpcId > TZPC_DECPROT_MAX) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-    MmioWrite32((UINTN)TzpcBase + TZPC_DECPROT0_SET_REG + (TzpcId * 0x0C), Bits);
+  MmioWrite32 ((UINTN)TzpcBase + TZPC_DECPROT0_SET_REG + (TzpcId * 0x0C), Bits);
 
-    return EFI_SUCCESS;
+  return EFI_SUCCESS;
 }
 
 /**
     FIXME: Need documentation
 **/
-EFI_STATUS TZPCClearDecProtBits(UINTN TzpcBase, UINTN TzpcId, UINTN Bits) {
-    if (TzpcId> TZPC_DECPROT_MAX) {
-        return EFI_INVALID_PARAMETER;
-    }
+EFI_STATUS
+TZPCClearDecProtBits (
+  IN  UINTN TzpcBase,
+  IN  UINTN TzpcId,
+  IN  UINTN Bits
+  )
+{
+  if (TzpcId> TZPC_DECPROT_MAX) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-    MmioWrite32((UINTN)TzpcBase + TZPC_DECPROT0_CLEAR_REG + (TzpcId * 0x0C), Bits);
+  MmioWrite32 ((UINTN)TzpcBase + TZPC_DECPROT0_CLEAR_REG + (TzpcId * 0x0C), Bits);
 
-    return EFI_SUCCESS;
+  return EFI_SUCCESS;
 }
 
 /**
     FIXME: Need documentation
 **/
-UINT32 TZASCGetNumRegions(UINTN TzascBase) {
-    return (MmioRead32((UINTN)TzascBase + TZASC_CONFIGURATION_REG) & 0xF);
+UINT32
+TZASCGetNumRegions (
+  IN UINTN TzascBase
+  )
+{
+  return (MmioRead32 ((UINTN)TzascBase + TZASC_CONFIGURATION_REG) & 0xF);
 }
 
 /**
     FIXME: Need documentation
 **/
-EFI_STATUS TZASCSetRegion(UINTN TzascBase, UINTN RegionId, UINTN Enabled, UINTN LowAddress, UINTN HighAddress, UINTN Size, UINTN Security) {
-    UINT32*     Region;
+EFI_STATUS
+TZASCSetRegion (
+  IN  INTN  TzascBase,
+  IN  UINTN RegionId,
+  IN  UINTN Enabled,
+  IN  UINTN LowAddress,
+  IN  UINTN HighAddress,
+  IN  UINTN Size,
+  IN  UINTN Security
+  )
+{
+  UINT32*     Region;
 
-    if (RegionId > TZASCGetNumRegions(TzascBase)) {
-        return EFI_INVALID_PARAMETER;
-    }
+  if (RegionId > TZASCGetNumRegions(TzascBase)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-    Region = (UINT32*)((UINTN)TzascBase + TZASC_REGIONS_REG + (RegionId * 0x10));
+  Region = (UINT32*)((UINTN)TzascBase + TZASC_REGIONS_REG + (RegionId * 0x10));
 
-    MmioWrite32((UINTN)(Region), LowAddress&0xFFFF8000);
+  MmioWrite32((UINTN)(Region), LowAddress&0xFFFF8000);
   MmioWrite32((UINTN)(Region+1), HighAddress);
   MmioWrite32((UINTN)(Region+2), ((Security & 0xF) <<28) | ((Size & 0x3F) << 1) | (Enabled & 0x1));
 
-    return EFI_SUCCESS;
+  return EFI_SUCCESS;
 }
