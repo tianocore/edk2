@@ -201,4 +201,20 @@ ArmPlatformGetAdditionalSystemMemory (
   OUT ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR** EfiMemoryMap
   );
 
+/**
+  Return the Platform specific PPIs
+
+  This function exposes the Platform Specific PPIs. They can be used by any PrePi modules or passed
+  to the PeiCore by PrePeiCore.
+
+  @param[out]   PpiListSize         Size in Bytes of the Platform PPI List
+  @param[out]   PpiList             Platform PPI List
+
+**/
+VOID
+ArmPlatformGetPlatformPpiList (
+  OUT UINTN                   *PpiListSize,
+  OUT EFI_PEI_PPI_DESCRIPTOR  **PpiList
+  );
+
 #endif

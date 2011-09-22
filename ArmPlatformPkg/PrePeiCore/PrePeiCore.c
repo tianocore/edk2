@@ -34,11 +34,39 @@ EFI_PEI_PPI_DESCRIPTOR      gCommonPpiTable[] = {
     &mTemporaryRamSupportPpi
   },
   {
-    EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+    EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gArmGlobalVariablePpiGuid,
     &mGlobalVariablePpi
   }
 };
+
+VOID
+CreatePpiList (
+  OUT UINTN                   *PpiListSize,
+  OUT EFI_PEI_PPI_DESCRIPTOR  **PpiList
+  )
+{
+  EFI_PEI_PPI_DESCRIPTOR *PlatformPpiList;
+  UINTN                   PlatformPpiListSize;
+  UINTN                   ListBase;
+  EFI_PEI_PPI_DESCRIPTOR *LastPpi;
+
+  // Get the Platform PPIs
+  PlatformPpiListSize = 0;
+  ArmPlatformGetPlatformPpiList (&PlatformPpiListSize, &PlatformPpiList);
+
+  // Copy the Common and Platform PPis in Temporrary Memory
+  ListBase = PcdGet32 (PcdCPUCoresStackBase);
+  CopyMem ((VOID*)ListBase, gCommonPpiTable, sizeof(gCommonPpiTable));
+  CopyMem ((VOID*)(ListBase + sizeof(gCommonPpiTable)), PlatformPpiList, PlatformPpiListSize);
+
+  // Set the Terminate flag on the last PPI entry
+  LastPpi = (EFI_PEI_PPI_DESCRIPTOR*)ListBase + ((sizeof(gCommonPpiTable) + PlatformPpiListSize) / sizeof(EFI_PEI_PPI_DESCRIPTOR)) - 1;
+  LastPpi->Flags |= EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
+
+  *PpiList     = (EFI_PEI_PPI_DESCRIPTOR*)ListBase;
+  *PpiListSize = sizeof(gCommonPpiTable) + PlatformPpiListSize;
+}
 
 VOID
 CEntryPoint (
@@ -67,7 +95,7 @@ CEntryPoint (
 
   //Note: The MMU will be enabled by MemoryPeim. Only the primary core will have the MMU on.
 
-  //If not primary Jump to Secondary Main
+  // If not primary Jump to Secondary Main
   if (IS_PRIMARY_CORE(MpId)) {
     // Initialize the Debug Agent for Source Level Debugging
     InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);

@@ -154,3 +154,13 @@ ArmPlatformInitializeSystemMemory (
   PL341DmcInit(ARM_VE_DMC_BASE, &DDRTimings);
   PL301AxiInit(ARM_VE_FAXI_BASE);
 }
+VOID
+ArmPlatformGetPlatformPpiList (
+  OUT UINTN                   *PpiListSize,
+  OUT EFI_PEI_PPI_DESCRIPTOR  **PpiList
+  )
+{
+  *PpiListSize = 0;
+  *PpiList = NULL;
+}
+

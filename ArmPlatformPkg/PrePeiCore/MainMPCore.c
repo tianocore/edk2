@@ -62,6 +62,12 @@ PrimaryMain (
   )
 {
   EFI_SEC_PEI_HAND_OFF        SecCoreData;
+  UINTN                       PpiListSize;
+  EFI_PEI_PPI_DESCRIPTOR      *PpiList;
+  UINTN                       TemporaryRamBase;
+  UINTN                       TemporaryRamSize;
+
+  CreatePpiList (&PpiListSize, &PpiList);
 
   // Enable the GIC Distributor
   ArmGicEnableDistributor(PcdGet32(PcdGicDistributorBase));
@@ -72,6 +78,12 @@ PrimaryMain (
     ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
   }
 
+  // Adjust the Temporary Ram as the new Ppi List (Common + Platform Ppi Lists) is created at
+  // the base of the primary core stack
+  PpiListSize = ALIGN_VALUE(PpiListSize, 0x4);
+  TemporaryRamBase = (UINTN)PcdGet32 (PcdCPUCoresStackBase) + PpiListSize;
+  TemporaryRamSize = (UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize) - PpiListSize;
+
   //
   // Bind this information into the SEC hand-off state
   // Note: this must be in sync with the stuff in the asm file
@@ -80,13 +92,13 @@ PrimaryMain (
   SecCoreData.DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
   SecCoreData.BootFirmwareVolumeBase = (VOID *)(UINTN)PcdGet32 (PcdFvBaseAddress);
   SecCoreData.BootFirmwareVolumeSize = PcdGet32 (PcdFvSize);
-  SecCoreData.TemporaryRamBase       = (VOID *)(UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize); // We consider we run on the primary core (and so we use the first stack)
-  SecCoreData.TemporaryRamSize       = (UINTN)(UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize);
-  SecCoreData.PeiTemporaryRamBase    = (VOID *)((UINTN)(SecCoreData.TemporaryRamBase) + (SecCoreData.TemporaryRamSize / 2));
+  SecCoreData.TemporaryRamBase       = (VOID *)TemporaryRamBase; // We run on the primary core (and so we use the first stack)
+  SecCoreData.TemporaryRamSize       = TemporaryRamSize;
+  SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;
   SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize / 2;
   SecCoreData.StackBase              = (VOID *)((UINTN)(SecCoreData.TemporaryRamBase) + (SecCoreData.TemporaryRamSize/2));
   SecCoreData.StackSize              = SecCoreData.TemporaryRamSize / 2;
 
   // Jump to PEI core entry point
-  (PeiCoreEntryPoint)(&SecCoreData, (VOID *)&gSecPpiTable);
+  (PeiCoreEntryPoint)(&SecCoreData, PpiList);
 }
