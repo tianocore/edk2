@@ -24,8 +24,6 @@
 
 #include <ArmPlatform.h>
 
-#define PL111_CLCD_SITE ARM_VE_DAUGHTERBOARD_1_SITE
-
 typedef struct {
   UINT32                     Mode;
   UINT32                     HorizontalResolution;

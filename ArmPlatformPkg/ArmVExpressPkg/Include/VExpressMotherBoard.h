@@ -23,6 +23,7 @@
 ************************************************************************************/
 
 // Define MotherBoard SYS flags offsets (from ARM_VE_BOARD_PERIPH_BASE)
+#define ARM_VE_SYS_ID_REG                         (ARM_VE_BOARD_PERIPH_BASE + 0x00000)
 #define ARM_VE_SYS_LED_REG                        (ARM_VE_BOARD_PERIPH_BASE + 0x00008)
 #define ARM_VE_SYS_FLAGS_REG                      (ARM_VE_BOARD_PERIPH_BASE + 0x00030)
 #define ARM_VE_SYS_FLAGS_SET_REG                  (ARM_VE_BOARD_PERIPH_BASE + 0x00030)
@@ -39,21 +40,6 @@
 
 // SP810 Controller
 #define SP810_CTRL_BASE                           (ARM_VE_BOARD_PERIPH_BASE + 0x01000)
-
-// Uart0
-#define PL011_CONSOLE_UART_BASE                   (ARM_VE_BOARD_PERIPH_BASE + 0x09000)
-
-// SP805 Watchdog on motherboard
-#define SP805_WDOG_MOTHERBOARD_BASE               (ARM_VE_BOARD_PERIPH_BASE + 0x0F000)
-
-// SP804 Timer Bases
-#define SP804_TIMER0_BASE                         (ARM_VE_BOARD_PERIPH_BASE + 0x11000)
-#define SP804_TIMER1_BASE                         (ARM_VE_BOARD_PERIPH_BASE + 0x11020)
-#define SP804_TIMER2_BASE                         (ARM_VE_BOARD_PERIPH_BASE + 0x12000)
-#define SP804_TIMER3_BASE                         (ARM_VE_BOARD_PERIPH_BASE + 0x12020)
-
-// PL031 Real Time Clock
-#define PL031_RTC_BASE                            (ARM_VE_BOARD_PERIPH_BASE + 0x17000)
 
 // PL111 Colour LCD Controller - motherboard
 #define PL111_CLCD_MOTHERBOARD_BASE               (ARM_VE_BOARD_PERIPH_BASE + 0x1F000)

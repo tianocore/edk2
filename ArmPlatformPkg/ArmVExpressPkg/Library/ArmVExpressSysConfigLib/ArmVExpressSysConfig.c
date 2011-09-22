@@ -216,6 +216,9 @@ ArmPlatformSysConfigSetDevice (
 
   // Intercept some functions
   switch(Function) {
+  case SYS_CFG_SCC:
+    MmioWrite32 ((ARM_VE_SCC_BASE + (Device * 4)),Value);
+    return EFI_SUCCESS;
 
   case SYS_CFG_OSC_SITE1:
     Function = SYS_CFG_OSC;
@@ -240,7 +243,6 @@ ArmPlatformSysConfigSetDevice (
   case SYS_CFG_AMP:
   case SYS_CFG_TEMP:
   case SYS_CFG_RESET:
-  case SYS_CFG_SCC:
   case SYS_CFG_SHUTDOWN:
   case SYS_CFG_REBOOT:
   case SYS_CFG_DVIMODE:

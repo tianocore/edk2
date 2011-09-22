@@ -68,6 +68,7 @@
 
 // PL111 Colour LCD Controller - core tile
 #define PL111_CLCD_CORE_TILE_BASE               (ARM_VE_BOARD_PERIPH_BASE + 0x20000)
+#define PL111_CLCD_SITE                         ARM_VE_DAUGHTERBOARD_1_SITE
 
 // PL341 Dynamic Memory Controller Base
 #define ARM_VE_DMC_BASE                         (ARM_VE_BOARD_PERIPH_BASE + 0xE0000)
@@ -76,12 +77,11 @@
 #define ARM_VE_SMC_CTRL_BASE                    (ARM_VE_BOARD_PERIPH_BASE + 0xE1000)
 
 // System Configuration Controller register Base addresses
-//#define ARM_VE_SYS_CFG_CTRL_BASE              (ARM_VE_BOARD_PERIPH_BASE + 0xE2000)
+#define ARM_VE_SYS_CFG_CTRL_BASE                (ARM_VE_BOARD_PERIPH_BASE + 0xE2000)
+#define ARM_VE_SCC_BASE                         ARM_VE_SYS_CFG_CTRL_BASE
 #define ARM_VE_SYS_CFGRW0_REG                   (ARM_VE_BOARD_PERIPH_BASE + 0xE2000)
 #define ARM_VE_SYS_CFGRW1_REG                   (ARM_VE_BOARD_PERIPH_BASE + 0xE2004)
 #define ARM_VE_SYS_CFGRW2_REG                   (ARM_VE_BOARD_PERIPH_BASE + 0xE2008)
-
-#define ARM_PLATFORM_SCC_BASE                   ARM_VE_SYS_CFGRW0_REG
 
 // SP805 Watchdog on Cortex A9 core tile
 #define SP805_WDOG_CORE_TILE_BASE               (ARM_VE_BOARD_PERIPH_BASE + 0xE5000)
@@ -117,17 +117,5 @@
 #define ARM_VE_DECPROT_BIT_DMC_TZASC_LOCK       (1 << 3)
 #define ARM_VE_DECPROT_BIT_NMC_TZASC_LOCK       (1 << 4)
 #define ARM_VE_DECPROT_BIT_SMC_TZASC_LOCK       (1 << 5)
-
-/***********************************************************************************
-// EFI Memory Map in Permanent Memory (DRAM)
-************************************************************************************/
-
-// This region is allocated at the bottom of the DRAM. It will be used
-// for fixed address allocations such as Vector Table
-#define ARM_VE_EFI_FIX_ADDRESS_REGION_SZ        SIZE_8MB
-
-// This region is the memory declared to PEI as permanent memory for PEI
-// and DXE. EFI stacks and heaps will be declared in this region.
-#define ARM_VE_EFI_MEMORY_REGION_SZ             SIZE_256MB
 
 #endif

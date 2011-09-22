@@ -31,68 +31,13 @@
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmPlatformPkg/ArmVExpressPkg/ArmVExpress-CTA9x4.fdf
 
-[LibraryClasses.common]
-!if $(TARGET) == RELEASE
-  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-  UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
-!else
-  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-  UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
-#  UncachedMemoryAllocationLib|ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
-!endif
-  DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
+!include ArmPlatformPkg/ArmVExpressPkg/ArmVExpress.dsc.inc
 
+[LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLib.inf
   ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibCTA9x4/ArmVExpressLib.inf
   ArmTrustZoneLib|ArmPkg/Library/ArmTrustZoneLib/ArmTrustZoneLib.inf
-  
-  BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
-  BaseMemoryLib|ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
-  SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
 
-  EfiResetSystemLib|ArmPlatformPkg/ArmVExpressPkg/Library/ResetSystemLib/ResetSystemLib.inf
-  PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
-  PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
-  
-  EblCmdLib|ArmPlatformPkg/Library/EblCmdLib/EblCmdLib.inf
-  EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
-  PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-  
-  HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
-  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
-  
-  #
-  # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window 
-  # in the debugger will show load and unload commands for symbols. You can cut and paste this
-  # into the command window to load symbols. We should be able to use a script to do this, but
-  # the version of RVD I have does not support scripts accessing system memory.
-  #
-#  PeCoffExtraActionLib|ArmPkg/Library/RvdPeCoffExtraActionLib/RvdPeCoffExtraActionLib.inf
-  PeCoffExtraActionLib|ArmPkg/Library/DebugPeCoffExtraActionLib/DebugPeCoffExtraActionLib.inf
-#  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
-  
-  CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
-  DefaultExceptioHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
-  
-  SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
-  
-  RealTimeClockLib|ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
-
-  IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  
-  UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
-  PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
-  
-  UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
-  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
-  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-
-  DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
-  UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
-  
   # ARM PL310 L2 Cache Driver
   L2X0CacheLib|ArmPlatformPkg/Drivers/PL310L2Cache/PL310L2CacheSec.inf
   # ARM PL354 SMC Driver
@@ -101,46 +46,14 @@
   PL341DmcLib|ArmPlatformPkg/Drivers/PL34xDmc/PL341Dmc.inf
   # ARM PL301 Axi Driver
   PL301AxiLib|ArmPlatformPkg/Drivers/PL301Axi/PL301Axi.inf
-  # ARM PL011 UART Driver
-  PL011UartLib|ArmPlatformPkg/Drivers/PL011Uart/PL011Uart.inf
   
   ArmPlatformSysConfigLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressSysConfigLib/ArmVExpressSysConfigLib.inf
   NorFlashPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/NorFlashArmVExpressLib/NorFlashArmVExpressLib.inf
   LcdPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/PL111LcdArmVExpressLib/PL111LcdArmVExpressLib.inf
 
-#
-# Assume everything is fixed at build
-#
-  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-
-  UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-
-  EblAddExternalCommandLib|EmbeddedPkg/Library/EblAddExternalCommandLib/EblAddExternalCommandLib.inf
-
-  CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
-  PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-
-  EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
-  
-  ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
-  DebugAgentLib|ArmPkg/Library/DebugAgentSymbolsOnlyLib/DebugAgentSymbolsOnlyLib.inf
-  #DebugAgentTimerLib|ArmPlatformPkg/ArmVExpressPkg/Library/DebugAgentTimerLib/DebugAgentTimerLib.inf
-
-  SerialPortLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
-  TimerLib|ArmPlatformPkg/Library/SP804TimerLib/SP804TimerLib.inf  
-  DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
-  
-  BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
-
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLibSec.inf
   ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibCTA9x4/ArmVExpressSecLib.inf
-  DebugSecExtraActionLib|ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.inf
-  
-  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  
-  # 1/123 faster than Stm or Vstm version
-  BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
 
   # Uncomment to turn on GDB stub in SEC. 
   #DebugAgentLib|EmbeddedPkg/Library/GdbDebugAgent/GdbDebugAgent.inf
@@ -148,108 +61,13 @@
   # ARM PL390 General Interrupt Driver in Secure and Non-secure
   ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
   ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
-  
-!if $(EDK2_SKIP_PEICORE) == 1
-  PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
-  ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
-  LzmaDecompressLib|IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
-  MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
-  HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
-  PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
-  PerformanceLib|MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
-  PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
-  MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
-!endif
-
-[LibraryClasses.common.PEI_CORE]
-  BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
-  # note: this won't actually work since globals in PEI are not writeable
-  # need to generate an ARM PEI services table pointer implementation
-  PeiServicesTablePointerLib|ArmPlatformPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
-  MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
-  PeiCoreEntryPoint|MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
-  PerformanceLib|MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
-  ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
-  OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
-  PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-  UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
-  ExtractGuidedSectionLib|MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
-
-[LibraryClasses.common.PEIM]
-  BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
-  # note: this won't actually work since globals in PEI are not writeable
-  # need to generate an ARM PEI services table pointer implementation
-  PeiServicesTablePointerLib|ArmPlatformPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
-  MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
-  PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
-  PerformanceLib|MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
-  ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
-  OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
-  PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-  PeiResourcePublicationLib|MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
-  UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
-  ExtractGuidedSectionLib|MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
-
-[LibraryClasses.common.DXE_CORE]
-  HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
-  MemoryAllocationLib|MdeModulePkg/Library/DxeCoreMemoryAllocationLib/DxeCoreMemoryAllocationLib.inf
-  DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
-  ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
-  UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
-  DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
-  PerformanceLib|MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
-
-[LibraryClasses.common.DXE_DRIVER]
-  ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
-  SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
-  PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
-  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-
-[LibraryClasses.common.UEFI_APPLICATION]
-  ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  UefiDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
-  PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
-  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-  HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
-
-[LibraryClasses.common.UEFI_DRIVER]
-  ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  UefiDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
-  ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
-  PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
-  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-
-[LibraryClasses.common.DXE_RUNTIME_DRIVER]
-  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-  ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
-
-[LibraryClasses.ARM]
-  #
-  # It is not possible to prevent the ARM compiler for generic intrinsic functions.
-  # This library provides the instrinsic functions generate by a given compiler.
-  # [LibraryClasses.ARM] and NULL mean link this library into all ARM images.
-  #
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 [BuildOptions]
-  RVCT:*_*_ARM_ARCHCC_FLAGS  == --cpu Cortex-A9 --thumb
-  RVCT:*_*_ARM_ARCHASM_FLAGS == --cpu Cortex-A9
-  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
-  RVCT:*_*_ARM_PLATFORM_FLAGS = -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
+  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A9 -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
 
-  ARMGCC:*_*_ARM_ARCHCC_FLAGS  == 
-  ARMGCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
-  ARMGCC:*_*_ARM_PLATFORM_FLAGS = -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
+  GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a9 -mfpu=neon -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
   
-  XCODE:*_*_ARM_PLATFORM_FLAGS = -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
+  XCODE:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a9 -mfpu=neon -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
 
 ################################################################################
 #
@@ -258,33 +76,6 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|TRUE
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|TRUE
-  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|TRUE
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|TRUE
-  
-  #
-  # Control what commands are supported from the UI
-  # Turn these on and off to add features or save size
-  #  
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedMacBoot|TRUE
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedDirCmd|TRUE
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedHobCmd|TRUE
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedHwDebugCmd|TRUE
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPciDebugCmd|TRUE
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedIoEnable|FALSE
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedScriptCmd|FALSE
-
-  gEmbeddedTokenSpaceGuid.PcdCacheEnable|TRUE  
-  
-  # Use the Vector Table location in CpuDxe. We will not copy the Vector Table at PcdCpuVectorBaseAddress
-  gArmTokenSpaceGuid.PcdRelocateVectorTable|FALSE
-  
-  gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
-  gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport|FALSE
-
-  gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
-
 !if $(EDK2_ARMVE_STANDALONE) == 1
   gArmPlatformTokenSpaceGuid.PcdStandalone|TRUE
 !else
@@ -303,7 +94,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
 
 [PcdsFixedAtBuild.common]
-  gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"
+  gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"  
   
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmVExpress"
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32
@@ -411,8 +202,8 @@
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000        # expressed in 100ns units, 100,000 x 100 ns = 10,000,000 ns = 10 ms
   gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicInterruptNum|34
   gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicBase|0x10011000
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerPerformanceBase|0x10012020
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerMetronomeBase|0x10012000
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPerformanceBase|0x10011020
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerMetronomeBase|0x10012020
 
   ## SP805 Watchdog - Motherboard Watchdog
   gArmPlatformTokenSpaceGuid.PcdSP805WatchdogBase|0x1000F000
@@ -455,7 +246,6 @@
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi();VenHw(407B4008-BF5B-11DF-9547-CF16E0D72085)"
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi()"
-  gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|10
 
   #
   # ARM L2x0 PCDs
@@ -469,25 +259,27 @@
 ################################################################################
 [Components.common]
   
-#
-# SEC
-#
+  #
+  # SEC
+  #
   ArmPlatformPkg/Sec/Sec.inf
   
-#
-# PEI Phase modules
-#
+  #
+  # PEI Phase modules
+  #
 !if $(EDK2_SKIP_PEICORE) == 1
   ArmPlatformPkg/PrePi/PeiMPCore.inf {
     <LibraryClasses>
       ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
       ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLib.inf
       ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibCTA9x4/ArmVExpressLib.inf
+      ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.inf
   }
 !else
   ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf {
     <LibraryClasses>
       ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
+      ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.inf
   }
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
@@ -506,9 +298,9 @@
   }
 !endif
 
-#
-# DXE
-#
+  #
+  # DXE
+  #
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
