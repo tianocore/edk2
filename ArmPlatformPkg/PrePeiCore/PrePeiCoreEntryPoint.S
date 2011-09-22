@@ -76,7 +76,7 @@ _InitGlobals:
 
 _PrepareArguments:
   // The PEI Core Entry Point has been computed by GenFV and stored in the second entry of the Reset Vector
-  LoadConstantToReg (FixedPcdGet32(PcdNormalFvBaseAddress), r2)
+  LoadConstantToReg (FixedPcdGet32(PcdFvBaseAddress), r2)
   add   r2, r2, #4
   ldr   r1, [r2]
 

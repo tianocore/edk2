@@ -49,9 +49,9 @@ _SetupStackPosition
   add   r1, r1, r2      // r1 = SystemMemoryTop = PcdSystemMemoryBase + PcdSystemMemorySize
 
   // Calculate Top of the Firmware Device
-  LoadConstantToReg (FixedPcdGet32(PcdNormalFdBaseAddress), r2)
-  LoadConstantToReg (FixedPcdGet32(PcdNormalFdSize), r3)
-  add   r3, r3, r2      // r4 = FdTop = PcdNormalFdBaseAddress + PcdNormalFdSize
+  LoadConstantToReg (FixedPcdGet32(PcdFdBaseAddress), r2)
+  LoadConstantToReg (FixedPcdGet32(PcdFdSize), r3)
+  add   r3, r3, r2      // r4 = FdTop = PcdFdBaseAddress + PcdFdSize
 
   // UEFI Memory Size (stacks are allocated in this region)
   LoadConstantToReg (FixedPcdGet32(PcdSystemMemoryUefiRegionSize), r4)

@@ -100,47 +100,47 @@ MemoryPeim (
   );
 
   SystemMemoryTop = PcdGet32 (PcdSystemMemoryBase) + PcdGet32 (PcdSystemMemorySize);
-  FdTop = PcdGet32(PcdNormalFdBaseAddress) + PcdGet32(PcdNormalFdSize);
+  FdTop = PcdGet32(PcdFdBaseAddress) + PcdGet32(PcdFdSize);
 
   // EDK2 does not have the concept of boot firmware copied into DRAM. To avoid the DXE
   // core to overwrite this area we must mark the region with the attribute non-present
-  if ((PcdGet32 (PcdNormalFdBaseAddress) >= PcdGet32 (PcdSystemMemoryBase)) && (FdTop <= SystemMemoryTop)) {
+  if ((PcdGet32 (PcdFdBaseAddress) >= PcdGet32 (PcdSystemMemoryBase)) && (FdTop <= SystemMemoryTop)) {
     Found = FALSE;
 
     // Search for System Memory Hob that contains the firmware
     NextHob.Raw = GetHobList ();
     while ((NextHob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, NextHob.Raw)) != NULL) {
       if ((NextHob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
-          (PcdGet32(PcdNormalFdBaseAddress) >= NextHob.ResourceDescriptor->PhysicalStart) &&
+          (PcdGet32(PcdFdBaseAddress) >= NextHob.ResourceDescriptor->PhysicalStart) &&
           (FdTop <= NextHob.ResourceDescriptor->PhysicalStart + NextHob.ResourceDescriptor->ResourceLength))
       {
         ResourceAttributes = NextHob.ResourceDescriptor->ResourceAttribute;
         ResourceLength = NextHob.ResourceDescriptor->ResourceLength;
         ResourceTop = NextHob.ResourceDescriptor->PhysicalStart + ResourceLength;
 
-        if (PcdGet32(PcdNormalFdBaseAddress) == NextHob.ResourceDescriptor->PhysicalStart) {
+        if (PcdGet32(PcdFdBaseAddress) == NextHob.ResourceDescriptor->PhysicalStart) {
           if (SystemMemoryTop == FdTop) {
             NextHob.ResourceDescriptor->ResourceAttribute = ResourceAttributes & ~EFI_RESOURCE_ATTRIBUTE_PRESENT;
           } else {
             // Create the System Memory HOB for the firmware with the non-present attribute
             BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY,
                                         ResourceAttributes & ~EFI_RESOURCE_ATTRIBUTE_PRESENT,
-                                        PcdGet32(PcdNormalFdBaseAddress),
-                                        PcdGet32(PcdNormalFdSize));
+                                        PcdGet32(PcdFdBaseAddress),
+                                        PcdGet32(PcdFdSize));
 
             // Top of the FD is system memory available for UEFI
-            NextHob.ResourceDescriptor->PhysicalStart += PcdGet32(PcdNormalFdSize);
-            NextHob.ResourceDescriptor->ResourceLength -= PcdGet32(PcdNormalFdSize);
+            NextHob.ResourceDescriptor->PhysicalStart += PcdGet32(PcdFdSize);
+            NextHob.ResourceDescriptor->ResourceLength -= PcdGet32(PcdFdSize);
           }
         } else {
           // Create the System Memory HOB for the firmware with the non-present attribute
           BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY,
                                       ResourceAttributes & ~EFI_RESOURCE_ATTRIBUTE_PRESENT,
-                                      PcdGet32(PcdNormalFdBaseAddress),
-                                      PcdGet32(PcdNormalFdSize));
+                                      PcdGet32(PcdFdBaseAddress),
+                                      PcdGet32(PcdFdSize));
 
           // Update the HOB
-          NextHob.ResourceDescriptor->ResourceLength = PcdGet32(PcdNormalFdBaseAddress) - NextHob.ResourceDescriptor->PhysicalStart;
+          NextHob.ResourceDescriptor->ResourceLength = PcdGet32(PcdFdBaseAddress) - NextHob.ResourceDescriptor->PhysicalStart;
 
           // If there is some memory available on the top of the FD then create a HOB
           if (FdTop < NextHob.ResourceDescriptor->PhysicalStart + ResourceLength) {

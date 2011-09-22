@@ -108,8 +108,8 @@ InitializeMemory (
 
   SystemMemoryBase = (UINTN)FixedPcdGet32 (PcdSystemMemoryBase);
   SystemMemoryTop = SystemMemoryBase + (UINTN)FixedPcdGet32 (PcdSystemMemorySize);
-  FdBase = (UINTN)PcdGet32 (PcdNormalFdBaseAddress);
-  FdTop = FdBase + (UINTN)PcdGet32 (PcdNormalFdSize);
+  FdBase = (UINTN)PcdGet32 (PcdFdBaseAddress);
+  FdTop = FdBase + (UINTN)PcdGet32 (PcdFdSize);
 
   //
   // Initialize the System Memory (DRAM)

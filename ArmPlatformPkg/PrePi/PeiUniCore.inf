@@ -62,11 +62,11 @@
 [FixedPcd]
   gArmTokenSpaceGuid.PcdVFPEnabled
 
-  gArmTokenSpaceGuid.PcdNormalFdBaseAddress
-  gArmTokenSpaceGuid.PcdNormalFdSize
+  gArmTokenSpaceGuid.PcdFdBaseAddress
+  gArmTokenSpaceGuid.PcdFdSize
 
-  gArmTokenSpaceGuid.PcdNormalFvBaseAddress
-  gArmTokenSpaceGuid.PcdNormalFvSize
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gArmTokenSpaceGuid.PcdFvSize
 
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize

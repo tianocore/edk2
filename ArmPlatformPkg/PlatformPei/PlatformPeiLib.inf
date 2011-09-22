@@ -40,11 +40,11 @@
   gEfiPeiBootInRecoveryModePpiGuid              # PPI SOMETIMES_PRODUCED
 
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdNormalFdBaseAddress
-  gArmTokenSpaceGuid.PcdNormalFdSize
+  gArmTokenSpaceGuid.PcdFdBaseAddress
+  gArmTokenSpaceGuid.PcdFdSize
   
-  gArmTokenSpaceGuid.PcdNormalFvBaseAddress
-  gArmTokenSpaceGuid.PcdNormalFvSize
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gArmTokenSpaceGuid.PcdFvSize
   
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize

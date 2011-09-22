@@ -33,7 +33,7 @@ NonSecureWaitForFirmware (
   VOID (*secondary_start)(VOID);
 
   // The secondary cores will execute the firmware once wake from WFI.
-  secondary_start = (VOID (*)())PcdGet32(PcdNormalFvBaseAddress);
+  secondary_start = (VOID (*)())PcdGet32(PcdFvBaseAddress);
 
   ArmCallWFI();
 
@@ -65,7 +65,7 @@ ArmPlatformSecExtraAction (
 
   if (FeaturePcdGet (PcdStandalone) == FALSE) {
     if (IS_PRIMARY_CORE(MpId)) {
-      UINTN*   StartAddress = (UINTN*)PcdGet32(PcdNormalFvBaseAddress);
+      UINTN*   StartAddress = (UINTN*)PcdGet32(PcdFvBaseAddress);
 
       // Patch the DRAM to make an infinite loop at the start address
       *StartAddress = 0xEAFFFFFE; // opcode for while(1)
@@ -73,7 +73,7 @@ ArmPlatformSecExtraAction (
       CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Waiting for firmware at 0x%08X ...\n\r",StartAddress);
       SerialPortWrite ((UINT8 *) Buffer, CharCount);
 
-      *JumpAddress = PcdGet32(PcdNormalFvBaseAddress);
+      *JumpAddress = PcdGet32(PcdFvBaseAddress);
     } else {
       // When the primary core is stopped by the hardware debugger to copy the firmware
       // into DRAM. The secondary cores are still running. As soon as the first bytes of
@@ -90,7 +90,7 @@ ArmPlatformSecExtraAction (
       ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
 
       // To enter into Non Secure state, we need to make a return from exception
-      *JumpAddress = PcdGet32(PcdNormalFvBaseAddress);
+      *JumpAddress = PcdGet32(PcdFvBaseAddress);
     } else {
       // We wait for the primary core to finish to initialize the System Memory. Otherwise the secondary
       // cores would make crash the system by setting their stacks in DRAM before the primary core has not
@@ -98,6 +98,6 @@ ArmPlatformSecExtraAction (
       *JumpAddress = (UINTN)NonSecureWaitForFirmware;
     }
   } else {
-    *JumpAddress = PcdGet32(PcdNormalFvBaseAddress);
+    *JumpAddress = PcdGet32(PcdFvBaseAddress);
   }
 }

@@ -86,10 +86,10 @@
   #
   # ARM Normal (or Non Secure) Firmware PCDs
   #
-  gArmTokenSpaceGuid.PcdNormalFdBaseAddress|0|UINT32|0x0000002B
-  gArmTokenSpaceGuid.PcdNormalFdSize|0|UINT32|0x0000002C
-  gArmTokenSpaceGuid.PcdNormalFvBaseAddress|0|UINT32|0x0000002D
-  gArmTokenSpaceGuid.PcdNormalFvSize|0|UINT32|0x0000002E
+  gArmTokenSpaceGuid.PcdFdBaseAddress|0|UINT32|0x0000002B
+  gArmTokenSpaceGuid.PcdFdSize|0|UINT32|0x0000002C
+  gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT32|0x0000002D
+  gArmTokenSpaceGuid.PcdFvSize|0|UINT32|0x0000002E
 
   # System Memory (DRAM): These PCDs define the region of in-built system memory
   # Some platforms can get DRAM extensions, these additional regions will be declared

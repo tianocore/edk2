@@ -15,8 +15,8 @@ PCDs	Description :
 # Firmware Device / Volume
 gArmTokenSpaceGuid.PcdSecureFdBaseAddress       : Base address of your Secure Firmware Device 
 gArmTokenSpaceGuid.PcdSecureFdSize              : Size in byte of your Secure Firmware Device.
-gArmTokenSpaceGuid.PcdNormalFdBaseAddress       : Base Address of your Non-Secure/Normal World Firmware Device.
-gArmTokenSpaceGuid.PcdNormalFdSize              : Size in bytes of your Non-Secure/Normal World Firmware Device 
+gArmTokenSpaceGuid.PcdFdBaseAddress       : Base Address of your Non-Secure/Normal World Firmware Device.
+gArmTokenSpaceGuid.PcdFdSize              : Size in bytes of your Non-Secure/Normal World Firmware Device 
 
 # Stacks
 gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase             : Base of Secure Stack for Secure World

@@ -29,7 +29,7 @@ PlatformPeim (
 
   BuildCpuHob (PcdGet8 (PcdPrePiCpuMemorySize), PcdGet8 (PcdPrePiCpuIoSize));
 
-  BuildFvHob (PcdGet32(PcdNormalFvBaseAddress), PcdGet32(PcdNormalFvSize));
+  BuildFvHob (PcdGet32(PcdFvBaseAddress), PcdGet32(PcdFvSize));
 
   return EFI_SUCCESS;
 }

@@ -42,8 +42,8 @@ PrimaryMain (
   // Note also:  HOBs (pei temp ram) MUST be above stack
   //
   SecCoreData.DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
-  SecCoreData.BootFirmwareVolumeBase = (VOID *)(UINTN)PcdGet32 (PcdNormalFvBaseAddress);
-  SecCoreData.BootFirmwareVolumeSize = PcdGet32 (PcdNormalFvSize);
+  SecCoreData.BootFirmwareVolumeBase = (VOID *)(UINTN)PcdGet32 (PcdFvBaseAddress);
+  SecCoreData.BootFirmwareVolumeSize = PcdGet32 (PcdFvSize);
   SecCoreData.TemporaryRamBase       = (VOID *)(UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize); // We consider we run on the primary core (and so we use the first stack)
   SecCoreData.TemporaryRamSize       = (UINTN)(UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize);
   SecCoreData.PeiTemporaryRamBase    = (VOID *)((UINTN)(SecCoreData.TemporaryRamBase) + (SecCoreData.TemporaryRamSize / 2));

@@ -27,8 +27,8 @@
 
 
 [FD.ArmRealViewEb_EFI]
-BaseAddress   = 0x40000000|gArmTokenSpaceGuid.PcdNormalFdBaseAddress
-Size          = 0x00200000|gArmTokenSpaceGuid.PcdNormalFdSize
+BaseAddress   = 0x40000000|gArmTokenSpaceGuid.PcdFdBaseAddress
+Size          = 0x00200000|gArmTokenSpaceGuid.PcdFdSize
 ErasePolarity = 1
 BlockSize     = 0x00010000
 NumBlocks     = 0x20
@@ -54,7 +54,7 @@ gArmTokenSpaceGuid.PcdSecureFvBaseAddress|gArmTokenSpaceGuid.PcdSecureFvBaseSize
 FV = FVMAIN_SEC
 
 0x00050000|0x00100000
-gArmTokenSpaceGuid.PcdNormalFvBaseAddress|gArmTokenSpaceGuid.PcdNormalFvSize
+gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
 
 ################################################################################

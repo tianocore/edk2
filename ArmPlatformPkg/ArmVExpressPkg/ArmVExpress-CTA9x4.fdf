@@ -55,11 +55,11 @@ FV = FVMAIN_SEC
 
 [FD.ArmVExpress_EFI]
 !if $(EDK2_ARMVE_STANDALONE) == 1
-BaseAddress   = 0x45000000|gArmTokenSpaceGuid.PcdNormalFdBaseAddress  # The base address of the Firmware in NOR Flash.
+BaseAddress   = 0x45000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in NOR Flash.
 !else
-BaseAddress   = 0x80000000|gArmTokenSpaceGuid.PcdNormalFdBaseAddress  # The base address of the Firmware in remapped DRAM.
+BaseAddress   = 0x80000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in remapped DRAM.
 !endif
-Size          = 0x00200000|gArmTokenSpaceGuid.PcdNormalFdSize         # The size in bytes of the FLASH Device
+Size          = 0x00200000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the FLASH Device
 ErasePolarity = 1
 
 # This one is tricky, it must be: BlockSize * NumBlocks = Size
@@ -83,7 +83,7 @@ NumBlocks     = 0x200
 ################################################################################
 
 0x00000000|0x00200000
-gArmTokenSpaceGuid.PcdNormalFvBaseAddress|gArmTokenSpaceGuid.PcdNormalFvBaseSize
+gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvBaseSize
 FV = FVMAIN_COMPACT
 
 

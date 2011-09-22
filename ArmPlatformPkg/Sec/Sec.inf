@@ -56,7 +56,7 @@
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
   gArmTokenSpaceGuid.PcdArmPrimaryCore
   
-  gArmTokenSpaceGuid.PcdNormalFvBaseAddress
+  gArmTokenSpaceGuid.PcdFvBaseAddress
   
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecPrimaryStackSize

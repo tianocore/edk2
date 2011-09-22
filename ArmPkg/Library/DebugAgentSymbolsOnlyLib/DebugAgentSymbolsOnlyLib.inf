@@ -35,4 +35,4 @@
 
 [Pcd]
   gArmTokenSpaceGuid.PcdSecureFvBaseAddress
-  gArmTokenSpaceGuid.PcdNormalFvBaseAddress
+  gArmTokenSpaceGuid.PcdFvBaseAddress

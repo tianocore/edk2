@@ -207,7 +207,7 @@ CEntryPoint (
     copy_cpsr_into_spsr ();
   }
 
-  JumpAddress = PcdGet32 (PcdNormalFvBaseAddress);
+  JumpAddress = PcdGet32 (PcdFvBaseAddress);
   ArmPlatformSecExtraAction (MpId, &JumpAddress);
 
   return_from_exception (JumpAddress);

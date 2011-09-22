@@ -40,4 +40,4 @@
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
 
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdNormalFvBaseAddress
+  gArmTokenSpaceGuid.PcdFvBaseAddress

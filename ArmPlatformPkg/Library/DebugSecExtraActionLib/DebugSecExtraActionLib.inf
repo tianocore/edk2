@@ -45,7 +45,7 @@
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec
 
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdNormalFvBaseAddress
+  gArmTokenSpaceGuid.PcdFvBaseAddress
   
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
   gArmTokenSpaceGuid.PcdArmPrimaryCore
