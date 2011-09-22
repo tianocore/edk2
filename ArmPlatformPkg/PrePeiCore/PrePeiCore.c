@@ -24,14 +24,14 @@
 
 #include "PrePeiCore.h"
 
-EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   mSecTemporaryRamSupportPpi = {SecTemporaryRamSupport};
+EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   mTemporaryRamSupportPpi = { PrePeiCoreTemporaryRamSupport };
 ARM_GLOBAL_VARIABLE_PPI             mGlobalVariablePpi = { PrePeiCoreGetGlobalVariableMemory };
 
 EFI_PEI_PPI_DESCRIPTOR      gCommonPpiTable[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiTemporaryRamSupportPpiGuid,
-    &mSecTemporaryRamSupportPpi
+    &mTemporaryRamSupportPpi
   },
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
@@ -85,23 +85,38 @@ CEntryPoint (
 
 EFI_STATUS
 EFIAPI
-SecTemporaryRamSupport (
+PrePeiCoreTemporaryRamSupport (
   IN CONST EFI_PEI_SERVICES   **PeiServices,
   IN EFI_PHYSICAL_ADDRESS     TemporaryMemoryBase,
   IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
   IN UINTN                    CopySize
   )
 {
-  //
-  // Migrate the whole temporary memory to permenent memory.
-  //
-  CopyMem (
-    (VOID*)(UINTN)PermanentMemoryBase, 
-    (VOID*)(UINTN)TemporaryMemoryBase, 
-    CopySize
-    );
+  VOID                             *OldHeap;
+  VOID                             *NewHeap;
+  VOID                             *OldStack;
+  VOID                             *NewStack;
 
-  SecSwitchStack((UINTN)(PermanentMemoryBase - TemporaryMemoryBase));
+  OldHeap = (VOID*)(UINTN)TemporaryMemoryBase;
+  NewHeap = (VOID*)((UINTN)PermanentMemoryBase + (CopySize >> 1));
+
+  OldStack = (VOID*)((UINTN)TemporaryMemoryBase + (CopySize >> 1));
+  NewStack = (VOID*)(UINTN)PermanentMemoryBase;
+
+  //
+  // Migrate the temporary memory stack to permanent memory stack.
+  //
+  CopyMem (NewStack, OldStack, CopySize >> 1);
+
+  //
+  // Migrate the temporary memory heap to permanent memory heap.
+  //
+  CopyMem (NewHeap, OldHeap, CopySize >> 1);
+  
+  SecSwitchStack ((UINTN)NewStack - (UINTN)OldStack);
+
+  return EFI_SUCCESS;
+}
 
 EFI_STATUS
 PrePeiCoreGetGlobalVariableMemory (

@@ -84,8 +84,8 @@ PrimaryMain (
   SecCoreData.TemporaryRamSize       = (UINTN)(UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize);
   SecCoreData.PeiTemporaryRamBase    = (VOID *)((UINTN)(SecCoreData.TemporaryRamBase) + (SecCoreData.TemporaryRamSize / 2));
   SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize / 2;
-  SecCoreData.StackBase              = SecCoreData.TemporaryRamBase;
-  SecCoreData.StackSize              = SecCoreData.TemporaryRamSize - SecCoreData.PeiTemporaryRamSize;
+  SecCoreData.StackBase              = (VOID *)((UINTN)(SecCoreData.TemporaryRamBase) + (SecCoreData.TemporaryRamSize/2));
+  SecCoreData.StackSize              = SecCoreData.TemporaryRamSize / 2;
 
   // Jump to PEI core entry point
   (PeiCoreEntryPoint)(&SecCoreData, (VOID *)&gSecPpiTable);
