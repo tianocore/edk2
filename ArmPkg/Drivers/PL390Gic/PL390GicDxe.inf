@@ -24,7 +24,6 @@
 [Sources.common]
   PL390GicDxe.c
 
-
 [Packages]
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
@@ -38,9 +37,6 @@
   PrintLib
   UefiDriverEntryPoint
   IoLib
-
-[Guids]
-  
 
 [Protocols]
   gHardwareInterruptProtocolGuid

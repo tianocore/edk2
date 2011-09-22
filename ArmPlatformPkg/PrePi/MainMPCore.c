@@ -14,9 +14,9 @@
 
 #include "PrePi.h"
 
+#include <Library/ArmGicLib.h>
 #include <Library/ArmMPCoreMailBoxLib.h>
 #include <Chipset/ArmV7.h>
-#include <Drivers/PL390Gic.h>
 
 VOID
 PrimaryMain (
@@ -24,13 +24,13 @@ PrimaryMain (
   IN  UINT64                    StartTimeStamp
   )
 {
-  //Enable the GIC Distributor
-  PL390GicEnableDistributor(PcdGet32(PcdGicDistributorBase));
+  // Enable the GIC Distributor
+  ArmGicEnableDistributor(PcdGet32(PcdGicDistributorBase));
 
   // In some cases, the secondary cores are waiting for an SGI from the next stage boot loader toresume their initialization
   if (!FixedPcdGet32(PcdSendSgiToBringUpSecondaryCores)) {
     // Sending SGI to all the Secondary CPU interfaces
-    PL390GicSendSgiTo (PcdGet32(PcdGicDistributorBase), GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
+    ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
   }
 
   PrePiMain (UefiMemoryBase, StartTimeStamp);
@@ -54,7 +54,7 @@ SecondaryMain (
   while (secondary_entry_addr = ArmGetMPCoreMailbox(), secondary_entry_addr == 0) {
     ArmCallWFI();
     // Acknowledge the interrupt and send End of Interrupt signal.
-    PL390GicAcknowledgeSgiFrom(PcdGet32(PcdGicInterruptInterfaceBase),0/*CoreId*/);
+    ArmGicAcknowledgeSgiFrom(PcdGet32(PcdGicInterruptInterfaceBase),0/*CoreId*/);
   }
 
   secondary_start = (VOID (*)())secondary_entry_addr;

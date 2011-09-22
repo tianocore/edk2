@@ -40,7 +40,7 @@
   DebugAgentLib
   ArmLib
   ArmMPCoreMailBoxLib
-  PL390GicNonSecLib
+  ArmGicLib
   IoLib
   TimerLib
   SerialPortLib

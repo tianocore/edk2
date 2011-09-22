@@ -12,9 +12,9 @@
 *
 **/
 
+#include <Library/ArmGicLib.h>
 #include <Library/ArmMPCoreMailBoxLib.h>
 #include <Chipset/ArmV7.h>
-#include <Drivers/PL390Gic.h>
 
 #include "PrePeiCore.h"
 
@@ -45,7 +45,7 @@ SecondaryMain (
   while (secondary_entry_addr = ArmGetMPCoreMailbox(), secondary_entry_addr == 0) {
     ArmCallWFI();
     // Acknowledge the interrupt and send End of Interrupt signal.
-    PL390GicAcknowledgeSgiFrom(PcdGet32(PcdGicInterruptInterfaceBase),0/*CoreId*/);
+    ArmGicAcknowledgeSgiFrom(PcdGet32(PcdGicInterruptInterfaceBase),0/*CoreId*/);
   }
 
   secondary_start = (VOID (*)())secondary_entry_addr;
@@ -65,13 +65,13 @@ PrimaryMain (
 {
   EFI_SEC_PEI_HAND_OFF        SecCoreData;
 
-  //Enable the GIC Distributor
-  PL390GicEnableDistributor(PcdGet32(PcdGicDistributorBase));
+  // Enable the GIC Distributor
+  ArmGicEnableDistributor(PcdGet32(PcdGicDistributorBase));
 
   // If ArmVe has not been built as Standalone then we need to wake up the secondary cores
-  if (FeaturePcdGet(PcdSendSgiToBringUpSecondaryCores)) {
+  if (FeaturePcdGet (PcdSendSgiToBringUpSecondaryCores)) {
     // Sending SGI to all the Secondary CPU interfaces
-    PL390GicSendSgiTo (PcdGet32(PcdGicDistributorBase), GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
+    ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
   }
 
   //

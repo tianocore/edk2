@@ -13,17 +13,16 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PL390GicNonSec
-  FILE_GUID                      = 03d05ee4-cdeb-458c-9dfc-993f09bdf405
+  BASE_NAME                      = PL390GicSecLib
+  FILE_GUID                      = 85f3cf80-b5f4-11df-9855-0002a5d5c51b
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PL390GicNonSecLib
+  LIBRARY_CLASS                  = ArmGicSecLib
 
 [Sources]
-  PL390GicNonSec.c
+  PL390Gic.c
+  PL390GicSec.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
-
-[FixedPcd]

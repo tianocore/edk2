@@ -42,7 +42,7 @@
   DebugLib
   DebugAgentLib
   IoLib
-  PL390GicSecLib
+  ArmGicSecLib
   PrintLib
   SerialPortLib
   

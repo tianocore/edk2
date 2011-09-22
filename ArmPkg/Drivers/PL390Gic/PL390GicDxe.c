@@ -29,25 +29,24 @@ Abstract:
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
+#include <Library/ArmGicLib.h>
 
 #include <Protocol/Cpu.h>
 #include <Protocol/HardwareInterrupt.h>
 
-#include <Drivers/PL390Gic.h>
-
 // number of 32-bit registers needed to represent those interrupts as a bit
 // (used for enable set, enable clear, pending set, pending clear, and active regs)
-#define GIC_NUM_REG_PER_INT_BITS   (PcdGet32(PcdGicNumInterrupts) / 32)
+#define ARM_GIC_NUM_REG_PER_INT_BITS   (PcdGet32(PcdGicNumInterrupts) / 32)
 
 // number of 32-bit registers needed to represent those interrupts as two bits
 // (used for configuration reg)
-#define GIC_NUM_REG_PER_INT_CFG    (PcdGet32(PcdGicNumInterrupts) / 16)
+#define ARM_GIC_NUM_REG_PER_INT_CFG    (PcdGet32(PcdGicNumInterrupts) / 16)
 
 // number of 32-bit registers needed to represent interrupts as 8-bit priority field
 // (used for priority regs)
-#define GIC_NUM_REG_PER_INT_BYTES  (PcdGet32(PcdGicNumInterrupts) / 4)
+#define ARM_GIC_NUM_REG_PER_INT_BYTES  (PcdGet32(PcdGicNumInterrupts) / 4)
 
-#define GIC_DEFAULT_PRIORITY  0x80
+#define ARM_GIC_DEFAULT_PRIORITY  0x80
 
 extern EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptProtocol;
 
@@ -130,7 +129,7 @@ EnableInterruptSource (
   RegShift = Source % 32;
 
   // write set-enable register
-  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDISER + (4*RegOffset), 1 << RegShift);
+  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDISER + (4*RegOffset), 1 << RegShift);
   
   return EFI_SUCCESS;
 }
@@ -165,7 +164,7 @@ DisableInterruptSource (
   RegShift = Source % 32;
 
   // Write set-enable register
-  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDICER + (4*RegOffset), 1 << RegShift);
+  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDICER + (4*RegOffset), 1 << RegShift);
   
   return EFI_SUCCESS;
 }
@@ -201,7 +200,7 @@ GetInterruptSourceState (
   RegOffset = Source / 32;
   RegShift = Source % 32;
     
-  if ((MmioRead32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDISER + (4*RegOffset)) & (1<<RegShift)) == 0) {
+  if ((MmioRead32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDISER + (4*RegOffset)) & (1<<RegShift)) == 0) {
     *InterruptState = FALSE;
   } else {
     *InterruptState = TRUE;
@@ -233,7 +232,7 @@ EndOfInterrupt (
     return EFI_UNSUPPORTED;
   }
 
-  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + GIC_ICCEIOR, Source);
+  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCEIOR, Source);
   return EFI_SUCCESS;
 }
 
@@ -258,9 +257,10 @@ IrqInterruptHandler (
   UINT32                      GicInterrupt;
   HARDWARE_INTERRUPT_HANDLER  InterruptHandler;
 
-  GicInterrupt = MmioRead32 (PcdGet32(PcdGicInterruptInterfaceBase) + GIC_ICCIAR);
+  GicInterrupt = MmioRead32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCIAR);
+  //TODO: Comment me
   if (GicInterrupt >= PcdGet32(PcdGicNumInterrupts)) {
-    MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + GIC_ICCEIOR, GicInterrupt);
+    MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCEIOR, GicInterrupt);
     return;
   }
   
@@ -323,11 +323,11 @@ ExitBootServicesEvent (
   }
 
   // Disable Gic Interface
-  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + GIC_ICCICR, 0x0);
-  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + GIC_ICCPMR, 0x0);
+  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCICR, 0x0);
+  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCPMR, 0x0);
 
   // Disable Gic Distributor
-  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDDCR, 0x0);
+  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDDCR, 0x0);
 }
 
 /**
@@ -363,28 +363,28 @@ InterruptDxeInitialize (
     RegOffset = Index / 4;
     RegShift = (Index % 4) * 8;
     MmioAndThenOr32 (
-      PcdGet32(PcdGicDistributorBase) + GIC_ICDIPR + (4*RegOffset),
+      PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDIPR + (4*RegOffset),
       ~(0xff << RegShift), 
-      GIC_DEFAULT_PRIORITY << RegShift
+      ARM_GIC_DEFAULT_PRIORITY << RegShift
       );
   }
 
   // Configure interrupts for cpu 0
-  for (Index = 0; Index < GIC_NUM_REG_PER_INT_BYTES; Index++) {
-    MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDIPTR + (Index*4), 0x01010101);
+  for (Index = 0; Index < ARM_GIC_NUM_REG_PER_INT_BYTES; Index++) {
+    MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDIPTR + (Index*4), 0x01010101);
   }
 
   // Set binary point reg to 0x7 (no preemption)
-  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + GIC_ICCBPR, 0x7);
+  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCBPR, 0x7);
 
   // Set priority mask reg to 0xff to allow all priorities through
-  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + GIC_ICCPMR, 0xff);
+  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCPMR, 0xff);
   
   // Enable gic cpu interface
-  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + GIC_ICCICR, 0x1);
+  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCICR, 0x1);
 
   // Enable gic distributor
-  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + GIC_ICDDCR, 0x1);
+  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDDCR, 0x1);
   
   ZeroMem (&gRegisteredInterruptHandlers, sizeof (gRegisteredInterruptHandlers));
   

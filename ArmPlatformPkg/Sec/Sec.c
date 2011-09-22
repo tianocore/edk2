@@ -24,7 +24,7 @@
 #include <Library/ArmPlatformLib.h>
 
 #include <Chipset/ArmV7.h>
-#include <Drivers/PL390Gic.h>
+#include <Library/ArmGicLib.h>
 
 #define ARM_PRIMARY_CORE  0
 
@@ -160,27 +160,27 @@ CEntryPoint (
       //      3: As all the cores are in secure state, use secure SGI's
       //
 
-      PL390GicEnableDistributor (PcdGet32(PcdGicDistributorBase));
-      PL390GicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
+      ArmGicEnableDistributor (PcdGet32(PcdGicDistributorBase));
+      ArmGicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
 
       // Send SGI to all Secondary core to wake them up from WFI state.
-      PL390GicSendSgiTo (PcdGet32(PcdGicDistributorBase), GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
+      ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
     } else {
       // The secondary cores need to wait until the Trustzone chipsets configuration is done
       // before switching to Non Secure World
 
       // Enabled GIC CPU Interface
-      PL390GicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
+      ArmGicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
 
       // Waiting for the SGI from the primary core
       ArmCallWFI();
 
       // Acknowledge the interrupt and send End of Interrupt signal.
-      PL390GicAcknowledgeSgiFrom (PcdGet32(PcdGicInterruptInterfaceBase), ARM_PRIMARY_CORE);
+      ArmGicAcknowledgeSgiFrom (PcdGet32(PcdGicInterruptInterfaceBase), PRIMARY_CORE_ID);
     }
 
     // Transfer the interrupt to Non-secure World
-    PL390GicSetupNonSecure (PcdGet32(PcdGicDistributorBase),PcdGet32(PcdGicInterruptInterfaceBase));
+    ArmGicSetupNonSecure (PcdGet32(PcdGicDistributorBase),PcdGet32(PcdGicInterruptInterfaceBase));
 
     // Write to CP15 Non-secure Access Control Register :
     //   - Enable CP10 and CP11 accesses in NS World
@@ -199,9 +199,9 @@ CEntryPoint (
 
     // Trustzone is not enabled, just enable the Distributor and CPU interface
     if (CoreId == ARM_PRIMARY_CORE) {
-      PL390GicEnableDistributor (PcdGet32(PcdGicDistributorBase));
+      ArmGicEnableDistributor (PcdGet32(PcdGicDistributorBase));
     }
-    PL390GicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
+    ArmGicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
 
     // With Trustzone support the transition from Sec to Normal world is done by return_from_exception().
     // If we want to keep this function call we need to ensure the SVC's SPSR point to the same Program

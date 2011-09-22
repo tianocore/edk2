@@ -120,6 +120,7 @@
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
   ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
-  ArmPkg/Drivers/PL390Gic/PL390GicNonSec.inf
-  ArmPkg/Drivers/PL390Gic/PL390GicSec.inf
+  ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
+  ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
+
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf

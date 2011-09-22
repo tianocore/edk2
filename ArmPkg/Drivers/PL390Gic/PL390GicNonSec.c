@@ -14,12 +14,12 @@
 
 #include <Uefi.h>
 #include <Library/IoLib.h>
-#include <Drivers/PL390Gic.h>
+#include <Library/ArmGicLib.h>
 
 
 VOID
 EFIAPI
-PL390GicEnableInterruptInterface (
+ArmGicEnableInterruptInterface (
   IN  INTN          GicInterruptInterfaceBase
   )
 {  
@@ -27,12 +27,12 @@ PL390GicEnableInterruptInterface (
   * Enable the CPU interface in Non-Secure world
   * Note: The ICCICR register is banked when Security extensions are implemented
   */
-  MmioWrite32 (GicInterruptInterfaceBase + GIC_ICCICR,0x00000001);
+  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCICR,0x00000001);
 }
 
 VOID
 EFIAPI
-PL390GicEnableDistributor (
+ArmGicEnableDistributor (
   IN  INTN          GicDistributorBase
   )
 {
@@ -40,59 +40,5 @@ PL390GicEnableDistributor (
    * Enable GIC distributor in Non-Secure world.
    * Note: The ICDDCR register is banked when Security extensions are implemented
    */
-  MmioWrite32 (GicDistributorBase + GIC_ICDDCR, 0x00000001);
-}
-
-VOID
-EFIAPI
-PL390GicSendSgiTo (
-  IN  INTN          GicDistributorBase,
-  IN  INTN          TargetListFilter,
-  IN  INTN          CPUTargetList
-  )
-{
-  MmioWrite32 (GicDistributorBase + GIC_ICDSGIR, ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16));
-}
-
-UINT32
-EFIAPI
-PL390GicAcknowledgeSgiFrom (
-  IN  INTN          GicInterruptInterfaceBase,
-  IN  INTN          CoreId
-  )
-{
-  INTN            InterruptId;
-
-  InterruptId = MmioRead32 (GicInterruptInterfaceBase + GIC_ICCIAR);
-
-  // Check if the Interrupt ID is valid, The read from Interrupt Ack register returns CPU ID and Interrupt ID
-  if (((CoreId & 0x7) << 10) == (InterruptId & 0x1C00)) {
-    // Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
-    MmioWrite32 (GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
-    return 1;
-  } else {
-    return 0;
-  }
-}
-
-UINT32
-EFIAPI
-PL390GicAcknowledgeSgi2From (
-  IN  INTN          GicInterruptInterfaceBase,
-  IN  INTN          CoreId,
-  IN  INTN          SgiId
-  )
-{
-  INTN            InterruptId;
-
-  InterruptId = MmioRead32(GicInterruptInterfaceBase + GIC_ICCIAR);
-
-  // Check if the Interrupt ID is valid, The read from Interrupt Ack register returns CPU ID and Interrupt ID
-  if((((CoreId & 0x7) << 10) | (SgiId & 0x3FF)) == (InterruptId & 0x1FFF)) {
-    // Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
-    MmioWrite32 (GicInterruptInterfaceBase + GIC_ICCEIOR, InterruptId);
-    return 1;
-  } else {
-    return 0;
-  }
+  MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x00000001);
 }

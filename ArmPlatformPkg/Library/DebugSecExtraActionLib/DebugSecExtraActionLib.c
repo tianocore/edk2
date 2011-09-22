@@ -14,12 +14,12 @@
 
 #include <PiPei.h>
 
+#include <Library/ArmGicLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
 #include <Library/SerialPortLib.h>
 #include <Chipset/ArmV7.h>
-#include <Drivers/PL390Gic.h>
 
 #define ARM_PRIMARY_CORE    0
 
@@ -38,7 +38,7 @@ NonSecureWaitForFirmware (
   ArmCallWFI();
 
   // Acknowledge the interrupt and send End of Interrupt signal.
-  PL390GicAcknowledgeSgiFrom (PcdGet32(PcdGicInterruptInterfaceBase), ARM_PRIMARY_CORE);
+  ArmGicAcknowledgeSgiFrom (PcdGet32(PcdGicInterruptInterfaceBase), ARM_PRIMARY_CORE);
 
   // Jump to secondary core entry point.
   secondary_start ();
@@ -87,7 +87,7 @@ ArmPlatformSecExtraAction (
   } else if (FeaturePcdGet (PcdSystemMemoryInitializeInSec)) {
     if (CoreId == ARM_PRIMARY_CORE) {
       // Signal the secondary cores they can jump to PEI phase
-      PL390GicSendSgiTo (PcdGet32(PcdGicDistributorBase), GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
+      ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
 
       // To enter into Non Secure state, we need to make a return from exception
       *JumpAddress = PcdGet32(PcdNormalFvBaseAddress);

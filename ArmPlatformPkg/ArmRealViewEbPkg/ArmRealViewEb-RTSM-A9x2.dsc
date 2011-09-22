@@ -115,7 +115,8 @@
   # ARM PL011 UART Driver
   PL011UartLib|ArmPlatformPkg/Drivers/PL011Uart/PL011Uart.inf
   # ARM PL390 General Interrupt Driver in Secure and Non-secure
-  PL390GicNonSecLib|ArmPkg/Drivers/PL390Gic/PL390GicNonSec.inf
+  ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
+  ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
 
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   
@@ -138,8 +139,6 @@
   
   # L2 Cache Driver
   L2X0CacheLib|ArmPlatformPkg/Library/L2X0CacheLibNull/L2X0CacheLibNull.inf
-  # ARM PL390 General Interrupt Driver in Secure
-  PL390GicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicSec.inf
 
 !if $(EDK2_SKIP_PEICORE) == 1
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
@@ -451,13 +450,14 @@
 !if $(EDK2_SKIP_PEICORE) == 1
   ArmPlatformPkg/PrePi/PeiMPCore.inf {
     <LibraryClasses>
+      ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
       ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLib.inf
       ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbLib.inf
   }
 !else
   ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf {
     <LibraryClasses>
-      PL390GicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicNonSec.inf
+      ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
   }
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
