@@ -68,9 +68,9 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[Index].Attributes   = (ARM_MEMORY_REGION_ATTRIBUTES)CacheAttributes;
 
   // DDR
-  VirtualMemoryTable[++Index].PhysicalBase = ARM_EB_DRAM_BASE;
-  VirtualMemoryTable[Index].VirtualBase  = ARM_EB_DRAM_BASE;
-  VirtualMemoryTable[Index].Length       = ARM_EB_DRAM_SZ;
+  VirtualMemoryTable[++Index].PhysicalBase = PcdGet32 (PcdSystemMemoryBase);
+  VirtualMemoryTable[Index].VirtualBase  = PcdGet32 (PcdSystemMemoryBase);
+  VirtualMemoryTable[Index].Length       = PcdGet32 (PcdSystemMemorySize);
   VirtualMemoryTable[Index].Attributes   = (ARM_MEMORY_REGION_ATTRIBUTES)CacheAttributes;
 
   // SMC CS7

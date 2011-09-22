@@ -34,8 +34,7 @@ ArmPlatformTrustzoneInit (
   VOID
   )
 {
-  //ASSERT(FALSE);
-  DEBUG((EFI_D_ERROR,"Initialize Trustzone Hardware\n"));
+  ASSERT(FALSE);
 }
 
 /**
@@ -48,7 +47,8 @@ ArmPlatformTrustzoneInit (
 VOID
 ArmPlatformSecInitialize (
   VOID
-  ) {
+  )
+{
   // Do nothing yet
 }
 

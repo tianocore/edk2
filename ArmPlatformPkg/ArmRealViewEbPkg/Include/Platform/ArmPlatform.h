@@ -48,10 +48,6 @@
 //#define ARM_EB_SMB_PERIPH_VRAM              0x4C000000
 #define ARM_EB_SMB_PERIPH_SZ                  0x02000000 /* 32 MB */
 
-// DRAM
-#define ARM_EB_DRAM_BASE                      0x70000000
-#define ARM_EB_DRAM_SZ                        0x10000000
-
 // Logic Tile
 #define ARM_EB_LOGIC_TILE_BASE                0xC0000000
 #define ARM_EB_LOGIC_TILE_SZ                  0x40000000
@@ -61,6 +57,7 @@
 *******************************************/
 
 // Define MotherBoard SYS flags offsets (from ARM_EB_BOARD_PERIPH_BASE)
+#define ARM_EB_SYS_ID_REG                     (ARM_EB_BOARD_PERIPH_BASE + 0x00000)
 #define ARM_EB_SYS_OSC4_REG                   (ARM_EB_BOARD_PERIPH_BASE + 0x0001C)
 #define ARM_EB_SYS_LOCK_REG                   (ARM_EB_BOARD_PERIPH_BASE + 0x00020)
 #define ARM_EB_SYS_100HZ_REG                  (ARM_EB_BOARD_PERIPH_BASE + 0x00024)
@@ -70,6 +67,7 @@
 #define ARM_EB_SYS_FLAGS_NV_REG               (ARM_EB_BOARD_PERIPH_BASE + 0x00038)
 #define ARM_EB_SYS_FLAGS_NV_SET_REG           (ARM_EB_BOARD_PERIPH_BASE + 0x00038)
 #define ARM_EB_SYS_FLAGS_NV_CLR_REG           (ARM_EB_BOARD_PERIPH_BASE + 0x0003C)
+#define ARM_EB_SYS_RESETCTL_REG               (ARM_EB_BOARD_PERIPH_BASE + 0x00040)
 #define ARM_EB_SYS_CLCD_REG                   (ARM_EB_BOARD_PERIPH_BASE + 0x00050)
 #define ARM_EB_SYS_PROCID0_REG                (ARM_EB_BOARD_PERIPH_BASE + 0x00084)
 #define ARM_EB_SYS_PROCID1_REG                (ARM_EB_BOARD_PERIPH_BASE + 0x00088)
@@ -80,25 +78,12 @@
 // SYSTRCL Register
 #define ARM_EB_SYSCTRL											  0x10001000
 
-// Uart0
-#define PL011_CONSOLE_UART_BASE               (ARM_EB_BOARD_PERIPH_BASE + 0x09000)
-
-// SP804 Timer Bases
-#define SP804_TIMER0_BASE                     (ARM_EB_BOARD_PERIPH_BASE + 0x11000)
-#define SP804_TIMER1_BASE                     (ARM_EB_BOARD_PERIPH_BASE + 0x11020)
-#define SP804_TIMER2_BASE                     (ARM_EB_BOARD_PERIPH_BASE + 0x12000)
-#define SP804_TIMER3_BASE                     (ARM_EB_BOARD_PERIPH_BASE + 0x12020)
-
-// PL301 RTC
-#define PL031_RTC_BASE                        (ARM_EB_BOARD_PERIPH_BASE + 0x17000)
-
 // Dynamic Memory Controller Base
 #define ARM_EB_DMC_BASE                       0x10018000
 
 // Static Memory Controller Base
 #define ARM_EB_SMC_CTRL_BASE                  0x10080000
 
-#define PL111_CLCD_BASE                       0x10020000
 //Note: Moving the framebuffer into the 0x70000000-0x80000000 region does not seem to work
 #define PL111_CLCD_VRAM_BASE                  0x00100000
 
@@ -122,18 +107,6 @@
 #define ARM_EB_SYS_PROC_ID_MASK                  (0xFF << 24)
 #define ARM_EB_SYS_PROC_ID_CORTEX_A8             (0x0E << 24)
 #define ARM_EB_SYS_PROC_ID_CORTEX_A9             (0x0C << 24)
-
-/*******************************************
-// EFI Memory Map in Permanent Memory (DRAM)
-*******************************************/
-
-// This region is allocated at the bottom of the DRAM. It will be used
-// for fixed address allocations such as Vector Table
-#define ARM_EB_EFI_FIX_ADDRESS_REGION_SZ        SIZE_8MB
-
-// This region is the memory declared to PEI as permanent memory for PEI
-// and DXE. EFI stacks and heaps will be declared in this region.
-#define ARM_EB_EFI_MEMORY_REGION_SZ             0x1000000
 
 /*******************************************
 // System Configuration Control

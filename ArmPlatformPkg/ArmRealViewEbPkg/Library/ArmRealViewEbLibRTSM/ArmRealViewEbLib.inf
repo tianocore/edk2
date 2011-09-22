@@ -37,3 +37,7 @@
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize

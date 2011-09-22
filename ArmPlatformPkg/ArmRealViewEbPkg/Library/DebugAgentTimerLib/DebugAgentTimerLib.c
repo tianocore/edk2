@@ -23,7 +23,6 @@
 
 #include <Library/DebugAgentTimerLib.h>
 
-#include <ArmEb/ArmEb.h>
 
 
 /**
