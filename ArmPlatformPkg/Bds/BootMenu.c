@@ -227,7 +227,7 @@ BootMenuSelectBootOption (
   UINTN                         Index;
 
   // Display the list of supported boot devices
-  BootOptionCount = 1;
+  BootOptionCount = 0;
   for (Entry = GetFirstNode (BootOptionsList);
        !IsNull (BootOptionsList,Entry);
        Entry = GetNextNode (BootOptionsList, Entry)
@@ -239,7 +239,7 @@ BootMenuSelectBootOption (
       continue;
     }
 
-    Print (L"[%d] %s\n", BootOptionCount, BdsLoadOption->Description);
+    Print (L"[%d] %s\n", (BootOptionCount + 1), BdsLoadOption->Description);
 
     DEBUG_CODE_BEGIN();
       CHAR16*                           DevicePathTxt;
@@ -264,8 +264,16 @@ BootMenuSelectBootOption (
     BootOptionCount++;
   }
 
+  // Check if a valid boot option(s) is found
   if (BootOptionCount == 0) {
-    Print (L"No supported Boot Entry.\n");
+    if (StrCmp (InputStatement, DELETE_BOOT_ENTRY) == 0) {
+      Print (L"Nothing to remove!\n");
+    }else if (StrCmp (InputStatement, UPDATE_BOOT_ENTRY) == 0) {
+      Print (L"Couldn't find valid boot entries\n");
+    } else{
+      Print (L"No supported Boot Entry.\n");
+    }
+
     return EFI_NOT_FOUND;
   }
 
@@ -276,8 +284,8 @@ BootMenuSelectBootOption (
     Status = GetHIInputInteger (&BootOptionSelected);
     if (EFI_ERROR(Status)) {
       return Status;
-    } else if ((BootOptionSelected == 0) || (BootOptionSelected >= BootOptionCount)) {
-      Print(L"Invalid input (max %d)\n",BootOptionCount-1);
+    } else if ((BootOptionSelected == 0) || (BootOptionSelected > BootOptionCount)) {
+      Print(L"Invalid input (max %d)\n",BootOptionCount);
       BootOptionSelected = 0;
     }
   }
