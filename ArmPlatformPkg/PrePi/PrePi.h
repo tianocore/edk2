@@ -44,6 +44,8 @@ TimerConstructor (
 VOID
 PrePiMain (
   IN  UINTN                     UefiMemoryBase,
+  IN  UINTN                     StacksBase,
+  IN  UINTN                     GlobalVariableBase,
   IN  UINT64                    StartTimeStamp
   );
 
@@ -63,6 +65,8 @@ PlatformPeim (
 VOID
 PrimaryMain (
   IN  UINTN                     UefiMemoryBase,
+  IN  UINTN                     StacksBase,
+  IN  UINTN                     GlobalVariableBase,
   IN  UINT64                    StartTimeStamp
   );
 

@@ -124,6 +124,7 @@
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
+  
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
@@ -293,7 +294,6 @@
 #  DEBUG_LOADFILE  0x00020000  // UNDI Driver
 #  DEBUG_EVENT     0x00080000  // Event messages
 #  DEBUG_ERROR     0x80000000  // Error
-
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000000F
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
@@ -331,9 +331,6 @@
 #
   gArmTokenSpaceGuid.PcdVFPEnabled|1
   
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackBase|0x87FE0000 # stack at top of memory
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresNonSecStackSize|0x20000  # 128K stack
-
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x80000000
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x08000000
 
@@ -353,7 +350,6 @@
   
   gEmbeddedTokenSpaceGuid.PcdMemoryBase|0x80000000
   gEmbeddedTokenSpaceGuid.PcdMemorySize|0x10000000
-
 
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x80008000
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x80008000

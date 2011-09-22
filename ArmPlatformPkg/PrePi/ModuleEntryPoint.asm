@@ -134,14 +134,21 @@ _InitGlobals
 
 
 _PrepareArguments
+  mov   r0, r5
+  mov   r1, r6
+  mov   r2, r7
+  mov   r3, sp
+
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
-  ldr   r2, StartupAddr
+  ldr   r4, StartupAddr
 
   // Jump to PrePiCore C code
   //    r0 = MpId
   //    r1 = UefiMemoryBase
-  blx   r2
+  //    r2 = StacksBase
+  //    r3 = GlobalVariableBase
+  blx   r4
 
 _NeverReturn
   b _NeverReturn

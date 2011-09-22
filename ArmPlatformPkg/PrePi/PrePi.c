@@ -51,6 +51,8 @@ LzmaDecompressLibConstructor (
 VOID
 PrePiMain (
   IN  UINTN                     UefiMemoryBase,
+  IN  UINTN                     StacksBase,
+  IN  UINTN                     GlobalVariableBase,
   IN  UINT64                    StartTimeStamp
   )
 {
@@ -58,9 +60,7 @@ PrePiMain (
   EFI_STATUS                    Status;
   CHAR8                         Buffer[100];
   UINTN                         CharCount;
-  UINTN                         UefiMemoryTop;
   UINTN                         StacksSize;
-  UINTN                         StacksBase;
 
   // Enable program flow prediction, if supported.
   ArmEnableBranchPrediction ();
@@ -77,12 +77,6 @@ PrePiMain (
   // Initialize the Debug Agent for Source Level Debugging
   InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
   SaveAndSetDebugTimerInterrupt (TRUE);
-
-  UefiMemoryTop = UefiMemoryBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
-  StacksBase = UefiMemoryTop - StacksSize;
-
-  // Check the PcdCPUCoresNonSecStackBase match with the calculated StackBase
-  ASSERT (StacksBase == PcdGet32 (PcdCPUCoresNonSecStackBase));
   
   // Declare the PI/UEFI memory region
   HobList = HobConstructor (
@@ -137,7 +131,9 @@ PrePiMain (
 VOID
 CEntryPoint (
   IN  UINTN                     MpId,
-  IN  UINTN                     UefiMemoryBase
+  IN  UINTN                     UefiMemoryBase,
+  IN  UINTN                     StacksBase,
+  IN  UINTN                     GlobalVariableBase
   )
 {
   UINT64   StartTimeStamp;
@@ -170,7 +166,7 @@ CEntryPoint (
   // If not primary Jump to Secondary Main
   if (IS_PRIMARY_CORE(MpId)) {
     // Goto primary Main.
-    PrimaryMain (UefiMemoryBase, StartTimeStamp);
+    PrimaryMain (UefiMemoryBase, StacksBase, GlobalVariableBase, StartTimeStamp);
   } else {
     SecondaryMain (MpId);
   }
