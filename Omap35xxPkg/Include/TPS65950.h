@@ -64,7 +64,17 @@
 #define VAUX2_DEDICATED       0x79
 #define VAUX2_DEV_GRP         0x76
 
+#define VAUX_DEV_GRP_NONE     0x00
 #define VAUX_DEV_GRP_P1       0x20
+#define VAUX_DEV_GRP_P2       0x40
+#define VAUX_DEV_GRP_P3       0x80
 #define VAUX_DEDICATED_18V    0x05
+
+// Display subsystem
+#define VPLL2_DEDICATED       0x91
+#define VPLL2_DEV_GRP         0x8E
+
+#define GPIODATADIR1          0x9B
+#define SETGPIODATAOUT1       0xA4
 
 #endif //__TPS65950_H__

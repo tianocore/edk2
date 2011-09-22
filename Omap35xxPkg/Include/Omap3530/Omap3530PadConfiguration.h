@@ -256,6 +256,12 @@
 #define ETK_D13             (SYSTEM_CONTROL_MODULE_BASE + 0x5F6)
 #define ETK_D14             (SYSTEM_CONTROL_MODULE_BASE + 0x5F8)
 #define ETK_D15             (SYSTEM_CONTROL_MODULE_BASE + 0x5FA)
+#define SYS_BOOT0           (SYSTEM_CONTROL_MODULE_BASE + 0xA0A)
+#define SYS_BOOT1           (SYSTEM_CONTROL_MODULE_BASE + 0xA0C)
+#define SYS_BOOT3           (SYSTEM_CONTROL_MODULE_BASE + 0xA10)
+#define SYS_BOOT4           (SYSTEM_CONTROL_MODULE_BASE + 0xA12)
+#define SYS_BOOT5           (SYSTEM_CONTROL_MODULE_BASE + 0xA14)
+#define SYS_BOOT6           (SYSTEM_CONTROL_MODULE_BASE + 0xA16)
 
 //Mux modes
 #define MUXMODE0            (0x0UL)

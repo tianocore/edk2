@@ -16,10 +16,13 @@
 #include <Library/IoLib.h>
 #include <Library/DebugLib.h>
 #include <Omap3530/Omap3530.h>
+#include <BeagleBoard.h>
 
-#define NUM_PINS 238
+#define NUM_PINS_SHARED 232
+#define NUM_PINS_ABC 6
+#define NUM_PINS_XM 12
 
-PAD_CONFIGURATION PadConfigurationTable[NUM_PINS] = {
+PAD_CONFIGURATION PadConfigurationTableShared[] = {
   //Pin,           MuxMode,    PullConfig,                      InputEnable
   { SDRC_D0,       MUXMODE0,   PULL_DISABLED,                INPUT  },
   { SDRC_D1,       MUXMODE0,   PULL_DISABLED,                INPUT  },
@@ -127,12 +130,6 @@ PAD_CONFIGURATION PadConfigurationTable[NUM_PINS] = {
   { DSS_DATA15,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
   { DSS_DATA16,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
   { DSS_DATA17,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA18,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA19,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA20,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA21,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA22,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
-  { DSS_DATA23,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
   { CAM_HS,        MUXMODE0,   PULL_UP_SELECTED,             INPUT },
   { CAM_VS,        MUXMODE0,   PULL_UP_SELECTED,             INPUT },
   { CAM_XCLKA,     MUXMODE0,   PULL_DISABLED,                OUTPUT },
@@ -226,7 +223,7 @@ PAD_CONFIGURATION PadConfigurationTable[NUM_PINS] = {
   { I2C2_SDA,      MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
   { I2C3_SCL,      MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
   { I2C3_SDA,      MUXMODE0,   PULL_UP_SELECTED,             INPUT  },
-  { HDQ_SIO,       MUXMODE4,   PULL_UP_SELECTED,             OUTPUT },
+  { HDQ_SIO,       MUXMODE4,   PULL_DISABLED,                OUTPUT },
   { MCSPI1_CLK,    MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
   { MCSPI1_SIMO,   MUXMODE4,   PULL_UP_SELECTED,             INPUT  },
   { MCSPI1_SOMI,   MUXMODE0,   PULL_DISABLED,                INPUT  },
@@ -261,22 +258,65 @@ PAD_CONFIGURATION PadConfigurationTable[NUM_PINS] = {
   { ETK_D15,       MUXMODE3,   PULL_UP_SELECTED,             INPUT  }
 };
 
+PAD_CONFIGURATION PadConfigurationTableAbc[] = {
+  { DSS_DATA18,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
+  { DSS_DATA19,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
+  { DSS_DATA20,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
+  { DSS_DATA21,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
+  { DSS_DATA22,    MUXMODE0,   PULL_DISABLED,                OUTPUT },
+  { DSS_DATA23,    MUXMODE0,   PULL_DISABLED,                OUTPUT }
+};
+
+PAD_CONFIGURATION PadConfigurationTableXm[] = {
+  { DSS_DATA18,    MUXMODE3,   PULL_DISABLED,                OUTPUT },
+  { DSS_DATA19,    MUXMODE3,   PULL_DISABLED,                OUTPUT },
+  { DSS_DATA20,    MUXMODE3,   PULL_DISABLED,                OUTPUT },
+  { DSS_DATA21,    MUXMODE3,   PULL_DISABLED,                OUTPUT },
+  { DSS_DATA22,    MUXMODE3,   PULL_DISABLED,                OUTPUT },
+  { DSS_DATA23,    MUXMODE3,   PULL_DISABLED,                OUTPUT },
+  { SYS_BOOT0,     MUXMODE3,   PULL_DISABLED,                OUTPUT },
+  { SYS_BOOT1,     MUXMODE3,   PULL_DISABLED,                OUTPUT },
+  { SYS_BOOT3,     MUXMODE3,   PULL_DISABLED,                OUTPUT },
+  { SYS_BOOT4,     MUXMODE3,   PULL_DISABLED,                OUTPUT },
+  { SYS_BOOT5,     MUXMODE3,   PULL_DISABLED,                OUTPUT },
+  { SYS_BOOT6,     MUXMODE3,   PULL_DISABLED,                OUTPUT }
+};
+
 VOID
 PadConfiguration (
-  VOID
+  BEAGLEBOARD_REVISION Revision
   )
 {
-  UINTN  Index;
-  UINT16 PadConfiguration;
-  UINTN  NumPinsToConfigure = sizeof(PadConfigurationTable)/sizeof(PAD_CONFIGURATION);
+  UINTN             Index;
+  UINT16            PadConfiguration;
+  PAD_CONFIGURATION *BoardConfiguration;
+  UINTN             NumPinsToConfigure;
+
+  for (Index = 0; Index < NUM_PINS_SHARED; Index++) {
+    // Set up Pad configuration for particular pin.
+    PadConfiguration =  (PadConfigurationTableShared[Index].MuxMode << MUXMODE_OFFSET);
+    PadConfiguration |= (PadConfigurationTableShared[Index].PullConfig << PULL_CONFIG_OFFSET);
+    PadConfiguration |= (PadConfigurationTableShared[Index].InputEnable << INPUTENABLE_OFFSET);
+
+    // Configure the pin with specific Pad configuration.
+    MmioWrite16(PadConfigurationTableShared[Index].Pin, PadConfiguration);
+  }
+
+  if (Revision == REVISION_XM) {
+    BoardConfiguration = PadConfigurationTableXm;
+    NumPinsToConfigure = NUM_PINS_XM;
+  } else {
+    BoardConfiguration = PadConfigurationTableAbc;
+    NumPinsToConfigure = NUM_PINS_ABC;
+  }
 
   for (Index = 0; Index < NumPinsToConfigure; Index++) {
     //Set up Pad configuration for particular pin.
-    PadConfiguration =  (PadConfigurationTable[Index].MuxMode << MUXMODE_OFFSET);
-    PadConfiguration |= (PadConfigurationTable[Index].PullConfig << PULL_CONFIG_OFFSET);
-    PadConfiguration |= (PadConfigurationTable[Index].InputEnable << INPUTENABLE_OFFSET);
+    PadConfiguration =  (BoardConfiguration[Index].MuxMode << MUXMODE_OFFSET);
+    PadConfiguration |= (BoardConfiguration[Index].PullConfig << PULL_CONFIG_OFFSET);
+    PadConfiguration |= (BoardConfiguration[Index].InputEnable << INPUTENABLE_OFFSET);
 
     //Configure the pin with specific Pad configuration.
-    MmioWrite16(PadConfigurationTable[Index].Pin, PadConfiguration);
+    MmioWrite16(BoardConfiguration[Index].Pin, PadConfiguration);
   }
 }
