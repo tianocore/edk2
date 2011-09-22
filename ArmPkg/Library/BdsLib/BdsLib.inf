@@ -21,10 +21,12 @@
 
 [Sources.common]
   BdsFilePath.c
-  BdsLinuxLoader.c
   BdsAppLoader.c
   BdsHelper.c
   BdsLoadOption.c
+
+  BdsLinuxLoader.c
+  BdsLinuxAtag.c
 
 [Packages]
   MdePkg/MdePkg.dec
