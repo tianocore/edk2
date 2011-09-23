@@ -1,7 +1,7 @@
 /** @file
 The module to produce Usb Bus PPI.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -307,13 +307,13 @@ PeiHubEnumeration (
         NewPeiUsbDevice->DeviceSpeed = (UINT8)IsPortLowSpeedDeviceAttached (PortStatus.PortStatus);
 
         if(NewPeiUsbDevice->DeviceSpeed != EFI_USB_SPEED_HIGH) {
-          if (PeiUsbDevice->DeviceSpeed == EFI_USB_SPEED_HIGH) {
-            NewPeiUsbDevice->Translator.TranslatorPortNumber = (UINT8)Index;
-            NewPeiUsbDevice->Translator.TranslatorHubAddress = *CurrentAddress;
-          } else {
-            CopyMem(&(NewPeiUsbDevice->Translator), &(PeiUsbDevice->Translator), sizeof(EFI_USB2_HC_TRANSACTION_TRANSLATOR));
+    	    if (PeiUsbDevice->DeviceSpeed == EFI_USB_SPEED_HIGH) {
+             NewPeiUsbDevice->Translator.TranslatorPortNumber = (UINT8)Index;
+             NewPeiUsbDevice->Translator.TranslatorHubAddress = *CurrentAddress;
+    	    } else {
+    	        CopyMem(&(NewPeiUsbDevice->Translator), &(PeiUsbDevice->Translator), sizeof(EFI_USB2_HC_TRANSACTION_TRANSLATOR));
           }
-        }
+      	}
 
         //
         // Configure that Usb Device
@@ -380,21 +380,18 @@ PeiUsbEnumeration (
 
 
   CurrentAddress = 0;
-  if (Usb2HcPpi != NULL) {
+  if (Usb2HcPpi != NULL){
     Usb2HcPpi->GetRootHubPortNumber (
                 PeiServices,
                 Usb2HcPpi,
                 (UINT8 *) &NumOfRootPort
                 );    
-  } else if (UsbHcPpi != NULL) {
+  } else {
     UsbHcPpi->GetRootHubPortNumber (
                 PeiServices,
                 UsbHcPpi,
                 (UINT8 *) &NumOfRootPort
                 );
-  } else {
-    ASSERT (FALSE);
-    return EFI_INVALID_PARAMETER;
   }
 
   for (Index = 0; Index < NumOfRootPort; Index++) {

@@ -627,18 +627,13 @@ SetKeyboardLayoutEvent (
     //
     KeyCode = EfiKeyToUsbKeyCodeConvertionTable [(UINT8) (TempKey.Key)];
     TableEntry = GetKeyDescriptor (UsbKeyboardDevice, KeyCode);
-    if (TableEntry == NULL) {
-      ReleaseKeyboardLayoutResources (UsbKeyboardDevice);
-      FreePool (KeyboardLayout);
-      return;
-    }
     CopyMem (TableEntry, KeyDescriptor, sizeof (EFI_KEY_DESCRIPTOR));
 
     //
     // For non-spacing key, create the list with a non-spacing key followed by physical keys.
     //
     if (TempKey.Modifier == EFI_NS_KEY_MODIFIER) {
-      UsbNsKey = AllocateZeroPool (sizeof (USB_NS_KEY));
+      UsbNsKey = AllocatePool (sizeof (USB_NS_KEY));
       ASSERT (UsbNsKey != NULL);
 
       //
