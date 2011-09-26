@@ -90,10 +90,22 @@ ProtectedModeStart::                  ; protected mode entry point
         ;
         mov         ecx, 1bh                          ; Read IA32_APIC_BASE MSR
         rdmsr
+
+        bt          eax, 10                           ; Check for x2apic mode
+        jnc         LegacyApicMode
+        mov         ecx, 802h                         ; Read APIC_ID
+        rdmsr
+        mov         ebx, eax                          ; ebx == apicid
+        jmp         GetCpuNumber
+
+LegacyApicMode::
+
         and         eax, 0fffff000h
         add         eax, 20h
         mov         ebx, dword ptr [eax]
-        shr         ebx, 24
+        shr         ebx, 24                           ; ebx == apicid
+
+GetCpuNumber::
         
         xor         ecx, ecx
         mov         edi, esi
