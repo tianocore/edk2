@@ -269,6 +269,18 @@ BiosVideoDriverBindingStart (
     return Status;
   }
 
+  //
+  // Prepare for status code
+  //
+  Status = gBS->HandleProtocol (
+                  Controller,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &ParentDevicePath
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   PciAttributesSaved = FALSE;
   //
   // Save original PCI attributes
@@ -303,18 +315,6 @@ BiosVideoDriverBindingStart (
     Status = EFI_UNSUPPORTED;
     goto Done;
   }  
-
-  //
-  // Prepare for status code
-  //
-  Status = gBS->HandleProtocol (
-                  Controller,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &ParentDevicePath
-                  );
-  if (EFI_ERROR (Status)) {
-    goto Done;
-  }
 
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
