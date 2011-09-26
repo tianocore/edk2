@@ -77,6 +77,46 @@ LOADED_IMAGE_PRIVATE_DATA mCorePrivateImage  = {
 //
 GLOBAL_REMOVE_IF_UNREFERENCED    UINT64                *mDxeCodeMemoryRangeUsageBitMap=NULL;
 
+typedef struct {
+  UINT16  MachineType;
+  CHAR16  *MachineTypeName;
+} MACHINE_TYPE_INFO;
+
+//
+// EBC machine is not listed in this table, because EBC is in the default supported scopes of other machine type.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED MACHINE_TYPE_INFO  mMachineTypeInfo[] = {
+  {EFI_IMAGE_MACHINE_IA32,           L"IA32"},
+  {EFI_IMAGE_MACHINE_IA64,           L"IA64"},
+  {EFI_IMAGE_MACHINE_X64,            L"X64"},
+  {EFI_IMAGE_MACHINE_ARMTHUMB_MIXED, L"ARM"}
+};
+
+UINT16 mDxeCoreImageMachineType = 0;
+
+/**
+ Return machine type name.
+
+ @param MachineType The machine type
+
+ @return machine type name
+**/
+CHAR16 *
+GetMachineTypeName (
+  UINT16 MachineType
+  )
+{
+  UINTN  Index;
+  
+  for (Index = 0; Index < sizeof(mMachineTypeInfo)/sizeof(mMachineTypeInfo[0]); Index++) {
+    if (mMachineTypeInfo[Index].MachineType == MachineType) {
+      return mMachineTypeInfo[Index].MachineTypeName;
+    }
+  }
+
+  return L"<Unknown>";
+}
+
 /**
   Add the Image Services to EFI Boot Services Table and install the protocol
   interfaces for this image.
@@ -147,6 +187,7 @@ CoreInitializeImageServices (
   //
   // Fill in DXE globals
   //
+  mDxeCoreImageMachineType = PeCoffLoaderGetMachineType (Image->Info.ImageBase);
   gDxeCoreImageHandle = Image->Handle;
   gDxeCoreLoadedImage = &Image->Info;
 
@@ -426,6 +467,7 @@ CoreLoadPeImage (
       // The PE/COFF loader can support loading image types that can be executed.
       // If we loaded an image type that we can not execute return EFI_UNSUPORTED.
       //
+      DEBUG ((EFI_D_ERROR, "Image type %s can't be loaded on %s UEFI system.\n", GetMachineTypeName(Image->ImageContext.Machine), GetMachineTypeName(mDxeCoreImageMachineType)));
       return EFI_UNSUPPORTED;
     }
   }
@@ -1436,8 +1478,12 @@ CoreStartImage (
   //
   // The image to be started must have the machine type supported by DxeCore.
   //
-  ASSERT (EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Image->Machine));
   if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Image->Machine)) {
+    //
+    // Do not ASSERT here, because image might be loaded via EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED
+    // But it can not be started.
+    //
+    DEBUG ((EFI_D_ERROR, "Image type %s can't be started on %s UEFI system.\n", GetMachineTypeName(Image->Machine), GetMachineTypeName(mDxeCoreImageMachineType)));
     return EFI_UNSUPPORTED;
   }
 
