@@ -20,8 +20,6 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 
-#include <Chipset/ArmV7.h>
-
 VOID
 BuildMemoryTypeInformationHob (
   VOID

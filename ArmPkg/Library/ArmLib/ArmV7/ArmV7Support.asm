@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------ 
 //
-// Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+// Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+// Copyright (c) 2011, ARM Limited. All rights reserved.
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -37,23 +38,18 @@
     EXPORT  ArmDataMemoryBarrier
     EXPORT  ArmDataSyncronizationBarrier
     EXPORT  ArmInstructionSynchronizationBarrier
-    EXPORT  ArmWriteNsacr
-    EXPORT  ArmWriteScr
-    EXPORT  ArmWriteVMBar
     EXPORT  ArmWriteVBar
-    EXPORT  ArmReadVBar
-    EXPORT  ArmWriteCPACR
     EXPORT  ArmEnableVFP
     EXPORT  ArmCallWFI
-    EXPORT  ArmWriteAuxCr
-    EXPORT  ArmReadAuxCr
     EXPORT  ArmReadCbar
     EXPORT  ArmInvalidateInstructionAndDataTlb
     EXPORT  ArmReadMpidr
     EXPORT  ArmReadTpidrurw
     EXPORT  ArmWriteTpidrurw
+    EXPORT  ArmIsArchTimerImplemented
+    EXPORT  ArmReadIdPfr1
 
-    AREA    ArmCacheLib, CODE, READONLY
+    AREA    ArmV7Support, CODE, READONLY
     PRESERVE8
 
 DC_ON           EQU     ( 0x1:SHL:2 )
@@ -69,7 +65,6 @@ ArmInvalidateDataCacheEntryByMVA
   dsb
   isb
   bx      lr
-
 
 ArmCleanDataCacheEntryByMVA
   mcr     p15, 0, r0, c7, c10, 1  ; clean single data cache line     
@@ -119,11 +114,6 @@ ArmEnableMmu
   isb
   bx      LR
 
-ArmMmuEnabled
-  mrc     p15,0,R0,c1,c0,0      ; Read SCTLR into R0 (Read control register configuration data)
-  and     R0,R0,#1
-  bx      LR
-
 ArmDisableMmu
   mrc     p15,0,R0,c1,c0,0      ; Read SCTLR into R0 (Read control register configuration data)
   bic     R0,R0,#1              ; Clear SCTLR.M bit : Disable MMU
@@ -145,6 +135,11 @@ ArmDisableCachesAndMmu
   isb
   bx      LR
 
+ArmMmuEnabled
+  mrc     p15,0,R0,c1,c0,0      ; Read SCTLR into R0 (Read control register configuration data)
+  and     R0,R0,#1
+  bx      LR
+
 ArmEnableDataCache
   ldr     R1,=DC_ON             ; Specify SCTLR.C bit : (Data) Cache enable bit
   mrc     p15,0,R0,c1,c0,0      ; Read SCTLR into R0 (Read control register configuration data)
@@ -159,6 +154,7 @@ ArmDisableDataCache
   mrc     p15,0,R0,c1,c0,0      ; Read SCTLR into R0 (Read control register configuration data)
   bic     R0,R0,R1              ; Clear SCTLR.C bit : Data and unified caches disabled
   mcr     p15,0,R0,c1,c0,0      ; Write R0 into SCTLR (Write control register configuration data)
+  dsb
   isb
   bx      LR
 
@@ -190,6 +186,7 @@ ArmEnableBranchPrediction
   mrc     p15, 0, r0, c1, c0, 0 ; Read SCTLR into R0 (Read control register configuration data)
   orr     r0, r0, #0x00000800   ;
   mcr     p15, 0, r0, c1, c0, 0 ; Write R0 into SCTLR (Write control register configuration data)
+  dsb
   isb
   bx      LR
 
@@ -197,6 +194,7 @@ ArmDisableBranchPrediction
   mrc     p15, 0, r0, c1, c0, 0 ; Read SCTLR into R0 (Read control register configuration data)
   bic     r0, r0, #0x00000800   ;
   mcr     p15, 0, r0, c1, c0, 0 ; Write R0 into SCTLR (Write control register configuration data)
+  dsb
   isb
   bx      LR
 
@@ -263,7 +261,6 @@ Finished
   ldmfd SP!, {r4-r12, lr}
   bx    LR
 
-
 ArmDataMemoryBarrier
   dmb
   bx      LR
@@ -277,26 +274,6 @@ ArmInstructionSynchronizationBarrier
   isb
   bx      LR
 
-ArmWriteNsacr
-  mcr     p15, 0, r0, c1, c1, 2
-  bx      lr
-
-ArmWriteScr
-  mcr     p15, 0, r0, c1, c1, 0
-  bx      lr
-
-ArmWriteAuxCr
-  mcr     p15, 0, r0, c1, c0, 1
-  bx      lr
-
-ArmReadAuxCr
-  mrc     p15, 0, r0, c1, c0, 1
-  bx      lr  
-
-ArmWriteVMBar
-  mcr     p15, 0, r0, c12, c0, 1
-  bx      lr
-
 ArmWriteVBar
   // Set the Address of the Vector Table in the VBAR register
   mcr     p15, 0, r0, c12, c0, 0 
@@ -305,14 +282,6 @@ ArmWriteVBar
   bic     r0, r0, #0x00002000   ; clear V bit
   mcr     p15, 0, r0, c1, c0, 0 ; Write R0 into SCTLR (Write control register configuration data)
   isb
-  bx      lr
-
-ArmReadVBar
-  mrc     p15, 0, r0, c12, c0, 0 
-  bx      lr
-
-ArmWriteCPACR
-  mcr     p15, 0, r0, c1, c0, 2
   bx      lr
 
 ArmEnableVFP
@@ -342,7 +311,7 @@ ArmInvalidateInstructionAndDataTlb
   bx lr
 
 ArmReadMpidr
-  mrc     p15, 0, r0, c0, c0, 5    ; read MPIDR
+  mrc     p15, 0, r0, c0, c0, 5     ; read MPIDR
   bx      lr
 
 ArmReadTpidrurw
@@ -350,8 +319,16 @@ ArmReadTpidrurw
   bx      lr
 
 ArmWriteTpidrurw
-  mcr     p15, 0, r0, c13, c0, 2    ; write TPIDRURW
+  mcr     p15, 0, r0, c13, c0, 2   ; write TPIDRURW
   bx      lr
 
-  END
+ArmIsArchTimerImplemented
+  mrc    p15, 0, r0, c0, c1, 1     ; Read ID_PFR1
+  and    r0, r0, #0x000F0000
+  bx     lr
 
+ArmReadIdPfr1
+  mrc    p15, 0, r0, c0, c1, 1     ; Read ID_PFR1 Register
+  bx     lr
+
+ END

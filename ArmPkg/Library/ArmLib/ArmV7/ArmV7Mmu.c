@@ -29,7 +29,8 @@ PopulateLevel2PageTable (
   IN UINT32                         PhysicalBase,
   IN UINT32                         RemainLength,
   IN ARM_MEMORY_REGION_ATTRIBUTES   Attributes
-  ) {
+  )
+{
   UINT32* PageEntry;
   UINT32  Pages;
   UINT32  Index;
@@ -173,14 +174,14 @@ FillTranslationTable (
         PhysicalBase += TT_DESCRIPTOR_SECTION_SIZE;
       } else {
         // Case: Physical address aligned on the Section Size (1MB) && the length does not fill a section
-        PopulateLevel2PageTable(SectionEntry++,PhysicalBase,RemainLength,MemoryRegion->Attributes);
+        PopulateLevel2PageTable (SectionEntry++, PhysicalBase, RemainLength, MemoryRegion->Attributes);
 
         // It must be the last entry
         break;
       }
     } else {
       // Case: Physical address NOT aligned on the Section Size (1MB)
-      PopulateLevel2PageTable(SectionEntry++,PhysicalBase,RemainLength,MemoryRegion->Attributes);
+      PopulateLevel2PageTable (SectionEntry++, PhysicalBase, RemainLength, MemoryRegion->Attributes);
       // Aligned the address
       PhysicalBase = (PhysicalBase + TT_DESCRIPTOR_SECTION_SIZE) & ~(TT_DESCRIPTOR_SECTION_SIZE-1);
 
@@ -206,7 +207,7 @@ ArmConfigureMmu (
   UINT32                        TTBRAttributes;
 
   // Allocate pages for translation table.
-  TranslationTable = (UINTN)AllocatePages(EFI_SIZE_TO_PAGES(TRANSLATION_TABLE_SECTION_SIZE + TRANSLATION_TABLE_SECTION_ALIGNMENT));
+  TranslationTable = (UINTN)AllocatePages (EFI_SIZE_TO_PAGES(TRANSLATION_TABLE_SECTION_SIZE + TRANSLATION_TABLE_SECTION_ALIGNMENT));
   TranslationTable = ((UINTN)TranslationTable + TRANSLATION_TABLE_SECTION_ALIGNMENT_MASK) & ~TRANSLATION_TABLE_SECTION_ALIGNMENT_MASK;
 
   if (TranslationTableBase != NULL) {
@@ -219,17 +220,17 @@ ArmConfigureMmu (
 
   ZeroMem ((VOID *)TranslationTable, TRANSLATION_TABLE_SECTION_SIZE);
 
-  ArmCleanInvalidateDataCache();
-  ArmInvalidateInstructionCache();
-  ArmInvalidateTlb();
+  ArmCleanInvalidateDataCache ();
+  ArmInvalidateInstructionCache ();
+  ArmInvalidateTlb ();
 
-  ArmDisableDataCache();
+  ArmDisableDataCache ();
   ArmDisableInstructionCache();
-  ArmDisableMmu();
+  ArmDisableMmu ();
 
   // Make sure nothing sneaked into the cache
-  ArmCleanInvalidateDataCache();
-  ArmInvalidateInstructionCache();
+  ArmCleanInvalidateDataCache ();
+  ArmInvalidateInstructionCache ();
 
   TranslationTableAttribute = (ARM_MEMORY_REGION_ATTRIBUTES)0;
   while (MemoryTable->Length != 0) {

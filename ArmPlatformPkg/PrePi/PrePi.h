@@ -25,8 +25,6 @@
 #include <Library/SerialPortLib.h>
 #include <Library/ArmPlatformLib.h>
 
-#include <Chipset/ArmV7.h>
-
 #define SerialPrint(txt)  SerialPortWrite (txt, AsciiStrLen(txt)+1);
 
 // Vector Table for PrePi Phase

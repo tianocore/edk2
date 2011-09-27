@@ -15,8 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 --*/
 
 #include "CpuDxe.h"
-//FIXME: Remove this ARMv7 specific header
-#include <Chipset/ArmV7.h>
 
 // First Level Descriptors
 typedef UINT32    ARM_FIRST_LEVEL_DESCRIPTOR;

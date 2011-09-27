@@ -20,7 +20,6 @@
 #include <Library/SerialPortLib.h>
 
 #include <Ppi/ArmGlobalVariable.h>
-#include <Chipset/ArmV7.h>
 
 #include "PrePeiCore.h"
 

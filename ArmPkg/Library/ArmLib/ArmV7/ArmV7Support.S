@@ -1,6 +1,7 @@
 #------------------------------------------------------------------------------ 
 #
-# Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2011, ARM Limited. All rights reserved.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -40,20 +41,16 @@ GCC_ASM_EXPORT (ArmV7AllDataCachesOperation)
 GCC_ASM_EXPORT (ArmDataMemoryBarrier)
 GCC_ASM_EXPORT (ArmDataSyncronizationBarrier)
 GCC_ASM_EXPORT (ArmInstructionSynchronizationBarrier)
-GCC_ASM_EXPORT (ArmWriteNsacr)
-GCC_ASM_EXPORT (ArmWriteScr)
-GCC_ASM_EXPORT (ArmWriteVMBar)
 GCC_ASM_EXPORT (ArmWriteVBar)
-GCC_ASM_EXPORT (ArmWriteCPACR)
 GCC_ASM_EXPORT (ArmEnableVFP)
 GCC_ASM_EXPORT (ArmCallWFI)
-GCC_ASM_EXPORT (ArmWriteAuxCr)
-GCC_ASM_EXPORT (ArmReadAuxCr)
 GCC_ASM_EXPORT (ArmReadCbar)
 GCC_ASM_EXPORT (ArmInvalidateInstructionAndDataTlb)
 GCC_ASM_EXPORT (ArmReadMpidr)
 GCC_ASM_EXPORT (ArmReadTpidrurw)
 GCC_ASM_EXPORT (ArmWriteTpidrurw)
+GCC_ASM_EXPORT (ArmIsArchTimerImplemented)
+GCC_ASM_EXPORT (ArmReadIdPfr1)
 
 .set DC_ON, (0x1<<2)
 .set IC_ON, (0x1<<12)
@@ -282,26 +279,6 @@ ASM_PFX(ArmDrainWriteBuffer):
 ASM_PFX(ArmInstructionSynchronizationBarrier):
   isb
   bx      LR
- 
-ASM_PFX(ArmWriteNsacr):
-  mcr     p15, 0, r0, c1, c1, 2
-  bx      lr
-
-ASM_PFX(ArmWriteScr):
-  mcr     p15, 0, r0, c1, c1, 0
-  bx      lr
-
-ASM_PFX(ArmWriteAuxCr):
-  mcr     p15, 0, r0, c1, c0, 1
-  bx      lr
-
-ASM_PFX(ArmReadAuxCr):
-  mrc     p15, 0, r0, c1, c0, 1
-  bx      lr  
-
-ASM_PFX(ArmWriteVMBar):
-  mcr     p15, 0, r0, c12, c0, 1
-  bx      lr
 
 ASM_PFX(ArmWriteVBar):
   # Set the Address of the Vector Table in the VBAR register
@@ -311,10 +288,6 @@ ASM_PFX(ArmWriteVBar):
   bic     r0, r0, #0x00002000   @ clear V bit
   mcr     p15, 0, r0, c1, c0, 0 @ Write R0 into SCTLR (Write control register configuration data)
   isb
-  bx      lr
-
-ASM_PFX(ArmWriteCPACR):
-  mcr     p15, 0, r0, c1, c0, 2
   bx      lr
 
 ASM_PFX(ArmEnableVFP):
@@ -354,5 +327,14 @@ ASM_PFX(ArmReadTpidrurw):
 ASM_PFX(ArmWriteTpidrurw):
   mcr     p15, 0, r0, c13, c0, 2    @ write TPIDRURW
   bx      lr
+
+ASM_PFX(ArmIsArchTimerImplemented):
+  mrc    p15, 0, r0, c0, c1, 1     @ Read ID_PFR1
+  and    r0, r0, #0x000F0000
+  bx     lr
+
+ASM_PFX(ArmReadIdPfr1):
+  mrc    p15, 0, r0, c0, c1, 1     @ Read ID_PFR1 Register
+  bx     lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

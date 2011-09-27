@@ -58,3 +58,15 @@ ArmProcessorMode (
 {
   return (ARM_PROCESSOR_MODE)(CPSRRead() & (UINT32)ARM_PROCESSOR_MODE_MASK);
 }
+
+VOID
+EFIAPI
+ArmSetAuxCrBit (
+  IN  UINT32    Bits
+  )
+{
+  UINT32 val = ArmReadAuxCr();
+  val |= Bits;
+  ArmWriteAuxCr(val);
+}
+

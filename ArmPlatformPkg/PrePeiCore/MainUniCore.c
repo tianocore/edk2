@@ -12,8 +12,6 @@
 *
 **/
 
-#include <Chipset/ArmV7.h>
-
 #include "PrePeiCore.h"
 
 VOID

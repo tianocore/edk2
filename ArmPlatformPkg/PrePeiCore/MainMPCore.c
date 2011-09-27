@@ -16,8 +16,6 @@
 
 #include <Ppi/ArmMpCoreInfo.h>
 
-#include <Chipset/ArmV7.h>
-
 #include "PrePeiCore.h"
 
 /*

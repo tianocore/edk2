@@ -235,13 +235,3 @@ ArmCleanDataCache (
   ArmV7DataCacheOperation (ArmCleanDataCacheEntryBySetWay);
 }
 
-VOID
-EFIAPI
-ArmSetAuxCrBit (
-  IN  UINT32    Bits
-  )
-{
-  UINT32 val = ArmReadAuxCr();
-  val |= Bits;
-  ArmWriteAuxCr(val);
-}
