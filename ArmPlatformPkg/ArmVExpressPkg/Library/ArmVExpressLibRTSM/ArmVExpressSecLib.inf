@@ -36,6 +36,8 @@
   RTSM.c
   RTSMBoot.asm     | RVCT
   RTSMBoot.S       | GCC
+  RTSMHelper.asm   | RVCT
+  RTSMHelper.S     | GCC
 
 [Protocols]
 

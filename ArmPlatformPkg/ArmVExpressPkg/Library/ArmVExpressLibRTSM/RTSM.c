@@ -148,7 +148,7 @@ PrePeiCoreGetMpCoreInfo (
   UINT32   ProcType;
 
   ProcType = MmioRead32 (ARM_VE_SYS_PROCID0_REG) & ARM_VE_SYS_PROC_ID_MASK;
-  if (ProcType == ARM_VE_SYS_PROC_ID_CORTEX_A9) {
+  if ((ProcType == ARM_VE_SYS_PROC_ID_CORTEX_A9) || (ProcType == ARM_VE_SYS_PROC_ID_CORTEX_A15)) {
     // Only support one cluster
     *CoreCount    = ArmGetCpuCountPerCluster ();
     *ArmCoreTable = mVersatileExpressMpCoreInfoTable;

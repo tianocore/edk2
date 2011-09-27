@@ -13,37 +13,34 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = RTSMArmVExpressLib
-  FILE_GUID                      = b98a6cb7-d472-4128-ad62-a7347f85ce13
+  BASE_NAME                      = ArmCortexA15Lib
+  FILE_GUID                      = 501b1c8f-21d5-4ef5-a565-435b7f0aae2d
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ArmPlatformLib
+  LIBRARY_CLASS                  = ArmCpuLib
 
 [Packages]
   MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
-  ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
-  IoLib
   ArmLib
-  MemoryAllocationLib
-  SerialPortLib
+  ArmGicSecLib
+  IoLib
+  PcdLib
 
 [Sources.common]
-  RTSM.c
-  RTSMMem.c  
-  RTSMHelper.asm    | RVCT
-  RTSMHelper.S      | GCC
+  ArmCortexA15Lib.c
+  ArmCortexA15Helper.asm     | RVCT
+  ArmCortexA15Helper.S       | GCC
 
 [FeaturePcd]
-  gEmbeddedTokenSpaceGuid.PcdCacheEnable
-  gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
-  gArmPlatformTokenSpaceGuid.PcdStandalone
 
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdSystemMemoryBase
-  gArmTokenSpaceGuid.PcdSystemMemorySize
-  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
+
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+
+  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz
