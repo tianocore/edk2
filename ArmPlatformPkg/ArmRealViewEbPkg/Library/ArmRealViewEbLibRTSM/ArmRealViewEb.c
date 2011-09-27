@@ -48,26 +48,6 @@ ARM_CORE_INFO mRealViewEbMpCoreInfoTable[] = {
 };
 
 /**
-  Return if Trustzone is supported by your platform
-
-  A non-zero value must be returned if you want to support a Secure World on your platform.
-  ArmPlatformTrustzoneInit() will later set up the secure regions.
-  This function can return 0 even if Trustzone is supported by your processor. In this case,
-  the platform will continue to run in Secure World.
-
-  @return   A non-zero value if Trustzone supported.
-
-**/
-UINTN
-ArmPlatformTrustzoneSupported (
-  VOID
-  )
-{
-  // There is no Trustzone controllers (TZPC & TZASC) and no Secure Memory on RTSM
-  return FALSE;
-}
-
-/**
   Remap the memory at 0x0
 
   Some platform requires or gives the ability to remap the memory at the address 0x0.

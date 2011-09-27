@@ -106,25 +106,6 @@ PL341_DMC_CONFIG DDRTimings = {
 };
 
 /**
-  Return if Trustzone is supported by your platform
-
-  A non-zero value must be returned if you want to support a Secure World on your platform.
-  ArmVExpressTrustzoneInit() will later set up the secure regions.
-  This function can return 0 even if Trustzone is supported by your processor. In this case,
-  the platform will continue to run in Secure World.
-
-  @return   A non-zero value if Trustzone supported.
-
-**/
-UINTN
-ArmPlatformTrustzoneSupported (
-  VOID
-  )
-{
-  return (MmioRead32(ARM_VE_SYS_CFGRW1_REG) & ARM_VE_CFGRW1_TZASC_EN_BIT_MASK);
-}
-
-/**
   Return the current Boot Mode
 
   This function returns the boot reason on the platform
@@ -137,7 +118,11 @@ ArmPlatformGetBootMode (
   VOID
   )
 {
-  return BOOT_WITH_FULL_CONFIGURATION;
+  if (MmioRead32(ARM_VE_SYS_FLAGS_NV_REG) == 0) {
+    return BOOT_WITH_FULL_CONFIGURATION;
+  } else {
+    return BOOT_ON_S2_RESUME;
+  }
 }
 
 /**

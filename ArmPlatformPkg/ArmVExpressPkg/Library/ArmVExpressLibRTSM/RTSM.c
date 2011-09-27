@@ -23,6 +23,11 @@
 
 #include <ArmPlatform.h>
 
+UINTN
+ArmGetCpuCountPerCluster (
+  VOID
+  );
+
 ARM_CORE_INFO mVersatileExpressMpCoreInfoTable[] = {
   {
     // Cluster 0, Core 0
@@ -65,26 +70,6 @@ ARM_CORE_INFO mVersatileExpressMpCoreInfoTable[] = {
     (UINT64)0xFFFFFFFF
   }
 };
-
-/**
-  Return if Trustzone is supported by your platform
-
-  A non-zero value must be returned if you want to support a Secure World on your platform.
-  ArmVExpressTrustzoneInit() will later set up the secure regions.
-  This function can return 0 even if Trustzone is supported by your processor. In this case,
-  the platform will continue to run in Secure World.
-
-  @return   A non-zero value if Trustzone supported.
-
-**/
-UINTN
-ArmPlatformTrustzoneSupported (
-  VOID
-  )
-{
-  // Not supported yet but model does have Secure SRAM (but no TZPC/TZASC) so we could support it
-  return FALSE;
-}
 
 /**
   Return the current Boot Mode

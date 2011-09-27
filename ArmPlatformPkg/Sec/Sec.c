@@ -103,7 +103,7 @@ CEntryPoint (
   }
 
   // Test if Trustzone is supported on this platform
-  if (ArmPlatformTrustzoneSupported ()) {
+  if (FixedPcdGetBool (PcdTrustzoneSupport)) {
     // Ensure the Monitor Stack Base & Size have been set
     ASSERT(PcdGet32(PcdCPUCoresSecMonStackBase) != 0);
     ASSERT(PcdGet32(PcdCPUCoreSecMonStackSize) != 0);

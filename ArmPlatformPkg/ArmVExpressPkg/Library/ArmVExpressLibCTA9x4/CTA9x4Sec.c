@@ -39,6 +39,12 @@ ArmPlatformTrustzoneInit (
   // Setup TZ Protection Controller
   //
 
+  if (MmioRead32(ARM_VE_SYS_CFGRW1_REG) & ARM_VE_CFGRW1_TZASC_EN_BIT_MASK) {
+    ASSERT (PcdGetBool (PcdTrustzoneSupport) == TRUE);
+  } else {
+    ASSERT (PcdGetBool (PcdTrustzoneSupport) == FALSE);
+  }
+
   // Set Non Secure access for all devices
   TZPCSetDecProtBits(ARM_VE_TZPC_BASE, TZPC_DECPROT_0, 0xFFFFFFFF);
   TZPCSetDecProtBits(ARM_VE_TZPC_BASE, TZPC_DECPROT_1, 0xFFFFFFFF);

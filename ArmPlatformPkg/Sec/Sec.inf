@@ -51,6 +51,7 @@
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec
   
 [FixedPcd]
+  gArmTokenSpaceGuid.PcdTrustzoneSupport
   gArmTokenSpaceGuid.PcdVFPEnabled
   
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask

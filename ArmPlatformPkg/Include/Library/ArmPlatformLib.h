@@ -144,22 +144,6 @@ ArmPlatformBootRemapping (
   );
 
 /**
-  Return if Trustzone is supported by your platform
-
-  A non-zero value must be returned if you want to support a Secure World on your platform.
-  ArmPlatformTrustzoneInit() will later set up the secure regions.
-  This function can return 0 even if Trustzone is supported by your processor. In this case,
-  the platform will continue to run in Secure World.
-
-  @return   A non-zero value if Trustzone supported.
-
-**/
-UINTN
-ArmPlatformTrustzoneSupported (
-  VOID
-  );
-
-/**
   Initialize the Secure peripherals and memory regions
 
   If Trustzone is supported by your platform then this function makes the required initialization
