@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011, ARM Limited. All rights reserved.
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -13,121 +14,36 @@
 **/
 
 #include <Chipset/ARM1176JZ-S.h>
-#include <Library/ArmLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
 
-VOID
-FillTranslationTable (
-  IN  UINT32                        *TranslationTable,
-  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion
-  )
-{
-  UINT32  *Entry;
-  UINTN   Sections;
-  UINTN   Index;
-  UINT32  Attributes;
-  UINT32  PhysicalBase = MemoryRegion->PhysicalBase;
-  
-  switch (MemoryRegion->Attributes) {
-    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK(0);
-      break;
-    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH(0);
-      break;
-    case ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED:
-      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED(0);
-      break;
-    case ARM_MEMORY_REGION_ATTRIBUTE_SECURE_WRITE_BACK:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK(1);
-      break;
-    case ARM_MEMORY_REGION_ATTRIBUTE_SECURE_WRITE_THROUGH:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH(1);
-      break;
-    case ARM_MEMORY_REGION_ATTRIBUTE_SECURE_UNCACHED_UNBUFFERED:
-      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED(1);
-      break;
-    default:
-      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED(0);
-      break;
-  }
-  
-  Entry    = TRANSLATION_TABLE_ENTRY_FOR_VIRTUAL_ADDRESS(TranslationTable, MemoryRegion->VirtualBase);
-  Sections = ((( MemoryRegion->Length - 1 ) / TT_DESCRIPTOR_SECTION_SIZE ) + 1 );
-  
-  for (Index = 0; Index < Sections; Index++)
-  {
-    *Entry++     =  TT_DESCRIPTOR_SECTION_BASE_ADDRESS(PhysicalBase) | Attributes;
-    PhysicalBase += TT_DESCRIPTOR_SECTION_SIZE;
-  }
-}
+#include <Library/ArmLib.h>
+#include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 
 VOID
 EFIAPI
-ArmConfigureMmu (
-  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable,
-  OUT VOID                          **TranslationTableBase OPTIONAL,
-  OUT UINTN                         *TranslationTableSize  OPTIONAL
+ArmWriteVBar (
+  IN  UINT32   VectorBase
   )
 {
-  VOID  *TranslationTable;
+  ASSERT(FeaturePcdGet (PcdRelocateVectorTable) == TRUE);
 
-  // Allocate pages for translation table.
-  TranslationTable = AllocatePages(EFI_SIZE_TO_PAGES(TRANSLATION_TABLE_SIZE + TRANSLATION_TABLE_ALIGNMENT));
-  TranslationTable = (VOID *)(((UINTN)TranslationTable + TRANSLATION_TABLE_ALIGNMENT_MASK) & ~TRANSLATION_TABLE_ALIGNMENT_MASK);
-
-  if (TranslationTableBase != NULL) {
-    *TranslationTableBase = TranslationTable;
+  if (VectorBase == 0x0) {
+    ArmSetLowVectors ();
+  } else if (VectorBase == 0xFFFF0000) {
+    ArmSetHighVectors ();
+  } else {
+    // Feature not supported by ARM11. The Vector Table is either at 0x0 or 0xFFFF0000
+    ASSERT(0);
   }
-  
-  if (TranslationTableBase != NULL) {
-    *TranslationTableSize = TRANSLATION_TABLE_SIZE;
-  }
-
-  ZeroMem(TranslationTable, TRANSLATION_TABLE_SIZE);
-
-  ArmCleanInvalidateDataCache();
-  ArmInvalidateInstructionCache();
-  ArmInvalidateTlb();
-
-  ArmDisableDataCache();
-  ArmDisableInstructionCache();
-  ArmDisableMmu();
-
-  // Make sure nothing sneaked into the cache
-  ArmCleanInvalidateDataCache();
-  ArmInvalidateInstructionCache();
-
-  while (MemoryTable->Length != 0) {
-    FillTranslationTable(TranslationTable, MemoryTable);
-    MemoryTable++;
-  }
-
-  ArmSetTTBR0(TranslationTable);
-    
-  ArmSetDomainAccessControl(DOMAIN_ACCESS_CONTROL_NONE(15) |
-                            DOMAIN_ACCESS_CONTROL_NONE(14) |
-                            DOMAIN_ACCESS_CONTROL_NONE(13) |
-                            DOMAIN_ACCESS_CONTROL_NONE(12) |
-                            DOMAIN_ACCESS_CONTROL_NONE(11) |
-                            DOMAIN_ACCESS_CONTROL_NONE(10) |
-                            DOMAIN_ACCESS_CONTROL_NONE( 9) |
-                            DOMAIN_ACCESS_CONTROL_NONE( 8) |
-                            DOMAIN_ACCESS_CONTROL_NONE( 7) |
-                            DOMAIN_ACCESS_CONTROL_NONE( 6) |
-                            DOMAIN_ACCESS_CONTROL_NONE( 5) |
-                            DOMAIN_ACCESS_CONTROL_NONE( 4) |
-                            DOMAIN_ACCESS_CONTROL_NONE( 3) |
-                            DOMAIN_ACCESS_CONTROL_NONE( 2) |
-                            DOMAIN_ACCESS_CONTROL_NONE( 1) |
-                            DOMAIN_ACCESS_CONTROL_MANAGER(0));
-    
-  ArmEnableInstructionCache();
-  ArmEnableDataCache();
-  ArmEnableMmu();  
 }
 
-
-
+UINT32
+EFIAPI
+ArmReadVBar (
+  VOID
+  )
+{
+  ASSERT((FeaturePcdGet (PcdRelocateVectorTable) == TRUE) && ((PcdGet32 (PcdCpuVectorBaseAddress) == 0x0) || (PcdGet32 (PcdCpuVectorBaseAddress) == 0xFFFF0000)));
+  return PcdGet32 (PcdCpuVectorBaseAddress);
+}
 

@@ -108,4 +108,20 @@
                                                    TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
                                                    TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE)
 
+#define CPACR_CP_FULL_ACCESS    0x0FFFFFFF
+
+// NSACR - Non-Secure Access Control Register definitions
+#define NSACR_CP(cp)            ((1 << (cp)) & 0x3FFF)
+#define NSACR_PLE               0
+#define NSACR_TL                0
+#define NSACR_NS_SMP            0
+
+// SCR - Secure Configuration Register definitions
+#define SCR_NS                  (1 << 0)
+#define SCR_IRQ                 (1 << 1)
+#define SCR_FIQ                 (1 << 2)
+#define SCR_EA                  (1 << 3)
+#define SCR_FW                  (1 << 4)
+#define SCR_AW                  (1 << 5)
+
 #endif // __ARM1176JZ_S_H__

@@ -15,9 +15,9 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = Arm11ArmLib
-  FILE_GUID                      = 00586300-0E06-4790-AC44-86C56ACBB942
-  MODULE_TYPE                    = DXE_DRIVER
+  BASE_NAME                      = Arm11LibSec
+  FILE_GUID                      = bfecdbc7-a860-4993-bc09-8e3ea762a758
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmLib
 
@@ -36,11 +36,12 @@
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
 
-[LibraryClasses]
-  MemoryAllocationLib
-  
 [Protocols]
   gEfiCpuArchProtocolGuid
 
+[FeaturePcd]
+  gArmTokenSpaceGuid.PcdRelocateVectorTable
+
 [FixedPcd]
   gArmTokenSpaceGuid.PcdArmCacheOperationThreshold
+  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress
