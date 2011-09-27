@@ -80,24 +80,24 @@ formset
           // Activate/deactivate (TPM_ORD_physicalSetDeactivated) command is not available when disabled.
           //
           suppressif ideqval TCG_CONFIGURATION.TpmEnable == 0;
-            option text = STRING_TOKEN(STR_DISABLE), value = DISABLE, flags = 0;
-            option text = STRING_TOKEN(STR_TPM_ACTIVATE), value = ACTIVATE, flags = 0;
-            option text = STRING_TOKEN(STR_TPM_DEACTIVATE), value = DEACTIVATE, flags = 0;
-            option text = STRING_TOKEN(STR_TPM_DEACTIVATE_DISABLE), value = DEACTIVATE_DISABLE, flags = 0;
+            option text = STRING_TOKEN(STR_DISABLE), value = PHYSICAL_PRESENCE_DISABLE, flags = 0;
+            option text = STRING_TOKEN(STR_TPM_ACTIVATE), value = PHYSICAL_PRESENCE_ACTIVATE, flags = 0;
+            option text = STRING_TOKEN(STR_TPM_DEACTIVATE), value = PHYSICAL_PRESENCE_DEACTIVATE, flags = 0;
+            option text = STRING_TOKEN(STR_TPM_DEACTIVATE_DISABLE), value = PHYSICAL_PRESENCE_DEACTIVATE_DISABLE, flags = 0;
           endif
           //
           // Clear (TPM_ORD_ForceClear) command is not available when disabled or deactivated. 
           //
           suppressif ideqval TCG_CONFIGURATION.TpmEnable == 0 OR
                      ideqval TCG_CONFIGURATION.TpmActivate == 0;
-            option text = STRING_TOKEN(STR_TPM_CLEAR), value = CLEAR, flags = 0;
-            option text = STRING_TOKEN(STR_TPM_CLEAR_ENABLE_ACTIVATE), value = CLEAR_ENABLE_ACTIVATE, flags = 0;
+            option text = STRING_TOKEN(STR_TPM_CLEAR), value = PHYSICAL_PRESENCE_CLEAR, flags = 0;
+            option text = STRING_TOKEN(STR_TPM_CLEAR_ENABLE_ACTIVATE), value = PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE, flags = 0;
           endif
 
-          option text = STRING_TOKEN(STR_ENABLE), value = ENABLE, flags = 0;
-          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE), value = ENABLE_ACTIVATE, flags = 0;          
-          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE_CLEAR), value = ENABLE_ACTIVATE_CLEAR, flags = 0;
-          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE_CLEAR_E_A), value = ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE, flags = 0;
+          option text = STRING_TOKEN(STR_ENABLE), value = PHYSICAL_PRESENCE_ENABLE, flags = 0;
+          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE, flags = 0;          
+          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE_CLEAR), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR, flags = 0;
+          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE_CLEAR_E_A), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE, flags = 0;
     endoneof;
 
     subtitle text = STRING_TOKEN(STR_NULL);

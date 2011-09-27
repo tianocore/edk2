@@ -49,7 +49,8 @@
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   TpmCommLib|SecurityPkg/Library/TpmCommLib/TpmCommLib.inf
-  PlatformSecureLib|SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf    
+  PlatformSecureLib|SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
+  TcgPhysicalPresenceLib|SecurityPkg/Library/DxeTcgPhysicalPresenceLib/DxeTcgPhysicalPresenceLib.inf
 
 [LibraryClasses.common.PEIM]
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
@@ -95,7 +96,6 @@
   SecurityPkg/Tcg/TcgPei/TcgPei.inf
   SecurityPkg/Tcg/TcgDxe/TcgDxe.inf
   SecurityPkg/Tcg/PhysicalPresencePei/PhysicalPresencePei.inf
-  SecurityPkg/Tcg/PhysicalPresenceDxe/PhysicalPresenceDxe.inf
   SecurityPkg/Tcg/MemoryOverwriteControl/TcgMor.inf
   SecurityPkg/Tcg/TcgConfigDxe/TcgConfigDxe.inf {
     <LibraryClasses>

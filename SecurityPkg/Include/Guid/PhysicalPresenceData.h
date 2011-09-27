@@ -40,35 +40,32 @@ typedef struct {
 #define FLAG_NO_PPI_MAINTENANCE                  BIT2
 #define FLAG_RESET_TRACK                         BIT3
 
-#define H2NS(x)        ((((x) << 8) | ((x) >> 8)) & 0xffff)
-#define H2NL(x)        (H2NS ((x) >> 16) | (H2NS ((x) & 0xffff) << 16))
-
 //
 // The definition of physical presence operation actions
 //
-#define NO_ACTION                               0
-#define ENABLE                                  1
-#define DISABLE                                 2
-#define ACTIVATE                                3
-#define DEACTIVATE                              4 
-#define CLEAR                                   5
-#define ENABLE_ACTIVATE                         6
-#define DEACTIVATE_DISABLE                      7
-#define SET_OWNER_INSTALL_TRUE                  8
-#define SET_OWNER_INSTALL_FALSE                 9
-#define ENABLE_ACTIVATE_OWNER_TRUE              10
-#define DEACTIVATE_DISABLE_OWNER_FALSE          11
-#define DEFERRED_PP_UNOWNERED_FIELD_UPGRADE     12
-#define SET_OPERATOR_AUTH                       13
-#define CLEAR_ENABLE_ACTIVATE                   14
-#define SET_NO_PPI_PROVISION_FALSE              15
-#define SET_NO_PPI_PROVISION_TRUE               16
-#define SET_NO_PPI_CLEAR_FALSE                  17
-#define SET_NO_PPI_CLEAR_TRUE                   18
-#define SET_NO_PPI_MAINTENANCE_FALSE            19
-#define SET_NO_PPI_MAINTENANCE_TRUE             20
-#define ENABLE_ACTIVATE_CLEAR                   21
-#define ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE   22
+#define PHYSICAL_PRESENCE_NO_ACTION                               0
+#define PHYSICAL_PRESENCE_ENABLE                                  1
+#define PHYSICAL_PRESENCE_DISABLE                                 2
+#define PHYSICAL_PRESENCE_ACTIVATE                                3
+#define PHYSICAL_PRESENCE_DEACTIVATE                              4 
+#define PHYSICAL_PRESENCE_CLEAR                                   5
+#define PHYSICAL_PRESENCE_ENABLE_ACTIVATE                         6
+#define PHYSICAL_PRESENCE_DEACTIVATE_DISABLE                      7
+#define PHYSICAL_PRESENCE_SET_OWNER_INSTALL_TRUE                  8
+#define PHYSICAL_PRESENCE_SET_OWNER_INSTALL_FALSE                 9
+#define PHYSICAL_PRESENCE_ENABLE_ACTIVATE_OWNER_TRUE              10
+#define PHYSICAL_PRESENCE_DEACTIVATE_DISABLE_OWNER_FALSE          11
+#define PHYSICAL_PRESENCE_DEFERRED_PP_UNOWNERED_FIELD_UPGRADE     12
+#define PHYSICAL_PRESENCE_SET_OPERATOR_AUTH                       13
+#define PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE                   14
+#define PHYSICAL_PRESENCE_SET_NO_PPI_PROVISION_FALSE              15
+#define PHYSICAL_PRESENCE_SET_NO_PPI_PROVISION_TRUE               16
+#define PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_FALSE                  17
+#define PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_TRUE                   18
+#define PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_FALSE            19
+#define PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_TRUE             20
+#define PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR                   21
+#define PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE   22
 
 extern EFI_GUID  gEfiPhysicalPresenceGuid;
 

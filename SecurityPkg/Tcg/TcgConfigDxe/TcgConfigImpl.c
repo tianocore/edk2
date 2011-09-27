@@ -79,13 +79,13 @@ GetTpmState (
   //
   if ((TpmEnable != NULL) || (TpmActivate != NULL)) {
     TpmSendSize           = sizeof (TPM_RQU_COMMAND_HDR) + sizeof (UINT32) * 3;
-    *(UINT16*)&CmdBuf[0]  = H2NS (TPM_TAG_RQU_COMMAND);
-    *(UINT32*)&CmdBuf[2]  = H2NL (TpmSendSize);
-    *(UINT32*)&CmdBuf[6]  = H2NL (TPM_ORD_GetCapability);
+    *(UINT16*)&CmdBuf[0]  = SwapBytes16 (TPM_TAG_RQU_COMMAND);
+    *(UINT32*)&CmdBuf[2]  = SwapBytes32 (TpmSendSize);
+    *(UINT32*)&CmdBuf[6]  = SwapBytes32 (TPM_ORD_GetCapability);
   
-    *(UINT32*)&CmdBuf[10] = H2NL (TPM_CAP_FLAG);
-    *(UINT32*)&CmdBuf[14] = H2NL (sizeof (TPM_CAP_FLAG_PERMANENT));
-    *(UINT32*)&CmdBuf[18] = H2NL (TPM_CAP_FLAG_PERMANENT);
+    *(UINT32*)&CmdBuf[10] = SwapBytes32 (TPM_CAP_FLAG);
+    *(UINT32*)&CmdBuf[14] = SwapBytes32 (sizeof (TPM_CAP_FLAG_PERMANENT));
+    *(UINT32*)&CmdBuf[18] = SwapBytes32 (TPM_CAP_FLAG_PERMANENT);
 
     Status = TcgProtocol->PassThroughToTpm (
                             TcgProtocol,
@@ -95,7 +95,7 @@ GetTpmState (
                             CmdBuf
                             ); 
     TpmRsp = (TPM_RSP_COMMAND_HDR *) &CmdBuf[0];
-    if (EFI_ERROR (Status) || (TpmRsp->tag != H2NS (TPM_TAG_RSP_COMMAND)) || (TpmRsp->returnCode != 0)) {
+    if (EFI_ERROR (Status) || (TpmRsp->tag != SwapBytes16 (TPM_TAG_RSP_COMMAND)) || (TpmRsp->returnCode != 0)) {
       return EFI_DEVICE_ERROR;
     }
   
@@ -182,7 +182,7 @@ TcgExtractConfig (
   ZeroMem (&Configuration, sizeof (TCG_CONFIGURATION));
 
   Configuration.MorState        = PcdGetBool (PcdMorEnable);
-  Configuration.TpmOperation    = ENABLE;
+  Configuration.TpmOperation    = PHYSICAL_PRESENCE_ENABLE;
   Configuration.HideTpm         = (BOOLEAN) (PcdGetBool (PcdHideTpmSupport) && PcdGetBool (PcdHideTpm));
   //
   // Read the original value of HideTpm from PrivateData which won't be changed by Setup in this boot.

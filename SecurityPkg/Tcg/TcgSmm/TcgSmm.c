@@ -128,7 +128,7 @@ PhysicalPresenceCallback (
     // Submit TPM Operation Request to Pre-OS Environment
     //
 
-    if (mTcgNvs->PhysicalPresence.Request == SET_OPERATOR_AUTH) {
+    if (mTcgNvs->PhysicalPresence.Request == PHYSICAL_PRESENCE_SET_OPERATOR_AUTH) {
       //
       // This command requires UI to prompt user for Auth data, NOT implemented.
       //
@@ -164,49 +164,49 @@ PhysicalPresenceCallback (
     RequestConfirmed = FALSE;
 
     switch (mTcgNvs->PhysicalPresence.Request) {
-      case ENABLE:
-      case DISABLE:
-      case ACTIVATE:
-      case DEACTIVATE:
-      case ENABLE_ACTIVATE:
-      case DEACTIVATE_DISABLE:
-      case SET_OWNER_INSTALL_TRUE:
-      case SET_OWNER_INSTALL_FALSE:
-      case ENABLE_ACTIVATE_OWNER_TRUE:
-      case DEACTIVATE_DISABLE_OWNER_FALSE:
+      case PHYSICAL_PRESENCE_ENABLE:
+      case PHYSICAL_PRESENCE_DISABLE:
+      case PHYSICAL_PRESENCE_ACTIVATE:
+      case PHYSICAL_PRESENCE_DEACTIVATE:
+      case PHYSICAL_PRESENCE_ENABLE_ACTIVATE:
+      case PHYSICAL_PRESENCE_DEACTIVATE_DISABLE:
+      case PHYSICAL_PRESENCE_SET_OWNER_INSTALL_TRUE:
+      case PHYSICAL_PRESENCE_SET_OWNER_INSTALL_FALSE:
+      case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_OWNER_TRUE:
+      case PHYSICAL_PRESENCE_DEACTIVATE_DISABLE_OWNER_FALSE:
         if ((Flags & FLAG_NO_PPI_PROVISION) != 0) {
           RequestConfirmed = TRUE;
         }
         break;
 
-      case CLEAR:
-      case ENABLE_ACTIVATE_CLEAR:
+      case PHYSICAL_PRESENCE_CLEAR:
+      case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR:
         if ((Flags & FLAG_NO_PPI_CLEAR) != 0) {
           RequestConfirmed = TRUE;
         }
         break;
 
-      case DEFERRED_PP_UNOWNERED_FIELD_UPGRADE:
+      case PHYSICAL_PRESENCE_DEFERRED_PP_UNOWNERED_FIELD_UPGRADE:
         if ((Flags & FLAG_NO_PPI_MAINTENANCE) != 0) {
           RequestConfirmed = TRUE;
         }
         break;
 
-      case ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE:
-      case CLEAR_ENABLE_ACTIVATE:
+      case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE:
+      case PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE:
         if ((Flags & FLAG_NO_PPI_CLEAR) != 0 && (Flags & FLAG_NO_PPI_PROVISION) != 0) {
           RequestConfirmed = TRUE;
         }
         break;  
 
-      case SET_NO_PPI_PROVISION_FALSE:
-      case SET_NO_PPI_CLEAR_FALSE:
-      case SET_NO_PPI_MAINTENANCE_FALSE:
-      case NO_ACTION:
+      case PHYSICAL_PRESENCE_SET_NO_PPI_PROVISION_FALSE:
+      case PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_FALSE:
+      case PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_FALSE:
+      case PHYSICAL_PRESENCE_NO_ACTION:
         RequestConfirmed = TRUE;
         break;
 
-      case SET_OPERATOR_AUTH:
+      case PHYSICAL_PRESENCE_SET_OPERATOR_AUTH:
         //
         // This command requires UI to prompt user for Auth data
         // Here it is NOT implemented

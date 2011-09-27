@@ -1,7 +1,8 @@
 ## @file
-#  Component file for PhysicalPresenceDxe driver.
+# TCG physical presence library instance. This library will lock
+# TPM after executing TPM request.
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -13,22 +14,21 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PhysicalPresenceDxe
-  FILE_GUID                      = D85A4A0C-2E73-4491-92E1-DCEFC3882A68
+  BASE_NAME                      = DxeTcgPhysicalPresenceLib   
+  FILE_GUID                      = EBC43A46-34AC-4F07-A7F5-A5394619361C
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-
-  ENTRY_POINT                    = DriverEntry
-
+  LIBRARY_CLASS                  = TcgPhysicalPresenceLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  CONSTRUCTOR                    = TcgPhysicalPresenceLibConstructor
+  
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
 [Sources]
-  PhysicalPresence.c
-  PhysicalPresence.h
+  DxeTcgPhysicalPresenceLib.c
   PhysicalPresenceStrings.uni
 
 [Packages]
@@ -52,10 +52,3 @@
 
 [Guids]
   gEfiPhysicalPresenceGuid
-
-[Depex]
-  gEfiTcgProtocolGuid                  AND
-  gEfiVariableArchProtocolGuid         AND
-  gEfiVariableWriteArchProtocolGuid    AND
-  gEfiResetArchProtocolGuid
-
