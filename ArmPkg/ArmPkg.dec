@@ -133,3 +133,10 @@
   # The Linux ATAGs are expected to be under 0x4000 (16KB) from the beginning of the System Memory
   gArmTokenSpaceGuid.PcdArmLinuxAtagMaxOffset|0x4000|UINT32|0x00000020
 
+  #
+  # ARM Architectural Timer
+  #
+  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0|UINT32|0x00000034
+  # ARM Architectural Timer Interrupt(GIC PPI) number
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035  
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036

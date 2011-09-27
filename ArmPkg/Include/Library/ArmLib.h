@@ -167,7 +167,7 @@ Cp15CacheInfo (
 
 BOOLEAN
 EFIAPI
-ArmIsMPCore (
+ArmIsMpCore (
   VOID
   );
 

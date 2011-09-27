@@ -17,6 +17,7 @@
 #define __ARM_V7_H__
 
 #include <Chipset/ArmV7Mmu.h>
+#include <Chipset/ArmV7ArchTimer.h>
 
 // Domain Access Control Register
 #define DOMAIN_ACCESS_CONTROL_MASK(a)     (3UL << (2 * (a)))
@@ -78,6 +79,12 @@ VOID
 EFIAPI
 ArmWriteTpidrurw (
   UINTN Value
+  );
+
+UINTN
+EFIAPI
+ArmIsArchTimerImplemented (
+  VOID
   );
 
 UINTN

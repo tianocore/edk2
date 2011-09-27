@@ -1,0 +1,115 @@
+/** @file
+
+  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#ifndef __ARM_V7_ARCH_TIMER_LIB_H__
+#define __ARM_V7_ARCH_TIMER_LIB_H__
+
+#define ARM_ARCH_TIMER_ENABLE           (1 << 0)
+#define ARM_ARCH_TIMER_IMASK            (1 << 1)
+#define ARM_ARCH_TIMER_ISTATUS          (1 << 2)
+
+typedef enum {
+  CntFrq = 0,
+  CntPct,
+  CntkCtl,
+  CntpTval,
+  CntpCtl,
+  CntvTval,
+  CntvCtl,
+  CntvCt,
+  CntpCval,
+  CntvCval,
+  CntvOff,
+  CnthCtl,
+  CnthpTval,
+  CnthpCtl,
+  CnthpCval,
+  RegMaximum
+}ARM_ARCH_TIMER_REGS;
+
+VOID
+EFIAPI
+ArmArchTimerReadReg (
+  IN   ARM_ARCH_TIMER_REGS   Reg,
+  OUT  VOID                  *DstBuf
+  );
+
+VOID
+EFIAPI
+ArmArchTimerWriteReg (
+  IN   ARM_ARCH_TIMER_REGS   Reg,
+  IN   VOID                  *SrcBuf
+  );
+
+VOID
+EFIAPI
+ArmArchTimerEnableTimer (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmArchTimerDisableTimer (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmArchTimerSetTimerFreq (
+  IN   UINTN  FreqInHz
+  );
+
+UINTN
+EFIAPI
+ArmArchTimerGetTimerFreq (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmArchTimerSetTimerVal (
+  IN   UINTN   Val
+  );
+
+UINTN
+EFIAPI
+ArmArchTimerGetTimerVal (
+  VOID
+  );
+
+UINT64
+EFIAPI
+ArmArchTimerGetSystemCount (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmArchTimerGetTimerCtrlReg (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmArchTimerSetTimerCtrlReg (
+  UINTN Val
+  );
+
+VOID
+EFIAPI
+ArmArchTimerSetCompareVal (
+  IN   UINT64   Val
+  );
+
+#endif // __ARM_V7_ARCH_TIMER_LIB_H__

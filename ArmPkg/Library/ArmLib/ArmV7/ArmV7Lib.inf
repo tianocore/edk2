@@ -35,6 +35,10 @@
   ArmV7Lib.c
   ArmV7Mmu.c
 
+  ArmV7ArchTimer.c
+  ArmV7ArchTimerSupport.S    | GCC
+  ArmV7ArchTimerSupport.asm    | RVCT
+
 [Packages]
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
