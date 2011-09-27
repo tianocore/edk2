@@ -157,31 +157,13 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
   #
-  # Multimedia Card Interface
-  #
-  INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
-  INF ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
-  
-  #
   # UEFI application (Shell Embedded Boot Loader) 
   #  
   INF EmbeddedPkg/Ebl/Ebl.inf
   
-  #
-  # UEFI application (Full EFI Shell) 
-  #  
-  FILE APPLICATION = PCD(gArmTokenSpaceGuid.PcdShellFile) {
-    SECTION PE32 = EdkShellBinPkg/FullShell/Arm/ShellFull.efi
-    SECTION UI      = "ShellFull"
-  }
-
 !if $(EDK2_ARMVE_UEFI2_SHELL) == 1
   INF ShellPkg/Application/Shell/Shell.inf
 !endif
-  #
-  # UEFI application (Test Variable Services)
-  #
-  INF ArmPkg/Application/VariableServicesTest/VariableServicesTest.inf
   
   #
   # Bds

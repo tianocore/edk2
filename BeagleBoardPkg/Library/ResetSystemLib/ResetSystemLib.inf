@@ -46,4 +46,4 @@
   UefiBootServicesTableLib
 
 [Pcd]
-  gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase
+  gArmTokenSpaceGuid.PcdFvBaseAddress

@@ -174,7 +174,6 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/Bds/Bds.inf
 
 
-
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 8
 ERASE_POLARITY     = 1

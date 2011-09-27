@@ -27,7 +27,7 @@ ArmGicEnableInterruptInterface (
   * Enable the CPU interface in Non-Secure world
   * Note: The ICCICR register is banked when Security extensions are implemented
   */
-  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCICR,0x00000001);
+  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCICR, 0x1);
 }
 
 VOID
@@ -40,5 +40,5 @@ ArmGicEnableDistributor (
    * Enable GIC distributor in Non-Secure world.
    * Note: The ICDDCR register is banked when Security extensions are implemented
    */
-  MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x00000001);
+  MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x1);
 }

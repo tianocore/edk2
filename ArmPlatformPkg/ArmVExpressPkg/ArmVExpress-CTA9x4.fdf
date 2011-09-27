@@ -171,9 +171,13 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/Drivers/SP805WatchdogDxe/SP805WatchdogDxe.inf
 
   #
-  # Semi-hosting filesystem
+
+!if $(EDK2_ARMVE_STANDALONE) != 1
+  #
+  # Semi-hosting filesystem (Required the Hardware Debugger to be connected)
   #
   INF ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
+!endif
   
   #
   # FAT filesystem + GPT/MBR partitioning
@@ -194,6 +198,10 @@ READ_LOCK_STATUS   = TRUE
   #  
   INF EmbeddedPkg/Ebl/Ebl.inf
     
+!if $(EDK2_ARMVE_UEFI2_SHELL) == 1
+  INF ShellPkg/Application/Shell/Shell.inf
+!endif
+  
   #
   # Bds
   #

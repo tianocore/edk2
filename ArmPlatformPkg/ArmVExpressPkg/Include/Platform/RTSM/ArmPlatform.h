@@ -70,6 +70,7 @@
 #define ARM_VE_SCC_BASE
 
 // SP810 Controller
+#undef SP810_CTRL_BASE
 #define SP810_CTRL_BASE                         0x1C020000
 
 // PL111 Colour LCD Controller

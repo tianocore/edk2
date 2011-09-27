@@ -21,7 +21,7 @@
 
 GCC_ASM_IMPORT(CEntryPoint)
 GCC_ASM_IMPORT(ArmReadMpidr)
-GCC_ASM_IMPORT(ArmIsMPCore)
+GCC_ASM_IMPORT(ArmIsMpCore)
 GCC_ASM_EXPORT(_ModuleEntryPoint)
 
 StartupAddr: .word    CEntryPoint
@@ -77,7 +77,7 @@ _SetupStack:
 _GetStackBase:
   // Compute Base of Normal stacks for CPU Cores
   // Is it MpCore system
-  bl    ArmIsMPCore
+  bl    ArmIsMpCore
   cmp   r0, #0
   // Case it is not an MP Core system. Just setup the primary core
   beq   _SetupUnicoreStack

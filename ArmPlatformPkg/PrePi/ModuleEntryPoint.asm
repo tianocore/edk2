@@ -20,7 +20,7 @@
   
   IMPORT  CEntryPoint
   IMPORT  ArmReadMpidr
-  IMPORT  ArmIsMPCore
+  IMPORT  ArmIsMpCore
   EXPORT  _ModuleEntryPoint
 
   PRESERVE8
@@ -78,7 +78,7 @@ _SetupStack
 _GetStackBase
   // Compute Base of Normal stacks for CPU Cores
   // Is it MpCore system
-  bl    ArmIsMPCore
+  bl    ArmIsMpCore
   cmp   r0, #0
   // Case it is not an MP Core system. Just setup the primary core
   beq   _SetupUnicoreStack

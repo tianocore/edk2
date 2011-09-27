@@ -278,7 +278,6 @@
   # Application
   #  
   EmbeddedPkg/Ebl/Ebl.inf
-  ArmPkg/Application/VariableServicesTest/VariableServicesTest.inf
 
 !ifdef $(EDK2_ARMVE_UEFI2_SHELL)
   ShellPkg/Application/Shell/Shell.inf {

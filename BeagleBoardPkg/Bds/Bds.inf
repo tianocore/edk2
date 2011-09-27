@@ -61,11 +61,5 @@
   gEfiUsbIoProtocolGuid
   gEfiFirmwareVolume2ProtocolGuid
 
-
-[FeaturePcd]  
-
-[FixedPcd]
-  gEmbeddedTokenSpaceGuid.PcdPrePiStackSize
-
 [Depex]
   TRUE

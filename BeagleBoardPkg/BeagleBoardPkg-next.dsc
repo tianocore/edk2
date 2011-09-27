@@ -122,7 +122,6 @@
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
 
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
-  FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
@@ -175,7 +174,6 @@
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
 
-
 [LibraryClasses.common.UEFI_APPLICATION]
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   UefiDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
@@ -207,18 +205,11 @@
 
 
 [BuildOptions]
-  XCODE:*_*_ARM_ARCHCC_FLAGS     == -arch armv7 -march=armv7
-  XCODE:*_*_ARM_ARCHASM_FLAGS    == -arch armv7
-  XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv7
-  XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
+  XCODE:*_*_ARM_PLATFORM_FLAGS == -arch armv7
 
-  GCC:*_*_ARM_ARCHCC_FLAGS     == -march=armv7-a -mthumb
-  GCC:*_*_ARM_ARCHASM_FLAGS    == -march=armv7-a
-  GCC:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
+  GCC:*_*_ARM_PLATFORM_FLAGS == -march=armv7-a
 
-  RVCT:*_*_ARM_ARCHCC_FLAGS  == --cpu Cortex-A8 --thumb
-  RVCT:*_*_ARM_ARCHASM_FLAGS == --cpu Cortex-A8 
-  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG 
+  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A8
 
 ################################################################################
 #
@@ -309,9 +300,6 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedDefaultTextColor|0x07
   gEmbeddedTokenSpaceGuid.PcdEmbeddedMemVariableStoreSize|0x10000
   
-  gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|0
-  gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize|0
-
 #
 # Optional feature to help prevent EFI memory map fragments
 # Turned on and off via: PcdPrePiProduceMemoryTypeInformationHob
@@ -347,17 +335,6 @@
   # Size of the region reserved for fixed address allocations (Reserved 32MB)
   gArmTokenSpaceGuid.PcdArmLinuxKernelMaxOffset|0x02000000
 
-  # Reserved to store the HobBase address (top of UEFI Memory Region)
-  #  = (PcdSystemMemoryBase + PcdSystemMemorySize) - sizeof(UINT32)
-  gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|0x87FFFFFC
-
-  #gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|0x80001000
-  gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0x87FE0000 # stack at top of memory
-  gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|0x20000  # 128K stack
-  
-  gEmbeddedTokenSpaceGuid.PcdMemoryBase|0x80000000
-  gEmbeddedTokenSpaceGuid.PcdMemorySize|0x10000000
-
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x80008000
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x80008000
   
@@ -392,14 +369,14 @@
 ################################################################################
 [Components.common]
 
-#
-# SEC
-#
+  #
+  # SEC
+  #
   ArmPlatformPkg/PrePi/PeiUniCore.inf
   
-#
-# DXE
-#
+  #
+  # DXE
+  #
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf

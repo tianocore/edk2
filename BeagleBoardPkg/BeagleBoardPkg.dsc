@@ -122,7 +122,6 @@
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
 
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
-  FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
@@ -202,18 +201,11 @@
 
 
 [BuildOptions]
-  XCODE:*_*_ARM_ARCHCC_FLAGS     == -arch armv7 -march=armv7
-  XCODE:*_*_ARM_ARCHASM_FLAGS    == -arch armv7
-  XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv7
-  XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
+  XCODE:*_*_ARM_PLATFORM_FLAGS == -arch armv7
 
-  GCC:*_*_ARM_ARCHCC_FLAGS     == -march=armv7-a -mthumb
-  GCC:*_*_ARM_ARCHASM_FLAGS    == -march=armv7-a
-  GCC:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
+  GCC:*_*_ARM_PLATFORM_FLAGS == -march=armv7-a
 
-  RVCT:*_*_ARM_ARCHCC_FLAGS  == --cpu Cortex-A8 --thumb
-  RVCT:*_*_ARM_ARCHASM_FLAGS == --cpu Cortex-A8 
-  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG 
+  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A8
 
 ################################################################################
 #

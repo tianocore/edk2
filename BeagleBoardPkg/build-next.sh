@@ -137,7 +137,7 @@ rm -f $FLASH_BOOT
 # point looks so strange. 
 # OMAP 3430 TRM section 26.4.8 has Image header information. (missing in OMAP 3530 TRM)
 #
-$GENERATE_IMAGE -D $WORKSPACE/BeagleBoardPkg/ConfigurationHeader.dat -E 0x80008208 -I $BUILD_ROOT/FV/BEAGLEBOARD_EFI.fd -O $FLASH_BOOT
+$GENERATE_IMAGE -D $WORKSPACE/BeagleBoardPkg/ConfigurationHeader.dat -E 0x80008000 -I $BUILD_ROOT/FV/BEAGLEBOARD_EFI.fd -O $FLASH_BOOT
 
 echo Creating debugger scripts
 process_debug_scripts $WORKSPACE/BeagleBoardPkg/Debugger_scripts
