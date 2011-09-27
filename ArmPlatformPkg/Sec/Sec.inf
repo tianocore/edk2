@@ -36,6 +36,7 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
+  ArmCpuLib
   ArmLib
   ArmPlatformLib
   BaseLib
@@ -51,7 +52,6 @@
   
 [FixedPcd]
   gArmTokenSpaceGuid.PcdVFPEnabled
-  gArmPlatformTokenSpaceGuid.PcdMPCoreSupport
   
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
   gArmTokenSpaceGuid.PcdArmPrimaryCore

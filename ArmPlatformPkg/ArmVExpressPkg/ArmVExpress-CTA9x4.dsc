@@ -35,6 +35,7 @@
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLib.inf
+  ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexA9Lib/ArmCortexA9Lib.inf
   ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibCTA9x4/ArmVExpressLib.inf
   ArmTrustZoneLib|ArmPkg/Library/ArmTrustZoneLib/ArmTrustZoneLib.inf
 
@@ -174,7 +175,6 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode|20
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData|0
   
-  gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|1
   gArmTokenSpaceGuid.PcdVFPEnabled|1
   
   # Stacks for MPCores in Secure World

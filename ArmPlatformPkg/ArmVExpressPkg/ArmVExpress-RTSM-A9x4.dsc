@@ -31,6 +31,7 @@
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLib.inf
+  ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexA9Lib/ArmCortexA9Lib.inf
   ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibRTSM/ArmVExpressLib.inf
   
   ArmPlatformSysConfigLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressSysConfigLib/ArmVExpressSysConfigLib.inf
@@ -89,7 +90,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x0FFE0000
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x00010000
 
-  gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|1
   gArmTokenSpaceGuid.PcdVFPEnabled|1
   
   # Stacks for MPCores in Secure World

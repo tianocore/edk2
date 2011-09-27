@@ -14,13 +14,12 @@
 **/
 
 #include <Library/DebugAgentLib.h>
-#include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/ArmLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/ArmPlatformLib.h>
 #include <Library/ArmGicLib.h>
+#include <Library/ArmCpuLib.h>
 
 #include "SecInternal.h"
 
@@ -39,8 +38,10 @@ CEntryPoint (
 
   // Primary CPU clears out the SCU tag RAMs, secondaries wait
   if (IS_PRIMARY_CORE(MpId)) {
-    if (FixedPcdGet32(PcdMPCoreSupport)) {
-      ArmInvalidScu ();
+    ArmCpuSetup (MpId);
+
+    if (ArmIsMpCore()) {
+      ArmCpuSynchronizeSignal (ARM_CPU_EVENT_BOOT_MEM_INIT);
     }
 
     // SEC phase needs to run library constructors by hand. This assumes we are linked against the SerialLib
@@ -58,6 +59,15 @@ CEntryPoint (
     // Now we've got UART, make the check:
     // - The Vector table must be 32-byte aligned
     ASSERT(((UINT32)SecVectorTable & ((1 << 5)-1)) == 0);
+
+    // Enable the GIC distributor and CPU Interface
+    // - no other Interrupts are enabled,  doesn't have to worry about the priority.
+    // - all the cores are in secure state, use secure SGI's
+    ArmGicEnableDistributor (PcdGet32(PcdGicDistributorBase));
+    ArmGicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
+  } else {
+    // Enable the GIC CPU Interface
+    ArmGicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
   }
 
   // Invalidate the data cache. Doesn't have to do the Data cache clean.
@@ -72,13 +82,7 @@ CEntryPoint (
   // Enable Full Access to CoProcessors
   ArmWriteCPACR (CPACR_CP_FULL_ACCESS);
 
-  // Enable SWP instructions
-  ArmEnableSWPInstruction ();
-
-  // Enable program flow prediction, if supported.
-  ArmEnableBranchPrediction ();
-
-  if (FixedPcdGet32(PcdVFPEnabled)) {
+  if (FixedPcdGet32 (PcdVFPEnabled)) {
     ArmEnableVFP();
   }
 
@@ -89,7 +93,7 @@ CEntryPoint (
 
     // If we skip the PEI Core we could want to initialize the DRAM in the SEC phase.
     // If we are in standalone, we need the initialization to copy the UEFI firmware into DRAM
-    if (FeaturePcdGet(PcdSystemMemoryInitializeInSec)) {
+    if (FeaturePcdGet (PcdSystemMemoryInitializeInSec)) {
       // Initialize system memory (DRAM)
       ArmPlatformInitializeSystemMemory ();
     }
@@ -104,9 +108,9 @@ CEntryPoint (
     ASSERT(PcdGet32(PcdCPUCoresSecMonStackBase) != 0);
     ASSERT(PcdGet32(PcdCPUCoreSecMonStackSize) != 0);
 
-    if (FixedPcdGet32(PcdMPCoreSupport)) {
+    if (ArmIsMpCore()) {
       // Setup SMP in Non Secure world
-      ArmSetupSmpNonSecure (GET_CORE_ID(MpId));
+      ArmCpuSetupSmpNonSecure (GET_CORE_ID(MpId));
     }
 
     // Enter Monitor Mode
@@ -120,35 +124,18 @@ CEntryPoint (
     if (IS_PRIMARY_CORE(MpId)) {
       ArmPlatformTrustzoneInit ();
 
-      // Wake up the secondary cores by sending a interrupt to everyone else
-      // NOTE 1: The Software Generated Interrupts are always enabled on Cortex-A9
-      //         MPcore test chip on Versatile Express board, So the Software doesn't have to
-      //         enable SGI's explicitly.
-      //      2: As no other Interrupts are enabled,  doesn't have to worry about the priority.
-      //      3: As all the cores are in secure state, use secure SGI's
-      //
-
-      ArmGicEnableDistributor (PcdGet32(PcdGicDistributorBase));
-      ArmGicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
-
-      // Send SGI to all Secondary core to wake them up from WFI state.
-      ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
+      // Waiting for the Primary Core to have finished to initialize the Secure World
+      ArmCpuSynchronizeSignal (ARM_CPU_EVENT_SECURE_INIT);
     } else {
       // The secondary cores need to wait until the Trustzone chipsets configuration is done
       // before switching to Non Secure World
 
-      // Enabled GIC CPU Interface
-      ArmGicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
-
-      // Waiting for the SGI from the primary core
-      ArmCallWFI();
-
-      // Acknowledge the interrupt and send End of Interrupt signal.
-      ArmGicAcknowledgeSgiFrom (PcdGet32(PcdGicInterruptInterfaceBase), PRIMARY_CORE_ID);
+      // Waiting for the Primary Core to have finished to initialize the Secure World
+      ArmCpuSynchronizeWait (ARM_CPU_EVENT_SECURE_INIT);
     }
 
     // Transfer the interrupt to Non-secure World
-    ArmGicSetupNonSecure (PcdGet32(PcdGicDistributorBase),PcdGet32(PcdGicInterruptInterfaceBase));
+    ArmGicSetupNonSecure (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase));
 
     // Write to CP15 Non-secure Access Control Register :
     //   - Enable CP10 and CP11 accesses in NS World
@@ -164,12 +151,6 @@ CEntryPoint (
     if (IS_PRIMARY_CORE(MpId)) {
       SerialPrint ("Trust Zone Configuration is disabled\n\r");
     }
-
-    // Trustzone is not enabled, just enable the Distributor and CPU interface
-    if (IS_PRIMARY_CORE(MpId)) {
-      ArmGicEnableDistributor (PcdGet32(PcdGicDistributorBase));
-    }
-    ArmGicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
 
     // With Trustzone support the transition from Sec to Normal world is done by return_from_exception().
     // If we want to keep this function call we need to ensure the SVC's SPSR point to the same Program

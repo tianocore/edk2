@@ -13,14 +13,10 @@
 
 #include <AutoGen.h>
 #include <AsmMacroIoLib.h>
-#include <Base.h>
-#include <Library/PcdLib.h>
-#include <Library/ArmPlatformLib.h>
+#include "SecInternal.h"
 
 .text
 .align 3
-
-GCC_ASM_EXPORT(_ModuleEntryPoint)
 
 GCC_ASM_IMPORT(CEntryPoint)
 GCC_ASM_IMPORT(ArmPlatformSecBootAction)
@@ -30,13 +26,10 @@ GCC_ASM_IMPORT(ArmDisableCachesAndMmu)
 GCC_ASM_IMPORT(ArmWriteVBar)
 GCC_ASM_IMPORT(ArmReadMpidr)
 GCC_ASM_IMPORT(SecVectorTable)
-
-#if (FixedPcdGet32(PcdMPCoreSupport))
-GCC_ASM_IMPORT(ArmIsScuEnable)
-#endif
+GCC_ASM_IMPORT(ArmCpuSynchronizeWait)
+GCC_ASM_EXPORT(_ModuleEntryPoint)
 
 StartupAddr:        .word       ASM_PFX(CEntryPoint)
-SecVectorTableAddr: .word	ASM_PFX(SecVectorTable)
 
 ASM_PFX(_ModuleEntryPoint):
   // First ensure all interrupts are disabled
@@ -65,14 +58,11 @@ _IdentifyCpu:
   // Only the primary core initialize the memory (SMC)
   beq   _InitMem
   
-#if (FixedPcdGet32(PcdMPCoreSupport))
-  // ... The secondary cores wait for SCU to be enabled
-_WaitForEnabledScu:
-  bl    ASM_PFX(ArmIsScuEnable)
-  tst   r1, #1
-  beq   _WaitForEnabledScu
+_WaitInitMem:
+  mov   r0, #ARM_CPU_EVENT_BOOT_MEM_INIT
+  bl    ASM_PFX(ArmCpuSynchronizeWait)
+  // Now the Init Mem is initialized, we setup the secondary core stacks
   b     _SetupSecondaryCoreStack
-#endif
   
 _InitMem:
   // Initialize Init Boot Memory
@@ -110,7 +100,7 @@ _SetupSecondaryCoreStack:
 
   // Get the base of the stack for the secondary cores
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoresSecStackBase), r1)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecPrimaryStackSize), r2)
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecSecondaryStackSize), r2)
   add   r1, r1, r2
 
   // StackOffset = CorePos * StackSize

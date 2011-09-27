@@ -31,6 +31,7 @@
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLib.inf
+  ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexA9Lib/ArmCortexA9Lib.inf
   ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbLib.inf
   
   # ARM PL390 General Interrupt Driver in Secure and Non-secure
@@ -44,7 +45,7 @@
 [BuildOptions]
   RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A9 --fpu=softvfp -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
 
-  GCC:*_*_ARM_PLATFORM_FLAGS == -march=armv7-a -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
+  GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a9 -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
 
   XCODE:*_*_ARM_PLATFORM_FLAGS == -arch armv7 -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
 
@@ -79,8 +80,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x43FE0000
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x00020000
 
-  gArmPlatformTokenSpaceGuid.PcdMPCoreSupport|1
-  
   # Stacks for MPCores in Secure World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0x4B000000
   # Stacks for MPCores in Monitor Mode

@@ -31,6 +31,7 @@
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
+  ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexA8Lib/ArmCortexA8Lib.inf
   ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbLib.inf
   
   # ARM PL390 General Interrupt Driver in Secure and Non-secure
@@ -44,7 +45,7 @@
 [BuildOptions]
   RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A8 --fpu=softvfp -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
 
-  GCC:*_*_ARM_PLATFORM_FLAGS == -march=armv7-a -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
+  GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a8 -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
 
   XCODE:*_*_ARM_PLATFORM_FLAGS == -arch armv7 -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
 

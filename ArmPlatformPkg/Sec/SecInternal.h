@@ -17,10 +17,12 @@
 #define __SEC_H__
 
 #include <Base.h>
+#include <Library/ArmLib.h>
+#include <Library/ArmCpuLib.h>
+#include <Library/ArmPlatformLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-
-#include <Chipset/ArmV7.h>
+#include <Library/PcdLib.h>
 
 #define IS_ALIGNED(Address, Align) (((UINTN)Address & (Align-1)) == 0)
 

@@ -31,7 +31,6 @@ gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize        : Size of the sta
 # CPU / Architectural controllers
 gArmTokenSpaceGuid.PcdGicDistributorBase        : Base address of the Distributor of your General Interrupt Controller
 gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase : Base address of the Interface of your General Interrupt Controller
-gArmPlatformTokenSpaceGuid.PcdMPCoreSupport     : Set to 1 when MP Core platforms
 
 # Memory Regions
 gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize  : Size of the region reserve for PI & UEFI

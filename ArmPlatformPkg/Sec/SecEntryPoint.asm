@@ -13,9 +13,7 @@
 
 #include <AutoGen.h>
 #include <AsmMacroIoLib.h>
-#include <Base.h>
-#include <Library/PcdLib.h>
-#include <Library/ArmPlatformLib.h>
+#include "SecInternal.h"
 
   INCLUDE AsmMacroIoLib.inc
   
@@ -27,12 +25,9 @@
   IMPORT  ArmWriteVBar
   IMPORT  ArmReadMpidr
   IMPORT  SecVectorTable
+  IMPORT  ArmCpuSynchronizeWait
   EXPORT  _ModuleEntryPoint
 
-#if (FixedPcdGet32(PcdMPCoreSupport))
-  IMPORT  ArmIsScuEnable
-#endif
-  
   PRESERVE8
   AREA    SecEntryPoint, CODE, READONLY
   
@@ -65,14 +60,11 @@ _IdentifyCpu
   // Only the primary core initialize the memory (SMC)
   beq   _InitMem
   
-#if (FixedPcdGet32(PcdMPCoreSupport))
-  // ... The secondary cores wait for SCU to be enabled
-_WaitForEnabledScu
-  bl    ArmIsScuEnable
-  tst   r1, #1
-  beq   _WaitForEnabledScu
+_WaitInitMem
+  mov   r0, #ARM_CPU_EVENT_BOOT_MEM_INIT
+  bl    ArmCpuSynchronizeWait
+  // Now the Init Mem is initialized, we setup the secondary core stacks
   b     _SetupSecondaryCoreStack
-#endif
   
 _InitMem
   // Initialize Init Boot Memory

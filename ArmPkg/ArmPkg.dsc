@@ -96,9 +96,6 @@
   ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
-  ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLib.inf
-  ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLibPrePi.inf
-  ArmPkg/Library/ArmLib/ArmV7/ArmV7MPCoreLibSec.inf
   ArmPkg/Library/ArmLib/Null/NullArmLib.inf
   ArmPkg/Library/ArmTrustZoneLib/ArmTrustZoneLib.inf
   ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
@@ -115,6 +112,9 @@
   ArmPkg/Library/SemihostLib/SemihostLib.inf
   ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
 
+  ArmPkg/Drivers/ArmCpuLib/ArmCortexA8Lib/ArmCortexA8Lib.inf
+  ArmPkg/Drivers/ArmCpuLib/ArmCortexA9Lib/ArmCortexA9Lib.inf
+  ArmPkg/Drivers/ArmCpuLib/ArmCortexA15Lib/ArmCortexA15Lib.inf
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
   ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
