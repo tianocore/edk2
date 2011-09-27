@@ -467,7 +467,8 @@ CoreLoadPeImage (
       // The PE/COFF loader can support loading image types that can be executed.
       // If we loaded an image type that we can not execute return EFI_UNSUPORTED.
       //
-      DEBUG ((EFI_D_ERROR, "Image type %s can't be loaded on %s UEFI system.\n", GetMachineTypeName(Image->ImageContext.Machine), GetMachineTypeName(mDxeCoreImageMachineType)));
+      DEBUG ((EFI_D_ERROR, "Image type %s can't be loaded ", GetMachineTypeName(Image->ImageContext.Machine)));
+      DEBUG ((EFI_D_ERROR, "on %s UEFI system.\n", GetMachineTypeName(mDxeCoreImageMachineType)));
       return EFI_UNSUPPORTED;
     }
   }
@@ -1483,7 +1484,8 @@ CoreStartImage (
     // Do not ASSERT here, because image might be loaded via EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED
     // But it can not be started.
     //
-    DEBUG ((EFI_D_ERROR, "Image type %s can't be started on %s UEFI system.\n", GetMachineTypeName(Image->Machine), GetMachineTypeName(mDxeCoreImageMachineType)));
+    DEBUG ((EFI_D_ERROR, "Image type %s can't be started ", GetMachineTypeName(Image->Machine)));
+    DEBUG ((EFI_D_ERROR, "on %s UEFI system.\n", GetMachineTypeName(mDxeCoreImageMachineType)));
     return EFI_UNSUPPORTED;
   }
 
