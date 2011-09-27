@@ -161,7 +161,7 @@ BdsBootLinuxAtag (
   //
  
   // By setting address=0 we leave the memory allocation to the function
-  Status = PrepareAtagList (Arguments, InitrdImage, InitrdImageSize, (LINUX_ATAG**)&KernelParamsAddress, &KernelParamsSize);
+  Status = PrepareAtagList (Arguments, InitrdImage, InitrdImageSize, &KernelParamsAddress, &KernelParamsSize);
   if (EFI_ERROR(Status)) {
     Print(L"ERROR: Can not prepare ATAG list. Status=0x%X\n", Status);
     return Status;

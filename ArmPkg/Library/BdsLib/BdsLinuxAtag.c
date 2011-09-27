@@ -98,11 +98,11 @@ SetupEndTag (
 
 EFI_STATUS
 PrepareAtagList (
-  IN  CONST CHAR8*     CommandLineString,
-  IN  EFI_PHYSICAL_ADDRESS InitrdImage,
-  IN  UINTN            InitrdImageSize,
-  OUT LINUX_ATAG       **AtagBase,
-  OUT UINT32           *AtagSize
+  IN  CONST CHAR8*          CommandLineString,
+  IN  EFI_PHYSICAL_ADDRESS  InitrdImage,
+  IN  UINTN                 InitrdImageSize,
+  OUT EFI_PHYSICAL_ADDRESS  *AtagBase,
+  OUT UINT32                *AtagSize
   )
 {
   EFI_STATUS                  Status;
@@ -155,7 +155,7 @@ PrepareAtagList (
   SetupEndTag();
 
   // Calculate atag list size
-  *AtagBase = (LINUX_ATAG*)(UINTN)AtagStartAddress;
+  *AtagBase = AtagStartAddress;
   *AtagSize = (UINT32)mLinuxKernelCurrentAtag - (UINT32)AtagStartAddress + 1;
 
   return EFI_SUCCESS;
