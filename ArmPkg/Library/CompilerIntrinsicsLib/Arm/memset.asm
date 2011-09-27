@@ -47,9 +47,11 @@ L9
   ldmfd  sp!, {r7, pc}
 
 __aeabi_memclr
+  mov   r2, r1
   mov   r1, #0
   b     __aeabi_memset
 
 __aeabi_memclr4
+  mov   r2, r1
   mov   r1, #0
   b     __aeabi_memset
