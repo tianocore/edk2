@@ -66,7 +66,7 @@
 
 [PcdsFeatureFlag.common]
 
-!if $(EDK2_SKIP_PEICORE) == 1
+!ifdef $(EDK2_SKIP_PEICORE)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|TRUE
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|TRUE
 !endif
@@ -187,7 +187,7 @@
   #
   # PEI Phase modules
   #
-!if $(EDK2_SKIP_PEICORE) == 1
+!ifdef $(EDK2_SKIP_PEICORE)
   ArmPlatformPkg/PrePi/PeiMPCore.inf {
     <LibraryClasses>
       ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
@@ -280,7 +280,7 @@
   EmbeddedPkg/Ebl/Ebl.inf
   ArmPkg/Application/VariableServicesTest/VariableServicesTest.inf
 
-!if $(EDK2_ARMVE_UEFI2_SHELL) == 1
+!ifdef $(EDK2_ARMVE_UEFI2_SHELL)
   ShellPkg/Application/Shell/Shell.inf {
     <LibraryClasses>
       ShellCommandLib|ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf

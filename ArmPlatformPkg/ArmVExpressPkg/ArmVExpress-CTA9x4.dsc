@@ -21,7 +21,7 @@
   PLATFORM_GUID                  = eb2bd5ff-2379-4a06-9c12-db905cdee9ea 
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-!if $(EDK2_ARMVE_STANDALONE) == 1
+!ifdef $(EDK2_ARMVE_STANDALONE)
   OUTPUT_DIRECTORY               = Build/ArmVExpress-CTA9x4-Standalone
 !else
   OUTPUT_DIRECTORY               = Build/ArmVExpress-CTA9x4
@@ -77,7 +77,7 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-!if $(EDK2_ARMVE_STANDALONE) == 1
+!ifdef $(EDK2_ARMVE_STANDALONE)
   gArmPlatformTokenSpaceGuid.PcdStandalone|TRUE
 !else
   gArmPlatformTokenSpaceGuid.PcdStandalone|FALSE
@@ -85,7 +85,7 @@
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|TRUE
 !endif
 
-!if $(EDK2_SKIP_PEICORE) == 1
+!ifdef $(EDK2_SKIP_PEICORE)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|TRUE
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|TRUE
 !endif
@@ -96,50 +96,7 @@
 
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"  
-  
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmVExpress"
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
-  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000
-  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF
-  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|1
-  gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask|0
-  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
-
-# DEBUG_ASSERT_ENABLED       0x01
-# DEBUG_PRINT_ENABLED        0x02
-# DEBUG_CODE_ENABLED         0x04
-# CLEAR_MEMORY_ENABLED       0x08
-# ASSERT_BREAKPOINT_ENABLED  0x10
-# ASSERT_DEADLOOP_ENABLED    0x20
-!if $(TARGET) == RELEASE
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x21
-!else
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2f
-!endif
-
-#  DEBUG_INIT      0x00000001  // Initialization
-#  DEBUG_WARN      0x00000002  // Warnings
-#  DEBUG_LOAD      0x00000004  // Load events
-#  DEBUG_FS        0x00000008  // EFI File system
-#  DEBUG_POOL      0x00000010  // Alloc & Free's
-#  DEBUG_PAGE      0x00000020  // Alloc & Free's
-#  DEBUG_INFO      0x00000040  // Verbose
-#  DEBUG_DISPATCH  0x00000080  // PEI/DXE Dispatchers
-#  DEBUG_VARIABLE  0x00000100  // Variable
-#  DEBUG_BM        0x00000400  // Boot Manager
-#  DEBUG_BLKIO     0x00001000  // BlkIo Driver
-#  DEBUG_NET       0x00004000  // SNI Driver
-#  DEBUG_UNDI      0x00010000  // UNDI Driver
-#  DEBUG_LOADFILE  0x00020000  // UNDI Driver
-#  DEBUG_EVENT     0x00080000  // Event messages
-#  DEBUG_ERROR     0x80000000  // Error
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000000F
-
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
 
   #
   # NV Storage PCDs. Use base of 0x43FC0000 for NOR0 or 0x47FC0000 for NOR1 on Versatile Express
@@ -151,30 +108,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x47FE0000
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x00010000
 
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedAutomaticBootCommand|""
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedDefaultTextColor|0x07
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedMemVariableStoreSize|0x10000
-  
-#
-# Optional feature to help prevent EFI memory map fragments
-# Turned on and off via: PcdPrePiProduceMemoryTypeInformationHob
-# Values are in EFI Pages (4K). DXE Core will make sure that 
-# at least this much of each type of memory can be allocated 
-# from a single memory range. This way you only end up with
-# maximum of two fragements for each type in the memory map
-# (the memory used, and the free memory that was prereserved
-# but not used).
-#
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|50
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|20
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode|400
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData|20000
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode|20
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData|0
-  
   gArmTokenSpaceGuid.PcdVFPEnabled|1
   
   # Stacks for MPCores in Secure World
@@ -267,7 +200,7 @@
   #
   # PEI Phase modules
   #
-!if $(EDK2_SKIP_PEICORE) == 1
+!ifdef $(EDK2_SKIP_PEICORE)
   ArmPlatformPkg/PrePi/PeiMPCore.inf {
     <LibraryClasses>
       ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
