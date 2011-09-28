@@ -670,6 +670,27 @@ ProcessOpRomImage (
     Indicator   = Pcir->Indicator;
 
     //
+    // Skip the image if it is not an EFI PCI Option ROM image
+    //
+    if (Pcir->CodeType != PCI_CODE_TYPE_EFI_IMAGE) {
+      goto NextImage;
+    }
+
+    //
+    // Skip the EFI PCI Option ROM image if its machine type is not supported
+    //
+    if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (EfiRomHeader->EfiMachineType)) {
+      goto NextImage;
+    }
+
+    //
+    // Ignore the EFI PCI Option ROM image if it is an EFI application
+    //
+    if (EfiRomHeader->EfiSubsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION) {
+      goto NextImage;
+    }
+
+    //
     // Create Pci Option Rom Image device path header
     //
     EfiOpRomImageNode.Header.Type     = MEDIA_DEVICE_PATH;
@@ -686,19 +707,16 @@ ProcessOpRomImage (
     //
     BufferSize  = 0;
     Buffer      = NULL;
-    Status      = EFI_SUCCESS;
     ImageHandle = NULL;
 
-     if (!EFI_ERROR (Status)) {
-      Status = gBS->LoadImage (
-                      FALSE,
-                      gPciBusDriverBinding.DriverBindingHandle,
-                      PciOptionRomImageDevicePath,
-                      Buffer,
-                      BufferSize,
-                      &ImageHandle
-                      );
-    }
+    Status = gBS->LoadImage (
+                    FALSE,
+                    gPciBusDriverBinding.DriverBindingHandle,
+                    PciOptionRomImageDevicePath,
+                    Buffer,
+                    BufferSize,
+                    &ImageHandle
+                    );
 
     FreePool (PciOptionRomImageDevicePath);
 
@@ -719,6 +737,7 @@ ProcessOpRomImage (
       }
     }
 
+NextImage:
     RomBarOffset += ImageSize;
 
   } while (((Indicator & 0x80) == 0x00) && ((UINTN) (RomBarOffset - (UINT8 *) RomBar) < PciDevice->RomSize));
