@@ -74,7 +74,7 @@ GetConsoleDevicePathFromVariable (
     // Set the environment variable with this device path multi-instances
     Size = GetDevicePathSize (DevicePathInstances);
     if (Size > 0) {
-      Status = gRT->SetVariable (
+      gRT->SetVariable (
           ConsoleVarName,
           &gEfiGlobalVariableGuid,
           EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
