@@ -353,8 +353,8 @@
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|10
   gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(B615F1F5-5088-43CD-809C-A16E52487D00)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/omap3-beagle.dtb"
 
-  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(6696936D-3637-467C-87CB-14EA8248948C)/Uart(115200,8,N,1)/VenPcAnsi()"
-  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(6696936D-3637-467C-87CB-14EA8248948C)/Uart(115200,8,N,1)/VenPcAnsi()"
+  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi()"
+  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi()"
 
   #
   # ARM OS Loader
@@ -394,7 +394,6 @@
   MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
   EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
   
-  EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf  
