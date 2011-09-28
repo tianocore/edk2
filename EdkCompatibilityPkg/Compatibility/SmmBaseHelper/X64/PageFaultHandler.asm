@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -35,7 +35,7 @@ PageFaultHandlerHook PROC
     add     rsp, -20h
     call    PageFaultHandler
     add     rsp, 20h
-    test    rax, rax
+    test    al, al
     pop     r11
     pop     r10
     pop     r9
