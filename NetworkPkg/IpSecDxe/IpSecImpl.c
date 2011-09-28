@@ -783,7 +783,7 @@ IpSecEspAuthVerifyPayload (
   IN UINT8                           *EspBuffer,
   IN UINTN                           EspSize,
   IN IPSEC_SAD_ENTRY                 *SadEntry,
-  IN UINTN                           *IcvSize
+  IN UINTN                           IcvSize
   )
 {
   EFI_STATUS           Status;
@@ -794,8 +794,7 @@ IpSecEspAuthVerifyPayload (
   //
   // Calculate the size of authentication payload.
   //
-  *IcvSize  = IpSecGetIcvLength (SadEntry->Data->AlgoInfo.EspAlgoInfo.AuthAlgoId);
-  AuthSize  = EspSize - *IcvSize;
+  AuthSize  = EspSize - IcvSize;
 
   //
   // Calculate the icv buffer and size of the payload.
@@ -810,7 +809,7 @@ IpSecEspAuthVerifyPayload (
              HashFragment,
              1,
              IcvBuffer,
-             *IcvSize
+             IcvSize
              );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -819,7 +818,7 @@ IpSecEspAuthVerifyPayload (
   //
   // Compare the calculated icv and the appended original icv.
   //
-  if (CompareMem (EspBuffer + AuthSize, IcvBuffer, *IcvSize) == 0) {
+  if (CompareMem (EspBuffer + AuthSize, IcvBuffer, IcvSize) == 0) {
     return EFI_SUCCESS;
   }
 
@@ -1371,7 +1370,7 @@ IpSecTunnelOutboundPacket (
 
   @retval EFI_SUCCESS              The operation was successful.
   @retval EFI_ACCESS_DENIED        One or more following conditions is TRUE:
-                                   - ESP header was not found.
+                                   - ESP header was not found or mal-format.
                                    - The related SAD entry was not found.
                                    - The related SAD entry does not support the ESP protocol.
   @retval EFI_OUT_OF_RESOURCES     The required system resource can't be allocated.
@@ -1394,6 +1393,8 @@ IpSecEspInboundPacket (
   NET_BUF               *Payload;
   UINTN                 EspSize;
   UINTN                 IvSize;
+  UINTN                 BlockSize;
+  UINTN                 MiscSize;
   UINTN                 PlainPayloadSize;
   UINTN                 PaddingSize;
   UINTN                 IcvSize;
@@ -1486,15 +1487,36 @@ IpSecEspInboundPacket (
   NetbufCopy (Payload, 0, (UINT32) EspSize, ProcessBuffer);
 
   //
-  // Authenticate the esp wrapped buffer by the auth keys which is from SAD entry.
+  // Get the IcvSize for authentication and BlockSize/IvSize for Decryption.
   //
-  IcvSize = 0;
+  IcvSize   = IpSecGetIcvLength (SadEntry->Data->AlgoInfo.EspAlgoInfo.AuthAlgoId);
+  IvSize    = IpSecGetEncryptIvLength (SadEntry->Data->AlgoInfo.EspAlgoInfo.EncAlgoId);
+  BlockSize = IpSecGetEncryptBlockSize (SadEntry->Data->AlgoInfo.EspAlgoInfo.EncAlgoId);
+  
+  //
+  // Make sure the ESP packet is not mal-formt.
+  // 1. Check whether the Espsize is larger than ESP header + IvSize + EspTail + IcvSize.
+  // 2. Check whether the left payload size is multiple of IvSize.
+  //
+  MiscSize = sizeof (EFI_ESP_HEADER) + IvSize + IcvSize;
+  if (EspSize <= (MiscSize + sizeof (EFI_ESP_TAIL))) {
+    Status = EFI_ACCESS_DENIED;
+    goto ON_EXIT;
+  }
+  if ((EspSize - MiscSize) % BlockSize != 0) {
+    Status = EFI_ACCESS_DENIED;
+    goto ON_EXIT;
+  }
+
+  //
+  // Authenticate the ESP packet.
+  //
   if (SadData->AlgoInfo.EspAlgoInfo.AuthKey != NULL) {
     Status = IpSecEspAuthVerifyPayload (
                ProcessBuffer,
                EspSize,
                SadEntry,
-               &IcvSize
+               IcvSize
                );
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
@@ -1503,7 +1525,6 @@ IpSecEspInboundPacket (
   //
   // Decrypt the payload by the SAD entry if it has decrypt key.
   //
-  IvSize = IpSecGetEncryptIvLength (SadEntry->Data->AlgoInfo.EspAlgoInfo.EncAlgoId);
   if (SadData->AlgoInfo.EspAlgoInfo.EncKey != NULL) {
     Status = IpSecCryptoIoDecrypt (
                SadEntry->Data->AlgoInfo.EspAlgoInfo.EncAlgoId,
@@ -1525,7 +1546,12 @@ IpSecEspInboundPacket (
   EspTail           = (EFI_ESP_TAIL *) (ProcessBuffer + EspSize - IcvSize - sizeof (EFI_ESP_TAIL));
   PaddingSize       = EspTail->PaddingLength;
   NextHeader        = EspTail->NextHeader;
-  PlainPayloadSize  = EspSize - sizeof (EFI_ESP_HEADER) - IvSize - IcvSize - sizeof (EFI_ESP_TAIL) - PaddingSize;
+  
+  if (EspSize <= (MiscSize + sizeof (EFI_ESP_TAIL) + PaddingSize)) {
+    Status = EFI_ACCESS_DENIED;
+    goto ON_EXIT;
+  }
+  PlainPayloadSize  = EspSize - MiscSize - sizeof (EFI_ESP_TAIL) - PaddingSize;
   
   //
   // TODO: handle anti-replay window
