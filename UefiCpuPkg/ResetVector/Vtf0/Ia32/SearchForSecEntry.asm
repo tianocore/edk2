@@ -2,7 +2,7 @@
 ; @file
 ; Search for the SEC Core entry point
 ;
-; Copyright (c) 2008 - 2009, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -115,6 +115,7 @@ secCoreEntryPointWasFound:
     OneTimeCallRet Flat32SearchForSecEntryPoint
 
 %define EFI_SECTION_PE32                  0x10
+%define EFI_SECTION_TE                    0x12
 
 ;
 ; Input:
@@ -139,8 +140,11 @@ getEntryPointOfFfsFileLoopForSections:
     cmp     byte [eax + 3], EFI_SECTION_PE32
     je      getEntryPointOfFfsFileFoundPe32Section
 
+    cmp     byte [eax + 3], EFI_SECTION_TE
+    je      getEntryPointOfFfsFileFoundTeSection
+
     ;
-    ; The section type was not PE32, so move to next section
+    ; The section type was not PE32 or TE, so move to next section
     ;
     mov     ebx, dword [eax]
     and     ebx, 0x00ffffff
@@ -158,26 +162,10 @@ getEntryPointOfFfsFileLoopForSections:
 getEntryPointOfFfsFileFoundPe32Section:
     add     eax, 4       ; EAX = Start of PE32 image
 
-    mov     ebx, eax
     cmp     word [eax], 'MZ'
-    jne     thereIsNotAnMzSignature
+    jne     getEntryPointOfFfsFileErrorReturn
     movzx   ebx, word [eax + 0x3c]
     add     ebx, eax
-thereIsNotAnMzSignature:
-
-    ; if (Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE)
-    cmp     word [ebx], 'VZ'
-    jne     thereIsNoVzSignature
-    ; *EntryPoint = (VOID *)((UINTN)Pe32Data +
-    ;   (UINTN)(Hdr.Te->AddressOfEntryPoint & 0x0ffffffff) +
-    ;   sizeof(EFI_TE_IMAGE_HEADER) - Hdr.Te->StrippedSize);
-    add     eax, [ebx + 0x8]
-    add     eax, 0x28
-    movzx   ebx, word [ebx + 0x6]
-    sub     eax, ebx
-    jmp     getEntryPointOfFfsFileReturn
-
-thereIsNoVzSignature:
 
     ; if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE)
     cmp     dword [ebx], `PE\x00\x00`
@@ -186,6 +174,22 @@ thereIsNoVzSignature:
     ; *EntryPoint = (VOID *)((UINTN)Pe32Data +
     ;   (UINTN)(Hdr.Pe32->OptionalHeader.AddressOfEntryPoint & 0x0ffffffff));
     add     eax, [ebx + 0x4 + 0x14 + 0x10]
+    jmp     getEntryPointOfFfsFileReturn
+
+getEntryPointOfFfsFileFoundTeSection:
+    add     eax, 4       ; EAX = Start of TE image
+    mov     ebx, eax
+
+    ; if (Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE)
+    cmp     word [ebx], 'VZ'
+    jne     getEntryPointOfFfsFileErrorReturn
+    ; *EntryPoint = (VOID *)((UINTN)Pe32Data +
+    ;   (UINTN)(Hdr.Te->AddressOfEntryPoint & 0x0ffffffff) +
+    ;   sizeof(EFI_TE_IMAGE_HEADER) - Hdr.Te->StrippedSize);
+    add     eax, [ebx + 0x8]
+    add     eax, 0x28
+    movzx   ebx, word [ebx + 0x6]
+    sub     eax, ebx
     jmp     getEntryPointOfFfsFileReturn
 
 getEntryPointOfFfsFileErrorReturn:
