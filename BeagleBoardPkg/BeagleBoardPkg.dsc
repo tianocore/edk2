@@ -27,7 +27,7 @@
   SUPPORTED_ARCHITECTURES        = ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = BeagleBoardPkg/BeagleBoardPkg.fdf
+  FLASH_DEFINITION               = BeagleBoardPkg/BeagleBoardPkg-next.fdf
 
 
 [LibraryClasses.common]
@@ -45,8 +45,8 @@
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
 
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
+  ArmPlatformLib|BeagleBoardPkg/Library/BeagleBoardLib/BeagleBoardLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-  PrePiHobListPointerLib|EmbeddedPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
   
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
@@ -82,7 +82,7 @@
   SerialPortLib|Omap35xxPkg/Library/SerialPortLib/SerialPortLib.inf
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
   
-  RealTimeClockLib|EmbeddedPkg/Library/TemplateRealTimeClockLib/TemplateRealTimeClockLib.inf
+  RealTimeClockLib|Omap35xxPkg/Library/RealTimeClockLib/RealTimeClockLib.inf
 
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   
@@ -125,19 +125,24 @@
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
+  ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.inf
+  
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
   LzmaDecompressLib|IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
 
-# Temp work around for Movt relocation issue. 
-  PeCoffLib|ArmPkg/Library/BasePeCoffLib/BasePeCoffLib.inf
-#  PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
+  # Temp work around for Movt relocation issue. 
+  #PeCoffLib|ArmPkg/Library/BasePeCoffLib/BasePeCoffLib.inf
+  PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   
   HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
+  PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
   MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
   PerformanceLib|MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
+  PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
+  MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
   
   # 1/123 faster than Stm or Vstm version
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -168,7 +173,6 @@
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
-
 
 [LibraryClasses.common.UEFI_APPLICATION]
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
@@ -288,8 +292,7 @@
 #  DEBUG_LOADFILE  0x00020000  // UNDI Driver
 #  DEBUG_EVENT     0x00080000  // Event messages
 #  DEBUG_ERROR     0x80000000  // Error
-
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000000F
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
 
@@ -297,9 +300,6 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedDefaultTextColor|0x07
   gEmbeddedTokenSpaceGuid.PcdEmbeddedMemVariableStoreSize|0x10000
   
-  gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|0
-  gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize|0
-
 #
 # Optional feature to help prevent EFI memory map fragments
 # Turned on and off via: PcdPrePiProduceMemoryTypeInformationHob
@@ -324,17 +324,18 @@
 #
 # Beagle board Specific PCDs
 #
-  gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|0x80001000
-  gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0x87FE0000 # stack at top of memory
-  gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|0x20000  # 128K stack
+  gArmTokenSpaceGuid.PcdVFPEnabled|1
   
-  gEmbeddedTokenSpaceGuid.PcdMemoryBase|0x80000000
-  gEmbeddedTokenSpaceGuid.PcdMemorySize|0x10000000
-
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x80000000
-  gArmTokenSpaceGuid.PcdSystemMemorySize|0x10000000
+  gArmTokenSpaceGuid.PcdSystemMemorySize|0x08000000
 
-  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x80000000
+  # Size of the region used by UEFI in permanent memory (Reserved 16MB)
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x01000000
+  
+  # Size of the region reserved for fixed address allocations (Reserved 32MB)
+  gArmTokenSpaceGuid.PcdArmLinuxKernelMaxOffset|0x02000000
+
+  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x80008000
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x80008000
   
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
@@ -352,8 +353,8 @@
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|10
   gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(B615F1F5-5088-43CD-809C-A16E52487D00)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/omap3-beagle.dtb"
 
-  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(6696936D-3637-467C-87CB-14EA8248948C)/Uart(115200,8,N,1)/VenPcAnsi()"
-  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(6696936D-3637-467C-87CB-14EA8248948C)/Uart(115200,8,N,1)/VenPcAnsi()"
+  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi()"
+  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi()"
 
   #
   # ARM OS Loader
@@ -368,14 +369,14 @@
 ################################################################################
 [Components.common]
 
-#
-# SEC
-#
-  BeagleBoardPkg/Sec/Sec.inf
+  #
+  # SEC
+  #
+  ArmPlatformPkg/PrePi/PeiUniCore.inf
   
-#
-# DXE
-#
+  #
+  # DXE
+  #
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -393,7 +394,6 @@
   MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
   EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
   
-  EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf  
@@ -446,10 +446,8 @@
   #
   # MMC/SD
   #
-  Omap35xxPkg/MMCHSDxe/MMCHS.inf {
-    <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x800fffff
-  }
+  EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
+  Omap35xxPkg/MmcHostDxe/MmcHostDxe.inf
   
   #
   # I2C
