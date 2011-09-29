@@ -26,8 +26,8 @@
 ;  );
 ;
 __aeabi_uread4
-    ldrb    r2, [r0, #1]
     ldrb    r1, [r0]
+    ldrb    r2, [r0, #1]
     ldrb    r3, [r0, #2]
     ldrb    r0, [r0, #3]
     orr     r1, r1, r2, lsl #8
