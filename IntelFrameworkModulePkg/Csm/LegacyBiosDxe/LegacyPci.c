@@ -2849,7 +2849,7 @@ LegacyBiosInstallPciRom (
       return EFI_UNSUPPORTED;
     }
   } else {
-    if (*RomImage == NULL) {
+    if ((RomImage == NULL) || (*RomImage == NULL)) {
       //
       // If PciHandle is NULL, and no OpRom is to be associated
       //
