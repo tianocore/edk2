@@ -582,7 +582,7 @@ Returns:
   //
   // Return an error if buffer is too small
   //
-  if (SizeOfNvStore > *ImageLength) {
+  if (SizeOfNvStore > *ImageLength || DefaultImage == NULL) {
     gBS->FreePool (OldData);
     *ImageLength = (UINT16) SizeOfNvStore;
     return EFI_BUFFER_TOO_SMALL;
