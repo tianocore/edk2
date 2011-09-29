@@ -336,7 +336,6 @@ UsbMassInitMedia (
 {
   EFI_BLOCK_IO_MEDIA          *Media;
   EFI_STATUS                  Status;
-  UINTN                       Index;
 
   Media = &UsbMass->BlockIoMedia;
 
@@ -351,25 +350,7 @@ UsbMassInitMedia (
   Media->IoAlign          = 0;
   Media->MediaId          = 1;
 
-  //
-  // Some device may spend several seconds before it is ready.
-  // Try several times before giving up. Wait 5s at most.
-  //
-  Status = EFI_SUCCESS;
-
-  for (Index = 0; Index < USB_BOOT_INIT_MEDIA_RETRY; Index++) {
-
-    Status = UsbBootGetParams (UsbMass);
-    if ((Status != EFI_MEDIA_CHANGED) && (Status != EFI_NOT_READY) && (Status != EFI_TIMEOUT)) {
-      break;
-    }
-
-    Status = UsbBootIsUnitReady (UsbMass);
-    if (EFI_ERROR (Status)) {
-      gBS->Stall (USB_BOOT_RETRY_UNIT_READY_STALL * (Index + 1));
-    }
-  }
-
+  Status = UsbBootGetParams (UsbMass);
   return Status;
 }
 

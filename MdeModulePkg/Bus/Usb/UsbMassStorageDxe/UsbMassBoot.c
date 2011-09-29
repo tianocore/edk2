@@ -183,6 +183,12 @@ UsbBootExecCmd (
                            Timeout,
                            &CmdResult
                            );
+
+  if (Status == EFI_TIMEOUT) {
+    DEBUG ((EFI_D_ERROR, "UsbBootExecCmd: Timeout to Exec 0x%x Cmd\n", *(UINT8 *)Cmd));
+    return EFI_TIMEOUT;
+  }
+
   //
   // If ExecCommand() returns no error and CmdResult is success,
   // then the commnad transfer is successful.
@@ -190,9 +196,6 @@ UsbBootExecCmd (
   if ((CmdResult == USB_MASS_CMD_SUCCESS) && !EFI_ERROR (Status)) {
     return EFI_SUCCESS;
   }
-
-  DEBUG ((EFI_D_INFO, "UsbBootExecCmd: Fail to Exec 0x%x Cmd /w %r\n",
-          *(UINT8 *)Cmd ,Status));
 
   //
   // If command execution failed, then retrieve error info via sense request.
@@ -235,11 +238,30 @@ UsbBootExecCmdWithRetry (
 {
   EFI_STATUS                  Status;
   UINTN                       Retry;
-  UINT8                       Terminate;
+  EFI_EVENT                   TimeoutEvt;
 
-  Status  = EFI_SUCCESS;
+  Retry  = 0;
+  Status = EFI_SUCCESS;
+  Status = gBS->CreateEvent (
+                  EVT_TIMER,
+                  TPL_CALLBACK,
+                  NULL,
+                  NULL,
+                  &TimeoutEvt
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
-  for (Retry = 0, Terminate = 0; Retry < USB_BOOT_COMMAND_RETRY; Retry++) {
+  Status = gBS->SetTimer (TimeoutEvt, TimerRelative, EFI_TIMER_PERIOD_SECONDS(60));
+  if (EFI_ERROR (Status)) {
+    goto EXIT;
+  }
+
+  //
+  // Execute the cmd and retry if it fails.
+  //
+  while (EFI_ERROR (gBS->CheckEvent (TimeoutEvt))) {
     Status = UsbBootExecCmd (
                UsbMass,
                Cmd,
@@ -249,16 +271,27 @@ UsbBootExecCmdWithRetry (
                DataLen,
                Timeout
                );
-    if (Status == EFI_SUCCESS || Status == EFI_MEDIA_CHANGED) {
+    if (Status == EFI_SUCCESS || Status == EFI_MEDIA_CHANGED || Status == EFI_NO_MEDIA) {
       break;
     }
     //
-    // If the device isn't ready, just wait for it without limit on retrial times.
+    // If the sense data shows the drive is not ready, we need execute the cmd again.
+    // We limit the upper boundary to 60 seconds.
     //
-    if (Status == EFI_NOT_READY  && Terminate < 3) {
-      Retry = 0;
-      Terminate++;
+    if (Status == EFI_NOT_READY) {
+      continue;
     }
+    //
+    // If the status is other error, then just retry 5 times.
+    //
+    if (Retry++ >= USB_BOOT_COMMAND_RETRY) {
+      break;
+    }
+  }
+
+EXIT:
+  if (TimeoutEvt != NULL) {
+    gBS->CloseEvent (TimeoutEvt);
   }
 
   return Status;
@@ -527,18 +560,9 @@ UsbBootGetParams (
     Media->BlockSize        = 0x0800;
   }
 
-  if ((UsbMass->Pdt != USB_PDT_CDROM) && (CmdSet == USB_MASS_STORE_SCSI)) {
-    //
-    // ModeSense is required for the device with PDT of 0x00/0x07/0x0E,
-    // which is from [MassStorageBootabilitySpec-Page7].
-    // ModeSense(10) is useless here, while ModeSense(6) defined in SCSI
-    // could get the information of WriteProtected.
-    // Since not all device support this command, so skip if fail.
-    //
-    UsbScsiModeSense (UsbMass);
-  }
+  Status = UsbBootDetectMedia (UsbMass);
 
-  return UsbBootReadCapacity (UsbMass);
+  return Status;
 }
 
 
@@ -569,7 +593,7 @@ UsbBootDetectMedia (
   CmdSet = ((EFI_USB_INTERFACE_DESCRIPTOR *) (UsbMass->Context))->InterfaceSubClass;
 
   Status = UsbBootIsUnitReady (UsbMass);
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && (Status != EFI_MEDIA_CHANGED)) {
     goto ON_ERROR;
   }
 
