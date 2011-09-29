@@ -27,7 +27,7 @@
   SUPPORTED_ARCHITECTURES        = ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = BeagleBoardPkg/BeagleBoardPkg-next.fdf
+  FLASH_DEFINITION               = BeagleBoardPkg/BeagleBoardPkg.fdf
 
 
 [LibraryClasses.common]
