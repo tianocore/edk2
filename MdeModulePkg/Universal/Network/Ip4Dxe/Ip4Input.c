@@ -419,7 +419,15 @@ Ip4Reassemble (
     }
 
     NewPacket->Ip.Ip4 = Assemble->Head;
-    CopyMem (IP4_GET_CLIP_INFO (NewPacket), Assemble->Info, sizeof (*IP4_GET_CLIP_INFO (NewPacket)));
+
+    ASSERT (Assemble->Info != NULL);
+
+    CopyMem (
+      IP4_GET_CLIP_INFO (NewPacket),
+      Assemble->Info,
+      sizeof (*IP4_GET_CLIP_INFO (NewPacket))
+      );
+
     return NewPacket;
   }
 
@@ -1272,7 +1280,9 @@ Ip4InstanceDeliverPacket (
       // headless. Trim the head off after copy. The IP head
       // may be not continuous before the data.
       //
-      Head    = NetbufAllocSpace (Dup, IP4_MAX_HEADLEN, NET_BUF_HEAD);
+      Head = NetbufAllocSpace (Dup, IP4_MAX_HEADLEN, NET_BUF_HEAD);
+      ASSERT (Head != NULL);
+      
       Dup->Ip.Ip4 = (IP4_HEAD *) Head;
 
       CopyMem (Head, Packet->Ip.Ip4, Packet->Ip.Ip4->HeadLen << 2);

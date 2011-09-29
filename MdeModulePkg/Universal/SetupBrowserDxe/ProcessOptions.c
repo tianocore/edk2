@@ -502,6 +502,7 @@ ProcessOptions (
           Character[0] = LEFT_ONEOF_DELIMITER;
           NewStrCat (OptionString[0], Character);
           StringPtr = GetToken (OneOfOption->Text, Selection->Handle);
+          ASSERT (StringPtr != NULL);
           NewStrCat (OptionString[0], StringPtr);
           Character[0] = RIGHT_ONEOF_DELIMITER;
           NewStrCat (OptionString[0], Character);
@@ -599,6 +600,7 @@ ProcessOptions (
         Character[0] = LEFT_ONEOF_DELIMITER;
         NewStrCat (OptionString[0], Character);
         StringPtr = GetToken (OneOfOption->Text, Selection->Handle);
+        ASSERT (StringPtr != NULL);
         NewStrCat (OptionString[0], StringPtr);
         Character[0] = RIGHT_ONEOF_DELIMITER;
         NewStrCat (OptionString[0], Character);

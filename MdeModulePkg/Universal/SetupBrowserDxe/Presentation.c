@@ -533,6 +533,7 @@ DisplayForm (
 
     if (!Suppress) {
       StringPtr = GetToken (Statement->Prompt, Handle);
+      ASSERT (StringPtr != NULL);
 
       Width     = GetWidth (Statement, Handle);
 

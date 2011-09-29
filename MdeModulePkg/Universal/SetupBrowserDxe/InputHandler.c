@@ -1122,6 +1122,7 @@ GetSelectionInputPopUp (
       Link = GetNextNode (&Question->OptionListHead, Link);
 
       StringPtr = GetToken (OneOfOption->Text, MenuOption->Handle);
+      ASSERT (StringPtr != NULL);
       //
       // If the string occupies multiple lines, truncate it to fit in one line,
       // and append a "..." for indication.
