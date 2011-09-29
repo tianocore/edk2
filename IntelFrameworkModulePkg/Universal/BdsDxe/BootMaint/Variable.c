@@ -673,6 +673,7 @@ Var_UpdateDriverOption (
                       &gEfiGlobalVariableGuid,
                       &DriverOrderListSize
                       );
+  ASSERT (DriverOrderList != NULL);
   NewDriverOrderList = AllocateZeroPool (DriverOrderListSize + sizeof (UINT16));
   ASSERT (NewDriverOrderList != NULL);
   CopyMem (NewDriverOrderList, DriverOrderList, DriverOrderListSize);
@@ -842,7 +843,7 @@ Var_UpdateBootOption (
                     &gEfiGlobalVariableGuid,
                     &BootOrderListSize
                     );
-
+  ASSERT (BootOrderList != NULL);
   NewBootOrderList = AllocateZeroPool (BootOrderListSize + sizeof (UINT16));
   ASSERT (NewBootOrderList != NULL);
   CopyMem (NewBootOrderList, BootOrderList, BootOrderListSize);
