@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -950,5 +950,17 @@ typedef struct {
 // be used for anything that gets sent to debug stream.
 //
 #define EFI_DC_UNSPECIFIED  0x0
+
+//
+// Progress code for S3 suspend start and S3 suspend end is not defined,
+// the following are the implementation specific definition.
+//
+#ifndef PROGRESS_CODE_S3_SUSPEND_START
+#define PROGRESS_CODE_S3_SUSPEND_START   (EFI_SOFTWARE_SMM_DRIVER | (EFI_OEM_SPECIFIC | 0x00000000))
+#endif
+
+#ifndef PROGRESS_CODE_S3_SUSPEND_END
+#define PROGRESS_CODE_S3_SUSPEND_END     (EFI_SOFTWARE_SMM_DRIVER | (EFI_OEM_SPECIFIC | 0x00000001))
+#endif
 
 #endif
