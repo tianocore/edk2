@@ -1,7 +1,7 @@
 /** @file
   SEC Core Debug Agent Library instance implementition.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -196,14 +196,36 @@ InitializeDebugAgent (
   DEBUG_AGENT_PHASE2_CONTEXT       Phase2Context;
   DEBUG_AGENT_CONTEXT_POSTMEM_SEC  *DebugAgentContext;
 
-  if (InitFlag != DEBUG_AGENT_INIT_PREMEM_SEC &&
-      InitFlag != DEBUG_AGENT_INIT_POSTMEM_SEC) {
-    return;
-  }
-
   DisableInterrupts ();
 
-  if (InitFlag == DEBUG_AGENT_INIT_POSTMEM_SEC) {
+  switch (InitFlag) {
+
+  case DEBUG_AGENT_INIT_PREMEM_SEC:
+
+    InitializeDebugIdt ();
+
+    Mailbox = &MailboxInStack;
+    ZeroMem ((VOID *) Mailbox, sizeof (DEBUG_AGENT_MAILBOX));
+
+    //
+    // Get and save debug port handle and set the length of memory block.
+    //
+    SetMailboxPointerInIdtEntry ((VOID *) Mailbox);
+
+    InitializeDebugTimer ();
+
+    Phase2Context.Context  = Context;
+    Phase2Context.Function = Function;
+    DebugPortInitialize ((VOID *) &Phase2Context, InitializeDebugAgentPhase2);
+
+    //
+    // If reaches here, it means Debug Port initialization failed.
+    //
+    DEBUG ((EFI_D_ERROR, "Debug Agent: Debug port initialization failed.\n"));
+
+    break;
+
+  case DEBUG_AGENT_INIT_POSTMEM_SEC:
 
     //
     // Memory has been ready
@@ -227,31 +249,25 @@ InitializeDebugAgent (
 
     EnableInterrupts ();
 
-    if (Function != NULL) {
-      Function (Context);
-    }
+    break;
 
-    return;
-
-  } else {
-
-    InitializeDebugIdt ();
-
-    Mailbox = &MailboxInStack;
-    ZeroMem ((VOID *) Mailbox, sizeof (DEBUG_AGENT_MAILBOX));
+  default:
 
     //
-    // Get and save debug port handle and set the length of memory block.
+    // Only DEBUG_AGENT_INIT_PREMEM_SEC and DEBUG_AGENT_INIT_POSTMEM_SEC are allowed for this 
+    // Debug Agent library instance.
     //
-    SetMailboxPointerInIdtEntry ((VOID *) Mailbox);
+    DEBUG ((EFI_D_ERROR, "Debug Agent: The InitFlag value is not allowed!\n"));
+    CpuDeadLoop ();
+    break;
 
-    InitializeDebugTimer ();
+  }
 
-    Phase2Context.Context  = Context;
-    Phase2Context.Function = Function;
-    DebugPortInitialize ((VOID *) &Phase2Context, InitializeDebugAgentPhase2);
-
-    return;
+  //
+  // If Function is not NULL, invoke it always whatever debug agent was initialized sucesssfully or not.
+  //
+  if (Function != NULL) {
+    Function (Context);
   }
 }
 
@@ -289,7 +305,7 @@ InitializeDebugAgentPhase2 (
   //
   Phase2Context = (DEBUG_AGENT_PHASE2_CONTEXT *) Context;
   SecCoreData = (EFI_SEC_PEI_HAND_OFF *)Phase2Context->Context;
-  if ((UINTN)SecCoreData->TemporaryRamBase < BASE_128MB) {
+  if ((UINTN)SecCoreData->TemporaryRamBase < BASE_128MB && IsHostConnected ()) {
     TriggerSoftInterrupt (MEMORY_READY_SIGNATURE);
   }
 
@@ -299,7 +315,7 @@ InitializeDebugAgentPhase2 (
   EnableInterrupts ();
 
   //
-  // Call continuation function is it is not NULL.
+  // Call continuation function if it is not NULL.
   //
   if (Phase2Context->Function != NULL) {
     Phase2Context->Function (Phase2Context->Context);

@@ -50,4 +50,5 @@
   IoLib
   PciLib
   PcdLib
+  DebugLib
 

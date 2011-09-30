@@ -22,6 +22,7 @@
 #include <Library/DebugCommunicationLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
 
 #define SETUP_PID            0x2D
 #define INPUT_PID            0x69
@@ -108,7 +109,7 @@ typedef struct _USB_DEBUG_PORT_HANDLE{
   // The usb debug port memory BAR number in EHCI configuration space.
   //
   UINT8        DebugPortBarNumber;
-  UINT8        Reserved;
+  BOOLEAN      Initialized;
   //
   // The offset of usb debug port registers in EHCI memory range.
   //
@@ -723,6 +724,13 @@ DebugPortReadBuffer (
     UsbDebugPortHandle = (USB_DEBUG_PORT_HANDLE *)Handle;
   }
 
+  //
+  // Check if debug port is ready
+  //
+  if (!UsbDebugPortHandle->Initialized) {
+    return 0;
+  }
+
   if (NeedReinitializeHardware(UsbDebugPortHandle)) {
     Status = InitializeUsbDebugHardware (UsbDebugPortHandle);
     if (RETURN_ERROR(Status)) {
@@ -868,6 +876,13 @@ DebugPortWriteBuffer (
     UsbDebugPortHandle = (USB_DEBUG_PORT_HANDLE *)Handle;
   }
 
+  //
+  // Check if debug port is ready
+  //
+  if (!UsbDebugPortHandle->Initialized) {
+    return 0;
+  }
+
   if (NeedReinitializeHardware(UsbDebugPortHandle)) {
     Status = InitializeUsbDebugHardware (UsbDebugPortHandle);
     if (RETURN_ERROR(Status)) {
@@ -938,6 +953,13 @@ DebugPortPollBuffer (
     UsbDebugPortHandle = &mUsbDebugPortHandle;
   } else {
     UsbDebugPortHandle = (USB_DEBUG_PORT_HANDLE *)Handle;
+  }
+
+  //
+  // Check if debug port is ready
+  //
+  if (!UsbDebugPortHandle->Initialized) {
+    return 0;
   }
 
   if (NeedReinitializeHardware(UsbDebugPortHandle)) {
@@ -1046,7 +1068,8 @@ DebugPortInitialize (
 
   Status = CalculateUsbDebugPortBar(&Handle.DebugPortOffset, &Handle.DebugPortBarNumber);
   if (RETURN_ERROR (Status)) {
-    return NULL;
+    DEBUG ((EFI_D_ERROR, "USB Debug Port: EHCI host controller does not support debug port capability!\n"));
+    goto Exit;
   }
 
   Handle.EhciMemoryBase = 0xFFFFFC00 & PciRead32(PcdGet32(PcdUsbEhciPciAddress) + PCI_BASE_ADDRESSREG_OFFSET);
@@ -1071,8 +1094,16 @@ DebugPortInitialize (
 
   Status = InitializeUsbDebugHardware (&Handle);
   if (RETURN_ERROR(Status)) {
-    return NULL;
+    DEBUG ((EFI_D_ERROR, "USB Debug Port: Initialization failed, please check if USB debug cable is plugged into EHCI debug port correctly!\n"));
+    goto Exit;
   }
+
+  //
+  // Set debug port initialized successfully flag
+  //
+  Handle.Initialized = TRUE;
+
+Exit:
 
   if (Function != NULL) {
     Function (Context, &Handle);

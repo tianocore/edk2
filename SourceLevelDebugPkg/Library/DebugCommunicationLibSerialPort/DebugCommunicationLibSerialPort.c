@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on serial port.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +17,7 @@
 #include <Library/DebugCommunicationLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/TimerLib.h>
+#include <Library/DebugLib.h>
 
 /**
   Initialize the debug port.
@@ -61,7 +62,12 @@ DebugPortInitialize (
   IN DEBUG_PORT_CONTINUE  Function
   )
 {
-  SerialPortInitialize ();
+  RETURN_STATUS      Status;
+
+  Status = SerialPortInitialize ();
+  if (RETURN_ERROR(Status)) {
+    DEBUG ((EFI_D_ERROR, "Debug Serial Port: Initialization failed!\n")); 
+  }
 
   if (Function != NULL) {
     Function (Context, NULL);
