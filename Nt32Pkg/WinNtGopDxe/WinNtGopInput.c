@@ -133,6 +133,16 @@ GopPrivateDeleteQ (
   CopyMem (Key, &Queue->Q[Queue->Front], sizeof (EFI_KEY_DATA));
   Queue->Front  = (Queue->Front + 1) % MAX_Q;
 
+  if (Key->Key.ScanCode == SCAN_NULL && Key->Key.UnicodeChar == CHAR_NULL) {
+    if (!Private->IsPartialKeySupport) {
+      //
+      // If partial keystrok is not enabled, don't return the partial keystroke.
+      //
+      Private->WinNtThunk->LeaveCriticalSection (&Queue->Cs);
+      ZeroMem (Key, sizeof (EFI_KEY_DATA));
+      return EFI_NOT_READY;
+    }
+  }
   Private->WinNtThunk->LeaveCriticalSection (&Queue->Cs);
   return EFI_SUCCESS;
 }
@@ -170,36 +180,36 @@ Routine Description:
 
 Arguments:
 
-  RegsiteredData    - A pointer to a buffer that is filled in with the keystroke 
+  RegsiteredData    - A pointer to a buffer that is filled in with the keystroke
                       state data for the key that was registered.
-  InputData         - A pointer to a buffer that is filled in with the keystroke 
+  InputData         - A pointer to a buffer that is filled in with the keystroke
                       state data for the key that was pressed.
 
 Returns:
   TRUE              - Key be pressed matches a registered key.
-  FLASE             - Match failed. 
-  
+  FLASE             - Match failed.
+
 --*/
 {
   ASSERT (RegsiteredData != NULL && InputData != NULL);
-  
+
   if ((RegsiteredData->Key.ScanCode    != InputData->Key.ScanCode) ||
       (RegsiteredData->Key.UnicodeChar != InputData->Key.UnicodeChar)) {
-    return FALSE;  
-  }      
-  
+    return FALSE;
+  }
+
   //
   // Assume KeyShiftState/KeyToggleState = 0 in Registered key data means these state could be ignored.
   //
   if (RegsiteredData->KeyState.KeyShiftState != 0 &&
       RegsiteredData->KeyState.KeyShiftState != InputData->KeyState.KeyShiftState) {
-    return FALSE;    
-  }   
+    return FALSE;
+  }
   if (RegsiteredData->KeyState.KeyToggleState != 0 &&
       RegsiteredData->KeyState.KeyToggleState != InputData->KeyState.KeyToggleState) {
-    return FALSE;    
-  }     
-  
+    return FALSE;
+  }
+
   return TRUE;
 
 }
@@ -219,29 +229,29 @@ Routine Description:
 Arguments:
 
   Private       - The private structure of WinNt Gop device.
-  KeyData       - A pointer to a buffer that is filled in with the keystroke 
+  KeyData       - A pointer to a buffer that is filled in with the keystroke
                   state data for the key that was pressed.
 
 Returns:
 
   EFI_SUCCESS   - The status light is updated successfully.
 
---*/  
-{ 
+--*/
+{
   LIST_ENTRY                          *Link;
   WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY  *CurrentNotify;
-  
+
   for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
     CurrentNotify = CR (
-                      Link, 
-                      WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY, 
-                      NotifyEntry, 
+                      Link,
+                      WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY,
+                      NotifyEntry,
                       WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE
                       );
     if (GopPrivateIsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
       CurrentNotify->KeyNotificationFn (KeyData);
     }
-  }    
+  }
 }
 
 VOID
@@ -299,7 +309,7 @@ GopPrivateAddKey (
   }
   if (Private->LeftShift) {
     KeyData.KeyState.KeyShiftState  |= EFI_LEFT_SHIFT_PRESSED;
-  }                                    
+  }
   if (Private->RightShift) {
     KeyData.KeyState.KeyShiftState  |= EFI_RIGHT_SHIFT_PRESSED;
   }
@@ -314,7 +324,7 @@ GopPrivateAddKey (
   }
   if (Private->SysReq) {
     KeyData.KeyState.KeyShiftState  |= EFI_SYS_REQ_PRESSED;
-  }  
+  }
   if (Private->CapsLock) {
     KeyData.KeyState.KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
   }
@@ -324,11 +334,14 @@ GopPrivateAddKey (
   if (Private->ScrollLock) {
     KeyData.KeyState.KeyToggleState |= EFI_SCROLL_LOCK_ACTIVE;
   }
-  
+  if (Private->IsPartialKeySupport) {
+    KeyData.KeyState.KeyToggleState |= EFI_KEY_STATE_EXPOSED;
+  }
+
   //
   // Convert Ctrl+[1-26] to Ctrl+[A-Z]
   //
-  if ((Private->LeftCtrl || Private->RightCtrl) && 
+  if ((Private->LeftCtrl || Private->RightCtrl) &&
       (KeyData.Key.UnicodeChar >= 1) && (KeyData.Key.UnicodeChar <= 26)
      ) {
     if ((Private->LeftShift || Private->RightShift) == Private->CapsLock) {
@@ -382,16 +395,16 @@ Returns:
 
   EFI_SUCCESS   - The status light is updated successfully.
 
---*/  
-{ 
+--*/
+{
   //
-  // BUGBUG:Only SendInput/keybd_event function can toggle 
+  // BUGBUG:Only SendInput/keybd_event function can toggle
   // NumLock, CapsLock and ScrollLock keys.
   // Neither of these functions is included in EFI_WIN_NT_THUNK_PROTOCOL.
   // Thus, return immediately without operation.
   //
   return EFI_SUCCESS;
-  
+
 }
 
 
@@ -441,11 +454,12 @@ Returns:
   Private->RightLogo               = FALSE;
   Private->Menu                    = FALSE;
   Private->SysReq                  = FALSE;
-  
+
   Private->CapsLock                = FALSE;
   Private->NumLock                 = FALSE;
   Private->ScrollLock              = FALSE;
- 
+  Private->IsPartialKeySupport     = FALSE;
+
   Private->KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
   Private->KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
 
@@ -465,25 +479,25 @@ GopPrivateReadKeyStrokeWorker (
 /*++
 
   Routine Description:
-    Reads the next keystroke from the input device. The WaitForKey Event can 
+    Reads the next keystroke from the input device. The WaitForKey Event can
     be used to test for existance of a keystroke via WaitForEvent () call.
 
   Arguments:
     Private    - The private structure of WinNt Gop device.
-    KeyData    - A pointer to a buffer that is filled in with the keystroke 
+    KeyData    - A pointer to a buffer that is filled in with the keystroke
                  state data for the key that was pressed.
 
   Returns:
     EFI_SUCCESS           - The keystroke information was returned.
     EFI_NOT_READY         - There was no keystroke data availiable.
-    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
+    EFI_DEVICE_ERROR      - The keystroke information was not returned due to
                             hardware errors.
-    EFI_INVALID_PARAMETER - KeyData is NULL.                        
+    EFI_INVALID_PARAMETER - KeyData is NULL.
 
 --*/
 {
   EFI_STATUS                      Status;
-  EFI_TPL                         OldTpl;  
+  EFI_TPL                         OldTpl;
 
   if (KeyData == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -507,10 +521,14 @@ GopPrivateReadKeyStrokeWorker (
     Status = GopPrivateDeleteQ (Private, &Private->QueueForRead, KeyData);
     if (!EFI_ERROR (Status)) {
       //
-      // Leave critical section and return
+      // If partial keystroke is not enabled, check whether it is value key. If not return
+      // EFI_NOT_READY.
       //
-      gBS->RestoreTPL (OldTpl);
-      return EFI_SUCCESS;
+      if (!Private->IsPartialKeySupport) {
+        if (KeyData->Key.ScanCode == SCAN_NULL && KeyData->Key.UnicodeChar == CHAR_NULL) {
+          Status = EFI_NOT_READY;
+        }
+      }
     }
   }
 
@@ -574,15 +592,22 @@ WinNtGopSimpleTextInReadKeyStroke (
   EFI_KEY_DATA      KeyData;
 
   Private = GOP_PRIVATE_DATA_FROM_TEXT_IN_THIS (This);
-
-  Status = GopPrivateReadKeyStrokeWorker (Private, &KeyData);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  CopyMem (Key, &KeyData.Key, sizeof (EFI_INPUT_KEY));
-  
-  return EFI_SUCCESS;  
+  //
+  // Considering if the partial keystroke is enabled, there maybe a partial
+  // keystroke in the queue, so here skip the partial keystroke and get the
+  // next key from the queue
+  //
+  while (1) {
+    Status = GopPrivateReadKeyStrokeWorker (Private, &KeyData);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    if (KeyData.Key.ScanCode == SCAN_NULL && KeyData.Key.UnicodeChar == CHAR_NULL) {
+      continue;
+    }
+    CopyMem (Key, &KeyData.Key, sizeof (EFI_INPUT_KEY));
+    return EFI_SUCCESS;
+  }  
 }
 
 
@@ -605,6 +630,7 @@ WinNtGopSimpleTextInWaitForKey (
   GOP_PRIVATE_DATA  *Private;
   EFI_STATUS        Status;
   EFI_TPL           OldTpl;
+  EFI_KEY_DATA      KeyData;
 
   Private = (GOP_PRIVATE_DATA *) Context;
 
@@ -612,26 +638,40 @@ WinNtGopSimpleTextInWaitForKey (
   // Enter critical section
   //
   OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
-  
+
   //
   // Call hot key callback before telling caller there is a key available
   //
   WinNtGopSimpleTextInTimerHandler (NULL, Private);
-
-  Status  = GopPrivateCheckQ (&Private->QueueForRead);
-  if (!EFI_ERROR (Status)) {
-    //
-    // If a there is a key in the queue signal our event.
-    //
-    gBS->SignalEvent (Event);
-  } else {
-    //
-    // We need to sleep or NT will schedule this thread with such high
-    // priority that WinProc thread will never run and we will not see
-    // keyboard input. This Sleep makes the syste run 10x faster, so don't
-    // remove it.
-    //
-    Private->WinNtThunk->Sleep (1);
+  
+  //
+  // WaitforKey doesn't suppor the partial key.
+  // Considering if the partial keystroke is enabled, there maybe a partial
+  // keystroke in the queue, so here skip the partial keystroke and get the
+  // next key from the queue
+  //
+  while (1) {
+    Status  = GopPrivateCheckQ (&Private->QueueForRead);
+    if (!EFI_ERROR (Status)) {
+      //
+      // If a there is a key in the queue and it is not partial keystroke,  signal event.
+      //
+      if (Private->QueueForRead.Q[Private->QueueForRead.Front].Key.ScanCode == SCAN_NULL &&
+        Private->QueueForRead.Q[Private->QueueForRead.Front].Key.UnicodeChar == CHAR_NULL) {
+        GopPrivateDeleteQ (Private,&Private->QueueForRead,&KeyData);
+        continue;
+      }
+      gBS->SignalEvent (Event);
+    } else {
+      //
+      // We need to sleep or NT will schedule this thread with such high
+      // priority that WinProc thread will never run and we will not see
+      // keyboard input. This Sleep makes the syste run 10x faster, so don't
+      // remove it.
+      //
+      Private->WinNtThunk->Sleep (1);
+    }
+    break;
   }
 
   //
@@ -667,7 +707,7 @@ WinNtGopSimpleTextInExResetEx (
   GOP_PRIVATE_DATA *Private;
 
   Private = GOP_PRIVATE_DATA_FROM_TEXT_IN_EX_THIS (This);
-  
+
   return GopPrivateResetWorker (Private);
 }
 
@@ -680,20 +720,20 @@ WinNtGopSimpleTextInExReadKeyStrokeEx (
 /*++
 
   Routine Description:
-    Reads the next keystroke from the input device. The WaitForKey Event can 
+    Reads the next keystroke from the input device. The WaitForKey Event can
     be used to test for existance of a keystroke via WaitForEvent () call.
 
   Arguments:
     This       - Protocol instance pointer.
-    KeyData    - A pointer to a buffer that is filled in with the keystroke 
+    KeyData    - A pointer to a buffer that is filled in with the keystroke
                  state data for the key that was pressed.
 
   Returns:
     EFI_SUCCESS           - The keystroke information was returned.
     EFI_NOT_READY         - There was no keystroke data availiable.
-    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
+    EFI_DEVICE_ERROR      - The keystroke information was not returned due to
                             hardware errors.
-    EFI_INVALID_PARAMETER - KeyData is NULL.                        
+    EFI_INVALID_PARAMETER - KeyData is NULL.
 
 --*/
 {
@@ -704,7 +744,7 @@ WinNtGopSimpleTextInExReadKeyStrokeEx (
   }
 
   Private = GOP_PRIVATE_DATA_FROM_TEXT_IN_EX_THIS (This);
-  
+
   return GopPrivateReadKeyStrokeWorker (Private, KeyData);
 
 }
@@ -722,17 +762,17 @@ WinNtGopSimpleTextInExSetState (
 
   Arguments:
     This                  - Protocol instance pointer.
-    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the 
+    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the
                             state for the input device.
-                          
-  Returns:                
+
+  Returns:
     EFI_SUCCESS           - The device state was set successfully.
-    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
+    EFI_DEVICE_ERROR      - The device is not functioning correctly and could
                             not have the setting adjusted.
     EFI_UNSUPPORTED       - The device does not have the ability to set its state.
-    EFI_INVALID_PARAMETER - KeyToggleState is NULL.                       
+    EFI_INVALID_PARAMETER - KeyToggleState is NULL.
 
---*/   
+--*/
 {
   EFI_STATUS                      Status;
   GOP_PRIVATE_DATA                *Private;
@@ -745,31 +785,35 @@ WinNtGopSimpleTextInExSetState (
 
   if (((Private->KeyState.KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID) ||
       ((*KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID)) {
-    return EFI_UNSUPPORTED;  
+    return EFI_UNSUPPORTED;
   }
 
-  Private->ScrollLock = FALSE;
-  Private->NumLock    = FALSE;
-  Private->CapsLock   = FALSE;
+  Private->ScrollLock          = FALSE;
+  Private->NumLock             = FALSE;
+  Private->CapsLock            = FALSE;
+  Private->IsPartialKeySupport = FALSE;
 
   if ((*KeyToggleState & EFI_SCROLL_LOCK_ACTIVE) == EFI_SCROLL_LOCK_ACTIVE) {
     Private->ScrollLock = TRUE;
-  } 
+  }
   if ((*KeyToggleState & EFI_NUM_LOCK_ACTIVE) == EFI_NUM_LOCK_ACTIVE) {
     Private->NumLock = TRUE;
   }
   if ((*KeyToggleState & EFI_CAPS_LOCK_ACTIVE) == EFI_CAPS_LOCK_ACTIVE) {
     Private->CapsLock = TRUE;
   }
+  if ((*KeyToggleState & EFI_KEY_STATE_EXPOSED) == EFI_KEY_STATE_EXPOSED) {
+    Private->IsPartialKeySupport = TRUE;
+  }
 
-  Status = GopPrivateUpdateStatusLight (Private);  
+  Status = GopPrivateUpdateStatusLight (Private);
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
 
   Private->KeyState.KeyToggleState = *KeyToggleState;
   return EFI_SUCCESS;
-  
+
 }
 
 EFI_STATUS
@@ -787,23 +831,23 @@ WinNtGopSimpleTextInExRegisterKeyNotify (
 
   Arguments:
     This                    - Protocol instance pointer.
-    KeyData                 - A pointer to a buffer that is filled in with the keystroke 
+    KeyData                 - A pointer to a buffer that is filled in with the keystroke
                               information data for the key that was pressed.
-    KeyNotificationFunction - Points to the function to be called when the key 
-                              sequence is typed specified by KeyData.                        
-    NotifyHandle            - Points to the unique handle assigned to the registered notification.                          
+    KeyNotificationFunction - Points to the function to be called when the key
+                              sequence is typed specified by KeyData.
+    NotifyHandle            - Points to the unique handle assigned to the registered notification.
 
   Returns:
     EFI_SUCCESS             - The notification function was registered successfully.
     EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
-    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.                       
-                              
---*/   
+    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.
+
+--*/
 {
   GOP_PRIVATE_DATA                   *Private;
   WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY *CurrentNotify;
   LIST_ENTRY                         *Link;
-  WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY *NewNotify;      
+  WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY *NewNotify;
 
   if (KeyData == NULL || KeyNotificationFunction == NULL || NotifyHandle == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -816,37 +860,37 @@ WinNtGopSimpleTextInExRegisterKeyNotify (
   //
   for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
     CurrentNotify = CR (
-                      Link, 
-                      WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY, 
-                      NotifyEntry, 
+                      Link,
+                      WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY,
+                      NotifyEntry,
                       WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE
                       );
-    if (GopPrivateIsKeyRegistered (&CurrentNotify->KeyData, KeyData)) { 
+    if (GopPrivateIsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
       if (CurrentNotify->KeyNotificationFn == KeyNotificationFunction) {
         *NotifyHandle = CurrentNotify->NotifyHandle;
         return EFI_SUCCESS;
       }
     }
-  }    
-  
+  }
+
   //
   // Allocate resource to save the notification function
-  //  
+  //
   NewNotify = (WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY *) AllocateZeroPool (sizeof (WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY));
   if (NewNotify == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewNotify->Signature         = WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE;     
+  NewNotify->Signature         = WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
   NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (EFI_KEY_DATA));
   InsertTailList (&Private->NotifyList, &NewNotify->NotifyEntry);
 
-  *NotifyHandle = NewNotify->NotifyHandle;  
-  
+  *NotifyHandle = NewNotify->NotifyHandle;
+
   return EFI_SUCCESS;
-  
+
 }
 
 EFI_STATUS
@@ -861,14 +905,14 @@ WinNtGopSimpleTextInExUnregisterKeyNotify (
     Remove a registered notification function from a particular keystroke.
 
   Arguments:
-    This                    - Protocol instance pointer.    
+    This                    - Protocol instance pointer.
     NotificationHandle      - The handle of the notification function being unregistered.
 
   Returns:
     EFI_SUCCESS             - The notification function was unregistered successfully.
     EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
-                              
---*/   
+
+--*/
 {
   GOP_PRIVATE_DATA                   *Private;
   LIST_ENTRY                         *Link;
@@ -876,28 +920,28 @@ WinNtGopSimpleTextInExUnregisterKeyNotify (
 
   if (NotificationHandle == NULL) {
     return EFI_INVALID_PARAMETER;
-  } 
+  }
 
   if (((WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY *) NotificationHandle)->Signature != WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE) {
     return EFI_INVALID_PARAMETER;
-  } 
+  }
 
   Private = GOP_PRIVATE_DATA_FROM_TEXT_IN_EX_THIS (This);
 
   for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
     CurrentNotify = CR (
-                      Link, 
-                      WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY, 
-                      NotifyEntry, 
+                      Link,
+                      WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY,
+                      NotifyEntry,
                       WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE
-                      );       
+                      );
     if (CurrentNotify->NotifyHandle == NotificationHandle) {
       //
       // Remove the notification function from NotifyList and free resources
       //
-      RemoveEntryList (&CurrentNotify->NotifyEntry);      
+      RemoveEntryList (&CurrentNotify->NotifyEntry);
 
-      gBS->FreePool (CurrentNotify);            
+      gBS->FreePool (CurrentNotify);
       return EFI_SUCCESS;
     }
   }
@@ -941,7 +985,7 @@ WinNtGopInitializeSimpleTextInForWindow (
                   &Private->SimpleTextIn.WaitForKey
                   );
 
-  
+
   Private->SimpleTextInEx.Reset               = WinNtGopSimpleTextInExResetEx;
   Private->SimpleTextInEx.ReadKeyStrokeEx     = WinNtGopSimpleTextInExReadKeyStrokeEx;
   Private->SimpleTextInEx.SetState            = WinNtGopSimpleTextInExSetState;
@@ -949,7 +993,7 @@ WinNtGopInitializeSimpleTextInForWindow (
   Private->SimpleTextInEx.UnregisterKeyNotify = WinNtGopSimpleTextInExUnregisterKeyNotify;
 
   Private->SimpleTextInEx.Reset (&Private->SimpleTextInEx, FALSE);
-  
+
   InitializeListHead (&Private->NotifyList);
 
   Status = gBS->CreateEvent (
@@ -972,7 +1016,7 @@ WinNtGopInitializeSimpleTextInForWindow (
                   &Private->TimerEvent
                   );
   ASSERT_EFI_ERROR (Status);
-  
+
   Status = gBS->SetTimer (
                   Private->TimerEvent,
                   TimerPeriodic,

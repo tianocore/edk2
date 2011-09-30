@@ -52,106 +52,154 @@ KillNtGopThread (
   IN VOID       *Context
   );
 
-VOID
+BOOLEAN
 WinNtGopConvertParamToEfiKeyShiftState (
   IN  GOP_PRIVATE_DATA  *Private,
   IN  WPARAM            *wParam,
+  IN  LPARAM            *lParam,
   IN  BOOLEAN           Flag
   )
 {
   switch (*wParam) {
   //
   // BUGBUG: Only GetAsyncKeyState() and GetKeyState() can distinguish
-  // left and right Ctrl, and Shift key. 
-  // Neither of the two is defined in EFI_WIN_NT_THUNK_PROTOCOL. 
+  // left and right Ctrl, and Shift key.
+  // Neither of the two is defined in EFI_WIN_NT_THUNK_PROTOCOL.
   // Therefor, we can not set the correct Shift state here.
-  // 
-  case VK_SHIFT:  
-    Private->LeftShift  = Flag;
-    break;  
+  //
+  case VK_SHIFT:
+    if ((*lParam & GOP_EXTENDED_KEY) == GOP_EXTENDED_KEY) {
+        Private->RightShift = Flag;
+      } else {
+        Private->LeftShift = Flag;
+      }
+    return TRUE;
+
+  case VK_LSHIFT:
+    Private->LeftShift = Flag;
+    return TRUE;
+
+  case VK_RSHIFT:
+    Private->RightShift = Flag;
+    return TRUE;
+
   case VK_CONTROL:
-    Private->LeftCtrl   = Flag;
-    break;
-  case VK_LWIN:      
+    if ((*lParam & GOP_EXTENDED_KEY) == GOP_EXTENDED_KEY) {
+        Private->RightCtrl= Flag;
+      } else {
+        Private->LeftCtrl = Flag;
+      }
+    return TRUE;
+
+  case VK_LCONTROL:
+    Private->LeftCtrl = Flag;
+    return TRUE;
+
+  case VK_RCONTROL:
+    Private->RightCtrl = Flag;
+    return TRUE;
+
+  case VK_LWIN:
     Private->LeftLogo   = Flag;
-    break;
-  case VK_RWIN:      
+    return TRUE;
+
+  case VK_RWIN:
     Private->RightLogo  = Flag;
-    break;
-  case VK_APPS:      
+    return TRUE;
+
+  case VK_APPS:
     Private->Menu       = Flag;
-    break;
+    return TRUE;
   //
   // BUGBUG: PrintScreen/SysRq can not trigger WM_KEYDOWN message,
   // so SySReq shift state is not supported here.
   //
-  case VK_PRINT:  
+  case VK_PRINT:
     Private->SysReq     = Flag;
-    break;
+    return TRUE;
+  //
+  // For Alt Keystroke.
+  //
+  case VK_MENU:
+    if ((*lParam & GOP_EXTENDED_KEY) == GOP_EXTENDED_KEY) {
+        Private->RightAlt = Flag;
+      } else {
+        Private->LeftAlt = Flag;
+      }
+    return TRUE;
+
+  default:
+    return FALSE;
   }
 }
 
-VOID
+BOOLEAN
 WinNtGopConvertParamToEfiKey (
   IN  GOP_PRIVATE_DATA  *Private,
   IN  WPARAM            *wParam,
+  IN  LPARAM            *lParam,
   IN  EFI_INPUT_KEY     *Key
   )
 {
+  BOOLEAN Flag;
+  Flag = FALSE;
   switch (*wParam) {
-  case VK_HOME:       Key->ScanCode = SCAN_HOME;       break;
-  case VK_END:        Key->ScanCode = SCAN_END;        break;
-  case VK_LEFT:       Key->ScanCode = SCAN_LEFT;       break;
-  case VK_RIGHT:      Key->ScanCode = SCAN_RIGHT;      break;
-  case VK_UP:         Key->ScanCode = SCAN_UP;         break;
-  case VK_DOWN:       Key->ScanCode = SCAN_DOWN;       break;
-  case VK_DELETE:     Key->ScanCode = SCAN_DELETE;     break;
-  case VK_INSERT:     Key->ScanCode = SCAN_INSERT;     break;
-  case VK_PRIOR:      Key->ScanCode = SCAN_PAGE_UP;    break;
-  case VK_NEXT:       Key->ScanCode = SCAN_PAGE_DOWN;  break;
-  case VK_ESCAPE:     Key->ScanCode = SCAN_ESC;        break;
-                         
-  case VK_F1:         Key->ScanCode = SCAN_F1;         break;
-  case VK_F2:         Key->ScanCode = SCAN_F2;         break;
-  case VK_F3:         Key->ScanCode = SCAN_F3;         break;
-  case VK_F4:         Key->ScanCode = SCAN_F4;         break;
-  case VK_F5:         Key->ScanCode = SCAN_F5;         break;
-  case VK_F6:         Key->ScanCode = SCAN_F6;         break;
-  case VK_F7:         Key->ScanCode = SCAN_F7;         break;
-  case VK_F8:         Key->ScanCode = SCAN_F8;         break;
-  case VK_F9:         Key->ScanCode = SCAN_F9;         break;
-  case VK_F11:        Key->ScanCode = SCAN_F11;        break;
-  case VK_F12:        Key->ScanCode = SCAN_F12;        break;
+  case VK_HOME:       Key->ScanCode = SCAN_HOME;      Flag = TRUE; break;
+  case VK_END:        Key->ScanCode = SCAN_END;       Flag = TRUE; break;
+  case VK_LEFT:       Key->ScanCode = SCAN_LEFT;      Flag = TRUE; break;
+  case VK_RIGHT:      Key->ScanCode = SCAN_RIGHT;     Flag = TRUE; break;
+  case VK_UP:         Key->ScanCode = SCAN_UP;        Flag = TRUE; break;
+  case VK_DOWN:       Key->ScanCode = SCAN_DOWN;      Flag = TRUE; break;
+  case VK_DELETE:     Key->ScanCode = SCAN_DELETE;    Flag = TRUE; break;
+  case VK_INSERT:     Key->ScanCode = SCAN_INSERT;    Flag = TRUE; break;
+  case VK_PRIOR:      Key->ScanCode = SCAN_PAGE_UP;   Flag = TRUE; break;
+  case VK_NEXT:       Key->ScanCode = SCAN_PAGE_DOWN; Flag = TRUE; break;
+  case VK_ESCAPE:     Key->ScanCode = SCAN_ESC;       Flag = TRUE; break;
 
-  case VK_F13:        Key->ScanCode = SCAN_F13;        break;
-  case VK_F14:        Key->ScanCode = SCAN_F14;        break;
-  case VK_F15:        Key->ScanCode = SCAN_F15;        break;
-  case VK_F16:        Key->ScanCode = SCAN_F16;        break;
-  case VK_F17:        Key->ScanCode = SCAN_F17;        break;
-  case VK_F18:        Key->ScanCode = SCAN_F18;        break;
-  case VK_F19:        Key->ScanCode = SCAN_F19;        break;
-  case VK_F20:        Key->ScanCode = SCAN_F20;        break;
-  case VK_F21:        Key->ScanCode = SCAN_F21;        break;
-  case VK_F22:        Key->ScanCode = SCAN_F22;        break;
-  case VK_F23:        Key->ScanCode = SCAN_F23;        break;
-  case VK_F24:        Key->ScanCode = SCAN_F24;        break;
-  case VK_PAUSE:      Key->ScanCode = SCAN_PAUSE;      break;
+  case VK_F1:         Key->ScanCode = SCAN_F1;    Flag = TRUE;     break;
+  case VK_F2:         Key->ScanCode = SCAN_F2;    Flag = TRUE;     break;
+  case VK_F3:         Key->ScanCode = SCAN_F3;    Flag = TRUE;     break;
+  case VK_F4:         Key->ScanCode = SCAN_F4;    Flag = TRUE;     break;
+  case VK_F5:         Key->ScanCode = SCAN_F5;    Flag = TRUE;     break;
+  case VK_F6:         Key->ScanCode = SCAN_F6;    Flag = TRUE;     break;
+  case VK_F7:         Key->ScanCode = SCAN_F7;    Flag = TRUE;     break;
+  case VK_F8:         Key->ScanCode = SCAN_F8;    Flag = TRUE;     break;
+  case VK_F9:         Key->ScanCode = SCAN_F9;    Flag = TRUE;     break;
+  case VK_F11:        Key->ScanCode = SCAN_F11;   Flag = TRUE;     break;
+  case VK_F12:        Key->ScanCode = SCAN_F12;   Flag = TRUE;     break;
+
+  case VK_F13:        Key->ScanCode = SCAN_F13;   Flag = TRUE;     break;
+  case VK_F14:        Key->ScanCode = SCAN_F14;   Flag = TRUE;     break;
+  case VK_F15:        Key->ScanCode = SCAN_F15;   Flag = TRUE;     break;
+  case VK_F16:        Key->ScanCode = SCAN_F16;   Flag = TRUE;     break;
+  case VK_F17:        Key->ScanCode = SCAN_F17;   Flag = TRUE;     break;
+  case VK_F18:        Key->ScanCode = SCAN_F18;   Flag = TRUE;     break;
+  case VK_F19:        Key->ScanCode = SCAN_F19;   Flag = TRUE;     break;
+  case VK_F20:        Key->ScanCode = SCAN_F20;   Flag = TRUE;     break;
+  case VK_F21:        Key->ScanCode = SCAN_F21;   Flag = TRUE;     break;
+  case VK_F22:        Key->ScanCode = SCAN_F22;   Flag = TRUE;     break;
+  case VK_F23:        Key->ScanCode = SCAN_F23;   Flag = TRUE;     break;
+  case VK_F24:        Key->ScanCode = SCAN_F24;   Flag = TRUE;     break;
+  case VK_PAUSE:      Key->ScanCode = SCAN_PAUSE; Flag = TRUE;     break;
 
   //
   // Set toggle state
-  //    
-  case VK_NUMLOCK:     
+  //
+  case VK_NUMLOCK:
     Private->NumLock    = (BOOLEAN)(!Private->NumLock);
+    Flag = TRUE;
     break;
   case VK_SCROLL:
     Private->ScrollLock = (BOOLEAN)(!Private->ScrollLock);
-    break;  
+    Flag = TRUE;
+    break;
   case VK_CAPITAL:
     Private->CapsLock   = (BOOLEAN)(!Private->CapsLock);
-    break;  
+    Flag = TRUE;
+    break;
   }
   
-  WinNtGopConvertParamToEfiKeyShiftState (Private, wParam, TRUE);  
+  return (WinNtGopConvertParamToEfiKeyShiftState (Private, wParam, lParam, TRUE)) == TRUE ? TRUE : Flag;
 }
 
 
@@ -616,6 +664,7 @@ WinNtGopThreadWindowProc (
   PAINTSTRUCT       PaintStruct;
   LPARAM            Index;
   EFI_INPUT_KEY     Key;
+  BOOLEAN           AltIsPress;
 
   //
   // BugBug - if there are two instances of this DLL in memory (such as is
@@ -630,6 +679,7 @@ WinNtGopThreadWindowProc (
   // This works since each Gop protocol has a unique Private data instance and
   // a unique thread.
   //
+  AltIsPress = FALSE;
   Private = mWinNt->TlsGetValue (mTlsIndex);
   ASSERT (NULL != Private);
 
@@ -689,92 +739,100 @@ WinNtGopThreadWindowProc (
 
   //
   // F10 and the ALT key do not create a WM_KEYDOWN message, thus this special case
-  // WM_SYSKEYDOWN is posted when F10 is pressed or 
+  // WM_SYSKEYDOWN is posted when F10 is pressed or
   // holds down ALT key and then presses another key.
   //
   case WM_SYSKEYDOWN:
-    Key.ScanCode = 0;
+
+    Key.ScanCode    = 0;
+    Key.UnicodeChar = CHAR_NULL;
     switch (wParam) {
     case VK_F10:
       Key.ScanCode    = SCAN_F10;
-      Key.UnicodeChar = 0;
+      Key.UnicodeChar = CHAR_NULL;
       GopPrivateAddKey (Private, Key);
       return 0;
     }
 
-    if ((lParam & GOP_ALT_KEY_PRESSED) == GOP_ALT_KEY_PRESSED) {
-      //
-      // ALT is pressed with another key pressed
-      //
-      WinNtGopConvertParamToEfiKey (Private, &wParam, &Key);
-
-      if ((lParam & GOP_EXTENDED_KEY) == GOP_EXTENDED_KEY) {
-        Private->RightAlt = TRUE;
-      } else {
+    //
+    // If ALT or ALT + modifier key is pressed.
+    //
+    if (WinNtGopConvertParamToEfiKey (Private, &wParam, &lParam, &Key)) {
+      if (Key.ScanCode != 0){
+        //
+        // If ALT is pressed with other ScanCode.
+        // Always revers the left Alt for simple.
+        //
         Private->LeftAlt = TRUE;
       }
-
-      if (Private->RightAlt && Private->LeftAlt) {
-        Private->LeftAlt = FALSE;
-      }
-    }
-
-    if (Key.ScanCode != 0) {
-      Key.UnicodeChar = 0;
       GopPrivateAddKey (Private, Key);
-    }
-
-    return 0;
-
-  case WM_SYSKEYUP:
-    if ((lParam & GOP_ALT_KEY_PRESSED) == GOP_ALT_KEY_PRESSED) {
       //
-      // ALT is pressed with another key released
-      //
-      WinNtGopConvertParamToEfiKeyShiftState (Private, &wParam, FALSE);  
-      //
-      // Actually ALT key is still held down here.
-      // Change the ALT key state when another key is released
-      // by user because we did not find a better solution to
-      // get a released ALT key. 
+      // When Alt is released there is no windoes message, so 
+      // clean it after using it.
       //
       Private->RightAlt = FALSE;
-      Private->LeftAlt = FALSE;
+      Private->LeftAlt  = FALSE;
+      return 0;
     }
+    AltIsPress = TRUE;
 
-    return 0;
-
-
-  case WM_KEYDOWN:
-    Key.ScanCode = 0;
-    WinNtGopConvertParamToEfiKey (Private, &wParam, &Key);
-    if (Key.ScanCode != 0) {
-      Key.UnicodeChar = 0;
-      GopPrivateAddKey (Private, Key);
-    }
-
-    return 0;
-
-  case WM_KEYUP:
-    WinNtGopConvertParamToEfiKeyShiftState (Private, &wParam, FALSE);  
-    return 0;
-
-  case WM_CHAR:
+  case WM_CHAR:    
     //
     // The ESC key also generate WM_CHAR.
     //
     if (wParam == 0x1B) {
-      return 0;
-    }
+	  return 0;
+    }    
 
+    if (AltIsPress == TRUE) {
+      //
+      // If AltIsPress is true that means the Alt key is pressed.
+      //
+      Private->LeftAlt = TRUE;
+    }
     for (Index = 0; Index < (lParam & 0xffff); Index++) {
       if (wParam != 0) {
         Key.UnicodeChar = (CHAR16) wParam;
-        Key.ScanCode    = 0;
-        GopPrivateAddKey (Private, Key);
+        Key.ScanCode    = SCAN_NULL;     
+        GopPrivateAddKey (Private, Key);    
       }
     }
+    if (AltIsPress == TRUE) {
+      //
+      // When Alt is released there is no windoes message, so 
+      // clean it after using it.
+      //
+      Private->LeftAlt  = FALSE;
+      Private->RightAlt = FALSE;
+    }
+    return 0;
 
+  case WM_SYSKEYUP:
+    //
+    // ALT is pressed with another key released
+    //
+    WinNtGopConvertParamToEfiKeyShiftState (Private, &wParam, &lParam, FALSE);
+    return 0;
+
+  case WM_KEYDOWN:
+    Key.ScanCode = SCAN_NULL;
+    //
+    // A value key press will cause a WM_KEYDOWN first, then cause a WM_CHAR
+    // So if there is no modifier key updated, skip the WM_KEYDOWN even.
+    //
+    if (WinNtGopConvertParamToEfiKey (Private, &wParam, &lParam, &Key)) {
+      if (Key.ScanCode != SCAN_NULL) {
+        Key.UnicodeChar = CHAR_NULL;
+      }
+      //
+      // Support the partial keystroke, add all keydown event into the queue.
+      //
+      GopPrivateAddKey (Private, Key);
+    }
+    return 0;
+
+  case WM_KEYUP:
+    WinNtGopConvertParamToEfiKeyShiftState (Private, &wParam, &lParam, FALSE);
     return 0;
 
   case WM_CLOSE:

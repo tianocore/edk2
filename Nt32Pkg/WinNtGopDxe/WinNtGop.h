@@ -46,13 +46,13 @@ Abstract:
 //
 // WM_SYSKEYDOWN/WM_SYSKEYUP Notification
 // lParam
-// bit 24: Specifies whether the key is an extended key, 
-// such as the right-hand ALT and CTRL keys that appear on 
-// an enhanced 101- or 102-key keyboard. 
+// bit 24: Specifies whether the key is an extended key,
+// such as the right-hand ALT and CTRL keys that appear on
+// an enhanced 101- or 102-key keyboard.
 // The value is 1 if it is an extended key; otherwise, it is 0.
-// bit 29:Specifies the context code. 
-// The value is 1 if the ALT key is down while the key is pressed/released; 
-// it is 0 if the WM_SYSKEYDOWN message is posted to the active window 
+// bit 29:Specifies the context code.
+// The value is 1 if the ALT key is down while the key is pressed/released;
+// it is 0 if the WM_SYSKEYDOWN message is posted to the active window
 // because no window has the keyboard focus.
 #define GOP_EXTENDED_KEY         (0x1 << 24)
 #define GOP_ALT_KEY_PRESSED      (0x1 << 29)
@@ -132,7 +132,7 @@ typedef struct {
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL *FillLine;
 
   //
-  // Keyboard Queue used by Simple Text In. 
+  // Keyboard Queue used by Simple Text In.
   // QueueForRead:   WinProc thread adds, and main thread removes.
   // QueueForNotify: WinProc thread adds, and timer thread removes.
   //
@@ -143,7 +143,7 @@ typedef struct {
   EFI_KEY_STATE                     KeyState;
   LIST_ENTRY                        NotifyList;
   BOOLEAN                           LeftShift;
-  BOOLEAN                           RightShift;  
+  BOOLEAN                           RightShift;
   BOOLEAN                           LeftAlt;
   BOOLEAN                           RightAlt;
   BOOLEAN                           LeftCtrl;
@@ -151,10 +151,11 @@ typedef struct {
   BOOLEAN                           LeftLogo;
   BOOLEAN                           RightLogo;
   BOOLEAN                           Menu;
-  BOOLEAN                           SysReq;  
+  BOOLEAN                           SysReq;
   BOOLEAN                           NumLock;
   BOOLEAN                           ScrollLock;
   BOOLEAN                           CapsLock;
+  BOOLEAN                           IsPartialKeySupport;
   EFI_EVENT                         TimerEvent;
 } GOP_PRIVATE_DATA;
 
