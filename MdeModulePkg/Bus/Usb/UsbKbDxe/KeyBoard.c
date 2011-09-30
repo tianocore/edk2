@@ -296,10 +296,17 @@ UINT8 ModifierValueToEfiScanCodeConvertionTable[] = {
   SCAN_F10,        // EFI_FUNCTION_KEY_TEN_MODIFIER
   SCAN_F11,        // EFI_FUNCTION_KEY_ELEVEN_MODIFIER
   SCAN_F12,        // EFI_FUNCTION_KEY_TWELVE_MODIFIER
+  //
+  // For Partial Keystroke support
+  //
   SCAN_NULL,       // EFI_PRINT_MODIFIER
   SCAN_NULL,       // EFI_SYS_REQUEST_MODIFIER
   SCAN_NULL,       // EFI_SCROLL_LOCK_MODIFIER
-  SCAN_PAUSE       // EFI_PAUSE_MODIFIER
+  SCAN_PAUSE,      // EFI_PAUSE_MODIFIER
+  SCAN_NULL,       // EFI_BREAK_MODIFIER
+  SCAN_NULL,       // EFI_LEFT_LOGO_MODIFIER
+  SCAN_NULL,       // EFI_RIGHT_LOGO_MODIFER
+  SCAN_NULL,       // EFI_MENU_MODIFER
 };
 
 /**
@@ -507,7 +514,7 @@ FindUsbNsKey (
   LIST_ENTRY      *Link;
   LIST_ENTRY      *NsKeyList;
   USB_NS_KEY      *UsbNsKey;
-  
+
   NsKeyList = &UsbKeyboardDevice->NsKeyList;
   Link = GetFirstNode (NsKeyList);
   while (!IsNull (NsKeyList, Link)) {
@@ -780,7 +787,7 @@ InitKeyboardLayout (
     //
     InstallDefaultKeyboardLayout (UsbKeyboardDevice);
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -820,14 +827,14 @@ InitUSBKeyboard (
   // Assumed the first config is the correct one and this is not always the case
   //
   Status = UsbGetConfiguration (
-             UsbKeyboardDevice->UsbIo, 
-             &ConfigValue, 
+             UsbKeyboardDevice->UsbIo,
+             &ConfigValue,
              &TransferResult
              );
   if (EFI_ERROR (Status)) {
     ConfigValue = 0x01;
   }
-  
+
   //
   // Uses default configuration to configure the USB Keyboard device.
   //
@@ -891,7 +898,7 @@ InitUSBKeyboard (
   UsbKeyboardDevice->NumLockOn  = FALSE;
   UsbKeyboardDevice->CapsOn     = FALSE;
   UsbKeyboardDevice->ScrollOn   = FALSE;
-  
+
   UsbKeyboardDevice->LeftCtrlOn   = FALSE;
   UsbKeyboardDevice->LeftAltOn    = FALSE;
   UsbKeyboardDevice->LeftShiftOn  = FALSE;
@@ -1033,7 +1040,7 @@ KeyboardHandler (
 
     //
     // Delete & Submit this interrupt again
-    // Handler of DelayedRecoveryEvent triggered by timer will re-submit the interrupt. 
+    // Handler of DelayedRecoveryEvent triggered by timer will re-submit the interrupt.
     //
     UsbIo->UsbAsyncInterruptTransfer (
              UsbIo,
@@ -1382,12 +1389,10 @@ USBParseKey (
     case EFI_LEFT_CONTROL_MODIFIER:
       UsbKeyboardDevice->LeftCtrlOn = TRUE;
       UsbKeyboardDevice->CtrlOn = TRUE;
-      continue;
       break;
     case EFI_RIGHT_CONTROL_MODIFIER:
       UsbKeyboardDevice->RightCtrlOn = TRUE;
       UsbKeyboardDevice->CtrlOn = TRUE;
-      continue;
       break;
 
     //
@@ -1396,12 +1401,10 @@ USBParseKey (
     case EFI_LEFT_SHIFT_MODIFIER:
       UsbKeyboardDevice->LeftShiftOn = TRUE;
       UsbKeyboardDevice->ShiftOn = TRUE;
-      continue;
       break;
     case EFI_RIGHT_SHIFT_MODIFIER:
       UsbKeyboardDevice->RightShiftOn = TRUE;
       UsbKeyboardDevice->ShiftOn = TRUE;
-      continue;
       break;
 
     //
@@ -1410,12 +1413,10 @@ USBParseKey (
     case EFI_LEFT_ALT_MODIFIER:
       UsbKeyboardDevice->LeftAltOn = TRUE;
       UsbKeyboardDevice->AltOn = TRUE;
-      continue;
       break;
     case EFI_RIGHT_ALT_MODIFIER:
       UsbKeyboardDevice->RightAltOn = TRUE;
       UsbKeyboardDevice->AltOn = TRUE;
-      continue;
       break;
 
     //
@@ -1445,7 +1446,6 @@ USBParseKey (
     case EFI_PRINT_MODIFIER:
     case EFI_SYS_REQUEST_MODIFIER:
       UsbKeyboardDevice->SysReqOn = TRUE;
-      continue;
       break;
 
     //
@@ -1461,7 +1461,6 @@ USBParseKey (
       //
       UsbKeyboardDevice->NumLockOn = (BOOLEAN) (!(UsbKeyboardDevice->NumLockOn));
       SetKeyLED (UsbKeyboardDevice);
-      continue;
       break;
 
     case EFI_CAPS_LOCK_MODIFIER:
@@ -1470,7 +1469,6 @@ USBParseKey (
       //
       UsbKeyboardDevice->CapsOn = (BOOLEAN) (!(UsbKeyboardDevice->CapsOn));
       SetKeyLED (UsbKeyboardDevice);
-      continue;
       break;
 
     case EFI_SCROLL_LOCK_MODIFIER:
@@ -1479,7 +1477,6 @@ USBParseKey (
       //
       UsbKeyboardDevice->ScrollOn = (BOOLEAN) (!(UsbKeyboardDevice->ScrollOn));
       SetKeyLED (UsbKeyboardDevice);
-      continue;
       break;
 
     default:
@@ -1529,18 +1526,11 @@ UsbKeyCodeToEfiInputKey (
   EFI_KEY_DESCRIPTOR            *KeyDescriptor;
   LIST_ENTRY                    *Link;
   LIST_ENTRY                    *NotifyList;
-  KEYBOARD_CONSOLE_IN_EX_NOTIFY *CurrentNotify;  
+  KEYBOARD_CONSOLE_IN_EX_NOTIFY *CurrentNotify;
 
   //
-  // KeyCode must in the range of 0x4 to 0x65
+  // KeyCode must in the range of  [0x4, 0x65] or [0xe0, 0xe7].
   //
-  if (!USBKBD_VALID_KEYCODE (KeyCode)) {
-    return EFI_INVALID_PARAMETER;
-  }
-  if ((KeyCode - 4) >= NUMBER_OF_VALID_NON_MODIFIER_USB_KEYCODE) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   KeyDescriptor = GetKeyDescriptor (UsbKeyboardDevice, KeyCode);
   ASSERT (KeyDescriptor != NULL);
 
@@ -1618,7 +1608,7 @@ UsbKeyCodeToEfiInputKey (
     if ((UsbKeyboardDevice->NumLockOn) && (!(UsbKeyboardDevice->ShiftOn))) {
       KeyData->Key.ScanCode = SCAN_NULL;
     } else {
-      KeyData->Key.UnicodeChar = 0x00;
+      KeyData->Key.UnicodeChar = CHAR_NULL;
     }
   }
 
@@ -1627,14 +1617,16 @@ UsbKeyCodeToEfiInputKey (
   //
   if (KeyData->Key.UnicodeChar == 0x1B && KeyData->Key.ScanCode == SCAN_NULL) {
     KeyData->Key.ScanCode = SCAN_ESC;
-    KeyData->Key.UnicodeChar = 0x00;
+    KeyData->Key.UnicodeChar = CHAR_NULL;
   }
 
   //
   // Not valid for key without both unicode key code and EFI Scan Code.
   //
   if (KeyData->Key.UnicodeChar == 0 && KeyData->Key.ScanCode == SCAN_NULL) {
+    if (!UsbKeyboardDevice->IsSupportPartialKey) {
     return EFI_NOT_READY;
+    }
   }
 
   //
@@ -1683,14 +1675,16 @@ UsbKeyCodeToEfiInputKey (
   if (UsbKeyboardDevice->CapsOn) {
     KeyData->KeyState.KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
   }
-
+  if (UsbKeyboardDevice->IsSupportPartialKey) {
+    KeyData->KeyState.KeyToggleState |= EFI_KEY_STATE_EXPOSED;
+  }
   //
   // Invoke notification functions if the key is registered.
   //
   NotifyList = &UsbKeyboardDevice->NotifyList;
   for (Link = GetFirstNode (NotifyList); !IsNull (NotifyList, Link); Link = GetNextNode (NotifyList, Link)) {
     CurrentNotify = CR (Link, KEYBOARD_CONSOLE_IN_EX_NOTIFY, NotifyEntry, USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE);
-    if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) { 
+    if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
       CurrentNotify->KeyNotificationFn (KeyData);
     }
   }

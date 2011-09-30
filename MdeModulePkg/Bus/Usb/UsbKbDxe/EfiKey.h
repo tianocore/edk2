@@ -130,7 +130,7 @@ typedef struct {
   EFI_EVENT                         RepeatTimer;
 
   EFI_UNICODE_STRING_TABLE          *ControllerNameTable;
-  
+
   BOOLEAN                           LeftCtrlOn;
   BOOLEAN                           LeftAltOn;
   BOOLEAN                           LeftShiftOn;
@@ -138,10 +138,14 @@ typedef struct {
   BOOLEAN                           RightCtrlOn;
   BOOLEAN                           RightAltOn;
   BOOLEAN                           RightShiftOn;
-  BOOLEAN                           RightLogoOn;  
+  BOOLEAN                           RightLogoOn;
   BOOLEAN                           MenuKeyOn;
   BOOLEAN                           SysReqOn;
   BOOLEAN                           AltGrOn;
+
+  BOOLEAN                         IsSupportPartialKey;
+
+  EFI_KEY_STATE                     KeyState;
   //
   // Notification function list
   //

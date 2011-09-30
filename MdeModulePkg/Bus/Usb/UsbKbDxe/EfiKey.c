@@ -259,9 +259,9 @@ USBKeyboardDriverBindingStart (
   UsbKeyboardDevice->SimpleInputEx.SetState            = USBKeyboardSetState;
   UsbKeyboardDevice->SimpleInputEx.RegisterKeyNotify   = USBKeyboardRegisterKeyNotify;
   UsbKeyboardDevice->SimpleInputEx.UnregisterKeyNotify = USBKeyboardUnregisterKeyNotify;
-  
+
   InitializeListHead (&UsbKeyboardDevice->NotifyList);
-  
+
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
@@ -546,7 +546,7 @@ USBKeyboardDriverBindingStop (
 
   DestroyQueue (&UsbKeyboardDevice->UsbKeyQueue);
   DestroyQueue (&UsbKeyboardDevice->EfiKeyQueue);
-  
+
   FreePool (UsbKeyboardDevice);
 
   return Status;
@@ -676,14 +676,25 @@ USBKeyboardReadKeyStroke (
 
   UsbKeyboardDevice = USB_KB_DEV_FROM_THIS (This);
 
-  Status = USBKeyboardReadKeyStrokeWorker (UsbKeyboardDevice, &KeyData);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  //
+  // Considering if the partial keystroke is enabled, there maybe a partial
+  // keystroke in the queue, so here skip the partial keystroke and get the
+  // next key from the queue
+  //
+  while (1) {
+    Status = USBKeyboardReadKeyStrokeWorker (UsbKeyboardDevice, &KeyData);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    //
+    // SimpleTextIn Protocol doesn't support partial keystroke;
+    //
+    if (KeyData.Key.ScanCode == CHAR_NULL && KeyData.Key.UnicodeChar == SCAN_NULL) {
+      continue;
+    }
+    CopyMem (Key, &KeyData.Key, sizeof (EFI_INPUT_KEY));
+    return EFI_SUCCESS;
   }
-
-  CopyMem (Key, &KeyData.Key, sizeof (EFI_INPUT_KEY));
-
-  return EFI_SUCCESS;
 }
 
 
@@ -703,15 +714,42 @@ USBKeyboardWaitForKey (
   )
 {
   USB_KB_DEV  *UsbKeyboardDevice;
+  EFI_KEY_DATA KeyData;
+  EFI_TPL      OldTpl;
 
   UsbKeyboardDevice = (USB_KB_DEV *) Context;
 
-  if (!IsQueueEmpty (&UsbKeyboardDevice->EfiKeyQueue)) {
+  //
+  // Enter critical section
+  //  
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+  
+  //
+  // WaitforKey doesn't suppor the partial key.
+  // Considering if the partial keystroke is enabled, there maybe a partial
+  // keystroke in the queue, so here skip the partial keystroke and get the
+  // next key from the queue
+  //
+  while (!IsQueueEmpty (&UsbKeyboardDevice->EfiKeyQueue)) {
     //
     // If there is pending key, signal the event.
     //
+    CopyMem (
+      &KeyData,
+      UsbKeyboardDevice->EfiKeyQueue.Buffer[UsbKeyboardDevice->EfiKeyQueue.Head],
+      sizeof (EFI_KEY_DATA)
+      );
+    if (KeyData.Key.ScanCode == SCAN_NULL && KeyData.Key.UnicodeChar == CHAR_NULL) {
+      Dequeue (&UsbKeyboardDevice->EfiKeyQueue, &KeyData, sizeof (EFI_KEY_DATA));
+      continue;
+    }
     gBS->SignalEvent (Event);
+    break;
   }
+  //
+  // Leave critical section and return
+  //
+  gBS->RestoreTPL (OldTpl);
 }
 
 /**
@@ -733,7 +771,7 @@ USBKeyboardTimerHandler (
   EFI_KEY_DATA                  KeyData;
 
   UsbKeyboardDevice = (USB_KB_DEV *) Context;
-  
+
   //
   // Fetch raw data from the USB keyboard buffer,
   // and translate it into USB keycode.
@@ -783,7 +821,7 @@ KbdFreeNotifyList (
     RemoveEntryList (Link);
     FreePool (NotifyNode);
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -804,29 +842,29 @@ IsKeyRegistered (
   )
 {
   ASSERT (RegsiteredData != NULL && InputData != NULL);
-  
+
   if ((RegsiteredData->Key.ScanCode    != InputData->Key.ScanCode) ||
       (RegsiteredData->Key.UnicodeChar != InputData->Key.UnicodeChar)) {
-    return FALSE;  
-  }      
-  
+    return FALSE;
+  }
+
   //
   // Assume KeyShiftState/KeyToggleState = 0 in Registered key data means these state could be ignored.
   //
   if (RegsiteredData->KeyState.KeyShiftState != 0 &&
       RegsiteredData->KeyState.KeyShiftState != InputData->KeyState.KeyShiftState) {
-    return FALSE;    
-  }   
+    return FALSE;
+  }
   if (RegsiteredData->KeyState.KeyToggleState != 0 &&
       RegsiteredData->KeyState.KeyToggleState != InputData->KeyState.KeyToggleState) {
-    return FALSE;    
-  }     
-  
+    return FALSE;
+  }
+
   return TRUE;
 }
 
 //
-// Simple Text Input Ex protocol functions 
+// Simple Text Input Ex protocol functions
 //
 /**
   Resets the input device hardware.
@@ -867,6 +905,9 @@ USBKeyboardResetEx (
     return EFI_DEVICE_ERROR;
   }
 
+  UsbKeyboardDevice->KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
+  UsbKeyboardDevice->KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
+
   return EFI_SUCCESS;
 
 }
@@ -901,7 +942,7 @@ USBKeyboardReadKeyStrokeEx (
   UsbKeyboardDevice = TEXT_INPUT_EX_USB_KB_DEV_FROM_THIS (This);
 
   return USBKeyboardReadKeyStrokeWorker (UsbKeyboardDevice, KeyData);
-  
+
 }
 
 /**
@@ -933,7 +974,8 @@ USBKeyboardSetState (
 
   UsbKeyboardDevice = TEXT_INPUT_EX_USB_KB_DEV_FROM_THIS (This);
 
-  if ((*KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID) {
+  if (((UsbKeyboardDevice->KeyState.KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID) ||
+      ((*KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -944,7 +986,8 @@ USBKeyboardSetState (
   UsbKeyboardDevice->ScrollOn   = FALSE;
   UsbKeyboardDevice->NumLockOn  = FALSE;
   UsbKeyboardDevice->CapsOn     = FALSE;
- 
+  UsbKeyboardDevice->IsSupportPartialKey = FALSE;
+
   if ((*KeyToggleState & EFI_SCROLL_LOCK_ACTIVE) == EFI_SCROLL_LOCK_ACTIVE) {
     UsbKeyboardDevice->ScrollOn = TRUE;
   }
@@ -954,11 +997,16 @@ USBKeyboardSetState (
   if ((*KeyToggleState & EFI_CAPS_LOCK_ACTIVE) == EFI_CAPS_LOCK_ACTIVE) {
     UsbKeyboardDevice->CapsOn = TRUE;
   }
+  if ((*KeyToggleState & EFI_KEY_STATE_EXPOSED) == EFI_KEY_STATE_EXPOSED) {
+    UsbKeyboardDevice->IsSupportPartialKey = TRUE;
+  }
 
   SetKeyLED (UsbKeyboardDevice);
 
+  UsbKeyboardDevice->KeyState.KeyToggleState = *KeyToggleState;
+
   return EFI_SUCCESS;
-  
+
 }
 
 /**
@@ -989,7 +1037,7 @@ USBKeyboardRegisterKeyNotify (
   KEYBOARD_CONSOLE_IN_EX_NOTIFY     *NewNotify;
   LIST_ENTRY                        *Link;
   LIST_ENTRY                        *NotifyList;
-  KEYBOARD_CONSOLE_IN_EX_NOTIFY     *CurrentNotify;  
+  KEYBOARD_CONSOLE_IN_EX_NOTIFY     *CurrentNotify;
 
   if (KeyData == NULL || NotifyHandle == NULL || KeyNotificationFunction == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1001,43 +1049,43 @@ USBKeyboardRegisterKeyNotify (
   // Return EFI_SUCCESS if the (KeyData, NotificationFunction) is already registered.
   //
   NotifyList = &UsbKeyboardDevice->NotifyList;
-  
+
   for (Link = GetFirstNode (NotifyList);
        !IsNull (NotifyList, Link);
        Link = GetNextNode (NotifyList, Link)) {
     CurrentNotify = CR (
-                      Link, 
-                      KEYBOARD_CONSOLE_IN_EX_NOTIFY, 
-                      NotifyEntry, 
+                      Link,
+                      KEYBOARD_CONSOLE_IN_EX_NOTIFY,
+                      NotifyEntry,
                       USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE
                       );
-    if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) { 
+    if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
       if (CurrentNotify->KeyNotificationFn == KeyNotificationFunction) {
-        *NotifyHandle = CurrentNotify->NotifyHandle;        
+        *NotifyHandle = CurrentNotify->NotifyHandle;
         return EFI_SUCCESS;
       }
     }
   }
-  
+
   //
   // Allocate resource to save the notification function
-  //  
+  //
   NewNotify = (KEYBOARD_CONSOLE_IN_EX_NOTIFY *) AllocateZeroPool (sizeof (KEYBOARD_CONSOLE_IN_EX_NOTIFY));
   if (NewNotify == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewNotify->Signature         = USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE;     
+  NewNotify->Signature         = USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
   NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (EFI_KEY_DATA));
   InsertTailList (&UsbKeyboardDevice->NotifyList, &NewNotify->NotifyEntry);
 
 
-  *NotifyHandle = NewNotify->NotifyHandle;  
-  
+  *NotifyHandle = NewNotify->NotifyHandle;
+
   return EFI_SUCCESS;
-  
+
 }
 
 /**
@@ -1064,14 +1112,14 @@ USBKeyboardUnregisterKeyNotify (
 
   if (NotificationHandle == NULL) {
     return EFI_INVALID_PARAMETER;
-  }  
+  }
 
   if (((KEYBOARD_CONSOLE_IN_EX_NOTIFY *) NotificationHandle)->Signature != USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE) {
     return EFI_INVALID_PARAMETER;
-  } 
-  
+  }
+
   UsbKeyboardDevice = TEXT_INPUT_EX_USB_KB_DEV_FROM_THIS (This);
-  
+
   //
   // Traverse notify list of USB keyboard and remove the entry of NotificationHandle.
   //
@@ -1080,18 +1128,18 @@ USBKeyboardUnregisterKeyNotify (
        !IsNull (NotifyList, Link);
        Link = GetNextNode (NotifyList, Link)) {
     CurrentNotify = CR (
-                      Link, 
-                      KEYBOARD_CONSOLE_IN_EX_NOTIFY, 
-                      NotifyEntry, 
+                      Link,
+                      KEYBOARD_CONSOLE_IN_EX_NOTIFY,
+                      NotifyEntry,
                       USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE
-                      );       
+                      );
     if (CurrentNotify->NotifyHandle == NotificationHandle) {
       //
       // Remove the notification function from NotifyList and free resources
       //
-      RemoveEntryList (&CurrentNotify->NotifyEntry);      
+      RemoveEntryList (&CurrentNotify->NotifyEntry);
 
-      FreePool (CurrentNotify);            
+      FreePool (CurrentNotify);
       return EFI_SUCCESS;
     }
   }
@@ -1099,6 +1147,6 @@ USBKeyboardUnregisterKeyNotify (
   //
   // Cannot find the matching entry in database.
   //
-  return EFI_INVALID_PARAMETER;  
+  return EFI_INVALID_PARAMETER;
 }
 
