@@ -1,18 +1,18 @@
 /** @file
   Simple Text Input Ex protocol from the UEFI 2.0 specification.
-  
+
   This protocol defines an extension to the EFI_SIMPLE_TEXT_INPUT_PROTOCOL
   which exposes much more state and modifier information from the input device,
   also allows one to register a notification for a particular keystroke.
 
   Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -47,7 +47,7 @@ typedef struct _EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL EFI_SIMPLE_TEXT_INPUT_EX_PROTO
 
 
   @retval EFI_SUCCESS       The device was reset.
-  
+
   @retval EFI_DEVICE_ERROR  The device is not functioning
                             correctly and could not be reset.
 
@@ -113,16 +113,17 @@ typedef struct {
 #define EFI_MENU_KEY_PRESSED      0x00000100
 #define EFI_SYS_REQ_PRESSED       0x00000200
 
-//                            
-// Toggle state               
-//                            
+//
+// Toggle state
+//
 #define EFI_TOGGLE_STATE_VALID    0x80
+#define EFI_KEY_STATE_EXPOSED     0x40
 #define EFI_SCROLL_LOCK_ACTIVE    0x01
 #define EFI_NUM_LOCK_ACTIVE       0x02
 #define EFI_CAPS_LOCK_ACTIVE      0x04
-                              
-//                            
-// EFI Scan codes             
+
+//
+// EFI Scan codes
 //
 #define SCAN_F11                  0x0015
 #define SCAN_F12                  0x0016
@@ -181,17 +182,17 @@ typedef struct {
   state information, and in those cases the high order bit in the
   respective Toggle and Shift state fields should not be active.
 
-  
+
   @param This     A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
 
   @param KeyData  A pointer to a buffer that is filled in with
                   the keystroke state data for the key that was
                   pressed.
 
-  
+
   @retval EFI_SUCCESS     The keystroke information was
                           returned.
-  
+
   @retval EFI_NOT_READY   There was no keystroke data available.
                           EFI_DEVICE_ERROR The keystroke
                           information was not returned due to
@@ -209,13 +210,13 @@ EFI_STATUS
 /**
   The SetState() function allows the input device hardware to
   have state settings adjusted.
-  
+
   @param This           A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
-  
+
   @param KeyToggleState Pointer to the EFI_KEY_TOGGLE_STATE to
                         set the state for the input device.
-  
-  
+
+
   @retval EFI_SUCCESS       The device state was set appropriately.
 
   @retval EFI_DEVICE_ERROR  The device is not functioning
@@ -245,21 +246,21 @@ EFI_STATUS
 /**
   The RegisterKeystrokeNotify() function registers a function
   which will be called when a specified keystroke will occur.
-  
+
   @param This                     A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
-  
+
   @param KeyData                  A pointer to a buffer that is filled in with
                                   the keystroke information for the key that was
                                   pressed.
-  
+
   @param KeyNotificationFunction  Points to the function to be
                                   called when the key sequence
                                   is typed specified by KeyData.
-  
-  
+
+
   @param NotifyHandle             Points to the unique handle assigned to
                                   the registered notification.
-  
+
   @retval EFI_SUCCESS           The device state was set
                                 appropriately.
 
@@ -279,14 +280,14 @@ EFI_STATUS
 /**
   The UnregisterKeystrokeNotify() function removes the
   notification which was previously registered.
-  
+
   @param This               A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
-  
+
   @param NotificationHandle The handle of the notification
                             function being unregistered.
-  
+
   @retval EFI_SUCCESS The device state was set appropriately.
-  
+
   @retval EFI_INVALID_PARAMETER The NotificationHandle is
                                 invalid.
 
