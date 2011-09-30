@@ -18,7 +18,8 @@
 /**
   Shutdown the socket receive and transmit operations
 
-  The ::shutdown routine stops socket receive and transmit operations.
+  The shutdown routine stops socket receive and transmit operations.
+
   The
   <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/shutdown.html">POSIX</a>
   documentation is available online.
@@ -27,8 +28,8 @@
 
   @param [in] how       Which operations to shutdown
 
-  @return     ::shutdown returns the zero (0) if successful or -1 when an
-              error occurs.  In the latter case, errno contains more details.
+  @return     This routine returns the zero (0) if successful or -1 when an
+              error occurs.  In the latter case, ::errno contains more details.
 
  **/
 int

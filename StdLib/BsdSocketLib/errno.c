@@ -15,4 +15,7 @@
 #include <sys/errno.h>
 
 
+/**
+  Variable that contains additional error information when an API call fails.
+**/
 int errno;

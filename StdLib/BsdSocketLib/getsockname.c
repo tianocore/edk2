@@ -18,7 +18,8 @@
 /**
   Get the local socket address.
 
-  The ::getsockname routine retrieves the local system address from the socket.
+  The getsockname routine retrieves the local system address from the socket.
+
   The
   <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/getsockname.html#">POSIX</a>
   documentation is available online.
@@ -29,8 +30,8 @@
 
   @param [in] address_len Length of the local network address structure
 
-  @return     ::getsockname returns zero (0) if successful or -1 when an error occurs.
-              In the case of an error, errno contains more details.
+  @return     This routine returns zero (0) if successful or -1 when an error occurs.
+              In the case of an error, ::errno contains more details.
 
  **/
 int

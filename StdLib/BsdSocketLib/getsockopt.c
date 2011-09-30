@@ -18,6 +18,10 @@
 /**
   Get the socket options
 
+  The
+  <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/getsockopt.html#">POSIX</a>
+  documentation is available online.
+
   @param [in] s               Socket file descriptor returned from ::socket.
   @param [in] level           Option protocol level
   @param [in] option_name     Name of the option
@@ -25,8 +29,8 @@
   @param [in,out] option_len  Length of the buffer in bytes,
                               upon return length of the option value in bytes
 
-  @retval   Zero (0) upon success
-  @retval   Minus one (-1) upon failure, errno set with additional error information
+  @return     This routine returns zero (0) if successful or -1 when an error occurs.
+              In the case of an error, ::errno contains more details.
 
 **/
 int

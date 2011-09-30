@@ -1,0 +1,322 @@
+/** @file
+  SocketDxe support routines
+
+  Copyright (c) 2011, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#include "Socket.h"
+
+
+/**
+  Creates a child handle and installs gEfiSocketProtocolGuid.
+
+  This routine creates a child handle for the socket driver and
+  installs the ::gEfiSocketProtocolGuid on that handle with a pointer
+  to the ::EFI_SOCKET_PROTOCOL structure address.
+
+  This routine is called by ::EslServiceGetProtocol in UseSocketDxe
+  when the socket application is linked with UseSocketDxe.
+
+  @param [in] pThis        Address of the EFI_SERVICE_BINDING_PROTOCOL structure.
+  @param [in] pChildHandle Pointer to the handle of the child to create. If it is NULL,
+                           then a new handle is created. If it is a pointer to an existing UEFI handle, 
+                           then the protocol is added to the existing UEFI handle.
+
+  @retval EFI_SUCCESS           The protocol was added to ChildHandle.
+  @retval EFI_INVALID_PARAMETER ChildHandle is NULL.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources availabe to create
+                                the child
+  @retval other                 The child handle was not created
+
+**/
+EFI_STATUS
+EFIAPI
+EslDxeCreateChild (
+  IN     EFI_SERVICE_BINDING_PROTOCOL * pThis,
+  IN OUT EFI_HANDLE * pChildHandle
+  )
+{
+  ESL_SOCKET * pSocket;
+  EFI_STATUS Status;
+
+  DBG_ENTER ( );
+
+  //
+  //  Create a socket structure
+  //
+  Status = EslSocketAllocate ( pChildHandle,
+                               DEBUG_SOCKET,
+                               &pSocket );
+
+  //
+  //  Return the operation status
+  //
+  DBG_EXIT_STATUS ( Status );
+  return Status;
+}
+
+
+/**
+  Removes gEfiSocketProtocolGuid and destroys the child handle.
+
+  This routine uninstalls ::gEfiSocketProtocolGuid from the child handle
+  and destroys the child handle if necessary.
+
+  This routine is called from ???.
+  
+  @param [in] pThis       Address of the EFI_SERVICE_BINDING_PROTOCOL structure.
+  @param [in] ChildHandle Handle of the child to destroy
+
+  @retval EFI_SUCCESS           The protocol was removed from ChildHandle.
+  @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
+  @retval EFI_INVALID_PARAMETER Child handle is not a valid UEFI Handle.
+  @retval EFI_ACCESS_DENIED     The protocol could not be removed from the ChildHandle
+                                because its services are being used.
+  @retval other                 The child handle was not destroyed
+
+**/
+EFI_STATUS
+EFIAPI
+EslDxeDestroyChild (
+  IN EFI_SERVICE_BINDING_PROTOCOL * pThis,
+  IN EFI_HANDLE ChildHandle
+  )
+{
+  ESL_LAYER * pLayer;
+  ESL_SOCKET * pSocket;
+  ESL_SOCKET * pSocketPrevious;
+  EFI_SOCKET_PROTOCOL * pSocketProtocol;
+  EFI_STATUS Status;
+  EFI_TPL TplPrevious;
+
+  DBG_ENTER ( );
+
+  //
+  //  Locate the socket control structure
+  //
+  pLayer = &mEslLayer;
+  Status = gBS->OpenProtocol (
+                  ChildHandle,
+                  &gEfiSocketProtocolGuid,
+                  (VOID **)&pSocketProtocol,
+                  pLayer->ImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if ( !EFI_ERROR ( Status )) {
+    pSocket = SOCKET_FROM_PROTOCOL ( pSocketProtocol );
+
+    //
+    //  Synchronize with the socket layer
+    //
+    RAISE_TPL ( TplPrevious, TPL_SOCKETS );
+
+    //
+    //  Walk the socket list
+    //
+    pSocketPrevious = pLayer->pSocketList;
+    if ( NULL != pSocketPrevious ) {
+      if ( pSocket == pSocketPrevious ) {
+        //
+        //  Remove the socket from the head of the list
+        //
+        pLayer->pSocketList = pSocket->pNext;
+      }
+      else {
+        //
+        //  Find the socket in the middle of the list
+        //
+        while (( NULL != pSocketPrevious )
+          && ( pSocket != pSocketPrevious->pNext )) {
+          //
+          //  Set the next socket
+          //
+          pSocketPrevious = pSocketPrevious->pNext;
+        }
+        if ( NULL != pSocketPrevious ) {
+          //
+          //  Remove the socket from the middle of the list
+          //
+          pSocketPrevious = pSocket->pNext;
+        }
+      }
+    }
+    else {
+      DEBUG (( DEBUG_ERROR | DEBUG_POOL,
+                "ERROR - Socket list is empty!\r\n" ));
+    }
+
+    //
+    //  Release the socket layer synchronization
+    //
+    RESTORE_TPL ( TplPrevious );
+
+    //
+    //  Determine if the socket was found
+    //
+    if ( NULL != pSocketPrevious ) {
+      pSocket->pNext = NULL;
+
+      //
+      //  Remove the socket protocol
+      //
+      Status = gBS->UninstallMultipleProtocolInterfaces (
+                ChildHandle,
+                &gEfiSocketProtocolGuid,
+                &pSocket->SocketProtocol,
+                NULL );
+      if ( !EFI_ERROR ( Status )) {
+        DEBUG (( DEBUG_POOL | DEBUG_INFO,
+                    "Removed:   gEfiSocketProtocolGuid from 0x%08x\r\n",
+                    ChildHandle ));
+
+        //
+        //  Free the socket structure
+        //
+        Status = gBS->FreePool ( pSocket );
+        if ( !EFI_ERROR ( Status )) {
+          DEBUG (( DEBUG_POOL,
+                    "0x%08x: Free pSocket, %d bytes\r\n",
+                    pSocket,
+                    sizeof ( *pSocket )));
+        }
+        else {
+          DEBUG (( DEBUG_ERROR | DEBUG_POOL,
+                    "ERROR - Failed to free pSocket 0x%08x, Status: %r\r\n",
+                    pSocket,
+                    Status ));
+        }
+      }
+      else {
+        DEBUG (( DEBUG_ERROR | DEBUG_POOL | DEBUG_INFO,
+                    "ERROR - Failed to remove gEfiSocketProtocolGuid from 0x%08x, Status: %r\r\n",
+                    ChildHandle,
+                    Status ));
+      }
+    }
+    else {
+      DEBUG (( DEBUG_ERROR | DEBUG_INFO,
+                "ERROR - The socket was not in the socket list!\r\n" ));
+      Status = EFI_NOT_FOUND;
+    }
+  }
+  else {
+    DEBUG (( DEBUG_ERROR,
+              "ERROR - Failed to open socket protocol on 0x%08x, Status; %r\r\n",
+              ChildHandle,
+              Status ));
+  }
+
+  //
+  //  Return the operation status
+  //
+  DBG_EXIT_STATUS ( Status );
+  return Status;
+}
+
+
+/**
+Install the socket service
+
+This routine installs the ::gEfiSocketServiceBindingProtocolGuid
+on the SocketDxe image handle to announce the availability
+of the socket layer to the rest of EFI.
+
+SocketDxe's EntryPoint routine calls this routine to
+make the socket layer available.
+
+@param [in] pImageHandle      Address of the image handle
+
+@retval EFI_SUCCESS     Service installed successfully
+**/
+EFI_STATUS
+EFIAPI
+EslDxeInstall (
+  IN EFI_HANDLE * pImageHandle
+  )
+{
+  EFI_STATUS Status;
+
+  //
+  //  Install the socket service binding protocol
+  //
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  pImageHandle,
+                  &gEfiSocketServiceBindingProtocolGuid,
+                  mEslLayer.pServiceBinding,
+                  NULL
+                  );
+  if ( !EFI_ERROR ( Status )) {
+    DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
+              "Installed: gEfiSocketServiceBindingProtocolGuid on   0x%08x\r\n",
+              *pImageHandle ));
+  }
+  else {
+    DEBUG (( DEBUG_ERROR | DEBUG_POOL | DEBUG_INIT,
+              "ERROR - InstallMultipleProtocolInterfaces failed, Status: %r\r\n",
+              Status ));
+  }
+
+  //
+  //  Return the operation status
+  //
+  return Status;
+}
+
+
+/**
+Uninstall the socket service
+
+This routine removes the gEfiSocketServiceBindingProtocolGuid from
+the SocketDxe image handle to notify EFI that the socket layer
+is no longer available.
+
+SocketDxe's DriverUnload routine calls this routine to remove the
+socket layer.
+
+@param [in] ImageHandle       Handle for the image.
+
+@retval EFI_SUCCESS     Service installed successfully
+**/
+EFI_STATUS
+EFIAPI
+EslDxeUninstall (
+  IN EFI_HANDLE ImageHandle
+  )
+{
+  EFI_STATUS Status;
+
+  //
+  //  Install the socket service binding protocol
+  //
+  Status = gBS->UninstallMultipleProtocolInterfaces (
+              ImageHandle,
+              &gEfiSocketServiceBindingProtocolGuid,
+              mEslLayer.pServiceBinding,
+              NULL
+              );
+  if ( !EFI_ERROR ( Status )) {
+    DEBUG (( DEBUG_POOL | DEBUG_INIT,
+                "Removed:   gEfiSocketServiceBindingProtocolGuid from 0x%08x\r\n",
+                ImageHandle ));
+  }
+  else {
+    DEBUG (( DEBUG_ERROR | DEBUG_POOL | DEBUG_INIT,
+                "ERROR - Failed to remove gEfiSocketServiceBindingProtocolGuid from 0x%08x, Status: %r\r\n",
+                ImageHandle,
+                Status ));
+  }
+
+  //
+  //  Return the operation status
+  //
+  return Status;
+}

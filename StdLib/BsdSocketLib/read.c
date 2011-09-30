@@ -18,12 +18,18 @@
 /**
   Read support routine for sockets
 
+  The BslSocketRead routine is called indirectly by the read file
+  system routine.  This routine is typically used for SOCK_STREAM
+  because it waits for receive data from the target system specified
+  in the ::connect call.
+
   @param [in] pDescriptor   Descriptor address for the file
   @param [in] pOffset       File offset
   @param [in] LengthInBytes Number of bytes to read
   @param [in] pBuffer       Address of the buffer to receive the data
 
   @return   The number of bytes read or -1 if an error occurs.
+            In the case of an error, ::errno contains more details.
 
 **/
 ssize_t

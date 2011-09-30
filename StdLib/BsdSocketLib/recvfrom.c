@@ -18,8 +18,12 @@
 /**
   Receive data from a network connection and return the remote system's address.
 
-  The ::recvfrom routine waits for receive data from a remote network
-  connection.  The
+  The recvfrom routine waits for receive data from a remote network
+  connection.  This routine is typically called for SOCK_DGRAM sockets
+  when the socket is being shared by multiple remote systems and it is
+  important to get the remote system address for a response.
+
+  The
   <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/recv.html">POSIX</a>
   documentation is available online.
 
@@ -35,9 +39,9 @@
 
   @param [in] address_len Length of the remote network address structure
 
-  @return     ::recvfrom returns the number of valid bytes in the buffer,
+  @return     This routine returns the number of valid bytes in the buffer,
               zero if no data was received, and -1 when an error occurs.
-              In the case of an error, errno contains more details.
+              In the case of an error, ::errno contains more details.
 
  **/
 ssize_t

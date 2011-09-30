@@ -28,7 +28,9 @@
 #
 
 [Sources.common]
+  DxeSupport.c
   Init.c
+  Ip4.c
   Service.c
   Socket.c
   Tcp4.c
@@ -43,10 +45,13 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
+  MemoryAllocationLib
   UefiBootServicesTableLib
   UefiLib
 
 [Protocols]
+  gEfiIp4ProtocolGuid
+  gEfiIp4ServiceBindingProtocolGuid
   gEfiTcp4ProtocolGuid
   gEfiTcp4ServiceBindingProtocolGuid
   gEfiUdp4ProtocolGuid

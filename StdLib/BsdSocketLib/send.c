@@ -18,7 +18,10 @@
 /**
   Send data using a network connection.
 
-  The ::send routine queues data to the network for transmission.
+  The send routine queues data to the network for transmission.
+  This routine is typically used for SOCK_STREAM sockets where the target
+  system was specified in the ::connect call.
+
   The
   <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/send.html">POSIX</a>
   documentation is available online.
@@ -31,9 +34,9 @@
 
   @param [in] flags     Message control flags
 
-  @return     ::send returns the number of data bytes that were
+  @return     This routine returns the number of data bytes that were
               sent and -1 when an error occurs.  In the case of
-              an error, errno contains more details.
+              an error, ::errno contains more details.
 
  **/
 ssize_t

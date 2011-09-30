@@ -24,6 +24,7 @@
   @param [in] pBuffer       Address of the data
 
   @return   The number of bytes written or -1 if an error occurs.
+            In the case of an error, ::errno contains more details.
 
 **/
 ssize_t

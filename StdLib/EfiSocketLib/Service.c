@@ -14,15 +14,16 @@
 
 #include "Socket.h"
 
-EFI_TCP4_PROTOCOL * mpEfiTcpClose4 [ 1024 ];
-
 
 /**
   Connect to the network service bindings
 
   Walk the network service protocols on the controller handle and
-  locate any that are not in use.  Create service structures to
-  manage the service binding for the socket driver.
+  locate any that are not in use.  Create ::ESL_SERVICE structures to
+  manage the network layer interfaces for the socket driver.  Tag
+  each of the network interfaces that are being used.  Finally, this
+  routine calls ESL_SOCKET_BINDING::pfnInitialize to prepare the network
+  interface for use by the socket layer.
 
   @param [in] BindingHandle    Handle for protocol binding.
   @param [in] Controller       Handle of device to work with.
@@ -40,11 +41,13 @@ EslServiceConnect (
 {
   BOOLEAN bInUse;
   UINTN LengthInBytes;
-  CONST DT_SOCKET_BINDING * pEnd;
+  UINT8 * pBuffer;
+  CONST ESL_SOCKET_BINDING * pEnd;
   VOID * pJunk;
-  VOID * pInterface;
-  DT_SERVICE * pService;
-  CONST DT_SOCKET_BINDING * pSocketBinding;
+  ESL_SERVICE ** ppServiceListHead;
+  ESL_SERVICE * pService;
+  CONST ESL_SOCKET_BINDING * pSocketBinding;
+  EFI_SERVICE_BINDING_PROTOCOL * pServiceBinding;
   EFI_STATUS Status;
   EFI_TPL TplPrevious;
 
@@ -68,7 +71,7 @@ EslServiceConnect (
     Status = gBS->OpenProtocol (
                     Controller,
                     pSocketBinding->pNetworkBinding,
-                    &pInterface,
+                    (VOID**)&pServiceBinding,
                     BindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -108,7 +111,7 @@ EslServiceConnect (
           pService->Signature = SERVICE_SIGNATURE;
           pService->pSocketBinding = pSocketBinding;
           pService->Controller = Controller;
-          pService->pInterface = pInterface;
+          pService->pServiceBinding = pServiceBinding;
 
           //
           //  Mark the controller in use
@@ -154,9 +157,13 @@ EslServiceConnect (
               RAISE_TPL ( TplPrevious, TPL_SOCKETS );
 
               //
-              //  Initialize the service
+              //  Connect the service to the list
               //
-              Status = pSocketBinding->pfnInitialize ( pService );
+              pBuffer = (UINT8 *)&mEslLayer;
+              pBuffer = &pBuffer[ pSocketBinding->ServiceListOffset ];
+              ppServiceListHead = (ESL_SERVICE **)pBuffer;
+              pService->pNext = *ppServiceListHead;
+              *ppServiceListHead = pService;
 
               //
               //  Release the socket layer synchronization
@@ -253,12 +260,13 @@ EslServiceConnect (
 
 
 /**
-  Shutdown the network connections to this controller by removing
-  NetworkInterfaceIdentifier protocol and closing the DevicePath
-  and PciIo protocols on Controller.
+  Shutdown the connections to the network layer by locating the
+  tags on the network interfaces established by ::EslServiceConnect.
+  This routine shutdowns any activity on the network interface and
+  then frees the ::ESL_SERVICE structures.
 
   @param [in] BindingHandle    Handle for protocol binding.
-  @param [in] Controller           Handle of device to stop driver on.
+  @param [in] Controller       Handle of device to stop driver on.
 
   @retval EFI_SUCCESS          This driver is removed Controller.
   @retval EFI_DEVICE_ERROR     The device could not be stopped due to a device error.
@@ -272,9 +280,13 @@ EslServiceDisconnect (
   IN  EFI_HANDLE Controller
   )
 {
-  CONST DT_SOCKET_BINDING * pEnd;
-  DT_SERVICE * pService;
-  CONST DT_SOCKET_BINDING * pSocketBinding;
+  UINT8 * pBuffer;
+  CONST ESL_SOCKET_BINDING * pEnd;
+  ESL_PORT * pPort;
+  ESL_SERVICE * pPreviousService;
+  ESL_SERVICE * pService;
+  ESL_SERVICE ** ppServiceListHead;
+  CONST ESL_SOCKET_BINDING * pSocketBinding;
   EFI_STATUS Status;
   EFI_TPL TplPrevious;
   
@@ -310,9 +322,54 @@ EslServiceDisconnect (
       RAISE_TPL ( TplPrevious, TPL_SOCKETS );
 
       //
-      //  Shutdown the service
+      //  Walk the list of ports
       //
-      pSocketBinding->pfnShutdown ( pService );
+      pPort = pService->pPortList;
+      while ( NULL != pPort ) {
+        //
+        //  Remove the port from the port list
+        //
+        pPort->pService = NULL;
+        pService->pPortList = pPort->pLinkService;
+  
+        //
+        //  Close the port
+        //
+        EslSocketPortCloseStart ( pPort,
+                                  TRUE,
+                                  DEBUG_POOL | DEBUG_INIT );
+
+        //
+        //  Set the next port
+        //
+        pPort = pService->pPortList;
+      }
+    
+      //
+      //  Remove the service from the service list
+      //
+      pBuffer = (UINT8 *)&mEslLayer;
+      pBuffer = &pBuffer[ pService->pSocketBinding->ServiceListOffset ];
+      ppServiceListHead = (ESL_SERVICE **)pBuffer;
+      pPreviousService = *ppServiceListHead;
+      if ( pService == pPreviousService ) {
+        //
+        //  Remove the service from the beginning of the list
+        //
+        *ppServiceListHead = pService->pNext;
+      }
+      else {
+        //
+        //  Remove the service from the middle of the list
+        //
+        while ( NULL != pPreviousService ) {
+          if ( pService == pPreviousService->pNext ) {
+            pPreviousService->pNext = pService->pNext;
+            break;
+          }
+          pPreviousService = pPreviousService->pNext;
+        }
+      }
 
       //
       //  Release the socket layer synchronization
@@ -388,48 +445,6 @@ EslServiceDisconnect (
 
 
 /**
-Install the socket service
-
-@param [in] pImageHandle      Address of the image handle
-
-@retval EFI_SUCCESS     Service installed successfully
-**/
-EFI_STATUS
-EFIAPI
-EslServiceInstall (
-  IN EFI_HANDLE * pImageHandle
-  )
-{
-  EFI_STATUS Status;
-
-  //
-  //  Install the socket service binding protocol
-  //
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  pImageHandle,
-                  &gEfiSocketServiceBindingProtocolGuid,
-                  &mEslLayer.ServiceBinding,
-                  NULL
-                  );
-  if ( !EFI_ERROR ( Status )) {
-    DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
-              "Installed: gEfiSocketServiceBindingProtocolGuid on   0x%08x\r\n",
-              *pImageHandle ));
-  }
-  else {
-    DEBUG (( DEBUG_ERROR | DEBUG_POOL | DEBUG_INIT,
-              "ERROR - InstallMultipleProtocolInterfaces failed, Status: %r\r\n",
-              Status ));
-  }
-
-  //
-  //  Return the operation status
-  //
-  return Status;
-}
-
-
-/**
 Initialize the service layer
 
 @param [in] ImageHandle       Handle for the image.
@@ -441,69 +456,20 @@ EslServiceLoad (
   IN EFI_HANDLE ImageHandle
   )
 {
-  DT_LAYER * pLayer;
+  ESL_LAYER * pLayer;
 
   //
   //  Save the image handle
   //
   pLayer = &mEslLayer;
+  ZeroMem ( pLayer, sizeof ( *pLayer ));
   pLayer->Signature = LAYER_SIGNATURE;
   pLayer->ImageHandle = ImageHandle;
 
   //
-  //  Initialize the TCP4 close
-  //
-  pLayer->TcpCloseMax4 = DIM ( mpEfiTcpClose4 );
-  pLayer->ppTcpClose4 = mpEfiTcpClose4;
-
-  //
   //  Connect the service binding protocol to the image handle
   //
-  pLayer->ServiceBinding.CreateChild = EslSocketCreateChild;
-  pLayer->ServiceBinding.DestroyChild = EslSocketDestroyChild;
-}
-
-
-/**
-Uninstall the socket service
-
-@param [in] ImageHandle       Handle for the image.
-
-@retval EFI_SUCCESS     Service installed successfully
-**/
-EFI_STATUS
-EFIAPI
-EslServiceUninstall (
-  IN EFI_HANDLE ImageHandle
-  )
-{
-  EFI_STATUS Status;
-
-  //
-  //  Install the socket service binding protocol
-  //
-  Status = gBS->UninstallMultipleProtocolInterfaces (
-              ImageHandle,
-              &gEfiSocketServiceBindingProtocolGuid,
-              &mEslLayer.ServiceBinding,
-              NULL
-              );
-  if ( !EFI_ERROR ( Status )) {
-    DEBUG (( DEBUG_POOL | DEBUG_INIT,
-                "Removed:   gEfiSocketServiceBindingProtocolGuid from 0x%08x\r\n",
-                ImageHandle ));
-  }
-  else {
-    DEBUG (( DEBUG_ERROR | DEBUG_POOL | DEBUG_INIT,
-                "ERROR - Failed to remove gEfiSocketServiceBindingProtocolGuid from 0x%08x, Status: %r\r\n",
-                ImageHandle,
-                Status ));
-  }
-
-  //
-  //  Return the operation status
-  //
-  return Status;
+  pLayer->pServiceBinding = &mEfiServiceBinding;
 }
 
 
@@ -517,13 +483,12 @@ EslServiceUnload (
   VOID
   )
 {
-  DT_LAYER * pLayer;
+  ESL_LAYER * pLayer;
 
   //
   //  Undo the work by ServiceLoad
   //
   pLayer = &mEslLayer;
   pLayer->ImageHandle = NULL;
-  pLayer->ServiceBinding.CreateChild = NULL;
-  pLayer->ServiceBinding.DestroyChild = NULL;
+  pLayer->pServiceBinding = NULL;
 }

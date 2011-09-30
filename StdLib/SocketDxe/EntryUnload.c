@@ -15,14 +15,31 @@
 #include "Socket.h"
 
 
-CONST EFI_GUID mEslRawServiceGuid = {
-    0xf9f5d280, 0x8a4b, 0x48e2, { 0x96, 0x28, 0xda, 0xfa, 0xa7, 0x70, 0x54, 0x5d }
+/**
+  The following GUID values are only used by the SocketDxe driver.  An
+  alternative set of values exists in EfiSocketLib\UseEfiSocketLib.c
+  which an application uses when it links against EfiSocketLib.  These
+  two sets of values allow the SocketDxe driver to coexist with socket
+  applications.
+
+  Tag GUID - IPv4 in use by SocketDxe
+**/
+CONST EFI_GUID mEslIp4ServiceGuid = {
+  0x4e3a82e6, 0xe43f, 0x460a, { 0x86, 0x6e, 0x9b, 0x5a, 0xab, 0x80, 0x44, 0x48 }
 };
 
+
+/**
+  Tag GUID - TCPv4 in use by SocketDxe
+**/
 CONST EFI_GUID mEslTcp4ServiceGuid = {
     0x4dcaab0a, 0x1990, 0x4352, { 0x8d, 0x2f, 0x2d, 0x8f, 0x13, 0x55, 0x98, 0xa5 }
 };
 
+
+/**
+  Tag GUID - UDPv4 in use by SocketDxe
+**/
 CONST EFI_GUID mEslUdp4ServiceGuid = {
     0x43a110ce, 0x9ccd, 0x402b, { 0x8c, 0x29, 0x4a, 0x6d, 0x8a, 0xf7, 0x79, 0x90 }
 };
@@ -98,7 +115,7 @@ DriverUnload (
       //
       Max = BufferSize / sizeof ( pHandle[ 0 ]);
       for ( Index = 0; Max > Index; Index++ ) {
-        Status = DriverStop ( &gDriverBinding,
+        Status = DriverStop ( &mDriverBinding,
                               pHandle[ Index ],
                               0,
                               NULL );
@@ -131,7 +148,7 @@ DriverUnload (
   //  Done with the socket layer
   //
   if ( !EFI_ERROR ( Status )) {
-    Status = EslServiceUninstall ( ImageHandle );
+    Status = EslDxeUninstall ( ImageHandle );
     if ( !EFI_ERROR ( Status )) {
       //
       //  Remove the protocols installed by the EntryPoint routine.
@@ -139,11 +156,11 @@ DriverUnload (
       Status = gBS->UninstallMultipleProtocolInterfaces (
                   ImageHandle,
                   &gEfiDriverBindingProtocolGuid,
-                  &gDriverBinding,
+                  &mDriverBinding,
                   &gEfiComponentNameProtocolGuid,
-                  &gComponentName,
+                  &mComponentName,
                   &gEfiComponentName2ProtocolGuid,
-                  &gComponentName2,
+                  &mComponentName2,
                   NULL
                   );
       if ( !EFI_ERROR ( Status )) {
@@ -225,10 +242,10 @@ EntryPoint (
     Status = EfiLibInstallDriverBindingComponentName2 (
                ImageHandle,
                pSystemTable,
-               &gDriverBinding,
+               &mDriverBinding,
                ImageHandle,
-               &gComponentName,
-               &gComponentName2
+               &mComponentName,
+               &mComponentName2
                );
     if ( !EFI_ERROR ( Status )) {
       DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
@@ -250,7 +267,7 @@ EntryPoint (
       //  Make the socket serivces available to other drivers
       //  and applications
       //
-      Status = EslServiceInstall ( &ImageHandle );
+      Status = EslDxeInstall ( &ImageHandle );
       if ( EFI_ERROR ( Status )) {
         //
         //  Disconnect from the network
@@ -263,11 +280,11 @@ EntryPoint (
         gBS->UninstallMultipleProtocolInterfaces (
                 ImageHandle,
                 &gEfiDriverBindingProtocolGuid,
-                &gDriverBinding,
+                &mDriverBinding,
                 &gEfiComponentNameProtocolGuid,
-                &gComponentName,
+                &mComponentName,
                 &gEfiComponentName2ProtocolGuid,
-                &gComponentName2,
+                &mComponentName2,
                 NULL
                 );
         DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
@@ -292,5 +309,19 @@ EntryPoint (
 }
 
 
-PFN_ESL_xSTRUCTOR mpfnEslConstructor = NULL;
-PFN_ESL_xSTRUCTOR mpfnEslDestructor = NULL;
+/**
+  Socket layer's service binding protocol delcaration.
+**/
+CONST EFI_SERVICE_BINDING_PROTOCOL mEfiServiceBinding = {
+  EslDxeCreateChild,
+  EslDxeDestroyChild
+};
+
+
+/**
+  The following entries disable the constructor and destructor
+  for the SocketDxe driver.  Note that socket applications linking
+  against EfiSocketLib use different redirection.
+**/
+PFN_ESL_xSTRUCTOR mpfnEslConstructor = NULL;  ///<  No EfiSocketLib constructor needed for SocketDxe
+PFN_ESL_xSTRUCTOR mpfnEslDestructor = NULL;   ///<  No EfiSocketLib destructor needed for SocketDxe

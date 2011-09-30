@@ -18,11 +18,8 @@
 /**
   Connect to a remote system via the network.
 
-  The ::connect routine attempts to establish a connection to a
+  The connect routine attempts to establish a connection to a
   socket on the local or remote system using the specified address.
-  The
-  <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/connect.html">POSIX</a>
-  documentation is available online.
 
   There are three states associated with a connection:
   <ul>
@@ -30,23 +27,27 @@
     <li>Connection in progress</li>
     <li>Connected</li>
   </ul>
-  In the "Not connected" state, calls to ::connect start the connection
+  In the initial "Not connected" state, calls to connect start the connection
   processing and update the state to "Connection in progress".  During
   the "Connection in progress" state, connect polls for connection completion
   and moves the state to "Connected" after the connection is established.
   Note that these states are only visible when the file descriptor is marked
-  with O_NONBLOCK.  Also, the POLL_WRITE bit is set when the connection
+  with O_NONBLOCK.  Also, the POLLOUT bit is set when the connection
   completes and may be used by poll or select as an indicator to call
   connect again.
 
+  The
+  <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/connect.html">POSIX</a>
+  documentation is available online.
+  
   @param [in] s         Socket file descriptor returned from ::socket.
 
   @param [in] address   Network address of the remote system
 
   @param [in] address_len Length of the remote network address
 
-  @return     ::connect returns zero if successful and -1 when an error occurs.
-              In the case of an error, errno contains more details.
+  @return     This routine returns zero if successful and -1 when an error occurs.
+              In the case of an error, ::errno contains more details.
 
  **/
 int
@@ -70,9 +71,9 @@ connect (
                                             &errno );
   if ( NULL != pSocketProtocol ) {
     //
-    // TODO: Check for NON_BLOCKING
+    //  Determine if the operation is blocking
     //
-    bBlocking = TRUE;
+    bBlocking = (BOOLEAN)( 0 == ( pDescriptor->Oflags & O_NONBLOCK ));
 
     //
     //  Attempt to connect to a remote system

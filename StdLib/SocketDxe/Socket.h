@@ -23,9 +23,9 @@
 // Protocol Declarations
 //------------------------------------------------------------------------------
 
-extern EFI_COMPONENT_NAME_PROTOCOL gComponentName;    ///<  Component name protocol declaration
-extern EFI_COMPONENT_NAME2_PROTOCOL gComponentName2;  ///<  Component name 2 protocol declaration
-extern EFI_DRIVER_BINDING_PROTOCOL gDriverBinding;    ///<  Driver binding protocol declaration
+extern EFI_COMPONENT_NAME_PROTOCOL mComponentName;    ///<  Component name protocol declaration
+extern EFI_COMPONENT_NAME2_PROTOCOL mComponentName2;  ///<  Component name 2 protocol declaration
+extern EFI_DRIVER_BINDING_PROTOCOL mDriverBinding;    ///<  Driver binding protocol declaration
 extern EFI_SERVICE_BINDING_PROTOCOL mServiceBinding;  ///<  Service binding protocol delcaration
 
 //------------------------------------------------------------------------------

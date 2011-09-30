@@ -57,7 +57,7 @@
                             address for the file
   @param [in] pErrno        Address of the errno variable
 
-  @return   A pointer to the socket protocol structure or NULL if
+  @return   A pointer to the EFI_SOCKET_PROTOCOL structure or NULL if
             an invalid file descriptor was passed in.
 
  **/
@@ -71,13 +71,17 @@ BslFdToSocketProtocol (
 /**
   Close the socket
 
-  @param [in] pDescriptor Descriptor address for the file
+  The BslSocketClose routine is called indirectly from the close file
+  system routine.  This routine closes the socket and returns the
+  status to the caller.
+
+  @param[in] pDescriptor Descriptor address for the file
 
   @return   This routine returns 0 upon success and -1 upon failure.
-            In the case of failure, errno contains more information.
+            In the case of failure, ::errno contains more information.
 
 **/
-INT32
+int
 BslSocketClose (
   struct __filedes * pDescriptor
   );
@@ -85,9 +89,9 @@ BslSocketClose (
 /**
   Worker routine to close the socket.
 
-  @param [in] pSocketProtocol   Socket protocol structure address
+  @param[in] pSocketProtocol   Socket protocol structure address
 
-  @param [in] pErrno            Address of the errno variable
+  @param[in] pErrno            Address of the ::errno variable
 
   @retval EFI_SUCCESS   Successfully closed the socket
 
@@ -133,12 +137,18 @@ BslSocketProtocolToFd (
 /**
   Read support routine for sockets
 
+  The BslSocketRead routine is called indirectly by the read file
+  system routine.  This routine is typically used for SOCK_STREAM
+  because it waits for receive data from the target system specified
+  in the ::connect call.
+
   @param [in] pDescriptor   Descriptor address for the file
   @param [in] pOffset       File offset
   @param [in] LengthInBytes Number of bytes to read
   @param [in] pBuffer       Address of the buffer to receive the data
 
   @return   The number of bytes read or -1 if an error occurs.
+            In the case of an error, ::errno contains more details.
 
 **/
 ssize_t
@@ -158,6 +168,7 @@ BslSocketRead (
   @param [in] pBuffer       Address of the data
 
   @return   The number of bytes written or -1 if an error occurs.
+            In the case of an error, ::errno contains more details.
 
 **/
 ssize_t
@@ -175,7 +186,7 @@ BslSocketWrite (
 
   @param [in] pErrno      Address of the errno variable
 
-  @return   A pointer to the socket protocol structure or NULL if
+  @return   A pointer to the EFI_SOCKET_PROTOCOL structure or NULL if
             an invalid file descriptor was passed in.
 
  **/

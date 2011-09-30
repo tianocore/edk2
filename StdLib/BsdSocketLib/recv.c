@@ -18,8 +18,12 @@
 /**
   Receive data from a network connection.
 
-  The ::recv routine waits for receive data from a remote network
-  connection.  The
+  The recv routine waits for receive data from a remote network
+  connection.  This routine is typically used for SOCK_STREAM
+  because it waits for receive data from the target system specified
+  in the ::connect call.
+
+  The
   <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/recv.html">POSIX</a>
   documentation is available online.
 
@@ -31,9 +35,9 @@
 
   @param [in] flags     Message control flags
 
-  @return     ::recv returns the number of valid bytes in the buffer,
+  @return     This routine returns the number of valid bytes in the buffer,
               zero if no data was received, and -1 when an error occurs.
-              In the case of an error, errno contains more details.
+              In the case of an error, ::errno contains more details.
 
  **/
 ssize_t

@@ -767,7 +767,7 @@ read_len:
             errno = 0;
             fromlen = sizeof(struct sockaddr_in);
             resplen = (int)recvfrom(s, (char*)ans, anssiz, 0,
-                       (struct sockaddr *)&from, &fromlen);
+                       (struct sockaddr *)&from, (socklen_t *)&fromlen);
             if (resplen <= 0) {
                 Perror(stderr, "recvfrom", errno);
                 res_close();

@@ -18,14 +18,18 @@
 /**
   Set the socket options
 
+  The
+  <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/setsockopt.html">POSIX</a>
+  documentation is available online.
+
   @param [in] s               Socket file descriptor returned from ::socket.
   @param [in] level           Option protocol level
   @param [in] option_name     Name of the option
   @param [in] option_value    Buffer containing the option value
   @param [in] option_len      Length of the value in bytes
 
-  @retval   Zero (0) upon success
-  @retval   Minus one (-1) upon failure, errno set with additional error information
+  @return   This routine returns zero (0) upon success and -1 when an error occurs.
+            In the case of an error, ::errno contains more details.
 
 **/
 int

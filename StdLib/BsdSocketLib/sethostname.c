@@ -97,7 +97,7 @@ Returns:
     //  Create a zero terminated string for name
     //
     memcpy ( pName, name, namelen );
-    pName [ namelen ] = 0;
+    pName[ namelen ] = 0;
   
     //
     //  Set the environment variable

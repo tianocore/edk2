@@ -27,6 +27,9 @@
 //  Data Types
 //------------------------------------------------------------------------------
 
+/**
+EfiSocketLib (SocketDxe) interface 
+**/
 typedef struct _EFI_SOCKET_PROTOCOL EFI_SOCKET_PROTOCOL;
 
 /**
@@ -45,11 +48,11 @@ EFI_STATUS
 // Data
 //------------------------------------------------------------------------------
 
-extern PFN_ESL_xSTRUCTOR mpfnEslConstructor;
-extern PFN_ESL_xSTRUCTOR mpfnEslDestructor;
+extern PFN_ESL_xSTRUCTOR mpfnEslConstructor;  ///<  Constructor address for EslSocketLib
+extern PFN_ESL_xSTRUCTOR mpfnEslDestructor;   ///<  Destructor address for EslSocketLib
 
-extern EFI_GUID  gEfiSocketProtocolGuid;
-extern EFI_GUID  gEfiSocketServiceBindingProtocolGuid;
+extern EFI_GUID  gEfiSocketProtocolGuid;      ///<  Socket protocol GUID
+extern EFI_GUID  gEfiSocketServiceBindingProtocolGuid;  ///<  Socket layer service binding protocol GUID
 
 //------------------------------------------------------------------------------
 //  Socket API
@@ -58,11 +61,16 @@ extern EFI_GUID  gEfiSocketServiceBindingProtocolGuid;
 /**
   Accept a network connection.
 
-  The SocketAccept routine waits for a network connection to the socket.
-  It is able to return the remote network address to the caller if
-  requested.
+  This routine calls the network specific layer to remove the next
+  connection from the FIFO.
 
-  @param [in] pSocketProtocol Address of the socket protocol structure.
+  The ::accept calls this routine to poll for a network
+  connection to the socket.  When a connection is available
+  this routine returns the ::EFI_SOCKET_PROTOCOL structure address
+  associated with the new socket and the remote network address
+  if requested.
+
+  @param [in] pSocketProtocol Address of the ::EFI_SOCKET_PROTOCOL structure.
 
   @param [in] pSockAddr       Address of a buffer to receive the remote
                               network address.
@@ -71,8 +79,9 @@ extern EFI_GUID  gEfiSocketServiceBindingProtocolGuid;
                                     On output specifies the length of the
                                     remote network address.
 
-  @param [out] ppSocketProtocol Address of a buffer to receive the socket protocol
-                                instance associated with the new socket.
+  @param [out] ppSocketProtocol Address of a buffer to receive the
+                                ::EFI_SOCKET_PROTOCOL instance
+                                associated with the new socket.
 
   @param [out] pErrno   Address to receive the errno value upon completion.
 
@@ -93,11 +102,13 @@ EFI_STATUS
 /**
   Bind a name to a socket.
 
-  The ::SocketBind routine connects a name to a socket on the local machine.  The
-  <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/bind.html">POSIX</a>
-  documentation for the bind routine is available online for reference.
+  This routine calls the network specific layer to save the network
+  address of the local connection point.
 
-  @param [in] pSocketProtocol Address of the socket protocol structure.
+  The ::bind routine calls this routine to connect a name
+  (network address and port) to a socket on the local machine.
+
+  @param [in] pSocketProtocol Address of the ::EFI_SOCKET_PROTOCOL structure.
 
   @param [in] pSockAddr Address of a sockaddr structure that contains the
                         connection point on the local machine.  An IPv4 address
@@ -128,9 +139,14 @@ EFI_STATUS
 /**
   Determine if the socket is closed
 
-  Reverses the operations of the ::SocketAllocate() routine.
+  This routine checks the state of the socket to determine if
+  the network specific layer has completed the close operation.
 
-  @param [in] pSocketProtocol Address of the socket protocol structure.
+  The ::close routine polls this routine to determine when the
+  close operation is complete.  The close operation needs to
+  reverse the operations of the ::EslSocketAllocate routine.
+
+  @param [in] pSocketProtocol Address of the ::EFI_SOCKET_PROTOCOL structure.
   @param [out] pErrno         Address to receive the errno value upon completion.
 
   @retval EFI_SUCCESS     Socket successfully closed
@@ -149,11 +165,19 @@ EFI_STATUS
 /**
   Start the close operation on the socket
 
-  Start closing the socket by closing all of the ports.  Upon
-  completion, the ::pfnClosePoll() routine finishes closing the
-  socket.
+  This routine calls the network specific layer to initiate the
+  close state machine.  This routine then calls the network
+  specific layer to determine if the close state machine has gone
+  to completion.  The result from this poll is returned to the
+  caller.
 
-  @param [in] pSocketProtocol Address of the socket protocol structure.
+  The ::close routine calls this routine to start the close
+  operation which reverses the operations of the
+  ::EslSocketAllocate routine.  The close routine then polls
+  the ::EslSocketClosePoll routine to determine when the
+  socket is closed.
+
+  @param [in] pSocketProtocol Address of the ::EFI_SOCKET_PROTOCOL structure.
   @param [in] bCloseNow       Boolean to control close behavior
   @param [out] pErrno         Address to receive the errno value upon completion.
 
@@ -174,35 +198,23 @@ EFI_STATUS
 /**
   Connect to a remote system via the network.
 
-  The ::Connect routine attempts to establish a connection to a
-  socket on the local or remote system using the specified address.
-  The
-  <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/connect.html">POSIX</a>
-  documentation is available online.
+  This routine calls the network specific layer to establish
+  the remote system address and establish the connection to
+  the remote system.
 
-  There are three states associated with a connection:
-  <ul>
-    <li>Not connected</li>
-    <li>Connection in progress</li>
-    <li>Connected</li>
-  </ul>
-  In the "Not connected" state, calls to ::connect start the connection
-  processing and update the state to "Connection in progress".  During
-  the "Connection in progress" state, connect polls for connection completion
-  and moves the state to "Connected" after the connection is established.
-  Note that these states are only visible when the file descriptor is marked
-  with O_NONBLOCK.  Also, the POLL_WRITE bit is set when the connection
-  completes and may be used by poll or select as an indicator to call
-  connect again.
-
-  @param [in] pSocketProtocol Address of the socket protocol structure.
+  The ::connect routine calls this routine to establish a
+  connection with the specified remote system.  This routine
+  is designed to be polled by the connect routine for completion
+  of the network connection.
+  
+  @param [in] pSocketProtocol Address of the ::EFI_SOCKET_PROTOCOL structure.
 
   @param [in] pSockAddr       Network address of the remote system.
-
+    
   @param [in] SockAddrLength  Length in bytes of the network address.
-
+  
   @param [out] pErrno   Address to receive the errno value upon completion.
-
+  
   @retval EFI_SUCCESS   The connection was successfully established.
   @retval EFI_NOT_READY The connection is in progress, call this routine again.
   @retval Others        The connection attempt failed.
@@ -220,8 +232,14 @@ EFI_STATUS
 /**
   Get the local address.
 
-  @param [in] pSocketProtocol Address of the socket protocol structure.
+  This routine calls the network specific layer to get the network
+  address of the local host connection point.
 
+  The ::getsockname routine calls this routine to obtain the network
+  address associated with the local host connection point.
+
+  @param [in] pSocketProtocol Address of the ::EFI_SOCKET_PROTOCOL structure.
+  
   @param [out] pAddress       Network address to receive the local system address
 
   @param [in,out] pAddressLength  Length of the local network address structure
@@ -243,8 +261,14 @@ EFI_STATUS
 /**
   Get the peer address.
 
-  @param [in] pSocketProtocol Address of the socket protocol structure.
+  This routine calls the network specific layer to get the remote
+  system connection point.
 
+  The ::getpeername routine calls this routine to obtain the network
+  address of the remote connection point.
+
+  @param [in] pSocketProtocol Address of the ::EFI_SOCKET_PROTOCOL structure.
+  
   @param [out] pAddress       Network address to receive the remote system address
 
   @param [in,out] pAddressLength  Length of the remote network address structure
@@ -266,12 +290,16 @@ EFI_STATUS
 /**
   Establish the known port to listen for network connections.
 
-  The ::SocketAisten routine places the port into a state that enables connection
-  attempts.  Connections are placed into FIFO order in a queue to be serviced
-  by the application.  The application calls the ::SocketAccept routine to remove
-  the next connection from the queue and get the associated socket.  The
-  <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/listen.html">POSIX</a>
-  documentation for the bind routine is available online for reference.
+  This routine calls into the network protocol layer to establish
+  a handler that is called upon connection completion.  The handler
+  is responsible for inserting the connection into the FIFO.
+
+  The ::listen routine indirectly calls this routine to place the
+  socket into a state that enables connection attempts.  Connections
+  are placed in a FIFO that is serviced by the application.  The
+  application calls the ::accept (::EslSocketAccept) routine to
+  remove the next connection from the FIFO and get the associated
+  socket and address.
 
   @param [in] pSocketProtocol Address of the socket protocol structure.
 
@@ -297,11 +325,13 @@ EFI_STATUS
 /**
   Get the socket options
 
-  Retrieve the socket options one at a time by name.  The
-  <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/getsockopt.html">POSIX</a>
-  documentation is available online.
+  This routine handles the socket level options and passes the
+  others to the network specific layer.
 
-  @param [in] pSocketProtocol   Address of the socket protocol structure.
+  The ::getsockopt routine calls this routine to retrieve the
+  socket options one at a time by name.
+
+  @param [in] pSocketProtocol   Address of the ::EFI_SOCKET_PROTOCOL structure.
   @param [in] level             Option protocol level
   @param [in] OptionName        Name of the option
   @param [out] pOptionValue     Buffer to receive the option value
@@ -326,18 +356,20 @@ EFI_STATUS
 /**
   Set the socket options
 
-  Adjust the socket options one at a time by name.  The
-  <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/setsockopt.html">POSIX</a>
-  documentation is available online.
+  This routine handles the socket level options and passes the
+  others to the network specific layer.
 
-  @param [in] pSocketProtocol Address of the socket protocol structure.
+  The ::setsockopt routine calls this routine to adjust the socket
+  options one at a time by name.
+
+  @param [in] pSocketProtocol Address of the ::EFI_SOCKET_PROTOCOL structure.
   @param [in] level           Option protocol level
   @param [in] OptionName      Name of the option
   @param [in] pOptionValue    Buffer containing the option value
   @param [in] OptionLength    Length of the buffer in bytes
   @param [out] pErrno         Address to receive the errno value upon completion.
 
-  @retval EFI_SUCCESS - Socket data successfully received
+  @retval EFI_SUCCESS - Option successfully set
 
  **/
 typedef
@@ -354,10 +386,14 @@ EFI_STATUS
 /**
   Poll a socket for pending activity.
 
-  The SocketPoll routine checks a socket for pending activity associated
-  with the event mask.  Activity is returned in the detected event buffer.
+  This routine builds a detected event mask which is returned to
+  the caller in the buffer provided.
 
-  @param [in] pSocketProtocol Address of the socket protocol structure.
+  The ::poll routine calls this routine to determine if the socket
+  needs to be serviced as a result of connection, error, receive or
+  transmit activity.
+
+  @param [in] pSocketProtocol Address of the ::EFI_SOCKET_PROTOCOL structure.
 
   @param [in] Events    Events of interest for this socket
 
@@ -381,19 +417,22 @@ EFI_STATUS
 /**
   Receive data from a network connection.
 
-  The ::recv routine waits for receive data from a remote network
-  connection.  The
-  <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/recv.html">POSIX</a>
-  documentation is available online.
+  This routine calls the network specific routine to remove the
+  next portion of data from the receive queue and return it to the
+  caller.
 
-  @param [in] pSocketProtocol Address of the socket protocol structure.
+  The ::recvfrom routine calls this routine to determine if any data
+  is received from the remote system.  Note that the other routines
+  ::recv and ::read are layered on top of ::recvfrom.
 
+  @param [in] pSocketProtocol Address of the ::EFI_SOCKET_PROTOCOL structure.
+  
   @param [in] Flags           Message control flags
-
+  
   @param [in] BufferLength    Length of the the buffer
-
+  
   @param [in] pBuffer         Address of a buffer to receive the data.
-
+  
   @param [in] pDataLength     Number of received data bytes in the buffer.
 
   @param [out] pAddress       Network address to receive the remote system address
@@ -419,53 +458,18 @@ EFI_STATUS
   );
 
 /**
-  Send data using a network connection.
-
-  The SocketTransmit routine queues the data for transmission to the
-  remote network connection.
-
-  @param [in] pSocketProtocol Address of the socket protocol structure.
-
-  @param [in] Flags           Message control flags
-
-  @param [in] BufferLength    Length of the the buffer
-
-  @param [in] pBuffer         Address of a buffer containing the data to send
-
-  @param [in] pDataLength     Address to receive the number of data bytes sent
-
-  @param [in] pAddress        Network address of the remote system address
-
-  @param [in] AddressLength   Length of the remote network address structure
-
-  @param [out] pErrno         Address to receive the errno value upon completion.
-
-  @retval EFI_SUCCESS - Socket data successfully queued for transmission
-
- **/
-typedef
-EFI_STATUS
-(* PFN_SEND) (
-  IN EFI_SOCKET_PROTOCOL * pSocketProtocol,
-  IN int Flags,
-  IN size_t BufferLength,
-  IN CONST UINT8 * pBuffer,
-  OUT size_t * pDataLength,
-  IN const struct sockaddr * pAddress,
-  IN socklen_t AddressLength,
-  IN int * pErrno
-  );
-
-/**
   Shutdown the socket receive and transmit operations
 
-  The SocketShutdown routine stops the socket receive and transmit
-  operations.
+  This routine sets a flag to stop future transmissions and calls
+  the network specific layer to cancel the pending receive operation.
 
-  @param [in] pSocketProtocol Address of the socket protocol structure.
+  The ::shutdown routine calls this routine to stop receive and transmit
+  operations on the socket.
 
+  @param [in] pSocketProtocol Address of the ::EFI_SOCKET_PROTOCOL structure.
+  
   @param [in] How             Which operations to stop
-
+  
   @param [out] pErrno         Address to receive the errno value upon completion.
 
   @retval EFI_SUCCESS - Socket operations successfully shutdown
@@ -482,40 +486,18 @@ EFI_STATUS
 /**
   Initialize an endpoint for network communication.
 
-  The ::Socket routine initializes the communication endpoint by providing
-  the support for the socket library function ::socket.  The
-  <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/socket.html">POSIX</a>
-  documentation for the socket routine is available online for reference.
+  This routine initializes the communication endpoint.
+
+  The ::socket routine calls this routine indirectly to create
+  the communication endpoint.
 
   @param [in] pSocketProtocol Address of the socket protocol structure.
-
   @param [in] domain    Select the family of protocols for the client or server
-                        application.
-
-  @param [in] type      Specifies how to make the network connection.  The following values
-                        are supported:
-                        <ul>
-                          <li>
-                            SOCK_STREAM - Connect to TCP, provides a byte stream
-                            that is manipluated by read, recv, send and write.
-                          </li>
-                          <li>
-                            SOCK_SEQPACKET - Connect to TCP, provides sequenced packet stream
-                            that is manipulated by read, recv, send and write.
-                          </li>
-                          <li>
-                            SOCK_DGRAM - Connect to UDP, provides a datagram service that is
-                            manipulated by recvfrom and sendto.
-                          </li>
-                        </ul>
-
-  @param [in] protocol  Specifies the lower layer protocol to use.  The following
-                        values are supported:
-                        <ul>
-                          <li>IPPROTO_TCP</li> - This value must be combined with SOCK_STREAM.</li>
-                          <li>IPPROTO_UDP</li> - This value must be combined with SOCK_DGRAM.</li>
-                        </ul>
-
+                        application.  See the ::socket documentation for values.
+  @param [in] type      Specifies how to make the network connection.
+                        See the ::socket documentation for values.
+  @param [in] protocol  Specifies the lower layer protocol to use.
+                        See the ::socket documentation for values.
   @param [out] pErrno   Address to receive the errno value upon completion.
 
   @retval EFI_SUCCESS - Socket successfully created
@@ -531,6 +513,50 @@ EFI_STATUS
   IN int domain,
   IN int type,
   IN int protocol,
+  IN int * pErrno
+  );
+
+/**
+  Send data using a network connection.
+
+  This routine calls the network specific layer to queue the data
+  for transmission.  Eventually the buffer will reach the head of
+  the queue and will get transmitted over the network.  For datagram
+  sockets there is no guarantee that the data reaches the application
+  running on the remote system.
+
+  The ::sendto routine calls this routine to send data to the remote
+  system.  Note that ::send and ::write are layered on top of ::sendto.
+
+  @param [in] pSocketProtocol Address of the ::EFI_SOCKET_PROTOCOL structure.
+  
+  @param [in] Flags           Message control flags
+  
+  @param [in] BufferLength    Length of the the buffer
+  
+  @param [in] pBuffer         Address of a buffer containing the data to send
+  
+  @param [in] pDataLength     Address to receive the number of data bytes sent
+
+  @param [in] pAddress        Network address of the remote system address
+
+  @param [in] AddressLength   Length of the remote network address structure
+
+  @param [out] pErrno         Address to receive the errno value upon completion.
+
+  @retval EFI_SUCCESS - Socket data successfully queued for transmit
+
+ **/
+typedef
+EFI_STATUS
+(* PFN_TRANSMIT) (
+  IN EFI_SOCKET_PROTOCOL * pSocketProtocol,
+  IN int Flags,
+  IN size_t BufferLength,
+  IN CONST UINT8 * pBuffer,
+  OUT size_t * pDataLength,
+  IN const struct sockaddr * pAddress,
+  IN socklen_t AddressLength,
   IN int * pErrno
   );
 
@@ -551,13 +577,13 @@ typedef struct _EFI_SOCKET_PROTOCOL {
   PFN_GET_LOCAL pfnGetLocal;      ///<  Get local address
   PFN_GET_PEER pfnGetPeer;        ///<  Get peer address
   PFN_LISTEN pfnListen;           ///<  Enable connection attempts on known port
-  PFN_POLL pfnPoll;               ///<  Poll for socket activity
   PFN_OPTION_GET pfnOptionGet;    ///<  Get socket options
   PFN_OPTION_SET pfnOptionSet;    ///<  Set socket options
+  PFN_POLL pfnPoll;               ///<  Poll for socket activity
   PFN_RECEIVE pfnReceive;         ///<  Receive data from a socket
-  PFN_SEND pfnSend;               ///<  Transmit data using the socket
   PFN_SHUTDOWN pfnShutdown;       ///<  Shutdown receive and transmit operations
   PFN_SOCKET pfnSocket;           ///<  Initialize the socket
+  PFN_TRANSMIT pfnTransmit;       ///<  Transmit data using the socket
 } GCC_EFI_SOCKET_PROTOCOL;
 
 //------------------------------------------------------------------------------
@@ -565,9 +591,7 @@ typedef struct _EFI_SOCKET_PROTOCOL {
 //------------------------------------------------------------------------------
 
 /**
-  Non blocking version of accept.
-
-  See ::accept
+  Non blocking version of ::accept.
 
   @param [in] s         Socket file descriptor returned from ::socket.
 
@@ -578,7 +602,7 @@ typedef struct _EFI_SOCKET_PROTOCOL {
                                 contains the length of the remote network address.
 
   @return     This routine returns zero if successful and -1 when an error occurs.
-              In the case of an error, errno contains more details.
+              In the case of an error, ::errno contains more details.
 
  **/
 int
@@ -589,12 +613,12 @@ AcceptNB (
   );
 
 /**
-  Connect to the socket driver
+  Connect to the EFI socket library
 
   @param [in] ppSocketProtocol  Address to receive the socket protocol address
 
-  @retval 0             Successfully returned the socket protocol
-  @retval other         Value for errno
+  @return       Value for ::errno, zero (0) indicates success.
+
  **/
 int
 EslServiceGetProtocol (

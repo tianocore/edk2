@@ -18,20 +18,23 @@
 /**
   Establish the known port to listen for network connections.
 
-  The ::listen routine places the port into a state that enables connection
+  The listen routine places the port into a state that enables connection
   attempts.  Connections are placed into FIFO order in a queue to be serviced
   by the application.  The application calls the ::accept routine to remove
-  the next connection from the queue and get the associated socket.  The
+  the next connection from the queue and get the associated socket.
+
+  The
   <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/listen.html">POSIX</a>
-  documentation for the bind routine is available online for reference.
+  documentation is available online.
 
   @param [in] s         Socket file descriptor returned from ::socket.
 
   @param [in] backlog   backlog specifies the maximum FIFO depth for the connections
-                        waiting for the application to call accept.  Connection attempts
+                        waiting for the application to call ::accept.  Connection attempts
                         received while the queue is full are refused.
 
-  @return     The listen routine returns zero (0) if successful and -1 upon failure.
+  @return     This routine returns zero (0) if successful or -1 when an error occurs.
+              In the case of an error, ::errno contains more details.
 
  **/
 int

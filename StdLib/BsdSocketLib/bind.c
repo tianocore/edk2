@@ -18,9 +18,11 @@
 /**
   Bind a name to a socket.
 
-  The ::bind routine connects a name to a socket on the local machine.  The
+  The bind routine connects a name (network address) to a socket on the local machine.
+
+  The
   <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/bind.html">POSIX</a>
-  documentation for the bind routine is available online for reference.
+  documentation is available online.
 
   @param[in] s         Socket file descriptor returned from ::socket.
 
@@ -37,6 +39,7 @@
   @param[in] namelen   Specifies the length in bytes of the sockaddr structure.
 
   @return     The bind routine returns zero (0) if successful and -1 upon failure.
+              In the case of an error, ::errno contains more information.
 
  **/
 int

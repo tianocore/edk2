@@ -23,12 +23,26 @@
 
 
 /**
-  Connect to the socket driver
+  Connect to the EFI socket library
 
-  @param [in] ppSocketProtocol  Address to receive the socket protocol address
+  This routine establishes a connection to the socket driver
+  and returns the API (::EFI_SOCKET_PROTOCOL address) to the
+  socket file system layer in BsdSocketLib.  This routine looks for
+  the gEfiSocketServiceBindingProtocolGuid to locate the socket
+  driver.  This routine then creates a child handle and locates
+  the gEfiSocketProtocolGuid protocol on that handle to get the
+  ::EFI_SOCKET_PROTOCOL structure address.
 
-  @retval 0             Successfully returned the socket protocol
-  @retval other         Value for errno
+  This routine is called from the ::socket routine in BsdSocketLib
+  to create the data structure and initialize the API for a socket.
+  Note that this implementation is only used by socket applications
+  that link directly to UseSocketDxe.
+
+  @param [in] ppSocketProtocol  Address to receive the ::EFI_SOCKET_PROTOCOL
+                                structure address
+
+  @return       Value for ::errno, zero (0) indicates success.
+
  **/
 int
 EslServiceGetProtocol (
@@ -148,7 +162,7 @@ EslServiceGetProtocol (
   }
   else {
     DEBUG (( DEBUG_ERROR,
-              "ERROR - No socket service binding protocol, Status: %r\r\n",
+              "ERROR - Socket driver not loaded, Status: %r\r\n",
               Status ));
     RetVal = ENODEV;
   }

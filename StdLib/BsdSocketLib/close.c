@@ -20,7 +20,7 @@
 
   @param[in] pSocketProtocol   Socket protocol structure address
 
-  @param[in] pErrno            Address of the errno variable
+  @param[in] pErrno            Address of the ::errno variable
 
   @retval EFI_SUCCESS   Successfully closed the socket
 
@@ -83,10 +83,14 @@ BslSocketCloseWork (
 /**
   Close the socket
 
+  The BslSocketClose routine is called indirectly from the close file
+  system routine.  This routine closes the socket and returns the
+  status to the caller.
+
   @param[in] pDescriptor Descriptor address for the file
 
   @return   This routine returns 0 upon success and -1 upon failure.
-            In the case of failure, errno contains more information.
+            In the case of failure, ::errno contains more information.
 
 **/
 int

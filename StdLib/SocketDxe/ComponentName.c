@@ -17,7 +17,7 @@
 /**
   EFI Component Name Protocol declaration
 **/
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  mComponentName = {
   GetDriverName,
   GetControllerName,
   "eng"
@@ -26,7 +26,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gComponentName = {
 /**
   EFI Component Name 2 Protocol declaration
 **/
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gComponentName2 = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL mComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) GetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) GetControllerName,
   "en"
@@ -91,7 +91,7 @@ GetDriverName (
              pThis->SupportedLanguages,
              mDriverNameTable,
              ppDriverName,
-             (BOOLEAN)(pThis == &gComponentName)
+             (BOOLEAN)(pThis == &mComponentName)
              );
   return Status;
 }

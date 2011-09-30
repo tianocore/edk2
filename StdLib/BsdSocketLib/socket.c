@@ -15,6 +15,12 @@
 #include <SocketInternals.h>
 
 
+/**
+  File system interface for the socket layer.
+
+  This data structure defines the routines for the various
+  file system functions associated with the socket layer.
+**/
 const struct fileops SocketOperations = {
   BslSocketClose,     //  close
   BslSocketRead,      //  read
@@ -47,7 +53,7 @@ const struct fileops SocketOperations = {
                             address for the file
   @param [in] pErrno        Address of the errno variable
 
-  @return   A pointer to the socket protocol structure or NULL if
+  @return   A pointer to the EFI_SOCKET_PROTOCOL structure or NULL if
             an invalid file descriptor was passed in.
 
  **/
@@ -79,7 +85,7 @@ BslFdToSocketProtocol (
     //
     //  Get the descriptor for the file
     //
-    pDescriptor = &gMD->fdarray [ s ];
+    pDescriptor = &gMD->fdarray[ s ];
 
     //
     //  Validate that the descriptor is associated with sockets
@@ -125,7 +131,7 @@ BslSocketProtocolToFd (
   //  Locate a file descriptor
   //
   FileDescriptor = FindFreeFD ( VALID_CLOSED );
-  if( FileDescriptor < 0 ) {
+  if ( FileDescriptor < 0 ) {
     //
     // All available FDs are in use
     //
@@ -135,7 +141,7 @@ BslSocketProtocolToFd (
     //
     //  Initialize the file descriptor
     //
-    pDescriptor = &gMD->fdarray [ FileDescriptor ];
+    pDescriptor = &gMD->fdarray[ FileDescriptor ];
     pDescriptor->f_offset = 0;
     pDescriptor->f_flag = 0;
     pDescriptor->f_iflags = DTYPE_SOCKET;
@@ -162,28 +168,33 @@ BslSocketProtocolToFd (
 /**
   Creates an endpoint for network communication.
 
-  The ::Socket routine initializes the communication endpoint by providing
-  the support for the socket library function ::socket.  The
+  The socket routine initializes the communication endpoint and returns a
+  file descriptor.
+
+  The
   <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/socket.html">POSIX</a>
-  documentation for the socket routine is available online for reference.
+  documentation is available online.
 
   @param [in] domain    Select the family of protocols for the client or server
-                        application.
+                        application.  The supported values are:
+                        <ul>
+                          <li>AF_INET - Version 4 UEFI network stack</li>
+                        </ul>
 
   @param [in] type      Specifies how to make the network connection.  The following values
                         are supported:
                         <ul>
                           <li>
+                            SOCK_DGRAM - Connect to UDP, provides a datagram service that is
+                            manipulated by recvfrom and sendto.
+                          </li>
+                          <li>
                             SOCK_STREAM - Connect to TCP, provides a byte stream
                             that is manipluated by read, recv, send and write.
                           </li>
                           <li>
-                            SOCK_SEQPACKET - Connect to TCP, provides sequenced packet stream
-                            that is manipulated by read, recv, send and write.
-                          </li>
-                          <li>
-                            SOCK_DGRAM - Connect to UDP, provides a datagram service that is
-                            manipulated by recvfrom and sendto.
+                            SOCK_RAW - Connect to IP, provides a datagram service that
+                            is manipulated by recvfrom and sendto.
                           </li>
                         </ul>
 
@@ -192,9 +203,14 @@ BslSocketProtocolToFd (
                         <ul>
                           <li>IPPROTO_TCP</li> - This value must be combined with SOCK_STREAM.</li>
                           <li>IPPROTO_UDP</li> - This value must be combined with SOCK_DGRAM.</li>
+                          <li>0 - 254</li> - An assigned
+                            <a href="http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xml">protocol number</a>
+                            is combined with SOCK_RAW.
+                          </li>
                         </ul>
 
-  @return  This routine returns a file descriptor for the socket.
+  @return  This routine returns a file descriptor for the socket.  If an error
+           occurs -1 is returned and ::errno contains more details.
 
  **/
 INT32
@@ -226,8 +242,7 @@ socket (
                                           type,
                                           protocol,
                                           &errno );
-    if ( !EFI_ERROR ( Status ))
-    {
+    if ( !EFI_ERROR ( Status )) {
       //
       //  Build the file descriptor for the socket
       //
@@ -250,7 +265,7 @@ socket (
 
   @param [in] pErrno      Address of the errno variable
 
-  @return   A pointer to the socket protocol structure or NULL if
+  @return   A pointer to the EFI_SOCKET_PROTOCOL structure or NULL if
             an invalid file descriptor was passed in.
 
  **/
