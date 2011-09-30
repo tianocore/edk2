@@ -2171,7 +2171,12 @@ BiosKeyboardSetState (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((*KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID) {
+  //
+  // Thunk keyboard driver doesn't support partial keystroke.
+  //
+  if ((*KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID ||
+      (*KeyToggleState & EFI_KEY_STATE_EXPOSED) == EFI_KEY_STATE_EXPOSED
+      ) {
     return EFI_UNSUPPORTED;
   }
 

@@ -89,7 +89,7 @@ typedef struct {
   BOOLEAN                             LeftAlt;
   BOOLEAN                             RightAlt;
   BOOLEAN                             LeftShift;
-  BOOLEAN                             RightShift;  
+  BOOLEAN                             RightShift;
   BOOLEAN                             LeftLogo;
   BOOLEAN                             RightLogo;
   BOOLEAN                             Menu;
@@ -99,6 +99,7 @@ typedef struct {
   BOOLEAN                             NumLock;
   BOOLEAN                             ScrollLock;
 
+  BOOLEAN                             IsSupportPartialKey;
   //
   // Queue storing key scancodes
   //
@@ -135,9 +136,9 @@ typedef struct {
 /**
   The user Entry Point for module Ps2Keyboard. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -179,7 +180,7 @@ InstallPs2KeyboardDriver (
 #define SCANCODE_LEFT_LOGO_BREAK        0xDB
 #define SCANCODE_RIGHT_LOGO_MAKE        0x5C
 #define SCANCODE_RIGHT_LOGO_BREAK       0xDC
-#define SCANCODE_MENU_MAKE              0x5D //APPS key defined in Keyboard scan code 
+#define SCANCODE_MENU_MAKE              0x5D //APPS key defined in Keyboard scan code
 #define SCANCODE_MENU_BREAK             0xDD
 #define SCANCODE_SYS_REQ_MAKE           0x37
 #define SCANCODE_SYS_REQ_BREAK          0xB7
@@ -229,7 +230,7 @@ InstallPs2KeyboardDriver (
   indicators in ConsoleIn.
 
   @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
-  
+
   @return status
 
 **/
@@ -321,9 +322,9 @@ KeyboardTimerHandler (
   Perform 8042 controller and keyboard initialization
 
   @param This    Pointer to instance of EFI_SIMPLE_TEXT_INPUT_PROTOCOL
-  @param ExtendedVerification Indicate that the driver may perform a more 
-                              exhaustive verification operation of the device during 
-                              reset, now this par is ignored in this driver    
+  @param ExtendedVerification Indicate that the driver may perform a more
+                              exhaustive verification operation of the device during
+                              reset, now this par is ignored in this driver
 
 **/
 EFI_STATUS
@@ -338,7 +339,7 @@ KeyboardEfiReset (
   Retrieve key values for driver user.
 
   @param This    Pointer to instance of EFI_SIMPLE_TEXT_INPUT_PROTOCOL
-  @param Key     The output buffer for key value 
+  @param Key     The output buffer for key value
 
   @retval EFI_SUCCESS success to read key stroke
 **/
@@ -406,7 +407,7 @@ EFIAPI
 KeyboardWaitForKeyEx (
   IN  EFI_EVENT               Event,
   IN  VOID                    *Context
-  );  
+  );
 
 //
 // Simple Text Input Ex protocol function prototypes
@@ -419,7 +420,7 @@ KeyboardWaitForKeyEx (
   @param ExtendedVerification - Driver may perform diagnostics on reset.
 
   @retval EFI_SUCCESS           - The device was reset.
-  @retval EFI_DEVICE_ERROR      - The device is not functioning properly and could 
+  @retval EFI_DEVICE_ERROR      - The device is not functioning properly and could
                                   not be reset.
 
 **/
@@ -431,19 +432,19 @@ KeyboardEfiResetEx (
   );
 
 /**
-    Reads the next keystroke from the input device. The WaitForKey Event can 
+    Reads the next keystroke from the input device. The WaitForKey Event can
     be used to test for existance of a keystroke via WaitForEvent () call.
 
 
     @param This       - Protocol instance pointer.
-    @param KeyData    - A pointer to a buffer that is filled in with the keystroke 
+    @param KeyData    - A pointer to a buffer that is filled in with the keystroke
                  state data for the key that was pressed.
 
     @retval EFI_SUCCESS           - The keystroke information was returned.
     @retval EFI_NOT_READY         - There was no keystroke data availiable.
-    @retval EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
+    @retval EFI_DEVICE_ERROR      - The keystroke information was not returned due to
                             hardware errors.
-    @retval EFI_INVALID_PARAMETER - KeyData is NULL.                        
+    @retval EFI_INVALID_PARAMETER - KeyData is NULL.
 
 **/
 EFI_STATUS
@@ -457,14 +458,14 @@ KeyboardReadKeyStrokeEx (
   Set certain state for the input device.
 
   @param This              - Protocol instance pointer.
-  @param KeyToggleState    - A pointer to the EFI_KEY_TOGGLE_STATE to set the 
+  @param KeyToggleState    - A pointer to the EFI_KEY_TOGGLE_STATE to set the
                         state for the input device.
 
   @retval EFI_SUCCESS           - The device state was set successfully.
-  @retval EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
+  @retval EFI_DEVICE_ERROR      - The device is not functioning correctly and could
                             not have the setting adjusted.
   @retval EFI_UNSUPPORTED       - The device does not have the ability to set its state.
-  @retval EFI_INVALID_PARAMETER - KeyToggleState is NULL.                       
+  @retval EFI_INVALID_PARAMETER - KeyToggleState is NULL.
 
 **/
 EFI_STATUS
@@ -478,17 +479,17 @@ KeyboardSetState (
     Register a notification function for a particular keystroke for the input device.
 
     @param This                    - Protocol instance pointer.
-    @param KeyData                 - A pointer to a buffer that is filled in with the keystroke 
+    @param KeyData                 - A pointer to a buffer that is filled in with the keystroke
                               information data for the key that was pressed.
-    @param KeyNotificationFunction - Points to the function to be called when the key 
-                              sequence is typed specified by KeyData.                        
-    @param NotifyHandle            - Points to the unique handle assigned to the registered notification.                          
+    @param KeyNotificationFunction - Points to the function to be called when the key
+                              sequence is typed specified by KeyData.
+    @param NotifyHandle            - Points to the unique handle assigned to the registered notification.
 
     @retval EFI_SUCCESS             - The notification function was registered successfully.
     @retval EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
-    @retval EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.                       
-                              
-**/   
+    @retval EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 KeyboardRegisterKeyNotify (
@@ -501,15 +502,15 @@ KeyboardRegisterKeyNotify (
 /**
     Remove a registered notification function from a particular keystroke.
 
-    @param This                    - Protocol instance pointer.    
+    @param This                    - Protocol instance pointer.
     @param NotificationHandle      - The handle of the notification function being unregistered.
 
-  
+
     @retval EFI_SUCCESS             - The notification function was unregistered successfully.
     @retval EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
-    @retval EFI_NOT_FOUND           - Can not find the matching entry in database.  
-                              
-**/ 
+    @retval EFI_NOT_FOUND           - Can not find the matching entry in database.
+
+**/
 EFI_STATUS
 EFIAPI
 KeyboardUnregisterKeyNotify (
@@ -532,18 +533,19 @@ PushEfikeyBufTail (
 /**
   Judge whether is a registed key
 
-  @param RegsiteredData       A pointer to a buffer that is filled in with the keystroke 
+  @param RegsiteredData       A pointer to a buffer that is filled in with the keystroke
                               state data for the key that was registered.
-  @param InputData            A pointer to a buffer that is filled in with the keystroke 
+  @param InputData            A pointer to a buffer that is filled in with the keystroke
                               state data for the key that was pressed.
 
   @retval TRUE                Key be pressed matches a registered key.
-  @retval FLASE               Match failed. 
-  
+  @retval FLASE               Match failed.
+
 **/
 BOOLEAN
 IsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,
   IN EFI_KEY_DATA  *InputData
   );
+
 #endif
