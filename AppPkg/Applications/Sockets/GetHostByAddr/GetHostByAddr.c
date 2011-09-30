@@ -59,10 +59,10 @@ main (
                        &RemoteAddress[1],
                        &RemoteAddress[2],
                        &RemoteAddress[3]))
-    || ( 255 < RemoteAddress [0])
-    || ( 255 < RemoteAddress [1])
-    || ( 255 < RemoteAddress [2])
-    || ( 255 < RemoteAddress [3])) {
+    || ( 255 < RemoteAddress[0])
+    || ( 255 < RemoteAddress[1])
+    || ( 255 < RemoteAddress[2])
+    || ( 255 < RemoteAddress[3])) {
     Print ( L"%a  <IPv4 Address>\r\n", Argv[0]);
   }
   else {
@@ -78,7 +78,7 @@ main (
       Print ( L"ERROR - host not found, errno: %d\r\n", errno );
     }
     else {
-      pIpAddress = (UINT8 *)pHost->h_addr_list [ 0 ];
+      pIpAddress = (UINT8 *)pHost->h_addr_list[ 0 ];
       Print ( L"%d.%d.%d.%d, %a\r\n",
               pIpAddress[0],
               pIpAddress[1],

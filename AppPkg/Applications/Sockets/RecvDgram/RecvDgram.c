@@ -25,7 +25,7 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 
-UINT8 mBuffer [ 65536 ];
+UINT8 mBuffer[ 65536 ];
 
 /**
   Receive a datagram

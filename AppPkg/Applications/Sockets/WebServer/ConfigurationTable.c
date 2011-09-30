@@ -38,7 +38,7 @@ typedef struct {
   CHAR16 * pWebPage;
 } GUID_NAME;
 
-CONST GUID_NAME mGuidName [] = {
+CONST GUID_NAME mGuidName[] = {
   { L"gEfiAcpi10TableGuid", &gEfiAcpi10TableGuid, PAGE_ACPI_RSDP_10B },
   { L"gEfiAcpiTableGuid", &gEfiAcpiTableGuid, PAGE_ACPI_RSDP_30 },
   { L"gEfiDebugImageInfoTableGuid", &gEfiDebugImageInfoTableGuid, NULL },
@@ -101,7 +101,7 @@ RowGuid (
     //  Determine if this is a known GUID
     //
     pGuidName = &mGuidName[0];
-    pGuidNameEnd = &pGuidName [ sizeof ( mGuidName ) / sizeof ( mGuidName[0])];
+    pGuidNameEnd = &pGuidName[ sizeof ( mGuidName ) / sizeof ( mGuidName[0])];
     while ( pGuidNameEnd > pGuidName ) {
       if ( CompareGuid ( pGuidName->pGuid, pGuid )) {
         //
@@ -339,7 +339,7 @@ ConfigurationTablePage (
     //  Determine the location of the configuration tables
     //
     pTable = gST->ConfigurationTable;
-    pEnd = &pTable [ gST->NumberOfTableEntries ];
+    pEnd = &pTable[ gST->NumberOfTableEntries ];
     while ( pEnd > pTable ) {
       Status = RowGuid ( SocketFD,
                          pPort,

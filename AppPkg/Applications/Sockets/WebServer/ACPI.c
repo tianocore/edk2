@@ -106,19 +106,19 @@ typedef struct {
   UINT16 IapcBootArch;        //  109
   UINT8 Reserved2;            //  111
   UINT32 Flags;               //  112
-  UINT32 ResetReg [3];        //  116
+  UINT32 ResetReg[3];         //  116
   UINT8 ResetValue;           //  128
-  UINT8 Reserved3 [3];        //  129
+  UINT8 Reserved3[3];         //  129
   UINT64 XFirmwareCtrl;       //  132
   UINT64 XDsdt;               //  140
-  UINT32 XPm1aEvtBlk [3];     //  148
-  UINT32 XPm1bEvtBlk [3];     //  160
-  UINT32 XPm1aCntBlk [3];     //  172
-  UINT32 XPm1bCntBlk [3];     //  184
-  UINT32 XPm2CntBlk [3];      //  196
-  UINT32 XPmTmrBlk [3];       //  208
-  UINT32 XGpe0Blk [3];        //  220
-  UINT32 XGpe1Blk [3];        //  232
+  UINT32 XPm1aEvtBlk[3];      //  148
+  UINT32 XPm1bEvtBlk[3];      //  160
+  UINT32 XPm1aCntBlk[3];      //  172
+  UINT32 XPm1bCntBlk[3];      //  184
+  UINT32 XPm2CntBlk[3];       //  196
+  UINT32 XPmTmrBlk[3];        //  208
+  UINT32 XGpe0Blk[3];         //  220
+  UINT32 XGpe1Blk[3];         //  232
 } ACPI_FADT;
 
 
@@ -146,7 +146,7 @@ typedef struct {
 } TABLE_SIGNATURE;
 
 
-CONST TABLE_SIGNATURE mTableId [] = {
+CONST TABLE_SIGNATURE mTableId[] = {
   { DSDT_SIGNATURE, "DSDT", PAGE_ACPI_DSDT },
   { FADT_SIGNATURE, "FADT", PAGE_ACPI_FADT }
 };
@@ -240,8 +240,8 @@ LocateTable (
     //
     //  Walk the list of entries
     //
-    pEntry = &pRsdt->Entry [ 0 ];
-    pEnd = &pEntry [(( pRsdt->Length - sizeof ( *pRsdt )) >> 2 ) + 1 ];
+    pEntry = &pRsdt->Entry[ 0 ];
+    pEnd = &pEntry[(( pRsdt->Length - sizeof ( *pRsdt )) >> 2 ) + 1 ];
     while ( pEnd > pEntry ) {
       //
       //  The entry is actually a 32-bit physical table address
@@ -324,7 +324,7 @@ RowAnsiArray (
     //  Display the characters
     //
     pData = pChar;
-    pEnd = &pChar [ Length ];
+    pEnd = &pChar[ Length ];
     while ( pEnd > pData ) {
       Status = HttpSendCharacter ( SocketFD,
                                    pPort,
@@ -440,7 +440,7 @@ RowBytes (
     if ( EFI_ERROR ( Status )) {
       break;
     }
-    pEnd = &pData [ ByteCount ];
+    pEnd = &pData[ ByteCount ];
     while ( pEnd > pData ) {
       Status = HttpSendHexBits ( SocketFD,
                                  pPort,
@@ -784,8 +784,8 @@ SignatureLookup (
   //  Walk the list of tables
   //
   Signature = *pSignature;
-  pTableId = &mTableId [ 0 ];
-  pEnd = &pTableId [ sizeof ( mTableId ) / sizeof ( mTableId [ 0 ])];
+  pTableId = &mTableId[ 0 ];
+  pEnd = &pTableId[ sizeof ( mTableId ) / sizeof ( mTableId[ 0 ])];
   while ( pEnd > pTableId ) {
     //
     //  Attempt to locate the table signature
@@ -895,7 +895,7 @@ AcpiDsdtPage (
                             pPort,
                             "OEMID",
                             sizeof ( pDsdt->OemId ),
-                            &pDsdt->OemId [ 0 ]);
+                            &pDsdt->OemId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -903,7 +903,7 @@ AcpiDsdtPage (
                             pPort,
                             "OEM Table ID",
                             sizeof ( pDsdt->OemTableId ),
-                            &pDsdt->OemTableId [ 0 ]);
+                            &pDsdt->OemTableId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1039,7 +1039,7 @@ AcpiFadtPage (
                             pPort,
                             "OEMID",
                             sizeof ( pFadt->OemId ),
-                            &pFadt->OemId [ 0 ]);
+                            &pFadt->OemId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1047,7 +1047,7 @@ AcpiFadtPage (
                             pPort,
                             "OEM Table ID",
                             sizeof ( pFadt->OemTableId ),
-                            &pFadt->OemTableId [ 0 ]);
+                            &pFadt->OemTableId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1576,7 +1576,7 @@ AcpiRsdp10Page (
                             pPort,
                             "OemId",
                             sizeof ( pRsdp10b->OemId ),
-                            &pRsdp10b->OemId [ 0 ]);
+                            &pRsdp10b->OemId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1679,7 +1679,7 @@ AcpiRsdp30Page (
                             pPort,
                             "OemId",
                             sizeof ( pRsdp30->OemId ),
-                            &pRsdp30->OemId [ 0 ]);
+                            &pRsdp30->OemId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1726,7 +1726,7 @@ AcpiRsdp30Page (
                         pPort,
                         "Reserved",
                         sizeof ( pRsdp30->Reserved ),
-                        &pRsdp30->Reserved [ 0 ]);
+                        &pRsdp30->Reserved[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1771,7 +1771,7 @@ AcpiRsdtPage (
   CONST CHAR8 * pTableName;
   CONST CHAR16 * pWebPage;
   EFI_STATUS Status;
-  UINT32 TableName [ 2 ];
+  UINT32 TableName[ 2 ];
 
   DBG_ENTER ( );
 
@@ -1833,7 +1833,7 @@ AcpiRsdtPage (
                             pPort,
                             "OEMID",
                             sizeof ( pRsdt->OemId ),
-                            &pRsdt->OemId [ 0 ]);
+                            &pRsdt->OemId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1841,7 +1841,7 @@ AcpiRsdtPage (
                             pPort,
                             "OEM Table ID",
                             sizeof ( pRsdt->OemTableId ),
-                            &pRsdt->OemTableId [ 0 ]);
+                            &pRsdt->OemTableId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1871,16 +1871,16 @@ AcpiRsdtPage (
     //
     //  Walk the list of entries
     //
-    pEntry = &pRsdt->Entry [ 0 ];
-    pEnd = &pEntry [(( pRsdt->Length - sizeof ( *pRsdt )) >> 2 ) + 1 ];
-    TableName [ 1 ] = 0;
+    pEntry = &pRsdt->Entry[ 0 ];
+    pEnd = &pEntry[(( pRsdt->Length - sizeof ( *pRsdt )) >> 2 ) + 1 ];
+    TableName[ 1 ] = 0;
     while ( pEnd > pEntry ) {
       //
       //  The entry is actually a 32-bit physical table address
       //  The first entry in the table is the 32-bit table signature
       //
-      TableName [ 0 ] = *(UINT32 *)*pEntry;
-      pWebPage = SignatureLookup ( &TableName [ 0 ], &pTableName );
+      TableName[ 0 ] = *(UINT32 *)*pEntry;
+      pWebPage = SignatureLookup ( &TableName[ 0 ], &pTableName );
 
       //
       //  Display the table address

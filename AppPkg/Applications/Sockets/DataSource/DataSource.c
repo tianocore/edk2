@@ -84,7 +84,7 @@ UINT64 TotalBytesSent;
 UINT64 PreviousBytes;
 UINT64 AverageBytes;
 UINT64 Samples;
-UINT8 Buffer [ DATA_BUFFER_SIZE ];
+UINT8 Buffer[ DATA_BUFFER_SIZE ];
 
 
 //
@@ -146,8 +146,7 @@ GetDigit (
   //  Walk the digits
   //
   Value = 0;
-  while (( '0' <= *pDigit ) && ( '9' >= *pDigit ))
-  {
+  while (( '0' <= *pDigit ) && ( '9' >= *pDigit )) {
     //
     //  Make room for the new least significant digit
     //
@@ -313,7 +312,7 @@ SocketConnect (
     //
     //  Check for user stop request
     //
-    while ( ! bTick ) {
+    while ( !bTick ) {
       Status = ControlCCheck ( );
       if ( EFI_ERROR ( Status )) {
         break;
@@ -494,8 +493,7 @@ SocketOpen (
   //
   //  Use do/while and break instead of goto
   //
-  do
-  {
+  do {
     //
     //  Wait for the network layer to initialize
     //
@@ -801,7 +799,7 @@ Tcp4Locate (
     //
     //  Open the network controller's service protocol
     //
-    Tcp4Controller = pHandles [ Tcp4Index++ ];
+    Tcp4Controller = pHandles[ Tcp4Index++ ];
     Status = gBS->OpenProtocol (
                     Tcp4Controller,
                     &gEfiTcp4ServiceBindingProtocolGuid,
@@ -1499,12 +1497,15 @@ main (
   //
   //  Validate the command line
   //
-  if ( 2 != Argc ) {
-    Print ( L"%s  <remote IP address>\r\n", Argv[0] );
+  if ( 2 > Argc ) {
+    Print ( L"%s  <remote IP address> [Use TCP]\r\n", Argv[0] );
     return -1;
   }
 
-bTcp4 = TRUE;
+  //
+  //  Determine if TCP should be used
+  //
+  bTcp4 = (BOOLEAN)( 2 < Argc );
 
   //
   //  Determine the support routines
@@ -1522,8 +1523,7 @@ bTcp4 = TRUE;
   //
   //  Use for/break instead of goto
   //
-  for ( ; ; )
-  {
+  for ( ; ; ) {
     //
     //  No bytes sent so far
     //
@@ -1540,14 +1540,10 @@ bTcp4 = TRUE;
     RemoteHostAddress.sin_family = AF_INET;
     RemoteHostAddress.sin_port = htons ( PcdGet16 ( DataSource_Port ));
 
-Print ( L"Argc: %d\r\n", Argc);
-Print ( L"Argv[0]: %a\r\n", Argv[0]);
-Print ( L"Argv[1]: %a\r\n", Argv[1]);
-
     //
     //  Get the IP address
     //
-    pRemoteHost = Argv [1];
+    pRemoteHost = Argv[1];
     Status = IpAddress ( );
     if ( EFI_ERROR ( Status )) {
       break;

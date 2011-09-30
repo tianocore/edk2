@@ -29,7 +29,7 @@ Intel Corporation.
 /**
   List of pages in the system
 **/
-CONST DT_PAGE mPageList [] = {
+CONST DT_PAGE mPageList[] = {
 
   //
   //  The index page must be first

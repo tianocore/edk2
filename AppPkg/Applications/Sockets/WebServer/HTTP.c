@@ -561,7 +561,7 @@ HttpRequest (
     //  Attempt to parse the command
     //
     pData = &pPort->Request[0];
-    pEnd = &pData [ pPort->RequestLength ];
+    pEnd = &pData[ pPort->RequestLength ];
     pVerb = pData;
     pWebPage = HttpReplaceSpace ( pVerb, pEnd );
     if ( pEnd <= pWebPage ) {
@@ -589,7 +589,7 @@ HttpRequest (
     //  Walk the page table
     //
     pPage = &mPageList[0];
-    pPageEnd = &pPage [ mPageCount ];
+    pPageEnd = &pPage[ mPageCount ];
     while ( pPageEnd > pPage ) {
       //
       //  Determine if the page was located
@@ -668,15 +668,14 @@ HttpSend (
     //
     MaxBytes = sizeof ( pPort->TxBuffer );
     DataBytes = MaxBytes - pPort->TxBytes;
-    if ( DataBytes > LengthInBytes )
-    {
+    if ( DataBytes > LengthInBytes ) {
       DataBytes = LengthInBytes;
     }
 
     //
     //  Copy the data into the buffer
     //
-    CopyMem ( &pPort->TxBuffer [ pPort->TxBytes ],
+    CopyMem ( &pPort->TxBuffer[ pPort->TxBytes ],
               pBuffer,
               DataBytes );
 
@@ -910,7 +909,7 @@ HttpSendDump (
     //
     //  Walk the bytes to be displayed
     //
-    pEnd = &pData [ ByteCount ];
+    pEnd = &pData[ ByteCount ];
     while ( pEnd > pData ) {
       //
       //  Display the address
@@ -958,7 +957,7 @@ HttpSendDump (
       if (( BYTES_ON_A_LINE - InitialSpaces ) < BytesToDisplay ) {
         BytesToDisplay = BYTES_ON_A_LINE - InitialSpaces;
       }
-      pDataEnd = &pData [ BytesToDisplay ];
+      pDataEnd = &pData[ BytesToDisplay ];
       pTemp = pData;
       while ( pDataEnd > pTemp ) {
         Status = HttpSendHexBits ( SocketFD,
@@ -1151,7 +1150,7 @@ HttpSendGuid (
       Status = HttpSendHexBits ( SocketFD,
                                  pPort,
                                  8,
-                                 pGuid->Data4 [ Index ]);
+                                 pGuid->Data4[ Index ]);
       if ( EFI_ERROR ( Status )) {
         break;
       }
@@ -1488,7 +1487,7 @@ HttpSendValue (
   UINT64 Digit;
   CONST UINT64 * pEnd;
   CONST UINT64 * pDivisor;
-  CONST UINT64 pDivisors [ ] = {
+  CONST UINT64 pDivisors[ ] = {
      10000000000000000000L,
       1000000000000000000L,
        100000000000000000L,
@@ -1522,7 +1521,7 @@ HttpSendValue (
   //
   bDisplayZeros = FALSE;
   pDivisor = &pDivisors[0];
-  pEnd = &pDivisor [ sizeof ( pDivisors ) / sizeof ( pDivisors [0])];
+  pEnd = &pDivisor[ sizeof ( pDivisors ) / sizeof ( pDivisors[0])];
   while ( pEnd > pDivisor ) {
     //
     //  Determine the next digit

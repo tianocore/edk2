@@ -125,7 +125,7 @@
 
 #endif  //  MDEPKG_NDEBUG
 
-#define WEB_SERVER_SIGNATURE        SIGNATURE_32('W','e','b','S') ///<  DT_WEB_SERVER memory signature
+#define WEB_SERVER_SIGNATURE        SIGNATURE_32 ('W','e','b','S')  ///<  DT_WEB_SERVER memory signature
 
 #define SPACES_ADDRESS_TO_DATA      2
 #define BYTES_ON_A_LINE             16
@@ -154,9 +154,9 @@ typedef struct {
   //
   size_t    RequestLength;      ///<  Request length in bytes
   size_t    TxBytes;            ///<  Bytes in the TX buffer
-  UINT8     Request [ 65536 ];  ///<  Page request
-  UINT8     RxBuffer [ 65536 ]; ///<  Receive buffer
-  UINT8     TxBuffer [ 65536 ]; ///<  Transmit buffer
+  UINT8     Request[ 65536 ];   ///<  Page request
+  UINT8     RxBuffer[ 65536 ];  ///<  Receive buffer
+  UINT8     TxBuffer[ 65536 ];  ///<  Transmit buffer
 } WSDT_PORT;
 
 /**
@@ -186,7 +186,7 @@ typedef struct {
   WSDT_PORT ** ppPortList;      ///<  List of port management structures
 } DT_WEB_SERVER;
 
-//#define SERVER_FROM_SERVICE(a) CR(a, DT_WEB_SERVER, ServiceBinding, WEB_SERVER_SIGNATURE) ///< Locate DT_LAYER from service binding
+//#define SERVER_FROM_SERVICE(a) CR (a, DT_WEB_SERVER, ServiceBinding, WEB_SERVER_SIGNATURE)  ///< Locate DT_LAYER from service binding
 
 extern DT_WEB_SERVER mWebServer;
 
@@ -217,7 +217,7 @@ typedef struct {
   UINT16 * pDescription;      ///<  Description of the page
 } DT_PAGE;
 
-extern CONST DT_PAGE mPageList [];  ///<  List of pages
+extern CONST DT_PAGE mPageList[];   ///<  List of pages
 extern CONST UINTN mPageCount;      ///<  Number of pages
 
 //------------------------------------------------------------------------------

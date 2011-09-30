@@ -22,7 +22,7 @@
 
 #include <sys/socket.h>
 
-char mBuffer [65536];
+char mBuffer[65536];
 
 
 /**

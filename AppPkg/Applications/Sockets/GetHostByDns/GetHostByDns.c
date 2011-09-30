@@ -23,9 +23,9 @@
 
 #include <sys/socket.h>
 
-struct hostent * _gethostbydnsname(const char *, int);
+struct hostent * _gethostbydnsname (const char *, int);
 
-char mBuffer [65536];
+char mBuffer[65536];
 
 
 /**

@@ -39,7 +39,7 @@ typedef struct {
   DATA_TYPE DataType;
 } OPTIONS;
 
-CONST OPTIONS mOptions [] = {
+CONST OPTIONS mOptions[] = {
   { "SO_ACCEPTCONN", SO_ACCEPTCONN, SOL_SOCKET, FALSE, DATA_TYPE_UNKNOWN },
   { "SO_BROADCAST", SO_BROADCAST, SOL_SOCKET, TRUE, DATA_TYPE_UNKNOWN },
   { "SO_DEBUG", SO_DEBUG, SOL_SOCKET, TRUE, DATA_TYPE_UNKNOWN },
@@ -62,9 +62,9 @@ CONST OPTIONS mOptions [] = {
 };
 
 
-UINT8 mBuffer [ 65536 ];
-UINT8 mValue [ 65536 ];
-char * mSocketType [] = {
+UINT8 mBuffer[ 65536 ];
+UINT8 mValue[ 65536 ];
+char * mSocketType[] = {
   "SOCK_STREAM",
   "SOCK_DGRAM",
   "SOCK_RAW",
@@ -103,11 +103,10 @@ DisplayOption (
   //  Display the value
   //
   Value.u8 = &mBuffer[0];
-  switch ( pOption->DataType )
-  {
+  switch ( pOption->DataType ) {
   case DATA_TYPE_UNKNOWN:
     Print ( L"%a:", pOption->pOptionName );
-    pEnd = &Value.u8 [ LengthInBytes ];
+    pEnd = &Value.u8[ LengthInBytes ];
     while ( pEnd > Value.u8 ) {
       Print ( L" %02x", *Value.u8 );
       Value.u8 += 1;
@@ -127,7 +126,7 @@ DisplayOption (
   case DATA_TYPE_SOCKET_TYPE:
     if ( 4 == LengthInBytes ) {
       if (( SOCK_STREAM <= *Value.i32 ) && ( SOCK_SEQPACKET >= *Value.i32 )) {
-        pString = mSocketType [ *Value.i32 - SOCK_STREAM ];
+        pString = mSocketType[ *Value.i32 - SOCK_STREAM ];
         Print ( L"%a", pString );
       }
       else {
@@ -295,7 +294,7 @@ main (
     //
     BytesToWrite = 0;
     if (( 3 > Argc )
-      || ( 0 < ( BytesToWrite = GetOptionValue ( pOption, Argv [2])))) {
+      || ( 0 < ( BytesToWrite = GetOptionValue ( pOption, Argv[2])))) {
       //
       //  Get the socket
       //

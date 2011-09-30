@@ -846,8 +846,7 @@ Print ( L"TFTP Opcode: 0x%08x\r\n", Opcode );
       bIgnorePacket = TRUE;
       break;
     }
-    if ( pTftpServer->RxBytes > (ssize_t)( pContext->BlockSize + 2 + 2 ))
-    {
+    if ( pTftpServer->RxBytes > (ssize_t)( pContext->BlockSize + 2 + 2 )) {
       DEBUG (( DEBUG_ERROR,
                 "ERROR - Receive data length of %d > %d bytes (maximum block size) for pContext 0x%08x\r\n",
                 pTftpServer->RxBytes - 2 - 2,
@@ -1049,8 +1048,7 @@ pContext->File = (EFI_HANDLE)1;
                 "ACK for block 0x%04x received\r\n",
                 BlockNumber ));
       if (( !pContext->bExpectAck )
-        || ( BlockNumber != pContext->AckNext ))
-      {
+        || ( BlockNumber != pContext->AckNext )) {
         DEBUG (( DEBUG_WARN | DEBUG_TFTP_ACK,
                   "WARNING - Expecting ACK 0x%0x4 not received ACK 0x%08x\r\n",
                   pContext->AckNext,
@@ -1248,8 +1246,7 @@ TftpServerTimer (
     pTftpServer->TftpPort.fd = socket ( AF_INET,
                                         SOCK_DGRAM,
                                         IPPROTO_UDP );
-    if ( -1 != pTftpServer->TftpPort.fd )
-    {
+    if ( -1 != pTftpServer->TftpPort.fd ) {
       //
       //  Set the socket address
       //

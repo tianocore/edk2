@@ -124,9 +124,9 @@ PortAdd (
       //  Initialize the new entries in the FD list
       //
       for ( ; MaxEntriesNew > Index; Index++ ) {
-        pFdListNew [ Index ].fd = -1;
-        pFdListNew [ Index ].events = 0;
-        pFdListNew [ Index ].revents = 0;
+        pFdListNew[ Index ].fd = -1;
+        pFdListNew[ Index ].events = 0;
+        pFdListNew[ Index ].revents = 0;
       }
 
       //
@@ -156,7 +156,7 @@ PortAdd (
       //  Initialize the new entries in the port list
       //
       for ( ; MaxEntriesNew > Index; Index++ ) {
-        ppPortListNew [ Index ] = NULL;
+        ppPortListNew[ Index ] = NULL;
       }
       
       //
@@ -200,15 +200,15 @@ PortAdd (
     //
     //  Add the socket to the FD list
     //
-    pFdList [ pWebServer->Entries ].fd = SocketFD;
-    pFdList [ pWebServer->Entries ].events = POLLRDNORM
+    pFdList[ pWebServer->Entries ].fd = SocketFD;
+    pFdList[ pWebServer->Entries ].events = POLLRDNORM
                                              | POLLHUP;
-    pFdList [ pWebServer->Entries ].revents = 0;
+    pFdList[ pWebServer->Entries ].revents = 0;
 
     //
     //  Add the port to the port list
     //
-    pWebServer->ppPortList [ pWebServer->Entries ] = pPort;
+    pWebServer->ppPortList[ pWebServer->Entries ] = pPort;
 
     //
     //  Account for the new entry
@@ -263,7 +263,7 @@ PortRemove (
     //
     //  Locate the specified socket file descriptor
     //
-    if ( SocketFD == pFdList [ Index ].fd ) {
+    if ( SocketFD == pFdList[ Index ].fd ) {
       //
       //  Determine if this is the listen port
       //
@@ -279,7 +279,7 @@ PortRemove (
       //
       //  Free the port structure
       //
-      gBS->FreePool ( ppPortList [ Index ]);
+      gBS->FreePool ( ppPortList[ Index ]);
 
       //
       //  Remove this port from the list by copying
@@ -287,13 +287,13 @@ PortRemove (
       //
       Entries -= 1;
       for ( ; Entries > Index; Index++ ) {
-        pFdList [ Index ] = pFdList [ Index + 1 ];
-        ppPortList [ Index ] = ppPortList [ Index + 1 ];
+        pFdList[ Index ] = pFdList[ Index + 1 ];
+        ppPortList[ Index ] = ppPortList[ Index + 1 ];
       }
-      pFdList [ Index ].fd = -1;
-      pFdList [ Index ].events = 0;
-      pFdList [ Index ].revents = 0;
-      ppPortList [ Index ] = NULL;
+      pFdList[ Index ].fd = -1;
+      pFdList[ Index ].events = 0;
+      pFdList[ Index ].revents = 0;
+      ppPortList[ Index ] = NULL;
 
       //
       //  Update the number of entries in the list
@@ -439,8 +439,7 @@ PortWork (
           }
         }
       }
-      else
-      {
+      else {
         //
         //  Receive the file data
         //
@@ -610,8 +609,7 @@ WebServerTimer (
     pWebServer->HttpListenPort = socket ( AF_INET,
                                           SOCK_STREAM,
                                           IPPROTO_TCP );
-    if ( -1 != pWebServer->HttpListenPort )
-    {
+    if ( -1 != pWebServer->HttpListenPort ) {
       //
       //  Set the socket address
       //

@@ -53,10 +53,10 @@ main (
                        &RemoteAddress[1],
                        &RemoteAddress[2],
                        &RemoteAddress[3]))
-    || ( 255 < RemoteAddress [0])
-    || ( 255 < RemoteAddress [1])
-    || ( 255 < RemoteAddress [2])
-    || ( 255 < RemoteAddress [3])) {
+    || ( 255 < RemoteAddress[0])
+    || ( 255 < RemoteAddress[1])
+    || ( 255 < RemoteAddress[2])
+    || ( 255 < RemoteAddress[3])) {
     Print ( L"%a  <IPv4 Address>\r\n", Argv[0]);
   }
   else {

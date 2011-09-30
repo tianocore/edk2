@@ -62,12 +62,12 @@
 //  Constants
 //------------------------------------------------------------------------------
 
-#define DEBUG_SOCKET_POLL       0x40000000  ///<  Display the socket poll messages
-#define DEBUG_PORT_WORK         0x20000000  ///<  Display the port work messages
-#define DEBUG_SERVER_TIMER      0x10000000  ///<  Display the socket poll messages
-#define DEBUG_TFTP_PORT         0x08000000  ///<  Display the TFTP port messages
-#define DEBUG_TFTP_REQUEST      0x04000000  ///<  Display the TFTP request messages
-#define DEBUG_TX                0x02000000  ///<  Display transmit messages
+#define DEBUG_PORT_WORK         0x40000000  ///<  Display the port work messages
+#define DEBUG_SERVER_TIMER      0x20000000  ///<  Display the socket poll messages
+#define DEBUG_TFTP_PORT         0x10000000  ///<  Display the TFTP port messages
+#define DEBUG_TFTP_REQUEST      0x08000000  ///<  Display the TFTP request messages
+#define DEBUG_TX                0x04000000  ///<  Display transmit messages
+#define DEBUG_SOCKET_POLL       0x02000000  ///<  Display the socket poll messages
 #define DEBUG_RX                0x01000000  ///<  Display receive messages
 #define DEBUG_TFTP_ACK          0x00800000  ///<  Display the TFTP ACK messages
 
@@ -155,13 +155,13 @@ typedef struct _TSDT_CONNECTION_CONTEXT {
   BOOLEAN bEofSent;             ///<  End of file sent
   UINT8 * pBuffer;              ///<  Pointer into the file data
   UINT8 * pEnd;                 ///<  End of the file data
-  UINT8 FileData [ 64 * TFTP_MAX_BLOCK_SIZE ];  ///<  File data to send
+  UINT8 FileData[ 64 * TFTP_MAX_BLOCK_SIZE ]; ///<  File data to send
 
   //
   //  Buffer management
   //
   ssize_t   TxBytes;            ///<  Bytes in the TX buffer
-  UINT8     TxBuffer [ 2 + 2 + TFTP_MAX_BLOCK_SIZE ]; ///<  Transmit buffer
+  UINT8     TxBuffer[ 2 + 2 + TFTP_MAX_BLOCK_SIZE ];  ///<  Transmit buffer
 }GCC_TSDT_CONNECTION_CONTEXT;
 
 /**
@@ -188,7 +188,7 @@ typedef struct {
   //
   struct sockaddr_in RemoteAddress; ///<  Remote address
   ssize_t   RxBytes;                ///<  Receive data length in bytes
-  UINT8     RxBuffer [ 2 + 2 + TFTP_MAX_BLOCK_SIZE ]; ///<  Receive buffer
+  UINT8     RxBuffer[ 2 + 2 + TFTP_MAX_BLOCK_SIZE ];  ///<  Receive buffer
 
   //
   //  Client port management

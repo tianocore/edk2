@@ -51,9 +51,9 @@ BOOLEAN bTimerRunning;
 struct sockaddr_in LocalAddress;
 EFI_EVENT pTimer;
 int ListenSocket;
-UINT8 Buffer [ DATA_BUFFER_SIZE ];
-struct pollfd PollFd [ MAX_CONNECTIONS ];
-DT_PORT Port [ MAX_CONNECTIONS ];
+UINT8 Buffer[ DATA_BUFFER_SIZE ];
+struct pollfd PollFd[ MAX_CONNECTIONS ];
+DT_PORT Port[ MAX_CONNECTIONS ];
 nfds_t MaxPort;
 
 
@@ -136,17 +136,17 @@ SocketAccept (
       //  Allocate a port
       //
       Index = MaxPort++;
-      PollFd [ Index ].fd = ListenSocket;
-      PollFd [ Index ].events = POLLRDNORM | POLLHUP;
-      PollFd [ Index ].revents = 0;
-      Port [ Index ].BytesAverage = 0;
-      Port [ Index ].BytesPrevious = 0;
-      Port [ Index ].BytesTotal = 0;
-      Port [ Index ].Samples = 0;
-      Port [ Index ].RemoteAddress.sin_len = 0;
-      Port [ Index ].RemoteAddress.sin_family = 0;
-      Port [ Index ].RemoteAddress.sin_port = 0;
-      Port [ Index ].RemoteAddress.sin_addr.s_addr= 0;
+      PollFd[ Index ].fd = ListenSocket;
+      PollFd[ Index ].events = POLLRDNORM | POLLHUP;
+      PollFd[ Index ].revents = 0;
+      Port[ Index ].BytesAverage = 0;
+      Port[ Index ].BytesPrevious = 0;
+      Port[ Index ].BytesTotal = 0;
+      Port[ Index ].Samples = 0;
+      Port[ Index ].RemoteAddress.sin_len = 0;
+      Port[ Index ].RemoteAddress.sin_family = 0;
+      Port[ Index ].RemoteAddress.sin_port = 0;
+      Port[ Index ].RemoteAddress.sin_addr.s_addr= 0;
     }
   }
 
@@ -242,8 +242,7 @@ SocketNew (
                 "0x%08x: Socket created\r\n",
                 ListenSocket ));
     }
-    else
-    {
+    else {
       Status = EFI_NOT_STARTED;
     }
   }
@@ -312,16 +311,16 @@ SocketPoll (
         //
         //  Account for this descriptor
         //
-        if ( 0 != PollFd [ Index ].revents ) {
+        if ( 0 != PollFd[ Index ].revents ) {
           FdCount -= 1;
         }
 
         //
         //  Check for a broken connection
         //
-        if ( 0 != ( PollFd [ Index ].revents & POLLHUP )) {
+        if ( 0 != ( PollFd[ Index ].revents & POLLHUP )) {
           bRemoveSocket = TRUE;
-          if ( ListenSocket == PollFd [ Index ].fd ) {
+          if ( ListenSocket == PollFd[ Index ].fd ) {
             bListenError = TRUE;
             DEBUG (( DEBUG_ERROR,
                       "ERROR - Network closed on listen socket, errno: %d\r\n",
@@ -330,37 +329,37 @@ SocketPoll (
           else {
             DEBUG (( DEBUG_ERROR,
                       "ERROR - Network closed on socket %d.%d.%d.%d:%d, errno: %d\r\n",
-                      Port [ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
-                      ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
-                      ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
-                      ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
-                      htons ( Port [ Index ].RemoteAddress.sin_port ),
+                      Port[ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
+                      ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
+                      ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
+                      ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
+                      htons ( Port[ Index ].RemoteAddress.sin_port ),
                       errno ));
 
             //
             //  Close the socket
             //
-            CloseStatus = close ( PollFd [ Index ].fd );
+            CloseStatus = close ( PollFd[ Index ].fd );
             if ( 0 == CloseStatus ) {
               bRemoveSocket = TRUE;
               DEBUG (( DEBUG_INFO,
                         "0x%08x: Socket closed for %d.%d.%d.%d:%d\r\n",
-                        PollFd [ Index ].fd,
-                        Port [ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
-                        ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
-                        ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
-                        ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
-                        htons ( Port [ Index ].RemoteAddress.sin_port )));
+                        PollFd[ Index ].fd,
+                        Port[ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
+                        ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
+                        ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
+                        ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
+                        htons ( Port[ Index ].RemoteAddress.sin_port )));
             }
             else {
               DEBUG (( DEBUG_ERROR,
                         "ERROR - Failed to close socket 0x%08x for %d.%d.%d.%d:%d, errno: %d\r\n",
-                        PollFd [ Index ].fd,
-                        Port [ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
-                        ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
-                        ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
-                        ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
-                        htons ( Port [ Index ].RemoteAddress.sin_port ),
+                        PollFd[ Index ].fd,
+                        Port[ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
+                        ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
+                        ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
+                        ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
+                        htons ( Port[ Index ].RemoteAddress.sin_port ),
                         errno ));
             }
           }
@@ -369,11 +368,11 @@ SocketPoll (
         //
         //  Check for a connection or read data
         //
-        if ( 0 != ( PollFd [ Index ].revents & POLLRDNORM )) {
+        if ( 0 != ( PollFd[ Index ].revents & POLLRDNORM )) {
           //
           //  Check for a connection
           //
-          if ( ListenSocket == PollFd [ Index ].fd ) {
+          if ( ListenSocket == PollFd[ Index ].fd ) {
             //
             //  Another client connection was received
             //
@@ -416,7 +415,7 @@ SocketPoll (
                   bRemoveSocket = TRUE;
                   DEBUG (( DEBUG_INFO,
                             "0x%08x: Socket closed for %d.%d.%d.%d:%d\r\n",
-                            PollFd [ Index ].fd,
+                            PollFd[ Index ].fd,
                             RemoteAddress.sin_addr.s_addr & 0xff,
                             ( RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
                             ( RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
@@ -426,7 +425,7 @@ SocketPoll (
                 else {
                   DEBUG (( DEBUG_ERROR,
                             "ERROR - Failed to close socket 0x%08x, errno: %d\r\n",
-                            PollFd [ Index ].fd,
+                            PollFd[ Index ].fd,
                             errno ));
                 }
 
@@ -436,8 +435,7 @@ SocketPoll (
                 //
                 Status = EFI_SUCCESS;
               }
-              else
-              {
+              else {
                 //
                 //  Display the connection
                 //
@@ -452,17 +450,17 @@ SocketPoll (
                 //  Allocate the client connection
                 //
                 Index = MaxPort++;
-                Port [ Index ].BytesAverage = 0;
-                Port [ Index ].BytesPrevious = 0;
-                Port [ Index ].BytesTotal = 0;
-                Port [ Index ].Samples = 0;
-                Port [ Index ].RemoteAddress.sin_len = RemoteAddress.sin_len;
-                Port [ Index ].RemoteAddress.sin_family = RemoteAddress.sin_family;
-                Port [ Index ].RemoteAddress.sin_port = RemoteAddress.sin_port;
-                Port [ Index ].RemoteAddress.sin_addr = RemoteAddress.sin_addr;
-                PollFd [ Index ].fd = Socket;
-                PollFd [ Index ].events = POLLRDNORM | POLLHUP;
-                PollFd [ Index ].revents = 0;
+                Port[ Index ].BytesAverage = 0;
+                Port[ Index ].BytesPrevious = 0;
+                Port[ Index ].BytesTotal = 0;
+                Port[ Index ].Samples = 0;
+                Port[ Index ].RemoteAddress.sin_len = RemoteAddress.sin_len;
+                Port[ Index ].RemoteAddress.sin_family = RemoteAddress.sin_family;
+                Port[ Index ].RemoteAddress.sin_port = RemoteAddress.sin_port;
+                Port[ Index ].RemoteAddress.sin_addr = RemoteAddress.sin_addr;
+                PollFd[ Index ].fd = Socket;
+                PollFd[ Index ].events = POLLRDNORM | POLLHUP;
+                PollFd[ Index ].revents = 0;
               }
             }
           }
@@ -470,7 +468,7 @@ SocketPoll (
             //
             //  Data received
             //
-            BytesReceived = read ( PollFd [ Index ].fd,
+            BytesReceived = read ( PollFd[ Index ].fd,
                                    &Buffer,
                                    sizeof ( Buffer ));
             if ( 0 < BytesReceived ) {
@@ -479,13 +477,13 @@ SocketPoll (
               //
               DEBUG (( DEBUG_INFO,
                         "0x%08x: Socket received 0x%08x bytes from %d.%d.%d.%d:%d\r\n",
-                        PollFd [ Index ].fd,
+                        PollFd[ Index ].fd,
                         BytesReceived,
-                        Port [ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
-                        ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
-                        ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
-                        ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
-                        htons ( Port [ Index ].RemoteAddress.sin_port )));
+                        Port[ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
+                        ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
+                        ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
+                        ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
+                        htons ( Port[ Index ].RemoteAddress.sin_port )));
 
               //
               //  Synchronize with the TimerCallback routine
@@ -495,7 +493,7 @@ SocketPoll (
               //
               //  Account for the data received
               //
-              Port [ Index ].BytesTotal += BytesReceived;
+              Port[ Index ].BytesTotal += BytesReceived;
 
               //
               //  Release the synchronization with the TimerCallback routine
@@ -508,33 +506,33 @@ SocketPoll (
               //
               DEBUG (( DEBUG_INFO,
                         "ERROR - Receive failure for %d.%d.%d.%d:%d, errno: %d\r\n",
-                        Port [ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
-                        ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
-                        ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
-                        ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
-                        htons ( Port [ Index ].RemoteAddress.sin_port ),
+                        Port[ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
+                        ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
+                        ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
+                        ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
+                        htons ( Port[ Index ].RemoteAddress.sin_port ),
                         errno ));
-              CloseStatus = close ( PollFd [ Index ].fd );
+              CloseStatus = close ( PollFd[ Index ].fd );
               if ( 0 == CloseStatus ) {
                 bRemoveSocket = TRUE;
                 DEBUG (( DEBUG_INFO,
                           "0x%08x: Socket closed for %d.%d.%d.%d:%d\r\n",
-                          PollFd [ Index ].fd,
-                          Port [ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
-                          ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
-                          ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
-                          ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
-                          htons ( Port [ Index ].RemoteAddress.sin_port )));
+                          PollFd[ Index ].fd,
+                          Port[ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
+                          ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
+                          ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
+                          ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
+                          htons ( Port[ Index ].RemoteAddress.sin_port )));
               }
               else {
                 DEBUG (( DEBUG_ERROR,
                           "ERROR - Failed to close socket 0x%08x for %d.%d.%d.%d:%d, errno: %d\r\n",
-                          PollFd [ Index ].fd,
-                          Port [ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
-                          ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
-                          ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
-                          ( Port [ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
-                          htons ( Port [ Index ].RemoteAddress.sin_port ),
+                          PollFd[ Index ].fd,
+                          Port[ Index ].RemoteAddress.sin_addr.s_addr & 0xff,
+                          ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
+                          ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
+                          ( Port[ Index ].RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
+                          htons ( Port[ Index ].RemoteAddress.sin_port ),
                           errno ));
               }
             }
@@ -553,23 +551,23 @@ SocketPoll (
         if ( bRemoveSocket ) {
           DEBUG (( DEBUG_INFO,
                     "0x%08x: Socket removed from polling\r\n",
-                    PollFd [ Index ].fd ));
+                    PollFd[ Index ].fd ));
           MaxPort -= 1;
           for ( Entry = Index + 1; MaxPort >= Entry; Entry++ ) {
             EntryPrevious = Entry;
-            Port [ EntryPrevious ].BytesAverage = Port [ Entry ].BytesAverage;
-            Port [ EntryPrevious ].BytesPrevious = Port [ Entry ].BytesPrevious;
-            Port [ EntryPrevious ].BytesTotal = Port [ Entry ].BytesTotal;
-            Port [ EntryPrevious ].RemoteAddress.sin_len = Port [ Entry ].RemoteAddress.sin_len;
-            Port [ EntryPrevious ].RemoteAddress.sin_family = Port [ Entry ].RemoteAddress.sin_family;
-            Port [ EntryPrevious ].RemoteAddress.sin_port = Port [ Entry ].RemoteAddress.sin_port;
-            Port [ EntryPrevious ].RemoteAddress.sin_addr.s_addr = Port [ Entry ].RemoteAddress.sin_addr.s_addr;
-            Port [ EntryPrevious ].Samples = Port [ Entry ].Samples;
-            PollFd [ EntryPrevious ].events = PollFd [ Entry ].events;
-            PollFd [ EntryPrevious ].fd = PollFd [ Entry ].fd;
-            PollFd [ EntryPrevious ].revents = PollFd [ Entry ].revents;
+            Port[ EntryPrevious ].BytesAverage = Port[ Entry ].BytesAverage;
+            Port[ EntryPrevious ].BytesPrevious = Port[ Entry ].BytesPrevious;
+            Port[ EntryPrevious ].BytesTotal = Port[ Entry ].BytesTotal;
+            Port[ EntryPrevious ].RemoteAddress.sin_len = Port[ Entry ].RemoteAddress.sin_len;
+            Port[ EntryPrevious ].RemoteAddress.sin_family = Port[ Entry ].RemoteAddress.sin_family;
+            Port[ EntryPrevious ].RemoteAddress.sin_port = Port[ Entry ].RemoteAddress.sin_port;
+            Port[ EntryPrevious ].RemoteAddress.sin_addr.s_addr = Port[ Entry ].RemoteAddress.sin_addr.s_addr;
+            Port[ EntryPrevious ].Samples = Port[ Entry ].Samples;
+            PollFd[ EntryPrevious ].events = PollFd[ Entry ].events;
+            PollFd[ EntryPrevious ].fd = PollFd[ Entry ].fd;
+            PollFd[ EntryPrevious ].revents = PollFd[ Entry ].revents;
           }
-          PollFd [ MaxPort ].fd = -1;
+          PollFd[ MaxPort ].fd = -1;
           Index -= 1;
         }
 
@@ -625,31 +623,31 @@ TimerCallback (
     //
     //  Determine if any data was received
     //
-    BytesReceived = Port [ Index ].BytesTotal;
-    if (( ListenSocket != PollFd [ Index ].fd )
+    BytesReceived = Port[ Index ].BytesTotal;
+    if (( ListenSocket != PollFd[ Index ].fd )
       && ( 0 != BytesReceived )) {
       //
       //  Update the average bytes per second
       //
-      DeltaBytes = Port [ Index ].BytesAverage >> AVERAGE_SHIFT_COUNT;
-      Port [ Index ].BytesAverage -= DeltaBytes;
-      DeltaBytes = BytesReceived - Port [ Index ].BytesPrevious;
-      Port [ Index ].BytesPrevious = BytesReceived;
-      Port [ Index ].BytesAverage += DeltaBytes;
+      DeltaBytes = Port[ Index ].BytesAverage >> AVERAGE_SHIFT_COUNT;
+      Port[ Index ].BytesAverage -= DeltaBytes;
+      DeltaBytes = BytesReceived - Port[ Index ].BytesPrevious;
+      Port[ Index ].BytesPrevious = BytesReceived;
+      Port[ Index ].BytesAverage += DeltaBytes;
 
       //
       //  Separate the samples
       //
-      if (( 2 << AVERAGE_SHIFT_COUNT ) == Port [ Index ].Samples ) {
+      if (( 2 << AVERAGE_SHIFT_COUNT ) == Port[ Index ].Samples ) {
         Print ( L"---------- Stable average ----------\r\n" );
       }
-      Port [ Index ].Samples += 1;
+      Port[ Index ].Samples += 1;
 
       //
       //  Display the data rate
       //
       Delta = (UINT32)( DeltaBytes >> DATA_RATE_UPDATE_SHIFT );
-      Average = Port [ Index ].BytesAverage >> ( AVERAGE_SHIFT_COUNT + DATA_RATE_UPDATE_SHIFT );
+      Average = Port[ Index ].BytesAverage >> ( AVERAGE_SHIFT_COUNT + DATA_RATE_UPDATE_SHIFT );
       if ( Average < RANGE_SWITCH ) {
         Print ( L"%d Bytes/sec, Ave: %d Bytes/Sec\r\n",
                 Delta,
@@ -919,8 +917,7 @@ main (
   //
   //  Use for/break instead of goto
   //
-  for ( ; ; )
-  {
+  for ( ; ; ) {
     //
     //  Create the timer
     //
