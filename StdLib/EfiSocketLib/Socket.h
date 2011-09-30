@@ -220,7 +220,7 @@ typedef struct _ESL_IO_MGMT {
     EFI_UDP4_COMPLETION_TOKEN Udp4Rx; ///<  UDP4 receive token
     EFI_UDP4_COMPLETION_TOKEN Udp4Tx; ///<  UDP4 transmit token
   } Token;                            ///<  Completion token for the network operation
-};
+} GCC_IO_MGMT;
 
 /**
   IP4 context structure
@@ -481,6 +481,26 @@ EFI_STATUS
   );
 
 /**
+  Process the completion event
+
+  This routine handles the I/O completion event.
+
+  This routine is called by the low level network driver when
+  the operation is completed.
+
+  @param [in] Event     The receive completion event
+
+  @param [in] pIo       The address of an ::ESL_IO_MGMT structure
+
+**/
+typedef
+VOID
+(* PFN_API_IO_COMPLETE) (
+  IN EFI_EVENT Event,
+  IN ESL_IO_MGMT * pIo
+  );
+
+/**
   Determine if the socket is configured.
 
 
@@ -727,26 +747,6 @@ EFI_STATUS
   );
 
 /**
-  Process the receive completion
-
-  This routine handles the receive completion event.
-
-  This routine is called by the low level network driver when
-  data is received.
-
-  @param [in] Event     The receive completion event
-
-  @param [in] pIo       The address of an ::ESL_IO_MGMT structure
-
-**/
-typedef
-VOID
-(* PFN_API_RX_COMPLETE) (
-  IN EFI_EVENT Event,
-  IN ESL_IO_MGMT * pIo
-  );
-
-/**
   Start a receive operation
 
   This routine prepares a packet for the receive operation.
@@ -853,7 +853,7 @@ typedef struct {
   PFN_API_RECEIVE pfnReceive;               ///<  Attempt to receive some data
   PFN_API_REMOTE_ADDR_GET pfnRemoteAddrGet; ///<  Get remote address
   PFN_API_REMOTE_ADDR_SET pfnRemoteAddrSet; ///<  Set the remote system address
-  PFN_API_RX_COMPLETE pfnRxComplete;        ///<  RX completion
+  PFN_API_IO_COMPLETE pfnRxComplete;        ///<  RX completion
   PFN_API_RX_START pfnRxStart;              ///<  Start a network specific receive operation
   PFN_API_TRANSMIT pfnTransmit;             ///<  Attempt to buffer a packet for transmit
   PFN_API_TX_COMPLETE pfnTxComplete;        ///<  TX completion for normal data
@@ -1132,7 +1132,7 @@ EslSocketIoInit (
   IN ESL_IO_MGMT ** ppFreeQueue,
   IN UINTN DebugFlags,
   IN CHAR8 * pEventName,
-  IN EFI_EVENT_NOTIFY pfnCompletion
+  IN PFN_API_IO_COMPLETE pfnCompletion
   );
 
 /**

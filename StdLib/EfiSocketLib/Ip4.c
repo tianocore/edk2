@@ -204,7 +204,7 @@ EslIp4OptionGet (
     break;
 
   case IP_HDRINCL:
-    *ppOptionData = (void *)pSocket->bIncludeHeader;
+    *ppOptionData = (void *)&pSocket->bIncludeHeader;
     *pOptionLength = sizeof ( pSocket->bIncludeHeader );
     break;
   }

@@ -23,6 +23,9 @@ The following issues exist with the EFI Socket Library:
 
 *  TCPv4 transfer rate is slow (< 10 Mbits/sec) - This is an unidentified issue.
 
+*  Tcp4Dxe transmits more urgent data than is sent through sockets when normal data is
+   queued for transmission before the urgent data.  HSD 206365
+
 *  Raw socket applications are not able to pass the IP header as part of their
    payload by using the IP option IP_HDRINCL.  This is because the UEFI IPv4 driver
    (Ip4Dxe) does not support RawData. HSD 206136

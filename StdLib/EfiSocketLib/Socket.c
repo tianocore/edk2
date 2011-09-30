@@ -2307,7 +2307,7 @@ EslSocketIoInit (
   IN ESL_IO_MGMT ** ppFreeQueue,
   IN UINTN DebugFlags,
   IN CHAR8 * pEventName,
-  IN EFI_EVENT_NOTIFY pfnCompletion
+  IN PFN_API_IO_COMPLETE pfnCompletion
   )
 {
   ESL_IO_MGMT * pEnd;
@@ -2670,7 +2670,7 @@ EslSocketOptionGet (
   int errno;
   socklen_t LengthInBytes;
   socklen_t MaxBytes;
-  UINT8 * pOptionData;
+  CONST UINT8 * pOptionData;
   ESL_SOCKET * pSocket;
   EFI_STATUS Status;
 
@@ -2709,7 +2709,7 @@ EslSocketOptionGet (
         if ( pSocket->pApi->DefaultProtocol == level ) {
           Status = pSocket->pApi->pfnOptionGet ( pSocket,
                                                  OptionName,
-                                                 &pOptionData,
+                                                 (CONST void ** __restrict)&pOptionData,
                                                  &LengthInBytes );
           errno = pSocket->errno;
           break;
@@ -2749,7 +2749,7 @@ EslSocketOptionGet (
         //
         //  Return the listen flag
         //
-        pOptionData = (UINT8 *)&pSocket->bListenCalled;
+        pOptionData = (CONST UINT8 *)&pSocket->bListenCalled;
         LengthInBytes = sizeof ( pSocket->bListenCalled );
         break;
 
@@ -2757,7 +2757,7 @@ EslSocketOptionGet (
         //
         //  Return the debug flags
         //
-        pOptionData = (UINT8 *)&pSocket->bOobInLine;
+        pOptionData = (CONST UINT8 *)&pSocket->bOobInLine;
         LengthInBytes = sizeof ( pSocket->bOobInLine );
         break;
 
@@ -2765,7 +2765,7 @@ EslSocketOptionGet (
         //
         //  Return the out-of-band inline flag
         //
-        pOptionData = (UINT8 *)&pSocket->bOobInLine;
+        pOptionData = (CONST UINT8 *)&pSocket->bOobInLine;
         LengthInBytes = sizeof ( pSocket->bOobInLine );
         break;
 
@@ -2773,7 +2773,7 @@ EslSocketOptionGet (
         //
         //  Return the receive timeout
         //
-        pOptionData = (UINT8 *)&pSocket->RxTimeout;
+        pOptionData = (CONST UINT8 *)&pSocket->RxTimeout;
         LengthInBytes = sizeof ( pSocket->RxTimeout );
         break;
         
@@ -2781,7 +2781,7 @@ EslSocketOptionGet (
         //
         //  Return the maximum receive buffer size
         //
-        pOptionData = (UINT8 *)&pSocket->MaxRxBuf;
+        pOptionData = (CONST UINT8 *)&pSocket->MaxRxBuf;
         LengthInBytes = sizeof ( pSocket->MaxRxBuf );
         break;
 
@@ -2789,7 +2789,7 @@ EslSocketOptionGet (
         //
         //  Return the maximum transmit buffer size
         //
-        pOptionData = (UINT8 *)&pSocket->MaxTxBuf;
+        pOptionData = (CONST UINT8 *)&pSocket->MaxTxBuf;
         LengthInBytes = sizeof ( pSocket->MaxTxBuf );
         break;
 
@@ -2797,7 +2797,7 @@ EslSocketOptionGet (
         //
         //  Return the socket type
         //
-        pOptionData = (UINT8 *)&pSocket->Type;
+        pOptionData = (CONST UINT8 *)&pSocket->Type;
         LengthInBytes = sizeof ( pSocket->Type );
         break;
       }
