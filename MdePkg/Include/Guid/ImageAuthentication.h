@@ -128,7 +128,7 @@ typedef struct {
 /// since the public key exponent is known to be 0x10001) shall be stored in big-endian
 /// order.
 /// The SignatureHeader size shall always be 0. The SignatureSize shall always be 16 (size 
-/// of SignatureOwner component) + 32 bytes.
+/// of SignatureOwner component) + 256 bytes.
 ///
 #define EFI_CERT_RSA2048_GUID \
   { \
@@ -138,7 +138,7 @@ typedef struct {
 ///
 /// This identifies a signature containing a RSA-2048 signature of a SHA-256 hash.  The 
 /// SignatureHeader size shall always be 0. The SignatureSize shall always be 16 (size of 
-/// SignatureOwner component) + 32 bytes.
+/// SignatureOwner component) + 256 bytes.
 ///
 #define EFI_CERT_RSA2048_SHA256_GUID \
   { \
@@ -147,7 +147,7 @@ typedef struct {
 
 ///
 /// This identifies a signature containing a SHA-1 hash.  The SignatureSize shall always
-/// be 16 (size of SignatureOwner component) + 32 bytes.
+/// be 16 (size of SignatureOwner component) + 20 bytes.
 ///
 #define EFI_CERT_SHA1_GUID \
   { \
@@ -157,7 +157,7 @@ typedef struct {
 ///
 /// TThis identifies a signature containing a RSA-2048 signature of a SHA-1 hash.  The 
 /// SignatureHeader size shall always be 0. The SignatureSize shall always be 16 (size of 
-/// SignatureOwner component) + 32 bytes.
+/// SignatureOwner component) + 256 bytes.
 ///
 #define EFI_CERT_RSA2048_SHA1_GUID \
   { \
