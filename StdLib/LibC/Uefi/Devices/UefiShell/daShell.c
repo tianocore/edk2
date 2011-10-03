@@ -304,14 +304,14 @@ da_ShellStat(
   }
   else {
     Status = RETURN_DEVICE_ERROR;
+    errno  = EIO;
   }
-  errno     = EFI2errno(Status);
   EFIerrno  = Status;
 
   if(FileInfo != NULL) {
     FreePool(FileInfo);     // Release the buffer allocated by the GetInfo function
   }
-  return errno? -1 : 0;
+  return (Status == RETURN_SUCCESS)? 0 : -1;
 }
 
 static

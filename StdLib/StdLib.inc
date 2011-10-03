@@ -4,6 +4,15 @@
 #
 # The including DSC file must DEFINE the EMULATE macro if
 # the application is to be run in an emulation environment.
+#
+#  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ################################################################
 
 ##########
@@ -53,10 +62,12 @@
 !ifndef $(EMULATE)
   # Not running in an Emulation Environment
 [LibraryClasses.IA32.UEFI_APPLICATION]
-  TimerLib|PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
+  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+#  TimerLib|PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
 
 [LibraryClasses.X64.UEFI_APPLICATION]
-  TimerLib|PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
+  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+#  TimerLib|PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
 
 [LibraryClasses.IPF.UEFI_APPLICATION]
   PalLib|MdePkg/Library/UefiPalLib/UefiPalLib.inf
@@ -108,9 +119,9 @@
 !ifndef $(EMULATE)
   # These Build Options are used when building the Standard Libraries to be run
   # on real hardware.
-   INTEL:*_*_*_CC_FLAGS      = /Qfreestanding
-    MSFT:*_*_*_CC_FLAGS      = /X /Zc:wchar_t
-     GCC:*_*_*_CC_FLAGS      = -nostdinc -nostdlib
+  INTEL:*_*_*_CC_FLAGS      = /Qfreestanding
+   MSFT:*_*_*_CC_FLAGS      = /X /Zc:wchar_t /D NT32dvm
+    GCC:*_*_*_CC_FLAGS      = -nostdinc -nostdlib
     RVCT:*_*_*_CC_FLAGS      = --library_interface=none -J$(WORKSPACE)/StdLib/Include -J$(WORKSPACE)/StdLib/Include/Arm -DNT32dvm
   ARMGCC:*_*_*_CC_FLAGS      = -nostdinc -nostdlib -Wno-unknown-pragmas -Wno-unused -Wno-format-zero-length -DNT32dvm
 
@@ -123,5 +134,3 @@
    MSFT:*_*_IA32_CC_FLAGS     = /Od /D NT32dvm
     GCC:*_*_IA32_CC_FLAGS     = -O0 -DNT32dvm
 !endif
-
-

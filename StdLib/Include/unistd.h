@@ -39,6 +39,7 @@ pid_t           tcgetpgrp(int);
 char           *getpass(const char *);
 int             usleep(useconds_t);
 unsigned int    sleep(unsigned int);
+char           *basename(char *path);
 
 // Networking
 long            gethostid(void);

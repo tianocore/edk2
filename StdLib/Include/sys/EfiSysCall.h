@@ -291,7 +291,7 @@ __BEGIN_DECLS
 
     @return
   **/
-  int     stat      (const char *, void *);
+  int     stat      (const char *, struct stat *);
 
   /**
     @param[in]

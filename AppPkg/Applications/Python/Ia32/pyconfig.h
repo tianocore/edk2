@@ -1,14 +1,25 @@
-/*  @file
+/** @file
     Manually generated Python Configuration file for EDK II.
-*/
+
+    Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available under
+    the terms and conditions of the BSD License that accompanies this distribution.
+    The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
+
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+**/
 
 
 #ifndef Py_PYCONFIG_H
 #define Py_PYCONFIG_H
 
-#ifndef PYTHONPATH
-# define PYTHONPATH "/Efi/Python;/Efi/Python/Lib"
-#endif
+#define PLATFORM    "UEFI 2.3 Ia32"
+
+//#ifndef PYTHONPATH
+//# define PYTHONPATH "/Efi/StdLib/lib/python.27;/Efi/StdLib/lib/python.27/lib-dynload"
+//#endif
 
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
@@ -278,7 +289,7 @@
 #undef HAVE_GETADDRINFO
 
 /* Define to 1 if you have the `getcwd' function. */
-#undef HAVE_GETCWD
+#define HAVE_GETCWD   1
 
 /* Define this if you have flockfile(), getc_unlocked(), and funlockfile() */
 #undef HAVE_GETC_UNLOCKED
@@ -392,7 +403,7 @@
 #undef HAVE_KQUEUE
 
 /* Define to 1 if you have the <langinfo.h> header file. */
-#define HAVE_LANGINFO_H   1
+#undef HAVE_LANGINFO_H   /* non-functional in EFI. */
 
 /* Defined to enable large file support when an off_t is bigger than a long
    and long long is available and at least as big as an off_t. You may need to
@@ -623,7 +634,7 @@
 #undef HAVE_SETUID
 
 /* Define to 1 if you have the `setvbuf' function. */
-#undef HAVE_SETVBUF
+#define HAVE_SETVBUF    1
 
 /* Define to 1 if you have the <shadow.h> header file. */
 #undef HAVE_SHADOW_H
@@ -656,7 +667,7 @@
 #undef HAVE_SPAWN_H
 
 /* Define if your compiler provides ssize_t */
-#undef HAVE_SSIZE_T
+#define HAVE_SSIZE_T    1
 
 /* Define to 1 if you have the `statvfs' function. */
 #undef HAVE_STATVFS
@@ -669,25 +680,25 @@
 
 /* Define if your compiler supports variable length function prototypes (e.g.
    void fprintf(FILE *, char *, ...);) *and* <stdarg.h> */
-#define HAVE_STDARG_PROTOTYPES    1
+#define HAVE_STDARG_PROTOTYPES          1
 
 /* Define to 1 if you have the <stdint.h> header file. */
-#define HAVE_STDINT_H   1
+#define HAVE_STDINT_H                   1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
-#define HAVE_STDLIB_H   1
+#define HAVE_STDLIB_H                   1
 
 /* Define to 1 if you have the `strdup' function. */
-#define HAVE_STRDUP     1
+#define HAVE_STRDUP                     1
 
 /* Define to 1 if you have the `strftime' function. */
-#define HAVE_STRFTIME   1
+#define HAVE_STRFTIME                   1
 
 /* Define to 1 if you have the <strings.h> header file. */
 #undef HAVE_STRINGS_H
 
 /* Define to 1 if you have the <string.h> header file. */
-#define HAVE_STRING_H   1
+#define HAVE_STRING_H                   1
 
 /* Define to 1 if you have the <stropts.h> header file. */
 #undef HAVE_STROPTS_H
@@ -762,25 +773,25 @@
 #undef HAVE_SYS_NDIR_H
 
 /* Define to 1 if you have the <sys/param.h> header file. */
-#define HAVE_SYS_PARAM_H    1
+#define HAVE_SYS_PARAM_H                1
 
 /* Define to 1 if you have the <sys/poll.h> header file. */
-#define HAVE_SYS_POLL_H     1
+#define HAVE_SYS_POLL_H                 1
 
 /* Define to 1 if you have the <sys/resource.h> header file. */
-#define HAVE_SYS_RESOURCE_H   1
+#define HAVE_SYS_RESOURCE_H             1
 
 /* Define to 1 if you have the <sys/select.h> header file. */
-#define HAVE_SYS_SELECT_H     1
+#define HAVE_SYS_SELECT_H               1
 
 /* Define to 1 if you have the <sys/socket.h> header file. */
-#define HAVE_SYS_SOCKET_H     1
+#define HAVE_SYS_SOCKET_H               1
 
 /* Define to 1 if you have the <sys/statvfs.h> header file. */
 #undef HAVE_SYS_STATVFS_H
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
-#define HAVE_SYS_STAT_H   1
+#define HAVE_SYS_STAT_H                 1
 
 /* Define to 1 if you have the <sys/termio.h> header file. */
 #undef HAVE_SYS_TERMIO_H
@@ -789,10 +800,10 @@
 #undef HAVE_SYS_TIMES_H
 
 /* Define to 1 if you have the <sys/time.h> header file. */
-#define HAVE_SYS_TIME_H     1
+#define HAVE_SYS_TIME_H                 1
 
 /* Define to 1 if you have the <sys/types.h> header file. */
-#define HAVE_SYS_TYPES_H    1
+#define HAVE_SYS_TYPES_H                1
 
 /* Define to 1 if you have the <sys/un.h> header file. */
 #undef HAVE_SYS_UN_H
@@ -810,10 +821,10 @@
 #undef HAVE_TCSETPGRP
 
 /* Define to 1 if you have the `tempnam' function. */
-#define HAVE_TEMPNAM      1
+#define HAVE_TEMPNAM                    1
 
 /* Define to 1 if you have the <termios.h> header file. */
-#define HAVE_TERMIOS_H    1
+#define HAVE_TERMIOS_H                  1
 
 /* Define to 1 if you have the <term.h> header file. */
 #undef HAVE_TERM_H
@@ -831,10 +842,10 @@
 #undef HAVE_TIMES
 
 /* Define to 1 if you have the `tmpfile' function. */
-#define HAVE_TMPFILE    1
+#define HAVE_TMPFILE                    1
 
 /* Define to 1 if you have the `tmpnam' function. */
-#define HAVE_TMPNAM     1
+#define HAVE_TMPNAM                     1
 
 /* Define to 1 if you have the `tmpnam_r' function. */
 #undef HAVE_TMPNAM_R
@@ -854,13 +865,13 @@
 #undef HAVE_UCS4_TCL
 
 /* Define to 1 if the system has the type `uintptr_t'. */
-#define HAVE_UINTPTR_T    1
+#define HAVE_UINTPTR_T                  1
 
 /* Define to 1 if you have the `uname' function. */
 #undef HAVE_UNAME
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#define HAVE_UNISTD_H     1
+#define HAVE_UNISTD_H                   1
 
 /* Define to 1 if you have the `unsetenv' function. */
 #undef HAVE_UNSETENV
@@ -868,7 +879,7 @@
 /* Define if you have a useable wchar_t type defined in wchar.h; useable means
    wchar_t must be an unsigned type with at least 16 bits. (see
    Include/unicodeobject.h). */
-#define HAVE_USABLE_WCHAR_T   1
+#define HAVE_USABLE_WCHAR_T             1
 
 /* Define to 1 if you have the <util.h> header file. */
 #undef HAVE_UTIL_H
@@ -922,22 +933,22 @@
 #undef MVWDELCH_IS_EXPRESSION
 
 /* Define to the address where bug reports for this package should be sent. */
-#undef PACKAGE_BUGREPORT
+#define PACKAGE_BUGREPORT   "edk2-devel@lists.sourceforge.net"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME    EDK II Python Package
+#define PACKAGE_NAME    "EDK II Python Package"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING  EDK II Python Package V0.1
+#define PACKAGE_STRING  "EDK II Python Package V0.2"
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME   UDK_Python
+#define PACKAGE_TARNAME   "EADK_Python"
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL   http://edk2.tianocore.org/toolkit/python
+#define PACKAGE_URL   "http://edk2.tianocore.org/toolkit/python"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION  V0.1
+#define PACKAGE_VERSION  "V0.2"
 
 /* Define if POSIX semaphores aren't enabled on your system */
 #define POSIX_SEMAPHORES_NOT_ENABLED    1
@@ -988,7 +999,7 @@
 #define SIZEOF_FLOAT      4
 
 /* The size of `fpos_t', as computed by sizeof. */
-#undef SIZEOF_FPOS_T
+#define SIZEOF_FPOS_T     8
 
 /* The size of `int', as computed by sizeof. */
 #define SIZEOF_INT        4
@@ -1006,7 +1017,7 @@
 #define SIZEOF_OFF_T      4
 
 /* The size of `pid_t', as computed by sizeof. */
-#undef SIZEOF_PID_T
+#define SIZEOF_PID_T      4
 
 /* The size of `pthread_t', as computed by sizeof. */
 #undef SIZEOF_PTHREAD_T
@@ -1033,7 +1044,7 @@
 #define SIZEOF__BOOL      1
 
 /* Define to 1 if you have the ANSI C header files. */
-#define STDC_HEADERS    1
+#define STDC_HEADERS      1
 
 /* Define if you can safely include both <sys/select.h> and <sys/time.h>
    (which you can't on SCO ODT 3.0). */
@@ -1247,11 +1258,4 @@
 /* Define to empty if the keyword does not work. */
 //#undef volatile
 
-
-/* Define the macros needed if on a UnixWare 7.x system. */
-#if defined(__USLC__) && defined(__SCO_VERSION__)
-#define STRICT_SYSV_CURSES /* Don't use ncurses extensions */
-#endif
-
 #endif /*Py_PYCONFIG_H*/
-

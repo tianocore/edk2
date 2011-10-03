@@ -1,4 +1,15 @@
-/* Module configuration */
+/** @file
+    Python Module configuration.
+
+    Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available under
+    the terms and conditions of the BSD License that accompanies this distribution.
+    The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
+
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+**/
 
 /* This file contains the table of built-in modules.
    See init_builtin() in import.c. */
@@ -6,9 +17,9 @@
 #include "Python.h"
 
 extern void initarray(void);
-//#ifndef MS_WINI64
-//extern void initaudioop(void);
-//#endif
+#ifndef MS_WINI64
+extern void initaudioop(void);
+#endif
 extern void initbinascii(void);
 extern void initcmath(void);
 extern void initerrno(void);
@@ -27,7 +38,7 @@ extern void init_sha256(void);
 extern void init_sha512(void);
 extern void initstrop(void);
 extern void inittime(void);
-//extern void initthread(void);
+extern void initthread(void);
 extern void initcStringIO(void);
 extern void initcPickle(void);
 #ifdef WIN32
@@ -38,23 +49,23 @@ extern void init_codecs(void);
 extern void init_weakref(void);
 extern void init_hotshot(void);
 extern void initxxsubtype(void);
-//extern void initzipimport(void);
+extern void initzipimport(void);
 extern void init_random(void);
 extern void inititertools(void);
 extern void init_collections(void);
 extern void init_heapq(void);
 extern void init_bisect(void);
 extern void init_symtable(void);
-//extern void initmmap(void);
+extern void initmmap(void);
 extern void init_csv(void);
 extern void init_sre(void);
 extern void initparser(void);
-//extern void init_winreg(void);
+extern void init_winreg(void);
 extern void init_struct(void);
 extern void initdatetime(void);
 extern void init_functools(void);
 extern void init_json(void);
-//extern void initzlib(void);
+extern void initzlib(void);
 
 extern void init_multibytecodec(void);
 extern void init_codecs_cn(void);
@@ -63,8 +74,8 @@ extern void init_codecs_iso2022(void);
 extern void init_codecs_jp(void);
 extern void init_codecs_kr(void);
 extern void init_codecs_tw(void);
-//extern void init_subprocess(void);
-//extern void init_lsprof(void);
+extern void init_subprocess(void);
+extern void init_lsprof(void);
 extern void init_ast(void);
 extern void init_io(void);
 extern void _PyWarnings_Init(void);
@@ -79,16 +90,20 @@ struct _inittab _PyImport_Inittab[] = {
 
     {"array", initarray},
     {"_ast", init_ast},
-//#ifdef MS_WINDOWS
-//#ifndef MS_WINI64
-//    {"audioop", initaudioop},
-//#endif
-//#endif
+#ifdef MS_WINDOWS
+#ifndef MS_WINI64
+    {"audioop", initaudioop},
+#endif
+#endif
     {"binascii", initbinascii},
     //{"cmath", initcmath},
     {"errno", initerrno},
-    {"future_builtins", initfuture_builtins},
+
     {"gc", initgc},
+    {"signal", initsignal},
+
+#if 0
+    {"future_builtins", initfuture_builtins},
 #ifndef MS_WINI64
     {"imageop", initimageop},
 #endif
@@ -96,7 +111,6 @@ struct _inittab _PyImport_Inittab[] = {
     {"_md5", init_md5},
     //{"nt", initnt}, /* Use the NT os functions, not posix */
     {"operator", initoperator},
-    {"signal", initsignal},
     {"_sha", init_sha},
     {"_sha256", init_sha256},
     {"_sha512", init_sha512},
@@ -127,10 +141,14 @@ struct _inittab _PyImport_Inittab[] = {
     //{"mmap", initmmap},
     {"_csv", init_csv},
     {"_sre", init_sre},
+#endif
+
     {"parser", initparser},
+
+#if 0
     //{"_winreg", init_winreg},
     {"_struct", init_struct},
-    //{"datetime", initdatetime},
+    {"datetime", initdatetime},
     {"_functools", init_functools},
     {"_json", init_json},
 
@@ -146,6 +164,7 @@ struct _inittab _PyImport_Inittab[] = {
     {"_codecs_jp", init_codecs_jp},
     {"_codecs_kr", init_codecs_kr},
     {"_codecs_tw", init_codecs_tw},
+#endif
 
 /* tools/freeze/makeconfig.py marker for additional "_inittab" entries */
 /* -- ADDMODULE MARKER 2 -- */
@@ -153,7 +172,7 @@ struct _inittab _PyImport_Inittab[] = {
     /* This module "lives in" with marshal.c */
     {"marshal", PyMarshal_Init},
 
-    /* This lives it with import.c */
+    /* This lives in with import.c */
     {"imp", initimp},
 
     /* These entries are here for sys.builtin_module_names */

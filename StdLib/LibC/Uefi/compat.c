@@ -94,6 +94,7 @@
 #include  <LibConfig.h>
 #include  <string.h>
 #include  <fcntl.h>
+#include  <sys/syslimits.h>
 
 #ifndef HAVE_GETOPT
 char *optarg;
@@ -138,11 +139,7 @@ getopt(int argc, char **argv, char *args)
 }
 #endif
 
-#ifdef WIN32
 #define ISPATHSEPARATOR(x) ((x == '/') || (x == '\\'))
-#else
-#define ISPATHSEPARATOR(x) (x == '/')
-#endif
 
 #ifndef HAVE_BASENAME
 #ifndef PATH_MAX

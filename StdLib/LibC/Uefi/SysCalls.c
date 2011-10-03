@@ -923,7 +923,7 @@ fstat (int fd, struct stat *statbuf)
                   identify the error.
 **/
 int
-stat   (const char *path, void *statbuf)
+stat   (const char *path, struct stat *statbuf)
 {
   int                 fd;
   int                 retval  = -1;
