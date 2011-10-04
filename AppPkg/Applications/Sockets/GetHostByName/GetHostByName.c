@@ -64,7 +64,7 @@ main (
     //
     pHost = gethostbyname ( Argv[1]);
     if ( NULL == pHost ) {
-      Print ( L"ERROR - host not found, errno: %d\r\n", errno );
+      Print ( L"ERROR - host not found, h_errno: %d\r\n", h_errno );
     }
     else {
       pIpAddress = (UINT8 *)pHost->h_addr;
