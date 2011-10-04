@@ -42,7 +42,7 @@ ASM_PFX(_ModuleEntryPoint):
   blx   ASM_PFX(ArmPlatformSecBootAction)
 
   // Set VBAR to the start of the exception vectors in Secure Mode
-  ldr   r0, =SecVectorTable
+  LoadConstantToReg (ASM_PFX(SecVectorTable), r0)
   bl    ASM_PFX(ArmWriteVBar)
 
 _IdentifyCpu:

@@ -184,7 +184,7 @@ GetPerformanceCounterProperties (
 
   if (EndValue != NULL) {
     // Timer counts down to 0x0
-    *EndValue = 0xFFFFFFFFFFFFFFFF;;
+    *EndValue = 0xFFFFFFFFFFFFFFFFUL;
   }
 
   return (UINT64)ArmArchTimerGetTimerFreq ();

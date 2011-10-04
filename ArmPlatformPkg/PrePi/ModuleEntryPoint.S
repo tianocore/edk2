@@ -77,7 +77,7 @@ _SetupStack:
 _GetStackBase:
   // Compute Base of Normal stacks for CPU Cores
   // Is it MpCore system
-  bl    ArmIsMpCore
+  bl    ASM_PFX(ArmIsMpCore)
   cmp   r0, #0
   // Case it is not an MP Core system. Just setup the primary core
   beq   _SetupUnicoreStack

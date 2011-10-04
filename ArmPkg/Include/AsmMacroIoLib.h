@@ -119,6 +119,21 @@
   .long (_Data)           ;                 \
 1:
 
+// Convert the (ClusterId,CoreId) into a Core Position
+// We assume there are 4 cores per cluster
+#define GetCorePositionInStack(Pos, MpId, Tmp) \
+  lsr   Pos, MpId, #6 ;                        \
+  and   Tmp, MpId, #3 ;                        \
+  add   Pos, Pos, Tmp
+
+// Reserve a region at the top of the Primary Core stack
+// for Global variables for the XIP phase
+#define SetPrimaryStack(StackTop, GlobalSize, Tmp)  \
+  and     Tmp, GlobalSize, #7         ;             \
+  rsbne   Tmp, Tmp, #8                ;             \
+  add     GlobalSize, GlobalSize, Tmp ;             \
+  sub     sp, StackTop, GlobalSize
+
 
 #elif defined (__GNUC__)
 

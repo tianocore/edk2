@@ -27,7 +27,7 @@ ASM_PFX(ArmCpuSynchronizeWait):
   cmp   r0, #ARM_CPU_EVENT_BOOT_MEM_INIT
   // The SCU enabled is the event to tell us the Init Boot Memory is initialized
   bx    lr
-  b     CArmCpuSynchronizeWait
+  b     ASM_PFX(CArmCpuSynchronizeWait)
 
 
 #if 0
@@ -43,7 +43,7 @@ ASM_PFX(ArmCpuSynchronizeWait):
   cmp   r0, #ARM_CPU_EVENT_BOOT_MEM_INIT
   // The SCU enabled is the event to tell us the Init Boot Memory is initialized
   beq   ArmWaitScuEnabled
-  b     CArmCpuSynchronizeWait
+  b     ASM_PFX(CArmCpuSynchronizeWait)
 
 // IN None
 // OUT r0 = SCU Base Address

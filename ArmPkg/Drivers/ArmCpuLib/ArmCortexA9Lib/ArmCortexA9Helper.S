@@ -28,8 +28,8 @@ GCC_ASM_IMPORT(CArmCpuSynchronizeWait)
 ASM_PFX(ArmCpuSynchronizeWait):
   cmp   r0, #ARM_CPU_EVENT_BOOT_MEM_INIT
   // The SCU enabled is the event to tell us the Init Boot Memory is initialized
-  beq   ArmWaitScuEnabled
-  b     CArmCpuSynchronizeWait
+  beq   ASM_PFX(ArmWaitScuEnabled)
+  b     ASM_PFX(CArmCpuSynchronizeWait)
 
 // IN None
 // OUT r0 = SCU Base Address
@@ -48,5 +48,5 @@ ASM_PFX(ArmWaitScuEnabled):
   add   r0, r0, #A9_SCU_CONTROL_OFFSET
   ldr   r0, [r0]
   cmp   r0, #1
-  bne   ArmWaitScuEnabled
+  bne   ASM_PFX(ArmWaitScuEnabled)
   bx    lr
