@@ -39,6 +39,7 @@
 
 [LibraryClasses]
   PcdLib
+  HobLib
   
 [Protocols]
   gEfiDebugMaskProtocolGuid

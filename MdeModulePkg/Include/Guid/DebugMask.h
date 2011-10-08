@@ -62,6 +62,7 @@ extern EFI_GUID gEfiDebugMaskProtocolGuid;
 
 ///
 /// GUID used to store the global debug mask in an the "EFIDebug" EFI Variabe
+/// Also used as a GUIDed HOB that contains a UINT32 debug mask default value
 ///
 #define EFI_GENERIC_VARIABLE_GUID \
   { 0x59d1c24f, 0x50f1, 0x401a, {0xb1, 0x01, 0xf3, 0x3e, 0x0d, 0xae, 0xd4, 0x43} }

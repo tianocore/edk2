@@ -19,6 +19,7 @@
 
 #include <Library/DebugPrintErrorLevelLib.h>
 #include <Library/PcdLib.h>
+#include <Library/HobLib.h>
 
 #include <Guid/DebugMask.h>
 
@@ -89,10 +90,11 @@ BOOLEAN           mGlobalErrorLevelInitialized = FALSE;
 /// Global variable that contains the current debug error level mask for the
 /// module that is using this library instance.  This variable is initially
 /// set to the PcdDebugPrintErrorLevel value.  If the EFI Variable exists that
-/// contains the global debug print error level mask, then that override the
-/// PcdDebugPrintErrorLevel value.  If the Debug Mask Protocol SetDebugMask()
-/// service is called, then that overrides bit the PcdDebugPrintErrorLevel and
-/// the EFI Variable setting.
+/// contains the global debug print error level mask, then that overrides the
+/// PcdDebugPrintErrorLevel value. The EFI Variable can optionally be 
+/// discovered via a HOB so early DXE drivers can access the variable. If the
+/// Debug Mask Protocol SetDebugMask() service is called, then that overrides 
+/// the PcdDebugPrintErrorLevel and the EFI Variable setting.
 ///
 UINT32            mDebugPrintErrorLevel        = 0;
 
@@ -122,13 +124,13 @@ DxeDebugPrintErrorLevelLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS  Status;
-
+  EFI_STATUS                  Status;
+  
   //
   // Initialize the error level mask from PCD setting.
   //
   mDebugPrintErrorLevel = PcdGet32 (PcdDebugPrintErrorLevel);
-  
+    
   //
   // Install Debug Mask Protocol onto ImageHandle
   //  
@@ -142,7 +144,8 @@ DxeDebugPrintErrorLevelLibConstructor (
   //
   // Attempt to retrieve the global debug print error level mask from the EFI Variable
   // If the EFI Variable can not be accessed when this module's library constructors are
-  // executed, then the EFI Variable access will be reattempted on every DEBUG() print
+  // executed a HOB can be used to set the global debug print error level. If no value 
+  // was found then the EFI Variable access will be reattempted on every DEBUG() print
   // from this module until the EFI Variable services are available.
   //
   GetDebugPrintErrorLevel ();
@@ -194,6 +197,7 @@ GetDebugPrintErrorLevel (
   EFI_TPL     CurrentTpl;
   UINTN       Size;
   UINTN       GlobalErrorLevel;
+  VOID        *Hob;
 
   //
   // If the constructor has not been executed yet, then just return the PCD value.
@@ -203,10 +207,10 @@ GetDebugPrintErrorLevel (
   if (mSystemTable == NULL) {
     return PcdGet32 (PcdDebugPrintErrorLevel);
   }
-
+  
   //
-  // Check to see if an attempt has been mde to retrieve the global debug print 
-  // error level mask.  Since this libtrary instance stores the global debug print
+  // Check to see if an attempt has been made to retrieve the global debug print 
+  // error level mask.  Since this library instance stores the global debug print
   // error level mask in an EFI Variable, the EFI Variable should only be accessed
   // once to reduce the overhead of reading the EFI Variable on every debug print
   //  
@@ -241,6 +245,18 @@ GetDebugPrintErrorLevel (
           // the global debug print error level mask value.
           //
           mDebugPrintErrorLevel = (UINT32)GlobalErrorLevel;
+        }
+      } else {
+        //
+        // If variable services are not yet availible optionally get the global
+        // debug print error level mask from a HOB.
+        //
+        Hob = GetFirstGuidHob (&gEfiGenericVariableGuid);
+        if (Hob != NULL) {
+          if (GET_GUID_HOB_DATA_SIZE (Hob) == sizeof (UINT32)) {
+            mDebugPrintErrorLevel = *(UINT32 *)GET_GUID_HOB_DATA (Hob);
+            mGlobalErrorLevelInitialized = TRUE;
+          }
         }
       }
     }
