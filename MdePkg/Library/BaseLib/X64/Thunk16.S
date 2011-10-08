@@ -153,7 +153,7 @@ L_SavedSp:  .space      4              # restore stack
 _EntryPoint: .long      ASM_PFX(ToUserCode) - ASM_PFX(m16Start)
              .word      CODE16
 _16Gdtr:     .word      GDT_SIZE - 1
-_16GdtrBase: .quad      ASM_PFX(NullSeg)
+_16GdtrBase: .quad      0
 _16Idtr:     .word      0x3ff
              .long      0
 
