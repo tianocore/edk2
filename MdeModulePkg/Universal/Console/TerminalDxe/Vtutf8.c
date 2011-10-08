@@ -36,7 +36,7 @@ VTUTF8RawDataToUnicode (
   // and translate it into unicode, then push
   // the unicode into unicode fifo, until the raw fifo is empty.
   //
-  while (!IsRawFiFoEmpty (TerminalDevice)) {
+  while (!IsRawFiFoEmpty (TerminalDevice) && !IsUnicodeFiFoFull(TerminalDevice) ) {
 
     GetOneValidUtf8Char (TerminalDevice, &Utf8Char, &ValidBytes);
 
