@@ -1496,6 +1496,7 @@ Ikev2GenerateSaKeys (
   Digest    = NULL;
   OutputKey = NULL;
   KeyBuffer = NULL;
+  Status = EFI_SUCCESS;
 
   //
   // Generate Gxy
@@ -1581,6 +1582,10 @@ Ikev2GenerateSaKeys (
                     2 * AuthAlgKeyLen +
                     2 * IntegrityAlgKeyLen;
   OutputKey       = AllocateZeroPool (OutputKeyLength);
+  if (OutputKey == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
 
   //
   // Generate Seven Keymates.
@@ -1603,6 +1608,10 @@ Ikev2GenerateSaKeys (
   // First, SK_d
   //
   IkeSaSession->IkeKeys->SkdKey     = AllocateZeroPool (PrfAlgKeyLen);
+  if (IkeSaSession->IkeKeys->SkdKey == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
   IkeSaSession->IkeKeys->SkdKeySize = PrfAlgKeyLen;
   CopyMem (IkeSaSession->IkeKeys->SkdKey, OutputKey, PrfAlgKeyLen);
 
@@ -1612,6 +1621,10 @@ Ikev2GenerateSaKeys (
   // Second, Sk_ai
   //
   IkeSaSession->IkeKeys->SkAiKey     = AllocateZeroPool (IntegrityAlgKeyLen);
+  if (IkeSaSession->IkeKeys->SkAiKey == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
   IkeSaSession->IkeKeys->SkAiKeySize = IntegrityAlgKeyLen;
   CopyMem (IkeSaSession->IkeKeys->SkAiKey, OutputKey + PrfAlgKeyLen, IntegrityAlgKeyLen);
   
@@ -1621,6 +1634,10 @@ Ikev2GenerateSaKeys (
   // Third, Sk_ar
   //
   IkeSaSession->IkeKeys->SkArKey     = AllocateZeroPool (IntegrityAlgKeyLen);
+  if (IkeSaSession->IkeKeys->SkArKey == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
   IkeSaSession->IkeKeys->SkArKeySize = IntegrityAlgKeyLen;
   CopyMem (
     IkeSaSession->IkeKeys->SkArKey,
@@ -1634,6 +1651,10 @@ Ikev2GenerateSaKeys (
   // Fourth, Sk_ei
   //
   IkeSaSession->IkeKeys->SkEiKey     = AllocateZeroPool (EncryptAlgKeyLen);
+  if (IkeSaSession->IkeKeys->SkEiKey == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
   IkeSaSession->IkeKeys->SkEiKeySize = EncryptAlgKeyLen;
   
   CopyMem (
@@ -1651,6 +1672,10 @@ Ikev2GenerateSaKeys (
   // Fifth, Sk_er
   //
   IkeSaSession->IkeKeys->SkErKey     = AllocateZeroPool (EncryptAlgKeyLen);
+  if (IkeSaSession->IkeKeys->SkErKey == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
   IkeSaSession->IkeKeys->SkErKeySize = EncryptAlgKeyLen;
 
   CopyMem (
@@ -1668,6 +1693,10 @@ Ikev2GenerateSaKeys (
   // Sixth, Sk_pi
   //
   IkeSaSession->IkeKeys->SkPiKey     = AllocateZeroPool (AuthAlgKeyLen);
+  if (IkeSaSession->IkeKeys->SkPiKey == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
   IkeSaSession->IkeKeys->SkPiKeySize = AuthAlgKeyLen;
 
   CopyMem (
@@ -1685,6 +1714,10 @@ Ikev2GenerateSaKeys (
   // Seventh, Sk_pr
   //
   IkeSaSession->IkeKeys->SkPrKey     = AllocateZeroPool (AuthAlgKeyLen);
+  if (IkeSaSession->IkeKeys->SkPrKey == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
   IkeSaSession->IkeKeys->SkPrKeySize = AuthAlgKeyLen;
 
   CopyMem (
@@ -1709,6 +1742,31 @@ Exit:
   if (OutputKey != NULL) {
     FreePool (OutputKey);
   }
+
+  if (EFI_ERROR(Status)) {
+    if (IkeSaSession->IkeKeys->SkdKey != NULL) {
+      FreePool (IkeSaSession->IkeKeys->SkdKey);
+    }
+    if (IkeSaSession->IkeKeys->SkAiKey != NULL) {
+      FreePool (IkeSaSession->IkeKeys->SkAiKey);
+    }
+    if (IkeSaSession->IkeKeys->SkArKey != NULL) {
+      FreePool (IkeSaSession->IkeKeys->SkArKey);
+    }
+    if (IkeSaSession->IkeKeys->SkEiKey != NULL) {
+      FreePool (IkeSaSession->IkeKeys->SkEiKey);
+    }
+    if (IkeSaSession->IkeKeys->SkErKey != NULL) {
+      FreePool (IkeSaSession->IkeKeys->SkErKey);
+    }
+    if (IkeSaSession->IkeKeys->SkPiKey != NULL) {
+      FreePool (IkeSaSession->IkeKeys->SkPiKey);
+    }
+    if (IkeSaSession->IkeKeys->SkPrKey != NULL) {
+      FreePool (IkeSaSession->IkeKeys->SkPrKey);
+    }
+  }
+
   
   return Status;
 }
@@ -1737,6 +1795,9 @@ Ikev2GenerateChildSaKeys (
   UINT8*              OutputKey;
   UINTN               OutputKeyLength;
 
+  Status = EFI_SUCCESS;
+  OutputKey = NULL;
+  
   if (KePayload != NULL) {
     //
     // Generate Gxy 
@@ -1760,7 +1821,8 @@ Ikev2GenerateChildSaKeys (
   OutputKeyLength    = 2 * EncryptAlgKeyLen + 2 * IntegrityAlgKeyLen;
 
   if ((EncryptAlgKeyLen == 0) || (IntegrityAlgKeyLen == 0)) {
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    goto Exit;
   }
 
   //
@@ -1769,6 +1831,10 @@ Ikev2GenerateChildSaKeys (
   // otherwise, KEYMAT = prf+(SK_d, Ni | Nr )
   //
   OutputKey = AllocateZeroPool (OutputKeyLength);
+  if (OutputKey == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
 
   //
   // Derive Key from the SkdKey Buffer.
@@ -1784,8 +1850,7 @@ Ikev2GenerateChildSaKeys (
              );
 
   if (EFI_ERROR (Status)) {
-    FreePool (OutputKey);
-    return Status;
+    goto Exit;  
   }
   
   //
@@ -1800,6 +1865,10 @@ Ikev2GenerateChildSaKeys (
     ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.EncAlgoId    = (UINT8)SaParams->EncAlgId;
     ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.EncKeyLength = EncryptAlgKeyLen;
     ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.EncKey       = AllocateZeroPool (EncryptAlgKeyLen);
+    if (ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.EncKey == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }
 
     CopyMem (
       ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.EncKey,
@@ -1813,7 +1882,11 @@ Ikev2GenerateChildSaKeys (
     ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.AuthAlgoId    = (UINT8)SaParams->IntegAlgId;
     ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.AuthKeyLength = IntegrityAlgKeyLen;
     ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.AuthKey       = AllocateZeroPool (IntegrityAlgKeyLen);
-
+    if (ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.AuthKey == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }    
+    
     CopyMem (
       ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.AuthKey,
       OutputKey + EncryptAlgKeyLen,
@@ -1826,7 +1899,11 @@ Ikev2GenerateChildSaKeys (
     ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.EncAlgoId    = (UINT8)SaParams->EncAlgId;
     ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.EncKeyLength = EncryptAlgKeyLen;
     ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.EncKey       = AllocateZeroPool (EncryptAlgKeyLen);
-
+    if (ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.EncKey == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }   
+    
     CopyMem (
       ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.EncKey,
       OutputKey + EncryptAlgKeyLen + IntegrityAlgKeyLen,
@@ -1839,6 +1916,10 @@ Ikev2GenerateChildSaKeys (
     ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.AuthAlgoId    = (UINT8)SaParams->IntegAlgId;
     ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.AuthKeyLength = IntegrityAlgKeyLen;
     ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.AuthKey       = AllocateZeroPool (IntegrityAlgKeyLen);
+    if (ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.AuthKey == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }   
     
     CopyMem (
       ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.AuthKey,
@@ -1852,7 +1933,11 @@ Ikev2GenerateChildSaKeys (
     ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.EncAlgoId    = (UINT8)SaParams->EncAlgId;
     ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.EncKeyLength = EncryptAlgKeyLen;
     ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.EncKey       = AllocateZeroPool (EncryptAlgKeyLen);
-
+    if (ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.EncKey == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }   
+    
     CopyMem (
       ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.EncKey,
       OutputKey,
@@ -1865,7 +1950,11 @@ Ikev2GenerateChildSaKeys (
     ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.AuthAlgoId    = (UINT8)SaParams->IntegAlgId;
     ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.AuthKeyLength = IntegrityAlgKeyLen;
     ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.AuthKey       = AllocateZeroPool (IntegrityAlgKeyLen);
-
+    if (ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.AuthKey == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }   
+    
     CopyMem (
       ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.AuthKey,
       OutputKey + EncryptAlgKeyLen,
@@ -1878,7 +1967,11 @@ Ikev2GenerateChildSaKeys (
     ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.EncAlgoId    = (UINT8)SaParams->EncAlgId;
     ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.EncKeyLength = EncryptAlgKeyLen;
     ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.EncKey       = AllocateZeroPool (EncryptAlgKeyLen);
-
+    if (ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.EncKey == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }  
+    
     CopyMem (
       ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.EncKey,
       OutputKey + EncryptAlgKeyLen + IntegrityAlgKeyLen,
@@ -1891,7 +1984,11 @@ Ikev2GenerateChildSaKeys (
     ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.AuthAlgoId    = (UINT8)SaParams->IntegAlgId;
     ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.AuthKeyLength = IntegrityAlgKeyLen;
     ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.AuthKey       = AllocateZeroPool (IntegrityAlgKeyLen);
-
+    if (ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.AuthKey == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }   
+    
     CopyMem (
       ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.AuthKey,
       OutputKey + 2 * EncryptAlgKeyLen + IntegrityAlgKeyLen,
@@ -1920,7 +2017,27 @@ Ikev2GenerateChildSaKeys (
     IntegrityAlgKeyLen
     );
 
-  FreePool (OutputKey);
+
+
+Exit:
+  if (EFI_ERROR (Status)) {
+    if (ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.EncKey != NULL) {
+      FreePool (ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.EncKey);
+    }
+    if (ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.AuthKey != NULL) {
+      FreePool (ChildSaSession->ChildKeymats.LocalPeerInfo.EspAlgoInfo.AuthKey);
+    }
+    if (ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.EncKey != NULL) {
+      FreePool (ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.EncKey);
+    }
+    if (ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.AuthKey != NULL) {
+      FreePool (ChildSaSession->ChildKeymats.RemotePeerInfo.EspAlgoInfo.AuthKey);
+    }
+  }
+
+  if (OutputKey != NULL) {
+    FreePool (OutputKey);
+  }
   
   return EFI_SUCCESS;
 }

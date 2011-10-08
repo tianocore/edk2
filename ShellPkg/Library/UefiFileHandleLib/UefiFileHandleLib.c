@@ -765,6 +765,9 @@ StrnCatGrowLeft (
   } else {
     *Destination = AllocateZeroPool(Count+sizeof(CHAR16));
   }
+  if (*Destination == NULL) {
+    return NULL;
+  }
 
   CopySize = StrSize(*Destination);
   CopyMem((*Destination)+((Count-2)/sizeof(CHAR16)), *Destination, CopySize);

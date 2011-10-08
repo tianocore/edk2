@@ -1237,6 +1237,7 @@ IpSecTunnelOutboundPacket (
       );
   } else {
     InnerHead = AllocateZeroPool (sizeof (EFI_IP6_HEADER) + *OptionsLength);
+    ASSERT (InnerHead != NULL);
     CopyMem (
       InnerHead,
       IpHead,

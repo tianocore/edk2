@@ -1497,13 +1497,16 @@ Ip6ProcessNeighborSolicit (
     goto Exit;
   } else {
     OptionLen = (UINT16) (Head->PayloadLength - IP6_ND_LENGTH);
-    Option    = NetbufGetByte (Packet, IP6_ND_LENGTH, NULL);
+    if (OptionLen != 0) {
+      Option    = NetbufGetByte (Packet, IP6_ND_LENGTH, NULL);
+      ASSERT (Option != NULL);
 
-    //
-    // All included options should have a length that is greater than zero.
-    //
-    if (!Ip6IsNDOptionValid (Option, OptionLen)) {
-      goto Exit;
+      //
+      // All included options should have a length that is greater than zero.
+      //
+      if (!Ip6IsNDOptionValid (Option, OptionLen)) {
+        goto Exit;
+      }
     }
   }
 
@@ -1733,13 +1736,16 @@ Ip6ProcessNeighborAdvertise (
     goto Exit;
   } else {
     OptionLen = (UINT16) (Head->PayloadLength - IP6_ND_LENGTH);
-    Option    = NetbufGetByte (Packet, IP6_ND_LENGTH, NULL);
+    if (OptionLen != 0) {
+      Option    = NetbufGetByte (Packet, IP6_ND_LENGTH, NULL);
+      ASSERT (Option != NULL);
 
-    //
-    // All included options should have a length that is greater than zero.
-    //
-    if (!Ip6IsNDOptionValid (Option, OptionLen)) {
-      goto Exit;
+      //
+      // All included options should have a length that is greater than zero.
+      //
+      if (!Ip6IsNDOptionValid (Option, OptionLen)) {
+        goto Exit;
+      }
     }
   }
 
@@ -1982,10 +1988,13 @@ Ip6ProcessRouterAdvertise (
   // All included options have a length that is greater than zero.
   //
   OptionLen = (UINT16) (Head->PayloadLength - IP6_RA_LENGTH);
-  Option    = NetbufGetByte (Packet, IP6_RA_LENGTH, NULL);
+  if (OptionLen != 0) {
+    Option    = NetbufGetByte (Packet, IP6_RA_LENGTH, NULL);
+    ASSERT (Option != NULL);
 
-  if (!Ip6IsNDOptionValid (Option, OptionLen)) {
-    goto Exit;
+    if (!Ip6IsNDOptionValid (Option, OptionLen)) {
+      goto Exit;
+    }
   }
 
   //
@@ -2428,10 +2437,13 @@ Ip6ProcessRedirect (
   // All included options have a length that is greater than zero.
   //
   OptionLen = (UINT16) (Head->PayloadLength - IP6_REDITECT_LENGTH);
-  Option    = NetbufGetByte (Packet, IP6_REDITECT_LENGTH, NULL);
+  if (OptionLen != 0) {
+    Option    = NetbufGetByte (Packet, IP6_REDITECT_LENGTH, NULL);
+    ASSERT (Option != NULL);
 
-  if (!Ip6IsNDOptionValid (Option, OptionLen)) {
-    goto Exit;
+    if (!Ip6IsNDOptionValid (Option, OptionLen)) {
+      goto Exit;
+    }
   }
 
   Target   = (EFI_IPv6_ADDRESS *) (Icmp + 1);

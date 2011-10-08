@@ -2446,9 +2446,7 @@ InternalHiiGrowOpCodeHandle (
               OpCodeBuffer->BufferSize + (Size + HII_LIB_OPCODE_ALLOCATION_SIZE),
               OpCodeBuffer->Buffer
               );
-    if (Buffer == NULL) {
-      return NULL;
-    }
+    ASSERT (Buffer != NULL);
     OpCodeBuffer->Buffer = Buffer;
     OpCodeBuffer->BufferSize += (Size + HII_LIB_OPCODE_ALLOCATION_SIZE);
   }

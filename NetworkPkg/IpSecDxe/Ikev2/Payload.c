@@ -1,7 +1,7 @@
 /** @file
   The implementation of Payloads Creation.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -311,6 +311,9 @@ Ikev2GenerateCertIdPayload (
     &CertSubject,
     &SubjectSize
     );
+  if (SubjectSize != 0) {
+    ASSERT (CertSubject != NULL);
+  }
 
   IdSize = sizeof (IKEV2_ID) + SubjectSize;
 
@@ -757,7 +760,7 @@ Ikev2CertGenerateAuthPayload (
       &SigSize
       );
 
-    if (SigSize == 0) {
+    if (SigSize == 0 || Signature == NULL) {
       goto EXIT;
     }
   }
@@ -1231,6 +1234,10 @@ Ikev2GenerateDeletePayload (
   //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
   //
   SpiBufSize    = (UINT16) (SpiSize * SpiNum);
+  if (SpiBufSize != 0 && SpiBuf == NULL) {
+    return NULL;
+  }
+  
   DelPayloadLen = (UINT16) (sizeof (IKEV2_DELETE) + SpiBufSize);
 
   Del           = AllocateZeroPool (DelPayloadLen);
@@ -1498,6 +1505,9 @@ Ikev2GenerateCertificatePayload (
     Fragment[0].DataSize = PublicKeyLen;
     HashDataSize      = IpSecGetHmacDigestLength (IKE_AALG_SHA1HMAC);
     HashData          = AllocateZeroPool (HashDataSize);
+    if (HashData == NULL) {
+      goto ON_EXIT;
+    }
     
     Status = IpSecCryptoIoHash (
                IKE_AALG_SHA1HMAC,
@@ -2289,6 +2299,10 @@ Ikev2DecodePacket (
     IkeSaSession = IKEV2_SA_SESSION_FROM_COMMON (SessionCommon);
     if (SessionCommon->IsInitiator) {
       IkeSaSession->RespPacket     = AllocateZeroPool (IkePacket->Header->Length);
+      if (IkeSaSession->RespPacket == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Exit; 
+      }
       IkeSaSession->RespPacketSize = IkePacket->Header->Length;
       CopyMem (IkeSaSession->RespPacket, IkeHeader, sizeof (IKE_HEADER));
       CopyMem (
@@ -2298,6 +2312,10 @@ Ikev2DecodePacket (
         );         
     } else {
       IkeSaSession->InitPacket     = AllocateZeroPool (IkePacket->Header->Length);
+      if (IkeSaSession->InitPacket == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Exit; 
+      }
       IkeSaSession->InitPacketSize = IkePacket->Header->Length;
       CopyMem (IkeSaSession->InitPacket, IkeHeader, sizeof (IKE_HEADER));
       CopyMem (
@@ -2766,6 +2784,8 @@ Ikev2EncryptPacket (
   UINTN                  CryptKeyLength;
   HASH_DATA_FRAGMENT     Fragments[1];
 
+  Status = EFI_SUCCESS;
+
   //
   // Initial all buffers to NULL.
   //
@@ -2827,6 +2847,10 @@ Ikev2EncryptPacket (
   //
   IvSize    = CryptBlockSize;
   IvBuffer  = (UINT8 *) AllocateZeroPool (IvSize);
+  if (IvBuffer == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
 
   //
   // Generate IV
@@ -2892,6 +2916,10 @@ Ikev2EncryptPacket (
   IkePacket->Header->NextPayload = IKEV2_PAYLOAD_TYPE_ENCRYPT;
   
   IntegrityBuf                   = AllocateZeroPool (IkePacket->Header->Length);
+  if (IntegrityBuf == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
   IntegrityBufSize               = IkePacket->Header->Length;
   IkeHdrHostToNet (IkePacket->Header);
 
@@ -2905,6 +2933,10 @@ Ikev2EncryptPacket (
   Fragments[0].DataSize = EncryptPayloadSize + sizeof (IKE_HEADER) - CheckSumSize;
 
   CheckSumData = AllocateZeroPool (CheckSumSize);
+  if (CheckSumData == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
   if (SessionCommon->IsInitiator) {
 
     IpSecCryptoIoHmac (
