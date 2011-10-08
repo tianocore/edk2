@@ -563,7 +563,7 @@ TerminalConInTimerHandler (
   // Fetch all the keys in the serial buffer,
   // and insert the byte stream into RawFIFO.
   //
-  while( !IsRawFiFoFull(TerminalDevice) ) {
+  while (!IsRawFiFoFull (TerminalDevice)) {
 
     Status = GetOneKeyFromSerial (TerminalDevice->SerialIo, &Input);
 
@@ -1061,7 +1061,9 @@ UnicodeToEfiKeyFlushState (
 
   InputState = TerminalDevice->InputState;
 
-  if( IsEfiKeyFiFoFull(TerminalDevice) ) return;
+  if (IsEfiKeyFiFoFull (TerminalDevice)) {
+    return;
+  }
 
   if ((InputState & INPUT_STATE_ESC) != 0) {
     Key.ScanCode    = SCAN_ESC;
@@ -1191,7 +1193,7 @@ UnicodeToEfiKey (
     TerminalDevice->ResetState = RESET_STATE_DEFAULT;
   }
 
-  while (!IsUnicodeFiFoEmpty(TerminalDevice) && !IsEfiKeyFiFoFull(TerminalDevice) ) {
+  while (!IsUnicodeFiFoEmpty (TerminalDevice) && !IsEfiKeyFiFoFull (TerminalDevice)) {
 
     if (TerminalDevice->InputState != INPUT_STATE_DEFAULT) {
       //
