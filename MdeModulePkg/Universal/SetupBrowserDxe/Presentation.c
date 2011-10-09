@@ -1290,11 +1290,21 @@ ProcessCallBackFunction (
       if (Action == EFI_BROWSER_ACTION_CHANGING || Action == EFI_BROWSER_ACTION_RETRIEVE) {
         SetQuestionValue(Selection->FormSet, Selection->Form, Statement, TRUE);
       }
-    } else if (Status == EFI_UNSUPPORTED) {
+    } else {
       //
-      // If return EFI_UNSUPPORTED, also consider Hii driver suceess deal with it.
+      // According the spec, return fail from call back of "changing" and 
+      // "retrieve", should restore the question's value.
       //
-      Status = EFI_SUCCESS;
+      if (Action  == EFI_BROWSER_ACTION_CHANGING || Action == EFI_BROWSER_ACTION_RETRIEVE) {
+        GetQuestionValue(Selection->FormSet, Selection->Form, Statement, TRUE);
+      }
+
+      if (Status == EFI_UNSUPPORTED) {
+        //
+        // If return EFI_UNSUPPORTED, also consider Hii driver suceess deal with it.
+        //
+        Status = EFI_SUCCESS;
+      }
     }
   }
 
