@@ -1960,6 +1960,35 @@ HiiGetSecondaryLanguages (
 }
 
 /**
+  Converts the ascii character of the string from uppercase to lowercase.
+  This is a internal function.
+
+  @param ConfigString  String to be converted
+
+**/
+VOID
+EFIAPI
+AsciiHiiToLower (
+  IN CHAR8  *ConfigString
+  )
+{
+  CHAR8      *String;
+
+  ASSERT (ConfigString != NULL);
+
+  //
+  // Convert all hex digits in range [A-F] in the configuration header to [a-f]
+  //
+  for (String = ConfigString; *String != '\0'; String++) {
+    if ( *String >= 'A' && *String <= 'Z') {
+      *String = (CHAR8) (*String - 'A' + 'a');
+    }
+  }
+
+  return;
+}
+
+/**
   Compare whether two names of languages are identical.
 
   @param  Language1              Name of language 1 from StringPackage
@@ -1976,18 +2005,37 @@ HiiCompareLanguage (
   )
 {
   UINTN  Index;
+  UINTN  StrLen;
+  CHAR8  *Lan1;
+  CHAR8  *Lan2;
+
+  //
+  // Convert to lower to compare.
+  //
+  StrLen = AsciiStrSize (Language1);
+  Lan1   = AllocateZeroPool (StrLen);
+  AsciiStrCpy(Lan1, Language1);
+  AsciiHiiToLower (Lan1);
+
+  StrLen = AsciiStrSize (Language2);
+  Lan2   = AllocateZeroPool (StrLen);
+  AsciiStrCpy(Lan2, Language2);
+  AsciiHiiToLower (Lan2);
 
   //
   // Compare the Primary Language in Language1 to Language2
   //
-  for (Index = 0; Language1[Index] != 0 && Language1[Index] != ';'; Index++) {
-    if (Language1[Index] != Language2[Index]) {
+  for (Index = 0; Lan1[Index] != 0 && Lan1[Index] != ';'; Index++) {
+    if (Lan1[Index] != Lan2[Index]) {
       //
       // Return FALSE if any characters are different.
       //
       return FALSE;
     }
   }
+
+  FreePool (Lan1);
+  FreePool (Lan2);
 
   //
   // Only return TRUE if Language2[Index] is a Null-terminator which means
