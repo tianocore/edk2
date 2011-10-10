@@ -2034,18 +2034,23 @@ EvaluateExpression (
         //
         // When converting from a string, if case-insensitive compare
         // with "true" is True, then push True. If a case-insensitive compare
-        // with "false" is True, then push False.
+        // with "false" is True, then push False. Otherwise, push Undefined. 
         //
         StrPtr = GetToken (Value->Value.string, FormSet->HiiHandle);
         if (StrPtr == NULL) {
           Status = EFI_INVALID_PARAMETER;
           goto Done;
         }
-
-        if ((StrCmp (StrPtr, L"true") == 0) || (StrCmp (StrPtr, L"false") == 0)){
+        
+        IfrStrToUpper (StrPtr);
+        if (StrCmp (StrPtr, L"TRUE") == 0){
           Value->Value.b = TRUE;
-        } else {
+        } else if (StrCmp (StrPtr, L"FALSE") == 0) {
           Value->Value.b = FALSE;
+        } else {
+          Status = EFI_INVALID_PARAMETER;
+          FreePool (StrPtr);
+          goto Done;
         }
         FreePool (StrPtr);
         Value->Type = EFI_IFR_TYPE_BOOLEAN;
