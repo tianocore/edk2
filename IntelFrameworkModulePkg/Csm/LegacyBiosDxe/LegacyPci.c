@@ -2857,6 +2857,23 @@ LegacyBiosInstallPciRom (
       return EFI_UNSUPPORTED;
     }
 
+    if (!Private->VgaInstalled) {
+      //
+      // A return status of EFI_NOT_FOUND is considered valid (No EFI
+      // driver is controlling video.
+      //
+      mVgaInstallationInProgress  = TRUE;
+      Status                      = LegacyBiosInstallVgaRom (Private);
+      if (EFI_ERROR (Status)) {
+        if (Status != EFI_NOT_FOUND) {
+          mVgaInstallationInProgress = FALSE;
+          return Status;
+        }
+      } else {
+        mVgaInstallationInProgress = FALSE;
+      }
+    }
+
     LocalRomImage = *RomImage;
     Pcir = (PCI_3_0_DATA_STRUCTURE *)
            ((UINT8 *) LocalRomImage + ((PCI_EXPANSION_ROM_HEADER *) LocalRomImage)->PcirOffset);
