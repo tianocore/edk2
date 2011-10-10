@@ -84,6 +84,8 @@ ShellIsDecimalDigitCharacter (
   Helper function to find ShellEnvironment2 for constructor.
 
   @param[in] ImageHandle    A copy of the calling image's handle.
+
+  @retval EFI_OUT_OF_RESOURCES    Memory allocation failed.
 **/
 EFI_STATUS
 EFIAPI
@@ -123,7 +125,9 @@ ShellFindSE2 (
     //
     if (Status == EFI_BUFFER_TOO_SMALL) {
       Buffer = (EFI_HANDLE*)AllocateZeroPool(BufferSize);
-      ASSERT(Buffer != NULL);
+      if (Buffer == NULL) {
+        return (EFI_OUT_OF_RESOURCES);
+      }
       Status = gBS->LocateHandle (ByProtocol,
                                   &gEfiShellEnvironment2Guid,
                                   NULL, // ignored for ByProtocol
@@ -1360,8 +1364,9 @@ InternalShellConvertFileListType (
     // allocate a new EFI_SHELL_FILE_INFO object
     //
     NewInfo               = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
-    ASSERT(NewInfo != NULL);
     if (NewInfo == NULL) {
+      ShellCloseFileMetaArg(&(EFI_SHELL_FILE_INFO*)ListHead);
+      ListHead = NULL;
       break;
     }
 
@@ -1384,9 +1389,11 @@ InternalShellConvertFileListType (
     //
     // make sure all the memory allocations were sucessful
     //
-    ASSERT(NewInfo->FullName != NULL);
-    ASSERT(NewInfo->FileName != NULL);
-    ASSERT(NewInfo->Info     != NULL);
+    if (NULL == NewInfo->FullName || NewInfo->FileName == NULL || NewInfo->Info == NULL) {
+      ShellCloseFileMetaArg(&(EFI_SHELL_FILE_INFO*)ListHead);
+      ListHead = NULL;
+      break;
+    }
 
     //
     // Copt the strings and structure
@@ -1612,7 +1619,6 @@ ShellFindFilePath (
     Size = StrSize(Path);
     Size += StrSize(FileName);
     TestPath = AllocateZeroPool(Size);
-    ASSERT(TestPath != NULL);
     if (TestPath == NULL) {
       return (NULL);
     }
@@ -1719,7 +1725,6 @@ ShellFindFilePathEx (
   Size =  StrSize(FileName);
   Size += StrSize(FileExtension);
   TestPath = AllocateZeroPool(Size);
-  ASSERT(TestPath != NULL);
   if (TestPath == NULL) {
     return (NULL);
   }
@@ -1934,8 +1939,9 @@ InternalCommandLineParse (
   //
   *CheckPackage = (LIST_ENTRY*)AllocateZeroPool(sizeof(LIST_ENTRY));
   if (*CheckPackage == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    return (EFI_OUT_OF_RESOURCES);
   }
+
   InitializeListHead(*CheckPackage);
 
   //
@@ -1958,9 +1964,17 @@ InternalCommandLineParse (
       // this is a flag
       //
       CurrentItemPackage = AllocateZeroPool(sizeof(SHELL_PARAM_PACKAGE));
-      ASSERT(CurrentItemPackage != NULL);
+      if (CurrentItemPackage == NULL) {
+        ShellCommandLineFreeVarList(*CheckPackage);
+        *CheckPackage = NULL;
+        return (EFI_OUT_OF_RESOURCES);
+      }
       CurrentItemPackage->Name  = AllocateZeroPool(StrSize(Argv[LoopCounter]));
-      ASSERT(CurrentItemPackage->Name != NULL);
+      if (CurrentItemPackage->Name == NULL) {
+        ShellCommandLineFreeVarList(*CheckPackage);
+        *CheckPackage = NULL;
+        return (EFI_OUT_OF_RESOURCES);
+      }
       StrCpy(CurrentItemPackage->Name,  Argv[LoopCounter]);
       CurrentItemPackage->Type  = CurrentItemType;
       CurrentItemPackage->OriginalPosition = (UINTN)(-1);
@@ -2024,11 +2038,19 @@ InternalCommandLineParse (
         TempPointer++;
       }
       CurrentItemPackage = AllocateZeroPool(sizeof(SHELL_PARAM_PACKAGE));
-      ASSERT(CurrentItemPackage != NULL);
+      if (CurrentItemPackage == NULL) {
+        ShellCommandLineFreeVarList(*CheckPackage);
+        *CheckPackage = NULL;
+        return (EFI_OUT_OF_RESOURCES);
+      }
       CurrentItemPackage->Name  = NULL;
       CurrentItemPackage->Type  = TypePosition;
       CurrentItemPackage->Value = AllocateZeroPool(StrSize(TempPointer));
-      ASSERT(CurrentItemPackage->Value != NULL);
+      if (CurrentItemPackage->Value == NULL) {
+        ShellCommandLineFreeVarList(*CheckPackage);
+        *CheckPackage = NULL;
+        return (EFI_OUT_OF_RESOURCES);
+      }
       StrCpy(CurrentItemPackage->Value, TempPointer);
       CurrentItemPackage->OriginalPosition = Count++;
       InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
@@ -2038,8 +2060,9 @@ InternalCommandLineParse (
       //
       if (ProblemParam != NULL) {
         *ProblemParam = AllocateZeroPool(StrSize(Argv[LoopCounter]));
-        ASSERT(*ProblemParam != NULL);
-        StrCpy(*ProblemParam, Argv[LoopCounter]);      
+        if (*ProblemParam != NULL) {
+          StrCpy(*ProblemParam, Argv[LoopCounter]);      
+        }
       }
       ShellCommandLineFreeVarList(*CheckPackage);
       *CheckPackage = NULL;
@@ -2504,7 +2527,9 @@ ShellCopySearchAndReplace(
     Replace = StrnCatGrow(&Replace, NULL, ReplaceWith, 0);
   } else {
     Replace = AllocateZeroPool(StrSize(ReplaceWith) + 2*sizeof(CHAR16));
-    UnicodeSPrint(Replace, StrSize(ReplaceWith) + 2*sizeof(CHAR16), L"\"%s\"", ReplaceWith);
+    if (Replace != NULL) {
+      UnicodeSPrint(Replace, StrSize(ReplaceWith) + 2*sizeof(CHAR16), L"\"%s\"", ReplaceWith);
+    }
   }
   if (Replace == NULL) {
     return (EFI_OUT_OF_RESOURCES);
@@ -3092,11 +3117,9 @@ StrnCatGrow (
       NewSize += 2 * Count * sizeof(CHAR16);
     }
     *Destination = ReallocatePool(*CurrentSize, NewSize, *Destination);
-    ASSERT(*Destination != NULL);
     *CurrentSize = NewSize;
   } else {
     *Destination = AllocateZeroPool((Count+1)*sizeof(CHAR16));
-    ASSERT(*Destination != NULL);
   }
 
   //
@@ -3831,7 +3854,8 @@ ShellIsHexOrDecimalNumber (
   @param[in, out]  Ascii         Boolean value for indicating whether the file is
                                  Ascii (TRUE) or UCS2 (FALSE).
 
-  @return                       The line of text from the file.
+  @return                        The line of text from the file.
+  @retval NULL                   There was not enough memory available.
 
   @sa ShellFileHandleReadLine
 **/
@@ -3852,9 +3876,12 @@ ShellFileHandleReturnLine(
   Status = ShellFileHandleReadLine(Handle, RetVal, &Size, FALSE, Ascii);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     RetVal = AllocateZeroPool(Size);
+    if (RetVal == NULL) {
+      return (NULL);
+    }
     Status = ShellFileHandleReadLine(Handle, RetVal, &Size, FALSE, Ascii);
+    
   }
-  ASSERT_EFI_ERROR(Status);
   if (EFI_ERROR(Status) && (RetVal != NULL)) {
     FreePool(RetVal);
     RetVal = NULL;

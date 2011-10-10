@@ -120,9 +120,10 @@ IsValidMove(
   @param[in, out] DestPathPointer  A pointer to the callee allocated final path.
   @param[in] Cwd                   A pointer to the current working directory.
 
-  @retval EFI_INVALID_PARAMETR  The DestDir could not be resolved to a location.
-  @retval EFI_INVALID_PARAMETR  The DestDir could be resolved to more than 1 location.
-  @retval EFI_SUCCESS           The operation was sucessful.
+  @retval SHELL_INVALID_PARAMETER  The DestDir could not be resolved to a location.
+  @retval SHELL_INVALID_PARAMETER  The DestDir could be resolved to more than 1 location.
+  @retval SHELL_INVALID_PARAMETER  Cwd is required and is NULL.
+  @retval SHELL_SUCCESS            The operation was sucessful.
 **/
 SHELL_STATUS
 EFIAPI
@@ -143,6 +144,9 @@ GetDestinationLocation(
   DestPath = NULL;
 
   if (StrStr(DestDir, L"\\") == DestDir) {
+    if (Cwd == NULL) {
+      return SHELL_INVALID_PARAMETER;
+    }
     DestPath = AllocateZeroPool(StrSize(Cwd));
     if (DestPath == NULL) {
       return (SHELL_OUT_OF_RESOURCES);
@@ -161,6 +165,10 @@ GetDestinationLocation(
     // Not existing... must be renaming
     //
     if ((TempLocation = StrStr(DestDir, L":")) == NULL) {
+      if (Cwd == NULL) {
+        ShellCloseFileMetaArg(&DestList);
+        return (SHELL_INVALID_PARAMETER);
+      }
       NewSize = StrSize(Cwd);
       NewSize += StrSize(DestDir);
       DestPath = AllocateZeroPool(NewSize);

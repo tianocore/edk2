@@ -179,6 +179,7 @@ ShellCommandRunDate (
   EFI_TIME      TheTime;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
+  CONST CHAR16  *Param1;
 
   ShellStatus  = SHELL_SUCCESS;
   ProblemParam = NULL;
@@ -238,9 +239,14 @@ ShellCommandRunDate (
           //
           // perform level 3 operation here.
           //
-          ShellStatus = CheckAndSetDate(ShellCommandLineGetRawValue(Package, 1));
+          Param1 = ShellCommandLineGetRawValue(Package, 1);
+          if (Param1 == NULL) {
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          } else {
+            ShellStatus = CheckAndSetDate(Param1);
+          }
           if (ShellStatus != SHELL_SUCCESS) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, ShellCommandLineGetRawValue(Package, 1));
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, Param1);
             ShellStatus = SHELL_INVALID_PARAMETER;
           }
         }
