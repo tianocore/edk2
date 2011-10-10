@@ -36,6 +36,7 @@ ShellCommandRunEdit (
   CONST CHAR16        *Cwd;
   CHAR16              *Nfs;
   CHAR16              *Spot;
+  CONST CHAR16        *TempParam;
 //  SHELL_FILE_HANDLE   TempHandle;
 
   Buffer      = NULL;
@@ -101,7 +102,9 @@ ShellCommandRunEdit (
         // if editor launched with file named
         //
         if (ShellCommandLineGetCount(Package) == 2) {
-          FileBufferSetFileName (ShellCommandLineGetRawValue(Package, 1));
+          TempParam = ShellCommandLineGetRawValue(Package, 1);
+          ASSERT(TempParam != NULL);
+          FileBufferSetFileName (TempParam);
 //          if (EFI_ERROR(ShellFileExists(MainEditor.FileBuffer->FileName))) {
 //            Status = ShellOpenFileByName(MainEditor.FileBuffer->FileName, &TempHandle, EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 0);
 //            if (!EFI_ERROR(Status)) {

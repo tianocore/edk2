@@ -206,8 +206,10 @@ TxtOutProtocolDumpInformation(
   RetVal = AllocateZeroPool(Size);
 
   Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_TXT_OUT_DUMP_HEADER), NULL);
-  UnicodeSPrint(RetVal, Size, Temp, Dev, Dev->Mode->Attribute);
-  FreePool(Temp);
+  if (Temp != NULL) {
+    UnicodeSPrint(RetVal, Size, Temp, Dev, Dev->Mode->Attribute);
+    FreePool(Temp);
+  }
 
   //
   // Dump TextOut Info
@@ -219,7 +221,7 @@ TxtOutProtocolDumpInformation(
     UnicodeSPrint(
       RetVal + StrLen(RetVal),
       NewSize,
-      Temp,
+      Temp == NULL?L"":Temp,
       Index == Dev->Mode->Mode ? L'*' : L' ',
       Index,
       !EFI_ERROR(Status)?Col:-1,

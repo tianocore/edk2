@@ -1327,7 +1327,8 @@ FileInterfaceMemGetPosition(
   @param[in, out] BufferSize   Size in bytes of Buffer.
   @param[in] Buffer            The pointer to the buffer to write.
   
-  @retval EFI_SUCCESS   The data was written.
+  @retval EFI_OUT_OF_RESOURCES The operation failed due to lack of resources.
+  @retval EFI_SUCCESS          The data was written.
 **/
 EFI_STATUS
 EFIAPI
@@ -1354,6 +1355,9 @@ FileInterfaceMemWrite(
     // Ascii
     //
     AsciiBuffer = AllocateZeroPool(*BufferSize);
+    if (AsciiBuffer == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
     AsciiSPrint(AsciiBuffer, *BufferSize, "%S", Buffer);
     if ((UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->Position + AsciiStrSize(AsciiBuffer)) > (UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize)) {
       ((EFI_FILE_PROTOCOL_MEM*)This)->Buffer = ReallocatePool((UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize), (UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize) + AsciiStrSize(AsciiBuffer) + 10, ((EFI_FILE_PROTOCOL_MEM*)This)->Buffer);

@@ -607,8 +607,10 @@ FreadCrc (
   Advance the current position (read in new data if needed).
   Delete outdated string info. Find a match string for current position.
 
+  @retval TRUE      The operation was successful.
+  @retval FALSE     The operation failed due to insufficient memory.
 **/
-VOID
+BOOLEAN
 EFIAPI
 GetNextMatch (
   VOID
@@ -621,6 +623,9 @@ GetNextMatch (
   mPos++;
   if (mPos == WNDSIZ * 2) {
     Temp = AllocateZeroPool (WNDSIZ + MAXMATCH);
+    if (Temp == NULL) {
+      return (FALSE);
+    }
     CopyMem (Temp, &mText[WNDSIZ], WNDSIZ + MAXMATCH);
     CopyMem (&mText[0], Temp, WNDSIZ + MAXMATCH);
     FreePool (Temp);
@@ -631,6 +636,8 @@ GetNextMatch (
 
   DeleteNode ();
   InsertNode ();
+
+  return (TRUE);
 }
 
 /**
@@ -1286,7 +1293,9 @@ Encode (
   while (mRemainder > 0) {
     LastMatchLen  = mMatchLen;
     LastMatchPos  = mMatchPos;
-    GetNextMatch ();
+    if (!GetNextMatch ()) {
+      Status = EFI_OUT_OF_RESOURCES;
+    }
     if (mMatchLen > mRemainder) {
       mMatchLen = mRemainder;
     }
@@ -1306,7 +1315,9 @@ Encode (
              (mPos - LastMatchPos - 2) & (WNDSIZ - 1));
       LastMatchLen--;
       while (LastMatchLen > 0) {
-        GetNextMatch ();
+        if (!GetNextMatch ()) {
+          Status = EFI_OUT_OF_RESOURCES;
+        }
         LastMatchLen--;
       }
 
@@ -1318,7 +1329,7 @@ Encode (
 
   HufEncodeEnd ();
   FreeMemory ();
-  return EFI_SUCCESS;
+  return (Status);
 }
 
 /**

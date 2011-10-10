@@ -548,7 +548,8 @@ ManFileFindTitleSection(
   @retval EFI_SUCCESS           The help text was returned.
   @retval EFI_OUT_OF_RESOURCES  The necessary buffer could not be allocated to hold the
                                 returned help text.
-  @retval EFI_INVALID_PARAMETER HelpText is NULL
+  @retval EFI_INVALID_PARAMETER HelpText is NULL.
+  @retval EFI_INVALID_PARAMETER ManFileName is invalid.
   @retval EFI_NOT_FOUND         There is no help text available for Command.
 **/
 EFI_STATUS
@@ -594,6 +595,9 @@ ProcessManFile(
   } else {
     FileHandle    = NULL;
     TempString  = GetManFileName(ManFileName);
+    if (TempString == NULL) {
+      return (EFI_INVALID_PARAMETER);
+    }
 
     Status = SearchPathForFile(TempString, &FileHandle);
     if (EFI_ERROR(Status)) {

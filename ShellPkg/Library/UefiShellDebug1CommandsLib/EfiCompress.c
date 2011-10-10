@@ -42,6 +42,7 @@ ShellCommandRunEfiCompress (
   VOID                *InBuffer;
   CHAR16              *InFileName;
   CONST CHAR16        *OutFileName;
+  CONST CHAR16        *TempParam;
 
   InFileName          = NULL;
   OutFileName         = NULL;
@@ -82,10 +83,12 @@ ShellCommandRunEfiCompress (
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      InFileName = ShellFindFilePath(ShellCommandLineGetRawValue(Package, 1));
+      TempParam = ShellCommandLineGetRawValue(Package, 1);
+      ASSERT(TempParam != NULL);
+      InFileName = ShellFindFilePath(TempParam);
       OutFileName = ShellCommandLineGetRawValue(Package, 2);
       if (InFileName == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 1));
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, TempParam);
         ShellStatus = SHELL_NOT_FOUND;
       } else {
         if (ShellIsDirectory(InFileName) == EFI_SUCCESS){

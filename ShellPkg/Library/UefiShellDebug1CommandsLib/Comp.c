@@ -49,6 +49,7 @@ ShellCommandRunComp (
   UINTN               DataSizeFromFile2;
   CHAR16              *FileName1;
   CHAR16              *FileName2;
+  CONST CHAR16        *TempParam;
 
   ErrorCount          = 0;
   ShellStatus         = SHELL_SUCCESS;
@@ -88,25 +89,29 @@ ShellCommandRunComp (
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      FileName1 = ShellFindFilePath(ShellCommandLineGetRawValue(Package, 1));
+      TempParam = ShellCommandLineGetRawValue(Package, 1);
+      ASSERT(TempParam != NULL);
+      FileName1 = ShellFindFilePath(TempParam);
       if (FileName1 == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 1));
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, TempParam);
         ShellStatus = SHELL_NOT_FOUND;
       } else {
         Status = ShellOpenFileByName(FileName1, &FileHandle1, EFI_FILE_MODE_READ, 0);
         if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 1), Status);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, TempParam, Status);
           ShellStatus = SHELL_NOT_FOUND;
         }
       }
-      FileName2 = ShellFindFilePath(ShellCommandLineGetRawValue(Package, 2));
+      TempParam = ShellCommandLineGetRawValue(Package, 2);
+      ASSERT(TempParam != NULL);
+      FileName2 = ShellFindFilePath(TempParam);
       if (FileName2 == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 2));
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, TempParam);
         ShellStatus = SHELL_NOT_FOUND;
       } else {
         Status = ShellOpenFileByName(FileName2, &FileHandle2, EFI_FILE_MODE_READ, 0);
         if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 2), Status);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, TempParam, Status);
           ShellStatus = SHELL_NOT_FOUND;
         }
       }
