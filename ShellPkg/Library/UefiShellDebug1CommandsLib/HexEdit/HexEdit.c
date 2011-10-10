@@ -189,7 +189,7 @@ ShellCommandRunHexEdit (
         switch (WhatToDo) {
         case FileTypeFileBuffer:
           Status = HBufferImageRead (
-                    Name,
+                    Name==NULL?L"":Name,
                     NULL,
                     0,
                     0,
@@ -203,7 +203,7 @@ ShellCommandRunHexEdit (
         case FileTypeDiskBuffer:
           Status = HBufferImageRead (
                     NULL,
-                    Name,
+                    Name==NULL?L"":Name,
                     Offset,
                     Size,
                     0,
