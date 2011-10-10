@@ -158,11 +158,6 @@ typedef struct {
 
 #endif
 
-//
-// Miscellaneous numbers
-//
-#define PMM_MEMORY_SIZE         0x400000  // 4 MB
-
 #pragma pack(1)
 
 //
@@ -493,8 +488,6 @@ typedef struct {
 extern BBS_TABLE           *mBbsTable;
 
 extern EFI_GENERIC_MEMORY_TEST_PROTOCOL *gGenMemoryTest;
-
-extern UINTN               mEndOpromShadowAddress;
 
 #define PORT_70 0x70
 #define PORT_71 0x71

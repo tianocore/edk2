@@ -2301,7 +2301,7 @@ LegacyBiosInstallRom (
     //   then test if there is enough space for its RT code
     //
     RuntimeAddress = Private->OptionRom;
-    if (RuntimeAddress + *RuntimeImageLength > mEndOpromShadowAddress) {
+    if (RuntimeAddress + *RuntimeImageLength > PcdGet32 (PcdEndOpromShadowAddress)) {
       DEBUG ((EFI_D_ERROR, "return LegacyBiosInstallRom(%d): EFI_OUT_OF_RESOURCES (no more space for OpROM)\n", __LINE__));
       gBS->FreePages (PhysicalAddress, EFI_SIZE_TO_PAGES (ImageSize));
       return EFI_OUT_OF_RESOURCES;
@@ -2312,7 +2312,7 @@ LegacyBiosInstallRom (
     //   test if there is enough space for its INIT code
     //
     InitAddress    = PCI_START_ADDRESS (Private->OptionRom);
-    if (InitAddress + ImageSize > mEndOpromShadowAddress) {
+    if (InitAddress + ImageSize > PcdGet32 (PcdEndOpromShadowAddress)) {
       DEBUG ((EFI_D_ERROR, "return LegacyBiosInstallRom(%d): EFI_OUT_OF_RESOURCES (no more space for OpROM)\n", __LINE__));
       return EFI_OUT_OF_RESOURCES;
     }

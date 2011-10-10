@@ -181,4 +181,14 @@
   #  make sure the memory size is large enough to meet boot script executor requiremnt in S3 phase.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize|0x8000|UINT32|0x30000007
 
-
+  ## The PCD is used to specify the end of address below 1MB for the OPROM.
+  #  The last shadowed OpROM should not exceed this address.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEndOpromShadowAddress|0xdffff|UINT32|0x30000008
+  
+  ## The PCD is used to specify the low PMM (Post Memory Manager) size with bytes below 1MB.
+  #  The value should be a multiple of 4KB.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLowPmmMemorySize|0x10000|UINT32|0x30000009
+  
+  ## The PCD is used to specify the high PMM (Post Memory Manager) size with bytes above 1MB.
+  #  The value should be a multiple of 4KB.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHighPmmMemorySize|0x400000|UINT32|0x3000000a

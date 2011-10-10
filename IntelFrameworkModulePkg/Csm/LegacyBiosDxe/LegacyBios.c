@@ -29,11 +29,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 LEGACY_BIOS_INSTANCE  mPrivateData;
 
-//
-// The end of OPROM shadow address
-//
-UINTN                 mEndOpromShadowAddress = 0;
-
 /**
   Do an AllocatePages () of type AllocateMaxAddress for EfiBootServicesCode
   memory.
@@ -386,23 +381,6 @@ ShadowAndStartLegacy16 (
   // Store away a copy of the EFI System Table
   //
   Table->EfiSystemTable = (UINT32) (UINTN) gST;
-
-  //
-  // Get the end of OPROM shadow address
-  //
-  Status = Private->LegacyBiosPlatform->GetPlatformInfo (
-                                          Private->LegacyBiosPlatform,
-                                          EfiGetPlatformEndOpromShadowAddr,
-                                          NULL,
-                                          NULL,
-                                          &mEndOpromShadowAddress,
-                                          NULL,
-                                          0,
-                                          0
-                                          );
-  if (EFI_ERROR (Status)) {
-    mEndOpromShadowAddress = 0xDFFFF;
-  }
 
   //
   // IPF CSM integration -Bug
@@ -905,17 +883,19 @@ LegacyBiosInstall (
   }
 
   //
-  // Allocate a 64k area (16 4k pages) for 16-bit code for scratch pad and zero it out
+  // Allocate low PMM memory and zero it out
   //
+  MemorySize = PcdGet32 (PcdLowPmmMemorySize);
+  ASSERT ((MemorySize & 0xFFF) == 0);  
   Status = AllocateLegacyMemory (
              AllocateMaxAddress,
              CONVENTIONAL_MEMORY_TOP,
-             16,
+             EFI_SIZE_TO_PAGES (MemorySize),
              &MemoryAddressUnder1MB
              );
   ASSERT_EFI_ERROR (Status);
 
-  ZeroMem ((VOID *) ((UINTN) MemoryAddressUnder1MB), 0x10000);
+  ZeroMem ((VOID *) ((UINTN) MemoryAddressUnder1MB), MemorySize);
 
   //
   // Allocate space for thunker and Init Thunker
@@ -940,20 +920,22 @@ LegacyBiosInstall (
   //
   EfiToLegacy16InitTable->BiosLessThan1MB         = (UINT32) MemoryAddressUnder1MB;
   EfiToLegacy16InitTable->LowPmmMemory            = (UINT32) MemoryAddressUnder1MB;
-  EfiToLegacy16InitTable->LowPmmMemorySizeInBytes = 0x10000;
+  EfiToLegacy16InitTable->LowPmmMemorySizeInBytes = MemorySize;
 
   //
-  // Allocate 4 MB of PMM Memory under 16 MB
+  // Allocate high PMM Memory under 16 MB
   //
+  MemorySize = PcdGet32 (PcdHighPmmMemorySize);
+  ASSERT ((MemorySize & 0xFFF) == 0);    
   Status = AllocateLegacyMemory (
              AllocateMaxAddress,
              0x1000000,
-             0x400,
+             EFI_SIZE_TO_PAGES (MemorySize),
              &MemoryAddress
              );
   if (!EFI_ERROR (Status)) {
     EfiToLegacy16InitTable->HiPmmMemory            = (UINT32) (EFI_PHYSICAL_ADDRESS) (UINTN) MemoryAddress;
-    EfiToLegacy16InitTable->HiPmmMemorySizeInBytes = PMM_MEMORY_SIZE;
+    EfiToLegacy16InitTable->HiPmmMemorySizeInBytes = MemorySize;
   }
 
   //
