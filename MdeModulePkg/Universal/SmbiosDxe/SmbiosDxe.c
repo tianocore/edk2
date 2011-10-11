@@ -994,6 +994,9 @@ SmbiosCreateTable (
   //
   // Fixup checksums in the Entry Point Structure
   //
+  EntryPointStructure->IntermediateChecksum = 0;
+  EntryPointStructure->EntryPointStructureChecksum = 0;
+
   EntryPointStructure->IntermediateChecksum =
     CalculateCheckSum8 ((UINT8 *) EntryPointStructure + 0x10, EntryPointStructure->EntryPointLength - 0x10);
   EntryPointStructure->EntryPointStructureChecksum =
