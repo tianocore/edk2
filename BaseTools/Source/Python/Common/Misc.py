@@ -1396,6 +1396,27 @@ class PathClass(object):
         else:
             return self.Path == str(Other)
 
+    ## Override __cmp__ function
+    #
+    # Customize the comparsion operation of two PathClass
+    #
+    # @retval 0     The two PathClass are different
+    # @retval -1    The first PathClass is less than the second PathClass
+    # @retval 1     The first PathClass is Bigger than the second PathClass
+    def __cmp__(self, Other):
+        if type(Other) == type(self):
+            OtherKey = Other.Path
+        else:
+            OtherKey = str(Other)
+            
+        SelfKey = self.Path
+        if SelfKey == OtherKey:
+            return 0
+        elif SelfKey > OtherKey:
+            return 1
+        else:
+            return -1
+
     ## Override __hash__ function
     #
     # Use Path as key in hash table

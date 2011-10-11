@@ -168,8 +168,9 @@ def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
     Str = WriteLine(Str, Line)
     Line = COMMENT_DEFINE_STR + ' ' + PRINTABLE_LANGUAGE_NAME_STRING_NAME + ' ' * (ValueStartPtr - len(DEFINE_STR + PRINTABLE_LANGUAGE_NAME_STRING_NAME)) + DecToHexStr(1, 4) + COMMENT_NOT_REFERENCED
     Str = WriteLine(Str, Line)
+    UnusedStr = ''
 
-    #Group the referred STRING token together. 
+    #Group the referred/Unused STRING token together. 
     for Index in range(2, len(UniObjectClass.OrderedStringList[UniObjectClass.LanguageDef[0][0]])):
         StringItem = UniObjectClass.OrderedStringList[UniObjectClass.LanguageDef[0][0]][Index]
         Name = StringItem.StringName
@@ -183,21 +184,14 @@ def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
                 else:
                     Line = DEFINE_STR + ' ' + Name + ' ' * (ValueStartPtr - len(DEFINE_STR + Name)) + DecToHexStr(Token, 4)
                 Str = WriteLine(Str, Line)
-
-    #Group the unused STRING token together.
-    for Index in range(2, len(UniObjectClass.OrderedStringList[UniObjectClass.LanguageDef[0][0]])):
-        StringItem = UniObjectClass.OrderedStringList[UniObjectClass.LanguageDef[0][0]][Index]
-        Name = StringItem.StringName
-        Token = StringItem.Token
-        Referenced = StringItem.Referenced
-        if Name != None:
-            Line = ''
-            if Referenced == False:
+            else:
                 if (ValueStartPtr - len(DEFINE_STR + Name)) <= 0:
                     Line = COMMENT_DEFINE_STR + ' ' + Name + ' ' + DecToHexStr(Token, 4) + COMMENT_NOT_REFERENCED
                 else:
                     Line = COMMENT_DEFINE_STR + ' ' + Name + ' ' * (ValueStartPtr - len(DEFINE_STR + Name)) + DecToHexStr(Token, 4) + COMMENT_NOT_REFERENCED
-                Str = WriteLine(Str, Line)
+                UnusedStr = WriteLine(UnusedStr, Line)
+
+    Str = ''.join([Str,UnusedStr])
 
     Str = WriteLine(Str, '')
     if IsCompatibleMode or UniGenCFlag:
@@ -383,7 +377,6 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer,
     #
     for IndexI in range(len(UniObjectClass.LanguageDef)):
         Language = UniObjectClass.LanguageDef[IndexI][0]
-        LangPrintName = UniObjectClass.LanguageDef[IndexI][1]
         if Language not in UniLanguageListFiltered:
             continue
         
@@ -393,12 +386,12 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer,
         NumberOfUseOtherLangDef = 0
         Index = 0
         for IndexJ in range(1, len(UniObjectClass.OrderedStringList[UniObjectClass.LanguageDef[IndexI][0]])):
-            Item = UniObjectClass.FindByToken(IndexJ, Language)
+            Item = UniObjectClass.OrderedStringListByToken[Language][IndexJ]
+
             Name = Item.StringName
             Value = Item.StringValueByteList
             Referenced = Item.Referenced
             Token = Item.Token
-            Length = Item.Length
             UseOtherLangDef = Item.UseOtherLangDef
 
             if UseOtherLangDef != '' and Referenced:
@@ -595,10 +588,7 @@ def SearchString(UniObjectClass, FileList, IsCompatibleMode):
 # This function is used for UEFI2.1 spec
 #
 #
-def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, SkipList, BaseName, IsCompatibleMode = False, ShellMode = False, UniGenCFlag = True, UniGenBinBuffer = None, FilterInfo = [True, []]):
-    Status = True
-    ErrorMessage = ''
-
+def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, SkipList, BaseName, IsCompatibleMode = False, ShellMode = False, UniGenCFlag = True, UniGenBinBuffer = None, FilterInfo = [True, []]):  
     if len(UniFilList) > 0:
         if ShellMode:
             #
@@ -627,13 +617,13 @@ def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, Ski
 # Write an item
 #
 def Write(Target, Item):
-    return Target + Item
+    return ''.join([Target,Item])
 
 #
 # Write an item with a break line
 #
 def WriteLine(Target, Item):
-    return Target + Item + '\n'
+    return ''.join([Target,Item,'\n'])
 
 # This acts like the main() function for the script, unless it is 'import'ed into another
 # script.

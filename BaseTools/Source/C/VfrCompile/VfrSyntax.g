@@ -1683,7 +1683,7 @@ vfrStatementGoto :
       Question "="
       (
           QN3:StringIdentifier ","                     << mCVfrQuestionDB.GetQuestionId (QN3->getText (), NULL, QId, BitMask); >>
-        | QN4:Number ","                               << QId = _STOQID(QN4->getText()); >>
+        | QN3:Number ","                               << QId = _STOQID(QN3->getText()); >>
       )
     )
     |

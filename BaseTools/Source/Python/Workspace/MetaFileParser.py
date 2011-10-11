@@ -895,21 +895,28 @@ class DscParser(MetaFileParser):
         # three operands
         elif TokenNumber == 3:
             TokenValue = TokenList[0] 
-            if TokenValue[0] in ["'", '"'] and TokenValue[-1] in ["'", '"']:
-                TokenValue = TokenValue[1:-1]             
-            if TokenValue.startswith("$(") and TokenValue.endswith(")"):
-                TokenValue = self._EvaluateToken(TokenValue, Expression)
-            if TokenValue[0] in ["'", '"'] and TokenValue[-1] in ["'", '"']:
-                TokenValue = TokenValue[1:-1]                
-            if TokenValue == None:
-                return False
+            if TokenValue != "":
+                if TokenValue[0] in ["'", '"'] and TokenValue[-1] in ["'", '"']:
+                    TokenValue = TokenValue[1:-1]             
+                if TokenValue.startswith("$(") and TokenValue.endswith(")"):
+                    TokenValue = self._EvaluateToken(TokenValue, Expression)
+                    if TokenValue == None:
+                        return False
+                if TokenValue != "":                
+                    if TokenValue[0] in ["'", '"'] and TokenValue[-1] in ["'", '"']:
+                        TokenValue = TokenValue[1:-1]
+               
             Value = TokenList[2]
-            if Value[0] in ["'", '"'] and Value[-1] in ["'", '"']:
-                Value = Value[1:-1]            
-            if Value.startswith("$(") and Value.endswith(")"):
-                Value = self._EvaluateToken(Value, Expression)          
-            if Value[0] in ["'", '"'] and Value[-1] in ["'", '"']:
-                Value = Value[1:-1]
+            if Value != "":
+                if Value[0] in ["'", '"'] and Value[-1] in ["'", '"']:
+                    Value = Value[1:-1]         
+                if Value.startswith("$(") and Value.endswith(")"):
+                    Value = self._EvaluateToken(Value, Expression)          
+                    if Value == None:
+                        return False
+                if Value != "":                
+                    if Value[0] in ["'", '"'] and Value[-1] in ["'", '"']:
+                        Value = Value[1:-1]
             Op = TokenList[1]
             if Op not in self._OP_:
                 EdkLogger.error('Parser', FORMAT_INVALID, "Unsupported operator [%s]" % Op, File=self.MetaFile,

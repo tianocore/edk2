@@ -62,7 +62,7 @@ def PrintErrorMsg(ErrorType, Msg, TableName, ItemId):
     for Part in MsgPartList:
         Msg += Part
         Msg += ' '
-    GetDB().TblReport.Insert(ErrorType, OtherMsg = Msg, BelongsToTable = TableName, BelongsToItem = ItemId)
+    GetDB().TblReport.Insert(ErrorType, OtherMsg=Msg, BelongsToTable=TableName, BelongsToItem=ItemId)
 
 def GetIdType(Str):
     Type = DataClass.MODEL_UNKNOWN
@@ -93,16 +93,16 @@ def SuOccurInTypedef (Su, TdList):
 def GetIdentifierList():
     IdList = []
     for comment in FileProfile.CommentList:
-        IdComment = DataClass.IdentifierClass(-1, '', '', '', comment.Content, DataClass.MODEL_IDENTIFIER_COMMENT, -1, -1, comment.StartPos[0],comment.StartPos[1],comment.EndPos[0],comment.EndPos[1])
+        IdComment = DataClass.IdentifierClass(-1, '', '', '', comment.Content, DataClass.MODEL_IDENTIFIER_COMMENT, -1, -1, comment.StartPos[0], comment.StartPos[1], comment.EndPos[0], comment.EndPos[1])
         IdList.append(IdComment)
 
     for pp in FileProfile.PPDirectiveList:
         Type = GetIdType(pp.Content)
-        IdPP = DataClass.IdentifierClass(-1, '', '', '', pp.Content, Type, -1, -1, pp.StartPos[0],pp.StartPos[1],pp.EndPos[0],pp.EndPos[1])
+        IdPP = DataClass.IdentifierClass(-1, '', '', '', pp.Content, Type, -1, -1, pp.StartPos[0], pp.StartPos[1], pp.EndPos[0], pp.EndPos[1])
         IdList.append(IdPP)
 
     for pe in FileProfile.PredicateExpressionList:
-        IdPE = DataClass.IdentifierClass(-1, '', '', '', pe.Content, DataClass.MODEL_IDENTIFIER_PREDICATE_EXPRESSION, -1, -1, pe.StartPos[0],pe.StartPos[1],pe.EndPos[0],pe.EndPos[1])
+        IdPE = DataClass.IdentifierClass(-1, '', '', '', pe.Content, DataClass.MODEL_IDENTIFIER_PREDICATE_EXPRESSION, -1, -1, pe.StartPos[0], pe.StartPos[1], pe.EndPos[0], pe.EndPos[1])
         IdList.append(IdPE)
 
     FuncDeclPattern = GetFuncDeclPattern()
@@ -191,7 +191,7 @@ def GetIdentifierList():
                     var.Modifier += ' ' + Name[LSBPos:]
                     Name = Name[0:LSBPos]
 
-                IdVar = DataClass.IdentifierClass(-1, var.Modifier, '', Name, (len(DeclList) > 1 and [DeclList[1]]or [''])[0], DataClass.MODEL_IDENTIFIER_VARIABLE, -1, -1, var.StartPos[0],var.StartPos[1], VarNameStartLine, VarNameStartColumn)
+                IdVar = DataClass.IdentifierClass(-1, var.Modifier, '', Name, (len(DeclList) > 1 and [DeclList[1]]or [''])[0], DataClass.MODEL_IDENTIFIER_VARIABLE, -1, -1, var.StartPos[0], var.StartPos[1], VarNameStartLine, VarNameStartColumn)
                 IdList.append(IdVar)
         else:
             DeclList = var.Declarator.split('=')
@@ -200,15 +200,15 @@ def GetIdentifierList():
                 LSBPos = var.Declarator.find('[')
                 var.Modifier += ' ' + Name[LSBPos:]
                 Name = Name[0:LSBPos]
-            IdVar = DataClass.IdentifierClass(-1, var.Modifier, '', Name, (len(DeclList) > 1 and [DeclList[1]]or [''])[0], DataClass.MODEL_IDENTIFIER_VARIABLE, -1, -1, var.StartPos[0],var.StartPos[1], VarNameStartLine, VarNameStartColumn)
+            IdVar = DataClass.IdentifierClass(-1, var.Modifier, '', Name, (len(DeclList) > 1 and [DeclList[1]]or [''])[0], DataClass.MODEL_IDENTIFIER_VARIABLE, -1, -1, var.StartPos[0], var.StartPos[1], VarNameStartLine, VarNameStartColumn)
             IdList.append(IdVar)
 
     for enum in FileProfile.EnumerationDefinitionList:
         LBPos = enum.Content.find('{')
         RBPos = enum.Content.find('}')
         Name = enum.Content[4:LBPos].strip()
-        Value = enum.Content[LBPos+1:RBPos]
-        IdEnum = DataClass.IdentifierClass(-1, '', '', Name, Value, DataClass.MODEL_IDENTIFIER_ENUMERATE, -1, -1, enum.StartPos[0],enum.StartPos[1],enum.EndPos[0],enum.EndPos[1])
+        Value = enum.Content[LBPos + 1:RBPos]
+        IdEnum = DataClass.IdentifierClass(-1, '', '', Name, Value, DataClass.MODEL_IDENTIFIER_ENUMERATE, -1, -1, enum.StartPos[0], enum.StartPos[1], enum.EndPos[0], enum.EndPos[1])
         IdList.append(IdEnum)
 
     for su in FileProfile.StructUnionDefinitionList:
@@ -226,8 +226,8 @@ def GetIdentifierList():
             Value = ''
         else:
             Name = su.Content[SkipLen:LBPos].strip()
-            Value = su.Content[LBPos:RBPos+1]
-        IdPE = DataClass.IdentifierClass(-1, '', '', Name, Value, Type, -1, -1, su.StartPos[0],su.StartPos[1],su.EndPos[0],su.EndPos[1])
+            Value = su.Content[LBPos:RBPos + 1]
+        IdPE = DataClass.IdentifierClass(-1, '', '', Name, Value, Type, -1, -1, su.StartPos[0], su.StartPos[1], su.EndPos[0], su.EndPos[1])
         IdList.append(IdPE)
 
     TdFuncPointerPattern = GetTypedefFuncPointerPattern()
@@ -238,7 +238,7 @@ def GetIdentifierList():
         if TdFuncPointerPattern.match(td.ToType):
             Modifier = td.FromType
             LBPos = td.ToType.find('(')
-            TmpStr = td.ToType[LBPos+1:].strip()
+            TmpStr = td.ToType[LBPos + 1:].strip()
             StarPos = TmpStr.find('*')
             if StarPos != -1:
                 Modifier += ' ' + TmpStr[0:StarPos]
@@ -260,11 +260,11 @@ def GetIdentifierList():
             Value += Name[LBPos : RBPos + 1]
             Name = Name[0 : LBPos]
 
-        IdTd = DataClass.IdentifierClass(-1, Modifier, '', Name, Value, DataClass.MODEL_IDENTIFIER_TYPEDEF, -1, -1, td.StartPos[0],td.StartPos[1],td.EndPos[0],td.EndPos[1])
+        IdTd = DataClass.IdentifierClass(-1, Modifier, '', Name, Value, DataClass.MODEL_IDENTIFIER_TYPEDEF, -1, -1, td.StartPos[0], td.StartPos[1], td.EndPos[0], td.EndPos[1])
         IdList.append(IdTd)
 
     for funcCall in FileProfile.FunctionCallingList:
-        IdFC = DataClass.IdentifierClass(-1, '', '', funcCall.FuncName, funcCall.ParamList, DataClass.MODEL_IDENTIFIER_FUNCTION_CALLING, -1, -1, funcCall.StartPos[0],funcCall.StartPos[1],funcCall.EndPos[0],funcCall.EndPos[1])
+        IdFC = DataClass.IdentifierClass(-1, '', '', funcCall.FuncName, funcCall.ParamList, DataClass.MODEL_IDENTIFIER_FUNCTION_CALLING, -1, -1, funcCall.StartPos[0], funcCall.StartPos[1], funcCall.EndPos[0], funcCall.EndPos[1])
         IdList.append(IdFC)
     return IdList
 
@@ -275,7 +275,7 @@ def StripNonAlnumChars(Str):
             StrippedStr += Char
     return StrippedStr
 
-def GetParamList(FuncDeclarator, FuncNameLine = 0, FuncNameOffset = 0):
+def GetParamList(FuncDeclarator, FuncNameLine=0, FuncNameOffset=0):
     FuncDeclarator = StripComments(FuncDeclarator)
     ParamIdList = []
     #DeclSplitList = FuncDeclarator.split('(')
@@ -477,7 +477,7 @@ def GetFunctionList():
                         FuncNameStartColumn += 1
                     PreChar = FirstChar
 
-        FuncObj = DataClass.FunctionClass(-1, FuncDef.Declarator, FuncDef.Modifier, FuncName.strip(), '', FuncDef.StartPos[0],FuncDef.StartPos[1],FuncDef.EndPos[0],FuncDef.EndPos[1], FuncDef.LeftBracePos[0], FuncDef.LeftBracePos[1], -1, ParamIdList, [], FuncNameStartLine, FuncNameStartColumn)
+        FuncObj = DataClass.FunctionClass(-1, FuncDef.Declarator, FuncDef.Modifier, FuncName.strip(), '', FuncDef.StartPos[0], FuncDef.StartPos[1], FuncDef.EndPos[0], FuncDef.EndPos[1], FuncDef.LeftBracePos[0], FuncDef.LeftBracePos[1], -1, ParamIdList, [], FuncNameStartLine, FuncNameStartColumn)
         FuncObjList.append(FuncObj)
 
     return FuncObjList
@@ -547,7 +547,7 @@ def CollectSourceCodeDataIntoDB(RootDir):
 
     Db.UpdateIdentifierBelongsToFunction()
 
-def GetTableID(FullFileName, ErrorMsgList = None):
+def GetTableID(FullFileName, ErrorMsgList=None):
     if ErrorMsgList == None:
         ErrorMsgList = []
 
@@ -562,11 +562,11 @@ def GetTableID(FullFileName, ErrorMsgList = None):
     for Result in ResultSet:
         if FileID != -1:
             ErrorMsgList.append('Duplicate file ID found in DB for file %s' % FullFileName)
-            return -2
+            return - 2
         FileID = Result[0]
     if FileID == -1:
         ErrorMsgList.append('NO file ID found in DB for file %s' % FullFileName)
-        return -1
+        return - 1
     return FileID
 
 def GetIncludeFileList(FullFileName):
@@ -645,7 +645,7 @@ def GetPredicateListFromPredicateExpStr(PES):
     while i < len(PES) - 1:
         if (PES[i].isalnum() or PES[i] == '_' or PES[i] == '*') and LogicOpPos > PredicateBegin:
             PredicateBegin = i
-        if (PES[i] == '&' and PES[i+1] == '&') or (PES[i] == '|' and PES[i+1] == '|'):
+        if (PES[i] == '&' and PES[i + 1] == '&') or (PES[i] == '|' and PES[i + 1] == '|'):
             LogicOpPos = i
             Exp = PES[PredicateBegin:i].strip()
             # Exp may contain '.' or '->'
@@ -670,7 +670,7 @@ def GetPredicateListFromPredicateExpStr(PES):
             PredicateList.append(Exp.rstrip(';').rstrip(')').strip())
     return PredicateList
 
-def GetCNameList(Lvalue, StarList = []):
+def GetCNameList(Lvalue, StarList=[]):
     Lvalue += ' '
     i = 0
     SearchBegin = 0
@@ -686,7 +686,7 @@ def GetCNameList(Lvalue, StarList = []):
                 VarEnd = i
                 i += 1
             elif VarEnd != -1:
-                VarList.append(Lvalue[VarStart:VarEnd+1])
+                VarList.append(Lvalue[VarStart:VarEnd + 1])
                 i += 1
                 break
             else:
@@ -714,7 +714,7 @@ def GetCNameList(Lvalue, StarList = []):
 
     return VarList
 
-def SplitPredicateByOp(Str, Op, IsFuncCalling = False):
+def SplitPredicateByOp(Str, Op, IsFuncCalling=False):
 
     Name = Str.strip()
     Value = None
@@ -760,7 +760,7 @@ def SplitPredicateByOp(Str, Op, IsFuncCalling = False):
             return [Name]
 
         Name = Str[0:Index + IndexInRemainingStr].strip()
-        Value = Str[Index+IndexInRemainingStr+len(Op):].strip().strip(')')
+        Value = Str[Index + IndexInRemainingStr + len(Op):].strip().strip(')')
         return [Name, Value]
 
     TmpStr = Str.rstrip(';').rstrip(')')
@@ -769,7 +769,7 @@ def SplitPredicateByOp(Str, Op, IsFuncCalling = False):
         if Index == -1:
             return [Name]
 
-        if Str[Index - 1].isalnum() or Str[Index - 1].isspace() or Str[Index - 1] == ')':
+        if Str[Index - 1].isalnum() or Str[Index - 1].isspace() or Str[Index - 1] == ')' or Str[Index - 1] == ']':
             Name = Str[0:Index].strip()
             Value = Str[Index + len(Op):].strip()
             return [Name, Value]
@@ -826,15 +826,13 @@ def PatternInModifier(Modifier, SubStr):
 
 def GetDataTypeFromModifier(ModifierStr):
     MList = ModifierStr.split()
-    for M in MList:
-        if M in EccGlobalData.gConfig.ModifierList:
-            MList.remove(M)
-        # remove array sufix
-        if M.startswith('['):
-            MList.remove(M)
-
     ReturnType = ''
     for M in MList:
+        if M in EccGlobalData.gConfig.ModifierList:
+            continue
+        # remove array sufix
+        if M.startswith('[') or M.endswith(']'):
+            continue
         ReturnType += M + ' '
 
     ReturnType = ReturnType.strip()
@@ -950,7 +948,7 @@ def StripComments(Str):
                 DoubleSlashComment = False
             Index += 1
         # check for */ comment end
-        elif InComment and not DoubleSlashComment and ListFromStr[Index] == '*' and ListFromStr[Index+1] == '/':
+        elif InComment and not DoubleSlashComment and ListFromStr[Index] == '*' and ListFromStr[Index + 1] == '/':
             ListFromStr[Index] = ' '
             Index += 1
             ListFromStr[Index] = ' '
@@ -961,12 +959,12 @@ def StripComments(Str):
             ListFromStr[Index] = ' '
             Index += 1
         # check for // comment
-        elif ListFromStr[Index] == '/' and ListFromStr[Index+1] == '/' and ListFromStr[Index+2] != '\n':
+        elif ListFromStr[Index] == '/' and ListFromStr[Index + 1] == '/' and ListFromStr[Index + 2] != '\n':
             InComment = True
             DoubleSlashComment = True
 
         # check for /* comment start
-        elif ListFromStr[Index] == '/' and ListFromStr[Index+1] == '*':
+        elif ListFromStr[Index] == '/' and ListFromStr[Index + 1] == '*':
             ListFromStr[Index] = ' '
             Index += 1
             ListFromStr[Index] = ' '
@@ -1024,7 +1022,7 @@ def GetFinalTypeValue(Type, FieldName, TypedefDict, SUDict):
 
     return None
 
-def GetRealType(Type, TypedefDict, TargetType = None):
+def GetRealType(Type, TypedefDict, TargetType=None):
     if TargetType != None and Type == TargetType:
             return Type
     while TypedefDict.get(Type):
@@ -1033,7 +1031,7 @@ def GetRealType(Type, TypedefDict, TargetType = None):
             return Type
     return Type
 
-def GetTypeInfo(RefList, Modifier, FullFileName, TargetType = None):
+def GetTypeInfo(RefList, Modifier, FullFileName, TargetType=None):
     TypedefDict = GetTypedefDict(FullFileName)
     SUDict = GetSUDict(FullFileName)
     Type = GetDataTypeFromModifier(Modifier).replace('*', '').strip()
@@ -1051,7 +1049,7 @@ def GetTypeInfo(RefList, Modifier, FullFileName, TargetType = None):
         # we only want to check if it is a pointer
         else:
             Type = FromType
-            if Type.find('*') != -1 and Index == len(RefList)-1:
+            if Type.find('*') != -1 and Index == len(RefList) - 1:
                 return Type
             Type = FromType.split()[0]
 
@@ -1061,7 +1059,7 @@ def GetTypeInfo(RefList, Modifier, FullFileName, TargetType = None):
 
     return Type
 
-def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall = False, TargetType = None, StarList = None):
+def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall=False, TargetType=None, StarList=None):
 
     PredVar = PredVarList[0]
     FileID = GetTableID(FullFileName)
@@ -1536,7 +1534,7 @@ def CheckFuncLayoutLocalVariable(FullFileName):
         FL.append(Result)
 
     for F in FL:
-        SqlStatement = """ select Name, Value, ID
+        SqlStatement = """ select Name, Value, ID, Modifier
                        from %s
                        where Model = %d and BelongsToFunction = %d
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_VARIABLE, F[0])
@@ -1545,7 +1543,7 @@ def CheckFuncLayoutLocalVariable(FullFileName):
             continue
 
         for Result in ResultSet:
-            if len(Result[1]) > 0:
+            if len(Result[1]) > 0 and 'CONST' not in Result[3]:
                 PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_NO_INIT_OF_VARIABLE, 'Variable Name: %s' % Result[0], FileTable, Result[2])
 
 def CheckMemberVariableFormat(Name, Value, FileTable, TdId, ModelId):
@@ -1687,9 +1685,9 @@ def CheckDeclTypedefFormat(FullFileName, ModelId):
         # Check member variable format.
         ErrMsgList = CheckMemberVariableFormat(Name, Value, FileTable, Td[5], ModelId)
         for ErrMsg in ErrMsgList:
-            if EccGlobalData.gException.IsException(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, Name+'.'+ErrMsg):
+            if EccGlobalData.gException.IsException(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, Name + '.' + ErrMsg):
                 continue
-            PrintErrorMsg(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, 'Member variable [%s] NOT follow naming convention.' % (Name+'.'+ErrMsg), FileTable, Td[5])
+            PrintErrorMsg(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, 'Member variable [%s] NOT follow naming convention.' % (Name + '.' + ErrMsg), FileTable, Td[5])
 
     # First check in current file to see whether struct/union/enum is typedef-ed.
     UntypedefedList = []
@@ -1710,9 +1708,9 @@ def CheckDeclTypedefFormat(FullFileName, ModelId):
             continue
         ErrMsgList = CheckMemberVariableFormat(Name, Value, FileTable, Result[3], ModelId)
         for ErrMsg in ErrMsgList:
-            if EccGlobalData.gException.IsException(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, Result[0]+'.'+ErrMsg):
+            if EccGlobalData.gException.IsException(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, Result[0] + '.' + ErrMsg):
                 continue
-            PrintErrorMsg(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, 'Member variable [%s] NOT follow naming convention.' % (Result[0]+'.'+ErrMsg), FileTable, Result[3])
+            PrintErrorMsg(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, 'Member variable [%s] NOT follow naming convention.' % (Result[0] + '.' + ErrMsg), FileTable, Result[3])
         # Check whether it is typedefed.
         Found = False
         for Td in TdList:
@@ -1949,7 +1947,7 @@ def CheckPointerNullComparison(FullFileName):
                 if SearchInCache:
                     Type = FuncReturnTypeDict.get(PredVarStr)
                     if Type != None:
-                        if Type.find('*') != -1:
+                        if Type.find('*') != -1 and Type != 'BOOLEAN*':
                             PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_COMPARISON_NULL_TYPE, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
                         continue
 
@@ -1962,7 +1960,7 @@ def CheckPointerNullComparison(FullFileName):
                 if Type == None:
                     continue
                 Type = GetTypeFromArray(Type, PredVarStr)
-                if Type.find('*') != -1:
+                if Type.find('*') != -1 and Type != 'BOOLEAN*':
                     PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_COMPARISON_NULL_TYPE, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
 
 def CheckNonBooleanValueComparison(FullFileName):
@@ -2004,8 +2002,6 @@ def CheckNonBooleanValueComparison(FullFileName):
             continue
 
         for Exp in GetPredicateListFromPredicateExpStr(Str[0]):
-#            if p.match(Exp):
-#                continue
             PredInfo = SplitPredicateStr(Exp)
             if PredInfo[1] == None:
                 PredVarStr = PredInfo[0][0].strip()
@@ -2037,7 +2033,6 @@ def CheckNonBooleanValueComparison(FullFileName):
 
                     if PredVarStr in FuncReturnTypeDict:
                         continue
-
                 Type = GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall, 'BOOLEAN', StarList)
                 if SearchInCache:
                     FuncReturnTypeDict[PredVarStr] = Type
@@ -2446,7 +2441,7 @@ def GetDoxygenStrFromComment(Str):
 
     return DoxygenStrList
 
-def CheckGeneralDoxygenCommentLayout(Str, StartLine, ErrorMsgList, CommentId = -1, TableName = ''):
+def CheckGeneralDoxygenCommentLayout(Str, StartLine, ErrorMsgList, CommentId= -1, TableName=''):
     #/** --*/ @retval after @param
     if not Str.startswith('/**'):
         ErrorMsgList.append('Line %d : Comment does NOT have prefix /** ' % StartLine)
@@ -2460,7 +2455,7 @@ def CheckGeneralDoxygenCommentLayout(Str, StartLine, ErrorMsgList, CommentId = -
         ErrorMsgList.append('Line %d : @retval appear before @param ' % StartLine)
         PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'in Comment, @retval appear before @param  ', TableName, CommentId)
 
-def CheckFunctionHeaderConsistentWithDoxygenComment(FuncModifier, FuncHeader, FuncStartLine, CommentStr, CommentStartLine, ErrorMsgList, CommentId = -1, TableName = ''):
+def CheckFunctionHeaderConsistentWithDoxygenComment(FuncModifier, FuncHeader, FuncStartLine, CommentStr, CommentStartLine, ErrorMsgList, CommentId= -1, TableName=''):
 
     ParamList = GetParamList(FuncHeader)
     CheckGeneralDoxygenCommentLayout(CommentStr, CommentStartLine, ErrorMsgList, CommentId, TableName)
@@ -2480,18 +2475,18 @@ def CheckFunctionHeaderConsistentWithDoxygenComment(FuncModifier, FuncHeader, Fu
             ParamName = ParamList[Index].Name.strip()
             Tag = DoxygenStrList[Index].strip(' ')
             if (not Tag[-1] == ('\n')) and (not Tag[-1] == ('\r')):
-                ErrorMsgList.append('Line %d : in Comment, \"%s\" does NOT end with new line ' % (CommentStartLine, Tag.replace('\n', '').replace('\r', '')))
-                PrintErrorMsg(ERROR_HEADER_CHECK_FUNCTION, 'in Comment, \"%s\" does NOT end with new line ' % (Tag.replace('\n', '').replace('\r', '')), TableName, CommentId)
+                ErrorMsgList.append('Line %d : in Comment, <%s> does NOT end with new line ' % (CommentStartLine, Tag.replace('\n', '').replace('\r', '')))
+                PrintErrorMsg(ERROR_HEADER_CHECK_FUNCTION, 'in Comment, <%s> does NOT end with new line ' % (Tag.replace('\n', '').replace('\r', '')), TableName, CommentId)
             TagPartList = Tag.split()
             if len(TagPartList) < 2:
-                ErrorMsgList.append('Line %d : in Comment, \"%s\" does NOT contain doxygen contents ' % (CommentStartLine, Tag.replace('\n', '').replace('\r', '')))
-                PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'in Comment, \"%s\" does NOT contain doxygen contents ' % (Tag.replace('\n', '').replace('\r', '')), TableName, CommentId)
+                ErrorMsgList.append('Line %d : in Comment, <%s> does NOT contain doxygen contents ' % (CommentStartLine, Tag.replace('\n', '').replace('\r', '')))
+                PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'in Comment, <%s> does NOT contain doxygen contents ' % (Tag.replace('\n', '').replace('\r', '')), TableName, CommentId)
                 Index += 1
                 continue
             LBPos = Tag.find('[')
             RBPos = Tag.find(']')
             ParamToLBContent = Tag[len('@param'):LBPos].strip()
-            if LBPos > 0 and len(ParamToLBContent)==0 and RBPos > LBPos:
+            if LBPos > 0 and len(ParamToLBContent) == 0 and RBPos > LBPos:
                 InOutStr = ''
                 ModifierPartList = ParamModifier.split()
                 for Part in ModifierPartList:
@@ -2504,12 +2499,19 @@ def CheckFunctionHeaderConsistentWithDoxygenComment(FuncModifier, FuncHeader, Fu
                             InOutStr = 'out'
 
                 if InOutStr != '':
-                    if Tag.find('['+InOutStr+']') == -1:
-                        ErrorMsgList.append('Line %d : in Comment, \"%s\" does NOT have %s ' % (CommentStartLine, (TagPartList[0] + ' ' +TagPartList[1]).replace('\n', '').replace('\r', ''), '['+InOutStr+']'))
-                        PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'in Comment, \"%s\" does NOT have %s ' % ((TagPartList[0] + ' ' +TagPartList[1]).replace('\n', '').replace('\r', ''), '['+InOutStr+']'), TableName, CommentId)
+                    if Tag.find('[' + InOutStr + ']') == -1:
+                        if InOutStr != 'in, out':
+                            ErrorMsgList.append('Line %d : in Comment, <%s> does NOT have %s ' % (CommentStartLine, (TagPartList[0] + ' ' + TagPartList[1]).replace('\n', '').replace('\r', ''), '[' + InOutStr + ']'))
+                            PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'in Comment, <%s> does NOT have %s ' % ((TagPartList[0] + ' ' + TagPartList[1]).replace('\n', '').replace('\r', ''), '[' + InOutStr + ']'), TableName, CommentId)
+                        else:
+                            if Tag.find('[in,out]') == -1:
+                                ErrorMsgList.append('Line %d : in Comment, <%s> does NOT have %s ' % (CommentStartLine, (TagPartList[0] + ' ' + TagPartList[1]).replace('\n', '').replace('\r', ''), '[' + InOutStr + ']'))
+                                PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'in Comment, <%s> does NOT have %s ' % ((TagPartList[0] + ' ' + TagPartList[1]).replace('\n', '').replace('\r', ''), '[' + InOutStr + ']'), TableName, CommentId)
+
+
             if Tag.find(ParamName) == -1 and ParamName != 'VOID' and ParamName != 'void':
-                ErrorMsgList.append('Line %d : in Comment, \"%s\" does NOT consistent with parameter name %s ' % (CommentStartLine, (TagPartList[0] + ' ' +TagPartList[1]).replace('\n', '').replace('\r', ''), ParamName))
-                PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'in Comment, \"%s\" does NOT consistent with parameter name %s ' % ((TagPartList[0] + ' ' +TagPartList[1]).replace('\n', '').replace('\r', ''), ParamName), TableName, CommentId)
+                ErrorMsgList.append('Line %d : in Comment, <%s> does NOT consistent with parameter name %s ' % (CommentStartLine, (TagPartList[0] + ' ' + TagPartList[1]).replace('\n', '').replace('\r', ''), ParamName))
+                PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'in Comment, <%s> does NOT consistent with parameter name %s ' % ((TagPartList[0] + ' ' + TagPartList[1]).replace('\n', '').replace('\r', ''), ParamName), TableName, CommentId)
             Index += 1
 
         if Index < ParamNumber:

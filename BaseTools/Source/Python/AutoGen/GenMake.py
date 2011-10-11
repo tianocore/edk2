@@ -614,7 +614,7 @@ cleanlib:
         self.FileDependency = self.GetFileDependency(
                                     SourceFileList,
                                     ForceIncludedFile,
-                                    self._AutoGenObject.IncludePathList
+                                    self._AutoGenObject.IncludePathList + self._AutoGenObject.BuildOptionIncPathList
                                     )
         DepSet = None
         for File in self.FileDependency:
@@ -1253,7 +1253,7 @@ ${END}\t@cd $(BUILD_DIR)
 #
 fds: init
 \t-@cd $(FV_DIR)
-${BEGIN}\tGenFds -f ${fdf_file} -o $(BUILD_DIR) -t $(TOOLCHAIN) -b $(TARGET) -p ${active_platform} -a ${build_architecture_list} ${extra_options}${END}${BEGIN} -r ${fd} ${END}${BEGIN} -i ${fv} ${END}${BEGIN} -C ${cap} ${END}${BEGIN} -D ${macro} ${END}
+${BEGIN}\tGenFds -f ${fdf_file} -o $(BUILD_DIR) -t $(TOOLCHAIN) -b $(TARGET) -p ${active_platform} -a ${build_architecture_list}${END}${BEGIN}${extra_options}${END}${BEGIN} -r ${fd}${END}${BEGIN} -i ${fv}${END}${BEGIN} -C ${cap}${END}${BEGIN} -D${macro}${END}
 
 #
 # run command for emulator platform only
@@ -1335,6 +1335,9 @@ ${END}\t@cd $(BUILD_DIR)\n
 
         if GlobalData.gCaseInsensitive:
             ExtraOption += " -c"
+        ExtraOptionList = []
+        if ExtraOption:
+            ExtraOptionList.append(ExtraOption)
 
         MakefileName = self._FILE_NAME_[self._FileType]
         SubBuildCommandList = []
@@ -1366,7 +1369,7 @@ ${END}\t@cd $(BUILD_DIR)\n
             "fd"                        : PlatformInfo.FdTargetList,
             "fv"                        : PlatformInfo.FvTargetList,
             "cap"                       : PlatformInfo.CapTargetList,
-            "extra_options"             : ExtraOption,
+            "extra_options"             : ExtraOptionList,
             "macro"                     : MacroList,
         }
 

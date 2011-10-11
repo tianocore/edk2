@@ -1690,9 +1690,13 @@ class FdfParser:
             self.__UndoToken()
             self.__GetRegionFileType( RegionObj)
 
-        else:
+        elif self.__Token == "DATA":
             self.__UndoToken()
             self.__GetRegionDataType( RegionObj)
+        else:
+            raise Warning("A valid region type was not found. "
+                          "Valid types are [SET, FV, CAPSULE, FILE, DATA]. This error occurred",
+                          self.FileName, self.CurrentLineNumber)
 
         return True
 
@@ -1929,6 +1933,8 @@ class FdfParser:
         self.__GetSetStatements(FvObj)
         
         self.__GetFvBaseAddress(FvObj)
+        
+        self.__GetFvForceRebase(FvObj)
 
         self.__GetFvAlignment(FvObj)
 
@@ -2006,11 +2012,42 @@ class FdfParser:
         IsValidBaseAddrValue = re.compile('^0[x|X][0-9a-fA-F]+')
 
         if not IsValidBaseAddrValue.match(self.__Token.upper()):
-            raise Warning("Unknown alignment value '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
+            raise Warning("Unknown FV base address value '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
         Obj.FvBaseAddress = self.__Token
         return True    
     
+    ## __GetFvForceRebase() method
+    #
+    #   Get FvForceRebase for FV
+    #
+    #   @param  self        The object pointer
+    #   @param  Obj         for whom FvForceRebase is got
+    #   @retval True        Successfully find a FvForceRebase statement
+    #   @retval False       Not able to find a FvForceRebase statement
+    #
+    def __GetFvForceRebase(self, Obj):
 
+        if not self.__IsKeyword("FvForceRebase"):
+            return False
+
+        if not self.__IsToken( "="):
+            raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+
+        if not self.__GetNextToken():
+            raise Warning("expected FvForceRebase value", self.FileName, self.CurrentLineNumber)
+
+        if self.__Token.upper() not in ["TRUE", "FALSE", "0", "0X0", "0X00", "1", "0X1", "0X01"]:
+            raise Warning("Unknown FvForceRebase value '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
+        
+        if self.__Token.upper() in ["TRUE", "1", "0X1", "0X01"]:
+            Obj.FvForceRebase = True
+        elif self.__Token.upper() in ["FALSE", "0", "0X0", "0X00"]:
+            Obj.FvForceRebase = False
+        else:
+            Obj.FvForceRebase = None
+           
+        return True
+    
     ## __GetFvAttributes() method
     #
     #   Get attributes for FV
@@ -2215,7 +2252,10 @@ class FdfParser:
                 ffsInf.KeepReloc = True
             else:
                 raise Warning("Unknown reloc strip flag '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
-
+        
+        ffsInf.CurrentLineNum = self.CurrentLineNumber
+        ffsInf.CurrentLineContent = self.__CurrentLine()
+        
         if ForCapsule:
             capsuleFfs = CapsuleData.CapsuleFfs()
             capsuleFfs.Ffs = ffsInf
@@ -2325,7 +2365,10 @@ class FdfParser:
                 self.__Token = 'PCD('+PcdPair[1]+'.'+PcdPair[0]+')'
                 
         FfsFileObj.NameGuid = self.__Token
-
+        
+        FfsFileObj.CurrentLineNum = self.CurrentLineNumber
+        FfsFileObj.CurrentLineContent = self.__CurrentLine()
+        
         self.__GetFilePart( FfsFileObj, MacroDict.copy())
 
         if ForCapsule:
@@ -3922,7 +3965,7 @@ class FdfParser:
                     Overrides.PciRevision = self.__Token
                     continue
 
-                if self.__IsKeyword( "COMPRESS"):
+                if self.__IsKeyword( "PCI_COMPRESS"):
                     if not self.__IsToken( "="):
                         raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
                     if not self.__GetNextToken():

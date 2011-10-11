@@ -232,6 +232,7 @@ typedef struct {
   CHAR8                   FvFiles[MAX_NUMBER_OF_FILES_IN_FV][_MAX_PATH];
   UINT32                  SizeofFvFiles[MAX_NUMBER_OF_FILES_IN_FV];
   BOOLEAN                 IsPiFvImage;
+  INT8                    ForceRebase;
 } FV_INFO;
 
 typedef struct {

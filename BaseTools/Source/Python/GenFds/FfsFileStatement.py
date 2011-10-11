@@ -39,6 +39,10 @@ class FileStatement (FileStatementClassObject) :
     #
     def __init__(self):
         FileStatementClassObject.__init__(self)
+        self.CurrentLineNum = None
+        self.CurrentLineContent = None
+        self.FileName = None
+        self.InfFileName = None
 
     ## GenFfs() method
     #
@@ -94,7 +98,7 @@ class FileStatement (FileStatementClassObject) :
             SectionFiles = []
             Index = 0
             SectionAlignments = []
-            for section in self.SectionList :
+            for section in self.SectionList:
                 Index = Index + 1
                 SecIndex = '%d' %Index
                 # process the inside FvImage from FvSection or GuidSection

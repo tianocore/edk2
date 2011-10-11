@@ -1896,7 +1896,7 @@ class InfBuildData(ModuleBuildClassObject):
     ## Retrieve PCDs used in this module
     def _GetPcds(self):
         if self._Pcds == None:
-            self._Pcds = {}
+            self._Pcds = sdict()
             self._Pcds.update(self._GetPcd(MODEL_PCD_FIXED_AT_BUILD))
             self._Pcds.update(self._GetPcd(MODEL_PCD_PATCHABLE_IN_MODULE))
             self._Pcds.update(self._GetPcd(MODEL_PCD_FEATURE_FLAG))
@@ -1996,7 +1996,7 @@ class InfBuildData(ModuleBuildClassObject):
 
     ## Retrieve PCD for given type
     def _GetPcd(self, Type):
-        Pcds = {}
+        Pcds = sdict()
         PcdDict = tdict(True, 4)
         PcdList = []
         RecordList = self._RawData[Type, self._Arch, self._Platform]
@@ -2071,18 +2071,9 @@ class InfBuildData(ModuleBuildClassObject):
                     #
                     # Check hexadecimal token value length and format.
                     #
+                    ReIsValidPcdTokenValue = re.compile(r"^[0][x|X][0]*[0-9a-fA-F]{1,8}$", re.DOTALL)
                     if Pcd.TokenValue.startswith("0x") or Pcd.TokenValue.startswith("0X"):
-                        if len(Pcd.TokenValue) < 3 or len(Pcd.TokenValue) > 10:
-                            EdkLogger.error(
-                                    'build',
-                                    FORMAT_INVALID,
-                                    "The format of TokenValue [%s] of PCD [%s.%s] in [%s] is invalid:" % (Pcd.TokenValue, TokenSpaceGuid, PcdCName, str(Package)),
-                                    File =self.MetaFile, Line=LineNo,
-                                    ExtraData=None
-                                    )                          
-                        try:
-                            int (Pcd.TokenValue, 16)
-                        except:
+                        if ReIsValidPcdTokenValue.match(Pcd.TokenValue) == None:
                             EdkLogger.error(
                                     'build',
                                     FORMAT_INVALID,

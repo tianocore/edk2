@@ -50,10 +50,10 @@ class OptRomInfStatement (FfsInfStatement):
             self.OverrideAttribs = OptionRom.OverrideAttribs()
 
         if self.OverrideAttribs.NeedCompress == None:
-            self.OverrideAttribs.NeedCompress = self.OptRomDefs.get ('COMPRESS')
+            self.OverrideAttribs.NeedCompress = self.OptRomDefs.get ('PCI_COMPRESS')
             if self.OverrideAttribs.NeedCompress is not None:
                 if self.OverrideAttribs.NeedCompress.upper() not in ('TRUE', 'FALSE'):
-                    GenFdsGlobalVariable.ErrorLogger( "Expected TRUE/FALSE for COMPRESS: %s" %self.InfFileName)
+                    GenFdsGlobalVariable.ErrorLogger( "Expected TRUE/FALSE for PCI_COMPRESS: %s" %self.InfFileName)
                 self.OverrideAttribs.NeedCompress = \
                     self.OverrideAttribs.NeedCompress.upper() == 'TRUE'
 

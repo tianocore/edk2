@@ -209,6 +209,7 @@ Returns:
       DebugMsg (NULL, 0, 9, "rebase address", "%s = %s", EFI_FV_BASE_ADDRESS_STRING, Value);
 
       FvInfo->BaseAddress = Value64;
+      FvInfo->BaseAddressSet = TRUE;
     }
   }
 
@@ -2826,11 +2827,20 @@ Returns:
   PeFileBuffer       = NULL;
 
   //
-  // Don't need to relocate image when BaseAddress is not set.
+  // Don't need to relocate image when BaseAddress is zero and no ForceRebase Flag specified.
   //
-  if (FvInfo->BaseAddress == 0) {
+  if ((FvInfo->BaseAddress == 0) && (FvInfo->ForceRebase == -1)) {
     return EFI_SUCCESS;
   }
+  
+  //
+  // If ForceRebase Flag specified to FALSE, will always not take rebase action.
+  //
+  if (FvInfo->ForceRebase == 0) {
+    return EFI_SUCCESS;
+  }
+
+
   XipBase = FvInfo->BaseAddress + XipOffset;
 
   //

@@ -56,6 +56,10 @@ class FfsInfStatement(FfsInfStatementClassObject):
         self.PiSpecVersion = '0x00000000'
         self.InfModule = None
         self.FinalTargetSuffixMap = {}
+        self.CurrentLineNum = None
+        self.CurrentLineContent = None
+        self.FileName = None
+        self.InfFileName = None
 
     ## GetFinalTargetSuffixMap() method
     #
@@ -452,7 +456,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
         Arch = ''
         OutputPath = ''
         (ModulePath, FileName) = os.path.split(self.InfFileName)
-        Index = FileName.find('.')
+        Index = FileName.rfind('.')
         FileName = FileName[0:Index]
         Arch = "NoneArch"
         if self.CurrentArch != None:

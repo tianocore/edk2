@@ -155,7 +155,7 @@ class AutoGen(object):
 class WorkspaceAutoGen(AutoGen):
     ## Real constructor of WorkspaceAutoGen
     #
-    # This method behaves the same as __init__ except that it needs explict invoke
+    # This method behaves the same as __init__ except that it needs explicit invoke
     # (in super class's __new__ method)
     #
     #   @param  WorkspaceDir            Root directory of workspace
@@ -246,12 +246,139 @@ class WorkspaceAutoGen(AutoGen):
         #
         self._CheckPcdDefineAndType()
         
+        if self.FdfFile:
+            self._CheckDuplicateInFV(Fdf)
+        
         self._BuildDir = None
         self._FvDir = None
         self._MakeFileDir = None
         self._BuildCommand = None
 
         return True
+
+    ## _CheckDuplicateInFV() method
+    #
+    # Check whether there is duplicate modules/files exist in FV section. 
+    # The check base on the file GUID;
+    #
+    def _CheckDuplicateInFV(self, Fdf):
+        for Fv in Fdf.Profile.FvDict:
+            _GuidDict = {}
+            for FfsFile in Fdf.Profile.FvDict[Fv].FfsList:
+                if FfsFile.InfFileName and FfsFile.NameGuid == None:
+                    #
+                    # Get INF file GUID
+                    #
+                    InfFoundFlag = False                   
+                    for Pa in self.AutoGenObjectList:
+                        for Module in Pa.ModuleAutoGenList:
+                            if path.normpath(Module.MetaFile.File) == path.normpath(FfsFile.InfFileName):
+                                InfFoundFlag = True
+                                if not Module.Guid.upper() in _GuidDict.keys():
+                                    _GuidDict[Module.Guid.upper()] = FfsFile
+                                else:
+                                    EdkLogger.error("build", 
+                                                    FORMAT_INVALID,
+                                                    "Duplicate GUID found for these lines: Line %d: %s and Line %d: %s. GUID: %s"%(FfsFile.CurrentLineNum,
+                                                                                                                                   FfsFile.CurrentLineContent,
+                                                                                                                                   _GuidDict[Module.Guid.upper()].CurrentLineNum,
+                                                                                                                                   _GuidDict[Module.Guid.upper()].CurrentLineContent,
+                                                                                                                                   Module.Guid.upper()),
+                                                    ExtraData=self.FdfFile)
+                    #
+                    # Some INF files not have entity in DSC file. 
+                    #
+                    if not InfFoundFlag:
+                        if FfsFile.InfFileName.find('$') == -1:
+                            InfPath = NormPath(FfsFile.InfFileName)
+                            if not os.path.exists(InfPath):
+                                EdkLogger.error('build', GENFDS_ERROR, "Non-existant Module %s !" % (FfsFile.InfFileName))
+                                
+                            PathClassObj = PathClass(FfsFile.InfFileName, self.WorkspaceDir)
+                            #
+                            # Here we just need to get FILE_GUID from INF file, use 'COMMON' as ARCH attribute. and use 
+                            # BuildObject from one of AutoGenObjectList is enough.
+                            #
+                            InfObj = self.AutoGenObjectList[0].BuildDatabase.WorkspaceDb.BuildObject[PathClassObj, 'COMMON', self.BuildTarget, self.ToolChain]
+                            if not InfObj.Guid.upper() in _GuidDict.keys():
+                                _GuidDict[InfObj.Guid.upper()] = FfsFile
+                            else:
+                                EdkLogger.error("build", 
+                                                FORMAT_INVALID,
+                                                "Duplicate GUID found for these lines: Line %d: %s and Line %d: %s. GUID: %s"%(FfsFile.CurrentLineNum,
+                                                                                                                               FfsFile.CurrentLineContent,
+                                                                                                                               _GuidDict[InfObj.Guid.upper()].CurrentLineNum,
+                                                                                                                               _GuidDict[InfObj.Guid.upper()].CurrentLineContent,
+                                                                                                                               InfObj.Guid.upper()),
+                                                ExtraData=self.FdfFile)
+                        InfFoundFlag = False
+                                                                   
+                if FfsFile.NameGuid != None:
+                    _CheckPCDAsGuidPattern = re.compile("^PCD\(.+\..+\)$")
+                    
+                    #
+                    # If the NameGuid reference a PCD name. 
+                    # The style must match: PCD(xxxx.yyy)
+                    #
+                    if _CheckPCDAsGuidPattern.match(FfsFile.NameGuid):
+                        #
+                        # Replace the PCD value.
+                        #
+                        _PcdName = FfsFile.NameGuid.lstrip("PCD(").rstrip(")")
+                        PcdFoundFlag = False
+                        for Pa in self.AutoGenObjectList:
+                            if not PcdFoundFlag:
+                                for PcdItem in Pa.AllPcdList:
+                                    if (PcdItem.TokenSpaceGuidCName + "." + PcdItem.TokenCName) == _PcdName:
+                                        #
+                                        # First convert from CFormatGuid to GUID string
+                                        #
+                                        _PcdGuidString = GuidStructureStringToGuidString(PcdItem.DefaultValue)
+                                        
+                                        if not _PcdGuidString:
+                                            #
+                                            # Then try Byte array.
+                                            #
+                                            _PcdGuidString = GuidStructureByteArrayToGuidString(PcdItem.DefaultValue)
+                                            
+                                        if not _PcdGuidString:
+                                            #
+                                            # Not Byte array or CFormat GUID, raise error.
+                                            #
+                                            EdkLogger.error("build",
+                                                            FORMAT_INVALID,
+                                                            "The format of PCD value is incorrect. PCD: %s , Value: %s\n"%(_PcdName, PcdItem.DefaultValue),
+                                                            ExtraData=self.FdfFile)
+                                        
+                                        if not _PcdGuidString.upper() in _GuidDict.keys():    
+                                            _GuidDict[_PcdGuidString.upper()] = FfsFile
+                                            PcdFoundFlag = True
+                                            break
+                                        else:
+                                            EdkLogger.error("build", 
+                                                            FORMAT_INVALID,
+                                                            "Duplicate GUID found for these lines: Line %d: %s and Line %d: %s. GUID: %s"%(FfsFile.CurrentLineNum,
+                                                                                                                                           FfsFile.CurrentLineContent,
+                                                                                                                                           _GuidDict[_PcdGuidString.upper()].CurrentLineNum,
+                                                                                                                                           _GuidDict[_PcdGuidString.upper()].CurrentLineContent,
+                                                                                                                                           FfsFile.NameGuid.upper()),
+                                                            ExtraData=self.FdfFile)                                                                       
+                
+                    if not FfsFile.NameGuid.upper() in _GuidDict.keys():
+                        _GuidDict[FfsFile.NameGuid.upper()] = FfsFile
+                    else:
+                        #
+                        # Two raw file GUID conflict.
+                        #
+                        EdkLogger.error("build", 
+                                        FORMAT_INVALID,
+                                        "Duplicate GUID found for these lines: Line %d: %s and Line %d: %s. GUID: %s"%(FfsFile.CurrentLineNum,
+                                                                                                                       FfsFile.CurrentLineContent,
+                                                                                                                       _GuidDict[FfsFile.NameGuid.upper()].CurrentLineNum,
+                                                                                                                       _GuidDict[FfsFile.NameGuid.upper()].CurrentLineContent,
+                                                                                                                       FfsFile.NameGuid.upper()),
+                                        ExtraData=self.FdfFile)
+                
 
     def _CheckPcdDefineAndType(self):
         PcdTypeList = [
@@ -1749,6 +1876,7 @@ class ModuleAutoGen(AutoGen):
         self._DepexList               = None
         self._DepexExpressionList     = None
         self._BuildOption             = None
+        self._BuildOptionIncPathList  = None
         self._BuildTargets            = None
         self._IntroBuildTargetList    = None
         self._FinalBuildTargetList    = None
@@ -2004,6 +2132,50 @@ class ModuleAutoGen(AutoGen):
             self._BuildOption = self.PlatformInfo.ApplyBuildOption(self.Module)
         return self._BuildOption
 
+    ## Get include path list from tool option for the module build
+    #
+    #   @retval     list            The include path list
+    #
+    def _GetBuildOptionIncPathList(self):
+        if self._BuildOptionIncPathList == None:
+            #
+            # Regular expression for finding Include Directories, the difference between MSFT and INTEL/GCC
+            # is the former use /I , the Latter used -I to specify include directories
+            #
+            if self.PlatformInfo.ToolChainFamily in ('MSFT'):
+                gBuildOptIncludePattern = re.compile(r"(?:.*?)/I[ \t]*([^ ]*)", re.MULTILINE|re.DOTALL)
+            elif self.PlatformInfo.ToolChainFamily in ('INTEL', 'GCC'):
+                gBuildOptIncludePattern = re.compile(r"(?:.*?)-I[ \t]*([^ ]*)", re.MULTILINE|re.DOTALL)
+            
+            BuildOptionIncPathList = []
+            for Tool in ('CC', 'PP', 'VFRPP', 'ASLPP', 'ASLCC', 'APP', 'ASM'):
+                Attr = 'FLAGS'
+                try:
+                    FlagOption = self.BuildOption[Tool][Attr]
+                except KeyError:
+                    FlagOption = ''
+                
+                IncPathList = [NormPath(Path, self.Macros) for Path in gBuildOptIncludePattern.findall(FlagOption)]
+                #
+                # EDK II modules must not reference header files outside of the packages they depend on or 
+                # within the module's directory tree. Report error if violation.
+                #
+                if self.AutoGenVersion >= 0x00010005 and len(IncPathList) > 0:
+                    for Path in IncPathList:
+                        if (Path not in self.IncludePathList) and (CommonPath([Path, self.MetaFile.Dir]) != self.MetaFile.Dir):
+                            ErrMsg = "The include directory for the EDK II module in this line is invalid %s specified in %s FLAGS '%s'" % (Path, Tool, FlagOption) 
+                            EdkLogger.error("build", 
+                                            PARAMETER_INVALID,
+                                            ExtraData = ErrMsg, 
+                                            File = str(self.MetaFile))
+
+                
+                BuildOptionIncPathList += IncPathList
+            
+            self._BuildOptionIncPathList = BuildOptionIncPathList
+        
+        return self._BuildOptionIncPathList
+        
     ## Return a list of files which can be built from source
     #
     #  What kind of files can be built is determined by build rules in
@@ -2256,7 +2428,7 @@ class ModuleAutoGen(AutoGen):
     #
     def _GetLibraryPcdList(self):
         if self._LibraryPcdList == None:
-            Pcds = {}
+            Pcds = sdict()
             if not self.IsLibrary:
                 # get PCDs from dependent libraries
                 for Library in self.DependentLibraryList:
@@ -2584,6 +2756,7 @@ class ModuleAutoGen(AutoGen):
     DxsFile                 = property(_GetDxsFile)
     DepexExpressionList     = property(_GetDepexExpressionTokenList)
     BuildOption             = property(_GetModuleBuildOption)
+    BuildOptionIncPathList  = property(_GetBuildOptionIncPathList)
     BuildCommand            = property(_GetBuildCommand)
 
 # This acts like the main() function for the script, unless it is 'import'ed into another script.

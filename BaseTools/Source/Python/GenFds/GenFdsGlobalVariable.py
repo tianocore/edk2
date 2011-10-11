@@ -422,7 +422,7 @@ class GenFdsGlobalVariable:
         GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate FFS")
 
     @staticmethod
-    def GenerateFirmwareVolume(Output, Input, BaseAddress=None, Capsule=False, Dump=False,
+    def GenerateFirmwareVolume(Output, Input, BaseAddress=None, ForceRebase=None, Capsule=False, Dump=False,
                                AddressFile=None, MapFile=None, FfsList=[]):
         if not GenFdsGlobalVariable.NeedsUpdate(Output, Input+FfsList):
             return
@@ -431,6 +431,12 @@ class GenFdsGlobalVariable:
         Cmd = ["GenFv"]
         if BaseAddress not in [None, '']:
             Cmd += ["-r", BaseAddress]
+        
+        if ForceRebase == False:
+            Cmd +=["-F", "FALSE"]
+        elif ForceRebase == True:
+            Cmd +=["-F", "TRUE"]
+                        
         if Capsule:
             Cmd += ["-c"]
         if Dump:
