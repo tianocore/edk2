@@ -1,7 +1,7 @@
 /** @file
   Serial I/O status code reporting worker.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -94,7 +94,7 @@ SerialStatusCodeReportWorker (
    
     if (CallerId != NULL) {
       CharCount += AsciiSPrint (
-                     &Buffer[CharCount - 1],
+                     &Buffer[CharCount],
                      (sizeof (Buffer) - (sizeof (Buffer[0]) * CharCount)),
                      " %g",
                      CallerId
@@ -103,7 +103,7 @@ SerialStatusCodeReportWorker (
 
     if (Data != NULL) {
       CharCount += AsciiSPrint (
-                     &Buffer[CharCount - 1],
+                     &Buffer[CharCount],
                      (sizeof (Buffer) - (sizeof (Buffer[0]) * CharCount)),
                      " %x",
                      Data
@@ -111,7 +111,7 @@ SerialStatusCodeReportWorker (
     }
 
     CharCount += AsciiSPrint (
-                   &Buffer[CharCount - 1],
+                   &Buffer[CharCount],
                    (sizeof (Buffer) - (sizeof (Buffer[0]) * CharCount)),
                    "\n\r"
                    );
