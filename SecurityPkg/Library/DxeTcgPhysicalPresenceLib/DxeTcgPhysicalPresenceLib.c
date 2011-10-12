@@ -482,7 +482,7 @@ TcgPhysicalPresenceLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  mPpStringPackHandle = HiiAddPackages (&gEfiPhysicalPresenceGuid, &ImageHandle, DxeTcgPhysicalPresenceLibStrings, NULL);
+  mPpStringPackHandle = HiiAddPackages (&gEfiPhysicalPresenceGuid, ImageHandle, DxeTcgPhysicalPresenceLibStrings, NULL);
   ASSERT (mPpStringPackHandle != NULL);
 
   return EFI_SUCCESS;

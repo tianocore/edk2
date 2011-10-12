@@ -18,7 +18,7 @@ CREDENTIAL_TABLE            *mUsbTable       = NULL;
 USB_PROVIDER_CALLBACK_INFO  *mCallbackInfo   = NULL;
 USB_CREDENTIAL_INFO         *mUsbInfoHandle  = NULL;
 
-EFI_USER_CREDENTIAL_PROTOCOL  gUsbCredentialProviderDriver = {
+EFI_USER_CREDENTIAL2_PROTOCOL  gUsbCredentialProviderDriver = {
   USB_CREDENTIAL_PROVIDER_GUID,
   EFI_USER_CREDENTIAL_CLASS_SECURE_CARD,
   CredentialEnroll,
@@ -30,7 +30,9 @@ EFI_USER_CREDENTIAL_PROTOCOL  gUsbCredentialProviderDriver = {
   CredentialDeselect,
   CredentialDefault,
   CredentialGetInfo,
-  CredentialGetNextInfo
+  CredentialGetNextInfo,
+  EFI_CREDENTIAL_CAPABILITIES_ENROLL,
+  CredentialDelete
 };
 
 
@@ -95,12 +97,12 @@ ExpandTableSize (
 
 
 /**
-  Add or delete info in table, and sync with NV variable.
+  Add, update or delete info in table, and sync with NV variable.
 
-  @param[in]  Index     The index of the password in table. The index begin from 1.
-                        If index is found in table, delete the info, else add the 
-                        into to table. 
-  @param[in]  Info      The new password info to add into table.
+  @param[in]  Index     The index of the password in table. If index is found in
+                        table, update the info, else add the into to table. 
+  @param[in]  Info      The new credential info to add into table. If Info is NULL, 
+                        delete the info by Index.
 
   @retval EFI_INVALID_PARAMETER  Info is NULL when save the info.
   @retval EFI_SUCCESS            Modify the table successfully.
@@ -114,18 +116,23 @@ ModifyTable (
   )
 {
   EFI_STATUS  Status;
+  USB_INFO    *NewUsbInfo;
   
+  NewUsbInfo = NULL;
   if (Index < mUsbTable->Count) {
-    //
-    // Delete the specified entry
-    //
-    mUsbTable->Count--;
-    if (Index != mUsbTable->Count) {
-      CopyMem (
-        &mUsbTable->UserInfo[Index],
-        &mUsbTable->UserInfo[mUsbTable->Count],
-        sizeof (USB_INFO)
-        );
+    if (Info == NULL) {
+      //
+      // Delete the specified entry.
+      //
+      mUsbTable->Count--;
+      if (Index != mUsbTable->Count) {
+        NewUsbInfo = &mUsbTable->UserInfo[mUsbTable->Count];
+      } 
+    } else {
+      //
+      // Update the specified entry.
+      //
+      NewUsbInfo = Info;
     }
   } else {
     //
@@ -139,12 +146,12 @@ ModifyTable (
       ExpandTableSize ();
     }
 
-    CopyMem (
-      &mUsbTable->UserInfo[mUsbTable->Count], 
-      Info, 
-      sizeof (USB_INFO)
-      );
+    NewUsbInfo = Info;
     mUsbTable->Count++;
+  }
+
+  if (NewUsbInfo != NULL) {
+    CopyMem (&mUsbTable->UserInfo[Index], NewUsbInfo, sizeof (USB_INFO));
   }
 
   //
@@ -636,13 +643,11 @@ InitFormBrowser (
 /**
   Enroll a user on a credential provider.
 
-  This function enrolls and deletes a user profile using this credential provider. 
-  If a user profile is successfully enrolled, it calls the User Manager Protocol 
-  function Notify() to notify the user manager driver that credential information 
-  has changed. If an enrolled user does exist, delete the user on the credential 
-  provider.
+  This function enrolls a user on this credential provider. If the user exists on 
+  this credential provider, update the user information on this credential provider; 
+  otherwise add the user information on credential provider.
   
-  @param[in] This                Points to this instance of EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in] This                Points to this instance of EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[in] User                The user profile to enroll.
  
   @retval EFI_SUCCESS            User profile was successfully enrolled.
@@ -660,7 +665,7 @@ InitFormBrowser (
 EFI_STATUS
 EFIAPI
 CredentialEnroll (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   IN        EFI_USER_PROFILE_HANDLE             User
   )
 {
@@ -671,8 +676,6 @@ CredentialEnroll (
   EFI_INPUT_KEY             Key;
   EFI_USER_MANAGER_PROTOCOL *UserManager;
   UINT8                     *UserId;
-  UINT8                     *NewUserId;
-  EFI_TPL                   OldTpl;
   CHAR16                    *QuestionStr;
   CHAR16                    *PromptStr;
 
@@ -701,22 +704,10 @@ CredentialEnroll (
   if (EFI_ERROR (Status)) {
     return EFI_INVALID_PARAMETER;
   }
-  
-  //
-  // If User exists in mUsbTable, delete User.
-  // 
-  for (Index = 0; Index < mUsbTable->Count; Index++) {
-    UserId    = (UINT8 *) &mUsbTable->UserInfo[Index].UserId;
-    NewUserId = (UINT8 *) (UserInfo + 1);
-    if (CompareMem (UserId, NewUserId, sizeof (EFI_USER_INFO_IDENTIFIER)) == 0) {
-      //
-      // Delete the exist Token.
-      //
-      FreePool (UserInfo);
-      return ModifyTable (Index, NULL);
-    }
-  }
 
+  CopyMem (UsbInfo.UserId, (UINT8 *) (UserInfo + 1), sizeof (EFI_USER_INFO_IDENTIFIER)); 
+  FreePool (UserInfo);
+  
   //
   // Get Token and User ID to UsbInfo.
   //
@@ -724,8 +715,6 @@ CredentialEnroll (
   if (EFI_ERROR (Status)) {
     QuestionStr = GetStringById (STRING_TOKEN (STR_READ_USB_TOKEN_ERROR));
     PromptStr   = GetStringById (STRING_TOKEN (STR_INSERT_USB_TOKEN)); 
-    OldTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-    gBS->RestoreTPL (TPL_APPLICATION);    
     CreatePopUp (
       EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
       &Key,
@@ -734,23 +723,28 @@ CredentialEnroll (
       PromptStr,
       NULL
       );
-    gBS->RaiseTPL (OldTpl);
     FreePool (QuestionStr);
     FreePool (PromptStr);
-    FreePool (UserInfo);
     return Status;
   } 
-  CopyMem (
-    UsbInfo.UserId,
-    (UINT8 *) (UserInfo + 1),
-    sizeof (EFI_USER_INFO_IDENTIFIER)
-    );
-  FreePool (UserInfo);
 
   //
-  // Save the new added entry.
+  // Check whether User is ever enrolled in the provider.
+  // 
+  for (Index = 0; Index < mUsbTable->Count; Index++) {
+    UserId = (UINT8 *) &mUsbTable->UserInfo[Index].UserId;
+    if (CompareMem (UserId, (UINT8 *) &UsbInfo.UserId, sizeof (EFI_USER_INFO_IDENTIFIER)) == 0) {
+      //
+      // User already exists, update the password.
+      //      
+      break;
+    }
+  }
+  
   //
-  Status = ModifyTable (mUsbTable->Count, &UsbInfo);
+  // Enroll the User to the provider.
+  //
+  Status = ModifyTable (Index, &UsbInfo);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -773,7 +767,7 @@ CredentialEnroll (
   the user credential provider does not require a form to identify the user, then this
   function should return EFI_NOT_FOUND.
 
-  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[out] Hii        On return, holds the HII database handle.
   @param[out] FormSetId  On return, holds the identifier of the form set which contains
                          the form used during user identification.
@@ -788,7 +782,7 @@ CredentialEnroll (
 EFI_STATUS
 EFIAPI
 CredentialForm (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   OUT       EFI_HII_HANDLE                      *Hii,
   OUT       EFI_GUID                            *FormSetId,
   OUT       EFI_FORM_ID                         *FormId
@@ -809,7 +803,7 @@ CredentialForm (
   of pixels specified by Width and Height. If no such bitmap exists, then EFI_NOT_FOUND
   is returned. 
 
-  @param[in]     This    Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]     This    Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[in, out] Width  On entry, points to the desired bitmap width. If NULL then no 
                          bitmap information will be returned. On exit, points to the 
                          width of the bitmap returned.
@@ -827,7 +821,7 @@ CredentialForm (
 EFI_STATUS
 EFIAPI
 CredentialTile (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   IN OUT    UINTN                               *Width,
   IN OUT    UINTN                               *Height,
   OUT       EFI_HII_HANDLE                      *Hii,
@@ -847,7 +841,7 @@ CredentialTile (
   This function returns a string which describes the credential provider. If no
   such string exists, then EFI_NOT_FOUND is returned. 
 
-  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[out] Hii        On return, holds the HII database handle.
   @param[out] String     On return, holds the HII string identifier.
  
@@ -859,7 +853,7 @@ CredentialTile (
 EFI_STATUS
 EFIAPI
 CredentialTitle (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   OUT       EFI_HII_HANDLE                      *Hii,
   OUT       EFI_STRING_ID                       *String
   )
@@ -885,7 +879,7 @@ CredentialTitle (
   submitted on a form OR after a call to Default() has returned that this credential is
   ready to log on.
 
-  @param[in]  This           Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]  This           Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[in]  User           The user profile handle of the user profile currently being 
                              considered by the user identity manager. If NULL, then no user
                              profile is currently under consideration.
@@ -902,7 +896,7 @@ CredentialTitle (
 EFI_STATUS
 EFIAPI
 CredentialUser (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   IN        EFI_USER_PROFILE_HANDLE             User,
   OUT       EFI_USER_INFO_IDENTIFIER            *Identifier
   )
@@ -1023,7 +1017,7 @@ CredentialUser (
   AutoLogon returns FALSE, then the user interface will be constructed by the User
   Identity Manager. 
 
-  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[out] AutoLogon  On return, points to the credential provider's capabilities 
                          after the credential provider has been selected by the user. 
  
@@ -1034,7 +1028,7 @@ CredentialUser (
 EFI_STATUS
 EFIAPI
 CredentialSelect (
-  IN  CONST  EFI_USER_CREDENTIAL_PROTOCOL    *This,
+  IN  CONST  EFI_USER_CREDENTIAL2_PROTOCOL   *This,
   OUT        EFI_CREDENTIAL_LOGON_FLAGS      *AutoLogon
   )
 {
@@ -1053,7 +1047,7 @@ CredentialSelect (
 
   This function is called when a credential provider is deselected by the user.
 
-  @param[in] This        Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in] This        Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
  
   @retval EFI_SUCCESS    Credential provider successfully deselected.
   
@@ -1061,7 +1055,7 @@ CredentialSelect (
 EFI_STATUS
 EFIAPI
 CredentialDeselect (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This
   )
 {
   if (This == NULL) {
@@ -1076,7 +1070,7 @@ CredentialDeselect (
 
   This function reports the default login behavior regarding this credential provider.  
 
-  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[out] AutoLogon  On return, holds whether the credential provider should be used
                          by default to automatically log on the user.  
  
@@ -1087,7 +1081,7 @@ CredentialDeselect (
 EFI_STATUS
 EFIAPI
 CredentialDefault (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   OUT       EFI_CREDENTIAL_LOGON_FLAGS          *AutoLogon
   )
 {
@@ -1105,7 +1099,7 @@ CredentialDefault (
 
   This function returns user information. 
 
-  @param[in]      This          Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]      This          Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[in]      UserInfo      Handle of the user information data record. 
   @param[out]     Info          On entry, points to a buffer of at least *InfoSize bytes. On
                                 exit, holds the user information. If the buffer is too small
@@ -1125,7 +1119,7 @@ CredentialDefault (
 EFI_STATUS
 EFIAPI
 CredentialGetInfo (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   IN        EFI_USER_INFO_HANDLE                UserInfo,
   OUT       EFI_USER_INFO                       *Info,
   IN OUT    UINTN                               *InfoSize
@@ -1173,7 +1167,7 @@ CredentialGetInfo (
   another user information record handle until there are no more, at which point UserInfo
   will point to NULL. 
 
-  @param[in]      This     Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]      This     Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[in, out] UserInfo On entry, points to the previous user information handle or NULL
                            to start enumeration. On exit, points to the next user information
                            handle or NULL if there is no more user information.
@@ -1186,7 +1180,7 @@ CredentialGetInfo (
 EFI_STATUS
 EFIAPI
 CredentialGetNextInfo (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   IN OUT    EFI_USER_INFO_HANDLE                *UserInfo
   )
 {
@@ -1318,6 +1312,72 @@ CredentialGetNextInfo (
 
 
 /**
+  Delete a user on this credential provider.
+
+  This function deletes a user on this credential provider. 
+
+  @param[in]     This            Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
+  @param[in]     User            The user profile handle to delete.
+
+  @retval EFI_SUCCESS            User profile was successfully deleted.
+  @retval EFI_ACCESS_DENIED      Current user profile does not permit deletion on the user profile handle. 
+                                 Either the user profile cannot delete on any user profile or cannot delete 
+                                 on a user profile other than the current user profile. 
+  @retval EFI_UNSUPPORTED        This credential provider does not support deletion in the pre-OS.
+  @retval EFI_DEVICE_ERROR       The new credential could not be deleted because of a device error.
+  @retval EFI_INVALID_PARAMETER  User does not refer to a valid user profile handle.
+**/
+EFI_STATUS
+EFIAPI
+CredentialDelete (
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
+  IN        EFI_USER_PROFILE_HANDLE             User
+  )
+{
+  EFI_STATUS                Status;
+  EFI_USER_INFO             *UserInfo;
+  UINT8                     *UserId;
+  UINT8                     *NewUserId;
+  UINTN                     Index;
+  
+  if ((This == NULL) || (User == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Get User Identifier.
+  //
+  UserInfo = NULL;
+  Status = FindUserInfoByType (
+             User,
+             EFI_USER_INFO_IDENTIFIER_RECORD,
+             &UserInfo
+             );
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Find the user by user identifier in mPwdTable.
+  // 
+  for (Index = 0; Index < mUsbTable->Count; Index++) {
+    UserId    = (UINT8 *) &mUsbTable->UserInfo[Index].UserId;
+    NewUserId = (UINT8 *) (UserInfo + 1);
+    if (CompareMem (UserId, NewUserId, sizeof (EFI_USER_INFO_IDENTIFIER)) == 0) {
+      //
+      // Found the user, delete it.
+      //
+      ModifyTable (Index, NULL);
+      break;
+    }
+  }
+
+  FreePool (UserInfo);
+  return EFI_SUCCESS;
+}
+
+
+/**
   Main entry for this driver.
 
   @param ImageHandle     Image handle this driver.
@@ -1356,7 +1416,7 @@ UsbProviderInit (
   //
   Status = gBS->InstallProtocolInterface (
                   &mCallbackInfo->DriverHandle,
-                  &gEfiUserCredentialProtocolGuid,
+                  &gEfiUserCredential2ProtocolGuid,
                   EFI_NATIVE_INTERFACE,
                   &gUsbCredentialProviderDriver
                   );

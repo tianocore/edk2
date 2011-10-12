@@ -379,7 +379,7 @@ ResolveIdentityPolicy (
   CHAR16                        *ProvStr;
   EFI_STRING_ID                 ProvId;
   EFI_HII_HANDLE                HiiHandle;
-  EFI_USER_CREDENTIAL_PROTOCOL  *UserCredential;
+  EFI_USER_CREDENTIAL2_PROTOCOL *UserCredential;
  
   TmpStr = NULL;
   

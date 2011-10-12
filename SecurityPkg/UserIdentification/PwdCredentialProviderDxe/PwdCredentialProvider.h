@@ -1,7 +1,7 @@
 /** @file
   Password Credential Provider driver header file.
     
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/GlobalVariable.h>
 
 #include <Protocol/HiiConfigAccess.h>
-#include <Protocol/UserCredential.h>
+#include <Protocol/UserCredential2.h>
 #include <Protocol/UserManager.h>
 
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -92,13 +92,11 @@ typedef struct {
 /**
   Enroll a user on a credential provider.
 
-  This function enrolls and deletes a user profile using this credential provider. 
-  If a user profile is successfully enrolled, it calls the User Manager Protocol 
-  function Notify() to notify the user manager driver that credential information 
-  has changed. If an enrolled user does exist, delete the user on the credential 
-  provider.
-
-  @param[in] This                Points to this instance of EFI_USER_CREDENTIAL_PROTOCOL.
+  This function enrolls a user on this credential provider. If the user exists on 
+  this credential provider, update the user information on this credential provider; 
+  otherwise delete the user information on credential provider.
+  
+  @param[in] This                Points to this instance of EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[in] User                The user profile to enroll.
  
   @retval EFI_SUCCESS            User profile was successfully enrolled.
@@ -116,7 +114,7 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 CredentialEnroll (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   IN        EFI_USER_PROFILE_HANDLE             User
   );
 
@@ -129,7 +127,7 @@ CredentialEnroll (
   the user credential provider does not require a form to identify the user, then this
   function should return EFI_NOT_FOUND.
 
-  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[out] Hii        On return, holds the HII database handle.
   @param[out] FormSetId  On return, holds the identifier of the form set which contains
                          the form used during user identification.
@@ -144,7 +142,7 @@ CredentialEnroll (
 EFI_STATUS
 EFIAPI
 CredentialForm (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   OUT       EFI_HII_HANDLE                      *Hii,
   OUT       EFI_GUID                            *FormSetId,
   OUT       EFI_FORM_ID                         *FormId
@@ -157,7 +155,7 @@ CredentialForm (
   of pixels specified by Width and Height. If no such bitmap exists, then EFI_NOT_FOUND
   is returned. 
 
-  @param[in]      This    Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]      This    Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[in, out] Width   On entry, points to the desired bitmap width. If NULL then no 
                           bitmap information will be returned. On exit, points to the 
                           width of the bitmap returned.
@@ -175,7 +173,7 @@ CredentialForm (
 EFI_STATUS
 EFIAPI
 CredentialTile (
-  IN  CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN  CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   IN  OUT    UINTN                               *Width,
   IN  OUT    UINTN                               *Height,
       OUT    EFI_HII_HANDLE                      *Hii,
@@ -188,7 +186,7 @@ CredentialTile (
   This function returns a string which describes the credential provider. If no
   such string exists, then EFI_NOT_FOUND is returned. 
 
-  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[out] Hii        On return, holds the HII database handle.
   @param[out] String     On return, holds the HII string identifier.
  
@@ -200,7 +198,7 @@ CredentialTile (
 EFI_STATUS
 EFIAPI
 CredentialTitle (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   OUT       EFI_HII_HANDLE                      *Hii,
   OUT       EFI_STRING_ID                       *String
   );
@@ -213,7 +211,7 @@ CredentialTitle (
   submitted on a form OR after a call to Default() has returned that this credential is
   ready to log on.
 
-  @param[in]  This           Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]  This           Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[in]  User           The user profile handle of the user profile currently being 
                              considered by the user identity manager. If NULL, then no user
                              profile is currently under consideration.
@@ -230,7 +228,7 @@ CredentialTitle (
 EFI_STATUS
 EFIAPI
 CredentialUser (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   IN        EFI_USER_PROFILE_HANDLE             User,
   OUT       EFI_USER_INFO_IDENTIFIER            *Identifier
   );
@@ -242,7 +240,7 @@ CredentialUser (
   AutoLogon returns FALSE, then the user interface will be constructed by the User
   Identity Manager. 
 
-  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[out] AutoLogon  On return, points to the credential provider's capabilities 
                          after the credential provider has been selected by the user. 
  
@@ -253,7 +251,7 @@ CredentialUser (
 EFI_STATUS
 EFIAPI
 CredentialSelect (
-  IN  CONST  EFI_USER_CREDENTIAL_PROTOCOL    *This,
+  IN  CONST  EFI_USER_CREDENTIAL2_PROTOCOL   *This,
   OUT        EFI_CREDENTIAL_LOGON_FLAGS      *AutoLogon
   );
 
@@ -262,7 +260,7 @@ CredentialSelect (
 
   This function is called when a credential provider is deselected by the user.
 
-  @param[in] This        Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in] This        Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
  
   @retval EFI_SUCCESS    Credential provider successfully deselected.
   
@@ -270,7 +268,7 @@ CredentialSelect (
 EFI_STATUS
 EFIAPI
 CredentialDeselect (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This
   );
 
 /**
@@ -278,7 +276,7 @@ CredentialDeselect (
 
   This function reports the default login behavior regarding this credential provider.  
 
-  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[out] AutoLogon  On return, holds whether the credential provider should be used
                          by default to automatically log on the user.  
  
@@ -289,7 +287,7 @@ CredentialDeselect (
 EFI_STATUS
 EFIAPI
 CredentialDefault (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   OUT       EFI_CREDENTIAL_LOGON_FLAGS          *AutoLogon
   );
 
@@ -298,7 +296,7 @@ CredentialDefault (
 
   This function returns user information. 
 
-  @param[in]      This          Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]      This          Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[in]      UserInfo      Handle of the user information data record. 
   @param[out]     Info          On entry, points to a buffer of at least *InfoSize bytes. On
                                 exit, holds the user information. If the buffer is too small
@@ -318,7 +316,7 @@ CredentialDefault (
 EFI_STATUS
 EFIAPI
 CredentialGetInfo (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   IN        EFI_USER_INFO_HANDLE                UserInfo,
   OUT       EFI_USER_INFO                       *Info,
   IN OUT    UINTN                               *InfoSize
@@ -333,7 +331,7 @@ CredentialGetInfo (
   another user information record handle until there are no more, at which point UserInfo
   will point to NULL. 
 
-  @param[in]      This     Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]      This     Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
   @param[in, out] UserInfo On entry, points to the previous user information handle or NULL
                            to start enumeration. On exit, points to the next user information
                            handle or NULL if there is no more user information.
@@ -346,8 +344,31 @@ CredentialGetInfo (
 EFI_STATUS
 EFIAPI
 CredentialGetNextInfo (
-  IN CONST  EFI_USER_CREDENTIAL_PROTOCOL        *This,
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
   IN OUT    EFI_USER_INFO_HANDLE                *UserInfo
+  );
+
+/**
+  Delete a user on this credential provider.
+
+  This function deletes a user on this credential provider. 
+
+  @param[in]     This            Points to this instance of the EFI_USER_CREDENTIAL2_PROTOCOL.
+  @param[in]     User            The user profile handle to delete.
+
+  @retval EFI_SUCCESS            User profile was successfully deleted.
+  @retval EFI_ACCESS_DENIED      Current user profile does not permit deletion on the user profile handle. 
+                                 Either the user profile cannot delete on any user profile or cannot delete 
+                                 on a user profile other than the current user profile. 
+  @retval EFI_UNSUPPORTED        This credential provider does not support deletion in the pre-OS.
+  @retval EFI_DEVICE_ERROR       The new credential could not be deleted because of a device error.
+  @retval EFI_INVALID_PARAMETER  User does not refer to a valid user profile handle.
+**/
+EFI_STATUS
+EFIAPI
+CredentialDelete (
+  IN CONST  EFI_USER_CREDENTIAL2_PROTOCOL       *This,
+  IN        EFI_USER_PROFILE_HANDLE             User
   );
 
 #endif

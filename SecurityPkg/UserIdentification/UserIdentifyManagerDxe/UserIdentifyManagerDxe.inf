@@ -50,7 +50,7 @@
 [Protocols]
   gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
   gEfiHiiDatabaseProtocolGuid                   ## CONSUMES
-  gEfiUserCredentialProtocolGuid                ## CONSUMES
+  gEfiUserCredential2ProtocolGuid               ## CONSUMES
   gEfiDeferredImageLoadProtocolGuid             ## CONSUMES
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
   gEfiUserManagerProtocolGuid                   ## PRODUCES

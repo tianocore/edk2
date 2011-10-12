@@ -54,7 +54,7 @@
 [Protocols]
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiHiiConfigAccessProtocolGuid
-  gEfiUserCredentialProtocolGuid
+  gEfiUserCredential2ProtocolGuid
   gEfiUserManagerProtocolGuid
   gEfiDevicePathToTextProtocolGuid
 

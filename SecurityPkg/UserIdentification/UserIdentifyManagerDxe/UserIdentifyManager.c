@@ -1016,6 +1016,8 @@ ExpandUserProfile (
   @param[in]  ByType              If TRUE, Provider is credential class guid.
                                   If FALSE, Provider is provider guid.
   @param[in]  User                Points to user profile.
+  @param[in]  Delete              If TRUE, delete User from the provider; If FALSE, add  
+                                  User info from the provider.
 
   @retval EFI_SUCCESS      Add or delete record successfully.
   @retval Others           Fail to add or delete record.
@@ -1025,17 +1027,17 @@ EFI_STATUS
 ModifyProviderCredential (
   IN  EFI_GUID                                  *Provider,
   IN  BOOLEAN                                   ByType,
-  IN  USER_PROFILE_ENTRY                        *User
+  IN  USER_PROFILE_ENTRY                        *User,
+  IN  BOOLEAN                                   Delete
   )
 {
   UINTN                         Index;
-  EFI_USER_CREDENTIAL_PROTOCOL  *UserCredential;
+  EFI_USER_CREDENTIAL2_PROTOCOL *UserCredential;
   
   if (Provider == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  
   //
   // Find the specified credential provider.
   //
@@ -1045,7 +1047,11 @@ ModifyProviderCredential (
     //
     UserCredential = mProviderDb->Provider[Index];
     if (CompareGuid (&UserCredential->Identifier, Provider)) {
-      return UserCredential->Enroll (UserCredential, User);
+      if (Delete) {
+        return UserCredential->Delete (UserCredential, User);
+      } else {
+        return UserCredential->Enroll (UserCredential, User);
+      }
     }
   }
 
@@ -1059,9 +1065,11 @@ ModifyProviderCredential (
   Found the providers information in PolicyInfo, and then add or delete the user's credential
   record in the providers.
 
-  @param  User                    Points to user profile.
-  @param  PolicyInfo              Point to identification policy to be modified.
-  @param  InfoLen                 The length of PolicyInfo.
+  @param[in]  User                Points to user profile.
+  @param[in]  PolicyInfo          Point to identification policy to be modified.
+  @param[in]  InfoLen             The length of PolicyInfo.
+  @param[in]  Delete              If TRUE, delete User from the provider; If FALSE, add  
+                                  User info from the provider.
 
   @retval EFI_SUCCESS      Modify PolicyInfo successfully.
   @retval Others           Fail to modify PolicyInfo.
@@ -1071,7 +1079,8 @@ EFI_STATUS
 ModifyCredentialInfo (
   IN  USER_PROFILE_ENTRY                        *User,
   IN  UINT8                                     *PolicyInfo,
-  IN  UINTN                                     InfoLen
+  IN  UINTN                                     InfoLen,
+  IN  BOOLEAN                                   Delete
   )
 {
   EFI_STATUS                    Status;
@@ -1089,14 +1098,14 @@ ModifyCredentialInfo (
     Identity = (EFI_USER_INFO_IDENTITY_POLICY *) (PolicyInfo + TotalLen);
     switch (Identity->Type) {
     case EFI_USER_INFO_IDENTITY_CREDENTIAL_TYPE:
-      Status = ModifyProviderCredential ((EFI_GUID *) (Identity + 1), TRUE, User);
+      Status = ModifyProviderCredential ((EFI_GUID *) (Identity + 1), TRUE, User, Delete);
       if (EFI_ERROR (Status)) {
         return Status;
       }
       break;
 
     case EFI_USER_INFO_IDENTITY_CREDENTIAL_PROVIDER:
-      Status = ModifyProviderCredential ((EFI_GUID *) (Identity + 1), FALSE, User);
+      Status = ModifyProviderCredential ((EFI_GUID *) (Identity + 1), FALSE, User, Delete);
       if (EFI_ERROR (Status)) {
         return Status;
       }
@@ -1372,7 +1381,7 @@ ModifyUserIpInfo (
         //
         // The credential is NOT found in the old identity policy; add it.
         //
-        Status = ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length);
+        Status = ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length, FALSE);
         if (EFI_ERROR (Status)) {
           break;
         }
@@ -1399,7 +1408,7 @@ ModifyUserIpInfo (
             break;
           }
 
-          ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length);
+          ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length, TRUE);
           CredentialCount--;
         }
       }
@@ -1426,7 +1435,7 @@ ModifyUserIpInfo (
         //
         // The credential is found in the old identity policy, so delete the old credential first.
         //
-        Status = ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length);
+        Status = ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length, TRUE);
         if (EFI_ERROR (Status)) {
           //
           // Failed to delete old credential.
@@ -1438,7 +1447,7 @@ ModifyUserIpInfo (
         //
         // Add the new credential.
         //
-        Status = ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length);
+        Status = ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length, FALSE);
         if (EFI_ERROR (Status)) {
           //
           // Failed to enroll the user by new identification policy.
@@ -1462,7 +1471,7 @@ ModifyUserIpInfo (
         //
         // The credential is NOT found in the new identity policy. Delete the old credential.
         //
-        ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length);
+        ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length, TRUE);
       }
     }
     TotalLen += Identity->Length;
@@ -1526,7 +1535,8 @@ AddUserInfo (
     Status = ModifyCredentialInfo (
               User,
               (UINT8 *) ((EFI_USER_INFO *) Info + 1),
-              InfoSize - sizeof (EFI_USER_INFO)
+              InfoSize - sizeof (EFI_USER_INFO),
+              FALSE
               );
     if (EFI_ERROR (Status)) {
       return Status;
@@ -1672,7 +1682,7 @@ DelUserInfo (
   if (Info->InfoType == EFI_USER_INFO_IDENTIFIER_RECORD) {
     return EFI_ACCESS_DENIED;
   } else if (Info->InfoType == EFI_USER_INFO_IDENTITY_POLICY_RECORD) {
-    Status = ModifyCredentialInfo (User, (UINT8 *) (Info + 1), Info->InfoSize - sizeof (EFI_USER_INFO));
+    Status = ModifyCredentialInfo (User, (UINT8 *) (Info + 1), Info->InfoSize - sizeof (EFI_USER_INFO), TRUE);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -2331,7 +2341,7 @@ IdentifyByProviderId (
   EFI_HII_HANDLE                HiiHandle;
   EFI_GUID                      FormSetId;
   EFI_FORM_ID                   FormId;
-  EFI_USER_CREDENTIAL_PROTOCOL  *UserCredential;
+  EFI_USER_CREDENTIAL2_PROTOCOL *UserCredential;
 
   if (Provider == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2523,7 +2533,7 @@ AddProviderSelection (
   EFI_STRING_ID                 ProvID;
   CHAR16                        *ProvStr;
   UINTN                         Index;
-  EFI_USER_CREDENTIAL_PROTOCOL  *UserCredential;
+  EFI_USER_CREDENTIAL2_PROTOCOL *UserCredential;
 
   for (Index = 0; Index < mProviderDb->Count; Index++) {
     UserCredential = mProviderDb->Provider[Index];
@@ -3152,7 +3162,7 @@ InitProviderInfo (
   HandleBuf   = NULL;
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
-                  &gEfiUserCredentialProtocolGuid,
+                  &gEfiUserCredential2ProtocolGuid,
                   NULL,
                   &HandleCount,
                   &HandleBuf
@@ -3166,8 +3176,8 @@ InitProviderInfo (
   //
   mProviderDb = AllocateZeroPool (
                   sizeof (CREDENTIAL_PROVIDER_INFO) - 
-                  sizeof (EFI_USER_CREDENTIAL_PROTOCOL *) + 
-                  HandleCount * sizeof (EFI_USER_CREDENTIAL_PROTOCOL *)
+                  sizeof (EFI_USER_CREDENTIAL2_PROTOCOL *) + 
+                  HandleCount * sizeof (EFI_USER_CREDENTIAL2_PROTOCOL *)
                   );
   if (mProviderDb == NULL) {
     FreePool (HandleBuf);
@@ -3178,7 +3188,7 @@ InitProviderInfo (
   for (Index = 0; Index < HandleCount; Index++) {
     Status = gBS->HandleProtocol (
                     HandleBuf[Index],
-                    &gEfiUserCredentialProtocolGuid,
+                    &gEfiUserCredential2ProtocolGuid,
                     (VOID **) &mProviderDb->Provider[Index]
                     );
     if (EFI_ERROR (Status)) {
@@ -3513,7 +3523,7 @@ IdentifyUser (
   EFI_CREDENTIAL_LOGON_FLAGS    AutoLogon;
   EFI_USER_INFO                 *IdentifyInfo;
   EFI_USER_INFO_IDENTITY_POLICY *Identity;
-  EFI_USER_CREDENTIAL_PROTOCOL  *UserCredential;
+  EFI_USER_CREDENTIAL2_PROTOCOL *UserCredential;
   USER_PROFILE_ENTRY            *UserEntry;
 
   //
@@ -4114,7 +4124,7 @@ UserProfileSetInfo (
   credential and add it.
 
   @param[in] This          Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
-  @param[in] Changed       Handle on which is installed an instance of the EFI_USER_CREDENTIAL_PROTOCOL 
+  @param[in] Changed       Handle on which is installed an instance of the EFI_USER_CREDENTIAL2_PROTOCOL 
                            where the user has changed.
 
   @retval EFI_SUCCESS      The User Identity Manager has handled the notification.
@@ -4130,7 +4140,7 @@ UserProfileNotify (
   )
 {
   EFI_STATUS                    Status;
-  EFI_USER_CREDENTIAL_PROTOCOL  *Provider;
+  EFI_USER_CREDENTIAL2_PROTOCOL *Provider;
   EFI_USER_INFO_IDENTIFIER      UserId;
   EFI_USER_INFO_HANDLE          UserInfo;
   EFI_USER_INFO_HANDLE          UserInfo2;
@@ -4144,7 +4154,7 @@ UserProfileNotify (
   
   Status = gBS->HandleProtocol (
                   Changed,
-                  &gEfiUserCredentialProtocolGuid,
+                  &gEfiUserCredential2ProtocolGuid,
                   (VOID **) &Provider
                   );
   if (EFI_ERROR (Status)) {

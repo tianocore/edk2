@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/HiiConfigAccess.h>
 #include <Protocol/DevicePathToText.h>
-#include <Protocol/UserCredential.h>
+#include <Protocol/UserCredential2.h>
 #include <Protocol/UserManager.h>
 
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -44,7 +44,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 typedef struct {
   UINTN                         Count;
-  EFI_USER_CREDENTIAL_PROTOCOL  *Provider[1];
+  EFI_USER_CREDENTIAL2_PROTOCOL *Provider[1];
 } CREDENTIAL_PROVIDER_INFO;
 
 //

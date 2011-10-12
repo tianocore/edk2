@@ -94,7 +94,7 @@ InitProviderInfo (
   HandleBuf   = NULL;
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
-                  &gEfiUserCredentialProtocolGuid,
+                  &gEfiUserCredential2ProtocolGuid,
                   NULL,
                   &HandleCount,
                   &HandleBuf
@@ -111,8 +111,8 @@ InitProviderInfo (
   }
   mProviderInfo = AllocateZeroPool (
                     sizeof (CREDENTIAL_PROVIDER_INFO) - 
-                    sizeof (EFI_USER_CREDENTIAL_PROTOCOL *) +
-                    HandleCount * sizeof (EFI_USER_CREDENTIAL_PROTOCOL *)
+                    sizeof (EFI_USER_CREDENTIAL2_PROTOCOL *) +
+                    HandleCount * sizeof (EFI_USER_CREDENTIAL2_PROTOCOL *)
                     );
   if (mProviderInfo == NULL) {
     FreePool (HandleBuf);
@@ -123,7 +123,7 @@ InitProviderInfo (
   for (Index = 0; Index < HandleCount; Index++) {
     Status = gBS->HandleProtocol (
                     HandleBuf[Index],
-                    &gEfiUserCredentialProtocolGuid,
+                    &gEfiUserCredential2ProtocolGuid,
                     (VOID **) &mProviderInfo->Provider[Index]
                     );
     if (EFI_ERROR (Status)) {
