@@ -118,7 +118,7 @@ DefinitionBlock (
       //
       // TCG Hardware Information
       //
-      Method (HINF, 3, Serialized, 0, {BuffObj, PkgObj}, {IntObj, IntObj, PkgObj})
+      Method (HINF, 3, Serialized, 0, {BuffObj, PkgObj}, {UnknownObj, UnknownObj, UnknownObj}) // IntObj, IntObj, PkgObj
       {
         //
         // Switch by function index
@@ -137,7 +137,7 @@ DefinitionBlock (
             //
             // Return failure if no TPM present
             //
-            Name(TPMV, Package () {0x01, Package () {ToBCD (1), ToBCD (20)}})
+            Name(TPMV, Package () {0x01, Package () {0x1, 0x20}})
             if (LEqual (_STA (), 0x00))
             {
               Return (Package () {0x00})
@@ -167,7 +167,7 @@ DefinitionBlock (
       //
       // TCG Physical Presence Interface
       //
-      Method (TPPI, 3, Serialized, 0, {BuffObj, PkgObj, IntObj, StrObj}, {IntObj, IntObj, PkgObj})
+      Method (TPPI, 3, Serialized, 0, {BuffObj, PkgObj, IntObj, StrObj}, {UnknownObj, UnknownObj, UnknownObj}) // IntObj, IntObj, PkgObj
       {        
         //
         // Switch by function index
@@ -283,7 +283,7 @@ DefinitionBlock (
         Return (1)
       }
 
-      Method (TMCI, 3, Serialized, 0, IntObj, {IntObj, IntObj, PkgObj})
+      Method (TMCI, 3, Serialized, 0, IntObj, {UnknownObj, UnknownObj, UnknownObj}) // IntObj, IntObj, PkgObj
       {
         //
         // Switch by function index
