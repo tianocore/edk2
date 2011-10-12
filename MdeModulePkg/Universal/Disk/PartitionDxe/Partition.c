@@ -25,7 +25,15 @@ EFI_DRIVER_BINDING_PROTOCOL gPartitionDriverBinding = {
   PartitionDriverBindingSupported,
   PartitionDriverBindingStart,
   PartitionDriverBindingStop,
-  0xa,
+  //
+  // Grub4Dos copies the BPB of the first partition to the MBR. If the 
+  // DriverBindingStart() of the Fat driver gets run before that of Partition 
+  // driver only the first partition can be recognized.
+  // Let the driver binding version of Partition driver be higher than that of
+  // Fat driver to make sure the DriverBindingStart() of the Partition driver
+  // gets run before that of Fat driver so that all the partitions can be recognized.
+  //
+  0xb,
   NULL,
   NULL
 };
