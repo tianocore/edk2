@@ -1365,7 +1365,7 @@ InternalShellConvertFileListType (
     //
     NewInfo               = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
     if (NewInfo == NULL) {
-      ShellCloseFileMetaArg(&(EFI_SHELL_FILE_INFO*)ListHead);
+      ShellCloseFileMetaArg((EFI_SHELL_FILE_INFO**)(&ListHead));
       ListHead = NULL;
       break;
     }
@@ -1390,7 +1390,7 @@ InternalShellConvertFileListType (
     // make sure all the memory allocations were sucessful
     //
     if (NULL == NewInfo->FullName || NewInfo->FileName == NULL || NewInfo->Info == NULL) {
-      ShellCloseFileMetaArg(&(EFI_SHELL_FILE_INFO*)ListHead);
+      ShellCloseFileMetaArg((EFI_SHELL_FILE_INFO**)(&ListHead));
       ListHead = NULL;
       break;
     }
