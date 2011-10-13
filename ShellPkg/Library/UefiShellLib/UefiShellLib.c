@@ -2236,14 +2236,9 @@ ShellCommandLineGetFlag (
   CHAR16                        *TempString;
 
   //
-  // ASSERT that both CheckPackage and KeyString aren't NULL
+  // return FALSE for no package or KeyString is NULL
   //
-  ASSERT(KeyString != NULL);
-
-  //
-  // return FALSE for no package
-  //
-  if (CheckPackage == NULL) {
+  if (CheckPackage == NULL || KeyString == NULL) {
     return (FALSE);
   }
 
@@ -2305,9 +2300,9 @@ ShellCommandLineGetValue (
   CHAR16                        *TempString;
 
   //
-  // check for CheckPackage == NULL
+  // return NULL for no package or KeyString is NULL
   //
-  if (CheckPackage == NULL) {
+  if (CheckPackage == NULL || KeyString == NULL) {
     return (NULL);
   }
 
