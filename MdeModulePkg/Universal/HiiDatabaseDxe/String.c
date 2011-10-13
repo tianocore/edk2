@@ -1972,20 +1972,16 @@ AsciiHiiToLower (
   IN CHAR8  *ConfigString
   )
 {
-  CHAR8      *String;
-
   ASSERT (ConfigString != NULL);
 
   //
   // Convert all hex digits in range [A-F] in the configuration header to [a-f]
   //
-  for (String = ConfigString; *String != '\0'; String++) {
-    if ( *String >= 'A' && *String <= 'Z') {
-      *String = (CHAR8) (*String - 'A' + 'a');
+  for (; *ConfigString != '\0'; ConfigString++) {
+    if ( *ConfigString >= 'A' && *ConfigString <= 'Z') {
+      *ConfigString = (CHAR8) (*ConfigString - 'A' + 'a');
     }
   }
-
-  return;
 }
 
 /**
@@ -2014,11 +2010,13 @@ HiiCompareLanguage (
   //
   StrLen = AsciiStrSize (Language1);
   Lan1   = AllocateZeroPool (StrLen);
+  ASSERT (Lan1 != NULL);
   AsciiStrCpy(Lan1, Language1);
   AsciiHiiToLower (Lan1);
 
   StrLen = AsciiStrSize (Language2);
   Lan2   = AllocateZeroPool (StrLen);
+  ASSERT (Lan2 != NULL);
   AsciiStrCpy(Lan2, Language2);
   AsciiHiiToLower (Lan2);
 
