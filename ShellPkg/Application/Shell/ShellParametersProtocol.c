@@ -471,6 +471,31 @@ StripQuotes (
 }
 
 /**
+  Calcualte the 32-bit CRC in a EFI table using the service provided by the
+  gRuntime service.
+
+  @param  Hdr                    Pointer to an EFI standard header
+
+**/
+VOID
+CalculateEfiHdrCrc (
+  IN  OUT EFI_TABLE_HEADER    *Hdr
+  )
+{
+  UINT32 Crc;
+
+  Hdr->CRC32 = 0;
+
+  //
+  // If gBS->CalculateCrce32 () == CoreEfiNotAvailableYet () then
+  //  Crc will come back as zero if we set it to zero here
+  //
+  Crc = 0;
+  gBS->CalculateCrc32 ((UINT8 *)Hdr, Hdr->HeaderSize, &Crc);
+  Hdr->CRC32 = Crc;
+}
+
+/**
   Funcion will replace the current StdIn and StdOut in the ShellParameters protocol
   structure by parsing NewCommandLine.  The current values are returned to the
   user.
@@ -1039,6 +1064,8 @@ UpdateStdInStdOutStdErr(
   }
   FreePool(CommandLineCopy);
 
+  CalculateEfiHdrCrc(&gST->Hdr);
+
   if (gST->ConIn == NULL ||gST->ConOut == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
@@ -1111,6 +1138,8 @@ RestoreStdInStdOutStdErr (
     gST->StdErr               = SystemTableInfo->ConErr;
     gST->StandardErrorHandle  = SystemTableInfo->ConErrHandle;
   }
+
+  CalculateEfiHdrCrc(&gST->Hdr);
 
   return (EFI_SUCCESS);
 }
