@@ -376,29 +376,33 @@ ShellCommandRunFor (
         }
         ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L"\"", 0);
       }
-      //
-      // set up for an 'in' for loop
-      //
-      NewSize = StrSize(ArgSet);
-      NewSize += sizeof(SHELL_FOR_INFO)+StrSize(gEfiShellParametersProtocol->Argv[1]);
-      Info = AllocateZeroPool(NewSize);
-      ASSERT(Info != NULL);
-      Info->Signature = SHELL_FOR_INFO_SIGNATURE;
-      CopyMem(Info->Set, ArgSet, StrSize(ArgSet));
-      NewSize = StrSize(gEfiShellParametersProtocol->Argv[1]);
-      CopyMem(Info->Set+(StrSize(ArgSet)/sizeof(Info->Set[0])), gEfiShellParametersProtocol->Argv[1], NewSize);
-      Info->ReplacementName = Info->Set+StrSize(ArgSet)/sizeof(Info->Set[0]);
-      Info->CurrentValue  = (CHAR16*)Info->Set;
-      Info->Step          = 0;
-      Info->Current       = 0;
-      Info->End           = 0;
-
-      if (InternalIsAliasOnList(Info->ReplacementName, &CurrentScriptFile->SubstList)) {
-        Info->RemoveSubstAlias  = FALSE;
+      if (ArgSet == NULL) {
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
       } else {
-        Info->RemoveSubstAlias  = TRUE;
+        //
+        // set up for an 'in' for loop
+        //
+        NewSize = StrSize(ArgSet);
+        NewSize += sizeof(SHELL_FOR_INFO)+StrSize(gEfiShellParametersProtocol->Argv[1]);
+        Info = AllocateZeroPool(NewSize);
+        ASSERT(Info != NULL);
+        Info->Signature = SHELL_FOR_INFO_SIGNATURE;
+        CopyMem(Info->Set, ArgSet, StrSize(ArgSet));
+        NewSize = StrSize(gEfiShellParametersProtocol->Argv[1]);
+        CopyMem(Info->Set+(StrSize(ArgSet)/sizeof(Info->Set[0])), gEfiShellParametersProtocol->Argv[1], NewSize);
+        Info->ReplacementName = Info->Set+StrSize(ArgSet)/sizeof(Info->Set[0]);
+        Info->CurrentValue  = (CHAR16*)Info->Set;
+        Info->Step          = 0;
+        Info->Current       = 0;
+        Info->End           = 0;
+
+        if (InternalIsAliasOnList(Info->ReplacementName, &CurrentScriptFile->SubstList)) {
+          Info->RemoveSubstAlias  = FALSE;
+        } else {
+          Info->RemoveSubstAlias  = TRUE;
+        }
+        CurrentScriptFile->CurrentCommand->Data = Info;
       }
-      CurrentScriptFile->CurrentCommand->Data = Info;
     } else if (gUnicodeCollation->StriColl(
         gUnicodeCollation,
         L"run",
@@ -413,80 +417,61 @@ ShellCommandRunFor (
         ArgSet = StrnCatGrow(&ArgSet, &ArgSize, gEfiShellParametersProtocol->Argv[LoopVar], 0);
 //        ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L" ", 0);
       }
-      //
-      // set up for a 'run' for loop
-      //
-      Info = AllocateZeroPool(sizeof(SHELL_FOR_INFO)+StrSize(gEfiShellParametersProtocol->Argv[1]));
-      ASSERT(Info != NULL);
-      CopyMem(Info->Set, gEfiShellParametersProtocol->Argv[1], StrSize(gEfiShellParametersProtocol->Argv[1]));
-      Info->ReplacementName = Info->Set;
-      Info->CurrentValue    = NULL;
-      ArgSetWalker            = ArgSet;
-      if (ArgSetWalker[0] != L'(') {
-        ShellPrintHiiEx(
-          -1, 
-          -1, 
-          NULL, 
-          STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
-          gShellLevel1HiiHandle, 
-          ArgSet, 
-          CurrentScriptFile!=NULL 
-            && CurrentScriptFile->CurrentCommand!=NULL
-            ? CurrentScriptFile->CurrentCommand->Line:0);
-        ShellStatus = SHELL_INVALID_PARAMETER;
+      if (ArgSet == NULL) {
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
       } else {
-        TempSpot = StrStr(ArgSetWalker, L")");
-        if (TempSpot != NULL) {
-          TempString = TempSpot+1;
-          if (*(TempString) != CHAR_NULL) {
-            while(TempString != NULL && *TempString == L' ') {
-              TempString++;
-            }
-            if (StrLen(TempString) > 0) {
-              TempSpot = NULL;
-            }
-          }
-        }
-        if (TempSpot == NULL) {
+        //
+        // set up for a 'run' for loop
+        //
+        Info = AllocateZeroPool(sizeof(SHELL_FOR_INFO)+StrSize(gEfiShellParametersProtocol->Argv[1]));
+        ASSERT(Info != NULL);
+        CopyMem(Info->Set, gEfiShellParametersProtocol->Argv[1], StrSize(gEfiShellParametersProtocol->Argv[1]));
+        Info->ReplacementName = Info->Set;
+        Info->CurrentValue    = NULL;
+        ArgSetWalker            = ArgSet;
+        if (ArgSetWalker[0] != L'(') {
           ShellPrintHiiEx(
             -1, 
             -1, 
             NULL, 
             STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
             gShellLevel1HiiHandle, 
+            ArgSet, 
             CurrentScriptFile!=NULL 
               && CurrentScriptFile->CurrentCommand!=NULL
               ? CurrentScriptFile->CurrentCommand->Line:0);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
-          *TempSpot = CHAR_NULL;
-          ArgSetWalker++;
-          while (ArgSetWalker != NULL && ArgSetWalker[0] == L' ') {
-            ArgSetWalker++;
+          TempSpot = StrStr(ArgSetWalker, L")");
+          if (TempSpot != NULL) {
+            TempString = TempSpot+1;
+            if (*(TempString) != CHAR_NULL) {
+              while(TempString != NULL && *TempString == L' ') {
+                TempString++;
+              }
+              if (StrLen(TempString) > 0) {
+                TempSpot = NULL;
+              }
+            }
           }
-          if (!ShellIsValidForNumber(ArgSetWalker)) {
+          if (TempSpot == NULL) {
             ShellPrintHiiEx(
               -1, 
               -1, 
               NULL, 
               STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
               gShellLevel1HiiHandle, 
-              ArgSet, 
               CurrentScriptFile!=NULL 
                 && CurrentScriptFile->CurrentCommand!=NULL
                 ? CurrentScriptFile->CurrentCommand->Line:0);
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
-            if (ArgSetWalker[0] == L'-') {
-              Info->Current = 0 - (INTN)ShellStrToUintn(ArgSetWalker+1);
-            } else {
-              Info->Current = (INTN)ShellStrToUintn(ArgSetWalker);
-            }
-            ArgSetWalker  = StrStr(ArgSetWalker, L" ");
+            *TempSpot = CHAR_NULL;
+            ArgSetWalker++;
             while (ArgSetWalker != NULL && ArgSetWalker[0] == L' ') {
               ArgSetWalker++;
             }
-            if (ArgSetWalker == NULL || *ArgSetWalker == CHAR_NULL || !ShellIsValidForNumber(ArgSetWalker)){
+            if (!ShellIsValidForNumber(ArgSetWalker)) {
               ShellPrintHiiEx(
                 -1, 
                 -1, 
@@ -500,73 +485,96 @@ ShellCommandRunFor (
               ShellStatus = SHELL_INVALID_PARAMETER;
             } else {
               if (ArgSetWalker[0] == L'-') {
-                Info->End = 0 - (INTN)ShellStrToUintn(ArgSetWalker+1);
+                Info->Current = 0 - (INTN)ShellStrToUintn(ArgSetWalker+1);
               } else {
-                Info->End = (INTN)ShellStrToUintn(ArgSetWalker);
+                Info->Current = (INTN)ShellStrToUintn(ArgSetWalker);
               }
-              if (Info->Current < Info->End) {
-                Info->Step            = 1;
-              } else {
-                Info->Step            = -1;
-              }
-
               ArgSetWalker  = StrStr(ArgSetWalker, L" ");
               while (ArgSetWalker != NULL && ArgSetWalker[0] == L' ') {
                 ArgSetWalker++;
               }
-              if (ArgSetWalker != NULL && *ArgSetWalker != CHAR_NULL) {
-                if (ArgSetWalker == NULL || *ArgSetWalker == CHAR_NULL || !ShellIsValidForNumber(ArgSetWalker)){
-                  ShellPrintHiiEx(
-                    -1, 
-                    -1, 
-                    NULL, 
-                    STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
-                    gShellLevel1HiiHandle, 
-                    ArgSet, 
-                    CurrentScriptFile!=NULL 
-                      && CurrentScriptFile->CurrentCommand!=NULL
-                      ? CurrentScriptFile->CurrentCommand->Line:0);
-                  ShellStatus = SHELL_INVALID_PARAMETER;
+              if (ArgSetWalker == NULL || *ArgSetWalker == CHAR_NULL || !ShellIsValidForNumber(ArgSetWalker)){
+                ShellPrintHiiEx(
+                  -1, 
+                  -1, 
+                  NULL, 
+                  STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
+                  gShellLevel1HiiHandle, 
+                  ArgSet, 
+                  CurrentScriptFile!=NULL 
+                    && CurrentScriptFile->CurrentCommand!=NULL
+                    ? CurrentScriptFile->CurrentCommand->Line:0);
+                ShellStatus = SHELL_INVALID_PARAMETER;
+              } else {
+                if (ArgSetWalker[0] == L'-') {
+                  Info->End = 0 - (INTN)ShellStrToUintn(ArgSetWalker+1);
                 } else {
-                  if (*ArgSetWalker == L')') {
-                    ASSERT(Info->Step == 1 || Info->Step == -1);
-                  } else {
-                    if (ArgSetWalker[0] == L'-') {
-                      Info->Step = 0 - (INTN)ShellStrToUintn(ArgSetWalker+1);
-                    } else {
-                      Info->Step = (INTN)ShellStrToUintn(ArgSetWalker);
-                    }
+                  Info->End = (INTN)ShellStrToUintn(ArgSetWalker);
+                }
+                if (Info->Current < Info->End) {
+                  Info->Step            = 1;
+                } else {
+                  Info->Step            = -1;
+                }
 
-                    if (StrStr(ArgSetWalker, L" ") != NULL) {
-                      ShellPrintHiiEx(
-                        -1, 
-                        -1, 
-                        NULL, 
-                        STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
-                        gShellLevel1HiiHandle, 
-                        ArgSet, 
-                        CurrentScriptFile!=NULL 
-                          && CurrentScriptFile->CurrentCommand!=NULL
-                          ? CurrentScriptFile->CurrentCommand->Line:0);
-                      ShellStatus = SHELL_INVALID_PARAMETER;
+                ArgSetWalker  = StrStr(ArgSetWalker, L" ");
+                while (ArgSetWalker != NULL && ArgSetWalker[0] == L' ') {
+                  ArgSetWalker++;
+                }
+                if (ArgSetWalker != NULL && *ArgSetWalker != CHAR_NULL) {
+                  if (ArgSetWalker == NULL || *ArgSetWalker == CHAR_NULL || !ShellIsValidForNumber(ArgSetWalker)){
+                    ShellPrintHiiEx(
+                      -1, 
+                      -1, 
+                      NULL, 
+                      STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
+                      gShellLevel1HiiHandle, 
+                      ArgSet, 
+                      CurrentScriptFile!=NULL 
+                        && CurrentScriptFile->CurrentCommand!=NULL
+                        ? CurrentScriptFile->CurrentCommand->Line:0);
+                    ShellStatus = SHELL_INVALID_PARAMETER;
+                  } else {
+                    if (*ArgSetWalker == L')') {
+                      ASSERT(Info->Step == 1 || Info->Step == -1);
+                    } else {
+                      if (ArgSetWalker[0] == L'-') {
+                        Info->Step = 0 - (INTN)ShellStrToUintn(ArgSetWalker+1);
+                      } else {
+                        Info->Step = (INTN)ShellStrToUintn(ArgSetWalker);
+                      }
+
+                      if (StrStr(ArgSetWalker, L" ") != NULL) {
+                        ShellPrintHiiEx(
+                          -1, 
+                          -1, 
+                          NULL, 
+                          STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
+                          gShellLevel1HiiHandle, 
+                          ArgSet, 
+                          CurrentScriptFile!=NULL 
+                            && CurrentScriptFile->CurrentCommand!=NULL
+                            ? CurrentScriptFile->CurrentCommand->Line:0);
+                        ShellStatus = SHELL_INVALID_PARAMETER;
+                      }
                     }
                   }
+                  
                 }
-                
               }
             }
           }
         }
-      }
-      if (ShellStatus == SHELL_SUCCESS) {
-        if (InternalIsAliasOnList(Info->ReplacementName, &CurrentScriptFile->SubstList)) {
-          Info->RemoveSubstAlias  = FALSE;
-        } else {
-          Info->RemoveSubstAlias  = TRUE;
+        if (ShellStatus == SHELL_SUCCESS) {
+          if (InternalIsAliasOnList(Info->ReplacementName, &CurrentScriptFile->SubstList)) {
+            Info->RemoveSubstAlias  = FALSE;
+          } else {
+            Info->RemoveSubstAlias  = TRUE;
+          }
         }
-      }
-      if (CurrentScriptFile->CurrentCommand != NULL) {
-        CurrentScriptFile->CurrentCommand->Data = Info;
+        if (CurrentScriptFile->CurrentCommand != NULL) {
+          CurrentScriptFile->CurrentCommand->Data = Info;
+        }
       }
     } else {
       ShellPrintHiiEx(
@@ -665,27 +673,30 @@ ShellCommandRunFor (
         //
         ASSERT(TempString == NULL);
         TempString = StrnCatGrow(&TempString, NULL, Info->CurrentValue, 0);
-        TempSpot   = StrStr(TempString, L"\" \"");
-        if (TempSpot != NULL) {
-          *TempSpot = CHAR_NULL;
-        }
-        while (TempString[StrLen(TempString)-1] == L'\"') {
-          TempString[StrLen(TempString)-1] = CHAR_NULL;
-        }
-        InternalUpdateAliasOnList(Info->ReplacementName, TempString, &CurrentScriptFile->SubstList);
-        Info->CurrentValue += StrLen(TempString);
+        if (TempString == NULL) {
+          ShellStatus = SHELL_OUT_OF_RESOURCES;
+        } else {
+          TempSpot   = StrStr(TempString, L"\" \"");
+          if (TempSpot != NULL) {
+            *TempSpot = CHAR_NULL;
+          }
+          while (TempString[StrLen(TempString)-1] == L'\"') {
+            TempString[StrLen(TempString)-1] = CHAR_NULL;
+          }
+          InternalUpdateAliasOnList(Info->ReplacementName, TempString, &CurrentScriptFile->SubstList);
+          Info->CurrentValue += StrLen(TempString);
 
-        if (Info->CurrentValue[0] == L'\"') {
-          Info->CurrentValue++;
+          if (Info->CurrentValue[0] == L'\"') {
+            Info->CurrentValue++;
+          }
+          while (Info->CurrentValue[0] == L' ') {
+            Info->CurrentValue++;
+          }
+          if (Info->CurrentValue[0] == L'\"') {
+            Info->CurrentValue++;
+          }
+          FreePool(TempString);
         }
-        while (Info->CurrentValue[0] == L' ') {
-          Info->CurrentValue++;
-        }
-        if (Info->CurrentValue[0] == L'\"') {
-          Info->CurrentValue++;
-        }
-        FreePool(TempString);
-
       } else {
         CurrentScriptFile->CurrentCommand->Data = NULL;
         //

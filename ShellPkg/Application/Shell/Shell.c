@@ -857,15 +857,19 @@ DoStartupScript(
     FileStringPath = NULL;
     NewSize = 0;
     FileStringPath = StrnCatGrow(&FileStringPath, &NewSize, MapName, 0);
-    TempSpot = StrStr(FileStringPath, L";");
-    if (TempSpot != NULL) {
-      *TempSpot = CHAR_NULL;
+    if (FileStringPath == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+    } else {
+      TempSpot = StrStr(FileStringPath, L";");
+      if (TempSpot != NULL) {
+        *TempSpot = CHAR_NULL;
+      }
+      FileStringPath = StrnCatGrow(&FileStringPath, &NewSize, ((FILEPATH_DEVICE_PATH*)FilePath)->PathName, 0);
+      PathRemoveLastItem(FileStringPath);
+      FileStringPath = StrnCatGrow(&FileStringPath, &NewSize, mStartupScript, 0);
+      Status = ShellInfoObject.NewEfiShellProtocol->OpenFileByName(FileStringPath, &FileHandle, EFI_FILE_MODE_READ);
+      FreePool(FileStringPath);
     }
-    FileStringPath = StrnCatGrow(&FileStringPath, &NewSize, ((FILEPATH_DEVICE_PATH*)FilePath)->PathName, 0);
-    PathRemoveLastItem(FileStringPath);
-    FileStringPath = StrnCatGrow(&FileStringPath, &NewSize, mStartupScript, 0);
-    Status = ShellInfoObject.NewEfiShellProtocol->OpenFileByName(FileStringPath, &FileHandle, EFI_FILE_MODE_READ);
-    FreePool(FileStringPath);
   }
   if (EFI_ERROR(Status)) {
     NamePath = FileDevicePath (NULL, mStartupScript);
@@ -1215,6 +1219,12 @@ RunSplitCommand(
 
   NextCommandLine = StrnCatGrow(&NextCommandLine, &Size1, StrStr(CmdLine, L"|")+1, 0);
   OurCommandLine  = StrnCatGrow(&OurCommandLine , &Size2, CmdLine                , StrStr(CmdLine, L"|") - CmdLine);
+
+  if (NextCommandLine == NULL || OurCommandLine == NULL) {
+    SHELL_FREE_NON_NULL(OurCommandLine);
+    SHELL_FREE_NON_NULL(NextCommandLine);
+    return (EFI_OUT_OF_RESOURCES);
+  }
   if (NextCommandLine[0] != CHAR_NULL &&
       NextCommandLine[0] == L'a' &&
       NextCommandLine[1] == L' '
@@ -1334,6 +1344,9 @@ RunCommand(
   Split               = NULL;
 
   CleanOriginal = StrnCatGrow(&CleanOriginal, NULL, CmdLine, 0);
+  if (CleanOriginal == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
   while (CleanOriginal[StrLen(CleanOriginal)-1] == L' ') {
     CleanOriginal[StrLen(CleanOriginal)-1] = CHAR_NULL;
   }

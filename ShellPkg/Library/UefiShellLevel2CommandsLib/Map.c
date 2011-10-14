@@ -414,6 +414,9 @@ PerformSingleMappingDisplay(
 
   CurrentName = NULL;
   CurrentName = StrnCatGrow(&CurrentName, 0, MapList, 0);
+  if (CurrentName == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
   TempSpot = StrStr(CurrentName, L";");
   if (TempSpot != NULL) {
     *TempSpot = CHAR_NULL;

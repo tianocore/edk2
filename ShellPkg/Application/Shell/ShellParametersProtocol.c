@@ -577,6 +577,9 @@ UpdateStdInStdOutStdErr(
   }
 
   CommandLineCopy = StrnCatGrow(&CommandLineCopy, NULL, NewCommandLine, 0);
+  if (CommandLineCopy == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
   Status          = EFI_SUCCESS;
   Split           = NULL;
   FirstLocation   = CommandLineCopy + StrLen(CommandLineCopy);
@@ -1030,16 +1033,19 @@ UpdateStdInStdOutStdErr(
       //
       if (!EFI_ERROR(Status) && StdInVarName != NULL) {
         TempHandle = CreateFileInterfaceEnv(StdInVarName);
-        if (!InUnicode) {
-          TempHandle = CreateFileInterfaceFile(TempHandle, FALSE);
-        }
-        Size = 0;
-        ASSERT(TempHandle != NULL);
-        if (((EFI_FILE_PROTOCOL*)TempHandle)->Read(TempHandle, &Size, NULL) != EFI_BUFFER_TOO_SMALL) {
-          Status = EFI_INVALID_PARAMETER;
+        if (TempHandle == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
         } else {
-          ShellParameters->StdIn = TempHandle;
-          gST->ConIn = CreateSimpleTextInOnFile(TempHandle, &gST->ConsoleInHandle);
+          if (!InUnicode) {
+            TempHandle = CreateFileInterfaceFile(TempHandle, FALSE);
+          }
+          Size = 0;
+          if (((EFI_FILE_PROTOCOL*)TempHandle)->Read(TempHandle, &Size, NULL) != EFI_BUFFER_TOO_SMALL) {
+            Status = EFI_INVALID_PARAMETER;
+          } else {
+            ShellParameters->StdIn = TempHandle;
+            gST->ConIn = CreateSimpleTextInOnFile(TempHandle, &gST->ConsoleInHandle);
+          }
         }
       }
 

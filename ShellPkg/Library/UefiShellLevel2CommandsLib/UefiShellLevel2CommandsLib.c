@@ -226,6 +226,10 @@ VerifyIntermediateDirectories (
   PathCopy    = StrnCatGrow(&PathCopy, NULL, Path, 0);
   FileHandle  = NULL;
 
+  if (PathCopy == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
+
   for (TempSpot = &PathCopy[StrLen(PathCopy)-1] ; *TempSpot != CHAR_NULL && *TempSpot != L'\\' ; TempSpot = &PathCopy[StrLen(PathCopy)-1]){
     *TempSpot = CHAR_NULL;
   }

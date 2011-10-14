@@ -978,7 +978,7 @@ ShellCommandRunBcfgInstall (
           ShellStatus = BcfgAddInstall1(
             CurrentOperation.Number1,
             CurrentOperation.FileName,
-            CurrentOperation.Description,
+            CurrentOperation.Description==NULL?L"":CurrentOperation.Description,
             CurrentOperation.Order,
             Length / sizeof(CurrentOperation.Order[0]),
             CurrentOperation.Target,

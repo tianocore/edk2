@@ -145,6 +145,10 @@ TestNodeForMove (
   //
   CommandName   = NULL;
   CommandName   = StrnCatGrow(&CommandName, NULL, CommandNode->Cl, 0);
+  if (CommandName == NULL) {
+    return (FALSE);
+  }
+
   CommandNameWalker = CommandName;
   while(CommandNameWalker[0] == L' ') {
     CommandNameWalker++;

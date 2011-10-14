@@ -303,6 +303,9 @@ ConvertStringToGuid (
   } 
   TempCopy = NULL;
   TempCopy = StrnCatGrow(&TempCopy, NULL, StringGuid, 0);
+  if (TempCopy == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
   Walker   = TempCopy;
   TempSpot = StrStr(Walker, L"-");
   if (TempSpot != NULL) {

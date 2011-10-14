@@ -79,10 +79,15 @@ DoTouchByHandle (
 
   if (FS == NULL) {
     FS = StrnCatGrow(&FS, NULL, Name, 0);
-    TempSpot = StrStr(FS, L"\\");
-    if (TempSpot != NULL) {
-      *TempSpot = CHAR_NULL;
+    if (FS != NULL) {
+      TempSpot = StrStr(FS, L"\\");
+      if (TempSpot != NULL) {
+        *TempSpot = CHAR_NULL;
+      }
     }
+  }
+  if (FS == NULL) {
+    return (EFI_INVALID_PARAMETER);
   }
 
   //

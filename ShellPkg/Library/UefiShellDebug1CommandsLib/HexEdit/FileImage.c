@@ -178,6 +178,7 @@ HFileImageRead (
 
     StatusBarSetStatusString (UnicodeBuffer);
     FreePool (UnicodeBuffer);
+    return EFI_OUT_OF_RESOURCES;
   }
 
   HFileImageSetFileName (FileName);

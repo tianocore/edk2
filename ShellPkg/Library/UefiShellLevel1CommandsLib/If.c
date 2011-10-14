@@ -739,6 +739,9 @@ MoveToTagSpecial (
     //
     CommandName   = NULL;
     CommandName   = StrnCatGrow(&CommandName, NULL, CommandNode->Cl, 0);
+    if (CommandName == NULL) {
+      continue;
+    }
     CommandWalker = CommandName;
     while (CommandWalker[0] == L' ') {
       CommandWalker++;

@@ -180,6 +180,10 @@ ManBufferFindSections(
         TempString2 = MIN(TempString2, StrStr(CurrentLocation, L"\n"));
         ASSERT(TempString == NULL);
         TempString = StrnCatGrow(&TempString, NULL, CurrentLocation, TempString2==NULL?0:TempString2 - CurrentLocation);
+        if (TempString == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          break;
+        }
         SectionName = TempString;
         SectionLen = StrLen(SectionName);
         SectionName = StrStr(Sections, SectionName);
@@ -197,12 +201,24 @@ ManBufferFindSections(
         TempString2 = MIN(TempString2, StrStr(CurrentLocation, L"\n"));
         ASSERT(TempString == NULL);
         TempString = StrnCatGrow(&TempString, NULL, CurrentLocation, TempString2==NULL?0:TempString2 - CurrentLocation);
+        if (TempString == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          break;
+        }
         //
         // copy and save the current line.
         //
         ASSERT((*HelpText == NULL && *HelpSize == 0) || (*HelpText != NULL));
         StrnCatGrow (HelpText, HelpSize, TempString, 0);
+        if (HelpText == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          break;
+        }
         StrnCatGrow (HelpText, HelpSize, L"\r\n", 0);
+        if (HelpText == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          break;
+        }
       }
     }
     SHELL_FREE_NON_NULL(TempString);

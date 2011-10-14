@@ -488,10 +488,12 @@ EfiShellGetFilePathFromDevicePath(
   This function converts a file system style name to a device path, by replacing any
   mapping references to the associated device path.
 
-  @param Path                   the pointer to the path
+  @param[in] Path               The pointer to the path.
 
-  @return all                   The pointer of the file path. The file path is callee
+  @return                       The pointer of the file path. The file path is callee
                                 allocated and should be freed by the caller.
+  @retval NULL                  The path could not be found.
+  @retval NULL                  There was not enough available memory.
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
@@ -525,7 +527,9 @@ EfiShellGetDevicePathFromFilePath(
     Size = StrSize(Cwd);
     Size += StrSize(Path);
     NewPath = AllocateZeroPool(Size);
-    ASSERT(NewPath != NULL);
+    if (NewPath == NULL) {
+      return (NULL);
+    }
     StrCpy(NewPath, Cwd);
     if (*Path == L'\\') {
       Path++;
@@ -543,8 +547,7 @@ EfiShellGetDevicePathFromFilePath(
   //
   ASSERT((MapName == NULL && Size == 0) || (MapName != NULL));
   MapName = StrnCatGrow(&MapName, &Size, Path, (StrStr(Path, L":")-Path+1));
-  if (MapName[StrLen(MapName)-1] != L':') {
-    ASSERT(FALSE);
+  if (MapName == NULL || MapName[StrLen(MapName)-1] != L':') {
     return (NULL);
   }
 
@@ -564,7 +567,6 @@ EfiShellGetDevicePathFromFilePath(
   //
   DevicePathCopyForFree = DevicePathCopy = DuplicateDevicePath(DevicePath);
   if (DevicePathCopy == NULL) {
-    ASSERT(FALSE);
     FreePool(MapName);
     return (NULL);
   }
@@ -1888,6 +1890,9 @@ EfiShellFindFilesInDir(
     TempString        = NULL;
     Size              = 0;
     TempString        = StrnCatGrow(&TempString, &Size, ShellFileHandleGetPath(FileDirHandle), 0);
+    if (TempString == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
     TempSpot          = StrStr(TempString, L";");
 
     if (TempSpot != NULL) {
@@ -1895,6 +1900,9 @@ EfiShellFindFilesInDir(
     }
 
     TempString        = StrnCatGrow(&TempString, &Size, BasePath, 0);
+    if (TempString == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
     BasePath          = TempString;
   }
 
@@ -2239,6 +2247,9 @@ EfiShellFindFiles(
 
   ASSERT(MapName == NULL);
   MapName = StrnCatGrow(&MapName, NULL, PatternCopy, Count);
+  if (MapName == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+  }
 
   if (!EFI_ERROR(Status)) {
     RootDevicePath = EfiShellGetDevicePathFromFilePath(PatternCopy);
@@ -2759,7 +2770,7 @@ EfiShellSetCurDir(
       MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, L"\\", 0);
       ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
       MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, DirectoryName, 0);
-      if (MapListItem->CurrentDirectoryPath[StrLen(MapListItem->CurrentDirectoryPath)-1] != L'\\') {
+      if (MapListItem->CurrentDirectoryPath != NULL && MapListItem->CurrentDirectoryPath[StrLen(MapListItem->CurrentDirectoryPath)-1] != L'\\') {
         ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
         MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, L"\\", 0);
       }
