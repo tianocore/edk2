@@ -383,6 +383,10 @@ GetVariableStore (
         }
       }
       break;
+
+    default:
+      ASSERT (FALSE);
+      break;
   }
 
   return VariableStoreHeader;
