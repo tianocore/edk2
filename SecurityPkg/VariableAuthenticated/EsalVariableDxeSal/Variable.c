@@ -846,6 +846,7 @@ UpdateVariableCache (
           // If size of data changes, allocate pool and copy data.
           //
           Entry->Data = AllocatePool (DataSize);
+          ASSERT (Entry->Data != NULL);
           Entry->DataSize = DataSize;
           CopyMem (Entry->Data, Data, DataSize);
         }

@@ -1591,12 +1591,11 @@ UpdateVariable (
   NextVariable->MonotonicCount  = MonotonicCount;
   SetMem (&NextVariable->TimeStamp, sizeof (EFI_TIME), 0);
 
-  if (((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) && 
-      ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0)) {
-    CopyMem (&NextVariable->TimeStamp, TimeStamp, sizeof (EFI_TIME));
-  } else if (
-      ((Attributes & EFI_VARIABLE_APPEND_WRITE) != 0) && 
-      ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0)) {
+  if (((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) &&
+        TimeStamp != NULL) {
+    if ((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) {
+      CopyMem (&NextVariable->TimeStamp, TimeStamp, sizeof (EFI_TIME));
+    } else {
       //
       // In the case when the EFI_VARIABLE_APPEND_WRITE attribute is set, only
       // when the new TimeStamp value is later than the current timestamp associated
@@ -1605,6 +1604,7 @@ UpdateVariable (
       if (CompareTimeStamp (&Variable->CurrPtr->TimeStamp, TimeStamp)) {
         CopyMem (&NextVariable->TimeStamp, TimeStamp, sizeof (EFI_TIME));
       }
+    }
   }
 
   //
