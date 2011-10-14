@@ -56,6 +56,7 @@
   BaseMemoryLib
   DebugLib
   DxeServicesTableLib
+  HobLib
 
 [Protocols]
   gEfiSmmFirmwareVolumeBlockProtocolGuid        ## SOMETIMES_CONSUMES

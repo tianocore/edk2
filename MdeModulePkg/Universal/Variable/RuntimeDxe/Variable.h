@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/FirmwareVolumeBlock.h>
 #include <Protocol/Variable.h>
 #include <Library/PcdLib.h>
+#include <Library/HobLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
@@ -44,6 +45,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 #define ISO_639_2_ENTRY_SIZE    3
 
+typedef enum {
+  VariableStoreTypeVolatile,
+  VariableStoreTypeHob,
+  VariableStoreTypeNv,
+  VariableStoreTypeMax
+} VARIABLE_STORE_TYPE;
+
 typedef struct {
   VARIABLE_HEADER *CurrPtr;
   VARIABLE_HEADER *EndPtr;
@@ -52,6 +60,7 @@ typedef struct {
 } VARIABLE_POINTER_TRACK;
 
 typedef struct {
+  EFI_PHYSICAL_ADDRESS  HobVariableBase;
   EFI_PHYSICAL_ADDRESS  VolatileVariableBase;
   EFI_PHYSICAL_ADDRESS  NonVolatileVariableBase;
   EFI_LOCK              VariableServicesLock;

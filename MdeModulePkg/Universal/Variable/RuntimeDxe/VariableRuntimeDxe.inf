@@ -52,6 +52,7 @@
   DxeServicesTableLib
   UefiDriverEntryPoint
   PcdLib
+  HobLib
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           ## SOMETIMES_CONSUMES

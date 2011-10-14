@@ -30,6 +30,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/VariableFormat.h>
 #include <Guid/VariableIndexTable.h>
+
+typedef enum {
+  VariableStoreTypeHob,
+  VariableStoreTypeNv,
+  VariableStoreTypeMax
+} VARIABLE_STORE_TYPE;
+
 //
 // Functions
 //
