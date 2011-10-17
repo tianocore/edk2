@@ -1040,7 +1040,7 @@ UpdateStdInStdOutStdErr(
             TempHandle = CreateFileInterfaceFile(TempHandle, FALSE);
           }
           Size = 0;
-          if (((EFI_FILE_PROTOCOL*)TempHandle)->Read(TempHandle, &Size, NULL) != EFI_BUFFER_TOO_SMALL) {
+          if (TempHandle != NULL || ((EFI_FILE_PROTOCOL*)TempHandle)->Read(TempHandle, &Size, NULL) != EFI_BUFFER_TOO_SMALL) {
             Status = EFI_INVALID_PARAMETER;
           } else {
             ShellParameters->StdIn = TempHandle;

@@ -163,8 +163,8 @@ ShellLevel2CommandsLibDestructor (
   @param[in] Path         The unknown Path Value
 
   @retval NULL            A memory allocation failed
-  @retval NULL            a fully qualified path could not be discovered.
-  @retval other           pointer to a fuly qualified path.
+  @retval NULL            A fully qualified path could not be discovered.
+  @retval other           An allocated pointer to a fuly qualified path.
 **/
 CHAR16*
 EFIAPI
@@ -193,6 +193,10 @@ GetFullyQualifiedPath(
   StrnCatGrow(&PathToReturn, &Size, Path, 0);
 
   PathCleanUpDirectories(PathToReturn);
+
+  if (PathTpReturn == NULL) {
+    return NULL;
+  }
 
   while (PathToReturn[StrLen(PathToReturn)-1] == L'*') {
     PathToReturn[StrLen(PathToReturn)-1] = CHAR_NULL;

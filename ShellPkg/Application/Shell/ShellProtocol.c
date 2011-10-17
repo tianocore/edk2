@@ -2249,9 +2249,7 @@ EfiShellFindFiles(
   MapName = StrnCatGrow(&MapName, NULL, PatternCopy, Count);
   if (MapName == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-  }
-
-  if (!EFI_ERROR(Status)) {
+  } else {
     RootDevicePath = EfiShellGetDevicePathFromFilePath(PatternCopy);
     if (RootDevicePath == NULL) {
       Status = EFI_INVALID_PARAMETER;

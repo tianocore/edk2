@@ -2865,9 +2865,10 @@ ShellPrintHiiEx(
 
   @param[in] DirName      Path to directory to test.
 
-  @retval EFI_SUCCESS     The Path represents a directory
-  @retval EFI_NOT_FOUND   The Path does not represent a directory
-  @return other           The path failed to open
+  @retval EFI_SUCCESS             The Path represents a directory
+  @retval EFI_NOT_FOUND           The Path does not represent a directory
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
+  @return                         The path failed to open
 **/
 EFI_STATUS
 EFIAPI
@@ -2892,6 +2893,10 @@ ShellIsDirectory(
     //
     if (gEfiShellProtocol != NULL) {
       TempLocation  = StrnCatGrow(&TempLocation, NULL, DirName, 0);
+      if (TempLocation == NULL) {
+        ShellCloseFile(&Handle);
+        return (EFI_OUT_OF_RESOURCES);
+      }
       TempLocation2 = StrStr(TempLocation, L":");
       if (TempLocation2 != NULL && StrLen(StrStr(TempLocation, L":")) == 2) {
         *(TempLocation2+1) = CHAR_NULL;
