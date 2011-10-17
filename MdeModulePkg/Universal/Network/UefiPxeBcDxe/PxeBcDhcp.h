@@ -1,7 +1,7 @@
 /** @file
   Dhcp and Discover routines for PxeBc.
 
-Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -116,8 +116,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define DHCP4_PACKET_TYPE_WFM11A           1
 #define DHCP4_PACKET_TYPE_BINL             2
 #define DHCP4_PACKET_TYPE_DHCP_ONLY        3
-#define DHCP4_PACKET_TYPE_MAX              4
-#define DHCP4_PACKET_TYPE_BOOTP            DHCP4_PACKET_TYPE_MAX
+#define DHCP4_PACKET_TYPE_BOOTP            4
+#define DHCP4_PACKET_TYPE_MAX              5
 
 #define BIT(x)  (1 << x)
 #define CTRL(x) (0x1F & (x))
