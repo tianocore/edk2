@@ -2421,7 +2421,7 @@ VariableCommonInitialize (
   //
   GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
   if (GuidHob != NULL) {
-    mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) GET_GUID_HOB_DATA (GuidHob);
+    mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) GET_GUID_HOB_DATA (GuidHob);
   }
 
   //
