@@ -1130,8 +1130,12 @@ DetermineDeviceAttribute (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+    //
+    // Assume the PCI Root Bridge supports DAC
+    //
     PciIoDevice->Supports |= (EFI_PCI_IO_ATTRIBUTE_EMBEDDED_DEVICE |
-                              EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM);
+                              EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM |
+                              EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE);
 
   } else {
 
