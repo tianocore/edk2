@@ -194,7 +194,7 @@ GetFullyQualifiedPath(
 
   PathCleanUpDirectories(PathToReturn);
 
-  if (PathTpReturn == NULL) {
+  if (PathToReturn == NULL) {
     return NULL;
   }
 
