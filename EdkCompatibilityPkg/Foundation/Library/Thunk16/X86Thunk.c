@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -381,8 +381,15 @@ Returns:
 
 --*/
 {
-  RegisterSet->E.EIP = (UINT16)((UINT32 *)NULL)[IntNumber];
-  RegisterSet->E.CS  = (UINT16)(((UINT32 *)NULL)[IntNumber] >> 16);
+  UINT32  *VectorBase;
+  
+  //
+  // The base address of legacy interrupt vector table is 0.
+  // We use this base address to get the legacy interrupt handler.
+  //
+  VectorBase = 0;
+  RegisterSet->E.EIP = (UINT16)(VectorBase)[IntNumber];
+  RegisterSet->E.CS  = (UINT16)((VectorBase)[IntNumber] >> 16);
 
   return AsmThunk16 (ThunkContext, RegisterSet, Flags | THUNK_INTERRUPT);
 }
