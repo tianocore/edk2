@@ -970,7 +970,7 @@ GetLangFromSupportedLangCodes (
     CompareLength = ISO_639_2_ENTRY_SIZE;
     mVariableModuleGlobal->Lang[CompareLength] = '\0';
     return CopyMem (mVariableModuleGlobal->Lang, SupportedLang + Index * CompareLength, CompareLength);
-      
+
   } else {
     while (TRUE) {
       //
@@ -2421,7 +2421,12 @@ VariableCommonInitialize (
   //
   GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
   if (GuidHob != NULL) {
-    mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) GET_GUID_HOB_DATA (GuidHob);
+    VariableStoreHeader = GET_GUID_HOB_DATA (GuidHob);
+    if (GetVariableStoreStatus (VariableStoreHeader) == EfiValid) {
+      mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) VariableStoreHeader;
+    } else {
+      DEBUG ((EFI_D_ERROR, "HOB Variable Store header is corrupted!\n"));
+    }
   }
 
   //

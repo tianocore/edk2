@@ -2,7 +2,7 @@
 # Emulation Variable for EFI_RUNTIME_SERVICES.
 #
 # This module provides three EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -48,6 +48,7 @@
   DebugLib
   MemoryAllocationLib
   BaseMemoryLib
+  HobLib
 
 
 [Protocols]
