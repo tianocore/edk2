@@ -375,10 +375,10 @@
 
 #############################################################################################################
 # NOTE:
-# The following [Libraries.IA32] section is for building R8 module under the R9 tool chain.
-# If you want build R8 module for Nt32 platform, please uncomment [Libraries.IA32] section and
-# libraries used by that R8 module.
-# Currently, Nt32 platform do not has any R8 style module
+# The following [Libraries.IA32] section is for building EDK module under the EDKII tool chain.
+# If you want build EDK module for Nt32 platform, please uncomment [Libraries.IA32] section and
+# libraries used by that EDK module.
+# Currently, Nt32 platform do not has any EDK style module
 #
 #
 #[Libraries.IA32]
