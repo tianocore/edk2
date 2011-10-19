@@ -656,7 +656,7 @@ AhciPioTransfer (
                     );
 
   if (EFI_ERROR (Status) || (DataCount != MapLength)) {
-    return EFI_OUT_OF_RESOURCES;
+    return EFI_BAD_BUFFER_SIZE;
   }
   
   //
@@ -877,7 +877,7 @@ AhciDmaTransfer (
                       );
 
     if (EFI_ERROR (Status) || (DataCount != MapLength)) {
-      return EFI_OUT_OF_RESOURCES;
+      return EFI_BAD_BUFFER_SIZE;
     }
 
     if (Task != NULL) {
