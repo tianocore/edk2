@@ -61,6 +61,7 @@
   DxeServicesTableLib
   BaseCryptLib
   PlatformSecureLib  
+  HobLib
 
 [Protocols]
   gEfiSmmFirmwareVolumeBlockProtocolGuid        ## SOMETIMES_CONSUMES

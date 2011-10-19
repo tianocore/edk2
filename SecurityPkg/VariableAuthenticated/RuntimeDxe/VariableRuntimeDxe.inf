@@ -54,7 +54,8 @@
   UefiDriverEntryPoint
   PcdLib
   BaseCryptLib
-  PlatformSecureLib  
+  PlatformSecureLib
+  HobLib
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           ## SOMETIMES_CONSUMES

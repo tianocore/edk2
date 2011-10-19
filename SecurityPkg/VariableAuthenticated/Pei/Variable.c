@@ -31,33 +31,6 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
   &mVariablePpi
 };
 
-
-/**
-  Check if it runs in Recovery mode.
-  
-  @param  PeiServices  General purpose services available to every PEIM.
-
-  @retval TRUE         It's in Recovery mode.
-  @retval FALSE        It's not in Recovery mode.
-
-**/
-BOOLEAN
-IsInRecoveryMode (
-  IN CONST EFI_PEI_SERVICES          **PeiServices
-  )
-{
-  EFI_STATUS              Status;
-  EFI_BOOT_MODE           BootMode;
-
-  Status = (*PeiServices)->GetBootMode (PeiServices, &BootMode);
-  ASSERT_EFI_ERROR (Status);
-  
-  if (BootMode == BOOT_IN_RECOVERY_MODE) {
-    return TRUE;
-  }
-  return FALSE;
-}
-
 /**
   Provide the functionality of the variable services.
   
@@ -67,7 +40,6 @@ IsInRecoveryMode (
 
   @retval EFI_SUCCESS  If the interface could be successfully installed
   @retval Others       Returned from PeiServicesInstallPpi()
-
 **/
 EFI_STATUS
 EFIAPI
@@ -348,14 +320,84 @@ CompareWithValidVariable (
   return EFI_NOT_FOUND;
 }
 
+/**
+  Return the variable store header and the index table based on the Index.
+
+  @param Index      The index of the variable store.
+  @param IndexTable Return the index table.
+
+  @return  Pointer to the variable store header.
+**/
+VARIABLE_STORE_HEADER *
+GetVariableStore (
+  IN VARIABLE_STORE_TYPE         Type,
+  OUT VARIABLE_INDEX_TABLE       **IndexTable  OPTIONAL
+  )
+{
+  EFI_HOB_GUID_TYPE           *GuidHob;
+  EFI_FIRMWARE_VOLUME_HEADER  *FvHeader;
+  VARIABLE_STORE_HEADER       *VariableStoreHeader;
+
+  if (IndexTable != NULL) {
+    *IndexTable       = NULL;
+  }
+  VariableStoreHeader = NULL;
+  switch (Type) {
+    case VariableStoreTypeHob:
+      GuidHob     = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
+      if (GuidHob != NULL) {
+        VariableStoreHeader = (VARIABLE_STORE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
+      }
+      break;
+
+    case VariableStoreTypeNv:
+      if (GetBootModeHob () != BOOT_IN_RECOVERY_MODE) {
+        //
+        // The content of NV storage for variable is not reliable in recovery boot mode.
+        //
+        FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0 ? 
+                                                           PcdGet64 (PcdFlashNvStorageVariableBase64) : 
+                                                           PcdGet32 (PcdFlashNvStorageVariableBase)
+                                                          );
+        VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINT8 *) FvHeader + FvHeader->HeaderLength);
+
+        if (IndexTable != NULL) {
+          GuidHob = GetFirstGuidHob (&gEfiVariableIndexTableGuid);
+          if (GuidHob != NULL) {
+            *IndexTable = GET_GUID_HOB_DATA (GuidHob);
+          } else {
+            //
+            // If it's the first time to access variable region in flash, create a guid hob to record
+            // VAR_ADDED type variable info.
+            // Note that as the resource of PEI phase is limited, only store the limited number of 
+            // VAR_ADDED type variables to reduce access time.
+            //
+            *IndexTable = BuildGuidHob (&gEfiVariableIndexTableGuid, sizeof (VARIABLE_INDEX_TABLE));
+            (*IndexTable)->Length      = 0;
+            (*IndexTable)->StartPtr    = GetStartPointer (VariableStoreHeader);
+            (*IndexTable)->EndPtr      = GetEndPointer   (VariableStoreHeader);
+            (*IndexTable)->GoneThrough = 0;
+          }
+        }
+      }
+      break;
+
+    default:
+      ASSERT (FALSE);
+      break;
+  }
+
+  return VariableStoreHeader;
+}
 
 /**
-  This code finds variable in storage blocks (Non-Volatile).
+  Find the variable in the specified variable store.
 
-  @param  PeiServices   General purpose services available to every PEIM.
-  @param  VariableName  Name of the variable to be found
-  @param  VendorGuid    Vendor GUID to be found.
-  @param  PtrTrack      Variable Track Pointer structure that contains Variable Information.
+  @param  VariableStoreHeader Pointer to the variable store header.
+  @param  IndexTable          Pointer to the index table.
+  @param  VariableName        Name of the variable to be found
+  @param  VendorGuid          Vendor GUID to be found.
+  @param  PtrTrack            Variable Track Pointer structure that contains Variable Information.
 
   @retval  EFI_SUCCESS            Variable found successfully
   @retval  EFI_NOT_FOUND          Variable not found
@@ -363,134 +405,100 @@ CompareWithValidVariable (
 
 **/
 EFI_STATUS
-FindVariable (
-  IN CONST EFI_PEI_SERVICES   **PeiServices,
-  IN CONST  CHAR16            *VariableName,
-  IN CONST  EFI_GUID          *VendorGuid,
-  OUT VARIABLE_POINTER_TRACK  *PtrTrack
+FindVariableEx (
+  IN VARIABLE_STORE_HEADER       *VariableStoreHeader,
+  IN VARIABLE_INDEX_TABLE        *IndexTable,
+  IN CONST CHAR16                *VariableName,
+  IN CONST EFI_GUID              *VendorGuid,
+  OUT VARIABLE_POINTER_TRACK     *PtrTrack
   )
 {
-  EFI_HOB_GUID_TYPE       *GuidHob;
-  VARIABLE_STORE_HEADER   *VariableStoreHeader;
   VARIABLE_HEADER         *Variable;
   VARIABLE_HEADER         *LastVariable;
   VARIABLE_HEADER         *MaxIndex;
-  VARIABLE_INDEX_TABLE    *IndexTable;
-  UINT32                  Count;
-  UINT32                  Offset;
-  UINT8                   *VariableBase;
+  UINTN                   Index;
+  UINTN                   Offset;
   BOOLEAN                 StopRecord;
 
-  if (VariableName[0] != 0 && VendorGuid == NULL) {
+  if (VariableStoreHeader == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  if (GetVariableStoreStatus (VariableStoreHeader) != EfiValid) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (~VariableStoreHeader->Size == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  PtrTrack->StartPtr = GetStartPointer (VariableStoreHeader);
+  PtrTrack->EndPtr   = GetEndPointer   (VariableStoreHeader);
+
   //
   // No Variable Address equals zero, so 0 as initial value is safe.
   //
-  MaxIndex = 0;
-  StopRecord = FALSE;
+  MaxIndex   = NULL;
 
-  GuidHob = GetFirstGuidHob (&gEfiVariableIndexTableGuid);
-  if (GuidHob == NULL) {
+  if (IndexTable != NULL) {
     //
-    // If it's the first time to access variable region in flash, create a guid hob to record
-    // VAR_ADDED type variable info.
-    // Note that as the resource of PEI phase is limited, only store the number of 
-    // VARIABLE_INDEX_TABLE_VOLUME of VAR_ADDED type variables to reduce access time.
+    // traverse the variable index table to look for varible.
+    // The IndexTable->Index[Index] records the distance of two neighbouring VAR_ADDED type variables.
     //
-    IndexTable = BuildGuidHob (&gEfiVariableIndexTableGuid, sizeof (VARIABLE_INDEX_TABLE));
-    IndexTable->Length      = 0;
-    IndexTable->StartPtr    = NULL;
-    IndexTable->EndPtr      = NULL;
-    IndexTable->GoneThrough = 0;
-  } else {
-    IndexTable = GET_GUID_HOB_DATA (GuidHob);
-    for (Offset = 0, Count = 0; Count < IndexTable->Length; Count++) {
-      //
-      // traverse the variable info list to look for varible.
-      // The IndexTable->Index[Count] records the distance of two neighbouring VAR_ADDED type variables.
-      //
-      ASSERT (Count < VARIABLE_INDEX_TABLE_VOLUME);
-      Offset   += IndexTable->Index[Count];
-      MaxIndex  = (VARIABLE_HEADER *)((CHAR8 *)(IndexTable->StartPtr) + Offset);
+    for (Offset = 0, Index = 0; Index < IndexTable->Length; Index++) {
+      ASSERT (Index < sizeof (IndexTable->Index) / sizeof (IndexTable->Index[0]));
+      Offset   += IndexTable->Index[Index];
+      MaxIndex  = (VARIABLE_HEADER *) ((UINT8 *) IndexTable->StartPtr + Offset);
       if (CompareWithValidVariable (MaxIndex, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
-        PtrTrack->StartPtr  = IndexTable->StartPtr;
-        PtrTrack->EndPtr    = IndexTable->EndPtr;
-
         return EFI_SUCCESS;
       }
     }
 
     if (IndexTable->GoneThrough != 0) {
+      //
+      // If the table has all the existing variables indexed and we still cannot find it.
+      //
       return EFI_NOT_FOUND;
     }
   }
-  //
-  // If not found in HOB, then let's start from the MaxIndex we've found.
-  //
+
   if (MaxIndex != NULL) {
+    //
+    // HOB exists but the variable cannot be found in HOB
+    // If not found in HOB, then let's start from the MaxIndex we've found.
+    //
     Variable     = GetNextVariablePtr (MaxIndex);
     LastVariable = MaxIndex;
   } else {
-    if ((IndexTable->StartPtr != NULL) || (IndexTable->EndPtr != NULL)) {
-      Variable = IndexTable->StartPtr;
-    } else {
-      VariableBase = (UINT8 *) (UINTN) PcdGet64 (PcdFlashNvStorageVariableBase64);
-      if (VariableBase == NULL) {
-        VariableBase = (UINT8 *) (UINTN) PcdGet32 (PcdFlashNvStorageVariableBase);
-      }
-      
-      VariableStoreHeader = (VARIABLE_STORE_HEADER *) (VariableBase + \
-                            ((EFI_FIRMWARE_VOLUME_HEADER *) (VariableBase)) -> HeaderLength);
-
-      if (GetVariableStoreStatus (VariableStoreHeader) != EfiValid) {
-        return EFI_UNSUPPORTED;
-      }
-
-      if (~VariableStoreHeader->Size == 0) {
-        return EFI_NOT_FOUND;
-      }
-      //
-      // Find the variable by walk through non-volatile variable store
-      //
-      IndexTable->StartPtr  = GetStartPointer (VariableStoreHeader);
-      IndexTable->EndPtr    = GetEndPointer (VariableStoreHeader);
-
-      //
-      // Start Pointers for the variable.
-      // Actual Data Pointer where data can be written.
-      //
-      Variable = IndexTable->StartPtr;
-    }
-
-    LastVariable = IndexTable->StartPtr;
+    //
+    // Start Pointers for the variable.
+    // Actual Data Pointer where data can be written.
+    //
+    Variable     = PtrTrack->StartPtr;
+    LastVariable = PtrTrack->StartPtr;
   }
+
   //
   // Find the variable by walk through non-volatile variable store
   //
-  PtrTrack->StartPtr  = IndexTable->StartPtr;
-  PtrTrack->EndPtr    = IndexTable->EndPtr;
-
-  while ((Variable < IndexTable->EndPtr) && IsValidVariableHeader (Variable)) {
+  StopRecord = FALSE;
+  while ((Variable < PtrTrack->EndPtr) && IsValidVariableHeader (Variable)) {
     if (Variable->State == VAR_ADDED) {
       //
       // Record Variable in VariableIndex HOB
       //
-      if (IndexTable->Length < VARIABLE_INDEX_TABLE_VOLUME && !StopRecord) {
-        Offset = (UINT32)((UINTN)Variable - (UINTN)LastVariable);
-        //
-        // The distance of two neighbouring VAR_ADDED variable is larger than 2^16, 
-        // which is beyond the allowable scope(UINT16) of record. In such case, need not to
-        // record the subsequent VAR_ADDED type variables again.
-        //
-        if ((Offset & 0xFFFF0000UL) != 0) {
+      if ((IndexTable != NULL) && !StopRecord) {
+        Offset = (UINTN) Variable - (UINTN) LastVariable;
+        if ((Offset > 0x0FFFF) || (IndexTable->Length == sizeof (IndexTable->Index) / sizeof (IndexTable->Index[0]))) {
+          //
+          // Stop to record if the distance of two neighbouring VAR_ADDED variable is larger than the allowable scope(UINT16),
+          // or the record buffer is full.
+          //
           StopRecord = TRUE;
-        }
-
-        if (!StopRecord) {
+        } else {
           IndexTable->Index[IndexTable->Length++] = (UINT16) Offset;
+          LastVariable = Variable;
         }
-        LastVariable = Variable;
       }
 
       if (CompareWithValidVariable (Variable, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
@@ -503,11 +511,55 @@ FindVariable (
   //
   // If gone through the VariableStore, that means we never find in Firmware any more.
   //
-  if ((IndexTable->Length < VARIABLE_INDEX_TABLE_VOLUME) && (!StopRecord)) {
+  if ((IndexTable != NULL) && !StopRecord) {
     IndexTable->GoneThrough = 1;
   }
 
   PtrTrack->CurrPtr = NULL;
+
+  return EFI_NOT_FOUND;
+}
+
+/**
+  Find the variable in HOB and Non-Volatile variable storages.
+
+  @param  VariableName  Name of the variable to be found
+  @param  VendorGuid    Vendor GUID to be found.
+  @param  PtrTrack      Variable Track Pointer structure that contains Variable Information.
+
+  @retval  EFI_SUCCESS            Variable found successfully
+  @retval  EFI_NOT_FOUND          Variable not found
+  @retval  EFI_INVALID_PARAMETER  Invalid variable name
+**/
+EFI_STATUS
+FindVariable (
+  IN CONST  CHAR16            *VariableName,
+  IN CONST  EFI_GUID          *VendorGuid,
+  OUT VARIABLE_POINTER_TRACK  *PtrTrack
+  )
+{
+  EFI_STATUS                  Status;
+  VARIABLE_STORE_HEADER       *VariableStoreHeader;
+  VARIABLE_INDEX_TABLE        *IndexTable;
+  VARIABLE_STORE_TYPE         Type;
+
+  if (VariableName[0] != 0 && VendorGuid == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Type = (VARIABLE_STORE_TYPE) 0; Type < VariableStoreTypeMax; Type++) {
+    VariableStoreHeader = GetVariableStore (Type, &IndexTable);
+    Status = FindVariableEx (
+               VariableStoreHeader,
+               IndexTable,
+               VariableName,
+               VendorGuid, 
+               PtrTrack
+               );
+    if (!EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
 
   return EFI_NOT_FOUND;
 }
@@ -552,27 +604,16 @@ PeiGetVariable (
   VARIABLE_POINTER_TRACK  Variable;
   UINTN                   VarDataSize;
   EFI_STATUS              Status;
-  CONST EFI_PEI_SERVICES  **PeiServices;
 
-  PeiServices = GetPeiServicesTablePointer ();
   if (VariableName == NULL || VariableGuid == NULL || DataSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
-  // Check if this is recovery boot path.
-  // If yes, the content of variable area is not reliable. Therefore we directly
-  // return EFI_NOT_FOUND. 
-  // 
-  if (IsInRecoveryMode(PeiServices)) {
-    return EFI_NOT_FOUND;
-  }
-
-  //
   // Find existing variable
   //
-  Status = FindVariable (PeiServices, VariableName, VariableGuid, &Variable);
-  if (Variable.CurrPtr == NULL || Status != EFI_SUCCESS) {
+  Status = FindVariable (VariableName, VariableGuid, &Variable);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
   //
@@ -636,26 +677,18 @@ PeiGetNextVariableName (
   IN OUT EFI_GUID                           *VariableGuid
   )
 {
+  VARIABLE_STORE_TYPE     Type;
   VARIABLE_POINTER_TRACK  Variable;
+  VARIABLE_POINTER_TRACK  VariableInHob;
   UINTN                   VarNameSize;
   EFI_STATUS              Status;
-  CONST EFI_PEI_SERVICES  **PeiServices;
+  VARIABLE_STORE_HEADER   *VariableStoreHeader[VariableStoreTypeMax];
 
-  PeiServices = GetPeiServicesTablePointer ();
   if (VariableName == NULL || VariableGuid == NULL || VariableNameSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // Check if this is recovery boot path.
-  // If yes, the content of variable area is not reliable. Therefore we directly
-  // return EFI_NOT_FOUND. 
-  //   
-  if (IsInRecoveryMode(PeiServices)) {
-    return EFI_NOT_FOUND;
-  }
-
-  Status = FindVariable (PeiServices, VariableName, VariableGuid, &Variable);
+  Status = FindVariable (VariableName, VariableGuid, &Variable);
   if (Variable.CurrPtr == NULL || Status != EFI_SUCCESS) {
     return Status;
   }
@@ -667,34 +700,88 @@ PeiGetNextVariableName (
     Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
   }
 
-  while (!(Variable.CurrPtr >= Variable.EndPtr || Variable.CurrPtr == NULL)) {
-    if (IsValidVariableHeader (Variable.CurrPtr)) {
-      if (Variable.CurrPtr->State == VAR_ADDED) {
-        ASSERT (NameSizeOfVariable (Variable.CurrPtr) != 0);
+  VariableStoreHeader[VariableStoreTypeHob] = GetVariableStore (VariableStoreTypeHob, NULL);
+  VariableStoreHeader[VariableStoreTypeNv]  = GetVariableStore (VariableStoreTypeNv, NULL);
 
-        VarNameSize = (UINTN) NameSizeOfVariable (Variable.CurrPtr);
-        if (VarNameSize <= *VariableNameSize) {
-          CopyMem (VariableName, GetVariableNamePtr (Variable.CurrPtr), VarNameSize);
-
-          CopyMem (VariableGuid, &Variable.CurrPtr->VendorGuid, sizeof (EFI_GUID));
-
-          Status = EFI_SUCCESS;
-        } else {
-          Status = EFI_BUFFER_TOO_SMALL;
+  while (TRUE) {
+    //
+    // Switch from HOB to Non-Volatile.
+    //
+    while ((Variable.CurrPtr >= Variable.EndPtr) ||
+           (Variable.CurrPtr == NULL)            ||
+           !IsValidVariableHeader (Variable.CurrPtr)
+          ) {
+      //
+      // Find current storage index
+      //
+      for (Type = (VARIABLE_STORE_TYPE) 0; Type < VariableStoreTypeMax; Type++) {
+        if ((VariableStoreHeader[Type] != NULL) && (Variable.StartPtr == GetStartPointer (VariableStoreHeader[Type]))) {
+          break;
         }
-
-        *VariableNameSize = VarNameSize;
-        return Status;
-        //
-        // Variable is found
-        //
-      } else {
-        Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
       }
+      ASSERT (Type < VariableStoreTypeMax);
+      //
+      // Switch to next storage
+      //
+      for (Type++; Type < VariableStoreTypeMax; Type++) {
+        if (VariableStoreHeader[Type] != NULL) {
+          break;
+        }
+      }
+      //
+      // Capture the case that 
+      // 1. current storage is the last one, or
+      // 2. no further storage
+      //
+      if (Type == VariableStoreTypeMax) {
+        return EFI_NOT_FOUND;
+      }
+      Variable.StartPtr = GetStartPointer (VariableStoreHeader[Type]);
+      Variable.EndPtr   = GetEndPointer   (VariableStoreHeader[Type]);
+      Variable.CurrPtr  = Variable.StartPtr;
+    }
+
+    if (Variable.CurrPtr->State == VAR_ADDED) {
+
+      //
+      // Don't return NV variable when HOB overrides it
+      //
+      if ((VariableStoreHeader[VariableStoreTypeHob] != NULL) && (VariableStoreHeader[VariableStoreTypeNv] != NULL) &&
+          (Variable.StartPtr == GetStartPointer (VariableStoreHeader[VariableStoreTypeNv]))
+         ) {
+        Status = FindVariableEx (
+                   VariableStoreHeader[VariableStoreTypeHob],
+                   NULL,
+                   GetVariableNamePtr (Variable.CurrPtr),
+                   &Variable.CurrPtr->VendorGuid, 
+                   &VariableInHob
+                   );
+        if (!EFI_ERROR (Status)) {
+          Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
+          continue;
+        }
+      }
+
+      VarNameSize = NameSizeOfVariable (Variable.CurrPtr);
+      ASSERT (VarNameSize != 0);
+
+      if (VarNameSize <= *VariableNameSize) {
+        CopyMem (VariableName, GetVariableNamePtr (Variable.CurrPtr), VarNameSize);
+
+        CopyMem (VariableGuid, &Variable.CurrPtr->VendorGuid, sizeof (EFI_GUID));
+
+        Status = EFI_SUCCESS;
+      } else {
+        Status = EFI_BUFFER_TOO_SMALL;
+      }
+
+      *VariableNameSize = VarNameSize;
+      //
+      // Variable is found
+      //
+      return Status;
     } else {
-      break;
+      Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
     }
   }
-
-  return EFI_NOT_FOUND;
 }

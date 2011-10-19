@@ -715,6 +715,67 @@ Reclaim (
   return Status;
 }
 
+/**
+  Find the variable in the specified variable store.
+
+  @param  VariableName        Name of the variable to be found
+  @param  VendorGuid          Vendor GUID to be found.
+  @param  PtrTrack            Variable Track Pointer structure that contains Variable Information.
+
+  @retval  EFI_SUCCESS            Variable found successfully
+  @retval  EFI_NOT_FOUND          Variable not found
+**/
+EFI_STATUS
+FindVariableEx (
+  IN     CHAR16                  *VariableName,
+  IN     EFI_GUID                *VendorGuid,
+  IN OUT VARIABLE_POINTER_TRACK  *PtrTrack
+  )
+{
+  VARIABLE_HEADER                *InDeletedVariable;
+  VOID                           *Point;
+
+  //
+  // Find the variable by walk through HOB, volatile and non-volatile variable store.
+  //
+  InDeletedVariable  = NULL;
+
+  for ( PtrTrack->CurrPtr = PtrTrack->StartPtr
+      ; (PtrTrack->CurrPtr < PtrTrack->EndPtr) && IsValidVariableHeader (PtrTrack->CurrPtr)
+      ; PtrTrack->CurrPtr = GetNextVariablePtr (PtrTrack->CurrPtr)
+      ) {
+    if (PtrTrack->CurrPtr->State == VAR_ADDED || 
+        PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)
+       ) {
+      if (!AtRuntime () || ((PtrTrack->CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) != 0)) {
+        if (VariableName[0] == 0) {
+          if (PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+            InDeletedVariable   = PtrTrack->CurrPtr;
+          } else {
+            return EFI_SUCCESS;
+          }
+        } else {
+          if (CompareGuid (VendorGuid, &PtrTrack->CurrPtr->VendorGuid)) {
+            Point = (VOID *) GetVariableNamePtr (PtrTrack->CurrPtr);
+
+            ASSERT (NameSizeOfVariable (PtrTrack->CurrPtr) != 0);
+            if (CompareMem (VariableName, Point, NameSizeOfVariable (PtrTrack->CurrPtr)) == 0) {
+              if (PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+                InDeletedVariable     = PtrTrack->CurrPtr;
+              } else {
+                return EFI_SUCCESS;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  PtrTrack->CurrPtr = InDeletedVariable;
+  return (PtrTrack->CurrPtr  == NULL) ? EFI_NOT_FOUND : EFI_SUCCESS;
+}
+
 
 /**
   Finds variable in storage blocks of volatile and non-volatile storage areas.
@@ -746,89 +807,40 @@ FindVariable (
   IN  VARIABLE_GLOBAL         *Global
   )
 {
-  VARIABLE_HEADER         *Variable[2];
-  VARIABLE_HEADER         *InDeletedVariable;
-  VARIABLE_STORE_HEADER   *VariableStoreHeader[2];
-  UINTN                   InDeletedStorageIndex;
-  UINTN                   Index;
-  VOID                    *Point;
-
-  //
-  // 0: Volatile, 1: Non-Volatile.
-  // The index and attributes mapping must be kept in this order as RuntimeServiceGetNextVariableName
-  // make use of this mapping to implement search algorithm.
-  //
-  VariableStoreHeader[0]  = (VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase);
-  VariableStoreHeader[1]  = mNvVariableCache;
-
-  //
-  // Start Pointers for the variable.
-  // Actual Data Pointer where data can be written.
-  //
-  Variable[0] = GetStartPointer (VariableStoreHeader[0]);
-  Variable[1] = GetStartPointer (VariableStoreHeader[1]);
+  EFI_STATUS              Status;
+  VARIABLE_STORE_HEADER   *VariableStoreHeader[VariableStoreTypeMax];
+  VARIABLE_STORE_TYPE     Type;
 
   if (VariableName[0] != 0 && VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
-  // Find the variable by walk through volatile and then non-volatile variable store.
+  // 0: Volatile, 1: HOB, 2: Non-Volatile.
+  // The index and attributes mapping must be kept in this order as RuntimeServiceGetNextVariableName
+  // make use of this mapping to implement search algorithm.
   //
-  InDeletedVariable     = NULL;
-  InDeletedStorageIndex = 0;
-  for (Index = 0; Index < 2; Index++) {
-    while ((Variable[Index] < GetEndPointer (VariableStoreHeader[Index])) && IsValidVariableHeader (Variable[Index])) {
-      if (Variable[Index]->State == VAR_ADDED || 
-          Variable[Index]->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)
-         ) {
-        if (!AtRuntime () || ((Variable[Index]->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) != 0)) {
-          if (VariableName[0] == 0) {
-            if (Variable[Index]->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
-              InDeletedVariable     = Variable[Index];
-              InDeletedStorageIndex = Index;
-            } else {
-              PtrTrack->StartPtr  = GetStartPointer (VariableStoreHeader[Index]);
-              PtrTrack->EndPtr    = GetEndPointer (VariableStoreHeader[Index]);
-              PtrTrack->CurrPtr   = Variable[Index];
-              PtrTrack->Volatile  = (BOOLEAN)(Index == 0);
+  VariableStoreHeader[VariableStoreTypeVolatile] = (VARIABLE_STORE_HEADER *) (UINTN) Global->VolatileVariableBase;
+  VariableStoreHeader[VariableStoreTypeHob]      = (VARIABLE_STORE_HEADER *) (UINTN) Global->HobVariableBase;
+  VariableStoreHeader[VariableStoreTypeNv]       = mNvVariableCache;
 
-              return EFI_SUCCESS;
-            }
-          } else {
-            if (CompareGuid (VendorGuid, &Variable[Index]->VendorGuid)) {
-              Point = (VOID *) GetVariableNamePtr (Variable[Index]);
-
-              ASSERT (NameSizeOfVariable (Variable[Index]) != 0);
-              if (CompareMem (VariableName, Point, NameSizeOfVariable (Variable[Index])) == 0) {
-                if (Variable[Index]->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
-                  InDeletedVariable     = Variable[Index];
-                  InDeletedStorageIndex = Index;
-                } else {
-                  PtrTrack->StartPtr  = GetStartPointer (VariableStoreHeader[Index]);
-                  PtrTrack->EndPtr    = GetEndPointer (VariableStoreHeader[Index]);
-                  PtrTrack->CurrPtr   = Variable[Index];
-                  PtrTrack->Volatile  = (BOOLEAN)(Index == 0);
-
-                  return EFI_SUCCESS;
-                }
-              }
-            }
-          }
-        }
-      }
-
-      Variable[Index] = GetNextVariablePtr (Variable[Index]);
+  //
+  // Find the variable by walk through HOB, volatile and non-volatile variable store.
+  //
+  for (Type = (VARIABLE_STORE_TYPE) 0; Type < VariableStoreTypeMax; Type++) {
+    if (VariableStoreHeader[Type] == NULL) {
+      continue;
     }
-    if (InDeletedVariable != NULL) {
-      PtrTrack->StartPtr  = GetStartPointer (VariableStoreHeader[InDeletedStorageIndex]);
-      PtrTrack->EndPtr    = GetEndPointer (VariableStoreHeader[InDeletedStorageIndex]);
-      PtrTrack->CurrPtr   = InDeletedVariable;
-      PtrTrack->Volatile  = (BOOLEAN)(InDeletedStorageIndex == 0);
-      return EFI_SUCCESS;
+
+    PtrTrack->StartPtr = GetStartPointer (VariableStoreHeader[Type]);
+    PtrTrack->EndPtr   = GetEndPointer   (VariableStoreHeader[Type]);
+    PtrTrack->Volatile = (BOOLEAN) (Type == VariableStoreTypeVolatile);
+
+    Status = FindVariableEx (VariableName, VendorGuid, PtrTrack);
+    if (!EFI_ERROR (Status)) {
+      return Status;
     }
   }
-  PtrTrack->CurrPtr = NULL;
   return EFI_NOT_FOUND;
 }
 
@@ -1226,7 +1238,7 @@ AutoUpdateLangVariable(
     // Update Lang if PlatformLang is already set
     // Update PlatformLang if Lang is already set
     //
-    Status = FindVariable (L"PlatformLang", &gEfiGlobalVariableGuid, &Variable, (VARIABLE_GLOBAL *) mVariableModuleGlobal);
+    Status = FindVariable (L"PlatformLang", &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal);
     if (!EFI_ERROR (Status)) {
       //
       // Update Lang
@@ -1235,7 +1247,7 @@ AutoUpdateLangVariable(
       Data         = GetVariableDataPtr (Variable.CurrPtr);
       DataSize     = Variable.CurrPtr->DataSize;
     } else {
-      Status = FindVariable (L"Lang", &gEfiGlobalVariableGuid, &Variable, (VARIABLE_GLOBAL *) mVariableModuleGlobal);
+      Status = FindVariable (L"Lang", &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal);
       if (!EFI_ERROR (Status)) {
         //
         // Update PlatformLang
@@ -1280,7 +1292,7 @@ AutoUpdateLangVariable(
         //
         // Successfully convert PlatformLang to Lang, and set the BestLang value into Lang variable simultaneously.
         //
-        FindVariable (L"Lang", &gEfiGlobalVariableGuid, &Variable, (VARIABLE_GLOBAL *)mVariableModuleGlobal);
+        FindVariable (L"Lang", &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal);
 
         Status = UpdateVariable (L"Lang", &gEfiGlobalVariableGuid, BestLang,
                                  ISO_639_2_ENTRY_SIZE + 1, Attributes, 0, 0, &Variable, NULL);
@@ -1314,7 +1326,7 @@ AutoUpdateLangVariable(
         //
         // Successfully convert Lang to PlatformLang, and set the BestPlatformLang value into PlatformLang variable simultaneously.
         //
-        FindVariable (L"PlatformLang", &gEfiGlobalVariableGuid, &Variable, (VARIABLE_GLOBAL *)mVariableModuleGlobal);
+        FindVariable (L"PlatformLang", &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal);
 
         Status = UpdateVariable (L"PlatformLang", &gEfiGlobalVariableGuid, BestPlatformLang, 
                                  AsciiStrSize (BestPlatformLang), Attributes, 0, 0, &Variable, NULL);
@@ -1935,9 +1947,12 @@ VariableServiceGetNextVariableName (
   IN OUT  EFI_GUID          *VendorGuid
   )
 {
+  VARIABLE_STORE_TYPE     Type;
   VARIABLE_POINTER_TRACK  Variable;
+  VARIABLE_POINTER_TRACK  VariableInHob;
   UINTN                   VarNameSize;
   EFI_STATUS              Status;
+  VARIABLE_STORE_HEADER   *VariableStoreHeader[VariableStoreTypeMax];
 
   if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1957,45 +1972,85 @@ VariableServiceGetNextVariableName (
     Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
   }
 
+  //
+  // 0: Volatile, 1: HOB, 2: Non-Volatile.
+  // The index and attributes mapping must be kept in this order as FindVariable
+  // makes use of this mapping to implement search algorithm.
+  //
+  VariableStoreHeader[VariableStoreTypeVolatile] = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase;
+  VariableStoreHeader[VariableStoreTypeHob]      = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase;
+  VariableStoreHeader[VariableStoreTypeNv]       = mNvVariableCache;
+
   while (TRUE) {
     //
-    // If both volatile and non-volatile variable store are parsed,
-    // return not found.
+    // Switch from Volatile to HOB, to Non-Volatile.
     //
-    if (Variable.CurrPtr >= Variable.EndPtr || Variable.CurrPtr == NULL) {
-      Variable.Volatile = (BOOLEAN) (Variable.Volatile ^ ((BOOLEAN) 0x1));
-      if (!Variable.Volatile) {
-        Variable.StartPtr = GetStartPointer ((VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
-        Variable.EndPtr   = GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase));
-      } else {
+    while ((Variable.CurrPtr >= Variable.EndPtr) ||
+           (Variable.CurrPtr == NULL)            ||
+           !IsValidVariableHeader (Variable.CurrPtr)
+          ) {
+      //
+      // Find current storage index
+      //
+      for (Type = (VARIABLE_STORE_TYPE) 0; Type < VariableStoreTypeMax; Type++) {
+        if ((VariableStoreHeader[Type] != NULL) && (Variable.StartPtr == GetStartPointer (VariableStoreHeader[Type]))) {
+          break;
+        }
+      }
+      ASSERT (Type < VariableStoreTypeMax);
+      //
+      // Switch to next storage
+      //
+      for (Type++; Type < VariableStoreTypeMax; Type++) {
+        if (VariableStoreHeader[Type] != NULL) {
+          break;
+        }
+      }
+      //
+      // Capture the case that 
+      // 1. current storage is the last one, or
+      // 2. no further storage
+      //
+      if (Type == VariableStoreTypeMax) {
         Status = EFI_NOT_FOUND;
         goto Done;
       }
-
-      Variable.CurrPtr = Variable.StartPtr;
-      if (!IsValidVariableHeader (Variable.CurrPtr)) {
-        continue;
-      }
+      Variable.StartPtr = GetStartPointer (VariableStoreHeader[Type]);
+      Variable.EndPtr   = GetEndPointer   (VariableStoreHeader[Type]);
+      Variable.CurrPtr  = Variable.StartPtr;
     }
+
     //
     // Variable is found
     //
-    if (IsValidVariableHeader (Variable.CurrPtr) && Variable.CurrPtr->State == VAR_ADDED) {
+    if (Variable.CurrPtr->State == VAR_ADDED) {
       if ((AtRuntime () && ((Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0)) == 0) {
+
+        //
+        // Don't return NV variable when HOB overrides it
+        //
+        if ((VariableStoreHeader[VariableStoreTypeHob] != NULL) && (VariableStoreHeader[VariableStoreTypeNv] != NULL) && 
+            (Variable.StartPtr == GetStartPointer (VariableStoreHeader[VariableStoreTypeNv]))
+           ) {
+          VariableInHob.StartPtr = GetStartPointer (VariableStoreHeader[VariableStoreTypeHob]);
+          VariableInHob.EndPtr   = GetEndPointer   (VariableStoreHeader[VariableStoreTypeHob]);
+          Status = FindVariableEx (
+                     GetVariableNamePtr (Variable.CurrPtr),
+                     &Variable.CurrPtr->VendorGuid,
+                     &VariableInHob
+                     );
+          if (!EFI_ERROR (Status)) {
+            Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
+            continue;
+          }
+        }
+
         VarNameSize = NameSizeOfVariable (Variable.CurrPtr);
         ASSERT (VarNameSize != 0);
 
         if (VarNameSize <= *VariableNameSize) {
-          CopyMem (
-            VariableName,
-            GetVariableNamePtr (Variable.CurrPtr),
-            VarNameSize
-            );
-          CopyMem (
-            VendorGuid,
-            &Variable.CurrPtr->VendorGuid,
-            sizeof (EFI_GUID)
-            );
+          CopyMem (VariableName, GetVariableNamePtr (Variable.CurrPtr), VarNameSize);
+          CopyMem (VendorGuid, &Variable.CurrPtr->VendorGuid, sizeof (EFI_GUID));
           Status = EFI_SUCCESS;
         } else {
           Status = EFI_BUFFER_TOO_SMALL;
@@ -2376,16 +2431,16 @@ VariableWriteServiceInitialize (
   UINTN                           Index;
   UINT8                           Data;
   EFI_PHYSICAL_ADDRESS            VariableStoreBase;
-  UINT64                          VariableStoreLength;
+  VARIABLE_HEADER                 *Variable;
+  VOID                            *VariableData;
 
   VariableStoreBase   = mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase;
   VariableStoreHeader = (VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase;
-  VariableStoreLength = VariableStoreHeader->Size;
-  
+ 
   //
   // Check if the free area is really free.
   //
-  for (Index = mVariableModuleGlobal->NonVolatileLastVariableOffset; Index < VariableStoreLength; Index++) {
+  for (Index = mVariableModuleGlobal->NonVolatileLastVariableOffset; Index < VariableStoreHeader->Size; Index++) {
     Data = ((UINT8 *) mNvVariableCache)[Index];
     if (Data != 0xff) {
       //
@@ -2401,6 +2456,35 @@ VariableWriteServiceInitialize (
         return Status;
       }
       break;
+    }
+  }
+
+  
+  //
+  // Flush the HOB variable to flash and invalidate HOB variable.
+  //
+  if (mVariableModuleGlobal->VariableGlobal.HobVariableBase != 0) {
+    //
+    // Clear the HobVariableBase to avoid SetVariable() updating the variable in HOB
+    //
+    VariableStoreHeader = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase;
+    mVariableModuleGlobal->VariableGlobal.HobVariableBase = 0;
+
+    for ( Variable = GetStartPointer (VariableStoreHeader)
+        ; (Variable < GetEndPointer (VariableStoreHeader) && IsValidVariableHeader (Variable))
+        ; Variable = GetNextVariablePtr (Variable)
+        ) {
+      ASSERT (Variable->State == VAR_ADDED);
+      ASSERT ((Variable->Attributes & EFI_VARIABLE_NON_VOLATILE) != 0);
+      VariableData = GetVariableDataPtr (Variable);
+      Status = VariableServiceSetVariable (
+                 GetVariableNamePtr (Variable),
+                 &Variable->VendorGuid,
+                 Variable->Attributes,
+                 Variable->DataSize,
+                 VariableData
+                 );
+      ASSERT_EFI_ERROR (Status);
     }
   }
 
@@ -2434,6 +2518,7 @@ VariableCommonInitialize (
   UINT64                          VariableStoreLength;
   UINTN                           ScratchSize;
   UINTN                           VariableSize;
+  EFI_HOB_GUID_TYPE               *GuidHob;
 
   //
   // Allocate runtime memory for variable driver global structure.
@@ -2452,6 +2537,19 @@ VariableCommonInitialize (
   // PcdFlashNvStorageVariableSize.
   //
   ASSERT (PcdGet32 (PcdHwErrStorageSize) <= PcdGet32 (PcdFlashNvStorageVariableSize));
+
+  //
+  // Get HOB variable store.
+  //
+  GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
+  if (GuidHob != NULL) {
+    VariableStoreHeader = GET_GUID_HOB_DATA (GuidHob);
+    if (GetVariableStoreStatus (VariableStoreHeader) == EfiValid) {
+      mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) VariableStoreHeader;
+    } else {
+      DEBUG ((EFI_D_ERROR, "HOB Variable Store header is corrupted!\n"));
+    }
+  }
 
   //
   // Allocate memory for volatile variable store, note that there is a scratch space to store scratch data.
@@ -2480,7 +2578,7 @@ VariableCommonInitialize (
   VolatileVariableStore->Reserved1   = 0;
 
   //
-  // Get non-volatile varaible store.
+  // Get non-volatile variable store.
   //
 
   TempVariableStoreHeader = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageVariableBase64);
