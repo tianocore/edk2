@@ -279,19 +279,12 @@ BiosKeyboardDriverBindingStart (
   BiosKeyboardPrivate->SimpleTextInputEx.UnregisterKeyNotify = BiosKeyboardUnregisterKeyNotify;    
   InitializeListHead (&BiosKeyboardPrivate->NotifyList);
 
-  Status = gBS->HandleProtocol (
-                  Controller,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &BiosKeyboardPrivate->DevicePath
-                  );
-
   //
   // Report that the keyboard is being enabled
   //
-  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+  REPORT_STATUS_CODE (
     EFI_PROGRESS_CODE,
-    EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_ENABLE,
-    BiosKeyboardPrivate->DevicePath
+    EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_ENABLE
     );
 
   //
@@ -350,10 +343,9 @@ BiosKeyboardDriverBindingStart (
   //
   // Report a Progress Code for an attempt to detect the precense of the keyboard device in the system
   //
-  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+  REPORT_STATUS_CODE (
     EFI_PROGRESS_CODE,
-    EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_PRESENCE_DETECT,
-    BiosKeyboardPrivate->DevicePath
+    EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_PRESENCE_DETECT
     );
 
   //
@@ -454,10 +446,9 @@ Done:
     //
     // Report an Error Code for failing to start the keyboard device
     //
-    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      StatusCode,
-      BiosKeyboardPrivate->DevicePath
+      StatusCode
       );
   }
 
@@ -1011,19 +1002,17 @@ BiosKeyboardReset (
   // 1
   // Report reset progress code
   //
-  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+  REPORT_STATUS_CODE (
     EFI_PROGRESS_CODE,
-    EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_RESET,
-    BiosKeyboardPrivate->DevicePath
+    EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_RESET
     );
 
   //
   // Report a Progress Code for clearing the keyboard buffer
   //
-  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+  REPORT_STATUS_CODE (
     EFI_PROGRESS_CODE,
-    EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_CLEAR_BUFFER,
-    BiosKeyboardPrivate->DevicePath
+    EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_CLEAR_BUFFER
     );
 
   //
@@ -1115,10 +1104,9 @@ BiosKeyboardReset (
     //
     // Report a Progress Code for performing a self test on the keyboard controller
     //
-    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    REPORT_STATUS_CODE (
       EFI_PROGRESS_CODE,
-      EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_SELF_TEST,
-      BiosKeyboardPrivate->DevicePath
+      EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_SELF_TEST
       );
 
     Status = KeyboardCommand (
@@ -1681,10 +1669,9 @@ CheckKeyboardConnect (
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "[KBD]CheckKeyboardConnect - Keyboard enable failed!\n"));
-    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_CONTROLLER_ERROR,
-      BiosKeyboardPrivate->DevicePath
+      EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_CONTROLLER_ERROR
       );
     return FALSE;
   }
@@ -1697,10 +1684,9 @@ CheckKeyboardConnect (
 
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "[KBD]CheckKeyboardConnect - Timeout!\n"));
-    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_CONTROLLER_ERROR,
-      BiosKeyboardPrivate->DevicePath
+      EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_CONTROLLER_ERROR
       );
     return FALSE;
   }

@@ -219,7 +219,6 @@ typedef struct {
   UINT16                                      StatusRegisterAddress;
   UINT16                                      CommandRegisterAddress;
   BOOLEAN                                     ExtendedKeyboard;
-  EFI_DEVICE_PATH_PROTOCOL                    *DevicePath;
   
   //
   // Buffer storing EFI_KEY_DATA
