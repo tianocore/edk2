@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -229,7 +229,7 @@ Routine Description:
   This was bad as Tiano did not own the enum. In UEFI 2.0 CreateEventEx was
   added and now it's possible to not voilate the UEFI specification by 
   declaring a GUID for the legacy boot event class. This library supports
-  the R8.5/EFI 1.10 form and R8.6/UEFI 2.0 form and allows common code to 
+  the EFI 1.10 form and UEFI 2.0 form and allows common code to 
   work both ways.
 
 Arguments:
@@ -308,7 +308,7 @@ Routine Description:
   This was bad as Tiano did not own the enum. In UEFI 2.0 CreateEventEx was
   added and now it's possible to not voilate the UEFI specification and use 
   the ready to boot event class defined in UEFI 2.0. This library supports
-  the R8.5/EFI 1.10 form and R8.6/UEFI 2.0 form and allows common code to 
+  the EFI 1.10 form and UEFI 2.0 form and allows common code to 
   work both ways.
 
 Arguments:

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -16,9 +16,9 @@ Module Name:
   
 Abstract: 
 
-  This file is supposed to be used by a .dxe file. To write common .dxs file for R8.x 
-  and R9, a header file named AutoGen.h musted be present. In R8.x-GlueLib code base, 
-  this AutoGen.h plays the role as the AutoGen.h in R9. Here the AutoGen.h isn't auto-generated 
+  This file is supposed to be used by a .dxe file. To write common .dxs file for EDK
+  and EDKII, a header file named AutoGen.h musted be present. In EDK-GlueLib code base, 
+  this AutoGen.h plays the role as the AutoGen.h in EDKII. Here the AutoGen.h isn't auto-generated 
   by any tool.
 
 --*/

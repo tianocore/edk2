@@ -7,12 +7,12 @@ drivers/apps that may have used Device I/O.
 Device I/O is on list of deprecated protocols for UEFI 2.0 and later.
 This module module layers Device I/O on top of PCI Root Bridge I/O (Segment 0)
  Use if:
-   There are no R8.x modules present that produces Device I/O
+   There are no EDK modules present that produces Device I/O
    EFI drivers included that consume Device I/O
    Platform required to support EFI drivers that consume Device I/O
    Platform required to support EFI applications that consume Device I/O
 
-Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at

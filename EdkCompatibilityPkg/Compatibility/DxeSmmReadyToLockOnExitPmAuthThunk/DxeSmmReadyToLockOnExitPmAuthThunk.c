@@ -1,9 +1,9 @@
 /** @file
   DxeSmmReadyToLock Protocol on ExitPmAuth Protocol Thunk driver.
-  R8 platform uses ExitPmAuth point to lock SMRAM and SMM API.
-  But R9 uses DxeSmmReadyToLock. We need a thunk driver to convert this event.
+  EDK platform uses ExitPmAuth point to lock SMRAM and SMM API.
+  But EDKII uses DxeSmmReadyToLock. We need a thunk driver to convert this event.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -37,7 +37,7 @@ ExitPmAuthProtocolNotification (
 
   //
   // Add more check to locate protocol after got event, because
-  // R8 ECP will signal this event immediately once it is register
+  // ECP will signal this event immediately once it is register
   // just in case it is already installed.
   //
   Status = gBS->LocateProtocol (

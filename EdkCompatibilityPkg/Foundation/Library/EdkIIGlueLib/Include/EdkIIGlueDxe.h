@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -238,7 +238,7 @@ Abstract:
 #endif
 
 //
-// R8.x Library headers used by EdkII Glue Libraries
+// EDK Library headers used by EDKII Glue Libraries
 //
 #include "EfiDriverLib.h"
 #include "EfiCapsule.h"

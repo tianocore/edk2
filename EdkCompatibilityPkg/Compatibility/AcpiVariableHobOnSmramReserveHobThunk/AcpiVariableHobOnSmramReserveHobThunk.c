@@ -51,7 +51,7 @@ GetSrmamHobData (
 
 /**
   This routine will split SmramReserve hob to reserve 1 page for SMRAM content in S3 phase
-  for R9 SMM core.
+  for PI SMM core.
   
   @retval EFI_SUCCESS           The gEfiSmmPeiSmramMemoryReserveGuid is splited successfully.
   @retval EFI_NOT_FOUND         The gEfiSmmPeiSmramMemoryReserveGuid is not found.
@@ -108,7 +108,7 @@ SplitSmramReserveHob (
 
   ASSERT (SmramRanges >= 1);
   //
-  // Copy last entry to the end - we assume TSEG is last entry, which is same assumption as R8 CPU/SMM driver
+  // Copy last entry to the end - we assume TSEG is last entry, which is same assumption as Framework CPU/SMM driver
   //
   CopyMem (&NewDescriptorBlock->Descriptor[SmramRanges], &NewDescriptorBlock->Descriptor[SmramRanges - 1], sizeof(EFI_SMRAM_DESCRIPTOR));
 
@@ -126,7 +126,7 @@ SplitSmramReserveHob (
   NewDescriptorBlock->Descriptor[SmramRanges].PhysicalSize  -= EFI_PAGE_SIZE;
 
   //
-  // Now, we have created SmramReserve Hob for SmmAccess drive. But the issue is that, R8 SmmAccess will assume there is 2 SmramReserve region only.
+  // Now, we have created SmramReserve Hob for SmmAccess drive. But the issue is that, Framework SmmAccess will assume there is 2 SmramReserve region only.
   // Reporting 3 SmramReserve region will cause buffer overflow. Moreover, we would like to filter AB-SEG or H-SEG to avoid SMM cache-poisoning issue.
   // So we uses scan SmmReserve Hob to remove AB-SEG or H-SEG.
   //
@@ -170,7 +170,7 @@ SplitSmramReserveHob (
 
 /**
   This routine will create AcpiVariable hob to point the reserved smram in S3 phase
-  for R9 SMM core.
+  for PI SMM core.
   
   @retval EFI_SUCCESS           The gEfiAcpiVariableGuid is created successfully.
   @retval EFI_NOT_FOUND         The gEfiSmmPeiSmramMemoryReserveGuid is not found.
@@ -233,7 +233,7 @@ AcpiVariableHobEntry (
   EFI_STATUS              Status;
 
   //
-  // Split SmramReserve hob, which is required for R9 SMM Core for S3.
+  // Split SmramReserve hob, which is required for PI SMM Core for S3.
   //
   Status = SplitSmramReserveHob ();
   if (EFI_ERROR (Status)) {
@@ -241,7 +241,7 @@ AcpiVariableHobEntry (
   }
 
   //
-  // Create AcpiVariable hob, which is required for R9 SMM Core for S3.
+  // Create AcpiVariable hob, which is required for PI SMM Core for S3.
   //
   Status = CreateAcpiVariableHob ();
 

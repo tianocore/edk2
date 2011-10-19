@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -49,7 +49,7 @@ Abstract:
 #include "EdkIIGlueProcessorBind.h"
 
 //
-// Some Status Code data type definitions are in TianoSpecTypes.h in R8.5
+// Some Status Code data type definitions are in TianoSpecTypes.h in EDK
 //
 #if (TIANO_RELEASE_VERSION <= 0x00080005)
 #include "TianoSpecTypes.h"
@@ -57,7 +57,7 @@ Abstract:
 #include "EfiStatusCode.h"
 
 //
-// R8.x Library headers used by EdkII Glue Libraries
+// EDK Library headers used by EdkII Glue Libraries
 //
 #include "LinkedList.h"
 #include "EfiCommonLib.h"

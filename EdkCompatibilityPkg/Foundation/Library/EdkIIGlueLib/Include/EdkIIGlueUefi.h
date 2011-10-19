@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -142,7 +142,7 @@ Abstract:
 
 #if (TIANO_RELEASE_VERSION > 0x00080005) 
 //
-// Need due to R8.5 Tiano contamination of UEFI enumes. 
+// Need due to EDK Tiano contamination of UEFI enumes. 
 // There is a UEFI library that does things the new way and the old way
 // This is why these definitions are need in Uefi.h
 //
@@ -151,7 +151,7 @@ Abstract:
 #endif
 
 //
-// R8.x Library headers used by EdkII Glue Libraries
+// EDK Library headers used by EdkII Glue Libraries
 //
 #include "TianoSpecTypes.h"
 #include "TianoSpecApi.h"

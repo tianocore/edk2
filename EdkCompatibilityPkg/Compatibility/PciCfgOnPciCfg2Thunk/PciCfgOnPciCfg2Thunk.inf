@@ -7,7 +7,7 @@
 # This module produces PciCfgPpi on top of PciCfgPpi2. This module is used on platform when both of
 # these two conditions are true:
 # 1) Framework module is present that consumes PCI CFG  AND
-# 2) R9 module is present that produces PCI CFG2 but not PCI CFG
+# 2) EDKII module is present that produces PCI CFG2 but not PCI CFG
 #
 # The Usage of this module is rare since EDK II module IntelFrameworkModulePkg\Universal\PcatSingleSegmentPciCfgPei\PcatSingleSegmentPciCfgPei.inf
 # that produce PCI CFG2 can also produce PCI CFG by setting Pcd Feature Flag gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfgDisable
