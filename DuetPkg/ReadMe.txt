@@ -59,7 +59,7 @@ B. Build DUET image on Linux Platform
 	To build DUET image, Mingw GCC is required:
 	
 		1).  Check out build tools project from svn repository: https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools
-		2).  Assume check out directory is /R9/BaseTools, enter /R9/BaseTools/gcc directory. Please refer to README.txt install all the necessary
+		2).  Assume check out directory is /EDKII/BaseTools, enter /EDKII/BaseTools/gcc directory. Please refer to README.txt install all the necessary
 			 build packages following:
 			 * Python 2.5
 			 * texinfo
@@ -71,9 +71,9 @@ B. Build DUET image on Linux Platform
              
 		3).  Run mingw-gcc-install.py from gcc folder, this script will download/build/install MingwGCC and BinUtil automatically
 		4).  Create symbol link in linux environment at /opt to match default setting in tools_def.txt
-			 "ln -s /R9/BaseTools/gcc/symlinks/ar   /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/ar"
-			 "ln -s /R9/BaseTools/gcc/symlinks/gcc  /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/gcc"
-			 "ln -s /R9/BaseTools/gcc/symlinks/ld   /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/ld"
+			 "ln -s /EDKII/BaseTools/gcc/symlinks/ar   /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/ar"
+			 "ln -s /EDKII/BaseTools/gcc/symlinks/gcc  /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/gcc"
+			 "ln -s /EDKII/BaseTools/gcc/symlinks/ld   /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/ld"
 		
 	
 2. Build steps
