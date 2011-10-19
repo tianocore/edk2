@@ -57,6 +57,8 @@ LegacyBiosInt86 (
   IN  EFI_IA32_REGISTER_SET         *Regs
   )
 {
+  UINT32  *VectorBase;
+
   Regs->X.Flags.Reserved1 = 1;
   Regs->X.Flags.Reserved2 = 0;
   Regs->X.Flags.Reserved3 = 0;
@@ -66,11 +68,16 @@ LegacyBiosInt86 (
   Regs->X.Flags.IF        = 0;
   Regs->X.Flags.TF        = 0;
   Regs->X.Flags.CF        = 0;
-
+  //
+  // The base address of legacy interrupt vector table is 0.
+  // We use this base address to get the legacy interrupt handler.
+  //
+  VectorBase              = 0;
+  
   return InternalLegacyBiosFarCall (
            This,
-           (UINT16) (((UINT32 *)NULL)[BiosInt] >> 16),
-           (UINT16) ((UINT32 *)NULL)[BiosInt],
+           (UINT16) ((VectorBase)[BiosInt] >> 16),
+           (UINT16) (VectorBase)[BiosInt],
            Regs,
            &Regs->X.Flags,
            sizeof (Regs->X.Flags)
