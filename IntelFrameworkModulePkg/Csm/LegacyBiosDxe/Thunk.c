@@ -315,14 +315,14 @@ InternalLegacyBiosFarCall (
   mThunkContext.RealModeState = NULL;
 
   //
-  // End critical section
-  //
-  gBS->RestoreTPL (OriginalTpl);
-
-  //
   // Enable and restore rate of DXE Timer
   //
   Private->Timer->SetTimerPeriod (Private->Timer, TimerPeriod);
+
+  //
+  // End critical section
+  //
+  gBS->RestoreTPL (OriginalTpl);
   
   //
   // Restore interrupt of debug timer
