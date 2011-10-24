@@ -3,14 +3,17 @@
 #
 # Timer Library that only uses CPU resources to provide calibrated delays
 #  on IA-32, x64, and IPF.
-# Note: Because CPU Local APIC and ITC could be programmed by OS, it cannot be
+# Note: A driver of type DXE_RUNTIME_DRIVER and DXE_SMM_DRIVER can use this TimerLib 
+#  in their initialization without any issues. They only have to be careful in 
+#  the implementation of runtime services and SMI handlers.  
+#  Because CPU Local APIC and ITC could be programmed by OS, it cannot be
 #  used by SMM drivers and runtime drivers, ACPI timer is recommended for SMM
 #  drivers and runtime drivers.
 #
 # Note that for IA-32 and x64, this library only supports xAPIC mode. If x2APIC
 # support is desired, the SecPeiDxeTimerLibUefiCpu library can be used.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -28,7 +31,7 @@
   FILE_GUID                      = b5a05743-9b71-489b-a0ed-a0eb3950d23b
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = TimerLib|BASE DXE_CORE DXE_DRIVER DXE_SAL_DRIVER PEIM PEI_CORE SEC UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = TimerLib
 
 
 #
