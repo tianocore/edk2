@@ -30,7 +30,9 @@ Abstract:
 
 #include "SecMain.h"
 
-
+#ifndef SE_TIME_ZONE_NAME
+#define SE_TIME_ZONE_NAME                 TEXT("SeTimeZonePrivilege")
+#endif
 
 NT_PEI_LOAD_FILE_PPI                      mSecNtLoadFilePpi     = { SecWinNtPeiLoadFile };
 
@@ -155,6 +157,8 @@ Returns:
 --*/
 {
   EFI_STATUS            Status;
+  HANDLE                Token;
+  TOKEN_PRIVILEGES      TokenPrivileges;
   EFI_PHYSICAL_ADDRESS  InitialStackMemory;
   UINT64                InitialStackMemorySize;
   UINTN                 Index;
@@ -167,6 +171,16 @@ Returns:
   CHAR16                *MemorySizeStr;
   CHAR16                *FirmwareVolumesStr;
   UINTN                 *StackPointer;
+
+  //
+  // Enable the privilege so that RTC driver can successfully run SetTime()
+  //
+  OpenProcessToken (GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY, &Token);
+  if (LookupPrivilegeValue(NULL, SE_TIME_ZONE_NAME, &TokenPrivileges.Privileges[0].Luid)) {
+    TokenPrivileges.PrivilegeCount = 1;
+    TokenPrivileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+    AdjustTokenPrivileges(Token, FALSE, &TokenPrivileges, 0, (PTOKEN_PRIVILEGES) NULL, 0);
+  }
 
   MemorySizeStr      = (CHAR16 *) PcdGetPtr (PcdWinNtMemorySizeForSecMain);
   FirmwareVolumesStr = (CHAR16 *) PcdGetPtr (PcdWinNtFirmwareVolume);

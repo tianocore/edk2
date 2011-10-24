@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -109,7 +109,7 @@ Returns:
 
   Time->Daylight = 0;
   if (TimeZone.StandardDate.wMonth) {
-    Time->Daylight = EFI_TIME_ADJUST_DAYLIGHT;
+    Time->Daylight = (UINT8) TimeZone.StandardDate.wMonth;
   }
 
   return EFI_SUCCESS;
@@ -162,7 +162,10 @@ Returns:
   gWinNt->GetTimeZoneInformation (&TimeZone);
   TimeZone.StandardDate.wMonth  = Time->Daylight;
   TimeZone.Bias                 = Time->TimeZone;
-  gWinNt->SetTimeZoneInformation (&TimeZone);
+  Flag = gWinNt->SetTimeZoneInformation (&TimeZone);
+  if (!Flag) {
+    return EFI_DEVICE_ERROR;
+  }
 
   SystemTime.wYear          = Time->Year;
   SystemTime.wMonth         = Time->Month;

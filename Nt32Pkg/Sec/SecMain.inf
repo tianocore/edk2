@@ -62,7 +62,7 @@
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume
   
 [BuildOptions]
-  MSFT:*_*_IA32_DLINK_FLAGS == /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib
+  MSFT:*_*_IA32_DLINK_FLAGS == /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib
   MSFT:*_*_IA32_CC_FLAGS == /nologo /W4 /WX /Gy /c /D UNICODE /Od /FIAutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
   MSFT:*_*_IA32_PP_FLAGS == /nologo /E /TC /FIAutoGen.h
   MSFT:*_*_IA32_ASM_FLAGS == /nologo /W3 /WX /c /coff /Cx /Zd /W0 /Zi
