@@ -655,21 +655,22 @@ BdsLibBootViaBootOption (
   }
 
   //
-  // Expand USB Class or USB WWID drive path node to full device path.
-  //
-  ImageHandle = BdsExpandUsbShortFormDevicePath (DevicePath);
-
-  //
   // Signal the EVT_SIGNAL_READY_TO_BOOT event
   //
   EfiSignalEventReadyToBoot();
+
+  //
+  // Expand USB Class or USB WWID device path node to be full device path of a USB
+  // device in platform then load the boot file on this full device path and get the
+  // image handle.
+  //
+  ImageHandle = BdsExpandUsbShortFormDevicePath (DevicePath);
 
   //
   // Adjust the different type memory page number just before booting
   // and save the updated info into the variable for next boot to use
   //
   BdsSetMemoryTypeInformationVariable ();
-
 
   //
   // Set Boot Current
