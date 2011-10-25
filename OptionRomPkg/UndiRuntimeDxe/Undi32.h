@@ -1,7 +1,7 @@
 /** @file
   EFI internal structures for the EFI UNDI driver.
 
-Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -70,18 +70,6 @@ typedef struct {
   UINT16 state;
   VOID (*api_ptr)();
 } UNDI_CALL_TABLE;
-
-typedef struct {
-  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL *InterfacePointer;
-  EFI_DEVICE_PATH_PROTOCOL                  *DevicePathPointer;
-} NII_ENTRY;
-
-typedef struct NII_CONFIG_ENTRY {
-  UINT32                   NumEntries;
-  UINT32                   Reserved;              // padding for alignment
-  struct NII_CONFIG_ENTRY  *NextLink;
-  NII_ENTRY                NiiEntry[1];
-} NII_TABLE;
 
 typedef VOID (*ptr)(VOID);
 typedef VOID (*bsptr_30)(UINTN);

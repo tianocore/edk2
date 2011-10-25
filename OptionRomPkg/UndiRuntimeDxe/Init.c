@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 PXE_SW_UNDI             *pxe_31 = NULL;  // 3.1 entry
 UNDI32_DEV              *UNDI32DeviceList[MAX_NIC_INTERFACES];
-NII_TABLE               *UndiDataPointer = NULL;
+UNDI_CONFIG_TABLE       *UndiDataPointer = NULL;
 
 //
 // UNDI Class Driver Global Variables
@@ -470,7 +470,7 @@ UndiDriverStart (
     goto UndiErrorDeleteDevicePath;
   }
 
-  Len = (pxe_31->IFcnt * sizeof (NII_ENTRY)) + sizeof (UndiDataPointer);
+  Len = (pxe_31->IFcnt * sizeof (UndiDataPointer->NII_entry)) + sizeof (UndiDataPointer);
   Status = gBS->AllocatePool (EfiRuntimeServicesData, Len, (VOID **) &UndiDataPointer);
 
   if (EFI_ERROR (Status)) {
@@ -935,9 +935,9 @@ InstallConfigTable (
 {
   EFI_STATUS              Status;
   EFI_CONFIGURATION_TABLE *CfgPtr;
-  NII_TABLE               *TmpData;
+  UNDI_CONFIG_TABLE       *TmpData;
   UINT16                  Index;
-  NII_TABLE               *UndiData;
+  UNDI_CONFIG_TABLE       *UndiData;
 
   if (pxe_31 == NULL) {
     return EFI_SUCCESS;
@@ -947,14 +947,14 @@ InstallConfigTable (
     return EFI_SUCCESS;
   }
 
-  UndiData = (NII_TABLE *)UndiDataPointer;
+  UndiData = (UNDI_CONFIG_TABLE *)UndiDataPointer;
 
-  UndiData->NumEntries  = pxe_31->IFcnt;
-  UndiData->NextLink    = NULL;
+  UndiData->NumberOfInterfaces  = pxe_31->IFcnt;
+  UndiData->nextlink            = NULL;
 
   for (Index = 0; Index < pxe_31->IFcnt; Index++) {
-    UndiData->NiiEntry[Index].InterfacePointer  = &UNDI32DeviceList[Index]->NIIProtocol_31;
-    UndiData->NiiEntry[Index].DevicePathPointer = UNDI32DeviceList[Index]->Undi32DevPath;
+    UndiData->NII_entry[Index].NII_InterfacePointer = &UNDI32DeviceList[Index]->NIIProtocol_31;
+    UndiData->NII_entry[Index].DevicePathPointer    = UNDI32DeviceList[Index]->Undi32DevPath;
   }
 
   //
@@ -975,21 +975,21 @@ InstallConfigTable (
   }
 
   if (Index < gST->NumberOfTableEntries) {
-    TmpData = (NII_TABLE *) CfgPtr->VendorTable;
+    TmpData = (UNDI_CONFIG_TABLE *) CfgPtr->VendorTable;
 
     //
     // go to the last link
     //
-    while (TmpData->NextLink != NULL) {
-      TmpData = TmpData->NextLink;
+    while (TmpData->nextlink != NULL) {
+      TmpData = TmpData->nextlink;
     }
 
-    TmpData->NextLink = UndiData;
+    TmpData->nextlink = UndiData;
 
     //
     // 1st one in chain
     //
-    UndiData = (NII_TABLE *) CfgPtr->VendorTable;
+    UndiData = (UNDI_CONFIG_TABLE *) CfgPtr->VendorTable;
   }
 
   //
