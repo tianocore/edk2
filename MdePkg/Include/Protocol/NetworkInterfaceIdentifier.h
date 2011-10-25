@@ -1,7 +1,7 @@
 /** @file
   EFI Network Interface Identifier Protocol.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -84,6 +84,29 @@ struct _EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL {
 typedef enum {
   EfiNetworkInterfaceUndi = 1
 } EFI_NETWORK_INTERFACE_TYPE;
+
+///
+/// Forward reference for pure ANSI compatability.
+///
+typedef struct undiconfig_table  UNDI_CONFIG_TABLE;
+
+///
+/// The format of the configuration table for UNDI
+///
+struct undiconfig_table {
+  UINT32             NumberOfInterfaces;    ///< The number of NIC devices
+                                            ///< that this UNDI controls.
+  UINT32             reserved;
+  UNDI_CONFIG_TABLE  *nextlink;             ///< A pointer to the next UNDI
+                                            ///< configuration table.
+  ///
+  /// The length of this array is given in the NumberOfInterfaces field.
+  ///
+  struct {
+    VOID             *NII_InterfacePointer; ///< Pointer to the NII interface structure.
+    VOID             *DevicePathPointer;    ///< Pointer to the device path for this NIC.
+  } NII_entry[1]; 
+};
 
 extern EFI_GUID gEfiNetworkInterfaceIdentifierProtocolGuid;
 extern EFI_GUID gEfiNetworkInterfaceIdentifierProtocolGuid_31;
