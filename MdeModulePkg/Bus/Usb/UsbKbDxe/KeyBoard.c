@@ -1689,18 +1689,6 @@ UsbKeyCodeToEfiInputKey (
     }
   }
 
-  //
-  // Translate the CTRL-Alpha characters to their corresponding control value
-  // (ctrl-a = 0x0001 through ctrl-Z = 0x001A)
-  //
-  if (UsbKeyboardDevice->CtrlOn) {
-    if (KeyData->Key.UnicodeChar >= 'a' && KeyData->Key.UnicodeChar <= 'z') {
-      KeyData->Key.UnicodeChar = (UINT8) (KeyData->Key.UnicodeChar - 'a' + 1);
-    } else if (KeyData->Key.UnicodeChar >= 'A' && KeyData->Key.UnicodeChar <= 'Z') {
-      KeyData->Key.UnicodeChar = (UINT8) (KeyData->Key.UnicodeChar - 'A' + 1);
-    }
-  }
-
   return EFI_SUCCESS;
 }
 

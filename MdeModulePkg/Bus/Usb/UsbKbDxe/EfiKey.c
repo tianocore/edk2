@@ -692,6 +692,18 @@ USBKeyboardReadKeyStroke (
     if (KeyData.Key.ScanCode == CHAR_NULL && KeyData.Key.UnicodeChar == SCAN_NULL) {
       continue;
     }
+    //
+    // Translate the CTRL-Alpha characters to their corresponding control value
+    // (ctrl-a = 0x0001 through ctrl-Z = 0x001A)
+    //
+    if ((KeyData.KeyState.KeyShiftState & (EFI_LEFT_CONTROL_PRESSED | EFI_RIGHT_CONTROL_PRESSED)) != 0) {
+      if (KeyData.Key.UnicodeChar >= L'a' && KeyData.Key.UnicodeChar <= L'z') {
+        KeyData.Key.UnicodeChar = (CHAR16) (KeyData.Key.UnicodeChar - L'a' + 1);
+      } else if (KeyData.Key.UnicodeChar >= L'A' && KeyData.Key.UnicodeChar <= L'Z') {
+        KeyData.Key.UnicodeChar = (CHAR16) (KeyData.Key.UnicodeChar - L'A' + 1);
+      }
+    }
+
     CopyMem (Key, &KeyData.Key, sizeof (EFI_INPUT_KEY));
     return EFI_SUCCESS;
   }
