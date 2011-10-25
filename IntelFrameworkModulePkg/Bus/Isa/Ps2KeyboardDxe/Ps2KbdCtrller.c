@@ -1470,17 +1470,6 @@ KeyGetchar (
     }
   }
 
-  //
-  // Translate the CTRL-Alpha characters to their corresponding control value (ctrl-a = 0x0001 through ctrl-Z = 0x001A)
-  //
-  if (ConsoleIn->LeftCtrl || ConsoleIn->RightCtrl) {
-    if (KeyData.Key.UnicodeChar >= L'a' && KeyData.Key.UnicodeChar <= L'z') {
-      KeyData.Key.UnicodeChar = (UINT16) (KeyData.Key.UnicodeChar - L'a' + 1);
-    } else if (KeyData.Key.UnicodeChar >= L'A' && KeyData.Key.UnicodeChar <= L'Z') {
-      KeyData.Key.UnicodeChar = (UINT16) (KeyData.Key.UnicodeChar - L'A' + 1);
-    }
-  }
-
   PushEfikeyBufTail (&ConsoleIn->EfiKeyQueue, &KeyData);
 }
 
