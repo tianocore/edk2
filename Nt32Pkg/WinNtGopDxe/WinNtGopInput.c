@@ -362,16 +362,6 @@ GopPrivateAddKey (
 
   GopPrivateAddQ (Private, &Private->QueueForNotify, &KeyData);
 
-  //
-  // Convert Ctrl+[A-Z] to Ctrl+[1-26]
-  //
-  if (Private->LeftCtrl || Private->RightCtrl) {
-    if ((KeyData.Key.UnicodeChar >= L'a') && (KeyData.Key.UnicodeChar <= L'z')) {
-      KeyData.Key.UnicodeChar = (CHAR16)(KeyData.Key.UnicodeChar - L'a' + 1);
-    } else if ((KeyData.Key.UnicodeChar >= L'A') && (KeyData.Key.UnicodeChar <= L'Z')) {
-      KeyData.Key.UnicodeChar = (CHAR16)(KeyData.Key.UnicodeChar - L'A' + 1);
-    }
-  }
   GopPrivateAddQ (Private, &Private->QueueForRead, &KeyData);
 
   return EFI_SUCCESS;
@@ -604,6 +594,16 @@ WinNtGopSimpleTextInReadKeyStroke (
     }
     if (KeyData.Key.ScanCode == SCAN_NULL && KeyData.Key.UnicodeChar == CHAR_NULL) {
       continue;
+    }
+    //
+    // Convert Ctrl+[A-Z] to Ctrl+[1-26]
+    //
+    if ((KeyData.KeyState.KeyShiftState & (EFI_LEFT_CONTROL_PRESSED | EFI_RIGHT_CONTROL_PRESSED)) != 0) {
+      if ((KeyData.Key.UnicodeChar >= L'a') && (KeyData.Key.UnicodeChar <= L'z')) {
+        KeyData.Key.UnicodeChar = (CHAR16) (KeyData.Key.UnicodeChar - L'a' + 1);
+      } else if ((KeyData.Key.UnicodeChar >= L'A') && (KeyData.Key.UnicodeChar <= L'Z')) {
+        KeyData.Key.UnicodeChar = (CHAR16) (KeyData.Key.UnicodeChar - L'A' + 1);
+      }
     }
     CopyMem (Key, &KeyData.Key, sizeof (EFI_INPUT_KEY));
     return EFI_SUCCESS;
