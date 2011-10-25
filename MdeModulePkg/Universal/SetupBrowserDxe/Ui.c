@@ -1308,16 +1308,12 @@ GetLineByWidth (
 
   @param  Selection              The user's selection.
   @param  MenuOption             The MenuOption to be checked.
-  @param  OptionalString         The option string.
-  @param  SkipValue              The number of lins to skip.
 
 **/
 VOID
 UpdateOptionSkipLines (
   IN UI_MENU_SELECTION            *Selection,
-  IN UI_MENU_OPTION               *MenuOption,
-  OUT CHAR16                       **OptionalString,
-  IN UINTN                        SkipValue
+  IN UI_MENU_OPTION               *MenuOption
   )
 {
   UINTN   Index;
@@ -1328,9 +1324,7 @@ UpdateOptionSkipLines (
   CHAR16  *OptionString;
 
   Row           = 0;
-  OptionString  = *OptionalString;
-  OutputString  = NULL;
-
+  OptionString  = NULL;
   ProcessOptions (Selection, MenuOption, FALSE, &OptionString);
 
   if (OptionString != NULL) {
@@ -1343,31 +1337,28 @@ UpdateOptionSkipLines (
       // If there is more string to process print on the next row and increment the Skip value
       //
       if (StrLen (&OptionString[Index]) != 0) {
-        if (SkipValue == 0) {
-          Row++;
-          //
-          // Since the Number of lines for this menu entry may or may not be reflected accurately
-          // since the prompt might be 1 lines and option might be many, and vice versa, we need to do
-          // some testing to ensure we are keeping this in-sync.
-          //
-          // If the difference in rows is greater than or equal to the skip value, increase the skip value
-          //
-          if ((Row - OriginalRow) >= MenuOption->Skip) {
-            MenuOption->Skip++;
-          }
+        Row++;
+        //
+        // Since the Number of lines for this menu entry may or may not be reflected accurately
+        // since the prompt might be 1 lines and option might be many, and vice versa, we need to do
+        // some testing to ensure we are keeping this in-sync.
+        //
+        // If the difference in rows is greater than or equal to the skip value, increase the skip value
+        //
+        if ((Row - OriginalRow) >= MenuOption->Skip) {
+          MenuOption->Skip++;
         }
       }
 
       FreePool (OutputString);
-      if (SkipValue != 0) {
-        SkipValue--;
-      }
     }
 
     Row = OriginalRow;
   }
 
-  *OptionalString = OptionString;
+  if (OptionString != NULL) {
+    FreePool (OptionString);
+  }
 }
 
 
@@ -1431,6 +1422,7 @@ ValueIsScroll (
 
   This is an internal function.
 
+  @param  Selection              Menu selection.
   @param  GoUp                   The navigation direction. TRUE: up, FALSE: down.
   @param  CurrentPosition        Current position.
   @param  GapToTop               Gap position to top or bottom.
@@ -1440,6 +1432,7 @@ ValueIsScroll (
 **/
 INTN
 MoveToNextStatement (
+  IN     UI_MENU_SELECTION         *Selection,
   IN     BOOLEAN                   GoUp,
   IN OUT LIST_ENTRY                **CurrentPosition,
   IN     UINTN                     GapToTop
@@ -1456,6 +1449,10 @@ MoveToNextStatement (
 
   while (TRUE) {
     NextMenuOption = MENU_OPTION_FROM_LINK (Pos);
+    if (NextMenuOption->Row == 0) {
+      UpdateOptionSkipLines (Selection, NextMenuOption);
+    }
+    
     if (GoUp && (PreMenuOption != NextMenuOption)) {
       //
       // Current Position doesn't need to be caculated when go up.
@@ -2324,7 +2321,7 @@ UiDisplayMenu (
       ControlFlag = CfUpdateHelpString;
       if (InitializedFlag) {
         InitializedFlag = FALSE;
-        MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+        MoveToNextStatement (Selection, FALSE, &NewPos, BottomRow - TopRow);
       }
 
       //
@@ -2353,20 +2350,45 @@ UiDisplayMenu (
           for (Index = TopRow; Index <= BottomRow && Link != NewPos;) {
             SavedMenuOption = MENU_OPTION_FROM_LINK (Link);
             Index += SavedMenuOption->Skip;
+            if (Link == TopOfScreen) {
+              Index -= OldSkipValue;
+            }
             Link = Link->ForwardLink;
           }
+          if (NewPos == Link) {
+            SavedMenuOption = MENU_OPTION_FROM_LINK (Link);
+          }
 
-          if (Link != NewPos || Index > BottomRow) {
+          if (Link != NewPos || Index > BottomRow || (Link == NewPos && SavedMenuOption->Row + SavedMenuOption->Skip - 1 > BottomRow)) {
             //
             // NewPos is not in the current page, simply scroll page so that NewPos is in the end of the page
             //
+            SavedMenuOption = MENU_OPTION_FROM_LINK (NewPos);
+            //
+            // SavedMenuOption->Row == 0 means the menu not show yet.
+            //
+            if (SavedMenuOption->Row == 0) {
+              UpdateOptionSkipLines (Selection, SavedMenuOption);
+            }
+            
             Link    = NewPos;
-            for (Index = TopRow; Index <= BottomRow; ) {
+            for (Index = TopRow + SavedMenuOption->Skip; Index <= BottomRow + 1; ) {            
               Link = Link->BackLink;
               SavedMenuOption = MENU_OPTION_FROM_LINK (Link);
+              if (SavedMenuOption->Row == 0) {
+                UpdateOptionSkipLines (Selection, SavedMenuOption);
+              }
               Index     += SavedMenuOption->Skip;
             }
-            TopOfScreen     = Link->ForwardLink;
+            
+            SkipValue = Index - BottomRow - 1;
+            if (SkipValue > 0 && SkipValue < (INTN) SavedMenuOption->Skip) {
+              TopOfScreen     = Link;
+              OldSkipValue    = SkipValue;
+            } else {
+              SkipValue       = 0;
+              TopOfScreen     = Link->ForwardLink;
+            }
 
             Repaint = TRUE;
             NewLine = TRUE;
@@ -2899,10 +2921,13 @@ UiDisplayMenu (
         NewPos     = NewPos->BackLink;
 
         PreviousMenuOption = MENU_OPTION_FROM_LINK (NewPos);
+        if (PreviousMenuOption->Row == 0) {
+          UpdateOptionSkipLines (Selection, PreviousMenuOption);
+        }
         DistanceValue = PreviousMenuOption->Skip;
         Difference    = 0;
         if (MenuOption->Row >= DistanceValue + TopRow) {
-          Difference = MoveToNextStatement (TRUE, &NewPos, MenuOption->Row - TopRow - DistanceValue);
+          Difference = MoveToNextStatement (Selection, TRUE, &NewPos, MenuOption->Row - TopRow - DistanceValue);
         }
         NextMenuOption = MENU_OPTION_FROM_LINK (NewPos);
        
@@ -2977,6 +3002,9 @@ UiDisplayMenu (
       while ((Index >= TopRow) && (Link->BackLink != &gMenuOption)) {
         Link = Link->BackLink;
         PreviousMenuOption = MENU_OPTION_FROM_LINK (Link);
+        if (PreviousMenuOption->Row == 0) {
+          UpdateOptionSkipLines (Selection, PreviousMenuOption);
+        }        
         if (Index < PreviousMenuOption->Skip) {
           Index = 0;
           break;
@@ -2988,19 +3016,19 @@ UiDisplayMenu (
         if (TopOfScreen == &gMenuOption) {
           TopOfScreen = gMenuOption.ForwardLink;
           NewPos      = gMenuOption.BackLink;
-          MoveToNextStatement (TRUE, &NewPos, BottomRow - TopRow);
+          MoveToNextStatement (Selection, TRUE, &NewPos, BottomRow - TopRow);
           Repaint = FALSE;
         } else if (TopOfScreen != Link) {
           TopOfScreen = Link;
           NewPos      = Link;
-          MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+          MoveToNextStatement (Selection, FALSE, &NewPos, BottomRow - TopRow);
         } else {
           //
           // Finally we know that NewPos is the last MenuOption can be focused.
           //
           Repaint = FALSE;
           NewPos  = Link;
-          MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+          MoveToNextStatement (Selection, FALSE, &NewPos, BottomRow - TopRow);
         }
       } else {
         if (Index + 1 < TopRow) {
@@ -3015,10 +3043,10 @@ UiDisplayMenu (
         //
         if (TopOfScreen == &gMenuOption) {
           NewPos = gMenuOption.BackLink;
-          MoveToNextStatement (TRUE, &NewPos, BottomRow - TopRow);
+          MoveToNextStatement (Selection, TRUE, &NewPos, BottomRow - TopRow);
         } else {
           NewPos = Link;
-          MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+          MoveToNextStatement (Selection, FALSE, &NewPos, BottomRow - TopRow);
         }
 
         //
@@ -3062,7 +3090,7 @@ UiDisplayMenu (
         // Finally we know that NewPos is the last MenuOption can be focused.
         //
         Repaint = FALSE;
-        MoveToNextStatement (TRUE, &Link, Index - TopRow);
+        MoveToNextStatement (Selection, TRUE, &Link, Index - TopRow);
       } else {
         if (Index - 1 > BottomRow) {
           //
@@ -3078,7 +3106,7 @@ UiDisplayMenu (
         //
         // Move to the option in Next page.
         //
-        MoveToNextStatement (FALSE, &Link, BottomRow - TopRow);
+        MoveToNextStatement (Selection, FALSE, &Link, BottomRow - TopRow);
       }
 
       //
@@ -3110,7 +3138,7 @@ UiDisplayMenu (
 
         Difference      = 0;
         if (BottomRow >= MenuOption->Row + MenuOption->Skip) {
-          Difference    = MoveToNextStatement (FALSE, &NewPos, BottomRow - MenuOption->Row - MenuOption->Skip);
+          Difference    = MoveToNextStatement (Selection, FALSE, &NewPos, BottomRow - MenuOption->Row - MenuOption->Skip);
           //
           // We hit the end of MenuOption that can be focused
           // so we simply scroll to the first page.
@@ -3127,7 +3155,7 @@ UiDisplayMenu (
               MenuOption = MENU_OPTION_FROM_LINK (SavedListEntry);
             }
             NewPos        = gMenuOption.ForwardLink;
-            MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+            MoveToNextStatement (Selection, FALSE, &NewPos, BottomRow - TopRow);
     
             //
             // If we are at the end of the list and sitting on a Date/Time op, rewind to the head.
@@ -3142,7 +3170,7 @@ UiDisplayMenu (
         //
         // An option might be multi-line, so we need to reflect that data in the overall skip value
         //
-        UpdateOptionSkipLines (Selection, NextMenuOption, &OptionString, (UINTN) SkipValue);
+        UpdateOptionSkipLines (Selection, NextMenuOption);
         DistanceValue  = Difference + NextMenuOption->Skip;
 
         Temp = MenuOption->Row + MenuOption->Skip + DistanceValue - 1;
@@ -3259,7 +3287,7 @@ UiDisplayMenu (
         }
         NewLine       = TRUE;
         NewPos        = gMenuOption.ForwardLink;
-        MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+        MoveToNextStatement (Selection, FALSE, &NewPos, BottomRow - TopRow);
       }
 
       //
