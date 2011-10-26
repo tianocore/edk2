@@ -598,10 +598,21 @@ typedef struct {
   ///
   UINT16                          Protocol;
   ///
-  /// 0x00 - The Source IP Address was assigned though DHCP.
-  /// 0x01 - The Source IP Address is statically bound.
+  /// 0x00 - The Local IP Address was manually configured.
+  /// 0x01 - The Local IP Address is assigned through IPv6
+  /// stateless auto-configuration.
+  /// 0x02 - The Local IP Address is assigned through IPv6
+  /// stateful configuration.
   ///
-  BOOLEAN                         StaticIpAddress;
+  UINT8                           IpAddressOrigin;
+  ///
+  /// The prefix length
+  ///
+  UINT8                           PrefixLength;
+  ///
+  /// The gateway IP address
+  ///
+  EFI_IPv6_ADDRESS                GatewayIpAddress;
 } IPv6_DEVICE_PATH;
 
 ///
@@ -749,6 +760,30 @@ typedef struct {
   ///
   UINT16                          RelativeTargetPort;
 } SAS_DEVICE_PATH;
+
+///
+/// Serial Attached SCSI (SAS) Ex Device Path SubType
+///
+#define MSG_SASEX_DP              0x16
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  ///
+  /// 8-byte array of the SAS Address for Serial Attached SCSI Target Port.
+  ///
+  UINT8                           SasAddress[8];
+  ///
+  /// 8-byte array of the SAS Logical Unit Number.
+  ///
+  UINT8                           Lun[8];
+  ///
+  /// More Information about the device and its interconnect.
+  ///
+  UINT16                          DeviceTopology;
+  ///
+  /// Relative Target Port (RTP).
+  ///
+  UINT16                          RelativeTargetPort;
+} SASEX_DEVICE_PATH;
 
 ///
 /// iSCSI Device Path SubType
@@ -1047,6 +1082,7 @@ typedef union {
   UART_DEVICE_PATH                           Uart;
   UART_FLOW_CONTROL_DEVICE_PATH              UartFlowControl;
   SAS_DEVICE_PATH                            Sas;
+  SASEX_DEVICE_PATH                          SasEx;
   HARDDRIVE_DEVICE_PATH                      HardDrive;
   CDROM_DEVICE_PATH                          CD;
 
@@ -1095,6 +1131,7 @@ typedef union {
   UART_DEVICE_PATH                           *Uart;
   UART_FLOW_CONTROL_DEVICE_PATH              *UartFlowControl;
   SAS_DEVICE_PATH                            *Sas;
+  SASEX_DEVICE_PATH                          *SasEx;
   HARDDRIVE_DEVICE_PATH                      *HardDrive;
   CDROM_DEVICE_PATH                          *CD;
 

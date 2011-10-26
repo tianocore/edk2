@@ -654,6 +654,66 @@ DevPathToTextFibreEx (
 }
 
 /**
+  Converts a Sas Ex device path structure to its string representative.
+
+  @param Str             The string representative of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
+VOID
+DevPathToTextSasEx (
+  IN OUT POOL_PRINT  *Str,
+  IN VOID            *DevPath,
+  IN BOOLEAN         DisplayOnly,
+  IN BOOLEAN         AllowShortcuts
+  )
+{
+  SASEX_DEVICE_PATH  *SasEx;
+  UINTN              Index;
+
+  SasEx = DevPath;
+  CatPrint (Str, L"SasEx(0x");
+
+  for (Index = 0; Index < sizeof (SasEx->SasAddress) / sizeof (SasEx->SasAddress[0]); Index++) {
+    CatPrint (Str, L"%02x", SasEx->SasAddress[Index]);
+  }
+  CatPrint (Str, L",0x");
+  for (Index = 0; Index < sizeof (SasEx->Lun) / sizeof (SasEx->Lun[0]); Index++) {
+    CatPrint (Str, L"%02x", SasEx->Lun[Index]);
+  }
+  CatPrint (Str, L",0x%x,", SasEx->RelativeTargetPort);
+
+  if ((SasEx->DeviceTopology & 0x0f) == 0) {
+    CatPrint (Str, L"NoTopology,0,0,0,");
+  } else if (((SasEx->DeviceTopology & 0x0f) == 1) || ((SasEx->DeviceTopology & 0x0f) == 2)) {
+    CatPrint (
+      Str,
+      L"%s,%s,%s,",
+      ((SasEx->DeviceTopology & (0x1 << 4)) != 0) ? L"SATA" : L"SAS",
+      ((SasEx->DeviceTopology & (0x1 << 5)) != 0) ? L"External" : L"Internal",
+      ((SasEx->DeviceTopology & (0x1 << 6)) != 0) ? L"Expanded" : L"Direct"
+      );
+    if ((SasEx->DeviceTopology & 0x0f) == 1) {
+      CatPrint (Str, L"0,");
+    } else {
+      CatPrint (Str, L"0x%x,", (SasEx->DeviceTopology >> 8) & 0xff);
+    }
+  } else {
+    CatPrint (Str, L"0,0,0,0,");
+  }
+
+  CatPrint (Str, L")");
+  return ;
+
+}
+
+/**
   Converts a 1394 device path structure to its string representative.
 
   @param Str             The string representative of input device.
@@ -1205,10 +1265,21 @@ DevPathToTextIPv6 (
     IPDevPath->Protocol
     );
 
+  switch (IPDevPath->IpAddressOrigin) {
+    case 0:
+      CatPrint (Str, L",Static");
+      break;
+    case 1:
+      CatPrint (Str, L",StatelessAutoConfigure");
+      break;
+    default:
+      CatPrint (Str, L",StatefulAutoConfigure");
+      break;
+  }
+
   CatPrint (
     Str,
-    L",%s,%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x)",
-    IPDevPath->StaticIpAddress ? L"Static" : L"DHCP",
+    L",%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x",
     IPDevPath->LocalIpAddress.Addr[0],
     IPDevPath->LocalIpAddress.Addr[1],
     IPDevPath->LocalIpAddress.Addr[2],
@@ -1226,6 +1297,31 @@ DevPathToTextIPv6 (
     IPDevPath->LocalIpAddress.Addr[14],
     IPDevPath->LocalIpAddress.Addr[15]
     );
+
+  if (DevicePathNodeLength (IPDevPath) == sizeof (IPv6_DEVICE_PATH)) {
+    CatPrint (
+      Str,
+      L",0x%x,%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x",
+      IPDevPath->PrefixLength,
+      IPDevPath->GatewayIpAddress.Addr[0],
+      IPDevPath->GatewayIpAddress.Addr[1],
+      IPDevPath->GatewayIpAddress.Addr[2],
+      IPDevPath->GatewayIpAddress.Addr[3],
+      IPDevPath->GatewayIpAddress.Addr[4],
+      IPDevPath->GatewayIpAddress.Addr[5],
+      IPDevPath->GatewayIpAddress.Addr[6],
+      IPDevPath->GatewayIpAddress.Addr[7],
+      IPDevPath->GatewayIpAddress.Addr[8],
+      IPDevPath->GatewayIpAddress.Addr[9],
+      IPDevPath->GatewayIpAddress.Addr[10],
+      IPDevPath->GatewayIpAddress.Addr[11],
+      IPDevPath->GatewayIpAddress.Addr[12],
+      IPDevPath->GatewayIpAddress.Addr[13],
+      IPDevPath->GatewayIpAddress.Addr[14],
+      IPDevPath->GatewayIpAddress.Addr[15]
+      );
+  }
+  CatPrint (Str, L")");
 }
 
 /**
@@ -1790,6 +1886,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED const DEVICE_PATH_TO_TEXT_TABLE DevPathToTextTable
   {MESSAGING_DEVICE_PATH, MSG_SCSI_DP, DevPathToTextScsi},
   {MESSAGING_DEVICE_PATH, MSG_FIBRECHANNEL_DP, DevPathToTextFibre},
   {MESSAGING_DEVICE_PATH, MSG_FIBRECHANNELEX_DP, DevPathToTextFibreEx},
+  {MESSAGING_DEVICE_PATH, MSG_SASEX_DP, DevPathToTextSasEx},
   {MESSAGING_DEVICE_PATH, MSG_1394_DP, DevPathToText1394},
   {MESSAGING_DEVICE_PATH, MSG_USB_DP, DevPathToTextUsb},
   {MESSAGING_DEVICE_PATH, MSG_USB_WWID_DP, DevPathToTextUsbWWID},

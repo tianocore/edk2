@@ -2578,7 +2578,6 @@ ON_EXIT:
 
   The header type of IPv4 device path node is MESSAGING_DEVICE_PATH.
   The header subtype of IPv4 device path node is MSG_IPv4_DP.
-  The length of the IPv4 device path node in bytes is 19.
   Get other info from parameters to make up the whole IPv4 device path node.
 
   @param[in, out]  Node                  Pointer to the IPv4 device path node.
@@ -2606,7 +2605,7 @@ NetLibCreateIPv4DPathNode (
 {
   Node->Header.Type    = MESSAGING_DEVICE_PATH;
   Node->Header.SubType = MSG_IPv4_DP;
-  SetDevicePathNodeLength (&Node->Header, 19);
+  SetDevicePathNodeLength (&Node->Header, sizeof (IPv4_DEVICE_PATH));
 
   CopyMem (&Node->LocalIpAddress, &LocalIp, sizeof (EFI_IPv4_ADDRESS));
   CopyMem (&Node->RemoteIpAddress, &RemoteIp, sizeof (EFI_IPv4_ADDRESS));
@@ -2621,6 +2620,14 @@ NetLibCreateIPv4DPathNode (
   } else {
     Node->StaticIpAddress = NetLibDefaultAddressIsStatic (Controller);
   }
+
+  //
+  // Set the Gateway IP address to default value 0:0:0:0.
+  // Set the Subnet mask to default value 255:255:255:0.
+  //
+  ZeroMem (&Node->GatewayIpAddress, sizeof (EFI_IPv4_ADDRESS));
+  SetMem (&Node->SubnetMask, sizeof (EFI_IPv4_ADDRESS), 0xff);
+  Node->SubnetMask.Addr[3] = 0;
 }
 
 /**
@@ -2662,7 +2669,14 @@ NetLibCreateIPv6DPathNode (
   Node->RemotePort = RemotePort;
 
   Node->Protocol        = Protocol;
-  Node->StaticIpAddress = FALSE;
+
+  //
+  // Set default value to IPAddressOrigin, PrefixLength.
+  // Set the Gateway IP address to unspecified address.
+  //
+  Node->IpAddressOrigin = 0;
+  Node->PrefixLength    = IP6_PREFIX_LENGTH;
+  ZeroMem (&Node->GatewayIpAddress, sizeof (EFI_IPv6_ADDRESS));
 }
 
 /**

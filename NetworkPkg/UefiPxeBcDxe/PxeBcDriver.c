@@ -949,7 +949,7 @@ PxeBcCreateIp6Children (
   ZeroMem (&Ip6Node, sizeof (IPv6_DEVICE_PATH));
   Ip6Node.Header.Type     = MESSAGING_DEVICE_PATH;
   Ip6Node.Header.SubType  = MSG_IPv6_DP;
-  Ip6Node.StaticIpAddress = FALSE;
+  Ip6Node.PrefixLength    = IP6_PREFIX_LENGTH;
 
   SetDevicePathNodeLength (&Ip6Node.Header, sizeof (Ip6Node));
 

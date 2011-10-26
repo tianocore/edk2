@@ -757,7 +757,19 @@ IScsiGetTcpConnDevicePath (
         ) {
 
       DPathNode->Ipv4.LocalPort       = 0;
-      DPathNode->Ipv4.StaticIpAddress = (BOOLEAN) (!Session->ConfigData.NvData.InitiatorInfoFromDhcp);
+      DPathNode->Ipv4.StaticIpAddress = 
+        (BOOLEAN) (!Session->ConfigData.NvData.InitiatorInfoFromDhcp);
+
+      IP4_COPY_ADDRESS (
+        &DPathNode->Ipv4.GatewayIpAddress,
+        &Session->ConfigData.NvData.Gateway
+        );
+
+      IP4_COPY_ADDRESS (
+        &DPathNode->Ipv4.SubnetMask,
+        &Session->ConfigData.NvData.SubnetMask
+        );
+
       break;
     }
 

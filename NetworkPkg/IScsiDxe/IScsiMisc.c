@@ -1287,11 +1287,25 @@ IScsiGetTcpConnDevicePath (
     if (DevicePathType (&DPathNode->DevPath) == MESSAGING_DEVICE_PATH) {
       if (!Conn->Ipv6Flag && DevicePathSubType (&DPathNode->DevPath) == MSG_IPv4_DP) {
         DPathNode->Ipv4.LocalPort       = 0;
-        DPathNode->Ipv4.StaticIpAddress = (BOOLEAN) !Session->ConfigData->SessionConfigData.InitiatorInfoFromDhcp;
+
+        DPathNode->Ipv4.StaticIpAddress = 
+          (BOOLEAN) (!Session->ConfigData->SessionConfigData.InitiatorInfoFromDhcp);
+
+        IP4_COPY_ADDRESS (
+          &DPathNode->Ipv4.GatewayIpAddress,
+          &Session->ConfigData->SessionConfigData.Gateway
+          );
+
+        IP4_COPY_ADDRESS (
+          &DPathNode->Ipv4.SubnetMask,
+          &Session->ConfigData->SessionConfigData.SubnetMask
+          );
         break;
       } else if (Conn->Ipv6Flag && DevicePathSubType (&DPathNode->DevPath) == MSG_IPv6_DP) {
         DPathNode->Ipv6.LocalPort       = 0;
-        DPathNode->Ipv6.StaticIpAddress = (BOOLEAN) !Session->ConfigData->SessionConfigData.InitiatorInfoFromDhcp;
+        DPathNode->Ipv6.IpAddressOrigin = 0;
+        DPathNode->Ipv6.PrefixLength    = IP6_PREFIX_LENGTH;
+        ZeroMem (&DPathNode->Ipv6.GatewayIpAddress, sizeof (EFI_IPv6_ADDRESS));
         break;
       }
     }

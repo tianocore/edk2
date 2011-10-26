@@ -61,6 +61,8 @@ typedef UINT16          TCP_PORTNO;
 #define  IP_VERSION_4          4
 #define  IP_VERSION_6          6
 
+#define  IP6_PREFIX_LENGTH     64
+
 #pragma pack(1)
 
 //

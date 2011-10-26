@@ -693,6 +693,14 @@ IScsiProcessLoginRsp (
 
   if ((Conn->CurrentStage == ISCSI_SECURITY_NEGOTIATION) && (Conn->CHAPStep == ISCSI_CHAP_INITIAL)) {
     //
+    // If the Login Request is a leading Login Request, the target MUST use
+    // the value presented in CmdSN as the target value for ExpCmdSN.
+    //
+    if ((Session->State == SESSION_STATE_FREE) && (Session->CmdSN != LoginRsp->ExpCmdSN)) {
+      return EFI_PROTOCOL_ERROR;
+    }
+
+    //
     // It's the initial Login Response, initialize the local ExpStatSN, MaxCmdSN
     // and ExpCmdSN.
     //

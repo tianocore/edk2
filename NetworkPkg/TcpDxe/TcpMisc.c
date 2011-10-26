@@ -1,7 +1,7 @@
 /** @file
   Misc support routines for TCP driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1244,6 +1244,8 @@ TcpInstallDevicePath (
       EFI_IP_PROTO_TCP,
       Tcb->UseDefaultAddr
       );
+
+    IP4_COPY_ADDRESS (&Ip4DPathNode.SubnetMask, &Tcb->SubnetMask);
 
     DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) &Ip4DPathNode;
   } else {
