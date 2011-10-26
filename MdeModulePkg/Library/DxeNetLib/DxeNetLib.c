@@ -2130,6 +2130,7 @@ NetLibGetMacAddress (
                     (VOID **) &Mnp
                     );
     if (EFI_ERROR (Status)) {
+      MnpSb->DestroyChild (MnpSb, MnpChildHandle);
       return Status;
     }
 
@@ -2138,6 +2139,7 @@ NetLibGetMacAddress (
     //
     Status = Mnp->GetModeData (Mnp, NULL, &SnpModeData);
     if (EFI_ERROR (Status)) {
+      MnpSb->DestroyChild (MnpSb, MnpChildHandle);
       return Status;
     }
     SnpMode = &SnpModeData;
