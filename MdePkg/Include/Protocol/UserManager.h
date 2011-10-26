@@ -514,7 +514,7 @@ EFI_STATUS
   This function changes user information.  If NULL is pointed to by UserInfo, then a new user 
   information record is created and its handle is returned in UserInfo. Otherwise, the existing one is 
   replaced.
-  If EFI_USER_INFO_IDENITTY_POLICY_RECORD is changed, it is the caller's responsibility to keep it to 
+  If EFI_USER_INFO_IDENTITY_POLICY_RECORD is changed, it is the caller's responsibility to keep it to 
   be synced with the information on credential providers.
   If EFI_USER_INFO_EXCLUSIVE is specified in Info and a user information record of the same 
   type already exists in the user profile, then EFI_ACCESS_DENIED will be returned and 
