@@ -1,7 +1,7 @@
 /** @file
   The functions to add a user profile.
     
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -239,7 +239,7 @@ SetIdentityPolicy (
 
   NewUserInfo->InfoType    = EFI_USER_INFO_IDENTITY_POLICY_RECORD;
   NewUserInfo->InfoAttribs = EFI_USER_INFO_STORAGE_PLATFORM_NV | 
-                             EFI_USER_INFO_PRIVATE | 
+                             EFI_USER_INFO_PUBLIC | 
                              EFI_USER_INFO_EXCLUSIVE;
   NewUserInfo->InfoSize    = sizeof (EFI_USER_INFO) + Policy->Length;
   UserInfo                 = NULL;

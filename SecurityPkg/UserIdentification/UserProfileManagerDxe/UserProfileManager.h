@@ -140,6 +140,7 @@ extern USER_INFO                           mUserInfo;
 
 extern USER_PROFILE_MANAGER_CALLBACK_INFO  *mCallbackInfo;
 
+extern EFI_USER_PROFILE_HANDLE             mModifyUser;
 
 /**
   Get string by string id from HII Interface.
@@ -377,6 +378,68 @@ EFI_STATUS
 GetUserNameInput (
   IN OUT  UINTN         *UserNameLen,
      OUT  CHAR16        *UserName
+  );
+
+/**
+  Find the specified info in User profile by the InfoType.
+
+  @param[in]  User         Handle of the user whose information will be searched.
+  @param[in]  InfoType     The user information type to find.
+  @param[out] UserInfo     Points to user information handle found.
+  
+  @retval EFI_SUCCESS      Find the user information successfully.
+  @retval Others           Fail to find the user information.
+
+**/
+EFI_STATUS
+FindInfoByType (
+  IN  EFI_USER_PROFILE_HANDLE                   User,
+  IN  UINT8                                     InfoType,
+  OUT EFI_USER_INFO_HANDLE                      *UserInfo
+  );
+
+/**
+  Convert the identity policy to a unicode string and update the Hii database
+  IpStringId string with it.
+
+  @param[in]  Ip         Points to identity policy.
+  @param[in]  IpLen      The identity policy length.
+  @param[in]  IpStringId String ID in the HII database to be replaced.
+
+**/
+VOID
+ResolveIdentityPolicy (
+  IN  UINT8                                     *Ip,
+  IN  UINTN                                     IpLen,
+  IN  EFI_STRING_ID                             IpStringId
+  );
+
+/**
+  Expand access policy memory size.
+
+  @param[in] ValidLen       The valid access policy length.
+  @param[in] ExpandLen      The length that is needed to expand.
+    
+**/
+VOID
+ExpandMemory (
+  IN      UINTN                                 ValidLen,
+  IN      UINTN                                 ExpandLen
+  );
+
+/**
+  Delete User's credental from all the providers that exist in User's identity policy.
+  
+  @param[in]  IdentityPolicy     Point to User's identity policy.
+  @param[in]  IdentityPolicyLen  The length of the identity policy.
+  @param[in]  User               Points to user profile.
+
+**/
+VOID
+DeleteCredentialFromProviders (
+  IN     UINT8                                *IdentityPolicy,
+  IN     UINTN                                 IdentityPolicyLen,
+  IN     EFI_USER_PROFILE_HANDLE               User 
   );
   
 #endif

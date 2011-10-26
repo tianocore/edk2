@@ -400,43 +400,6 @@ FindUserProfileByInfo (
   return EFI_NOT_FOUND;
 }
 
-/**
-  Find the credential provider in the specified identity policy.
-
-  @param[in]  FindIdentity        Point to the user identity policy.
-  @param[in]  IdentifyInfo        Point to the user information to be searched.
-
-  @retval TRUE     The credential provider was found in the identity policy.
-  @retval FALSE    The credential provider was not found.
-**/
-BOOLEAN
-FindProvider (
-  IN       EFI_USER_INFO_IDENTITY_POLICY        *FindIdentity,
-  IN CONST EFI_USER_INFO                        *IdentifyInfo
-  )
-{
-  UINTN                         TotalLen;
-  EFI_USER_INFO_IDENTITY_POLICY *Identity;
-
-  //
-  // Found the credential provider.
-  //
-  TotalLen = 0;
-  while (TotalLen < IdentifyInfo->InfoSize - sizeof (EFI_USER_INFO)) {
-    Identity = (EFI_USER_INFO_IDENTITY_POLICY *) ((UINT8 *) (IdentifyInfo + 1) + TotalLen);
-    if ((Identity->Type == FindIdentity->Type) &&
-        (Identity->Length == FindIdentity->Length) &&
-        CompareGuid ((EFI_GUID *) (Identity + 1), (EFI_GUID *) (FindIdentity + 1))
-        ) {
-      return TRUE;
-    }
-
-    TotalLen += Identity->Length;
-  }
-
-  return FALSE;
-}
-
 
 /**
   Check whether the access policy is valid.
@@ -1010,119 +973,6 @@ ExpandUserProfile (
 
 
 /**
-  Add or delete the user's credential record in the provider.
-
-  @param[in]  ProviderGuid        Point to credential provider guid or class guid.
-  @param[in]  ByType              If TRUE, Provider is credential class guid.
-                                  If FALSE, Provider is provider guid.
-  @param[in]  User                Points to user profile.
-  @param[in]  Delete              If TRUE, delete User from the provider; If FALSE, add  
-                                  User info from the provider.
-
-  @retval EFI_SUCCESS      Add or delete record successfully.
-  @retval Others           Fail to add or delete record.
-
-**/
-EFI_STATUS
-ModifyProviderCredential (
-  IN  EFI_GUID                                  *Provider,
-  IN  BOOLEAN                                   ByType,
-  IN  USER_PROFILE_ENTRY                        *User,
-  IN  BOOLEAN                                   Delete
-  )
-{
-  UINTN                         Index;
-  EFI_USER_CREDENTIAL2_PROTOCOL *UserCredential;
-  
-  if (Provider == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Find the specified credential provider.
-  //
-  for (Index = 0; Index < mProviderDb->Count; Index++) {
-    //
-    // Check credential provider ID.
-    //
-    UserCredential = mProviderDb->Provider[Index];
-    if (CompareGuid (&UserCredential->Identifier, Provider)) {
-      if (Delete) {
-        return UserCredential->Delete (UserCredential, User);
-      } else {
-        return UserCredential->Enroll (UserCredential, User);
-      }
-    }
-  }
-
-  return EFI_NOT_FOUND;
-}
-
-
-/**
-  Modify user's credential record in the providers.
-
-  Found the providers information in PolicyInfo, and then add or delete the user's credential
-  record in the providers.
-
-  @param[in]  User                Points to user profile.
-  @param[in]  PolicyInfo          Point to identification policy to be modified.
-  @param[in]  InfoLen             The length of PolicyInfo.
-  @param[in]  Delete              If TRUE, delete User from the provider; If FALSE, add  
-                                  User info from the provider.
-
-  @retval EFI_SUCCESS      Modify PolicyInfo successfully.
-  @retval Others           Fail to modify PolicyInfo.
-
-**/
-EFI_STATUS
-ModifyCredentialInfo (
-  IN  USER_PROFILE_ENTRY                        *User,
-  IN  UINT8                                     *PolicyInfo,
-  IN  UINTN                                     InfoLen,
-  IN  BOOLEAN                                   Delete
-  )
-{
-  EFI_STATUS                    Status;
-  UINTN                         TotalLen;
-  EFI_USER_INFO_IDENTITY_POLICY *Identity;
-
-  //
-  // Modify user's credential.
-  //
-  TotalLen = 0;
-  while (TotalLen < InfoLen) {
-    //
-    // Check identification policy according to type.
-    //
-    Identity = (EFI_USER_INFO_IDENTITY_POLICY *) (PolicyInfo + TotalLen);
-    switch (Identity->Type) {
-    case EFI_USER_INFO_IDENTITY_CREDENTIAL_TYPE:
-      Status = ModifyProviderCredential ((EFI_GUID *) (Identity + 1), TRUE, User, Delete);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-      break;
-
-    case EFI_USER_INFO_IDENTITY_CREDENTIAL_PROVIDER:
-      Status = ModifyProviderCredential ((EFI_GUID *) (Identity + 1), FALSE, User, Delete);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-      break;
-
-    default:
-      break;
-    }
-
-    TotalLen += Identity->Length;
-  }
-
-  return EFI_SUCCESS;
-}
-
-
-/**
   Save the user profile to non-volatile memory, or delete it from non-volatile memory.
 
   @param[in]  User         Point to the user profile
@@ -1160,327 +1010,6 @@ SaveNvUserProfile (
                   );
   return Status;
 }
-
-
-/**
-  Replace the old identity info with NewInfo in NV Flash.
-
-  This function only replace the identity record in the user profile. Don't update
-  the the information on the credential provider.
-  
-  @param[in]   User               Point to the user profile.
-  @param[in]   NewInfo            Point to the new identity policy info.
-  @param[out]  UserInfo           Point to the new added identity info.
-
-  @retval EFI_SUCCESS      Replace user identity successfully.
-  @retval Others           Fail to Replace user identity.
-
-**/
-EFI_STATUS
-SaveUserIpInfo (
-  IN       USER_PROFILE_ENTRY                   * User,
-  IN CONST EFI_USER_INFO                        * NewInfo,
-  OUT   EFI_USER_INFO                           **UserInfo OPTIONAL
-  )
-{
-  EFI_STATUS    Status;
-  EFI_USER_INFO *OldIpInfo;
-  UINTN         Offset;
-  UINTN         NextOffset;
-
-  if ((NewInfo == NULL) || (User == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-  
-  //
-  // Get user old identify policy information.
-  //
-  OldIpInfo = NULL;
-  Status    = FindUserInfoByType (User, &OldIpInfo, EFI_USER_INFO_IDENTITY_POLICY_RECORD);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  
-  //
-  // Get the old identity policy offset.
-  //
-  Status = FindUserInfo (User, &OldIpInfo, FALSE, &Offset);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  
-  //
-  // Delete the old identity policy information.
-  //
-  NextOffset = ALIGN_VARIABLE (OldIpInfo->InfoSize) + Offset;
-  User->UserProfileSize -= ALIGN_VARIABLE (OldIpInfo->InfoSize);
-  if (Offset < User->UserProfileSize) {
-    CopyMem (User->ProfileInfo + Offset, User->ProfileInfo + NextOffset, User->UserProfileSize - Offset);
-  }
-  
-  //
-  // Add new user information.
-  //
-  if (User->MaxProfileSize - User->UserProfileSize < ALIGN_VARIABLE (NewInfo->InfoSize)) {
-    if (!ExpandUserProfile (User, ALIGN_VARIABLE (NewInfo->InfoSize))) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-  }
-
-  CopyMem (User->ProfileInfo + User->UserProfileSize, (VOID *) NewInfo, NewInfo->InfoSize);
-  if (UserInfo != NULL) {
-    *UserInfo = (EFI_USER_INFO *) (User->ProfileInfo + User->UserProfileSize);
-  }
-
-  User->UserProfileSize += ALIGN_VARIABLE (NewInfo->InfoSize);
-
-  //
-  // Save user profile information.
-  //
-  Status = SaveNvUserProfile (User, FALSE);
-  return Status;
-}
-
-
-/**
-  Remove the provider in FindIdentity from the user identification information record.
-  
-  @param[in, out] NewInfo       On entry, points to the user information to remove provider. 
-                                On return, points to the user information the provider is removed.
-  @param[in]      FindIdentity  Point to the user identity policy.
-
-  @retval TRUE                  The provider is removed successfully.
-  @retval FALSE                 Fail to remove the provider.
-
-**/
-BOOLEAN
-RemoveProvider (
-  IN OUT EFI_USER_INFO                         **NewInfo,
-  IN     EFI_USER_INFO_IDENTITY_POLICY         *FindIdentity
-  )
-{
-  UINTN                         TotalLen;
-  EFI_USER_INFO_IDENTITY_POLICY *Identity;
-  EFI_USER_INFO                 *IdentifyInfo;
-  UINT8                         *Buffer;
-
-  IdentifyInfo = *NewInfo;
-  TotalLen = IdentifyInfo->InfoSize - sizeof (EFI_USER_INFO);
-  if (TotalLen == FindIdentity->Length) {
-    //
-    // Only one credential provider in the identification policy.
-    // Set the new policy to be TRUE after removed the provider.
-    //
-    Identity = (EFI_USER_INFO_IDENTITY_POLICY *) (IdentifyInfo + 1);
-    Identity->Type         = EFI_USER_INFO_IDENTITY_TRUE;
-    Identity->Length       = sizeof (EFI_USER_INFO_IDENTITY_POLICY);  
-    IdentifyInfo->InfoSize = sizeof (EFI_USER_INFO) + Identity->Length;
-    return TRUE;
-  }
-
-  //
-  // Found the credential provider.
-  //
-  TotalLen = 0;
-  while (TotalLen < IdentifyInfo->InfoSize - sizeof (EFI_USER_INFO)) {
-    Identity = (EFI_USER_INFO_IDENTITY_POLICY *) ((UINT8 *) (IdentifyInfo + 1) + TotalLen);
-    if ((Identity->Type == FindIdentity->Type) &&
-        (Identity->Length == FindIdentity->Length) &&
-        CompareGuid ((EFI_GUID *) (Identity + 1), (EFI_GUID *) (FindIdentity + 1))
-        ) {
-      //
-      // Found the credential provider to delete
-      //
-      if (Identity == (EFI_USER_INFO_IDENTITY_POLICY *)(IdentifyInfo + 1)) {
-        //
-        // It is the first item in the identification policy, delete it and the connector after it.
-        //
-        Buffer = (UINT8 *) Identity + Identity->Length + sizeof(EFI_USER_INFO_IDENTITY_POLICY);
-        IdentifyInfo->InfoSize -= Identity->Length + sizeof(EFI_USER_INFO_IDENTITY_POLICY);
-        TotalLen = IdentifyInfo->InfoSize - sizeof (EFI_USER_INFO);
-        CopyMem (Identity, Buffer, TotalLen);
-       } else {
-        //
-        // It is not the first item in the identification policy, delete it and the connector before it.
-        //
-        Buffer    = (UINT8 *) Identity + Identity->Length;
-        TotalLen  = IdentifyInfo->InfoSize - sizeof (EFI_USER_INFO);
-        TotalLen -= (Buffer - (UINT8 *)(IdentifyInfo + 1));
-        IdentifyInfo->InfoSize -= Identity->Length + sizeof(EFI_USER_INFO_IDENTITY_POLICY);
-        CopyMem ((UINT8 *) (Identity - 1), Buffer, TotalLen);
-      }      
-      return TRUE;
-    }
-
-    TotalLen += Identity->Length;
-  }  
-  return FALSE;
-}
-
-
-/**
-  This function replaces the old identity policy with a new identity policy.
-
-  This function changes user identity policy information.
-  If enroll new credential failed, recover the old identity policy.
-
-  For new policy:
-  a. For each credential, if it is newly added, try to enroll it.
-     If enroll failed, try to delete the newly added ones.
-  
-  b. For each credential, if it exists in the old policy, delete old one, 
-     and enroll new one. If failed to enroll the new one, removed it from new 
-     identification policy.
-
-  For old policy:  
-  a. For each credential, if it does not exist in new one, delete it.
-
-  @param[in]  User         Point to the user profile.
-  @param[in]  Info         Points to the user identity information.
-  @param[in]  InfoSize     The size of Info (Not used in this function).
-  @param[out] IpInfo       The new identification info after modify.
-
-  @retval EFI_SUCCESS      Modify user identity policy successfully.
-  @retval Others           Fail to modify user identity policy.
-
-**/
-EFI_STATUS
-ModifyUserIpInfo (
-  IN        USER_PROFILE_ENTRY                  *User,
-  IN CONST  EFI_USER_INFO                       *Info,
-  IN        UINTN                               InfoSize,
-     OUT    EFI_USER_INFO                       **IpInfo
-  )
-{
-  EFI_STATUS                    Status;
-  EFI_USER_INFO                 *OldIpInfo;
-  UINTN                         TotalLen;
-  EFI_USER_INFO_IDENTITY_POLICY *Identity;
-  UINT32                        CredentialCount;
-  EFI_USER_INFO                 *NewIpInfo;
-
-  //
-  // Get user old identify policy information.
-  //
-  OldIpInfo = NULL;
-  Status    = FindUserInfoByType (User, &OldIpInfo, EFI_USER_INFO_IDENTITY_POLICY_RECORD);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  ASSERT (OldIpInfo != NULL);
-  
-  //
-  // Enroll new added credential provider.
-  //
-  CredentialCount = 0;
-  TotalLen        = 0;
-  while (TotalLen < Info->InfoSize - sizeof (EFI_USER_INFO)) {
-    Identity = (EFI_USER_INFO_IDENTITY_POLICY *) ((UINT8 *) (Info + 1) + TotalLen);
-    if (Identity->Type == EFI_USER_INFO_IDENTITY_CREDENTIAL_PROVIDER) {
-      if (!FindProvider (Identity, OldIpInfo)) {
-        //
-        // The credential is NOT found in the old identity policy; add it.
-        //
-        Status = ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length, FALSE);
-        if (EFI_ERROR (Status)) {
-          break;
-        }
-        CredentialCount++;
-      }
-    }
-
-    TotalLen += Identity->Length;
-  }
-
-  if (EFI_ERROR (Status)) {
-    //
-    // Enroll new credential failed. Delete the newly enrolled credential, and return.
-    //
-    TotalLen = 0;
-    while (TotalLen < Info->InfoSize - sizeof (EFI_USER_INFO)) {
-      Identity = (EFI_USER_INFO_IDENTITY_POLICY *) ((UINT8 *) (Info + 1) + TotalLen);
-      if (Identity->Type == EFI_USER_INFO_IDENTITY_CREDENTIAL_PROVIDER) {
-        if (!FindProvider (Identity, OldIpInfo)) {
-          //
-          // The credential is NOT found in the old identity policy. Delete it.
-          //
-          if (CredentialCount == 0) {
-            break;
-          }
-
-          ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length, TRUE);
-          CredentialCount--;
-        }
-      }
-      TotalLen += Identity->Length;
-    }
-
-    return EFI_DEVICE_ERROR;
-  }
-  
-  //
-  // Backup new identification policy
-  //
-  NewIpInfo = AllocateCopyPool (Info->InfoSize, Info);    
-  ASSERT (NewIpInfo != NULL);
-
-  //
-  // Enroll the credential that existed in the old identity policy.
-  //
-  TotalLen = 0;
-  while (TotalLen < Info->InfoSize - sizeof (EFI_USER_INFO)) {
-    Identity = (EFI_USER_INFO_IDENTITY_POLICY *) ((UINT8 *) (Info + 1) + TotalLen);
-    if (Identity->Type == EFI_USER_INFO_IDENTITY_CREDENTIAL_PROVIDER) {
-      if (FindProvider (Identity, OldIpInfo)) {
-        //
-        // The credential is found in the old identity policy, so delete the old credential first.
-        //
-        Status = ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length, TRUE);
-        if (EFI_ERROR (Status)) {
-          //
-          // Failed to delete old credential.
-          //
-          FreePool (NewIpInfo);
-          return EFI_DEVICE_ERROR;
-        }
-
-        //
-        // Add the new credential.
-        //
-        Status = ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length, FALSE);
-        if (EFI_ERROR (Status)) {
-          //
-          // Failed to enroll the user by new identification policy.
-          // So removed the credential provider from the identification policy          
-          //
-          RemoveProvider (&NewIpInfo, Identity);
-        }        
-      }
-    }
-    TotalLen += Identity->Length;
-  }
-  
-  //
-  // Delete old credential that didn't exist in the new identity policy.
-  //
-  TotalLen = 0;
-  while (TotalLen < OldIpInfo->InfoSize - sizeof (EFI_USER_INFO)) {
-    Identity = (EFI_USER_INFO_IDENTITY_POLICY *) ((UINT8 *) (OldIpInfo + 1) + TotalLen);
-    if (Identity->Type == EFI_USER_INFO_IDENTITY_CREDENTIAL_PROVIDER) {
-      if (!FindProvider (Identity, Info)) {
-        //
-        // The credential is NOT found in the new identity policy. Delete the old credential.
-        //
-        ModifyCredentialInfo (User, (UINT8 *) Identity, Identity->Length, TRUE);
-      }
-    }
-    TotalLen += Identity->Length;
-  }
-
-  *IpInfo = NewIpInfo;
-  return EFI_SUCCESS;
-}
-
 
 /**
   Add one new user info into the user's profile.
@@ -1525,21 +1054,6 @@ AddUserInfo (
   if (User->MaxProfileSize - User->UserProfileSize < ALIGN_VARIABLE (InfoSize)) {
     if (!ExpandUserProfile (User, ALIGN_VARIABLE (InfoSize))) {
       return EFI_OUT_OF_RESOURCES;
-    }
-  }
-  
-  //
-  // Add credential.
-  //
-  if (((EFI_USER_INFO *) Info)->InfoType == EFI_USER_INFO_IDENTITY_POLICY_RECORD) {
-    Status = ModifyCredentialInfo (
-              User,
-              (UINT8 *) ((EFI_USER_INFO *) Info + 1),
-              InfoSize - sizeof (EFI_USER_INFO),
-              FALSE
-              );
-    if (EFI_ERROR (Status)) {
-      return Status;
     }
   }
   
@@ -1681,11 +1195,6 @@ DelUserInfo (
 
   if (Info->InfoType == EFI_USER_INFO_IDENTIFIER_RECORD) {
     return EFI_ACCESS_DENIED;
-  } else if (Info->InfoType == EFI_USER_INFO_IDENTITY_POLICY_RECORD) {
-    Status = ModifyCredentialInfo (User, (UINT8 *) (Info + 1), Info->InfoSize - sizeof (EFI_USER_INFO), TRUE);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
   }
   
   //
@@ -1731,7 +1240,6 @@ ModifyUserInfo (
   EFI_STATUS    Status;
   UINTN         PayloadLen;
   EFI_USER_INFO *OldInfo;
-  EFI_USER_INFO *IpInfo;
 
   if ((UserInfo == NULL) || (Info == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1833,25 +1341,6 @@ ModifyUserInfo (
     } while (TRUE);    
   }
 
-  if (Info->InfoType == EFI_USER_INFO_IDENTITY_POLICY_RECORD) {
-    //
-    // For user identification policy, need to update the info in credential provider.
-    //
-    IpInfo = NULL;
-    Status = ModifyUserIpInfo (User, Info, InfoSize, &IpInfo);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    ASSERT (IpInfo != NULL);
-    Status = SaveUserIpInfo (User, IpInfo, UserInfo);
-    if (IpInfo->InfoSize != Info->InfoSize) {
-      Status = EFI_DEVICE_ERROR;
-    }
-    FreePool (IpInfo);    
-    return Status;
-  }
-
   Status = DelUserInfo (User, *UserInfo, FALSE);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1877,7 +1366,6 @@ DelUserProfile (
 {
   EFI_STATUS          Status;
   UINTN               Index;
-  EFI_USER_INFO       *UserInfo;
 
   //
   // Check whether it is in the user profile database.
@@ -1892,18 +1380,6 @@ DelUserProfile (
   //
   if (User == mCurrentUser) {
     return EFI_ACCESS_DENIED;
-  }
-  
-  //
-  // Delete user credential information.
-  //
-  UserInfo  = NULL;
-  Status    = FindUserInfoByType (User, &UserInfo, EFI_USER_INFO_IDENTITY_POLICY_RECORD);
-  if (Status == EFI_SUCCESS) {
-    Status = DelUserInfo (User, UserInfo, FALSE);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
   }
   
   //
@@ -4028,6 +3504,8 @@ UserProfileGetInfo (
   This function changes user information.  If NULL is pointed to by UserInfo, then a new user 
   information record is created and its handle is returned in UserInfo. Otherwise, the existing  
   one is replaced.
+  If EFI_USER_INFO_IDENITTY_POLICY_RECORD is changed, it is the caller's responsibility to keep 
+  it to be synced with the information on credential providers.
   If EFI_USER_INFO_EXCLUSIVE is specified in Info and a user information record of the same 
   type already exists in the user profile, then EFI_ACCESS_DENIED will be returned and UserInfo
   will point to the handle of the existing record.
@@ -4116,12 +3594,15 @@ UserProfileSetInfo (
   Called by credential provider to notify of information change.
 
   This function allows the credential provider to notify the User Identity Manager when user status  
-  has changed while deselected.
+  has changed.
   If the User Identity Manager doesn't support asynchronous changes in credentials, then this function 
   should return EFI_UNSUPPORTED. 
-  If the User Identity Manager supports this, it will call User() to get the user identifier and then 
-  GetNextInfo() and GetInfo() in the User Credential Protocol to get all of the information from the 
-  credential and add it.
+  If current user does not exist, and the credential provider can identify a user, then make the user 
+  to be current user and signal the EFI_EVENT_GROUP_USER_PROFILE_CHANGED event.
+  If current user already exists, and the credential provider can identify another user, then switch 
+  current user to the newly identified user, and signal the EFI_EVENT_GROUP_USER_PROFILE_CHANGED event.
+  If current user was identified by this credential provider and now the credential provider cannot identify 
+  current user, then logout current user and signal the EFI_EVENT_GROUP_USER_PROFILE_CHANGED event.
 
   @param[in] This          Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
   @param[in] Changed       Handle on which is installed an instance of the EFI_USER_CREDENTIAL2_PROTOCOL 
@@ -4138,102 +3619,8 @@ UserProfileNotify (
   IN CONST  EFI_USER_MANAGER_PROTOCOL           *This,
   IN        EFI_HANDLE                          Changed
   )
-{
-  EFI_STATUS                    Status;
-  EFI_USER_CREDENTIAL2_PROTOCOL *Provider;
-  EFI_USER_INFO_IDENTIFIER      UserId;
-  EFI_USER_INFO_HANDLE          UserInfo;
-  EFI_USER_INFO_HANDLE          UserInfo2;
-  UINTN                         InfoSize;
-  EFI_USER_INFO                 *Info;
-  USER_PROFILE_ENTRY            *User;
-
-  if (This == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-  
-  Status = gBS->HandleProtocol (
-                  Changed,
-                  &gEfiUserCredential2ProtocolGuid,
-                  (VOID **) &Provider
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = Provider->User (Provider, NULL, &UserId);
-  if (EFI_ERROR (Status)) {
-    return EFI_NOT_READY;
-  }
-
-  //
-  // Find user with the UserId.
-  //
-  User = NULL;
-  while (TRUE) {
-    //
-    // Find next user profile.
-    // 
-    Status = FindUserProfile (&User, TRUE, NULL);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  
-    //
-    // Find the user information.
-    //
-    Info = NULL;
-    FindUserInfoByType (User, &Info, EFI_USER_INFO_IDENTIFIER_RECORD);
-    if (CompareMem ((UINT8 *) (Info + 1), UserId, sizeof (UserId)) == 0) {
-      //
-      // Found the infomation record. 
-      //
-      break;
-    }
-  }
-
-  UserInfo = NULL;
-  do {
-    //
-    // Get user info handle.
-    //
-    Status = Provider->GetNextInfo(Provider, &UserInfo);
-    if (EFI_ERROR (Status)) {
-      return EFI_SUCCESS;
-    }
-
-    //
-    // Get the user information from the user info handle.
-    // 
-    InfoSize = 0;
-    Status = Provider->GetInfo(Provider, UserInfo, NULL, &InfoSize);
-    if (EFI_ERROR (Status)) {
-      if (Status == EFI_BUFFER_TOO_SMALL) {
-        Info = AllocateZeroPool (InfoSize);
-        if (Info == NULL) {
-          return EFI_OUT_OF_RESOURCES;
-        }
-        Status = Provider->GetInfo(Provider, UserInfo, Info, &InfoSize);
-        if (EFI_ERROR (Status)) {
-          FreePool (Info);
-          break;
-        }
-      }
-      break;
-    }
-
-    //
-    // Save the user information.
-    // 
-    UserInfo2 = NULL;
-    Status = UserProfileSetInfo (&gUserIdentifyManager, (EFI_USER_PROFILE_HANDLE)User, &UserInfo2, Info, InfoSize);
-    FreePool (Info);
-    if (EFI_ERROR (Status)) {
-      break;
-    }
-  } while (TRUE);
-  
-  return Status;
+{    
+  return EFI_UNSUPPORTED;
 }
 
 

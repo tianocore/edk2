@@ -745,22 +745,12 @@ CredentialEnroll (
   EFI_USER_INFO             *UserInfo;
   CHAR8                     Password[CREDENTIAL_LEN];
   EFI_INPUT_KEY             Key;
-  EFI_USER_MANAGER_PROTOCOL *UserManager;
   UINT8                     *UserId;
   CHAR16                    *QuestionStr;
   CHAR16                    *PromptStr;
 
   if ((This == NULL) || (User == NULL)) {
     return EFI_INVALID_PARAMETER;
-  }
-
-  Status = gBS->LocateProtocol (
-                  &gEfiUserManagerProtocolGuid,
-                  NULL,
-                  (VOID **) &UserManager
-                  );
-  if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
   }
 
   //
@@ -834,11 +824,6 @@ CredentialEnroll (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  //
-  // Notify the user manager driver that credential information has changed.
-  //
-  UserManager->Notify (UserManager, mCallbackInfo->DriverHandle);  
 
   return EFI_SUCCESS;
 }

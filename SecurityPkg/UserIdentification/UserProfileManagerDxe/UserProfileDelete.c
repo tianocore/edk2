@@ -185,6 +185,9 @@ DeleteUser (
   EFI_STATUS              Status;
   EFI_USER_PROFILE_HANDLE User;
   EFI_INPUT_KEY           Key;
+  EFI_USER_INFO_HANDLE    UserInfo;
+  EFI_USER_INFO           *Info;
+  UINTN                   InfoSize;
 
   //
   // Find specified user profile and delete it.
@@ -204,6 +207,31 @@ DeleteUser (
   }
 
   if (UserIndex == 1) {
+    //
+    // Get the identification policy.
+    //
+    Status = FindInfoByType (User, EFI_USER_INFO_IDENTITY_POLICY_RECORD, &UserInfo);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+
+    InfoSize = 0;
+    Info = NULL;
+    Status   = mUserManager->GetInfo (mUserManager, User, UserInfo, Info, &InfoSize);
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      Info = AllocateZeroPool (InfoSize);
+      if (Info == NULL) {
+        goto Done;
+      }
+      Status = mUserManager->GetInfo (mUserManager, User, UserInfo, Info, &InfoSize);
+    }
+
+    //
+    // Delete the user on the credential providers by its identification policy.
+    //
+    DeleteCredentialFromProviders ((UINT8 *)(Info + 1), Info->InfoSize - sizeof (EFI_USER_INFO), User);
+    FreePool (Info);
+    
     Status = mUserManager->Delete (mUserManager, User);
     if (EFI_ERROR (Status)) {
       goto Done;

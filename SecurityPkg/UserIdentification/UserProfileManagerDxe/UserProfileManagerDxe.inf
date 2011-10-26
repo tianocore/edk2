@@ -25,6 +25,8 @@
   UserProfileAdd.c
   UserProfileDelete.c
   UserProfileModify.c
+  ModifyIdentityPolicy.c
+  ModifyAccessPolicy.c
   UserProfileManagerData.h
   UserProfileManagerStrings.uni
   UserProfileManagerVfr.Vfr
