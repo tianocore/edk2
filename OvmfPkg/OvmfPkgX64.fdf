@@ -172,11 +172,7 @@ INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 INF  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
 INF  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
 INF  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
-
-!ifndef $(SOURCE_DEBUG_ENABLE)
 INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
-!endif
-
 INF  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
 INF  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
@@ -193,7 +189,11 @@ INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 
 INF  PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
+
+!ifndef $(SOURCE_DEBUG_ENABLE)
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
+!endif
+
 INF  IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 
