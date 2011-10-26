@@ -781,7 +781,7 @@ WinNtGopThreadWindowProc (
     // The ESC key also generate WM_CHAR.
     //
     if (wParam == 0x1B) {
-	  return 0;
+	    return 0;
     }    
 
     if (AltIsPress == TRUE) {
@@ -815,15 +815,13 @@ WinNtGopThreadWindowProc (
     return 0;
 
   case WM_KEYDOWN:
-    Key.ScanCode = SCAN_NULL;
+    Key.ScanCode    = SCAN_NULL;
+    Key.UnicodeChar = CHAR_NULL;
     //
     // A value key press will cause a WM_KEYDOWN first, then cause a WM_CHAR
     // So if there is no modifier key updated, skip the WM_KEYDOWN even.
     //
     if (WinNtGopConvertParamToEfiKey (Private, &wParam, &lParam, &Key)) {
-      if (Key.ScanCode != SCAN_NULL) {
-        Key.UnicodeChar = CHAR_NULL;
-      }
       //
       // Support the partial keystroke, add all keydown event into the queue.
       //
