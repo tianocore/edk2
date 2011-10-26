@@ -1,9 +1,9 @@
 /** @file
-  UEFI 2.2 User Manager Protocol definition.
+  UEFI User Manager Protocol definition.
 
   This protocol manages user profiles.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -445,13 +445,16 @@ EFI_STATUS
 /**
   Called by credential provider to notify of information change.
 
-  This function allows the credential provider to notify the User Identity Manager when user status has 
-  changed while deselected.
+  This function allows the credential provider to notify the User Identity Manager when user status  
+  has changed.
   If the User Identity Manager doesn't support asynchronous changes in credentials, then this function 
   should return EFI_UNSUPPORTED. 
-  If the User Identity Manager supports this, it will call User() to get the user identifier and then 
-  GetNextInfo() and GetInfo() in the User Credential Protocol to get all of the information 
-  from the credential and add it.
+  If current user does not exist, and the credential provider can identify a user, then make the user 
+  to be current user and signal the EFI_EVENT_GROUP_USER_PROFILE_CHANGED event.
+  If current user already exists, and the credential provider can identify another user, then switch 
+  current user to the newly identified user, and signal the EFI_EVENT_GROUP_USER_PROFILE_CHANGED event.
+  If current user was identified by this credential provider and now the credential provider cannot identify 
+  current user, then logout current user and signal the EFI_EVENT_GROUP_USER_PROFILE_CHANGED event.
 
   @param[in] This          Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
   @param[in] Changed       Handle on which is installed an instance of the
@@ -511,6 +514,8 @@ EFI_STATUS
   This function changes user information.  If NULL is pointed to by UserInfo, then a new user 
   information record is created and its handle is returned in UserInfo. Otherwise, the existing one is 
   replaced.
+  If EFI_USER_INFO_IDENITTY_POLICY_RECORD is changed, it is the caller's responsibility to keep it to 
+  be synced with the information on credential providers.
   If EFI_USER_INFO_EXCLUSIVE is specified in Info and a user information record of the same 
   type already exists in the user profile, then EFI_ACCESS_DENIED will be returned and 
   UserInfo will point to the handle of the existing record.
