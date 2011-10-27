@@ -176,6 +176,15 @@ typedef struct {
   UINT32                    ExtendedSize;
 } EFI_FFS_FILE_HEADER2;
 
+#define IS_FFS_FILE2(FfsFileHeaderPtr) \
+    (((((EFI_FFS_FILE_HEADER *) (UINTN) FfsFileHeaderPtr)->Attributes) & FFS_ATTRIB_LARGE_FILE) == FFS_ATTRIB_LARGE_FILE)
+
+#define FFS_FILE_SIZE(FfsFileHeaderPtr) \
+    ((UINT32) (*((UINT32 *) ((EFI_FFS_FILE_HEADER *) (UINTN) FfsFileHeaderPtr)->Size) & 0x00ffffff))
+
+#define FFS_FILE2_SIZE(FfsFileHeaderPtr) \
+    (((EFI_FFS_FILE_HEADER2 *) (UINTN) FfsFileHeaderPtr)->ExtendedSize)
+
 typedef UINT8 EFI_SECTION_TYPE;
 
 ///
@@ -470,8 +479,14 @@ typedef struct {
   CHAR16                        VersionString[1];
 } EFI_VERSION_SECTION2;
 
+#define IS_SECTION2(SectionHeaderPtr) \
+    ((UINT32) (*((UINT32 *) ((EFI_COMMON_SECTION_HEADER *) (UINTN) SectionHeaderPtr)->Size) & 0x00ffffff) == 0x00ffffff)
+
 #define SECTION_SIZE(SectionHeaderPtr) \
-    ((UINT32) (*((UINT32 *) ((EFI_COMMON_SECTION_HEADER *) SectionHeaderPtr)->Size) & 0x00ffffff))
+    ((UINT32) (*((UINT32 *) ((EFI_COMMON_SECTION_HEADER *) (UINTN) SectionHeaderPtr)->Size) & 0x00ffffff))
+
+#define SECTION2_SIZE(SectionHeaderPtr) \
+    (((EFI_COMMON_SECTION_HEADER2 *) (UINTN) SectionHeaderPtr)->ExtendedSize)
 
 #pragma pack()
 

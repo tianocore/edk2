@@ -3,7 +3,7 @@
   It wraps Lzma decompress interfaces to GUIDed Section Extraction interfaces
   and registers them into GUIDed handler table.
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -63,20 +63,37 @@ LzmaGuidedSectionGetInfo (
   ASSERT (ScratchBufferSize != NULL);
   ASSERT (SectionAttribute != NULL);
 
-  if (!CompareGuid (
-        &gLzmaCustomDecompressGuid, 
+  if (IS_SECTION2 (InputSection)) {
+    if (!CompareGuid (
+        &gLzmaCustomDecompressGuid,
+        &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid))) {
+      return RETURN_INVALID_PARAMETER;
+    }
+
+    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->Attributes;
+
+    return LzmaUefiDecompressGetInfo (
+             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset,
+             SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset,
+             OutputBufferSize,
+             ScratchBufferSize
+             );
+  } else {
+    if (!CompareGuid (
+        &gLzmaCustomDecompressGuid,
         &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
-    return RETURN_INVALID_PARAMETER;
+      return RETURN_INVALID_PARAMETER;
+    }
+
+    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION *) InputSection)->Attributes;
+
+    return LzmaUefiDecompressGetInfo (
+             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+             SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+             OutputBufferSize,
+             ScratchBufferSize
+             );
   }
-
-  *SectionAttribute = ((EFI_GUID_DEFINED_SECTION *) InputSection)->Attributes;
-
-  return LzmaUefiDecompressGetInfo (
-          (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
-          SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
-          OutputBufferSize,
-          ScratchBufferSize
-          );
 }
 
 /**
@@ -124,23 +141,43 @@ LzmaGuidedSectionExtraction (
   ASSERT (OutputBuffer != NULL);
   ASSERT (InputSection != NULL);
 
-  if (!CompareGuid (
-        &gLzmaCustomDecompressGuid, 
+  if (IS_SECTION2 (InputSection)) {
+    if (!CompareGuid (
+        &gLzmaCustomDecompressGuid,
+        &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid))) {
+      return RETURN_INVALID_PARAMETER;
+    }
+
+    //
+    // Authentication is set to Zero, which may be ignored.
+    //
+    *AuthenticationStatus = 0;
+
+    return LzmaUefiDecompress (
+             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset,
+             SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset,
+             *OutputBuffer,
+             ScratchBuffer
+             );
+  } else {
+    if (!CompareGuid (
+        &gLzmaCustomDecompressGuid,
         &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
-    return RETURN_INVALID_PARAMETER;
-  }
+      return RETURN_INVALID_PARAMETER;
+    }
 
-  //
-  // Authentication is set to Zero, which may be ignored.
-  //
-  *AuthenticationStatus = 0;
+    //
+    // Authentication is set to Zero, which may be ignored.
+    //
+    *AuthenticationStatus = 0;
 
-  return LzmaUefiDecompress (
-    (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
-    SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
-    *OutputBuffer,
-    ScratchBuffer
+    return LzmaUefiDecompress (
+             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+             SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+             *OutputBuffer,
+             ScratchBuffer
     );
+  }
 }
 
 

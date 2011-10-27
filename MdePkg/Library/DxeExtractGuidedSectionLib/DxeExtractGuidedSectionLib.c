@@ -1,7 +1,7 @@
 /** @file
   Provide generic extract guided section functions for Dxe phase.
 
-  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -259,17 +259,24 @@ ExtractGuidedSectionGetInfo (
   )
 {
   UINT32 Index;
+  EFI_GUID *SectionDefinitionGuid;
 
   ASSERT (InputSection != NULL);  
   ASSERT (OutputBufferSize != NULL);
   ASSERT (ScratchBufferSize != NULL);
   ASSERT (SectionAttribute != NULL);
+
+  if (IS_SECTION2 (InputSection)) {
+    SectionDefinitionGuid = &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid);
+  } else {
+    SectionDefinitionGuid = &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid);
+  }
  
   //
   // Search the match registered GetInfo handler for the input guided section.
   //
   for (Index = 0; Index < mNumberOfExtractHandler; Index ++) {
-    if (CompareGuid (&mExtractHandlerGuidTable[Index], &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+    if (CompareGuid (&mExtractHandlerGuidTable[Index], SectionDefinitionGuid)) {
       //
       // Call the match handler to getinfo for the input section data.
       //
@@ -333,6 +340,7 @@ ExtractGuidedSectionDecode (
   )
 {
   UINT32 Index;
+  EFI_GUID *SectionDefinitionGuid;
   
   //
   // Check the input parameters
@@ -341,11 +349,17 @@ ExtractGuidedSectionDecode (
   ASSERT (OutputBuffer != NULL);
   ASSERT (AuthenticationStatus != NULL);
 
+  if (IS_SECTION2 (InputSection)) {
+    SectionDefinitionGuid = &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid);
+  } else {
+    SectionDefinitionGuid = &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid);
+  }
+
   //
   // Search the match registered extract handler for the input guided section.
   //
   for (Index = 0; Index < mNumberOfExtractHandler; Index ++) {
-    if (CompareGuid (&mExtractHandlerGuidTable[Index], &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+    if (CompareGuid (&mExtractHandlerGuidTable[Index], SectionDefinitionGuid)) {
       //
       // Call the match handler to extract raw data for the input section data.
       //

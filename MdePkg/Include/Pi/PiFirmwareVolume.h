@@ -211,7 +211,8 @@ typedef struct {
 #define EFI_FV_EXT_TYPE_GUID_TYPE 0x0002
 
 ///
-/// This extension header provides a mapping between a GUID and an OEM file type.
+/// This extension header EFI_FIRMWARE_VOLUME_EXT_ENTRY_GUID_TYPE provides a vendor specific
+/// GUID FormatType type which includes a length and a successive series of data bytes.
 ///
 typedef struct {
   ///

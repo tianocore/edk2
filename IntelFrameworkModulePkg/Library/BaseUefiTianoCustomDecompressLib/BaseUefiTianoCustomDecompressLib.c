@@ -1,8 +1,8 @@
 /** @file
   UEFI and Tiano Custom Decompress Library 
-  Tt will do Tiano or UEFI decompress with different verison parameter.
+  It will do Tiano or UEFI decompress with different verison parameter.
   
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -897,25 +897,47 @@ TianoDecompressGetInfo (
     return RETURN_INVALID_PARAMETER;
   }
 
-  if (!CompareGuid (
-        &gTianoCustomDecompressGuid, 
-        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
-    return RETURN_INVALID_PARAMETER;
-  }
-  //
-  // Get guid attribute of guid section. 
-  //
-  *SectionAttribute = ((EFI_GUID_DEFINED_SECTION *) InputSection)->Attributes;
+  if (IS_SECTION2 (InputSection)) {
+    if (!CompareGuid (
+        &gTianoCustomDecompressGuid,
+        &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid))) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    //
+    // Get guid attribute of guid section. 
+    //
+    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->Attributes;
 
-  //
-  // Call Tiano GetInfo to get the required size info.
-  //
-  return UefiDecompressGetInfo (
-          (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
-          (*(UINT32 *) (((EFI_COMMON_SECTION_HEADER *) InputSection)->Size) & 0x00ffffff) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
-          OutputBufferSize,
-          ScratchBufferSize
-         );
+    //
+    // Call Tiano GetInfo to get the required size info.
+    //
+    return UefiDecompressGetInfo (
+             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset,
+             SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset,
+             OutputBufferSize,
+             ScratchBufferSize
+             );
+  } else {
+    if (!CompareGuid (
+        &gTianoCustomDecompressGuid,
+        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    //
+    // Get guid attribute of guid section. 
+    //
+    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION *) InputSection)->Attributes;
+
+    //
+    // Call Tiano GetInfo to get the required size info.
+    //
+    return UefiDecompressGetInfo (
+             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+             SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+             OutputBufferSize,
+             ScratchBufferSize
+             );
+  }
 }
 
 /**
@@ -963,26 +985,49 @@ TianoDecompress (
   ASSERT (OutputBuffer != NULL);
   ASSERT (InputSection != NULL);
 
-  if (!CompareGuid (
-        &gTianoCustomDecompressGuid, 
-        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
-    return RETURN_INVALID_PARAMETER;
-  }
+  if (IS_SECTION2 (InputSection)) {
+    if (!CompareGuid (
+        &gTianoCustomDecompressGuid,
+        &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid))) {
+      return RETURN_INVALID_PARAMETER;
+    }
 
-  //
-  // Set Authentication to Zero.
-  //
-  *AuthenticationStatus = 0;
-  
-  //
-  // Call Tiano Decompress to get the raw data
-  //
-  return UefiTianoDecompress (
-          (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
-          *OutputBuffer,
-          ScratchBuffer,
-          2
-         );
+    //
+    // Set Authentication to Zero.
+    //
+    *AuthenticationStatus = 0;
+
+    //
+    // Call Tiano Decompress to get the raw data
+    //
+    return UefiTianoDecompress (
+             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset,
+             *OutputBuffer,
+             ScratchBuffer,
+             2
+           );
+  } else {
+    if (!CompareGuid (
+        &gTianoCustomDecompressGuid,
+        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+      return RETURN_INVALID_PARAMETER;
+    }
+
+    //
+    // Set Authentication to Zero.
+    //
+    *AuthenticationStatus = 0;
+
+    //
+    // Call Tiano Decompress to get the raw data
+    //
+    return UefiTianoDecompress (
+             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+             *OutputBuffer,
+             ScratchBuffer,
+             2
+           );
+  }
 }
 
 /**
@@ -1000,5 +1045,5 @@ TianoDecompressLibConstructor (
           &gTianoCustomDecompressGuid,
           TianoDecompressGetInfo,
           TianoDecompress
-          );      
+          );
 }

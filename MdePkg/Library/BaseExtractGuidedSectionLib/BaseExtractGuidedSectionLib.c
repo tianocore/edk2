@@ -1,7 +1,7 @@
 /** @file
   Provide generic extract guided section functions.
 
-  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -261,6 +261,7 @@ ExtractGuidedSectionGetInfo (
   UINT32                              Index;
   RETURN_STATUS                       Status;
   EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
+  EFI_GUID                            *SectionDefinitionGuid;
   
   //
   // Check input paramter
@@ -278,11 +279,17 @@ ExtractGuidedSectionGetInfo (
     return Status;
   }
 
+  if (IS_SECTION2 (InputSection)) {
+    SectionDefinitionGuid = &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid);
+  } else {
+    SectionDefinitionGuid = &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid);
+  }
+
   //
   // Search the match registered GetInfo handler for the input guided section.
   //
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
-    if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+    if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, SectionDefinitionGuid)) {
       //
       // Call the match handler to get information for the input section data.
       //
@@ -348,6 +355,7 @@ ExtractGuidedSectionDecode (
   UINT32                              Index;
   RETURN_STATUS                       Status;
   EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
+  EFI_GUID                            *SectionDefinitionGuid;
   
   //
   // Check input parameter
@@ -364,11 +372,17 @@ ExtractGuidedSectionDecode (
     return Status;
   }
 
+  if (IS_SECTION2 (InputSection)) {
+    SectionDefinitionGuid = &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid);
+  } else {
+    SectionDefinitionGuid = &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid);
+  }
+
   //
   // Search the match registered Extract handler for the input guided section.
   //
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
-    if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+    if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, SectionDefinitionGuid)) {
       //
       // Call the match handler to extract raw data for the input guided section.
       //
