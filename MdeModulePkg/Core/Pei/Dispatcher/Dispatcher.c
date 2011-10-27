@@ -41,7 +41,7 @@ DiscoverPeimsAndOrderWithApriori (
   )
 {
   EFI_STATUS                          Status;
-  EFI_PEI_FV_HANDLE                   FileHandle;
+  EFI_PEI_FILE_HANDLE                 FileHandle;
   EFI_PEI_FILE_HANDLE                 AprioriFileHandle;
   EFI_GUID                            *Apriori;
   UINTN                               Index;
@@ -49,7 +49,7 @@ DiscoverPeimsAndOrderWithApriori (
   UINTN                               PeimIndex;
   UINTN                               PeimCount;
   EFI_GUID                            *Guid;
-  EFI_PEI_FV_HANDLE                   TempFileHandles[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
+  EFI_PEI_FILE_HANDLE                 TempFileHandles[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
   EFI_GUID                            FileGuid[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
   EFI_PEI_FIRMWARE_VOLUME_PPI         *FvPpi;
   EFI_FV_FILE_INFO                    FileInfo;
@@ -106,8 +106,12 @@ DiscoverPeimsAndOrderWithApriori (
       //
       Status = FvPpi->GetFileInfo (FvPpi, AprioriFileHandle, &FileInfo);
       ASSERT_EFI_ERROR (Status);
-      Private->AprioriCount = FileInfo.BufferSize & 0x00FFFFFF;
-      Private->AprioriCount -= sizeof (EFI_COMMON_SECTION_HEADER);
+      Private->AprioriCount = FileInfo.BufferSize;
+      if (IS_SECTION2 (FileInfo.Buffer)) {
+        Private->AprioriCount -= sizeof (EFI_COMMON_SECTION_HEADER2);
+      } else {
+        Private->AprioriCount -= sizeof (EFI_COMMON_SECTION_HEADER);
+      }
       Private->AprioriCount /= sizeof (EFI_GUID);
 
       ZeroMem (FileGuid, sizeof (FileGuid));
@@ -122,7 +126,7 @@ DiscoverPeimsAndOrderWithApriori (
 
       //
       // Walk through FileGuid array to find out who is invalid PEIM guid in Apriori file.
-      // Add avalible PEIMs in Apriori file into TempFileHandles array at first.
+      // Add available PEIMs in Apriori file into TempFileHandles array at first.
       //
       Index2 = 0;
       for (Index = 0; Index2 < Private->AprioriCount; Index++) {

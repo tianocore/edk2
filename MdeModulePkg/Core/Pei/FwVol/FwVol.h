@@ -1,7 +1,7 @@
 /** @file
   The internal header file for firmware volume related definitions.
   
-Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -19,6 +19,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define GET_OCCUPIED_SIZE(ActualSize, Alignment) \
   ((ActualSize) + (((Alignment) - ((ActualSize) & ((Alignment) - 1))) & ((Alignment) - 1)))
+
+
+#define PEI_FW_VOL_SIGNATURE  SIGNATURE_32('P','F','W','V')
+
+typedef struct {
+  UINTN                         Signature;
+  BOOLEAN                       IsFfs3Fv;
+  EFI_PEI_FIRMWARE_VOLUME_PPI   Fv;
+} PEI_FW_VOL_INSTANCE;
+
+#define PEI_FW_VOL_INSTANCE_FROM_FV_THIS(a) \
+  CR(a, PEI_FW_VOL_INSTANCE, Fv, PEI_FW_VOL_SIGNATURE)
 
 
 /**
@@ -47,7 +59,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 EFI_STATUS
 EFIAPI
-PeiFfs2FvPpiProcessVolume (
+PeiFfsFvPpiProcessVolume (
   IN  CONST  EFI_PEI_FIRMWARE_VOLUME_PPI *This,
   IN  VOID                               *Buffer,
   IN  UINTN                              BufferSize,
@@ -78,7 +90,7 @@ PeiFfs2FvPpiProcessVolume (
 **/  
 EFI_STATUS
 EFIAPI
-PeiFfs2FvPpiFindFileByType (
+PeiFfsFvPpiFindFileByType (
   IN CONST  EFI_PEI_FIRMWARE_VOLUME_PPI *This,
   IN        EFI_FV_FILETYPE             SearchType,
   IN        EFI_PEI_FV_HANDLE           FvHandle,
@@ -112,7 +124,7 @@ PeiFfs2FvPpiFindFileByType (
 **/    
 EFI_STATUS
 EFIAPI
-PeiFfs2FvPpiFindFileByName (
+PeiFfsFvPpiFindFileByName (
   IN  CONST  EFI_PEI_FIRMWARE_VOLUME_PPI *This,
   IN  CONST  EFI_GUID                    *FileName,
   IN  EFI_PEI_FV_HANDLE                  *FvHandle,
@@ -140,7 +152,7 @@ PeiFfs2FvPpiFindFileByName (
 **/      
 EFI_STATUS
 EFIAPI
-PeiFfs2FvPpiFindSectionByType (
+PeiFfsFvPpiFindSectionByType (
   IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI    *This,
   IN        EFI_SECTION_TYPE               SearchType,
   IN        EFI_PEI_FILE_HANDLE            FileHandle,
@@ -168,7 +180,7 @@ PeiFfs2FvPpiFindSectionByType (
 **/         
 EFI_STATUS
 EFIAPI
-PeiFfs2FvPpiGetFileInfo (
+PeiFfsFvPpiGetFileInfo (
   IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI   *This, 
   IN        EFI_PEI_FILE_HANDLE           FileHandle, 
   OUT       EFI_FV_FILE_INFO              *FileInfo
@@ -190,7 +202,7 @@ PeiFfs2FvPpiGetFileInfo (
 **/            
 EFI_STATUS
 EFIAPI
-PeiFfs2FvPpiGetVolumeInfo (
+PeiFfsFvPpiGetVolumeInfo (
   IN  CONST  EFI_PEI_FIRMWARE_VOLUME_PPI   *This, 
   IN  EFI_PEI_FV_HANDLE                    FvHandle, 
   OUT EFI_FV_INFO                          *VolumeInfo

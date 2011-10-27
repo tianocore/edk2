@@ -43,6 +43,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Guid/FirmwareFileSystem2.h>
+#include <Guid/FirmwareFileSystem3.h>
 #include <Guid/AprioriFileName.h>
 
 ///

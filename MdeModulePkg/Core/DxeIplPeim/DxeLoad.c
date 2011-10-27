@@ -515,21 +515,32 @@ Decompress (
   UINT8                           *ScratchBuffer;
   UINT32                          DstBufferSize;
   UINT32                          ScratchBufferSize;
-  EFI_COMMON_SECTION_HEADER       *Section;
-  UINT32                          SectionLength;
+  VOID                            *CompressionSource;
+  UINT32                          CompressionSourceSize;
+  UINT32                          UncompressedLength;
+  UINT8                           CompressionType;
 
   if (CompressionSection->CommonHeader.Type != EFI_SECTION_COMPRESSION) {
     ASSERT (FALSE);
     return EFI_INVALID_PARAMETER;
   }
 
-  Section = (EFI_COMMON_SECTION_HEADER *) CompressionSection;
-  SectionLength = *(UINT32 *) (Section->Size) & 0x00ffffff;
+  if (IS_SECTION2 (CompressionSection)) {
+    CompressionSource = (VOID *) ((UINT8 *) CompressionSection + sizeof (EFI_COMPRESSION_SECTION2));
+    CompressionSourceSize = (UINT32) (SECTION2_SIZE (CompressionSection) - sizeof (EFI_COMPRESSION_SECTION2));
+    UncompressedLength = ((EFI_COMPRESSION_SECTION2 *) CompressionSection)->UncompressedLength;
+    CompressionType = ((EFI_COMPRESSION_SECTION2 *) CompressionSection)->CompressionType;
+  } else {
+    CompressionSource = (VOID *) ((UINT8 *) CompressionSection + sizeof (EFI_COMPRESSION_SECTION));
+    CompressionSourceSize = (UINT32) (SECTION_SIZE (CompressionSection) - sizeof (EFI_COMPRESSION_SECTION));
+    UncompressedLength = CompressionSection->UncompressedLength;
+    CompressionType = CompressionSection->CompressionType;
+  }
   
   //
   // This is a compression set, expand it
   //
-  switch (CompressionSection->CompressionType) {
+  switch (CompressionType) {
   case EFI_STANDARD_COMPRESSION:
     if (FeaturePcdGet(PcdDxeIplSupportUefiDecompress)) {
       //
@@ -537,8 +548,8 @@ Decompress (
       // For compressed data, decompress them to destination buffer.
       //
       Status = UefiDecompressGetInfo (
-                 (UINT8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
-                 SectionLength - sizeof (EFI_COMPRESSION_SECTION),
+                 CompressionSource,
+                 CompressionSourceSize,
                  &DstBufferSize,
                  &ScratchBufferSize
                  );
@@ -572,7 +583,7 @@ Decompress (
       // Call decompress function
       //
       Status = UefiDecompress (
-                  (CHAR8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
+                  CompressionSource,
                   DstBuffer,
                   ScratchBuffer
                   );
@@ -597,7 +608,7 @@ Decompress (
     //
     // Allocate destination buffer
     //
-    DstBufferSize = CompressionSection->UncompressedLength;
+    DstBufferSize = UncompressedLength;
     DstBuffer     = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize) + 1);
     if (DstBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -610,7 +621,7 @@ Decompress (
     //
     // stream is not actually compressed, just encapsulated.  So just copy it.
     //
-    CopyMem (DstBuffer, CompressionSection + 1, DstBufferSize);
+    CopyMem (DstBuffer, CompressionSource, DstBufferSize);
     break;
 
   default:

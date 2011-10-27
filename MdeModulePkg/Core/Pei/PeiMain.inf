@@ -71,6 +71,7 @@
 [Guids]
   gPeiAprioriFileNameGuid       ## CONSUMES ## GUID
   gEfiFirmwareFileSystem2Guid   ## CONSUMES ## FV
+  gEfiFirmwareFileSystem3Guid   ## CONSUMES ## FV
   
 [Ppis]
   gEfiPeiStatusCodePpiGuid                      ## SOMETIMES_CONSUMES (PeiReportStatusService is not ready if this PPI doesn't exist)
