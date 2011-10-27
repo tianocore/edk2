@@ -3,7 +3,7 @@
   Layers on top of Firmware Block protocol to produce a file abstraction
   of FV based files.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -304,7 +304,6 @@ FvCheck (
   UINTN                                 Index;
   EFI_LBA                               LbaIndex;
   UINTN                                 Size;
-  UINTN                                 FileLength;
   EFI_FFS_FILE_STATE                    FileState;
   UINT8                                 *TopFvAddress;
   UINTN                                 TestLength;
@@ -438,7 +437,14 @@ FvCheck (
     if (!IsValidFfsHeader (FvDevice->ErasePolarity, FfsHeader, &FileState)) {
       if ((FileState == EFI_FILE_HEADER_INVALID) ||
           (FileState == EFI_FILE_HEADER_CONSTRUCTION)) {
-        FfsHeader++;
+        if (IS_FFS_FILE2 (FfsHeader)) {
+          if (!FvDevice->IsFfs3Fv) {
+            DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsHeader->Name));
+          }
+          FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + sizeof (EFI_FFS_FILE_HEADER2));
+        } else {
+          FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + sizeof (EFI_FFS_FILE_HEADER));
+        }
         continue;
       } else {
         //
@@ -457,10 +463,18 @@ FvCheck (
       goto Done;
     }
 
-    //
-    // Size[3] is a three byte array, read 4 bytes and throw one away
-    //
-    FileLength = *(UINT32 *)&FfsHeader->Size[0] & 0x00FFFFFF;
+    if (IS_FFS_FILE2 (FfsHeader)) {
+      ASSERT (FFS_FILE2_SIZE (FfsHeader) > 0x00FFFFFF);
+      if (!FvDevice->IsFfs3Fv) {
+        DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsHeader->Name));
+        FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE2_SIZE (FfsHeader));
+        //
+        // Adjust pointer to the next 8-byte aligned boundry.
+        //
+        FfsHeader = (EFI_FFS_FILE_HEADER *) (((UINTN) FfsHeader + 7) & ~0x07);
+        continue;
+      }
+    }
 
     FileState = GetFileState (FvDevice->ErasePolarity, FfsHeader);
 
@@ -481,7 +495,11 @@ FvCheck (
       InsertTailList (&FvDevice->FfsFileListHeader, &FfsFileEntry->Link);
     }
 
-    FfsHeader =  (EFI_FFS_FILE_HEADER *)(((UINT8 *)FfsHeader) + FileLength);
+    if (IS_FFS_FILE2 (FfsHeader)) {
+      FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE2_SIZE (FfsHeader));
+    } else {
+      FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE_SIZE (FfsHeader));
+    }
 
     //
     // Adjust pointer to the next 8-byte aligned boundry.
@@ -502,7 +520,7 @@ Done:
 
 /**
   This notification function is invoked when an instance of the
-  EFI_FW_VOLUME_BLOCK_PROTOCOL is produced.  It layers an instance of the
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL is produced.  It layers an instance of the
   EFI_FIRMWARE_VOLUME2_PROTOCOL on the same handle.  This is the function where
   the actual initialization of the EFI_FIRMWARE_VOLUME2_PROTOCOL is done.
 
@@ -577,7 +595,8 @@ NotifyFwVolBlock (
     // Check to see that the file system is indeed formatted in a way we can
     // understand it...
     //
-    if (!CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem2Guid)) {
+    if ((!CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem2Guid)) &&
+        (!CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem3Guid))) {
       continue;
     }
 
@@ -610,6 +629,7 @@ NotifyFwVolBlock (
       FvDevice->Handle          = Handle;
       FvDevice->FwVolHeader     = FwVolHeader;
       FvDevice->Fv.ParentHandle = Fvb->ParentHandle;
+      FvDevice->IsFfs3Fv        = CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem3Guid);
 
       //
       // Install an New FV protocol on the existing handle

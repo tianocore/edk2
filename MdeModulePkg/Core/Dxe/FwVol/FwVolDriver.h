@@ -2,7 +2,7 @@
   Firmware File System protocol. Layers on top of Firmware
   Block protocol to produce a file abstraction of FV based files.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -43,6 +43,7 @@ typedef struct {
   LIST_ENTRY                              FfsFileListHeader;
 
   UINT8                                   ErasePolarity;
+  BOOLEAN                                 IsFfs3Fv;
 } FV_DEVICE;
 
 #define FV_DEVICE_FROM_THIS(a) CR(a, FV_DEVICE, Fv, FV2_DEVICE_SIGNATURE)

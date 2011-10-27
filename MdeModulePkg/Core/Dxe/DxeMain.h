@@ -54,6 +54,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmBase2.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FirmwareFileSystem2.h>
+#include <Guid/FirmwareFileSystem3.h>
 #include <Guid/HobList.h>
 #include <Guid/DebugImageInfoTable.h>
 #include <Guid/FileInfo.h>
@@ -2255,6 +2256,7 @@ OpenSectionStream (
                                 function returns anything other than
                                 EFI_SUCCESS, the value of *AuthenticationStatus
                                 is undefined.
+  @param  IsFfs3Fv              Indicates the FV format.
 
   @retval EFI_SUCCESS           Section was retrieved successfully
   @retval EFI_PROTOCOL_ERROR    A GUID defined section was encountered in the
@@ -2285,7 +2287,8 @@ GetSection (
   IN UINTN                                              SectionInstance,
   IN VOID                                               **Buffer,
   IN OUT UINTN                                          *BufferSize,
-  OUT UINT32                                            *AuthenticationStatus
+  OUT UINT32                                            *AuthenticationStatus,
+  IN BOOLEAN                                            IsFfs3Fv
   );
 
 

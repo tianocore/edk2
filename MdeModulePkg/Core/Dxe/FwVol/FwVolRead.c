@@ -1,7 +1,7 @@
 /** @file
   Implements functions to read firmware file
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -119,7 +119,6 @@ FvGetNextFile (
   UINTN                                       *KeyValue;
   LIST_ENTRY                                  *Link;
   FFS_FILE_LIST_ENTRY                         *FfsFileEntry;
-  UINTN                                       FileLength;
 
   FvDevice = FV_DEVICE_FROM_THIS (This);
 
@@ -202,14 +201,13 @@ FvGetNextFile (
   *Attributes = FfsAttributes2FvFileAttributes (FfsFileHeader->Attributes);
 
   //
-  // Read four bytes out of the 3 byte array and throw out extra data
-  //
-  FileLength = *(UINT32 *)&FfsFileHeader->Size[0] & 0x00FFFFFF;
-
-  //
   // we need to substract the header size
   //
-  *Size = FileLength - sizeof(EFI_FFS_FILE_HEADER);
+  if (IS_FFS_FILE2 (FfsFileHeader)) {
+    *Size = FFS_FILE2_SIZE (FfsFileHeader) - sizeof (EFI_FFS_FILE_HEADER2);
+  } else {
+    *Size = FFS_FILE_SIZE (FfsFileHeader) - sizeof (EFI_FFS_FILE_HEADER);
+  }
 
   return EFI_SUCCESS;
 }
@@ -333,7 +331,11 @@ FvReadFile (
   //
   // Skip over file header
   //
-  SrcPtr = ((UINT8 *)FfsHeader) + sizeof (EFI_FFS_FILE_HEADER);
+  if (IS_FFS_FILE2 (FfsHeader)) {
+    SrcPtr = ((UINT8 *) FfsHeader) + sizeof (EFI_FFS_FILE_HEADER2);
+  } else {
+    SrcPtr = ((UINT8 *) FfsHeader) + sizeof (EFI_FFS_FILE_HEADER);
+  }
 
   Status = EFI_SUCCESS;
   if (*Buffer == NULL) {
@@ -447,7 +449,7 @@ FvReadFileSection (
   }
 
   //
-  // Use FfsEntry to cache Section Extraction Protocol Inforomation
+  // Use FfsEntry to cache Section Extraction Protocol Information
   //
   if (FfsEntry->StreamHandle == 0) {
     Status = OpenSectionStream (
@@ -470,7 +472,8 @@ FvReadFileSection (
              (SectionType == 0) ? 0 : SectionInstance,
              Buffer,
              BufferSize,
-             AuthenticationStatus
+             AuthenticationStatus,
+             FvDevice->IsFfs3Fv
              );
 
   //
