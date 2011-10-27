@@ -2409,6 +2409,11 @@ EvaluateExpression (
       break;
 
     case EFI_IFR_MATCH_OP:
+      Status = InitializeUnicodeCollationProtocol ();
+      if (EFI_ERROR (Status)) {
+        goto Done;
+      }
+     
       Status = IfrMatch (FormSet, Value);
       break;
 
