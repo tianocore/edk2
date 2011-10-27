@@ -239,7 +239,11 @@ VerifyHeaderChecksum (
 {
   UINT8 HeaderChecksum;
 
-  HeaderChecksum = CalculateSum8 ((UINT8 *) FfsHeader, sizeof (EFI_FFS_FILE_HEADER));
+  if (IS_FFS_FILE2 (FfsHeader)) {
+    HeaderChecksum = CalculateSum8 ((UINT8 *) FfsHeader, sizeof (EFI_FFS_FILE_HEADER2));
+  } else {
+    HeaderChecksum = CalculateSum8 ((UINT8 *) FfsHeader, sizeof (EFI_FFS_FILE_HEADER));
+  }
   HeaderChecksum = (UINT8) (HeaderChecksum - FfsHeader->State - FfsHeader->IntegrityCheck.Checksum.File);
 
   if (HeaderChecksum == 0) {
@@ -265,18 +269,19 @@ VerifyFileChecksum (
 {
   UINT8                   FileChecksum;
   EFI_FV_FILE_ATTRIBUTES  Attributes;
-  UINT32                  FileSize;
 
   Attributes = FfsHeader->Attributes;
 
   if ((Attributes & FFS_ATTRIB_CHECKSUM) != 0) {
 
-    FileSize = *(UINT32 *) FfsHeader->Size & 0x00FFFFFF;
-
     //
     // Check checksum of FFS data
     //
-    FileChecksum = CalculateSum8 ((UINT8 *) FfsHeader + sizeof (EFI_FFS_FILE_HEADER), FileSize - sizeof (EFI_FFS_FILE_HEADER));
+    if (IS_FFS_FILE2 (FfsHeader)) {
+      FileChecksum = CalculateSum8 ((UINT8 *) FfsHeader + sizeof (EFI_FFS_FILE_HEADER2), FFS_FILE2_SIZE (FfsHeader) - sizeof (EFI_FFS_FILE_HEADER2));
+    } else {
+      FileChecksum = CalculateSum8 ((UINT8 *) FfsHeader + sizeof (EFI_FFS_FILE_HEADER), FFS_FILE_SIZE (FfsHeader) - sizeof (EFI_FFS_FILE_HEADER));
+    }
     FileChecksum = (UINT8) (FileChecksum + FfsHeader->IntegrityCheck.Checksum.File);
 
     if (FileChecksum == 0) {
@@ -388,10 +393,18 @@ GetNextPossibleFileHeader (
     //
     // Skip this header
     //
-    return (EFI_PHYSICAL_ADDRESS) (UINTN) FfsHeader + sizeof (EFI_FFS_FILE_HEADER);
+    if (IS_FFS_FILE2 (FfsHeader)) {
+      return (EFI_PHYSICAL_ADDRESS) (UINTN) FfsHeader + sizeof (EFI_FFS_FILE_HEADER2);
+    } else {
+      return (EFI_PHYSICAL_ADDRESS) (UINTN) FfsHeader + sizeof (EFI_FFS_FILE_HEADER);
+    }
   }
 
-  FileLength = *(UINT32 *) FfsHeader->Size & 0x00FFFFFF;
+  if (IS_FFS_FILE2 (FfsHeader)) {
+    FileLength = FFS_FILE2_SIZE (FfsHeader);
+  } else {
+    FileLength = FFS_FILE_SIZE (FfsHeader);
+  }
 
   //
   // Since FileLength is not multiple of 8, we need skip some bytes
@@ -593,33 +606,3 @@ IsValidFFSFile (
   return TRUE;
 }
 
-/**
-  Locate the first file in FV.
-
-  @param  FvDevice  Cached FV image.
-  @param  FirstFile Points to the got first FFS file header.
-
-  @retval EFI_NOT_FOUND   No FFS file is found in FV.
-  @retval EFI_SUCCESS     The first FFS file is got.
-
-**/
-EFI_STATUS
-FvLocateFirstFile (
-  IN     FV_DEVICE              *FvDevice,
-  OUT EFI_FFS_FILE_HEADER       **FirstFile
-  )
-{
-  FFS_FILE_LIST_ENTRY *TmpFileList;
-  LIST_ENTRY      *Link;
-
-  Link = FvDevice->FfsFileListHeader.ForwardLink;
-
-  if (Link == &FvDevice->FfsFileListHeader) {
-    return EFI_NOT_FOUND;
-  }
-
-  TmpFileList = (FFS_FILE_LIST_ENTRY *) Link;
-  *FirstFile  = (EFI_FFS_FILE_HEADER *) TmpFileList->FfsHeader;
-
-  return EFI_SUCCESS;
-}

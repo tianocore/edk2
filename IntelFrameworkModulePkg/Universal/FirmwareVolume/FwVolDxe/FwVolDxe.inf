@@ -57,6 +57,7 @@
 [Guids]
   gEfiFirmwareVolumeTopFileGuid                ## CONSUMES
   gEfiFirmwareFileSystem2Guid                  ## CONSUMES
+  gEfiFirmwareFileSystem3Guid                  ## CONSUMES
 
 [Protocols]
   gEfiSectionExtractionProtocolGuid            ## CONSUMES

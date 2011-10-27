@@ -1,7 +1,7 @@
 /** @file
   Implements functions to read firmware file.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -100,7 +100,6 @@ FvGetNextFile (
   UINTN               *KeyValue;
   LIST_ENTRY      *Link;
   FFS_FILE_LIST_ENTRY *FfsFileEntry;
-  UINTN               FileLength;
 
   FvDevice  = FV_DEVICE_FROM_THIS (This);
 
@@ -202,12 +201,14 @@ FvGetNextFile (
   CopyGuid (NameGuid, &FfsFileHeader->Name);
   *Attributes = FfsAttributes2FvFileAttributes (FfsFileHeader->Attributes);
 
-  FileLength  = *(UINT32 *) FfsFileHeader->Size & 0x00FFFFFF;
-
   //
   // we need to substract the header size
   //
-  *Size = FileLength - sizeof (EFI_FFS_FILE_HEADER);
+  if (IS_FFS_FILE2 (FfsFileHeader)) {
+    *Size = FFS_FILE2_SIZE (FfsFileHeader) - sizeof (EFI_FFS_FILE_HEADER2);
+  } else {
+    *Size = FFS_FILE_SIZE (FfsFileHeader) - sizeof (EFI_FFS_FILE_HEADER);
+  }
 
   if (CompareGuid (&gEfiFirmwareVolumeTopFileGuid, NameGuid)) {
     //
@@ -216,8 +217,11 @@ FvGetNextFile (
     UINT8   *SrcPtr;
     UINT32  Tmp;
 
-    SrcPtr = (UINT8 *) FfsFileHeader;
-    SrcPtr += sizeof (EFI_FFS_FILE_HEADER);
+    if (IS_FFS_FILE2 (FfsFileHeader)) {
+      SrcPtr = ((UINT8 *) FfsFileHeader) + sizeof (EFI_FFS_FILE_HEADER2);
+    } else {
+      SrcPtr = ((UINT8 *) FfsFileHeader) + sizeof (EFI_FFS_FILE_HEADER);
+    }
 
     while (*Size >= 4) {
       Tmp = *(UINT32 *) SrcPtr;
@@ -362,8 +366,11 @@ FvReadFile (
     //
     // Get File Size of the cached file
     //
-    FileSize = *(UINT32 *) FfsHeader->Size & 0x00FFFFFF;
-    FileSize -= sizeof (EFI_FFS_FILE_HEADER);
+    if (IS_FFS_FILE2 (FfsHeader)) {
+      FileSize = FFS_FILE2_SIZE (FfsHeader) - sizeof (EFI_FFS_FILE_HEADER2);
+    } else {
+      FileSize = FFS_FILE_SIZE (FfsHeader) - sizeof (EFI_FFS_FILE_HEADER);
+    }
   }
   //
   // Get file info
@@ -380,8 +387,11 @@ FvReadFile (
     return EFI_SUCCESS;
   }
 
-  SrcPtr = (UINT8 *) FfsHeader;
-  SrcPtr += sizeof (EFI_FFS_FILE_HEADER);
+  if (IS_FFS_FILE2 (FfsHeader)) {
+    SrcPtr = ((UINT8 *) FfsHeader) + sizeof (EFI_FFS_FILE_HEADER2);
+  } else {
+    SrcPtr = ((UINT8 *) FfsHeader) + sizeof (EFI_FFS_FILE_HEADER);
+  }
 
   if (CompareGuid (&gEfiFirmwareVolumeTopFileGuid, NameGuid)) {
     //

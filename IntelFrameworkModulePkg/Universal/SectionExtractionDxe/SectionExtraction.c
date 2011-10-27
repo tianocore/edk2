@@ -27,7 +27,7 @@
   3) A support protocol is not found, and the data is not available to be read
      without it.  This results in EFI_PROTOCOL_ERROR.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -278,7 +278,11 @@ IsValidSectionStream (
   SectionHeader = (EFI_COMMON_SECTION_HEADER *)SectionStream;
   
   while (TotalLength < SectionStreamLength) {
-    SectionLength = SECTION_SIZE (SectionHeader);
+    if (IS_SECTION2 (SectionHeader)) {
+      SectionLength = SECTION2_SIZE (SectionHeader);
+    } else {
+      SectionLength = SECTION_SIZE (SectionHeader);
+    }
     TotalLength += SectionLength;
 
     if (TotalLength == SectionStreamLength) {
@@ -462,7 +466,11 @@ ChildIsType (
     return TRUE;
   }
   GuidedSection = (EFI_GUID_DEFINED_SECTION * )(Stream->StreamBuffer + Child->OffsetInStream);
-  return CompareGuid (&GuidedSection->SectionDefinitionGuid, SectionDefinitionGuid);
+  if (IS_SECTION2 (GuidedSection)) {
+    return CompareGuid (&(((EFI_GUID_DEFINED_SECTION2 *) GuidedSection)->SectionDefinitionGuid), SectionDefinitionGuid);
+  } else {
+    return CompareGuid (&GuidedSection->SectionDefinitionGuid, SectionDefinitionGuid);
+  }
 }
 
 /**
@@ -580,7 +588,7 @@ NotifyGuidedExtraction (
                                  );
     ASSERT_EFI_ERROR (Status);
     //
-    // OR in the parent stream's aggregagate status.
+    // OR in the parent stream's aggregate status.
     //
     AuthenticationStatus |= Context->ParentStream->AuthenticationStatus & EFI_AGGREGATE_AUTH_STATUS_ALL;
     Status = OpenSectionStreamEx (
@@ -674,7 +682,11 @@ CreateChildNode (
   UINT32                                       ScratchSize;
   UINTN                                        NewStreamBufferSize;
   UINT32                                       AuthenticationStatus;
-  UINT32                                       SectionLength;
+  VOID                                         *CompressionSource;
+  UINT32                                       CompressionSourceSize;
+  UINT32                                       UncompressedLength;
+  UINT8                                        CompressionType;
+  UINT16                                       GuidedSectionAttributes;
     
   FRAMEWORK_SECTION_CHILD_NODE                      *Node;
 
@@ -694,7 +706,11 @@ CreateChildNode (
   //
   Node->Signature = FRAMEWORK_SECTION_CHILD_SIGNATURE;
   Node->Type = SectionHeader->Type;
-  Node->Size = SECTION_SIZE (SectionHeader);
+  if (IS_SECTION2 (SectionHeader)) {
+    Node->Size = SECTION2_SIZE (SectionHeader);
+  } else {
+    Node->Size = SECTION_SIZE (SectionHeader);
+  }
   Node->OffsetInStream = ChildOffset;
   Node->EncapsulatedStreamHandle = NULL_STREAM_HANDLE;
   Node->EncapsulationGuid = NULL;
@@ -710,24 +726,36 @@ CreateChildNode (
       ASSERT (Node->Size >= sizeof (EFI_COMPRESSION_SECTION));
       
       CompressionHeader = (EFI_COMPRESSION_SECTION *) SectionHeader;
-      
+
+      if (IS_SECTION2 (CompressionHeader)) {
+        CompressionSource = (VOID *) ((UINT8 *) CompressionHeader + sizeof (EFI_COMPRESSION_SECTION2));
+        CompressionSourceSize = (UINT32) (SECTION2_SIZE (CompressionHeader) - sizeof (EFI_COMPRESSION_SECTION2));
+        UncompressedLength = ((EFI_COMPRESSION_SECTION2 *) CompressionHeader)->UncompressedLength;
+        CompressionType = ((EFI_COMPRESSION_SECTION2 *) CompressionHeader)->CompressionType;
+      } else {
+        CompressionSource = (VOID *) ((UINT8 *) CompressionHeader + sizeof (EFI_COMPRESSION_SECTION));
+        CompressionSourceSize = (UINT32) (SECTION_SIZE (CompressionHeader) - sizeof (EFI_COMPRESSION_SECTION));
+        UncompressedLength = CompressionHeader->UncompressedLength;
+        CompressionType = CompressionHeader->CompressionType;
+      }
+
       //
       // Allocate space for the new stream
       //
-      if (CompressionHeader->UncompressedLength > 0) {
-        NewStreamBufferSize = CompressionHeader->UncompressedLength;
+      if (UncompressedLength > 0) {
+        NewStreamBufferSize = UncompressedLength;
         NewStreamBuffer = AllocatePool (NewStreamBufferSize);
         if (NewStreamBuffer == NULL) {
           FreePool (Node);
           return EFI_OUT_OF_RESOURCES;
         }
         
-        if (CompressionHeader->CompressionType == EFI_NOT_COMPRESSED) {
+        if (CompressionType == EFI_NOT_COMPRESSED) {
           //
           // stream is not actually compressed, just encapsulated.  So just copy it.
           //
-          CopyMem (NewStreamBuffer, CompressionHeader + 1, NewStreamBufferSize);
-        } else if (CompressionHeader->CompressionType == EFI_STANDARD_COMPRESSION) {
+          CopyMem (NewStreamBuffer, CompressionSource, NewStreamBufferSize);
+        } else if (CompressionType == EFI_STANDARD_COMPRESSION) {
           //
           // Only support the EFI_SATNDARD_COMPRESSION algorithm.
           // 
@@ -741,13 +769,13 @@ CreateChildNode (
           
           Status = Decompress->GetInfo (
                                  Decompress,
-                                 CompressionHeader + 1,
-                                 Node->Size - sizeof (EFI_COMPRESSION_SECTION),
+                                 CompressionSource,
+                                 CompressionSourceSize,
                                  (UINT32 *)&NewStreamBufferSize,
                                  &ScratchSize
                                  );
           ASSERT_EFI_ERROR (Status);
-          ASSERT (NewStreamBufferSize == CompressionHeader->UncompressedLength);
+          ASSERT (NewStreamBufferSize == UncompressedLength);
 
           ScratchBuffer = AllocatePool (ScratchSize);
           if (ScratchBuffer == NULL) {
@@ -758,8 +786,8 @@ CreateChildNode (
 
           Status = Decompress->Decompress (
                                  Decompress,
-                                 CompressionHeader + 1,
-                                 Node->Size - sizeof (EFI_COMPRESSION_SECTION),
+                                 CompressionSource,
+                                 CompressionSourceSize,
                                  NewStreamBuffer,
                                  (UINT32)NewStreamBufferSize,
                                  ScratchBuffer,
@@ -789,7 +817,13 @@ CreateChildNode (
 
     case EFI_SECTION_GUID_DEFINED:
       GuidedHeader = (EFI_GUID_DEFINED_SECTION *) SectionHeader;
-      Node->EncapsulationGuid = &GuidedHeader->SectionDefinitionGuid;
+      if (IS_SECTION2 (GuidedHeader)) {
+        Node->EncapsulationGuid = &(((EFI_GUID_DEFINED_SECTION2 *) GuidedHeader)->SectionDefinitionGuid);
+        GuidedSectionAttributes = ((EFI_GUID_DEFINED_SECTION2 *) GuidedHeader)->Attributes;
+      } else {
+        Node->EncapsulationGuid = &GuidedHeader->SectionDefinitionGuid;
+        GuidedSectionAttributes = GuidedHeader->Attributes;
+      }
       Status = gBS->LocateProtocol (Node->EncapsulationGuid, NULL, (VOID **)&GuidedExtraction);
       if (!EFI_ERROR (Status)) {
         //
@@ -812,7 +846,7 @@ CreateChildNode (
         // Make sure we initialize the new stream with the correct 
         // authentication status for both aggregate and local status fields.
         //
-        if ((GuidedHeader->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) == EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
+        if ((GuidedSectionAttributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) == EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
           //
           // OR in the parent stream's aggregate status.
           //
@@ -841,7 +875,7 @@ CreateChildNode (
         //
         // There's no GUIDed section extraction protocol available.
         //
-        if ((GuidedHeader->Attributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) == EFI_GUIDED_SECTION_PROCESSING_REQUIRED) {
+        if ((GuidedSectionAttributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) == EFI_GUIDED_SECTION_PROCESSING_REQUIRED) {
           //
           // If the section REQUIRES an extraction protocol, register for RPN 
           // when the required GUIDed extraction protocol becomes available. 
@@ -853,7 +887,7 @@ CreateChildNode (
           // Figure out the proper authentication status
           //
           AuthenticationStatus = Stream->AuthenticationStatus;
-          if ((GuidedHeader->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) == EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
+          if ((GuidedSectionAttributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) == EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
             //
             //  The local status of the new stream is contained in 
             //  AuthenticaionStatus.  This value needs to be ORed into the
@@ -871,14 +905,23 @@ CreateChildNode (
             AuthenticationStatus |= AuthenticationStatus >> 16;
           }
           
-          SectionLength = SECTION_SIZE (GuidedHeader);
-          Status = OpenSectionStreamEx (
-                     SectionLength - GuidedHeader->DataOffset,
-                     (UINT8 *) GuidedHeader + GuidedHeader->DataOffset,
-                     TRUE,
-                     AuthenticationStatus,
-                     &Node->EncapsulatedStreamHandle
-                     );
+          if (IS_SECTION2 (GuidedHeader)) {
+            Status = OpenSectionStreamEx (
+                       SECTION2_SIZE (GuidedHeader) - ((EFI_GUID_DEFINED_SECTION2 *) GuidedHeader)->DataOffset,
+                       (UINT8 *) GuidedHeader + ((EFI_GUID_DEFINED_SECTION2 *) GuidedHeader)->DataOffset,
+                       TRUE,
+                       AuthenticationStatus,
+                       &Node->EncapsulatedStreamHandle
+                       );
+          } else {
+            Status = OpenSectionStreamEx (
+                       SECTION_SIZE (GuidedHeader) - ((EFI_GUID_DEFINED_SECTION *) GuidedHeader)->DataOffset,
+                       (UINT8 *) GuidedHeader + ((EFI_GUID_DEFINED_SECTION *) GuidedHeader)->DataOffset,
+                       TRUE,
+                       AuthenticationStatus,
+                       &Node->EncapsulatedStreamHandle
+                       );
+          }
           if (EFI_ERROR (Status)) {
             FreePool (Node);
             return Status;
@@ -1177,6 +1220,7 @@ GetSection (
   UINTN                                                 Instance;
   UINT8                                                 *CopyBuffer;
   UINTN                                                 SectionSize;
+  EFI_COMMON_SECTION_HEADER                             *Section;
   
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
@@ -1219,8 +1263,15 @@ GetSection (
     }
     ASSERT (ChildNode != NULL);
     ASSERT (ChildStreamNode != NULL);
-    CopySize = ChildNode->Size - sizeof (EFI_COMMON_SECTION_HEADER);
-    CopyBuffer = ChildStreamNode->StreamBuffer + ChildNode->OffsetInStream + sizeof (EFI_COMMON_SECTION_HEADER);
+    Section = (EFI_COMMON_SECTION_HEADER *) (ChildStreamNode->StreamBuffer + ChildNode->OffsetInStream);
+
+    if (IS_SECTION2 (Section)) {
+      CopySize = SECTION2_SIZE (Section) - sizeof (EFI_COMMON_SECTION_HEADER2);
+      CopyBuffer = (UINT8 *) Section + sizeof (EFI_COMMON_SECTION_HEADER2);
+    } else {
+      CopySize = SECTION_SIZE (Section) - sizeof (EFI_COMMON_SECTION_HEADER);
+      CopyBuffer = (UINT8 *) Section + sizeof (EFI_COMMON_SECTION_HEADER);
+    }
     *AuthenticationStatus = ExtractedAuthenticationStatus;
   }   
     

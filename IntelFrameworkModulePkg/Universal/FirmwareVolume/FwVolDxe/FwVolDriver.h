@@ -1,7 +1,7 @@
 /** @file
   Common defines and definitions for a FwVolDxe driver.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -20,6 +20,7 @@
 #include <PiDxe.h>
 
 #include <Guid/FirmwareFileSystem2.h>
+#include <Guid/FirmwareFileSystem3.h>
 #include <Protocol/SectionExtraction.h>
 #include <Protocol/FaultTolerantWrite.h>
 #include <Protocol/FirmwareVolume2.h>
@@ -92,7 +93,7 @@ typedef struct {
   LIST_ENTRY                          FfsFileListHeader;
 
   FFS_FILE_LIST_ENTRY                 *CurrentFfsFile;
-
+  BOOLEAN                             IsFfs3Fv;
 } FV_DEVICE;
 
 #define FV_DEVICE_FROM_THIS(a)  CR (a, FV_DEVICE, Fv, FV_DEVICE_SIGNATURE)
@@ -487,22 +488,6 @@ EFI_STATUS
 GetFwVolHeader (
   IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *Fvb,
   OUT EFI_FIRMWARE_VOLUME_HEADER                **FwVolHeader
-  );
-
-/**
-  Locate the first file in FV.
-
-  @param  FvDevice  Cached FV image.
-  @param  FirstFile Points to the got first FFS file header.
-
-  @retval EFI_NOT_FOUND   No FFS file is found in FV.
-  @retval EFI_SUCCESS     The first FFS file is got.
-
-**/
-EFI_STATUS
-FvLocateFirstFile (
-  IN     FV_DEVICE              *FvDevice,
-  OUT EFI_FFS_FILE_HEADER       **FirstFile
   );
 
 /**

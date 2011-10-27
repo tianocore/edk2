@@ -27,17 +27,22 @@ SetPadFileChecksum (
   IN EFI_FFS_FILE_HEADER *PadFileHeader
   )
 {
-  UINT32 PadFileLength;
-
   if ((PadFileHeader->Attributes & FFS_ATTRIB_CHECKSUM) != 0) {
 
-    PadFileLength = *(UINT32 *) PadFileHeader->Size & 0x00FFFFFF;
+    if (IS_FFS_FILE2 (PadFileHeader)) {
+      //
+      // Calculate checksum of Pad File Data
+      //
+      PadFileHeader->IntegrityCheck.Checksum.File =
+        CalculateCheckSum8 ((UINT8 *) PadFileHeader + sizeof (EFI_FFS_FILE_HEADER2), FFS_FILE2_SIZE (PadFileHeader) - sizeof (EFI_FFS_FILE_HEADER2));
 
-    //
-    // Calculate checksum of Pad File Data
-    //
-    PadFileHeader->IntegrityCheck.Checksum.File =
-      CalculateCheckSum8 ((UINT8 *) PadFileHeader + sizeof (EFI_FFS_FILE_HEADER), PadFileLength - sizeof (EFI_FFS_FILE_HEADER));
+      } else {
+      //
+      // Calculate checksum of Pad File Data
+      //
+      PadFileHeader->IntegrityCheck.Checksum.File =
+        CalculateCheckSum8 ((UINT8 *) PadFileHeader + sizeof (EFI_FFS_FILE_HEADER), FFS_FILE_SIZE (PadFileHeader) - sizeof (EFI_FFS_FILE_HEADER));
+    }
 
   } else {
 
@@ -76,8 +81,17 @@ FvCreatePadFileInFreeSpace (
   UINTN                               StateOffset;
   UINT8                               *StartPos;
   FFS_FILE_LIST_ENTRY                 *FfsFileEntry;
+  UINTN                               HeaderSize;
+  UINTN                               FileSize;
 
-  if (FreeSpaceEntry->Length < Size + sizeof (EFI_FFS_FILE_HEADER)) {
+  HeaderSize = sizeof (EFI_FFS_FILE_HEADER);
+  FileSize = Size + HeaderSize;
+  if (FileSize > 0x00FFFFFF) {
+    HeaderSize = sizeof (EFI_FFS_FILE_HEADER2);
+    FileSize = Size + HeaderSize;
+  }
+
+  if (FreeSpaceEntry->Length < FileSize) {
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -93,7 +107,7 @@ FvCreatePadFileInFreeSpace (
   if (!IsBufferErased (
         FvDevice->ErasePolarity,
         StartPos,
-        Size + sizeof (EFI_FFS_FILE_HEADER)
+        FileSize
         )) {
     return EFI_DEVICE_ERROR;
   }
@@ -122,8 +136,8 @@ FvCreatePadFileInFreeSpace (
   //
   // Update Free Space Entry, since header is allocated
   //
-  FreeSpaceEntry->Length -= sizeof (EFI_FFS_FILE_HEADER);
-  FreeSpaceEntry->StartingAddress += sizeof (EFI_FFS_FILE_HEADER);
+  FreeSpaceEntry->Length -= HeaderSize;
+  FreeSpaceEntry->StartingAddress += HeaderSize;
 
   //
   // Fill File Name Guid, here we assign a NULL-GUID to Pad files
@@ -135,15 +149,21 @@ FvCreatePadFileInFreeSpace (
   //
   PadFileHeader->Type       = EFI_FV_FILETYPE_FFS_PAD;
   PadFileHeader->Attributes = 0;
-  *(UINT32 *) PadFileHeader->Size &= 0xFF000000;
-  *(UINT32 *) PadFileHeader->Size |= (Size + sizeof (EFI_FFS_FILE_HEADER));
+  if ((FileSize) > 0x00FFFFFF) {
+    ((EFI_FFS_FILE_HEADER2 *) PadFileHeader)->ExtendedSize = (UINT32) FileSize;
+    *(UINT32 *) PadFileHeader->Size &= 0xFF000000;
+    PadFileHeader->Attributes |= FFS_ATTRIB_LARGE_FILE;
+  } else {
+    *(UINT32 *) PadFileHeader->Size &= 0xFF000000;
+    *(UINT32 *) PadFileHeader->Size |= FileSize;
+  }
 
   SetHeaderChecksum (PadFileHeader);
   SetPadFileChecksum (PadFileHeader);
 
   Offset          = (UINTN) (StartPos - FvDevice->CachedFv);
 
-  NumBytesWritten = sizeof (EFI_FFS_FILE_HEADER);
+  NumBytesWritten = HeaderSize;
   Status = FvcWrite (
             FvDevice,
             Offset,
@@ -220,8 +240,14 @@ FvFillPadFile (
   //
   PadFileHeader->Type       = EFI_FV_FILETYPE_FFS_PAD;
   PadFileHeader->Attributes = 0;
-  *(UINT32 *) PadFileHeader->Size &= 0xFF000000;
-  *(UINT32 *) PadFileHeader->Size |= PadFileLength;
+  if (PadFileLength > 0x00FFFFFF) {
+    ((EFI_FFS_FILE_HEADER2 *) PadFileHeader)->ExtendedSize = (UINT32) PadFileLength;
+    *(UINT32 *) PadFileHeader->Size &= 0xFF000000;
+    PadFileHeader->Attributes |= FFS_ATTRIB_LARGE_FILE;
+  } else {
+    *(UINT32 *) PadFileHeader->Size &= 0xFF000000;
+    *(UINT32 *) PadFileHeader->Size |= PadFileLength;
+  }
 
   SetHeaderChecksum (PadFileHeader);
   SetPadFileChecksum (PadFileHeader);
@@ -286,8 +312,14 @@ FvFillFfsFile (
 
   TmpFileHeader->Attributes = TmpFileAttribute;
 
-  *(UINT32 *) TmpFileHeader->Size &= 0xFF000000;
-  *(UINT32 *) TmpFileHeader->Size |= ActualFileSize;
+  if (ActualFileSize > 0x00FFFFFF) {
+    ((EFI_FFS_FILE_HEADER2 *) FileHeader)->ExtendedSize = (UINT32) ActualFileSize;
+    *(UINT32 *) FileHeader->Size &= 0xFF000000;
+    FileHeader->Attributes |= FFS_ATTRIB_LARGE_FILE;
+  } else {
+    *(UINT32 *) FileHeader->Size &= 0xFF000000;
+    *(UINT32 *) FileHeader->Size |= ActualFileSize;
+  }
 
   SetHeaderChecksum (TmpFileHeader);
   SetFileChecksum (TmpFileHeader, ActualFileSize);
@@ -319,12 +351,14 @@ FvAdjustFfsFile (
   IN  UINTN                 ExtraLength
   )
 {
-  UINTN FileLength;
   UINT8 *Ptr;
   UINT8 PadingByte;
 
-  FileLength  = *(UINT32 *) FileHeader->Size & 0x00FFFFFF;
-  Ptr         = (UINT8 *) FileHeader + FileLength;
+  if (IS_FFS_FILE2 (FileHeader)) {
+    Ptr         = (UINT8 *) FileHeader + FFS_FILE2_SIZE (FileHeader);
+  } else {
+    Ptr         = (UINT8 *) FileHeader + FFS_FILE_SIZE (FileHeader);
+  }
 
   if (ErasePolarity == 0) {
     PadingByte = 0;
@@ -461,11 +495,15 @@ FvCreateNewFileInsidePadFile (
   //
   InitializeListHead (&NewFileList);
 
-  PadAreaLength = (*(UINT32 *) OldPadFileHeader->Size & 0x00FFFFFF) - sizeof (EFI_FFS_FILE_HEADER);
+  if (IS_FFS_FILE2 (OldPadFileHeader)) {
+    PadAreaLength = FFS_FILE2_SIZE (OldPadFileHeader) - sizeof (EFI_FFS_FILE_HEADER);
+    PadFileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) OldPadFileHeader + sizeof (EFI_FFS_FILE_HEADER2));
+  } else {
+    PadAreaLength = FFS_FILE_SIZE (OldPadFileHeader) - sizeof (EFI_FFS_FILE_HEADER);
+    PadFileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) OldPadFileHeader + sizeof (EFI_FFS_FILE_HEADER));
+  }
 
-  PadFileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) OldPadFileHeader + sizeof (EFI_FFS_FILE_HEADER));
-
-  if (RequiredAlignment != 8) {
+  if (PadSize != 0) {
     //
     // Insert a PAD file before to achieve required alignment
     //
@@ -488,6 +526,7 @@ FvCreateNewFileInsidePadFile (
             FileAttributes
             );
   if (EFI_ERROR (Status)) {
+    FreeFileList (&NewFileList);
     return Status;
   }
 
@@ -527,7 +566,11 @@ FvCreateNewFileInsidePadFile (
   //
   // Start writing to FV
   //
-  StartPos = (UINT8 *) OldPadFileHeader + sizeof (EFI_FFS_FILE_HEADER);
+  if (IS_FFS_FILE2 (OldPadFileHeader)) {
+    StartPos = (UINT8 *) OldPadFileHeader + sizeof (EFI_FFS_FILE_HEADER2);
+  } else {
+    StartPos = (UINT8 *) OldPadFileHeader + sizeof (EFI_FFS_FILE_HEADER);
+  }
 
   Offset          = (UINTN) (StartPos - FvDevice->CachedFv);
 
@@ -540,6 +583,7 @@ FvCreateNewFileInsidePadFile (
             );
   if (EFI_ERROR (Status)) {
     FreeFileList (&NewFileList);
+    FvDevice->CurrentFfsFile = NULL;
     return Status;
   }
 
@@ -562,6 +606,8 @@ FvCreateNewFileInsidePadFile (
             );
   if (EFI_ERROR (Status)) {
     SetFileState (EFI_FILE_HEADER_INVALID, OldPadFileHeader);
+    FreeFileList (&NewFileList);
+    FvDevice->CurrentFfsFile = NULL;
     return Status;
   }
 
@@ -657,7 +703,11 @@ FvCreateMultipleFilesInsidePadFile (
   NewFileListEntry  = NULL;
 
   OldPadFileHeader  = (EFI_FFS_FILE_HEADER *) PadFileEntry->FfsHeader;
-  PadAreaLength     = (*(UINT32 *) OldPadFileHeader->Size & 0x00FFFFFF) - sizeof (EFI_FFS_FILE_HEADER);
+  if (IS_FFS_FILE2 (OldPadFileHeader)) {
+    PadAreaLength = FFS_FILE2_SIZE (OldPadFileHeader) - sizeof (EFI_FFS_FILE_HEADER2);
+  } else {
+    PadAreaLength = FFS_FILE_SIZE (OldPadFileHeader) - sizeof (EFI_FFS_FILE_HEADER);
+  }
 
   Status = UpdateHeaderBit (
             FvDevice,
@@ -671,7 +721,11 @@ FvCreateMultipleFilesInsidePadFile (
   // Update PAD area
   //
   TotalSize     = 0;
-  PadFileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) OldPadFileHeader + sizeof (EFI_FFS_FILE_HEADER));
+  if (IS_FFS_FILE2 (OldPadFileHeader)) {
+    PadFileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) OldPadFileHeader + sizeof (EFI_FFS_FILE_HEADER2));
+  } else {
+    PadFileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) OldPadFileHeader + sizeof (EFI_FFS_FILE_HEADER));
+  }
   FileHeader    = PadFileHeader;
 
   for (Index = 0; Index < NumOfFiles; Index++) {
@@ -679,6 +733,7 @@ FvCreateMultipleFilesInsidePadFile (
       FvFillPadFile (PadFileHeader, PadSize[Index]);
       NewFileListEntry = AllocatePool (sizeof (FFS_FILE_LIST_ENTRY));
       if (NewFileListEntry == NULL) {
+        FreeFileList (&NewFileList);
         return EFI_OUT_OF_RESOURCES;
       }
 
@@ -697,6 +752,7 @@ FvCreateMultipleFilesInsidePadFile (
               FileData[Index].FileAttributes
               );
     if (EFI_ERROR (Status)) {
+      FreeFileList (&NewFileList);
       return Status;
     }
 
@@ -729,6 +785,7 @@ FvCreateMultipleFilesInsidePadFile (
       NewFileListEntry = AllocatePool (sizeof (FFS_FILE_LIST_ENTRY));
       if (NewFileListEntry == NULL) {
         FreeFileList (&NewFileList);
+        FvDevice->CurrentFfsFile = NULL;
         return EFI_OUT_OF_RESOURCES;
       }
 
@@ -749,7 +806,11 @@ FvCreateMultipleFilesInsidePadFile (
   //
   // Start writing to FV
   //
-  StartPos = (UINT8 *) OldPadFileHeader + sizeof (EFI_FFS_FILE_HEADER);
+  if (IS_FFS_FILE2 (OldPadFileHeader)) {
+    StartPos = (UINT8 *) OldPadFileHeader + sizeof (EFI_FFS_FILE_HEADER2);
+  } else {
+    StartPos = (UINT8 *) OldPadFileHeader + sizeof (EFI_FFS_FILE_HEADER);
+  }
 
   Offset          = (UINTN) (StartPos - FvDevice->CachedFv);
 
@@ -762,6 +823,7 @@ FvCreateMultipleFilesInsidePadFile (
             );
   if (EFI_ERROR (Status)) {
     FreeFileList (&NewFileList);
+    FvDevice->CurrentFfsFile = NULL;
     return Status;
   }
 
@@ -772,6 +834,7 @@ FvCreateMultipleFilesInsidePadFile (
             );
   if (EFI_ERROR (Status)) {
     FreeFileList (&NewFileList);
+    FvDevice->CurrentFfsFile = NULL;
     return Status;
   }
 
@@ -791,6 +854,136 @@ FvCreateMultipleFilesInsidePadFile (
   (NewFileList.ForwardLink)->BackLink = &FfsEntry->Link;
   NextFfsEntry->Link.BackLink         = NewFileList.BackLink;
   (NewFileList.BackLink)->ForwardLink = &NextFfsEntry->Link;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Create multiple files within the Free Space.
+
+  @param FvDevice        Firmware Volume Device.
+  @param FreeSpaceEntry  Indicating in which Free Space(Cache) the multiple files will be inserted.
+  @param NumOfFiles      Total File number to be written.
+  @param BufferSize      The array of buffer size of each FfsBuffer.
+  @param ActualFileSize  The array of actual file size.
+  @param PadSize         The array of leading pad file size for each FFS File
+  @param FfsBuffer       The array of Ffs Buffer pointer.
+  @param FileData        The array of EFI_FV_WRITE_FILE_DATA structure, 
+                         used to get name, attributes, type, etc.
+
+  @retval EFI_SUCCESS           Add the input multiple files into PAD file area.
+  @retval EFI_OUT_OF_RESOURCES  No enough memory is allocated.
+  @retval other error           Files can't be added into PAD file area.
+
+**/
+EFI_STATUS
+FvCreateMultipleFilesInsideFreeSpace (
+  IN FV_DEVICE              *FvDevice,
+  IN FREE_SPACE_ENTRY       *FreeSpaceEntry,
+  IN UINTN                  NumOfFiles,
+  IN UINTN                  *BufferSize,
+  IN UINTN                  *ActualFileSize,
+  IN UINTN                  *PadSize,
+  IN UINT8                  **FfsBuffer,
+  IN EFI_FV_WRITE_FILE_DATA *FileData
+  )
+{
+  EFI_STATUS                          Status;
+  UINTN                               Index;
+  EFI_FFS_FILE_HEADER                 *PadFileHeader;
+  EFI_FFS_FILE_HEADER                 *FileHeader;
+  UINTN                               TotalSize;
+  LIST_ENTRY                          NewFileList;
+  FFS_FILE_LIST_ENTRY                 *NewFileListEntry;
+  UINTN                               Offset;
+  UINTN                               NumBytesWritten;
+  UINT8                               *StartPos;
+
+  InitializeListHead (&NewFileList);
+
+  NewFileListEntry  = NULL;
+
+  TotalSize     = 0;
+  StartPos      = FreeSpaceEntry->StartingAddress;
+  PadFileHeader = (EFI_FFS_FILE_HEADER *) StartPos;
+  FileHeader    = PadFileHeader;
+
+  for (Index = 0; Index < NumOfFiles; Index++) {
+    if (PadSize[Index] != 0) {
+      FvFillPadFile (PadFileHeader, PadSize[Index]);
+      NewFileListEntry = AllocatePool (sizeof (FFS_FILE_LIST_ENTRY));
+      if (NewFileListEntry == NULL) {
+        FreeFileList (&NewFileList);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      NewFileListEntry->FfsHeader = (UINT8 *) PadFileHeader;
+      InsertTailList (&NewFileList, &NewFileListEntry->Link);
+    }
+
+    FileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) PadFileHeader + PadSize[Index]);
+    Status = FvFillFfsFile (
+              FileHeader,
+              FfsBuffer[Index],
+              BufferSize[Index],
+              ActualFileSize[Index],
+              FileData[Index].NameGuid,
+              FileData[Index].Type,
+              FileData[Index].FileAttributes
+              );
+    if (EFI_ERROR (Status)) {
+      FreeFileList (&NewFileList);
+      return Status;
+    }
+
+    NewFileListEntry = AllocatePool (sizeof (FFS_FILE_LIST_ENTRY));
+    if (NewFileListEntry == NULL) {
+      FreeFileList (&NewFileList);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    NewFileListEntry->FfsHeader = (UINT8 *) FileHeader;
+    InsertTailList (&NewFileList, &NewFileListEntry->Link);
+
+    PadFileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FileHeader + BufferSize[Index]);
+    TotalSize += PadSize[Index];
+    TotalSize += BufferSize[Index];
+  }
+
+  if (FreeSpaceEntry->Length < TotalSize) {
+    FreeFileList (&NewFileList);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  FvDevice->CurrentFfsFile = NewFileListEntry;
+
+  //
+  // Start writing to FV
+  //
+  Offset          = (UINTN) (StartPos - FvDevice->CachedFv);
+
+  NumBytesWritten = TotalSize;
+  Status = FvcWrite (
+            FvDevice,
+            Offset,
+            &NumBytesWritten,
+            StartPos
+            );
+  if (EFI_ERROR (Status)) {
+    FreeFileList (&NewFileList);
+    FvDevice->CurrentFfsFile = NULL;
+    return Status;
+  }
+
+  FreeSpaceEntry->Length -= TotalSize;
+  FreeSpaceEntry->StartingAddress += TotalSize;
+
+  NewFileListEntry = (FFS_FILE_LIST_ENTRY *) (NewFileList.ForwardLink);
+
+  while (NewFileListEntry != (FFS_FILE_LIST_ENTRY *) &NewFileList) {
+    InsertTailList (&FvDevice->FfsFileListHeader, &NewFileListEntry->Link);
+    NewFileListEntry = (FFS_FILE_LIST_ENTRY *) (NewFileListEntry->Link.ForwardLink);
+  }
 
   return EFI_SUCCESS;
 }
@@ -838,6 +1031,7 @@ FvCreateMultipleFiles (
   FFS_FILE_LIST_ENTRY           *OldFfsFileEntry[MAX_FILES];
   EFI_FFS_FILE_HEADER           *OldFileHeader[MAX_FILES];
   BOOLEAN                       IsCreateFile;
+  UINTN                         HeaderSize;
 
   //
   // To use this function, we must ensure that the NumOfFiles is great
@@ -863,10 +1057,15 @@ FvCreateMultipleFiles (
   // Adjust file size
   //
   for (Index1 = 0; Index1 < NumOfFiles; Index1++) {
-    ActualFileSize[Index1] = FileData[Index1].BufferSize + sizeof (EFI_FFS_FILE_HEADER);
+    HeaderSize = sizeof (EFI_FFS_FILE_HEADER);
+    ActualFileSize[Index1] = FileData[Index1].BufferSize + HeaderSize;
+    if (ActualFileSize[Index1] > 0x00FFFFFF) {
+      HeaderSize = sizeof (EFI_FFS_FILE_HEADER2);
+      ActualFileSize[Index1] = FileData[Index1].BufferSize + HeaderSize;
+    }
     BufferSize[Index1]     = ActualFileSize[Index1];
 
-    if (BufferSize[Index1] == sizeof (EFI_FFS_FILE_HEADER)) {
+    if (BufferSize[Index1] == HeaderSize) {
       //
       // clear file attributes, zero-length file does not have any attributes
       //
@@ -883,18 +1082,18 @@ FvCreateMultipleFiles (
     // Copy File Data into FileBuffer
     //
     CopyMem (
-      FfsBuffer[Index1] + sizeof (EFI_FFS_FILE_HEADER),
+      FfsBuffer[Index1] + HeaderSize,
       FileData[Index1].Buffer,
       FileData[Index1].BufferSize
       );
 
     if (FvDevice->ErasePolarity == 1) {
-      for (Index2 = 0; Index2 < sizeof (EFI_FFS_FILE_HEADER); Index2++) {
+      for (Index2 = 0; Index2 < HeaderSize; Index2++) {
         FfsBuffer[Index1][Index2] = (UINT8)~FfsBuffer[Index1][Index2];
       }
     }
 
-    if ((FileData[Index1].FileAttributes & FFS_ATTRIB_DATA_ALIGNMENT) != 0) {
+    if ((FileData[Index1].FileAttributes & EFI_FV_FILE_ATTRIB_ALIGNMENT) != 0) {
       RequiredAlignment[Index1] = GetRequiredAlignment (FileData[Index1].FileAttributes);
     }
     //
@@ -954,7 +1153,6 @@ FvCreateMultipleFiles (
   if (Status == EFI_NOT_FOUND) {
     //
     // Try to find a free space that can hold these files
-    // and create a suitable PAD file in this free space
     //
     Status = FvSearchSuitableFreeSpace (
               FvDevice,
@@ -969,35 +1167,33 @@ FvCreateMultipleFiles (
       FreeFfsBuffer (NumOfFiles, FfsBuffer);
       return EFI_OUT_OF_RESOURCES;
     }
-    //
-    // Create a PAD file in that space
-    //
-    Status = FvCreatePadFileInFreeSpace (
+    Status = FvCreateMultipleFilesInsideFreeSpace (
               FvDevice,
               FreeSpaceEntry,
-              TotalSizeNeeded,
-              &PadFileEntry
+              NumOfFiles,
+              BufferSize,
+              ActualFileSize,
+              PadSize,
+              FfsBuffer,
+              FileData
               );
 
-    if (EFI_ERROR (Status)) {
-      FreeFfsBuffer (NumOfFiles, FfsBuffer);
-      return Status;
-    }
+  } else {
+    //
+    // Create multiple files inside such a pad file
+    // to achieve lock-step update
+    //
+    Status = FvCreateMultipleFilesInsidePadFile (
+              FvDevice,
+              PadFileEntry,
+              NumOfFiles,
+              BufferSize,
+              ActualFileSize,
+              PadSize,
+              FfsBuffer,
+              FileData
+              );
   }
-  //
-  // Create multiple files inside such a pad file
-  // to achieve lock-step update
-  //
-  Status = FvCreateMultipleFilesInsidePadFile (
-            FvDevice,
-            PadFileEntry,
-            NumOfFiles,
-            BufferSize,
-            ActualFileSize,
-            PadSize,
-            FfsBuffer,
-            FileData
-            );
 
   FreeFfsBuffer (NumOfFiles, FfsBuffer);
 

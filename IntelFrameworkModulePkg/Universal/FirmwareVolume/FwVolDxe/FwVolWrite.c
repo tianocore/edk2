@@ -28,7 +28,6 @@ SetHeaderChecksum (
   )
 {
   EFI_FFS_FILE_STATE  State;
-  UINT8               HeaderChecksum;
   UINT8               FileChecksum;
 
   //
@@ -42,12 +41,17 @@ SetHeaderChecksum (
 
   FfsHeader->IntegrityCheck.Checksum.Header = 0;
 
-  HeaderChecksum = CalculateSum8 (
-    (UINT8 *)FfsHeader,
-    sizeof (EFI_FFS_FILE_HEADER)
-    );
-
-  FfsHeader->IntegrityCheck.Checksum.Header = (UINT8) (~HeaderChecksum + 1);
+  if (IS_FFS_FILE2 (FfsHeader)) {
+    FfsHeader->IntegrityCheck.Checksum.Header = CalculateCheckSum8 (
+      (UINT8 *) FfsHeader,
+      sizeof (EFI_FFS_FILE_HEADER2)
+      );
+  } else {
+    FfsHeader->IntegrityCheck.Checksum.Header = CalculateCheckSum8 (
+      (UINT8 *) FfsHeader,
+      sizeof (EFI_FFS_FILE_HEADER)
+      );
+  }
 
   FfsHeader->State                          = State;
   FfsHeader->IntegrityCheck.Checksum.File   = FileChecksum;
@@ -68,29 +72,21 @@ SetFileChecksum (
   IN UINTN               ActualFileSize
   )
 {
-  EFI_FFS_FILE_STATE  State;
-  UINT8               FileChecksum;
-
   if ((FfsHeader->Attributes & FFS_ATTRIB_CHECKSUM) != 0) {
-    //
-    // The file state is not included
-    //
-    State = FfsHeader->State;
-    FfsHeader->State = 0;
 
     FfsHeader->IntegrityCheck.Checksum.File = 0;
 
-    //
-    // File checksum 
-    //
-    FileChecksum = CalculateSum8 (
-      (UINT8 *)(FfsHeader + 1),
-   		ActualFileSize - sizeof (EFI_FFS_FILE_HEADER)
-      );
-
-    FfsHeader->IntegrityCheck.Checksum.File = (UINT8) (~FileChecksum + 1);
-
-    FfsHeader->State                        = State;
+    if (IS_FFS_FILE2 (FfsHeader)) {
+      FfsHeader->IntegrityCheck.Checksum.File = CalculateCheckSum8 (
+        (UINT8 *) FfsHeader + sizeof (EFI_FFS_FILE_HEADER2),
+        ActualFileSize - sizeof (EFI_FFS_FILE_HEADER2)
+        );
+    } else {
+      FfsHeader->IntegrityCheck.Checksum.File = CalculateCheckSum8 (
+        (UINT8 *) FfsHeader + sizeof (EFI_FFS_FILE_HEADER),
+        ActualFileSize - sizeof (EFI_FFS_FILE_HEADER)
+        );
+    }
 
   } else {
 
@@ -138,6 +134,7 @@ GetRequiredAlignment (
 
   @param FvDevice          Cached Firmware Volume.
   @param StartAddress      The starting address to write the FFS File.
+  @param BufferSize        The FFS File Buffer Size.
   @param RequiredAlignment FFS File Data alignment requirement.
 
   @return The required Pad File Size.
@@ -147,6 +144,7 @@ UINTN
 CaculatePadFileSize (
   IN FV_DEVICE            *FvDevice,
   IN EFI_PHYSICAL_ADDRESS StartAddress,
+  IN UINTN                BufferSize,
   IN UINTN                RequiredAlignment
   )
 {
@@ -154,7 +152,11 @@ CaculatePadFileSize (
   UINTN RelativePos;
   UINTN PadSize;
 
-  DataStartPos  = (UINTN) StartAddress + sizeof (EFI_FFS_FILE_HEADER);
+  if (BufferSize > 0x00FFFFFF) {
+    DataStartPos  = (UINTN) StartAddress + sizeof (EFI_FFS_FILE_HEADER2);
+  } else {
+    DataStartPos  = (UINTN) StartAddress + sizeof (EFI_FFS_FILE_HEADER);
+  }
   RelativePos   = DataStartPos - (UINTN) FvDevice->CachedFv;
 
   PadSize       = 0;
@@ -331,6 +333,7 @@ FvLocateFreeSpaceEntry (
     PadFileSize = CaculatePadFileSize (
                     FvDevice,
                     (EFI_PHYSICAL_ADDRESS) (UINTN) FreeSpaceListEntry->StartingAddress,
+                    Size,
                     RequiredAlignment
                     );
     if (FreeSpaceListEntry->Length >= Size + PadFileSize) {
@@ -344,54 +347,6 @@ FvLocateFreeSpaceEntry (
 
   return EFI_NOT_FOUND;
 
-}
-
-/**
-  Locate a free space that can hold this file.
-
-  @param FvDevice           Cached Firmware Volume.
-  @param Size               On input, it is the required size.
-                            On output, it is the actual size of free space.
-  @param RequiredAlignment  FFS File Data alignment requirement.
-  @param PadSize            Pointer to the size of leading Pad File.
-  @param StartingAddress    The starting address of the Free Space Entry
-                            that meets the requirement.
-
-  @retval EFI_SUCCESS     The free space is found.
-  @retval EFI_NOT_FOUND   The free space can't be found.
-
-**/
-EFI_STATUS
-FvLocateFreeSpace (
-  IN  FV_DEVICE             *FvDevice,
-  IN  OUT UINTN             *Size,
-  IN  UINTN                 RequiredAlignment,
-  OUT UINTN                 *PadSize,
-  OUT EFI_PHYSICAL_ADDRESS  *StartingAddress
-  )
-{
-  EFI_STATUS        Status;
-  FREE_SPACE_ENTRY  *FreeSpaceEntry;
-
-  //
-  // First find the free space entry
-  //
-  Status = FvLocateFreeSpaceEntry (
-            FvDevice,
-            *Size,
-            RequiredAlignment,
-            PadSize,
-            &FreeSpaceEntry
-            );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  *Size             = FreeSpaceEntry->Length;
-  *StartingAddress  = (EFI_PHYSICAL_ADDRESS) (UINTN) FreeSpaceEntry->StartingAddress;
-
-  return EFI_SUCCESS;
 }
 
 /**
@@ -419,9 +374,9 @@ FvLocatePadFile (
   FFS_FILE_LIST_ENTRY *FileEntry;
   EFI_FFS_FILE_STATE  FileState;
   EFI_FFS_FILE_HEADER *FileHeader;
-  UINTN               FileLength;
   UINTN               PadAreaLength;
   UINTN               PadFileSize;
+  UINTN               HeaderSize;
 
   FileEntry = (FFS_FILE_LIST_ENTRY *) FvDevice->FfsFileListHeader.ForwardLink;
 
@@ -437,12 +392,18 @@ FvLocatePadFile (
       //
       // we find one valid pad file, check its free area length
       //
-      FileLength    = *(UINT32 *) FileHeader->Size & 0x00FFFFFF;
-      PadAreaLength = FileLength - sizeof (EFI_FFS_FILE_HEADER);
+      if (IS_FFS_FILE2 (FileHeader)) {
+        HeaderSize = sizeof (EFI_FFS_FILE_HEADER2);
+        PadAreaLength = FFS_FILE2_SIZE (FileHeader) - HeaderSize;
+      } else {
+        HeaderSize = sizeof (EFI_FFS_FILE_HEADER);
+        PadAreaLength = FFS_FILE_SIZE (FileHeader) - HeaderSize;
+      }
 
       PadFileSize = CaculatePadFileSize (
                       FvDevice,
-                      (EFI_PHYSICAL_ADDRESS) (UINTN) FileHeader + sizeof (EFI_FFS_FILE_HEADER),
+                      (EFI_PHYSICAL_ADDRESS) (UINTN) FileHeader + HeaderSize,
+                      Size,
                       RequiredAlignment
                       );
       if (PadAreaLength >= (Size + PadFileSize)) {
@@ -487,10 +448,10 @@ FvSearchSuitablePadFile (
   FFS_FILE_LIST_ENTRY *FileEntry;
   EFI_FFS_FILE_STATE  FileState;
   EFI_FFS_FILE_HEADER *FileHeader;
-  UINTN               FileLength;
   UINTN               PadAreaLength;
   UINTN               TotalSize;
   UINTN               Index;
+  UINTN               HeaderSize;
 
   FileEntry = (FFS_FILE_LIST_ENTRY *) FvDevice->FfsFileListHeader.ForwardLink;
 
@@ -506,14 +467,20 @@ FvSearchSuitablePadFile (
       //
       // we find one valid pad file, check its length
       //
-      FileLength    = *(UINT32 *) FileHeader->Size & 0x00FFFFFF;
-      PadAreaLength = FileLength - sizeof (EFI_FFS_FILE_HEADER);
+      if (IS_FFS_FILE2 (FileHeader)) {
+        HeaderSize = sizeof (EFI_FFS_FILE_HEADER2);
+        PadAreaLength = FFS_FILE2_SIZE (FileHeader) - HeaderSize;
+      } else {
+        HeaderSize = sizeof (EFI_FFS_FILE_HEADER);
+        PadAreaLength = FFS_FILE_SIZE (FileHeader) - HeaderSize;
+      }
       TotalSize     = 0;
 
       for (Index = 0; Index < NumOfFiles; Index++) {
         PadSize[Index] = CaculatePadFileSize (
                       FvDevice,
-                      (EFI_PHYSICAL_ADDRESS) (UINTN) FileHeader + sizeof (EFI_FFS_FILE_HEADER) + TotalSize,
+                      (EFI_PHYSICAL_ADDRESS) (UINTN) FileHeader + HeaderSize + TotalSize,
+                      BufferSize[Index],
                       RequiredAlignment[Index]
                       );
         TotalSize += PadSize[Index];
@@ -589,6 +556,7 @@ FvSearchSuitableFreeSpace (
       PadSize[Index] = CaculatePadFileSize (
                     FvDevice,
                     (EFI_PHYSICAL_ADDRESS) (UINTN) StartAddr + TotalSize,
+                    BufferSize[Index],
                     RequiredAlignment[Index]
                     );
 
@@ -803,6 +771,7 @@ FvCreateNewFile (
   FFS_FILE_LIST_ENTRY                 *PadFileEntry;
   EFI_FFS_FILE_ATTRIBUTES             TmpFileAttribute;
   FFS_FILE_LIST_ENTRY                 *FfsFileEntry;
+  UINTN                               HeaderSize;
 
   //
   // File Type: 0x0E~0xE0 are reserved
@@ -869,6 +838,11 @@ FvCreateNewFile (
   // Write Name, IntegrityCheck.Header, Type, Attributes, and Size
   //
   FileHeader = (EFI_FFS_FILE_HEADER *) FfsFileBuffer;
+  if (ActualFileSize > 0x00FFFFFF) {
+    HeaderSize = sizeof (EFI_FFS_FILE_HEADER2);
+  } else {
+    HeaderSize = sizeof (EFI_FFS_FILE_HEADER);
+  }
   SetFileState (EFI_FILE_HEADER_CONSTRUCTION, FileHeader);
 
   Offset          = (UINTN) (BufferPtr - FvDevice->CachedFv);
@@ -890,14 +864,14 @@ FvCreateNewFile (
   CopyMem (
     (UINT8 *) (UINTN) BufferPtr,
     FileHeader,
-    sizeof (EFI_FFS_FILE_HEADER)
+    HeaderSize
     );
 
   //
-  // update Free Space Entry, now need to substract the EFI_FFS_FILE_HEADER
+  // update Free Space Entry, now need to substract the file header length
   //
-  FreeSpaceEntry->StartingAddress += sizeof (EFI_FFS_FILE_HEADER);
-  FreeSpaceEntry->Length -= sizeof (EFI_FFS_FILE_HEADER);
+  FreeSpaceEntry->StartingAddress += HeaderSize;
+  FreeSpaceEntry->Length -= HeaderSize;
 
   CopyGuid (&FileHeader->Name, FileName);
   FileHeader->Type = FileType;
@@ -912,14 +886,20 @@ FvCreateNewFile (
   //
   // File size is including the FFS File Header.
   //
-  *(UINT32 *) FileHeader->Size &= 0xFF000000;
-  *(UINT32 *) FileHeader->Size |= ActualFileSize;
+  if (ActualFileSize > 0x00FFFFFF) {
+    ((EFI_FFS_FILE_HEADER2 *) FileHeader)->ExtendedSize = (UINT32) ActualFileSize;
+    *(UINT32 *) FileHeader->Size &= 0xFF000000;
+    FileHeader->Attributes |= FFS_ATTRIB_LARGE_FILE;
+  } else {
+    *(UINT32 *) FileHeader->Size &= 0xFF000000;
+    *(UINT32 *) FileHeader->Size |= ActualFileSize;
+  }
 
   SetHeaderChecksum (FileHeader);
 
   Offset          = (UINTN) (BufferPtr - FvDevice->CachedFv);
 
-  NumBytesWritten = sizeof (EFI_FFS_FILE_HEADER);
+  NumBytesWritten = HeaderSize;
   Status = FvcWrite (
             FvDevice,
             Offset,
@@ -935,7 +915,7 @@ FvCreateNewFile (
   CopyMem (
     (UINT8 *) (UINTN) BufferPtr,
     FileHeader,
-    sizeof (EFI_FFS_FILE_HEADER)
+    HeaderSize
     );
 
   //
@@ -966,14 +946,14 @@ FvCreateNewFile (
   CopyMem (
     (UINT8 *) (UINTN) BufferPtr,
     FileHeader,
-    sizeof (EFI_FFS_FILE_HEADER)
+    HeaderSize
     );
 
   //
   // update Free Space Entry, now need to substract the file data length
   //
-  FreeSpaceEntry->StartingAddress += (BufferSize - sizeof (EFI_FFS_FILE_HEADER));
-  FreeSpaceEntry->Length -= (BufferSize - sizeof (EFI_FFS_FILE_HEADER));
+  FreeSpaceEntry->StartingAddress += (BufferSize - HeaderSize);
+  FreeSpaceEntry->Length -= (BufferSize - HeaderSize);
 
   //
   // Caculate File Checksum
@@ -1025,7 +1005,7 @@ FvCreateNewFile (
   CopyMem (
     (UINT8 *) (UINTN) BufferPtr,
     FileHeader,
-    sizeof (EFI_FFS_FILE_HEADER)
+    HeaderSize
     );
 
   //
@@ -1381,6 +1361,7 @@ FvWriteFile (
   UINTN                               NumDelete;
   EFI_FV_ATTRIBUTES                   FvAttributes;
   UINT32                              AuthenticationStatus;
+  UINTN                               HeaderSize;
 
   if (NumberOfFiles > MAX_FILES) {
     return EFI_UNSUPPORTED;
@@ -1416,6 +1397,15 @@ FvWriteFile (
   //
   NumDelete = 0;
   for (Index1 = 0; Index1 < NumberOfFiles; Index1++) {
+
+    if ((FileData[Index1].BufferSize + sizeof (EFI_FFS_FILE_HEADER) > 0x00FFFFFF) && !FvDevice->IsFfs3Fv) {
+      //
+      // Found a file needs a FFS3 formatted file to store it, but it is in a non-FFS3 formatted FV.
+      //
+      DEBUG ((EFI_D_ERROR, "FFS3 formatted file can't be written in a non-FFS3 formatted FV.\n"));
+      return EFI_INVALID_PARAMETER;
+    }
+
     if (FileData[Index1].BufferSize == 0) {
       //
       // Here we will delete this file
@@ -1525,7 +1515,12 @@ FvWriteFile (
     //
     // Making Buffersize QWORD boundry, and add file tail.
     //
-    ActualSize  = FileData[Index1].BufferSize + sizeof (EFI_FFS_FILE_HEADER);
+    HeaderSize = sizeof (EFI_FFS_FILE_HEADER);
+    ActualSize = FileData[Index1].BufferSize + HeaderSize;
+    if (ActualSize > 0x00FFFFFF) {
+      HeaderSize = sizeof (EFI_FFS_FILE_HEADER2);
+      ActualSize = FileData[Index1].BufferSize + HeaderSize;
+    }
     BufferSize  = ActualSize;
 
     while ((BufferSize & 0x07) != 0) {
@@ -1540,7 +1535,7 @@ FvWriteFile (
     // Copy File Data into FileBuffer
     //
     CopyMem (
-      FileBuffer + sizeof (EFI_FFS_FILE_HEADER),
+      FileBuffer + HeaderSize,
       FileData[Index1].Buffer,
       FileData[Index1].BufferSize
       );
@@ -1549,7 +1544,7 @@ FvWriteFile (
       //
       // Fill the file header and padding byte with Erase Byte
       //
-      for (Index2 = 0; Index2 < sizeof (EFI_FFS_FILE_HEADER); Index2++) {
+      for (Index2 = 0; Index2 < HeaderSize; Index2++) {
         FileBuffer[Index2] = (UINT8)~FileBuffer[Index2];
       }
 

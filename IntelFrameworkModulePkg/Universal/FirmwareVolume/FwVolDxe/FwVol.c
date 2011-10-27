@@ -4,7 +4,7 @@
   Layers on top of Firmware Block protocol to produce a file abstraction
   of FV based files.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -206,7 +206,6 @@ FvCheck (
   UINT8                               *FreeStart;
   UINTN                               FreeSize;
   UINT8                               ErasePolarity;
-  UINTN                               FileLength;
   EFI_FFS_FILE_STATE                  FileState;
   UINT8                               *TopFvAddress;
   UINTN                               TestLength;
@@ -229,6 +228,8 @@ FvCheck (
     return Status;
   }
   ASSERT (FwVolHeader != NULL);
+
+  FvDevice->IsFfs3Fv = CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem3Guid);
 
   //
   // Double Check firmware volume header here
@@ -412,7 +413,14 @@ FvCheck (
                     (EFI_FFS_FILE_HEADER *) Ptr
                     );
       if ((FileState == EFI_FILE_HEADER_INVALID) || (FileState == EFI_FILE_HEADER_CONSTRUCTION)) {
-        Ptr += sizeof (EFI_FFS_FILE_HEADER);
+        if (IS_FFS_FILE2 (Ptr)) {
+          if (!FvDevice->IsFfs3Fv) {
+            DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &((EFI_FFS_FILE_HEADER *) Ptr)->Name));
+          }
+          Ptr = Ptr + sizeof (EFI_FFS_FILE_HEADER2);
+        } else {
+          Ptr = Ptr + sizeof (EFI_FFS_FILE_HEADER);
+        }
 
         continue;
 
@@ -425,8 +433,22 @@ FvCheck (
       }
     }
 
+    if (IS_FFS_FILE2 (Ptr)) {
+      ASSERT (FFS_FILE2_SIZE (Ptr) > 0x00FFFFFF);
+      if (!FvDevice->IsFfs3Fv) {
+        DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &((EFI_FFS_FILE_HEADER *) Ptr)->Name));
+        Ptr = Ptr + FFS_FILE2_SIZE (Ptr);
+        //
+        // Adjust Ptr to the next 8-byte aligned boundry.
+        //
+        while (((UINTN) Ptr & 0x07) != 0) {
+          Ptr++;
+        }
+        continue;
+      }
+    }
+
     if (IsValidFFSFile (FvDevice, (EFI_FFS_FILE_HEADER *) Ptr)) {
-      FileLength = *(UINT32 *) ((EFI_FFS_FILE_HEADER *) Ptr)->Size & 0x00FFFFFF;
       FileState = GetFileState (
                     FvDevice->ErasePolarity,
                     (EFI_FFS_FILE_HEADER *) Ptr
@@ -449,7 +471,11 @@ FvCheck (
         InsertTailList (&FvDevice->FfsFileListHeader, &FfsFileEntry->Link);
       }
 
-      Ptr += FileLength;
+      if (IS_FFS_FILE2 (Ptr)) {
+        Ptr = Ptr + FFS_FILE2_SIZE (Ptr);
+      } else {
+        Ptr = Ptr + FFS_FILE_SIZE (Ptr);
+      }
 
       //
       // Adjust Ptr to the next 8-byte aligned boundry.
@@ -513,9 +539,7 @@ FwVolDriverInit (
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
-  //
-  // Get FV with gEfiFirmwareFileSystemGuid
-  //
+
   for (Index = 0; Index < HandleCount; Index += 1) {
     Status = gBS->HandleProtocol (
                     HandleBuffer[Index],
@@ -536,10 +560,8 @@ FwVolDriverInit (
     // Check to see that the file system is indeed formatted in a way we can
     // understand it...
     //
-    if (!CompareGuid (
-          &FwVolHeader->FileSystemGuid,
-          &gEfiFirmwareFileSystem2Guid
-          )) {
+    if ((!CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem2Guid)) &&
+        (!CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem3Guid))) {
       FreePool (FwVolHeader);
       continue;
     }
