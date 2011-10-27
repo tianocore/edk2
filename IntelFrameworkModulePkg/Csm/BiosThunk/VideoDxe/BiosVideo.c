@@ -255,6 +255,18 @@ BiosVideoDriverBindingStart (
   }
 
   //
+  // Prepare for status code
+  //
+  Status = gBS->HandleProtocol (
+                  Controller,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &ParentDevicePath
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
   // Open the IO Abstraction(s) needed
   //
   Status = gBS->OpenProtocol (
@@ -266,18 +278,6 @@ BiosVideoDriverBindingStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
-    return Status;
-  }
-
-  //
-  // Prepare for status code
-  //
-  Status = gBS->HandleProtocol (
-                  Controller,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &ParentDevicePath
-                  );
-  if (EFI_ERROR (Status)) {
     return Status;
   }
 
