@@ -1,7 +1,7 @@
 /** @file
   Ia32-specific functionality for DxeLoad.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "VirtualMemory.h"
 
 #define IDT_ENTRY_COUNT       32
+
+typedef struct _X64_IDT_TABLE {
+  //
+  // Reserved 4 bytes preceding PeiService and IdtTable,
+  // since IDT base address should be 8-byte alignment.
+  //
+  UINT32                   Reserved;
+  CONST EFI_PEI_SERVICES   **PeiService;
+  X64_IDT_GATE_DESCRIPTOR  IdtTable[IDT_ENTRY_COUNT];
+} X64_IDT_TABLE;
 
 //
 // Global Descriptor Table (GDT)
@@ -72,6 +82,7 @@ HandOffToDxeCore (
   VOID                      *TemplateBase;
   EFI_PHYSICAL_ADDRESS      VectorAddress;
   UINT32                    Index;
+  X64_IDT_TABLE             *IdtTableForX64;
 
   Status = PeiServicesAllocatePages (EfiBootServicesData, EFI_SIZE_TO_PAGES (STACK_SIZE), &BaseOfStack);
   ASSERT_EFI_ERROR (Status);
@@ -120,12 +131,19 @@ HandOffToDxeCore (
 
     Status = PeiServicesAllocatePages (
                EfiBootServicesData,
-               EFI_SIZE_TO_PAGES((SizeOfTemplate + sizeof (X64_IDT_GATE_DESCRIPTOR)) * IDT_ENTRY_COUNT),
-               &VectorAddress
+               EFI_SIZE_TO_PAGES(sizeof (X64_IDT_TABLE) + SizeOfTemplate * IDT_ENTRY_COUNT),
+               (EFI_PHYSICAL_ADDRESS *) &IdtTableForX64
                );
     ASSERT_EFI_ERROR (Status);
 
-    IdtTable      = (X64_IDT_GATE_DESCRIPTOR *) (UINTN) (VectorAddress + SizeOfTemplate * IDT_ENTRY_COUNT);
+    //
+    // Store EFI_PEI_SERVICES** in the 4 bytes immediately preceding IDT to avoid that
+    // it may not be gotten correctly after IDT register is re-written.
+    //
+    IdtTableForX64->PeiService = GetPeiServicesTablePointer ();
+
+    VectorAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) (IdtTableForX64 + 1);
+    IdtTable      = IdtTableForX64->IdtTable;
     for (Index = 0; Index < IDT_ENTRY_COUNT; Index++) {
       IdtTable[Index].Ia32IdtEntry.Bits.GateType    =  0x8e;
       IdtTable[Index].Ia32IdtEntry.Bits.Reserved_0  =  0;
