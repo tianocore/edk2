@@ -979,6 +979,7 @@ SetupBrowser (
 
           case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
             SubmitForm (Selection->FormSet, Selection->Form);
+            Selection->Action = UI_ACTION_EXIT;
             break;
 
           case EFI_BROWSER_ACTION_REQUEST_EXIT:
