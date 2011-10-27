@@ -515,6 +515,7 @@ TerminalConInTimerHandler (
 {
   EFI_STATUS              Status;
   TERMINAL_DEV            *TerminalDevice;
+  UINT32                  Control;
   UINT8                   Input;
   EFI_SERIAL_IO_MODE      *Mode;
   EFI_SERIAL_IO_PROTOCOL  *SerialIo;
@@ -558,27 +559,33 @@ TerminalConInTimerHandler (
       TerminalDevice->SerialInTimeOut = SerialInTimeOut;
     }
   }
-
   //
-  // Fetch all the keys in the serial buffer,
-  // and insert the byte stream into RawFIFO.
+  // Check whether serial buffer is empty.
   //
-  while (!IsRawFiFoFull (TerminalDevice)) {
+  Status = SerialIo->GetControl (SerialIo, &Control);
 
-    Status = GetOneKeyFromSerial (TerminalDevice->SerialIo, &Input);
+  if ((Control & EFI_SERIAL_INPUT_BUFFER_EMPTY) == 0) {
+    //
+    // Fetch all the keys in the serial buffer,
+    // and insert the byte stream into RawFIFO.
+    //
+    while (!IsRawFiFoFull (TerminalDevice)) {
 
-    if (EFI_ERROR (Status)) {
-      if (Status == EFI_DEVICE_ERROR) {
-        REPORT_STATUS_CODE_WITH_DEVICE_PATH (
-          EFI_ERROR_CODE | EFI_ERROR_MINOR,
-          (EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR),
-          TerminalDevice->DevicePath
-          );
+      Status = GetOneKeyFromSerial (TerminalDevice->SerialIo, &Input);
+
+      if (EFI_ERROR (Status)) {
+        if (Status == EFI_DEVICE_ERROR) {
+          REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+            EFI_ERROR_CODE | EFI_ERROR_MINOR,
+            (EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR),
+            TerminalDevice->DevicePath
+            );
+        }
+        break;
       }
-      break;
-    }
 
-    RawFiFoInsertOneKey (TerminalDevice, Input);
+      RawFiFoInsertOneKey (TerminalDevice, Input);
+    }
   }
 
   //
