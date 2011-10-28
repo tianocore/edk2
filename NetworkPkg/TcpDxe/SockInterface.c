@@ -1,7 +1,7 @@
 /** @file
   Interface function of the Socket.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -245,6 +245,7 @@ SockCreateChild (
   // with a new protocol control block
   //
   Status = Sock->ProtoHandler (Sock, SOCK_ATTACH, NULL);
+  EfiReleaseLock (&(Sock->Lock));
   if (EFI_ERROR (Status)) {
 
     DEBUG (
@@ -257,7 +258,6 @@ SockCreateChild (
     Sock = NULL;
   }
 
-  EfiReleaseLock (&(Sock->Lock));
   return Sock;
 }
 
