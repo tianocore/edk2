@@ -69,11 +69,15 @@ AutenticatedVariableServiceInitialize (
 {
   EFI_STATUS              Status;
   VARIABLE_POINTER_TRACK  Variable;
+  VARIABLE_POINTER_TRACK  Variable2;
   UINT8                   VarValue;
   UINT32                  VarAttr;
   UINT8                   *Data;
   UINTN                   DataSize;
   UINTN                   CtxSize;
+  UINT8                   SecureBootMode;
+  UINT8                   SecureBootEnable;
+  
   //
   // Initialize hash context.
   //
@@ -146,10 +150,10 @@ AutenticatedVariableServiceInitialize (
     Status = FindVariable (
                EFI_PLATFORM_KEY_NAME, 
                &gEfiGlobalVariableGuid, 
-               &Variable, 
+               &Variable2, 
                &mVariableModuleGlobal->VariableGlobal
                );
-    if (Variable.CurrPtr == NULL) {
+    if (Variable2.CurrPtr == NULL) {
       mPlatformMode = SETUP_MODE;
     } else {
       mPlatformMode = USER_MODE;
@@ -184,6 +188,7 @@ AutenticatedVariableServiceInitialize (
              &mVariableModuleGlobal->VariableGlobal
              );
 
+
   if (Variable.CurrPtr == NULL) {
     VarAttr = EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS;
     Status  = UpdateVariable (
@@ -198,7 +203,37 @@ AutenticatedVariableServiceInitialize (
                 NULL
                 );
   }
-  
+
+  //
+  // If "SecureBootEnable" variable exists, then update "SecureBoot" variable.
+  // If "SecureBootEnable" variable is SECURE_BOOT_ENABLE, Set "SecureBoot" variable to SECURE_BOOT_MODE_ENABLE.
+  // If "SecureBootEnable" variable is SECURE_BOOT_DISABLE, Set "SecureBoot" variable to SECURE_BOOT_MODE_DISABLE.
+  //
+  FindVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal);
+  if (Variable.CurrPtr != NULL) {
+    SecureBootEnable = *(GetVariableDataPtr (Variable.CurrPtr));
+    if (SecureBootEnable == SECURE_BOOT_ENABLE) {
+      SecureBootMode = SECURE_BOOT_MODE_ENABLE;
+    } else {
+      SecureBootMode = SECURE_BOOT_MODE_DISABLE;
+    }
+    FindVariable (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal);
+    Status = UpdateVariable (
+               EFI_SECURE_BOOT_MODE_NAME, 
+               &gEfiGlobalVariableGuid, 
+               &SecureBootMode, 
+               sizeof(UINT8), 
+               EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS, 
+               0, 
+               0, 
+               &Variable,
+               NULL
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
   //
   // Detect whether a secure platform-specific method to clear PK(Platform Key)
   // is configured by platform owner. This method is provided for users force to clear PK 
@@ -445,7 +480,9 @@ UpdatePlatformMode (
   VARIABLE_POINTER_TRACK  Variable;
   UINT32                  VarAttr;
   UINT8                   SecureBootMode;
-
+  UINT8                   SecureBootEnable;
+  UINTN                   VariableDataSize;
+  
   Status = FindVariable (
              EFI_SETUP_MODE_NAME, 
              &gEfiGlobalVariableGuid, 
@@ -457,7 +494,7 @@ UpdatePlatformMode (
   }
 
   mPlatformMode  = Mode;
-  VarAttr        = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS;
+  VarAttr        = EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS;
   Status         = UpdateVariable (
                      EFI_SETUP_MODE_NAME,
                      &gEfiGlobalVariableGuid,
@@ -501,8 +538,8 @@ UpdatePlatformMode (
     }
   }
 
-  VarAttr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS;
-  return    UpdateVariable (
+  VarAttr = EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS;
+  Status  = UpdateVariable (
               EFI_SECURE_BOOT_MODE_NAME,
               &gEfiGlobalVariableGuid,
               &SecureBootMode,
@@ -513,6 +550,51 @@ UpdatePlatformMode (
               &Variable,
               NULL
               );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Check "SecureBootEnable" variable's existence. It can enable/disable secure boot feature.
+  //
+  Status = FindVariable (
+             EFI_SECURE_BOOT_ENABLE_NAME, 
+             &gEfiSecureBootEnableDisableGuid, 
+             &Variable, 
+             &mVariableModuleGlobal->VariableGlobal
+             );
+ 
+  if (SecureBootMode == SECURE_BOOT_MODE_ENABLE) {
+    //
+    // Create the "SecureBootEnable" variable as secure boot is enabled.
+    //
+    SecureBootEnable = SECURE_BOOT_ENABLE;
+    VariableDataSize = sizeof (SecureBootEnable);
+  } else {
+    //
+    // Delete the "SecureBootEnable" variable if this variable exist as "SecureBoot" 
+    // variable is not in secure boot state.
+    //
+    if (Variable.CurrPtr == NULL || EFI_ERROR (Status)) {
+      return EFI_SUCCESS;
+    }
+    SecureBootEnable = SECURE_BOOT_DISABLE;
+    VariableDataSize = 0;
+  }
+  
+  Status = UpdateVariable (
+             EFI_SECURE_BOOT_ENABLE_NAME, 
+             &gEfiSecureBootEnableDisableGuid, 
+             &SecureBootEnable, 
+             VariableDataSize, 
+             EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS, 
+             0, 
+             0, 
+             &Variable,
+             NULL
+             );
+  return Status;
 }
 
 /**

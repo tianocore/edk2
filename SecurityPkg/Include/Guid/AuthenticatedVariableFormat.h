@@ -21,7 +21,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_AUTHENTICATED_VARIABLE_GUID \
   { 0xaaf32c78, 0x947b, 0x439a, { 0xa1, 0x80, 0x2e, 0x14, 0x4e, 0xc3, 0x77, 0x92 } }
 
+#define EFI_SECURE_BOOT_ENABLE_DISABLE \
+  { 0xf0a30bc7, 0xaf08, 0x4556, { 0x99, 0xc4, 0x0, 0x10, 0x9, 0xc9, 0x3a, 0x44 } }
+
+
 extern EFI_GUID gEfiAuthenticatedVariableGuid;
+extern EFI_GUID gEfiSecureBootEnableDisableGuid;
+
+///
+/// "SecureBootEnable" variable for the Secure boot feature enable/disable.
+///
+#define EFI_SECURE_BOOT_ENABLE_NAME      L"SecureBootEnable"
+#define SECURE_BOOT_ENABLE               1
+#define SECURE_BOOT_DISABLE              0
 
 ///
 /// Alignment of variable name and data, according to the architecture:

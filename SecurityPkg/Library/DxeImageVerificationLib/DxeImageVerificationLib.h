@@ -34,6 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/VariableWrite.h>
 #include <Guid/ImageAuthentication.h>
+#include <Guid/AuthenticatedVariableFormat.h>
 #include <IndustryStandard/PeImage.h>
 
 #define EFI_CERT_TYPE_RSA2048_SHA256_SIZE 256

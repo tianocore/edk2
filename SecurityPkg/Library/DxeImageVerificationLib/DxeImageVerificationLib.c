@@ -1117,7 +1117,6 @@ DxeImageVerificationHandler (
   IN  VOID                             *FileBuffer,
   IN  UINTN                            FileSize
   )
-
 {
   EFI_STATUS                  Status;
   UINT16                      Magic;
@@ -1130,6 +1129,7 @@ DxeImageVerificationHandler (
   EFI_IMAGE_EXECUTION_ACTION  Action;
   WIN_CERTIFICATE             *WinCertificate;
   UINT32                      Policy;
+  UINT8                       *SecureBootEnable;
 
   if (File == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1173,6 +1173,23 @@ DxeImageVerificationHandler (
   } else if (Policy == NEVER_EXECUTE) {
     return EFI_ACCESS_DENIED;
   }
+
+  SecureBootEnable = GetVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid);
+  //
+  // Skip verification if SecureBootEnable variable doesn't exist.
+  //
+  if (SecureBootEnable == NULL) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Skip verification if SecureBootEnable is disabled.
+  //
+  if (*SecureBootEnable == SECURE_BOOT_DISABLE) {
+    FreePool (SecureBootEnable);
+    return EFI_SUCCESS;
+  }    
+ 
   SetupMode = GetEfiGlobalVariable (EFI_SETUP_MODE_NAME);
 
   //

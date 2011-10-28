@@ -76,7 +76,8 @@
   gEfiImageSecurityDatabaseGuid
   gEfiCertX509Guid
   gEfiCertPkcs7Guid
-  gEfiCertRsa2048Guid  
+  gEfiCertRsa2048Guid
+  gEfiSecureBootEnableDisableGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
