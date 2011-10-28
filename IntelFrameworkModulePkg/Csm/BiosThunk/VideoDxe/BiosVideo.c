@@ -1225,12 +1225,18 @@ BiosVideoCheckForVbe (
   UINT8                                  *EdidOverrideDataBlock;
   UINTN                                  EdidActiveDataSize;
   UINT8                                  *EdidActiveDataBlock;
+  UINT32                                 HighestHorizontalResolution;
+  UINT32                                 HighestVerticalResolution;
+  UINTN                                  HighestResolutionMode;
 
   EdidFound             = TRUE;
   EdidOverrideFound     = FALSE;
   EdidOverrideDataBlock = NULL;
   EdidActiveDataSize    = 0;
   EdidActiveDataBlock   = NULL;
+  HighestHorizontalResolution = 0;
+  HighestVerticalResolution   = 0;
+  HighestResolutionMode       = 0;
 
   //
   // Allocate buffer under 1MB for VBE data structures
@@ -1527,6 +1533,16 @@ BiosVideoCheckForVbe (
     }
 
     //
+    // Record the highest resolution mode to set later
+    //
+    if ((BiosVideoPrivate->VbeModeInformationBlock->XResolution >= HighestHorizontalResolution) &&
+        (BiosVideoPrivate->VbeModeInformationBlock->YResolution >= HighestVerticalResolution)) {
+      HighestHorizontalResolution = BiosVideoPrivate->VbeModeInformationBlock->XResolution;
+      HighestVerticalResolution = BiosVideoPrivate->VbeModeInformationBlock->YResolution;
+      HighestResolutionMode = ModeNumber;
+    }
+
+    //
     // Add mode to the list of available modes
     //
     ModeNumber ++;
@@ -1620,6 +1636,15 @@ BiosVideoCheckForVbe (
   //
   // Find the best mode to initialize
   //
+  if ((PcdGet32 (PcdVideoHorizontalResolution) == 0x0) || (PcdGet32 (PcdVideoVerticalResolution) == 0x0)) {
+    DEBUG_CODE (
+      BIOS_VIDEO_MODE_DATA    *ModeData;
+      ModeData = &BiosVideoPrivate->ModeData[HighestResolutionMode];
+      DEBUG ((EFI_D_INFO, "BiosVideo set highest resolution %d x %d\n",
+              ModeData->HorizontalResolution, ModeData->VerticalResolution));
+    );
+    PreferMode = HighestResolutionMode;
+  }
   Status = BiosVideoGraphicsOutputSetMode (&BiosVideoPrivate->GraphicsOutput, (UINT32) PreferMode);
   if (EFI_ERROR (Status)) {
     for (PreferMode = 0; PreferMode < ModeNumber; PreferMode ++) {

@@ -78,3 +78,5 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoSetTextVgaModeEnable
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoCheckVbeEnable
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoCheckVgaEnable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution  
