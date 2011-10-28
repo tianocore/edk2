@@ -2,11 +2,11 @@
 #  Component description file for SMM Authenticated Variable module.
 #
 #  This module installs SMM variable protocol into SMM protocol database,
-#  which can be used by SMM driver, and installs SMM variable protocol 
+#  which can be used by SMM driver, and installs SMM variable protocol
 #  into BS protocol database, which can be used to notify the SMM Runtime
 #  Dxe driver that the SMM variable service is ready.
-#  This module should be used with SMM Runtime DXE module together. The 
-#  SMM Runtime DXE module would install variable arch protocol and variable 
+#  This module should be used with SMM Runtime DXE module together. The
+#  SMM Runtime DXE module would install variable arch protocol and variable
 #  write arch protocol based on SMM variable module.
 #
 # Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
@@ -60,7 +60,7 @@
   DebugLib
   DxeServicesTableLib
   BaseCryptLib
-  PlatformSecureLib  
+  PlatformSecureLib
   HobLib
 
 [Protocols]
@@ -69,9 +69,9 @@
   gEfiSmmFaultTolerantWriteProtocolGuid         ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEfiAuthenticatedVariableGuid                 ## PRODUCES ## Configuration Table Guid 
+  gEfiAuthenticatedVariableGuid                 ## PRODUCES ## Configuration Table Guid
   gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
-  gSmmVariableWriteGuid                         ## PRODUCES ## SMM Variable Write Guid 
+  gSmmVariableWriteGuid                         ## PRODUCES ## SMM Variable Write Guid
   gEfiCertRsa2048Sha256Guid
   gEfiImageSecurityDatabaseGuid
   gEfiCertX509Guid
@@ -87,12 +87,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize
-  gEfiSecurityPkgTokenSpaceGuid.PcdMaxAppendVariableSize  
-  
+
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## SOMETIME_CONSUMES (statistic the information of variable.)
 
 [Depex]
-  TRUE 
+  TRUE
 
-    
+

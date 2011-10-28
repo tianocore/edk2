@@ -64,7 +64,7 @@
   gEfiFaultTolerantWriteProtocolGuid            ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEfiAuthenticatedVariableGuid                 ## PRODUCES ## Configuration Table Guid 
+  gEfiAuthenticatedVariableGuid                 ## PRODUCES ## Configuration Table Guid
   gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
   gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event
   gEfiCertRsa2048Sha256Guid
@@ -82,8 +82,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize
-  gEfiSecurityPkgTokenSpaceGuid.PcdMaxAppendVariableSize
-  
+
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## SOMETIME_CONSUMES (statistic the information of variable.)
 
@@ -97,4 +96,4 @@
 #   EVENT_TYPE_NOTIFY_SIGNAL                    ## PRODUCES
 #
 #
-    
+
