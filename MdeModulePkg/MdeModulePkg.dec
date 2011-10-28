@@ -618,11 +618,21 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxEfiSystemTablePointerAddress|0x0|UINT64|0x30001027
   
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
-  ## This PCD defines the Console output column and the default value is 25 according to UEFI spec
+  ## This PCD defines the Console output column and the default value is 25 according to UEFI spec.
+  #  This PCD could be set to 0 then console output could be at max column and max row.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|25|UINT32|0x40000006
 
-  ## This PCD defines the Console output row and the default value is 80 according to UEFI spec
+  ## This PCD defines the Console output row and the default value is 80 according to UEFI spec.
+  #  This PCD could be set to 0 then console output could be at max column and max row.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|80|UINT32|0x40000007
+
+  ## This PCD defines the video horizontal resolution.
+  #  This PCD could be set to 0 then video resolution could be at highest resolution.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|800|UINT32|0x40000009
+
+  ## This PCD defines the video vertical resolution.
+  #  This PCD could be set to 0 then video resolution could be at highest resolution.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|600|UINT32|0x4000000a
 
 [PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx]
   ## Base address of the NV variable range in flash device

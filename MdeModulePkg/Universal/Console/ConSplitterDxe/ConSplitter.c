@@ -2901,6 +2901,7 @@ ConsplitterSetConsoleOutMode (
   UINTN                            MaxMode;
   EFI_STATUS                       Status;
   CONSOLE_OUT_MODE                 ModeInfo;
+  CONSOLE_OUT_MODE                 MaxModeInfo;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut;
 
   PreferMode   = 0xFF;
@@ -2908,8 +2909,10 @@ ConsplitterSetConsoleOutMode (
   TextOut      = &Private->TextOut;
   MaxMode      = (UINTN) (TextOut->Mode->MaxMode);
 
-  ModeInfo.Column = PcdGet32 (PcdConOutColumn);
-  ModeInfo.Row    = PcdGet32 (PcdConOutRow);
+  MaxModeInfo.Column = 0;
+  MaxModeInfo.Row    = 0; 
+  ModeInfo.Column    = PcdGet32 (PcdConOutColumn);
+  ModeInfo.Row       = PcdGet32 (PcdConOutRow);
 
   //
   // To find the prefer mode and basic mode from Text Out mode list
@@ -2917,8 +2920,23 @@ ConsplitterSetConsoleOutMode (
   for (Mode = 0; Mode < MaxMode; Mode++) {
     Status = TextOut->QueryMode (TextOut, Mode, &Col, &Row);
     if (!EFI_ERROR(Status)) {
-      if (Col == ModeInfo.Column && Row == ModeInfo.Row) {
-        PreferMode = Mode;
+      if ((ModeInfo.Column != 0) && (ModeInfo.Row != 0)) {
+        //
+        // Use user defined column and row
+        //
+        if (Col == ModeInfo.Column && Row == ModeInfo.Row) {
+          PreferMode = Mode;
+        }
+      } else {
+        //
+        // If user sets PcdConOutColumn or PcdConOutRow to 0,
+        // find and set the highest text mode.
+        //
+        if ((Col >= MaxModeInfo.Column) && (Row >= MaxModeInfo.Row)) {
+          MaxModeInfo.Column  = Col;
+          MaxModeInfo.Row     = Row;
+          PreferMode          = Mode;
+        }
       }
       if (Col == 80 && Row == 25) {
         BaseMode = Mode;

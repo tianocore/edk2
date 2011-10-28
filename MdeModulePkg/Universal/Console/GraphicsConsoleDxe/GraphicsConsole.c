@@ -1,7 +1,7 @@
 /** @file
   This is the main routine for initializing the Graphics Console support routines.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -239,13 +239,17 @@ GraphicsConsoleControllerDriverStart (
   UINT32                               VerticalResolution;
   UINT32                               ColorDepth;
   UINT32                               RefreshRate;
-  UINTN                                ModeIndex;
+  UINT32                               ModeIndex;
   UINTN                                MaxMode;
-  UINTN                                Columns;
-  UINTN                                Rows;
+  UINTN                                MaxColumns;
+  UINTN                                MaxRows;
   UINT32                               ModeNumber;
   EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE    *Mode;
   GRAPHICS_CONSOLE_MODE_DATA           *ModeData;
+  UINTN                                SizeOfInfo;  
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
+  BOOLEAN                              TextModeFound;
+  
   ModeNumber = 0;
 
   //
@@ -285,12 +289,8 @@ GraphicsConsoleControllerDriverStart (
     goto Error;
   }
 
-  //
-  // If the current mode information can not be retrieved, then attempt to set the default mode
-  // of 800x600, 32 bit color, 60 Hz refresh.
-  //
-  HorizontalResolution  = 800;
-  VerticalResolution    = 600;
+  HorizontalResolution  = PcdGet32 (PcdVideoHorizontalResolution);
+  VerticalResolution    = PcdGet32 (PcdVideoVerticalResolution);
 
   if (Private->GraphicsOutput != NULL) {
     //
@@ -298,39 +298,63 @@ GraphicsConsoleControllerDriverStart (
     // for the user-defined mode; if there are multiple video devices,
     // graphic console driver will set all the video devices to the same mode.
     //
-    Status = CheckModeSupported (
-                 Private->GraphicsOutput,
-                 CURRENT_HORIZONTAL_RESOLUTION,
-                 CURRENT_VERTICAL_RESOLUTION,
-                 &ModeNumber
-                 );
-    if (!EFI_ERROR(Status)) {
+    if ((HorizontalResolution == 0x0) || (VerticalResolution == 0x0)) {
       //
-      // Update default mode to current mode
-      //
-      HorizontalResolution = CURRENT_HORIZONTAL_RESOLUTION;
-      VerticalResolution   = CURRENT_VERTICAL_RESOLUTION;
+      // Find the highest resolution which GOP supports.
+      //    
+      MaxMode = Private->GraphicsOutput->Mode->MaxMode;
+      
+      for (ModeIndex = 0; ModeIndex < MaxMode; ModeIndex++) {
+        Status = Private->GraphicsOutput->QueryMode (
+                           Private->GraphicsOutput,
+                           ModeIndex,
+                           &SizeOfInfo,
+                           &Info
+                           );
+        if (!EFI_ERROR (Status)) {
+          if ((Info->HorizontalResolution >= HorizontalResolution) &&
+              (Info->VerticalResolution >= VerticalResolution)) {
+            HorizontalResolution = Info->HorizontalResolution;
+            VerticalResolution   = Info->VerticalResolution;
+            ModeNumber           = ModeIndex;
+          }
+          FreePool (Info);
+        }
+      }
+      if ((HorizontalResolution == 0x0) || (VerticalResolution == 0x0)) {
+        Status = EFI_UNSUPPORTED;
+        goto Error;
+      }
     } else {
       //
-      // if not supporting current mode, try 800x600 which is required by UEFI/EFI spec
+      // Use user-defined resolution
       //
       Status = CheckModeSupported (
                    Private->GraphicsOutput,
-                   800,
-                   600,
+                   HorizontalResolution,
+                   VerticalResolution,
                    &ModeNumber
                    );
-    }
-
-    Mode = Private->GraphicsOutput->Mode;
-
-    if (EFI_ERROR (Status) || (Mode->MaxMode != 0)) {
-      //
-      // Set default mode failed or device don't support default mode, then get the current mode information
-      //
-      HorizontalResolution = Mode->Info->HorizontalResolution;
-      VerticalResolution = Mode->Info->VerticalResolution;
-      ModeNumber = Mode->Mode;
+      if (EFI_ERROR (Status)) {
+        //
+        // if not supporting current mode, try 800x600 which is required by UEFI/EFI spec
+        //
+        Status = CheckModeSupported (
+                     Private->GraphicsOutput,
+                     800,
+                     600,
+                     &ModeNumber
+                     );
+        Mode = Private->GraphicsOutput->Mode;
+        if (EFI_ERROR (Status) && Mode->MaxMode != 0) {
+          //
+          // Set default mode failed or device don't support default mode, then get the current mode information
+          //
+          HorizontalResolution = Mode->Info->HorizontalResolution;
+          VerticalResolution = Mode->Info->VerticalResolution;
+          ModeNumber = Mode->Mode;
+        }
+      }
     }
   } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     //
@@ -340,22 +364,19 @@ GraphicsConsoleControllerDriverStart (
     RefreshRate           = 60;
     Status = Private->UgaDraw->SetMode (
                                 Private->UgaDraw,
-                                CURRENT_HORIZONTAL_RESOLUTION,
-                                CURRENT_VERTICAL_RESOLUTION,
+                                HorizontalResolution,
+                                VerticalResolution,
                                 ColorDepth,
                                 RefreshRate
                                 );
-    if (!EFI_ERROR (Status)) {
-      HorizontalResolution = CURRENT_HORIZONTAL_RESOLUTION;
-      VerticalResolution   = CURRENT_VERTICAL_RESOLUTION;
-    } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
+    if (EFI_ERROR (Status)) {
       //
       // Try to set 800*600 which is required by UEFI/EFI spec
       //
       Status = Private->UgaDraw->SetMode (
                                   Private->UgaDraw,
-                                  HorizontalResolution,
-                                  VerticalResolution,
+                                  800,
+                                  600,
                                   ColorDepth,
                                   RefreshRate
                                   );
@@ -378,50 +399,67 @@ GraphicsConsoleControllerDriverStart (
   }
 
   //
-  // Add Mode #3 that uses the entire display for user-defined mode
+  // Include the existing pre-defined 80x25, 80x50 and 100x31 
+  // in mGraphicsConsoleDevTemplate.
   //
-  Private->ModeData[3].Columns = HorizontalResolution / EFI_GLYPH_WIDTH;
-  Private->ModeData[3].Rows    = VerticalResolution / EFI_GLYPH_HEIGHT;
-
-  //
-  // Add Mode #4 that uses the PCD values
-  //
-  Private->ModeData[4].Columns = (UINTN) PcdGet32 (PcdConOutColumn);
-  Private->ModeData[4].Rows    = (UINTN) PcdGet32 (PcdConOutRow);
+  MaxMode = 3;
 
   //
   // Compute the maximum number of text Rows and Columns that this current graphics mode can support
   //
-  Columns = HorizontalResolution / EFI_GLYPH_WIDTH;
-  Rows    = VerticalResolution / EFI_GLYPH_HEIGHT;
+  MaxColumns = HorizontalResolution / EFI_GLYPH_WIDTH;
+  MaxRows    = VerticalResolution / EFI_GLYPH_HEIGHT;
+
+  //
+  // Add Mode #3 that uses the entire display for user-defined mode
+  //
+  Private->ModeData[MaxMode].Columns = MaxColumns;
+  Private->ModeData[MaxMode].Rows    = MaxRows;
+  MaxMode++;
+
+  //
+  // Add Mode #4 that uses the PCD values
+  //
+  Private->ModeData[MaxMode].Columns = (UINTN) PcdGet32 (PcdConOutColumn);
+  Private->ModeData[MaxMode].Rows    = (UINTN) PcdGet32 (PcdConOutRow);  
+  if ((Private->ModeData[MaxMode].Columns != 0) && (Private->ModeData[MaxMode].Rows != 0)) {
+    MaxMode++;
+  }
 
   //
   // Here we make sure that mode 0 is valid
   //
-  if (Columns < Private->ModeData[0].Columns ||
-      Rows < Private->ModeData[0].Rows) {
+  if (MaxColumns < Private->ModeData[0].Columns ||
+      MaxRows < Private->ModeData[0].Rows) {
     //
     // 80x25 cannot be supported.
     //
-    // Fallback to using the PcdConOutColumn and PcdConOutRow
-    // for mode 0.  If the PCDs are also to large, then mode 0
-    // will be shrunk to fit as needed.
+    if ((Private->ModeData[4].Columns != 0) && (Private->ModeData[4].Rows != 0)) {
     //
-    Private->ModeData[0].Columns = MIN (Private->ModeData[4].Columns, Columns);
-    Private->ModeData[0].Rows    = MIN (Private->ModeData[4].Rows, Rows);
+    // Fallback to using the Mode 4 for mode 0 if PcdConOutColumn and PcdConOutRow
+    // are not 0. If the PCDs are also too large, then mode 0
+    // will be shrunk to fit as needed. If the PCDs are all 0,
+    // then mode 0 will be the entire display.
+    //
+      Private->ModeData[0].Columns = MIN (Private->ModeData[4].Columns, MaxColumns);
+      Private->ModeData[0].Rows    = MIN (Private->ModeData[4].Rows, MaxRows);
+    } else {
+      Private->ModeData[0].Columns = MaxColumns;
+      Private->ModeData[0].Rows    = MaxRows;
+    }
   }
-
-  MaxMode = 0;
+  
+  TextModeFound = FALSE;
   for (ModeIndex = 0; ModeIndex < GRAPHICS_MAX_MODE; ModeIndex++) {
     ModeData = &Private->ModeData[ModeIndex];
     ModeData->GopWidth      = HorizontalResolution;
     ModeData->GopHeight     = VerticalResolution;
     ModeData->GopModeNumber = ModeNumber;
-    if (Columns >= ModeData->Columns &&
-        Rows >= ModeData->Rows) {
+    if ((ModeData->Columns != 0) && (ModeData->Rows != 0) &&
+        (MaxColumns >= ModeData->Columns) && (MaxRows >= ModeData->Rows)) {
       ModeData->DeltaX        = (HorizontalResolution - (ModeData->Columns * EFI_GLYPH_WIDTH)) >> 1;
       ModeData->DeltaY        = (VerticalResolution - (ModeData->Rows * EFI_GLYPH_HEIGHT)) >> 1;
-      MaxMode = ModeIndex + 1;
+      TextModeFound = TRUE;
     } else {
       ModeData->Columns       = 0;
       ModeData->Rows          = 0;
@@ -433,7 +471,8 @@ GraphicsConsoleControllerDriverStart (
   //
   // See if the resolution was too small to support any text modes
   //
-  if (MaxMode == 0) {
+  if (!TextModeFound) {
+    Status = EFI_UNSUPPORTED;
     goto Error;
   }
 

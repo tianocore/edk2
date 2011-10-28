@@ -42,12 +42,6 @@ extern EFI_DRIVER_BINDING_PROTOCOL   gGraphicsConsoleDriverBinding;
 extern EFI_NARROW_GLYPH              gUsStdNarrowGlyphData[];
 
 extern UINT32 mNarrowFontSize;
-//
-// User can define valid graphic resolution here
-// e.g. 640x480, 800x600, 1024x768...
-//
-#define CURRENT_HORIZONTAL_RESOLUTION  800
-#define CURRENT_VERTICAL_RESOLUTION    600
 
 typedef union {
   EFI_NARROW_GLYPH  NarrowGlyph;
