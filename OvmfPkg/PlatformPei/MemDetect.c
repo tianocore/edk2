@@ -1,7 +1,7 @@
 /**@file
   Memory Detection for Virtual Machines.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -30,6 +30,7 @@ Module Name:
 #include <Library/PcdLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/ResourcePublicationLib.h>
+#include <Library/MtrrLib.h>
 
 #include "Platform.h"
 #include "Cmos.h"
@@ -130,8 +131,17 @@ MemDetect (
   AddMemoryRangeHob (BASE_1MB, MemoryBase);
   AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
 
+  Status = MtrrSetMemoryAttribute (BASE_1MB, MemoryBase + MemorySize - BASE_1MB, CacheWriteBack);
+  ASSERT_EFI_ERROR(Status);
+
+  Status = MtrrSetMemoryAttribute (0, BASE_512KB + BASE_128KB, CacheWriteBack);
+  ASSERT_EFI_ERROR(Status);
+
   if (UpperMemorySize != 0) {
     AddUntestedMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
+
+    Status = MtrrSetMemoryAttribute (BASE_4GB, UpperMemorySize, CacheWriteBack);
+    ASSERT_EFI_ERROR(Status);
   }
 
   return MemoryBase + MemorySize;
