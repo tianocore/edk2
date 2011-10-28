@@ -63,8 +63,6 @@ typedef struct {
 extern SECUREBOOT_CONFIG_PRIVATE_DATA      mSecureBootConfigPrivateDateTemplate;
 
 #define SECUREBOOT_CONFIG_PRIVATE_DATA_SIGNATURE     SIGNATURE_32 ('S', 'E', 'C', 'B')
-#define SECUREBOOT_CONFIG_PRIVATE_DATA_FROM_THIS(a)  CR (a, SECUREBOOT_CONFIG_PRIVATE_DATA, ConfigAccess, SECUREBOOT_CONFIG_PRIVATE_DATA_SIGNATURE)
-
 
 /**
   This function publish the SecureBoot configuration Form.
