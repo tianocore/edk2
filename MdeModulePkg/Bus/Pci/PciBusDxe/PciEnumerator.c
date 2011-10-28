@@ -158,10 +158,16 @@ PciRootBridgeEnumerator (
 {
   EFI_STATUS                        Status;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Configuration;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Configuration1;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Configuration2;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Configuration3;
   UINT8                             SubBusNumber;
   UINT8                             StartBusNumber;
   UINT8                             PaddedBusRange;
   EFI_HANDLE                        RootBridgeHandle;
+  UINT8                             Desc;
+  UINT64                            AddrLen;
+  UINT64                            AddrRangeMin;
 
   SubBusNumber    = 0;
   StartBusNumber  = 0;
@@ -191,11 +197,40 @@ PciRootBridgeEnumerator (
     return Status;
   }
 
+  if (Configuration == NULL || Configuration->Desc == ACPI_END_TAG_DESCRIPTOR) {
+    return EFI_INVALID_PARAMETER;
+  }
+  RootBridgeDev->BusNumberRanges = Configuration;
+
+  //
+  // Sort the descriptors in ascending order
+  //
+  for (Configuration1 = Configuration; Configuration1->Desc != ACPI_END_TAG_DESCRIPTOR; Configuration1++) {
+    Configuration2 = Configuration1;
+    for (Configuration3 = Configuration1 + 1; Configuration3->Desc != ACPI_END_TAG_DESCRIPTOR; Configuration3++) {
+      if (Configuration2->AddrRangeMin > Configuration3->AddrRangeMin) {
+        Configuration2 = Configuration3;
+      }
+    }
+    //
+    // All other fields other than AddrRangeMin and AddrLen are ignored in a descriptor,
+    // so only need to swap these two fields.
+    //
+    if (Configuration2 != Configuration1) {
+      AddrRangeMin = Configuration1->AddrRangeMin;
+      Configuration1->AddrRangeMin = Configuration2->AddrRangeMin;
+      Configuration2->AddrRangeMin = AddrRangeMin;
+      
+      AddrLen = Configuration1->AddrLen;
+      Configuration1->AddrLen = Configuration2->AddrLen;
+      Configuration2->AddrLen = AddrLen;
+    }
+  }
+
   //
   // Get the bus number to start with
   //
   StartBusNumber = (UINT8) (Configuration->AddrRangeMin);
-  PaddedBusRange  = (UINT8) (Configuration->AddrRangeMax);
 
   //
   // Initialize the subordinate bus number
@@ -215,7 +250,7 @@ PciRootBridgeEnumerator (
   //
   Status = PciScanBus (
             RootBridgeDev,
-            (UINT8) (Configuration->AddrRangeMin),
+            StartBusNumber,
             &SubBusNumber,
             &PaddedBusRange
             );
@@ -228,24 +263,45 @@ PciRootBridgeEnumerator (
   //
   // Assign max bus number scanned
   //
-  Configuration->AddrLen = SubBusNumber - StartBusNumber + 1 + PaddedBusRange;
 
+  Status = PciAllocateBusNumber (RootBridgeDev, SubBusNumber, PaddedBusRange, &SubBusNumber);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }  
+
+  //
+  // Find the bus range which contains the higest bus number, then returns the number of buses
+  // that should be decoded.
+  //
+  while (Configuration->AddrRangeMin + Configuration->AddrLen - 1 < SubBusNumber) {
+    Configuration++;
+  }
+  AddrLen = Configuration->AddrLen;
+  Configuration->AddrLen = SubBusNumber - Configuration->AddrRangeMin + 1;
+
+  //
+  // Save the Desc field of the next descriptor. Mark the next descriptor as an END descriptor.
+  //
+  Configuration++;
+  Desc = Configuration->Desc;
+  Configuration->Desc = ACPI_END_TAG_DESCRIPTOR;
+  
   //
   // Set bus number
   //
   Status = PciResAlloc->SetBusNumbers (
                           PciResAlloc,
                           RootBridgeHandle,
-                          Configuration
+                          RootBridgeDev->BusNumberRanges
                           );
 
-  FreePool (Configuration);
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
+  //
+  // Restore changed fields
+  //
+  Configuration->Desc = Desc;
+  (Configuration - 1)->AddrLen = AddrLen;
+  
+  return Status;
 }
 
 /**
@@ -351,7 +407,11 @@ PciAssignBusNumber (
         //
         // Reserved one bus for cardbus bridge
         //
-        SecondBus = ++(*SubBusNumber);
+        Status = PciAllocateBusNumber (Bridge, *SubBusNumber, 1, SubBusNumber);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+        SecondBus = *SubBusNumber;
 
         Register  = (UINT16) ((SecondBus << 8) | (UINT16) StartBusNumber);
 

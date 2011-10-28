@@ -1,7 +1,7 @@
 /** @file
   Internal library declaration for PCI Bus module.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -72,6 +72,27 @@ RemoveRejectedPciDevices (
 EFI_STATUS
 PciHostBridgeResourceAllocator (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
+  );
+
+/**
+  Allocate NumberOfBuses buses and return the next available PCI bus number.
+
+  @param  Bridge           Bridge device instance.
+  @param  StartBusNumber   Current available PCI bus number.
+  @param  NumberOfBuses    Number of buses enumerated below the StartBusNumber.
+  @param  NextBusNumber    Next available PCI bus number.
+
+  @retval EFI_SUCCESS           Available bus number resource is enough. Next available PCI bus number
+                                is returned in NextBusNumber.
+  @retval EFI_OUT_OF_RESOURCES  Available bus number resource is not enough for allocation.
+
+**/
+EFI_STATUS
+PciAllocateBusNumber (
+  IN PCI_IO_DEVICE                      *Bridge,
+  IN UINT8                              StartBusNumber,
+  IN UINT8                              NumberOfBuses,
+  OUT UINT8                             *NextBusNumber
   );
 
 /**

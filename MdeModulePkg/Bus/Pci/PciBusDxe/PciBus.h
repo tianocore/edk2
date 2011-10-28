@@ -268,6 +268,11 @@ struct _PCI_IO_DEVICE {
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR         *ResourcePaddingDescriptors;
   EFI_HPC_PADDING_ATTRIBUTES                PaddingAttributes;
 
+  //
+  // Bus number ranges for a PCI Root Bridge device
+  //
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR         *BusNumberRanges;
+
   BOOLEAN                                   IsPciExp;
   //
   // For SR-IOV

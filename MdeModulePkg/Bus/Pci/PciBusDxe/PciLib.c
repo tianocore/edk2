@@ -897,6 +897,64 @@ PciHostBridgeResourceAllocator (
 }
 
 /**
+  Allocate NumberOfBuses buses and return the next available PCI bus number.
+
+  @param  Bridge           Bridge device instance.
+  @param  StartBusNumber   Current available PCI bus number.
+  @param  NumberOfBuses    Number of buses enumerated below the StartBusNumber.
+  @param  NextBusNumber    Next available PCI bus number.
+
+  @retval EFI_SUCCESS           Available bus number resource is enough. Next available PCI bus number
+                                is returned in NextBusNumber.
+  @retval EFI_OUT_OF_RESOURCES  Available bus number resource is not enough for allocation.
+
+**/
+EFI_STATUS
+PciAllocateBusNumber (
+  IN PCI_IO_DEVICE                      *Bridge,
+  IN UINT8                              StartBusNumber,
+  IN UINT8                              NumberOfBuses,
+  OUT UINT8                             *NextBusNumber
+  )
+{
+  PCI_IO_DEVICE                      *RootBridge;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *BusNumberRanges;
+  UINT8                              NextNumber;
+  UINT64                             MaxNumberInRange;
+
+  //
+  // Get PCI Root Bridge device
+  //
+  RootBridge = Bridge;
+  while (RootBridge->Parent != NULL) {
+    RootBridge = RootBridge->Parent;
+  }
+
+  //
+  // Get next available PCI bus number
+  //
+  BusNumberRanges = RootBridge->BusNumberRanges;
+  while (BusNumberRanges->Desc != ACPI_END_TAG_DESCRIPTOR) {
+    MaxNumberInRange = BusNumberRanges->AddrRangeMin + BusNumberRanges->AddrLen - 1;
+    if (StartBusNumber >= BusNumberRanges->AddrRangeMin && StartBusNumber <=  MaxNumberInRange) {
+      NextNumber = StartBusNumber + NumberOfBuses;
+      while (NextNumber > MaxNumberInRange) {
+        ++BusNumberRanges;
+        if (BusNumberRanges->Desc == ACPI_END_TAG_DESCRIPTOR) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+        NextNumber += (UINT8)(BusNumberRanges->AddrRangeMin - (MaxNumberInRange + 1));
+        MaxNumberInRange = BusNumberRanges->AddrRangeMin + BusNumberRanges->AddrLen - 1;
+      }
+      *NextBusNumber = NextNumber;
+      return EFI_SUCCESS;
+    }
+    BusNumberRanges++;
+  }
+  return EFI_OUT_OF_RESOURCES;
+}
+
+/**
   Scan pci bus and assign bus number to the given PCI bus system.
 
   @param  Bridge           Bridge device instance.
@@ -1100,15 +1158,10 @@ PciScanBus (
           }
         }
 
-        //
-        // Add feature to support customized secondary bus number
-        //
-        if (*SubBusNumber == 0) {
-          *SubBusNumber   = *PaddedBusRange;
-          *PaddedBusRange = 0;
+        Status = PciAllocateBusNumber (Bridge, *SubBusNumber, 1, SubBusNumber);
+        if (EFI_ERROR (Status)) {
+          return Status;
         }
-
-        (*SubBusNumber)++;
         SecondBus = *SubBusNumber;
 
         Register  = (UINT16) ((SecondBus << 8) | (UINT16) StartBusNumber);
@@ -1173,7 +1226,10 @@ PciScanBus (
               (State & EFI_HPC_STATE_INITIALIZED) != 0) {
             *PaddedBusRange = (UINT8) ((UINT8) (BusRange) +*PaddedBusRange);
           } else {
-            *SubBusNumber = (UINT8) ((UINT8) (BusRange) +*SubBusNumber);
+            Status = PciAllocateBusNumber (PciDevice, *SubBusNumber, (UINT8) (BusRange), SubBusNumber);
+            if (EFI_ERROR (Status)) {
+              return Status;
+            }
           }
         }
 
@@ -1197,7 +1253,10 @@ PciScanBus (
         if (PcdGetBool (PcdSrIovSupport) && PciDevice->SrIovCapabilityOffset != 0) {
           if (TempReservedBusNum < PciDevice->ReservedBusNum) {
 
-            (*SubBusNumber) = (UINT8)((*SubBusNumber) + PciDevice->ReservedBusNum - TempReservedBusNum);
+            Status = PciAllocateBusNumber (PciDevice, *SubBusNumber, (UINT8) (PciDevice->ReservedBusNum - TempReservedBusNum), SubBusNumber);
+            if (EFI_ERROR (Status)) {
+              return Status;
+            }
             TempReservedBusNum = PciDevice->ReservedBusNum;
 
             if (Func == 0) {
