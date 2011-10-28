@@ -268,7 +268,7 @@ GetEndPointer (
   //
   // The end of variable store
   //
-  return (VARIABLE_HEADER *) ((UINTN) VolHeader + VolHeader->Size);
+  return (VARIABLE_HEADER *) HEADER_ALIGN (VolHeader + 1);
 }
 
 /**
@@ -990,9 +990,9 @@ UpdateVariable (
   if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
     NonVolatileVarableStoreSize = ((VARIABLE_STORE_HEADER *)(UINTN)(Global->NonVolatileVariableBase))->Size;
     if ((((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0) 
-      && ((VarSize + mVariableModuleGlobal->HwErrVariableTotalSize) > PcdGet32 (PcdHwErrStorageSize)))
+      && ((HEADER_ALIGN (VarSize) + mVariableModuleGlobal->HwErrVariableTotalSize) > PcdGet32 (PcdHwErrStorageSize)))
       || (((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == 0) 
-      && ((VarSize + mVariableModuleGlobal->CommonVariableTotalSize) > NonVolatileVarableStoreSize - sizeof (VARIABLE_STORE_HEADER) - PcdGet32 (PcdHwErrStorageSize)))) {
+      && ((HEADER_ALIGN (VarSize) + mVariableModuleGlobal->CommonVariableTotalSize) > NonVolatileVarableStoreSize - sizeof (VARIABLE_STORE_HEADER) - PcdGet32 (PcdHwErrStorageSize)))) {
       Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
@@ -1007,7 +1007,7 @@ UpdateVariable (
       mVariableModuleGlobal->CommonVariableTotalSize += HEADER_ALIGN (VarSize);
     }
   } else {
-    if ((UINT32) (VarSize + mVariableModuleGlobal->VolatileLastVariableOffset) >
+    if ((UINT32) (HEADER_ALIGN (VarSize) + mVariableModuleGlobal->VolatileLastVariableOffset) >
           ((VARIABLE_STORE_HEADER *) ((UINTN) (Global->VolatileVariableBase)))->Size
           ) {
       Status = EFI_OUT_OF_RESOURCES;
@@ -1103,8 +1103,8 @@ FindVariable (
   // Start Pointers for the variable.
   // Actual Data Pointer where data can be written.
   //
-  Variable[0] = (VARIABLE_HEADER *) (VariableStoreHeader[0] + 1);
-  Variable[1] = (VARIABLE_HEADER *) (VariableStoreHeader[1] + 1);
+  Variable[0] = (VARIABLE_HEADER *) HEADER_ALIGN (VariableStoreHeader[0] + 1);
+  Variable[1] = (VARIABLE_HEADER *) HEADER_ALIGN (VariableStoreHeader[1] + 1);
 
   if (VariableName[0] != 0 && VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1113,7 +1113,7 @@ FindVariable (
   // Find the variable by walk through non-volatile and volatile variable store
   //
   for (Index = 0; Index < 2; Index++) {
-    PtrTrack->StartPtr  = (VARIABLE_HEADER *) (VariableStoreHeader[Index] + 1);
+    PtrTrack->StartPtr  = (VARIABLE_HEADER *) HEADER_ALIGN (VariableStoreHeader[Index] + 1);
     PtrTrack->EndPtr    = GetEndPointer (VariableStoreHeader[Index]);
 
     while ((Variable[Index] < GetEndPointer (VariableStoreHeader[Index])) && (Variable[Index] != NULL)) {
@@ -1282,7 +1282,7 @@ EmuGetNextVariableName (
     if (Variable.CurrPtr >= Variable.EndPtr || Variable.CurrPtr == NULL) {
       Variable.Volatile = (BOOLEAN) (Variable.Volatile ^ ((BOOLEAN) 0x1));
       if (Variable.Volatile) {
-        Variable.StartPtr = (VARIABLE_HEADER *) ((UINTN) (Global->VolatileVariableBase + sizeof (VARIABLE_STORE_HEADER)));
+        Variable.StartPtr = (VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) (Global->VolatileVariableBase + sizeof (VARIABLE_STORE_HEADER)));
         Variable.EndPtr = (VARIABLE_HEADER *) GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) Global->VolatileVariableBase));
       } else {
         Status = EFI_NOT_FOUND;
@@ -1556,7 +1556,7 @@ EmuQueryVariableInfo (
   //
   // Point to the starting address of the variables.
   //
-  Variable = (VARIABLE_HEADER *) (VariableStoreHeader + 1);
+  Variable = (VARIABLE_HEADER *) HEADER_ALIGN (VariableStoreHeader + 1);
 
   //
   // Now walk through the related variable store.
@@ -1701,7 +1701,7 @@ InitializeVariableStore (
         //
         // Flush the HOB variable to Emulation Variable storage.
         //
-        for ( Variable = (VARIABLE_HEADER *) (VariableStoreHeader + 1)
+        for ( Variable = (VARIABLE_HEADER *) HEADER_ALIGN (VariableStoreHeader + 1)
             ; (Variable < GetEndPointer (VariableStoreHeader) && (Variable != NULL))
             ; Variable = GetNextVariablePtr (Variable)
             ) {
