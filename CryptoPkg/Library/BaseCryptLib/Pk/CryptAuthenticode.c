@@ -65,6 +65,10 @@ AuthenticodeVerify (
   ASSERT (AuthData  != NULL);
   ASSERT (ImageHash != NULL);
 
+  if (DataSize > INT_MAX) {
+    return FALSE;
+  }
+
   Status       = FALSE;
   Pkcs7        = NULL;
   OrigAuthData = AuthData;

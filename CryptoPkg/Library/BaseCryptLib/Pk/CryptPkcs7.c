@@ -18,6 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <openssl/x509.h>
 #include <openssl/pkcs7.h>
 
+UINT8 mOidValue[9] = { 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x07, 0x02 };
 
 /**
   Verification callback function to override any existing callbacks in OpenSSL
@@ -143,6 +144,8 @@ Pkcs7Sign (
   PKCS7     *Pkcs7;
   UINT8     *RsaContext;
   UINT8     *P7Data;
+  UINTN     P7DataSize;
+  UINT8     *Tmp;
 
   //
   // Check input parameters.
@@ -152,6 +155,10 @@ Pkcs7Sign (
   }
   
   if ((SignCert == NULL) || (SignedData == NULL) || (SignedDataSize == NULL)) {
+    return FALSE;
+  }
+
+  if (InDataSize > INT_MAX) {
     return FALSE;
   }
 
@@ -216,13 +223,23 @@ Pkcs7Sign (
   //
   // Convert PKCS#7 signedData structure into DER-encoded buffer.
   //
-  *SignedDataSize = i2d_PKCS7 (Pkcs7, NULL);
-  if (*SignedDataSize == 0) {
+  P7DataSize = i2d_PKCS7 (Pkcs7, NULL);
+  if (P7DataSize <= 19) {
     goto _Exit;
   }
+  P7Data     = OPENSSL_malloc (P7DataSize);
+  Tmp        = P7Data;
+  P7DataSize = i2d_PKCS7 (Pkcs7, (unsigned char **) &Tmp);
+
+  //
+  // Strip ContentInfo to content only for signeddata. The data be trimmed off
+  // is totally 19 bytes.
+  //
+  *SignedDataSize = P7DataSize - 19;
   *SignedData     = OPENSSL_malloc (*SignedDataSize);
-  P7Data          = *SignedData;
-  *SignedDataSize = i2d_PKCS7 (Pkcs7, (unsigned char **) &P7Data);
+  CopyMem (*SignedData, P7Data + 19, *SignedDataSize);
+  
+  OPENSSL_free (P7Data);
 
   Status = TRUE;
 
@@ -253,8 +270,9 @@ _Exit:
 }
 
 /**
-  Verifies the validility of a PKCS#7 signed data as described in "PKCS #7: Cryptographic
-  Message Syntax Standard".
+  Verifies the validility of a PKCS#7 signed data as described in "PKCS #7:
+  Cryptographic Message Syntax Standard". The input signed data could be wrapped
+  in a ContentInfo structure.
 
   If P7Data is NULL, then ASSERT().
 
@@ -287,11 +305,19 @@ Pkcs7Verify (
   BOOLEAN     Status;
   X509        *Cert;
   X509_STORE  *CertStore;
+  UINT8       *SignedData;
+  UINT8       *Temp;
+  UINTN       SignedDataSize;
+  BOOLEAN     Wrapped;
 
   //
-  // ASSERT if P7Data is NULL
+  // ASSERT if P7Data is NULL or P7Length is not larger than 19 bytes.
   //
-  ASSERT (P7Data != NULL);
+  ASSERT ((P7Data != NULL) || (P7Length <= 19));
+
+  if ((CertLength > INT_MAX) || (DataLength > INT_MAX)) {
+    return FALSE;
+  }
 
   Status    = FALSE;
   Pkcs7     = NULL;
@@ -309,9 +335,80 @@ Pkcs7Verify (
   EVP_add_digest (EVP_sha256());
 
   //
+  // Check whether input P7Data is a wrapped ContentInfo structure or not.
+  //
+  Wrapped = FALSE;
+  if ((P7Data[4] == 0x06) && (P7Data[5] == 0x09)) {
+    if (CompareMem (P7Data + 6, mOidValue, sizeof (mOidValue)) == 0) {
+      if ((P7Data[15] == 0xA0) && (P7Data[16] == 0x82)) {
+        Wrapped = TRUE;
+      }
+    }
+  }
+
+  if (Wrapped) {
+    SignedData     = (UINT8 *) P7Data;
+    SignedDataSize = P7Length;
+  } else {
+    //
+    // Wrap PKCS#7 signeddata to a ContentInfo structure - add a header in 19 bytes.
+    //
+    SignedDataSize = P7Length + 19;
+    SignedData     = OPENSSL_malloc (SignedDataSize);
+    if (SignedData == NULL) {
+      return FALSE;
+    }
+
+    //
+    // Part1: 0x30, 0x82.
+    //
+    SignedData[0] = 0x30;
+    SignedData[1] = 0x82;
+
+    //
+    // Part2: Length1 = P7Length + 19 - 4, in big endian.
+    //
+    SignedData[2] = (UINT8) (((UINT16) (SignedDataSize - 4)) >> 8);
+    SignedData[3] = (UINT8) (((UINT16) (SignedDataSize - 4)) & 0xff);
+
+    //
+    // Part3: 0x06, 0x09.
+    //
+    SignedData[4] = 0x06;
+    SignedData[5] = 0x09;
+
+    //
+    // Part4: OID value -- 0x2A 0x86 0x48 0x86 0xF7 0x0D 0x01 0x07 0x02.
+    //
+    CopyMem (SignedData + 6, mOidValue, sizeof (mOidValue));
+
+    //
+    // Part5: 0xA0, 0x82.
+    //
+    SignedData[15] = 0xA0;
+    SignedData[16] = 0x82;
+
+    //
+    // Part6: Length2 = P7Length, in big endian.
+    //
+    SignedData[17] = (UINT8) (((UINT16) P7Length) >> 8);
+    SignedData[18] = (UINT8) (((UINT16) P7Length) & 0xff);
+
+    //
+    // Part7: P7Data.
+    //
+    CopyMem (SignedData + 19, P7Data, P7Length);
+  }
+  
+  //
   // Retrieve PKCS#7 Data (DER encoding)
   //
-  Pkcs7 = d2i_PKCS7 (NULL, &P7Data, (int)P7Length);
+  if (SignedDataSize > INT_MAX) {
+    goto _Exit;
+  }
+
+  Temp = SignedData;
+  Pkcs7 = d2i_PKCS7 (NULL, &Temp, (int) SignedDataSize);
   if (Pkcs7 == NULL) {
     goto _Exit;
   }
@@ -374,6 +471,10 @@ _Exit:
   X509_free (Cert);
   X509_STORE_free (CertStore);
   PKCS7_free (Pkcs7);
+
+  if (!Wrapped) {
+    OPENSSL_free (SignedData);
+  }
 
   return Status;
 }

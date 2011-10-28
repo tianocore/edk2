@@ -48,6 +48,10 @@ X509ConstructCertificate (
   ASSERT (Cert != NULL);
   ASSERT (SingleX509Cert != NULL);
 
+  if (CertSize > INT_MAX) {
+    return FALSE;
+  }
+
   Status = FALSE;
 
   //
@@ -439,6 +443,7 @@ X509VerifyCert (
   // X509 Certificate Verification.
   //
   Status = (BOOLEAN) X509_verify_cert (&CertCtx);
+  X509_STORE_CTX_cleanup (&CertCtx);
 
 _Exit:
   //
@@ -447,7 +452,6 @@ _Exit:
   X509_free (X509Cert);
   X509_free (X509CACert);
   X509_STORE_free (CertStore);
-  X509_STORE_CTX_cleanup (&CertCtx);
 
   return Status;
 }
