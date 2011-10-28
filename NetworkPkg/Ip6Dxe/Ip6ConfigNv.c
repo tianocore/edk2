@@ -1758,7 +1758,7 @@ Ip6FormCallback (
       break;
     }
 
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
     break;
 
   case KEY_GET_CURRENT_SETTING:
