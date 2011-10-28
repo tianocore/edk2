@@ -408,7 +408,7 @@ Pkcs7Verify (
   }
 
   Temp = SignedData;
-  Pkcs7 = d2i_PKCS7 (NULL, &Temp, (int) SignedDataSize);
+  Pkcs7 = d2i_PKCS7 (NULL, (const unsigned char **) &Temp, (int) SignedDataSize);
   if (Pkcs7 == NULL) {
     goto _Exit;
   }
