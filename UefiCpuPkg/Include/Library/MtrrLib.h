@@ -1,7 +1,7 @@
 /** @file
   MTRR setting library
 
-  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -328,6 +328,18 @@ MtrrDebugPrintAllMtrrs (
 BOOLEAN
 EFIAPI
 IsMtrrSupported (
+  VOID
+  );
+
+/**
+  Returns the default MTRR cache type for the system.
+
+  @return  The default MTRR cache type.
+
+**/
+MTRR_MEMORY_CACHE_TYPE
+EFIAPI
+MtrrGetDefaultMemoryType (
   VOID
   );
 
