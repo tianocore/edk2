@@ -161,20 +161,22 @@ def main():
                 if len(List) == 2:
                     if List[0].strip() == "EFI_SOURCE":
                         GlobalData.gEfiSource = List[1].strip()
+                        GlobalData.gGlobalDefines["EFI_SOURCE"] = GlobalData.gEfiSource
                         continue
                     elif List[0].strip() == "EDK_SOURCE":
                         GlobalData.gEdkSource = List[1].strip()
+                        GlobalData.gGlobalDefines["EDK_SOURCE"] = GlobalData.gEdkSource
                         continue
+                    elif List[0].strip() in ["WORKSPACE", "TARGET", "TOOLCHAIN"]:
+                        GlobalData.gGlobalDefines[List[0].strip()] = List[1].strip()
                     else:
-                        GlobalData.gEdkGlobal[List[0].strip()] = List[1].strip()
-                        FdfParser.InputMacroDict[List[0].strip()] = List[1].strip()
+                        GlobalData.gCommandLineDefines[List[0].strip()] = List[1].strip()
                 else:
-                    FdfParser.InputMacroDict[List[0].strip()] = ""
+                    GlobalData.gCommandLineDefines[List[0].strip()] = "TRUE"
+        os.environ["WORKSPACE"] = Workspace
 
         """call Workspace build create database"""
-        os.environ["WORKSPACE"] = Workspace
-        FdfParser.InputMacroDict["WORKSPACE"] = Workspace
-        BuildWorkSpace = WorkspaceDatabase(':memory:', FdfParser.InputMacroDict)
+        BuildWorkSpace = WorkspaceDatabase(None)
         BuildWorkSpace.InitDatabase()
         
         #
@@ -187,15 +189,15 @@ def main():
             ArchList = Options.archList.split(',')
         else:
 #            EdkLogger.error("GenFds", OPTION_MISSING, "Missing build ARCH")
-            ArchList = BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'COMMON'].SupArchList
+            ArchList = BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'COMMON', Options.BuildTarget, Options.ToolChain].SupArchList
 
-        TargetArchList = set(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'COMMON'].SupArchList) & set(ArchList)
+        TargetArchList = set(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'COMMON', Options.BuildTarget, Options.ToolChain].SupArchList) & set(ArchList)
         if len(TargetArchList) == 0:
             EdkLogger.error("GenFds", GENFDS_ERROR, "Target ARCH %s not in platform supported ARCH %s" % (str(ArchList), str(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'COMMON'].SupArchList)))
         
         for Arch in ArchList:
-            GenFdsGlobalVariable.OutputDirFromDscDict[Arch] = NormPath(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch].OutputDirectory)
-            GenFdsGlobalVariable.PlatformName = BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch].PlatformName
+            GenFdsGlobalVariable.OutputDirFromDscDict[Arch] = NormPath(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, Options.BuildTarget, Options.ToolChain].OutputDirectory)
+            GenFdsGlobalVariable.PlatformName = BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, Options.BuildTarget, Options.ToolChain].PlatformName
 
         if (Options.outputDir):
             OutputDirFromCommandLine = GenFdsGlobalVariable.ReplaceWorkspaceMacro(Options.outputDir)
@@ -276,7 +278,8 @@ def main():
                     ExtraData="Please send email to edk2-buildtools-devel@lists.sourceforge.net for help, attaching following call stack trace!\n",
                     RaiseError=False
                     )
-        EdkLogger.quiet(traceback.format_exc())
+        if Options.debug != None:
+            EdkLogger.quiet(traceback.format_exc())
         ReturnCode = CODE_ERROR
     return ReturnCode
 
@@ -482,7 +485,7 @@ class GenFds :
     #   @retval None
     #
     def PreprocessImage(BuildDb, DscFile):
-        PcdDict = BuildDb.BuildObject[DscFile, 'COMMON'].Pcds
+        PcdDict = BuildDb.BuildObject[DscFile, 'COMMON', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag].Pcds
         PcdValue = ''
         for Key in PcdDict:
             PcdObj = PcdDict[Key]
@@ -501,18 +504,18 @@ class GenFds :
         if Int64PcdValue > 0:
             TopAddress = Int64PcdValue
             
-        ModuleDict = BuildDb.BuildObject[DscFile, 'COMMON'].Modules
+        ModuleDict = BuildDb.BuildObject[DscFile, 'COMMON', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag].Modules
         for Key in ModuleDict:
-            ModuleObj = BuildDb.BuildObject[Key, 'COMMON']
+            ModuleObj = BuildDb.BuildObject[Key, 'COMMON', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
             print ModuleObj.BaseName + ' ' + ModuleObj.ModuleType
 
     def GenerateGuidXRefFile(BuildDb, ArchList):
         GuidXRefFileName = os.path.join(GenFdsGlobalVariable.FvDir, "Guid.xref")
         GuidXRefFile = StringIO.StringIO('')
         for Arch in ArchList:
-            PlatformDataBase = BuildDb.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch]
+            PlatformDataBase = BuildDb.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
             for ModuleFile in PlatformDataBase.Modules:
-                Module = BuildDb.BuildObject[ModuleFile, Arch]
+                Module = BuildDb.BuildObject[ModuleFile, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
                 GuidXRefFile.write("%s %s\n" % (Module.Guid, Module.BaseName))
         SaveFileOnChange(GuidXRefFileName, GuidXRefFile.getvalue(), False)
         GuidXRefFile.close()

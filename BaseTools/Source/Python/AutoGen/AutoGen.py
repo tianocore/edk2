@@ -180,16 +180,16 @@ class WorkspaceAutoGen(AutoGen):
             Fvs = []
         if Caps is None:
             Caps = []
-        self.MetaFile       = ActivePlatform.MetaFile
+        self.BuildDatabase  = MetaFileDb
+        self.MetaFile       = ActivePlatform
         self.WorkspaceDir   = WorkspaceDir
-        self.Platform       = ActivePlatform
+        self.Platform       = self.BuildDatabase[self.MetaFile, 'COMMON', Target, Toolchain]
         self.BuildTarget    = Target
         self.ToolChain      = Toolchain
         self.ArchList       = ArchList
         self.SkuId          = SkuId
         self.UniFlag        = UniFlag
 
-        self.BuildDatabase  = MetaFileDb
         self.TargetTxt      = BuildConfig
         self.ToolDef        = ToolDefinition
         self.FdfFile        = FlashDefinitionFile
@@ -201,30 +201,74 @@ class WorkspaceAutoGen(AutoGen):
         # there's many relative directory operations, so ...
         os.chdir(self.WorkspaceDir)
 
+        #
+        # Merge Arch
+        #
+        if not self.ArchList:
+            ArchList = set(self.Platform.SupArchList)
+        else:
+            ArchList = set(self.ArchList) & set(self.Platform.SupArchList)
+        if not ArchList:
+            EdkLogger.error("build", PARAMETER_INVALID,
+                            ExtraData = "Invalid ARCH specified. [Valid ARCH: %s]" % (" ".join(self.Platform.SupArchList)))
+        elif self.ArchList and len(ArchList) != len(self.ArchList):
+            SkippedArchList = set(self.ArchList).symmetric_difference(set(self.Platform.SupArchList))
+            EdkLogger.verbose("\nArch [%s] is ignored because the platform supports [%s] only!"
+                              % (" ".join(SkippedArchList), " ".join(self.Platform.SupArchList)))
+        self.ArchList = tuple(ArchList)
+
+        # Validate build target
+        if self.BuildTarget not in self.Platform.BuildTargets:
+            EdkLogger.error("build", PARAMETER_INVALID, 
+                            ExtraData="Build target [%s] is not supported by the platform. [Valid target: %s]"
+                                      % (self.BuildTarget, " ".join(self.Platform.BuildTargets)))
+
+        # Validate SKU ID
+        if not self.SkuId:
+            self.SkuId = 'DEFAULT'
+
+        if self.SkuId not in self.Platform.SkuIds:
+            EdkLogger.error("build", PARAMETER_INVALID, 
+                            ExtraData="SKU-ID [%s] is not supported by the platform. [Valid SKU-ID: %s]"
+                                      % (self.SkuId, " ".join(self.Platform.SkuIds.keys())))
+
         # parse FDF file to get PCDs in it, if any
-        if self.FdfFile != None and self.FdfFile != '':
-            #
-            # Make global macros available when parsing FDF file
-            #
-            InputMacroDict.update(self.BuildDatabase.WorkspaceDb._GlobalMacros)
+        if not self.FdfFile:
+            self.FdfFile = self.Platform.FlashDefinition
+        EdkLogger.verbose("\nFLASH_DEFINITION = %s" % self.FdfFile)
+
+        if self.FdfFile:
             #
             # Mark now build in AutoGen Phase
             #
-            GlobalData.gAutoGenPhase = True            
+            GlobalData.gAutoGenPhase = True    
             Fdf = FdfParser(self.FdfFile.Path)
             Fdf.ParseFile()
-            GlobalData.gAutoGenPhase = False  
+            GlobalData.gAutoGenPhase = False
             PcdSet = Fdf.Profile.PcdDict
             ModuleList = Fdf.Profile.InfList
             self.FdfProfile = Fdf.Profile
+            for fvname in self.FvTargetList:
+                if fvname.upper() not in self.FdfProfile.FvDict:
+                    EdkLogger.error("build", OPTION_VALUE_INVALID,
+                                    "No such an FV in FDF file: %s" % fvname)
         else:
             PcdSet = {}
             ModuleList = []
             self.FdfProfile = None
+            if self.FdTargetList:
+                EdkLogger.info("No flash definition file found. FD [%s] will be ignored." % " ".join(self.FdTargetList))
+                self.FdTargetList = []
+            if self.FvTargetList:
+                EdkLogger.info("No flash definition file found. FV [%s] will be ignored." % " ".join(self.FvTargetList))
+                self.FvTargetList = []
+            if self.CapTargetList:
+                EdkLogger.info("No flash definition file found. Capsule [%s] will be ignored." % " ".join(self.CapTargetList))
+                self.CapTargetList = []
         
         # apply SKU and inject PCDs from Flash Definition file
         for Arch in self.ArchList:
-            Platform = self.BuildDatabase[self.MetaFile, Arch]
+            Platform = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
             Platform.SkuName = self.SkuId
             for Name, Guid in PcdSet:
                 Platform.AddPcd(Name, Guid, PcdSet[Name, Guid])
@@ -971,7 +1015,7 @@ class PlatformAutoGen(AutoGen):
     ## Return the platform build data object
     def _GetPlatform(self):
         if self._Platform == None:
-            self._Platform = self.BuildDatabase[self.MetaFile, self.Arch]
+            self._Platform = self.BuildDatabase[self.MetaFile, self.Arch, self.BuildTarget, self.ToolChain]
         return self._Platform
 
     ## Return platform name
@@ -1309,7 +1353,7 @@ class PlatformAutoGen(AutoGen):
                                             File=self.MetaFile,
                                             ExtraData="in [%s] [%s]\n\tconsumed by module [%s]" % (str(M), self.Arch, str(Module)))
 
-                    LibraryModule = self.BuildDatabase[LibraryPath, self.Arch]
+                    LibraryModule = self.BuildDatabase[LibraryPath, self.Arch, self.BuildTarget, self.ToolChain]
                     # for those forced library instance (NULL library), add a fake library class
                     if LibraryClassName.startswith("NULL"):
                         LibraryModule.LibraryClass.append(LibraryClassObject(LibraryClassName, [ModuleType]))
@@ -1907,6 +1951,7 @@ class ModuleAutoGen(AutoGen):
             self._Macro["ARCH"                  ] = self.Arch
             self._Macro["TOOLCHAIN"             ] = self.ToolChain
             self._Macro["TOOLCHAIN_TAG"         ] = self.ToolChain
+            self._Macro["TOOL_CHAIN_TAG"        ] = self.ToolChain
             self._Macro["TARGET"                ] = self.BuildTarget
 
             self._Macro["BUILD_DIR"             ] = self.PlatformInfo.BuildDir
@@ -1920,7 +1965,7 @@ class ModuleAutoGen(AutoGen):
     ## Return the module build data object
     def _GetModule(self):
         if self._Module == None:
-            self._Module = self.Workspace.BuildDatabase[self.MetaFile, self.Arch]
+            self._Module = self.Workspace.BuildDatabase[self.MetaFile, self.Arch, self.BuildTarget, self.ToolChain]
         return self._Module
 
     ## Return the module name
@@ -2279,7 +2324,7 @@ class ModuleAutoGen(AutoGen):
             if File.IsBinary and File == Source and self._BinaryFileList != None and File in self._BinaryFileList:
                 # Skip all files that are not binary libraries
                 if not self.IsLibrary:
-                    continue
+                    continue            
                 RuleObject = self.BuildRules[TAB_DEFAULT_BINARY_FILE]
             elif FileType in self.BuildRules:
                 RuleObject = self.BuildRules[FileType]
@@ -2672,7 +2717,7 @@ class ModuleAutoGen(AutoGen):
             DpxFile = gAutoGenDepexFileName % {"module_name" : self.Name}
 
             if len(Dpx.PostfixNotation) <> 0:
-              self.DepexGenerated = True
+                self.DepexGenerated = True
 
             if Dpx.Generate(path.join(self.OutputDir, DpxFile)):
                 AutoGenList.append(str(DpxFile))

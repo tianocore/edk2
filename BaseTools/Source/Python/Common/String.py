@@ -22,6 +22,7 @@ import EdkLogger as EdkLogger
 
 import GlobalData
 from BuildToolError import *
+from CommonDataClass.Exceptions import *
 
 gHexVerPatt = re.compile('0x[a-f0-9]{4}[a-f0-9]{4}$',re.IGNORECASE)
 gHumanReadableVerPatt = re.compile(r'([1-9][0-9]*|0)\.[0-9]{1,2}$')
@@ -39,7 +40,52 @@ gHumanReadableVerPatt = re.compile(r'([1-9][0-9]*|0)\.[0-9]{1,2}$')
 # @retval list() A list for splitted string
 #
 def GetSplitValueList(String, SplitTag = DataType.TAB_VALUE_SPLIT, MaxSplit = -1):
-    return map(lambda l: l.strip(), String.split(SplitTag, MaxSplit))
+    ValueList = []
+    Last = 0
+    Escaped = False
+    InString = False
+    for Index in range(0, len(String)):
+        Char = String[Index]
+
+        if not Escaped:
+            # Found a splitter not in a string, split it
+            if not InString and Char == SplitTag:
+                ValueList.append(String[Last:Index].strip())
+                Last = Index+1
+                if MaxSplit > 0 and len(ValueList) >= MaxSplit:
+                    break
+
+            if Char == '\\' and InString:
+                Escaped = True
+            elif Char == '"':
+                if not InString:
+                    InString = True
+                else:
+                    InString = False
+        else:
+            Escaped = False
+
+    if Last < len(String):
+        ValueList.append(String[Last:].strip())
+    elif Last == len(String):
+        ValueList.append('')
+
+    return ValueList
+
+## GetSplitList
+#
+# Get a value list from a string with multiple values splited with SplitString
+# The default SplitTag is DataType.TAB_VALUE_SPLIT
+# 'AAA|BBB|CCC' -> ['AAA', 'BBB', 'CCC']
+#
+# @param String:    The input string to be splitted
+# @param SplitStr:  The split key, default is DataType.TAB_VALUE_SPLIT
+# @param MaxSplit:  The max number of split values, default is -1
+#
+# @retval list() A list for splitted string
+#
+def GetSplitList(String, SplitStr = DataType.TAB_VALUE_SPLIT, MaxSplit = -1):
+    return map(lambda l: l.strip(), String.split(SplitStr, MaxSplit))
 
 ## MergeArches
 #
@@ -210,16 +256,18 @@ def ReplaceMacros(StringList, MacroDefinitions={}, SelfReplacement = False):
 #
 # @retval string            The string whose macros are replaced
 #
-def ReplaceMacro(String, MacroDefinitions={}, SelfReplacement = False):
+def ReplaceMacro(String, MacroDefinitions={}, SelfReplacement=False, RaiseError=False):
     LastString = String
-    while MacroDefinitions:
-        MacroUsed = GlobalData.gMacroPattern.findall(String)
+    while String and MacroDefinitions:
+        MacroUsed = GlobalData.gMacroRefPattern.findall(String)
         # no macro found in String, stop replacing
         if len(MacroUsed) == 0:
             break
 
         for Macro in MacroUsed:
             if Macro not in MacroDefinitions:
+                if RaiseError:
+                    raise SymbolNotFound("%s not defined" % Macro)
                 if SelfReplacement:
                     String = String.replace("$(%s)" % Macro, '')
                 continue

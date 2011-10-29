@@ -23,7 +23,6 @@ from optparse import make_option
 from Common.BuildToolError import *
 import Common.EdkLogger as EdkLogger
 from Common.BuildVersion import gBUILD_VERSION
-
 import array
 
 # Version and Copyright

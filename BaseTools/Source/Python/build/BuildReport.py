@@ -4,7 +4,7 @@
 # This module contains the functionality to generate build report after
 # build all target completes successfully.
 #
-# Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -184,16 +184,17 @@ class DepexParser(object):
     #
     def __init__(self, Wa):
         self._GuidDb = {}
-        for Package in Wa.BuildDatabase.WorkspaceDb.PackageList:
-            for Protocol in Package.Protocols:
-                GuidValue = GuidStructureStringToGuidString(Package.Protocols[Protocol])
-                self._GuidDb[GuidValue.upper()] = Protocol
-            for Ppi in Package.Ppis:
-                GuidValue = GuidStructureStringToGuidString(Package.Ppis[Ppi])
-                self._GuidDb[GuidValue.upper()] = Ppi
-            for Guid in Package.Guids:
-                GuidValue = GuidStructureStringToGuidString(Package.Guids[Guid])
-                self._GuidDb[GuidValue.upper()] = Guid
+        for Pa in Wa.AutoGenObjectList:
+            for Package in Pa.PackageList:        
+                for Protocol in Package.Protocols:
+                    GuidValue = GuidStructureStringToGuidString(Package.Protocols[Protocol])
+                    self._GuidDb[GuidValue.upper()] = Protocol
+                for Ppi in Package.Ppis:
+                    GuidValue = GuidStructureStringToGuidString(Package.Ppis[Ppi])
+                    self._GuidDb[GuidValue.upper()] = Ppi
+                for Guid in Package.Guids:
+                    GuidValue = GuidStructureStringToGuidString(Package.Guids[Guid])
+                    self._GuidDb[GuidValue.upper()] = Guid
     
     ##
     # Parse the binary dependency expression files.
@@ -486,7 +487,7 @@ class ModuleReport(object):
             #
             if ModuleType == "DXE_SMM_DRIVER":
                 PiSpec =  M.Module.Specification.get("PI_SPECIFICATION_VERSION", "0x00010000")
-                if int(PiSpec, 16) >= 0x0001000A:
+                if int(PiSpec, 0) >= 0x0001000A:
                     ModuleType = "SMM_DRIVER"
             self.DriverType = gDriverTypeMap.get(ModuleType, "0x2 (FREE_FORM)")
         self.UefiSpecVersion = M.Module.Specification.get("UEFI_SPECIFICATION_VERSION", "")
@@ -641,10 +642,11 @@ class PcdReport(object):
         # Collect PCD DEC default value.
         #
         self.DecPcdDefault = {}
-        for Package in Wa.BuildDatabase.WorkspaceDb.PackageList:
-            for (TokenCName, TokenSpaceGuidCName, DecType) in Package.Pcds:
-                DecDefaultValue = Package.Pcds[TokenCName, TokenSpaceGuidCName, DecType].DefaultValue
-                self.DecPcdDefault.setdefault((TokenCName, TokenSpaceGuidCName, DecType), DecDefaultValue)
+        for Pa in Wa.AutoGenObjectList:
+            for Package in Pa.PackageList:
+                for (TokenCName, TokenSpaceGuidCName, DecType) in Package.Pcds:
+                    DecDefaultValue = Package.Pcds[TokenCName, TokenSpaceGuidCName, DecType].DefaultValue
+                    self.DecPcdDefault.setdefault((TokenCName, TokenSpaceGuidCName, DecType), DecDefaultValue)
         #
         # Collect PCDs defined in DSC common section
         #
@@ -1174,14 +1176,14 @@ class FdRegionReport(object):
             self._DiscoverNestedFvList(FvName, Wa)
 
         PlatformPcds = {}
-        
         #
         # Collect PCDs declared in DEC files.
-        #
-        for Package in Wa.BuildDatabase.WorkspaceDb.PackageList:
-            for (TokenCName, TokenSpaceGuidCName, DecType) in Package.Pcds:
-                DecDefaultValue = Package.Pcds[TokenCName, TokenSpaceGuidCName, DecType].DefaultValue
-                PlatformPcds[(TokenCName, TokenSpaceGuidCName)] = DecDefaultValue
+        #        
+        for Pa in Wa.AutoGenObjectList:
+            for Package in Pa.PackageList:
+                for (TokenCName, TokenSpaceGuidCName, DecType) in Package.Pcds:
+                    DecDefaultValue = Package.Pcds[TokenCName, TokenSpaceGuidCName, DecType].DefaultValue
+                    PlatformPcds[(TokenCName, TokenSpaceGuidCName)] = DecDefaultValue
         #
         # Collect PCDs defined in DSC common section
         #

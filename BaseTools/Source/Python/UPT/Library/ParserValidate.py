@@ -17,6 +17,7 @@ PaserValidate
 
 import os.path
 import re
+import platform
 
 from Library.DataType import MODULE_LIST
 from Library.DataType import COMPONENT_TYPE_LIST
@@ -281,9 +282,14 @@ def IsValidPath(Path, Root):
 # @param Path: path to be checked
 #
 def IsValidInstallPath(Path):
-    if os.path.isabs(Path):
-        return False
-   
+    if platform.platform().find("Windows") >= 0:
+        if os.path.isabs(Path):
+            return False
+    else:
+        if Path[1:2] == ':' or Path.find('\\') >=0:
+            return False
+        if os.path.isabs(Path):
+            return False
     if Path.startswith('.'):
         return False
     

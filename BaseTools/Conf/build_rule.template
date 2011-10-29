@@ -305,7 +305,7 @@
         #
         #The below 2 lines are only needed for UNIXGCC tool chain, which genereates PE image directly
         #
-        -$(OBJCOPY) --add-gnu-debuglink=$(DEBUG_DIR)(+)$(MODULE_NAME).debug ${src}
+        -$(OBJCOPY) $(OBJCOPY_ADDDEBUGFLAG) ${src}
         -$(CP) $(DEBUG_DIR)(+)$(MODULE_NAME).debug $(BIN_DIR)
 
         "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)

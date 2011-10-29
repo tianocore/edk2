@@ -71,11 +71,11 @@ class FD(FDClassObject):
         
         for RegionObj in self.RegionList :
             if RegionObj.RegionType == 'CAPSULE':
-              continue
+                continue
             if RegionObj.Offset + RegionObj.Size <= PreviousRegionStart:
-              pass
+                pass
             elif RegionObj.Offset <= PreviousRegionStart or (RegionObj.Offset >=PreviousRegionStart and RegionObj.Offset < PreviousRegionStart + PreviousRegionSize):
-              pass
+                pass
             elif RegionObj.Offset > PreviousRegionStart + PreviousRegionSize:
                 GenFdsGlobalVariable.InfLogger('Padding region starting from offset 0x%X, with size 0x%X' %(PreviousRegionStart + PreviousRegionSize, RegionObj.Offset - (PreviousRegionStart + PreviousRegionSize)))
                 PadRegion = Region.Region()
@@ -88,7 +88,7 @@ class FD(FDClassObject):
             # Call each region's AddToBuffer function
             #
             if PreviousRegionSize > self.Size:
-              pass
+                pass
             GenFdsGlobalVariable.VerboseLogger('Call each region\'s AddToBuffer function')
             RegionObj.AddToBuffer (TempFdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFds.ImageBinDict, self.vtfRawDict, self.DefineVarDict)
         

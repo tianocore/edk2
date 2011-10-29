@@ -92,20 +92,14 @@ class DscBuildData(PlatformBuildClassObject):
     #   @param      Platform        (not used for DscBuildData)
     #   @param      Macros          Macros used for replacement in DSC file
     #
-    def __init__(self, FilePath, RawData, BuildDataBase, Arch='COMMON', Platform='DUMMY', Macros={}):
+    def __init__(self, FilePath, RawData, BuildDataBase, Arch='COMMON', Target=None, Toolchain=None):
         self.MetaFile = FilePath
         self._RawData = RawData
         self._Bdb = BuildDataBase
         self._Arch = Arch
-        self._Macros = Macros
+        self._Target = Target
+        self._Toolchain = Toolchain
         self._Clear()
-        RecordList = self._RawData[MODEL_META_DATA_DEFINE, self._Arch]
-        for Record in RecordList:
-            GlobalData.gEdkGlobal[Record[0]] = Record[1]
-        
-        RecordList = self._RawData[MODEL_META_DATA_GLOBAL_DEFINE, self._Arch]
-        for Record in RecordList:
-            GlobalData.gGlobalDefines[Record[0]] = Record[1]
 
     ## XXX[key] = value
     def __setitem__(self, key, value):
@@ -145,6 +139,16 @@ class DscBuildData(PlatformBuildClassObject):
         self._RFCLanguages      = None
         self._ISOLanguages      = None
         self._VpdToolGuid       = None
+        self.__Macros            = None
+
+    ## Get current effective macros
+    def _GetMacros(self):
+        if self.__Macros == None:
+            self.__Macros = {}
+            self.__Macros.update(GlobalData.gPlatformDefines)
+            self.__Macros.update(GlobalData.gGlobalDefines)
+            self.__Macros.update(GlobalData.gCommandLineDefines)
+        return self.__Macros
 
     ## Get architecture
     def _GetArch(self):
@@ -172,37 +176,40 @@ class DscBuildData(PlatformBuildClassObject):
     def _GetHeaderInfo(self):
         RecordList = self._RawData[MODEL_META_DATA_HEADER, self._Arch]
         for Record in RecordList:
-            Name = Record[0]
+            Name = Record[1]
             # items defined _PROPERTY_ don't need additional processing
             if Name in self:
-                self[Name] = Record[1]
+                self[Name] = Record[2]
             # some special items in [Defines] section need special treatment
             elif Name == TAB_DSC_DEFINES_OUTPUT_DIRECTORY:
-                self._OutputDirectory = NormPath(Record[1], self._Macros)
+                self._OutputDirectory = NormPath(Record[2], self._Macros)
                 if ' ' in self._OutputDirectory:
                     EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in OUTPUT_DIRECTORY",
                                     File=self.MetaFile, Line=Record[-1],
                                     ExtraData=self._OutputDirectory)
             elif Name == TAB_DSC_DEFINES_FLASH_DEFINITION:
-                self._FlashDefinition = PathClass(NormPath(Record[1], self._Macros), GlobalData.gWorkspace)
+                self._FlashDefinition = PathClass(NormPath(Record[2], self._Macros), GlobalData.gWorkspace)
                 ErrorCode, ErrorInfo = self._FlashDefinition.Validate('.fdf')
                 if ErrorCode != 0:
                     EdkLogger.error('build', ErrorCode, File=self.MetaFile, Line=Record[-1],
                                     ExtraData=ErrorInfo)
             elif Name == TAB_DSC_DEFINES_SUPPORTED_ARCHITECTURES:
-                self._SupArchList = GetSplitValueList(Record[1], TAB_VALUE_SPLIT)
+                self._SupArchList = GetSplitValueList(Record[2], TAB_VALUE_SPLIT)
             elif Name == TAB_DSC_DEFINES_BUILD_TARGETS:
-                self._BuildTargets = GetSplitValueList(Record[1])
+                self._BuildTargets = GetSplitValueList(Record[2])
             elif Name == TAB_DSC_DEFINES_SKUID_IDENTIFIER:
                 if self._SkuName == None:
-                    self._SkuName = Record[1]
+                    self._SkuName = Record[2]
             elif Name == TAB_FIX_LOAD_TOP_MEMORY_ADDRESS:
-                self._LoadFixAddress = Record[1]
+                try:
+                    self._LoadFixAddress = int (Record[2], 0)
+                except:
+                    EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS %s is not valid dec or hex string" % (Record[2]))
             elif Name == TAB_DSC_DEFINES_RFC_LANGUAGES:
-                if not Record[1] or Record[1][0] != '"' or Record[1][-1] != '"' or len(Record[1]) == 1:
+                if not Record[2] or Record[2][0] != '"' or Record[2][-1] != '"' or len(Record[2]) == 1:
                     EdkLogger.error('build', FORMAT_NOT_SUPPORTED, 'language code for RFC_LANGUAGES must have double quotes around it, for example: RFC_LANGUAGES = "en-us;zh-hans"',
                                     File=self.MetaFile, Line=Record[-1])
-                LanguageCodes = Record[1][1:-1]
+                LanguageCodes = Record[2][1:-1]
                 if not LanguageCodes:
                     EdkLogger.error('build', FORMAT_NOT_SUPPORTED, 'one or more RFC4646 format language code must be provided for RFC_LANGUAGES statement',
                                     File=self.MetaFile, Line=Record[-1])                
@@ -213,10 +220,10 @@ class DscBuildData(PlatformBuildClassObject):
                                     File=self.MetaFile, Line=Record[-1])                      
                 self._RFCLanguages = LanguageList
             elif Name == TAB_DSC_DEFINES_ISO_LANGUAGES:
-                if not Record[1] or Record[1][0] != '"' or Record[1][-1] != '"' or len(Record[1]) == 1:
+                if not Record[2] or Record[2][0] != '"' or Record[2][-1] != '"' or len(Record[2]) == 1:
                     EdkLogger.error('build', FORMAT_NOT_SUPPORTED, 'language code for ISO_LANGUAGES must have double quotes around it, for example: ISO_LANGUAGES = "engchn"',
                                     File=self.MetaFile, Line=Record[-1])
-                LanguageCodes = Record[1][1:-1]
+                LanguageCodes = Record[2][1:-1]
                 if not LanguageCodes:
                     EdkLogger.error('build', FORMAT_NOT_SUPPORTED, 'one or more ISO639-2 format language code must be provided for ISO_LANGUAGES statement',
                                     File=self.MetaFile, Line=Record[-1])                    
@@ -233,10 +240,10 @@ class DscBuildData(PlatformBuildClassObject):
                 # for VPD_TOOL_GUID is correct.
                 #
                 try:
-                    uuid.UUID(Record[1])
+                    uuid.UUID(Record[2])
                 except:
                     EdkLogger.error("build", FORMAT_INVALID, "Invalid GUID format for VPD_TOOL_GUID", File=self.MetaFile)
-                self._VpdToolGuid = Record[1]                   
+                self._VpdToolGuid = Record[2]                   
         # set _Header to non-None in order to avoid database re-querying
         self._Header = 'DUMMY'
 
@@ -368,8 +375,18 @@ class DscBuildData(PlatformBuildClassObject):
         if self._LoadFixAddress == None:
             if self._Header == None:
                 self._GetHeaderInfo()
+
             if self._LoadFixAddress == None:
-                self._LoadFixAddress = ''
+                self._LoadFixAddress = self._Macros.get(TAB_FIX_LOAD_TOP_MEMORY_ADDRESS, '0')
+
+            try:
+                self._LoadFixAddress = int (self._LoadFixAddress, 0)
+            except:
+                EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS %s is not valid dec or hex string" % (self._LoadFixAddress))
+            if self._LoadFixAddress < 0:
+                EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS is set to the invalid negative value %s" % (self._LoadFixAddress))
+            if self._LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self._LoadFixAddress % 0x1000 != 0:
+                EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS is set to the invalid unaligned 4K value %s" % (self._LoadFixAddress))
         return self._LoadFixAddress
 
     ## Retrieve RFCLanguage filter
@@ -389,7 +406,6 @@ class DscBuildData(PlatformBuildClassObject):
             if self._ISOLanguages == None:
                 self._ISOLanguages = []
         return self._ISOLanguages
-
     ## Retrieve the GUID string for VPD tool
     def _GetVpdToolGuid(self):
         if self._VpdToolGuid == None:
@@ -402,8 +418,8 @@ class DscBuildData(PlatformBuildClassObject):
     ## Retrieve [SkuIds] section information
     def _GetSkuIds(self):
         if self._SkuIds == None:
-            self._SkuIds = {}
-            RecordList = self._RawData[MODEL_EFI_SKU_ID]
+            self._SkuIds = sdict()
+            RecordList = self._RawData[MODEL_EFI_SKU_ID, self._Arch]
             for Record in RecordList:
                 if Record[0] in [None, '']:
                     EdkLogger.error('build', FORMAT_INVALID, 'No Sku ID number',
@@ -423,8 +439,8 @@ class DscBuildData(PlatformBuildClassObject):
 
         self._Modules = sdict()
         RecordList = self._RawData[MODEL_META_DATA_COMPONENT, self._Arch]
-        Macros = {"EDK_SOURCE":GlobalData.gEcpSource, "EFI_SOURCE":GlobalData.gEfiSource}
-        Macros.update(self._Macros)
+        Macros = self._Macros
+        Macros["EDK_SOURCE"] = GlobalData.gEcpSource
         for Record in RecordList:
             ModuleFile = PathClass(NormPath(Record[0], Macros), GlobalData.gWorkspace, Arch=self._Arch)
             ModuleId = Record[5]
@@ -530,9 +546,8 @@ class DscBuildData(PlatformBuildClassObject):
             LibraryClassDict = tdict(True, 3)
             # track all library class names
             LibraryClassSet = set()
-            RecordList = self._RawData[MODEL_EFI_LIBRARY_CLASS, self._Arch]
-            Macros = {"EDK_SOURCE":GlobalData.gEcpSource, "EFI_SOURCE":GlobalData.gEfiSource}
-            Macros.update(self._Macros)
+            RecordList = self._RawData[MODEL_EFI_LIBRARY_CLASS, self._Arch, None, -1]
+            Macros = self._Macros
             for Record in RecordList:
                 LibraryClass, LibraryInstance, Dummy, Arch, ModuleType, Dummy, LineNo = Record
                 if LibraryClass == '' or LibraryClass == 'NULL':
@@ -564,7 +579,8 @@ class DscBuildData(PlatformBuildClassObject):
                         continue
                     self._LibraryClasses[LibraryClass, ModuleType] = LibraryInstance
 
-            # for EDK style library instances, which are listed in different section
+            # for Edk style library instances, which are listed in different section
+            Macros["EDK_SOURCE"] = GlobalData.gEcpSource
             RecordList = self._RawData[MODEL_EFI_LIBRARY_INSTANCE, self._Arch]
             for Record in RecordList:
                 File = PathClass(NormPath(Record[0], Macros), GlobalData.gWorkspace, Arch=self._Arch)
@@ -581,14 +597,14 @@ class DscBuildData(PlatformBuildClassObject):
                 # to parse it here. (self._Bdb[] will trigger a file parse if it
                 # hasn't been parsed)
                 #
-                Library = self._Bdb[File, self._Arch]
+                Library = self._Bdb[File, self._Arch, self._Target, self._Toolchain]
                 self._LibraryClasses[Library.BaseName, ':dummy:'] = Library
         return self._LibraryClasses
 
     ## Retrieve all PCD settings in platform
     def _GetPcds(self):
         if self._Pcds == None:
-            self._Pcds = {}
+            self._Pcds = sdict()
             self._Pcds.update(self._GetPcd(MODEL_PCD_FIXED_AT_BUILD))
             self._Pcds.update(self._GetPcd(MODEL_PCD_PATCHABLE_IN_MODULE))
             self._Pcds.update(self._GetPcd(MODEL_PCD_FEATURE_FLAG))
@@ -603,17 +619,17 @@ class DscBuildData(PlatformBuildClassObject):
     ## Retrieve [BuildOptions]
     def _GetBuildOptions(self):
         if self._BuildOptions == None:
-            self._BuildOptions = {}
+            self._BuildOptions = sdict()
             #
             # Retrieve build option for EDKII style module
             #
-            RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, 'COMMON', EDKII_NAME]
+            RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, EDKII_NAME]
             for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4 in RecordList:
                 self._BuildOptions[ToolChainFamily, ToolChain, EDKII_NAME] = Option
             #
             # Retrieve build option for EDK style module
             #
-            RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, 'COMMON', EDK_NAME]     
+            RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, EDK_NAME]     
             for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4 in RecordList:
                 self._BuildOptions[ToolChainFamily, ToolChain, EDK_NAME] = Option
         return self._BuildOptions
@@ -625,7 +641,7 @@ class DscBuildData(PlatformBuildClassObject):
     #   @retval a dict object contains settings of given PCD type
     #
     def _GetPcd(self, Type):
-        Pcds = {}
+        Pcds = sdict()
         #
         # tdict is a special dict kind of type, used for selecting correct
         # PCD settings for certain ARCH
@@ -664,7 +680,7 @@ class DscBuildData(PlatformBuildClassObject):
     #   @retval a dict object contains settings of given PCD type
     #
     def _GetDynamicPcd(self, Type):
-        Pcds = {}
+        Pcds = sdict()
         #
         # tdict is a special dict kind of type, used for selecting correct
         # PCD settings for certain ARCH and SKU
@@ -706,7 +722,7 @@ class DscBuildData(PlatformBuildClassObject):
     #   @retval a dict object contains settings of given PCD type
     #
     def _GetDynamicHiiPcd(self, Type):
-        Pcds = {}
+        Pcds = sdict()
         #
         # tdict is a special dict kind of type, used for selecting correct
         # PCD settings for certain ARCH and SKU
@@ -746,7 +762,7 @@ class DscBuildData(PlatformBuildClassObject):
     #   @retval a dict object contains settings of given PCD type
     #
     def _GetDynamicVpdPcd(self, Type):
-        Pcds = {}
+        Pcds = sdict()
         #
         # tdict is a special dict kind of type, used for selecting correct
         # PCD settings for certain ARCH and SKU
@@ -814,6 +830,7 @@ class DscBuildData(PlatformBuildClassObject):
             self.Pcds[Name, Guid] = PcdClassObject(Name, Guid, '', '', '', '', '', {}, False, None)
         self.Pcds[Name, Guid].DefaultValue = Value
 
+    _Macros             = property(_GetMacros)
     Arch                = property(_GetArch, _SetArch)
     Platform            = property(_GetPlatformName)
     PlatformName        = property(_GetPlatformName)
@@ -884,13 +901,14 @@ class DecBuildData(PackageBuildClassObject):
     #   @param      Platform        (not used for DecBuildData)
     #   @param      Macros          Macros used for replacement in DSC file
     #
-    def __init__(self, File, RawData, BuildDataBase, Arch='COMMON', Platform='DUMMY', Macros={}):
+    def __init__(self, File, RawData, BuildDataBase, Arch='COMMON', Target=None, Toolchain=None):
         self.MetaFile = File
         self._PackageDir = File.Dir
         self._RawData = RawData
         self._Bdb = BuildDataBase
         self._Arch = Arch
-        self._Macros = Macros
+        self._Target = Target
+        self._Toolchain = Toolchain
         self._Clear()
 
     ## XXX[key] = value
@@ -918,6 +936,14 @@ class DecBuildData(PackageBuildClassObject):
         self._Includes          = None
         self._LibraryClasses    = None
         self._Pcds              = None
+        self.__Macros           = None
+
+    ## Get current effective macros
+    def _GetMacros(self):
+        if self.__Macros == None:
+            self.__Macros = {}
+            self.__Macros.update(GlobalData.gGlobalDefines)
+        return self.__Macros
 
     ## Get architecture
     def _GetArch(self):
@@ -943,11 +969,11 @@ class DecBuildData(PackageBuildClassObject):
     #   (Retriving all [Defines] information in one-shot is just to save time.)
     #
     def _GetHeaderInfo(self):
-        RecordList = self._RawData[MODEL_META_DATA_HEADER]
+        RecordList = self._RawData[MODEL_META_DATA_HEADER, self._Arch]
         for Record in RecordList:
-            Name = Record[0]
+            Name = Record[1]
             if Name in self:
-                self[Name] = Record[1]
+                self[Name] = Record[2]
         self._Header = 'DUMMY'
 
     ## Retrieve package name
@@ -1057,8 +1083,8 @@ class DecBuildData(PackageBuildClassObject):
         if self._Includes == None:
             self._Includes = []
             RecordList = self._RawData[MODEL_EFI_INCLUDE, self._Arch]
-            Macros = {"EDK_SOURCE":GlobalData.gEcpSource, "EFI_SOURCE":GlobalData.gEfiSource}
-            Macros.update(self._Macros)
+            Macros = self._Macros
+            Macros["EDK_SOURCE"] = GlobalData.gEcpSource
             for Record in RecordList:
                 File = PathClass(NormPath(Record[0], Macros), self._PackageDir, Arch=self._Arch)
                 LineNo = Record[-1]
@@ -1082,8 +1108,7 @@ class DecBuildData(PackageBuildClassObject):
             LibraryClassDict = tdict(True)
             LibraryClassSet = set()
             RecordList = self._RawData[MODEL_EFI_LIBRARY_CLASS, self._Arch]
-            Macros = {"EDK_SOURCE":GlobalData.gEcpSource, "EFI_SOURCE":GlobalData.gEfiSource}
-            Macros.update(self._Macros)
+            Macros = self._Macros
             for LibraryClass, File, Dummy, Arch, ID, LineNo in RecordList:
                 File = PathClass(NormPath(File, Macros), self._PackageDir, Arch=self._Arch)
                 # check the file validation
@@ -1100,7 +1125,7 @@ class DecBuildData(PackageBuildClassObject):
     ## Retrieve PCD declarations
     def _GetPcds(self):
         if self._Pcds == None:
-            self._Pcds = {}
+            self._Pcds = sdict()
             self._Pcds.update(self._GetPcd(MODEL_PCD_FIXED_AT_BUILD))
             self._Pcds.update(self._GetPcd(MODEL_PCD_PATCHABLE_IN_MODULE))
             self._Pcds.update(self._GetPcd(MODEL_PCD_FEATURE_FLAG))
@@ -1110,7 +1135,7 @@ class DecBuildData(PackageBuildClassObject):
 
     ## Retrieve PCD declarations for given type
     def _GetPcd(self, Type):
-        Pcds = {}
+        Pcds = sdict()
         #
         # tdict is a special kind of dict, used for selecting correct
         # PCD declaration for given ARCH
@@ -1150,6 +1175,7 @@ class DecBuildData(PackageBuildClassObject):
         return Pcds
 
 
+    _Macros         = property(_GetMacros)
     Arch            = property(_GetArch, _SetArch)
     PackageName     = property(_GetPackageName)
     Guid            = property(_GetFileGuid)
@@ -1194,7 +1220,7 @@ class InfBuildData(ModuleBuildClassObject):
         #
         # Optional Fields
         #
-        TAB_INF_DEFINES_INF_VERSION                 : "_AutoGenVersion",
+        #TAB_INF_DEFINES_INF_VERSION                 : "_AutoGenVersion",
         TAB_INF_DEFINES_COMPONENT_TYPE              : "_ComponentType",
         TAB_INF_DEFINES_MAKEFILE_NAME               : "_MakefileName",
         #TAB_INF_DEFINES_CUSTOM_MAKEFILE             : "_CustomMakefile",
@@ -1249,14 +1275,15 @@ class InfBuildData(ModuleBuildClassObject):
     #   @param      Platform        The name of platform employing this module
     #   @param      Macros          Macros used for replacement in DSC file
     #
-    def __init__(self, FilePath, RawData, BuildDatabase, Arch='COMMON', Platform='COMMON', Macros={}):
+    def __init__(self, FilePath, RawData, BuildDatabase, Arch='COMMON', Target=None, Toolchain=None):
         self.MetaFile = FilePath
         self._ModuleDir = FilePath.Dir
         self._RawData = RawData
         self._Bdb = BuildDatabase
         self._Arch = Arch
+        self._Target = Target
+        self._Toolchain = Toolchain
         self._Platform = 'COMMON'
-        self._Macros = Macros
         self._SourceOverridePath = None
         if FilePath.Key in GlobalData.gOverrideDir:
             self._SourceOverridePath = GlobalData.gOverrideDir[FilePath.Key]
@@ -1310,7 +1337,17 @@ class InfBuildData(ModuleBuildClassObject):
         self._BuildOptions          = None
         self._Depex                 = None
         self._DepexExpression       = None
-        #self._SourceOverridePath    = None
+        self.__Macros               = None
+
+    ## Get current effective macros
+    def _GetMacros(self):
+        if self.__Macros == None:
+            self.__Macros = {}
+            # EDK_GLOBAL defined macros can be applied to EDK modoule
+            if self.AutoGenVersion < 0x00010005:
+                self.__Macros.update(GlobalData.gEdkGlobal)
+            self.__Macros.update(GlobalData.gGlobalDefines)
+        return self.__Macros
 
     ## Get architecture
     def _GetArch(self):
@@ -1354,26 +1391,25 @@ class InfBuildData(ModuleBuildClassObject):
     def _GetHeaderInfo(self):
         RecordList = self._RawData[MODEL_META_DATA_HEADER, self._Arch, self._Platform]
         for Record in RecordList:
-            Record = ReplaceMacros(Record, GlobalData.gEdkGlobal, False)
-            Name = Record[0]
+            Name, Value = Record[1], ReplaceMacro(Record[2], self._Macros, False)
             # items defined _PROPERTY_ don't need additional processing
             if Name in self:
-                self[Name] = Record[1]
+                self[Name] = Value
             # some special items in [Defines] section need special treatment
             elif Name in ('EFI_SPECIFICATION_VERSION', 'UEFI_SPECIFICATION_VERSION', 'EDK_RELEASE_VERSION', 'PI_SPECIFICATION_VERSION'):
                 if Name in ('EFI_SPECIFICATION_VERSION', 'UEFI_SPECIFICATION_VERSION'):
                     Name = 'UEFI_SPECIFICATION_VERSION'
                 if self._Specification == None:
                     self._Specification = sdict()
-                self._Specification[Name] = GetHexVerValue(Record[1])
+                self._Specification[Name] = GetHexVerValue(Value)
                 if self._Specification[Name] == None:
                     EdkLogger.error("build", FORMAT_NOT_SUPPORTED,
-                                    "'%s' format is not supported for %s" % (Record[1], Name),
+                                    "'%s' format is not supported for %s" % (Value, Name),
                                     File=self.MetaFile, Line=Record[-1])
             elif Name == 'LIBRARY_CLASS':
                 if self._LibraryClass == None:
                     self._LibraryClass = []
-                ValueList = GetSplitValueList(Record[1])
+                ValueList = GetSplitValueList(Value)
                 LibraryClass = ValueList[0]
                 if len(ValueList) > 1:
                     SupModuleList = GetSplitValueList(ValueList[1], ' ')
@@ -1383,27 +1419,27 @@ class InfBuildData(ModuleBuildClassObject):
             elif Name == 'ENTRY_POINT':
                 if self._ModuleEntryPointList == None:
                     self._ModuleEntryPointList = []
-                self._ModuleEntryPointList.append(Record[1])
+                self._ModuleEntryPointList.append(Value)
             elif Name == 'UNLOAD_IMAGE':
                 if self._ModuleUnloadImageList == None:
                     self._ModuleUnloadImageList = []
-                if Record[1] == '':
+                if not Value:
                     continue
-                self._ModuleUnloadImageList.append(Record[1])
+                self._ModuleUnloadImageList.append(Value)
             elif Name == 'CONSTRUCTOR':
                 if self._ConstructorList == None:
                     self._ConstructorList = []
-                if Record[1] == '':
+                if not Value:
                     continue
-                self._ConstructorList.append(Record[1])
+                self._ConstructorList.append(Value)
             elif Name == 'DESTRUCTOR':
                 if self._DestructorList == None:
                     self._DestructorList = []
-                if Record[1] == '':
+                if not Value:
                     continue
-                self._DestructorList.append(Record[1])
+                self._DestructorList.append(Value)
             elif Name == TAB_INF_DEFINES_CUSTOM_MAKEFILE:
-                TokenList = GetSplitValueList(Record[1])
+                TokenList = GetSplitValueList(Value)
                 if self._CustomMakefile == None:
                     self._CustomMakefile = {}
                 if len(TokenList) < 2:
@@ -1418,25 +1454,25 @@ class InfBuildData(ModuleBuildClassObject):
             else:
                 if self._Defs == None:
                     self._Defs = sdict()
-                self._Defs[Name] = Record[1]
+                self._Defs[Name] = Value
 
         #
-        # Retrieve information in sections specific to EDK.x modules
+        # Retrieve information in sections specific to Edk.x modules
         #
-        if self._AutoGenVersion >= 0x00010005:   # _AutoGenVersion may be None, which is less than anything
+        if self.AutoGenVersion >= 0x00010005:
             if not self._ModuleType:
                 EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE,
                                 "MODULE_TYPE is not given", File=self.MetaFile)
             if self._ModuleType not in SUP_MODULE_LIST:
                 RecordList = self._RawData[MODEL_META_DATA_HEADER, self._Arch, self._Platform]
                 for Record in RecordList:
-                    Name = Record[0]
+                    Name = Record[1]
                     if Name == "MODULE_TYPE":
                         LineNo = Record[6]
                         break
                 EdkLogger.error("build", FORMAT_NOT_SUPPORTED,
                                 "MODULE_TYPE %s is not supported for EDK II, valid values are:\n %s" % (self._ModuleType,' '.join(l for l in SUP_MODULE_LIST)), 
-                                File=self.MetaFile, Line=LineNo)             
+                                File=self.MetaFile, Line=LineNo)
             if (self._Specification == None) or (not 'PI_SPECIFICATION_VERSION' in self._Specification) or (int(self._Specification['PI_SPECIFICATION_VERSION'], 16) < 0x0001000A):
                 if self._ModuleType == SUP_MODULE_SMM_CORE:
                     EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "SMM_CORE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x0001000A", File=self.MetaFile)                
@@ -1459,29 +1495,28 @@ class InfBuildData(ModuleBuildClassObject):
                 if self.Sources == None:
                     self._Sources = []
                 self._Sources.append(File)
-        else:
-            self._BuildType = self._ComponentType.upper()
+        else:  
             if not self._ComponentType:
                 EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE,
                                 "COMPONENT_TYPE is not given", File=self.MetaFile)
+            self._BuildType = self._ComponentType.upper()                
             if self._ComponentType in self._MODULE_TYPE_:
                 self._ModuleType = self._MODULE_TYPE_[self._ComponentType]
             if self._ComponentType == 'LIBRARY':
                 self._LibraryClass = [LibraryClassObject(self._BaseName, SUP_MODULE_LIST)]
             # make use some [nmake] section macros
+            Macros = self._Macros
+            Macros["EDK_SOURCE"] = GlobalData.gEcpSource
+            Macros['PROCESSOR'] = self._Arch
             RecordList = self._RawData[MODEL_META_DATA_NMAKE, self._Arch, self._Platform]
             for Name,Value,Dummy,Arch,Platform,ID,LineNo in RecordList:
-                Value = Value.replace('$(PROCESSOR)', self._Arch)
-                Name = Name.replace('$(PROCESSOR)', self._Arch)
-                Name, Value = ReplaceMacros((Name, Value), GlobalData.gEdkGlobal, True)
+                Value = ReplaceMacro(Value, Macros, True)
                 if Name == "IMAGE_ENTRY_POINT":
                     if self._ModuleEntryPointList == None:
                         self._ModuleEntryPointList = []
                     self._ModuleEntryPointList.append(Value)
                 elif Name == "DPX_SOURCE":
-                    Macros = {"EDK_SOURCE":GlobalData.gEcpSource, "EFI_SOURCE":GlobalData.gEfiSource}
-                    Macros.update(self._Macros)
-                    File = PathClass(NormPath(Value, Macros), self._ModuleDir, Arch=self._Arch)
+                    File = PathClass(NormPath(Value), self._ModuleDir, Arch=self._Arch)
                     # check the file validation
                     ErrorCode, ErrorInfo = File.Validate(".dxs", CaseSensitive=False)
                     if ErrorCode != 0:
@@ -1505,9 +1540,9 @@ class InfBuildData(ModuleBuildClassObject):
                         else:
                             Tool = ToolList[0]
                         ToolChain = "*_*_*_%s_FLAGS" % Tool
-                        ToolChainFamily = 'MSFT'    # EDK.x only support MSFT tool chain
+                        ToolChainFamily = 'MSFT'    # Edk.x only support MSFT tool chain
                         #ignore not replaced macros in value
-                        ValueList = GetSplitValueList(' ' + Value, '/D')
+                        ValueList = GetSplitList(' ' + Value, '/D')
                         Dummy = ValueList[0]
                         for Index in range(1, len(ValueList)):
                             if ValueList[Index][-1] == '=' or ValueList[Index] == '':
@@ -1525,8 +1560,11 @@ class InfBuildData(ModuleBuildClassObject):
     ## Retrieve file version
     def _GetInfVersion(self):
         if self._AutoGenVersion == None:
-            if self._Header_ == None:
-                self._GetHeaderInfo()
+            RecordList = self._RawData[MODEL_META_DATA_HEADER, self._Arch, self._Platform]
+            for Record in RecordList:
+                if Record[1] == TAB_INF_DEFINES_INF_VERSION:
+                    self._AutoGenVersion = int(Record[2], 0)
+                    break
             if self._AutoGenVersion == None:
                 self._AutoGenVersion = 0x00010000
         return self._AutoGenVersion
@@ -1693,10 +1731,10 @@ class InfBuildData(ModuleBuildClassObject):
         if self._Binaries == None:
             self._Binaries = []
             RecordList = self._RawData[MODEL_EFI_BINARY_FILE, self._Arch, self._Platform]
-            Macros = {"EDK_SOURCE":GlobalData.gEcpSource, "EFI_SOURCE":GlobalData.gEfiSource, 'PROCESSOR':self._Arch}
-            Macros.update(self._Macros)
+            Macros = self._Macros
+            Macros["EDK_SOURCE"] = GlobalData.gEcpSource
+            Macros['PROCESSOR'] = self._Arch
             for Record in RecordList:
-                Record = ReplaceMacros(Record, GlobalData.gEdkGlobal, False)
                 FileType = Record[0]
                 LineNo = Record[-1]
                 Target = 'COMMON'
@@ -1721,17 +1759,17 @@ class InfBuildData(ModuleBuildClassObject):
         if self._Sources == None:
             self._Sources = []
             RecordList = self._RawData[MODEL_EFI_SOURCE_FILE, self._Arch, self._Platform]
-            Macros = {"EDK_SOURCE":GlobalData.gEcpSource, "EFI_SOURCE":GlobalData.gEfiSource, 'PROCESSOR':self._Arch}
-            Macros.update(self._Macros)
+            Macros = self._Macros
+            Macros["EDK_SOURCE"] = GlobalData.gEcpSource
+            Macros['PROCESSOR'] = self._Arch
             for Record in RecordList:
-                Record = ReplaceMacros(Record, GlobalData.gEdkGlobal, False)
                 LineNo = Record[-1]
                 ToolChainFamily = Record[1]
                 TagName = Record[2]
                 ToolCode = Record[3]
                 FeatureFlag = Record[4]
-                if self._AutoGenVersion < 0x00010005:
-                    # old module source files (EDK)
+                if self.AutoGenVersion < 0x00010005:
+                    # old module source files (Edk)
                     File = PathClass(NormPath(Record[0], Macros), self._ModuleDir, self._SourceOverridePath,
                                      '', False, self._Arch, ToolChainFamily, '', TagName, ToolCode)
                     # check the file validation
@@ -1760,23 +1798,22 @@ class InfBuildData(ModuleBuildClassObject):
             self._LibraryClasses = sdict()
             RecordList = self._RawData[MODEL_EFI_LIBRARY_CLASS, self._Arch, self._Platform]
             for Record in RecordList:
-                Record = ReplaceMacros(Record, GlobalData.gEdkGlobal, False)
                 Lib = Record[0]
                 Instance = Record[1]
-                if Instance != None and Instance != '':
+                if Instance:
                     Instance = NormPath(Instance, self._Macros)
                 self._LibraryClasses[Lib] = Instance
         return self._LibraryClasses
 
-    ## Retrieve library names (for EDK.x style of modules)
+    ## Retrieve library names (for Edk.x style of modules)
     def _GetLibraryNames(self):
         if self._Libraries == None:
             self._Libraries = []
             RecordList = self._RawData[MODEL_EFI_LIBRARY_INSTANCE, self._Arch, self._Platform]
             for Record in RecordList:
-                # in case of name with '.lib' extension, which is unusual in EDK.x inf
-                Record = ReplaceMacros(Record, GlobalData.gEdkGlobal, False)
-                LibraryName = os.path.splitext(Record[0])[0]
+                LibraryName = ReplaceMacro(Record[0], self._Macros, False)
+                # in case of name with '.lib' extension, which is unusual in Edk.x inf
+                LibraryName = os.path.splitext(LibraryName)[0]
                 if LibraryName not in self._Libraries:
                     self._Libraries.append(LibraryName)
         return self._Libraries
@@ -1829,23 +1866,23 @@ class InfBuildData(ModuleBuildClassObject):
                 self._Guids[CName] = Value
         return self._Guids
 
-    ## Retrieve include paths necessary for this module (for EDK.x style of modules)
+    ## Retrieve include paths necessary for this module (for Edk.x style of modules)
     def _GetIncludes(self):
         if self._Includes == None:
             self._Includes = []
             if self._SourceOverridePath:
                 self._Includes.append(self._SourceOverridePath)
+
+            Macros = self._Macros
+            if 'PROCESSOR' in GlobalData.gEdkGlobal.keys():
+                Macros['PROCESSOR'] = GlobalData.gEdkGlobal['PROCESSOR']
+            else:
+                Macros['PROCESSOR'] = self._Arch
             RecordList = self._RawData[MODEL_EFI_INCLUDE, self._Arch, self._Platform]
-            # [includes] section must be used only in old (EDK.x) inf file
-            if self.AutoGenVersion >= 0x00010005 and len(RecordList) > 0:
-                EdkLogger.error('build', FORMAT_NOT_SUPPORTED, "No [include] section allowed",
-                                File=self.MetaFile, Line=RecordList[0][-1]-1)
             for Record in RecordList:
-                Record = ReplaceMacros(Record, GlobalData.gEdkGlobal, False)
-                Record[0] = Record[0].replace('$(PROCESSOR)', self._Arch)
-                Record[0] = ReplaceMacro(Record[0], {'EFI_SOURCE' : GlobalData.gEfiSource}, False)
                 if Record[0].find('EDK_SOURCE') > -1:
-                    File = NormPath(ReplaceMacro(Record[0], {'EDK_SOURCE' : GlobalData.gEcpSource}, False), self._Macros)
+                    Macros['EDK_SOURCE'] = GlobalData.gEcpSource
+                    File = NormPath(Record[0], self._Macros)
                     if File[0] == '.':
                         File = os.path.join(self._ModuleDir, File)
                     else:
@@ -1855,7 +1892,8 @@ class InfBuildData(ModuleBuildClassObject):
                         self._Includes.append(File)
 
                     #TRICK: let compiler to choose correct header file
-                    File = NormPath(ReplaceMacro(Record[0], {'EDK_SOURCE' : GlobalData.gEdkSource}, False), self._Macros)
+                    Macros['EDK_SOURCE'] = GlobalData.gEdkSource
+                    File = NormPath(Record[0], self._Macros)
                     if File[0] == '.':
                         File = os.path.join(self._ModuleDir, File)
                     else:
@@ -1864,7 +1902,7 @@ class InfBuildData(ModuleBuildClassObject):
                     if File:
                         self._Includes.append(File)
                 else:
-                    File = NormPath(Record[0], self._Macros)
+                    File = NormPath(Record[0], Macros)
                     if File[0] == '.':
                         File = os.path.join(self._ModuleDir, File)
                     else:
@@ -1879,8 +1917,8 @@ class InfBuildData(ModuleBuildClassObject):
         if self._Packages == None:
             self._Packages = []
             RecordList = self._RawData[MODEL_META_DATA_PACKAGE, self._Arch, self._Platform]
-            Macros = {"EDK_SOURCE":GlobalData.gEcpSource, "EFI_SOURCE":GlobalData.gEfiSource}
-            Macros.update(self._Macros)
+            Macros = self._Macros
+            Macros['EDK_SOURCE'] = GlobalData.gEcpSource
             for Record in RecordList:
                 File = PathClass(NormPath(Record[0], Macros), GlobalData.gWorkspace, Arch=self._Arch)
                 LineNo = Record[-1]
@@ -1889,7 +1927,7 @@ class InfBuildData(ModuleBuildClassObject):
                 if ErrorCode != 0:
                     EdkLogger.error('build', ErrorCode, ExtraData=ErrorInfo, File=self.MetaFile, Line=LineNo)
                 # parse this package now. we need it to get protocol/ppi/guid value
-                Package = self._Bdb[File, self._Arch]
+                Package = self._Bdb[File, self._Arch, self._Target, self._Toolchain]
                 self._Packages.append(Package)
         return self._Packages
 
@@ -1921,7 +1959,7 @@ class InfBuildData(ModuleBuildClassObject):
                     self._BuildOptions[ToolChainFamily, ToolChain] = OptionString + " " + Option
         return self._BuildOptions
 
-    ## Retrieve depedency expression
+    ## Retrieve dependency expression
     def _GetDepex(self):
         if self._Depex == None:
             self._Depex = tdict(False, 2)
@@ -1929,8 +1967,8 @@ class InfBuildData(ModuleBuildClassObject):
             
             # If the module has only Binaries and no Sources, then ignore [Depex] 
             if self.Sources == None or self.Sources == []:
-              if self.Binaries <> None and self.Binaries <> []:
-                return self._Depex
+                if self.Binaries != None and self.Binaries != []:
+                    return self._Depex
                 
             # PEIM and DXE drivers must have a valid [Depex] section
             if len(self.LibraryClass) == 0 and len(RecordList) == 0:
@@ -1939,12 +1977,12 @@ class InfBuildData(ModuleBuildClassObject):
                     EdkLogger.error('build', RESOURCE_NOT_AVAILABLE, "No [Depex] section or no valid expression in [Depex] section for [%s] module" \
                                     % self.ModuleType, File=self.MetaFile)
 
-            Depex = {}
+            Depex = sdict()
             for Record in RecordList:
-                Record = ReplaceMacros(Record, GlobalData.gEdkGlobal, False)
+                DepexStr = ReplaceMacro(Record[0], self._Macros, False)
                 Arch = Record[3]
                 ModuleType = Record[4]
-                TokenList = Record[0].split()
+                TokenList = DepexStr.split()
                 if (Arch, ModuleType) not in Depex:
                     Depex[Arch, ModuleType] = []
                 DepexList = Depex[Arch, ModuleType]
@@ -1980,12 +2018,12 @@ class InfBuildData(ModuleBuildClassObject):
         if self._DepexExpression == None:
             self._DepexExpression = tdict(False, 2)
             RecordList = self._RawData[MODEL_EFI_DEPEX, self._Arch]
-            DepexExpression = {}
+            DepexExpression = sdict()
             for Record in RecordList:
-                Record = ReplaceMacros(Record, GlobalData.gEdkGlobal, False)
+                DepexStr = ReplaceMacro(Record[0], self._Macros, False)
                 Arch = Record[3]
                 ModuleType = Record[4]
-                TokenList = Record[0].split()
+                TokenList = DepexStr.split()
                 if (Arch, ModuleType) not in DepexExpression:
                     DepexExpression[Arch, ModuleType] = ''
                 for Token in TokenList:
@@ -2123,6 +2161,7 @@ class InfBuildData(ModuleBuildClassObject):
 
         return Pcds
 
+    _Macros                 = property(_GetMacros)
     Arch                    = property(_GetArch, _SetArch)
     Platform                = property(_GetPlatform, _SetPlatform)
 
@@ -2170,21 +2209,6 @@ class InfBuildData(ModuleBuildClassObject):
 # @prarm RenewDb=False      Create new database file if it's already there
 #
 class WorkspaceDatabase(object):
-    # file parser
-    _FILE_PARSER_ = {
-        MODEL_FILE_INF  :   InfParser,
-        MODEL_FILE_DEC  :   DecParser,
-        MODEL_FILE_DSC  :   DscParser,
-        MODEL_FILE_FDF  :   None, #FdfParser,
-        MODEL_FILE_CIF  :   None
-    }
-
-    # file table
-    _FILE_TABLE_ = {
-        MODEL_FILE_INF  :   ModuleTable,
-        MODEL_FILE_DEC  :   PackageTable,
-        MODEL_FILE_DSC  :   PlatformTable,
-    }
 
     # default database file path
     _DB_PATH_ = "Conf/.cache/build.db"
@@ -2194,11 +2218,18 @@ class WorkspaceDatabase(object):
     # to avoid unnecessary re-parsing
     #
     class BuildObjectFactory(object):
+
         _FILE_TYPE_ = {
             ".inf"  : MODEL_FILE_INF,
             ".dec"  : MODEL_FILE_DEC,
             ".dsc"  : MODEL_FILE_DSC,
-            ".fdf"  : MODEL_FILE_FDF,
+        }
+
+        # file parser
+        _FILE_PARSER_ = {
+            MODEL_FILE_INF  :   InfParser,
+            MODEL_FILE_DEC  :   DecParser,
+            MODEL_FILE_DSC  :   DscParser,
         }
 
         # convert to xxxBuildData object
@@ -2206,7 +2237,6 @@ class WorkspaceDatabase(object):
             MODEL_FILE_INF  :   InfBuildData,
             MODEL_FILE_DEC  :   DecBuildData,
             MODEL_FILE_DSC  :   DscBuildData,
-            MODEL_FILE_FDF  :   None #FlashDefTable,
         }
 
         _CACHE_ = {}    # (FilePath, Arch)  : <object>
@@ -2215,46 +2245,61 @@ class WorkspaceDatabase(object):
         def __init__(self, WorkspaceDb):
             self.WorkspaceDb = WorkspaceDb
 
-        # key = (FilePath, Arch='COMMON')
+        # key = (FilePath, Arch=None)
         def __contains__(self, Key):
             FilePath = Key[0]
-            Arch = 'COMMON'
             if len(Key) > 1:
                 Arch = Key[1]
+            else:
+                Arch = None
             return (FilePath, Arch) in self._CACHE_
 
-        # key = (FilePath, Arch='COMMON')
+        # key = (FilePath, Arch=None, Target=None, Toochain=None)
         def __getitem__(self, Key):
             FilePath = Key[0]
-            Arch = 'COMMON'
-            Platform = 'COMMON'
-            if len(Key) > 1:
+            KeyLength = len(Key)
+            if KeyLength > 1:
                 Arch = Key[1]
-            if len(Key) > 2:
-                Platform = Key[2]
+            else:
+                Arch = None
+            if KeyLength > 2:
+                Target = Key[2]
+            else:
+                Target = None
+            if KeyLength > 3:
+                Toolchain = Key[3]
+            else:
+                Toolchain = None
 
             # if it's generated before, just return the cached one
-            Key = (FilePath, Arch)
+            Key = (FilePath, Arch, Target, Toolchain)
             if Key in self._CACHE_:
                 return self._CACHE_[Key]
 
             # check file type
-            Ext = FilePath.Ext.lower()
+            Ext = FilePath.Type
             if Ext not in self._FILE_TYPE_:
                 return None
             FileType = self._FILE_TYPE_[Ext]
             if FileType not in self._GENERATOR_:
                 return None
 
-            # get table for current file
-            MetaFile = self.WorkspaceDb[FilePath, FileType, self.WorkspaceDb._GlobalMacros]
+            # get the parser ready for this file
+            MetaFile = self._FILE_PARSER_[FileType](
+                                FilePath, 
+                                FileType, 
+                                MetaFileStorage(self.WorkspaceDb.Cur, FilePath, FileType)
+                                )
+            # alwasy do post-process, in case of macros change
+            MetaFile.DoPostProcess()
+            # object the build is based on
             BuildObject = self._GENERATOR_[FileType](
                                     FilePath,
                                     MetaFile,
                                     self,
                                     Arch,
-                                    Platform,
-                                    self.WorkspaceDb._GlobalMacros,
+                                    Target,
+                                    Toolchain
                                     )
             self._CACHE_[Key] = BuildObject
             return BuildObject
@@ -2274,11 +2319,9 @@ class WorkspaceDatabase(object):
     # @param GlobalMacros       Global macros used for replacement during file parsing
     # @prarm RenewDb=False      Create new database file if it's already there
     #
-    def __init__(self, DbPath, GlobalMacros={}, RenewDb=False):
+    def __init__(self, DbPath, RenewDb=False):
         self._DbClosedFlag = False
-        self._GlobalMacros = GlobalMacros
-
-        if DbPath == None or DbPath == '':
+        if not DbPath:
             DbPath = os.path.normpath(os.path.join(GlobalData.gWorkspace, self._DB_PATH_))
 
         # don't create necessary path for db in memory
@@ -2306,6 +2349,7 @@ class WorkspaceDatabase(object):
         # create table for internal uses
         self.TblDataModel = TableDataModel(self.Cur)
         self.TblFile = TableFile(self.Cur)
+        self.Platform = None
 
         # conversion object for build or file format conversion purpose
         self.BuildObject = WorkspaceDatabase.BuildObjectFactory(self)
@@ -2324,41 +2368,6 @@ class WorkspaceDatabase(object):
     #  @return Bool value for whether need renew workspace databse
     #
     def _CheckWhetherDbNeedRenew (self, force, DbPath):
-        DbDir = os.path.split(DbPath)[0]
-        MacroFilePath = os.path.normpath(os.path.join(DbDir, "build.mac"))
-        MacroMatch = False
-        if os.path.exists(MacroFilePath) and os.path.isfile(MacroFilePath):
-            LastMacros = None
-            try:
-                f = open(MacroFilePath,'r')
-                LastMacros = pickle.load(f)
-                f.close()
-            except IOError:
-                pass
-            except:
-                f.close()
-
-            if LastMacros != None and type(LastMacros) is DictType:
-                if LastMacros == self._GlobalMacros:
-                    MacroMatch = True
-                    for Macro in LastMacros.keys():
-                        if not (Macro in self._GlobalMacros and LastMacros[Macro] == self._GlobalMacros[Macro]):
-                            MacroMatch = False;
-                            break;
-
-        if not MacroMatch:
-            # save command line macros to file
-            try:
-                f = open(MacroFilePath,'w')
-                pickle.dump(self._GlobalMacros, f, 2)
-                f.close()
-            except IOError:
-                pass
-            except:
-                f.close()
-
-            force = True
-
         # if database does not exist, we need do nothing
         if not os.path.exists(DbPath): return False
             
@@ -2423,6 +2432,9 @@ determine whether database file is out of date!\n")
     def QueryTable(self, Table):
         Table.Query()
 
+    def __del__(self):
+        self.Close()
+
     ## Close entire database
     #
     # Commit all first
@@ -2435,83 +2447,28 @@ determine whether database file is out of date!\n")
             self.Conn.close()
             self._DbClosedFlag = True
 
-    ## Get unique file ID for the gvien file
-    def GetFileId(self, FilePath):
-        return self.TblFile.GetFileId(FilePath)
-
-    ## Get file type value for the gvien file ID
-    def GetFileType(self, FileId):
-        return self.TblFile.GetFileType(FileId)
-
-    ## Get time stamp stored in file table
-    def GetTimeStamp(self, FileId):
-        return self.TblFile.GetFileTimeStamp(FileId)
-
-    ## Update time stamp in file table
-    def SetTimeStamp(self, FileId, TimeStamp):
-        return self.TblFile.SetFileTimeStamp(FileId, TimeStamp)
-
-    ## Check if a table integrity flag exists or not
-    def CheckIntegrity(self, TableName):
-        try:
-            Result = self.Cur.execute("select min(ID) from %s" % (TableName)).fetchall()
-            if Result[0][0] != -1:
-                return False
-            #
-            # Check whether the meta data file has external dependency by comparing the time stamp
-            #
-            Sql = "select Value1, Value2 from %s where Model=%d" % (TableName, MODEL_EXTERNAL_DEPENDENCY)
-            for Dependency in self.Cur.execute(Sql).fetchall():
-                if str(os.stat(Dependency[0])[8]) != Dependency[1]:
-                    return False
-        except:
-            return False
-        return True
-
-    ## Compose table name for given file type and file ID
-    def GetTableName(self, FileType, FileId):
-        return "_%s_%s" % (FileType, FileId)
-
-    ## Return a temp table containing all content of the given file
-    #
-    #   @param  FileInfo    The tuple containing path and type of a file
-    #
-    def __getitem__(self, FileInfo):
-        FilePath, FileType, Macros = FileInfo
-        if FileType not in self._FILE_TABLE_:
-            return None
-
-        # flag used to indicate if it's parsed or not
-        FilePath = str(FilePath)
-        Parsed = False
-        FileId = self.GetFileId(FilePath)
-        if FileId != None:
-            TimeStamp = os.stat(FilePath)[8]
-            TableName = self.GetTableName(FileType, FileId)
-            if TimeStamp != self.GetTimeStamp(FileId):
-                # update the timestamp in database
-                self.SetTimeStamp(FileId, TimeStamp)
-            else:
-                # if the table exists and is integrity, don't parse it
-                Parsed = self.CheckIntegrity(TableName)
-        else:
-            FileId = self.TblFile.InsertFile(FilePath, FileType)
-            TableName = self.GetTableName(FileType, FileId)
-
-        FileTable = self._FILE_TABLE_[FileType](self.Cur, TableName, FileId)
-        FileTable.Create(not Parsed)
-        Parser = self._FILE_PARSER_[FileType](FilePath, FileType, FileTable, Macros)
-        # set the "Finished" flag in parser in order to avoid re-parsing (if parsed)
-        Parser.Finished = Parsed
-        return Parser
-
     ## Summarize all packages in the database
-    def _GetPackageList(self):
-        PackageList = []
-        for Module in self.ModuleList:
-            for Package in Module.Packages:
+    def GetPackageList(self, Platform, Arch, TargetName, ToolChainTag):
+        self.Platform = Platform
+        PackageList =[]
+        Pa = self.BuildObject[self.Platform, 'COMMON']
+        #
+        # Get Package related to Modules
+        #
+        for Module in Pa.Modules:
+            ModuleObj = self.BuildObject[Module, Arch, TargetName, ToolChainTag]
+            for Package in ModuleObj.Packages:
                 if Package not in PackageList:
                     PackageList.append(Package)
+        #
+        # Get Packages related to Libraries
+        #
+        for Lib in Pa.LibraryInstances:
+            LibObj = self.BuildObject[Lib, Arch, TargetName, ToolChainTag]
+            for Package in LibObj.Packages:
+                if Package not in PackageList:
+                    PackageList.append(Package)            
+        
         return PackageList
 
     ## Summarize all platforms in the database
@@ -2526,21 +2483,7 @@ determine whether database file is out of date!\n")
                 PlatformList.append(Platform)
         return PlatformList
 
-    ## Summarize all modules in the database
-    def _GetModuleList(self):
-        ModuleList = []
-        for ModuleFile in self.TblFile.GetFileList(MODEL_FILE_INF):
-            try:
-                Module = self.BuildObject[PathClass(ModuleFile), 'COMMON']
-            except:
-                Module = None
-            if Module != None:
-                ModuleList.append(Module)
-        return ModuleList
-
     PlatformList = property(_GetPlatformList)
-    PackageList = property(_GetPackageList)
-    ModuleList = property(_GetModuleList)
 
 ##
 #

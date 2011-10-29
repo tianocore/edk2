@@ -71,7 +71,7 @@ class FileStatement (FileStatementClassObject) :
         
         OutputDir = os.path.join(GenFdsGlobalVariable.FfsDir, self.NameGuid)
         if not os.path.exists(OutputDir):
-             os.makedirs(OutputDir)
+            os.makedirs(OutputDir)
 
         Dict.update(self.DefineVarDict)
         SectionAlignments = None
@@ -98,7 +98,7 @@ class FileStatement (FileStatementClassObject) :
             SectionFiles = []
             Index = 0
             SectionAlignments = []
-            for section in self.SectionList:
+            for section in self.SectionList :
                 Index = Index + 1
                 SecIndex = '%d' %Index
                 # process the inside FvImage from FvSection or GuidSection

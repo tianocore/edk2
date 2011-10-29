@@ -137,7 +137,7 @@ class FileBuildRule:
         self.MacroList = []
         self.CommandList = []
         for CmdLine in Command:
-            self.MacroList.extend(gMacroPattern.findall(CmdLine))
+            self.MacroList.extend(gMacroRefPattern.findall(CmdLine))
             # replace path separator with native one
             self.CommandList.append(CmdLine)
 

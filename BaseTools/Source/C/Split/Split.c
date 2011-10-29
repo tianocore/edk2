@@ -2,7 +2,7 @@
 
   Split a file into two pieces at the request offset.
 
-Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution.  The full text of the license may be found at
@@ -26,7 +26,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "ParseInf.h"
 #include "CommonLib.h"
 #include "EfiUtilityMsgs.h"
-
 //
 // Utility Name
 //
@@ -230,7 +229,6 @@ Returns:
   CHAR8         *CurrentDir = NULL;
   UINT64        Index;
   CHAR8         CharC;
-  BOOLEAN       QuietFlag = TRUE;
   UINT64        DebugLevel = 0;
   UINT64        VerboseLevel = 0;
 
@@ -308,7 +306,6 @@ Returns:
     }
 
     if ((stricmp (argv[0], "-q") == 0) || (stricmp (argv[0], "--quiet") == 0)) {
-      QuietFlag = TRUE;
       argc --;
       argv ++;
       continue;

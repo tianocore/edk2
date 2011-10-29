@@ -172,6 +172,12 @@ def CheckEnvVariable():
     GlobalData.gEdkSource = EdkSourceDir
     GlobalData.gEcpSource = EcpSourceDir
 
+    GlobalData.gGlobalDefines["WORKSPACE"]  = WorkspaceDir
+    GlobalData.gGlobalDefines["EFI_SOURCE"] = EfiSourceDir
+    GlobalData.gGlobalDefines["EDK_SOURCE"] = EdkSourceDir
+    GlobalData.gGlobalDefines["ECP_SOURCE"] = EcpSourceDir
+    GlobalData.gGlobalDefines["EDK_TOOLS_PATH"] = os.environ["EDK_TOOLS_PATH"]
+
 ## Get normalized file path
 #
 # Convert the path to be local format, and remove the WORKSPACE path at the
@@ -301,9 +307,13 @@ class BuildUnit:
         self.WorkingDir = WorkingDir
         self.Target = Target
         self.BuildCommand = BuildCommand
-        if BuildCommand == None or len(BuildCommand) == 0:
-            EdkLogger.error("build", OPTION_MISSING, "No build command found for",
+        if not BuildCommand:
+            EdkLogger.error("build", OPTION_MISSING,
+                            "No build command found for this module. "
+                            "Please check your setting of %s_%s_%s_MAKE_PATH in Conf/tools_def.txt file." % 
+                                (Obj.BuildTarget, Obj.ToolChain, Obj.Arch),
                             ExtraData=str(Obj))
+
 
     ## str() method
     #
@@ -690,93 +700,59 @@ class Build():
     #
     #   @param  Target              The build command target, one of gSupportedTarget
     #   @param  WorkspaceDir        The directory of workspace
-    #   @param  Platform            The DSC file of active platform
-    #   @param  Module              The INF file of active module, if any
-    #   @param  Arch                The Arch list of platform or module
-    #   @param  ToolChain           The name list of toolchain
-    #   @param  BuildTarget         The "DEBUG" or "RELEASE" build
-    #   @param  FlashDefinition     The FDF file of active platform
-    #   @param  FdList=[]           The FD names to be individually built
-    #   @param  FvList=[]           The FV names to be individually built
-    #   @param  MakefileType        The type of makefile (for MSFT make or GNU make)
-    #   @param  SilentMode          Indicate multi-thread build mode
-    #   @param  ThreadNumber        The maximum number of thread if in multi-thread build mode
-    #   @param  SkipAutoGen         Skip AutoGen step
-    #   @param  Reparse             Re-parse all meta files
-    #   @param  SkuId               SKU id from command line
+    #   @param  BuildOptions        Build options passed from command line
     #
-    def __init__(self, Target, WorkspaceDir, Platform, Module, Arch, ToolChain,
-                 BuildTarget, FlashDefinition, FdList=[], FvList=[], CapList=[],
-                 MakefileType="nmake", SilentMode=False, ThreadNumber=2,
-                 SkipAutoGen=False, Reparse=False, SkuId=None, 
-                 ReportFile=None, ReportType=None, UniFlag=None):
-
-        self.WorkspaceDir = WorkspaceDir
+    def __init__(self, Target, WorkspaceDir, BuildOptions):
+        self.WorkspaceDir   = WorkspaceDir
         self.Target         = Target
-        self.PlatformFile   = Platform
-        self.ModuleFile     = Module
-        self.ArchList       = Arch
-        self.ToolChainList  = ToolChain
-        self.BuildTargetList= BuildTarget
-        self.Fdf            = FlashDefinition
-        self.FdList         = FdList
-        self.FvList         = FvList
-        self.CapList        = CapList
-        self.MakefileType   = MakefileType
-        self.SilentMode     = SilentMode
-        self.ThreadNumber   = ThreadNumber
-        self.SkipAutoGen    = SkipAutoGen
-        self.Reparse        = Reparse
-        self.SkuId          = SkuId
+        self.PlatformFile   = BuildOptions.PlatformFile
+        self.ModuleFile     = BuildOptions.ModuleFile
+        self.ArchList       = BuildOptions.TargetArch
+        self.ToolChainList  = BuildOptions.ToolChain
+        self.BuildTargetList= BuildOptions.BuildTarget
+        self.Fdf            = BuildOptions.FdfFile
+        self.FdList         = BuildOptions.RomImage
+        self.FvList         = BuildOptions.FvImage
+        self.CapList        = BuildOptions.CapName
+        self.SilentMode     = BuildOptions.SilentMode
+        self.ThreadNumber   = BuildOptions.ThreadNumber
+        self.SkipAutoGen    = BuildOptions.SkipAutoGen
+        self.Reparse        = BuildOptions.Reparse
+        self.SkuId          = BuildOptions.SkuId
         self.SpawnMode      = True
-        self.BuildReport    = BuildReport(ReportFile, ReportType)
+        self.BuildReport    = BuildReport(BuildOptions.ReportFile, BuildOptions.ReportType)
         self.TargetTxt      = TargetTxtClassObject()
         self.ToolDef        = ToolDefClassObject()
-        self.Db             = WorkspaceDatabase(None, GlobalData.gGlobalDefines, self.Reparse)
-        #self.Db             = WorkspaceDatabase(None, {}, self.Reparse)
+        if BuildOptions.DisableCache:
+            self.Db         = WorkspaceDatabase(":memory:")
+        else:
+            self.Db         = WorkspaceDatabase(None, self.Reparse)
         self.BuildDatabase  = self.Db.BuildObject
         self.Platform       = None
         self.LoadFixAddress = 0
-        self.UniFlag        = UniFlag
+        self.UniFlag        = BuildOptions.Flag
 
         # print dot character during doing some time-consuming work
         self.Progress = Utils.Progressor()
 
-        # parse target.txt, tools_def.txt, and platform file
-        #self.RestoreBuildData()
-        self.LoadConfiguration()
-        
-        #
-        # @attention Treat $(TARGET)/$(TOOL_CHAIN_TAG) in meta data files as special macro when it has only one build target/toolchain.
-        # This is not a complete support for $(TARGET)/$(TOOL_CHAIN_TAG) macro as it can only support one build target/toolchain in ONE
-        # invocation of build command. However, it should cover the frequent usage model that $(TARGET)/$(TOOL_CHAIN_TAG) macro
-        # is used in DSC/FDF files to specify different libraries & PCD setting for debug/release build.
-        #
-        if len(self.BuildTargetList) == 1:
-            self.Db._GlobalMacros.setdefault("TARGET", self.BuildTargetList[0])
-        if len(self.ToolChainList) == 1:   
-            self.Db._GlobalMacros.setdefault("TOOL_CHAIN_TAG", self.ToolChainList[0])
-        
         self.InitBuild()
 
         # print current build environment and configuration
-        EdkLogger.quiet("%-24s = %s" % ("WORKSPACE", os.environ["WORKSPACE"]))
-        EdkLogger.quiet("%-24s = %s" % ("ECP_SOURCE", os.environ["ECP_SOURCE"]))
-        EdkLogger.quiet("%-24s = %s" % ("EDK_SOURCE", os.environ["EDK_SOURCE"]))
-        EdkLogger.quiet("%-24s = %s" % ("EFI_SOURCE", os.environ["EFI_SOURCE"]))
-        EdkLogger.quiet("%-24s = %s" % ("EDK_TOOLS_PATH", os.environ["EDK_TOOLS_PATH"]))
+        EdkLogger.quiet("%-16s = %s" % ("WORKSPACE", os.environ["WORKSPACE"]))
+        EdkLogger.quiet("%-16s = %s" % ("ECP_SOURCE", os.environ["ECP_SOURCE"]))
+        EdkLogger.quiet("%-16s = %s" % ("EDK_SOURCE", os.environ["EDK_SOURCE"]))
+        EdkLogger.quiet("%-16s = %s" % ("EFI_SOURCE", os.environ["EFI_SOURCE"]))
+        EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_PATH", os.environ["EDK_TOOLS_PATH"]))
 
-        EdkLogger.info('\n%-24s = %s' % ("TARGET_ARCH", ' '.join(self.ArchList)))
-        EdkLogger.info('%-24s = %s' % ("TARGET", ' '.join(self.BuildTargetList)))
-        EdkLogger.info('%-24s = %s' % ("TOOL_CHAIN_TAG", ' '.join(self.ToolChainList)))
+        EdkLogger.info("")
+        if self.ArchList:
+            EdkLogger.info('%-16s = %s' % ("Architecture(s)", ' '.join(self.ArchList)))
+        EdkLogger.info('%-16s = %s' % ("Build target", ' '.join(self.BuildTargetList)))
+        EdkLogger.info('%-16s = %s' % ("Toolchain", ' '.join(self.ToolChainList)))
 
-        EdkLogger.info('\n%-24s = %s' % ("Active Platform", self.PlatformFile))
-
-        if self.Fdf != None and self.Fdf != "":
-            EdkLogger.info('%-24s = %s' % ("Flash Image Definition", self.Fdf))
-
-        if self.ModuleFile != None and self.ModuleFile != "":
-            EdkLogger.info('%-24s = %s' % ("Active Module", self.ModuleFile))
+        #EdkLogger.info('\n%-24s = %s' % ("Active Platform", self.PlatformFile))
+        if self.ModuleFile:
+            EdkLogger.info('%-16s = %s' % ("Active Module", self.ModuleFile))
 
         os.chdir(self.WorkspaceDir)
         self.Progress.Start("\nProcessing meta-data")
@@ -805,15 +781,16 @@ class Build():
             EdkLogger.error("build", FILE_NOT_FOUND, ExtraData=BuildConfigurationFile)
 
         # if no ARCH given in command line, get it from target.txt
-        if self.ArchList == None or len(self.ArchList) == 0:
+        if not self.ArchList:
             self.ArchList = self.TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TARGET_ARCH]
+        self.ArchList = tuple(self.ArchList)
 
         # if no build target given in command line, get it from target.txt
-        if self.BuildTargetList == None or len(self.BuildTargetList) == 0:
+        if not self.BuildTargetList:
             self.BuildTargetList = self.TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TARGET]
 
         # if no tool chain given in command line, get it from target.txt
-        if self.ToolChainList == None or len(self.ToolChainList) == 0:
+        if not self.ToolChainList:
             self.ToolChainList = self.TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_TAG]
             if self.ToolChainList == None or len(self.ToolChainList) == 0:
                 EdkLogger.error("build", RESOURCE_NOT_AVAILABLE, ExtraData="No toolchain given. Don't know how to build.\n")
@@ -859,9 +836,6 @@ class Build():
                                     ExtraData="No active platform specified in target.txt or command line! Nothing can be built.\n")
 
             self.PlatformFile = PathClass(NormFile(PlatformFile, self.WorkspaceDir), self.WorkspaceDir)
-            ErrorCode, ErrorInfo = self.PlatformFile.Validate(".dsc", False)
-            if ErrorCode != 0:
-                EdkLogger.error("build", ErrorCode, ExtraData=ErrorInfo)
 
     ## Initialize build configuration
     #
@@ -869,89 +843,16 @@ class Build():
     #   command line and target.txt, then get the final build configurations.
     #
     def InitBuild(self):
-        ErrorCode, ErrorInfo = self.PlatformFile.Validate(".dsc")
+        # parse target.txt, tools_def.txt, and platform file
+        self.LoadConfiguration()        
+
+        # Allow case-insensitive for those from command line or configuration file
+        ErrorCode, ErrorInfo = self.PlatformFile.Validate(".dsc", False)
         if ErrorCode != 0:
             EdkLogger.error("build", ErrorCode, ExtraData=ErrorInfo)
 
         # create metafile database
         self.Db.InitDatabase()
-
-        # we need information in platform description file to determine how to build
-        self.Platform = self.BuildDatabase[self.PlatformFile, 'COMMON']
-        if not self.Fdf:
-            self.Fdf = self.Platform.FlashDefinition
-        
-        LoadFixAddressString = None
-        if TAB_FIX_LOAD_TOP_MEMORY_ADDRESS in GlobalData.gGlobalDefines:
-            LoadFixAddressString = GlobalData.gGlobalDefines[TAB_FIX_LOAD_TOP_MEMORY_ADDRESS]
-        else:
-            LoadFixAddressString = self.Platform.LoadFixAddress
-
-        if LoadFixAddressString != None and LoadFixAddressString != '':
-            try:
-                if LoadFixAddressString.upper().startswith('0X'):
-                    self.LoadFixAddress = int (LoadFixAddressString, 16)
-                else:
-                    self.LoadFixAddress = int (LoadFixAddressString)
-            except:
-                EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS %s is not valid dec or hex string" % (LoadFixAddressString))
-            if self.LoadFixAddress < 0:
-                EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS is set to the invalid negative value %s" % (LoadFixAddressString))
-            if self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress % 0x1000 != 0:
-                EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS is set to the invalid unaligned 4K value %s" % (LoadFixAddressString))
-
-        if self.SkuId == None or self.SkuId == '':
-            self.SkuId = self.Platform.SkuName
-
-        # check FD/FV build target
-        if self.Fdf == None or self.Fdf == "":
-            if self.FdList != []:
-                EdkLogger.info("No flash definition file found. FD [%s] will be ignored." % " ".join(self.FdList))
-                self.FdList = []
-            if self.FvList != []:
-                EdkLogger.info("No flash definition file found. FV [%s] will be ignored." % " ".join(self.FvList))
-                self.FvList = []
-        else:
-            #
-            # Mark now build in AutoGen Phase
-            #
-            GlobalData.gAutoGenPhase = True
-            FdfParserObj = FdfParser(str(self.Fdf))
-            for key in self.Db._GlobalMacros:
-                InputMacroDict[key] = self.Db._GlobalMacros[key]
-            FdfParserObj.ParseFile()
-            for fvname in self.FvList:
-                if fvname.upper() not in FdfParserObj.Profile.FvDict.keys():
-                    EdkLogger.error("build", OPTION_VALUE_INVALID,
-                                    "No such an FV in FDF file: %s" % fvname)
-            GlobalData.gAutoGenPhase = False
-
-        #
-        # Merge Arch
-        #
-        if self.ArchList == None or len(self.ArchList) == 0:
-            ArchList = set(self.Platform.SupArchList)
-        else:
-            ArchList = set(self.ArchList) & set(self.Platform.SupArchList)
-        if len(ArchList) == 0:
-            EdkLogger.error("build", PARAMETER_INVALID,
-                            ExtraData = "Active platform supports [%s] only, but [%s] is given."
-                                        % (" ".join(self.Platform.SupArchList), " ".join(self.ArchList)))
-        elif len(ArchList) != len(self.ArchList):
-            SkippedArchList = set(self.ArchList).symmetric_difference(set(self.Platform.SupArchList))
-            EdkLogger.verbose("\nArch [%s] is ignored because active platform supports [%s] but [%s] is specified !"
-                           % (" ".join(SkippedArchList), " ".join(self.Platform.SupArchList), " ".join(self.ArchList)))
-        self.ArchList = tuple(ArchList)
-
-        # Merge build target
-        if self.BuildTargetList == None or len(self.BuildTargetList) == 0:
-            BuildTargetList = self.Platform.BuildTargets
-        else:
-            BuildTargetList = list(set(self.BuildTargetList) & set(self.Platform.BuildTargets))
-        if BuildTargetList == []:
-            EdkLogger.error("build", PARAMETER_INVALID, "Active platform only supports [%s], but [%s] is given"
-                                % (" ".join(self.Platform.BuildTargets), " ".join(self.BuildTargetList)))
-        self.BuildTargetList = BuildTargetList
 
     ## Build a module or platform
     #
@@ -1000,7 +901,11 @@ class Build():
 
         BuildCommand = AutoGenObject.BuildCommand
         if BuildCommand == None or len(BuildCommand) == 0:
-            EdkLogger.error("build", OPTION_MISSING, ExtraData="No MAKE command found for [%s, %s, %s]" % Key)
+            EdkLogger.error("build", OPTION_MISSING,
+                            "No build command found for this module. "
+                            "Please check your setting of %s_%s_%s_MAKE_PATH in Conf/tools_def.txt file." % 
+                                (AutoGenObject.BuildTarget, AutoGenObject.ToolChain, AutoGenObject.Arch),
+                            ExtraData=str(AutoGenObject))
 
         BuildCommand = BuildCommand + [Target]
         LaunchCommand(BuildCommand, AutoGenObject.MakeFileDir)
@@ -1011,7 +916,7 @@ class Build():
                 #
                 # First should close DB.
                 #
-                self.Db.Close()     
+                self.Db.Close()
                 RemoveDirectory(gBuildCacheDir, True)
             except WindowsError, X:
                 EdkLogger.error("build", FILE_DELETE_FAILURE, ExtraData=str(X))
@@ -1121,7 +1026,7 @@ class Build():
     ## Collect MAP information of all FVs
     #
     def _CollectFvMapBuffer (self, MapBuffer, Wa, ModuleList):
-        if self.Fdf != '':
+        if self.Fdf:
             # First get the XIP base address for FV map file.
             GuidPattern = re.compile("[-a-fA-F0-9]+")
             GuidName = re.compile("\(GUID=[-a-fA-F0-9]+")
@@ -1318,10 +1223,13 @@ class Build():
     #
     def _BuildPlatform(self):
         for BuildTarget in self.BuildTargetList:
+            GlobalData.gGlobalDefines['TARGET'] = BuildTarget
             for ToolChain in self.ToolChainList:
+                GlobalData.gGlobalDefines['TOOLCHAIN'] = ToolChain
+                GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = ToolChain
                 Wa = WorkspaceAutoGen(
                         self.WorkspaceDir,
-                        self.Platform,
+                        self.PlatformFile,
                         BuildTarget,
                         ToolChain,
                         self.ArchList,
@@ -1335,18 +1243,21 @@ class Build():
                         self.SkuId,
                         self.UniFlag
                         )
+                self.Fdf = Wa.FdfFile
+                self.LoadFixAddress = Wa.Platform.LoadFixAddress
                 self.BuildReport.AddPlatformReport(Wa)
                 self.Progress.Stop("done!")
                 self._Build(self.Target, Wa)
                 
                 # Create MAP file when Load Fix Address is enabled.
                 if self.Target in ["", "all", "fds"]:
-                    for Arch in self.ArchList:
+                    for Arch in Wa.ArchList:
+                        GlobalData.gGlobalDefines['ARCH'] = Arch
                         #
                         # Check whether the set fix address is above 4G for 32bit image.
                         #
                         if (Arch == 'IA32' or Arch == 'ARM') and self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress >= 0x100000000:
-                            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS can't be set to larger than or equal to 4G for the platorm with IA32 or ARM arch modules")
+                            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS can't be set to larger than or equal to 4G for the platform with IA32 or ARM arch modules")
                     #
                     # Get Module List
                     #
@@ -1364,12 +1275,12 @@ class Build():
                         # Rebase module to the preferred memory address before GenFds
                         #
                         self._CollectModuleMapBuffer(MapBuffer, ModuleList)
-                        if self.Fdf != '':
+                        if self.Fdf:
                             #
                             # create FDS again for the updated EFI image
                             #
                             self._Build("fds", Wa)
-                    if self.Fdf != '':
+                    if self.Fdf:
                         #
                         # Create MAP file for all platform FVs after GenFds.
                         #
@@ -1383,14 +1294,17 @@ class Build():
     #
     def _BuildModule(self):
         for BuildTarget in self.BuildTargetList:
+            GlobalData.gGlobalDefines['TARGET'] = BuildTarget
             for ToolChain in self.ToolChainList:
+                GlobalData.gGlobalDefines['TOOLCHAIN'] = ToolChain
+                GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = ToolChain             
                 #
                 # module build needs platform build information, so get platform
                 # AutoGen first
                 #
                 Wa = WorkspaceAutoGen(
                         self.WorkspaceDir,
-                        self.Platform,
+                        self.PlatformFile,
                         BuildTarget,
                         ToolChain,
                         self.ArchList,
@@ -1404,10 +1318,13 @@ class Build():
                         self.SkuId,
                         self.UniFlag
                         )
+                self.Fdf = Wa.FdfFile
+                self.LoadFixAddress = Wa.Platform.LoadFixAddress
                 Wa.CreateMakeFile(False)
                 self.Progress.Stop("done!")
                 MaList = []
-                for Arch in self.ArchList:
+                for Arch in Wa.ArchList:
+                    GlobalData.gGlobalDefines['ARCH'] = Arch
                     Ma = ModuleAutoGen(Wa, self.ModuleFile, BuildTarget, ToolChain, Arch, self.PlatformFile)
                     if Ma == None: continue
                     MaList.append(Ma)
@@ -1421,12 +1338,12 @@ class Build():
                                 "Module for [%s] is not a component of active platform."\
                                 " Please make sure that the ARCH and inf file path are"\
                                 " given in the same as in [%s]" %\
-                                    (', '.join(self.ArchList), self.Platform),
+                                    (', '.join(Wa.ArchList), self.PlatformFile),
                                 ExtraData=self.ModuleFile
                                 )
                 # Create MAP file when Load Fix Address is enabled.
-                if self.Target == "fds" and self.Fdf != '':
-                    for Arch in self.ArchList:
+                if self.Target == "fds" and self.Fdf:
+                    for Arch in Wa.ArchList:
                         #
                         # Check whether the set fix address is above 4G for 32bit image.
                         #
@@ -1466,10 +1383,13 @@ class Build():
     #
     def _MultiThreadBuildPlatform(self):
         for BuildTarget in self.BuildTargetList:
+            GlobalData.gGlobalDefines['TARGET'] = BuildTarget
             for ToolChain in self.ToolChainList:
+                GlobalData.gGlobalDefines['TOOLCHAIN'] = ToolChain
+                GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = ToolChain  
                 Wa = WorkspaceAutoGen(
                         self.WorkspaceDir,
-                        self.Platform,
+                        self.PlatformFile,
                         BuildTarget,
                         ToolChain,
                         self.ArchList,
@@ -1483,13 +1403,16 @@ class Build():
                         self.SkuId,
                         self.UniFlag
                         )
+                self.Fdf = Wa.FdfFile
+                self.LoadFixAddress = Wa.Platform.LoadFixAddress
                 self.BuildReport.AddPlatformReport(Wa)
                 Wa.CreateMakeFile(False)
 
                 # multi-thread exit flag
                 ExitFlag = threading.Event()
                 ExitFlag.clear()
-                for Arch in self.ArchList:
+                for Arch in Wa.ArchList:
+                    GlobalData.gGlobalDefines['ARCH'] = Arch
                     Pa = PlatformAutoGen(Wa, self.PlatformFile, BuildTarget, ToolChain, Arch)
                     if Pa == None:
                         continue
@@ -1546,7 +1469,7 @@ class Build():
 
                 # Create MAP file when Load Fix Address is enabled.
                 if self.Target in ["", "all", "fds"]:
-                    for Arch in self.ArchList:
+                    for Arch in Wa.ArchList:
                         #
                         # Check whether the set fix address is above 4G for 32bit image.
                         #
@@ -1569,7 +1492,7 @@ class Build():
                     if self.LoadFixAddress != 0:
                         self._CollectModuleMapBuffer(MapBuffer, ModuleList)
 
-                    if self.Fdf != '':
+                    if self.Fdf:
                         #
                         # Generate FD image if there's a FDF file found
                         #
@@ -1586,20 +1509,32 @@ class Build():
     ## Generate GuidedSectionTools.txt in the FV directories.
     #
     def CreateGuidedSectionToolsFile(self):
-        for Arch in self.ArchList:
-            for BuildTarget in self.BuildTargetList:
-                for ToolChain in self.ToolChainList:
-                    FvDir = os.path.join(
-                                self.WorkspaceDir,
-                                self.Platform.OutputDirectory,
-                                '_'.join((BuildTarget, ToolChain)),
-                                'FV'
-                                )
-                    if not os.path.exists(FvDir):
-                        continue
+        for BuildTarget in self.BuildTargetList:
+            for ToolChain in self.ToolChainList:
+                Wa = WorkspaceAutoGen(
+                        self.WorkspaceDir,
+                        self.PlatformFile,
+                        BuildTarget,
+                        ToolChain,
+                        self.ArchList,
+                        self.BuildDatabase,
+                        self.TargetTxt,
+                        self.ToolDef,
+                        self.Fdf,
+                        self.FdList,
+                        self.FvList,
+                        self.CapList,
+                        self.SkuId,
+                        self.UniFlag
+                        )
+                FvDir = Wa.FvDir
+                if not os.path.exists(FvDir):
+                    continue
+
+                for Arch in self.ArchList:    
                     # Build up the list of supported architectures for this build
                     prefix = '%s_%s_%s_' % (BuildTarget, ToolChain, Arch)
-
+    
                     # Look through the tool definitions for GUIDed tools
                     guidAttribs = []
                     for (attrib, value) in self.ToolDef.ToolsDefTxtDictionary.iteritems():
@@ -1614,7 +1549,7 @@ class Build():
                                 path = self.ToolDef.ToolsDefTxtDictionary[path]
                                 path = self.GetFullPathOfTool(path)
                                 guidAttribs.append((guid, toolName, path))
-
+    
                     # Write out GuidedSecTools.txt
                     toolsFile = os.path.join(FvDir, 'GuidedSectionTools.txt')
                     toolsFile = open(toolsFile, 'wt')
@@ -1642,7 +1577,7 @@ class Build():
     ## Launch the module or platform build
     #
     def Launch(self):
-        if self.ModuleFile == None or self.ModuleFile == "":
+        if not self.ModuleFile:
             if not self.SpawnMode or self.Target not in ["", "all"]:
                 self.SpawnMode = False
                 self._BuildPlatform()
@@ -1687,8 +1622,13 @@ def ParseDefines(DefineList=[]):
     if DefineList != None:
         for Define in DefineList:
             DefineTokenList = Define.split("=", 1)
+            if not GlobalData.gMacroNamePattern.match(DefineTokenList[0]):
+                EdkLogger.error('build', FORMAT_INVALID,
+                                "The macro name must be in the pattern [A-Z][A-Z0-9_]*",
+                                ExtraData=DefineTokenList[0])
+                
             if len(DefineTokenList) == 1:
-                DefineDict[DefineTokenList[0]] = ""
+                DefineDict[DefineTokenList[0]] = "TRUE"
             else:
                 DefineDict[DefineTokenList[0]] = DefineTokenList[1].strip()
     return DefineDict
@@ -1737,10 +1677,7 @@ def MyOptionParser():
     Parser.add_option("-u", "--skip-autogen", action="store_true", dest="SkipAutoGen", help="Skip AutoGen step.")
     Parser.add_option("-e", "--re-parse", action="store_true", dest="Reparse", help="Re-parse all meta-data files.")
 
-    Parser.add_option("-c", "--case-insensitive", action="store_true", dest="CaseInsensitive", help="Don't check case of file name.")
-
-    # Parser.add_option("-D", "--define", action="append", dest="Defines", metavar="NAME[=[VALUE]]",
-    #     help="Define global macro which can be used in DSC/DEC/INF files.")
+    Parser.add_option("-c", "--case-insensitive", action="store_true", dest="CaseInsensitive", default=False, help="Don't check case of file name.")
 
     Parser.add_option("-w", "--warning-as-error", action="store_true", dest="WarningAsError", help="Treat warning in tools as error.")
     Parser.add_option("-j", "--log", action="store", dest="LogFile", help="Put log in specified file as well as on console.")
@@ -1762,6 +1699,7 @@ def MyOptionParser():
         help="Specify the specific option to parse EDK UNI file. Must be one of: [-c, -s]. -c is for EDK framework UNI file, and -s is for EDK UEFI UNI file. "\
              "This option can also be specified by setting *_*_*_BUILD_FLAGS in [BuildOptions] section of platform DSC. If they are both specified, this value "\
              "will override the setting in [BuildOptions] section of platform DSC.")
+    Parser.add_option("-N", "--no-cache", action="store_true", dest="DisableCache", default=False, help="Disable build cache mechanism")
 
     (Opt, Args)=Parser.parse_args()
     return (Opt, Args)
@@ -1826,11 +1764,12 @@ def Main():
             EdkLogger.error("build", OPTION_NOT_SUPPORTED, "Not supported target [%s]." % Target,
                             ExtraData="Please select one of: %s" %(' '.join(gSupportedTarget)))
 
-        GlobalData.gGlobalDefines = ParseDefines(Option.Macros)
         #
         # Check environment variable: EDK_TOOLS_PATH, WORKSPACE, PATH
         #
         CheckEnvVariable()
+        GlobalData.gCommandLineDefines.update(ParseDefines(Option.Macros))
+
         Workspace = os.getenv("WORKSPACE")
         #
         # Get files real name in workspace dir
@@ -1861,9 +1800,6 @@ def Main():
                 if os.path.normcase (os.path.normpath(Option.PlatformFile)).find (Workspace) == 0:
                     Option.PlatformFile = NormFile(os.path.normpath(Option.PlatformFile), Workspace)
             Option.PlatformFile = PathClass(Option.PlatformFile, Workspace)
-            ErrorCode, ErrorInfo = Option.PlatformFile.Validate(".dsc", False)
-            if ErrorCode != 0:
-                EdkLogger.error("build", ErrorCode, ExtraData=ErrorInfo)
 
         if Option.FdfFile != None:
             if os.path.isabs (Option.FdfFile):
@@ -1877,12 +1813,7 @@ def Main():
         if Option.Flag != None and Option.Flag not in ['-c', '-s']:
             EdkLogger.error("build", OPTION_VALUE_INVALID, "UNI flag must be one of -c or -s")
 
-        MyBuild = Build(Target, Workspace, Option.PlatformFile, Option.ModuleFile,
-                        Option.TargetArch, Option.ToolChain, Option.BuildTarget,
-                        Option.FdfFile, Option.RomImage, Option.FvImage, Option.CapName,
-                        None, Option.SilentMode, Option.ThreadNumber,
-                        Option.SkipAutoGen, Option.Reparse, Option.SkuId, 
-                        Option.ReportFile, Option.ReportType, Option.Flag)
+        MyBuild = Build(Target, Workspace, Option)
         MyBuild.Launch()
         #MyBuild.DumpBuildData()
     except FatalError, X:
@@ -1925,7 +1856,8 @@ def Main():
                     ExtraData="\n(Please send email to edk2-buildtools-devel@lists.sourceforge.net for help, attaching following call stack trace!)\n",
                     RaiseError=False
                     )
-        EdkLogger.quiet("(Python %s on %s) " % (platform.python_version(), sys.platform) + traceback.format_exc())
+        if Option != None and Option.debug != None:
+            EdkLogger.quiet("(Python %s on %s) " % (platform.python_version(), sys.platform) + traceback.format_exc())
         ReturnCode = CODE_ERROR
     finally:
         Utils.Progressor.Abort()

@@ -1,5 +1,18 @@
-/* LzmaEnc.c -- LZMA Encoder
-2009-02-02 : Igor Pavlov : Public domain */
+/** @file
+  Based on LZMA SDK 4.65:
+    LzmaEnc.c -- LZMA Encoder
+    2009-02-02 : Igor Pavlov : Public domain
+
+  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
 
 #include <string.h>
 
@@ -1919,11 +1932,13 @@ static SRes LzmaEnc_CodeOneBlock(CLzmaEnc *p, Bool useLimits, UInt32 maxPackSize
 static SRes LzmaEnc_Alloc(CLzmaEnc *p, UInt32 keepWindowSize, ISzAlloc *alloc, ISzAlloc *allocBig)
 {
   UInt32 beforeSize = kNumOpts;
+  #ifdef COMPRESS_MF_MT
   Bool btMode;
+  #endif
   if (!RangeEnc_Alloc(&p->rc, alloc))
     return SZ_ERROR_MEM;
-  btMode = (p->matchFinderBase.btMode != 0);
   #ifdef COMPRESS_MF_MT
+  btMode = (p->matchFinderBase.btMode != 0);
   p->mtMode = (p->multiThread && !p->fastMode && btMode);
   #endif
 

@@ -662,6 +662,13 @@ CFormPkg::DeclarePendingQuestion (
 
       CNObj.SetQuestionId (QId);
       CNObj.SetVarStoreInfo (&Info);
+      //
+      // Numeric doesn't support BOOLEAN data type. 
+      // BOOLEAN type has the same data size to UINT8. 
+      //
+      if (Info.mVarType == EFI_IFR_TYPE_BOOLEAN) {
+        Info.mVarType = EFI_IFR_TYPE_NUM_SIZE_8;
+      }
       CNObj.SetFlags (0, Info.mVarType);
 
       //

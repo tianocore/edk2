@@ -14,13 +14,58 @@
 ##
 # Import Modules
 #
+import uuid
+
 import Common.EdkLogger as EdkLogger
-from MetaDataTable import Table
+
+from MetaDataTable import Table, TableFile
 from MetaDataTable import ConvertToSqlString
+from CommonDataClass.DataClass import MODEL_FILE_DSC, MODEL_FILE_DEC, MODEL_FILE_INF, \
+                                      MODEL_FILE_OTHERS
+
+class MetaFileTable(Table):
+    # TRICK: use file ID as the part before '.'
+    _ID_STEP_ = 0.00000001
+    _ID_MAX_ = 0.99999999
+
+    ## Constructor
+    def __init__(self, Cursor, MetaFile, FileType, Temporary):
+        self.MetaFile = MetaFile
+
+        self._FileIndexTable = TableFile(Cursor)
+        self._FileIndexTable.Create(False)
+
+        FileId = self._FileIndexTable.GetFileId(MetaFile)
+        if not FileId:
+            FileId = self._FileIndexTable.InsertFile(MetaFile, FileType)
+
+        if Temporary:
+            TableName = "_%s_%s_%s" % (FileType, FileId, uuid.uuid4().hex)
+        else:
+            TableName = "_%s_%s" % (FileType, FileId)
+
+        #Table.__init__(self, Cursor, TableName, FileId, False)
+        Table.__init__(self, Cursor, TableName, FileId, Temporary)
+        self.Create(not self.IsIntegrity())
+
+    def IsIntegrity(self):
+        try:
+            Result = self.Cur.execute("select ID from %s where ID<0" % (self.Table)).fetchall()
+            if not Result:
+                return False
+
+            TimeStamp = self.MetaFile.TimeStamp
+            if TimeStamp != self._FileIndexTable.GetFileTimeStamp(self.IdBase):
+                # update the timestamp in database
+                self._FileIndexTable.SetFileTimeStamp(self.IdBase, TimeStamp)
+                return False
+        except Exception, Exc:
+            EdkLogger.debug(EdkLogger.DEBUG_5, str(Exc))
+            return False
+        return True
 
 ## Python class representation of table storing module data
-class ModuleTable(Table):
-    # TRICK: use file ID as the part before '.'
+class ModuleTable(MetaFileTable):
     _ID_STEP_ = 0.00000001
     _ID_MAX_  = 0.99999999
     _COLUMN_ = '''
@@ -42,8 +87,8 @@ class ModuleTable(Table):
     _DUMMY_ = "-1, -1, '====', '====', '====', '====', '====', -1, -1, -1, -1, -1, -1"
 
     ## Constructor
-    def __init__(self, Cursor, Name='Inf', IdBase=0, Temporary=False):
-        Table.__init__(self, Cursor, Name, IdBase, Temporary)
+    def __init__(self, Cursor, MetaFile, Temporary):
+        MetaFileTable.__init__(self, Cursor, MetaFile, MODEL_FILE_INF, Temporary)
 
     ## Insert a record into table Inf
     #
@@ -100,9 +145,7 @@ class ModuleTable(Table):
         return self.Exec(SqlCommand)
 
 ## Python class representation of table storing package data
-class PackageTable(Table):
-    _ID_STEP_ = 0.00000001
-    _ID_MAX_ = 0.99999999
+class PackageTable(MetaFileTable):
     _COLUMN_ = '''
         ID REAL PRIMARY KEY,
         Model INTEGER NOT NULL,
@@ -122,8 +165,8 @@ class PackageTable(Table):
     _DUMMY_ = "-1, -1, '====', '====', '====', '====', '====', -1, -1, -1, -1, -1, -1"
 
     ## Constructor
-    def __init__(self, Cursor, Name='Dec', IdBase=0, Temporary=False):
-        Table.__init__(self, Cursor, Name, IdBase, Temporary)
+    def __init__(self, Cursor, MetaFile, Temporary):
+        MetaFileTable.__init__(self, Cursor, MetaFile, MODEL_FILE_DEC, Temporary)
 
     ## Insert table
     #
@@ -179,9 +222,7 @@ class PackageTable(Table):
         return self.Exec(SqlCommand)
 
 ## Python class representation of table storing platform data
-class PlatformTable(Table):
-    _ID_STEP_ = 0.00000001
-    _ID_MAX_ = 0.99999999
+class PlatformTable(MetaFileTable):
     _COLUMN_ = '''
         ID REAL PRIMARY KEY,
         Model INTEGER NOT NULL,
@@ -202,8 +243,8 @@ class PlatformTable(Table):
     _DUMMY_ = "-1, -1, '====', '====', '====', '====', '====', -1, -1, -1, -1, -1, -1, -1"
 
     ## Constructor
-    def __init__(self, Cursor, Name='Dsc', IdBase=0, Temporary=False):
-        Table.__init__(self, Cursor, Name, IdBase, Temporary)
+    def __init__(self, Cursor, MetaFile, Temporary):
+        MetaFileTable.__init__(self, Cursor, MetaFile, MODEL_FILE_DSC, Temporary)
 
     ## Insert table
     #
@@ -254,7 +295,7 @@ class PlatformTable(Table):
     # @retval:       A recordSet of all found records 
     #
     def Query(self, Model, Scope1=None, Scope2=None, BelongsToItem=None, FromItem=None):
-        ConditionString = "Model=%s AND Enabled>=0" % Model
+        ConditionString = "Model=%s AND Enabled>0" % Model
         ValueString = "Value1,Value2,Value3,Scope1,Scope2,ID,StartLine"
 
         if Scope1 != None and Scope1 != 'COMMON':
@@ -272,4 +313,37 @@ class PlatformTable(Table):
 
         SqlCommand = "SELECT %s FROM %s WHERE %s" % (ValueString, self.Table, ConditionString)
         return self.Exec(SqlCommand)
+
+## Factory class to produce different storage for different type of meta-file
+class MetaFileStorage(object):
+    _FILE_TABLE_ = {
+        MODEL_FILE_INF      :   ModuleTable,
+        MODEL_FILE_DEC      :   PackageTable,
+        MODEL_FILE_DSC      :   PlatformTable,
+        MODEL_FILE_OTHERS   :   MetaFileTable,
+    }
+
+    _FILE_TYPE_ = {
+        ".inf"  : MODEL_FILE_INF,
+        ".dec"  : MODEL_FILE_DEC,
+        ".dsc"  : MODEL_FILE_DSC,
+    }
+
+    ## Constructor
+    def __new__(Class, Cursor, MetaFile, FileType=None, Temporary=False):
+        # no type given, try to find one
+        if not FileType:
+            if MetaFile.Type in self._FILE_TYPE_:
+                FileType = Class._FILE_TYPE_[MetaFile.Type]
+            else:
+                FileType = MODEL_FILE_OTHERS
+
+        # don't pass the type around if it's well known
+        if FileType == MODEL_FILE_OTHERS:
+            Args = (Cursor, MetaFile, FileType, Temporary)
+        else:
+            Args = (Cursor, MetaFile, Temporary)
+
+        # create the storage object and return it to caller
+        return Class._FILE_TABLE_[FileType](*Args)
 

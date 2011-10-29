@@ -117,7 +117,7 @@ class GenFdsGlobalVariable:
         if not BuildRuleDatabase:
             return {}
 
-        PathClassObj = PathClass(str(Inf.MetaFile).lstrip(GenFdsGlobalVariable.WorkSpaceDir),
+        PathClassObj = PathClass(Inf.MetaFile.File,
                                  GenFdsGlobalVariable.WorkSpaceDir)
         Macro = {}
         Macro["WORKSPACE"             ] = GenFdsGlobalVariable.WorkSpaceDir
@@ -135,6 +135,7 @@ class GenFdsGlobalVariable:
         Macro["ARCH"                  ] = Arch
         Macro["TOOLCHAIN"             ] = GenFdsGlobalVariable.ToolChainTag
         Macro["TOOLCHAIN_TAG"         ] = GenFdsGlobalVariable.ToolChainTag
+        Macro["TOOL_CHAIN_TAG"        ] = GenFdsGlobalVariable.ToolChainTag
         Macro["TARGET"                ] = GenFdsGlobalVariable.TargetName
 
         Macro["BUILD_DIR"             ] = GenFdsGlobalVariable.OutputDirDict[Arch]
@@ -280,8 +281,8 @@ class GenFdsGlobalVariable:
         FvAddressFile.writelines("[options]" + T_CHAR_LF)
         BsAddress = '0'
         for Arch in ArchList:
-            if GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch].BsBaseAddress:
-                BsAddress = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch].BsBaseAddress
+            if GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag].BsBaseAddress:
+                BsAddress = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag].BsBaseAddress
                 break
 
         FvAddressFile.writelines("EFI_BOOT_DRIVER_BASE_ADDRESS = " + \
@@ -290,8 +291,8 @@ class GenFdsGlobalVariable:
 
         RtAddress = '0'
         for Arch in ArchList:
-            if GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch].RtBaseAddress:
-                RtAddress = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch].RtBaseAddress
+            if GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag].RtBaseAddress:
+                RtAddress = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag].RtBaseAddress
 
         FvAddressFile.writelines("EFI_RUNTIME_DRIVER_BASE_ADDRESS = " + \
                                        RtAddress          + \
@@ -345,10 +346,6 @@ class GenFdsGlobalVariable:
     @staticmethod
     def GenerateSection(Output, Input, Type=None, CompressionType=None, Guid=None,
                         GuidHdrLen=None, GuidAttr=[], Ui=None, Ver=None, InputAlign=None):
-        if not GenFdsGlobalVariable.NeedsUpdate(Output, Input):
-            return
-        GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
-
         Cmd = ["GenSec"]
         if Type not in [None, '']:
             Cmd += ["-s", Type]
@@ -388,6 +385,13 @@ class GenFdsGlobalVariable:
         else:
             Cmd += ["-o", Output]
             Cmd += Input
+
+            CommandFile = Output + '.txt'
+            SaveFileOnChange(CommandFile, ' '.join(Cmd), False)
+            if not GenFdsGlobalVariable.NeedsUpdate(Output, list(Input) + [CommandFile]):
+                return
+            GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
+
             GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate section")
 
     @staticmethod
@@ -402,10 +406,6 @@ class GenFdsGlobalVariable:
     @staticmethod
     def GenerateFfs(Output, Input, Type, Guid, Fixed=False, CheckSum=False, Align=None,
                     SectionAlign=None):
-        if not GenFdsGlobalVariable.NeedsUpdate(Output, Input):
-            return
-        GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
-
         Cmd = ["GenFfs", "-t", Type, "-g", Guid]
         if Fixed == True:
             Cmd += ["-x"]
@@ -419,6 +419,13 @@ class GenFdsGlobalVariable:
             Cmd += ("-i", Input[I])
             if SectionAlign not in [None, '', []] and SectionAlign[I] not in [None, '']:
                 Cmd += ("-n", SectionAlign[I])
+
+        CommandFile = Output + '.txt'
+        SaveFileOnChange(CommandFile, ' '.join(Cmd), False)
+        if not GenFdsGlobalVariable.NeedsUpdate(Output, list(Input) + [CommandFile]):
+            return
+        GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
+
         GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate FFS")
 
     @staticmethod
@@ -436,7 +443,7 @@ class GenFdsGlobalVariable:
             Cmd +=["-F", "FALSE"]
         elif ForceRebase == True:
             Cmd +=["-F", "TRUE"]
-                        
+            
         if Capsule:
             Cmd += ["-c"]
         if Dump:
@@ -653,25 +660,9 @@ class GenFdsGlobalVariable:
         TokenCName = PcdPair[1]
 
         PcdValue = ''
-        for Platform in GenFdsGlobalVariable.WorkSpace.PlatformList:
-            #
-            # Only process platform which match current build option.
-            #
-            if Platform.MetaFile == GenFdsGlobalVariable.ActivePlatform:            
-                PcdDict = Platform.Pcds
-                for Key in PcdDict:
-                    PcdObj = PcdDict[Key]
-                    if (PcdObj.TokenCName == TokenCName) and (PcdObj.TokenSpaceGuidCName == TokenSpace):
-                        if PcdObj.Type != 'FixedAtBuild':
-                            EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not FixedAtBuild type." % PcdPattern)
-                        if PcdObj.DatumType != 'VOID*':
-                            EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not VOID* datum type." % PcdPattern)
-                            
-                        PcdValue = PcdObj.DefaultValue
-                        return PcdValue
-
-        for Package in GenFdsGlobalVariable.WorkSpace.PackageList:
-            PcdDict = Package.Pcds
+        for Arch in GenFdsGlobalVariable.ArchList:
+            Platform = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
+            PcdDict = Platform.Pcds
             for Key in PcdDict:
                 PcdObj = PcdDict[Key]
                 if (PcdObj.TokenCName == TokenCName) and (PcdObj.TokenSpaceGuidCName == TokenSpace):
@@ -682,6 +673,22 @@ class GenFdsGlobalVariable:
                         
                     PcdValue = PcdObj.DefaultValue
                     return PcdValue
+                
+            for Package in GenFdsGlobalVariable.WorkSpace.GetPackageList(GenFdsGlobalVariable.ActivePlatform, 
+                                                                         Arch, 
+                                                                         GenFdsGlobalVariable.TargetName, 
+                                                                         GenFdsGlobalVariable.ToolChainTag):
+                PcdDict = Package.Pcds
+                for Key in PcdDict:
+                    PcdObj = PcdDict[Key]
+                    if (PcdObj.TokenCName == TokenCName) and (PcdObj.TokenSpaceGuidCName == TokenSpace):
+                        if PcdObj.Type != 'FixedAtBuild':
+                            EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not FixedAtBuild type." % PcdPattern)
+                        if PcdObj.DatumType != 'VOID*':
+                            EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not VOID* datum type." % PcdPattern)
+                            
+                        PcdValue = PcdObj.DefaultValue
+                        return PcdValue
 
         return PcdValue
 

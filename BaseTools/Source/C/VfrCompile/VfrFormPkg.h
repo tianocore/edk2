@@ -847,7 +847,7 @@ private:
 
 public:
   CIfrImage () : CIfrObj (EFI_IFR_IMAGE_OP, (CHAR8 **)&mImage),
-                 CIfrOpHeader (EFI_IFR_FORM_OP, &mImage->Header) {
+                 CIfrOpHeader (EFI_IFR_IMAGE_OP, &mImage->Header) {
     mImage->Id = EFI_IMAGE_ID_INVALID;
   }
 
@@ -1061,12 +1061,8 @@ public:
     mRef2->FormId = FormId;
   }
 
-  EFI_VFR_RETURN_CODE SetQuestionId (IN EFI_QUESTION_ID QuestionId) {
-    if (QuestionId == EFI_QUESTION_ID_INVALID) {
-      return VFR_RETURN_UNDEFINED;
-    }
+  VOID SetQuestionId (IN EFI_QUESTION_ID QuestionId) {
     mRef2->QuestionId = QuestionId;
-    return VFR_RETURN_SUCCESS;
   }
 };
 

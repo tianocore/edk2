@@ -738,10 +738,6 @@ WriteRelocations32 (
   UINT8                            *Targ;
   Elf32_Phdr                       *DynamicSegment;
   Elf32_Phdr                       *TargetSegment;
-  Elf_Sym                          *Sym;
-  Elf_Shdr                         *SymtabShdr;
-  UINT8                            *Symtab;
-  
 
   for (Index = 0, FoundRelocations = FALSE; Index < mEhdr->e_shnum; Index++) {
     Elf_Shdr *RelShdr = GetShdrByIndex(Index);
@@ -750,16 +746,10 @@ WriteRelocations32 (
       if (IsTextShdr(SecShdr) || IsDataShdr(SecShdr)) {
         UINT32 RelIdx;
 
-        SymtabShdr = GetShdrByIndex (RelShdr->sh_link);
-        Symtab = (UINT8*)mEhdr + SymtabShdr->sh_offset;
         FoundRelocations = TRUE;
         for (RelIdx = 0; RelIdx < RelShdr->sh_size; RelIdx += RelShdr->sh_entsize) {
           Elf_Rel  *Rel = (Elf_Rel *)((UINT8*)mEhdr + RelShdr->sh_offset + RelIdx);
-          Elf_Shdr *SymShdr;
 
-          Sym = (Elf_Sym *)(Symtab + ELF_R_SYM(Rel->r_info) * SymtabShdr->sh_entsize);
-          SymShdr = GetShdrByIndex (Sym->st_shndx);
-          
           if (mEhdr->e_machine == EM_386) { 
             switch (ELF_R_TYPE(Rel->r_info)) {
             case R_386_NONE:

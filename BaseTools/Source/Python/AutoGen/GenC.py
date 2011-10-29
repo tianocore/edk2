@@ -956,6 +956,14 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
         Value = Pcd.DefaultValue
         Unicode = False
         ValueNumber = 0
+
+        if Pcd.DatumType == 'BOOLEAN':
+            BoolValue = Value.upper()
+            if BoolValue == 'TRUE':
+                Value = 1
+            elif BoolValue == 'FALSE':
+                Value = 0
+
         if Pcd.DatumType in ['UINT64', 'UINT32', 'UINT16', 'UINT8']:
             try:
                 if Value.upper().startswith('0X'):

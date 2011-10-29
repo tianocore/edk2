@@ -22,9 +22,11 @@ gEcpSource = "EdkCompatibilityPkg"
 
 gOptions = None
 gCaseInsensitive = False
-gGlobalDefines = {}
 gAllFiles = None
 
+gGlobalDefines = {}
+gPlatformDefines = {}
+gCommandLineDefines = {}
 gEdkGlobal = {}
 gOverrideDir = {}
 
@@ -33,8 +35,13 @@ gProcessingFile = ''
 gBuildingModule = ''
 
 ## Regular expression for matching macro used in DSC/DEC/INF file inclusion
-gMacroPattern = re.compile("\$\(([_A-Z][_A-Z0-9]*)\)", re.UNICODE)
+gMacroRefPattern = re.compile("\$\(([A-Z][_A-Z0-9]*)\)", re.UNICODE)
+gMacroDefPattern = re.compile("^(DEFINE|EDK_GLOBAL)[ \t]+")
+gMacroNamePattern = re.compile("^[A-Z][A-Z0-9_]*$")
+# C-style wide string pattern
+gWideStringPattern = re.compile('(\W|\A)L"')
 #
 # A global variable for whether current build in AutoGen phase or not.
 #
 gAutoGenPhase = False
+

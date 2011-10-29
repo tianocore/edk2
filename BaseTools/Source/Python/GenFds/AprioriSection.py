@@ -79,11 +79,11 @@ class AprioriSection (AprioriSectionClassObject):
                 InfFileName = GenFdsGlobalVariable.MacroExtend(InfFileName, Dict, Arch)
 
                 if Arch != None:
-                    Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClass(InfFileName, GenFdsGlobalVariable.WorkSpaceDir), Arch]
+                    Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClass(InfFileName, GenFdsGlobalVariable.WorkSpaceDir), Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
                     Guid = Inf.Guid
 
                 else:
-                    Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClass(InfFileName, GenFdsGlobalVariable.WorkSpaceDir), 'COMMON']
+                    Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClass(InfFileName, GenFdsGlobalVariable.WorkSpaceDir), 'COMMON', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
                     Guid = Inf.Guid
 
                     self.BinFileList = Inf.Module.Binaries

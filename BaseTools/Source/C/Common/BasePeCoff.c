@@ -979,6 +979,7 @@ Returns:
             ImageContext,
             Section->VirtualAddress + Section->Misc.VirtualSize - 1
             );
+
     //
     // If the base start or end address resolved to 0, then fail.
     //
@@ -987,6 +988,7 @@ Returns:
       return RETURN_LOAD_ERROR;
     }
 
+	
     if (ImageContext->IsTeImage) {
       Base  = (CHAR8 *) ((UINTN) Base + sizeof (EFI_TE_IMAGE_HEADER) - (UINTN) TeHdr->StrippedSize);
       End   = (CHAR8 *) ((UINTN) End + sizeof (EFI_TE_IMAGE_HEADER) - (UINTN) TeHdr->StrippedSize);

@@ -637,28 +637,16 @@ WriteRelocations64 (
   UINT32                           Index;
   EFI_IMAGE_OPTIONAL_HEADER_UNION  *NtHdr;
   EFI_IMAGE_DATA_DIRECTORY         *Dir;
-  BOOLEAN                          FoundRelocations;
-  Elf_Sym                          *Sym;
-  Elf_Shdr                         *SymtabShdr;
-  UINT8                            *Symtab;
 
-
-  for (Index = 0, FoundRelocations = FALSE; Index < mEhdr->e_shnum; Index++) {
+  for (Index = 0; Index < mEhdr->e_shnum; Index++) {
     Elf_Shdr *RelShdr = GetShdrByIndex(Index);
     if ((RelShdr->sh_type == SHT_REL) || (RelShdr->sh_type == SHT_RELA)) {
       Elf_Shdr *SecShdr = GetShdrByIndex (RelShdr->sh_info);
       if (IsTextShdr(SecShdr) || IsDataShdr(SecShdr)) {
         UINT64 RelIdx;
 
-        SymtabShdr = GetShdrByIndex (RelShdr->sh_link);
-        Symtab = (UINT8*)mEhdr + SymtabShdr->sh_offset;
-        FoundRelocations = TRUE;
         for (RelIdx = 0; RelIdx < RelShdr->sh_size; RelIdx += RelShdr->sh_entsize) {
           Elf_Rela *Rel = (Elf_Rela *)((UINT8*)mEhdr + RelShdr->sh_offset + RelIdx);
-          Elf_Shdr *SymShdr;
-
-          Sym = (Elf_Sym *)(Symtab + ELF_R_SYM(Rel->r_info) * SymtabShdr->sh_entsize);
-          SymShdr = GetShdrByIndex (Sym->st_shndx);
 
           if (mEhdr->e_machine == EM_X86_64) {
             switch (ELF_R_TYPE(Rel->r_info)) {

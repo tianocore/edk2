@@ -30,7 +30,6 @@ Abstract:
 #include <Common/UefiCapsule.h>
 #include <Common/PiFirmwareFile.h>
 #include <Common/PiFirmwareVolume.h>
-
 #include <Guid/PiFirmwareFileSystem.h>
 #include <IndustryStandard/PeImage.h>
 #include <Protocol/GuidedSectionExtraction.h>

@@ -15,6 +15,8 @@
 ##
 # Import Modules
 #
+import re
+
 import Fd
 import Region
 import Fv
@@ -45,6 +47,8 @@ from Common.BuildToolError import *
 from Common import EdkLogger
 from Common.Misc import PathClass
 from Common.String import NormPath
+import Common.GlobalData as GlobalData
+from Common.Expression import *
 from Common import GlobalData
 
 import re
@@ -67,6 +71,9 @@ T_CHAR_BACKSLASH, T_CHAR_DOUBLE_QUOTE, T_CHAR_SINGLE_QUOTE, T_CHAR_STAR, T_CHAR_
 (' ', '\0', '\r', '\t', '\n', '/', '\\', '\"', '\'', '*', '#')
 
 SEPERATOR_TUPLE = ('=', '|', ',', '{', '}')
+
+RegionSizePattern = re.compile("\s*(?P<base>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<size>(?:0x|0X)?[a-fA-F0-9]+)\s*")
+RegionSizeGuidPattern = re.compile("\s*(?P<base>\w+\.\w+)\s*\|\s*(?P<size>\w+\.\w+)\s*")
 
 IncludeFileList = []
 # Macro passed from command line, which has greatest priority and can NOT be overridden by those in FDF
@@ -211,6 +218,10 @@ class FdfParser:
         if GenFdsGlobalVariable.WorkSpaceDir == '':
             GenFdsGlobalVariable.WorkSpaceDir = os.getenv("WORKSPACE")
 
+        InputMacroDict.update(GlobalData.gPlatformDefines)
+        InputMacroDict.update(GlobalData.gGlobalDefines)
+        InputMacroDict.update(GlobalData.gCommandLineDefines)
+
     ## __IsWhiteSpace() method
     #
     #   Whether char at current FileBufferPos is whitespace
@@ -317,10 +328,10 @@ class FdfParser:
     #
     def __GetOneChar(self):
         if self.CurrentOffsetWithinLine == len(self.Profile.FileLinesList[self.CurrentLineNumber - 1]) - 1:
-                self.CurrentLineNumber += 1
-                self.CurrentOffsetWithinLine = 0
+            self.CurrentLineNumber += 1
+            self.CurrentOffsetWithinLine = 0
         else:
-                self.CurrentOffsetWithinLine += 1
+            self.CurrentOffsetWithinLine += 1
 
     ## __CurrentChar() method
     #
@@ -564,7 +575,7 @@ class FdfParser:
                 self.Profile.FileLinesList[IncludeLine - 1] = ''.join(TempList)
 
         self.Rewind()
-
+        
     def __GetIfListCurrentItemStat(self, IfList):
         if len(IfList) == 0:
             return True
@@ -574,8 +585,7 @@ class FdfParser:
                 return False
         
         return True
-                   
-
+    
     ## PreprocessConditionalStatement() method
     #
     #   Preprocess conditional statement.
@@ -586,9 +596,10 @@ class FdfParser:
     def PreprocessConditionalStatement(self):
         # IfList is a stack of if branches with elements of list [Pos, CondSatisfied, BranchDetermined]
         IfList = []
+        RegionLayoutLine = 0
         while self.__GetNextToken():
             if self.__Token == 'DEFINE':
-                if self.__GetIfListCurrentItemStat(IfList):
+                if self.__GetIfListCurrentItemStat(IfList): 
                     DefineLine = self.CurrentLineNumber - 1
                     DefineOffset = self.CurrentOffsetWithinLine - len('DEFINE')
                     if not self.__GetNextToken():
@@ -609,60 +620,48 @@ class FdfParser:
                         MacProfile.MacroName = Macro
                         MacProfile.MacroValue = Value
                         AllMacroList.append(MacProfile)
+                        InputMacroDict[MacProfile.MacroName] = MacProfile.MacroValue
                     self.__WipeOffArea.append(((DefineLine, DefineOffset), (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
+            elif self.__Token == 'SET':
+                PcdPair = self.__GetNextPcdName()
+                PcdName = "%s.%s" % (PcdPair[1], PcdPair[0])
+                if not self.__IsToken( "="):
+                    raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
 
+                if not self.__GetNextToken():
+                    raise Warning("expected value", self.FileName, self.CurrentLineNumber)
+
+                Value = self.__Token
+                if Value.startswith("{"):
+                    # deal with value with {}
+                    if not self.__SkipToToken( "}"):
+                        raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)
+                    Value += self.__SkippedChars
+
+                InputMacroDict[PcdName] = Value
             elif self.__Token in ('!ifdef', '!ifndef', '!if'):
                 IfStartPos = (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - len(self.__Token))
                 IfList.append([IfStartPos, None, None])
+
                 CondLabel = self.__Token
+                Expression = self.__GetExpression()
                 
-                MacroName, NotFlag = self.__GetMacroName() 
-                NotDefineFlag = False
-                if CondLabel == '!ifndef':
-                    NotDefineFlag = True
-                if CondLabel == '!ifdef' or CondLabel == '!ifndef':
-                    if NotFlag:
-                        raise Warning("'NOT' operation not allowed for Macro name", self.FileName, self.CurrentLineNumber)
-
                 if CondLabel == '!if':
-
-                    if not self.__GetNextOp():
-                        raise Warning("expected !endif", self.FileName, self.CurrentLineNumber)
-
-                    if self.__Token in ('!=', '==', '>', '<', '>=', '<='):
-                        Op = self.__Token
-                        if not self.__GetNextToken():
-                            raise Warning("expected value", self.FileName, self.CurrentLineNumber)
-                        if self.__GetStringData():
-                            pass
-                        MacroValue = self.__Token
-                        ConditionSatisfied = self.__EvaluateConditional(MacroName, IfList[-1][0][0] + 1, Op, MacroValue)
-                        if NotFlag:
-                            ConditionSatisfied = not ConditionSatisfied
-                        BranchDetermined = ConditionSatisfied
-                    else:
-                        self.CurrentOffsetWithinLine -= len(self.__Token)
-                        ConditionSatisfied = self.__EvaluateConditional(MacroName, IfList[-1][0][0] + 1, None, 'Bool')
-                        if NotFlag:
-                            ConditionSatisfied = not ConditionSatisfied
-                        BranchDetermined = ConditionSatisfied
-                    IfList[-1] = [IfList[-1][0], ConditionSatisfied, BranchDetermined]
-                    if ConditionSatisfied:
-                        self.__WipeOffArea.append((IfList[-1][0], (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
-
+                    ConditionSatisfied = self.__EvaluateConditional(Expression, IfList[-1][0][0] + 1, 'eval')
                 else:
-                    ConditionSatisfied = self.__EvaluateConditional(MacroName, IfList[-1][0][0] + 1)
-                    if NotDefineFlag:
+                    ConditionSatisfied = self.__EvaluateConditional(Expression, IfList[-1][0][0] + 1, 'in')
+                    if CondLabel == '!ifndef':
                         ConditionSatisfied = not ConditionSatisfied
-                    BranchDetermined = ConditionSatisfied
-                    IfList[-1] = [IfList[-1][0], ConditionSatisfied, BranchDetermined]
-                    if ConditionSatisfied:
-                        self.__WipeOffArea.append((IfStartPos, (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
 
+                BranchDetermined = ConditionSatisfied
+                IfList[-1] = [IfList[-1][0], ConditionSatisfied, BranchDetermined]
+                if ConditionSatisfied:
+                    self.__WipeOffArea.append((IfList[-1][0], (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))                 
             elif self.__Token in ('!elseif', '!else'):
                 ElseStartPos = (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - len(self.__Token))
                 if len(IfList) <= 0:
                     raise Warning("Missing !if statement", self.FileName, self.CurrentLineNumber)
+
                 if IfList[-1][1]:
                     IfList[-1] = [ElseStartPos, False, True]
                     self.__WipeOffArea.append((ElseStartPos, (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
@@ -670,27 +669,8 @@ class FdfParser:
                     self.__WipeOffArea.append((IfList[-1][0], ElseStartPos))
                     IfList[-1] = [ElseStartPos, True, IfList[-1][2]]
                     if self.__Token == '!elseif':
-                        MacroName, NotFlag = self.__GetMacroName() 
-                        if not self.__GetNextOp():
-                            raise Warning("expected !endif", self.FileName, self.CurrentLineNumber)
-
-                        if self.__Token in ('!=', '==', '>', '<', '>=', '<='):
-                            Op = self.__Token
-                            if not self.__GetNextToken():
-                                raise Warning("expected value", self.FileName, self.CurrentLineNumber)
-                            if self.__GetStringData():
-                                pass
-                            MacroValue = self.__Token
-                            ConditionSatisfied = self.__EvaluateConditional(MacroName, IfList[-1][0][0] + 1, Op, MacroValue)
-                            if NotFlag:
-                                ConditionSatisfied = not ConditionSatisfied
-
-                        else:
-                            self.CurrentOffsetWithinLine -= len(self.__Token)
-                            ConditionSatisfied = self.__EvaluateConditional(MacroName, IfList[-1][0][0] + 1, None, 'Bool')
-                            if NotFlag:
-                                ConditionSatisfied = not ConditionSatisfied
-
+                        Expression = self.__GetExpression()
+                        ConditionSatisfied = self.__EvaluateConditional(Expression, IfList[-1][0][0] + 1, 'eval')
                         IfList[-1] = [IfList[-1][0], ConditionSatisfied, IfList[-1][2]]
 
                     if IfList[-1][1]:
@@ -699,8 +679,6 @@ class FdfParser:
                         else:
                             IfList[-1][2] = True
                             self.__WipeOffArea.append((IfList[-1][0], (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
-
-
             elif self.__Token == '!endif':
                 if IfList[-1][1]:
                     self.__WipeOffArea.append(((self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - len('!endif')), (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
@@ -708,106 +686,48 @@ class FdfParser:
                     self.__WipeOffArea.append((IfList[-1][0], (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
 
                 IfList.pop()
+            elif not IfList:    # Don't use PCDs inside conditional directive
+                if self.CurrentLineNumber <= RegionLayoutLine:
+                    # Don't try the same line twice
+                    continue
+                RegionSize = RegionSizePattern.match(self.Profile.FileLinesList[self.CurrentLineNumber - 1])
+                if not RegionSize:
+                    RegionLayoutLine = self.CurrentLineNumber
+                    continue
+                RegionSizeGuid = RegionSizeGuidPattern.match(self.Profile.FileLinesList[self.CurrentLineNumber])
+                if not RegionSizeGuid:
+                    RegionLayoutLine = self.CurrentLineNumber + 1
+                    continue
+                InputMacroDict[RegionSizeGuid.group('base')] = RegionSize.group('base')
+                InputMacroDict[RegionSizeGuid.group('size')] = RegionSize.group('size')
+                RegionLayoutLine = self.CurrentLineNumber + 1
 
-
-        if len(IfList) > 0:
+        if IfList:
             raise Warning("Missing !endif", self.FileName, self.CurrentLineNumber)
         self.Rewind()
 
-    def __EvaluateConditional(self, Name, Line, Op = None, Value = None):
-
+    def __EvaluateConditional(self, Expression, Line, Op = None, Value = None):
         FileLineTuple = GetRealFileLine(self.FileName, Line)
-        if Name in InputMacroDict:
-            MacroValue = InputMacroDict[Name]
-            if Op == None:
-                if Value == 'Bool' and MacroValue == None or MacroValue.upper() == 'FALSE':
-                    return False
-                return True
-            elif Op == '!=':
-                if Value != MacroValue:
-                    return True
-                else:
-                    return False
-            elif Op == '==':
-                if Value == MacroValue:
-                    return True
-                else:
-                    return False
-            else:
-                if (self.__IsHex(Value) or Value.isdigit()) and (self.__IsHex(MacroValue) or (MacroValue != None and MacroValue.isdigit())):
-                    InputVal = long(Value, 0)
-                    MacroVal = long(MacroValue, 0)
-                    if Op == '>':
-                        if MacroVal > InputVal:
-                            return True
-                        else:
-                            return False
-                    elif Op == '>=':
-                        if MacroVal >= InputVal:
-                            return True
-                        else:
-                            return False
-                    elif Op == '<':
-                        if MacroVal < InputVal:
-                            return True
-                        else:
-                            return False
-                    elif Op == '<=':
-                        if MacroVal <= InputVal:
-                            return True
-                        else:
-                            return False
-                    else:
-                        return False
-                else:
-                    raise Warning("Value %s is not a number", self.FileName, Line)
-
-        for Profile in AllMacroList:
-            if Profile.MacroName == Name and Profile.DefinedAtLine <= FileLineTuple[1]:
-                if Op == None:
-                    if Value == 'Bool' and Profile.MacroValue == None or Profile.MacroValue.upper() == 'FALSE':
-                        return False
-                    return True
-                elif Op == '!=':
-                    if Value != Profile.MacroValue:
-                        return True
-                    else:
-                        return False
-                elif Op == '==':
-                    if Value == Profile.MacroValue:
-                        return True
-                    else:
-                        return False
-                else:
-                    if (self.__IsHex(Value) or Value.isdigit()) and (self.__IsHex(Profile.MacroValue) or (Profile.MacroValue != None and Profile.MacroValue.isdigit())):
-                        InputVal = long(Value, 0)
-                        MacroVal = long(Profile.MacroValue, 0)
-                        if Op == '>':
-                            if MacroVal > InputVal:
-                                return True
-                            else:
-                                return False
-                        elif Op == '>=':
-                            if MacroVal >= InputVal:
-                                return True
-                            else:
-                                return False
-                        elif Op == '<':
-                            if MacroVal < InputVal:
-                                return True
-                            else:
-                                return False
-                        elif Op == '<=':
-                            if MacroVal <= InputVal:
-                                return True
-                            else:
-                                return False
-                        else:
-                            return False
-                    else:
-                        raise Warning("Value %s is not a number", self.FileName, Line)
-
-        return False
+        if Op == 'eval':
+            try:
+                return ValueExpression(Expression, InputMacroDict)()
+            except SymbolNotFound:
+                return False
+            except WrnExpression, Excpt:
+                # 
+                # Catch expression evaluation warning here. We need to report
+                # the precise number of line and return the evaluation result
+                #
+                EdkLogger.warn('Parser', "Suspicious expression: %s" % str(Excpt),
+                                File=self.FileName, ExtraData=self.__CurrentLine(), 
+                                Line=Line)
+                return Excpt.result
+            except Exception, Excpt:
+                raise Warning("Invalid expression", *FileLineTuple)
+        else:
+            if Expression.startswith('$(') and Expression[-1] == ')':
+                Expression = Expression[2:-1]            
+            return Expression in InputMacroDict
 
     ## __IsToken() method
     #
@@ -865,6 +785,16 @@ class FdfParser:
             self.__Token = self.__CurrentLine()[StartPos : self.CurrentOffsetWithinLine]
             return True
         return False
+
+    def __GetExpression(self):
+        Line = self.Profile.FileLinesList[self.CurrentLineNumber - 1]
+        Index = len(Line) - 1
+        while Line[Index] in ['\r', '\n']:
+            Index -= 1
+        ExpressionString = self.Profile.FileLinesList[self.CurrentLineNumber - 1][self.CurrentOffsetWithinLine:Index+1]
+        self.CurrentOffsetWithinLine += len(ExpressionString)
+        ExpressionString = ExpressionString.strip()
+        return ExpressionString
 
     ## __GetNextWord() method
     #
@@ -1208,7 +1138,7 @@ class FdfParser:
             for Pos in self.__WipeOffArea:
                 self.__ReplaceFragment(Pos[0], Pos[1])
             self.Profile.FileLinesList = ["".join(list) for list in self.Profile.FileLinesList]
-            
+
             while self.__GetDefines():
                 pass
             
@@ -2014,8 +1944,8 @@ class FdfParser:
         if not IsValidBaseAddrValue.match(self.__Token.upper()):
             raise Warning("Unknown FV base address value '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
         Obj.FvBaseAddress = self.__Token
-        return True    
-    
+        return True  
+      
     ## __GetFvForceRebase() method
     #
     #   Get FvForceRebase for FV
@@ -2047,7 +1977,8 @@ class FdfParser:
             Obj.FvForceRebase = None
            
         return True
-    
+
+
     ## __GetFvAttributes() method
     #
     #   Get attributes for FV
@@ -2474,6 +2405,7 @@ class FdfParser:
                         ErrorCode, ErrorInfo = PathClass(NormPath(FfsFileObj.FileName), GenFdsGlobalVariable.WorkSpaceDir).Validate()
                         if ErrorCode != 0:
                             EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)                    
+
 
         if not self.__IsToken( "}"):
             raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)

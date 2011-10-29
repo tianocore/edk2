@@ -163,7 +163,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
         
         if self.CurrentArch != None:
 
-            Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClassObj, self.CurrentArch]
+            Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClassObj, self.CurrentArch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
             #
             # Set Ffs BaseName, MdouleGuid, ModuleType, Version, OutputPath
             #
@@ -181,7 +181,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 self.ShadowFromInfFile = Inf.Shadow
 
         else:
-            Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClassObj, 'COMMON']
+            Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClassObj, 'COMMON', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
             self.BaseName = Inf.BaseName
             self.ModuleGuid = Inf.Guid
             self.ModuleType = Inf.ModuleType
@@ -363,27 +363,27 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
         InfFileKey = os.path.normpath(os.path.join(GenFdsGlobalVariable.WorkSpaceDir, self.InfFileName))
         DscArchList = []
-        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'IA32']
+        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'IA32', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
         if  PlatformDataBase != None:
             if InfFileKey in PlatformDataBase.Modules:
                 DscArchList.append ('IA32')
 
-        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'X64']
+        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'X64', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
         if  PlatformDataBase != None:
             if InfFileKey in PlatformDataBase.Modules:
                 DscArchList.append ('X64')
 
-        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'IPF']
+        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'IPF', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
         if PlatformDataBase != None:
             if InfFileKey in (PlatformDataBase.Modules):
                 DscArchList.append ('IPF')
 
-        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'ARM']
+        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'ARM', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
         if PlatformDataBase != None:
             if InfFileKey in (PlatformDataBase.Modules):
                 DscArchList.append ('ARM')
 
-        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'EBC']
+        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'EBC', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
         if PlatformDataBase != None:
             if InfFileKey in (PlatformDataBase.Modules):
                 DscArchList.append ('EBC')
