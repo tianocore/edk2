@@ -104,7 +104,7 @@
       PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   }
   SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
-  SecurityPkg\VariableAuthenticated\SecureBootConfigDxe\SecureBootConfigDxe.inf
+  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
   
 [Components.IA32, Components.X64]
   SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf {
