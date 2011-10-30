@@ -24,7 +24,7 @@
   FILE_GUID                      = 342C36C0-15DF-43b4-9EC9-FBF748BFB3D1
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = TimerLib|SEC PEIM PEI_CORE
+  LIBRARY_CLASS                  = TimerLib|PEIM PEI_CORE
 
 
 #
@@ -32,6 +32,7 @@
 #
 
 [Sources.common]
+  TscTimerLibShare.c
   PeiTscTimerLib.c
 
 

@@ -63,15 +63,16 @@
   # that is different than the one below.
   #
   # TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-  TimerLib|PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
+  TimerLib|PerformancePkg/Library/TscTimerLib/DxeTscTimerLib.inf
 
 [LibraryClasses.IPF]
   PalLib|MdePkg/Library/UefiPalLib/UefiPalLib.inf
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
 
 [Components.IA32, Components.X64]
-  PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
-  PerformancePkg/Library/PeiTscTimerLib/PeiTscTimerLib.inf
+  PerformancePkg/Library/TscTimerLib/DxeTscTimerLib.inf
+  PerformancePkg/Library/TscTimerLib/PeiTscTimerLib.inf
+  PerformancePkg/Library/TscTimerLib/BaseTscTimerLib.inf
 
 [Components]
   PerformancePkg/Dp_App/Dp.inf

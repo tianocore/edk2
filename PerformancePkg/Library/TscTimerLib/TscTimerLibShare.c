@@ -1,5 +1,5 @@
 /** @file
-  A Pei Timer Library implementation which uses the Time Stamp Counter in the processor.
+  The Timer Library implementation which uses the Time Stamp Counter in the processor.
 
   For Pentium 4 processors, Intel Xeon processors (family [0FH], models [03H and higher]);
     for Intel Core Solo and Intel Core Duo processors (family [06H], model [0EH]);
@@ -28,19 +28,9 @@
 
 **/
 
-#include <PiPei.h>
-#include <Ich/GenericIch.h>
+#include "TscTimerLibInternal.h"
 
-#include <Library/TimerLib.h>
-#include <Library/BaseLib.h>
-#include <Library/IoLib.h>
-#include <Library/PciLib.h>
-#include <Library/PcdLib.h>
-#include <Library/HobLib.h>
-
-#include <Guid/TscFrequency.h>
-
-/**  Get TSC frequency from TSC frequency GUID HOB, if the HOB is not found, build it.
+/**  Calculate TSC frequency.
 
   The TSC counting frequency is determined by comparing how far it counts
   during a 1ms period as determined by the ACPI timer. The ACPI timer is
@@ -49,37 +39,21 @@
   TSC is sampled, followed by waiting for 3579 clocks of the ACPI timer, or 1ms.
   The TSC is then sampled again. The difference multiplied by 1000 is the TSC
   frequency. There will be a small error because of the overhead of reading
-  the ACPI timer.
+  the ACPI timer. An attempt is made to determine and compensate for this error.
 
   @return The number of TSC counts per second.
 
 **/
 UINT64
-InternalGetTscFrequency (
+InternalCalculateTscFrequency (
   VOID
   )
 {
-  EFI_HOB_GUID_TYPE       *GuidHob;
-  VOID        *DataInHob;
   UINT64      StartTSC;
   UINT64      EndTSC;
   UINT32      TimerAddr;
   UINT32      Ticks;
   UINT64      TscFrequency;
-
-  //
-  // Get TSC frequency from TSC frequency GUID HOB.
-  //
-  GuidHob = GetFirstGuidHob (&gEfiTscFrequencyGuid);
-  if (GuidHob != NULL) {
-    DataInHob = GET_GUID_HOB_DATA (GuidHob);
-    TscFrequency = * (UINT64 *) DataInHob;
-    return TscFrequency;
-  }
-
-  //
-  // TSC frequency GUID HOB is not found, build it.
-  //
 
   //
   // If ACPI I/O space is not enabled yet, program ACPI I/O base address and enable it.
@@ -111,14 +85,6 @@ InternalGetTscFrequency (
                       (EndTSC - StartTSC),    // Number of TSC counts in 1ms
                       1000                    // Number of ms in a second
                     );
-  //
-  // TscFrequency is now equal to the number of TSC counts per second, build GUID HOB for it.
-  //
-  BuildGuidDataHob (
-    &gEfiTscFrequencyGuid,
-    &TscFrequency,
-    sizeof (UINT64)
-    );
 
   return TscFrequency;
 }

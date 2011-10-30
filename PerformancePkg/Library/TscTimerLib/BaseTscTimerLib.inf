@@ -1,5 +1,8 @@
 ## @file
-#  Dxe Timer Library which uses the Time Stamp Counter in the processor.
+#  Base Timer Library which uses the Time Stamp Counter in the processor.
+#
+#  Note: There will be 1ms penalty to get TSC frequency every time
+#    by waiting for 3579 clocks of the ACPI timer, or 1ms.
 #
 #  A version of the Timer Library using the processor's TSC.
 #  The time stamp counter in newer processors may support an enhancement, referred to as invariant TSC.
@@ -20,13 +23,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxeTscTimerLib
-  FILE_GUID                      = 95ab030f-b4fd-4ee4-92a5-9e04e87634d9
-  MODULE_TYPE                    = DXE_DRIVER
+  BASE_NAME                      = BaseTscTimerLib
+  FILE_GUID                      = D29338B9-50FE-4e4f-B7D4-A150A2C1F4FB
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = TimerLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE
-
-  CONSTRUCTOR                    = DxeTscTimerLibConstructor
+  LIBRARY_CLASS                  = TimerLib
 
 
 #
@@ -34,7 +35,8 @@
 #
 
 [Sources.common]
-  DxeTscTimerLib.c
+  TscTimerLibShare.c
+  BaseTscTimerLib.c
 
 
 [Packages]
@@ -43,16 +45,10 @@
 
 
 [LibraryClasses]
-  UefiBootServicesTableLib
   PcdLib
   PciLib
   IoLib
   BaseLib
-  UefiLib
-  DebugLib
-
-[Guids]
-  gEfiTscFrequencyGuid                          ## CONSUMES ## System Configuration Table
 
 [Pcd.common]
   gPerformancePkgTokenSpaceGuid.PcdPerfPkgAcpiIoPortBaseAddress
