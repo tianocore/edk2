@@ -937,13 +937,13 @@ PciAllocateBusNumber (
   while (BusNumberRanges->Desc != ACPI_END_TAG_DESCRIPTOR) {
     MaxNumberInRange = BusNumberRanges->AddrRangeMin + BusNumberRanges->AddrLen - 1;
     if (StartBusNumber >= BusNumberRanges->AddrRangeMin && StartBusNumber <=  MaxNumberInRange) {
-      NextNumber = StartBusNumber + NumberOfBuses;
+      NextNumber = (UINT8)(StartBusNumber + NumberOfBuses);
       while (NextNumber > MaxNumberInRange) {
         ++BusNumberRanges;
         if (BusNumberRanges->Desc == ACPI_END_TAG_DESCRIPTOR) {
           return EFI_OUT_OF_RESOURCES;
         }
-        NextNumber += (UINT8)(BusNumberRanges->AddrRangeMin - (MaxNumberInRange + 1));
+        NextNumber = (UINT8)(NextNumber + (BusNumberRanges->AddrRangeMin - (MaxNumberInRange + 1)));
         MaxNumberInRange = BusNumberRanges->AddrRangeMin + BusNumberRanges->AddrLen - 1;
       }
       *NextBusNumber = NextNumber;
