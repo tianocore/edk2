@@ -131,17 +131,14 @@ MemDetect (
   AddMemoryRangeHob (BASE_1MB, MemoryBase);
   AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
 
-  Status = MtrrSetMemoryAttribute (BASE_1MB, MemoryBase + MemorySize - BASE_1MB, CacheWriteBack);
-  ASSERT_EFI_ERROR(Status);
+  MtrrSetMemoryAttribute (BASE_1MB, MemoryBase + MemorySize - BASE_1MB, CacheWriteBack);
 
-  Status = MtrrSetMemoryAttribute (0, BASE_512KB + BASE_128KB, CacheWriteBack);
-  ASSERT_EFI_ERROR(Status);
+  MtrrSetMemoryAttribute (0, BASE_512KB + BASE_128KB, CacheWriteBack);
 
   if (UpperMemorySize != 0) {
     AddUntestedMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
 
-    Status = MtrrSetMemoryAttribute (BASE_4GB, UpperMemorySize, CacheWriteBack);
-    ASSERT_EFI_ERROR(Status);
+    MtrrSetMemoryAttribute (BASE_4GB, UpperMemorySize, CacheWriteBack);
   }
 
   return MemoryBase + MemorySize;
