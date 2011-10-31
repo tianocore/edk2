@@ -1006,14 +1006,32 @@ FindNextMenu (
   CHAR16                  NoResponse;
   EFI_INPUT_KEY           Key;
   EFI_STATUS              Status;
+  BROWSER_SETTING_SCOPE   Scope;
   
   CurrentMenu = Selection->CurrentMenu;
 
   if (CurrentMenu != NULL && CurrentMenu->Parent != NULL) {
     //
+    // we have a parent, so go to the parent menu
+    //
+    if (CompareGuid (&CurrentMenu->FormSetGuid, &CurrentMenu->Parent->FormSetGuid)) {
+      //
+      // The parent menu and current menu are in the same formset
+      //
+      Selection->Action = UI_ACTION_REFRESH_FORM;
+      Scope             = FormLevel;
+    } else {
+      Selection->Action = UI_ACTION_REFRESH_FORMSET;
+      CopyMem (&Selection->FormSetGuid, &CurrentMenu->Parent->FormSetGuid, sizeof (EFI_GUID));
+      Selection->Handle = CurrentMenu->Parent->HiiHandle;
+      Scope             = FormSetLevel;
+    }
+
+    //
     // Form Level Check whether the data is changed.
     //
-    if (gBrowserSettingScope == FormLevel && Selection->Form->NvUpdateRequired) {
+    if ((gBrowserSettingScope == FormLevel && Selection->Form->NvUpdateRequired) ||
+        (gBrowserSettingScope == FormSetLevel && IsNvUpdateRequired(Selection->FormSet) && Scope == FormSetLevel)) {
       Status      = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
   
       YesResponse = gYesResponse[0];
@@ -1050,26 +1068,15 @@ FindNextMenu (
         //
         // If the user hits the YesResponse key
         //
-        Status = SubmitForm (Selection->FormSet, Selection->Form, FormLevel);
+        Status = SubmitForm (Selection->FormSet, Selection->Form, Scope);
       } else {
         //
         // If the user hits the NoResponse key
         //
-        Status = DiscardForm (Selection->FormSet, Selection->Form, FormLevel);
+        Status = DiscardForm (Selection->FormSet, Selection->Form, Scope);
       }
     }
 
-    //
-    // we have a parent, so go to the parent menu
-    //
-    if (CompareGuid (&CurrentMenu->FormSetGuid, &CurrentMenu->Parent->FormSetGuid)) {
-      //
-      // The parent menu and current menu are in the same formset
-      //
-      Selection->Action = UI_ACTION_REFRESH_FORM;
-    } else {
-      Selection->Action = UI_ACTION_REFRESH_FORMSET;
-    }
     Selection->Statement = NULL;
 
     Selection->FormId = CurrentMenu->Parent->FormId;

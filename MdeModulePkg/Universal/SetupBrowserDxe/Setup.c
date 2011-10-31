@@ -322,11 +322,6 @@ SendForm (
       CopyMem (&Selection->FormSetGuid, &gEfiHiiPlatformSetupFormsetGuid, sizeof (EFI_GUID));
     }
 
-    //
-    // Try to find pre FormSet in the maintain backup list.
-    //
-    gOldFormSet = GetFormSetFromHiiHandle (Selection->Handle);
-
     do {
       FormSet = AllocateZeroPool (sizeof (FORM_BROWSER_FORMSET));
       ASSERT (FormSet != NULL);
@@ -340,6 +335,11 @@ SendForm (
         break;
       }
       Selection->FormSet = FormSet;
+
+      //
+      // Try to find pre FormSet in the maintain backup list.
+      //
+      gOldFormSet = GetFormSetFromHiiHandle (Selection->Handle);
 
       //
       // Display this formset

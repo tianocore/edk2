@@ -175,6 +175,7 @@ UiFreeMenu (
   of the given parent menu.
 
   @param  Parent                 The parent of menu to be added.
+  @param  HiiHandle              Hii handle related to this formset.
   @param  FormSetGuid            The Formset Guid of menu to be added.
   @param  FormId                 The Form ID of menu to be added.
 
@@ -184,6 +185,7 @@ UiFreeMenu (
 UI_MENU_LIST *
 UiAddMenuList (
   IN OUT UI_MENU_LIST     *Parent,
+  IN EFI_HII_HANDLE       HiiHandle,
   IN EFI_GUID             *FormSetGuid,
   IN UINT16               FormId
   )
@@ -198,6 +200,7 @@ UiAddMenuList (
   MenuList->Signature = UI_MENU_LIST_SIGNATURE;
   InitializeListHead (&MenuList->ChildListHead);
 
+  MenuList->HiiHandle = HiiHandle;
   CopyMem (&MenuList->FormSetGuid, FormSetGuid, sizeof (EFI_GUID));
   MenuList->FormId = FormId;
   MenuList->Parent = Parent;
@@ -216,9 +219,10 @@ UiAddMenuList (
 
 
 /**
-  Search Menu with given FormId in the parent menu and all its child menus.
+  Search Menu with given FormId and FormSetGuid in all cached menu list.
 
   @param  Parent                 The parent of menu to search.
+  @param  FormSetGuid            The Formset GUID of the menu to search.  
   @param  FormId                 The Form ID of menu to search.
 
   @return A pointer to menu found or NULL if not found.
@@ -227,6 +231,7 @@ UiAddMenuList (
 UI_MENU_LIST *
 UiFindChildMenuList (
   IN UI_MENU_LIST         *Parent,
+  IN EFI_GUID             *FormSetGuid, 
   IN UINT16               FormId
   )
 {
@@ -234,7 +239,9 @@ UiFindChildMenuList (
   UI_MENU_LIST    *Child;
   UI_MENU_LIST    *MenuList;
 
-  if (Parent->FormId == FormId) {
+  ASSERT (Parent != NULL);
+
+  if (Parent->FormId == FormId && CompareGuid (FormSetGuid, &Parent->FormSetGuid)) {
     return Parent;
   }
 
@@ -242,7 +249,7 @@ UiFindChildMenuList (
   while (!IsNull (&Parent->ChildListHead, Link)) {
     Child = UI_MENU_LIST_FROM_LINK (Link);
 
-    MenuList = UiFindChildMenuList (Child, FormId);
+    MenuList = UiFindChildMenuList (Child, FormSetGuid, FormId);
     if (MenuList != NULL) {
       return MenuList;
     }
@@ -277,14 +284,9 @@ UiFindMenuList (
   while (!IsNull (&gMenuList, Link)) {
     MenuList = UI_MENU_LIST_FROM_LINK (Link);
 
-    if (CompareGuid (FormSetGuid, &MenuList->FormSetGuid)) {
-      //
-      // This is the formset we are looking for, find the form in this formset
-      //
-      Child = UiFindChildMenuList (MenuList, FormId);
-      if (Child != NULL) {
-        return Child;
-      }
+    Child = UiFindChildMenuList(MenuList, FormSetGuid, FormId);
+    if (Child != NULL) {
+      return Child;
     }
 
     Link = GetNextNode (&gMenuList, Link);
@@ -1665,6 +1667,112 @@ DevicePathToHiiHandle (
 }
 
 /**
+  Find HII Handle in the HII database associated with given form set guid.
+
+  If FormSetGuid is NULL, then ASSERT.
+
+  @param  ComparingGuid          FormSet Guid associated with the HII package list
+                                 handle.
+
+  @retval Handle                 HII package list Handle associated with the Device
+                                        Path.
+  @retval NULL                   Hii Package list handle is not found.
+
+**/
+EFI_HII_HANDLE
+FormSetGuidToHiiHandle (
+  EFI_GUID     *ComparingGuid
+  )
+{
+  EFI_HII_HANDLE               *HiiHandles;
+  UINTN                        Index;
+  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
+  UINTN                        BufferSize;
+  UINT32                       Offset;
+  UINT32                       Offset2;
+  UINT32                       PackageListLength;
+  EFI_HII_PACKAGE_HEADER       PackageHeader;
+  UINT8                        *Package;
+  UINT8                        *OpCodeData;
+  EFI_STATUS                   Status;
+  EFI_HII_HANDLE               HiiHandle;
+
+  ASSERT (ComparingGuid != NULL);
+
+  HiiHandle  = NULL;
+  //
+  // Get all the Hii handles
+  //
+  HiiHandles = HiiGetHiiHandles (NULL);
+  ASSERT (HiiHandles != NULL);
+
+  //
+  // Search for formset of each class type
+  //
+  for (Index = 0; HiiHandles[Index] != NULL; Index++) {
+    BufferSize = 0;
+    HiiPackageList = NULL;
+    Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, HiiHandles[Index], &BufferSize, HiiPackageList);
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      HiiPackageList = AllocatePool (BufferSize);
+      ASSERT (HiiPackageList != NULL);
+
+      Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, HiiHandles[Index], &BufferSize, HiiPackageList);
+    }
+    if (EFI_ERROR (Status) || HiiPackageList == NULL) {
+      return NULL;
+    }
+
+    //
+    // Get Form package from this HII package List
+    //
+    Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
+    Offset2 = 0;
+    CopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32)); 
+
+    while (Offset < PackageListLength) {
+      Package = ((UINT8 *) HiiPackageList) + Offset;
+      CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
+
+      if (PackageHeader.Type == EFI_HII_PACKAGE_FORMS) {
+        //
+        // Search FormSet in this Form Package
+        //
+        Offset2 = sizeof (EFI_HII_PACKAGE_HEADER);
+        while (Offset2 < PackageHeader.Length) {
+          OpCodeData = Package + Offset2;
+
+          if (((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_FORM_SET_OP) {
+            //
+            // Try to compare against formset GUID
+            //
+            if (CompareGuid (ComparingGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
+              HiiHandle = HiiHandles[Index];
+              break;
+            }
+          }
+
+          Offset2 += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
+        }
+      }
+      if (HiiHandle != NULL) {
+        break;
+      }
+      Offset += PackageHeader.Length;
+    }
+    
+    FreePool (HiiPackageList);
+  	if (HiiHandle != NULL) {
+  		break;
+  	}
+  }
+
+  FreePool (HiiHandles);
+
+  return HiiHandle;
+}
+
+/**
   Process the goto op code, update the info in the selection structure.
 
   @param Statement    The statement belong to goto op code.
@@ -1694,8 +1802,10 @@ ProcessGotoOpCode (
   EFI_INPUT_KEY                   Key;
   EFI_STATUS                      Status;
   UI_MENU_LIST                    *MenuList;
+  BOOLEAN                         UpdateFormInfo;
   
   Status = EFI_SUCCESS;
+  UpdateFormInfo = TRUE;
 
   if (Statement->HiiValue.Value.ref.DevicePath != 0) {
     if (Selection->Form->ModalForm) {
@@ -1763,6 +1873,16 @@ ProcessGotoOpCode (
     // Goto another Formset, check for uncommitted data
     //
     Selection->Action = UI_ACTION_REFRESH_FORMSET;
+    
+    Selection->Handle = FormSetGuidToHiiHandle(&Statement->HiiValue.Value.ref.FormSetGuid);
+    if (Selection->Handle == NULL) {
+      //
+      // If target Hii Handle not found, exit
+      //
+      Selection->Action = UI_ACTION_EXIT;
+      Selection->Statement = NULL;
+      return Status;
+    } 
 
     CopyMem (&Selection->FormSetGuid, &Statement->HiiValue.Value.ref.FormSetGuid, sizeof (EFI_GUID));
     Selection->FormId = Statement->HiiValue.Value.ref.FormId;
@@ -1798,14 +1918,6 @@ ProcessGotoOpCode (
     //
     Selection->Action = UI_ACTION_REFRESH_FORM;
 
-    //
-    // Link current form so that we can always go back when someone hits the ESC
-    //
-    MenuList = UiFindMenuList (&Selection->FormSetGuid, Statement->HiiValue.Value.ref.FormId);
-    if (MenuList == NULL && Selection->CurrentMenu != NULL) {
-      MenuList = UiAddMenuList (Selection->CurrentMenu, &Selection->FormSetGuid, Statement->HiiValue.Value.ref.FormId);
-    }
-
     Selection->FormId = Statement->HiiValue.Value.ref.FormId;
     Selection->QuestionId = Statement->HiiValue.Value.ref.QuestionId;
   } else if (Statement->HiiValue.Value.ref.QuestionId != 0) {
@@ -1824,9 +1936,21 @@ ProcessGotoOpCode (
         *NewLine = TRUE;
       }
     }
+    UpdateFormInfo = FALSE;
   } else {
     if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) {
       Selection->Action = UI_ACTION_REFRESH_FORM;
+    }
+    UpdateFormInfo = FALSE;
+  }
+
+  if (UpdateFormInfo) {
+    //
+    // Link current form so that we can always go back when someone hits the ESC
+    //
+    MenuList = UiFindMenuList (&Selection->FormSetGuid, Selection->FormId);
+    if (MenuList == NULL && Selection->CurrentMenu != NULL) {
+      MenuList = UiAddMenuList (Selection->CurrentMenu, Selection->Handle, &Selection->FormSetGuid, Selection->FormId);
     }
   }
 
@@ -1953,7 +2077,7 @@ UiDisplayMenu (
     //
     // Current menu not found, add it to the menu tree
     //
-    CurrentMenu = UiAddMenuList (NULL, &Selection->FormSetGuid, Selection->FormId);
+    CurrentMenu = UiAddMenuList (NULL, Selection->Handle, &Selection->FormSetGuid, Selection->FormId);
   }
   ASSERT (CurrentMenu != NULL);
   Selection->CurrentMenu = CurrentMenu;

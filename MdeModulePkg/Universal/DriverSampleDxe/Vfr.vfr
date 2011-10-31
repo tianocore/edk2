@@ -494,6 +494,13 @@ formset
       prompt = STRING_TOKEN(STR_GOTO_FORM6), //SixthSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
       help   = STRING_TOKEN(STR_GOTO_HELP);
 
+    goto 
+      formsetguid = DRIVER_SAMPLE_INVENTORY_GUID,
+      formid  = 0x1,
+      question = 0x1,
+      prompt  = STRING_TOKEN(STR_GOTO_ANOTHER_FORMSET),
+      help    = STRING_TOKEN(STR_GOTO_ANOTHER_FORMSET_HELP);
+
     guidop 
       guid = DRIVER_SAMPLE_FORMSET_GUID,
       datatype = MY_EFI_VARSTORE_DATA,

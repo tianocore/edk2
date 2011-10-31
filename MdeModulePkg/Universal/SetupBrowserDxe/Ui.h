@@ -160,6 +160,7 @@ struct _UI_MENU_LIST {
   UINTN           Signature;
   LIST_ENTRY      Link;
 
+  EFI_HII_HANDLE  HiiHandle;
   EFI_GUID        FormSetGuid;
   UINT16          FormId;
   UINT16          QuestionId;
@@ -233,6 +234,7 @@ UiFreeMenu (
   of the given parent menu.
 
   @param  Parent                 The parent of menu to be added.
+  @param  HiiHandle              Hii handle related to this formset.
   @param  FormSetGuid            The Formset Guid of menu to be added.
   @param  FormId                 The Form ID of menu to be added.
 
@@ -242,6 +244,7 @@ UiFreeMenu (
 UI_MENU_LIST *
 UiAddMenuList (
   IN OUT UI_MENU_LIST     *Parent,
+  IN EFI_HII_HANDLE       HiiHandle,
   IN EFI_GUID             *FormSetGuid,
   IN UINT16               FormId
   );
@@ -250,6 +253,7 @@ UiAddMenuList (
   Search Menu with given FormId in the parent menu and all its child menus.
 
   @param  Parent                 The parent of menu to search.
+  @param  FormSetGuid            The Formset GUID of the menu to search.  
   @param  FormId                 The Form ID of menu to search.
 
   @return A pointer to menu found or NULL if not found.
@@ -258,6 +262,7 @@ UiAddMenuList (
 UI_MENU_LIST *
 UiFindChildMenuList (
   IN UI_MENU_LIST         *Parent,
+  IN EFI_GUID             *FormSetGuid, 
   IN UINT16               FormId
   );
 
