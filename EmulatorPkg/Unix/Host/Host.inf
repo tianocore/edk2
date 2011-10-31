@@ -113,18 +113,20 @@
 
 
 [BuildOptions]
-   GCC:*_*_IA32_DLINK_FLAGS == -o $(BIN_DIR)/Host -m elf_i386 -dynamic-linker /lib$(LIB_ARCH_SFX)/ld-linux.so.2 /usr/lib$(LIB_ARCH_SFX)/crt1.o /usr/lib$(LIB_ARCH_SFX)/crti.o -L/usr/X11R6/lib -lXext -lX11 /usr/lib$(LIB_ARCH_SFX)/crtn.o
-   GCC:*_*_*_DLINK2_FLAGS == -lpthread -lc
+   GCC:*_*_IA32_DLINK_FLAGS == -o $(BIN_DIR)/Host -m elf_i386 -dynamic-linker $(HOST_DLINK_PATHS) -L/usr/X11R6/lib -lXext -lX11
    GCC:*_*_IA32_CC_FLAGS == -m32 -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -idirafter/usr/include -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
    GCC:*_*_IA32_PP_FLAGS == -m32 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
    GCC:*_*_IA32_ASM_FLAGS == -m32 -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 
-   GCC:*_*_X64_DLINK_FLAGS == -o $(BIN_DIR)/Host -m elf_x86_64 -dynamic-linker /lib$(LIB_ARCH_SFX)/ld-linux-x86-64.so.2 /usr/lib$(LIB_ARCH_SFX)/crt1.o /usr/lib$(LIB_ARCH_SFX)/crti.o -L/usr/X11R6/lib -lXext -lX11 /usr/lib$(LIB_ARCH_SFX)/crtn.o
+   GCC:*_*_X64_DLINK_FLAGS == -o $(BIN_DIR)/Host -m elf_x86_64 -dynamic-linker $(HOST_DLINK_PATHS) -L/usr/X11R6/lib -lXext -lX11
    GCC:*_*_X64_CC_FLAGS == -m64 -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -idirafter/usr/include -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
    GCC:*_GCC44_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
    GCC:*_GCC45_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
+   GCC:*_GCC46_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
    GCC:*_*_X64_PP_FLAGS == -m64 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
    GCC:*_*_X64_ASM_FLAGS == -m64 -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
+
+   GCC:*_*_*_DLINK2_FLAGS == -lpthread -lc
 
 #
 # Need to do this link via gcc and not ld as the pathing to libraries changes from OS version to OS version

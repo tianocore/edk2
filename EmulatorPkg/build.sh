@@ -159,19 +159,27 @@ case $PROCESSOR in
   IA32)
     ARCH_SIZE=32
     BUILD_OUTPUT_DIR=$WORKSPACE/Build/Emulator32
-    if [ -d /lib32 ]; then
-      export LIB_ARCH_SFX=32
-    fi
+    LIB_NAMES="ld-linux.so.2 crt1.o crti.o crtn.o"
+    LIB_SEARCH_PATHS="/usr/lib/i386-linux-gnu /usr/lib32 /lib32 /usr/lib /lib"
     ;;
   X64)
     ARCH_SIZE=64
     BUILD_OUTPUT_DIR=$WORKSPACE/Build/Emulator
-    if [ -d /lib64 ]; then
-      export LIB_ARCH_SFX=64
-    fi
+    LIB_NAMES="ld-linux-x86-64.so.2 crt1.o crti.o crtn.o"
+    LIB_SEARCH_PATHS="/usr/lib/x86_64-linux-gnu /usr/lib64 /lib64 /usr/lib /lib"
     ;;
 esac
 
+for libname in $LIB_NAMES
+do
+  for dirname in $LIB_SEARCH_PATHS
+  do
+    if [ -e $dirname/$libname ]; then
+      export HOST_DLINK_PATHS="$HOST_DLINK_PATHS $dirname/$libname"
+      break
+    fi
+  done
+done
 
 PLATFORMFILE=$WORKSPACE/EmulatorPkg/EmulatorPkg.dsc
 BUILD_ROOT_ARCH=$BUILD_OUTPUT_DIR/DEBUG_"$TARGET_TOOLS"/$PROCESSOR
