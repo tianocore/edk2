@@ -714,7 +714,7 @@ InitializeMtrrMask (
 **/
 UINT64
 GetMemorySpaceAttributeFromMtrrType (
-  IN MTRR_MEMORY_CACHE_TYPE  MtrrAttributes
+  IN UINT8                MtrrAttributes
   )
 {
   switch (MtrrAttributes) {
@@ -879,14 +879,14 @@ RefreshGcdMemoryAttributes (
   UINT64                              Length;
   UINT64                              Attributes;
   UINT64                              CurrentAttributes;
-  MTRR_MEMORY_CACHE_TYPE              MtrrType;
+  UINT8                               MtrrType;
   UINTN                               NumberOfDescriptors;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR     *MemorySpaceMap;
   UINT64                              DefaultAttributes;
   VARIABLE_MTRR                       VariableMtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
   MTRR_FIXED_SETTINGS                 MtrrFixedSettings;
   UINT32                              FirmwareVariableMtrrCount;
-  MTRR_MEMORY_CACHE_TYPE              DefaultMemoryType;
+  UINT8                               DefaultMemoryType;
 
   if (!IsMtrrSupported ()) {
     return;
@@ -921,7 +921,7 @@ RefreshGcdMemoryAttributes (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  DefaultMemoryType = MtrrGetDefaultMemoryType ();
+  DefaultMemoryType = (UINT8) MtrrGetDefaultMemoryType ();
   DefaultAttributes = GetMemorySpaceAttributeFromMtrrType (DefaultMemoryType);
 
   //
@@ -962,7 +962,7 @@ RefreshGcdMemoryAttributes (
     if (VariableMtrr[Index].Valid &&                          
         VariableMtrr[Index].Type != MTRR_CACHE_WRITE_BACK &&
         VariableMtrr[Index].Type != MTRR_CACHE_UNCACHEABLE) {
-      Attributes = GetMemorySpaceAttributeFromMtrrType ((MTRR_MEMORY_CACHE_TYPE) VariableMtrr[Index].Type);
+      Attributes = GetMemorySpaceAttributeFromMtrrType ((UINT8) VariableMtrr[Index].Type);
       SetGcdMemorySpaceAttributes (
         MemorySpaceMap,
         NumberOfDescriptors,
@@ -1002,7 +1002,7 @@ RefreshGcdMemoryAttributes (
     // Check for continuous fixed MTRR sections
     //
     for (SubIndex = 0; SubIndex < 8; SubIndex++) {
-      MtrrType = (MTRR_MEMORY_CACHE_TYPE) RShiftU64 (RegValue, SubIndex * 8);
+      MtrrType = (UINT8) RShiftU64 (RegValue, SubIndex * 8);
       CurrentAttributes = GetMemorySpaceAttributeFromMtrrType (MtrrType);
       if (Length == 0) {
         //
