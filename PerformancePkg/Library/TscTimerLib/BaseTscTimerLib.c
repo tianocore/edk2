@@ -30,8 +30,6 @@
 
 #include "TscTimerLibInternal.h"
 
-UINT64  mTscFrequency = 0;
-
 /**  Get TSC frequency.
 
   @return The number of TSC counts per second.
@@ -42,16 +40,6 @@ InternalGetTscFrequency (
   VOID
   )
 {
-  UINT64    TscFrequency;
-
-  if (mTscFrequency != 0) {
-    return mTscFrequency;
-  }
-
-  TscFrequency = InternalCalculateTscFrequency ();
-
-  mTscFrequency = TscFrequency;
-
-  return TscFrequency;
+  return InternalCalculateTscFrequency ();
 }
 
