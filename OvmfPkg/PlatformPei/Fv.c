@@ -1,7 +1,7 @@
 /** @file
   Build FV related hobs for platform.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -33,8 +33,6 @@ PeiFvInitialization (
   VOID
   )
 {
-  EFI_PHYSICAL_ADDRESS        FdBase;
-
   DEBUG ((EFI_D_ERROR, "Platform PEI Firmware Volume Initialization\n"));
 
   DEBUG (
@@ -44,7 +42,6 @@ PeiFvInitialization (
       )
     );
 
-  FdBase = PcdGet32 (PcdOvmfMemFvBase) - PcdGet32 (PcdVariableStoreSize) - PcdGet32 (PcdFlashNvStorageFtwSpareSize);
   BuildFvHob (PcdGet32 (PcdOvmfMemFvBase), PcdGet32 (PcdOvmfMemFvSize));
 
   //

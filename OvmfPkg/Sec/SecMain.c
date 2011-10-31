@@ -98,11 +98,9 @@ FindMainFv (
 {
   EFI_FIRMWARE_VOLUME_HEADER  *Fv;
   UINTN                       Distance;
-  BOOLEAN                     Found;
 
   ASSERT (((UINTN) *BootFv & EFI_PAGE_MASK) == 0);
 
-  Found = FALSE;
   Fv = *BootFv;
   Distance = (UINTN) (*BootFv)->FvLength;
   do {

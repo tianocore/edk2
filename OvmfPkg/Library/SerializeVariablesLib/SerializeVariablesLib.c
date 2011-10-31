@@ -137,7 +137,6 @@ IterateVariablesInBuffer (
   )
 {
   RETURN_STATUS Status;
-  UINTN         Count;
   UINTN         TotalSizeUsed;
   UINTN         SizeUsed;
 
@@ -160,7 +159,7 @@ IterateVariablesInBuffer (
   Data = NULL;
 
   for (
-    Status = EFI_SUCCESS, Count = 0, TotalSizeUsed = 0;
+    Status = EFI_SUCCESS, TotalSizeUsed = 0;
     !EFI_ERROR (Status) && (TotalSizeUsed < MaxSize);
     ) {
     Status = UnpackVariableFromBuffer (
