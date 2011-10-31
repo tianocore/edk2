@@ -374,7 +374,6 @@ CpuMpServicesStartupAllAps (
 {
   EFI_STATUS            Status;
   PROCESSOR_DATA_BLOCK  *ProcessorData;
-  UINTN                 ListIndex;
   UINTN                 Number;
   UINTN                 NextNumber;
   PROCESSOR_STATE       APInitialState;
@@ -411,7 +410,6 @@ CpuMpServicesStartupAllAps (
 
   Timeout = TimeoutInMicroseconds;
 
-  ListIndex                   = 0;
   ProcessorData               = NULL;
 
   gMPSystem.FinishCount   = 0;
@@ -650,7 +648,6 @@ CpuMpServicesStartupThisAP (
   OUT BOOLEAN                   *Finished               OPTIONAL
   )
 {
-  EFI_STATUS      Status;
   INTN            Timeout;
 
   if (!IsBSP ()) {
@@ -685,13 +682,13 @@ CpuMpServicesStartupThisAP (
   SetApProcedure (&gMPSystem.ProcessorData[ProcessorNumber], Procedure, ProcedureArgument);
 
   if (WaitEvent != NULL) {
-      // Non Blocking
-      gMPSystem.WaitEvent = WaitEvent;
-      Status = gBS->SetTimer (
-                      gMPSystem.ProcessorData[ProcessorNumber].CheckThisAPEvent,
-                      TimerPeriodic,
-                      gPollInterval
-                      );
+    // Non Blocking
+    gMPSystem.WaitEvent = WaitEvent;
+    gBS->SetTimer (
+           gMPSystem.ProcessorData[ProcessorNumber].CheckThisAPEvent,
+           TimerPeriodic,
+           gPollInterval
+           );
     return EFI_SUCCESS;
   }
 
@@ -1155,10 +1152,6 @@ FillInProcessorInformation (
   IN     UINTN                ProcessorNumber
   )
 {
-  PROCESSOR_DATA_BLOCK            *ProcessorData;
-
-  ProcessorData = &gMPSystem.ProcessorData[ProcessorNumber];
-
   gMPSystem.ProcessorData[ProcessorNumber].Info.ProcessorId  = gThread->Self ();
   gMPSystem.ProcessorData[ProcessorNumber].Info.StatusFlag   = PROCESSOR_ENABLED_BIT | PROCESSOR_HEALTH_STATUS_BIT;
   if (BSP) {

@@ -300,10 +300,6 @@ EmuGopSimpleTextInExResetEx (
 
 **/
 {
-  GOP_PRIVATE_DATA *Private;
-
-  Private = GOP_PRIVATE_DATA_FROM_TEXT_IN_EX_THIS (This);
-
   return EFI_SUCCESS;
 }
 

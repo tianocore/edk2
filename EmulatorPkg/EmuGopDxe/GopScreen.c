@@ -1,6 +1,6 @@
 /*++ @file
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2010 - 2011, Apple Inc. All rights reserved.
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -368,11 +368,8 @@ EmuGopDestructor (
   GOP_PRIVATE_DATA     *Private
   )
 {
-  EFI_STATUS  Status;
-
-  Status = EFI_SUCCESS;
   if (!Private->HardwareNeedsStarting) {
-    Status = Private->EmuIoThunk->Close (Private->EmuIoThunk);
+    Private->EmuIoThunk->Close (Private->EmuIoThunk);
     Private->EmuGraphicsWindow = NULL;
   }
 
@@ -414,7 +411,6 @@ Returns:
 
 **/
 {
-  EFI_STATUS  Status;
-  Status = EmuGopDestructor (Context);
+  EmuGopDestructor (Context);
 }
 
