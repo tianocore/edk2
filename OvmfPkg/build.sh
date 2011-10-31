@@ -67,8 +67,19 @@ case `uname` in
       fi
       ;;
   Linux*)
-    TARGET_TOOLS=GCC44
-    ;;
+    gcc_version=$(gcc -v 2>&1 | tail -1 | awk '{print $3}')
+    case $gcc_version in
+      4.5.*)
+        TARGET_TOOLS=GCC45
+        ;;
+      4.6.*)
+        TARGET_TOOLS=GCC46
+        ;;
+      *)
+        TARGET_TOOLS=GCC44
+        exit 1
+        ;;
+    esac
 esac
 
 #
