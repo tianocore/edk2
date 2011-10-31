@@ -1134,7 +1134,6 @@ InternalPrintLibSPrintMarker (
   IN  BASE_LIST    BaseListMarker  OPTIONAL
   )
 {
-  CHAR8             *OriginalBuffer;
   CHAR8             *EndBuffer;
   CHAR8             ValueBuffer[MAXIMUM_VALUE_CHARACTERS];
   UINT32            BytesPerOutputCharacter;
@@ -1185,7 +1184,6 @@ InternalPrintLibSPrintMarker (
   // Reserve space for the Null terminator.
   //
   BufferSize--;
-  OriginalBuffer = Buffer;
 
   //
   // Set the tag for the end of the input Buffer.

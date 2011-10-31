@@ -534,10 +534,8 @@ UsbBootGetParams (
 {
   EFI_BLOCK_IO_MEDIA          *Media;
   EFI_STATUS                  Status;
-  UINT8                       CmdSet;
 
   Media  = &(UsbMass->BlockIoMedia);
-  CmdSet = ((EFI_USB_INTERFACE_DESCRIPTOR *) (UsbMass->Context))->InterfaceSubClass;
 
   Status = UsbBootInquiry (UsbMass);
   if (EFI_ERROR (Status)) {

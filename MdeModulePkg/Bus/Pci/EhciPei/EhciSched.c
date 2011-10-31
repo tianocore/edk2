@@ -2,7 +2,7 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -264,7 +264,6 @@ EhcUnlinkQhFromAsync (
   )
 {
   PEI_EHC_QH              *Head;
-  EFI_STATUS              Status;
 
   ASSERT (Ehc->ReclaimHead->NextQh == Qh);
 
@@ -283,7 +282,7 @@ EhcUnlinkQhFromAsync (
   //
   // Set and wait the door bell to synchronize with the hardware
   //
-  Status = EhcSetAndWaitDoorBell (Ehc, EHC_GENERIC_TIMEOUT);
+  EhcSetAndWaitDoorBell (Ehc, EHC_GENERIC_TIMEOUT);
   
   return;
 }
@@ -804,8 +803,7 @@ EhcMoniteAsyncRequests (
   BOOLEAN                 Finished;
   UINT8                   *ProcBuf;
   PEI_URB                 *Urb;
-  EFI_STATUS              Status;
-  UINTN               PageNumber;
+  UINTN                   PageNumber;
 
   Ehc     = (PEI_USB2_HC_DEV *) Context;
 
@@ -826,7 +824,7 @@ EhcMoniteAsyncRequests (
     // Flush any PCI posted write transactions from a PCI host 
     // bridge to system memory.
     //
-    Status = EhcFlushAsyncIntMap (Ehc, Urb);
+    EhcFlushAsyncIntMap (Ehc, Urb);
     
     //
     // Allocate a buffer then copy the transferred data for user.
@@ -838,11 +836,11 @@ EhcMoniteAsyncRequests (
     if (Urb->Result == EFI_USB_NOERROR) {
       ASSERT (Urb->Completed <= Urb->DataLen);
       PageNumber =  Urb->Completed/PAGESIZE +1;
-      Status = PeiServicesAllocatePages (
-                 EfiBootServicesCode,
-                 PageNumber,
-                 (EFI_PHYSICAL_ADDRESS *)ProcBuf
-                 );
+      PeiServicesAllocatePages (
+        EfiBootServicesCode,
+        PageNumber,
+        (EFI_PHYSICAL_ADDRESS *)ProcBuf
+        );
       if (ProcBuf == NULL) {
         EhcUpdateAsyncRequest (Urb);
         continue;

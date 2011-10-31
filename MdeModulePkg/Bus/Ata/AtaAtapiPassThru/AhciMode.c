@@ -1389,15 +1389,12 @@ AhciReset (
   IN  UINT64                    Timeout
   )    
 {
-  EFI_STATUS             Status;
   UINT32                 Delay;
   UINT32                 Value;
 
   AhciOrReg (PciIo, EFI_AHCI_GHC_OFFSET, EFI_AHCI_GHC_ENABLE);
 
   AhciOrReg (PciIo, EFI_AHCI_GHC_OFFSET, EFI_AHCI_GHC_RESET);
-
-  Status  = EFI_TIMEOUT;
 
   Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
 
@@ -2137,8 +2134,6 @@ AhciModeInitialization (
   UINT32                           Capability;
   UINT8                            MaxPortNumber;
   UINT32                           PortImplementBitMap;
-  UINT8                            MaxCommandSlotNumber;
-  BOOLEAN                          Support64Bit;
 
   EFI_AHCI_REGISTERS               *AhciRegisters;
 
@@ -2178,9 +2173,7 @@ AhciModeInitialization (
   //
   // Get the number of command slots per port supported by this HBA.
   //
-  MaxCommandSlotNumber = (UINT8) (((Capability & 0x1F00) >> 8) + 1);
   MaxPortNumber        = (UINT8) ((Capability & 0x1F) + 1);
-  Support64Bit         = (BOOLEAN) (((Capability & EFI_AHCI_CAP_S64A) != 0) ? TRUE : FALSE);
 
   //
   // Get the bit map of those ports exposed by this HBA.

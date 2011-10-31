@@ -1482,7 +1482,6 @@ AtaUdmaInOut (
   EFI_PCI_IO_PROTOCOL_OPERATION PciIoOperation;
 
   UINT8                         DeviceHead;
-  UINT8                         AtaCommand;
   EFI_PCI_IO_PROTOCOL           *PciIo;
   EFI_TPL                       OldTpl;
 
@@ -1639,7 +1638,6 @@ AtaUdmaInOut (
     // Start to enable the DMA operation
     //
     DeviceHead = AtaCommandBlock->AtaDeviceHead;
-    AtaCommand = AtaCommandBlock->AtaCommand;
 
     IdeWritePortB (PciIo, IdeRegisters->Head, (UINT8)(0xe0 | DeviceHead));
 
@@ -2797,7 +2795,6 @@ IdeModeInitialization (
   IN  ATA_ATAPI_PASS_THRU_INSTANCE    *Instance
   )
 {
-  BOOLEAN                           EnumAll;
   EFI_STATUS                        Status;
   EFI_IDE_CONTROLLER_INIT_PROTOCOL  *IdeInit;
   EFI_PCI_IO_PROTOCOL               *PciIo;
@@ -2808,7 +2805,6 @@ IdeModeInitialization (
 
   IdeInit = Instance->IdeControllerInit;
   PciIo   = Instance->PciIo;
-  EnumAll = IdeInit->EnumAll;
   Channel = IdeInit->ChannelCount;
 
   //

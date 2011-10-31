@@ -1005,7 +1005,6 @@ FindNextMenu (
   CHAR16                  YesResponse;
   CHAR16                  NoResponse;
   EFI_INPUT_KEY           Key;
-  EFI_STATUS              Status;
   BROWSER_SETTING_SCOPE   Scope;
   
   CurrentMenu = Selection->CurrentMenu;
@@ -1032,7 +1031,7 @@ FindNextMenu (
     //
     if ((gBrowserSettingScope == FormLevel && Selection->Form->NvUpdateRequired) ||
         (gBrowserSettingScope == FormSetLevel && IsNvUpdateRequired(Selection->FormSet) && Scope == FormSetLevel)) {
-      Status      = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+      gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
   
       YesResponse = gYesResponse[0];
       NoResponse  = gNoResponse[0];
@@ -1068,12 +1067,12 @@ FindNextMenu (
         //
         // If the user hits the YesResponse key
         //
-        Status = SubmitForm (Selection->FormSet, Selection->Form, Scope);
+        SubmitForm (Selection->FormSet, Selection->Form, Scope);
       } else {
         //
         // If the user hits the NoResponse key
         //
-        Status = DiscardForm (Selection->FormSet, Selection->Form, Scope);
+        DiscardForm (Selection->FormSet, Selection->Form, Scope);
       }
     }
 
@@ -1101,7 +1100,7 @@ FindNextMenu (
   // We are going to leave current FormSet, so check uncommited data in this FormSet
   //
   if (gBrowserSettingScope != SystemLevel && IsNvUpdateRequired(Selection->FormSet)) {
-    Status      = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
 
     YesResponse = gYesResponse[0];
     NoResponse  = gNoResponse[0];
@@ -1138,12 +1137,12 @@ FindNextMenu (
       //
       // If the user hits the YesResponse key
       //
-      Status = SubmitForm (Selection->FormSet, Selection->Form, FormSetLevel);
+      SubmitForm (Selection->FormSet, Selection->Form, FormSetLevel);
     } else {
       //
       // If the user hits the NoResponse key
       //
-      Status = DiscardForm (Selection->FormSet, Selection->Form, FormSetLevel);
+      DiscardForm (Selection->FormSet, Selection->Form, FormSetLevel);
     }
   }
 

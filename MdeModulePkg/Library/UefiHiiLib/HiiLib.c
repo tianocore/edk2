@@ -1630,12 +1630,11 @@ InternalHiiIfrValueAction (
   EFI_GUID       *VarGuid;
   EFI_STRING     VarName;
 
-  UINT8                        *PackageData;
   EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
   UINTN                        PackageListLength;
   EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL     *TempDevicePath;
-  
+
   ConfigAltResp = NULL;
   ConfigResp    = NULL;
   VarGuid       = NULL;
@@ -1646,7 +1645,6 @@ InternalHiiIfrValueAction (
   Index            = 0;
   TempDriverHandle = NULL;
   HiiHandle        = NULL;
-  PackageData      = NULL;
   HiiPackageList   = NULL;
   
   //

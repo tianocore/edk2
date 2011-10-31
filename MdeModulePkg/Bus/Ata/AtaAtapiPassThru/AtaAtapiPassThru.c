@@ -658,13 +658,11 @@ AtaAtapiPassThruStart (
   ATA_ATAPI_PASS_THRU_INSTANCE      *Instance;
   EFI_PCI_IO_PROTOCOL               *PciIo;
   UINT64                            Supports;
-  BOOLEAN                           PciAttributesSaved;
   UINT64                            OriginalPciAttributes;
 
   Status                = EFI_SUCCESS;
   IdeControllerInit     = NULL;
   Instance              = NULL;
-  PciAttributesSaved    = FALSE;
   OriginalPciAttributes = 0;
 
   DEBUG ((EFI_D_INFO, "==AtaAtapiPassThru Start== Controller = %x\n", Controller));
@@ -706,7 +704,6 @@ AtaAtapiPassThruStart (
   if (EFI_ERROR (Status)) {
     goto ErrorExit;
   }
-  PciAttributesSaved = TRUE;
 
   Status = PciIo->Attributes (
                     PciIo,

@@ -973,16 +973,16 @@ XhcControlTransfer (
       //
       // For super speed hub, its bit10~12 presents the attached device speed.
       //
-      if ((*(UINT32 *)Data & XHC_PORTSC_PS) >> 10 == 0) {
+      if ((State & XHC_PORTSC_PS) >> 10 == 0) {
         PortStatus.PortStatus |= USB_PORT_STAT_SUPER_SPEED;
       }
     } else if (DeviceSpeed == EFI_USB_SPEED_HIGH) {
       //
       // For high speed hub, its bit9~10 presents the attached device speed.
       //
-      if (XHC_BIT_IS_SET (*(UINT32 *)Data, BIT9)) {
+      if (XHC_BIT_IS_SET (State, BIT9)) {
         PortStatus.PortStatus |= USB_PORT_STAT_LOW_SPEED;
-      } else if (XHC_BIT_IS_SET (*(UINT32 *)Data, BIT10)) {
+      } else if (XHC_BIT_IS_SET (State, BIT10)) {
         PortStatus.PortStatus |= USB_PORT_STAT_HIGH_SPEED;
       }
     } else {
@@ -994,14 +994,14 @@ XhcControlTransfer (
     //
     MapSize = sizeof (mUsbPortStateMap) / sizeof (USB_PORT_STATE_MAP);
     for (Index = 0; Index < MapSize; Index++) {
-      if (XHC_BIT_IS_SET (*(UINT32 *)Data, mUsbPortStateMap[Index].HwState)) {
+      if (XHC_BIT_IS_SET (State, mUsbPortStateMap[Index].HwState)) {
         PortStatus.PortStatus = (UINT16) (PortStatus.PortStatus | mUsbPortStateMap[Index].UefiState);
       }
     }
     MapSize = sizeof (mUsbPortChangeMap) / sizeof (USB_PORT_STATE_MAP);
 
     for (Index = 0; Index < MapSize; Index++) {
-      if (XHC_BIT_IS_SET (*(UINT32 *)Data, mUsbPortChangeMap[Index].HwState)) {
+      if (XHC_BIT_IS_SET (State, mUsbPortChangeMap[Index].HwState)) {
       PortStatus.PortChangeStatus = (UINT16) (PortStatus.PortChangeStatus | mUsbPortChangeMap[Index].UefiState);
       }
     }

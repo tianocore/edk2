@@ -181,6 +181,7 @@ XhcCreateUrb (
   Urb->Context  = Context;
 
   Status = XhcCreateTransferTrb (Xhc, Urb);
+  ASSERT_EFI_ERROR (Status);
 
   return Urb;
 }
@@ -740,13 +741,11 @@ XhcFreeEventRing (
   EVENT_RING_SEG_TABLE_ENTRY    *TablePtr;
   VOID                          *RingBuf;
   EVENT_RING_SEG_TABLE_ENTRY    *EventRingPtr;
-  UINTN                         InterrupterTarget;
 
   if(EventRing->EventRingSeg0 == NULL) {
     return EFI_SUCCESS;
   }
 
-  InterrupterTarget = EventRing->EventInterrupter;
   //
   // Get the Event Ring Segment Table base address
   //
@@ -1048,12 +1047,10 @@ XhciDelAsyncIntTransfer (
   LIST_ENTRY              *Next;
   URB                     *Urb;
   EFI_USB_DATA_DIRECTION  Direction;
-  BOOLEAN                 Found;
 
   Direction = ((EpNum & 0x80) != 0) ? EfiUsbDataIn : EfiUsbDataOut;
   EpNum    &= 0x0F;
 
-  Found = FALSE;
   Urb   = NULL;
 
   EFI_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {

@@ -662,7 +662,6 @@ AppendAltCfgString (
   )
 {
   EFI_STRING                          StringPtr;
-  EFI_STRING                          TmpPtr;
   UINTN                               Length;
   UINT8                               *TmpBuffer;
   UINTN                               Offset;
@@ -683,11 +682,6 @@ AppendAltCfgString (
   }
 
   while (*StringPtr != 0 && StrnCmp (StringPtr, L"OFFSET=", StrLen (L"OFFSET=")) == 0) {
-    //
-    // Back up the header of one <BlockName>
-    //
-    TmpPtr = StringPtr;
-
     StringPtr += StrLen (L"OFFSET=");
     //
     // Get Offset

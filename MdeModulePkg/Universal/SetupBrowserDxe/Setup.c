@@ -4128,7 +4128,6 @@ SaveReminder (
   CHAR16                  *ChangeReminderString;
   CHAR16                  *SaveConfirmString;
   EFI_INPUT_KEY           Key;
-  EFI_STATUS              Status;
 
   DataSavedAction  = BROWSER_NO_CHANGES;
   IsDataChanged    = FALSE;
@@ -4152,7 +4151,7 @@ SaveReminder (
   //
   // If data is changed, prompt user
   //
-  Status      = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+  gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
 
   YesResponse          = GetToken (STRING_TOKEN (ARE_YOU_SURE_YES), gHiiHandle);
   ASSERT (YesResponse != NULL);

@@ -265,8 +265,6 @@ PeiLoadFixAddressHook(
   EFI_PEI_HOB_POINTERS               CurrentHob;
   EFI_PEI_HOB_POINTERS               Hob;
   EFI_PEI_HOB_POINTERS               NextHob;
-  EFI_PHYSICAL_ADDRESS               MaxMemoryBaseAddress;
-  UINT64                             MaxMemoryLength;
   EFI_HOB_MEMORY_ALLOCATION          *MemoryHob;
   //
   // Initialize Local Variables
@@ -274,8 +272,6 @@ PeiLoadFixAddressHook(
   CurrentResourceHob    = NULL;
   ResourceHob           = NULL;
   NextResourceHob       = NULL;
-  MaxMemoryBaseAddress  = 0;
-  MaxMemoryLength       = 0;
   HighAddress           = 0;
   TopLoadingAddress     = 0;
   MemoryRangeEnd      = 0;

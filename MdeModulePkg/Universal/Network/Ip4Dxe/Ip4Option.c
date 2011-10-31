@@ -1,7 +1,7 @@
 /** @file
   IP4 option support functions.
   
-Copyright (c) 2005 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,8 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Validate the IP4 option format for both the packets we received
-  and will transmit. It will compute the ICMP error message fields
-  if the option is mal-formated. But this information isn't used.
+  and will transmit.
 
   @param[in]  Option            The first byte of the option
   @param[in]  OptionLen         The length of the whole option
@@ -39,13 +38,6 @@ Ip4OptionIsValid (
   UINT32                    Cur;
   UINT32                    Len;
   UINT32                    Point;
-  volatile UINT8            IcmpType;
-  volatile UINT8            IcmpCode;
-  volatile UINT32           IcmpPoint;
-
-  IcmpType  = ICMP_PARAMETER_PROBLEM;
-  IcmpCode  = 0;
-  IcmpPoint = 0;
 
   Cur       = 0;
 
@@ -69,12 +61,10 @@ Ip4OptionIsValid (
       // SRR/RR options are formatted as |Type|Len|Point|Ip1|Ip2|...
       //
       if ((OptionLen - Cur < Len) || (Len < 3) || ((Len - 3) % 4 != 0)) {
-        IcmpPoint = Cur + 1;
         return FALSE;
       }
 
       if ((Point > Len + 1) || (Point % 4 != 0)) {
-        IcmpPoint = Cur + 2;
         return FALSE;
       }
 
@@ -86,8 +76,6 @@ Ip4OptionIsValid (
       if ((Option[Cur] != IP4_OPTION_RR) &&
           ((Rcvd && (Point != Len + 1)) || (!Rcvd && (Point != 4)))) {
 
-        IcmpType  = ICMP_DEST_UNREACHABLE;
-        IcmpCode  = ICMP_SOURCEROUTE_FAILED;
         return FALSE;
       }
 
@@ -98,7 +86,6 @@ Ip4OptionIsValid (
       Len = Option[Cur + 1];
 
       if ((OptionLen - Cur < Len) || (Len < 2)) {
-        IcmpPoint = Cur + 1;
         return FALSE;
       }
 
