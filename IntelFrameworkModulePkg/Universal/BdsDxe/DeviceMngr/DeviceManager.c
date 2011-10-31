@@ -579,7 +579,6 @@ IsNeedAddNetworkMenu (
   EFI_STATUS     Status;
   UINTN          EntryCount;
   UINTN          Index;  
-  EFI_HII_HANDLE HiiDeviceManagerHandle;
   EFI_HANDLE     DriverHandle;
   EFI_HANDLE     ControllerHandle;
   EFI_DEVICE_PATH_PROTOCOL   *DevicePath;
@@ -588,7 +587,6 @@ IsNeedAddNetworkMenu (
   EFI_OPEN_PROTOCOL_INFORMATION_ENTRY   *OpenInfoBuffer;
   BOOLEAN        IsNeedAdd;
 
-  HiiDeviceManagerHandle = gDeviceManagerPrivate.HiiHandle;
   IsNeedAdd  = FALSE;
   OpenInfoBuffer = NULL;
   if ((Handle == NULL) || (ItemCount == NULL)) {
@@ -1157,11 +1155,9 @@ CallDriverHealth (
   DRIVER_HEALTH_INFO          *DriverHealthInfo;
   LIST_ENTRY                  *Link;
   EFI_DEVICE_PATH_PROTOCOL    *DriverDevicePath;
-  UINTN                       Length;
   BOOLEAN                     RebootRequired;
 
   Index               = 0;
-  Length              = 0;
   DriverHealthInfo    = NULL;  
   DriverDevicePath    = NULL;
   InitializeListHead (&DriverHealthList);
