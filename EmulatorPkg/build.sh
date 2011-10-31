@@ -48,7 +48,7 @@ PLATFORMFILE=
 LAST_ARG=
 RUN_EMULATOR=no
 CLEAN_TYPE=none
-UNIXPKG_TOOLS=GCC44
+TARGET_TOOLS=GCC44
 NETWORK_SUPPORT=
 BUILD_NEW_SHELL=
 BUILD_FAT=
@@ -63,8 +63,8 @@ case `uname` in
         echo UnixPkg requires Snow Leopard or later OS
         exit 1
       else
-        TARGET_TOOLS=XCODE32
-        UNIXPKG_TOOLS=XCLANG
+        HOST_TOOLS=XCODE32
+        TARGET_TOOLS=XCLANG
       fi
       BUILD_NEW_SHELL="-D BUILD_NEW_SHELL"
       BUILD_FAT="-D BUILD_FAT"
@@ -121,7 +121,7 @@ do
         PLATFORMFILE=$arg
         ;;
       -t)
-        TARGET_TOOLS=$arg
+        HOST_TOOLS=$arg
         ;;
       *)
         BUILD_OPTIONS="$BUILD_OPTIONS $arg"
@@ -131,9 +131,9 @@ do
   fi
   shift
 done
-if [ -z "$TARGET_TOOLS" ]
+if [ -z "$HOST_TOOLS" ]
 then
-  TARGET_TOOLS=$UNIXPKG_TOOLS
+  HOST_TOOLS=$TARGET_TOOLS
 fi
 
 if [ -z "$PROCESSOR" ]
@@ -160,7 +160,7 @@ esac
 
 
 PLATFORMFILE=$WORKSPACE/EmulatorPkg/EmulatorPkg.dsc
-BUILD_ROOT_ARCH=$BUILD_OUTPUT_DIR/DEBUG_"$UNIXPKG_TOOLS"/$PROCESSOR
+BUILD_ROOT_ARCH=$BUILD_OUTPUT_DIR/DEBUG_"$TARGET_TOOLS"/$PROCESSOR
 
 if  [[ ! -f `which build` || ! -f `which GenFv` ]];
 then
@@ -185,7 +185,7 @@ if [[ "$RUN_EMULATOR" == "yes" ]]; then
       # This .gdbinit script sets a breakpoint that loads symbols for the PE/COFFEE
       # images that get loaded in Host
       #
-      cp $WORKSPACE/EmulatorPkg/Unix/.gdbinit $BUILD_OUTPUT_DIR/DEBUG_"$UNIXPKG_TOOLS"/$PROCESSOR
+      cp $WORKSPACE/EmulatorPkg/Unix/.gdbinit $BUILD_OUTPUT_DIR/DEBUG_"$TARGET_TOOLS"/$PROCESSOR
       ;;
   esac
 
@@ -195,15 +195,15 @@ fi
 
 case $CLEAN_TYPE in
   clean)
-    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS -D UNIX_SEC_BUILD -n 3 clean
-    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $UNIXPKG_TOOLS -n 3 clean
+    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $HOST_TOOLS -D UNIX_SEC_BUILD -n 3 clean
+    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS -n 3 clean
     exit $?
     ;;
   cleanall)
     make -C $WORKSPACE/BaseTools clean
-    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS -D UNIX_SEC_BUILD -n 3 clean
-    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $UNIXPKG_TOOLS -n 3 clean
-    build -p $WORKSPACE/ShellPkg/ShellPkg.dsc -a IA32 -b $BUILDTARGET -t $UNIXPKG_TOOLS -n 3 clean
+    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $HOST_TOOLS -D UNIX_SEC_BUILD -n 3 clean
+    build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS -n 3 clean
+    build -p $WORKSPACE/ShellPkg/ShellPkg.dsc -a IA32 -b $BUILDTARGET -t $TARGET_TOOLS -n 3 clean
     exit $?
     ;;
 esac
@@ -212,12 +212,12 @@ esac
 #
 # Build the edk2 EmulatorPkg
 #
-if [[ $TARGET_TOOLS == $UNIXPKG_TOOLS ]]; then
-  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $UNIXPKG_TOOLS -D BUILD_$ARCH_SIZE -D UNIX_SEC_BUILD $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3
+if [[ $HOST_TOOLS == $TARGET_TOOLS ]]; then
+  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS -D BUILD_$ARCH_SIZE -D UNIX_SEC_BUILD $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3
 else
-  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS  -D BUILD_$ARCH_SIZE -D UNIX_SEC_BUILD -D SKIP_MAIN_BUILD -n 3 modules
-  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $UNIXPKG_TOOLS -D BUILD_$ARCH_SIZE $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3
-  cp $BUILD_OUTPUT_DIR/DEBUG_"$TARGET_TOOLS"/$PROCESSOR/Host $BUILD_ROOT_ARCH
+  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $HOST_TOOLS  -D BUILD_$ARCH_SIZE -D UNIX_SEC_BUILD -D SKIP_MAIN_BUILD -n 3 modules
+  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS -D BUILD_$ARCH_SIZE $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3
+  cp $BUILD_OUTPUT_DIR/DEBUG_"$HOST_TOOLS"/$PROCESSOR/Host $BUILD_ROOT_ARCH
 fi
 exit $?
 
