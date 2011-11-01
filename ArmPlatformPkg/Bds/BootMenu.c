@@ -126,6 +126,7 @@ BootMenuAddBootOption (
   EFI_DEVICE_PATH_PROTOCOL  *InitrdPathNode;
   EFI_DEVICE_PATH_PROTOCOL  *InitrdPath;
   UINTN                     CmdLineSize;
+  BOOLEAN                   InitrdSupport;
   UINTN                     InitrdSize;
 
   Attributes                = 0;
@@ -139,8 +140,7 @@ BootMenuAddBootOption (
   }
 
   // Create the specific device path node
-  Print(L"File path of the EFI Application or the kernel: ");
-  Status = SupportedBootDevice->Support->CreateDevicePathNode (SupportedBootDevice, &DevicePathNode, &BootType, &Attributes);
+  Status = SupportedBootDevice->Support->CreateDevicePathNode (L"EFI Application or the kernel", &DevicePathNode, &BootType, &Attributes);
   if (EFI_ERROR(Status)) {
     Status = EFI_ABORTED;
     goto EXIT;
@@ -149,17 +149,27 @@ BootMenuAddBootOption (
   DevicePath = AppendDevicePathNode (SupportedBootDevice->DevicePathProtocol, (CONST EFI_DEVICE_PATH_PROTOCOL *)DevicePathNode);
 
   if ((BootType == BDS_LOADER_KERNEL_LINUX_ATAG) || (BootType == BDS_LOADER_KERNEL_LINUX_FDT)) {
-    // Create the specific device path node
-    Print(L"File path of the initrd: ");
-    Status = SupportedBootDevice->Support->CreateDevicePathNode (SupportedBootDevice, &InitrdPathNode, NULL, NULL);
-    if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) { // EFI_NOT_FOUND is returned on empty input string, but we can boot without an initrd
+    Print(L"Add an initrd: ");
+    Status = GetHIInputBoolean (&InitrdSupport);
+    if (EFI_ERROR(Status)) {
       Status = EFI_ABORTED;
       goto EXIT;
     }
 
-    if (InitrdPathNode != NULL) {
-      // Append the Device Path node to the select device path
-      InitrdPath = AppendDevicePathNode (SupportedBootDevice->DevicePathProtocol, (CONST EFI_DEVICE_PATH_PROTOCOL *)InitrdPathNode);
+    if (InitrdSupport) {
+      // Create the specific device path node
+      Status = SupportedBootDevice->Support->CreateDevicePathNode (L"initrd", &InitrdPathNode, NULL, NULL);
+      if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) { // EFI_NOT_FOUND is returned on empty input string, but we can boot without an initrd
+        Status = EFI_ABORTED;
+        goto EXIT;
+      }
+
+      if (InitrdPathNode != NULL) {
+        // Append the Device Path node to the select device path
+        InitrdPath = AppendDevicePathNode (SupportedBootDevice->DevicePathProtocol, (CONST EFI_DEVICE_PATH_PROTOCOL *)InitrdPathNode);
+      } else {
+        InitrdPath = NULL;
+      }
     } else {
       InitrdPath = NULL;
     }
@@ -348,9 +358,11 @@ BootMenuUpdateBootOption (
   ARM_BDS_LOADER_TYPE           BootType;
   ARM_BDS_LOADER_OPTIONAL_DATA* OptionalData;
   ARM_BDS_LINUX_ARGUMENTS*      LinuxArguments;
-  EFI_DEVICE_PATH*              InitrdPathList;
+  EFI_DEVICE_PATH               *InitrdPathNode;
+  EFI_DEVICE_PATH               *InitrdPath;
   UINTN                         InitrdSize;
   UINTN                         CmdLineSize;
+  BOOLEAN                       InitrdSupport;
 
   Status = BootMenuSelectBootOption (BootOptionsList, UPDATE_BOOT_ENTRY, TRUE, &BootOptionEntry);
   if (EFI_ERROR(Status)) {
@@ -359,14 +371,13 @@ BootMenuUpdateBootOption (
   BootOption = BootOptionEntry->BdsLoadOption;
 
   // Get the device support for this Boot Option
-  Status = BootDeviceGetDeviceSupport (BootOption, &DeviceSupport);
+  Status = BootDeviceGetDeviceSupport (BootOption->FilePathList, &DeviceSupport);
   if (EFI_ERROR(Status)) {
     Print(L"Not possible to retrieve the supported device for the update\n");
     return EFI_UNSUPPORTED;
   }
 
-  Print(L"File path of the EFI Application or the kernel: ");
-  Status = DeviceSupport->UpdateDevicePathNode (BootOption->FilePathList, &DevicePath, NULL, NULL);
+  Status = DeviceSupport->UpdateDevicePathNode (BootOption->FilePathList, L"EFI Application or the kernel", &DevicePath, NULL, NULL);
   if (EFI_ERROR(Status)) {
     Status = EFI_ABORTED;
     goto EXIT;
@@ -375,7 +386,6 @@ BootMenuUpdateBootOption (
   OptionalData = BootOption->OptionalData;
   BootType = (ARM_BDS_LOADER_TYPE)ReadUnaligned32 ((UINT32 *)(&OptionalData->Header.LoaderType));
 
-  // TODO: Allow adding an initrd to a boot entry without one
   if ((BootType == BDS_LOADER_KERNEL_LINUX_ATAG) || (BootType == BDS_LOADER_KERNEL_LINUX_FDT)) {
     LinuxArguments = &OptionalData->Arguments.LinuxArguments;
 
@@ -383,13 +393,47 @@ BootMenuUpdateBootOption (
 
     InitrdSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->InitrdSize);
     if (InitrdSize > 0) {
-      Print(L"File path of the initrd: ");
-      Status = DeviceSupport->UpdateDevicePathNode ((EFI_DEVICE_PATH*)((LinuxArguments + 1) + CmdLineSize), &InitrdPathList, NULL, NULL);
-      if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) {// EFI_NOT_FOUND is returned on empty input string, but we can boot without an initrd
-        Status = EFI_ABORTED;
-        goto EXIT;
+      Print(L"Keep the initrd: ");
+    } else {
+      Print(L"Add an initrd: ");
+    }
+    Status = GetHIInputBoolean (&InitrdSupport);
+    if (EFI_ERROR(Status)) {
+      Status = EFI_ABORTED;
+      goto EXIT;
+    }
+
+    if (InitrdSupport) {
+      if (InitrdSize > 0) {
+        // Case we update the initrd device path
+        Status = DeviceSupport->UpdateDevicePathNode ((EFI_DEVICE_PATH*)((LinuxArguments + 1) + CmdLineSize), L"initrd", &InitrdPath, NULL, NULL);
+        if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) {// EFI_NOT_FOUND is returned on empty input string, but we can boot without an initrd
+          Status = EFI_ABORTED;
+          goto EXIT;
+        }
+        InitrdSize = GetDevicePathSize (InitrdPath);
+      } else {
+        // Case we create the initrd device path
+
+        Status = DeviceSupport->CreateDevicePathNode (L"initrd", &InitrdPathNode, NULL, NULL);
+        if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) { // EFI_NOT_FOUND is returned on empty input string, but we can boot without an initrd
+          Status = EFI_ABORTED;
+          goto EXIT;
+        }
+
+        if (InitrdPathNode != NULL) {
+          // Duplicate Linux kernel Device Path
+          DevicePath = DuplicateDevicePath (BootOption->FilePathList);
+          // Replace Linux kernel Node by EndNode
+          SetDevicePathEndNode (GetLastDevicePathNode (DevicePath));
+          // Append the Device Path node to the select device path
+          InitrdPath = AppendDevicePathNode (DevicePath, (CONST EFI_DEVICE_PATH_PROTOCOL *)InitrdPathNode);
+        } else {
+          InitrdPath = NULL;
+        }
       }
-      InitrdSize = GetDevicePathSize (InitrdPathList);
+    } else {
+      InitrdSize = 0;
     }
 
     Print(L"Arguments to pass to the binary: "); 
@@ -410,7 +454,7 @@ BootMenuUpdateBootOption (
     BootArguments->LinuxArguments.CmdLineSize = CmdLineSize;
     BootArguments->LinuxArguments.InitrdSize = InitrdSize;
     CopyMem (&BootArguments->LinuxArguments + 1, CmdLine, CmdLineSize);
-    CopyMem ((UINTN)(&BootArguments->LinuxArguments + 1) + CmdLine, InitrdPathList, InitrdSize);
+    CopyMem ((UINTN)(&BootArguments->LinuxArguments + 1) + CmdLine, InitrdPath, InitrdSize);
   } else {
     BootArguments = NULL;
   }

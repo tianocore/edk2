@@ -99,9 +99,9 @@ typedef struct {
 typedef struct _BDS_LOAD_OPTION_SUPPORT {
   BDS_SUPPORTED_DEVICE_TYPE   Type;
   EFI_STATUS    (*ListDevices)(IN OUT LIST_ENTRY* BdsLoadOptionList);
-  BOOLEAN       (*IsSupported)(IN BDS_LOAD_OPTION* BdsLoadOption);
-  EFI_STATUS    (*CreateDevicePathNode)(IN BDS_SUPPORTED_DEVICE* BdsLoadOption, OUT EFI_DEVICE_PATH_PROTOCOL **DevicePathNode, OUT ARM_BDS_LOADER_TYPE *BootType, OUT UINT32 *Attributes);
-  EFI_STATUS    (*UpdateDevicePathNode)(IN EFI_DEVICE_PATH *OldDevicePath, OUT EFI_DEVICE_PATH_PROTOCOL** NewDevicePath, OUT ARM_BDS_LOADER_TYPE *BootType, OUT UINT32 *Attributes);
+  BOOLEAN       (*IsSupported)(IN  EFI_DEVICE_PATH *DevicePath);
+  EFI_STATUS    (*CreateDevicePathNode)(IN CHAR16* FileName, OUT EFI_DEVICE_PATH_PROTOCOL **DevicePathNode, OUT ARM_BDS_LOADER_TYPE *BootType, OUT UINT32 *Attributes);
+  EFI_STATUS    (*UpdateDevicePathNode)(IN EFI_DEVICE_PATH *OldDevicePath, IN CHAR16* FileName, OUT EFI_DEVICE_PATH_PROTOCOL** NewDevicePath, OUT ARM_BDS_LOADER_TYPE *BootType, OUT UINT32 *Attributes);
 } BDS_LOAD_OPTION_SUPPORT;
 
 #define LOAD_OPTION_ENTRY_FROM_LINK(a)  BASE_CR(a, BDS_LOAD_OPTION_ENTRY, Link)
@@ -128,8 +128,8 @@ BootDeviceListSupportedFree (
 
 EFI_STATUS
 BootDeviceGetDeviceSupport (
-  IN  BDS_LOAD_OPTION *BootOption,
-  OUT BDS_LOAD_OPTION_SUPPORT**  DeviceSupport
+  IN  EFI_DEVICE_PATH           *DevicePath,
+  OUT BDS_LOAD_OPTION_SUPPORT   **DeviceSupport
   );
 
 EFI_STATUS
