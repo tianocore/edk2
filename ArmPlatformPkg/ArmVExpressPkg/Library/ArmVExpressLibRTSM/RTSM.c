@@ -88,22 +88,6 @@ ArmPlatformGetBootMode (
 }
 
 /**
-  Remap the memory at 0x0
-
-  Some platform requires or gives the ability to remap the memory at the address 0x0.
-  This function can do nothing if this feature is not relevant to your platform.
-
-**/
-VOID
-ArmPlatformBootRemapping (
-  VOID
-  )
-{
-  // Disable memory remapping and return to normal mapping
-  MmioOr32 (SP810_CTRL_BASE, BIT8);
-}
-
-/**
   Initialize controllers that must setup in the normal world
 
   This function is called by the ArmPlatformPkg/Pei or ArmPlatformPkg/Pei/PlatformPeim
@@ -115,7 +99,8 @@ ArmPlatformNormalInitialize (
   VOID
   )
 {
-  // Nothing to do here
+  // Disable memory remapping and return to normal mapping
+  MmioOr32 (SP810_CTRL_BASE, BIT8);
 }
 
 /**

@@ -132,18 +132,6 @@ ArmPlatformInitializeSystemMemory (
   );
 
 /**
-  Remap the memory at 0x0
-
-  Some platform requires or gives the ability to remap the memory at the address 0x0.
-  This function can do nothing if this feature is not relevant to your platform.
-
-**/
-VOID
-ArmPlatformBootRemapping (
-  VOID
-  );
-
-/**
   Initialize the Secure peripherals and memory regions
 
   If Trustzone is supported by your platform then this function makes the required initialization

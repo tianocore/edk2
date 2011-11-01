@@ -48,22 +48,6 @@ ARM_CORE_INFO mRealViewEbMpCoreInfoTable[] = {
 };
 
 /**
-  Remap the memory at 0x0
-
-  Some platform requires or gives the ability to remap the memory at the address 0x0.
-  This function can do nothing if this feature is not relevant to your platform.
-
-**/
-VOID
-ArmPlatformBootRemapping (
-  VOID
-  )
-{
-  // Disable memory remapping and return to normal mapping
-  MmioOr32 (ARM_EB_SYSCTRL, BIT8); //EB_SP810_CTRL_BASE
-}
-
-/**
   Return the current Boot Mode
 
   This function returns the boot reason on the platform
@@ -89,6 +73,9 @@ ArmPlatformNormalInitialize (
   VOID
   )
 {
+  // Disable memory remapping and return to normal mapping
+  MmioOr32 (ARM_EB_SYSCTRL, BIT8); //EB_SP810_CTRL_BASE
+
   // Configure periodic timer (TIMER0) for 1MHz operation
   MmioOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, SP810_SYS_CTRL_TIMER0_TIMCLK);
   // Configure 1MHz clock

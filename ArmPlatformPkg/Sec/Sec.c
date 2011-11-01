@@ -17,7 +17,6 @@
 #include <Library/PrintLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/SerialPortLib.h>
-#include <Library/ArmPlatformLib.h>
 #include <Library/ArmGicLib.h>
 #include <Library/ArmCpuLib.h>
 
@@ -97,9 +96,6 @@ CEntryPoint (
       // Initialize system memory (DRAM)
       ArmPlatformInitializeSystemMemory ();
     }
-
-    // Some platform can change their physical memory mapping
-    ArmPlatformBootRemapping ();
   }
 
   // Test if Trustzone is supported on this platform

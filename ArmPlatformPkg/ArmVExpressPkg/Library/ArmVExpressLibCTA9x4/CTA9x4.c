@@ -126,29 +126,6 @@ ArmPlatformGetBootMode (
 }
 
 /**
-  Remap the memory at 0x0
-
-  Some platform requires or gives the ability to remap the memory at the address 0x0.
-  This function can do nothing if this feature is not relevant to your platform.
-
-**/
-VOID
-ArmPlatformBootRemapping (
-  VOID
-  )
-{
-  UINT32 Value;
-
-  if (FeaturePcdGet(PcdNorFlashRemapping)) {
-    SerialPrint ("Secure ROM at 0x0\n\r");
-  } else {
-    Value = MmioRead32(ARM_VE_SYS_CFGRW1_REG); //Scc - CFGRW1
-    // Remap the DRAM to 0x0
-    MmioWrite32(ARM_VE_SYS_CFGRW1_REG, (Value & 0x0FFFFFFF) | ARM_VE_CFGRW1_REMAP_DRAM);
-  }
-}
-
-/**
   Initialize controllers that must setup in the normal world
 
   This function is called by the ArmPlatformPkg/PrePi or ArmPlatformPkg/PlatformPei
@@ -181,6 +158,17 @@ ArmPlatformInitializeSystemMemory (
   VOID
   )
 {
+  UINT32 Value;
+
+  // Memory Map remapping
+  if (FeaturePcdGet(PcdNorFlashRemapping)) {
+    SerialPrint ("Secure ROM at 0x0\n\r");
+  } else {
+    Value = MmioRead32(ARM_VE_SYS_CFGRW1_REG); //Scc - CFGRW1
+    // Remap the DRAM to 0x0
+    MmioWrite32(ARM_VE_SYS_CFGRW1_REG, (Value & 0x0FFFFFFF) | ARM_VE_CFGRW1_REMAP_DRAM);
+  }
+
   PL341DmcInit(ARM_VE_DMC_BASE, &DDRTimings);
   PL301AxiInit(ARM_VE_FAXI_BASE);
 }
