@@ -107,10 +107,12 @@ READ_LOCK_STATUS   = TRUE
   INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
   
+!if $(TARGET) == RELEASE
   #
   # Semi-hosting filesystem
   #
   INF ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
+!endif
   
   #
   # Nand Flash
