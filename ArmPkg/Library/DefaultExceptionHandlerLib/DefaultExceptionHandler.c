@@ -18,7 +18,9 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/PrintLib.h>
 #include <Library/ArmDisassemblerLib.h>
+#include <Library/SerialPortLib.h>
 
 #include <Guid/DebugImageInfoTable.h>
 #include <Protocol/DebugSupport.h>
@@ -220,12 +222,17 @@ DefaultExceptionHandler (
   IN OUT EFI_SYSTEM_CONTEXT           SystemContext
   )
 {
+  CHAR8     Buffer[100];
+  UINTN     CharCount;
   UINT32    DfsrStatus;
   UINT32    IfsrStatus;
   BOOLEAN   DfsrWrite;
   UINT32    PcAdjust = 0;
 
-  Print(L"\n%a Exception PC at 0x%08x  CPSR 0x%08x ", gExceptionTypeString[ExceptionType], SystemContext.SystemContextArm->PC, SystemContext.SystemContextArm->CPSR);
+  CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"\n%a Exception PC at 0x%08x  CPSR 0x%08x ",
+	  gExceptionTypeString[ExceptionType], SystemContext.SystemContextArm->PC, SystemContext.SystemContextArm->CPSR);
+  SerialPortWrite ((UINT8 *) Buffer, CharCount);
+
   DEBUG_CODE_BEGIN ();
     CHAR8   *Pdb;
     UINT32  ImageBase;
