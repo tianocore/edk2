@@ -88,9 +88,9 @@ typedef enum {
 } BDS_SUPPORTED_DEVICE_TYPE;
 
 typedef struct {
-  LIST_ENTRY                  Link;
-  CHAR16                      Description[BOOT_DEVICE_DESCRIPTION_MAX];
-  EFI_DEVICE_PATH_PROTOCOL*   DevicePathProtocol;
+  LIST_ENTRY                          Link;
+  CHAR16                              Description[BOOT_DEVICE_DESCRIPTION_MAX];
+  EFI_DEVICE_PATH_PROTOCOL*           DevicePathProtocol;
   struct _BDS_LOAD_OPTION_SUPPORT*    Support;
 } BDS_SUPPORTED_DEVICE;
 

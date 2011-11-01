@@ -57,7 +57,7 @@ UefiMain (
       return EFI_UNSUPPORTED;
     }
 
-    // Generate the File Path Node for the Linux Kernel & Device Tree blobl
+    // Generate the File Path Node for the Linux Kernel & Device Tree blob
     DevicePathKernel = FileDevicePath (LoadedImage->DeviceHandle, LINUX_KERNEL_NAME);
     DevicePathFdt    = FileDevicePath (LoadedImage->DeviceHandle, FDT_NAME);
 

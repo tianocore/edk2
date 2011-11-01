@@ -12,8 +12,8 @@
 #
 
 #include <AsmMacroIoLib.h>
-#include <Base.h>
 #include <AutoGen.h>
+#include "SecInternal.h"
 
 .text
 .align 5

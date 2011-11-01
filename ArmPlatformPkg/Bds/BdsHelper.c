@@ -181,7 +181,7 @@ GetHIInputBoolean (
 
   while(1) {
     Print (L"[y/n] ");
-    Status = GetHIInputStr (CmdBoolean,2);
+    Status = GetHIInputStr (CmdBoolean, 2);
     if (EFI_ERROR(Status)) {
       return Status;
     } else if ((CmdBoolean[0] == L'y') || (CmdBoolean[0] == L'Y')) {
