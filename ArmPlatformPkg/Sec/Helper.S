@@ -19,6 +19,7 @@ GCC_ASM_EXPORT(monitor_vector_table)
 GCC_ASM_EXPORT(return_from_exception)
 GCC_ASM_EXPORT(enter_monitor_mode)
 GCC_ASM_EXPORT(copy_cpsr_into_spsr)
+GCC_ASM_EXPORT(set_non_secure_mode)
 
 ASM_PFX(monitor_vector_table):
     ldr pc, dead
@@ -67,6 +68,18 @@ ASM_PFX(copy_cpsr_into_spsr):
     mrs     r0, cpsr
     msr     spsr_cxsf, r0
     bx      lr
+
+# Set the Non Secure Mode
+ASM_PFX(set_non_secure_mode):
+    push    { r1 }
+    and	    r0, r0, #0x1f     @ Keep only the mode bits
+    mrs     r1, spsr          @ Read the spsr
+    bic     r1, r1, #0x1f     @ Clear all mode bits
+    orr	    r1, r1, r0
+    msr     spsr_cxsf, r1     @ write back spsr (may have caused a mode switch)
+    isb
+    pop     { r1 }
+    bx      lr                @ return (hopefully thumb-safe!)
 
 dead:
     b       dead

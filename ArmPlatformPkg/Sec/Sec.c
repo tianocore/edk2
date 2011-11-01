@@ -133,16 +133,11 @@ CEntryPoint (
     // Transfer the interrupt to Non-secure World
     ArmGicSetupNonSecure (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase));
 
-    // Write to CP15 Non-secure Access Control Register :
-    //   - Enable CP10 and CP11 accesses in NS World
-    //   - Enable Access to Preload Engine in NS World
-    //   - Enable lockable TLB entries allocation in NS world
-    //   - Enable R/W access to SMP bit of Auxiliary Control Register in NS world
-    ArmWriteNsacr (NSACR_NS_SMP | NSACR_TL | NSACR_PLE | NSACR_CP(10) | NSACR_CP(11));
+    // Write to CP15 Non-secure Access Control Register
+    ArmWriteNsacr (PcdGet32 (PcdArmNsacr));
 
-    // CP15 Secure Configuration Register with Non Secure bit (SCR_NS), CPSR.A modified in any
-    // security state (SCR_AW), CPSR.F modified in any security state (SCR_FW)
-    ArmWriteScr (SCR_NS | SCR_FW | SCR_AW);
+    // CP15 Secure Configuration Register
+    ArmWriteScr (PcdGet32 (PcdArmScr));
   } else {
     if (IS_PRIMARY_CORE(MpId)) {
       SerialPrint ("Trust Zone Configuration is disabled\n\r");
@@ -156,6 +151,12 @@ CEntryPoint (
 
   JumpAddress = PcdGet32 (PcdFvBaseAddress);
   ArmPlatformSecExtraAction (MpId, &JumpAddress);
+
+  // If PcdArmNonSecModeTransition is defined then set this specific mode to CPSR before the transition
+  // By not set, the mode for Non Secure World is SVC
+  if (PcdGet32 (PcdArmNonSecModeTransition) != 0) {
+    set_non_secure_mode ((ARM_PROCESSOR_MODE)PcdGet32 (PcdArmNonSecModeTransition));
+  }
 
   return_from_exception (JumpAddress);
   //-------------------- Non Secure Mode ---------------------

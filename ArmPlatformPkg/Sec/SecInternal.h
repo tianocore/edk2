@@ -59,6 +59,11 @@ copy_cpsr_into_spsr (
   );
 
 VOID
+set_non_secure_mode (
+  IN ARM_PROCESSOR_MODE              Mode
+  );
+
+VOID
 SecCommonExceptionEntry (
   IN UINT32 Entry,
   IN UINT32 LR
