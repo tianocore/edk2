@@ -85,7 +85,6 @@ InstallSecureBootConfigForm (
   @param[in, out]  PrivateData   Points to SecureBoot configuration private data.
 
 **/
-
 VOID
 UninstallSecureBootConfigForm (
   IN OUT SECUREBOOT_CONFIG_PRIVATE_DATA    *PrivateData

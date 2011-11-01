@@ -229,6 +229,7 @@ DeleteUser (
     //
     // Delete the user on the credential providers by its identification policy.
     //
+    ASSERT (Info != NULL);
     DeleteCredentialFromProviders ((UINT8 *)(Info + 1), Info->InfoSize - sizeof (EFI_USER_INFO), User);
     FreePool (Info);
     

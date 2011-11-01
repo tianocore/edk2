@@ -58,7 +58,7 @@ ProviderAlreadyInPolicy (
 
 
 /**
-  Add or delete the user's credential record in the provider.
+  Add the user's credential record in the provider.
 
   @param[in]  ProviderGuid        Point to credential provider guid.
   @param[in]  User                Points to user profile.
@@ -157,17 +157,13 @@ DeleteCredentialFromProviders (
 
 
 /**
-  Remove the provider in FindIdentity from the user identification information record.
+  Remove the provider specified by Offset from the new user identification record.
   
-  @param[in, out] NewInfo       On entry, points to the user information to remove provider. 
-                                On return, points to the user information the provider is removed.
-  @param[in]      FindIdentity  Point to the user identity policy.
-
-  @retval TRUE                  The provider is removed successfully.
-  @retval FALSE                 Fail to remove the provider.
+  @param[in]  IdentityPolicy    Point to user identity item in new identification policy.
+  @param[in]  Offset            The item offset in the new identification policy.
 
 **/
-BOOLEAN
+VOID
 DeleteProviderFromPolicy (
   IN     EFI_USER_INFO_IDENTITY_POLICY         *IdentityPolicy,
   IN     UINTN                                 Offset
@@ -184,7 +180,7 @@ DeleteProviderFromPolicy (
     IdentityPolicy->Type           = EFI_USER_INFO_IDENTITY_TRUE;
     IdentityPolicy->Length         = sizeof (EFI_USER_INFO_IDENTITY_POLICY);
     mUserInfo.NewIdentityPolicyLen = IdentityPolicy->Length;
-    return TRUE;
+    return ;
   }
 
   DeleteLen = IdentityPolicy->Length + sizeof(EFI_USER_INFO_IDENTITY_POLICY);
@@ -196,17 +192,19 @@ DeleteProviderFromPolicy (
     CopyMem ((UINT8 *) IdentityPolicy, (UINT8 *) IdentityPolicy + DeleteLen, RemainingLen);
   }
   mUserInfo.NewIdentityPolicyLen -= DeleteLen;  
- 
-  return FALSE;
 }
 
 
 /**
-  Update the mUserInfo.NewIdentityPolicy, and UI when 'add option' is pressed.
+  Add a new provider to the mUserInfo.NewIdentityPolicy.
 
+  It is invoked when 'add option' in UI is pressed.
+
+  @param[in] NewGuid       Points to the credential provider guid.
+  
 **/
 VOID
- AddProviderToPolicy (
+AddProviderToPolicy (
   IN  EFI_GUID                                  *NewGuid
   )
 {
@@ -489,7 +487,7 @@ SaveIdentityPolicy (
 
 **/
 VOID
- AddIdentityPolicyItem (
+AddIdentityPolicyItem (
   VOID
   )
 {

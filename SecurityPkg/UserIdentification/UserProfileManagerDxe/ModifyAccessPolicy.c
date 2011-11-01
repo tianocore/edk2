@@ -167,7 +167,7 @@ SaveAccessPolicy (
   //
   // Save access policy.
   //
-  if (mUserInfo.AccessPolicyModified && (mUserInfo.AccessPolicyLen > 0)) {
+  if (mUserInfo.AccessPolicyModified && (mUserInfo.AccessPolicyLen > 0) && (mUserInfo.AccessPolicy != NULL)) {
     Info = AllocateZeroPool (sizeof (EFI_USER_INFO) + mUserInfo.AccessPolicyLen);
     if (Info == NULL) {
       return ;
