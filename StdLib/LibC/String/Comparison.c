@@ -40,7 +40,7 @@ int       memcmp(const void *s1, const void *s2, size_t n)
 **/
 int       strcmp(const char *s1, const char *s2)
 {
-  return (int)AsciiStriCmp( s1, s2);
+  return (int)AsciiStrCmp( s1, s2);
 }
 
 /** The strcoll function compares the string pointed to by s1 to the string
@@ -72,33 +72,33 @@ int       strncmp(const char *s1, const char *s2, size_t n)
   return (int)AsciiStrnCmp( s1, s2, n);
 }
 
-/** The strxfrm function transforms the string pointed to by s2 and places the
-    resulting string into the array pointed to by s1. The transformation is
+/** The strxfrm function transforms the string pointed to by Src and places the
+    resulting string into the array pointed to by Dest. The transformation is
     such that if the strcmp function is applied to two transformed strings, it
     returns a value greater than, equal to, or less than zero, corresponding to
     the result of the strcoll function applied to the same two original
-    strings. No more than n characters are placed into the resulting array
-    pointed to by s1, including the terminating null character. If n is zero,
-    s1 is permitted to be a null pointer. If copying takes place between
+    strings. No more than Len characters are placed into the resulting array
+    pointed to by Dest, including the terminating null character. If Len is zero,
+    Dest is permitted to be a null pointer. If copying takes place between
     objects that overlap, the behavior is undefined.
 
     @return   The strxfrm function returns the length of the transformed string
               (not including the terminating null character). If the value
-              returned is n or more, the contents of the array pointed to by s1
+              returned is Len or more, the contents of the array pointed to by Dest
               are indeterminate.
 **/
-size_t    strxfrm(char * __restrict s1, const char * __restrict s2, size_t n)
+size_t    strxfrm(char * __restrict Dest, const char * __restrict Src, size_t Len)
 {
   size_t srclen, copysize;
 
   /*
   * Since locales are unimplemented, this is just a copy.
   */
-  srclen = strlen(s2);
-  if (n != 0) {
-    copysize = srclen < n ? srclen : n - 1;
-    (void)memcpy(s1, s2, copysize);
-    s1[copysize] = 0;
+  srclen = strlen(Src);
+  if (Len != 0) {
+    copysize = srclen < Len ? srclen : Len - 1;
+    (void)memcpy(Dest, Src, copysize);
+    Dest[copysize] = 0;
   }
   return (srclen);
 }
@@ -107,17 +107,5 @@ size_t    strxfrm(char * __restrict s1, const char * __restrict s2, size_t n)
 int
 strcasecmp(const char *s1, const char *s2)
 {
-  const unsigned char *us1 = (const unsigned char *)s1,
-  *us2 = (const unsigned char *)s2;
-  int Difference;
-
-  while ( 0 == ( Difference = tolower(*us1) - tolower(*us2))) {
-    if (*us1 == 0) {
-    return (0);
-    }
-    us1 += 1;
-    us2 += 1;
-  }
-  return Difference;
+  return (int)AsciiStriCmp( s1, s2);
 }
-
