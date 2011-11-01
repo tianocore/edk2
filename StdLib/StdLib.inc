@@ -63,11 +63,11 @@
   # Not running in an Emulation Environment
 [LibraryClasses.IA32.UEFI_APPLICATION]
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
-#  TimerLib|PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
+#  TimerLib|PerformancePkg/Library/TscTimerLib/DxeTscTimerLib.inf
 
 [LibraryClasses.X64.UEFI_APPLICATION]
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
-#  TimerLib|PerformancePkg/Library/DxeTscTimerLib/DxeTscTimerLib.inf
+#  TimerLib|PerformancePkg/Library/TscTimerLib/DxeTscTimerLib.inf
 
 [LibraryClasses.IPF.UEFI_APPLICATION]
   PalLib|MdePkg/Library/UefiPalLib/UefiPalLib.inf
