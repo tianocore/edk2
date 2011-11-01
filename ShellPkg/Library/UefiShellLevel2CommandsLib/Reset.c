@@ -72,14 +72,14 @@ ShellCommandRunReset (
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
-      // check for cold reset flag, then shutdown reset flag, then warm (default) reset flag
+      // check for warm reset flag, then shutdown reset flag, then cold (default) reset flag
       //
-      if (ShellCommandLineGetFlag(Package, L"-c")) {
-        if (ShellCommandLineGetFlag(Package, L"-s") || ShellCommandLineGetFlag(Package, L"-w")) {
+      if (ShellCommandLineGetFlag(Package, L"-w")) {
+        if (ShellCommandLineGetFlag(Package, L"-s") || ShellCommandLineGetFlag(Package, L"-c")) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
-          String = ShellCommandLineGetValue(Package, L"-c");
+          String = ShellCommandLineGetValue(Package, L"-w");
           if (String != NULL) {
             gRT->ResetSystem(EfiResetCold, EFI_SUCCESS, StrSize(String), (VOID*)String);
           } else {
@@ -87,7 +87,7 @@ ShellCommandRunReset (
           }
         }
       } else if (ShellCommandLineGetFlag(Package, L"-s")) {
-        if (ShellCommandLineGetFlag(Package, L"-w")) {
+        if (ShellCommandLineGetFlag(Package, L"-c")) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
@@ -103,7 +103,7 @@ ShellCommandRunReset (
         //
         // this is default so dont worry about flag...
         //
-        String = ShellCommandLineGetValue(Package, L"-w");
+        String = ShellCommandLineGetValue(Package, L"-c");
         if (String != NULL) {
           gRT->ResetSystem(EfiResetWarm, EFI_SUCCESS, StrSize(String), (VOID*)String);
         } else {
