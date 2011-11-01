@@ -65,10 +65,6 @@
 // Memory-mapped peripherals
 ************************************************************************************/
 
-// Note: There is no System Configuration Controller on the Model,
-// So do dummy definition to avoid build failures
-#define ARM_VE_SCC_BASE
-
 // SP810 Controller
 #undef SP810_CTRL_BASE
 #define SP810_CTRL_BASE                         0x1C020000

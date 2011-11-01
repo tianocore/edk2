@@ -217,8 +217,13 @@ ArmPlatformSysConfigSetDevice (
   // Intercept some functions
   switch(Function) {
   case SYS_CFG_SCC:
+#ifdef ARM_VE_SCC_BASE
     MmioWrite32 ((ARM_VE_SCC_BASE + (Device * 4)),Value);
     return EFI_SUCCESS;
+#else
+    // There is no System Configuration Controller on the Model
+    return EFI_UNSUPPORTED;
+#endif
 
   case SYS_CFG_OSC_SITE1:
     Function = SYS_CFG_OSC;
