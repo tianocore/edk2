@@ -11,6 +11,7 @@
 //
 //
 
+#include <AsmMacroIoLib.h>
 #include <Library/ArmCpuLib.h>
 #include <Chipset/ArmCortexA9.h>
 
@@ -29,7 +30,12 @@ ASM_PFX(ArmCpuSynchronizeWait):
   cmp   r0, #ARM_CPU_EVENT_BOOT_MEM_INIT
   // The SCU enabled is the event to tell us the Init Boot Memory is initialized
   beq   ASM_PFX(ArmWaitScuEnabled)
-  b     ASM_PFX(CArmCpuSynchronizeWait)
+  // Case when the stack has been set up
+  push	{r1,lr}
+  LoadConstantToReg (ASM_PFX(CArmCpuSynchronizeWait), r1)
+  blx   r1
+  pop	{r1,lr}
+  bx	lr
 
 // IN None
 // OUT r0 = SCU Base Address

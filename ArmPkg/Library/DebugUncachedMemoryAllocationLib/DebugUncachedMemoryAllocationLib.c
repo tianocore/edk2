@@ -22,6 +22,7 @@
 
 **/
 
+#include <Base.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>

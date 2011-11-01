@@ -34,7 +34,11 @@ ASM_PFX(ArmCpuSynchronizeWait):
   cmp   r0, #ARM_CPU_EVENT_BOOT_MEM_INIT
   // The SCU enabled is the event to tell us the Init Boot Memory is initialized
   beq   ArmWaitGicDistributorEnabled
-  bx    ASM_PFX(CArmCpuSynchronizeWait)
+  push	{r1,lr}
+  LoadConstantToReg (ASM_PFX(CArmCpuSynchronizeWait), r1)
+  blx   r1
+  pop	{r1,lr}
+  bx	lr
 
 // IN  None
 ArmWaitGicDistributorEnabled:
