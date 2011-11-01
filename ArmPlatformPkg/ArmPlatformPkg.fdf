@@ -48,11 +48,11 @@ NumBlocks     = 0x10
 ################################################################################
 
 0x00000000|0x00010000
-gArmTokenSpaceGuid.PcdSecureFvBaseAddress|gArmTokenSpaceGuid.PcdSecureFvBaseSize
+gArmTokenSpaceGuid.PcdSecureFvBaseAddress|gArmTokenSpaceGuid.PcdSecureFvSize
 FV = FVMAIN_SEC
 
 
-[FD.Tuscan_EFI]
+[FD.ArmPlatform_EFI]
 BaseAddress   = 0xEC200000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in NOR Flash.
 Size          = 0x00200000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the FLASH Device
 ErasePolarity = 1
@@ -78,7 +78,7 @@ NumBlocks     = 0x200
 ################################################################################
 
 0x00000000|0x00200000
-gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvBaseSize
+gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
 
 
@@ -142,14 +142,17 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+  INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
-  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-  INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+  INF MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
   INF EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
   INF EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
+  # Simple TextIn/TextOut for UEFI Terminal
+  INF EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
+  
   #
   # Semi-hosting filesystem (Required the Hardware Debugger to be connected)
   #
