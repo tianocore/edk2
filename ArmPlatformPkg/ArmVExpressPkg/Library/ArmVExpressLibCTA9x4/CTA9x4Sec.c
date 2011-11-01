@@ -67,29 +67,29 @@ ArmPlatformTrustzoneInit (
       TZASC_REGION_SIZE_64MB, TZASC_REGION_SECURITY_NSRW);
 
   // NOR Flash 1. The first half of the NOR Flash1 must be secure for the secure firmware (sec_uefi.bin)
-#if EDK2_ARMVE_SECURE_SYSTEM
-  //Note: Your OS Kernel must be aware of the secure regions before to enable this region
-  TZASCSetRegion(ARM_VE_TZASC_BASE,2,TZASC_REGION_ENABLED,
-      ARM_VE_SMB_NOR1_BASE + SIZE_32MB,0,
-      TZASC_REGION_SIZE_32MB, TZASC_REGION_SECURITY_NSRW);
-#else
-  TZASCSetRegion(ARM_VE_TZASC_BASE,2,TZASC_REGION_ENABLED,
-      ARM_VE_SMB_NOR1_BASE,0,
-      TZASC_REGION_SIZE_64MB, TZASC_REGION_SECURITY_NSRW);
-#endif
+  if (PcdGetBool (PcdTrustzoneSupport) == TRUE) {
+    //Note: Your OS Kernel must be aware of the secure regions before to enable this region
+    TZASCSetRegion(ARM_VE_TZASC_BASE,2,TZASC_REGION_ENABLED,
+        ARM_VE_SMB_NOR1_BASE + SIZE_32MB,0,
+        TZASC_REGION_SIZE_32MB, TZASC_REGION_SECURITY_NSRW);
+  } else {
+    TZASCSetRegion(ARM_VE_TZASC_BASE,2,TZASC_REGION_ENABLED,
+        ARM_VE_SMB_NOR1_BASE,0,
+        TZASC_REGION_SIZE_64MB, TZASC_REGION_SECURITY_NSRW);
+  }
 
   // Base of SRAM. Only half of SRAM in Non Secure world
   // First half non secure (16MB) + Second Half secure (16MB) = 32MB of SRAM
-#if EDK2_ARMVE_SECURE_SYSTEM
-  //Note: Your OS Kernel must be aware of the secure regions before to enable this region
-  TZASCSetRegion(ARM_VE_TZASC_BASE,3,TZASC_REGION_ENABLED,
-      ARM_VE_SMB_SRAM_BASE,0,
-      TZASC_REGION_SIZE_16MB, TZASC_REGION_SECURITY_NSRW);
-#else
-  TZASCSetRegion(ARM_VE_TZASC_BASE,3,TZASC_REGION_ENABLED,
-      ARM_VE_SMB_SRAM_BASE,0,
-      TZASC_REGION_SIZE_32MB, TZASC_REGION_SECURITY_NSRW);
-#endif
+  if (PcdGetBool (PcdTrustzoneSupport) == TRUE) {
+    //Note: Your OS Kernel must be aware of the secure regions before to enable this region
+    TZASCSetRegion(ARM_VE_TZASC_BASE,3,TZASC_REGION_ENABLED,
+        ARM_VE_SMB_SRAM_BASE,0,
+        TZASC_REGION_SIZE_16MB, TZASC_REGION_SECURITY_NSRW);
+  } else {
+    TZASCSetRegion(ARM_VE_TZASC_BASE,3,TZASC_REGION_ENABLED,
+        ARM_VE_SMB_SRAM_BASE,0,
+        TZASC_REGION_SIZE_32MB, TZASC_REGION_SECURITY_NSRW);
+  }
 
   // Memory Mapped Peripherals. All in non secure world
   TZASCSetRegion(ARM_VE_TZASC_BASE,4,TZASC_REGION_ENABLED,
