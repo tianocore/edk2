@@ -44,7 +44,7 @@ ArmArchTimerLibConstructor (
     ASSERT (TICKS_PER_MICRO_SEC);
 
     // If the security extensions are not implemented set Timer Frequency
-    if ((ArmReadIdPfr1 () & 0xF0)) {
+    if ((ArmReadIdPfr1 () & 0xF0) == 0x0) {
       ArmArchTimerSetTimerFreq (PcdGet32 (PcdArmArchTimerFreqInHz));
     }
 
