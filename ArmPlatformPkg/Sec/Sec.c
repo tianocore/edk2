@@ -35,10 +35,20 @@ CEntryPoint (
   UINTN           CharCount;
   UINTN           JumpAddress;
 
+  // Invalidate the data cache. Doesn't have to do the Data cache clean.
+  ArmInvalidateDataCache();
+
+  // Invalidate Instruction Cache
+  ArmInvalidateInstructionCache();
+
+  // Invalidate I & D TLBs
+  ArmInvalidateInstructionAndDataTlb();
+
+  // CPU specific settings
+  ArmCpuSetup (MpId);
+
   // Primary CPU clears out the SCU tag RAMs, secondaries wait
   if (IS_PRIMARY_CORE(MpId)) {
-    ArmCpuSetup (MpId);
-
     if (ArmIsMpCore()) {
       ArmCpuSynchronizeSignal (ARM_CPU_EVENT_BOOT_MEM_INIT);
     }
@@ -68,15 +78,6 @@ CEntryPoint (
     // Enable the GIC CPU Interface
     ArmGicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
   }
-
-  // Invalidate the data cache. Doesn't have to do the Data cache clean.
-  ArmInvalidateDataCache();
-
-  // Invalidate Instruction Cache
-  ArmInvalidateInstructionCache();
-
-  // Invalidate I & D TLBs
-  ArmInvalidateInstructionAndDataTlb();
 
   // Enable Full Access to CoProcessors
   ArmWriteCPACR (CPACR_CP_FULL_ACCESS);
