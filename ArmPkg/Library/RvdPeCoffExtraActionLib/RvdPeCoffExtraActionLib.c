@@ -117,7 +117,7 @@ PeCoffLoaderRelocateImageExtraAction (
 {
   CHAR8 Buffer[256];
   
-  AsciiSPrint (Buffer, sizeof(Buffer), "load /a /ni /np %a &0x%08x\n", ImageContext->PdbPointer, (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders));
+  AsciiSPrint (Buffer, sizeof(Buffer), "load /a /ni /np \"%a\" &0x%08x\n", ImageContext->PdbPointer, (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders));
   DeCygwinPathIfNeeded (&Buffer[16]);
  
   WriteStringToFile (Buffer, AsciiStrSize (Buffer));
@@ -143,7 +143,7 @@ PeCoffLoaderUnloadImageExtraAction (
 {
   CHAR8 Buffer[256];
   
-  AsciiSPrint (Buffer, sizeof(Buffer), "unload symbols_only %a\n", ImageContext->PdbPointer);
+  AsciiSPrint (Buffer, sizeof(Buffer), "unload symbols_only \"%a\"\n", ImageContext->PdbPointer);
   DeCygwinPathIfNeeded (Buffer);
  
   WriteStringToFile (Buffer, AsciiStrSize (Buffer));
