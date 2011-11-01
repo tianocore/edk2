@@ -29,17 +29,13 @@
   SKUID_IDENTIFIER               = DEFAULT
 
 [BuildOptions]
-  XCODE:*_*_ARM_ARCHCC_FLAGS     == -arch armv7 -march=armv7
-  XCODE:*_*_ARM_ARCHASM_FLAGS    == -arch armv7
-  XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv7
+  XCODE:*_*_ARM_PLATFORM_FLAGS  == -arch armv7
   XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
   
-  GCC:*_*_ARM_ARCHCC_FLAGS     == -march=armv7-a -mthumb
-  GCC:*_*_ARM_ARCHASM_FLAGS    == -march=armv7-a -mfpu=neon
+  GCC:*_*_ARM_PLATFORM_FLAGS    == -march=armv7-a -mfpu=neon
   GCC:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
 
-  RVCT:*_*_ARM_ARCHCC_FLAGS  == --cpu Cortex-A8 --thumb
-  RVCT:*_*_ARM_ARCHASM_FLAGS == --cpu Cortex-A8 
+  RVCT:*_*_ARM_PLATFORM_FLAGS  == --cpu Cortex-A8
   RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG 
 
 [LibraryClasses.common]
@@ -69,7 +65,12 @@
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
   ArmTrustZoneLib|ArmPkg/Library/ArmTrustZoneLib/ArmTrustZoneLib.inf
-  
+
+  UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
+  PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+  # TODO: Check if we cannot remove this dependancy (Mayve using the SerialLibNull implementation makes the EFI application do not print)
+  SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
+
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
@@ -81,9 +82,11 @@
   PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
 
+[LibraryClasses.common.DXE_DRIVER]
+  ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Dxe/DxeArmPlatformGlobalVariableLib.inf
+
 [LibraryClasses.ARM]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
 
 [Components.common]
   ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
@@ -120,6 +123,7 @@
   ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
   ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
   ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
+  ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
