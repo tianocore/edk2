@@ -38,6 +38,7 @@
   BaseLib
   DebugLib
   DebugAgentLib
+  ArmCpuLib
   ArmLib
   ArmGicLib
   IoLib
@@ -54,6 +55,9 @@
   PrePiHobListPointerLib
   PlatformPeiLib
   MemoryInitPeiLib
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid
 
 [Guids]
   gArmGlobalVariableGuid

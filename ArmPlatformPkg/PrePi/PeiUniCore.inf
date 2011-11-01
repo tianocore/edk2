@@ -38,6 +38,7 @@
   BaseLib
   DebugLib
   DebugAgentLib
+  ArmCpuLib
   ArmLib
   IoLib
   TimerLib
@@ -53,6 +54,9 @@
   PrePiHobListPointerLib
   PlatformPeiLib
   MemoryInitPeiLib
+
+[Guids]
+  gArmGlobalVariableGuid
 
 [Guids]
   gArmGlobalVariableGuid

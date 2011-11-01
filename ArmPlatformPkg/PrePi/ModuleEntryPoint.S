@@ -34,7 +34,7 @@ ASM_PFX(_ModuleEntryPoint):
   and   r5, r0, r1
 
 _SetSVCMode:
-  // Enter SVC mode
+  // Enter SVC mode, Disable FIQ and IRQ
   mov     r1, #0x13|0x80|0x40
   msr     CPSR_c, r1
 
@@ -98,7 +98,7 @@ _GetStackBaseMpCore:
 
   // Is it the Primary Core ?
   LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCore), r4)
-  cmp   r0, r4
+  cmp   r5, r4
   beq   _SetupPrimaryCoreStack
 
 _SetupSecondaryCoreStack:

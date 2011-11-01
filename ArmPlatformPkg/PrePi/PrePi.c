@@ -14,10 +14,9 @@
 
 #include <PiPei.h>
 
+#include <Library/ArmCpuLib.h>
 #include <Library/DebugAgentLib.h>
-#include <Library/BaseMemoryLib.h>
 #include <Library/PrePiLib.h>
-#include <Library/IoLib.h>
 #include <Library/PrintLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PrePiHobListPointerLib.h>
@@ -31,7 +30,7 @@
 #include "PrePi.h"
 #include "LzmaDecompress.h"
 
-#define IS_XIP() ((FixedPcdGet32 (PcdFdBaseAddress) > (FixedPcdGet32 (PcdSystemMemoryBase) + FixedPcdGet32 (PcdSystemMemorySize))) || \
+#define IS_XIP() (((UINT32)FixedPcdGet32 (PcdFdBaseAddress) > (UINT32)(FixedPcdGet32 (PcdSystemMemoryBase) + FixedPcdGet32 (PcdSystemMemorySize))) || \
                   ((FixedPcdGet32 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) < FixedPcdGet32 (PcdSystemMemoryBase)))
 
 // Not used when PrePi in run in XIP mode
@@ -89,7 +88,7 @@ PrePiMain (
   // If ensure the FD is either part of the System Memory or totally outside of the System Memory (XIP)
   ASSERT (IS_XIP() || 
           ((FixedPcdGet32 (PcdFdBaseAddress) >= FixedPcdGet32 (PcdSystemMemoryBase)) &&
-           ((FixedPcdGet32 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) <= (FixedPcdGet32 (PcdSystemMemoryBase) + FixedPcdGet32 (PcdSystemMemorySize)))));
+           ((UINT32)(FixedPcdGet32 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) <= (UINT32)(FixedPcdGet32 (PcdSystemMemoryBase) + FixedPcdGet32 (PcdSystemMemorySize)))));
 
   // Enable program flow prediction, if supported.
   ArmEnableBranchPrediction ();
@@ -106,10 +105,6 @@ PrePiMain (
   // Initialize the Debug Agent for Source Level Debugging
   InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
   SaveAndSetDebugTimerInterrupt (TRUE);
-
-  if (!IS_XIP()) {
-    mGlobalVariableBase = GlobalVariableBase;
-  }
   
   // Declare the PI/UEFI memory region
   HobList = HobConstructor (
@@ -125,7 +120,11 @@ PrePiMain (
   ASSERT_EFI_ERROR (Status);
 
   // Create the Stacks HOB (reserve the memory for all stacks)
-  StacksSize = PcdGet32 (PcdCPUCorePrimaryStackSize) + (FixedPcdGet32(PcdClusterCount) * 4 * FixedPcdGet32(PcdCPUCoreSecondaryStackSize));
+  if (ArmIsMpCore ()) {
+    StacksSize = PcdGet32 (PcdCPUCorePrimaryStackSize) + (FixedPcdGet32(PcdClusterCount) * 4 * FixedPcdGet32(PcdCPUCoreSecondaryStackSize));
+  } else {
+    StacksSize = PcdGet32 (PcdCPUCorePrimaryStackSize);
+  }
   BuildStackHob (StacksBase, StacksSize);
 
   // Declare the Global Variable HOB
@@ -198,6 +197,17 @@ CEntryPoint (
   ArmEnableDataCache ();
   ArmEnableInstructionCache ();
 
+  // Define the Global Variable region when we are not running in XIP
+  if (!IS_XIP()) {
+    if (IS_PRIMARY_CORE(MpId)) {
+      mGlobalVariableBase = GlobalVariableBase;
+      ArmCpuSynchronizeSignal (ARM_CPU_EVENT_DEFAULT);
+    } else {
+	  // Wait the Primay core has defined the address of the Global Variable region
+	  ArmCpuSynchronizeWait (ARM_CPU_EVENT_DEFAULT);
+    }
+  }
+  
   // Write VBAR - The Vector table must be 32-byte aligned
   ASSERT (((UINT32)PrePiVectorTable & ((1 << 5)-1)) == 0);
   ArmWriteVBar ((UINT32)PrePiVectorTable);

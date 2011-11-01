@@ -16,6 +16,32 @@
 
 #include <Library/ArmGicLib.h>
 
+#include <Ppi/ArmMpCoreInfo.h>
+
+EFI_STATUS
+GetPlatformPpi (
+  IN  EFI_GUID  *PpiGuid,
+  OUT VOID      **Ppi
+  )
+{
+  UINTN                   PpiListSize;
+  UINTN                   PpiListCount;
+  EFI_PEI_PPI_DESCRIPTOR  *PpiList;
+  UINTN                   Index;
+
+  PpiListSize = 0;
+  ArmPlatformGetPlatformPpiList (&PpiListSize, &PpiList);
+  PpiListCount = PpiListSize / sizeof(EFI_PEI_PPI_DESCRIPTOR);
+  for (Index = 0; Index < PpiListCount; Index++, PpiList++) {
+    if (CompareGuid (PpiList->Guid, PpiGuid) == TRUE) {
+      *Ppi = PpiList->Ppi;
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
 VOID
 PrimaryMain (
   IN  UINTN                     UefiMemoryBase,
@@ -24,6 +50,15 @@ PrimaryMain (
   IN  UINT64                    StartTimeStamp
   )
 {
+  // On MP Core Platform we must implement the ARM MP Core Info PPI (gArmMpCoreInfoPpiGuid)
+  DEBUG_CODE_BEGIN();
+    EFI_STATUS              Status;
+    ARM_MP_CORE_INFO_PPI    *ArmMpCoreInfoPpi;
+
+    Status = GetPlatformPpi (&gArmMpCoreInfoPpiGuid, (VOID**)&ArmMpCoreInfoPpi);
+    ASSERT_EFI_ERROR (Status);
+  DEBUG_CODE_END();
+
   // Enable the GIC Distributor
   ArmGicEnableDistributor(PcdGet32(PcdGicDistributorBase));
 
@@ -44,23 +79,50 @@ SecondaryMain (
   IN  UINTN                     MpId
   )
 {
-  // Function pointer to Secondary Core entry point
-  VOID (*secondary_start)(VOID);
-  UINTN secondary_entry_addr=0;
+  EFI_STATUS              Status;
+  ARM_MP_CORE_INFO_PPI    *ArmMpCoreInfoPpi;
+  UINTN                   Index;
+  UINTN                   ArmCoreCount;
+  ARM_CORE_INFO           *ArmCoreInfoTable;
+  UINT32                  ClusterId;
+  UINT32                  CoreId;
+  VOID                    (*SecondaryStart)(VOID);
+  UINTN                   SecondaryEntryAddr;
+
+  ClusterId = GET_CLUSTER_ID(MpId);
+  CoreId    = GET_CORE_ID(MpId);
+
+  // On MP Core Platform we must implement the ARM MP Core Info PPI (gArmMpCoreInfoPpiGuid)
+  Status = GetPlatformPpi (&gArmMpCoreInfoPpiGuid, (VOID**)&ArmMpCoreInfoPpi);
+  ASSERT_EFI_ERROR (Status);
+
+  ArmCoreCount = 0;
+  Status = ArmMpCoreInfoPpi->GetMpCoreInfo (&ArmCoreCount, &ArmCoreInfoTable);
+  ASSERT_EFI_ERROR (Status);
+
+  // Find the core in the ArmCoreTable
+  for (Index = 0; Index < ArmCoreCount; Index++) {
+    if ((ArmCoreInfoTable[Index].ClusterId == ClusterId) && (ArmCoreInfoTable[Index].CoreId == CoreId)) {
+      break;
+    }
+  }
+
+  // The ARM Core Info Table must define every core
+  ASSERT (Index != ArmCoreCount);
 
   // Clear Secondary cores MailBox
-  ArmClearMPCoreMailbox();
+  MmioWrite32 (ArmCoreInfoTable[Index].MailboxClearAddress, ArmCoreInfoTable[Index].MailboxClearValue);
 
-  while (secondary_entry_addr = ArmGetMPCoreMailbox(), secondary_entry_addr == 0) {
-    ArmCallWFI();
+  SecondaryEntryAddr = 0;
+  while (SecondaryEntryAddr = MmioRead32 (ArmCoreInfoTable[Index].MailboxGetAddress), SecondaryEntryAddr == 0) {
+    ArmCallWFI ();
     // Acknowledge the interrupt and send End of Interrupt signal.
     ArmGicAcknowledgeSgiFrom (PcdGet32(PcdGicInterruptInterfaceBase), PRIMARY_CORE_ID);
   }
 
-  secondary_start = (VOID (*)())secondary_entry_addr;
-
   // Jump to secondary core entry point.
-  secondary_start();
+  SecondaryStart = (VOID (*)())SecondaryEntryAddr;
+  SecondaryStart();
 
   // The secondaries shouldn't reach here
   ASSERT(FALSE);

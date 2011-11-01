@@ -18,7 +18,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/PcdLib.h>
 
-#define IS_XIP() ((PcdGet32 (PcdFdBaseAddress) > (PcdGet32 (PcdSystemMemoryBase) + PcdGet32 (PcdSystemMemorySize))) || \
+#define IS_XIP() (((UINT32)PcdGet32 (PcdFdBaseAddress) > (UINT32)(PcdGet32 (PcdSystemMemoryBase) + PcdGet32 (PcdSystemMemorySize))) || \
                   ((PcdGet32 (PcdFdBaseAddress) + PcdGet32 (PcdFdSize)) < PcdGet32 (PcdSystemMemoryBase)))
 
 // Declared by ArmPlatformPkg/PrePi Module
@@ -35,7 +35,8 @@ ArmPlatformGetGlobalVariable (
 
   if (IS_XIP()) {
     // In Case of XIP, we expect the Primary Stack at the top of the System Memory
-    GlobalVariableBase = PcdGet32 (PcdSystemMemoryBase) + PcdGet32 (PcdSystemMemorySize) - PcdGet32 (PcdPeiGlobalVariableSize);
+    // The size must be 64bit aligned to allow 64bit variable to be aligned
+    GlobalVariableBase = PcdGet32 (PcdSystemMemoryBase) + PcdGet32 (PcdSystemMemorySize) - ALIGN_VALUE(PcdGet32 (PcdPeiGlobalVariableSize),0x8);
   } else {
     GlobalVariableBase = mGlobalVariableBase;
   }
@@ -60,7 +61,8 @@ ArmPlatformSetGlobalVariable (
 
   if (IS_XIP()) {
     // In Case of XIP, we expect the Primary Stack at the top of the System Memory
-    GlobalVariableBase = PcdGet32 (PcdSystemMemoryBase) + PcdGet32 (PcdSystemMemorySize) - PcdGet32 (PcdPeiGlobalVariableSize);
+    // The size must be 64bit aligned to allow 64bit variable to be aligned
+    GlobalVariableBase = PcdGet32 (PcdSystemMemoryBase) + PcdGet32 (PcdSystemMemorySize) - ALIGN_VALUE(PcdGet32 (PcdPeiGlobalVariableSize),0x8);
   } else {
     GlobalVariableBase = mGlobalVariableBase;
   }
