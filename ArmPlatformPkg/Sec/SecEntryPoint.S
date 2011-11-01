@@ -88,7 +88,7 @@ _SetupPrimaryCoreStack:
 _InitGlobals:
   str     r1, [r3], #4
   cmp     r3, r2
-  blt     _InitGlobals
+  bne     _InitGlobals
 
   b     _PrepareArguments
 

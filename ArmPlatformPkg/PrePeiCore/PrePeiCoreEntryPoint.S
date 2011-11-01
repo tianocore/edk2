@@ -72,7 +72,7 @@ _SetupPrimaryCoreStack:
 _InitGlobals:
   str   r1, [r3], #4
   cmp   r3, r2
-  blt   _InitGlobals
+  bne   _InitGlobals
 
 _PrepareArguments:
   // The PEI Core Entry Point has been computed by GenFV and stored in the second entry of the Reset Vector

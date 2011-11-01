@@ -130,7 +130,7 @@ _SetGlobals
 _InitGlobals
   str   r2, [r3], #4
   cmp   r3, r1
-  blt   _InitGlobals
+  bne   _InitGlobals
 
 
 _PrepareArguments
