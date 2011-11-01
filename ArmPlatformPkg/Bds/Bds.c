@@ -41,6 +41,12 @@ GetConsoleDevicePathFromVariable (
 
   Status = GetEnvironmentVariable (ConsoleVarName, NULL, NULL, (VOID**)&DevicePathInstances);
   if (EFI_ERROR(Status)) {
+    // In case no default console device path has been defined we assume a driver handles the console (eg: SimpleTextInOutSerial)
+    if ((DefaultConsolePaths == NULL) || (DefaultConsolePaths[0] == L'\0')) {
+      *DevicePaths = NULL;
+      return EFI_SUCCESS;
+    }
+
     Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);
     ASSERT_EFI_ERROR(Status);
 
@@ -89,7 +95,7 @@ GetConsoleDevicePathFromVariable (
   if (!EFI_ERROR(Status)) {
     *DevicePaths = DevicePathInstances;
   }
-  return EFI_SUCCESS;
+  return Status;
 }
 
 STATIC
@@ -108,7 +114,7 @@ InitializeConsolePipe (
   EFI_DEVICE_PATH_PROTOCOL* DevicePath;
 
   // Connect all the Device Path Consoles
-  do {
+  while (ConsoleDevicePaths != NULL) {
     DevicePath = GetNextDevicePathInstance (&ConsoleDevicePaths, &Size);
 
     Status = BdsConnectDevicePath (DevicePath, Handle, NULL);
@@ -135,7 +141,7 @@ InitializeConsolePipe (
     if (!EFI_ERROR(Status) && (*Interface == NULL)) {
       Status = gBS->HandleProtocol (*Handle, Protocol, Interface);
     }
-  } while (ConsoleDevicePaths != NULL);
+  }
 
   // No Device Path has been defined for this console interface. We take the first protocol implementation
   if (*Interface == NULL) {
@@ -171,11 +177,11 @@ InitializeConsole (
   // By getting the Console Device Paths from the environment variables before initializing the console pipe, we
   // create the 3 environment variables (ConIn, ConOut, ConErr) that allows to initialize all the console interface
   // of newly installed console drivers
-  Status = GetConsoleDevicePathFromVariable (L"ConOut", (CHAR16*)PcdGetPtr(PcdDefaultConOutPaths),&ConOutDevicePaths);
+  Status = GetConsoleDevicePathFromVariable (L"ConOut", (CHAR16*)PcdGetPtr(PcdDefaultConOutPaths), &ConOutDevicePaths);
   ASSERT_EFI_ERROR (Status);
-  Status = GetConsoleDevicePathFromVariable (L"ConIn", (CHAR16*)PcdGetPtr(PcdDefaultConInPaths),&ConInDevicePaths);
+  Status = GetConsoleDevicePathFromVariable (L"ConIn", (CHAR16*)PcdGetPtr(PcdDefaultConInPaths), &ConInDevicePaths);
   ASSERT_EFI_ERROR (Status);
-  Status = GetConsoleDevicePathFromVariable (L"ConErr", (CHAR16*)PcdGetPtr(PcdDefaultConOutPaths),&ConErrDevicePaths);
+  Status = GetConsoleDevicePathFromVariable (L"ConErr", (CHAR16*)PcdGetPtr(PcdDefaultConOutPaths), &ConErrDevicePaths);
   ASSERT_EFI_ERROR (Status);
 
   // Initialize the Consoles
