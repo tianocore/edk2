@@ -81,7 +81,7 @@ typedef enum {
 
 #define IS_PRIMARY_CORE(MpId) (((MpId) & PcdGet32(PcdArmPrimaryCoreMask)) == PcdGet32(PcdArmPrimaryCore))
 #define GET_CORE_ID(MpId)     ((MpId) & 0x3)
-#define GET_CLUSTER_ID(MpId)  (((MpId) >> 6) & 0x3C)
+#define GET_CLUSTER_ID(MpId)  (((MpId) >> 8) & 0x3C)
 // Get the position of the core for the Stack Offset (4 Core per Cluster)
 //   Position = (ClusterId * 4) + CoreId
 #define GET_CORE_POS(MpId)    ((((MpId) >> 6) & 0x3C) + ((MpId) & 0x3))
