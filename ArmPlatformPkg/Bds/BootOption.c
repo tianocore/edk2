@@ -75,7 +75,7 @@ BootOptionStart (
 
       // Get the FDT device path
       FdtDevicePathSize = GetDevicePathSize (DefaultFdtDevicePath);
-      Status = GetEnvironmentVariable ((CHAR16 *)L"FDT", DefaultFdtDevicePath, &FdtDevicePathSize, (VOID **)&FdtDevicePath);
+      Status = GetEnvironmentVariable ((CHAR16 *)L"Fdt", DefaultFdtDevicePath, &FdtDevicePathSize, (VOID **)&FdtDevicePath);
       ASSERT_EFI_ERROR(Status);
 
       Status = BdsBootLinuxFdt (BootOption->FilePathList,
