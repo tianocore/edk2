@@ -37,6 +37,7 @@
 [Sources.common]
   TscTimerLibShare.c
   BaseTscTimerLib.c
+  TscTimerLibInternal.h
 
 
 [Packages]

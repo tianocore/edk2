@@ -34,6 +34,7 @@
 [Sources.common]
   TscTimerLibShare.c
   PeiTscTimerLib.c
+  TscTimerLibInternal.h
 
 
 [Packages]
