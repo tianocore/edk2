@@ -89,7 +89,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/fcntl.h>
-#include "internal.h"
 
 #ifdef HAVE_NBTOOL_CONFIG_H
 #define NO_GETPW_R

@@ -43,9 +43,9 @@ char *__dtoa(double, int, int, int *, int *, char **);
 void __freedtoa(char *);
 int __sysctl(const int *, unsigned int, void *, size_t *, const void *, size_t);
 
-struct sigaction;
-int __sigaction_sigtramp(int, const struct sigaction *,
-    struct sigaction *, const void *, int);
+//struct sigaction;
+//int __sigaction_sigtramp(int, const struct sigaction *,
+//    struct sigaction *, const void *, int);
 
 #ifdef WIDE_DOUBLE
   char *__hdtoa(double, const char *, int, int *, int *, char **);
@@ -53,15 +53,15 @@ int __sigaction_sigtramp(int, const struct sigaction *,
   char *__ldtoa(long double *, int, int, int *, int *, char **);
 #endif
 
-struct syslog_data;
-void  syslog_ss(int, struct syslog_data *, const char *, ...)
-    __attribute__((__format__(__printf__,3,4)));
-void  vsyslog_ss(int, struct syslog_data *, const char *, _BSD_VA_LIST_);
+//struct syslog_data;
+//void  syslog_ss(int, struct syslog_data *, const char *, ...)
+//    __attribute__((__format__(__printf__,3,4)));
+//void  vsyslog_ss(int, struct syslog_data *, const char *, _BSD_VA_LIST_);
 
-int snprintf_ss(char * __restrict, size_t, const char * __restrict, ...)
-    __attribute__((__format__(__printf__, 3, 4)));
-int vsnprintf_ss(char * __restrict, size_t, const char * __restrict,
-    _BSD_VA_LIST_) __attribute__((__format__(__printf__, 3, 0)));
+//int snprintf_ss(char * __restrict, size_t, const char * __restrict, ...)
+//    __attribute__((__format__(__printf__, 3, 4)));
+//int vsnprintf_ss(char * __restrict, size_t, const char * __restrict,
+//    _BSD_VA_LIST_) __attribute__((__format__(__printf__, 3, 0)));
 
 void    Efi2Tm( EFI_TIME *ET, struct tm *BT);
 time_t  Efi2Time( EFI_TIME *EfiBDtime);

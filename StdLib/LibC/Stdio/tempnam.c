@@ -75,7 +75,7 @@ tempnam(const char *dir, const char *pfx)
   char *name, *f;
   const char *tmp;
 
-  if (!(name = malloc((size_t)MAXPATHLEN)))
+  if ((name = malloc((size_t)MAXPATHLEN)) == NULL)
     return NULL;
 
   if (!pfx)

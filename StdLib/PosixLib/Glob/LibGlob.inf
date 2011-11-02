@@ -27,7 +27,6 @@
 #
 
 [Sources.common]
-  DirFunctions.c
   glob.c
 
 [Packages]

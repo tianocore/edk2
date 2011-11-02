@@ -43,7 +43,7 @@ static const int map[] = {
   1,  /* round to nearest */
   2,  /* round to positive infinity */
   3,  /* round to negative infinity */
-  0 /* round to zero */
+  0   /* round to zero */
 };
 
 /*

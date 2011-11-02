@@ -1496,7 +1496,7 @@ __BEGIN_DECLS
   int   mkstemp(char *);
   char *mktemp(char *);
 
-    char *tempnam(const char *, const char *);
+  char *tempnam(const char *, const char *);
 __END_DECLS
 
 /*

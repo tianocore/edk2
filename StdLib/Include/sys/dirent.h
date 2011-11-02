@@ -59,18 +59,22 @@
  *
  * All names are wide characters and are guaranteed to be null terminated.
  * The maximum length of a name in a directory is MAXNAMLEN.
+ *
+ *  This structure is identical to the EFI_FILE_INFO structure.  A new
+ *  structure is declared because one must be able to refer to it
+ *  as struct dirent.
  */
 struct dirent {
-  UINT64    Size;               // Size of this dirent structure instance,
-                                  // including the Null-terminated FileName string.
-  UINT64    FileSize;           // The size of the file in bytes.
-  UINT64    PhysicalSize;       // The amount of physical space the file consumes
-                                  // on the file system volume.
-  UINT64    Attribute;          // The time the file was created.
-  struct timespec  CreateTime;         // The time when the file was last accessed.
-  struct timespec  LastAccessTime;     // The time when the file's contents were last modified.
-  struct timespec  ModificationTime;   // The attribute bits for the file. See below.
-  CHAR16    FileName[1];         // The Null-terminated name of the file.
+  UINT64            Size;               // (d_reclen) Size of this dirent structure instance,
+                                        // including the Null-terminated FileName string.
+  UINT64            FileSize;           // The size of the file in bytes.
+  UINT64            PhysicalSize;       // The amount of physical space the file consumes
+                                        // on the file system volume.
+  struct timespec   CreateTime;         // The time the file was created.
+  struct timespec   LastAccessTime;     // The time when the file was last accessed.
+  struct timespec   ModificationTime;   // The time when the file's contents were last modified.
+  UINT64            Attribute;          // (d_type)   The attribute bits for the file. See below.
+  CHAR16            FileName[1];        // (d_name)   The Null-terminated name of the file.
 };
 
 /*
@@ -87,5 +91,47 @@ struct dirent {
 #define DT_BLK        0x0000000000020000  // File attaches to a block device
 #define DT_SOCKET     0x0000000000030000  // File attaches to a socket
 #define DT_VALID_ATTR 0x0000000000030037  // Mask for valid attribute bits
+
+/*
+ * The _DIRENT_ALIGN macro returns the alignment of struct dirent.
+ * struct dirent uses 8.
+ */
+#define _DIRENT_ALIGN(dp) (sizeof((dp)->Size) - 1)
+
+/*
+ * The _DIRENT_NAMEOFF macro returns the offset of the d_name field in
+ * struct dirent
+ */
+#define _DIRENT_NAMEOFF(dp) \
+    ((char *)(void *)&(dp)->FileName - (char *)(void *)dp)
+
+/*
+ * The _DIRENT_RECLEN macro gives the minimum record length which will hold
+ * a name of size "namlen".  This requires the amount of space in struct dirent
+ * without the d_name field, plus enough space for the name with a terminating
+ * null byte (namlen+1), rounded up to a the appropriate byte boundary.
+ */
+#define _DIRENT_RECLEN(dp, namlen) \
+    ((_DIRENT_NAMEOFF(dp) + (namlen) + 1 + _DIRENT_ALIGN(dp)) & \
+    ~_DIRENT_ALIGN(dp))
+
+#define _DIRENT_NAMELEN(dp) \
+          ((dp)->Size - _DIRENT_NAMEOFF(dp) - 1)
+
+/*
+ * The _DIRENT_SIZE macro returns the minimum record length required for
+ * name name stored in the current record.
+ */
+#define _DIRENT_SIZE(dp) _DIRENT_RECLEN(dp, _DIRENT_NAMELEN(dp))
+
+/*
+ * The _DIRENT_NEXT macro advances to the next dirent record.
+ */
+#define _DIRENT_NEXT(dp) ((void *)((char *)(void *)(dp) + (dp)->Size))
+
+/*
+ * The _DIRENT_MINSIZE returns the size of an empty (invalid) record.
+ */
+#define _DIRENT_MINSIZE(dp) _DIRENT_RECLEN(dp, 0)
 
 #endif  /* !_SYS_DIRENT_H_ */

@@ -183,7 +183,7 @@ __BEGIN_DECLS
 
   /**
   **/
-  extern int      stat      (const char *, void *);
+  extern int      stat      (const char *, struct stat *);
 
   /**
   **/

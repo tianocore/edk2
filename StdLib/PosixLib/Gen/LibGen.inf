@@ -28,6 +28,9 @@
 
 [Sources.common]
   dirname.c
+  opendir.c
+  closedir.c
+  readdir.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -35,6 +38,7 @@
   StdLibPrivateInternalFiles/DoNotUse.dec
 
 [Libraries]
+  LibStdio
   LibString
   LibStdLib
 
