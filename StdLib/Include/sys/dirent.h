@@ -43,9 +43,10 @@
    @(#)dirent.h  8.3 (Berkeley) 8/10/94
    NetBSD: dirent.h,v 1.23 2005/12/26 18:41:36 perry Exp
 **/
-
 #ifndef _SYS_DIRENT_H_
 #define _SYS_DIRENT_H_
+
+#include  <Uefi.h>
 
 #include  <sys/featuretest.h>
 #include  <time.h>
@@ -70,12 +71,18 @@ struct dirent {
   UINT64            FileSize;           // The size of the file in bytes.
   UINT64            PhysicalSize;       // The amount of physical space the file consumes
                                         // on the file system volume.
-  struct timespec   CreateTime;         // The time the file was created.
-  struct timespec   LastAccessTime;     // The time when the file was last accessed.
-  struct timespec   ModificationTime;   // The time when the file's contents were last modified.
+  EFI_TIME          CreateTime;         // The time the file was created.
+  EFI_TIME          LastAccessTime;     // The time when the file was last accessed.
+  EFI_TIME          ModificationTime;   // The time when the file's contents were last modified.
   UINT64            Attribute;          // (d_type)   The attribute bits for the file. See below.
   CHAR16            FileName[1];        // (d_name)   The Null-terminated name of the file.
 };
+
+/* For compatibility */
+#define   d_name    FileName
+#define   d_type    Attribute
+#define   d_reclen  Size
+
 
 /*
  * File Attributes
