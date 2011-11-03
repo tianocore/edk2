@@ -13,7 +13,7 @@
   * Dp uses this information to group records in different ways.  It also uses
   * timer information to calculate elapsed time for each measurement.
   *
-  * Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  * Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   * This program and the accompanying materials
   * are licensed and made available under the terms and conditions of the BSD License
   * which accompanies this distribution.  The full text of the license may be found at
@@ -84,6 +84,19 @@ PARAM_ITEM_LIST  ParamList[] = {
   };
 
 ///@}
+
+/**
+  Wrap original FreePool to check NULL pointer first.
+**/
+VOID
+SafeFreePool (
+  IN VOID   *Buffer
+  )
+{
+  if (Buffer != NULL) {
+    FreePool (Buffer);
+  }
+}
 
 /**
   Transfer the param list value and get the command line parse.
@@ -433,23 +446,23 @@ InitializeDp (
     ListIndex ++;
   }  
   FreePool (DpParamList);
-  
-  FreePool (StringDpOptionQh);
-  FreePool (StringDpOptionLh);
-  FreePool (StringDpOptionUh);
-  FreePool (StringDpOptionLv);
-  FreePool (StringDpOptionUs);
-  FreePool (StringDpOptionLs);
-  FreePool (StringDpOptionUa);
-  FreePool (StringDpOptionUr);
-  FreePool (StringDpOptionUt);
-  FreePool (StringDpOptionUp);
-  FreePool (StringDpOptionLx);
-  FreePool (StringDpOptionLn);
-  FreePool (StringDpOptionLt);  
-  FreePool (StringPtr);
-  FreePool (mPrintTokenBuffer);
-  
+
+  SafeFreePool (StringDpOptionQh);
+  SafeFreePool (StringDpOptionLh);
+  SafeFreePool (StringDpOptionUh);
+  SafeFreePool (StringDpOptionLv);
+  SafeFreePool (StringDpOptionUs);
+  SafeFreePool (StringDpOptionLs);
+  SafeFreePool (StringDpOptionUa);
+  SafeFreePool (StringDpOptionUr);
+  SafeFreePool (StringDpOptionUt);
+  SafeFreePool (StringDpOptionUp);
+  SafeFreePool (StringDpOptionLx);
+  SafeFreePool (StringDpOptionLn);
+  SafeFreePool (StringDpOptionLt);
+  SafeFreePool (StringPtr);
+  SafeFreePool (mPrintTokenBuffer);
+
   HiiRemovePackages (gHiiHandle);
   return Status;
 }
