@@ -53,11 +53,10 @@
 
 #include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
+#include <strings.h>
 #include <sys/poll.h>
 #include <sys/param.h>
 #include <sys/time.h>
-#include  <extern.h>      /* For ffs() */
 #ifndef KERNEL
 #define KERNEL
 #include <errno.h>

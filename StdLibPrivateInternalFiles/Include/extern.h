@@ -66,6 +66,4 @@ int __sysctl(const int *, unsigned int, void *, size_t *, const void *, size_t);
 void    Efi2Tm( EFI_TIME *ET, struct tm *BT);
 time_t  Efi2Time( EFI_TIME *EfiBDtime);
 
-int     ffs(int x);
-
 __END_DECLS
