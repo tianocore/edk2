@@ -2,10 +2,6 @@
   The header <errno.h> defines several macros, all relating to the reporting of
   error conditions.
 
-  The macros expand to integral constant expressions
-  with distinct nonzero values, suitable for use in #if preprocessing
-  directives.
-
   The ISO/IEC 9899 specification requires that these be macros.
 
   The macros expand to integral constant expressions
@@ -51,44 +47,44 @@ extern  RETURN_STATUS   EFIerrno;
 
 #define ERESTART          -1                      /* restart syscall */
 
-#define EMINERRORVAL      __EMINERRORVAL          /* The lowest valid error value */
+#define EMINERRORVAL      __EMINERRORVAL          /*  1   The lowest valid error value */
 
-#define EPERM             __EPERM                 /* Operation not permitted */
-#define ENOENT            __ENOENT                /* No such file or directory */
-#define ESRCH             __ESRCH                 /* No such process */
-#define EINTR             __EINTR                 /* Interrupted system call */
-#define EIO               __EIO                   /* Input/output error */
-#define ENXIO             __ENXIO                 /* Device not configured */
-#define E2BIG             __E2BIG                 /* Argument list too long */
-#define ENOEXEC           __ENOEXEC               /* Exec format error */
-#define EBADF             __EBADF                 /* Bad file descriptor */
-#define ECHILD            __ECHILD                /* No child processes */
-#define EDEADLK           __EDEADLK               /* Resource deadlock avoided */
-#define ENOMEM            __ENOMEM                /* Cannot allocate memory */
-#define EACCES            __EACCES                /* Permission denied */
-#define EFAULT            __EFAULT                /* Bad address */
-#define ENOTBLK           __ENOTBLK               /* Block device required */
-#define EBUSY             __EBUSY                 /* Device busy */
-#define EEXIST            __EEXIST                /* File exists */
-#define EXDEV             __EXDEV                 /* Cross-device link */
-#define ENODEV            __ENODEV                /* Operation not supported by device */
-#define ENOTDIR           __ENOTDIR               /* Not a directory */
-#define EISDIR            __EISDIR                /* Is a directory */
-#define EINVAL            __EINVAL                /* Invalid argument */
-#define ENFILE            __ENFILE                /* Too many open files in system */
-#define EMFILE            __EMFILE                /* Too many open file descriptors */
-#define ENOTTY            __ENOTTY                /* Inappropriate ioctl for device */
-#define ETXTBSY           __ETXTBSY               /* Text file busy */
-#define EFBIG             __EFBIG                 /* File too large */
-#define ENOSPC            __ENOSPC                /* No space left on device */
-#define ESPIPE            __ESPIPE                /* Illegal seek */
-#define EROFS             __EROFS                 /* Read-only filesystem */
-#define EMLINK            __EMLINK                /* Too many links */
-#define EPIPE             __EPIPE                 /* Broken pipe */
+#define EPERM             __EPERM                 /*  1   Operation not permitted */
+#define ENOENT            __ENOENT                /*  2   No such file or directory */
+#define ESRCH             __ESRCH                 /*  3   No such process */
+#define EINTR             __EINTR                 /*  4   Interrupted system call */
+#define EIO               __EIO                   /*  5   Input/output error */
+#define ENXIO             __ENXIO                 /*  6   Device not configured */
+#define E2BIG             __E2BIG                 /*  7   Argument list too long */
+#define ENOEXEC           __ENOEXEC               /*  8   Exec format error */
+#define EBADF             __EBADF                 /*  9   Bad file descriptor */
+#define ECHILD            __ECHILD                /* 10   No child processes */
+#define EDEADLK           __EDEADLK               /* 11   Resource deadlock avoided */
+#define ENOMEM            __ENOMEM                /* 12   Cannot allocate memory */
+#define EACCES            __EACCES                /* 13   Permission denied */
+#define EFAULT            __EFAULT                /* 14   Bad address */
+#define ENOTBLK           __ENOTBLK               /* 15   Block device required */
+#define EBUSY             __EBUSY                 /* 16   Device busy */
+#define EEXIST            __EEXIST                /* 17   File exists */
+#define EXDEV             __EXDEV                 /* 18   Cross-device link */
+#define ENODEV            __ENODEV                /* 19   Operation not supported by device */
+#define ENOTDIR           __ENOTDIR               /* 20   Not a directory */
+#define EISDIR            __EISDIR                /* 21   Is a directory */
+#define EINVAL            __EINVAL                /* 22   Invalid argument */
+#define ENFILE            __ENFILE                /* 23   Too many open files in system */
+#define EMFILE            __EMFILE                /* 24   Too many open file descriptors */
+#define ENOTTY            __ENOTTY                /* 25   Inappropriate ioctl for device */
+#define ETXTBSY           __ETXTBSY               /* 26   Text file busy */
+#define EFBIG             __EFBIG                 /* 27   File too large */
+#define ENOSPC            __ENOSPC                /* 28   No space left on device */
+#define ESPIPE            __ESPIPE                /* 29   Illegal seek */
+#define EROFS             __EROFS                 /* 30   Read-only filesystem */
+#define EMLINK            __EMLINK                /* 31   Too many links */
+#define EPIPE             __EPIPE                 /* 32   Broken pipe */
 
 /* math software -- these are the only two values required by the C Standard */
-#define EDOM              __EDOM                  /* 3umerical argument out of domain */
-#define ERANGE            __ERANGE                /* 3esult too large */
+#define EDOM              __EDOM                  /* 33   Numerical argument out of domain */
+#define ERANGE            __ERANGE                /* 34   Result too large */
 
 /* non-blocking and interrupt i/o */
 #define EAGAIN            __EAGAIN                /* 35   Resource temporarily unavailable */
