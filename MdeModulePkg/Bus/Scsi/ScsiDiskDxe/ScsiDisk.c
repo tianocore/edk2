@@ -1265,7 +1265,7 @@ DetectMediaParsingSenseKeys (
   @param  NumberOfSenseKeys  The number of sense key
 
   @retval EFI_DEVICE_ERROR   Indicates that error occurs
-  @retval EFI_SUCCESS        Successfully to read capacity
+  @retval EFI_SUCCESS        Successfully to read capacity or sense data is received.
 
 **/
 EFI_STATUS
@@ -1402,8 +1402,7 @@ ScsiDiskReadCapacity (
               TRUE
               );
     if (!EFI_ERROR (Status)) {
-      *NeedRetry = TRUE;
-      return EFI_DEVICE_ERROR;
+      return EFI_SUCCESS;
     }
 
     if (!*NeedRetry) {

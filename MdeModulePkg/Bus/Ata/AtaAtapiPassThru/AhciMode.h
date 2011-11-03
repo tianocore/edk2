@@ -327,7 +327,7 @@ AhciPacketCommandExecute (
   @param  PciIo              The PCI IO protocol instance.
   @param  Port               The number of port.
   @param  CommandSlot        The number of CommandSlot.
-  @param  Timeout            The timeout value of start.
+  @param  Timeout            The timeout value of start, uses 100ns as a unit.
    
   @retval EFI_DEVICE_ERROR   The command start unsuccessfully.
   @retval EFI_TIMEOUT        The operation is time out.
@@ -348,7 +348,7 @@ AhciStartCommand (
     
   @param  PciIo              The PCI IO protocol instance.
   @param  Port               The number of port.
-  @param  Timeout            The timeout value of stop.
+  @param  Timeout            The timeout value of stop, uses 100ns as a unit.
    
   @retval EFI_DEVICE_ERROR   The command stop unsuccessfully.
   @retval EFI_TIMEOUT        The operation is time out.

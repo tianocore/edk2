@@ -17,7 +17,7 @@
 /**
   read a one-byte data from a IDE port.
 
-  @param  PciIo  The PCI IO protocol instance
+  @param  PciIo  A pointer to EFI_PCI_IO_PROTOCOL data structure
   @param  Port   The IDE Port number 
 
   @return  the one-byte data read from IDE port
@@ -51,7 +51,7 @@ IdeReadPortB (
 /**
   write a 1-byte data to a specific IDE port.
 
-  @param  PciIo  The PCI IO protocol instance
+  @param  PciIo  A pointer to EFI_PCI_IO_PROTOCOL data structure
   @param  Port   The IDE port to be writen
   @param  Data   The data to write to the port
 **/
@@ -81,7 +81,7 @@ IdeWritePortB (
 /**
   write a 1-word data to a specific IDE port.
 
-  @param  PciIo  PCI IO protocol instance
+  @param  PciIo  A pointer to EFI_PCI_IO_PROTOCOL data structure
   @param  Port   The IDE port to be writen
   @param  Data   The data to write to the port
 **/
@@ -111,7 +111,7 @@ IdeWritePortW (
 /**
   write a 2-word data to a specific IDE port.
 
-  @param  PciIo  PCI IO protocol instance
+  @param  PciIo  A pointer to EFI_PCI_IO_PROTOCOL data structure
   @param  Port   The IDE port to be writen
   @param  Data   The data to write to the port
 **/
@@ -143,7 +143,7 @@ IdeWritePortDW (
   Call the IO abstraction once to do the complete read,
   not one word at a time
 
-  @param  PciIo      Pointer to the EFI_PCI_IO instance
+  @param  PciIo      A pointer to EFI_PCI_IO_PROTOCOL data structure
   @param  Port       IO port to read
   @param  Count      No. of UINT16's to read
   @param  Buffer     Pointer to the data buffer for read
@@ -180,7 +180,7 @@ IdeWritePortWMultiple (
   Call the IO abstraction once to do the complete read,
   not one word at a time
 
-  @param  PciIo    Pointer to the EFI_PCI_IO instance
+  @param  PciIo    A pointer to EFI_PCI_IO_PROTOCOL data structure
   @param  Port     IO port to read
   @param  Count    Number of UINT16's to read
   @param  Buffer   Pointer to the data buffer for read
@@ -217,7 +217,7 @@ IdeReadPortWMultiple (
   some debug information and if there is ERR bit set in the Status
   Register, the Error Register's value is also be parsed and print out.
 
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
+  @param PciIo            A pointer to EFI_PCI_IO_PROTOCOL data structure.
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
   @param AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
 
@@ -294,11 +294,10 @@ DumpAllIdeRegisters (
 }
 
 /**
-  This function is used to analyze the Status Register and print out
-  some debug information and if there is ERR bit set in the Status
-  Register, the Error Register's value is also be parsed and print out.
+  This function is used to analyze the Status Register at the condition that BSY is zero.
+  if there is ERR bit set in the Status Register, then return error.
 
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
+  @param PciIo            A pointer to EFI_PCI_IO_PROTOCOL data structure.
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
 
   @retval EFI_SUCCESS       No err information in the Status Register.
@@ -312,7 +311,6 @@ CheckStatusRegister (
   IN  EFI_IDE_REGISTERS        *IdeRegisters
   )
 {
-  EFI_STATUS      Status;
   UINT8           StatusRegister;
 
   ASSERT (PciIo != NULL);
@@ -320,13 +318,14 @@ CheckStatusRegister (
 
   StatusRegister = IdeReadPortB (PciIo, IdeRegisters->CmdOrStatus);
 
-  if ((StatusRegister & (ATA_STSREG_ERR | ATA_STSREG_DWF | ATA_STSREG_CORR)) == 0) {
-    Status = EFI_SUCCESS;
-  } else {
-    Status = EFI_DEVICE_ERROR;
+  if ((StatusRegister & ATA_STSREG_BSY) == 0) {
+    if ((StatusRegister & (ATA_STSREG_ERR | ATA_STSREG_DWF | ATA_STSREG_CORR)) == 0) {
+      return EFI_SUCCESS;
+    } else {
+      return EFI_DEVICE_ERROR;
+    }
   }
-
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -334,9 +333,9 @@ CheckStatusRegister (
   Register. DRQ is cleared when the device is finished transferring data.
   So this function is called after data transfer is finished.
 
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
+  @param PciIo            A pointer to EFI_PCI_IO_PROTOCOL data structure.
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Timeout          The time to complete the command.
+  @param Timeout          The time to complete the command, uses 100ns as a unit.
 
   @retval EFI_SUCCESS     DRQ bit clear within the time out.
 
@@ -356,7 +355,6 @@ DRQClear (
 {
   UINT32  Delay;
   UINT8   StatusRegister;
-  UINT8   ErrorRegister;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
@@ -366,22 +364,18 @@ DRQClear (
     StatusRegister = IdeReadPortB (PciIo, IdeRegisters->CmdOrStatus);
 
     //
-    // wait for BSY == 0 and DRQ == 0
+    // Wait for BSY == 0, then judge if DRQ is clear
     //
-    if ((StatusRegister & (ATA_STSREG_DRQ | ATA_STSREG_BSY)) == 0) {
-      break;
-    }
-
-    if ((StatusRegister & (ATA_STSREG_BSY | ATA_STSREG_ERR)) == ATA_STSREG_ERR) {
-      ErrorRegister = IdeReadPortB (PciIo, IdeRegisters->ErrOrFeature);
-
-      if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
-        return EFI_ABORTED;
+    if ((StatusRegister & ATA_STSREG_BSY) == 0) {
+      if ((StatusRegister & ATA_STSREG_DRQ) == ATA_STSREG_DRQ) {
+        return EFI_DEVICE_ERROR;
+      } else {
+        return EFI_SUCCESS;
       }
     }
 
     //
-    //  Stall for 100 microseconds.
+    // Stall for 100 microseconds.
     //
     MicroSecondDelay (100);
 
@@ -389,11 +383,7 @@ DRQClear (
 
   } while (Delay > 0);
 
-  if (Delay == 0) {
-    return EFI_TIMEOUT;
-  }
-
-  return EFI_SUCCESS;
+  return EFI_TIMEOUT;
 }
 /**
   This function is used to poll for the DRQ bit clear in the Alternate
@@ -401,9 +391,9 @@ DRQClear (
   transferring data. So this function is called after data transfer
   is finished.
 
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
+  @param PciIo            A pointer to EFI_PCI_IO_PROTOCOL data structure.
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Timeout          The time to complete the command.
+  @param Timeout          The time to complete the command, uses 100ns as a unit.
 
   @retval EFI_SUCCESS     DRQ bit clear within the time out.
 
@@ -421,7 +411,6 @@ DRQClear2 (
 {
   UINT32  Delay;
   UINT8   AltRegister;
-  UINT8   ErrorRegister;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
@@ -431,17 +420,13 @@ DRQClear2 (
     AltRegister = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
 
     //
-    //  wait for BSY == 0 and DRQ == 0
+    // Wait for BSY == 0, then judge if DRQ is clear
     //
-    if ((AltRegister & (ATA_STSREG_DRQ | ATA_STSREG_BSY)) == 0) {
-      break;
-    }
-
-    if ((AltRegister & (ATA_STSREG_BSY | ATA_STSREG_ERR)) == ATA_STSREG_ERR) {
-      ErrorRegister = IdeReadPortB (PciIo, IdeRegisters->ErrOrFeature);
-
-      if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
-        return EFI_ABORTED;
+    if ((AltRegister & ATA_STSREG_BSY) == 0) {
+      if ((AltRegister & ATA_STSREG_DRQ) == ATA_STSREG_DRQ) {
+        return EFI_DEVICE_ERROR;
+      } else {
+        return EFI_SUCCESS;
       }
     }
 
@@ -454,11 +439,7 @@ DRQClear2 (
 
   } while (Delay > 0);
 
-  if (Delay == 0) {
-    return EFI_TIMEOUT;
-  }
-
-  return EFI_SUCCESS;
+  return EFI_TIMEOUT;
 }
 
 /**
@@ -468,9 +449,9 @@ DRQClear2 (
   is called after the command is sent to the device and before required
   data is transferred.
 
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
+  @param PciIo            A pointer to EFI_PCI_IO_PROTOCOL data structure.
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Timeout          The time to complete the command.
+  @param Timeout          The time to complete the command, uses 100ns as a unit.
 
   @retval EFI_SUCCESS          DRQ bit set within the time out.
   @retval EFI_TIMEOUT          DRQ bit not set within the time out.
@@ -497,22 +478,27 @@ DRQReady (
   Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
   do {
     //
-    //  read Status Register will clear interrupt
+    // Read Status Register will clear interrupt
     //
     StatusRegister = IdeReadPortB (PciIo, IdeRegisters->CmdOrStatus);
 
     //
-    //  BSY==0,DRQ==1
+    // Wait for BSY == 0, then judge if DRQ is clear or ERR is set
     //
-    if ((StatusRegister & (ATA_STSREG_BSY | ATA_STSREG_DRQ)) == ATA_STSREG_DRQ) {
-      break;
-    }
+    if ((StatusRegister & ATA_STSREG_BSY) == 0) {
+      if ((StatusRegister & ATA_STSREG_ERR) == ATA_STSREG_ERR) {
+        ErrorRegister = IdeReadPortB (PciIo, IdeRegisters->ErrOrFeature);
 
-    if ((StatusRegister & (ATA_STSREG_BSY | ATA_STSREG_ERR)) == ATA_STSREG_ERR) {
-      ErrorRegister = IdeReadPortB (PciIo, IdeRegisters->ErrOrFeature);
+        if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
+          return EFI_ABORTED;
+        }
+        return EFI_DEVICE_ERROR;
+      }
 
-      if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
-        return EFI_ABORTED;
+      if ((StatusRegister & ATA_STSREG_DRQ) == ATA_STSREG_DRQ) {
+        return EFI_SUCCESS;
+      } else {
+        return EFI_NOT_READY;
       }
     }
 
@@ -524,20 +510,16 @@ DRQReady (
     Delay--;
   } while (Delay > 0);
 
-  if (Delay == 0) {
-    return EFI_TIMEOUT;
-  }
-
-  return EFI_SUCCESS;
+  return EFI_TIMEOUT;
 }
 /**
   This function is used to poll for the DRQ bit set in the Alternate Status Register.
   DRQ is set when the device is ready to transfer data. So this function is called after 
   the command is sent to the device and before required data is transferred.
 
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
+  @param PciIo            A pointer to EFI_PCI_IO_PROTOCOL data structure.
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Timeout          The time to complete the command.
+  @param Timeout          The time to complete the command, uses 100ns as a unit.
 
   @retval EFI_SUCCESS           DRQ bit set within the time out.
   @retval EFI_TIMEOUT           DRQ bit not set within the time out.
@@ -564,21 +546,26 @@ DRQReady2 (
 
   do {
     //
-    //  Read Alternate Status Register will not clear interrupt status
+    // Read Alternate Status Register will not clear interrupt status
     //
     AltRegister = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
     //
-    // BSY == 0 , DRQ == 1
+    // Wait for BSY == 0, then judge if DRQ is clear or ERR is set
     //
-    if ((AltRegister & (ATA_STSREG_BSY | ATA_STSREG_DRQ)) == ATA_STSREG_DRQ) {
-      break;
-    }
+    if ((AltRegister & ATA_STSREG_BSY) == 0) {
+      if ((AltRegister & ATA_STSREG_ERR) == ATA_STSREG_ERR) {
+        ErrorRegister = IdeReadPortB (PciIo, IdeRegisters->ErrOrFeature);
 
-    if ((AltRegister & (ATA_STSREG_BSY | ATA_STSREG_ERR)) == ATA_STSREG_ERR) {
-      ErrorRegister = IdeReadPortB (PciIo, IdeRegisters->ErrOrFeature);
+        if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
+          return EFI_ABORTED;
+        }
+        return EFI_DEVICE_ERROR;
+      }
 
-      if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
-        return EFI_ABORTED;
+      if ((AltRegister & ATA_STSREG_DRQ) == ATA_STSREG_DRQ) {
+        return EFI_SUCCESS;
+      } else {
+        return EFI_NOT_READY;
       }
     }
 
@@ -590,11 +577,7 @@ DRQReady2 (
     Delay--;
   } while (Delay > 0);
 
-  if (Delay == 0) {
-    return EFI_TIMEOUT;
-  }
-
-  return EFI_SUCCESS;
+  return EFI_TIMEOUT;
 }
 
 /**
@@ -602,9 +585,9 @@ DRQReady2 (
   bit is set when the device is ready to accept command. Most ATA commands must be 
   sent after DRDY set except the ATAPI Packet Command.
 
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
+  @param PciIo            A pointer to EFI_PCI_IO_PROTOCOL data structure.
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Timeout          The time to complete the command.
+  @param Timeout          The time to complete the command, uses 100ns as a unit.
 
   @retval EFI_SUCCESS         DRDY bit set within the time out.
   @retval EFI_TIMEOUT         DRDY bit not set within the time out.
@@ -630,17 +613,22 @@ DRDYReady (
   do {
     StatusRegister = IdeReadPortB (PciIo, IdeRegisters->CmdOrStatus);
     //
-    //  BSY == 0 , DRDY == 1
+    // Wait for BSY == 0, then judge if DRDY is set or ERR is set
     //
-    if ((StatusRegister & (ATA_STSREG_DRDY | ATA_STSREG_BSY)) == ATA_STSREG_DRDY) {
-      break;
-    }
+    if ((StatusRegister & ATA_STSREG_BSY) == 0) {
+      if ((StatusRegister & ATA_STSREG_ERR) == ATA_STSREG_ERR) {
+        ErrorRegister = IdeReadPortB (PciIo, IdeRegisters->ErrOrFeature);
 
-    if ((StatusRegister & (ATA_STSREG_BSY | ATA_STSREG_ERR)) == ATA_STSREG_ERR) {
-      ErrorRegister = IdeReadPortB (PciIo, IdeRegisters->ErrOrFeature);
+        if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
+          return EFI_ABORTED;
+        }
+        return EFI_DEVICE_ERROR;
+      }
 
-      if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
-        return EFI_ABORTED;
+      if ((StatusRegister & ATA_STSREG_DRDY) == ATA_STSREG_DRDY) {
+        return EFI_SUCCESS;
+      } else {
+        return EFI_DEVICE_ERROR;
       }
     }
 
@@ -652,11 +640,7 @@ DRDYReady (
     Delay--;
   } while (Delay > 0);
 
-  if (Delay == 0) {
-    return EFI_TIMEOUT;
-  }
-
-  return EFI_SUCCESS;
+  return EFI_TIMEOUT;
 }
 
 /**
@@ -664,9 +648,9 @@ DRDYReady (
   DRDY bit is set when the device is ready to accept command. Most ATA commands must 
   be sent after DRDY set except the ATAPI Packet Command.
 
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
+  @param PciIo            A pointer to EFI_PCI_IO_PROTOCOL data structure.
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Timeout          The time to complete the command.
+  @param Timeout          The time to complete the command, uses 100ns as a unit.
 
   @retval EFI_SUCCESS      DRDY bit set within the time out.
   @retval EFI_TIMEOUT      DRDY bit not set within the time out.
@@ -693,17 +677,22 @@ DRDYReady2 (
   do {
     AltRegister = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
     //
-    //  BSY == 0 , DRDY == 1
+    // Wait for BSY == 0, then judge if DRDY is set or ERR is set
     //
-    if ((AltRegister & (ATA_STSREG_DRDY | ATA_STSREG_BSY)) == ATA_STSREG_DRDY) {
-      break;
-    }
+    if ((AltRegister & ATA_STSREG_BSY) == 0) {
+      if ((AltRegister & ATA_STSREG_ERR) == ATA_STSREG_ERR) {
+        ErrorRegister = IdeReadPortB (PciIo, IdeRegisters->ErrOrFeature);
 
-    if ((AltRegister & (ATA_STSREG_BSY | ATA_STSREG_ERR)) == ATA_STSREG_ERR) {
-      ErrorRegister = IdeReadPortB (PciIo, IdeRegisters->ErrOrFeature);
+        if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
+          return EFI_ABORTED;
+        }
+        return EFI_DEVICE_ERROR;
+      }
 
-      if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
-        return EFI_ABORTED;
+      if ((AltRegister & ATA_STSREG_DRDY) == ATA_STSREG_DRDY) {
+        return EFI_SUCCESS;
+      } else {
+        return EFI_DEVICE_ERROR;
       }
     }
 
@@ -715,11 +704,7 @@ DRDYReady2 (
     Delay--;
   } while (Delay > 0);
 
-  if (Delay == 0) {
-    return EFI_TIMEOUT;
-  }
-
-  return EFI_SUCCESS;
+  return EFI_TIMEOUT;
 }
 
 /**
@@ -728,7 +713,7 @@ DRDYReady2 (
 
   @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Timeout          The time to complete the command.
+  @param Timeout          The time to complete the command, uses 100ns as a unit.
 
   @retval EFI_SUCCESS          BSY bit clear within the time out.
   @retval EFI_TIMEOUT          BSY bit not clear within the time out.
@@ -754,7 +739,7 @@ WaitForBSYClear (
     StatusRegister = IdeReadPortB (PciIo, IdeRegisters->CmdOrStatus);
 
     if ((StatusRegister & ATA_STSREG_BSY) == 0x00) {
-      break;
+      return EFI_SUCCESS;
     }
 
     //
@@ -766,11 +751,7 @@ WaitForBSYClear (
 
   } while (Delay > 0);
 
-  if (Delay == 0) {
-    return EFI_TIMEOUT;
-  }
-
-  return EFI_SUCCESS;
+  return EFI_TIMEOUT;
 }
 
 /**
@@ -779,7 +760,7 @@ WaitForBSYClear (
 
   @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Timeout          The time to complete the command.
+  @param Timeout          The time to complete the command, uses 100ns as a unit.
 
   @retval EFI_SUCCESS          BSY bit clear within the time out.
   @retval EFI_TIMEOUT          BSY bit not clear within the time out.
@@ -805,7 +786,7 @@ WaitForBSYClear2 (
     AltStatusRegister = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
 
     if ((AltStatusRegister & ATA_STSREG_BSY) == 0x00) {
-      break;
+      return EFI_SUCCESS;
     }
 
     //
@@ -817,11 +798,7 @@ WaitForBSYClear2 (
 
   } while (Delay > 0);
 
-  if (Delay == 0) {
-    return EFI_TIMEOUT;
-  }
-
-  return EFI_SUCCESS;
+  return EFI_TIMEOUT;
 }
 
 /**
@@ -978,7 +955,7 @@ GetIdeRegisterIoAddr (
 
   @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Timeout          The time to complete the command.
+  @param Timeout          The time to complete the command, uses 100ns as a unit.
 
   @retval EFI_SUCCESS       Soft reset completes successfully.
   @retval EFI_DEVICE_ERROR  Any step during the reset process is failed.
@@ -1038,7 +1015,7 @@ AtaSoftReset (
   @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
   @param AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
-  @param Timeout          The time to complete the command.
+  @param Timeout          The time to complete the command, uses 100ns as a unit.
 
   @retval  EFI_SUCCESS Reading succeed
   @retval  EFI_DEVICE_ERROR Error executing commands on this device.
@@ -1134,7 +1111,7 @@ AtaIssueCommand (
                                    from host to device.
   @param[in]      AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
   @param[in, out] AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
-  @param[in]      Timeout          The time to complete the command.
+  @param[in]      Timeout          The time to complete the command, uses 100ns as a unit.
   @param[in]      Task             Optional. Pointer to the ATA_NONBLOCK_TASK
                                    used by non-blocking mode.
   
@@ -1268,7 +1245,7 @@ Exit:
   @param[in]      AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data
                                    structure.
   @param[in, out] AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
-  @param[in]      Timeout          The time to complete the command.
+  @param[in]      Timeout          The time to complete the command, uses 100ns as a unit.
   @param[in]      Task             Optional. Pointer to the ATA_NONBLOCK_TASK
                                    used by non-blocking mode.
 
@@ -1334,7 +1311,7 @@ Exit:
   Wait for memory to be set.
     
   @param[in]  PciIo           The PCI IO protocol instance.
-  @param[in]  PortNum         The IDE Port number.
+  @param[in]  IdeRegisters    A pointer to EFI_IDE_REGISTERS data structure.
 
   @retval EFI_DEVICE_ERROR  The memory is not set.
   @retval EFI_TIMEOUT       The memory setting is time out.
@@ -1344,18 +1321,25 @@ Exit:
 EFI_STATUS
 AtaUdmStatusWait (
   IN     EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN     UINT16                    PortNum
+  IN     EFI_IDE_REGISTERS         *IdeRegisters
  ) 
 {
   UINT8                         RegisterValue;
   EFI_STATUS                    Status;
+  UINT16                        IoPortForBmis;
   UINT64                        Timeout;
 
   Timeout = 2000;
 
   while (TRUE) {
-    RegisterValue  = IdeReadPortB (PciIo, PortNum);
+    Status = CheckStatusRegister (PciIo, IdeRegisters);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
+      break;
+    }
 
+    IoPortForBmis = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMIS_OFFSET);
+    RegisterValue = IdeReadPortB (PciIo, IoPortForBmis);
     if (((RegisterValue & BMIS_ERROR) != 0) || (Timeout == 0)) {
       DEBUG ((EFI_D_ERROR, "ATA UDMA operation fails\n"));
       Status = EFI_DEVICE_ERROR;
@@ -1382,7 +1366,7 @@ AtaUdmStatusWait (
   @param[in]  PciIo           The PCI IO protocol instance.
   @param[in]  Task            Optional. Pointer to the ATA_NONBLOCK_TASK
                               used by non-blocking mode.
-  @param[in]  PortForBit      The bit to be checked.
+  @param[in]  IdeRegisters    A pointer to EFI_IDE_REGISTERS data structure.
 
   @retval EFI_DEVICE_ERROR  The memory setting met a issue.
   @retval EFI_NOT_READY     The memory is not set.
@@ -1394,13 +1378,22 @@ EFI_STATUS
 AtaUdmStatusCheck (
   IN     EFI_PCI_IO_PROTOCOL        *PciIo,
   IN     ATA_NONBLOCK_TASK          *Task,
-  IN     UINT16                     PortForBit
+  IN     EFI_IDE_REGISTERS          *IdeRegisters
  )
 {
-  UINT8                         RegisterValue;
+  UINT8          RegisterValue;
+  UINT16         IoPortForBmis;
+  EFI_STATUS     Status;
 
   Task->RetryTimes--;
-  RegisterValue  = IdeReadPortB(PciIo, PortForBit);
+
+  Status = CheckStatusRegister (PciIo, IdeRegisters);
+  if (EFI_ERROR (Status)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  IoPortForBmis = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMIS_OFFSET);
+  RegisterValue = IdeReadPortB (PciIo, IoPortForBmis);
 
   if ((RegisterValue & BMIS_ERROR) != 0) {
     DEBUG ((EFI_D_ERROR, "ATA UDMA operation fails\n"));
@@ -1435,7 +1428,7 @@ AtaUdmStatusCheck (
   @param[in]      DataLength       The length of  the data.
   @param[in]      AtaCommandBlock  A pointer to EFI_ATA_COMMAND_BLOCK data structure.
   @param[in, out] AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
-  @param[in]      Timeout          The time to complete the command.
+  @param[in]      Timeout          The time to complete the command, uses 100ns as a unit.
   @param[in]      Task             Optional. Pointer to the ATA_NONBLOCK_TASK
                                    used by non-blocking mode.
 
@@ -1652,7 +1645,7 @@ AtaUdmaInOut (
     //
     RegisterValue  = IdeReadPortB(PciIo, IoPortForBmis);
     RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
-    IdeWritePortB(PciIo, IoPortForBmis, RegisterValue);
+    IdeWritePortB (PciIo, IoPortForBmis, RegisterValue);
 
     //
     // Set the base address to BMID register
@@ -1680,6 +1673,11 @@ AtaUdmaInOut (
       goto Exit;
     }
 
+    Status = CheckStatusRegister (PciIo, IdeRegisters);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
+      goto Exit;
+    }
     //
     // Set START bit of BMIC register
     //
@@ -1709,9 +1707,9 @@ AtaUdmaInOut (
   // So set the variable Count to 2000, for about 2 second Timeout time.
   //
   if (Task != NULL) {
-    Status = AtaUdmStatusCheck (PciIo, Task, IoPortForBmis);
+    Status = AtaUdmStatusCheck (PciIo, Task, IdeRegisters);
   } else {
-    Status = AtaUdmStatusWait (PciIo, IoPortForBmis);
+    Status = AtaUdmStatusWait (PciIo, IdeRegisters);
   }
 
   //
@@ -1829,7 +1827,8 @@ AtaPacketReadPendingData (
   @param Read          Flag used to determine the data transfer direction.
                        Read equals 1, means data transferred from device to host;
                        Read equals 0, means data transferred from host to device.
-  @param Timeout       Timeout value for wait DRQ ready before each data stream's transfer.
+  @param Timeout       Timeout value for wait DRQ ready before each data stream's transfer
+                       , uses 100ns as a unit.
 
   @retval EFI_SUCCESS      data is transferred successfully.
   @retval EFI_DEVICE_ERROR the device failed to transfer data.
@@ -1933,7 +1932,7 @@ AtaPacketReadWrite (
   //
   // After data transfer is completed, normally, DRQ bit should clear.
   //
-  Status = DRQClear2 (PciIo, IdeRegisters, Timeout);
+  Status = DRQClear (PciIo, IdeRegisters, Timeout);
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
@@ -1951,7 +1950,7 @@ AtaPacketReadWrite (
   @param[in] Device          The device number of device.
   @param[in] SenseData       A pointer to store sense data.
   @param[in] SenseDataLength The sense data length.
-  @param[in] Timeout         The timeout value to execute this cmd.
+  @param[in] Timeout         The timeout value to execute this cmd, uses 100ns as a unit.
 
   @retval EFI_SUCCESS        Send out the ATAPI packet command successfully.
   @retval EFI_DEVICE_ERROR   The device failed to send data.
@@ -2207,7 +2206,6 @@ SetDriveParameters (
   IN     UINT8                         Device,
   IN     EFI_ATA_DRIVE_PARMS           *DriveParameters,
   IN OUT EFI_ATA_STATUS_BLOCK          *AtaStatusBlock
-  
   )
 {
   EFI_STATUS              Status;
