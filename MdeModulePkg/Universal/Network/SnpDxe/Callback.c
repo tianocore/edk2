@@ -3,7 +3,7 @@
   the callback routines for Undi3.1 have an extra parameter UniqueId which
   stores the interface context for the NIC that snp is trying to talk.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,25 +30,26 @@ EFI_LOCK             mLock;
 //
 extern EFI_PCI_IO_PROTOCOL  *mPciIo;
 
-/** 
-  Convert a virtual or CPU address provided by SNP to a physical or device 
-  address. 
+/**
+  Convert a virtual or CPU address provided by SNP to a physical or device
+  address.
 
   This is a callback routine supplied to UNDI at undi_start time. Since EFI uses
-  the identical mapping, this routine returns the physical address same as the 
-  virtual address for most of the addresses. an address above 4GB cannot 
-  generally be used as a device address, it needs to be mapped to a lower 
-  physical address. This routine does not call the map routine itself, but it 
-  assumes that the mapping was done at the time of providing the address to 
-  UNDI. This routine just looks up the address in a map table (which is the v2p 
-  structure chain). 
-  
+  the identical mapping, this routine returns the physical address same as the
+  virtual address for most of the addresses. an address above 4GB cannot
+  generally be used as a device address, it needs to be mapped to a lower
+  physical address. This routine does not call the map routine itself, but it
+  assumes that the mapping was done at the time of providing the address to
+  UNDI. This routine just looks up the address in a map table (which is the v2p
+  structure chain).
+
   @param  CpuAddr        Virtual address.
-  @param  DeviceAddrPtr  Pointer to the physical address, or 0 in case of any 
+  @param  DeviceAddrPtr  Pointer to the physical address, or 0 in case of any
                          error.
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackV2p30 (
   IN UINT64     CpuAddr,
   IN OUT UINT64 DeviceAddrPtr
@@ -83,7 +84,7 @@ SnpUndi32CallbackV2p30 (
 
 /**
   Acquire or release a lock of an exclusive access to a critical section of the
-  code/data. 
+  code/data.
 
   This is a callback routine supplied to UNDI at undi_start time.
 
@@ -91,6 +92,7 @@ SnpUndi32CallbackV2p30 (
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackBlock30 (
   IN UINT32 Enable
   )
@@ -113,13 +115,14 @@ SnpUndi32CallbackBlock30 (
 
 /**
   Delay MicroSeconds of micro seconds.
-   
+
   This is a callback routine supplied to UNDI at undi_start time.
 
   @param MicroSeconds  Number of micro seconds to pause, ususlly multiple of 10.
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackDelay30 (
   IN UINT64 MicroSeconds
   )
@@ -130,16 +133,16 @@ SnpUndi32CallbackDelay30 (
 }
 
 /**
-  IO routine for UNDI. 
+  IO routine for UNDI.
 
-  This is a callback routine supplied to UNDI at undi_start time. This is not 
-  currently being used by UNDI3.0 because Undi3.0 uses io/mem offsets relative 
-  to the beginning of the device io/mem address and so it needs to use the 
-  PCI_IO_FUNCTION that abstracts the start of the device's io/mem addresses. 
-  Since SNP cannot retrive the context of the undi3.0 interface it cannot use 
-  the PCI_IO_FUNCTION that specific for that NIC and uses one global IO 
-  functions structure, this does not work. This however works fine for EFI1.0 
-  Undis because they use absolute addresses for io/mem access. 
+  This is a callback routine supplied to UNDI at undi_start time. This is not
+  currently being used by UNDI3.0 because Undi3.0 uses io/mem offsets relative
+  to the beginning of the device io/mem address and so it needs to use the
+  PCI_IO_FUNCTION that abstracts the start of the device's io/mem addresses.
+  Since SNP cannot retrive the context of the undi3.0 interface it cannot use
+  the PCI_IO_FUNCTION that specific for that NIC and uses one global IO
+  functions structure, this does not work. This however works fine for EFI1.0
+  Undis because they use absolute addresses for io/mem access.
 
   @param ReadOrWrite  Indicates read or write, IO or Memory.
   @param NumBytes     Number of bytes to read or write.
@@ -149,6 +152,7 @@ SnpUndi32CallbackDelay30 (
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackMemio30 (
   IN UINT8      ReadOrWrite,
   IN UINT8      NumBytes,
@@ -225,20 +229,21 @@ SnpUndi32CallbackMemio30 (
 }
 
 /**
-  Acquire or release a lock of the exclusive access to a critical section of the 
-  code/data. 
-   
+  Acquire or release a lock of the exclusive access to a critical section of the
+  code/data.
+
   This is a callback routine supplied to UNDI3.1 at undi_start time.
   New callbacks for 3.1: there won't be a virtual2physical callback for UNDI 3.1
-  because undi3.1 uses the MemMap call to map the required address by itself! 
+  because undi3.1 uses the MemMap call to map the required address by itself!
 
-  @param UniqueId  This was supplied to UNDI at Undi_Start, SNP uses this to 
+  @param UniqueId  This was supplied to UNDI at Undi_Start, SNP uses this to
                       store Undi interface context (Undi does not read or write
                       this variable).
-  @param Enable    Non-zero indicates acquire; Zero indicates release. 
+  @param Enable    Non-zero indicates acquire; Zero indicates release.
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackBlock (
   IN UINT64 UniqueId,
   IN UINT32 Enable
@@ -260,16 +265,17 @@ SnpUndi32CallbackBlock (
 
 /**
   Delay MicroSeconds of micro seconds.
-   
+
   This is a callback routine supplied to UNDI at undi_start time.
 
   @param UniqueId      This was supplied to UNDI at Undi_Start, SNP uses this to
                        store Undi interface context (Undi does not read or write
                        this variable).
-  @param MicroSeconds  Number of micro seconds to pause, ususlly multiple of 10.  
+  @param MicroSeconds  Number of micro seconds to pause, ususlly multiple of 10.
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackDelay (
   IN UINT64 UniqueId,
   IN UINT64 MicroSeconds
@@ -281,21 +287,22 @@ SnpUndi32CallbackDelay (
 }
 
 /**
-  IO routine for UNDI3.1. 
-   
+  IO routine for UNDI3.1.
+
   This is a callback routine supplied to UNDI at undi_start time.
-   
-  @param UniqueId       This was supplied to UNDI at Undi_Start, SNP uses this 
-                       	to store Undi interface context (Undi does not read or
-                       	write this variable).
+
+  @param UniqueId       This was supplied to UNDI at Undi_Start, SNP uses this
+                        to store Undi interface context (Undi does not read or
+                        write this variable).
   @param ReadOrWrite    Indicates read or write, IO or Memory.
   @param NumBytes       Number of bytes to read or write.
   @param MemOrPortAddr  IO or memory address to read from or write to.
   @param BufferPtr      Memory location to read into or that contains the bytes
-                       	to write.
+                        to write.
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackMemio (
   IN UINT64     UniqueId,
   IN UINT8      ReadOrWrite,
@@ -374,7 +381,7 @@ SnpUndi32CallbackMemio (
 }
 
 /**
-  Map a CPU address to a device address. 
+  Map a CPU address to a device address.
 
   This is a callback routine supplied to UNDI at undi_start time.
 
@@ -389,6 +396,7 @@ SnpUndi32CallbackMemio (
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackMap (
   IN UINT64     UniqueId,
   IN UINT64     CpuAddr,
@@ -467,21 +475,22 @@ SnpUndi32CallbackMap (
 }
 
 /**
-  Unmap an address that was previously mapped using map callback. 
-   
+  Unmap an address that was previously mapped using map callback.
+
   This is a callback routine supplied to UNDI at undi_start time.
 
-  @param UniqueId    This was supplied to UNDI at Undi_Start, SNP uses this to 
+  @param UniqueId    This was supplied to UNDI at Undi_Start, SNP uses this to
                      store. Undi interface context (Undi does not read or write
                      this variable).
   @param CpuAddr     Virtual address that was mapped.
   @param NumBytes    Size of memory mapped.
-  @param Direction   Direction of data flow for this memory's usage: 
+  @param Direction   Direction of data flow for this memory's usage:
                      cpu->device, device->cpu or both ways.
   @param DeviceAddr  The mapped device address.
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackUnmap (
   IN UINT64 UniqueId,
   IN UINT64 CpuAddr,
@@ -512,19 +521,19 @@ SnpUndi32CallbackUnmap (
   return ;
 }
 
-/** 
-  Synchronize the virtual buffer contents with the mapped buffer contents. 
-   
-  This is a callback routine supplied to UNDI at undi_start time. The virtual
-  and mapped buffers need not correspond to the same physical memory (especially 
-  if the virtual address is > 4GB). Depending on the direction for which the 
-  buffer is mapped, undi will need to synchronize their contents whenever it 
-  writes to/reads from the buffer using either the cpu address or the device 
-  address. 
-  EFI does not provide a sync call since virt=physical, we should just do the 
-  synchronization ourselves here. 
+/**
+  Synchronize the virtual buffer contents with the mapped buffer contents.
 
-  @param UniqueId    This was supplied to UNDI at Undi_Start, SNP uses this to 
+  This is a callback routine supplied to UNDI at undi_start time. The virtual
+  and mapped buffers need not correspond to the same physical memory (especially
+  if the virtual address is > 4GB). Depending on the direction for which the
+  buffer is mapped, undi will need to synchronize their contents whenever it
+  writes to/reads from the buffer using either the cpu address or the device
+  address.
+  EFI does not provide a sync call since virt=physical, we should just do the
+  synchronization ourselves here.
+
+  @param UniqueId    This was supplied to UNDI at Undi_Start, SNP uses this to
                      store Undi interface context (Undi does not read or write
                      this variable).
   @param CpuAddr     Virtual address that was mapped.
@@ -535,6 +544,7 @@ SnpUndi32CallbackUnmap (
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackSync (
   IN UINT64             UniqueId,
   IN UINT64             CpuAddr,

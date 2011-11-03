@@ -1,7 +1,7 @@
 /** @file
     Declaration of strctures and functions for SnpDxe driver.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed
 and made available under the terms and conditions of the BSD License which
 accompanies this distribution. The full text of the license may be found at
@@ -49,7 +49,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef
 EFI_STATUS
-(*ISSUE_UNDI32_COMMAND) (
+(EFIAPI *ISSUE_UNDI32_COMMAND) (
   UINT64         Cdb
   );
 
@@ -295,6 +295,7 @@ DelV2p (
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackBlock30 (
   IN UINT32 Enable
   );
@@ -308,6 +309,7 @@ SnpUndi32CallbackBlock30 (
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackDelay30 (
   IN UINT64 MicroSeconds
   );
@@ -331,6 +333,7 @@ SnpUndi32CallbackDelay30 (
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackMemio30 (
   IN UINT8      ReadOrWrite,
   IN UINT8      NumBytes,
@@ -355,6 +358,7 @@ SnpUndi32CallbackMemio30 (
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackV2p30 (
   IN UINT64     CpuAddr,
   IN OUT UINT64 DeviceAddrPtr
@@ -369,12 +373,13 @@ SnpUndi32CallbackV2p30 (
   the MemMap call to map the required address by itself!
 
   @param UniqueId  This was supplied to UNDI at Undi_Start, SNP uses this to
-   								 store Undi interface context (Undi does not read or write
-   								 this variable)
+                   store Undi interface context (Undi does not read or write
+                   this variable)
   @param Enable    non-zero indicates acquire
                    zero indicates release
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackBlock (
   IN UINT64 UniqueId,
   IN UINT32 Enable
@@ -386,11 +391,12 @@ SnpUndi32CallbackBlock (
   pause.
 
   @param UniqueId      This was supplied to UNDI at Undi_Start, SNP uses this to
-   								     store Undi interface context (Undi does not read or write
-   								     this variable)
+                       store Undi interface context (Undi does not read or write
+                       this variable)
   @param MicroSeconds  number of micro seconds to pause, ususlly multiple of 10.
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackDelay (
   IN UINT64 UniqueId,
   IN UINT64 MicroSeconds
@@ -401,8 +407,8 @@ SnpUndi32CallbackDelay (
   This is the IO routine for UNDI3.1 to start CPB.
 
   @param UniqueId       This was supplied to UNDI at Undi_Start, SNP uses this
-   											to store Undi interface context (Undi does not read or
-   											write this variable)
+                        to store Undi interface context (Undi does not read or
+                        write this variable)
   @param ReadOrWrite    indicates read or write, IO or Memory.
   @param NumBytes       number of bytes to read or write.
   @param MemOrPortAddr  IO or memory address to read from or write to.
@@ -410,6 +416,7 @@ SnpUndi32CallbackDelay (
                         to write.
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackMemio (
   IN UINT64     UniqueId,
   IN UINT8      ReadOrWrite,
@@ -433,6 +440,7 @@ SnpUndi32CallbackMemio (
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackMap (
   IN UINT64     UniqueId,
   IN UINT64     CpuAddr,
@@ -456,6 +464,7 @@ SnpUndi32CallbackMap (
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackUnmap (
   IN UINT64             UniqueId,
   IN UINT64             CpuAddr,
@@ -486,6 +495,7 @@ SnpUndi32CallbackUnmap (
 
 **/
 VOID
+EFIAPI
 SnpUndi32CallbackSync (
   IN UINT64             UniqueId,
   IN UINT64             CpuAddr,

@@ -58,6 +58,7 @@ SnpNotifyExitBootServices (
 
 **/
 EFI_STATUS
+EFIAPI
 IssueHwUndiCommand (
   UINT64 Cdb
   )
