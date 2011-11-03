@@ -48,6 +48,7 @@
 #define strtoll       _strtoll
 #define strtoull      _strtoull
 #define strtoumax     _strtoumax
+#define vfscanf       __svfscanf
 
 #if 0
 #define brk           _brk

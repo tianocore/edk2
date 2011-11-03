@@ -68,7 +68,7 @@
 #endif
 
 /*
- * Provide an external name for vfscanf.  Note, we don't use the normal
+ * Provide an external name for vfscanf.  Note, EFI uses the normal
  * namespace.h method; stdio routines explicitly use the internal name
  * __svfscanf.
  */
