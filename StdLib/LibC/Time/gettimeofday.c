@@ -48,9 +48,9 @@
 #include <sys/EfiCdefs.h>
 #include <sys/time.h>
 #include <time.h>
-#ifndef HAVE_GETTIMEOFDAY
 
 
+#ifdef HAVE_GETTIMEOFDAY
 /*
  * Simple gettimeofday that only returns seconds.
  */

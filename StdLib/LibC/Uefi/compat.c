@@ -134,16 +134,15 @@ getopt(int argc, char **argv, char *args)
                         }
                 }
         }
-
         return -1;
 }
 #endif
 
 #define ISPATHSEPARATOR(x) ((x == '/') || (x == '\\'))
 
-#ifndef HAVE_BASENAME
+#ifdef HAVE_BASENAME
 #ifndef PATH_MAX
-#define PATH_MAX 5000
+  #define PATH_MAX 5000
 #endif
 
 char *
@@ -232,7 +231,7 @@ mkstemp(char *path)
 }
 #endif
 
-#ifndef HAVE_FFS
+#ifdef HAVE_FFS
 int
 ffs(int x)
 {

@@ -40,7 +40,7 @@
  */
 #include  <LibConfig.h>
 
-#ifndef HAVE_SETPROGNAME
+#ifdef HAVE_SETPROGNAME
 #include <string.h>
 
 static const char *__progname = NULL;
