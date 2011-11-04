@@ -328,6 +328,10 @@
 
   ## Include/Protocol/EbcSimpleDebugger.h
   gEfiEbcSimpleDebuggerProtocolGuid = { 0x2a72d11e, 0x7376, 0x40f6, { 0x9c, 0x68, 0x23, 0xfa, 0x2f, 0xe3, 0x63, 0xf1 } }
+
+  ## Include/Protocol/BootLogo.h
+  gEfiBootLogoProtocolGuid = { 0xcdea2bd3, 0xfc25, 0x4c1c, { 0xb9, 0x7c, 0xb3, 0x11, 0x86, 0x6, 0x49, 0x90 } }
+
 [PcdsFeatureFlag]
   ## Indicate whether platform can support update capsule across a system reset
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE|BOOLEAN|0x0001001d
