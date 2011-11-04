@@ -45,6 +45,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/LegacyBios.h>
 #include <Protocol/SimpleTextInEx.h>
 #include <Protocol/DriverHealth.h>
+#include <Protocol/BootLogo.h>
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/PrintLib.h>

@@ -13,7 +13,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "InternalBdsLib.h"
-#include "Bmp.h"
+#include <IndustryStandard/Bmp.h>
+
+#include <Protocol/BootLogo.h>
 
 /**
   Check if we need to save the EFI variable with "ConVarName" as name
@@ -786,6 +788,17 @@ EnableQuietBoot (
   UINT32                        ColorDepth;
   UINT32                        RefreshRate;
   EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
+  EFI_BOOT_LOGO_PROTOCOL        *BootLogo;
+  UINTN                         NumberOfLogos;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *LogoBlt;
+  UINTN                         LogoDestX;
+  UINTN                         LogoDestY;
+  UINTN                         LogoHeight;
+  UINTN                         LogoWidth;
+  UINTN                         NewDestX;
+  UINTN                         NewDestY;
+  UINTN                         NewHeight;
+  UINTN                         NewWidth;
 
   UgaDraw = NULL;
   //
@@ -802,6 +815,12 @@ EnableQuietBoot (
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
+
+  //
+  // Try to open Boot Logo Protocol.
+  //
+  BootLogo = NULL;
+  gBS->LocateProtocol (&gEfiBootLogoProtocolGuid, NULL, (VOID **) &BootLogo);
 
   //
   // Erase Cursor from screen
@@ -824,6 +843,16 @@ EnableQuietBoot (
     return EFI_UNSUPPORTED;
   }
 
+  Blt = NULL;
+  NumberOfLogos = 0;
+  LogoDestX = 0;
+  LogoDestY = 0;
+  LogoHeight = 0;
+  LogoWidth = 0;
+  NewDestX = 0;
+  NewDestY = 0;
+  NewHeight = 0;
+  NewWidth = 0;
   Instance = 0;
   while (1) {
     ImageData = NULL;
@@ -844,7 +873,7 @@ EnableQuietBoot (
                           &CoordinateY
                           );
       if (EFI_ERROR (Status)) {
-        return Status;
+        goto Done;
       }
 
       //
@@ -870,6 +899,9 @@ EnableQuietBoot (
       Attribute   = EfiBadgingDisplayAttributeCenter;
     }
 
+    if (Blt != NULL) {
+      FreePool (Blt);
+    }
     Blt = NULL;
     Status = ConvertBmpToGopBlt (
               ImageData,
@@ -972,20 +1004,116 @@ EnableQuietBoot (
                             Width * sizeof (EFI_UGA_PIXEL)
                             );
       } else {
-      Status = EFI_UNSUPPORTED;
+        Status = EFI_UNSUPPORTED;
+      }
+
+      //
+      // Report displayed Logo information.
+      //
+      if (!EFI_ERROR (Status)) {
+        NumberOfLogos++;
+
+        if (LogoWidth == 0) {
+          //
+          // The first Logo.
+          //
+          LogoDestX = DestX;
+          LogoDestY = DestY;
+          LogoWidth = Width;
+          LogoHeight = Height;
+        } else {
+          //
+          // Merge new logo with old one.
+          //
+          NewDestX = MIN ((UINTN) DestX, LogoDestX);
+          NewDestY = MIN ((UINTN) DestY, LogoDestY);
+          NewWidth = MAX ((UINTN) DestX + Width, LogoDestX + LogoWidth) - NewDestX;
+          NewHeight = MAX ((UINTN) DestY + Height, LogoDestY + LogoHeight) - NewDestY;
+
+          LogoDestX = NewDestX;
+          LogoDestY = NewDestY;
+          LogoWidth = NewWidth;
+          LogoHeight = NewHeight;
+        }
       }
     }
 
     FreePool (ImageData);
 
-    if (Blt != NULL) {
-      FreePool (Blt);
-    }
-
     if (Badging == NULL) {
       break;
     }
   }
+
+Done:
+  if (BootLogo == NULL || NumberOfLogos == 0) {
+    //
+    // No logo displayed.
+    //
+    if (Blt != NULL) {
+      FreePool (Blt);
+    }
+
+    return Status;
+  }
+
+  //
+  // Advertise displayed Logo information.
+  //
+  if (NumberOfLogos == 1) {
+    //
+    // Only one logo displayed, use its Blt buffer directly for BootLogo protocol.
+    //
+    LogoBlt = Blt;
+    Status = EFI_SUCCESS;
+  } else {
+    //
+    // More than one Logo displayed, get merged BltBuffer using VideoToBuffer operation. 
+    //
+    if (Blt != NULL) {
+      FreePool (Blt);
+    }
+
+    LogoBlt = AllocateZeroPool (LogoWidth * LogoHeight * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+    if (LogoBlt == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    if (GraphicsOutput != NULL) {
+      Status = GraphicsOutput->Blt (
+                          GraphicsOutput,
+                          LogoBlt,
+                          EfiBltVideoToBltBuffer,
+                          LogoDestX,
+                          LogoDestY,
+                          0,
+                          0,
+                          LogoWidth,
+                          LogoHeight,
+                          LogoWidth * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+                          );
+    } else if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
+      Status = UgaDraw->Blt (
+                          UgaDraw,
+                          (EFI_UGA_PIXEL *) LogoBlt,
+                          EfiUgaVideoToBltBuffer,
+                          LogoDestX,
+                          LogoDestY,
+                          0,
+                          0,
+                          LogoWidth,
+                          LogoHeight,
+                          LogoWidth * sizeof (EFI_UGA_PIXEL)
+                          );
+    } else {
+      Status = EFI_UNSUPPORTED;
+    }
+  }
+
+  if (!EFI_ERROR (Status)) {
+    BootLogo->SetBootLogo (BootLogo, LogoBlt, LogoDestX, LogoDestY, LogoWidth, LogoHeight);
+  }
+  FreePool (LogoBlt);
 
   return Status;
 }

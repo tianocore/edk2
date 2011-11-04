@@ -39,7 +39,6 @@
   BdsConsole.c
   BdsBoot.c
   InternalBdsLib.h
-  Bmp.h
   String.h
   String.c
   GenericBdsStrings.uni
@@ -115,6 +114,7 @@
   gEfiHiiFontProtocolGuid                       # PROTOCOL CONSUMES
   gEfiUserManagerProtocolGuid                   # PROTOCOL CONSUMES
   gEfiUsbIoProtocolGuid                         # PROTOCOL SOMETIMES_CONSUMES
+  gEfiBootLogoProtocolGuid                      # PROTOCOL SOMETIMES_CONSUMES
 
 [FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport

@@ -958,6 +958,7 @@ PlatformBdsEnterFrontPage (
   )
 {
   EFI_STATUS                    Status;
+  EFI_BOOT_LOGO_PROTOCOL        *BootLogo;
 
   PERF_START (NULL, "BdsTimeOut", "BDS", 0);
   //
@@ -984,6 +985,14 @@ PlatformBdsEnterFrontPage (
       //
       goto Exit;
     }
+  }
+
+  //
+  // Boot Logo is corrupted, report it using Boot Logo protocol.
+  //
+  Status = gBS->LocateProtocol (&gEfiBootLogoProtocolGuid, NULL, (VOID **) &BootLogo);
+  if (!EFI_ERROR (Status) && (BootLogo != NULL)) {
+    BootLogo->SetBootLogo (BootLogo, NULL, 0, 0, 0, 0);
   }
 
   do {
