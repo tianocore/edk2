@@ -60,14 +60,11 @@ AuthenticodeVerify (
   UINTN        ContentSize;
 
   //
-  // ASSERT if Authenticode Signature Data or PE Image Hash is NULL
+  // ASSERT if Authenticode Signature Data or PE Image Hash is NULL.
   //
   ASSERT (AuthData  != NULL);
   ASSERT (ImageHash != NULL);
-
-  if (DataSize > INT_MAX) {
-    return FALSE;
-  }
+  ASSERT (DataSize  <= INT_MAX);
 
   Status       = FALSE;
   Pkcs7        = NULL;

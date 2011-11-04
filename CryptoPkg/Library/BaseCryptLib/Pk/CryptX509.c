@@ -45,12 +45,9 @@ X509ConstructCertificate (
   //
   // ASSERT if Cert is NULL or SingleX509Cert is NULL.
   //
-  ASSERT (Cert != NULL);
+  ASSERT (Cert           != NULL);
   ASSERT (SingleX509Cert != NULL);
-
-  if (CertSize > INT_MAX) {
-    return FALSE;
-  }
+  ASSERT (CertSize       <= INT_MAX);
 
   Status = FALSE;
 

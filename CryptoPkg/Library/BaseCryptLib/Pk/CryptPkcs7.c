@@ -150,17 +150,13 @@ Pkcs7Sign (
   //
   // Check input parameters.
   //
-  if ((PrivateKey == NULL) || (KeyPassword == NULL) || (InData == NULL)) {
-    return FALSE;
-  }
-  
-  if ((SignCert == NULL) || (SignedData == NULL) || (SignedDataSize == NULL)) {
-    return FALSE;
-  }
-
-  if (InDataSize > INT_MAX) {
-    return FALSE;
-  }
+  ASSERT (PrivateKey     != NULL);
+  ASSERT (KeyPassword    != NULL);
+  ASSERT (InData         != NULL);
+  ASSERT (SignCert       != NULL);
+  ASSERT (SignedData     != NULL);
+  ASSERT (SignedDataSize != NULL);
+  ASSERT (InDataSize     <= INT_MAX);
 
   RsaContext = NULL;
   Key        = NULL;
@@ -311,13 +307,14 @@ Pkcs7Verify (
   BOOLEAN     Wrapped;
 
   //
-  // ASSERT if P7Data is NULL or P7Length is not larger than 19 bytes.
+  // ASSERT if any input parameter is invalid.
   //
-  ASSERT ((P7Data != NULL) || (P7Length <= 19));
-
-  if ((CertLength > INT_MAX) || (DataLength > INT_MAX)) {
-    return FALSE;
-  }
+  ASSERT (P7Data      != NULL);
+  ASSERT (TrustedCert != NULL);
+  ASSERT (InData      != NULL);
+  ASSERT (P7Length    <= INT_MAX);
+  ASSERT (CertLength  <= INT_MAX);
+  ASSERT (DataLength  <= INT_MAX);
 
   Status    = FALSE;
   Pkcs7     = NULL;

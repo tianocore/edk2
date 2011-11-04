@@ -84,10 +84,7 @@ RsaGetPrivateKeyFromPem (
   //
   ASSERT (PemData    != NULL);
   ASSERT (RsaContext != NULL);
-
-  if (PemSize > INT_MAX) {
-    return FALSE;
-  }
+  ASSERT (PemSize    <= INT_MAX);
 
   Status = FALSE;
   PemBio = NULL;
