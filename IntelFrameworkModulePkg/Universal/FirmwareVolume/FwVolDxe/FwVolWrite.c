@@ -693,7 +693,7 @@ FvcWrite (
     return Status;
   }
 
-  if ((FvbAttributes & EFI_FV2_WRITE_STATUS) != 0) {
+  if ((FvbAttributes & EFI_FV2_WRITE_STATUS) == 0) {
     return EFI_ACCESS_DENIED;
   }
 
@@ -1386,7 +1386,7 @@ FvWriteFile (
   //
   // Can we have write right?
   //
-  if ((FvAttributes & EFI_FV2_WRITE_STATUS) != 0) {
+  if ((FvAttributes & EFI_FV2_WRITE_STATUS) == 0) {
     return EFI_WRITE_PROTECTED;
   }
 
