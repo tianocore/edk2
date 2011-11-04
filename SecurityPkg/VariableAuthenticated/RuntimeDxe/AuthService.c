@@ -91,6 +91,7 @@ AutenticatedVariableServiceInitialize (
 {
   EFI_STATUS              Status;
   VARIABLE_POINTER_TRACK  Variable;
+  VARIABLE_POINTER_TRACK  PkVariable;
   UINT8                   VarValue;
   UINT32                  VarAttr;
   UINT8                   *Data;
@@ -164,6 +165,14 @@ AutenticatedVariableServiceInitialize (
     CopyMem (mPubKeyStore, (UINT8 *) Data, DataSize);
     mPubKeyNumber = (UINT32) (DataSize / EFI_CERT_TYPE_RSA2048_SIZE);
   }
+
+  FindVariable (EFI_PLATFORM_KEY_NAME, &gEfiGlobalVariableGuid, &PkVariable, &mVariableModuleGlobal->VariableGlobal);
+  if (PkVariable.CurrPtr == NULL) {
+    DEBUG ((EFI_D_INFO, "Variable %s does not exist.\n", EFI_PLATFORM_KEY_NAME));
+  } else {
+    DEBUG ((EFI_D_INFO, "Variable %s exists.\n", EFI_PLATFORM_KEY_NAME));
+  }
+  
   //
   // Check "SetupMode" variable's existence.
   // If it doesn't exist, check PK database's existence to determine the value.
@@ -177,13 +186,7 @@ AutenticatedVariableServiceInitialize (
              );
 
   if (Variable.CurrPtr == NULL) {
-    Status = FindVariable (
-               EFI_PLATFORM_KEY_NAME,
-               &gEfiGlobalVariableGuid,
-               &Variable,
-               &mVariableModuleGlobal->VariableGlobal
-               );
-    if (Variable.CurrPtr == NULL) {
+    if (PkVariable.CurrPtr == NULL) {
       mPlatformMode = SETUP_MODE;
     } else {
       mPlatformMode = USER_MODE;
@@ -284,12 +287,18 @@ AutenticatedVariableServiceInitialize (
     return Status;
   }
 
+  DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_SETUP_MODE_NAME, mPlatformMode));
+  DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_SECURE_BOOT_MODE_NAME, SecureBootMode));
+  DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_SECURE_BOOT_ENABLE_NAME, SecureBootEnable));
+
   //
   // Detect whether a secure platform-specific method to clear PK(Platform Key)
   // is configured by platform owner. This method is provided for users force to clear PK
   // in case incorrect enrollment mis-haps.
   //
   if (ForceClearPK ()) {
+    DEBUG ((EFI_D_INFO, "Variable PK/KEK/DB/DBX will be cleared in clear PK mode.\n"));
+
     //
     // 1. Clear PK.
     //
