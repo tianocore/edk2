@@ -1017,8 +1017,8 @@ EnableQuietBoot (
           //
           // The first Logo.
           //
-          LogoDestX = DestX;
-          LogoDestY = DestY;
+          LogoDestX = (UINTN) DestX;
+          LogoDestY = (UINTN) DestY;
           LogoWidth = Width;
           LogoHeight = Height;
         } else {
