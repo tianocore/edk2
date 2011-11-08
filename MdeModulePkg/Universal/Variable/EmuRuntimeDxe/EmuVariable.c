@@ -268,7 +268,7 @@ GetEndPointer (
   //
   // The end of variable store
   //
-  return (VARIABLE_HEADER *) HEADER_ALIGN (VolHeader + 1);
+  return (VARIABLE_HEADER *) HEADER_ALIGN (VolHeader + VolHeader->Size);
 }
 
 /**
