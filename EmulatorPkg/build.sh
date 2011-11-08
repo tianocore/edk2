@@ -92,7 +92,6 @@ case `uname` in
         ;;
       *)
         TARGET_TOOLS=GCC44
-        exit 1
         ;;
     esac
     ;;
