@@ -164,8 +164,28 @@ CalculateUsbDebugPortBar (
  )
 {
   UINT16     PciStatus;
+  UINT16     VendorId;
+  UINT16     DeviceId;
+  UINT8      ProgInterface;
+  UINT8      SubClassCode;
+  UINT8      BaseCode;
   UINT8      CapabilityPtr;
   UINT8      CapabilityId;
+
+  VendorId = PciRead16 (PcdGet32(PcdUsbEhciPciAddress) + PCI_VENDOR_ID_OFFSET);
+  DeviceId = PciRead16 (PcdGet32(PcdUsbEhciPciAddress) + PCI_DEVICE_ID_OFFSET);
+  
+  if ((VendorId == 0xFFFF) || (DeviceId == 0xFFFF)) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  ProgInterface = PciRead8 (PcdGet32(PcdUsbEhciPciAddress) + PCI_CLASSCODE_OFFSET);
+  SubClassCode  = PciRead8 (PcdGet32(PcdUsbEhciPciAddress) + PCI_CLASSCODE_OFFSET + 1);
+  BaseCode      = PciRead8 (PcdGet32(PcdUsbEhciPciAddress) + PCI_CLASSCODE_OFFSET + 2);
+  
+  if ((ProgInterface != PCI_IF_EHCI) || (SubClassCode != PCI_CLASS_SERIAL_USB) || (BaseCode != PCI_CLASS_SERIAL)) {
+    return RETURN_UNSUPPORTED;
+  }
 
   //
   // Enable Ehci Host Controller MMIO Space.
@@ -1068,7 +1088,7 @@ DebugPortInitialize (
 
   Status = CalculateUsbDebugPortBar(&Handle.DebugPortOffset, &Handle.DebugPortBarNumber);
   if (RETURN_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "USB Debug Port: EHCI host controller does not support debug port capability!\n"));
+    DEBUG ((EFI_D_ERROR, "USB Debug Port: the pci device pointed by PcdUsbEhciPciAddress is not EHCI host controller or does not support debug port capability!\n"));
     goto Exit;
   }
 
