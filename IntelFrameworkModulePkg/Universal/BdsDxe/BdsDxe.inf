@@ -177,6 +177,13 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareRevision
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutColumn
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutRow
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
 
 [Depex]
   TRUE

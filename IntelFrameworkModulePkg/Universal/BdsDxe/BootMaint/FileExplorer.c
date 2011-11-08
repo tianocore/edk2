@@ -161,6 +161,10 @@ UpdateFileExplorer (
         // Here boot from file
         //
         BootThisFile (NewFileContext);
+        //
+        // Set proper video resolution and text mode for setup.
+        //
+        ChangeModeForSetup ();
         ExitFileExplorer = TRUE;
         break;
 

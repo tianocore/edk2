@@ -236,5 +236,20 @@ PlatformBdsEnterFrontPage (
   IN BOOLEAN                ConnectAllHappened
   );
 
+/**
+  This function will change video resolution and text mode for setup when setup is launched.
+
+  @param   None.
+
+  @retval  EFI_SUCCESS  Mode is changed successfully.
+  @retval  Others       Mode failed to changed.
+
+**/
+EFI_STATUS
+EFIAPI
+ChangeModeForSetup (
+  VOID
+  );
+
 #endif // _FRONT_PAGE_H_
 
