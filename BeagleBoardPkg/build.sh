@@ -58,8 +58,11 @@ case `uname` in
       TARGET_TOOLS=RVCT31CYGWIN 
       ;;
   Linux*)  
-      # Not tested
-      TARGET_TOOLS=ARMGCC 
+      if [[ ! -z `locate arm-linux-gnueabi-gcc` ]]; then
+        TARGET_TOOLS=ARMLINUXGCC
+      else 
+        TARGET_TOOLS=ARMGCC 
+      fi
       ;;
   Darwin*) 
       Major=$(uname -r | cut -f 1 -d '.')
