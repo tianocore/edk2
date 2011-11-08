@@ -469,7 +469,7 @@
   Arm/CpuBreakpoint.asm      | RVCT
  
   Arm/Math64.S                  | GCC
-  Arm/GccInline.c               | GCC
+  Arm/SwitchStack.S             | GCC
   Arm/EnableInterrupts.S        | GCC
   Arm/DisableInterrupts.S       | GCC
   Arm/GetInterruptsState.S      | GCC
