@@ -1365,8 +1365,10 @@ ValueIsScroll (
 
   This is an internal function.
 
+  @param  Selection              Menu selection.
   @param  GoUp                   The navigation direction. TRUE: up, FALSE: down.
   @param  CurrentPosition        Current position.
+  @param  GapToTop               Gap position to top or bottom.
 
   @return The row distance from current MenuOption to next selectable MenuOption.
 
