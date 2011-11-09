@@ -91,7 +91,7 @@ class DscObject(object):
 class Dsc(DscObject):
     _NullClassIndex = 0
 
-    def __init__(self, Filename = None, IsToDatabase = False, IsToPlatform = False, WorkspaceDir = None, Database = None):
+    def __init__(self, Filename=None, IsToDatabase=False, IsToPlatform=False, WorkspaceDir=None, Database=None):
         self.Identification = Identification()
         self.Platform = PlatformClass()
         self.UserExtensions = ''
@@ -460,7 +460,7 @@ class Dsc(DscObject):
     # @param Type:           The type of Pcd
     # @param ContainerFile:  The file which describes the pcd, used for error report
     #
-    def GenPcds(self, Type = '', ContainerFile = ''):
+    def GenPcds(self, Type='', ContainerFile=''):
         Pcds = {}
         if Type == DataType.TAB_PCDS_PATCHABLE_IN_MODULE:
             Model = MODEL_PCD_PATCHABLE_IN_MODULE
@@ -512,7 +512,7 @@ class Dsc(DscObject):
     # @param Type:           The type of Pcd
     # @param ContainerFile:  The file which describes the pcd, used for error report
     #
-    def GenFeatureFlagPcds(self, Type = '', ContainerFile = ''):
+    def GenFeatureFlagPcds(self, Type='', ContainerFile=''):
         Pcds = {}
         if Type == DataType.TAB_PCDS_FEATURE_FLAG:
             Model = MODEL_PCD_FEATURE_FLAG
@@ -562,7 +562,7 @@ class Dsc(DscObject):
     # @param Type:           The type of Pcd
     # @param ContainerFile:  The file which describes the pcd, used for error report
     #
-    def GenDynamicDefaultPcds(self, Type = '', ContainerFile = ''):
+    def GenDynamicDefaultPcds(self, Type='', ContainerFile=''):
         Pcds = {}
         SkuInfoList = {}
         if Type == DataType.TAB_PCDS_DYNAMIC_DEFAULT:
@@ -594,20 +594,20 @@ class Dsc(DscObject):
                         if CleanString(NewItem) == '':
                             continue
                         (K1, K2, K3, K4, K5, K6) = GetDynamicDefaultPcd(NewItem, Type, Filename, -1)
-                        MergeArches(Pcds,  (K1, K2, K3, K4, K5, K6, IncludeFile[4]), Arch)
+                        MergeArches(Pcds, (K1, K2, K3, K4, K5, K6, IncludeFile[4]), Arch)
                         self.PcdToken[Record[3]] = (K2, K1)
 
             for Record in RecordSet:
                 if Record[1] == Arch or Record[1] == TAB_ARCH_COMMON.upper():
                     (K1, K2, K3, K4, K5, K6) = GetDynamicDefaultPcd(Record[0], Type, ContainerFile, Record[2])
-                    MergeArches(Pcds,  (K1, K2, K3, K4, K5, K6, Record[4]), Arch)
+                    MergeArches(Pcds, (K1, K2, K3, K4, K5, K6, Record[4]), Arch)
                     self.PcdToken[Record[3]] = (K2, K1)
 
         for Key in Pcds:
             (Status, SkuInfoList) = self.GenSkuInfoList(Key[6], self.Platform.SkuInfos.SkuInfoList, '', '', '', '', '', Key[2])
             if Status == False:
                 ErrorMsg = "The SKUID '%s' used in section '%s' is not defined in section [SkuIds]" % (SkuInfoList, Type)
-                EdkLogger.error("DSC File Parser", PARSER_ERROR, ErrorMsg, ContainerFile, RaiseError = EdkLogger.IsRaiseError)
+                EdkLogger.error("DSC File Parser", PARSER_ERROR, ErrorMsg, ContainerFile, RaiseError=EdkLogger.IsRaiseError)
             Pcd = PcdClass(Key[0], '', Key[1], Key[3], Key[4], Key[2], Key[5], [], SkuInfoList, [])
             Pcd.SupArchList = Pcds[Key]
             self.Platform.DynamicPcdBuildDefinitions.append(Pcd)
@@ -619,7 +619,7 @@ class Dsc(DscObject):
     # @param Type:           The type of Pcd
     # @param ContainerFile:  The file which describes the pcd, used for error report
     #
-    def GenDynamicHiiPcds(self, Type = '', ContainerFile = ''):
+    def GenDynamicHiiPcds(self, Type='', ContainerFile=''):
         Pcds = {}
         SkuInfoList = {}
         if Type == DataType.TAB_PCDS_DYNAMIC_HII:
@@ -651,20 +651,20 @@ class Dsc(DscObject):
                         if CleanString(NewItem) == '':
                             continue
                         (K1, K2, K3, K4, K5, K6, K7, K8) = GetDynamicHiiPcd(NewItem, Type, Filename, -1)
-                        MergeArches(Pcds,  (K1, K2, K3, K4, K5, K6, K7, K8, IncludeFile[4]), Arch)
+                        MergeArches(Pcds, (K1, K2, K3, K4, K5, K6, K7, K8, IncludeFile[4]), Arch)
                         self.PcdToken[Record[3]] = (K2, K1)
 
             for Record in RecordSet:
                 if Record[1] == Arch or Record[1] == TAB_ARCH_COMMON.upper():
                     (K1, K2, K3, K4, K5, K6, K7, K8) = GetDynamicHiiPcd(Record[0], Type, ContainerFile, Record[2])
-                    MergeArches(Pcds,  (K1, K2, K3, K4, K5, K6, K7, K8, Record[4]), Arch)
+                    MergeArches(Pcds, (K1, K2, K3, K4, K5, K6, K7, K8, Record[4]), Arch)
                     self.PcdToken[Record[3]] = (K2, K1)
 
         for Key in Pcds:
             (Status, SkuInfoList) = self.GenSkuInfoList(Key[8], self.Platform.SkuInfos.SkuInfoList, Key[2], Key[3], Key[4], Key[5], '', '')
             if Status == False:
                 ErrorMsg = "The SKUID '%s' used in section '%s' is not defined in section [SkuIds]" % (SkuInfoList, Type)
-                EdkLogger.error("DSC File Parser", PARSER_ERROR, ErrorMsg, ContainerFile, RaiseError = EdkLogger.IsRaiseError)
+                EdkLogger.error("DSC File Parser", PARSER_ERROR, ErrorMsg, ContainerFile, RaiseError=EdkLogger.IsRaiseError)
             Pcd = PcdClass(Key[0], '', Key[1], '', Key[6], Key[5], Key[7], [], SkuInfoList, [])
             Pcd.SupArchList = Pcds[Key]
             self.Platform.DynamicPcdBuildDefinitions.append(Pcd)
@@ -676,7 +676,7 @@ class Dsc(DscObject):
     # @param Type:           The type of Pcd
     # @param ContainerFile:  The file which describes the pcd, used for error report
     #
-    def GenDynamicVpdPcds(self, Type = '', ContainerFile = ''):
+    def GenDynamicVpdPcds(self, Type='', ContainerFile=''):
         Pcds = {}
         SkuInfoList = {}
         if Type == DataType.TAB_PCDS_DYNAMIC_VPD:
@@ -708,20 +708,20 @@ class Dsc(DscObject):
                         if CleanString(NewItem) == '':
                             continue
                         (K1, K2, K3, K4, K5) = GetDynamicVpdPcd(NewItem, Type, Filename, -1)
-                        MergeArches(Pcds,  (K1, K2, K3, K4, K5, IncludeFile[4]), Arch)
+                        MergeArches(Pcds, (K1, K2, K3, K4, K5, IncludeFile[4]), Arch)
                         self.PcdToken[Record[3]] = (K2, K1)
 
             for Record in RecordSet:
                 if Record[1] == Arch or Record[1] == TAB_ARCH_COMMON.upper():
                     (K1, K2, K3, K4, K5) = GetDynamicVpdPcd(Record[0], Type, ContainerFile, Record[2])
-                    MergeArches(Pcds,  (K1, K2, K3, K4, K5, Record[4]), Arch)
+                    MergeArches(Pcds, (K1, K2, K3, K4, K5, Record[4]), Arch)
                     self.PcdToken[Record[3]] = (K2, K1)
 
         for Key in Pcds:
             (Status, SkuInfoList) = self.GenSkuInfoList(Key[5], self.Platform.SkuInfos.SkuInfoList, '', '', '', '', Key[2], '')
             if Status == False:
                 ErrorMsg = "The SKUID '%s' used in section '%s' is not defined in section [SkuIds]" % (SkuInfoList, Type)
-                EdkLogger.error("DSC File Parser", PARSER_ERROR, ErrorMsg, ContainerFile, RaiseError = EdkLogger.IsRaiseError)
+                EdkLogger.error("DSC File Parser", PARSER_ERROR, ErrorMsg, ContainerFile, RaiseError=EdkLogger.IsRaiseError)
             Pcd = PcdClass(Key[0], '', Key[1], '', Key[3], '', Key[4], [], SkuInfoList, [])
             Pcd.SupArchList = Pcds[Key]
             self.Platform.DynamicPcdBuildDefinitions.append(Pcd)
@@ -769,7 +769,7 @@ class Dsc(DscObject):
 
                     SubLibSet = QueryDscItem(self.TblDsc, MODEL_EFI_LIBRARY_CLASS, Record[3], self.FileID)
                     for SubLib in SubLibSet:
-                        Lib.append(TAB_VALUE_SPLIT.join([SubLib[0],SubLib[4]]))
+                        Lib.append(TAB_VALUE_SPLIT.join([SubLib[0], SubLib[4]]))
 
                     SubBoSet = QueryDscItem(self.TblDsc, MODEL_META_DATA_BUILD_OPTION, Record[3], self.FileID)
                     for SubBo in SubBoSet:
@@ -806,7 +806,7 @@ class Dsc(DscObject):
     #
     # @retval PlatformModuleClass() A instance for PlatformModuleClass
     #
-    def GenComponent(self, Item, ContainerFile, LineNo = -1):
+    def GenComponent(self, Item, ContainerFile, LineNo= -1):
         (InfFilename, ExecFilename) = GetExec(Item[0])
         LibraryClasses = Item[1]
         BuildOptions = Item[2]
@@ -894,7 +894,7 @@ class Dsc(DscObject):
     # @retval (False, SkuName)     Not found in section SkuId Dsc file
     # @retval (True, SkuInfoList)  Found in section SkuId of Dsc file
     #
-    def GenSkuInfoList(self, SkuNameList, SkuInfo, VariableName = '', VariableGuid = '', VariableOffset = '', HiiDefaultValue = '', VpdOffset = '', DefaultValue = ''):
+    def GenSkuInfoList(self, SkuNameList, SkuInfo, VariableName='', VariableGuid='', VariableOffset='', HiiDefaultValue='', VpdOffset='', DefaultValue=''):
         SkuNameList = GetSplitValueList(SkuNameList)
         if SkuNameList == None or SkuNameList == [] or SkuNameList == ['']:
             SkuNameList = ['DEFAULT']
@@ -964,7 +964,7 @@ class Dsc(DscObject):
         (Value1, Value2, Value3, Model, StartColumn, EndColumn, Enabled) = ('', '', '', -1, -1, -1, 0)
         if IfDefList == []:
             ErrorMsg = 'Not suited conditional statement in file %s' % Filename
-            EdkLogger.error("DSC File Parser", PARSER_ERROR, ErrorMsg, Filename, RaiseError = EdkLogger.IsRaiseError)
+            EdkLogger.error("DSC File Parser", PARSER_ERROR, ErrorMsg, Filename, RaiseError=EdkLogger.IsRaiseError)
         else:
             #
             # Get New Dsc item ID
@@ -1046,10 +1046,10 @@ class Dsc(DscObject):
             # Remove comment block
             #
             if Line.find(TAB_COMMENT_EDK_START) > -1:
-                ReservedLine = GetSplitValueList(Line, TAB_COMMENT_EDK_START, 1)[0]
+                ReservedLine = GetSplitList(Line, TAB_COMMENT_EDK_START, 1)[0]
                 IsFindBlockComment = True
             if Line.find(TAB_COMMENT_EDK_END) > -1:
-                Line = ReservedLine + GetSplitValueList(Line, TAB_COMMENT_EDK_END, 1)[1]
+                Line = ReservedLine + GetSplitList(Line, TAB_COMMENT_EDK_END, 1)[1]
                 ReservedLine = ''
                 IsFindBlockComment = False
             if IsFindBlockComment:
@@ -1087,7 +1087,7 @@ class Dsc(DscObject):
                         CurrentSection = ItemList[0]
                     else:
                         if CurrentSection != ItemList[0]:
-                            EdkLogger.error("Parser", PARSER_ERROR, "Different section names '%s' and '%s' are found in one section definition, this is not allowed." % (CurrentSection, ItemList[0]), File=Filename, Line=LineNo, RaiseError = EdkLogger.IsRaiseError)
+                            EdkLogger.error("Parser", PARSER_ERROR, "Different section names '%s' and '%s' are found in one section definition, this is not allowed." % (CurrentSection, ItemList[0]), File=Filename, Line=LineNo, RaiseError=EdkLogger.IsRaiseError)
                     if CurrentSection.upper() not in self.KeyList:
                         RaiseParserError(Line, CurrentSection, Filename, '', LineNo)
                         CurrentSection = TAB_UNKNOWN
@@ -1098,7 +1098,7 @@ class Dsc(DscObject):
                         RaiseParserError(Line, CurrentSection, Filename, '', LineNo)
                     else:
                         if ItemList[1] != '' and ItemList[1].upper() not in ARCH_LIST_FULL:
-                            EdkLogger.error("Parser", PARSER_ERROR, "Invalid Arch definition '%s' found" % ItemList[1], File=Filename, Line=LineNo, RaiseError = EdkLogger.IsRaiseError)
+                            EdkLogger.error("Parser", PARSER_ERROR, "Invalid Arch definition '%s' found" % ItemList[1], File=Filename, Line=LineNo, RaiseError=EdkLogger.IsRaiseError)
                         ArchList.append(ItemList[1].upper())
                         ThirdList.append(ItemList[2])
 
@@ -1109,7 +1109,7 @@ class Dsc(DscObject):
             #
             if CurrentSection == TAB_UNKNOWN:
                 ErrorMsg = "%s is not in any defined section" % Line
-                EdkLogger.error("Parser", PARSER_ERROR, ErrorMsg, File=Filename, Line=LineNo, RaiseError = EdkLogger.IsRaiseError)
+                EdkLogger.error("Parser", PARSER_ERROR, ErrorMsg, File=Filename, Line=LineNo, RaiseError=EdkLogger.IsRaiseError)
 
             #
             # Add a section item
@@ -1161,7 +1161,7 @@ class Dsc(DscObject):
                          MODEL_META_DATA_DEFINE)
         RecordSet = self.TblDsc.Exec(SqlCommand)
         for Record in RecordSet:
-            SqlCommand = """Update %s set Enabled = -1 where StartLine >= %s and EndLine <= %s""" %(self.TblDsc.Table, Record[0], Record[1])
+            SqlCommand = """Update %s set Enabled = -1 where StartLine >= %s and EndLine <= %s""" % (self.TblDsc.Table, Record[0], Record[1])
             self.TblDsc.Exec(SqlCommand)
 
         #
@@ -1185,8 +1185,8 @@ class Dsc(DscObject):
                          MODEL_META_DATA_DEFINE)
         RecordSet = self.TblDsc.Exec(SqlCommand)
         for Record in RecordSet:
-            SqlCommand = """Update %s set Enabled = -1 where StartLine >= %s and EndLine <= %s""" %(self.TblDsc.Table, Record[0], Record[1])
-            EdkLogger.debug(4, "SqlCommand: %s" %SqlCommand)
+            SqlCommand = """Update %s set Enabled = -1 where StartLine >= %s and EndLine <= %s""" % (self.TblDsc.Table, Record[0], Record[1])
+            EdkLogger.debug(4, "SqlCommand: %s" % SqlCommand)
             self.Cur.execute(SqlCommand)
 
         #
@@ -1210,13 +1210,13 @@ class Dsc(DscObject):
         for Record in RecordSet:
             if Record[0] == MODEL_META_DATA_CONDITIONAL_STATEMENT_IF:
                 if not self.Compare(Record[6], Record[2], Record[3]):
-                    SqlCommand = """Update %s set Enabled = -1 where StartLine >= %s and EndLine <= %s""" %(self.TblDsc.Table, Record[4], Record[5])
+                    SqlCommand = """Update %s set Enabled = -1 where StartLine >= %s and EndLine <= %s""" % (self.TblDsc.Table, Record[4], Record[5])
                     self.TblDsc.Exec(SqlCommand)
                 else:
                     DisabledList.append(Record[1])
                 continue
             if Record[0] == MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSE and Record[1] in DisabledList:
-                SqlCommand = """Update %s set Enabled = -1 where StartLine >= %s and EndLine <= %s""" %(self.TblDsc.Table, Record[4], Record[5])
+                SqlCommand = """Update %s set Enabled = -1 where StartLine >= %s and EndLine <= %s""" % (self.TblDsc.Table, Record[4], Record[5])
                 self.TblDsc.Exec(SqlCommand)
 
     ## Compare
@@ -1227,7 +1227,7 @@ class Dsc(DscObject):
     # @param Value2:
     #
     def Compare(self, Value1, CompareType, Value2):
-        Command = """Value1 %s Value2""" %CompareType
+        Command = """Value1 %s Value2""" % CompareType
         return eval(Command)
 
     ## First time to insert records to database
@@ -1259,7 +1259,7 @@ class Dsc(DscObject):
                 LineValue, StartLine, EndLine = SectionItem[0], SectionItem[1], SectionItem[1]
 
 
-                EdkLogger.debug(4, "Parsing %s ..." %LineValue)
+                EdkLogger.debug(4, "Parsing %s ..." % LineValue)
                 #
                 # Parse '!ifdef'
                 #
@@ -1337,10 +1337,10 @@ class Dsc(DscObject):
                 Components = []
                 GetComponent(SectionItemList, Components)
                 for Component in Components:
-                    EdkLogger.debug(4, "Parsing component %s ..." %Component)
+                    EdkLogger.debug(4, "Parsing component %s ..." % Component)
                     DscItmeID = self.TblDsc.Insert(MODEL_META_DATA_COMPONENT, Component[0], '', '', Arch, -1, FileID, StartLine, -1, StartLine, -1, 0)
                     for Item in Component[1]:
-                        List = GetSplitValueList(Item, MaxSplit = 2)
+                        List = GetSplitValueList(Item, MaxSplit=2)
                         LibName, LibIns = '', ''
                         if len(List) == 2:
                             LibName = List[0]

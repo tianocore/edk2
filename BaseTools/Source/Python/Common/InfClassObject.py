@@ -163,7 +163,7 @@ class InfObject(object):
 # @var KeyList:             To store value for KeyList, a list for all Keys used in Inf
 #
 class Inf(InfObject):
-    def __init__(self, Filename = None, IsToDatabase = False, IsToModule = False, WorkspaceDir = None, Database = None, SupArchList = DataType.ARCH_LIST):
+    def __init__(self, Filename=None, IsToDatabase=False, IsToModule=False, WorkspaceDir=None, Database=None, SupArchList=DataType.ARCH_LIST):
         self.Identification = Identification()
         self.Module = ModuleClass()
         self.UserExtensions = ''
@@ -353,10 +353,10 @@ class Inf(InfObject):
             # Remove comment block
             #
             if Line.find(TAB_COMMENT_EDK_START) > -1:
-                ReservedLine = GetSplitValueList(Line, TAB_COMMENT_EDK_START, 1)[0]
+                ReservedLine = GetSplitList(Line, TAB_COMMENT_EDK_START, 1)[0]
                 IsFindBlockComment = True
             if Line.find(TAB_COMMENT_EDK_END) > -1:
-                Line = ReservedLine + GetSplitValueList(Line, TAB_COMMENT_EDK_END, 1)[1]
+                Line = ReservedLine + GetSplitList(Line, TAB_COMMENT_EDK_END, 1)[1]
                 ReservedLine = ''
                 IsFindBlockComment = False
             if IsFindBlockComment:
@@ -397,7 +397,7 @@ class Inf(InfObject):
                         CurrentSection = ItemList[0]
                     else:
                         if CurrentSection != ItemList[0]:
-                            EdkLogger.error("Parser", PARSER_ERROR, "Different section names '%s' and '%s' are found in one section definition, this is not allowed." % (CurrentSection, ItemList[0]), File=Filename, Line=LineNo, RaiseError = EdkLogger.IsRaiseError)
+                            EdkLogger.error("Parser", PARSER_ERROR, "Different section names '%s' and '%s' are found in one section definition, this is not allowed." % (CurrentSection, ItemList[0]), File=Filename, Line=LineNo, RaiseError=EdkLogger.IsRaiseError)
                     if CurrentSection.upper() not in self.KeyList:
                         RaiseParserError(Line, CurrentSection, Filename, '', LineNo)
                         CurrentSection = TAB_UNKNOWN
@@ -408,7 +408,7 @@ class Inf(InfObject):
                         RaiseParserError(Line, CurrentSection, Filename, '', LineNo)
                     else:
                         if ItemList[1] != '' and ItemList[1].upper() not in ARCH_LIST_FULL:
-                            EdkLogger.error("Parser", PARSER_ERROR, "Invalid Arch definition '%s' found" % ItemList[1], File=Filename, Line=LineNo, RaiseError = EdkLogger.IsRaiseError)
+                            EdkLogger.error("Parser", PARSER_ERROR, "Invalid Arch definition '%s' found" % ItemList[1], File=Filename, Line=LineNo, RaiseError=EdkLogger.IsRaiseError)
                         ArchList.append(ItemList[1].upper())
                         ThirdList.append(ItemList[2])
 
@@ -419,7 +419,7 @@ class Inf(InfObject):
             #
             if CurrentSection == TAB_UNKNOWN:
                 ErrorMsg = "%s is not in any defined section" % Line
-                EdkLogger.error("Parser", PARSER_ERROR, ErrorMsg, File=Filename, Line=LineNo, RaiseError = EdkLogger.IsRaiseError)
+                EdkLogger.error("Parser", PARSER_ERROR, ErrorMsg, File=Filename, Line=LineNo, RaiseError=EdkLogger.IsRaiseError)
 
             #
             # Add a section item
@@ -497,13 +497,13 @@ class Inf(InfObject):
             print Item.Name, Item.Value, Item.SupArchList
         print '\nPcds =', M.PcdCodes
         for Item in M.PcdCodes:
-            print '\tCName=',Item.CName, 'TokenSpaceGuidCName=', Item.TokenSpaceGuidCName, 'DefaultValue=', Item.DefaultValue, 'ItemType=', Item.ItemType, Item.SupArchList
+            print '\tCName=', Item.CName, 'TokenSpaceGuidCName=', Item.TokenSpaceGuidCName, 'DefaultValue=', Item.DefaultValue, 'ItemType=', Item.ItemType, Item.SupArchList
         print '\nSources =', M.Sources
         for Source in M.Sources:
             print Source.SourceFile, 'Fam=', Source.ToolChainFamily, 'Pcd=', Source.FeatureFlag, 'Tag=', Source.TagName, 'ToolCode=', Source.ToolCode, Source.SupArchList
         print '\nUserExtensions =', M.UserExtensions
         for UserExtension in M.UserExtensions:
-            print UserExtension.UserID, UserExtension.Identifier,UserExtension.Content
+            print UserExtension.UserID, UserExtension.Identifier, UserExtension.Content
         print '\nGuids =', M.Guids
         for Item in M.Guids:
             print Item.CName, Item.SupArchList, Item.FeatureFlag
@@ -629,7 +629,7 @@ class Inf(InfObject):
                 if ModuleHeader.ComponentType in gComponentType2ModuleType:
                     ModuleHeader.ModuleType = gComponentType2ModuleType[ModuleHeader.ComponentType]
                 elif ModuleHeader.ComponentType != '':
-                    EdkLogger.error("Parser", PARSER_ERROR, "Unsupported Edk component type [%s]" % ModuleHeader.ComponentType, ExtraData=File, RaiseError = EdkLogger.IsRaiseError)
+                    EdkLogger.error("Parser", PARSER_ERROR, "Unsupported Edk component type [%s]" % ModuleHeader.ComponentType, ExtraData=File, RaiseError=EdkLogger.IsRaiseError)
 
             self.Module.Header[Arch] = ModuleHeader
 

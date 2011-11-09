@@ -1118,6 +1118,34 @@ class FdfParser:
     def SetFileBufferPos(self, Pos):
         (self.CurrentLineNumber, self.CurrentOffsetWithinLine) = Pos
 
+    ## Preprocess() method
+    #
+    #   Preprocess comment, conditional directive, include directive, replace macro.
+    #   Exception will be raised if syntax error found
+    #
+    #   @param  self        The object pointer
+    #
+    def Preprocess(self):
+        self.__StringToList()
+        self.PreprocessFile()
+        self.PreprocessIncludeFile()
+        self.__StringToList()
+        self.PreprocessFile()
+        self.PreprocessConditionalStatement()
+        self.__StringToList()
+        for Pos in self.__WipeOffArea:
+            self.__ReplaceFragment(Pos[0], Pos[1])
+        self.Profile.FileLinesList = ["".join(list) for list in self.Profile.FileLinesList]
+
+        while self.__GetDefines():
+            pass
+        
+        Index = 0
+        while Index < len(self.Profile.FileLinesList):
+            FileLineTuple = GetRealFileLine(self.FileName, Index + 1)
+            self.Profile.FileLinesList[Index] = self.__ReplaceMacros(self.Profile.FileLinesList[Index], FileLineTuple[0], FileLineTuple[1])
+            Index += 1
+
     ## ParseFile() method
     #
     #   Parse the file profile buffer to extract fd, fv ... information
@@ -1128,26 +1156,7 @@ class FdfParser:
     def ParseFile(self):
 
         try:
-            self.__StringToList()
-            self.PreprocessFile()
-            self.PreprocessIncludeFile()
-            self.__StringToList()
-            self.PreprocessFile()
-            self.PreprocessConditionalStatement()
-            self.__StringToList()
-            for Pos in self.__WipeOffArea:
-                self.__ReplaceFragment(Pos[0], Pos[1])
-            self.Profile.FileLinesList = ["".join(list) for list in self.Profile.FileLinesList]
-
-            while self.__GetDefines():
-                pass
-            
-            Index = 0
-            while Index < len(self.Profile.FileLinesList):
-                FileLineTuple = GetRealFileLine(self.FileName, Index + 1)
-                self.Profile.FileLinesList[Index] = self.__ReplaceMacros(self.Profile.FileLinesList[Index], FileLineTuple[0], FileLineTuple[1])
-                Index += 1
-
+            self.Preprocess()
             while self.__GetFd():
                 pass
 

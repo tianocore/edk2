@@ -660,10 +660,10 @@ def RemoveBlockComment(Lines):
         # Remove comment block
         #
         if Line.find(DataType.TAB_COMMENT_EDK1_START) > -1:
-            ReservedLine = GetSplitValueList(Line, DataType.TAB_COMMENT_EDK1_START, 1)[0]
+            ReservedLine = GetSplitList(Line, DataType.TAB_COMMENT_EDK1_START, 1)[0]
             IsFindBlockComment = True
         if Line.find(DataType.TAB_COMMENT_EDK1_END) > -1:
-            Line = ReservedLine + GetSplitValueList(Line, DataType.TAB_COMMENT_EDK1_END, 1)[1]
+            Line = ReservedLine + GetSplitList(Line, DataType.TAB_COMMENT_EDK1_END, 1)[1]
             ReservedLine = ''
             IsFindBlockComment = False
         if IsFindBlockComment:

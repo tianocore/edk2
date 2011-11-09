@@ -310,9 +310,18 @@ gAutoGenHPrologueString = TemplateString("""
 #ifndef _${File}_${Guid}
 #define _${File}_${Guid}
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 """)
 
 gAutoGenHEpilogueString = """
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 """
 
@@ -917,7 +926,7 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                             "No generated token number for %s.%s\n" % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
                             ExtraData="[%s]" % str(Info))
         TokenNumber = PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName]
-    AutoGenH.Append('\n#define %s  %d\n' % (PcdTokenName, TokenNumber))
+    AutoGenH.Append('\n#define %s  %dU\n' % (PcdTokenName, TokenNumber))
 
     EdkLogger.debug(EdkLogger.DEBUG_3, "Creating code for " + Pcd.TokenCName + "." + Pcd.TokenSpaceGuidCName)
     if Pcd.Type not in gItemTypeStringDatabase:
@@ -960,9 +969,9 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
         if Pcd.DatumType == 'BOOLEAN':
             BoolValue = Value.upper()
             if BoolValue == 'TRUE':
-                Value = 1
+                Value = '1U'
             elif BoolValue == 'FALSE':
-                Value = 0
+                Value = '0U'
 
         if Pcd.DatumType in ['UINT64', 'UINT32', 'UINT16', 'UINT8']:
             try:
@@ -994,6 +1003,8 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                     EdkLogger.error("build", AUTOGEN_ERROR,
                                     "Too large PCD value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
                                     ExtraData="[%s]" % str(Info))
+                if not Value.endswith('U'):
+                    Value += 'U'
             elif Pcd.DatumType == 'UINT16':
                 if ValueNumber < 0:
                     EdkLogger.error("build", AUTOGEN_ERROR,
@@ -1003,6 +1014,8 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                     EdkLogger.error("build", AUTOGEN_ERROR,
                                     "Too large PCD value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
                                     ExtraData="[%s]" % str(Info))
+                if not Value.endswith('U'):
+                    Value += 'U'                    
             elif Pcd.DatumType == 'UINT8':
                 if ValueNumber < 0:
                     EdkLogger.error("build", AUTOGEN_ERROR,
@@ -1012,6 +1025,8 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                     EdkLogger.error("build", AUTOGEN_ERROR,
                                     "Too large PCD value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
                                     ExtraData="[%s]" % str(Info))
+                if not Value.endswith('U'):
+                    Value += 'U'
         if Pcd.DatumType == 'VOID*':
             if Pcd.MaxDatumSize == None or Pcd.MaxDatumSize == '':
                 EdkLogger.error("build", AUTOGEN_ERROR,
@@ -1131,7 +1146,7 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
         Type = '(VOID *)'
         Array = '[]'
 
-    AutoGenH.Append('#define _PCD_TOKEN_%s  %d\n' % (TokenCName, TokenNumber))
+    AutoGenH.Append('#define _PCD_TOKEN_%s  %dU\n' % (TokenCName, TokenNumber))
 
     PcdItemType = Pcd.Type
     #if PcdItemType in gDynamicPcd:
@@ -1405,6 +1420,8 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                 #
                 if Pcd.DatumType == "UINT64":
                     ValueList.append(Sku.DefaultValue + "ULL")
+                elif Pcd.DatumType in ("UINT32", "UINT16", "UINT8"):
+                    ValueList.append(Sku.DefaultValue + "U")
                 else:
                     ValueList.append(Sku.DefaultValue)
 

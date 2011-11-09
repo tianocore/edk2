@@ -450,6 +450,7 @@ class InfDefSection(InfDefSectionOptionRomInfo):
             if len(ValueList) == 2:
                 Type = ValueList[1]
                 TypeList = GetSplitValueList(Type, ' ')
+                TypeList = [Type for Type in TypeList if Type != '']
                 for Item in TypeList:
                     if Item not in DT.MODULE_LIST:
                         ErrorInInf(ST.ERR_INF_PARSER_DEFINE_FROMAT_INVALID%(Item),

@@ -82,14 +82,14 @@ class DecObject(object):
 # @var KeyList:             To store value for KeyList, a list for all Keys used in Dec
 #
 class Dec(DecObject):
-    def __init__(self, Filename = None, IsToDatabase = False, IsToPackage = False, WorkspaceDir = None, Database = None, SupArchList = DataType.ARCH_LIST):
+    def __init__(self, Filename=None, IsToDatabase=False, IsToPackage=False, WorkspaceDir=None, Database=None, SupArchList=DataType.ARCH_LIST):
         self.Identification = Identification()
         self.Package = PackageClass()
         self.UserExtensions = ''
         self.WorkspaceDir = WorkspaceDir
         self.SupArchList = SupArchList
         self.IsToDatabase = IsToDatabase
-        
+
         self.Cur = Database.Cur
         self.TblFile = Database.TblFile
         self.TblDec = Database.TblDec
@@ -104,26 +104,26 @@ class Dec(DecObject):
         # Upper all KEYs to ignore case sensitive when parsing
         #
         self.KeyList = map(lambda c: c.upper(), self.KeyList)
-        
+
         #
         # Init RecordSet
         #
-        self.RecordSet = {}        
+        self.RecordSet = {}
         for Key in self.KeyList:
             self.RecordSet[Section[Key]] = []
-        
+
         #
         # Load Dec file if filename is not None
         #
         if Filename != None:
             self.LoadDecFile(Filename)
-        
+
         #
         # Transfer to Package Object if IsToPackage is True
         #
         if IsToPackage:
             self.DecToPackage()
-    
+
     ## Load Dec file
     #
     # Load the file if it exists
@@ -138,20 +138,20 @@ class Dec(DecObject):
         self.Identification.FileFullPath = Filename
         (self.Identification.FileRelativePath, self.Identification.FileName) = os.path.split(Filename)
         self.FileID = self.TblFile.InsertFile(Filename, MODEL_FILE_DEC)
-        
+
         #
         # Init DecTable
         #
         #self.TblDec.Table = "Dec%s" % self.FileID
         #self.TblDec.Create()
-        
+
         #
         # Init common datas
         #
         IfDefList, SectionItemList, CurrentSection, ArchList, ThirdList, IncludeFiles = \
         [], [], TAB_UNKNOWN, [], [], []
         LineNo = 0
-        
+
         #
         # Parse file content
         #
@@ -163,10 +163,10 @@ class Dec(DecObject):
             # Remove comment block
             #
             if Line.find(TAB_COMMENT_EDK_START) > -1:
-                ReservedLine = GetSplitValueList(Line, TAB_COMMENT_EDK_START, 1)[0]
+                ReservedLine = GetSplitList(Line, TAB_COMMENT_EDK_START, 1)[0]
                 IsFindBlockComment = True
             if Line.find(TAB_COMMENT_EDK_END) > -1:
-                Line = ReservedLine + GetSplitValueList(Line, TAB_COMMENT_EDK_END, 1)[1]
+                Line = ReservedLine + GetSplitList(Line, TAB_COMMENT_EDK_END, 1)[1]
                 ReservedLine = ''
                 IsFindBlockComment = False
             if IsFindBlockComment:
@@ -178,7 +178,7 @@ class Dec(DecObject):
             Line = CleanString(Line)
             if Line == '':
                 continue
-            
+
             #
             # Find a new section tab
             # First insert previous section items
@@ -197,7 +197,7 @@ class Dec(DecObject):
                 SectionItemList = []
                 ArchList = []
                 ThirdList = []
-                
+
                 CurrentSection = ''
                 LineList = GetSplitValueList(Line[len(TAB_SECTION_START):len(Line) - len(TAB_SECTION_END)], TAB_COMMA_SPLIT)
                 for Item in LineList:
@@ -206,7 +206,7 @@ class Dec(DecObject):
                         CurrentSection = ItemList[0]
                     else:
                         if CurrentSection != ItemList[0]:
-                            EdkLogger.error("Parser", PARSER_ERROR, "Different section names '%s' and '%s' are found in one section definition, this is not allowed." % (CurrentSection, ItemList[0]), File=Filename, Line=LineNo, RaiseError = EdkLogger.IsRaiseError)
+                            EdkLogger.error("Parser", PARSER_ERROR, "Different section names '%s' and '%s' are found in one section definition, this is not allowed." % (CurrentSection, ItemList[0]), File=Filename, Line=LineNo, RaiseError=EdkLogger.IsRaiseError)
                     if CurrentSection.upper() not in self.KeyList:
                         RaiseParserError(Line, CurrentSection, Filename, '', LineNo)
                     ItemList.append('')
@@ -215,18 +215,18 @@ class Dec(DecObject):
                         RaiseParserError(Line, CurrentSection, Filename, '', LineNo)
                     else:
                         if ItemList[1] != '' and ItemList[1].upper() not in ARCH_LIST_FULL:
-                            EdkLogger.error("Parser", PARSER_ERROR, "Invalid Arch definition '%s' found" % ItemList[1], File=Filename, Line=LineNo, RaiseError = EdkLogger.IsRaiseError)
+                            EdkLogger.error("Parser", PARSER_ERROR, "Invalid Arch definition '%s' found" % ItemList[1], File=Filename, Line=LineNo, RaiseError=EdkLogger.IsRaiseError)
                         ArchList.append(ItemList[1].upper())
                         ThirdList.append(ItemList[2])
 
                 continue
-            
+
             #
             # Not in any defined section
             #
             if CurrentSection == TAB_UNKNOWN:
                 ErrorMsg = "%s is not in any defined section" % Line
-                EdkLogger.error("Parser", PARSER_ERROR, ErrorMsg, File=Filename, Line=LineNo, RaiseError = EdkLogger.IsRaiseError)
+                EdkLogger.error("Parser", PARSER_ERROR, ErrorMsg, File=Filename, Line=LineNo, RaiseError=EdkLogger.IsRaiseError)
 
             #
             # Add a section item
@@ -234,13 +234,13 @@ class Dec(DecObject):
             SectionItemList.append([Line, LineNo])
             # End of parse
         #End of For
-        
+
         #
         # Insert items data of last section
         #
         Model = Section[CurrentSection.upper()]
         InsertSectionItemsIntoDatabase(self.TblDec, self.FileID, Filename, Model, CurrentSection, SectionItemList, ArchList, ThirdList, IfDefList, self.RecordSet)
-        
+
         #
         # Replace all DEFINE macros with its actual values
         #
@@ -255,12 +255,12 @@ class Dec(DecObject):
         # Init global information for the file
         #
         ContainerFile = self.Identification.FileFullPath
-        
+
         #
         # Generate Package Header
         #
         self.GenPackageHeader(ContainerFile)
-        
+
         #
         # Generate Includes
         #
@@ -280,17 +280,17 @@ class Dec(DecObject):
         # Generate Ppis
         #
         self.GenGuidProtocolPpis(DataType.TAB_PPIS, ContainerFile)
-        
+
         #
         # Generate LibraryClasses
         #
         self.GenLibraryClasses(ContainerFile)
-        
+
         #
         # Generate Pcds
         #
         self.GenPcds(ContainerFile)
-    
+
     ## Get Package Header
     #
     # Gen Package Header of Dec as <Key> = <Value>
@@ -311,22 +311,22 @@ class Dec(DecObject):
             SqlCommand = """update %s set Value1 = '%s', Value2 = '%s'
                             where ID = %s""" % (self.TblDec.Table, ConvertToSqlString2(Value1), ConvertToSqlString2(Value2), ID)
             self.TblDec.Exec(SqlCommand)
-        
+
         #
         # Get detailed information
         #
         for Arch in self.SupArchList:
             PackageHeader = PackageHeaderClass()
-            
+
             PackageHeader.Name = QueryDefinesItem(self.TblDec, TAB_DEC_DEFINES_PACKAGE_NAME, Arch, self.FileID)[0]
             PackageHeader.Guid = QueryDefinesItem(self.TblDec, TAB_DEC_DEFINES_PACKAGE_GUID, Arch, self.FileID)[0]
             PackageHeader.Version = QueryDefinesItem(self.TblDec, TAB_DEC_DEFINES_PACKAGE_VERSION, Arch, self.FileID)[0]
             PackageHeader.FileName = self.Identification.FileName
             PackageHeader.FullPath = self.Identification.FileFullPath
             PackageHeader.DecSpecification = QueryDefinesItem(self.TblDec, TAB_DEC_DEFINES_DEC_SPECIFICATION, Arch, self.FileID)[0]
-            
+
             self.Package.Header[Arch] = PackageHeader
-    
+
     ## GenIncludes
     #
     # Gen Includes of Dec
@@ -341,7 +341,7 @@ class Dec(DecObject):
         # Get all Includes
         #
         RecordSet = self.RecordSet[MODEL_EFI_INCLUDE]
-        
+
         #
         # Go through each arch
         #
@@ -355,7 +355,7 @@ class Dec(DecObject):
             Include.FilePath = NormPath(Key)
             Include.SupArchList = Includes[Key]
             self.Package.Includes.append(Include)
-    
+
     ## GenPpis
     #
     # Gen Ppis of Dec
@@ -370,7 +370,7 @@ class Dec(DecObject):
         # Get all Items
         #
         RecordSet = self.RecordSet[Section[Type.upper()]]
-        
+
         #
         # Go through each arch
         #
@@ -383,7 +383,7 @@ class Dec(DecObject):
                         SqlCommand = """update %s set Value1 = '%s', Value2 = '%s'
                                         where ID = %s""" % (self.TblDec.Table, ConvertToSqlString2(Name), ConvertToSqlString2(Value), Record[3])
                         self.TblDec.Exec(SqlCommand)
-        
+
         ListMember = None
         if Type == TAB_GUIDS:
             ListMember = self.Package.GuidDeclarations
@@ -391,15 +391,15 @@ class Dec(DecObject):
             ListMember = self.Package.ProtocolDeclarations
         elif Type == TAB_PPIS:
             ListMember = self.Package.PpiDeclarations
-        
+
         for Key in Lists.keys():
             ListClass = GuidProtocolPpiCommonClass()
             ListClass.CName = Key[0]
             ListClass.Guid = Key[1]
             ListClass.SupArchList = Lists[Key]
             ListMember.append(ListClass)
-            
-    
+
+
     ## GenLibraryClasses
     #
     # Gen LibraryClasses of Dec
@@ -414,7 +414,7 @@ class Dec(DecObject):
         # Get all Guids
         #
         RecordSet = self.RecordSet[MODEL_EFI_LIBRARY_CLASS]
-        
+
         #
         # Go through each arch
         #
@@ -432,7 +432,7 @@ class Dec(DecObject):
                                         where ID = %s""" % (self.TblDec.Table, ConvertToSqlString2(List[0]), ConvertToSqlString2(List[1]), SUP_MODULE_LIST_STRING, Record[3])
                         self.TblDec.Exec(SqlCommand)
 
-        
+
         for Key in LibraryClasses.keys():
             LibraryClass = LibraryClassClass()
             LibraryClass.LibraryClass = Key[0]
@@ -440,7 +440,7 @@ class Dec(DecObject):
             LibraryClass.SupModuleList = SUP_MODULE_LIST
             LibraryClass.SupArchList = LibraryClasses[Key]
             self.Package.LibraryClassDeclarations.append(LibraryClass)
-    
+
     ## GenPcds
     #
     # Gen Pcds of Dec
@@ -460,7 +460,7 @@ class Dec(DecObject):
         RecordSet3 = self.RecordSet[MODEL_PCD_FEATURE_FLAG]
         RecordSet4 = self.RecordSet[MODEL_PCD_DYNAMIC_EX]
         RecordSet5 = self.RecordSet[MODEL_PCD_DYNAMIC]
-        
+
         #
         # Go through each arch
         #
@@ -508,7 +508,7 @@ class Dec(DecObject):
             Pcd.ItemType = Key[5]
             Pcd.SupArchList = Pcds[Key]
             self.Package.PcdDeclarations.append(Pcd)
-    
+
     ## Show detailed information of Package
     #
     # Print all members and their values of Package class
@@ -550,14 +550,14 @@ class Dec(DecObject):
 if __name__ == '__main__':
     EdkLogger.Initialize()
     EdkLogger.SetLevel(EdkLogger.DEBUG_0)
-    
+
     W = os.getenv('WORKSPACE')
     F = os.path.join(W, 'Nt32Pkg/Nt32Pkg.dec')
 
     Db = Database.Database('Dec.db')
     Db.InitDatabase()
-    
+
     P = Dec(os.path.normpath(F), True, True, W, Db)
     P.ShowPackage()
-    
+
     Db.Close()

@@ -2184,13 +2184,19 @@ class ModuleAutoGen(AutoGen):
     def _GetBuildOptionIncPathList(self):
         if self._BuildOptionIncPathList == None:
             #
-            # Regular expression for finding Include Directories, the difference between MSFT and INTEL/GCC
+            # Regular expression for finding Include Directories, the difference between MSFT and INTEL/GCC/RVCT
             # is the former use /I , the Latter used -I to specify include directories
             #
             if self.PlatformInfo.ToolChainFamily in ('MSFT'):
                 gBuildOptIncludePattern = re.compile(r"(?:.*?)/I[ \t]*([^ ]*)", re.MULTILINE|re.DOTALL)
-            elif self.PlatformInfo.ToolChainFamily in ('INTEL', 'GCC'):
+            elif self.PlatformInfo.ToolChainFamily in ('INTEL', 'GCC', 'RVCT'):
                 gBuildOptIncludePattern = re.compile(r"(?:.*?)-I[ \t]*([^ ]*)", re.MULTILINE|re.DOTALL)
+            else:
+                #
+                # New ToolChainFamily, don't known whether there is option to specify include directories
+                #
+                self._BuildOptionIncPathList = []
+                return self._BuildOptionIncPathList
             
             BuildOptionIncPathList = []
             for Tool in ('CC', 'PP', 'VFRPP', 'ASLPP', 'ASLCC', 'APP', 'ASM'):
@@ -2200,7 +2206,17 @@ class ModuleAutoGen(AutoGen):
                 except KeyError:
                     FlagOption = ''
                 
-                IncPathList = [NormPath(Path, self.Macros) for Path in gBuildOptIncludePattern.findall(FlagOption)]
+                if self.PlatformInfo.ToolChainFamily != 'RVCT':
+                    IncPathList = [NormPath(Path, self.Macros) for Path in gBuildOptIncludePattern.findall(FlagOption)]
+                else:
+                    #
+                    # RVCT may specify a list of directory seperated by commas
+                    #
+                    IncPathList = []
+                    for Path in gBuildOptIncludePattern.findall(FlagOption):
+                        PathList = GetSplitList(Path, TAB_COMMA_SPLIT)
+                        IncPathList += [NormPath(PathEntry, self.Macros) for PathEntry in PathList]
+
                 #
                 # EDK II modules must not reference header files outside of the packages they depend on or 
                 # within the module's directory tree. Report error if violation.

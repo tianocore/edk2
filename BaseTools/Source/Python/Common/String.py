@@ -24,7 +24,7 @@ import GlobalData
 from BuildToolError import *
 from CommonDataClass.Exceptions import *
 
-gHexVerPatt = re.compile('0x[a-f0-9]{4}[a-f0-9]{4}$',re.IGNORECASE)
+gHexVerPatt = re.compile('0x[a-f0-9]{4}[a-f0-9]{4}$', re.IGNORECASE)
 gHumanReadableVerPatt = re.compile(r'([1-9][0-9]*|0)\.[0-9]{1,2}$')
 
 ## GetSplitValueList
@@ -39,7 +39,7 @@ gHumanReadableVerPatt = re.compile(r'([1-9][0-9]*|0)\.[0-9]{1,2}$')
 #
 # @retval list() A list for splitted string
 #
-def GetSplitValueList(String, SplitTag = DataType.TAB_VALUE_SPLIT, MaxSplit = -1):
+def GetSplitValueList(String, SplitTag=DataType.TAB_VALUE_SPLIT, MaxSplit= -1):
     ValueList = []
     Last = 0
     Escaped = False
@@ -51,7 +51,7 @@ def GetSplitValueList(String, SplitTag = DataType.TAB_VALUE_SPLIT, MaxSplit = -1
             # Found a splitter not in a string, split it
             if not InString and Char == SplitTag:
                 ValueList.append(String[Last:Index].strip())
-                Last = Index+1
+                Last = Index + 1
                 if MaxSplit > 0 and len(ValueList) >= MaxSplit:
                     break
 
@@ -84,7 +84,7 @@ def GetSplitValueList(String, SplitTag = DataType.TAB_VALUE_SPLIT, MaxSplit = -1
 #
 # @retval list() A list for splitted string
 #
-def GetSplitList(String, SplitStr = DataType.TAB_VALUE_SPLIT, MaxSplit = -1):
+def GetSplitList(String, SplitStr=DataType.TAB_VALUE_SPLIT, MaxSplit= -1):
     return map(lambda l: l.strip(), String.split(SplitStr, MaxSplit))
 
 ## MergeArches
@@ -235,7 +235,7 @@ def SplitModuleType(Key):
 #
 # @retval NewList           A new string list whose macros are replaced
 #
-def ReplaceMacros(StringList, MacroDefinitions={}, SelfReplacement = False):
+def ReplaceMacros(StringList, MacroDefinitions={}, SelfReplacement=False):
     NewList = []
     for String in StringList:
         if type(String) == type(''):
@@ -289,7 +289,7 @@ def ReplaceMacro(String, MacroDefinitions={}, SelfReplacement=False, RaiseError=
 #
 # @retval Path Formatted path
 #
-def NormPath(Path, Defines = {}):
+def NormPath(Path, Defines={}):
     IsRelativePath = False
     if Path:
         if Path[0] == '.':
@@ -319,7 +319,7 @@ def NormPath(Path, Defines = {}):
 #
 # @retval Path Formatted path
 #
-def CleanString(Line, CommentCharacter = DataType.TAB_COMMENT_SPLIT, AllowCppStyleComment=False):
+def CleanString(Line, CommentCharacter=DataType.TAB_COMMENT_SPLIT, AllowCppStyleComment=False):
     #
     # remove whitespace
     #
@@ -342,19 +342,19 @@ def CleanString(Line, CommentCharacter = DataType.TAB_COMMENT_SPLIT, AllowCppSty
         elif Line[Index] == CommentCharacter and not InString :
             Line = Line[0: Index]
             break
-        
+
     if CommentInString:
         Line = Line.replace('"', '')
         ChIndex = Line.find('#')
         while ChIndex >= 0:
             if GlobalData.gIsWindows:
-                if ChIndex == 0 or Line[ChIndex-1] != '^':
+                if ChIndex == 0 or Line[ChIndex - 1] != '^':
                     Line = Line[0:ChIndex] + '^' + Line[ChIndex:]
                     ChIndex = Line.find('#', ChIndex + 2)
                 else:
                     ChIndex = Line.find('#', ChIndex + 1)
             else:
-                if ChIndex == 0 or Line[ChIndex-1] != '\\':
+                if ChIndex == 0 or Line[ChIndex - 1] != '\\':
                     Line = Line[0:ChIndex] + '\\' + Line[ChIndex:]
                     ChIndex = Line.find('#', ChIndex + 2)
                 else:
@@ -376,7 +376,7 @@ def CleanString(Line, CommentCharacter = DataType.TAB_COMMENT_SPLIT, AllowCppSty
 #
 # @retval Path Formatted path
 #
-def CleanString2(Line, CommentCharacter = DataType.TAB_COMMENT_SPLIT, AllowCppStyleComment=False):
+def CleanString2(Line, CommentCharacter=DataType.TAB_COMMENT_SPLIT, AllowCppStyleComment=False):
     #
     # remove whitespace
     #
@@ -468,7 +468,7 @@ def GetHexVerValue(VerString):
         if len(Minor) == 1:
             Minor += '0'
         DeciValue = (int(Major) << 16) + int(Minor);
-        return "0x%08x"%DeciValue
+        return "0x%08x" % DeciValue
     elif gHexVerPatt.match(VerString):
         return VerString
     else:
@@ -578,7 +578,7 @@ def PreCheck(FileName, FileContent, SupSectionTag):
         #
         if Line.find('$') > -1:
             if Line.find('$(') < 0 or Line.find(')') < 0:
-                EdkLogger.error("Parser", FORMAT_INVALID, Line=LineNo, File=FileName, RaiseError = EdkLogger.IsRaiseError)
+                EdkLogger.error("Parser", FORMAT_INVALID, Line=LineNo, File=FileName, RaiseError=EdkLogger.IsRaiseError)
 
         #
         # Check []
@@ -588,7 +588,7 @@ def PreCheck(FileName, FileContent, SupSectionTag):
             # Only get one '[' or one ']'
             #
             if not (Line.find('[') > -1 and Line.find(']') > -1):
-                EdkLogger.error("Parser", FORMAT_INVALID, Line=LineNo, File=FileName, RaiseError = EdkLogger.IsRaiseError)
+                EdkLogger.error("Parser", FORMAT_INVALID, Line=LineNo, File=FileName, RaiseError=EdkLogger.IsRaiseError)
 
         #
         # Regenerate FileContent
@@ -596,7 +596,7 @@ def PreCheck(FileName, FileContent, SupSectionTag):
         NewFileContent = NewFileContent + Line + '\r\n'
 
     if IsFailed:
-       EdkLogger.error("Parser", FORMAT_INVALID, Line=LineNo, File=FileName, RaiseError = EdkLogger.IsRaiseError)
+       EdkLogger.error("Parser", FORMAT_INVALID, Line=LineNo, File=FileName, RaiseError=EdkLogger.IsRaiseError)
 
     return NewFileContent
 
@@ -614,7 +614,7 @@ def PreCheck(FileName, FileContent, SupSectionTag):
 #
 # @retval True The file type is correct
 #
-def CheckFileType(CheckFilename, ExtName, ContainerFilename, SectionName, Line, LineNo = -1):
+def CheckFileType(CheckFilename, ExtName, ContainerFilename, SectionName, Line, LineNo= -1):
     if CheckFilename != '' and CheckFilename != None:
         (Root, Ext) = os.path.splitext(CheckFilename)
         if Ext.upper() != ExtName.upper():
@@ -623,7 +623,7 @@ def CheckFileType(CheckFilename, ExtName, ContainerFilename, SectionName, Line, 
                 LineNo = GetLineNo(ContainerFile, Line)
             ErrorMsg = "Invalid %s. '%s' is found, but '%s' file is needed" % (SectionName, CheckFilename, ExtName)
             EdkLogger.error("Parser", PARSER_ERROR, ErrorMsg, Line=LineNo,
-                            File=ContainerFilename, RaiseError = EdkLogger.IsRaiseError)
+                            File=ContainerFilename, RaiseError=EdkLogger.IsRaiseError)
 
     return True
 
@@ -641,7 +641,7 @@ def CheckFileType(CheckFilename, ExtName, ContainerFilename, SectionName, Line, 
 #
 # @retval The file full path if the file exists
 #
-def CheckFileExist(WorkspaceDir, CheckFilename, ContainerFilename, SectionName, Line, LineNo = -1):
+def CheckFileExist(WorkspaceDir, CheckFilename, ContainerFilename, SectionName, Line, LineNo= -1):
     CheckFile = ''
     if CheckFilename != '' and CheckFilename != None:
         CheckFile = WorkspaceFile(WorkspaceDir, CheckFilename)
@@ -651,7 +651,7 @@ def CheckFileExist(WorkspaceDir, CheckFilename, ContainerFilename, SectionName, 
                 LineNo = GetLineNo(ContainerFile, Line)
             ErrorMsg = "Can't find file '%s' defined in section '%s'" % (CheckFile, SectionName)
             EdkLogger.error("Parser", PARSER_ERROR, ErrorMsg,
-                            File=ContainerFilename, Line = LineNo, RaiseError = EdkLogger.IsRaiseError)
+                            File=ContainerFilename, Line=LineNo, RaiseError=EdkLogger.IsRaiseError)
 
     return CheckFile
 
@@ -665,7 +665,7 @@ def CheckFileExist(WorkspaceDir, CheckFilename, ContainerFilename, SectionName, 
 # @retval int  Index of the line
 # @retval -1     The line is not found
 #
-def GetLineNo(FileContent, Line, IsIgnoreComment = True):
+def GetLineNo(FileContent, Line, IsIgnoreComment=True):
     LineList = FileContent.splitlines()
     for Index in range(len(LineList)):
         if LineList[Index].find(Line) > -1:
@@ -688,13 +688,13 @@ def GetLineNo(FileContent, Line, IsIgnoreComment = True):
 # @param File:     File which has the string
 # @param Format:   Correct format
 #
-def RaiseParserError(Line, Section, File, Format = '', LineNo = -1):
+def RaiseParserError(Line, Section, File, Format='', LineNo= -1):
     if LineNo == -1:
         LineNo = GetLineNo(open(os.path.normpath(File), 'r').read(), Line)
     ErrorMsg = "Invalid statement '%s' is found in section '%s'" % (Line, Section)
     if Format != '':
         Format = "Correct format is " + Format
-    EdkLogger.error("Parser", PARSER_ERROR, ErrorMsg, File=File, Line=LineNo, ExtraData=Format, RaiseError = EdkLogger.IsRaiseError)
+    EdkLogger.error("Parser", PARSER_ERROR, ErrorMsg, File=File, Line=LineNo, ExtraData=Format, RaiseError=EdkLogger.IsRaiseError)
 
 ## WorkspaceFile
 #
@@ -757,10 +757,10 @@ def RemoveBlockComment(Lines):
         # Remove comment block
         #
         if Line.find(DataType.TAB_COMMENT_EDK_START) > -1:
-            ReservedLine = GetSplitValueList(Line, DataType.TAB_COMMENT_EDK_START, 1)[0]
+            ReservedLine = GetSplitList(Line, DataType.TAB_COMMENT_EDK_START, 1)[0]
             IsFindBlockComment = True
         if Line.find(DataType.TAB_COMMENT_EDK_END) > -1:
-            Line = ReservedLine + GetSplitValueList(Line, DataType.TAB_COMMENT_EDK_END, 1)[1]
+            Line = ReservedLine + GetSplitList(Line, DataType.TAB_COMMENT_EDK_END, 1)[1]
             ReservedLine = ''
             IsFindBlockComment = False
         if IsFindBlockComment:
@@ -773,7 +773,7 @@ def RemoveBlockComment(Lines):
 #
 # Get String of a List
 #
-def GetStringOfList(List, Split = ' '):
+def GetStringOfList(List, Split=' '):
     if type(List) != type([]):
         return List
     Str = ''
@@ -797,7 +797,7 @@ def GetHelpTextList(HelpTextClassList):
 
 def StringToArray(String):
     if isinstance(String, unicode):
-        if len(unicode) ==0:
+        if len(unicode) == 0:
             return "{0x00, 0x00}"
         return "{%s, 0x00, 0x00}" % ", ".join(["0x%02x, 0x00" % ord(C) for C in String])
     elif String.startswith('L"'):
@@ -822,7 +822,7 @@ def StringArrayLength(String):
         return (len(String) - 2 + 1)
     else:
         return len(String.split()) + 1
-    
+
 def RemoveDupOption(OptionString, Which="/I", Against=None):
     OptionList = OptionString.split()
     ValueList = []

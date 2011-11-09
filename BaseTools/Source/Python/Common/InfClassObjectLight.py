@@ -73,7 +73,7 @@ class InfHeader(ModuleHeaderClass):
         TAB_INF_DEFINES_MODULE_TYPE                 : "ModuleType",
         TAB_INF_DEFINES_EFI_SPECIFICATION_VERSION   : "UefiSpecificationVersion",
         TAB_INF_DEFINES_UEFI_SPECIFICATION_VERSION  : "UefiSpecificationVersion",
-        TAB_INF_DEFINES_EDK_RELEASE_VERSION         : "EdkReleaseVersion",        
+        TAB_INF_DEFINES_EDK_RELEASE_VERSION         : "EdkReleaseVersion",
 
         # Optional Fields
         TAB_INF_DEFINES_INF_VERSION                 : "InfVersion",
@@ -139,34 +139,34 @@ class InfObject(object):
 # @var KeyList:             To store value for KeyList, a list for all Keys used in Inf
 #
 class Inf(InfObject):
-    def __init__(self, Filename = None, IsToModule = False, WorkspaceDir = None, PackageDir = None, SupArchList = DataType.ARCH_LIST):
+    def __init__(self, Filename=None, IsToModule=False, WorkspaceDir=None, PackageDir=None, SupArchList=DataType.ARCH_LIST):
         self.Identification = IdentificationClass()
         self.Module = ModuleClass()
         self.WorkspaceDir = WorkspaceDir
         self.PackageDir = PackageDir
         self.SupArchList = SupArchList
-        
+
         self.KeyList = [
-            TAB_SOURCES, TAB_BUILD_OPTIONS, TAB_BINARIES, TAB_INCLUDES, TAB_GUIDS, 
-            TAB_PROTOCOLS, TAB_PPIS, TAB_LIBRARY_CLASSES, TAB_PACKAGES, TAB_INF_FIXED_PCD, 
-            TAB_INF_PATCH_PCD, TAB_INF_FEATURE_PCD, TAB_INF_PCD, TAB_INF_PCD_EX, 
+            TAB_SOURCES, TAB_BUILD_OPTIONS, TAB_BINARIES, TAB_INCLUDES, TAB_GUIDS,
+            TAB_PROTOCOLS, TAB_PPIS, TAB_LIBRARY_CLASSES, TAB_PACKAGES, TAB_INF_FIXED_PCD,
+            TAB_INF_PATCH_PCD, TAB_INF_FEATURE_PCD, TAB_INF_PCD, TAB_INF_PCD_EX,
             TAB_DEPEX, TAB_INF_DEFINES
         ]
         # Upper all KEYs to ignore case sensitive when parsing
         self.KeyList = map(lambda c: c.upper(), self.KeyList)
-        
+
         # Init RecordSet
-        self.RecordSet = {}        
+        self.RecordSet = {}
         for Key in self.KeyList:
             self.RecordSet[Section[Key]] = []
-        
+
         # Init Comment
         self.SectionHeaderCommentDict = {}
-        
+
         # Load Inf file if filename is not None
         if Filename != None:
             self.LoadInfFile(Filename)
-        
+
         # Transfer to Module Object if IsToModule is True
         if IsToModule:
             self.InfToModule()
@@ -209,16 +209,16 @@ class Inf(InfObject):
         InfList['Defines'] = TmpList
         if ModuleHeader.Description != '':
             SectionHeaderCommentDict['Defines'] = ModuleHeader.Description
-        
+
         if Module.UserExtensions != None:
             InfList['BuildOptions'] = Module.UserExtensions.BuildOptions
-        
+
         for Item in Module.Includes:
             Key = 'Includes.' + GetStringOfList(Item.SupArchList)
             Value = GetHelpTextList(Item.HelpTextList)
             Value.append(Item.FilePath)
             GenMetaDatSectionItem(Key, Value, InfList)
-        
+
         for Item in Module.LibraryClasses:
             Key = 'LibraryClasses.' + GetStringOfList(Item.SupArchList)
             Value = GetHelpTextList(Item.HelpTextList)
@@ -227,15 +227,15 @@ class Inf(InfObject):
                 NewValue = NewValue + '|' + Item.RecommendedInstance
             if Item.FeatureFlag:
                 NewValue = NewValue + '|' + Item.FeatureFlag
-            Value.append(NewValue)    
+            Value.append(NewValue)
             GenMetaDatSectionItem(Key, Value, InfList)
-        
+
         for Item in Module.PackageDependencies:
             Key = 'Packages.' + GetStringOfList(Item.SupArchList)
             Value = GetHelpTextList(Item.HelpTextList)
             Value.append(Item.FilePath)
             GenMetaDatSectionItem(Key, Value, InfList)
-        
+
         for Item in Module.PcdCodes:
             Key = 'Pcds' + Item.ItemType + '.' + GetStringOfList(Item.SupArchList)
             Value = GetHelpTextList(Item.HelpTextList)
@@ -244,7 +244,7 @@ class Inf(InfObject):
                 NewValue = NewValue + '|' + Item.DefaultValue
             Value.append(NewValue)
             GenMetaDatSectionItem(Key, Value, InfList)
-               
+
         for Item in Module.Sources:
             Key = 'Sources.' + GetStringOfList(Item.SupArchList)
             Value = GetHelpTextList(Item.HelpTextList)
@@ -261,40 +261,40 @@ class Inf(InfObject):
             if Item.HelpText != '':
                 SectionHeaderCommentDict[Key] = Item.HelpText
             GenMetaDatSectionItem(Key, Value, InfList)
-        
+
         for Item in Module.Guids:
             Key = 'Guids.' + GetStringOfList(Item.SupArchList)
             Value = GetHelpTextList(Item.HelpTextList)
             Value.append(Item.CName)
             GenMetaDatSectionItem(Key, Value, InfList)
-        
+
         for Item in Module.Protocols:
             Key = 'Protocols.' + GetStringOfList(Item.SupArchList)
             Value = GetHelpTextList(Item.HelpTextList)
             Value.append(Item.CName)
             GenMetaDatSectionItem(Key, Value, InfList)
-        
+
         for Item in Module.Ppis:
             Key = 'Ppis.' + GetStringOfList(Item.SupArchList)
             Value = GetHelpTextList(Item.HelpTextList)
             Value.append(Item.CName)
             GenMetaDatSectionItem(Key, Value, InfList)
-        
+
         if Module.PeiDepex:
             Key = 'Depex'
             Value = Module.PeiDepex.Depex
             GenMetaDatSectionItem(Key, Value, InfList)
-        
+
         if Module.DxeDepex:
             Key = 'Depex'
             Value = Module.DxeDepex.Depex
             GenMetaDatSectionItem(Key, Value, InfList)
-        
+
         if Module.SmmDepex:
             Key = 'Depex'
             Value = Module.SmmDepex.Depex
             GenMetaDatSectionItem(Key, Value, InfList)
-        
+
         for Item in Module.Binaries:
             Key = 'Binaries.' + GetStringOfList(Item.SupArchList)
             Value = GetHelpTextList(Item.HelpTextList)
@@ -318,10 +318,10 @@ class Inf(InfObject):
                 else:
                     Inf = Inf + '  ' + Value + '\n'
             Inf = Inf + '\n'
-        
+
         return Inf
-    
-    
+
+
     ## Transfer to Module Object
     # 
     # Transfer all contents of an Inf file to a standard Module Object
@@ -329,28 +329,28 @@ class Inf(InfObject):
     def InfToModule(self):
         # Init global information for the file
         ContainerFile = self.Identification.FullPath
-        
+
         # Generate Module Header
         self.GenModuleHeader(ContainerFile)
-        
+
         # Generate BuildOptions
         self.GenBuildOptions(ContainerFile)
-        
+
         # Generate Includes
         self.GenIncludes(ContainerFile)
-        
+
         # Generate LibraryClasses
         self.GenLibraryClasses(ContainerFile)
-        
+
         # Generate Packages
         self.GenPackages(ContainerFile)
-        
+
         # Generate Pcds
         self.GenPcds(ContainerFile)
-        
+
         # Generate Sources
         self.GenSources(ContainerFile)
-        
+
         # Generate Guids
         self.GenGuidProtocolPpis(DataType.TAB_GUIDS, ContainerFile)
 
@@ -359,13 +359,13 @@ class Inf(InfObject):
 
         # Generate Ppis
         self.GenGuidProtocolPpis(DataType.TAB_PPIS, ContainerFile)
-        
+
         # Generate Depexes
         self.GenDepexes(ContainerFile)
-        
+
         # Generate Binaries
         self.GenBinaries(ContainerFile)
-        
+
         # Init MiscFiles
         self.GenMiscFiles(ContainerFile)
 
@@ -386,24 +386,24 @@ class Inf(InfObject):
     #
     # @param Filename:  Input value for filename of Inf file
     #
-    def LoadInfFile(self, Filename):     
+    def LoadInfFile(self, Filename):
         # Insert a record for file
         Filename = NormPath(Filename)
-        
+
         self.Identification.FullPath = Filename
         (self.Identification.RelaPath, self.Identification.FileName) = os.path.split(Filename)
         if self.Identification.FullPath.find(self.WorkspaceDir) > -1:
-            self.Identification.ModulePath = os.path.dirname(self.Identification.FullPath[len(self.WorkspaceDir) + 1:])        
+            self.Identification.ModulePath = os.path.dirname(self.Identification.FullPath[len(self.WorkspaceDir) + 1:])
         if self.PackageDir:
             self.Identification.PackagePath = self.PackageDir
             if self.Identification.ModulePath.find(self.PackageDir) == 0:
                 self.Identification.ModulePath = self.Identification.ModulePath[len(self.PackageDir) + 1:]
-        
+
         # Init common datas
         IfDefList, SectionItemList, CurrentSection, ArchList, ThirdList, IncludeFiles = \
         [], [], TAB_UNKNOWN, [], [], []
         LineNo = 0
-        
+
         # Parse file content
         IsFindBlockComment = False
         ReservedLine = ''
@@ -412,7 +412,7 @@ class Inf(InfObject):
             LineNo = LineNo + 1
             # Remove comment block
             if Line.find(TAB_COMMENT_EDK_START) > -1:
-                ReservedLine = GetSplitValueList(Line, TAB_COMMENT_EDK_START, 1)[0]
+                ReservedLine = GetSplitList(Line, TAB_COMMENT_EDK_START, 1)[0]
                 if ReservedLine.strip().startswith(TAB_COMMENT_SPLIT):
                     Comment = Comment + Line.strip() + '\n'
                     ReservedLine = ''
@@ -423,20 +423,20 @@ class Inf(InfObject):
                     continue
             if Line.find(TAB_COMMENT_EDK_END) > -1:
                 Comment = Comment + Line[:Line.find(TAB_COMMENT_EDK_END) + len(TAB_COMMENT_EDK_END)] + '\n'
-                Line = ReservedLine + GetSplitValueList(Line, TAB_COMMENT_EDK_END, 1)[1]
+                Line = ReservedLine + GetSplitList(Line, TAB_COMMENT_EDK_END, 1)[1]
                 ReservedLine = ''
                 IsFindBlockComment = False
             if IsFindBlockComment:
                 Comment = Comment + Line.strip() + '\n'
                 continue
-            
+
             # Remove comments at tail and remove spaces again
             if Line.strip().startswith(TAB_COMMENT_SPLIT) or Line.strip().startswith('--/'):
                 Comment = Comment + Line.strip() + '\n'
             Line = CleanString(Line)
             if Line == '':
                 continue
-            
+
             ## Find a new section tab
             # First insert previous section items
             # And then parse the content of the new section
@@ -446,12 +446,12 @@ class Inf(InfObject):
                 Model = Section[CurrentSection.upper()]
                 # Insert items data of previous section
                 InsertSectionItems(Model, CurrentSection, SectionItemList, ArchList, ThirdList, self.RecordSet)
-                
+
                 # Parse the new section
                 SectionItemList = []
                 ArchList = []
                 ThirdList = []
-                
+
                 CurrentSection = ''
                 LineList = GetSplitValueList(Line[len(TAB_SECTION_START):len(Line) - len(TAB_SECTION_END)], TAB_COMMA_SPLIT)
                 for Item in LineList:
@@ -460,7 +460,7 @@ class Inf(InfObject):
                         CurrentSection = ItemList[0]
                     else:
                         if CurrentSection != ItemList[0]:
-                            EdkLogger.error("Parser", PARSER_ERROR, "Different section names '%s' and '%s' are found in one section definition, this is not allowed." % (CurrentSection, ItemList[0]), File=Filename, Line=LineNo, RaiseError = EdkLogger.IsRaiseError)
+                            EdkLogger.error("Parser", PARSER_ERROR, "Different section names '%s' and '%s' are found in one section definition, this is not allowed." % (CurrentSection, ItemList[0]), File=Filename, Line=LineNo, RaiseError=EdkLogger.IsRaiseError)
                     if CurrentSection.upper() not in self.KeyList:
                         RaiseParserError(Line, CurrentSection, Filename, '', LineNo)
                     ItemList.append('')
@@ -469,7 +469,7 @@ class Inf(InfObject):
                         RaiseParserError(Line, CurrentSection, Filename, '', LineNo)
                     else:
                         if ItemList[1] != '' and ItemList[1].upper() not in ARCH_LIST_FULL:
-                            EdkLogger.error("Parser", PARSER_ERROR, "Invalid Arch definition '%s' found" % ItemList[1], File=Filename, Line=LineNo, RaiseError = EdkLogger.IsRaiseError)
+                            EdkLogger.error("Parser", PARSER_ERROR, "Invalid Arch definition '%s' found" % ItemList[1], File=Filename, Line=LineNo, RaiseError=EdkLogger.IsRaiseError)
                         ArchList.append(ItemList[1].upper())
                         ThirdList.append(ItemList[2])
 
@@ -479,18 +479,18 @@ class Inf(InfObject):
                     self.SectionHeaderCommentDict[Section[CurrentSection.upper()]] = Comment
                     Comment = ''
                 continue
-            
+
             # Not in any defined section
             if CurrentSection == TAB_UNKNOWN:
                 ErrorMsg = "%s is not in any defined section" % Line
-                EdkLogger.error("Parser", PARSER_ERROR, ErrorMsg, File=Filename, Line=LineNo, RaiseError = EdkLogger.IsRaiseError)
+                EdkLogger.error("Parser", PARSER_ERROR, ErrorMsg, File=Filename, Line=LineNo, RaiseError=EdkLogger.IsRaiseError)
 
             # Add a section item
             SectionItemList.append([Line, LineNo, Comment])
             Comment = ''
             # End of parse
         #End of For
-        
+
         # Insert items data of last section
         Model = Section[CurrentSection.upper()]
         InsertSectionItems(Model, CurrentSection, SectionItemList, ArchList, ThirdList, self.RecordSet)
@@ -510,7 +510,7 @@ class Inf(InfObject):
         print 'PackagePath =', M.ModuleHeader.PackagePath
         print 'ModulePath =', M.ModuleHeader.ModulePath
         print 'CombinePath =', M.ModuleHeader.CombinePath
-        
+
         print 'BaseName =', M.ModuleHeader.Name
         print 'Guid =', M.ModuleHeader.Guid
         print 'Version =', M.ModuleHeader.Version
@@ -526,7 +526,7 @@ class Inf(InfObject):
             print Item.FilePath, Item.SupArchList, Item.FeatureFlag
         print '\nPcds ='
         for Item in M.PcdCodes:
-            print '\tCName=',Item.CName, 'TokenSpaceGuidCName=', Item.TokenSpaceGuidCName, 'DefaultValue=', Item.DefaultValue, 'ItemType=', Item.ItemType, Item.SupArchList
+            print '\tCName=', Item.CName, 'TokenSpaceGuidCName=', Item.TokenSpaceGuidCName, 'DefaultValue=', Item.DefaultValue, 'ItemType=', Item.ItemType, Item.SupArchList
         print '\nSources ='
         for Source in M.Sources:
             print Source.SourceFile, 'Fam=', Source.ToolChainFamily, 'Pcd=', Source.FeatureFlag, 'Tag=', Source.TagName, 'ToolCode=', Source.ToolCode, Source.SupArchList
@@ -562,7 +562,7 @@ class Inf(InfObject):
         EdkLogger.debug(2, "Generate ModuleHeader ...")
         # Update all defines item in database
         RecordSet = self.RecordSet[MODEL_META_DATA_HEADER]
-        
+
         ModuleHeader = ModuleHeaderClass()
         ModuleExtern = ModuleExternClass()
         OtherDefines = []
@@ -614,7 +614,7 @@ class Inf(InfObject):
             UE = UserExtensionsClass()
         UE.Defines = OtherDefines
         self.Module.UserExtensions = UE
-        
+
     ## GenBuildOptions
     #
     # Gen BuildOptions of Inf
@@ -633,7 +633,7 @@ class Inf(InfObject):
         for Record in RecordSet:
             UE.BuildOptions.append(Record[0])
         self.Module.UserExtensions = UE
-        
+
     ## GenIncludes
     #
     # Gen Includes of Inf
@@ -653,7 +653,7 @@ class Inf(InfObject):
                 Include.HelpTextList.append(GenerateHelpText(Record[5], ''))
             self.Module.Includes.append(Include)
             #self.Module.FileList.extend(GetFiles(os.path.normpath(os.path.join(self.Identification.FileRelativePath, Include.FilePath)), ['CVS', '.svn']))
-    
+
     ## GenLibraryClasses
     #
     # Get LibraryClass of Inf
@@ -667,7 +667,7 @@ class Inf(InfObject):
         # Get all LibraryClasses
         RecordSet = self.RecordSet[MODEL_EFI_LIBRARY_CLASS]
         for Record in RecordSet:
-            (LibClassName, LibClassIns, Pcd, SupModelList) = GetLibraryClassOfInf([Record[0], Record[4]], ContainerFile, self.WorkspaceDir, Record[2])            
+            (LibClassName, LibClassIns, Pcd, SupModelList) = GetLibraryClassOfInf([Record[0], Record[4]], ContainerFile, self.WorkspaceDir, Record[2])
             LibraryClass = CommonClass.LibraryClassClass()
             LibraryClass.LibraryClass = LibClassName
             LibraryClass.RecommendedInstance = LibClassIns
@@ -698,7 +698,7 @@ class Inf(InfObject):
             if GenerateHelpText(Record[5], ''):
                 Package.HelpTextList.append(GenerateHelpText(Record[5], ''))
             self.Module.PackageDependencies.append(Package)
-    
+
     def AddPcd(self, CName, TokenSpaceGuidCName, DefaultValue, ItemType, Arch, HelpTextList):
         Pcd = PcdClass()
         Pcd.CName = CName
@@ -709,7 +709,7 @@ class Inf(InfObject):
         if GenerateHelpText(HelpTextList, ''):
             Pcd.HelpTextList.append(GenerateHelpText(HelpTextList, ''))
         self.Module.PcdCodes.append(Pcd)
-    
+
     ## GenPcds
     #
     # Gen Pcds of Inf
@@ -721,14 +721,14 @@ class Inf(InfObject):
         EdkLogger.debug(2, "Generate %s ..." % TAB_PCDS)
         Pcds = {}
         PcdToken = {}
-        
+
         # Get all Pcds
         RecordSet1 = self.RecordSet[MODEL_PCD_FIXED_AT_BUILD]
         RecordSet2 = self.RecordSet[MODEL_PCD_PATCHABLE_IN_MODULE]
         RecordSet3 = self.RecordSet[MODEL_PCD_FEATURE_FLAG]
         RecordSet4 = self.RecordSet[MODEL_PCD_DYNAMIC_EX]
         RecordSet5 = self.RecordSet[MODEL_PCD_DYNAMIC]
-        
+
         # Go through each arch
         for Record in RecordSet1:
             (TokenSpaceGuidCName, TokenName, Value, Type) = GetPcdOfInf(Record[0], TAB_PCDS_FIXED_AT_BUILD, ContainerFile, Record[2])
@@ -745,7 +745,7 @@ class Inf(InfObject):
         for Record in RecordSet5:
             (TokenSpaceGuidCName, TokenName, Value, Type) = GetPcdOfInf(Record[0], '', ContainerFile, Record[2])
             self.AddPcd(TokenName, TokenSpaceGuidCName, Value, Type, Record[1], Record[5])
-        
+
     ## GenSources
     #
     # Gen Sources of Inf
@@ -756,7 +756,7 @@ class Inf(InfObject):
     def GenSources(self, ContainerFile):
         EdkLogger.debug(2, "Generate %s ..." % TAB_SOURCES)
         Sources = {}
-        
+
         # Get all Sources
         RecordSet = self.RecordSet[MODEL_EFI_SOURCE_FILE]
         for Record in RecordSet:
@@ -820,7 +820,7 @@ class Inf(InfObject):
     def GenBinaries(self, ContainerFile):
         EdkLogger.debug(2, "Generate %s ..." % TAB_BINARIES)
         Binaries = {}
-        
+
         # Get all Guids
         RecordSet = self.RecordSet[MODEL_EFI_BINARY_FILE]
         for Record in RecordSet:
@@ -830,7 +830,7 @@ class Inf(InfObject):
                 Binary.HelpTextList.append(GenerateHelpText(Record[5], ''))
             self.Module.Binaries.append(Binary)
             #self.Module.FileList.append(os.path.normpath(os.path.join(self.Identification.RelaPath, Filename)))
-        
+
     ## GenGuids
     #
     # Gen Guids of Inf
@@ -859,7 +859,7 @@ class Inf(InfObject):
             if GenerateHelpText(Record[5], ''):
                 ListClass.HelpTextList.append(GenerateHelpText(Record[5], ''))
             ListMember.append(ListClass)
-       
+
 ##
 #
 # This acts like the main() function for the script, unless it is 'import'ed into another
@@ -868,10 +868,10 @@ class Inf(InfObject):
 if __name__ == '__main__':
     EdkLogger.Initialize()
     EdkLogger.SetLevel(EdkLogger.QUIET)
-        
+
     W = os.getenv('WORKSPACE')
     F = os.path.join(W, 'MdeModulePkg/Application/HelloWorld/HelloWorld.inf')
-    
+
     P = Inf(os.path.normpath(F), True, W, 'MdeModulePkg')
     P.ShowModule()
     print P.ModuleToInf(P.Module)
