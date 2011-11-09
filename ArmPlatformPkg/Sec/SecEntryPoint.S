@@ -86,11 +86,10 @@ _SetupPrimaryCoreStack:
   mov     r3, sp
   mov     r1, #0x0
 _InitGlobals:
-  str     r1, [r3], #4
   cmp     r3, r2
-  bne     _InitGlobals
-
-  b     _PrepareArguments
+  beq     _PrepareArguments
+  str     r1, [r3], #4
+  b       _InitGlobals
 
 _SetupSecondaryCoreStack:
   // Get the Core Position (ClusterId * 4) + CoreId

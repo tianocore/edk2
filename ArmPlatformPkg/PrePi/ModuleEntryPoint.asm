@@ -128,10 +128,10 @@ _SetGlobals
   mov   r3, sp
   mov   r2, #0x0
 _InitGlobals
-  str   r2, [r3], #4
   cmp   r3, r1
-  bne   _InitGlobals
-
+  beq   _PrepareArguments
+  str   r2, [r3], #4
+  b     _InitGlobals
 
 _PrepareArguments
   mov   r0, r5
