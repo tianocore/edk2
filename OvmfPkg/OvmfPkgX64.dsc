@@ -410,6 +410,12 @@
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
+!ifdef $(CSM_ENABLE)
+  IntelFrameworkModulePkg/Csm/BiosThunk/VideoDxe/VideoDxe.inf
+  IntelFrameworkModulePkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
+  OvmfPkg/Csm/Csm16/Csm16.inf
+!endif
+
 !if $(BUILD_NEW_SHELL)
   ShellPkg/Application/Shell/Shell.inf {
     <LibraryClasses>
