@@ -323,6 +323,9 @@
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf {
     <LibraryClasses>
       TimerLib|OvmfPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
+!ifdef $(CSM_ENABLE)
+      NULL|OvmfPkg/Csm/CsmSupportLib/CsmSupportLib.inf
+!endif
   }
 
   OvmfPkg/BlockMmioToBlockIoDxe/BlockIo.inf
