@@ -87,6 +87,9 @@ PARAM_ITEM_LIST  ParamList[] = {
 
 /**
   Wrap original FreePool to check NULL pointer first.
+
+  @param[in]    Buffer      The pointer to the buffer to free.
+
 **/
 VOID
 SafeFreePool (
