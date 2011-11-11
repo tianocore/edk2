@@ -425,7 +425,7 @@ IsValidFileNameChar (
   //
   // See if there are any illegal characters within the name
   //
-  if (Ch < 0x20 || Ch == L'\"' || Ch == L'*' || Ch == L'/' || Ch == L'<' || Ch == L'>' || Ch == L'?' || Ch == L'|' || Ch == L' ') {
+  if (Ch < 0x20 || Ch == L'\"' || Ch == L'*' || Ch == L'/' || Ch == L'<' || Ch == L'>' || Ch == L'?' || Ch == L'|') {
     return FALSE;
   }
 
