@@ -43,7 +43,6 @@
 
 [LibraryClasses]
   UefiLib
-  TimerLib
   BaseLib
   UefiRuntimeServicesTableLib
 

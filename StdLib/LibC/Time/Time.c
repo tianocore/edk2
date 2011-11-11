@@ -180,34 +180,6 @@ timesub(
 
 /* ###############  Time Manipulation Functions  ########################## */
 
-/** The clock function determines the processor time used.
-
-    @return   The clock function returns the implementation's best
-              approximation to the processor time used by the program since the
-              beginning of an implementation-defined era related only to the
-              program invocation.  To determine the time in seconds, the value
-              returned by the clock function should be divided by the value of
-              the macro CLOCKS_PER_SEC.  If the processor time used is not
-              available or its value cannot be represented, the function
-              returns the value (clock_t)(-1).
-
-              On IA32 or X64 platforms, the value returned is the number of
-              CPU TimeStamp Counter ticks since the appliation started.
-**/
-clock_t
-clock(void)
-{
-#ifndef NT32dvm
-  clock_t   temp;
-
-  temp = (clock_t)GetPerformanceCounter();
-
-  return temp - gMD->AppStartTime;
-#else
-  return (clock_t)-1;
-#endif  /* NT32dvm */
-}
-
 /**
 **/
 double
@@ -589,6 +561,28 @@ time(time_t *timer)
     *timer = CalTime;
   }
   return CalTime;   // Return calendar time in microseconds
+}
+
+/** The clock function determines the processor time used.
+
+    @return   The clock function returns the implementation's best
+              approximation to the processor time used by the program since the
+              beginning of an implementation-defined era related only to the
+              program invocation.  To determine the time in seconds, the value
+              returned by the clock function should be divided by the value of
+              the macro CLOCKS_PER_SEC.  If the processor time used is not
+              available or its value cannot be represented, the function
+              returns the value (clock_t)(-1).
+**/
+clock_t
+clock(void)
+{
+  clock_t   retval;
+  time_t    temp;
+
+  temp = time(NULL);
+  retval = ((clock_t)((UINT32)temp)) - gMD->AppStartTime;
+  return retval;
 }
 
 /* #################  Time Conversion Functions  ########################## */

@@ -27,8 +27,9 @@
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <string.h>
+#include  <time.h>
 #include  <MainData.h>
-#include  <sys/EfiSysCall.h>
+#include  <unistd.h>
 
 extern int main( int, char**);
 extern int __sse2_available;
@@ -149,13 +150,8 @@ ShellAppMain (
     errno                 = 0;
     EFIerrno              = 0;
 
-#ifdef NT32dvm
-    gMD->ClocksPerSecond  = 1;  // For NT32 only
-    gMD->AppStartTime     = 1;  // For NT32 only
-#else
-    gMD->ClocksPerSecond = (clock_t)GetPerformanceCounterProperties( NULL, NULL);
-    gMD->AppStartTime = (clock_t)GetPerformanceCounter();
-#endif  /* NT32 dvm */
+    gMD->ClocksPerSecond  = 1;
+    gMD->AppStartTime     = (clock_t)((UINT32)time(NULL));
 
     // Initialize file descriptors
     mfd = gMD->fdarray;

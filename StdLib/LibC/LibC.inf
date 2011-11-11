@@ -100,7 +100,6 @@
   BaseLib
   BaseMemoryLib
   MemoryAllocationLib
-  TimerLib
   LibStdLib
   LibStdio
   LibString
