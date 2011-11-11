@@ -496,6 +496,46 @@ CalculateEfiHdrCrc (
 }
 
 /**
+  Fix a string to only have the file name, removing starting at the first space of whatever is quoted.
+
+  @param[in]  FileName    The filename to start with.
+
+  @retval NULL  FileName was invalid.
+  @return       The modified FileName.
+**/
+CHAR16*
+EFIAPI
+FixFileName (
+  IN CHAR16 *FileName
+  )
+{
+  CHAR16  *Copy;
+  CHAR16  *TempLocation;
+
+  if (FileName == NULL) {
+    return (NULL);
+  }
+
+  if (FileName[0] == L'\"') {
+    Copy = FileName+1;
+    if ((TempLocation = StrStr(Copy , L"\"")) != NULL) {
+      TempLocation[0] = CHAR_NULL;
+    }    
+  } else {
+    Copy = FileName;
+    if ((TempLocation = StrStr(Copy , L" ")) != NULL) {
+      TempLocation[0] = CHAR_NULL;
+    }    
+  }
+
+  if (Copy[0] == CHAR_NULL) {
+    return (NULL);
+  }
+
+  return (Copy);
+}
+
+/**
   Funcion will replace the current StdIn and StdOut in the ShellParameters protocol
   structure by parsing NewCommandLine.  The current values are returned to the
   user.
@@ -842,6 +882,11 @@ UpdateStdInStdOutStdErr(
     }
   }
 
+  //
+  // re-populate the string to support any filenames that were in quotes.
+  //
+  StrCpy(CommandLineCopy, NewCommandLine);
+
   if (FirstLocation != CommandLineCopy + StrLen(CommandLineCopy)
     && ((UINTN)(FirstLocation - CommandLineCopy) < StrLen(NewCommandLine))
     ){
@@ -849,23 +894,36 @@ UpdateStdInStdOutStdErr(
   }
 
   if (!EFI_ERROR(Status)) {
-    if (StdErrFileName != NULL && (CommandLineWalker = StrStr(StdErrFileName, L" ")) != NULL) {
-      CommandLineWalker[0] = CHAR_NULL;
+
+    if (StdErrFileName != NULL) {
+      if ((StdErrFileName    = FixFileName(StdErrFileName)) == NULL) {
+        Status = EFI_INVALID_PARAMETER;
+      }
     }
-    if (StdOutFileName != NULL && (CommandLineWalker = StrStr(StdOutFileName, L" ")) != NULL) {
-      CommandLineWalker[0] = CHAR_NULL;
+    if (StdOutFileName != NULL) {
+      if ((StdOutFileName    = FixFileName(StdOutFileName)) == NULL) {
+        Status = EFI_INVALID_PARAMETER;
+      }
     }
-    if (StdInFileName  != NULL && (CommandLineWalker = StrStr(StdInFileName , L" ")) != NULL) {
-      CommandLineWalker[0] = CHAR_NULL;
+    if (StdInFileName  != NULL) {
+      if ((StdInFileName     = FixFileName(StdInFileName)) == NULL) {
+        Status = EFI_INVALID_PARAMETER;
+      }
     }
-    if (StdErrVarName  != NULL && (CommandLineWalker = StrStr(StdErrVarName , L" ")) != NULL) {
-      CommandLineWalker[0] = CHAR_NULL;
+    if (StdErrVarName  != NULL) {
+      if ((StdErrVarName     = FixFileName(StdErrVarName)) == NULL) {
+        Status = EFI_INVALID_PARAMETER;
+      }
     }
-    if (StdOutVarName  != NULL && (CommandLineWalker = StrStr(StdOutVarName , L" ")) != NULL) {
-      CommandLineWalker[0] = CHAR_NULL;
+    if (StdOutVarName  != NULL) {
+      if ((StdOutVarName     = FixFileName(StdOutVarName)) == NULL) {
+        Status = EFI_INVALID_PARAMETER;
+      }
     }
-    if (StdInVarName   != NULL && (CommandLineWalker = StrStr(StdInVarName  , L" ")) != NULL) {
-      CommandLineWalker[0] = CHAR_NULL;
+    if (StdInVarName   != NULL) {
+      if ((StdInVarName      = FixFileName(StdInVarName)) == NULL) {
+        Status = EFI_INVALID_PARAMETER;
+      }
     }
 
     //
