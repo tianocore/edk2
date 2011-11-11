@@ -17,7 +17,7 @@
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = LibErr
   FILE_GUID                      = FC1D4706-88FB-42b0-98B0-A4B2E607EBAA
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = LibErr|UEFI_APPLICATION UEFI_DRIVER
 
@@ -35,7 +35,7 @@
   StdLib/StdLib.dec
   StdLibPrivateInternalFiles/DoNotUse.dec
 
-[Libraries]
+[LibraryClasses]
   LibC
   LibStdio
   LibStdLib

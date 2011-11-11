@@ -17,7 +17,7 @@
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = LibStringlist
   FILE_GUID                      = 19D17940-BA8D-4fa7-A704-F33D9FAFAB9D
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = LibStringlist|UEFI_APPLICATION UEFI_DRIVER
 
@@ -34,7 +34,7 @@
   StdLib/StdLib.dec
   StdLibPrivateInternalFiles/DoNotUse.dec
 
-[Libraries]
+[LibraryClasses]
   LibC
   LibStdio
   LibStdLib

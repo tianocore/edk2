@@ -17,7 +17,7 @@
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = LibGen
   FILE_GUID                      = CA599759-90A7-4fe4-BC8B-4B71C350DCAC
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = LibGen|UEFI_APPLICATION UEFI_DRIVER
 
@@ -37,7 +37,7 @@
   StdLib/StdLib.dec
   StdLibPrivateInternalFiles/DoNotUse.dec
 
-[Libraries]
+[LibraryClasses]
   LibStdio
   LibString
   LibStdLib

@@ -17,7 +17,7 @@
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = LibGlob
   FILE_GUID                      = 1D57B5D5-BAB4-4d2b-B7EB-0EB41D7B189C
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = LibGlob|UEFI_APPLICATION UEFI_DRIVER
 
@@ -35,7 +35,7 @@
   StdLib/StdLib.dec
   StdLibPrivateInternalFiles/DoNotUse.dec
 
-[Libraries]
+[LibraryClasses]
   MemoryAllocationLib
   ShellLib
   BaseLib
