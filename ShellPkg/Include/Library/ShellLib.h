@@ -59,20 +59,20 @@ ShellGetFileInfo (
 
   @param[in]  FileInfo          The information to set.
 
-  @retval EFI_SUCCESS		        The information was set.
+  @retval EFI_SUCCESS           The information was set.
   @retval EFI_INVALID_PARAMETER A parameter was out of range or invalid.
   @retval EFI_UNSUPPORTED       The FileHandle does not support FileInfo.
-  @retval EFI_NO_MEDIA		      The device has no medium.
-  @retval EFI_DEVICE_ERROR	    The device reported an error.
-  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED	  The file or medium is write protected.
+  @retval EFI_NO_MEDIA          The device has no medium.
+  @retval EFI_DEVICE_ERROR      The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED   The file or medium is write protected.
   @retval EFI_ACCESS_DENIED     The file was opened read only.
   @retval EFI_VOLUME_FULL       The volume is full.
 **/
 EFI_STATUS
 EFIAPI
 ShellSetFileInfo (
-  IN SHELL_FILE_HANDLE	        FileHandle,
+  IN SHELL_FILE_HANDLE          FileHandle,
   IN EFI_FILE_INFO              *FileInfo
   );
 
@@ -89,31 +89,31 @@ ShellSetFileInfo (
   @param[in]    OpenMode         The mode to open the file with.
   @param[in]    Attributes       The file's file attributes.
 
-  @retval EFI_SUCCESS	        The information was set.
-  @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
+  @retval EFI_SUCCESS         The information was set.
+  @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
   @retval EFI_UNSUPPORTED       Could not open the file path.
-  @retval EFI_NOT_FOUND	        The specified file could not be found on the
+  @retval EFI_NOT_FOUND         The specified file could not be found on the
                                 device or the file system could not be found on
                                 the device.
   @retval EFI_NO_MEDIA          The device has no medium.
   @retval EFI_MEDIA_CHANGED     The device has a different medium in it or the
                                 medium is no longer supported.
   @retval EFI_DEVICE_ERROR      The device reported an error.
-  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
   @retval EFI_WRITE_PROTECTED   The file or medium is write protected.
   @retval EFI_ACCESS_DENIED     The file was opened read only.
-  @retval EFI_OUT_OF_RESOURCES	Not enough resources were available to open the
+  @retval EFI_OUT_OF_RESOURCES  Not enough resources were available to open the
                                 file.
   @retval EFI_VOLUME_FULL       The volume is full.
 **/
 EFI_STATUS
 EFIAPI
 ShellOpenFileByDevicePath(
-  IN OUT EFI_DEVICE_PATH_PROTOCOL  	  **FilePath,
-  OUT EFI_HANDLE                    	*DeviceHandle,
-  OUT SHELL_FILE_HANDLE             	*FileHandle,
-  IN UINT64                          	OpenMode,
-  IN UINT64                          	Attributes
+  IN OUT EFI_DEVICE_PATH_PROTOCOL     **FilePath,
+  OUT EFI_HANDLE                      *DeviceHandle,
+  OUT SHELL_FILE_HANDLE               *FileHandle,
+  IN UINT64                           OpenMode,
+  IN UINT64                           Attributes
   );
 
 /**
@@ -128,30 +128,30 @@ ShellOpenFileByDevicePath(
   @param[in] OpenMode           The mode to open the file with.
   @param[in] Attributes         The file's file attributes.
 
-  @retval EFI_SUCCESS	        The information was set.
-  @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
+  @retval EFI_SUCCESS         The information was set.
+  @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
   @retval EFI_UNSUPPORTED       Could not open the file path.
-  @retval EFI_NOT_FOUND	        The specified file could not be found on the
+  @retval EFI_NOT_FOUND         The specified file could not be found on the
                                 device or the file system could not be found
                                 on the device.
   @retval EFI_NO_MEDIA          The device has no medium.
   @retval EFI_MEDIA_CHANGED     The device has a different medium in it or the
                                 medium is no longer supported.
   @retval EFI_DEVICE_ERROR      The device reported an error.
-  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
   @retval EFI_WRITE_PROTECTED   The file or medium is write protected.
   @retval EFI_ACCESS_DENIED     The file was opened read only.
-  @retval EFI_OUT_OF_RESOURCES	Not enough resources were available to open the
+  @retval EFI_OUT_OF_RESOURCES  Not enough resources were available to open the
                                 file.
   @retval EFI_VOLUME_FULL       The volume is full.
 **/
 EFI_STATUS
 EFIAPI
 ShellOpenFileByName(
-  IN CONST CHAR16		            *FilePath,
+  IN CONST CHAR16               *FilePath,
   OUT SHELL_FILE_HANDLE         *FileHandle,
   IN UINT64                     OpenMode,
-  IN UINT64                    	Attributes
+  IN UINT64                     Attributes
   );
 
 /**
@@ -164,20 +164,20 @@ ShellOpenFileByName(
   @param[in]  DirectoryName     The pointer to Directory name.
   @param[out] FileHandle        The pointer to the file handle.
 
-  @retval EFI_SUCCESS	        The information was set.
-  @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
+  @retval EFI_SUCCESS         The information was set.
+  @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
   @retval EFI_UNSUPPORTED       Could not open the file path.
-  @retval EFI_NOT_FOUND	        The specified file could not be found on the
+  @retval EFI_NOT_FOUND         The specified file could not be found on the
                                 device, or the file system could not be found
                                 on the device.
   @retval EFI_NO_MEDIA          The device has no medium.
   @retval EFI_MEDIA_CHANGED     The device has a different medium in it or the
                                 medium is no longer supported.
   @retval EFI_DEVICE_ERROR      The device reported an error.
-  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
   @retval EFI_WRITE_PROTECTED   The file or medium is write protected.
   @retval EFI_ACCESS_DENIED     The file was opened read only.
-  @retval EFI_OUT_OF_RESOURCES	Not enough resources were available to open the
+  @retval EFI_OUT_OF_RESOURCES  Not enough resources were available to open the
                                 file.
   @retval EFI_VOLUME_FULL       The volume is full.
 **/
@@ -210,9 +210,9 @@ ShellCreateDirectory(
   @param[out] Buffer             The buffer to put read data into.
 
   @retval EFI_SUCCESS           Data was read.
-  @retval EFI_NO_MEDIA	        The device has no media.
+  @retval EFI_NO_MEDIA          The device has no media.
   @retval EFI_DEVICE_ERROR      The device reported an error.
-  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
   @retval EFI_BUFFER_TO_SMALL   Buffer is too small. ReadSize contains required
                                 size.
 
@@ -244,7 +244,7 @@ ShellReadFile(
 
   @retval EFI_SUCCESS           Data was written.
   @retval EFI_UNSUPPORTED       Writes to an open directory are not supported.
-  @retval EFI_NO_MEDIA	        The device has no media.
+  @retval EFI_NO_MEDIA          The device has no media.
   @retval EFI_DEVICE_ERROR      The device reported an error.
   @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
   @retval EFI_WRITE_PROTECTED   The device is write-protected.
@@ -289,7 +289,7 @@ ShellCloseFile (
   @retval EFI_SUCCESS               The file was closed sucessfully.
   @retval EFI_WARN_DELETE_FAILURE   The handle was closed, but the file was not
                                     deleted.
-  @retval INVALID_PARAMETER    	    One of the parameters has an invalid value.
+  @retval INVALID_PARAMETER         One of the parameters has an invalid value.
 **/
 EFI_STATUS
 EFIAPI
@@ -320,8 +320,8 @@ ShellDeleteFile (
 EFI_STATUS
 EFIAPI
 ShellSetFilePosition (
-  IN SHELL_FILE_HANDLE 	FileHandle,
-  IN UINT64           	Position
+  IN SHELL_FILE_HANDLE  FileHandle,
+  IN UINT64             Position
   );
 
 /**
@@ -366,16 +366,18 @@ ShellFlushFile (
   IN SHELL_FILE_HANDLE          FileHandle
   );
 
-/**
-  Retrieves the first file from a directory
+/** Retrieve first entry from a directory.
 
-  This function takes an open directory handle and gets the first file
-  in the directory's info. Caller can use ShellFindNextFile() to get
-  subsequent files.
+  This function takes an open directory handle and gets information from the
+  first entry in the directory.  A buffer is allocated to contain
+  the information and a pointer to the buffer is returned in *Buffer.  The
+  caller can use ShellFindNextFile() to get subsequent directory entries.
 
-  Caller must use FreePool on *Buffer opon completion of all file searching.
+  The buffer will be freed by ShellFindNextFile() when the last directory
+  entry is read.  Otherwise, the caller must free the buffer, using FreePool,
+  when finished with it.
 
-  @param[in] DirHandle          The file handle of the directory to search.
+  @param[in]  DirHandle         The file handle of the directory to search.
   @param[out] Buffer            The pointer to the buffer for the file's information.
 
   @retval EFI_SUCCESS           Found the first file.
@@ -383,41 +385,44 @@ ShellFlushFile (
   @retval EFI_NO_MEDIA          The device has no media.
   @retval EFI_DEVICE_ERROR      The device reported an error.
   @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+  @return Others                Status of ShellGetFileInfo, ShellSetFilePosition,
+                                or ShellReadFile.
+
   @sa ShellReadFile
 **/
 EFI_STATUS
 EFIAPI
 ShellFindFirstFile (
-  IN SHELL_FILE_HANDLE          DirHandle,
-  OUT EFI_FILE_INFO             **Buffer
+  IN      SHELL_FILE_HANDLE       DirHandle,
+     OUT  EFI_FILE_INFO         **Buffer
   );
 
-/**
-  Retrieves the next file in a directory.
+/** Retrieve next entries from a directory.
 
-  To use this function, caller must call the ShellFindFirstFile() to get the
-  first file, and then use this function get other files. This function can be
-  called for several times to get each file's information in the directory. If
-  the call of ShellFindNextFile() got the last file in the directory, the next
-  call of this function has no file to get. *NoFile will be set to TRUE, and the
-  data in Buffer is meaningless.
+  To use this function, the caller must first call the ShellFindFirstFile()
+  function to get the first directory entry.  Subsequent directory entries are
+  retrieved by using the ShellFindNextFile() function.  This function can
+  be called several times to get each entry from the directory.  If the call of
+  ShellFindNextFile() retrieved the last directory entry, the next call of
+  this function will set *NoFile to TRUE and free the buffer.
 
-  @param[in] DirHandle           The file handle of the directory.
-  @param[in, out] Buffer         The pointer to buffer for file's information.
-  @param[in, out] NoFile         The pointer to boolean when last file is found.
+  @param[in]  DirHandle         The file handle of the directory.
+  @param[out] Buffer            The pointer to buffer for file's information.
+  @param[out] NoFile            The pointer to boolean when last file is found.
 
   @retval EFI_SUCCESS           Found the next file.
   @retval EFI_NO_MEDIA          The device has no media.
   @retval EFI_DEVICE_ERROR      The device reported an error.
   @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+
   @sa ShellReadFile
 **/
 EFI_STATUS
 EFIAPI
 ShellFindNextFile(
-  IN SHELL_FILE_HANDLE           DirHandle,
-  IN OUT EFI_FILE_INFO           *Buffer,
-  IN OUT BOOLEAN                 *NoFile
+  IN      SHELL_FILE_HANDLE       DirHandle,
+  IN OUT  EFI_FILE_INFO          *Buffer,
+  IN OUT  BOOLEAN                *NoFile
   );
 
 /**
@@ -988,7 +993,7 @@ ShellIsFileInPath(
   Function to determine whether a string is decimal or hex representation of a number
   and return the number converted from the string.
 
-  Note: this function cannot be used when (UINTN)(-1), (0xFFFFFFFF) may be a valid 
+  Note: this function cannot be used when (UINTN)(-1), (0xFFFFFFFF) may be a valid
   result.  Use ShellConvertStringToUint64 instead.
 
   @param[in] String   String representation of a number.
@@ -1235,9 +1240,9 @@ ShellIsHexOrDecimalNumber (
   @param[in] String       The string to evaluate.
   @param[out] Value       Upon a successful return the value of the conversion.
   @param[in] ForceHex     TRUE - always assume hex.
-  @param[in] StopAtSpace  TRUE to halt upon finding a space, FALSE to 
+  @param[in] StopAtSpace  TRUE to halt upon finding a space, FALSE to
                           process the entire String.
-  
+
   @retval EFI_SUCCESS             The conversion was successful.
   @retval EFI_INVALID_PARAMETER   String contained an invalid character.
   @retval EFI_NOT_FOUND           String was a number, but Value was NULL.

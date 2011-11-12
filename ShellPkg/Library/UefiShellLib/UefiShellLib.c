@@ -163,7 +163,7 @@ ShellFindSE2 (
 }
 
 /**
-  Function to do most of the work of the constructor.  Allows for calling 
+  Function to do most of the work of the constructor.  Allows for calling
   multiple times without complete re-initialization.
 
   @param[in] ImageHandle  A copy of the ImageHandle.
@@ -421,20 +421,20 @@ ShellGetFileInfo (
 
   @param[in]  FileInfo          The information to set.
 
-  @retval EFI_SUCCESS		        The information was set.
+  @retval EFI_SUCCESS           The information was set.
   @retval EFI_INVALID_PARAMETER A parameter was out of range or invalid.
   @retval EFI_UNSUPPORTED       The FileHandle does not support FileInfo.
-  @retval EFI_NO_MEDIA		      The device has no medium.
-  @retval EFI_DEVICE_ERROR	    The device reported an error.
-  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED	  The file or medium is write protected.
+  @retval EFI_NO_MEDIA          The device has no medium.
+  @retval EFI_DEVICE_ERROR      The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED   The file or medium is write protected.
   @retval EFI_ACCESS_DENIED     The file was opened read only.
   @retval EFI_VOLUME_FULL       The volume is full.
 **/
 EFI_STATUS
 EFIAPI
 ShellSetFileInfo (
-  IN SHELL_FILE_HANDLE           	        FileHandle,
+  IN SHELL_FILE_HANDLE                    FileHandle,
   IN EFI_FILE_INFO              *FileInfo
   )
 {
@@ -447,38 +447,38 @@ ShellSetFileInfo (
   This function opens a file with the open mode according to the file path. The
   Attributes is valid only for EFI_FILE_MODE_CREATE.
 
-  @param  FilePath 		    on input the device path to the file.  On output
+  @param  FilePath        on input the device path to the file.  On output
                           the remaining device path.
-  @param  DeviceHandle  	pointer to the system device handle.
-  @param  FileHandle		  pointer to the file handle.
-  @param  OpenMode		    the mode to open the file with.
-  @param  Attributes		  the file's file attributes.
+  @param  DeviceHandle    pointer to the system device handle.
+  @param  FileHandle      pointer to the file handle.
+  @param  OpenMode        the mode to open the file with.
+  @param  Attributes      the file's file attributes.
 
-  @retval EFI_SUCCESS		        The information was set.
-  @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED	      Could not open the file path.
-  @retval EFI_NOT_FOUND	        The specified file could not be found on the
+  @retval EFI_SUCCESS           The information was set.
+  @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
+  @retval EFI_UNSUPPORTED       Could not open the file path.
+  @retval EFI_NOT_FOUND         The specified file could not be found on the
                                 device or the file system could not be found on
                                 the device.
-  @retval EFI_NO_MEDIA		      The device has no medium.
-  @retval EFI_MEDIA_CHANGED	    The device has a different medium in it or the
+  @retval EFI_NO_MEDIA          The device has no medium.
+  @retval EFI_MEDIA_CHANGED     The device has a different medium in it or the
                                 medium is no longer supported.
-  @retval EFI_DEVICE_ERROR	    The device reported an error.
-  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED	  The file or medium is write protected.
-  @retval EFI_ACCESS_DENIED	    The file was opened read only.
-  @retval EFI_OUT_OF_RESOURCES	Not enough resources were available to open the
+  @retval EFI_DEVICE_ERROR      The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED   The file or medium is write protected.
+  @retval EFI_ACCESS_DENIED     The file was opened read only.
+  @retval EFI_OUT_OF_RESOURCES  Not enough resources were available to open the
                                 file.
-  @retval EFI_VOLUME_FULL	      The volume is full.
+  @retval EFI_VOLUME_FULL       The volume is full.
 **/
 EFI_STATUS
 EFIAPI
 ShellOpenFileByDevicePath(
-  IN OUT EFI_DEVICE_PATH_PROTOCOL  	  **FilePath,
-  OUT EFI_HANDLE                    	*DeviceHandle,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL     **FilePath,
+  OUT EFI_HANDLE                      *DeviceHandle,
   OUT SHELL_FILE_HANDLE               *FileHandle,
-  IN UINT64                          	OpenMode,
-  IN UINT64                          	Attributes
+  IN UINT64                           OpenMode,
+  IN UINT64                           Attributes
   )
 {
   CHAR16                          *FileName;
@@ -605,35 +605,35 @@ ShellOpenFileByDevicePath(
 
   if FileName is NULL then ASSERT()
 
-  @param  FileName 		  pointer to file name
-  @param  FileHandle		pointer to the file handle.
-  @param  OpenMode		  the mode to open the file with.
-  @param  Attributes		the file's file attributes.
+  @param  FileName      pointer to file name
+  @param  FileHandle    pointer to the file handle.
+  @param  OpenMode      the mode to open the file with.
+  @param  Attributes    the file's file attributes.
 
-  @retval EFI_SUCCESS		        The information was set.
-  @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED	      Could not open the file path.
-  @retval EFI_NOT_FOUND	        The specified file could not be found on the
+  @retval EFI_SUCCESS           The information was set.
+  @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
+  @retval EFI_UNSUPPORTED       Could not open the file path.
+  @retval EFI_NOT_FOUND         The specified file could not be found on the
                                 device or the file system could not be found
                                 on the device.
-  @retval EFI_NO_MEDIA		      The device has no medium.
-  @retval EFI_MEDIA_CHANGED	    The device has a different medium in it or the
+  @retval EFI_NO_MEDIA          The device has no medium.
+  @retval EFI_MEDIA_CHANGED     The device has a different medium in it or the
                                 medium is no longer supported.
-  @retval EFI_DEVICE_ERROR	    The device reported an error.
-  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED	  The file or medium is write protected.
-  @retval EFI_ACCESS_DENIED	    The file was opened read only.
-  @retval EFI_OUT_OF_RESOURCES	Not enough resources were available to open the
+  @retval EFI_DEVICE_ERROR      The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED   The file or medium is write protected.
+  @retval EFI_ACCESS_DENIED     The file was opened read only.
+  @retval EFI_OUT_OF_RESOURCES  Not enough resources were available to open the
                                 file.
-  @retval EFI_VOLUME_FULL	      The volume is full.
+  @retval EFI_VOLUME_FULL       The volume is full.
 **/
 EFI_STATUS
 EFIAPI
 ShellOpenFileByName(
-  IN CONST CHAR16		            *FileName,
+  IN CONST CHAR16               *FileName,
   OUT SHELL_FILE_HANDLE         *FileHandle,
   IN UINT64                     OpenMode,
-  IN UINT64                    	Attributes
+  IN UINT64                     Attributes
   )
 {
   EFI_HANDLE                    DeviceHandle;
@@ -692,25 +692,25 @@ ShellOpenFileByName(
   otherwise, the Filehandle is NULL. If the directory already existed, this
   function opens the existing directory.
 
-  @param  DirectoryName		pointer to directory name
-  @param  FileHandle		  pointer to the file handle.
+  @param  DirectoryName   pointer to directory name
+  @param  FileHandle      pointer to the file handle.
 
-  @retval EFI_SUCCESS		        The information was set.
-  @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED	      Could not open the file path.
-  @retval EFI_NOT_FOUND	        The specified file could not be found on the
+  @retval EFI_SUCCESS           The information was set.
+  @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
+  @retval EFI_UNSUPPORTED       Could not open the file path.
+  @retval EFI_NOT_FOUND         The specified file could not be found on the
                                 device or the file system could not be found
                                 on the device.
-  @retval EFI_NO_MEDIA		      The device has no medium.
-  @retval EFI_MEDIA_CHANGED	    The device has a different medium in it or the
+  @retval EFI_NO_MEDIA          The device has no medium.
+  @retval EFI_MEDIA_CHANGED     The device has a different medium in it or the
                                 medium is no longer supported.
-  @retval EFI_DEVICE_ERROR	    The device reported an error.
-  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED	  The file or medium is write protected.
-  @retval EFI_ACCESS_DENIED	    The file was opened read only.
-  @retval EFI_OUT_OF_RESOURCES	Not enough resources were available to open the
+  @retval EFI_DEVICE_ERROR      The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED   The file or medium is write protected.
+  @retval EFI_ACCESS_DENIED     The file was opened read only.
+  @retval EFI_OUT_OF_RESOURCES  Not enough resources were available to open the
                                 file.
-  @retval EFI_VOLUME_FULL	      The volume is full.
+  @retval EFI_VOLUME_FULL       The volume is full.
   @sa ShellOpenFileByName
 **/
 EFI_STATUS
@@ -758,11 +758,11 @@ ShellCreateDirectory(
                                 the number of bytes written.
   @param Buffer                 the buffer to put read data into.
 
-  @retval EFI_SUCCESS	          Data was read.
-  @retval EFI_NO_MEDIA	        The device has no media.
-  @retval EFI_DEVICE_ERROR	The device reported an error.
-  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_BUFFER_TO_SMALL	Buffer is too small. ReadSize contains required
+  @retval EFI_SUCCESS           Data was read.
+  @retval EFI_NO_MEDIA          The device has no media.
+  @retval EFI_DEVICE_ERROR  The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+  @retval EFI_BUFFER_TO_SMALL Buffer is too small. ReadSize contains required
                                 size.
 
 **/
@@ -793,14 +793,14 @@ ShellReadFile(
                               the number of bytes written.
   @param Buffer               the buffer containing data to write is stored.
 
- @retval EFI_SUCCESS	        Data was written.
- @retval EFI_UNSUPPORTED	    Writes to an open directory are not supported.
- @retval EFI_NO_MEDIA	        The device has no media.
- @retval EFI_DEVICE_ERROR	    The device reported an error.
- @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
- @retval EFI_WRITE_PROTECTED	The device is write-protected.
- @retval EFI_ACCESS_DENIED	  The file was open for read only.
- @retval EFI_VOLUME_FULL	    The volume is full.
+ @retval EFI_SUCCESS          Data was written.
+ @retval EFI_UNSUPPORTED      Writes to an open directory are not supported.
+ @retval EFI_NO_MEDIA         The device has no media.
+ @retval EFI_DEVICE_ERROR     The device reported an error.
+ @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
+ @retval EFI_WRITE_PROTECTED  The device is write-protected.
+ @retval EFI_ACCESS_DENIED    The file was open for read only.
+ @retval EFI_VOLUME_FULL      The volume is full.
 **/
 EFI_STATUS
 EFIAPI
@@ -845,12 +845,12 @@ ShellCloseFile (
   @retval EFI_SUCCESS           the file was closed sucessfully
   @retval EFI_WARN_DELETE_FAILURE the handle was closed, but the file was not
                                 deleted
-  @retval INVALID_PARAMETER    	One of the parameters has an invalid value.
+  @retval INVALID_PARAMETER     One of the parameters has an invalid value.
 **/
 EFI_STATUS
 EFIAPI
 ShellDeleteFile (
-  IN SHELL_FILE_HANDLE         		*FileHandle
+  IN SHELL_FILE_HANDLE            *FileHandle
   )
 {
   return (FileFunctionMap.DeleteFile(*FileHandle));
@@ -878,8 +878,8 @@ ShellDeleteFile (
 EFI_STATUS
 EFIAPI
 ShellSetFilePosition (
-  IN SHELL_FILE_HANDLE            	FileHandle,
-  IN UINT64           	Position
+  IN SHELL_FILE_HANDLE              FileHandle,
+  IN UINT64             Position
   )
 {
   return (FileFunctionMap.SetFilePosition(FileHandle, Position));
@@ -932,15 +932,19 @@ ShellFlushFile (
   return (FileFunctionMap.FlushFile(FileHandle));
 }
 
-/**
-  Retrieves the first file from a directory
+/** Retrieve first entry from a directory.
 
-  This function opens a directory and gets the first file's info in the
-  directory. Caller can use ShellFindNextFile() to get other files.  When
-  complete the caller is responsible for calling FreePool() on Buffer.
+  This function takes an open directory handle and gets information from the
+  first entry in the directory.  A buffer is allocated to contain
+  the information and a pointer to the buffer is returned in *Buffer.  The
+  caller can use ShellFindNextFile() to get subsequent directory entries.
 
-  @param DirHandle              The file handle of the directory to search
-  @param Buffer                 Pointer to buffer for file's information
+  The buffer will be freed by ShellFindNextFile() when the last directory
+  entry is read.  Otherwise, the caller must free the buffer, using FreePool,
+  when finished with it.
+
+  @param[in]  DirHandle         The file handle of the directory to search.
+  @param[out] Buffer            The pointer to the buffer for the file's information.
 
   @retval EFI_SUCCESS           Found the first file.
   @retval EFI_NOT_FOUND         Cannot find the directory.
@@ -962,19 +966,18 @@ ShellFindFirstFile (
   //
   return (FileHandleFindFirstFile(DirHandle, Buffer));
 }
-/**
-  Retrieves the next file in a directory.
+/** Retrieve next entries from a directory.
 
-  To use this function, caller must call the ShellFindFirstFile() to get the
-  first file, and then use this function get other files. This function can be
-  called for several times to get each file's information in the directory. If
-  the call of ShellFindNextFile() got the last file in the directory, the next
-  call of this function has no file to get. *NoFile will be set to TRUE and the
-  Buffer memory will be automatically freed.
+  To use this function, the caller must first call the ShellFindFirstFile()
+  function to get the first directory entry.  Subsequent directory entries are
+  retrieved by using the ShellFindNextFile() function.  This function can
+  be called several times to get each entry from the directory.  If the call of
+  ShellFindNextFile() retrieved the last directory entry, the next call of
+  this function will set *NoFile to TRUE and free the buffer.
 
-  @param DirHandle              the file handle of the directory
-  @param Buffer			            pointer to buffer for file's information
-  @param NoFile			            pointer to boolean when last file is found
+  @param[in]  DirHandle         The file handle of the directory.
+  @param[out] Buffer            The pointer to buffer for file's information.
+  @param[out] NoFile            The pointer to boolean when last file is found.
 
   @retval EFI_SUCCESS           Found the next file, or reached last file
   @retval EFI_NO_MEDIA          The device has no media.
@@ -1807,7 +1810,7 @@ InternalIsOnCheckList (
     // If the Type is TypeStart only check the first characters of the passed in param
     // If it matches set the type and return TRUE
     //
-    if (TempListItem->Type == TypeStart) { 
+    if (TempListItem->Type == TypeStart) {
       if (StrnCmp(Name, TempListItem->Name, StrLen(TempListItem->Name)) == 0) {
         *Type = TempListItem->Type;
         return (TRUE);
@@ -2031,7 +2034,7 @@ InternalCommandLineParse (
       //
 
       TempPointer = Argv[LoopCounter];
-      if ((*TempPointer == L'^' && *(TempPointer+1) == L'-') 
+      if ((*TempPointer == L'^' && *(TempPointer+1) == L'-')
        || (*TempPointer == L'^' && *(TempPointer+1) == L'/')
        || (*TempPointer == L'^' && *(TempPointer+1) == L'+')
       ){
@@ -2061,7 +2064,7 @@ InternalCommandLineParse (
       if (ProblemParam != NULL) {
         *ProblemParam = AllocateZeroPool(StrSize(Argv[LoopCounter]));
         if (*ProblemParam != NULL) {
-          StrCpy(*ProblemParam, Argv[LoopCounter]);      
+          StrCpy(*ProblemParam, Argv[LoopCounter]);
         }
       }
       ShellCommandLineFreeVarList(*CheckPackage);
@@ -3418,7 +3421,7 @@ InternalShellIsHexOrDecimalNumber (
   if (String != NULL && *String == L'-') {
     String++;
   }
-  
+
   if (String == NULL) {
     return (FALSE);
   }
@@ -3497,7 +3500,7 @@ ShellFileExists(
 }
 
 /**
-  Convert a Unicode character to upper case only if 
+  Convert a Unicode character to upper case only if
   it maps to a valid small-case ASCII character.
 
   This internal function only deal with Unicode character
@@ -3529,7 +3532,7 @@ InternalShellCharToUpper (
 
   This internal function only deal with Unicode character
   which maps to a valid hexadecimal ASII character, i.e.
-  L'0' to L'9', L'a' to L'f' or L'A' to L'F'. For other 
+  L'0' to L'9', L'a' to L'f' or L'A' to L'F'. For other
   Unicode character, the value returned does not make sense.
 
   @param  Char  The character to convert.
@@ -3593,9 +3596,9 @@ InternalShellStrHexToUint64 (
   if (String == NULL || StrSize(String) == 0 || Value == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
-  
+
   //
-  // Ignore the pad spaces (space or tab) 
+  // Ignore the pad spaces (space or tab)
   //
   while ((*String == L' ') || (*String == L'\t')) {
     String++;
@@ -3619,17 +3622,17 @@ InternalShellStrHexToUint64 (
   }
 
   Result = 0;
-  
+
   //
   // Skip spaces if requested
   //
   while (StopAtSpace && *String == L' ') {
     String++;
   }
-  
+
   while (ShellIsHexaDecimalDigitCharacter (*String)) {
     //
-    // If the Hex Number represented by String overflows according 
+    // If the Hex Number represented by String overflows according
     // to the range defined by UINTN, then ASSERT().
     //
     if (!(Result <= (RShiftU64((((UINT64) ~0) - InternalShellHexCharToUintn (*String)), 4)))) {
@@ -3720,10 +3723,10 @@ InternalShellStrDecimalToUint64 (
   }
   while (ShellIsDecimalDigitCharacter (*String)) {
     //
-    // If the number represented by String overflows according 
+    // If the number represented by String overflows according
     // to the range defined by UINT64, then ASSERT().
     //
-    
+
     if (!(Result <= (DivU64x32((((UINT64) ~0) - (*String - L'0')),10)))) {
       return (EFI_DEVICE_ERROR);
     }
@@ -3740,7 +3743,7 @@ InternalShellStrDecimalToUint64 (
   }
 
   *Value = Result;
-  
+
   return (EFI_SUCCESS);
 }
 
@@ -3753,7 +3756,7 @@ InternalShellStrDecimalToUint64 (
   @param[out] Value       Upon a successful return the value of the conversion.
   @param[in] ForceHex     TRUE - always assume hex.
   @param[in] StopAtSpace  FALSE to skip spaces.
-  
+
   @retval EFI_SUCCESS             The conversion was successful.
   @retval EFI_INVALID_PARAMETER   String contained an invalid character.
   @retval EFI_NOT_FOUND           String was a number, but Value was NULL.
@@ -3795,7 +3798,7 @@ ShellConvertStringToUint64(
   //
   if (Walker == NULL || *Walker == CHAR_NULL || !InternalShellIsHexOrDecimalNumber(Walker, Hex, StopAtSpace)) {
     return (EFI_INVALID_PARAMETER);
-  } 
+  }
 
   //
   // do the conversion.
@@ -3880,7 +3883,7 @@ ShellFileHandleReturnLine(
       return (NULL);
     }
     Status = ShellFileHandleReadLine(Handle, RetVal, &Size, FALSE, Ascii);
-    
+
   }
   if (EFI_ERROR(Status) && (RetVal != NULL)) {
     FreePool(RetVal);
