@@ -1,7 +1,7 @@
 /** @file
   Implementation for S3 Boot Script Saver state driver.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -827,7 +827,8 @@ BootScriptInsert (
   @param  Label                 Points to the label which will be inserted in the boot script table.
 
   @retval EFI_SUCCESS           The label already exists or was inserted.
-  @retval EFI_INVALID_PARAMETER The Opcode is an invalid opcode value or the Position is not a valid position in the boot script table..
+  @retval EFI_INVALID_PARAMETER The Label is NULL or points to an empty string.
+  @retval EFI_INVALID_PARAMETER The Position is not a valid position in the boot script table.
   
 **/
 EFI_STATUS
@@ -856,6 +857,7 @@ BootScriptLabel (
 
   @retval EFI_SUCCESS           The operation succeeded. 
   @retval EFI_INVALID_PARAMETER The Position1 or Position2 is not a valid position in the boot script table.
+  @retval EFI_INVALID_PARAMETER The RelativePosition is NULL.
 
 **/
 EFI_STATUS

@@ -1,7 +1,7 @@
 /** @file
   Save the S3 data to S3 boot script. 
  
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -1754,9 +1754,15 @@ S3BootScriptLabel (
   EFI_BOOT_SCRIPT_TABLE_HEADER   TableHeader;
   UINT32                         LabelLength;
   //
-  // Assume Label is not NULL
+  // Check NULL Label
   //
- if (Label == NULL) {
+  if (Label == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  //
+  // Check empty Label
+  //
+  if (Label[0] == '\0') {
     return EFI_INVALID_PARAMETER;
   }
   
