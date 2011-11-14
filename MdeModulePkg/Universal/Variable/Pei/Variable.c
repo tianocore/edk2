@@ -325,7 +325,7 @@ CompareWithValidVariable (
 /**
   Return the variable store header and the index table based on the Index.
 
-  @param Index      The index of the variable store.
+  @param Type       The type of the variable store.
   @param IndexTable Return the index table.
 
   @return  Pointer to the variable store header.
