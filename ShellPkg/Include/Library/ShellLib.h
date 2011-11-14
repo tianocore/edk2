@@ -407,8 +407,8 @@ ShellFindFirstFile (
   this function will set *NoFile to TRUE and free the buffer.
 
   @param[in]  DirHandle         The file handle of the directory.
-  @param[out] Buffer            The pointer to buffer for file's information.
-  @param[out] NoFile            The pointer to boolean when last file is found.
+  @param[in, out] Buffer        The pointer to buffer for file's information.
+  @param[in, out] NoFile        The pointer to boolean when last file is found.
 
   @retval EFI_SUCCESS           Found the next file.
   @retval EFI_NO_MEDIA          The device has no media.
