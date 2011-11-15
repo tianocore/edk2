@@ -53,8 +53,6 @@
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|FALSE|BOOLEAN|0x00000004
 
 [PcdsFixedAtBuild.common]
-  # These PCDs should be FeaturePcds. But we used these PCDs as an '#if' in an ASM file.
-  # Using a FeaturePcd make a '(BOOLEAN) casting for its value which is not understood by the preprocessor.
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1|UINT32|0x00000038
     
   # Stack for CPU Cores in Secure Mode
