@@ -1,6 +1,6 @@
 Index: BaseTools/Conf/build_rule.template
 ===================================================================
---- BaseTools/Conf/build_rule.template	(revision 12664)
+--- BaseTools/Conf/build_rule.template	(revision 12691)
 +++ BaseTools/Conf/build_rule.template	(working copy)
 @@ -129,7 +129,7 @@
          "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
@@ -58,7 +58,7 @@ Index: BaseTools/Conf/build_rule.template
          
 Index: BaseTools/Conf/tools_def.template
 ===================================================================
---- BaseTools/Conf/tools_def.template	(revision 12664)
+--- BaseTools/Conf/tools_def.template	(revision 12691)
 +++ BaseTools/Conf/tools_def.template	(working copy)
 @@ -467,6 +467,7 @@
  #   MSFT           - Microsoft
@@ -141,7 +141,7 @@ Index: BaseTools/Conf/tools_def.template
  #################
 Index: BaseTools/Source/Python/Workspace/MetaFileParser.py
 ===================================================================
---- BaseTools/Source/Python/Workspace/MetaFileParser.py	(revision 12664)
+--- BaseTools/Source/Python/Workspace/MetaFileParser.py	(revision 12691)
 +++ BaseTools/Source/Python/Workspace/MetaFileParser.py	(working copy)
 @@ -1280,6 +1280,9 @@
              Records = IncludedFileTable.GetAll()
@@ -155,7 +155,7 @@ Index: BaseTools/Source/Python/Workspace/MetaFileParser.py
          self._ValueList = [ReplaceMacro(Value, self._Macros, RaiseError=True)
 Index: BaseTools/Source/Python/Workspace/WorkspaceDatabase.py
 ===================================================================
---- BaseTools/Source/Python/Workspace/WorkspaceDatabase.py	(revision 12664)
+--- BaseTools/Source/Python/Workspace/WorkspaceDatabase.py	(revision 12691)
 +++ BaseTools/Source/Python/Workspace/WorkspaceDatabase.py	(working copy)
 @@ -2319,7 +2319,7 @@
      # @param GlobalMacros       Global macros used for replacement during file parsing
@@ -217,7 +217,7 @@ Index: BaseTools/Source/Python/Workspace/WorkspaceDatabase.py
              
 Index: BaseTools/Source/Python/build/build.py
 ===================================================================
---- BaseTools/Source/Python/build/build.py	(revision 12664)
+--- BaseTools/Source/Python/build/build.py	(revision 12691)
 +++ BaseTools/Source/Python/build/build.py	(working copy)
 @@ -704,6 +704,8 @@
      #
@@ -237,9 +237,41 @@ Index: BaseTools/Source/Python/build/build.py
          self.BuildDatabase  = self.Db.BuildObject
          self.Platform       = None
          self.LoadFixAddress = 0
+Index: BaseTools/Source/Python/Trim/Trim.py
+===================================================================
+--- BaseTools/Source/Python/Trim/Trim.py	(revision 12691)
++++ BaseTools/Source/Python/Trim/Trim.py	(working copy)
+@@ -37,7 +37,9 @@
+ ## Regular expression for matching "#pragma pack"
+ gPragmaPattern = re.compile("^\s*#pragma\s+pack", re.MULTILINE)
+ ## Regular expression for matching HEX number
+-gHexNumberPattern = re.compile("0[xX]([0-9a-fA-F]+)")
++gHexNumberPattern = re.compile("(0[xX])([0-9a-fA-F]+)U?")
++## Regular expression for matching decimal number
++gDecNumberPattern = re.compile("([0-9]+)U?")
+ ## Regular expression for matching "Include ()" in asl file
+ gAslIncludePattern = re.compile("^(\s*)[iI]nclude\s*\(\"?([^\"\(\)]+)\"\)", re.MULTILINE)
+ ## Regular expression for matching C style #include "XXX.asl" in asl file
+@@ -169,10 +171,15 @@
+ 
+         # convert HEX number format if indicated
+         if ConvertHex:
+-            Line = gHexNumberPattern.sub(r"0\1h", Line)
++            Line = gHexNumberPattern.sub(r"0\2h", Line)
++        else:
++            Line = gHexNumberPattern.sub(r"\1\2", Line)
+         if TrimLong:
+             Line = gLongNumberPattern.sub(r"\1", Line)
+ 
++        # convert Decimal number format
++        Line = gDecNumberPattern.sub(r"\1", Line)
++
+         if LineNumber != None:
+             EdkLogger.verbose("Got line directive: line=%d" % LineNumber)
+             # in case preprocessor removed some lines, like blank or comment lines
 Index: BaseTools/Source/C/GenFv/GenFv.c
 ===================================================================
---- BaseTools/Source/C/GenFv/GenFv.c	(revision 12664)
+--- BaseTools/Source/C/GenFv/GenFv.c	(revision 12691)
 +++ BaseTools/Source/C/GenFv/GenFv.c	(working copy)
 @@ -623,12 +623,7 @@
                );
@@ -257,7 +289,7 @@ Index: BaseTools/Source/C/GenFv/GenFv.c
      //
 Index: BaseTools/Source/C/GenFv/GenFvInternalLib.c
 ===================================================================
---- BaseTools/Source/C/GenFv/GenFvInternalLib.c	(revision 12664)
+--- BaseTools/Source/C/GenFv/GenFvInternalLib.c	(revision 12691)
 +++ BaseTools/Source/C/GenFv/GenFvInternalLib.c	(working copy)
 @@ -506,6 +506,7 @@
  
