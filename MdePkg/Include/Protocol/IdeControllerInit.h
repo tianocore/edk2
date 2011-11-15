@@ -2,12 +2,12 @@
   This file declares EFI IDE Controller Init Protocol
   
   The EFI_IDE_CONTROLLER_INIT_PROTOCOL provides the chipset-specific information
-  to the IDE bus driver. This protocol is mandatory for IDE controllers if the
-  IDE devices behind the controller are to be enumerated by an IDE bus driver.
+  to the driver entity. This protocol is mandatory for IDE controllers if the
+  IDE devices behind the controller are to be enumerated by a driver entity.
   
   There can only be one instance of EFI_IDE_CONTROLLER_INIT_PROTOCOL for each IDE
   controller in a system. It is installed on the handle that corresponds to the
-  IDE controller. An IDE bus driver that wishes to manage an IDE bus and possibly
+  IDE controller. A driver entity that wishes to manage an IDE bus and possibly
   IDE devices in a system will have to retrieve the EFI_IDE_CONTROLLER_INIT_PROTOCOL
   instance that is associated with the controller to be managed.
   
@@ -51,38 +51,38 @@ typedef struct _EFI_IDE_CONTROLLER_INIT_PROTOCOL  EFI_IDE_CONTROLLER_INIT_PROTOC
 ///
 typedef enum {
   ///
-  /// The IDE bus driver is about to begin enumerating the devices
+  /// The driver entity is about to begin enumerating the devices
   /// behind the specified channel. This notification can be used to
   /// perform any chipset-specific programming.
   ///
   EfiIdeBeforeChannelEnumeration,
   ///
-  /// The IDE bus driver has completed enumerating the devices
+  /// The driver entity has completed enumerating the devices
   /// behind the specified channel. This notification can be used to
   /// perform any chipset-specific programming.
   ///
   EfiIdeAfterChannelEnumeration,
   ///
-  /// The IDE bus driver is about to reset the devices behind the
+  /// The driver entity is about to reset the devices behind the
   /// specified channel. This notification can be used to perform any
   /// chipset-specific programming.
   ///
   EfiIdeBeforeChannelReset,
   ///
-  /// The IDE bus driver has completed resetting the devices behind
+  /// The driver entity has completed resetting the devices behind
   /// the specified channel. This notification can be used to perform
   /// any chipset-specific programming.  
   ///
   EfiIdeAfterChannelReset,
   ///
-  /// The IDE bus driver is about to detect the presence of devices
+  /// The driver entity is about to detect the presence of devices
   /// behind the specified channel. This notification can be used to
   /// set up the bus signals to default levels or for implementing
   /// predelays.
   ///
   EfiIdeBusBeforeDevicePresenceDetection,
   ///
-  /// The IDE bus driver is done with detecting the presence of
+  /// The driver entity is done with detecting the presence of
   /// devices behind the specified channel. This notification can be
   /// used to perform any chipset-specific programming.  
   ///
@@ -240,9 +240,9 @@ typedef union {
   Returns the information about the specified IDE channel.
   
   This function can be used to obtain information about a particular IDE channel.
-  The IDE bus driver uses this information during the enumeration process. 
+  The driver entity uses this information during the enumeration process. 
   
-  If Enabled is set to FALSE, the IDE bus driver will not scan the channel. Note 
+  If Enabled is set to FALSE, the driver entity will not scan the channel. Note 
   that it will not prevent an operating system driver from scanning the channel.
   
   For most of today's controllers, MaxDevices will either be 1 or 2. For SATA 
@@ -282,7 +282,7 @@ EFI_STATUS
   );
 
 /**
-  The notifications from the IDE bus driver that it is about to enter a certain
+  The notifications from the driver entity that it is about to enter a certain
   phase of the IDE channel enumeration process.
   
   This function can be used to notify the IDE controller driver to perform 
@@ -316,11 +316,11 @@ EFI_STATUS
 /**
   Submits the device information to the IDE controller driver.
 
-  This function is used by the IDE bus driver to pass detailed information about 
-  a particular device to the IDE controller driver. The IDE bus driver obtains 
+  This function is used by the driver entity to pass detailed information about 
+  a particular device to the IDE controller driver. The driver entity obtains 
   this information by issuing an ATA or ATAPI IDENTIFY_DEVICE command. IdentifyData
   is the pointer to the response data buffer. The IdentifyData buffer is owned 
-  by the IDE bus driver, and the IDE controller driver must make a local copy 
+  by the driver entity, and the IDE controller driver must make a local copy 
   of the entire buffer or parts of the buffer as needed. The original IdentifyData 
   buffer pointer may not be valid when
   
@@ -332,7 +332,7 @@ EFI_STATUS
   timing information. For example, an implementation of the IDE controller driver 
   may examine the vendor and type/mode field to match known bad drives.  
   
-  The IDE bus driver may submit drive information in any order, as long as it 
+  The driver entity may submit drive information in any order, as long as it 
   submits information for all the devices belonging to the enumeration group 
   before EFI_IDE_CONTROLLER_INIT_PROTOCOL.CalculateMode() is called for any device
   in that enumeration group. If a device is absent, EFI_IDE_CONTROLLER_INIT_PROTOCOL.SubmitData()
@@ -364,20 +364,20 @@ EFI_STATUS
 /**
   Disqualifies specific modes for an IDE device.
 
-  This function allows the IDE bus driver or other drivers (such as platform 
+  This function allows the driver entity or other drivers (such as platform 
   drivers) to reject certain timing modes and request the IDE controller driver
-  to recalculate modes. This function allows the IDE bus driver and the IDE 
+  to recalculate modes. This function allows the driver entity and the IDE 
   controller driver to negotiate the timings on a per-device basis. This function 
   is useful in the case of drives that lie about their capabilities. An example 
   is when the IDE device fails to accept the timing modes that are calculated 
   by the IDE controller driver based on the response to the Identify Drive command.
 
-  If the IDE bus driver does not want to limit the ATA timing modes and leave that 
+  If the driver entity does not want to limit the ATA timing modes and leave that 
   decision to the IDE controller driver, it can either not call this function for 
   the given device or call this function and set the Valid flag to FALSE for all 
   modes that are listed in EFI_ATA_COLLECTIVE_MODE.
   
-  The IDE bus driver may disqualify modes for a device in any order and any number 
+  The driver entity may disqualify modes for a device in any order and any number 
   of times.
   
   This function can be called multiple times to invalidate multiple modes of the 
@@ -413,24 +413,24 @@ EFI_STATUS
 /**
   Returns the information about the optimum modes for the specified IDE device.
 
-  This function is used by the IDE bus driver to obtain the optimum ATA modes for
+  This function is used by the driver entity to obtain the optimum ATA modes for
   a specific device.  The IDE controller driver takes into account the following 
   while calculating the mode:
     - The IdentifyData inputs to EFI_IDE_CONTROLLER_INIT_PROTOCOL.SubmitData()
     - The BadModes inputs to EFI_IDE_CONTROLLER_INIT_PROTOCOL.DisqualifyMode()
 
-  The IDE bus driver is required to call EFI_IDE_CONTROLLER_INIT_PROTOCOL.SubmitData() 
+  The driver entity is required to call EFI_IDE_CONTROLLER_INIT_PROTOCOL.SubmitData() 
   for all the devices that belong to an enumeration group before calling 
   EFI_IDE_CONTROLLER_INIT_PROTOCOL.CalculateMode() for any device in the same group.  
   
   The IDE controller driver will use controller- and possibly platform-specific 
   algorithms to arrive at SupportedModes.  The IDE controller may base its 
   decision on user preferences and other considerations as well. This function 
-  may be called multiple times because the IDE bus driver may renegotiate the mode 
+  may be called multiple times because the driver entity may renegotiate the mode 
   with the IDE controller driver using EFI_IDE_CONTROLLER_INIT_PROTOCOL.DisqualifyMode().
     
-  The IDE bus driver may collect timing information for various devices in any 
-  order. The IDE bus driver is responsible for making sure that all the dependencies
+  The driver entity may collect timing information for various devices in any 
+  order. The driver entity is responsible for making sure that all the dependencies
   are satisfied. For example, the SupportedModes information for device A that 
   was previously returned may become stale after a call to 
   EFI_IDE_CONTROLLER_INIT_PROTOCOL.DisqualifyMode() for device B.
@@ -444,7 +444,7 @@ EFI_STATUS
   The IDE controller driver for a Serial ATA (SATA) controller can use this 
   member function to force a lower speed (first-generation [Gen1] speeds on a 
   second-generation [Gen2]-capable hardware).  The IDE controller driver can 
-  also allow the IDE bus driver to stay with the speed that has been negotiated 
+  also allow the driver entity to stay with the speed that has been negotiated 
   by the physical layer.
   
   @param[in]  This             The pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
@@ -477,7 +477,7 @@ EFI_STATUS
   Commands the IDE controller driver to program the IDE controller hardware
   so that the specified device can operate at the specified mode.
 
-  This function is used by the IDE bus driver to instruct the IDE controller 
+  This function is used by the driver entity to instruct the IDE controller 
   driver to program the IDE controller hardware to the specified modes. This 
   function can be called only once for a particular device. For a Serial ATA 
   (SATA) Advanced Host Controller Interface (AHCI) controller, no controller-
@@ -493,7 +493,7 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER   Device is invalid.
   @retval EFI_NOT_READY           Modes cannot be set at this time due to lack of data.
   @retval EFI_DEVICE_ERROR        Modes cannot be set due to hardware failure.
-                                  The IDE bus driver should not use this device.
+                                  The driver entity should not use this device.
 
 **/
 typedef
@@ -515,7 +515,7 @@ struct _EFI_IDE_CONTROLLER_INIT_PROTOCOL {
   EFI_IDE_CONTROLLER_GET_CHANNEL_INFO    GetChannelInfo;
   
   ///
-  /// The notification that the IDE bus driver is about to enter the
+  /// The notification that the driver entity is about to enter the
   /// specified phase during the enumeration process.  
   ///
   EFI_IDE_CONTROLLER_NOTIFY_PHASE        NotifyPhase;
