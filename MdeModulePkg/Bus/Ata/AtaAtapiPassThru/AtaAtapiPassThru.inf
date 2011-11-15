@@ -60,8 +60,8 @@
   ReportStatusCodeLib
 
 [Protocols]
-  gEfiIdeControllerInitProtocolGuid             # BY_START
   gEfiAtaPassThruProtocolGuid                   # BY_START
   gEfiExtScsiPassThruProtocolGuid               # BY_START
+  gEfiIdeControllerInitProtocolGuid             # TO_START
   gEfiDevicePathProtocolGuid                    # TO_START
   gEfiPciIoProtocolGuid                         # TO_START
