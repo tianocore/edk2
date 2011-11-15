@@ -183,11 +183,21 @@ EFI_TIMER_NOTIFY  mTimerNotifyFunction = NULL;
 UINT64  mTimerPeriod = 0;
 
 ///
-/// Accumulates HPET timer ticks to account for time passed when the 
-/// HPET timer is disabled or when there is no timer notification function
-/// registered.
+/// The number of HPET timer ticks required for the current HPET rate specified by mTimerPeriod.
 ///
-volatile UINT64  mTimerAccumulator = 0;
+UINT64  mTimerCount;
+
+///
+/// Mask used for counter and comparator calculations to adjust for a 32-bit or 64-bit counter.
+///
+UINT64  mCounterMask;
+
+///
+/// The HPET main counter value from the most recent HPET timer interrupt.
+///
+volatile UINT64  mPreviousMainCounter;
+
+volatile UINT64  mPreviousComparator;
 
 ///
 /// The index of the HPET timer being managed by this driver.
@@ -288,8 +298,11 @@ TimerInterruptHandler (
   IN EFI_SYSTEM_CONTEXT   SystemContext
   )
 {
+  UINT64  MainCounter;
+  UINT64  Comparator;
   UINT64  TimerPeriod;
-  
+  UINT64  Delta;
+
   //
   // Count number of ticks
   //
@@ -306,15 +319,51 @@ TimerInterruptHandler (
   SendApicEoi ();
 
   //
-  // Accumulate time from the HPET main counter value
+  // Disable HPET timer when adjusting the COMPARATOR value to prevent a missed interrupt
   //
-  mTimerAccumulator += HpetRead (HPET_MAIN_COUNTER_OFFSET);
+  HpetEnable (FALSE);
+  
+  //
+  // Capture main counter value
+  //
+  MainCounter = HpetRead (HPET_MAIN_COUNTER_OFFSET);
 
   //
-  // Reset HPET main counter to 0
+  // Get the previous comparator counter
   //
-  HpetWrite (HPET_MAIN_COUNTER_OFFSET, 0);
+  mPreviousComparator = HpetRead (HPET_TIMER_COMPARATOR_OFFSET + mTimerIndex * HPET_TIMER_STRIDE);
 
+  //
+  // Set HPET COMPARATOR to the value required for the next timer tick
+  //
+  Comparator = (mPreviousComparator + mTimerCount) & mCounterMask;
+
+  if ((mPreviousMainCounter < MainCounter) && (mPreviousComparator > Comparator)) {
+    //
+    // When comparator overflows
+    //
+    HpetWrite (HPET_TIMER_COMPARATOR_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, Comparator);
+  } else if ((mPreviousMainCounter > MainCounter) && (mPreviousComparator < Comparator)) {
+    //
+    // When main counter overflows
+    //
+    HpetWrite (HPET_TIMER_COMPARATOR_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, (MainCounter + mTimerCount) & mCounterMask);
+  } else {
+    //
+    // When both main counter and comparator do not overflow or both do overflow
+    //
+    if (Comparator > MainCounter) {
+      HpetWrite (HPET_TIMER_COMPARATOR_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, Comparator);
+    } else {
+      HpetWrite (HPET_TIMER_COMPARATOR_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, (MainCounter + mTimerCount) & mCounterMask);
+    }
+  }
+
+  //
+  // Enable the HPET counter once the new COMPARATOR value has been set.
+  //
+  HpetEnable (TRUE);
+  
   //
   // Check to see if there is a registered notification function
   //
@@ -322,14 +371,24 @@ TimerInterruptHandler (
     //
     // Compute time since last notification in 100 ns units (10 ^ -7) 
     //
+    if (MainCounter > mPreviousMainCounter) {
+      //
+      // Main counter does not overflow
+      //
+      Delta = MainCounter - mPreviousMainCounter;
+    } else {
+      //
+      // Main counter overflows, first usb, then add
+      //
+      Delta = (mCounterMask - mPreviousMainCounter) + MainCounter;
+    }
     TimerPeriod = DivU64x32 (
                     MultU64x32 (
-                      mTimerAccumulator, 
+                      Delta & mCounterMask,
                       mHpetGeneralCapabilities.Bits.CounterClockPeriod
                       ), 
                     100000000
                     );
-    mTimerAccumulator = 0;
                     
     //
     // Call registered notification function passing in the time since the last
@@ -337,6 +396,11 @@ TimerInterruptHandler (
     //    
     mTimerNotifyFunction (TimerPeriod);
   }
+  
+  //
+  // Save main counter value
+  //
+  mPreviousMainCounter = MainCounter;
 }
 
 /**
@@ -428,14 +492,39 @@ TimerDriverSetTimerPeriod (
   IN UINT64                   TimerPeriod
   )
 {
-  UINT64  TimerCount;
-
+  UINT64  MainCounter;
+  UINT64  Delta;
+  UINT64  CurrentComparator;
+  
   //
   // Disable HPET timer when adjusting the timer period
   //
   HpetEnable (FALSE);
   
   if (TimerPeriod == 0) {
+    if (mTimerPeriod != 0) {
+      //
+      // Check if there is possibly a pending interrupt
+      //
+      MainCounter = HpetRead (HPET_MAIN_COUNTER_OFFSET);
+      if (MainCounter < mPreviousMainCounter) {
+        Delta = (mCounterMask - mPreviousMainCounter) + MainCounter;
+      } else { 
+        Delta = MainCounter - mPreviousMainCounter;
+      }
+      if ((Delta & mCounterMask) >= mTimerCount) {
+        //
+        // Interrupt still happens after disable HPET, wait to be processed
+        // Wait until interrupt is processed and comparator is increased
+        //
+        CurrentComparator = HpetRead (HPET_TIMER_COMPARATOR_OFFSET + mTimerIndex * HPET_TIMER_STRIDE);
+        while (CurrentComparator == mPreviousComparator) {
+          CurrentComparator = HpetRead (HPET_TIMER_COMPARATOR_OFFSET + mTimerIndex * HPET_TIMER_STRIDE);
+          CpuPause();
+        }
+      }
+    }
+
     //
     // If TimerPeriod is 0, then mask HPET Timer interrupts
     //
@@ -463,36 +552,24 @@ TimerDriverSetTimerPeriod (
     // per tick of the HPET counter to determine the number of HPET counter ticks
     // in TimerPeriod 100 ns units.
     // 
-    TimerCount = DivU64x32 (
-                   MultU64x32 (TimerPeriod, 100000000),
-                   mHpetGeneralCapabilities.Bits.CounterClockPeriod
-                   );
+    mTimerCount = DivU64x32 (
+                    MultU64x32 (TimerPeriod, 100000000),
+                    mHpetGeneralCapabilities.Bits.CounterClockPeriod
+                    );
 
     //
     // Program the HPET Comparator with the number of ticks till the next interrupt
     //
-    HpetWrite (HPET_TIMER_COMPARATOR_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, TimerCount);
-
-    //
-    // Capture the number of ticks since the last HPET Timer interrupt before 
-    // clearing the main counter.  This value will be used in the next HPET
-    // timer interrupt handler to compute the total amount of time since the
-    // last HPET timer interrupt
-    //    
-    mTimerAccumulator = HpetRead (HPET_MAIN_COUNTER_OFFSET);
-    
-    //
-    // If the number of ticks since the last timer interrupt is greater than the
-    // timer period, reduce the number of ticks till the next interrupt to 1, so 
-    // a timer interrupt will be generated as soon as the HPET counter is enabled.
-    //    
-    if (mTimerAccumulator >= TimerCount) {
-      HpetWrite (HPET_MAIN_COUNTER_OFFSET, TimerCount - 1);
-      //
-      // Adjust the accumulator down by TimerCount ticks because TimerCount
-      // ticks will be added to the accumulator on the next interrupt
-      //
-      mTimerAccumulator -= TimerCount;
+    MainCounter = HpetRead (HPET_MAIN_COUNTER_OFFSET);
+    if (MainCounter > mPreviousMainCounter) {
+      Delta = MainCounter - mPreviousMainCounter;
+    } else { 
+      Delta = (mCounterMask - mPreviousMainCounter) + MainCounter;
+    }
+    if ((Delta & mCounterMask) >= mTimerCount) {
+      HpetWrite (HPET_TIMER_COMPARATOR_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, (MainCounter + 1) & mCounterMask);
+    } else {  
+      HpetWrite (HPET_TIMER_COMPARATOR_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, (mPreviousMainCounter + mTimerCount) & mCounterMask);
     }
     
     //
@@ -585,23 +662,20 @@ TimerDriverGenerateSoftInterrupt (
   IN EFI_TIMER_ARCH_PROTOCOL  *This
   )
 {
+  UINT64   MainCounter;
   EFI_TPL  Tpl;
   UINT64   TimerPeriod;
+  UINT64   Delta;
 
   //
   // Disable interrupts
   //  
   Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-
+  
   //
-  // Read the current HPET main counter value
+  // Capture main counter value
   //
-  mTimerAccumulator += HpetRead (HPET_MAIN_COUNTER_OFFSET);
-
-  //
-  // Reset HPET main counter to 0
-  //
-  HpetWrite (HPET_MAIN_COUNTER_OFFSET, 0);
+  MainCounter = HpetRead (HPET_MAIN_COUNTER_OFFSET);
 
   //
   // Check to see if there is a registered notification function
@@ -610,14 +684,25 @@ TimerDriverGenerateSoftInterrupt (
     //
     // Compute time since last interrupt in 100 ns units (10 ^ -7) 
     //
+    if (MainCounter > mPreviousMainCounter) {
+      //
+      // Main counter does not overflow
+      //
+      Delta = MainCounter - mPreviousMainCounter;
+    } else {
+      //
+      // Main counter overflows, first usb, then add
+      //
+      Delta = (mCounterMask - mPreviousMainCounter) + MainCounter;
+    }
+
     TimerPeriod = DivU64x32 (
                     MultU64x32 (
-                      mTimerAccumulator, 
+                      Delta & mCounterMask,
                       mHpetGeneralCapabilities.Bits.CounterClockPeriod
                       ), 
                     100000000
                     );
-    mTimerAccumulator = 0;
                     
     //
     // Call registered notification function passing in the time since the last
@@ -626,6 +711,11 @@ TimerDriverGenerateSoftInterrupt (
     mTimerNotifyFunction (TimerPeriod);
   }
 
+  //
+  // Save main counter value
+  //
+  mPreviousMainCounter = MainCounter;
+  
   //
   // Restore interrupts
   //  
@@ -696,18 +786,23 @@ TimerDriverInitialize (
   // Dump HPET Configuration Information
   //  
   DEBUG_CODE (
-    DEBUG ((DEBUG_INFO, "HPET Base Address = %08x\n", PcdGet32 (PcdHpetBaseAddress)));
-    DEBUG ((DEBUG_INFO, "  HPET_GENERAL_CAPABILITIES_ID  = %016lx\n", mHpetGeneralCapabilities));
-    DEBUG ((DEBUG_INFO, "  HPET_GENERAL_CONFIGURATION    = %016lx\n", mHpetGeneralConfiguration.Uint64));
-    DEBUG ((DEBUG_INFO, "  HPET_GENERAL_INTERRUPT_STATUS = %016lx\n", HpetRead (HPET_GENERAL_INTERRUPT_STATUS_OFFSET)));
-    DEBUG ((DEBUG_INFO, "  HPET_MAIN_COUNTER             = %016lx\n", HpetRead (HPET_MAIN_COUNTER_OFFSET)));
+    DEBUG ((DEBUG_INFO, "HPET Base Address = 0x%08x\n", PcdGet32 (PcdHpetBaseAddress)));
+    DEBUG ((DEBUG_INFO, "  HPET_GENERAL_CAPABILITIES_ID  = 0x%016lx\n", mHpetGeneralCapabilities));
+    DEBUG ((DEBUG_INFO, "  HPET_GENERAL_CONFIGURATION    = 0x%016lx\n", mHpetGeneralConfiguration.Uint64));
+    DEBUG ((DEBUG_INFO, "  HPET_GENERAL_INTERRUPT_STATUS = 0x%016lx\n", HpetRead (HPET_GENERAL_INTERRUPT_STATUS_OFFSET)));
+    DEBUG ((DEBUG_INFO, "  HPET_MAIN_COUNTER             = 0x%016lx\n", HpetRead (HPET_MAIN_COUNTER_OFFSET)));
     DEBUG ((DEBUG_INFO, "  HPET Main Counter Period      = %d (fs)\n", mHpetGeneralCapabilities.Bits.CounterClockPeriod));
     for (TimerIndex = 0; TimerIndex <= mHpetGeneralCapabilities.Bits.NumberOfTimers; TimerIndex++) {
-      DEBUG ((DEBUG_INFO, "  HPET_TIMER%d_CONFIGURATION     = %016lx\n", TimerIndex, HpetRead (HPET_TIMER_CONFIGURATION_OFFSET + TimerIndex * HPET_TIMER_STRIDE)));
-      DEBUG ((DEBUG_INFO, "  HPET_TIMER%d_COMPARATOR        = %016lx\n", TimerIndex, HpetRead (HPET_TIMER_COMPARATOR_OFFSET    + TimerIndex * HPET_TIMER_STRIDE)));
-      DEBUG ((DEBUG_INFO, "  HPET_TIMER%d_MSI_ROUTE         = %016lx\n", TimerIndex, HpetRead (HPET_TIMER_MSI_ROUTE_OFFSET     + TimerIndex * HPET_TIMER_STRIDE)));
+      DEBUG ((DEBUG_INFO, "  HPET_TIMER%d_CONFIGURATION     = 0x%016lx\n", TimerIndex, HpetRead (HPET_TIMER_CONFIGURATION_OFFSET + TimerIndex * HPET_TIMER_STRIDE)));
+      DEBUG ((DEBUG_INFO, "  HPET_TIMER%d_COMPARATOR        = 0x%016lx\n", TimerIndex, HpetRead (HPET_TIMER_COMPARATOR_OFFSET    + TimerIndex * HPET_TIMER_STRIDE)));
+      DEBUG ((DEBUG_INFO, "  HPET_TIMER%d_MSI_ROUTE         = 0x%016lx\n", TimerIndex, HpetRead (HPET_TIMER_MSI_ROUTE_OFFSET     + TimerIndex * HPET_TIMER_STRIDE)));
     }
   );
+  
+  //
+  // Capture the current HPET main counter value.
+  //
+  mPreviousMainCounter = HpetRead (HPET_MAIN_COUNTER_OFFSET);
   
   //
   // Determine the interrupt mode to use for the HPET Timer.  
@@ -801,8 +896,29 @@ TimerDriverInitialize (
   //
   mTimerConfiguration.Bits.InterruptEnable         = 0;
   mTimerConfiguration.Bits.PeriodicInterruptEnable = 0;
-  mTimerConfiguration.Bits.CounterSizeEnable       = 0;
+  mTimerConfiguration.Bits.CounterSizeEnable       = 1;
   HpetWrite (HPET_TIMER_CONFIGURATION_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, mTimerConfiguration.Uint64);
+  
+  //
+  // Read the HPET Timer Capabilities and Configuration register back again.
+  // CounterSizeEnable will be read back as a 0 if it is a 32-bit only timer
+  //
+  mTimerConfiguration.Uint64 = HpetRead (HPET_TIMER_CONFIGURATION_OFFSET + mTimerIndex * HPET_TIMER_STRIDE);
+  if ((mTimerConfiguration.Bits.CounterSizeEnable == 1) && (sizeof (UINTN) == sizeof (UINT64))) {
+    DEBUG ((DEBUG_INFO, "Choose 64-bit HPET timer.\n"));
+    //
+    // 64-bit BIOS can use 64-bit HPET timer
+    //
+    mCounterMask = 0xffffffffffffffffULL;
+    //
+    // Set timer back to 64-bit
+    //
+    mTimerConfiguration.Bits.CounterSizeEnable = 0;
+    HpetWrite (HPET_TIMER_CONFIGURATION_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, mTimerConfiguration.Uint64);
+  } else {
+    DEBUG ((DEBUG_INFO, "Choose 32-bit HPET timer.\n"));
+    mCounterMask = 0x00000000ffffffffULL;
+  }
 
   //
   // Install interrupt handler for selected HPET Timer
@@ -832,12 +948,15 @@ TimerDriverInitialize (
       DEBUG ((DEBUG_INFO, "HPET Interrupt Mode MSI\n"));
     } else {
       DEBUG ((DEBUG_INFO, "HPET Interrupt Mode I/O APIC\n"));
-      DEBUG ((DEBUG_INFO, "HPET I/O APIC IRQ         = %02x\n",   mTimerIrq));
+      DEBUG ((DEBUG_INFO, "HPET I/O APIC IRQ         = 0x%02x\n",  mTimerIrq));
     }  
-    DEBUG ((DEBUG_INFO, "HPET Interrupt Vector     = %02x\n",   PcdGet8 (PcdHpetLocalApicVector)));
-    DEBUG ((DEBUG_INFO, "HPET_TIMER%d_CONFIGURATION = %016lx\n", mTimerIndex, HpetRead (HPET_TIMER_CONFIGURATION_OFFSET + mTimerIndex * HPET_TIMER_STRIDE)));
-    DEBUG ((DEBUG_INFO, "HPET_TIMER%d_COMPARATOR    = %016lx\n", mTimerIndex, HpetRead (HPET_TIMER_COMPARATOR_OFFSET    + mTimerIndex * HPET_TIMER_STRIDE)));
-    DEBUG ((DEBUG_INFO, "HPET_TIMER%d_MSI_ROUTE     = %016lx\n", mTimerIndex, HpetRead (HPET_TIMER_MSI_ROUTE_OFFSET     + mTimerIndex * HPET_TIMER_STRIDE)));
+    DEBUG ((DEBUG_INFO, "HPET Interrupt Vector     = 0x%02x\n",    PcdGet8 (PcdHpetLocalApicVector)));
+    DEBUG ((DEBUG_INFO, "HPET Counter Mask         = 0x%016lx\n",  mCounterMask));
+    DEBUG ((DEBUG_INFO, "HPET Timer Period         = %d\n",        mTimerPeriod));
+    DEBUG ((DEBUG_INFO, "HPET Timer Count          = 0x%016lx\n",  mTimerCount));
+    DEBUG ((DEBUG_INFO, "HPET_TIMER%d_CONFIGURATION = 0x%016lx\n", mTimerIndex, HpetRead (HPET_TIMER_CONFIGURATION_OFFSET + mTimerIndex * HPET_TIMER_STRIDE)));
+    DEBUG ((DEBUG_INFO, "HPET_TIMER%d_COMPARATOR    = 0x%016lx\n", mTimerIndex, HpetRead (HPET_TIMER_COMPARATOR_OFFSET    + mTimerIndex * HPET_TIMER_STRIDE)));
+    DEBUG ((DEBUG_INFO, "HPET_TIMER%d_MSI_ROUTE     = 0x%016lx\n", mTimerIndex, HpetRead (HPET_TIMER_MSI_ROUTE_OFFSET     + mTimerIndex * HPET_TIMER_STRIDE)));
 
     //
     // Wait for a few timer interrupts to fire before continuing
