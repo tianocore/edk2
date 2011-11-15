@@ -990,7 +990,7 @@ ChangeModeForSetup (
     SimpleTextOut = NULL;
   }  
 
-  if ((GraphicsOutput == NULL) && (SimpleTextOut == NULL)) {
+  if ((GraphicsOutput == NULL) || (SimpleTextOut == NULL)) {
     return EFI_UNSUPPORTED;
   }
 
