@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -106,7 +106,7 @@ typedef UINT32  EFI_FVB_ATTRIBUTES;
 #define EFI_FVB2_ALIGNMENT_64K        0x00100000
 #define EFI_FVB2_ALIGNMENT_128K       0x00110000
 #define EFI_FVB2_ALIGNMENT_256K       0x00120000
-#define EFI_FVB2_ALIGNMNET_512K       0x00130000
+#define EFI_FVB2_ALIGNMENT_512K       0x00130000
 #define EFI_FVB2_ALIGNMENT_1M         0x00140000
 #define EFI_FVB2_ALIGNMENT_2M         0x00150000
 #define EFI_FVB2_ALIGNMENT_4M         0x00160000

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -923,7 +923,7 @@ Returns:
     } else if (strcmp (Value, EFI_FVB2_ALIGNMENT_256K_STRING) == 0) {
       FvInfo->FvAttributes |= EFI_FVB2_ALIGNMENT_256K;
     } else if (strcmp (Value, EFI_FVB2_ALIGNMENT_512K_STRING) == 0) {
-      FvInfo->FvAttributes |= EFI_FVB2_ALIGNMNET_512K;
+      FvInfo->FvAttributes |= EFI_FVB2_ALIGNMENT_512K;
     } else if (strcmp (Value, EFI_FVB2_ALIGNMENT_1M_STRING) == 0) {
       FvInfo->FvAttributes |= EFI_FVB2_ALIGNMENT_1M;
     } else if (strcmp (Value, EFI_FVB2_ALIGNMENT_2M_STRING) == 0) {
