@@ -1,14 +1,14 @@
 /** @file
   The file for AHCI mode of ATA host controller.
-  
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -33,7 +33,7 @@ AhciReadReg (
   UINT32                  Data;
 
   ASSERT (PciIo != NULL);
-  
+
   Data = 0;
 
   PciIo->Mem.Read (
@@ -95,7 +95,7 @@ AhciAndReg (
   )
 {
   UINT32 Data;
-  
+
   ASSERT (PciIo != NULL);
 
   Data  = AhciReadReg (PciIo, Offset);
@@ -134,7 +134,7 @@ AhciOrReg (
 
 /**
   Wait for the value of the specified MMIO register set to the test value.
-    
+
   @param  PciIo             The PCI IO protocol instance.
   @param  Offset            The MMIO address to test.
   @param  MaskValue         The mask value of memory.
@@ -155,7 +155,7 @@ AhciWaitMmioSet (
   IN  UINT64                    Timeout
   )
 {
-  UINT32     Value;  
+  UINT32     Value;
   UINT32     Delay;
 
   Delay = (UINT32) (DivU64x32 (Timeout, 1000) + 1);
@@ -184,7 +184,7 @@ AhciWaitMmioSet (
 
 /**
   Wait for the value of the specified system memory set to the test value.
-    
+
   @param  Address           The system memory address to test.
   @param  MaskValue         The mask value of memory.
   @param  TestValue         The test value of memory.
@@ -203,7 +203,7 @@ AhciWaitMemSet (
   IN  UINT64                    Timeout
   )
 {
-  UINT32     Value;  
+  UINT32     Value;
   UINT32     Delay;
 
   Delay = (UINT32) (DivU64x32 (Timeout, 1000) + 1);
@@ -238,7 +238,7 @@ AhciWaitMemSet (
 
 /**
   Check the memory status to the test value.
-    
+
   @param[in]       Address           The memory address to test.
   @param[in]       MaskValue         The mask value of memory.
   @param[in]       TestValue         The test value of memory.
@@ -263,7 +263,7 @@ AhciCheckMemSet (
   if (RetryTimes != NULL) {
     (*RetryTimes)--;
   }
- 
+
   Value  = *(volatile UINT32 *) Address;
   Value &= MaskValue;
 
@@ -279,13 +279,13 @@ AhciCheckMemSet (
 }
 
 /**
-  Check if the device is still on port. It also checks if the AHCI controller 
+  Check if the device is still on port. It also checks if the AHCI controller
   supports the address and data count will be transferred.
 
   @param  PciIo            The PCI IO protocol instance.
   @param  Port             The number of port.
 
-  @retval EFI_SUCCESS      The device is attached to port and the transfer data is 
+  @retval EFI_SUCCESS      The device is attached to port and the transfer data is
                            supported by AHCI controller.
   @retval EFI_UNSUPPORTED  The transfer address and count is not supported by AHCI
                            controller.
@@ -318,17 +318,17 @@ AhciCheckDeviceStatus (
 
   Clear the port interrupt and error status. It will also clear
   HBA interrupt status.
-    
+
   @param      PciIo          The PCI IO protocol instance.
   @param      Port           The number of port.
-     
-**/ 
+
+**/
 VOID
 EFIAPI
 AhciClearPortStatus (
   IN  EFI_PCI_IO_PROTOCOL    *PciIo,
   IN  UINT8                  Port
-  )  
+  )
 {
   UINT32 Offset;
 
@@ -388,7 +388,7 @@ AhciDumpPortStatus (
 
 /**
   Enable the FIS running for giving port.
-    
+
   @param      PciIo          The PCI IO protocol instance.
   @param      Port           The number of port.
   @param      Timeout        The timeout value of enabling FIS, uses 100ns as a unit.
@@ -412,7 +412,7 @@ AhciEnableFisReceive (
   AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_CMD_FRE);
 
   return AhciWaitMmioSet (
-           PciIo, 
+           PciIo,
            Offset,
            EFI_AHCI_PORT_CMD_FR,
            EFI_AHCI_PORT_CMD_FR,
@@ -439,7 +439,7 @@ AhciDisableFisReceive (
   IN  EFI_PCI_IO_PROTOCOL       *PciIo,
   IN  UINT8                     Port,
   IN  UINT64                    Timeout
-  )  
+  )
 {
   UINT32 Offset;
   UINT32 Data;
@@ -453,7 +453,7 @@ AhciDisableFisReceive (
   if ((Data & (EFI_AHCI_PORT_CMD_ST | EFI_AHCI_PORT_CMD_CR)) != 0) {
     return EFI_UNSUPPORTED;
   }
-  
+
   //
   // Check if the Fis receive DMA engine for the port is running.
   //
@@ -476,7 +476,7 @@ AhciDisableFisReceive (
 
 /**
   Build the command list, command table and prepare the fis receiver.
-    
+
   @param    PciIo                 The PCI IO protocol instance.
   @param    AhciRegisters         The pointer to the EFI_AHCI_REGISTERS.
   @param    Port                  The number of port.
@@ -489,7 +489,7 @@ AhciDisableFisReceive (
   @param    DataPhysicalAddr      The pointer to the data buffer pci bus master address.
   @param    DataLength            The data count to be transferred.
 
-**/  
+**/
 VOID
 EFIAPI
 AhciBuildCommand (
@@ -504,7 +504,7 @@ AhciBuildCommand (
   IN     UINT8                      CommandSlotNumber,
   IN OUT VOID                       *DataPhysicalAddr,
   IN     UINT64                     DataLength
-  )   
+  )
 {
   UINT64     BaseAddr;
   UINT64     PrdtNumber;
@@ -516,7 +516,7 @@ AhciBuildCommand (
 
   //
   // Filling the PRDT
-  //  
+  //
   PrdtNumber = (DataLength + EFI_AHCI_MAX_DATA_PER_PRDT - 1) / EFI_AHCI_MAX_DATA_PER_PRDT;
 
   //
@@ -529,13 +529,13 @@ AhciBuildCommand (
   Data64.Uint64 = (UINTN) (AhciRegisters->AhciRFis) + sizeof (EFI_AHCI_RECEIVED_FIS) * Port;
 
   BaseAddr = Data64.Uint64;
-  
+
   ZeroMem ((VOID *)((UINTN) BaseAddr), sizeof (EFI_AHCI_RECEIVED_FIS));
-    
+
   ZeroMem (AhciRegisters->AhciCommandTable, sizeof (EFI_AHCI_COMMAND_TABLE));
 
   CommandFis->AhciCFisPmNum = PortMultiplier;
-  
+
   CopyMem (&AhciRegisters->AhciCommandTable->CommandFis, CommandFis, sizeof (EFI_AHCI_COMMAND_FIS));
 
   Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CMD;
@@ -554,11 +554,11 @@ AhciBuildCommand (
   } else {
     AhciAndReg (PciIo, Offset, (UINT32)~(EFI_AHCI_PORT_CMD_DLAE | EFI_AHCI_PORT_CMD_ATAPI));
   }
-  
+
   RemainedData = (UINTN) DataLength;
   MemAddr      = (UINTN) DataPhysicalAddr;
   CommandList->AhciCmdPrdtl = (UINT32)PrdtNumber;
-  
+
   for (PrdtIndex = 0; PrdtIndex < PrdtNumber; PrdtIndex++) {
     if (RemainedData < EFI_AHCI_MAX_DATA_PER_PRDT) {
       AhciRegisters->AhciCommandTable->PrdtTable[PrdtIndex].AhciPrdtDbc = (UINT32)RemainedData - 1;
@@ -584,7 +584,7 @@ AhciBuildCommand (
     (VOID *) ((UINTN) AhciRegisters->AhciCmdList + (UINTN) CommandSlotNumber * sizeof (EFI_AHCI_COMMAND_LIST)),
     CommandList,
     sizeof (EFI_AHCI_COMMAND_LIST)
-    );  
+    );
 
   Data64.Uint64 = (UINT64)(UINTN) AhciRegisters->AhciCommandTablePciAddr;
   AhciRegisters->AhciCmdList[CommandSlotNumber].AhciCmdCtba  = Data64.Uint32.Lower32;
@@ -595,7 +595,7 @@ AhciBuildCommand (
 
 /**
   Buid a command FIS.
-    
+
   @param  CmdFis            A pointer to the EFI_AHCI_COMMAND_FIS data structure.
   @param  AtaCommandBlock   A pointer to the AhciBuildCommandFis data structure.
 
@@ -613,7 +613,7 @@ AhciBuildCommandFis (
   //
   // Indicator it's a command
   //
-  CmdFis->AhciCFisCmdInd      = 0x1; 
+  CmdFis->AhciCFisCmdInd      = 0x1;
   CmdFis->AhciCFisCmd         = AtaCommandBlock->AtaCommand;
 
   CmdFis->AhciCFisFeature     = AtaCommandBlock->AtaFeatures;
@@ -636,7 +636,7 @@ AhciBuildCommandFis (
 
 /**
   Start a PIO data transfer on specific port.
-    
+
   @param[in]       PciIo               The PCI IO protocol instance.
   @param[in]       AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
   @param[in]       Port                The number of port.
@@ -667,8 +667,8 @@ AhciPioTransfer (
   IN     UINT8                      Port,
   IN     UINT8                      PortMultiplier,
   IN     EFI_AHCI_ATAPI_COMMAND     *AtapiCommand OPTIONAL,
-  IN     UINT8                      AtapiCommandLength,  
-  IN     BOOLEAN                    Read,  
+  IN     UINT8                      AtapiCommandLength,
+  IN     BOOLEAN                    Read,
   IN     EFI_ATA_COMMAND_BLOCK      *AtaCommandBlock,
   IN OUT EFI_ATA_STATUS_BLOCK       *AtaStatusBlock,
   IN OUT VOID                       *MemoryAddr,
@@ -686,7 +686,7 @@ AhciPioTransfer (
   EFI_PCI_IO_PROTOCOL_OPERATION Flag;
   UINT32                        Delay;
   EFI_AHCI_COMMAND_FIS          CFis;
-  EFI_AHCI_COMMAND_LIST         CmdList; 
+  EFI_AHCI_COMMAND_LIST         CmdList;
   UINT32                        PortTfd;
   UINT32                        PrdCount;
 
@@ -712,7 +712,7 @@ AhciPioTransfer (
   if (EFI_ERROR (Status) || (DataCount != MapLength)) {
     return EFI_BAD_BUFFER_SIZE;
   }
-  
+
   //
   // Package read needed
   //
@@ -735,8 +735,8 @@ AhciPioTransfer (
     0,
     (VOID *)(UINTN)PhyAddr,
     DataCount
-    );    
-  
+    );
+
   Status = AhciStartCommand (
              PciIo,
              Port,
@@ -819,7 +819,7 @@ Exit:
     Port,
     Timeout
     );
-  
+
   AhciDisableFisReceive (
     PciIo,
     Port,
@@ -870,7 +870,7 @@ AhciDmaTransfer (
   IN     UINT8                      PortMultiplier,
   IN     EFI_AHCI_ATAPI_COMMAND     *AtapiCommand OPTIONAL,
   IN     UINT8                      AtapiCommandLength,
-  IN     BOOLEAN                    Read,  
+  IN     BOOLEAN                    Read,
   IN     EFI_ATA_COMMAND_BLOCK      *AtaCommandBlock,
   IN OUT EFI_ATA_STATUS_BLOCK       *AtaStatusBlock,
   IN OUT VOID                       *MemoryAddr,
@@ -905,15 +905,15 @@ AhciDmaTransfer (
   // BlockIO tasks.
   // Delay 100us to simulate the blocking time out checking.
   //
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   while ((Task == NULL) && (!IsListEmpty (&Instance->NonBlockingTaskList))) {
-    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     AsyncNonBlockingTransferRoutine (NULL, Instance);
-    gBS->RestoreTPL (OldTpl);  
     //
     // Stall for 100us.
     //
     MicroSecondDelay (100);
   }
+  gBS->RestoreTPL (OldTpl);
 
   if ((Task == NULL) || ((Task != NULL) && (!Task->IsStart))) {
     //
@@ -1022,21 +1022,21 @@ Exit:
   //
   // For Blocking mode, the command should be stopped, the Fis should be disabled
   // and the PciIo should be unmapped.
-  // For non-blocking mode, only when a error is happened (if the return status is 
-  // EFI_NOT_READY that means the command doesn't finished, try again.), first do the 
+  // For non-blocking mode, only when a error is happened (if the return status is
+  // EFI_NOT_READY that means the command doesn't finished, try again.), first do the
   // context cleanup, then set the packet's Asb status.
   //
   if (Task == NULL ||
       ((Task != NULL) && (Status != EFI_NOT_READY))
      ) {
     AhciStopCommand (
-      PciIo, 
+      PciIo,
       Port,
       Timeout
       );
 
     AhciDisableFisReceive (
-      PciIo, 
+      PciIo,
       Port,
       Timeout
       );
@@ -1057,7 +1057,7 @@ Exit:
 
 /**
   Start a non data transfer on specific port.
-    
+
   @param[in]       PciIo               The PCI IO protocol instance.
   @param[in]       AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
   @param[in]       Port                The number of port.
@@ -1076,7 +1076,7 @@ Exit:
   @retval EFI_UNSUPPORTED     The device is not ready for transfer.
   @retval EFI_SUCCESS         The non data transfer executes successfully.
 
-**/ 
+**/
 EFI_STATUS
 EFIAPI
 AhciNonDataTransfer (
@@ -1174,11 +1174,11 @@ Exit:
 
 /**
   Stop command running for giving port
-    
+
   @param  PciIo              The PCI IO protocol instance.
   @param  Port               The number of port.
   @param  Timeout            The timeout value of stop, uses 100ns as a unit.
-   
+
   @retval EFI_DEVICE_ERROR   The command stop unsuccessfully.
   @retval EFI_TIMEOUT        The operation is time out.
   @retval EFI_SUCCESS        The command stop successfully.
@@ -1258,7 +1258,7 @@ AhciStartCommand (
     );
 
   Status = AhciEnableFisReceive (
-             PciIo, 
+             PciIo,
              Port,
              Timeout
              );
@@ -1318,7 +1318,7 @@ AhciStartCommand (
   @param  PciIo              The PCI IO protocol instance.
   @param  Port               The number of port.
   @param  Timeout            The timeout value of reset, uses 100ns as a unit.
-   
+
   @retval EFI_DEVICE_ERROR   The port reset unsuccessfully
   @retval EFI_TIMEOUT        The reset operation is time out.
   @retval EFI_SUCCESS        The port reset successfully.
@@ -1397,7 +1397,7 @@ EFIAPI
 AhciReset (
   IN  EFI_PCI_IO_PROTOCOL       *PciIo,
   IN  UINT64                    Timeout
-  )    
+  )
 {
   UINT32                 Delay;
   UINT32                 Value;
@@ -1544,7 +1544,7 @@ AhciAtaSmartSupport (
     //
     // S.M.A.R.T is not supported by the device
     //
-    DEBUG ((EFI_D_INFO, "S.M.A.R.T feature is not supported at port [%d] PortMultiplier [%d]!\n", 
+    DEBUG ((EFI_D_INFO, "S.M.A.R.T feature is not supported at port [%d] PortMultiplier [%d]!\n",
             Port, PortMultiplier));
   } else {
     //
@@ -1620,7 +1620,7 @@ AhciAtaSmartSupport (
 
 /**
   Send Buffer cmd to specific device.
-    
+
   @param  PciIo               The PCI IO protocol instance.
   @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
   @param  Port                The number of port.
@@ -1640,7 +1640,7 @@ AhciIdentify (
   IN EFI_AHCI_REGISTERS       *AhciRegisters,
   IN UINT8                    Port,
   IN UINT8                    PortMultiplier,
-  IN OUT EFI_IDENTIFY_DATA    *Buffer  
+  IN OUT EFI_IDENTIFY_DATA    *Buffer
   )
 {
   EFI_STATUS                   Status;
@@ -1669,7 +1669,7 @@ AhciIdentify (
              &AtaStatusBlock,
              Buffer,
              sizeof (EFI_IDENTIFY_DATA),
-             ATA_ATAPI_TIMEOUT, 
+             ATA_ATAPI_TIMEOUT,
              NULL
              );
 
@@ -1678,7 +1678,7 @@ AhciIdentify (
 
 /**
   Send Buffer cmd to specific device.
-    
+
   @param  PciIo               The PCI IO protocol instance.
   @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
   @param  Port                The number of port.
@@ -1698,7 +1698,7 @@ AhciIdentifyPacket (
   IN EFI_AHCI_REGISTERS       *AhciRegisters,
   IN UINT8                    Port,
   IN UINT8                    PortMultiplier,
-  IN OUT EFI_IDENTIFY_DATA    *Buffer  
+  IN OUT EFI_IDENTIFY_DATA    *Buffer
   )
 {
   EFI_STATUS                   Status;
@@ -1736,7 +1736,7 @@ AhciIdentifyPacket (
 
 /**
   Send SET FEATURE cmd on specific device.
-    
+
   @param  PciIo               The PCI IO protocol instance.
   @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
   @param  Port                The number of port.
@@ -1785,7 +1785,7 @@ AhciDeviceSetFeature (
              0,
              &AtaCommandBlock,
              &AtaStatusBlock,
-             ATA_ATAPI_TIMEOUT, 
+             ATA_ATAPI_TIMEOUT,
              NULL
              );
 
@@ -1793,12 +1793,12 @@ AhciDeviceSetFeature (
 }
 
 /**
-  This function is used to send out ATAPI commands conforms to the Packet Command 
+  This function is used to send out ATAPI commands conforms to the Packet Command
   with PIO Protocol.
 
   @param PciIo              The PCI IO protocol instance.
   @param AhciRegisters      The pointer to the EFI_AHCI_REGISTERS.
-  @param Port               The number of port.     
+  @param Port               The number of port.
   @param PortMultiplier     The number of port multiplier.
   @param Packet             A pointer to EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET structure.
 
@@ -1862,7 +1862,7 @@ AhciPacketCommandExecute (
                Packet->CdbLength,
                &AtaCommandBlock,
                &AtaStatusBlock,
-               Packet->Timeout, 
+               Packet->Timeout,
                NULL
                );
   } else {
@@ -1878,7 +1878,7 @@ AhciPacketCommandExecute (
                &AtaStatusBlock,
                Buffer,
                Length,
-               Packet->Timeout, 
+               Packet->Timeout,
                NULL
                );
   }
@@ -1887,7 +1887,7 @@ AhciPacketCommandExecute (
 
 /**
   Allocate transfer-related data struct which is used at AHCI mode.
-  
+
   @param  PciIo                 The PCI IO protocol instance.
   @param  AhciRegisters         The pointer to the EFI_AHCI_REGISTERS.
 
@@ -1957,7 +1957,7 @@ AhciCreateTransferDescriptor (
 
   if (EFI_ERROR (Status) || (Bytes != MaxReceiveFisSize)) {
     //
-    // Map error or unable to map the whole RFis buffer into a contiguous region. 
+    // Map error or unable to map the whole RFis buffer into a contiguous region.
     //
     Status = EFI_OUT_OF_RESOURCES;
     goto Error6;
@@ -1989,7 +1989,7 @@ AhciCreateTransferDescriptor (
 
   if (EFI_ERROR (Status)) {
     //
-    // Free mapped resource. 
+    // Free mapped resource.
     //
     Status = EFI_OUT_OF_RESOURCES;
     goto Error5;
@@ -2045,7 +2045,7 @@ AhciCreateTransferDescriptor (
 
   if (EFI_ERROR (Status)) {
     //
-    // Free mapped resource. 
+    // Free mapped resource.
     //
     Status = EFI_OUT_OF_RESOURCES;
     goto Error3;
@@ -2085,7 +2085,7 @@ AhciCreateTransferDescriptor (
 
   return EFI_SUCCESS;
   //
-  // Map error or unable to map the whole CmdList buffer into a contiguous region. 
+  // Map error or unable to map the whole CmdList buffer into a contiguous region.
   //
 Error1:
   PciIo->Unmap (
@@ -2127,8 +2127,8 @@ Error6:
 /**
   Initialize ATA host controller at AHCI mode.
 
-  The function is designed to initialize ATA host controller. 
-  
+  The function is designed to initialize ATA host controller.
+
   @param[in]  Instance          A pointer to the ATA_ATAPI_PASS_THRU_INSTANCE instance.
 
 **/
@@ -2164,7 +2164,7 @@ AhciModeInitialization (
   PciIo   = Instance->PciIo;
   IdeInit = Instance->IdeControllerInit;
 
-  Status = AhciReset (PciIo, EFI_AHCI_BUS_RESET_TIMEOUT); 
+  Status = AhciReset (PciIo, EFI_AHCI_BUS_RESET_TIMEOUT);
 
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
@@ -2187,10 +2187,10 @@ AhciModeInitialization (
 
   //
   // Get the bit map of those ports exposed by this HBA.
-  // It indicates which ports that the HBA supports are available for software to use. 
+  // It indicates which ports that the HBA supports are available for software to use.
   //
   PortImplementBitMap  = AhciReadReg(PciIo, EFI_AHCI_PI_OFFSET);
-  
+
   AhciRegisters = &Instance->AhciRegisters;
   Status = AhciCreateTransferDescriptor (PciIo, AhciRegisters);
 
@@ -2198,7 +2198,7 @@ AhciModeInitialization (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  for (Port = 0; Port < MaxPortNumber; Port ++) {  
+  for (Port = 0; Port < MaxPortNumber; Port ++) {
     if ((PortImplementBitMap & (BIT0 << Port)) != 0) {
       IdeInit->NotifyPhase (IdeInit, EfiIdeBeforeChannelEnumeration, Port);
 
@@ -2249,7 +2249,7 @@ AhciModeInitialization (
       Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CMD;
       AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_CMD_FRE);
       Status = AhciWaitMmioSet (
-                 PciIo, 
+                 PciIo,
                  Offset,
                  EFI_AHCI_PORT_CMD_FR,
                  EFI_AHCI_PORT_CMD_FR,
@@ -2302,7 +2302,7 @@ AhciModeInitialization (
         MicroSecondDelay (1000);
         PhyDetectDelay--;
       } while (PhyDetectDelay > 0);
-      
+
       if (PhyDetectDelay == 0) {
         continue;
       }
@@ -2312,7 +2312,7 @@ AhciModeInitialization (
       //
       Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SIG;
       Status = AhciWaitMmioSet (
-                 PciIo, 
+                 PciIo,
                  Offset,
                  0x0000FFFF,
                  0x00000101,
@@ -2343,7 +2343,7 @@ AhciModeInitialization (
       } else {
         continue;
       }
-      DEBUG ((EFI_D_INFO, "port [%d] port mulitplier [%d] has a [%a]\n", 
+      DEBUG ((EFI_D_INFO, "port [%d] port mulitplier [%d] has a [%a]\n",
               Port, 0, DeviceType == EfiIdeCdrom ? "cdrom" : "harddisk"));
 
       //
@@ -2401,7 +2401,7 @@ AhciModeInitialization (
         TransferMode.ModeNumber = (UINT8) (SupportedModes->UdmaMode.Mode);
       } else if (SupportedModes->MultiWordDmaMode.Valid) {
         TransferMode.ModeCategory = EFI_ATA_MODE_MDMA;
-        TransferMode.ModeNumber = (UINT8) SupportedModes->MultiWordDmaMode.Mode;  
+        TransferMode.ModeNumber = (UINT8) SupportedModes->MultiWordDmaMode.Mode;
       }
 
       Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, 0, 0x03, (UINT32)(*(UINT8 *)&TransferMode));
