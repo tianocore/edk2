@@ -1,7 +1,7 @@
 /** @file
   Report Status Code Library for DXE Phase.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -45,6 +45,7 @@ InternalGetReportStatusCode (
   )
 {
   EFI_STATUS  Status;
+  EFI_TPL     Tpl;
 
   if (mReportStatusCodeLibStatusCodeProtocol != NULL) {
     return;
@@ -53,10 +54,18 @@ InternalGetReportStatusCode (
   //
   // Check gBS just in case ReportStatusCode is called before gBS is initialized.
   //
-  if (gBS != NULL && gBS->LocateProtocol != NULL) {
-    Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID**) &mReportStatusCodeLibStatusCodeProtocol);
-    if (EFI_ERROR (Status)) {
-      mReportStatusCodeLibStatusCodeProtocol = NULL;
+  if ((gBS != NULL) && (gBS->LocateProtocol != NULL) && (gBS->RaiseTPL != NULL) && (gBS->RestoreTPL != NULL)) {
+    //
+    // Retrieve the current TPL
+    //
+    Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+    gBS->RestoreTPL (Tpl);
+
+    if (Tpl < TPL_NOTIFY) {
+      Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID**) &mReportStatusCodeLibStatusCodeProtocol);
+      if (EFI_ERROR (Status)) {
+        mReportStatusCodeLibStatusCodeProtocol = NULL;
+      }
     }
   }
 }
@@ -496,7 +505,10 @@ ReportStatusCodeEx (
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
-  if (gBS == NULL || gBS->AllocatePool == NULL || gBS->FreePool == NULL) {
+  if ((gBS == NULL) ||
+      (gBS->AllocatePool == NULL) || (gBS->FreePool == NULL) ||
+      (gBS->RaiseTPL == NULL) || (gBS->RestoreTPL == NULL)
+     ) {
     return EFI_UNSUPPORTED;
   }
 
