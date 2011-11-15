@@ -13,7 +13,7 @@
   requiring an update to MajorVersion and MinorVersion.
   The SMBIOS protocol can only be called a TPL < TPL_NOTIFY.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -31,8 +31,8 @@
     { 0x3583ff6, 0xcb36, 0x4940, { 0x94, 0x7e, 0xb9, 0xb3, 0x9f, 0x4a, 0xfa, 0xf7 }}
     
 //
-// SMBIOS type macros which is according to SMBIOS specification.
-//    
+// SMBIOS type macros which is according to SMBIOS 2.7 specification.
+//
 #define EFI_SMBIOS_TYPE_BIOS_INFORMATION                    0
 #define EFI_SMBIOS_TYPE_SYSTEM_INFORMATION                  1
 #define EFI_SMBIOS_TYPE_BASEBOARD_INFORMATION               2
@@ -73,6 +73,9 @@
 #define EFI_SMBIOS_TYPE_MEMORY_CHANNEL                      37
 #define EFI_SMBIOS_TYPE_IPMI_DEVICE_INFORMATION             38
 #define EFI_SMBIOS_TYPE_SYSTEM_POWER_SUPPLY                 39
+#define EFI_SMBIOS_TYPE_ADDITIONAL_INFORMATION              40
+#define EFI_SMBIOS_TYPE_ONBOARD_DEVICES_EXTENDED_INFORMATION 41
+#define EFI_SMBIOS_TYPE_MANAGEMENT_CONTROLLER_HOST_INTERFACE 42
 #define EFI_SMBIOS_TYPE_INACTIVE                            126
 #define EFI_SMBIOS_TYPE_END_OF_TABLE                        127
 #define EFI_SMBIOS_OEM_BEGIN                                128
