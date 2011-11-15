@@ -1204,10 +1204,17 @@ GenericLegacyBoot (
     //
     EfiSignalEventLegacyBoot ();
     DEBUG ((EFI_D_INFO, "Legacy INT19 Boot...\n"));
+
     //
-    // Raise TPL to high level to disable CPU interrupts
+    // Disable DXE Timer while executing in real mode
     //
-    gBS->RaiseTPL (TPL_HIGH_LEVEL);
+    Private->Timer->SetTimerPeriod (Private->Timer, 0);
+    
+    //
+    // Save and disable interrupt of debug timer
+    //
+    SaveAndSetDebugTimerInterrupt (FALSE);
+
 
     //
     // Put the 8259 into its legacy mode by reprogramming the vector bases
