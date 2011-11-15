@@ -2,12 +2,12 @@
   HII Config Access protocol implementation of SecureBoot configuration module.
 
 Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -40,7 +40,7 @@ HII_VENDOR_DEVICE_PATH          mSecureBootHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -62,12 +62,12 @@ SaveSecureBootVariable (
   )
 {
   EFI_STATUS                       Status;
-  
+
   Status = gRT->SetVariable (
-             EFI_SECURE_BOOT_ENABLE_NAME, 
+             EFI_SECURE_BOOT_ENABLE_NAME,
              &gEfiSecureBootEnableDisableGuid,
-             EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS, 
-             sizeof (UINT8), 
+             EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+             sizeof (UINT8),
              &VarValue
              );
   if (EFI_ERROR (Status)) {
@@ -114,25 +114,36 @@ SecureBootExtractConfig (
 {
   EFI_STATUS                        Status;
   UINTN                             BufferSize;
+  UINTN                             Size;
   SECUREBOOT_CONFIGURATION          Configuration;
-  
+
   EFI_STRING                        ConfigRequest;
+  EFI_STRING                        ConfigRequestHdr;
   UINT8                             *SecureBootEnable;
-  
+  SECUREBOOT_CONFIG_PRIVATE_DATA    *PrivateData;
+  BOOLEAN                           AllocatedRequest;
+
   if (Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-
-  *Progress = Request;
+  AllocatedRequest = FALSE;
+  ConfigRequestHdr = NULL;
+  ConfigRequest    = NULL;
+  Size             = 0;
+  
+  PrivateData      = SECUREBOOT_CONFIG_PRIVATE_FROM_THIS (This);
+  *Progress        = Request;
+  
   if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &gSecureBootConfigFormSetGuid, mSecureBootStorageName)) {
     return EFI_NOT_FOUND;
   }
 
+  
   //
   // Get the SecureBoot Variable
   //
-  SecureBootEnable = GetVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid);  
-  
+  SecureBootEnable = GetVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid);
+
   //
   // If the SecureBoot Variable doesn't exist, hide the SecureBoot Enable/Disable
   // Checkbox.
@@ -144,8 +155,26 @@ SecureBootExtractConfig (
     Configuration.SecureBootState = *SecureBootEnable;
   }
   
-  BufferSize = sizeof (Configuration);
+  BufferSize = sizeof (SECUREBOOT_CONFIGURATION);
   ConfigRequest = Request;
+  if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
+    //
+    // Request is set to NULL or OFFSET is NULL, construct full request string.
+    //
+
+    //
+    // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
+    // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
+    //
+    ConfigRequestHdr = HiiConstructConfigHdr (&gSecureBootConfigFormSetGuid, mSecureBootStorageName, PrivateData->DriverHandle);
+    Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
+    ASSERT (ConfigRequest != NULL);
+    AllocatedRequest = TRUE;
+    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+    FreePool (ConfigRequestHdr);
+    ConfigRequestHdr = NULL;
+  }
 
   Status = gHiiConfigRouting->BlockToConfig (
                                 gHiiConfigRouting,
@@ -155,7 +184,14 @@ SecureBootExtractConfig (
                                 Results,
                                 Progress
                                 );
-  
+
+  //
+  // Free the allocated config request string.
+  //
+  if (AllocatedRequest) {
+    FreePool (ConfigRequest);
+  }
+
   //
   // Set Progress string to the original request string.
   //
@@ -198,7 +234,7 @@ SecureBootRouteConfig (
   UINTN                            BufferSize;
   SECUREBOOT_CONFIGURATION         SecureBootConfiguration;
   UINT8                            *SecureBootEnable;
-    
+
 
   if (Configuration == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -224,17 +260,17 @@ SecureBootRouteConfig (
     return Status;
   }
 
-  SecureBootEnable = GetVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid);  
+  SecureBootEnable = GetVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid);
   if (SecureBootEnable == NULL) {
     return EFI_SUCCESS;
-  } 
-  
+  }
+
   if ((*SecureBootEnable) != SecureBootConfiguration.SecureBootState) {
     //
     // If the configure is changed, update the SecureBoot Variable.
     //
-    SaveSecureBootVariable (SecureBootConfiguration.SecureBootState); 
-  }  
+    SaveSecureBootVariable (SecureBootConfiguration.SecureBootState);
+  }
   return EFI_SUCCESS;
 }
 
@@ -272,7 +308,7 @@ SecureBootCallback (
   )
 {
   BOOLEAN           SecureBootEnable;
-  
+
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -280,13 +316,13 @@ SecureBootCallback (
   if ((Action != EFI_BROWSER_ACTION_CHANGING) || (QuestionId != KEY_SECURE_BOOT_ENABLE)) {
     return EFI_UNSUPPORTED;
   }
-  
+
   if (NULL == GetVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid)) {
     return EFI_SUCCESS;
   }
-  
+
   SecureBootEnable = Value->u8;
-  SaveSecureBootVariable (Value->u8); 
+  SaveSecureBootVariable (Value->u8);
   return EFI_SUCCESS;
 
 }
@@ -346,13 +382,13 @@ InstallSecureBootConfigForm (
            &gEfiHiiConfigAccessProtocolGuid,
            ConfigAccess,
            NULL
-           );  
+           );
 
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   PrivateData->HiiHandle = HiiHandle;
-  return EFI_SUCCESS;  
+  return EFI_SUCCESS;
 }
 
 /**
@@ -388,6 +424,6 @@ UninstallSecureBootConfigForm (
            );
     PrivateData->DriverHandle = NULL;
   }
-  
+
   FreePool (PrivateData);
 }
