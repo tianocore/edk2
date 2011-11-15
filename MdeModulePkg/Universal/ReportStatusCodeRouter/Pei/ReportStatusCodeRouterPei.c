@@ -249,6 +249,7 @@ ReportDispatcher (
     NumberOfEntries = GET_GUID_HOB_DATA (Hob);
     CallbackEntry   = (EFI_PEI_RSC_HANDLER_CALLBACK *) (NumberOfEntries + 1);
     for (Index = 0; Index < *NumberOfEntries; Index++) {
+      if (CallbackEntry[Index] != NULL) {
       CallbackEntry[Index](
         PeiServices,
         CodeType,
@@ -257,6 +258,7 @@ ReportDispatcher (
         CallerId,
         Data
         );
+      }
     }
     Hob.Raw = GET_NEXT_HOB (Hob);
     Hob.Raw = GetNextGuidHob (&gStatusCodeCallbackGuid, Hob.Raw);
