@@ -469,9 +469,12 @@ EhcSetRootHubPortFeature (
 
   case EfiUsbPortPower:
     //
-    // Not supported, ignore the operation
+    // Set port power bit when PPC is 1
     //
-    Status = EFI_SUCCESS;
+    if ((Ehc->HcCapParams & HCSP_PPC) == HCSP_PPC) {
+      State |= PORTSC_POWER;
+      EhcWriteOpReg (Ehc, Offset, State);
+    }
     break;
 
   case EfiUsbPortOwner:
@@ -598,6 +601,14 @@ EhcClearRootHubPortFeature (
     break;
 
   case EfiUsbPortPower:
+    //
+    // Clear port power bit when PPC is 1
+    //
+    if ((Ehc->HcCapParams & HCSP_PPC) == HCSP_PPC) {
+      State &= ~PORTSC_POWER;
+      EhcWriteOpReg (Ehc, Offset, State);
+    }
+    break;
   case EfiUsbPortSuspendChange:
   case EfiUsbPortResetChange:
     //

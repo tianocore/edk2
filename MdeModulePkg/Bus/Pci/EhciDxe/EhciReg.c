@@ -2,7 +2,7 @@
 
   The EHCI register operation routines.
 
-Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -554,6 +554,7 @@ EhcInitHC (
   )
 {
   EFI_STATUS              Status;
+  UINT32                  Index;
 
   // This ASSERT crashes the BeagleBoard. There is some issue in the USB stack.
   // This ASSERT needs to be removed so the BeagleBoard will boot. When we fix
@@ -580,20 +581,28 @@ EhcInitHC (
   EhcWriteOpReg (Ehc, EHC_USBINTR_OFFSET, 0);
 
   //
-  // 2. Program periodic frame list, already done in EhcInitSched
-  // 3. Start the Host Controller
+  // 2. Start the Host Controller
   //
   EhcSetOpRegBit (Ehc, EHC_USBCMD_OFFSET, USBCMD_RUN);
 
   //
-  // 4. Set all ports routing to EHC
+  // 3. Power up all ports if EHCI has Port Power Control (PPC) support
   //
-  EhcSetOpRegBit (Ehc, EHC_CONFIG_FLAG_OFFSET, CONFIGFLAG_ROUTE_EHC);
+  if (Ehc->HcStructParams & HCSP_PPC) {
+    for (Index = 0; Index < (UINT8) (Ehc->HcStructParams & HCSP_NPORTS); Index++) {
+      EhcSetOpRegBit (Ehc, (UINT32) (EHC_PORT_STAT_OFFSET + (4 * Index)), PORTSC_POWER);
+    }
+  }
 
   //
   // Wait roothub port power stable
   //
   gBS->Stall (EHC_ROOT_PORT_RECOVERY_STALL);
+
+  //
+  // 4. Set all ports routing to EHC
+  //
+  EhcSetOpRegBit (Ehc, EHC_CONFIG_FLAG_OFFSET, CONFIGFLAG_ROUTE_EHC);
 
   Status = EhcEnablePeriodSchd (Ehc, EHC_GENERIC_TIMEOUT);
 
