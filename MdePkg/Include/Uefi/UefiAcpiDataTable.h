@@ -23,6 +23,32 @@ typedef struct {
   GUID                          Identifier;
   UINT16                        DataOffset;
 } EFI_ACPI_DATA_TABLE;
+
+typedef struct {
+  EFI_ACPI_DATA_TABLE  UefiAcpiDataTable;
+  UINT32               SwSmiNumber;
+  UINT64               BufferPtrAddress;
+} EFI_SMM_COMMUNICATION_ACPI_TABLE;
+
+///
+/// To avoid confusion in interpreting frames, the communication buffer should always 
+/// begin with EFI_SMM_COMMUNICATE_HEADER
+///
+typedef struct {
+  ///
+  /// Allows for disambiguation of the message format.
+  ///
+  EFI_GUID  HeaderGuid;
+  ///
+  /// Describes the size of Data (in bytes) and does not include the size of the header.
+  ///
+  UINTN     MessageLength;
+  ///
+  /// Designates an array of bytes that is MessageLength in size.
+  ///
+  UINT8     Data[1];
+} EFI_SMM_COMMUNICATE_HEADER;
+
 #pragma pack()
 
 #endif

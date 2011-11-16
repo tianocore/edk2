@@ -17,12 +17,4 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Uefi/UefiAcpiDataTable.h>
 
-#pragma pack(1)
-typedef struct {
-  EFI_ACPI_DATA_TABLE  UefiAcpiDataTable;
-  UINT32               SwSmiNumber;
-  UINT64               BufferPtrAddress;
-} EFI_SMM_COMMUNICATION_ACPI_TABLE;
-#pragma pack()
-
 #endif
