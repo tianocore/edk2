@@ -374,7 +374,7 @@ typedef struct {
 
   EFI_DEFAULT_ID        DefaultId;        // for EFI_IFR_RESET_BUTTON
   EFI_GUID              RefreshGuid;      // for EFI_IFR_REFRESH_ID
-
+  BOOLEAN               Locked;           // Whether this statement is locked.
   //
   // Get from IFR parsing
   //
@@ -425,6 +425,7 @@ typedef struct {
   EFI_IMAGE_ID      ImageId;
 
   BOOLEAN           ModalForm;            // Whether this is a modal form.
+  BOOLEAN           Locked;               // Whether this form is locked.
 
   BOOLEAN           NvUpdateRequired;     // Whether this form has NV update request.
 

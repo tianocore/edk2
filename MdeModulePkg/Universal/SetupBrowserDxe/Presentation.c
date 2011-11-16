@@ -554,7 +554,7 @@ DisplayForm (
       // We are NOT!! removing this StringPtr buffer via FreePool since it is being used in the menuoptions, we will do
       // it in UiFreeMenu.
       //
-      MenuOption = UiAddMenuOption (StringPtr, Selection->Handle, Statement, NumberOfLines, MenuItemCount);
+      MenuOption = UiAddMenuOption (StringPtr, Selection->Handle, Selection->Form, Statement, NumberOfLines, MenuItemCount);
       MenuItemCount++;
 
       if (MenuOption->IsQuestion && !MenuOption->ReadOnly) {

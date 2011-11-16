@@ -358,6 +358,7 @@ formset
             minimum = 0,
             maximum = 0xff,
             step    = 0,
+            locked,
     endnumeric;
 
     numeric varid   = MyNameValueVar[1],     // This numeric take NameValueVar1 as storage

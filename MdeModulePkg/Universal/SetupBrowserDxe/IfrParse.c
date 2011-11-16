@@ -2118,6 +2118,28 @@ ParseOpCodes (
       break;
 
     //
+    // Lock tag, used by form and statement.
+    //
+    case EFI_IFR_LOCKED_OP:
+      //
+      // Get ScopeOpcode from top of stack
+      //
+      PopScope (&ScopeOpCode);
+      PushScope (ScopeOpCode);
+      switch (ScopeOpCode) {
+      case EFI_IFR_FORM_OP:
+      case EFI_IFR_FORM_MAP_OP:
+        ASSERT (CurrentForm != NULL);
+        CurrentForm->Locked = TRUE;
+        break;
+
+      default:
+        ASSERT (CurrentStatement != NULL);
+        CurrentStatement->Locked = TRUE;
+      }      
+      break;
+
+    //
     // Vendor specific
     //
     case EFI_IFR_GUID_OP:

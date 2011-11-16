@@ -295,6 +295,7 @@ UiFreeRefreshList (
 
   @param  String                 String description for this option.
   @param  Handle                 Hii handle for the package list.
+  @param  Form                   The form this statement belong to.
   @param  Statement              Statement of this Menu Option.
   @param  NumberOfLines          Display lines for this Menu Option.
   @param  MenuItemCount          The index for this Option in the Menu.
@@ -306,6 +307,7 @@ UI_MENU_OPTION *
 UiAddMenuOption (
   IN CHAR16                  *String,
   IN EFI_HII_HANDLE          Handle,
+  IN FORM_BROWSER_FORM       *Form,
   IN FORM_BROWSER_STATEMENT  *Statement,
   IN UINT16                  NumberOfLines,
   IN UINT16                  MenuItemCount
