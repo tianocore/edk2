@@ -60,8 +60,8 @@ ProviderAlreadyInPolicy (
 /**
   Add the user's credential record in the provider.
 
-  @param[in]  ProviderGuid        Point to credential provider guid.
-  @param[in]  User                Points to user profile.
+  @param[in]  Identity     Identity policy item including credential provider.
+  @param[in]  User         Points to user profile.
 
   @retval EFI_SUCCESS      Add or delete record successfully.
   @retval Others           Fail to add or delete record.
