@@ -199,10 +199,12 @@ CEntryPoint (
   if (!IS_XIP()) {
     if (IS_PRIMARY_CORE(MpId)) {
       mGlobalVariableBase = GlobalVariableBase;
-      ArmCpuSynchronizeSignal (ARM_CPU_EVENT_DEFAULT);
+      if (ArmIsMpCore()) {
+        ArmCpuSynchronizeSignal (ARM_CPU_EVENT_DEFAULT);
+      }
     } else {
-	  // Wait the Primay core has defined the address of the Global Variable region
-	  ArmCpuSynchronizeWait (ARM_CPU_EVENT_DEFAULT);
+      // Wait the Primay core has defined the address of the Global Variable region
+      ArmCpuSynchronizeWait (ARM_CPU_EVENT_DEFAULT);
     }
   }
   
