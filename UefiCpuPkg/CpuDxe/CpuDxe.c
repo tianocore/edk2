@@ -25,6 +25,8 @@ EFI_HANDLE                mCpuHandle = NULL;
 BOOLEAN                   mIsFlushingGCD;
 UINT64                    mValidMtrrAddressMask = MTRR_LIB_CACHE_VALID_ADDRESS;
 UINT64                    mValidMtrrBitsMask    = MTRR_LIB_MSR_VALID_MASK;
+IA32_IDT_GATE_DESCRIPTOR  *mOrigIdtEntry        = NULL;
+UINT16                    mOrigIdtEntryCount    = 0;
 
 FIXED_MTRR    mFixedMtrrTable[] = {
   {
@@ -520,7 +522,15 @@ CpuRegisterInterruptHandler (
     return EFI_ALREADY_STARTED;
   }
 
-  SetInterruptDescriptorTableHandlerAddress ((UINTN)InterruptType, NULL);
+  if (InterruptHandler != NULL) {
+    SetInterruptDescriptorTableHandlerAddress ((UINTN)InterruptType, NULL);
+  } else {
+    //
+    // Restore the original IDT handler address if InterruptHandler is NULL.
+    //
+    RestoreInterruptDescriptorTableHandlerAddress ((UINTN)InterruptType);
+  }
+
   ExternalVectorTable[InterruptType] = InterruptHandler;
   return EFI_SUCCESS;
 }
@@ -1081,6 +1091,25 @@ SetInterruptDescriptorTableHandlerAddress (
 #endif
 }
 
+/**
+  Restore original Interrupt Descriptor Table Handler Address.
+
+  @param Index        The Index of the interrupt descriptor table handle.
+
+**/
+VOID
+RestoreInterruptDescriptorTableHandlerAddress (
+  IN UINTN       Index
+  )
+{
+  if (Index < mOrigIdtEntryCount) {
+    gIdtTable[Index].Bits.OffsetLow   = mOrigIdtEntry[Index].Bits.OffsetLow;
+    gIdtTable[Index].Bits.OffsetHigh  = mOrigIdtEntry[Index].Bits.OffsetHigh;
+#if defined (MDE_CPU_X64)
+    gIdtTable[Index].Bits.OffsetUpper = mOrigIdtEntry[Index].Bits.OffsetUpper;
+#endif
+  }
+}
 
 /**
   Initialize Interrupt Descriptor Table for interrupt handling.
@@ -1111,6 +1140,12 @@ InitInterruptDescriptorTable (
   if ((OldIdtPtr.Base != 0) && ((OldIdtPtr.Limit & 7) == 7)) {
     OldIdt = (IA32_IDT_GATE_DESCRIPTOR*) OldIdtPtr.Base;
     OldIdtSize = (OldIdtPtr.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR);
+    //
+    // Save original IDT entry and IDT entry count.
+    //
+    mOrigIdtEntry = AllocateCopyPool (OldIdtPtr.Limit + 1, (VOID *) OldIdtPtr.Base);
+    ASSERT (mOrigIdtEntry != NULL);
+    mOrigIdtEntryCount = (UINT16) OldIdtSize;
   } else {
     OldIdt = NULL;
     OldIdtSize = 0;
