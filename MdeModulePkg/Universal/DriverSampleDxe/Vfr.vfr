@@ -616,7 +616,7 @@ formset
             varid   = MyIfrNVData.Time, 
             prompt  = STRING_TOKEN(STR_TIME_PROMPT), 
             help    = STRING_TOKEN(STR_TIME_PROMPT), 
-            flags   = STORAGE_NORMAL, 
+            flags   = STORAGE_NORMAL | SECOND_SUPPRESS,
             default = 15:33:33, 
       endtime;
       

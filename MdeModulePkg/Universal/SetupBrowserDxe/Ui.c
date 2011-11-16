@@ -324,6 +324,102 @@ UiFreeRefreshList (
 }
 
 
+/**
+  Process option string for date/time opcode.
+
+  @param  MenuOption              Menu option point to date/time.
+  @param  OptionString            Option string input for process.
+  @param  AddOptCol               Whether need to update MenuOption->OptCol. 
+
+**/
+VOID 
+ProcessStringForDateTime (
+  UI_MENU_OPTION                  *MenuOption,
+  CHAR16                          *OptionString,
+  BOOLEAN                         AddOptCol
+  )
+{
+  UINTN Index;
+  UINTN Count;
+  FORM_BROWSER_STATEMENT          *Statement;
+
+  ASSERT (MenuOption != NULL && OptionString != NULL);
+  
+  Statement = MenuOption->ThisTag;
+  
+  //
+  // If leading spaces on OptionString - remove the spaces
+  //
+  for (Index = 0; OptionString[Index] == L' '; Index++) {
+    //
+    // Base on the blockspace to get the option column info.
+    //
+    if (AddOptCol) {
+      MenuOption->OptCol++;
+    }
+  }
+  
+  for (Count = 0; OptionString[Index] != CHAR_NULL; Index++) {
+    OptionString[Count] = OptionString[Index];
+    Count++;
+  }
+  OptionString[Count] = CHAR_NULL;
+  
+  //
+  // Enable to suppress field in the opcode base on the flag.
+  //
+  if (Statement->Operand == EFI_IFR_DATE_OP) {
+    //
+    // OptionString format is: <**:  **: ****>
+    //                        |month|day|year|
+    //                          4     3    5
+    //
+    if ((Statement->Flags & EFI_QF_DATE_MONTH_SUPPRESS) && (MenuOption->Sequence == 0)) {
+      //
+      // At this point, only "<**:" in the optionstring. 
+      // Clean the day's ** field, after clean, the format is "<  :"
+      //
+      SetUnicodeMem (&OptionString[1], 2, L' ');
+    } else if ((Statement->Flags & EFI_QF_DATE_DAY_SUPPRESS) && (MenuOption->Sequence == 1)) {
+      //
+      // At this point, only "**:" in the optionstring. 
+      // Clean the month's "**" field, after clean, the format is "  :"
+      //                
+      SetUnicodeMem (&OptionString[0], 2, L' ');
+    } else if ((Statement->Flags & EFI_QF_DATE_YEAR_SUPPRESS) && (MenuOption->Sequence == 2)) {
+      //
+      // At this point, only "****>" in the optionstring. 
+      // Clean the year's "****" field, after clean, the format is "  >"
+      //                
+      SetUnicodeMem (&OptionString[0], 4, L' ');
+    }
+  } else if (Statement->Operand == EFI_IFR_TIME_OP) {
+    //
+    // OptionString format is: <**:  **:    **>
+    //                        |hour|minute|second|
+    //                          4     3      3
+    //
+    if ((Statement->Flags & QF_TIME_HOUR_SUPPRESS) && (MenuOption->Sequence == 0)) {
+      //
+      // At this point, only "<**:" in the optionstring. 
+      // Clean the hour's ** field, after clean, the format is "<  :"
+      //
+      SetUnicodeMem (&OptionString[1], 2, L' ');
+    } else if ((Statement->Flags & QF_TIME_MINUTE_SUPPRESS) && (MenuOption->Sequence == 1)) {
+      //
+      // At this point, only "**:" in the optionstring. 
+      // Clean the minute's "**" field, after clean, the format is "  :"
+      //                
+      SetUnicodeMem (&OptionString[0], 2, L' ');
+    } else if ((Statement->Flags & QF_TIME_SECOND_SUPPRESS) && (MenuOption->Sequence == 2)) {
+      //
+      // At this point, only "**>" in the optionstring. 
+      // Clean the second's "**" field, after clean, the format is "  >"
+      //                
+      SetUnicodeMem (&OptionString[0], 2, L' ');
+    }
+  }
+}
 
 /**
   Refresh question.
@@ -336,7 +432,6 @@ RefreshQuestion (
   )
 {
   CHAR16                          *OptionString;
-  UINTN                           Index;
   EFI_STATUS                      Status;
   UI_MENU_SELECTION               *Selection;
   FORM_BROWSER_STATEMENT          *Question;
@@ -354,12 +449,6 @@ RefreshQuestion (
 
   if (OptionString != NULL) {
     //
-    // If leading spaces on OptionString - remove the spaces
-    //
-    for (Index = 0; OptionString[Index] == L' '; Index++)
-      ;
-
-    //
     // If old Text is longer than new string, need to clean the old string before paint the newer.
     // This option is no need for time/date opcode, because time/data opcode has fixed string length.
     //
@@ -375,7 +464,8 @@ RefreshQuestion (
     }
 
     gST->ConOut->SetAttribute (gST->ConOut, MenuRefreshEntry->CurrentAttribute);
-    PrintStringAt (MenuRefreshEntry->CurrentColumn, MenuRefreshEntry->CurrentRow, &OptionString[Index]);
+    ProcessStringForDateTime(MenuRefreshEntry->MenuOption, OptionString, FALSE);
+    PrintStringAt (MenuRefreshEntry->CurrentColumn, MenuRefreshEntry->CurrentRow, OptionString);
     FreePool (OptionString);
   }
 
@@ -1993,7 +2083,6 @@ UiDisplayMenu (
   UINTN                           BottomRow;
   UINTN                           OriginalRow;
   UINTN                           Index;
-  UINT32                          Count;
   UINT16                          Width;
   CHAR16                          *StringPtr;
   CHAR16                          *OptionString;
@@ -2235,19 +2324,7 @@ UiDisplayMenu (
 
           if (OptionString != NULL) {
             if (Statement->Operand == EFI_IFR_DATE_OP || Statement->Operand == EFI_IFR_TIME_OP) {
-              //
-              // If leading spaces on OptionString - remove the spaces
-              //
-              for (Index = 0; OptionString[Index] == L' '; Index++) {
-                MenuOption->OptCol++;
-              }
-
-              for (Count = 0; OptionString[Index] != CHAR_NULL; Index++) {
-                OptionString[Count] = OptionString[Index];
-                Count++;
-              }
-
-              OptionString[Count] = CHAR_NULL;
+              ProcessStringForDateTime(MenuOption, OptionString, TRUE);
             }
 
             Width       = (UINT16) gOptionBlockWidth;
@@ -2554,18 +2631,7 @@ UiDisplayMenu (
             if ((MenuOption->ThisTag->Operand == EFI_IFR_DATE_OP) ||
                 (MenuOption->ThisTag->Operand == EFI_IFR_TIME_OP)
                ) {
-              //
-              // If leading spaces on OptionString - remove the spaces
-              //
-              for (Index = 0; OptionString[Index] == L' '; Index++)
-                ;
-
-              for (Count = 0; OptionString[Index] != CHAR_NULL; Index++) {
-                OptionString[Count] = OptionString[Index];
-                Count++;
-              }
-
-              OptionString[Count] = CHAR_NULL;
+              ProcessStringForDateTime(MenuOption, OptionString, FALSE);
             }
 
             Width               = (UINT16) gOptionBlockWidth;
@@ -2664,18 +2730,7 @@ UiDisplayMenu (
         ProcessOptions (Selection, MenuOption, FALSE, &OptionString);
         if (OptionString != NULL) {
           if (Statement->Operand == EFI_IFR_DATE_OP || Statement->Operand == EFI_IFR_TIME_OP) {
-            //
-            // If leading spaces on OptionString - remove the spaces
-            //
-            for (Index = 0; OptionString[Index] == L' '; Index++)
-              ;
-
-            for (Count = 0; OptionString[Index] != CHAR_NULL; Index++) {
-              OptionString[Count] = OptionString[Index];
-              Count++;
-            }
-
-            OptionString[Count] = CHAR_NULL;
+            ProcessStringForDateTime(MenuOption, OptionString, FALSE);
           }
           Width               = (UINT16) gOptionBlockWidth;
 

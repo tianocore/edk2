@@ -699,7 +699,7 @@ ProcessOptions (
 
       case 2:
         SetUnicodeMem (OptionString[0], 7, L' ');
-        UnicodeSPrint (OptionString[0] + 7, 21 * sizeof (CHAR16), L"%4d", QuestionValue->Value.date.Year);
+        UnicodeSPrint (OptionString[0] + 7, 21 * sizeof (CHAR16), L"%04d", QuestionValue->Value.date.Year);
         *(OptionString[0] + 11) = RIGHT_NUMERIC_DELIMITER;
         break;
       }
