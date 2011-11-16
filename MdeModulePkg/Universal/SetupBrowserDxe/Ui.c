@@ -2485,6 +2485,10 @@ UiDisplayMenu (
 
           if (Link != NewPos || Index > BottomRow || (Link == NewPos && SavedMenuOption->Row + SavedMenuOption->Skip - 1 > BottomRow)) {
             //
+            // Find the MenuOption which has the skip value for Date/Time opcode. 
+            //
+            AdjustDateAndTimePosition(FALSE, &NewPos);
+            //
             // NewPos is not in the current page, simply scroll page so that NewPos is in the end of the page
             //
             SavedMenuOption = MENU_OPTION_FROM_LINK (NewPos);
