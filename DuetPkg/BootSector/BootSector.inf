@@ -1,6 +1,6 @@
 ## @file
 # 
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials                          
 # are licensed and made available under the terms and conditions of the BSD License         
 # which accompanies this distribution.  The full text of the license may be found at        
@@ -60,4 +60,20 @@
   efi32.asm    | INTEL
   efi32.asm    | MSFT
   efi32.S      | GCC
+
+  start64.asm  | INTEL
+  start64.asm  | MSFT
+  start64.S    | GCC
+
+  st16_64.asm  | INTEL
+  st16_64.asm  | MSFT
+  st16_64.S    | GCC
+
+  st32_64.asm  | INTEL
+  st32_64.asm  | MSFT
+  st32_64.S    | GCC
+
+  efi64.asm    | INTEL
+  efi64.asm    | MSFT
+  efi64.S      | GCC
 

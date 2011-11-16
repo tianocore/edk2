@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;*
-;*   Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+;*   Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 ;*   This program and the accompanying materials                          
 ;*   are licensed and made available under the terms and conditions of the BSD License         
 ;*   which accompanies this distribution.  The full text of the license may be found at        
@@ -408,7 +408,7 @@ Timeout8042:
 
 
 A20GateEnabled:
-
+        mov     bx,0008h                    ; Flat data descriptor
 ;
 ; DISABLE INTERRUPTS - Entering Protected Mode
 ;
@@ -429,11 +429,6 @@ A20GateEnabled:
         mov     eax,cr0
         or      al,1
         mov     cr0,eax
-
-        mov eax,0008h                       ; Flat data descriptor
-        mov ebp,000400000h                  ; Destination of EFILDR32
-        mov ebx,000070000h                  ; Length of copy
-        
 JUMP:
 ; jmp far 0010:00020000
         db  066h
