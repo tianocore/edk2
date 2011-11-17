@@ -206,6 +206,8 @@ PcRtcInit (
     Time.Month  = RTC_INIT_MONTH;
     Time.Year   = RTC_INIT_YEAR;
     Time.Nanosecond  = 0;
+    Time.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
+    Time.Daylight = 0;
   }
 
   //
