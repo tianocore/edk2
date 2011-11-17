@@ -1,7 +1,7 @@
 /** @file
   PI PEI master include file. This file should match the PI spec.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -12,7 +12,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  PI Version 1.0.
+  PI Version 1.2.
 
 **/
 
@@ -720,7 +720,7 @@ EFI_STATUS
 // PEI Specification Revision information
 //
 #define PEI_SPECIFICATION_MAJOR_REVISION  1
-#define PEI_SPECIFICATION_MINOR_REVISION  10
+#define PEI_SPECIFICATION_MINOR_REVISION  20
 ///
 /// Specification inconsistency here: 
 /// In the PI1.0 spec, PEI_SERVICES_SIGNATURE is defined as 0x5652455320494550. But 

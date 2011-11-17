@@ -1,7 +1,7 @@
 /** @file
   Include file matches things in PI.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -11,7 +11,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  PI Version 1.0
+  PI Version 1.2
 
 **/
 
@@ -654,8 +654,10 @@ EFI_STATUS
 //
 // DXE Services Table
 //
-#define DXE_SERVICES_SIGNATURE  0x565245535f455844ULL
-#define DXE_SERVICES_REVISION   ((1<<16) | (00))
+#define DXE_SERVICES_SIGNATURE            0x565245535f455844ULL
+#define DXE_SPECIFICATION_MAJOR_REVISION  1
+#define DXE_SPECIFICATION_MINOR_REVISION  20
+#define DXE_SERVICES_REVISION             ((DXE_SPECIFICATION_MAJOR_REVISION<<16) | (DXE_SPECIFICATION_MINOR_REVISION))
 
 typedef struct {
   ///
