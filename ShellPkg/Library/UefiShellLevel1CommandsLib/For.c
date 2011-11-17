@@ -42,7 +42,7 @@ ShellIsValidForNumber (
   }
 
   if (StrLen(Number) >= 7) {
-    if (StrStr(Number, L" ") != NULL && (StrStr(Number, L" ") - Number) >= 7) {
+    if ((StrStr(Number, L" ") == NULL) || (((StrStr(Number, L" ") != NULL) && (StrStr(Number, L" ") - Number) >= 7))) {
       return (FALSE);
     }
   }
