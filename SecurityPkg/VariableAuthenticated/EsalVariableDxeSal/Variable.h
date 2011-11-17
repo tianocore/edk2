@@ -30,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/EventGroup.h>
 
 #include <Library/PcdLib.h>
+#include <Library/HobLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
@@ -491,6 +492,14 @@ IsValidVariableHeader (
   IN  VARIABLE_GLOBAL        *Global,
   IN  UINTN                  Instance,
   OUT VARIABLE_HEADER        *VariableHeader  OPTIONAL
+  );
+
+/**
+  Flush the HOB variable to NV variable storage.
+**/
+VOID
+FlushHob2Nv (
+  VOID
   );
 
 #endif

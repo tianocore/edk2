@@ -57,6 +57,7 @@
   PcdLib
   ExtendedSalLib
   BaseCryptLib
+  HobLib
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL SOMETIMES_CONSUMED

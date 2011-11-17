@@ -223,6 +223,8 @@ VariableServiceInitialize (
   Status = AutenticatedVariableServiceInitialize ();
   ASSERT_EFI_ERROR (Status);
 
+  FlushHob2Nv ();
+
   //
   // Register All the Functions with Extended SAL Variable Services Class
   //

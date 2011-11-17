@@ -2939,6 +2939,58 @@ ReclaimForOS(
 }
 
 /**
+  Flush the HOB variable to NV variable storage.
+**/
+VOID
+FlushHob2Nv (
+  VOID
+  )
+{
+  EFI_STATUS                      Status;
+  VOID                            *GuidHob;
+  VARIABLE_STORE_HEADER           *VariableStoreHeader;
+  VARIABLE_HEADER                 *VariableHeader;
+  //
+  // Get HOB variable store.
+  //
+  GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
+  if (GuidHob != NULL) {
+    VariableStoreHeader = (VARIABLE_STORE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
+    if (CompareGuid (&VariableStoreHeader->Signature, &gEfiAuthenticatedVariableGuid) &&
+        (VariableStoreHeader->Format == VARIABLE_STORE_FORMATTED) &&
+        (VariableStoreHeader->State == VARIABLE_STORE_HEALTHY)
+       ) {
+      DEBUG ((EFI_D_INFO, "HOB Variable Store appears to be valid.\n"));
+      //
+      // Flush the HOB variable to NV Variable storage.
+      //
+      for ( VariableHeader = (VARIABLE_HEADER *) HEADER_ALIGN (VariableStoreHeader + 1)
+          ; (VariableHeader < (VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) VariableStoreHeader + VariableStoreHeader->Size)
+            &&
+            (VariableHeader->StartId == VARIABLE_DATA))
+          ; VariableHeader = (VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) (VariableHeader + 1)
+                           + VariableHeader->NameSize + GET_PAD_SIZE (VariableHeader->NameSize)
+                           + VariableHeader->DataSize + GET_PAD_SIZE (VariableHeader->DataSize)
+                           )
+          ) {
+        ASSERT (VariableHeader->State == VAR_ADDED);
+        ASSERT ((VariableHeader->Attributes & EFI_VARIABLE_NON_VOLATILE) != 0);
+        Status = EsalSetVariable (
+                   (CHAR16 *) (VariableHeader + 1),
+                   &VariableHeader->VendorGuid,
+                   VariableHeader->Attributes,
+                   VariableHeader->DataSize,
+                   (UINT8 *) (VariableHeader + 1) + VariableHeader->NameSize + GET_PAD_SIZE (VariableHeader->NameSize),
+                   Physical,
+                   mVariableModuleGlobal
+                   );
+        ASSERT_EFI_ERROR (Status);
+      }
+    }
+  }
+}
+
+/**
   Initializes variable store area for non-volatile and volatile variable.
 
   This function allocates and initializes memory space for global context of ESAL
