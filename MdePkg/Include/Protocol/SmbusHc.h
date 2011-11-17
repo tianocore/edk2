@@ -2,7 +2,7 @@
   The file provides basic SMBus host controller management 
   and basic data transactions over the SMBus.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -123,10 +123,10 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SMBUS_HC_EXECUTE_OPERATION)(
   IN CONST  EFI_SMBUS_HC_PROTOCOL     *This,
-  IN CONST  EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,
-  IN CONST  EFI_SMBUS_DEVICE_COMMAND  Command,
-  IN CONST  EFI_SMBUS_OPERATION       Operation,
-  IN CONST  BOOLEAN                   PecCheck,
+  IN        EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,
+  IN        EFI_SMBUS_DEVICE_COMMAND  Command,
+  IN        EFI_SMBUS_OPERATION       Operation,
+  IN        BOOLEAN                   PecCheck,
   IN OUT    UINTN                     *Length,
   IN OUT    VOID                      *Buffer
 );
@@ -189,8 +189,8 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SMBUS_HC_PROTOCOL_ARP_DEVICE)(
   IN CONST  EFI_SMBUS_HC_PROTOCOL     *This,
-  IN CONST  BOOLEAN                   ArpAll,
-  IN CONST  EFI_SMBUS_UDID            *SmbusUdid,   OPTIONAL
+  IN        BOOLEAN                   ArpAll,
+  IN        EFI_SMBUS_UDID            *SmbusUdid,   OPTIONAL
   IN OUT    EFI_SMBUS_DEVICE_ADDRESS  *SlaveAddress OPTIONAL
 );
 
@@ -236,8 +236,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SMBUS_NOTIFY_FUNCTION)(
-  IN CONST  EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,
-  IN CONST  UINTN                     Data
+  IN        EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,
+  IN        UINTN                     Data
 );
 
 
@@ -270,9 +270,9 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SMBUS_HC_PROTOCOL_NOTIFY)(
   IN CONST  EFI_SMBUS_HC_PROTOCOL     *This,
-  IN CONST  EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,
-  IN CONST  UINTN                     Data,
-  IN CONST  EFI_SMBUS_NOTIFY_FUNCTION NotifyFunction
+  IN        EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,
+  IN        UINTN                     Data,
+  IN        EFI_SMBUS_NOTIFY_FUNCTION NotifyFunction
 );
 
 
