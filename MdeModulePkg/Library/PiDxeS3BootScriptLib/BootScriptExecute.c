@@ -1,7 +1,7 @@
 /** @file
   Interpret and execute the S3 data in S3 boot script. 
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -1199,8 +1199,18 @@ BootScriptExecuteInformation (
   )
 
 {
-  UINT8 Index;
-  for (Index = 0; Index < 10; Index++);
+  UINT32                        Index;
+  EFI_BOOT_SCRIPT_INFORMATION   Information;
+
+  CopyMem ((VOID*)&Information, (VOID*)Script, sizeof(Information));
+
+  DEBUG ((EFI_D_INFO, "BootScriptExecuteInformation - 0x%08x\n", (UINTN)Information.Information));
+
+  DEBUG ((EFI_D_INFO, "BootScriptInformation: "));
+  for (Index = 0; Index < Information.InformationLength; Index++) {
+    DEBUG ((EFI_D_INFO, "%02x ", *(UINT8 *)(UINTN)(Information.Information + Index)));
+  }
+  DEBUG ((EFI_D_INFO, "\n"));
 }
 /**
   calculate the mask value for 'and' and 'or' operation
