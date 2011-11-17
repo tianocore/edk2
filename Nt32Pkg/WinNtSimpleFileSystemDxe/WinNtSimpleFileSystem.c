@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2404,7 +2404,7 @@ Returns:
   //
   NewFileInfo = (EFI_FILE_INFO *) Buffer;
 
-  if (NewFileInfo->Size <= sizeof (EFI_FILE_INFO) ||
+  if ((NewFileInfo->Size <= SIZE_OF_EFI_FILE_INFO) ||
       (NewFileInfo->Attribute &~(EFI_FILE_VALID_ATTR)) ||
       (sizeof (UINTN) == 4 && NewFileInfo->Size > 0xFFFFFFFF)
       ) {
