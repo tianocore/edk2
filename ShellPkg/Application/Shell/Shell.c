@@ -1815,15 +1815,6 @@ RunScriptFileHandle (
         //
       } else {
         if (CommandLine3 != NULL && StrLen(CommandLine3) > 0) {
-          if (ShellCommandGetEchoState()) {
-            CurDir = ShellInfoObject.NewEfiShellProtocol->GetEnv(L"cwd");
-            if (CurDir != NULL && StrLen(CurDir) > 1) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_CURDIR), ShellInfoObject.HiiHandle, CurDir);
-            } else {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_SHELL), ShellInfoObject.HiiHandle);
-            }
-            ShellPrintEx(-1, -1, L"%s\r\n", CommandLine2);
-          }
           if (CommandLine3[0] == L'@') {
             //
             // We need to save the current echo state
@@ -1838,6 +1829,15 @@ RunScriptFileHandle (
             //
             ShellCommandSetEchoState(PreCommandEchoState);
           } else {
+            if (ShellCommandGetEchoState()) {
+              CurDir = ShellInfoObject.NewEfiShellProtocol->GetEnv(L"cwd");
+              if (CurDir != NULL && StrLen(CurDir) > 1) {
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_CURDIR), ShellInfoObject.HiiHandle, CurDir);
+              } else {
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_SHELL), ShellInfoObject.HiiHandle);
+              }
+              ShellPrintEx(-1, -1, L"%s\r\n", CommandLine2);
+            }
             Status = RunCommand(CommandLine3);
           }
         }
