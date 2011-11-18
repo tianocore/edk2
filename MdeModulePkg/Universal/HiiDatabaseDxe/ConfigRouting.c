@@ -654,33 +654,28 @@ InsertDefaultValue (
   for (Link = BlockData->DefaultValueEntry.ForwardLink; Link != &BlockData->DefaultValueEntry; Link = Link->ForwardLink) {
     DefaultValueArray = BASE_CR (Link, IFR_DEFAULT_DATA, Entry);
     if (DefaultValueArray->DefaultId == DefaultValueData->DefaultId) {
-      if (DefaultValueData->OpCode == EFI_IFR_DEFAULT_OP) {
+      //
+      // DEFAULT_VALUE_FROM_OPCODE has high priority, DEFAULT_VALUE_FROM_DEFAULT has low priority.
+      //
+      if (DefaultValueData->Type > DefaultValueArray->Type) {
         //
         // Update the default value array in BlockData.
         //
         DefaultValueArray->Value = DefaultValueData->Value;
-      } else if (DefaultValueArray->OpCode != EFI_IFR_DEFAULT_OP) {
-        //
-        // Update the default value array in BlockData.
-        //
-        DefaultValueArray->Value = DefaultValueData->Value;
+        DefaultValueArray->Type  = DefaultValueData->Type;
+        DefaultValueArray->Cleaned = DefaultValueData->Cleaned;
       }
-      FreePool (DefaultValueData);
       return;
-    } else if (DefaultValueArray->DefaultId > DefaultValueData->DefaultId) {
-      //
-      // Insert new default value data in the front of this default value array.
-      //
-      InsertTailList (Link, &DefaultValueData->Entry);
-      return;
-    }
+    } 
   }
 
   //
   // Insert new default value data in tail.
   //
-  InsertTailList (Link, &DefaultValueData->Entry);
-  return;
+  DefaultValueArray = AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
+  ASSERT (DefaultValueArray != NULL);
+  CopyMem (DefaultValueArray, DefaultValueData, sizeof (IFR_DEFAULT_DATA));
+  InsertTailList (Link, &DefaultValueArray->Entry);
 }
 
 /**
@@ -1001,7 +996,8 @@ ParseIfrData (
   EFI_IFR_CHECKBOX         *IfrCheckBox;
   EFI_IFR_PASSWORD         *IfrPassword;
   EFI_IFR_STRING           *IfrString;
-  IFR_DEFAULT_DATA         *DefaultData;
+  IFR_DEFAULT_DATA         DefaultData;
+  IFR_DEFAULT_DATA         *DefaultDataPtr;
   IFR_BLOCK_DATA           *BlockData;
   CHAR16                   *VarStoreName;
   UINT16                   VarOffset;
@@ -1012,6 +1008,8 @@ ParseIfrData (
   EFI_STRING               TempStr;
   UINTN                    LengthString;
   BOOLEAN                  FirstOneOfOption;
+  LIST_ENTRY               *LinkData;
+  LIST_ENTRY               *LinkDefault;
 
   LengthString     = 0;
   Status           = EFI_SUCCESS;
@@ -1019,8 +1017,9 @@ ParseIfrData (
   NameStr          = NULL;
   TempStr          = NULL;
   BlockData        = NULL;
-  DefaultData      = NULL;
+  DefaultDataPtr   = NULL;
   FirstOneOfOption = FALSE;
+  ZeroMem (&DefaultData, sizeof (IFR_DEFAULT_DATA));
 
   //
   // Go through the form package to parse OpCode one by one.
@@ -1158,14 +1157,14 @@ ParseIfrData (
       //
       // Add new the map between default id and default name.
       //
-      DefaultData = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
-      if (DefaultData == NULL) {
+      DefaultDataPtr = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
+      if (DefaultDataPtr == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
-      DefaultData->DefaultId   = ((EFI_IFR_DEFAULTSTORE *) IfrOpHdr)->DefaultId;
-      InsertTailList (&DefaultIdArray->Entry, &DefaultData->Entry);
-      DefaultData = NULL;
+      DefaultDataPtr->DefaultId   = ((EFI_IFR_DEFAULTSTORE *) IfrOpHdr)->DefaultId;
+      InsertTailList (&DefaultIdArray->Entry, &DefaultDataPtr->Entry);
+      DefaultDataPtr = NULL;
       break;
 
     case EFI_IFR_FORM_OP:
@@ -1251,43 +1250,32 @@ ParseIfrData (
         //
         // Numeric minimum value will be used as default value when no default is specified. 
         //
-
-        //
-        // Set standard ID
-        //
-        VarDefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
-        //
-        // Prepare new DefaultValue
-        //
-        DefaultData = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
-        if (DefaultData == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto Done;
-        }
-        DefaultData->OpCode      = IfrOpHdr->OpCode;
-        DefaultData->DefaultId   = VarDefaultId;
-
+        DefaultData.Type        = DEFAULT_VALUE_FROM_DEFAULT;
         switch (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE) {
         case EFI_IFR_NUMERIC_SIZE_1:
-          DefaultData->Value = (UINT64) IfrOneOf->data.u8.MinValue;
+          DefaultData.Value = (UINT64) IfrOneOf->data.u8.MinValue;
           break;
   
         case EFI_IFR_NUMERIC_SIZE_2:
-          CopyMem (&DefaultData->Value, &IfrOneOf->data.u16.MinValue, sizeof (UINT16));
+          CopyMem (&DefaultData.Value, &IfrOneOf->data.u16.MinValue, sizeof (UINT16));
           break;
   
         case EFI_IFR_NUMERIC_SIZE_4:
-          CopyMem (&DefaultData->Value, &IfrOneOf->data.u32.MinValue, sizeof (UINT32));
+          CopyMem (&DefaultData.Value, &IfrOneOf->data.u32.MinValue, sizeof (UINT32));
           break;
   
         case EFI_IFR_NUMERIC_SIZE_8:
-          CopyMem (&DefaultData->Value, &IfrOneOf->data.u64.MinValue, sizeof (UINT64));
+          CopyMem (&DefaultData.Value, &IfrOneOf->data.u64.MinValue, sizeof (UINT64));
           break;
         }
         //
-        // Add DefaultValue into current BlockData
-        //
-        InsertDefaultValue (BlockData, DefaultData);      
+        // Set default value base on the DefaultId list get from IFR data.
+        //        
+        for (LinkData = DefaultIdArray->Entry.ForwardLink; LinkData != &DefaultIdArray->Entry; LinkData = LinkData->ForwardLink) {
+          DefaultDataPtr = BASE_CR (LinkData, IFR_DEFAULT_DATA, Entry);     
+          DefaultData.DefaultId   = DefaultDataPtr->DefaultId;
+          InsertDefaultValue (BlockData, &DefaultData);
+        }
       }
       break;
 
@@ -1411,28 +1399,24 @@ ParseIfrData (
       //
       // Prepare new DefaultValue
       //
-      DefaultData = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
-      if (DefaultData == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto Done;
-      }
-      DefaultData->OpCode      = IfrOpHdr->OpCode;
-      DefaultData->DefaultId   = VarDefaultId;
+      DefaultData.DefaultId   = VarDefaultId;
       if ((IfrCheckBox->Flags & EFI_IFR_CHECKBOX_DEFAULT) == EFI_IFR_CHECKBOX_DEFAULT) {
         //
         // When flag is set, defautl value is TRUE.
         //
-        DefaultData->Value    = 1;
+        DefaultData.Type     = DEFAULT_VALUE_FROM_FLAG;
+        DefaultData.Value    = 1;
       } else {
         //
         // When flag is not set, defautl value is FASLE.
         //
-        DefaultData->Value    = 0;
+        DefaultData.Type     = DEFAULT_VALUE_FROM_DEFAULT;
+        DefaultData.Value    = 0;
       }
       //
       // Add DefaultValue into current BlockData
       //
-      InsertDefaultValue (BlockData, DefaultData);
+      InsertDefaultValue (BlockData, &DefaultData);
 
       //
       // Add default value for Manufacture ID by CheckBox Flag
@@ -1441,28 +1425,24 @@ ParseIfrData (
       //
       // Prepare new DefaultValue
       //
-      DefaultData = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
-      if (DefaultData == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto Done;
-      }
-      DefaultData->OpCode      = IfrOpHdr->OpCode;
-      DefaultData->DefaultId   = VarDefaultId;
+      DefaultData.DefaultId   = VarDefaultId;
       if ((IfrCheckBox->Flags & EFI_IFR_CHECKBOX_DEFAULT_MFG) == EFI_IFR_CHECKBOX_DEFAULT_MFG) {
         //
         // When flag is set, defautl value is TRUE.
         //
-        DefaultData->Value    = 1;
+        DefaultData.Type     = DEFAULT_VALUE_FROM_FLAG;
+        DefaultData.Value    = 1;
       } else {
         //
         // When flag is not set, defautl value is FASLE.
         //
-        DefaultData->Value    = 0;
+        DefaultData.Type     = DEFAULT_VALUE_FROM_DEFAULT;        
+        DefaultData.Value    = 0;
       }
       //
       // Add DefaultValue into current BlockData
       //
-      InsertDefaultValue (BlockData, DefaultData);
+      InsertDefaultValue (BlockData, &DefaultData);
       break;
 
     case EFI_IFR_STRING_OP:
@@ -1671,54 +1651,51 @@ ParseIfrData (
         break;
       }
 
+      //
+      // 1. Set default value for OneOf option when flag field has default attribute.
+      //
       if (((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT) == EFI_IFR_OPTION_DEFAULT) ||
-          (BlockData->OpCode == EFI_IFR_ONE_OF_OP && FirstOneOfOption)) {
+          ((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT_MFG) == EFI_IFR_OPTION_DEFAULT_MFG)) {
         //
         // This flag is used to specify whether this option is the first. Set it to FALSE for the following options. 
         // The first oneof option value will be used as default value when no default value is specified. 
         //
         FirstOneOfOption = FALSE;
-        //
-        // Set standard ID to Manufacture ID
-        //
-        VarDefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
-        //
+        
         // Prepare new DefaultValue
         //
-        DefaultData = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
-        if (DefaultData == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto Done;
+        DefaultData.Type  = DEFAULT_VALUE_FROM_FLAG;
+        DefaultData.Value = IfrOneOfOption->Value.u64;
+        if ((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT) == EFI_IFR_OPTION_DEFAULT) {
+          DefaultData.DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
+          InsertDefaultValue (BlockData, &DefaultData);
+        } 
+        if ((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT_MFG) == EFI_IFR_OPTION_DEFAULT_MFG) {
+          DefaultData.DefaultId = EFI_HII_DEFAULT_CLASS_MANUFACTURING;
+          InsertDefaultValue (BlockData, &DefaultData);
         }
-        DefaultData->OpCode      = IfrOpHdr->OpCode;
-        DefaultData->DefaultId   = VarDefaultId;
-        DefaultData->Value       = IfrOneOfOption->Value.u64;
-        //
-        // Add DefaultValue into current BlockData
-        //
-        InsertDefaultValue (BlockData, DefaultData);
-      }
 
-      if ((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT_MFG) == EFI_IFR_OPTION_DEFAULT_MFG) {
-        //
-        // Set default ID to Manufacture ID
-        //
-        VarDefaultId = EFI_HII_DEFAULT_CLASS_MANUFACTURING;
+        
+      }
+      
+      //
+      // 2. Set as the default value when this is the first option.
+      // The first oneof option value will be used as default value when no default value is specified. 
+      //
+      if (FirstOneOfOption) {
+        // This flag is used to specify whether this option is the first. Set it to FALSE for the following options. 
+        FirstOneOfOption = FALSE;
+        
         //
         // Prepare new DefaultValue
-        //
-        DefaultData = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
-        if (DefaultData == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto Done;
-        }
-        DefaultData->OpCode      = IfrOpHdr->OpCode;
-        DefaultData->DefaultId   = VarDefaultId;
-        DefaultData->Value       = IfrOneOfOption->Value.u64;
-        //
-        // Add DefaultValue into current BlockData
-        //
-        InsertDefaultValue (BlockData, DefaultData);
+        //        
+        DefaultData.Type        = DEFAULT_VALUE_FROM_DEFAULT;
+        DefaultData.Value       = IfrOneOfOption->Value.u64;        
+        for (LinkData = DefaultIdArray->Entry.ForwardLink; LinkData != &DefaultIdArray->Entry; LinkData = LinkData->ForwardLink) {
+          DefaultDataPtr = BASE_CR (LinkData, IFR_DEFAULT_DATA, Entry); 
+          DefaultData.DefaultId   = DefaultDataPtr->DefaultId;
+          InsertDefaultValue (BlockData, &DefaultData);
+        }        
       }
       break;
 
@@ -1747,18 +1724,25 @@ ParseIfrData (
       //
       // Prepare new DefaultValue
       //
-      DefaultData = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
-      if (DefaultData == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto Done;
+      DefaultData.Type        = DEFAULT_VALUE_FROM_OPCODE;
+      DefaultData.DefaultId   = VarDefaultId;
+      DefaultData.Value       = IfrDefault->Value.u64;  
+      
+      // If the value field is expression, set the cleaned flag.
+      if (IfrDefault->Type ==  EFI_IFR_TYPE_OTHER) {
+        DefaultData.Cleaned = TRUE;
       }
-      DefaultData->OpCode      = IfrOpHdr->OpCode;
-      DefaultData->DefaultId   = VarDefaultId;
-      DefaultData->Value       = IfrDefault->Value.u64;
       //
       // Add DefaultValue into current BlockData
       //
-      InsertDefaultValue (BlockData, DefaultData);
+      InsertDefaultValue (BlockData, &DefaultData);
+       
+      //
+      // After insert the default value, reset the cleaned value for next 
+      // time used. If not set here, need to set the value before everytime 
+      // use it.
+      //
+      DefaultData.Cleaned     = FALSE;
       break;
     case EFI_IFR_END_OP:
       //
@@ -1779,6 +1763,18 @@ ParseIfrData (
   }
 
 Done:
+  for (LinkData = VarStorageData->BlockEntry.ForwardLink; LinkData != &VarStorageData->BlockEntry; LinkData = LinkData->ForwardLink) {
+    BlockData = BASE_CR (LinkData, IFR_BLOCK_DATA, Entry);
+    for (LinkDefault = BlockData->DefaultValueEntry.ForwardLink; LinkDefault != &BlockData->DefaultValueEntry; ) {
+      DefaultDataPtr = BASE_CR (LinkDefault, IFR_DEFAULT_DATA, Entry);
+      LinkDefault = LinkDefault->ForwardLink;
+      if (DefaultDataPtr->Cleaned == TRUE) {
+        RemoveEntryList (&DefaultDataPtr->Entry);
+        FreePool (DefaultDataPtr);
+      }
+    }
+  }
+
   return Status;  
 }
 

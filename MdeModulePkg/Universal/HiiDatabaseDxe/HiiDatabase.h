@@ -80,9 +80,21 @@ typedef struct {
   LIST_ENTRY          DefaultValueEntry; // Link to its default value array
 } IFR_BLOCK_DATA;
 
+//
+// Get default value from IFR data.
+//
+typedef enum {
+  DEFAULT_VALUE_FROM_DEFAULT = 0,   // Get from the minimum or first one when not set default value.
+  DEFAULT_VALUE_FROM_FLAG,          // Get default value from the defalut flag.
+  DEFAULT_VALUE_FROM_OPCODE         // Get default value from default opcode, highest priority.
+} DEFAULT_VALUE_TYPE;
+
 typedef struct {
   LIST_ENTRY          Entry;
-  UINT8               OpCode;
+  DEFAULT_VALUE_TYPE  Type;
+  BOOLEAN             Cleaned;       // Whether this value is cleaned
+                                     // TRUE  Cleaned, the value can't be used
+                                     // FALSE Not cleaned, the value can  be used.
   UINT16              DefaultId;
   UINT64              Value;
 } IFR_DEFAULT_DATA;
