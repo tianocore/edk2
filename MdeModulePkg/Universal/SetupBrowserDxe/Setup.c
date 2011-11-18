@@ -1234,7 +1234,19 @@ GetQuestionValue (
   if (Question->ValueExpression != NULL) {
     Status = EvaluateExpression (FormSet, Form, Question->ValueExpression);
     if (!EFI_ERROR (Status)) {
-      CopyMem (&Question->HiiValue, &Question->ValueExpression->Result, sizeof (EFI_HII_VALUE));
+      if (Question->ValueExpression->Result.Type == EFI_IFR_TYPE_BUFFER) {
+        ASSERT (Question->HiiValue.Type == EFI_IFR_TYPE_BUFFER && Question->HiiValue.Buffer != NULL);
+        if (Question->StorageWidth > Question->ValueExpression->Result.BufferLen) {
+          CopyMem (Question->HiiValue.Buffer, Question->ValueExpression->Result.Buffer, Question->ValueExpression->Result.BufferLen);
+          Question->HiiValue.BufferLen = Question->ValueExpression->Result.BufferLen;
+        } else {
+          CopyMem (Question->HiiValue.Buffer, Question->ValueExpression->Result.Buffer, Question->StorageWidth);
+          Question->HiiValue.BufferLen = Question->StorageWidth;
+        }
+        FreePool (Question->ValueExpression->Result.Buffer);
+      }
+      Question->HiiValue.Type = Question->ValueExpression->Result.Type;
+      CopyMem (&Question->HiiValue.Value, &Question->ValueExpression->Result.Value, sizeof (EFI_IFR_TYPE_VALUE));      
     }
     return Status;
   }
@@ -1244,11 +1256,24 @@ GetQuestionValue (
   //
   if (Question->ReadExpression != NULL && Form->FormType == STANDARD_MAP_FORM_TYPE) {
     Status = EvaluateExpression (FormSet, Form, Question->ReadExpression);
-    if (!EFI_ERROR (Status) && (Question->ReadExpression->Result.Type < EFI_IFR_TYPE_OTHER)) {
+    if (!EFI_ERROR (Status) && 
+      ((Question->ReadExpression->Result.Type < EFI_IFR_TYPE_OTHER) || (Question->ReadExpression->Result.Type == EFI_IFR_TYPE_BUFFER))) {
       //
       // Only update question value to the valid result.
       //
-      CopyMem (&Question->HiiValue, &Question->ReadExpression->Result, sizeof (EFI_HII_VALUE));
+      if (Question->ReadExpression->Result.Type == EFI_IFR_TYPE_BUFFER) {
+        ASSERT (Question->HiiValue.Type == EFI_IFR_TYPE_BUFFER && Question->HiiValue.Buffer != NULL);
+        if (Question->StorageWidth > Question->ReadExpression->Result.BufferLen) {
+          CopyMem (Question->HiiValue.Buffer, Question->ReadExpression->Result.Buffer, Question->ReadExpression->Result.BufferLen);
+          Question->HiiValue.BufferLen = Question->ReadExpression->Result.BufferLen;
+        } else {
+          CopyMem (Question->HiiValue.Buffer, Question->ReadExpression->Result.Buffer, Question->StorageWidth);
+          Question->HiiValue.BufferLen = Question->StorageWidth;
+        }
+        FreePool (Question->ReadExpression->Result.Buffer);
+      }
+      Question->HiiValue.Type = Question->ReadExpression->Result.Type;
+      CopyMem (&Question->HiiValue.Value, &Question->ReadExpression->Result.Value, sizeof (EFI_IFR_TYPE_VALUE));       
       return EFI_SUCCESS;
     }
   }
@@ -2795,7 +2820,19 @@ GetQuestionDefault (
             return Status;
           }
 
-          CopyMem (HiiValue, &Default->ValueExpression->Result, sizeof (EFI_HII_VALUE));
+          if (Default->ValueExpression->Result.Type == EFI_IFR_TYPE_BUFFER) {
+            ASSERT (HiiValue->Type == EFI_IFR_TYPE_BUFFER && Question->BufferValue != NULL);
+            if (Question->StorageWidth > Default->ValueExpression->Result.BufferLen) {
+              CopyMem (Question->HiiValue.Buffer, Default->ValueExpression->Result.Buffer, Default->ValueExpression->Result.BufferLen);
+              Question->HiiValue.BufferLen = Default->ValueExpression->Result.BufferLen;
+            } else {
+              CopyMem (Question->HiiValue.Buffer, Default->ValueExpression->Result.Buffer, Question->StorageWidth);
+              Question->HiiValue.BufferLen = Question->StorageWidth;
+            }
+            FreePool (Default->ValueExpression->Result.Buffer);
+          }
+          HiiValue->Type = Default->ValueExpression->Result.Type;
+          CopyMem (&HiiValue->Value, &Default->ValueExpression->Result.Value, sizeof (EFI_IFR_TYPE_VALUE));       
         } else {
           //
           // Default value is embedded in EFI_IFR_DEFAULT

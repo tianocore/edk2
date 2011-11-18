@@ -1841,6 +1841,10 @@ ParseOpCodes (
         CurrentStatement->StorageWidth = (UINT16) (CurrentStatement->MaxContainers * Width);
         CurrentStatement->BufferValue = AllocateZeroPool (CurrentStatement->StorageWidth);
         CurrentStatement->ValueType = CurrentOption->Value.Type;
+        if (CurrentStatement->HiiValue.Type == EFI_IFR_TYPE_BUFFER) {
+          CurrentStatement->HiiValue.Buffer = CurrentStatement->BufferValue;
+          CurrentStatement->HiiValue.BufferLen = CurrentStatement->StorageWidth;
+        }
 
         InitializeRequestElement (FormSet, CurrentStatement, CurrentForm);
       }

@@ -198,6 +198,8 @@ typedef struct {
 
 typedef struct {
   UINT8               Type;
+  UINT8               *Buffer;
+  UINT16              BufferLen;
   EFI_IFR_TYPE_VALUE  Value;
 } EFI_HII_VALUE;
 
