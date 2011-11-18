@@ -324,13 +324,13 @@ ValidateAndMoveFiles(
     // construct the new file info block
     //
     NewSize = StrSize(DestPath);
-    NewSize += StrSize(Node->FileName) + sizeof(EFI_FILE_INFO) + sizeof(CHAR16);
+    NewSize += StrSize(Node->FileName) + SIZE_OF_EFI_FILE_INFO + sizeof(CHAR16);
     NewFileInfo = AllocateZeroPool(NewSize);
     if (NewFileInfo == NULL) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellLevel2HiiHandle);
       ShellStatus = SHELL_OUT_OF_RESOURCES;
     } else {
-      CopyMem(NewFileInfo, Node->Info, sizeof(EFI_FILE_INFO));
+      CopyMem(NewFileInfo, Node->Info, SIZE_OF_EFI_FILE_INFO);
       if (DestPath[0] != L'\\') {
         StrCpy(NewFileInfo->FileName, L"\\");
         StrCat(NewFileInfo->FileName, DestPath);
@@ -350,7 +350,7 @@ ValidateAndMoveFiles(
         }
         StrCat(NewFileInfo->FileName, Node->FileName);
       }
-      NewFileInfo->Size = sizeof(EFI_FILE_INFO) + StrSize(NewFileInfo->FileName);
+      NewFileInfo->Size = SIZE_OF_EFI_FILE_INFO + StrSize(NewFileInfo->FileName);
       ShellPrintEx(-1, -1, HiiOutput, Node->FullName, NewFileInfo->FileName);
 
       if (!EFI_ERROR(ShellFileExists(NewFileInfo->FileName))) {
