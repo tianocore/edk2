@@ -205,7 +205,8 @@ typedef struct {
   ///
   /// An array of GUIDs, each GUID representing an OEM file type.
   /// 
-  EFI_GUID  Types[1];
+  /// EFI_GUID  Types[1];
+  ///
 } EFI_FIRMWARE_VOLUME_EXT_ENTRY_OEM_TYPE;
 
 #define EFI_FV_EXT_TYPE_GUID_TYPE 0x0002
@@ -226,7 +227,8 @@ typedef struct {
   ///
   /// An arry of bytes of length Length.
   ///
-  UINT8                             Data[1];
+  /// UINT8                             Data[1];
+  ///
 } EFI_FIRMWARE_VOLUME_EXT_ENTRY_GUID_TYPE;
 
 #endif
