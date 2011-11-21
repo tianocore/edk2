@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -70,13 +70,8 @@ MISC_SMBIOS_TABLE_FUNCTION(SystemLanguageString)
   //
   // Now we have got the full smbios record, call smbios protocol to add this record.
   //
-  SmbiosHandle = 0;
-  Status = Smbios-> Add(
-                      Smbios, 
-                      NULL,
-                      &SmbiosHandle, 
-                      (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
-                      );
+  Status = AddSmbiosRecord (Smbios, &SmbiosHandle, (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord);
+
   FreePool(SmbiosRecord);
   return Status;
 }

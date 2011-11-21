@@ -402,7 +402,7 @@ LogSmbiosData (
   EFI_STATUS         Status;
   EFI_SMBIOS_HANDLE  SmbiosHandle;
   
-  SmbiosHandle = 0;
+  SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
   Status = Smbios->Add (
                      Smbios,
                      NULL,

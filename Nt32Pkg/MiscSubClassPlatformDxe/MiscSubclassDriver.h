@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -102,15 +102,27 @@ extern UINTN                        mMiscSubclassDataTableEntries;
 extern UINT8                        MiscSubclassStrings[];
 extern EFI_HII_HANDLE               mHiiHandle;
 
-//
-// Prototypes
-//
-EFI_STATUS
-MiscSubclassDriverEntryPoint (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
-  );
 
+/**
+  Add an SMBIOS record.
+
+  @param  Smbios                The EFI_SMBIOS_PROTOCOL instance.
+  @param  SmbiosHandle          A unique handle will be assigned to the SMBIOS record.
+  @param  Record                The data for the fixed portion of the SMBIOS record. The format of the record is
+                                determined by EFI_SMBIOS_TABLE_HEADER.Type. The size of the formatted area is defined 
+                                by EFI_SMBIOS_TABLE_HEADER.Length and either followed by a double-null (0x0000) or 
+                                a set of null terminated strings and a null.
+
+  @retval EFI_SUCCESS           Record was added.
+  @retval EFI_OUT_OF_RESOURCES  Record was not added due to lack of system resources.
+
+**/
+EFI_STATUS
+AddSmbiosRecord (
+  IN EFI_SMBIOS_PROTOCOL        *Smbios,
+  OUT EFI_SMBIOS_HANDLE         *SmbiosHandle,
+  IN EFI_SMBIOS_TABLE_HEADER    *Record
+  );
 
 #endif /* _MISC_SUBCLASS_DRIVER_H */
 
