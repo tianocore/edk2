@@ -189,13 +189,7 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscBiosVendor)
   //
   // Now we have got the full smbios record, call smbios protocol to add this record.
   //
-  SmbiosHandle = 0;
-  Status = Smbios-> Add(
-                      Smbios,
-                      NULL,
-                      &SmbiosHandle,
-                      (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
-                      );
+  Status = AddSmbiosRecord (Smbios, &SmbiosHandle, (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord);
 
   FreePool(SmbiosRecord);
   return Status;
