@@ -266,7 +266,10 @@ PS2MouseDriverStart (
   //
   // Reset the mouse
   //
-  Status = MouseDev->SimplePointerProtocol.Reset (&MouseDev->SimplePointerProtocol, TRUE);
+  Status = MouseDev->SimplePointerProtocol.Reset (
+                     &MouseDev->SimplePointerProtocol,
+                     FeaturePcdGet (PcdPs2MouseExtendedVerification)
+                     );
   if (EFI_ERROR (Status)) {
     //
     // mouse not connected

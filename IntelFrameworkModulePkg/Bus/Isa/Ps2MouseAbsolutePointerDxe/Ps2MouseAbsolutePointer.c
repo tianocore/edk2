@@ -256,7 +256,10 @@ PS2MouseAbsolutePointerDriverStart (
   //
   // Reset the mouse
   //
-  Status = MouseAbsolutePointerDev->AbsolutePointerProtocol.Reset (&MouseAbsolutePointerDev->AbsolutePointerProtocol, TRUE);
+  Status = MouseAbsolutePointerDev->AbsolutePointerProtocol.Reset (
+                     &MouseAbsolutePointerDev->AbsolutePointerProtocol,
+                     FeaturePcdGet (PcdPs2MouseExtendedVerification)
+                     );
   if (EFI_ERROR (Status)) {
     //
     // mouse not connected
