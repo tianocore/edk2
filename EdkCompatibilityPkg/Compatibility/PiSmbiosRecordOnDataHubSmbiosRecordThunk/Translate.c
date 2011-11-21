@@ -217,7 +217,7 @@ SmbiosProcessDataRecord (
         StructureNode->SmbiosType = Conversion->SmbiosType;
       }
       
-      StructureNode->SmbiosHandle        = 0;
+      StructureNode->SmbiosHandle        = SMBIOS_HANDLE_PI_RESERVED;
       Status = SmbiosProtocolCreateRecord (
                  NULL, 
                  StructureNode
@@ -530,7 +530,7 @@ GetSmbiosBufferFromHandle (
   EFI_SMBIOS_TABLE_HEADER *RecordInSmbiosDatabase;
   EFI_STATUS              Status;
   
-  SearchingHandle = 0;
+  SearchingHandle = SMBIOS_HANDLE_PI_RESERVED;
   Smbios          = GetSmbiosProtocol();
   ASSERT (Smbios != NULL);
   
