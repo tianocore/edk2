@@ -264,7 +264,7 @@ GetAvailableSmbiosHandle (
 
   Private = SMBIOS_INSTANCE_FROM_THIS (This);
   Head = &Private->AllocatedHandleListHead;
-  for (AvailableHandle = 1; AvailableHandle < MaxSmbiosHandle; AvailableHandle++) {
+  for (AvailableHandle = 0; AvailableHandle < MaxSmbiosHandle; AvailableHandle++) {
     if (!CheckSmbiosHandleExistance(Head, AvailableHandle)) {
       *Handle = AvailableHandle;
       return EFI_SUCCESS;
@@ -281,8 +281,8 @@ GetAvailableSmbiosHandle (
   @param  This                  The EFI_SMBIOS_PROTOCOL instance.
   @param  ProducerHandle        The handle of the controller or driver associated with the SMBIOS information. NULL
                                 means no handle.
-  @param  SmbiosHandle          On entry, if non-zero, the handle of the SMBIOS record. If zero, then a unique handle
-                                will be assigned to the SMBIOS record. If the SMBIOS handle is already in use
+  @param  SmbiosHandle          On entry, the handle of the SMBIOS record to add. If FFFEh, then a unique handle
+                                will be assigned to the SMBIOS record. If the SMBIOS handle is already in use,
                                 EFI_ALREADY_STARTED is returned and the SMBIOS record is not updated.
   @param  Record                The data for the fixed portion of the SMBIOS record. The format of the record is
                                 determined by EFI_SMBIOS_TABLE_HEADER.Type. The size of the formatted area is defined 
@@ -325,14 +325,14 @@ SmbiosAdd (
   // Check whether SmbiosHandle is already in use
   //
   Head = &Private->AllocatedHandleListHead;
-  if (*SmbiosHandle != 0 && CheckSmbiosHandleExistance(Head, *SmbiosHandle)) {
+  if (*SmbiosHandle != SMBIOS_HANDLE_PI_RESERVED && CheckSmbiosHandleExistance(Head, *SmbiosHandle)) {
     return EFI_ALREADY_STARTED;
   }
 
   //
-  // when SmbiosHandle is zero, an available handle will be assigned
+  // when SmbiosHandle is 0xFFFE, an available handle will be assigned
   //
-  if (*SmbiosHandle == 0) {
+  if (*SmbiosHandle == SMBIOS_HANDLE_PI_RESERVED) {
     Status = GetAvailableSmbiosHandle(This, SmbiosHandle);
     if (EFI_ERROR(Status)) {
       return Status;
@@ -434,7 +434,7 @@ SmbiosAdd (
 
   @retval EFI_SUCCESS           SmbiosHandle had its StringNumber String updated.
   @retval EFI_INVALID_PARAMETER SmbiosHandle does not exist.
-  @retval EFI_UNSUPPORTED       String was not added since it's longer than 64 significant characters.
+  @retval EFI_UNSUPPORTED       String was not added because it is longer than the SMBIOS Table supports.
   @retval EFI_NOT_FOUND         The StringNumber.is not valid for this SMBIOS record.
 
 **/
@@ -711,8 +711,8 @@ SmbiosRemove (
 
   @param  This                  The EFI_SMBIOS_PROTOCOL instance.
   @param  SmbiosHandle          On entry, points to the previous handle of the SMBIOS record. On exit, points to the
-                                next SMBIOS record handle. If it is zero on entry, then the first SMBIOS record
-                                handle will be returned. If it returns zero on exit, then there are no more SMBIOS records.
+                                next SMBIOS record handle. If it is FFFEh on entry, then the first SMBIOS record
+                                handle will be returned. If it returns FFFEh on exit, then there are no more SMBIOS records.
   @param  Type                  On entry it means return the next SMBIOS record of type Type. If a NULL is passed in 
                                 this functionally it ignored. Type is not modified by the GetNext() function.
   @param  Record                On exit, points to the SMBIOS Record consisting of the formatted area followed by
@@ -753,9 +753,9 @@ SmbiosGetNext (
     SmbiosTableHeader = (EFI_SMBIOS_TABLE_HEADER*)(SmbiosEntry->RecordHeader + 1); 
 
     //
-    // If SmbiosHandle is zero, the first matched SMBIOS record handle will be returned
+    // If SmbiosHandle is 0xFFFE, the first matched SMBIOS record handle will be returned
     //
-    if (*SmbiosHandle == 0) {
+    if (*SmbiosHandle == SMBIOS_HANDLE_PI_RESERVED) {
       if ((Type != NULL) && (*Type != SmbiosTableHeader->Type)) {
         continue;  
       }
@@ -791,7 +791,7 @@ SmbiosGetNext (
     }
   }
 
-  *SmbiosHandle = 0;
+  *SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
   return EFI_NOT_FOUND;
   
 }
