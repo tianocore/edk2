@@ -722,7 +722,7 @@ UpdateFrontPageStrings (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  SmbiosHandle = 0;
+  SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
   do {
     Status = Smbios->GetNext (Smbios, &SmbiosHandle, NULL, &Record, NULL);
     if (EFI_ERROR(Status)) {
