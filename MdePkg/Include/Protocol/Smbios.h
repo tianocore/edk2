@@ -136,8 +136,8 @@ typedef struct _EFI_SMBIOS_PROTOCOL EFI_SMBIOS_PROTOCOL;
   
   @param[in]        This                The EFI_SMBIOS_PROTOCOL instance.
   @param[in]        ProducerHandle      The handle of the controller or driver associated with the SMBIOS information. NULL means no handle.
-  @param[in, out]   SmbiosHandle        On entry, if non-zero, the handle of the SMBIOS record. If zero, then a unique handle
-                                        will be assigned to the SMBIOS record. If the SMBIOS handle is already in use
+  @param[in, out]   SmbiosHandle        On entry, the handle of the SMBIOS record to add. If FFFEh, then a unique handle
+                                        will be assigned to the SMBIOS record. If the SMBIOS handle is already in use,
                                         EFI_ALREADY_STARTED is returned and the SMBIOS record is not updated.
   @param[in]        Record              The data for the fixed portion of the SMBIOS record. The format of the record is
                                         determined by EFI_SMBIOS_TABLE_HEADER.Type. The size of the formatted
@@ -170,7 +170,7 @@ EFI_STATUS
   
   @retval EFI_SUCCESS           SmbiosHandle had its StringNumber String updated.
   @retval EFI_INVALID_PARAMETER SmbiosHandle does not exist.
-  @retval EFI_UNSUPPORTED       String was not added since it's longer than 64 significant characters.
+  @retval EFI_UNSUPPORTED       String was not added because it is longer than the SMBIOS Table supports.
   @retval EFI_NOT_FOUND         The StringNumber.is not valid for this SMBIOS record.    
 **/
 typedef
@@ -208,8 +208,8 @@ EFI_STATUS
   
   @param[in]        This            The EFI_SMBIOS_PROTOCOL instance.
   @param[in, out]   SmbiosHandle    On entry, points to the previous handle of the SMBIOS record. On exit, points to the
-                                    next SMBIOS record handle. If it is zero on entry, then the first SMBIOS record
-                                    handle will be returned. If it returns zero on exit, then there are no more SMBIOS records.
+                                    next SMBIOS record handle. If it is FFFEh on entry, then the first SMBIOS record
+                                    handle will be returned. If it returns FFFEh on exit, then there are no more SMBIOS records.
   @param[in]        Type            On entry, it points to the type of the next SMBIOS record to return. If NULL, it
                                     indicates that the next record of any type will be returned. Type is not
                                     modified by the this function.
