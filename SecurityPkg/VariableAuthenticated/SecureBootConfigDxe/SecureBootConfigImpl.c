@@ -131,6 +131,7 @@ SecureBootExtractConfig (
   ConfigRequest    = NULL;
   Size             = 0;
   
+  ZeroMem (&Configuration, sizeof (Configuration));
   PrivateData      = SECUREBOOT_CONFIG_PRIVATE_FROM_THIS (This);
   *Progress        = Request;
   
