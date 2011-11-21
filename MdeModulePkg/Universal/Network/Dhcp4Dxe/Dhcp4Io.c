@@ -1,7 +1,7 @@
 /** @file
   EFI DHCP protocol implementation.
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,6 +37,11 @@ DhcpInitRequest (
 
   ASSERT ((DhcpSb->DhcpState == Dhcp4Init) || (DhcpSb->DhcpState == Dhcp4InitReboot));
 
+  //
+  // Clear initial time to make sure that elapsed-time is set to 0 for first Discover or REQUEST message.
+  //
+  DhcpSb->ActiveChild->ElaspedTime= 0;
+  
   if (DhcpSb->DhcpState == Dhcp4Init) {
     DhcpSetState (DhcpSb, Dhcp4Selecting, FALSE);
     Status = DhcpSendMessage (DhcpSb, NULL, NULL, DHCP_MSG_DISCOVER, NULL);
@@ -1218,6 +1223,17 @@ DhcpSendMessage (
   EFI_IP4 (Head->ClientAddr) = HTONL (DhcpSb->ClientAddr);
   CopyMem (Head->ClientHwAddr, DhcpSb->Mac.Addr, DhcpSb->HwLen);
 
+  if ((Type == DHCP_MSG_DECLINE) || (Type == DHCP_MSG_RELEASE)) {
+    Head->Seconds = 0;
+  } else if ((Type == DHCP_MSG_REQUEST) && (DhcpSb->DhcpState == Dhcp4Requesting)) {
+    //
+    // Use the same value as the original DHCPDISCOVER message.
+    //
+    Head->Seconds = DhcpSb->LastPacket->Dhcp4.Header.Seconds;
+  } else {
+    SetElapsedTime(&Head->Seconds, DhcpSb->ActiveChild);
+  }
+
   //
   // Append the DHCP message type
   //
@@ -1429,7 +1445,12 @@ DhcpRetransmit (
 
   ASSERT (DhcpSb->LastPacket != NULL);
 
-  DhcpSb->LastPacket->Dhcp4.Header.Seconds = HTONS (*(UINT16 *)(&DhcpSb->LastTimeout));
+  //
+  // For REQUEST message in Dhcp4Requesting state, do not change the secs fields.
+  //
+  if (DhcpSb->DhcpState != Dhcp4Requesting) {
+    SetElapsedTime(&DhcpSb->LastPacket->Dhcp4.Header.Seconds, DhcpSb->ActiveChild);
+  }
 
   //
   // Wrap it into a netbuf then send it.
@@ -1502,6 +1523,13 @@ DhcpOnTimerTick (
 
   DhcpSb   = (DHCP_SERVICE *) Context;
   Instance = DhcpSb->ActiveChild;
+
+  //
+  // 0xffff is the maximum supported value for elapsed time according to RFC.
+  //
+  if (Instance != NULL && Instance->ElaspedTime < 0xffff) {
+    Instance->ElaspedTime++;
+  }
   
   //
   // Check the retransmit timer
@@ -1593,6 +1621,8 @@ DhcpOnTimerTick (
         goto END_SESSION;
       }
 
+      Instance->ElaspedTime= 0;
+      
       Status = DhcpSendMessage (
                  DhcpSb,
                  DhcpSb->Selected,
@@ -1612,6 +1642,8 @@ DhcpOnTimerTick (
       if (EFI_ERROR (DhcpSetState (DhcpSb, Dhcp4Renewing, TRUE))) {
         goto END_SESSION;
       }
+
+      Instance->ElaspedTime= 0;
 
       Status = DhcpSendMessage (
                  DhcpSb,

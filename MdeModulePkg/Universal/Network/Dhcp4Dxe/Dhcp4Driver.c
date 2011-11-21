@@ -478,6 +478,7 @@ DhcpInitProtocol (
   Instance->RenewRebindEvent  = NULL;
   Instance->Token             = NULL;
   Instance->UdpIo             = NULL;
+  Instance->ElaspedTime       = 0;
   NetbufQueInit (&Instance->ResponseQueue);
 }
 

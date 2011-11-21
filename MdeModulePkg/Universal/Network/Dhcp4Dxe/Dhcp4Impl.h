@@ -6,7 +6,7 @@
   RFC 1534: Interoperation Between DHCP and BOOTP
   RFC 3396: Encoding Long Options in DHCP.
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -71,6 +71,7 @@ struct _DHCP_PROTOCOL {
   EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token;
   UDP_IO                            *UdpIo; // The UDP IO used for TransmitReceive.
   UINT32                            Timeout;
+  UINT16                            ElaspedTime;
   NET_BUF_QUEUE                     ResponseQueue;
 };
 
@@ -181,6 +182,19 @@ PxeDhcpDone (
 VOID
 DhcpCleanConfigure (
   IN OUT EFI_DHCP4_CONFIG_DATA  *Config
+  );
+
+/**
+  Set the elapsed time based on the given instance and the pointer to the
+  elapsed time option.
+
+  @param[in]      Elapsed       The pointer to the position to append.
+  @param[in]      Instance      The pointer to the Dhcp4 instance.
+**/
+VOID
+SetElapsedTime (
+  IN     UINT16                 *Elapsed,
+  IN     DHCP_PROTOCOL          *Instance
   );
 
 #endif

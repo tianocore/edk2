@@ -1,7 +1,7 @@
 /** @file
   This file implement the EFI_DHCP4_PROTOCOL interface.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -932,6 +932,12 @@ EfiDhcp4RenewRebind (
     DhcpSetState (DhcpSb, Dhcp4Rebinding, FALSE);
   }
 
+  //
+  // Clear initial time to make sure that elapsed-time
+  // is set to 0 for first REQUEST in renewal process.
+  //
+  Instance->ElaspedTime = 0;
+
   Status = DhcpSendMessage (
              DhcpSb,
              DhcpSb->Selected,
@@ -1722,4 +1728,20 @@ EfiDhcp4Parse (
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Set the elapsed time based on the given instance and the pointer to the
+  elapsed time option.
+
+  @param[in]      Elapsed       The pointer to the position to append.
+  @param[in]      Instance      The pointer to the Dhcp4 instance.
+**/
+VOID
+SetElapsedTime (
+  IN     UINT16                 *Elapsed,
+  IN     DHCP_PROTOCOL          *Instance
+  )
+{
+  WriteUnaligned16 (Elapsed, HTONS(Instance->ElaspedTime));
 }
