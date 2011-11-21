@@ -1,7 +1,7 @@
 /** @file
   SMM Control2 Protocol on SMM Control Protocol Thunk driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -38,6 +38,7 @@ UINT8                      mDataPort;
   @retval EFI_SUCCESS            The SMI/PMI has been engendered.
   @retval EFI_DEVICE_ERROR       The timing is unsupported.
   @retval EFI_INVALID_PARAMETER  The activation period is unsupported.
+  @retval EFI_INVALID_PARAMETER  The last periodic activation has not been cleared. 
   @retval EFI_NOT_STARTED        The SMM base service has not been initialized.
 **/
 EFI_STATUS
