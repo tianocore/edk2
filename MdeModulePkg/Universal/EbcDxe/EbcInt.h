@@ -146,21 +146,6 @@ EbcLLGetEbcEntryPoint (
   );
 
 /**
-  Returns the caller's value of the stack pointer.
-
-  We adjust it by 4 here because when they called us, the return address
-  is put on the stack, thereby lowering it by 4 bytes.
-
-  @return The current value of the stack pointer for the caller.
-
-**/
-UINTN
-EFIAPI
-EbcLLGetStackPointer (
-  VOID
-  );
-
-/**
   This function is called to execute an EBC CALLEX instruction.
   This instruction requires that we thunk out to external native
   code. For x64, we switch stacks, copy the arguments to the stack
@@ -172,8 +157,10 @@ EbcLLGetStackPointer (
   @param  EbcSp        The new EBC stack pointer.
   @param  FramePtr     The frame pointer.
 
+  @return The unmodified value returned by the native code.
+
 **/
-VOID
+INT64
 EFIAPI
 EbcLLCALLEXNative (
   IN UINTN        CallAddr,
@@ -203,21 +190,6 @@ EbcLLCALLEX (
   IN UINTN        NewStackPointer,
   IN VOID         *FramePtr,
   IN UINT8        Size
-  );
-
-/**
-  When EBC calls native, on return the VM has to stuff the return
-  value into a VM register. It's assumed here that the value is still
-  in the register, so simply return and the caller should get the
-  return result properly.
-
-  @return The unmodified value returned by the native code.
-
-**/
-INT64
-EFIAPI
-EbcLLGetReturnValue (
-  VOID
   );
 
 /**

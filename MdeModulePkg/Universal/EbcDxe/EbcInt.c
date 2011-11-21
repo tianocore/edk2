@@ -875,9 +875,62 @@ CommonEbcExceptionHandler (
   )
 {
   //
+  // We print debug information to let user know what happen.
+  //
+  DEBUG ((
+    EFI_D_ERROR,
+    "EBC Interrupter Version - 0x%016lx\n",
+    (UINT64) (((VM_MAJOR_VERSION & 0xFFFF) << 16) | ((VM_MINOR_VERSION & 0xFFFF)))
+    ));
+  DEBUG ((
+    EFI_D_ERROR,
+    "Exception Type - 0x%016lx\n",
+    (UINT64)(UINTN)InterruptType
+    ));
+  DEBUG ((
+    EFI_D_ERROR,
+    "  R0 - 0x%016lx, R1 - 0x%016lx\n",
+    SystemContext.SystemContextEbc->R0,
+    SystemContext.SystemContextEbc->R1
+    ));
+  DEBUG ((
+    EFI_D_ERROR,
+    "  R2 - 0x%016lx, R3 - 0x%016lx\n",
+    SystemContext.SystemContextEbc->R2,
+    SystemContext.SystemContextEbc->R3
+    ));
+  DEBUG ((
+    EFI_D_ERROR,
+    "  R4 - 0x%016lx, R5 - 0x%016lx\n",
+    SystemContext.SystemContextEbc->R4,
+    SystemContext.SystemContextEbc->R5
+    ));
+  DEBUG ((
+    EFI_D_ERROR,
+    "  R6 - 0x%016lx, R7 - 0x%016lx\n",
+    SystemContext.SystemContextEbc->R6,
+    SystemContext.SystemContextEbc->R7
+    ));
+  DEBUG ((
+    EFI_D_ERROR,
+    "  Flags - 0x%016lx\n",
+    SystemContext.SystemContextEbc->Flags
+    ));
+  DEBUG ((
+    EFI_D_ERROR,
+    "  ControlFlags - 0x%016lx\n",
+    SystemContext.SystemContextEbc->ControlFlags
+    ));
+  DEBUG ((
+    EFI_D_ERROR,
+    "  Ip - 0x%016lx\n\n",
+    SystemContext.SystemContextEbc->Ip
+    ));
+
+  //
   // We deadloop here to make it easy to debug this issue.
   //
-  ASSERT (FALSE);
+  CpuDeadLoop ();
 
   return ;
 }

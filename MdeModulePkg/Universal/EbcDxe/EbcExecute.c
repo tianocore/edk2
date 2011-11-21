@@ -2546,9 +2546,9 @@ ExecuteMOVsnw (
   //
   // Get the data from the source.
   //
-  Op2 = (UINT64) (VmPtr->Gpr[OPERAND2_REGNUM (Operands)] + Op2Index);
+  Op2 = (UINT64)(INT64)(INTN)(VmPtr->Gpr[OPERAND2_REGNUM (Operands)] + Op2Index);
   if (OPERAND2_INDIRECT (Operands)) {
-    Op2 = (UINT64) VmReadMemN (VmPtr, (UINTN) Op2);
+    Op2 = (UINT64)(INT64)(INTN)VmReadMemN (VmPtr, (UINTN) Op2);
   }
   //
   // Now write back the result.
@@ -2639,9 +2639,9 @@ ExecuteMOVsnd (
   //
   // Get the data from the source.
   //
-  Op2 = (UINT64) (VmPtr->Gpr[OPERAND2_REGNUM (Operands)] + Op2Index);
+  Op2 = (UINT64)(INT64)(INTN)(INT64)(VmPtr->Gpr[OPERAND2_REGNUM (Operands)] + Op2Index);
   if (OPERAND2_INDIRECT (Operands)) {
-    Op2 = (UINT64) VmReadMemN (VmPtr, (UINTN) Op2);
+    Op2 = (UINT64)(INT64)(INTN)(INT64)VmReadMemN (VmPtr, (UINTN) Op2);
   }
   //
   // Now write back the result.

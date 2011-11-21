@@ -3,7 +3,7 @@
 #    This code provides low level routines that support the Virtual Machine
 #   for option ROMs.
 #  
-#  Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -18,9 +18,7 @@
 # Equate files needed.
 #---------------------------------------------------------------------------
 
-#---------------------------------------------------------------------------
-##GenericPostSegment      SEGMENT USE16
-#---------------------------------------------------------------------------
+ASM_GLOBAL ASM_PFX(CopyMem);
 
 #****************************************************************************
 # EbcLLCALLEX
@@ -33,8 +31,6 @@
 #
 # Destroys no working registers.
 #****************************************************************************
-ASM_GLOBAL _CopyMem;
-
 # VOID EbcLLCALLEXNative(UINTN FuncAddr, UINTN NewStackPointer, VOID *FramePtr)
 ASM_GLOBAL ASM_PFX(EbcLLCALLEXNative);
 ASM_PFX(EbcLLCALLEXNative):
@@ -87,48 +83,4 @@ ASM_PFX(EbcLLCALLEXNative):
 ASM_GLOBAL ASM_PFX(EbcLLGetEbcEntryPoint);
 ASM_PFX(EbcLLGetEbcEntryPoint):
     mov    %r10, %rax
-    ret
-
-#/*++
-#
-#Routine Description:
-#
-#  Return the caller's value of the stack pointer.
-#
-#Arguments:
-#
-#  None.
-#
-#Returns:
-#
-#  The current value of the stack pointer for the caller. We
-#  adjust it by 4 here because when they called us, the return address
-#  is put on the stack, thereby lowering it by 4 bytes.
-#
-#--*/
-
-# UINTN EbcLLGetStackPointer()
-ASM_GLOBAL ASM_PFX(EbcLLGetStackPointer);
-ASM_PFX(EbcLLGetStackPointer):
-    mov    %rsp, %rax
-    # Stack adjusted by this much when we were called,
-    # For this function, it's 4.
-    add   $4, %rax
-    ret
-
-ASM_GLOBAL ASM_PFX(EbcLLGetReturnValue);
-ASM_PFX(EbcLLGetReturnValue):
-# UINT64 EbcLLGetReturnValue(VOID);
-# Routine Description:
-#   When EBC calls native, on return the VM has to stuff the return
-#   value into a VM register. It's assumed here that the value is still
-#    in the register, so simply return and the caller should get the
-#   return result properly.
-#
-# Arguments:
-#     None.
-#
-# Returns:
-#     The unmodified value returned by the native code.
-#
     ret

@@ -2,7 +2,7 @@
 #  
 #    Low level IA32 specific EBC support routines.
 #  
-#  Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -44,14 +44,4 @@ ASM_PFX(EbcLLCALLEXNative):
 
 ASM_GLOBAL ASM_PFX(EbcLLGetEbcEntryPoint)
 ASM_PFX(EbcLLGetEbcEntryPoint):
-        ret
-
-ASM_GLOBAL ASM_PFX(EbcLLGetStackPointer)
-ASM_PFX(EbcLLGetStackPointer):
-        mov    %esp,%eax
-        add    $0x4,%eax
-        ret
-
-ASM_GLOBAL ASM_PFX(EbcLLGetReturnValue)
-ASM_PFX(EbcLLGetReturnValue):
         ret

@@ -3,7 +3,7 @@
 ;    This code provides low level routines that support the Virtual Machine.
 ;    for option ROMs.
 ;  
-;  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+;  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 ;  This program and the accompanying materials
 ;  are licensed and made available under the terms and conditions of the BSD License
 ;  which accompanies this distribution.  The full text of the license may be found at
@@ -21,11 +21,9 @@
 ; Equate files needed.
 ;---------------------------------------------------------------------------
 
-text SEGMENT
+.CODE
 
-;---------------------------------------------------------------------------
-;;GenericPostSegment      SEGMENT USE16
-;---------------------------------------------------------------------------
+CopyMem  PROTO  Destination:PTR DWORD, Source:PTR DWORD, Count:DWORD
 
 ;****************************************************************************
 ; EbcLLCALLEX
@@ -38,11 +36,7 @@ text SEGMENT
 ;
 ; Destroys no working registers.
 ;****************************************************************************
-; VOID EbcLLCALLEXNative(UINTN FuncAddr, UINTN NewStackPointer, VOID *FramePtr)
-
-CopyMem  PROTO  Destination:PTR DWORD, Source:PTR DWORD, Count:DWORD
-
-
+; INT64 EbcLLCALLEXNative(UINTN FuncAddr, UINTN NewStackPointer, VOID *FramePtr)
 EbcLLCALLEXNative        PROC    PUBLIC
       push   rbp
       push   rbx
@@ -92,54 +86,10 @@ EbcLLCALLEXNative    ENDP
 ;     The contents of the register in which the entry point is passed.
 ;
 EbcLLGetEbcEntryPoint        PROC    PUBLIC
+    ; The EbcEntryPoint is saved to R10.
     mov  rax, r10
     ret
 EbcLLGetEbcEntryPoint    ENDP
 
-;/*++
-;
-;Routine Description:
-;
-;  Return the caller's value of the stack pointer.
-;
-;Arguments:
-;
-;  None.
-;
-;Returns:
-;
-;  The current value of the stack pointer for the caller. We
-;  adjust it by 4 here because when they called us, the return address
-;  is put on the stack, thereby lowering it by 4 bytes.
-;
-;--*/
-
-; UINTN EbcLLGetStackPointer()
-EbcLLGetStackPointer        PROC    PUBLIC
-    mov    rax, rsp      ; get current stack pointer
-    ; Stack adjusted by this much when we were called,
-    ; For this function, it's 4.
-    add   rax, 4
-    ret
-EbcLLGetStackPointer    ENDP
-
-; UINT64 EbcLLGetReturnValue(VOID);
-; Routine Description:
-;   When EBC calls native, on return the VM has to stuff the return
-;   value into a VM register. It's assumed here that the value is still
-;    in the register, so simply return and the caller should get the
-;   return result properly.
-;
-; Arguments:
-;     None.
-;
-; Returns:
-;     The unmodified value returned by the native code.
-;
-EbcLLGetReturnValue   PROC    PUBLIC
-    ret
-EbcLLGetReturnValue    ENDP
-
-text  ENDS
 END
 

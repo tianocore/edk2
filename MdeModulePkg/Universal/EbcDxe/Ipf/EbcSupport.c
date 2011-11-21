@@ -2,7 +2,7 @@
   This module contains EBC support routines that are customized based on
   the target processor.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -238,6 +238,7 @@ EbcInterpret (
 
 **/
 UINT64
+EFIAPI
 ExecuteEbcImageEntryPoint (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
@@ -277,7 +278,6 @@ ExecuteEbcImageEntryPoint (
   //
   // Get the stack pointer. This is the bottom of the upper stack.
   //
-  Addr                      = EbcLLGetStackPointer ();
 
   Status = GetEBCStack(ImageHandle, &VmContext.StackPool, &StackIndex);
   if (EFI_ERROR(Status)) {
@@ -865,14 +865,14 @@ Action:
     VmPtr->Ip = (VMIP) (UINTN) TargetEbcAddr;
   } else {
     //
-    // The callee is not a thunk to EBC, call native code.
+    // The callee is not a thunk to EBC, call native code,
+    // and get return value.
     //
-    EbcLLCALLEXNative (FuncAddr, NewStackPointer, FramePtr);
+    VmPtr->Gpr[7] = EbcLLCALLEXNative (FuncAddr, NewStackPointer, FramePtr);
 
     //
-    // Get return value and advance the IP.
+    // Advance the IP.
     //
-    VmPtr->Gpr[7] = EbcLLGetReturnValue ();
     VmPtr->Ip += Size;
   }
 }
