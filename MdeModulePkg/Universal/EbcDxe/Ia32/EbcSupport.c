@@ -27,6 +27,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define STACK_REMAIN_SIZE (1024 * 4)
 
+/**
+  Begin executing an EBC image.
+  This is used for Ebc Thunk call.
+
+  @return The value returned by the EBC application we're going to run.
+
+**/
+UINT64
+EFIAPI
+EbcLLEbcInterpret (
+  VOID
+  );
+
+/**
+  Begin executing an EBC image.
+  This is used for Ebc image entrypoint.
+
+  @return The value returned by the EBC application we're going to run.
+
+**/
+UINT64
+EFIAPI
+EbcLLExecuteEbcImageEntryPoint (
+  VOID
+  );
 
 /**
   This function is called to execute an EBC CALLEX instruction.
@@ -131,14 +156,13 @@ Action:
 
 
 /**
-  Begin executing an EBC image. The address of the entry point is passed
-  in via a processor register, so we'll need to make a call to get the
-  value.
+  Begin executing an EBC image.
 
   This is a thunk function. Microsoft x64 compiler only provide fast_call
   calling convention, so the first four arguments are passed by rcx, rdx,
   r8, and r9, while other arguments are passed in stack.
 
+  @param  EntryPoint            The entrypoint of EBC code.
   @param  Arg1                  The 1st argument.
   @param  Arg2                  The 2nd argument.
   @param  Arg3                  The 3rd argument.
@@ -162,22 +186,23 @@ Action:
 UINT64
 EFIAPI
 EbcInterpret (
-  IN OUT UINTN      Arg1,
-  IN OUT UINTN      Arg2,
-  IN OUT UINTN      Arg3,
-  IN OUT UINTN      Arg4,
-  IN OUT UINTN      Arg5,
-  IN OUT UINTN      Arg6,
-  IN OUT UINTN      Arg7,
-  IN OUT UINTN      Arg8,
-  IN OUT UINTN      Arg9,
-  IN OUT UINTN      Arg10,
-  IN OUT UINTN      Arg11,
-  IN OUT UINTN      Arg12,
-  IN OUT UINTN      Arg13,
-  IN OUT UINTN      Arg14,
-  IN OUT UINTN      Arg15,
-  IN OUT UINTN      Arg16
+  IN UINTN      EntryPoint,
+  IN UINTN      Arg1,
+  IN UINTN      Arg2,
+  IN UINTN      Arg3,
+  IN UINTN      Arg4,
+  IN UINTN      Arg5,
+  IN UINTN      Arg6,
+  IN UINTN      Arg7,
+  IN UINTN      Arg8,
+  IN UINTN      Arg9,
+  IN UINTN      Arg10,
+  IN UINTN      Arg11,
+  IN UINTN      Arg12,
+  IN UINTN      Arg13,
+  IN UINTN      Arg14,
+  IN UINTN      Arg15,
+  IN UINTN      Arg16
   )
 {
   //
@@ -189,9 +214,9 @@ EbcInterpret (
   UINTN       StackIndex;
 
   //
-  // Get the EBC entry point from the processor register.
+  // Get the EBC entry point
   //
-  Addr = EbcLLGetEbcEntryPoint ();
+  Addr = EntryPoint;
 
   //
   // Now clear out our context
@@ -297,10 +322,9 @@ EbcInterpret (
 
 
 /**
-  Begin executing an EBC image. The address of the entry point is passed
-  in via a processor register, so we'll need to make a call to get the
-  value.
+  Begin executing an EBC image.
 
+  @param  EntryPoint       The entrypoint of EBC code.
   @param  ImageHandle      image handle for the EBC application we're executing
   @param  SystemTable      standard system table passed into an driver's entry
                            point
@@ -311,6 +335,7 @@ EbcInterpret (
 UINT64
 EFIAPI
 ExecuteEbcImageEntryPoint (
+  IN UINTN                EntryPoint,
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
@@ -324,15 +349,10 @@ ExecuteEbcImageEntryPoint (
   UINTN       StackIndex;
 
   //
-  // Get the EBC entry point from the processor register. Make sure you don't
-  // call any functions before this or you could mess up the register the
-  // entry point is passed in.
+  // Get the EBC entry point
   //
-  Addr = EbcLLGetEbcEntryPoint ();
+  Addr = EntryPoint;
 
-  //
-  //  Print(L"*** Thunked into EBC entry point - ImageHandle = 0x%X\n", (UINTN)ImageHandle);
-  //  Print(L"EBC entry point is 0x%X\n", (UINT32)(UINTN)Addr);
   //
   // Now clear out our context
   //
@@ -496,9 +516,9 @@ EbcCreateThunks (
   //  mov ecx 12345678h  => 0xB9 0x78 0x56 0x34 0x12
   //
   if ((Flags & FLAG_THUNK_ENTRY_POINT) != 0) {
-    Addr = (UINT32) (UINTN) ExecuteEbcImageEntryPoint;
+    Addr = (UINT32) (UINTN) EbcLLExecuteEbcImageEntryPoint;
   } else {
-    Addr = (UINT32) (UINTN) EbcInterpret;
+    Addr = (UINT32) (UINTN) EbcLLEbcInterpret;
   }
 
   //

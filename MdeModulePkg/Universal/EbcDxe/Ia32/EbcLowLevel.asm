@@ -30,9 +30,11 @@
 ;---------------------------------------------------------------------------
 
 .686p
-.model  flat
+.model  flat, C
 .code
-CopyMem  PROTO  C Destination:PTR DWORD, Source:PTR DWORD, Count:DWORD
+CopyMem  PROTO  Destination:PTR DWORD, Source:PTR DWORD, Count:DWORD
+EbcInterpret               PROTO
+ExecuteEbcImageEntryPoint  PROTO
 
 ;****************************************************************************
 ; EbcLLCALLEXNative
@@ -47,7 +49,7 @@ CopyMem  PROTO  C Destination:PTR DWORD, Source:PTR DWORD, Count:DWORD
 ; Destroys no working registers.
 ;****************************************************************************
 ; INT64 EbcLLCALLEXNative(UINTN FuncAddr, UINTN NewStackPointer, VOID *FramePtr)
-_EbcLLCALLEXNative        PROC        PUBLIC
+EbcLLCALLEXNative        PROC        PUBLIC
       push   ebp
       push   ebx
       mov    ebp, esp              ; standard function prolog
@@ -85,25 +87,121 @@ _EbcLLCALLEXNative        PROC        PUBLIC
       pop      ebx
       pop      ebp
       ret
-_EbcLLCALLEXNative    ENDP
+EbcLLCALLEXNative    ENDP
 
+;****************************************************************************
+; EbcLLEbcInterpret
+;
+; Begin executing an EBC image.
+;****************************************************************************
+; UINT64 EbcLLEbcInterpret(VOID)
+EbcLLEbcInterpret PROC PUBLIC
+    ;
+    ;; mov eax, 0xca112ebc
+    ;; mov eax, EbcEntryPoint
+    ;; mov ecx, EbcLLEbcInterpret
+    ;; jmp ecx
+    ;
+    ; Caller uses above instruction to jump here
+    ; The stack is below:
+    ; +-----------+
+    ; |  RetAddr  |
+    ; +-----------+
+    ; |EntryPoint | (EAX)
+    ; +-----------+
+    ; |   Arg1    | <- EDI
+    ; +-----------+
+    ; |   Arg2    |
+    ; +-----------+
+    ; |   ...     |
+    ; +-----------+
+    ; |   Arg16   |
+    ; +-----------+
+    ; |   EDI     |
+    ; +-----------+
+    ; |   ESI     |
+    ; +-----------+
+    ; |   EBP     | <- EBP
+    ; +-----------+
+    ; |  RetAddr  | <- ESP is here
+    ; +-----------+
+    ; |   Arg1    | <- ESI
+    ; +-----------+
+    ; |   Arg2    |
+    ; +-----------+
+    ; |   ...     |
+    ; +-----------+
+    ; |   Arg16   |
+    ; +-----------+
+    ; 
 
-; UINTN EbcLLGetEbcEntryPoint(VOID);
-; Routine Description:
-;   The VM thunk code stuffs an EBC entry point into a processor
-;   register. Since we can't use inline assembly to get it from
-;   the interpreter C code, stuff it into the return value
-;   register and return.
-;
-; Arguments:
-;     None.
-;
-; Returns:
-;     The contents of the register in which the entry point is passed.
-;
-_EbcLLGetEbcEntryPoint        PROC        PUBLIC
-    ; The EbcEntryPoint is saved to EAX, so just return here.
+    ; Construct new stack
+    push ebp
+    mov  ebp, esp
+    push esi
+    push edi
+    sub  esp, 40h
+    push eax
+    mov  esi, ebp
+    add  esi, 8
+    mov  edi, esp
+    add  edi, 4
+    mov  ecx, 16
+    rep  movsd
+    
+    ; call C-code
+    call EbcInterpret
+    add  esp, 44h
+    pop  edi
+    pop  esi
+    pop  ebp
     ret
-_EbcLLGetEbcEntryPoint    ENDP
+EbcLLEbcInterpret ENDP
+
+;****************************************************************************
+; EbcLLExecuteEbcImageEntryPoint
+;
+; Begin executing an EBC image.
+;****************************************************************************
+; UINT64 EbcLLExecuteEbcImageEntryPoint(VOID)
+EbcLLExecuteEbcImageEntryPoint PROC PUBLIC
+    ;
+    ;; mov eax, 0xca112ebc
+    ;; mov eax, EbcEntryPoint
+    ;; mov ecx, EbcLLExecuteEbcImageEntryPoint
+    ;; jmp ecx
+    ;
+    ; Caller uses above instruction to jump here
+    ; The stack is below:
+    ; +-----------+
+    ; |  RetAddr  |
+    ; +-----------+
+    ; |EntryPoint | (EAX)
+    ; +-----------+
+    ; |ImageHandle|
+    ; +-----------+
+    ; |SystemTable|
+    ; +-----------+
+    ; |  RetAddr  | <- ESP is here
+    ; +-----------+
+    ; |ImageHandle|
+    ; +-----------+
+    ; |SystemTable|
+    ; +-----------+
+    ; 
+    
+    ; Construct new stack
+    mov  [esp - 0Ch], eax
+    mov  eax, [esp + 04h]
+    mov  [esp - 08h], eax
+    mov  eax, [esp + 08h]
+    mov  [esp - 04h], eax
+    
+    ; call C-code
+    sub  esp, 0Ch
+    call ExecuteEbcImageEntryPoint
+    add  esp, 0Ch
+    ret
+EbcLLExecuteEbcImageEntryPoint ENDP
 
 END

@@ -24,6 +24,8 @@
 .CODE
 
 CopyMem  PROTO  Destination:PTR DWORD, Source:PTR DWORD, Count:DWORD
+EbcInterpret               PROTO
+ExecuteEbcImageEntryPoint  PROTO
 
 ;****************************************************************************
 ; EbcLLCALLEX
@@ -71,25 +73,146 @@ EbcLLCALLEXNative        PROC    PUBLIC
       ret
 EbcLLCALLEXNative    ENDP
 
+;****************************************************************************
+; EbcLLEbcInterpret
+;
+; Begin executing an EBC image.
+;****************************************************************************
+; UINT64 EbcLLEbcInterpret(VOID)
+EbcLLEbcInterpret PROC PUBLIC
+    ;
+    ;; mov rax, ca112ebccall2ebch
+    ;; mov r10, EbcEntryPoint
+    ;; mov r11, EbcLLEbcInterpret
+    ;; jmp r11
+    ;
+    ; Caller uses above instruction to jump here
+    ; The stack is below:
+    ; +-----------+
+    ; |  RetAddr  |
+    ; +-----------+
+    ; |EntryPoint | (R10)
+    ; +-----------+
+    ; |   Arg1    | <- RDI
+    ; +-----------+
+    ; |   Arg2    |
+    ; +-----------+
+    ; |   ...     |
+    ; +-----------+
+    ; |   Arg16   |
+    ; +-----------+
+    ; |   Dummy   |
+    ; +-----------+
+    ; |   RDI     |
+    ; +-----------+
+    ; |   RSI     |
+    ; +-----------+
+    ; |   RBP     | <- RBP
+    ; +-----------+
+    ; |  RetAddr  | <- RSP is here
+    ; +-----------+
+    ; |  Scratch1 | (RCX) <- RSI
+    ; +-----------+
+    ; |  Scratch2 | (RDX)
+    ; +-----------+
+    ; |  Scratch3 | (R8)
+    ; +-----------+
+    ; |  Scratch4 | (R9)
+    ; +-----------+
+    ; |   Arg5    |
+    ; +-----------+
+    ; |   Arg6    |
+    ; +-----------+
+    ; |   ...     |
+    ; +-----------+
+    ; |   Arg16   |
+    ; +-----------+
+    ;
 
-; UINTN EbcLLGetEbcEntryPoint(VOID);
-; Routine Description:
-;   The VM thunk code stuffs an EBC entry point into a processor
-;   register. Since we can't use inline assembly to get it from
-;   the interpreter C code, stuff it into the return value
-;   register and return.
-;
-; Arguments:
-;     None.
-;
-; Returns:
-;     The contents of the register in which the entry point is passed.
-;
-EbcLLGetEbcEntryPoint        PROC    PUBLIC
-    ; The EbcEntryPoint is saved to R10.
-    mov  rax, r10
+    ; save old parameter to stack
+    mov  [rsp + 08h], rcx
+    mov  [rsp + 10h], rdx
+    mov  [rsp + 18h], r8
+    mov  [rsp + 20h], r9
+
+    ; Construct new stack
+    push rbp
+    mov  rbp, rsp
+    push rsi
+    push rdi
+    push rbx
+    sub  rsp, 80h
+    push r10
+    mov  rsi, rbp
+    add  rsi, 10h
+    mov  rdi, rsp
+    add  rdi, 8
+    mov  rcx, 16
+    rep  movsq
+    
+    ; build new paramater calling convention
+    mov  r9,  [rsp + 18h]
+    mov  r8,  [rsp + 10h]
+    mov  rdx, [rsp + 08h]
+    mov  rcx, r10
+
+    ; call C-code
+    call EbcInterpret
+    add  rsp, 88h
+    pop  rbx
+    pop  rdi
+    pop  rsi
+    pop  rbp
     ret
-EbcLLGetEbcEntryPoint    ENDP
+EbcLLEbcInterpret ENDP
+
+;****************************************************************************
+; EbcLLExecuteEbcImageEntryPoint
+;
+; Begin executing an EBC image.
+;****************************************************************************
+; UINT64 EbcLLExecuteEbcImageEntryPoint(VOID)
+EbcLLExecuteEbcImageEntryPoint PROC PUBLIC
+    ;
+    ;; mov rax, ca112ebccall2ebch
+    ;; mov r10, EbcEntryPoint
+    ;; mov r11, EbcLLExecuteEbcImageEntryPoint
+    ;; jmp r11
+    ;
+    ; Caller uses above instruction to jump here
+    ; The stack is below:
+    ; +-----------+
+    ; |  RetAddr  |
+    ; +-----------+
+    ; |EntryPoint | (R10)
+    ; +-----------+
+    ; |ImageHandle|
+    ; +-----------+
+    ; |SystemTable|
+    ; +-----------+
+    ; |   Dummy   |
+    ; +-----------+
+    ; |   Dummy   |
+    ; +-----------+
+    ; |  RetAddr  | <- RSP is here
+    ; +-----------+
+    ; |ImageHandle| (RCX)
+    ; +-----------+
+    ; |SystemTable| (RDX)
+    ; +-----------+
+    ; 
+
+    ; build new paramater calling convention
+    mov  r8, rdx
+    mov  rdx, rcx
+    mov  rcx, r10
+
+    ; call C-code
+    sub  rsp, 28h
+    call ExecuteEbcImageEntryPoint
+    add  rsp, 28h
+    ret
+EbcLLExecuteEbcImageEntryPoint ENDP
 
 END
 

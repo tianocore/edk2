@@ -14,6 +14,8 @@
 #**/
 
 ASM_GLOBAL ASM_PFX(CopyMem)
+ASM_GLOBAL ASM_PFX(EbcInterpret)
+ASM_GLOBAL ASM_PFX(ExecuteEbcImageEntryPoint)
 
 ASM_GLOBAL ASM_PFX(EbcLLCALLEXNative)
 ASM_PFX(EbcLLCALLEXNative):
@@ -42,6 +44,40 @@ ASM_PFX(EbcLLCALLEXNative):
          pop    %ebp
          ret
 
-ASM_GLOBAL ASM_PFX(EbcLLGetEbcEntryPoint)
-ASM_PFX(EbcLLGetEbcEntryPoint):
-        ret
+ASM_GLOBAL ASM_PFX(EbcLLEbcInterpret)
+ASM_PFX(EbcLLEbcInterpret):
+    # Construct new stack
+    push %ebp
+    mov  %esp, %ebp
+    push %esi
+    push %edi
+    sub  $0x40, %esp
+    push %eax
+    mov  %ebp, %esi
+    add  $0x8, %esi
+    mov  %esp, %edi
+    add  $0x4, %edi
+    mov  $0x10, %ecx
+    rep  movsd
+    
+    # call C-code
+    call ASM_PFX(EbcInterpret)
+    add  $0x44, %esp
+    pop  %edi
+    pop  %esi
+    pop  %ebp
+    ret
+
+ASM_GLOBAL ASM_PFX(EbcLLExecuteEbcImageEntryPoint)
+ASM_PFX(EbcLLExecuteEbcImageEntryPoint):
+    # Construct new stack
+    mov  %eax, -0xC(%esp)
+    mov  0x4(%esp), %eax
+    mov  %eax, -0x8(%esp)
+    mov  0x8(%esp), %eax
+    mov  %eax, -0x4(%esp)
+    # call C-code
+    sub  $0xC, %esp
+    call ASM_PFX(ExecuteEbcImageEntryPoint)
+    add  $0xC, %esp
+    ret

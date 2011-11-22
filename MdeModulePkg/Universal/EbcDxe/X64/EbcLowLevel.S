@@ -19,6 +19,8 @@
 #---------------------------------------------------------------------------
 
 ASM_GLOBAL ASM_PFX(CopyMem);
+ASM_GLOBAL ASM_PFX(EbcInterpret);
+ASM_GLOBAL ASM_PFX(ExecuteEbcImageEntryPoint);
 
 #****************************************************************************
 # EbcLLCALLEX
@@ -66,21 +68,53 @@ ASM_PFX(EbcLLCALLEXNative):
       pop      %rbp
       ret
 
+ASM_GLOBAL ASM_PFX(EbcLLEbcInterpret);
+ASM_PFX(EbcLLEbcInterpret):
+    # save old parameter to stack
+    mov  %rcx, 0x8(%rsp)
+    mov  %rdx, 0x10(%rsp)
+    mov  %r8, 0x18(%rsp)
+    mov  %r9, 0x20(%rsp)
 
-# UINTN EbcLLGetEbcEntryPoint(VOID);
-# Routine Description:
-#   The VM thunk code stuffs an EBC entry point into a processor
-#   register. Since we can't use inline assembly to get it from
-#   the interpreter C code, stuff it into the return value
-#   register and return.
-#
-# Arguments:
-#     None.
-#
-# Returns:
-#     The contents of the register in which the entry point is passed.
-#
-ASM_GLOBAL ASM_PFX(EbcLLGetEbcEntryPoint);
-ASM_PFX(EbcLLGetEbcEntryPoint):
-    mov    %r10, %rax
+    # Construct new stack
+    push %rbp
+    mov  %rsp, %rbp
+    push %rsi
+    push %rdi
+    push %rbx
+    sub  $0x80, %rsp
+    push %r10
+    mov  %rbp, %rsi
+    add  $0x10, %rsi
+    mov  %rsp, %rdi
+    add  $0x8, %rdi
+    mov  $0x10, %rcx
+    rep  movsq
+    
+    # build new paramater calling convention
+    mov  0x18(%rsp), %r9
+    mov  0x10(%rsp), %r8
+    mov  0x8(%rsp), %rdx
+    mov  %r10, %rcx
+
+    # call C-code
+    call ASM_PFX(EbcInterpret)
+    add  $0x88, %esp
+    pop  %rbx
+    pop  %rdi
+    pop  %rsi
+    pop  %rbp
+    ret
+
+ASM_GLOBAL ASM_PFX(EbcLLExecuteEbcImageEntryPoint);
+ASM_PFX(EbcLLExecuteEbcImageEntryPoint):
+    # build new paramater calling convention
+    mov  %rdx, %r8
+    mov  %rcx, %rdx
+    mov  %r10, %rcx
+
+    # call C-code
+    sub  $0x28, %rsp
+    call ASM_PFX(ExecuteEbcImageEntryPoint)
+    add  $0x28, %rsp
     ret
