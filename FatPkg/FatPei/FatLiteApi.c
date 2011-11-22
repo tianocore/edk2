@@ -1,7 +1,7 @@
 /** @file
   FAT recovery PEIM entry point, Ppi Functions and FAT Api functions.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -577,6 +577,7 @@ FindRecoveryFile (
   //
   // Construct root directory file
   //
+  ZeroMem (&Parent, sizeof (PEI_FAT_FILE));
   Parent.IsFixedRootDir   = (BOOLEAN) ((PrivateData->Volume[VolumeIndex].FatType == Fat32) ? FALSE : TRUE);
   Parent.Attributes       = FAT_ATTR_DIRECTORY;
   Parent.CurrentPos       = 0;
@@ -593,6 +594,9 @@ FindRecoveryFile (
   //
   Status = FatReadNextDirectoryEntry (PrivateData, &Parent, File);
   while (Status == EFI_SUCCESS) {
+    //
+    // Compare whether the file name is recovery file name.
+    //
     if (EngStriColl (PrivateData, FileName, File->FileName)) {
       break;
     }
@@ -602,6 +606,13 @@ FindRecoveryFile (
 
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
+  }
+
+  //
+  // Get the recovery file, set its file position to 0.
+  //
+  if (File->StartingCluster != 0) {
+    Status = FatSetFilePos (PrivateData, File, 0);
   }
 
   *Handle = File;

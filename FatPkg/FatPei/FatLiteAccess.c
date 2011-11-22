@@ -1,7 +1,7 @@
 /** @file
   FAT file system access routines for FAT recovery PEIM
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -315,7 +315,10 @@ FatSetFilePos (
     }
 
     File->CurrentPos += Pos;
-
+    //
+    // Calculate the amount of consecutive cluster occupied by the file.
+    // FatReadFile() will use it to read these blocks once.
+    //
     File->StraightReadAmount  = 0;
     Cluster                   = File->CurrentCluster;
     while (!FAT_CLUSTER_FUNCTIONAL (Cluster)) {
@@ -517,9 +520,6 @@ FatReadNextDirectoryEntry (
   SubFile->StartingCluster  = SubFile->CurrentCluster;
   SubFile->Volume           = ParentDir->Volume;
 
-  if (SubFile->StartingCluster != 0) {
-    Status = FatSetFilePos (PrivateData, SubFile, 0);
-  }
   //
   // in Pei phase, time parameters do not need to be filled for minimum use.
   //
