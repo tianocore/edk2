@@ -704,7 +704,9 @@ GetFileBufferByFilePath (
         }
       }
     }
-    goto Finish;
+    if (!EFI_ERROR (Status)) {
+      goto Finish;
+    }
   }
 
   //
@@ -728,8 +730,11 @@ GetFileBufferByFilePath (
         TempDevicePathNode = DuplicateDevicePath (DevicePathNode);
         if (TempDevicePathNode == NULL) {
           FileHandle->Close (FileHandle);
+          //
+          // Setting Status to an EFI_ERROR value will cause the rest of
+          // the file system support below to be skipped.
+          //
           Status = EFI_OUT_OF_RESOURCES;
-          goto Finish;
         }
         //
         // Parse each MEDIA_FILEPATH_DP node. There may be more than one, since the
@@ -737,7 +742,7 @@ GetFileBufferByFilePath (
         // our way down each device path node and close the previous node
         //
         DevicePathNode = TempDevicePathNode;
-        while (!IsDevicePathEnd (DevicePathNode) && !EFI_ERROR (Status)) {
+        while (!EFI_ERROR (Status) && !IsDevicePathEnd (DevicePathNode)) {
           if (DevicePathType (DevicePathNode) != MEDIA_DEVICE_PATH ||
               DevicePathSubType (DevicePathNode) != MEDIA_FILEPATH_DP) {
             Status = EFI_UNSUPPORTED;
@@ -816,10 +821,14 @@ GetFileBufferByFilePath (
         if (FileHandle != NULL) {
           FileHandle->Close (FileHandle);
         }
-        FreePool (TempDevicePathNode);
+        if (TempDevicePathNode != NULL) {
+          FreePool (TempDevicePathNode);
+        }
       }
     }
-    goto Finish;
+    if (!EFI_ERROR (Status)) {
+      goto Finish;
+    }
   }
 
   //
@@ -858,7 +867,9 @@ GetFileBufferByFilePath (
           }
         }
       }
-      goto Finish;
+      if (!EFI_ERROR (Status)) {
+        goto Finish;
+      }
     }
   }
 
