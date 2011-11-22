@@ -329,7 +329,7 @@ SendForm (
       //
       // Initialize internal data structures of FormSet
       //
-      Status = InitializeFormSet (Selection->Handle, &Selection->FormSetGuid, FormSet);
+      Status = InitializeFormSet (Selection->Handle, &Selection->FormSetGuid, FormSet, TRUE);
       if (EFI_ERROR (Status) || IsListEmpty (&FormSet->FormListHead)) {
         DestroyFormSet (FormSet);
         break;
@@ -1220,6 +1220,7 @@ GetQuestionValue (
 
   Status = EFI_SUCCESS;
   Value  = NULL;
+  Result = NULL;
 
   //
   // Statement don't have storage, skip them
@@ -1428,7 +1429,7 @@ GetQuestionValue (
       FreePool (Value);
     }
   } else {
-    if (Storage->Type == EFI_HII_VARSTORE_BUFFER) {
+    if (Storage->Type == EFI_HII_VARSTORE_BUFFER || Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
       //
       // Request current settings from Configuration Driver
       //
@@ -1541,9 +1542,9 @@ GetQuestionValue (
           }
         }
       }
-      FreePool (Result);
 
       if (EFI_ERROR (Status)) {
+        FreePool (Result);
         return Status;
       }
     } else if (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
@@ -1578,6 +1579,10 @@ GetQuestionValue (
       CopyMem (Storage->EditBuffer + Question->VarStoreInfo.VarOffset, Dst, StorageWidth);
     } else {
       SetValueByName (Storage, Question->VariableName, Value, TRUE);
+    }
+
+    if (Result != NULL) {
+      FreePool (Result);
     }
   }
 
@@ -1783,7 +1788,7 @@ SetQuestionValue (
   }
 
   if (!Cached) {
-    if (Storage->Type == EFI_HII_VARSTORE_BUFFER) {
+    if (Storage->Type == EFI_HII_VARSTORE_BUFFER || Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
       //
       // <ConfigResp> ::= <ConfigHdr> + <BlockName> + "&VALUE=" + "<HexCh>StorageWidth * 2" ||
       //                <ConfigHdr> + "&" + <VariableName> + "=" + "<string>"
@@ -2991,7 +2996,6 @@ ExtractDefault (
   EFI_HII_HANDLE          *HiiHandles;
   UINTN                   Index;
   EFI_GUID                ZeroGuid;
-  UINTN                   BackUpClassOfVfr;
 
   //
   // Check the supported setting level.
@@ -3051,7 +3055,6 @@ ExtractDefault (
     // Open all FormSet by locate HII packages.
     // Initiliaze the maintain FormSet to store default data as back up data.
     //
-    BackUpClassOfVfr = gClassOfVfr;
     BackUpFormSet    = gOldFormSet;
     gOldFormSet      = NULL;
 
@@ -3078,7 +3081,7 @@ ExtractDefault (
       LocalFormSet = AllocateZeroPool (sizeof (FORM_BROWSER_FORMSET));
       ASSERT (LocalFormSet != NULL);
       ZeroMem (&ZeroGuid, sizeof (ZeroGuid));
-      Status = InitializeFormSet (HiiHandles[Index], &ZeroGuid, LocalFormSet);
+      Status = InitializeFormSet (HiiHandles[Index], &ZeroGuid, LocalFormSet, FALSE);
       if (EFI_ERROR (Status) || IsListEmpty (&LocalFormSet->FormListHead)) {
         DestroyFormSet (LocalFormSet);
         continue;
@@ -3108,7 +3111,6 @@ ExtractDefault (
     //
     FreePool (HiiHandles);
     gOldFormSet = BackUpFormSet;
-    gClassOfVfr = BackUpClassOfVfr;
        
     //
     // Set Default Value for each FormSet in the maintain list.
@@ -3660,6 +3662,7 @@ GetIfrBinaryData (
                                  found in package list.
                                  On output, GUID of the formset found(if not NULL).
   @param  FormSet                FormSet data structure.
+  @param  UpdateGlobalVar        Whether need to update the global variable.
 
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_NOT_FOUND          The specified FormSet could not be found.
@@ -3669,7 +3672,8 @@ EFI_STATUS
 InitializeFormSet (
   IN  EFI_HII_HANDLE                   Handle,
   IN OUT EFI_GUID                      *FormSetGuid,
-  OUT FORM_BROWSER_FORMSET             *FormSet
+  OUT FORM_BROWSER_FORMSET             *FormSet,
+  IN  BOOLEAN                          UpdateGlobalVar                   
   )
 {
   EFI_STATUS                Status;
@@ -3711,6 +3715,13 @@ InitializeFormSet (
   //
   Status = ParseOpCodes (FormSet);
   if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // 
+  // If not need to update the global variable, just return.
+  //
+  if (!UpdateGlobalVar) {
     return Status;
   }
 

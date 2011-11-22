@@ -522,7 +522,7 @@ IdToQuestion2 (
   LIST_ENTRY              *Link;
   FORM_BROWSER_STATEMENT  *Question;
 
-  if (QuestionId == 0) {
+  if (QuestionId == 0 || Form == NULL) {
     //
     // The value of zero is reserved
     //
@@ -757,6 +757,7 @@ IfrToString (
     // so need 1 byte to align, also need 2 bytes for L'\0'.
     //
     TmpBuf = AllocateZeroPool (Value.BufferLen + 3);
+    ASSERT (TmpBuf != NULL);
     if (Format == EFI_IFR_STRING_ASCII) {
       CopyMem (TmpBuf, Value.Buffer, Value.BufferLen);
       PrintFormat = L"%a"; 
@@ -1652,6 +1653,151 @@ CheckUserPrivilege (
 }
 
 /**
+  Get question value from the predefined formset.
+
+  @param  DevicePath             The driver's device path which produece the formset data.
+  @param  InputHiiHandle         The hii handle associate with the formset data.
+  @param  FormSetGuid            The formset guid which include the question.
+  @param  QuestionId             The question id which need to get value from.
+  @param  Value                  The return data about question's value.
+  
+  @retval TRUE                   Get the question value success.
+  @retval FALSE                  Get the question value failed.
+**/
+BOOLEAN 
+GetQuestionValueFromForm (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN EFI_HII_HANDLE            InputHiiHandle,
+  IN EFI_GUID                  *FormSetGuid,
+  IN EFI_QUESTION_ID           QuestionId,
+  OUT EFI_HII_VALUE            *Value
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_HANDLE                   DriverHandle;
+  EFI_HANDLE                   Handle;
+  EFI_HII_HANDLE               *HiiHandles;
+  EFI_HII_HANDLE               HiiHandle;
+  UINTN                        Index;
+  FORM_BROWSER_STATEMENT       *Question;
+  FORM_BROWSER_FORMSET         *FormSet;
+  FORM_BROWSER_FORM            *Form;
+  BOOLEAN                      GetTheVal;
+  LIST_ENTRY                   *Link;
+
+  // 
+  // The input parameter DevicePath or InputHiiHandle must have one valid input. 
+  //
+  ASSERT ((DevicePath != NULL && InputHiiHandle == NULL) || 
+          (DevicePath == NULL && InputHiiHandle != NULL) );
+
+  GetTheVal    = TRUE;
+  DriverHandle = NULL;
+  HiiHandle    = NULL;
+  Question     = NULL;
+  Form         = NULL;
+
+  //
+  // Get HiiHandle.
+  //
+  if (DevicePath != NULL) {
+    //
+    // 1. Get Driver handle.
+    //
+    Status = gBS->LocateDevicePath (
+                    &gEfiDevicePathProtocolGuid,
+                    &DevicePath,
+                    &DriverHandle
+                    );
+    if (EFI_ERROR (Status) || (DriverHandle == NULL)) {
+      return FALSE;
+    }
+
+    //
+    // 2. Get Hii handle
+    //
+    HiiHandles = HiiGetHiiHandles (NULL);
+    if (HiiHandles == NULL) {
+      return FALSE;
+    }
+
+    for (Index = 0; HiiHandles[Index] != NULL; Index++) {
+      Status = mHiiDatabase->GetPackageListHandle (
+                               mHiiDatabase,
+                               HiiHandles[Index],
+                               &Handle
+                               );
+      if (!EFI_ERROR (Status) && (Handle == DriverHandle)) {
+        HiiHandle = HiiHandles[Index];
+        break;
+      }
+    }
+    FreePool (HiiHandles);
+  } else {
+    HiiHandle = InputHiiHandle;
+  } 
+  ASSERT (HiiHandle != NULL);
+
+  //
+  // Get the formset data include this question.
+  //
+  FormSet = AllocateZeroPool (sizeof (FORM_BROWSER_FORMSET));
+  ASSERT (FormSet != NULL);
+  Status = InitializeFormSet(HiiHandle, FormSetGuid, FormSet, FALSE);
+  if (EFI_ERROR (Status)) {
+    GetTheVal = FALSE;
+    goto Done;
+  }
+
+  //
+  // Base on the Question Id to get the question info.
+  //  
+  Question = IdToQuestion(FormSet, NULL, QuestionId);
+  if (Question == NULL) {
+    GetTheVal = FALSE;
+    goto Done;
+  }
+
+  //
+  // Search form in the formset scope
+  //
+  Link = GetFirstNode (&FormSet->FormListHead);
+  while (!IsNull (&FormSet->FormListHead, Link)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+
+    Question = IdToQuestion2 (Form, QuestionId);
+    if (Question != NULL) {
+      break;
+    }
+
+    Link = GetNextNode (&FormSet->FormListHead, Link);
+    Form = NULL;
+  }
+  ASSERT (Form != NULL);
+  
+  //
+  // Get the question value.
+  //
+  Status = GetQuestionValue(FormSet, Form, Question, FALSE);
+  if (EFI_ERROR (Status)) {
+    GetTheVal = FALSE;
+    goto Done;
+  }
+
+  CopyMem (Value, &Question->HiiValue, sizeof (EFI_HII_VALUE));
+  
+Done:
+  //
+  // Clean the formset structure and restore the global parameter.
+  //
+  if (FormSet != NULL) {
+    DestroyFormSet (FormSet);
+  }
+  
+  return GetTheVal;
+}
+
+/**
   Evaluate the result of a HII expression.
 
   If Expression is NULL, then ASSERT.
@@ -1699,6 +1845,7 @@ EvaluateExpression (
   UINT8                   DigitUint8;
   UINT8                   *TempBuffer;
   EFI_TIME                EfiTime;
+  EFI_HII_VALUE           QuestionVal;
 
   //
   // Save current stack offset.
@@ -1931,24 +2078,42 @@ EvaluateExpression (
       break;
 
     case EFI_IFR_QUESTION_REF3_OP:
-      if (OpCode->DevicePath == 0) {
-        //
-        // EFI_IFR_QUESTION_REF3
-        // Pop an expression from the expression stack
-        //
-        Status = PopExpression (Value);
-        if (EFI_ERROR (Status)) {
-          goto Done;
-        }
+      //
+      // EFI_IFR_QUESTION_REF3
+      // Pop an expression from the expression stack
+      //
+      Status = PopExpression (Value);
+      if (EFI_ERROR (Status)) {
+        goto Done;
+      }
+    
+      //
+      // Validate the expression value
+      //
+      if ((Value->Type > EFI_IFR_TYPE_NUM_SIZE_64) || (Value->Value.u64 > 0xffff)) {
+        Status = EFI_NOT_FOUND;
+        goto Done;
+      }
 
-        //
-        // Validate the expression value
-        //
-        if ((Value->Type > EFI_IFR_TYPE_NUM_SIZE_64) || (Value->Value.u64 > 0xffff)) {
+      if (OpCode->DevicePath != 0) {
+        StrPtr = GetToken (OpCode->DevicePath, FormSet->HiiHandle);
+        if (StrPtr == NULL) {
           Status = EFI_NOT_FOUND;
           goto Done;
         }
 
+        if (!GetQuestionValueFromForm((EFI_DEVICE_PATH_PROTOCOL*)StrPtr, NULL, &OpCode->Guid, Value->Value.u16, &QuestionVal)){
+          Status = EFI_NOT_FOUND;
+          goto Done;
+        }
+        Value = &QuestionVal;
+      } else if (CompareGuid (&OpCode->Guid, &gZeroGuid) != 0) {
+        if (!GetQuestionValueFromForm(NULL, FormSet->HiiHandle, &OpCode->Guid, Value->Value.u16, &QuestionVal)){
+          Status = EFI_NOT_FOUND;
+          goto Done;
+        }
+        Value = &QuestionVal;        
+      } else {
         Question = IdToQuestion (FormSet, Form, Value->Value.u16);
         if (Question == NULL) {
           Status = EFI_NOT_FOUND;
@@ -1959,13 +2124,6 @@ EvaluateExpression (
         // push the questions' value on to the expression stack
         //
         Value = &Question->HiiValue;
-      } else {
-        //
-        // BUGBUG: push 0 for EFI_IFR_QUESTION_REF3_2 and EFI_IFR_QUESTION_REF3_3,
-        // since it is impractical to evaluate the value of a Question in another
-        // Hii Package list.
-        //
-        ZeroMem (Value, sizeof (EFI_HII_VALUE));
       }
       break;
 
