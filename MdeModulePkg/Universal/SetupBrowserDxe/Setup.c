@@ -3088,7 +3088,15 @@ ExtractDefault (
         DestroyFormSet (LocalFormSet);
         continue;
       }
-      
+      //
+      // Initilize Questions' Value
+      //
+      LoadFormSetConfig (NULL, LocalFormSet);
+      if (EFI_ERROR (Status)) {
+        DestroyFormSet (LocalFormSet);
+        continue;
+      }
+
       //
       // Add FormSet into the maintain list.
       //
@@ -3122,6 +3130,7 @@ ExtractDefault (
   @param  Selection              Selection contains the information about 
                                  the Selection, form and formset to be displayed.
                                  Selection action may be updated in retrieve callback.
+                                 If Selection is NULL, only initialize Question value.
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
 
@@ -3160,7 +3169,7 @@ LoadFormConfig (
     //
     // According the spec, ref opcode try to get value from call back with "retrieve" type.
     //
-    if ((Question->Operand == EFI_IFR_REF_OP) && (FormSet->ConfigAccess != NULL)) {
+    if ((Question->Operand == EFI_IFR_REF_OP) && (FormSet->ConfigAccess != NULL) && (Selection != NULL)) {
       Status = ProcessCallBackFunction(Selection, Question, EFI_BROWSER_ACTION_RETRIEVE, TRUE);
       if (EFI_ERROR (Status)) {
         return Status;
@@ -3171,6 +3180,7 @@ LoadFormConfig (
     // Check whether EfiVarstore with CallBack can be got.
     //
     if ((FormSet->ConfigAccess != NULL) &&
+        (Selection != NULL) &&
         (Selection->Action != UI_ACTION_REFRESH_FORMSET) &&
         (Question->QuestionId != 0) && 
         (Question->Storage != NULL) &&
@@ -3211,6 +3221,7 @@ LoadFormConfig (
   @param  Selection              Selection contains the information about 
                                  the Selection, form and formset to be displayed.
                                  Selection action may be updated in retrieve callback.
+                                 If Selection is NULL, only initialize Question value.
   @param  FormSet                FormSet data structure.
 
   @retval EFI_SUCCESS            The function completed successfully.

@@ -1064,6 +1064,7 @@ ExtractDefault (
   @param  Selection              Selection contains the information about 
                                  the Selection, form and formset to be displayed.
                                  Selection action may be updated in retrieve callback.
+                                 If Selection is NULL, only initialize Question value.
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
 
@@ -1083,6 +1084,7 @@ LoadFormConfig (
   @param  Selection              Selection contains the information about 
                                  the Selection, form and formset to be displayed.
                                  Selection action may be updated in retrieve callback.
+                                 If Selection is NULL, only initialize Question value.
   @param  FormSet                FormSet data structure.
 
   @retval EFI_SUCCESS            The function completed successfully.
