@@ -137,9 +137,7 @@ InitializePcRtc (
   EfiInitializeLock (&mModuleGlobal.RtcLock, TPL_CALLBACK);
 
   Status = PcRtcInit (&mModuleGlobal);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  ASSERT_EFI_ERROR (Status);
 
   gRT->GetTime       = PcRtcEfiGetTime;
   gRT->SetTime       = PcRtcEfiSetTime;

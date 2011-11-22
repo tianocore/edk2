@@ -141,6 +141,11 @@ PcRtcInit (
   //
   Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
+    //
+    // Set the variable with default value if the RTC is functioning incorrectly.
+    //
+    Global->SavedTimeZone = EFI_UNSPECIFIED_TIMEZONE;
+    Global->Daylight      = 0;
     if (!EfiAtRuntime ()) {
       EfiReleaseLock (&Global->RtcLock);
     }
