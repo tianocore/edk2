@@ -1683,8 +1683,18 @@ CoreGetMemorySpaceDescriptor (
   @param  Length                 Specified length
   @param  Attributes             Specified attributes
 
-  @retval EFI_SUCCESS            Successfully set attribute of a segment of
-                                 memory space.
+  @retval EFI_SUCCESS           The attributes were set for the memory region.
+  @retval EFI_INVALID_PARAMETER Length is zero. 
+  @retval EFI_UNSUPPORTED       The processor does not support one or more bytes of the memory
+                                resource range specified by BaseAddress and Length.
+  @retval EFI_UNSUPPORTED       The bit mask of attributes is not support for the memory resource
+                                range specified by BaseAddress and Length.
+  @retval EFI_ACCESS_DEFINED    The attributes for the memory resource range specified by
+                                BaseAddress and Length cannot be modified.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough system resources to modify the attributes of
+                                the memory resource range.
+  @retval EFI_NOT_AVAILABLE_YET The attributes cannot be set because CPU architectural protocol is
+                                not available yet.
 
 **/
 EFI_STATUS
