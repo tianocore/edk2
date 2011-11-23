@@ -1621,7 +1621,9 @@ DhcpOnTimerTick (
         goto END_SESSION;
       }
 
-      Instance->ElaspedTime= 0;
+      if (Instance != NULL) {
+        Instance->ElaspedTime= 0;
+      }      
       
       Status = DhcpSendMessage (
                  DhcpSb,
@@ -1643,7 +1645,9 @@ DhcpOnTimerTick (
         goto END_SESSION;
       }
 
-      Instance->ElaspedTime= 0;
+      if (Instance != NULL) {
+        Instance->ElaspedTime= 0;
+      }    
 
       Status = DhcpSendMessage (
                  DhcpSb,
