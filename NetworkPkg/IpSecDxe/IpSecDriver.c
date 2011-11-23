@@ -1,7 +1,7 @@
 /** @file
   Driver Binding Protocol for IPsec Driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -81,7 +81,7 @@ IpSecDriverBindingSupported (
 
   @retval EFI_SUCCES           This driver is added to ControllerHandle
   @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
-  @retval EFI_DEVICE_ERROR     The device could not be started due to a device error.  
+  @retval EFI_DEVICE_ERROR     The device could not be started due to a device error.
                                Currently not implemented.
   @retval other                This driver does not support this device
 
@@ -190,6 +190,10 @@ IpSecDriverBindingStop (
   Private = IPSEC_PRIVATE_DATA_FROM_IPSEC (IpSec);
 
   //
+  // Delete all SAs before stop Ipsec.
+  //
+  IkeDeleteAllSas (Private, FALSE);
+  //
   // If has udp4 io opened on the controller, close and free it.
   //
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &Private->Udp4List) {
@@ -256,9 +260,9 @@ EFI_DRIVER_BINDING_PROTOCOL gIpSecDriverBinding = {
 
 /**
   This is a callback function when the mIpSecInstance.DisabledEvent is signaled.
-    
+
   @param[in]  Event        Event whose notification function is being invoked.
-  @param[in]  Context      Pointer to the notification function's context. 
+  @param[in]  Context      Pointer to the notification function's context.
 
 **/
 VOID
@@ -271,15 +275,15 @@ IpSecCleanupAllSa (
   IPSEC_PRIVATE_DATA  *Private;
   Private                   = (IPSEC_PRIVATE_DATA *) Context;
   Private->IsIPsecDisabling = TRUE;
-  IkeDeleteAllSas (Private);
+  IkeDeleteAllSas (Private, TRUE);
 }
 
 /**
   This is the declaration of an EFI image entry point. This entry point is
   the same for UEFI Applications, UEFI OS Loaders, and UEFI Drivers, including
   both device drivers and bus drivers.
-  
-  The entry point for IPsec driver which installs the driver binding, 
+
+  The entry point for IPsec driver which installs the driver binding,
   component name protocol, IPsec Config protcolon, and IPsec protocol in
   its ImageHandle.
 
@@ -289,7 +293,7 @@ IpSecCleanupAllSa (
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_ALREADY_STARTED   The IPsec driver has been already loaded.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
-  @retval Others                The operation is failed. 
+  @retval Others                The operation is failed.
 
 **/
 EFI_STATUS
@@ -346,7 +350,7 @@ IpSecDriverEntryPoint (
   Private->Signature    = IPSEC_PRIVATE_DATA_SIGNATURE;
   Private->ImageHandle  = ImageHandle;
   CopyMem (&Private->IpSec, &mIpSecInstance, sizeof (EFI_IPSEC2_PROTOCOL));
-  
+
   //
   // Initilize Private's members. Thess members is used for IKE.
   //
@@ -356,7 +360,7 @@ IpSecDriverEntryPoint (
   InitializeListHead (&Private->Ikev1EstablishedList);
   InitializeListHead (&Private->Ikev2SessionList);
   InitializeListHead (&Private->Ikev2EstablishedList);
-  
+
   RandomSeed (NULL, 0);
   //
   // Initialize the ipsec config data and restore it from variable.
@@ -390,7 +394,7 @@ IpSecDriverEntryPoint (
   if (EFI_ERROR (Status)) {
     goto ON_UNINSTALL_IPSEC;
   }
-  
+
   return Status;
 
 ON_UNINSTALL_IPSEC:

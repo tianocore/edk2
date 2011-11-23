@@ -1,6 +1,6 @@
 /** @file
   Provide IPsec Key Exchange (IKE) service general interfaces.
-  
+
   Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -104,13 +104,13 @@ IkeLookupUdp (
 
 /**
   Configure a UDPIO's UDP4 instance.
-  
-  This fuction is called by the UdpIoCreateIo() to configures a 
+
+  This fuction is called by the UdpIoCreateIo() to configures a
   UDP4 instance.
-    
+
   @param[in] UdpIo         The UDP_IO to be configured.
   @param[in] Context       User-defined data when calling UdpIoCreateIo().
-  
+
   @retval EFI_SUCCESS      The configuration succeeded.
   @retval Others           The UDP4 instance fails to configure.
 
@@ -146,13 +146,13 @@ IkeConfigUdp4 (
 
 /**
   Configure a UDPIO's UDP6 instance.
-  
-  This fuction is called by the UdpIoCreateIo()to configure a 
+
+  This fuction is called by the UdpIoCreateIo()to configure a
   UDP6 instance.
-    
+
   @param[in] UdpIo         The UDP_IO to be configured.
   @param[in] Context       User-defined data when calling UdpIoCreateIo().
-  
+
   @retval EFI_SUCCESS      The configuration succeeded.
   @retval Others           The configuration fails.
 
@@ -194,14 +194,14 @@ IkeConfigUdp6 (
 
 /**
   Open and configure the related output UDPIO for IKE packet sending.
-  
-  If the UdpService is not configured, this fuction calls UdpIoCreatIo() to 
+
+  If the UdpService is not configured, this fuction calls UdpIoCreatIo() to
   create UDPIO to bind this UdpService for IKE packet sending. If the UdpService
   has already been configured, then return.
-  
+
   @param[in] UdpService     The UDP_IO to be configured.
   @param[in] RemoteIp       User-defined data when calling UdpIoCreateIo().
-  
+
   @retval EFI_SUCCESS      The configuration is successful.
   @retval Others           The configuration fails.
 
@@ -340,16 +340,16 @@ ON_EXIT:
 
 /**
   Open and configure a UDPIO of Udp4 for IKE packet receiving.
-  
-  This function is called at the IPsecDriverBinding start. IPsec create a UDP4 and 
+
+  This function is called at the IPsecDriverBinding start. IPsec create a UDP4 and
   UDP4 IO for each NIC handle.
-  
+
   @param[in] Private        Point to IPSEC_PRIVATE_DATA
   @param[in] Controller     Handler for NIC card.
-  
+
   @retval EFI_SUCCESS             The Operation is successful.
   @retval EFI_OUT_OF_RESOURCE     The required system resource can't be allocated.
-  
+
 **/
 EFI_STATUS
 IkeOpenInputUdp4 (
@@ -411,16 +411,16 @@ IkeOpenInputUdp4 (
 
 /**
   Open and configure a UDPIO of Udp6 for IKE packet receiving.
-  
+
   This function is called at the IPsecDriverBinding start. IPsec create a UDP6 and UDP6
   IO for each NIC handle.
-  
+
   @param[in] Private        Point to IPSEC_PRIVATE_DATA
   @param[in] Controller     Handler for NIC card.
-  
+
   @retval EFI_SUCCESS             The Operation is successful.
   @retval EFI_OUT_OF_RESOURCE     The required system resource can't be allocated.
-  
+
 **/
 EFI_STATUS
 IkeOpenInputUdp6 (
@@ -479,18 +479,18 @@ IkeOpenInputUdp6 (
 
 /**
   The general interface of starting IPsec Key Exchange.
-  
+
   This function is called when a IKE negotiation to start getting a Key.
-  
-  @param[in] UdpService   Point to IKE_UDP_SERVICE which will be used for 
+
+  @param[in] UdpService   Point to IKE_UDP_SERVICE which will be used for
                           IKE packet sending.
   @param[in] SpdEntry     Point to the SPD entry related to the IKE negotiation.
   @param[in] RemoteIp     Point to EFI_IP_ADDRESS related to the IKE negotiation.
-  
+
   @retval EFI_SUCCESS            The Operation is successful.
   @retval EFI_ACCESS_DENIED      No related PAD entry was found.
   @retval EFI_INVALID_PARAMETER  The IKE version is not supported.
-  
+
 **/
 EFI_STATUS
 IkeNegotiate (
@@ -519,8 +519,8 @@ IkeNegotiate (
   }
   //
   // Try to find the IKE SA session in the IKEv1 and IKEv2 established SA session list.
-  //  
-  IkeSaSession = (UINT8 *) Ikev2SaSessionLookup (&Private->Ikev2EstablishedList, RemoteIp);    
+  //
+  IkeSaSession = (UINT8 *) Ikev2SaSessionLookup (&Private->Ikev2EstablishedList, RemoteIp);
 
 
   if (IkeSaSession == NULL) {
@@ -551,7 +551,7 @@ IkeNegotiate (
     if (IkeVersion != 2) {
       return EFI_INVALID_PARAMETER;
     }
-   
+
     Exchange = mIkeExchange[IkeVersion - 1];
     //
     // Start the quick mode stage to negotiate child SA.
@@ -564,15 +564,15 @@ IkeNegotiate (
 
 /**
   The generic interface when receive a IKE packet.
-  
+
   This function is called when UDP IO receives a IKE packet.
-  
+
   @param[in] Packet       Point to received IKE packet.
-  @param[in] EndPoint     Point to UDP_END_POINT which contains the information of 
+  @param[in] EndPoint     Point to UDP_END_POINT which contains the information of
                           Remote IP and Port.
   @param[in] IoStatus     The Status of Recieve Token.
   @param[in] Context      Point to data passed from the caller.
-    
+
 **/
 VOID
 EFIAPI
@@ -687,17 +687,19 @@ ON_EXIT:
 
 /**
   Delete all established IKE SAs and related Child SAs.
-  
-  This function is the subfunction of the IpSecCleanupAllSa(). It first calls  
-  IkeDeleteChildSa() to delete all Child SAs then send out the related 
+
+  This function is the subfunction of the IpSecCleanupAllSa(). It first calls
+  IkeDeleteChildSa() to delete all Child SAs then send out the related
   Information packet.
 
-  @param[in]  Private  Pointer of the IPSEC_PRIVATE_DATA
+  @param[in]  Private           Pointer of the IPSEC_PRIVATE_DATA
+  @param[in]  IsDisableIPsec    Indicate whether needs to disable IPsec.
 
 **/
 VOID
 IkeDeleteAllSas (
-  IN IPSEC_PRIVATE_DATA  *Private
+  IN IPSEC_PRIVATE_DATA  *Private,
+  IN BOOLEAN             IsDisableIpsec
   )
 {
   LIST_ENTRY             *Entry;
@@ -719,17 +721,17 @@ IkeDeleteAllSas (
   //
   if (!IsListEmpty (&Private->Ikev2SessionList)) {
     NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Private->Ikev2SessionList) {
-      Ikev2SaSession = IKEV2_SA_SESSION_BY_SESSION (Entry);  
+      Ikev2SaSession = IKEV2_SA_SESSION_BY_SESSION (Entry);
       RemoveEntryList (Entry);
       Ikev2SaSessionFree (Ikev2SaSession);
     }
   }
-  
+
   //
   // If there is no existing established IKE SA, set the Ipsec DisableFlag to TRUE
   // and turn off the IsIPsecDisabling flag.
   //
-  if (IsListEmpty (&Private->Ikev2EstablishedList)) {
+  if (IsListEmpty (&Private->Ikev2EstablishedList) && IsDisableIpsec) {
     Value = IPSEC_STATUS_DISABLED;
     Status = gRT->SetVariable (
                IPSECCONFIG_STATUS_NAME,
@@ -752,7 +754,7 @@ IkeDeleteAllSas (
     for (Entry = Private->Ikev2EstablishedList.ForwardLink; Entry != &Private->Ikev2EstablishedList;) {
       Ikev2SaSession = IKEV2_SA_SESSION_BY_SESSION (Entry);
       Entry = Entry->ForwardLink;
-    
+
       Ikev2SaSession->SessionCommon.State = IkeStateSaDeleting;
 
       //
@@ -762,10 +764,10 @@ IkeDeleteAllSas (
       if (IkeVersion == 2) {
         Exchange = mIkeExchange[IkeVersion - 1];
         Exchange->NegotiateInfo((UINT8*)Ikev2SaSession, NULL);
-      }      
+      }
     }
   }
-  
+
 }
 
 

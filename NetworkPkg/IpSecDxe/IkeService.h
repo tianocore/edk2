@@ -1,6 +1,6 @@
 /** @file
   Prototypes definitions of IKE service.
-  
+
   Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -44,7 +44,7 @@ EFI_STATUS
   );
 
 /**
-  This is prototype definition fo general interface to start a IKE negotiation at Quick Mode. 
+  This is prototype definition fo general interface to start a IKE negotiation at Quick Mode.
 
   This function will be called when the related IKE SA is existed and start to
   create a Child SA.
@@ -81,7 +81,7 @@ EFI_STATUS
   );
 
 /**
-  This is prototype definition of the general interface when recived a IKE Pakcet 
+  This is prototype definition of the general interface when recived a IKE Pakcet
   for the IKE SA establishing.
 
   @param[in]  UdpService      Point to UDP service used to send IKE Packet.
@@ -97,8 +97,8 @@ VOID
 
 /**
   This is prototyp definition of the general interface when recived a IKE Packet
-  xfor the Child SA establishing. 
- 
+  xfor the Child SA establishing.
+
   @param[in]  UdpService      Point to UDP service used to send IKE packet.
   @param[in]  IkePacket       Point to received IKE packet.
 
@@ -111,7 +111,7 @@ VOID
   );
 
 /**
-  This is prototype definition of the general interface when received a IKE 
+  This is prototype definition of the general interface when received a IKE
   information Packet.
 
   @param[in]  UdpService      Point to UDP service used to send IKE packet.
@@ -137,16 +137,16 @@ typedef struct _IKE_EXCHANGE_INTERFACE {
 
 /**
   Open and configure a UDPIO of Udp4 for IKE packet receiving.
-  
-  This function is called at the IPsecDriverBinding start. IPsec create a UDP4 and  
+
+  This function is called at the IPsecDriverBinding start. IPsec create a UDP4 and
   a UDP4 IO for each NIC handle.
-  
+
   @param[in] Private        Point to IPSEC_PRIVATE_DATA
   @param[in] Controller     Handler for NIC card.
-  
+
   @retval EFI_SUCCESS             The Operation is successful.
   @retval EFI_OUT_OF_RESOURCE     The required system resource can't be allocated.
-  
+
 **/
 EFI_STATUS
 IkeOpenInputUdp4 (
@@ -156,16 +156,16 @@ IkeOpenInputUdp4 (
 
 /**
   Open and configure a UDPIO of Udp6 for IKE packet receiving.
-  
+
   This function is called at the IPsecDriverBinding start. IPsec create a UDP6 and UDP6
   IO for each NIC handle.
-  
+
   @param[in] Private        Point to IPSEC_PRIVATE_DATA
   @param[in] Controller     Handler for NIC card.
-  
+
   @retval EFI_SUCCESS             The Operation is successful.
   @retval EFI_OUT_OF_RESOURCE     The required system resource can't be allocated.
-  
+
 **/
 EFI_STATUS
 IkeOpenInputUdp6 (
@@ -175,17 +175,17 @@ IkeOpenInputUdp6 (
 
 /**
   The general interface of starting IPsec Key Exchange.
-  
+
   This function is called when start a IKE negotiation to get a Key.
-  
-  @param[in] UdpService   Point to IKE_UDP_SERVICE which will be used for 
+
+  @param[in] UdpService   Point to IKE_UDP_SERVICE which will be used for
                           IKE packet sending.
   @param[in] SpdEntry     Point to the SPD entry related to the IKE negotiation.
   @param[in] RemoteIp     Point to EFI_IP_ADDRESS related to the IKE negotiation.
-  
+
   @retval EFI_SUCCESS          The Operation is successful.
   @retval EFI_ACCESS_DENIED    No related PAD entry was found.
-  
+
 **/
 EFI_STATUS
 IkeNegotiate (
@@ -196,15 +196,15 @@ IkeNegotiate (
 
 /**
   The general interface when receive a IKE packet.
-  
+
   This function is called when UDP IO receives a IKE packet.
-  
+
   @param[in] Packet       Point to received IKE packet.
-  @param[in] EndPoint     Point to UDP_END_POINT which contains the information of 
+  @param[in] EndPoint     Point to UDP_END_POINT which contains the information of
                           Remote IP and Port.
   @param[in] IoStatus     The Status of Recieve Token.
   @param[in] Context      Point to data passed from the caller.
-    
+
 **/
 VOID
 EFIAPI
@@ -235,17 +235,19 @@ IkeLookupUdp (
 
 /**
   Delete all established IKE SAs and related Child SAs.
-  
-  This function is the subfunction of the IpSecCleanupAllSa(). It first calls  
-  IkeDeleteChildSa() to delete all Child SAs then send out the related 
+
+  This function is the subfunction of the IpSecCleanupAllSa(). It first calls
+  IkeDeleteChildSa() to delete all Child SAs then send out the related
   Information packet.
 
-  @param[in]  Private  Pointer of the IPSEC_PRIVATE_DATA.
+  @param[in]  Private           Pointer of the IPSEC_PRIVATE_DATA.
+  @param[in]  IsDisableIPsec    Indicate whether needs to disable IPsec.
 
 **/
 VOID
 IkeDeleteAllSas (
-  IN IPSEC_PRIVATE_DATA             *Private
+  IN IPSEC_PRIVATE_DATA             *Private,
+  IN BOOLEAN                        IsDisableIpsec
   );
 
 

@@ -23,7 +23,7 @@
   Check if the specified Address is the Valid Address Range.
 
   This function checks if the bytes after prefixed length are all Zero in this
-  Address. This Address is supposed to point to a range address. That means it 
+  Address. This Address is supposed to point to a range address. That means it
   should gives the correct prefixed address and the bytes outside the prefixed are
   zero.
 
@@ -329,7 +329,7 @@ IpSecLookupSadBySpd (
 {
   LIST_ENTRY      *Entry;
   IPSEC_SAD_ENTRY *SadEntry;
-  
+
   NET_LIST_FOR_EACH (Entry, SadList) {
 
     SadEntry = IPSEC_SAD_ENTRY_FROM_SPD (Entry);
@@ -341,7 +341,7 @@ IpSecLookupSadBySpd (
           DestAddress,
           SadEntry->Data->SpdSelector->RemoteAddress,
           SadEntry->Data->SpdSelector->RemoteAddressCount
-          )){    
+          )){
       return SadEntry;
     }
   }
@@ -382,7 +382,7 @@ IpSecLookupSadBySpi (
     if (SadEntry->Id->Spi == Spi) {
       if (SadEntry->Data->Mode == EfiIPsecTunnel) {
         if (CompareMem (
-              &DestAddress, 
+              &DestAddress,
               &SadEntry->Data->TunnelDestAddress,
               sizeof (EFI_IP_ADDRESS)
               )) {
@@ -391,14 +391,14 @@ IpSecLookupSadBySpi (
       } else {
         if (SadEntry->Data->SpdSelector != NULL &&
             IpSecMatchIpAddress (
-              IpVersion, 
-              DestAddress, 
+              IpVersion,
+              DestAddress,
               SadEntry->Data->SpdSelector->RemoteAddress,
               SadEntry->Data->SpdSelector->RemoteAddressCount
               )
             ) {
           return SadEntry;
-        }       
+        }
       }
     }
   }
@@ -471,14 +471,13 @@ IpSecLookupSadEntry (
       sizeof (EFI_IP_ADDRESS)
       );
   }
-  
+
   //
   // Find the SAD entry in the spd.sas list according to the dest address.
   //
   Entry = IpSecLookupSadBySpd (&SpdEntry->Data->Sas, &DestIp, IpVersion);
 
   if (Entry == NULL) {
-
     if (OldLastHead != IP6_ICMP ||
         (OldLastHead == IP6_ICMP && *IpPayload == ICMP_V6_ECHO_REQUEST)
         ) {
@@ -498,7 +497,7 @@ IpSecLookupSadEntry (
           &DestIp
         );
       }
-      
+
     }
 
     return EFI_NOT_READY;
@@ -595,7 +594,7 @@ IpSecLookupSpdEntry (
   IN     VOID                    *IpHead,
   IN     UINT8                   *IpPayload,
   IN     UINT8                   Protocol,
-  IN     BOOLEAN                 IsOutbound, 
+  IN     BOOLEAN                 IsOutbound,
      OUT EFI_IPSEC_ACTION        *Action
   )
 {
@@ -733,7 +732,7 @@ IpSecRecycleCallback (
 }
 
 /**
-  Calculate the extension hader of IP. The return length only doesn't contain 
+  Calculate the extension hader of IP. The return length only doesn't contain
   the fixed IP header length.
 
   @param[in]  IpHead             Points to an IP head to be calculated.
@@ -801,7 +800,7 @@ IpSecEspAuthVerifyPayload (
   //
   HashFragment[0].Data     = EspBuffer;
   HashFragment[0].DataSize = AuthSize;
-  
+
   Status = IpSecCryptoIoHmac (
              SadEntry->Data->AlgoInfo.EspAlgoInfo.AuthAlgoId,
              SadEntry->Data->AlgoInfo.EspAlgoInfo.AuthKey,
@@ -814,7 +813,7 @@ IpSecEspAuthVerifyPayload (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Compare the calculated icv and the appended original icv.
   //
@@ -832,10 +831,10 @@ IpSecEspAuthVerifyPayload (
   @param[in]  IpHead       The pointer to IP header.
   @param[in]  IpVersion    The version of IP (IP4 or IP6).
   @param[in]  Spi          The SPI used to search the related SAD entry.
-  
+
 
   @retval     NULL             Not find the related SAD entry.
-  @retval     IPSEC_SAD_ENTRY  Return the related SAD entry. 
+  @retval     IPSEC_SAD_ENTRY  Return the related SAD entry.
 
 **/
 IPSEC_SAD_ENTRY *
@@ -843,10 +842,10 @@ IpSecFoundSadFromInboundPacket (
    UINT8   *IpHead,
    UINT8   IpVersion,
    UINT32  Spi
-   ) 
+   )
 {
   EFI_IP_ADDRESS   DestIp;
-   
+
   //
   // Parse destination address from ip header.
   //
@@ -864,10 +863,10 @@ IpSecFoundSadFromInboundPacket (
       sizeof (EFI_IPv6_ADDRESS)
       );
   }
-  
+
   //
   // Lookup SAD entry according to the spi and dest address.
-  //  
+  //
   return IpSecLookupSadBySpi (Spi, &DestIp, IpVersion);
 }
 
@@ -994,7 +993,7 @@ IpSecIsIp6ExtsValid (
        }
 
        return TRUE;
-    }   
+    }
   }
 
   *LastHeader = NextHeader;
@@ -1007,14 +1006,14 @@ IpSecIsIp6ExtsValid (
 }
 
 /**
-  The actual entry to process the tunnel header and inner header for tunnel mode 
+  The actual entry to process the tunnel header and inner header for tunnel mode
   outbound traffic.
 
-  This function is the subfunction of IpSecEspInboundPacket(). It change the destination 
+  This function is the subfunction of IpSecEspInboundPacket(). It change the destination
   Ip address to the station address and recalculate the uplayyer's checksum.
-  
 
-  @param[in, out] IpHead             Points to the IP header containing the ESP header 
+
+  @param[in, out] IpHead             Points to the IP header containing the ESP header
                                      to be trimed on input, and without ESP header
                                      on return.
   @param[in]      IpPayload          The decrypted Ip payload. It start from the inner
@@ -1042,10 +1041,10 @@ IpSecTunnelInboundPacket (
   IP6_ICMP_HEAD    *Icmp6Head;
 
   Checksum = NULL;
-  
+
   if (IpVersion == IP_VERSION_4) {
     //
-    // Zero OutIP header use this to indicate the input packet is under 
+    // Zero OutIP header use this to indicate the input packet is under
     // IPsec Tunnel protected.
     //
     ZeroMem (
@@ -1057,20 +1056,20 @@ IpSecTunnelInboundPacket (
       &SadData->TunnelDestAddress.v4,
       sizeof (EFI_IPv4_ADDRESS)
       );
-      
+
     //
     // Recalculate IpHeader Checksum
     //
     if (((IP4_HEAD *)(IpPayload))->Checksum != 0 ) {
       ((IP4_HEAD *)(IpPayload))->Checksum = 0;
       ((IP4_HEAD *)(IpPayload))->Checksum = (UINT16) (~NetblockChecksum (
-                                                        (UINT8 *)IpPayload, 
+                                                        (UINT8 *)IpPayload,
                                                         ((IP4_HEAD *)IpPayload)->HeadLen << 2
                                                         ));
 
 
     }
-    
+
     //
     // Recalcualte PseudoChecksum
     //
@@ -1091,7 +1090,7 @@ IpSecTunnelInboundPacket (
       break;
       }
     PacketChecksum = NetblockChecksum (
-                       (UINT8 *)IpPayload + (((IP4_HEAD *)IpPayload)->HeadLen << 2), 
+                       (UINT8 *)IpPayload + (((IP4_HEAD *)IpPayload)->HeadLen << 2),
                        NTOHS (((IP4_HEAD *)IpPayload)->TotalLen) - (((IP4_HEAD *)IpPayload)->HeadLen << 2)
                        );
     PseudoChecksum = NetPseudoHeadChecksum (
@@ -1100,14 +1099,14 @@ IpSecTunnelInboundPacket (
                        ((IP4_HEAD *)IpPayload)->Protocol,
                        0
                        );
-      
+
       if (Checksum != NULL) {
         *Checksum = NetAddChecksum (PacketChecksum, PseudoChecksum);
         *Checksum = (UINT16) ~(NetAddChecksum (*Checksum, HTONS((UINT16)(NTOHS (((IP4_HEAD *)IpPayload)->TotalLen) - (((IP4_HEAD *)IpPayload)->HeadLen << 2)))));
       }
     }else {
       //
-      //  Zero OutIP header use this to indicate the input packet is under 
+      //  Zero OutIP header use this to indicate the input packet is under
       //  IPsec Tunnel protected.
       //
       ZeroMem (
@@ -1119,7 +1118,7 @@ IpSecTunnelInboundPacket (
         &SadData->TunnelDestAddress.v6,
         sizeof (EFI_IPv6_ADDRESS)
         );
-      
+
       //
       // Get the Extension Header and Header length.
       //
@@ -1130,7 +1129,7 @@ IpSecTunnelInboundPacket (
         &LastHead,
         &OptionLen
         );
-      
+
       //
       // Recalcualte PseudoChecksum
       //
@@ -1154,7 +1153,7 @@ IpSecTunnelInboundPacket (
         break;
       }
       PacketChecksum = NetblockChecksum (
-                         IpPayload + sizeof (EFI_IP6_HEADER) + OptionLen, 
+                         IpPayload + sizeof (EFI_IP6_HEADER) + OptionLen,
                          NTOHS(((EFI_IP6_HEADER *)IpPayload)->PayloadLength) - OptionLen
                          );
       PseudoChecksum = NetIp6PseudoHeadChecksum (
@@ -1163,7 +1162,7 @@ IpSecTunnelInboundPacket (
                          *LastHead,
                          0
                          );
-    
+
     if (Checksum != NULL) {
       *Checksum = NetAddChecksum (PacketChecksum, PseudoChecksum);
       *Checksum = (UINT16) ~(NetAddChecksum (
@@ -1171,22 +1170,22 @@ IpSecTunnelInboundPacket (
                                HTONS ((UINT16)((NTOHS (((EFI_IP6_HEADER *)(IpPayload))->PayloadLength)) - OptionLen))
                                ));
     }
-  }    
+  }
 }
 
 /**
   The actual entry to create inner header for tunnel mode inbound traffic.
 
-  This function is the subfunction of IpSecEspOutboundPacket(). It create 
-  the sending packet by encrypting its payload and inserting ESP header in the orginal 
+  This function is the subfunction of IpSecEspOutboundPacket(). It create
+  the sending packet by encrypting its payload and inserting ESP header in the orginal
   IP header, then return the IpHeader and IPsec protected Fragmentable.
-  
-  @param[in, out] IpHead             Points to IP header containing the orginal IP header 
+
+  @param[in, out] IpHead             Points to IP header containing the orginal IP header
                                      to be processed on input, and inserted ESP header
                                      on return.
   @param[in]      IpVersion          The version of IP.
   @param[in]      SadData            The related SAD data.
-  @param[in, out] LastHead           The Last Header in IP header.  
+  @param[in, out] LastHead           The Last Header in IP header.
   @param[in]      OptionsBuffer      Pointer to the options buffer.
   @param[in]      OptionsLength      Length of the options buffer.
   @param[in, out] FragmentTable      Pointer to a list of fragments to be protected by
@@ -1221,7 +1220,7 @@ IpSecTunnelOutboundPacket (
   if (OptionsLength == NULL) {
     return NULL;
   }
-  
+
   if (IpVersion == IP_VERSION_4) {
     InnerHead = AllocateZeroPool (sizeof (IP4_HEAD) + *OptionsLength);
     ASSERT (InnerHead != NULL);
@@ -1256,7 +1255,7 @@ IpSecTunnelOutboundPacket (
       *OptionsLength = 0;
     }
   }
-  
+
   //
   // 2. Reassamlbe Fragment into Packet
   //
@@ -1294,13 +1293,13 @@ IpSecTunnelOutboundPacket (
     Checksum = &IcmpHead->Checksum;
     *Checksum = 0;
     break;
-  
-  default: 
+
+  default:
     break;
   }
 
   PacketChecksum = NetbufChecksum (Packet);
-    
+
   if (IpVersion == IP_VERSION_4) {
     //
     // Replace the source address of Inner Header.
@@ -1318,7 +1317,7 @@ IpSecTunnelOutboundPacket (
                        *LastHead,
                        0
                        );
-    
+
    } else {
      //
      // Replace the source address of Inner Header.
@@ -1335,7 +1334,7 @@ IpSecTunnelOutboundPacket (
                       *LastHead,
                       0
                       );
-   
+
    }
    if (Checksum != NULL) {
      *Checksum = NetAddChecksum (PacketChecksum, PseudoChecksum);
@@ -1351,12 +1350,12 @@ IpSecTunnelOutboundPacket (
 /**
   The actual entry to relative function processes the inbound traffic of ESP header.
 
-  This function is the subfunction of IpSecProtectInboundPacket(). It checks the 
+  This function is the subfunction of IpSecProtectInboundPacket(). It checks the
   received packet security property and trim the ESP header and then returns without
   an IPsec protected IP Header and FramgmentTable.
-  
+
   @param[in]      IpVersion          The version of IP.
-  @param[in, out] IpHead             Points to the IP header containing the ESP header 
+  @param[in, out] IpHead             Points to the IP header containing the ESP header
                                      to be trimed on input, and without ESP header
                                      on return.
   @param[out]     LastHead           The Last Header in IP header on return.
@@ -1417,7 +1416,7 @@ IpSecEspInboundPacket (
   *RecycleEvent     = NULL;
   PlainPayloadSize  = 0;
   NextHeader        = 0;
-  
+
   //
   // Build netbuf from fragment table first.
   //
@@ -1433,27 +1432,27 @@ IpSecEspInboundPacket (
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
-  
+
   //
   // Get the esp size and esp header from netbuf.
   //
   EspSize   = Payload->TotalSize;
   EspHeader = (EFI_ESP_HEADER *) NetbufGetByte (Payload, 0, NULL);
-  
+
   if (EspHeader == NULL) {
     Status = EFI_ACCESS_DENIED;
     goto ON_EXIT;
   }
-  
+
   //
   // Parse destination address from ip header and found the related SAD Entry.
   //
   SadEntry = IpSecFoundSadFromInboundPacket (
-               IpHead, 
+               IpHead,
                IpVersion,
                NTOHL (EspHeader->Spi)
                );
-  
+
   if (SadEntry == NULL) {
     Status = EFI_ACCESS_DENIED;
     goto ON_EXIT;
@@ -1475,7 +1474,7 @@ IpSecEspInboundPacket (
     // TODO: Check SA lifetime and sequence number
     //
   }
-    
+
   //
   // Allocate buffer for decryption and authentication.
   //
@@ -1493,7 +1492,7 @@ IpSecEspInboundPacket (
   IcvSize   = IpSecGetIcvLength (SadEntry->Data->AlgoInfo.EspAlgoInfo.AuthAlgoId);
   IvSize    = IpSecGetEncryptIvLength (SadEntry->Data->AlgoInfo.EspAlgoInfo.EncAlgoId);
   BlockSize = IpSecGetEncryptBlockSize (SadEntry->Data->AlgoInfo.EspAlgoInfo.EncAlgoId);
-  
+
   //
   // Make sure the ESP packet is not mal-formt.
   // 1. Check whether the Espsize is larger than ESP header + IvSize + EspTail + IcvSize.
@@ -1540,20 +1539,20 @@ IpSecEspInboundPacket (
       goto ON_EXIT;
     }
   }
-  
+
   //
   // Parse EspTail and compute the plain payload size.
   //
   EspTail           = (EFI_ESP_TAIL *) (ProcessBuffer + EspSize - IcvSize - sizeof (EFI_ESP_TAIL));
   PaddingSize       = EspTail->PaddingLength;
   NextHeader        = EspTail->NextHeader;
-  
+
   if (EspSize <= (MiscSize + sizeof (EFI_ESP_TAIL) + PaddingSize)) {
     Status = EFI_ACCESS_DENIED;
     goto ON_EXIT;
   }
   PlainPayloadSize  = EspSize - MiscSize - sizeof (EFI_ESP_TAIL) - PaddingSize;
-  
+
   //
   // TODO: handle anti-replay window
   //
@@ -1577,7 +1576,7 @@ IpSecEspInboundPacket (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
-  
+
   //
   // The caller will take responsible to handle the original fragment table
   //
@@ -1589,7 +1588,7 @@ IpSecEspInboundPacket (
 
   RecycleContext->PayloadBuffer       = ProcessBuffer;
   RecycleContext->FragmentTable       = *FragmentTable;
-  
+
   //
   // If Tunnel, recalculate upper-layyer PesudoCheckSum and trim the out
   //
@@ -1602,20 +1601,20 @@ IpSecEspInboundPacket (
       SadData,
       LastHead
       );
-    
+
     if (IpVersion == IP_VERSION_4) {
       (*FragmentTable)[0].FragmentBuffer  = InnerHead ;
       (*FragmentTable)[0].FragmentLength  = (UINT32) PlainPayloadSize;
-      
-    }else {      
+
+    }else {
       (*FragmentTable)[0].FragmentBuffer  = InnerHead;
       (*FragmentTable)[0].FragmentLength  = (UINT32) PlainPayloadSize;
-    }    
+    }
   } else {
     (*FragmentTable)[0].FragmentBuffer  = ProcessBuffer + sizeof (EFI_ESP_HEADER) + IvSize;
     (*FragmentTable)[0].FragmentLength  = (UINT32) PlainPayloadSize;
   }
-  
+
   *FragmentCount                      = 1;
 
   //
@@ -1633,7 +1632,7 @@ IpSecEspInboundPacket (
     //
     *LastHead = NextHeader;
   }
-  
+
 
   //
   // Update the SPD association of the SAD entry.
@@ -1721,7 +1720,7 @@ IpSecEspOutboundPacket (
   EFI_ESP_TAIL          *EspTail;        // Address behind padding
   UINT8                 *InnerHead;
   HASH_DATA_FRAGMENT    HashFragment[1];
-  
+
   Status          = EFI_ACCESS_DENIED;
   SaId            = SadEntry->Id;
   SadData         = SadEntry->Data;
@@ -1754,7 +1753,7 @@ IpSecEspOutboundPacket (
                   FragmentTable,
                   FragmentCount
                   );
-    
+
     if (InnerHead == NULL) {
       return EFI_INVALID_PARAMETER;
     }
@@ -1794,7 +1793,7 @@ IpSecEspOutboundPacket (
     //
     // OPtions should be encryption into it
     //
-    PlainPayloadSize += *OptionsLength;    
+    PlainPayloadSize += *OptionsLength;
   }
 
 
@@ -1852,7 +1851,7 @@ IpSecEspOutboundPacket (
       // HeadLen, Total Length
       //
       ((IP4_HEAD *)InnerHead)->HeadLen  = (UINT8) ((sizeof (IP4_HEAD) + *OptionsLength) >> 2);
-      ((IP4_HEAD *)InnerHead)->TotalLen = HTONS ((UINT16) PlainPayloadSize);  
+      ((IP4_HEAD *)InnerHead)->TotalLen = HTONS ((UINT16) PlainPayloadSize);
       ((IP4_HEAD *)InnerHead)->Checksum = 0;
       ((IP4_HEAD *)InnerHead)->Checksum = (UINT16) (~NetblockChecksum (
                                                   (UINT8 *)InnerHead,
@@ -1904,7 +1903,7 @@ IpSecEspOutboundPacket (
       EspTail->NextHeader = 4;
     } else {
       EspTail->NextHeader = 41;
-    }    
+    }
   }
 
   //
@@ -1914,8 +1913,8 @@ IpSecEspOutboundPacket (
              (UINT8 *) (EspHeader + 1),
              IvSize
              );
-  
-  
+
+
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
@@ -2011,10 +2010,10 @@ IpSecEspOutboundPacket (
   if (SadData->Mode == EfiIPsecTunnel) {
     if (IpVersion == IP_VERSION_4) {
       CopyMem (
-        &((IP4_HEAD *) IpHead)->Src, 
+        &((IP4_HEAD *) IpHead)->Src,
         &SadData->TunnelSourceAddress.v4,
         sizeof (EFI_IPv4_ADDRESS)
-        );  
+        );
       CopyMem (
         &((IP4_HEAD *) IpHead)->Dst,
         &SadData->TunnelDestAddress.v4,
@@ -2065,11 +2064,11 @@ ON_EXIT:
 /**
   This function processes the inbound traffic with IPsec.
 
-  It checks the received packet security property, trims the ESP/AH header, and then 
+  It checks the received packet security property, trims the ESP/AH header, and then
   returns without an IPsec protected IP Header and FragmentTable.
-  
+
   @param[in]      IpVersion          The version of IP.
-  @param[in, out] IpHead             Points to IP header containing the ESP/AH header 
+  @param[in, out] IpHead             Points to IP header containing the ESP/AH header
                                      to be trimed on input, and without ESP/AH header
                                      on return.
   @param[in, out] LastHead           The Last Header in IP header on return.

@@ -1,7 +1,7 @@
 /** @file
   The general interfaces of the IKEv2.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -46,7 +46,7 @@ Ikev2NegotiateSa (
   IKEV2_PACKET_HANDLER      Handler;
   IKE_PACKET                *IkePacket;
   EFI_STATUS                Status;
-  
+
   if (UdpService == NULL || RemoteIp == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -66,7 +66,7 @@ Ikev2NegotiateSa (
     //
     return EFI_SUCCESS;
   }
-  
+
   //
   // Create a new IkeSaSession and initiate the common parameters.
   //
@@ -79,7 +79,7 @@ Ikev2NegotiateSa (
   // Set the specific parameters and state(IKE_STATE_INIT).
   //
   IkeSaSession->Spd            = SpdEntry;
-  IkeSaSession->Pad            = PadEntry;  
+  IkeSaSession->Pad            = PadEntry;
   SessionCommon                = &IkeSaSession->SessionCommon;
   SessionCommon->IsInitiator   = TRUE;
   SessionCommon->State         = IkeStateInit;
@@ -88,13 +88,13 @@ Ikev2NegotiateSa (
   // to support it.
   //
   SessionCommon->PreferDhGroup = IKEV2_TRANSFORM_ID_DH_1024MODP;
-  
+
   CopyMem (
     &SessionCommon->RemotePeerIp,
     RemoteIp,
     sizeof (EFI_IP_ADDRESS)
     );
-  
+
   CopyMem (
     &SessionCommon->LocalPeerIp,
     &UdpService->DefaultAddress,
@@ -147,15 +147,15 @@ ON_ERROR:
 /**
   It is general interface to negotiate the Child SA.
 
-  There are three situations which will invoke this function. First, create a CHILD 
-  SA if the input Context is NULL. Second, rekeying the existing IKE SA if the Context 
-  is a IKEv2_SA_SESSION. Third, rekeying the existing CHILD SA if the context is a 
+  There are three situations which will invoke this function. First, create a CHILD
+  SA if the input Context is NULL. Second, rekeying the existing IKE SA if the Context
+  is a IKEv2_SA_SESSION. Third, rekeying the existing CHILD SA if the context is a
   IKEv2_CHILD_SA_SESSION.
 
   @param[in] IkeSaSession  Pointer to IKEv2_SA_SESSION related to this operation.
   @param[in] SpdEntry      Pointer to IPSEC_SPD_ENTRY related to this operation.
   @param[in] Context       The data pass from the caller.
-  
+
   @retval EFI_SUCCESS          The operation is successful.
   @retval EFI_OUT_OF_RESOURCES The required system resource can't be allocated.
   @retval EFI_UNSUPPORTED      The condition is not support yet.
@@ -239,7 +239,7 @@ Ikev2NegotiateChildSa (
     if (EFI_ERROR (Status)) {
       goto ON_ERROR;
     }
-    
+
     //
     // Insert the ChildSaSession into processing child SA list.
     //
@@ -278,8 +278,8 @@ ON_ERROR:
   It is general interface to start the Information Exchange.
 
   There are three situations which will invoke this function. First, deliver a Delete Information
-  to delete the IKE SA if the input Context is NULL and the state of related IkeSaSeesion's is on 
-  deleting.Second, deliver a Notify Information without the contents if the input Context is NULL. 
+  to delete the IKE SA if the input Context is NULL and the state of related IkeSaSeesion's is on
+  deleting.Second, deliver a Notify Information without the contents if the input Context is NULL.
   Third, deliver a Notify Information if the input Context is not NULL.
 
   @param[in] IkeSaSession  Pointer to IKEv2_SA_SESSION related to this operation.
@@ -297,7 +297,7 @@ Ikev2NegotiateInfo (
   IN UINT8           *Context
   )
 {
-  
+
   EFI_STATUS                Status;
   IKEV2_SA_SESSION          *Ikev2SaSession;
   IKEV2_CHILD_SA_SESSION    *ChildSaSession;
@@ -319,11 +319,6 @@ Ikev2NegotiateInfo (
   if (Ikev2SaSession->SessionCommon.State == IkeStateSaDeleting && Context == NULL) {
 
     //
-    // The IKE SA Session should be initiator if it triggers the deleting.
-    //
-    Ikev2SaSession->SessionCommon.IsInitiator = TRUE;
-
-    //
     // Generate Information Packet which contains the Delete Payload.
     //
     IkePacket = mIkev2Info.Generator ((UINT8 *) Ikev2SaSession, NULL);
@@ -335,10 +330,12 @@ Ikev2NegotiateInfo (
     //
     // Send out the Packet
     //
-    Status = Ikev2SendIkePacket (UdpService, (UINT8 *) SaCommon, IkePacket, 0);
+    if (UdpService != NULL) {
+      Status = Ikev2SendIkePacket (UdpService, (UINT8 *) SaCommon, IkePacket, 0);
 
-    if (EFI_ERROR (Status)) {
-      goto ON_ERROR;
+      if (EFI_ERROR (Status)) {
+        goto ON_ERROR;
+      }
     }
   } else if (!IsListEmpty (&Ikev2SaSession->DeleteSaList)) {
     //
@@ -360,10 +357,12 @@ Ikev2NegotiateInfo (
       //
       // Send out the Packet
       //
-      Status = Ikev2SendIkePacket (UdpService, (UINT8 *) &ChildSaSession->SessionCommon, IkePacket, 0);
+      if (UdpService != NULL) {
+        Status = Ikev2SendIkePacket (UdpService, (UINT8 *) &ChildSaSession->SessionCommon, IkePacket, 0);
 
-      if (EFI_ERROR (Status)) {
-        goto ON_ERROR;
+        if (EFI_ERROR (Status)) {
+          goto ON_ERROR;
+        }
       }
     }
   }  else if (Context == NULL) {
@@ -386,9 +385,9 @@ ON_ERROR:
 /**
   The general interface when received a IKEv2 packet for the IKE SA establishing.
 
-  This function first find the related IKE SA Session according to the IKE packet's 
+  This function first find the related IKE SA Session according to the IKE packet's
   remote IP. Then call the corresponding function to handle this IKE packet according
-  to the related IKE SA Session's State. 
+  to the related IKE SA Session's State.
 
   @param[in] UdpService    Pointer of related UDP Service.
   @param[in] IkePacket     Data passed by caller.
@@ -411,13 +410,13 @@ Ikev2HandleSa (
   IPSEC_PRIVATE_DATA      *Private;
   BOOLEAN                 IsNewSession;
 
-  Private = (UdpService->IpVersion == IP_VERSION_4) ? 
+  Private = (UdpService->IpVersion == IP_VERSION_4) ?
              IPSEC_PRIVATE_DATA_FROM_UDP4LIST(UdpService->ListHead) :
              IPSEC_PRIVATE_DATA_FROM_UDP6LIST(UdpService->ListHead);
 
   ChildSaSession = NULL;
   ChildSaCommon  = NULL;
-  
+
   //
   // Lookup the remote ip address in the processing IKE SA session list.
   //
@@ -461,7 +460,7 @@ Ikev2HandleSa (
       &UdpService->DefaultAddress,
       sizeof (EFI_IP_ADDRESS)
       );
-    
+
     IsNewSession = TRUE;
   }
 
@@ -517,15 +516,15 @@ Ikev2HandleSa (
     //
     // Generate a piggyback child SA in IKE_STATE_AUTH state.
     //
-    ASSERT (IsListEmpty (&IkeSaSession->ChildSaSessionList) && 
+    ASSERT (IsListEmpty (&IkeSaSession->ChildSaSessionList) &&
             IsListEmpty (&IkeSaSession->ChildSaEstablishSessionList));
-    
+
     ChildSaSession = Ikev2ChildSaSessionCreate (IkeSaSession, UdpService);
     ChildSaCommon  = &ChildSaSession->SessionCommon;
 
     //
     // Initialize the SA data for Child SA.
-    //    
+    //
     ChildSaSession->SaData = Ikev2InitializeSaData (ChildSaCommon);
   }
 
@@ -570,7 +569,7 @@ Ikev2HandleSa (
 
     //
     // Remove the Established Child SA Session from the IkeSaSession->ChildSaSessionList
-    // ,insert it into IkeSaSession->ChildSaEstablishSessionList and save this Child SA 
+    // ,insert it into IkeSaSession->ChildSaEstablishSessionList and save this Child SA
     // into SAD.
     //
     ChildSaSession = IKEV2_CHILD_SA_SESSION_BY_IKE_SA (IkeSaSession->ChildSaSessionList.BackLink);
@@ -610,12 +609,12 @@ ON_ERROR:
 
 /**
 
-  The general interface when received a IKEv2 packet for the IKE Child SA establishing 
+  The general interface when received a IKEv2 packet for the IKE Child SA establishing
   or IKE SA/CHILD SA rekeying.
 
-  This function first find the related IKE SA Session according to the IKE packet's 
+  This function first find the related IKE SA Session according to the IKE packet's
   remote IP. Then call the corresponding function to handle this IKE packet according
-  to the related IKE Child Session's State. 
+  to the related IKE Child Session's State.
 
   @param[in] UdpService    Pointer of related UDP Service.
   @param[in] IkePacket     Data passed by caller.
@@ -632,8 +631,8 @@ Ikev2HandleChildSa (
   IKEV2_CREATE_CHILD_REQUEST_TYPE  RequestType;
   IKE_PACKET                       *Reply;
   IPSEC_PRIVATE_DATA               *Private;
-  
-  Private = (UdpService->IpVersion == IP_VERSION_4) ? 
+
+  Private = (UdpService->IpVersion == IP_VERSION_4) ?
              IPSEC_PRIVATE_DATA_FROM_UDP4LIST(UdpService->ListHead) :
              IPSEC_PRIVATE_DATA_FROM_UDP6LIST(UdpService->ListHead);
 
@@ -671,20 +670,20 @@ Ikev2HandleChildSa (
 
   //
   // Get the request type: CreateChildSa/RekeyChildSa/RekeyIkeSa.
-  //  
+  //
   RequestType = Ikev2ChildExchangeRequestType (IkePacket);
 
   switch (RequestType) {
   case IkeRequestTypeCreateChildSa:
-  case IkeRequestTypeRekeyChildSa: 
-  case IkeRequestTypeRekeyIkeSa: 
+  case IkeRequestTypeRekeyChildSa:
+  case IkeRequestTypeRekeyIkeSa:
     //
     // Parse the IKE request packet. Not support CREATE_CHILD_SA exchange yet, so
-    // only EFI_UNSUPPORTED will be returned and that will trigger a reply with a 
+    // only EFI_UNSUPPORTED will be returned and that will trigger a reply with a
     // Notify payload of type NO_ADDITIONAL_SAS.
     //
     Status = mIkev2CreateChild.Parser ((UINT8 *) IkeSaSession, IkePacket);
-    if (EFI_ERROR (Status)) {     
+    if (EFI_ERROR (Status)) {
       goto ON_REPLY;
     }
 
@@ -694,7 +693,7 @@ Ikev2HandleChildSa (
     //
     return ;
   }
-  
+
 ON_REPLY:
   //
   // Generate the reply packet if needed and send it out.
@@ -712,15 +711,15 @@ ON_REPLY:
         }
       }
     }
-  }  
+  }
   return ;
 }
 
 /**
 
   It is general interface to handle IKEv2 information Exchange.
-  
-  @param[in] UdpService  Point to IKE UPD Service related to this information exchange.  
+
+  @param[in] UdpService  Point to IKE UPD Service related to this information exchange.
   @param[in] IkePacket   The IKE packet to be parsed.
 
 **/
@@ -735,15 +734,15 @@ Ikev2HandleInfo (
   IKEV2_SA_SESSION        *IkeSaSession;
   IPSEC_PRIVATE_DATA      *Private;
 
-  Private = (UdpService->IpVersion == IP_VERSION_4) ? 
-             IPSEC_PRIVATE_DATA_FROM_UDP4LIST(UdpService->ListHead) : 
+  Private = (UdpService->IpVersion == IP_VERSION_4) ?
+             IPSEC_PRIVATE_DATA_FROM_UDP4LIST(UdpService->ListHead) :
              IPSEC_PRIVATE_DATA_FROM_UDP6LIST(UdpService->ListHead);
 
   //
   // Lookup the remote ip address in the processing IKE SA session list.
   //
   IkeSaSession = Ikev2SaSessionLookup (&Private->Ikev2EstablishedList, &IkePacket->RemotePeerIp);
-  
+
   if (IkeSaSession == NULL) {
     //
     // Drop the packet if no IKE SA associated.
@@ -754,12 +753,12 @@ Ikev2HandleInfo (
   // Validate the IKE packet header.
   //
   if (!Ikev2ValidateHeader (IkeSaSession, IkePacket->Header)) {
-  
+
     //
     // Drop the packet if invalid IKE header.
     //
     return;
-  }  
+  }
 
   SessionCommon = &IkeSaSession->SessionCommon;
 
@@ -778,7 +777,7 @@ Ikev2HandleInfo (
     // Drop the packet if fail to parse.
     //
     return;
-  }    
+  }
 }
 
 IKE_EXCHANGE_INTERFACE  mIkev1Exchange = {

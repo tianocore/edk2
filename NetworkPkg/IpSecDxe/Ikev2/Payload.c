@@ -19,10 +19,10 @@
 #include "IpSecCryptIo.h"
 
 //
-// The Constant String of "Key Pad for IKEv2" for Authentication Payload generation. 
+// The Constant String of "Key Pad for IKEv2" for Authentication Payload generation.
 //
 #define CONSTANT_KEY_SIZE     17
-GLOBAL_REMOVE_IF_UNREFERENCED CHAR8 mConstantKey[CONSTANT_KEY_SIZE] = 
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR8 mConstantKey[CONSTANT_KEY_SIZE] =
 {
   'K', 'e', 'y', ' ', 'P', 'a', 'd', ' ', 'f', 'o', 'r', ' ', 'I', 'K', 'E', 'v', '2'
 };
@@ -31,13 +31,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED CHAR8 mConstantKey[CONSTANT_KEY_SIZE] =
   Generate Ikev2 SA payload according to SessionSaData
 
   @param[in] SessionSaData   The data used in SA payload.
-  @param[in] NextPayload     The payload type presented in NextPayload field of 
+  @param[in] NextPayload     The payload type presented in NextPayload field of
                              SA Payload header.
   @param[in] Type            The SA type. It MUST be neither (1) for IKE_SA or
                              (2) for CHILD_SA or (3) for INFO.
 
   @retval a Pointer to SA IKE payload.
-  
+
 **/
 IKE_PAYLOAD *
 Ikev2GenerateSaPayload (
@@ -56,16 +56,16 @@ Ikev2GenerateSaPayload (
   // TODO: Get the Proposal Number and Transform Number from IPsec Config,
   // after the Ipsecconfig Application is support it.
   //
-  
+
   if (Type == IkeSessionTypeIkeSa) {
-    SaDataSize = sizeof (IKEV2_SA_DATA) + 
+    SaDataSize = sizeof (IKEV2_SA_DATA) +
                  SessionSaData->NumProposals * sizeof (IKEV2_PROPOSAL_DATA) +
                  sizeof (IKEV2_TRANSFORM_DATA) * SessionSaData->NumProposals * 4;
   } else {
-    SaDataSize = sizeof (IKEV2_SA_DATA) + 
+    SaDataSize = sizeof (IKEV2_SA_DATA) +
                  SessionSaData->NumProposals * sizeof (IKEV2_PROPOSAL_DATA) +
                  sizeof (IKEV2_TRANSFORM_DATA) * SessionSaData->NumProposals * 3;
-             
+
   }
 
   SaData = AllocateZeroPool (SaDataSize);
@@ -82,10 +82,10 @@ Ikev2GenerateSaPayload (
 /**
   Generate a Nonce payload containing the input parameter NonceBuf.
 
-  @param[in]  NonceBuf      The nonce buffer contains the whole Nonce payload block 
+  @param[in]  NonceBuf      The nonce buffer contains the whole Nonce payload block
                             except the payload header.
   @param[in]  NonceSize     The buffer size of the NonceBuf
-  @param[in]  NextPayload   The payload type presented in the NextPayload field 
+  @param[in]  NextPayload   The payload type presented in the NextPayload field
                             of Nonce Payload header.
 
   @retval Pointer to Nonce IKE paload.
@@ -133,11 +133,11 @@ Ikev2GenerateNoncePayload (
 }
 
 /**
-  Generate a Key Exchange payload according to the DH group type and save the 
+  Generate a Key Exchange payload according to the DH group type and save the
   public Key into IkeSaSession IkeKey field.
 
   @param[in, out] IkeSaSession    Pointer of the IKE_SA_SESSION.
-  @param[in]      NextPayload     The payload type presented in the NextPayload field of Key 
+  @param[in]      NextPayload     The payload type presented in the NextPayload field of Key
                                   Exchange Payload header.
 
   @retval Pointer to Key IKE payload.
@@ -174,7 +174,7 @@ Ikev2GenerateKePayload (
   } else {
     KeSize = sizeof (IKEV2_KEY_EXCHANGE) + IkeKeys->DhBuffer->GxSize;
   }
-  
+
   //
   // Allocate buffer for Key Exchange
   //
@@ -186,13 +186,13 @@ Ikev2GenerateKePayload (
   Ke->DhGroup               = IkeSaSession->SessionCommon.PreferDhGroup;
 
   CopyMem (Ke + 1, IkeKeys->DhBuffer->GxBuffer, IkeKeys->DhBuffer->GxSize);
-  
+
   //
-  // Create IKE_PAYLOAD to point to Key Exchange payload  
-  //  
+  // Create IKE_PAYLOAD to point to Key Exchange payload
+  //
   KePayload = IkePayloadAlloc ();
   ASSERT (KePayload != NULL);
-  
+
   KePayload->PayloadType = IKEV2_PAYLOAD_TYPE_KE;
   KePayload->PayloadBuf  = (UINT8 *) Ke;
   KePayload->PayloadSize = KeSize;
@@ -203,7 +203,7 @@ Ikev2GenerateKePayload (
   Generate a ID payload.
 
   @param[in] CommonSession   Pointer to IKEV2_SESSION_COMMON related to ID payload.
-  @param[in] NextPayload     The payload type presented in the NextPayload field 
+  @param[in] NextPayload     The payload type presented in the NextPayload field
                              of ID Payload header.
 
   @retval Pointer to ID IKE payload.
@@ -234,7 +234,7 @@ Ikev2GenerateIdPayload (
   //   !                                                               !
   //   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
   //
-  
+
   IpVersion = CommonSession->UdpService->IpVersion;
   AddrSize  = (UINT8) ((IpVersion == IP_VERSION_4) ? sizeof(EFI_IPv4_ADDRESS) : sizeof(EFI_IPv6_ADDRESS));
   IdSize    = sizeof (IKEV2_ID) + AddrSize;
@@ -250,7 +250,7 @@ Ikev2GenerateIdPayload (
   IdPayload->PayloadSize  = IdSize;
 
   //
-  // Set generic header of identification payload 
+  // Set generic header of identification payload
   //
   Id->Header.NextPayload    = NextPayload;
   Id->Header.PayloadLength  = (UINT16) IdSize;
@@ -264,7 +264,7 @@ Ikev2GenerateIdPayload (
   Generate a ID payload.
 
   @param[in] CommonSession   Pointer to IKEV2_SESSION_COMMON related to ID payload.
-  @param[in] NextPayload     The payload type presented in the NextPayload field 
+  @param[in] NextPayload     The payload type presented in the NextPayload field
                              of ID Payload header.
   @param[in] InCert          Pointer to the Certificate which distinguished name
                              will be added into the Id payload.
@@ -287,7 +287,7 @@ Ikev2GenerateCertIdPayload (
   UINT8          IpVersion;
   UINTN          SubjectSize;
   UINT8          *CertSubject;
-  
+
   //
   // ID payload
   //    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -328,7 +328,7 @@ Ikev2GenerateCertIdPayload (
   IdPayload->PayloadSize  = IdSize;
 
   //
-  // Set generic header of identification payload 
+  // Set generic header of identification payload
   //
   Id->Header.NextPayload    = NextPayload;
   Id->Header.PayloadLength  = (UINT16) IdSize;
@@ -344,15 +344,15 @@ Ikev2GenerateCertIdPayload (
 /**
   Generate a Authentication Payload.
 
-  This function is used for both Authentication generation and verification. When the 
-  IsVerify is TRUE, it create a Auth Data for verification. This function choose the 
+  This function is used for both Authentication generation and verification. When the
+  IsVerify is TRUE, it create a Auth Data for verification. This function choose the
   related IKE_SA_INIT Message for Auth data creation according to the IKE Session's type
   and the value of IsVerify parameter.
 
   @param[in]  IkeSaSession  Pointer to IKEV2_SA_SESSION related to.
-  @param[in]  IdPayload     Pointer to the ID payload to be used for Authentication 
+  @param[in]  IdPayload     Pointer to the ID payload to be used for Authentication
                             payload generation.
-  @param[in]  NextPayload   The type filled into the Authentication Payload next 
+  @param[in]  NextPayload   The type filled into the Authentication Payload next
                             payload field.
   @param[in]  IsVerify      If it is TURE, the Authentication payload is used for
                             verification.
@@ -392,11 +392,11 @@ Ikev2PskGenerateAuthPayload (
   //    !                                                               !
   //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
   //
- 
+
   KeyBuf      = NULL;
   AuthPayload = NULL;
   Digest      = NULL;
-  
+
   DigestSize = IpSecGetHmacDigestLength ((UINT8)IkeSaSession->SessionCommon.SaParams->Prf);
   Digest     = AllocateZeroPool (DigestSize);
 
@@ -415,7 +415,7 @@ Ikev2PskGenerateAuthPayload (
   Status = IpSecCryptoIoHmac (
              (UINT8)IkeSaSession->SessionCommon.SaParams->Prf,
              IkeSaSession->Pad->Data->AuthData,
-             IkeSaSession->Pad->Data->AuthDataSize,             
+             IkeSaSession->Pad->Data->AuthDataSize,
              (HASH_DATA_FRAGMENT *)Fragments,
              1,
              Digest,
@@ -485,7 +485,7 @@ Ikev2PskGenerateAuthPayload (
 
   //
   // Copy the result of Prf(SK_Pr, IDi/r) to Fragments[2].
-  // 
+  //
   Fragments[2].Data     = AllocateZeroPool (DigestSize);
   Fragments[2].DataSize = DigestSize;
   CopyMem (Fragments[2].Data, Digest, DigestSize);
@@ -542,7 +542,7 @@ Ikev2PskGenerateAuthPayload (
     Digest,
     DigestSize
     );
-  
+
   //
   // Fill in IKE_PACKET
   //
@@ -559,7 +559,7 @@ EXIT:
   if (Fragments[2].Data != NULL) {
     //
     // Free the buffer which contains the result of Prf(SK_Pr, IDi/r)
-    //     
+    //
     FreePool (Fragments[2].Data);
   }
 
@@ -574,26 +574,26 @@ EXIT:
 }
 
 /**
-  Generate a Authentication Payload for Certificate Auth method.  
+  Generate a Authentication Payload for Certificate Auth method.
 
-  This function has two functions. One is creating a local Authentication 
-  Payload for sending and other is creating the remote Authentication data 
+  This function has two functions. One is creating a local Authentication
+  Payload for sending and other is creating the remote Authentication data
   for verification when the IsVerify is TURE.
 
   @param[in]  IkeSaSession      Pointer to IKEV2_SA_SESSION related to.
-  @param[in]  IdPayload         Pointer to the ID payload to be used for Authentication 
+  @param[in]  IdPayload         Pointer to the ID payload to be used for Authentication
                                 payload generation.
-  @param[in]  NextPayload       The type filled into the Authentication Payload 
+  @param[in]  NextPayload       The type filled into the Authentication Payload
                                 next payload field.
-  @param[in]  IsVerify          If it is TURE, the Authentication payload is used 
+  @param[in]  IsVerify          If it is TURE, the Authentication payload is used
                                 for verification.
-  @param[in]  UefiPrivateKey    Pointer to the UEFI private key. Ignore it when 
+  @param[in]  UefiPrivateKey    Pointer to the UEFI private key. Ignore it when
                                 verify the authenticate payload.
-  @param[in]  UefiPrivateKeyLen The size of UefiPrivateKey in bytes. Ignore it 
+  @param[in]  UefiPrivateKeyLen The size of UefiPrivateKey in bytes. Ignore it
                                 when verify the authenticate payload.
-  @param[in]  UefiKeyPwd        Pointer to the password of UEFI private key. 
+  @param[in]  UefiKeyPwd        Pointer to the password of UEFI private key.
                                 Ignore it when verify the authenticate payload.
-  @param[in]  UefiKeyPwdLen     The size of UefiKeyPwd in bytes.Ignore it when 
+  @param[in]  UefiKeyPwdLen     The size of UefiKeyPwd in bytes.Ignore it when
                                 verify the authenticate payload.
 
   @return pointer to IKE Authentication payload for Cerifitcation method.
@@ -722,10 +722,10 @@ Ikev2CertGenerateAuthPayload (
     IpSecDumpBuf ("RealMessage1", Fragments[0].Data, Fragments[0].DataSize);
     IpSecDumpBuf ("NonceRDdata", Fragments[1].Data, Fragments[1].DataSize);
   }
-  
+
   //
   // Copy the result of Prf(SK_Pr, IDi/r) to Fragments[2].
-  // 
+  //
   Fragments[2].Data     = AllocateZeroPool (DigestSize);
   Fragments[2].DataSize = DigestSize;
   CopyMem (Fragments[2].Data, Digest, DigestSize);
@@ -746,7 +746,7 @@ Ikev2CertGenerateAuthPayload (
 
   IpSecDumpBuf ("HashSignedOctects", Digest, DigestSize);
   //
-  // Sign the data by the private Key  
+  // Sign the data by the private Key
   //
   if (!IsVerify) {
     IpSecCryptoIoAuthDataWithCertificate (
@@ -820,7 +820,7 @@ EXIT:
   if (Fragments[2].Data != NULL) {
     //
     // Free the buffer which contains the result of Prf(SK_Pr, IDi/r)
-    //     
+    //
     FreePool (Fragments[2].Data);
   }
 
@@ -840,9 +840,9 @@ EXIT:
   This function generates TSi or TSr payload according to type of next payload.
   If the next payload is Responder TS, gereate TSi Payload. Otherwise, generate
   TSr payload.
-  
+
   @param[in] ChildSa        Pointer to IKEV2_CHILD_SA_SESSION related to this TS payload.
-  @param[in] NextPayload    The payload type presented in the NextPayload field 
+  @param[in] NextPayload    The payload type presented in the NextPayload field
                             of ID Payload header.
   @param[in] IsTunnel       It indicates that if the Ts Payload is after the CP payload.
                             If yes, it means the Tsi and Tsr payload should be with
@@ -886,7 +886,7 @@ Ikev2GenerateTsPayload (
 
   IpVersion    = ChildSa->SessionCommon.UdpService->IpVersion;
   //
-  // The Starting Address and Ending Address is variable length depends on 
+  // The Starting Address and Ending Address is variable length depends on
   // is IPv4 or IPv6
   //
   AddrSize      = (UINT8)((IpVersion == IP_VERSION_4) ? sizeof (EFI_IPv4_ADDRESS) : sizeof (EFI_IPv6_ADDRESS));
@@ -901,7 +901,7 @@ Ikev2GenerateTsPayload (
   TsSelector->TSType = (UINT8)((IpVersion == IP_VERSION_4) ? IKEV2_TS_TYPE_IPV4_ADDR_RANGE : IKEV2_TS_TYPS_IPV6_ADDR_RANGE);
 
   //
-  // For tunnel mode 
+  // For tunnel mode
   //
   if (IsTunnel) {
     TsSelector->IpProtocolId = IKEV2_TS_ANY_PROTOCOL;
@@ -917,8 +917,8 @@ Ikev2GenerateTsPayload (
     //
     if (NextPayload == IKEV2_PAYLOAD_TYPE_TS_RSP){
       //
-      // Create initiator Traffic Selector 
-      //      
+      // Create initiator Traffic Selector
+      //
       TsSelector->SelecorLen   = (UINT16)SelectorSize;
 
       //
@@ -929,7 +929,7 @@ Ikev2GenerateTsPayload (
       if (ChildSa->SessionCommon.IsInitiator) {
         if (ChildSa->Spd->Selector->LocalPort != 0 &&
             ChildSa->Spd->Selector->LocalPortRange == 0) {
-          //  
+          //
           // For not port range.
           //
           TsSelector->StartPort = ChildSa->Spd->Selector->LocalPort;
@@ -947,7 +947,7 @@ Ikev2GenerateTsPayload (
           goto ON_ERROR;
         }
       } else {
-        if (ChildSa->Spd->Selector->RemotePort != 0 && 
+        if (ChildSa->Spd->Selector->RemotePort != 0 &&
             ChildSa->Spd->Selector->RemotePortRange == 0) {
           //
           // For not port range.
@@ -970,7 +970,7 @@ Ikev2GenerateTsPayload (
       //
       // Copy Address.Currently the address range is not supported.
       // The Starting address is same as Ending address
-      // TODO: Support Address Range. 
+      // TODO: Support Address Range.
       //
       CopyMem (
         (UINT8*)TsSelector + sizeof(TRAFFIC_SELECTOR),
@@ -993,9 +993,9 @@ Ikev2GenerateTsPayload (
     }else{
         //
         // Create responder Traffic Selector
-        //      
+        //
         TsSelector->SelecorLen   = (UINT16)SelectorSize;
-        
+
         //
         // Currently only support the port range from 0~0xffff. Don't support other
         // port range.
@@ -1045,7 +1045,7 @@ Ikev2GenerateTsPayload (
         //
         // Copy Address.Currently the address range is not supported.
         // The Starting address is same as Ending address
-        // TODO: Support Address Range. 
+        // TODO: Support Address Range.
         //
         CopyMem (
           (UINT8*)TsSelector + sizeof(TRAFFIC_SELECTOR),
@@ -1072,8 +1072,8 @@ Ikev2GenerateTsPayload (
       TsSelector->IpProtocolId = (UINT8)ChildSa->Spd->Selector->NextLayerProtocol;
     } else {
       TsSelector->IpProtocolId = IKEV2_TS_ANY_PROTOCOL;
-    } 
-    
+    }
+
   TsPayloadBuf->Header.NextPayload    = NextPayload;
   TsPayloadBuf->Header.PayloadLength  = (UINT16)TsPayloadSize;
   TsPayloadBuf->TSNumbers             = 1;
@@ -1082,10 +1082,10 @@ Ikev2GenerateTsPayload (
 
 ON_ERROR:
   if (TsPayload != NULL) {
-    IkePayloadFree (TsPayload);  
+    IkePayloadFree (TsPayload);
     TsPayload = NULL;
   }
-ON_EXIT: 
+ON_EXIT:
   return TsPayload;
 }
 
@@ -1093,23 +1093,23 @@ ON_EXIT:
   Generate the Notify payload.
 
   Since the structure of Notify payload which defined in RFC 4306 is simple, so
-  there is no internal data structure for Notify payload. This function generate 
-  Notify payload defined in RFC 4306, but all the fields in this payload are still 
-  in host order and need call Ikev2EncodePayload() to convert those fields from 
+  there is no internal data structure for Notify payload. This function generate
+  Notify payload defined in RFC 4306, but all the fields in this payload are still
+  in host order and need call Ikev2EncodePayload() to convert those fields from
   the host order to network order beforing sending it.
 
   @param[in]  ProtocolId        The protocol type ID. For IKE_SA it MUST be one (1).
                                 For IPsec SAs it MUST be neither (2) for AH or (3)
                                 for ESP.
-  @param[in]  NextPayload       The next paylaod type in NextPayload field of 
+  @param[in]  NextPayload       The next paylaod type in NextPayload field of
                                 the Notify payload.
-  @param[in]  SpiSize           Size of the SPI in SPI size field of the Notify Payload.  
-  @param[in]  MessageType       The message type in NotifyMessageType field of the 
+  @param[in]  SpiSize           Size of the SPI in SPI size field of the Notify Payload.
+  @param[in]  MessageType       The message type in NotifyMessageType field of the
                                 Notify Payload.
   @param[in]  SpiBuf            Pointer to buffer contains the SPI value.
   @param[in]  NotifyData        Pointer to buffer contains the notification data.
   @param[in]  NotifyDataSize    The size of NotifyData in bytes.
-  
+
 
   @retval Pointer to IKE Notify Payload.
 
@@ -1190,14 +1190,14 @@ Ikev2GenerateNotifyPayload (
 /**
   Generate the Delete payload.
 
-  Since the structure of Delete payload which defined in RFC 4306 is simple, 
-  there is no internal data structure for Delete payload. This function generate 
-  Delete payload defined in RFC 4306, but all the fields in this payload are still 
-  in host order and need call Ikev2EncodePayload() to convert those fields from 
+  Since the structure of Delete payload which defined in RFC 4306 is simple,
+  there is no internal data structure for Delete payload. This function generate
+  Delete payload defined in RFC 4306, but all the fields in this payload are still
+  in host order and need call Ikev2EncodePayload() to convert those fields from
   the host order to network order beforing sending it.
 
   @param[in]  IkeSaSession      Pointer to IKE SA Session to be used of Delete payload generation.
-  @param[in]  NextPayload       The next paylaod type in NextPayload field of 
+  @param[in]  NextPayload       The next paylaod type in NextPayload field of
                                 the Delete payload.
   @param[in]  SpiSize           Size of the SPI in SPI size field of the Delete Payload.
   @param[in]  SpiNum            Number of SPI in NumofSPIs field of the Delete Payload.
@@ -1213,7 +1213,7 @@ Ikev2GenerateDeletePayload (
   IN UINT8             SpiSize,
   IN UINT16            SpiNum,
   IN UINT8             *SpiBuf
-  
+
   )
 {
   IKE_PAYLOAD  *DelPayload;
@@ -1237,12 +1237,12 @@ Ikev2GenerateDeletePayload (
   if (SpiBufSize != 0 && SpiBuf == NULL) {
     return NULL;
   }
-  
+
   DelPayloadLen = (UINT16) (sizeof (IKEV2_DELETE) + SpiBufSize);
 
   Del           = AllocateZeroPool (DelPayloadLen);
   ASSERT (Del != NULL);
-  
+
   //
   // Set Delete Payload's Generic Header
   //
@@ -1275,13 +1275,13 @@ Ikev2GenerateDeletePayload (
 /**
   Generate the Configuration payload.
 
-  This function generate configuration payload defined in RFC 4306, but all the 
-  fields in this payload are still in host order and need call Ikev2EncodePayload() 
+  This function generate configuration payload defined in RFC 4306, but all the
+  fields in this payload are still in host order and need call Ikev2EncodePayload()
   to convert those fields from the host order to network order beforing sending it.
 
-  @param[in]  IkeSaSession      Pointer to IKE SA Session to be used for Delete payload 
+  @param[in]  IkeSaSession      Pointer to IKE SA Session to be used for Delete payload
                                 generation.
-  @param[in]  NextPayload       The next paylaod type in NextPayload field of 
+  @param[in]  NextPayload       The next paylaod type in NextPayload field of
                                 the Delete payload.
   @param[in]  CfgType           The attribute type in the Configuration attribute.
 
@@ -1323,8 +1323,8 @@ Ikev2GenerateCpPayload (
   CfgAttributes = (IKEV2_CFG_ATTRIBUTES *)((UINT8 *)Cfg + sizeof (IKEV2_CFG));
 
   //
-  // Only generate the configuration payload with an empty INTERNAL_IP4_ADDRESS 
-  // or INTERNAL_IP6_ADDRESS. 
+  // Only generate the configuration payload with an empty INTERNAL_IP4_ADDRESS
+  // or INTERNAL_IP6_ADDRESS.
   //
 
   Cfg->Header.NextPayload   = NextPayload;
@@ -1355,7 +1355,7 @@ Ikev2GenerateCpPayload (
   IPSEC_PROTO_ISAKMP or if the SpiSize is not zero or if the MessageType is not
   the COOKIE, return EFI_INVALID_PARAMETER.
 
-  @param[in]      IkeNCookie    Pointer to the IKE_PAYLOAD which contians the 
+  @param[in]      IkeNCookie    Pointer to the IKE_PAYLOAD which contians the
                                 Notify Cookie payload.
                                 the Notify payload.
   @param[in, out] IkeSaSession  Pointer to the relevant IKE SA Session.
@@ -1369,14 +1369,14 @@ EFI_STATUS
 Ikev2ParserNotifyCookiePayload (
   IN     IKE_PAYLOAD      *IkeNCookie,
   IN OUT IKEV2_SA_SESSION *IkeSaSession
-  ) 
+  )
 {
   IKEV2_NOTIFY      *NotifyPayload;
   UINTN             NotifyDataSize;
 
   NotifyPayload = (IKEV2_NOTIFY *)IkeNCookie->PayloadBuf;
 
-  if ((NotifyPayload->ProtocolId != IPSEC_PROTO_ISAKMP) || 
+  if ((NotifyPayload->ProtocolId != IPSEC_PROTO_ISAKMP) ||
       (NotifyPayload->SpiSize != 0) ||
       (NotifyPayload->MessageType != IKEV2_NOTIFICATION_COOKIE)
       ) {
@@ -1392,8 +1392,8 @@ Ikev2ParserNotifyCookiePayload (
   IkeSaSession->NCookieSize = NotifyDataSize;
 
   CopyMem (
-    IkeSaSession->NCookie, 
-    NotifyPayload + sizeof (IKEV2_NOTIFY), 
+    IkeSaSession->NCookie,
+    NotifyPayload + sizeof (IKEV2_NOTIFY),
     NotifyDataSize
     );
 
@@ -1404,16 +1404,16 @@ Ikev2ParserNotifyCookiePayload (
 /**
   Generate the Certificate payload or Certificate Request Payload.
 
-  Since the Certificate Payload structure is same with Certificate Request Payload, 
+  Since the Certificate Payload structure is same with Certificate Request Payload,
   the only difference is that one contains the Certificate Data, other contains
-  the acceptable certificateion CA. This function generate Certificate payload 
-  or Certificate Request Payload defined in RFC 4306, but all the fields 
-  in the payload are still in host order and need call Ikev2EncodePayload() 
+  the acceptable certificateion CA. This function generate Certificate payload
+  or Certificate Request Payload defined in RFC 4306, but all the fields
+  in the payload are still in host order and need call Ikev2EncodePayload()
   to convert those fields from the host order to network order beforing sending it.
 
-  @param[in]  IkeSaSession      Pointer to IKE SA Session to be used of Delete payload 
+  @param[in]  IkeSaSession      Pointer to IKE SA Session to be used of Delete payload
                                 generation.
-  @param[in]  NextPayload       The next paylaod type in NextPayload field of 
+  @param[in]  NextPayload       The next paylaod type in NextPayload field of
                                 the Delete payload.
   @param[in]  Certificate       Pointer of buffer contains the certification data.
   @param[in]  CertificateLen    The length of Certificate in byte.
@@ -1462,7 +1462,7 @@ Ikev2GenerateCertificatePayload (
 
   Status       = EFI_SUCCESS;
   PublicKey    = NULL;
-  PublicKeyLen = 0; 
+  PublicKeyLen = 0;
 
   if (!IsRequest) {
     PayloadLen = (UINT16) (sizeof (IKEV2_CERT) + CertificateLen);
@@ -1477,7 +1477,7 @@ Ikev2GenerateCertificatePayload (
   if (Cert == NULL) {
     return NULL;
   }
-   
+
   //
   // Generate Certificate Payload or Certificate Request Payload.
   //
@@ -1498,7 +1498,7 @@ Ikev2GenerateCertificatePayload (
                &PublicKeyLen
                );
     if (EFI_ERROR (Status)) {
-      goto ON_EXIT; 
+      goto ON_EXIT;
     }
 
     Fragment[0].Data     = PublicKey;
@@ -1508,7 +1508,7 @@ Ikev2GenerateCertificatePayload (
     if (HashData == NULL) {
       goto ON_EXIT;
     }
-    
+
     Status = IpSecCryptoIoHash (
                IKE_AALG_SHA1HMAC,
                Fragment,
@@ -1519,7 +1519,7 @@ Ikev2GenerateCertificatePayload (
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
-    
+
     CopyMem (
       ((UINT8 *)Cert) + sizeof (IKEV2_CERT),
       HashData,
@@ -1531,7 +1531,7 @@ Ikev2GenerateCertificatePayload (
   if (CertPayload == NULL) {
     goto ON_EXIT;
   }
-  
+
   if (!IsRequest) {
     CertPayload->PayloadType = IKEV2_PAYLOAD_TYPE_CERT;
   } else {
@@ -1583,7 +1583,7 @@ ClearAllPayloads (
   @param[in] SaData        Pointer to IKEV2_SA_DATA to be transfered.
 
   @retval  return the pointer of IKEV2_SA.
-  
+
 **/
 IKEV2_SA*
 Ikev2EncodeSa (
@@ -1605,10 +1605,8 @@ Ikev2EncodeSa (
   UINTN                 TransformIndex;
   IKE_SA_ATTRIBUTE      *SaAttribute;
   IKEV2_PROPOSAL        *Proposal;
-  IKEV2_PROPOSAL        *LastProposal;
   IKEV2_TRANSFORM       *Transform;
-  IKEV2_TRANSFORM       *LastTransform;
-  
+
   //
   // Transform IKE_SA_DATA structure to IKE_SA Payload.
   // Header length is host order.
@@ -1635,7 +1633,6 @@ Ikev2EncodeSa (
   CopyMem (Sa, SaData, sizeof (IKEV2_SA));
   Sa->Header.PayloadLength  = (UINT16) sizeof (IKEV2_SA);
   ProposalsSize             = 0;
-  LastProposal              = NULL;
   Proposal                  = (IKEV2_PROPOSAL *) (Sa + 1);
 
   //
@@ -1655,7 +1652,6 @@ Ikev2EncodeSa (
     }
 
     TransformsSize  = 0;
-    LastTransform   = NULL;
     Transform       = (IKEV2_TRANSFORM *) ((UINT8 *) (Proposal + 1) + Proposal->SpiSize);
 
     //
@@ -1690,17 +1686,17 @@ Ikev2EncodeSa (
 
       TransformSize                 = sizeof (IKEV2_TRANSFORM) + SaAttrsSize;
       TransformsSize               += TransformSize;
-      
+
       Transform->Header.NextPayload   = IKE_TRANSFORM_NEXT_PAYLOAD_MORE;
       Transform->Header.PayloadLength = HTONS ((UINT16)TransformSize);
-      
-      if (TransformIndex == ProposalData->NumTransforms) {
-        LastTransform->Header.NextPayload = IKE_TRANSFORM_NEXT_PAYLOAD_NONE;
+
+      if (TransformIndex == (UINTN)(ProposalData->NumTransforms - 1)) {
+        Transform->Header.NextPayload = IKE_TRANSFORM_NEXT_PAYLOAD_NONE;
       }
 
       Transform     = (IKEV2_TRANSFORM *)((UINT8 *) Transform + TransformSize);
     }
-    
+
     //
     // Set Proposal's Generic Header.
     //
@@ -1708,9 +1704,9 @@ Ikev2EncodeSa (
     ProposalsSize                 += ProposalSize;
     Proposal->Header.NextPayload   = IKE_PROPOSAL_NEXT_PAYLOAD_MORE;
     Proposal->Header.PayloadLength = HTONS ((UINT16)ProposalSize);
-    
-    if (ProposalIndex == SaData->NumProposals) {
-      LastProposal->Header.NextPayload = IKE_PROPOSAL_NEXT_PAYLOAD_NONE;
+
+    if (ProposalIndex == (UINTN)(SaData->NumProposals - 1)) {
+      Proposal->Header.NextPayload = IKE_PROPOSAL_NEXT_PAYLOAD_NONE;
     }
 
     //
@@ -1731,7 +1727,7 @@ Ikev2EncodeSa (
 
   This function converts the received SA payload to internal data structure.
 
-  @param[in]  SessionCommon       Pointer to IKE Common Session used to decode the SA 
+  @param[in]  SessionCommon       Pointer to IKE Common Session used to decode the SA
                                   Payload.
   @param[in]  Sa                  Pointer to SA Payload
 
@@ -1804,11 +1800,14 @@ Ikev2DecodeSa (
   }
 
   //
-  // Check the proposal number. The Proposal Payload type is 2. Nonce Paylod is 0.
-  // SUM(ProposalNextPayload) = Proposal Num * 2 + Noce Payload Type (0).
+  // Check the proposal number.
+  // The proposal Substructure, the NextPayLoad field indicates : 0 (last) or 2 (more)
+  // which Specifies whether this is the last Proposal Substructure in the SA.
+  // Here suming all Proposal NextPayLoad field to check the proposal number is correct
+  // or not.
   //
   if (TotalProposals == 0 ||
-      (TotalProposals - 1) * IKE_PROPOSAL_NEXT_PAYLOAD_MORE + IKE_PROPOSAL_NEXT_PAYLOAD_NONE != ProposalNextPayloadSum
+      (TotalProposals - 1) * IKE_PROPOSAL_NEXT_PAYLOAD_MORE != ProposalNextPayloadSum
       ) {
     Status = EFI_INVALID_PARAMETER;
     goto Exit;
@@ -1843,7 +1842,7 @@ Ikev2DecodeSa (
        ProposalIndex < TotalProposals;
        ProposalIndex++
        ) {
-       
+
     //
     // TODO: check ProposalId
     //
@@ -1902,7 +1901,7 @@ Ikev2DecodeSa (
       SaAttrRemaining = TransformSize - sizeof (IKEV2_TRANSFORM);
 
       //
-      // According to RFC 4603, currently only the Key length attribute type is 
+      // According to RFC 4603, currently only the Key length attribute type is
       // supported. For each Transform, there is only one attributeion.
       //
       if (SaAttrRemaining > 0) {
@@ -1920,12 +1919,12 @@ Ikev2DecodeSa (
         if (TransformData->Attribute.AttrType != IKEV2_ATTRIBUTE_TYPE_KEYLEN) {
           Status = EFI_INVALID_PARAMETER;
           goto Exit;
-        }        
+        }
       }
 
       //
       // Move to next Transform
-      //      
+      //
       Transform = IKEV2_NEXT_TRANSFORM_WITH_SIZE (Transform, TransformSize);
     }
     Proposal     = IKEV2_NEXT_PROPOSAL_WITH_SIZE (Proposal, ProposalSize);
@@ -1945,7 +1944,7 @@ Exit:
 /**
   General interface of payload encoding.
 
-  This function encodes the internal data structure into payload which 
+  This function encodes the internal data structure into payload which
   is defined in RFC 4306. The IkePayload->PayloadBuf is used to store both the input
   payload and converted payload. Only the SA payload use the interal structure
   to store the attribute. Other payload use structure which is same with the RFC
@@ -2006,17 +2005,17 @@ Ikev2EncodePayload (
     NotifyPayload               = (IKEV2_NOTIFY *) IkePayload->PayloadBuf;
     NotifyPayload->MessageType  = HTONS (NotifyPayload->MessageType);
     break;
-    
+
   case IKEV2_PAYLOAD_TYPE_DELETE:
     DeletePayload           = (IKEV2_DELETE *) IkePayload->PayloadBuf;
     DeletePayload->NumSpis  = HTONS (DeletePayload->NumSpis);
     break;
-    
+
   case IKEV2_PAYLOAD_TYPE_KE:
     KeyPayload              = (IKEV2_KEY_EXCHANGE *) IkePayload->PayloadBuf;
     KeyPayload->DhGroup     = HTONS (KeyPayload->DhGroup);
     break;
-    
+
   case IKEV2_PAYLOAD_TYPE_TS_INIT:
   case IKEV2_PAYLOAD_TYPE_TS_RSP:
     TsPayload = (IKEV2_TS *) IkePayload->PayloadBuf;
@@ -2031,7 +2030,7 @@ Ikev2EncodePayload (
       TrafficSelector->SelecorLen = HTONS (TrafficSelector->SelecorLen);
       TrafficSelector->StartPort  = HTONS (TrafficSelector->StartPort);
       TrafficSelector->EndPort    = HTONS (TrafficSelector->EndPort);
-      
+
     }
 
     break;
@@ -2040,14 +2039,14 @@ Ikev2EncodePayload (
     CfgAttribute = (IKEV2_CFG_ATTRIBUTES *)(((IKEV2_CFG *) IkePayload->PayloadBuf) + 1);
     CfgAttribute->AttritType  = HTONS (CfgAttribute->AttritType);
     CfgAttribute->ValueLength = HTONS (CfgAttribute->ValueLength);
-    
+
   case IKEV2_PAYLOAD_TYPE_ID_INIT:
   case IKEV2_PAYLOAD_TYPE_ID_RSP:
   case IKEV2_PAYLOAD_TYPE_AUTH:
   default:
     break;
   }
-  
+
   PayloadHdr  = (IKEV2_COMMON_PAYLOAD_HEADER *) IkePayload->PayloadBuf;
   IkePayload->PayloadSize = PayloadHdr->PayloadLength;
   PayloadHdr->PayloadLength = HTONS (PayloadHdr->PayloadLength);
@@ -2062,7 +2061,7 @@ Ikev2EncodePayload (
 
   @param[in]      SessionCommon     Pointer to IKE Session Common used for decoding.
   @param[in, out] IkePayload        Pointer to IKE payload to be decoded as input, and
-                                    store the decoded result as output. 
+                                    store the decoded result as output.
 
   @retval EFI_INVALID_PARAMETER  Meet error when decoding the SA payload.
   @retval EFI_SUCCESS            Decoded successfully.
@@ -2092,8 +2091,8 @@ Ikev2DecodePayload (
   // Transform the IKE payload to Internal IKE structure.
   // Only the SA payload and Hash Payload use the interal
   // structure to store the attribute. Other payloads use
-  // structure which is same with the definitions in RFC, 
-  // so there is no need to tranform them to internal IKE 
+  // structure which is same with the definitions in RFC,
+  // so there is no need to tranform them to internal IKE
   // structure.
   //
   Status      = EFI_SUCCESS;
@@ -2123,9 +2122,9 @@ Ikev2DecodePayload (
     if (!IkePayload->IsPayloadBufExt) {
       FreePool (IkePayload->PayloadBuf);
     }
-    
+
     IkePayload->PayloadBuf      = (UINT8 *) SaData;
-    IkePayload->IsPayloadBufExt = FALSE;    
+    IkePayload->IsPayloadBufExt = FALSE;
     break;
 
   case IKEV2_PAYLOAD_TYPE_ID_INIT:
@@ -2145,7 +2144,7 @@ Ikev2DecodePayload (
     NotifyPayload               = (IKEV2_NOTIFY *) PayloadHdr;
     NotifyPayload->MessageType  = NTOHS (NotifyPayload->MessageType);
     break;
-    
+
   case IKEV2_PAYLOAD_TYPE_DELETE:
     if (PayloadSize < sizeof (IKEV2_DELETE)) {
       Status = EFI_INVALID_PARAMETER;
@@ -2155,7 +2154,7 @@ Ikev2DecodePayload (
     DeletePayload           = (IKEV2_DELETE *) PayloadHdr;
     DeletePayload->NumSpis  = NTOHS (DeletePayload->NumSpis);
     break;
-    
+
   case IKEV2_PAYLOAD_TYPE_AUTH:
     if (PayloadSize < sizeof (IKEV2_AUTH)) {
       Status = EFI_INVALID_PARAMETER;
@@ -2166,7 +2165,7 @@ Ikev2DecodePayload (
   case IKEV2_PAYLOAD_TYPE_KE:
     KeyPayload              = (IKEV2_KEY_EXCHANGE *) IkePayload->PayloadBuf;
     KeyPayload->DhGroup     = HTONS (KeyPayload->DhGroup);
-    break;  
+    break;
 
   case IKEV2_PAYLOAD_TYPE_TS_INIT:
   case IKEV2_PAYLOAD_TYPE_TS_RSP :
@@ -2212,12 +2211,12 @@ Ikev2DecodePayload (
 /**
   Decode the IKE packet.
 
-  This function first decrypts the IKE packet if needed , then separates the whole 
+  This function first decrypts the IKE packet if needed , then separates the whole
   IKE packet from the IkePacket->PayloadBuf into IkePacket payload list.
-  
-  @param[in]      SessionCommon          Pointer to IKEV1_SESSION_COMMON containing 
+
+  @param[in]      SessionCommon          Pointer to IKEV1_SESSION_COMMON containing
                                          some parameter used by IKE packet decoding.
-  @param[in, out] IkePacket              The IKE Packet to be decoded on input, and 
+  @param[in, out] IkePacket              The IKE Packet to be decoded on input, and
                                          the decoded result on return.
   @param[in]      IkeType                The type of IKE. IKE_SA_TYPE, IKE_INFO_TYPE and
                                          IKE_CHILD_TYPE are supported.
@@ -2243,7 +2242,7 @@ Ikev2DecodePacket (
   IKEV2_SA_SESSION            *IkeSaSession;
 
   IkeHeader = NULL;
-  
+
   //
   // Check if the IkePacket need decrypt.
   //
@@ -2260,7 +2259,7 @@ Ikev2DecodePacket (
   // If the IkePacket doesn't contain any payload return invalid parameter.
   //
   if (IkePacket->Header->NextPayload == IKEV2_PAYLOAD_TYPE_NONE) {
-    if ((SessionCommon->State >= IkeStateAuth) && 
+    if ((SessionCommon->State >= IkeStateAuth) &&
         (IkePacket->Header->ExchangeType == IKEV2_EXCHANGE_TYPE_INFO)
         ) {
       //
@@ -2301,7 +2300,7 @@ Ikev2DecodePacket (
       IkeSaSession->RespPacket     = AllocateZeroPool (IkePacket->Header->Length);
       if (IkeSaSession->RespPacket == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
-        goto Exit; 
+        goto Exit;
       }
       IkeSaSession->RespPacketSize = IkePacket->Header->Length;
       CopyMem (IkeSaSession->RespPacket, IkeHeader, sizeof (IKE_HEADER));
@@ -2309,12 +2308,12 @@ Ikev2DecodePacket (
         IkeSaSession->RespPacket + sizeof (IKE_HEADER),
         IkePacket->PayloadsBuf,
         IkePacket->Header->Length - sizeof (IKE_HEADER)
-        );         
+        );
     } else {
       IkeSaSession->InitPacket     = AllocateZeroPool (IkePacket->Header->Length);
       if (IkeSaSession->InitPacket == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
-        goto Exit; 
+        goto Exit;
       }
       IkeSaSession->InitPacketSize = IkePacket->Header->Length;
       CopyMem (IkeSaSession->InitPacket, IkeHeader, sizeof (IKE_HEADER));
@@ -2327,7 +2326,7 @@ Ikev2DecodePacket (
   }
 
   //
-  // Point to the first Payload 
+  // Point to the first Payload
   //
   PayloadHdr  = (IKEV2_COMMON_PAYLOAD_HEADER *) IkePacket->PayloadsBuf;
   PayloadType = IkePacket->Header->NextPayload;
@@ -2412,9 +2411,9 @@ Exit:
 
   This function puts all Payloads into one payload then encrypt it if needed.
 
-  @param[in]      SessionCommon      Pointer to IKEV2_SESSION_COMMON containing 
+  @param[in]      SessionCommon      Pointer to IKEV2_SESSION_COMMON containing
                                      some parameter used during IKE packet encoding.
-  @param[in, out] IkePacket          Pointer to IKE_PACKET to be encoded as input, 
+  @param[in, out] IkePacket          Pointer to IKE_PACKET to be encoded as input,
                                      and the encoded result as output.
   @param[in]      IkeType            The type of IKE. IKE_SA_TYPE, IKE_INFO_TYPE and
                                      IKE_CHILD_TYPE are supportted.
@@ -2479,12 +2478,12 @@ Ikev2EncodePacket (
   }
 
   //
-  // If the packet is first message, store whole message in IkeSa->InitiPacket 
+  // If the packet is first message, store whole message in IkeSa->InitiPacket
   // for following Auth Payload calculation.
   //
   if (IkePacket->Header->ExchangeType == IKEV2_EXCHANGE_TYPE_INIT) {
     IkeSaSession =  IKEV2_SA_SESSION_FROM_COMMON (SessionCommon);
-    if (SessionCommon->IsInitiator) {      
+    if (SessionCommon->IsInitiator) {
       IkeSaSession->InitPacketSize = IkePacket->PayloadTotalSize + sizeof (IKE_HEADER);
       IkeSaSession->InitPacket     = AllocateZeroPool (IkeSaSession->InitPacketSize);
       ASSERT (IkeSaSession->InitPacket != NULL);
@@ -2500,7 +2499,7 @@ Ikev2EncodePacket (
           );
         PayloadTotalSize = PayloadTotalSize + IkePayload->PayloadSize;
       }
-    } else {      
+    } else {
       IkeSaSession->RespPacketSize = IkePacket->PayloadTotalSize + sizeof(IKE_HEADER);
       IkeSaSession->RespPacket     = AllocateZeroPool (IkeSaSession->RespPacketSize);
       ASSERT (IkeSaSession->RespPacket != NULL);
@@ -2528,9 +2527,9 @@ Ikev2EncodePacket (
 
   This function decrypts the Encrypted IKE packet and put the result into IkePacket->PayloadBuf.
 
-  @param[in]      SessionCommon       Pointer to IKEV2_SESSION_COMMON containing 
+  @param[in]      SessionCommon       Pointer to IKEV2_SESSION_COMMON containing
                                       some parameter used during decrypting.
-  @param[in, out] IkePacket           Pointer to IKE_PACKET to be decrypted as input, 
+  @param[in, out] IkePacket           Pointer to IKE_PACKET to be decrypted as input,
                                       and the decrypted result as output.
   @param[in, out] IkeType             The type of IKE. IKE_SA_TYPE, IKE_INFO_TYPE and
                                       IKE_CHILD_TYPE are supportted.
@@ -2538,7 +2537,7 @@ Ikev2EncodePacket (
   @retval EFI_INVALID_PARAMETER      If the IKE packet length is zero or the
                                      IKE packet length is not aligned with Algorithm Block Size
   @retval EFI_SUCCESS                Decrypt IKE packet successfully.
-  
+
 **/
 EFI_STATUS
 Ikev2DecryptPacket (
@@ -2548,12 +2547,12 @@ Ikev2DecryptPacket (
   )
 {
   UINT8                  CryptBlockSize;      // Encrypt Block Size
-  UINTN                  DecryptedSize;       // Encrypted IKE Payload Size  
+  UINTN                  DecryptedSize;       // Encrypted IKE Payload Size
   UINT8                  *DecryptedBuf;       // Encrypted IKE Payload buffer
   UINTN                  IntegritySize;
   UINT8                  *IntegrityBuffer;
-  UINTN                  IvSize;              // Iv Size 
-  UINT8                  CheckSumSize;        // Integrity Check Sum Size depends on intergrity Auth 
+  UINTN                  IvSize;              // Iv Size
+  UINT8                  CheckSumSize;        // Integrity Check Sum Size depends on intergrity Auth
   UINT8                  *CheckSumData;       // Check Sum data
   IKEV2_SA_SESSION       *IkeSaSession;
   IKEV2_CHILD_SA_SESSION *ChildSaSession;
@@ -2582,7 +2581,7 @@ Ikev2DecryptPacket (
   // Get the Block Size
   //
   if (SessionCommon->IkeSessionType == IkeSessionTypeIkeSa) {
-    
+
     CryptBlockSize = (UINT8) IpSecGetEncryptBlockSize ((UINT8) SessionCommon->SaParams->EncAlgId);
     CryptKeyLength = IpSecGetEncryptKeyLength ((UINT8) SessionCommon->SaParams->EncAlgId);
     CheckSumSize   = (UINT8) IpSecGetIcvLength ((UINT8) SessionCommon->SaParams->IntegAlgId);
@@ -2615,7 +2614,7 @@ Ikev2DecryptPacket (
   CopyMem (IntegrityBuffer + sizeof (IKE_HEADER), IkePacket->PayloadsBuf, IkePacket->PayloadTotalSize);
 
   //
-  // Change Host order to Network order, since the header order was changed 
+  // Change Host order to Network order, since the header order was changed
   // in the IkePacketFromNetbuf.
   //
   IkeHdrHostToNet ((IKE_HEADER *)IntegrityBuffer);
@@ -2663,9 +2662,9 @@ Ikev2DecryptPacket (
     Status = EFI_ACCESS_DENIED;
     goto ON_EXIT;
   }
- 
+
   IvSize = CryptBlockSize;
-   
+
   //
   // Decrypt the payload with the key.
   //
@@ -2716,7 +2715,7 @@ Ikev2DecryptPacket (
   // Save the next payload of encrypted payload into IkePacket->Hdr->NextPayload
   //
   IkePacket->Header->NextPayload = ((IKEV2_ENCRYPTED *) IkePacket->PayloadsBuf)->Header.NextPayload;
-  
+
   //
   // Free old IkePacket->PayloadBuf and point it to decrypted paylaod buffer.
   //
@@ -2725,7 +2724,7 @@ Ikev2DecryptPacket (
   IkePacket->PayloadTotalSize = DecryptedSize - PadLen;
 
   IPSEC_DUMP_BUF ("Decrypted Buffer", DecryptedBuf, DecryptedSize);
-  
+
 
 ON_EXIT:
   if (CheckSumData != NULL) {
@@ -2739,7 +2738,7 @@ ON_EXIT:
   if (IntegrityBuffer != NULL) {
     FreePool (IntegrityBuffer);
   }
-  
+
   return Status;
 }
 
@@ -2748,7 +2747,7 @@ ON_EXIT:
 
   This function encrypt IKE packet before sending it. The Encrypted IKE packet
   is put in to IKEV2 Encrypted Payload.
-  
+
   @param[in]        SessionCommon     Pointer to IKEV2_SESSION_COMMON related to the IKE packet.
   @param[in, out]   IkePacket         Pointer to IKE packet to be encrypted.
 
@@ -2764,15 +2763,15 @@ Ikev2EncryptPacket (
 {
   UINT8                  CryptBlockSize;      // Encrypt Block Size
   UINT8                  CryptBlockSizeMask;  // Block Mask
-  UINTN                  EncryptedSize;       // Encrypted IKE Payload Size  
+  UINTN                  EncryptedSize;       // Encrypted IKE Payload Size
   UINT8                  *EncryptedBuf;       // Encrypted IKE Payload buffer
   UINT8                  *EncryptPayloadBuf;  // Contain whole Encrypted Payload
   UINTN                  EncryptPayloadSize;  // Total size of the Encrypted payload
-  UINT8                  *IntegrityBuf;       // Buffer to be intergity 
+  UINT8                  *IntegrityBuf;       // Buffer to be intergity
   UINT32                 IntegrityBufSize;    // Buffer size of IntegrityBuf
   UINT8                  *IvBuffer;           // Initialization Vector
-  UINT8                  IvSize;              // Iv Size 
-  UINT8                  CheckSumSize;        // Integrity Check Sum Size depends on intergrity Auth 
+  UINT8                  IvSize;              // Iv Size
+  UINT8                  CheckSumSize;        // Integrity Check Sum Size depends on intergrity Auth
   UINT8                  *CheckSumData;       // Check Sum data
   UINTN                  Index;
   IKE_PAYLOAD            *EncryptPayload;
@@ -2816,7 +2815,7 @@ Ikev2EncryptPacket (
     CryptKeyLength = IpSecGetEncryptKeyLength ((UINT8) IkeSaSession->SessionCommon.SaParams->EncAlgId);
     CheckSumSize   = (UINT8) IpSecGetIcvLength ((UINT8) IkeSaSession->SessionCommon.SaParams->IntegAlgId);
   }
-  
+
   //
   // Calcualte the EncryptPayloadSize and the PAD length
   //
@@ -2910,11 +2909,11 @@ Ikev2EncryptPacket (
 
   //
   // Fill in the IKE Packet header
-  //  
+  //
   IkePacket->PayloadTotalSize    = EncryptPayloadSize;
   IkePacket->Header->Length      = (UINT32) (sizeof (IKE_HEADER) + IkePacket->PayloadTotalSize);
   IkePacket->Header->NextPayload = IKEV2_PAYLOAD_TYPE_ENCRYPT;
-  
+
   IntegrityBuf                   = AllocateZeroPool (IkePacket->Header->Length);
   if (IntegrityBuf == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -2954,7 +2953,7 @@ Ikev2EncryptPacket (
       (UINT8)IkeSaSession->SessionCommon.SaParams->IntegAlgId,
       IkeSaSession->IkeKeys->SkArKey,
       IkeSaSession->IkeKeys->SkArKeySize,
-      (HASH_DATA_FRAGMENT *) Fragments, 
+      (HASH_DATA_FRAGMENT *) Fragments,
       1,
       CheckSumData,
       CheckSumSize
@@ -2986,7 +2985,7 @@ Ikev2EncryptPacket (
   EncryptPayload->PayloadBuf  = EncryptPayloadBuf;
   EncryptPayload->PayloadSize = EncryptPayloadSize;
   EncryptPayload->PayloadType = IKEV2_PAYLOAD_TYPE_ENCRYPT;
-  
+
   IKE_PACKET_APPEND_PAYLOAD (IkePacket, EncryptPayload);
 
 ON_EXIT:
@@ -3037,8 +3036,8 @@ Ikev2OnPacketAccepted (
   The notification function. It will be called when the related UDP_TX_TOKEN's event
   is signaled.
 
-  This function frees the Net Buffer pointed to the input Packet. 
-  
+  This function frees the Net Buffer pointed to the input Packet.
+
   @param[in]  Packet           Pointer to Net buffer containing the sending IKE packet.
   @param[in]  EndPoint         Pointer to UDP_END_POINT containing the remote and local
                                address information.
@@ -3064,11 +3063,11 @@ Ikev2OnPacketSent (
 
  IkePacket  = (IKE_PACKET *) Context;
  Private    = NULL;
- 
+
  if (EFI_ERROR (IoStatus)) {
     DEBUG ((DEBUG_ERROR, "Error send the last packet in IkeSessionTypeIkeSa with %r\n", IoStatus));
   }
-  
+
   NetbufFree (Packet);
 
   if (IkePacket->IsDeleteInfo) {
@@ -3088,7 +3087,7 @@ Ikev2OnPacketSent (
     if (IkePacket->Spi != 0 ) {
       //
       // At that time, the established Child SA still in eht ChildSaEstablishSessionList.
-      // And meanwhile, if the Child SA is in the the ChildSa in Delete list, 
+      // And meanwhile, if the Child SA is in the the ChildSa in Delete list,
       // remove it from delete list and delete it direclty.
       //
       ChildSaSession = Ikev2ChildSaSessionLookupBySpi (
@@ -3129,7 +3128,7 @@ Ikev2OnPacketSent (
   IkePacketFree (IkePacket);
 
   //
-  // when all IKE SAs were disabled by calling "IPsecConfig -disable", the IPsec status 
+  // when all IKE SAs were disabled by calling "IPsecConfig -disable", the IPsec status
   // should be changed.
   //
   if (Private != NULL && Private->IsIPsecDisabling) {
@@ -3163,8 +3162,8 @@ Ikev2OnPacketSent (
   @param[in]  IkeUdpService     Pointer to IKE_UDP_SERVICE used to send the IKE packet.
   @param[in]  SessionCommon     Pointer to IKEV1_SESSION_COMMON related to the IKE packet.
   @param[in]  IkePacket         Pointer to IKE_PACKET to be sent out.
-  @param[in]  IkeType           The type of IKE to point what's kind of the IKE 
-                                packet is to be sent out. IKE_SA_TYPE, IKE_INFO_TYPE 
+  @param[in]  IkeType           The type of IKE to point what's kind of the IKE
+                                packet is to be sent out. IKE_SA_TYPE, IKE_INFO_TYPE
                                 and IKE_CHILD_TYPE are supportted.
 
   @retval     EFI_SUCCESS       The operation complete successfully.
@@ -3185,7 +3184,7 @@ Ikev2SendIkePacket (
   IKEV2_SESSION_COMMON  *Common;
 
   Common = (IKEV2_SESSION_COMMON *) SessionCommon;
-  
+
   //
   // Set the resend interval
   //
@@ -3212,7 +3211,7 @@ Ikev2SendIkePacket (
 
   IKE_PACKET_REF (IkePacket);
   //
-  // If the last sent packet is same with this round packet, the packet is resent packet. 
+  // If the last sent packet is same with this round packet, the packet is resent packet.
   //
   if (IkePacket != Common->LastSentPacket && Common->LastSentPacket != NULL) {
     IkePacketFree (Common->LastSentPacket);
