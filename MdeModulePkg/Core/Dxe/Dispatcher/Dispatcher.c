@@ -168,6 +168,7 @@ CoreFvToDevicePath (
                                 EFI_CORE_DRIVER_ENTRY so that the PE image can be
                                 read out of the FV at a later time.
   @param  DriverName            Name of driver to add to mDiscoveredList.
+  @param  Type                  Fv File Type of file to add to mDiscoveredList.
 
   @retval EFI_SUCCESS           If driver was added to the mDiscoveredList.
   @retval EFI_ALREADY_STARTED   The driver has already been started. Only one
@@ -179,7 +180,8 @@ EFI_STATUS
 CoreAddToDriverList (
   IN  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv,
   IN  EFI_HANDLE                      FvHandle,
-  IN  EFI_GUID                        *DriverName
+  IN  EFI_GUID                        *DriverName,
+  IN  EFI_FV_FILETYPE                 Type
   );
 
 /**
@@ -477,7 +479,7 @@ CoreDispatcher (
       // Untrused to Scheduled it would have already been loaded so we may need to
       // skip the LoadImage
       //
-      if (DriverEntry->ImageHandle == NULL) {
+      if (DriverEntry->ImageHandle == NULL && !DriverEntry->IsFvImage) {
         DEBUG ((DEBUG_INFO, "Loading driver %g\n", &DriverEntry->FileName));
         Status = CoreLoadImage (
                         FALSE,
@@ -530,21 +532,28 @@ CoreDispatcher (
       CoreReleaseDispatcherLock ();
 
  
-      REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
-        EFI_PROGRESS_CODE,
-        (EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_BEGIN),
-        &DriverEntry->ImageHandle,
-        sizeof (DriverEntry->ImageHandle)
-        );
-
-      Status = CoreStartImage (DriverEntry->ImageHandle, NULL, NULL);
-
-      REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
-        EFI_PROGRESS_CODE,
-        (EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_END),
-        &DriverEntry->ImageHandle,
-        sizeof (DriverEntry->ImageHandle)
-        );
+      if (DriverEntry->IsFvImage) {
+        //
+        // Produce a firmware volume block protocol for FvImage so it gets dispatched from. 
+        //
+        Status = CoreProcessFvImageFile (DriverEntry->Fv, DriverEntry->FvHandle, &DriverEntry->FileName);
+      } else {
+        REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
+          EFI_PROGRESS_CODE,
+          (EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_BEGIN),
+          &DriverEntry->ImageHandle,
+          sizeof (DriverEntry->ImageHandle)
+          );
+  
+        Status = CoreStartImage (DriverEntry->ImageHandle, NULL, NULL);
+  
+        REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
+          EFI_PROGRESS_CODE,
+          (EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_END),
+          &DriverEntry->ImageHandle,
+          sizeof (DriverEntry->ImageHandle)
+          );
+      }
 
       ReturnStatus = EFI_SUCCESS;
     }
@@ -784,6 +793,7 @@ CoreFvToDevicePath (
                                 EFI_CORE_DRIVER_ENTRY so that the PE image can be
                                 read out of the FV at a later time.
   @param  DriverName            Name of driver to add to mDiscoveredList.
+  @param  Type                  Fv File Type of file to add to mDiscoveredList.
 
   @retval EFI_SUCCESS           If driver was added to the mDiscoveredList.
   @retval EFI_ALREADY_STARTED   The driver has already been started. Only one
@@ -795,7 +805,8 @@ EFI_STATUS
 CoreAddToDriverList (
   IN  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv,
   IN  EFI_HANDLE                      FvHandle,
-  IN  EFI_GUID                        *DriverName
+  IN  EFI_GUID                        *DriverName,
+  IN  EFI_FV_FILETYPE                 Type
   )
 {
   EFI_CORE_DRIVER_ENTRY               *DriverEntry;
@@ -807,6 +818,9 @@ CoreAddToDriverList (
   //
   DriverEntry = AllocateZeroPool (sizeof (EFI_CORE_DRIVER_ENTRY));
   ASSERT (DriverEntry != NULL);
+  if (Type == EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE) {
+    DriverEntry->IsFvImage = TRUE;
+  }
 
   DriverEntry->Signature        = EFI_CORE_DRIVER_ENTRY_SIGNATURE;
   CopyGuid (&DriverEntry->FileName, DriverName);
@@ -1006,7 +1020,7 @@ CoreFwVolEventProtocolNotify (
   LIST_ENTRY                    *Link;
   UINT32                        AuthenticationStatus;
   UINTN                         SizeOfBuffer;
-
+  VOID                          *DepexBuffer;
 
   while (TRUE) {
     BufferSize = sizeof (EFI_HANDLE);
@@ -1120,17 +1134,84 @@ CoreFwVolEventProtocolNotify (
             if (FvFoundInHobFv2 (FvHandle, &NameGuid)) {
               continue;
             }
+
             //
-            // Found a firmware volume image. Produce a firmware volume block
-            // protocol for it so it gets dispatched from. This is usually a
-            // capsule.
+            // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has PEI depex section.
             //
-            CoreProcessFvImageFile (Fv, FvHandle, &NameGuid);
+            DepexBuffer  = NULL;
+            SizeOfBuffer = 0;
+            Status = Fv->ReadSection (
+                           Fv,
+                           &NameGuid,
+                           EFI_SECTION_PEI_DEPEX,
+                           0,
+                           &DepexBuffer,
+                           &SizeOfBuffer,
+                           &AuthenticationStatus
+                           );
+            if (!EFI_ERROR (Status)) {
+              //
+              // If PEI depex section is found, this FV image will be ignored in DXE phase.
+              // Now, DxeCore doesn't support FV image with more one type DEPEX section.
+              //
+              FreePool (DepexBuffer);
+              continue;
+            }
+
+            //
+            // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has SMM depex section.
+            //
+            DepexBuffer  = NULL;
+            SizeOfBuffer = 0;
+            Status = Fv->ReadSection (
+                           Fv,
+                           &NameGuid,
+                           EFI_SECTION_SMM_DEPEX,
+                           0,
+                           &DepexBuffer,
+                           &SizeOfBuffer,
+                           &AuthenticationStatus
+                           );
+            if (!EFI_ERROR (Status)) {
+              //
+              // If SMM depex section is found, this FV image will be ignored in DXE phase.
+              // Now, DxeCore doesn't support FV image with more one type DEPEX section.
+              //
+              FreePool (DepexBuffer);
+              continue;
+            }
+
+            //
+            // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has DXE depex section.
+            //
+            DepexBuffer  = NULL;
+            SizeOfBuffer = 0;
+            Status = Fv->ReadSection (
+                           Fv,
+                           &NameGuid,
+                           EFI_SECTION_DXE_DEPEX,
+                           0,
+                           &DepexBuffer,
+                           &SizeOfBuffer,
+                           &AuthenticationStatus
+                           );
+            if (EFI_ERROR (Status)) {
+              //
+              // If no depex section, produce a firmware volume block protocol for it so it gets dispatched from. 
+              //
+              CoreProcessFvImageFile (Fv, FvHandle, &NameGuid);
+            } else {
+              //
+              // If depex section is found, this FV image will be dispatched until its depex is evaluated to TRUE.
+              //
+              FreePool (DepexBuffer);
+              CoreAddToDriverList (Fv, FvHandle, &NameGuid, Type);
+            }
           } else {
             //
             // Transition driver from Undiscovered to Discovered state
             //
-            CoreAddToDriverList (Fv, FvHandle, &NameGuid);
+            CoreAddToDriverList (Fv, FvHandle, &NameGuid, Type);
           }
         }
       } while (!EFI_ERROR (GetNextFileStatus));

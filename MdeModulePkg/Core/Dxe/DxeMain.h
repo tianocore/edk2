@@ -164,6 +164,7 @@ typedef struct {
   BOOLEAN                         DepexProtocolError;
 
   EFI_HANDLE                      ImageHandle;
+  BOOLEAN                         IsFvImage;
 
 } EFI_CORE_DRIVER_ENTRY;
 
