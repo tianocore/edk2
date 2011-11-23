@@ -1250,7 +1250,7 @@ ParseIfrData (
         //
         // Numeric minimum value will be used as default value when no default is specified. 
         //
-        DefaultData.Type        = DEFAULT_VALUE_FROM_DEFAULT;
+        DefaultData.Type        = DefaultValueFromDefault;
         switch (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE) {
         case EFI_IFR_NUMERIC_SIZE_1:
           DefaultData.Value = (UINT64) IfrOneOf->data.u8.MinValue;
@@ -1404,13 +1404,13 @@ ParseIfrData (
         //
         // When flag is set, defautl value is TRUE.
         //
-        DefaultData.Type     = DEFAULT_VALUE_FROM_FLAG;
+        DefaultData.Type     = DefaultValueFromFlag;
         DefaultData.Value    = 1;
       } else {
         //
         // When flag is not set, defautl value is FASLE.
         //
-        DefaultData.Type     = DEFAULT_VALUE_FROM_DEFAULT;
+        DefaultData.Type     = DefaultValueFromDefault;
         DefaultData.Value    = 0;
       }
       //
@@ -1430,13 +1430,13 @@ ParseIfrData (
         //
         // When flag is set, defautl value is TRUE.
         //
-        DefaultData.Type     = DEFAULT_VALUE_FROM_FLAG;
+        DefaultData.Type     = DefaultValueFromFlag;
         DefaultData.Value    = 1;
       } else {
         //
         // When flag is not set, defautl value is FASLE.
         //
-        DefaultData.Type     = DEFAULT_VALUE_FROM_DEFAULT;        
+        DefaultData.Type     = DefaultValueFromDefault;        
         DefaultData.Value    = 0;
       }
       //
@@ -1664,7 +1664,7 @@ ParseIfrData (
         
         // Prepare new DefaultValue
         //
-        DefaultData.Type  = DEFAULT_VALUE_FROM_FLAG;
+        DefaultData.Type  = DefaultValueFromFlag;
         DefaultData.Value = IfrOneOfOption->Value.u64;
         if ((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT) == EFI_IFR_OPTION_DEFAULT) {
           DefaultData.DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
@@ -1689,7 +1689,7 @@ ParseIfrData (
         //
         // Prepare new DefaultValue
         //        
-        DefaultData.Type        = DEFAULT_VALUE_FROM_DEFAULT;
+        DefaultData.Type        = DefaultValueFromDefault;
         DefaultData.Value       = IfrOneOfOption->Value.u64;        
         for (LinkData = DefaultIdArray->Entry.ForwardLink; LinkData != &DefaultIdArray->Entry; LinkData = LinkData->ForwardLink) {
           DefaultDataPtr = BASE_CR (LinkData, IFR_DEFAULT_DATA, Entry); 
@@ -1724,7 +1724,7 @@ ParseIfrData (
       //
       // Prepare new DefaultValue
       //
-      DefaultData.Type        = DEFAULT_VALUE_FROM_OPCODE;
+      DefaultData.Type        = DefaultValueFromOpcode;
       DefaultData.DefaultId   = VarDefaultId;
       DefaultData.Value       = IfrDefault->Value.u64;  
       

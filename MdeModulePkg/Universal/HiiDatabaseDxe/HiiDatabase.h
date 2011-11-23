@@ -84,9 +84,9 @@ typedef struct {
 // Get default value from IFR data.
 //
 typedef enum {
-  DEFAULT_VALUE_FROM_DEFAULT = 0,   // Get from the minimum or first one when not set default value.
-  DEFAULT_VALUE_FROM_FLAG,          // Get default value from the defalut flag.
-  DEFAULT_VALUE_FROM_OPCODE         // Get default value from default opcode, highest priority.
+  DefaultValueFromDefault = 0,     // Get from the minimum or first one when not set default value.
+  DefaultValueFromFlag,            // Get default value from the defalut flag.
+  DefaultValueFromOpcode           // Get default value from default opcode, highest priority.
 } DEFAULT_VALUE_TYPE;
 
 typedef struct {

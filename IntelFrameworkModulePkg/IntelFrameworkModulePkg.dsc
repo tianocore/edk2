@@ -73,7 +73,6 @@
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   PalLib|MdePkg/Library/BasePalLibNull/BasePalLibNull.inf
 
 [LibraryClasses.common.PEIM]
