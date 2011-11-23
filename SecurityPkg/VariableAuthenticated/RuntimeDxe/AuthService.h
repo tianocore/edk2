@@ -49,6 +49,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 #define SIGSUPPORT_NUM 2
 
+///
+/// Struct to record signature requirement defined by UEFI spec.
+/// For SigHeaderSize and SigDataSize, ((UINT32) ~0) means NO exact length requirement for this field.
+///
+typedef struct {
+  EFI_GUID    SigType;
+  // Expected SignatureHeader size in Bytes.
+  UINT32      SigHeaderSize;
+  // Expected SignatureData size in Bytes.
+  UINT32      SigDataSize;
+} EFI_SIGNATURE_ITEM;
 
 /**
   Process variable with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS/EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set.
@@ -114,6 +125,26 @@ AutenticatedVariableServiceInitialize (
 VOID
 CryptLibraryInitialize (
   VOID
+  );
+
+/**
+  Check input data form to make sure it is a valid EFI_SIGNATURE_LIST for PK/KEK variable.
+
+  @param[in]  VariableName                Name of Variable to be check.
+  @param[in]  VendorGuid                  Variable vendor GUID.
+  @param[in]  Data                        Point to the variable data to be checked.
+  @param[in]  DataSize                    Size of Data.
+
+  @return EFI_INVALID_PARAMETER           Invalid signature list format.
+  @return EFI_SUCCESS                     Passed signature list format check successfully.
+  
+**/
+EFI_STATUS
+CheckSignatureListFormat(
+  IN  CHAR16                    *VariableName,
+  IN  EFI_GUID                  *VendorGuid,
+  IN  VOID                      *Data,
+  IN  UINTN                     DataSize
   );
 
 /**

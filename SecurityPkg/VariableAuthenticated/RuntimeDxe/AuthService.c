@@ -48,6 +48,23 @@ VOID  *mStorageArea = NULL;
 //
 UINT8 *mSerializationRuntimeBuffer = NULL;
 
+//
+// Requirement for different signature type which have been defined in UEFI spec.
+// These data are used to peform SignatureList format check while setting PK/KEK variable.
+//
+EFI_SIGNATURE_ITEM mSupportSigItem[] = {
+//{SigType,                       SigHeaderSize,   SigDataSize  }
+  {EFI_CERT_SHA256_GUID,          0,               32           },
+  {EFI_CERT_RSA2048_GUID,         0,               256          },
+  {EFI_CERT_RSA2048_SHA256_GUID,  0,               256          },
+  {EFI_CERT_SHA1_GUID,            0,               20           },
+  {EFI_CERT_RSA2048_SHA1_GUID,    0,               256          },
+  {EFI_CERT_X509_GUID,            0,               ((UINT32) ~0)},
+  {EFI_CERT_SHA224_GUID,          0,               28           },
+  {EFI_CERT_SHA384_GUID,          0,               48           },
+  {EFI_CERT_SHA512_GUID,          0,               64           }
+};
+
 /**
   Internal function to delete a Variable given its name and GUID, no authentication
   required.
@@ -653,6 +670,100 @@ UpdatePlatformMode (
 }
 
 /**
+  Check input data form to make sure it is a valid EFI_SIGNATURE_LIST for PK/KEK variable.
+
+  @param[in]  VariableName                Name of Variable to be check.
+  @param[in]  VendorGuid                  Variable vendor GUID.
+  @param[in]  Data                        Point to the variable data to be checked.
+  @param[in]  DataSize                    Size of Data.
+
+  @return EFI_INVALID_PARAMETER           Invalid signature list format.
+  @return EFI_SUCCESS                     Passed signature list format check successfully.
+  
+**/
+EFI_STATUS
+CheckSignatureListFormat(
+  IN  CHAR16                    *VariableName,
+  IN  EFI_GUID                  *VendorGuid,
+  IN  VOID                      *Data,
+  IN  UINTN                     DataSize
+  )
+{
+  EFI_SIGNATURE_LIST     *SigList;
+  UINTN                  SigDataSize;
+  UINT32                 Index;
+  UINT32                 SigCount;
+  BOOLEAN                IsPk;
+
+  if (DataSize == 0) {
+    return EFI_SUCCESS;
+  }
+
+  ASSERT (VariableName != NULL && VendorGuid != NULL && Data != NULL);
+
+  if (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && (StrCmp (VariableName, EFI_PLATFORM_KEY_NAME) == 0)){
+    IsPk = TRUE;
+  } else if (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && (StrCmp (VariableName, EFI_KEY_EXCHANGE_KEY_NAME) == 0)) {
+    IsPk = FALSE;
+  } else {
+    return EFI_SUCCESS;
+  }
+
+  SigCount = 0;
+  SigList  = (EFI_SIGNATURE_LIST *) Data;
+  SigDataSize  = DataSize;
+
+  //
+  // Walk throuth the input signature list and check the data format.
+  // If any signature is incorrectly formed, the whole check will fail.
+  //
+  while ((SigDataSize > 0) && (SigDataSize >= SigList->SignatureListSize)) {
+    for (Index = 0; Index < (sizeof (mSupportSigItem) / sizeof (EFI_SIGNATURE_ITEM)); Index++ ) {
+      if (CompareGuid (&SigList->SignatureType, &mSupportSigItem[Index].SigType)) {
+        //
+        // The value of SignatureSize should always be 16 (size of SignatureOwner 
+        // component) add the data length according to signature type.
+        //
+        if (mSupportSigItem[Index].SigDataSize != ((UINT32) ~0) && 
+          (SigList->SignatureSize - sizeof (EFI_GUID)) != mSupportSigItem[Index].SigDataSize) {
+          return EFI_INVALID_PARAMETER;
+        }
+        if (mSupportSigItem[Index].SigHeaderSize != ((UINTN) ~0) &&
+          SigList->SignatureHeaderSize != mSupportSigItem[Index].SigHeaderSize) {
+          return EFI_INVALID_PARAMETER;
+        }
+        break;
+      }
+    }
+
+    if (Index == (sizeof (mSupportSigItem) / sizeof (EFI_SIGNATURE_ITEM))) {
+      //
+      // Undefined signature type.
+      //
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if ((SigList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - SigList->SignatureHeaderSize) % SigList->SignatureSize != 0) {
+      return EFI_INVALID_PARAMETER;
+    }
+    SigCount += (SigList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - SigList->SignatureHeaderSize) / SigList->SignatureSize;
+    
+    SigDataSize -= SigList->SignatureListSize;
+    SigList = (EFI_SIGNATURE_LIST *) ((UINT8 *) SigList + SigList->SignatureListSize);
+  }
+
+  if (((UINTN) SigList - (UINTN) Data) != DataSize) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (IsPk && SigCount > 1) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Process variable with platform key for verification.
 
   @param[in]  VariableName                Name of Variable to be found.
@@ -757,6 +868,15 @@ ProcessVarWithPk (
       OldPkData = (EFI_SIGNATURE_DATA *) ((UINT8 *) OldPkList + sizeof (EFI_SIGNATURE_LIST) + OldPkList->SignatureHeaderSize);
       Status    = VerifyCounterBasedPayload (Data, DataSize, OldPkData->SignatureData);
       if (!EFI_ERROR (Status)) {
+        Status = CheckSignatureListFormat(
+                   VariableName,
+                   VendorGuid,
+                   (UINT8*)Data + AUTHINFO_SIZE,
+                   DataSize - AUTHINFO_SIZE);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+        
         Status = UpdateVariable (
                    VariableName,
                    VendorGuid,
@@ -807,6 +927,11 @@ ProcessVarWithPk (
       TimeStamp = NULL;
       Payload = Data;
       PayloadSize = DataSize;
+    }
+
+    Status = CheckSignatureListFormat(VariableName, VendorGuid, Payload, PayloadSize);
+    if (EFI_ERROR (Status)) {
+      return Status;
     }
 
     Status = UpdateVariable (
@@ -1494,6 +1619,11 @@ Exit:
 
   if (!VerifyStatus) {
     return EFI_SECURITY_VIOLATION;
+  }
+
+  Status = CheckSignatureListFormat(VariableName, VendorGuid, PayloadPtr, PayloadSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   if ((PayloadSize == 0) && (VarDel != NULL)) {
